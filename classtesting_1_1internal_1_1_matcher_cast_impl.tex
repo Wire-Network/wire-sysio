@@ -1,0 +1,71 @@
+\doxysection{testing\+::internal\+::Matcher\+Cast\+Impl\texorpdfstring{$<$}{<} T, M \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classtesting_1_1internal_1_1_matcher_cast_impl}{}\label{classtesting_1_1internal_1_1_matcher_cast_impl}\index{testing::internal::MatcherCastImpl$<$ T, M $>$@{testing::internal::MatcherCastImpl$<$ T, M $>$}}
+
+
+{\ttfamily \#include $<$gmock-\/matchers.\+h$>$}
+
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static \mbox{\hyperlink{classtesting_1_1_matcher}{Matcher}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \mbox{\hyperlink{classtesting_1_1internal_1_1_matcher_cast_impl_a3060220a0ff6b449dcc0be874e0a7dc0}{Cast}} (const M \&polymorphic\+\_\+matcher\+\_\+or\+\_\+value)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, typename M$>$\newline
+class testing\+::internal\+::\+Matcher\+Cast\+Impl$<$ T, M $>$}
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l00646}{646}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_matcher_cast_impl_a3060220a0ff6b449dcc0be874e0a7dc0}\index{testing::internal::MatcherCastImpl$<$ T, M $>$@{testing::internal::MatcherCastImpl$<$ T, M $>$}!Cast@{Cast}}
+\index{Cast@{Cast}!testing::internal::MatcherCastImpl$<$ T, M $>$@{testing::internal::MatcherCastImpl$<$ T, M $>$}}
+\doxysubsubsection{\texorpdfstring{Cast()}{Cast()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_matcher_cast_impl_a3060220a0ff6b449dcc0be874e0a7dc0} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename M $>$ \\
+static \mbox{\hyperlink{classtesting_1_1_matcher}{Matcher}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \mbox{\hyperlink{classtesting_1_1internal_1_1_matcher_cast_impl}{testing\+::internal\+::\+Matcher\+Cast\+Impl}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, M $>$\+::\+Cast (\begin{DoxyParamCaption}\item[{const M \&}]{polymorphic\+\_\+matcher\+\_\+or\+\_\+value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l00648}{648}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00648\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00649\ \ \ \ \ \textcolor{comment}{//\ M\ can\ be\ a\ polymorphic\ matcher,\ in\ which\ case\ we\ want\ to\ use}}
+\DoxyCodeLine{00650\ \ \ \ \ \textcolor{comment}{//\ its\ conversion\ operator\ to\ create\ Matcher<T>.\ \ Or\ it\ can\ be\ a\ value}}
+\DoxyCodeLine{00651\ \ \ \ \ \textcolor{comment}{//\ that\ should\ be\ passed\ to\ the\ Matcher<T>'s\ constructor.}}
+\DoxyCodeLine{00652\ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00653\ \ \ \ \ \textcolor{comment}{//\ We\ can't\ call\ Matcher<T>(polymorphic\_matcher\_or\_value)\ when\ M\ is\ a}}
+\DoxyCodeLine{00654\ \ \ \ \ \textcolor{comment}{//\ polymorphic\ matcher\ because\ it'll\ be\ ambiguous\ if\ T\ has\ an\ implicit}}
+\DoxyCodeLine{00655\ \ \ \ \ \textcolor{comment}{//\ constructor\ from\ M\ (this\ usually\ happens\ when\ T\ has\ an\ implicit}}
+\DoxyCodeLine{00656\ \ \ \ \ \textcolor{comment}{//\ constructor\ from\ any\ type).}}
+\DoxyCodeLine{00657\ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00658\ \ \ \ \ \textcolor{comment}{//\ It\ won't\ work\ to\ unconditionally\ implict\_cast}}
+\DoxyCodeLine{00659\ \ \ \ \ \textcolor{comment}{//\ polymorphic\_matcher\_or\_value\ to\ Matcher<T>\ because\ it\ won't\ trigger}}
+\DoxyCodeLine{00660\ \ \ \ \ \textcolor{comment}{//\ a\ user-\/defined\ conversion\ from\ M\ to\ T\ if\ one\ exists\ (assuming\ M\ is}}
+\DoxyCodeLine{00661\ \ \ \ \ \textcolor{comment}{//\ a\ value).}}
+\DoxyCodeLine{00662\ \ \ \ \ \textcolor{keywordflow}{return}\ CastImpl(}
+\DoxyCodeLine{00663\ \ \ \ \ \ \ \ \ polymorphic\_matcher\_or\_value,}
+\DoxyCodeLine{00664\ \ \ \ \ \ \ \ \ BooleanConstant<}
+\DoxyCodeLine{00665\ \ \ \ \ \ \ \ \ \ \ \ \ internal::ImplicitlyConvertible<M,\ Matcher<T>\ >\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{::value}}>(),}
+\DoxyCodeLine{00666\ \ \ \ \ \ \ \ \ BooleanConstant<}
+\DoxyCodeLine{00667\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_implicitly_convertible_aea51cecabca681fb75659e224771b7b7}{internal::ImplicitlyConvertible<M,\ T>::value}}>());}
+\DoxyCodeLine{00668\ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{classtesting_1_1internal_1_1_matcher_cast_impl_a3060220a0ff6b449dcc0be874e0a7dc0_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/include/gmock/\mbox{\hyperlink{gmock-matchers_8h}{gmock-\/matchers.\+h}}\end{DoxyCompactItemize}

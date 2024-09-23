@@ -1,0 +1,411 @@
+\doxysection{internal\+::Hasher\texorpdfstring{$<$}{<} Encoding, Allocator \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classinternal_1_1_hasher}{}\label{classinternal_1_1_hasher}\index{internal::Hasher$<$ Encoding, Allocator $>$@{internal::Hasher$<$ Encoding, Allocator $>$}}
+
+
+{\ttfamily \#include $<$schema.\+h$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef Encoding\+::\+Ch \mbox{\hyperlink{classinternal_1_1_hasher_a9f0ed5c436aa1b384141eaa1a9301633}{Ch}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classinternal_1_1_hasher_a7b6abfdd3bdc60064a2322cdd20708c1}{Hasher}} (\mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} \texorpdfstring{$\ast$}{*}allocator=0, size\+\_\+t stack\+Capacity=k\+Default\+Size)
+\item 
+bool \mbox{\hyperlink{classinternal_1_1_hasher_a57c656866aa08cc7c448ce47b7a243c3}{Null}} ()
+\item 
+bool \mbox{\hyperlink{classinternal_1_1_hasher_a11efd784a4e9c4f8a3dc281552df0486}{Bool}} (bool b)
+\item 
+bool \mbox{\hyperlink{classinternal_1_1_hasher_aadbadf98ee7c9ab03a636e0f06d38bac}{Int}} (int i)
+\item 
+bool \mbox{\hyperlink{classinternal_1_1_hasher_a4401600c24c817a45cea6c281438e5b4}{Uint}} (unsigned u)
+\item 
+bool \mbox{\hyperlink{classinternal_1_1_hasher_ae0579cd54b3c545f77452543793b9a97}{Int64}} (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} i)
+\item 
+bool \mbox{\hyperlink{classinternal_1_1_hasher_a14832ac4ec204f1065b929df2c255457}{Uint64}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} u)
+\item 
+bool \mbox{\hyperlink{classinternal_1_1_hasher_a83abe847e24ed88d5aab092d840e37c1}{Double}} (double d)
+\item 
+bool \mbox{\hyperlink{classinternal_1_1_hasher_ae277289ad2fb3a938a6507e566d3c5e2}{Raw\+Number}} (const \mbox{\hyperlink{classinternal_1_1_hasher_a9f0ed5c436aa1b384141eaa1a9301633}{Ch}} \texorpdfstring{$\ast$}{*}str, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}, bool)
+\item 
+bool \mbox{\hyperlink{classinternal_1_1_hasher_a885f2bf42f2bb64d6f9443129dce3883}{String}} (const \mbox{\hyperlink{classinternal_1_1_hasher_a9f0ed5c436aa1b384141eaa1a9301633}{Ch}} \texorpdfstring{$\ast$}{*}str, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}, bool)
+\item 
+bool \mbox{\hyperlink{classinternal_1_1_hasher_a1607d6cac3daab9725e442e38d121028}{Start\+Object}} ()
+\item 
+bool \mbox{\hyperlink{classinternal_1_1_hasher_a1b34d88f85f9c6a739c1f9038f14f078}{Key}} (const \mbox{\hyperlink{classinternal_1_1_hasher_a9f0ed5c436aa1b384141eaa1a9301633}{Ch}} \texorpdfstring{$\ast$}{*}str, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}, bool copy)
+\item 
+bool \mbox{\hyperlink{classinternal_1_1_hasher_a7050f1552d88967944195163a6a0b08e}{End\+Object}} (\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} member\+Count)
+\item 
+bool \mbox{\hyperlink{classinternal_1_1_hasher_a2ceb3cc00216f6b6ce66907856a16404}{Start\+Array}} ()
+\item 
+bool \mbox{\hyperlink{classinternal_1_1_hasher_ad445b2730be23e18b4dec2c4d1033419}{End\+Array}} (\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} element\+Count)
+\item 
+bool \mbox{\hyperlink{classinternal_1_1_hasher_ae09fee05c56194031e8af94a1b1be145}{Is\+Valid}} () const
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{classinternal_1_1_hasher_ac221aaaa0d643aae553125e76aed7b47}{Get\+Hash\+Code}} () const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}$>$\newline
+class internal\+::\+Hasher$<$ Encoding, Allocator $>$}
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l00220}{220}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classinternal_1_1_hasher_a9f0ed5c436aa1b384141eaa1a9301633}\index{internal::Hasher$<$ Encoding, Allocator $>$@{internal::Hasher$<$ Encoding, Allocator $>$}!Ch@{Ch}}
+\index{Ch@{Ch}!internal::Hasher$<$ Encoding, Allocator $>$@{internal::Hasher$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{Ch}{Ch}}
+{\footnotesize\ttfamily \label{classinternal_1_1_hasher_a9f0ed5c436aa1b384141eaa1a9301633} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+Encoding\+::\+Ch \mbox{\hyperlink{classinternal_1_1_hasher}{internal\+::\+Hasher}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Ch}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l00222}{222}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classinternal_1_1_hasher_a7b6abfdd3bdc60064a2322cdd20708c1}\index{internal::Hasher$<$ Encoding, Allocator $>$@{internal::Hasher$<$ Encoding, Allocator $>$}!Hasher@{Hasher}}
+\index{Hasher@{Hasher}!internal::Hasher$<$ Encoding, Allocator $>$@{internal::Hasher$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{Hasher()}{Hasher()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_hasher_a7b6abfdd3bdc60064a2322cdd20708c1} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+\mbox{\hyperlink{classinternal_1_1_hasher}{internal\+::\+Hasher}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Hasher (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} \texorpdfstring{$\ast$}{*}}]{allocator}{ = {\ttfamily 0}, }\item[{size\+\_\+t}]{stack\+Capacity}{ = {\ttfamily kDefaultSize}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l00224}{224}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00224\ :\ stack\_(allocator,\ stackCapacity)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classinternal_1_1_hasher_a11efd784a4e9c4f8a3dc281552df0486}\index{internal::Hasher$<$ Encoding, Allocator $>$@{internal::Hasher$<$ Encoding, Allocator $>$}!Bool@{Bool}}
+\index{Bool@{Bool}!internal::Hasher$<$ Encoding, Allocator $>$@{internal::Hasher$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{Bool()}{Bool()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_hasher_a11efd784a4e9c4f8a3dc281552df0486} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+bool \mbox{\hyperlink{classinternal_1_1_hasher}{internal\+::\+Hasher}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\mbox{\hyperlink{struct_bool}{\+::\+Bool}} (\begin{DoxyParamCaption}\item[{bool}]{b}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l00227}{227}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00227\ \{\ \textcolor{keywordflow}{return}\ WriteType(b\ ?\ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7a209434e5edd66630011ca19d710d7cd6}{kTrueType}}\ :\ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7a062b8296274a258acf0e142868684c54}{kFalseType}});\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classinternal_1_1_hasher_a83abe847e24ed88d5aab092d840e37c1}\index{internal::Hasher$<$ Encoding, Allocator $>$@{internal::Hasher$<$ Encoding, Allocator $>$}!Double@{Double}}
+\index{Double@{Double}!internal::Hasher$<$ Encoding, Allocator $>$@{internal::Hasher$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{Double()}{Double()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_hasher_a83abe847e24ed88d5aab092d840e37c1} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+bool \mbox{\hyperlink{classinternal_1_1_hasher}{internal\+::\+Hasher}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Double (\begin{DoxyParamCaption}\item[{double}]{d}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l00232}{232}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00232\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ }
+\DoxyCodeLine{00233\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_c_l_i_a713b5a1bbb98173dbc74edd4f295a582}{Number}}\ n;\ }
+\DoxyCodeLine{00234\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (d\ <\ 0)\ n.u.i\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\textcolor{keyword}{>}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}});}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \ \ \ \ \ \ n.u.u\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\textcolor{keyword}{>}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}});\ }
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ n.d\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}};}
+\DoxyCodeLine{00237\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ WriteNumber(n);}
+\DoxyCodeLine{00238\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classinternal_1_1_hasher_ad445b2730be23e18b4dec2c4d1033419}\index{internal::Hasher$<$ Encoding, Allocator $>$@{internal::Hasher$<$ Encoding, Allocator $>$}!EndArray@{EndArray}}
+\index{EndArray@{EndArray}!internal::Hasher$<$ Encoding, Allocator $>$@{internal::Hasher$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{EndArray()}{EndArray()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_hasher_ad445b2730be23e18b4dec2c4d1033419} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+bool \mbox{\hyperlink{classinternal_1_1_hasher}{internal\+::\+Hasher}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+End\+Array (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{element\+Count}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l00262}{262}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00262\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ }
+\DoxyCodeLine{00263\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ h\ =\ Hash(0,\ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7af41527d6925efa3c5c3dadb23dfef7c8}{kArrayType}});}
+\DoxyCodeLine{00264\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}*\ e\ =\ stack\_.template\ Pop<uint64\_t>(elementCount);}
+\DoxyCodeLine{00265\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\ i\ =\ 0;\ i\ <\ elementCount;\ i++)}
+\DoxyCodeLine{00266\ \ \ \ \ \ \ \ \ \ \ \ \ h\ =\ Hash(h,\ e[i]);\ \textcolor{comment}{//\ Use\ hash\ to\ achieve\ element\ order\ sensitive}}
+\DoxyCodeLine{00267\ \ \ \ \ \ \ \ \ *stack\_.template\ Push<uint64\_t>()\ =\ h;}
+\DoxyCodeLine{00268\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00269\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classinternal_1_1_hasher_a7050f1552d88967944195163a6a0b08e}\index{internal::Hasher$<$ Encoding, Allocator $>$@{internal::Hasher$<$ Encoding, Allocator $>$}!EndObject@{EndObject}}
+\index{EndObject@{EndObject}!internal::Hasher$<$ Encoding, Allocator $>$@{internal::Hasher$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{EndObject()}{EndObject()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_hasher_a7050f1552d88967944195163a6a0b08e} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+bool \mbox{\hyperlink{classinternal_1_1_hasher}{internal\+::\+Hasher}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+End\+Object (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{member\+Count}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l00252}{252}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00252\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ }
+\DoxyCodeLine{00253\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ h\ =\ Hash(0,\ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7a146f46700e905e8df96a6a90b5c7640f}{kObjectType}});}
+\DoxyCodeLine{00254\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}*\ kv\ =\ stack\_.template\ Pop<uint64\_t>(memberCount\ *\ 2);}
+\DoxyCodeLine{00255\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\ i\ =\ 0;\ i\ <\ memberCount;\ i++)}
+\DoxyCodeLine{00256\ \ \ \ \ \ \ \ \ \ \ \ \ h\ \string^=\ Hash(kv[i\ *\ 2],\ kv[i\ *\ 2\ +\ 1]);\ \ \textcolor{comment}{//\ Use\ xor\ to\ achieve\ member\ order\ insensitive}}
+\DoxyCodeLine{00257\ \ \ \ \ \ \ \ \ *stack\_.template\ Push<uint64\_t>()\ =\ h;}
+\DoxyCodeLine{00258\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00259\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classinternal_1_1_hasher_ac221aaaa0d643aae553125e76aed7b47}\index{internal::Hasher$<$ Encoding, Allocator $>$@{internal::Hasher$<$ Encoding, Allocator $>$}!GetHashCode@{GetHashCode}}
+\index{GetHashCode@{GetHashCode}!internal::Hasher$<$ Encoding, Allocator $>$@{internal::Hasher$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{GetHashCode()}{GetHashCode()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_hasher_ac221aaaa0d643aae553125e76aed7b47} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{classinternal_1_1_hasher}{internal\+::\+Hasher}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Get\+Hash\+Code (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l00273}{273}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00273\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00274\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\mbox{\hyperlink{classinternal_1_1_hasher_ae09fee05c56194031e8af94a1b1be145}{IsValid}}());}
+\DoxyCodeLine{00275\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *stack\_.template\ Top<uint64\_t>();}
+\DoxyCodeLine{00276\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classinternal_1_1_hasher_ac221aaaa0d643aae553125e76aed7b47_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classinternal_1_1_hasher_aadbadf98ee7c9ab03a636e0f06d38bac}\index{internal::Hasher$<$ Encoding, Allocator $>$@{internal::Hasher$<$ Encoding, Allocator $>$}!Int@{Int}}
+\index{Int@{Int}!internal::Hasher$<$ Encoding, Allocator $>$@{internal::Hasher$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{Int()}{Int()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_hasher_aadbadf98ee7c9ab03a636e0f06d38bac} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+bool \mbox{\hyperlink{classinternal_1_1_hasher}{internal\+::\+Hasher}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Int (\begin{DoxyParamCaption}\item[{int}]{i}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l00228}{228}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00228\ \{\ \mbox{\hyperlink{namespace_c_l_i_a713b5a1bbb98173dbc74edd4f295a582}{Number}}\ n;\ n.u.i\ =\ i;\ n.d\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{double}\textcolor{keyword}{>}(i);\ \textcolor{keywordflow}{return}\ WriteNumber(n);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classinternal_1_1_hasher_ae0579cd54b3c545f77452543793b9a97}\index{internal::Hasher$<$ Encoding, Allocator $>$@{internal::Hasher$<$ Encoding, Allocator $>$}!Int64@{Int64}}
+\index{Int64@{Int64}!internal::Hasher$<$ Encoding, Allocator $>$@{internal::Hasher$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{Int64()}{Int64()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_hasher_ae0579cd54b3c545f77452543793b9a97} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+bool \mbox{\hyperlink{classinternal_1_1_hasher}{internal\+::\+Hasher}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Int64 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}}]{i}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l00230}{230}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00230\ \{\ \mbox{\hyperlink{namespace_c_l_i_a713b5a1bbb98173dbc74edd4f295a582}{Number}}\ n;\ n.u.i\ =\ i;\ n.d\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{double}\textcolor{keyword}{>}(i);\ \textcolor{keywordflow}{return}\ WriteNumber(n);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classinternal_1_1_hasher_ae09fee05c56194031e8af94a1b1be145}\index{internal::Hasher$<$ Encoding, Allocator $>$@{internal::Hasher$<$ Encoding, Allocator $>$}!IsValid@{IsValid}}
+\index{IsValid@{IsValid}!internal::Hasher$<$ Encoding, Allocator $>$@{internal::Hasher$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{IsValid()}{IsValid()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_hasher_ae09fee05c56194031e8af94a1b1be145} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+bool \mbox{\hyperlink{classinternal_1_1_hasher}{internal\+::\+Hasher}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Is\+Valid (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l00271}{271}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00271\ \{\ \textcolor{keywordflow}{return}\ stack\_.GetSize()\ ==\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}});\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classinternal_1_1_hasher_ae09fee05c56194031e8af94a1b1be145_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classinternal_1_1_hasher_a1b34d88f85f9c6a739c1f9038f14f078}\index{internal::Hasher$<$ Encoding, Allocator $>$@{internal::Hasher$<$ Encoding, Allocator $>$}!Key@{Key}}
+\index{Key@{Key}!internal::Hasher$<$ Encoding, Allocator $>$@{internal::Hasher$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{Key()}{Key()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_hasher_a1b34d88f85f9c6a739c1f9038f14f078} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+bool \mbox{\hyperlink{classinternal_1_1_hasher}{internal\+::\+Hasher}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Key (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classinternal_1_1_hasher_a9f0ed5c436aa1b384141eaa1a9301633}{Ch}} \texorpdfstring{$\ast$}{*}}]{str}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{len}{, }\item[{bool}]{copy}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l00251}{251}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00251\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classinternal_1_1_hasher_a885f2bf42f2bb64d6f9443129dce3883}{String}}(str,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ copy);\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=341pt]{classinternal_1_1_hasher_a1b34d88f85f9c6a739c1f9038f14f078_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classinternal_1_1_hasher_a57c656866aa08cc7c448ce47b7a243c3}\index{internal::Hasher$<$ Encoding, Allocator $>$@{internal::Hasher$<$ Encoding, Allocator $>$}!Null@{Null}}
+\index{Null@{Null}!internal::Hasher$<$ Encoding, Allocator $>$@{internal::Hasher$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{Null()}{Null()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_hasher_a57c656866aa08cc7c448ce47b7a243c3} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+bool \mbox{\hyperlink{classinternal_1_1_hasher}{internal\+::\+Hasher}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Null (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l00226}{226}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00226\ \{\ \textcolor{keywordflow}{return}\ WriteType(\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7aa09befbfb4f2e1409f237817979d8087}{kNullType}});\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classinternal_1_1_hasher_ae277289ad2fb3a938a6507e566d3c5e2}\index{internal::Hasher$<$ Encoding, Allocator $>$@{internal::Hasher$<$ Encoding, Allocator $>$}!RawNumber@{RawNumber}}
+\index{RawNumber@{RawNumber}!internal::Hasher$<$ Encoding, Allocator $>$@{internal::Hasher$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{RawNumber()}{RawNumber()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_hasher_ae277289ad2fb3a938a6507e566d3c5e2} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+bool \mbox{\hyperlink{classinternal_1_1_hasher}{internal\+::\+Hasher}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Raw\+Number (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classinternal_1_1_hasher_a9f0ed5c436aa1b384141eaa1a9301633}{Ch}} \texorpdfstring{$\ast$}{*}}]{str}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{len}{, }\item[{bool}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l00240}{240}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00241\ \ \ \ \ \ \ \ \ WriteBuffer(\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7afc9f813b7aaf71911bdae20a86b2702d}{kNumberType}},\ str,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ *\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{classinternal_1_1_hasher_a9f0ed5c436aa1b384141eaa1a9301633}{Ch}}));}
+\DoxyCodeLine{00242\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00243\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classinternal_1_1_hasher_a2ceb3cc00216f6b6ce66907856a16404}\index{internal::Hasher$<$ Encoding, Allocator $>$@{internal::Hasher$<$ Encoding, Allocator $>$}!StartArray@{StartArray}}
+\index{StartArray@{StartArray}!internal::Hasher$<$ Encoding, Allocator $>$@{internal::Hasher$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{StartArray()}{StartArray()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_hasher_a2ceb3cc00216f6b6ce66907856a16404} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+bool \mbox{\hyperlink{classinternal_1_1_hasher}{internal\+::\+Hasher}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Start\+Array (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l00261}{261}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00261\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classinternal_1_1_hasher_a1607d6cac3daab9725e442e38d121028}\index{internal::Hasher$<$ Encoding, Allocator $>$@{internal::Hasher$<$ Encoding, Allocator $>$}!StartObject@{StartObject}}
+\index{StartObject@{StartObject}!internal::Hasher$<$ Encoding, Allocator $>$@{internal::Hasher$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{StartObject()}{StartObject()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_hasher_a1607d6cac3daab9725e442e38d121028} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+bool \mbox{\hyperlink{classinternal_1_1_hasher}{internal\+::\+Hasher}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Start\+Object (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l00250}{250}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00250\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classinternal_1_1_hasher_a885f2bf42f2bb64d6f9443129dce3883}\index{internal::Hasher$<$ Encoding, Allocator $>$@{internal::Hasher$<$ Encoding, Allocator $>$}!String@{String}}
+\index{String@{String}!internal::Hasher$<$ Encoding, Allocator $>$@{internal::Hasher$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{String()}{String()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_hasher_a885f2bf42f2bb64d6f9443129dce3883} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+bool \mbox{\hyperlink{classinternal_1_1_hasher}{internal\+::\+Hasher}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+String (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classinternal_1_1_hasher_a9f0ed5c436aa1b384141eaa1a9301633}{Ch}} \texorpdfstring{$\ast$}{*}}]{str}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{len}{, }\item[{bool}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l00245}{245}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00245\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00246\ \ \ \ \ \ \ \ \ WriteBuffer(\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7a2d823b89b055bc743d05c03183d3f338}{kStringType}},\ str,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ *\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{classinternal_1_1_hasher_a9f0ed5c436aa1b384141eaa1a9301633}{Ch}}));}
+\DoxyCodeLine{00247\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00248\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=341pt]{classinternal_1_1_hasher_a885f2bf42f2bb64d6f9443129dce3883_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classinternal_1_1_hasher_a4401600c24c817a45cea6c281438e5b4}\index{internal::Hasher$<$ Encoding, Allocator $>$@{internal::Hasher$<$ Encoding, Allocator $>$}!Uint@{Uint}}
+\index{Uint@{Uint}!internal::Hasher$<$ Encoding, Allocator $>$@{internal::Hasher$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{Uint()}{Uint()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_hasher_a4401600c24c817a45cea6c281438e5b4} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+bool \mbox{\hyperlink{classinternal_1_1_hasher}{internal\+::\+Hasher}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Uint (\begin{DoxyParamCaption}\item[{unsigned}]{u}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l00229}{229}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00229\ \{\ \mbox{\hyperlink{namespace_c_l_i_a713b5a1bbb98173dbc74edd4f295a582}{Number}}\ n;\ n.u.u\ =\ u;\ n.d\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{double}\textcolor{keyword}{>}(u);\ \textcolor{keywordflow}{return}\ WriteNumber(n);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classinternal_1_1_hasher_a14832ac4ec204f1065b929df2c255457}\index{internal::Hasher$<$ Encoding, Allocator $>$@{internal::Hasher$<$ Encoding, Allocator $>$}!Uint64@{Uint64}}
+\index{Uint64@{Uint64}!internal::Hasher$<$ Encoding, Allocator $>$@{internal::Hasher$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{Uint64()}{Uint64()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_hasher_a14832ac4ec204f1065b929df2c255457} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+bool \mbox{\hyperlink{classinternal_1_1_hasher}{internal\+::\+Hasher}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Uint64 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{u}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l00231}{231}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00231\ \{\ \mbox{\hyperlink{namespace_c_l_i_a713b5a1bbb98173dbc74edd4f295a582}{Number}}\ n;\ n.u.u\ =\ u;\ n.d\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{double}\textcolor{keyword}{>}(u);\ \textcolor{keywordflow}{return}\ WriteNumber(n);\ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/\mbox{\hyperlink{schema_8h}{schema.\+h}}\end{DoxyCompactItemize}

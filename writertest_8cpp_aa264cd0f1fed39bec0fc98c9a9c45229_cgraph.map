@@ -1,0 +1,27 @@
+<map id="TEST" name="TEST">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,144,61,169"/>
+<area shape="rect" id="Node000002" href="$class_generic_string_buffer.html#a725e862b9a78375f5363b0b61ad789f3" title="Get the size of string in bytes in the string buffer." alt="" coords="116,5,252,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="39,142,66,101,85,78,107,57,113,52,117,57,110,61,89,81,70,104,44,144"/>
+<area shape="rect" id="Node000003" href="$class_generic_string_buffer.html#a42079865bab1deb930c6cff7d491c719" title=" " alt="" coords="116,136,252,177"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="61,154,101,154,101,159,61,159"/>
+<area shape="rect" id="Node000006" href="$class_writer.html#a07d74d36dd3191b06e0aab678c246157" title="Checks whether the output is a complete JSON." alt="" coords="119,201,249,226"/>
+<area shape="poly" id="edge7_Node000001_Node000006" title=" " alt="" coords="62,166,110,186,128,193,126,198,108,191,60,171"/>
+<area shape="rect" id="Node000008" href="$class_generic_reader.html#a0c450620d14ff1824e58bb7bd9b42099" title="Parse JSON text." alt="" coords="109,250,259,276"/>
+<area shape="poly" id="edge9_Node000001_Node000008" title=" " alt="" coords="45,168,72,202,110,237,118,241,115,246,107,241,68,206,41,171"/>
+<area shape="rect" id="Node000011" href="$class_generic_string_buffer.html#a0dbdb77489b95923795011a24f705be5" title=" " alt="" coords="116,71,252,111"/>
+<area shape="poly" id="edge12_Node000001_Node000011" title=" " alt="" coords="60,142,120,116,122,120,62,147"/>
+<area shape="rect" id="Node000004" href="$class_generic_string_buffer.html#a0038e53ba03c271bc4cbbac403ec4de4" title=" " alt="" coords="307,62,473,88"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="231,133,258,121,306,98,326,91,328,96,308,103,260,125,233,138"/>
+<area shape="rect" id="Node000005" href="$class_generic_string_buffer.html#a80af78c43da93126a940a40d1889278a" title=" " alt="" coords="322,136,458,177"/>
+<area shape="poly" id="edge5_Node000003_Node000005" title=" " alt="" coords="252,154,307,154,307,159,252,159"/>
+<area shape="poly" id="edge4_Node000004_Node000004" title=" " alt="" coords="358,63,352,54,355,44,369,38,390,36,414,38,426,45,423,50,412,43,390,41,370,43,359,48,357,53,362,60"/>
+<area shape="poly" id="edge6_Node000005_Node000005" title=" " alt="" coords="354,136,352,126,358,117,371,111,390,109,411,112,424,118,421,123,410,117,390,115,372,117,361,121,357,127,359,135"/>
+<area shape="rect" id="Node000007" href="$classinternal_1_1_stack.html#a2b8bda380e33838a99e3c73ff9785f03" title=" " alt="" coords="314,201,466,226"/>
+<area shape="poly" id="edge8_Node000006_Node000007" title=" " alt="" coords="250,211,299,211,299,216,250,216"/>
+<area shape="rect" id="Node000009" href="$struct_parse_result.html#a88b6d44f052a19e6436ae6aadc2c40b4" title="Reset error code." alt="" coords="324,250,456,276"/>
+<area shape="poly" id="edge10_Node000008_Node000009" title=" " alt="" coords="259,260,309,260,309,266,259,266"/>
+<area shape="rect" id="Node000010" href="$struct_parse_result.html#aa81b4a7b776b77216cb752385203a8c1" title="Update error code and offset." alt="" coords="521,250,643,276"/>
+<area shape="poly" id="edge11_Node000009_Node000010" title=" " alt="" coords="457,260,506,260,506,266,457,266"/>
+<area shape="poly" id="edge13_Node000011_Node000004" title=" " alt="" coords="252,83,291,80,292,85,252,88"/>
+<area shape="poly" id="edge14_Node000011_Node000005" title=" " alt="" coords="251,109,310,128,308,133,249,114"/>
+</map>

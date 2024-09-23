@@ -1,0 +1,7 @@
+<map id="is_PSS_sign_mechanism" name="is_PSS_sign_mechanism">
+<area shape="rect" id="Node000001" title=" " alt="" coords="179,31,349,56"/>
+<area shape="rect" id="Node000002" href="$yubihsm__pkcs11_8c.html#a47dc8b58f8b5e520f4f6d6e29223ee63" title=" " alt="" coords="49,5,87,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="163,33,87,23,88,18,164,28"/>
+<area shape="rect" id="Node000003" href="$util__pkcs11_8c.html#a547f9032e3bcd7d6a5a810e94822e337" title=" " alt="" coords="5,55,131,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="164,58,131,62,131,57,163,53"/>
+</map>

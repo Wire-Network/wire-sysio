@@ -1,0 +1,36 @@
+<map id="websocketpp::http::is_not_whitespace_char" name="websocketpp::http::is_not_whitespace_char">
+<area shape="rect" id="Node000001" title="Is the character non&#45;whitespace." alt="" coords="1350,84,1512,125"/>
+<area shape="rect" id="Node000002" href="$namespacewebsocketpp_1_1http_1_1parser.html#a1dacef9abccd8e5b6c572447d9f5a3ab" title="Read and discard one unit of linear whitespace." alt="" coords="1166,84,1302,125"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1335,108,1303,108,1303,102,1335,102"/>
+<area shape="rect" id="Node000003" href="$namespacewebsocketpp_1_1http_1_1parser.html#a263c7c466bbed56948d5877b9c33c354" title="Read and discard linear whitespace." alt="" coords="966,84,1118,125"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="1150,108,1118,108,1118,102,1150,102"/>
+<area shape="rect" id="Node000004" href="$parser_8cpp.html#a18cc8397e3e7b19f7693599bcf3bbe30" title=" " alt="" coords="721,5,918,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="990,79,917,46,880,34,881,29,919,41,992,75"/>
+<area shape="rect" id="Node000005" href="$namespacewebsocketpp_1_1http_1_1parser.html#ac13fb3aca2101c9e6d2ee14039f1a758" title="Extract HTTP attributes." alt="" coords="736,55,903,96"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="950,95,903,89,903,84,951,90"/>
+<area shape="rect" id="Node000008" href="$namespacewebsocketpp_1_1http_1_1parser.html#adabfd491d364be43bee4c7cad63e7e08" title="Extract HTTP parameters." alt="" coords="486,112,664,153"/>
+<area shape="poly" id="edge11_Node000003_Node000008" title=" " alt="" coords="951,113,664,130,664,125,950,108"/>
+<area shape="rect" id="Node000012" href="$namespacewebsocketpp_1_1http_1_1parser.html#ae656f7130716b25fb2a34cee77a0444e" title=" " alt="" coords="751,170,888,210"/>
+<area shape="poly" id="edge12_Node000003_Node000012" title=" " alt="" coords="974,134,876,172,874,167,972,129"/>
+<area shape="rect" id="Node000006" href="$parser_8cpp.html#a643a09a7248f9cf7a1c63eba7e27a7fa" title=" " alt="" coords="477,13,673,39"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="720,58,642,42,643,37,721,53"/>
+<area shape="rect" id="Node000007" href="$parser_8cpp.html#aa3430b9bb5f9f4f2b5aed19d0877336d" title=" " alt="" coords="477,63,673,88"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="720,78,674,78,674,73,720,73"/>
+<area shape="poly" id="edge7_Node000005_Node000008" title=" " alt="" coords="722,101,665,115,664,109,720,96"/>
+<area shape="rect" id="Node000009" href="$parser_8cpp.html#a64c6535ab9b7008bfe06cc6f9b32c677" title=" " alt="" coords="233,67,429,92"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="470,113,393,96,394,90,471,108"/>
+<area shape="rect" id="Node000010" href="$classwebsocketpp_1_1http_1_1parser_1_1parser.html#af903e5538e362d9ac0aeaea3064aed0c" title="Extract an HTTP parameter list from a string." alt="" coords="260,117,402,173"/>
+<area shape="poly" id="edge9_Node000008_Node000010" title=" " alt="" coords="471,141,402,144,402,139,471,135"/>
+<area shape="rect" id="Node000011" href="$classwebsocketpp_1_1http_1_1parser_1_1parser.html#a42ab85c14bef2028d1e6f050af1140ce" title="Extract an HTTP parameter list from a parser header." alt="" coords="27,117,163,173"/>
+<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="244,148,163,148,163,142,244,142"/>
+<area shape="rect" id="Node000013" href="$parser_8cpp.html#aaf32dbf85a444e1657a5ee29489fdc4b" title=" " alt="" coords="477,177,673,203"/>
+<area shape="poly" id="edge13_Node000012_Node000013" title=" " alt="" coords="736,193,674,193,674,188,736,188"/>
+<area shape="rect" id="Node000014" href="$classwebsocketpp_1_1http_1_1parser_1_1parser.html#a4dbb443fd916f8b4306e7afdb2e8ff45" title="Process a header line." alt="" coords="498,228,653,283"/>
+<area shape="poly" id="edge14_Node000012_Node000014" title=" " alt="" coords="737,215,654,237,653,232,736,210"/>
+<area shape="rect" id="Node000015" href="$classwebsocketpp_1_1http_1_1parser_1_1request.html#abd9cae6f44634d62253d806d982ab1d6" title="Process bytes in the input buffer." alt="" coords="246,222,416,262"/>
+<area shape="poly" id="edge15_Node000014_Node000015" title=" " alt="" coords="482,253,416,249,416,244,483,248"/>
+<area shape="rect" id="Node000016" href="$classwebsocketpp_1_1http_1_1parser_1_1response.html#ae99b8f1287898b74d1963b95347ab838" title="Process bytes in the input buffer." alt="" coords="241,287,420,328"/>
+<area shape="poly" id="edge16_Node000014_Node000016" title=" " alt="" coords="483,278,421,291,420,286,482,272"/>
+<area shape="rect" id="Node000017" href="$classwebsocketpp_1_1http_1_1parser_1_1response.html#a5b274a9e5766e679f0939a7e1ecbad56" title="Process bytes in the input buffer (istream version)" alt="" coords="5,287,185,328"/>
+<area shape="poly" id="edge17_Node000016_Node000017" title=" " alt="" coords="226,310,185,310,185,305,226,305"/>
+</map>

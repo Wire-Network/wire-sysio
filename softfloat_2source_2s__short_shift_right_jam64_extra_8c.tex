@@ -1,0 +1,49 @@
+\doxysection{libraries/softfloat/source/s\+\_\+short\+Shift\+Right\+Jam64\+Extra.c File Reference}
+\hypertarget{softfloat_2source_2s__short_shift_right_jam64_extra_8c}{}\label{softfloat_2source_2s__short_shift_right_jam64_extra_8c}\index{libraries/softfloat/source/s\_shortShiftRightJam64Extra.c@{libraries/softfloat/source/s\_shortShiftRightJam64Extra.c}}
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include "{}platform.\+h"{}}\newline
+{\ttfamily \#include "{}primitive\+Types.\+h"{}}\newline
+Include dependency graph for s\+\_\+short\+Shift\+Right\+Jam64\+Extra.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=343pt]{softfloat_2source_2s__short_shift_right_jam64_extra_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+struct uint64\+\_\+extra \mbox{\hyperlink{softfloat_2source_2s__short_shift_right_jam64_extra_8c_ab64c01d5c0feb1bd1a89d90490f629d2}{softfloat\+\_\+short\+Shift\+Right\+Jam64\+Extra}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} extra, \mbox{\hyperlink{stdint_8h_ad0fca8b15c218d2c687f8c373a71d228}{uint\+\_\+fast8\+\_\+t}} dist)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{softfloat_2source_2s__short_shift_right_jam64_extra_8c_ab64c01d5c0feb1bd1a89d90490f629d2}\index{s\_shortShiftRightJam64Extra.c@{s\_shortShiftRightJam64Extra.c}!softfloat\_shortShiftRightJam64Extra@{softfloat\_shortShiftRightJam64Extra}}
+\index{softfloat\_shortShiftRightJam64Extra@{softfloat\_shortShiftRightJam64Extra}!s\_shortShiftRightJam64Extra.c@{s\_shortShiftRightJam64Extra.c}}
+\doxysubsubsection{\texorpdfstring{softfloat\_shortShiftRightJam64Extra()}{softfloat\_shortShiftRightJam64Extra()}}
+{\footnotesize\ttfamily \label{softfloat_2source_2s__short_shift_right_jam64_extra_8c_ab64c01d5c0feb1bd1a89d90490f629d2} 
+struct uint64\+\_\+extra softfloat\+\_\+short\+Shift\+Right\+Jam64\+Extra (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{a}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{extra}{, }\item[{\mbox{\hyperlink{stdint_8h_ad0fca8b15c218d2c687f8c373a71d228}{uint\+\_\+fast8\+\_\+t}}}]{dist}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2s__short_shift_right_jam64_extra_8c_source_l00044}{44}} of file \mbox{\hyperlink{softfloat_2source_2s__short_shift_right_jam64_extra_8c_source}{s\+\_\+short\+Shift\+Right\+Jam64\+Extra.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00046\ \{}
+\DoxyCodeLine{00047\ \ \ \ \ \textcolor{keyword}{struct\ }uint64\_extra\ z;}
+\DoxyCodeLine{00048\ }
+\DoxyCodeLine{00049\ \ \ \ \ z.v\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}>>dist;}
+\DoxyCodeLine{00050\ \ \ \ \ z.extra\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}<<(-\/dist\ \&\ 63)\ |\ (extra\ !=\ 0);}
+\DoxyCodeLine{00051\ \ \ \ \ \textcolor{keywordflow}{return}\ z;}
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{softfloat_2source_2s__short_shift_right_jam64_extra_8c_ab64c01d5c0feb1bd1a89d90490f629d2_icgraph}
+\end{center}
+\end{figure}

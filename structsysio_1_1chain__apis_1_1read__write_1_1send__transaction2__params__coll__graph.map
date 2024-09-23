@@ -1,0 +1,5 @@
+<map id="sysio::chain_apis::read_write::send_transaction2_params" name="sysio::chain_apis::read_write::send_transaction2_params">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,94,201,150"/>
+<area shape="rect" id="Node000002" href="$classfc_1_1variant.html" title="stores null, int64, uint64, double, bool, string, std::vector&lt;variant&gt;, and variant_object&#39;s." alt="" coords="63,5,143,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="106,47,106,93,100,93,100,47"/>
+</map>

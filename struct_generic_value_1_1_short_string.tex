@@ -1,0 +1,155 @@
+\doxysection{Generic\+Value\texorpdfstring{$<$}{<} Encoding, Allocator \texorpdfstring{$>$}{>}\+::Short\+String Struct Reference}
+\hypertarget{struct_generic_value_1_1_short_string}{}\label{struct_generic_value_1_1_short_string}\index{GenericValue$<$ Encoding, Allocator $>$::ShortString@{GenericValue$<$ Encoding, Allocator $>$::ShortString}}
+
+
+{\ttfamily \#include $<$document.\+h$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \{ \mbox{\hyperlink{struct_generic_value_1_1_short_string_a773ca227e2218cd7b962d75b171a0132a6b29cffcea816906d271656a958bc0c7}{Max\+Chars}} = sizeof(static\+\_\+cast\texorpdfstring{$<$}{<}Flag\texorpdfstring{$\ast$}{*}\texorpdfstring{$>$}{>}(0)-\/\texorpdfstring{$>$}{>}payload) / sizeof(Ch)
+, \mbox{\hyperlink{struct_generic_value_1_1_short_string_a773ca227e2218cd7b962d75b171a0132a991735d2e27155ccabe1c657653044ba}{Max\+Size}} = Max\+Chars -\/ 1
+, \mbox{\hyperlink{struct_generic_value_1_1_short_string_a773ca227e2218cd7b962d75b171a0132ac4ec681af40f3f6cfe7dcf6500637364}{Len\+Pos}} = Max\+Size
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{struct_generic_value_1_1_short_string_adbfe8461e0cb0ccb2cb3825489e743c2}{Set\+Length}} (\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})
+\item 
+\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} \mbox{\hyperlink{struct_generic_value_1_1_short_string_a4aa295331ab0d019fd64f8f5d57d450b}{Get\+Length}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static bool \mbox{\hyperlink{struct_generic_value_1_1_short_string_a73e40f625c1abbd84f95ac7fff8365f7}{Usable}} (\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_generic_value_a4541cc8138f2fac80d69836cc1e07116}{Ch}} \mbox{\hyperlink{struct_generic_value_1_1_short_string_a444e24523d4cc33830d18a2cfcfd333b}{str}} \mbox{[}\mbox{\hyperlink{struct_generic_value_1_1_short_string_a773ca227e2218cd7b962d75b171a0132a6b29cffcea816906d271656a958bc0c7}{Max\+Chars}}\mbox{]}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} = Memory\+Pool\+Allocator$<$$>$$>$\newline
+struct Generic\+Value$<$ Encoding, Allocator $>$\+::\+Short\+String}
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l01970}{1970}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+
+\doxysubsection{Member Enumeration Documentation}
+\Hypertarget{struct_generic_value_1_1_short_string_a773ca227e2218cd7b962d75b171a0132}\doxysubsubsection{\texorpdfstring{anonymous enum}{anonymous enum}}
+{\footnotesize\ttfamily \label{struct_generic_value_1_1_short_string_a773ca227e2218cd7b962d75b171a0132} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Memory\+Pool\+Allocator$<$$>$$>$ \\
+anonymous enum}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{MaxChars@{MaxChars}!GenericValue$<$ Encoding, Allocator $>$::ShortString@{GenericValue$<$ Encoding, Allocator $>$::ShortString}}\index{GenericValue$<$ Encoding, Allocator $>$::ShortString@{GenericValue$<$ Encoding, Allocator $>$::ShortString}!MaxChars@{MaxChars}}}\Hypertarget{struct_generic_value_1_1_short_string_a773ca227e2218cd7b962d75b171a0132a6b29cffcea816906d271656a958bc0c7}\label{struct_generic_value_1_1_short_string_a773ca227e2218cd7b962d75b171a0132} 
+Max\+Chars&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{MaxSize@{MaxSize}!GenericValue$<$ Encoding, Allocator $>$::ShortString@{GenericValue$<$ Encoding, Allocator $>$::ShortString}}\index{GenericValue$<$ Encoding, Allocator $>$::ShortString@{GenericValue$<$ Encoding, Allocator $>$::ShortString}!MaxSize@{MaxSize}}}\Hypertarget{struct_generic_value_1_1_short_string_a773ca227e2218cd7b962d75b171a0132a991735d2e27155ccabe1c657653044ba}\label{struct_generic_value_1_1_short_string_a773ca227e2218cd7b962d75b171a0132} 
+Max\+Size&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{LenPos@{LenPos}!GenericValue$<$ Encoding, Allocator $>$::ShortString@{GenericValue$<$ Encoding, Allocator $>$::ShortString}}\index{GenericValue$<$ Encoding, Allocator $>$::ShortString@{GenericValue$<$ Encoding, Allocator $>$::ShortString}!LenPos@{LenPos}}}\Hypertarget{struct_generic_value_1_1_short_string_a773ca227e2218cd7b962d75b171a0132ac4ec681af40f3f6cfe7dcf6500637364}\label{struct_generic_value_1_1_short_string_a773ca227e2218cd7b962d75b171a0132} 
+Len\+Pos&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l01971}{1971}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01971\ \{\ \mbox{\hyperlink{struct_generic_value_1_1_short_string_a773ca227e2218cd7b962d75b171a0132a6b29cffcea816906d271656a958bc0c7}{MaxChars}}\ =\ \textcolor{keyword}{sizeof}(\textcolor{keyword}{static\_cast<}Flag*\textcolor{keyword}{>}(0)-\/>payload)\ /\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{class_generic_value_a4541cc8138f2fac80d69836cc1e07116}{Ch}}),\ \mbox{\hyperlink{struct_generic_value_1_1_short_string_a773ca227e2218cd7b962d75b171a0132a991735d2e27155ccabe1c657653044ba}{MaxSize}}\ =\ \mbox{\hyperlink{struct_generic_value_1_1_short_string_a773ca227e2218cd7b962d75b171a0132a6b29cffcea816906d271656a958bc0c7}{MaxChars}}\ -\/\ 1,\ \mbox{\hyperlink{struct_generic_value_1_1_short_string_a773ca227e2218cd7b962d75b171a0132ac4ec681af40f3f6cfe7dcf6500637364}{LenPos}}\ =\ \mbox{\hyperlink{struct_generic_value_1_1_short_string_a773ca227e2218cd7b962d75b171a0132a991735d2e27155ccabe1c657653044ba}{MaxSize}}\ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_generic_value_1_1_short_string_a4aa295331ab0d019fd64f8f5d57d450b}\index{GenericValue$<$ Encoding, Allocator $>$::ShortString@{GenericValue$<$ Encoding, Allocator $>$::ShortString}!GetLength@{GetLength}}
+\index{GetLength@{GetLength}!GenericValue$<$ Encoding, Allocator $>$::ShortString@{GenericValue$<$ Encoding, Allocator $>$::ShortString}}
+\doxysubsubsection{\texorpdfstring{GetLength()}{GetLength()}}
+{\footnotesize\ttfamily \label{struct_generic_value_1_1_short_string_a4aa295331ab0d019fd64f8f5d57d450b} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Memory\+Pool\+Allocator$<$$>$$>$ \\
+\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} \mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Short\+String\+::\+Get\+Length (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l01976}{1976}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01976\ \{\ \textcolor{keywordflow}{return}\ \ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\textcolor{keyword}{>}(\mbox{\hyperlink{struct_generic_value_1_1_short_string_a773ca227e2218cd7b962d75b171a0132a991735d2e27155ccabe1c657653044ba}{MaxSize}}\ -\/\ \ \mbox{\hyperlink{struct_generic_value_1_1_short_string_a444e24523d4cc33830d18a2cfcfd333b}{str}}[\mbox{\hyperlink{struct_generic_value_1_1_short_string_a773ca227e2218cd7b962d75b171a0132ac4ec681af40f3f6cfe7dcf6500637364}{LenPos}}]);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_generic_value_1_1_short_string_adbfe8461e0cb0ccb2cb3825489e743c2}\index{GenericValue$<$ Encoding, Allocator $>$::ShortString@{GenericValue$<$ Encoding, Allocator $>$::ShortString}!SetLength@{SetLength}}
+\index{SetLength@{SetLength}!GenericValue$<$ Encoding, Allocator $>$::ShortString@{GenericValue$<$ Encoding, Allocator $>$::ShortString}}
+\doxysubsubsection{\texorpdfstring{SetLength()}{SetLength()}}
+{\footnotesize\ttfamily \label{struct_generic_value_1_1_short_string_adbfe8461e0cb0ccb2cb3825489e743c2} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Memory\+Pool\+Allocator$<$$>$$>$ \\
+void \mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Short\+String\+::\+Set\+Length (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{len}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l01975}{1975}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01975\ \{\ \mbox{\hyperlink{struct_generic_value_1_1_short_string_a444e24523d4cc33830d18a2cfcfd333b}{str}}[\mbox{\hyperlink{struct_generic_value_1_1_short_string_a773ca227e2218cd7b962d75b171a0132ac4ec681af40f3f6cfe7dcf6500637364}{LenPos}}]\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{class_generic_value_a4541cc8138f2fac80d69836cc1e07116}{Ch}}\textcolor{keyword}{>}(\mbox{\hyperlink{struct_generic_value_1_1_short_string_a773ca227e2218cd7b962d75b171a0132a991735d2e27155ccabe1c657653044ba}{MaxSize}}\ -\/\ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}});\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_generic_value_1_1_short_string_adbfe8461e0cb0ccb2cb3825489e743c2_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_generic_value_1_1_short_string_a73e40f625c1abbd84f95ac7fff8365f7}\index{GenericValue$<$ Encoding, Allocator $>$::ShortString@{GenericValue$<$ Encoding, Allocator $>$::ShortString}!Usable@{Usable}}
+\index{Usable@{Usable}!GenericValue$<$ Encoding, Allocator $>$::ShortString@{GenericValue$<$ Encoding, Allocator $>$::ShortString}}
+\doxysubsubsection{\texorpdfstring{Usable()}{Usable()}}
+{\footnotesize\ttfamily \label{struct_generic_value_1_1_short_string_a73e40f625c1abbd84f95ac7fff8365f7} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Memory\+Pool\+Allocator$<$$>$$>$ \\
+static bool \mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Short\+String\+::\+Usable (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{len}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l01974}{1974}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01974\ \{\ \textcolor{keywordflow}{return}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{struct_generic_value_1_1_short_string_a773ca227e2218cd7b962d75b171a0132a991735d2e27155ccabe1c657653044ba}{MaxSize}}\ >=\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}});\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_generic_value_1_1_short_string_a73e40f625c1abbd84f95ac7fff8365f7_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_generic_value_1_1_short_string_a444e24523d4cc33830d18a2cfcfd333b}\index{GenericValue$<$ Encoding, Allocator $>$::ShortString@{GenericValue$<$ Encoding, Allocator $>$::ShortString}!str@{str}}
+\index{str@{str}!GenericValue$<$ Encoding, Allocator $>$::ShortString@{GenericValue$<$ Encoding, Allocator $>$::ShortString}}
+\doxysubsubsection{\texorpdfstring{str}{str}}
+{\footnotesize\ttfamily \label{struct_generic_value_1_1_short_string_a444e24523d4cc33830d18a2cfcfd333b} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Memory\+Pool\+Allocator$<$$>$$>$ \\
+\mbox{\hyperlink{class_generic_value_a4541cc8138f2fac80d69836cc1e07116}{Ch}} \mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Short\+String\+::str\mbox{[}\mbox{\hyperlink{struct_generic_value_1_1_short_string_a773ca227e2218cd7b962d75b171a0132a6b29cffcea816906d271656a958bc0c7}{Max\+Chars}}\mbox{]}}
+
+
+
+Definition at line \mbox{\hyperlink{document_8h_source_l01972}{1972}} of file \mbox{\hyperlink{document_8h_source}{document.\+h}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/\mbox{\hyperlink{document_8h}{document.\+h}}\end{DoxyCompactItemize}

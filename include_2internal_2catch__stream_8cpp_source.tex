@@ -1,0 +1,187 @@
+\doxysection{catch\+\_\+stream.\+cpp}
+\hypertarget{include_2internal_2catch__stream_8cpp_source}{}\label{include_2internal_2catch__stream_8cpp_source}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_stream.cpp@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_stream.cpp}}
+\mbox{\hyperlink{include_2internal_2catch__stream_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00002}00002\ \textcolor{comment}{\ *\ \ Created\ by\ Phil\ on\ 17/01/2011.}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00003}00003\ \textcolor{comment}{\ *\ \ Copyright\ 2011\ Two\ Blue\ Cubes\ Ltd.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00004}00004\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00005}00005\ \textcolor{comment}{\ *\ \ Distributed\ under\ the\ Boost\ Software\ License,\ Version\ 1.0.\ (See\ accompanying}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00006}00006\ \textcolor{comment}{\ *\ \ file\ LICENSE\_1\_0.txt\ or\ copy\ at\ http://www.boost.org/LICENSE\_1\_0.txt)}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00008}00008\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__common_8h}{catch\_common.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00011}00011\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__enforce_8h}{catch\_enforce.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00012}00012\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__stream_8h}{catch\_stream.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00013}00013\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__debug__console_8h}{catch\_debug\_console.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00014}00014\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__stringref_8h}{catch\_stringref.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00015}00015\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__singletons_8hpp}{catch\_singletons.hpp}}"{}}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00017}00017\ \textcolor{preprocessor}{\#include\ <cstdio>}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00018}00018\ \textcolor{preprocessor}{\#include\ <iostream>}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00019}00019\ \textcolor{preprocessor}{\#include\ <fstream>}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00020}00020\ \textcolor{preprocessor}{\#include\ <sstream>}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00021}00021\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00022}00022\ \textcolor{preprocessor}{\#include\ <memory>}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00024}00024\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}}\ \{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00026}00026\ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_i_stream_a02a8837d876f3b34c1b6209c778414cb}{Catch::IStream::\string~IStream}}()\ =\ \textcolor{keywordflow}{default};}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00028}\mbox{\hyperlink{namespace_catch_1_1detail}{00028}}\ \ \ \ \ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacedetail}{detail}}\ \{\ \textcolor{keyword}{namespace\ }\{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00029}00029\ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ WriterF,\ std::\textcolor{keywordtype}{size\_t}\ bufferSize=256>}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00030}00030\ \ \ \ \ \ \ \ \ \textcolor{keyword}{class\ }StreamBufImpl\ :\ \textcolor{keyword}{public}\ std::streambuf\ \{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00031}00031\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ data[bufferSize];}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00032}00032\ \ \ \ \ \ \ \ \ \ \ \ \ WriterF\ m\_writer;}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00034}00034\ \ \ \ \ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00035}00035\ \ \ \ \ \ \ \ \ \ \ \ \ StreamBufImpl()\ \{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00036}00036\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{xbyak__mnemonic_8h_a97704c4d17199d650845c0144f96ae64}{setp}}(\ data,\ data\ +\ \textcolor{keyword}{sizeof}(data)\ );}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00037}00037\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00039}00039\ \ \ \ \ \ \ \ \ \ \ \ \ \string~StreamBufImpl()\ \textcolor{keyword}{noexcept}\ \{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00040}00040\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ StreamBufImpl::sync();}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00041}00041\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00043}00043\ \ \ \ \ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00044}00044\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a49aa97067a36875627e1380c3fb3833d}{overflow}}(\ \textcolor{keywordtype}{int}\ c\ )\textcolor{keyword}{\ override\ }\{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00045}00045\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sync();}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00047}00047\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ c\ !=\ EOF\ )\ \{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ pbase()\ ==\ epptr()\ )}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_writer(\ std::string(\ 1,\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{char}\textcolor{keyword}{>}(\ c\ )\ )\ );}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00050}00050\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00051}00051\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sputc(\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{char}\textcolor{keyword}{>}(\ c\ )\ );}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ sync()\textcolor{keyword}{\ override\ }\{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ pbase()\ !=\ pptr()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_writer(\ std::string(\ pbase(),\ \textcolor{keyword}{static\_cast<}std::string::size\_type\textcolor{keyword}{>}(\ pptr()\ -\/\ pbase()\ )\ )\ );}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00059}00059\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{xbyak__mnemonic_8h_a97704c4d17199d650845c0144f96ae64}{setp}}(\ pbase(),\ epptr()\ );}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00061}00061\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00062}00062\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00063}00063\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00067}00067\ \ \ \ \ \ \ \ \ \textcolor{keyword}{struct\ }OutputDebugWriter\ \{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ operator()(\ std::string\ \textcolor{keyword}{const}\&str\ )\ \{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_catch_aa5dcf4750ce9a854f4b74d3c952d13cc}{writeToDebugConsole}}(\ str\ );}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00071}00071\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00072}00072\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00073}00073\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00075}00075\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00076}00076\ \ \ \ \ \ \ \ \ \textcolor{keyword}{class\ }FileStream\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{struct_catch_1_1_i_stream}{IStream}}\ \{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{mutable}\ std::ofstream\ m\_ofs;}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00078}00078\ \ \ \ \ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \ \ \ FileStream(\ \mbox{\hyperlink{class_catch_1_1_string_ref}{StringRef}}\ filename\ )\ \{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00080}00080\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_ofs.open(\ filename.c\_str()\ );}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00081}00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{catch__enforce_8h_aa4c5f453d4352f75712de56e5892849f}{CATCH\_ENFORCE}}(\ !m\_ofs.fail(),\ \textcolor{stringliteral}{"{}Unable\ to\ open\ file:\ '"{}}\ <<\ filename\ <<\ \textcolor{stringliteral}{"{}'"{}}\ );}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00082}00082\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00083}00083\ \ \ \ \ \ \ \ \ \ \ \ \ \string~FileStream()\ \textcolor{keyword}{override}\ =\ \textcolor{keywordflow}{default};}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00084}00084\ \ \ \ \ \ \ \ \ \textcolor{keyword}{public}:\ \textcolor{comment}{//\ IStream}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00085}00085\ \ \ \ \ \ \ \ \ \ \ \ \ std::ostream\&\ stream()\textcolor{keyword}{\ const\ override\ }\{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00086}00086\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_ofs;}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00087}00087\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00088}00088\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00089}00089\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00091}00091\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00092}00092\ \ \ \ \ \ \ \ \ \textcolor{keyword}{class\ }CoutStream\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{struct_catch_1_1_i_stream}{IStream}}\ \{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00093}00093\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{mutable}\ std::ostream\ m\_os;}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00094}00094\ \ \ \ \ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00095}00095\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Store\ the\ streambuf\ from\ cout\ up-\/front\ because}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00096}00096\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ cout\ may\ get\ redirected\ when\ running\ tests}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00097}00097\ \ \ \ \ \ \ \ \ \ \ \ \ CoutStream()\ :\ m\_os(\ \mbox{\hyperlink{namespace_catch_a0179d453617ba2296f2baa99a49e7264}{Catch::cout}}().rdbuf()\ )\ \{\}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00098}00098\ \ \ \ \ \ \ \ \ \ \ \ \ \string~CoutStream()\ \textcolor{keyword}{override}\ =\ \textcolor{keywordflow}{default};}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00099}00099\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00100}00100\ \ \ \ \ \ \ \ \ \textcolor{keyword}{public}:\ \textcolor{comment}{//\ IStream}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00101}00101\ \ \ \ \ \ \ \ \ \ \ \ \ std::ostream\&\ stream()\textcolor{keyword}{\ const\ override\ }\{\ \textcolor{keywordflow}{return}\ m\_os;\ \}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00102}00102\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00103}00103\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00105}00105\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00106}00106\ \ \ \ \ \ \ \ \ \textcolor{keyword}{class\ }DebugOutStream\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{struct_catch_1_1_i_stream}{IStream}}\ \{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00107}00107\ \ \ \ \ \ \ \ \ \ \ \ \ std::unique\_ptr<StreamBufImpl<OutputDebugWriter>>\ m\_streamBuf;}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00108}00108\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{mutable}\ std::ostream\ m\_os;}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00109}00109\ \ \ \ \ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00110}00110\ \ \ \ \ \ \ \ \ \ \ \ \ DebugOutStream()}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00111}00111\ \ \ \ \ \ \ \ \ \ \ \ \ :\ \ \ m\_streamBuf(\ \textcolor{keyword}{new}\ StreamBufImpl<OutputDebugWriter>()\ ),}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00112}00112\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_os(\ m\_streamBuf.get()\ )}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00113}00113\ \ \ \ \ \ \ \ \ \ \ \ \ \{\}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00114}00114\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00115}00115\ \ \ \ \ \ \ \ \ \ \ \ \ \string~DebugOutStream()\ \textcolor{keyword}{override}\ =\ \textcolor{keywordflow}{default};}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00116}00116\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00117}00117\ \ \ \ \ \ \ \ \ \textcolor{keyword}{public}:\ \textcolor{comment}{//\ IStream}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00118}00118\ \ \ \ \ \ \ \ \ \ \ \ \ std::ostream\&\ stream()\textcolor{keyword}{\ const\ override\ }\{\ \textcolor{keywordflow}{return}\ m\_os;\ \}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00119}00119\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00120}00120\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00121}00121\ \ \ \ \ \}\}\ \textcolor{comment}{//\ namespace\ anon::detail}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00122}00122\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00124}00124\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00125}\mbox{\hyperlink{namespace_catch_af6d27462573d60c30c51acf1c980e3ff}{00125}}\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespace_catch_af6d27462573d60c30c51acf1c980e3ff}{makeStream}}(\ \mbox{\hyperlink{class_catch_1_1_string_ref}{StringRef}}\ \textcolor{keyword}{const}\ \&filename\ )\ -\/>\ \mbox{\hyperlink{struct_catch_1_1_i_stream}{IStream}}\ \textcolor{keyword}{const}*\ \{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00126}00126\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ filename.empty()\ )}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00127}00127\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ detail::CoutStream();}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00128}00128\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(\ filename[0]\ ==\ \textcolor{charliteral}{'\%'}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00129}00129\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ filename\ ==\ \textcolor{stringliteral}{"{}\%debug"{}}\ )}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00130}00130\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ detail::DebugOutStream();}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00131}00131\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00132}00132\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{catch__enforce_8h_adc6e1c0661c7c34fbb6033de06ec4833}{CATCH\_ERROR}}(\ \textcolor{stringliteral}{"{}Unrecognised\ stream:\ '"{}}\ <<\ filename\ <<\ \textcolor{stringliteral}{"{}'"{}}\ );}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00133}00133\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00134}00134\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00135}00135\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ detail::FileStream(\ filename\ );}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00136}00136\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00137}00137\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00138}00138\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00139}00139\ \ \ \ \ \textcolor{comment}{//\ This\ class\ encapsulates\ the\ idea\ of\ a\ pool\ of\ ostringstreams\ that\ can\ be\ reused.}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00140}\mbox{\hyperlink{struct_catch_1_1_string_streams}{00140}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_catch_1_1_string_streams}{StringStreams}}\ \{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00141}\mbox{\hyperlink{struct_catch_1_1_string_streams_a8cc72b5dedbd8189e32bac6b1d41c432}{00141}}\ \ \ \ \ \ \ \ \ std::vector<std::unique\_ptr<std::ostringstream>>\ \mbox{\hyperlink{struct_catch_1_1_string_streams_a8cc72b5dedbd8189e32bac6b1d41c432}{m\_streams}};}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00142}\mbox{\hyperlink{struct_catch_1_1_string_streams_a6c04fb72aa5c9eb66af33a56857f996f}{00142}}\ \ \ \ \ \ \ \ \ std::vector<std::size\_t>\ \mbox{\hyperlink{struct_catch_1_1_string_streams_a6c04fb72aa5c9eb66af33a56857f996f}{m\_unused}};}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00143}\mbox{\hyperlink{struct_catch_1_1_string_streams_a3eee987f15e8bd678b751cf0a1702a03}{00143}}\ \ \ \ \ \ \ \ \ std::ostringstream\ \mbox{\hyperlink{struct_catch_1_1_string_streams_a3eee987f15e8bd678b751cf0a1702a03}{m\_referenceStream}};\ \textcolor{comment}{//\ Used\ for\ copy\ state/\ flags\ from}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00144}00144\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00145}\mbox{\hyperlink{struct_catch_1_1_string_streams_a1e98cd696f9e141b3a89f305af962d91}{00145}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{struct_catch_1_1_string_streams_a1e98cd696f9e141b3a89f305af962d91}{add}}()\ -\/>\ std::size\_t\ \{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00146}00146\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{struct_catch_1_1_string_streams_a6c04fb72aa5c9eb66af33a56857f996f}{m\_unused}}.empty()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00147}00147\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_string_streams_a8cc72b5dedbd8189e32bac6b1d41c432}{m\_streams}}.push\_back(\ std::unique\_ptr<std::ostringstream>(\ \textcolor{keyword}{new}\ std::ostringstream\ )\ );}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00148}00148\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_catch_1_1_string_streams_a8cc72b5dedbd8189e32bac6b1d41c432}{m\_streams}}.size()-\/1;}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00149}00149\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00150}00150\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00151}00151\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ index\ =\ \mbox{\hyperlink{struct_catch_1_1_string_streams_a6c04fb72aa5c9eb66af33a56857f996f}{m\_unused}}.back();}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00152}00152\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_string_streams_a6c04fb72aa5c9eb66af33a56857f996f}{m\_unused}}.pop\_back();}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00153}00153\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ index;}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00154}00154\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00155}00155\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00156}00156\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00157}\mbox{\hyperlink{struct_catch_1_1_string_streams_a7e746fe736750cd67389883f6787a9b7}{00157}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_catch_1_1_string_streams_a7e746fe736750cd67389883f6787a9b7}{release}}(\ std::size\_t\ index\ )\ \{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00158}00158\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_string_streams_a8cc72b5dedbd8189e32bac6b1d41c432}{m\_streams}}[index]-\/>copyfmt(\ \mbox{\hyperlink{struct_catch_1_1_string_streams_a3eee987f15e8bd678b751cf0a1702a03}{m\_referenceStream}}\ );\ \textcolor{comment}{//\ Restore\ initial\ flags\ and\ other\ state}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00159}00159\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_string_streams_a6c04fb72aa5c9eb66af33a56857f996f}{m\_unused}}.push\_back(index);}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00160}00160\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00161}00161\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00162}00162\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00163}\mbox{\hyperlink{class_catch_1_1_reusable_string_stream_a9b3f8c52b0d2d63ffd825297a9c09781}{00163}}\ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_reusable_string_stream_a9b3f8c52b0d2d63ffd825297a9c09781}{ReusableStringStream::ReusableStringStream}}()}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00164}00164\ \ \ \ \ :\ \ \ m\_index(\ \mbox{\hyperlink{class_catch_1_1_singleton}{Singleton}}<\mbox{\hyperlink{struct_catch_1_1_string_streams}{StringStreams}}>::getMutable().\mbox{\hyperlink{static__buf_8cpp_aa99823a0fc8313c9c32541ce768fb801}{add}}()\ ),}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00165}00165\ \ \ \ \ \ \ \ \ m\_oss(\ \mbox{\hyperlink{class_catch_1_1_singleton}{Singleton}}<\mbox{\hyperlink{struct_catch_1_1_string_streams}{StringStreams}}>::getMutable().m\_streams[m\_index].get()\ )}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00166}00166\ \ \ \ \ \{\}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00167}00167\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00168}\mbox{\hyperlink{class_catch_1_1_reusable_string_stream_aba9384e258a4db3178447b6a58414712}{00168}}\ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_reusable_string_stream_aba9384e258a4db3178447b6a58414712}{ReusableStringStream::\string~ReusableStringStream}}()\ \{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00169}00169\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}std::ostringstream*\textcolor{keyword}{>}(\ m\_oss\ )-\/>\mbox{\hyperlink{class_catch_1_1_reusable_string_stream_a0e9ecf260b2a5d35f4886ef0d51f6270}{str}}(\textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00170}00170\ \ \ \ \ \ \ \ \ m\_oss-\/>clear();}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00171}00171\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_singleton_a8c18286fe40405813c5bab05e20ce4f0}{Singleton<StringStreams>::getMutable}}().release(\ m\_index\ );}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00172}00172\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00173}00173\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00174}\mbox{\hyperlink{class_catch_1_1_reusable_string_stream_a0e9ecf260b2a5d35f4886ef0d51f6270}{00174}}\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{class_catch_1_1_reusable_string_stream_a0e9ecf260b2a5d35f4886ef0d51f6270}{ReusableStringStream::str}}()\ const\ -\/>\ \mbox{\hyperlink{namespacestd}{std}}::\textcolor{keywordtype}{string}\ \{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00175}00175\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}std::ostringstream*\textcolor{keyword}{>}(\ m\_oss\ )-\/>\mbox{\hyperlink{class_catch_1_1_reusable_string_stream_a0e9ecf260b2a5d35f4886ef0d51f6270}{str}}();}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00176}00176\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00177}00177\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00178}00178\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00180}00180\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00181}00181\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00182}00182\ \textcolor{preprocessor}{\#ifndef\ CATCH\_CONFIG\_NOSTDOUT\ }\textcolor{comment}{//\ If\ you\ \#define\ this\ you\ must\ implement\ these\ functions}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00183}00183\ \ \ \ \ std::ostream\&\ \mbox{\hyperlink{namespace_catch_a0179d453617ba2296f2baa99a49e7264}{cout}}()\ \{\ \textcolor{keywordflow}{return}\ std::cout;\ \}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00184}00184\ \ \ \ \ std::ostream\&\ \mbox{\hyperlink{namespace_catch_a54c1ce08041448d684ae8edc14162cd2}{cerr}}()\ \{\ \textcolor{keywordflow}{return}\ std::cerr;\ \}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00185}00185\ \ \ \ \ std::ostream\&\ \mbox{\hyperlink{namespace_catch_a1b2213f54e4d31a659db49827e81856b}{clog}}()\ \{\ \textcolor{keywordflow}{return}\ std::clog;\ \}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00186}00186\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__stream_8cpp_source_l00187}00187\ \}}
+
+\end{DoxyCode}

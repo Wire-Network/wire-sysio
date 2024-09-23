@@ -1,0 +1,9 @@
+<map id="softfloat_tryPropagateNaNExtF80M" name="softfloat_tryPropagateNaNExtF80M">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,23,172,64"/>
+<area shape="rect" id="Node000002" href="$softfloat_2source_28086-_s_s_e_2s__propagate_na_n_ext_f80_m_8c.html#a6d1fff7785c3407c872c7c2147223b5a" title=" " alt="" coords="220,31,432,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="172,41,204,41,204,46,172,46"/>
+<area shape="rect" id="Node000003" href="$softfloat_2source_28086-_s_s_e_2ext_f80_m__is_signaling_na_n_8c.html#ace8e5230b332cd22bdf612d80da1a3de" title=" " alt="" coords="480,5,649,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="432,30,464,26,465,31,433,35"/>
+<area shape="rect" id="Node000004" href="$softfloat_2source_28086-_s_s_e_2softfloat__raise_flags_8c.html#ac16bbf09eca0fe8ff91301d82c5a667f" title=" " alt="" coords="497,55,632,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="433,52,482,57,481,62,432,57"/>
+</map>

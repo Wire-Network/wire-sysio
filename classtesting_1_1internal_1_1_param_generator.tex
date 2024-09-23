@@ -1,0 +1,155 @@
+\doxysection{testing\+::internal\+::Param\+Generator\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classtesting_1_1internal_1_1_param_generator}{}\label{classtesting_1_1internal_1_1_param_generator}\index{testing::internal::ParamGenerator$<$ T $>$@{testing::internal::ParamGenerator$<$ T $>$}}
+
+
+{\ttfamily \#include $<$gtest-\/param-\/util.\+h$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator}{Param\+Iterator}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator_a9ef0754cb27db32142d1b6af028c09d8}{iterator}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator_a6b017d4d030927714d495ee95ae92fbc}{Param\+Generator}} (\mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator_interface}{Param\+Generator\+Interface}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \texorpdfstring{$\ast$}{*}impl)
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator_a5891d25c31919b3099489f8bbcd58b5e}{Param\+Generator}} (const \mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator}{Param\+Generator}} \&other)
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator}{Param\+Generator}} \& \mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator_afea19efc38617dca495a8027e24d4d32}{operator=}} (const \mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator}{Param\+Generator}} \&other)
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator_a9ef0754cb27db32142d1b6af028c09d8}{iterator}} \mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator_a14e735c8bd113556ae905a560cd2d607}{begin}} () const
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator_a9ef0754cb27db32142d1b6af028c09d8}{iterator}} \mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator_aaf8f75df1099a07ff771a550b48f9fbe}{end}} () const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$\newline
+class testing\+::internal\+::\+Param\+Generator$<$ T $>$}
+
+
+Definition at line \mbox{\hyperlink{gtest-param-util_8h_source_l00178}{178}} of file \mbox{\hyperlink{gtest-param-util_8h_source}{gtest-\/param-\/util.\+h}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_param_generator_a9ef0754cb27db32142d1b6af028c09d8}\index{testing::internal::ParamGenerator$<$ T $>$@{testing::internal::ParamGenerator$<$ T $>$}!iterator@{iterator}}
+\index{iterator@{iterator}!testing::internal::ParamGenerator$<$ T $>$@{testing::internal::ParamGenerator$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{iterator}{iterator}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_param_generator_a9ef0754cb27db32142d1b6af028c09d8} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator}{Param\+Iterator}}$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator}{testing\+::internal\+::\+Param\+Generator}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::iterator}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-param-util_8h_source_l00180}{180}} of file \mbox{\hyperlink{gtest-param-util_8h_source}{gtest-\/param-\/util.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_param_generator_a6b017d4d030927714d495ee95ae92fbc}\index{testing::internal::ParamGenerator$<$ T $>$@{testing::internal::ParamGenerator$<$ T $>$}!ParamGenerator@{ParamGenerator}}
+\index{ParamGenerator@{ParamGenerator}!testing::internal::ParamGenerator$<$ T $>$@{testing::internal::ParamGenerator$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{ParamGenerator()}{ParamGenerator()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_param_generator_a6b017d4d030927714d495ee95ae92fbc} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator}{testing\+::internal\+::\+Param\+Generator}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::\+Param\+Generator (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator_interface}{Param\+Generator\+Interface}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \texorpdfstring{$\ast$}{*}}]{impl}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-param-util_8h_source_l00182}{182}} of file \mbox{\hyperlink{gtest-param-util_8h_source}{gtest-\/param-\/util.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00182\ :\ impl\_(impl)\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1internal_1_1_param_generator_a5891d25c31919b3099489f8bbcd58b5e}\index{testing::internal::ParamGenerator$<$ T $>$@{testing::internal::ParamGenerator$<$ T $>$}!ParamGenerator@{ParamGenerator}}
+\index{ParamGenerator@{ParamGenerator}!testing::internal::ParamGenerator$<$ T $>$@{testing::internal::ParamGenerator$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{ParamGenerator()}{ParamGenerator()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_param_generator_a5891d25c31919b3099489f8bbcd58b5e} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator}{testing\+::internal\+::\+Param\+Generator}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::\+Param\+Generator (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator}{Param\+Generator}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&}]{other}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-param-util_8h_source_l00183}{183}} of file \mbox{\hyperlink{gtest-param-util_8h_source}{gtest-\/param-\/util.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00183\ :\ impl\_(\mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.impl\_)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_param_generator_a14e735c8bd113556ae905a560cd2d607}\index{testing::internal::ParamGenerator$<$ T $>$@{testing::internal::ParamGenerator$<$ T $>$}!begin@{begin}}
+\index{begin@{begin}!testing::internal::ParamGenerator$<$ T $>$@{testing::internal::ParamGenerator$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{begin()}{begin()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_param_generator_a14e735c8bd113556ae905a560cd2d607} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator_a9ef0754cb27db32142d1b6af028c09d8}{iterator}} \mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator}{testing\+::internal\+::\+Param\+Generator}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::begin (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-param-util_8h_source_l00190}{190}} of file \mbox{\hyperlink{gtest-param-util_8h_source}{gtest-\/param-\/util.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00190\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator_a9ef0754cb27db32142d1b6af028c09d8}{iterator}}(impl\_-\/>Begin());\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_param_generator_a14e735c8bd113556ae905a560cd2d607_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_param_generator_aaf8f75df1099a07ff771a550b48f9fbe}\index{testing::internal::ParamGenerator$<$ T $>$@{testing::internal::ParamGenerator$<$ T $>$}!end@{end}}
+\index{end@{end}!testing::internal::ParamGenerator$<$ T $>$@{testing::internal::ParamGenerator$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{end()}{end()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_param_generator_aaf8f75df1099a07ff771a550b48f9fbe} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator_a9ef0754cb27db32142d1b6af028c09d8}{iterator}} \mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator}{testing\+::internal\+::\+Param\+Generator}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::end (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-param-util_8h_source_l00191}{191}} of file \mbox{\hyperlink{gtest-param-util_8h_source}{gtest-\/param-\/util.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00191\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator_a9ef0754cb27db32142d1b6af028c09d8}{iterator}}(impl\_-\/>End());\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_param_generator_aaf8f75df1099a07ff771a550b48f9fbe_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_param_generator_afea19efc38617dca495a8027e24d4d32}\index{testing::internal::ParamGenerator$<$ T $>$@{testing::internal::ParamGenerator$<$ T $>$}!operator=@{operator=}}
+\index{operator=@{operator=}!testing::internal::ParamGenerator$<$ T $>$@{testing::internal::ParamGenerator$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_param_generator_afea19efc38617dca495a8027e24d4d32} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator}{Param\+Generator}} \& \mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator}{testing\+::internal\+::\+Param\+Generator}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::operator= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator}{Param\+Generator}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&}]{other}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-param-util_8h_source_l00185}{185}} of file \mbox{\hyperlink{gtest-param-util_8h_source}{gtest-\/param-\/util.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00186\ \ \ \ \ impl\_\ =\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.impl\_;}
+\DoxyCodeLine{00187\ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00188\ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/include/gtest/internal/\mbox{\hyperlink{gtest-param-util_8h}{gtest-\/param-\/util.\+h}}\end{DoxyCompactItemize}

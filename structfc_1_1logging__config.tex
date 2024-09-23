@@ -1,0 +1,119 @@
+\doxysection{fc\+::logging\+\_\+config Struct Reference}
+\hypertarget{structfc_1_1logging__config}{}\label{structfc_1_1logging__config}\index{fc::logging\_config@{fc::logging\_config}}
+
+
+{\ttfamily \#include $<$logger\+\_\+config.\+hpp$>$}
+
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static \mbox{\hyperlink{structfc_1_1logging__config}{logging\+\_\+config}} \mbox{\hyperlink{structfc_1_1logging__config_a8af01d185dda6259354f127c526902d5}{default\+\_\+config}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::vector$<$ \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} $>$ \mbox{\hyperlink{structfc_1_1logging__config_a7e30a543b2d4aec4324c6ec958a2dd13}{includes}}
+\item 
+std\+::vector$<$ \mbox{\hyperlink{structfc_1_1appender__config}{appender\+\_\+config}} $>$ \mbox{\hyperlink{structfc_1_1logging__config_ab703540d495cdbc67828de6b6dd6aec3}{appenders}}
+\item 
+std\+::vector$<$ \mbox{\hyperlink{structfc_1_1logger__config}{logger\+\_\+config}} $>$ \mbox{\hyperlink{structfc_1_1logging__config_a1a9da85cddeca8c8997bd666e7b29784}{loggers}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{logger__config_8hpp_source_l00038}{38}} of file \mbox{\hyperlink{logger__config_8hpp_source}{logger\+\_\+config.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structfc_1_1logging__config_a8af01d185dda6259354f127c526902d5}\index{fc::logging\_config@{fc::logging\_config}!default\_config@{default\_config}}
+\index{default\_config@{default\_config}!fc::logging\_config@{fc::logging\_config}}
+\doxysubsubsection{\texorpdfstring{default\_config()}{default\_config()}}
+{\footnotesize\ttfamily \label{structfc_1_1logging__config_a8af01d185dda6259354f127c526902d5} 
+\mbox{\hyperlink{structfc_1_1logging__config}{logging\+\_\+config}} fc\+::logging\+\_\+config\+::default\+\_\+config (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{logger__config_8cpp_source_l00105}{105}} of file \mbox{\hyperlink{logger__config_8cpp_source}{logger\+\_\+config.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \textcolor{comment}{//slog(\ "{}default\ cfg"{}\ );}}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ logging\_config\ cfg;}
+\DoxyCodeLine{00108\ }
+\DoxyCodeLine{00109\ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}\ \ c;}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ c.push\_back(\ \ mutable\_variant\_object(\ \textcolor{stringliteral}{"{}level"{}},\textcolor{stringliteral}{"{}debug"{}})(\textcolor{stringliteral}{"{}color"{}},\ \textcolor{stringliteral}{"{}green"{}})\ );}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ c.push\_back(\ \ mutable\_variant\_object(\ \textcolor{stringliteral}{"{}level"{}},\textcolor{stringliteral}{"{}warn"{}})(\textcolor{stringliteral}{"{}color"{}},\ \textcolor{stringliteral}{"{}brown"{}})\ );}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ c.push\_back(\ \ mutable\_variant\_object(\ \textcolor{stringliteral}{"{}level"{}},\textcolor{stringliteral}{"{}error"{}})(\textcolor{stringliteral}{"{}color"{}},\ \textcolor{stringliteral}{"{}red"{}})\ );}
+\DoxyCodeLine{00113\ }
+\DoxyCodeLine{00114\ \ \ \ \ \ \ cfg.appenders.push\_back(}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \ \ \ \ appender\_config(\ \textcolor{stringliteral}{"{}stderr"{}},\ \textcolor{stringliteral}{"{}console"{}},}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ mutable\_variant\_object()}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\ \textcolor{stringliteral}{"{}stream"{}},\textcolor{stringliteral}{"{}std\_error"{}})}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\ \textcolor{stringliteral}{"{}level\_colors"{}},\ c\ )}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ )\ );}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ cfg.appenders.push\_back(}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \ \ \ \ \ appender\_config(\ \textcolor{stringliteral}{"{}stdout"{}},\ \textcolor{stringliteral}{"{}console"{}},}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ mutable\_variant\_object()}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\ \textcolor{stringliteral}{"{}stream"{}},\textcolor{stringliteral}{"{}std\_out"{}})}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\ \textcolor{stringliteral}{"{}level\_colors"{}},\ c\ )}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ )\ );}
+\DoxyCodeLine{00126\ }
+\DoxyCodeLine{00127\ \ \ \ \ \ \ logger\_config\ dlc;}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ dlc.name\ =\ \mbox{\hyperlink{logger_8hpp_a8c7a288fea519c7e895518f8dff4888f}{DEFAULT\_LOGGER}};}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ dlc.level\ =\ \mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4afe6da1f3a75c3911b0b59bffaea070e1}{log\_level::info}};}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ dlc.appenders.push\_back(\textcolor{stringliteral}{"{}stderr"{}});}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ cfg.loggers.push\_back(\ dlc\ );}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ cfg;}
+\DoxyCodeLine{00133\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structfc_1_1logging__config_a8af01d185dda6259354f127c526902d5_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structfc_1_1logging__config_ab703540d495cdbc67828de6b6dd6aec3}\index{fc::logging\_config@{fc::logging\_config}!appenders@{appenders}}
+\index{appenders@{appenders}!fc::logging\_config@{fc::logging\_config}}
+\doxysubsubsection{\texorpdfstring{appenders}{appenders}}
+{\footnotesize\ttfamily \label{structfc_1_1logging__config_ab703540d495cdbc67828de6b6dd6aec3} 
+std\+::vector$<$\mbox{\hyperlink{structfc_1_1appender__config}{appender\+\_\+config}}$>$ fc\+::logging\+\_\+config\+::appenders}
+
+
+
+Definition at line \mbox{\hyperlink{logger__config_8hpp_source_l00041}{41}} of file \mbox{\hyperlink{logger__config_8hpp_source}{logger\+\_\+config.\+hpp}}.
+
+\Hypertarget{structfc_1_1logging__config_a7e30a543b2d4aec4324c6ec958a2dd13}\index{fc::logging\_config@{fc::logging\_config}!includes@{includes}}
+\index{includes@{includes}!fc::logging\_config@{fc::logging\_config}}
+\doxysubsubsection{\texorpdfstring{includes}{includes}}
+{\footnotesize\ttfamily \label{structfc_1_1logging__config_a7e30a543b2d4aec4324c6ec958a2dd13} 
+std\+::vector$<$\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}}$>$ fc\+::logging\+\_\+config\+::includes}
+
+
+
+Definition at line \mbox{\hyperlink{logger__config_8hpp_source_l00040}{40}} of file \mbox{\hyperlink{logger__config_8hpp_source}{logger\+\_\+config.\+hpp}}.
+
+\Hypertarget{structfc_1_1logging__config_a1a9da85cddeca8c8997bd666e7b29784}\index{fc::logging\_config@{fc::logging\_config}!loggers@{loggers}}
+\index{loggers@{loggers}!fc::logging\_config@{fc::logging\_config}}
+\doxysubsubsection{\texorpdfstring{loggers}{loggers}}
+{\footnotesize\ttfamily \label{structfc_1_1logging__config_a1a9da85cddeca8c8997bd666e7b29784} 
+std\+::vector$<$\mbox{\hyperlink{structfc_1_1logger__config}{logger\+\_\+config}}$>$ fc\+::logging\+\_\+config\+::loggers}
+
+
+
+Definition at line \mbox{\hyperlink{logger__config_8hpp_source_l00042}{42}} of file \mbox{\hyperlink{logger__config_8hpp_source}{logger\+\_\+config.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/log/\mbox{\hyperlink{logger__config_8hpp}{logger\+\_\+config.\+hpp}}\item 
+libraries/fc/src/log/\mbox{\hyperlink{logger__config_8cpp}{logger\+\_\+config.\+cpp}}\end{DoxyCompactItemize}

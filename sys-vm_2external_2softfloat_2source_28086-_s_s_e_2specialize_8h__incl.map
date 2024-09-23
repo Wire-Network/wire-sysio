@@ -1,0 +1,15 @@
+<map id="libraries/sys&#45;vm/external/softfloat/source/8086&#45;SSE/specialize.h" name="libraries/sys&#45;vm/external/softfloat/source/8086&#45;SSE/specialize.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="112,5,275,61"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,109,80,135"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="147,64,78,103,75,99,145,59"/>
+<area shape="rect" id="Node000003" href="$stdint_8h.html" title=" " alt="" coords="104,109,168,135"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="178,63,154,97,150,94,173,60"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="192,109,309,135"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="213,60,236,94,232,97,209,63"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="332,109,412,135"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="250,59,334,99,332,104,248,64"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="59,183,122,208"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="131,136,108,171,104,168,126,133"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="147,183,213,208"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="145,133,167,168,162,171,141,136"/>
+</map>

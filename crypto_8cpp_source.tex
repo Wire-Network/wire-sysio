@@ -1,0 +1,280 @@
+\doxysection{crypto.\+cpp}
+\hypertarget{crypto_8cpp_source}{}\label{crypto_8cpp_source}\index{libraries/chain/webassembly/crypto.cpp@{libraries/chain/webassembly/crypto.cpp}}
+\mbox{\hyperlink{crypto_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{interface_8hpp}{sysio/chain/webassembly/interface.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{protocol__state__object_8hpp}{sysio/chain/protocol\_state\_object.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{transaction__context_8hpp}{sysio/chain/transaction\_context.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{apply__context_8hpp}{sysio/chain/apply\_context.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{alt__bn128_8hpp}{fc/crypto/alt\_bn128.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{modular__arithmetic_8hpp}{fc/crypto/modular\_arithmetic.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{blake2_8hpp}{fc/crypto/blake2.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{sha3_8hpp}{fc/crypto/sha3.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{k1__recover_8hpp}{fc/crypto/k1\_recover.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00011}00011\ \textcolor{keyword}{namespace\ }\{}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00012}00012\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ ceil\_log2(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ n)}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00013}00013\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00014}00014\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (n\ <=\ 1)\ \{}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00015}00015\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00016}00016\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00017}00017\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 32\ -\/\ \_\_builtin\_clz(n\ -\/\ 1);}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00018}00018\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00019}00019\ \}}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00021}00021\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{\ \textcolor{keyword}{namespace\ }chain\ \{\ \textcolor{keyword}{namespace\ }webassembly\ \{}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00023}\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_a08c5378bb6d60caa788eb7bfdea58ed4}{00023}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_a08c5378bb6d60caa788eb7bfdea58ed4}{interface::assert\_recover\_key}}(\ \mbox{\hyperlink{structsysio_1_1vm_1_1argument__proxy}{legacy\_ptr<const\ fc::sha256>}}\ \mbox{\hyperlink{namespacefc_a150ca4cd9c0318ca45dc0dc7df5d58b9}{digest}},}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00024}00024\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1argument__proxy}{legacy\_span<const\ char>}}\ sig,}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00025}00025\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1argument__proxy}{legacy\_span<const\ char>}}\ pub\ )\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00026}00026\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{fc::crypto::signature}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00027}00027\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1crypto_1_1public__key}{fc::crypto::public\_key}}\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}};}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00028}00028\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1datastream}{datastream<const\ char*>}}\ ds(\ sig.data(),\ sig.size()\ );}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00029}00029\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1datastream}{datastream<const\ char*>}}\ pubds\ (\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3037ff69dd24c6e34aee6fdd45269f13}{pub}}.data(),\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3037ff69dd24c6e34aee6fdd45269f13}{pub}}.size()\ );}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00031}00031\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a0b442d98ceb22dd5a6ae84745e43ffab}{fc::raw::unpack}}(\ ds,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ );}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00032}00032\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a0b442d98ceb22dd5a6ae84745e43ffab}{fc::raw::unpack}}(\ pubds,\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ );}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00034}00034\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.which()\ <\ \mbox{\hyperlink{structcontext}{context}}.db.get<\mbox{\hyperlink{classsysio_1_1chain_1_1protocol__state__object}{protocol\_state\_object}}>().\mbox{\hyperlink{classsysio_1_1chain_1_1protocol__state__object_af0f14fd2383a20afd49de85013402cdc}{num\_supported\_key\_types}},\ unactivated\_signature\_type,}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00035}00035\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Unactivated\ signature\ type\ used\ during\ assert\_recover\_key"{}});}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00036}00036\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.which()\ <\ \mbox{\hyperlink{structcontext}{context}}.db.get<\mbox{\hyperlink{classsysio_1_1chain_1_1protocol__state__object}{protocol\_state\_object}}>().\mbox{\hyperlink{classsysio_1_1chain_1_1protocol__state__object_af0f14fd2383a20afd49de85013402cdc}{num\_supported\_key\_types}},\ unactivated\_key\_type,}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00037}00037\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Unactivated\ key\ type\ used\ when\ creating\ assert\_recover\_key"{}});}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00039}00039\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{structcontext}{context}}.control.is\_producing\_block())}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00040}00040\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.variable\_size()\ <=\ \mbox{\hyperlink{structcontext}{context}}.control.configured\_subjective\_signature\_length\_limit(),}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00041}00041\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sig\_variable\_size\_limit\_exception,\ \textcolor{stringliteral}{"{}signature\ variable\ length\ component\ size\ greater\ than\ subjective\ maximum"{}});}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00043}00043\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ check\ =\ \mbox{\hyperlink{classfc_1_1crypto_1_1public__key}{fc::crypto::public\_key}}(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ *\mbox{\hyperlink{namespacefc_a150ca4cd9c0318ca45dc0dc7df5d58b9}{digest}},\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00044}00044\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ check\ ==\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\ crypto\_api\_exception,\ \textcolor{stringliteral}{"{}Error\ expected\ key\ different\ than\ recovered\ key"{}}\ );}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00045}00045\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00047}\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_a44314bf6f0a00b1aa8595862a41fc3c6}{00047}}\ \ \ \ \mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}}\ \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_a44314bf6f0a00b1aa8595862a41fc3c6}{interface::recover\_key}}(\ \mbox{\hyperlink{structsysio_1_1vm_1_1argument__proxy}{legacy\_ptr<const\ fc::sha256>}}\ \mbox{\hyperlink{namespacefc_a150ca4cd9c0318ca45dc0dc7df5d58b9}{digest}},}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1argument__proxy}{legacy\_span<const\ char>}}\ sig,}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1argument__proxy}{legacy\_span<char>}}\ pub\ )\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00050}00050\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{fc::crypto::signature}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00051}00051\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1datastream}{datastream<const\ char*>}}\ ds(\ sig.data(),\ sig.size()\ );}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00052}00052\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a0b442d98ceb22dd5a6ae84745e43ffab}{fc::raw::unpack}}(ds,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00054}00054\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.which()\ <\ \mbox{\hyperlink{structcontext}{context}}.db.get<\mbox{\hyperlink{classsysio_1_1chain_1_1protocol__state__object}{protocol\_state\_object}}>().\mbox{\hyperlink{classsysio_1_1chain_1_1protocol__state__object_af0f14fd2383a20afd49de85013402cdc}{num\_supported\_key\_types}},\ unactivated\_signature\_type,}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Unactivated\ signature\ type\ used\ during\ recover\_key"{}});}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00057}00057\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{structcontext}{context}}.control.is\_producing\_block())}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.variable\_size()\ <=\ \mbox{\hyperlink{structcontext}{context}}.control.configured\_subjective\_signature\_length\_limit(),}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00059}00059\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sig\_variable\_size\_limit\_exception,\ \textcolor{stringliteral}{"{}signature\ variable\ length\ component\ size\ greater\ than\ subjective\ maximum"{}});}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00062}00062\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ recovered\ =\ \mbox{\hyperlink{classfc_1_1crypto_1_1public__key}{fc::crypto::public\_key}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ *\mbox{\hyperlink{namespacefc_a150ca4cd9c0318ca45dc0dc7df5d58b9}{digest}},\ \textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00064}00064\ \ \ \ \ \ \ \textcolor{comment}{//\ the\ key\ types\ newer\ than\ the\ first\ 2\ may\ be\ varible\ in\ length}}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00065}00065\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.which()\ >=\ config::genesis\_num\_supported\_key\_types\ )\ \{}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00066}00066\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3037ff69dd24c6e34aee6fdd45269f13}{pub}}.size()\ >=\ 33,\ wasm\_execution\_error,}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00067}00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}destination\ buffer\ must\ at\ least\ be\ able\ to\ hold\ an\ ECC\ public\ key"{}});}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ packed\_pubkey\ =\ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(recovered);}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ copy\_size\ =\ std::min<size\_t>(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3037ff69dd24c6e34aee6fdd45269f13}{pub}}.size(),\ packed\_pubkey.size());}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00070}00070\ \ \ \ \ \ \ \ \ \ std::memcpy(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3037ff69dd24c6e34aee6fdd45269f13}{pub}}.data(),\ packed\_pubkey.data(),\ copy\_size);}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00071}00071\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ packed\_pubkey.size();}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00072}00072\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00073}00073\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ legacy\ behavior,\ key\ types\ 0\ and\ 1\ always\ pack\ to\ 33\ bytes.}}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00074}00074\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ this\ will\ do\ one\ less\ copy\ for\ those\ keys\ while\ maintaining\ the\ rules\ of}}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00075}00075\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ \ \ \ [0..33)\ dest\ sizes:\ assert\ (asserts\ in\ fc::raw::pack)}}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ \ \ \ [33..inf)\ dest\ sizes:\ return\ packed\ size\ (always\ 33)}}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1datastream}{datastream<char*>}}\ out\_ds(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3037ff69dd24c6e34aee6fdd45269f13}{pub}}.data(),\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3037ff69dd24c6e34aee6fdd45269f13}{pub}}.size()\ );}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00078}00078\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(out\_ds,\ recovered);}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ out\_ds.tellp();}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00080}00080\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00081}00081\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00083}\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_af5deef400b2def641a75537b8955b1c1}{00083}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_af5deef400b2def641a75537b8955b1c1}{interface::assert\_sha256}}(\mbox{\hyperlink{structsysio_1_1vm_1_1argument__proxy}{legacy\_span<const\ char>}}\ data,\ \mbox{\hyperlink{structsysio_1_1vm_1_1argument__proxy}{legacy\_ptr<const\ fc::sha256>}}\ hash\_val)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00084}00084\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ result\ =\ \mbox{\hyperlink{structcontext}{context}}.trx\_context.hash\_with\_checktime<\mbox{\hyperlink{classfc_1_1sha256}{fc::sha256}}>(\ data.data(),\ data.size()\ );}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00085}00085\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ result\ ==\ *hash\_val,\ crypto\_api\_exception,\ \textcolor{stringliteral}{"{}hash\ mismatch"{}}\ );}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00086}00086\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00087}00087\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00088}\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_ac7d825c06f082f40cc11801a57a444f4}{00088}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_ac7d825c06f082f40cc11801a57a444f4}{interface::assert\_sha1}}(\mbox{\hyperlink{structsysio_1_1vm_1_1argument__proxy}{legacy\_span<const\ char>}}\ data,\ \mbox{\hyperlink{structsysio_1_1vm_1_1argument__proxy}{legacy\_ptr<const\ fc::sha1>}}\ hash\_val)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00089}00089\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ result\ =\ \mbox{\hyperlink{structcontext}{context}}.trx\_context.hash\_with\_checktime<\mbox{\hyperlink{classfc_1_1sha1}{fc::sha1}}>(\ data.data(),\ data.size()\ );}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00090}00090\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ result\ ==\ *hash\_val,\ crypto\_api\_exception,\ \textcolor{stringliteral}{"{}hash\ mismatch"{}}\ );}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00091}00091\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00092}00092\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00093}\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_aac595bc32faa1777453e52e5a52b3c62}{00093}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_aac595bc32faa1777453e52e5a52b3c62}{interface::assert\_sha512}}(\mbox{\hyperlink{structsysio_1_1vm_1_1argument__proxy}{legacy\_span<const\ char>}}\ data,\ \mbox{\hyperlink{structsysio_1_1vm_1_1argument__proxy}{legacy\_ptr<const\ fc::sha512>}}\ hash\_val)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00094}00094\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ result\ =\ \mbox{\hyperlink{structcontext}{context}}.trx\_context.hash\_with\_checktime<\mbox{\hyperlink{classfc_1_1sha512}{fc::sha512}}>(\ data.data(),\ data.size()\ );}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00095}00095\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ result\ ==\ *hash\_val,\ crypto\_api\_exception,\ \textcolor{stringliteral}{"{}hash\ mismatch"{}}\ );}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00096}00096\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00097}00097\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00098}\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_ad9cc60d729ed9f4afd7ae2e566d90b2a}{00098}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_ad9cc60d729ed9f4afd7ae2e566d90b2a}{interface::assert\_ripemd160}}(\mbox{\hyperlink{structsysio_1_1vm_1_1argument__proxy}{legacy\_span<const\ char>}}\ data,\ \mbox{\hyperlink{structsysio_1_1vm_1_1argument__proxy}{legacy\_ptr<const\ fc::ripemd160>}}\ hash\_val)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00099}00099\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ result\ =\ \mbox{\hyperlink{structcontext}{context}}.trx\_context.hash\_with\_checktime<\mbox{\hyperlink{classfc_1_1ripemd160}{fc::ripemd160}}>(\ data.data(),\ data.size()\ );}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00100}00100\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ result\ ==\ *hash\_val,\ crypto\_api\_exception,\ \textcolor{stringliteral}{"{}hash\ mismatch"{}}\ );}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00101}00101\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00102}00102\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00103}\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_a5f1d4e9ea75e1ef71f217b5800cf1989}{00103}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_a5f1d4e9ea75e1ef71f217b5800cf1989}{interface::sha1}}(\mbox{\hyperlink{structsysio_1_1vm_1_1argument__proxy}{legacy\_span<const\ char>}}\ data,\ \mbox{\hyperlink{structsysio_1_1vm_1_1argument__proxy}{legacy\_ptr<fc::sha1>}}\ hash\_val)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00104}00104\ \ \ \ \ \ \ *hash\_val\ =\ \mbox{\hyperlink{structcontext}{context}}.trx\_context.hash\_with\_checktime<\mbox{\hyperlink{classfc_1_1sha1}{fc::sha1}}>(\ data.data(),\ data.size()\ );}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00105}00105\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00106}00106\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00107}\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_a6a8a6c7b1d159ec333e2c929ced1a388}{00107}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_a6a8a6c7b1d159ec333e2c929ced1a388}{interface::sha256}}(\mbox{\hyperlink{structsysio_1_1vm_1_1argument__proxy}{legacy\_span<const\ char>}}\ data,\ \mbox{\hyperlink{structsysio_1_1vm_1_1argument__proxy}{legacy\_ptr<fc::sha256>}}\ hash\_val)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00108}00108\ \ \ \ \ \ \ *hash\_val\ =\ \mbox{\hyperlink{structcontext}{context}}.trx\_context.hash\_with\_checktime<\mbox{\hyperlink{classfc_1_1sha256}{fc::sha256}}>(\ data.data(),\ data.size()\ );}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00109}00109\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00110}00110\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00111}\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_a929d2d35be8abca6871bb6acd537eb6e}{00111}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_a929d2d35be8abca6871bb6acd537eb6e}{interface::sha512}}(\mbox{\hyperlink{structsysio_1_1vm_1_1argument__proxy}{legacy\_span<const\ char>}}\ data,\ \mbox{\hyperlink{structsysio_1_1vm_1_1argument__proxy}{legacy\_ptr<fc::sha512>}}\ hash\_val)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00112}00112\ \ \ \ \ \ \ *hash\_val\ =\ \mbox{\hyperlink{structcontext}{context}}.trx\_context.hash\_with\_checktime<\mbox{\hyperlink{classfc_1_1sha512}{fc::sha512}}>(\ data.data(),\ data.size()\ );}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00113}00113\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00114}00114\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00115}\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_adb2fed0f204f94c3d6706f7f05480d8f}{00115}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_adb2fed0f204f94c3d6706f7f05480d8f}{interface::ripemd160}}(\mbox{\hyperlink{structsysio_1_1vm_1_1argument__proxy}{legacy\_span<const\ char>}}\ data,\ \mbox{\hyperlink{structsysio_1_1vm_1_1argument__proxy}{legacy\_ptr<fc::ripemd160>}}\ hash\_val)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00116}00116\ \ \ \ \ \ \ *hash\_val\ =\ \mbox{\hyperlink{structcontext}{context}}.trx\_context.hash\_with\_checktime<\mbox{\hyperlink{classfc_1_1ripemd160}{fc::ripemd160}}>(\ data.data(),\ data.size()\ );}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00117}00117\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00118}00118\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00119}\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_a87e4174e8b850207ab01a7345d8cd077}{00119}}\ \ \ \ \mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}}\ \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_a87e4174e8b850207ab01a7345d8cd077}{interface::alt\_bn128\_add}}(\mbox{\hyperlink{classsysio_1_1vm_1_1span}{span<const\ char>}}\ op1,\ \mbox{\hyperlink{classsysio_1_1vm_1_1span}{span<const\ char>}}\ op2,\ \mbox{\hyperlink{classsysio_1_1vm_1_1span}{span<char>}}\ result\ )\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00120}00120\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1vector}{bytes}}\ bop1(op1.\mbox{\hyperlink{classsysio_1_1vm_1_1span_a65d9e2641d763c860ae175a9a936a309}{data}}(),\ op1.\mbox{\hyperlink{classsysio_1_1vm_1_1span_a65d9e2641d763c860ae175a9a936a309}{data}}()\ +\ op1.\mbox{\hyperlink{classsysio_1_1vm_1_1span_a584ee0404e01edf225142e86d23d6d7d}{size}}());}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00121}00121\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1vector}{bytes}}\ bop2(op2.\mbox{\hyperlink{classsysio_1_1vm_1_1span_a65d9e2641d763c860ae175a9a936a309}{data}}(),\ op2.\mbox{\hyperlink{classsysio_1_1vm_1_1span_a65d9e2641d763c860ae175a9a936a309}{data}}()\ +\ op2.\mbox{\hyperlink{classsysio_1_1vm_1_1span_a584ee0404e01edf225142e86d23d6d7d}{size}}());}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00122}00122\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00123}00123\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ maybe\_err\ =\ \mbox{\hyperlink{namespacefc_aaccc65ddd035c56d5e92bedde7de3bde}{fc::alt\_bn128\_add}}(bop1,\ bop2);}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00124}00124\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(std::holds\_alternative<fc::alt\_bn128\_error>(maybe\_err))\ \{}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00125}00125\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a72ffd6653260a2dedcc4b55e39e10973a7d4cd494d78f4cdd5d46d2c36a5baeac}{return\_code::failure}};}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00126}00126\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00127}00127\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00128}00128\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ res\ =\ std::get<bytes>(maybe\_err);}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00129}00129\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00130}00130\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ result.size()\ <\ res.size()\ )}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00131}00131\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a72ffd6653260a2dedcc4b55e39e10973a7d4cd494d78f4cdd5d46d2c36a5baeac}{return\_code::failure}};}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00132}00132\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00133}00133\ \ \ \ \ \ \ std::memcpy(\ result.data(),\ res.data(),\ res.size()\ );}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00134}00134\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a72ffd6653260a2dedcc4b55e39e10973a4e09c20e9a85794807a130e8283e8769}{return\_code::success}};}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00135}00135\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00136}00136\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00137}\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_a6f30f2acaf6c69fd651053de03385fb6}{00137}}\ \ \ \ \mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}}\ \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_a6f30f2acaf6c69fd651053de03385fb6}{interface::alt\_bn128\_mul}}(\mbox{\hyperlink{classsysio_1_1vm_1_1span}{span<const\ char>}}\ g1\_point,\ \mbox{\hyperlink{classsysio_1_1vm_1_1span}{span<const\ char>}}\ scalar,\ \mbox{\hyperlink{classsysio_1_1vm_1_1span}{span<char>}}\ result)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00138}00138\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1vector}{bytes}}\ bg1\_point(g1\_point.\mbox{\hyperlink{classsysio_1_1vm_1_1span_a65d9e2641d763c860ae175a9a936a309}{data}}(),\ g1\_point.\mbox{\hyperlink{classsysio_1_1vm_1_1span_a65d9e2641d763c860ae175a9a936a309}{data}}()\ +\ g1\_point.\mbox{\hyperlink{classsysio_1_1vm_1_1span_a584ee0404e01edf225142e86d23d6d7d}{size}}());}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00139}00139\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1vector}{bytes}}\ bscalar(scalar.\mbox{\hyperlink{classsysio_1_1vm_1_1span_a65d9e2641d763c860ae175a9a936a309}{data}}(),\ scalar.\mbox{\hyperlink{classsysio_1_1vm_1_1span_a65d9e2641d763c860ae175a9a936a309}{data}}()\ +\ scalar.\mbox{\hyperlink{classsysio_1_1vm_1_1span_a584ee0404e01edf225142e86d23d6d7d}{size}}());}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00140}00140\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00141}00141\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ maybe\_err\ =\ \mbox{\hyperlink{namespacefc_adabebd5c846d83006ef00e1e63c5ec09}{fc::alt\_bn128\_mul}}(bg1\_point,\ bscalar);}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00142}00142\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(std::holds\_alternative<fc::alt\_bn128\_error>(maybe\_err))\ \{}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00143}00143\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a72ffd6653260a2dedcc4b55e39e10973a7d4cd494d78f4cdd5d46d2c36a5baeac}{return\_code::failure}};}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00144}00144\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00145}00145\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00146}00146\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ res\ =\ std::get<bytes>(maybe\_err);}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00147}00147\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00148}00148\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ result.size()\ <\ res.size()\ )}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00149}00149\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a72ffd6653260a2dedcc4b55e39e10973a7d4cd494d78f4cdd5d46d2c36a5baeac}{return\_code::failure}};}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00150}00150\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00151}00151\ \ \ \ \ \ \ std::memcpy(\ result.data(),\ res.data(),\ res.size()\ );}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00152}00152\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a72ffd6653260a2dedcc4b55e39e10973a4e09c20e9a85794807a130e8283e8769}{return\_code::success}};}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00153}00153\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00154}00154\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00155}\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_aed80304573df2ac1991a303330a20eb8}{00155}}\ \ \ \ \mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}}\ \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_aed80304573df2ac1991a303330a20eb8}{interface::alt\_bn128\_pair}}(\mbox{\hyperlink{classsysio_1_1vm_1_1span}{span<const\ char>}}\ g1\_g2\_pairs)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00156}00156\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1vector}{bytes}}\ bg1\_g2\_pairs(g1\_g2\_pairs.\mbox{\hyperlink{classsysio_1_1vm_1_1span_a65d9e2641d763c860ae175a9a936a309}{data}}(),\ g1\_g2\_pairs.\mbox{\hyperlink{classsysio_1_1vm_1_1span_a65d9e2641d763c860ae175a9a936a309}{data}}()\ +\ g1\_g2\_pairs.\mbox{\hyperlink{classsysio_1_1vm_1_1span_a584ee0404e01edf225142e86d23d6d7d}{size}}());}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00157}00157\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00158}00158\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ checktime\ =\ [\textcolor{keyword}{this}]()\ \{\ \mbox{\hyperlink{structcontext}{context}}.trx\_context.checktime();\ \};}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00159}00159\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ res\ =\ \mbox{\hyperlink{namespacefc_afff05d8da5063eecb517149a272d20ed}{fc::alt\_bn128\_pair}}(bg1\_g2\_pairs,\ checktime);}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00160}00160\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(std::holds\_alternative<fc::alt\_bn128\_error>(res))\ \{}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00161}00161\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a72ffd6653260a2dedcc4b55e39e10973a7d4cd494d78f4cdd5d46d2c36a5baeac}{return\_code::failure}};}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00162}00162\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00163}00163\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00164}00164\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !std::get<bool>(res);\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00165}00165\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00166}00166\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00167}\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_add0c4e2d8f7e1f4f64646c0ae8a0072d}{00167}}\ \ \ \ \mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}}\ \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_add0c4e2d8f7e1f4f64646c0ae8a0072d}{interface::mod\_exp}}(\mbox{\hyperlink{classsysio_1_1vm_1_1span}{span<const\ char>}}\ base,}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00168}00168\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1span}{span<const\ char>}}\ exp,}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00169}00169\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1span}{span<const\ char>}}\ modulus,}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00170}00170\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1span}{span<char>}}\ out)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00171}00171\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structcontext}{context}}.control.is\_producing\_block())\ \{}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00172}00172\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ base\_modulus\_size\ =\ std::max(base.size(),\ modulus.\mbox{\hyperlink{classsysio_1_1vm_1_1span_a584ee0404e01edf225142e86d23d6d7d}{size}}());}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00173}00173\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00174}00174\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (base\_modulus\_size\ <\ exp.\mbox{\hyperlink{classsysio_1_1vm_1_1span_a584ee0404e01edf225142e86d23d6d7d}{size}}())\ \{}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00175}00175\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a1bfa656552ea0534b2c91ee0fe33f850}{SYS\_THROW}}(subjective\_block\_production\_exception,\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00176}00176\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}mod\_exp\ restriction:\ exponent\ bit\ size\ cannot\ exceed\ bit\ size\ of\ either\ base\ or\ modulus"{}});}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00177}00177\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00178}00178\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00179}00179\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ bit\_calc\_limit\ =\ 106;}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00180}00180\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00181}00181\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ bit\_calc\ =\ 5\ *\ ceil\_log2(exp.\mbox{\hyperlink{classsysio_1_1vm_1_1span_a584ee0404e01edf225142e86d23d6d7d}{size}}())\ +\ 8\ *\ ceil\_log2(base\_modulus\_size);}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00182}00182\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00183}00183\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (bit\_calc\_limit\ <\ bit\_calc)\ \{}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00184}00184\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a1bfa656552ea0534b2c91ee0fe33f850}{SYS\_THROW}}(subjective\_block\_production\_exception,\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00185}00185\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}mod\_exp\ restriction:\ bit\ size\ too\ large\ for\ input\ arguments"{}});}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00186}00186\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00187}00187\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00188}00188\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00189}00189\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1vector}{bytes}}\ bbase(base.data(),\ base.data()\ +\ base.size());}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00190}00190\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1vector}{bytes}}\ bexp(exp.\mbox{\hyperlink{classsysio_1_1vm_1_1span_a65d9e2641d763c860ae175a9a936a309}{data}}(),\ exp.\mbox{\hyperlink{classsysio_1_1vm_1_1span_a65d9e2641d763c860ae175a9a936a309}{data}}()\ +\ exp.\mbox{\hyperlink{classsysio_1_1vm_1_1span_a584ee0404e01edf225142e86d23d6d7d}{size}}());}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00191}00191\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1vector}{bytes}}\ bmod(modulus.\mbox{\hyperlink{classsysio_1_1vm_1_1span_a65d9e2641d763c860ae175a9a936a309}{data}}(),\ modulus.\mbox{\hyperlink{classsysio_1_1vm_1_1span_a65d9e2641d763c860ae175a9a936a309}{data}}()\ +\ modulus.\mbox{\hyperlink{classsysio_1_1vm_1_1span_a584ee0404e01edf225142e86d23d6d7d}{size}}());}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00192}00192\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00193}00193\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ maybe\_err\ =\ \mbox{\hyperlink{namespacefc_a281277066c9c4feee4ced185bc0a182d}{fc::modexp}}(bbase,\ bexp,\ bmod);}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00194}00194\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(std::holds\_alternative<fc::modular\_arithmetic\_error>(maybe\_err))\ \{}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00195}00195\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a72ffd6653260a2dedcc4b55e39e10973a7d4cd494d78f4cdd5d46d2c36a5baeac}{return\_code::failure}};}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00196}00196\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00197}00197\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00198}00198\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ res\ =\ std::get<bytes>(maybe\_err);}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00199}00199\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00200}00200\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ out.size()\ <\ res.size()\ )}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00201}00201\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a72ffd6653260a2dedcc4b55e39e10973a7d4cd494d78f4cdd5d46d2c36a5baeac}{return\_code::failure}};}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00202}00202\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00203}00203\ \ \ \ \ \ \ std::memcpy(\ out.data(),\ res.data(),\ res.size()\ );}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00204}00204\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a72ffd6653260a2dedcc4b55e39e10973a4e09c20e9a85794807a130e8283e8769}{return\_code::success}};}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00205}00205\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00206}00206\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00207}\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_aa0d9eccdffb4218f3fe53f104ae8ce7a}{00207}}\ \ \ \ \mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}}\ \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_aa0d9eccdffb4218f3fe53f104ae8ce7a}{interface::blake2\_f}}(\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ rounds,}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00208}00208\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1span}{span<const\ char>}}\ \mbox{\hyperlink{structstate}{state}},}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00209}00209\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1span}{span<const\ char>}}\ message,}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00210}00210\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1span}{span<const\ char>}}\ t0\_offset,}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00211}00211\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1span}{span<const\ char>}}\ t1\_offset,}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00212}00212\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}}\ \textcolor{keyword}{final},}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00213}00213\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1span}{span<char>}}\ out)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00214}00214\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00215}00215\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \_final\ =\ \textcolor{keyword}{final}\ ==\ 1;}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00216}00216\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1vector}{bytes}}\ bstate(\mbox{\hyperlink{structstate}{state}}.data(),\ \mbox{\hyperlink{structstate}{state}}.data()\ +\ \mbox{\hyperlink{structstate}{state}}.size());}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00217}00217\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1vector}{bytes}}\ bmessage(message.data(),\ message.data()\ +\ message.size());}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00218}00218\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1vector}{bytes}}\ bt0\_offset(t0\_offset.\mbox{\hyperlink{classsysio_1_1vm_1_1span_a65d9e2641d763c860ae175a9a936a309}{data}}(),\ t0\_offset.\mbox{\hyperlink{classsysio_1_1vm_1_1span_a65d9e2641d763c860ae175a9a936a309}{data}}()\ +\ t0\_offset.\mbox{\hyperlink{classsysio_1_1vm_1_1span_a584ee0404e01edf225142e86d23d6d7d}{size}}());}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00219}00219\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1vector}{bytes}}\ bt1\_offset(t1\_offset.\mbox{\hyperlink{classsysio_1_1vm_1_1span_a65d9e2641d763c860ae175a9a936a309}{data}}(),\ t1\_offset.\mbox{\hyperlink{classsysio_1_1vm_1_1span_a65d9e2641d763c860ae175a9a936a309}{data}}()\ +\ t1\_offset.\mbox{\hyperlink{classsysio_1_1vm_1_1span_a584ee0404e01edf225142e86d23d6d7d}{size}}());}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00220}00220\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00221}00221\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ checktime\ =\ [\textcolor{keyword}{this}]()\ \{\ \mbox{\hyperlink{structcontext}{context}}.trx\_context.checktime();\ \};}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00222}00222\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00223}00223\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ maybe\_err\ =\ \mbox{\hyperlink{namespacefc_a3bcfede4e3ebdbd08006e020492dc7ce}{fc::blake2b}}(rounds,\ bstate,\ bmessage,\ bt0\_offset,\ bt1\_offset,\ \_final,\ checktime);}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00224}00224\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(std::holds\_alternative<fc::blake2b\_error>(maybe\_err))\ \{}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00225}00225\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a72ffd6653260a2dedcc4b55e39e10973a7d4cd494d78f4cdd5d46d2c36a5baeac}{return\_code::failure}};}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00226}00226\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00227}00227\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00228}00228\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ res\ =\ std::get<bytes>(maybe\_err);}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00229}00229\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00230}00230\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ out.size()\ <\ res.size()\ )}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00231}00231\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a72ffd6653260a2dedcc4b55e39e10973a7d4cd494d78f4cdd5d46d2c36a5baeac}{return\_code::failure}};}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00232}00232\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00233}00233\ \ \ \ \ \ \ std::memcpy(\ out.data(),\ res.data(),\ res.size()\ );}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00234}00234\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a72ffd6653260a2dedcc4b55e39e10973a4e09c20e9a85794807a130e8283e8769}{return\_code::success}};}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00235}00235\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00236}00236\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00237}\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_a4875d5a054594f5be90befbf588461dc}{00237}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_a4875d5a054594f5be90befbf588461dc}{interface::sha3}}(\ \mbox{\hyperlink{classsysio_1_1vm_1_1span}{span<const\ char>}}\ input,\ \mbox{\hyperlink{classsysio_1_1vm_1_1span}{span<char>}}\ output,\ \mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}}\ keccak\ )\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00238}00238\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \_keccak\ =\ keccak\ ==\ 1;}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00239}00239\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ bs\ =\ sysio::chain::config::hashing\_checktime\_block\_size;}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00240}00240\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ data\ =\ input.\mbox{\hyperlink{classsysio_1_1vm_1_1span_a65d9e2641d763c860ae175a9a936a309}{data}}();}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00241}00241\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a133461752aa04472950ae3cccb8b86de}{datalen}}\ =\ input.\mbox{\hyperlink{classsysio_1_1vm_1_1span_a584ee0404e01edf225142e86d23d6d7d}{size}}();}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00242}00242\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1sha3_1_1encoder}{fc::sha3::encoder}}\ enc;}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00243}00243\ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a133461752aa04472950ae3cccb8b86de}{datalen}}\ >\ bs\ )\ \{}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00244}00244\ \ \ \ \ \ \ \ \ \ enc.\mbox{\hyperlink{classfc_1_1sha3_1_1encoder_a661125220328a46ba8bb35614098225b}{write}}(\ data,\ bs);}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00245}00245\ \ \ \ \ \ \ \ \ \ data\ \ \ \ +=\ bs;}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00246}00246\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a133461752aa04472950ae3cccb8b86de}{datalen}}\ -\/=\ bs;}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00247}00247\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structcontext}{context}}.trx\_context.checktime();}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00248}00248\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00249}00249\ \ \ \ \ \ \ enc.\mbox{\hyperlink{classfc_1_1sha3_1_1encoder_a661125220328a46ba8bb35614098225b}{write}}(\ data,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a133461752aa04472950ae3cccb8b86de}{datalen}});}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00250}00250\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ res\ =\ enc.\mbox{\hyperlink{classfc_1_1sha3_1_1encoder_a1a67af4cb5c1e75dd87d6fb2fcad2c63}{result}}(!\_keccak);}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00251}00251\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00252}00252\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ copy\_size\ =\ std::min(\ output.size(),\ res.data\_size()\ );}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00253}00253\ \ \ \ \ \ \ std::memcpy(\ output.data(),\ res.data(),\ copy\_size\ );}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00254}00254\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00255}00255\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00256}\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_aadc7995b8ec5b48f31bd81216a0b6fc7}{00256}}\ \ \ \ \mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}}\ \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_aadc7995b8ec5b48f31bd81216a0b6fc7}{interface::k1\_recover}}(\ \mbox{\hyperlink{classsysio_1_1vm_1_1span}{span<const\ char>}}\ \mbox{\hyperlink{namespacefc_a50190ee8a24af6929033b058b16158c4}{signature}},\ \mbox{\hyperlink{classsysio_1_1vm_1_1span}{span<const\ char>}}\ \mbox{\hyperlink{namespacefc_a150ca4cd9c0318ca45dc0dc7df5d58b9}{digest}},\ \mbox{\hyperlink{classsysio_1_1vm_1_1span}{span<char>}}\ pub)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00257}00257\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1vector}{bytes}}\ bsignature(\mbox{\hyperlink{namespacefc_a50190ee8a24af6929033b058b16158c4}{signature}}.data(),\ \mbox{\hyperlink{namespacefc_a50190ee8a24af6929033b058b16158c4}{signature}}.data()\ +\ \mbox{\hyperlink{namespacefc_a50190ee8a24af6929033b058b16158c4}{signature}}.size());}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00258}00258\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1vector}{bytes}}\ bdigest(\mbox{\hyperlink{namespacefc_a150ca4cd9c0318ca45dc0dc7df5d58b9}{digest}}.\mbox{\hyperlink{classfc_1_1sha256_ab897537f6c524085b28049be51ed370d}{data}}(),\ \mbox{\hyperlink{namespacefc_a150ca4cd9c0318ca45dc0dc7df5d58b9}{digest}}.\mbox{\hyperlink{classfc_1_1sha256_ab897537f6c524085b28049be51ed370d}{data}}()\ +\ \mbox{\hyperlink{namespacefc_a150ca4cd9c0318ca45dc0dc7df5d58b9}{digest}}.size());}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00259}00259\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00260}00260\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ maybe\_err\ =\ \mbox{\hyperlink{namespacefc_ad33908e48c447780b71e5e4ba567d523}{fc::k1\_recover}}(bsignature,\ bdigest);}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00261}00261\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ std::holds\_alternative<fc::k1\_recover\_error>(maybe\_err))\ \{}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00262}00262\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a72ffd6653260a2dedcc4b55e39e10973a7d4cd494d78f4cdd5d46d2c36a5baeac}{return\_code::failure}};}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00263}00263\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00264}00264\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00265}00265\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ res\ =\ std::get<bytes>(maybe\_err);}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00266}00266\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00267}00267\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3037ff69dd24c6e34aee6fdd45269f13}{pub}}.size()\ <\ res.size()\ )}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00268}00268\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a72ffd6653260a2dedcc4b55e39e10973a7d4cd494d78f4cdd5d46d2c36a5baeac}{return\_code::failure}};}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00269}00269\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00270}00270\ \ \ \ \ \ \ std::memcpy(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3037ff69dd24c6e34aee6fdd45269f13}{pub}}.data(),\ res.data(),\ res.size()\ );}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00271}00271\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a72ffd6653260a2dedcc4b55e39e10973a4e09c20e9a85794807a130e8283e8769}{return\_code::success}};}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00272}00272\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00273}00273\ }
+\DoxyCodeLine{\Hypertarget{crypto_8cpp_source_l00274}00274\ \}\}\}\ \textcolor{comment}{//\ ns\ sysio::chain::webassembly}}
+
+\end{DoxyCode}

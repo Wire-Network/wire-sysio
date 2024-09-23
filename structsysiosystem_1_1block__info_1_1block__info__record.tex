@@ -1,0 +1,94 @@
+\doxysection{sysiosystem\+::block\+\_\+info\+::block\+\_\+info\+\_\+record Struct Reference}
+\hypertarget{structsysiosystem_1_1block__info_1_1block__info__record}{}\label{structsysiosystem_1_1block__info_1_1block__info__record}\index{sysiosystem::block\_info::block\_info\_record@{sysiosystem::block\_info::block\_info\_record}}
+
+
+{\ttfamily \#include $<$block\+\_\+info.\+hpp$>$}
+
+
+
+Collaboration diagram for sysiosystem\+::block\+\_\+info\+::block\+\_\+info\+\_\+record\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=217pt]{structsysiosystem_1_1block__info_1_1block__info__record__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1block__info_1_1block__info__record_af5499289b956e42b991a6654bfa57a27}{primary\+\_\+key}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1block__info_1_1block__info__record_a03d487178e4294f14d0ae2a0057bcb1f}{version}} = 0
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1block__info_1_1block__info__record_a621d1f9fb2e8f6c250fddde30c452f6c}{block\+\_\+height}}
+\item 
+\mbox{\hyperlink{classfc_1_1time__point}{sysio\+::time\+\_\+point}} \mbox{\hyperlink{structsysiosystem_1_1block__info_1_1block__info__record_a794bc04b5b30e15583a6ef162bcd179a}{block\+\_\+timestamp}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+The blockinfo table holds a rolling window of records containing information for recent blocks.
+
+Each record stores the height and timestamp of the correspond block. \doxylink{struct_a}{A} record is added for a new block through the onblock action. The onblock action also erases up to two old records at a time in an attempt to keep the table consisting of only records for blocks going back a particular block height difference backward from the most recent block. Currently that block height difference is hardcoded to 10. 
+
+Definition at line \mbox{\hyperlink{block__info_8hpp_source_l00023}{23}} of file \mbox{\hyperlink{block__info_8hpp_source}{block\+\_\+info.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysiosystem_1_1block__info_1_1block__info__record_af5499289b956e42b991a6654bfa57a27}\index{sysiosystem::block\_info::block\_info\_record@{sysiosystem::block\_info::block\_info\_record}!primary\_key@{primary\_key}}
+\index{primary\_key@{primary\_key}!sysiosystem::block\_info::block\_info\_record@{sysiosystem::block\_info::block\_info\_record}}
+\doxysubsubsection{\texorpdfstring{primary\_key()}{primary\_key()}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1block__info_1_1block__info__record_af5499289b956e42b991a6654bfa57a27} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} sysiosystem\+::block\+\_\+info\+::block\+\_\+info\+\_\+record\+::primary\+\_\+key (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{block__info_8hpp_source_l00029}{29}} of file \mbox{\hyperlink{block__info_8hpp_source}{block\+\_\+info.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00029\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysiosystem_1_1block__info_1_1block__info__record_a621d1f9fb2e8f6c250fddde30c452f6c}{block\_height}};\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysiosystem_1_1block__info_1_1block__info__record_a621d1f9fb2e8f6c250fddde30c452f6c}\index{sysiosystem::block\_info::block\_info\_record@{sysiosystem::block\_info::block\_info\_record}!block\_height@{block\_height}}
+\index{block\_height@{block\_height}!sysiosystem::block\_info::block\_info\_record@{sysiosystem::block\_info::block\_info\_record}}
+\doxysubsubsection{\texorpdfstring{block\_height}{block\_height}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1block__info_1_1block__info__record_a621d1f9fb2e8f6c250fddde30c452f6c} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysiosystem\+::block\+\_\+info\+::block\+\_\+info\+\_\+record\+::block\+\_\+height}
+
+
+
+Definition at line \mbox{\hyperlink{block__info_8hpp_source_l00026}{26}} of file \mbox{\hyperlink{block__info_8hpp_source}{block\+\_\+info.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1block__info_1_1block__info__record_a794bc04b5b30e15583a6ef162bcd179a}\index{sysiosystem::block\_info::block\_info\_record@{sysiosystem::block\_info::block\_info\_record}!block\_timestamp@{block\_timestamp}}
+\index{block\_timestamp@{block\_timestamp}!sysiosystem::block\_info::block\_info\_record@{sysiosystem::block\_info::block\_info\_record}}
+\doxysubsubsection{\texorpdfstring{block\_timestamp}{block\_timestamp}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1block__info_1_1block__info__record_a794bc04b5b30e15583a6ef162bcd179a} 
+\mbox{\hyperlink{classfc_1_1time__point}{sysio\+::time\+\_\+point}} sysiosystem\+::block\+\_\+info\+::block\+\_\+info\+\_\+record\+::block\+\_\+timestamp}
+
+
+
+Definition at line \mbox{\hyperlink{block__info_8hpp_source_l00027}{27}} of file \mbox{\hyperlink{block__info_8hpp_source}{block\+\_\+info.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1block__info_1_1block__info__record_a03d487178e4294f14d0ae2a0057bcb1f}\index{sysiosystem::block\_info::block\_info\_record@{sysiosystem::block\_info::block\_info\_record}!version@{version}}
+\index{version@{version}!sysiosystem::block\_info::block\_info\_record@{sysiosystem::block\_info::block\_info\_record}}
+\doxysubsubsection{\texorpdfstring{version}{version}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1block__info_1_1block__info__record_a03d487178e4294f14d0ae2a0057bcb1f} 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} sysiosystem\+::block\+\_\+info\+::block\+\_\+info\+\_\+record\+::version = 0}
+
+
+
+Definition at line \mbox{\hyperlink{block__info_8hpp_source_l00025}{25}} of file \mbox{\hyperlink{block__info_8hpp_source}{block\+\_\+info.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/svetlasyrimis/\+Desktop/wire-\/network/\+WN-\/org/wire-\/system-\/contracts/contracts/sysio.\+system/include/sysio.\+system/\mbox{\hyperlink{block__info_8hpp}{block\+\_\+info.\+hpp}}\end{DoxyCompactItemize}

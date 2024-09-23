@@ -1,0 +1,430 @@
+\doxysection{testing\+::internal\+::posix Namespace Reference}
+\hypertarget{namespacetesting_1_1internal_1_1posix}{}\label{namespacetesting_1_1internal_1_1posix}\index{testing::internal::posix@{testing::internal::posix}}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef struct stat \mbox{\hyperlink{namespacetesting_1_1internal_1_1posix_a8eb9f08d3af29941c2d2a964cfff3ecb}{Stat\+Struct}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{namespacetesting_1_1internal_1_1posix_a3117b067e1f942a2031e666953120ccc}{File\+No}} (FILE \texorpdfstring{$\ast$}{*}file)
+\item 
+int \mbox{\hyperlink{namespacetesting_1_1internal_1_1posix_a16ebe936b3a8ea462a94191635aedc27}{Is\+ATTY}} (int fd)
+\item 
+int \mbox{\hyperlink{namespacetesting_1_1internal_1_1posix_a2b87b7ff647a128614daf50667eb9304}{Stat}} (const char \texorpdfstring{$\ast$}{*}path, \mbox{\hyperlink{namespacetesting_1_1internal_1_1posix_a8eb9f08d3af29941c2d2a964cfff3ecb}{Stat\+Struct}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}})
+\item 
+int \mbox{\hyperlink{namespacetesting_1_1internal_1_1posix_a1ef2385a7f8e4c706054da35967e76bd}{Str\+Case\+Cmp}} (const char \texorpdfstring{$\ast$}{*}s1, const char \texorpdfstring{$\ast$}{*}s2)
+\item 
+char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacetesting_1_1internal_1_1posix_a5c0864ea9d81d27332b9133e35cbc43c}{Str\+Dup}} (const char \texorpdfstring{$\ast$}{*}src)
+\item 
+int \mbox{\hyperlink{namespacetesting_1_1internal_1_1posix_acbad5d4ea5b73fd1765f5f760642932a}{Rm\+Dir}} (const char \texorpdfstring{$\ast$}{*}dir)
+\item 
+bool \mbox{\hyperlink{namespacetesting_1_1internal_1_1posix_af0d04ed5baeed28353fa38742748a421}{Is\+Dir}} (const \mbox{\hyperlink{namespacetesting_1_1internal_1_1posix_a8eb9f08d3af29941c2d2a964cfff3ecb}{Stat\+Struct}} \&st)
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacetesting_1_1internal_1_1posix_a3defc980438fce16cf5320a458ccea17}{Str\+NCpy}} (char \texorpdfstring{$\ast$}{*}dest, const char \texorpdfstring{$\ast$}{*}src, size\+\_\+t n)
+\item 
+int \mbox{\hyperlink{namespacetesting_1_1internal_1_1posix_a1ddc8a4fc6bb21da372307485591a212}{Ch\+Dir}} (const char \texorpdfstring{$\ast$}{*}dir)
+\item 
+FILE \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacetesting_1_1internal_1_1posix_affa05d06d3e3b1ce975935cb0eac4fa7}{FOpen}} (const char \texorpdfstring{$\ast$}{*}path, const char \texorpdfstring{$\ast$}{*}mode)
+\item 
+FILE \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacetesting_1_1internal_1_1posix_a7428e40e37fc1798e36804eafc11680b}{FReopen}} (const char \texorpdfstring{$\ast$}{*}path, const char \texorpdfstring{$\ast$}{*}mode, FILE \texorpdfstring{$\ast$}{*}stream)
+\item 
+FILE \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacetesting_1_1internal_1_1posix_a78eb38374e5a5c87ab0cbb30583627f7}{FDOpen}} (int fd, const char \texorpdfstring{$\ast$}{*}mode)
+\item 
+int \mbox{\hyperlink{namespacetesting_1_1internal_1_1posix_af4beeaaa8d62916d5e3b644a1ddfbd6b}{FClose}} (FILE \texorpdfstring{$\ast$}{*}fp)
+\item 
+int \mbox{\hyperlink{namespacetesting_1_1internal_1_1posix_a3c6ab13e581a56f1b02f3eb7536c97fd}{Read}} (int fd, void \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}, unsigned int \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}})
+\item 
+int \mbox{\hyperlink{namespacetesting_1_1internal_1_1posix_af4acf9f78d55f815a18b43786511abef}{Write}} (int fd, const void \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}, unsigned int \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}})
+\item 
+int \mbox{\hyperlink{namespacetesting_1_1internal_1_1posix_a15e5b8f2a535ef1b2529b85b861e4846}{Close}} (int fd)
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacetesting_1_1internal_1_1posix_a6e7e77c37cacb64c32234b988b10933c}{Str\+Error}} (int errnum)
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacetesting_1_1internal_1_1posix_aa78973d3f7aa4efd24742b0537c8cd50}{Get\+Env}} (const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})
+\item 
+void \mbox{\hyperlink{namespacetesting_1_1internal_1_1posix_a69b8278c59359dd6a6f941b4643db9fb}{Abort}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{namespacetesting_1_1internal_1_1posix_a8eb9f08d3af29941c2d2a964cfff3ecb}\index{testing::internal::posix@{testing::internal::posix}!StatStruct@{StatStruct}}
+\index{StatStruct@{StatStruct}!testing::internal::posix@{testing::internal::posix}}
+\doxysubsubsection{\texorpdfstring{StatStruct}{StatStruct}}
+{\footnotesize\ttfamily \label{namespacetesting_1_1internal_1_1posix_a8eb9f08d3af29941c2d2a964cfff3ecb} 
+typedef struct stat \mbox{\hyperlink{namespacetesting_1_1internal_1_1posix_a8eb9f08d3af29941c2d2a964cfff3ecb}{testing\+::internal\+::posix\+::\+Stat\+Struct}}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-port_8h_source_l02470}{2470}} of file \mbox{\hyperlink{gtest-port_8h_source}{gtest-\/port.\+h}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacetesting_1_1internal_1_1posix_a69b8278c59359dd6a6f941b4643db9fb}\index{testing::internal::posix@{testing::internal::posix}!Abort@{Abort}}
+\index{Abort@{Abort}!testing::internal::posix@{testing::internal::posix}}
+\doxysubsubsection{\texorpdfstring{Abort()}{Abort()}}
+{\footnotesize\ttfamily \label{namespacetesting_1_1internal_1_1posix_a69b8278c59359dd6a6f941b4643db9fb} 
+void testing\+::internal\+::posix\+::\+Abort (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-port_8h_source_l02542}{2542}} of file \mbox{\hyperlink{gtest-port_8h_source}{gtest-\/port.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02542\ \{\ abort();\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacetesting_1_1internal_1_1posix_a69b8278c59359dd6a6f941b4643db9fb_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacetesting_1_1internal_1_1posix_a1ddc8a4fc6bb21da372307485591a212}\index{testing::internal::posix@{testing::internal::posix}!ChDir@{ChDir}}
+\index{ChDir@{ChDir}!testing::internal::posix@{testing::internal::posix}}
+\doxysubsubsection{\texorpdfstring{ChDir()}{ChDir()}}
+{\footnotesize\ttfamily \label{namespacetesting_1_1internal_1_1posix_a1ddc8a4fc6bb21da372307485591a212} 
+int testing\+::internal\+::posix\+::\+Ch\+Dir (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{dir}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-port_8h_source_l02497}{2497}} of file \mbox{\hyperlink{gtest-port_8h_source}{gtest-\/port.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02497\ \{\ \textcolor{keywordflow}{return}\ chdir(dir);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacetesting_1_1internal_1_1posix_a15e5b8f2a535ef1b2529b85b861e4846}\index{testing::internal::posix@{testing::internal::posix}!Close@{Close}}
+\index{Close@{Close}!testing::internal::posix@{testing::internal::posix}}
+\doxysubsubsection{\texorpdfstring{Close()}{Close()}}
+{\footnotesize\ttfamily \label{namespacetesting_1_1internal_1_1posix_a15e5b8f2a535ef1b2529b85b861e4846} 
+int testing\+::internal\+::posix\+::\+Close (\begin{DoxyParamCaption}\item[{int}]{fd}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-port_8h_source_l02516}{2516}} of file \mbox{\hyperlink{gtest-port_8h_source}{gtest-\/port.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02516\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{integration_8cpp_af5b66d867a040d002fb57d645cae3fb4}{close}}(fd);\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=244pt]{namespacetesting_1_1internal_1_1posix_a15e5b8f2a535ef1b2529b85b861e4846_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacetesting_1_1internal_1_1posix_af4beeaaa8d62916d5e3b644a1ddfbd6b}\index{testing::internal::posix@{testing::internal::posix}!FClose@{FClose}}
+\index{FClose@{FClose}!testing::internal::posix@{testing::internal::posix}}
+\doxysubsubsection{\texorpdfstring{FClose()}{FClose()}}
+{\footnotesize\ttfamily \label{namespacetesting_1_1internal_1_1posix_af4beeaaa8d62916d5e3b644a1ddfbd6b} 
+int testing\+::internal\+::posix\+::\+FClose (\begin{DoxyParamCaption}\item[{FILE \texorpdfstring{$\ast$}{*}}]{fp}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-port_8h_source_l02508}{2508}} of file \mbox{\hyperlink{gtest-port_8h_source}{gtest-\/port.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02508\ \{\ \textcolor{keywordflow}{return}\ fclose(fp);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacetesting_1_1internal_1_1posix_a78eb38374e5a5c87ab0cbb30583627f7}\index{testing::internal::posix@{testing::internal::posix}!FDOpen@{FDOpen}}
+\index{FDOpen@{FDOpen}!testing::internal::posix@{testing::internal::posix}}
+\doxysubsubsection{\texorpdfstring{FDOpen()}{FDOpen()}}
+{\footnotesize\ttfamily \label{namespacetesting_1_1internal_1_1posix_a78eb38374e5a5c87ab0cbb30583627f7} 
+FILE \texorpdfstring{$\ast$}{*} testing\+::internal\+::posix\+::\+FDOpen (\begin{DoxyParamCaption}\item[{int}]{fd}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{mode}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-port_8h_source_l02506}{2506}} of file \mbox{\hyperlink{gtest-port_8h_source}{gtest-\/port.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02506\ \{\ \textcolor{keywordflow}{return}\ fdopen(fd,\ mode);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacetesting_1_1internal_1_1posix_a3117b067e1f942a2031e666953120ccc}\index{testing::internal::posix@{testing::internal::posix}!FileNo@{FileNo}}
+\index{FileNo@{FileNo}!testing::internal::posix@{testing::internal::posix}}
+\doxysubsubsection{\texorpdfstring{FileNo()}{FileNo()}}
+{\footnotesize\ttfamily \label{namespacetesting_1_1internal_1_1posix_a3117b067e1f942a2031e666953120ccc} 
+int testing\+::internal\+::posix\+::\+File\+No (\begin{DoxyParamCaption}\item[{FILE \texorpdfstring{$\ast$}{*}}]{file}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-port_8h_source_l02472}{2472}} of file \mbox{\hyperlink{gtest-port_8h_source}{gtest-\/port.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02472\ \{\ \textcolor{keywordflow}{return}\ fileno(file);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacetesting_1_1internal_1_1posix_affa05d06d3e3b1ce975935cb0eac4fa7}\index{testing::internal::posix@{testing::internal::posix}!FOpen@{FOpen}}
+\index{FOpen@{FOpen}!testing::internal::posix@{testing::internal::posix}}
+\doxysubsubsection{\texorpdfstring{FOpen()}{FOpen()}}
+{\footnotesize\ttfamily \label{namespacetesting_1_1internal_1_1posix_affa05d06d3e3b1ce975935cb0eac4fa7} 
+FILE \texorpdfstring{$\ast$}{*} testing\+::internal\+::posix\+::\+FOpen (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{path}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{mode}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-port_8h_source_l02499}{2499}} of file \mbox{\hyperlink{gtest-port_8h_source}{gtest-\/port.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02499\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02500\ \ \ \textcolor{keywordflow}{return}\ fopen(path,\ mode);}
+\DoxyCodeLine{02501\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacetesting_1_1internal_1_1posix_affa05d06d3e3b1ce975935cb0eac4fa7_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacetesting_1_1internal_1_1posix_a7428e40e37fc1798e36804eafc11680b}\index{testing::internal::posix@{testing::internal::posix}!FReopen@{FReopen}}
+\index{FReopen@{FReopen}!testing::internal::posix@{testing::internal::posix}}
+\doxysubsubsection{\texorpdfstring{FReopen()}{FReopen()}}
+{\footnotesize\ttfamily \label{namespacetesting_1_1internal_1_1posix_a7428e40e37fc1798e36804eafc11680b} 
+FILE \texorpdfstring{$\ast$}{*} testing\+::internal\+::posix\+::\+FReopen (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{path}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{mode}{, }\item[{FILE \texorpdfstring{$\ast$}{*}}]{stream}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-port_8h_source_l02503}{2503}} of file \mbox{\hyperlink{gtest-port_8h_source}{gtest-\/port.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02503\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02504\ \ \ \textcolor{keywordflow}{return}\ freopen(path,\ mode,\ stream);}
+\DoxyCodeLine{02505\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=242pt]{namespacetesting_1_1internal_1_1posix_a7428e40e37fc1798e36804eafc11680b_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacetesting_1_1internal_1_1posix_aa78973d3f7aa4efd24742b0537c8cd50}\index{testing::internal::posix@{testing::internal::posix}!GetEnv@{GetEnv}}
+\index{GetEnv@{GetEnv}!testing::internal::posix@{testing::internal::posix}}
+\doxysubsubsection{\texorpdfstring{GetEnv()}{GetEnv()}}
+{\footnotesize\ttfamily \label{namespacetesting_1_1internal_1_1posix_aa78973d3f7aa4efd24742b0537c8cd50} 
+const char \texorpdfstring{$\ast$}{*} testing\+::internal\+::posix\+::\+Get\+Env (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{name}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-port_8h_source_l02519}{2519}} of file \mbox{\hyperlink{gtest-port_8h_source}{gtest-\/port.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02519\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02520\ \textcolor{preprocessor}{\#if\ GTEST\_OS\_WINDOWS\_MOBILE\ ||\ GTEST\_OS\_WINDOWS\_PHONE\ ||\ GTEST\_OS\_WINDOWS\_RT}}
+\DoxyCodeLine{02521\ \ \ \textcolor{comment}{//\ We\ are\ on\ Windows\ CE,\ which\ has\ no\ environment\ variables.}}
+\DoxyCodeLine{02522\ \ \ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{void}\textcolor{keyword}{>}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}});\ \ \textcolor{comment}{//\ To\ prevent\ 'unused\ argument'\ warning.}}
+\DoxyCodeLine{02523\ \ \ \textcolor{keywordflow}{return}\ NULL;}
+\DoxyCodeLine{02524\ \textcolor{preprocessor}{\#elif\ defined(\_\_BORLANDC\_\_)\ ||\ defined(\_\_SunOS\_5\_8)\ ||\ defined(\_\_SunOS\_5\_9)}}
+\DoxyCodeLine{02525\ \ \ \textcolor{comment}{//\ Environment\ variables\ which\ we\ programmatically\ clear\ will\ be\ set\ to\ the}}
+\DoxyCodeLine{02526\ \ \ \textcolor{comment}{//\ empty\ string\ rather\ than\ unset\ (NULL).\ \ Handle\ that\ case.}}
+\DoxyCodeLine{02527\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \textcolor{keyword}{const}\ env\ =\ getenv(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}});}
+\DoxyCodeLine{02528\ \ \ \textcolor{keywordflow}{return}\ (env\ !=\ NULL\ \&\&\ env[0]\ !=\ \textcolor{charliteral}{'\(\backslash\)0'})\ ?\ env\ :\ NULL;}
+\DoxyCodeLine{02529\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{02530\ \ \ \textcolor{keywordflow}{return}\ getenv(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}});}
+\DoxyCodeLine{02531\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{02532\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacetesting_1_1internal_1_1posix_aa78973d3f7aa4efd24742b0537c8cd50_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacetesting_1_1internal_1_1posix_a16ebe936b3a8ea462a94191635aedc27}\index{testing::internal::posix@{testing::internal::posix}!IsATTY@{IsATTY}}
+\index{IsATTY@{IsATTY}!testing::internal::posix@{testing::internal::posix}}
+\doxysubsubsection{\texorpdfstring{IsATTY()}{IsATTY()}}
+{\footnotesize\ttfamily \label{namespacetesting_1_1internal_1_1posix_a16ebe936b3a8ea462a94191635aedc27} 
+int testing\+::internal\+::posix\+::\+Is\+ATTY (\begin{DoxyParamCaption}\item[{int}]{fd}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-port_8h_source_l02473}{2473}} of file \mbox{\hyperlink{gtest-port_8h_source}{gtest-\/port.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02473\ \{\ \textcolor{keywordflow}{return}\ isatty(fd);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacetesting_1_1internal_1_1posix_af0d04ed5baeed28353fa38742748a421}\index{testing::internal::posix@{testing::internal::posix}!IsDir@{IsDir}}
+\index{IsDir@{IsDir}!testing::internal::posix@{testing::internal::posix}}
+\doxysubsubsection{\texorpdfstring{IsDir()}{IsDir()}}
+{\footnotesize\ttfamily \label{namespacetesting_1_1internal_1_1posix_af0d04ed5baeed28353fa38742748a421} 
+bool testing\+::internal\+::posix\+::\+Is\+Dir (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacetesting_1_1internal_1_1posix_a8eb9f08d3af29941c2d2a964cfff3ecb}{Stat\+Struct}} \&}]{st}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-port_8h_source_l02480}{2480}} of file \mbox{\hyperlink{gtest-port_8h_source}{gtest-\/port.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02480\ \{\ \textcolor{keywordflow}{return}\ S\_ISDIR(st.st\_mode);\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacetesting_1_1internal_1_1posix_af0d04ed5baeed28353fa38742748a421_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacetesting_1_1internal_1_1posix_a3c6ab13e581a56f1b02f3eb7536c97fd}\index{testing::internal::posix@{testing::internal::posix}!Read@{Read}}
+\index{Read@{Read}!testing::internal::posix@{testing::internal::posix}}
+\doxysubsubsection{\texorpdfstring{Read()}{Read()}}
+{\footnotesize\ttfamily \label{namespacetesting_1_1internal_1_1posix_a3c6ab13e581a56f1b02f3eb7536c97fd} 
+int testing\+::internal\+::posix\+::\+Read (\begin{DoxyParamCaption}\item[{int}]{fd}{, }\item[{void \texorpdfstring{$\ast$}{*}}]{buf}{, }\item[{unsigned int}]{count}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-port_8h_source_l02510}{2510}} of file \mbox{\hyperlink{gtest-port_8h_source}{gtest-\/port.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02510\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02511\ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(read(fd,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}));}
+\DoxyCodeLine{02512\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacetesting_1_1internal_1_1posix_acbad5d4ea5b73fd1765f5f760642932a}\index{testing::internal::posix@{testing::internal::posix}!RmDir@{RmDir}}
+\index{RmDir@{RmDir}!testing::internal::posix@{testing::internal::posix}}
+\doxysubsubsection{\texorpdfstring{RmDir()}{RmDir()}}
+{\footnotesize\ttfamily \label{namespacetesting_1_1internal_1_1posix_acbad5d4ea5b73fd1765f5f760642932a} 
+int testing\+::internal\+::posix\+::\+Rm\+Dir (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{dir}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-port_8h_source_l02479}{2479}} of file \mbox{\hyperlink{gtest-port_8h_source}{gtest-\/port.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02479\ \{\ \textcolor{keywordflow}{return}\ rmdir(dir);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacetesting_1_1internal_1_1posix_a2b87b7ff647a128614daf50667eb9304}\index{testing::internal::posix@{testing::internal::posix}!Stat@{Stat}}
+\index{Stat@{Stat}!testing::internal::posix@{testing::internal::posix}}
+\doxysubsubsection{\texorpdfstring{Stat()}{Stat()}}
+{\footnotesize\ttfamily \label{namespacetesting_1_1internal_1_1posix_a2b87b7ff647a128614daf50667eb9304} 
+int testing\+::internal\+::posix\+::\+Stat (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{path}{, }\item[{\mbox{\hyperlink{namespacetesting_1_1internal_1_1posix_a8eb9f08d3af29941c2d2a964cfff3ecb}{Stat\+Struct}} \texorpdfstring{$\ast$}{*}}]{buf}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-port_8h_source_l02474}{2474}} of file \mbox{\hyperlink{gtest-port_8h_source}{gtest-\/port.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02474\ \{\ \textcolor{keywordflow}{return}\ stat(path,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}});\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacetesting_1_1internal_1_1posix_a2b87b7ff647a128614daf50667eb9304_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacetesting_1_1internal_1_1posix_a1ef2385a7f8e4c706054da35967e76bd}\index{testing::internal::posix@{testing::internal::posix}!StrCaseCmp@{StrCaseCmp}}
+\index{StrCaseCmp@{StrCaseCmp}!testing::internal::posix@{testing::internal::posix}}
+\doxysubsubsection{\texorpdfstring{StrCaseCmp()}{StrCaseCmp()}}
+{\footnotesize\ttfamily \label{namespacetesting_1_1internal_1_1posix_a1ef2385a7f8e4c706054da35967e76bd} 
+int testing\+::internal\+::posix\+::\+Str\+Case\+Cmp (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{s1}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{s2}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-port_8h_source_l02475}{2475}} of file \mbox{\hyperlink{gtest-port_8h_source}{gtest-\/port.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02475\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02476\ \ \ \textcolor{keywordflow}{return}\ strcasecmp(s1,\ s2);}
+\DoxyCodeLine{02477\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacetesting_1_1internal_1_1posix_a1ef2385a7f8e4c706054da35967e76bd_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacetesting_1_1internal_1_1posix_a5c0864ea9d81d27332b9133e35cbc43c}\index{testing::internal::posix@{testing::internal::posix}!StrDup@{StrDup}}
+\index{StrDup@{StrDup}!testing::internal::posix@{testing::internal::posix}}
+\doxysubsubsection{\texorpdfstring{StrDup()}{StrDup()}}
+{\footnotesize\ttfamily \label{namespacetesting_1_1internal_1_1posix_a5c0864ea9d81d27332b9133e35cbc43c} 
+char \texorpdfstring{$\ast$}{*} testing\+::internal\+::posix\+::\+Str\+Dup (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{src}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-port_8h_source_l02478}{2478}} of file \mbox{\hyperlink{gtest-port_8h_source}{gtest-\/port.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02478\ \{\ \textcolor{keywordflow}{return}\ strdup(src);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacetesting_1_1internal_1_1posix_a6e7e77c37cacb64c32234b988b10933c}\index{testing::internal::posix@{testing::internal::posix}!StrError@{StrError}}
+\index{StrError@{StrError}!testing::internal::posix@{testing::internal::posix}}
+\doxysubsubsection{\texorpdfstring{StrError()}{StrError()}}
+{\footnotesize\ttfamily \label{namespacetesting_1_1internal_1_1posix_a6e7e77c37cacb64c32234b988b10933c} 
+const char \texorpdfstring{$\ast$}{*} testing\+::internal\+::posix\+::\+Str\+Error (\begin{DoxyParamCaption}\item[{int}]{errnum}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-port_8h_source_l02517}{2517}} of file \mbox{\hyperlink{gtest-port_8h_source}{gtest-\/port.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02517\ \{\ \textcolor{keywordflow}{return}\ strerror(errnum);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacetesting_1_1internal_1_1posix_a3defc980438fce16cf5320a458ccea17}\index{testing::internal::posix@{testing::internal::posix}!StrNCpy@{StrNCpy}}
+\index{StrNCpy@{StrNCpy}!testing::internal::posix@{testing::internal::posix}}
+\doxysubsubsection{\texorpdfstring{StrNCpy()}{StrNCpy()}}
+{\footnotesize\ttfamily \label{namespacetesting_1_1internal_1_1posix_a3defc980438fce16cf5320a458ccea17} 
+const char \texorpdfstring{$\ast$}{*} testing\+::internal\+::posix\+::\+Str\+NCpy (\begin{DoxyParamCaption}\item[{char \texorpdfstring{$\ast$}{*}}]{dest}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{src}{, }\item[{size\+\_\+t}]{n}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-port_8h_source_l02488}{2488}} of file \mbox{\hyperlink{gtest-port_8h_source}{gtest-\/port.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02488\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02489\ \ \ \textcolor{keywordflow}{return}\ strncpy(dest,\ src,\ n);}
+\DoxyCodeLine{02490\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacetesting_1_1internal_1_1posix_af4acf9f78d55f815a18b43786511abef}\index{testing::internal::posix@{testing::internal::posix}!Write@{Write}}
+\index{Write@{Write}!testing::internal::posix@{testing::internal::posix}}
+\doxysubsubsection{\texorpdfstring{Write()}{Write()}}
+{\footnotesize\ttfamily \label{namespacetesting_1_1internal_1_1posix_af4acf9f78d55f815a18b43786511abef} 
+int testing\+::internal\+::posix\+::\+Write (\begin{DoxyParamCaption}\item[{int}]{fd}{, }\item[{const void \texorpdfstring{$\ast$}{*}}]{buf}{, }\item[{unsigned int}]{count}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-port_8h_source_l02513}{2513}} of file \mbox{\hyperlink{gtest-port_8h_source}{gtest-\/port.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02513\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02514\ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(write(fd,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}));}
+\DoxyCodeLine{02515\ \}}
+
+\end{DoxyCode}

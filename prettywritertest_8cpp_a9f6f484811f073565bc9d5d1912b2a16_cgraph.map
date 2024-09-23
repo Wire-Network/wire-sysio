@@ -1,0 +1,19 @@
+<map id="TEST" name="TEST">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,168,61,194"/>
+<area shape="rect" id="Node000002" href="$class_generic_string_buffer.html#a42079865bab1deb930c6cff7d491c719" title=" " alt="" coords="118,103,254,144"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="60,168,115,147,117,152,62,173"/>
+<area shape="rect" id="Node000005" href="$class_generic_reader.html#a0c450620d14ff1824e58bb7bd9b42099" title="Parse JSON text." alt="" coords="111,168,261,194"/>
+<area shape="poly" id="edge6_Node000001_Node000005" title=" " alt="" coords="61,178,95,178,95,184,61,184"/>
+<area shape="rect" id="Node000008" href="$class_pretty_writer.html#abbdc83ce02cf4a811a7355aa3879b45a" title="Set custom indentation." alt="" coords="109,217,263,243"/>
+<area shape="poly" id="edge9_Node000001_Node000008" title=" " alt="" coords="62,188,110,204,128,210,126,215,108,209,60,193"/>
+<area shape="rect" id="Node000003" href="$class_generic_string_buffer.html#a0038e53ba03c271bc4cbbac403ec4de4" title=" " alt="" coords="311,29,477,55"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="229,100,310,65,331,58,332,63,312,70,231,105"/>
+<area shape="rect" id="Node000004" href="$class_generic_string_buffer.html#a80af78c43da93126a940a40d1889278a" title=" " alt="" coords="326,103,462,144"/>
+<area shape="poly" id="edge4_Node000002_Node000004" title=" " alt="" coords="254,121,311,121,311,126,254,126"/>
+<area shape="poly" id="edge3_Node000003_Node000003" title=" " alt="" coords="362,30,356,21,359,11,373,5,394,3,418,5,430,12,427,17,416,10,394,8,374,10,363,15,361,20,366,27"/>
+<area shape="poly" id="edge5_Node000004_Node000004" title=" " alt="" coords="358,103,356,93,362,84,375,79,394,77,415,79,428,85,425,90,414,84,394,82,376,84,365,88,361,94,363,102"/>
+<area shape="rect" id="Node000006" href="$struct_parse_result.html#a88b6d44f052a19e6436ae6aadc2c40b4" title="Reset error code." alt="" coords="328,168,460,194"/>
+<area shape="poly" id="edge7_Node000005_Node000006" title=" " alt="" coords="261,178,312,178,312,184,261,184"/>
+<area shape="rect" id="Node000007" href="$struct_parse_result.html#aa81b4a7b776b77216cb752385203a8c1" title="Update error code and offset." alt="" coords="525,168,647,194"/>
+<area shape="poly" id="edge8_Node000006_Node000007" title=" " alt="" coords="461,178,510,178,510,184,461,184"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="sysio::wallet_plugin::plugin_initialize" name="sysio::wallet_plugin::plugin_initialize">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,35,141,75"/>
+<area shape="rect" id="Node000002" href="$namespaceappbase.html#a99374dc23934f008a09f2f79be9eae40" title=" " alt="" coords="209,13,308,38"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="141,42,194,33,195,38,141,47"/>
+<area shape="rect" id="Node000004" href="$classappbase_1_1application.html#a5dfd3cfb1124c57963fa17b3f4aabbe1" title="Get data directory." alt="" coords="189,63,329,103"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="141,63,173,67,173,73,141,68"/>
+<area shape="rect" id="Node000003" href="$classappbase_1_1application.html#ac874b2659b400fe254f1ae4260d06ecf" title=" " alt="" coords="377,5,517,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="309,23,361,23,361,28,309,28"/>
+</map>

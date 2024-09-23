@@ -1,0 +1,569 @@
+\doxysection{websocketpp\+::server\texorpdfstring{$<$}{<} config \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classwebsocketpp_1_1server}{}\label{classwebsocketpp_1_1server}\index{websocketpp::server$<$ config $>$@{websocketpp::server$<$ config $>$}}
+
+
+Server endpoint role based on the given config.  
+
+
+
+
+{\ttfamily \#include $<$server\+\_\+endpoint.\+hpp$>$}
+
+
+
+Inheritance diagram for websocketpp\+::server\texorpdfstring{$<$}{<} config \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=320pt]{classwebsocketpp_1_1server__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for websocketpp\+::server\texorpdfstring{$<$}{<} config \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=320pt]{classwebsocketpp_1_1server__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1server}{server}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$ \mbox{\hyperlink{classwebsocketpp_1_1server_aacf807e48f77c28b33dce5c5e12e2ede}{type}}
+\begin{DoxyCompactList}\small\item\em Type of this endpoint. \end{DoxyCompactList}\item 
+typedef config\+::concurrency\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1server_aad5b46acb5bb9946aa97cfac456d9dd7}{concurrency\+\_\+type}}
+\begin{DoxyCompactList}\small\item\em Type of the endpoint concurrency component. \end{DoxyCompactList}\item 
+typedef config\+::transport\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1server_a1b67e3aea62b524aae9b5080e301ec3d}{transport\+\_\+type}}
+\begin{DoxyCompactList}\small\item\em Type of the endpoint transport component. \end{DoxyCompactList}\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$ \mbox{\hyperlink{classwebsocketpp_1_1server_a3e777e222c7dcdabeb160df225078c41}{connection\+\_\+type}}
+\begin{DoxyCompactList}\small\item\em Type of the connections this server will create. \end{DoxyCompactList}\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1connection_af5839adca921ce08ea3ca3e634155e86}{connection\+\_\+type\+::ptr}} \mbox{\hyperlink{classwebsocketpp_1_1server_abb895563dddafdc1426997d245cbd7cb}{connection\+\_\+ptr}}
+\begin{DoxyCompactList}\small\item\em Type of a shared pointer to the connections this server will create. \end{DoxyCompactList}\item 
+typedef transport\+\_\+type\+::transport\+\_\+con\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1server_a0fd0b6345e5e0d948fa3566fabe4a79f}{transport\+\_\+con\+\_\+type}}
+\begin{DoxyCompactList}\small\item\em Type of the connection transport component. \end{DoxyCompactList}\item 
+typedef transport\+\_\+con\+\_\+type\+::ptr \mbox{\hyperlink{classwebsocketpp_1_1server_a246781fa7052ee93b3fe33923c65c7c3}{transport\+\_\+con\+\_\+ptr}}
+\begin{DoxyCompactList}\small\item\em Type of a shared pointer to the connection transport component. \end{DoxyCompactList}\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1server_a3e777e222c7dcdabeb160df225078c41}{connection\+\_\+type}}, \mbox{\hyperlink{classconfig}{config}} $>$ \mbox{\hyperlink{classwebsocketpp_1_1server_a78dfdd216fd7bc2d06d52ee47c4610c2}{endpoint\+\_\+type}}
+\begin{DoxyCompactList}\small\item\em Type of the endpoint component of this server. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Public Types inherited from \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint$<$ connection$<$ config $>$, config $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{endpoint}}$<$ \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}, \mbox{\hyperlink{classconfig}{config}} $>$ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a70a5de6d11b241eb73c8ab7f675d06ae}{type}}
+\item 
+typedef config\+::transport\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1endpoint_acb9f10a56c1ace1ae494a826cc82a3b5}{transport\+\_\+type}}
+\begin{DoxyCompactList}\small\item\em Type of the transport component of this endpoint. \end{DoxyCompactList}\item 
+typedef config\+::concurrency\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1endpoint_ad62ddd751b47bb56d5ad9b488186270b}{concurrency\+\_\+type}}
+\begin{DoxyCompactList}\small\item\em Type of the concurrency component of this endpoint. \end{DoxyCompactList}\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}} \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a480ce09473cadd3156b20a0248167787}{connection\+\_\+type}}
+\begin{DoxyCompactList}\small\item\em Type of the connections that this endpoint creates. \end{DoxyCompactList}\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1connection_af5839adca921ce08ea3ca3e634155e86}{connection\+\_\+type\+::ptr}} \mbox{\hyperlink{classwebsocketpp_1_1endpoint_aab0c5b0f36b0baabd78672e0ee2f1346}{connection\+\_\+ptr}}
+\begin{DoxyCompactList}\small\item\em Shared pointer to connection\+\_\+type. \end{DoxyCompactList}\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1connection_a96d3321aee803b0c23f4a72e6c5cc875}{connection\+\_\+type\+::weak\+\_\+ptr}} \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a7f7f67e1ceb178688201d89f5c2e870d}{connection\+\_\+weak\+\_\+ptr}}
+\begin{DoxyCompactList}\small\item\em Weak pointer to connection type. \end{DoxyCompactList}\item 
+typedef transport\+\_\+type\+::transport\+\_\+con\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1endpoint_ae95c95597c19ed0d5b6251e9cb261255}{transport\+\_\+con\+\_\+type}}
+\item 
+typedef transport\+\_\+con\+\_\+type\+::ptr \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a3f75dfb60f17dec1278c4b3f2feaca45}{transport\+\_\+con\+\_\+ptr}}
+\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1connection_a78988e5609b6ccdbd0949d5cd5fe440a}{connection\+\_\+type\+::message\+\_\+handler}} \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a539ae39b8ae01e0cb22e237373bfea6c}{message\+\_\+handler}}
+\begin{DoxyCompactList}\small\item\em Type of message\+\_\+handler. \end{DoxyCompactList}\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1connection_a470a4dfe286833dc14e0906eb6e858a5}{connection\+\_\+type\+::message\+\_\+ptr}} \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a8097edab4feb0c36a69601c3786f0062}{message\+\_\+ptr}}
+\begin{DoxyCompactList}\small\item\em Type of message pointers that this endpoint uses. \end{DoxyCompactList}\item 
+typedef config\+::elog\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a928771bc4dae5bf42879aeb2e98ae69a}{elog\+\_\+type}}
+\begin{DoxyCompactList}\small\item\em Type of error logger. \end{DoxyCompactList}\item 
+typedef config\+::alog\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1endpoint_ae2b58b244a7b824e30a18ee2ddaccc02}{alog\+\_\+type}}
+\begin{DoxyCompactList}\small\item\em Type of access logger. \end{DoxyCompactList}\item 
+typedef concurrency\+\_\+type\+::scoped\+\_\+lock\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a0270a5b25d41d95a4d136b9bdf1fd547}{scoped\+\_\+lock\+\_\+type}}
+\begin{DoxyCompactList}\small\item\em Type of our concurrency policy\textquotesingle{}s scoped lock object. \end{DoxyCompactList}\item 
+typedef concurrency\+\_\+type\+::mutex\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1endpoint_aa8dead9a91c34343e29dae2c34adbd1f}{mutex\+\_\+type}}
+\begin{DoxyCompactList}\small\item\em Type of our concurrency policy\textquotesingle{}s mutex object. \end{DoxyCompactList}\item 
+typedef config\+::rng\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a21266599607a9cfa5bd9cf9a9763405a}{rng\+\_\+type}}
+\begin{DoxyCompactList}\small\item\em Type of RNG. \end{DoxyCompactList}\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1connection_a0dafdb1188f82418a8fd33a3638496ea}{connection\+\_\+type\+::termination\+\_\+handler}} \mbox{\hyperlink{classwebsocketpp_1_1endpoint_aa5166db2b96fb109d1955660663eb859}{termination\+\_\+handler}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classwebsocketpp_1_1server_ae6ed4fd23f86c3079277ff70b9fe2e52}{server}} ()
+\item 
+\mbox{\hyperlink{classwebsocketpp_1_1server_aa9f0c40951f9a365e23233551fbc3f6b}{\texorpdfstring{$\sim$}{\string~}server}} ()
+\begin{DoxyCompactList}\small\item\em Destructor. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classwebsocketpp_1_1server_abb895563dddafdc1426997d245cbd7cb}{connection\+\_\+ptr}} \mbox{\hyperlink{classwebsocketpp_1_1server_a9146c63ed1afb5bdec29eca52c487226}{get\+\_\+connection}} ()
+\begin{DoxyCompactList}\small\item\em Create and initialize a new connection. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1server_a0204a7d444144f7ea5b8bbcf14689fc1}{start\+\_\+accept}} (lib\+::error\+\_\+code \&ec)
+\begin{DoxyCompactList}\small\item\em Starts the server\textquotesingle{}s async connection acceptance loop (exception free) \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1server_ab61bcdf9fd532fe7ebd934f8d84fdfea}{start\+\_\+accept}} ()
+\begin{DoxyCompactList}\small\item\em Starts the server\textquotesingle{}s async connection acceptance loop. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1server_aa24feb1c5d2bde47de8b11f5369c54d4}{handle\+\_\+accept}} (\mbox{\hyperlink{classwebsocketpp_1_1server_abb895563dddafdc1426997d245cbd7cb}{connection\+\_\+ptr}} con, lib\+::error\+\_\+code const \&ec)
+\begin{DoxyCompactList}\small\item\em Handler callback for start\+\_\+accept. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint$<$ connection$<$ config $>$, config $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a12015b0910fe39d0cbbd7fc7ea5ffcfd}{endpoint}} (bool p\+\_\+is\+\_\+server)
+\item 
+\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a4fea6c12eff3d5326d13731a08df2f9e}{\texorpdfstring{$\sim$}{\string~}endpoint}} ()
+\begin{DoxyCompactList}\small\item\em Destructor. \end{DoxyCompactList}\item 
+std\+::string \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a2a106056b019063573120c7a61472834}{get\+\_\+user\+\_\+agent}} () const
+\begin{DoxyCompactList}\small\item\em Returns the user agent string that this endpoint will use. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a06a703c52196d900d1e58b79d6657cc8}{set\+\_\+user\+\_\+agent}} (std\+::string const \&ua)
+\begin{DoxyCompactList}\small\item\em Sets the user agent string that this endpoint will use. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a4f6a1e239250ef6c485865e2adf65b1b}{is\+\_\+server}} () const
+\begin{DoxyCompactList}\small\item\em Returns whether or not this endpoint is a server. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a5d7da609ebd2f797e5e67b6d050ebc59}{set\+\_\+access\+\_\+channels}} (\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{log\+::level}} channels)
+\begin{DoxyCompactList}\small\item\em Set Access logging channel. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a3fe357b3c6434273a9965eb52902575d}{clear\+\_\+access\+\_\+channels}} (\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{log\+::level}} channels)
+\begin{DoxyCompactList}\small\item\em Clear Access logging channels. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a8292bcdca9344b57af1b0964ff7fc778}{set\+\_\+error\+\_\+channels}} (\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{log\+::level}} channels)
+\begin{DoxyCompactList}\small\item\em Set Error logging channel. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a8cefa4fc37c0df4eb6ed0bcf04bb0da5}{clear\+\_\+error\+\_\+channels}} (\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{log\+::level}} channels)
+\begin{DoxyCompactList}\small\item\em Clear Error logging channels. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classwebsocketpp_1_1endpoint_ae2b58b244a7b824e30a18ee2ddaccc02}{alog\+\_\+type}} \& \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a1d9163813aa02ed32100f443b4ddbd8e}{get\+\_\+alog}} ()
+\begin{DoxyCompactList}\small\item\em Get reference to access logger. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a928771bc4dae5bf42879aeb2e98ae69a}{elog\+\_\+type}} \& \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a4be3f1d85aca33ccc6ed149c943a5f1e}{get\+\_\+elog}} ()
+\begin{DoxyCompactList}\small\item\em Get reference to error logger. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a5753d9848aefc04ee91da401c0cc65b8}{set\+\_\+open\+\_\+handler}} (\mbox{\hyperlink{namespacewebsocketpp_a53c8b4ae59cf13b5f883b119bbd14d72}{open\+\_\+handler}} h)
+\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a8d7d95bebc154879655211e2b0b5e069}{set\+\_\+close\+\_\+handler}} (\mbox{\hyperlink{namespacewebsocketpp_a27acb39e01cbca06ccc4e4e8eb8f877d}{close\+\_\+handler}} h)
+\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a073540365f5c810f5a45e5fc76f52f87}{set\+\_\+fail\+\_\+handler}} (\mbox{\hyperlink{namespacewebsocketpp_a5bb2e61cfe649b2e012f1a2c5693a4d5}{fail\+\_\+handler}} h)
+\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_adc6caf0164a0cd073f0535078ccac123}{set\+\_\+ping\+\_\+handler}} (\mbox{\hyperlink{namespacewebsocketpp_a9dcaaa7370865f1bcacb55ae715793ef}{ping\+\_\+handler}} h)
+\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a8ab51c3878bbbcfc92cf5ed6af65e8d7}{set\+\_\+pong\+\_\+handler}} (\mbox{\hyperlink{namespacewebsocketpp_a1798d54e6d98a481cf870091af84bc1f}{pong\+\_\+handler}} h)
+\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a02f6288d1e7c32de7a5940a337076917}{set\+\_\+pong\+\_\+timeout\+\_\+handler}} (\mbox{\hyperlink{namespacewebsocketpp_a2c5925a111b9e553efebea35d5ea155f}{pong\+\_\+timeout\+\_\+handler}} h)
+\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a026eb37f85cea8e79f1a007d12bb55dd}{set\+\_\+interrupt\+\_\+handler}} (\mbox{\hyperlink{namespacewebsocketpp_a55f6947df7673a9de3c44b6bd5d4a82a}{interrupt\+\_\+handler}} h)
+\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a511874384b71238b042968cf736bc510}{set\+\_\+http\+\_\+handler}} (\mbox{\hyperlink{namespacewebsocketpp_a37bc4d5b3b21d3bb494d8a23236315d2}{http\+\_\+handler}} h)
+\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_ac5d059736dd862ccfb3582ba310dfae7}{set\+\_\+validate\+\_\+handler}} (\mbox{\hyperlink{namespacewebsocketpp_ae28f3fed86a59b1998746694f3d4edbd}{validate\+\_\+handler}} h)
+\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a34a3a8351bff65ba878975be471cab85}{set\+\_\+message\+\_\+handler}} (\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a539ae39b8ae01e0cb22e237373bfea6c}{message\+\_\+handler}} h)
+\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_adb8b3736e30bb8e5ee6add965a948102}{set\+\_\+open\+\_\+handshake\+\_\+timeout}} (long dur)
+\begin{DoxyCompactList}\small\item\em Set open handshake timeout. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a54caf799e1cf531d26f67999068d483b}{set\+\_\+close\+\_\+handshake\+\_\+timeout}} (long dur)
+\begin{DoxyCompactList}\small\item\em Set close handshake timeout. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_abcb25dde6f71933c3dbe517c45ebe5c6}{set\+\_\+pong\+\_\+timeout}} (long dur)
+\begin{DoxyCompactList}\small\item\em Set pong timeout. \end{DoxyCompactList}\item 
+size\+\_\+t \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a67d0a1ac6e9a332a485f569e71f85882}{get\+\_\+max\+\_\+message\+\_\+size}} () const
+\begin{DoxyCompactList}\small\item\em Get default maximum message size. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a6268a63c9ce030941fcfb32ddabf3090}{set\+\_\+max\+\_\+message\+\_\+size}} (size\+\_\+t new\+\_\+value)
+\begin{DoxyCompactList}\small\item\em Set default maximum message size. \end{DoxyCompactList}\item 
+size\+\_\+t \mbox{\hyperlink{classwebsocketpp_1_1endpoint_ace4f1bdfdf20c13557b34c35c10ca554}{get\+\_\+max\+\_\+http\+\_\+body\+\_\+size}} () const
+\begin{DoxyCompactList}\small\item\em Get maximum HTTP message body size. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a00be7e08ca5c567dd2a4989b8d41d26b}{set\+\_\+max\+\_\+http\+\_\+body\+\_\+size}} (size\+\_\+t new\+\_\+value)
+\begin{DoxyCompactList}\small\item\em Set maximum HTTP message body size. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_ab6cd8d850c40f33f48d0afb4d7be094c}{interrupt}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}} hdl, lib\+::error\+\_\+code \&ec)
+\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_aa77facb47f09c143e5c22486f02bb455}{interrupt}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}} hdl)
+\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_aef7666b82bf98864b213c3df09298595}{pause\+\_\+reading}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}} hdl, lib\+::error\+\_\+code \&ec)
+\begin{DoxyCompactList}\small\item\em Pause reading of new data (exception free) \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_af7ec27363d0fb1d657a264c4ad853b8e}{pause\+\_\+reading}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}} hdl)
+\begin{DoxyCompactList}\small\item\em Pause reading of new data. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a9753aaade09c9a7a0efd459861ba3b97}{resume\+\_\+reading}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}} hdl, lib\+::error\+\_\+code \&ec)
+\begin{DoxyCompactList}\small\item\em Resume reading of new data (exception free) \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a4592d2270f56fce0f30a41cd17f77650}{resume\+\_\+reading}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}} hdl)
+\begin{DoxyCompactList}\small\item\em Resume reading of new data. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_ae78b1414f7e0cf71c9eab0a29efab8a1}{send\+\_\+http\+\_\+response}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}} hdl, lib\+::error\+\_\+code \&ec)
+\begin{DoxyCompactList}\small\item\em Send deferred HTTP Response. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_af29ca34a6659beea0422a2f27718b9c2}{send\+\_\+http\+\_\+response}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}} hdl)
+\begin{DoxyCompactList}\small\item\em Send deferred HTTP Response (exception free) \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a5341f59de7ef1a565a2fd93daba212d5}{send}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}} hdl, std\+::string const \&payload, \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e}{frame\+::opcode\+::value}} \mbox{\hyperlink{unionop}{op}}, lib\+::error\+\_\+code \&ec)
+\begin{DoxyCompactList}\small\item\em Create a message and add it to the outgoing send queue (exception free) \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a9eb8f9fd7fbb7d8374eb02e100430bcf}{send}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}} hdl, std\+::string const \&payload, \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e}{frame\+::opcode\+::value}} \mbox{\hyperlink{unionop}{op}})
+\begin{DoxyCompactList}\small\item\em Create a message and add it to the outgoing send queue. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a71e4454af8d8f133ca736e80c3adf268}{send}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}} hdl, void const \texorpdfstring{$\ast$}{*}payload, size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}, \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e}{frame\+::opcode\+::value}} \mbox{\hyperlink{unionop}{op}}, lib\+::error\+\_\+code \&ec)
+\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_adc03a5bd5797a54fde64afd279032671}{send}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}} hdl, void const \texorpdfstring{$\ast$}{*}payload, size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}, \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e}{frame\+::opcode\+::value}} \mbox{\hyperlink{unionop}{op}})
+\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a5cad5b7944435e7eec248e98e7e7a912}{send}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}} hdl, \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a8097edab4feb0c36a69601c3786f0062}{message\+\_\+ptr}} msg, lib\+::error\+\_\+code \&ec)
+\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a702e7d609babdacb8ae772b82c3fa8d0}{send}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}} hdl, \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a8097edab4feb0c36a69601c3786f0062}{message\+\_\+ptr}} msg)
+\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_aa6b81c003dba27c6b30d62d5e79593a6}{close}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}} hdl, \mbox{\hyperlink{namespacewebsocketpp_1_1close_1_1status_a8614a5c4733d708e2d2a32191c5bef84}{close\+::status\+::value}} const code, std\+::string const \&reason, lib\+::error\+\_\+code \&ec)
+\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a7a4595364dc18d423ff5aa6eda41ecde}{close}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}} hdl, \mbox{\hyperlink{namespacewebsocketpp_1_1close_1_1status_a8614a5c4733d708e2d2a32191c5bef84}{close\+::status\+::value}} const code, std\+::string const \&reason)
+\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a1d4bcbc3fcd87f48120fbb421467f414}{ping}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}} hdl, std\+::string const \&payload, lib\+::error\+\_\+code \&ec)
+\begin{DoxyCompactList}\small\item\em Send a ping to a specific connection. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a35267939caf4b611b01701ba13cd0b33}{ping}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}} hdl, std\+::string const \&payload)
+\begin{DoxyCompactList}\small\item\em Send a ping to a specific connection. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a58a55e0288d4da518b2a806587df3809}{pong}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}} hdl, std\+::string const \&payload, lib\+::error\+\_\+code \&ec)
+\begin{DoxyCompactList}\small\item\em Send a pong to a specific connection. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1endpoint_ab546cb4089f868a09c8d0694fb6f0be6}{pong}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}} hdl, std\+::string const \&payload)
+\begin{DoxyCompactList}\small\item\em Send a pong to a specific connection. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classwebsocketpp_1_1endpoint_aab0c5b0f36b0baabd78672e0ee2f1346}{connection\+\_\+ptr}} \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a0fe4457427d4124abe7ca022ba7afbb4}{get\+\_\+con\+\_\+from\+\_\+hdl}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}} hdl, lib\+::error\+\_\+code \&ec)
+\begin{DoxyCompactList}\small\item\em Retrieves a connection\+\_\+ptr from a connection\+\_\+hdl (exception free) \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classwebsocketpp_1_1endpoint_aab0c5b0f36b0baabd78672e0ee2f1346}{connection\+\_\+ptr}} \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a7be6f2e7dc3901dd577eae33dfd2df24}{get\+\_\+con\+\_\+from\+\_\+hdl}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}} hdl)
+\begin{DoxyCompactList}\small\item\em Retrieves a connection\+\_\+ptr from a connection\+\_\+hdl (exception version) \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classwebsocketpp_1_1server_a408f6796a357de56c73c3beb2f13c61d}{connection$<$ config $>$}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Protected Member Functions inherited from \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint$<$ connection$<$ config $>$, config $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classwebsocketpp_1_1endpoint_aab0c5b0f36b0baabd78672e0ee2f1346}{connection\+\_\+ptr}} \mbox{\hyperlink{classwebsocketpp_1_1endpoint_abfbee4cb244700560ef80594a913cd95}{create\+\_\+connection}} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Attributes inherited from \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{websocketpp\+::endpoint$<$ connection$<$ config $>$, config $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classwebsocketpp_1_1endpoint_ae2b58b244a7b824e30a18ee2ddaccc02}{alog\+\_\+type}} \mbox{\hyperlink{classwebsocketpp_1_1endpoint_ab77acb19adafe52f5c28aa387077cfbc}{m\+\_\+alog}}
+\item 
+\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a928771bc4dae5bf42879aeb2e98ae69a}{elog\+\_\+type}} \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a46d6afb6f4f1541da167230c8c1e6f9a}{m\+\_\+elog}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{classconfig}{config}}$>$\newline
+class websocketpp\+::server$<$ config $>$}
+
+
+Definition at line \mbox{\hyperlink{server__endpoint_8hpp_source_l00044}{44}} of file \mbox{\hyperlink{server__endpoint_8hpp_source}{server\+\_\+endpoint.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classwebsocketpp_1_1server_aad5b46acb5bb9946aa97cfac456d9dd7}\index{websocketpp::server$<$ config $>$@{websocketpp::server$<$ config $>$}!concurrency\_type@{concurrency\_type}}
+\index{concurrency\_type@{concurrency\_type}!websocketpp::server$<$ config $>$@{websocketpp::server$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{concurrency\_type}{concurrency\_type}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1server_aad5b46acb5bb9946aa97cfac456d9dd7} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+config\+::concurrency\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1server}{websocketpp\+::server}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::concurrency\+\_\+type}
+
+
+
+Definition at line \mbox{\hyperlink{server__endpoint_8hpp_source_l00050}{50}} of file \mbox{\hyperlink{server__endpoint_8hpp_source}{server\+\_\+endpoint.\+hpp}}.
+
+\Hypertarget{classwebsocketpp_1_1server_abb895563dddafdc1426997d245cbd7cb}\index{websocketpp::server$<$ config $>$@{websocketpp::server$<$ config $>$}!connection\_ptr@{connection\_ptr}}
+\index{connection\_ptr@{connection\_ptr}!websocketpp::server$<$ config $>$@{websocketpp::server$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{connection\_ptr}{connection\_ptr}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1server_abb895563dddafdc1426997d245cbd7cb} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+\mbox{\hyperlink{classwebsocketpp_1_1connection_af5839adca921ce08ea3ca3e634155e86}{connection\+\_\+type\+::ptr}} \mbox{\hyperlink{classwebsocketpp_1_1server}{websocketpp\+::server}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\mbox{\hyperlink{debug__client_8cpp_ae9c9779aea742ab80689add7e553df0d}{\+::connection\+\_\+ptr}}}
+
+
+
+Definition at line \mbox{\hyperlink{server__endpoint_8hpp_source_l00057}{57}} of file \mbox{\hyperlink{server__endpoint_8hpp_source}{server\+\_\+endpoint.\+hpp}}.
+
+\Hypertarget{classwebsocketpp_1_1server_a3e777e222c7dcdabeb160df225078c41}\index{websocketpp::server$<$ config $>$@{websocketpp::server$<$ config $>$}!connection\_type@{connection\_type}}
+\index{connection\_type@{connection\_type}!websocketpp::server$<$ config $>$@{websocketpp::server$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{connection\_type}{connection\_type}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1server_a3e777e222c7dcdabeb160df225078c41} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+\mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}$<$\mbox{\hyperlink{classconfig}{config}}$>$ \mbox{\hyperlink{classwebsocketpp_1_1server}{websocketpp\+::server}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::connection\+\_\+type}
+
+
+
+Definition at line \mbox{\hyperlink{server__endpoint_8hpp_source_l00055}{55}} of file \mbox{\hyperlink{server__endpoint_8hpp_source}{server\+\_\+endpoint.\+hpp}}.
+
+\Hypertarget{classwebsocketpp_1_1server_a78dfdd216fd7bc2d06d52ee47c4610c2}\index{websocketpp::server$<$ config $>$@{websocketpp::server$<$ config $>$}!endpoint\_type@{endpoint\_type}}
+\index{endpoint\_type@{endpoint\_type}!websocketpp::server$<$ config $>$@{websocketpp::server$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{endpoint\_type}{endpoint\_type}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1server_a78dfdd216fd7bc2d06d52ee47c4610c2} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+\mbox{\hyperlink{classwebsocketpp_1_1endpoint}{endpoint}}$<$\mbox{\hyperlink{classwebsocketpp_1_1server_a3e777e222c7dcdabeb160df225078c41}{connection\+\_\+type}},\mbox{\hyperlink{classconfig}{config}}$>$ \mbox{\hyperlink{classwebsocketpp_1_1server}{websocketpp\+::server}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::endpoint\+\_\+type}
+
+
+
+Definition at line \mbox{\hyperlink{server__endpoint_8hpp_source_l00065}{65}} of file \mbox{\hyperlink{server__endpoint_8hpp_source}{server\+\_\+endpoint.\+hpp}}.
+
+\Hypertarget{classwebsocketpp_1_1server_a246781fa7052ee93b3fe33923c65c7c3}\index{websocketpp::server$<$ config $>$@{websocketpp::server$<$ config $>$}!transport\_con\_ptr@{transport\_con\_ptr}}
+\index{transport\_con\_ptr@{transport\_con\_ptr}!websocketpp::server$<$ config $>$@{websocketpp::server$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{transport\_con\_ptr}{transport\_con\_ptr}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1server_a246781fa7052ee93b3fe33923c65c7c3} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+transport\+\_\+con\+\_\+type\+::ptr \mbox{\hyperlink{classwebsocketpp_1_1server}{websocketpp\+::server}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::transport\+\_\+con\+\_\+ptr}
+
+
+
+Definition at line \mbox{\hyperlink{server__endpoint_8hpp_source_l00062}{62}} of file \mbox{\hyperlink{server__endpoint_8hpp_source}{server\+\_\+endpoint.\+hpp}}.
+
+\Hypertarget{classwebsocketpp_1_1server_a0fd0b6345e5e0d948fa3566fabe4a79f}\index{websocketpp::server$<$ config $>$@{websocketpp::server$<$ config $>$}!transport\_con\_type@{transport\_con\_type}}
+\index{transport\_con\_type@{transport\_con\_type}!websocketpp::server$<$ config $>$@{websocketpp::server$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{transport\_con\_type}{transport\_con\_type}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1server_a0fd0b6345e5e0d948fa3566fabe4a79f} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+transport\+\_\+type\+::transport\+\_\+con\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1server}{websocketpp\+::server}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::transport\+\_\+con\+\_\+type}
+
+
+
+Definition at line \mbox{\hyperlink{server__endpoint_8hpp_source_l00060}{60}} of file \mbox{\hyperlink{server__endpoint_8hpp_source}{server\+\_\+endpoint.\+hpp}}.
+
+\Hypertarget{classwebsocketpp_1_1server_a1b67e3aea62b524aae9b5080e301ec3d}\index{websocketpp::server$<$ config $>$@{websocketpp::server$<$ config $>$}!transport\_type@{transport\_type}}
+\index{transport\_type@{transport\_type}!websocketpp::server$<$ config $>$@{websocketpp::server$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{transport\_type}{transport\_type}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1server_a1b67e3aea62b524aae9b5080e301ec3d} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+config\+::transport\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1server}{websocketpp\+::server}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::transport\+\_\+type}
+
+
+
+Definition at line \mbox{\hyperlink{server__endpoint_8hpp_source_l00052}{52}} of file \mbox{\hyperlink{server__endpoint_8hpp_source}{server\+\_\+endpoint.\+hpp}}.
+
+\Hypertarget{classwebsocketpp_1_1server_aacf807e48f77c28b33dce5c5e12e2ede}\index{websocketpp::server$<$ config $>$@{websocketpp::server$<$ config $>$}!type@{type}}
+\index{type@{type}!websocketpp::server$<$ config $>$@{websocketpp::server$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{type}{type}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1server_aacf807e48f77c28b33dce5c5e12e2ede} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+\mbox{\hyperlink{classwebsocketpp_1_1server}{server}}$<$\mbox{\hyperlink{classconfig}{config}}$>$ \mbox{\hyperlink{classwebsocketpp_1_1server}{websocketpp\+::server}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::type}
+
+
+
+Definition at line \mbox{\hyperlink{server__endpoint_8hpp_source_l00047}{47}} of file \mbox{\hyperlink{server__endpoint_8hpp_source}{server\+\_\+endpoint.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classwebsocketpp_1_1server_ae6ed4fd23f86c3079277ff70b9fe2e52}\index{websocketpp::server$<$ config $>$@{websocketpp::server$<$ config $>$}!server@{server}}
+\index{server@{server}!websocketpp::server$<$ config $>$@{websocketpp::server$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{server()}{server()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1server_ae6ed4fd23f86c3079277ff70b9fe2e52} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+\mbox{\hyperlink{classwebsocketpp_1_1server}{websocketpp\+::server}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\mbox{\hyperlink{docs_2simple__broadcast__server_8cpp_afc38239e3eef2a4200e324bff14d91d1}{\+::server}} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{server__endpoint_8hpp_source_l00069}{69}} of file \mbox{\hyperlink{server__endpoint_8hpp_source}{server\+\_\+endpoint.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{classwebsocketpp_1_1server_a78dfdd216fd7bc2d06d52ee47c4610c2}{endpoint\_type}}(\textcolor{keyword}{true})}
+\DoxyCodeLine{00070\ \ \ \ \ \{}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_ab77acb19adafe52f5c28aa387077cfbc}{endpoint\_type::m\_alog}}.write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}{log::alevel::devel}},\ \textcolor{stringliteral}{"{}server\ constructor"{}});}
+\DoxyCodeLine{00072\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1server_aa9f0c40951f9a365e23233551fbc3f6b}\index{websocketpp::server$<$ config $>$@{websocketpp::server$<$ config $>$}!````~server@{\texorpdfstring{$\sim$}{\string~}server}}
+\index{````~server@{\texorpdfstring{$\sim$}{\string~}server}!websocketpp::server$<$ config $>$@{websocketpp::server$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}server()}{\string~server()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1server_aa9f0c40951f9a365e23233551fbc3f6b} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+\mbox{\hyperlink{classwebsocketpp_1_1server}{websocketpp\+::server}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::\texorpdfstring{$\sim$}{\string~}\mbox{\hyperlink{classwebsocketpp_1_1server}{server}} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{server__endpoint_8hpp_source_l00069}{69}} of file \mbox{\hyperlink{server__endpoint_8hpp_source}{server\+\_\+endpoint.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00075\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classwebsocketpp_1_1server_a9146c63ed1afb5bdec29eca52c487226}\index{websocketpp::server$<$ config $>$@{websocketpp::server$<$ config $>$}!get\_connection@{get\_connection}}
+\index{get\_connection@{get\_connection}!websocketpp::server$<$ config $>$@{websocketpp::server$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{get\_connection()}{get\_connection()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1server_a9146c63ed1afb5bdec29eca52c487226} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+\mbox{\hyperlink{classwebsocketpp_1_1server_abb895563dddafdc1426997d245cbd7cb}{connection\+\_\+ptr}} \mbox{\hyperlink{classwebsocketpp_1_1server}{websocketpp\+::server}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::get\+\_\+connection (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+The connection will be initialized and ready to begin. \doxylink{struct_call}{Call} its start() method to begin the processing loop.
+
+Note\+: The connection must either be started or terminated using \doxylink{classwebsocketpp_1_1connection_a7267aae677a77e5e9379ecb6db1789a3}{connection\+::terminate} in order to avoid memory leaks.
+
+\begin{DoxyReturn}{Returns}
+\doxylink{struct_a}{A} pointer to the new connection. 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{server__endpoint_8hpp_source_l00106}{106}} of file \mbox{\hyperlink{server__endpoint_8hpp_source}{server\+\_\+endpoint.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_abfbee4cb244700560ef80594a913cd95}{endpoint\_type::create\_connection}}();}
+\DoxyCodeLine{00108\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=339pt]{classwebsocketpp_1_1server_a9146c63ed1afb5bdec29eca52c487226_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1server_a9146c63ed1afb5bdec29eca52c487226_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1server_aa24feb1c5d2bde47de8b11f5369c54d4}\index{websocketpp::server$<$ config $>$@{websocketpp::server$<$ config $>$}!handle\_accept@{handle\_accept}}
+\index{handle\_accept@{handle\_accept}!websocketpp::server$<$ config $>$@{websocketpp::server$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{handle\_accept()}{handle\_accept()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1server_aa24feb1c5d2bde47de8b11f5369c54d4} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1server}{websocketpp\+::server}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::handle\+\_\+accept (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classwebsocketpp_1_1server_abb895563dddafdc1426997d245cbd7cb}{connection\+\_\+ptr}}}]{con}{, }\item[{lib\+::error\+\_\+code const \&}]{ec}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{server__endpoint_8hpp_source_l00161}{161}} of file \mbox{\hyperlink{server__endpoint_8hpp_source}{server\+\_\+endpoint.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ec)\ \{}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \ \ \ \ con-\/>terminate(ec);}
+\DoxyCodeLine{00164\ }
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ec\ ==\ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da3b58b6bfba3dcc3dbdf828c07bb040f4}{error::operation\_canceled}})\ \{}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a46d6afb6f4f1541da167230c8c1e6f9a}{endpoint\_type::m\_elog}}.write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1elevel_a3ab47987a682f0de7b1d0df8c9c3b9d2}{log::elevel::info}},}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}handle\_accept\ error:\ "{}}+ec.message());}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a46d6afb6f4f1541da167230c8c1e6f9a}{endpoint\_type::m\_elog}}.write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1elevel_ae8a9a9f8b1fa45a731acd340e10aa342}{log::elevel::rerror}},}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}handle\_accept\ error:\ "{}}+ec.message());}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ \ \ \ \ con-\/>start();}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00175\ }
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ lib::error\_code\ start\_ec;}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1server_ab61bcdf9fd532fe7ebd934f8d84fdfea}{start\_accept}}(start\_ec);}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (start\_ec\ ==\ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da3a15d734910438b77e8f1919e6dac9e6}{error::async\_accept\_not\_listening}})\ \{}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a46d6afb6f4f1541da167230c8c1e6f9a}{endpoint\_type::m\_elog}}.write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1elevel_a3ab47987a682f0de7b1d0df8c9c3b9d2}{log::elevel::info}},}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Stopping\ acceptance\ of\ new\ connections\ because\ the\ underlying\ transport\ is\ no\ longer\ listening."{}});}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (start\_ec)\ \{}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a46d6afb6f4f1541da167230c8c1e6f9a}{endpoint\_type::m\_elog}}.write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1elevel_ae8a9a9f8b1fa45a731acd340e10aa342}{log::elevel::rerror}},}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Restarting\ async\_accept\ loop\ failed:\ "{}}+ec.message());}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00185\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=330pt]{classwebsocketpp_1_1server_aa24feb1c5d2bde47de8b11f5369c54d4_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1server_aa24feb1c5d2bde47de8b11f5369c54d4_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1server_ab61bcdf9fd532fe7ebd934f8d84fdfea}\index{websocketpp::server$<$ config $>$@{websocketpp::server$<$ config $>$}!start\_accept@{start\_accept}}
+\index{start\_accept@{start\_accept}!websocketpp::server$<$ config $>$@{websocketpp::server$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{start\_accept()}{start\_accept()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1server_ab61bcdf9fd532fe7ebd934f8d84fdfea} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1server}{websocketpp\+::server}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::start\+\_\+accept (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Initiates the server connection acceptance loop. Must be called after listen. This method will have no effect until the underlying io\+\_\+service starts running. It may be called after the io\+\_\+service is already running.
+
+Refer to documentation for the transport policy you are using for instructions on how to stop this acceptance loop. 
+
+Definition at line \mbox{\hyperlink{server__endpoint_8hpp_source_l00152}{152}} of file \mbox{\hyperlink{server__endpoint_8hpp_source}{server\+\_\+endpoint.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ lib::error\_code\ ec;}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1server_ab61bcdf9fd532fe7ebd934f8d84fdfea}{start\_accept}}(ec);}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ec)\ \{}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ exception(ec);}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00158\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=187pt]{classwebsocketpp_1_1server_ab61bcdf9fd532fe7ebd934f8d84fdfea_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1server_ab61bcdf9fd532fe7ebd934f8d84fdfea_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1server_a0204a7d444144f7ea5b8bbcf14689fc1}\index{websocketpp::server$<$ config $>$@{websocketpp::server$<$ config $>$}!start\_accept@{start\_accept}}
+\index{start\_accept@{start\_accept}!websocketpp::server$<$ config $>$@{websocketpp::server$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{start\_accept()}{start\_accept()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1server_a0204a7d444144f7ea5b8bbcf14689fc1} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1server}{websocketpp\+::server}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::start\+\_\+accept (\begin{DoxyParamCaption}\item[{lib\+::error\+\_\+code \&}]{ec}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Initiates the server connection acceptance loop. Must be called after listen. This method will have no effect until the underlying io\+\_\+service starts running. It may be called after the io\+\_\+service is already running.
+
+Refer to documentation for the transport policy you are using for instructions on how to stop this acceptance loop.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ out}}  & {\em ec} & \doxylink{struct_a}{A} status code indicating an error, if any. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{server__endpoint_8hpp_source_l00121}{121}} of file \mbox{\hyperlink{server__endpoint_8hpp_source}{server\+\_\+endpoint.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!transport\_type::is\_listening())\ \{}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \ \ \ \ ec\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a3344622df8c36e8ae03c59164e7b5e89}{error::make\_error\_code}}(\mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da3a15d734910438b77e8f1919e6dac9e6}{error::async\_accept\_not\_listening}});}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ ec\ =\ lib::error\_code();}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{debug__client_8cpp_ae9c9779aea742ab80689add7e553df0d}{connection\_ptr}}\ con\ =\ \mbox{\hyperlink{classwebsocketpp_1_1server_a9146c63ed1afb5bdec29eca52c487226}{get\_connection}}();}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ transport\_type::async\_accept(}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \ \ \ lib::static\_pointer\_cast<transport\_con\_type>(con),}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \ \ \ lib::bind(\&\mbox{\hyperlink{classwebsocketpp_1_1server_aa24feb1c5d2bde47de8b11f5369c54d4}{type::handle\_accept}},\textcolor{keyword}{this},con,lib::placeholders::\_1),}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \ \ \ \ ec}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ec\ \&\&\ con)\ \{}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ the\ connection\ was\ constructed\ but\ the\ accept\ failed,}}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ terminate\ the\ connection\ to\ prevent\ memory\ leaks}}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \ \ \ \ con-\/>terminate(lib::error\_code());}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00141\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1server_a0204a7d444144f7ea5b8bbcf14689fc1_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1server_a0204a7d444144f7ea5b8bbcf14689fc1_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{classwebsocketpp_1_1server_a408f6796a357de56c73c3beb2f13c61d}\index{websocketpp::server$<$ config $>$@{websocketpp::server$<$ config $>$}!connection$<$ config $>$@{connection$<$ config $>$}}
+\index{connection$<$ config $>$@{connection$<$ config $>$}!websocketpp::server$<$ config $>$@{websocketpp::server$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{connection$<$ config $>$}{connection< config >}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1server_a408f6796a357de56c73c3beb2f13c61d} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+friend \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{server__endpoint_8hpp_source_l00065}{65}} of file \mbox{\hyperlink{server__endpoint_8hpp_source}{server\+\_\+endpoint.\+hpp}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/vendor/websocketpp/websocketpp/roles/\mbox{\hyperlink{server__endpoint_8hpp}{server\+\_\+endpoint.\+hpp}}\end{DoxyCompactItemize}

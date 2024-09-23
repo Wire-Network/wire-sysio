@@ -1,0 +1,191 @@
+\doxysection{round\+\_\+robin.\+hpp}
+\hypertarget{round__robin_8hpp_source}{}\label{round__robin_8hpp_source}\index{libraries/fc/src/thread/asio/round\_robin.hpp@{libraries/fc/src/thread/asio/round\_robin.hpp}}
+\mbox{\hyperlink{round__robin_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00001}00001\ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ Copyright\ Oliver\ Kowalke\ 2013.}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00002}00002\ \textcolor{comment}{//\ Distributed\ under\ the\ Boost\ Software\ License,\ Version\ 1.0.}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00003}00003\ \textcolor{comment}{//\ \ \ \ (See\ accompanying\ file\ LICENSE\_1\_0.txt\ or\ copy\ at}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00004}00004\ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ http://www.boost.org/LICENSE\_1\_0.txt)}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00006}00006\ \textcolor{preprocessor}{\#ifndef\ BOOST\_FIBERS\_ASIO\_ROUND\_ROBIN\_H}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00007}00007\ \textcolor{preprocessor}{\#define\ BOOST\_FIBERS\_ASIO\_ROUND\_ROBIN\_H}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ <chrono>}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <cstddef>}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00011}00011\ \textcolor{preprocessor}{\#include\ <mutex>}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00012}00012\ \textcolor{preprocessor}{\#include\ <queue>}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00014}00014\ \textcolor{preprocessor}{\#include\ <boost/asio.hpp>}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00015}00015\ \textcolor{preprocessor}{\#include\ <boost/assert.hpp>}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00016}00016\ \textcolor{preprocessor}{\#include\ <boost/asio/steady\_timer.hpp>}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00017}00017\ \textcolor{preprocessor}{\#include\ <boost/config.hpp>}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00019}00019\ \textcolor{preprocessor}{\#include\ <boost/fiber/condition\_variable.hpp>}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00020}00020\ \textcolor{preprocessor}{\#include\ <boost/fiber/context.hpp>}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00021}00021\ \textcolor{preprocessor}{\#include\ <boost/fiber/mutex.hpp>}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00022}00022\ \textcolor{preprocessor}{\#include\ <boost/fiber/operations.hpp>}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00023}00023\ \textcolor{preprocessor}{\#include\ <boost/fiber/scheduler.hpp>}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00025}00025\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{yield_8hpp}{yield.hpp}}"{}}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00027}00027\ \textcolor{preprocessor}{\#ifdef\ BOOST\_HAS\_ABI\_HEADERS}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00028}00028\ \textcolor{preprocessor}{\#\ \ include\ BOOST\_ABI\_PREFIX}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00029}00029\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00031}00031\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceboost}{boost}}\ \{}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00032}00032\ \textcolor{keyword}{namespace\ }fibers\ \{}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00033}00033\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacewebsocketpp_1_1lib_1_1asio}{asio}}\ \{}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00035}\mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1round__robin}{00035}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1round__robin}{round\_robin}}\ :\ \textcolor{keyword}{public}\ algo::algorithm\ \{}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00036}00036\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00037}00037\ \ \ \ \ \textcolor{keyword}{typedef}\ scheduler::ready\_queue\_t\ rqueue\_t;}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00039}00039\ \textcolor{comment}{//[asio\_rr\_suspend\_timer}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00040}00040\ \ \ \ \ boost::asio::io\_service\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\ \ \ io\_svc\_;}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00041}00041\ \ \ \ \ boost::asio::steady\_timer\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ suspend\_timer\_;}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00042}00042\ \textcolor{comment}{//]}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00043}00043\ \ \ \ \ rqueue\_t\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ rqueue\_\{\};}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00045}00045\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00046}00046\ \textcolor{comment}{//[asio\_rr\_service\_top}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00047}\mbox{\hyperlink{structboost_1_1fibers_1_1asio_1_1round__robin_1_1service}{00047}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structboost_1_1fibers_1_1asio_1_1round__robin_1_1service}{service}}\ :\ \textcolor{keyword}{public}\ boost::asio::io\_service::service\ \{}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00048}\mbox{\hyperlink{structboost_1_1fibers_1_1asio_1_1round__robin_1_1service_a6f248abcf76ef404a9c804fbcaa4852c}{00048}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ boost::asio::io\_service::id\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structboost_1_1fibers_1_1asio_1_1round__robin_1_1service_a6f248abcf76ef404a9c804fbcaa4852c}{id}};}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00050}\mbox{\hyperlink{structboost_1_1fibers_1_1asio_1_1round__robin_1_1service_ab3ee3b26155151605450e8b9020747c0}{00050}}\ \ \ \ \ \ \ \ \ std::unique\_ptr<\ boost::asio::io\_service::work\ >\ \ \ \ \mbox{\hyperlink{structboost_1_1fibers_1_1asio_1_1round__robin_1_1service_ab3ee3b26155151605450e8b9020747c0}{work\_}};}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00052}\mbox{\hyperlink{structboost_1_1fibers_1_1asio_1_1round__robin_1_1service_a5a70b1f98352210c028ec6c7b0b4c551}{00052}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structboost_1_1fibers_1_1asio_1_1round__robin_1_1service_a5a70b1f98352210c028ec6c7b0b4c551}{service}}(\ boost::asio::io\_service\ \&\ io\_svc)\ :}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceboost}{boost}}::\mbox{\hyperlink{namespacewebsocketpp_1_1lib_1_1asio}{asio}}::io\_service::\mbox{\hyperlink{structboost_1_1fibers_1_1asio_1_1round__robin_1_1service}{service}}(\ io\_svc),}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structboost_1_1fibers_1_1asio_1_1round__robin_1_1service_ab3ee3b26155151605450e8b9020747c0}{work\_}}\{\ new\ \mbox{\hyperlink{namespaceboost}{boost}}::\mbox{\hyperlink{namespacewebsocketpp_1_1lib_1_1asio}{asio}}::io\_service::work(\ io\_svc)\ \}\ \{}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \ \ \ io\_svc.post([\&io\_svc]()\{}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00056}00056\ \textcolor{comment}{//]}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00057}00057\ \textcolor{comment}{//[asio\_rr\_service\_lambda}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (\ !\ io\_svc.stopped()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00059}00059\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ boost::fibers::has\_ready\_fibers()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ run\ all\ pending\ handlers\ in\ round\_robin}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00061}00061\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (\ io\_svc.poll()\ );}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00062}00062\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ run\ pending\ (ready)\ fibers}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ this\_fiber::yield();}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00064}00064\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00065}00065\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ run\ one\ handler\ inside\ io\_service}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00066}00066\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ if\ no\ handler\ available,\ block\ this\ thread}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00067}00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ !\ io\_svc.run\_one()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00071}00071\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00072}00072\ \textcolor{comment}{//]}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00073}00073\ \textcolor{comment}{//[asio\_rr\_service\_bottom}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00074}00074\ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00075}00075\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00076}00076\ }
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00077}\mbox{\hyperlink{structboost_1_1fibers_1_1asio_1_1round__robin_1_1service_af928978e12c73a234d8db3a64196698a}{00077}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{structboost_1_1fibers_1_1asio_1_1round__robin_1_1service_af928978e12c73a234d8db3a64196698a}{\string~service}}()\ \{\}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00079}\mbox{\hyperlink{structboost_1_1fibers_1_1asio_1_1round__robin_1_1service_ab91aa937da14f49271578bbe5f29f2c3}{00079}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structboost_1_1fibers_1_1asio_1_1round__robin_1_1service_ab91aa937da14f49271578bbe5f29f2c3}{service}}(\ \mbox{\hyperlink{structboost_1_1fibers_1_1asio_1_1round__robin_1_1service}{service}}\ \textcolor{keyword}{const}\&)\ =\ \textcolor{keyword}{delete};}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00080}\mbox{\hyperlink{structboost_1_1fibers_1_1asio_1_1round__robin_1_1service_aad5d5e65b36f00866e6d164569fa81ff}{00080}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structboost_1_1fibers_1_1asio_1_1round__robin_1_1service}{service}}\ \&\ \mbox{\hyperlink{structboost_1_1fibers_1_1asio_1_1round__robin_1_1service_aad5d5e65b36f00866e6d164569fa81ff}{operator=}}(\ \mbox{\hyperlink{structboost_1_1fibers_1_1asio_1_1round__robin_1_1service}{service}}\ \textcolor{keyword}{const}\&)\ =\ \textcolor{keyword}{delete};}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00081}00081\ }
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00082}\mbox{\hyperlink{structboost_1_1fibers_1_1asio_1_1round__robin_1_1service_a627fd1ef2f8de4047e825d7077751fa8}{00082}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structboost_1_1fibers_1_1asio_1_1round__robin_1_1service_a627fd1ef2f8de4047e825d7077751fa8}{shutdown\_service}}()\ override\ final\ \{}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00083}00083\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structboost_1_1fibers_1_1asio_1_1round__robin_1_1service_ab3ee3b26155151605450e8b9020747c0}{work\_}}.reset();}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00084}00084\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00085}00085\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00086}00086\ \textcolor{comment}{//]}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00087}00087\ }
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00088}00088\ \textcolor{comment}{//[asio\_rr\_ctor}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00089}\mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1round__robin_aee1131d9ade630b117f0e208d24487f0}{00089}}\ \ \ \ \ \mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1round__robin_aee1131d9ade630b117f0e208d24487f0}{round\_robin}}(\ boost::asio::io\_service\ \&\ io\_svc)\ :}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00090}00090\ \ \ \ \ \ \ \ \ io\_svc\_(\ io\_svc),}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00091}00091\ \ \ \ \ \ \ \ \ suspend\_timer\_(\ io\_svc\_)\ \{}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00092}00092\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ We\ use\ add\_service()\ very\ deliberately.\ This\ will\ throw}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00093}00093\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ service\_already\_exists\ if\ you\ pass\ the\ same\ io\_service\ instance\ to}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00094}00094\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ more\ than\ one\ round\_robin\ instance.}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00095}00095\ \ \ \ \ \ \ \ \ boost::asio::add\_service(\ io\_svc\_,\ \textcolor{keyword}{new}\ \mbox{\hyperlink{structboost_1_1fibers_1_1asio_1_1round__robin_1_1service}{service}}(\ io\_svc\_));}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00096}00096\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00097}00097\ \textcolor{comment}{//]}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00098}00098\ }
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00099}\mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1round__robin_af0b5f5de86abf157f4f92d499b1ffaee}{00099}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1round__robin_af0b5f5de86abf157f4f92d499b1ffaee}{awakened}}(\ \mbox{\hyperlink{structcontext}{context}}\ *\ ctx)\ \textcolor{keyword}{noexcept}\ \{}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00100}00100\ \ \ \ \ \ \ \ \ BOOST\_ASSERT(\ \textcolor{keyword}{nullptr}\ !=\ ctx);}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00101}00101\ \ \ \ \ \ \ \ \ ctx-\/>ready\_link(\ rqueue\_);\ \textcolor{comment}{/*<\ fiber,\ enqueue\ on\ ready\ queue\ >*/}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00102}00102\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00103}00103\ }
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00104}\mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1round__robin_a42dc0e10a8b389d079e7d48b59c3daf0}{00104}}\ \ \ \ \ \mbox{\hyperlink{structcontext}{context}}\ *\ \mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1round__robin_a42dc0e10a8b389d079e7d48b59c3daf0}{pick\_next}}()\ noexcept\ \{}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00105}00105\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structcontext}{context}}\ *\ ctx(\ \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00106}00106\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ !\ rqueue\_.empty()\ )\ \{\ \textcolor{comment}{/*<}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00107}00107\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ pop\ an\ item\ from\ the\ ready\ queue}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00108}00108\ \textcolor{comment}{\ \ \ \ \ \ \ \ >*/}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00109}00109\ \ \ \ \ \ \ \ \ \ \ \ \ ctx\ =\ \&\ rqueue\_.front();}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00110}00110\ \ \ \ \ \ \ \ \ \ \ \ \ rqueue\_.pop\_front();}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00111}00111\ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_ASSERT(\ \textcolor{keyword}{nullptr}\ !=\ ctx);}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00112}00112\ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_ASSERT(\ context::active()\ !=\ ctx);}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00113}00113\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00114}00114\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ctx;}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00115}00115\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00116}00116\ }
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00117}\mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1round__robin_a7a2c74f6bda80e69c87bf52a0ae79c62}{00117}}\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1round__robin_a7a2c74f6bda80e69c87bf52a0ae79c62}{has\_ready\_fibers}}()\ const\ noexcept\ \{}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00118}00118\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !\ rqueue\_.empty();}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00119}00119\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00120}00120\ }
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00121}00121\ \textcolor{comment}{//[asio\_rr\_suspend\_until}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00122}\mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1round__robin_ac45de1f9a2b54df5b615a6e9d5b5a411}{00122}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1round__robin_ac45de1f9a2b54df5b615a6e9d5b5a411}{suspend\_until}}(\ std::chrono::steady\_clock::time\_point\ \textcolor{keyword}{const}\&\ abs\_time)\ \textcolor{keyword}{noexcept}\ \{}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00123}00123\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Set\ a\ timer\ so\ at\ least\ one\ handler\ will\ eventually\ fire,\ causing}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00124}00124\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ run\_one()\ to\ eventually\ return.\ Set\ a\ timer\ even\ if\ abs\_time\ ==}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00125}00125\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ time\_point::max()\ so\ the\ timer\ can\ be\ canceled\ by\ our\ notify()}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00126}00126\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ method\ -\/-\/\ which\ calls\ the\ handler.}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00127}00127\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ suspend\_timer\_.expires\_at()\ !=\ abs\_time)\ \{}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00128}00128\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Each\ expires\_at(time\_point)\ call\ cancels\ any\ previous\ pending}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00129}00129\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ call.\ We\ could\ inadvertently\ spin\ like\ this:}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00130}00130\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ dispatcher\ calls\ suspend\_until()\ with\ earliest\ wake\ time}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00131}00131\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ suspend\_until()\ sets\ suspend\_timer\_}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00132}00132\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ lambda\ loop\ calls\ run\_one()}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00133}00133\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ some\ other\ asio\ handler\ runs\ before\ timer\ expires}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00134}00134\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ run\_one()\ returns\ to\ lambda\ loop}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00135}00135\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ lambda\ loop\ yields\ to\ dispatcher}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00136}00136\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ dispatcher\ finds\ no\ ready\ fibers}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00137}00137\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ dispatcher\ calls\ suspend\_until()\ with\ SAME\ wake\ time}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00138}00138\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ suspend\_until()\ sets\ suspend\_timer\_\ to\ same\ time,\ canceling}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00139}00139\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ previous\ async\_wait()}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00140}00140\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ lambda\ loop\ calls\ run\_one()}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00141}00141\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ asio\ calls\ suspend\_timer\_\ handler\ with\ operation\_aborted}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00142}00142\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ run\_one()\ returns\ to\ lambda\ loop...\ etc.\ etc.}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00143}00143\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ So\ only\ actually\ set\ the\ timer\ when\ we're\ passed\ a\ DIFFERENT}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00144}00144\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ abs\_time\ value.}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00145}00145\ \ \ \ \ \ \ \ \ \ \ \ \ suspend\_timer\_.expires\_at(\ abs\_time);}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00146}00146\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ It\ really\ doesn't\ matter\ what\ the\ suspend\_timer\_\ handler\ does,}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00147}00147\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ or\ even\ whether\ it's\ called\ because\ the\ timer\ ran\ out\ or\ was}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00148}00148\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ canceled.\ The\ whole\ point\ is\ to\ cause\ the\ run\_one()\ call\ to}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00149}00149\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ return.\ So\ just\ pass\ a\ no-\/op\ lambda\ with\ proper\ signature.}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00150}00150\ \ \ \ \ \ \ \ \ \ \ \ \ suspend\_timer\_.async\_wait([](boost::system::error\_code\ \textcolor{keyword}{const}\&)\{\});}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00151}00151\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00152}00152\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00153}00153\ \textcolor{comment}{//]}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00154}00154\ }
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00155}00155\ \textcolor{comment}{//[asio\_rr\_notify}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00156}\mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1round__robin_aac505bb623204b864769bfc80f26a408}{00156}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1round__robin_aac505bb623204b864769bfc80f26a408}{notify}}()\ noexcept\ \{}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00157}00157\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Something\ has\ happened\ that\ should\ wake\ one\ or\ more\ fibers\ BEFORE}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00158}00158\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ suspend\_timer\_\ expires.\ Reset\ the\ timer\ to\ cause\ it\ to\ fire}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00159}00159\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ immediately,\ causing\ the\ run\_one()\ call\ to\ return.\ In\ theory\ we}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00160}00160\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ could\ use\ cancel()\ because\ we\ don't\ care\ whether\ suspend\_timer\_'s}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00161}00161\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ handler\ is\ called\ with\ operation\_aborted\ or\ success.\ However\ -\/-\/}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00162}00162\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ cancel()\ doesn't\ change\ the\ expiration\ time,\ and\ we\ use}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00163}00163\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ suspend\_timer\_'s\ expiration\ time\ to\ decide\ whether\ it's\ already}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00164}00164\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ set.\ If\ suspend\_until()\ set\ some\ specific\ wake\ time,\ then\ notify()}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00165}00165\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ canceled\ it,\ then\ suspend\_until()\ was\ called\ again\ with\ the\ same}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00166}00166\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ wake\ time,\ it\ would\ match\ suspend\_timer\_'s\ expiration\ time\ and\ we'd}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00167}00167\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ refrain\ from\ setting\ the\ timer.\ So\ instead\ of\ simply\ calling}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00168}00168\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ cancel(),\ reset\ the\ timer,\ which\ cancels\ the\ pending\ sleep\ AND\ sets}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00169}00169\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ a\ new\ expiration\ time.\ This\ will\ cause\ us\ to\ spin\ the\ loop\ twice\ -\/-\/}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00170}00170\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ once\ for\ the\ operation\_aborted\ handler,\ once\ for\ timer\ expiration}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00171}00171\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ -\/-\/\ but\ that\ shouldn't\ be\ a\ big\ problem.}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00172}00172\ \ \ \ \ \ \ \ \ suspend\_timer\_.expires\_at(\ std::chrono::steady\_clock::now()\ );}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00173}00173\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00174}00174\ \textcolor{comment}{//]}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00175}00175\ \};}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00176}00176\ }
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00177}00177\ boost::asio::io\_service::id\ \mbox{\hyperlink{structboost_1_1fibers_1_1asio_1_1round__robin_1_1service_a6f248abcf76ef404a9c804fbcaa4852c}{round\_robin::service::id}};}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00178}00178\ }
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00179}00179\ \}\}\}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00180}00180\ }
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00181}00181\ \textcolor{preprocessor}{\#ifdef\ BOOST\_HAS\_ABI\_HEADERS}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00182}00182\ \textcolor{preprocessor}{\#\ \ include\ BOOST\_ABI\_SUFFIX}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00183}00183\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00184}00184\ }
+\DoxyCodeLine{\Hypertarget{round__robin_8hpp_source_l00185}00185\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ BOOST\_FIBERS\_ASIO\_ROUND\_ROBIN\_H}}
+
+\end{DoxyCode}

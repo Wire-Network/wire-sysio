@@ -1,0 +1,43 @@
+\doxysection{template\+\_\+plugin.\+cpp}
+\hypertarget{template__plugin_8cpp_source}{}\label{template__plugin_8cpp_source}\index{plugins/template\_plugin/template\_plugin.cpp@{plugins/template\_plugin/template\_plugin.cpp}}
+\mbox{\hyperlink{template__plugin_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{template__plugin_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{template__plugin_8hpp}{sysio/template\_plugin/template\_plugin.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{template__plugin_8cpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{template__plugin_8cpp_source_l00003}00003\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{}
+\DoxyCodeLine{\Hypertarget{template__plugin_8cpp_source_l00004}00004\ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classappbase_1_1abstract__plugin}{appbase::abstract\_plugin}}\&\ \_template\_plugin\ =\ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_a87e84549150056c56c0327cc4976cc2a}{register\_plugin}}<template\_plugin>();}
+\DoxyCodeLine{\Hypertarget{template__plugin_8cpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{template__plugin_8cpp_source_l00006}\mbox{\hyperlink{classsysio_1_1template__plugin__impl}{00006}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1template__plugin__impl}{template\_plugin\_impl}}\ \{}
+\DoxyCodeLine{\Hypertarget{template__plugin_8cpp_source_l00007}00007\ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{template__plugin_8cpp_source_l00008}00008\ \};}
+\DoxyCodeLine{\Hypertarget{template__plugin_8cpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{template__plugin_8cpp_source_l00010}\mbox{\hyperlink{classsysio_1_1template__plugin_a87b1c78a7825a57f5c4ef0b7c8a80c47}{00010}}\ \mbox{\hyperlink{classsysio_1_1template__plugin_a87b1c78a7825a57f5c4ef0b7c8a80c47}{template\_plugin::template\_plugin}}():my(new\ \mbox{\hyperlink{classsysio_1_1template__plugin__impl}{template\_plugin\_impl}}())\{\}}
+\DoxyCodeLine{\Hypertarget{template__plugin_8cpp_source_l00011}\mbox{\hyperlink{classsysio_1_1template__plugin_a3ee9ba1fd0383c0876249434698ea48d}{00011}}\ \mbox{\hyperlink{classsysio_1_1template__plugin_a3ee9ba1fd0383c0876249434698ea48d}{template\_plugin::\string~template\_plugin}}()\{\}}
+\DoxyCodeLine{\Hypertarget{template__plugin_8cpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{template__plugin_8cpp_source_l00013}\mbox{\hyperlink{classsysio_1_1template__plugin_a766d3fa7bbfeefeaa3bdc7bfba4303c0}{00013}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1template__plugin_a766d3fa7bbfeefeaa3bdc7bfba4303c0}{template\_plugin::set\_program\_options}}(options\_description\&,\ options\_description\&\ cfg)\ \{}
+\DoxyCodeLine{\Hypertarget{template__plugin_8cpp_source_l00014}00014\ \ \ \ cfg.add\_options()}
+\DoxyCodeLine{\Hypertarget{template__plugin_8cpp_source_l00015}00015\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}option-\/name"{}},\ bpo::value<string>()-\/>default\_value(\textcolor{stringliteral}{"{}default\ value"{}}),}
+\DoxyCodeLine{\Hypertarget{template__plugin_8cpp_source_l00016}00016\ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Option\ Description"{}})}
+\DoxyCodeLine{\Hypertarget{template__plugin_8cpp_source_l00017}00017\ \ \ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{\Hypertarget{template__plugin_8cpp_source_l00018}00018\ \}}
+\DoxyCodeLine{\Hypertarget{template__plugin_8cpp_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{template__plugin_8cpp_source_l00020}\mbox{\hyperlink{classsysio_1_1template__plugin_aef6c80e12b065be23cd760e6173d6d69}{00020}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1template__plugin_aef6c80e12b065be23cd760e6173d6d69}{template\_plugin::plugin\_initialize}}(\textcolor{keyword}{const}\ variables\_map\&\ options)\ \{}
+\DoxyCodeLine{\Hypertarget{template__plugin_8cpp_source_l00021}00021\ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{template__plugin_8cpp_source_l00022}00022\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ options.count(\ \textcolor{stringliteral}{"{}option-\/name"{}}\ ))\ \{}
+\DoxyCodeLine{\Hypertarget{template__plugin_8cpp_source_l00023}00023\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Handle\ the\ option}}
+\DoxyCodeLine{\Hypertarget{template__plugin_8cpp_source_l00024}00024\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{template__plugin_8cpp_source_l00025}00025\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{template__plugin_8cpp_source_l00026}00026\ \ \ \ \mbox{\hyperlink{exception_8hpp_ae70bfa24f5a3bc0917382b3c17fc033c}{FC\_LOG\_AND\_RETHROW}}()}
+\DoxyCodeLine{\Hypertarget{template__plugin_8cpp_source_l00027}00027\ \}}
+\DoxyCodeLine{\Hypertarget{template__plugin_8cpp_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{template__plugin_8cpp_source_l00029}\mbox{\hyperlink{classsysio_1_1template__plugin_ae0e65d9b178560bd40a0936375677caa}{00029}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1template__plugin_ae0e65d9b178560bd40a0936375677caa}{template\_plugin::plugin\_startup}}()\ \{}
+\DoxyCodeLine{\Hypertarget{template__plugin_8cpp_source_l00030}00030\ \ \ \ \textcolor{comment}{//\ Make\ the\ magic\ happen}}
+\DoxyCodeLine{\Hypertarget{template__plugin_8cpp_source_l00031}00031\ \}}
+\DoxyCodeLine{\Hypertarget{template__plugin_8cpp_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{template__plugin_8cpp_source_l00033}\mbox{\hyperlink{classsysio_1_1template__plugin_a35e18f6749b7a003d11c1779bbce30e6}{00033}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1template__plugin_a35e18f6749b7a003d11c1779bbce30e6}{template\_plugin::plugin\_shutdown}}()\ \{}
+\DoxyCodeLine{\Hypertarget{template__plugin_8cpp_source_l00034}00034\ \ \ \ \textcolor{comment}{//\ OK,\ that's\ enough\ magic}}
+\DoxyCodeLine{\Hypertarget{template__plugin_8cpp_source_l00035}00035\ \}}
+\DoxyCodeLine{\Hypertarget{template__plugin_8cpp_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{template__plugin_8cpp_source_l00037}00037\ \}}
+
+\end{DoxyCode}

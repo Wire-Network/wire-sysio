@@ -1,0 +1,30 @@
+\doxysection{print\+\_\+server.\+cpp}
+\hypertarget{print__server_8cpp_source}{}\label{print__server_8cpp_source}\index{libraries/fc/vendor/websocketpp/examples/print\_server/print\_server.cpp@{libraries/fc/vendor/websocketpp/examples/print\_server/print\_server.cpp}}
+\mbox{\hyperlink{print__server_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{print__server_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <iostream>}}
+\DoxyCodeLine{\Hypertarget{print__server_8cpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{print__server_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{asio__no__tls_8hpp}{websocketpp/config/asio\_no\_tls.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{print__server_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{server_8hpp}{websocketpp/server.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{print__server_8cpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{print__server_8cpp_source_l00006}\mbox{\hyperlink{print__server_8cpp_afc38239e3eef2a4200e324bff14d91d1}{00006}}\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1server}{websocketpp::server<websocketpp::config::asio>}}\ \mbox{\hyperlink{print__server_8cpp_afc38239e3eef2a4200e324bff14d91d1}{server}};}
+\DoxyCodeLine{\Hypertarget{print__server_8cpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{print__server_8cpp_source_l00008}\mbox{\hyperlink{print__server_8cpp_a9144902cfb7b566fbe5ac9ea87a119ba}{00008}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{print__server_8cpp_a9144902cfb7b566fbe5ac9ea87a119ba}{on\_message}}(\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{websocketpp::connection\_hdl}},\ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a8097edab4feb0c36a69601c3786f0062}{server::message\_ptr}}\ msg)\ \{}
+\DoxyCodeLine{\Hypertarget{print__server_8cpp_source_l00009}00009\ \ \ \ \ \ \ \ \ std::cout\ <<\ msg-\/>get\_payload()\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{print__server_8cpp_source_l00010}00010\ \}}
+\DoxyCodeLine{\Hypertarget{print__server_8cpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{print__server_8cpp_source_l00012}\mbox{\hyperlink{print__server_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{00012}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{print__server_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}()\ \{}
+\DoxyCodeLine{\Hypertarget{print__server_8cpp_source_l00013}00013\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1server}{server}}\ \mbox{\hyperlink{classprint__server}{print\_server}};}
+\DoxyCodeLine{\Hypertarget{print__server_8cpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{print__server_8cpp_source_l00015}00015\ \ \ \ \ \mbox{\hyperlink{classprint__server}{print\_server}}.set\_message\_handler(\&\mbox{\hyperlink{print__server_8cpp_a9144902cfb7b566fbe5ac9ea87a119ba}{on\_message}});}
+\DoxyCodeLine{\Hypertarget{print__server_8cpp_source_l00016}00016\ \ \ \ \ \mbox{\hyperlink{classprint__server}{print\_server}}.set\_access\_channels(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a853aa0b8976e53f3181af3bc398d493e}{websocketpp::log::alevel::all}});}
+\DoxyCodeLine{\Hypertarget{print__server_8cpp_source_l00017}00017\ \ \ \ \ \mbox{\hyperlink{classprint__server}{print\_server}}.set\_error\_channels(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1elevel_a9b31ff708c221d314f9f4eb3ff2b1ad7}{websocketpp::log::elevel::all}});}
+\DoxyCodeLine{\Hypertarget{print__server_8cpp_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{print__server_8cpp_source_l00019}00019\ \ \ \ \ \mbox{\hyperlink{classprint__server}{print\_server}}.init\_asio();}
+\DoxyCodeLine{\Hypertarget{print__server_8cpp_source_l00020}00020\ \ \ \ \ \mbox{\hyperlink{classprint__server}{print\_server}}.listen(9002);}
+\DoxyCodeLine{\Hypertarget{print__server_8cpp_source_l00021}00021\ \ \ \ \ \mbox{\hyperlink{classprint__server}{print\_server}}.start\_accept();}
+\DoxyCodeLine{\Hypertarget{print__server_8cpp_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{print__server_8cpp_source_l00023}00023\ \ \ \ \ \mbox{\hyperlink{classprint__server}{print\_server}}.\mbox{\hyperlink{classprint__server_a724db97a6c441b5db090f6274c6112d8}{run}}();}
+\DoxyCodeLine{\Hypertarget{print__server_8cpp_source_l00024}00024\ \}}
+
+\end{DoxyCode}

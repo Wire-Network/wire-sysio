@@ -1,0 +1,7 @@
+<map id="websocketpp::processor::get_uri_from_host" name="websocketpp::processor::get_uri_from_host">
+<area shape="rect" id="Node000001" title="Extract a URI ptr from the host header of the request." alt="" coords="249,39,412,79"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1processor_1_1hybi13.html#a49ae173c8cdef4e78c472a46200df8d0" title="Extracts client uri from a handshake request." alt="" coords="21,5,185,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="233,48,185,40,185,35,234,42"/>
+<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1connection.html#a569483c7dcf542f500f6e9f49d803010" title=" " alt="" coords="5,71,201,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="234,75,202,80,201,75,233,70"/>
+</map>

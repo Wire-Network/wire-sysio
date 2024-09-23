@@ -1,0 +1,9 @@
+<map id="CLI::detail::trim_copy" name="CLI::detail::trim_copy">
+<area shape="rect" id="Node000001" title="Make a copy of the string and then trim it, any filter string can be used (any char in string is filt..." alt="" coords="5,31,152,56"/>
+<area shape="rect" id="Node000002" href="$namespace_c_l_i_1_1detail.html#a621323632158048f6168deacc432b838" title="Trim whitespace from string." alt="" coords="200,31,311,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="152,41,184,41,184,46,152,46"/>
+<area shape="rect" id="Node000003" href="$namespace_c_l_i_1_1detail.html#aa06bf54cb3fb347d68d23d31384af42f" title="Trim whitespace from left of string." alt="" coords="360,5,474,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="311,32,344,27,345,32,312,37"/>
+<area shape="rect" id="Node000004" href="$namespace_c_l_i_1_1detail.html#a32d84ce1a65de779e88fdf4aa3b54ea6" title="Trim whitespace from right of string." alt="" coords="359,55,474,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="312,49,344,54,343,59,311,54"/>
+</map>

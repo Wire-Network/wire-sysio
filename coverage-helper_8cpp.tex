@@ -1,0 +1,363 @@
+\doxysection{libraries/sys-\/vm/external/\+Catch2/misc/coverage-\/helper.cpp File Reference}
+\hypertarget{coverage-helper_8cpp}{}\label{coverage-helper_8cpp}\index{libraries/sys-\/vm/external/Catch2/misc/coverage-\/helper.cpp@{libraries/sys-\/vm/external/Catch2/misc/coverage-\/helper.cpp}}
+{\ttfamily \#include $<$algorithm$>$}\newline
+{\ttfamily \#include $<$array$>$}\newline
+{\ttfamily \#include $<$cassert$>$}\newline
+{\ttfamily \#include $<$fstream$>$}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$memory$>$}\newline
+{\ttfamily \#include $<$numeric$>$}\newline
+{\ttfamily \#include $<$regex$>$}\newline
+{\ttfamily \#include $<$string$>$}\newline
+{\ttfamily \#include $<$vector$>$}\newline
+Include dependency graph for coverage-\/helper.cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{coverage-helper_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+std\+::string \mbox{\hyperlink{coverage-helper_8cpp_a6ddcf5def188b35811ca4d6b15567ed6}{escape\+\_\+arg}} (const std\+::string \&arg)
+\item 
+void \mbox{\hyperlink{coverage-helper_8cpp_a9147e75274cac79757e4f95a13910faa}{create\+\_\+empty\+\_\+file}} (std\+::string const \&path)
+\item 
+bool \mbox{\hyperlink{coverage-helper_8cpp_acf4803e8473417fc0a4ec061a7260106}{starts\+\_\+with}} (std\+::string const \&str, std\+::string const \&pref)
+\item 
+int \mbox{\hyperlink{coverage-helper_8cpp_ac7219d6c8bed061556e207e21c0b9a75}{parse\+\_\+log\+\_\+file\+\_\+arg}} (std\+::string const \&arg)
+\item 
+std\+::string \mbox{\hyperlink{coverage-helper_8cpp_a52d2aa50aaf085c1f89c4adf04e2178c}{catch\+\_\+path}} (std\+::string path)
+\item 
+std\+::string \mbox{\hyperlink{coverage-helper_8cpp_aeb84b89496214640e0a6ef1d3ecb175b}{windowsify\+\_\+path}} (std\+::string path)
+\item 
+void \mbox{\hyperlink{coverage-helper_8cpp_ad6f25130060acce9682d43c4a26e7be6}{exec\+\_\+cmd}} (std\+::string const \&cmd, int log\+\_\+num, std\+::string const \&path)
+\item 
+int \mbox{\hyperlink{coverage-helper_8cpp_a3c04138a5bfe5d72780bb7e82a18e627}{main}} (int argc, char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+const std\+::string \mbox{\hyperlink{coverage-helper_8cpp_aab06e721d3449b3d6815d538f22520c8}{separator}} = "{}-\/-\/sep-\/-\/"{}
+\item 
+const std\+::string \mbox{\hyperlink{coverage-helper_8cpp_ad861555025dda02ff5b77f8e59241028}{logfile\+\_\+prefix}} = "{}-\/-\/log-\/file="{}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{coverage-helper_8cpp_a52d2aa50aaf085c1f89c4adf04e2178c}\index{coverage-\/helper.cpp@{coverage-\/helper.cpp}!catch\_path@{catch\_path}}
+\index{catch\_path@{catch\_path}!coverage-\/helper.cpp@{coverage-\/helper.cpp}}
+\doxysubsubsection{\texorpdfstring{catch\_path()}{catch\_path()}}
+{\footnotesize\ttfamily \label{coverage-helper_8cpp_a52d2aa50aaf085c1f89c4adf04e2178c} 
+std\+::string catch\+\_\+path (\begin{DoxyParamCaption}\item[{std\+::string}]{path}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{coverage-helper_8cpp_source_l00070}{70}} of file \mbox{\hyperlink{coverage-helper_8cpp_source}{coverage-\/helper.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00071\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103aea2b2676c28c0db26d39331a336c6b92}{start}}\ =\ path.find(\textcolor{stringliteral}{"{}catch"{}});}
+\DoxyCodeLine{00072\ \ \ \ \ \textcolor{comment}{//\ try\ capitalized\ instead}}
+\DoxyCodeLine{00073\ \ \ \ \ \textcolor{keywordflow}{if}\ (start\ ==\ std::string::npos)\ \{}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103aea2b2676c28c0db26d39331a336c6b92}{start}}\ =\ path.find(\textcolor{stringliteral}{"{}Catch"{}});}
+\DoxyCodeLine{00075\ \ \ \ \ \}}
+\DoxyCodeLine{00076\ \ \ \ \ \textcolor{keywordflow}{if}\ (start\ ==\ std::string::npos)\ \{}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::domain\_error(\textcolor{stringliteral}{"{}Couldn't\ find\ Catch's\ base\ path"{}});}
+\DoxyCodeLine{00078\ \ \ \ \ \}}
+\DoxyCodeLine{00079\ \ \ \ \ \textcolor{keyword}{auto}\ end\ =\ path.find\_first\_of(\textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)/"{}},\ start);}
+\DoxyCodeLine{00080\ \ \ \ \ \textcolor{keywordflow}{return}\ path.substr(0,\ end);}
+\DoxyCodeLine{00081\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=217pt]{coverage-helper_8cpp_a52d2aa50aaf085c1f89c4adf04e2178c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{coverage-helper_8cpp_a9147e75274cac79757e4f95a13910faa}\index{coverage-\/helper.cpp@{coverage-\/helper.cpp}!create\_empty\_file@{create\_empty\_file}}
+\index{create\_empty\_file@{create\_empty\_file}!coverage-\/helper.cpp@{coverage-\/helper.cpp}}
+\doxysubsubsection{\texorpdfstring{create\_empty\_file()}{create\_empty\_file()}}
+{\footnotesize\ttfamily \label{coverage-helper_8cpp_a9147e75274cac79757e4f95a13910faa} 
+void create\+\_\+empty\+\_\+file (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{path}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{coverage-helper_8cpp_source_l00045}{45}} of file \mbox{\hyperlink{coverage-helper_8cpp_source}{coverage-\/helper.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00046\ \ \ \ \ std::ofstream\ ofs(path);}
+\DoxyCodeLine{00047\ \ \ \ \ ofs\ <<\ \textcolor{charliteral}{'\(\backslash\)n'};}
+\DoxyCodeLine{00048\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{coverage-helper_8cpp_a9147e75274cac79757e4f95a13910faa_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{coverage-helper_8cpp_a6ddcf5def188b35811ca4d6b15567ed6}\index{coverage-\/helper.cpp@{coverage-\/helper.cpp}!escape\_arg@{escape\_arg}}
+\index{escape\_arg@{escape\_arg}!coverage-\/helper.cpp@{coverage-\/helper.cpp}}
+\doxysubsubsection{\texorpdfstring{escape\_arg()}{escape\_arg()}}
+{\footnotesize\ttfamily \label{coverage-helper_8cpp_a6ddcf5def188b35811ca4d6b15567ed6} 
+std\+::string escape\+\_\+arg (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{arg}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{coverage-helper_8cpp_source_l00012}{12}} of file \mbox{\hyperlink{coverage-helper_8cpp_source}{coverage-\/helper.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00012\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00013\ \ \ \ \ \textcolor{keywordflow}{if}\ (arg.empty()\ ==\ \textcolor{keyword}{false}\ \&\&}
+\DoxyCodeLine{00014\ \ \ \ \ \ \ \ \ arg.find\_first\_of(\textcolor{stringliteral}{"{}\ \(\backslash\)t\(\backslash\)n\(\backslash\)v\(\backslash\)"{}"{}})\ ==\ arg.npos)\ \{}
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ arg;}
+\DoxyCodeLine{00016\ \ \ \ \ \}}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \ \ \ \ std::string\ escaped;}
+\DoxyCodeLine{00019\ \ \ \ \ escaped.push\_back(\textcolor{charliteral}{'"{}'});}
+\DoxyCodeLine{00020\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\ it\ =\ arg.begin();\ ;\ ++it)\ \{}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ num\_backslashes\ =\ 0;}
+\DoxyCodeLine{00022\ }
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (it\ !=\ arg.end()\ \&\&\ *it\ ==\ \textcolor{charliteral}{'\(\backslash\)\(\backslash\)'})\ \{}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \ \ \ \ ++it;}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \ \ \ \ ++num\_backslashes;}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00027\ }
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (it\ ==\ arg.end())\ \{}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ \ \ \ escaped.append(num\_backslashes\ *\ 2,\ \textcolor{charliteral}{'\(\backslash\)\(\backslash\)'});}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (*it\ ==\ \textcolor{charliteral}{'"{}'})\ \{}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \ \ \ escaped.append(num\_backslashes\ *\ 2\ +\ 1,\ \textcolor{charliteral}{'\(\backslash\)\(\backslash\)'});}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \ \ \ escaped.push\_back(*it);}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \ \ \ escaped.append(num\_backslashes,\ \textcolor{charliteral}{'\(\backslash\)\(\backslash\)'});}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ \ \ \ escaped.push\_back(*it);}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00038\ \ \ \ \ \}}
+\DoxyCodeLine{00039\ \ \ \ \ escaped.push\_back(\textcolor{charliteral}{'"{}'});}
+\DoxyCodeLine{00040\ }
+\DoxyCodeLine{00041\ \ \ \ \ \textcolor{keywordflow}{return}\ escaped;}
+\DoxyCodeLine{00042\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=316pt]{coverage-helper_8cpp_a6ddcf5def188b35811ca4d6b15567ed6_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{coverage-helper_8cpp_ad6f25130060acce9682d43c4a26e7be6}\index{coverage-\/helper.cpp@{coverage-\/helper.cpp}!exec\_cmd@{exec\_cmd}}
+\index{exec\_cmd@{exec\_cmd}!coverage-\/helper.cpp@{coverage-\/helper.cpp}}
+\doxysubsubsection{\texorpdfstring{exec\_cmd()}{exec\_cmd()}}
+{\footnotesize\ttfamily \label{coverage-helper_8cpp_ad6f25130060acce9682d43c4a26e7be6} 
+void exec\+\_\+cmd (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{cmd}{, }\item[{int}]{log\+\_\+num}{, }\item[{std\+::string const \&}]{path}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{coverage-helper_8cpp_source_l00092}{92}} of file \mbox{\hyperlink{coverage-helper_8cpp_source}{coverage-\/helper.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00093\ \ \ \ \ std::array<char,\ 128>\ buffer;}
+\DoxyCodeLine{00094\ \textcolor{preprocessor}{\#if\ defined(\_WIN32)}}
+\DoxyCodeLine{00095\ \ \ \ \ \textcolor{comment}{//\ cmd\ has\ already\ been\ escaped\ outside\ this\ function.}}
+\DoxyCodeLine{00096\ \ \ \ \ \textcolor{keyword}{auto}\ real\_cmd\ =\ \textcolor{stringliteral}{"{}OpenCppCoverage\ -\/-\/export\_type\ binary:cov-\/report"{}}\ +\ std::to\_string(log\_num)}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ +\ \textcolor{stringliteral}{"{}.bin\ -\/-\/quiet\ "{}}\ +\ \textcolor{stringliteral}{"{}-\/-\/sources\ "{}}\ +\ \mbox{\hyperlink{coverage-helper_8cpp_a6ddcf5def188b35811ca4d6b15567ed6}{escape\_arg}}(path)\ +\ \textcolor{stringliteral}{"{}\ -\/-\/cover\_children\ -\/-\/\ "{}}\ +\ cmd;}
+\DoxyCodeLine{00098\ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}===\ Marker\ ===:\ Cmd:\ "{}}\ <<\ real\_cmd\ <<\ \textcolor{charliteral}{'\(\backslash\)n'};}
+\DoxyCodeLine{00099\ \ \ \ \ std::shared\_ptr<FILE>\ pipe(\_popen(real\_cmd.c\_str(),\ \textcolor{stringliteral}{"{}r"{}}),\ \_pclose);}
+\DoxyCodeLine{00100\ \textcolor{preprocessor}{\#else\ }\textcolor{comment}{//\ Just\ for\ testing,\ in\ the\ real\ world\ we\ will\ always\ work\ under\ WIN32}}
+\DoxyCodeLine{00101\ \ \ \ \ (void)log\_num;\ (void)path;}
+\DoxyCodeLine{00102\ \ \ \ \ std::shared\_ptr<FILE>\ pipe(popen(cmd.c\_str(),\ \textcolor{stringliteral}{"{}r"{}}),\ pclose);}
+\DoxyCodeLine{00103\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00104\ }
+\DoxyCodeLine{00105\ \ \ \ \ \textcolor{keywordflow}{if}\ (!pipe)\ \{}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}popen()\ failed!"{}});}
+\DoxyCodeLine{00107\ \ \ \ \ \}}
+\DoxyCodeLine{00108\ \ \ \ \ \textcolor{keywordflow}{while}\ (!feof(pipe.get()))\ \{}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (fgets(buffer.data(),\ 128,\ pipe.get())\ !=\ \textcolor{keyword}{nullptr})\ \{}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ buffer.data();}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00112\ \ \ \ \ \}}
+\DoxyCodeLine{00113\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=243pt]{coverage-helper_8cpp_ad6f25130060acce9682d43c4a26e7be6_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=214pt]{coverage-helper_8cpp_ad6f25130060acce9682d43c4a26e7be6_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{coverage-helper_8cpp_a3c04138a5bfe5d72780bb7e82a18e627}\index{coverage-\/helper.cpp@{coverage-\/helper.cpp}!main@{main}}
+\index{main@{main}!coverage-\/helper.cpp@{coverage-\/helper.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{coverage-helper_8cpp_a3c04138a5bfe5d72780bb7e82a18e627} 
+int main (\begin{DoxyParamCaption}\item[{int}]{argc}{, }\item[{char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{argv}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{coverage-helper_8cpp_source_l00121}{121}} of file \mbox{\hyperlink{coverage-helper_8cpp_source}{coverage-\/helper.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00122\ \ \ \ \ std::vector<std::string>\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}(\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}\ +\ argc);}
+\DoxyCodeLine{00123\ \ \ \ \ \textcolor{keyword}{auto}\ sep\ =\ std::find(begin(args),\ end(args),\ \mbox{\hyperlink{coverage-helper_8cpp_aab06e721d3449b3d6815d538f22520c8}{separator}});}
+\DoxyCodeLine{00124\ \ \ \ \ assert(sep\ -\/\ begin(args)\ ==\ 2\ \&\&\ \textcolor{stringliteral}{"{}Structure\ differs\ from\ expected!"{}});}
+\DoxyCodeLine{00125\ }
+\DoxyCodeLine{00126\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6a0fc3cfbc27e91ea60a787de13dae3e3c}{num}}\ =\ \mbox{\hyperlink{coverage-helper_8cpp_ac7219d6c8bed061556e207e21c0b9a75}{parse\_log\_file\_arg}}(args[1]);}
+\DoxyCodeLine{00127\ \ \ \ \ }
+\DoxyCodeLine{00128\ \ \ \ \ \textcolor{keyword}{auto}\ cmdline\ =\ std::accumulate(++sep,\ end(args),\ std::string\{\},\ []\ (\textcolor{keyword}{const}\ std::string\&\ lhs,\ \textcolor{keyword}{const}\ std::string\&\ rhs)\ \{}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ lhs\ +\ \textcolor{charliteral}{'\ '}\ +\ \mbox{\hyperlink{coverage-helper_8cpp_a6ddcf5def188b35811ca4d6b15567ed6}{escape\_arg}}(rhs);}
+\DoxyCodeLine{00130\ \ \ \ \ \});}
+\DoxyCodeLine{00131\ }
+\DoxyCodeLine{00132\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{coverage-helper_8cpp_ad6f25130060acce9682d43c4a26e7be6}{exec\_cmd}}(cmdline,\ num,\ \mbox{\hyperlink{coverage-helper_8cpp_aeb84b89496214640e0a6ef1d3ecb175b}{windowsify\_path}}(\mbox{\hyperlink{coverage-helper_8cpp_a52d2aa50aaf085c1f89c4adf04e2178c}{catch\_path}}(args[0])));}
+\DoxyCodeLine{00134\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (std::exception\ \textcolor{keyword}{const}\&\ ex)\ \{}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}Helper\ failed\ with:\ '"{}}\ <<\ ex.what()\ <<\ \textcolor{stringliteral}{"{}'\(\backslash\)n"{}};}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 12;}
+\DoxyCodeLine{00137\ \ \ \ \ \}}
+\DoxyCodeLine{00138\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{coverage-helper_8cpp_a3c04138a5bfe5d72780bb7e82a18e627_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{coverage-helper_8cpp_ac7219d6c8bed061556e207e21c0b9a75}\index{coverage-\/helper.cpp@{coverage-\/helper.cpp}!parse\_log\_file\_arg@{parse\_log\_file\_arg}}
+\index{parse\_log\_file\_arg@{parse\_log\_file\_arg}!coverage-\/helper.cpp@{coverage-\/helper.cpp}}
+\doxysubsubsection{\texorpdfstring{parse\_log\_file\_arg()}{parse\_log\_file\_arg()}}
+{\footnotesize\ttfamily \label{coverage-helper_8cpp_ac7219d6c8bed061556e207e21c0b9a75} 
+int parse\+\_\+log\+\_\+file\+\_\+arg (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{arg}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{coverage-helper_8cpp_source_l00057}{57}} of file \mbox{\hyperlink{coverage-helper_8cpp_source}{coverage-\/helper.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00058\ \ \ \ \ assert(\mbox{\hyperlink{coverage-helper_8cpp_acf4803e8473417fc0a4ec061a7260106}{starts\_with}}(arg,\ \mbox{\hyperlink{coverage-helper_8cpp_ad861555025dda02ff5b77f8e59241028}{logfile\_prefix}})\ \&\&\ \textcolor{stringliteral}{"{}Attempting\ to\ parse\ incorrect\ arg!"{}});}
+\DoxyCodeLine{00059\ \ \ \ \ \textcolor{keyword}{auto}\ fname\ =\ arg.substr(\mbox{\hyperlink{coverage-helper_8cpp_ad861555025dda02ff5b77f8e59241028}{logfile\_prefix}}.size());}
+\DoxyCodeLine{00060\ \ \ \ \ \mbox{\hyperlink{coverage-helper_8cpp_a9147e75274cac79757e4f95a13910faa}{create\_empty\_file}}(fname);}
+\DoxyCodeLine{00061\ \ \ \ \ std::regex\ regex(\textcolor{stringliteral}{"{}MemoryChecker\(\backslash\)\(\backslash\).(\(\backslash\)\(\backslash\)d+)\(\backslash\)\(\backslash\).log"{}},\ std::regex::icase);}
+\DoxyCodeLine{00062\ \ \ \ \ std::smatch\ match;}
+\DoxyCodeLine{00063\ \ \ \ \ \textcolor{keywordflow}{if}\ (std::regex\_search(fname,\ match,\ regex))\ \{}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::stoi(match[1]);}
+\DoxyCodeLine{00065\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::domain\_error(\textcolor{stringliteral}{"{}Couldn't\ find\ desired\ expression\ in\ string:\ "{}}\ +\ fname);}
+\DoxyCodeLine{00067\ \ \ \ \ \}}
+\DoxyCodeLine{00068\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=304pt]{coverage-helper_8cpp_ac7219d6c8bed061556e207e21c0b9a75_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=248pt]{coverage-helper_8cpp_ac7219d6c8bed061556e207e21c0b9a75_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{coverage-helper_8cpp_acf4803e8473417fc0a4ec061a7260106}\index{coverage-\/helper.cpp@{coverage-\/helper.cpp}!starts\_with@{starts\_with}}
+\index{starts\_with@{starts\_with}!coverage-\/helper.cpp@{coverage-\/helper.cpp}}
+\doxysubsubsection{\texorpdfstring{starts\_with()}{starts\_with()}}
+{\footnotesize\ttfamily \label{coverage-helper_8cpp_acf4803e8473417fc0a4ec061a7260106} 
+bool starts\+\_\+with (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{str}{, }\item[{std\+::string const \&}]{pref}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{coverage-helper_8cpp_source_l00053}{53}} of file \mbox{\hyperlink{coverage-helper_8cpp_source}{coverage-\/helper.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00054\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}.find(pref)\ ==\ 0;}
+\DoxyCodeLine{00055\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{coverage-helper_8cpp_acf4803e8473417fc0a4ec061a7260106_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{coverage-helper_8cpp_aeb84b89496214640e0a6ef1d3ecb175b}\index{coverage-\/helper.cpp@{coverage-\/helper.cpp}!windowsify\_path@{windowsify\_path}}
+\index{windowsify\_path@{windowsify\_path}!coverage-\/helper.cpp@{coverage-\/helper.cpp}}
+\doxysubsubsection{\texorpdfstring{windowsify\_path()}{windowsify\_path()}}
+{\footnotesize\ttfamily \label{coverage-helper_8cpp_aeb84b89496214640e0a6ef1d3ecb175b} 
+std\+::string windowsify\+\_\+path (\begin{DoxyParamCaption}\item[{std\+::string}]{path}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{coverage-helper_8cpp_source_l00083}{83}} of file \mbox{\hyperlink{coverage-helper_8cpp_source}{coverage-\/helper.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00084\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\&\ c\ :\ path)\ \{}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (c\ ==\ \textcolor{charliteral}{'/'})\ \{}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \ \ \ \ c\ =\ \textcolor{charliteral}{'\(\backslash\)\(\backslash\)'};}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00088\ \ \ \ \ \}}
+\DoxyCodeLine{00089\ \ \ \ \ \textcolor{keywordflow}{return}\ path;}
+\DoxyCodeLine{00090\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=242pt]{coverage-helper_8cpp_aeb84b89496214640e0a6ef1d3ecb175b_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{coverage-helper_8cpp_ad861555025dda02ff5b77f8e59241028}\index{coverage-\/helper.cpp@{coverage-\/helper.cpp}!logfile\_prefix@{logfile\_prefix}}
+\index{logfile\_prefix@{logfile\_prefix}!coverage-\/helper.cpp@{coverage-\/helper.cpp}}
+\doxysubsubsection{\texorpdfstring{logfile\_prefix}{logfile\_prefix}}
+{\footnotesize\ttfamily \label{coverage-helper_8cpp_ad861555025dda02ff5b77f8e59241028} 
+const std\+::string logfile\+\_\+prefix = "{}-\/-\/log-\/file="{}}
+
+
+
+Definition at line \mbox{\hyperlink{coverage-helper_8cpp_source_l00051}{51}} of file \mbox{\hyperlink{coverage-helper_8cpp_source}{coverage-\/helper.\+cpp}}.
+
+\Hypertarget{coverage-helper_8cpp_aab06e721d3449b3d6815d538f22520c8}\index{coverage-\/helper.cpp@{coverage-\/helper.cpp}!separator@{separator}}
+\index{separator@{separator}!coverage-\/helper.cpp@{coverage-\/helper.cpp}}
+\doxysubsubsection{\texorpdfstring{separator}{separator}}
+{\footnotesize\ttfamily \label{coverage-helper_8cpp_aab06e721d3449b3d6815d538f22520c8} 
+const std\+::string separator = "{}-\/-\/sep-\/-\/"{}}
+
+
+
+Definition at line \mbox{\hyperlink{coverage-helper_8cpp_source_l00050}{50}} of file \mbox{\hyperlink{coverage-helper_8cpp_source}{coverage-\/helper.\+cpp}}.
+

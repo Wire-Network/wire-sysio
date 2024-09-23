@@ -1,0 +1,5 @@
+<map id="sysio::trace_api::authorization_trace_v0" name="sysio::trace_api::authorization_trace_v0">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,109,201,150"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1name.html" title="Immutable except for fc::from_variant." alt="" coords="37,5,169,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="106,47,106,109,100,109,100,47"/>
+</map>

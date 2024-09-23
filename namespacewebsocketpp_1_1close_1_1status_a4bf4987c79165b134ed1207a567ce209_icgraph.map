@@ -1,0 +1,9 @@
+<map id="websocketpp::close::status::get_string" name="websocketpp::close::status::get_string">
+<area shape="rect" id="Node000001" title="Return a human readable interpretation of a WebSocket close code." alt="" coords="484,5,622,46"/>
+<area shape="rect" id="Node000002" href="$classconnection__metadata.html#ac297cf7710d8d510ef383b7395222ce5" title=" " alt="" coords="291,5,436,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="469,28,437,28,437,23,469,23"/>
+<area shape="rect" id="Node000003" href="$classwebsocket__endpoint.html#a5850523b829e145793d42e137d5eb8c0" title=" " alt="" coords="103,5,243,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="275,28,243,28,243,23,275,23"/>
+<area shape="rect" id="Node000004" href="$scratch__client_8cpp.html#ae66f6b31b5ad750f1fe042a706a4e3d4" title=" " alt="" coords="5,13,55,38"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="87,28,55,28,55,23,87,23"/>
+</map>

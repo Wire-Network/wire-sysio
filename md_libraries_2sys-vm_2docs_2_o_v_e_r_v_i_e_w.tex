@@ -1,0 +1,40 @@
+\chapter{Building SYS-\/\+VM}
+\hypertarget{md_libraries_2sys-vm_2docs_2_o_v_e_r_v_i_e_w}{}\label{md_libraries_2sys-vm_2docs_2_o_v_e_r_v_i_e_w}\index{Building SYS-\/VM@{Building SYS-\/VM}}
+To build {\bfseries{SYS-\/\+VM}} you will need a fully C++17 compliant toolchain.
+
+Since {\bfseries{SYS-\/\+VM}} is designed to be a header only library (with the exception of softfloat), building the {\bfseries{SYS-\/\+VM}} CMake project is not necessary to use {\bfseries{SYS-\/\+VM}} in a C++ project. But, if you would like to use the softfloat capabilities, then building the library is required.
+
+\doxysection*{Using The Example Tools}
+
+Once you have built {\bfseries{SYS-\/\+VM}} you will notice 3 tools in the directory {\bfseries{build/tools}}. You can run your test WASMs by executing the command {\ttfamily eos-\/vm-\/interp \texorpdfstring{$<$}{<}path\texorpdfstring{$>$}{>}/\texorpdfstring{$<$}{<}wasm name\texorpdfstring{$>$}{>}.wasm}, this will then run all exported functions within that \doxylink{namespace_w_a_s_m}{WASM}. You can also run {\ttfamily bench-\/interp \texorpdfstring{$<$}{<}path\texorpdfstring{$>$}{>}/\texorpdfstring{$<$}{<}wasm name\texorpdfstring{$>$}{>}.wasm} and get two times in nanoseconds; the time to parse and instantiate your \doxylink{namespace_w_a_s_m}{WASM} and the time to execute your \doxylink{namespace_w_a_s_m}{WASM}. The last tool is {\ttfamily hello-\/driver}. It is a prebaked in helloworld \doxylink{namespace_w_a_s_m}{WASM} and uses user input to bound the number of loops the printing occurs and whether it should assert. This tool is an example of how to setup a fully integrated solution with host functions.
+
+These are designed to be modified by the end-\/user and are simply there to show how to easily integrate {\bfseries{SYS-\/\+VM}} into your own project.
+
+\doxysection*{Integrating Into Existing CMake Project}
+
+Adding {\bfseries{SYS-\/\+VM}} as a submodule to your project and adding the subdirectory that contains {\bfseries{SYS-\/\+VM}}, and adding {\bfseries{eos-\/vm}} to the list of link libraries of your executables/libraries is all that is required to integrate into your project. CMake options that can be passed into via command line or with CMake {\bfseries{set}}. These can be found in {\bfseries{CMake\+Lists.\+txt}} and {\bfseries{modules/\+Eos\+VMBuild\+Utils.\+cmake}}, or by running {\ttfamily ccmake ..} instead of {\ttfamily cmake ..}.
+
+\doxysubsection*{Getting Started}
+
+1) Start by creating a type alias of {\ttfamily \doxylink{classsysio_1_1vm_1_1backend}{sysio\+::vm\+::backend}} with the host function class type. a) This class takes an additional optional template argument if wanted. By default, i.\+e. left blank, this will create the interpreter {\ttfamily backend}. If you set this to {\ttfamily sysio\+::vm\+::jit}, this will create the JIT based backend. 2) Next you can create a {\ttfamily watchdog} timer with a specific duration type, and setting the duration to the time interval you need, or use the predefined {\ttfamily null\+\_\+watchdog} for unbounded execution. ~\newline
+ 3) You should now read the \doxylink{namespace_w_a_s_m}{WASM} file. The {\ttfamily \doxylink{classsysio_1_1vm_1_1backend}{sysio\+::vm\+::backend}} class has a method to read from a file or you can use a {\ttfamily std\+::vector\texorpdfstring{$<$}{<}uint8\+\_\+t\texorpdfstring{$>$}{>}} that already contains the \doxylink{namespace_w_a_s_m}{WASM}. This gets passed to the constructor of {\ttfamily \doxylink{classsysio_1_1vm_1_1backend}{sysio\+::vm\+::backend}}. 4) You should register and resolve any host functions, please see the {\bfseries{Adding Host Functions}} section. 5) You can now construct your {\ttfamily backend} object by passing in the read \doxylink{namespace_w_a_s_m}{WASM} code and an instance of the {\ttfamily registered\+\_\+host\+\_\+functions} class which houses your imports. 6) Finally, you can execute a specific export via the {\ttfamily ()} operator of {\ttfamily \doxylink{classsysio_1_1vm_1_1backend}{sysio\+::vm\+::backend}}. This takes the host function instance reference, the module name, the export name and typesafe export arguments. (see \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}/tools/interp.cpp\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*} and \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}/tools/hello\+\_\+driver.cpp\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*} for more details)
+
+\doxysubsection*{Adding Host Functions}
+
+Without any host functions, your \doxylink{namespace_w_a_s_m}{WASM} execution is going to be very limited (you will not be able to observe side effects or get intermediate values). ~\newline
+
+
+There are three options currently for creating "{}host functions"{}\+: 1) C-\/style function 2) static method of a class 3) proper method of a class
+
+Currently, you are limited to only one type of host class to encapsulate your host functions, this limitation will be removed in a future release.
+
+\doxysubsubsection*{Registered Host Functions Class}
+
+Firstly, you should create a type alias to limit the redundant typing needed.
+\begin{DoxyItemize}
+\item {\ttfamily using rhf\+\_\+t = \doxylink{structsysio_1_1vm_1_1registered__host__functions}{sysio\+::vm\+::registered\+\_\+host\+\_\+functions}\texorpdfstring{$<$}{<}Class\+Type\texorpdfstring{$>$}{>};}, where {\bfseries{Class\+Type}} is either {\ttfamily nullptr\+\_\+t} if you are only using C-\/style functions, or the type of the host class. Then, you will {\ttfamily add} your host functions via {\ttfamily \doxylink{structsysio_1_1vm_1_1registered__host__functions_a11ed5e893c0eb9af80290f9024485be2}{rhf\+\_\+t\+::add}\texorpdfstring{$<$}{<}Class\+Type, \&function\+\_\+name, wasm\+\_\+allocator\texorpdfstring{$>$}{>}("{}module name"{}, "{}wasm function name"{});} for each host function.
+\end{DoxyItemize}
+
+The last thing to do is to resolve the imports of your {\ttfamily module}, this is handled by {\ttfamily \doxylink{structsysio_1_1vm_1_1registered__host__functions_abb74daf946a6b4a1756a0ba3f08c1c04}{rhf\+\_\+t\+::resolve}( \texorpdfstring{$<$}{<}reference to module\texorpdfstring{$>$}{>} );}.
+
+For a more concise example of this, please see \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}/tools/hello\+\_\+driver.cpp\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}. 

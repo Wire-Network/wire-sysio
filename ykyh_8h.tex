@@ -1,0 +1,1340 @@
+\doxysection{libraries/yubihsm/ykyh/ykyh.h File Reference}
+\hypertarget{ykyh_8h}{}\label{ykyh_8h}\index{libraries/yubihsm/ykyh/ykyh.h@{libraries/yubihsm/ykyh/ykyh.h}}
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include $<$stddef.\+h$>$}\newline
+Include dependency graph for ykyh.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=230pt]{ykyh_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{ykyh_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structykyh__list__entry}{ykyh\+\_\+list\+\_\+entry}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{ykyh_8h_aaf3cacb408d5b3c4b30321a7ab046554}{YKYH\+\_\+\+INS\+\_\+\+PUT}}~0x01
+\item 
+\#define \mbox{\hyperlink{ykyh_8h_ae302e62b3add4c602ac23216dcec4d46}{YKYH\+\_\+\+INS\+\_\+\+DELETE}}~0x02
+\item 
+\#define \mbox{\hyperlink{ykyh_8h_a93f62213473fb25da833d39f7f51ec95}{YKYH\+\_\+\+INS\+\_\+\+CALCULATE}}~0x03
+\item 
+\#define \mbox{\hyperlink{ykyh_8h_a6979f4a6b2d9519964aba3f5365a3ed0}{YKYH\+\_\+\+INS\+\_\+\+GET\+\_\+\+CHALLENGE}}~0x04
+\item 
+\#define \mbox{\hyperlink{ykyh_8h_a7c53db94c23f5e592e8517c0fcd9f18e}{YKYH\+\_\+\+INS\+\_\+\+LIST}}~0x05
+\item 
+\#define \mbox{\hyperlink{ykyh_8h_a42ae5fc5228a23e671d3cb707e493378}{YKYH\+\_\+\+INS\+\_\+\+RESET}}~0x06
+\item 
+\#define \mbox{\hyperlink{ykyh_8h_a824ea775a85955b88cda9593b54b32a9}{YKYH\+\_\+\+INS\+\_\+\+GET\+\_\+\+VERSION}}~0x07
+\item 
+\#define \mbox{\hyperlink{ykyh_8h_ab4bd17f6a1b0642c393b29e66d858070}{YKYH\+\_\+\+P1\+\_\+\+RESET}}~0xde
+\item 
+\#define \mbox{\hyperlink{ykyh_8h_ab135ab62c981c7deb83f5c74af68610d}{YKYH\+\_\+\+P2\+\_\+\+RESET}}~0xad
+\item 
+\#define \mbox{\hyperlink{ykyh_8h_a1d9d05d1211e99f0edff27bfa82df0b8}{YKYH\+\_\+\+TAG\+\_\+\+NAME}}~0x71
+\item 
+\#define \mbox{\hyperlink{ykyh_8h_aea4750a6749dca19d059e06aaf75e74a}{YKYH\+\_\+\+TAG\+\_\+\+NAME\+\_\+\+LIST}}~0x72
+\item 
+\#define \mbox{\hyperlink{ykyh_8h_a2df9aee745a0c8a8cd5d127c72dea523}{YKYH\+\_\+\+TAG\+\_\+\+PW}}~0x73
+\item 
+\#define \mbox{\hyperlink{ykyh_8h_a44933eda63818d2195aac0e007be30dc}{YKYH\+\_\+\+TAG\+\_\+\+ALGO}}~0x74
+\item 
+\#define \mbox{\hyperlink{ykyh_8h_a72b145d0e689f9f70791c2332a3f944b}{YKYH\+\_\+\+TAG\+\_\+\+KEY\+\_\+\+ENC}}~0x75
+\item 
+\#define \mbox{\hyperlink{ykyh_8h_a88992df18ab407b8afa214102ca29bbb}{YKYH\+\_\+\+TAG\+\_\+\+KEY\+\_\+\+MAC}}~0x76
+\item 
+\#define \mbox{\hyperlink{ykyh_8h_affd0605d22de3476bb44cae076c1302e}{YKYH\+\_\+\+TAG\+\_\+\+CONTEXT}}~0x77
+\item 
+\#define \mbox{\hyperlink{ykyh_8h_a32fbf0a082e546d8e0f30d412360e720}{YKYH\+\_\+\+TAG\+\_\+\+RESPONSE}}~0x78
+\item 
+\#define \mbox{\hyperlink{ykyh_8h_a71c7b4fe57d684c319d3b4198b963e84}{YKYH\+\_\+\+TAG\+\_\+\+VERSION}}~0x79
+\item 
+\#define \mbox{\hyperlink{ykyh_8h_a121aacd54595ba241bfd40ed46fc1f04}{YKYH\+\_\+\+TAG\+\_\+\+TOUCH}}~0x7a
+\item 
+\#define \mbox{\hyperlink{ykyh_8h_a242db20335c7944a79a64147c2a7ba10}{YKYH\+\_\+\+SCP03\+\_\+\+ALGO}}~38
+\item 
+\#define \mbox{\hyperlink{ykyh_8h_ac632eacb1f1615fb42741b91db9e9947}{YKYH\+\_\+\+SCP11\+\_\+\+ALGO}}~39
+\item 
+\#define \mbox{\hyperlink{ykyh_8h_a3328a41be5837af4761365aafb108025}{SW\+\_\+\+SUCCESS}}~0x9000
+\item 
+\#define \mbox{\hyperlink{ykyh_8h_a1ab82884b9dfbbb754379f78eeb6ee3f}{SW\+\_\+\+ERR\+\_\+\+AUTHENTICATION\+\_\+\+FAILED}}~0x63c0
+\item 
+\#define \mbox{\hyperlink{ykyh_8h_ae8331a6f47276895ad08a1cbf3a6a508}{YKYH\+\_\+\+MIN\+\_\+\+NAME\+\_\+\+LEN}}~1
+\item 
+\#define \mbox{\hyperlink{ykyh_8h_aba3c1d3e48c3662d8e58a87bc564cc82}{YKYH\+\_\+\+MAX\+\_\+\+NAME\+\_\+\+LEN}}~64
+\item 
+\#define \mbox{\hyperlink{ykyh_8h_aa076fd48c09e4acec46eace24ad27a2f}{YKYH\+\_\+\+KEY\+\_\+\+LEN}}~16
+\item 
+\#define \mbox{\hyperlink{ykyh_8h_a00e800150afe4404120c2090461fdf1a}{YKYH\+\_\+\+PW\+\_\+\+LEN}}~16
+\item 
+\#define \mbox{\hyperlink{ykyh_8h_a6bbc44e9048c273ded8a25a0b799b3ee}{YKYH\+\_\+\+CONTEXT\+\_\+\+LEN}}~16
+\item 
+\#define \mbox{\hyperlink{ykyh_8h_aa95edf3726d4ad4d12717605e1ff4b83}{YKYH\+\_\+\+DEFAULT\+\_\+\+SALT}}~"{}Yubico"{}
+\item 
+\#define \mbox{\hyperlink{ykyh_8h_a789ab3b49d1644687f2399ce220b4576}{YKYH\+\_\+\+DEFAULT\+\_\+\+ITERS}}~10000
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef struct ykyh\+\_\+state \mbox{\hyperlink{ykyh_8h_abb80706a5ad5ea04f74eb16886edb241}{ykyh\+\_\+state}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112}{ykyh\+\_\+rc}} \{ \newline
+\mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112a40500f2b4bd15d31f1348475e35f2459}{YKYHR\+\_\+\+SUCCESS}} = 0
+, \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112a734cac714da70c8a7853708acff0970f}{YKYHR\+\_\+\+MEMORY\+\_\+\+ERROR}} = -\/1
+, \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112aa66bb77f3c39144ec56d01e741a6d0b5}{YKYHR\+\_\+\+PCSC\+\_\+\+ERROR}} = -\/2
+, \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112a3d10dec4a5d83d4227ea94c06efed2a3}{YKYHR\+\_\+\+GENERIC\+\_\+\+ERROR}} = -\/3
+, \newline
+\mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112ae58239391b2ac02c8bb353666cdf9ac8}{YKYHR\+\_\+\+WRONG\+\_\+\+PW}} = -\/4
+, \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112a3616b15980deeeb94e24538ede829d84}{YKYHR\+\_\+\+INVALID\+\_\+\+PARAMS}} = -\/5
+, \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112acd0e2c78f0a0e431afb2a4ba555f821e}{YKYHR\+\_\+\+ENTRY\+\_\+\+NOT\+\_\+\+FOUND}} = -\/6
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{ykyh_8h_a4544a3e0741c078e01233bb1ab541805}{ykyh\+\_\+strerror}} (\mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112}{ykyh\+\_\+rc}} err)
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{ykyh_8h_ad38c0d31859cc20ece3748e74e9bbd75}{ykyh\+\_\+strerror\+\_\+name}} (\mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112}{ykyh\+\_\+rc}} err)
+\item 
+\mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112}{ykyh\+\_\+rc}} \mbox{\hyperlink{ykyh_8h_aaf8c4d6e022e4363c006d9066991776b}{ykyh\+\_\+init}} (\mbox{\hyperlink{structykyh__state}{ykyh\+\_\+state}} \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\mbox{\hyperlink{structstate}{state}}, int verbose)
+\item 
+\mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112}{ykyh\+\_\+rc}} \mbox{\hyperlink{ykyh_8h_a6833a1e74b0e7494cc904dc94cf276c0}{ykyh\+\_\+done}} (\mbox{\hyperlink{structykyh__state}{ykyh\+\_\+state}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{structstate}{state}})
+\item 
+\mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112}{ykyh\+\_\+rc}} \mbox{\hyperlink{ykyh_8h_a6b53f9d9825a88a6a20352c9734e4a4d}{ykyh\+\_\+connect}} (\mbox{\hyperlink{structykyh__state}{ykyh\+\_\+state}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{structstate}{state}}, const char \texorpdfstring{$\ast$}{*}wanted)
+\item 
+\mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112}{ykyh\+\_\+rc}} \mbox{\hyperlink{ykyh_8h_a9a87b4e80e8f980badba176c4b713e13}{ykyh\+\_\+list\+\_\+readers}} (\mbox{\hyperlink{structykyh__state}{ykyh\+\_\+state}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{structstate}{state}}, char \texorpdfstring{$\ast$}{*}readers, size\+\_\+t \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})
+\item 
+\mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112}{ykyh\+\_\+rc}} \mbox{\hyperlink{ykyh_8h_af8e0c6bd9abb1282586aa040b8c03d45}{ykyh\+\_\+disconnect}} (\mbox{\hyperlink{structykyh__state}{ykyh\+\_\+state}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{structstate}{state}})
+\item 
+\mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112}{ykyh\+\_\+rc}} \mbox{\hyperlink{ykyh_8h_a14f49c7ef8ee9ac66936346e7f21d6ce}{ykyh\+\_\+get\+\_\+version}} (\mbox{\hyperlink{structykyh__state}{ykyh\+\_\+state}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{structstate}{state}}, char \texorpdfstring{$\ast$}{*}version, size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})
+\item 
+\mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112}{ykyh\+\_\+rc}} \mbox{\hyperlink{ykyh_8h_a0b123e6c68508162de189bcac06a3954}{ykyh\+\_\+put}} (\mbox{\hyperlink{structykyh__state}{ykyh\+\_\+state}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{structstate}{state}}, const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}, const \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}key\+\_\+enc, size\+\_\+t key\+\_\+enc\+\_\+len, const \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}key\+\_\+mac, size\+\_\+t key\+\_\+mac\+\_\+len, const char \texorpdfstring{$\ast$}{*}pw, const \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} touch\+\_\+policy)
+\item 
+\mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112}{ykyh\+\_\+rc}} \mbox{\hyperlink{ykyh_8h_acfb1affcb2e434d0cfdb9dd468ddbc8a}{ykyh\+\_\+delete}} (\mbox{\hyperlink{structykyh__state}{ykyh\+\_\+state}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{structstate}{state}}, char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})
+\item 
+\mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112}{ykyh\+\_\+rc}} \mbox{\hyperlink{ykyh_8h_af6e95562757fb174ae74843f2ec6304a}{ykyh\+\_\+calculate}} (\mbox{\hyperlink{structykyh__state}{ykyh\+\_\+state}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{structstate}{state}}, const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}, \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{structcontext}{context}}, size\+\_\+t context\+\_\+len, const char \texorpdfstring{$\ast$}{*}pw, \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}key\+\_\+s\+\_\+enc, size\+\_\+t key\+\_\+s\+\_\+enc\+\_\+len, \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}key\+\_\+s\+\_\+mac, size\+\_\+t key\+\_\+s\+\_\+mac\+\_\+len, \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}key\+\_\+s\+\_\+rmac, size\+\_\+t key\+\_\+s\+\_\+rmac\+\_\+len, \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}retries)
+\item 
+\mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112}{ykyh\+\_\+rc}} \mbox{\hyperlink{ykyh_8h_a94ec07237ae4d03c38751f3d966194e3}{ykyh\+\_\+reset}} (\mbox{\hyperlink{structykyh__state}{ykyh\+\_\+state}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{structstate}{state}})
+\item 
+\mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112}{ykyh\+\_\+rc}} \mbox{\hyperlink{ykyh_8h_a869199318f736641bf0779c5d2e90866}{ykyh\+\_\+list\+\_\+keys}} (\mbox{\hyperlink{structykyh__state}{ykyh\+\_\+state}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{structstate}{state}}, \mbox{\hyperlink{structykyh__list__entry}{ykyh\+\_\+list\+\_\+entry}} \texorpdfstring{$\ast$}{*}list, size\+\_\+t \texorpdfstring{$\ast$}{*}list\+\_\+items)
+\item 
+\mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112}{ykyh\+\_\+rc}} \mbox{\hyperlink{ykyh_8h_a55f6b7523751ffb9d6b54f9088f4d90c}{ykyh\+\_\+get\+\_\+challenge}} (\mbox{\hyperlink{structykyh__state}{ykyh\+\_\+state}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{structstate}{state}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{ykyh_8h_a1ab82884b9dfbbb754379f78eeb6ee3f}\index{ykyh.h@{ykyh.h}!SW\_ERR\_AUTHENTICATION\_FAILED@{SW\_ERR\_AUTHENTICATION\_FAILED}}
+\index{SW\_ERR\_AUTHENTICATION\_FAILED@{SW\_ERR\_AUTHENTICATION\_FAILED}!ykyh.h@{ykyh.h}}
+\doxysubsubsection{\texorpdfstring{SW\_ERR\_AUTHENTICATION\_FAILED}{SW\_ERR\_AUTHENTICATION\_FAILED}}
+{\footnotesize\ttfamily \label{ykyh_8h_a1ab82884b9dfbbb754379f78eeb6ee3f} 
+\#define SW\+\_\+\+ERR\+\_\+\+AUTHENTICATION\+\_\+\+FAILED~0x63c0}
+
+
+
+Definition at line \mbox{\hyperlink{ykyh_8h_source_l00061}{61}} of file \mbox{\hyperlink{ykyh_8h_source}{ykyh.\+h}}.
+
+\Hypertarget{ykyh_8h_a3328a41be5837af4761365aafb108025}\index{ykyh.h@{ykyh.h}!SW\_SUCCESS@{SW\_SUCCESS}}
+\index{SW\_SUCCESS@{SW\_SUCCESS}!ykyh.h@{ykyh.h}}
+\doxysubsubsection{\texorpdfstring{SW\_SUCCESS}{SW\_SUCCESS}}
+{\footnotesize\ttfamily \label{ykyh_8h_a3328a41be5837af4761365aafb108025} 
+\#define SW\+\_\+\+SUCCESS~0x9000}
+
+
+
+Definition at line \mbox{\hyperlink{ykyh_8h_source_l00060}{60}} of file \mbox{\hyperlink{ykyh_8h_source}{ykyh.\+h}}.
+
+\Hypertarget{ykyh_8h_a6bbc44e9048c273ded8a25a0b799b3ee}\index{ykyh.h@{ykyh.h}!YKYH\_CONTEXT\_LEN@{YKYH\_CONTEXT\_LEN}}
+\index{YKYH\_CONTEXT\_LEN@{YKYH\_CONTEXT\_LEN}!ykyh.h@{ykyh.h}}
+\doxysubsubsection{\texorpdfstring{YKYH\_CONTEXT\_LEN}{YKYH\_CONTEXT\_LEN}}
+{\footnotesize\ttfamily \label{ykyh_8h_a6bbc44e9048c273ded8a25a0b799b3ee} 
+\#define YKYH\+\_\+\+CONTEXT\+\_\+\+LEN~16}
+
+
+
+Definition at line \mbox{\hyperlink{ykyh_8h_source_l00068}{68}} of file \mbox{\hyperlink{ykyh_8h_source}{ykyh.\+h}}.
+
+\Hypertarget{ykyh_8h_a789ab3b49d1644687f2399ce220b4576}\index{ykyh.h@{ykyh.h}!YKYH\_DEFAULT\_ITERS@{YKYH\_DEFAULT\_ITERS}}
+\index{YKYH\_DEFAULT\_ITERS@{YKYH\_DEFAULT\_ITERS}!ykyh.h@{ykyh.h}}
+\doxysubsubsection{\texorpdfstring{YKYH\_DEFAULT\_ITERS}{YKYH\_DEFAULT\_ITERS}}
+{\footnotesize\ttfamily \label{ykyh_8h_a789ab3b49d1644687f2399ce220b4576} 
+\#define YKYH\+\_\+\+DEFAULT\+\_\+\+ITERS~10000}
+
+
+
+Definition at line \mbox{\hyperlink{ykyh_8h_source_l00072}{72}} of file \mbox{\hyperlink{ykyh_8h_source}{ykyh.\+h}}.
+
+\Hypertarget{ykyh_8h_aa95edf3726d4ad4d12717605e1ff4b83}\index{ykyh.h@{ykyh.h}!YKYH\_DEFAULT\_SALT@{YKYH\_DEFAULT\_SALT}}
+\index{YKYH\_DEFAULT\_SALT@{YKYH\_DEFAULT\_SALT}!ykyh.h@{ykyh.h}}
+\doxysubsubsection{\texorpdfstring{YKYH\_DEFAULT\_SALT}{YKYH\_DEFAULT\_SALT}}
+{\footnotesize\ttfamily \label{ykyh_8h_aa95edf3726d4ad4d12717605e1ff4b83} 
+\#define YKYH\+\_\+\+DEFAULT\+\_\+\+SALT~"{}Yubico"{}}
+
+
+
+Definition at line \mbox{\hyperlink{ykyh_8h_source_l00071}{71}} of file \mbox{\hyperlink{ykyh_8h_source}{ykyh.\+h}}.
+
+\Hypertarget{ykyh_8h_a93f62213473fb25da833d39f7f51ec95}\index{ykyh.h@{ykyh.h}!YKYH\_INS\_CALCULATE@{YKYH\_INS\_CALCULATE}}
+\index{YKYH\_INS\_CALCULATE@{YKYH\_INS\_CALCULATE}!ykyh.h@{ykyh.h}}
+\doxysubsubsection{\texorpdfstring{YKYH\_INS\_CALCULATE}{YKYH\_INS\_CALCULATE}}
+{\footnotesize\ttfamily \label{ykyh_8h_a93f62213473fb25da833d39f7f51ec95} 
+\#define YKYH\+\_\+\+INS\+\_\+\+CALCULATE~0x03}
+
+
+
+Definition at line \mbox{\hyperlink{ykyh_8h_source_l00032}{32}} of file \mbox{\hyperlink{ykyh_8h_source}{ykyh.\+h}}.
+
+\Hypertarget{ykyh_8h_ae302e62b3add4c602ac23216dcec4d46}\index{ykyh.h@{ykyh.h}!YKYH\_INS\_DELETE@{YKYH\_INS\_DELETE}}
+\index{YKYH\_INS\_DELETE@{YKYH\_INS\_DELETE}!ykyh.h@{ykyh.h}}
+\doxysubsubsection{\texorpdfstring{YKYH\_INS\_DELETE}{YKYH\_INS\_DELETE}}
+{\footnotesize\ttfamily \label{ykyh_8h_ae302e62b3add4c602ac23216dcec4d46} 
+\#define YKYH\+\_\+\+INS\+\_\+\+DELETE~0x02}
+
+
+
+Definition at line \mbox{\hyperlink{ykyh_8h_source_l00031}{31}} of file \mbox{\hyperlink{ykyh_8h_source}{ykyh.\+h}}.
+
+\Hypertarget{ykyh_8h_a6979f4a6b2d9519964aba3f5365a3ed0}\index{ykyh.h@{ykyh.h}!YKYH\_INS\_GET\_CHALLENGE@{YKYH\_INS\_GET\_CHALLENGE}}
+\index{YKYH\_INS\_GET\_CHALLENGE@{YKYH\_INS\_GET\_CHALLENGE}!ykyh.h@{ykyh.h}}
+\doxysubsubsection{\texorpdfstring{YKYH\_INS\_GET\_CHALLENGE}{YKYH\_INS\_GET\_CHALLENGE}}
+{\footnotesize\ttfamily \label{ykyh_8h_a6979f4a6b2d9519964aba3f5365a3ed0} 
+\#define YKYH\+\_\+\+INS\+\_\+\+GET\+\_\+\+CHALLENGE~0x04}
+
+
+
+Definition at line \mbox{\hyperlink{ykyh_8h_source_l00033}{33}} of file \mbox{\hyperlink{ykyh_8h_source}{ykyh.\+h}}.
+
+\Hypertarget{ykyh_8h_a824ea775a85955b88cda9593b54b32a9}\index{ykyh.h@{ykyh.h}!YKYH\_INS\_GET\_VERSION@{YKYH\_INS\_GET\_VERSION}}
+\index{YKYH\_INS\_GET\_VERSION@{YKYH\_INS\_GET\_VERSION}!ykyh.h@{ykyh.h}}
+\doxysubsubsection{\texorpdfstring{YKYH\_INS\_GET\_VERSION}{YKYH\_INS\_GET\_VERSION}}
+{\footnotesize\ttfamily \label{ykyh_8h_a824ea775a85955b88cda9593b54b32a9} 
+\#define YKYH\+\_\+\+INS\+\_\+\+GET\+\_\+\+VERSION~0x07}
+
+
+
+Definition at line \mbox{\hyperlink{ykyh_8h_source_l00036}{36}} of file \mbox{\hyperlink{ykyh_8h_source}{ykyh.\+h}}.
+
+\Hypertarget{ykyh_8h_a7c53db94c23f5e592e8517c0fcd9f18e}\index{ykyh.h@{ykyh.h}!YKYH\_INS\_LIST@{YKYH\_INS\_LIST}}
+\index{YKYH\_INS\_LIST@{YKYH\_INS\_LIST}!ykyh.h@{ykyh.h}}
+\doxysubsubsection{\texorpdfstring{YKYH\_INS\_LIST}{YKYH\_INS\_LIST}}
+{\footnotesize\ttfamily \label{ykyh_8h_a7c53db94c23f5e592e8517c0fcd9f18e} 
+\#define YKYH\+\_\+\+INS\+\_\+\+LIST~0x05}
+
+
+
+Definition at line \mbox{\hyperlink{ykyh_8h_source_l00034}{34}} of file \mbox{\hyperlink{ykyh_8h_source}{ykyh.\+h}}.
+
+\Hypertarget{ykyh_8h_aaf3cacb408d5b3c4b30321a7ab046554}\index{ykyh.h@{ykyh.h}!YKYH\_INS\_PUT@{YKYH\_INS\_PUT}}
+\index{YKYH\_INS\_PUT@{YKYH\_INS\_PUT}!ykyh.h@{ykyh.h}}
+\doxysubsubsection{\texorpdfstring{YKYH\_INS\_PUT}{YKYH\_INS\_PUT}}
+{\footnotesize\ttfamily \label{ykyh_8h_aaf3cacb408d5b3c4b30321a7ab046554} 
+\#define YKYH\+\_\+\+INS\+\_\+\+PUT~0x01}
+
+
+
+Definition at line \mbox{\hyperlink{ykyh_8h_source_l00030}{30}} of file \mbox{\hyperlink{ykyh_8h_source}{ykyh.\+h}}.
+
+\Hypertarget{ykyh_8h_a42ae5fc5228a23e671d3cb707e493378}\index{ykyh.h@{ykyh.h}!YKYH\_INS\_RESET@{YKYH\_INS\_RESET}}
+\index{YKYH\_INS\_RESET@{YKYH\_INS\_RESET}!ykyh.h@{ykyh.h}}
+\doxysubsubsection{\texorpdfstring{YKYH\_INS\_RESET}{YKYH\_INS\_RESET}}
+{\footnotesize\ttfamily \label{ykyh_8h_a42ae5fc5228a23e671d3cb707e493378} 
+\#define YKYH\+\_\+\+INS\+\_\+\+RESET~0x06}
+
+
+
+Definition at line \mbox{\hyperlink{ykyh_8h_source_l00035}{35}} of file \mbox{\hyperlink{ykyh_8h_source}{ykyh.\+h}}.
+
+\Hypertarget{ykyh_8h_aa076fd48c09e4acec46eace24ad27a2f}\index{ykyh.h@{ykyh.h}!YKYH\_KEY\_LEN@{YKYH\_KEY\_LEN}}
+\index{YKYH\_KEY\_LEN@{YKYH\_KEY\_LEN}!ykyh.h@{ykyh.h}}
+\doxysubsubsection{\texorpdfstring{YKYH\_KEY\_LEN}{YKYH\_KEY\_LEN}}
+{\footnotesize\ttfamily \label{ykyh_8h_aa076fd48c09e4acec46eace24ad27a2f} 
+\#define YKYH\+\_\+\+KEY\+\_\+\+LEN~16}
+
+
+
+Definition at line \mbox{\hyperlink{ykyh_8h_source_l00066}{66}} of file \mbox{\hyperlink{ykyh_8h_source}{ykyh.\+h}}.
+
+\Hypertarget{ykyh_8h_aba3c1d3e48c3662d8e58a87bc564cc82}\index{ykyh.h@{ykyh.h}!YKYH\_MAX\_NAME\_LEN@{YKYH\_MAX\_NAME\_LEN}}
+\index{YKYH\_MAX\_NAME\_LEN@{YKYH\_MAX\_NAME\_LEN}!ykyh.h@{ykyh.h}}
+\doxysubsubsection{\texorpdfstring{YKYH\_MAX\_NAME\_LEN}{YKYH\_MAX\_NAME\_LEN}}
+{\footnotesize\ttfamily \label{ykyh_8h_aba3c1d3e48c3662d8e58a87bc564cc82} 
+\#define YKYH\+\_\+\+MAX\+\_\+\+NAME\+\_\+\+LEN~64}
+
+
+
+Definition at line \mbox{\hyperlink{ykyh_8h_source_l00065}{65}} of file \mbox{\hyperlink{ykyh_8h_source}{ykyh.\+h}}.
+
+\Hypertarget{ykyh_8h_ae8331a6f47276895ad08a1cbf3a6a508}\index{ykyh.h@{ykyh.h}!YKYH\_MIN\_NAME\_LEN@{YKYH\_MIN\_NAME\_LEN}}
+\index{YKYH\_MIN\_NAME\_LEN@{YKYH\_MIN\_NAME\_LEN}!ykyh.h@{ykyh.h}}
+\doxysubsubsection{\texorpdfstring{YKYH\_MIN\_NAME\_LEN}{YKYH\_MIN\_NAME\_LEN}}
+{\footnotesize\ttfamily \label{ykyh_8h_ae8331a6f47276895ad08a1cbf3a6a508} 
+\#define YKYH\+\_\+\+MIN\+\_\+\+NAME\+\_\+\+LEN~1}
+
+
+
+Definition at line \mbox{\hyperlink{ykyh_8h_source_l00064}{64}} of file \mbox{\hyperlink{ykyh_8h_source}{ykyh.\+h}}.
+
+\Hypertarget{ykyh_8h_ab4bd17f6a1b0642c393b29e66d858070}\index{ykyh.h@{ykyh.h}!YKYH\_P1\_RESET@{YKYH\_P1\_RESET}}
+\index{YKYH\_P1\_RESET@{YKYH\_P1\_RESET}!ykyh.h@{ykyh.h}}
+\doxysubsubsection{\texorpdfstring{YKYH\_P1\_RESET}{YKYH\_P1\_RESET}}
+{\footnotesize\ttfamily \label{ykyh_8h_ab4bd17f6a1b0642c393b29e66d858070} 
+\#define YKYH\+\_\+\+P1\+\_\+\+RESET~0xde}
+
+
+
+Definition at line \mbox{\hyperlink{ykyh_8h_source_l00039}{39}} of file \mbox{\hyperlink{ykyh_8h_source}{ykyh.\+h}}.
+
+\Hypertarget{ykyh_8h_ab135ab62c981c7deb83f5c74af68610d}\index{ykyh.h@{ykyh.h}!YKYH\_P2\_RESET@{YKYH\_P2\_RESET}}
+\index{YKYH\_P2\_RESET@{YKYH\_P2\_RESET}!ykyh.h@{ykyh.h}}
+\doxysubsubsection{\texorpdfstring{YKYH\_P2\_RESET}{YKYH\_P2\_RESET}}
+{\footnotesize\ttfamily \label{ykyh_8h_ab135ab62c981c7deb83f5c74af68610d} 
+\#define YKYH\+\_\+\+P2\+\_\+\+RESET~0xad}
+
+
+
+Definition at line \mbox{\hyperlink{ykyh_8h_source_l00042}{42}} of file \mbox{\hyperlink{ykyh_8h_source}{ykyh.\+h}}.
+
+\Hypertarget{ykyh_8h_a00e800150afe4404120c2090461fdf1a}\index{ykyh.h@{ykyh.h}!YKYH\_PW\_LEN@{YKYH\_PW\_LEN}}
+\index{YKYH\_PW\_LEN@{YKYH\_PW\_LEN}!ykyh.h@{ykyh.h}}
+\doxysubsubsection{\texorpdfstring{YKYH\_PW\_LEN}{YKYH\_PW\_LEN}}
+{\footnotesize\ttfamily \label{ykyh_8h_a00e800150afe4404120c2090461fdf1a} 
+\#define YKYH\+\_\+\+PW\+\_\+\+LEN~16}
+
+
+
+Definition at line \mbox{\hyperlink{ykyh_8h_source_l00067}{67}} of file \mbox{\hyperlink{ykyh_8h_source}{ykyh.\+h}}.
+
+\Hypertarget{ykyh_8h_a242db20335c7944a79a64147c2a7ba10}\index{ykyh.h@{ykyh.h}!YKYH\_SCP03\_ALGO@{YKYH\_SCP03\_ALGO}}
+\index{YKYH\_SCP03\_ALGO@{YKYH\_SCP03\_ALGO}!ykyh.h@{ykyh.h}}
+\doxysubsubsection{\texorpdfstring{YKYH\_SCP03\_ALGO}{YKYH\_SCP03\_ALGO}}
+{\footnotesize\ttfamily \label{ykyh_8h_a242db20335c7944a79a64147c2a7ba10} 
+\#define YKYH\+\_\+\+SCP03\+\_\+\+ALGO~38}
+
+
+
+Definition at line \mbox{\hyperlink{ykyh_8h_source_l00057}{57}} of file \mbox{\hyperlink{ykyh_8h_source}{ykyh.\+h}}.
+
+\Hypertarget{ykyh_8h_ac632eacb1f1615fb42741b91db9e9947}\index{ykyh.h@{ykyh.h}!YKYH\_SCP11\_ALGO@{YKYH\_SCP11\_ALGO}}
+\index{YKYH\_SCP11\_ALGO@{YKYH\_SCP11\_ALGO}!ykyh.h@{ykyh.h}}
+\doxysubsubsection{\texorpdfstring{YKYH\_SCP11\_ALGO}{YKYH\_SCP11\_ALGO}}
+{\footnotesize\ttfamily \label{ykyh_8h_ac632eacb1f1615fb42741b91db9e9947} 
+\#define YKYH\+\_\+\+SCP11\+\_\+\+ALGO~39}
+
+
+
+Definition at line \mbox{\hyperlink{ykyh_8h_source_l00058}{58}} of file \mbox{\hyperlink{ykyh_8h_source}{ykyh.\+h}}.
+
+\Hypertarget{ykyh_8h_a44933eda63818d2195aac0e007be30dc}\index{ykyh.h@{ykyh.h}!YKYH\_TAG\_ALGO@{YKYH\_TAG\_ALGO}}
+\index{YKYH\_TAG\_ALGO@{YKYH\_TAG\_ALGO}!ykyh.h@{ykyh.h}}
+\doxysubsubsection{\texorpdfstring{YKYH\_TAG\_ALGO}{YKYH\_TAG\_ALGO}}
+{\footnotesize\ttfamily \label{ykyh_8h_a44933eda63818d2195aac0e007be30dc} 
+\#define YKYH\+\_\+\+TAG\+\_\+\+ALGO~0x74}
+
+
+
+Definition at line \mbox{\hyperlink{ykyh_8h_source_l00048}{48}} of file \mbox{\hyperlink{ykyh_8h_source}{ykyh.\+h}}.
+
+\Hypertarget{ykyh_8h_affd0605d22de3476bb44cae076c1302e}\index{ykyh.h@{ykyh.h}!YKYH\_TAG\_CONTEXT@{YKYH\_TAG\_CONTEXT}}
+\index{YKYH\_TAG\_CONTEXT@{YKYH\_TAG\_CONTEXT}!ykyh.h@{ykyh.h}}
+\doxysubsubsection{\texorpdfstring{YKYH\_TAG\_CONTEXT}{YKYH\_TAG\_CONTEXT}}
+{\footnotesize\ttfamily \label{ykyh_8h_affd0605d22de3476bb44cae076c1302e} 
+\#define YKYH\+\_\+\+TAG\+\_\+\+CONTEXT~0x77}
+
+
+
+Definition at line \mbox{\hyperlink{ykyh_8h_source_l00051}{51}} of file \mbox{\hyperlink{ykyh_8h_source}{ykyh.\+h}}.
+
+\Hypertarget{ykyh_8h_a72b145d0e689f9f70791c2332a3f944b}\index{ykyh.h@{ykyh.h}!YKYH\_TAG\_KEY\_ENC@{YKYH\_TAG\_KEY\_ENC}}
+\index{YKYH\_TAG\_KEY\_ENC@{YKYH\_TAG\_KEY\_ENC}!ykyh.h@{ykyh.h}}
+\doxysubsubsection{\texorpdfstring{YKYH\_TAG\_KEY\_ENC}{YKYH\_TAG\_KEY\_ENC}}
+{\footnotesize\ttfamily \label{ykyh_8h_a72b145d0e689f9f70791c2332a3f944b} 
+\#define YKYH\+\_\+\+TAG\+\_\+\+KEY\+\_\+\+ENC~0x75}
+
+
+
+Definition at line \mbox{\hyperlink{ykyh_8h_source_l00049}{49}} of file \mbox{\hyperlink{ykyh_8h_source}{ykyh.\+h}}.
+
+\Hypertarget{ykyh_8h_a88992df18ab407b8afa214102ca29bbb}\index{ykyh.h@{ykyh.h}!YKYH\_TAG\_KEY\_MAC@{YKYH\_TAG\_KEY\_MAC}}
+\index{YKYH\_TAG\_KEY\_MAC@{YKYH\_TAG\_KEY\_MAC}!ykyh.h@{ykyh.h}}
+\doxysubsubsection{\texorpdfstring{YKYH\_TAG\_KEY\_MAC}{YKYH\_TAG\_KEY\_MAC}}
+{\footnotesize\ttfamily \label{ykyh_8h_a88992df18ab407b8afa214102ca29bbb} 
+\#define YKYH\+\_\+\+TAG\+\_\+\+KEY\+\_\+\+MAC~0x76}
+
+
+
+Definition at line \mbox{\hyperlink{ykyh_8h_source_l00050}{50}} of file \mbox{\hyperlink{ykyh_8h_source}{ykyh.\+h}}.
+
+\Hypertarget{ykyh_8h_a1d9d05d1211e99f0edff27bfa82df0b8}\index{ykyh.h@{ykyh.h}!YKYH\_TAG\_NAME@{YKYH\_TAG\_NAME}}
+\index{YKYH\_TAG\_NAME@{YKYH\_TAG\_NAME}!ykyh.h@{ykyh.h}}
+\doxysubsubsection{\texorpdfstring{YKYH\_TAG\_NAME}{YKYH\_TAG\_NAME}}
+{\footnotesize\ttfamily \label{ykyh_8h_a1d9d05d1211e99f0edff27bfa82df0b8} 
+\#define YKYH\+\_\+\+TAG\+\_\+\+NAME~0x71}
+
+
+
+Definition at line \mbox{\hyperlink{ykyh_8h_source_l00045}{45}} of file \mbox{\hyperlink{ykyh_8h_source}{ykyh.\+h}}.
+
+\Hypertarget{ykyh_8h_aea4750a6749dca19d059e06aaf75e74a}\index{ykyh.h@{ykyh.h}!YKYH\_TAG\_NAME\_LIST@{YKYH\_TAG\_NAME\_LIST}}
+\index{YKYH\_TAG\_NAME\_LIST@{YKYH\_TAG\_NAME\_LIST}!ykyh.h@{ykyh.h}}
+\doxysubsubsection{\texorpdfstring{YKYH\_TAG\_NAME\_LIST}{YKYH\_TAG\_NAME\_LIST}}
+{\footnotesize\ttfamily \label{ykyh_8h_aea4750a6749dca19d059e06aaf75e74a} 
+\#define YKYH\+\_\+\+TAG\+\_\+\+NAME\+\_\+\+LIST~0x72}
+
+
+
+Definition at line \mbox{\hyperlink{ykyh_8h_source_l00046}{46}} of file \mbox{\hyperlink{ykyh_8h_source}{ykyh.\+h}}.
+
+\Hypertarget{ykyh_8h_a2df9aee745a0c8a8cd5d127c72dea523}\index{ykyh.h@{ykyh.h}!YKYH\_TAG\_PW@{YKYH\_TAG\_PW}}
+\index{YKYH\_TAG\_PW@{YKYH\_TAG\_PW}!ykyh.h@{ykyh.h}}
+\doxysubsubsection{\texorpdfstring{YKYH\_TAG\_PW}{YKYH\_TAG\_PW}}
+{\footnotesize\ttfamily \label{ykyh_8h_a2df9aee745a0c8a8cd5d127c72dea523} 
+\#define YKYH\+\_\+\+TAG\+\_\+\+PW~0x73}
+
+
+
+Definition at line \mbox{\hyperlink{ykyh_8h_source_l00047}{47}} of file \mbox{\hyperlink{ykyh_8h_source}{ykyh.\+h}}.
+
+\Hypertarget{ykyh_8h_a32fbf0a082e546d8e0f30d412360e720}\index{ykyh.h@{ykyh.h}!YKYH\_TAG\_RESPONSE@{YKYH\_TAG\_RESPONSE}}
+\index{YKYH\_TAG\_RESPONSE@{YKYH\_TAG\_RESPONSE}!ykyh.h@{ykyh.h}}
+\doxysubsubsection{\texorpdfstring{YKYH\_TAG\_RESPONSE}{YKYH\_TAG\_RESPONSE}}
+{\footnotesize\ttfamily \label{ykyh_8h_a32fbf0a082e546d8e0f30d412360e720} 
+\#define YKYH\+\_\+\+TAG\+\_\+\+RESPONSE~0x78}
+
+
+
+Definition at line \mbox{\hyperlink{ykyh_8h_source_l00052}{52}} of file \mbox{\hyperlink{ykyh_8h_source}{ykyh.\+h}}.
+
+\Hypertarget{ykyh_8h_a121aacd54595ba241bfd40ed46fc1f04}\index{ykyh.h@{ykyh.h}!YKYH\_TAG\_TOUCH@{YKYH\_TAG\_TOUCH}}
+\index{YKYH\_TAG\_TOUCH@{YKYH\_TAG\_TOUCH}!ykyh.h@{ykyh.h}}
+\doxysubsubsection{\texorpdfstring{YKYH\_TAG\_TOUCH}{YKYH\_TAG\_TOUCH}}
+{\footnotesize\ttfamily \label{ykyh_8h_a121aacd54595ba241bfd40ed46fc1f04} 
+\#define YKYH\+\_\+\+TAG\+\_\+\+TOUCH~0x7a}
+
+
+
+Definition at line \mbox{\hyperlink{ykyh_8h_source_l00054}{54}} of file \mbox{\hyperlink{ykyh_8h_source}{ykyh.\+h}}.
+
+\Hypertarget{ykyh_8h_a71c7b4fe57d684c319d3b4198b963e84}\index{ykyh.h@{ykyh.h}!YKYH\_TAG\_VERSION@{YKYH\_TAG\_VERSION}}
+\index{YKYH\_TAG\_VERSION@{YKYH\_TAG\_VERSION}!ykyh.h@{ykyh.h}}
+\doxysubsubsection{\texorpdfstring{YKYH\_TAG\_VERSION}{YKYH\_TAG\_VERSION}}
+{\footnotesize\ttfamily \label{ykyh_8h_a71c7b4fe57d684c319d3b4198b963e84} 
+\#define YKYH\+\_\+\+TAG\+\_\+\+VERSION~0x79}
+
+
+
+Definition at line \mbox{\hyperlink{ykyh_8h_source_l00053}{53}} of file \mbox{\hyperlink{ykyh_8h_source}{ykyh.\+h}}.
+
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{ykyh_8h_abb80706a5ad5ea04f74eb16886edb241}\index{ykyh.h@{ykyh.h}!ykyh\_state@{ykyh\_state}}
+\index{ykyh\_state@{ykyh\_state}!ykyh.h@{ykyh.h}}
+\doxysubsubsection{\texorpdfstring{ykyh\_state}{ykyh\_state}}
+{\footnotesize\ttfamily \label{ykyh_8h_abb80706a5ad5ea04f74eb16886edb241} 
+typedef struct ykyh\+\_\+state ykyh\+\_\+state}
+
+
+
+Definition at line \mbox{\hyperlink{ykyh_8h_source_l00074}{74}} of file \mbox{\hyperlink{ykyh_8h_source}{ykyh.\+h}}.
+
+
+
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{ykyh_8h_a93aafaa60a79c75641302448631ea112}\index{ykyh.h@{ykyh.h}!ykyh\_rc@{ykyh\_rc}}
+\index{ykyh\_rc@{ykyh\_rc}!ykyh.h@{ykyh.h}}
+\doxysubsubsection{\texorpdfstring{ykyh\_rc}{ykyh\_rc}}
+{\footnotesize\ttfamily \label{ykyh_8h_a93aafaa60a79c75641302448631ea112} 
+enum \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112}{ykyh\+\_\+rc}}}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{YKYHR\_SUCCESS@{YKYHR\_SUCCESS}!ykyh.h@{ykyh.h}}\index{ykyh.h@{ykyh.h}!YKYHR\_SUCCESS@{YKYHR\_SUCCESS}}}\Hypertarget{ykyh_8h_a93aafaa60a79c75641302448631ea112a40500f2b4bd15d31f1348475e35f2459}\label{ykyh_8h_a93aafaa60a79c75641302448631ea112} 
+YKYHR\+\_\+\+SUCCESS&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{YKYHR\_MEMORY\_ERROR@{YKYHR\_MEMORY\_ERROR}!ykyh.h@{ykyh.h}}\index{ykyh.h@{ykyh.h}!YKYHR\_MEMORY\_ERROR@{YKYHR\_MEMORY\_ERROR}}}\Hypertarget{ykyh_8h_a93aafaa60a79c75641302448631ea112a734cac714da70c8a7853708acff0970f}\label{ykyh_8h_a93aafaa60a79c75641302448631ea112} 
+YKYHR\+\_\+\+MEMORY\+\_\+\+ERROR&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{YKYHR\_PCSC\_ERROR@{YKYHR\_PCSC\_ERROR}!ykyh.h@{ykyh.h}}\index{ykyh.h@{ykyh.h}!YKYHR\_PCSC\_ERROR@{YKYHR\_PCSC\_ERROR}}}\Hypertarget{ykyh_8h_a93aafaa60a79c75641302448631ea112aa66bb77f3c39144ec56d01e741a6d0b5}\label{ykyh_8h_a93aafaa60a79c75641302448631ea112} 
+YKYHR\+\_\+\+PCSC\+\_\+\+ERROR&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{YKYHR\_GENERIC\_ERROR@{YKYHR\_GENERIC\_ERROR}!ykyh.h@{ykyh.h}}\index{ykyh.h@{ykyh.h}!YKYHR\_GENERIC\_ERROR@{YKYHR\_GENERIC\_ERROR}}}\Hypertarget{ykyh_8h_a93aafaa60a79c75641302448631ea112a3d10dec4a5d83d4227ea94c06efed2a3}\label{ykyh_8h_a93aafaa60a79c75641302448631ea112} 
+YKYHR\+\_\+\+GENERIC\+\_\+\+ERROR&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{YKYHR\_WRONG\_PW@{YKYHR\_WRONG\_PW}!ykyh.h@{ykyh.h}}\index{ykyh.h@{ykyh.h}!YKYHR\_WRONG\_PW@{YKYHR\_WRONG\_PW}}}\Hypertarget{ykyh_8h_a93aafaa60a79c75641302448631ea112ae58239391b2ac02c8bb353666cdf9ac8}\label{ykyh_8h_a93aafaa60a79c75641302448631ea112} 
+YKYHR\+\_\+\+WRONG\+\_\+\+PW&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{YKYHR\_INVALID\_PARAMS@{YKYHR\_INVALID\_PARAMS}!ykyh.h@{ykyh.h}}\index{ykyh.h@{ykyh.h}!YKYHR\_INVALID\_PARAMS@{YKYHR\_INVALID\_PARAMS}}}\Hypertarget{ykyh_8h_a93aafaa60a79c75641302448631ea112a3616b15980deeeb94e24538ede829d84}\label{ykyh_8h_a93aafaa60a79c75641302448631ea112} 
+YKYHR\+\_\+\+INVALID\+\_\+\+PARAMS&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{YKYHR\_ENTRY\_NOT\_FOUND@{YKYHR\_ENTRY\_NOT\_FOUND}!ykyh.h@{ykyh.h}}\index{ykyh.h@{ykyh.h}!YKYHR\_ENTRY\_NOT\_FOUND@{YKYHR\_ENTRY\_NOT\_FOUND}}}\Hypertarget{ykyh_8h_a93aafaa60a79c75641302448631ea112acd0e2c78f0a0e431afb2a4ba555f821e}\label{ykyh_8h_a93aafaa60a79c75641302448631ea112} 
+YKYHR\+\_\+\+ENTRY\+\_\+\+NOT\+\_\+\+FOUND&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{ykyh_8h_source_l00076}{76}} of file \mbox{\hyperlink{ykyh_8h_source}{ykyh.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00077\ \ \ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112a40500f2b4bd15d31f1348475e35f2459}{YKYHR\_SUCCESS}}\ =\ 0,}
+\DoxyCodeLine{00078\ \ \ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112a734cac714da70c8a7853708acff0970f}{YKYHR\_MEMORY\_ERROR}}\ =\ -\/1,}
+\DoxyCodeLine{00079\ \ \ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112aa66bb77f3c39144ec56d01e741a6d0b5}{YKYHR\_PCSC\_ERROR}}\ =\ -\/2,}
+\DoxyCodeLine{00080\ \ \ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112a3d10dec4a5d83d4227ea94c06efed2a3}{YKYHR\_GENERIC\_ERROR}}\ =\ -\/3,}
+\DoxyCodeLine{00081\ \ \ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112ae58239391b2ac02c8bb353666cdf9ac8}{YKYHR\_WRONG\_PW}}\ =\ -\/4,}
+\DoxyCodeLine{00082\ \ \ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112a3616b15980deeeb94e24538ede829d84}{YKYHR\_INVALID\_PARAMS}}\ =\ -\/5,}
+\DoxyCodeLine{00083\ \ \ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112acd0e2c78f0a0e431afb2a4ba555f821e}{YKYHR\_ENTRY\_NOT\_FOUND}}\ =\ -\/6,}
+\DoxyCodeLine{00084\ \}\ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112}{ykyh\_rc}};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{ykyh_8h_af6e95562757fb174ae74843f2ec6304a}\index{ykyh.h@{ykyh.h}!ykyh\_calculate@{ykyh\_calculate}}
+\index{ykyh\_calculate@{ykyh\_calculate}!ykyh.h@{ykyh.h}}
+\doxysubsubsection{\texorpdfstring{ykyh\_calculate()}{ykyh\_calculate()}}
+{\footnotesize\ttfamily \label{ykyh_8h_af6e95562757fb174ae74843f2ec6304a} 
+\mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112}{ykyh\+\_\+rc}} ykyh\+\_\+calculate (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structykyh__state}{ykyh\+\_\+state}} \texorpdfstring{$\ast$}{*}}]{state}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{name}{, }\item[{\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{context}{, }\item[{size\+\_\+t}]{context\+\_\+len}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{pw}{, }\item[{\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{key\+\_\+s\+\_\+enc}{, }\item[{size\+\_\+t}]{key\+\_\+s\+\_\+enc\+\_\+len}{, }\item[{\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{key\+\_\+s\+\_\+mac}{, }\item[{size\+\_\+t}]{key\+\_\+s\+\_\+mac\+\_\+len}{, }\item[{\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{key\+\_\+s\+\_\+rmac}{, }\item[{size\+\_\+t}]{key\+\_\+s\+\_\+rmac\+\_\+len}{, }\item[{\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{retries}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{ykyh_8c_source_l00403}{403}} of file \mbox{\hyperlink{ykyh_8c_source}{ykyh.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00407\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00408\ \ \ \mbox{\hyperlink{unionu___a_p_d_u}{APDU}}\ apdu;}
+\DoxyCodeLine{00409\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *ptr;}
+\DoxyCodeLine{00410\ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ data[64];\ \textcolor{comment}{//\ NOTE(adma):\ must\ be\ >=\ (YKYH\_KEY\_LEN\ *\ 3)\ +\ 2\ =\ 50}}
+\DoxyCodeLine{00411\ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ recv\_len\ =\ \textcolor{keyword}{sizeof}(data);}
+\DoxyCodeLine{00412\ \ \ \textcolor{keywordtype}{int}\ sw;}
+\DoxyCodeLine{00413\ \ \ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112}{ykyh\_rc}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}};}
+\DoxyCodeLine{00414\ }
+\DoxyCodeLine{00415\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structstate}{state}}\ ==\ NULL\ ||\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ ==\ NULL\ ||\ strlen(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})\ <\ \mbox{\hyperlink{ykyh_8h_ae8331a6f47276895ad08a1cbf3a6a508}{YKYH\_MIN\_NAME\_LEN}}\ ||}
+\DoxyCodeLine{00416\ \ \ \ \ \ \ strlen(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})\ >\ \mbox{\hyperlink{ykyh_8h_aba3c1d3e48c3662d8e58a87bc564cc82}{YKYH\_MAX\_NAME\_LEN}}\ ||\ \mbox{\hyperlink{structcontext}{context}}\ ==\ NULL\ ||}
+\DoxyCodeLine{00417\ \ \ \ \ \ \ context\_len\ !=\ \mbox{\hyperlink{ykyh_8h_a6bbc44e9048c273ded8a25a0b799b3ee}{YKYH\_CONTEXT\_LEN}}\ ||\ pw\ ==\ NULL\ ||}
+\DoxyCodeLine{00418\ \ \ \ \ \ \ strlen(pw)\ !=\ \mbox{\hyperlink{ykyh_8h_a00e800150afe4404120c2090461fdf1a}{YKYH\_PW\_LEN}}\ ||\ key\_s\_enc\ ==\ NULL\ ||}
+\DoxyCodeLine{00419\ \ \ \ \ \ \ key\_s\_enc\_len\ !=\ \mbox{\hyperlink{ykyh_8h_aa076fd48c09e4acec46eace24ad27a2f}{YKYH\_KEY\_LEN}}\ ||\ key\_s\_mac\ ==\ NULL\ ||}
+\DoxyCodeLine{00420\ \ \ \ \ \ \ key\_s\_mac\_len\ !=\ \mbox{\hyperlink{ykyh_8h_aa076fd48c09e4acec46eace24ad27a2f}{YKYH\_KEY\_LEN}}\ ||\ key\_s\_rmac\ ==\ NULL\ ||}
+\DoxyCodeLine{00421\ \ \ \ \ \ \ key\_s\_rmac\_len\ !=\ \mbox{\hyperlink{ykyh_8h_aa076fd48c09e4acec46eace24ad27a2f}{YKYH\_KEY\_LEN}})\ \{}
+\DoxyCodeLine{00422\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112a3616b15980deeeb94e24538ede829d84}{YKYHR\_INVALID\_PARAMS}};}
+\DoxyCodeLine{00423\ \ \ \}}
+\DoxyCodeLine{00424\ }
+\DoxyCodeLine{00425\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(apdu.\mbox{\hyperlink{unionu___a_p_d_u_a864cd8b850ed1d88c60064c17b29fec9}{raw}},\ 0,\ \textcolor{keyword}{sizeof}(apdu));}
+\DoxyCodeLine{00426\ \ \ apdu.\mbox{\hyperlink{unionu___a_p_d_u_abe564f763a61d62cb4de9b5cff4b2530}{st}}.ins\ =\ \mbox{\hyperlink{ykyh_8h_a93f62213473fb25da833d39f7f51ec95}{YKYH\_INS\_CALCULATE}};}
+\DoxyCodeLine{00427\ }
+\DoxyCodeLine{00428\ \ \ ptr\ =\ apdu.\mbox{\hyperlink{unionu___a_p_d_u_abe564f763a61d62cb4de9b5cff4b2530}{st}}.data;}
+\DoxyCodeLine{00429\ }
+\DoxyCodeLine{00430\ \ \ *(ptr++)\ =\ \mbox{\hyperlink{ykyh_8h_a1d9d05d1211e99f0edff27bfa82df0b8}{YKYH\_TAG\_NAME}};}
+\DoxyCodeLine{00431\ \ \ apdu.\mbox{\hyperlink{unionu___a_p_d_u_abe564f763a61d62cb4de9b5cff4b2530}{st}}.lc++;}
+\DoxyCodeLine{00432\ \ \ *(ptr++)\ =\ strlen(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}});}
+\DoxyCodeLine{00433\ \ \ apdu.\mbox{\hyperlink{unionu___a_p_d_u_abe564f763a61d62cb4de9b5cff4b2530}{st}}.lc++;}
+\DoxyCodeLine{00434\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(ptr,\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ strlen(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}));}
+\DoxyCodeLine{00435\ \ \ ptr\ +=\ strlen(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}});}
+\DoxyCodeLine{00436\ \ \ apdu.\mbox{\hyperlink{unionu___a_p_d_u_abe564f763a61d62cb4de9b5cff4b2530}{st}}.lc\ +=\ strlen(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}});}
+\DoxyCodeLine{00437\ }
+\DoxyCodeLine{00438\ \ \ *(ptr++)\ =\ \mbox{\hyperlink{ykyh_8h_affd0605d22de3476bb44cae076c1302e}{YKYH\_TAG\_CONTEXT}};}
+\DoxyCodeLine{00439\ \ \ apdu.\mbox{\hyperlink{unionu___a_p_d_u_abe564f763a61d62cb4de9b5cff4b2530}{st}}.lc++;}
+\DoxyCodeLine{00440\ \ \ *(ptr++)\ =\ context\_len;}
+\DoxyCodeLine{00441\ \ \ apdu.\mbox{\hyperlink{unionu___a_p_d_u_abe564f763a61d62cb4de9b5cff4b2530}{st}}.lc++;}
+\DoxyCodeLine{00442\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(ptr,\ \mbox{\hyperlink{structcontext}{context}},\ context\_len);}
+\DoxyCodeLine{00443\ \ \ ptr\ +=\ context\_len;}
+\DoxyCodeLine{00444\ \ \ apdu.\mbox{\hyperlink{unionu___a_p_d_u_abe564f763a61d62cb4de9b5cff4b2530}{st}}.lc\ +=\ context\_len;}
+\DoxyCodeLine{00445\ }
+\DoxyCodeLine{00446\ \ \ *(ptr++)\ =\ \mbox{\hyperlink{ykyh_8h_a2df9aee745a0c8a8cd5d127c72dea523}{YKYH\_TAG\_PW}};}
+\DoxyCodeLine{00447\ \ \ apdu.\mbox{\hyperlink{unionu___a_p_d_u_abe564f763a61d62cb4de9b5cff4b2530}{st}}.lc++;}
+\DoxyCodeLine{00448\ \ \ *(ptr++)\ =\ \mbox{\hyperlink{ykyh_8h_a00e800150afe4404120c2090461fdf1a}{YKYH\_PW\_LEN}};}
+\DoxyCodeLine{00449\ \ \ apdu.\mbox{\hyperlink{unionu___a_p_d_u_abe564f763a61d62cb4de9b5cff4b2530}{st}}.lc++;}
+\DoxyCodeLine{00450\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(ptr,\ pw,\ \mbox{\hyperlink{ykyh_8h_a00e800150afe4404120c2090461fdf1a}{YKYH\_PW\_LEN}});}
+\DoxyCodeLine{00451\ \ \ ptr\ +=\ \mbox{\hyperlink{ykyh_8h_a00e800150afe4404120c2090461fdf1a}{YKYH\_PW\_LEN}};}
+\DoxyCodeLine{00452\ \ \ apdu.\mbox{\hyperlink{unionu___a_p_d_u_abe564f763a61d62cb4de9b5cff4b2530}{st}}.lc\ +=\ \mbox{\hyperlink{ykyh_8h_a00e800150afe4404120c2090461fdf1a}{YKYH\_PW\_LEN}};}
+\DoxyCodeLine{00453\ }
+\DoxyCodeLine{00454\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}}\ =\ send\_data(\mbox{\hyperlink{structstate}{state}},\ \&apdu,\ data,\ \&recv\_len,\ \&sw);}
+\DoxyCodeLine{00455\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}}\ !=\ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112a40500f2b4bd15d31f1348475e35f2459}{YKYHR\_SUCCESS}})\ \{}
+\DoxyCodeLine{00456\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}};}
+\DoxyCodeLine{00457\ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (sw\ !=\ \mbox{\hyperlink{ykyh_8h_a3328a41be5837af4761365aafb108025}{SW\_SUCCESS}})\ \{}
+\DoxyCodeLine{00458\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structstate}{state}}-\/>verbose)\ \{}
+\DoxyCodeLine{00459\ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Unable\ to\ derive\ keys:\ \%04x\(\backslash\)n"{}},\ sw);}
+\DoxyCodeLine{00460\ \ \ \ \ \}}
+\DoxyCodeLine{00461\ \ \ \ \ \textcolor{keywordflow}{if}\ ((sw\ \&\ 0xfff0)\ ==\ \mbox{\hyperlink{ykyh_8h_a1ab82884b9dfbbb754379f78eeb6ee3f}{SW\_ERR\_AUTHENTICATION\_FAILED}})\ \{}
+\DoxyCodeLine{00462\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (retries\ !=\ NULL)\ \{}
+\DoxyCodeLine{00463\ \ \ \ \ \ \ \ \ *retries\ =\ sw\ \&\ \string~SW\_ERR\_AUTHENTICATION\_FAILED;}
+\DoxyCodeLine{00464\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00465\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112ae58239391b2ac02c8bb353666cdf9ac8}{YKYHR\_WRONG\_PW}};}
+\DoxyCodeLine{00466\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00467\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112acd0e2c78f0a0e431afb2a4ba555f821e}{YKYHR\_ENTRY\_NOT\_FOUND}};}
+\DoxyCodeLine{00468\ \ \ \ \ \}}
+\DoxyCodeLine{00469\ \ \ \}}
+\DoxyCodeLine{00470\ }
+\DoxyCodeLine{00471\ \ \ ptr\ =\ data;}
+\DoxyCodeLine{00472\ }
+\DoxyCodeLine{00473\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(key\_s\_enc,\ ptr,\ \mbox{\hyperlink{ykyh_8h_aa076fd48c09e4acec46eace24ad27a2f}{YKYH\_KEY\_LEN}});}
+\DoxyCodeLine{00474\ \ \ ptr\ +=\ \mbox{\hyperlink{ykyh_8h_aa076fd48c09e4acec46eace24ad27a2f}{YKYH\_KEY\_LEN}};}
+\DoxyCodeLine{00475\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(key\_s\_mac,\ ptr,\ \mbox{\hyperlink{ykyh_8h_aa076fd48c09e4acec46eace24ad27a2f}{YKYH\_KEY\_LEN}});}
+\DoxyCodeLine{00476\ \ \ ptr\ +=\ \mbox{\hyperlink{ykyh_8h_aa076fd48c09e4acec46eace24ad27a2f}{YKYH\_KEY\_LEN}};}
+\DoxyCodeLine{00477\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(key\_s\_rmac,\ ptr,\ \mbox{\hyperlink{ykyh_8h_aa076fd48c09e4acec46eace24ad27a2f}{YKYH\_KEY\_LEN}});}
+\DoxyCodeLine{00478\ \ \ ptr\ +=\ \mbox{\hyperlink{ykyh_8h_aa076fd48c09e4acec46eace24ad27a2f}{YKYH\_KEY\_LEN}};}
+\DoxyCodeLine{00479\ }
+\DoxyCodeLine{00480\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112a40500f2b4bd15d31f1348475e35f2459}{YKYHR\_SUCCESS}};}
+\DoxyCodeLine{00481\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=251pt]{ykyh_8h_af6e95562757fb174ae74843f2ec6304a_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{ykyh_8h_af6e95562757fb174ae74843f2ec6304a_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{ykyh_8h_a6b53f9d9825a88a6a20352c9734e4a4d}\index{ykyh.h@{ykyh.h}!ykyh\_connect@{ykyh\_connect}}
+\index{ykyh\_connect@{ykyh\_connect}!ykyh.h@{ykyh.h}}
+\doxysubsubsection{\texorpdfstring{ykyh\_connect()}{ykyh\_connect()}}
+{\footnotesize\ttfamily \label{ykyh_8h_a6b53f9d9825a88a6a20352c9734e4a4d} 
+\mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112}{ykyh\+\_\+rc}} ykyh\+\_\+connect (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structykyh__state}{ykyh\+\_\+state}} \texorpdfstring{$\ast$}{*}}]{state}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{wanted}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{ykyh_8c_source_l00092}{92}} of file \mbox{\hyperlink{ykyh_8c_source}{ykyh.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00093\ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ active\_protocol;}
+\DoxyCodeLine{00094\ \ \ \textcolor{keywordtype}{char}\ reader\_buf[2048];}
+\DoxyCodeLine{00095\ \ \ \textcolor{keywordtype}{size\_t}\ num\_readers\ =\ \textcolor{keyword}{sizeof}(reader\_buf);}
+\DoxyCodeLine{00096\ \ \ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}};}
+\DoxyCodeLine{00097\ \ \ \textcolor{keywordtype}{char}\ *reader\_ptr;}
+\DoxyCodeLine{00098\ }
+\DoxyCodeLine{00099\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structstate}{state}}\ ==\ NULL)\ \{}
+\DoxyCodeLine{00100\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112a3616b15980deeeb94e24538ede829d84}{YKYHR\_INVALID\_PARAMS}};}
+\DoxyCodeLine{00101\ \ \ \}}
+\DoxyCodeLine{00102\ }
+\DoxyCodeLine{00103\ \ \ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112}{ykyh\_rc}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{ykyh_8c_a9a87b4e80e8f980badba176c4b713e13}{ykyh\_list\_readers}}(\mbox{\hyperlink{structstate}{state}},\ reader\_buf,\ \&num\_readers);}
+\DoxyCodeLine{00104\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ !=\ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112a40500f2b4bd15d31f1348475e35f2459}{YKYHR\_SUCCESS}})\ \{}
+\DoxyCodeLine{00105\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structstate}{state}}-\/>verbose)\ \{}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Unable\ to\ list\_readers:\ \%s"{}},\ \mbox{\hyperlink{ykyh_2error_8c_a4544a3e0741c078e01233bb1ab541805}{ykyh\_strerror}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}));}
+\DoxyCodeLine{00107\ \ \ \ \ \}}
+\DoxyCodeLine{00108\ }
+\DoxyCodeLine{00109\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00110\ \ \ \}}
+\DoxyCodeLine{00111\ }
+\DoxyCodeLine{00112\ \ \ \textcolor{keywordflow}{for}\ (reader\_ptr\ =\ reader\_buf;\ *reader\_ptr\ !=\ \textcolor{charliteral}{'\(\backslash\)0'};}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ reader\_ptr\ +=\ strlen(reader\_ptr)\ +\ 1)\ \{}
+\DoxyCodeLine{00114\ \ \ \ \ \textcolor{keywordflow}{if}\ (wanted)\ \{}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!strstr(reader\_ptr,\ wanted))\ \{}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structstate}{state}}-\/>verbose)\ \{}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}skipping\ reader\ '\%s'\ since\ it\ doesn't\ match\ '\%s'\(\backslash\)n"{}},}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ reader\_ptr,\ wanted);}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00122\ \ \ \ \ \}}
+\DoxyCodeLine{00123\ }
+\DoxyCodeLine{00124\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structstate}{state}}-\/>verbose)\ \{}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}trying\ to\ connect\ to\ reader\ '\%s'\(\backslash\)n"{}},\ reader\_ptr);}
+\DoxyCodeLine{00126\ \ \ \ \ \}}
+\DoxyCodeLine{00127\ }
+\DoxyCodeLine{00128\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}}\ =}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ SCardConnect(\mbox{\hyperlink{structstate}{state}}-\/>\mbox{\hyperlink{structstate_a8d9e24fc2a15a8ea6b841006d9c1ec17}{context}},\ reader\_ptr,\ SCARD\_SHARE\_SHARED,}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ SCARD\_PROTOCOL\_T1,\ \&\mbox{\hyperlink{structstate}{state}}-\/>card,\ (LPDWORD)\ \&active\_protocol);}
+\DoxyCodeLine{00131\ }
+\DoxyCodeLine{00132\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}}\ !=\ SCARD\_S\_SUCCESS)\ \{}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structstate}{state}}-\/>verbose)\ \{}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}SCardConnect\ failed,\ rc=\%08lx\(\backslash\)n"{}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}});}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{00137\ \ \ \ \ \}}
+\DoxyCodeLine{00138\ }
+\DoxyCodeLine{00139\ \ \ \ \ \mbox{\hyperlink{unionu___a_p_d_u}{APDU}}\ apdu;}
+\DoxyCodeLine{00140\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ data[0xff];}
+\DoxyCodeLine{00141\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ recv\_len\ =\ \textcolor{keyword}{sizeof}(data);}
+\DoxyCodeLine{00142\ \ \ \ \ \textcolor{keywordtype}{int}\ sw;}
+\DoxyCodeLine{00143\ \ \ \ \ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112}{ykyh\_rc}}\ res;}
+\DoxyCodeLine{00144\ }
+\DoxyCodeLine{00145\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(apdu.\mbox{\hyperlink{unionu___a_p_d_u_a864cd8b850ed1d88c60064c17b29fec9}{raw}},\ 0,\ \textcolor{keyword}{sizeof}(apdu));}
+\DoxyCodeLine{00146\ \ \ \ \ apdu.\mbox{\hyperlink{unionu___a_p_d_u_abe564f763a61d62cb4de9b5cff4b2530}{st}}.ins\ =\ 0xa4;}
+\DoxyCodeLine{00147\ \ \ \ \ apdu.\mbox{\hyperlink{unionu___a_p_d_u_abe564f763a61d62cb4de9b5cff4b2530}{st}}.p1\ =\ 0x04;}
+\DoxyCodeLine{00148\ \ \ \ \ apdu.\mbox{\hyperlink{unionu___a_p_d_u_abe564f763a61d62cb4de9b5cff4b2530}{st}}.lc\ =\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{ykyh_2internal_8h_ae9c5490e642a06846009f761174e7ca1}{aid}});}
+\DoxyCodeLine{00149\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(apdu.\mbox{\hyperlink{unionu___a_p_d_u_abe564f763a61d62cb4de9b5cff4b2530}{st}}.data,\ \mbox{\hyperlink{ykyh_2internal_8h_ae9c5490e642a06846009f761174e7ca1}{aid}},\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{ykyh_2internal_8h_ae9c5490e642a06846009f761174e7ca1}{aid}}));}
+\DoxyCodeLine{00150\ }
+\DoxyCodeLine{00151\ \ \ \ \ \textcolor{keywordflow}{if}\ ((res\ =\ send\_data(\mbox{\hyperlink{structstate}{state}},\ \&apdu,\ data,\ \&recv\_len,\ \&sw))\ !=}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112a40500f2b4bd15d31f1348475e35f2459}{YKYHR\_SUCCESS}})\ \{}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structstate}{state}}-\/>verbose)\ \{}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Failed\ communicating\ with\ card:\ '\%s'\(\backslash\)n"{}},}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ykyh_2error_8c_a4544a3e0741c078e01233bb1ab541805}{ykyh\_strerror}}(res));}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00157\ }
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{00159\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (sw\ ==\ \mbox{\hyperlink{ykyh_8h_a3328a41be5837af4761365aafb108025}{SW\_SUCCESS}})\ \{}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112a40500f2b4bd15d31f1348475e35f2459}{YKYHR\_SUCCESS}};}
+\DoxyCodeLine{00161\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structstate}{state}}-\/>verbose)\ \{}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Failed\ selecting\ application:\ \%04x\(\backslash\)n"{}},\ sw);}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00165\ \ \ \ \ \}}
+\DoxyCodeLine{00166\ \ \ \}}
+\DoxyCodeLine{00167\ }
+\DoxyCodeLine{00168\ \ \ \textcolor{keywordflow}{if}\ (*reader\_ptr\ ==\ \textcolor{charliteral}{'\(\backslash\)0'})\ \{}
+\DoxyCodeLine{00169\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structstate}{state}}-\/>verbose)\ \{}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}error:\ no\ usable\ reader\ found\(\backslash\)n"{}});}
+\DoxyCodeLine{00171\ \ \ \ \ \}}
+\DoxyCodeLine{00172\ \ \ \ \ SCardReleaseContext(\mbox{\hyperlink{structstate}{state}}-\/>\mbox{\hyperlink{structstate_a8d9e24fc2a15a8ea6b841006d9c1ec17}{context}});}
+\DoxyCodeLine{00173\ \ \ \ \ \mbox{\hyperlink{structstate}{state}}-\/>\mbox{\hyperlink{structstate_a8d9e24fc2a15a8ea6b841006d9c1ec17}{context}}\ =\ SCARD\_E\_INVALID\_HANDLE;}
+\DoxyCodeLine{00174\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112aa66bb77f3c39144ec56d01e741a6d0b5}{YKYHR\_PCSC\_ERROR}};}
+\DoxyCodeLine{00175\ \ \ \}}
+\DoxyCodeLine{00176\ }
+\DoxyCodeLine{00177\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112a3d10dec4a5d83d4227ea94c06efed2a3}{YKYHR\_GENERIC\_ERROR}};}
+\DoxyCodeLine{00178\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=285pt]{ykyh_8h_a6b53f9d9825a88a6a20352c9734e4a4d_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{ykyh_8h_a6b53f9d9825a88a6a20352c9734e4a4d_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{ykyh_8h_acfb1affcb2e434d0cfdb9dd468ddbc8a}\index{ykyh.h@{ykyh.h}!ykyh\_delete@{ykyh\_delete}}
+\index{ykyh\_delete@{ykyh\_delete}!ykyh.h@{ykyh.h}}
+\doxysubsubsection{\texorpdfstring{ykyh\_delete()}{ykyh\_delete()}}
+{\footnotesize\ttfamily \label{ykyh_8h_acfb1affcb2e434d0cfdb9dd468ddbc8a} 
+\mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112}{ykyh\+\_\+rc}} ykyh\+\_\+delete (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structykyh__state}{ykyh\+\_\+state}} \texorpdfstring{$\ast$}{*}}]{state}{, }\item[{char \texorpdfstring{$\ast$}{*}}]{name}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{ykyh_8c_source_l00364}{364}} of file \mbox{\hyperlink{ykyh_8c_source}{ykyh.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00364\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00365\ \ \ \mbox{\hyperlink{unionu___a_p_d_u}{APDU}}\ apdu;}
+\DoxyCodeLine{00366\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *ptr;}
+\DoxyCodeLine{00367\ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ data[64];}
+\DoxyCodeLine{00368\ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ recv\_len\ =\ \textcolor{keyword}{sizeof}(data);}
+\DoxyCodeLine{00369\ \ \ \textcolor{keywordtype}{int}\ sw;}
+\DoxyCodeLine{00370\ \ \ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112}{ykyh\_rc}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}};}
+\DoxyCodeLine{00371\ }
+\DoxyCodeLine{00372\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structstate}{state}}\ ==\ NULL\ ||\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ ==\ NULL\ ||\ strlen(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})\ <\ \mbox{\hyperlink{ykyh_8h_ae8331a6f47276895ad08a1cbf3a6a508}{YKYH\_MIN\_NAME\_LEN}}\ ||}
+\DoxyCodeLine{00373\ \ \ \ \ \ \ strlen(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})\ >\ \mbox{\hyperlink{ykyh_8h_aba3c1d3e48c3662d8e58a87bc564cc82}{YKYH\_MAX\_NAME\_LEN}})\ \{}
+\DoxyCodeLine{00374\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112a3616b15980deeeb94e24538ede829d84}{YKYHR\_INVALID\_PARAMS}};}
+\DoxyCodeLine{00375\ \ \ \}}
+\DoxyCodeLine{00376\ }
+\DoxyCodeLine{00377\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(apdu.\mbox{\hyperlink{unionu___a_p_d_u_a864cd8b850ed1d88c60064c17b29fec9}{raw}},\ 0,\ \textcolor{keyword}{sizeof}(apdu));}
+\DoxyCodeLine{00378\ \ \ apdu.\mbox{\hyperlink{unionu___a_p_d_u_abe564f763a61d62cb4de9b5cff4b2530}{st}}.ins\ =\ \mbox{\hyperlink{ykyh_8h_ae302e62b3add4c602ac23216dcec4d46}{YKYH\_INS\_DELETE}};}
+\DoxyCodeLine{00379\ }
+\DoxyCodeLine{00380\ \ \ ptr\ =\ apdu.\mbox{\hyperlink{unionu___a_p_d_u_abe564f763a61d62cb4de9b5cff4b2530}{st}}.data;}
+\DoxyCodeLine{00381\ }
+\DoxyCodeLine{00382\ \ \ *(ptr++)\ =\ \mbox{\hyperlink{ykyh_8h_a1d9d05d1211e99f0edff27bfa82df0b8}{YKYH\_TAG\_NAME}};}
+\DoxyCodeLine{00383\ \ \ apdu.\mbox{\hyperlink{unionu___a_p_d_u_abe564f763a61d62cb4de9b5cff4b2530}{st}}.lc++;}
+\DoxyCodeLine{00384\ \ \ *(ptr++)\ =\ strlen(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}});}
+\DoxyCodeLine{00385\ \ \ apdu.\mbox{\hyperlink{unionu___a_p_d_u_abe564f763a61d62cb4de9b5cff4b2530}{st}}.lc++;}
+\DoxyCodeLine{00386\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(ptr,\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ strlen(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}));}
+\DoxyCodeLine{00387\ \ \ ptr\ +=\ strlen(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}});}
+\DoxyCodeLine{00388\ \ \ apdu.\mbox{\hyperlink{unionu___a_p_d_u_abe564f763a61d62cb4de9b5cff4b2530}{st}}.lc\ +=\ strlen(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}});}
+\DoxyCodeLine{00389\ }
+\DoxyCodeLine{00390\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}}\ =\ send\_data(\mbox{\hyperlink{structstate}{state}},\ \&apdu,\ data,\ \&recv\_len,\ \&sw);}
+\DoxyCodeLine{00391\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}}\ !=\ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112a40500f2b4bd15d31f1348475e35f2459}{YKYHR\_SUCCESS}})\ \{}
+\DoxyCodeLine{00392\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}};}
+\DoxyCodeLine{00393\ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (sw\ !=\ \mbox{\hyperlink{ykyh_8h_a3328a41be5837af4761365aafb108025}{SW\_SUCCESS}})\ \{}
+\DoxyCodeLine{00394\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structstate}{state}}-\/>verbose)\ \{}
+\DoxyCodeLine{00395\ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Unable\ to\ delete\ key:\ \%04x\(\backslash\)n"{}},\ sw);}
+\DoxyCodeLine{00396\ \ \ \ \ \}}
+\DoxyCodeLine{00397\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112a3d10dec4a5d83d4227ea94c06efed2a3}{YKYHR\_GENERIC\_ERROR}};}
+\DoxyCodeLine{00398\ \ \ \}}
+\DoxyCodeLine{00399\ }
+\DoxyCodeLine{00400\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112a40500f2b4bd15d31f1348475e35f2459}{YKYHR\_SUCCESS}};}
+\DoxyCodeLine{00401\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=238pt]{ykyh_8h_acfb1affcb2e434d0cfdb9dd468ddbc8a_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{ykyh_8h_af8e0c6bd9abb1282586aa040b8c03d45}\index{ykyh.h@{ykyh.h}!ykyh\_disconnect@{ykyh\_disconnect}}
+\index{ykyh\_disconnect@{ykyh\_disconnect}!ykyh.h@{ykyh.h}}
+\doxysubsubsection{\texorpdfstring{ykyh\_disconnect()}{ykyh\_disconnect()}}
+{\footnotesize\ttfamily \label{ykyh_8h_af8e0c6bd9abb1282586aa040b8c03d45} 
+\mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112}{ykyh\+\_\+rc}} ykyh\+\_\+disconnect (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structykyh__state}{ykyh\+\_\+state}} \texorpdfstring{$\ast$}{*}}]{state}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{ykyh_8c_source_l00074}{74}} of file \mbox{\hyperlink{ykyh_8c_source}{ykyh.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00075\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structstate}{state}}\ ==\ NULL)\ \{}
+\DoxyCodeLine{00076\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112a3616b15980deeeb94e24538ede829d84}{YKYHR\_INVALID\_PARAMS}};}
+\DoxyCodeLine{00077\ \ \ \}}
+\DoxyCodeLine{00078\ }
+\DoxyCodeLine{00079\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structstate}{state}}-\/>card)\ \{}
+\DoxyCodeLine{00080\ \ \ \ \ SCardDisconnect(\mbox{\hyperlink{structstate}{state}}-\/>card,\ SCARD\_RESET\_CARD);}
+\DoxyCodeLine{00081\ \ \ \ \ \mbox{\hyperlink{structstate}{state}}-\/>card\ =\ 0;}
+\DoxyCodeLine{00082\ \ \ \}}
+\DoxyCodeLine{00083\ }
+\DoxyCodeLine{00084\ \ \ \textcolor{keywordflow}{if}\ (SCardIsValidContext(\mbox{\hyperlink{structstate}{state}}-\/>\mbox{\hyperlink{structstate_a8d9e24fc2a15a8ea6b841006d9c1ec17}{context}})\ ==\ SCARD\_S\_SUCCESS)\ \{}
+\DoxyCodeLine{00085\ \ \ \ \ SCardReleaseContext(\mbox{\hyperlink{structstate}{state}}-\/>\mbox{\hyperlink{structstate_a8d9e24fc2a15a8ea6b841006d9c1ec17}{context}});}
+\DoxyCodeLine{00086\ \ \ \ \ \mbox{\hyperlink{structstate}{state}}-\/>\mbox{\hyperlink{structstate_a8d9e24fc2a15a8ea6b841006d9c1ec17}{context}}\ =\ SCARD\_E\_INVALID\_HANDLE;}
+\DoxyCodeLine{00087\ \ \ \}}
+\DoxyCodeLine{00088\ }
+\DoxyCodeLine{00089\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112a40500f2b4bd15d31f1348475e35f2459}{YKYHR\_SUCCESS}};}
+\DoxyCodeLine{00090\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=342pt]{ykyh_8h_af8e0c6bd9abb1282586aa040b8c03d45_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{ykyh_8h_a6833a1e74b0e7494cc904dc94cf276c0}\index{ykyh.h@{ykyh.h}!ykyh\_done@{ykyh\_done}}
+\index{ykyh\_done@{ykyh\_done}!ykyh.h@{ykyh.h}}
+\doxysubsubsection{\texorpdfstring{ykyh\_done()}{ykyh\_done()}}
+{\footnotesize\ttfamily \label{ykyh_8h_a6833a1e74b0e7494cc904dc94cf276c0} 
+\mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112}{ykyh\+\_\+rc}} ykyh\+\_\+done (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structykyh__state}{ykyh\+\_\+state}} \texorpdfstring{$\ast$}{*}}]{state}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{ykyh_8c_source_l00064}{64}} of file \mbox{\hyperlink{ykyh_8c_source}{ykyh.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00065\ \ \ \mbox{\hyperlink{ykyh_8c_af8e0c6bd9abb1282586aa040b8c03d45}{ykyh\_disconnect}}(\mbox{\hyperlink{structstate}{state}});}
+\DoxyCodeLine{00066\ }
+\DoxyCodeLine{00067\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structstate}{state}}\ !=\ NULL)\ \{}
+\DoxyCodeLine{00068\ \ \ \ \ free(\mbox{\hyperlink{structstate}{state}});}
+\DoxyCodeLine{00069\ \ \ \}}
+\DoxyCodeLine{00070\ }
+\DoxyCodeLine{00071\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112a40500f2b4bd15d31f1348475e35f2459}{YKYHR\_SUCCESS}};}
+\DoxyCodeLine{00072\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=269pt]{ykyh_8h_a6833a1e74b0e7494cc904dc94cf276c0_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=216pt]{ykyh_8h_a6833a1e74b0e7494cc904dc94cf276c0_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{ykyh_8h_a55f6b7523751ffb9d6b54f9088f4d90c}\index{ykyh.h@{ykyh.h}!ykyh\_get\_challenge@{ykyh\_get\_challenge}}
+\index{ykyh\_get\_challenge@{ykyh\_get\_challenge}!ykyh.h@{ykyh.h}}
+\doxysubsubsection{\texorpdfstring{ykyh\_get\_challenge()}{ykyh\_get\_challenge()}}
+{\footnotesize\ttfamily \label{ykyh_8h_a55f6b7523751ffb9d6b54f9088f4d90c} 
+\mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112}{ykyh\+\_\+rc}} ykyh\+\_\+get\+\_\+challenge (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structykyh__state}{ykyh\+\_\+state}} \texorpdfstring{$\ast$}{*}}]{state}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{ykyh_8c_source_l00566}{566}} of file \mbox{\hyperlink{ykyh_8c_source}{ykyh.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00566\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00567\ }
+\DoxyCodeLine{00568\ \ \ (void)\ \mbox{\hyperlink{structstate}{state}};}
+\DoxyCodeLine{00569\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112a40500f2b4bd15d31f1348475e35f2459}{YKYHR\_SUCCESS}};}
+\DoxyCodeLine{00570\ \}}
+
+\end{DoxyCode}
+\Hypertarget{ykyh_8h_a14f49c7ef8ee9ac66936346e7f21d6ce}\index{ykyh.h@{ykyh.h}!ykyh\_get\_version@{ykyh\_get\_version}}
+\index{ykyh\_get\_version@{ykyh\_get\_version}!ykyh.h@{ykyh.h}}
+\doxysubsubsection{\texorpdfstring{ykyh\_get\_version()}{ykyh\_get\_version()}}
+{\footnotesize\ttfamily \label{ykyh_8h_a14f49c7ef8ee9ac66936346e7f21d6ce} 
+\mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112}{ykyh\+\_\+rc}} ykyh\+\_\+get\+\_\+version (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structykyh__state}{ykyh\+\_\+state}} \texorpdfstring{$\ast$}{*}}]{state}{, }\item[{char \texorpdfstring{$\ast$}{*}}]{version}{, }\item[{size\+\_\+t}]{len}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{ykyh_8c_source_l00260}{260}} of file \mbox{\hyperlink{ykyh_8c_source}{ykyh.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00260\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00261\ \ \ \mbox{\hyperlink{unionu___a_p_d_u}{APDU}}\ apdu;}
+\DoxyCodeLine{00262\ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ data[261];}
+\DoxyCodeLine{00263\ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ recv\_len\ =\ \textcolor{keyword}{sizeof}(data);}
+\DoxyCodeLine{00264\ \ \ \textcolor{keywordtype}{int}\ sw;}
+\DoxyCodeLine{00265\ \ \ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112}{ykyh\_rc}}\ res;}
+\DoxyCodeLine{00266\ }
+\DoxyCodeLine{00267\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structstate}{state}}\ ==\ NULL\ ||\ version\ ==\ NULL)\ \{}
+\DoxyCodeLine{00268\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112a3616b15980deeeb94e24538ede829d84}{YKYHR\_INVALID\_PARAMS}};}
+\DoxyCodeLine{00269\ \ \ \}}
+\DoxyCodeLine{00270\ }
+\DoxyCodeLine{00271\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(apdu.\mbox{\hyperlink{unionu___a_p_d_u_a864cd8b850ed1d88c60064c17b29fec9}{raw}},\ 0,\ \textcolor{keyword}{sizeof}(apdu));}
+\DoxyCodeLine{00272\ \ \ apdu.\mbox{\hyperlink{unionu___a_p_d_u_abe564f763a61d62cb4de9b5cff4b2530}{st}}.ins\ =\ \mbox{\hyperlink{ykyh_8h_a824ea775a85955b88cda9593b54b32a9}{YKYH\_INS\_GET\_VERSION}};}
+\DoxyCodeLine{00273\ \ \ \textcolor{keywordflow}{if}\ ((res\ =\ send\_data(\mbox{\hyperlink{structstate}{state}},\ \&apdu,\ data,\ \&recv\_len,\ \&sw))\ !=\ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112a40500f2b4bd15d31f1348475e35f2459}{YKYHR\_SUCCESS}})\ \{}
+\DoxyCodeLine{00274\ \ \ \ \ \textcolor{keywordflow}{return}\ res;}
+\DoxyCodeLine{00275\ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (sw\ ==\ \mbox{\hyperlink{ykyh_8h_a3328a41be5837af4761365aafb108025}{SW\_SUCCESS}})\ \{}
+\DoxyCodeLine{00276\ \ \ \ \ \textcolor{keywordtype}{int}\ result\ =\ snprintf(version,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ \textcolor{stringliteral}{"{}\%d.\%d.\%d"{}},\ data[0],\ data[1],\ data[2]);}
+\DoxyCodeLine{00277\ \ \ \ \ \textcolor{keywordflow}{if}\ (result\ <\ 0)\ \{}
+\DoxyCodeLine{00278\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structstate}{state}}-\/>verbose)\ \{}
+\DoxyCodeLine{00279\ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Version\ buffer\ too\ small\(\backslash\)n"{}});}
+\DoxyCodeLine{00280\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00281\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112a3d10dec4a5d83d4227ea94c06efed2a3}{YKYHR\_GENERIC\_ERROR}};}
+\DoxyCodeLine{00282\ \ \ \ \ \}}
+\DoxyCodeLine{00283\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112a40500f2b4bd15d31f1348475e35f2459}{YKYHR\_SUCCESS}};}
+\DoxyCodeLine{00284\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00285\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112a3d10dec4a5d83d4227ea94c06efed2a3}{YKYHR\_GENERIC\_ERROR}};}
+\DoxyCodeLine{00286\ \ \ \}}
+\DoxyCodeLine{00287\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=260pt]{ykyh_8h_a14f49c7ef8ee9ac66936346e7f21d6ce_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=348pt]{ykyh_8h_a14f49c7ef8ee9ac66936346e7f21d6ce_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{ykyh_8h_aaf8c4d6e022e4363c006d9066991776b}\index{ykyh.h@{ykyh.h}!ykyh\_init@{ykyh\_init}}
+\index{ykyh\_init@{ykyh\_init}!ykyh.h@{ykyh.h}}
+\doxysubsubsection{\texorpdfstring{ykyh\_init()}{ykyh\_init()}}
+{\footnotesize\ttfamily \label{ykyh_8h_aaf8c4d6e022e4363c006d9066991776b} 
+\mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112}{ykyh\+\_\+rc}} ykyh\+\_\+init (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structykyh__state}{ykyh\+\_\+state}} \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{state}{, }\item[{int}]{verbose}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{ykyh_8c_source_l00035}{35}} of file \mbox{\hyperlink{ykyh_8c_source}{ykyh.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00036\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structstate}{state}}\ ==\ NULL)\ \{}
+\DoxyCodeLine{00037\ \ \ \ \ \textcolor{keywordflow}{if}\ (verbose)\ \{}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Unable\ to\ initialize:\ \%s"{}},}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ykyh_2error_8c_a4544a3e0741c078e01233bb1ab541805}{ykyh\_strerror}}(\mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112a3616b15980deeeb94e24538ede829d84}{YKYHR\_INVALID\_PARAMS}}));}
+\DoxyCodeLine{00040\ \ \ \ \ \}}
+\DoxyCodeLine{00041\ }
+\DoxyCodeLine{00042\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112a3616b15980deeeb94e24538ede829d84}{YKYHR\_INVALID\_PARAMS}};}
+\DoxyCodeLine{00043\ \ \ \}}
+\DoxyCodeLine{00044\ }
+\DoxyCodeLine{00045\ \ \ \mbox{\hyperlink{structykyh__state}{ykyh\_state}}\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ =\ malloc(\textcolor{keyword}{sizeof}(\mbox{\hyperlink{structykyh__state}{ykyh\_state}}));}
+\DoxyCodeLine{00046\ }
+\DoxyCodeLine{00047\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ ==\ NULL)\ \{}
+\DoxyCodeLine{00048\ \ \ \ \ \textcolor{keywordflow}{if}\ (verbose)\ \{}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Unable\ to\ initialize:\ \%s"{}},}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ykyh_2error_8c_a4544a3e0741c078e01233bb1ab541805}{ykyh\_strerror}}(\mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112a734cac714da70c8a7853708acff0970f}{YKYHR\_MEMORY\_ERROR}}));}
+\DoxyCodeLine{00051\ \ \ \ \ \}}
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112a734cac714da70c8a7853708acff0970f}{YKYHR\_MEMORY\_ERROR}};}
+\DoxyCodeLine{00054\ \ \ \}}
+\DoxyCodeLine{00055\ }
+\DoxyCodeLine{00056\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ 0,\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{structykyh__state}{ykyh\_state}}));}
+\DoxyCodeLine{00057\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}-\/>verbose\ =\ \mbox{\hyperlink{programs_2clio_2main_8cpp_ab3f078684998b83967d507d0f453f454}{verbose}};}
+\DoxyCodeLine{00058\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}-\/>context\ =\ SCARD\_E\_INVALID\_HANDLE;}
+\DoxyCodeLine{00059\ \ \ *\mbox{\hyperlink{structstate}{state}}\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{00060\ }
+\DoxyCodeLine{00061\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112a40500f2b4bd15d31f1348475e35f2459}{YKYHR\_SUCCESS}};}
+\DoxyCodeLine{00062\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=244pt]{ykyh_8h_aaf8c4d6e022e4363c006d9066991776b_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=208pt]{ykyh_8h_aaf8c4d6e022e4363c006d9066991776b_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{ykyh_8h_a869199318f736641bf0779c5d2e90866}\index{ykyh.h@{ykyh.h}!ykyh\_list\_keys@{ykyh\_list\_keys}}
+\index{ykyh\_list\_keys@{ykyh\_list\_keys}!ykyh.h@{ykyh.h}}
+\doxysubsubsection{\texorpdfstring{ykyh\_list\_keys()}{ykyh\_list\_keys()}}
+{\footnotesize\ttfamily \label{ykyh_8h_a869199318f736641bf0779c5d2e90866} 
+\mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112}{ykyh\+\_\+rc}} ykyh\+\_\+list\+\_\+keys (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structykyh__state}{ykyh\+\_\+state}} \texorpdfstring{$\ast$}{*}}]{state}{, }\item[{\mbox{\hyperlink{structykyh__list__entry}{ykyh\+\_\+list\+\_\+entry}} \texorpdfstring{$\ast$}{*}}]{list}{, }\item[{size\+\_\+t \texorpdfstring{$\ast$}{*}}]{list\+\_\+items}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{ykyh_8c_source_l00510}{510}} of file \mbox{\hyperlink{ykyh_8c_source}{ykyh.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00511\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00512\ }
+\DoxyCodeLine{00513\ \ \ \mbox{\hyperlink{unionu___a_p_d_u}{APDU}}\ apdu;}
+\DoxyCodeLine{00514\ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ data[1024];}
+\DoxyCodeLine{00515\ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ recv\_len\ =\ \textcolor{keyword}{sizeof}(data);}
+\DoxyCodeLine{00516\ \ \ \textcolor{keywordtype}{int}\ sw;}
+\DoxyCodeLine{00517\ \ \ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112}{ykyh\_rc}}\ res;}
+\DoxyCodeLine{00518\ }
+\DoxyCodeLine{00519\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structstate}{state}}\ ==\ NULL\ ||\ list\_items\ ==\ NULL)\ \{}
+\DoxyCodeLine{00520\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112a3616b15980deeeb94e24538ede829d84}{YKYHR\_INVALID\_PARAMS}};}
+\DoxyCodeLine{00521\ \ \ \}}
+\DoxyCodeLine{00522\ }
+\DoxyCodeLine{00523\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(apdu.\mbox{\hyperlink{unionu___a_p_d_u_a864cd8b850ed1d88c60064c17b29fec9}{raw}},\ 0,\ \textcolor{keyword}{sizeof}(apdu));}
+\DoxyCodeLine{00524\ \ \ apdu.\mbox{\hyperlink{unionu___a_p_d_u_abe564f763a61d62cb4de9b5cff4b2530}{st}}.ins\ =\ \mbox{\hyperlink{ykyh_8h_a7c53db94c23f5e592e8517c0fcd9f18e}{YKYH\_INS\_LIST}};}
+\DoxyCodeLine{00525\ }
+\DoxyCodeLine{00526\ \ \ res\ =\ send\_data(\mbox{\hyperlink{structstate}{state}},\ \&apdu,\ data,\ \&recv\_len,\ \&sw);}
+\DoxyCodeLine{00527\ \ \ \textcolor{keywordflow}{if}\ (res\ !=\ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112a40500f2b4bd15d31f1348475e35f2459}{YKYHR\_SUCCESS}}\ ||\ sw\ !=\ \mbox{\hyperlink{ykyh_8h_a3328a41be5837af4761365aafb108025}{SW\_SUCCESS}})\ \{}
+\DoxyCodeLine{00528\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structstate}{state}}-\/>verbose)\ \{}
+\DoxyCodeLine{00529\ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Unable\ to\ list\ keys:\ \%s\(\backslash\)n"{}},\ \mbox{\hyperlink{ykyh_2error_8c_a4544a3e0741c078e01233bb1ab541805}{ykyh\_strerror}}(res));}
+\DoxyCodeLine{00530\ \ \ \ \ \}}
+\DoxyCodeLine{00531\ \ \ \ \ \textcolor{keywordflow}{return}\ res;}
+\DoxyCodeLine{00532\ \ \ \}}
+\DoxyCodeLine{00533\ }
+\DoxyCodeLine{00534\ \ \ \textcolor{keywordflow}{if}\ (list\ ==\ NULL)\ \{}
+\DoxyCodeLine{00535\ \ \ \ \ *list\_items\ =\ data[0];}
+\DoxyCodeLine{00536\ }
+\DoxyCodeLine{00537\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112a40500f2b4bd15d31f1348475e35f2459}{YKYHR\_SUCCESS}};}
+\DoxyCodeLine{00538\ \ \ \}}
+\DoxyCodeLine{00539\ }
+\DoxyCodeLine{00540\ \ \ \textcolor{keywordflow}{if}\ (*list\_items\ <\ data[0])\ \{}
+\DoxyCodeLine{00541\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112a3d10dec4a5d83d4227ea94c06efed2a3}{YKYHR\_GENERIC\_ERROR}};\ \textcolor{comment}{//\ TODO(adma):\ not\ enough\ space,\ better\ error?}}
+\DoxyCodeLine{00542\ \ \ \}}
+\DoxyCodeLine{00543\ \ \ *list\_items\ =\ data[0];}
+\DoxyCodeLine{00544\ }
+\DoxyCodeLine{00545\ \ \ \textcolor{keywordtype}{size\_t}\ i\ =\ 1;}
+\DoxyCodeLine{00546\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ =\ 0;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ <\ *list\_items;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}++)\ \{}
+\DoxyCodeLine{00547\ \ \ \ \ \textcolor{keywordflow}{if}\ (data[i++]\ ==\ \mbox{\hyperlink{ykyh_8h_aea4750a6749dca19d059e06aaf75e74a}{YKYH\_TAG\_NAME\_LIST}})\ \{}
+\DoxyCodeLine{00548\ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ =\ data[i++];}
+\DoxyCodeLine{00549\ \ \ \ \ \ \ list[\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}].algo\ =\ data[i++];}
+\DoxyCodeLine{00550\ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(list[\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}].\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ 0,\ \textcolor{keyword}{sizeof}(list[\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}].\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}));}
+\DoxyCodeLine{00551\ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(list[\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}].\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ data\ +\ i,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ -\/\ 2);}
+\DoxyCodeLine{00552\ \ \ \ \ \ \ i\ +=\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ -\/\ 2;}
+\DoxyCodeLine{00553\ \ \ \ \ \ \ list[\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}].ctr\ =\ data[i++];}
+\DoxyCodeLine{00554\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00555\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112a3d10dec4a5d83d4227ea94c06efed2a3}{YKYHR\_GENERIC\_ERROR}};}
+\DoxyCodeLine{00556\ \ \ \ \ \}}
+\DoxyCodeLine{00557\ \ \ \}}
+\DoxyCodeLine{00558\ }
+\DoxyCodeLine{00559\ \ \ \textcolor{keywordflow}{if}\ (i\ !=\ recv\_len\ -\/\ 2)\ \{}
+\DoxyCodeLine{00560\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112a3d10dec4a5d83d4227ea94c06efed2a3}{YKYHR\_GENERIC\_ERROR}};}
+\DoxyCodeLine{00561\ \ \ \}}
+\DoxyCodeLine{00562\ }
+\DoxyCodeLine{00563\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112a40500f2b4bd15d31f1348475e35f2459}{YKYHR\_SUCCESS}};}
+\DoxyCodeLine{00564\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=270pt]{ykyh_8h_a869199318f736641bf0779c5d2e90866_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{ykyh_8h_a9a87b4e80e8f980badba176c4b713e13}\index{ykyh.h@{ykyh.h}!ykyh\_list\_readers@{ykyh\_list\_readers}}
+\index{ykyh\_list\_readers@{ykyh\_list\_readers}!ykyh.h@{ykyh.h}}
+\doxysubsubsection{\texorpdfstring{ykyh\_list\_readers()}{ykyh\_list\_readers()}}
+{\footnotesize\ttfamily \label{ykyh_8h_a9a87b4e80e8f980badba176c4b713e13} 
+\mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112}{ykyh\+\_\+rc}} ykyh\+\_\+list\+\_\+readers (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structykyh__state}{ykyh\+\_\+state}} \texorpdfstring{$\ast$}{*}}]{state}{, }\item[{char \texorpdfstring{$\ast$}{*}}]{readers}{, }\item[{size\+\_\+t \texorpdfstring{$\ast$}{*}}]{len}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{ykyh_8c_source_l00180}{180}} of file \mbox{\hyperlink{ykyh_8c_source}{ykyh.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00181\ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ num\_readers\ =\ 0;}
+\DoxyCodeLine{00182\ \ \ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}};}
+\DoxyCodeLine{00183\ }
+\DoxyCodeLine{00184\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structstate}{state}}\ ==\ NULL\ ||\ readers\ ==\ NULL)\ \{}
+\DoxyCodeLine{00185\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112a3616b15980deeeb94e24538ede829d84}{YKYHR\_INVALID\_PARAMS}};}
+\DoxyCodeLine{00186\ \ \ \}}
+\DoxyCodeLine{00187\ }
+\DoxyCodeLine{00188\ \ \ \textcolor{keywordflow}{if}\ (SCardIsValidContext(\mbox{\hyperlink{structstate}{state}}-\/>\mbox{\hyperlink{structstate_a8d9e24fc2a15a8ea6b841006d9c1ec17}{context}})\ !=\ SCARD\_S\_SUCCESS)\ \{}
+\DoxyCodeLine{00189\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}}\ =\ SCardEstablishContext(SCARD\_SCOPE\_SYSTEM,\ NULL,\ NULL,\ \&\mbox{\hyperlink{structstate}{state}}-\/>\mbox{\hyperlink{structstate_a8d9e24fc2a15a8ea6b841006d9c1ec17}{context}});}
+\DoxyCodeLine{00190\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}}\ !=\ SCARD\_S\_SUCCESS)\ \{}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structstate}{state}}-\/>verbose)\ \{}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}error:\ SCardEstablishContext\ failed,\ rc=\%08lx\(\backslash\)n"{}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}});}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112aa66bb77f3c39144ec56d01e741a6d0b5}{YKYHR\_PCSC\_ERROR}};}
+\DoxyCodeLine{00195\ \ \ \ \ \}}
+\DoxyCodeLine{00196\ \ \ \}}
+\DoxyCodeLine{00197\ }
+\DoxyCodeLine{00198\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}}\ =\ SCardListReaders(\mbox{\hyperlink{structstate}{state}}-\/>\mbox{\hyperlink{structstate_a8d9e24fc2a15a8ea6b841006d9c1ec17}{context}},\ NULL,\ NULL,\ (LPDWORD)\ \&num\_readers);}
+\DoxyCodeLine{00199\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}}\ !=\ SCARD\_S\_SUCCESS)\ \{}
+\DoxyCodeLine{00200\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structstate}{state}}-\/>verbose)\ \{}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}error:\ SCardListReaders\ failed,\ rc=\%08lx\(\backslash\)n"{}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}});}
+\DoxyCodeLine{00202\ \ \ \ \ \}}
+\DoxyCodeLine{00203\ \ \ \ \ SCardReleaseContext(\mbox{\hyperlink{structstate}{state}}-\/>\mbox{\hyperlink{structstate_a8d9e24fc2a15a8ea6b841006d9c1ec17}{context}});}
+\DoxyCodeLine{00204\ \ \ \ \ \mbox{\hyperlink{structstate}{state}}-\/>\mbox{\hyperlink{structstate_a8d9e24fc2a15a8ea6b841006d9c1ec17}{context}}\ =\ SCARD\_E\_INVALID\_HANDLE;}
+\DoxyCodeLine{00205\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112aa66bb77f3c39144ec56d01e741a6d0b5}{YKYHR\_PCSC\_ERROR}};}
+\DoxyCodeLine{00206\ \ \ \}}
+\DoxyCodeLine{00207\ }
+\DoxyCodeLine{00208\ \ \ \textcolor{keywordflow}{if}\ (num\_readers\ >\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})\ \{}
+\DoxyCodeLine{00209\ \ \ \ \ num\_readers\ =\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}};}
+\DoxyCodeLine{00210\ \ \ \}}
+\DoxyCodeLine{00211\ }
+\DoxyCodeLine{00212\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}}\ =\ SCardListReaders(\mbox{\hyperlink{structstate}{state}}-\/>\mbox{\hyperlink{structstate_a8d9e24fc2a15a8ea6b841006d9c1ec17}{context}},\ NULL,\ readers,\ (LPDWORD)\ \&num\_readers);}
+\DoxyCodeLine{00213\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}}\ !=\ SCARD\_S\_SUCCESS)\ \{}
+\DoxyCodeLine{00214\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structstate}{state}}-\/>verbose)\ \{}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}error:\ SCardListReaders\ failed,\ rc=\%08lx\(\backslash\)n"{}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}});}
+\DoxyCodeLine{00216\ \ \ \ \ \}}
+\DoxyCodeLine{00217\ \ \ \ \ SCardReleaseContext(\mbox{\hyperlink{structstate}{state}}-\/>\mbox{\hyperlink{structstate_a8d9e24fc2a15a8ea6b841006d9c1ec17}{context}});}
+\DoxyCodeLine{00218\ \ \ \ \ \mbox{\hyperlink{structstate}{state}}-\/>\mbox{\hyperlink{structstate_a8d9e24fc2a15a8ea6b841006d9c1ec17}{context}}\ =\ SCARD\_E\_INVALID\_HANDLE;}
+\DoxyCodeLine{00219\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112aa66bb77f3c39144ec56d01e741a6d0b5}{YKYHR\_PCSC\_ERROR}};}
+\DoxyCodeLine{00220\ \ \ \}}
+\DoxyCodeLine{00221\ }
+\DoxyCodeLine{00222\ \ \ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ =\ num\_readers;}
+\DoxyCodeLine{00223\ }
+\DoxyCodeLine{00224\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112a40500f2b4bd15d31f1348475e35f2459}{YKYHR\_SUCCESS}};}
+\DoxyCodeLine{00225\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{ykyh_8h_a9a87b4e80e8f980badba176c4b713e13_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{ykyh_8h_a0b123e6c68508162de189bcac06a3954}\index{ykyh.h@{ykyh.h}!ykyh\_put@{ykyh\_put}}
+\index{ykyh\_put@{ykyh\_put}!ykyh.h@{ykyh.h}}
+\doxysubsubsection{\texorpdfstring{ykyh\_put()}{ykyh\_put()}}
+{\footnotesize\ttfamily \label{ykyh_8h_a0b123e6c68508162de189bcac06a3954} 
+\mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112}{ykyh\+\_\+rc}} ykyh\+\_\+put (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structykyh__state}{ykyh\+\_\+state}} \texorpdfstring{$\ast$}{*}}]{state}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{name}{, }\item[{const \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{key\+\_\+enc}{, }\item[{size\+\_\+t}]{key\+\_\+enc\+\_\+len}{, }\item[{const \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{key\+\_\+mac}{, }\item[{size\+\_\+t}]{key\+\_\+mac\+\_\+len}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{pw}{, }\item[{const \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}}}]{touch\+\_\+policy}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{ykyh_8c_source_l00289}{289}} of file \mbox{\hyperlink{ykyh_8c_source}{ykyh.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00291\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00292\ \ \ \mbox{\hyperlink{unionu___a_p_d_u}{APDU}}\ apdu;}
+\DoxyCodeLine{00293\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *ptr\ =\ apdu.\mbox{\hyperlink{unionu___a_p_d_u_abe564f763a61d62cb4de9b5cff4b2530}{st}}.data;}
+\DoxyCodeLine{00294\ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ data[261];}
+\DoxyCodeLine{00295\ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ recv\_len\ =\ \textcolor{keyword}{sizeof}(data);}
+\DoxyCodeLine{00296\ \ \ \textcolor{keywordtype}{int}\ sw;}
+\DoxyCodeLine{00297\ }
+\DoxyCodeLine{00298\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structstate}{state}}\ ==\ NULL\ ||\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ ==\ NULL\ ||\ strlen(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})\ <\ \mbox{\hyperlink{ykyh_8h_ae8331a6f47276895ad08a1cbf3a6a508}{YKYH\_MIN\_NAME\_LEN}}\ ||}
+\DoxyCodeLine{00299\ \ \ \ \ \ \ strlen(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})\ >\ \mbox{\hyperlink{ykyh_8h_aba3c1d3e48c3662d8e58a87bc564cc82}{YKYH\_MAX\_NAME\_LEN}}\ ||\ key\_enc\ ==\ NULL\ ||}
+\DoxyCodeLine{00300\ \ \ \ \ \ \ key\_enc\_len\ !=\ \mbox{\hyperlink{ykyh_8h_aa076fd48c09e4acec46eace24ad27a2f}{YKYH\_KEY\_LEN}}\ ||\ key\_mac\ ==\ NULL\ ||}
+\DoxyCodeLine{00301\ \ \ \ \ \ \ key\_mac\_len\ !=\ \mbox{\hyperlink{ykyh_8h_aa076fd48c09e4acec46eace24ad27a2f}{YKYH\_KEY\_LEN}}\ ||\ pw\ ==\ NULL\ ||\ strlen(pw)\ !=\ \mbox{\hyperlink{ykyh_8h_aa076fd48c09e4acec46eace24ad27a2f}{YKYH\_KEY\_LEN}})\ \{}
+\DoxyCodeLine{00302\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112a3616b15980deeeb94e24538ede829d84}{YKYHR\_INVALID\_PARAMS}};}
+\DoxyCodeLine{00303\ \ \ \}}
+\DoxyCodeLine{00304\ }
+\DoxyCodeLine{00305\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(apdu.\mbox{\hyperlink{unionu___a_p_d_u_a864cd8b850ed1d88c60064c17b29fec9}{raw}},\ 0,\ \textcolor{keyword}{sizeof}(apdu));}
+\DoxyCodeLine{00306\ \ \ apdu.\mbox{\hyperlink{unionu___a_p_d_u_abe564f763a61d62cb4de9b5cff4b2530}{st}}.ins\ =\ \mbox{\hyperlink{ykyh_8h_aaf3cacb408d5b3c4b30321a7ab046554}{YKYH\_INS\_PUT}};}
+\DoxyCodeLine{00307\ }
+\DoxyCodeLine{00308\ \ \ *(ptr++)\ =\ \mbox{\hyperlink{ykyh_8h_a1d9d05d1211e99f0edff27bfa82df0b8}{YKYH\_TAG\_NAME}};}
+\DoxyCodeLine{00309\ \ \ apdu.\mbox{\hyperlink{unionu___a_p_d_u_abe564f763a61d62cb4de9b5cff4b2530}{st}}.lc++;}
+\DoxyCodeLine{00310\ \ \ *(ptr++)\ =\ strlen(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}});}
+\DoxyCodeLine{00311\ \ \ apdu.\mbox{\hyperlink{unionu___a_p_d_u_abe564f763a61d62cb4de9b5cff4b2530}{st}}.lc++;}
+\DoxyCodeLine{00312\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(ptr,\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ strlen(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}));}
+\DoxyCodeLine{00313\ \ \ ptr\ +=\ strlen(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}});}
+\DoxyCodeLine{00314\ \ \ apdu.\mbox{\hyperlink{unionu___a_p_d_u_abe564f763a61d62cb4de9b5cff4b2530}{st}}.lc\ +=\ strlen(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}});}
+\DoxyCodeLine{00315\ }
+\DoxyCodeLine{00316\ \ \ *(ptr++)\ =\ \mbox{\hyperlink{ykyh_8h_a44933eda63818d2195aac0e007be30dc}{YKYH\_TAG\_ALGO}};}
+\DoxyCodeLine{00317\ \ \ apdu.\mbox{\hyperlink{unionu___a_p_d_u_abe564f763a61d62cb4de9b5cff4b2530}{st}}.lc++;}
+\DoxyCodeLine{00318\ \ \ *(ptr++)\ =\ 1;}
+\DoxyCodeLine{00319\ \ \ apdu.\mbox{\hyperlink{unionu___a_p_d_u_abe564f763a61d62cb4de9b5cff4b2530}{st}}.lc++;}
+\DoxyCodeLine{00320\ \ \ *(ptr++)\ =\ \mbox{\hyperlink{ykyh_8h_a242db20335c7944a79a64147c2a7ba10}{YKYH\_SCP03\_ALGO}};}
+\DoxyCodeLine{00321\ \ \ apdu.\mbox{\hyperlink{unionu___a_p_d_u_abe564f763a61d62cb4de9b5cff4b2530}{st}}.lc++;}
+\DoxyCodeLine{00322\ }
+\DoxyCodeLine{00323\ \ \ *(ptr++)\ =\ \mbox{\hyperlink{ykyh_8h_a72b145d0e689f9f70791c2332a3f944b}{YKYH\_TAG\_KEY\_ENC}};}
+\DoxyCodeLine{00324\ \ \ apdu.\mbox{\hyperlink{unionu___a_p_d_u_abe564f763a61d62cb4de9b5cff4b2530}{st}}.lc++;}
+\DoxyCodeLine{00325\ \ \ *(ptr++)\ =\ 16;}
+\DoxyCodeLine{00326\ \ \ apdu.\mbox{\hyperlink{unionu___a_p_d_u_abe564f763a61d62cb4de9b5cff4b2530}{st}}.lc++;}
+\DoxyCodeLine{00327\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(ptr,\ key\_enc,\ 16);}
+\DoxyCodeLine{00328\ \ \ ptr\ +=\ 16;}
+\DoxyCodeLine{00329\ \ \ apdu.\mbox{\hyperlink{unionu___a_p_d_u_abe564f763a61d62cb4de9b5cff4b2530}{st}}.lc\ +=\ 16;}
+\DoxyCodeLine{00330\ }
+\DoxyCodeLine{00331\ \ \ *(ptr++)\ =\ \mbox{\hyperlink{ykyh_8h_a88992df18ab407b8afa214102ca29bbb}{YKYH\_TAG\_KEY\_MAC}};}
+\DoxyCodeLine{00332\ \ \ apdu.\mbox{\hyperlink{unionu___a_p_d_u_abe564f763a61d62cb4de9b5cff4b2530}{st}}.lc++;}
+\DoxyCodeLine{00333\ \ \ *(ptr++)\ =\ 16;}
+\DoxyCodeLine{00334\ \ \ apdu.\mbox{\hyperlink{unionu___a_p_d_u_abe564f763a61d62cb4de9b5cff4b2530}{st}}.lc++;}
+\DoxyCodeLine{00335\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(ptr,\ key\_mac,\ 16);}
+\DoxyCodeLine{00336\ \ \ ptr\ +=\ 16;}
+\DoxyCodeLine{00337\ \ \ apdu.\mbox{\hyperlink{unionu___a_p_d_u_abe564f763a61d62cb4de9b5cff4b2530}{st}}.lc\ +=\ 16;}
+\DoxyCodeLine{00338\ }
+\DoxyCodeLine{00339\ \ \ *(ptr++)\ =\ \mbox{\hyperlink{ykyh_8h_a2df9aee745a0c8a8cd5d127c72dea523}{YKYH\_TAG\_PW}};}
+\DoxyCodeLine{00340\ \ \ apdu.\mbox{\hyperlink{unionu___a_p_d_u_abe564f763a61d62cb4de9b5cff4b2530}{st}}.lc++;}
+\DoxyCodeLine{00341\ \ \ *(ptr++)\ =\ \mbox{\hyperlink{ykyh_8h_a00e800150afe4404120c2090461fdf1a}{YKYH\_PW\_LEN}};}
+\DoxyCodeLine{00342\ \ \ apdu.\mbox{\hyperlink{unionu___a_p_d_u_abe564f763a61d62cb4de9b5cff4b2530}{st}}.lc++;}
+\DoxyCodeLine{00343\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(ptr,\ pw,\ \mbox{\hyperlink{ykyh_8h_a00e800150afe4404120c2090461fdf1a}{YKYH\_PW\_LEN}});}
+\DoxyCodeLine{00344\ \ \ ptr\ +=\ \mbox{\hyperlink{ykyh_8h_a00e800150afe4404120c2090461fdf1a}{YKYH\_PW\_LEN}};}
+\DoxyCodeLine{00345\ \ \ apdu.\mbox{\hyperlink{unionu___a_p_d_u_abe564f763a61d62cb4de9b5cff4b2530}{st}}.lc\ +=\ \mbox{\hyperlink{ykyh_8h_a00e800150afe4404120c2090461fdf1a}{YKYH\_PW\_LEN}};}
+\DoxyCodeLine{00346\ }
+\DoxyCodeLine{00347\ \ \ *(ptr++)\ =\ \mbox{\hyperlink{ykyh_8h_a121aacd54595ba241bfd40ed46fc1f04}{YKYH\_TAG\_TOUCH}};}
+\DoxyCodeLine{00348\ \ \ apdu.\mbox{\hyperlink{unionu___a_p_d_u_abe564f763a61d62cb4de9b5cff4b2530}{st}}.lc++;}
+\DoxyCodeLine{00349\ \ \ *(ptr++)\ =\ 1;}
+\DoxyCodeLine{00350\ \ \ apdu.\mbox{\hyperlink{unionu___a_p_d_u_abe564f763a61d62cb4de9b5cff4b2530}{st}}.lc++;}
+\DoxyCodeLine{00351\ \ \ *(ptr++)\ =\ touch\_policy\ ?\ 1\ :\ 0;}
+\DoxyCodeLine{00352\ \ \ apdu.\mbox{\hyperlink{unionu___a_p_d_u_abe564f763a61d62cb4de9b5cff4b2530}{st}}.lc++;}
+\DoxyCodeLine{00353\ }
+\DoxyCodeLine{00354\ \ \ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112}{ykyh\_rc}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}}\ =\ send\_data(\mbox{\hyperlink{structstate}{state}},\ \&apdu,\ data,\ \&recv\_len,\ \&sw);}
+\DoxyCodeLine{00355\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}}\ !=\ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112a40500f2b4bd15d31f1348475e35f2459}{YKYHR\_SUCCESS}})\ \{}
+\DoxyCodeLine{00356\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}};}
+\DoxyCodeLine{00357\ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (sw\ !=\ \mbox{\hyperlink{ykyh_8h_a3328a41be5837af4761365aafb108025}{SW\_SUCCESS}})\ \{}
+\DoxyCodeLine{00358\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112a3d10dec4a5d83d4227ea94c06efed2a3}{YKYHR\_GENERIC\_ERROR}};\ \textcolor{comment}{//\ TODO(adma):\ better\ error}}
+\DoxyCodeLine{00359\ \ \ \}}
+\DoxyCodeLine{00360\ }
+\DoxyCodeLine{00361\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112a40500f2b4bd15d31f1348475e35f2459}{YKYHR\_SUCCESS}};}
+\DoxyCodeLine{00362\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=225pt]{ykyh_8h_a0b123e6c68508162de189bcac06a3954_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{ykyh_8h_a94ec07237ae4d03c38751f3d966194e3}\index{ykyh.h@{ykyh.h}!ykyh\_reset@{ykyh\_reset}}
+\index{ykyh\_reset@{ykyh\_reset}!ykyh.h@{ykyh.h}}
+\doxysubsubsection{\texorpdfstring{ykyh\_reset()}{ykyh\_reset()}}
+{\footnotesize\ttfamily \label{ykyh_8h_a94ec07237ae4d03c38751f3d966194e3} 
+\mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112}{ykyh\+\_\+rc}} ykyh\+\_\+reset (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structykyh__state}{ykyh\+\_\+state}} \texorpdfstring{$\ast$}{*}}]{state}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{ykyh_8c_source_l00483}{483}} of file \mbox{\hyperlink{ykyh_8c_source}{ykyh.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00483\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00484\ }
+\DoxyCodeLine{00485\ \ \ \mbox{\hyperlink{unionu___a_p_d_u}{APDU}}\ apdu;}
+\DoxyCodeLine{00486\ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ data[8];}
+\DoxyCodeLine{00487\ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ recv\_len\ =\ \textcolor{keyword}{sizeof}(data);}
+\DoxyCodeLine{00488\ \ \ \textcolor{keywordtype}{int}\ sw;}
+\DoxyCodeLine{00489\ \ \ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112}{ykyh\_rc}}\ res;}
+\DoxyCodeLine{00490\ }
+\DoxyCodeLine{00491\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structstate}{state}}\ ==\ NULL)\ \{}
+\DoxyCodeLine{00492\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112a3616b15980deeeb94e24538ede829d84}{YKYHR\_INVALID\_PARAMS}};}
+\DoxyCodeLine{00493\ \ \ \}}
+\DoxyCodeLine{00494\ }
+\DoxyCodeLine{00495\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(apdu.\mbox{\hyperlink{unionu___a_p_d_u_a864cd8b850ed1d88c60064c17b29fec9}{raw}},\ 0,\ \textcolor{keyword}{sizeof}(apdu));}
+\DoxyCodeLine{00496\ \ \ apdu.\mbox{\hyperlink{unionu___a_p_d_u_abe564f763a61d62cb4de9b5cff4b2530}{st}}.ins\ =\ \mbox{\hyperlink{ykyh_8h_a42ae5fc5228a23e671d3cb707e493378}{YKYH\_INS\_RESET}};}
+\DoxyCodeLine{00497\ \ \ apdu.\mbox{\hyperlink{unionu___a_p_d_u_abe564f763a61d62cb4de9b5cff4b2530}{st}}.p1\ =\ \mbox{\hyperlink{ykyh_8h_ab4bd17f6a1b0642c393b29e66d858070}{YKYH\_P1\_RESET}};}
+\DoxyCodeLine{00498\ \ \ apdu.\mbox{\hyperlink{unionu___a_p_d_u_abe564f763a61d62cb4de9b5cff4b2530}{st}}.p2\ =\ \mbox{\hyperlink{ykyh_8h_ab135ab62c981c7deb83f5c74af68610d}{YKYH\_P2\_RESET}};}
+\DoxyCodeLine{00499\ }
+\DoxyCodeLine{00500\ \ \ res\ =\ send\_data(\mbox{\hyperlink{structstate}{state}},\ \&apdu,\ data,\ \&recv\_len,\ \&sw);}
+\DoxyCodeLine{00501\ \ \ \textcolor{keywordflow}{if}\ (sw\ !=\ \mbox{\hyperlink{ykyh_8h_a3328a41be5837af4761365aafb108025}{SW\_SUCCESS}})\ \{}
+\DoxyCodeLine{00502\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structstate}{state}}-\/>verbose)\ \{}
+\DoxyCodeLine{00503\ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Unable\ to\ reset:\ \%s\(\backslash\)n"{}},\ \mbox{\hyperlink{ykyh_2error_8c_a4544a3e0741c078e01233bb1ab541805}{ykyh\_strerror}}(res));}
+\DoxyCodeLine{00504\ \ \ \ \ \}}
+\DoxyCodeLine{00505\ \ \ \}}
+\DoxyCodeLine{00506\ }
+\DoxyCodeLine{00507\ \ \ \textcolor{keywordflow}{return}\ res;}
+\DoxyCodeLine{00508\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=253pt]{ykyh_8h_a94ec07237ae4d03c38751f3d966194e3_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=325pt]{ykyh_8h_a94ec07237ae4d03c38751f3d966194e3_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{ykyh_8h_a4544a3e0741c078e01233bb1ab541805}\index{ykyh.h@{ykyh.h}!ykyh\_strerror@{ykyh\_strerror}}
+\index{ykyh\_strerror@{ykyh\_strerror}!ykyh.h@{ykyh.h}}
+\doxysubsubsection{\texorpdfstring{ykyh\_strerror()}{ykyh\_strerror()}}
+{\footnotesize\ttfamily \label{ykyh_8h_a4544a3e0741c078e01233bb1ab541805} 
+const char \texorpdfstring{$\ast$}{*} ykyh\+\_\+strerror (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112}{ykyh\+\_\+rc}}}]{err}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{ykyh_2error_8c_source_l00040}{40}} of file \mbox{\hyperlink{ykyh_2error_8c_source}{error.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00041\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_ac160cc61da581bdcf075273493b9f156}{unknown}}\ =\ \textcolor{stringliteral}{"{}Unknown\ ykyh\ error"{}};}
+\DoxyCodeLine{00042\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}};}
+\DoxyCodeLine{00043\ }
+\DoxyCodeLine{00044\ \ \ \textcolor{keywordflow}{if}\ (-\/err\ <\ 0\ ||\ -\/err\ >=\ (\textcolor{keywordtype}{int})\ (\textcolor{keyword}{sizeof}(errors)\ /\ \textcolor{keyword}{sizeof}(errors[0])))\ \{}
+\DoxyCodeLine{00045\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_ac160cc61da581bdcf075273493b9f156}{unknown}};}
+\DoxyCodeLine{00046\ \ \ \}}
+\DoxyCodeLine{00047\ }
+\DoxyCodeLine{00048\ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ errors[-\/err].\mbox{\hyperlink{structerr__t_a5443ed757b35a94fdb06a5dccaa2c427}{description}};}
+\DoxyCodeLine{00049\ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})\ \{}
+\DoxyCodeLine{00050\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_ac160cc61da581bdcf075273493b9f156}{unknown}};}
+\DoxyCodeLine{00051\ \ \ \}}
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}};}
+\DoxyCodeLine{00054\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{ykyh_8h_a4544a3e0741c078e01233bb1ab541805_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{ykyh_8h_ad38c0d31859cc20ece3748e74e9bbd75}\index{ykyh.h@{ykyh.h}!ykyh\_strerror\_name@{ykyh\_strerror\_name}}
+\index{ykyh\_strerror\_name@{ykyh\_strerror\_name}!ykyh.h@{ykyh.h}}
+\doxysubsubsection{\texorpdfstring{ykyh\_strerror\_name()}{ykyh\_strerror\_name()}}
+{\footnotesize\ttfamily \label{ykyh_8h_ad38c0d31859cc20ece3748e74e9bbd75} 
+const char \texorpdfstring{$\ast$}{*} ykyh\+\_\+strerror\+\_\+name (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{ykyh_8h_a93aafaa60a79c75641302448631ea112}{ykyh\+\_\+rc}}}]{err}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{ykyh_2error_8c_source_l00056}{56}} of file \mbox{\hyperlink{ykyh_2error_8c_source}{error.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00057\ \ \ \textcolor{keywordflow}{if}\ (-\/err\ <\ 0\ ||\ -\/err\ >=\ (\textcolor{keywordtype}{int})\ (\textcolor{keyword}{sizeof}(errors)\ /\ \textcolor{keyword}{sizeof}(errors[0])))\ \{}
+\DoxyCodeLine{00058\ \ \ \ \ \textcolor{keywordflow}{return}\ NULL;}
+\DoxyCodeLine{00059\ \ \ \}}
+\DoxyCodeLine{00060\ }
+\DoxyCodeLine{00061\ \ \ \textcolor{keywordflow}{return}\ errors[-\/err].\mbox{\hyperlink{structerr__t_a57a5cce969fd1a24d67633246758d479}{name}};}
+\DoxyCodeLine{00062\ \}}
+
+\end{DoxyCode}

@@ -1,0 +1,7 @@
+<map id="secp256k1_keypair_pub" name="secp256k1_keypair_pub">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,167,56"/>
+<area shape="rect" id="Node000002" href="$yubihsm__pkcs11_8c.html#ae785d5badbf1f08b491af31f32a135a1" title=" " alt="" coords="215,5,286,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="167,28,199,23,199,29,168,34"/>
+<area shape="rect" id="Node000003" href="$yubihsm__pkcs11_8c.html#adc4bd59a60361844aa0e852efa210105" title=" " alt="" coords="216,55,284,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="168,53,201,58,201,63,167,58"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="bench_schnorrsig_verify" name="bench_schnorrsig_verify">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,46,168,72"/>
+<area shape="rect" id="Node000002" href="$schnorrsig_2main__impl_8h.html#ab4b9ea2608b3c6e0dadad4c42a48d85f" title=" " alt="" coords="226,5,377,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="168,44,210,37,211,42,168,49"/>
+<area shape="rect" id="Node000003" href="$extrakeys_2main__impl_8h.html#ad13aa30c6a14103321a6467918965b16" title=" " alt="" coords="216,71,387,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="168,68,200,73,200,79,168,74"/>
+<area shape="rect" id="Node000004" href="$yubihsm__pkcs11_8c.html#adc4bd59a60361844aa0e852efa210105" title=" " alt="" coords="435,78,503,104"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="387,88,419,88,419,94,387,94"/>
+</map>

@@ -1,0 +1,254 @@
+\doxysection{reflect.\+hpp}
+\hypertarget{reflect_8hpp_source}{}\label{reflect_8hpp_source}\index{libraries/fc/include/fc/reflect/reflect.hpp@{libraries/fc/include/fc/reflect/reflect.hpp}}
+\mbox{\hyperlink{reflect_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{utility_8hpp}{fc/utility.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <boost/lexical\_cast.hpp>}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00011}00011\ \textcolor{preprocessor}{\#include\ <boost/preprocessor/seq/for\_each.hpp>}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00012}00012\ \textcolor{preprocessor}{\#include\ <boost/preprocessor/seq/enum.hpp>}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00013}00013\ \textcolor{preprocessor}{\#include\ <boost/preprocessor/seq/size.hpp>}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00014}00014\ \textcolor{preprocessor}{\#include\ <boost/preprocessor/seq/seq.hpp>}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00015}00015\ \textcolor{preprocessor}{\#include\ <boost/preprocessor/stringize.hpp>}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00016}00016\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{stdint_8h}{stdint.h}}>}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00017}00017\ \textcolor{preprocessor}{\#include\ <string.h>}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00019}00019\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{typename_8hpp}{fc/reflect/typename.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00021}00021\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}\ \{}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00032}00032\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00033}\mbox{\hyperlink{structfc_1_1reflector}{00033}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structfc_1_1reflector}{reflector}}\{}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00034}\mbox{\hyperlink{structfc_1_1reflector_a2ab82a950a3f3d5ea6884428e0d4b442}{00034}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \mbox{\hyperlink{structfc_1_1reflector_a2ab82a950a3f3d5ea6884428e0d4b442}{type}};}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00035}\mbox{\hyperlink{structfc_1_1reflector_a7b958f4c6630e69f0157476481446b4c}{00035}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{structfc_1_1false__type}{fc::false\_type}}\ \mbox{\hyperlink{structfc_1_1reflector_a7b958f4c6630e69f0157476481446b4c}{is\_defined}};}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00036}\mbox{\hyperlink{structfc_1_1reflector_ab955c8262ae2b8dfb8db04fd840b5f6a}{00036}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{structfc_1_1false__type}{fc::false\_type}}\ \mbox{\hyperlink{structfc_1_1reflector_ab955c8262ae2b8dfb8db04fd840b5f6a}{is\_enum}};}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00080}00080\ \textcolor{preprocessor}{\ \ \ \ \#ifdef\ DOXYGEN}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00081}00081\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ Visitor>}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00082}00082\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ visit(\ \textcolor{keyword}{const}\ Visitor\&\ v\ );}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00083}00083\ \textcolor{preprocessor}{\ \ \ \ \#endif\ }\textcolor{comment}{//\ DOXYGEN}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00084}00084\ \};}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00085}00085\ }
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00086}00086\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefc_a68077fb0265729efb10412aa4261628c}{throw\_bad\_enum\_cast}}(\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ i,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ e\ );}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00087}00087\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefc_a68077fb0265729efb10412aa4261628c}{throw\_bad\_enum\_cast}}(\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ k,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ e\ );}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00088}00088\ }
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00089}00089\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ C>}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00090}\mbox{\hyperlink{structfc_1_1has__reflector__init}{00090}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structfc_1_1has__reflector__init}{has\_reflector\_init}}\ \{}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00091}00091\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00092}00092\ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00093}00093\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ test(\ \textcolor{keywordtype}{int}\ )\ -\/>\ \textcolor{keyword}{decltype}(\ std::declval<T>().reflector\_init(),\ std::true\_type()\ )\ \{\ \textcolor{keywordflow}{return}\ \{\};\ \}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00094}00094\ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}>}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00095}00095\ \ \ \ \textcolor{keyword}{static}\ std::false\_type\ test(\ \textcolor{keywordtype}{long}\ )\ \{\ \textcolor{keywordflow}{return}\ \{\};\ \}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00096}00096\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00097}\mbox{\hyperlink{structfc_1_1has__reflector__init_a0c0af9f98f79f54c16a3d3c01ca8f09f}{00097}}\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{structfc_1_1has__reflector__init_a0c0af9f98f79f54c16a3d3c01ca8f09f}{value}}\ =\ std::is\_same<decltype(\ test<C>(\ 0\ )\ ),\ std::true\_type>\mbox{\hyperlink{structfc_1_1has__reflector__init_a0c0af9f98f79f54c16a3d3c01ca8f09f}{::value}};}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00098}00098\ \};}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00099}00099\ }
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00100}\mbox{\hyperlink{structfc_1_1reflect__init}{00100}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structfc_1_1reflect__init}{reflect\_init}}\ \{\};}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00101}00101\ }
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00102}00102\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ Class>}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00103}\mbox{\hyperlink{structfc_1_1reflector__init__visitor}{00103}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structfc_1_1reflector__init__visitor}{reflector\_init\_visitor}}\ \{}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00104}\mbox{\hyperlink{structfc_1_1reflector__init__visitor_ad74a66494e1f6e146e621de8c772e29e}{00104}}\ \ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{structfc_1_1reflector__init__visitor_ad74a66494e1f6e146e621de8c772e29e}{reflector\_init\_visitor}}(\ Class\&\ c\ )}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00105}00105\ \ \ \ \ \ :\ \mbox{\hyperlink{structfc_1_1reflector__init__visitor_ac4901d25fdb4caadd4a6c8dae65203ef}{obj}}(c)\ \{\}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00106}00106\ }
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00107}\mbox{\hyperlink{structfc_1_1reflector__init__visitor_a7ad9f3dfa39b723f07745ced514c6f36}{00107}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structfc_1_1reflector__init__visitor_a7ad9f3dfa39b723f07745ced514c6f36}{reflector\_init}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00108}00108\ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1reflect__init}{reflect\_init}}(\ \mbox{\hyperlink{structfc_1_1reflector__init__visitor_ac4901d25fdb4caadd4a6c8dae65203ef}{obj}}\ );}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00109}00109\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00110}\mbox{\hyperlink{structfc_1_1reflector__init__visitor_ac6ec8597a5721bbc373cda32a8d5e081}{00110}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structfc_1_1reflector__init__visitor_ac6ec8597a5721bbc373cda32a8d5e081}{reflector\_init}}()\ \{}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00111}00111\ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1reflect__init}{reflect\_init}}(\ \mbox{\hyperlink{structfc_1_1reflector__init__visitor_ac4901d25fdb4caadd4a6c8dae65203ef}{obj}}\ );}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00112}00112\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00113}00113\ }
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00114}00114\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00115}00115\ }
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00116}00116\ \ \ \ \textcolor{comment}{//\ 0\ matches\ int\ if\ Class\ derived\ from\ reflect\_init\ (SFINAE)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00117}00117\ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{class}\ T>}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00118}00118\ \ \ \ \textcolor{keyword}{typename}\ std::enable\_if<std::is\_base\_of<fc::reflect\_init,\ T>::value>::type}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00119}00119\ \ \ \ init\_imp(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ t)\ \{}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00120}00120\ \ \ \ \ \ \ t.reflector\_init();}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00121}00121\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00122}00122\ }
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00123}00123\ \ \ \ \textcolor{comment}{//\ SFINAE\ if\ Class\ not\ derived\ from\ reflect\_init}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00124}00124\ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{class}\ T>}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00125}00125\ \ \ \ \textcolor{keyword}{typename}\ std::enable\_if<not\ std::is\_base\_of<fc::reflect\_init,\ T>::value>::type}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00126}00126\ \ \ \ init\_imp(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ t)\ \{\}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00127}00127\ }
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00128}00128\ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00129}00129\ \ \ \ \textcolor{keyword}{auto}\ reflect\_init(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ t)\ -\/>\ \textcolor{keyword}{decltype}(init\_imp(t),\ void())\ \{}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00130}00130\ \ \ \ \ \ \ init\_imp(t);}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00131}00131\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00132}00132\ }
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00133}00133\ \ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00134}\mbox{\hyperlink{structfc_1_1reflector__init__visitor_ac4901d25fdb4caadd4a6c8dae65203ef}{00134}}\ \ \ \ Class\&\ \mbox{\hyperlink{structfc_1_1reflector__init__visitor_ac4901d25fdb4caadd4a6c8dae65203ef}{obj}};}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00135}00135\ \};}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00136}00136\ }
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00137}00137\ \}\ \textcolor{comment}{//\ namespace\ fc}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00138}00138\ }
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00139}00139\ }
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00140}00140\ \textcolor{preprocessor}{\#ifndef\ DOXYGEN}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00141}00141\ }
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00142}\mbox{\hyperlink{reflect_8hpp_a52c788d78bead9df6c9742d07e2cd40b}{00142}}\ \textcolor{preprocessor}{\#define\ FC\_REFLECT\_VISIT\_BASE(r,\ visitor,\ base)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00143}00143\ \textcolor{preprocessor}{\ \ fc::reflector<base>::visit\_base(\ visitor\ );}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00144}00144\ }
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00145}00145\ }
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00146}00146\ \textcolor{preprocessor}{\#ifndef\ \_MSC\_VER}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00147}\mbox{\hyperlink{reflect_8hpp_a25ad5dd44c8ca5fbd10c3310605244af}{00147}}\ \textcolor{preprocessor}{\ \ \#define\ FC\_TEMPLATE\ template}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00148}00148\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00149}00149\ \ \ \textcolor{comment}{//\ Disable\ warning\ C4482:\ nonstandard\ extention\ used:\ enum\ 'enum\_type::enum\_value'\ used\ in\ qualified\ name}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00150}00150\ \textcolor{preprocessor}{\ \ \#pragma\ warning(\ disable:\ 4482\ )}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00151}00151\ \textcolor{preprocessor}{\ \ \#define\ FC\_TEMPLATE}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00152}00152\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00153}00153\ }
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00154}\mbox{\hyperlink{reflect_8hpp_ac2869bd7a45cf89d13a36b8670ffe81c}{00154}}\ \textcolor{preprocessor}{\#define\ FC\_REFLECT\_VISIT\_MEMBER(\ r,\ visitor,\ elem\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00155}00155\ \textcolor{preprocessor}{\{\ typedef\ decltype((static\_cast<type*>(nullptr))-\/>elem)\ member\_type;\ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00156}00156\ \textcolor{preprocessor}{\ \ visitor.FC\_TEMPLATE\ operator()<member\_type,type,\&type::elem>(\ BOOST\_PP\_STRINGIZE(elem)\ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00157}00157\ \textcolor{preprocessor}{\}}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00158}00158\ }
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00159}00159\ }
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00160}\mbox{\hyperlink{reflect_8hpp_ab1e2d3906d3ec6b50589d7d85295ef6a}{00160}}\ \textcolor{preprocessor}{\#define\ FC\_REFLECT\_BASE\_MEMBER\_COUNT(\ r,\ OP,\ elem\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00161}00161\ \textcolor{preprocessor}{\ \ OP\ fc::reflector<elem>::total\_member\_count}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00162}00162\ }
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00163}\mbox{\hyperlink{reflect_8hpp_a7f5c0805b721d4cd8f1e7f1fe0a2df7d}{00163}}\ \textcolor{preprocessor}{\#define\ FC\_REFLECT\_MEMBER\_COUNT(\ r,\ OP,\ elem\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00164}00164\ \textcolor{preprocessor}{\ \ OP\ 1}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00165}00165\ }
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00166}\mbox{\hyperlink{reflect_8hpp_aa2030e357bc307cfd08229966cd1e028}{00166}}\ \textcolor{preprocessor}{\#define\ FC\_REFLECT\_DERIVED\_IMPL\_INLINE(\ TYPE,\ INHERITS,\ MEMBERS\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00167}00167\ \textcolor{preprocessor}{template<typename\ Visitor>\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00168}00168\ \textcolor{preprocessor}{static\ inline\ void\ visit\_base(\ Visitor\&\&\ v\ )\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00169}00169\ \textcolor{preprocessor}{\ \ \ \ BOOST\_PP\_SEQ\_FOR\_EACH(\ FC\_REFLECT\_VISIT\_BASE,\ v,\ INHERITS\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00170}00170\ \textcolor{preprocessor}{\ \ \ \ BOOST\_PP\_SEQ\_FOR\_EACH(\ FC\_REFLECT\_VISIT\_MEMBER,\ v,\ MEMBERS\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00171}00171\ \textcolor{preprocessor}{\}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00172}00172\ \textcolor{preprocessor}{template<typename\ Visitor>\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00173}00173\ \textcolor{preprocessor}{static\ inline\ void\ visit(\ Visitor\&\&\ v\ )\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00174}00174\ \textcolor{preprocessor}{\ \ \ \ BOOST\_PP\_SEQ\_FOR\_EACH(\ FC\_REFLECT\_VISIT\_BASE,\ v,\ INHERITS\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00175}00175\ \textcolor{preprocessor}{\ \ \ \ BOOST\_PP\_SEQ\_FOR\_EACH(\ FC\_REFLECT\_VISIT\_MEMBER,\ v,\ MEMBERS\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00176}00176\ \textcolor{preprocessor}{\ \ \ \ init(\ std::forward<Visitor>(v)\ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00177}00177\ \textcolor{preprocessor}{\}}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00178}00178\ }
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00179}00179\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ DOXYGEN}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00180}00180\ }
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00181}00181\ }
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00182}\mbox{\hyperlink{reflect_8hpp_aa0d7f5f903fe59f4112ff0ffb42ef5d3}{00182}}\ \textcolor{preprocessor}{\#define\ FC\_REFLECT\_VISIT\_ENUM(\ r,\ enum\_type,\ elem\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00183}00183\ \textcolor{preprocessor}{\ \ v.operator()(BOOST\_PP\_STRINGIZE(elem),\ int64\_t(enum\_type::elem)\ );}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00184}\mbox{\hyperlink{reflect_8hpp_a8d38ea89cb2687279255c4730626e0ef}{00184}}\ \textcolor{preprocessor}{\#define\ FC\_REFLECT\_ENUM\_TO\_STRING(\ r,\ enum\_type,\ elem\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00185}00185\ \textcolor{preprocessor}{\ \ \ case\ enum\_type::elem:\ return\ BOOST\_PP\_STRINGIZE(elem);}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00186}\mbox{\hyperlink{reflect_8hpp_ac50c97da3e854fe80fe3eb14fbd9f358}{00186}}\ \textcolor{preprocessor}{\#define\ FC\_REFLECT\_ENUM\_TO\_FC\_STRING(\ r,\ enum\_type,\ elem\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00187}00187\ \textcolor{preprocessor}{\ \ \ case\ enum\_type::elem:\ return\ fc::string(BOOST\_PP\_STRINGIZE(elem));}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00188}00188\ }
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00189}\mbox{\hyperlink{reflect_8hpp_a80d3716910453e13bee2ce264c65af69}{00189}}\ \textcolor{preprocessor}{\#define\ FC\_REFLECT\_ENUM\_FROM\_STRING(\ r,\ enum\_type,\ elem\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00190}00190\ \textcolor{preprocessor}{\ \ if(\ strcmp(\ s,\ BOOST\_PP\_STRINGIZE(elem)\ \ )\ ==\ 0\ )\ return\ enum\_type::elem;}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00191}\mbox{\hyperlink{reflect_8hpp_ac1e36c48669326400aa60ca2b6cc3331}{00191}}\ \textcolor{preprocessor}{\#define\ FC\_REFLECT\_ENUM\_FROM\_STRING\_CASE(\ r,\ enum\_type,\ elem\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00192}00192\ \textcolor{preprocessor}{\ \ \ case\ enum\_type::elem:}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00193}00193\ }
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00194}\mbox{\hyperlink{reflect_8hpp_a3243e9d5f0a24341d7f7e64f9cd525ee}{00194}}\ \textcolor{preprocessor}{\#define\ FC\_REFLECT\_ENUM(\ ENUM,\ FIELDS\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00195}00195\ \textcolor{preprocessor}{namespace\ fc\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00196}00196\ \textcolor{preprocessor}{template<>\ struct\ reflector<ENUM>\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00197}00197\ \textcolor{preprocessor}{\ \ \ \ typedef\ fc::true\_type\ is\_defined;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00198}00198\ \textcolor{preprocessor}{\ \ \ \ typedef\ fc::true\_type\ is\_enum;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00199}00199\ \textcolor{preprocessor}{\ \ \ \ static\ const\ char*\ to\_string(ENUM\ elem)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00200}00200\ \textcolor{preprocessor}{\ \ \ \ \ \ switch(\ elem\ )\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00201}00201\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ BOOST\_PP\_SEQ\_FOR\_EACH(\ FC\_REFLECT\_ENUM\_TO\_STRING,\ ENUM,\ FIELDS\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00202}00202\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ default:\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00203}00203\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ fc::throw\_bad\_enum\_cast(\ fc::to\_string(int64\_t(elem)).c\_str(),\ BOOST\_PP\_STRINGIZE(ENUM)\ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00204}00204\ \textcolor{preprocessor}{\ \ \ \ \ \ \}\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00205}00205\ \textcolor{preprocessor}{\ \ \ \ \ \ return\ nullptr;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00206}00206\ \textcolor{preprocessor}{\ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00207}00207\ \textcolor{preprocessor}{\ \ \ \ static\ const\ char*\ to\_string(int64\_t\ i)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00208}00208\ \textcolor{preprocessor}{\ \ \ \ \ \ return\ to\_string(ENUM(i));\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00209}00209\ \textcolor{preprocessor}{\ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00210}00210\ \textcolor{preprocessor}{\ \ \ \ static\ fc::string\ to\_fc\_string(ENUM\ elem)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00211}00211\ \textcolor{preprocessor}{\ \ \ \ \ \ switch(\ elem\ )\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00212}00212\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ BOOST\_PP\_SEQ\_FOR\_EACH(\ FC\_REFLECT\_ENUM\_TO\_FC\_STRING,\ ENUM,\ FIELDS\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00213}00213\ \textcolor{preprocessor}{\ \ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00214}00214\ \textcolor{preprocessor}{\ \ \ \ \ \ return\ fc::to\_string(int64\_t(elem));\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00215}00215\ \textcolor{preprocessor}{\ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00216}00216\ \textcolor{preprocessor}{\ \ \ \ static\ fc::string\ to\_fc\_string(int64\_t\ i)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00217}00217\ \textcolor{preprocessor}{\ \ \ \ \ \ return\ to\_fc\_string(ENUM(i));\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00218}00218\ \textcolor{preprocessor}{\ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00219}00219\ \textcolor{preprocessor}{\ \ \ \ static\ ENUM\ from\_int(int64\_t\ i)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00220}00220\ \textcolor{preprocessor}{\ \ \ \ \ \ ENUM\ e\ =\ ENUM(i);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00221}00221\ \textcolor{preprocessor}{\ \ \ \ \ \ switch(\ e\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00222}00222\ \textcolor{preprocessor}{\ \ \ \ \ \ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00223}00223\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ BOOST\_PP\_SEQ\_FOR\_EACH(\ FC\_REFLECT\_ENUM\_FROM\_STRING\_CASE,\ ENUM,\ FIELDS\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00224}00224\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ break;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00225}00225\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ default:\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00226}00226\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ fc::throw\_bad\_enum\_cast(\ i,\ BOOST\_PP\_STRINGIZE(ENUM)\ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00227}00227\ \textcolor{preprocessor}{\ \ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00228}00228\ \textcolor{preprocessor}{\ \ \ \ \ \ return\ e;\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00229}00229\ \textcolor{preprocessor}{\ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00230}00230\ \textcolor{preprocessor}{\ \ \ \ static\ ENUM\ from\_string(\ const\ char*\ s\ )\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00231}00231\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ BOOST\_PP\_SEQ\_FOR\_EACH(\ FC\_REFLECT\_ENUM\_FROM\_STRING,\ ENUM,\ FIELDS\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00232}00232\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ int64\_t\ i\ =\ 0;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00233}00233\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ try\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00234}00234\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00235}00235\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ i\ =\ boost::lexical\_cast<int64\_t>(s);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00236}00236\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00237}00237\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ catch(\ const\ boost::bad\_lexical\_cast\&\ e\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00238}00238\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00239}00239\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ fc::throw\_bad\_enum\_cast(\ s,\ BOOST\_PP\_STRINGIZE(ENUM)\ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00240}00240\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00241}00241\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ return\ from\_int(i);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00242}00242\ \textcolor{preprocessor}{\ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00243}00243\ \textcolor{preprocessor}{\ \ \ \ template<\ typename\ Visitor\ >\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00244}00244\ \textcolor{preprocessor}{\ \ \ \ static\ void\ visit(\ Visitor\&\ v\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00245}00245\ \textcolor{preprocessor}{\ \ \ \ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00246}00246\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ BOOST\_PP\_SEQ\_FOR\_EACH(\ FC\_REFLECT\_VISIT\_ENUM,\ ENUM,\ FIELDS\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00247}00247\ \textcolor{preprocessor}{\ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00248}00248\ \textcolor{preprocessor}{\};\ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00249}00249\ \textcolor{preprocessor}{template<>\ struct\ get\_typename<ENUM>\ \ \{\ static\ const\ char*\ name()\ \ \{\ return\ BOOST\_PP\_STRINGIZE(ENUM);\ \ \}\ \};\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00250}00250\ \textcolor{preprocessor}{\}}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00251}00251\ }
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00252}00252\ \textcolor{comment}{/*\ \ Note:\ FC\_REFLECT\_ENUM\ previously\ defined\ this\ function,\ but\ I\ don't\ think\ it\ ever}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00253}00253\ \textcolor{comment}{\ *\ \ \ \ \ \ \ \ did\ what\ we\ expected\ it\ to\ do.\ \ I've\ disabled\ it\ for\ now.}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00254}00254\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00255}00255\ \textcolor{comment}{\ *\ \ template<typename\ Visitor>\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00256}00256\ \textcolor{comment}{\ *\ \ static\ inline\ void\ visit(\ const\ Visitor\&\ v\ )\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00257}00257\ \textcolor{comment}{\ *\ \ \ \ \ \ BOOST\_PP\_SEQ\_FOR\_EACH(\ FC\_REFLECT\_VISIT\_ENUM,\ ENUM,\ FIELDS\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00258}00258\ \textcolor{comment}{\ *\ \ \}\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00259}00259\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00260}00260\ }
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00270}\mbox{\hyperlink{reflect_8hpp_ac649660d1bd3ca60197b339a1c25642e}{00270}}\ \textcolor{preprocessor}{\#define\ FC\_REFLECT\_DERIVED\_TEMPLATE(\ TEMPLATE\_ARGS,\ TYPE,\ INHERITS,\ MEMBERS\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00271}00271\ \textcolor{preprocessor}{namespace\ fc\ \{\ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00272}00272\ \textcolor{preprocessor}{\ \ template<BOOST\_PP\_SEQ\_ENUM(TEMPLATE\_ARGS)>\ struct\ get\_typename<TYPE>\ \ \{\ static\ const\ char*\ name()\ \ \{\ return\ BOOST\_PP\_STRINGIZE(TYPE);\ \ \}\ \};\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00273}00273\ \textcolor{preprocessor}{template<BOOST\_PP\_SEQ\_ENUM(TEMPLATE\_ARGS)>\ struct\ reflector<TYPE>\ \{\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00274}00274\ \textcolor{preprocessor}{\ \ \ \ typedef\ TYPE\ type;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00275}00275\ \textcolor{preprocessor}{\ \ \ \ typedef\ fc::true\_type\ \ is\_defined;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00276}00276\ \textcolor{preprocessor}{\ \ \ \ typedef\ fc::false\_type\ is\_enum;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00277}00277\ \textcolor{preprocessor}{\ \ \ \ template<typename\ Visitor>\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00278}00278\ \textcolor{preprocessor}{\ \ \ \ static\ auto\ init\_imp(Visitor\&\&\ v,\ int)\ -\/>\ decltype(std::forward<Visitor>(v).reflector\_init(),\ void())\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00279}00279\ \textcolor{preprocessor}{\ \ \ \ \ \ \ std::forward<Visitor>(v).reflector\_init();\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00280}00280\ \textcolor{preprocessor}{\ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00281}00281\ \textcolor{preprocessor}{\ \ \ \ template<typename\ Visitor>\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00282}00282\ \textcolor{preprocessor}{\ \ \ \ static\ auto\ init\_imp(Visitor\&\&\ v,\ long)\ -\/>\ decltype(v,\ void())\ \{\}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00283}00283\ \textcolor{preprocessor}{\ \ \ \ template<typename\ Visitor>\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00284}00284\ \textcolor{preprocessor}{\ \ \ \ static\ auto\ init(Visitor\&\&\ v)\ -\/>\ decltype(init\_imp(std::forward<Visitor>(v),\ 0),\ void())\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00285}00285\ \textcolor{preprocessor}{\ \ \ \ \ \ \ init\_imp(std::forward<Visitor>(v),\ 0);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00286}00286\ \textcolor{preprocessor}{\ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00287}00287\ \textcolor{preprocessor}{\ \ \ \ enum\ \ member\_count\_enum\ \{\ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00288}00288\ \textcolor{preprocessor}{\ \ \ \ \ \ local\_member\_count\ =\ 0\ \ BOOST\_PP\_SEQ\_FOR\_EACH(\ FC\_REFLECT\_MEMBER\_COUNT,\ +,\ MEMBERS\ ),\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00289}00289\ \textcolor{preprocessor}{\ \ \ \ \ \ total\_member\_count\ =\ local\_member\_count\ BOOST\_PP\_SEQ\_FOR\_EACH(\ FC\_REFLECT\_BASE\_MEMBER\_COUNT,\ +,\ INHERITS\ )\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00290}00290\ \textcolor{preprocessor}{\ \ \ \ \};\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00291}00291\ \textcolor{preprocessor}{\ \ \ \ FC\_REFLECT\_DERIVED\_IMPL\_INLINE(\ TYPE,\ INHERITS,\ MEMBERS\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00292}00292\ \textcolor{preprocessor}{\ \ \ \ static\_assert(\ not\ fc::has\_reflector\_init<TYPE>::value\ ||\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00293}00293\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::is\_base\_of<fc::reflect\_init,\ TYPE>::value,\ "{}must\ derive\ from\ fc::reflect\_init"{}\ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00294}00294\ \textcolor{preprocessor}{\ \ \ \ static\_assert(\ not\ std::is\_base\_of<fc::reflect\_init,\ TYPE>::value\ ||\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00295}00295\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fc::has\_reflector\_init<TYPE>::value,\ "{}must\ provide\ reflector\_init()\ method"{}\ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00296}00296\ \textcolor{preprocessor}{\};\ \}}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00297}00297\ }
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00298}\mbox{\hyperlink{reflect_8hpp_abd9da6cfee7b98ef83fac107d13275c7}{00298}}\ \textcolor{preprocessor}{\#define\ FC\_REFLECT\_DERIVED(\ TYPE,\ INHERITS,\ MEMBERS\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00299}00299\ \textcolor{preprocessor}{\ \ \ FC\_REFLECT\_DERIVED\_TEMPLATE(\ (),\ TYPE,\ INHERITS,\ MEMBERS\ )}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00300}00300\ }
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00301}00301\ \textcolor{comment}{//BOOST\_PP\_SEQ\_SIZE(MEMBERS),}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00302}00302\ }
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00311}\mbox{\hyperlink{reflect_8hpp_a2ace850e636b1ca0b18fe3177e413d99}{00311}}\ \textcolor{preprocessor}{\#define\ FC\_REFLECT(\ TYPE,\ MEMBERS\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00312}00312\ \textcolor{preprocessor}{\ \ \ \ FC\_REFLECT\_DERIVED(\ TYPE,\ BOOST\_PP\_SEQ\_NIL,\ MEMBERS\ )}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00313}00313\ }
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00314}\mbox{\hyperlink{reflect_8hpp_a174ab7b071f1b6db5666a266315fe1b5}{00314}}\ \textcolor{preprocessor}{\#define\ FC\_REFLECT\_TEMPLATE(\ TEMPLATE\_ARGS,\ TYPE,\ MEMBERS\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00315}00315\ \textcolor{preprocessor}{\ \ \ \ FC\_REFLECT\_DERIVED\_TEMPLATE(\ TEMPLATE\_ARGS,\ TYPE,\ BOOST\_PP\_SEQ\_NIL,\ MEMBERS\ )}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00316}00316\ }
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00317}\mbox{\hyperlink{reflect_8hpp_afc5277135165e6bbca19931035ca313b}{00317}}\ \textcolor{preprocessor}{\#define\ FC\_REFLECT\_EMPTY(\ TYPE\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00318}00318\ \textcolor{preprocessor}{\ \ \ \ FC\_REFLECT\_DERIVED(\ TYPE,\ BOOST\_PP\_SEQ\_NIL,\ BOOST\_PP\_SEQ\_NIL\ )}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00319}00319\ }
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00320}\mbox{\hyperlink{reflect_8hpp_a215aebc2773910145178fc5e0292d01b}{00320}}\ \textcolor{preprocessor}{\#define\ FC\_REFLECT\_TYPENAME(\ TYPE\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00321}00321\ \textcolor{preprocessor}{namespace\ fc\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00322}00322\ \textcolor{preprocessor}{\ \ template<>\ struct\ get\_typename<TYPE>\ \ \{\ static\ const\ char*\ name()\ \ \{\ return\ BOOST\_PP\_STRINGIZE(TYPE);\ \ \}\ \};\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{reflect_8hpp_source_l00323}00323\ \textcolor{preprocessor}{\}}}
+
+\end{DoxyCode}

@@ -1,0 +1,313 @@
+\doxysection{libraries/chain/include/sysio/chain/types.hpp File Reference}
+\hypertarget{chain_2include_2sysio_2chain_2types_8hpp}{}\label{chain_2include_2sysio_2chain_2types_8hpp}\index{libraries/chain/include/sysio/chain/types.hpp@{libraries/chain/include/sysio/chain/types.hpp}}
+{\ttfamily \#include $<$sysio/chain/name.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/chain\+\_\+id\+\_\+type.\+hpp$>$}\newline
+{\ttfamily \#include $<$chainbase/chainbase.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/interprocess/container.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/io/varint.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/io/enum\+\_\+type.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/crypto/sha224.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/safe.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/container/flat.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/string.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/io/raw.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/static\+\_\+variant.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/crypto/ripemd160.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/fixed\+\_\+string.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/crypto/private\+\_\+key.\+hpp$>$}\newline
+{\ttfamily \#include $<$memory$>$}\newline
+{\ttfamily \#include $<$vector$>$}\newline
+{\ttfamily \#include $<$deque$>$}\newline
+{\ttfamily \#include $<$cstdint$>$}\newline
+Include dependency graph for types.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{chain_2include_2sysio_2chain_2types_8hpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1void__t}{sysio\+::chain\+::void\+\_\+t}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1chain_1_1shared__blob}{sysio\+::chain\+::shared\+\_\+blob}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1sha256__less}{sysio\+::chain\+::sha256\+\_\+less}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1chain_1_1end__insert__iterator}{sysio\+::chain\+::end\+\_\+insert\+\_\+iterator$<$ Container $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1enum__hash}{sysio\+::chain\+::enum\+\_\+hash$<$ T $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1detail_1_1extract__match}{sysio\+::chain\+::detail\+::extract\+\_\+match}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1detail_1_1decompose_3_4}{sysio\+::chain\+::detail\+::decompose$<$$>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1detail_1_1decompose_3_01_t_00_01_rest_8_8_8_01_4}{sysio\+::chain\+::detail\+::decompose$<$ T, Rest... $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1detail_1_1is__any__of}{sysio\+::chain\+::detail\+::is\+\_\+any\+\_\+of$<$ T, Ts $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1overloaded}{sysio\+::chain\+::overloaded$<$ Ts $>$}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain}{sysio\+::chain}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain_1_1detail}{sysio\+::chain\+::detail}}
+\item 
+namespace \mbox{\hyperlink{namespacechainbase}{chainbase}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{chain_2include_2sysio_2chain_2types_8hpp_ad277ebb9fbb7830bb1d5e8e40e83389a}{OBJECT\+\_\+\+CTOR1}}(\mbox{\hyperlink{pointertest_8cpp_a59c7737920212dcb3bb9df58d7062de4}{NAME}})
+\item 
+\#define \mbox{\hyperlink{chain_2include_2sysio_2chain_2types_8hpp_a734edf0ed9953c889bb767246b277192}{OBJECT\+\_\+\+CTOR2\+\_\+\+MACRO}}(x,  y,  \mbox{\hyperlink{hello__driver_8cpp_a0b6f424d9a532680c6b2ca5c119c938b}{field}})
+\item 
+\#define \mbox{\hyperlink{chain_2include_2sysio_2chain_2types_8hpp_aa55d9423f1517a63972deec9d73e9d36}{OBJECT\+\_\+\+CTOR2}}(\mbox{\hyperlink{pointertest_8cpp_a59c7737920212dcb3bb9df58d7062de4}{NAME}},  FIELDS)
+\item 
+\#define \mbox{\hyperlink{chain_2include_2sysio_2chain_2types_8hpp_a4f726ee00eb9bbf2574c06492926cf73}{OBJECT\+\_\+\+CTOR}}(...)
+\item 
+\#define \mbox{\hyperlink{chain_2include_2sysio_2chain_2types_8hpp_a6bc6377fbef64c17239c389e9ae274a9}{\+\_\+V}}(n,  v)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_a0628a11f388cd2e43b1ccc1260a1042f}{sysio\+::chain\+::public\+\_\+key\+\_\+type}} = \mbox{\hyperlink{classfc_1_1crypto_1_1public__key}{fc\+::crypto\+::public\+\_\+key}}
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_ac31c0e1bc25b7e5fcf2b3c7f41a23fd6}{sysio\+::chain\+::private\+\_\+key\+\_\+type}} = \mbox{\hyperlink{classfc_1_1crypto_1_1private__key}{fc\+::crypto\+::private\+\_\+key}}
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_af141a69eb789b86fa0eb93c2d263f0df}{sysio\+::chain\+::signature\+\_\+type}} = \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{fc\+::crypto\+::signature}}
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_a91a8c75d36e75e33f8a9ed2a3e724893}{sysio\+::chain\+::shared\+\_\+string}} = \mbox{\hyperlink{namespacechainbase_a895da7b5480367dc984b326d363552c8}{chainbase\+::shared\+\_\+string}}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\using \mbox{\hyperlink{namespacesysio_1_1chain_a915de5728df4a4ce45da87438053ee90}{sysio\+::chain\+::shared\+\_\+vector}} = boost\+::interprocess\+::vector$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{namespacechainbase_add7d4cf66ab3f2808fe613e6b0343b89}{allocator}}$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$$>$
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\using \mbox{\hyperlink{namespacesysio_1_1chain_a695d8bcc3628d0f2466099033512ef51}{sysio\+::chain\+::shared\+\_\+set}} = boost\+::interprocess\+::set$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, std\+::less$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$, \mbox{\hyperlink{namespacechainbase_add7d4cf66ab3f2808fe613e6b0343b89}{allocator}}$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$$>$
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{make__512_8cpp_a3d4e997ddc51e0c06c306fe4862826c0}{K}} , typename \mbox{\hyperlink{struct_v}{V}} $>$ }\\using \mbox{\hyperlink{namespacesysio_1_1chain_af69ee36ca3d8976c72c55262f7378e47}{sysio\+::chain\+::shared\+\_\+flat\+\_\+multimap}} = boost\+::interprocess\+::flat\+\_\+multimap$<$ \mbox{\hyperlink{make__512_8cpp_a3d4e997ddc51e0c06c306fe4862826c0}{K}}, \mbox{\hyperlink{struct_v}{V}}, std\+::less$<$\mbox{\hyperlink{make__512_8cpp_a3d4e997ddc51e0c06c306fe4862826c0}{K}}$>$, \mbox{\hyperlink{namespacechainbase_add7d4cf66ab3f2808fe613e6b0343b89}{allocator}}$<$ std\+::pair$<$\mbox{\hyperlink{make__512_8cpp_a3d4e997ddc51e0c06c306fe4862826c0}{K}},\mbox{\hyperlink{struct_v}{V}}$>$ $>$ $>$
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_a58379f7b40727cd3645e0f5a9b24e653}{sysio\+::chain\+::scope\+\_\+name}} = \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{sysio\+::chain\+::account\+\_\+name}} = \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_aacc541763fed17ee490b6ac42b7bb77a}{sysio\+::chain\+::permission\+\_\+name}} = \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_ad1cfc9966d13ee8241fc64f187aee188}{sysio\+::chain\+::table\+\_\+name}} = \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{sysio\+::chain\+::block\+\_\+id\+\_\+type}} = \mbox{\hyperlink{classfc_1_1sha256}{fc\+::sha256}}
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_af47b3e45f07ecc8f38ea6b1c763dcad0}{sysio\+::chain\+::checksum\+\_\+type}} = \mbox{\hyperlink{classfc_1_1sha256}{fc\+::sha256}}
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_a9c3cb5131331ed8d52a589437ccfb03e}{sysio\+::chain\+::checksum256\+\_\+type}} = \mbox{\hyperlink{classfc_1_1sha256}{fc\+::sha256}}
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_a9f767eeb90d44f996d7890cc555b3e1d}{sysio\+::chain\+::checksum512\+\_\+type}} = \mbox{\hyperlink{classfc_1_1sha512}{fc\+::sha512}}
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_a8c569dc41640150496395cc2d92b5fb5}{sysio\+::chain\+::checksum160\+\_\+type}} = \mbox{\hyperlink{classfc_1_1ripemd160}{fc\+::ripemd160}}
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_aa85a3b49b3b219d1e3840567579e7e63}{sysio\+::chain\+::transaction\+\_\+id\+\_\+type}} = \mbox{\hyperlink{namespacesysio_1_1chain_af47b3e45f07ecc8f38ea6b1c763dcad0}{checksum\+\_\+type}}
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_a357fd9478475457e5bb386a3143079b6}{sysio\+::chain\+::digest\+\_\+type}} = \mbox{\hyperlink{namespacesysio_1_1chain_af47b3e45f07ecc8f38ea6b1c763dcad0}{checksum\+\_\+type}}
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_abb0a383cca5adde7807bbcc3c48840d4}{sysio\+::chain\+::weight\+\_\+type}} = \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}}
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_aa7dec331abc416574479c64c2b384696}{sysio\+::chain\+::block\+\_\+num\+\_\+type}} = \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_a5a0727cc491da226747ee12e49611a6e}{sysio\+::chain\+::share\+\_\+type}} = \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_a1bb5400f29594a546f9db9458b84600e}{sysio\+::chain\+::int128\+\_\+t}} = \+\_\+\+\_\+int128
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_a896515137d9a7844105786ee3a6b1d47}{sysio\+::chain\+::uint128\+\_\+t}} = unsigned \+\_\+\+\_\+int128
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_ac6f5a1f1e061f000983f5d5f3ac25dfa}{sysio\+::chain\+::bytes}} = \mbox{\hyperlink{classfc_1_1vector}{vector}}$<$char$>$
+\item 
+typedef \mbox{\hyperlink{classfc_1_1vector}{vector}}$<$ std\+::pair$<$ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}}, \mbox{\hyperlink{classfc_1_1vector}{vector}}$<$ char $>$ $>$ $>$ \mbox{\hyperlink{namespacesysio_1_1chain_a73874b5910498c8a58def7defc7eaee8}{sysio\+::chain\+::extensions\+\_\+type}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{namespacesysio_1_1chain_a2d924ca9891de9b9edf3ccb582ec7591}{sysio\+::chain\+::object\+\_\+type}} \{ \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_a2d924ca9891de9b9edf3ccb582ec7591aaaebee0f8abc495cf59d6874cf950668}{sysio\+::chain\+::null\+\_\+object\+\_\+type}} = 0
+, \mbox{\hyperlink{namespacesysio_1_1chain_a2d924ca9891de9b9edf3ccb582ec7591a4641a9366c05c6f32692d4adbb0eb7da}{sysio\+::chain\+::account\+\_\+object\+\_\+type}}
+, \mbox{\hyperlink{namespacesysio_1_1chain_a2d924ca9891de9b9edf3ccb582ec7591ae95fee4ae4a63e82d6baf71eec6d959a}{sysio\+::chain\+::account\+\_\+metadata\+\_\+object\+\_\+type}}
+, \mbox{\hyperlink{namespacesysio_1_1chain_a2d924ca9891de9b9edf3ccb582ec7591a7bbccdace36e7a22c4e705a491d7f7ef}{sysio\+::chain\+::permission\+\_\+object\+\_\+type}}
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_a2d924ca9891de9b9edf3ccb582ec7591a9e32b513ded10ea5f17be4e02bc9aad2}{sysio\+::chain\+::permission\+\_\+usage\+\_\+object\+\_\+type}}
+, \mbox{\hyperlink{namespacesysio_1_1chain_a2d924ca9891de9b9edf3ccb582ec7591aaa09799e9b5ba673e04c0de211873eae}{sysio\+::chain\+::permission\+\_\+link\+\_\+object\+\_\+type}}
+, \mbox{\hyperlink{namespacesysio_1_1chain_a2d924ca9891de9b9edf3ccb582ec7591ae7c3af830d015f3ca585596c77dfe475}{sysio\+::chain\+::\+UNUSED\+\_\+action\+\_\+code\+\_\+object\+\_\+type}}
+, \mbox{\hyperlink{namespacesysio_1_1chain_a2d924ca9891de9b9edf3ccb582ec7591a513162d9415c681a9ced5ccd4f9504c2}{sysio\+::chain\+::key\+\_\+value\+\_\+object\+\_\+type}}
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_a2d924ca9891de9b9edf3ccb582ec7591aa57bf8d197a3b021e311f1e54f438bcd}{sysio\+::chain\+::index64\+\_\+object\+\_\+type}}
+, \mbox{\hyperlink{namespacesysio_1_1chain_a2d924ca9891de9b9edf3ccb582ec7591ab28aae74fc6fd17545f8852766f1ecd5}{sysio\+::chain\+::index128\+\_\+object\+\_\+type}}
+, \mbox{\hyperlink{namespacesysio_1_1chain_a2d924ca9891de9b9edf3ccb582ec7591a3189cc37df0d87978fe441f3bb89b0dd}{sysio\+::chain\+::index256\+\_\+object\+\_\+type}}
+, \mbox{\hyperlink{namespacesysio_1_1chain_a2d924ca9891de9b9edf3ccb582ec7591a338967b9db4a051fe968a272834271ad}{sysio\+::chain\+::index\+\_\+double\+\_\+object\+\_\+type}}
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_a2d924ca9891de9b9edf3ccb582ec7591a579d8dc2f2849ad43b730aa040f6963d}{sysio\+::chain\+::index\+\_\+long\+\_\+double\+\_\+object\+\_\+type}}
+, \mbox{\hyperlink{namespacesysio_1_1chain_a2d924ca9891de9b9edf3ccb582ec7591ab838cd5eb9389ee964e9742c641000d5}{sysio\+::chain\+::global\+\_\+property\+\_\+object\+\_\+type}}
+, \mbox{\hyperlink{namespacesysio_1_1chain_a2d924ca9891de9b9edf3ccb582ec7591af19a93bbab7e47436ffb66f25fea97c0}{sysio\+::chain\+::dynamic\+\_\+global\+\_\+property\+\_\+object\+\_\+type}}
+, \mbox{\hyperlink{namespacesysio_1_1chain_a2d924ca9891de9b9edf3ccb582ec7591a145da61b5ac072e6bff9fe10e074abfb}{sysio\+::chain\+::block\+\_\+summary\+\_\+object\+\_\+type}}
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_a2d924ca9891de9b9edf3ccb582ec7591a781ad35e2acc24dc9218c9cdf54df324}{sysio\+::chain\+::transaction\+\_\+object\+\_\+type}}
+, \mbox{\hyperlink{namespacesysio_1_1chain_a2d924ca9891de9b9edf3ccb582ec7591a674543517786fd676a9f871550c58543}{sysio\+::chain\+::generated\+\_\+transaction\+\_\+object\+\_\+type}}
+, \mbox{\hyperlink{namespacesysio_1_1chain_a2d924ca9891de9b9edf3ccb582ec7591abb61648c911a11d89ce47b41ce51a250}{sysio\+::chain\+::\+UNUSED\+\_\+producer\+\_\+object\+\_\+type}}
+, \mbox{\hyperlink{namespacesysio_1_1chain_a2d924ca9891de9b9edf3ccb582ec7591a978e781fdd76f9dc65542409a40a581c}{sysio\+::chain\+::\+UNUSED\+\_\+chain\+\_\+property\+\_\+object\+\_\+type}}
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_a2d924ca9891de9b9edf3ccb582ec7591a2065e7a3aac3a5f779169e127e3bd3fb}{sysio\+::chain\+::account\+\_\+control\+\_\+history\+\_\+object\+\_\+type}}
+, \mbox{\hyperlink{namespacesysio_1_1chain_a2d924ca9891de9b9edf3ccb582ec7591a138f8fab4c6a6f93898929c3814823a9}{sysio\+::chain\+::\+UNUSED\+\_\+account\+\_\+transaction\+\_\+history\+\_\+object\+\_\+type}}
+, \mbox{\hyperlink{namespacesysio_1_1chain_a2d924ca9891de9b9edf3ccb582ec7591a96b65954e035352d375ac36ea23655b4}{sysio\+::chain\+::\+UNUSED\+\_\+transaction\+\_\+history\+\_\+object\+\_\+type}}
+, \mbox{\hyperlink{namespacesysio_1_1chain_a2d924ca9891de9b9edf3ccb582ec7591aa633992514699c80bbb6894957ff3998}{sysio\+::chain\+::public\+\_\+key\+\_\+history\+\_\+object\+\_\+type}}
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_a2d924ca9891de9b9edf3ccb582ec7591ae4e0a19c8051d1c4a880d513036b0b92}{sysio\+::chain\+::\+UNUSED\+\_\+balance\+\_\+object\+\_\+type}}
+, \mbox{\hyperlink{namespacesysio_1_1chain_a2d924ca9891de9b9edf3ccb582ec7591aa179b90ae7557be7a92a4876b3d326c1}{sysio\+::chain\+::\+UNUSED\+\_\+staked\+\_\+balance\+\_\+object\+\_\+type}}
+, \mbox{\hyperlink{namespacesysio_1_1chain_a2d924ca9891de9b9edf3ccb582ec7591a878e99fd7f6a0948edb35378e12f7b7c}{sysio\+::chain\+::\+UNUSED\+\_\+producer\+\_\+votes\+\_\+object\+\_\+type}}
+, \mbox{\hyperlink{namespacesysio_1_1chain_a2d924ca9891de9b9edf3ccb582ec7591ab41a66aef9d03149b3e17a5819e0bf2b}{sysio\+::chain\+::\+UNUSED\+\_\+producer\+\_\+schedule\+\_\+object\+\_\+type}}
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_a2d924ca9891de9b9edf3ccb582ec7591a56c6bb0e0185483fbbb3b96387741eb7}{sysio\+::chain\+::\+UNUSED\+\_\+proxy\+\_\+vote\+\_\+object\+\_\+type}}
+, \mbox{\hyperlink{namespacesysio_1_1chain_a2d924ca9891de9b9edf3ccb582ec7591a2ec7461904b866f8a76efe2cd05b3446}{sysio\+::chain\+::\+UNUSED\+\_\+scope\+\_\+sequence\+\_\+object\+\_\+type}}
+, \mbox{\hyperlink{namespacesysio_1_1chain_a2d924ca9891de9b9edf3ccb582ec7591a91a498733484867c97fe187cc38c627a}{sysio\+::chain\+::table\+\_\+id\+\_\+object\+\_\+type}}
+, \mbox{\hyperlink{namespacesysio_1_1chain_a2d924ca9891de9b9edf3ccb582ec7591a748a45e02c9d4eae9325c7083fd40e86}{sysio\+::chain\+::resource\+\_\+limits\+\_\+object\+\_\+type}}
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_a2d924ca9891de9b9edf3ccb582ec7591a2c74d0baaa29659b4e6338fe79f259d8}{sysio\+::chain\+::resource\+\_\+usage\+\_\+object\+\_\+type}}
+, \mbox{\hyperlink{namespacesysio_1_1chain_a2d924ca9891de9b9edf3ccb582ec7591a614d0c7ac1d8a927b680eb7bc434da85}{sysio\+::chain\+::resource\+\_\+limits\+\_\+state\+\_\+object\+\_\+type}}
+, \mbox{\hyperlink{namespacesysio_1_1chain_a2d924ca9891de9b9edf3ccb582ec7591a77935d1242c0b15ab42f7f826e1ede58}{sysio\+::chain\+::resource\+\_\+limits\+\_\+config\+\_\+object\+\_\+type}}
+, \mbox{\hyperlink{namespacesysio_1_1chain_a2d924ca9891de9b9edf3ccb582ec7591a579b0107fbc16863e796050e6640556d}{sysio\+::chain\+::account\+\_\+history\+\_\+object\+\_\+type}}
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_a2d924ca9891de9b9edf3ccb582ec7591a36dc21b2fb01f47bc0a58b0dbacbd6cf}{sysio\+::chain\+::action\+\_\+history\+\_\+object\+\_\+type}}
+, \mbox{\hyperlink{namespacesysio_1_1chain_a2d924ca9891de9b9edf3ccb582ec7591a9103bd3b861a2769fb911b74457f255a}{sysio\+::chain\+::reversible\+\_\+block\+\_\+object\+\_\+type}}
+, \mbox{\hyperlink{namespacesysio_1_1chain_a2d924ca9891de9b9edf3ccb582ec7591a7c8cf6f1142c8095f9364c6a08ea6343}{sysio\+::chain\+::protocol\+\_\+state\+\_\+object\+\_\+type}}
+, \mbox{\hyperlink{namespacesysio_1_1chain_a2d924ca9891de9b9edf3ccb582ec7591a87fc6a186db546ac90fc9024404d0457}{sysio\+::chain\+::account\+\_\+ram\+\_\+correction\+\_\+object\+\_\+type}}
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1chain_a2d924ca9891de9b9edf3ccb582ec7591a9ee97a2bb91d09c05f5944ed039ef6e8}{sysio\+::chain\+::code\+\_\+object\+\_\+type}}
+, \mbox{\hyperlink{namespacesysio_1_1chain_a2d924ca9891de9b9edf3ccb582ec7591a83df68d9e71e4c0c85c105ab5c41ec9c}{sysio\+::chain\+::database\+\_\+header\+\_\+object\+\_\+type}}
+, \mbox{\hyperlink{namespacesysio_1_1chain_a2d924ca9891de9b9edf3ccb582ec7591a17b7f49f085673469726cbfbe4640fa0}{sysio\+::chain\+::\+OBJECT\+\_\+\+TYPE\+\_\+\+COUNT}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+auto \mbox{\hyperlink{namespacesysio_1_1chain_a4e167bafac72001dee047e0f198bb689}{sysio\+::chain\+::emplace\+\_\+extension}} (\mbox{\hyperlink{namespacesysio_1_1chain_a73874b5910498c8a58def7defc7eaee8}{extensions\+\_\+type}} \&exts, \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} eid, \mbox{\hyperlink{classfc_1_1vector}{vector}}$<$ char $>$ \&\&data)
+\item 
+{\footnotesize template$<$typename Container $>$ }\\\mbox{\hyperlink{classsysio_1_1chain_1_1end__insert__iterator}{end\+\_\+insert\+\_\+iterator}}$<$ Container $>$ \mbox{\hyperlink{namespacesysio_1_1chain_a1491348a4182743cfdf2d0d41f5c6796}{sysio\+::chain\+::end\+\_\+inserter}} (Container \&c)
+\item 
+{\footnotesize template$<$class... Ts$>$ }\\\mbox{\hyperlink{namespacesysio_1_1chain_ae5470abf94d0fdeff7866fda992ba844}{sysio\+::chain\+::overloaded}} (Ts...) -\/$>$ overloaded$<$ Ts... $>$
+\item 
+{\footnotesize template$<$typename Data\+Stream $>$ }\\Data\+Stream \& \mbox{\hyperlink{namespacechainbase_abb0c97ebd98434014db91bef3afafadd}{chainbase\+::operator$<$$<$}} (Data\+Stream \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, const \mbox{\hyperlink{classchainbase_1_1shared__cow__string}{chainbase\+::shared\+\_\+cow\+\_\+string}} \&v)
+\item 
+{\footnotesize template$<$typename Data\+Stream $>$ }\\Data\+Stream \& \mbox{\hyperlink{namespacechainbase_a42fa77a4b7fd878c28a83b4ebbb63789}{chainbase\+::operator$>$$>$}} (Data\+Stream \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, \mbox{\hyperlink{classchainbase_1_1shared__cow__string}{chainbase\+::shared\+\_\+cow\+\_\+string}} \&v)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename ... Ts$>$ }\\constexpr bool \mbox{\hyperlink{namespacesysio_1_1chain_1_1detail_ae82282647a4dcd8de80f8700266280e8}{sysio\+::chain\+::detail\+::is\+\_\+any\+\_\+of\+\_\+v}} = \mbox{\hyperlink{structsysio_1_1chain_1_1detail_1_1is__any__of}{is\+\_\+any\+\_\+of}}$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Ts...$>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{chain_2include_2sysio_2chain_2types_8hpp_a6bc6377fbef64c17239c389e9ae274a9}\index{types.hpp@{types.hpp}!\_V@{\_V}}
+\index{\_V@{\_V}!types.hpp@{types.hpp}}
+\doxysubsubsection{\texorpdfstring{\_V}{\_V}}
+{\footnotesize\ttfamily \label{chain_2include_2sysio_2chain_2types_8hpp_a6bc6377fbef64c17239c389e9ae274a9} 
+\#define \+\_\+V(\begin{DoxyParamCaption}\item[{}]{n}{, }\item[{}]{v}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}(n,\ v)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{chain_2include_2sysio_2chain_2types_8hpp_source_l00041}{41}} of file \mbox{\hyperlink{chain_2include_2sysio_2chain_2types_8hpp_source}{types.\+hpp}}.
+
+\Hypertarget{chain_2include_2sysio_2chain_2types_8hpp_a4f726ee00eb9bbf2574c06492926cf73}\index{types.hpp@{types.hpp}!OBJECT\_CTOR@{OBJECT\_CTOR}}
+\index{OBJECT\_CTOR@{OBJECT\_CTOR}!types.hpp@{types.hpp}}
+\doxysubsubsection{\texorpdfstring{OBJECT\_CTOR}{OBJECT\_CTOR}}
+{\footnotesize\ttfamily \label{chain_2include_2sysio_2chain_2types_8hpp_a4f726ee00eb9bbf2574c06492926cf73} 
+\#define OBJECT\+\_\+\+CTOR(\begin{DoxyParamCaption}\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{BOOST\_PP\_OVERLOAD(\mbox{\hyperlink{chain_2include_2sysio_2chain_2types_8hpp_a4f726ee00eb9bbf2574c06492926cf73}{OBJECT\_CTOR}},\ \_\_VA\_ARGS\_\_)(\_\_VA\_ARGS\_\_)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{chain_2include_2sysio_2chain_2types_8hpp_source_l00039}{39}} of file \mbox{\hyperlink{chain_2include_2sysio_2chain_2types_8hpp_source}{types.\+hpp}}.
+
+\Hypertarget{chain_2include_2sysio_2chain_2types_8hpp_ad277ebb9fbb7830bb1d5e8e40e83389a}\index{types.hpp@{types.hpp}!OBJECT\_CTOR1@{OBJECT\_CTOR1}}
+\index{OBJECT\_CTOR1@{OBJECT\_CTOR1}!types.hpp@{types.hpp}}
+\doxysubsubsection{\texorpdfstring{OBJECT\_CTOR1}{OBJECT\_CTOR1}}
+{\footnotesize\ttfamily \label{chain_2include_2sysio_2chain_2types_8hpp_ad277ebb9fbb7830bb1d5e8e40e83389a} 
+\#define OBJECT\+\_\+\+CTOR1(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{pointertest_8cpp_a59c7737920212dcb3bb9df58d7062de4}{NAME}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{pointertest_8cpp_a59c7737920212dcb3bb9df58d7062de4}{NAME}}()\ =\ \textcolor{keyword}{delete};\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{public}:\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ template<typename\ Constructor,\ typename\ Allocator>\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ NAME(Constructor\&\&\ c,\ \mbox{\hyperlink{namespacechainbase_add7d4cf66ab3f2808fe613e6b0343b89}{chainbase::allocator<Allocator>}})\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \{\ c(*\textcolor{keyword}{this});\ \}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{chain_2include_2sysio_2chain_2types_8hpp_source_l00025}{25}} of file \mbox{\hyperlink{chain_2include_2sysio_2chain_2types_8hpp_source}{types.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00025\ \textcolor{preprocessor}{\#define\ OBJECT\_CTOR1(NAME)\ \(\backslash\)}}
+\DoxyCodeLine{00026\ \textcolor{preprocessor}{\ \ \ \ NAME()\ =\ delete;\ \(\backslash\)}}
+\DoxyCodeLine{00027\ \textcolor{preprocessor}{\ \ \ \ public:\ \(\backslash\)}}
+\DoxyCodeLine{00028\ \textcolor{preprocessor}{\ \ \ \ template<typename\ Constructor,\ typename\ Allocator>\ \(\backslash\)}}
+\DoxyCodeLine{00029\ \textcolor{preprocessor}{\ \ \ \ NAME(Constructor\&\&\ c,\ chainbase::allocator<Allocator>)\ \(\backslash\)}}
+\DoxyCodeLine{00030\ \textcolor{preprocessor}{\ \ \ \ \{\ c(*this);\ \}}}
+
+\end{DoxyCode}
+\Hypertarget{chain_2include_2sysio_2chain_2types_8hpp_aa55d9423f1517a63972deec9d73e9d36}\index{types.hpp@{types.hpp}!OBJECT\_CTOR2@{OBJECT\_CTOR2}}
+\index{OBJECT\_CTOR2@{OBJECT\_CTOR2}!types.hpp@{types.hpp}}
+\doxysubsubsection{\texorpdfstring{OBJECT\_CTOR2}{OBJECT\_CTOR2}}
+{\footnotesize\ttfamily \label{chain_2include_2sysio_2chain_2types_8hpp_aa55d9423f1517a63972deec9d73e9d36} 
+\#define OBJECT\+\_\+\+CTOR2(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{pointertest_8cpp_a59c7737920212dcb3bb9df58d7062de4}{NAME}}}{, }\item[{}]{FIELDS}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{pointertest_8cpp_a59c7737920212dcb3bb9df58d7062de4}{NAME}}()\ =\ \textcolor{keyword}{delete};\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{public}:\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ template<typename\ Constructor,\ typename\ Allocator>\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ NAME(Constructor\&\&\ c,\ \mbox{\hyperlink{namespacechainbase_add7d4cf66ab3f2808fe613e6b0343b89}{chainbase::allocator<Allocator>}}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ :\ \mbox{\hyperlink{code__cache_8cpp_aa0efefe21f4700d78692edc823e763be}{id}}(0)\ BOOST\_PP\_SEQ\_FOR\_EACH(\mbox{\hyperlink{chain_2include_2sysio_2chain_2types_8hpp_a734edf0ed9953c889bb767246b277192}{OBJECT\_CTOR2\_MACRO}},\ \_,\ FIELDS)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \{\ c(*\textcolor{keyword}{this});\ \}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{chain_2include_2sysio_2chain_2types_8hpp_source_l00032}{32}} of file \mbox{\hyperlink{chain_2include_2sysio_2chain_2types_8hpp_source}{types.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00032\ \textcolor{preprocessor}{\#define\ OBJECT\_CTOR2(NAME,\ FIELDS)\ \(\backslash\)}}
+\DoxyCodeLine{00033\ \textcolor{preprocessor}{\ \ \ \ NAME()\ =\ delete;\ \(\backslash\)}}
+\DoxyCodeLine{00034\ \textcolor{preprocessor}{\ \ \ \ public:\ \(\backslash\)}}
+\DoxyCodeLine{00035\ \textcolor{preprocessor}{\ \ \ \ template<typename\ Constructor,\ typename\ Allocator>\ \(\backslash\)}}
+\DoxyCodeLine{00036\ \textcolor{preprocessor}{\ \ \ \ NAME(Constructor\&\&\ c,\ chainbase::allocator<Allocator>\ a)\ \(\backslash\)}}
+\DoxyCodeLine{00037\ \textcolor{preprocessor}{\ \ \ \ :\ id(0)\ BOOST\_PP\_SEQ\_FOR\_EACH(OBJECT\_CTOR2\_MACRO,\ \_,\ FIELDS)\ \(\backslash\)}}
+\DoxyCodeLine{00038\ \textcolor{preprocessor}{\ \ \ \ \{\ c(*this);\ \}}}
+
+\end{DoxyCode}
+\Hypertarget{chain_2include_2sysio_2chain_2types_8hpp_a734edf0ed9953c889bb767246b277192}\index{types.hpp@{types.hpp}!OBJECT\_CTOR2\_MACRO@{OBJECT\_CTOR2\_MACRO}}
+\index{OBJECT\_CTOR2\_MACRO@{OBJECT\_CTOR2\_MACRO}!types.hpp@{types.hpp}}
+\doxysubsubsection{\texorpdfstring{OBJECT\_CTOR2\_MACRO}{OBJECT\_CTOR2\_MACRO}}
+{\footnotesize\ttfamily \label{chain_2include_2sysio_2chain_2types_8hpp_a734edf0ed9953c889bb767246b277192} 
+\#define OBJECT\+\_\+\+CTOR2\+\_\+\+MACRO(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{, }\item[{}]{\mbox{\hyperlink{hello__driver_8cpp_a0b6f424d9a532680c6b2ca5c119c938b}{field}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{,\mbox{\hyperlink{hello__driver_8cpp_a0b6f424d9a532680c6b2ca5c119c938b}{field}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{chain_2include_2sysio_2chain_2types_8hpp_source_l00031}{31}} of file \mbox{\hyperlink{chain_2include_2sysio_2chain_2types_8hpp_source}{types.\+hpp}}.
+

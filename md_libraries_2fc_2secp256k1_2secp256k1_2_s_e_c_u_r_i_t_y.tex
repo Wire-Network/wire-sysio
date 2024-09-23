@@ -1,0 +1,25 @@
+\chapter{Security Policy}
+\hypertarget{md_libraries_2fc_2secp256k1_2secp256k1_2_s_e_c_u_r_i_t_y}{}\label{md_libraries_2fc_2secp256k1_2secp256k1_2_s_e_c_u_r_i_t_y}\index{Security Policy@{Security Policy}}
+\doxysection*{Reporting a Vulnerability}
+
+To report security issues send an email to \href{mailto:secp256k1-security@bitcoincore.org}{\texttt{ secp256k1-\/security@bitcoincore.\+org}} (not for support).
+
+The following keys may be used to communicate sensitive information to developers\+:
+
+\tabulinesep=1mm
+\begin{longtabu}spread 0pt [c]{*{2}{|X[-1]}|}
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Name   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Fingerprint    }\\\cline{1-2}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Name   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Fingerprint    }\\\cline{1-2}
+\endhead
+Pieter Wuille   &133E AC17 9436 F14A 5CF1 B794 860F EB80 4E66 9320    \\\cline{1-2}
+Jonas Nick   &36C7 1A37 C9\+D9 88BD E825 08D9 B1\+A7 0E4F 8DCD 0366    \\\cline{1-2}
+Tim Ruffing   &09E0 3F87 1092 E40E 106E 902\doxylink{namespace_b}{B} 33BC 86AB 80FF 5516   \\\cline{1-2}
+\end{longtabu}
+
+
+You can import a key by running the following command with that individual’s fingerprint\+: {\ttfamily gpg -\/-\/keyserver hkps\+://keys.openpgp.\+org -\/-\/recv-\/keys "{}$<$fingerprint$>$"{}} Ensure that you put quotes around fingerprints containing spaces. 

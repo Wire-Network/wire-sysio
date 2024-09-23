@@ -1,0 +1,42 @@
+\doxysection{libraries/chain/include/sysio/chain/whitelisted\+\_\+intrinsics.hpp File Reference}
+\hypertarget{whitelisted__intrinsics_8hpp}{}\label{whitelisted__intrinsics_8hpp}\index{libraries/chain/include/sysio/chain/whitelisted\_intrinsics.hpp@{libraries/chain/include/sysio/chain/whitelisted\_intrinsics.hpp}}
+{\ttfamily \#include $<$sysio/chain/types.\+hpp$>$}\newline
+Include dependency graph for whitelisted\+\_\+intrinsics.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{whitelisted__intrinsics_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{whitelisted__intrinsics_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain}{sysio\+::chain}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_ab67e634f02d35e09950917271779b2ff}{sysio\+::chain\+::whitelisted\+\_\+intrinsics\+\_\+type}} = \mbox{\hyperlink{namespacesysio_1_1chain_af69ee36ca3d8976c72c55262f7378e47}{shared\+\_\+flat\+\_\+multimap}}$<$\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}, \mbox{\hyperlink{namespacesysio_1_1chain_a91a8c75d36e75e33f8a9ed2a3e724893}{shared\+\_\+string}}$>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{namespacesysio_1_1chain_a87c46d5ffb5acbf3cf047af691093a12}{sysio\+::chain\+::is\+\_\+intrinsic\+\_\+whitelisted}} (const \mbox{\hyperlink{namespacesysio_1_1chain_ab67e634f02d35e09950917271779b2ff}{whitelisted\+\_\+intrinsics\+\_\+type}} \&whitelisted\+\_\+intrinsics, std\+::string\+\_\+view \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}})
+\item 
+void \mbox{\hyperlink{namespacesysio_1_1chain_a32f7ac67403d93f11d6098fb6abd1cc3}{sysio\+::chain\+::add\+\_\+intrinsic\+\_\+to\+\_\+whitelist}} (\mbox{\hyperlink{namespacesysio_1_1chain_ab67e634f02d35e09950917271779b2ff}{whitelisted\+\_\+intrinsics\+\_\+type}} \&whitelisted\+\_\+intrinsics, std\+::string\+\_\+view \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}})
+\item 
+void \mbox{\hyperlink{namespacesysio_1_1chain_a84ed15414a787e23c23383bd3362d0f7}{sysio\+::chain\+::remove\+\_\+intrinsic\+\_\+from\+\_\+whitelist}} (\mbox{\hyperlink{namespacesysio_1_1chain_ab67e634f02d35e09950917271779b2ff}{whitelisted\+\_\+intrinsics\+\_\+type}} \&whitelisted\+\_\+intrinsics, std\+::string\+\_\+view \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}})
+\item 
+void \mbox{\hyperlink{namespacesysio_1_1chain_a6f7ffc3d482aa46ff548e1968c66dd67}{sysio\+::chain\+::reset\+\_\+intrinsic\+\_\+whitelist}} (\mbox{\hyperlink{namespacesysio_1_1chain_ab67e634f02d35e09950917271779b2ff}{whitelisted\+\_\+intrinsics\+\_\+type}} \&whitelisted\+\_\+intrinsics, const std\+::set$<$ std\+::string $>$ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\item 
+std\+::set$<$ std\+::string $>$ \mbox{\hyperlink{namespacesysio_1_1chain_a9c55bd214b4e78fe1a28ef44ac2c3917}{sysio\+::chain\+::convert\+\_\+intrinsic\+\_\+whitelist\+\_\+to\+\_\+set}} (const \mbox{\hyperlink{namespacesysio_1_1chain_ab67e634f02d35e09950917271779b2ff}{whitelisted\+\_\+intrinsics\+\_\+type}} \&whitelisted\+\_\+intrinsics)
+\end{DoxyCompactItemize}

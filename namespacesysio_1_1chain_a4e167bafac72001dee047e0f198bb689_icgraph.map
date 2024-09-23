@@ -1,0 +1,7 @@
+<map id="sysio::chain::emplace_extension" name="sysio::chain::emplace_extension">
+<area shape="rect" id="Node000001" title=" " alt="" coords="239,53,387,94"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1pending__block__header__state.html#ad78d659c77418866805767eb7ca8b04d" title=" " alt="" coords="23,5,173,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="223,59,173,50,174,44,224,54"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1chain_1_1apply__context.html#ac09c8f3118154bb22b0bd50526e138fa" title=" " alt="" coords="5,85,191,141"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="224,92,192,98,191,93,223,87"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="cpp.ast.AstBuilder.GetScope" name="cpp.ast.AstBuilder.GetScope">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,13,195,38"/>
+<area shape="rect" id="Node000002" href="$classcpp_1_1ast_1_1_ast_builder.html#a57fbed5b56ee6c4fd80df7bb5af54c48" title=" " alt="" coords="243,5,374,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="195,23,227,23,227,28,195,28"/>
+<area shape="rect" id="Node000003" href="$classcpp_1_1ast_1_1_ast_builder.html#a8a5869468f959d0f1e6c92e6230125a4" title=" " alt="" coords="422,5,553,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="374,23,407,23,407,28,374,28"/>
+<area shape="rect" id="Node000004" href="$namespacecpp_1_1ast.html#a25b104cfd21fb8487a07063b6ce62062" title=" " alt="" coords="601,13,695,38"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="554,23,586,23,586,28,554,28"/>
+</map>

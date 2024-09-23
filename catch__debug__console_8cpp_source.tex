@@ -1,0 +1,37 @@
+\doxysection{catch\+\_\+debug\+\_\+console.\+cpp}
+\hypertarget{catch__debug__console_8cpp_source}{}\label{catch__debug__console_8cpp_source}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_debug\_console.cpp@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_debug\_console.cpp}}
+\mbox{\hyperlink{catch__debug__console_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{catch__debug__console_8cpp_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{catch__debug__console_8cpp_source_l00002}00002\ \textcolor{comment}{\ *\ \ Created\ by\ Martin\ on\ 29/08/2017.}}
+\DoxyCodeLine{\Hypertarget{catch__debug__console_8cpp_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{catch__debug__console_8cpp_source_l00004}00004\ \textcolor{comment}{\ *\ \ Distributed\ under\ the\ Boost\ Software\ License,\ Version\ 1.0.\ (See\ accompanying}}
+\DoxyCodeLine{\Hypertarget{catch__debug__console_8cpp_source_l00005}00005\ \textcolor{comment}{\ *\ \ file\ LICENSE\_1\_0.txt\ or\ copy\ at\ http://www.boost.org/LICENSE\_1\_0.txt)}}
+\DoxyCodeLine{\Hypertarget{catch__debug__console_8cpp_source_l00006}00006\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{catch__debug__console_8cpp_source_l00007}00007\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{catch__debug__console_8cpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{catch__debug__console_8cpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__debug__console_8h}{catch\_debug\_console.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__debug__console_8cpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__stream_8h}{catch\_stream.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__debug__console_8cpp_source_l00011}00011\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__platform_8h}{catch\_platform.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__debug__console_8cpp_source_l00012}00012\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__windows__h__proxy_8h}{catch\_windows\_h\_proxy.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__debug__console_8cpp_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{catch__debug__console_8cpp_source_l00014}00014\ \textcolor{preprocessor}{\#ifdef\ CATCH\_PLATFORM\_WINDOWS}}
+\DoxyCodeLine{\Hypertarget{catch__debug__console_8cpp_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{catch__debug__console_8cpp_source_l00016}00016\ \ \ \ \ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__debug__console_8cpp_source_l00017}00017\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespace_catch_aa5dcf4750ce9a854f4b74d3c952d13cc}{writeToDebugConsole}}(\ std::string\ \textcolor{keyword}{const}\&\ text\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__debug__console_8cpp_source_l00018}00018\ \ \ \ \ \ \ \ \ \ \ \ \ ::OutputDebugStringA(\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea6b65f28626b19b2eef447744c564e727}{text}}.c\_str()\ );}
+\DoxyCodeLine{\Hypertarget{catch__debug__console_8cpp_source_l00019}00019\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__debug__console_8cpp_source_l00020}00020\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__debug__console_8cpp_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{catch__debug__console_8cpp_source_l00022}00022\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{catch__debug__console_8cpp_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{catch__debug__console_8cpp_source_l00024}00024\ \ \ \ \ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__debug__console_8cpp_source_l00025}\mbox{\hyperlink{namespace_catch_aa5dcf4750ce9a854f4b74d3c952d13cc}{00025}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespace_catch_aa5dcf4750ce9a854f4b74d3c952d13cc}{writeToDebugConsole}}(\ std::string\ \textcolor{keyword}{const}\&\ text\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__debug__console_8cpp_source_l00026}00026\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ !TBD:\ Need\ a\ version\ for\ Mac/\ XCode\ and\ other\ IDEs}}
+\DoxyCodeLine{\Hypertarget{catch__debug__console_8cpp_source_l00027}00027\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_catch_a0179d453617ba2296f2baa99a49e7264}{Catch::cout}}()\ <<\ text;}
+\DoxyCodeLine{\Hypertarget{catch__debug__console_8cpp_source_l00028}00028\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__debug__console_8cpp_source_l00029}00029\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__debug__console_8cpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{catch__debug__console_8cpp_source_l00031}00031\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ Platform}}
+
+\end{DoxyCode}

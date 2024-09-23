@@ -1,0 +1,140 @@
+\doxysection{rentnet\+\_\+subcommand Struct Reference}
+\hypertarget{structrentnet__subcommand}{}\label{structrentnet__subcommand}\index{rentnet\_subcommand@{rentnet\_subcommand}}
+
+
+Collaboration diagram for rentnet\+\_\+subcommand\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=190pt]{structrentnet__subcommand__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structrentnet__subcommand_af44e949826393fed2ab0e0dda3c78b2b}{rentnet\+\_\+subcommand}} (\mbox{\hyperlink{class_c_l_i_1_1_app}{CLI\+::\+App}} \texorpdfstring{$\ast$}{*}action\+Root)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structrentnet__subcommand_a02686300fa593b2b7c0947a8afc21c2b}{from\+\_\+str}}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structrentnet__subcommand_a50068b0b6ce16abf4590deb7f1532cd7}{receiver\+\_\+str}}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structrentnet__subcommand_a3d7d20dbf76632c7c567f8884a629f33}{loan\+\_\+payment\+\_\+str}}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structrentnet__subcommand_ac495095bede9a2446cecad0c8a04104b}{loan\+\_\+fund\+\_\+str}}
+\item 
+const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \mbox{\hyperlink{structrentnet__subcommand_ae0bf28547699bb32fe09e7cc2eb70d79}{act\+\_\+name}} \{ "{}rentnet"{}\+\_\+n \}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01985}{1985}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structrentnet__subcommand_af44e949826393fed2ab0e0dda3c78b2b}\index{rentnet\_subcommand@{rentnet\_subcommand}!rentnet\_subcommand@{rentnet\_subcommand}}
+\index{rentnet\_subcommand@{rentnet\_subcommand}!rentnet\_subcommand@{rentnet\_subcommand}}
+\doxysubsubsection{\texorpdfstring{rentnet\_subcommand()}{rentnet\_subcommand()}}
+{\footnotesize\ttfamily \label{structrentnet__subcommand_af44e949826393fed2ab0e0dda3c78b2b} 
+rentnet\+\_\+subcommand\+::rentnet\+\_\+subcommand (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_c_l_i_1_1_app}{CLI\+::\+App}} \texorpdfstring{$\ast$}{*}}]{action\+Root}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01992}{1992}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01992\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01993\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ rentnet\ =\ actionRoot-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_a8b461d2233ec4121259011b5ed24b336}{add\_subcommand}}(\textcolor{stringliteral}{"{}rentnet"{}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}Rent\ Network\ bandwidth\ for\ 30\ days"{}}));}
+\DoxyCodeLine{01994\ \ \ \ \ \ \ rentnet-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_a8c812d42c7720ecb5cd0aec41b5aa941}{add\_option}}(\textcolor{stringliteral}{"{}from"{}},\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structrentnet__subcommand_a02686300fa593b2b7c0947a8afc21c2b}{from\_str}},\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}Account\ paying\ rent\ fees"{}}))-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a}{required}}();}
+\DoxyCodeLine{01995\ \ \ \ \ \ \ rentnet-\/>add\_option(\textcolor{stringliteral}{"{}receiver"{}},\ \ \ \ \ \mbox{\hyperlink{structrentnet__subcommand_a50068b0b6ce16abf4590deb7f1532cd7}{receiver\_str}},\ \ \ \ \ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}Account\ to\ whom\ rented\ Network\ bandwidth\ is\ staked"{}}))-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a}{required}}();}
+\DoxyCodeLine{01996\ \ \ \ \ \ \ rentnet-\/>add\_option(\textcolor{stringliteral}{"{}loan\_payment"{}},\ \mbox{\hyperlink{structrentnet__subcommand_a3d7d20dbf76632c7c567f8884a629f33}{loan\_payment\_str}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}Loan\ fee\ to\ be\ paid,\ used\ to\ calculate\ amount\ of\ rented\ bandwidth"{}}))-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a}{required}}();}
+\DoxyCodeLine{01997\ \ \ \ \ \ \ rentnet-\/>add\_option(\textcolor{stringliteral}{"{}loan\_fund"{}},\ \ \ \ \mbox{\hyperlink{structrentnet__subcommand_ac495095bede9a2446cecad0c8a04104b}{loan\_fund\_str}},\ \ \ \ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}Loan\ fund\ to\ be\ used\ in\ automatic\ renewal,\ can\ be\ 0\ tokens"{}}))-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a}{required}}();}
+\DoxyCodeLine{01998\ \ \ \ \ \ \ \mbox{\hyperlink{programs_2clio_2main_8cpp_aa5d53f41b83b5323c73622fbbb15e9cd}{add\_standard\_transaction\_options}}(rentnet,\ \textcolor{stringliteral}{"{}from@active"{}});}
+\DoxyCodeLine{01999\ \ \ \ \ \ \ rentnet-\/>callback([\textcolor{keyword}{this}]\ \{}
+\DoxyCodeLine{02000\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}\ act\_payload\ =\ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}()}
+\DoxyCodeLine{02001\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}from"{}},\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structrentnet__subcommand_a02686300fa593b2b7c0947a8afc21c2b}{from\_str}})}
+\DoxyCodeLine{02002\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}receiver"{}},\ \ \ \ \ \mbox{\hyperlink{structrentnet__subcommand_a50068b0b6ce16abf4590deb7f1532cd7}{receiver\_str}})}
+\DoxyCodeLine{02003\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}loan\_payment"{}},\ \mbox{\hyperlink{structrentnet__subcommand_a3d7d20dbf76632c7c567f8884a629f33}{loan\_payment\_str}})}
+\DoxyCodeLine{02004\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}loan\_fund"{}},\ \ \ \ \mbox{\hyperlink{structrentnet__subcommand_ac495095bede9a2446cecad0c8a04104b}{loan\_fund\_str}});}
+\DoxyCodeLine{02005\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ accountPermissions\ =\ \mbox{\hyperlink{programs_2clio_2main_8cpp_a2b91ca5dbe7cc4ab287d0e44c3037552}{get\_account\_permissions}}(\mbox{\hyperlink{programs_2clio_2main_8cpp_ad552924cb151dcd5b60c73856d1ff706}{tx\_permission}},\ \{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(\mbox{\hyperlink{structrentnet__subcommand_a02686300fa593b2b7c0947a8afc21c2b}{from\_str}}),\ config::active\_name\});}
+\DoxyCodeLine{02006\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{programs_2clio_2main_8cpp_aaf784434864a29e4835be7465173d1ab}{send\_actions}}(\{\mbox{\hyperlink{programs_2clio_2main_8cpp_a067e20df5f65333b0c3cf5840bc37dea}{create\_action}}(accountPermissions,\ config::system\_account\_name,\ \mbox{\hyperlink{structrentnet__subcommand_ae0bf28547699bb32fe09e7cc2eb70d79}{act\_name}},\ act\_payload)\});}
+\DoxyCodeLine{02007\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{02008\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structrentnet__subcommand_af44e949826393fed2ab0e0dda3c78b2b_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structrentnet__subcommand_ae0bf28547699bb32fe09e7cc2eb70d79}\index{rentnet\_subcommand@{rentnet\_subcommand}!act\_name@{act\_name}}
+\index{act\_name@{act\_name}!rentnet\_subcommand@{rentnet\_subcommand}}
+\doxysubsubsection{\texorpdfstring{act\_name}{act\_name}}
+{\footnotesize\ttfamily \label{structrentnet__subcommand_ae0bf28547699bb32fe09e7cc2eb70d79} 
+const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} rentnet\+\_\+subcommand\+::act\+\_\+name \{ "{}rentnet"{}\+\_\+n \}}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01990}{1990}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01990\ \{\ \textcolor{stringliteral}{"{}rentnet"{}}\_n\ \};}
+
+\end{DoxyCode}
+\Hypertarget{structrentnet__subcommand_a02686300fa593b2b7c0947a8afc21c2b}\index{rentnet\_subcommand@{rentnet\_subcommand}!from\_str@{from\_str}}
+\index{from\_str@{from\_str}!rentnet\_subcommand@{rentnet\_subcommand}}
+\doxysubsubsection{\texorpdfstring{from\_str}{from\_str}}
+{\footnotesize\ttfamily \label{structrentnet__subcommand_a02686300fa593b2b7c0947a8afc21c2b} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} rentnet\+\_\+subcommand\+::from\+\_\+str}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01986}{1986}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{structrentnet__subcommand_ac495095bede9a2446cecad0c8a04104b}\index{rentnet\_subcommand@{rentnet\_subcommand}!loan\_fund\_str@{loan\_fund\_str}}
+\index{loan\_fund\_str@{loan\_fund\_str}!rentnet\_subcommand@{rentnet\_subcommand}}
+\doxysubsubsection{\texorpdfstring{loan\_fund\_str}{loan\_fund\_str}}
+{\footnotesize\ttfamily \label{structrentnet__subcommand_ac495095bede9a2446cecad0c8a04104b} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} rentnet\+\_\+subcommand\+::loan\+\_\+fund\+\_\+str}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01989}{1989}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{structrentnet__subcommand_a3d7d20dbf76632c7c567f8884a629f33}\index{rentnet\_subcommand@{rentnet\_subcommand}!loan\_payment\_str@{loan\_payment\_str}}
+\index{loan\_payment\_str@{loan\_payment\_str}!rentnet\_subcommand@{rentnet\_subcommand}}
+\doxysubsubsection{\texorpdfstring{loan\_payment\_str}{loan\_payment\_str}}
+{\footnotesize\ttfamily \label{structrentnet__subcommand_a3d7d20dbf76632c7c567f8884a629f33} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} rentnet\+\_\+subcommand\+::loan\+\_\+payment\+\_\+str}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01988}{1988}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{structrentnet__subcommand_a50068b0b6ce16abf4590deb7f1532cd7}\index{rentnet\_subcommand@{rentnet\_subcommand}!receiver\_str@{receiver\_str}}
+\index{receiver\_str@{receiver\_str}!rentnet\_subcommand@{rentnet\_subcommand}}
+\doxysubsubsection{\texorpdfstring{receiver\_str}{receiver\_str}}
+{\footnotesize\ttfamily \label{structrentnet__subcommand_a50068b0b6ce16abf4590deb7f1532cd7} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} rentnet\+\_\+subcommand\+::receiver\+\_\+str}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01987}{1987}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+programs/clio/\mbox{\hyperlink{programs_2clio_2main_8cpp}{main.\+cpp}}\end{DoxyCompactItemize}

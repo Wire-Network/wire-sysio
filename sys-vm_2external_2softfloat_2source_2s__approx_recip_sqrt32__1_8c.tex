@@ -1,0 +1,111 @@
+\doxysection{libraries/sys-\/vm/external/softfloat/source/s\+\_\+approx\+Recip\+Sqrt32\+\_\+1.c File Reference}
+\hypertarget{sys-vm_2external_2softfloat_2source_2s__approx_recip_sqrt32__1_8c}{}\label{sys-vm_2external_2softfloat_2source_2s__approx_recip_sqrt32__1_8c}\index{libraries/sys-\/vm/external/softfloat/source/s\_approxRecipSqrt32\_1.c@{libraries/sys-\/vm/external/softfloat/source/s\_approxRecipSqrt32\_1.c}}
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include "{}platform.\+h"{}}\newline
+Include dependency graph for s\+\_\+approx\+Recip\+Sqrt32\+\_\+1.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=250pt]{sys-vm_2external_2softfloat_2source_2s__approx_recip_sqrt32__1_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2s__approx_recip_sqrt32__1_8c_aed4ec4ae662fd07e2684e6871b728219}{softfloat\+\_\+approx\+Recip\+Sqrt32\+\_\+1}} (unsigned int odd\+ExpA, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+const \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2s__approx_recip_sqrt32__1_8c_a0f7c742e708cc2e45f28f9d4ef7439ea}{softfloat\+\_\+approx\+Recip\+Sqrt\+\_\+1k0s}} \mbox{[}$\,$\mbox{]}
+\item 
+const \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2s__approx_recip_sqrt32__1_8c_a2d2179ec501e4cdd4ac2c8dd2579d560}{softfloat\+\_\+approx\+Recip\+Sqrt\+\_\+1k1s}} \mbox{[}$\,$\mbox{]}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{sys-vm_2external_2softfloat_2source_2s__approx_recip_sqrt32__1_8c_aed4ec4ae662fd07e2684e6871b728219}\index{s\_approxRecipSqrt32\_1.c@{s\_approxRecipSqrt32\_1.c}!softfloat\_approxRecipSqrt32\_1@{softfloat\_approxRecipSqrt32\_1}}
+\index{softfloat\_approxRecipSqrt32\_1@{softfloat\_approxRecipSqrt32\_1}!s\_approxRecipSqrt32\_1.c@{s\_approxRecipSqrt32\_1.c}}
+\doxysubsubsection{\texorpdfstring{softfloat\_approxRecipSqrt32\_1()}{softfloat\_approxRecipSqrt32\_1()}}
+{\footnotesize\ttfamily \label{sys-vm_2external_2softfloat_2source_2s__approx_recip_sqrt32__1_8c_aed4ec4ae662fd07e2684e6871b728219} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} softfloat\+\_\+approx\+Recip\+Sqrt32\+\_\+1 (\begin{DoxyParamCaption}\item[{unsigned int}]{odd\+ExpA}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{a}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2s__approx_recip_sqrt32__1_8c_source_l00045}{45}} of file \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2s__approx_recip_sqrt32__1_8c_source}{s\+\_\+approx\+Recip\+Sqrt32\+\_\+1.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00046\ \{}
+\DoxyCodeLine{00047\ \ \ \ \ \textcolor{keywordtype}{int}\ index;}
+\DoxyCodeLine{00048\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ eps,\ r0;}
+\DoxyCodeLine{00049\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a8f075c759c74e109e8184306c663809d}{uint\_fast32\_t}}\ ESqrR0;}
+\DoxyCodeLine{00050\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{hash__impl_8h_a672bd39bdf2f6dc295a23ddd109175ff}{sigma0}};}
+\DoxyCodeLine{00051\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a8f075c759c74e109e8184306c663809d}{uint\_fast32\_t}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};}
+\DoxyCodeLine{00052\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ sqrSigma0;}
+\DoxyCodeLine{00053\ }
+\DoxyCodeLine{00054\ \ \ \ \ index\ =\ (\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}>>27\ \&\ 0xE)\ +\ oddExpA;}
+\DoxyCodeLine{00055\ \ \ \ \ eps\ =\ (\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}})\ (\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}>>12);}
+\DoxyCodeLine{00056\ \ \ \ \ r0\ =\ \mbox{\hyperlink{softfloat_2source_2s__approx_recip_sqrt32__1_8c_a0f7c742e708cc2e45f28f9d4ef7439ea}{softfloat\_approxRecipSqrt\_1k0s}}[index]}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/\ ((\mbox{\hyperlink{softfloat_2source_2s__approx_recip_sqrt32__1_8c_a2d2179ec501e4cdd4ac2c8dd2579d560}{softfloat\_approxRecipSqrt\_1k1s}}[index]\ *\ (\mbox{\hyperlink{stdint_8h_a8f075c759c74e109e8184306c663809d}{uint\_fast32\_t}})\ eps)}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ >>20);}
+\DoxyCodeLine{00059\ \ \ \ \ ESqrR0\ =\ (\mbox{\hyperlink{stdint_8h_a8f075c759c74e109e8184306c663809d}{uint\_fast32\_t}})\ r0\ *\ r0;}
+\DoxyCodeLine{00060\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ !\ oddExpA\ )\ ESqrR0\ <<=\ 1;}
+\DoxyCodeLine{00061\ \ \ \ \ \mbox{\hyperlink{hash__impl_8h_a672bd39bdf2f6dc295a23ddd109175ff}{sigma0}}\ =\ \string~(\mbox{\hyperlink{stdint_8h_a8f075c759c74e109e8184306c663809d}{uint\_fast32\_t}})\ (((\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})\ ESqrR0\ *\ (\mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\_fast64\_t}})\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})>>23);}
+\DoxyCodeLine{00062\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ =\ ((\mbox{\hyperlink{stdint_8h_a8f075c759c74e109e8184306c663809d}{uint\_fast32\_t}})\ r0<<16)\ +\ ((r0\ *\ (\mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\_fast64\_t}})\ \mbox{\hyperlink{hash__impl_8h_a672bd39bdf2f6dc295a23ddd109175ff}{sigma0}})>>25);}
+\DoxyCodeLine{00063\ \ \ \ \ sqrSigma0\ =\ ((\mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\_fast64\_t}})\ \mbox{\hyperlink{hash__impl_8h_a672bd39bdf2f6dc295a23ddd109175ff}{sigma0}}\ *\ \mbox{\hyperlink{hash__impl_8h_a672bd39bdf2f6dc295a23ddd109175ff}{sigma0}})>>32;}
+\DoxyCodeLine{00064\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ +=\ ((\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})\ ((\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}>>1)\ +\ (\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}>>3)\ -\/\ ((\mbox{\hyperlink{stdint_8h_a8f075c759c74e109e8184306c663809d}{uint\_fast32\_t}})\ r0<<14))}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *\ (\mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\_fast64\_t}})\ sqrSigma0)}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ \ \ \ >>48;}
+\DoxyCodeLine{00067\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ !\ (\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ \&\ 0x80000000)\ )\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ =\ 0x80000000;}
+\DoxyCodeLine{00068\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};}
+\DoxyCodeLine{00069\ }
+\DoxyCodeLine{00070\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sys-vm_2external_2softfloat_2source_2s__approx_recip_sqrt32__1_8c_aed4ec4ae662fd07e2684e6871b728219_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{sys-vm_2external_2softfloat_2source_2s__approx_recip_sqrt32__1_8c_a0f7c742e708cc2e45f28f9d4ef7439ea}\index{s\_approxRecipSqrt32\_1.c@{s\_approxRecipSqrt32\_1.c}!softfloat\_approxRecipSqrt\_1k0s@{softfloat\_approxRecipSqrt\_1k0s}}
+\index{softfloat\_approxRecipSqrt\_1k0s@{softfloat\_approxRecipSqrt\_1k0s}!s\_approxRecipSqrt32\_1.c@{s\_approxRecipSqrt32\_1.c}}
+\doxysubsubsection{\texorpdfstring{softfloat\_approxRecipSqrt\_1k0s}{softfloat\_approxRecipSqrt\_1k0s}}
+{\footnotesize\ttfamily \label{sys-vm_2external_2softfloat_2source_2s__approx_recip_sqrt32__1_8c_a0f7c742e708cc2e45f28f9d4ef7439ea} 
+const \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} softfloat\+\_\+approx\+Recip\+Sqrt\+\_\+1k0s\mbox{[}$\,$\mbox{]}\hspace{0.3cm}{\ttfamily [extern]}}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2s__approx_recip_sqrt__1_ks_8c_source_l00041}{41}} of file \mbox{\hyperlink{softfloat_2source_2s__approx_recip_sqrt__1_ks_8c_source}{s\+\_\+approx\+Recip\+Sqrt\+\_\+1\+Ks.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00042\ \ \ \ \ 0xB4C9,\ 0xFFAB,\ 0xAA7D,\ 0xF11C,\ 0xA1C5,\ 0xE4C7,\ 0x9A43,\ 0xDA29,}
+\DoxyCodeLine{00043\ \ \ \ \ 0x93B5,\ 0xD0E5,\ 0x8DED,\ 0xC8B7,\ 0x88C6,\ 0xC16D,\ 0x8424,\ 0xBAE1}
+\DoxyCodeLine{00044\ \};}
+
+\end{DoxyCode}
+\Hypertarget{sys-vm_2external_2softfloat_2source_2s__approx_recip_sqrt32__1_8c_a2d2179ec501e4cdd4ac2c8dd2579d560}\index{s\_approxRecipSqrt32\_1.c@{s\_approxRecipSqrt32\_1.c}!softfloat\_approxRecipSqrt\_1k1s@{softfloat\_approxRecipSqrt\_1k1s}}
+\index{softfloat\_approxRecipSqrt\_1k1s@{softfloat\_approxRecipSqrt\_1k1s}!s\_approxRecipSqrt32\_1.c@{s\_approxRecipSqrt32\_1.c}}
+\doxysubsubsection{\texorpdfstring{softfloat\_approxRecipSqrt\_1k1s}{softfloat\_approxRecipSqrt\_1k1s}}
+{\footnotesize\ttfamily \label{sys-vm_2external_2softfloat_2source_2s__approx_recip_sqrt32__1_8c_a2d2179ec501e4cdd4ac2c8dd2579d560} 
+const \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} softfloat\+\_\+approx\+Recip\+Sqrt\+\_\+1k1s\mbox{[}$\,$\mbox{]}\hspace{0.3cm}{\ttfamily [extern]}}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2s__approx_recip_sqrt__1_ks_8c_source_l00045}{45}} of file \mbox{\hyperlink{softfloat_2source_2s__approx_recip_sqrt__1_ks_8c_source}{s\+\_\+approx\+Recip\+Sqrt\+\_\+1\+Ks.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00046\ \ \ \ \ 0xA5A5,\ 0xEA42,\ 0x8C21,\ 0xC62D,\ 0x788F,\ 0xAA7F,\ 0x6928,\ 0x94B6,}
+\DoxyCodeLine{00047\ \ \ \ \ 0x5CC7,\ 0x8335,\ 0x52A6,\ 0x74E2,\ 0x4A3E,\ 0x68FE,\ 0x432B,\ 0x5EFD}
+\DoxyCodeLine{00048\ \};}
+
+\end{DoxyCode}

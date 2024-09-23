@@ -1,0 +1,116 @@
+\doxysection{libraries/chain/include/sysio/chain/webassembly/sys-\/vm-\/oc/sys-\/vm-\/oc.hpp File Reference}
+\hypertarget{sys-vm-oc_2sys-vm-oc_8hpp}{}\label{sys-vm-oc_2sys-vm-oc_8hpp}\index{libraries/chain/include/sysio/chain/webassembly/sys-\/vm-\/oc/sys-\/vm-\/oc.hpp@{libraries/chain/include/sysio/chain/webassembly/sys-\/vm-\/oc/sys-\/vm-\/oc.hpp}}
+{\ttfamily \#include $<$sysio/chain/types.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/webassembly/sys-\/vm-\/oc/sys-\/vm-\/oc.\+h$>$}\newline
+{\ttfamily \#include $<$exception$>$}\newline
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include $<$stddef.\+h$>$}\newline
+{\ttfamily \#include $<$setjmp.\+h$>$}\newline
+{\ttfamily \#include $<$vector$>$}\newline
+{\ttfamily \#include $<$list$>$}\newline
+Include dependency graph for sys-\/vm-\/oc.hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sys-vm-oc_2sys-vm-oc_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sys-vm-oc_2sys-vm-oc_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1no__offset}{sysio\+::chain\+::eosvmoc\+::no\+\_\+offset}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1code__offset}{sysio\+::chain\+::eosvmoc\+::code\+\_\+offset}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1intrinsic__ordinal}{sysio\+::chain\+::eosvmoc\+::intrinsic\+\_\+ordinal}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1code__descriptor}{sysio\+::chain\+::eosvmoc\+::code\+\_\+descriptor}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain}{sysio\+::chain}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc}{sysio\+::chain\+::eosvmoc}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{sys-vm-oc_2sys-vm-oc_8hpp_adf95390531a85e18a528b50f2617554b}{SYSVMOC\+\_\+\+INTRINSIC\+\_\+\+INIT\+\_\+\+PRIORITY}}~\+\_\+\+\_\+attribute\+\_\+\+\_\+((init\+\_\+priority(198)))
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a7cfa050a8e417822975ca260ac344c98}{sysio\+::chain\+::eosvmoc\+::control\+\_\+block}} = \mbox{\hyperlink{structeos__vm__oc__control__block}{eos\+\_\+vm\+\_\+oc\+\_\+control\+\_\+block}}
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a3f05d22e0b6e9719359408875c7ff0e3}{sysio\+::chain\+::eosvmoc\+::eosvmoc\+\_\+optional\+\_\+offset\+\_\+or\+\_\+import\+\_\+t}} = std\+::variant$<$\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1no__offset}{no\+\_\+offset}}, \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1code__offset}{code\+\_\+offset}}, \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1intrinsic__ordinal}{intrinsic\+\_\+ordinal}}$>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a1ddba067ecc18a3960be5ff756bc73f9}{sysio\+::chain\+::eosvmoc\+::eosvmoc\+\_\+exitcode}} \+: int \{ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a1ddba067ecc18a3960be5ff756bc73f9a36f75913eb0917485ea9b89a8c495078}{sysio\+::chain\+::eosvmoc\+::\+SYSVMOC\+\_\+\+EXIT\+\_\+\+CLEAN\+\_\+\+EXIT}} = 1
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a1ddba067ecc18a3960be5ff756bc73f9ae19ad8f2c051431379110a731c1c6e9d}{sysio\+::chain\+::eosvmoc\+::\+SYSVMOC\+\_\+\+EXIT\+\_\+\+CHECKTIME\+\_\+\+FAIL}}
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a1ddba067ecc18a3960be5ff756bc73f9a555f34533254a2280542ca9d53a83ca1}{sysio\+::chain\+::eosvmoc\+::\+SYSVMOC\+\_\+\+EXIT\+\_\+\+SEGV}}
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a1ddba067ecc18a3960be5ff756bc73f9aebd8c9bd1767539a42045512514f92dd}{sysio\+::chain\+::eosvmoc\+::\+SYSVMOC\+\_\+\+EXIT\+\_\+\+EXCEPTION}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{sys-vm-oc_2sys-vm-oc_8hpp_a9cfdcbcbfd6c1ac018e17402ae15f478}{FC\+\_\+\+REFLECT}} (\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1no__offset}{sysio\+::chain\+::eosvmoc\+::no\+\_\+offset}},)
+\item 
+\mbox{\hyperlink{sys-vm-oc_2sys-vm-oc_8hpp_ae267750198fa397d681d4cb843982972}{FC\+\_\+\+REFLECT}} (\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1code__offset}{sysio\+::chain\+::eosvmoc\+::code\+\_\+offset}},(offset))
+\item 
+\mbox{\hyperlink{sys-vm-oc_2sys-vm-oc_8hpp_a7d1db88bae177e4871b103ccb7bb46b6}{FC\+\_\+\+REFLECT}} (\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1intrinsic__ordinal}{sysio\+::chain\+::eosvmoc\+::intrinsic\+\_\+ordinal}},(ordinal))
+\item 
+\mbox{\hyperlink{sys-vm-oc_2sys-vm-oc_8hpp_a7eaa2348e5e51938fcd3e50d834dadb7}{FC\+\_\+\+REFLECT}} (\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1code__descriptor}{sysio\+::chain\+::eosvmoc\+::code\+\_\+descriptor}},(code\+\_\+hash)(vm\+\_\+version)(codegen\+\_\+version)(code\+\_\+begin)(start)(apply\+\_\+offset)(starting\+\_\+memory\+\_\+pages)(initdata\+\_\+begin)(initdata\+\_\+size)(initdata\+\_\+prologue\+\_\+size))
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{sys-vm-oc_2sys-vm-oc_8hpp_adf95390531a85e18a528b50f2617554b}\index{sys-\/vm-\/oc.hpp@{sys-\/vm-\/oc.hpp}!SYSVMOC\_INTRINSIC\_INIT\_PRIORITY@{SYSVMOC\_INTRINSIC\_INIT\_PRIORITY}}
+\index{SYSVMOC\_INTRINSIC\_INIT\_PRIORITY@{SYSVMOC\_INTRINSIC\_INIT\_PRIORITY}!sys-\/vm-\/oc.hpp@{sys-\/vm-\/oc.hpp}}
+\doxysubsubsection{\texorpdfstring{SYSVMOC\_INTRINSIC\_INIT\_PRIORITY}{SYSVMOC\_INTRINSIC\_INIT\_PRIORITY}}
+{\footnotesize\ttfamily \label{sys-vm-oc_2sys-vm-oc_8hpp_adf95390531a85e18a528b50f2617554b} 
+\#define SYSVMOC\+\_\+\+INTRINSIC\+\_\+\+INIT\+\_\+\+PRIORITY~\+\_\+\+\_\+attribute\+\_\+\+\_\+((init\+\_\+priority(198)))}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm-oc_2sys-vm-oc_8hpp_source_l00062}{62}} of file \mbox{\hyperlink{sys-vm-oc_2sys-vm-oc_8hpp_source}{sys-\/vm-\/oc.\+hpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{sys-vm-oc_2sys-vm-oc_8hpp_a7eaa2348e5e51938fcd3e50d834dadb7}\index{sys-\/vm-\/oc.hpp@{sys-\/vm-\/oc.hpp}!FC\_REFLECT@{FC\_REFLECT}}
+\index{FC\_REFLECT@{FC\_REFLECT}!sys-\/vm-\/oc.hpp@{sys-\/vm-\/oc.hpp}}
+\doxysubsubsection{\texorpdfstring{FC\_REFLECT()}{FC\_REFLECT()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{sys-vm-oc_2sys-vm-oc_8hpp_a7eaa2348e5e51938fcd3e50d834dadb7} 
+FC\+\_\+\+REFLECT (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1code__descriptor}{sysio\+::chain\+::eosvmoc\+::code\+\_\+descriptor}}}]{}{, }\item[{(code\+\_\+hash)(vm\+\_\+version)(codegen\+\_\+version)(code\+\_\+begin)(start)(apply\+\_\+offset)(starting\+\_\+memory\+\_\+pages)(initdata\+\_\+begin)(initdata\+\_\+size)(initdata\+\_\+prologue\+\_\+size)}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{sys-vm-oc_2sys-vm-oc_8hpp_ae267750198fa397d681d4cb843982972}\index{sys-\/vm-\/oc.hpp@{sys-\/vm-\/oc.hpp}!FC\_REFLECT@{FC\_REFLECT}}
+\index{FC\_REFLECT@{FC\_REFLECT}!sys-\/vm-\/oc.hpp@{sys-\/vm-\/oc.hpp}}
+\doxysubsubsection{\texorpdfstring{FC\_REFLECT()}{FC\_REFLECT()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{sys-vm-oc_2sys-vm-oc_8hpp_ae267750198fa397d681d4cb843982972} 
+FC\+\_\+\+REFLECT (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1code__offset}{sysio\+::chain\+::eosvmoc\+::code\+\_\+offset}}}]{}{, }\item[{(offset)}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{sys-vm-oc_2sys-vm-oc_8hpp_a7d1db88bae177e4871b103ccb7bb46b6}\index{sys-\/vm-\/oc.hpp@{sys-\/vm-\/oc.hpp}!FC\_REFLECT@{FC\_REFLECT}}
+\index{FC\_REFLECT@{FC\_REFLECT}!sys-\/vm-\/oc.hpp@{sys-\/vm-\/oc.hpp}}
+\doxysubsubsection{\texorpdfstring{FC\_REFLECT()}{FC\_REFLECT()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{sys-vm-oc_2sys-vm-oc_8hpp_a7d1db88bae177e4871b103ccb7bb46b6} 
+FC\+\_\+\+REFLECT (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1intrinsic__ordinal}{sysio\+::chain\+::eosvmoc\+::intrinsic\+\_\+ordinal}}}]{}{, }\item[{(ordinal)}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{sys-vm-oc_2sys-vm-oc_8hpp_a9cfdcbcbfd6c1ac018e17402ae15f478}\index{sys-\/vm-\/oc.hpp@{sys-\/vm-\/oc.hpp}!FC\_REFLECT@{FC\_REFLECT}}
+\index{FC\_REFLECT@{FC\_REFLECT}!sys-\/vm-\/oc.hpp@{sys-\/vm-\/oc.hpp}}
+\doxysubsubsection{\texorpdfstring{FC\_REFLECT()}{FC\_REFLECT()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{sys-vm-oc_2sys-vm-oc_8hpp_a9cfdcbcbfd6c1ac018e17402ae15f478} 
+FC\+\_\+\+REFLECT (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1no__offset}{sysio\+::chain\+::eosvmoc\+::no\+\_\+offset}}}]{}{}\end{DoxyParamCaption})}
+

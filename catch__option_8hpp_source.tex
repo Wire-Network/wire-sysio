@@ -1,0 +1,79 @@
+\doxysection{catch\+\_\+option.\+hpp}
+\hypertarget{catch__option_8hpp_source}{}\label{catch__option_8hpp_source}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_option.hpp@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_option.hpp}}
+\mbox{\hyperlink{catch__option_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00002}00002\ \textcolor{comment}{\ *\ \ Created\ by\ Phil\ on\ 02/12/2012.}}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00003}00003\ \textcolor{comment}{\ *\ \ Copyright\ 2012\ Two\ Blue\ Cubes\ Ltd.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00004}00004\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00005}00005\ \textcolor{comment}{\ *\ \ Distributed\ under\ the\ Boost\ Software\ License,\ Version\ 1.0.\ (See\ accompanying}}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00006}00006\ \textcolor{comment}{\ *\ \ file\ LICENSE\_1\_0.txt\ or\ copy\ at\ http://www.boost.org/LICENSE\_1\_0.txt)}}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00007}00007\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00008}00008\ \textcolor{preprocessor}{\#ifndef\ TWOBLUECUBES\_CATCH\_OPTION\_HPP\_INCLUDED}}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00009}00009\ \textcolor{preprocessor}{\#define\ TWOBLUECUBES\_CATCH\_OPTION\_HPP\_INCLUDED}}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00011}00011\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00013}00013\ \ \ \ \ \textcolor{comment}{//\ An\ optional\ type}}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00014}00014\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00015}\mbox{\hyperlink{class_catch_1_1_option}{00015}}\ \ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_catch_1_1_option}{Option}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00016}00016\ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00017}\mbox{\hyperlink{class_catch_1_1_option_a8efb01b593d798decc80cbbdf311f2a3}{00017}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_option_a8efb01b593d798decc80cbbdf311f2a3}{Option}}()\ :\ nullableValue(\ nullptr\ )\ \{\}}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00018}\mbox{\hyperlink{class_catch_1_1_option_a5aeb9c22d48a6882bdf5fb4730b06c86}{00018}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_option_a5aeb9c22d48a6882bdf5fb4730b06c86}{Option}}(\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \textcolor{keyword}{const}\&\ \_value\ )}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00019}00019\ \ \ \ \ \ \ \ \ :\ nullableValue(\ new(\ storage\ )\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}(\ \_value\ )\ )}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00020}00020\ \ \ \ \ \ \ \ \ \{\}}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00021}\mbox{\hyperlink{class_catch_1_1_option_af02f2e4559f06384baec0def8c68c5fd}{00021}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_option_af02f2e4559f06384baec0def8c68c5fd}{Option}}(\ \mbox{\hyperlink{class_catch_1_1_option}{Option}}\ \textcolor{keyword}{const}\&\ \_other\ )}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00022}00022\ \ \ \ \ \ \ \ \ :\ nullableValue(\ \_other\ ?\ new(\ storage\ )\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}(\ *\_other\ )\ :\ nullptr\ )}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00023}00023\ \ \ \ \ \ \ \ \ \{\}}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00025}\mbox{\hyperlink{class_catch_1_1_option_a37fe90bb47bb909f150a5ad6be25581a}{00025}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_option_a37fe90bb47bb909f150a5ad6be25581a}{\string~Option}}()\ \{}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00026}00026\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_option_a37b4e0e5d4d56296adacd267a616f4e0}{reset}}();}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00027}00027\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00029}\mbox{\hyperlink{class_catch_1_1_option_a960fd629f3048995038d58fcf9c018b0}{00029}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_option}{Option}}\&\ \mbox{\hyperlink{class_catch_1_1_option_a960fd629f3048995038d58fcf9c018b0}{operator=\ }}(\ \mbox{\hyperlink{class_catch_1_1_option}{Option}}\ \textcolor{keyword}{const}\&\ \_other\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00030}00030\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \&\_other\ !=\ \textcolor{keyword}{this}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00031}00031\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_option_a37b4e0e5d4d56296adacd267a616f4e0}{reset}}();}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00032}00032\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \_other\ )}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00033}00033\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ nullableValue\ =\ \textcolor{keyword}{new}(\ storage\ )\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}(\ *\_other\ );}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00034}00034\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00035}00035\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00036}00036\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00037}\mbox{\hyperlink{class_catch_1_1_option_a32af4018dd8aaf071944f79fc1af520a}{00037}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_option}{Option}}\&\ \mbox{\hyperlink{class_catch_1_1_option_a960fd629f3048995038d58fcf9c018b0}{operator\ =\ }}(\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \textcolor{keyword}{const}\&\ \_value\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00038}00038\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_option_a37b4e0e5d4d56296adacd267a616f4e0}{reset}}();}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00039}00039\ \ \ \ \ \ \ \ \ \ \ \ \ nullableValue\ =\ \textcolor{keyword}{new}(\ storage\ )\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}(\ \_value\ );}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00040}00040\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00041}00041\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00043}\mbox{\hyperlink{class_catch_1_1_option_a37b4e0e5d4d56296adacd267a616f4e0}{00043}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_option_a37b4e0e5d4d56296adacd267a616f4e0}{reset}}()\ \{}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00044}00044\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ nullableValue\ )}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00045}00045\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ nullableValue-\/>\string~T();}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00046}00046\ \ \ \ \ \ \ \ \ \ \ \ \ nullableValue\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00047}00047\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00049}\mbox{\hyperlink{class_catch_1_1_option_ac250ca96c9af3bf5f94f253f4c0ec336}{00049}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ \mbox{\hyperlink{class_catch_1_1_option_ac250ca96c9af3bf5f94f253f4c0ec336}{operator*}}()\ \{\ \textcolor{keywordflow}{return}\ *nullableValue;\ \}}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00050}\mbox{\hyperlink{class_catch_1_1_option_a873a00ed8844b137287f25c811cfd330}{00050}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{class_catch_1_1_option_a873a00ed8844b137287f25c811cfd330}{operator*}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ *nullableValue;\ \}}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00051}\mbox{\hyperlink{class_catch_1_1_option_a04da75b6b0946cc38b4bbd51c8d407e0}{00051}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ \mbox{\hyperlink{class_catch_1_1_option_a04da75b6b0946cc38b4bbd51c8d407e0}{operator-\/>}}()\ \{\ \textcolor{keywordflow}{return}\ nullableValue;\ \}}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00052}\mbox{\hyperlink{class_catch_1_1_option_acb3ec06778a8761e5f0014543d8f898e}{00052}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ \mbox{\hyperlink{class_catch_1_1_option_acb3ec06778a8761e5f0014543d8f898e}{operator-\/>}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ nullableValue;\ \}}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00054}\mbox{\hyperlink{class_catch_1_1_option_a8d9ae2e30b0eb76fe134a6fbc8423124}{00054}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \mbox{\hyperlink{class_catch_1_1_option_a8d9ae2e30b0eb76fe134a6fbc8423124}{valueOr}}(\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{pointer_8h_a3db30c1795eb39d4452f8698f4a67f05}{defaultValue}}\ )\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ nullableValue\ ?\ *nullableValue\ :\ \mbox{\hyperlink{pointer_8h_a3db30c1795eb39d4452f8698f4a67f05}{defaultValue}};}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00056}00056\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00058}\mbox{\hyperlink{class_catch_1_1_option_a97c95829afbe92f2bcc5fd75b32c0825}{00058}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_catch_1_1_option_a97c95829afbe92f2bcc5fd75b32c0825}{some}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ nullableValue\ !=\ \textcolor{keyword}{nullptr};\ \}}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00059}\mbox{\hyperlink{class_catch_1_1_option_a821753afdc3fac947a13a01fbe0d248e}{00059}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_catch_1_1_option_a821753afdc3fac947a13a01fbe0d248e}{none}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ nullableValue\ ==\ \textcolor{keyword}{nullptr};\ \}}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00061}\mbox{\hyperlink{class_catch_1_1_option_a96dccb86bdf45ee0c08e122b6133bef3}{00061}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_catch_1_1_option_a96dccb86bdf45ee0c08e122b6133bef3}{operator\ !}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ nullableValue\ ==\ \textcolor{keyword}{nullptr};\ \}}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00062}\mbox{\hyperlink{class_catch_1_1_option_aba0def0bd9cd45d4e00fe47a604b0270}{00062}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{explicit}\ \textcolor{keyword}{operator}\ bool()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_catch_1_1_option_a97c95829afbe92f2bcc5fd75b32c0825}{some}}();}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00064}00064\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00066}00066\ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00067}00067\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ *nullableValue;}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00068}00068\ \ \ \ \ \ \ \ \ \textcolor{keyword}{alignas}(\textcolor{keyword}{alignof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}))\ \textcolor{keywordtype}{char}\ storage[\textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}})];}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00069}00069\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00071}00071\ \}\ \textcolor{comment}{//\ end\ namespace\ Catch}}
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{catch__option_8hpp_source_l00073}00073\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ TWOBLUECUBES\_CATCH\_OPTION\_HPP\_INCLUDED}}
+
+\end{DoxyCode}

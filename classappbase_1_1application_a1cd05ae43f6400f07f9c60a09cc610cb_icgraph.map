@@ -1,0 +1,26 @@
+<map id="appbase::application::get_options" name="appbase::application::get_options">
+<area shape="rect" id="Node000001" title=" " alt="" coords="814,120,954,161"/>
+<area shape="rect" id="Node000002" href="$programs_2kiod_2main_8cpp.html#a3c04138a5bfe5d72780bb7e82a18e627" title=" " alt="" coords="668,5,717,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="850,112,811,78,764,46,716,27,718,22,767,41,814,73,853,108"/>
+<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_formatter.html#ad48dd6b9432babc0037d6726230221f0" title="This prints out all the groups of options." alt="" coords="619,55,766,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="807,118,753,99,755,94,809,113"/>
+<area shape="rect" id="Node000007" href="$class_c_l_i_1_1_formatter.html#aab5f07a6d3154ace0be4d9dbf85f795b" title="This prints out just the positionals &quot;group&quot;." alt="" coords="619,120,766,161"/>
+<area shape="poly" id="edge9_Node000001_Node000007" title=" " alt="" coords="798,144,766,144,766,138,798,138"/>
+<area shape="rect" id="Node000008" href="$class_c_l_i_1_1_formatter.html#a3aac4a7ce4ca139704e632915892024c" title="This displays the usage line." alt="" coords="425,178,571,218"/>
+<area shape="poly" id="edge12_Node000001_Node000008" title=" " alt="" coords="800,168,766,175,665,190,572,197,571,192,664,184,765,170,799,163"/>
+<area shape="rect" id="Node000009" href="$class_c_l_i_1_1_config_base.html#a5832f6f03212648fa08a8ff83bc9bc08" title="Convert an app into a configuration." alt="" coords="624,259,761,300"/>
+<area shape="poly" id="edge14_Node000001_Node000009" title=" " alt="" coords="844,173,724,261,721,256,841,168"/>
+<area shape="rect" id="Node000004" href="$class_c_l_i_1_1_formatter.html#ade54fd392e2c9f5364744dca82408e60" title="This prints out a subcommand in help&#45;all." alt="" coords="425,63,571,104"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="604,82,572,83,571,78,604,76"/>
+<area shape="rect" id="Node000005" href="$class_c_l_i_1_1_formatter.html#a838e0f47efa4fbd1b738eedb156887b9" title="This puts everything together." alt="" coords="5,71,183,96"/>
+<area shape="poly" id="edge8_Node000003_Node000005" title=" " alt="" coords="604,55,524,39,431,27,330,23,280,26,231,33,172,51,122,72,120,68,170,46,230,28,280,21,330,18,431,21,525,34,605,50"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="416,62,377,54,304,48,231,54,141,73,140,67,230,49,304,43,377,49,417,56"/>
+<area shape="rect" id="Node000006" href="$class_c_l_i_1_1_formatter.html#a9e6b7c4c6eee50b11fe1ca785002db04" title="This prints out all the subcommands." alt="" coords="231,63,377,104"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="409,95,377,95,377,90,409,90"/>
+<area shape="poly" id="edge6_Node000006_Node000004" title=" " alt="" coords="392,72,424,72,424,77,392,77"/>
+<area shape="poly" id="edge7_Node000006_Node000005" title=" " alt="" coords="215,86,183,86,183,81,215,81"/>
+<area shape="poly" id="edge10_Node000007_Node000004" title=" " alt="" coords="606,118,569,107,570,102,608,113"/>
+<area shape="poly" id="edge11_Node000007_Node000005" title=" " alt="" coords="604,143,431,137,330,130,230,118,143,100,144,94,231,113,331,124,431,132,604,138"/>
+<area shape="poly" id="edge13_Node000008_Node000005" title=" " alt="" coords="409,196,321,185,230,162,164,131,113,99,115,95,166,127,232,157,322,179,410,191"/>
+<area shape="poly" id="edge15_Node000009_Node000009" title=" " alt="" coords="723,246,712,240,692,238,674,240,664,244,659,250,661,258,656,259,654,249,660,240,673,235,693,233,713,235,726,241"/>
+</map>

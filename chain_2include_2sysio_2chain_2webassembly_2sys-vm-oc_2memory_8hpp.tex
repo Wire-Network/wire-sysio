@@ -1,0 +1,71 @@
+\doxysection{libraries/chain/include/sysio/chain/webassembly/sys-\/vm-\/oc/memory.hpp File Reference}
+\hypertarget{chain_2include_2sysio_2chain_2webassembly_2sys-vm-oc_2memory_8hpp}{}\label{chain_2include_2sysio_2chain_2webassembly_2sys-vm-oc_2memory_8hpp}\index{libraries/chain/include/sysio/chain/webassembly/sys-\/vm-\/oc/memory.hpp@{libraries/chain/include/sysio/chain/webassembly/sys-\/vm-\/oc/memory.hpp}}
+{\ttfamily \#include $<$sysio/chain/wasm\+\_\+sysio\+\_\+constraints.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/webassembly/sys-\/vm-\/oc/sys-\/vm-\/oc.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/webassembly/sys-\/vm-\/oc/intrinsic\+\_\+mapping.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/webassembly/sys-\/vm-\/oc/gs\+\_\+seg\+\_\+helpers.\+h$>$}\newline
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include $<$stddef.\+h$>$}\newline
+Include dependency graph for memory.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{chain_2include_2sysio_2chain_2webassembly_2sys-vm-oc_2memory_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{chain_2include_2sysio_2chain_2webassembly_2sys-vm-oc_2memory_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1memory}{sysio\+::chain\+::eosvmoc\+::memory}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain}{sysio\+::chain}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc}{sysio\+::chain\+::eosvmoc}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{chain_2include_2sysio_2chain_2webassembly_2sys-vm-oc_2memory_8hpp_a443bdded664dbbbaba48f86abb6f9590}{OFFSET\+\_\+\+OF\+\_\+\+CONTROL\+\_\+\+BLOCK\+\_\+\+MEMBER}}(M)
+\item 
+\#define \mbox{\hyperlink{chain_2include_2sysio_2chain_2webassembly_2sys-vm-oc_2memory_8hpp_a974299bd4dc294ea74e8400ecabdc40e}{OFFSET\+\_\+\+OF\+\_\+\+FIRST\+\_\+\+INTRINSIC}}~((int)-\/\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1memory_a3ca9186ab4cbb5e78898f09b3b4ef349}{sysio\+::chain\+::eosvmoc\+::memory\+::first\+\_\+intrinsic\+\_\+offset}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{chain_2include_2sysio_2chain_2webassembly_2sys-vm-oc_2memory_8hpp_a443bdded664dbbbaba48f86abb6f9590}\index{memory.hpp@{memory.hpp}!OFFSET\_OF\_CONTROL\_BLOCK\_MEMBER@{OFFSET\_OF\_CONTROL\_BLOCK\_MEMBER}}
+\index{OFFSET\_OF\_CONTROL\_BLOCK\_MEMBER@{OFFSET\_OF\_CONTROL\_BLOCK\_MEMBER}!memory.hpp@{memory.hpp}}
+\doxysubsubsection{\texorpdfstring{OFFSET\_OF\_CONTROL\_BLOCK\_MEMBER}{OFFSET\_OF\_CONTROL\_BLOCK\_MEMBER}}
+{\footnotesize\ttfamily \label{chain_2include_2sysio_2chain_2webassembly_2sys-vm-oc_2memory_8hpp_a443bdded664dbbbaba48f86abb6f9590} 
+\#define OFFSET\+\_\+\+OF\+\_\+\+CONTROL\+\_\+\+BLOCK\+\_\+\+MEMBER(\begin{DoxyParamCaption}\item[{}]{M}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(-\/(int)\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1memory_a74ea75f2c5e285a08e86d4f82bfaf3bb}{sysio::chain::eosvmoc::memory::cb\_offset}}\ +\ (int)offsetof(\mbox{\hyperlink{structeos__vm__oc__control__block}{sysio::chain::eosvmoc::control\_block}},\ M))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{chain_2include_2sysio_2chain_2webassembly_2sys-vm-oc_2memory_8hpp_source_l00066}{66}} of file \mbox{\hyperlink{chain_2include_2sysio_2chain_2webassembly_2sys-vm-oc_2memory_8hpp_source}{memory.\+hpp}}.
+
+\Hypertarget{chain_2include_2sysio_2chain_2webassembly_2sys-vm-oc_2memory_8hpp_a974299bd4dc294ea74e8400ecabdc40e}\index{memory.hpp@{memory.hpp}!OFFSET\_OF\_FIRST\_INTRINSIC@{OFFSET\_OF\_FIRST\_INTRINSIC}}
+\index{OFFSET\_OF\_FIRST\_INTRINSIC@{OFFSET\_OF\_FIRST\_INTRINSIC}!memory.hpp@{memory.hpp}}
+\doxysubsubsection{\texorpdfstring{OFFSET\_OF\_FIRST\_INTRINSIC}{OFFSET\_OF\_FIRST\_INTRINSIC}}
+{\footnotesize\ttfamily \label{chain_2include_2sysio_2chain_2webassembly_2sys-vm-oc_2memory_8hpp_a974299bd4dc294ea74e8400ecabdc40e} 
+\#define OFFSET\+\_\+\+OF\+\_\+\+FIRST\+\_\+\+INTRINSIC~((int)-\/\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1memory_a3ca9186ab4cbb5e78898f09b3b4ef349}{sysio\+::chain\+::eosvmoc\+::memory\+::first\+\_\+intrinsic\+\_\+offset}})}
+
+
+
+Definition at line \mbox{\hyperlink{chain_2include_2sysio_2chain_2webassembly_2sys-vm-oc_2memory_8hpp_source_l00067}{67}} of file \mbox{\hyperlink{chain_2include_2sysio_2chain_2webassembly_2sys-vm-oc_2memory_8hpp_source}{memory.\+hpp}}.
+

@@ -1,0 +1,269 @@
+\doxysection{sysio\+::chain\+::impl\+::abi\+\_\+from\+\_\+variant Struct Reference}
+\hypertarget{structsysio_1_1chain_1_1impl_1_1abi__from__variant}{}\label{structsysio_1_1chain_1_1impl_1_1abi__from__variant}\index{sysio::chain::impl::abi\_from\_variant@{sysio::chain::impl::abi\_from\_variant}}
+
+
+{\ttfamily \#include $<$abi\+\_\+serializer.\+hpp$>$}
+
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename M , typename Resolver , \mbox{\hyperlink{namespacesysio_1_1chain_1_1impl_a7573b97a32a70ecbba5cab59b8914397}{not\+\_\+require\+\_\+abi\+\_\+t}}$<$ M $>$  = 1$>$ }\\static void \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1abi__from__variant_a733b2b85ed5f3e9826f93bb5d1af0d8c}{extract}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&v, M \&o, Resolver, \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1abi__traverse__context}{abi\+\_\+traverse\+\_\+context}} \&ctx)
+\item 
+{\footnotesize template$<$typename M , typename Resolver , \mbox{\hyperlink{namespacesysio_1_1chain_1_1impl_a79368639d533d7445d10816c3a89476d}{require\+\_\+abi\+\_\+t}}$<$ M $>$  = 1$>$ }\\static void \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1abi__from__variant_aab446ce232b7003ef48f6a50f61d788f}{extract}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&v, M \&o, Resolver resolver, \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1abi__traverse__context}{abi\+\_\+traverse\+\_\+context}} \&ctx)
+\item 
+{\footnotesize template$<$typename M , typename Resolver , \mbox{\hyperlink{namespacesysio_1_1chain_1_1impl_a79368639d533d7445d10816c3a89476d}{require\+\_\+abi\+\_\+t}}$<$ M $>$  = 1$>$ }\\static void \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1abi__from__variant_a0c7da9f35411a81e3291b2189cb43d05}{extract}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&v, \mbox{\hyperlink{classfc_1_1vector}{vector}}$<$ M $>$ \&o, Resolver resolver, \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1abi__traverse__context}{abi\+\_\+traverse\+\_\+context}} \&ctx)
+\item 
+{\footnotesize template$<$typename M , typename Resolver , \mbox{\hyperlink{namespacesysio_1_1chain_1_1impl_a79368639d533d7445d10816c3a89476d}{require\+\_\+abi\+\_\+t}}$<$ M $>$  = 1$>$ }\\static void \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1abi__from__variant_a836832ea7a0e61303e2f8ffb1812345d}{extract}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&v, std\+::shared\+\_\+ptr$<$ M $>$ \&o, Resolver resolver, \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1abi__traverse__context}{abi\+\_\+traverse\+\_\+context}} \&ctx)
+\item 
+{\footnotesize template$<$typename Resolver $>$ }\\static void \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1abi__from__variant_ade26c910d071fe796e2cbce8ea7f777b}{extract}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&v, \mbox{\hyperlink{structsysio_1_1chain_1_1action}{action}} \&act, Resolver resolver, \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1abi__traverse__context}{abi\+\_\+traverse\+\_\+context}} \&ctx)
+\item 
+{\footnotesize template$<$typename Resolver $>$ }\\static void \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1abi__from__variant_a45c46f0767d38a7913dd4bc36475f3de}{extract}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&v, \mbox{\hyperlink{structsysio_1_1chain_1_1packed__transaction}{packed\+\_\+transaction}} \&ptrx, Resolver resolver, \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1abi__traverse__context}{abi\+\_\+traverse\+\_\+context}} \&ctx)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{abi__serializer_8hpp_source_l00696}{696}} of file \mbox{\hyperlink{abi__serializer_8hpp_source}{abi\+\_\+serializer.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1chain_1_1impl_1_1abi__from__variant_ade26c910d071fe796e2cbce8ea7f777b}\index{sysio::chain::impl::abi\_from\_variant@{sysio::chain::impl::abi\_from\_variant}!extract@{extract}}
+\index{extract@{extract}!sysio::chain::impl::abi\_from\_variant@{sysio::chain::impl::abi\_from\_variant}}
+\doxysubsubsection{\texorpdfstring{extract()}{extract()}\hspace{0.1cm}{\footnotesize\ttfamily [1/6]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1impl_1_1abi__from__variant_ade26c910d071fe796e2cbce8ea7f777b} 
+template$<$typename Resolver $>$ \\
+static void sysio\+::chain\+::impl\+::abi\+\_\+from\+\_\+variant\+::extract (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&}]{v}{, }\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1action}{action}} \&}]{act}{, }\item[{Resolver}]{resolver}{, }\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1abi__traverse__context}{abi\+\_\+traverse\+\_\+context}} \&}]{ctx}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+Non templated overload that has priority for the action structure this type has members which must be directly translated by the ABI so it is exploded and processed explicitly 
+
+Definition at line \mbox{\hyperlink{abi__serializer_8hpp_source_l00753}{753}} of file \mbox{\hyperlink{abi__serializer_8hpp_source}{abi\+\_\+serializer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00754\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00755\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ h\ =\ ctx.enter\_scope();}
+\DoxyCodeLine{00756\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ variant\_object\&\ vo\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.get\_object();}
+\DoxyCodeLine{00757\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(vo.contains(\textcolor{stringliteral}{"{}account"{}}),\ packed\_transaction\_type\_exception,\ \textcolor{stringliteral}{"{}Missing\ account"{}});}
+\DoxyCodeLine{00758\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(vo.contains(\textcolor{stringliteral}{"{}name"{}}),\ packed\_transaction\_type\_exception,\ \textcolor{stringliteral}{"{}Missing\ name"{}});}
+\DoxyCodeLine{00759\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_accef08adf4ee05c36ccc550d8101b08f}{from\_variant}}(vo[\textcolor{stringliteral}{"{}account"{}}],\ act.account);}
+\DoxyCodeLine{00760\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_accef08adf4ee05c36ccc550d8101b08f}{from\_variant}}(vo[\textcolor{stringliteral}{"{}name"{}}],\ act.name);}
+\DoxyCodeLine{00761\ }
+\DoxyCodeLine{00762\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (vo.contains(\textcolor{stringliteral}{"{}authorization"{}}))\ \{}
+\DoxyCodeLine{00763\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_accef08adf4ee05c36ccc550d8101b08f}{from\_variant}}(vo[\textcolor{stringliteral}{"{}authorization"{}}],\ act.authorization);}
+\DoxyCodeLine{00764\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00765\ }
+\DoxyCodeLine{00766\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ valid\_empty\_data\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00767\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ vo.contains(\ \textcolor{stringliteral}{"{}data"{}}\ )\ )\ \{}
+\DoxyCodeLine{00768\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ data\ =\ vo[\textcolor{stringliteral}{"{}data"{}}];}
+\DoxyCodeLine{00769\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ data.is\_string()\ )\ \{}
+\DoxyCodeLine{00770\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_accef08adf4ee05c36ccc550d8101b08f}{from\_variant}}(data,\ act.data);}
+\DoxyCodeLine{00771\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ valid\_empty\_data\ =\ act.data.empty();}
+\DoxyCodeLine{00772\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\ data.is\_object()\ )\ \{}
+\DoxyCodeLine{00773\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ abi\ =\ resolver(act.account);}
+\DoxyCodeLine{00774\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (abi)\ \{}
+\DoxyCodeLine{00775\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ type\ =\ abi-\/>get\_action\_type(act.name);}
+\DoxyCodeLine{00776\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!type.empty())\ \{}
+\DoxyCodeLine{00777\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ variant\_to\_binary\_context\ \_ctx(*abi,\ ctx,\ type);}
+\DoxyCodeLine{00778\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_ctx.short\_path\ =\ \textcolor{keyword}{true};\ \textcolor{comment}{//\ Just\ to\ be\ safe\ while\ avoiding\ the\ complexity\ of\ threading\ an\ override\ boolean\ all\ over\ the\ place}}
+\DoxyCodeLine{00779\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ act.data\ =\ std::move(\ abi-\/>\_variant\_to\_binary(\ type,\ data,\ \_ctx\ ));}
+\DoxyCodeLine{00780\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ valid\_empty\_data\ =\ act.data.empty();}
+\DoxyCodeLine{00781\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00782\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00783\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00784\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00785\ }
+\DoxyCodeLine{00786\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !valid\_empty\_data\ \&\&\ act.data.empty()\ )\ \{}
+\DoxyCodeLine{00787\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ vo.contains(\ \textcolor{stringliteral}{"{}hex\_data"{}}\ )\ )\ \{}
+\DoxyCodeLine{00788\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ data\ =\ vo[\textcolor{stringliteral}{"{}hex\_data"{}}];}
+\DoxyCodeLine{00789\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ data.is\_string()\ )\ \{}
+\DoxyCodeLine{00790\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_accef08adf4ee05c36ccc550d8101b08f}{from\_variant}}(data,\ act.data);}
+\DoxyCodeLine{00791\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00792\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00793\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00794\ }
+\DoxyCodeLine{00795\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(valid\_empty\_data\ ||\ !act.data.empty(),\ packed\_transaction\_type\_exception,}
+\DoxyCodeLine{00796\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Failed\ to\ deserialize\ data\ for\ \$\{account\}:\$\{name\}"{}},\ (\textcolor{stringliteral}{"{}account"{}},\ act.account)(\textcolor{stringliteral}{"{}name"{}},\ act.name));}
+\DoxyCodeLine{00797\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1impl_1_1abi__from__variant_ade26c910d071fe796e2cbce8ea7f777b_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1impl_1_1abi__from__variant_aab446ce232b7003ef48f6a50f61d788f}\index{sysio::chain::impl::abi\_from\_variant@{sysio::chain::impl::abi\_from\_variant}!extract@{extract}}
+\index{extract@{extract}!sysio::chain::impl::abi\_from\_variant@{sysio::chain::impl::abi\_from\_variant}}
+\doxysubsubsection{\texorpdfstring{extract()}{extract()}\hspace{0.1cm}{\footnotesize\ttfamily [2/6]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1impl_1_1abi__from__variant_aab446ce232b7003ef48f6a50f61d788f} 
+template$<$typename M , typename Resolver , \mbox{\hyperlink{namespacesysio_1_1chain_1_1impl_a79368639d533d7445d10816c3a89476d}{require\+\_\+abi\+\_\+t}}$<$ M $>$  = 1$>$ \\
+static void sysio\+::chain\+::impl\+::abi\+\_\+from\+\_\+variant\+::extract (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&}]{v}{, }\item[{M \&}]{o}{, }\item[{Resolver}]{resolver}{, }\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1abi__traverse__context}{abi\+\_\+traverse\+\_\+context}} \&}]{ctx}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+template which overloads extract for types which contain ABI information in their trees for these types we create new ABI aware visitors \Hypertarget{structsysio_1_1chain_1_1impl_1_1abi__from__variant_a733b2b85ed5f3e9826f93bb5d1af0d8c}\index{sysio::chain::impl::abi\_from\_variant@{sysio::chain::impl::abi\_from\_variant}!extract@{extract}}
+\index{extract@{extract}!sysio::chain::impl::abi\_from\_variant@{sysio::chain::impl::abi\_from\_variant}}
+\doxysubsubsection{\texorpdfstring{extract()}{extract()}\hspace{0.1cm}{\footnotesize\ttfamily [3/6]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1impl_1_1abi__from__variant_a733b2b85ed5f3e9826f93bb5d1af0d8c} 
+template$<$typename M , typename Resolver , \mbox{\hyperlink{namespacesysio_1_1chain_1_1impl_a79368639d533d7445d10816c3a89476d}{require\+\_\+abi\+\_\+t}}$<$ M $>$ $>$ \\
+void sysio\+::chain\+::impl\+::abi\+\_\+from\+\_\+variant\+::extract (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&}]{v}{, }\item[{M \&}]{o}{, }\item[{Resolver}]{resolver}{, }\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1abi__traverse__context}{abi\+\_\+traverse\+\_\+context}} \&}]{ctx}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+template which overloads extract for types which are not relvant to ABI information and can be degraded to the normal \+::from\+\_\+variant(...) processing 
+
+Definition at line \mbox{\hyperlink{abi__serializer_8hpp_source_l00702}{702}} of file \mbox{\hyperlink{abi__serializer_8hpp_source}{abi\+\_\+serializer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00703\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00704\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ h\ =\ ctx.enter\_scope();}
+\DoxyCodeLine{00705\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_accef08adf4ee05c36ccc550d8101b08f}{from\_variant}}(v,\ o);}
+\DoxyCodeLine{00706\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=329pt]{structsysio_1_1chain_1_1impl_1_1abi__from__variant_a733b2b85ed5f3e9826f93bb5d1af0d8c_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1impl_1_1abi__from__variant_a733b2b85ed5f3e9826f93bb5d1af0d8c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1impl_1_1abi__from__variant_a45c46f0767d38a7913dd4bc36475f3de}\index{sysio::chain::impl::abi\_from\_variant@{sysio::chain::impl::abi\_from\_variant}!extract@{extract}}
+\index{extract@{extract}!sysio::chain::impl::abi\_from\_variant@{sysio::chain::impl::abi\_from\_variant}}
+\doxysubsubsection{\texorpdfstring{extract()}{extract()}\hspace{0.1cm}{\footnotesize\ttfamily [4/6]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1impl_1_1abi__from__variant_a45c46f0767d38a7913dd4bc36475f3de} 
+template$<$typename Resolver $>$ \\
+static void sysio\+::chain\+::impl\+::abi\+\_\+from\+\_\+variant\+::extract (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&}]{v}{, }\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1packed__transaction}{packed\+\_\+transaction}} \&}]{ptrx}{, }\item[{Resolver}]{resolver}{, }\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1abi__traverse__context}{abi\+\_\+traverse\+\_\+context}} \&}]{ctx}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{abi__serializer_8hpp_source_l00800}{800}} of file \mbox{\hyperlink{abi__serializer_8hpp_source}{abi\+\_\+serializer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00801\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00802\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ h\ =\ ctx.enter\_scope();}
+\DoxyCodeLine{00803\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ variant\_object\&\ vo\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.get\_object();}
+\DoxyCodeLine{00804\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(vo.contains(\textcolor{stringliteral}{"{}signatures"{}}),\ packed\_transaction\_type\_exception,\ \textcolor{stringliteral}{"{}Missing\ signatures"{}});}
+\DoxyCodeLine{00805\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(vo.contains(\textcolor{stringliteral}{"{}compression"{}}),\ packed\_transaction\_type\_exception,\ \textcolor{stringliteral}{"{}Missing\ compression"{}});}
+\DoxyCodeLine{00806\ \ \ \ \ \ \ \ \ \ std::vector<signature\_type>\ signatures;}
+\DoxyCodeLine{00807\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1packed__transaction_aec47710805eaf76d06f50bed3c9a0383}{packed\_transaction::compression\_type}}\ compression;}
+\DoxyCodeLine{00808\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_accef08adf4ee05c36ccc550d8101b08f}{from\_variant}}(vo[\textcolor{stringliteral}{"{}signatures"{}}],\ signatures);}
+\DoxyCodeLine{00809\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_accef08adf4ee05c36ccc550d8101b08f}{from\_variant}}(vo[\textcolor{stringliteral}{"{}compression"{}}],\ compression);}
+\DoxyCodeLine{00810\ }
+\DoxyCodeLine{00811\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_ac6f5a1f1e061f000983f5d5f3ac25dfa}{bytes}}\ packed\_cfd;}
+\DoxyCodeLine{00812\ \ \ \ \ \ \ \ \ \ std::vector<bytes>\ cfd;}
+\DoxyCodeLine{00813\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ use\_packed\_cfd\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00814\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ vo.contains(\textcolor{stringliteral}{"{}packed\_context\_free\_data"{}})\ \&\&\ vo[\textcolor{stringliteral}{"{}packed\_context\_free\_data"{}}].is\_string()\ \&\&\ !vo[\textcolor{stringliteral}{"{}packed\_context\_free\_data"{}}].as\_string().empty()\ )\ \{}
+\DoxyCodeLine{00815\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_accef08adf4ee05c36ccc550d8101b08f}{from\_variant}}(vo[\textcolor{stringliteral}{"{}packed\_context\_free\_data"{}}],\ packed\_cfd\ );}
+\DoxyCodeLine{00816\ \ \ \ \ \ \ \ \ \ \ \ \ use\_packed\_cfd\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00817\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(\ vo.contains(\textcolor{stringliteral}{"{}context\_free\_data"{}})\ )\ \{}
+\DoxyCodeLine{00818\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_accef08adf4ee05c36ccc550d8101b08f}{from\_variant}}(vo[\textcolor{stringliteral}{"{}context\_free\_data"{}}],\ cfd);}
+\DoxyCodeLine{00819\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00820\ }
+\DoxyCodeLine{00821\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ vo.contains(\textcolor{stringliteral}{"{}packed\_trx"{}})\ \&\&\ vo[\textcolor{stringliteral}{"{}packed\_trx"{}}].is\_string()\ \&\&\ !vo[\textcolor{stringliteral}{"{}packed\_trx"{}}].as\_string().empty()\ )\ \{}
+\DoxyCodeLine{00822\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_ac6f5a1f1e061f000983f5d5f3ac25dfa}{bytes}}\ packed\_trx;}
+\DoxyCodeLine{00823\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_accef08adf4ee05c36ccc550d8101b08f}{from\_variant}}(vo[\textcolor{stringliteral}{"{}packed\_trx"{}}],\ packed\_trx);}
+\DoxyCodeLine{00824\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ use\_packed\_cfd\ )\ \{}
+\DoxyCodeLine{00825\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ptrx\ =\ packed\_transaction(\ std::move(\ packed\_trx\ ),\ std::move(\ signatures\ ),\ std::move(\ packed\_cfd\ ),\ compression\ );}
+\DoxyCodeLine{00826\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00827\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ptrx\ =\ packed\_transaction(\ std::move(\ packed\_trx\ ),\ std::move(\ signatures\ ),\ std::move(\ cfd\ ),\ compression\ );}
+\DoxyCodeLine{00828\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00829\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00830\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(vo.contains(\textcolor{stringliteral}{"{}transaction"{}}),\ packed\_transaction\_type\_exception,\ \textcolor{stringliteral}{"{}Missing\ transaction"{}});}
+\DoxyCodeLine{00831\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ use\_packed\_cfd\ )\ \{}
+\DoxyCodeLine{00832\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ transaction\ trx;}
+\DoxyCodeLine{00833\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_a2384e06d62f7580d7599d3b77b68acbb}{extract}}(\ vo[\textcolor{stringliteral}{"{}transaction"{}}],\ trx,\ resolver,\ ctx\ );}
+\DoxyCodeLine{00834\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ptrx\ =\ packed\_transaction(\ std::move(trx),\ std::move(signatures),\ std::move(packed\_cfd),\ compression\ );}
+\DoxyCodeLine{00835\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00836\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ signed\_transaction\ trx;}
+\DoxyCodeLine{00837\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_a2384e06d62f7580d7599d3b77b68acbb}{extract}}(\ vo[\textcolor{stringliteral}{"{}transaction"{}}],\ trx,\ resolver,\ ctx\ );}
+\DoxyCodeLine{00838\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ trx.signatures\ =\ std::move(\ signatures\ );}
+\DoxyCodeLine{00839\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ trx.context\_free\_data\ =\ std::move(cfd);}
+\DoxyCodeLine{00840\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ptrx\ =\ packed\_transaction(\ std::move(\ trx\ ),\ compression\ );}
+\DoxyCodeLine{00841\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00842\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00843\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1impl_1_1abi__from__variant_a45c46f0767d38a7913dd4bc36475f3de_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1impl_1_1abi__from__variant_a836832ea7a0e61303e2f8ffb1812345d}\index{sysio::chain::impl::abi\_from\_variant@{sysio::chain::impl::abi\_from\_variant}!extract@{extract}}
+\index{extract@{extract}!sysio::chain::impl::abi\_from\_variant@{sysio::chain::impl::abi\_from\_variant}}
+\doxysubsubsection{\texorpdfstring{extract()}{extract()}\hspace{0.1cm}{\footnotesize\ttfamily [5/6]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1impl_1_1abi__from__variant_a836832ea7a0e61303e2f8ffb1812345d} 
+template$<$typename M , typename Resolver , \mbox{\hyperlink{namespacesysio_1_1chain_1_1impl_a79368639d533d7445d10816c3a89476d}{require\+\_\+abi\+\_\+t}}$<$ M $>$  = 1$>$ \\
+static void sysio\+::chain\+::impl\+::abi\+\_\+from\+\_\+variant\+::extract (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&}]{v}{, }\item[{std\+::shared\+\_\+ptr$<$ M $>$ \&}]{o}{, }\item[{Resolver}]{resolver}{, }\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1abi__traverse__context}{abi\+\_\+traverse\+\_\+context}} \&}]{ctx}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+template which overloads extract for shared\+\_\+ptr of types which contain ABI information in their trees for these members we call \doxylink{structsysio_1_1chain_1_1impl_1_1abi__from__variant_a733b2b85ed5f3e9826f93bb5d1af0d8c}{extract} in order to trigger further processing 
+
+Definition at line \mbox{\hyperlink{abi__serializer_8hpp_source_l00738}{738}} of file \mbox{\hyperlink{abi__serializer_8hpp_source}{abi\+\_\+serializer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00739\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00740\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ h\ =\ ctx.enter\_scope();}
+\DoxyCodeLine{00741\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ variant\_object\&\ vo\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.get\_object();}
+\DoxyCodeLine{00742\ \ \ \ \ \ \ \ \ \ M\ obj;}
+\DoxyCodeLine{00743\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_a2384e06d62f7580d7599d3b77b68acbb}{extract}}(vo,\ obj,\ resolver,\ ctx);}
+\DoxyCodeLine{00744\ \ \ \ \ \ \ \ \ \ o\ =\ std::make\_shared<M>(obj);}
+\DoxyCodeLine{00745\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=329pt]{structsysio_1_1chain_1_1impl_1_1abi__from__variant_a836832ea7a0e61303e2f8ffb1812345d_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1impl_1_1abi__from__variant_a0c7da9f35411a81e3291b2189cb43d05}\index{sysio::chain::impl::abi\_from\_variant@{sysio::chain::impl::abi\_from\_variant}!extract@{extract}}
+\index{extract@{extract}!sysio::chain::impl::abi\_from\_variant@{sysio::chain::impl::abi\_from\_variant}}
+\doxysubsubsection{\texorpdfstring{extract()}{extract()}\hspace{0.1cm}{\footnotesize\ttfamily [6/6]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1impl_1_1abi__from__variant_a0c7da9f35411a81e3291b2189cb43d05} 
+template$<$typename M , typename Resolver , \mbox{\hyperlink{namespacesysio_1_1chain_1_1impl_a79368639d533d7445d10816c3a89476d}{require\+\_\+abi\+\_\+t}}$<$ M $>$  = 1$>$ \\
+static void sysio\+::chain\+::impl\+::abi\+\_\+from\+\_\+variant\+::extract (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&}]{v}{, }\item[{\mbox{\hyperlink{classfc_1_1vector}{vector}}$<$ M $>$ \&}]{o}{, }\item[{Resolver}]{resolver}{, }\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1abi__traverse__context}{abi\+\_\+traverse\+\_\+context}} \&}]{ctx}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+template which overloads extract for vectors of types which contain ABI information in their trees for these members we call \doxylink{structsysio_1_1chain_1_1impl_1_1abi__from__variant_a733b2b85ed5f3e9826f93bb5d1af0d8c}{extract} in order to trigger further processing 
+
+Definition at line \mbox{\hyperlink{abi__serializer_8hpp_source_l00720}{720}} of file \mbox{\hyperlink{abi__serializer_8hpp_source}{abi\+\_\+serializer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00721\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00722\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ h\ =\ ctx.enter\_scope();}
+\DoxyCodeLine{00723\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}\&\ \mbox{\hyperlink{namespacepicojson_ac1e72166adfe3d96dc58cddc7ebd536a}{array}}\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.get\_array();}
+\DoxyCodeLine{00724\ \ \ \ \ \ \ \ \ \ o.clear();}
+\DoxyCodeLine{00725\ \ \ \ \ \ \ \ \ \ o.reserve(\ \mbox{\hyperlink{namespacepicojson_ac1e72166adfe3d96dc58cddc7ebd536a}{array}}.size()\ );}
+\DoxyCodeLine{00726\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\ itr\ =\ \mbox{\hyperlink{namespacepicojson_ac1e72166adfe3d96dc58cddc7ebd536a}{array}}.begin();\ itr\ !=\ \mbox{\hyperlink{namespacepicojson_ac1e72166adfe3d96dc58cddc7ebd536a}{array}}.end();\ ++itr\ )\ \{}
+\DoxyCodeLine{00727\ \ \ \ \ \ \ \ \ \ \ \ \ M\ o\_iter;}
+\DoxyCodeLine{00728\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{scalar__4x64__impl_8h_a2384e06d62f7580d7599d3b77b68acbb}{extract}}(*itr,\ o\_iter,\ resolver,\ ctx);}
+\DoxyCodeLine{00729\ \ \ \ \ \ \ \ \ \ \ \ \ o.emplace\_back(std::move(o\_iter));}
+\DoxyCodeLine{00730\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00731\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=329pt]{structsysio_1_1chain_1_1impl_1_1abi__from__variant_a0c7da9f35411a81e3291b2189cb43d05_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{abi__serializer_8hpp}{abi\+\_\+serializer.\+hpp}}\end{DoxyCompactItemize}

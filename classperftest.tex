@@ -1,0 +1,335 @@
+\doxysection{perftest Class Reference}
+\hypertarget{classperftest}{}\label{classperftest}\index{perftest@{perftest}}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{classperftest}{perftest}} \mbox{\hyperlink{classperftest_a1be1567bd40a0646f38eedb927933c16}{type}}
+\item 
+typedef std\+::chrono\+::duration$<$ int, std\+::micro $>$ \mbox{\hyperlink{classperftest_ab3151b2026b118056453aca37cc80e0c}{dur\+\_\+type}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classperftest_a4e118ad1d9d81fddf82b5db930b26924}{perftest}} ()
+\item 
+void \mbox{\hyperlink{classperftest_afa86f15f51139add01d21a1cc1b42d8a}{start}} (std\+::string uri)
+\item 
+void \mbox{\hyperlink{classperftest_aca420618efac42bcafa8f582fc80584b}{on\+\_\+socket\+\_\+init}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{websocketpp\+::connection\+\_\+hdl}})
+\item 
+\mbox{\hyperlink{debug__client_8cpp_ab68ea3df896e32c1d2fb314a96c46a8f}{context\+\_\+ptr}} \mbox{\hyperlink{classperftest_a9acaf6688b55a4c341609f36a3daf47a}{on\+\_\+tls\+\_\+init}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{websocketpp\+::connection\+\_\+hdl}})
+\item 
+void \mbox{\hyperlink{classperftest_aa3802566f897c99564008e301a56fc99}{on\+\_\+fail}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{websocketpp\+::connection\+\_\+hdl}} hdl)
+\item 
+void \mbox{\hyperlink{classperftest_a55d1e404c7a1e57b27dbb9b16cd72fbc}{on\+\_\+open}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{websocketpp\+::connection\+\_\+hdl}} hdl)
+\item 
+void \mbox{\hyperlink{classperftest_a7806f56e172fe624849f4df473b1bb18}{on\+\_\+message}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{websocketpp\+::connection\+\_\+hdl}} hdl, \mbox{\hyperlink{debug__client_8cpp_a08398c4d31a4dc3e42d1b9a9ef64c6ad}{message\+\_\+ptr}})
+\item 
+void \mbox{\hyperlink{classperftest_a3394af04525712135cd6795c4778b882}{on\+\_\+close}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{websocketpp\+::connection\+\_\+hdl}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{debug__client_8cpp_source_l00052}{52}} of file \mbox{\hyperlink{debug__client_8cpp_source}{debug\+\_\+client.\+cpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classperftest_ab3151b2026b118056453aca37cc80e0c}\index{perftest@{perftest}!dur\_type@{dur\_type}}
+\index{dur\_type@{dur\_type}!perftest@{perftest}}
+\doxysubsubsection{\texorpdfstring{dur\_type}{dur\_type}}
+{\footnotesize\ttfamily \label{classperftest_ab3151b2026b118056453aca37cc80e0c} 
+std\+::chrono\+::duration$<$int,std\+::micro$>$ \mbox{\hyperlink{classperftest_ab3151b2026b118056453aca37cc80e0c}{perftest\+::dur\+\_\+type}}}
+
+
+
+Definition at line \mbox{\hyperlink{debug__client_8cpp_source_l00055}{55}} of file \mbox{\hyperlink{debug__client_8cpp_source}{debug\+\_\+client.\+cpp}}.
+
+\Hypertarget{classperftest_a1be1567bd40a0646f38eedb927933c16}\index{perftest@{perftest}!type@{type}}
+\index{type@{type}!perftest@{perftest}}
+\doxysubsubsection{\texorpdfstring{type}{type}}
+{\footnotesize\ttfamily \label{classperftest_a1be1567bd40a0646f38eedb927933c16} 
+\mbox{\hyperlink{classperftest}{perftest}} \mbox{\hyperlink{classperftest_a1be1567bd40a0646f38eedb927933c16}{perftest\+::type}}}
+
+
+
+Definition at line \mbox{\hyperlink{debug__client_8cpp_source_l00054}{54}} of file \mbox{\hyperlink{debug__client_8cpp_source}{debug\+\_\+client.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classperftest_a4e118ad1d9d81fddf82b5db930b26924}\index{perftest@{perftest}!perftest@{perftest}}
+\index{perftest@{perftest}!perftest@{perftest}}
+\doxysubsubsection{\texorpdfstring{perftest()}{perftest()}}
+{\footnotesize\ttfamily \label{classperftest_a4e118ad1d9d81fddf82b5db930b26924} 
+perftest\+::perftest (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{debug__client_8cpp_source_l00057}{57}} of file \mbox{\hyperlink{debug__client_8cpp_source}{debug\+\_\+client.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ m\_endpoint.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a5d7da609ebd2f797e5e67b6d050ebc59}{set\_access\_channels}}(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a853aa0b8976e53f3181af3bc398d493e}{websocketpp::log::alevel::all}});}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ m\_endpoint.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a8292bcdca9344b57af1b0964ff7fc778}{set\_error\_channels}}(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1elevel_a9b31ff708c221d314f9f4eb3ff2b1ad7}{websocketpp::log::elevel::all}});}
+\DoxyCodeLine{00060\ }
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Initialize\ ASIO}}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ m\_endpoint.init\_asio();}
+\DoxyCodeLine{00063\ }
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Register\ our\ handlers}}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ m\_endpoint.set\_socket\_init\_handler(bind(\&\mbox{\hyperlink{classperftest_aca420618efac42bcafa8f582fc80584b}{type::on\_socket\_init}},\textcolor{keyword}{this},::\_1));}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \textcolor{comment}{//m\_endpoint.set\_tls\_init\_handler(bind(\&type::on\_tls\_init,this,::\_1));}}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ m\_endpoint.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a34a3a8351bff65ba878975be471cab85}{set\_message\_handler}}(bind(\&\mbox{\hyperlink{classperftest_a7806f56e172fe624849f4df473b1bb18}{type::on\_message}},\textcolor{keyword}{this},::\_1,::\_2));}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ m\_endpoint.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a5753d9848aefc04ee91da401c0cc65b8}{set\_open\_handler}}(bind(\&\mbox{\hyperlink{classperftest_a55d1e404c7a1e57b27dbb9b16cd72fbc}{type::on\_open}},\textcolor{keyword}{this},::\_1));}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ m\_endpoint.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a8d7d95bebc154879655211e2b0b5e069}{set\_close\_handler}}(bind(\&\mbox{\hyperlink{classperftest_a3394af04525712135cd6795c4778b882}{type::on\_close}},\textcolor{keyword}{this},::\_1));}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ m\_endpoint.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a073540365f5c810f5a45e5fc76f52f87}{set\_fail\_handler}}(bind(\&\mbox{\hyperlink{classperftest_aa3802566f897c99564008e301a56fc99}{type::on\_fail}},\textcolor{keyword}{this},::\_1));}
+\DoxyCodeLine{00071\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classperftest_a4e118ad1d9d81fddf82b5db930b26924_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classperftest_a3394af04525712135cd6795c4778b882}\index{perftest@{perftest}!on\_close@{on\_close}}
+\index{on\_close@{on\_close}!perftest@{perftest}}
+\doxysubsubsection{\texorpdfstring{on\_close()}{on\_close()}}
+{\footnotesize\ttfamily \label{classperftest_a3394af04525712135cd6795c4778b882} 
+void perftest\+::on\+\_\+close (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{websocketpp\+::connection\+\_\+hdl}}}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{debug__client_8cpp_source_l00130}{130}} of file \mbox{\hyperlink{debug__client_8cpp_source}{debug\+\_\+client.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ m\_close\ =\ std::chrono::high\_resolution\_clock::now();}
+\DoxyCodeLine{00132\ }
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}Socket\ Init:\ "{}}\ <<\ std::chrono::duration\_cast<dur\_type>(m\_socket\_init-\/m\_start).count()\ <<\ std::endl;}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}TLS\ Init:\ "{}}\ <<\ std::chrono::duration\_cast<dur\_type>(m\_tls\_init-\/m\_start).count()\ <<\ std::endl;}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}Open:\ "{}}\ <<\ std::chrono::duration\_cast<dur\_type>(m\_open-\/m\_start).count()\ <<\ std::endl;}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}Message:\ "{}}\ <<\ std::chrono::duration\_cast<dur\_type>(m\_message-\/m\_start).count()\ <<\ std::endl;}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}Close:\ "{}}\ <<\ std::chrono::duration\_cast<dur\_type>(m\_close-\/m\_start).count()\ <<\ std::endl;}
+\DoxyCodeLine{00138\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=298pt]{classperftest_a3394af04525712135cd6795c4778b882_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classperftest_aa3802566f897c99564008e301a56fc99}\index{perftest@{perftest}!on\_fail@{on\_fail}}
+\index{on\_fail@{on\_fail}!perftest@{perftest}}
+\doxysubsubsection{\texorpdfstring{on\_fail()}{on\_fail()}}
+{\footnotesize\ttfamily \label{classperftest_aa3802566f897c99564008e301a56fc99} 
+void perftest\+::on\+\_\+fail (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{websocketpp\+::connection\+\_\+hdl}}}]{hdl}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{debug__client_8cpp_source_l00110}{110}} of file \mbox{\hyperlink{debug__client_8cpp_source}{debug\+\_\+client.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1client_ad9e541a43023d33d5cd5669d62a13edc}{client::connection\_ptr}}\ con\ =\ m\_endpoint.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a0fe4457427d4124abe7ca022ba7afbb4}{get\_con\_from\_hdl}}(hdl);}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}Fail\ handler"{}}\ <<\ std::endl;}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ std::cout\ <<\ con-\/>get\_state()\ <<\ std::endl;}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ std::cout\ <<\ con-\/>get\_local\_close\_code()\ <<\ std::endl;}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ std::cout\ <<\ con-\/>get\_local\_close\_reason()\ <<\ std::endl;}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ std::cout\ <<\ con-\/>get\_remote\_close\_code()\ <<\ std::endl;}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ std::cout\ <<\ con-\/>get\_remote\_close\_reason()\ <<\ std::endl;}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ std::cout\ <<\ con-\/>get\_ec()\ <<\ \textcolor{stringliteral}{"{}\ -\/\ "{}}\ <<\ con-\/>get\_ec().message()\ <<\ std::endl;}
+\DoxyCodeLine{00120\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classperftest_aa3802566f897c99564008e301a56fc99_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=288pt]{classperftest_aa3802566f897c99564008e301a56fc99_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classperftest_a7806f56e172fe624849f4df473b1bb18}\index{perftest@{perftest}!on\_message@{on\_message}}
+\index{on\_message@{on\_message}!perftest@{perftest}}
+\doxysubsubsection{\texorpdfstring{on\_message()}{on\_message()}}
+{\footnotesize\ttfamily \label{classperftest_a7806f56e172fe624849f4df473b1bb18} 
+void perftest\+::on\+\_\+message (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{websocketpp\+::connection\+\_\+hdl}}}]{hdl}{, }\item[{\mbox{\hyperlink{debug__client_8cpp_a08398c4d31a4dc3e42d1b9a9ef64c6ad}{message\+\_\+ptr}}}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{debug__client_8cpp_source_l00126}{126}} of file \mbox{\hyperlink{debug__client_8cpp_source}{debug\+\_\+client.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ m\_message\ =\ std::chrono::high\_resolution\_clock::now();}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ m\_endpoint.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_aa6b81c003dba27c6b30d62d5e79593a6}{close}}(hdl,websocketpp::close::status::going\_away,\textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{00129\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=343pt]{classperftest_a7806f56e172fe624849f4df473b1bb18_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=315pt]{classperftest_a7806f56e172fe624849f4df473b1bb18_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classperftest_a55d1e404c7a1e57b27dbb9b16cd72fbc}\index{perftest@{perftest}!on\_open@{on\_open}}
+\index{on\_open@{on\_open}!perftest@{perftest}}
+\doxysubsubsection{\texorpdfstring{on\_open()}{on\_open()}}
+{\footnotesize\ttfamily \label{classperftest_a55d1e404c7a1e57b27dbb9b16cd72fbc} 
+void perftest\+::on\+\_\+open (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{websocketpp\+::connection\+\_\+hdl}}}]{hdl}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{debug__client_8cpp_source_l00122}{122}} of file \mbox{\hyperlink{debug__client_8cpp_source}{debug\+\_\+client.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ m\_open\ =\ std::chrono::high\_resolution\_clock::now();}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ m\_endpoint.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a5341f59de7ef1a565a2fd93daba212d5}{send}}(hdl,\ \textcolor{stringliteral}{"{}"{}},\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea6b65f28626b19b2eef447744c564e727}{websocketpp::frame::opcode::text}});}
+\DoxyCodeLine{00125\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=324pt]{classperftest_a55d1e404c7a1e57b27dbb9b16cd72fbc_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=296pt]{classperftest_a55d1e404c7a1e57b27dbb9b16cd72fbc_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classperftest_aca420618efac42bcafa8f582fc80584b}\index{perftest@{perftest}!on\_socket\_init@{on\_socket\_init}}
+\index{on\_socket\_init@{on\_socket\_init}!perftest@{perftest}}
+\doxysubsubsection{\texorpdfstring{on\_socket\_init()}{on\_socket\_init()}}
+{\footnotesize\ttfamily \label{classperftest_aca420618efac42bcafa8f582fc80584b} 
+void perftest\+::on\+\_\+socket\+\_\+init (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{websocketpp\+::connection\+\_\+hdl}}}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{debug__client_8cpp_source_l00091}{91}} of file \mbox{\hyperlink{debug__client_8cpp_source}{debug\+\_\+client.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ m\_socket\_init\ =\ std::chrono::high\_resolution\_clock::now();}
+\DoxyCodeLine{00093\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=322pt]{classperftest_aca420618efac42bcafa8f582fc80584b_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classperftest_a9acaf6688b55a4c341609f36a3daf47a}\index{perftest@{perftest}!on\_tls\_init@{on\_tls\_init}}
+\index{on\_tls\_init@{on\_tls\_init}!perftest@{perftest}}
+\doxysubsubsection{\texorpdfstring{on\_tls\_init()}{on\_tls\_init()}}
+{\footnotesize\ttfamily \label{classperftest_a9acaf6688b55a4c341609f36a3daf47a} 
+\mbox{\hyperlink{debug__client_8cpp_ab68ea3df896e32c1d2fb314a96c46a8f}{context\+\_\+ptr}} perftest\+::on\+\_\+tls\+\_\+init (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{websocketpp\+::connection\+\_\+hdl}}}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{debug__client_8cpp_source_l00095}{95}} of file \mbox{\hyperlink{debug__client_8cpp_source}{debug\+\_\+client.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ m\_tls\_init\ =\ std::chrono::high\_resolution\_clock::now();}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{debug__client_8cpp_ab68ea3df896e32c1d2fb314a96c46a8f}{context\_ptr}}\ ctx\ =\ websocketpp::lib::make\_shared<boost::asio::ssl::context>(boost::asio::ssl::context::tlsv1);}
+\DoxyCodeLine{00098\ }
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ \ \ \ ctx-\/>set\_options(boost::asio::ssl::context::default\_workarounds\ |}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::asio::ssl::context::no\_sslv2\ |}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::asio::ssl::context::no\_sslv3\ |}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::asio::ssl::context::single\_dh\_use);}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (std::exception\&\ e)\ \{}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ e.what()\ <<\ std::endl;}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ctx;}
+\DoxyCodeLine{00108\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classperftest_afa86f15f51139add01d21a1cc1b42d8a}\index{perftest@{perftest}!start@{start}}
+\index{start@{start}!perftest@{perftest}}
+\doxysubsubsection{\texorpdfstring{start()}{start()}}
+{\footnotesize\ttfamily \label{classperftest_afa86f15f51139add01d21a1cc1b42d8a} 
+void perftest\+::start (\begin{DoxyParamCaption}\item[{std\+::string}]{uri}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{debug__client_8cpp_source_l00073}{73}} of file \mbox{\hyperlink{debug__client_8cpp_source}{debug\+\_\+client.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ websocketpp::lib::error\_code\ ec;}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1client_ad9e541a43023d33d5cd5669d62a13edc}{client::connection\_ptr}}\ con\ =\ m\_endpoint.\mbox{\hyperlink{classwebsocketpp_1_1client_aa95cec974921e32bc37a61c683ae240d}{get\_connection}}(uri,\ ec);}
+\DoxyCodeLine{00076\ }
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ec)\ \{}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \ \ \ m\_endpoint.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a1d9163813aa02ed32100f443b4ddbd8e}{get\_alog}}().write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_aaf67c94a68502c49308489ff01d8d0a8}{websocketpp::log::alevel::app}},ec.message());}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00081\ }
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \textcolor{comment}{//con-\/>set\_proxy("{}http://humupdates.uchicago.edu:8443"{});}}
+\DoxyCodeLine{00083\ }
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ m\_endpoint.\mbox{\hyperlink{classwebsocketpp_1_1client_a818c30343180123bf1fee6dc21524bae}{connect}}(con);}
+\DoxyCodeLine{00085\ }
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Start\ the\ ASIO\ io\_service\ run\ loop}}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ m\_start\ =\ std::chrono::high\_resolution\_clock::now();}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ m\_endpoint.run();}
+\DoxyCodeLine{00089\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classperftest_afa86f15f51139add01d21a1cc1b42d8a_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classperftest_afa86f15f51139add01d21a1cc1b42d8a_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/vendor/websocketpp/examples/debug\+\_\+client/\mbox{\hyperlink{debug__client_8cpp}{debug\+\_\+client.\+cpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,65 @@
+\doxysection{sysio\+::chain\+::enum\+\_\+hash\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>} Struct Template Reference}
+\hypertarget{structsysio_1_1chain_1_1enum__hash}{}\label{structsysio_1_1chain_1_1enum__hash}\index{sysio::chain::enum\_hash$<$ T $>$@{sysio::chain::enum\_hash$<$ T $>$}}
+
+
+{\ttfamily \#include $<$types.\+hpp$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1enum__hash_a559449aae928a041e3adfadf91845fd3}{underlying\+\_\+type}} = typename std\+::underlying\+\_\+type$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$\+::type
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+std\+::size\+\_\+t \mbox{\hyperlink{structsysio_1_1chain_1_1enum__hash_ae9fc056531979285293f2cdadcccaf41}{operator()}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} t) const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$\newline
+struct sysio\+::chain\+::enum\+\_\+hash$<$ T $>$}
+
+
+Definition at line \mbox{\hyperlink{chain_2include_2sysio_2chain_2types_8hpp_source_l00308}{308}} of file \mbox{\hyperlink{chain_2include_2sysio_2chain_2types_8hpp_source}{types.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{structsysio_1_1chain_1_1enum__hash_a559449aae928a041e3adfadf91845fd3}\index{sysio::chain::enum\_hash$<$ T $>$@{sysio::chain::enum\_hash$<$ T $>$}!underlying\_type@{underlying\_type}}
+\index{underlying\_type@{underlying\_type}!sysio::chain::enum\_hash$<$ T $>$@{sysio::chain::enum\_hash$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{underlying\_type}{underlying\_type}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1enum__hash_a559449aae928a041e3adfadf91845fd3} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+using \mbox{\hyperlink{structsysio_1_1chain_1_1enum__hash}{sysio\+::chain\+::enum\+\_\+hash}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::underlying\+\_\+type = typename std\+::underlying\+\_\+type$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$\+::type}
+
+
+
+Definition at line \mbox{\hyperlink{chain_2include_2sysio_2chain_2types_8hpp_source_l00312}{312}} of file \mbox{\hyperlink{chain_2include_2sysio_2chain_2types_8hpp_source}{types.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1chain_1_1enum__hash_ae9fc056531979285293f2cdadcccaf41}\index{sysio::chain::enum\_hash$<$ T $>$@{sysio::chain::enum\_hash$<$ T $>$}!operator()@{operator()}}
+\index{operator()@{operator()}!sysio::chain::enum\_hash$<$ T $>$@{sysio::chain::enum\_hash$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1enum__hash_ae9fc056531979285293f2cdadcccaf41} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+std\+::size\+\_\+t \mbox{\hyperlink{structsysio_1_1chain_1_1enum__hash}{sysio\+::chain\+::enum\+\_\+hash}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::operator() (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}}]{t}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{chain_2include_2sysio_2chain_2types_8hpp_source_l00314}{314}} of file \mbox{\hyperlink{chain_2include_2sysio_2chain_2types_8hpp_source}{types.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00315\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00316\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::hash<underlying\_type>\{\}(\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{structsysio_1_1chain_1_1enum__hash_a559449aae928a041e3adfadf91845fd3}{underlying\_type}}\textcolor{keyword}{>}(t)\ );}
+\DoxyCodeLine{00317\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{chain_2include_2sysio_2chain_2types_8hpp}{types.\+hpp}}\end{DoxyCompactItemize}

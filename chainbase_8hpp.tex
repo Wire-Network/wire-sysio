@@ -1,0 +1,183 @@
+\doxysection{libraries/chainbase/include/chainbase/chainbase.hpp File Reference}
+\hypertarget{chainbase_8hpp}{}\label{chainbase_8hpp}\index{libraries/chainbase/include/chainbase/chainbase.hpp@{libraries/chainbase/include/chainbase/chainbase.hpp}}
+{\ttfamily \#include $<$boost/interprocess/managed\+\_\+mapped\+\_\+file.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/interprocess/containers/map.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/interprocess/containers/set.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/interprocess/containers/flat\+\_\+map.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/interprocess/containers/deque.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/interprocess/containers/string.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/interprocess/allocators/allocator.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/interprocess/sync/interprocess\+\_\+sharable\+\_\+mutex.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/interprocess/sync/sharable\+\_\+lock.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/core/demangle.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/multi\+\_\+index\+\_\+container.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/chrono.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/config.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/filesystem.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/lexical\+\_\+cast.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/throw\+\_\+exception.\+hpp$>$}\newline
+{\ttfamily \#include $<$array$>$}\newline
+{\ttfamily \#include $<$atomic$>$}\newline
+{\ttfamily \#include $<$fstream$>$}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$stdexcept$>$}\newline
+{\ttfamily \#include $<$typeindex$>$}\newline
+{\ttfamily \#include $<$typeinfo$>$}\newline
+{\ttfamily \#include $<$set$>$}\newline
+{\ttfamily \#include $<$chainbase/pinnable\+\_\+mapped\+\_\+file.\+hpp$>$}\newline
+{\ttfamily \#include $<$chainbase/shared\+\_\+cow\+\_\+string.\+hpp$>$}\newline
+{\ttfamily \#include $<$chainbase/chainbase\+\_\+node\+\_\+allocator.\+hpp$>$}\newline
+{\ttfamily \#include $<$chainbase/undo\+\_\+index.\+hpp$>$}\newline
+Include dependency graph for chainbase.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{chainbase_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{chainbase_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classchainbase_1_1oid}{chainbase\+::oid$<$ T $>$}}
+\item 
+struct \mbox{\hyperlink{structchainbase_1_1object}{chainbase\+::object$<$ Type\+Number, Derived $>$}}
+\item 
+struct \mbox{\hyperlink{structchainbase_1_1get__index__type}{chainbase\+::get\+\_\+index\+\_\+type$<$ T $>$}}
+\item 
+class \mbox{\hyperlink{classchainbase_1_1int__incrementer}{chainbase\+::int\+\_\+incrementer}}
+\item 
+class \mbox{\hyperlink{classchainbase_1_1abstract__session}{chainbase\+::abstract\+\_\+session}}
+\item 
+class \mbox{\hyperlink{classchainbase_1_1session__impl}{chainbase\+::session\+\_\+impl$<$ Session\+Type $>$}}
+\item 
+class \mbox{\hyperlink{classchainbase_1_1abstract__index}{chainbase\+::abstract\+\_\+index}}
+\item 
+class \mbox{\hyperlink{classchainbase_1_1index__impl}{chainbase\+::index\+\_\+impl$<$ Base\+Index $>$}}
+\item 
+class \mbox{\hyperlink{classchainbase_1_1index}{chainbase\+::index$<$ Index\+Type $>$}}
+\item 
+class \mbox{\hyperlink{classchainbase_1_1read__write__mutex__manager}{chainbase\+::read\+\_\+write\+\_\+mutex\+\_\+manager}}
+\item 
+class \mbox{\hyperlink{classchainbase_1_1database}{chainbase\+::database}}
+\item 
+struct \mbox{\hyperlink{structchainbase_1_1database_1_1session}{chainbase\+::database\+::session}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacechainbase}{chainbase}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{chainbase_8hpp_a8c47a63069539cee2d294752009d6e88}{CHAINBASE\+\_\+\+NUM\+\_\+\+RW\+\_\+\+LOCKS}}~10
+\item 
+\#define \mbox{\hyperlink{chainbase_8hpp_a92cd7cf8dd03d26bd5ef6a1a15d6d755}{CHAINBASE\+\_\+\+REQUIRE\+\_\+\+READ\+\_\+\+LOCK}}(m,  t)
+\item 
+\#define \mbox{\hyperlink{chainbase_8hpp_a43b0c8cc6f841c06b58acec3d0fc10e5}{CHAINBASE\+\_\+\+REQUIRE\+\_\+\+WRITE\+\_\+\+LOCK}}(m,  t)
+\item 
+\#define \mbox{\hyperlink{chainbase_8hpp_a789572f90cbf8d6a0c1909c170298a1a}{CHAINBASE\+\_\+\+SET\+\_\+\+INDEX\+\_\+\+TYPE}}(OBJECT\+\_\+\+TYPE,  INDEX\+\_\+\+TYPE)
+\item 
+\#define \mbox{\hyperlink{chainbase_8hpp_a297f09ad324f87a7d411965f8793086d}{CHAINBASE\+\_\+\+DEFAULT\+\_\+\+CONSTRUCTOR}}(OBJECT\+\_\+\+TYPE)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\using \mbox{\hyperlink{namespacechainbase_add7d4cf66ab3f2808fe613e6b0343b89}{chainbase\+::allocator}} = bip\+::allocator$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a550aa643b3bd7335e48afd94f1089d2b}{pinnable\+\_\+mapped\+\_\+file\+::segment\+\_\+manager}}$>$
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\using \mbox{\hyperlink{namespacechainbase_a5235419f9dd4d8333aa4b5a2aa8f6125}{chainbase\+::node\+\_\+allocator}} = \mbox{\hyperlink{classchainbase_1_1chainbase__node__allocator}{chainbase\+\_\+node\+\_\+allocator}}$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a550aa643b3bd7335e48afd94f1089d2b}{pinnable\+\_\+mapped\+\_\+file\+::segment\+\_\+manager}}$>$
+\item 
+using \mbox{\hyperlink{namespacechainbase_a895da7b5480367dc984b326d363552c8}{chainbase\+::shared\+\_\+string}} = \mbox{\hyperlink{classchainbase_1_1shared__cow__string}{shared\+\_\+cow\+\_\+string}}
+\item 
+typedef boost\+::interprocess\+::interprocess\+\_\+sharable\+\_\+mutex \mbox{\hyperlink{namespacechainbase_aad8e368b62fa8230255e90840a42dc2a}{chainbase\+::read\+\_\+write\+\_\+mutex}}
+\item 
+typedef boost\+::interprocess\+::sharable\+\_\+lock$<$ \mbox{\hyperlink{namespacechainbase_aad8e368b62fa8230255e90840a42dc2a}{read\+\_\+write\+\_\+mutex}} $>$ \mbox{\hyperlink{namespacechainbase_af9c751cb717344c32889e0a797c50803}{chainbase\+::read\+\_\+lock}}
+\item 
+{\footnotesize template$<$typename Multi\+Index\+Type $>$ }\\using \mbox{\hyperlink{namespacechainbase_a3ba122cfc1e47fa4ddf024212ec17431}{chainbase\+::generic\+\_\+index}} = \mbox{\hyperlink{namespacechainbase_a8f797a59401f3deae45451f837bd6ebe}{multi\+\_\+index\+\_\+to\+\_\+undo\+\_\+index}}$<$Multi\+Index\+Type$>$
+\item 
+{\footnotesize template$<$typename Object , typename... Args$>$ }\\using \mbox{\hyperlink{namespacechainbase_aba1e047495dcaa4e0d32ff25b8705f1f}{chainbase\+::shared\+\_\+multi\+\_\+index\+\_\+container}} = boost\+::multi\+\_\+index\+\_\+container$<$Object,Args..., \mbox{\hyperlink{namespacechainbase_a5235419f9dd4d8333aa4b5a2aa8f6125}{chainbase\+::node\+\_\+allocator}}$<$Object$>$ $>$
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{chainbase_8hpp_a297f09ad324f87a7d411965f8793086d}\index{chainbase.hpp@{chainbase.hpp}!CHAINBASE\_DEFAULT\_CONSTRUCTOR@{CHAINBASE\_DEFAULT\_CONSTRUCTOR}}
+\index{CHAINBASE\_DEFAULT\_CONSTRUCTOR@{CHAINBASE\_DEFAULT\_CONSTRUCTOR}!chainbase.hpp@{chainbase.hpp}}
+\doxysubsubsection{\texorpdfstring{CHAINBASE\_DEFAULT\_CONSTRUCTOR}{CHAINBASE\_DEFAULT\_CONSTRUCTOR}}
+{\footnotesize\ttfamily \label{chainbase_8hpp_a297f09ad324f87a7d411965f8793086d} 
+\#define CHAINBASE\+\_\+\+DEFAULT\+\_\+\+CONSTRUCTOR(\begin{DoxyParamCaption}\item[{}]{OBJECT\+\_\+\+TYPE}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a53ef06e29c840024a683512c1acd791a}{template<typename\ Constructor,\ typename\ Allocator>\ \(\backslash\)}}}
+\DoxyCodeLine{\mbox{\hyperlink{yubihsm__pkcs11_8c_a53ef06e29c840024a683512c1acd791a}{\ \ \ OBJECT\_TYPE}}(\ Constructor\&\&\ c,\ \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}\&\&\ \ )\ \{\ c(*\textcolor{keyword}{this});\ \}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00108}{108}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00108\ \textcolor{preprocessor}{\ \ \ \#define\ CHAINBASE\_DEFAULT\_CONSTRUCTOR(\ OBJECT\_TYPE\ )\ \(\backslash\)}}
+\DoxyCodeLine{00109\ \textcolor{preprocessor}{\ \ \ template<typename\ Constructor,\ typename\ Allocator>\ \(\backslash\)}}
+\DoxyCodeLine{00110\ \textcolor{preprocessor}{\ \ \ OBJECT\_TYPE(\ Constructor\&\&\ c,\ Allocator\&\&\ \ )\ \{\ c(*this);\ \}}}
+
+\end{DoxyCode}
+\Hypertarget{chainbase_8hpp_a8c47a63069539cee2d294752009d6e88}\index{chainbase.hpp@{chainbase.hpp}!CHAINBASE\_NUM\_RW\_LOCKS@{CHAINBASE\_NUM\_RW\_LOCKS}}
+\index{CHAINBASE\_NUM\_RW\_LOCKS@{CHAINBASE\_NUM\_RW\_LOCKS}!chainbase.hpp@{chainbase.hpp}}
+\doxysubsubsection{\texorpdfstring{CHAINBASE\_NUM\_RW\_LOCKS}{CHAINBASE\_NUM\_RW\_LOCKS}}
+{\footnotesize\ttfamily \label{chainbase_8hpp_a8c47a63069539cee2d294752009d6e88} 
+\#define CHAINBASE\+\_\+\+NUM\+\_\+\+RW\+\_\+\+LOCKS~10}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00037}{37}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+\Hypertarget{chainbase_8hpp_a92cd7cf8dd03d26bd5ef6a1a15d6d755}\index{chainbase.hpp@{chainbase.hpp}!CHAINBASE\_REQUIRE\_READ\_LOCK@{CHAINBASE\_REQUIRE\_READ\_LOCK}}
+\index{CHAINBASE\_REQUIRE\_READ\_LOCK@{CHAINBASE\_REQUIRE\_READ\_LOCK}!chainbase.hpp@{chainbase.hpp}}
+\doxysubsubsection{\texorpdfstring{CHAINBASE\_REQUIRE\_READ\_LOCK}{CHAINBASE\_REQUIRE\_READ\_LOCK}}
+{\footnotesize\ttfamily \label{chainbase_8hpp_a92cd7cf8dd03d26bd5ef6a1a15d6d755} 
+\#define CHAINBASE\+\_\+\+REQUIRE\+\_\+\+READ\+\_\+\+LOCK(\begin{DoxyParamCaption}\item[{}]{m}{, }\item[{}]{t}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00044}{44}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+\Hypertarget{chainbase_8hpp_a43b0c8cc6f841c06b58acec3d0fc10e5}\index{chainbase.hpp@{chainbase.hpp}!CHAINBASE\_REQUIRE\_WRITE\_LOCK@{CHAINBASE\_REQUIRE\_WRITE\_LOCK}}
+\index{CHAINBASE\_REQUIRE\_WRITE\_LOCK@{CHAINBASE\_REQUIRE\_WRITE\_LOCK}!chainbase.hpp@{chainbase.hpp}}
+\doxysubsubsection{\texorpdfstring{CHAINBASE\_REQUIRE\_WRITE\_LOCK}{CHAINBASE\_REQUIRE\_WRITE\_LOCK}}
+{\footnotesize\ttfamily \label{chainbase_8hpp_a43b0c8cc6f841c06b58acec3d0fc10e5} 
+\#define CHAINBASE\+\_\+\+REQUIRE\+\_\+\+WRITE\+\_\+\+LOCK(\begin{DoxyParamCaption}\item[{}]{m}{, }\item[{}]{t}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00045}{45}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+\Hypertarget{chainbase_8hpp_a789572f90cbf8d6a0c1909c170298a1a}\index{chainbase.hpp@{chainbase.hpp}!CHAINBASE\_SET\_INDEX\_TYPE@{CHAINBASE\_SET\_INDEX\_TYPE}}
+\index{CHAINBASE\_SET\_INDEX\_TYPE@{CHAINBASE\_SET\_INDEX\_TYPE}!chainbase.hpp@{chainbase.hpp}}
+\doxysubsubsection{\texorpdfstring{CHAINBASE\_SET\_INDEX\_TYPE}{CHAINBASE\_SET\_INDEX\_TYPE}}
+{\footnotesize\ttfamily \label{chainbase_8hpp_a789572f90cbf8d6a0c1909c170298a1a} 
+\#define CHAINBASE\+\_\+\+SET\+\_\+\+INDEX\+\_\+\+TYPE(\begin{DoxyParamCaption}\item[{}]{OBJECT\+\_\+\+TYPE}{, }\item[{}]{INDEX\+\_\+\+TYPE}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacechainbase}{chainbase}}\ \{\ \textcolor{keyword}{template}<>\ \textcolor{keyword}{struct\ }get\_index\_type<OBJECT\_TYPE>\ \{\ \textcolor{keyword}{typedef}\ INDEX\_TYPE\ \mbox{\hyperlink{yubihsm_8h_a1d127017fb298b889f4ba24752d08b8e}{type}};\ \};\ \}}
+
+\end{DoxyCode}
+This macro must be used at global scope and OBJECT\+\_\+\+TYPE and INDEX\+\_\+\+TYPE must be fully qualified 
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00105}{105}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00105\ \textcolor{preprocessor}{\ \ \ \#define\ CHAINBASE\_SET\_INDEX\_TYPE(\ OBJECT\_TYPE,\ INDEX\_TYPE\ )\ \ \(\backslash\)}}
+\DoxyCodeLine{00106\ \textcolor{preprocessor}{\ \ \ namespace\ chainbase\ \{\ template<>\ struct\ get\_index\_type<OBJECT\_TYPE>\ \{\ typedef\ INDEX\_TYPE\ type;\ \};\ \}}}
+
+\end{DoxyCode}

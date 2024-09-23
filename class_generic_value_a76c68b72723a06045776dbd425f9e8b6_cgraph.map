@@ -1,0 +1,19 @@
+<map id="GenericValue::GenericValue" name="GenericValue::GenericValue">
+<area shape="rect" id="Node000001" title="Explicit copy constructor (with allocator)" alt="" coords="5,193,189,219"/>
+<area shape="rect" id="Node000002" href="$class_generic_value.html#ab0205d57176d83814ea4e4598c596fe8" title="Default constructor creates a null value." alt="" coords="239,5,422,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="104,191,152,120,190,77,235,41,246,35,249,40,238,46,194,81,156,123,108,194"/>
+<area shape="rect" id="Node000003" href="$class_generic_value.html#a40f567bae6fabbb07822ebac5fe00bfc" title=" " alt="" coords="239,55,422,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="112,191,165,150,235,106,249,100,251,105,238,111,168,155,116,195"/>
+<area shape="rect" id="Node000004" href="$class_generic_value.html#a8c39af1a639eae1b59db66e2cbb537c9" title=" " alt="" coords="240,120,421,161"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="145,190,240,163,241,168,146,195"/>
+<area shape="rect" id="Node000005" href="$class_generic_value.html#a1ccc6e15fa49f0c30eab8e8f7f9418f2" title=" " alt="" coords="240,186,421,226"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="189,204,224,204,224,209,189,209"/>
+<area shape="rect" id="Node000006" href="$class_generic_value.html#a634a87972649943604153708ca9aefb7" title=" " alt="" coords="240,251,420,292"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="146,217,241,244,240,249,145,222"/>
+<area shape="rect" id="Node000007" href="$class_generic_value.html#a1451603922dcdf34976f125dc60f70ee" title="Initialize this value as constant string, without calling destructor." alt="" coords="237,316,424,342"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="115,217,167,258,202,281,238,301,255,308,253,313,236,306,199,286,164,263,112,222"/>
+<area shape="rect" id="Node000009" href="$document_8h.html#aa6b9fd9f6aa49405a574c362ba9af6b5" title="Mark a character pointer as constant string." alt="" coords="292,365,368,391"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="109,218,159,283,195,320,238,352,278,368,276,373,235,356,192,324,154,286,105,221"/>
+<area shape="rect" id="Node000008" href="$class_generic_value.html#ab3e8833927fb1454585e8692200dbb93" title=" " alt="" coords="472,316,673,342"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="424,326,456,326,456,332,424,332"/>
+</map>

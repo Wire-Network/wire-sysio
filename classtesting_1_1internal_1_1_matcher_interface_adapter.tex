@@ -1,0 +1,159 @@
+\doxysection{testing\+::internal\+::Matcher\+Interface\+Adapter\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classtesting_1_1internal_1_1_matcher_interface_adapter}{}\label{classtesting_1_1internal_1_1_matcher_interface_adapter}\index{testing::internal::MatcherInterfaceAdapter$<$ T $>$@{testing::internal::MatcherInterfaceAdapter$<$ T $>$}}
+
+
+{\ttfamily \#include $<$gmock-\/matchers.\+h$>$}
+
+
+
+Inheritance diagram for testing\+::internal\+::Matcher\+Interface\+Adapter\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=227pt]{classtesting_1_1internal_1_1_matcher_interface_adapter__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for testing\+::internal\+::Matcher\+Interface\+Adapter\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=227pt]{classtesting_1_1internal_1_1_matcher_interface_adapter__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_matcher_interface_adapter_a83ddc3c29192e57c74121ca7faf2060b}{Matcher\+Interface\+Adapter}} (const \mbox{\hyperlink{classtesting_1_1_matcher_interface}{Matcher\+Interface}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \texorpdfstring{$\ast$}{*}impl)
+\item 
+virtual \mbox{\hyperlink{classtesting_1_1internal_1_1_matcher_interface_adapter_a80a6a5af6f60dab895d8fef63da3159a}{\texorpdfstring{$\sim$}{\string~}\+Matcher\+Interface\+Adapter}} ()
+\item 
+virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_matcher_interface_adapter_a759c7639624cae3c2ba70024f1b4989c}{Describe\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}os) const
+\item 
+virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_matcher_interface_adapter_a32590a7a2bd7e04796750da13c17ef05}{Describe\+Negation\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}os) const
+\item 
+virtual bool \mbox{\hyperlink{classtesting_1_1internal_1_1_matcher_interface_adapter_ac4a8938d03f55aebaa9c36bcc58467fd}{Match\+And\+Explain}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&x, \mbox{\hyperlink{classtesting_1_1_match_result_listener}{Match\+Result\+Listener}} \texorpdfstring{$\ast$}{*}listener) const
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classtesting_1_1_matcher_interface}{testing\+::\+Matcher\+Interface$<$ const T \& $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual bool \mbox{\hyperlink{classtesting_1_1_matcher_interface_a296b43607cd99d60365f0e6a762777cf}{Match\+And\+Explain}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} x, \mbox{\hyperlink{classtesting_1_1_match_result_listener}{Match\+Result\+Listener}} \texorpdfstring{$\ast$}{*}listener) const=0
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classtesting_1_1_matcher_describer_interface}{testing\+::\+Matcher\+Describer\+Interface}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{classtesting_1_1_matcher_describer_interface_ae2236a56ad2cc35cad10efc1208854f4}{\texorpdfstring{$\sim$}{\string~}\+Matcher\+Describer\+Interface}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$\newline
+class testing\+::internal\+::\+Matcher\+Interface\+Adapter$<$ T $>$}
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l00186}{186}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_matcher_interface_adapter_a83ddc3c29192e57c74121ca7faf2060b}\index{testing::internal::MatcherInterfaceAdapter$<$ T $>$@{testing::internal::MatcherInterfaceAdapter$<$ T $>$}!MatcherInterfaceAdapter@{MatcherInterfaceAdapter}}
+\index{MatcherInterfaceAdapter@{MatcherInterfaceAdapter}!testing::internal::MatcherInterfaceAdapter$<$ T $>$@{testing::internal::MatcherInterfaceAdapter$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{MatcherInterfaceAdapter()}{MatcherInterfaceAdapter()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_matcher_interface_adapter_a83ddc3c29192e57c74121ca7faf2060b} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_matcher_interface_adapter}{testing\+::internal\+::\+Matcher\+Interface\+Adapter}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::\+Matcher\+Interface\+Adapter (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classtesting_1_1_matcher_interface}{Matcher\+Interface}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \texorpdfstring{$\ast$}{*}}]{impl}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l00188}{188}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ :\ impl\_(impl)\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1internal_1_1_matcher_interface_adapter_a80a6a5af6f60dab895d8fef63da3159a}\index{testing::internal::MatcherInterfaceAdapter$<$ T $>$@{testing::internal::MatcherInterfaceAdapter$<$ T $>$}!````~MatcherInterfaceAdapter@{\texorpdfstring{$\sim$}{\string~}MatcherInterfaceAdapter}}
+\index{````~MatcherInterfaceAdapter@{\texorpdfstring{$\sim$}{\string~}MatcherInterfaceAdapter}!testing::internal::MatcherInterfaceAdapter$<$ T $>$@{testing::internal::MatcherInterfaceAdapter$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}MatcherInterfaceAdapter()}{\string~MatcherInterfaceAdapter()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_matcher_interface_adapter_a80a6a5af6f60dab895d8fef63da3159a} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+virtual \mbox{\hyperlink{classtesting_1_1internal_1_1_matcher_interface_adapter}{testing\+::internal\+::\+Matcher\+Interface\+Adapter}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::\texorpdfstring{$\sim$}{\string~}\mbox{\hyperlink{classtesting_1_1internal_1_1_matcher_interface_adapter}{Matcher\+Interface\+Adapter}} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l00190}{190}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00190\ \{\ \textcolor{keyword}{delete}\ impl\_;\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_matcher_interface_adapter_a32590a7a2bd7e04796750da13c17ef05}\index{testing::internal::MatcherInterfaceAdapter$<$ T $>$@{testing::internal::MatcherInterfaceAdapter$<$ T $>$}!DescribeNegationTo@{DescribeNegationTo}}
+\index{DescribeNegationTo@{DescribeNegationTo}!testing::internal::MatcherInterfaceAdapter$<$ T $>$@{testing::internal::MatcherInterfaceAdapter$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{DescribeNegationTo()}{DescribeNegationTo()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_matcher_interface_adapter_a32590a7a2bd7e04796750da13c17ef05} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_matcher_interface_adapter}{testing\+::internal\+::\+Matcher\+Interface\+Adapter}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::\+Describe\+Negation\+To (\begin{DoxyParamCaption}\item[{\+::std\+::ostream \texorpdfstring{$\ast$}{*}}]{os}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classtesting_1_1_matcher_describer_interface_a2071afbc47097c4d1c0064275af34db0}{testing\+::\+Matcher\+Describer\+Interface}}.
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l00194}{194}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00195\ \ \ \ \ impl\_-\/>DescribeNegationTo(os);}
+\DoxyCodeLine{00196\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1internal_1_1_matcher_interface_adapter_a759c7639624cae3c2ba70024f1b4989c}\index{testing::internal::MatcherInterfaceAdapter$<$ T $>$@{testing::internal::MatcherInterfaceAdapter$<$ T $>$}!DescribeTo@{DescribeTo}}
+\index{DescribeTo@{DescribeTo}!testing::internal::MatcherInterfaceAdapter$<$ T $>$@{testing::internal::MatcherInterfaceAdapter$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{DescribeTo()}{DescribeTo()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_matcher_interface_adapter_a759c7639624cae3c2ba70024f1b4989c} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_matcher_interface_adapter}{testing\+::internal\+::\+Matcher\+Interface\+Adapter}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::\+Describe\+To (\begin{DoxyParamCaption}\item[{\+::std\+::ostream \texorpdfstring{$\ast$}{*}}]{os}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classtesting_1_1_matcher_describer_interface_ad9f861588bd969b6e3e717f13bb94e7b}{testing\+::\+Matcher\+Describer\+Interface}}.
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l00192}{192}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00192\ \{\ impl\_-\/>DescribeTo(os);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1internal_1_1_matcher_interface_adapter_ac4a8938d03f55aebaa9c36bcc58467fd}\index{testing::internal::MatcherInterfaceAdapter$<$ T $>$@{testing::internal::MatcherInterfaceAdapter$<$ T $>$}!MatchAndExplain@{MatchAndExplain}}
+\index{MatchAndExplain@{MatchAndExplain}!testing::internal::MatcherInterfaceAdapter$<$ T $>$@{testing::internal::MatcherInterfaceAdapter$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{MatchAndExplain()}{MatchAndExplain()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_matcher_interface_adapter_ac4a8938d03f55aebaa9c36bcc58467fd} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+virtual bool \mbox{\hyperlink{classtesting_1_1internal_1_1_matcher_interface_adapter}{testing\+::internal\+::\+Matcher\+Interface\+Adapter}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::\+Match\+And\+Explain (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{x}{, }\item[{\mbox{\hyperlink{classtesting_1_1_match_result_listener}{Match\+Result\+Listener}} \texorpdfstring{$\ast$}{*}}]{listener}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l00198}{198}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00200\ \ \ \ \ \textcolor{keywordflow}{return}\ impl\_-\/>MatchAndExplain(x,\ listener);}
+\DoxyCodeLine{00201\ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/include/gmock/\mbox{\hyperlink{gmock-matchers_8h}{gmock-\/matchers.\+h}}\end{DoxyCompactItemize}

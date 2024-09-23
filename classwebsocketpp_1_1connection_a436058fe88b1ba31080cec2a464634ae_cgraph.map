@@ -1,0 +1,11 @@
+<map id="websocketpp::connection::close" name="websocketpp::connection::close">
+<area shape="rect" id="Node000001" title="exception free variant of close" alt="" coords="5,55,175,96"/>
+<area shape="rect" id="Node000002" href="$xbyak__mnemonic_8h.html#aa81aed607133209dade63a226818224d" title=" " alt="" coords="269,5,314,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="163,52,253,26,254,31,164,57"/>
+<area shape="rect" id="Node000003" href="$namespacewebsocketpp_1_1error.html#a3344622df8c36e8ae03c59164e7b5e89" title=" " alt="" coords="225,55,358,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="175,73,209,73,209,78,175,78"/>
+<area shape="rect" id="Node000005" href="$namespacewebsocketpp_1_1close_1_1status.html#a3f9ce953f12693f74493e2eb7a80952b" title="Determine if the code represents an unrecoverable error." alt="" coords="223,120,360,161"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="156,94,213,113,211,118,154,99"/>
+<area shape="rect" id="Node000004" href="$namespacewebsocketpp_1_1error.html#ac1acac2bfb24bbd2b1791db80993b0c2" title=" " alt="" coords="408,55,540,96"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="358,73,393,73,393,78,358,78"/>
+</map>

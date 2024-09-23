@@ -1,0 +1,128 @@
+\doxysection{Catch\+::Summary\+Column Struct Reference}
+\hypertarget{struct_catch_1_1_summary_column}{}\label{struct_catch_1_1_summary_column}\index{Catch::SummaryColumn@{Catch::SummaryColumn}}
+
+
+Collaboration diagram for Catch\+::Summary\+Column\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=204pt]{struct_catch_1_1_summary_column__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_catch_1_1_summary_column_a5ccb6d3a534033e95fe8624494a5330b}{Summary\+Column}} (std\+::string \+\_\+label, \mbox{\hyperlink{struct_catch_1_1_colour_a987a596fd001bd80db06b3ba7d53231e}{Colour\+::\+Code}} \+\_\+colour)
+\item 
+\mbox{\hyperlink{struct_catch_1_1_summary_column}{Summary\+Column}} \mbox{\hyperlink{struct_catch_1_1_summary_column_aed5c921b3ad08f653d879280be435d1a}{add\+Row}} (std\+::size\+\_\+t \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::string \mbox{\hyperlink{struct_catch_1_1_summary_column_a01f1eaae714a8f53494ad6e0926a1157}{label}}
+\item 
+\mbox{\hyperlink{struct_catch_1_1_colour_a987a596fd001bd80db06b3ba7d53231e}{Colour\+::\+Code}} \mbox{\hyperlink{struct_catch_1_1_summary_column_adeb1eac3b0eda3b653c9063a2fe521d7}{colour}}
+\item 
+std\+::vector$<$ std\+::string $>$ \mbox{\hyperlink{struct_catch_1_1_summary_column_ad0f54e7422f5773b03e96d0019915f8d}{rows}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__console_8cpp_source_l00532}{532}} of file \mbox{\hyperlink{catch__reporter__console_8cpp_source}{catch\+\_\+reporter\+\_\+console.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{struct_catch_1_1_summary_column_a5ccb6d3a534033e95fe8624494a5330b}\index{Catch::SummaryColumn@{Catch::SummaryColumn}!SummaryColumn@{SummaryColumn}}
+\index{SummaryColumn@{SummaryColumn}!Catch::SummaryColumn@{Catch::SummaryColumn}}
+\doxysubsubsection{\texorpdfstring{SummaryColumn()}{SummaryColumn()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_summary_column_a5ccb6d3a534033e95fe8624494a5330b} 
+Catch\+::\+Summary\+Column\+::\+Summary\+Column (\begin{DoxyParamCaption}\item[{std\+::string}]{\+\_\+label}{, }\item[{\mbox{\hyperlink{struct_catch_1_1_colour_a987a596fd001bd80db06b3ba7d53231e}{Colour\+::\+Code}}}]{\+\_\+colour}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__console_8cpp_source_l00534}{534}} of file \mbox{\hyperlink{catch__reporter__console_8cpp_source}{catch\+\_\+reporter\+\_\+console.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00535\ \ \ \ \ :\ \ \ \mbox{\hyperlink{struct_catch_1_1_summary_column_a01f1eaae714a8f53494ad6e0926a1157}{label}}(\ std::move(\ \_label\ )\ ),}
+\DoxyCodeLine{00536\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_summary_column_adeb1eac3b0eda3b653c9063a2fe521d7}{colour}}(\ \_colour\ )\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_catch_1_1_summary_column_aed5c921b3ad08f653d879280be435d1a}\index{Catch::SummaryColumn@{Catch::SummaryColumn}!addRow@{addRow}}
+\index{addRow@{addRow}!Catch::SummaryColumn@{Catch::SummaryColumn}}
+\doxysubsubsection{\texorpdfstring{addRow()}{addRow()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_summary_column_aed5c921b3ad08f653d879280be435d1a} 
+\mbox{\hyperlink{struct_catch_1_1_summary_column}{Summary\+Column}} Catch\+::\+Summary\+Column\+::add\+Row (\begin{DoxyParamCaption}\item[{std\+::size\+\_\+t}]{count}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__console_8cpp_source_l00537}{537}} of file \mbox{\hyperlink{catch__reporter__console_8cpp_source}{catch\+\_\+reporter\+\_\+console.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00537\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00538\ \ \ \ \ \ \ \ \ ReusableStringStream\ rss;}
+\DoxyCodeLine{00539\ \ \ \ \ \ \ \ \ rss\ <<\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}};}
+\DoxyCodeLine{00540\ \ \ \ \ \ \ \ \ std::string\ row\ =\ rss.str();}
+\DoxyCodeLine{00541\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\&\ oldRow\ :\ \mbox{\hyperlink{struct_catch_1_1_summary_column_ad0f54e7422f5773b03e96d0019915f8d}{rows}})\ \{}
+\DoxyCodeLine{00542\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (oldRow.size()\ <\ row.size())}
+\DoxyCodeLine{00543\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ oldRow\ =\ \textcolor{charliteral}{'\ '}\ +\ oldRow;}
+\DoxyCodeLine{00544\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (oldRow.size()\ >\ row.size())}
+\DoxyCodeLine{00545\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ row\ =\ \textcolor{charliteral}{'\ '}\ +\ row;}
+\DoxyCodeLine{00546\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00547\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_summary_column_ad0f54e7422f5773b03e96d0019915f8d}{rows}}.push\_back(row);}
+\DoxyCodeLine{00548\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00549\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_catch_1_1_summary_column_aed5c921b3ad08f653d879280be435d1a_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_catch_1_1_summary_column_adeb1eac3b0eda3b653c9063a2fe521d7}\index{Catch::SummaryColumn@{Catch::SummaryColumn}!colour@{colour}}
+\index{colour@{colour}!Catch::SummaryColumn@{Catch::SummaryColumn}}
+\doxysubsubsection{\texorpdfstring{colour}{colour}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_summary_column_adeb1eac3b0eda3b653c9063a2fe521d7} 
+\mbox{\hyperlink{struct_catch_1_1_colour_a987a596fd001bd80db06b3ba7d53231e}{Colour\+::\+Code}} Catch\+::\+Summary\+Column\+::colour}
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__console_8cpp_source_l00552}{552}} of file \mbox{\hyperlink{catch__reporter__console_8cpp_source}{catch\+\_\+reporter\+\_\+console.\+cpp}}.
+
+\Hypertarget{struct_catch_1_1_summary_column_a01f1eaae714a8f53494ad6e0926a1157}\index{Catch::SummaryColumn@{Catch::SummaryColumn}!label@{label}}
+\index{label@{label}!Catch::SummaryColumn@{Catch::SummaryColumn}}
+\doxysubsubsection{\texorpdfstring{label}{label}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_summary_column_a01f1eaae714a8f53494ad6e0926a1157} 
+std\+::string Catch\+::\+Summary\+Column\+::label}
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__console_8cpp_source_l00551}{551}} of file \mbox{\hyperlink{catch__reporter__console_8cpp_source}{catch\+\_\+reporter\+\_\+console.\+cpp}}.
+
+\Hypertarget{struct_catch_1_1_summary_column_ad0f54e7422f5773b03e96d0019915f8d}\index{Catch::SummaryColumn@{Catch::SummaryColumn}!rows@{rows}}
+\index{rows@{rows}!Catch::SummaryColumn@{Catch::SummaryColumn}}
+\doxysubsubsection{\texorpdfstring{rows}{rows}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_summary_column_ad0f54e7422f5773b03e96d0019915f8d} 
+std\+::vector$<$std\+::string$>$ Catch\+::\+Summary\+Column\+::rows}
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__console_8cpp_source_l00553}{553}} of file \mbox{\hyperlink{catch__reporter__console_8cpp_source}{catch\+\_\+reporter\+\_\+console.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/include/reporters/\mbox{\hyperlink{catch__reporter__console_8cpp}{catch\+\_\+reporter\+\_\+console.\+cpp}}\end{DoxyCompactItemize}

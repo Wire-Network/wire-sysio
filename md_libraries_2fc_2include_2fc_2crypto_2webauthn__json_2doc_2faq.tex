@@ -1,0 +1,288 @@
+\chapter{FAQ}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2faq}{}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2faq}\index{FAQ@{FAQ}}
+\doxysection*{General}
+
+
+\begin{DoxyEnumerate}
+\item What is Rapid\+JSON?
+
+Rapid\+JSON is a C++ library for parsing and generating JSON. You may check all \doxylink{features_8md}{features} of it.
+\item Why is Rapid\+JSON named so?
+
+It is inspired by \href{http://rapidxml.sourceforge.net/}{\texttt{ Rapid\+XML}}, which is a fast XML DOM parser.
+\item Is Rapid\+JSON similar to Rapid\+XML?
+
+Rapid\+JSON borrowed some designs of Rapid\+XML, including {\itshape in situ} parsing, header-\/only library. But the two APIs are completely different. Also Rapid\+JSON provide many features that are not in Rapid\+XML.
+\item Is Rapid\+JSON free?
+
+Yes, it is free under MIT license. It can be used in commercial applications. Please check the details in \href{https://github.com/Tencent/rapidjson/blob/master/license.txt}{\texttt{ license.\+txt}}.
+\item Is Rapid\+JSON small? What are its dependencies?
+
+Yes. \doxylink{struct_a}{A} simple executable which parses a JSON and prints its statistics is less than 30KB on Windows.
+
+Rapid\+JSON depends on C++ standard library only.
+\item How to install Rapid\+JSON?
+
+Check \href{https://miloyip.github.io/rapidjson/}{\texttt{ Installation section}}.
+\item Can Rapid\+JSON run on my platform?
+
+Rapid\+JSON has been tested in many combinations of operating systems, compilers and CPU architecture by the community. But we cannot ensure that it can be run on your particular platform. Building and running the unit test suite will give you the answer.
+\item Does Rapid\+JSON support C++03? C++11?
+
+Rapid\+JSON was firstly implemented for C++03. Later it added optional support of some C++11 features (e.\+g., move constructor, {\ttfamily noexcept}). Rapid\+JSON shall be compatible with C++03 or C++11 compliant compilers.
+\item Does Rapid\+JSON really work in real applications?
+
+Yes. It is deployed in both client and server real applications. \doxylink{struct_a}{A} community member reported that Rapid\+JSON in their system parses 50 million JSONs daily.
+\item How Rapid\+JSON is tested?
+
+Rapid\+JSON contains a unit test suite for automatic testing. \href{https://travis-ci.org/Tencent/rapidjson/}{\texttt{ Travis}}(for Linux) and \href{https://ci.appveyor.com/project/Tencent/rapidjson/}{\texttt{ App\+Veyor}}(for Windows) will compile and run the unit test suite for all modifications. The test process also uses Valgrind (in Linux) to detect memory leaks.
+\item Is Rapid\+JSON well documented?
+
+Rapid\+JSON provides user guide and API documentationn.
+\item Are there alternatives?
+
+Yes, there are a lot alternatives. For example, \href{https://github.com/miloyip/nativejson-benchmark}{\texttt{ nativejson-\/benchmark}} has a listing of open-\/source C/\+C++ JSON libraries. \href{http://www.json.org/}{\texttt{ json.\+org}} also has a list.
+\end{DoxyEnumerate}
+
+\doxysection*{JSON}
+
+
+\begin{DoxyEnumerate}
+\item What is JSON?
+
+JSON (Java\+Script Object Notation) is a lightweight data-\/interchange format. It uses human readable text format. More details of JSON can be referred to \href{http://www.ietf.org/rfc/rfc7159.txt}{\texttt{ RFC7159}} and \href{http://www.ecma-international.org/publications/standards/Ecma-404.htm}{\texttt{ ECMA-\/404}}.
+\item What are applications of JSON?
+
+JSON are commonly used in web applications for transferring structured data. It is also used as a file format for data persistence.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Does Rapid\+JSON conform to the JSON standard?
+
+Yes. Rapid\+JSON is fully compliance with \href{http://www.ietf.org/rfc/rfc7159.txt}{\texttt{ RFC7159}} and \href{http://www.ecma-international.org/publications/standards/Ecma-404.htm}{\texttt{ ECMA-\/404}}. It can handle corner cases, such as supporting null character and surrogate pairs in JSON strings.
+\item Does Rapid\+JSON support relaxed syntax?
+
+Currently no. Rapid\+JSON only support the strict standardized format. Support on related syntax is under discussion in this \href{https://github.com/Tencent/rapidjson/issues/36}{\texttt{ issue}}.
+\end{DoxyEnumerate}
+
+\doxysection*{DOM and SAX}
+
+
+\begin{DoxyEnumerate}
+\item What is DOM style API?
+
+Document Object Model (DOM) is an in-\/memory representation of JSON for query and manipulation.
+\item What is SAX style API?
+
+SAX is an event-\/driven API for parsing and generation.
+\item Should I choose DOM or SAX?
+
+DOM is easy for query and manipulation. SAX is very fast and memory-\/saving but often more difficult to be applied.
+\item What is {\itshape in situ} parsing?
+
+{\itshape in situ} parsing decodes the JSON strings directly into the input JSON. This is an optimization which can reduce memory consumption and improve performance, but the input JSON will be modified. Check \doxylink{dom_8md}{in-\/situ parsing} for details.
+\item When does parsing generate an error?
+
+The parser generates an error when the input JSON contains invalid syntax, or a value can not be represented (a number is too big), or the handler of parsers terminate the parsing. Check \doxylink{dom_8md}{parse error} for details.
+\item What error information is provided?
+
+The error is stored in {\ttfamily \doxylink{struct_parse_result}{Parse\+Result}}, which includes the error code and offset (number of characters from the beginning of JSON). The error code can be translated into human-\/readable error message.
+\item Why not just using {\ttfamily double} to represent JSON number?
+
+Some applications use 64-\/bit unsigned/signed integers. And these integers cannot be converted into {\ttfamily double} without loss of precision. So the parsers detects whether a JSON number is convertible to different types of integers and/or {\ttfamily double}.
+\item How to clear-\/and-\/minimize a document or value?
+
+\doxylink{struct_call}{Call} one of the {\ttfamily Set\+XXX()} methods -\/ they call destructor which deallocates DOM data\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_document}{Document}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}};}
+\DoxyCodeLine{...}
+\DoxyCodeLine{d.SetObject();\ \ \textcolor{comment}{//\ clear\ and\ minimize}}
+
+\end{DoxyCode}
+
+
+Alternatively, use equivalent of the \href{https://en.wikibooks.org/wiki/More_C\%2B\%2B_Idioms/Clear-and-minimize}{\texttt{ C++ swap with temporary idiom}}\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}}(\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7a146f46700e905e8df96a6a90b5c7640f}{kObjectType}}).Swap(d);}
+
+\end{DoxyCode}
+ or equivalent, but slightly longer to type\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.Swap(\mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}}(\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7a146f46700e905e8df96a6a90b5c7640f}{kObjectType}}).Move());\ }
+
+\end{DoxyCode}
+
+\item How to insert a document node into another document?
+
+Let\textquotesingle{}s take the following two DOM trees represented as JSON documents\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_document}{Document}}\ person;}
+\DoxyCodeLine{person.\mbox{\hyperlink{class_generic_document_a901db1678f99a1b550003eed75bc380a}{Parse}}(\textcolor{stringliteral}{"{}\{\(\backslash\)"{}person\(\backslash\)"{}:\{\(\backslash\)"{}name\(\backslash\)"{}:\{\(\backslash\)"{}first\(\backslash\)"{}:\(\backslash\)"{}Adam\(\backslash\)"{},\(\backslash\)"{}last\(\backslash\)"{}:\(\backslash\)"{}Thomas\(\backslash\)"{}\}\}\}"{}});}
+\DoxyCodeLine{}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_document}{Document}}\ address;}
+\DoxyCodeLine{address.\mbox{\hyperlink{class_generic_document_a901db1678f99a1b550003eed75bc380a}{Parse}}(\textcolor{stringliteral}{"{}\{\(\backslash\)"{}address\(\backslash\)"{}:\{\(\backslash\)"{}city\(\backslash\)"{}:\(\backslash\)"{}Moscow\(\backslash\)"{},\(\backslash\)"{}street\(\backslash\)"{}:\(\backslash\)"{}Quiet\(\backslash\)"{}\}\}"{}});}
+
+\end{DoxyCode}
+ Let\textquotesingle{}s assume we want to merge them in such way that the whole {\ttfamily address} document becomes a node of the {\ttfamily person}\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\{\ "{}person"{}:\ \{}
+\DoxyCodeLine{\ \ \ "{}name"{}:\ \{\ "{}first"{}:\ "{}Adam"{},\ "{}last"{}:\ "{}Thomas"{}\ \},}
+\DoxyCodeLine{\ \ \ "{}address"{}:\ \{\ "{}city"{}:\ "{}Moscow"{},\ "{}street"{}:\ "{}Quiet"{}\ \}}
+\DoxyCodeLine{\ \ \ \}}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+The most important requirement to take care of document and value life-\/cycle as well as consistent memory management using the right allocator during the value transfer.
+
+Simple yet most efficient way to achieve that is to modify the {\ttfamily address} definition above to initialize it with allocator of the {\ttfamily person} document, then we just add the root member of the value\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_document}{Document}}\ address(\&person.\mbox{\hyperlink{class_generic_document_a1362cbdcce6ca37356744a3a0dbb11d6}{GetAllocator}}());}
+\DoxyCodeLine{...}
+\DoxyCodeLine{person[\textcolor{stringliteral}{"{}person"{}}].AddMember(\textcolor{stringliteral}{"{}address"{}},\ address[\textcolor{stringliteral}{"{}address"{}}],\ person.\mbox{\hyperlink{class_generic_document_a1362cbdcce6ca37356744a3a0dbb11d6}{GetAllocator}}());}
+
+\end{DoxyCode}
+ Alternatively, if we don\textquotesingle{}t want to explicitly refer to the root value of {\ttfamily address} by name, we can refer to it via iterator\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{auto}\ addressRoot\ =\ address.MemberBegin();}
+\DoxyCodeLine{person[\textcolor{stringliteral}{"{}person"{}}].AddMember(addressRoot-\/>name,\ addressRoot-\/>value,\ person.\mbox{\hyperlink{class_generic_document_a1362cbdcce6ca37356744a3a0dbb11d6}{GetAllocator}}());}
+
+\end{DoxyCode}
+
+
+Second way is to deep-\/clone the value from the address document\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_value}{Value}}\ addressValue\ =\ \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}}(address[\textcolor{stringliteral}{"{}address"{}}],\ person.\mbox{\hyperlink{class_generic_document_a1362cbdcce6ca37356744a3a0dbb11d6}{GetAllocator}}());}
+\DoxyCodeLine{person[\textcolor{stringliteral}{"{}person"{}}].AddMember(\textcolor{stringliteral}{"{}address"{}},\ addressValue,\ person.\mbox{\hyperlink{class_generic_document_a1362cbdcce6ca37356744a3a0dbb11d6}{GetAllocator}}());}
+
+\end{DoxyCode}
+
+\end{DoxyEnumerate}
+
+\doxysection*{Document/\+Value (DOM)}
+
+
+\begin{DoxyEnumerate}
+\item What is move semantics? Why?
+
+Instead of copy semantics, move semantics is used in {\ttfamily Value}. That means, when assigning a source value to a target value, the ownership of source value is moved to the target value.
+
+Since moving is faster than copying, this design decision forces user to aware of the copying overhead.
+\item How to copy a value?
+
+There are two APIs\+: constructor with allocator, and {\ttfamily Copy\+From()}. See \doxylink{fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8md}{Deep Copy Value} for an example.
+\item Why do I need to provide the length of string?
+
+Since C string is null-\/terminated, the length of string needs to be computed via {\ttfamily strlen()}, with linear runtime complexity. This incurs an unnecessary overhead of many operations, if the user already knows the length of string.
+
+Also, Rapid\+JSON can handle {\ttfamily \textbackslash{}u0000} (null character) within a string. If a string contains null characters, {\ttfamily strlen()} cannot return the true length of it. In such case user must provide the length of string explicitly.
+\item Why do I need to provide allocator parameter in many DOM manipulation API?
+
+Since the APIs are member functions of {\ttfamily Value}, we do not want to save an allocator pointer in every {\ttfamily Value}.
+\item Does it convert between numerical types?
+
+When using {\ttfamily Get\+Int()}, {\ttfamily Get\+Uint()}, ... conversion may occur. For integer-\/to-\/integer conversion, it only convert when it is safe (otherwise it will assert). However, when converting a 64-\/bit signed/unsigned integer to double, it will convert but be aware that it may lose precision. \doxylink{struct_a}{A} number with fraction, or an integer larger than 64-\/bit, can only be obtained by {\ttfamily Get\+Double()}.
+\end{DoxyEnumerate}
+
+\doxysection*{Reader/\+Writer (SAX)}
+
+
+\begin{DoxyEnumerate}
+\item Why don\textquotesingle{}t we just {\ttfamily printf} a JSON? Why do we need a {\ttfamily \doxylink{class_writer}{Writer}}?
+
+Most importantly, {\ttfamily \doxylink{class_writer}{Writer}} will ensure the output JSON is well-\/formed. Calling SAX events incorrectly (e.\+g. {\ttfamily Start\+Object()} pairing with {\ttfamily End\+Array()}) will assert. Besides, {\ttfamily \doxylink{class_writer}{Writer}} will escapes strings (e.\+g., {\ttfamily \textbackslash{}n}). Finally, the numeric output of {\ttfamily printf()} may not be a valid JSON number, especially in some locale with digit delimiters. And the number-\/to-\/string conversion in {\ttfamily \doxylink{class_writer}{Writer}} is implemented with very fast algorithms, which outperforms than {\ttfamily printf()} or {\ttfamily iostream}.
+\item Can I pause the parsing process and resume it later?
+
+This is not directly supported in the current version due to performance consideration. However, if the execution environment supports multi-\/threading, user can parse a JSON in a separate thread, and pause it by blocking in the input stream.
+\end{DoxyEnumerate}
+
+\doxysection*{Unicode}
+
+
+\begin{DoxyEnumerate}
+\item Does it support UTF-\/8, UTF-\/16 and other format?
+
+Yes. It fully support UTF-\/8, UTF-\/16 (LE/\+BE), UTF-\/32 (LE/\+BE) and \doxylink{struct_a_s_c_i_i}{ASCII}.
+\item Can it validate the encoding?
+
+Yes, just pass {\ttfamily k\+Parse\+Validate\+Encoding\+Flag} to {\ttfamily Parse()}. If there is invalid encoding in the stream, it will generate {\ttfamily k\+Parse\+Error\+String\+Invalid\+Encoding} error.
+\item What is surrogate pair? Does Rapid\+JSON support it?
+
+JSON uses UTF-\/16 encoding when escaping unicode character, e.\+g. {\ttfamily \textbackslash{}u5927} representing Chinese character "{}big"{}. To handle characters other than those in basic multilingual plane (BMP), UTF-\/16 encodes those characters with two 16-\/bit values, which is called UTF-\/16 surrogate pair. For example, the Emoji character U+1\+F602 can be encoded as {\ttfamily \textbackslash{}u\+D83D\textbackslash{}u\+DE02} in JSON.
+
+Rapid\+JSON fully support parsing/generating UTF-\/16 surrogates.
+\item Can it handle {\ttfamily \textbackslash{}u0000} (null character) in JSON string?
+
+Yes. Rapid\+JSON fully support null character in JSON string. However, user need to be aware of it and using {\ttfamily Get\+String\+Length()} and related APIs to obtain the true length of string.
+\item Can I output {\ttfamily \textbackslash{}uxxxx} for all non-\/\+ASCII character?
+
+Yes, use {\ttfamily \doxylink{struct_a_s_c_i_i}{ASCII}\texorpdfstring{$<$}{<}\texorpdfstring{$>$}{>}} as output encoding template parameter in {\ttfamily \doxylink{class_writer}{Writer}} can enforce escaping those characters.
+\end{DoxyEnumerate}
+
+\doxysection*{Stream}
+
+
+\begin{DoxyEnumerate}
+\item I have a big JSON file. Should I load the whole file to memory?
+
+User can use {\ttfamily \doxylink{class_file_read_stream}{File\+Read\+Stream}} to read the file chunk-\/by-\/chunk. But for {\itshape in situ} parsing, the whole file must be loaded.
+\item Can I parse JSON while it is streamed from network?
+
+Yes. User can implement a custom stream for this. Please refer to the implementation of {\ttfamily \doxylink{class_file_read_stream}{File\+Read\+Stream}}.
+\item I don\textquotesingle{}t know what encoding will the JSON be. How to handle them?
+
+You may use {\ttfamily \doxylink{class_auto_u_t_f_input_stream}{Auto\+UTFInput\+Stream}} which detects the encoding of input stream automatically. However, it will incur some performance overhead.
+\item What is BOM? How Rapid\+JSON handle it?
+
+\href{http://en.wikipedia.org/wiki/Byte_order_mark}{\texttt{ Byte order mark (BOM)}} sometimes reside at the beginning of file/stream to indicate the UTF encoding type of it.
+
+Rapid\+JSON\textquotesingle{}s {\ttfamily \doxylink{class_encoded_input_stream}{Encoded\+Input\+Stream}} can detect/consume BOM. {\ttfamily \doxylink{class_encoded_output_stream}{Encoded\+Output\+Stream}} can optionally write a BOM. See \doxylink{stream_8md}{Encoded Streams} for example.
+\item Why little/big endian is related?
+
+little/big endian of stream is an issue for UTF-\/16 and UTF-\/32 streams, but not UTF-\/8 stream.
+\end{DoxyEnumerate}
+
+\doxysection*{Performance}
+
+
+\begin{DoxyEnumerate}
+\item Is Rapid\+JSON really fast?
+
+Yes. It may be the fastest open source JSON library. There is a \href{https://github.com/miloyip/nativejson-benchmark}{\texttt{ benchmark}} for evaluating performance of C/\+C++ JSON libraries.
+\item Why is it fast?
+
+Many design decisions of Rapid\+JSON is aimed at time/space performance. These may reduce user-\/friendliness of APIs. Besides, it also employs low-\/level optimizations (intrinsics, SIMD) and special algorithms (custom double-\/to-\/string, string-\/to-\/double conversions).
+\item What is SIMD? How it is applied in Rapid\+JSON?
+
+\href{http://en.wikipedia.org/wiki/SIMD}{\texttt{ SIMD}} instructions can perform parallel computation in modern CPUs. Rapid\+JSON support Intel\textquotesingle{}s SSE2/\+SSE4.\+2 and ARM\textquotesingle{}s Neon to accelerate whitespace/tabspace/carriage-\/return/line-\/feed skipping. This improves performance of parsing indent formatted JSON. Define {\ttfamily RAPIDJSON\+\_\+\+SSE2}, {\ttfamily RAPIDJSON\+\_\+\+SSE42} or {\ttfamily RAPIDJSON\+\_\+\+NEON} macro to enable this feature. However, running the executable on a machine without such instruction set support will make it crash.
+\item Does it consume a lot of memory?
+
+The design of Rapid\+JSON aims at reducing memory footprint.
+
+In the SAX API, {\ttfamily Reader} consumes memory proportional to maximum depth of JSON tree, plus maximum length of JSON string.
+
+In the DOM API, each {\ttfamily Value} consumes exactly 16/24 bytes for 32/64-\/bit architecture respectively. Rapid\+JSON also uses a special memory allocator to minimize overhead of allocations.
+\item What is the purpose of being high performance?
+
+Some applications need to process very large JSON files. Some server-\/side applications need to process huge amount of JSONs. Being high performance can improve both latency and throughput. In a broad sense, it will also save energy.
+\end{DoxyEnumerate}
+
+\doxysection*{Gossip}
+
+
+\begin{DoxyEnumerate}
+\item Who are the developers of Rapid\+JSON?
+
+Milo Yip (\href{https://github.com/miloyip}{\texttt{ miloyip}}) is the original author of Rapid\+JSON. Many contributors from the world have improved Rapid\+JSON. Philipp \doxylink{struct_a}{A}. Hartmann (\href{https://github.com/pah}{\texttt{ pah}}) has implemented a lot of improvements, setting up automatic testing and also involves in a lot of discussions for the community. Don Ding (\href{https://github.com/thebusytypist}{\texttt{ thebusytypist}}) implemented the iterative parser. Andrii Senkovych (\href{https://github.com/jollyroger}{\texttt{ jollyroger}}) completed the CMake migration. Kosta (\href{https://github.com/Kosta-Github}{\texttt{ Kosta-\/\+Github}}) provided a very neat short-\/string optimization. Thank you for all other contributors and community members as well.
+\item Why do you develop Rapid\+JSON?
+
+It was just a hobby project initially in 2011. Milo Yip is a game programmer and he just knew about JSON at that time and would like to apply JSON in future projects. As JSON seems very simple he would like to write a header-\/only and fast library.
+\item Why there is a long empty period of development?
+
+It is basically due to personal issues, such as getting new family members. Also, Milo Yip has spent a lot of spare time on translating "{}\+Game Engine Architecture"{} by Jason Gregory into Chinese.
+\item Why did the repository move from Google \doxylink{struct_code}{Code} to Git\+Hub?
+
+This is the trend. And Git\+Hub is much more powerful and convenient. 
+\end{DoxyEnumerate}

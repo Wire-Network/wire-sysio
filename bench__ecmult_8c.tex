@@ -1,0 +1,200 @@
+\doxysection{libraries/fc/secp256k1/secp256k1/src/bench\+\_\+ecmult.c File Reference}
+\hypertarget{bench__ecmult_8c}{}\label{bench__ecmult_8c}\index{libraries/fc/secp256k1/secp256k1/src/bench\_ecmult.c@{libraries/fc/secp256k1/secp256k1/src/bench\_ecmult.c}}
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include "{}secp256k1.\+c"{}}\newline
+{\ttfamily \#include "{}../include/secp256k1.\+h"{}}\newline
+{\ttfamily \#include "{}util.\+h"{}}\newline
+{\ttfamily \#include "{}hash\+\_\+impl.\+h"{}}\newline
+{\ttfamily \#include "{}field\+\_\+impl.\+h"{}}\newline
+{\ttfamily \#include "{}group\+\_\+impl.\+h"{}}\newline
+{\ttfamily \#include "{}scalar\+\_\+impl.\+h"{}}\newline
+{\ttfamily \#include "{}ecmult\+\_\+impl.\+h"{}}\newline
+{\ttfamily \#include "{}bench.\+h"{}}\newline
+Include dependency graph for bench\+\_\+ecmult.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{bench__ecmult_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structbench__data}{bench\+\_\+data}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{bench__ecmult_8c_ae6910994a90091fe877b021c590c894e}{POINTS}}~32768
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{bench__ecmult_8c_a6d6a48e3841bf9007929f691d654614c}{help}} (char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}})
+\item 
+int \mbox{\hyperlink{bench__ecmult_8c_a3c04138a5bfe5d72780bb7e82a18e627}{main}} (int argc, char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{bench__ecmult_8c_ae6910994a90091fe877b021c590c894e}\index{bench\_ecmult.c@{bench\_ecmult.c}!POINTS@{POINTS}}
+\index{POINTS@{POINTS}!bench\_ecmult.c@{bench\_ecmult.c}}
+\doxysubsubsection{\texorpdfstring{POINTS}{POINTS}}
+{\footnotesize\ttfamily \label{bench__ecmult_8c_ae6910994a90091fe877b021c590c894e} 
+\#define POINTS~32768}
+
+
+
+Definition at line \mbox{\hyperlink{bench__ecmult_8c_source_l00019}{19}} of file \mbox{\hyperlink{bench__ecmult_8c_source}{bench\+\_\+ecmult.\+c}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{bench__ecmult_8c_a6d6a48e3841bf9007929f691d654614c}\index{bench\_ecmult.c@{bench\_ecmult.c}!help@{help}}
+\index{help@{help}!bench\_ecmult.c@{bench\_ecmult.c}}
+\doxysubsubsection{\texorpdfstring{help()}{help()}}
+{\footnotesize\ttfamily \label{bench__ecmult_8c_a6d6a48e3841bf9007929f691d654614c} 
+void help (\begin{DoxyParamCaption}\item[{char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{argv}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bench__ecmult_8c_source_l00021}{21}} of file \mbox{\hyperlink{bench__ecmult_8c_source}{bench\+\_\+ecmult.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00022\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Benchmark\ EC\ multiplication\ algorithms\(\backslash\)n"{}});}
+\DoxyCodeLine{00023\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{00024\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Usage:\ \%s\ <help|pippenger\_wnaf|strauss\_wnaf|simple>\(\backslash\)n"{}},\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[0]);}
+\DoxyCodeLine{00025\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}The\ output\ shows\ the\ number\ of\ multiplied\ and\ summed\ points\ right\ after\ the\(\backslash\)n"{}});}
+\DoxyCodeLine{00026\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}function\ name.\ The\ letter\ 'g'\ indicates\ that\ one\ of\ the\ points\ is\ the\ generator.\(\backslash\)n"{}});}
+\DoxyCodeLine{00027\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}The\ benchmarks\ are\ divided\ by\ the\ number\ of\ points.\(\backslash\)n"{}});}
+\DoxyCodeLine{00028\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{00029\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}default\ (ecmult\_multi):\ picks\ pippenger\_wnaf\ or\ strauss\_wnaf\ depending\ on\ the\(\backslash\)n"{}});}
+\DoxyCodeLine{00030\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ batch\ size\(\backslash\)n"{}});}
+\DoxyCodeLine{00031\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}pippenger\_wnaf:\ \ \ \ \ \ \ \ \ for\ all\ batch\ sizes\(\backslash\)n"{}});}
+\DoxyCodeLine{00032\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}strauss\_wnaf:\ \ \ \ \ \ \ \ \ \ \ for\ all\ batch\ sizes\(\backslash\)n"{}});}
+\DoxyCodeLine{00033\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}simple:\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ multiply\ and\ sum\ each\ point\ individually\(\backslash\)n"{}});}
+\DoxyCodeLine{00034\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=187pt]{bench__ecmult_8c_a6d6a48e3841bf9007929f691d654614c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{bench__ecmult_8c_a3c04138a5bfe5d72780bb7e82a18e627}\index{bench\_ecmult.c@{bench\_ecmult.c}!main@{main}}
+\index{main@{main}!bench\_ecmult.c@{bench\_ecmult.c}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{bench__ecmult_8c_a3c04138a5bfe5d72780bb7e82a18e627} 
+int main (\begin{DoxyParamCaption}\item[{int}]{argc}{, }\item[{char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{argv}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bench__ecmult_8c_source_l00281}{281}} of file \mbox{\hyperlink{bench__ecmult_8c_source}{bench\+\_\+ecmult.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00281\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00282\ \ \ \ \ \mbox{\hyperlink{structbench__data}{bench\_data}}\ data;}
+\DoxyCodeLine{00283\ \ \ \ \ \textcolor{keywordtype}{int}\ i,\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}};}
+\DoxyCodeLine{00284\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ scratch\_size;}
+\DoxyCodeLine{00285\ }
+\DoxyCodeLine{00286\ \ \ \ \ \textcolor{keywordtype}{int}\ iters\ =\ \mbox{\hyperlink{bench_8h_a451eb25db60dd3d4abedc8a41aecd204}{get\_iters}}(10000);}
+\DoxyCodeLine{00287\ }
+\DoxyCodeLine{00288\ \ \ \ \ data.ecmult\_multi\ =\ secp256k1\_ecmult\_multi\_var;}
+\DoxyCodeLine{00289\ }
+\DoxyCodeLine{00290\ \ \ \ \ \textcolor{keywordflow}{if}\ (argc\ >\ 1)\ \{}
+\DoxyCodeLine{00291\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}-\/h"{}})}
+\DoxyCodeLine{00292\ \ \ \ \ \ \ \ \ \ \ \ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}-\/-\/help"{}})}
+\DoxyCodeLine{00293\ \ \ \ \ \ \ \ \ \ \ \ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}help"{}}))\ \{}
+\DoxyCodeLine{00294\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bench__ecmult_8c_a6d6a48e3841bf9007929f691d654614c}{help}}(\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}});}
+\DoxyCodeLine{00295\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00296\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(\mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}pippenger\_wnaf"{}}))\ \{}
+\DoxyCodeLine{00297\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Using\ pippenger\_wnaf:\(\backslash\)n"{}});}
+\DoxyCodeLine{00298\ \ \ \ \ \ \ \ \ \ \ \ \ data.ecmult\_multi\ =\ secp256k1\_ecmult\_pippenger\_batch\_single;}
+\DoxyCodeLine{00299\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(\mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}strauss\_wnaf"{}}))\ \{}
+\DoxyCodeLine{00300\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Using\ strauss\_wnaf:\(\backslash\)n"{}});}
+\DoxyCodeLine{00301\ \ \ \ \ \ \ \ \ \ \ \ \ data.ecmult\_multi\ =\ secp256k1\_ecmult\_strauss\_batch\_single;}
+\DoxyCodeLine{00302\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(\mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}simple"{}}))\ \{}
+\DoxyCodeLine{00303\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Using\ simple\ algorithm:\(\backslash\)n"{}});}
+\DoxyCodeLine{00304\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00305\ \ \ \ \ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}\%s:\ unrecognized\ argument\ '\%s'.\(\backslash\)n\(\backslash\)n"{}},\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[0],\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[1]);}
+\DoxyCodeLine{00306\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bench__ecmult_8c_a6d6a48e3841bf9007929f691d654614c}{help}}(\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}});}
+\DoxyCodeLine{00307\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{00308\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00309\ \ \ \ \ \}}
+\DoxyCodeLine{00310\ }
+\DoxyCodeLine{00311\ \ \ \ \ data.ctx\ =\ \mbox{\hyperlink{secp256k1_8h_a3aaa9fcc3ab67bc8f841779a049069c5}{secp256k1\_context\_create}}(\mbox{\hyperlink{secp256k1_8h_a0d34fe6baa73d3145f2e376e43de0b15}{SECP256K1\_CONTEXT\_SIGN}}\ |\ \mbox{\hyperlink{secp256k1_8h_add20a6c320e247ca7bd524cbc4259d64}{SECP256K1\_CONTEXT\_VERIFY}});}
+\DoxyCodeLine{00312\ \ \ \ \ scratch\_size\ =\ secp256k1\_strauss\_scratch\_size(\mbox{\hyperlink{bench__ecmult_8c_ae6910994a90091fe877b021c590c894e}{POINTS}})\ +\ \mbox{\hyperlink{ecmult__impl_8h_a0447eb99687dea95c58a48eb6b6e17e2}{STRAUSS\_SCRATCH\_OBJECTS}}*16;}
+\DoxyCodeLine{00313\ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}simple"{}}))\ \{}
+\DoxyCodeLine{00314\ \ \ \ \ \ \ \ \ data.scratch\ =\ \mbox{\hyperlink{secp256k1_8h_a0ff055dc909a6a4e4272097fe71870ef}{secp256k1\_scratch\_space\_create}}(data.ctx,\ scratch\_size);}
+\DoxyCodeLine{00315\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00316\ \ \ \ \ \ \ \ \ data.scratch\ =\ NULL;}
+\DoxyCodeLine{00317\ \ \ \ \ \}}
+\DoxyCodeLine{00318\ }
+\DoxyCodeLine{00319\ \ \ \ \ \textcolor{comment}{/*\ Allocate\ stuff\ */}}
+\DoxyCodeLine{00320\ \ \ \ \ data.scalars\ =\ malloc(\textcolor{keyword}{sizeof}(\mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}})\ *\ \mbox{\hyperlink{bench__ecmult_8c_ae6910994a90091fe877b021c590c894e}{POINTS}});}
+\DoxyCodeLine{00321\ \ \ \ \ data.seckeys\ =\ malloc(\textcolor{keyword}{sizeof}(\mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}})\ *\ \mbox{\hyperlink{bench__ecmult_8c_ae6910994a90091fe877b021c590c894e}{POINTS}});}
+\DoxyCodeLine{00322\ \ \ \ \ data.pubkeys\ =\ malloc(\textcolor{keyword}{sizeof}(\mbox{\hyperlink{structsecp256k1__ge}{secp256k1\_ge}})\ *\ \mbox{\hyperlink{bench__ecmult_8c_ae6910994a90091fe877b021c590c894e}{POINTS}});}
+\DoxyCodeLine{00323\ \ \ \ \ data.pubkeys\_gej\ =\ malloc(\textcolor{keyword}{sizeof}(\mbox{\hyperlink{structsecp256k1__gej}{secp256k1\_gej}})\ *\ \mbox{\hyperlink{bench__ecmult_8c_ae6910994a90091fe877b021c590c894e}{POINTS}});}
+\DoxyCodeLine{00324\ \ \ \ \ data.expected\_output\ =\ malloc(\textcolor{keyword}{sizeof}(\mbox{\hyperlink{structsecp256k1__gej}{secp256k1\_gej}})\ *\ (iters\ +\ 1));}
+\DoxyCodeLine{00325\ \ \ \ \ data.output\ =\ malloc(\textcolor{keyword}{sizeof}(\mbox{\hyperlink{structsecp256k1__gej}{secp256k1\_gej}})\ *\ (iters\ +\ 1));}
+\DoxyCodeLine{00326\ }
+\DoxyCodeLine{00327\ \ \ \ \ \textcolor{comment}{/*\ Generate\ a\ set\ of\ scalars,\ and\ private/public\ keypairs.\ */}}
+\DoxyCodeLine{00328\ \ \ \ \ secp256k1\_gej\_set\_ge(\&data.pubkeys\_gej[0],\ \&secp256k1\_ge\_const\_g);}
+\DoxyCodeLine{00329\ \ \ \ \ secp256k1\_scalar\_set\_int(\&data.seckeys[0],\ 1);}
+\DoxyCodeLine{00330\ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ \mbox{\hyperlink{bench__ecmult_8c_ae6910994a90091fe877b021c590c894e}{POINTS}};\ ++i)\ \{}
+\DoxyCodeLine{00331\ \ \ \ \ \ \ \ \ generate\_scalar(i,\ \&data.scalars[i]);}
+\DoxyCodeLine{00332\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (i)\ \{}
+\DoxyCodeLine{00333\ \ \ \ \ \ \ \ \ \ \ \ \ secp256k1\_gej\_double\_var(\&data.pubkeys\_gej[i],\ \&data.pubkeys\_gej[i\ -\/\ 1],\ NULL);}
+\DoxyCodeLine{00334\ \ \ \ \ \ \ \ \ \ \ \ \ secp256k1\_scalar\_add(\&data.seckeys[i],\ \&data.seckeys[i\ -\/\ 1],\ \&data.seckeys[i\ -\/\ 1]);}
+\DoxyCodeLine{00335\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00336\ \ \ \ \ \}}
+\DoxyCodeLine{00337\ \ \ \ \ secp256k1\_ge\_set\_all\_gej\_var(data.pubkeys,\ data.pubkeys\_gej,\ \mbox{\hyperlink{bench__ecmult_8c_ae6910994a90091fe877b021c590c894e}{POINTS}});}
+\DoxyCodeLine{00338\ }
+\DoxyCodeLine{00339\ }
+\DoxyCodeLine{00340\ \ \ \ \ \mbox{\hyperlink{bench_8h_a02fea1a81d22421b858db710e6850482}{print\_output\_table\_header\_row}}();}
+\DoxyCodeLine{00341\ \ \ \ \ \textcolor{comment}{/*\ Initialize\ offset1\ and\ offset2\ */}}
+\DoxyCodeLine{00342\ \ \ \ \ hash\_into\_offset(\&data,\ 0);}
+\DoxyCodeLine{00343\ \ \ \ \ run\_ecmult\_bench(\&data,\ iters);}
+\DoxyCodeLine{00344\ }
+\DoxyCodeLine{00345\ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 1;\ i\ <=\ 8;\ ++i)\ \{}
+\DoxyCodeLine{00346\ \ \ \ \ \ \ \ \ run\_ecmult\_multi\_bench(\&data,\ i,\ 1,\ iters);}
+\DoxyCodeLine{00347\ \ \ \ \ \}}
+\DoxyCodeLine{00348\ }
+\DoxyCodeLine{00349\ \ \ \ \ \textcolor{comment}{/*\ This\ is\ disabled\ with\ low\ count\ of\ iterations\ because\ the\ loop\ runs\ 77\ times\ even\ with\ iters=1}}
+\DoxyCodeLine{00350\ \textcolor{comment}{\ \ \ \ *\ and\ the\ higher\ it\ goes\ the\ longer\ the\ computation\ takes(more\ points)}}
+\DoxyCodeLine{00351\ \textcolor{comment}{\ \ \ \ *\ So\ we\ don't\ run\ this\ benchmark\ with\ low\ iterations\ to\ prevent\ slow\ down\ */}}
+\DoxyCodeLine{00352\ \ \ \ \ \ \textcolor{keywordflow}{if}\ (iters\ >\ 2)\ \{}
+\DoxyCodeLine{00353\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ 0;\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ <=\ 11;\ ++\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})\ \{}
+\DoxyCodeLine{00354\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 9;\ i\ <=\ 16;\ ++i)\ \{}
+\DoxyCodeLine{00355\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ run\_ecmult\_multi\_bench(\&data,\ i\ <<\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\ 1,\ iters);}
+\DoxyCodeLine{00356\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00357\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00358\ \ \ \ \ \}}
+\DoxyCodeLine{00359\ }
+\DoxyCodeLine{00360\ \ \ \ \ \textcolor{keywordflow}{if}\ (data.scratch\ !=\ NULL)\ \{}
+\DoxyCodeLine{00361\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{secp256k1_8h_ad6ebf73791ba271fd801a4deeba36780}{secp256k1\_scratch\_space\_destroy}}(data.ctx,\ data.scratch);}
+\DoxyCodeLine{00362\ \ \ \ \ \}}
+\DoxyCodeLine{00363\ \ \ \ \ \mbox{\hyperlink{secp256k1_8h_a026db914e3723531825ecf25a0cbd699}{secp256k1\_context\_destroy}}(data.ctx);}
+\DoxyCodeLine{00364\ \ \ \ \ free(data.scalars);}
+\DoxyCodeLine{00365\ \ \ \ \ free(data.pubkeys);}
+\DoxyCodeLine{00366\ \ \ \ \ free(data.pubkeys\_gej);}
+\DoxyCodeLine{00367\ \ \ \ \ free(data.seckeys);}
+\DoxyCodeLine{00368\ \ \ \ \ free(data.output);}
+\DoxyCodeLine{00369\ \ \ \ \ free(data.expected\_output);}
+\DoxyCodeLine{00370\ }
+\DoxyCodeLine{00371\ \ \ \ \ \textcolor{keywordflow}{return}(0);}
+\DoxyCodeLine{00372\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{bench__ecmult_8c_a3c04138a5bfe5d72780bb7e82a18e627_cgraph}
+\end{center}
+\end{figure}

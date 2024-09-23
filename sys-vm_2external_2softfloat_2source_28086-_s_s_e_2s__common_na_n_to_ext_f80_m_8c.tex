@@ -1,0 +1,41 @@
+\doxysection{libraries/sys-\/vm/external/softfloat/source/8086-\/\+SSE/s\+\_\+common\+Na\+NTo\+Ext\+F80M.c File Reference}
+\hypertarget{sys-vm_2external_2softfloat_2source_28086-_s_s_e_2s__common_na_n_to_ext_f80_m_8c}{}\label{sys-vm_2external_2softfloat_2source_28086-_s_s_e_2s__common_na_n_to_ext_f80_m_8c}\index{libraries/sys-\/vm/external/softfloat/source/8086-\/SSE/s\_commonNaNToExtF80M.c@{libraries/sys-\/vm/external/softfloat/source/8086-\/SSE/s\_commonNaNToExtF80M.c}}
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include "{}platform.\+h"{}}\newline
+{\ttfamily \#include "{}internals.\+h"{}}\newline
+{\ttfamily \#include "{}specialize.\+h"{}}\newline
+Include dependency graph for s\+\_\+common\+Na\+NTo\+Ext\+F80\+M.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sys-vm_2external_2softfloat_2source_28086-_s_s_e_2s__common_na_n_to_ext_f80_m_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_28086-_s_s_e_2s__common_na_n_to_ext_f80_m_8c_a9c0d6eed364b76c22461f99db8958007}{softfloat\+\_\+common\+Na\+NTo\+Ext\+F80M}} (const struct \mbox{\hyperlink{structcommon_na_n}{common\+NaN}} \texorpdfstring{$\ast$}{*}a\+Ptr, struct \mbox{\hyperlink{structext_float80_m}{ext\+Float80M}} \texorpdfstring{$\ast$}{*}z\+SPtr)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{sys-vm_2external_2softfloat_2source_28086-_s_s_e_2s__common_na_n_to_ext_f80_m_8c_a9c0d6eed364b76c22461f99db8958007}\index{s\_commonNaNToExtF80M.c@{s\_commonNaNToExtF80M.c}!softfloat\_commonNaNToExtF80M@{softfloat\_commonNaNToExtF80M}}
+\index{softfloat\_commonNaNToExtF80M@{softfloat\_commonNaNToExtF80M}!s\_commonNaNToExtF80M.c@{s\_commonNaNToExtF80M.c}}
+\doxysubsubsection{\texorpdfstring{softfloat\_commonNaNToExtF80M()}{softfloat\_commonNaNToExtF80M()}}
+{\footnotesize\ttfamily \label{sys-vm_2external_2softfloat_2source_28086-_s_s_e_2s__common_na_n_to_ext_f80_m_8c_a9c0d6eed364b76c22461f99db8958007} 
+void softfloat\+\_\+common\+Na\+NTo\+Ext\+F80M (\begin{DoxyParamCaption}\item[{const struct \mbox{\hyperlink{structcommon_na_n}{common\+NaN}} \texorpdfstring{$\ast$}{*}}]{a\+Ptr}{, }\item[{struct \mbox{\hyperlink{structext_float80_m}{ext\+Float80M}} \texorpdfstring{$\ast$}{*}}]{z\+SPtr}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_28086-_s_s_e_2s__common_na_n_to_ext_f80_m_8c_source_l00048}{48}} of file \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_28086-_s_s_e_2s__common_na_n_to_ext_f80_m_8c_source}{s\+\_\+common\+Na\+NTo\+Ext\+F80\+M.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00050\ \{}
+\DoxyCodeLine{00051\ }
+\DoxyCodeLine{00052\ \ \ \ \ zSPtr-\/>\mbox{\hyperlink{structext_float80_m_afcc87c4645279344c5365a291766afe2}{signExp}}\ =\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a5e62ae06b6c2a91feb5b6e8175082250}{packToExtF80UI64}}(\ aPtr-\/>\mbox{\hyperlink{structcommon_na_n_a32e90937a4ec3878d2620fbafd31a16f}{sign}},\ 0x7FFF\ );}
+\DoxyCodeLine{00053\ \ \ \ \ zSPtr-\/>\mbox{\hyperlink{structext_float80_m_ac0c736880d01d0abd0a818e658755b3b}{signif}}\ =\ \mbox{\hyperlink{stdint_8h_a8da5373e041921aa34c2b6172ac3babc}{UINT64\_C}}(\ 0xC000000000000000\ )\ |\ aPtr-\/>\mbox{\hyperlink{structcommon_na_n_a05124b0293f6d395ce047744b12deff6}{v64}}>>1;}
+\DoxyCodeLine{00054\ }
+\DoxyCodeLine{00055\ \}}
+
+\end{DoxyCode}

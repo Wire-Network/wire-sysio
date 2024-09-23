@@ -1,0 +1,33 @@
+<map id="CLI::App::get_group" name="CLI::App::get_group">
+<area shape="rect" id="Node000001" title="Get the group of this subcommand." alt="" coords="1564,120,1702,146"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_app.html#ae29f7783c9d8725a6262b1f025f6a4d4" title="Get a display name for an app." alt="" coords="1330,87,1516,112"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1548,122,1507,116,1508,110,1549,117"/>
+<area shape="rect" id="Node000012" href="$class_c_l_i_1_1_formatter.html#a9e6b7c4c6eee50b11fe1ca785002db04" title="This prints out all the subcommands." alt="" coords="1350,140,1496,181"/>
+<area shape="poly" id="edge13_Node000001_Node000012" title=" " alt="" coords="1549,147,1497,154,1496,148,1549,141"/>
+<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_app.html#a4e0c00ce18bbfca1ae890a653bbd2b93" title="Verify required options and cross requirements. Subcommands too (only if selected)." alt="" coords="1141,75,1276,116"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="1314,100,1276,99,1276,94,1314,95"/>
+<area shape="rect" id="Node000004" href="$class_c_l_i_1_1_app.html#a241ba75a6c98b36349ae2f71a9137291" title="Internal parse function." alt="" coords="167,29,287,55"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="1126,74,1087,66,935,45,782,41,583,41,287,44,287,38,583,36,782,36,936,39,1088,61,1127,69"/>
+<area shape="rect" id="Node000007" href="$class_c_l_i_1_1_app.html#a1f7a70f4bc4c375a7de10073a5de709d" title="Fill in a single config option." alt="" coords="918,75,1079,116"/>
+<area shape="poly" id="edge6_Node000003_Node000007" title=" " alt="" coords="1126,98,1080,98,1080,93,1126,93"/>
+<area shape="rect" id="Node000010" href="$class_c_l_i_1_1_app.html#a0fec24c804daf5b458bb5762e4e75a73" title="Process callbacks and such." alt="" coords="335,83,469,108"/>
+<area shape="poly" id="edge12_Node000003_Node000010" title=" " alt="" coords="1127,123,1088,130,928,149,802,156,677,149,517,130,441,112,442,106,518,125,677,144,802,150,927,144,1087,125,1126,117"/>
+<area shape="rect" id="Node000005" href="$class_c_l_i_1_1_app.html#a8ffb155a1153ee23d442c5bfed21225c" title="The real work is done here. Expects a reversed vector." alt="" coords="5,5,119,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="151,34,119,29,119,24,151,29"/>
+<area shape="rect" id="Node000006" href="$class_c_l_i_1_1_app.html#a878c1067ade7145aa11478d64f5173ed" title=" " alt="" coords="5,55,119,80"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="151,56,119,61,119,56,151,51"/>
+<area shape="rect" id="Node000008" href="$class_c_l_i_1_1_app.html#aee09795046c3b47948e6c2fa45349eca" title=" " alt="" coords="700,83,862,108"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="903,98,862,98,862,93,903,93"/>
+<area shape="rect" id="Node000009" href="$class_c_l_i_1_1_app.html#a7a15e5743d4a8eccac57955ed5a6a3b6" title="Read and process a configuration file (main app only)" alt="" coords="517,75,652,116"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="684,98,652,98,652,93,684,93"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="502,98,470,98,470,93,502,93"/>
+<area shape="poly" id="edge11_Node000010_Node000004" title=" " alt="" coords="342,80,271,58,273,53,344,75"/>
+<area shape="rect" id="Node000011" href="$class_c_l_i_1_1_app.html#a26a92886a7d7f10a9afbd39b6535f42b" title="Internal parse function." alt="" coords="167,83,287,108"/>
+<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="319,98,287,98,287,93,319,93"/>
+<area shape="rect" id="Node000013" href="$class_c_l_i_1_1_formatter.html#ade54fd392e2c9f5364744dca82408e60" title="This prints out a subcommand in help&#45;all." alt="" coords="1135,140,1282,181"/>
+<area shape="poly" id="edge14_Node000012_Node000013" title=" " alt="" coords="1334,172,1282,172,1282,167,1334,167"/>
+<area shape="rect" id="Node000014" href="$class_c_l_i_1_1_formatter.html#a838e0f47efa4fbd1b738eedb156887b9" title="This puts everything together." alt="" coords="910,197,1087,223"/>
+<area shape="poly" id="edge17_Node000012_Node000014" title=" " alt="" coords="1335,186,1282,195,1182,206,1088,211,1088,206,1181,201,1281,190,1334,180"/>
+<area shape="poly" id="edge16_Node000013_Node000012" title=" " alt="" coords="1297,149,1349,150,1349,155,1297,155"/>
+<area shape="poly" id="edge15_Node000013_Node000014" title=" " alt="" coords="1121,184,1057,199,1056,194,1119,179"/>
+</map>

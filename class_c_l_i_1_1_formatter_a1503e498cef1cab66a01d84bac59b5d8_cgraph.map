@@ -1,0 +1,66 @@
+<map id="CLI::Formatter::make_option" name="CLI::Formatter::make_option">
+<area shape="rect" id="Node000001" title="This prints out an option help line, either positional or optional form." alt="" coords="5,139,152,180"/>
+<area shape="rect" id="Node000002" href="$namespace_c_l_i_1_1detail.html#ab6563defa0065e45292b843a56cbb361" title="Print a two part &quot;help&quot; string." alt="" coords="200,56,357,82"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="113,136,199,92,216,85,218,90,201,97,115,141"/>
+<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_formatter.html#acf6c56689b56533dad59f8e1ff71c7ce" title="This is the description. Default: Right column, on new line if left column too large." alt="" coords="205,106,352,146"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="152,145,189,138,190,144,153,150"/>
+<area shape="rect" id="Node000005" href="$class_c_l_i_1_1_formatter.html#ad29eb726bf961560f0c6419fd74332d0" title="This is the name part of an option, Default: left column." alt="" coords="205,171,352,212"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="153,169,190,175,189,180,152,174"/>
+<area shape="rect" id="Node000019" href="$class_c_l_i_1_1_formatter.html#a9f11b9ee12c8ccb8bf9670be1b47a3b1" title="This is the options part of the name, Default: combined into left column." alt="" coords="205,434,352,474"/>
+<area shape="poly" id="edge21_Node000001_Node000019" title=" " alt="" coords="96,179,257,419,252,422,91,182"/>
+<area shape="rect" id="Node000004" href="$class_c_l_i_1_1_option.html#a6298f2354e3e02d262f1f6815621639a" title="Get the description." alt="" coords="416,113,600,139"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="352,124,400,124,400,129,352,129"/>
+<area shape="rect" id="Node000006" href="$class_c_l_i_1_1_option.html#ab84751fbf9037efaed5b64fed17fe57f" title="Gets a comma separated list of names. Will include / prefer the positional name if positional is true..." alt="" coords="432,171,585,196"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="351,186,416,184,416,189,352,192"/>
+<area shape="rect" id="Node000007" href="$class_c_l_i_1_1_option.html#a4d2329268bae134aa58e704fa61f4b57" title="Requires &quot;&#45;&#45;&quot; to be removed from string." alt="" coords="678,16,809,57"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="576,168,610,149,626,130,633,110,641,88,657,67,663,63,666,67,661,71,645,91,638,111,631,133,613,154,578,172"/>
+<area shape="rect" id="Node000013" href="$class_c_l_i_1_1_option.html#af5677ee4a55c2a85784f64198db6b452" title="True if the option was not passed." alt="" coords="677,81,810,107"/>
+<area shape="poly" id="edge14_Node000006_Node000013" title=" " alt="" coords="561,168,610,149,634,133,658,117,675,110,677,115,661,122,637,138,613,154,563,173"/>
+<area shape="rect" id="Node000014" href="$class_c_l_i_1_1_option.html#a4eb6212ac30a0b139da52d258a3a1790" title=" " alt="" coords="672,131,815,172"/>
+<area shape="poly" id="edge15_Node000006_Node000014" title=" " alt="" coords="585,170,656,161,657,166,585,176"/>
+<area shape="rect" id="Node000015" href="$class_c_l_i_1_1_option_base.html#ad824d0f4f973675beece17d6b5ad9d00" title=" " alt="" coords="659,196,828,237"/>
+<area shape="poly" id="edge17_Node000006_Node000015" title=" " alt="" coords="585,192,644,200,644,205,585,197"/>
+<area shape="rect" id="Node000016" href="$class_c_l_i_1_1_option.html#afe31a608506cbe75d40d6cced342be11" title="The total min number of expected string values to be used." alt="" coords="667,262,820,302"/>
+<area shape="poly" id="edge18_Node000006_Node000016" title=" " alt="" coords="586,194,613,205,628,215,638,226,661,247,671,252,668,257,658,251,634,229,624,219,610,210,584,199"/>
+<area shape="rect" id="Node000018" href="$namespace_c_l_i_1_1detail.html#ab351f13ec104e2cba19ec6baf4a552f6" title="Simple function to join a string." alt="" coords="689,327,798,352"/>
+<area shape="poly" id="edge20_Node000006_Node000018" title=" " alt="" coords="586,191,613,205,625,219,633,232,638,260,644,287,650,300,661,312,676,322,673,327,658,316,646,303,638,289,633,261,628,234,621,222,610,210,584,195"/>
+<area shape="rect" id="Node000008" href="$namespace_c_l_i_1_1detail.html#a356b9c9cc904af2b0a918fd55e86cd9c" title="Check if a string is a member of a list of strings and optionally ignore case or ignore underscores." alt="" coords="876,81,1040,107"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="810,52,893,74,891,79,809,57"/>
+<area shape="rect" id="Node000009" href="$namespace_c_l_i.html#a0c52326d2681814c22aa1a93ce43375e" title="Helper function to allow ignore_case to be passed to IsMember or Transform." alt="" coords="1106,5,1226,31"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="995,78,1114,34,1116,39,996,83"/>
+<area shape="rect" id="Node000010" href="$namespace_c_l_i_1_1detail.html#ae83709ec148057ec53df4383645727e9" title="Return a lower case version of a string." alt="" coords="1292,43,1431,68"/>
+<area shape="poly" id="edge13_Node000008_Node000010" title=" " alt="" coords="1040,84,1276,61,1277,66,1041,89"/>
+<area shape="rect" id="Node000011" href="$namespace_c_l_i.html#a111b6f05d21b9b84e7ba933ade79884c" title="Helper function to allow ignore_underscore to be passed to IsMember or Transform." alt="" coords="1088,107,1244,132"/>
+<area shape="poly" id="edge10_Node000008_Node000011" title=" " alt="" coords="1041,102,1073,105,1072,111,1040,107"/>
+<area shape="rect" id="Node000012" href="$namespace_c_l_i_1_1detail.html#a5359a7a0e33366a12e15523b100f591a" title="remove underscores from a string" alt="" coords="1295,114,1428,154"/>
+<area shape="poly" id="edge12_Node000008_Node000012" title=" " alt="" coords="986,105,1033,126,1089,142,1137,148,1187,150,1280,144,1280,149,1187,155,1137,154,1087,147,1031,131,984,110"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="1227,27,1278,37,1277,42,1226,32"/>
+<area shape="poly" id="edge11_Node000011_Node000012" title=" " alt="" coords="1245,123,1280,125,1280,131,1245,128"/>
+<area shape="poly" id="edge16_Node000014_Node000008" title=" " alt="" coords="815,130,892,109,893,114,816,135"/>
+<area shape="rect" id="Node000017" href="$class_c_l_i_1_1_option.html#af87dffed2cb245673312c993e563710e" title="The total min number of expected string values to be used." alt="" coords="881,262,1034,302"/>
+<area shape="poly" id="edge19_Node000016_Node000017" title=" " alt="" coords="821,280,866,280,866,285,821,285"/>
+<area shape="rect" id="Node000020" href="$class_c_l_i_1_1_option.html#a3b8410c5366dbbb6781b37d963677101" title="The default value (for help printing)" alt="" coords="417,220,599,246"/>
+<area shape="poly" id="edge22_Node000019_Node000020" title=" " alt="" coords="284,433,300,394,325,346,359,296,380,274,403,255,409,251,412,255,407,259,384,278,363,300,330,349,305,397,289,435"/>
+<area shape="rect" id="Node000021" href="$class_c_l_i_1_1_option.html#a9657b97545e51cdcda8efd61d13b5ab3" title="The environment variable associated to this value." alt="" coords="421,269,595,295"/>
+<area shape="poly" id="edge23_Node000019_Node000021" title=" " alt="" coords="289,432,333,368,366,333,404,304,412,299,415,304,406,308,369,337,338,371,293,435"/>
+<area shape="rect" id="Node000022" href="$class_c_l_i_1_1_option.html#a833eaaba4c8823298e7740a3e43a82b6" title="The set of options excluded." alt="" coords="422,319,595,344"/>
+<area shape="poly" id="edge24_Node000019_Node000022" title=" " alt="" coords="298,432,344,391,373,371,404,353,417,347,420,352,406,358,376,375,347,396,302,436"/>
+<area shape="rect" id="Node000023" href="$class_c_l_i_1_1_option.html#a307543e6e4ddeb6e4ea00438b5b10be3" title="The number of times the option expects to be included." alt="" coords="421,368,595,394"/>
+<area shape="poly" id="edge25_Node000019_Node000023" title=" " alt="" coords="327,431,404,402,428,395,430,401,406,407,329,436"/>
+<area shape="rect" id="Node000024" href="$class_c_l_i_1_1_option.html#a21133f27201fa12203567cf0ee40c9c5" title="The max number of times the option expects to be included." alt="" coords="405,417,611,443"/>
+<area shape="poly" id="edge26_Node000019_Node000024" title=" " alt="" coords="351,444,389,440,390,445,352,449"/>
+<area shape="rect" id="Node000025" href="$class_c_l_i_1_1_option.html#a19c64a02c22d968e834c2aaf13f98f62" title="The number of times the option expects to be included." alt="" coords="407,467,609,492"/>
+<area shape="poly" id="edge27_Node000019_Node000025" title=" " alt="" coords="352,460,391,464,391,469,351,465"/>
+<area shape="rect" id="Node000026" href="$class_c_l_i_1_1_formatter_base.html#a7e8f9d7896c599f7befd84a9947d4cab" title="Get the current value of a name (REQUIRED, etc.)" alt="" coords="440,516,576,557"/>
+<area shape="poly" id="edge28_Node000019_Node000026" title=" " alt="" coords="330,473,406,502,426,509,425,514,404,507,328,478"/>
+<area shape="rect" id="Node000027" href="$class_c_l_i_1_1_option.html#acf898e5c04f5fb3f42ec1ea711e97743" title="The set of options needed." alt="" coords="430,581,586,607"/>
+<area shape="poly" id="edge29_Node000019_Node000027" title=" " alt="" coords="298,473,344,521,374,545,406,566,421,573,418,578,404,571,371,550,340,524,295,477"/>
+<area shape="rect" id="Node000028" href="$class_c_l_i_1_1_option_base.html#aa902dee6da6d7f5b083b1c7d5f9c1308" title="True if this is a required option." alt="" coords="436,631,580,672"/>
+<area shape="poly" id="edge30_Node000019_Node000028" title=" " alt="" coords="292,473,336,544,368,583,407,617,423,627,420,632,403,622,364,587,331,547,288,476"/>
+<area shape="rect" id="Node000029" href="$class_c_l_i_1_1_option.html#a8b8425827ceb852c3cc3f44b9b1c26a4" title="Get the full typename for this option." alt="" coords="416,696,601,722"/>
+<area shape="poly" id="edge31_Node000019_Node000029" title=" " alt="" coords="287,474,301,518,325,574,360,632,382,659,407,681,414,686,411,691,403,686,378,662,356,636,320,577,296,520,282,476"/>
+<area shape="rect" id="Node000031" href="$class_c_l_i_1_1_option.html#a88f36e42c1afcf1d4887230cc133f1fa" title="The number of arguments the option expects." alt="" coords="420,745,597,771"/>
+<area shape="poly" id="edge33_Node000019_Node000031" title=" " alt="" coords="285,474,296,527,318,597,334,634,354,670,378,703,407,732,411,735,407,739,403,736,374,707,349,673,329,636,313,599,291,528,280,475"/>
+<area shape="rect" id="Node000030" href="$class_c_l_i_1_1_validator.html#a77c9d0a1f496ccaa4a8ef293a41bca78" title="Generate type description information for the Validator." alt="" coords="680,688,807,729"/>
+<area shape="poly" id="edge32_Node000029_Node000030" title=" " alt="" coords="601,706,665,706,665,712,601,712"/>
+</map>

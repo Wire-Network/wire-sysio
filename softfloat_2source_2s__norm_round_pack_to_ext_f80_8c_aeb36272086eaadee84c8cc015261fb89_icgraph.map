@@ -1,0 +1,11 @@
+<map id="softfloat_normRoundPackToExtF80" name="softfloat_normRoundPackToExtF80">
+<area shape="rect" id="Node000001" title=" " alt="" coords="361,23,547,64"/>
+<area shape="rect" id="Node000002" href="$softfloat_2source_2ext_f80__rem_8c.html#ac6cadb3a4da28083b97be0f0393b4dc2" title=" " alt="" coords="183,5,273,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="345,34,273,26,274,21,346,29"/>
+<area shape="rect" id="Node000003" href="$softfloat_2source_2s__sub_mags_ext_f80_8c.html#afe5c2bdc15f0b1fa27e46faf9b13ecb3" title=" " alt="" coords="143,55,313,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="346,58,314,61,313,56,345,52"/>
+<area shape="rect" id="Node000004" href="$softfloat_2source_2ext_f80__add_8c.html#a56e6d7b8048e43484e0494d6faa6b5d2" title=" " alt="" coords="5,29,95,55"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="127,56,95,51,96,46,128,51"/>
+<area shape="rect" id="Node000005" href="$softfloat_2source_2ext_f80__sub_8c.html#ad42214e94cb6c71daefbc8ed467e8ea8" title=" " alt="" coords="5,79,95,104"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="128,84,96,88,95,83,127,78"/>
+</map>

@@ -1,0 +1,228 @@
+\doxysection{plugins/chain\+\_\+api\+\_\+plugin/chain\+\_\+api\+\_\+plugin.cpp File Reference}
+\hypertarget{chain__api__plugin_8cpp}{}\label{chain__api__plugin_8cpp}\index{plugins/chain\_api\_plugin/chain\_api\_plugin.cpp@{plugins/chain\_api\_plugin/chain\_api\_plugin.cpp}}
+{\ttfamily \#include $<$sysio/chain\+\_\+api\+\_\+plugin/chain\+\_\+api\+\_\+plugin.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/exceptions.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/io/json.\+hpp$>$}\newline
+Include dependency graph for chain\+\_\+api\+\_\+plugin.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{chain__api__plugin_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classsysio_1_1chain__api__plugin__impl}{sysio\+::chain\+\_\+api\+\_\+plugin\+\_\+impl}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1async__result__visitor}{sysio\+::async\+\_\+result\+\_\+visitor}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{chain__api__plugin_8cpp_ab9297a5c7b7f085c77cad8641f734ba6}{CALL\+\_\+\+WITH\+\_\+400}}(api\+\_\+name,  api\+\_\+handle,  api\+\_\+namespace,  call\+\_\+name,  http\+\_\+response\+\_\+code,  params\+\_\+type)
+\item 
+\#define \mbox{\hyperlink{chain__api__plugin_8cpp_a3159215e62d08f5b3ff6749207774303}{CALL\+\_\+\+ASYNC\+\_\+\+WITH\+\_\+400}}(api\+\_\+name,  api\+\_\+handle,  api\+\_\+namespace,  call\+\_\+name,  call\+\_\+result,  http\+\_\+response\+\_\+code,  params\+\_\+type)
+\item 
+\#define \mbox{\hyperlink{chain__api__plugin_8cpp_af30579c85185bcda813619205a246c24}{CHAIN\+\_\+\+RO\+\_\+\+CALL}}(call\+\_\+name,  http\+\_\+response\+\_\+code,  params\+\_\+type)
+\item 
+\#define \mbox{\hyperlink{chain__api__plugin_8cpp_a0c898b5cbe82b297625ebb61c03e01b9}{CHAIN\+\_\+\+RW\+\_\+\+CALL}}(call\+\_\+name,  http\+\_\+response\+\_\+code,  params\+\_\+type)
+\item 
+\#define \mbox{\hyperlink{chain__api__plugin_8cpp_a1ecc20ecac83cc8b5e94e862dc4b0b6c}{CHAIN\+\_\+\+RO\+\_\+\+CALL\+\_\+\+ASYNC}}(call\+\_\+name,  call\+\_\+result,  http\+\_\+response\+\_\+code,  params\+\_\+type)
+\item 
+\#define \mbox{\hyperlink{chain__api__plugin_8cpp_a262656e4d130aa3ad5e182cd87b2198f}{CHAIN\+\_\+\+RW\+\_\+\+CALL\+\_\+\+ASYNC}}(call\+\_\+name,  call\+\_\+result,  http\+\_\+response\+\_\+code,  params\+\_\+type)
+\item 
+\#define \mbox{\hyperlink{chain__api__plugin_8cpp_ab36a65d18616c2e76bc38ab47c242df0}{CHAIN\+\_\+\+RO\+\_\+\+CALL\+\_\+\+WITH\+\_\+400}}(call\+\_\+name,  http\+\_\+response\+\_\+code,  params\+\_\+type)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+template$<$$>$ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1get__transaction__status__params}{chain\+\_\+apis\+::read\+\_\+only\+::get\+\_\+transaction\+\_\+status\+\_\+params}} \mbox{\hyperlink{namespacesysio_a4095dd48f50b063f6287d1ba2459a117}{sysio\+::parse\+\_\+params$<$ chain\+\_\+apis\+::read\+\_\+only\+::get\+\_\+transaction\+\_\+status\+\_\+params, http\+\_\+params\+\_\+types\+::params\+\_\+required $>$}} (const std\+::string \&body)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{chain__api__plugin_8cpp_a3159215e62d08f5b3ff6749207774303}\index{chain\_api\_plugin.cpp@{chain\_api\_plugin.cpp}!CALL\_ASYNC\_WITH\_400@{CALL\_ASYNC\_WITH\_400}}
+\index{CALL\_ASYNC\_WITH\_400@{CALL\_ASYNC\_WITH\_400}!chain\_api\_plugin.cpp@{chain\_api\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{CALL\_ASYNC\_WITH\_400}{CALL\_ASYNC\_WITH\_400}}
+{\footnotesize\ttfamily \label{chain__api__plugin_8cpp_a3159215e62d08f5b3ff6749207774303} 
+\#define CALL\+\_\+\+ASYNC\+\_\+\+WITH\+\_\+400(\begin{DoxyParamCaption}\item[{}]{api\+\_\+name}{, }\item[{}]{api\+\_\+handle}{, }\item[{}]{api\+\_\+namespace}{, }\item[{}]{call\+\_\+name}{, }\item[{}]{call\+\_\+result}{, }\item[{}]{http\+\_\+response\+\_\+code}{, }\item[{}]{params\+\_\+type}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\{std::string(\textcolor{stringliteral}{"{}/v1/"{}}\ \#api\_name\ \textcolor{stringliteral}{"{}/"{}}\ \#call\_name),\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ [api\_handle](string,\ \textcolor{keywordtype}{string}\ body,\ url\_response\_callback\ cb)\ \textcolor{keyword}{mutable}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ api\_handle.validate();\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}}\ =\ parse\_params<api\_namespace::call\_name\ \#\#\ \_params,\ params\_type>(body);\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ api\_handle.call\_name(\ std::move(\mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}}),\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ [cb,\ body](\textcolor{keyword}{const}\ std::variant<fc::exception\_ptr,\ call\_result>\&\ result)\{\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ (std::holds\_alternative<fc::exception\_ptr>(result))\ \{\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::get<fc::exception\_ptr>(result)-\/>dynamic\_rethrow\_exception();\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ http\_plugin::handle\_exception(\#api\_name,\ \#call\_name,\ body,\ cb);\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ cb(http\_response\_code,\ std::visit(async\_result\_visitor(),\ result));\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \});\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ http\_plugin::handle\_exception(\#api\_name,\ \#call\_name,\ body,\ cb);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \}\(\backslash\)}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{chain__api__plugin_8cpp_source_l00064}{64}} of file \mbox{\hyperlink{chain__api__plugin_8cpp_source}{chain\+\_\+api\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00064\ \textcolor{preprocessor}{\#define\ CALL\_ASYNC\_WITH\_400(api\_name,\ api\_handle,\ api\_namespace,\ call\_name,\ call\_result,\ http\_response\_code,\ params\_type)\ \(\backslash\)}}
+\DoxyCodeLine{00065\ \textcolor{preprocessor}{\{std::string("{}/v1/"{}\ \#api\_name\ "{}/"{}\ \#call\_name),\ \(\backslash\)}}
+\DoxyCodeLine{00066\ \textcolor{preprocessor}{\ \ \ [api\_handle](string,\ string\ body,\ url\_response\_callback\ cb)\ mutable\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00067\ \textcolor{preprocessor}{\ \ \ \ \ \ api\_handle.validate();\ \(\backslash\)}}
+\DoxyCodeLine{00068\ \textcolor{preprocessor}{\ \ \ \ \ \ try\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00069\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ auto\ params\ =\ parse\_params<api\_namespace::call\_name\ \#\#\ \_params,\ params\_type>(body);\(\backslash\)}}
+\DoxyCodeLine{00070\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ api\_handle.call\_name(\ std::move(params),\(\backslash\)}}
+\DoxyCodeLine{00071\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ [cb,\ body](const\ std::variant<fc::exception\_ptr,\ call\_result>\&\ result)\{\(\backslash\)}}
+\DoxyCodeLine{00072\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ (std::holds\_alternative<fc::exception\_ptr>(result))\ \{\(\backslash\)}}
+\DoxyCodeLine{00073\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ try\ \{\(\backslash\)}}
+\DoxyCodeLine{00074\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::get<fc::exception\_ptr>(result)-\/>dynamic\_rethrow\_exception();\(\backslash\)}}
+\DoxyCodeLine{00075\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ catch\ (...)\ \{\(\backslash\)}}
+\DoxyCodeLine{00076\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ http\_plugin::handle\_exception(\#api\_name,\ \#call\_name,\ body,\ cb);\(\backslash\)}}
+\DoxyCodeLine{00077\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\(\backslash\)}}
+\DoxyCodeLine{00078\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ else\ \{\(\backslash\)}}
+\DoxyCodeLine{00079\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ cb(http\_response\_code,\ std::visit(async\_result\_visitor(),\ result));\(\backslash\)}}
+\DoxyCodeLine{00080\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\(\backslash\)}}
+\DoxyCodeLine{00081\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \});\(\backslash\)}}
+\DoxyCodeLine{00082\ \textcolor{preprocessor}{\ \ \ \ \ \ \}\ catch\ (...)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00083\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ http\_plugin::handle\_exception(\#api\_name,\ \#call\_name,\ body,\ cb);\ \(\backslash\)}}
+\DoxyCodeLine{00084\ \textcolor{preprocessor}{\ \ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00085\ \textcolor{preprocessor}{\ \ \ \}\(\backslash\)}}
+\DoxyCodeLine{00086\ \textcolor{preprocessor}{\}}}
+
+\end{DoxyCode}
+\Hypertarget{chain__api__plugin_8cpp_ab9297a5c7b7f085c77cad8641f734ba6}\index{chain\_api\_plugin.cpp@{chain\_api\_plugin.cpp}!CALL\_WITH\_400@{CALL\_WITH\_400}}
+\index{CALL\_WITH\_400@{CALL\_WITH\_400}!chain\_api\_plugin.cpp@{chain\_api\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{CALL\_WITH\_400}{CALL\_WITH\_400}}
+{\footnotesize\ttfamily \label{chain__api__plugin_8cpp_ab9297a5c7b7f085c77cad8641f734ba6} 
+\#define CALL\+\_\+\+WITH\+\_\+400(\begin{DoxyParamCaption}\item[{}]{api\+\_\+name}{, }\item[{}]{api\+\_\+handle}{, }\item[{}]{api\+\_\+namespace}{, }\item[{}]{call\+\_\+name}{, }\item[{}]{http\+\_\+response\+\_\+code}{, }\item[{}]{params\+\_\+type}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\{std::string(\textcolor{stringliteral}{"{}/v1/"{}}\ \#api\_name\ \textcolor{stringliteral}{"{}/"{}}\ \#call\_name),\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ [api\_handle](string,\ \textcolor{keywordtype}{string}\ body,\ url\_response\_callback\ cb)\ \textcolor{keyword}{mutable}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ api\_handle.validate();\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}}\ =\ parse\_params<api\_namespace::call\_name\ \#\#\ \_params,\ params\_type>(body);\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}\ result(\ api\_handle.call\_name(\ std::move(\mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}})\ )\ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ cb(http\_response\_code,\ std::move(result));\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ http\_plugin::handle\_exception(\#api\_name,\ \#call\_name,\ body,\ cb);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \}\}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{chain__api__plugin_8cpp_source_l00051}{51}} of file \mbox{\hyperlink{chain__api__plugin_8cpp_source}{chain\+\_\+api\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00051\ \textcolor{preprocessor}{\#define\ CALL\_WITH\_400(api\_name,\ api\_handle,\ api\_namespace,\ call\_name,\ http\_response\_code,\ params\_type)\ \(\backslash\)}}
+\DoxyCodeLine{00052\ \textcolor{preprocessor}{\{std::string("{}/v1/"{}\ \#api\_name\ "{}/"{}\ \#call\_name),\ \(\backslash\)}}
+\DoxyCodeLine{00053\ \textcolor{preprocessor}{\ \ \ [api\_handle](string,\ string\ body,\ url\_response\_callback\ cb)\ mutable\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00054\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ api\_handle.validate();\ \(\backslash\)}}
+\DoxyCodeLine{00055\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ try\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00056\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ auto\ params\ =\ parse\_params<api\_namespace::call\_name\ \#\#\ \_params,\ params\_type>(body);\(\backslash\)}}
+\DoxyCodeLine{00057\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ fc::variant\ result(\ api\_handle.call\_name(\ std::move(params)\ )\ );\ \(\backslash\)}}
+\DoxyCodeLine{00058\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ cb(http\_response\_code,\ std::move(result));\ \(\backslash\)}}
+\DoxyCodeLine{00059\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \}\ catch\ (...)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00060\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ http\_plugin::handle\_exception(\#api\_name,\ \#call\_name,\ body,\ cb);\ \(\backslash\)}}
+\DoxyCodeLine{00061\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00062\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \}\}}}
+
+\end{DoxyCode}
+\Hypertarget{chain__api__plugin_8cpp_af30579c85185bcda813619205a246c24}\index{chain\_api\_plugin.cpp@{chain\_api\_plugin.cpp}!CHAIN\_RO\_CALL@{CHAIN\_RO\_CALL}}
+\index{CHAIN\_RO\_CALL@{CHAIN\_RO\_CALL}!chain\_api\_plugin.cpp@{chain\_api\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{CHAIN\_RO\_CALL}{CHAIN\_RO\_CALL}}
+{\footnotesize\ttfamily \label{chain__api__plugin_8cpp_af30579c85185bcda813619205a246c24} 
+\#define CHAIN\+\_\+\+RO\+\_\+\+CALL(\begin{DoxyParamCaption}\item[{}]{call\+\_\+name}{, }\item[{}]{http\+\_\+response\+\_\+code}{, }\item[{}]{params\+\_\+type}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{chain__api__plugin_8cpp_ab9297a5c7b7f085c77cad8641f734ba6}{CALL\_WITH\_400}}(chain,\ ro\_api,\ chain\_apis::read\_only,\ call\_name,\ http\_response\_code,\ params\_type)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{chain__api__plugin_8cpp_source_l00088}{88}} of file \mbox{\hyperlink{chain__api__plugin_8cpp_source}{chain\+\_\+api\+\_\+plugin.\+cpp}}.
+
+\Hypertarget{chain__api__plugin_8cpp_a1ecc20ecac83cc8b5e94e862dc4b0b6c}\index{chain\_api\_plugin.cpp@{chain\_api\_plugin.cpp}!CHAIN\_RO\_CALL\_ASYNC@{CHAIN\_RO\_CALL\_ASYNC}}
+\index{CHAIN\_RO\_CALL\_ASYNC@{CHAIN\_RO\_CALL\_ASYNC}!chain\_api\_plugin.cpp@{chain\_api\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{CHAIN\_RO\_CALL\_ASYNC}{CHAIN\_RO\_CALL\_ASYNC}}
+{\footnotesize\ttfamily \label{chain__api__plugin_8cpp_a1ecc20ecac83cc8b5e94e862dc4b0b6c} 
+\#define CHAIN\+\_\+\+RO\+\_\+\+CALL\+\_\+\+ASYNC(\begin{DoxyParamCaption}\item[{}]{call\+\_\+name}{, }\item[{}]{call\+\_\+result}{, }\item[{}]{http\+\_\+response\+\_\+code}{, }\item[{}]{params\+\_\+type}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{chain__api__plugin_8cpp_a3159215e62d08f5b3ff6749207774303}{CALL\_ASYNC\_WITH\_400}}(chain,\ ro\_api,\ chain\_apis::read\_only,\ call\_name,\ call\_result,\ http\_response\_code,\ params\_type)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{chain__api__plugin_8cpp_source_l00090}{90}} of file \mbox{\hyperlink{chain__api__plugin_8cpp_source}{chain\+\_\+api\+\_\+plugin.\+cpp}}.
+
+\Hypertarget{chain__api__plugin_8cpp_ab36a65d18616c2e76bc38ab47c242df0}\index{chain\_api\_plugin.cpp@{chain\_api\_plugin.cpp}!CHAIN\_RO\_CALL\_WITH\_400@{CHAIN\_RO\_CALL\_WITH\_400}}
+\index{CHAIN\_RO\_CALL\_WITH\_400@{CHAIN\_RO\_CALL\_WITH\_400}!chain\_api\_plugin.cpp@{chain\_api\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{CHAIN\_RO\_CALL\_WITH\_400}{CHAIN\_RO\_CALL\_WITH\_400}}
+{\footnotesize\ttfamily \label{chain__api__plugin_8cpp_ab36a65d18616c2e76bc38ab47c242df0} 
+\#define CHAIN\+\_\+\+RO\+\_\+\+CALL\+\_\+\+WITH\+\_\+400(\begin{DoxyParamCaption}\item[{}]{call\+\_\+name}{, }\item[{}]{http\+\_\+response\+\_\+code}{, }\item[{}]{params\+\_\+type}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{chain__api__plugin_8cpp_ab9297a5c7b7f085c77cad8641f734ba6}{CALL\_WITH\_400}}(chain,\ ro\_api,\ chain\_apis::read\_only,\ call\_name,\ http\_response\_code,\ params\_type)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{chain__api__plugin_8cpp_source_l00093}{93}} of file \mbox{\hyperlink{chain__api__plugin_8cpp_source}{chain\+\_\+api\+\_\+plugin.\+cpp}}.
+
+\Hypertarget{chain__api__plugin_8cpp_a0c898b5cbe82b297625ebb61c03e01b9}\index{chain\_api\_plugin.cpp@{chain\_api\_plugin.cpp}!CHAIN\_RW\_CALL@{CHAIN\_RW\_CALL}}
+\index{CHAIN\_RW\_CALL@{CHAIN\_RW\_CALL}!chain\_api\_plugin.cpp@{chain\_api\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{CHAIN\_RW\_CALL}{CHAIN\_RW\_CALL}}
+{\footnotesize\ttfamily \label{chain__api__plugin_8cpp_a0c898b5cbe82b297625ebb61c03e01b9} 
+\#define CHAIN\+\_\+\+RW\+\_\+\+CALL(\begin{DoxyParamCaption}\item[{}]{call\+\_\+name}{, }\item[{}]{http\+\_\+response\+\_\+code}{, }\item[{}]{params\+\_\+type}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{chain__api__plugin_8cpp_ab9297a5c7b7f085c77cad8641f734ba6}{CALL\_WITH\_400}}(chain,\ rw\_api,\ chain\_apis::read\_write,\ call\_name,\ http\_response\_code,\ params\_type)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{chain__api__plugin_8cpp_source_l00089}{89}} of file \mbox{\hyperlink{chain__api__plugin_8cpp_source}{chain\+\_\+api\+\_\+plugin.\+cpp}}.
+
+\Hypertarget{chain__api__plugin_8cpp_a262656e4d130aa3ad5e182cd87b2198f}\index{chain\_api\_plugin.cpp@{chain\_api\_plugin.cpp}!CHAIN\_RW\_CALL\_ASYNC@{CHAIN\_RW\_CALL\_ASYNC}}
+\index{CHAIN\_RW\_CALL\_ASYNC@{CHAIN\_RW\_CALL\_ASYNC}!chain\_api\_plugin.cpp@{chain\_api\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{CHAIN\_RW\_CALL\_ASYNC}{CHAIN\_RW\_CALL\_ASYNC}}
+{\footnotesize\ttfamily \label{chain__api__plugin_8cpp_a262656e4d130aa3ad5e182cd87b2198f} 
+\#define CHAIN\+\_\+\+RW\+\_\+\+CALL\+\_\+\+ASYNC(\begin{DoxyParamCaption}\item[{}]{call\+\_\+name}{, }\item[{}]{call\+\_\+result}{, }\item[{}]{http\+\_\+response\+\_\+code}{, }\item[{}]{params\+\_\+type}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{chain__api__plugin_8cpp_a3159215e62d08f5b3ff6749207774303}{CALL\_ASYNC\_WITH\_400}}(chain,\ rw\_api,\ chain\_apis::read\_write,\ call\_name,\ call\_result,\ http\_response\_code,\ params\_type)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{chain__api__plugin_8cpp_source_l00091}{91}} of file \mbox{\hyperlink{chain__api__plugin_8cpp_source}{chain\+\_\+api\+\_\+plugin.\+cpp}}.
+

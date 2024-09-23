@@ -1,0 +1,78 @@
+\doxysection{testing\+::In\+Sequence Class Reference}
+\hypertarget{classtesting_1_1_in_sequence}{}\label{classtesting_1_1_in_sequence}\index{testing::InSequence@{testing::InSequence}}
+
+
+{\ttfamily \#include $<$gmock-\/spec-\/builders.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1_in_sequence_ac40a4ac3e4f26e088ebc09e543514b6b}{In\+Sequence}} ()
+\item 
+\mbox{\hyperlink{classtesting_1_1_in_sequence_afe11b11ccb5f55daea5f1e0a9a1af48f}{\texorpdfstring{$\sim$}{\string~}\+In\+Sequence}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00665}{665}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1_in_sequence_ac40a4ac3e4f26e088ebc09e543514b6b}\index{testing::InSequence@{testing::InSequence}!InSequence@{InSequence}}
+\index{InSequence@{InSequence}!testing::InSequence@{testing::InSequence}}
+\doxysubsubsection{\texorpdfstring{InSequence()}{InSequence()}}
+{\footnotesize\ttfamily \label{classtesting_1_1_in_sequence_ac40a4ac3e4f26e088ebc09e543514b6b} 
+testing\+::\+In\+Sequence\+::\+In\+Sequence (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8cc_source_l00859}{859}} of file \mbox{\hyperlink{gmock-spec-builders_8cc_source}{gmock-\/spec-\/builders.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00859\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00860\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacetesting_1_1internal_af4407fe8aeb1e43b2f58940736a20590}{internal::g\_gmock\_implicit\_sequence}}.get()\ ==\ NULL)\ \{}
+\DoxyCodeLine{00861\ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_af4407fe8aeb1e43b2f58940736a20590}{internal::g\_gmock\_implicit\_sequence}}.set(\textcolor{keyword}{new}\ Sequence);}
+\DoxyCodeLine{00862\ \ \ \ \ sequence\_created\_\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00863\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00864\ \ \ \ \ sequence\_created\_\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00865\ \ \ \}}
+\DoxyCodeLine{00866\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1_in_sequence_ac40a4ac3e4f26e088ebc09e543514b6b_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1_in_sequence_afe11b11ccb5f55daea5f1e0a9a1af48f}\index{testing::InSequence@{testing::InSequence}!````~InSequence@{\texorpdfstring{$\sim$}{\string~}InSequence}}
+\index{````~InSequence@{\texorpdfstring{$\sim$}{\string~}InSequence}!testing::InSequence@{testing::InSequence}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}InSequence()}{\string~InSequence()}}
+{\footnotesize\ttfamily \label{classtesting_1_1_in_sequence_afe11b11ccb5f55daea5f1e0a9a1af48f} 
+testing\+::\+In\+Sequence\+::\texorpdfstring{$\sim$}{\string~}\+In\+Sequence (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8cc_source_l00870}{870}} of file \mbox{\hyperlink{gmock-spec-builders_8cc_source}{gmock-\/spec-\/builders.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00870\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00871\ \ \ \textcolor{keywordflow}{if}\ (sequence\_created\_)\ \{}
+\DoxyCodeLine{00872\ \ \ \ \ \textcolor{keyword}{delete}\ \mbox{\hyperlink{namespacetesting_1_1internal_af4407fe8aeb1e43b2f58940736a20590}{internal::g\_gmock\_implicit\_sequence}}.get();}
+\DoxyCodeLine{00873\ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_af4407fe8aeb1e43b2f58940736a20590}{internal::g\_gmock\_implicit\_sequence}}.set(NULL);}
+\DoxyCodeLine{00874\ \ \ \}}
+\DoxyCodeLine{00875\ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/include/gmock/\mbox{\hyperlink{gmock-spec-builders_8h}{gmock-\/spec-\/builders.\+h}}\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/src/\mbox{\hyperlink{gmock-spec-builders_8cc}{gmock-\/spec-\/builders.\+cc}}\end{DoxyCompactItemize}

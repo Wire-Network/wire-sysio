@@ -1,0 +1,19 @@
+<map id="TEST_F" name="TEST_F">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,96,76,122"/>
+<area shape="rect" id="Node000002" href="$class_generic_reader.html#ac417441794477ea747b63adb6d3653a9" title="Whether a parse error has occurred in the last parsing." alt="" coords="124,5,326,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="53,94,83,67,122,41,139,34,141,39,125,46,86,71,56,98"/>
+<area shape="rect" id="Node000004" href="$class_generic_reader.html#aa1e9e1eef614fde971550ed2f955151d" title="Check if token&#45;by&#45;token parsing JSON text is complete." alt="" coords="143,55,306,96"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="76,100,127,90,128,96,76,105"/>
+<area shape="rect" id="Node000005" href="$class_generic_reader.html#a7de472eda2ad9de13cfd8c1de74f1754" title="Initialize JSON text token&#45;by&#45;token parsing." alt="" coords="143,120,306,161"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="76,112,128,121,127,127,76,117"/>
+<area shape="rect" id="Node000008" href="$class_generic_reader.html#a257891331e0c259903e7066fb4cebf92" title="Parse one token from JSON text." alt="" coords="143,186,306,226"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="58,120,87,146,125,171,138,177,136,182,122,175,84,150,54,124"/>
+<area shape="rect" id="Node000003" href="$struct_parse_result.html#adfe0ef5b994e82f8aa9ebf0b30c924b1" title="Whether the result is an error." alt="" coords="376,5,516,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="327,16,361,16,361,21,327,21"/>
+<area shape="rect" id="Node000006" href="$struct_parse_result.html#a88b6d44f052a19e6436ae6aadc2c40b4" title="Reset error code." alt="" coords="380,128,512,154"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="307,138,364,138,364,144,307,144"/>
+<area shape="rect" id="Node000007" href="$struct_parse_result.html#aa81b4a7b776b77216cb752385203a8c1" title="Update error code and offset." alt="" coords="566,128,688,154"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="513,138,551,138,551,144,513,144"/>
+<area shape="rect" id="Node000009" href="$classinternal_1_1_stack.html#a02da31665a372738e81ded2f7b7d598e" title=" " alt="" coords="374,193,518,219"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="307,204,358,204,358,209,307,209"/>
+</map>

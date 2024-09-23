@@ -1,0 +1,41 @@
+\doxysection{libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/internal/dtoa.h File Reference}
+\hypertarget{dtoa_8h}{}\label{dtoa_8h}\index{libraries/fc/include/fc/crypto/webauthn\_json/include/rapidjson/internal/dtoa.h@{libraries/fc/include/fc/crypto/webauthn\_json/include/rapidjson/internal/dtoa.h}}
+{\ttfamily \#include "{}itoa.\+h"{}}\newline
+{\ttfamily \#include "{}diyfp.\+h"{}}\newline
+{\ttfamily \#include "{}ieee754.\+h"{}}\newline
+Include dependency graph for dtoa.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=260pt]{dtoa_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{dtoa_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespaceinternal}{internal}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{namespaceinternal_a234e10bef097ccb2f202b7a133086e71}{internal\+::\+Grisu\+Round}} (char \texorpdfstring{$\ast$}{*}buffer, int \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} delta, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} rest, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} ten\+\_\+kappa, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} wp\+\_\+w)
+\item 
+int \mbox{\hyperlink{namespaceinternal_a8aae11dbb46da9ac99e116aa2a6dbfc9}{internal\+::\+Count\+Decimal\+Digit32}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} n)
+\item 
+void \mbox{\hyperlink{namespaceinternal_a47be9aea8d0f9cae49dc03dc046d2450}{internal\+::\+Digit\+Gen}} (const \mbox{\hyperlink{structinternal_1_1_diy_fp}{Diy\+Fp}} \&W, const \mbox{\hyperlink{structinternal_1_1_diy_fp}{Diy\+Fp}} \&Mp, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} delta, char \texorpdfstring{$\ast$}{*}buffer, int \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}, int \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{make__512_8cpp_a3d4e997ddc51e0c06c306fe4862826c0}{K}})
+\item 
+void \mbox{\hyperlink{namespaceinternal_aeb7b6c0784b644968003cbd1b9da57e3}{internal\+::\+Grisu2}} (double \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}, char \texorpdfstring{$\ast$}{*}buffer, int \texorpdfstring{$\ast$}{*}length, int \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{make__512_8cpp_a3d4e997ddc51e0c06c306fe4862826c0}{K}})
+\item 
+char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespaceinternal_aadc1fd5929c1c67a56c8ba480c587bac}{internal\+::\+Write\+Exponent}} (int \mbox{\hyperlink{make__512_8cpp_a3d4e997ddc51e0c06c306fe4862826c0}{K}}, char \texorpdfstring{$\ast$}{*}buffer)
+\item 
+char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespaceinternal_a4b194248657212e94cc3f244b09dbeae}{internal\+::\+Prettify}} (char \texorpdfstring{$\ast$}{*}buffer, int length, int k, int max\+Decimal\+Places)
+\item 
+char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespaceinternal_a38ffd2dab9bb216948f828f3a36c801f}{internal\+::dtoa}} (double \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}, char \texorpdfstring{$\ast$}{*}buffer, int max\+Decimal\+Places=324)
+\end{DoxyCompactItemize}

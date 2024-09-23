@@ -1,0 +1,26 @@
+<map id="WAST::TextFileLocus::column" name="WAST::TextFileLocus::column">
+<area shape="rect" id="Node000001" title=" " alt="" coords="1058,146,1204,186"/>
+<area shape="rect" id="Node000002" href="$classpump_1_1_cursor.html#a7a565e3c30559d7b02ece7817ab1cf72" title=" " alt="" coords="862,5,1010,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1104,135,1062,88,1037,65,1009,44,988,34,990,29,1011,40,1040,61,1066,85,1108,132"/>
+<area shape="rect" id="Node000003" href="$classpump_1_1_cursor.html#a012a67506d0a3e81daec0394d18359b8" title=" " alt="" coords="865,55,1006,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="1087,139,1009,94,983,83,985,78,1011,89,1090,135"/>
+<area shape="rect" id="Node000004" href="$classpump_1_1_cursor.html#a7ec8a30a836133d7654fcaf81250fc77" title=" " alt="" coords="869,104,1003,130"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="1042,147,989,133,990,128,1044,141"/>
+<area shape="rect" id="Node000005" href="$classpump_1_1_cursor.html#afca901b5f22d9b2bfe207beccdec7dfa" title=" " alt="" coords="865,153,1007,179"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="1042,169,1007,169,1007,164,1042,164"/>
+<area shape="rect" id="Node000006" href="$classpump_1_1_cursor.html#a8a9a818d6c242243bc08641deb3b007d" title=" " alt="" coords="862,203,1010,228"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="1044,191,990,205,989,200,1042,186"/>
+<area shape="rect" id="Node000007" href="$classpump_1_1_cursor.html#ae5be3cd7be0409815feaa37cca01f0bf" title=" " alt="" coords="869,252,1002,278"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="1090,198,1011,243,985,254,983,249,1009,238,1087,193"/>
+<area shape="rect" id="Node000008" href="$struct_w_a_s_t_1_1_text_file_locus.html#a6a1645bd22ae8a3b5f318b0975b5abd8" title=" " alt="" coords="863,302,1009,342"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="1107,200,1065,247,1012,292,993,304,990,299,1008,288,1061,243,1103,197"/>
+<area shape="rect" id="Node000009" href="$namespace_w_a_s_t.html#a9b736e747098508f90bd9495fa4a9a11" title=" " alt="" coords="689,309,814,335"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="847,325,814,325,814,320,847,320"/>
+<area shape="rect" id="Node000010" href="$namespace_w_a_s_t.html#ad67ed47b4a120f234a3a4a2da076418f" title=" " alt="" coords="5,311,174,336"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="674,323,469,321,222,322,174,323,174,318,222,317,469,316,674,318"/>
+<area shape="rect" id="Node000011" href="$namespace_w_a_s_t.html#afdc0ca4bc5028ce0d0d1f0b50eadf451" title=" " alt="" coords="466,335,641,360"/>
+<area shape="poly" id="edge10_Node000009_Node000011" title=" " alt="" coords="674,335,642,339,641,334,673,329"/>
+<area shape="rect" id="Node000012" href="$namespace_w_a_s_t.html#ab72b47fe2520b8a7840ff4ce5d07684d" title=" " alt="" coords="222,331,418,372"/>
+<area shape="poly" id="edge11_Node000011_Node000012" title=" " alt="" coords="450,352,419,352,418,347,450,347"/>
+<area shape="poly" id="edge12_Node000012_Node000010" title=" " alt="" coords="206,340,174,336,174,331,206,335"/>
+</map>

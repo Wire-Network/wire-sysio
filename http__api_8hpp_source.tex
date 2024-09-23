@@ -1,0 +1,41 @@
+\doxysection{http\+\_\+api.\+hpp}
+\hypertarget{http__api_8hpp_source}{}\label{http__api_8hpp_source}\index{libraries/fc/include/fc/rpc/http\_api.hpp@{libraries/fc/include/fc/rpc/http\_api.hpp}}
+\mbox{\hyperlink{http__api_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{http__api_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{http__api_8hpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{json_8hpp}{fc/io/json.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{http__api_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <fc/network/http/connection.hpp>}}
+\DoxyCodeLine{\Hypertarget{http__api_8hpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <fc/network/http/server.hpp>}}
+\DoxyCodeLine{\Hypertarget{http__api_8hpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{fc_2include_2fc_2reflect_2variant_8hpp}{fc/reflect/variant.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{http__api_8hpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{api__connection_8hpp}{fc/rpc/api\_connection.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{http__api_8hpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <fc/rpc/state.hpp>}}
+\DoxyCodeLine{\Hypertarget{http__api_8hpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{http__api_8hpp_source_l00009}00009\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}\ \{\ \textcolor{keyword}{namespace\ }rpc\ \{}
+\DoxyCodeLine{\Hypertarget{http__api_8hpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{http__api_8hpp_source_l00011}\mbox{\hyperlink{classfc_1_1rpc_1_1http__api__connection}{00011}}\ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classfc_1_1rpc_1_1http__api__connection}{http\_api\_connection}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classfc_1_1api__connection}{api\_connection}}}
+\DoxyCodeLine{\Hypertarget{http__api_8hpp_source_l00012}00012\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{http__api_8hpp_source_l00013}00013\ \ \ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{http__api_8hpp_source_l00014}00014\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1rpc_1_1http__api__connection_a725d9f6837ca97683ba2e744cf206138}{http\_api\_connection}}();}
+\DoxyCodeLine{\Hypertarget{http__api_8hpp_source_l00015}00015\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1rpc_1_1http__api__connection_a8182916970c77da2ddc1d6b4204ce94e}{\string~http\_api\_connection}}();}
+\DoxyCodeLine{\Hypertarget{http__api_8hpp_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{http__api_8hpp_source_l00017}00017\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classfc_1_1variant}{variant}}\ \mbox{\hyperlink{classfc_1_1rpc_1_1http__api__connection_a3f613b413f6792e3aa631d8e20f4f2c9}{send\_call}}(}
+\DoxyCodeLine{\Hypertarget{http__api_8hpp_source_l00018}00018\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a18e9e0bd9c0a52896425ae1172bc4e2b}{api\_id\_type}}\ api\_id,}
+\DoxyCodeLine{\Hypertarget{http__api_8hpp_source_l00019}00019\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ method\_name,}
+\DoxyCodeLine{\Hypertarget{http__api_8hpp_source_l00020}00020\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}\ args\ =\ \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}()\ )\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{http__api_8hpp_source_l00021}00021\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classfc_1_1variant}{variant}}\ \mbox{\hyperlink{classfc_1_1rpc_1_1http__api__connection_a14fc66782552d9a76279a5c2f6fc3f14}{send\_callback}}(}
+\DoxyCodeLine{\Hypertarget{http__api_8hpp_source_l00022}00022\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ callback\_id,}
+\DoxyCodeLine{\Hypertarget{http__api_8hpp_source_l00023}00023\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}\ args\ =\ \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}()\ )\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{http__api_8hpp_source_l00024}00024\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1rpc_1_1http__api__connection_a95fd35a8597ba6beefd424ccafff04f0}{send\_notice}}(}
+\DoxyCodeLine{\Hypertarget{http__api_8hpp_source_l00025}00025\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ callback\_id,}
+\DoxyCodeLine{\Hypertarget{http__api_8hpp_source_l00026}00026\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}\ args\ =\ \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}()\ )\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{http__api_8hpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{http__api_8hpp_source_l00028}00028\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1rpc_1_1http__api__connection_a188a41e7a1bdda4cd09b6fb9fbd7e30b}{on\_request}}(}
+\DoxyCodeLine{\Hypertarget{http__api_8hpp_source_l00029}00029\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ fc::http::request\&\ req,}
+\DoxyCodeLine{\Hypertarget{http__api_8hpp_source_l00030}00030\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ fc::http::server::response\&\ resp\ );}
+\DoxyCodeLine{\Hypertarget{http__api_8hpp_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{http__api_8hpp_source_l00032}\mbox{\hyperlink{classfc_1_1rpc_1_1http__api__connection_a56b36afdcec3344f78d344b4636ca96c}{00032}}\ \ \ \ \ \ \ \ \ \ fc::rpc::state\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1rpc_1_1http__api__connection_a56b36afdcec3344f78d344b4636ca96c}{\_rpc\_state}};}
+\DoxyCodeLine{\Hypertarget{http__api_8hpp_source_l00033}00033\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{http__api_8hpp_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{http__api_8hpp_source_l00035}00035\ \}\ \}\ \textcolor{comment}{//\ namespace\ fc::rpc}}
+
+\end{DoxyCode}

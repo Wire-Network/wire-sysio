@@ -1,0 +1,157 @@
+\doxysection{plugins/chain\+\_\+plugin/chain\+\_\+plugin.cpp File Reference}
+\hypertarget{chain__plugin_8cpp}{}\label{chain__plugin_8cpp}\index{plugins/chain\_plugin/chain\_plugin.cpp@{plugins/chain\_plugin/chain\_plugin.cpp}}
+{\ttfamily \#include $<$sysio/chain\+\_\+plugin/chain\+\_\+plugin.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain\+\_\+plugin/trx\+\_\+retry\+\_\+db.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/producer\+\_\+plugin/producer\+\_\+plugin.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/fork\+\_\+database.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/block\+\_\+log.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/exceptions.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/authorization\+\_\+manager.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/code\+\_\+object.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/config.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/wasm\+\_\+interface.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/resource\+\_\+limits.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/controller.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/generated\+\_\+transaction\+\_\+object.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/snapshot.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/deep\+\_\+mind.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain\+\_\+plugin/trx\+\_\+finality\+\_\+status\+\_\+processing.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/permission\+\_\+link\+\_\+object.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/sysio\+\_\+contract.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/resource\+\_\+monitor\+\_\+plugin/resource\+\_\+monitor\+\_\+plugin.\+hpp$>$}\newline
+{\ttfamily \#include $<$chainbase/environment.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/signals2/connection.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/algorithm/string.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/lexical\+\_\+cast.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/filesystem.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/filesystem/path.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/io/json.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/variant.\+hpp$>$}\newline
+{\ttfamily \#include $<$signal.\+h$>$}\newline
+{\ttfamily \#include $<$cstdlib$>$}\newline
+Include dependency graph for chain\+\_\+plugin.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{chain__plugin_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classsysio_1_1chain__plugin__impl}{sysio\+::chain\+\_\+plugin\+\_\+impl}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain__apis_1_1resolver__factory}{sysio\+::chain\+\_\+apis\+::resolver\+\_\+factory}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain}{sysio\+::chain}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain__apis}{sysio\+::chain\+\_\+apis}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{chain__plugin_8cpp_ac96900c0c3efb424647faf59995487d6}{LOAD\+\_\+\+VALUE\+\_\+\+SET}}(options,  op\+\_\+name,  container)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{namespacesysio_af322f17f4ee9adb9dc402c8608dac30e}{sysio\+::vm\+\_\+type}} = \mbox{\hyperlink{classsysio_1_1chain_1_1wasm__interface_a9053d9e65167e5f241f1f3f27b175f9c}{wasm\+\_\+interface\+::vm\+\_\+type}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+std\+::ostream \& \mbox{\hyperlink{namespacesysio_1_1chain_a236a2001d1784487280aafeb716a0f0a}{sysio\+::chain\+::operator$<$$<$}} (std\+::ostream \&osm, \mbox{\hyperlink{namespacesysio_1_1chain_af3e35f3e1b78dd00fa247009a2d9ba5e}{sysio\+::chain\+::db\+\_\+read\+\_\+mode}} m)
+\item 
+void \mbox{\hyperlink{namespacesysio_1_1chain_a2392b943cefb788368ffd4afd493d06b}{sysio\+::chain\+::validate}} (boost\+::any \&v, const std\+::vector$<$ std\+::string $>$ \&values, \mbox{\hyperlink{namespacesysio_1_1chain_af3e35f3e1b78dd00fa247009a2d9ba5e}{sysio\+::chain\+::db\+\_\+read\+\_\+mode}} \texorpdfstring{$\ast$}{*}, int)
+\item 
+std\+::ostream \& \mbox{\hyperlink{namespacesysio_1_1chain_a83946e263cb83b4c0c177ef579e17405}{sysio\+::chain\+::operator$<$$<$}} (std\+::ostream \&osm, \mbox{\hyperlink{namespacesysio_1_1chain_a7d207c8c6bf978826102eca76da530e0}{sysio\+::chain\+::validation\+\_\+mode}} m)
+\item 
+void \mbox{\hyperlink{namespacesysio_1_1chain_aa8eb419d6066c8830bef31674bdad2c1}{sysio\+::chain\+::validate}} (boost\+::any \&v, const std\+::vector$<$ std\+::string $>$ \&values, \mbox{\hyperlink{namespacesysio_1_1chain_a7d207c8c6bf978826102eca76da530e0}{sysio\+::chain\+::validation\+\_\+mode}} \texorpdfstring{$\ast$}{*}, int)
+\item 
+\mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}} \mbox{\hyperlink{namespacesysio_a23ea7ef126523715ac0dfa6881b6b7eb}{sysio\+::calculate\+\_\+genesis\+\_\+timestamp}} (\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} tstr)
+\item 
+void \mbox{\hyperlink{namespacesysio_aff3a217d3e7006c6f48afb10c16408b9}{sysio\+::clear\+\_\+directory\+\_\+contents}} (const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})
+\item 
+void \mbox{\hyperlink{namespacesysio_a735040263215e078563aaca1cfcfc39e}{sysio\+::clear\+\_\+chainbase\+\_\+files}} (const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})
+\item 
+std\+::optional$<$ \mbox{\hyperlink{classsysio_1_1chain_1_1builtin__protocol__feature}{builtin\+\_\+protocol\+\_\+feature}} $>$ \mbox{\hyperlink{namespacesysio_a45a53a381269130d87e80a8fb42a24c5}{sysio\+::read\+\_\+builtin\+\_\+protocol\+\_\+feature}} (const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})
+\item 
+\mbox{\hyperlink{classsysio_1_1chain_1_1protocol__feature__set}{protocol\+\_\+feature\+\_\+set}} \mbox{\hyperlink{namespacesysio_a42c982ab5630888ec8df71785a9a226c}{sysio\+::initialize\+\_\+protocol\+\_\+features}} (const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}, bool populate\+\_\+missing\+\_\+builtins=true)
+\item 
+{\footnotesize template$<$typename I $>$ }\\std\+::string \mbox{\hyperlink{namespacesysio_1_1chain__apis_a7df01d6a5fd1809e162d989a02998ba2}{sysio\+::chain\+\_\+apis\+::itoh}} (I n, size\+\_\+t hlen=\mbox{\hyperlink{yubihsm__pkcs11_8c_af82555d15fc1c126f72a5c0566b5389a}{sizeof}}(I)$<$$<$ 1)
+\item 
+template$<$$>$ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{namespacesysio_1_1chain__apis_a836b04c2028748eb9cb50c3d9fb8f473}{sysio\+::chain\+\_\+apis\+::convert\+\_\+to\+\_\+type}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&str, const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&desc)
+\item 
+template$<$$>$ double \mbox{\hyperlink{namespacesysio_1_1chain__apis_a881bf8817ff7863c88e2ce590e465d94}{sysio\+::chain\+\_\+apis\+::convert\+\_\+to\+\_\+type}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&str, const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&desc)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}} $>$ }\\\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1chain__apis_a0dc2b6941bd899b78a443fedb25354cc}{sysio\+::chain\+\_\+apis\+::convert\+\_\+to\+\_\+string}} (const \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}} \&\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}}, const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_afa4592d59d085cf06cad9000120eba84}{key\+\_\+type}}, const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&encode\+\_\+type, const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&desc)
+\item 
+template$<$$>$ \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1chain__apis_a3992489d9f3dd0cb2178f78d8b31374b}{sysio\+::chain\+\_\+apis\+::convert\+\_\+to\+\_\+string}} (const \mbox{\hyperlink{namespacesysio_1_1chain_a4404f0f28252f82bd7b98d70d1605e4f}{chain\+::key256\+\_\+t}} \&\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}}, const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_afa4592d59d085cf06cad9000120eba84}{key\+\_\+type}}, const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&encode\+\_\+type, const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&desc)
+\item 
+template$<$$>$ \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1chain__apis_aacb780a423bcb09110881970e8fac186}{sysio\+::chain\+\_\+apis\+::convert\+\_\+to\+\_\+string}} (const \mbox{\hyperlink{structfloat128__t}{float128\+\_\+t}} \&\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}}, const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_afa4592d59d085cf06cad9000120eba84}{key\+\_\+type}}, const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&encode\+\_\+type, const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&desc)
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1abi__def}{abi\+\_\+def}} \mbox{\hyperlink{namespacesysio_1_1chain__apis_a4ebb2db783f15e8f2aef59cdc5e96ca1}{sysio\+::chain\+\_\+apis\+::get\+\_\+abi}} (const \mbox{\hyperlink{classsysio_1_1chain_1_1controller}{controller}} \&db, const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&account)
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1chain__apis_a0e2fe898ce108132e5941fb41d6e749a}{sysio\+::chain\+\_\+apis\+::get\+\_\+table\+\_\+type}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1abi__def}{abi\+\_\+def}} \&abi, const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&\mbox{\hyperlink{namespacesysio_1_1chain_ad1cfc9966d13ee8241fc64f187aee188}{table\+\_\+name}})
+\item 
+\mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \mbox{\hyperlink{namespacesysio_1_1chain__apis_a8566344f638304618d3768b20885e2b5}{sysio\+::chain\+\_\+apis\+::get\+\_\+global\+\_\+row}} (const \mbox{\hyperlink{classchainbase_1_1database}{database}} \&db, const \mbox{\hyperlink{structsysio_1_1chain_1_1abi__def}{abi\+\_\+def}} \&abi, const \mbox{\hyperlink{structsysio_1_1chain_1_1abi__serializer}{abi\+\_\+serializer}} \&abis, const \mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}} \&abi\+\_\+serializer\+\_\+max\+\_\+time\+\_\+us, bool shorten\+\_\+abi\+\_\+errors)
+\item 
+auto \mbox{\hyperlink{namespacesysio_1_1chain__apis_a47b2ffecf4cf6834bb372487ea012708}{sysio\+::chain\+\_\+apis\+::make\+\_\+resolver}} (const \mbox{\hyperlink{classsysio_1_1chain_1_1controller}{controller}} \&control, \mbox{\hyperlink{structsysio_1_1chain_1_1abi__serializer_ac81c8efe132df6ebffcfa61fb2a6959e}{abi\+\_\+serializer\+::yield\+\_\+function\+\_\+t}} yield)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{reflect_8hpp_a3243e9d5f0a24341d7f7e64f9cd525ee}{FC\+\_\+\+REFLECT\+\_\+\+ENUM}}(\mbox{\hyperlink{structchainbase_1_1environment_a5230c250a35c7d13c3c059e117c54395}{chainbase\+::environment\+::os\+\_\+t}},(\mbox{\hyperlink{environment_8hpp_a5e55ee7dabe1ec807ab569fc11babbb0ac3724e0358f391346c785d3450532797}{OS\+\_\+\+LINUX}})(\mbox{\hyperlink{environment_8hpp_a5e55ee7dabe1ec807ab569fc11babbb0af1b08c91685e3bc4d30e56dfd468e735}{OS\+\_\+\+MACOS}})(\mbox{\hyperlink{environment_8hpp_a5e55ee7dabe1ec807ab569fc11babbb0a8780f81c6157f670aaa1d4a0f7c15467}{OS\+\_\+\+WINDOWS}})(\mbox{\hyperlink{environment_8hpp_a5e55ee7dabe1ec807ab569fc11babbb0a3d3a12d1d170260bc66459e6437d06cb}{OS\+\_\+\+OTHER}})) \mbox{\hyperlink{reflect_8hpp_a3243e9d5f0a24341d7f7e64f9cd525ee}{FC\+\_\+\+REFLECT\+\_\+\+ENUM}}(chainbase \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler}{sysio\+::chain\+::deep\+\_\+mind\+\_\+handler}} \mbox{\hyperlink{chain__plugin_8cpp_a012f953b2f11a2881c400561bf10cd02}{\+\_\+deep\+\_\+mind\+\_\+log}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{chain__plugin_8cpp_ac96900c0c3efb424647faf59995487d6}\index{chain\_plugin.cpp@{chain\_plugin.cpp}!LOAD\_VALUE\_SET@{LOAD\_VALUE\_SET}}
+\index{LOAD\_VALUE\_SET@{LOAD\_VALUE\_SET}!chain\_plugin.cpp@{chain\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{LOAD\_VALUE\_SET}{LOAD\_VALUE\_SET}}
+{\footnotesize\ttfamily \label{chain__plugin_8cpp_ac96900c0c3efb424647faf59995487d6} 
+\#define LOAD\+\_\+\+VALUE\+\_\+\+SET(\begin{DoxyParamCaption}\item[{}]{options}{, }\item[{}]{op\+\_\+name}{, }\item[{}]{container}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordflow}{if}(\ options.count(op\_name)\ )\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \textcolor{keyword}{const}\ std::vector<std::string>\&\ ops\ =\ options[op\_name].as<std::vector<std::string>>();\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ for(\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ v\ :\ ops\ )\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ container.emplace(\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{sysio::chain::name}}(\ v\ )\ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{chain__plugin_8cpp_source_l00378}{378}} of file \mbox{\hyperlink{chain__plugin_8cpp_source}{chain\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00378\ \textcolor{preprocessor}{\#define\ LOAD\_VALUE\_SET(options,\ op\_name,\ container)\ \(\backslash\)}}
+\DoxyCodeLine{00379\ \textcolor{preprocessor}{if(\ options.count(op\_name)\ )\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00380\ \textcolor{preprocessor}{\ \ \ const\ std::vector<std::string>\&\ ops\ =\ options[op\_name].as<std::vector<std::string>>();\ \(\backslash\)}}
+\DoxyCodeLine{00381\ \textcolor{preprocessor}{\ \ \ for(\ const\ auto\&\ v\ :\ ops\ )\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00382\ \textcolor{preprocessor}{\ \ \ \ \ \ container.emplace(\ sysio::chain::name(\ v\ )\ );\ \(\backslash\)}}
+\DoxyCodeLine{00383\ \textcolor{preprocessor}{\ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00384\ \textcolor{preprocessor}{\}}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{chain__plugin_8cpp_a012f953b2f11a2881c400561bf10cd02}\index{chain\_plugin.cpp@{chain\_plugin.cpp}!\_deep\_mind\_log@{\_deep\_mind\_log}}
+\index{\_deep\_mind\_log@{\_deep\_mind\_log}!chain\_plugin.cpp@{chain\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{\_deep\_mind\_log}{\_deep\_mind\_log}}
+{\footnotesize\ttfamily \label{chain__plugin_8cpp_a012f953b2f11a2881c400561bf10cd02} 
+\mbox{\hyperlink{reflect_8hpp_a3243e9d5f0a24341d7f7e64f9cd525ee}{FC\+\_\+\+REFLECT\+\_\+\+ENUM}} ( \mbox{\hyperlink{structchainbase_1_1environment_a5230c250a35c7d13c3c059e117c54395}{chainbase\+::environment\+::os\+\_\+t}}, (\mbox{\hyperlink{environment_8hpp_a5e55ee7dabe1ec807ab569fc11babbb0ac3724e0358f391346c785d3450532797}{OS\+\_\+\+LINUX}})(\mbox{\hyperlink{environment_8hpp_a5e55ee7dabe1ec807ab569fc11babbb0af1b08c91685e3bc4d30e56dfd468e735}{OS\+\_\+\+MACOS}})(\mbox{\hyperlink{environment_8hpp_a5e55ee7dabe1ec807ab569fc11babbb0a8780f81c6157f670aaa1d4a0f7c15467}{OS\+\_\+\+WINDOWS}})(\mbox{\hyperlink{environment_8hpp_a5e55ee7dabe1ec807ab569fc11babbb0a3d3a12d1d170260bc66459e6437d06cb}{OS\+\_\+\+OTHER}}) ) \mbox{\hyperlink{reflect_8hpp_a3243e9d5f0a24341d7f7e64f9cd525ee}{FC\+\_\+\+REFLECT\+\_\+\+ENUM}}( chainbase \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler}{sysio\+::chain\+::deep\+\_\+mind\+\_\+handler}} \+\_\+deep\+\_\+mind\+\_\+log}
+
+
+
+Definition at line \mbox{\hyperlink{chain__plugin_8cpp_source_l00044}{44}} of file \mbox{\hyperlink{chain__plugin_8cpp_source}{chain\+\_\+plugin.\+cpp}}.
+

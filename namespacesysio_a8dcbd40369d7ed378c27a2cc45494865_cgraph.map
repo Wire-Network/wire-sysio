@@ -1,0 +1,5 @@
+<map id="sysio::is_empty_content" name="sysio::is_empty_content">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,13,169,38"/>
+<area shape="rect" id="Node000002" href="$namespacesysio.html#ab130c0e642be21f97a497e01e3731c89" title="Used to trim whitespace from body. Returned string_view valid only for lifetime of body." alt="" coords="217,5,363,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="169,23,201,23,201,28,169,28"/>
+</map>

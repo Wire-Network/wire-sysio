@@ -1,0 +1,48 @@
+\doxysection{validation.\+hpp}
+\hypertarget{vm_2validation_8hpp_source}{}\label{vm_2validation_8hpp_source}\index{libraries/sys-\/vm/include/sysio/vm/validation.hpp@{libraries/sys-\/vm/include/sysio/vm/validation.hpp}}
+\mbox{\hyperlink{vm_2validation_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{vm_2validation_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{vm_2validation_8hpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{vm_2validation_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <sysio/wasm\_backend/exceptions.hpp>}}
+\DoxyCodeLine{\Hypertarget{vm_2validation_8hpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <sysio/wasm\_backend/utils.hpp>}}
+\DoxyCodeLine{\Hypertarget{vm_2validation_8hpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{vm_2validation_8hpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <array>}}
+\DoxyCodeLine{\Hypertarget{vm_2validation_8hpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <iostream>}}
+\DoxyCodeLine{\Hypertarget{vm_2validation_8hpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{vm_2validation_8hpp_source_l00009}00009\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{\ \textcolor{keyword}{namespace\ }vm\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2validation_8hpp_source_l00010}\mbox{\hyperlink{classsysio_1_1vm_1_1validator}{00010}}\ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1vm_1_1validator}{validator}}\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2validation_8hpp_source_l00011}00011\ \ \ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{vm_2validation_8hpp_source_l00012}00012\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ validate\ limits\ 3.2.1}}
+\DoxyCodeLine{\Hypertarget{vm_2validation_8hpp_source_l00013}\mbox{\hyperlink{classsysio_1_1vm_1_1validator_a2f196e33583ecc3b68e4b90d3f0147e0}{00013}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classsysio_1_1vm_1_1validator_a2f196e33583ecc3b68e4b90d3f0147e0}{validate}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1vm_1_1resizable__limits}{resizable\_limits}}\&\ rl)\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2validation_8hpp_source_l00014}00014\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ rl.\mbox{\hyperlink{structsysio_1_1vm_1_1resizable__limits_a083f54d601560ecfaf1e74c61bdeaa60}{flags}}\ ?\ rl.\mbox{\hyperlink{structsysio_1_1vm_1_1resizable__limits_a906226724c114382f8b153851abd09d0}{maximum}}\ >=\ rl.\mbox{\hyperlink{structsysio_1_1vm_1_1resizable__limits_a6e7ab979dc79fbd6249b482e227bc08b}{initial}}\ :\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{vm_2validation_8hpp_source_l00015}00015\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2validation_8hpp_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{vm_2validation_8hpp_source_l00017}00017\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ validate\ a\ function\ type\ 3.2.2}}
+\DoxyCodeLine{\Hypertarget{vm_2validation_8hpp_source_l00018}\mbox{\hyperlink{classsysio_1_1vm_1_1validator_acda407fd57c347ad399161095cec776d}{00018}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classsysio_1_1vm_1_1validator_acda407fd57c347ad399161095cec776d}{validate}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1vm_1_1func__type}{func\_type}}\&\ ft)\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2validation_8hpp_source_l00019}00019\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (ft.\mbox{\hyperlink{structsysio_1_1vm_1_1func__type_a0dd4bb03c4fb8572ec6ca95fc5d5d139}{return\_count}}\ ==\ 0\ ||\ ft.\mbox{\hyperlink{structsysio_1_1vm_1_1func__type_a0dd4bb03c4fb8572ec6ca95fc5d5d139}{return\_count}}\ ==\ 1);}
+\DoxyCodeLine{\Hypertarget{vm_2validation_8hpp_source_l00020}00020\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2validation_8hpp_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{vm_2validation_8hpp_source_l00022}00022\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ validate\ a\ table\ type\ 3.2.3}}
+\DoxyCodeLine{\Hypertarget{vm_2validation_8hpp_source_l00023}\mbox{\hyperlink{classsysio_1_1vm_1_1validator_aa15a5368d6b261da6ae71b2612c32e2c}{00023}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classsysio_1_1vm_1_1validator_aa15a5368d6b261da6ae71b2612c32e2c}{validate}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1vm_1_1table__type}{table\_type}}\&\ tt)\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2validation_8hpp_source_l00024}00024\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ max\_limit\ =\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})2\ <<\ 32;}
+\DoxyCodeLine{\Hypertarget{vm_2validation_8hpp_source_l00025}00025\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ max\_not\_exceeded\ =\ tt.flags\ ?\ tt.\mbox{\hyperlink{structsysio_1_1vm_1_1table__type_a285a5a12e16d2ea774ee6d28283d6ac2}{limits}}.\mbox{\hyperlink{structsysio_1_1vm_1_1resizable__limits_a906226724c114382f8b153851abd09d0}{maximum}}\ <=\ max\_limit\ :\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{vm_2validation_8hpp_source_l00026}00026\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ tt.\mbox{\hyperlink{structsysio_1_1vm_1_1table__type_a285a5a12e16d2ea774ee6d28283d6ac2}{limits}}.\mbox{\hyperlink{structsysio_1_1vm_1_1resizable__limits_a6e7ab979dc79fbd6249b482e227bc08b}{initial}}\ <=\ max\_limit\ \&\&\ max\_not\_exceeded\ \&\&\ \mbox{\hyperlink{classsysio_1_1vm_1_1validator_a2f196e33583ecc3b68e4b90d3f0147e0}{validate}}(tt.\mbox{\hyperlink{structsysio_1_1vm_1_1table__type_a285a5a12e16d2ea774ee6d28283d6ac2}{limits}});}
+\DoxyCodeLine{\Hypertarget{vm_2validation_8hpp_source_l00027}00027\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2validation_8hpp_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{vm_2validation_8hpp_source_l00029}00029\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ validate\ a\ memory\ type\ 3.2.4}}
+\DoxyCodeLine{\Hypertarget{vm_2validation_8hpp_source_l00030}\mbox{\hyperlink{classsysio_1_1vm_1_1validator_a52c4470d7db7aa44410c21faae1b44e3}{00030}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classsysio_1_1vm_1_1validator_a52c4470d7db7aa44410c21faae1b44e3}{validate}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1vm_1_1memory__type}{memory\_type}}\&\ mt)\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2validation_8hpp_source_l00031}00031\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ max\_limit\ =\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})2\ <<\ 16;}
+\DoxyCodeLine{\Hypertarget{vm_2validation_8hpp_source_l00032}00032\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ max\_not\_exceeded\ =\ mt.flags\ ?\ mt.\mbox{\hyperlink{structsysio_1_1vm_1_1memory__type_a4419b96ff2bce075f2a22267afd5eb97}{limits}}.\mbox{\hyperlink{structsysio_1_1vm_1_1resizable__limits_a906226724c114382f8b153851abd09d0}{maximum}}\ <=\ max\_limit\ :\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{vm_2validation_8hpp_source_l00033}00033\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ mt.\mbox{\hyperlink{structsysio_1_1vm_1_1memory__type_a4419b96ff2bce075f2a22267afd5eb97}{limits}}.\mbox{\hyperlink{structsysio_1_1vm_1_1resizable__limits_a6e7ab979dc79fbd6249b482e227bc08b}{initial}}\ <=\ max\_limit\ \&\&\ max\_not\_exceeded\ \&\&\ \mbox{\hyperlink{classsysio_1_1vm_1_1validator_a2f196e33583ecc3b68e4b90d3f0147e0}{validate}}(mt.\mbox{\hyperlink{structsysio_1_1vm_1_1memory__type_a4419b96ff2bce075f2a22267afd5eb97}{limits}});}
+\DoxyCodeLine{\Hypertarget{vm_2validation_8hpp_source_l00034}00034\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2validation_8hpp_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{vm_2validation_8hpp_source_l00036}00036\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ validate\ a\ global\ type\ 3.2.5}}
+\DoxyCodeLine{\Hypertarget{vm_2validation_8hpp_source_l00037}\mbox{\hyperlink{classsysio_1_1vm_1_1validator_a8feeb40ac1e2e520921255a6d9ca0a9b}{00037}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classsysio_1_1vm_1_1validator_a8feeb40ac1e2e520921255a6d9ca0a9b}{validate}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1vm_1_1global__type}{global\_type}}\&\ gt)\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2validation_8hpp_source_l00038}00038\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{vm_2validation_8hpp_source_l00039}00039\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2validation_8hpp_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{vm_2validation_8hpp_source_l00041}00041\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{vm_2validation_8hpp_source_l00042}00042\ \}\}\ \textcolor{comment}{//\ ns\ sysio::vm}}
+
+\end{DoxyCode}

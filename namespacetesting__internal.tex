@@ -1,0 +1,61 @@
+\doxysection{testing\+\_\+internal Namespace Reference}
+\hypertarget{namespacetesting__internal}{}\label{namespacetesting__internal}\index{testing\_internal@{testing\_internal}}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{namespacetesting__internal_a3f49d3d0c996242f9d383c850097a656}{Default\+Print\+Non\+Container\+To}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}, \+::std\+::ostream \texorpdfstring{$\ast$}{*}os)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacetesting__internal_a3f49d3d0c996242f9d383c850097a656}\index{testing\_internal@{testing\_internal}!DefaultPrintNonContainerTo@{DefaultPrintNonContainerTo}}
+\index{DefaultPrintNonContainerTo@{DefaultPrintNonContainerTo}!testing\_internal@{testing\_internal}}
+\doxysubsubsection{\texorpdfstring{DefaultPrintNonContainerTo()}{DefaultPrintNonContainerTo()}}
+{\footnotesize\ttfamily \label{namespacetesting__internal_a3f49d3d0c996242f9d383c850097a656} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+void testing\+\_\+internal\+::\+Default\+Print\+Non\+Container\+To (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{value}{, }\item[{\+::std\+::ostream \texorpdfstring{$\ast$}{*}}]{os}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-printers_8h_source_l00258}{258}} of file \mbox{\hyperlink{gtest-printers_8h_source}{gtest-\/printers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00258\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00259\ \ \ \textcolor{comment}{//\ With\ the\ following\ statement,\ during\ unqualified\ name\ lookup,}}
+\DoxyCodeLine{00260\ \ \ \textcolor{comment}{//\ testing::internal2::operator<<\ appears\ as\ if\ it\ was\ declared\ in}}
+\DoxyCodeLine{00261\ \ \ \textcolor{comment}{//\ the\ nearest\ enclosing\ namespace\ that\ contains\ both}}
+\DoxyCodeLine{00262\ \ \ \textcolor{comment}{//\ ::testing\_internal\ and\ ::testing::internal2,\ i.e.\ the\ global}}
+\DoxyCodeLine{00263\ \ \ \textcolor{comment}{//\ namespace.\ \ For\ more\ details,\ refer\ to\ the\ C++\ Standard\ section}}
+\DoxyCodeLine{00264\ \ \ \textcolor{comment}{//\ 7.3.4-\/1\ [namespace.udir].\ \ This\ allows\ us\ to\ fall\ back\ onto}}
+\DoxyCodeLine{00265\ \ \ \textcolor{comment}{//\ testing::internal2::operator<<\ in\ case\ T\ doesn't\ come\ with\ a\ <<}}
+\DoxyCodeLine{00266\ \ \ \textcolor{comment}{//\ operator.}}
+\DoxyCodeLine{00267\ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00268\ \ \ \textcolor{comment}{//\ We\ cannot\ write\ 'using\ ::testing::internal2::operator<<;',\ which}}
+\DoxyCodeLine{00269\ \ \ \textcolor{comment}{//\ gcc\ 3.3\ fails\ to\ compile\ due\ to\ a\ compiler\ bug.}}
+\DoxyCodeLine{00270\ \ \ \textcolor{keyword}{using\ namespace\ }::\mbox{\hyperlink{namespacetesting_1_1internal2}{testing::internal2}};\ \ \textcolor{comment}{//\ NOLINT}}
+\DoxyCodeLine{00271\ }
+\DoxyCodeLine{00272\ \ \ \textcolor{comment}{//\ Assuming\ T\ is\ defined\ in\ namespace\ foo,\ in\ the\ next\ statement,}}
+\DoxyCodeLine{00273\ \ \ \textcolor{comment}{//\ the\ compiler\ will\ consider\ all\ of:}}
+\DoxyCodeLine{00274\ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00275\ \ \ \textcolor{comment}{//\ \ \ 1.\ foo::operator<<\ (thanks\ to\ Koenig\ look-\/up),}}
+\DoxyCodeLine{00276\ \ \ \textcolor{comment}{//\ \ \ 2.\ ::operator<<\ (as\ the\ current\ namespace\ is\ enclosed\ in\ ::),}}
+\DoxyCodeLine{00277\ \ \ \textcolor{comment}{//\ \ \ 3.\ testing::internal2::operator<<\ (thanks\ to\ the\ using\ statement\ above).}}
+\DoxyCodeLine{00278\ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00279\ \ \ \textcolor{comment}{//\ The\ operator<<\ whose\ type\ matches\ T\ best\ will\ be\ picked.}}
+\DoxyCodeLine{00280\ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00281\ \ \ \textcolor{comment}{//\ We\ deliberately\ allow\ \#2\ to\ be\ a\ candidate,\ as\ sometimes\ it's}}
+\DoxyCodeLine{00282\ \ \ \textcolor{comment}{//\ impossible\ to\ define\ \#1\ (e.g.\ when\ foo\ is\ ::std,\ defining}}
+\DoxyCodeLine{00283\ \ \ \textcolor{comment}{//\ anything\ in\ it\ is\ undefined\ behavior\ unless\ you\ are\ a\ compiler}}
+\DoxyCodeLine{00284\ \ \ \textcolor{comment}{//\ vendor.).}}
+\DoxyCodeLine{00285\ \ \ *os\ <<\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}};}
+\DoxyCodeLine{00286\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=324pt]{namespacetesting__internal_a3f49d3d0c996242f9d383c850097a656_icgraph}
+\end{center}
+\end{figure}

@@ -1,0 +1,35 @@
+\doxysection{base32.\+cpp}
+\hypertarget{base32_8cpp_source}{}\label{base32_8cpp_source}\index{libraries/fc/src/crypto/base32.cpp@{libraries/fc/src/crypto/base32.cpp}}
+\mbox{\hyperlink{base32_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{base32_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{base32_8hpp}{fc/crypto/base32.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{base32_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <CyoDecode.h>}}
+\DoxyCodeLine{\Hypertarget{base32_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <CyoEncode.h>}}
+\DoxyCodeLine{\Hypertarget{base32_8cpp_source_l00004}00004\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}}
+\DoxyCodeLine{\Hypertarget{base32_8cpp_source_l00005}00005\ \{}
+\DoxyCodeLine{\Hypertarget{base32_8cpp_source_l00006}\mbox{\hyperlink{namespacefc_a7e0ee723a0f5a89960fb483bc6e4b3a3}{00006}}\ \ \ \ \ std::vector<char>\ \mbox{\hyperlink{namespacefc_a7e0ee723a0f5a89960fb483bc6e4b3a3}{from\_base32}}(\ \textcolor{keyword}{const}\ std::string\&\ b32\ )}
+\DoxyCodeLine{\Hypertarget{base32_8cpp_source_l00007}00007\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{base32_8cpp_source_l00008}00008\ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ =\ cyoBase32DecodeGetLength(\ b32.size()\ );}
+\DoxyCodeLine{\Hypertarget{base32_8cpp_source_l00009}00009\ \ \ \ \ \ \ \ std::vector<char>\ v(\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}});}
+\DoxyCodeLine{\Hypertarget{base32_8cpp_source_l00010}00010\ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ =\ cyoBase32Decode(\ v.data(),\ b32.c\_str(),\ b32.size()\ );}
+\DoxyCodeLine{\Hypertarget{base32_8cpp_source_l00011}00011\ \ \ \ \ \ \ \ v.resize(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ );}
+\DoxyCodeLine{\Hypertarget{base32_8cpp_source_l00012}00012\ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ v;}
+\DoxyCodeLine{\Hypertarget{base32_8cpp_source_l00013}00013\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{base32_8cpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{base32_8cpp_source_l00015}\mbox{\hyperlink{namespacefc_ac19e2510f785035f90b6fe9e4d6cc8fa}{00015}}\ \ \ \ \ std::string\ \mbox{\hyperlink{namespacefc_a7d3be19a2b98a8eb765213ec1753c51d}{to\_base32}}(\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ data,\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ )}
+\DoxyCodeLine{\Hypertarget{base32_8cpp_source_l00016}00016\ \ \ \ \ \{\ }
+\DoxyCodeLine{\Hypertarget{base32_8cpp_source_l00017}00017\ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ =\ cyoBase32EncodeGetLength(\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}});}
+\DoxyCodeLine{\Hypertarget{base32_8cpp_source_l00018}00018\ \ \ \ \ \ \ \ std::vector<char>\ b32;}
+\DoxyCodeLine{\Hypertarget{base32_8cpp_source_l00019}00019\ \ \ \ \ \ \ \ b32.resize(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{\Hypertarget{base32_8cpp_source_l00020}00020\ \ \ \ \ \ \ \ cyoBase32Encode(\ b32.data(),\ data,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ );}
+\DoxyCodeLine{\Hypertarget{base32_8cpp_source_l00021}00021\ \ \ \ \ \ \ \ b32.resize(\ b32.size()-\/1);\ \textcolor{comment}{//\ strip\ the\ nullterm}}
+\DoxyCodeLine{\Hypertarget{base32_8cpp_source_l00022}00022\ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::string(b32.begin(),b32.end());}
+\DoxyCodeLine{\Hypertarget{base32_8cpp_source_l00023}00023\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{base32_8cpp_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{base32_8cpp_source_l00025}\mbox{\hyperlink{namespacefc_a7d3be19a2b98a8eb765213ec1753c51d}{00025}}\ \ \ \ \ std::string\ \mbox{\hyperlink{namespacefc_a7d3be19a2b98a8eb765213ec1753c51d}{to\_base32}}(\ \textcolor{keyword}{const}\ std::vector<char>\&\ vec\ )}
+\DoxyCodeLine{\Hypertarget{base32_8cpp_source_l00026}00026\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{base32_8cpp_source_l00027}00027\ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_a7d3be19a2b98a8eb765213ec1753c51d}{to\_base32}}(\ vec.data(),\ vec.size()\ );}
+\DoxyCodeLine{\Hypertarget{base32_8cpp_source_l00028}00028\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{base32_8cpp_source_l00029}00029\ \}}
+
+\end{DoxyCode}

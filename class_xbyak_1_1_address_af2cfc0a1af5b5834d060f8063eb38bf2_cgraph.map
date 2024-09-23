@@ -1,0 +1,9 @@
+<map id="Xbyak::Address::is32bit" name="Xbyak::Address::is32bit">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,55,166,80"/>
+<area shape="rect" id="Node000002" href="$class_xbyak_1_1_reg_exp.html#a05a62626805e525926499d900adfbb04" title=" " alt="" coords="215,5,384,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="144,51,225,32,226,38,145,57"/>
+<area shape="rect" id="Node000003" href="$class_xbyak_1_1_operand.html#ab855bd6658a3e238422d2bcf81f96873" title=" " alt="" coords="221,55,378,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="166,65,205,65,205,70,166,70"/>
+<area shape="rect" id="Node000004" href="$class_xbyak_1_1_reg_exp.html#af884a8375c52991c759e48c7098ea9b6" title=" " alt="" coords="214,104,385,130"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="145,78,226,97,225,103,144,84"/>
+</map>

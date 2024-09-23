@@ -1,0 +1,230 @@
+\doxysection{yubihsm\+\_\+pkcs11\+\_\+object\+\_\+template Struct Reference}
+\hypertarget{structyubihsm__pkcs11__object__template}{}\label{structyubihsm__pkcs11__object__template}\index{yubihsm\_pkcs11\_object\_template@{yubihsm\_pkcs11\_object\_template}}
+
+
+{\ttfamily \#include $<$yubihsm\+\_\+pkcs11.\+h$>$}
+
+
+
+Collaboration diagram for yubihsm\+\_\+pkcs11\+\_\+object\+\_\+template\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=201pt]{structyubihsm__pkcs11__object__template__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{yubihsm_8h_a498937b5a72accbb0ef21bb1dcdd55ca}{yh\+\_\+algorithm}} \mbox{\hyperlink{structyubihsm__pkcs11__object__template_ad180a15b1f1a790679f9e5af6716b191}{algorithm}}
+\item 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{structyubihsm__pkcs11__object__template_ad1b0e5ec887cae21e37a4b852a66727a}{id}}
+\item 
+char \mbox{\hyperlink{structyubihsm__pkcs11__object__template_a22edd3acceb711249d7593e73ad0d7f3}{label}} \mbox{[}\mbox{\hyperlink{yubihsm_8h_a431f8b753552a8b2f5f980e871b6d019}{YH\+\_\+\+OBJ\+\_\+\+LABEL\+\_\+\+LEN}}+1\mbox{]}
+\item 
+\mbox{\hyperlink{yubihsm__pkcs11_8h_ade78776cf4e2dd3e25c4170aeb4edc63}{yubihsm\+\_\+pkcs11\+\_\+attribute}} \mbox{\hyperlink{structyubihsm__pkcs11__object__template_a10f570d27a0e5b375f3e5e32f09c2c84}{sign}}
+\item 
+\mbox{\hyperlink{yubihsm__pkcs11_8h_ade78776cf4e2dd3e25c4170aeb4edc63}{yubihsm\+\_\+pkcs11\+\_\+attribute}} \mbox{\hyperlink{structyubihsm__pkcs11__object__template_a9a386dfe41e927efc0796adcfdcda5a7}{encrypt}}
+\item 
+\mbox{\hyperlink{yubihsm__pkcs11_8h_ade78776cf4e2dd3e25c4170aeb4edc63}{yubihsm\+\_\+pkcs11\+\_\+attribute}} \mbox{\hyperlink{structyubihsm__pkcs11__object__template_a11816ed4ec4908d99d1fc35935f4bf52}{decrypt}}
+\item 
+\mbox{\hyperlink{yubihsm__pkcs11_8h_ade78776cf4e2dd3e25c4170aeb4edc63}{yubihsm\+\_\+pkcs11\+\_\+attribute}} \mbox{\hyperlink{structyubihsm__pkcs11__object__template_a42d6ff195518eae194d4ca0abd64301f}{derive}}
+\item 
+\mbox{\hyperlink{yubihsm__pkcs11_8h_ade78776cf4e2dd3e25c4170aeb4edc63}{yubihsm\+\_\+pkcs11\+\_\+attribute}} \mbox{\hyperlink{structyubihsm__pkcs11__object__template_a30a6882cb36864acc3e27baaf38ff0f1}{exportable}}
+\item 
+\mbox{\hyperlink{yubihsm__pkcs11_8h_ade78776cf4e2dd3e25c4170aeb4edc63}{yubihsm\+\_\+pkcs11\+\_\+attribute}} \mbox{\hyperlink{structyubihsm__pkcs11__object__template_a81add48bb33e8bb51a7f1047ec451baa}{verify}}
+\item 
+\mbox{\hyperlink{yubihsm__pkcs11_8h_ade78776cf4e2dd3e25c4170aeb4edc63}{yubihsm\+\_\+pkcs11\+\_\+attribute}} \mbox{\hyperlink{structyubihsm__pkcs11__object__template_a139e6333451b0bd3b6ab6f347c3ecede}{wrap}}
+\item 
+\mbox{\hyperlink{yubihsm__pkcs11_8h_ade78776cf4e2dd3e25c4170aeb4edc63}{yubihsm\+\_\+pkcs11\+\_\+attribute}} \mbox{\hyperlink{structyubihsm__pkcs11__object__template_ab25f77df8d63b4e988b4b3cc6daa973c}{unwrap}}
+\item 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{structyubihsm__pkcs11__object__template_aee63938d6c8d1867137146053020d61a}{objlen}}
+\item 
+\begin{tabbing}
+xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=\kill
+union \{\\
+\>struct \{\\
+\>\>\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structyubihsm__pkcs11__object__template_ad17b99aa7167b5cf6f3043dbcad2c6fb}{p}}\\
+\>\>\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structyubihsm__pkcs11__object__template_aa2f3438431816566b54371461779b95a}{q}}\\
+\>\} \mbox{\hyperlink{structyubihsm__pkcs11__object__template_a63b0dbd1182e372d6a05a5321fe0bd0e}{rsa}}\\
+\>\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structyubihsm__pkcs11__object__template_acbc6f8ad9110ca09d862eaf06691897b}{buf}}\\
+\} \mbox{\hyperlink{structyubihsm__pkcs11__object__template_aa7e23493c41030819bd65ab687c604a7}{obj}}\\
+
+\end{tabbing}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8h_source_l00177}{177}} of file \mbox{\hyperlink{yubihsm__pkcs11_8h_source}{yubihsm\+\_\+pkcs11.\+h}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structyubihsm__pkcs11__object__template_ad180a15b1f1a790679f9e5af6716b191}\index{yubihsm\_pkcs11\_object\_template@{yubihsm\_pkcs11\_object\_template}!algorithm@{algorithm}}
+\index{algorithm@{algorithm}!yubihsm\_pkcs11\_object\_template@{yubihsm\_pkcs11\_object\_template}}
+\doxysubsubsection{\texorpdfstring{algorithm}{algorithm}}
+{\footnotesize\ttfamily \label{structyubihsm__pkcs11__object__template_ad180a15b1f1a790679f9e5af6716b191} 
+\mbox{\hyperlink{yubihsm_8h_a498937b5a72accbb0ef21bb1dcdd55ca}{yh\+\_\+algorithm}} yubihsm\+\_\+pkcs11\+\_\+object\+\_\+template\+::algorithm}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8h_source_l00178}{178}} of file \mbox{\hyperlink{yubihsm__pkcs11_8h_source}{yubihsm\+\_\+pkcs11.\+h}}.
+
+\Hypertarget{structyubihsm__pkcs11__object__template_acbc6f8ad9110ca09d862eaf06691897b}\index{yubihsm\_pkcs11\_object\_template@{yubihsm\_pkcs11\_object\_template}!buf@{buf}}
+\index{buf@{buf}!yubihsm\_pkcs11\_object\_template@{yubihsm\_pkcs11\_object\_template}}
+\doxysubsubsection{\texorpdfstring{buf}{buf}}
+{\footnotesize\ttfamily \label{structyubihsm__pkcs11__object__template_acbc6f8ad9110ca09d862eaf06691897b} 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}}\texorpdfstring{$\ast$}{*} yubihsm\+\_\+pkcs11\+\_\+object\+\_\+template\+::buf}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8h_source_l00195}{195}} of file \mbox{\hyperlink{yubihsm__pkcs11_8h_source}{yubihsm\+\_\+pkcs11.\+h}}.
+
+\Hypertarget{structyubihsm__pkcs11__object__template_a11816ed4ec4908d99d1fc35935f4bf52}\index{yubihsm\_pkcs11\_object\_template@{yubihsm\_pkcs11\_object\_template}!decrypt@{decrypt}}
+\index{decrypt@{decrypt}!yubihsm\_pkcs11\_object\_template@{yubihsm\_pkcs11\_object\_template}}
+\doxysubsubsection{\texorpdfstring{decrypt}{decrypt}}
+{\footnotesize\ttfamily \label{structyubihsm__pkcs11__object__template_a11816ed4ec4908d99d1fc35935f4bf52} 
+\mbox{\hyperlink{yubihsm__pkcs11_8h_ade78776cf4e2dd3e25c4170aeb4edc63}{yubihsm\+\_\+pkcs11\+\_\+attribute}} yubihsm\+\_\+pkcs11\+\_\+object\+\_\+template\+::decrypt}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8h_source_l00183}{183}} of file \mbox{\hyperlink{yubihsm__pkcs11_8h_source}{yubihsm\+\_\+pkcs11.\+h}}.
+
+\Hypertarget{structyubihsm__pkcs11__object__template_a42d6ff195518eae194d4ca0abd64301f}\index{yubihsm\_pkcs11\_object\_template@{yubihsm\_pkcs11\_object\_template}!derive@{derive}}
+\index{derive@{derive}!yubihsm\_pkcs11\_object\_template@{yubihsm\_pkcs11\_object\_template}}
+\doxysubsubsection{\texorpdfstring{derive}{derive}}
+{\footnotesize\ttfamily \label{structyubihsm__pkcs11__object__template_a42d6ff195518eae194d4ca0abd64301f} 
+\mbox{\hyperlink{yubihsm__pkcs11_8h_ade78776cf4e2dd3e25c4170aeb4edc63}{yubihsm\+\_\+pkcs11\+\_\+attribute}} yubihsm\+\_\+pkcs11\+\_\+object\+\_\+template\+::derive}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8h_source_l00184}{184}} of file \mbox{\hyperlink{yubihsm__pkcs11_8h_source}{yubihsm\+\_\+pkcs11.\+h}}.
+
+\Hypertarget{structyubihsm__pkcs11__object__template_a9a386dfe41e927efc0796adcfdcda5a7}\index{yubihsm\_pkcs11\_object\_template@{yubihsm\_pkcs11\_object\_template}!encrypt@{encrypt}}
+\index{encrypt@{encrypt}!yubihsm\_pkcs11\_object\_template@{yubihsm\_pkcs11\_object\_template}}
+\doxysubsubsection{\texorpdfstring{encrypt}{encrypt}}
+{\footnotesize\ttfamily \label{structyubihsm__pkcs11__object__template_a9a386dfe41e927efc0796adcfdcda5a7} 
+\mbox{\hyperlink{yubihsm__pkcs11_8h_ade78776cf4e2dd3e25c4170aeb4edc63}{yubihsm\+\_\+pkcs11\+\_\+attribute}} yubihsm\+\_\+pkcs11\+\_\+object\+\_\+template\+::encrypt}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8h_source_l00182}{182}} of file \mbox{\hyperlink{yubihsm__pkcs11_8h_source}{yubihsm\+\_\+pkcs11.\+h}}.
+
+\Hypertarget{structyubihsm__pkcs11__object__template_a30a6882cb36864acc3e27baaf38ff0f1}\index{yubihsm\_pkcs11\_object\_template@{yubihsm\_pkcs11\_object\_template}!exportable@{exportable}}
+\index{exportable@{exportable}!yubihsm\_pkcs11\_object\_template@{yubihsm\_pkcs11\_object\_template}}
+\doxysubsubsection{\texorpdfstring{exportable}{exportable}}
+{\footnotesize\ttfamily \label{structyubihsm__pkcs11__object__template_a30a6882cb36864acc3e27baaf38ff0f1} 
+\mbox{\hyperlink{yubihsm__pkcs11_8h_ade78776cf4e2dd3e25c4170aeb4edc63}{yubihsm\+\_\+pkcs11\+\_\+attribute}} yubihsm\+\_\+pkcs11\+\_\+object\+\_\+template\+::exportable}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8h_source_l00185}{185}} of file \mbox{\hyperlink{yubihsm__pkcs11_8h_source}{yubihsm\+\_\+pkcs11.\+h}}.
+
+\Hypertarget{structyubihsm__pkcs11__object__template_ad1b0e5ec887cae21e37a4b852a66727a}\index{yubihsm\_pkcs11\_object\_template@{yubihsm\_pkcs11\_object\_template}!id@{id}}
+\index{id@{id}!yubihsm\_pkcs11\_object\_template@{yubihsm\_pkcs11\_object\_template}}
+\doxysubsubsection{\texorpdfstring{id}{id}}
+{\footnotesize\ttfamily \label{structyubihsm__pkcs11__object__template_ad1b0e5ec887cae21e37a4b852a66727a} 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} yubihsm\+\_\+pkcs11\+\_\+object\+\_\+template\+::id}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8h_source_l00179}{179}} of file \mbox{\hyperlink{yubihsm__pkcs11_8h_source}{yubihsm\+\_\+pkcs11.\+h}}.
+
+\Hypertarget{structyubihsm__pkcs11__object__template_a22edd3acceb711249d7593e73ad0d7f3}\index{yubihsm\_pkcs11\_object\_template@{yubihsm\_pkcs11\_object\_template}!label@{label}}
+\index{label@{label}!yubihsm\_pkcs11\_object\_template@{yubihsm\_pkcs11\_object\_template}}
+\doxysubsubsection{\texorpdfstring{label}{label}}
+{\footnotesize\ttfamily \label{structyubihsm__pkcs11__object__template_a22edd3acceb711249d7593e73ad0d7f3} 
+char yubihsm\+\_\+pkcs11\+\_\+object\+\_\+template\+::label\mbox{[}\mbox{\hyperlink{yubihsm_8h_a431f8b753552a8b2f5f980e871b6d019}{YH\+\_\+\+OBJ\+\_\+\+LABEL\+\_\+\+LEN}}+1\mbox{]}}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8h_source_l00180}{180}} of file \mbox{\hyperlink{yubihsm__pkcs11_8h_source}{yubihsm\+\_\+pkcs11.\+h}}.
+
+\Hypertarget{structyubihsm__pkcs11__object__template_aa7e23493c41030819bd65ab687c604a7}\index{yubihsm\_pkcs11\_object\_template@{yubihsm\_pkcs11\_object\_template}!obj@{obj}}
+\index{obj@{obj}!yubihsm\_pkcs11\_object\_template@{yubihsm\_pkcs11\_object\_template}}
+\doxysubsubsection{\texorpdfstring{[union]}{[union]}}
+{\footnotesize\ttfamily \label{structyubihsm__pkcs11__object__template_aa7e23493c41030819bd65ab687c604a7} 
+union  \{ ... \}  yubihsm\+\_\+pkcs11\+\_\+object\+\_\+template\+::obj}
+
+\Hypertarget{structyubihsm__pkcs11__object__template_aee63938d6c8d1867137146053020d61a}\index{yubihsm\_pkcs11\_object\_template@{yubihsm\_pkcs11\_object\_template}!objlen@{objlen}}
+\index{objlen@{objlen}!yubihsm\_pkcs11\_object\_template@{yubihsm\_pkcs11\_object\_template}}
+\doxysubsubsection{\texorpdfstring{objlen}{objlen}}
+{\footnotesize\ttfamily \label{structyubihsm__pkcs11__object__template_aee63938d6c8d1867137146053020d61a} 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} yubihsm\+\_\+pkcs11\+\_\+object\+\_\+template\+::objlen}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8h_source_l00189}{189}} of file \mbox{\hyperlink{yubihsm__pkcs11_8h_source}{yubihsm\+\_\+pkcs11.\+h}}.
+
+\Hypertarget{structyubihsm__pkcs11__object__template_ad17b99aa7167b5cf6f3043dbcad2c6fb}\index{yubihsm\_pkcs11\_object\_template@{yubihsm\_pkcs11\_object\_template}!p@{p}}
+\index{p@{p}!yubihsm\_pkcs11\_object\_template@{yubihsm\_pkcs11\_object\_template}}
+\doxysubsubsection{\texorpdfstring{p}{p}}
+{\footnotesize\ttfamily \label{structyubihsm__pkcs11__object__template_ad17b99aa7167b5cf6f3043dbcad2c6fb} 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}}\texorpdfstring{$\ast$}{*} yubihsm\+\_\+pkcs11\+\_\+object\+\_\+template\+::p}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8h_source_l00192}{192}} of file \mbox{\hyperlink{yubihsm__pkcs11_8h_source}{yubihsm\+\_\+pkcs11.\+h}}.
+
+\Hypertarget{structyubihsm__pkcs11__object__template_aa2f3438431816566b54371461779b95a}\index{yubihsm\_pkcs11\_object\_template@{yubihsm\_pkcs11\_object\_template}!q@{q}}
+\index{q@{q}!yubihsm\_pkcs11\_object\_template@{yubihsm\_pkcs11\_object\_template}}
+\doxysubsubsection{\texorpdfstring{q}{q}}
+{\footnotesize\ttfamily \label{structyubihsm__pkcs11__object__template_aa2f3438431816566b54371461779b95a} 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}}\texorpdfstring{$\ast$}{*} yubihsm\+\_\+pkcs11\+\_\+object\+\_\+template\+::q}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8h_source_l00193}{193}} of file \mbox{\hyperlink{yubihsm__pkcs11_8h_source}{yubihsm\+\_\+pkcs11.\+h}}.
+
+\Hypertarget{structyubihsm__pkcs11__object__template_a63b0dbd1182e372d6a05a5321fe0bd0e}\index{yubihsm\_pkcs11\_object\_template@{yubihsm\_pkcs11\_object\_template}!rsa@{rsa}}
+\index{rsa@{rsa}!yubihsm\_pkcs11\_object\_template@{yubihsm\_pkcs11\_object\_template}}
+\doxysubsubsection{\texorpdfstring{[struct]}{[struct]}}
+{\footnotesize\ttfamily \label{structyubihsm__pkcs11__object__template_a63b0dbd1182e372d6a05a5321fe0bd0e} 
+struct  \{ ... \}  yubihsm\+\_\+pkcs11\+\_\+object\+\_\+template\+::rsa}
+
+\Hypertarget{structyubihsm__pkcs11__object__template_a10f570d27a0e5b375f3e5e32f09c2c84}\index{yubihsm\_pkcs11\_object\_template@{yubihsm\_pkcs11\_object\_template}!sign@{sign}}
+\index{sign@{sign}!yubihsm\_pkcs11\_object\_template@{yubihsm\_pkcs11\_object\_template}}
+\doxysubsubsection{\texorpdfstring{sign}{sign}}
+{\footnotesize\ttfamily \label{structyubihsm__pkcs11__object__template_a10f570d27a0e5b375f3e5e32f09c2c84} 
+\mbox{\hyperlink{yubihsm__pkcs11_8h_ade78776cf4e2dd3e25c4170aeb4edc63}{yubihsm\+\_\+pkcs11\+\_\+attribute}} yubihsm\+\_\+pkcs11\+\_\+object\+\_\+template\+::sign}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8h_source_l00181}{181}} of file \mbox{\hyperlink{yubihsm__pkcs11_8h_source}{yubihsm\+\_\+pkcs11.\+h}}.
+
+\Hypertarget{structyubihsm__pkcs11__object__template_ab25f77df8d63b4e988b4b3cc6daa973c}\index{yubihsm\_pkcs11\_object\_template@{yubihsm\_pkcs11\_object\_template}!unwrap@{unwrap}}
+\index{unwrap@{unwrap}!yubihsm\_pkcs11\_object\_template@{yubihsm\_pkcs11\_object\_template}}
+\doxysubsubsection{\texorpdfstring{unwrap}{unwrap}}
+{\footnotesize\ttfamily \label{structyubihsm__pkcs11__object__template_ab25f77df8d63b4e988b4b3cc6daa973c} 
+\mbox{\hyperlink{yubihsm__pkcs11_8h_ade78776cf4e2dd3e25c4170aeb4edc63}{yubihsm\+\_\+pkcs11\+\_\+attribute}} yubihsm\+\_\+pkcs11\+\_\+object\+\_\+template\+::unwrap}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8h_source_l00188}{188}} of file \mbox{\hyperlink{yubihsm__pkcs11_8h_source}{yubihsm\+\_\+pkcs11.\+h}}.
+
+\Hypertarget{structyubihsm__pkcs11__object__template_a81add48bb33e8bb51a7f1047ec451baa}\index{yubihsm\_pkcs11\_object\_template@{yubihsm\_pkcs11\_object\_template}!verify@{verify}}
+\index{verify@{verify}!yubihsm\_pkcs11\_object\_template@{yubihsm\_pkcs11\_object\_template}}
+\doxysubsubsection{\texorpdfstring{verify}{verify}}
+{\footnotesize\ttfamily \label{structyubihsm__pkcs11__object__template_a81add48bb33e8bb51a7f1047ec451baa} 
+\mbox{\hyperlink{yubihsm__pkcs11_8h_ade78776cf4e2dd3e25c4170aeb4edc63}{yubihsm\+\_\+pkcs11\+\_\+attribute}} yubihsm\+\_\+pkcs11\+\_\+object\+\_\+template\+::verify}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8h_source_l00186}{186}} of file \mbox{\hyperlink{yubihsm__pkcs11_8h_source}{yubihsm\+\_\+pkcs11.\+h}}.
+
+\Hypertarget{structyubihsm__pkcs11__object__template_a139e6333451b0bd3b6ab6f347c3ecede}\index{yubihsm\_pkcs11\_object\_template@{yubihsm\_pkcs11\_object\_template}!wrap@{wrap}}
+\index{wrap@{wrap}!yubihsm\_pkcs11\_object\_template@{yubihsm\_pkcs11\_object\_template}}
+\doxysubsubsection{\texorpdfstring{wrap}{wrap}}
+{\footnotesize\ttfamily \label{structyubihsm__pkcs11__object__template_a139e6333451b0bd3b6ab6f347c3ecede} 
+\mbox{\hyperlink{yubihsm__pkcs11_8h_ade78776cf4e2dd3e25c4170aeb4edc63}{yubihsm\+\_\+pkcs11\+\_\+attribute}} yubihsm\+\_\+pkcs11\+\_\+object\+\_\+template\+::wrap}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8h_source_l00187}{187}} of file \mbox{\hyperlink{yubihsm__pkcs11_8h_source}{yubihsm\+\_\+pkcs11.\+h}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/yubihsm/pkcs11/\mbox{\hyperlink{yubihsm__pkcs11_8h}{yubihsm\+\_\+pkcs11.\+h}}\end{DoxyCompactItemize}

@@ -1,0 +1,183 @@
+\doxysection{libraries/fc/libraries/ff/depends/ate-\/pairing/include/bn.h File Reference}
+\hypertarget{bn_8h}{}\label{bn_8h}\index{libraries/fc/libraries/ff/depends/ate-\/pairing/include/bn.h@{libraries/fc/libraries/ff/depends/ate-\/pairing/include/bn.h}}
+
+
+BN parameter.  
+
+
+{\ttfamily \#include $<$stdexcept$>$}\newline
+{\ttfamily \#include $<$vector$>$}\newline
+{\ttfamily \#include "{}zm2.\+h"{}}\newline
+Include dependency graph for bn.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{bn_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{bn_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structbn_1_1_curve_param}{bn\+::\+Curve\+Param}}
+\item 
+struct \mbox{\hyperlink{structbn_1_1_param_t}{bn\+::\+Param\+T$<$ Fp2 $>$}}
+\item 
+struct \mbox{\hyperlink{structbn_1_1_fp2_t}{bn\+::\+Fp2\+T$<$ T $>$}}
+\item 
+struct \mbox{\hyperlink{structbn_1_1_fp2_t_1_1_dbl}{bn\+::\+Fp2\+T$<$ T $>$\+::\+Dbl}}
+\item 
+struct \mbox{\hyperlink{structbn_1_1_fp6_t}{bn\+::\+Fp6\+T$<$ T $>$}}
+\item 
+struct \mbox{\hyperlink{structbn_1_1_fp6_t_1_1_dbl}{bn\+::\+Fp6\+T$<$ T $>$\+::\+Dbl}}
+\item 
+struct \mbox{\hyperlink{structbn_1_1_fp12_t}{bn\+::\+Fp12\+T$<$ T $>$}}
+\item 
+struct \mbox{\hyperlink{structbn_1_1_fp12_t_1_1_dbl}{bn\+::\+Fp12\+T$<$ T $>$\+::\+Dbl}}
+\item 
+struct \mbox{\hyperlink{structbn_1_1_compress_t}{bn\+::\+Compress\+T$<$ T $>$}}
+\item 
+class \mbox{\hyperlink{classbn_1_1_ec_t}{bn\+::\+Ec\+T$<$ T $>$}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacebn}{bn}}
+\item 
+namespace \mbox{\hyperlink{namespacebn_1_1util}{bn\+::util}}
+\item 
+namespace \mbox{\hyperlink{namespacebn_1_1ecop}{bn\+::ecop}}
+\item 
+namespace \mbox{\hyperlink{namespacebn_1_1components}{bn\+::components}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{classmie_1_1_fp}{mie\+::\+Fp}} \mbox{\hyperlink{namespacebn_a790c0215583382a829e202ecb0c844b9}{bn\+::\+Fp}}
+\item 
+typedef \mbox{\hyperlink{structmie_1_1_fp_1_1_dbl}{Fp\+::\+Dbl}} \mbox{\hyperlink{namespacebn_a108fd401ab8feb8cfeb72d21f53e0d65}{bn\+::\+Fp\+Dbl}}
+\item 
+typedef \mbox{\hyperlink{structbn_1_1_fp2_t}{Fp2T}}$<$ \mbox{\hyperlink{namespacebn_a790c0215583382a829e202ecb0c844b9}{Fp}} $>$ \mbox{\hyperlink{namespacebn_afe11bd65aac84b50b31d9984d059be92}{bn\+::\+Fp2}}
+\item 
+typedef \mbox{\hyperlink{structbn_1_1_fp2_t_1_1_dbl}{Fp2\+::\+Dbl}} \mbox{\hyperlink{namespacebn_ad3e390e1cb6f311b307dee64c68aadb4}{bn\+::\+Fp2\+Dbl}}
+\item 
+typedef \mbox{\hyperlink{structbn_1_1_param_t}{ParamT}}$<$ \mbox{\hyperlink{namespacebn_afe11bd65aac84b50b31d9984d059be92}{Fp2}} $>$ \mbox{\hyperlink{namespacebn_a59a3b06a556a5311a60c3c60a72b1c3d}{bn\+::\+Param}}
+\item 
+typedef \mbox{\hyperlink{structbn_1_1_fp6_t}{Fp6T}}$<$ \mbox{\hyperlink{namespacebn_afe11bd65aac84b50b31d9984d059be92}{Fp2}} $>$ \mbox{\hyperlink{namespacebn_a011312b1273d2b6f5d88762678205814}{bn\+::\+Fp6}}
+\item 
+typedef \mbox{\hyperlink{structbn_1_1_fp6_t_1_1_dbl}{Fp6\+::\+Dbl}} \mbox{\hyperlink{namespacebn_aa8fa256677ee027cd9f59d7ca4db5827}{bn\+::\+Fp6\+Dbl}}
+\item 
+typedef \mbox{\hyperlink{structbn_1_1_fp12_t}{Fp12T}}$<$ \mbox{\hyperlink{namespacebn_a011312b1273d2b6f5d88762678205814}{Fp6}} $>$ \mbox{\hyperlink{namespacebn_abd6ddb9ecff5d59c093581706e088644}{bn\+::\+Fp12}}
+\item 
+typedef \mbox{\hyperlink{structbn_1_1_fp12_t_1_1_dbl}{Fp12\+::\+Dbl}} \mbox{\hyperlink{namespacebn_ab6e4ac3f7615f652b11db01e7211ccc2}{bn\+::\+Fp12\+Dbl}}
+\item 
+typedef \mbox{\hyperlink{structbn_1_1_compress_t}{CompressT}}$<$ \mbox{\hyperlink{namespacebn_afe11bd65aac84b50b31d9984d059be92}{Fp2}} $>$ \mbox{\hyperlink{namespacebn_a33c5feb59354e0c881aae7d1decf29ae}{bn\+::\+Compress}}
+\item 
+typedef \mbox{\hyperlink{classbn_1_1_ec_t}{EcT}}$<$ \mbox{\hyperlink{namespacebn_afe11bd65aac84b50b31d9984d059be92}{Fp2}} $>$ \mbox{\hyperlink{namespacebn_ab9c11a8074c768f1149f5bdc7332a8c5}{bn\+::\+Ec2}}
+\item 
+typedef \mbox{\hyperlink{classbn_1_1_ec_t}{EcT}}$<$ \mbox{\hyperlink{namespacebn_a790c0215583382a829e202ecb0c844b9}{Fp}} $>$ \mbox{\hyperlink{namespacebn_ae14c8fdf84d628aae3b455d439782b56}{bn\+::\+Ec1}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{namespacebn_1_1util_a4ce0db4bf4403a450d267da071f68c81}{bn\+::util\+::put}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&x, size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{namespacebn_1_1util_af2f98ef7a7e2ba7b4b90ac778655ccd9}{bn\+::util\+::put}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&x)
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} Vec $>$ }\\void \mbox{\hyperlink{namespacebn_1_1util_a4dacd912645a2f4db3c0f9bace8ce4ca}{bn\+::util\+::convert\+To\+Binary}} (Vec \&v, const \mbox{\hyperlink{namespacemie_ac62ddfee233ba71d08dc91a1924d4b74}{mie\+::\+Vuint}} \&x)
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} Vec $>$ }\\size\+\_\+t \mbox{\hyperlink{namespacebn_1_1util_ac9ed3fc4cd8a3692d51b6521a67515dd}{bn\+::util\+::get\+Continuous\+Val}} (const Vec \&v, size\+\_\+t pos, int val)
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} Vec $>$ }\\void \mbox{\hyperlink{namespacebn_1_1util_aca7d045894f979d940fd6cff431c767c}{bn\+::util\+::convert\+To\+NAF}} (Vec \&v, const Vec \&in)
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} Vec $>$ }\\size\+\_\+t \mbox{\hyperlink{namespacebn_1_1util_ab00095c4a358927bf1a9ea90685bb335}{bn\+::util\+::get\+Num\+Of\+Non\+Zero\+Element}} (const Vec \&v)
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} Vec $>$ }\\bool \mbox{\hyperlink{namespacebn_1_1util_a6fcaf0f6e5263aaa409645319491bcec}{bn\+::util\+::get\+Good\+Repl}} (Vec \&v, const \mbox{\hyperlink{namespacemie_ac62ddfee233ba71d08dc91a1924d4b74}{mie\+::\+Vuint}} \&x)
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} F , \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} G $>$ }\\void \mbox{\hyperlink{namespacebn_af7516ecad2a315b7ba3d004de3bc7daf}{bn\+::mul\+\_\+gamma\+\_\+add}} (F \&z, const F \&x, const F \&y)
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} FF $>$ }\\void \mbox{\hyperlink{namespacebn_1_1ecop_a4a6928bb915f1eef461635202d2e4c30}{bn\+::ecop\+::copy}} (FF \texorpdfstring{$\ast$}{*}out, const FF \texorpdfstring{$\ast$}{*}in)
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{namespacebn_a790c0215583382a829e202ecb0c844b9}{Fp}} $>$ }\\bool \mbox{\hyperlink{namespacebn_1_1ecop_ac76cf4f8f7e83e3c53c6b2b3f45700ee}{bn\+::ecop\+::is\+On\+ECJac3}} (const \mbox{\hyperlink{namespacebn_a790c0215583382a829e202ecb0c844b9}{Fp}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}})
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{namespacebn_a790c0215583382a829e202ecb0c844b9}{Fp}} $>$ }\\bool \mbox{\hyperlink{namespacebn_1_1ecop_adc1ce153dfcdd38bae1d6646c3ee5b84}{bn\+::ecop\+::is\+On\+ECHom2}} (const \mbox{\hyperlink{namespacebn_a790c0215583382a829e202ecb0c844b9}{Fp}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}})
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{namespacebn_a790c0215583382a829e202ecb0c844b9}{Fp}} $>$ }\\bool \mbox{\hyperlink{namespacebn_1_1ecop_a3df243e12e6038ced4f4f9e1d8ff7c95}{bn\+::ecop\+::is\+On\+ECHom3}} (const \mbox{\hyperlink{namespacebn_a790c0215583382a829e202ecb0c844b9}{Fp}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}})
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{namespacebn_a790c0215583382a829e202ecb0c844b9}{Fp}} $>$ }\\bool \mbox{\hyperlink{namespacebn_1_1ecop_a36b62fbe733f8af0f7d63c7c4c4cbe4f}{bn\+::ecop\+::is\+On\+Twist\+ECJac3}} (const \mbox{\hyperlink{structbn_1_1_fp2_t}{Fp2T}}$<$ \mbox{\hyperlink{namespacebn_a790c0215583382a829e202ecb0c844b9}{Fp}} $>$ \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}})
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{namespacebn_a790c0215583382a829e202ecb0c844b9}{Fp}} $>$ }\\bool \mbox{\hyperlink{namespacebn_1_1ecop_a7a25cfef9f1e645bf711765eff7e6e55}{bn\+::ecop\+::is\+On\+Twist\+ECHom2}} (const \mbox{\hyperlink{structbn_1_1_fp2_t}{Fp2T}}$<$ \mbox{\hyperlink{namespacebn_a790c0215583382a829e202ecb0c844b9}{Fp}} $>$ \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}})
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{namespacebn_a790c0215583382a829e202ecb0c844b9}{Fp}} $>$ }\\bool \mbox{\hyperlink{namespacebn_1_1ecop_a644743b0d0e18276a67ff5fd41599139}{bn\+::ecop\+::is\+On\+Twist\+ECHom3}} (const \mbox{\hyperlink{structbn_1_1_fp2_t}{Fp2T}}$<$ \mbox{\hyperlink{namespacebn_a790c0215583382a829e202ecb0c844b9}{Fp}} $>$ \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}})
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} FF $>$ }\\void \mbox{\hyperlink{namespacebn_1_1ecop_a699ba608398adde415b5ec415d4bf100}{bn\+::ecop\+::\+Normalize\+Jac}} (FF \texorpdfstring{$\ast$}{*}out, const FF \texorpdfstring{$\ast$}{*}in)
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} FF $>$ }\\void \mbox{\hyperlink{namespacebn_1_1ecop_a7555e0531b9d3386d01bf926fbe2259c}{bn\+::ecop\+::\+Normalize\+Hom}} (FF \texorpdfstring{$\ast$}{*}out, const FF \texorpdfstring{$\ast$}{*}in)
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} FF $>$ }\\void \mbox{\hyperlink{namespacebn_1_1ecop_a0e64ca6d01c24fb266f1986ebce3a07d}{bn\+::ecop\+::\+ECDouble}} (FF \texorpdfstring{$\ast$}{*}out, const FF \texorpdfstring{$\ast$}{*}in)
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} FF $>$ }\\void \mbox{\hyperlink{namespacebn_1_1ecop_abcaa67b67f6c2af1201769cd15cbbed9}{bn\+::ecop\+::\+ECAdd}} (FF \texorpdfstring{$\ast$}{*}out, const FF \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, const FF \texorpdfstring{$\ast$}{*}b)
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} FF , \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} INT $>$ }\\void \mbox{\hyperlink{namespacebn_1_1ecop_a621a324cd1f6acd0c2214f715cab4615}{bn\+::ecop\+::\+Scalar\+Mult}} (FF \texorpdfstring{$\ast$}{*}out, const FF \texorpdfstring{$\ast$}{*}in, const INT \&m)
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{namespacebn_a790c0215583382a829e202ecb0c844b9}{Fp}} $>$ }\\void \mbox{\hyperlink{namespacebn_1_1ecop_aecdd2b15dc57403600d49afb5bc6ac57}{bn\+::ecop\+::\+Frob\+End\+On\+Twist\+\_\+1}} (\mbox{\hyperlink{structbn_1_1_fp2_t}{Fp2T}}$<$ \mbox{\hyperlink{namespacebn_a790c0215583382a829e202ecb0c844b9}{Fp}} $>$ \texorpdfstring{$\ast$}{*}Q, const \mbox{\hyperlink{structbn_1_1_fp2_t}{Fp2T}}$<$ \mbox{\hyperlink{namespacebn_a790c0215583382a829e202ecb0c844b9}{Fp}} $>$ \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}})
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{namespacebn_a790c0215583382a829e202ecb0c844b9}{Fp}} $>$ }\\void \mbox{\hyperlink{namespacebn_1_1ecop_a5de8f9e367f80bcfab0d2c5294613666}{bn\+::ecop\+::\+Frob\+End\+On\+Twist\+\_\+2}} (\mbox{\hyperlink{structbn_1_1_fp2_t}{Fp2T}}$<$ \mbox{\hyperlink{namespacebn_a790c0215583382a829e202ecb0c844b9}{Fp}} $>$ \texorpdfstring{$\ast$}{*}Q, const \mbox{\hyperlink{structbn_1_1_fp2_t}{Fp2T}}$<$ \mbox{\hyperlink{namespacebn_a790c0215583382a829e202ecb0c844b9}{Fp}} $>$ \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}})
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{namespacebn_a790c0215583382a829e202ecb0c844b9}{Fp}} $>$ }\\void \mbox{\hyperlink{namespacebn_1_1ecop_aca919beee5940012257273d038039c54}{bn\+::ecop\+::\+Frob\+End\+On\+Twist\+\_\+8}} (\mbox{\hyperlink{structbn_1_1_fp2_t}{Fp2T}}$<$ \mbox{\hyperlink{namespacebn_a790c0215583382a829e202ecb0c844b9}{Fp}} $>$ \texorpdfstring{$\ast$}{*}Q, const \mbox{\hyperlink{structbn_1_1_fp2_t}{Fp2T}}$<$ \mbox{\hyperlink{namespacebn_a790c0215583382a829e202ecb0c844b9}{Fp}} $>$ \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}})
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{namespacebn_a790c0215583382a829e202ecb0c844b9}{Fp}} $>$ }\\void \mbox{\hyperlink{namespacebn_ad9358851168fca47e8912f07288e8f1a}{bn\+::opt\+\_\+ate\+Pairing}} (\mbox{\hyperlink{structbn_1_1_fp12_t}{Fp12T}}$<$ \mbox{\hyperlink{structbn_1_1_fp6_t}{Fp6T}}$<$ \mbox{\hyperlink{structbn_1_1_fp2_t}{Fp2T}}$<$ \mbox{\hyperlink{namespacebn_a790c0215583382a829e202ecb0c844b9}{Fp}} $>$ $>$ $>$ \&\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}, const \mbox{\hyperlink{structbn_1_1_fp2_t}{Fp2T}}$<$ \mbox{\hyperlink{namespacebn_a790c0215583382a829e202ecb0c844b9}{Fp}} $>$ Q\mbox{[}2\mbox{]}, const \mbox{\hyperlink{namespacebn_a790c0215583382a829e202ecb0c844b9}{Fp}} \mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}}\mbox{[}2\mbox{]})
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{namespacebn_a790c0215583382a829e202ecb0c844b9}{Fp}} $>$ }\\void \mbox{\hyperlink{namespacebn_a16f80852c94b554033462bb38fbed34c}{bn\+::opt\+\_\+ate\+Pairing\+Jac}} (\mbox{\hyperlink{structbn_1_1_fp12_t}{Fp12T}}$<$ \mbox{\hyperlink{structbn_1_1_fp6_t}{Fp6T}}$<$ \mbox{\hyperlink{structbn_1_1_fp2_t}{Fp2T}}$<$ \mbox{\hyperlink{namespacebn_a790c0215583382a829e202ecb0c844b9}{Fp}} $>$ $>$ $>$ \&\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}, const \mbox{\hyperlink{structbn_1_1_fp2_t}{Fp2T}}$<$ \mbox{\hyperlink{namespacebn_a790c0215583382a829e202ecb0c844b9}{Fp}} $>$ \+\_\+Q\mbox{[}3\mbox{]}, const \mbox{\hyperlink{namespacebn_a790c0215583382a829e202ecb0c844b9}{Fp}} \+\_\+P\mbox{[}3\mbox{]})
+\item 
+void \mbox{\hyperlink{namespacebn_a9072e4174bd5881a89747520b33e3241}{bn\+::opt\+\_\+ate\+Pairing}} (\mbox{\hyperlink{namespacebn_abd6ddb9ecff5d59c093581706e088644}{Fp12}} \&\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}, const \mbox{\hyperlink{namespacebn_ab9c11a8074c768f1149f5bdc7332a8c5}{Ec2}} \&Q, const \mbox{\hyperlink{namespacebn_ae14c8fdf84d628aae3b455d439782b56}{Ec1}} \&\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}})
+\item 
+void \mbox{\hyperlink{namespacebn_1_1components_af7e078139e69b4cb42eb6a547dc748c6}{bn\+::components\+::precompute\+G2}} (std\+::vector$<$ \mbox{\hyperlink{namespacebn_a011312b1273d2b6f5d88762678205814}{Fp6}} $>$ \&coeff, \mbox{\hyperlink{namespacebn_afe11bd65aac84b50b31d9984d059be92}{Fp2}} Q\mbox{[}3\mbox{]}, const \mbox{\hyperlink{namespacebn_afe11bd65aac84b50b31d9984d059be92}{Fp2}} inQ\mbox{[}3\mbox{]})
+\item 
+void \mbox{\hyperlink{namespacebn_1_1components_a6ffa9f1e05f963b0af227759acee63b0}{bn\+::components\+::miller\+Loop}} (\mbox{\hyperlink{namespacebn_abd6ddb9ecff5d59c093581706e088644}{Fp12}} \&\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}, const std\+::vector$<$ \mbox{\hyperlink{namespacebn_a011312b1273d2b6f5d88762678205814}{Fp6}} $>$ \&Qcoeff, const \mbox{\hyperlink{namespacebn_a790c0215583382a829e202ecb0c844b9}{Fp}} precP\mbox{[}2\mbox{]})
+\item 
+void \mbox{\hyperlink{namespacebn_1_1components_a530c629f42e45f300a15d012c5979ed1}{bn\+::components\+::miller\+Loop2}} (\mbox{\hyperlink{namespacebn_abd6ddb9ecff5d59c093581706e088644}{Fp12}} \&\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}, const std\+::vector$<$ \mbox{\hyperlink{namespacebn_a011312b1273d2b6f5d88762678205814}{Fp6}} $>$ \&Q1coeff, const \mbox{\hyperlink{namespacebn_a790c0215583382a829e202ecb0c844b9}{Fp}} prec\+P1\mbox{[}2\mbox{]}, const std\+::vector$<$ \mbox{\hyperlink{namespacebn_a011312b1273d2b6f5d88762678205814}{Fp6}} $>$ \&Q2coeff, const \mbox{\hyperlink{namespacebn_a790c0215583382a829e202ecb0c844b9}{Fp}} prec\+P2\mbox{[}2\mbox{]})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{bn_8h_aaf506f96cf930089629139158edd12a7}{debug\+\_\+buf}} \mbox{[}128\mbox{]}
+\item 
+const \mbox{\hyperlink{structbn_1_1_curve_param}{Curve\+Param}} \mbox{\hyperlink{namespacebn_a79a7b30048022e75b4f8d886fe5224a0}{bn\+::\+Curve\+Fp254\+BNb}} = \{ -\/((1LL $<$$<$ 62) + (1LL $<$$<$ 55) + (1LL $<$$<$ 0)), 2, 1, 1 \}
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{namespacebn_a790c0215583382a829e202ecb0c844b9}{Fp}} $>$ }\\void(\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacebn_a62f5d204b1f72748867cefeb6d0374f7}{bn\+::\+Fp2T}} )(Fp2T$<$ \mbox{\hyperlink{namespacebn_a790c0215583382a829e202ecb0c844b9}{Fp}} $>$ \&out, const Fp2T$<$ \mbox{\hyperlink{namespacebn_a790c0215583382a829e202ecb0c844b9}{Fp}} $>$ \&x, const Fp2T$<$ \mbox{\hyperlink{namespacebn_a790c0215583382a829e202ecb0c844b9}{Fp}} $>$ \&y) = \&(Fp2T$<$\mbox{\hyperlink{namespacebn_a790c0215583382a829e202ecb0c844b9}{Fp}}$>$\+::addC)
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{namespacebn_afe11bd65aac84b50b31d9984d059be92}{Fp2}} $>$ }\\void(\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacebn_a685c6ca660e1a30f8488b9f5880162d8}{bn\+::\+Fp6T}} )(Fp6T$<$ \mbox{\hyperlink{namespacebn_afe11bd65aac84b50b31d9984d059be92}{Fp2}} $>$ \&z, const Fp6T$<$ \mbox{\hyperlink{namespacebn_afe11bd65aac84b50b31d9984d059be92}{Fp2}} $>$ \&x, const Fp6T$<$ \mbox{\hyperlink{namespacebn_afe11bd65aac84b50b31d9984d059be92}{Fp2}} $>$ \&y) = \&(Fp6T$<$\mbox{\hyperlink{namespacebn_afe11bd65aac84b50b31d9984d059be92}{Fp2}}$>$\+::addC)
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{namespacebn_a011312b1273d2b6f5d88762678205814}{Fp6}} $>$ }\\void(\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacebn_a826d2e48d757dc01bed852ae2aea5380}{bn\+::\+Fp12T}} )(Fp12T \&x) = \&(Fp12T$<$\mbox{\hyperlink{namespacebn_a011312b1273d2b6f5d88762678205814}{Fp6}}$>$\+::squareC)
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{namespacebn_afe11bd65aac84b50b31d9984d059be92}{Fp2}} $>$ }\\void(\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacebn_a33e475aa5b74853f41d5f83b6a964386}{bn\+::\+CompressT}} )(CompressT \&, int) = \&(CompressT$<$\mbox{\hyperlink{namespacebn_afe11bd65aac84b50b31d9984d059be92}{Fp2}}$>$\+::square\+\_\+nC)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\begin{DoxyAuthor}{Author}
+herumi and t\+\_\+teruya 
+\end{DoxyAuthor}
+\begin{DoxyNote}{Note}
+modified new BSD license \href{http://opensource.org/licenses/BSD-3-Clause}{\texttt{ http\+://opensource.\+org/licenses/\+BSD-\/3-\/\+Clause}} 
+\end{DoxyNote}
+
+
+Definition in file \mbox{\hyperlink{bn_8h_source}{bn.\+h}}.
+
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{bn_8h_aaf506f96cf930089629139158edd12a7}\index{bn.h@{bn.h}!debug\_buf@{debug\_buf}}
+\index{debug\_buf@{debug\_buf}!bn.h@{bn.h}}
+\doxysubsubsection{\texorpdfstring{debug\_buf}{debug\_buf}}
+{\footnotesize\ttfamily \label{bn_8h_aaf506f96cf930089629139158edd12a7} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} debug\+\_\+buf\mbox{[}128\mbox{]}\hspace{0.3cm}{\ttfamily [extern]}}
+

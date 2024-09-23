@@ -1,0 +1,2286 @@
+\doxysection{fc\+::variant Class Reference}
+\hypertarget{classfc_1_1variant}{}\label{classfc_1_1variant}\index{fc::variant@{fc::variant}}
+
+
+stores null, int64, uint64, double, bool, string, std\+::vector$<$variant$>$, and \doxylink{classfc_1_1variant__object}{variant\+\_\+object}\textquotesingle{}s.  
+
+
+
+
+{\ttfamily \#include $<$variant.\+hpp$>$}
+
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classfc_1_1variant_1_1visitor}{visitor}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5f}{type\+\_\+id}} \{ \newline
+\mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa5e16cde26441090f51ebd51c04d7a185}{null\+\_\+type}} = 0
+, \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fab2547aa70d744fdd14790e31df14bbe7}{int64\+\_\+type}} = 1
+, \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa99f1bd3c719716a47670a71a406eff6c}{uint64\+\_\+type}} = 2
+, \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa6c6595f9a12c6ca1664b2e5ad286bce9}{double\+\_\+type}} = 3
+, \newline
+\mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fafd4bc66170646a108792cdb339b23872}{bool\+\_\+type}} = 4
+, \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa23b1f70051406849b91e76a91ab291e2}{string\+\_\+type}} = 5
+, \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5faaf4b658450fa70459033b77c0cae75af}{array\+\_\+type}} = 6
+, \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa44a37e1c4fe41b08ad5ea8ef8f480ecf}{object\+\_\+type}} = 7
+, \newline
+\mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa57823fd7445ab1ebc8571811e76de5f5}{blob\+\_\+type}} = 8
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1variant_ab18b9c0de85df3571204f86805bf6c5e}{variant}} ()
+\begin{DoxyCompactList}\small\item\em Constructs a null\+\_\+type variant. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classfc_1_1variant_a08377c8927ed9f8f62211cd9dca566e7}{variant}} (\mbox{\hyperlink{namespacefc_aeffaff8d6d824699c60630a03055fd2f}{nullptr\+\_\+t}})
+\begin{DoxyCompactList}\small\item\em Constructs a null\+\_\+type variant. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classfc_1_1variant_a045c86b5101d4e46e30c03dcb2ce9794}{variant}} (const char \texorpdfstring{$\ast$}{*}str)
+\item 
+\mbox{\hyperlink{classfc_1_1variant_af645ca0b7a8dc9f545bd1271c34ecf74}{variant}} (char \texorpdfstring{$\ast$}{*}str)
+\item 
+\mbox{\hyperlink{classfc_1_1variant_a737d936a212681bd29cea8afaa1bbda1}{variant}} (wchar\+\_\+t \texorpdfstring{$\ast$}{*}str)
+\item 
+\mbox{\hyperlink{classfc_1_1variant_af63dd9292e7dbee67323047eb8f892ab}{variant}} (const wchar\+\_\+t \texorpdfstring{$\ast$}{*}str)
+\item 
+\mbox{\hyperlink{classfc_1_1variant_a89b8a8bab932ad360be4c8436e1c5dda}{variant}} (float val)
+\item 
+\mbox{\hyperlink{classfc_1_1variant_ade702fd608763e0c1c44a4297ef22aca}{variant}} (\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} val)
+\item 
+\mbox{\hyperlink{classfc_1_1variant_a743d279294b6f1ca9f1e14c01b71802a}{variant}} (\mbox{\hyperlink{stdint_8h_aef44329758059c91c76d334e8fc09700}{int8\+\_\+t}} val)
+\item 
+\mbox{\hyperlink{classfc_1_1variant_a1f91d872520c59395ab44b337ef30e58}{variant}} (\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} val)
+\item 
+\mbox{\hyperlink{classfc_1_1variant_a6480dc77c355024b39448319caae9a98}{variant}} (\mbox{\hyperlink{stdint_8h_a269259c924dce846340ddbb810db2e3c}{int16\+\_\+t}} val)
+\item 
+\mbox{\hyperlink{classfc_1_1variant_a858fb98a073c500744896a75d83c55c0}{variant}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} val)
+\item 
+\mbox{\hyperlink{classfc_1_1variant_a8e3df3c9259e45f4d052c384c1be18ef}{variant}} (\mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\+\_\+t}} val)
+\item 
+\mbox{\hyperlink{classfc_1_1variant_af541c3713ccf43d5a3a031aa70f83c40}{variant}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} val)
+\item 
+\mbox{\hyperlink{classfc_1_1variant_aace180d69f4ec94a7bddc12887128638}{variant}} (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} val)
+\item 
+\mbox{\hyperlink{classfc_1_1variant_abf264769c98ab0ef6b3c2dd6306ba0d7}{variant}} (double val)
+\item 
+\mbox{\hyperlink{classfc_1_1variant_a407d960e0391593c6c0c0445db1a6e4c}{variant}} (bool val)
+\item 
+\mbox{\hyperlink{classfc_1_1variant_af099123791ba91d6c1fd2c3b384578ca}{variant}} (\mbox{\hyperlink{structfc_1_1blob}{blob}} val)
+\item 
+\mbox{\hyperlink{classfc_1_1variant_aaf133bf73eb77eda72cfed51a6dfc7ad}{variant}} (\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} val)
+\item 
+\mbox{\hyperlink{classfc_1_1variant_a7850e84b5671f9b18e31276678ed0288}{variant}} (\mbox{\hyperlink{classfc_1_1variant__object}{variant\+\_\+object}})
+\item 
+\mbox{\hyperlink{classfc_1_1variant_ad0fbaa5228660c7fb39fe4b1b1e7ba2c}{variant}} (\mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\+\_\+variant\+\_\+object}})
+\item 
+\mbox{\hyperlink{classfc_1_1variant_a525e612e5c6a007d426a1184acdd880b}{variant}} (\mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}})
+\item 
+\mbox{\hyperlink{classfc_1_1variant_a33013c40e9afe5c953d7cc45cfdfe2b9}{variant}} (const \mbox{\hyperlink{classfc_1_1variant}{variant}} \&)
+\item 
+\mbox{\hyperlink{classfc_1_1variant_a7df504e005cca53f8dbe8f6286698d66}{variant}} (\mbox{\hyperlink{classfc_1_1variant}{variant}} \&\&)
+\item 
+\mbox{\hyperlink{classfc_1_1variant_a0d4a392a86d2aae2bab4d21ee368c2cb}{\texorpdfstring{$\sim$}{\string~}variant}} ()
+\item 
+void \mbox{\hyperlink{classfc_1_1variant_a327534c432bafeffa193555109c2dd6f}{visit}} (const \mbox{\hyperlink{classfc_1_1variant_1_1visitor}{visitor}} \&v) const
+\item 
+\mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5f}{type\+\_\+id}} \mbox{\hyperlink{classfc_1_1variant_afaae1df286ff97c83301eda21dbd51ea}{get\+\_\+type}} () const
+\item 
+bool \mbox{\hyperlink{classfc_1_1variant_a531450deac912ee3e1bc606422714a68}{is\+\_\+null}} () const
+\item 
+bool \mbox{\hyperlink{classfc_1_1variant_ac51c0354c1fcef2cc5ce43a5062e8de6}{is\+\_\+string}} () const
+\item 
+bool \mbox{\hyperlink{classfc_1_1variant_a99a395b36d39966512f7ac52473aeaaf}{is\+\_\+bool}} () const
+\item 
+bool \mbox{\hyperlink{classfc_1_1variant_a2ec4c0d3b694adcf41d846b8af9b610a}{is\+\_\+int64}} () const
+\item 
+bool \mbox{\hyperlink{classfc_1_1variant_ac06c2b8b4af18cefcaee6cd91b29b293}{is\+\_\+uint64}} () const
+\item 
+bool \mbox{\hyperlink{classfc_1_1variant_adf93b827afeac79e87d6a7e84341d6f2}{is\+\_\+double}} () const
+\item 
+bool \mbox{\hyperlink{classfc_1_1variant_aa542b555ee260a07e61a2d38ff765d87}{is\+\_\+object}} () const
+\item 
+bool \mbox{\hyperlink{classfc_1_1variant_a102129c61e671e93d0d6899976fffc96}{is\+\_\+array}} () const
+\item 
+bool \mbox{\hyperlink{classfc_1_1variant_adfc583823fe5ba9e4f7f1a7720796535}{is\+\_\+blob}} () const
+\item 
+bool \mbox{\hyperlink{classfc_1_1variant_a5c2238ce8bbeb5dc454134ec92624aab}{is\+\_\+numeric}} () const
+\item 
+bool \mbox{\hyperlink{classfc_1_1variant_a59f43987b39a2e02b9699e917f5cc3d2}{is\+\_\+integer}} () const
+\item 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{classfc_1_1variant_ab5d7877d2c19dbd6ac9eac7a1205dbeb}{as\+\_\+int64}} () const
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{classfc_1_1variant_a483bb1f23d9b71ae03e9ca03136ee453}{as\+\_\+uint64}} () const
+\item 
+bool \mbox{\hyperlink{classfc_1_1variant_a86ffd49f6eec1c0fd16ead01e2735107}{as\+\_\+bool}} () const
+\item 
+double \mbox{\hyperlink{classfc_1_1variant_a61f334febee9b226fb077f6da3c52276}{as\+\_\+double}} () const
+\item 
+\mbox{\hyperlink{structfc_1_1blob}{blob}} \& \mbox{\hyperlink{classfc_1_1variant_aa475101b0f2181350d76a2fdc6cf7c76}{get\+\_\+blob}} ()
+\item 
+const \mbox{\hyperlink{structfc_1_1blob}{blob}} \& \mbox{\hyperlink{classfc_1_1variant_ae5eb8afda3a41fc20854875e4d91d5c8}{get\+\_\+blob}} () const
+\item 
+\mbox{\hyperlink{structfc_1_1blob}{blob}} \mbox{\hyperlink{classfc_1_1variant_a026901a2f99914f10aa5c516eca76d40}{as\+\_\+blob}} () const
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{classfc_1_1variant_acbd70a93184e4277631f2a261acb707c}{as\+\_\+string}} () const
+\item 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \& \mbox{\hyperlink{classfc_1_1variant_a2ca9f4d2feb8c9743da4128b18bfa886}{get\+\_\+string}} () const
+\item 
+\mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}} \& \mbox{\hyperlink{classfc_1_1variant_aea83c87e4e1b1e185f57717b4bd683a5}{get\+\_\+array}} ()
+\item 
+const \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}} \& \mbox{\hyperlink{classfc_1_1variant_a5cb44834253397df276f5107cf9211b6}{get\+\_\+array}} () const
+\item 
+\mbox{\hyperlink{classfc_1_1variant__object}{variant\+\_\+object}} \& \mbox{\hyperlink{classfc_1_1variant_a17a7054a10963360c6a14d60f6e30128}{get\+\_\+object}} ()
+\item 
+const \mbox{\hyperlink{classfc_1_1variant__object}{variant\+\_\+object}} \& \mbox{\hyperlink{classfc_1_1variant_a3efce335057e900b569af78acb1cad6c}{get\+\_\+object}} () const
+\item 
+const \mbox{\hyperlink{classfc_1_1variant}{variant}} \& \mbox{\hyperlink{classfc_1_1variant_afc8519b6b2c1c192506a10289196cbf5}{operator\mbox{[}$\,$\mbox{]}}} (const char \texorpdfstring{$\ast$}{*}) const
+\item 
+const \mbox{\hyperlink{classfc_1_1variant}{variant}} \& \mbox{\hyperlink{classfc_1_1variant_af88be0a0533f9d58f36d88339d42f9fd}{operator\mbox{[}$\,$\mbox{]}}} (size\+\_\+t pos) const
+\item 
+size\+\_\+t \mbox{\hyperlink{classfc_1_1variant_a67f6416c5dd1b9c53b4b20b73f9cd117}{size}} () const
+\item 
+size\+\_\+t \mbox{\hyperlink{classfc_1_1variant_ab5f4bb5f1f3ab7bc8fee99135445df52}{estimated\+\_\+size}} () const
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{classfc_1_1variant_a82edd1f33199355d3a1f19bbb92909cc}{as}} () const
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{classfc_1_1variant_a38d824a91168bea0aed58a29d782d4cd}{as}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&v) const
+\item 
+\mbox{\hyperlink{classfc_1_1variant}{variant}} \& \mbox{\hyperlink{classfc_1_1variant_a0dca5e5489ee3baac5bdab51417d9e02}{operator=}} (\mbox{\hyperlink{classfc_1_1variant}{variant}} \&\&v)
+\item 
+\mbox{\hyperlink{classfc_1_1variant}{variant}} \& \mbox{\hyperlink{classfc_1_1variant_af0367a0aa45efe02b3db8e17ce94e43e}{operator=}} (const \mbox{\hyperlink{classfc_1_1variant}{variant}} \&v)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{classfc_1_1variant}{variant}} \& \mbox{\hyperlink{classfc_1_1variant_a1dc9212581e7a405ac5b374116ecdd6e}{operator=}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\&v)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{classfc_1_1variant_a525f5fb6668edc755bd9b43ef55e5028}{variant}} (const std\+::optional$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&v)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{classfc_1_1variant_a9c0d8a975fbe4a35be95976ba3d457e1}{variant}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&val)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{classfc_1_1variant_a72f28504ab10f7dec85e0112a58322ca}{variant}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&val, const \mbox{\hyperlink{namespacefc_a978f9e97f64eb2ce6cbe892d3cc93397}{fc\+::yield\+\_\+function\+\_\+t}} \&yield)
+\item 
+void \mbox{\hyperlink{classfc_1_1variant_a201c1ea686618f06d5839e541da3d641}{clear}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+variant\textquotesingle{}s allocate everything but strings, arrays, and objects on the stack and are \textquotesingle{}move aware\textquotesingle{} for values allcoated on the heap.
+
+Memory usage on 64 bit systems is 16 bytes and 12 bytes on 32 bit systems. 
+
+Definition at line \mbox{\hyperlink{fc_2include_2fc_2variant_8hpp_source_l00190}{190}} of file \mbox{\hyperlink{fc_2include_2fc_2variant_8hpp_source}{variant.\+hpp}}.
+
+
+
+\doxysubsection{Member Enumeration Documentation}
+\Hypertarget{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5f}\index{fc::variant@{fc::variant}!type\_id@{type\_id}}
+\index{type\_id@{type\_id}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{type\_id}{type\_id}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5f} 
+enum \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5f}{fc\+::variant\+::type\+\_\+id}}}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{null\_type@{null\_type}!fc::variant@{fc::variant}}\index{fc::variant@{fc::variant}!null\_type@{null\_type}}}\Hypertarget{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa5e16cde26441090f51ebd51c04d7a185}\label{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5f} 
+null\+\_\+type&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{int64\_type@{int64\_type}!fc::variant@{fc::variant}}\index{fc::variant@{fc::variant}!int64\_type@{int64\_type}}}\Hypertarget{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fab2547aa70d744fdd14790e31df14bbe7}\label{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5f} 
+int64\+\_\+type&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{uint64\_type@{uint64\_type}!fc::variant@{fc::variant}}\index{fc::variant@{fc::variant}!uint64\_type@{uint64\_type}}}\Hypertarget{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa99f1bd3c719716a47670a71a406eff6c}\label{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5f} 
+uint64\+\_\+type&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{double\_type@{double\_type}!fc::variant@{fc::variant}}\index{fc::variant@{fc::variant}!double\_type@{double\_type}}}\Hypertarget{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa6c6595f9a12c6ca1664b2e5ad286bce9}\label{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5f} 
+double\+\_\+type&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{bool\_type@{bool\_type}!fc::variant@{fc::variant}}\index{fc::variant@{fc::variant}!bool\_type@{bool\_type}}}\Hypertarget{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fafd4bc66170646a108792cdb339b23872}\label{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5f} 
+bool\+\_\+type&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{string\_type@{string\_type}!fc::variant@{fc::variant}}\index{fc::variant@{fc::variant}!string\_type@{string\_type}}}\Hypertarget{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa23b1f70051406849b91e76a91ab291e2}\label{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5f} 
+string\+\_\+type&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{array\_type@{array\_type}!fc::variant@{fc::variant}}\index{fc::variant@{fc::variant}!array\_type@{array\_type}}}\Hypertarget{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5faaf4b658450fa70459033b77c0cae75af}\label{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5f} 
+array\+\_\+type&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{object\_type@{object\_type}!fc::variant@{fc::variant}}\index{fc::variant@{fc::variant}!object\_type@{object\_type}}}\Hypertarget{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa44a37e1c4fe41b08ad5ea8ef8f480ecf}\label{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5f} 
+object\+\_\+type&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{blob\_type@{blob\_type}!fc::variant@{fc::variant}}\index{fc::variant@{fc::variant}!blob\_type@{blob\_type}}}\Hypertarget{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa57823fd7445ab1ebc8571811e76de5f5}\label{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5f} 
+blob\+\_\+type&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{fc_2include_2fc_2variant_8hpp_source_l00193}{193}} of file \mbox{\hyperlink{fc_2include_2fc_2variant_8hpp_source}{variant.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa5e16cde26441090f51ebd51c04d7a185}{null\_type}}\ \ \ =\ 0,}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fab2547aa70d744fdd14790e31df14bbe7}{int64\_type}}\ \ =\ 1,}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa99f1bd3c719716a47670a71a406eff6c}{uint64\_type}}\ =\ 2,}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa6c6595f9a12c6ca1664b2e5ad286bce9}{double\_type}}\ =\ 3,}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fafd4bc66170646a108792cdb339b23872}{bool\_type}}\ \ \ =\ 4,}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa23b1f70051406849b91e76a91ab291e2}{string\_type}}\ =\ 5,}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5faaf4b658450fa70459033b77c0cae75af}{array\_type}}\ \ =\ 6,}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa44a37e1c4fe41b08ad5ea8ef8f480ecf}{object\_type}}\ =\ 7,}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa57823fd7445ab1ebc8571811e76de5f5}{blob\_type}}\ \ \ =\ 8}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1variant_ab18b9c0de85df3571204f86805bf6c5e}\index{fc::variant@{fc::variant}!variant@{variant}}
+\index{variant@{variant}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{variant()}{variant()}\hspace{0.1cm}{\footnotesize\ttfamily [1/27]}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_ab18b9c0de85df3571204f86805bf6c5e} 
+fc\+::variant\+::variant (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{variant_8cpp_source_l00024}{24}} of file \mbox{\hyperlink{variant_8cpp_source}{variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00025\ \{}
+\DoxyCodeLine{00026\ \ \ \ \mbox{\hyperlink{namespacefc_a101ffbbefd2ddbb23eea290bbe9f87a1}{set\_variant\_type}}(\ \textcolor{keyword}{this},\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa5e16cde26441090f51ebd51c04d7a185}{null\_type}}\ );}
+\DoxyCodeLine{00027\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=313pt]{classfc_1_1variant_ab18b9c0de85df3571204f86805bf6c5e_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=318pt]{classfc_1_1variant_ab18b9c0de85df3571204f86805bf6c5e_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_a08377c8927ed9f8f62211cd9dca566e7}\index{fc::variant@{fc::variant}!variant@{variant}}
+\index{variant@{variant}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{variant()}{variant()}\hspace{0.1cm}{\footnotesize\ttfamily [2/27]}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_a08377c8927ed9f8f62211cd9dca566e7} 
+fc\+::variant\+::variant (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacefc_aeffaff8d6d824699c60630a03055fd2f}{fc\+::nullptr\+\_\+t}}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{variant_8cpp_source_l00029}{29}} of file \mbox{\hyperlink{variant_8cpp_source}{variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00030\ \{}
+\DoxyCodeLine{00031\ \ \ \ \mbox{\hyperlink{namespacefc_a101ffbbefd2ddbb23eea290bbe9f87a1}{set\_variant\_type}}(\ \textcolor{keyword}{this},\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa5e16cde26441090f51ebd51c04d7a185}{null\_type}}\ );}
+\DoxyCodeLine{00032\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=313pt]{classfc_1_1variant_a08377c8927ed9f8f62211cd9dca566e7_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_a045c86b5101d4e46e30c03dcb2ce9794}\index{fc::variant@{fc::variant}!variant@{variant}}
+\index{variant@{variant}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{variant()}{variant()}\hspace{0.1cm}{\footnotesize\ttfamily [3/27]}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_a045c86b5101d4e46e30c03dcb2ce9794} 
+fc\+::variant\+::variant (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{str}{}\end{DoxyParamCaption})}
+
+
+\begin{DoxyParams}{Parameters}
+{\em str} & -\/ \doxylink{struct_u_t_f8}{UTF8} string \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{variant_8cpp_source_l00106}{106}} of file \mbox{\hyperlink{variant_8cpp_source}{variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00107\ \{}
+\DoxyCodeLine{00108\ \ \ \ *\textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{string}**\textcolor{keyword}{>}(\textcolor{keyword}{this})\ \ =\ \textcolor{keyword}{new}\ \textcolor{keywordtype}{string}(\ str\ );}
+\DoxyCodeLine{00109\ \ \ \ \mbox{\hyperlink{namespacefc_a101ffbbefd2ddbb23eea290bbe9f87a1}{set\_variant\_type}}(\ \textcolor{keyword}{this},\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa23b1f70051406849b91e76a91ab291e2}{string\_type}}\ );}
+\DoxyCodeLine{00110\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=313pt]{classfc_1_1variant_a045c86b5101d4e46e30c03dcb2ce9794_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_af645ca0b7a8dc9f545bd1271c34ecf74}\index{fc::variant@{fc::variant}!variant@{variant}}
+\index{variant@{variant}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{variant()}{variant()}\hspace{0.1cm}{\footnotesize\ttfamily [4/27]}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_af645ca0b7a8dc9f545bd1271c34ecf74} 
+fc\+::variant\+::variant (\begin{DoxyParamCaption}\item[{char \texorpdfstring{$\ast$}{*}}]{str}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{variant_8cpp_source_l00100}{100}} of file \mbox{\hyperlink{variant_8cpp_source}{variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00101\ \{}
+\DoxyCodeLine{00102\ \ \ \ *\textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{string}**\textcolor{keyword}{>}(\textcolor{keyword}{this})\ \ =\ \textcolor{keyword}{new}\ \textcolor{keywordtype}{string}(\ str\ );}
+\DoxyCodeLine{00103\ \ \ \ \mbox{\hyperlink{namespacefc_a101ffbbefd2ddbb23eea290bbe9f87a1}{set\_variant\_type}}(\ \textcolor{keyword}{this},\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa23b1f70051406849b91e76a91ab291e2}{string\_type}}\ );}
+\DoxyCodeLine{00104\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=313pt]{classfc_1_1variant_af645ca0b7a8dc9f545bd1271c34ecf74_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_a737d936a212681bd29cea8afaa1bbda1}\index{fc::variant@{fc::variant}!variant@{variant}}
+\index{variant@{variant}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{variant()}{variant()}\hspace{0.1cm}{\footnotesize\ttfamily [5/27]}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_a737d936a212681bd29cea8afaa1bbda1} 
+fc\+::variant\+::variant (\begin{DoxyParamCaption}\item[{wchar\+\_\+t \texorpdfstring{$\ast$}{*}}]{str}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{variant_8cpp_source_l00113}{113}} of file \mbox{\hyperlink{variant_8cpp_source}{variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00114\ \{}
+\DoxyCodeLine{00115\ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ =\ wcslen(str);}
+\DoxyCodeLine{00116\ \ \ \ boost::scoped\_array<char>\ buffer(\textcolor{keyword}{new}\ \textcolor{keywordtype}{char}[\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}]);}
+\DoxyCodeLine{00117\ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{unsigned}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}};\ ++i)}
+\DoxyCodeLine{00118\ \ \ \ \ \ buffer[i]\ =\ (\textcolor{keywordtype}{char})\mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}[i];}
+\DoxyCodeLine{00119\ \ \ \ *\textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{string}**\textcolor{keyword}{>}(\textcolor{keyword}{this})\ \ =\ \textcolor{keyword}{new}\ \textcolor{keywordtype}{string}(buffer.get(),\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}});}
+\DoxyCodeLine{00120\ \ \ \ \mbox{\hyperlink{namespacefc_a101ffbbefd2ddbb23eea290bbe9f87a1}{set\_variant\_type}}(\ \textcolor{keyword}{this},\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa23b1f70051406849b91e76a91ab291e2}{string\_type}}\ );}
+\DoxyCodeLine{00121\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=313pt]{classfc_1_1variant_a737d936a212681bd29cea8afaa1bbda1_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_af63dd9292e7dbee67323047eb8f892ab}\index{fc::variant@{fc::variant}!variant@{variant}}
+\index{variant@{variant}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{variant()}{variant()}\hspace{0.1cm}{\footnotesize\ttfamily [6/27]}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_af63dd9292e7dbee67323047eb8f892ab} 
+fc\+::variant\+::variant (\begin{DoxyParamCaption}\item[{const wchar\+\_\+t \texorpdfstring{$\ast$}{*}}]{str}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{variant_8cpp_source_l00124}{124}} of file \mbox{\hyperlink{variant_8cpp_source}{variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00125\ \{}
+\DoxyCodeLine{00126\ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ =\ wcslen(str);}
+\DoxyCodeLine{00127\ \ \ \ boost::scoped\_array<char>\ buffer(\textcolor{keyword}{new}\ \textcolor{keywordtype}{char}[\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}]);}
+\DoxyCodeLine{00128\ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{unsigned}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}};\ ++i)}
+\DoxyCodeLine{00129\ \ \ \ \ \ buffer[i]\ =\ (\textcolor{keywordtype}{char})\mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}[i];}
+\DoxyCodeLine{00130\ \ \ \ *\textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{string}**\textcolor{keyword}{>}(\textcolor{keyword}{this})\ \ =\ \textcolor{keyword}{new}\ \textcolor{keywordtype}{string}(buffer.get(),\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}});}
+\DoxyCodeLine{00131\ \ \ \ \mbox{\hyperlink{namespacefc_a101ffbbefd2ddbb23eea290bbe9f87a1}{set\_variant\_type}}(\ \textcolor{keyword}{this},\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa23b1f70051406849b91e76a91ab291e2}{string\_type}}\ );}
+\DoxyCodeLine{00132\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=313pt]{classfc_1_1variant_af63dd9292e7dbee67323047eb8f892ab_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_a89b8a8bab932ad360be4c8436e1c5dda}\index{fc::variant@{fc::variant}!variant@{variant}}
+\index{variant@{variant}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{variant()}{variant()}\hspace{0.1cm}{\footnotesize\ttfamily [7/27]}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_a89b8a8bab932ad360be4c8436e1c5dda} 
+fc\+::variant\+::variant (\begin{DoxyParamCaption}\item[{float}]{val}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{variant_8cpp_source_l00082}{82}} of file \mbox{\hyperlink{variant_8cpp_source}{variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00083\ \{}
+\DoxyCodeLine{00084\ \ \ \ *\textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{double}*\textcolor{keyword}{>}(\textcolor{keyword}{this})\ \ =\ val;}
+\DoxyCodeLine{00085\ \ \ \ \mbox{\hyperlink{namespacefc_a101ffbbefd2ddbb23eea290bbe9f87a1}{set\_variant\_type}}(\ \textcolor{keyword}{this},\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa6c6595f9a12c6ca1664b2e5ad286bce9}{double\_type}}\ );}
+\DoxyCodeLine{00086\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=313pt]{classfc_1_1variant_a89b8a8bab932ad360be4c8436e1c5dda_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_ade702fd608763e0c1c44a4297ef22aca}\index{fc::variant@{fc::variant}!variant@{variant}}
+\index{variant@{variant}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{variant()}{variant()}\hspace{0.1cm}{\footnotesize\ttfamily [8/27]}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_ade702fd608763e0c1c44a4297ef22aca} 
+fc\+::variant\+::variant (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}}}]{val}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{variant_8cpp_source_l00034}{34}} of file \mbox{\hyperlink{variant_8cpp_source}{variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00035\ \{}
+\DoxyCodeLine{00036\ \ \ \ *\textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}*\textcolor{keyword}{>}(\textcolor{keyword}{this})\ \ =\ val;}
+\DoxyCodeLine{00037\ \ \ \ \mbox{\hyperlink{namespacefc_a101ffbbefd2ddbb23eea290bbe9f87a1}{set\_variant\_type}}(\ \textcolor{keyword}{this},\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa99f1bd3c719716a47670a71a406eff6c}{uint64\_type}}\ );}
+\DoxyCodeLine{00038\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=313pt]{classfc_1_1variant_ade702fd608763e0c1c44a4297ef22aca_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_a743d279294b6f1ca9f1e14c01b71802a}\index{fc::variant@{fc::variant}!variant@{variant}}
+\index{variant@{variant}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{variant()}{variant()}\hspace{0.1cm}{\footnotesize\ttfamily [9/27]}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_a743d279294b6f1ca9f1e14c01b71802a} 
+fc\+::variant\+::variant (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aef44329758059c91c76d334e8fc09700}{int8\+\_\+t}}}]{val}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{variant_8cpp_source_l00040}{40}} of file \mbox{\hyperlink{variant_8cpp_source}{variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00041\ \{}
+\DoxyCodeLine{00042\ \ \ \ *\textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}*\textcolor{keyword}{>}(\textcolor{keyword}{this})\ \ =\ val;}
+\DoxyCodeLine{00043\ \ \ \ \mbox{\hyperlink{namespacefc_a101ffbbefd2ddbb23eea290bbe9f87a1}{set\_variant\_type}}(\ \textcolor{keyword}{this},\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fab2547aa70d744fdd14790e31df14bbe7}{int64\_type}}\ );}
+\DoxyCodeLine{00044\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=313pt]{classfc_1_1variant_a743d279294b6f1ca9f1e14c01b71802a_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_a1f91d872520c59395ab44b337ef30e58}\index{fc::variant@{fc::variant}!variant@{variant}}
+\index{variant@{variant}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{variant()}{variant()}\hspace{0.1cm}{\footnotesize\ttfamily [10/27]}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_a1f91d872520c59395ab44b337ef30e58} 
+fc\+::variant\+::variant (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}}}]{val}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{variant_8cpp_source_l00046}{46}} of file \mbox{\hyperlink{variant_8cpp_source}{variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00047\ \{}
+\DoxyCodeLine{00048\ \ \ \ *\textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}*\textcolor{keyword}{>}(\textcolor{keyword}{this})\ \ =\ val;}
+\DoxyCodeLine{00049\ \ \ \ \mbox{\hyperlink{namespacefc_a101ffbbefd2ddbb23eea290bbe9f87a1}{set\_variant\_type}}(\ \textcolor{keyword}{this},\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa99f1bd3c719716a47670a71a406eff6c}{uint64\_type}}\ );}
+\DoxyCodeLine{00050\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=313pt]{classfc_1_1variant_a1f91d872520c59395ab44b337ef30e58_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_a6480dc77c355024b39448319caae9a98}\index{fc::variant@{fc::variant}!variant@{variant}}
+\index{variant@{variant}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{variant()}{variant()}\hspace{0.1cm}{\footnotesize\ttfamily [11/27]}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_a6480dc77c355024b39448319caae9a98} 
+fc\+::variant\+::variant (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a269259c924dce846340ddbb810db2e3c}{int16\+\_\+t}}}]{val}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{variant_8cpp_source_l00052}{52}} of file \mbox{\hyperlink{variant_8cpp_source}{variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00053\ \{}
+\DoxyCodeLine{00054\ \ \ \ *\textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}*\textcolor{keyword}{>}(\textcolor{keyword}{this})\ \ =\ val;}
+\DoxyCodeLine{00055\ \ \ \ \mbox{\hyperlink{namespacefc_a101ffbbefd2ddbb23eea290bbe9f87a1}{set\_variant\_type}}(\ \textcolor{keyword}{this},\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fab2547aa70d744fdd14790e31df14bbe7}{int64\_type}}\ );}
+\DoxyCodeLine{00056\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=313pt]{classfc_1_1variant_a6480dc77c355024b39448319caae9a98_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_a858fb98a073c500744896a75d83c55c0}\index{fc::variant@{fc::variant}!variant@{variant}}
+\index{variant@{variant}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{variant()}{variant()}\hspace{0.1cm}{\footnotesize\ttfamily [12/27]}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_a858fb98a073c500744896a75d83c55c0} 
+fc\+::variant\+::variant (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{val}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{variant_8cpp_source_l00058}{58}} of file \mbox{\hyperlink{variant_8cpp_source}{variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00059\ \{}
+\DoxyCodeLine{00060\ \ \ \ *\textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}*\textcolor{keyword}{>}(\textcolor{keyword}{this})\ \ =\ val;}
+\DoxyCodeLine{00061\ \ \ \ \mbox{\hyperlink{namespacefc_a101ffbbefd2ddbb23eea290bbe9f87a1}{set\_variant\_type}}(\ \textcolor{keyword}{this},\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa99f1bd3c719716a47670a71a406eff6c}{uint64\_type}}\ );}
+\DoxyCodeLine{00062\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=313pt]{classfc_1_1variant_a858fb98a073c500744896a75d83c55c0_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_a8e3df3c9259e45f4d052c384c1be18ef}\index{fc::variant@{fc::variant}!variant@{variant}}
+\index{variant@{variant}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{variant()}{variant()}\hspace{0.1cm}{\footnotesize\ttfamily [13/27]}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_a8e3df3c9259e45f4d052c384c1be18ef} 
+fc\+::variant\+::variant (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\+\_\+t}}}]{val}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{variant_8cpp_source_l00064}{64}} of file \mbox{\hyperlink{variant_8cpp_source}{variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00065\ \{}
+\DoxyCodeLine{00066\ \ \ \ *\textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}*\textcolor{keyword}{>}(\textcolor{keyword}{this})\ \ =\ val;}
+\DoxyCodeLine{00067\ \ \ \ \mbox{\hyperlink{namespacefc_a101ffbbefd2ddbb23eea290bbe9f87a1}{set\_variant\_type}}(\ \textcolor{keyword}{this},\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fab2547aa70d744fdd14790e31df14bbe7}{int64\_type}}\ );}
+\DoxyCodeLine{00068\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=313pt]{classfc_1_1variant_a8e3df3c9259e45f4d052c384c1be18ef_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_af541c3713ccf43d5a3a031aa70f83c40}\index{fc::variant@{fc::variant}!variant@{variant}}
+\index{variant@{variant}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{variant()}{variant()}\hspace{0.1cm}{\footnotesize\ttfamily [14/27]}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_af541c3713ccf43d5a3a031aa70f83c40} 
+fc\+::variant\+::variant (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{val}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{variant_8cpp_source_l00070}{70}} of file \mbox{\hyperlink{variant_8cpp_source}{variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00071\ \{}
+\DoxyCodeLine{00072\ \ \ \ *\textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}*\textcolor{keyword}{>}(\textcolor{keyword}{this})\ \ =\ val;}
+\DoxyCodeLine{00073\ \ \ \ \mbox{\hyperlink{namespacefc_a101ffbbefd2ddbb23eea290bbe9f87a1}{set\_variant\_type}}(\ \textcolor{keyword}{this},\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa99f1bd3c719716a47670a71a406eff6c}{uint64\_type}}\ );}
+\DoxyCodeLine{00074\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=313pt]{classfc_1_1variant_af541c3713ccf43d5a3a031aa70f83c40_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_aace180d69f4ec94a7bddc12887128638}\index{fc::variant@{fc::variant}!variant@{variant}}
+\index{variant@{variant}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{variant()}{variant()}\hspace{0.1cm}{\footnotesize\ttfamily [15/27]}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_aace180d69f4ec94a7bddc12887128638} 
+fc\+::variant\+::variant (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}}]{val}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{variant_8cpp_source_l00076}{76}} of file \mbox{\hyperlink{variant_8cpp_source}{variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00077\ \{}
+\DoxyCodeLine{00078\ \ \ \ *\textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}*\textcolor{keyword}{>}(\textcolor{keyword}{this})\ \ =\ val;}
+\DoxyCodeLine{00079\ \ \ \ \mbox{\hyperlink{namespacefc_a101ffbbefd2ddbb23eea290bbe9f87a1}{set\_variant\_type}}(\ \textcolor{keyword}{this},\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fab2547aa70d744fdd14790e31df14bbe7}{int64\_type}}\ );}
+\DoxyCodeLine{00080\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=313pt]{classfc_1_1variant_aace180d69f4ec94a7bddc12887128638_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_abf264769c98ab0ef6b3c2dd6306ba0d7}\index{fc::variant@{fc::variant}!variant@{variant}}
+\index{variant@{variant}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{variant()}{variant()}\hspace{0.1cm}{\footnotesize\ttfamily [16/27]}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_abf264769c98ab0ef6b3c2dd6306ba0d7} 
+fc\+::variant\+::variant (\begin{DoxyParamCaption}\item[{double}]{val}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{variant_8cpp_source_l00088}{88}} of file \mbox{\hyperlink{variant_8cpp_source}{variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00089\ \{}
+\DoxyCodeLine{00090\ \ \ \ *\textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{double}*\textcolor{keyword}{>}(\textcolor{keyword}{this})\ \ =\ val;}
+\DoxyCodeLine{00091\ \ \ \ \mbox{\hyperlink{namespacefc_a101ffbbefd2ddbb23eea290bbe9f87a1}{set\_variant\_type}}(\ \textcolor{keyword}{this},\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa6c6595f9a12c6ca1664b2e5ad286bce9}{double\_type}}\ );}
+\DoxyCodeLine{00092\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=313pt]{classfc_1_1variant_abf264769c98ab0ef6b3c2dd6306ba0d7_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_a407d960e0391593c6c0c0445db1a6e4c}\index{fc::variant@{fc::variant}!variant@{variant}}
+\index{variant@{variant}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{variant()}{variant()}\hspace{0.1cm}{\footnotesize\ttfamily [17/27]}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_a407d960e0391593c6c0c0445db1a6e4c} 
+fc\+::variant\+::variant (\begin{DoxyParamCaption}\item[{bool}]{val}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{variant_8cpp_source_l00094}{94}} of file \mbox{\hyperlink{variant_8cpp_source}{variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00095\ \{}
+\DoxyCodeLine{00096\ \ \ \ *\textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{bool}*\textcolor{keyword}{>}(\textcolor{keyword}{this})\ \ =\ val;}
+\DoxyCodeLine{00097\ \ \ \ \mbox{\hyperlink{namespacefc_a101ffbbefd2ddbb23eea290bbe9f87a1}{set\_variant\_type}}(\ \textcolor{keyword}{this},\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fafd4bc66170646a108792cdb339b23872}{bool\_type}}\ );}
+\DoxyCodeLine{00098\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=313pt]{classfc_1_1variant_a407d960e0391593c6c0c0445db1a6e4c_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_af099123791ba91d6c1fd2c3b384578ca}\index{fc::variant@{fc::variant}!variant@{variant}}
+\index{variant@{variant}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{variant()}{variant()}\hspace{0.1cm}{\footnotesize\ttfamily [18/27]}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_af099123791ba91d6c1fd2c3b384578ca} 
+fc\+::variant\+::variant (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structfc_1_1blob}{blob}}}]{val}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{variant_8cpp_source_l00139}{139}} of file \mbox{\hyperlink{variant_8cpp_source}{variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00140\ \{}
+\DoxyCodeLine{00141\ \ \ \ *\textcolor{keyword}{reinterpret\_cast<}blob**\textcolor{keyword}{>}(\textcolor{keyword}{this})\ \ =\ \textcolor{keyword}{new}\ blob(\ fc::move(val)\ );}
+\DoxyCodeLine{00142\ \ \ \ \mbox{\hyperlink{namespacefc_a101ffbbefd2ddbb23eea290bbe9f87a1}{set\_variant\_type}}(\ \textcolor{keyword}{this},\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa57823fd7445ab1ebc8571811e76de5f5}{blob\_type}}\ );}
+\DoxyCodeLine{00143\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=313pt]{classfc_1_1variant_af099123791ba91d6c1fd2c3b384578ca_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_aaf133bf73eb77eda72cfed51a6dfc7ad}\index{fc::variant@{fc::variant}!variant@{variant}}
+\index{variant@{variant}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{variant()}{variant()}\hspace{0.1cm}{\footnotesize\ttfamily [19/27]}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_aaf133bf73eb77eda72cfed51a6dfc7ad} 
+fc\+::variant\+::variant (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}}}]{val}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{variant_8cpp_source_l00134}{134}} of file \mbox{\hyperlink{variant_8cpp_source}{variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00135\ \{}
+\DoxyCodeLine{00136\ \ \ \ *\textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{string}**\textcolor{keyword}{>}(\textcolor{keyword}{this})\ \ =\ \textcolor{keyword}{new}\ \textcolor{keywordtype}{string}(\ fc::move(val)\ );}
+\DoxyCodeLine{00137\ \ \ \ \mbox{\hyperlink{namespacefc_a101ffbbefd2ddbb23eea290bbe9f87a1}{set\_variant\_type}}(\ \textcolor{keyword}{this},\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa23b1f70051406849b91e76a91ab291e2}{string\_type}}\ );}
+\DoxyCodeLine{00138\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=313pt]{classfc_1_1variant_aaf133bf73eb77eda72cfed51a6dfc7ad_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_a7850e84b5671f9b18e31276678ed0288}\index{fc::variant@{fc::variant}!variant@{variant}}
+\index{variant@{variant}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{variant()}{variant()}\hspace{0.1cm}{\footnotesize\ttfamily [20/27]}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_a7850e84b5671f9b18e31276678ed0288} 
+fc\+::variant\+::variant (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1variant__object}{variant\+\_\+object}}}]{obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{variant_8cpp_source_l00145}{145}} of file \mbox{\hyperlink{variant_8cpp_source}{variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00146\ \{}
+\DoxyCodeLine{00147\ \ \ \ *\textcolor{keyword}{reinterpret\_cast<}variant\_object**\textcolor{keyword}{>}(\textcolor{keyword}{this})\ \ =\ \textcolor{keyword}{new}\ variant\_object(fc::move(obj));}
+\DoxyCodeLine{00148\ \ \ \ \mbox{\hyperlink{namespacefc_a101ffbbefd2ddbb23eea290bbe9f87a1}{set\_variant\_type}}(\textcolor{keyword}{this},\ \ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa44a37e1c4fe41b08ad5ea8ef8f480ecf}{object\_type}}\ );}
+\DoxyCodeLine{00149\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=313pt]{classfc_1_1variant_a7850e84b5671f9b18e31276678ed0288_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_ad0fbaa5228660c7fb39fe4b1b1e7ba2c}\index{fc::variant@{fc::variant}!variant@{variant}}
+\index{variant@{variant}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{variant()}{variant()}\hspace{0.1cm}{\footnotesize\ttfamily [21/27]}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_ad0fbaa5228660c7fb39fe4b1b1e7ba2c} 
+fc\+::variant\+::variant (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\+\_\+variant\+\_\+object}}}]{obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{variant_8cpp_source_l00150}{150}} of file \mbox{\hyperlink{variant_8cpp_source}{variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00151\ \{}
+\DoxyCodeLine{00152\ \ \ \ *\textcolor{keyword}{reinterpret\_cast<}variant\_object**\textcolor{keyword}{>}(\textcolor{keyword}{this})\ \ =\ \textcolor{keyword}{new}\ variant\_object(fc::move(obj));}
+\DoxyCodeLine{00153\ \ \ \ \mbox{\hyperlink{namespacefc_a101ffbbefd2ddbb23eea290bbe9f87a1}{set\_variant\_type}}(\textcolor{keyword}{this},\ \ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa44a37e1c4fe41b08ad5ea8ef8f480ecf}{object\_type}}\ );}
+\DoxyCodeLine{00154\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=313pt]{classfc_1_1variant_ad0fbaa5228660c7fb39fe4b1b1e7ba2c_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_a525e612e5c6a007d426a1184acdd880b}\index{fc::variant@{fc::variant}!variant@{variant}}
+\index{variant@{variant}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{variant()}{variant()}\hspace{0.1cm}{\footnotesize\ttfamily [22/27]}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_a525e612e5c6a007d426a1184acdd880b} 
+fc\+::variant\+::variant (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}}]{arr}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{variant_8cpp_source_l00156}{156}} of file \mbox{\hyperlink{variant_8cpp_source}{variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00157\ \{}
+\DoxyCodeLine{00158\ \ \ \ *\textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}**\textcolor{keyword}{>}(\textcolor{keyword}{this})\ \ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}(fc::move(arr));}
+\DoxyCodeLine{00159\ \ \ \ \mbox{\hyperlink{namespacefc_a101ffbbefd2ddbb23eea290bbe9f87a1}{set\_variant\_type}}(\textcolor{keyword}{this},\ \ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5faaf4b658450fa70459033b77c0cae75af}{array\_type}}\ );}
+\DoxyCodeLine{00160\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=313pt]{classfc_1_1variant_a525e612e5c6a007d426a1184acdd880b_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_a33013c40e9afe5c953d7cc45cfdfe2b9}\index{fc::variant@{fc::variant}!variant@{variant}}
+\index{variant@{variant}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{variant()}{variant()}\hspace{0.1cm}{\footnotesize\ttfamily [23/27]}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_a33013c40e9afe5c953d7cc45cfdfe2b9} 
+fc\+::variant\+::variant (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1variant}{variant}} \&}]{v}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{variant_8cpp_source_l00190}{190}} of file \mbox{\hyperlink{variant_8cpp_source}{variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00191\ \{}
+\DoxyCodeLine{00192\ \ \ \ \textcolor{keywordflow}{switch}(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.get\_type()\ )}
+\DoxyCodeLine{00193\ \ \ \ \{}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa44a37e1c4fe41b08ad5ea8ef8f480ecf}{object\_type}}:}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ \ \ *\textcolor{keyword}{reinterpret\_cast<}variant\_object**\textcolor{keyword}{>}(\textcolor{keyword}{this})\ \ =}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ variant\_object(**\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\mbox{\hyperlink{namespacefc_a1b3b274949f105f85361886e7a71c4b3}{const\_variant\_object\_ptr}}*\textcolor{keyword}{>}(\&v));}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a101ffbbefd2ddbb23eea290bbe9f87a1}{set\_variant\_type}}(\ \textcolor{keyword}{this},\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa44a37e1c4fe41b08ad5ea8ef8f480ecf}{object\_type}}\ );}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5faaf4b658450fa70459033b77c0cae75af}{array\_type}}:}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \ \ *\textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}**\textcolor{keyword}{>}(\textcolor{keyword}{this})\ \ =}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}(**\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\mbox{\hyperlink{namespacefc_aadd61a2cdda27916a87e371eca11ca65}{const\_variants\_ptr}}*\textcolor{keyword}{>}(\&v));}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a101ffbbefd2ddbb23eea290bbe9f87a1}{set\_variant\_type}}(\ \textcolor{keyword}{this},\ \ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5faaf4b658450fa70459033b77c0cae75af}{array\_type}}\ );}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa23b1f70051406849b91e76a91ab291e2}{string\_type}}:}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ \ \ *\textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{string}**\textcolor{keyword}{>}(\textcolor{keyword}{this})\ \ =}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ \textcolor{keywordtype}{string}(**\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\mbox{\hyperlink{namespacefc_a36d22c779fd1bc3b3635166055cb025f}{const\_string\_ptr}}*\textcolor{keyword}{>}(\&v)\ );}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a101ffbbefd2ddbb23eea290bbe9f87a1}{set\_variant\_type}}(\ \textcolor{keyword}{this},\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa23b1f70051406849b91e76a91ab291e2}{string\_type}}\ );}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa57823fd7445ab1ebc8571811e76de5f5}{blob\_type}}:}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \ \ \ \ *\textcolor{keyword}{reinterpret\_cast<}blob**\textcolor{keyword}{>}(\textcolor{keyword}{this})\ \ =}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ blob(**\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\mbox{\hyperlink{namespacefc_ad704d5db30b44013543e951d889ca437}{const\_blob\_ptr}}*\textcolor{keyword}{>}(\&v)\ );}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a101ffbbefd2ddbb23eea290bbe9f87a1}{set\_variant\_type}}(\ \textcolor{keyword}{this},\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa57823fd7445ab1ebc8571811e76de5f5}{blob\_type}}\ );}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(\ \textcolor{keyword}{this},\ \&v,\ \textcolor{keyword}{sizeof}(v)\ );}
+\DoxyCodeLine{00216\ \ \ \ \}}
+\DoxyCodeLine{00217\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=313pt]{classfc_1_1variant_a33013c40e9afe5c953d7cc45cfdfe2b9_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_a7df504e005cca53f8dbe8f6286698d66}\index{fc::variant@{fc::variant}!variant@{variant}}
+\index{variant@{variant}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{variant()}{variant()}\hspace{0.1cm}{\footnotesize\ttfamily [24/27]}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_a7df504e005cca53f8dbe8f6286698d66} 
+fc\+::variant\+::variant (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1variant}{variant}} \&\&}]{v}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{variant_8cpp_source_l00219}{219}} of file \mbox{\hyperlink{variant_8cpp_source}{variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00220\ \{}
+\DoxyCodeLine{00221\ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(\ \textcolor{keyword}{this},\ \&v,\ \textcolor{keyword}{sizeof}(v)\ );}
+\DoxyCodeLine{00222\ \ \ \ \mbox{\hyperlink{namespacefc_a101ffbbefd2ddbb23eea290bbe9f87a1}{set\_variant\_type}}(\ \&v,\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa5e16cde26441090f51ebd51c04d7a185}{null\_type}}\ );}
+\DoxyCodeLine{00223\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=313pt]{classfc_1_1variant_a7df504e005cca53f8dbe8f6286698d66_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_a0d4a392a86d2aae2bab4d21ee368c2cb}\index{fc::variant@{fc::variant}!````~variant@{\texorpdfstring{$\sim$}{\string~}variant}}
+\index{````~variant@{\texorpdfstring{$\sim$}{\string~}variant}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}variant()}{\string~variant()}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_a0d4a392a86d2aae2bab4d21ee368c2cb} 
+fc\+::variant\+::\texorpdfstring{$\sim$}{\string~}variant (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{variant_8cpp_source_l00225}{225}} of file \mbox{\hyperlink{variant_8cpp_source}{variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00226\ \{}
+\DoxyCodeLine{00227\ \ \ \ \mbox{\hyperlink{classfc_1_1variant_a201c1ea686618f06d5839e541da3d641}{clear}}();}
+\DoxyCodeLine{00228\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1variant_a0d4a392a86d2aae2bab4d21ee368c2cb_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_a525f5fb6668edc755bd9b43ef55e5028}\index{fc::variant@{fc::variant}!variant@{variant}}
+\index{variant@{variant}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{variant()}{variant()}\hspace{0.1cm}{\footnotesize\ttfamily [25/27]}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_a525f5fb6668edc755bd9b43ef55e5028} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+fc\+::variant\+::variant (\begin{DoxyParamCaption}\item[{const std\+::optional$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&}]{v}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{fc_2include_2fc_2variant_8hpp_source_l00350}{350}} of file \mbox{\hyperlink{fc_2include_2fc_2variant_8hpp_source}{variant.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00351\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00352\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(\ \textcolor{keyword}{this},\ 0,\ \textcolor{keyword}{sizeof}(*\textcolor{keyword}{this})\ );}
+\DoxyCodeLine{00353\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.has\_value()\ )\ *\textcolor{keyword}{this}\ =\ \mbox{\hyperlink{classfc_1_1variant_ab18b9c0de85df3571204f86805bf6c5e}{variant}}(*v);}
+\DoxyCodeLine{00354\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1variant_a525f5fb6668edc755bd9b43ef55e5028_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_a9c0d8a975fbe4a35be95976ba3d457e1}\index{fc::variant@{fc::variant}!variant@{variant}}
+\index{variant@{variant}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{variant()}{variant()}\hspace{0.1cm}{\footnotesize\ttfamily [26/27]}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_a9c0d8a975fbe4a35be95976ba3d457e1} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+fc\+::variant\+::variant (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{val}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{fc_2include_2fc_2variant_8hpp_source_l00616}{616}} of file \mbox{\hyperlink{fc_2include_2fc_2variant_8hpp_source}{variant.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00617\ \ \ \ \{}
+\DoxyCodeLine{00618\ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(\ \textcolor{keyword}{this},\ 0,\ \textcolor{keyword}{sizeof}(*\textcolor{keyword}{this})\ );}
+\DoxyCodeLine{00619\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_adea61f2343de94d0fbcb920a32332ad9}{to\_variant}}(\ val,\ *\textcolor{keyword}{this}\ );}
+\DoxyCodeLine{00620\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1variant_a9c0d8a975fbe4a35be95976ba3d457e1_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_a72f28504ab10f7dec85e0112a58322ca}\index{fc::variant@{fc::variant}!variant@{variant}}
+\index{variant@{variant}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{variant()}{variant()}\hspace{0.1cm}{\footnotesize\ttfamily [27/27]}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_a72f28504ab10f7dec85e0112a58322ca} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+fc\+::variant\+::variant (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{val}{, }\item[{const \mbox{\hyperlink{namespacefc_a978f9e97f64eb2ce6cbe892d3cc93397}{fc\+::yield\+\_\+function\+\_\+t}} \&}]{yield}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{fc_2include_2fc_2variant_8hpp_source_l00623}{623}} of file \mbox{\hyperlink{fc_2include_2fc_2variant_8hpp_source}{variant.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00624\ \ \ \ \{}
+\DoxyCodeLine{00625\ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(\ \textcolor{keyword}{this},\ 0,\ \textcolor{keyword}{sizeof}(*\textcolor{keyword}{this})\ );}
+\DoxyCodeLine{00626\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_adea61f2343de94d0fbcb920a32332ad9}{to\_variant}}(\ val,\ *\textcolor{keyword}{this},\ yield\ );}
+\DoxyCodeLine{00627\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1variant_a72f28504ab10f7dec85e0112a58322ca_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1variant_a82edd1f33199355d3a1f19bbb92909cc}\index{fc::variant@{fc::variant}!as@{as}}
+\index{as@{as}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{as()}{as()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_a82edd1f33199355d3a1f19bbb92909cc} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} fc\+::variant\+::as (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+\+\_\+types that use non-\/intrusive variant conversion can implement the following method to implement conversion from variant to T.
+
+{\ttfamily  void from\+\_\+variant( const Variant\& var, T\& val ) }
+
+The above form is not always convienant, so the this templated method is used to enable conversion from Variants to other types. 
+
+Definition at line \mbox{\hyperlink{fc_2include_2fc_2variant_8hpp_source_l00327}{327}} of file \mbox{\hyperlink{fc_2include_2fc_2variant_8hpp_source}{variant.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00328\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00329\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ tmp;}
+\DoxyCodeLine{00330\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_accef08adf4ee05c36ccc550d8101b08f}{from\_variant}}(\ *\textcolor{keyword}{this},\ tmp\ );}
+\DoxyCodeLine{00331\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ tmp;}
+\DoxyCodeLine{00332\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=276pt]{classfc_1_1variant_a82edd1f33199355d3a1f19bbb92909cc_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{classfc_1_1variant_a82edd1f33199355d3a1f19bbb92909cc_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_a38d824a91168bea0aed58a29d782d4cd}\index{fc::variant@{fc::variant}!as@{as}}
+\index{as@{as}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{as()}{as()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_a38d824a91168bea0aed58a29d782d4cd} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+void fc\+::variant\+::as (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{v}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{fc_2include_2fc_2variant_8hpp_source_l00335}{335}} of file \mbox{\hyperlink{fc_2include_2fc_2variant_8hpp_source}{variant.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00336\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00337\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_accef08adf4ee05c36ccc550d8101b08f}{from\_variant}}(\ *\textcolor{keyword}{this},\ v\ );}
+\DoxyCodeLine{00338\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=276pt]{classfc_1_1variant_a38d824a91168bea0aed58a29d782d4cd_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_a026901a2f99914f10aa5c516eca76d40}\index{fc::variant@{fc::variant}!as\_blob@{as\_blob}}
+\index{as\_blob@{as\_blob}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{as\_blob()}{as\_blob()}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_a026901a2f99914f10aa5c516eca76d40} 
+\mbox{\hyperlink{structfc_1_1blob}{blob}} fc\+::variant\+::as\+\_\+blob (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{variant_8cpp_source_l00518}{518}} of file \mbox{\hyperlink{variant_8cpp_source}{variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00519\ \{}
+\DoxyCodeLine{00520\ \ \ \ \textcolor{keywordflow}{switch}(\ \mbox{\hyperlink{classfc_1_1variant_afaae1df286ff97c83301eda21dbd51ea}{get\_type}}()\ )}
+\DoxyCodeLine{00521\ \ \ \ \{}
+\DoxyCodeLine{00522\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa5e16cde26441090f51ebd51c04d7a185}{null\_type}}:\ \textcolor{keywordflow}{return}\ blob();}
+\DoxyCodeLine{00523\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa57823fd7445ab1ebc8571811e76de5f5}{blob\_type}}:\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1variant_aa475101b0f2181350d76a2fdc6cf7c76}{get\_blob}}();}
+\DoxyCodeLine{00524\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa23b1f70051406849b91e76a91ab291e2}{string\_type}}:}
+\DoxyCodeLine{00525\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00526\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\&\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}\ =\ \mbox{\hyperlink{classfc_1_1variant_a2ca9f4d2feb8c9743da4128b18bfa886}{get\_string}}();}
+\DoxyCodeLine{00527\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}.size()\ ==\ 0\ )\ \textcolor{keywordflow}{return}\ blob();}
+\DoxyCodeLine{00528\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}.back()\ ==\ \textcolor{charliteral}{'='}\ )}
+\DoxyCodeLine{00529\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00530\ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ b64\ =\ \mbox{\hyperlink{namespacefc_ae8deb03ba4f32aa68c5dcc62578ea2de}{base64\_decode}}(\ \mbox{\hyperlink{classfc_1_1variant_a2ca9f4d2feb8c9743da4128b18bfa886}{get\_string}}()\ );}
+\DoxyCodeLine{00531\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ blob(\ \{\ std::vector<char>(\ b64.begin(),\ b64.end()\ )\ \}\ );}
+\DoxyCodeLine{00532\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00533\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ blob(\ \{\ std::vector<char>(\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}.begin(),\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}.end()\ )\ \}\ );}
+\DoxyCodeLine{00534\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00535\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa44a37e1c4fe41b08ad5ea8ef8f480ecf}{object\_type}}:}
+\DoxyCodeLine{00536\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5faaf4b658450fa70459033b77c0cae75af}{array\_type}}:}
+\DoxyCodeLine{00537\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ bad\_cast\_exception,\ \textcolor{stringliteral}{"{}Invalid\ cast\ from\ \$\{type\}\ to\ Blob"{}},\ (\textcolor{stringliteral}{"{}type"{}},\mbox{\hyperlink{classfc_1_1variant_afaae1df286ff97c83301eda21dbd51ea}{get\_type}}())\ );}
+\DoxyCodeLine{00538\ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00539\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ blob(\ \{\ std::vector<char>(\ (\textcolor{keywordtype}{char}*)\&\_data,\ (\textcolor{keywordtype}{char}*)\&\_data\ +\ \textcolor{keyword}{sizeof}(\_data)\ )\ \}\ );}
+\DoxyCodeLine{00540\ \ \ \ \}}
+\DoxyCodeLine{00541\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1variant_a026901a2f99914f10aa5c516eca76d40_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_a86ffd49f6eec1c0fd16ead01e2735107}\index{fc::variant@{fc::variant}!as\_bool@{as\_bool}}
+\index{as\_bool@{as\_bool}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{as\_bool()}{as\_bool()}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_a86ffd49f6eec1c0fd16ead01e2735107} 
+bool fc\+::variant\+::as\+\_\+bool (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{variant_8cpp_source_l00441}{441}} of file \mbox{\hyperlink{variant_8cpp_source}{variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00442\ \{}
+\DoxyCodeLine{00443\ \ \ \ \textcolor{keywordflow}{switch}(\ \mbox{\hyperlink{classfc_1_1variant_afaae1df286ff97c83301eda21dbd51ea}{get\_type}}()\ )}
+\DoxyCodeLine{00444\ \ \ \ \{}
+\DoxyCodeLine{00445\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa23b1f70051406849b91e76a91ab291e2}{string\_type}}:}
+\DoxyCodeLine{00446\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00447\ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ =\ **\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\mbox{\hyperlink{namespacefc_a36d22c779fd1bc3b3635166055cb025f}{const\_string\_ptr}}*\textcolor{keyword}{>}(\textcolor{keyword}{this});}
+\DoxyCodeLine{00448\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ ==\ \textcolor{stringliteral}{"{}true"{}}\ )}
+\DoxyCodeLine{00449\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00450\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ ==\ \textcolor{stringliteral}{"{}false"{}}\ )}
+\DoxyCodeLine{00451\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00452\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ bad\_cast\_exception,\ \textcolor{stringliteral}{"{}Cannot\ convert\ string\ to\ bool\ (only\ \(\backslash\)"{}true\(\backslash\)"{}\ or\ \(\backslash\)"{}false\(\backslash\)"{}\ can\ be\ converted)"{}}\ );}
+\DoxyCodeLine{00453\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00454\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa6c6595f9a12c6ca1664b2e5ad286bce9}{double\_type}}:}
+\DoxyCodeLine{00455\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{double}*\textcolor{keyword}{>}(\textcolor{keyword}{this})\ !=\ 0.0;}
+\DoxyCodeLine{00456\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fab2547aa70d744fdd14790e31df14bbe7}{int64\_type}}:}
+\DoxyCodeLine{00457\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}*\textcolor{keyword}{>}(\textcolor{keyword}{this})\ !=\ 0;}
+\DoxyCodeLine{00458\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa99f1bd3c719716a47670a71a406eff6c}{uint64\_type}}:}
+\DoxyCodeLine{00459\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}*\textcolor{keyword}{>}(\textcolor{keyword}{this})\ !=\ 0;}
+\DoxyCodeLine{00460\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fafd4bc66170646a108792cdb339b23872}{bool\_type}}:}
+\DoxyCodeLine{00461\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{bool}*\textcolor{keyword}{>}(\textcolor{keyword}{this});}
+\DoxyCodeLine{00462\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa5e16cde26441090f51ebd51c04d7a185}{null\_type}}:}
+\DoxyCodeLine{00463\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00464\ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00465\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ bad\_cast\_exception,\ \textcolor{stringliteral}{"{}Invalid\ cast\ from\ \$\{type\}\ to\ bool"{}}\ ,\ (\textcolor{stringliteral}{"{}type"{}},\mbox{\hyperlink{classfc_1_1variant_afaae1df286ff97c83301eda21dbd51ea}{get\_type}}()));}
+\DoxyCodeLine{00466\ \ \ \ \}}
+\DoxyCodeLine{00467\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=318pt]{classfc_1_1variant_a86ffd49f6eec1c0fd16ead01e2735107_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=300pt]{classfc_1_1variant_a86ffd49f6eec1c0fd16ead01e2735107_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_a61f334febee9b226fb077f6da3c52276}\index{fc::variant@{fc::variant}!as\_double@{as\_double}}
+\index{as\_double@{as\_double}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{as\_double()}{as\_double()}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_a61f334febee9b226fb077f6da3c52276} 
+double fc\+::variant\+::as\+\_\+double (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{variant_8cpp_source_l00420}{420}} of file \mbox{\hyperlink{variant_8cpp_source}{variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00421\ \{}
+\DoxyCodeLine{00422\ \ \ \ \textcolor{keywordflow}{switch}(\ \mbox{\hyperlink{classfc_1_1variant_afaae1df286ff97c83301eda21dbd51ea}{get\_type}}()\ )}
+\DoxyCodeLine{00423\ \ \ \ \{}
+\DoxyCodeLine{00424\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa23b1f70051406849b91e76a91ab291e2}{string\_type}}:}
+\DoxyCodeLine{00425\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_aafd3b0e6ae1093d8678f3973faf39a38}{to\_double}}(**\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\mbox{\hyperlink{namespacefc_a36d22c779fd1bc3b3635166055cb025f}{const\_string\_ptr}}*\textcolor{keyword}{>}(\textcolor{keyword}{this}));}
+\DoxyCodeLine{00426\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa6c6595f9a12c6ca1664b2e5ad286bce9}{double\_type}}:}
+\DoxyCodeLine{00427\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{double}*\textcolor{keyword}{>}(\textcolor{keyword}{this});}
+\DoxyCodeLine{00428\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fab2547aa70d744fdd14790e31df14bbe7}{int64\_type}}:}
+\DoxyCodeLine{00429\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{double}\textcolor{keyword}{>}(*\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}*\textcolor{keyword}{>}(\textcolor{keyword}{this}));}
+\DoxyCodeLine{00430\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa99f1bd3c719716a47670a71a406eff6c}{uint64\_type}}:}
+\DoxyCodeLine{00431\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{double}\textcolor{keyword}{>}(*\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}*\textcolor{keyword}{>}(\textcolor{keyword}{this}));}
+\DoxyCodeLine{00432\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fafd4bc66170646a108792cdb339b23872}{bool\_type}}:}
+\DoxyCodeLine{00433\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{bool}*\textcolor{keyword}{>}(\textcolor{keyword}{this});}
+\DoxyCodeLine{00434\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa5e16cde26441090f51ebd51c04d7a185}{null\_type}}:}
+\DoxyCodeLine{00435\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00436\ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00437\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ bad\_cast\_exception,\ \textcolor{stringliteral}{"{}Invalid\ cast\ from\ \$\{type\}\ to\ double"{}},\ (\textcolor{stringliteral}{"{}type"{}},\mbox{\hyperlink{classfc_1_1variant_afaae1df286ff97c83301eda21dbd51ea}{get\_type}}())\ );}
+\DoxyCodeLine{00438\ \ \ \ \}}
+\DoxyCodeLine{00439\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=329pt]{classfc_1_1variant_a61f334febee9b226fb077f6da3c52276_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1variant_a61f334febee9b226fb077f6da3c52276_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_ab5d7877d2c19dbd6ac9eac7a1205dbeb}\index{fc::variant@{fc::variant}!as\_int64@{as\_int64}}
+\index{as\_int64@{as\_int64}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{as\_int64()}{as\_int64()}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_ab5d7877d2c19dbd6ac9eac7a1205dbeb} 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} fc\+::variant\+::as\+\_\+int64 (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{variant_8cpp_source_l00377}{377}} of file \mbox{\hyperlink{variant_8cpp_source}{variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00378\ \{}
+\DoxyCodeLine{00379\ \ \ \ \textcolor{keywordflow}{switch}(\ \mbox{\hyperlink{classfc_1_1variant_afaae1df286ff97c83301eda21dbd51ea}{get\_type}}()\ )}
+\DoxyCodeLine{00380\ \ \ \ \{}
+\DoxyCodeLine{00381\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa23b1f70051406849b91e76a91ab291e2}{string\_type}}:}
+\DoxyCodeLine{00382\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_afe327b84123fcbda675ea00418471c9a}{to\_int64}}(**\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\mbox{\hyperlink{namespacefc_a36d22c779fd1bc3b3635166055cb025f}{const\_string\_ptr}}*\textcolor{keyword}{>}(\textcolor{keyword}{this}));}
+\DoxyCodeLine{00383\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa6c6595f9a12c6ca1664b2e5ad286bce9}{double\_type}}:}
+\DoxyCodeLine{00384\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}(*\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{double}*\textcolor{keyword}{>}(\textcolor{keyword}{this}));}
+\DoxyCodeLine{00385\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fab2547aa70d744fdd14790e31df14bbe7}{int64\_type}}:}
+\DoxyCodeLine{00386\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}*\textcolor{keyword}{>}(\textcolor{keyword}{this});}
+\DoxyCodeLine{00387\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa99f1bd3c719716a47670a71a406eff6c}{uint64\_type}}:}
+\DoxyCodeLine{00388\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}(*\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}*\textcolor{keyword}{>}(\textcolor{keyword}{this}));}
+\DoxyCodeLine{00389\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fafd4bc66170646a108792cdb339b23872}{bool\_type}}:}
+\DoxyCodeLine{00390\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{bool}*\textcolor{keyword}{>}(\textcolor{keyword}{this});}
+\DoxyCodeLine{00391\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa5e16cde26441090f51ebd51c04d7a185}{null\_type}}:}
+\DoxyCodeLine{00392\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00393\ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00394\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ bad\_cast\_exception,\ \textcolor{stringliteral}{"{}Invalid\ cast\ from\ \$\{type\}\ to\ int64"{}},\ (\textcolor{stringliteral}{"{}type"{}},\ \mbox{\hyperlink{classfc_1_1variant_afaae1df286ff97c83301eda21dbd51ea}{get\_type}}())\ );}
+\DoxyCodeLine{00395\ \ \ \ \}}
+\DoxyCodeLine{00396\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=321pt]{classfc_1_1variant_ab5d7877d2c19dbd6ac9eac7a1205dbeb_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{classfc_1_1variant_ab5d7877d2c19dbd6ac9eac7a1205dbeb_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_acbd70a93184e4277631f2a261acb707c}\index{fc::variant@{fc::variant}!as\_string@{as\_string}}
+\index{as\_string@{as\_string}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{as\_string()}{as\_string()}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_acbd70a93184e4277631f2a261acb707c} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} fc\+::variant\+::as\+\_\+string (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+Convert\textquotesingle{}s double, ints, bools, etc to a string 
+\begin{DoxyExceptions}{Exceptions}
+{\em if} & \doxylink{classfc_1_1variant_afaae1df286ff97c83301eda21dbd51ea}{get\+\_\+type()} == array\+\_\+type \texorpdfstring{$\vert$}{|} \doxylink{classfc_1_1variant_afaae1df286ff97c83301eda21dbd51ea}{get\+\_\+type()} == object\+\_\+type \\
+\hline
+\end{DoxyExceptions}
+
+
+Definition at line \mbox{\hyperlink{variant_8cpp_source_l00469}{469}} of file \mbox{\hyperlink{variant_8cpp_source}{variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00470\ \{}
+\DoxyCodeLine{00471\ \ \ \ \textcolor{keywordflow}{switch}(\ \mbox{\hyperlink{classfc_1_1variant_afaae1df286ff97c83301eda21dbd51ea}{get\_type}}()\ )}
+\DoxyCodeLine{00472\ \ \ \ \{}
+\DoxyCodeLine{00473\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa23b1f70051406849b91e76a91ab291e2}{string\_type}}:}
+\DoxyCodeLine{00474\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ **\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\mbox{\hyperlink{namespacefc_a36d22c779fd1bc3b3635166055cb025f}{const\_string\_ptr}}*\textcolor{keyword}{>}(\textcolor{keyword}{this});}
+\DoxyCodeLine{00475\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa6c6595f9a12c6ca1664b2e5ad286bce9}{double\_type}}:}
+\DoxyCodeLine{00476\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_a4e07b3870aa72f8c38bdd5f78044dad1}{to\_string}}(*\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{double}*\textcolor{keyword}{>}(\textcolor{keyword}{this}));}
+\DoxyCodeLine{00477\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fab2547aa70d744fdd14790e31df14bbe7}{int64\_type}}:}
+\DoxyCodeLine{00478\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_a4e07b3870aa72f8c38bdd5f78044dad1}{to\_string}}(*\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}*\textcolor{keyword}{>}(\textcolor{keyword}{this}));}
+\DoxyCodeLine{00479\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa99f1bd3c719716a47670a71a406eff6c}{uint64\_type}}:}
+\DoxyCodeLine{00480\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_a4e07b3870aa72f8c38bdd5f78044dad1}{to\_string}}(*\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}*\textcolor{keyword}{>}(\textcolor{keyword}{this}));}
+\DoxyCodeLine{00481\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fafd4bc66170646a108792cdb339b23872}{bool\_type}}:}
+\DoxyCodeLine{00482\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{bool}*\textcolor{keyword}{>}(\textcolor{keyword}{this})\ ?\ \textcolor{stringliteral}{"{}true"{}}\ :\ \textcolor{stringliteral}{"{}false"{}};}
+\DoxyCodeLine{00483\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa57823fd7445ab1ebc8571811e76de5f5}{blob\_type}}:}
+\DoxyCodeLine{00484\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{classfc_1_1variant_aa475101b0f2181350d76a2fdc6cf7c76}{get\_blob}}().data.size()\ )}
+\DoxyCodeLine{00485\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_a3668095306e6c6c4c53de5d7701e4dde}{base64\_encode}}(\ \mbox{\hyperlink{classfc_1_1variant_aa475101b0f2181350d76a2fdc6cf7c76}{get\_blob}}().data.\mbox{\hyperlink{structfc_1_1blob_a88a9325abb9edd4766c3292e7fd89380}{data}}(),\ \mbox{\hyperlink{classfc_1_1variant_aa475101b0f2181350d76a2fdc6cf7c76}{get\_blob}}().data.size()\ )\ +\ \textcolor{stringliteral}{"{}="{}};}
+\DoxyCodeLine{00486\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}}();}
+\DoxyCodeLine{00487\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa5e16cde26441090f51ebd51c04d7a185}{null\_type}}:}
+\DoxyCodeLine{00488\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}}();}
+\DoxyCodeLine{00489\ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00490\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ bad\_cast\_exception,\ \textcolor{stringliteral}{"{}Invalid\ cast\ from\ \$\{type\}\ to\ string"{}},\ (\textcolor{stringliteral}{"{}type"{}},\ \mbox{\hyperlink{classfc_1_1variant_afaae1df286ff97c83301eda21dbd51ea}{get\_type}}()\ )\ );}
+\DoxyCodeLine{00491\ \ \ \ \}}
+\DoxyCodeLine{00492\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1variant_acbd70a93184e4277631f2a261acb707c_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{classfc_1_1variant_acbd70a93184e4277631f2a261acb707c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_a483bb1f23d9b71ae03e9ca03136ee453}\index{fc::variant@{fc::variant}!as\_uint64@{as\_uint64}}
+\index{as\_uint64@{as\_uint64}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{as\_uint64()}{as\_uint64()}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_a483bb1f23d9b71ae03e9ca03136ee453} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} fc\+::variant\+::as\+\_\+uint64 (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{variant_8cpp_source_l00398}{398}} of file \mbox{\hyperlink{variant_8cpp_source}{variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00399\ \{\ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00400\ \ \ \ \textcolor{keywordflow}{switch}(\ \mbox{\hyperlink{classfc_1_1variant_afaae1df286ff97c83301eda21dbd51ea}{get\_type}}()\ )}
+\DoxyCodeLine{00401\ \ \ \ \{}
+\DoxyCodeLine{00402\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa23b1f70051406849b91e76a91ab291e2}{string\_type}}:}
+\DoxyCodeLine{00403\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_ab20c9acf886f89fabeb8a0d9ebc9abb8}{to\_uint64}}(**\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\mbox{\hyperlink{namespacefc_a36d22c779fd1bc3b3635166055cb025f}{const\_string\_ptr}}*\textcolor{keyword}{>}(\textcolor{keyword}{this}));}
+\DoxyCodeLine{00404\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa6c6595f9a12c6ca1664b2e5ad286bce9}{double\_type}}:}
+\DoxyCodeLine{00405\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\textcolor{keyword}{>}(*\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{double}*\textcolor{keyword}{>}(\textcolor{keyword}{this}));}
+\DoxyCodeLine{00406\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fab2547aa70d744fdd14790e31df14bbe7}{int64\_type}}:}
+\DoxyCodeLine{00407\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\textcolor{keyword}{>}(*\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}*\textcolor{keyword}{>}(\textcolor{keyword}{this}));}
+\DoxyCodeLine{00408\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa99f1bd3c719716a47670a71a406eff6c}{uint64\_type}}:}
+\DoxyCodeLine{00409\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}*\textcolor{keyword}{>}(\textcolor{keyword}{this});}
+\DoxyCodeLine{00410\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fafd4bc66170646a108792cdb339b23872}{bool\_type}}:}
+\DoxyCodeLine{00411\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\textcolor{keyword}{>}(*\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{bool}*\textcolor{keyword}{>}(\textcolor{keyword}{this}));}
+\DoxyCodeLine{00412\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa5e16cde26441090f51ebd51c04d7a185}{null\_type}}:}
+\DoxyCodeLine{00413\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00414\ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00415\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ bad\_cast\_exception,\textcolor{stringliteral}{"{}Invalid\ cast\ from\ \$\{type\}\ to\ uint64"{}},\ (\textcolor{stringliteral}{"{}type"{}},\mbox{\hyperlink{classfc_1_1variant_afaae1df286ff97c83301eda21dbd51ea}{get\_type}}()));}
+\DoxyCodeLine{00416\ \ \ \ \}}
+\DoxyCodeLine{00417\ \}\ \mbox{\hyperlink{exception_8hpp_a094902280cad82ad6529ebbd12a697eb}{FC\_CAPTURE\_AND\_RETHROW}}(\ (*\textcolor{keyword}{this})\ )\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=327pt]{classfc_1_1variant_a483bb1f23d9b71ae03e9ca03136ee453_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{classfc_1_1variant_a483bb1f23d9b71ae03e9ca03136ee453_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_a201c1ea686618f06d5839e541da3d641}\index{fc::variant@{fc::variant}!clear@{clear}}
+\index{clear@{clear}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{clear()}{clear()}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_a201c1ea686618f06d5839e541da3d641} 
+void fc\+::variant\+::clear (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{variant_8cpp_source_l00168}{168}} of file \mbox{\hyperlink{variant_8cpp_source}{variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00169\ \{}
+\DoxyCodeLine{00170\ \ \ \ \textcolor{keywordflow}{switch}(\ \mbox{\hyperlink{classfc_1_1variant_afaae1df286ff97c83301eda21dbd51ea}{get\_type}}()\ )}
+\DoxyCodeLine{00171\ \ \ \ \{}
+\DoxyCodeLine{00172\ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa44a37e1c4fe41b08ad5ea8ef8f480ecf}{object\_type}}:}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ \textcolor{keyword}{delete}\ *\textcolor{keyword}{reinterpret\_cast<}variant\_object**\textcolor{keyword}{>}(\textcolor{keyword}{this});}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00175\ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5faaf4b658450fa70459033b77c0cae75af}{array\_type}}:}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \textcolor{keyword}{delete}\ *\textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}**\textcolor{keyword}{>}(\textcolor{keyword}{this});}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00178\ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa23b1f70051406849b91e76a91ab291e2}{string\_type}}:}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \textcolor{keyword}{delete}\ *\textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{string}**\textcolor{keyword}{>}(\textcolor{keyword}{this});}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00181\ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa57823fd7445ab1ebc8571811e76de5f5}{blob\_type}}:}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \textcolor{keyword}{delete}\ *\textcolor{keyword}{reinterpret\_cast<}blob**\textcolor{keyword}{>}(\textcolor{keyword}{this});}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00184\ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00186\ \ \ \ \}}
+\DoxyCodeLine{00187\ \ \ \ \mbox{\hyperlink{namespacefc_a101ffbbefd2ddbb23eea290bbe9f87a1}{set\_variant\_type}}(\ \textcolor{keyword}{this},\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa5e16cde26441090f51ebd51c04d7a185}{null\_type}}\ );}
+\DoxyCodeLine{00188\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=306pt]{classfc_1_1variant_a201c1ea686618f06d5839e541da3d641_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=309pt]{classfc_1_1variant_a201c1ea686618f06d5839e541da3d641_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_ab5f4bb5f1f3ab7bc8fee99135445df52}\index{fc::variant@{fc::variant}!estimated\_size@{estimated\_size}}
+\index{estimated\_size@{estimated\_size}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{estimated\_size()}{estimated\_size()}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_ab5f4bb5f1f3ab7bc8fee99135445df52} 
+size\+\_\+t fc\+::variant\+::estimated\+\_\+size (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{variant_8cpp_source_l00575}{575}} of file \mbox{\hyperlink{variant_8cpp_source}{variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00576\ \{}
+\DoxyCodeLine{00577\ \ \ \ \textcolor{keywordflow}{switch}(\ \mbox{\hyperlink{classfc_1_1variant_afaae1df286ff97c83301eda21dbd51ea}{get\_type}}()\ )}
+\DoxyCodeLine{00578\ \ \ \ \{}
+\DoxyCodeLine{00579\ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa5e16cde26441090f51ebd51c04d7a185}{null\_type}}:}
+\DoxyCodeLine{00580\ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fab2547aa70d744fdd14790e31df14bbe7}{int64\_type}}:}
+\DoxyCodeLine{00581\ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa99f1bd3c719716a47670a71a406eff6c}{uint64\_type}}:}
+\DoxyCodeLine{00582\ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa6c6595f9a12c6ca1664b2e5ad286bce9}{double\_type}}:}
+\DoxyCodeLine{00583\ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fafd4bc66170646a108792cdb339b23872}{bool\_type}}:}
+\DoxyCodeLine{00584\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{sizeof}(*this);}
+\DoxyCodeLine{00585\ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa23b1f70051406849b91e76a91ab291e2}{string\_type}}:}
+\DoxyCodeLine{00586\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1variant_acbd70a93184e4277631f2a261acb707c}{as\_string}}().length()\ +\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}})\ +\ \textcolor{keyword}{sizeof}(*\textcolor{keyword}{this});}
+\DoxyCodeLine{00587\ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5faaf4b658450fa70459033b77c0cae75af}{array\_type}}:}
+\DoxyCodeLine{00588\ \ \ \ \{}
+\DoxyCodeLine{00589\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ arr\ =\ \mbox{\hyperlink{classfc_1_1variant_aea83c87e4e1b1e185f57717b4bd683a5}{get\_array}}();}
+\DoxyCodeLine{00590\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ arr\_size\ =\ arr.size();}
+\DoxyCodeLine{00591\ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ sum\ =\ \textcolor{keyword}{sizeof}(*this)\ +\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}});}
+\DoxyCodeLine{00592\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ iter\ =\ 0;\ iter\ <\ arr\_size;\ ++iter)\ \{}
+\DoxyCodeLine{00593\ \ \ \ \ \ \ \ \ \ sum\ +=\ arr[iter].estimated\_size();}
+\DoxyCodeLine{00594\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00595\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ sum;}
+\DoxyCodeLine{00596\ \ \ \ \}}
+\DoxyCodeLine{00597\ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa44a37e1c4fe41b08ad5ea8ef8f480ecf}{object\_type}}:}
+\DoxyCodeLine{00598\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1variant_a17a7054a10963360c6a14d60f6e30128}{get\_object}}().\mbox{\hyperlink{classfc_1_1variant__object_a2b3dd60b8f874f342ffda9d9d68eb7b6}{estimated\_size}}()\ +\ \textcolor{keyword}{sizeof}(*this);}
+\DoxyCodeLine{00599\ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa57823fd7445ab1ebc8571811e76de5f5}{blob\_type}}:}
+\DoxyCodeLine{00600\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{sizeof}(blob)\ +\ \mbox{\hyperlink{classfc_1_1variant_aa475101b0f2181350d76a2fdc6cf7c76}{get\_blob}}().\mbox{\hyperlink{structfc_1_1blob_a88a9325abb9edd4766c3292e7fd89380}{data}}.size()\ +\ \textcolor{keyword}{sizeof}(*this);}
+\DoxyCodeLine{00601\ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00602\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ assert\_exception,\ \textcolor{stringliteral}{"{}Invalid\ Type\ /\ Corrupted\ Memory"{}}\ );}
+\DoxyCodeLine{00603\ \ \ \ \}}
+\DoxyCodeLine{00604\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1variant_ab5f4bb5f1f3ab7bc8fee99135445df52_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1variant_ab5f4bb5f1f3ab7bc8fee99135445df52_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_aea83c87e4e1b1e185f57717b4bd683a5}\index{fc::variant@{fc::variant}!get\_array@{get\_array}}
+\index{get\_array@{get\_array}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{get\_array()}{get\_array()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_aea83c87e4e1b1e185f57717b4bd683a5} 
+\mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}} \& fc\+::variant\+::get\+\_\+array (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+\begin{DoxyExceptions}{Exceptions}
+{\em if} & \doxylink{classfc_1_1variant_afaae1df286ff97c83301eda21dbd51ea}{get\+\_\+type()} != array\+\_\+type \texorpdfstring{$\vert$}{|} null\+\_\+type \\
+\hline
+\end{DoxyExceptions}
+
+
+Definition at line \mbox{\hyperlink{variant_8cpp_source_l00496}{496}} of file \mbox{\hyperlink{variant_8cpp_source}{variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00497\ \{}
+\DoxyCodeLine{00498\ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{classfc_1_1variant_afaae1df286ff97c83301eda21dbd51ea}{get\_type}}()\ ==\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5faaf4b658450fa70459033b77c0cae75af}{array\_type}}\ )}
+\DoxyCodeLine{00499\ \ \ \ \ \ \textcolor{keywordflow}{return}\ **\textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}**\textcolor{keyword}{>}(\textcolor{keyword}{this});}
+\DoxyCodeLine{00500\ }
+\DoxyCodeLine{00501\ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ bad\_cast\_exception,\ \textcolor{stringliteral}{"{}Invalid\ cast\ from\ \$\{type\}\ to\ Array"{}},\ (\textcolor{stringliteral}{"{}type"{}},\mbox{\hyperlink{classfc_1_1variant_afaae1df286ff97c83301eda21dbd51ea}{get\_type}}())\ );}
+\DoxyCodeLine{00502\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=325pt]{classfc_1_1variant_aea83c87e4e1b1e185f57717b4bd683a5_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{classfc_1_1variant_aea83c87e4e1b1e185f57717b4bd683a5_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_a5cb44834253397df276f5107cf9211b6}\index{fc::variant@{fc::variant}!get\_array@{get\_array}}
+\index{get\_array@{get\_array}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{get\_array()}{get\_array()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_a5cb44834253397df276f5107cf9211b6} 
+const \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}} \& fc\+::variant\+::get\+\_\+array (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+\begin{DoxyExceptions}{Exceptions}
+{\em if} & \doxylink{classfc_1_1variant_afaae1df286ff97c83301eda21dbd51ea}{get\+\_\+type()} != array\+\_\+type \\
+\hline
+\end{DoxyExceptions}
+
+
+Definition at line \mbox{\hyperlink{variant_8cpp_source_l00545}{545}} of file \mbox{\hyperlink{variant_8cpp_source}{variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00546\ \{}
+\DoxyCodeLine{00547\ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{classfc_1_1variant_afaae1df286ff97c83301eda21dbd51ea}{get\_type}}()\ ==\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5faaf4b658450fa70459033b77c0cae75af}{array\_type}}\ )}
+\DoxyCodeLine{00548\ \ \ \ \ \ \textcolor{keywordflow}{return}\ **\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\mbox{\hyperlink{namespacefc_aadd61a2cdda27916a87e371eca11ca65}{const\_variants\_ptr}}*\textcolor{keyword}{>}(\textcolor{keyword}{this});}
+\DoxyCodeLine{00549\ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ bad\_cast\_exception,\ \textcolor{stringliteral}{"{}Invalid\ cast\ from\ \$\{type\}\ to\ Array"{}},\ (\textcolor{stringliteral}{"{}type"{}},\mbox{\hyperlink{classfc_1_1variant_afaae1df286ff97c83301eda21dbd51ea}{get\_type}}())\ );}
+\DoxyCodeLine{00550\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=325pt]{classfc_1_1variant_a5cb44834253397df276f5107cf9211b6_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_aa475101b0f2181350d76a2fdc6cf7c76}\index{fc::variant@{fc::variant}!get\_blob@{get\_blob}}
+\index{get\_blob@{get\_blob}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{get\_blob()}{get\_blob()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_aa475101b0f2181350d76a2fdc6cf7c76} 
+\mbox{\hyperlink{structfc_1_1blob}{blob}} \& fc\+::variant\+::get\+\_\+blob (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{variant_8cpp_source_l00503}{503}} of file \mbox{\hyperlink{variant_8cpp_source}{variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00504\ \{}
+\DoxyCodeLine{00505\ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{classfc_1_1variant_afaae1df286ff97c83301eda21dbd51ea}{get\_type}}()\ ==\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa57823fd7445ab1ebc8571811e76de5f5}{blob\_type}}\ )}
+\DoxyCodeLine{00506\ \ \ \ \ \ \textcolor{keywordflow}{return}\ **\textcolor{keyword}{reinterpret\_cast<}blob**\textcolor{keyword}{>}(\textcolor{keyword}{this});}
+\DoxyCodeLine{00507\ }
+\DoxyCodeLine{00508\ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ bad\_cast\_exception,\ \textcolor{stringliteral}{"{}Invalid\ cast\ from\ \$\{type\}\ to\ Blob"{}},\ (\textcolor{stringliteral}{"{}type"{}},\mbox{\hyperlink{classfc_1_1variant_afaae1df286ff97c83301eda21dbd51ea}{get\_type}}())\ );}
+\DoxyCodeLine{00509\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=321pt]{classfc_1_1variant_aa475101b0f2181350d76a2fdc6cf7c76_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{classfc_1_1variant_aa475101b0f2181350d76a2fdc6cf7c76_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_ae5eb8afda3a41fc20854875e4d91d5c8}\index{fc::variant@{fc::variant}!get\_blob@{get\_blob}}
+\index{get\_blob@{get\_blob}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{get\_blob()}{get\_blob()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_ae5eb8afda3a41fc20854875e4d91d5c8} 
+const \mbox{\hyperlink{structfc_1_1blob}{blob}} \& fc\+::variant\+::get\+\_\+blob (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{variant_8cpp_source_l00510}{510}} of file \mbox{\hyperlink{variant_8cpp_source}{variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00511\ \{}
+\DoxyCodeLine{00512\ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{classfc_1_1variant_afaae1df286ff97c83301eda21dbd51ea}{get\_type}}()\ ==\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa57823fd7445ab1ebc8571811e76de5f5}{blob\_type}}\ )}
+\DoxyCodeLine{00513\ \ \ \ \ \ \textcolor{keywordflow}{return}\ **\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\mbox{\hyperlink{namespacefc_ad704d5db30b44013543e951d889ca437}{const\_blob\_ptr}}*\textcolor{keyword}{>}(\textcolor{keyword}{this});}
+\DoxyCodeLine{00514\ }
+\DoxyCodeLine{00515\ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ bad\_cast\_exception,\ \textcolor{stringliteral}{"{}Invalid\ cast\ from\ \$\{type\}\ to\ Blob"{}},\ (\textcolor{stringliteral}{"{}type"{}},\mbox{\hyperlink{classfc_1_1variant_afaae1df286ff97c83301eda21dbd51ea}{get\_type}}())\ );}
+\DoxyCodeLine{00516\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=321pt]{classfc_1_1variant_ae5eb8afda3a41fc20854875e4d91d5c8_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_a17a7054a10963360c6a14d60f6e30128}\index{fc::variant@{fc::variant}!get\_object@{get\_object}}
+\index{get\_object@{get\_object}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{get\_object()}{get\_object()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_a17a7054a10963360c6a14d60f6e30128} 
+\mbox{\hyperlink{classfc_1_1variant__object}{variant\+\_\+object}} \& fc\+::variant\+::get\+\_\+object (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+\begin{DoxyExceptions}{Exceptions}
+{\em if} & \doxylink{classfc_1_1variant_afaae1df286ff97c83301eda21dbd51ea}{get\+\_\+type()} != object\+\_\+type \texorpdfstring{$\vert$}{|} null\+\_\+type \\
+\hline
+\end{DoxyExceptions}
+
+
+Definition at line \mbox{\hyperlink{variant_8cpp_source_l00554}{554}} of file \mbox{\hyperlink{variant_8cpp_source}{variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00555\ \{}
+\DoxyCodeLine{00556\ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{classfc_1_1variant_afaae1df286ff97c83301eda21dbd51ea}{get\_type}}()\ ==\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa44a37e1c4fe41b08ad5ea8ef8f480ecf}{object\_type}}\ )}
+\DoxyCodeLine{00557\ \ \ \ \ \ \textcolor{keywordflow}{return}\ **\textcolor{keyword}{reinterpret\_cast<}variant\_object**\textcolor{keyword}{>}(\textcolor{keyword}{this});}
+\DoxyCodeLine{00558\ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ bad\_cast\_exception,\ \textcolor{stringliteral}{"{}Invalid\ cast\ from\ \$\{type\}\ to\ Object"{}},\ (\textcolor{stringliteral}{"{}type"{}},\mbox{\hyperlink{classfc_1_1variant_afaae1df286ff97c83301eda21dbd51ea}{get\_type}}())\ );}
+\DoxyCodeLine{00559\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=330pt]{classfc_1_1variant_a17a7054a10963360c6a14d60f6e30128_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1variant_a17a7054a10963360c6a14d60f6e30128_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_a3efce335057e900b569af78acb1cad6c}\index{fc::variant@{fc::variant}!get\_object@{get\_object}}
+\index{get\_object@{get\_object}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{get\_object()}{get\_object()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_a3efce335057e900b569af78acb1cad6c} 
+const \mbox{\hyperlink{classfc_1_1variant__object}{variant\+\_\+object}} \& fc\+::variant\+::get\+\_\+object (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+\begin{DoxyExceptions}{Exceptions}
+{\em if} & \doxylink{classfc_1_1variant_afaae1df286ff97c83301eda21dbd51ea}{get\+\_\+type()} != object\+\_\+type \\
+\hline
+\end{DoxyExceptions}
+
+
+Definition at line \mbox{\hyperlink{variant_8cpp_source_l00614}{614}} of file \mbox{\hyperlink{variant_8cpp_source}{variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00615\ \{}
+\DoxyCodeLine{00616\ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{classfc_1_1variant_afaae1df286ff97c83301eda21dbd51ea}{get\_type}}()\ ==\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa44a37e1c4fe41b08ad5ea8ef8f480ecf}{object\_type}}\ )}
+\DoxyCodeLine{00617\ \ \ \ \ \ \textcolor{keywordflow}{return}\ **\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\mbox{\hyperlink{namespacefc_a1b3b274949f105f85361886e7a71c4b3}{const\_variant\_object\_ptr}}*\textcolor{keyword}{>}(\textcolor{keyword}{this});}
+\DoxyCodeLine{00618\ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ bad\_cast\_exception,\ \textcolor{stringliteral}{"{}Invalid\ cast\ from\ type\ '\$\{type\}'\ to\ Object"{}},\ (\textcolor{stringliteral}{"{}type"{}},\mbox{\hyperlink{classfc_1_1variant_afaae1df286ff97c83301eda21dbd51ea}{get\_type}}())\ );}
+\DoxyCodeLine{00619\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=330pt]{classfc_1_1variant_a3efce335057e900b569af78acb1cad6c_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_a2ca9f4d2feb8c9743da4128b18bfa886}\index{fc::variant@{fc::variant}!get\_string@{get\_string}}
+\index{get\_string@{get\_string}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{get\_string()}{get\_string()}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_a2ca9f4d2feb8c9743da4128b18bfa886} 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \& fc\+::variant\+::get\+\_\+string (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+\begin{DoxyPrecond}{Precondition}
+\doxylink{classfc_1_1variant_afaae1df286ff97c83301eda21dbd51ea}{get\+\_\+type()} == string\+\_\+type 
+\end{DoxyPrecond}
+
+
+Definition at line \mbox{\hyperlink{variant_8cpp_source_l00606}{606}} of file \mbox{\hyperlink{variant_8cpp_source}{variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00607\ \{}
+\DoxyCodeLine{00608\ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{classfc_1_1variant_afaae1df286ff97c83301eda21dbd51ea}{get\_type}}()\ ==\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa23b1f70051406849b91e76a91ab291e2}{string\_type}}\ )}
+\DoxyCodeLine{00609\ \ \ \ \ \ \textcolor{keywordflow}{return}\ **\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\mbox{\hyperlink{namespacefc_a36d22c779fd1bc3b3635166055cb025f}{const\_string\_ptr}}*\textcolor{keyword}{>}(\textcolor{keyword}{this});}
+\DoxyCodeLine{00610\ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ bad\_cast\_exception,\ \textcolor{stringliteral}{"{}Invalid\ cast\ from\ type\ '\$\{type\}'\ to\ string"{}},\ (\textcolor{stringliteral}{"{}type"{}},\mbox{\hyperlink{classfc_1_1variant_afaae1df286ff97c83301eda21dbd51ea}{get\_type}}())\ );}
+\DoxyCodeLine{00611\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=327pt]{classfc_1_1variant_a2ca9f4d2feb8c9743da4128b18bfa886_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1variant_a2ca9f4d2feb8c9743da4128b18bfa886_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_afaae1df286ff97c83301eda21dbd51ea}\index{fc::variant@{fc::variant}!get\_type@{get\_type}}
+\index{get\_type@{get\_type}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{get\_type()}{get\_type()}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_afaae1df286ff97c83301eda21dbd51ea} 
+\mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5f}{variant\+::type\+\_\+id}} fc\+::variant\+::get\+\_\+type (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{variant_8cpp_source_l00304}{304}} of file \mbox{\hyperlink{variant_8cpp_source}{variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00305\ \{}
+\DoxyCodeLine{00306\ \ \ \ \textcolor{keywordflow}{return}\ (\mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5f}{type\_id}})\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(\textcolor{keyword}{this})[\textcolor{keyword}{sizeof}(*\textcolor{keyword}{this})-\/1];}
+\DoxyCodeLine{00307\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{classfc_1_1variant_afaae1df286ff97c83301eda21dbd51ea_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_a102129c61e671e93d0d6899976fffc96}\index{fc::variant@{fc::variant}!is\_array@{is\_array}}
+\index{is\_array@{is\_array}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{is\_array()}{is\_array()}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_a102129c61e671e93d0d6899976fffc96} 
+bool fc\+::variant\+::is\+\_\+array (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{variant_8cpp_source_l00368}{368}} of file \mbox{\hyperlink{variant_8cpp_source}{variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00369\ \{}
+\DoxyCodeLine{00370\ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1variant_afaae1df286ff97c83301eda21dbd51ea}{get\_type}}()\ ==\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5faaf4b658450fa70459033b77c0cae75af}{array\_type}};}
+\DoxyCodeLine{00371\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=319pt]{classfc_1_1variant_a102129c61e671e93d0d6899976fffc96_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=300pt]{classfc_1_1variant_a102129c61e671e93d0d6899976fffc96_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_adfc583823fe5ba9e4f7f1a7720796535}\index{fc::variant@{fc::variant}!is\_blob@{is\_blob}}
+\index{is\_blob@{is\_blob}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{is\_blob()}{is\_blob()}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_adfc583823fe5ba9e4f7f1a7720796535} 
+bool fc\+::variant\+::is\+\_\+blob (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{variant_8cpp_source_l00372}{372}} of file \mbox{\hyperlink{variant_8cpp_source}{variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00373\ \{}
+\DoxyCodeLine{00374\ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1variant_afaae1df286ff97c83301eda21dbd51ea}{get\_type}}()\ ==\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa57823fd7445ab1ebc8571811e76de5f5}{blob\_type}};}
+\DoxyCodeLine{00375\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=315pt]{classfc_1_1variant_adfc583823fe5ba9e4f7f1a7720796535_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_a99a395b36d39966512f7ac52473aeaaf}\index{fc::variant@{fc::variant}!is\_bool@{is\_bool}}
+\index{is\_bool@{is\_bool}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{is\_bool()}{is\_bool()}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_a99a395b36d39966512f7ac52473aeaaf} 
+bool fc\+::variant\+::is\+\_\+bool (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{variant_8cpp_source_l00318}{318}} of file \mbox{\hyperlink{variant_8cpp_source}{variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00319\ \{}
+\DoxyCodeLine{00320\ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1variant_afaae1df286ff97c83301eda21dbd51ea}{get\_type}}()\ ==\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fafd4bc66170646a108792cdb339b23872}{bool\_type}};}
+\DoxyCodeLine{00321\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=315pt]{classfc_1_1variant_a99a395b36d39966512f7ac52473aeaaf_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_adf93b827afeac79e87d6a7e84341d6f2}\index{fc::variant@{fc::variant}!is\_double@{is\_double}}
+\index{is\_double@{is\_double}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{is\_double()}{is\_double()}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_adf93b827afeac79e87d6a7e84341d6f2} 
+bool fc\+::variant\+::is\+\_\+double (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{variant_8cpp_source_l00322}{322}} of file \mbox{\hyperlink{variant_8cpp_source}{variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00323\ \{}
+\DoxyCodeLine{00324\ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1variant_afaae1df286ff97c83301eda21dbd51ea}{get\_type}}()\ ==\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa6c6595f9a12c6ca1664b2e5ad286bce9}{double\_type}};}
+\DoxyCodeLine{00325\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=326pt]{classfc_1_1variant_adf93b827afeac79e87d6a7e84341d6f2_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=300pt]{classfc_1_1variant_adf93b827afeac79e87d6a7e84341d6f2_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_a2ec4c0d3b694adcf41d846b8af9b610a}\index{fc::variant@{fc::variant}!is\_int64@{is\_int64}}
+\index{is\_int64@{is\_int64}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{is\_int64()}{is\_int64()}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_a2ec4c0d3b694adcf41d846b8af9b610a} 
+bool fc\+::variant\+::is\+\_\+int64 (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{variant_8cpp_source_l00330}{330}} of file \mbox{\hyperlink{variant_8cpp_source}{variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00331\ \{}
+\DoxyCodeLine{00332\ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1variant_afaae1df286ff97c83301eda21dbd51ea}{get\_type}}()\ ==\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fab2547aa70d744fdd14790e31df14bbe7}{int64\_type}};}
+\DoxyCodeLine{00333\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=318pt]{classfc_1_1variant_a2ec4c0d3b694adcf41d846b8af9b610a_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=300pt]{classfc_1_1variant_a2ec4c0d3b694adcf41d846b8af9b610a_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_a59f43987b39a2e02b9699e917f5cc3d2}\index{fc::variant@{fc::variant}!is\_integer@{is\_integer}}
+\index{is\_integer@{is\_integer}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{is\_integer()}{is\_integer()}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_a59f43987b39a2e02b9699e917f5cc3d2} 
+bool fc\+::variant\+::is\+\_\+integer (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+int64, uint64, bool 
+
+Definition at line \mbox{\hyperlink{variant_8cpp_source_l00335}{335}} of file \mbox{\hyperlink{variant_8cpp_source}{variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00336\ \{}
+\DoxyCodeLine{00337\ \ \ \ \textcolor{keywordflow}{switch}(\ \mbox{\hyperlink{classfc_1_1variant_afaae1df286ff97c83301eda21dbd51ea}{get\_type}}()\ )}
+\DoxyCodeLine{00338\ \ \ \ \{}
+\DoxyCodeLine{00339\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fab2547aa70d744fdd14790e31df14bbe7}{int64\_type}}:}
+\DoxyCodeLine{00340\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa99f1bd3c719716a47670a71a406eff6c}{uint64\_type}}:}
+\DoxyCodeLine{00341\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fafd4bc66170646a108792cdb339b23872}{bool\_type}}:}
+\DoxyCodeLine{00342\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00343\ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00344\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00345\ \ \ \ \}}
+\DoxyCodeLine{00346\ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00347\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=327pt]{classfc_1_1variant_a59f43987b39a2e02b9699e917f5cc3d2_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_a531450deac912ee3e1bc606422714a68}\index{fc::variant@{fc::variant}!is\_null@{is\_null}}
+\index{is\_null@{is\_null}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{is\_null()}{is\_null()}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_a531450deac912ee3e1bc606422714a68} 
+bool fc\+::variant\+::is\+\_\+null (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{variant_8cpp_source_l00309}{309}} of file \mbox{\hyperlink{variant_8cpp_source}{variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00310\ \{}
+\DoxyCodeLine{00311\ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1variant_afaae1df286ff97c83301eda21dbd51ea}{get\_type}}()\ ==\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa5e16cde26441090f51ebd51c04d7a185}{null\_type}};}
+\DoxyCodeLine{00312\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=312pt]{classfc_1_1variant_a531450deac912ee3e1bc606422714a68_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1variant_a531450deac912ee3e1bc606422714a68_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_a5c2238ce8bbeb5dc454134ec92624aab}\index{fc::variant@{fc::variant}!is\_numeric@{is\_numeric}}
+\index{is\_numeric@{is\_numeric}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{is\_numeric()}{is\_numeric()}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_a5c2238ce8bbeb5dc454134ec92624aab} 
+bool fc\+::variant\+::is\+\_\+numeric (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+int64, uint64, double,bool 
+
+Definition at line \mbox{\hyperlink{variant_8cpp_source_l00348}{348}} of file \mbox{\hyperlink{variant_8cpp_source}{variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00349\ \{}
+\DoxyCodeLine{00350\ \ \ \ \textcolor{keywordflow}{switch}(\ \mbox{\hyperlink{classfc_1_1variant_afaae1df286ff97c83301eda21dbd51ea}{get\_type}}()\ )}
+\DoxyCodeLine{00351\ \ \ \ \{}
+\DoxyCodeLine{00352\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fab2547aa70d744fdd14790e31df14bbe7}{int64\_type}}:}
+\DoxyCodeLine{00353\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa99f1bd3c719716a47670a71a406eff6c}{uint64\_type}}:}
+\DoxyCodeLine{00354\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa6c6595f9a12c6ca1664b2e5ad286bce9}{double\_type}}:}
+\DoxyCodeLine{00355\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fafd4bc66170646a108792cdb339b23872}{bool\_type}}:}
+\DoxyCodeLine{00356\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00357\ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00358\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00359\ \ \ \ \}}
+\DoxyCodeLine{00360\ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00361\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=332pt]{classfc_1_1variant_a5c2238ce8bbeb5dc454134ec92624aab_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_aa542b555ee260a07e61a2d38ff765d87}\index{fc::variant@{fc::variant}!is\_object@{is\_object}}
+\index{is\_object@{is\_object}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{is\_object()}{is\_object()}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_aa542b555ee260a07e61a2d38ff765d87} 
+bool fc\+::variant\+::is\+\_\+object (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{variant_8cpp_source_l00363}{363}} of file \mbox{\hyperlink{variant_8cpp_source}{variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00364\ \{}
+\DoxyCodeLine{00365\ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1variant_afaae1df286ff97c83301eda21dbd51ea}{get\_type}}()\ ==\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa44a37e1c4fe41b08ad5ea8ef8f480ecf}{object\_type}};}
+\DoxyCodeLine{00366\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=324pt]{classfc_1_1variant_aa542b555ee260a07e61a2d38ff765d87_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1variant_aa542b555ee260a07e61a2d38ff765d87_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_ac51c0354c1fcef2cc5ce43a5062e8de6}\index{fc::variant@{fc::variant}!is\_string@{is\_string}}
+\index{is\_string@{is\_string}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{is\_string()}{is\_string()}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_ac51c0354c1fcef2cc5ce43a5062e8de6} 
+bool fc\+::variant\+::is\+\_\+string (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{variant_8cpp_source_l00314}{314}} of file \mbox{\hyperlink{variant_8cpp_source}{variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00315\ \{}
+\DoxyCodeLine{00316\ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1variant_afaae1df286ff97c83301eda21dbd51ea}{get\_type}}()\ ==\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa23b1f70051406849b91e76a91ab291e2}{string\_type}};}
+\DoxyCodeLine{00317\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=321pt]{classfc_1_1variant_ac51c0354c1fcef2cc5ce43a5062e8de6_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=303pt]{classfc_1_1variant_ac51c0354c1fcef2cc5ce43a5062e8de6_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_ac06c2b8b4af18cefcaee6cd91b29b293}\index{fc::variant@{fc::variant}!is\_uint64@{is\_uint64}}
+\index{is\_uint64@{is\_uint64}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{is\_uint64()}{is\_uint64()}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_ac06c2b8b4af18cefcaee6cd91b29b293} 
+bool fc\+::variant\+::is\+\_\+uint64 (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{variant_8cpp_source_l00326}{326}} of file \mbox{\hyperlink{variant_8cpp_source}{variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00327\ \{}
+\DoxyCodeLine{00328\ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1variant_afaae1df286ff97c83301eda21dbd51ea}{get\_type}}()\ ==\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa99f1bd3c719716a47670a71a406eff6c}{uint64\_type}};}
+\DoxyCodeLine{00329\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=324pt]{classfc_1_1variant_ac06c2b8b4af18cefcaee6cd91b29b293_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=305pt]{classfc_1_1variant_ac06c2b8b4af18cefcaee6cd91b29b293_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_af0367a0aa45efe02b3db8e17ce94e43e}\index{fc::variant@{fc::variant}!operator=@{operator=}}
+\index{operator=@{operator=}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_af0367a0aa45efe02b3db8e17ce94e43e} 
+\mbox{\hyperlink{classfc_1_1variant}{variant}} \& fc\+::variant\+::operator= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1variant}{variant}} \&}]{v}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{variant_8cpp_source_l00239}{239}} of file \mbox{\hyperlink{variant_8cpp_source}{variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00240\ \{}
+\DoxyCodeLine{00241\ \ \ \ \textcolor{keywordflow}{if}(\ \textcolor{keyword}{this}\ ==\ \&v\ )}
+\DoxyCodeLine{00242\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00243\ }
+\DoxyCodeLine{00244\ \ \ \ \mbox{\hyperlink{classfc_1_1variant_a201c1ea686618f06d5839e541da3d641}{clear}}();}
+\DoxyCodeLine{00245\ \ \ \ \textcolor{keywordflow}{switch}(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.get\_type()\ )}
+\DoxyCodeLine{00246\ \ \ \ \{}
+\DoxyCodeLine{00247\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa44a37e1c4fe41b08ad5ea8ef8f480ecf}{object\_type}}:}
+\DoxyCodeLine{00248\ \ \ \ \ \ \ \ \ \ *\textcolor{keyword}{reinterpret\_cast<}variant\_object**\textcolor{keyword}{>}(\textcolor{keyword}{this})\ \ =}
+\DoxyCodeLine{00249\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ variant\_object((**\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\mbox{\hyperlink{namespacefc_a1b3b274949f105f85361886e7a71c4b3}{const\_variant\_object\_ptr}}*\textcolor{keyword}{>}(\&v)));}
+\DoxyCodeLine{00250\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00251\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5faaf4b658450fa70459033b77c0cae75af}{array\_type}}:}
+\DoxyCodeLine{00252\ \ \ \ \ \ \ \ \ \ *\textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}**\textcolor{keyword}{>}(\textcolor{keyword}{this})\ \ =}
+\DoxyCodeLine{00253\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}((**\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\mbox{\hyperlink{namespacefc_aadd61a2cdda27916a87e371eca11ca65}{const\_variants\_ptr}}*\textcolor{keyword}{>}(\&v)));}
+\DoxyCodeLine{00254\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00255\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa23b1f70051406849b91e76a91ab291e2}{string\_type}}:}
+\DoxyCodeLine{00256\ \ \ \ \ \ \ \ \ \ *\textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{string}**\textcolor{keyword}{>}(\textcolor{keyword}{this})\ \ =\ \textcolor{keyword}{new}\ \textcolor{keywordtype}{string}((**\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\mbox{\hyperlink{namespacefc_a36d22c779fd1bc3b3635166055cb025f}{const\_string\_ptr}}*\textcolor{keyword}{>}(\&v))\ );}
+\DoxyCodeLine{00257\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00258\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa57823fd7445ab1ebc8571811e76de5f5}{blob\_type}}:}
+\DoxyCodeLine{00259\ \ \ \ \ \ \ \ \ \ *\textcolor{keyword}{reinterpret\_cast<}blob**\textcolor{keyword}{>}(\textcolor{keyword}{this})\ \ =\ \textcolor{keyword}{new}\ blob((**\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\mbox{\hyperlink{namespacefc_ad704d5db30b44013543e951d889ca437}{const\_blob\_ptr}}*\textcolor{keyword}{>}(\&v))\ );}
+\DoxyCodeLine{00260\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00261\ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00262\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(\ \textcolor{keyword}{this},\ \&v,\ \textcolor{keyword}{sizeof}(v)\ );}
+\DoxyCodeLine{00263\ \ \ \ \}}
+\DoxyCodeLine{00264\ \ \ \ \mbox{\hyperlink{namespacefc_a101ffbbefd2ddbb23eea290bbe9f87a1}{set\_variant\_type}}(\ \textcolor{keyword}{this},\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.get\_type()\ );}
+\DoxyCodeLine{00265\ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00266\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1variant_af0367a0aa45efe02b3db8e17ce94e43e_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_a1dc9212581e7a405ac5b374116ecdd6e}\index{fc::variant@{fc::variant}!operator=@{operator=}}
+\index{operator=@{operator=}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_a1dc9212581e7a405ac5b374116ecdd6e} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{classfc_1_1variant}{variant}} \& fc\+::variant\+::operator= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\&}]{v}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{fc_2include_2fc_2variant_8hpp_source_l00344}{344}} of file \mbox{\hyperlink{fc_2include_2fc_2variant_8hpp_source}{variant.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00345\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00346\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this}\ =\ \mbox{\hyperlink{classfc_1_1variant_ab18b9c0de85df3571204f86805bf6c5e}{variant}}(\ fc::forward<T>(v)\ );}
+\DoxyCodeLine{00347\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1variant_a1dc9212581e7a405ac5b374116ecdd6e_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_a0dca5e5489ee3baac5bdab51417d9e02}\index{fc::variant@{fc::variant}!operator=@{operator=}}
+\index{operator=@{operator=}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_a0dca5e5489ee3baac5bdab51417d9e02} 
+\mbox{\hyperlink{classfc_1_1variant}{variant}} \& fc\+::variant\+::operator= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1variant}{variant}} \&\&}]{v}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{variant_8cpp_source_l00230}{230}} of file \mbox{\hyperlink{variant_8cpp_source}{variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00231\ \{}
+\DoxyCodeLine{00232\ \ \ \ \textcolor{keywordflow}{if}(\ \textcolor{keyword}{this}\ ==\ \&v\ )\ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00233\ \ \ \ \mbox{\hyperlink{classfc_1_1variant_a201c1ea686618f06d5839e541da3d641}{clear}}();}
+\DoxyCodeLine{00234\ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(\ (\textcolor{keywordtype}{char}*)\textcolor{keyword}{this},\ (\textcolor{keywordtype}{char}*)\&v,\ \textcolor{keyword}{sizeof}(v)\ );}
+\DoxyCodeLine{00235\ \ \ \ \mbox{\hyperlink{namespacefc_a101ffbbefd2ddbb23eea290bbe9f87a1}{set\_variant\_type}}(\ \&v,\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa5e16cde26441090f51ebd51c04d7a185}{null\_type}}\ );}
+\DoxyCodeLine{00236\ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00237\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1variant_a0dca5e5489ee3baac5bdab51417d9e02_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_afc8519b6b2c1c192506a10289196cbf5}\index{fc::variant@{fc::variant}!operator\mbox{[}\mbox{]}@{operator[]}}
+\index{operator\mbox{[}\mbox{]}@{operator[]}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{operator[]()}{operator[]()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_afc8519b6b2c1c192506a10289196cbf5} 
+const \mbox{\hyperlink{classfc_1_1variant}{variant}} \& fc\+::variant\+::operator\mbox{[}$\,$\mbox{]} (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{key}{}\end{DoxyParamCaption}) const}
+
+\begin{DoxyPrecond}{Precondition}
+\doxylink{classfc_1_1variant_aa542b555ee260a07e61a2d38ff765d87}{is\+\_\+object()} 
+\end{DoxyPrecond}
+
+
+Definition at line \mbox{\hyperlink{variant_8cpp_source_l00561}{561}} of file \mbox{\hyperlink{variant_8cpp_source}{variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00562\ \{}
+\DoxyCodeLine{00563\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1variant_a17a7054a10963360c6a14d60f6e30128}{get\_object}}()[\mbox{\hyperlink{yubico__otp_8c_a9246c20bb98ad2b4c60313c053c70f08}{key}}];}
+\DoxyCodeLine{00564\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1variant_afc8519b6b2c1c192506a10289196cbf5_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_af88be0a0533f9d58f36d88339d42f9fd}\index{fc::variant@{fc::variant}!operator\mbox{[}\mbox{]}@{operator[]}}
+\index{operator\mbox{[}\mbox{]}@{operator[]}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{operator[]()}{operator[]()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_af88be0a0533f9d58f36d88339d42f9fd} 
+const \mbox{\hyperlink{classfc_1_1variant}{variant}} \& fc\+::variant\+::operator\mbox{[}$\,$\mbox{]} (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{pos}{}\end{DoxyParamCaption}) const}
+
+\begin{DoxyPrecond}{Precondition}
+\doxylink{classfc_1_1variant_a102129c61e671e93d0d6899976fffc96}{is\+\_\+array()} 
+\end{DoxyPrecond}
+
+
+Definition at line \mbox{\hyperlink{variant_8cpp_source_l00565}{565}} of file \mbox{\hyperlink{variant_8cpp_source}{variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00566\ \{}
+\DoxyCodeLine{00567\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1variant_aea83c87e4e1b1e185f57717b4bd683a5}{get\_array}}()[pos];}
+\DoxyCodeLine{00568\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1variant_af88be0a0533f9d58f36d88339d42f9fd_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_a67f6416c5dd1b9c53b4b20b73f9cd117}\index{fc::variant@{fc::variant}!size@{size}}
+\index{size@{size}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{size()}{size()}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_a67f6416c5dd1b9c53b4b20b73f9cd117} 
+size\+\_\+t fc\+::variant\+::size (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+\begin{DoxyPrecond}{Precondition}
+\doxylink{classfc_1_1variant_a102129c61e671e93d0d6899976fffc96}{is\+\_\+array()} 
+\end{DoxyPrecond}
+
+
+Definition at line \mbox{\hyperlink{variant_8cpp_source_l00570}{570}} of file \mbox{\hyperlink{variant_8cpp_source}{variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00571\ \{}
+\DoxyCodeLine{00572\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1variant_aea83c87e4e1b1e185f57717b4bd683a5}{get\_array}}().size();}
+\DoxyCodeLine{00573\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1variant_a67f6416c5dd1b9c53b4b20b73f9cd117_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1variant_a327534c432bafeffa193555109c2dd6f}\index{fc::variant@{fc::variant}!visit@{visit}}
+\index{visit@{visit}!fc::variant@{fc::variant}}
+\doxysubsubsection{\texorpdfstring{visit()}{visit()}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_a327534c432bafeffa193555109c2dd6f} 
+void fc\+::variant\+::visit (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1variant_1_1visitor}{visitor}} \&}]{v}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{variant_8cpp_source_l00268}{268}} of file \mbox{\hyperlink{variant_8cpp_source}{variant.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00269\ \{}
+\DoxyCodeLine{00270\ \ \ \ \textcolor{keywordflow}{switch}(\ \mbox{\hyperlink{classfc_1_1variant_afaae1df286ff97c83301eda21dbd51ea}{get\_type}}()\ )}
+\DoxyCodeLine{00271\ \ \ \ \{}
+\DoxyCodeLine{00272\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa5e16cde26441090f51ebd51c04d7a185}{null\_type}}:}
+\DoxyCodeLine{00273\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.handle();}
+\DoxyCodeLine{00274\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00275\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fab2547aa70d744fdd14790e31df14bbe7}{int64\_type}}:}
+\DoxyCodeLine{00276\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.handle(\ *\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}*\textcolor{keyword}{>}(\textcolor{keyword}{this})\ );}
+\DoxyCodeLine{00277\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00278\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa99f1bd3c719716a47670a71a406eff6c}{uint64\_type}}:}
+\DoxyCodeLine{00279\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.handle(\ *\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}*\textcolor{keyword}{>}(\textcolor{keyword}{this})\ );}
+\DoxyCodeLine{00280\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00281\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa6c6595f9a12c6ca1664b2e5ad286bce9}{double\_type}}:}
+\DoxyCodeLine{00282\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.handle(\ *\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{double}*\textcolor{keyword}{>}(\textcolor{keyword}{this})\ );}
+\DoxyCodeLine{00283\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00284\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fafd4bc66170646a108792cdb339b23872}{bool\_type}}:}
+\DoxyCodeLine{00285\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.handle(\ *\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{bool}*\textcolor{keyword}{>}(\textcolor{keyword}{this})\ );}
+\DoxyCodeLine{00286\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00287\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa23b1f70051406849b91e76a91ab291e2}{string\_type}}:}
+\DoxyCodeLine{00288\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.handle(\ **\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\mbox{\hyperlink{namespacefc_a36d22c779fd1bc3b3635166055cb025f}{const\_string\_ptr}}*\textcolor{keyword}{>}(\textcolor{keyword}{this})\ );}
+\DoxyCodeLine{00289\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00290\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5faaf4b658450fa70459033b77c0cae75af}{array\_type}}:}
+\DoxyCodeLine{00291\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.handle(\ **\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\mbox{\hyperlink{namespacefc_aadd61a2cdda27916a87e371eca11ca65}{const\_variants\_ptr}}*\textcolor{keyword}{>}(\textcolor{keyword}{this})\ );}
+\DoxyCodeLine{00292\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00293\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa44a37e1c4fe41b08ad5ea8ef8f480ecf}{object\_type}}:}
+\DoxyCodeLine{00294\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.handle(\ **\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\mbox{\hyperlink{namespacefc_a1b3b274949f105f85361886e7a71c4b3}{const\_variant\_object\_ptr}}*\textcolor{keyword}{>}(\textcolor{keyword}{this})\ );}
+\DoxyCodeLine{00295\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00296\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa57823fd7445ab1ebc8571811e76de5f5}{blob\_type}}:}
+\DoxyCodeLine{00297\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.handle(\ **\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\mbox{\hyperlink{namespacefc_ad704d5db30b44013543e951d889ca437}{const\_blob\_ptr}}*\textcolor{keyword}{>}(\textcolor{keyword}{this})\ );}
+\DoxyCodeLine{00298\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00299\ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00300\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ assert\_exception,\ \textcolor{stringliteral}{"{}Invalid\ Type\ /\ Corrupted\ Memory"{}}\ );}
+\DoxyCodeLine{00301\ \ \ \ \}}
+\DoxyCodeLine{00302\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=303pt]{classfc_1_1variant_a327534c432bafeffa193555109c2dd6f_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/\mbox{\hyperlink{fc_2include_2fc_2variant_8hpp}{variant.\+hpp}}\item 
+libraries/fc/src/\mbox{\hyperlink{variant_8cpp}{variant.\+cpp}}\end{DoxyCompactItemize}

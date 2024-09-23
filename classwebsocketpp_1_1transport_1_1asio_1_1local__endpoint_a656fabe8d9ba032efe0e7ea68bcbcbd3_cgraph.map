@@ -1,0 +1,7 @@
+<map id="websocketpp::transport::asio::local_endpoint::set_timer" name="websocketpp::transport::asio::local_endpoint::set_timer">
+<area shape="rect" id="Node000001" title="Call back a function after a period of time." alt="" coords="5,41,163,97"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1transport_1_1asio_1_1local__endpoint.html#aa1f5cf6c70de3e0e5d15567e3c731829" title="Timer handler." alt="" coords="211,5,368,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="163,53,195,47,196,52,164,58"/>
+<area shape="rect" id="Node000003" href="$namespacewebsocketpp_1_1lib_1_1asio.html#a38ce6cba13c37a134a65f3623d00090e" title=" " alt="" coords="214,85,365,126"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="164,80,199,87,198,92,163,86"/>
+</map>

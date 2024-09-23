@@ -1,0 +1,13 @@
+<map id="f64_to_i64" name="f64_to_i64">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,54,87,79"/>
+<area shape="rect" id="Node000002" href="$softfloat_2source_28086-_s_s_e_2softfloat__raise_flags_8c.html#ac16bbf09eca0fe8ff91301d82c5a667f" title=" " alt="" coords="353,28,488,54"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="63,51,94,30,134,13,193,4,254,4,311,11,360,21,359,27,310,17,254,10,194,9,135,18,97,35,66,55"/>
+<area shape="rect" id="Node000003" href="$sys-vm_2external_2softfloat_2source_2s__round_m_to_i64_8c.html#a1d993595125afbf9eae41f1584f8501e" title=" " alt="" coords="145,28,295,54"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="87,58,129,52,130,57,87,63"/>
+<area shape="rect" id="Node000004" href="$softfloat_2source_2s__round_to_i64_8c.html#ade71787d45a8f73efde3ddb76a00701c" title=" " alt="" coords="150,78,290,103"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="87,70,135,76,134,81,87,75"/>
+<area shape="rect" id="Node000005" href="$softfloat_2source_2s__shift_right_jam64_extra_8c.html#ad77b47aa5e02c75d01e4e0beeac87043" title=" " alt="" coords="135,128,305,168"/>
+<area shape="poly" id="edge6_Node000001_Node000005" title=" " alt="" coords="70,78,136,114,148,119,145,124,133,118,67,82"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="296,39,337,39,337,44,296,44"/>
+<area shape="poly" id="edge5_Node000004_Node000002" title=" " alt="" coords="275,75,350,56,351,61,276,80"/>
+</map>

@@ -1,0 +1,1469 @@
+\doxysection{appbase\+::application Class Reference}
+\hypertarget{classappbase_1_1application}{}\label{classappbase_1_1application}\index{appbase::application@{appbase::application}}
+
+
+{\ttfamily \#include $<$application.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classappbase_1_1application_ae9b89e36574867b0eaf08a6755c67ce2}{\texorpdfstring{$\sim$}{\string~}application}} ()
+\item 
+void \mbox{\hyperlink{classappbase_1_1application_a2794807d31e9f29f1327811dda40820d}{set\+\_\+version}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{classappbase_1_1application_ae4ec67aea2aa3bab8800c875590245b2}{version}})
+\begin{DoxyCompactList}\small\item\em Set version. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{classappbase_1_1application_ae4ec67aea2aa3bab8800c875590245b2}{version}} () const
+\begin{DoxyCompactList}\small\item\em Get version. \end{DoxyCompactList}\item 
+string \mbox{\hyperlink{classappbase_1_1application_a780543c4d0330fe88b912a3fa914f953}{version\+\_\+string}} () const
+\begin{DoxyCompactList}\small\item\em Get version string; generated from git describe if available. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classappbase_1_1application_a1d2a9932724a536b94eb3d5cff815ffc}{set\+\_\+version\+\_\+string}} (std\+::string v)
+\begin{DoxyCompactList}\small\item\em User provided version string for \doxylink{classappbase_1_1application_a780543c4d0330fe88b912a3fa914f953}{version\+\_\+string()} which overrides git describe value. \end{DoxyCompactList}\item 
+string \mbox{\hyperlink{classappbase_1_1application_ab53fa2d323d053e4e57adc832a9969bb}{full\+\_\+version\+\_\+string}} () const
+\begin{DoxyCompactList}\small\item\em Get full version string; same as \doxylink{classappbase_1_1application_a780543c4d0330fe88b912a3fa914f953}{version\+\_\+string()} unless set differently. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classappbase_1_1application_ae894f512cb24cba9b754cf984dceaa84}{set\+\_\+full\+\_\+version\+\_\+string}} (std\+::string v)
+\begin{DoxyCompactList}\small\item\em User provided full version string for \doxylink{classappbase_1_1application_ab53fa2d323d053e4e57adc832a9969bb}{full\+\_\+version\+\_\+string()} \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classappbase_1_1application_af81fa07af200b5b24049ed5d197a864f}{set\+\_\+default\+\_\+data\+\_\+dir}} (const bfs\+::path \&\mbox{\hyperlink{classappbase_1_1application_a5dfd3cfb1124c57963fa17b3f4aabbe1}{data\+\_\+dir}}="{}data-\/dir"{})
+\begin{DoxyCompactList}\small\item\em Set default data directory. \end{DoxyCompactList}\item 
+bfs\+::path \mbox{\hyperlink{classappbase_1_1application_a5dfd3cfb1124c57963fa17b3f4aabbe1}{data\+\_\+dir}} () const
+\begin{DoxyCompactList}\small\item\em Get data directory. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classappbase_1_1application_a49901c76b365337c933e6485649a50b6}{set\+\_\+default\+\_\+config\+\_\+dir}} (const bfs\+::path \&\mbox{\hyperlink{classappbase_1_1application_a9b2c99749c7209e218a3dbbe51cfdeac}{config\+\_\+dir}}="{}etc"{})
+\begin{DoxyCompactList}\small\item\em Set default config directory. \end{DoxyCompactList}\item 
+bfs\+::path \mbox{\hyperlink{classappbase_1_1application_a9b2c99749c7209e218a3dbbe51cfdeac}{config\+\_\+dir}} () const
+\begin{DoxyCompactList}\small\item\em Get config directory. \end{DoxyCompactList}\item 
+bfs\+::path \mbox{\hyperlink{classappbase_1_1application_a9abb5f5858e4dc6ba3ba45071ffdaed5}{get\+\_\+logging\+\_\+conf}} () const
+\begin{DoxyCompactList}\small\item\em Get logging configuration path. \end{DoxyCompactList}\item 
+bfs\+::path \mbox{\hyperlink{classappbase_1_1application_a5ef9c293a86a7dd786641ce25a671208}{full\+\_\+config\+\_\+file\+\_\+path}} () const
+\begin{DoxyCompactList}\small\item\em Get full config.\+ini path. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classappbase_1_1application_a741b1b2adb2974b9cf72f1fa129b1adf}{set\+\_\+sighup\+\_\+callback}} (std\+::function$<$ void()$>$ callback)
+\begin{DoxyCompactList}\small\item\em Set function pointer invoked on receipt of SIGHUP. \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename... Plugin$>$ }\\bool \mbox{\hyperlink{classappbase_1_1application_a29ed51314f78ebe6795930a4ca910fd6}{initialize}} (int argc, char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}})
+\begin{DoxyCompactList}\small\item\em Looks for the --plugin commandline / config option and calls initialize on those plugins. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classappbase_1_1application_a3b77bd811744da79c9d8ba0d078e7668}{startup}} ()
+\item 
+void \mbox{\hyperlink{classappbase_1_1application_a116e20109f980460cf8c38e349766bcc}{shutdown}} ()
+\item 
+void \mbox{\hyperlink{classappbase_1_1application_a39286b0b034b97f6940568a00f44edaf}{exec}} ()
+\item 
+void \mbox{\hyperlink{classappbase_1_1application_a81aa58d3f94570b7976145039155fc46}{quit}} ()
+\item 
+bool \mbox{\hyperlink{classappbase_1_1application_aa47481ba83e2811dff7f84eff8662a56}{is\+\_\+quiting}} () const
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{classappbase_1_1application_ab53422301065100de5ac7818f5b9b3fc}{register\+\_\+config\+\_\+type}} ()
+\item 
+void \mbox{\hyperlink{classappbase_1_1application_a713c989466d9ce55f9fe3d7257f99009}{register\+\_\+config\+\_\+type\+\_\+comparison}} (std\+::type\+\_\+index, \mbox{\hyperlink{namespaceappbase_a34fffab26998c1f3c0607cbbda228faa}{config\+\_\+comparison\+\_\+f}} comp)
+\item 
+\mbox{\hyperlink{classappbase_1_1abstract__plugin}{abstract\+\_\+plugin}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classappbase_1_1application_a1d2c585f90007be342c9c64ee9cc0f7c}{find\+\_\+plugin}} (const string \&\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}) const
+\item 
+\mbox{\hyperlink{classappbase_1_1abstract__plugin}{abstract\+\_\+plugin}} \& \mbox{\hyperlink{classappbase_1_1application_a3c4b68a0667942b58f1369f454ce0ce3}{get\+\_\+plugin}} (const string \&\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}) const
+\item 
+{\footnotesize template$<$typename Plugin $>$ }\\auto \& \mbox{\hyperlink{classappbase_1_1application_a87e84549150056c56c0327cc4976cc2a}{register\+\_\+plugin}} ()
+\item 
+{\footnotesize template$<$typename Plugin $>$ }\\Plugin \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classappbase_1_1application_add09ef243c90b8f86636c9ee592db739}{find\+\_\+plugin}} () const
+\item 
+{\footnotesize template$<$typename Plugin $>$ }\\Plugin \& \mbox{\hyperlink{classappbase_1_1application_a9e37a08603d6b3b3cc06d662fc4100eb}{get\+\_\+plugin}} () const
+\item 
+{\footnotesize template$<$typename Method\+Decl $>$ }\\auto \mbox{\hyperlink{classappbase_1_1application_a87887b19b1f639ca551645813bb380de}{get\+\_\+method}} () -\/$>$ std\+::enable\+\_\+if\+\_\+t$<$ \mbox{\hyperlink{namespaceappbase_af6d8cf2c6f2a52a0016b86ce095f7ede}{is\+\_\+method\+\_\+decl}}$<$ Method\+Decl $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}}, typename Method\+Decl\+::method\+\_\+type \& $>$
+\item 
+{\footnotesize template$<$typename Channel\+Decl $>$ }\\auto \mbox{\hyperlink{classappbase_1_1application_ac9e3f923a46466ea3ffbf4fea3187682}{get\+\_\+channel}} () -\/$>$ std\+::enable\+\_\+if\+\_\+t$<$ \mbox{\hyperlink{namespaceappbase_a8bca2384fc9c0fe6dc0eb2c35038d0cc}{is\+\_\+channel\+\_\+decl}}$<$ Channel\+Decl $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}}, typename Channel\+Decl\+::channel\+\_\+type \& $>$
+\item 
+boost\+::asio\+::io\+\_\+service \& \mbox{\hyperlink{classappbase_1_1application_a916a3366706654967671be9b82ab0e35}{get\+\_\+io\+\_\+service}} ()
+\item 
+{\footnotesize template$<$typename Func $>$ }\\auto \mbox{\hyperlink{classappbase_1_1application_a77aff91b861010fd61a616c59b310dcc}{post}} (int \mbox{\hyperlink{structappbase_1_1priority}{priority}}, Func \&\&func)
+\item 
+auto \& \mbox{\hyperlink{classappbase_1_1application_a7ea7e39bd0c3b79353b20d4a31942150}{get\+\_\+priority\+\_\+queue}} ()
+\item 
+const bpo\+::variables\+\_\+map \& \mbox{\hyperlink{classappbase_1_1application_a1cd05ae43f6400f07f9c60a09cc610cb}{get\+\_\+options}} () const
+\item 
+void \mbox{\hyperlink{classappbase_1_1application_a81b7e2878583791179e90e1ec5ba9131}{set\+\_\+thread\+\_\+priority\+\_\+max}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static \mbox{\hyperlink{classappbase_1_1application}{application}} \& \mbox{\hyperlink{classappbase_1_1application_ac874b2659b400fe254f1ae4260d06ecf}{instance}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{classappbase_1_1application_adebe1a60f6663b205a196385d4bc6231}{initialize\+\_\+impl}} (int argc, char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}, vector$<$ \mbox{\hyperlink{classappbase_1_1abstract__plugin}{abstract\+\_\+plugin}} \texorpdfstring{$\ast$}{*} $>$ autostart\+\_\+plugins)
+\end{DoxyCompactItemize}
+\textbf{ }\par
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{classappbase_1_1application_a110137cd2c59d1d998750eeb28443b5d}{plugin\+\_\+initialized}} (\mbox{\hyperlink{classappbase_1_1abstract__plugin}{abstract\+\_\+plugin}} \&plug)
+\item 
+void \mbox{\hyperlink{classappbase_1_1application_ad5635d30c2f520340d58665ed99f8a4d}{plugin\+\_\+started}} (\mbox{\hyperlink{classappbase_1_1abstract__plugin}{abstract\+\_\+plugin}} \&plug)
+\end{DoxyCompactItemize}
+
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename Impl $>$ }\\\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classappbase_1_1application_ad76f20d019c93aec51c49c7b9c8cda18}{plugin}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{application_8hpp_source_l00016}{16}} of file \mbox{\hyperlink{application_8hpp_source}{application.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classappbase_1_1application_ae9b89e36574867b0eaf08a6755c67ce2}\index{appbase::application@{appbase::application}!````~application@{\texorpdfstring{$\sim$}{\string~}application}}
+\index{````~application@{\texorpdfstring{$\sim$}{\string~}application}!appbase::application@{appbase::application}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}application()}{\string~application()}}
+{\footnotesize\ttfamily \label{classappbase_1_1application_ae9b89e36574867b0eaf08a6755c67ce2} 
+appbase\+::application\+::\texorpdfstring{$\sim$}{\string~}application (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{application_8cpp_source_l00096}{96}} of file \mbox{\hyperlink{application_8cpp_source}{application.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00096\ \{\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classappbase_1_1application_a9b2c99749c7209e218a3dbbe51cfdeac}\index{appbase::application@{appbase::application}!config\_dir@{config\_dir}}
+\index{config\_dir@{config\_dir}!appbase::application@{appbase::application}}
+\doxysubsubsection{\texorpdfstring{config\_dir()}{config\_dir()}}
+{\footnotesize\ttfamily \label{classappbase_1_1application_a9b2c99749c7209e218a3dbbe51cfdeac} 
+bfs\+::path appbase\+::application\+::config\+\_\+dir (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+\begin{DoxyReturn}{Returns}
+Config directory, possibly from command line 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{application_8cpp_source_l00531}{531}} of file \mbox{\hyperlink{application_8cpp_source}{application.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00531\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00532\ \ \ \ \textcolor{keywordflow}{return}\ my-\/>\_config\_dir;}
+\DoxyCodeLine{00533\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classappbase_1_1application_a9b2c99749c7209e218a3dbbe51cfdeac_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classappbase_1_1application_a5dfd3cfb1124c57963fa17b3f4aabbe1}\index{appbase::application@{appbase::application}!data\_dir@{data\_dir}}
+\index{data\_dir@{data\_dir}!appbase::application@{appbase::application}}
+\doxysubsubsection{\texorpdfstring{data\_dir()}{data\_dir()}}
+{\footnotesize\ttfamily \label{classappbase_1_1application_a5dfd3cfb1124c57963fa17b3f4aabbe1} 
+bfs\+::path appbase\+::application\+::data\+\_\+dir (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+\begin{DoxyReturn}{Returns}
+\doxylink{struct_data}{Data} directory, possibly from command line 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{application_8cpp_source_l00527}{527}} of file \mbox{\hyperlink{application_8cpp_source}{application.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00527\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00528\ \ \ \ \textcolor{keywordflow}{return}\ my-\/>\_data\_dir;}
+\DoxyCodeLine{00529\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classappbase_1_1application_a5dfd3cfb1124c57963fa17b3f4aabbe1_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classappbase_1_1application_a39286b0b034b97f6940568a00f44edaf}\index{appbase::application@{appbase::application}!exec@{exec}}
+\index{exec@{exec}!appbase::application@{appbase::application}}
+\doxysubsubsection{\texorpdfstring{exec()}{exec()}}
+{\footnotesize\ttfamily \label{classappbase_1_1application_a39286b0b034b97f6940568a00f44edaf} 
+void appbase\+::application\+::exec (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+Wait until \doxylink{classappbase_1_1application_a81aa58d3f94570b7976145039155fc46}{quit()}, SIGINT or SIGTERM and then shutdown. Should only be executed from one thread. perform synchronous shutdown
+
+Definition at line \mbox{\hyperlink{application_8cpp_source_l00442}{442}} of file \mbox{\hyperlink{application_8cpp_source}{application.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00442\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00443\ \ \ \ \{}
+\DoxyCodeLine{00444\ \ \ \ \ \ \ boost::asio::io\_service::work\ work(*io\_serv);}
+\DoxyCodeLine{00445\ \ \ \ \ \ \ (void)work;}
+\DoxyCodeLine{00446\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ more\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00447\ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\ more\ ||\ io\_serv-\/>run\_one()\ )\ \{}
+\DoxyCodeLine{00448\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\ io\_serv-\/>poll\_one()\ )\ \{\}}
+\DoxyCodeLine{00449\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ execute\ the\ highest\ priority\ item}}
+\DoxyCodeLine{00450\ \ \ \ \ \ \ \ \ \ more\ =\ pri\_queue.\mbox{\hyperlink{classappbase_1_1execution__priority__queue_a86081d87bce3735b5addeeb6d44dbcb2}{execute\_highest}}();}
+\DoxyCodeLine{00451\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00452\ }
+\DoxyCodeLine{00453\ \ \ \ \ \ \ \mbox{\hyperlink{classappbase_1_1application_a116e20109f980460cf8c38e349766bcc}{shutdown}}();\ }
+\DoxyCodeLine{00454\ \ \ \ \}}
+\DoxyCodeLine{00455\ \ \ \ io\_serv.reset();}
+\DoxyCodeLine{00456\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classappbase_1_1application_a39286b0b034b97f6940568a00f44edaf_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classappbase_1_1application_a39286b0b034b97f6940568a00f44edaf_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classappbase_1_1application_add09ef243c90b8f86636c9ee592db739}\index{appbase::application@{appbase::application}!find\_plugin@{find\_plugin}}
+\index{find\_plugin@{find\_plugin}!appbase::application@{appbase::application}}
+\doxysubsubsection{\texorpdfstring{find\_plugin()}{find\_plugin()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classappbase_1_1application_add09ef243c90b8f86636c9ee592db739} 
+template$<$typename Plugin $>$ \\
+Plugin \texorpdfstring{$\ast$}{*} appbase\+::application\+::find\+\_\+plugin (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{application_8hpp_source_l00148}{148}} of file \mbox{\hyperlink{application_8hpp_source}{application.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ =\ boost::core::demangle(\textcolor{keyword}{typeid}(Plugin).\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}());}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{dynamic\_cast<}Plugin*\textcolor{keyword}{>}(\mbox{\hyperlink{classappbase_1_1application_add09ef243c90b8f86636c9ee592db739}{find\_plugin}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}));}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=185pt]{classappbase_1_1application_add09ef243c90b8f86636c9ee592db739_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classappbase_1_1application_add09ef243c90b8f86636c9ee592db739_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classappbase_1_1application_a1d2c585f90007be342c9c64ee9cc0f7c}\index{appbase::application@{appbase::application}!find\_plugin@{find\_plugin}}
+\index{find\_plugin@{find\_plugin}!appbase::application@{appbase::application}}
+\doxysubsubsection{\texorpdfstring{find\_plugin()}{find\_plugin()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classappbase_1_1application_a1d2c585f90007be342c9c64ee9cc0f7c} 
+\mbox{\hyperlink{classappbase_1_1abstract__plugin}{abstract\+\_\+plugin}} \texorpdfstring{$\ast$}{*} appbase\+::application\+::find\+\_\+plugin (\begin{DoxyParamCaption}\item[{const string \&}]{name}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{application_8cpp_source_l00511}{511}} of file \mbox{\hyperlink{application_8cpp_source}{application.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00512\ \{}
+\DoxyCodeLine{00513\ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ plugins.find(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}});}
+\DoxyCodeLine{00514\ \ \ \ \textcolor{keywordflow}{if}(itr\ ==\ plugins.end())\ \{}
+\DoxyCodeLine{00515\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00516\ \ \ \ \}}
+\DoxyCodeLine{00517\ \ \ \ \textcolor{keywordflow}{return}\ itr-\/>second.get();}
+\DoxyCodeLine{00518\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classappbase_1_1application_a1d2c585f90007be342c9c64ee9cc0f7c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classappbase_1_1application_a5ef9c293a86a7dd786641ce25a671208}\index{appbase::application@{appbase::application}!full\_config\_file\_path@{full\_config\_file\_path}}
+\index{full\_config\_file\_path@{full\_config\_file\_path}!appbase::application@{appbase::application}}
+\doxysubsubsection{\texorpdfstring{full\_config\_file\_path()}{full\_config\_file\_path()}}
+{\footnotesize\ttfamily \label{classappbase_1_1application_a5ef9c293a86a7dd786641ce25a671208} 
+bfs\+::path appbase\+::application\+::full\+\_\+config\+\_\+file\+\_\+path (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+\begin{DoxyReturn}{Returns}
+Config directory \& config file name, possibly from command line. Only valid after \doxylink{classappbase_1_1application_a29ed51314f78ebe6795930a4ca910fd6}{initialize()} has been called. 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{application_8cpp_source_l00535}{535}} of file \mbox{\hyperlink{application_8cpp_source}{application.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00535\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00536\ \ \ \ \textcolor{keywordflow}{return}\ bfs::canonical(my-\/>\_config\_file\_name);}
+\DoxyCodeLine{00537\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classappbase_1_1application_a5ef9c293a86a7dd786641ce25a671208_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classappbase_1_1application_ab53fa2d323d053e4e57adc832a9969bb}\index{appbase::application@{appbase::application}!full\_version\_string@{full\_version\_string}}
+\index{full\_version\_string@{full\_version\_string}!appbase::application@{appbase::application}}
+\doxysubsubsection{\texorpdfstring{full\_version\_string()}{full\_version\_string()}}
+{\footnotesize\ttfamily \label{classappbase_1_1application_ab53fa2d323d053e4e57adc832a9969bb} 
+string appbase\+::application\+::full\+\_\+version\+\_\+string (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+\begin{DoxyReturn}{Returns}
+\doxylink{struct_a}{A} string worthy of output with -\/v/--version, or "{}\+Unknown"{} if git not available 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{application_8cpp_source_l00114}{114}} of file \mbox{\hyperlink{application_8cpp_source}{application.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00115\ \ \ \ \textcolor{keywordflow}{return}\ my-\/>\_full\_version\_str;}
+\DoxyCodeLine{00116\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classappbase_1_1application_ab53fa2d323d053e4e57adc832a9969bb_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classappbase_1_1application_ac9e3f923a46466ea3ffbf4fea3187682}\index{appbase::application@{appbase::application}!get\_channel@{get\_channel}}
+\index{get\_channel@{get\_channel}!appbase::application@{appbase::application}}
+\doxysubsubsection{\texorpdfstring{get\_channel()}{get\_channel()}}
+{\footnotesize\ttfamily \label{classappbase_1_1application_ac9e3f923a46466ea3ffbf4fea3187682} 
+template$<$typename Channel\+Decl $>$ \\
+auto appbase\+::application\+::get\+\_\+channel (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) -\/$>$ std\+::enable\+\_\+if\+\_\+t$<$\mbox{\hyperlink{namespaceappbase_a8bca2384fc9c0fe6dc0eb2c35038d0cc}{is\+\_\+channel\+\_\+decl}}$<$Channel\+Decl$>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}}, typename Channel\+Decl\+::channel\+\_\+type\&$>$          \hspace{0.3cm}{\ttfamily [inline]}}
+
+Fetch a reference to the channel declared by the passed in type. This will construct the channel on first access. This allows loose and deferred binding between plugins
+
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em Channel\+Decl} & -\/ \doxylink{structappbase_1_1channel__decl}{appbase\+::channel\+\_\+decl} \\
+\hline
+\end{DoxyTemplParams}
+\begin{DoxyReturn}{Returns}
+reference to the channel described by the declaration 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{application_8hpp_source_l00188}{188}} of file \mbox{\hyperlink{application_8hpp_source}{application.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ }channel\_type\ =\ \textcolor{keyword}{typename}\ ChannelDecl::channel\_type;}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ key\ =\ std::type\_index(\textcolor{keyword}{typeid}(ChannelDecl));}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ channels.find(key);}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(itr\ !=\ channels.end())\ \{}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *channel\_type::get\_channel(itr-\/>second);}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ channels.emplace(std::make\_pair(key,\ channel\_type::make\_unique()));}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \ *channel\_type::get\_channel(channels.at(key));}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classappbase_1_1application_ac9e3f923a46466ea3ffbf4fea3187682_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classappbase_1_1application_a916a3366706654967671be9b82ab0e35}\index{appbase::application@{appbase::application}!get\_io\_service@{get\_io\_service}}
+\index{get\_io\_service@{get\_io\_service}!appbase::application@{appbase::application}}
+\doxysubsubsection{\texorpdfstring{get\_io\_service()}{get\_io\_service()}}
+{\footnotesize\ttfamily \label{classappbase_1_1application_a916a3366706654967671be9b82ab0e35} 
+boost\+::asio\+::io\+\_\+service \& appbase\+::application\+::get\+\_\+io\+\_\+service (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Do not run io\+\_\+service in any other threads, as application assumes single-\/threaded execution in \doxylink{classappbase_1_1application_a39286b0b034b97f6940568a00f44edaf}{exec()}. \begin{DoxyReturn}{Returns}
+io\+\_\+serivice of application 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{application_8hpp_source_l00205}{205}} of file \mbox{\hyperlink{application_8hpp_source}{application.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00205\ \{\ \textcolor{keywordflow}{return}\ *io\_serv;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classappbase_1_1application_a916a3366706654967671be9b82ab0e35_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classappbase_1_1application_a9abb5f5858e4dc6ba3ba45071ffdaed5}\index{appbase::application@{appbase::application}!get\_logging\_conf@{get\_logging\_conf}}
+\index{get\_logging\_conf@{get\_logging\_conf}!appbase::application@{appbase::application}}
+\doxysubsubsection{\texorpdfstring{get\_logging\_conf()}{get\_logging\_conf()}}
+{\footnotesize\ttfamily \label{classappbase_1_1application_a9abb5f5858e4dc6ba3ba45071ffdaed5} 
+bfs\+::path appbase\+::application\+::get\+\_\+logging\+\_\+conf (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+\begin{DoxyReturn}{Returns}
+Logging configuration location from command line 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{application_8cpp_source_l00130}{130}} of file \mbox{\hyperlink{application_8cpp_source}{application.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00131\ \ \ \textcolor{keywordflow}{return}\ my-\/>\_logging\_conf;}
+\DoxyCodeLine{00132\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classappbase_1_1application_a9abb5f5858e4dc6ba3ba45071ffdaed5_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classappbase_1_1application_a87887b19b1f639ca551645813bb380de}\index{appbase::application@{appbase::application}!get\_method@{get\_method}}
+\index{get\_method@{get\_method}!appbase::application@{appbase::application}}
+\doxysubsubsection{\texorpdfstring{get\_method()}{get\_method()}}
+{\footnotesize\ttfamily \label{classappbase_1_1application_a87887b19b1f639ca551645813bb380de} 
+template$<$typename Method\+Decl $>$ \\
+auto appbase\+::application\+::get\+\_\+method (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) -\/$>$ std\+::enable\+\_\+if\+\_\+t$<$\mbox{\hyperlink{namespaceappbase_af6d8cf2c6f2a52a0016b86ce095f7ede}{is\+\_\+method\+\_\+decl}}$<$Method\+Decl$>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}}, typename Method\+Decl\+::method\+\_\+type\&$>$          \hspace{0.3cm}{\ttfamily [inline]}}
+
+Fetch a reference to the method declared by the passed in type. This will construct the method on first access. This allows loose and deferred binding between plugins
+
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em Method\+Decl} & -\/ \doxylink{structappbase_1_1method__decl}{appbase\+::method\+\_\+decl} \\
+\hline
+\end{DoxyTemplParams}
+\begin{DoxyReturn}{Returns}
+reference to the method described by the declaration 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{application_8hpp_source_l00167}{167}} of file \mbox{\hyperlink{application_8hpp_source}{application.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ }method\_type\ =\ \textcolor{keyword}{typename}\ MethodDecl::method\_type;}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ key\ =\ std::type\_index(\textcolor{keyword}{typeid}(MethodDecl));}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ methods.find(key);}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(itr\ !=\ methods.end())\ \{}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *method\_type::get\_method(itr-\/>second);}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ methods.emplace(std::make\_pair(key,\ method\_type::make\_unique()));}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \ *method\_type::get\_method(methods.at(key));}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classappbase_1_1application_a87887b19b1f639ca551645813bb380de_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classappbase_1_1application_a1cd05ae43f6400f07f9c60a09cc610cb}\index{appbase::application@{appbase::application}!get\_options@{get\_options}}
+\index{get\_options@{get\_options}!appbase::application@{appbase::application}}
+\doxysubsubsection{\texorpdfstring{get\_options()}{get\_options()}}
+{\footnotesize\ttfamily \label{classappbase_1_1application_a1cd05ae43f6400f07f9c60a09cc610cb} 
+const bpo\+::variables\+\_\+map \& appbase\+::application\+::get\+\_\+options (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{application_8cpp_source_l00543}{543}} of file \mbox{\hyperlink{application_8cpp_source}{application.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00543\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00544\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ my-\/>\_options;}
+\DoxyCodeLine{00545\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classappbase_1_1application_a1cd05ae43f6400f07f9c60a09cc610cb_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classappbase_1_1application_a9e37a08603d6b3b3cc06d662fc4100eb}\index{appbase::application@{appbase::application}!get\_plugin@{get\_plugin}}
+\index{get\_plugin@{get\_plugin}!appbase::application@{appbase::application}}
+\doxysubsubsection{\texorpdfstring{get\_plugin()}{get\_plugin()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classappbase_1_1application_a9e37a08603d6b3b3cc06d662fc4100eb} 
+template$<$typename Plugin $>$ \\
+Plugin \& appbase\+::application\+::get\+\_\+plugin (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{application_8hpp_source_l00154}{154}} of file \mbox{\hyperlink{application_8hpp_source}{application.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ ptr\ =\ \mbox{\hyperlink{classappbase_1_1application_add09ef243c90b8f86636c9ee592db739}{find\_plugin<Plugin>}}();}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *ptr;}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=327pt]{classappbase_1_1application_a9e37a08603d6b3b3cc06d662fc4100eb_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classappbase_1_1application_a9e37a08603d6b3b3cc06d662fc4100eb_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classappbase_1_1application_a3c4b68a0667942b58f1369f454ce0ce3}\index{appbase::application@{appbase::application}!get\_plugin@{get\_plugin}}
+\index{get\_plugin@{get\_plugin}!appbase::application@{appbase::application}}
+\doxysubsubsection{\texorpdfstring{get\_plugin()}{get\_plugin()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classappbase_1_1application_a3c4b68a0667942b58f1369f454ce0ce3} 
+\mbox{\hyperlink{classappbase_1_1abstract__plugin}{abstract\+\_\+plugin}} \& appbase\+::application\+::get\+\_\+plugin (\begin{DoxyParamCaption}\item[{const string \&}]{name}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{application_8cpp_source_l00520}{520}} of file \mbox{\hyperlink{application_8cpp_source}{application.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00520\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00521\ \ \ \ \textcolor{keyword}{auto}\ ptr\ =\ \mbox{\hyperlink{classappbase_1_1application_add09ef243c90b8f86636c9ee592db739}{find\_plugin}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}});}
+\DoxyCodeLine{00522\ \ \ \ \textcolor{keywordflow}{if}(!ptr)}
+\DoxyCodeLine{00523\ \ \ \ \ \ \ BOOST\_THROW\_EXCEPTION(std::runtime\_error(\textcolor{stringliteral}{"{}unable\ to\ find\ plugin:\ "{}}\ +\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}));}
+\DoxyCodeLine{00524\ \ \ \ \textcolor{keywordflow}{return}\ *ptr;}
+\DoxyCodeLine{00525\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=327pt]{classappbase_1_1application_a3c4b68a0667942b58f1369f454ce0ce3_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{classappbase_1_1application_a3c4b68a0667942b58f1369f454ce0ce3_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classappbase_1_1application_a7ea7e39bd0c3b79353b20d4a31942150}\index{appbase::application@{appbase::application}!get\_priority\_queue@{get\_priority\_queue}}
+\index{get\_priority\_queue@{get\_priority\_queue}!appbase::application@{appbase::application}}
+\doxysubsubsection{\texorpdfstring{get\_priority\_queue()}{get\_priority\_queue()}}
+{\footnotesize\ttfamily \label{classappbase_1_1application_a7ea7e39bd0c3b79353b20d4a31942150} 
+auto \& appbase\+::application\+::get\+\_\+priority\+\_\+queue (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Provide access to execution priority queue so it can be used to wrap functions for prioritized execution.
+
+Example\+: boost\+::asio\+::steady\+\_\+timer timer( \doxylink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app()}.\doxylink{classappbase_1_1application_a916a3366706654967671be9b82ab0e35}{get\+\_\+io\+\_\+service()} ); timer.\+async\+\_\+wait( \doxylink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app()}.\doxylink{classappbase_1_1application_a7ea7e39bd0c3b79353b20d4a31942150}{get\+\_\+priority\+\_\+queue()}.wrap(\doxylink{structappbase_1_1priority_ae0c72abae2c2ba770667fcf90e40d654}{priority\+::low}, \mbox{[}\mbox{]}()\{ do\+\_\+something(); \}) ); 
+
+Definition at line \mbox{\hyperlink{application_8hpp_source_l00227}{227}} of file \mbox{\hyperlink{application_8hpp_source}{application.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00227\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00228\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ pri\_queue;}
+\DoxyCodeLine{00229\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classappbase_1_1application_a29ed51314f78ebe6795930a4ca910fd6}\index{appbase::application@{appbase::application}!initialize@{initialize}}
+\index{initialize@{initialize}!appbase::application@{appbase::application}}
+\doxysubsubsection{\texorpdfstring{initialize()}{initialize()}}
+{\footnotesize\ttfamily \label{classappbase_1_1application_a29ed51314f78ebe6795930a4ca910fd6} 
+template$<$typename... Plugin$>$ \\
+bool appbase\+::application\+::initialize (\begin{DoxyParamCaption}\item[{int}]{argc}{, }\item[{char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{argv}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em Plugin} & \doxylink{struct_list}{List} of plugins to initalize even if not mentioned by configuration. For plugins started by configuration settings or dependency resolution, this template has no effect. \\
+\hline
+\end{DoxyTemplParams}
+\begin{DoxyReturn}{Returns}
+true if the application and plugins were initialized, false or exception on error 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{application_8hpp_source_l00099}{99}} of file \mbox{\hyperlink{application_8hpp_source}{application.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classappbase_1_1application_adebe1a60f6663b205a196385d4bc6231}{initialize\_impl}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \{\mbox{\hyperlink{classappbase_1_1application_add09ef243c90b8f86636c9ee592db739}{find\_plugin<Plugin>}}()...\});}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classappbase_1_1application_a29ed51314f78ebe6795930a4ca910fd6_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classappbase_1_1application_a29ed51314f78ebe6795930a4ca910fd6_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classappbase_1_1application_adebe1a60f6663b205a196385d4bc6231}\index{appbase::application@{appbase::application}!initialize\_impl@{initialize\_impl}}
+\index{initialize\_impl@{initialize\_impl}!appbase::application@{appbase::application}}
+\doxysubsubsection{\texorpdfstring{initialize\_impl()}{initialize\_impl()}}
+{\footnotesize\ttfamily \label{classappbase_1_1application_adebe1a60f6663b205a196385d4bc6231} 
+bool appbase\+::application\+::initialize\+\_\+impl (\begin{DoxyParamCaption}\item[{int}]{argc}{, }\item[{char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{argv}{, }\item[{vector$<$ \mbox{\hyperlink{classappbase_1_1abstract__plugin}{abstract\+\_\+plugin}} \texorpdfstring{$\ast$}{*} $>$}]{autostart\+\_\+plugins}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{application_8cpp_source_l00250}{250}} of file \mbox{\hyperlink{application_8cpp_source}{application.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00250\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00251\ \ \ \ set\_program\_options();}
+\DoxyCodeLine{00252\ }
+\DoxyCodeLine{00253\ \ \ \ bpo::variables\_map\&\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}\ =\ my-\/>\_options;}
+\DoxyCodeLine{00254\ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00255\ \ \ \ \ \ \ bpo::parsed\_options\ parsed\ =\ bpo::command\_line\_parser(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}).options(my-\/>\_app\_options).run();}
+\DoxyCodeLine{00256\ \ \ \ \ \ \ bpo::store(parsed,\ options);}
+\DoxyCodeLine{00257\ \ \ \ \ \ \ vector<string>\ positionals\ =\ bpo::collect\_unrecognized(parsed.options,\ bpo::include\_positional);}
+\DoxyCodeLine{00258\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!positionals.empty())}
+\DoxyCodeLine{00259\ \ \ \ \ \ \ \ \ \ BOOST\_THROW\_EXCEPTION(std::runtime\_error(\textcolor{stringliteral}{"{}Unknown\ option\ '"{}}\ +\ positionals[0]\ +\ \textcolor{stringliteral}{"{}'\ passed\ as\ command\ line\ argument"{}}));}
+\DoxyCodeLine{00260\ \ \ \ \}\ \textcolor{keywordflow}{catch}(\ \textcolor{keyword}{const}\ boost::program\_options::unknown\_option\&\ e\ )\ \{}
+\DoxyCodeLine{00261\ \ \ \ \ \ \ BOOST\_THROW\_EXCEPTION(std::runtime\_error(\textcolor{stringliteral}{"{}Unknown\ option\ '"{}}\ +\ e.get\_option\_name()\ +\ \textcolor{stringliteral}{"{}'\ passed\ as\ command\ line\ argument"{}}));}
+\DoxyCodeLine{00262\ \ \ \ \}}
+\DoxyCodeLine{00263\ }
+\DoxyCodeLine{00264\ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.count(\ \textcolor{stringliteral}{"{}help"{}}\ )\ )\ \{}
+\DoxyCodeLine{00265\ \ \ \ \ \ \ cout\ <<\ my-\/>\_app\_options\ <<\ std::endl;}
+\DoxyCodeLine{00266\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00267\ \ \ \ \}}
+\DoxyCodeLine{00268\ }
+\DoxyCodeLine{00269\ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.count(\ \textcolor{stringliteral}{"{}version"{}}\ )\ )\ \{}
+\DoxyCodeLine{00270\ \ \ \ \ \ \ cout\ <<\ \mbox{\hyperlink{classappbase_1_1application_a780543c4d0330fe88b912a3fa914f953}{version\_string}}()\ <<\ std::endl;}
+\DoxyCodeLine{00271\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00272\ \ \ \ \}}
+\DoxyCodeLine{00273\ }
+\DoxyCodeLine{00274\ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.count(\ \textcolor{stringliteral}{"{}full-\/version"{}}\ )\ )\ \{}
+\DoxyCodeLine{00275\ \ \ \ \ \ \ cout\ <<\ \mbox{\hyperlink{classappbase_1_1application_ab53fa2d323d053e4e57adc832a9969bb}{full\_version\_string}}()\ <<\ std::endl;}
+\DoxyCodeLine{00276\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00277\ \ \ \ \}}
+\DoxyCodeLine{00278\ }
+\DoxyCodeLine{00279\ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.count(\ \textcolor{stringliteral}{"{}print-\/default-\/config"{}}\ )\ )\ \{}
+\DoxyCodeLine{00280\ \ \ \ \ \ \ print\_default\_config(cout);}
+\DoxyCodeLine{00281\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00282\ \ \ \ \}}
+\DoxyCodeLine{00283\ }
+\DoxyCodeLine{00284\ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.count(\ \textcolor{stringliteral}{"{}data-\/dir"{}}\ )\ )\ \{}
+\DoxyCodeLine{00285\ \ \ \ \ \ \ \textcolor{comment}{//\ Workaround\ for\ 10+\ year\ old\ Boost\ defect}}
+\DoxyCodeLine{00286\ \ \ \ \ \ \ \textcolor{comment}{//\ See\ https://svn.boost.org/trac10/ticket/8535}}
+\DoxyCodeLine{00287\ \ \ \ \ \ \ \textcolor{comment}{//\ Should\ be\ .as<bfs::path>()\ but\ paths\ with\ escaped\ spaces\ break\ bpo\ e.g.}}
+\DoxyCodeLine{00288\ \ \ \ \ \ \ \textcolor{comment}{//\ std::exception::what:\ the\ argument\ ('/path/with/white\(\backslash\)\ space')\ for\ option\ '-\/-\/data-\/dir'\ is\ invalid}}
+\DoxyCodeLine{00289\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ workaround\ =\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}[\textcolor{stringliteral}{"{}data-\/dir"{}}].as<std::string>();}
+\DoxyCodeLine{00290\ \ \ \ \ \ \ bfs::path\ \mbox{\hyperlink{classappbase_1_1application_a5dfd3cfb1124c57963fa17b3f4aabbe1}{data\_dir}}\ =\ workaround;}
+\DoxyCodeLine{00291\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{classappbase_1_1application_a5dfd3cfb1124c57963fa17b3f4aabbe1}{data\_dir}}.is\_relative()\ )}
+\DoxyCodeLine{00292\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classappbase_1_1application_a5dfd3cfb1124c57963fa17b3f4aabbe1}{data\_dir}}\ =\ bfs::current\_path()\ /\ \mbox{\hyperlink{classappbase_1_1application_a5dfd3cfb1124c57963fa17b3f4aabbe1}{data\_dir}};}
+\DoxyCodeLine{00293\ \ \ \ \ \ \ my-\/>\_data\_dir\ =\ \mbox{\hyperlink{classappbase_1_1application_a5dfd3cfb1124c57963fa17b3f4aabbe1}{data\_dir}};}
+\DoxyCodeLine{00294\ \ \ \ \}}
+\DoxyCodeLine{00295\ }
+\DoxyCodeLine{00296\ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.count(\ \textcolor{stringliteral}{"{}config-\/dir"{}}\ )\ )\ \{}
+\DoxyCodeLine{00297\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ workaround\ =\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}[\textcolor{stringliteral}{"{}config-\/dir"{}}].as<std::string>();}
+\DoxyCodeLine{00298\ \ \ \ \ \ \ bfs::path\ \mbox{\hyperlink{classappbase_1_1application_a9b2c99749c7209e218a3dbbe51cfdeac}{config\_dir}}\ =\ workaround;}
+\DoxyCodeLine{00299\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{classappbase_1_1application_a9b2c99749c7209e218a3dbbe51cfdeac}{config\_dir}}.is\_relative()\ )}
+\DoxyCodeLine{00300\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classappbase_1_1application_a9b2c99749c7209e218a3dbbe51cfdeac}{config\_dir}}\ =\ bfs::current\_path()\ /\ \mbox{\hyperlink{classappbase_1_1application_a9b2c99749c7209e218a3dbbe51cfdeac}{config\_dir}};}
+\DoxyCodeLine{00301\ \ \ \ \ \ \ my-\/>\_config\_dir\ =\ \mbox{\hyperlink{classappbase_1_1application_a9b2c99749c7209e218a3dbbe51cfdeac}{config\_dir}};}
+\DoxyCodeLine{00302\ \ \ \ \}}
+\DoxyCodeLine{00303\ }
+\DoxyCodeLine{00304\ \ \ \ \textcolor{keyword}{auto}\ workaround\ =\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}[\textcolor{stringliteral}{"{}logconf"{}}].as<std::string>();}
+\DoxyCodeLine{00305\ \ \ \ bfs::path\ logconf\ =\ workaround;}
+\DoxyCodeLine{00306\ \ \ \ \textcolor{keywordflow}{if}(\ logconf.is\_relative()\ )}
+\DoxyCodeLine{00307\ \ \ \ \ \ \ logconf\ =\ my-\/>\_config\_dir\ /\ logconf;}
+\DoxyCodeLine{00308\ \ \ \ my-\/>\_logging\_conf\ =\ logconf;}
+\DoxyCodeLine{00309\ }
+\DoxyCodeLine{00310\ \ \ \ workaround\ =\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}[\textcolor{stringliteral}{"{}config"{}}].as<std::string>();}
+\DoxyCodeLine{00311\ \ \ \ my-\/>\_config\_file\_name\ =\ workaround;}
+\DoxyCodeLine{00312\ \ \ \ \textcolor{keywordflow}{if}(\ my-\/>\_config\_file\_name.is\_relative()\ )}
+\DoxyCodeLine{00313\ \ \ \ \ \ \ my-\/>\_config\_file\_name\ =\ my-\/>\_config\_dir\ /\ my-\/>\_config\_file\_name;}
+\DoxyCodeLine{00314\ }
+\DoxyCodeLine{00315\ \ \ \ \textcolor{keywordflow}{if}(!bfs::exists(my-\/>\_config\_file\_name))\ \{}
+\DoxyCodeLine{00316\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(my-\/>\_config\_file\_name.compare(my-\/>\_config\_dir\ /\ \textcolor{stringliteral}{"{}config.ini"{}})\ !=\ 0)}
+\DoxyCodeLine{00317\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00318\ \ \ \ \ \ \ \ \ \ cout\ <<\ \textcolor{stringliteral}{"{}Config\ file\ "{}}\ <<\ my-\/>\_config\_file\_name\ <<\ \textcolor{stringliteral}{"{}\ missing."{}}\ <<\ std::endl;}
+\DoxyCodeLine{00319\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00320\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00321\ \ \ \ \ \ \ write\_default\_config(my-\/>\_config\_file\_name);}
+\DoxyCodeLine{00322\ \ \ \ \}}
+\DoxyCodeLine{00323\ }
+\DoxyCodeLine{00324\ \ \ \ std::vector<\ bpo::basic\_option<char>\ >\ opts\_from\_config;}
+\DoxyCodeLine{00325\ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00326\ \ \ \ \ \ \ bpo::parsed\_options\ parsed\_opts\_from\_config\ =\ bpo::parse\_config\_file<char>(my-\/>\_config\_file\_name.make\_preferred().string().c\_str(),\ my-\/>\_cfg\_options,\ \textcolor{keyword}{false});}
+\DoxyCodeLine{00327\ \ \ \ \ \ \ bpo::store(parsed\_opts\_from\_config,\ options);}
+\DoxyCodeLine{00328\ \ \ \ \ \ \ opts\_from\_config\ =\ parsed\_opts\_from\_config.options;}
+\DoxyCodeLine{00329\ \ \ \ \}\ \textcolor{keywordflow}{catch}(\ \textcolor{keyword}{const}\ boost::program\_options::unknown\_option\&\ e\ )\ \{}
+\DoxyCodeLine{00330\ \ \ \ \ \ \ BOOST\_THROW\_EXCEPTION(std::runtime\_error(\textcolor{stringliteral}{"{}Unknown\ option\ '"{}}\ +\ e.get\_option\_name()\ +\ \textcolor{stringliteral}{"{}'\ inside\ the\ config\ file\ "{}}\ +\ \ \mbox{\hyperlink{classappbase_1_1application_a5ef9c293a86a7dd786641ce25a671208}{full\_config\_file\_path}}().\textcolor{keywordtype}{string}()));}
+\DoxyCodeLine{00331\ \ \ \ \}}
+\DoxyCodeLine{00332\ }
+\DoxyCodeLine{00333\ \ \ \ std::vector<string>\ set\_but\_default\_list;}
+\DoxyCodeLine{00334\ }
+\DoxyCodeLine{00335\ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ boost::shared\_ptr<bpo::option\_description>\&\ od\_ptr\ :\ my-\/>\_cfg\_options.options())\ \{}
+\DoxyCodeLine{00336\ \ \ \ \ \ \ boost::any\ default\_val,\ config\_val;}
+\DoxyCodeLine{00337\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!od\_ptr-\/>semantic()-\/>apply\_default(default\_val))}
+\DoxyCodeLine{00338\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{00339\ }
+\DoxyCodeLine{00340\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(my-\/>\_any\_compare\_map.find(default\_val.type())\ ==\ my-\/>\_any\_compare\_map.end())\ \{}
+\DoxyCodeLine{00341\ \ \ \ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}APPBASE:\ Developer\ -\/-\/\ the\ type\ "{}}\ <<\ default\_val.type().name()\ <<\ \textcolor{stringliteral}{"{}\ is\ not\ registered\ with\ appbase,"{}}\ <<\ std::endl;}
+\DoxyCodeLine{00342\ \ \ \ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ \ \ add\ a\ register\_config\_type<>()\ in\ your\ plugin's\ ctor"{}}\ <<\ std::endl;}
+\DoxyCodeLine{00343\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00344\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00345\ }
+\DoxyCodeLine{00346\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ bpo::basic\_option<char>\&\ opt\ :\ opts\_from\_config)\ \{}
+\DoxyCodeLine{00347\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(opt.string\_key\ !=\ od\_ptr-\/>long\_name())}
+\DoxyCodeLine{00348\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{00349\ }
+\DoxyCodeLine{00350\ \ \ \ \ \ \ \ \ \ od\_ptr-\/>semantic()-\/>parse(config\_val,\ opt.value,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00351\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(my-\/>\_any\_compare\_map.at(default\_val.type())(default\_val,\ config\_val))}
+\DoxyCodeLine{00352\ \ \ \ \ \ \ \ \ \ \ \ \ set\_but\_default\_list.push\_back(opt.string\_key);}
+\DoxyCodeLine{00353\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00354\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00355\ \ \ \ \}}
+\DoxyCodeLine{00356\ \ \ \ \textcolor{keywordflow}{if}(set\_but\_default\_list.size())\ \{}
+\DoxyCodeLine{00357\ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}APPBASE:\ Warning:\ The\ following\ configuration\ items\ in\ the\ config.ini\ file\ are\ redundantly\ set\ to"{}}\ <<\ std::endl;}
+\DoxyCodeLine{00358\ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ \ \ their\ default\ value:"{}}\ <<\ std::endl;}
+\DoxyCodeLine{00359\ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ \ \ \ \ \ \ "{}};}
+\DoxyCodeLine{00360\ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ chars\_on\_line\ =\ 0;}
+\DoxyCodeLine{00361\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\ it\ =\ set\_but\_default\_list.cbegin();\ it\ !=\ set\_but\_default\_list.end();\ ++it)\ \{}
+\DoxyCodeLine{00362\ \ \ \ \ \ \ \ \ \ std::cerr\ <<\ *it;}
+\DoxyCodeLine{00363\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(it\ +\ 1\ !=\ set\_but\_default\_list.end())}
+\DoxyCodeLine{00364\ \ \ \ \ \ \ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{},\ "{}};}
+\DoxyCodeLine{00365\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}((chars\_on\_line\ +=\ it-\/>size())\ >\ 65)\ \{}
+\DoxyCodeLine{00366\ \ \ \ \ \ \ \ \ \ \ \ \ std::cerr\ <<\ std::endl\ <<\ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ \ \ \ \ \ \ "{}};}
+\DoxyCodeLine{00367\ \ \ \ \ \ \ \ \ \ \ \ \ chars\_on\_line\ =\ 0;}
+\DoxyCodeLine{00368\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00369\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00370\ \ \ \ \ \ \ std::cerr\ <<\ std::endl;}
+\DoxyCodeLine{00371\ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ \ \ Explicit\ values\ will\ override\ future\ changes\ to\ application\ defaults.\ Consider\ commenting\ out\ or"{}}\ <<\ std::endl;}
+\DoxyCodeLine{00372\ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ \ \ removing\ these\ items."{}}\ <<\ std::endl;}
+\DoxyCodeLine{00373\ \ \ \ \}}
+\DoxyCodeLine{00374\ }
+\DoxyCodeLine{00375\ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.count(\textcolor{stringliteral}{"{}plugin"{}})\ >\ 0)}
+\DoxyCodeLine{00376\ \ \ \ \{}
+\DoxyCodeLine{00377\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ plugins\ =\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}.at(\textcolor{stringliteral}{"{}plugin"{}}).as<std::vector<std::string>>();}
+\DoxyCodeLine{00378\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\&\ arg\ :\ plugins)}
+\DoxyCodeLine{00379\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00380\ \ \ \ \ \ \ \ \ \ vector<string>\ names;}
+\DoxyCodeLine{00381\ \ \ \ \ \ \ \ \ \ boost::split(names,\ arg,\ boost::is\_any\_of(\textcolor{stringliteral}{"{}\ \(\backslash\)t,"{}}));}
+\DoxyCodeLine{00382\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ std::string\&\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ :\ names)}
+\DoxyCodeLine{00383\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classappbase_1_1application_a9e37a08603d6b3b3cc06d662fc4100eb}{get\_plugin}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}).initialize(options);}
+\DoxyCodeLine{00384\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00385\ \ \ \ \}}
+\DoxyCodeLine{00386\ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00387\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\ \mbox{\hyperlink{classappbase_1_1application_ad76f20d019c93aec51c49c7b9c8cda18}{plugin}}\ :\ autostart\_plugins)}
+\DoxyCodeLine{00388\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classappbase_1_1application_ad76f20d019c93aec51c49c7b9c8cda18}{plugin}}\ !=\ \textcolor{keyword}{nullptr}\ \&\&\ \mbox{\hyperlink{classappbase_1_1application_ad76f20d019c93aec51c49c7b9c8cda18}{plugin}}-\/>get\_state()\ ==\ \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408ac712ce3482a78b8bf87080aefd77cf7d}{abstract\_plugin::registered}})}
+\DoxyCodeLine{00389\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classappbase_1_1application_ad76f20d019c93aec51c49c7b9c8cda18}{plugin}}-\/>initialize(options);}
+\DoxyCodeLine{00390\ }
+\DoxyCodeLine{00391\ \ \ \ \ \ \ bpo::notify(options);}
+\DoxyCodeLine{00392\ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{}
+\DoxyCodeLine{00393\ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}Failed\ to\ initialize\(\backslash\)n"{}};}
+\DoxyCodeLine{00394\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00395\ \ \ \ \}}
+\DoxyCodeLine{00396\ }
+\DoxyCodeLine{00397\ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00398\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classappbase_1_1application_adebe1a60f6663b205a196385d4bc6231_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classappbase_1_1application_adebe1a60f6663b205a196385d4bc6231_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classappbase_1_1application_ac874b2659b400fe254f1ae4260d06ecf}\index{appbase::application@{appbase::application}!instance@{instance}}
+\index{instance@{instance}!appbase::application@{appbase::application}}
+\doxysubsubsection{\texorpdfstring{instance()}{instance()}}
+{\footnotesize\ttfamily \label{classappbase_1_1application_ac874b2659b400fe254f1ae4260d06ecf} 
+\mbox{\hyperlink{classappbase_1_1application}{application}} \& appbase\+::application\+::instance (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{application_8cpp_source_l00206}{206}} of file \mbox{\hyperlink{application_8cpp_source}{application.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00207\ \ \ \ \textcolor{keyword}{static}\ application\ \_app;}
+\DoxyCodeLine{00208\ \ \ \ \textcolor{keywordflow}{return}\ \_app;}
+\DoxyCodeLine{00209\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{classappbase_1_1application_ac874b2659b400fe254f1ae4260d06ecf_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classappbase_1_1application_aa47481ba83e2811dff7f84eff8662a56}\index{appbase::application@{appbase::application}!is\_quiting@{is\_quiting}}
+\index{is\_quiting@{is\_quiting}!appbase::application@{appbase::application}}
+\doxysubsubsection{\texorpdfstring{is\_quiting()}{is\_quiting()}}
+{\footnotesize\ttfamily \label{classappbase_1_1application_aa47481ba83e2811dff7f84eff8662a56} 
+bool appbase\+::application\+::is\+\_\+quiting (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+If in long running process this flag can be checked to see if processing should be stoppped. \begin{DoxyReturn}{Returns}
+true if \doxylink{classappbase_1_1application_a81aa58d3f94570b7976145039155fc46}{quit()} has been called. 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{application_8cpp_source_l00420}{420}} of file \mbox{\hyperlink{application_8cpp_source}{application.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00420\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00421\ \ \ \ \textcolor{keywordflow}{return}\ my-\/>\_is\_quiting;}
+\DoxyCodeLine{00422\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classappbase_1_1application_aa47481ba83e2811dff7f84eff8662a56_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classappbase_1_1application_a110137cd2c59d1d998750eeb28443b5d}\index{appbase::application@{appbase::application}!plugin\_initialized@{plugin\_initialized}}
+\index{plugin\_initialized@{plugin\_initialized}!appbase::application@{appbase::application}}
+\doxysubsubsection{\texorpdfstring{plugin\_initialized()}{plugin\_initialized()}}
+{\footnotesize\ttfamily \label{classappbase_1_1application_a110137cd2c59d1d998750eeb28443b5d} 
+void appbase\+::application\+::plugin\+\_\+initialized (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classappbase_1_1abstract__plugin}{abstract\+\_\+plugin}} \&}]{plug}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+these notifications get called from the plugin when their state changes so that the application can call shutdown in the reverse order. 
+
+Definition at line \mbox{\hyperlink{application_8hpp_source_l00249}{249}} of file \mbox{\hyperlink{application_8hpp_source}{application.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00249\ \{\ initialized\_plugins.push\_back(\&plug);\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classappbase_1_1application_a110137cd2c59d1d998750eeb28443b5d_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classappbase_1_1application_ad5635d30c2f520340d58665ed99f8a4d}\index{appbase::application@{appbase::application}!plugin\_started@{plugin\_started}}
+\index{plugin\_started@{plugin\_started}!appbase::application@{appbase::application}}
+\doxysubsubsection{\texorpdfstring{plugin\_started()}{plugin\_started()}}
+{\footnotesize\ttfamily \label{classappbase_1_1application_ad5635d30c2f520340d58665ed99f8a4d} 
+void appbase\+::application\+::plugin\+\_\+started (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classappbase_1_1abstract__plugin}{abstract\+\_\+plugin}} \&}]{plug}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{application_8hpp_source_l00250}{250}} of file \mbox{\hyperlink{application_8hpp_source}{application.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00250\ \{\ running\_plugins.push\_back(\&plug);\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classappbase_1_1application_ad5635d30c2f520340d58665ed99f8a4d_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classappbase_1_1application_a77aff91b861010fd61a616c59b310dcc}\index{appbase::application@{appbase::application}!post@{post}}
+\index{post@{post}!appbase::application@{appbase::application}}
+\doxysubsubsection{\texorpdfstring{post()}{post()}}
+{\footnotesize\ttfamily \label{classappbase_1_1application_a77aff91b861010fd61a616c59b310dcc} 
+template$<$typename Func $>$ \\
+auto appbase\+::application\+::post (\begin{DoxyParamCaption}\item[{int}]{priority}{, }\item[{Func \&\&}]{func}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Post func to run on io\+\_\+service with given priority.
+
+
+\begin{DoxyParams}{Parameters}
+{\em priority} & can be \doxylink{structappbase_1_1priority}{appbase\+::priority}\+:\+:\texorpdfstring{$\ast$}{*} constants or any int, larger ints run first \\
+\hline
+{\em func} & function to run on io\+\_\+service \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+result of boost\+::asio\+::post 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{application_8hpp_source_l00215}{215}} of file \mbox{\hyperlink{application_8hpp_source}{application.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ boost::asio::post(*io\_serv,\ pri\_queue.\mbox{\hyperlink{classappbase_1_1execution__priority__queue_acfa0c68e913a02f179e52ed758451a69}{wrap}}(priority,\ std::forward<Func>(func)));}
+\DoxyCodeLine{00217\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=330pt]{classappbase_1_1application_a77aff91b861010fd61a616c59b310dcc_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{classappbase_1_1application_a77aff91b861010fd61a616c59b310dcc_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classappbase_1_1application_a81aa58d3f94570b7976145039155fc46}\index{appbase::application@{appbase::application}!quit@{quit}}
+\index{quit@{quit}!appbase::application@{appbase::application}}
+\doxysubsubsection{\texorpdfstring{quit()}{quit()}}
+{\footnotesize\ttfamily \label{classappbase_1_1application_a81aa58d3f94570b7976145039155fc46} 
+void appbase\+::application\+::quit (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{application_8cpp_source_l00415}{415}} of file \mbox{\hyperlink{application_8cpp_source}{application.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00415\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00416\ \ \ \ my-\/>\_is\_quiting\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00417\ \ \ \ io\_serv-\/>stop();}
+\DoxyCodeLine{00418\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classappbase_1_1application_a81aa58d3f94570b7976145039155fc46_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classappbase_1_1application_ab53422301065100de5ac7818f5b9b3fc}\index{appbase::application@{appbase::application}!register\_config\_type@{register\_config\_type}}
+\index{register\_config\_type@{register\_config\_type}!appbase::application@{appbase::application}}
+\doxysubsubsection{\texorpdfstring{register\_config\_type()}{register\_config\_type()}}
+{\footnotesize\ttfamily \label{classappbase_1_1application_ab53422301065100de5ac7818f5b9b3fc} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+void appbase\+::application\+::register\+\_\+config\+\_\+type (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Register a configuration type with appbase. most "{}plain"{} types are already registered in \doxylink{application_8cpp}{application.\+cpp}. Failure to register a type will cause initialization to fail. 
+
+Definition at line \mbox{\hyperlink{application_8hpp_source_l00123}{123}} of file \mbox{\hyperlink{application_8hpp_source}{application.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classappbase_1_1application_a713c989466d9ce55f9fe3d7257f99009}{register\_config\_type\_comparison}}(\textcolor{keyword}{typeid}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}),\ [](\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ b)\ \{}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ boost::any\_cast<const\ T\&>(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})\ ==\ boost::any\_cast<const\ T\&>(b);}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=336pt]{classappbase_1_1application_ab53422301065100de5ac7818f5b9b3fc_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=325pt]{classappbase_1_1application_ab53422301065100de5ac7818f5b9b3fc_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classappbase_1_1application_a713c989466d9ce55f9fe3d7257f99009}\index{appbase::application@{appbase::application}!register\_config\_type\_comparison@{register\_config\_type\_comparison}}
+\index{register\_config\_type\_comparison@{register\_config\_type\_comparison}!appbase::application@{appbase::application}}
+\doxysubsubsection{\texorpdfstring{register\_config\_type\_comparison()}{register\_config\_type\_comparison()}}
+{\footnotesize\ttfamily \label{classappbase_1_1application_a713c989466d9ce55f9fe3d7257f99009} 
+void appbase\+::application\+::register\+\_\+config\+\_\+type\+\_\+comparison (\begin{DoxyParamCaption}\item[{std\+::type\+\_\+index}]{i}{, }\item[{\mbox{\hyperlink{namespaceappbase_a34fffab26998c1f3c0607cbbda228faa}{config\+\_\+comparison\+\_\+f}}}]{comp}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{application_8cpp_source_l00212}{212}} of file \mbox{\hyperlink{application_8cpp_source}{application.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00213\ \ \ \ my-\/>\_any\_compare\_map.emplace(i,\ comp);}
+\DoxyCodeLine{00214\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classappbase_1_1application_a713c989466d9ce55f9fe3d7257f99009_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classappbase_1_1application_a87e84549150056c56c0327cc4976cc2a}\index{appbase::application@{appbase::application}!register\_plugin@{register\_plugin}}
+\index{register\_plugin@{register\_plugin}!appbase::application@{appbase::application}}
+\doxysubsubsection{\texorpdfstring{register\_plugin()}{register\_plugin()}}
+{\footnotesize\ttfamily \label{classappbase_1_1application_a87e84549150056c56c0327cc4976cc2a} 
+template$<$typename Plugin $>$ \\
+auto \& appbase\+::application\+::register\+\_\+plugin (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{application_8hpp_source_l00136}{136}} of file \mbox{\hyperlink{application_8hpp_source}{application.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ existing\ =\ \mbox{\hyperlink{classappbase_1_1application_add09ef243c90b8f86636c9ee592db739}{find\_plugin<Plugin>}}();}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(existing)}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *existing;}
+\DoxyCodeLine{00140\ }
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ plug\ =\ \textcolor{keyword}{new}\ Plugin();}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \ \ \ \ plugins[plug-\/>name()].reset(plug);}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \ \ \ \ plug-\/>register\_dependencies();}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *plug;}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=327pt]{classappbase_1_1application_a87e84549150056c56c0327cc4976cc2a_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=258pt]{classappbase_1_1application_a87e84549150056c56c0327cc4976cc2a_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classappbase_1_1application_a49901c76b365337c933e6485649a50b6}\index{appbase::application@{appbase::application}!set\_default\_config\_dir@{set\_default\_config\_dir}}
+\index{set\_default\_config\_dir@{set\_default\_config\_dir}!appbase::application@{appbase::application}}
+\doxysubsubsection{\texorpdfstring{set\_default\_config\_dir()}{set\_default\_config\_dir()}}
+{\footnotesize\ttfamily \label{classappbase_1_1application_a49901c76b365337c933e6485649a50b6} 
+void appbase\+::application\+::set\+\_\+default\+\_\+config\+\_\+dir (\begin{DoxyParamCaption}\item[{const bfs\+::path \&}]{config\+\_\+dir}{ = {\ttfamily "{}etc"{}}}\end{DoxyParamCaption})}
+
+
+\begin{DoxyParams}{Parameters}
+{\em config\+\_\+dir} & Default configuration directory to use if not specified on the command line. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{application_8cpp_source_l00126}{126}} of file \mbox{\hyperlink{application_8cpp_source}{application.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00127\ \ \ my-\/>\_config\_dir\ =\ \mbox{\hyperlink{classappbase_1_1application_a9b2c99749c7209e218a3dbbe51cfdeac}{config\_dir}};}
+\DoxyCodeLine{00128\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=339pt]{classappbase_1_1application_a49901c76b365337c933e6485649a50b6_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=270pt]{classappbase_1_1application_a49901c76b365337c933e6485649a50b6_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classappbase_1_1application_af81fa07af200b5b24049ed5d197a864f}\index{appbase::application@{appbase::application}!set\_default\_data\_dir@{set\_default\_data\_dir}}
+\index{set\_default\_data\_dir@{set\_default\_data\_dir}!appbase::application@{appbase::application}}
+\doxysubsubsection{\texorpdfstring{set\_default\_data\_dir()}{set\_default\_data\_dir()}}
+{\footnotesize\ttfamily \label{classappbase_1_1application_af81fa07af200b5b24049ed5d197a864f} 
+void appbase\+::application\+::set\+\_\+default\+\_\+data\+\_\+dir (\begin{DoxyParamCaption}\item[{const bfs\+::path \&}]{data\+\_\+dir}{ = {\ttfamily "{}data-\/dir"{}}}\end{DoxyParamCaption})}
+
+
+\begin{DoxyParams}{Parameters}
+{\em data\+\_\+dir} & Default data directory to use if not specified on the command line. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{application_8cpp_source_l00122}{122}} of file \mbox{\hyperlink{application_8cpp_source}{application.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00123\ \ \ my-\/>\_data\_dir\ =\ \mbox{\hyperlink{classappbase_1_1application_a5dfd3cfb1124c57963fa17b3f4aabbe1}{data\_dir}};}
+\DoxyCodeLine{00124\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=331pt]{classappbase_1_1application_af81fa07af200b5b24049ed5d197a864f_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=263pt]{classappbase_1_1application_af81fa07af200b5b24049ed5d197a864f_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classappbase_1_1application_ae894f512cb24cba9b754cf984dceaa84}\index{appbase::application@{appbase::application}!set\_full\_version\_string@{set\_full\_version\_string}}
+\index{set\_full\_version\_string@{set\_full\_version\_string}!appbase::application@{appbase::application}}
+\doxysubsubsection{\texorpdfstring{set\_full\_version\_string()}{set\_full\_version\_string()}}
+{\footnotesize\ttfamily \label{classappbase_1_1application_ae894f512cb24cba9b754cf984dceaa84} 
+void appbase\+::application\+::set\+\_\+full\+\_\+version\+\_\+string (\begin{DoxyParamCaption}\item[{std\+::string}]{v}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{application_8cpp_source_l00118}{118}} of file \mbox{\hyperlink{application_8cpp_source}{application.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00119\ \ \ \ my-\/>\_full\_version\_str\ =\ std::move(\ v\ );}
+\DoxyCodeLine{00120\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=273pt]{classappbase_1_1application_ae894f512cb24cba9b754cf984dceaa84_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classappbase_1_1application_a741b1b2adb2974b9cf72f1fa129b1adf}\index{appbase::application@{appbase::application}!set\_sighup\_callback@{set\_sighup\_callback}}
+\index{set\_sighup\_callback@{set\_sighup\_callback}!appbase::application@{appbase::application}}
+\doxysubsubsection{\texorpdfstring{set\_sighup\_callback()}{set\_sighup\_callback()}}
+{\footnotesize\ttfamily \label{classappbase_1_1application_a741b1b2adb2974b9cf72f1fa129b1adf} 
+void appbase\+::application\+::set\+\_\+sighup\+\_\+callback (\begin{DoxyParamCaption}\item[{std\+::function$<$ void()$>$}]{callback}{}\end{DoxyParamCaption})}
+
+The provided function will be invoked on receipt of SIGHUP followed by invoking handle\+\_\+sighup() on all initialized plugins. Caller is responsible for preserving an object if necessary.
+
+
+\begin{DoxyParams}{Parameters}
+{\em callback} & Function pointer that will be invoked when the process receives the HUP (1) signal. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{application_8cpp_source_l00539}{539}} of file \mbox{\hyperlink{application_8cpp_source}{application.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00539\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00540\ \ \ \ sighup\_callback\ =\ callback;}
+\DoxyCodeLine{00541\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classappbase_1_1application_a741b1b2adb2974b9cf72f1fa129b1adf_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classappbase_1_1application_a81b7e2878583791179e90e1ec5ba9131}\index{appbase::application@{appbase::application}!set\_thread\_priority\_max@{set\_thread\_priority\_max}}
+\index{set\_thread\_priority\_max@{set\_thread\_priority\_max}!appbase::application@{appbase::application}}
+\doxysubsubsection{\texorpdfstring{set\_thread\_priority\_max()}{set\_thread\_priority\_max()}}
+{\footnotesize\ttfamily \label{classappbase_1_1application_a81b7e2878583791179e90e1ec5ba9131} 
+void appbase\+::application\+::set\+\_\+thread\+\_\+priority\+\_\+max (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+Set the current thread schedule priority to maximum. Works for pthreads. 
+
+Definition at line \mbox{\hyperlink{application_8cpp_source_l00424}{424}} of file \mbox{\hyperlink{application_8cpp_source}{application.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00424\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00425\ \textcolor{preprocessor}{\#if\ \_\_has\_include(<pthread.h>)}}
+\DoxyCodeLine{00426\ \ \ \ pthread\_t\ this\_thread\ =\ pthread\_self();}
+\DoxyCodeLine{00427\ \ \ \ \textcolor{keyword}{struct\ }sched\_param\ \mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}}\{\};}
+\DoxyCodeLine{00428\ \ \ \ \textcolor{keywordtype}{int}\ policy\ =\ 0;}
+\DoxyCodeLine{00429\ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ pthread\_getschedparam(this\_thread,\ \&policy,\ \&\mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}});}
+\DoxyCodeLine{00430\ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ !=\ 0\ )\ \{}
+\DoxyCodeLine{00431\ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}ERROR:\ Unable\ to\ get\ thread\ priority"{}}\ <<\ std::endl;}
+\DoxyCodeLine{00432\ \ \ \ \}}
+\DoxyCodeLine{00433\ }
+\DoxyCodeLine{00434\ \ \ \ \mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}}.sched\_priority\ =\ sched\_get\_priority\_max(policy);}
+\DoxyCodeLine{00435\ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ pthread\_setschedparam(this\_thread,\ policy,\ \&\mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}});}
+\DoxyCodeLine{00436\ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ !=\ 0\ )\ \{}
+\DoxyCodeLine{00437\ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}ERROR:\ Unable\ to\ set\ thread\ priority"{}}\ <<\ std::endl;}
+\DoxyCodeLine{00438\ \ \ \ \}}
+\DoxyCodeLine{00439\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00440\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=279pt]{classappbase_1_1application_a81b7e2878583791179e90e1ec5ba9131_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classappbase_1_1application_a2794807d31e9f29f1327811dda40820d}\index{appbase::application@{appbase::application}!set\_version@{set\_version}}
+\index{set\_version@{set\_version}!appbase::application@{appbase::application}}
+\doxysubsubsection{\texorpdfstring{set\_version()}{set\_version()}}
+{\footnotesize\ttfamily \label{classappbase_1_1application_a2794807d31e9f29f1327811dda40820d} 
+void appbase\+::application\+::set\+\_\+version (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{version}{}\end{DoxyParamCaption})}
+
+
+\begin{DoxyParams}{Parameters}
+{\em version} & Version output with -\/v/--version \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{application_8cpp_source_l00098}{98}} of file \mbox{\hyperlink{application_8cpp_source}{application.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00099\ \ \ my-\/>\_version\ =\ \mbox{\hyperlink{classappbase_1_1application_ae4ec67aea2aa3bab8800c875590245b2}{version}};}
+\DoxyCodeLine{00100\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=327pt]{classappbase_1_1application_a2794807d31e9f29f1327811dda40820d_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=258pt]{classappbase_1_1application_a2794807d31e9f29f1327811dda40820d_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classappbase_1_1application_a1d2a9932724a536b94eb3d5cff815ffc}\index{appbase::application@{appbase::application}!set\_version\_string@{set\_version\_string}}
+\index{set\_version\_string@{set\_version\_string}!appbase::application@{appbase::application}}
+\doxysubsubsection{\texorpdfstring{set\_version\_string()}{set\_version\_string()}}
+{\footnotesize\ttfamily \label{classappbase_1_1application_a1d2a9932724a536b94eb3d5cff815ffc} 
+void appbase\+::application\+::set\+\_\+version\+\_\+string (\begin{DoxyParamCaption}\item[{std\+::string}]{v}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{application_8cpp_source_l00110}{110}} of file \mbox{\hyperlink{application_8cpp_source}{application.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00111\ \ \ \ my-\/>\_version\_str\ =\ std::move(\ v\ );}
+\DoxyCodeLine{00112\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=258pt]{classappbase_1_1application_a1d2a9932724a536b94eb3d5cff815ffc_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classappbase_1_1application_a116e20109f980460cf8c38e349766bcc}\index{appbase::application@{appbase::application}!shutdown@{shutdown}}
+\index{shutdown@{shutdown}!appbase::application@{appbase::application}}
+\doxysubsubsection{\texorpdfstring{shutdown()}{shutdown()}}
+{\footnotesize\ttfamily \label{classappbase_1_1application_a116e20109f980460cf8c38e349766bcc} 
+void appbase\+::application\+::shutdown (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{application_8cpp_source_l00400}{400}} of file \mbox{\hyperlink{application_8cpp_source}{application.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00400\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00401\ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\ ritr\ =\ running\_plugins.rbegin();}
+\DoxyCodeLine{00402\ \ \ \ \ \ \ \ ritr\ !=\ running\_plugins.rend();\ ++ritr)\ \{}
+\DoxyCodeLine{00403\ \ \ \ \ \ \ (*ritr)-\/>shutdown();}
+\DoxyCodeLine{00404\ \ \ \ \}}
+\DoxyCodeLine{00405\ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\ ritr\ =\ running\_plugins.rbegin();}
+\DoxyCodeLine{00406\ \ \ \ \ \ \ \ ritr\ !=\ running\_plugins.rend();\ ++ritr)\ \{}
+\DoxyCodeLine{00407\ \ \ \ \ \ \ plugins.erase((*ritr)-\/>name());}
+\DoxyCodeLine{00408\ \ \ \ \}}
+\DoxyCodeLine{00409\ \ \ \ running\_plugins.clear();}
+\DoxyCodeLine{00410\ \ \ \ initialized\_plugins.clear();}
+\DoxyCodeLine{00411\ \ \ \ plugins.clear();}
+\DoxyCodeLine{00412\ \ \ \ \mbox{\hyperlink{classappbase_1_1application_a81aa58d3f94570b7976145039155fc46}{quit}}();}
+\DoxyCodeLine{00413\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=327pt]{classappbase_1_1application_a116e20109f980460cf8c38e349766bcc_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classappbase_1_1application_a116e20109f980460cf8c38e349766bcc_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classappbase_1_1application_a3b77bd811744da79c9d8ba0d078e7668}\index{appbase::application@{appbase::application}!startup@{startup}}
+\index{startup@{startup}!appbase::application@{appbase::application}}
+\doxysubsubsection{\texorpdfstring{startup()}{startup()}}
+{\footnotesize\ttfamily \label{classappbase_1_1application_a3b77bd811744da79c9d8ba0d078e7668} 
+void appbase\+::application\+::startup (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{application_8cpp_source_l00156}{156}} of file \mbox{\hyperlink{application_8cpp_source}{application.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00157\ \ \ \ \textcolor{comment}{//during\ startup,\ run\ a\ second\ thread\ to\ catch\ SIGINT/SIGTERM/SIGPIPE/SIGHUP}}
+\DoxyCodeLine{00158\ \ \ \ boost::asio::io\_service\ startup\_thread\_ios;}
+\DoxyCodeLine{00159\ \ \ \ setup\_signal\_handling\_on\_ios(startup\_thread\_ios,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00160\ \ \ \ std::thread\ startup\_thread([\&startup\_thread\_ios]()\ \{}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ startup\_thread\_ios.run();}
+\DoxyCodeLine{00162\ \ \ \ \});}
+\DoxyCodeLine{00163\ \ \ \ \textcolor{keyword}{auto}\ clean\_up\_signal\_thread\ =\ [\&startup\_thread\_ios,\ \&startup\_thread]()\ \{}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ startup\_thread\_ios.stop();}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ startup\_thread.join();}
+\DoxyCodeLine{00166\ \ \ \ \};}
+\DoxyCodeLine{00167\ }
+\DoxyCodeLine{00168\ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{classappbase_1_1application_ad76f20d019c93aec51c49c7b9c8cda18}{plugin}}\ :\ initialized\_plugins\ )\ \{}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{classappbase_1_1application_aa47481ba83e2811dff7f84eff8662a56}{is\_quiting}}()\ )\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classappbase_1_1application_ad76f20d019c93aec51c49c7b9c8cda18}{plugin}}-\/>startup();}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00173\ }
+\DoxyCodeLine{00174\ \ \ \ \}\ \textcolor{keywordflow}{catch}(\ ...\ )\ \{}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ clean\_up\_signal\_thread();}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \mbox{\hyperlink{classappbase_1_1application_a116e20109f980460cf8c38e349766bcc}{shutdown}}();}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \textcolor{keywordflow}{throw};}
+\DoxyCodeLine{00178\ \ \ \ \}}
+\DoxyCodeLine{00179\ }
+\DoxyCodeLine{00180\ \ \ \ \textcolor{comment}{//after\ startup,\ shut\ down\ the\ signal\ handling\ thread\ and\ catch\ the\ signals\ back\ on\ main\ io\_service}}
+\DoxyCodeLine{00181\ \ \ \ clean\_up\_signal\_thread();}
+\DoxyCodeLine{00182\ \ \ \ setup\_signal\_handling\_on\_ios(\mbox{\hyperlink{classappbase_1_1application_a916a3366706654967671be9b82ab0e35}{get\_io\_service}}(),\ \textcolor{keyword}{false});}
+\DoxyCodeLine{00183\ }
+\DoxyCodeLine{00184\ \textcolor{preprocessor}{\#ifdef\ SIGHUP}}
+\DoxyCodeLine{00185\ \ \ \ std::shared\_ptr<boost::asio::signal\_set>\ sighup\_set(\textcolor{keyword}{new}\ boost::asio::signal\_set(\mbox{\hyperlink{classappbase_1_1application_a916a3366706654967671be9b82ab0e35}{get\_io\_service}}(),\ SIGHUP));}
+\DoxyCodeLine{00186\ \ \ \ start\_sighup\_handler(\ sighup\_set\ );}
+\DoxyCodeLine{00187\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00188\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classappbase_1_1application_a3b77bd811744da79c9d8ba0d078e7668_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classappbase_1_1application_a3b77bd811744da79c9d8ba0d078e7668_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classappbase_1_1application_ae4ec67aea2aa3bab8800c875590245b2}\index{appbase::application@{appbase::application}!version@{version}}
+\index{version@{version}!appbase::application@{appbase::application}}
+\doxysubsubsection{\texorpdfstring{version()}{version()}}
+{\footnotesize\ttfamily \label{classappbase_1_1application_ae4ec67aea2aa3bab8800c875590245b2} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} appbase\+::application\+::version (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+\begin{DoxyReturn}{Returns}
+Version output with -\/v/--version 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{application_8cpp_source_l00102}{102}} of file \mbox{\hyperlink{application_8cpp_source}{application.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00103\ \ \ \textcolor{keywordflow}{return}\ my-\/>\_version;}
+\DoxyCodeLine{00104\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classappbase_1_1application_ae4ec67aea2aa3bab8800c875590245b2_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classappbase_1_1application_a780543c4d0330fe88b912a3fa914f953}\index{appbase::application@{appbase::application}!version\_string@{version\_string}}
+\index{version\_string@{version\_string}!appbase::application@{appbase::application}}
+\doxysubsubsection{\texorpdfstring{version\_string()}{version\_string()}}
+{\footnotesize\ttfamily \label{classappbase_1_1application_a780543c4d0330fe88b912a3fa914f953} 
+string appbase\+::application\+::version\+\_\+string (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+\begin{DoxyReturn}{Returns}
+\doxylink{struct_a}{A} string worthy of output with -\/v/--version, or "{}\+Unknown"{} if git not available 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{application_8cpp_source_l00106}{106}} of file \mbox{\hyperlink{application_8cpp_source}{application.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00107\ \ \ \ \textcolor{keywordflow}{return}\ my-\/>\_version\_str;}
+\DoxyCodeLine{00108\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classappbase_1_1application_a780543c4d0330fe88b912a3fa914f953_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{classappbase_1_1application_ad76f20d019c93aec51c49c7b9c8cda18}\index{appbase::application@{appbase::application}!plugin@{plugin}}
+\index{plugin@{plugin}!appbase::application@{appbase::application}}
+\doxysubsubsection{\texorpdfstring{plugin}{plugin}}
+{\footnotesize\ttfamily \label{classappbase_1_1application_ad76f20d019c93aec51c49c7b9c8cda18} 
+template$<$typename Impl $>$ \\
+friend \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classappbase_1_1plugin}{plugin}}\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{application_8hpp_source_l00241}{241}} of file \mbox{\hyperlink{application_8hpp_source}{application.\+hpp}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/appbase/include/appbase/\mbox{\hyperlink{application_8hpp}{application.\+hpp}}\item 
+libraries/appbase/\mbox{\hyperlink{application_8cpp}{application.\+cpp}}\end{DoxyCompactItemize}

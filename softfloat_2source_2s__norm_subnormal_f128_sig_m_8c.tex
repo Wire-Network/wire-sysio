@@ -1,0 +1,53 @@
+\doxysection{libraries/softfloat/source/s\+\_\+norm\+Subnormal\+F128\+SigM.c File Reference}
+\hypertarget{softfloat_2source_2s__norm_subnormal_f128_sig_m_8c}{}\label{softfloat_2source_2s__norm_subnormal_f128_sig_m_8c}\index{libraries/softfloat/source/s\_normSubnormalF128SigM.c@{libraries/softfloat/source/s\_normSubnormalF128SigM.c}}
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include "{}platform.\+h"{}}\newline
+{\ttfamily \#include "{}internals.\+h"{}}\newline
+Include dependency graph for s\+\_\+norm\+Subnormal\+F128\+Sig\+M.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=317pt]{softfloat_2source_2s__norm_subnormal_f128_sig_m_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{softfloat_2source_2s__norm_subnormal_f128_sig_m_8c_a9da18990ec1794adacb63b400d0f12e7}{softfloat\+\_\+norm\+Subnormal\+F128\+SigM}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*}sig\+Ptr)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{softfloat_2source_2s__norm_subnormal_f128_sig_m_8c_a9da18990ec1794adacb63b400d0f12e7}\index{s\_normSubnormalF128SigM.c@{s\_normSubnormalF128SigM.c}!softfloat\_normSubnormalF128SigM@{softfloat\_normSubnormalF128SigM}}
+\index{softfloat\_normSubnormalF128SigM@{softfloat\_normSubnormalF128SigM}!s\_normSubnormalF128SigM.c@{s\_normSubnormalF128SigM.c}}
+\doxysubsubsection{\texorpdfstring{softfloat\_normSubnormalF128SigM()}{softfloat\_normSubnormalF128SigM()}}
+{\footnotesize\ttfamily \label{softfloat_2source_2s__norm_subnormal_f128_sig_m_8c_a9da18990ec1794adacb63b400d0f12e7} 
+int softfloat\+\_\+norm\+Subnormal\+F128\+SigM (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{sig\+Ptr}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2s__norm_subnormal_f128_sig_m_8c_source_l00041}{41}} of file \mbox{\hyperlink{softfloat_2source_2s__norm_subnormal_f128_sig_m_8c_source}{s\+\_\+norm\+Subnormal\+F128\+Sig\+M.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00042\ \{}
+\DoxyCodeLine{00043\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ *ptr;}
+\DoxyCodeLine{00044\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a9b7386d4af0e20ee32296d9a158c9f3a}{int\_fast16\_t}}\ shiftDist;}
+\DoxyCodeLine{00045\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ wordSig;}
+\DoxyCodeLine{00046\ }
+\DoxyCodeLine{00047\ \ \ \ \ ptr\ =\ sigPtr\ +\ \mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_aa3af452dd34ad7a607f4ad31c234fda7}{indexWordHi}}(\ 4\ );}
+\DoxyCodeLine{00048\ \ \ \ \ shiftDist\ =\ 0;}
+\DoxyCodeLine{00049\ \ \ \ \ \textcolor{keywordflow}{for}\ (;;)\ \{}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ wordSig\ =\ *ptr;}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ wordSig\ )\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ shiftDist\ +=\ 32;}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ 128\ <=\ shiftDist\ )\ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ ptr\ -\/=\ \mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a22ffd10aefa829eef57da03cff970e45}{wordIncr}};}
+\DoxyCodeLine{00055\ \ \ \ \ \}}
+\DoxyCodeLine{00056\ \ \ \ \ shiftDist\ +=\ \mbox{\hyperlink{softfloat_2source_2s__count_leading_zeros32_8c_a20e06c2785548bfc8a5351e7e241e351}{softfloat\_countLeadingZeros32}}(\ wordSig\ )\ -\/\ 15;}
+\DoxyCodeLine{00057\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ shiftDist\ )\ \mbox{\hyperlink{softfloat_2source_2include_2primitives_8h_ac29c8b598e2e06c806817244aa2a756a}{softfloat\_shiftLeft128M}}(\ sigPtr,\ shiftDist,\ sigPtr\ );}
+\DoxyCodeLine{00058\ \ \ \ \ \textcolor{keywordflow}{return}\ 1\ -\/\ shiftDist;}
+\DoxyCodeLine{00059\ }
+\DoxyCodeLine{00060\ \}}
+
+\end{DoxyCode}

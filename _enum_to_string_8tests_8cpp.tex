@@ -1,0 +1,273 @@
+\doxysection{libraries/sys-\/vm/external/\+Catch2/projects/\+Self\+Test/\+Usage\+Tests/\+Enum\+To\+String.tests.\+cpp File Reference}
+\hypertarget{_enum_to_string_8tests_8cpp}{}\label{_enum_to_string_8tests_8cpp}\index{libraries/sys-\/vm/external/Catch2/projects/SelfTest/UsageTests/EnumToString.tests.cpp@{libraries/sys-\/vm/external/Catch2/projects/SelfTest/UsageTests/EnumToString.tests.cpp}}
+{\ttfamily \#include "{}catch.\+hpp"{}}\newline
+Include dependency graph for Enum\+To\+String.\+tests.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=260pt]{_enum_to_string_8tests_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespace_bikeshed}{Bikeshed}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum class \mbox{\hyperlink{_enum_to_string_8tests_8cpp_ac017343e4e620bbb8069612fe5353941}{Enum\+Class3}} \{ \newline
+\mbox{\hyperlink{_enum_to_string_8tests_8cpp_ac017343e4e620bbb8069612fe5353941a7ee5a281b28d7ca1fab06b43d0b7d8ac}{Value1}}
+, \mbox{\hyperlink{_enum_to_string_8tests_8cpp_ac017343e4e620bbb8069612fe5353941a0fe13ed1638da4d4b1ef316729f3bb32}{Value2}}
+, \mbox{\hyperlink{_enum_to_string_8tests_8cpp_ac017343e4e620bbb8069612fe5353941a121bcef76aa7694f7d8ef4d381b86dad}{Value3}}
+, \mbox{\hyperlink{_enum_to_string_8tests_8cpp_ac017343e4e620bbb8069612fe5353941a3cdf05413e72fd826ed3a2aa33cff022}{Value4}}
+, \newline
+\mbox{\hyperlink{_enum_to_string_8tests_8cpp_ac017343e4e620bbb8069612fe5353941a7ee5a281b28d7ca1fab06b43d0b7d8ac}{Value1}}
+, \mbox{\hyperlink{_enum_to_string_8tests_8cpp_ac017343e4e620bbb8069612fe5353941a0fe13ed1638da4d4b1ef316729f3bb32}{Value2}}
+, \mbox{\hyperlink{_enum_to_string_8tests_8cpp_ac017343e4e620bbb8069612fe5353941a121bcef76aa7694f7d8ef4d381b86dad}{Value3}}
+, \mbox{\hyperlink{_enum_to_string_8tests_8cpp_ac017343e4e620bbb8069612fe5353941a3cdf05413e72fd826ed3a2aa33cff022}{Value4}}
+ \}
+\item 
+enum class \mbox{\hyperlink{namespace_bikeshed_a5e3ea5a66d530e5f53c18879fc97e402}{Bikeshed\+::\+Colours}} \{ \mbox{\hyperlink{namespace_bikeshed_a5e3ea5a66d530e5f53c18879fc97e402aee38e4d5dd68c4e440825018d549cb47}{Bikeshed\+::\+Red}}
+, \mbox{\hyperlink{namespace_bikeshed_a5e3ea5a66d530e5f53c18879fc97e402ad382816a3cbeed082c9e216e7392eed1}{Bikeshed\+::\+Green}}
+, \mbox{\hyperlink{namespace_bikeshed_a5e3ea5a66d530e5f53c18879fc97e402a9594eec95be70e7b1710f730fdda33d9}{Bikeshed\+::\+Blue}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{_enum_to_string_8tests_8cpp_ad31cb0cfd4cbdf825b386279ec86827c}{TEST\+\_\+\+CASE}} ("{}to\+String(enum)"{}, "{}\mbox{[}to\+String\mbox{]}\mbox{[}enum\mbox{]}"{})
+\item 
+\mbox{\hyperlink{_enum_to_string_8tests_8cpp_af3f49a40adb0e896649946a09f2a8ff4}{TEST\+\_\+\+CASE}} ("{}to\+String(enum w/operator$<$$<$)"{}, "{}\mbox{[}to\+String\mbox{]}\mbox{[}enum\mbox{]}"{})
+\item 
+\mbox{\hyperlink{_enum_to_string_8tests_8cpp_ae175fdf12ce094a6e35e0f1ea922d978}{TEST\+\_\+\+CASE}} ("{}to\+String(enum \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}})"{}, "{}\mbox{[}to\+String\mbox{]}\mbox{[}enum\mbox{]}\mbox{[}enum\+Class\mbox{]}"{})
+\item 
+\mbox{\hyperlink{_enum_to_string_8tests_8cpp_a7a292536193bbde3d72de8da823067a5}{TEST\+\_\+\+CASE}} ("{}to\+String(enum \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} w/operator$<$$<$)"{}, "{}\mbox{[}to\+String\mbox{]}\mbox{[}enum\mbox{]}\mbox{[}enum\+Class\mbox{]}"{})
+\item 
+\mbox{\hyperlink{_enum_to_string_8tests_8cpp_a1d4e95bb2ca3fa56a1fbb213515d236f}{TEST\+\_\+\+CASE}} ("{}Enums can quickly have stringification enabled using REGISTER\+\_\+\+ENUM"{})
+\item 
+\mbox{\hyperlink{_enum_to_string_8tests_8cpp_ae02ba9459cf998d87048c6081c930f3b}{CATCH\+\_\+\+REGISTER\+\_\+\+ENUM}} (\mbox{\hyperlink{namespace_bikeshed_a5e3ea5a66d530e5f53c18879fc97e402}{Bikeshed\+::\+Colours}}, \mbox{\hyperlink{namespace_bikeshed_a5e3ea5a66d530e5f53c18879fc97e402aee38e4d5dd68c4e440825018d549cb47}{Bikeshed\+::\+Colours\+::\+Red}}, \mbox{\hyperlink{namespace_bikeshed_a5e3ea5a66d530e5f53c18879fc97e402ad382816a3cbeed082c9e216e7392eed1}{Bikeshed\+::\+Colours\+::\+Green}}, \mbox{\hyperlink{namespace_bikeshed_a5e3ea5a66d530e5f53c18879fc97e402a9594eec95be70e7b1710f730fdda33d9}{Bikeshed\+::\+Colours\+::\+Blue}}) \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\+\_\+\+CASE}}("{}Enums in namespaces can quickly have stringification enabled using REGISTER\+\_\+\+ENUM"{})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{_enum_to_string_8tests_8cpp_ac017343e4e620bbb8069612fe5353941}\index{EnumToString.tests.cpp@{EnumToString.tests.cpp}!EnumClass3@{EnumClass3}}
+\index{EnumClass3@{EnumClass3}!EnumToString.tests.cpp@{EnumToString.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{EnumClass3}{EnumClass3}}
+{\footnotesize\ttfamily \label{_enum_to_string_8tests_8cpp_ac017343e4e620bbb8069612fe5353941} 
+enum \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{_to_string_8tests_8cpp_ac017343e4e620bbb8069612fe5353941}{Enum\+Class3}}\hspace{0.3cm}{\ttfamily [strong]}}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Value1@{Value1}!EnumToString.tests.cpp@{EnumToString.tests.cpp}}\index{EnumToString.tests.cpp@{EnumToString.tests.cpp}!Value1@{Value1}}}\Hypertarget{_enum_to_string_8tests_8cpp_ac017343e4e620bbb8069612fe5353941a7ee5a281b28d7ca1fab06b43d0b7d8ac}\label{_enum_to_string_8tests_8cpp_ac017343e4e620bbb8069612fe5353941} 
+Value1&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Value2@{Value2}!EnumToString.tests.cpp@{EnumToString.tests.cpp}}\index{EnumToString.tests.cpp@{EnumToString.tests.cpp}!Value2@{Value2}}}\Hypertarget{_enum_to_string_8tests_8cpp_ac017343e4e620bbb8069612fe5353941a0fe13ed1638da4d4b1ef316729f3bb32}\label{_enum_to_string_8tests_8cpp_ac017343e4e620bbb8069612fe5353941} 
+Value2&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Value3@{Value3}!EnumToString.tests.cpp@{EnumToString.tests.cpp}}\index{EnumToString.tests.cpp@{EnumToString.tests.cpp}!Value3@{Value3}}}\Hypertarget{_enum_to_string_8tests_8cpp_ac017343e4e620bbb8069612fe5353941a121bcef76aa7694f7d8ef4d381b86dad}\label{_enum_to_string_8tests_8cpp_ac017343e4e620bbb8069612fe5353941} 
+Value3&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Value4@{Value4}!EnumToString.tests.cpp@{EnumToString.tests.cpp}}\index{EnumToString.tests.cpp@{EnumToString.tests.cpp}!Value4@{Value4}}}\Hypertarget{_enum_to_string_8tests_8cpp_ac017343e4e620bbb8069612fe5353941a3cdf05413e72fd826ed3a2aa33cff022}\label{_enum_to_string_8tests_8cpp_ac017343e4e620bbb8069612fe5353941} 
+Value4&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Value1@{Value1}!EnumToString.tests.cpp@{EnumToString.tests.cpp}}\index{EnumToString.tests.cpp@{EnumToString.tests.cpp}!Value1@{Value1}}}\Hypertarget{_enum_to_string_8tests_8cpp_ac017343e4e620bbb8069612fe5353941a7ee5a281b28d7ca1fab06b43d0b7d8ac}\label{_enum_to_string_8tests_8cpp_ac017343e4e620bbb8069612fe5353941} 
+Value1&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Value2@{Value2}!EnumToString.tests.cpp@{EnumToString.tests.cpp}}\index{EnumToString.tests.cpp@{EnumToString.tests.cpp}!Value2@{Value2}}}\Hypertarget{_enum_to_string_8tests_8cpp_ac017343e4e620bbb8069612fe5353941a0fe13ed1638da4d4b1ef316729f3bb32}\label{_enum_to_string_8tests_8cpp_ac017343e4e620bbb8069612fe5353941} 
+Value2&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Value3@{Value3}!EnumToString.tests.cpp@{EnumToString.tests.cpp}}\index{EnumToString.tests.cpp@{EnumToString.tests.cpp}!Value3@{Value3}}}\Hypertarget{_enum_to_string_8tests_8cpp_ac017343e4e620bbb8069612fe5353941a121bcef76aa7694f7d8ef4d381b86dad}\label{_enum_to_string_8tests_8cpp_ac017343e4e620bbb8069612fe5353941} 
+Value3&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Value4@{Value4}!EnumToString.tests.cpp@{EnumToString.tests.cpp}}\index{EnumToString.tests.cpp@{EnumToString.tests.cpp}!Value4@{Value4}}}\Hypertarget{_enum_to_string_8tests_8cpp_ac017343e4e620bbb8069612fe5353941a3cdf05413e72fd826ed3a2aa33cff022}\label{_enum_to_string_8tests_8cpp_ac017343e4e620bbb8069612fe5353941} 
+Value4&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{_enum_to_string_8tests_8cpp_source_l00068}{68}} of file \mbox{\hyperlink{_enum_to_string_8tests_8cpp_source}{Enum\+To\+String.\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00068\ \{\ \mbox{\hyperlink{_enum_to_string_8tests_8cpp_ac017343e4e620bbb8069612fe5353941a7ee5a281b28d7ca1fab06b43d0b7d8ac}{Value1}},\ \mbox{\hyperlink{_enum_to_string_8tests_8cpp_ac017343e4e620bbb8069612fe5353941a0fe13ed1638da4d4b1ef316729f3bb32}{Value2}},\ \mbox{\hyperlink{_enum_to_string_8tests_8cpp_ac017343e4e620bbb8069612fe5353941a121bcef76aa7694f7d8ef4d381b86dad}{Value3}},\ \mbox{\hyperlink{_enum_to_string_8tests_8cpp_ac017343e4e620bbb8069612fe5353941a3cdf05413e72fd826ed3a2aa33cff022}{Value4}}\ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{_enum_to_string_8tests_8cpp_ae02ba9459cf998d87048c6081c930f3b}\index{EnumToString.tests.cpp@{EnumToString.tests.cpp}!CATCH\_REGISTER\_ENUM@{CATCH\_REGISTER\_ENUM}}
+\index{CATCH\_REGISTER\_ENUM@{CATCH\_REGISTER\_ENUM}!EnumToString.tests.cpp@{EnumToString.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{CATCH\_REGISTER\_ENUM()}{CATCH\_REGISTER\_ENUM()}}
+{\footnotesize\ttfamily \label{_enum_to_string_8tests_8cpp_ae02ba9459cf998d87048c6081c930f3b} 
+CATCH\+\_\+\+REGISTER\+\_\+\+ENUM (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespace_bikeshed_a5e3ea5a66d530e5f53c18879fc97e402}{Bikeshed\+::\+Colours}}}]{}{, }\item[{\mbox{\hyperlink{namespace_bikeshed_a5e3ea5a66d530e5f53c18879fc97e402aee38e4d5dd68c4e440825018d549cb47}{Bikeshed\+::\+Colours\+::\+Red}}}]{}{, }\item[{\mbox{\hyperlink{namespace_bikeshed_a5e3ea5a66d530e5f53c18879fc97e402ad382816a3cbeed082c9e216e7392eed1}{Bikeshed\+::\+Colours\+::\+Green}}}]{}{, }\item[{\mbox{\hyperlink{namespace_bikeshed_a5e3ea5a66d530e5f53c18879fc97e402a9594eec95be70e7b1710f730fdda33d9}{Bikeshed\+::\+Colours\+::\+Blue}}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_enum_to_string_8tests_8cpp_source_l00090}{90}} of file \mbox{\hyperlink{_enum_to_string_8tests_8cpp_source}{Enum\+To\+String.\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00096\ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{Catch::Detail::stringify}};}
+\DoxyCodeLine{00097\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{simplepullreader_8cpp_a43b8f2b628e0f7f9342371359889a778}{stringify}}(\ \mbox{\hyperlink{namespace_bikeshed_a5e3ea5a66d530e5f53c18879fc97e402aee38e4d5dd68c4e440825018d549cb47}{Bikeshed::Colours::Red}}\ )\ ==\ \textcolor{stringliteral}{"{}Red"{}}\ );}
+\DoxyCodeLine{00098\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{simplepullreader_8cpp_a43b8f2b628e0f7f9342371359889a778}{stringify}}(\ \mbox{\hyperlink{namespace_bikeshed_a5e3ea5a66d530e5f53c18879fc97e402a9594eec95be70e7b1710f730fdda33d9}{Bikeshed::Colours::Blue}}\ )\ ==\ \textcolor{stringliteral}{"{}Blue"{}}\ );}
+\DoxyCodeLine{00099\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{_enum_to_string_8tests_8cpp_ae02ba9459cf998d87048c6081c930f3b_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{_enum_to_string_8tests_8cpp_a1d4e95bb2ca3fa56a1fbb213515d236f}\index{EnumToString.tests.cpp@{EnumToString.tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!EnumToString.tests.cpp@{EnumToString.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/5]}}
+{\footnotesize\ttfamily \label{_enum_to_string_8tests_8cpp_a1d4e95bb2ca3fa56a1fbb213515d236f} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Enums can quickly have stringification enabled using REGISTER\+\_\+\+ENUM"{}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_enum_to_string_8tests_8cpp_source_l00073}{73}} of file \mbox{\hyperlink{_enum_to_string_8tests_8cpp_source}{Enum\+To\+String.\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00074\ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{Catch::Detail::stringify}};}
+\DoxyCodeLine{00075\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{simplepullreader_8cpp_a43b8f2b628e0f7f9342371359889a778}{stringify}}(\ \mbox{\hyperlink{_to_string_8tests_8cpp_ac017343e4e620bbb8069612fe5353941a7ee5a281b28d7ca1fab06b43d0b7d8ac}{EnumClass3::Value1}}\ )\ ==\ \textcolor{stringliteral}{"{}Value1"{}}\ );}
+\DoxyCodeLine{00076\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{simplepullreader_8cpp_a43b8f2b628e0f7f9342371359889a778}{stringify}}(\ \mbox{\hyperlink{_to_string_8tests_8cpp_ac017343e4e620bbb8069612fe5353941a0fe13ed1638da4d4b1ef316729f3bb32}{EnumClass3::Value2}}\ )\ ==\ \textcolor{stringliteral}{"{}Value2"{}}\ );}
+\DoxyCodeLine{00077\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{simplepullreader_8cpp_a43b8f2b628e0f7f9342371359889a778}{stringify}}(\ \mbox{\hyperlink{_to_string_8tests_8cpp_ac017343e4e620bbb8069612fe5353941a121bcef76aa7694f7d8ef4d381b86dad}{EnumClass3::Value3}}\ )\ ==\ \textcolor{stringliteral}{"{}Value3"{}}\ );}
+\DoxyCodeLine{00078\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{simplepullreader_8cpp_a43b8f2b628e0f7f9342371359889a778}{stringify}}(\ \mbox{\hyperlink{_to_string_8tests_8cpp_ac017343e4e620bbb8069612fe5353941a3cdf05413e72fd826ed3a2aa33cff022}{EnumClass3::Value4}}\ )\ ==\ \textcolor{stringliteral}{"{}\{**\ unexpected\ enum\ value\ **\}"{}}\ );}
+\DoxyCodeLine{00079\ }
+\DoxyCodeLine{00080\ \ \ \ \ \mbox{\hyperlink{_to_string_8tests_8cpp_ac017343e4e620bbb8069612fe5353941}{EnumClass3}}\ ec3\ =\ EnumClass3\ ::Value2;}
+\DoxyCodeLine{00081\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{simplepullreader_8cpp_a43b8f2b628e0f7f9342371359889a778}{stringify}}(\ ec3\ )\ ==\ \textcolor{stringliteral}{"{}Value2"{}}\ );}
+\DoxyCodeLine{00082\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=305pt]{_enum_to_string_8tests_8cpp_a1d4e95bb2ca3fa56a1fbb213515d236f_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{_enum_to_string_8tests_8cpp_a7a292536193bbde3d72de8da823067a5}\index{EnumToString.tests.cpp@{EnumToString.tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!EnumToString.tests.cpp@{EnumToString.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/5]}}
+{\footnotesize\ttfamily \label{_enum_to_string_8tests_8cpp_a7a292536193bbde3d72de8da823067a5} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}to\+String(enum \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} w/operator$<$$<$)"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}to\+String\mbox{]}\mbox{[}enum\mbox{]}\mbox{[}enum\+Class\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_enum_to_string_8tests_8cpp_source_l00058}{58}} of file \mbox{\hyperlink{_enum_to_string_8tests_8cpp_source}{Enum\+To\+String.\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00059\ \ \ \ \ EnumClass2\ e0\ =\ EnumClass2::EnumClass2Value0;}
+\DoxyCodeLine{00060\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(e0)\ ==\ \textcolor{stringliteral}{"{}E2/V0"{}}\ );}
+\DoxyCodeLine{00061\ \ \ \ \ EnumClass2\ e1\ =\ EnumClass2::EnumClass2Value1;}
+\DoxyCodeLine{00062\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(e1)\ ==\ \textcolor{stringliteral}{"{}E2/V1"{}}\ );}
+\DoxyCodeLine{00063\ }
+\DoxyCodeLine{00064\ \ \ \ \ \textcolor{keyword}{auto}\ e3\ =\ \textcolor{keyword}{static\_cast<}EnumClass2\textcolor{keyword}{>}(10);}
+\DoxyCodeLine{00065\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(e3)\ ==\ \textcolor{stringliteral}{"{}Unknown\ enum\ value\ 10"{}}\ );}
+\DoxyCodeLine{00066\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=305pt]{_enum_to_string_8tests_8cpp_a7a292536193bbde3d72de8da823067a5_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{_enum_to_string_8tests_8cpp_ae175fdf12ce094a6e35e0f1ea922d978}\index{EnumToString.tests.cpp@{EnumToString.tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!EnumToString.tests.cpp@{EnumToString.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [3/5]}}
+{\footnotesize\ttfamily \label{_enum_to_string_8tests_8cpp_ae175fdf12ce094a6e35e0f1ea922d978} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}to\+String(enum \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}})"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}to\+String\mbox{]}\mbox{[}enum\mbox{]}\mbox{[}enum\+Class\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_enum_to_string_8tests_8cpp_source_l00050}{50}} of file \mbox{\hyperlink{_enum_to_string_8tests_8cpp_source}{Enum\+To\+String.\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00051\ \ \ \ \ EnumClass1\ e0\ =\ EnumClass1::EnumClass1Value0;}
+\DoxyCodeLine{00052\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(e0)\ ==\ \textcolor{stringliteral}{"{}0"{}}\ );}
+\DoxyCodeLine{00053\ \ \ \ \ EnumClass1\ e1\ =\ EnumClass1::EnumClass1Value1;}
+\DoxyCodeLine{00054\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(e1)\ ==\ \textcolor{stringliteral}{"{}1"{}}\ );}
+\DoxyCodeLine{00055\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=305pt]{_enum_to_string_8tests_8cpp_ae175fdf12ce094a6e35e0f1ea922d978_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{_enum_to_string_8tests_8cpp_af3f49a40adb0e896649946a09f2a8ff4}\index{EnumToString.tests.cpp@{EnumToString.tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!EnumToString.tests.cpp@{EnumToString.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [4/5]}}
+{\footnotesize\ttfamily \label{_enum_to_string_8tests_8cpp_af3f49a40adb0e896649946a09f2a8ff4} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}to\+String(enum w/operator$<$$<$)"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}to\+String\mbox{]}\mbox{[}enum\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_enum_to_string_8tests_8cpp_source_l00023}{23}} of file \mbox{\hyperlink{_enum_to_string_8tests_8cpp_source}{Enum\+To\+String.\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00024\ \ \ \ \ Enum2\ e0\ =\ Enum2Value0;}
+\DoxyCodeLine{00025\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(e0)\ ==\ \textcolor{stringliteral}{"{}E2\{0\}"{}}\ );}
+\DoxyCodeLine{00026\ \ \ \ \ Enum2\ e1\ =\ Enum2Value1;}
+\DoxyCodeLine{00027\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(e1)\ ==\ \textcolor{stringliteral}{"{}E2\{1\}"{}}\ );}
+\DoxyCodeLine{00028\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=305pt]{_enum_to_string_8tests_8cpp_af3f49a40adb0e896649946a09f2a8ff4_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{_enum_to_string_8tests_8cpp_ad31cb0cfd4cbdf825b386279ec86827c}\index{EnumToString.tests.cpp@{EnumToString.tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!EnumToString.tests.cpp@{EnumToString.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [5/5]}}
+{\footnotesize\ttfamily \label{_enum_to_string_8tests_8cpp_ad31cb0cfd4cbdf825b386279ec86827c} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}to\+String(enum)"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}to\+String\mbox{]}\mbox{[}enum\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_enum_to_string_8tests_8cpp_source_l00016}{16}} of file \mbox{\hyperlink{_enum_to_string_8tests_8cpp_source}{Enum\+To\+String.\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00017\ \ \ \ \ Enum1\ e0\ =\ Enum1Value0;}
+\DoxyCodeLine{00018\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(e0)\ ==\ \textcolor{stringliteral}{"{}0"{}}\ );}
+\DoxyCodeLine{00019\ \ \ \ \ Enum1\ e1\ =\ Enum1Value1;}
+\DoxyCodeLine{00020\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(e1)\ ==\ \textcolor{stringliteral}{"{}1"{}}\ );}
+\DoxyCodeLine{00021\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=305pt]{_enum_to_string_8tests_8cpp_ad31cb0cfd4cbdf825b386279ec86827c_cgraph}
+\end{center}
+\end{figure}

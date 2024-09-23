@@ -1,0 +1,93 @@
+\doxysection{gmock-\/port.h}
+\hypertarget{gmock-port_8h_source}{}\label{gmock-port_8h_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googlemock/include/gmock/internal/gmock-\/port.h@{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googlemock/include/gmock/internal/gmock-\/port.h}}
+\mbox{\hyperlink{gmock-port_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00001}00001\ \textcolor{comment}{//\ Copyright\ 2008,\ Google\ Inc.}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00002}00002\ \textcolor{comment}{//\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00003}00003\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00004}00004\ \textcolor{comment}{//\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00005}00005\ \textcolor{comment}{//\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00006}00006\ \textcolor{comment}{//\ met:}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00007}00007\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00008}00008\ \textcolor{comment}{//\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00009}00009\ \textcolor{comment}{//\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00010}00010\ \textcolor{comment}{//\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00011}00011\ \textcolor{comment}{//\ copyright\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00012}00012\ \textcolor{comment}{//\ in\ the\ documentation\ and/or\ other\ materials\ provided\ with\ the}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00013}00013\ \textcolor{comment}{//\ distribution.}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00014}00014\ \textcolor{comment}{//\ \ \ \ \ *\ Neither\ the\ name\ of\ Google\ Inc.\ nor\ the\ names\ of\ its}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00015}00015\ \textcolor{comment}{//\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products\ derived\ from}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00016}00016\ \textcolor{comment}{//\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00017}00017\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00018}00018\ \textcolor{comment}{//\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00019}00019\ \textcolor{comment}{//\ "{}AS\ IS"{}\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00020}00020\ \textcolor{comment}{//\ LIMITED\ TO,\ THE\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00021}00021\ \textcolor{comment}{//\ A\ PARTICULAR\ PURPOSE\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ THE\ COPYRIGHT}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00022}00022\ \textcolor{comment}{//\ OWNER\ OR\ CONTRIBUTORS\ BE\ LIABLE\ FOR\ ANY\ DIRECT,\ INDIRECT,\ INCIDENTAL,}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00023}00023\ \textcolor{comment}{//\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES\ (INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00024}00024\ \textcolor{comment}{//\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;\ LOSS\ OF\ USE,}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00025}00025\ \textcolor{comment}{//\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND\ ON\ ANY}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00026}00026\ \textcolor{comment}{//\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00027}00027\ \textcolor{comment}{//\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00028}00028\ \textcolor{comment}{//\ OF\ THIS\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00029}00029\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00030}00030\ \textcolor{comment}{//\ Author:\ vadimb@google.com\ (Vadim\ Berman)}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00031}00031\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00032}00032\ \textcolor{comment}{//\ Low-\/level\ types\ and\ utilities\ for\ porting\ Google\ Mock\ to\ various}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00033}00033\ \textcolor{comment}{//\ platforms.\ \ All\ macros\ ending\ with\ \_\ and\ symbols\ defined\ in\ an}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00034}00034\ \textcolor{comment}{//\ internal\ namespace\ are\ subject\ to\ change\ without\ notice.\ \ Code}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00035}00035\ \textcolor{comment}{//\ outside\ Google\ Mock\ MUST\ NOT\ USE\ THEM\ DIRECTLY.\ \ Macros\ that\ don't}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00036}00036\ \textcolor{comment}{//\ end\ with\ \_\ are\ part\ of\ Google\ Mock's\ public\ API\ and\ can\ be\ used\ by}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00037}00037\ \textcolor{comment}{//\ code\ outside\ Google\ Mock.}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00039}00039\ \textcolor{preprocessor}{\#ifndef\ GMOCK\_INCLUDE\_GMOCK\_INTERNAL\_GMOCK\_PORT\_H\_}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00040}00040\ \textcolor{preprocessor}{\#define\ GMOCK\_INCLUDE\_GMOCK\_INTERNAL\_GMOCK\_PORT\_H\_}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00042}00042\ \textcolor{preprocessor}{\#include\ <assert.h>}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00043}00043\ \textcolor{preprocessor}{\#include\ <stdlib.h>}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00044}00044\ \textcolor{preprocessor}{\#include\ <iostream>}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00046}00046\ \textcolor{comment}{//\ Most\ of\ the\ utilities\ needed\ for\ porting\ Google\ Mock\ are\ also}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00047}00047\ \textcolor{comment}{//\ required\ for\ Google\ Test\ and\ are\ defined\ in\ gtest-\/port.h.}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00048}00048\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00049}00049\ \textcolor{comment}{//\ Note\ to\ maintainers:\ to\ reduce\ code\ duplication,\ prefer\ adding}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00050}00050\ \textcolor{comment}{//\ portability\ utilities\ to\ Google\ Test's\ gtest-\/port.h\ instead\ of}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00051}00051\ \textcolor{comment}{//\ here,\ as\ Google\ Mock\ depends\ on\ Google\ Test.\ \ Only\ add\ a\ utility}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00052}00052\ \textcolor{comment}{//\ here\ if\ it's\ truly\ specific\ to\ Google\ Mock.}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00054}00054\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{gtest-linked__ptr_8h}{gtest/internal/gtest-\/linked\_ptr.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00055}00055\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{gtest-port_8h}{gtest/internal/gtest-\/port.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00056}00056\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{custom_2gmock-port_8h}{gmock/internal/custom/gmock-\/port.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00058}00058\ \textcolor{comment}{//\ For\ MS\ Visual\ C++,\ check\ the\ compiler\ version.\ At\ least\ VS\ 2003\ is}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00059}00059\ \textcolor{comment}{//\ required\ to\ compile\ Google\ Mock.}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00060}00060\ \textcolor{preprocessor}{\#if\ defined(\_MSC\_VER)\ \&\&\ \_MSC\_VER\ <\ 1310}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00061}00061\ \textcolor{preprocessor}{\#\ error\ "{}At\ least\ Visual\ C++\ 2003\ (7.1)\ is\ required\ to\ compile\ Google\ Mock."{}}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00062}00062\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00064}00064\ \textcolor{comment}{//\ Macro\ for\ referencing\ flags.\ \ This\ is\ public\ as\ we\ want\ the\ user\ to}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00065}00065\ \textcolor{comment}{//\ use\ this\ syntax\ to\ reference\ Google\ Mock\ flags.}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00066}\mbox{\hyperlink{gmock-port_8h_ad7119adfef06be5e7b1551633f5a1436}{00066}}\ \textcolor{preprocessor}{\#define\ GMOCK\_FLAG(name)\ FLAGS\_gmock\_\#\#name}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00067}00067\ }
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00068}00068\ \textcolor{preprocessor}{\#if\ !defined(GMOCK\_DECLARE\_bool\_)}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00069}00069\ }
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00070}00070\ \textcolor{comment}{//\ Macros\ for\ declaring\ flags.}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00071}\mbox{\hyperlink{gmock-port_8h_a7a0a953221ea8ef5aaa6c644a48af599}{00071}}\ \textcolor{preprocessor}{\#\ define\ GMOCK\_DECLARE\_bool\_(name)\ extern\ GTEST\_API\_\ bool\ GMOCK\_FLAG(name)}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00072}\mbox{\hyperlink{gmock-port_8h_adeb7f0a8d842d1d541615763835af3f9}{00072}}\ \textcolor{preprocessor}{\#\ define\ GMOCK\_DECLARE\_int32\_(name)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00073}00073\ \textcolor{preprocessor}{\ \ \ \ extern\ GTEST\_API\_\ ::testing::internal::Int32\ GMOCK\_FLAG(name)}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00074}\mbox{\hyperlink{gmock-port_8h_a35af08c45131cf68d78446cb8cfe40fe}{00074}}\ \textcolor{preprocessor}{\#\ define\ GMOCK\_DECLARE\_string\_(name)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00075}00075\ \textcolor{preprocessor}{\ \ \ \ extern\ GTEST\_API\_\ ::std::string\ GMOCK\_FLAG(name)}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00076}00076\ }
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00077}00077\ \textcolor{comment}{//\ Macros\ for\ defining\ flags.}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00078}\mbox{\hyperlink{gmock-port_8h_a470be328fabbeef3987127adc18a1433}{00078}}\ \textcolor{preprocessor}{\#\ define\ GMOCK\_DEFINE\_bool\_(name,\ default\_val,\ doc)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00079}00079\ \textcolor{preprocessor}{\ \ \ \ GTEST\_API\_\ bool\ GMOCK\_FLAG(name)\ =\ (default\_val)}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00080}\mbox{\hyperlink{gmock-port_8h_a19d91081ff0aaab2f60ef1dc2d6e6b34}{00080}}\ \textcolor{preprocessor}{\#\ define\ GMOCK\_DEFINE\_int32\_(name,\ default\_val,\ doc)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00081}00081\ \textcolor{preprocessor}{\ \ \ \ GTEST\_API\_\ ::testing::internal::Int32\ GMOCK\_FLAG(name)\ =\ (default\_val)}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00082}\mbox{\hyperlink{gmock-port_8h_ad6badbf90e5a813e2bd5668fc6b6a8f7}{00082}}\ \textcolor{preprocessor}{\#\ define\ GMOCK\_DEFINE\_string\_(name,\ default\_val,\ doc)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00083}00083\ \textcolor{preprocessor}{\ \ \ \ GTEST\_API\_\ ::std::string\ GMOCK\_FLAG(name)\ =\ (default\_val)}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00084}00084\ }
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00085}00085\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ !defined(GMOCK\_DECLARE\_bool\_)}}
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00086}00086\ }
+\DoxyCodeLine{\Hypertarget{gmock-port_8h_source_l00087}00087\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GMOCK\_INCLUDE\_GMOCK\_INTERNAL\_GMOCK\_PORT\_H\_}}
+
+\end{DoxyCode}

@@ -1,0 +1,152 @@
+\doxysection{libraries/fc/secp256k1/secp256k1/examples/ecdh.c File Reference}
+\hypertarget{ecdh_8c}{}\label{ecdh_8c}\index{libraries/fc/secp256k1/secp256k1/examples/ecdh.c@{libraries/fc/secp256k1/secp256k1/examples/ecdh.c}}
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$assert.\+h$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include $<$secp256k1.\+h$>$}\newline
+{\ttfamily \#include $<$secp256k1\+\_\+ecdh.\+h$>$}\newline
+{\ttfamily \#include "{}random.\+h"{}}\newline
+Include dependency graph for ecdh.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{ecdh_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{ecdh_8c_a840291bc02cba5474a4cb46a9b9566fe}{main}} (void)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{ecdh_8c_a840291bc02cba5474a4cb46a9b9566fe}\index{ecdh.c@{ecdh.c}!main@{main}}
+\index{main@{main}!ecdh.c@{ecdh.c}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{ecdh_8c_a840291bc02cba5474a4cb46a9b9566fe} 
+int main (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{ecdh_8c_source_l00020}{20}} of file \mbox{\hyperlink{ecdh_8c_source}{ecdh.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00021\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ seckey1[32];}
+\DoxyCodeLine{00022\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ seckey2[32];}
+\DoxyCodeLine{00023\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ compressed\_pubkey1[33];}
+\DoxyCodeLine{00024\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ compressed\_pubkey2[33];}
+\DoxyCodeLine{00025\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ shared\_secret1[32];}
+\DoxyCodeLine{00026\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ shared\_secret2[32];}
+\DoxyCodeLine{00027\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ randomize[32];}
+\DoxyCodeLine{00028\ \ \ \ \ \textcolor{keywordtype}{int}\ return\_val;}
+\DoxyCodeLine{00029\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}};}
+\DoxyCodeLine{00030\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__pubkey}{secp256k1\_pubkey}}\ pubkey1;}
+\DoxyCodeLine{00031\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__pubkey}{secp256k1\_pubkey}}\ pubkey2;}
+\DoxyCodeLine{00032\ }
+\DoxyCodeLine{00033\ \ \ \ \ \textcolor{comment}{/*\ The\ specification\ in\ secp256k1.h\ states\ that\ \`{}secp256k1\_ec\_pubkey\_create`}}
+\DoxyCodeLine{00034\ \textcolor{comment}{\ \ \ \ \ *\ needs\ a\ context\ object\ initialized\ for\ signing,\ which\ is\ why\ we\ create}}
+\DoxyCodeLine{00035\ \textcolor{comment}{\ \ \ \ \ *\ a\ context\ with\ the\ SECP256K1\_CONTEXT\_SIGN\ flag.}}
+\DoxyCodeLine{00036\ \textcolor{comment}{\ \ \ \ \ *\ (The\ docs\ for\ \`{}secp256k1\_ecdh`\ don't\ require\ any\ special\ context,\ just}}
+\DoxyCodeLine{00037\ \textcolor{comment}{\ \ \ \ \ *\ some\ initialized\ context)\ */}}
+\DoxyCodeLine{00038\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__context__struct}{secp256k1\_context}}*\ ctx\ =\ \mbox{\hyperlink{secp256k1_8h_a3aaa9fcc3ab67bc8f841779a049069c5}{secp256k1\_context\_create}}(\mbox{\hyperlink{secp256k1_8h_a0d34fe6baa73d3145f2e376e43de0b15}{SECP256K1\_CONTEXT\_SIGN}});}
+\DoxyCodeLine{00039\ \ \ \ \ \textcolor{keywordflow}{if}\ (!fill\_random(randomize,\ \textcolor{keyword}{sizeof}(randomize)))\ \{}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Failed\ to\ generate\ randomness\(\backslash\)n"{}});}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{00042\ \ \ \ \ \}}
+\DoxyCodeLine{00043\ \ \ \ \ \textcolor{comment}{/*\ Randomizing\ the\ context\ is\ recommended\ to\ protect\ against\ side-\/channel}}
+\DoxyCodeLine{00044\ \textcolor{comment}{\ \ \ \ \ *\ leakage\ See\ \`{}secp256k1\_context\_randomize`\ in\ secp256k1.h\ for\ more}}
+\DoxyCodeLine{00045\ \textcolor{comment}{\ \ \ \ \ *\ information\ about\ it.\ This\ should\ never\ fail.\ */}}
+\DoxyCodeLine{00046\ \ \ \ \ return\_val\ =\ \mbox{\hyperlink{secp256k1_8h_a1b81d70feb6ed24dc902cbbd5ba569e7}{secp256k1\_context\_randomize}}(ctx,\ randomize);}
+\DoxyCodeLine{00047\ \ \ \ \ assert(return\_val);}
+\DoxyCodeLine{00048\ }
+\DoxyCodeLine{00049\ \textcolor{comment}{\ \ \ \ /***\ Key\ Generation\ ***/}}
+\DoxyCodeLine{00050\ }
+\DoxyCodeLine{00051\ \ \ \ \ \textcolor{comment}{/*\ If\ the\ secret\ key\ is\ zero\ or\ out\ of\ range\ (bigger\ than\ secp256k1's}}
+\DoxyCodeLine{00052\ \textcolor{comment}{\ \ \ \ \ *\ order),\ we\ try\ to\ sample\ a\ new\ key.\ Note\ that\ the\ probability\ of\ this}}
+\DoxyCodeLine{00053\ \textcolor{comment}{\ \ \ \ \ *\ happening\ is\ negligible.\ */}}
+\DoxyCodeLine{00054\ \ \ \ \ \textcolor{keywordflow}{while}\ (1)\ \{}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!fill\_random(seckey1,\ \textcolor{keyword}{sizeof}(seckey1))\ ||\ !fill\_random(seckey2,\ \textcolor{keyword}{sizeof}(seckey2)))\ \{}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Failed\ to\ generate\ randomness\(\backslash\)n"{}});}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{secp256k1_8h_a366f922fc0c787351e82ff8e3a95f652}{secp256k1\_ec\_seckey\_verify}}(ctx,\ seckey1)\ \&\&\ \mbox{\hyperlink{secp256k1_8h_a366f922fc0c787351e82ff8e3a95f652}{secp256k1\_ec\_seckey\_verify}}(ctx,\ seckey2))\ \{}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00062\ \ \ \ \ \}}
+\DoxyCodeLine{00063\ }
+\DoxyCodeLine{00064\ \ \ \ \ \textcolor{comment}{/*\ Public\ key\ creation\ using\ a\ valid\ context\ with\ a\ verified\ secret\ key\ should\ never\ fail\ */}}
+\DoxyCodeLine{00065\ \ \ \ \ return\_val\ =\ \mbox{\hyperlink{secp256k1_8h_a7438071aa8a6dc4697abe4f4659f2161}{secp256k1\_ec\_pubkey\_create}}(ctx,\ \&pubkey1,\ seckey1);}
+\DoxyCodeLine{00066\ \ \ \ \ assert(return\_val);}
+\DoxyCodeLine{00067\ \ \ \ \ return\_val\ =\ \mbox{\hyperlink{secp256k1_8h_a7438071aa8a6dc4697abe4f4659f2161}{secp256k1\_ec\_pubkey\_create}}(ctx,\ \&pubkey2,\ seckey2);}
+\DoxyCodeLine{00068\ \ \ \ \ assert(return\_val);}
+\DoxyCodeLine{00069\ }
+\DoxyCodeLine{00070\ \ \ \ \ \textcolor{comment}{/*\ Serialize\ pubkey1\ in\ a\ compressed\ form\ (33\ bytes),\ should\ always\ return\ 1\ */}}
+\DoxyCodeLine{00071\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ =\ \textcolor{keyword}{sizeof}(compressed\_pubkey1);}
+\DoxyCodeLine{00072\ \ \ \ \ return\_val\ =\ \mbox{\hyperlink{secp256k1_8h_a34977bf00322e510e881160c421836d7}{secp256k1\_ec\_pubkey\_serialize}}(ctx,\ compressed\_pubkey1,\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ \&pubkey1,\ \mbox{\hyperlink{secp256k1_8h_a7b8f642c65e8b5c81fa4421b7c42ab57}{SECP256K1\_EC\_COMPRESSED}});}
+\DoxyCodeLine{00073\ \ \ \ \ assert(return\_val);}
+\DoxyCodeLine{00074\ \ \ \ \ \textcolor{comment}{/*\ Should\ be\ the\ same\ size\ as\ the\ size\ of\ the\ output,\ because\ we\ passed\ a\ 33\ byte\ array.\ */}}
+\DoxyCodeLine{00075\ \ \ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ ==\ \textcolor{keyword}{sizeof}(compressed\_pubkey1));}
+\DoxyCodeLine{00076\ }
+\DoxyCodeLine{00077\ \ \ \ \ \textcolor{comment}{/*\ Serialize\ pubkey2\ in\ a\ compressed\ form\ (33\ bytes)\ */}}
+\DoxyCodeLine{00078\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ =\ \textcolor{keyword}{sizeof}(compressed\_pubkey2);}
+\DoxyCodeLine{00079\ \ \ \ \ return\_val\ =\ \mbox{\hyperlink{secp256k1_8h_a34977bf00322e510e881160c421836d7}{secp256k1\_ec\_pubkey\_serialize}}(ctx,\ compressed\_pubkey2,\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ \&pubkey2,\ \mbox{\hyperlink{secp256k1_8h_a7b8f642c65e8b5c81fa4421b7c42ab57}{SECP256K1\_EC\_COMPRESSED}});}
+\DoxyCodeLine{00080\ \ \ \ \ assert(return\_val);}
+\DoxyCodeLine{00081\ \ \ \ \ \textcolor{comment}{/*\ Should\ be\ the\ same\ size\ as\ the\ size\ of\ the\ output,\ because\ we\ passed\ a\ 33\ byte\ array.\ */}}
+\DoxyCodeLine{00082\ \ \ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ ==\ \textcolor{keyword}{sizeof}(compressed\_pubkey2));}
+\DoxyCodeLine{00083\ }
+\DoxyCodeLine{00084\ \textcolor{comment}{\ \ \ \ /***\ Creating\ the\ shared\ secret\ ***/}}
+\DoxyCodeLine{00085\ }
+\DoxyCodeLine{00086\ \ \ \ \ \textcolor{comment}{/*\ Perform\ ECDH\ with\ seckey1\ and\ pubkey2.\ Should\ never\ fail\ with\ a\ verified}}
+\DoxyCodeLine{00087\ \textcolor{comment}{\ \ \ \ \ *\ seckey\ and\ valid\ pubkey\ */}}
+\DoxyCodeLine{00088\ \ \ \ \ return\_val\ =\ \mbox{\hyperlink{secp256k1__ecdh_8h_a4386914d0dce8b04f056ce3fae9a37a8}{secp256k1\_ecdh}}(ctx,\ shared\_secret1,\ \&pubkey2,\ seckey1,\ NULL,\ NULL);}
+\DoxyCodeLine{00089\ \ \ \ \ assert(return\_val);}
+\DoxyCodeLine{00090\ }
+\DoxyCodeLine{00091\ \ \ \ \ \textcolor{comment}{/*\ Perform\ ECDH\ with\ seckey2\ and\ pubkey1.\ Should\ never\ fail\ with\ a\ verified}}
+\DoxyCodeLine{00092\ \textcolor{comment}{\ \ \ \ \ *\ seckey\ and\ valid\ pubkey\ */}}
+\DoxyCodeLine{00093\ \ \ \ \ return\_val\ =\ \mbox{\hyperlink{secp256k1__ecdh_8h_a4386914d0dce8b04f056ce3fae9a37a8}{secp256k1\_ecdh}}(ctx,\ shared\_secret2,\ \&pubkey1,\ seckey2,\ NULL,\ NULL);}
+\DoxyCodeLine{00094\ \ \ \ \ assert(return\_val);}
+\DoxyCodeLine{00095\ }
+\DoxyCodeLine{00096\ \ \ \ \ \textcolor{comment}{/*\ Both\ parties\ should\ end\ up\ with\ the\ same\ shared\ secret\ */}}
+\DoxyCodeLine{00097\ \ \ \ \ return\_val\ =\ memcmp(shared\_secret1,\ shared\_secret2,\ \textcolor{keyword}{sizeof}(shared\_secret1));}
+\DoxyCodeLine{00098\ \ \ \ \ assert(return\_val\ ==\ 0);}
+\DoxyCodeLine{00099\ }
+\DoxyCodeLine{00100\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Secret\ Key1:\ "{}});}
+\DoxyCodeLine{00101\ \ \ \ \ print\_hex(seckey1,\ \textcolor{keyword}{sizeof}(seckey1));}
+\DoxyCodeLine{00102\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Compressed\ Pubkey1:\ "{}});}
+\DoxyCodeLine{00103\ \ \ \ \ print\_hex(compressed\_pubkey1,\ \textcolor{keyword}{sizeof}(compressed\_pubkey1));}
+\DoxyCodeLine{00104\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\(\backslash\)nSecret\ Key2:\ "{}});}
+\DoxyCodeLine{00105\ \ \ \ \ print\_hex(seckey2,\ \textcolor{keyword}{sizeof}(seckey2));}
+\DoxyCodeLine{00106\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Compressed\ Pubkey2:\ "{}});}
+\DoxyCodeLine{00107\ \ \ \ \ print\_hex(compressed\_pubkey2,\ \textcolor{keyword}{sizeof}(compressed\_pubkey2));}
+\DoxyCodeLine{00108\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\(\backslash\)nShared\ Secret:\ "{}});}
+\DoxyCodeLine{00109\ \ \ \ \ print\_hex(shared\_secret1,\ \textcolor{keyword}{sizeof}(shared\_secret1));}
+\DoxyCodeLine{00110\ }
+\DoxyCodeLine{00111\ \ \ \ \ \textcolor{comment}{/*\ This\ will\ clear\ everything\ from\ the\ context\ and\ free\ the\ memory\ */}}
+\DoxyCodeLine{00112\ \ \ \ \ \mbox{\hyperlink{secp256k1_8h_a026db914e3723531825ecf25a0cbd699}{secp256k1\_context\_destroy}}(ctx);}
+\DoxyCodeLine{00113\ }
+\DoxyCodeLine{00114\ \ \ \ \ \textcolor{comment}{/*\ It's\ best\ practice\ to\ try\ to\ clear\ secrets\ from\ memory\ after\ using\ them.}}
+\DoxyCodeLine{00115\ \textcolor{comment}{\ \ \ \ \ *\ This\ is\ done\ because\ some\ bugs\ can\ allow\ an\ attacker\ to\ leak\ memory,\ for}}
+\DoxyCodeLine{00116\ \textcolor{comment}{\ \ \ \ \ *\ example\ through\ "{}out\ of\ bounds"{}\ array\ access\ (see\ Heartbleed),\ Or\ the\ OS}}
+\DoxyCodeLine{00117\ \textcolor{comment}{\ \ \ \ \ *\ swapping\ them\ to\ disk.\ Hence,\ we\ overwrite\ the\ secret\ key\ buffer\ with\ zeros.}}
+\DoxyCodeLine{00118\ \textcolor{comment}{\ \ \ \ \ *}}
+\DoxyCodeLine{00119\ \textcolor{comment}{\ \ \ \ \ *\ TODO:\ Prevent\ these\ writes\ from\ being\ optimized\ out,\ as\ any\ good\ compiler}}
+\DoxyCodeLine{00120\ \textcolor{comment}{\ \ \ \ \ *\ will\ remove\ any\ writes\ that\ aren't\ used.\ */}}
+\DoxyCodeLine{00121\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(seckey1,\ 0,\ \textcolor{keyword}{sizeof}(seckey1));}
+\DoxyCodeLine{00122\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(seckey2,\ 0,\ \textcolor{keyword}{sizeof}(seckey2));}
+\DoxyCodeLine{00123\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(shared\_secret1,\ 0,\ \textcolor{keyword}{sizeof}(shared\_secret1));}
+\DoxyCodeLine{00124\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(shared\_secret2,\ 0,\ \textcolor{keyword}{sizeof}(shared\_secret2));}
+\DoxyCodeLine{00125\ }
+\DoxyCodeLine{00126\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00127\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{ecdh_8c_a840291bc02cba5474a4cb46a9b9566fe_cgraph}
+\end{center}
+\end{figure}

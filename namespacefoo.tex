@@ -1,0 +1,172 @@
+\doxysection{foo Namespace Reference}
+\hypertarget{namespacefoo}{}\label{namespacefoo}\index{foo@{foo}}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structfoo_1_1helper__1403}{helper\+\_\+1403}}
+\item 
+class \mbox{\hyperlink{classfoo_1_1_mixed_up_test_case_test}{Mixed\+Up\+Test\+Case\+Test}}
+\item 
+class \mbox{\hyperlink{classfoo_1_1_mixed_up_test_case_with_same_test_name_test}{Mixed\+Up\+Test\+Case\+With\+Same\+Test\+Name\+Test}}
+\item 
+class \mbox{\hyperlink{classfoo_1_1_path_like}{Path\+Like}}
+\item 
+struct \mbox{\hyperlink{structfoo_1_1_pointer_printable}{Pointer\+Printable}}
+\item 
+struct \mbox{\hyperlink{structfoo_1_1_printable_via_print_to}{Printable\+Via\+Print\+To}}
+\item 
+class \mbox{\hyperlink{classfoo_1_1_printable_via_print_to_template}{Printable\+Via\+Print\+To\+Template}}
+\item 
+class \mbox{\hyperlink{classfoo_1_1_streamable_template_in_foo}{Streamable\+Template\+In\+Foo}}
+\item 
+class \mbox{\hyperlink{classfoo_1_1_unprintable_in_foo}{Unprintable\+In\+Foo}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{namespacefoo_ac435de653934c97045bbdba8c8afbe3f}{Print\+To}} (const \mbox{\hyperlink{structfoo_1_1_printable_via_print_to}{Printable\+Via\+Print\+To}} \&x, \+::std\+::ostream \texorpdfstring{$\ast$}{*}os)
+\item 
+\+::std\+::ostream \& \mbox{\hyperlink{namespacefoo_aaa854bf85744e6ec2ffa474ce15e36fe}{operator$<$$<$}} (\+::std\+::ostream \&os, const \mbox{\hyperlink{structfoo_1_1_pointer_printable}{Pointer\+Printable}} \texorpdfstring{$\ast$}{*})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{namespacefoo_a7b78eba501ea7ff1226a8cb40b6e3d92}{Print\+To}} (const \mbox{\hyperlink{classfoo_1_1_printable_via_print_to_template}{Printable\+Via\+Print\+To\+Template}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&x, \+::std\+::ostream \texorpdfstring{$\ast$}{*}os)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\inline \+::std\+::ostream \& \mbox{\hyperlink{namespacefoo_a4a4d839c73d5476881324336467fdfd3}{operator$<$$<$}} (\+::std\+::ostream \&os, const \mbox{\hyperlink{classfoo_1_1_streamable_template_in_foo}{Streamable\+Template\+In\+Foo}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&x)
+\item 
+\mbox{\hyperlink{namespacefoo_a0d50eecc97df56ae625078848ba9c98a}{TEST\+\_\+F}} (\mbox{\hyperlink{classfoo_1_1_mixed_up_test_case_test}{Mixed\+Up\+Test\+Case\+Test}}, First\+Test\+From\+Namespace\+Foo)
+\item 
+\mbox{\hyperlink{namespacefoo_a7911fd62b6ae405016caed779b2f95dc}{TEST\+\_\+F}} (\mbox{\hyperlink{classfoo_1_1_mixed_up_test_case_test}{Mixed\+Up\+Test\+Case\+Test}}, Second\+Test\+From\+Namespace\+Foo)
+\item 
+\mbox{\hyperlink{namespacefoo_a2bc2a2547ff38da0ecf68676e75583cd}{TEST\+\_\+F}} (\mbox{\hyperlink{classfoo_1_1_mixed_up_test_case_with_same_test_name_test}{Mixed\+Up\+Test\+Case\+With\+Same\+Test\+Name\+Test}}, The\+Second\+Test\+With\+This\+Name\+Should\+Fail)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacefoo_aaa854bf85744e6ec2ffa474ce15e36fe}\index{foo@{foo}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!foo@{foo}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{namespacefoo_aaa854bf85744e6ec2ffa474ce15e36fe} 
+\+::std\+::ostream \& foo\+::operator$<$$<$ (\begin{DoxyParamCaption}\item[{\+::std\+::ostream \&}]{os}{, }\item[{const \mbox{\hyperlink{structfoo_1_1_pointer_printable}{Pointer\+Printable}} \texorpdfstring{$\ast$}{*}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-printers__test_8cc_source_l00150}{150}} of file \mbox{\hyperlink{gtest-printers__test_8cc_source}{gtest-\/printers\+\_\+test.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00154\ \ \ \textcolor{keywordflow}{return}\ os\ <<\ \textcolor{stringliteral}{"{}PointerPrintable*"{}};}
+\DoxyCodeLine{00155\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacefoo_a4a4d839c73d5476881324336467fdfd3}\index{foo@{foo}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!foo@{foo}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{namespacefoo_a4a4d839c73d5476881324336467fdfd3} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+inline \+::std\+::ostream \& foo\+::operator$<$$<$ (\begin{DoxyParamCaption}\item[{\+::std\+::ostream \&}]{os}{, }\item[{const \mbox{\hyperlink{classfoo_1_1_streamable_template_in_foo}{Streamable\+Template\+In\+Foo}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&}]{x}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-printers__test_8cc_source_l00185}{185}} of file \mbox{\hyperlink{gtest-printers__test_8cc_source}{gtest-\/printers\+\_\+test.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00187\ \ \ \textcolor{keywordflow}{return}\ os\ <<\ \textcolor{stringliteral}{"{}StreamableTemplateInFoo:\ "{}}\ <<\ x.\mbox{\hyperlink{classfoo_1_1_streamable_template_in_foo_acb166eea328a1354a6b10ac519b2a77d}{value}}();}
+\DoxyCodeLine{00188\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=332pt]{namespacefoo_a4a4d839c73d5476881324336467fdfd3_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacefoo_ac435de653934c97045bbdba8c8afbe3f}\index{foo@{foo}!PrintTo@{PrintTo}}
+\index{PrintTo@{PrintTo}!foo@{foo}}
+\doxysubsubsection{\texorpdfstring{PrintTo()}{PrintTo()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{namespacefoo_ac435de653934c97045bbdba8c8afbe3f} 
+void foo\+::\+Print\+To (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structfoo_1_1_printable_via_print_to}{Printable\+Via\+Print\+To}} \&}]{x}{, }\item[{\+::std\+::ostream \texorpdfstring{$\ast$}{*}}]{os}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-printers__test_8cc_source_l00144}{144}} of file \mbox{\hyperlink{gtest-printers__test_8cc_source}{gtest-\/printers\+\_\+test.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00145\ \ \ *os\ <<\ \textcolor{stringliteral}{"{}PrintableViaPrintTo:\ "{}}\ <<\ x.\mbox{\hyperlink{structfoo_1_1_printable_via_print_to_a16f8c6420275d86f0d0112ca5a41bca2}{value}};}
+\DoxyCodeLine{00146\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacefoo_a7b78eba501ea7ff1226a8cb40b6e3d92}\index{foo@{foo}!PrintTo@{PrintTo}}
+\index{PrintTo@{PrintTo}!foo@{foo}}
+\doxysubsubsection{\texorpdfstring{PrintTo()}{PrintTo()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{namespacefoo_a7b78eba501ea7ff1226a8cb40b6e3d92} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+void foo\+::\+Print\+To (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfoo_1_1_printable_via_print_to_template}{Printable\+Via\+Print\+To\+Template}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&}]{x}{, }\item[{\+::std\+::ostream \texorpdfstring{$\ast$}{*}}]{os}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-printers__test_8cc_source_l00169}{169}} of file \mbox{\hyperlink{gtest-printers__test_8cc_source}{gtest-\/printers\+\_\+test.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00170\ \ \ *os\ <<\ \textcolor{stringliteral}{"{}PrintableViaPrintToTemplate:\ "{}}\ <<\ x.\mbox{\hyperlink{classfoo_1_1_printable_via_print_to_template_abf729e1562cdea4257fbb35b1eab486c}{value}}();}
+\DoxyCodeLine{00171\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=301pt]{namespacefoo_a7b78eba501ea7ff1226a8cb40b6e3d92_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacefoo_a0d50eecc97df56ae625078848ba9c98a}\index{foo@{foo}!TEST\_F@{TEST\_F}}
+\index{TEST\_F@{TEST\_F}!foo@{foo}}
+\doxysubsubsection{\texorpdfstring{TEST\_F()}{TEST\_F()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{namespacefoo_a0d50eecc97df56ae625078848ba9c98a} 
+foo\+::\+TEST\+\_\+F (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfoo_1_1_mixed_up_test_case_test}{Mixed\+Up\+Test\+Case\+Test}}}]{}{, }\item[{First\+Test\+From\+Namespace\+Foo}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest__output__test___8cc_source_l00547}{547}} of file \mbox{\hyperlink{gtest__output__test___8cc_source}{gtest\+\_\+output\+\_\+test\+\_\+.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00547\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{namespacefoo_a7911fd62b6ae405016caed779b2f95dc}\index{foo@{foo}!TEST\_F@{TEST\_F}}
+\index{TEST\_F@{TEST\_F}!foo@{foo}}
+\doxysubsubsection{\texorpdfstring{TEST\_F()}{TEST\_F()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{namespacefoo_a7911fd62b6ae405016caed779b2f95dc} 
+foo\+::\+TEST\+\_\+F (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfoo_1_1_mixed_up_test_case_test}{Mixed\+Up\+Test\+Case\+Test}}}]{}{, }\item[{Second\+Test\+From\+Namespace\+Foo}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest__output__test___8cc_source_l00548}{548}} of file \mbox{\hyperlink{gtest__output__test___8cc_source}{gtest\+\_\+output\+\_\+test\+\_\+.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00548\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{namespacefoo_a2bc2a2547ff38da0ecf68676e75583cd}\index{foo@{foo}!TEST\_F@{TEST\_F}}
+\index{TEST\_F@{TEST\_F}!foo@{foo}}
+\doxysubsubsection{\texorpdfstring{TEST\_F()}{TEST\_F()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{namespacefoo_a2bc2a2547ff38da0ecf68676e75583cd} 
+foo\+::\+TEST\+\_\+F (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfoo_1_1_mixed_up_test_case_with_same_test_name_test}{Mixed\+Up\+Test\+Case\+With\+Same\+Test\+Name\+Test}}}]{}{, }\item[{The\+Second\+Test\+With\+This\+Name\+Should\+Fail}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest__output__test___8cc_source_l00553}{553}} of file \mbox{\hyperlink{gtest__output__test___8cc_source}{gtest\+\_\+output\+\_\+test\+\_\+.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00554\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\}}
+
+\end{DoxyCode}

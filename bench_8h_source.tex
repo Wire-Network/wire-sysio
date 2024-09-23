@@ -1,0 +1,178 @@
+\doxysection{bench.\+h}
+\hypertarget{bench_8h_source}{}\label{bench_8h_source}\index{libraries/fc/secp256k1/secp256k1/src/bench.h@{libraries/fc/secp256k1/secp256k1/src/bench.h}}
+\mbox{\hyperlink{bench_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00001}00001\ \textcolor{comment}{/***********************************************************************}}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2014\ Pieter\ Wuille\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00003}00003\ \textcolor{comment}{\ *\ Distributed\ under\ the\ MIT\ software\ license,\ see\ the\ accompanying\ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00004}00004\ \textcolor{comment}{\ *\ file\ COPYING\ or\ https://www.opensource.org/licenses/mit-\/license.php.*}}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00005}00005\ \textcolor{comment}{\ ***********************************************************************/}}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00007}00007\ \textcolor{preprocessor}{\#ifndef\ SECP256K1\_BENCH\_H}}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00008}00008\ \textcolor{preprocessor}{\#define\ SECP256K1\_BENCH\_H}}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{stdint_8h}{stdint.h}}>}}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00011}00011\ \textcolor{preprocessor}{\#include\ <stdio.h>}}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00012}00012\ \textcolor{preprocessor}{\#include\ <string.h>}}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00013}00013\ \textcolor{preprocessor}{\#include\ "{}sys/time.h"{}}}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00015}00015\ \textcolor{keyword}{static}\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ gettime\_i64(\textcolor{keywordtype}{void})\ \{}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00016}00016\ \ \ \ \ \textcolor{keyword}{struct\ }timeval\ tv;}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00017}00017\ \ \ \ \ gettimeofday(\&tv,\ NULL);}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00018}00018\ \ \ \ \ \textcolor{keywordflow}{return}\ (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}})tv.tv\_usec\ +\ (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}})tv.tv\_sec\ *\ 1000000LL;}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00019}00019\ \}}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00021}\mbox{\hyperlink{bench_8h_a473b076a923ce92a97f95be4dd10d3fd}{00021}}\ \textcolor{preprocessor}{\#define\ FP\_EXP\ (6)}}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00022}\mbox{\hyperlink{bench_8h_a92391c628f2c57418422a94cc8712c51}{00022}}\ \textcolor{preprocessor}{\#define\ FP\_MULT\ (1000000LL)}}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00024}00024\ \textcolor{comment}{/*\ Format\ fixed\ point\ number.\ */}}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00025}\mbox{\hyperlink{bench_8h_a75b5cae79d48e5e21e3b9dee987531c3}{00025}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{bench_8h_a75b5cae79d48e5e21e3b9dee987531c3}{print\_number}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ x)\ \{}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00026}00026\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ x\_abs,\ y;}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00027}00027\ \ \ \ \ \textcolor{keywordtype}{int}\ c,\ i,\ rounding,\ g;\ \textcolor{comment}{/*\ g\ =\ integer\ part\ size,\ c\ =\ fractional\ part\ size\ */}}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00028}00028\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ ptr;}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00029}00029\ \ \ \ \ \textcolor{keywordtype}{char}\ buffer[30];}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00031}00031\ \ \ \ \ \textcolor{keywordflow}{if}\ (x\ ==\ \mbox{\hyperlink{stdint_8h_ab21f12f372f67b8ff0aa3432336ede67}{INT64\_MIN}})\ \{}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00032}00032\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ Prevent\ UB.\ */}}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00033}00033\ \ \ \ \ \ \ \ \ printf(\textcolor{stringliteral}{"{}ERR"{}});}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00034}00034\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00035}00035\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00036}00036\ \ \ \ \ x\_abs\ =\ x\ <\ 0\ ?\ -\/x\ :\ x;}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00038}00038\ \ \ \ \ \textcolor{comment}{/*\ Determine\ how\ many\ decimals\ we\ want\ to\ show\ (more\ than\ FP\_EXP\ makes\ no}}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00039}00039\ \textcolor{comment}{\ \ \ \ \ *\ sense).\ */}}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00040}00040\ \ \ \ \ y\ =\ x\_abs;}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00041}00041\ \ \ \ \ c\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00042}00042\ \ \ \ \ \textcolor{keywordflow}{while}\ (y\ >\ 0LL\ \&\&\ y\ <\ 100LL\ *\ \mbox{\hyperlink{bench_8h_a92391c628f2c57418422a94cc8712c51}{FP\_MULT}}\ \&\&\ c\ <\ \mbox{\hyperlink{bench_8h_a473b076a923ce92a97f95be4dd10d3fd}{FP\_EXP}})\ \{}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00043}00043\ \ \ \ \ \ \ \ \ y\ *=\ 10LL;}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00044}00044\ \ \ \ \ \ \ \ \ c++;}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00045}00045\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00047}00047\ \ \ \ \ \textcolor{comment}{/*\ Round\ to\ 'c'\ decimals.\ */}}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00048}00048\ \ \ \ \ y\ =\ x\_abs;}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00049}00049\ \ \ \ \ rounding\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00050}00050\ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ c;\ i\ <\ \mbox{\hyperlink{bench_8h_a473b076a923ce92a97f95be4dd10d3fd}{FP\_EXP}};\ ++i)\ \{}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00051}00051\ \ \ \ \ \ \ \ \ rounding\ =\ (y\ \%\ 10)\ >=\ 5;}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00052}00052\ \ \ \ \ \ \ \ \ y\ /=\ 10;}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00053}00053\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00054}00054\ \ \ \ \ y\ +=\ rounding;}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00056}00056\ \ \ \ \ \textcolor{comment}{/*\ Format\ and\ print\ the\ number.\ */}}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00057}00057\ \ \ \ \ ptr\ =\ \textcolor{keyword}{sizeof}(buffer)\ -\/\ 1;}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00058}00058\ \ \ \ \ buffer[ptr]\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00059}00059\ \ \ \ \ g\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00060}00060\ \ \ \ \ \textcolor{keywordflow}{if}\ (c\ !=\ 0)\ \{\ \textcolor{comment}{/*\ non\ zero\ fractional\ part\ */}}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00061}00061\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ c;\ ++i)\ \{}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00062}00062\ \ \ \ \ \ \ \ \ \ \ \ \ buffer[-\/-\/ptr]\ =\ \textcolor{charliteral}{'0'}\ +\ (y\ \%\ 10);}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \ \ \ y\ /=\ 10;}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00064}00064\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00065}00065\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (c\ ==\ 0)\ \{\ \textcolor{comment}{/*\ fractional\ part\ is\ 0\ */}}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00066}00066\ \ \ \ \ \ \ \ \ buffer[-\/-\/ptr]\ =\ \textcolor{charliteral}{'0'};\ }
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00067}00067\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00068}00068\ \ \ \ \ buffer[-\/-\/ptr]\ =\ \textcolor{charliteral}{'.'};}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00069}00069\ \ \ \ \ \textcolor{keywordflow}{do}\ \{}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00070}00070\ \ \ \ \ \ \ \ \ buffer[-\/-\/ptr]\ =\ \textcolor{charliteral}{'0'}\ +\ (y\ \%\ 10);}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00071}00071\ \ \ \ \ \ \ \ \ y\ /=\ 10;}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00072}00072\ \ \ \ \ \ \ \ \ g++;}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00073}00073\ \ \ \ \ \}\ \textcolor{keywordflow}{while}\ (y\ !=\ 0);}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00074}00074\ \ \ \ \ \textcolor{keywordflow}{if}\ (x\ <\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00075}00075\ \ \ \ \ \ \ \ \ buffer[-\/-\/ptr]\ =\ \textcolor{charliteral}{'-\/'};}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00076}00076\ \ \ \ \ \ \ \ \ g++;}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00077}00077\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00078}00078\ \ \ \ \ printf(\textcolor{stringliteral}{"{}\%5.*s"{}},\ g,\ \&buffer[ptr]);\ \textcolor{comment}{/*\ Prints\ integer\ part\ */}}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00079}00079\ \ \ \ \ printf(\textcolor{stringliteral}{"{}\%-\/*s"{}},\ \mbox{\hyperlink{bench_8h_a473b076a923ce92a97f95be4dd10d3fd}{FP\_EXP}},\ \&buffer[ptr\ +\ g]);\ \textcolor{comment}{/*\ Prints\ fractional\ part\ */}}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00080}00080\ \}}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00081}00081\ }
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00082}\mbox{\hyperlink{bench_8h_aabcd2ce2b43c96bd396b30f8ecb79a17}{00082}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{bench_8h_aabcd2ce2b43c96bd396b30f8ecb79a17}{run\_benchmark}}(\textcolor{keywordtype}{char}\ *\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ \textcolor{keywordtype}{void}\ (*benchmark)(\textcolor{keywordtype}{void}*,\ \textcolor{keywordtype}{int}),\ \textcolor{keywordtype}{void}\ (*setup)(\textcolor{keywordtype}{void}*),\ \textcolor{keywordtype}{void}\ (*teardown)(\textcolor{keywordtype}{void}*,\ \textcolor{keywordtype}{int}),\ \textcolor{keywordtype}{void}*\ data,\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}},\ \textcolor{keywordtype}{int}\ iter)\ \{}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00083}00083\ \ \ \ \ \textcolor{keywordtype}{int}\ i;}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00084}00084\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ min\ =\ \mbox{\hyperlink{stdint_8h_ad0d744f05898e32d01f73f8af3cd2071}{INT64\_MAX}};}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00085}00085\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ sum\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00086}00086\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ max\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00087}00087\ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}};\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00088}00088\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ begin,\ total;}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00089}00089\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (setup\ !=\ NULL)\ \{}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00090}00090\ \ \ \ \ \ \ \ \ \ \ \ \ setup(data);}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00091}00091\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00092}00092\ \ \ \ \ \ \ \ \ begin\ =\ gettime\_i64();}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00093}00093\ \ \ \ \ \ \ \ \ benchmark(data,\ iter);}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00094}00094\ \ \ \ \ \ \ \ \ total\ =\ gettime\_i64()\ -\/\ begin;}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00095}00095\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (teardown\ !=\ NULL)\ \{}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00096}00096\ \ \ \ \ \ \ \ \ \ \ \ \ teardown(data,\ iter);}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00097}00097\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00098}00098\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (total\ <\ min)\ \{}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00099}00099\ \ \ \ \ \ \ \ \ \ \ \ \ min\ =\ total;}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00100}00100\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00101}00101\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (total\ >\ max)\ \{}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00102}00102\ \ \ \ \ \ \ \ \ \ \ \ \ max\ =\ total;}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00103}00103\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00104}00104\ \ \ \ \ \ \ \ \ sum\ +=\ total;}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00105}00105\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00106}00106\ \ \ \ \ \textcolor{comment}{/*\ ','\ is\ used\ as\ a\ column\ delimiter\ */}}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00107}00107\ \ \ \ \ printf(\textcolor{stringliteral}{"{}\%-\/30s,\ "{}},\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}});}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00108}00108\ \ \ \ \ \mbox{\hyperlink{bench_8h_a75b5cae79d48e5e21e3b9dee987531c3}{print\_number}}(min\ *\ \mbox{\hyperlink{bench_8h_a92391c628f2c57418422a94cc8712c51}{FP\_MULT}}\ /\ iter);}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00109}00109\ \ \ \ \ printf(\textcolor{stringliteral}{"{}\ \ \ ,\ "{}});}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00110}00110\ \ \ \ \ \mbox{\hyperlink{bench_8h_a75b5cae79d48e5e21e3b9dee987531c3}{print\_number}}(((sum\ *\ \mbox{\hyperlink{bench_8h_a92391c628f2c57418422a94cc8712c51}{FP\_MULT}})\ /\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}})\ /\ iter);}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00111}00111\ \ \ \ \ printf(\textcolor{stringliteral}{"{}\ \ \ ,\ "{}});}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00112}00112\ \ \ \ \ \mbox{\hyperlink{bench_8h_a75b5cae79d48e5e21e3b9dee987531c3}{print\_number}}(max\ *\ \mbox{\hyperlink{bench_8h_a92391c628f2c57418422a94cc8712c51}{FP\_MULT}}\ /\ iter);}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00113}00113\ \ \ \ \ printf(\textcolor{stringliteral}{"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00114}00114\ \}}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00115}00115\ }
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00116}\mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{00116}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(\textcolor{keywordtype}{int}\ argc,\ \textcolor{keywordtype}{char}**\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{keywordtype}{char}\ *flag)\ \{}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00117}00117\ \ \ \ \ \textcolor{keywordtype}{char}**\ argm\ =\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}\ +\ argc;}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00118}00118\ \ \ \ \ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}++;}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00119}00119\ \ \ \ \ \textcolor{keywordflow}{while}\ (\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}\ !=\ argm)\ \{}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00120}00120\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (strcmp(*\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ flag)\ ==\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00121}00121\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00122}00122\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00123}00123\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}++;}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00124}00124\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00125}00125\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00126}00126\ \}}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00127}00127\ }
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00128}00128\ \textcolor{comment}{/*\ takes\ an\ array\ containing\ the\ arguments\ that\ the\ user\ is\ allowed\ to\ enter\ on\ the\ command-\/line}}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00129}00129\ \textcolor{comment}{\ \ \ returns:}}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00130}00130\ \textcolor{comment}{\ \ \ \ \ \ -\/\ 1\ if\ the\ user\ entered\ an\ invalid\ argument}}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00131}00131\ \textcolor{comment}{\ \ \ \ \ \ -\/\ 0\ if\ all\ the\ user\ entered\ arguments\ are\ valid\ */}}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00132}\mbox{\hyperlink{bench_8h_a8e26ecdf7f0d912f5b7b017794b603bc}{00132}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{bench_8h_a8e26ecdf7f0d912f5b7b017794b603bc}{have\_invalid\_args}}(\textcolor{keywordtype}{int}\ argc,\ \textcolor{keywordtype}{char}**\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{keywordtype}{char}**\ valid\_args,\ \textcolor{keywordtype}{size\_t}\ n)\ \{}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00133}00133\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ i;}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00134}00134\ \ \ \ \ \textcolor{keywordtype}{int}\ found\_valid;}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00135}00135\ \ \ \ \ \textcolor{keywordtype}{char}**\ argm\ =\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}\ +\ argc;}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00136}00136\ \ \ \ \ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}++;}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00137}00137\ }
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00138}00138\ \ \ \ \ \textcolor{keywordflow}{while}\ (\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}\ !=\ argm)\ \{}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00139}00139\ \ \ \ \ \ \ \ \ found\_valid\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00140}00140\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ n;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00141}00141\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (strcmp(*\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ valid\_args[i])\ ==\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00142}00142\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ found\_valid\ =\ 1;\ \textcolor{comment}{/*\ user\ entered\ a\ valid\ arg\ from\ the\ list\ */}}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00143}00143\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00144}00144\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00145}00145\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00146}00146\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (found\_valid\ ==\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00147}00147\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;\ \textcolor{comment}{/*\ invalid\ arg\ found\ */}}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00148}00148\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00149}00149\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}++;}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00150}00150\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00151}00151\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00152}00152\ \}}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00153}00153\ }
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00154}\mbox{\hyperlink{bench_8h_a451eb25db60dd3d4abedc8a41aecd204}{00154}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{bench_8h_a451eb25db60dd3d4abedc8a41aecd204}{get\_iters}}(\textcolor{keywordtype}{int}\ default\_iters)\ \{}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00155}00155\ \ \ \ \ \textcolor{keywordtype}{char}*\ env\ =\ getenv(\textcolor{stringliteral}{"{}SECP256K1\_BENCH\_ITERS"{}});}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00156}00156\ \ \ \ \ \textcolor{keywordflow}{if}\ (env)\ \{}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00157}00157\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ strtol(env,\ NULL,\ 0);}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00158}00158\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00159}00159\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ default\_iters;}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00160}00160\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00161}00161\ \}}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00162}00162\ }
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00163}\mbox{\hyperlink{bench_8h_a02fea1a81d22421b858db710e6850482}{00163}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{bench_8h_a02fea1a81d22421b858db710e6850482}{print\_output\_table\_header\_row}}(\textcolor{keywordtype}{void})\ \{}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00164}00164\ \ \ \ \ \textcolor{keywordtype}{char}*\ bench\_str\ =\ \textcolor{stringliteral}{"{}Benchmark"{}};\ \ \ \ \ \textcolor{comment}{/*\ left\ justified\ */}}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00165}00165\ \ \ \ \ \textcolor{keywordtype}{char}*\ min\_str\ =\ \textcolor{stringliteral}{"{}\ \ \ \ Min(us)\ \ \ \ "{}};\ \textcolor{comment}{/*\ center\ alignment\ */}}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00166}00166\ \ \ \ \ \textcolor{keywordtype}{char}*\ avg\_str\ =\ \textcolor{stringliteral}{"{}\ \ \ \ Avg(us)\ \ \ \ "{}};}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00167}00167\ \ \ \ \ \textcolor{keywordtype}{char}*\ max\_str\ =\ \textcolor{stringliteral}{"{}\ \ \ \ Max(us)\ \ \ \ "{}};}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00168}00168\ \ \ \ \ printf(\textcolor{stringliteral}{"{}\%-\/30s,\%-\/15s,\%-\/15s,\%-\/15s\(\backslash\)n"{}},\ bench\_str,\ min\_str,\ avg\_str,\ max\_str);}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00169}00169\ \ \ \ \ printf(\textcolor{stringliteral}{"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00170}00170\ \}}
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00171}00171\ }
+\DoxyCodeLine{\Hypertarget{bench_8h_source_l00172}00172\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{/*\ SECP256K1\_BENCH\_H\ */}\textcolor{preprocessor}{}}
+
+\end{DoxyCode}

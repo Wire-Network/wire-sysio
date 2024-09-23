@@ -1,0 +1,66 @@
+\doxysection{catch\+\_\+context.\+h}
+\hypertarget{catch__context_8h_source}{}\label{catch__context_8h_source}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_context.h@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_context.h}}
+\mbox{\hyperlink{catch__context_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{catch__context_8h_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{catch__context_8h_source_l00002}00002\ \textcolor{comment}{\ *\ \ Created\ by\ Phil\ on\ 31/12/2010.}}
+\DoxyCodeLine{\Hypertarget{catch__context_8h_source_l00003}00003\ \textcolor{comment}{\ *\ \ Copyright\ 2010\ Two\ Blue\ Cubes\ Ltd.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{catch__context_8h_source_l00004}00004\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{catch__context_8h_source_l00005}00005\ \textcolor{comment}{\ *\ \ Distributed\ under\ the\ Boost\ Software\ License,\ Version\ 1.0.\ (See\ accompanying}}
+\DoxyCodeLine{\Hypertarget{catch__context_8h_source_l00006}00006\ \textcolor{comment}{\ *\ \ file\ LICENSE\_1\_0.txt\ or\ copy\ at\ http://www.boost.org/LICENSE\_1\_0.txt)}}
+\DoxyCodeLine{\Hypertarget{catch__context_8h_source_l00007}00007\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{catch__context_8h_source_l00008}00008\ \textcolor{preprocessor}{\#ifndef\ TWOBLUECUBES\_CATCH\_CONTEXT\_H\_INCLUDED}}
+\DoxyCodeLine{\Hypertarget{catch__context_8h_source_l00009}00009\ \textcolor{preprocessor}{\#define\ TWOBLUECUBES\_CATCH\_CONTEXT\_H\_INCLUDED}}
+\DoxyCodeLine{\Hypertarget{catch__context_8h_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{catch__context_8h_source_l00011}00011\ \textcolor{preprocessor}{\#include\ <memory>}}
+\DoxyCodeLine{\Hypertarget{catch__context_8h_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{catch__context_8h_source_l00013}00013\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__context_8h_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{catch__context_8h_source_l00015}00015\ \ \ \ \ \textcolor{keyword}{struct\ }IResultCapture;}
+\DoxyCodeLine{\Hypertarget{catch__context_8h_source_l00016}00016\ \ \ \ \ \textcolor{keyword}{struct\ }IRunner;}
+\DoxyCodeLine{\Hypertarget{catch__context_8h_source_l00017}00017\ \ \ \ \ \textcolor{keyword}{struct\ }IConfig;}
+\DoxyCodeLine{\Hypertarget{catch__context_8h_source_l00018}00018\ \ \ \ \ \textcolor{keyword}{struct\ }IMutableContext;}
+\DoxyCodeLine{\Hypertarget{catch__context_8h_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{catch__context_8h_source_l00020}\mbox{\hyperlink{namespace_catch_a961f6f5f07e265684c220a8ae014d7d6}{00020}}\ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespace_catch_a961f6f5f07e265684c220a8ae014d7d6}{IConfigPtr}}\ =\ std::shared\_ptr<IConfig\ const>;}
+\DoxyCodeLine{\Hypertarget{catch__context_8h_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{catch__context_8h_source_l00022}00022\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_catch_1_1_i_context}{IContext}}}
+\DoxyCodeLine{\Hypertarget{catch__context_8h_source_l00023}00023\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{catch__context_8h_source_l00024}\mbox{\hyperlink{struct_catch_1_1_i_context_adb4b6e8f1357f7ea414e22c162721f02}{00024}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{struct_catch_1_1_i_context_adb4b6e8f1357f7ea414e22c162721f02}{\string~IContext}}();}
+\DoxyCodeLine{\Hypertarget{catch__context_8h_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{catch__context_8h_source_l00026}\mbox{\hyperlink{struct_catch_1_1_i_context_a950f10a5f6d3c9385f9493ba6298b174}{00026}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{struct_catch_1_1_i_result_capture}{IResultCapture}}*\ \mbox{\hyperlink{struct_catch_1_1_i_context_a950f10a5f6d3c9385f9493ba6298b174}{getResultCapture}}()\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{catch__context_8h_source_l00027}\mbox{\hyperlink{struct_catch_1_1_i_context_ace6ece997b27c76d70563272f9e93f2f}{00027}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{struct_catch_1_1_i_runner}{IRunner}}*\ \mbox{\hyperlink{struct_catch_1_1_i_context_ace6ece997b27c76d70563272f9e93f2f}{getRunner}}()\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{catch__context_8h_source_l00028}\mbox{\hyperlink{struct_catch_1_1_i_context_ad72743ae753feab0a6f5505f26f79ced}{00028}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{namespace_catch_a961f6f5f07e265684c220a8ae014d7d6}{IConfigPtr}}\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{struct_catch_1_1_i_context_ad72743ae753feab0a6f5505f26f79ced}{getConfig}}()\ \textcolor{keyword}{const}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{catch__context_8h_source_l00029}00029\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{catch__context_8h_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{catch__context_8h_source_l00031}00031\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_catch_1_1_i_mutable_context}{IMutableContext}}\ :\ \mbox{\hyperlink{struct_catch_1_1_i_context}{IContext}}}
+\DoxyCodeLine{\Hypertarget{catch__context_8h_source_l00032}00032\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{catch__context_8h_source_l00033}\mbox{\hyperlink{struct_catch_1_1_i_mutable_context_a98bd9be08438c2a02a4152c6554ca53e}{00033}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{struct_catch_1_1_i_mutable_context_a98bd9be08438c2a02a4152c6554ca53e}{\string~IMutableContext}}();}
+\DoxyCodeLine{\Hypertarget{catch__context_8h_source_l00034}\mbox{\hyperlink{struct_catch_1_1_i_mutable_context_a4a80afd0525b7def21bee8d9b48f2d39}{00034}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_catch_1_1_i_mutable_context_a4a80afd0525b7def21bee8d9b48f2d39}{setResultCapture}}(\ \mbox{\hyperlink{struct_catch_1_1_i_result_capture}{IResultCapture}}*\ resultCapture\ )\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{catch__context_8h_source_l00035}\mbox{\hyperlink{struct_catch_1_1_i_mutable_context_af2e53b1dea4527a2587cff266a730f6e}{00035}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_catch_1_1_i_mutable_context_af2e53b1dea4527a2587cff266a730f6e}{setRunner}}(\ \mbox{\hyperlink{struct_catch_1_1_i_runner}{IRunner}}*\ runner\ )\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{catch__context_8h_source_l00036}\mbox{\hyperlink{struct_catch_1_1_i_mutable_context_aa81ba080fce084e9482f20338bc88531}{00036}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_catch_1_1_i_mutable_context_aa81ba080fce084e9482f20338bc88531}{setConfig}}(\ \mbox{\hyperlink{namespace_catch_a961f6f5f07e265684c220a8ae014d7d6}{IConfigPtr}}\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{classconfig}{config}}\ )\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{catch__context_8h_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{catch__context_8h_source_l00038}00038\ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{catch__context_8h_source_l00039}00039\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{struct_catch_1_1_i_mutable_context}{IMutableContext}}\ *currentContext;}
+\DoxyCodeLine{\Hypertarget{catch__context_8h_source_l00040}00040\ \ \ \ \ \ \ \ \ \textcolor{keyword}{friend}\ \mbox{\hyperlink{struct_catch_1_1_i_mutable_context}{IMutableContext}}\&\ \mbox{\hyperlink{struct_catch_1_1_i_mutable_context_ad22507c2e4bc58f80a205db9756b8e29}{getCurrentMutableContext}}();}
+\DoxyCodeLine{\Hypertarget{catch__context_8h_source_l00041}00041\ \ \ \ \ \ \ \ \ \textcolor{keyword}{friend}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_catch_1_1_i_mutable_context_ac07cdb7d744cc8f09672d924324b55fd}{cleanUpContext}}();}
+\DoxyCodeLine{\Hypertarget{catch__context_8h_source_l00042}00042\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ createContext();}
+\DoxyCodeLine{\Hypertarget{catch__context_8h_source_l00043}00043\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{catch__context_8h_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{catch__context_8h_source_l00045}\mbox{\hyperlink{class_catch_1_1_context_ad22507c2e4bc58f80a205db9756b8e29}{00045}}\ \ \ \ \ \textcolor{keyword}{inline}\ \mbox{\hyperlink{struct_catch_1_1_i_mutable_context}{IMutableContext}}\&\ \mbox{\hyperlink{namespace_catch_a710841d4732b86c06f816bd4822bd425}{getCurrentMutableContext}}()}
+\DoxyCodeLine{\Hypertarget{catch__context_8h_source_l00046}00046\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{catch__context_8h_source_l00047}00047\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !IMutableContext::currentContext\ )}
+\DoxyCodeLine{\Hypertarget{catch__context_8h_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \ \ \ IMutableContext::createContext();}
+\DoxyCodeLine{\Hypertarget{catch__context_8h_source_l00049}00049\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *IMutableContext::currentContext;}
+\DoxyCodeLine{\Hypertarget{catch__context_8h_source_l00050}00050\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__context_8h_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{catch__context_8h_source_l00052}\mbox{\hyperlink{namespace_catch_a228a625318bb6183842e394eeba17d50}{00052}}\ \ \ \ \ \textcolor{keyword}{inline}\ \mbox{\hyperlink{struct_catch_1_1_i_context}{IContext}}\&\ \mbox{\hyperlink{namespace_catch_a228a625318bb6183842e394eeba17d50}{getCurrentContext}}()}
+\DoxyCodeLine{\Hypertarget{catch__context_8h_source_l00053}00053\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{catch__context_8h_source_l00054}00054\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_catch_a710841d4732b86c06f816bd4822bd425}{getCurrentMutableContext}}();}
+\DoxyCodeLine{\Hypertarget{catch__context_8h_source_l00055}00055\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__context_8h_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{catch__context_8h_source_l00057}00057\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespace_catch_ae50508f10ffc4ed873a31a4db4caea16}{cleanUpContext}}();}
+\DoxyCodeLine{\Hypertarget{catch__context_8h_source_l00058}00058\ \}}
+\DoxyCodeLine{\Hypertarget{catch__context_8h_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{catch__context_8h_source_l00060}00060\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ TWOBLUECUBES\_CATCH\_CONTEXT\_H\_INCLUDED}}
+
+\end{DoxyCode}

@@ -1,0 +1,125 @@
+\doxysection{list\+\_\+producers\+\_\+subcommand Struct Reference}
+\hypertarget{structlist__producers__subcommand}{}\label{structlist__producers__subcommand}\index{list\_producers\_subcommand@{list\_producers\_subcommand}}
+
+
+Collaboration diagram for list\+\_\+producers\+\_\+subcommand\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=221pt]{structlist__producers__subcommand__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structlist__producers__subcommand_a43ce5287266400178dd850fde053e243}{list\+\_\+producers\+\_\+subcommand}} (\mbox{\hyperlink{class_c_l_i_1_1_app}{CLI\+::\+App}} \texorpdfstring{$\ast$}{*}action\+Root)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{structlist__producers__subcommand_ad6bc2fbedabe67c036c71ee11a47f82e}{print\+\_\+json}} = false
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structlist__producers__subcommand_ad2f7fa079d1507628aafedc2f4213288}{limit}} = 50
+\item 
+std\+::string \mbox{\hyperlink{structlist__producers__subcommand_a32467416e6b28721d609f1cc9d549105}{lower}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01383}{1383}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structlist__producers__subcommand_a43ce5287266400178dd850fde053e243}\index{list\_producers\_subcommand@{list\_producers\_subcommand}!list\_producers\_subcommand@{list\_producers\_subcommand}}
+\index{list\_producers\_subcommand@{list\_producers\_subcommand}!list\_producers\_subcommand@{list\_producers\_subcommand}}
+\doxysubsubsection{\texorpdfstring{list\_producers\_subcommand()}{list\_producers\_subcommand()}}
+{\footnotesize\ttfamily \label{structlist__producers__subcommand_a43ce5287266400178dd850fde053e243} 
+list\+\_\+producers\+\_\+subcommand\+::list\+\_\+producers\+\_\+subcommand (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_c_l_i_1_1_app}{CLI\+::\+App}} \texorpdfstring{$\ast$}{*}}]{action\+Root}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01388}{1388}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01388\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01389\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ list\_producers\ =\ actionRoot-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_a8b461d2233ec4121259011b5ed24b336}{add\_subcommand}}(\textcolor{stringliteral}{"{}listproducers"{}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}List\ producers"{}}));}
+\DoxyCodeLine{01390\ \ \ \ \ \ \ list\_producers-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_a5fef22317a182fa5db1d7b1af4c89c68}{add\_flag}}(\textcolor{stringliteral}{"{}-\/-\/json,-\/j"{}},\ \mbox{\hyperlink{structlist__producers__subcommand_ad6bc2fbedabe67c036c71ee11a47f82e}{print\_json}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}Output\ in\ JSON\ format"{}}));}
+\DoxyCodeLine{01391\ \ \ \ \ \ \ list\_producers-\/>add\_option(\textcolor{stringliteral}{"{}-\/l,-\/-\/limit"{}},\ limit,\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}The\ maximum\ number\ of\ rows\ to\ return"{}}));}
+\DoxyCodeLine{01392\ \ \ \ \ \ \ list\_producers-\/>add\_option(\textcolor{stringliteral}{"{}-\/L,-\/-\/lower"{}},\ \mbox{\hyperlink{structlist__producers__subcommand_a32467416e6b28721d609f1cc9d549105}{lower}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}Lower\ bound\ value\ of\ key,\ defaults\ to\ first"{}}));}
+\DoxyCodeLine{01393\ \ \ \ \ \ \ list\_producers-\/>callback([\textcolor{keyword}{this}]\ \{}
+\DoxyCodeLine{01394\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ rawResult\ =\ \mbox{\hyperlink{programs_2clio_2main_8cpp_af931af8e9f099860a2670931f8d3ad2c}{call}}(\mbox{\hyperlink{namespacesysio_1_1client_1_1http_a088028e1ea02b9b17bb45826d1828917}{get\_producers\_func}},\ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}}
+\DoxyCodeLine{01395\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}json"{}},\ \textcolor{keyword}{true})(\textcolor{stringliteral}{"{}lower\_bound"{}},\ \mbox{\hyperlink{structlist__producers__subcommand_a32467416e6b28721d609f1cc9d549105}{lower}})(\textcolor{stringliteral}{"{}limit"{}},\ limit));}
+\DoxyCodeLine{01396\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ \mbox{\hyperlink{structlist__producers__subcommand_ad6bc2fbedabe67c036c71ee11a47f82e}{print\_json}}\ )\ \{}
+\DoxyCodeLine{01397\ \ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ \mbox{\hyperlink{classfc_1_1json_ae6c022ab581a9552ae2c97ff5d73aaf8}{fc::json::to\_pretty\_string}}(rawResult)\ <<\ std::endl;}
+\DoxyCodeLine{01398\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{01399\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01400\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ result\ =\ rawResult.as<\mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1get__producers__result}{sysio::chain\_apis::read\_only::get\_producers\_result}}>();}
+\DoxyCodeLine{01401\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ result.rows.empty()\ )\ \{}
+\DoxyCodeLine{01402\ \ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}No\ producers\ found"{}}\ <<\ std::endl;}
+\DoxyCodeLine{01403\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{01404\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01405\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ weight\ =\ result.total\_producer\_vote\_weight;}
+\DoxyCodeLine{01406\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ !weight\ )}
+\DoxyCodeLine{01407\ \ \ \ \ \ \ \ \ \ \ \ \ weight\ =\ 1;}
+\DoxyCodeLine{01408\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\%-\/13s\ \%-\/57s\ \%-\/59s\ \%s\(\backslash\)n"{}},\ \textcolor{stringliteral}{"{}Producer"{}},\ \textcolor{stringliteral}{"{}Producer\ key"{}},\ \textcolor{stringliteral}{"{}Url"{}},\ \textcolor{stringliteral}{"{}Scaled\ votes"{}});}
+\DoxyCodeLine{01409\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\ \textcolor{keyword}{auto}\&\ row\ :\ result.rows\ )}
+\DoxyCodeLine{01410\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\%-\/13.13s\ \%-\/57.57s\ \%-\/59.59s\ \%1.4f\(\backslash\)n"{}},}
+\DoxyCodeLine{01411\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ row[\textcolor{stringliteral}{"{}owner"{}}].as\_string().c\_str(),}
+\DoxyCodeLine{01412\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ row[\textcolor{stringliteral}{"{}producer\_key"{}}].as\_string().c\_str(),}
+\DoxyCodeLine{01413\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{programs_2clio_2main_8cpp_ab7cc3d30029de93fca6caa103fa22d32}{clean\_output}}(\ row[\textcolor{stringliteral}{"{}url"{}}].as\_string()\ ).c\_str(),}
+\DoxyCodeLine{01414\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ row[\textcolor{stringliteral}{"{}total\_votes"{}}].as\_double()\ /\ weight);}
+\DoxyCodeLine{01415\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ !result.more.empty()\ )}
+\DoxyCodeLine{01416\ \ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}-\/L\ "{}}\ <<\ \mbox{\hyperlink{programs_2clio_2main_8cpp_ab7cc3d30029de93fca6caa103fa22d32}{clean\_output}}(\ result.more\ )\ <<\ \textcolor{stringliteral}{"{}\ for\ more"{}}\ <<\ std::endl;}
+\DoxyCodeLine{01417\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{01418\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structlist__producers__subcommand_a43ce5287266400178dd850fde053e243_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structlist__producers__subcommand_ad2f7fa079d1507628aafedc2f4213288}\index{list\_producers\_subcommand@{list\_producers\_subcommand}!limit@{limit}}
+\index{limit@{limit}!list\_producers\_subcommand@{list\_producers\_subcommand}}
+\doxysubsubsection{\texorpdfstring{limit}{limit}}
+{\footnotesize\ttfamily \label{structlist__producers__subcommand_ad2f7fa079d1507628aafedc2f4213288} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} list\+\_\+producers\+\_\+subcommand\+::limit = 50}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01385}{1385}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{structlist__producers__subcommand_a32467416e6b28721d609f1cc9d549105}\index{list\_producers\_subcommand@{list\_producers\_subcommand}!lower@{lower}}
+\index{lower@{lower}!list\_producers\_subcommand@{list\_producers\_subcommand}}
+\doxysubsubsection{\texorpdfstring{lower}{lower}}
+{\footnotesize\ttfamily \label{structlist__producers__subcommand_a32467416e6b28721d609f1cc9d549105} 
+std\+::string list\+\_\+producers\+\_\+subcommand\+::lower}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01386}{1386}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{structlist__producers__subcommand_ad6bc2fbedabe67c036c71ee11a47f82e}\index{list\_producers\_subcommand@{list\_producers\_subcommand}!print\_json@{print\_json}}
+\index{print\_json@{print\_json}!list\_producers\_subcommand@{list\_producers\_subcommand}}
+\doxysubsubsection{\texorpdfstring{print\_json}{print\_json}}
+{\footnotesize\ttfamily \label{structlist__producers__subcommand_ad6bc2fbedabe67c036c71ee11a47f82e} 
+bool list\+\_\+producers\+\_\+subcommand\+::print\+\_\+json = false}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01384}{1384}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+programs/clio/\mbox{\hyperlink{programs_2clio_2main_8cpp}{main.\+cpp}}\end{DoxyCompactItemize}

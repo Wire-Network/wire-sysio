@@ -1,0 +1,7 @@
+<map id="apply_verify_mechanism_update" name="apply_verify_mechanism_update">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,23,171,64"/>
+<area shape="rect" id="Node000002" href="$structmechanism.html#afeb8198b0f33f94f4520c0ffbc584a9a" title=" " alt="" coords="219,5,382,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="171,31,203,27,203,32,171,36"/>
+<area shape="rect" id="Node000003" href="$yubihsm__pkcs11_8c.html#ae785d5badbf1f08b491af31f32a135a1" title=" " alt="" coords="265,55,336,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="171,50,250,59,249,64,171,55"/>
+</map>

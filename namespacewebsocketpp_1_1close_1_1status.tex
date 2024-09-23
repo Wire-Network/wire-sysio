@@ -1,0 +1,210 @@
+\doxysection{websocketpp\+::close\+::status Namespace Reference}
+\hypertarget{namespacewebsocketpp_1_1close_1_1status}{}\label{namespacewebsocketpp_1_1close_1_1status}\index{websocketpp::close::status@{websocketpp::close::status}}
+
+
+\doxylink{struct_a}{A} package of types and methods for manipulating Web\+Socket close status\textquotesingle{}.  
+
+
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{namespacewebsocketpp_1_1close_1_1status_a8614a5c4733d708e2d2a32191c5bef84}{value}}
+\begin{DoxyCompactList}\small\item\em The type of a close code value. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{namespacewebsocketpp_1_1close_1_1status_af26a61f8a8c3247cf656349f96ea3008}{reserved}} (\mbox{\hyperlink{namespacewebsocketpp_1_1close_1_1status_a8614a5c4733d708e2d2a32191c5bef84}{value}} code)
+\begin{DoxyCompactList}\small\item\em \doxylink{class_test}{Test} whether a close code is in a reserved range. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{namespacewebsocketpp_1_1close_1_1status_ad024f852889be28eadcec8209fdf9bc8}{invalid}} (\mbox{\hyperlink{namespacewebsocketpp_1_1close_1_1status_a8614a5c4733d708e2d2a32191c5bef84}{value}} code)
+\begin{DoxyCompactList}\small\item\em \doxylink{class_test}{Test} whether a close code is invalid on the wire. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{namespacewebsocketpp_1_1close_1_1status_a3f9ce953f12693f74493e2eb7a80952b}{terminal}} (\mbox{\hyperlink{namespacewebsocketpp_1_1close_1_1status_a8614a5c4733d708e2d2a32191c5bef84}{value}} code)
+\begin{DoxyCompactList}\small\item\em Determine if the code represents an unrecoverable error. \end{DoxyCompactList}\item 
+std\+::string \mbox{\hyperlink{namespacewebsocketpp_1_1close_1_1status_a4bf4987c79165b134ed1207a567ce209}{get\+\_\+string}} (\mbox{\hyperlink{namespacewebsocketpp_1_1close_1_1status_a8614a5c4733d708e2d2a32191c5bef84}{value}} code)
+\begin{DoxyCompactList}\small\item\em Return a human readable interpretation of a Web\+Socket close code. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{namespacewebsocketpp_1_1close_1_1status_a8614a5c4733d708e2d2a32191c5bef84}\index{websocketpp::close::status@{websocketpp::close::status}!value@{value}}
+\index{value@{value}!websocketpp::close::status@{websocketpp::close::status}}
+\doxysubsubsection{\texorpdfstring{value}{value}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1close_1_1status_a8614a5c4733d708e2d2a32191c5bef84} 
+typedef \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{namespacewebsocketpp_1_1close_1_1status_a8614a5c4733d708e2d2a32191c5bef84}{websocketpp\+::close\+::status\+::value}}}
+
+
+
+Definition at line \mbox{\hyperlink{close_8hpp_source_l00049}{49}} of file \mbox{\hyperlink{close_8hpp_source}{close.\+hpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacewebsocketpp_1_1close_1_1status_a4bf4987c79165b134ed1207a567ce209}\index{websocketpp::close::status@{websocketpp::close::status}!get\_string@{get\_string}}
+\index{get\_string@{get\_string}!websocketpp::close::status@{websocketpp::close::status}}
+\doxysubsubsection{\texorpdfstring{get\_string()}{get\_string()}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1close_1_1status_a4bf4987c79165b134ed1207a567ce209} 
+std\+::string websocketpp\+::close\+::status\+::get\+\_\+string (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1close_1_1status_a8614a5c4733d708e2d2a32191c5bef84}{value}}}]{code}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+See \href{https://tools.ietf.org/html/rfc6455\#section-7.4}{\texttt{ https\+://tools.\+ietf.\+org/html/rfc6455\#section-\/7.\+4}} for more details.
+
+\begin{DoxySince}{Since}
+0.\+3.\+0
+\end{DoxySince}
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em code} & The code to look up. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\doxylink{struct_a}{A} human readable interpretation of the code. 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{close_8hpp_source_l00227}{227}} of file \mbox{\hyperlink{close_8hpp_source}{close.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00227\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00228\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (code)\ \{}
+\DoxyCodeLine{00229\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ normal:}
+\DoxyCodeLine{00230\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Normal\ close"{}};}
+\DoxyCodeLine{00231\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ going\_away:}
+\DoxyCodeLine{00232\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Going\ away"{}};}
+\DoxyCodeLine{00233\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ protocol\_error:}
+\DoxyCodeLine{00234\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Protocol\ error"{}};}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ unsupported\_data:}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Unsupported\ data"{}};}
+\DoxyCodeLine{00237\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ no\_status:}
+\DoxyCodeLine{00238\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}No\ status\ set"{}};}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ abnormal\_close:}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Abnormal\ close"{}};}
+\DoxyCodeLine{00241\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ invalid\_payload:}
+\DoxyCodeLine{00242\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Invalid\ payload"{}};}
+\DoxyCodeLine{00243\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ policy\_violation:}
+\DoxyCodeLine{00244\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Policy\ violoation"{}};}
+\DoxyCodeLine{00245\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ message\_too\_big:}
+\DoxyCodeLine{00246\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Message\ too\ big"{}};}
+\DoxyCodeLine{00247\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ extension\_required:}
+\DoxyCodeLine{00248\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Extension\ required"{}};}
+\DoxyCodeLine{00249\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ internal\_endpoint\_error:}
+\DoxyCodeLine{00250\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Internal\ endpoint\ error"{}};}
+\DoxyCodeLine{00251\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ tls\_handshake:}
+\DoxyCodeLine{00252\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}TLS\ handshake\ failure"{}};}
+\DoxyCodeLine{00253\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ subprotocol\_error:}
+\DoxyCodeLine{00254\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Generic\ subprotocol\ error"{}};}
+\DoxyCodeLine{00255\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ invalid\_subprotocol\_data:}
+\DoxyCodeLine{00256\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Invalid\ subprotocol\ data"{}};}
+\DoxyCodeLine{00257\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00258\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Unknown"{}};}
+\DoxyCodeLine{00259\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00260\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacewebsocketpp_1_1close_1_1status_a4bf4987c79165b134ed1207a567ce209_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacewebsocketpp_1_1close_1_1status_ad024f852889be28eadcec8209fdf9bc8}\index{websocketpp::close::status@{websocketpp::close::status}!invalid@{invalid}}
+\index{invalid@{invalid}!websocketpp::close::status@{websocketpp::close::status}}
+\doxysubsubsection{\texorpdfstring{invalid()}{invalid()}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1close_1_1status_ad024f852889be28eadcec8209fdf9bc8} 
+bool websocketpp\+::close\+::status\+::invalid (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1close_1_1status_a8614a5c4733d708e2d2a32191c5bef84}{value}}}]{code}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em code} & The code to test \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Whether or not code is invalid on the wire 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{close_8hpp_source_l00194}{194}} of file \mbox{\hyperlink{close_8hpp_source}{close.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (code\ <=\ invalid\_low\ ||\ code\ >=\ invalid\_high\ ||}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ code\ ==\ no\_status\ ||\ code\ ==\ abnormal\_close\ ||}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ code\ ==\ tls\_handshake);}
+\DoxyCodeLine{00198\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacewebsocketpp_1_1close_1_1status_ad024f852889be28eadcec8209fdf9bc8_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacewebsocketpp_1_1close_1_1status_af26a61f8a8c3247cf656349f96ea3008}\index{websocketpp::close::status@{websocketpp::close::status}!reserved@{reserved}}
+\index{reserved@{reserved}!websocketpp::close::status@{websocketpp::close::status}}
+\doxysubsubsection{\texorpdfstring{reserved()}{reserved()}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1close_1_1status_af26a61f8a8c3247cf656349f96ea3008} 
+bool websocketpp\+::close\+::status\+::reserved (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1close_1_1status_a8614a5c4733d708e2d2a32191c5bef84}{value}}}]{code}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em code} & The code to test \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Whether or not code is reserved 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{close_8hpp_source_l00179}{179}} of file \mbox{\hyperlink{close_8hpp_source}{close.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ((code\ >=\ rsv\_start\ \&\&\ code\ <=\ rsv\_end)\ ||}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ code\ ==\ 1004\ ||\ code\ ==\ 1014);}
+\DoxyCodeLine{00182\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacewebsocketpp_1_1close_1_1status_af26a61f8a8c3247cf656349f96ea3008_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacewebsocketpp_1_1close_1_1status_a3f9ce953f12693f74493e2eb7a80952b}\index{websocketpp::close::status@{websocketpp::close::status}!terminal@{terminal}}
+\index{terminal@{terminal}!websocketpp::close::status@{websocketpp::close::status}}
+\doxysubsubsection{\texorpdfstring{terminal()}{terminal()}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1close_1_1status_a3f9ce953f12693f74493e2eb7a80952b} 
+bool websocketpp\+::close\+::status\+::terminal (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1close_1_1status_a8614a5c4733d708e2d2a32191c5bef84}{value}}}]{code}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+There is a class of errors for which once they are discovered normal Web\+Socket functionality can no longer occur. This function determines if a given code is one of these values. This information is used to determine if the system has the capability of waiting for a close acknowledgement or if it should drop the TCP connection immediately after sending its close frame.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em code} & The value to test. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True if the code represents an unrecoverable error 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{close_8hpp_source_l00212}{212}} of file \mbox{\hyperlink{close_8hpp_source}{close.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (code\ ==\ protocol\_error\ ||\ code\ ==\ invalid\_payload\ ||}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ code\ ==\ policy\_violation\ ||\ code\ ==\ message\_too\_big\ ||}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ code\ ==\ internal\_endpoint\_error);}
+\DoxyCodeLine{00216\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=346pt]{namespacewebsocketpp_1_1close_1_1status_a3f9ce953f12693f74493e2eb7a80952b_icgraph}
+\end{center}
+\end{figure}

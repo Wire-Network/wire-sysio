@@ -1,0 +1,85 @@
+\doxysection{floattidf.\+c}
+\hypertarget{floattidf_8c_source}{}\label{floattidf_8c_source}\index{libraries/builtins/floattidf.c@{libraries/builtins/floattidf.c}}
+\mbox{\hyperlink{floattidf_8c}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00001}00001\ \textcolor{comment}{/*\ ===-\/-\/\ floattidf.c\ -\/\ Implement\ \_\_floattidf\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/===}}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00002}00002\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00003}00003\ \textcolor{comment}{\ *\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ The\ LLVM\ Compiler\ Infrastructure}}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00004}00004\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00005}00005\ \textcolor{comment}{\ *\ This\ file\ is\ dual\ licensed\ under\ the\ MIT\ and\ the\ University\ of\ Illinois\ Open}}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00006}00006\ \textcolor{comment}{\ *\ Source\ Licenses.\ See\ LICENSE.TXT\ for\ details.}}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00008}00008\ \textcolor{comment}{\ *\ ===-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/===}}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00009}00009\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00010}00010\ \textcolor{comment}{\ *\ This\ file\ implements\ \_\_floattidf\ for\ the\ compiler\_rt\ library.}}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00011}00011\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00012}00012\ \textcolor{comment}{\ *\ ===-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/===}}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00013}00013\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00015}00015\ \textcolor{comment}{/*\ Returns:\ convert\ a\ to\ a\ double,\ rounding\ toward\ even.*/}}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00017}00017\ \textcolor{comment}{/*\ Assumption:\ double\ is\ a\ IEEE\ 64\ bit\ floating\ point\ type}}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00018}00018\ \textcolor{comment}{\ *\ \ \ \ \ \ \ \ \ \ \ \ ti\_int\ is\ a\ 128\ bit\ integral\ type}}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00019}00019\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00021}00021\ \textcolor{comment}{/*\ seee\ eeee\ eeee\ mmmm\ mmmm\ mmmm\ mmmm\ mmmm\ |\ mmmm\ mmmm\ mmmm\ mmmm\ mmmm\ mmmm\ mmmm\ mmmm\ */}}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00023}00023\ \textcolor{preprocessor}{\#include\ <float.h>}\ \textcolor{comment}{//\ needed\ for\ DBL\_MANT\_DIG}}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00024}00024\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{int__t_8h}{int\_t.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00026}\mbox{\hyperlink{compiler__builtins_8hpp_a5ca3fdbfc30ed4f0280f6acf63ffd532}{00026}}\ \textcolor{keywordtype}{double}\ \mbox{\hyperlink{floattidf_8c_ad2e43c554e23d7415e97d1ac0f32a11d}{\_\_\_floattidf}}(\_\_int128\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00027}00027\ \{}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00028}00028\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ ==\ 0)}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00029}00029\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0.0;}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00030}00030\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\ =\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{int__t_8h_a809ddb4bf175c5d5cb11a93120f171bd}{ti\_int}})\ *\ CHAR\_BIT;}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00031}00031\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{int__t_8h_a809ddb4bf175c5d5cb11a93120f171bd}{ti\_int}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ >>\ (\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}-\/1);}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00032}00032\ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ =\ (\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ \string^\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})\ -\/\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00033}00033\ \ \ \ \ \textcolor{keywordtype}{int}\ sd\ =\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\ -\/\ \mbox{\hyperlink{int__t_8h_a2d5320c270ab41e5bbbcf4ff2b941832}{\_\_clzti2}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});\ \ \textcolor{comment}{/*\ number\ of\ significant\ digits\ */}}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00034}00034\ \ \ \ \ \textcolor{keywordtype}{int}\ e\ =\ sd\ -\/\ 1;\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ exponent\ */}}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00035}00035\ \ \ \ \ \textcolor{keywordflow}{if}\ (sd\ >\ DBL\_MANT\_DIG)}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00036}00036\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00037}00037\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ start:\ \ 0000000000000000000001xxxxxxxxxxxxxxxxxxxxxxPQxxxxxxxxxxxxxxxxxx}}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00038}00038\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ *\ \ finish:\ 000000000000000000000000000000000000001xxxxxxxxxxxxxxxxxxxxxxPQR}}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00039}00039\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ *\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 12345678901234567890123456}}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00040}00040\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ *\ 1\ =\ msb\ 1\ bit}}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00041}00041\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ *\ P\ =\ bit\ DBL\_MANT\_DIG-\/1\ bits\ to\ the\ right\ of\ 1}}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00042}00042\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ *\ Q\ =\ bit\ DBL\_MANT\_DIG\ bits\ to\ the\ right\ of\ 1}}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00043}00043\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ *\ R\ =\ "{}or"{}\ of\ all\ bits\ to\ the\ right\ of\ Q}}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00044}00044\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ */}}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00045}00045\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (sd)}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00046}00046\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00047}00047\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ DBL\_MANT\_DIG\ +\ 1:}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ <<=\ 1;}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00049}00049\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00050}00050\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ DBL\_MANT\_DIG\ +\ 2:}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00051}00051\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00052}00052\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ =\ ((\mbox{\hyperlink{fixunstfti_8c_a37d58ea0ad02657a74cd76aa6d3c88e6}{tu\_int}})\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ >>\ (sd\ -\/\ (DBL\_MANT\_DIG+2)))\ |}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ \&\ ((\mbox{\hyperlink{fixunstfti_8c_a37d58ea0ad02657a74cd76aa6d3c88e6}{tu\_int}})(-\/1)\ >>\ ((\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\ +\ DBL\_MANT\_DIG+2)\ -\/\ sd)))\ !=\ 0);}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00055}00055\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00056}00056\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ finish:\ */}}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00057}00057\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ |=\ (\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ \&\ 4)\ !=\ 0;\ \ \textcolor{comment}{/*\ Or\ P\ into\ R\ */}}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00058}00058\ \ \ \ \ \ \ \ \ ++\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}};\ \ \textcolor{comment}{/*\ round\ -\/\ this\ step\ may\ add\ a\ significant\ bit\ */}}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00059}00059\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ >>=\ 2;\ \ \textcolor{comment}{/*\ dump\ Q\ and\ R\ */}}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00060}00060\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ a\ is\ now\ rounded\ to\ DBL\_MANT\_DIG\ or\ DBL\_MANT\_DIG+1\ bits\ */}}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00061}00061\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ \&\ ((\mbox{\hyperlink{fixunstfti_8c_a37d58ea0ad02657a74cd76aa6d3c88e6}{tu\_int}})1\ <<\ DBL\_MANT\_DIG))}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00062}00062\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ >>=\ 1;}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00064}00064\ \ \ \ \ \ \ \ \ \ \ \ \ ++e;}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00065}00065\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00066}00066\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ a\ is\ now\ rounded\ to\ DBL\_MANT\_DIG\ bits\ */}}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00067}00067\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00068}00068\ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00069}00069\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00070}00070\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ <<=\ (DBL\_MANT\_DIG\ -\/\ sd);}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00071}00071\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ a\ is\ now\ rounded\ to\ DBL\_MANT\_DIG\ bits\ */}}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00072}00072\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00073}00073\ \ \ \ \ \mbox{\hyperlink{uniondouble__bits}{double\_bits}}\ fb;}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00074}00074\ \ \ \ \ fb.\mbox{\hyperlink{uniondouble__bits_ad25214e05a20a4be9b61c1230fab3fe7}{u}}.\mbox{\hyperlink{unionudwords_a7638ca5d28010c22362690629d8853ca}{s}}.high\ =\ ((\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ \&\ 0x80000000)\ |\ \ \ \ \ \ \ \ \textcolor{comment}{/*\ sign\ */}}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00075}00075\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((e\ +\ 1023)\ <<\ 20)\ \ \ \ \ \ |\ \ \ \ \ \ \ \ \textcolor{comment}{/*\ exponent\ */}}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ >>\ 32)\ \&\ 0x000FFFFF);\ \textcolor{comment}{/*\ mantissa-\/high\ */}}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00077}00077\ \ \ \ \ fb.\mbox{\hyperlink{uniondouble__bits_ad25214e05a20a4be9b61c1230fab3fe7}{u}}.\mbox{\hyperlink{unionudwords_a7638ca5d28010c22362690629d8853ca}{s}}.low\ =\ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ mantissa-\/low\ */}}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00078}00078\ \ \ \ \ \textcolor{keywordflow}{return}\ fb.\mbox{\hyperlink{uniondouble__bits_a3af9745e2519808d43c1ddb192b2ee02}{f}};}
+\DoxyCodeLine{\Hypertarget{floattidf_8c_source_l00079}00079\ \}}
+
+\end{DoxyCode}

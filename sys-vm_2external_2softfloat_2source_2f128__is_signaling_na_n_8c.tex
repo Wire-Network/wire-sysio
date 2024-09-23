@@ -1,0 +1,43 @@
+\doxysection{libraries/sys-\/vm/external/softfloat/source/f128\+\_\+is\+Signaling\+NaN.c File Reference}
+\hypertarget{sys-vm_2external_2softfloat_2source_2f128__is_signaling_na_n_8c}{}\label{sys-vm_2external_2softfloat_2source_2f128__is_signaling_na_n_8c}\index{libraries/sys-\/vm/external/softfloat/source/f128\_isSignalingNaN.c@{libraries/sys-\/vm/external/softfloat/source/f128\_isSignalingNaN.c}}
+{\ttfamily \#include $<$stdbool.\+h$>$}\newline
+{\ttfamily \#include "{}platform.\+h"{}}\newline
+{\ttfamily \#include "{}internals.\+h"{}}\newline
+{\ttfamily \#include "{}specialize.\+h"{}}\newline
+{\ttfamily \#include "{}softfloat.\+h"{}}\newline
+Include dependency graph for f128\+\_\+is\+Signaling\+Na\+N.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sys-vm_2external_2softfloat_2source_2f128__is_signaling_na_n_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2f128__is_signaling_na_n_8c_ace5781db76f03a5db2d5441b8803d478}{f128\+\_\+is\+Signaling\+NaN}} (\mbox{\hyperlink{structfloat128__t}{float128\+\_\+t}} \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{sys-vm_2external_2softfloat_2source_2f128__is_signaling_na_n_8c_ace5781db76f03a5db2d5441b8803d478}\index{f128\_isSignalingNaN.c@{f128\_isSignalingNaN.c}!f128\_isSignalingNaN@{f128\_isSignalingNaN}}
+\index{f128\_isSignalingNaN@{f128\_isSignalingNaN}!f128\_isSignalingNaN.c@{f128\_isSignalingNaN.c}}
+\doxysubsubsection{\texorpdfstring{f128\_isSignalingNaN()}{f128\_isSignalingNaN()}}
+{\footnotesize\ttfamily \label{sys-vm_2external_2softfloat_2source_2f128__is_signaling_na_n_8c_ace5781db76f03a5db2d5441b8803d478} 
+bool f128\+\_\+is\+Signaling\+NaN (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structfloat128__t}{float128\+\_\+t}}}]{a}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2f128__is_signaling_na_n_8c_source_l00043}{43}} of file \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2f128__is_signaling_na_n_8c_source}{f128\+\_\+is\+Signaling\+Na\+N.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00044\ \{}
+\DoxyCodeLine{00045\ \ \ \ \ \textcolor{keyword}{union\ }ui128\_f128\ uA;}
+\DoxyCodeLine{00046\ }
+\DoxyCodeLine{00047\ \ \ \ \ uA.f\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}};}
+\DoxyCodeLine{00048\ \ \ \ \ \textcolor{keywordflow}{return}\ softfloat\_isSigNaNF128UI(\ uA.ui.v64,\ uA.ui.v0\ );}
+\DoxyCodeLine{00049\ }
+\DoxyCodeLine{00050\ \}}
+
+\end{DoxyCode}

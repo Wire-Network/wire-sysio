@@ -1,0 +1,11 @@
+<map id="sysio::chain::builtin_protocol_feature_spec" name="sysio::chain::builtin_protocol_feature_spec">
+<area shape="rect" id="Node000001" title=" " alt="" coords="733,55,889,96"/>
+<area shape="rect" id="Node000002" href="$classfc_1_1sha256.html" title=" " alt="" coords="407,5,490,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="505,23,709,53,733,57,732,62,709,58,504,28"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="367,55,530,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="546,73,732,73,732,78,546,78"/>
+<area shape="rect" id="Node000004" href="$structsysio_1_1chain_1_1protocol__feature__subjective__restrictions.html" title=" " alt="" coords="346,120,551,161"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="566,119,709,93,732,89,733,94,709,98,567,124"/>
+<area shape="rect" id="Node000005" href="$classfc_1_1time__point.html" title=" " alt="" coords="5,128,106,154"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="121,138,345,138,345,144,121,144"/>
+</map>

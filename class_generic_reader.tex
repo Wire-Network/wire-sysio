@@ -1,0 +1,509 @@
+\doxysection{Generic\+Reader\texorpdfstring{$<$}{<} Source\+Encoding, Target\+Encoding, Stack\+Allocator \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{class_generic_reader}{}\label{class_generic_reader}\index{GenericReader$<$ SourceEncoding, TargetEncoding, StackAllocator $>$@{GenericReader$<$ SourceEncoding, TargetEncoding, StackAllocator $>$}}
+
+
+SAX-\/style JSON parser. Use \doxysectlink{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2sax_8zh-cn_Reader}{Reader}{1} for \doxylink{struct_u_t_f8}{UTF8} encoding and default allocator.  
+
+
+
+
+{\ttfamily \#include $<$reader.\+h$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef Source\+Encoding\+::\+Ch \mbox{\hyperlink{class_generic_reader_a8b72321110aa5823db0a989602f6c6ec}{Ch}}
+\begin{DoxyCompactList}\small\item\em Source\+Encoding character type. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_generic_reader_aab875a34b3092df9fb4e2b8eac6dbb96}{Generic\+Reader}} (Stack\+Allocator \texorpdfstring{$\ast$}{*}stack\+Allocator=0, size\+\_\+t stack\+Capacity=k\+Default\+Stack\+Capacity)
+\begin{DoxyCompactList}\small\item\em Constructor. \end{DoxyCompactList}\item 
+{\footnotesize template$<$unsigned parse\+Flags, typename Input\+Stream , typename \mbox{\hyperlink{classrapidjson_1_1_handler}{Handler}} $>$ }\\\mbox{\hyperlink{struct_parse_result}{Parse\+Result}} \mbox{\hyperlink{class_generic_reader_a0c450620d14ff1824e58bb7bd9b42099}{Parse}} (Input\+Stream \&is, \mbox{\hyperlink{classrapidjson_1_1_handler}{Handler}} \&handler)
+\begin{DoxyCompactList}\small\item\em Parse JSON text. \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename Input\+Stream , typename \mbox{\hyperlink{classrapidjson_1_1_handler}{Handler}} $>$ }\\\mbox{\hyperlink{struct_parse_result}{Parse\+Result}} \mbox{\hyperlink{class_generic_reader_a76d91e5fd8dfe48aea7dd6d8a51dd6dc}{Parse}} (Input\+Stream \&is, \mbox{\hyperlink{classrapidjson_1_1_handler}{Handler}} \&handler)
+\begin{DoxyCompactList}\small\item\em Parse JSON text (with \doxylink{reader_8h_ab7be7dabe6ffcba60fad441505583450a9104b0946d648e9467cb7a967401ec80}{k\+Parse\+Default\+Flags}) \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_generic_reader_a7de472eda2ad9de13cfd8c1de74f1754}{Iterative\+Parse\+Init}} ()
+\begin{DoxyCompactList}\small\item\em Initialize JSON text token-\/by-\/token parsing. \end{DoxyCompactList}\item 
+{\footnotesize template$<$unsigned parse\+Flags, typename Input\+Stream , typename \mbox{\hyperlink{classrapidjson_1_1_handler}{Handler}} $>$ }\\bool \mbox{\hyperlink{class_generic_reader_a257891331e0c259903e7066fb4cebf92}{Iterative\+Parse\+Next}} (Input\+Stream \&is, \mbox{\hyperlink{classrapidjson_1_1_handler}{Handler}} \&handler)
+\begin{DoxyCompactList}\small\item\em Parse one token from JSON text. \end{DoxyCompactList}\item 
+RAPIDJSON\+\_\+\+FORCEINLINE bool \mbox{\hyperlink{class_generic_reader_aa1e9e1eef614fde971550ed2f955151d}{Iterative\+Parse\+Complete}} () const
+\begin{DoxyCompactList}\small\item\em Check if token-\/by-\/token parsing JSON text is complete. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_generic_reader_ac417441794477ea747b63adb6d3653a9}{Has\+Parse\+Error}} () const
+\begin{DoxyCompactList}\small\item\em Whether a parse error has occurred in the last parsing. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_ga8d4b32dfc45840bca189ade2bbcb6ba7}{Parse\+Error\+Code}} \mbox{\hyperlink{class_generic_reader_a937bf90919f50e1c370b312cee5833e8}{Get\+Parse\+Error\+Code}} () const
+\begin{DoxyCompactList}\small\item\em Get the \doxylink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_ga8d4b32dfc45840bca189ade2bbcb6ba7}{Parse\+Error\+Code} of last parsing. \end{DoxyCompactList}\item 
+size\+\_\+t \mbox{\hyperlink{class_generic_reader_ae9008523ccd06d839a57335835cb4091}{Get\+Error\+Offset}} () const
+\begin{DoxyCompactList}\small\item\em Get the position of last parsing error in input, 0 otherwise. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{class_generic_reader_ae50079444295bf109730c3b708a818a6}{Set\+Parse\+Error}} (\mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_ga8d4b32dfc45840bca189ade2bbcb6ba7}{Parse\+Error\+Code}} code, size\+\_\+t offset)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Source\+Encoding, typename Target\+Encoding, typename Stack\+Allocator = Crt\+Allocator$>$\newline
+class Generic\+Reader$<$ Source\+Encoding, Target\+Encoding, Stack\+Allocator $>$}
+\doxylink{class_generic_reader}{Generic\+Reader} parses JSON text from a stream, and send events synchronously to an object implementing Handler concept.
+
+It needs to allocate a stack for storing a single decoded string during non-\/destructive parsing.
+
+For in-\/situ parsing, the decoded string is directly written to the source text string, no temporary buffer is required.
+
+\doxylink{struct_a}{A} \doxylink{class_generic_reader}{Generic\+Reader} object can be reused for parsing multiple JSON text.
+
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em Source\+Encoding} & Encoding of the input stream. \\
+\hline
+{\em Target\+Encoding} & Encoding of the parse output. \\
+\hline
+{\em Stack\+Allocator} & Allocator type for stack. \\
+\hline
+\end{DoxyTemplParams}
+
+
+Definition at line \mbox{\hyperlink{reader_8h_source_l00537}{537}} of file \mbox{\hyperlink{reader_8h_source}{reader.\+h}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{class_generic_reader_a8b72321110aa5823db0a989602f6c6ec}\index{GenericReader$<$ SourceEncoding, TargetEncoding, StackAllocator $>$@{GenericReader$<$ SourceEncoding, TargetEncoding, StackAllocator $>$}!Ch@{Ch}}
+\index{Ch@{Ch}!GenericReader$<$ SourceEncoding, TargetEncoding, StackAllocator $>$@{GenericReader$<$ SourceEncoding, TargetEncoding, StackAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{Ch}{Ch}}
+{\footnotesize\ttfamily \label{class_generic_reader_a8b72321110aa5823db0a989602f6c6ec} 
+template$<$typename Source\+Encoding , typename Target\+Encoding , typename Stack\+Allocator  = Crt\+Allocator$>$ \\
+Source\+Encoding\+::\+Ch \mbox{\hyperlink{class_generic_reader}{Generic\+Reader}}$<$ Source\+Encoding, Target\+Encoding, Stack\+Allocator $>$\+::\+Ch}
+
+
+
+Definition at line \mbox{\hyperlink{reader_8h_source_l00539}{539}} of file \mbox{\hyperlink{reader_8h_source}{reader.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_generic_reader_aab875a34b3092df9fb4e2b8eac6dbb96}\index{GenericReader$<$ SourceEncoding, TargetEncoding, StackAllocator $>$@{GenericReader$<$ SourceEncoding, TargetEncoding, StackAllocator $>$}!GenericReader@{GenericReader}}
+\index{GenericReader@{GenericReader}!GenericReader$<$ SourceEncoding, TargetEncoding, StackAllocator $>$@{GenericReader$<$ SourceEncoding, TargetEncoding, StackAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{GenericReader()}{GenericReader()}}
+{\footnotesize\ttfamily \label{class_generic_reader_aab875a34b3092df9fb4e2b8eac6dbb96} 
+template$<$typename Source\+Encoding , typename Target\+Encoding , typename Stack\+Allocator  = Crt\+Allocator$>$ \\
+\mbox{\hyperlink{class_generic_reader}{Generic\+Reader}}$<$ Source\+Encoding, Target\+Encoding, Stack\+Allocator $>$\mbox{\hyperlink{class_generic_reader}{\+::\+Generic\+Reader}} (\begin{DoxyParamCaption}\item[{Stack\+Allocator \texorpdfstring{$\ast$}{*}}]{stack\+Allocator}{ = {\ttfamily 0}, }\item[{size\+\_\+t}]{stack\+Capacity}{ = {\ttfamily kDefaultStackCapacity}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+\begin{DoxyParams}{Parameters}
+{\em stack\+Allocator} & Optional allocator for allocating stack memory. (Only use for non-\/destructive parsing) \\
+\hline
+{\em stack\+Capacity} & stack capacity in bytes for storing a single decoded string. (Only use for non-\/destructive parsing) \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{reader_8h_source_l00545}{545}} of file \mbox{\hyperlink{reader_8h_source}{reader.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00545\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :}
+\DoxyCodeLine{00546\ \ \ \ \ \ \ \ \ stack\_(stackAllocator,\ stackCapacity),\ parseResult\_(),\ state\_(IterativeParsingStartState)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_generic_reader_ae9008523ccd06d839a57335835cb4091}\index{GenericReader$<$ SourceEncoding, TargetEncoding, StackAllocator $>$@{GenericReader$<$ SourceEncoding, TargetEncoding, StackAllocator $>$}!GetErrorOffset@{GetErrorOffset}}
+\index{GetErrorOffset@{GetErrorOffset}!GenericReader$<$ SourceEncoding, TargetEncoding, StackAllocator $>$@{GenericReader$<$ SourceEncoding, TargetEncoding, StackAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{GetErrorOffset()}{GetErrorOffset()}}
+{\footnotesize\ttfamily \label{class_generic_reader_ae9008523ccd06d839a57335835cb4091} 
+template$<$typename Source\+Encoding , typename Target\+Encoding , typename Stack\+Allocator  = Crt\+Allocator$>$ \\
+size\+\_\+t \mbox{\hyperlink{class_generic_reader}{Generic\+Reader}}$<$ Source\+Encoding, Target\+Encoding, Stack\+Allocator $>$\+::\+Get\+Error\+Offset (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{reader_8h_source_l00686}{686}} of file \mbox{\hyperlink{reader_8h_source}{reader.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00686\ \{\ \textcolor{keywordflow}{return}\ parseResult\_.\mbox{\hyperlink{struct_parse_result_afbe762766ac21b2aae266105f1dfa643}{Offset}}();\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_generic_reader_ae9008523ccd06d839a57335835cb4091_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=304pt]{class_generic_reader_ae9008523ccd06d839a57335835cb4091_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_reader_a937bf90919f50e1c370b312cee5833e8}\index{GenericReader$<$ SourceEncoding, TargetEncoding, StackAllocator $>$@{GenericReader$<$ SourceEncoding, TargetEncoding, StackAllocator $>$}!GetParseErrorCode@{GetParseErrorCode}}
+\index{GetParseErrorCode@{GetParseErrorCode}!GenericReader$<$ SourceEncoding, TargetEncoding, StackAllocator $>$@{GenericReader$<$ SourceEncoding, TargetEncoding, StackAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{GetParseErrorCode()}{GetParseErrorCode()}}
+{\footnotesize\ttfamily \label{class_generic_reader_a937bf90919f50e1c370b312cee5833e8} 
+template$<$typename Source\+Encoding , typename Target\+Encoding , typename Stack\+Allocator  = Crt\+Allocator$>$ \\
+\mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_ga8d4b32dfc45840bca189ade2bbcb6ba7}{Parse\+Error\+Code}} \mbox{\hyperlink{class_generic_reader}{Generic\+Reader}}$<$ Source\+Encoding, Target\+Encoding, Stack\+Allocator $>$\+::\+Get\+Parse\+Error\+Code (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{reader_8h_source_l00683}{683}} of file \mbox{\hyperlink{reader_8h_source}{reader.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00683\ \{\ \textcolor{keywordflow}{return}\ parseResult\_.\mbox{\hyperlink{struct_parse_result_a2aae3c2f42b31cc2409ee1e03bc4852e}{Code}}();\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_generic_reader_a937bf90919f50e1c370b312cee5833e8_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_generic_reader_a937bf90919f50e1c370b312cee5833e8_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_reader_ac417441794477ea747b63adb6d3653a9}\index{GenericReader$<$ SourceEncoding, TargetEncoding, StackAllocator $>$@{GenericReader$<$ SourceEncoding, TargetEncoding, StackAllocator $>$}!HasParseError@{HasParseError}}
+\index{HasParseError@{HasParseError}!GenericReader$<$ SourceEncoding, TargetEncoding, StackAllocator $>$@{GenericReader$<$ SourceEncoding, TargetEncoding, StackAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{HasParseError()}{HasParseError()}}
+{\footnotesize\ttfamily \label{class_generic_reader_ac417441794477ea747b63adb6d3653a9} 
+template$<$typename Source\+Encoding , typename Target\+Encoding , typename Stack\+Allocator  = Crt\+Allocator$>$ \\
+bool \mbox{\hyperlink{class_generic_reader}{Generic\+Reader}}$<$ Source\+Encoding, Target\+Encoding, Stack\+Allocator $>$\+::\+Has\+Parse\+Error (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{reader_8h_source_l00680}{680}} of file \mbox{\hyperlink{reader_8h_source}{reader.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00680\ \{\ \textcolor{keywordflow}{return}\ parseResult\_.\mbox{\hyperlink{struct_parse_result_adfe0ef5b994e82f8aa9ebf0b30c924b1}{IsError}}();\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_generic_reader_ac417441794477ea747b63adb6d3653a9_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_generic_reader_ac417441794477ea747b63adb6d3653a9_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_reader_aa1e9e1eef614fde971550ed2f955151d}\index{GenericReader$<$ SourceEncoding, TargetEncoding, StackAllocator $>$@{GenericReader$<$ SourceEncoding, TargetEncoding, StackAllocator $>$}!IterativeParseComplete@{IterativeParseComplete}}
+\index{IterativeParseComplete@{IterativeParseComplete}!GenericReader$<$ SourceEncoding, TargetEncoding, StackAllocator $>$@{GenericReader$<$ SourceEncoding, TargetEncoding, StackAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{IterativeParseComplete()}{IterativeParseComplete()}}
+{\footnotesize\ttfamily \label{class_generic_reader_aa1e9e1eef614fde971550ed2f955151d} 
+template$<$typename Source\+Encoding , typename Target\+Encoding , typename Stack\+Allocator  = Crt\+Allocator$>$ \\
+RAPIDJSON\+\_\+\+FORCEINLINE bool \mbox{\hyperlink{class_generic_reader}{Generic\+Reader}}$<$ Source\+Encoding, Target\+Encoding, Stack\+Allocator $>$\+::\+Iterative\+Parse\+Complete (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+\begin{DoxyReturn}{Returns}
+Whether the JSON has been fully decoded. 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{reader_8h_source_l00675}{675}} of file \mbox{\hyperlink{reader_8h_source}{reader.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00675\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00676\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ IsIterativeParsingCompleteState(state\_);}
+\DoxyCodeLine{00677\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=291pt]{class_generic_reader_aa1e9e1eef614fde971550ed2f955151d_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_reader_a7de472eda2ad9de13cfd8c1de74f1754}\index{GenericReader$<$ SourceEncoding, TargetEncoding, StackAllocator $>$@{GenericReader$<$ SourceEncoding, TargetEncoding, StackAllocator $>$}!IterativeParseInit@{IterativeParseInit}}
+\index{IterativeParseInit@{IterativeParseInit}!GenericReader$<$ SourceEncoding, TargetEncoding, StackAllocator $>$@{GenericReader$<$ SourceEncoding, TargetEncoding, StackAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{IterativeParseInit()}{IterativeParseInit()}}
+{\footnotesize\ttfamily \label{class_generic_reader_a7de472eda2ad9de13cfd8c1de74f1754} 
+template$<$typename Source\+Encoding , typename Target\+Encoding , typename Stack\+Allocator  = Crt\+Allocator$>$ \\
+void \mbox{\hyperlink{class_generic_reader}{Generic\+Reader}}$<$ Source\+Encoding, Target\+Encoding, Stack\+Allocator $>$\+::\+Iterative\+Parse\+Init (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{reader_8h_source_l00605}{605}} of file \mbox{\hyperlink{reader_8h_source}{reader.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00605\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00606\ \ \ \ \ \ \ \ \ parseResult\_.\mbox{\hyperlink{struct_parse_result_a88b6d44f052a19e6436ae6aadc2c40b4}{Clear}}();}
+\DoxyCodeLine{00607\ \ \ \ \ \ \ \ \ state\_\ =\ IterativeParsingStartState;}
+\DoxyCodeLine{00608\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_generic_reader_a7de472eda2ad9de13cfd8c1de74f1754_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_generic_reader_a7de472eda2ad9de13cfd8c1de74f1754_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_reader_a257891331e0c259903e7066fb4cebf92}\index{GenericReader$<$ SourceEncoding, TargetEncoding, StackAllocator $>$@{GenericReader$<$ SourceEncoding, TargetEncoding, StackAllocator $>$}!IterativeParseNext@{IterativeParseNext}}
+\index{IterativeParseNext@{IterativeParseNext}!GenericReader$<$ SourceEncoding, TargetEncoding, StackAllocator $>$@{GenericReader$<$ SourceEncoding, TargetEncoding, StackAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{IterativeParseNext()}{IterativeParseNext()}}
+{\footnotesize\ttfamily \label{class_generic_reader_a257891331e0c259903e7066fb4cebf92} 
+template$<$typename Source\+Encoding , typename Target\+Encoding , typename Stack\+Allocator  = Crt\+Allocator$>$ \\
+template$<$unsigned parse\+Flags, typename Input\+Stream , typename \mbox{\hyperlink{classrapidjson_1_1_handler}{Handler}} $>$ \\
+bool \mbox{\hyperlink{class_generic_reader}{Generic\+Reader}}$<$ Source\+Encoding, Target\+Encoding, Stack\+Allocator $>$\+::\+Iterative\+Parse\+Next (\begin{DoxyParamCaption}\item[{Input\+Stream \&}]{is}{, }\item[{\mbox{\hyperlink{classrapidjson_1_1_handler}{Handler}} \&}]{handler}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em Input\+Stream} & Type of input stream, implementing Stream concept \\
+\hline
+{\em Handler} & Type of handler, implementing Handler concept. \\
+\hline
+\end{DoxyTemplParams}
+
+\begin{DoxyParams}{Parameters}
+{\em is} & Input stream to be parsed. \\
+\hline
+{\em handler} & The handler to receive events. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Whether the parsing is successful. 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{reader_8h_source_l00618}{618}} of file \mbox{\hyperlink{reader_8h_source}{reader.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00618\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00619\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (\mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_ga5dc14176a9e71ace282404b0bcda57a1}{RAPIDJSON\_LIKELY}}(is.Peek()\ !=\ \textcolor{charliteral}{'\(\backslash\)0'}))\ \{}
+\DoxyCodeLine{00620\ \ \ \ \ \ \ \ \ \ \ \ \ SkipWhitespaceAndComments<parseFlags>(is);}
+\DoxyCodeLine{00621\ }
+\DoxyCodeLine{00622\ \ \ \ \ \ \ \ \ \ \ \ \ Token\ t\ =\ Tokenize(is.Peek());}
+\DoxyCodeLine{00623\ \ \ \ \ \ \ \ \ \ \ \ \ IterativeParsingState\ n\ =\ Predict(state\_,\ t);}
+\DoxyCodeLine{00624\ \ \ \ \ \ \ \ \ \ \ \ \ IterativeParsingState\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ =\ Transit<parseFlags>(state\_,\ t,\ n,\ is,\ handler);}
+\DoxyCodeLine{00625\ }
+\DoxyCodeLine{00626\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ we've\ finished\ or\ hit\ an\ error...}}
+\DoxyCodeLine{00627\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_ga6a2b1695c13e77ae425e3cbac980ccb5}{RAPIDJSON\_UNLIKELY}}(IsIterativeParsingCompleteState(d)))\ \{}
+\DoxyCodeLine{00628\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Report\ errors.}}
+\DoxyCodeLine{00629\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (d\ ==\ IterativeParsingErrorState)\ \{}
+\DoxyCodeLine{00630\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ HandleError(state\_,\ is);}
+\DoxyCodeLine{00631\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00632\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00633\ }
+\DoxyCodeLine{00634\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Transition\ to\ the\ finish\ state.}}
+\DoxyCodeLine{00635\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(d\ ==\ IterativeParsingFinishState);}
+\DoxyCodeLine{00636\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ state\_\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}};}
+\DoxyCodeLine{00637\ }
+\DoxyCodeLine{00638\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ StopWhenDone\ is\ not\ set...}}
+\DoxyCodeLine{00639\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!(parseFlags\ \&\ \mbox{\hyperlink{reader_8h_ab7be7dabe6ffcba60fad441505583450af77d115d3bbed0a448b6b335f3b93b36}{kParseStopWhenDoneFlag}}))\ \{}
+\DoxyCodeLine{00640\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ ...\ and\ extra\ non-\/whitespace\ data\ is\ found...}}
+\DoxyCodeLine{00641\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ SkipWhitespaceAndComments<parseFlags>(is);}
+\DoxyCodeLine{00642\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is.Peek()\ !=\ \textcolor{charliteral}{'\(\backslash\)0'})\ \{}
+\DoxyCodeLine{00643\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ ...\ this\ is\ considered\ an\ error.}}
+\DoxyCodeLine{00644\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ HandleError(state\_,\ is);}
+\DoxyCodeLine{00645\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00646\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00647\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00648\ }
+\DoxyCodeLine{00649\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Success!\ We\ are\ done!}}
+\DoxyCodeLine{00650\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00651\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00652\ }
+\DoxyCodeLine{00653\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Transition\ to\ the\ new\ state.}}
+\DoxyCodeLine{00654\ \ \ \ \ \ \ \ \ \ \ \ \ state\_\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}};}
+\DoxyCodeLine{00655\ }
+\DoxyCodeLine{00656\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ we\ parsed\ anything\ other\ than\ a\ delimiter,\ we\ invoked\ the\ handler,\ so\ we\ can\ return\ true\ now.}}
+\DoxyCodeLine{00657\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!IsIterativeParsingDelimiterState(n))}
+\DoxyCodeLine{00658\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00659\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00660\ }
+\DoxyCodeLine{00661\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ We\ reached\ the\ end\ of\ file.}}
+\DoxyCodeLine{00662\ \ \ \ \ \ \ \ \ stack\_.\mbox{\hyperlink{classinternal_1_1_stack_a02da31665a372738e81ded2f7b7d598e}{Clear}}();}
+\DoxyCodeLine{00663\ }
+\DoxyCodeLine{00664\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (state\_\ !=\ IterativeParsingFinishState)\ \{}
+\DoxyCodeLine{00665\ \ \ \ \ \ \ \ \ \ \ \ \ HandleError(state\_,\ is);}
+\DoxyCodeLine{00666\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00667\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00668\ }
+\DoxyCodeLine{00669\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00670\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=347pt]{class_generic_reader_a257891331e0c259903e7066fb4cebf92_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_generic_reader_a257891331e0c259903e7066fb4cebf92_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_reader_a0c450620d14ff1824e58bb7bd9b42099}\index{GenericReader$<$ SourceEncoding, TargetEncoding, StackAllocator $>$@{GenericReader$<$ SourceEncoding, TargetEncoding, StackAllocator $>$}!Parse@{Parse}}
+\index{Parse@{Parse}!GenericReader$<$ SourceEncoding, TargetEncoding, StackAllocator $>$@{GenericReader$<$ SourceEncoding, TargetEncoding, StackAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{Parse()}{Parse()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_generic_reader_a0c450620d14ff1824e58bb7bd9b42099} 
+template$<$typename Source\+Encoding , typename Target\+Encoding , typename Stack\+Allocator  = Crt\+Allocator$>$ \\
+template$<$unsigned parse\+Flags, typename Input\+Stream , typename \mbox{\hyperlink{classrapidjson_1_1_handler}{Handler}} $>$ \\
+\mbox{\hyperlink{struct_parse_result}{Parse\+Result}} \mbox{\hyperlink{class_generic_reader}{Generic\+Reader}}$<$ Source\+Encoding, Target\+Encoding, Stack\+Allocator $>$\+::\+Parse (\begin{DoxyParamCaption}\item[{Input\+Stream \&}]{is}{, }\item[{\mbox{\hyperlink{classrapidjson_1_1_handler}{Handler}} \&}]{handler}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em parse\+Flags} & Combination of \doxylink{reader_8h_ab7be7dabe6ffcba60fad441505583450}{Parse\+Flag}. \\
+\hline
+{\em Input\+Stream} & Type of input stream, implementing Stream concept. \\
+\hline
+{\em Handler} & Type of handler, implementing Handler concept. \\
+\hline
+\end{DoxyTemplParams}
+
+\begin{DoxyParams}{Parameters}
+{\em is} & Input stream to be parsed. \\
+\hline
+{\em handler} & The handler to receive events. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Whether the parsing is successful. 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{reader_8h_source_l00557}{557}} of file \mbox{\hyperlink{reader_8h_source}{reader.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00557\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00558\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (parseFlags\ \&\ \mbox{\hyperlink{reader_8h_ab7be7dabe6ffcba60fad441505583450aadb14f5a3b6b33e28055e913a2eae5e9}{kParseIterativeFlag}})}
+\DoxyCodeLine{00559\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ IterativeParse<parseFlags>(is,\ handler);}
+\DoxyCodeLine{00560\ }
+\DoxyCodeLine{00561\ \ \ \ \ \ \ \ \ parseResult\_.\mbox{\hyperlink{struct_parse_result_a88b6d44f052a19e6436ae6aadc2c40b4}{Clear}}();}
+\DoxyCodeLine{00562\ }
+\DoxyCodeLine{00563\ \ \ \ \ \ \ \ \ ClearStackOnExit\ scope(*\textcolor{keyword}{this});}
+\DoxyCodeLine{00564\ }
+\DoxyCodeLine{00565\ \ \ \ \ \ \ \ \ SkipWhitespaceAndComments<parseFlags>(is);}
+\DoxyCodeLine{00566\ \ \ \ \ \ \ \ \ RAPIDJSON\_PARSE\_ERROR\_EARLY\_RETURN(parseResult\_);}
+\DoxyCodeLine{00567\ }
+\DoxyCodeLine{00568\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_ga6a2b1695c13e77ae425e3cbac980ccb5}{RAPIDJSON\_UNLIKELY}}(is.Peek()\ ==\ \textcolor{charliteral}{'\(\backslash\)0'}))\ \{}
+\DoxyCodeLine{00569\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_ga7f8c4265b2edda78568ae3338aaf1461}{RAPIDJSON\_PARSE\_ERROR\_NORETURN}}(\mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_gga8d4b32dfc45840bca189ade2bbcb6ba7a04b368d184e84b50580be2faa55f738a}{kParseErrorDocumentEmpty}},\ is.Tell());}
+\DoxyCodeLine{00570\ \ \ \ \ \ \ \ \ \ \ \ \ RAPIDJSON\_PARSE\_ERROR\_EARLY\_RETURN(parseResult\_);}
+\DoxyCodeLine{00571\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00572\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00573\ \ \ \ \ \ \ \ \ \ \ \ \ ParseValue<parseFlags>(is,\ handler);}
+\DoxyCodeLine{00574\ \ \ \ \ \ \ \ \ \ \ \ \ RAPIDJSON\_PARSE\_ERROR\_EARLY\_RETURN(parseResult\_);}
+\DoxyCodeLine{00575\ }
+\DoxyCodeLine{00576\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!(parseFlags\ \&\ \mbox{\hyperlink{reader_8h_ab7be7dabe6ffcba60fad441505583450af77d115d3bbed0a448b6b335f3b93b36}{kParseStopWhenDoneFlag}}))\ \{}
+\DoxyCodeLine{00577\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ SkipWhitespaceAndComments<parseFlags>(is);}
+\DoxyCodeLine{00578\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ RAPIDJSON\_PARSE\_ERROR\_EARLY\_RETURN(parseResult\_);}
+\DoxyCodeLine{00579\ }
+\DoxyCodeLine{00580\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_ga6a2b1695c13e77ae425e3cbac980ccb5}{RAPIDJSON\_UNLIKELY}}(is.Peek()\ !=\ \textcolor{charliteral}{'\(\backslash\)0'}))\ \{}
+\DoxyCodeLine{00581\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_ga7f8c4265b2edda78568ae3338aaf1461}{RAPIDJSON\_PARSE\_ERROR\_NORETURN}}(\mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_gga8d4b32dfc45840bca189ade2bbcb6ba7a2293b39033220f4c2a568482c497dab5}{kParseErrorDocumentRootNotSingular}},\ is.Tell());}
+\DoxyCodeLine{00582\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ RAPIDJSON\_PARSE\_ERROR\_EARLY\_RETURN(parseResult\_);}
+\DoxyCodeLine{00583\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00584\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00585\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00586\ }
+\DoxyCodeLine{00587\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ parseResult\_;}
+\DoxyCodeLine{00588\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_generic_reader_a0c450620d14ff1824e58bb7bd9b42099_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_reader_a76d91e5fd8dfe48aea7dd6d8a51dd6dc}\index{GenericReader$<$ SourceEncoding, TargetEncoding, StackAllocator $>$@{GenericReader$<$ SourceEncoding, TargetEncoding, StackAllocator $>$}!Parse@{Parse}}
+\index{Parse@{Parse}!GenericReader$<$ SourceEncoding, TargetEncoding, StackAllocator $>$@{GenericReader$<$ SourceEncoding, TargetEncoding, StackAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{Parse()}{Parse()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_generic_reader_a76d91e5fd8dfe48aea7dd6d8a51dd6dc} 
+template$<$typename Source\+Encoding , typename Target\+Encoding , typename Stack\+Allocator  = Crt\+Allocator$>$ \\
+template$<$typename Input\+Stream , typename \mbox{\hyperlink{classrapidjson_1_1_handler}{Handler}} $>$ \\
+\mbox{\hyperlink{struct_parse_result}{Parse\+Result}} \mbox{\hyperlink{class_generic_reader}{Generic\+Reader}}$<$ Source\+Encoding, Target\+Encoding, Stack\+Allocator $>$\+::\+Parse (\begin{DoxyParamCaption}\item[{Input\+Stream \&}]{is}{, }\item[{\mbox{\hyperlink{classrapidjson_1_1_handler}{Handler}} \&}]{handler}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em Input\+Stream} & Type of input stream, implementing Stream concept \\
+\hline
+{\em Handler} & Type of handler, implementing Handler concept. \\
+\hline
+\end{DoxyTemplParams}
+
+\begin{DoxyParams}{Parameters}
+{\em is} & Input stream to be parsed. \\
+\hline
+{\em handler} & The handler to receive events. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Whether the parsing is successful. 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{reader_8h_source_l00598}{598}} of file \mbox{\hyperlink{reader_8h_source}{reader.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00598\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00599\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_generic_reader_a0c450620d14ff1824e58bb7bd9b42099}{Parse<kParseDefaultFlags>}}(is,\ handler);}
+\DoxyCodeLine{00600\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_generic_reader_a76d91e5fd8dfe48aea7dd6d8a51dd6dc_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_reader_ae50079444295bf109730c3b708a818a6}\index{GenericReader$<$ SourceEncoding, TargetEncoding, StackAllocator $>$@{GenericReader$<$ SourceEncoding, TargetEncoding, StackAllocator $>$}!SetParseError@{SetParseError}}
+\index{SetParseError@{SetParseError}!GenericReader$<$ SourceEncoding, TargetEncoding, StackAllocator $>$@{GenericReader$<$ SourceEncoding, TargetEncoding, StackAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{SetParseError()}{SetParseError()}}
+{\footnotesize\ttfamily \label{class_generic_reader_ae50079444295bf109730c3b708a818a6} 
+template$<$typename Source\+Encoding , typename Target\+Encoding , typename Stack\+Allocator  = Crt\+Allocator$>$ \\
+void \mbox{\hyperlink{class_generic_reader}{Generic\+Reader}}$<$ Source\+Encoding, Target\+Encoding, Stack\+Allocator $>$\+::\+Set\+Parse\+Error (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_ga8d4b32dfc45840bca189ade2bbcb6ba7}{Parse\+Error\+Code}}}]{code}{, }\item[{size\+\_\+t}]{offset}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{reader_8h_source_l00689}{689}} of file \mbox{\hyperlink{reader_8h_source}{reader.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00689\ \{\ parseResult\_.\mbox{\hyperlink{struct_parse_result_aa81b4a7b776b77216cb752385203a8c1}{Set}}(code,\ offset);\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_generic_reader_ae50079444295bf109730c3b708a818a6_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/\mbox{\hyperlink{fwd_8h}{fwd.\+h}}\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/\mbox{\hyperlink{reader_8h}{reader.\+h}}\end{DoxyCompactItemize}

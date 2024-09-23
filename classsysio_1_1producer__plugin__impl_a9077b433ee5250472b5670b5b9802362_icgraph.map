@@ -1,0 +1,19 @@
+<map id="sysio::producer_plugin_impl::get_watermark" name="sysio::producer_plugin_impl::get_watermark">
+<area shape="rect" id="Node000001" title=" " alt="" coords="1136,75,1287,115"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1producer__plugin__impl.html#a9368777de44180b2070838ff18f2fb36" title=" " alt="" coords="937,34,1088,90"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1120,82,1088,77,1089,72,1121,77"/>
+<area shape="rect" id="Node000008" href="$classsysio_1_1producer__plugin__impl.html#a7db63178eda240d671fc6ae4e46bf01e" title=" " alt="" coords="520,99,671,139"/>
+<area shape="poly" id="edge9_Node000001_Node000008" title=" " alt="" coords="1121,103,1088,104,672,119,672,114,1088,99,1121,97"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1producer__plugin__impl.html#a652ecc759215ca6fa58b36370cc72e43" title=" " alt="" coords="719,34,889,90"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="921,64,889,64,889,59,921,59"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1producer__plugin__impl.html#ad8895b72aaf8928b54665684ffdb9405" title=" " alt="" coords="262,71,472,111"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="704,71,473,87,472,81,703,66"/>
+<area shape="poly" id="edge7_Node000003_Node000008" title=" " alt="" coords="705,92,673,101,671,96,704,87"/>
+<area shape="rect" id="Node000005" href="$classsysio_1_1producer__plugin__impl.html#a230c88a6ed7efbc3588a043fe4915bd9" title=" " alt="" coords="14,5,205,46"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="269,69,192,49,193,44,270,64"/>
+<area shape="rect" id="Node000006" href="$classsysio_1_1producer__plugin__impl.html#a9ce89d0c80f40aeb7df69c5a49beff5a" title=" " alt="" coords="24,71,195,111"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="246,94,196,94,196,88,246,88"/>
+<area shape="rect" id="Node000007" href="$classsysio_1_1producer__plugin__impl.html#ab57089953b20f4eac5adc247b73040ec" title=" " alt="" coords="5,136,214,177"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="270,118,193,138,192,133,269,113"/>
+<area shape="poly" id="edge8_Node000008_Node000004" title=" " alt="" coords="504,111,472,107,473,101,505,105"/>
+</map>

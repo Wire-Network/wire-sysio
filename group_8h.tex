@@ -1,0 +1,124 @@
+\doxysection{libraries/fc/secp256k1/secp256k1/src/group.h File Reference}
+\hypertarget{group_8h}{}\label{group_8h}\index{libraries/fc/secp256k1/secp256k1/src/group.h@{libraries/fc/secp256k1/secp256k1/src/group.h}}
+{\ttfamily \#include "{}field.\+h"{}}\newline
+Include dependency graph for group.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=309pt]{group_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{group_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsecp256k1__ge}{secp256k1\+\_\+ge}}
+\item 
+struct \mbox{\hyperlink{structsecp256k1__gej}{secp256k1\+\_\+gej}}
+\item 
+struct \mbox{\hyperlink{structsecp256k1__ge__storage}{secp256k1\+\_\+ge\+\_\+storage}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{group_8h_adb0cb248ca6d0aabe3a82423233e6ce3}{SECP256\+K1\+\_\+\+GE\+\_\+\+CONST}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},  b,  c,  d,  e,  \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}},  g,  h,  i,  \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}},  k,  \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}},  m,  n,  o,  \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})
+\item 
+\#define \mbox{\hyperlink{group_8h_a9b939335f1394bfa95e55b3f4f8d0d58}{SECP256\+K1\+\_\+\+GE\+\_\+\+CONST\+\_\+\+INFINITY}}~\{\mbox{\hyperlink{field__10x26_8h_a8c00ba3d97ea0d9b0d461463e890de15}{SECP256\+K1\+\_\+\+FE\+\_\+\+CONST}}(0, 0, 0, 0, 0, 0, 0, 0), \mbox{\hyperlink{field__10x26_8h_a8c00ba3d97ea0d9b0d461463e890de15}{SECP256\+K1\+\_\+\+FE\+\_\+\+CONST}}(0, 0, 0, 0, 0, 0, 0, 0), 1\}
+\item 
+\#define \mbox{\hyperlink{group_8h_af46c307c9174e2aa45dbf6f32e61ed21}{SECP256\+K1\+\_\+\+GEJ\+\_\+\+CONST}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},  b,  c,  d,  e,  \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}},  g,  h,  i,  \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}},  k,  \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}},  m,  n,  o,  \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})
+\item 
+\#define \mbox{\hyperlink{group_8h_a0143422e1ce1601b00ff71c20c455ceb}{SECP256\+K1\+\_\+\+GEJ\+\_\+\+CONST\+\_\+\+INFINITY}}~\{\mbox{\hyperlink{field__10x26_8h_a8c00ba3d97ea0d9b0d461463e890de15}{SECP256\+K1\+\_\+\+FE\+\_\+\+CONST}}(0, 0, 0, 0, 0, 0, 0, 0), \mbox{\hyperlink{field__10x26_8h_a8c00ba3d97ea0d9b0d461463e890de15}{SECP256\+K1\+\_\+\+FE\+\_\+\+CONST}}(0, 0, 0, 0, 0, 0, 0, 0), \mbox{\hyperlink{field__10x26_8h_a8c00ba3d97ea0d9b0d461463e890de15}{SECP256\+K1\+\_\+\+FE\+\_\+\+CONST}}(0, 0, 0, 0, 0, 0, 0, 0), 1\}
+\item 
+\#define \mbox{\hyperlink{group_8h_a01dc428f2a47a18098539b5c620834f1}{SECP256\+K1\+\_\+\+GE\+\_\+\+STORAGE\+\_\+\+CONST}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},  b,  c,  d,  e,  \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}},  g,  h,  i,  \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}},  k,  \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}},  m,  n,  o,  \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})
+\item 
+\#define \mbox{\hyperlink{group_8h_adefefa4ed4193a466784391616bc2f9f}{SECP256\+K1\+\_\+\+GE\+\_\+\+STORAGE\+\_\+\+CONST\+\_\+\+GET}}(t)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{group_8h_adb0cb248ca6d0aabe3a82423233e6ce3}\index{group.h@{group.h}!SECP256K1\_GE\_CONST@{SECP256K1\_GE\_CONST}}
+\index{SECP256K1\_GE\_CONST@{SECP256K1\_GE\_CONST}!group.h@{group.h}}
+\doxysubsubsection{\texorpdfstring{SECP256K1\_GE\_CONST}{SECP256K1\_GE\_CONST}}
+{\footnotesize\ttfamily \label{group_8h_adb0cb248ca6d0aabe3a82423233e6ce3} 
+\#define SECP256\+K1\+\_\+\+GE\+\_\+\+CONST(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}}{, }\item[{}]{b}{, }\item[{}]{c}{, }\item[{}]{d}{, }\item[{}]{e}{, }\item[{}]{\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}}{, }\item[{}]{g}{, }\item[{}]{h}{, }\item[{}]{i}{, }\item[{}]{\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}}{, }\item[{}]{k}{, }\item[{}]{\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}}{, }\item[{}]{m}{, }\item[{}]{n}{, }\item[{}]{o}{, }\item[{}]{\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\{\mbox{\hyperlink{field__10x26_8h_a8c00ba3d97ea0d9b0d461463e890de15}{SECP256K1\_FE\_CONST}}((\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}),(b),(c),(d),(e),(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}),(g),(h)),\ \mbox{\hyperlink{field__10x26_8h_a8c00ba3d97ea0d9b0d461463e890de15}{SECP256K1\_FE\_CONST}}((i),(\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}),(k),(\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}),(m),(n),(o),(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})),\ 0\}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{group_8h_source_l00022}{22}} of file \mbox{\hyperlink{group_8h_source}{group.\+h}}.
+
+\Hypertarget{group_8h_a9b939335f1394bfa95e55b3f4f8d0d58}\index{group.h@{group.h}!SECP256K1\_GE\_CONST\_INFINITY@{SECP256K1\_GE\_CONST\_INFINITY}}
+\index{SECP256K1\_GE\_CONST\_INFINITY@{SECP256K1\_GE\_CONST\_INFINITY}!group.h@{group.h}}
+\doxysubsubsection{\texorpdfstring{SECP256K1\_GE\_CONST\_INFINITY}{SECP256K1\_GE\_CONST\_INFINITY}}
+{\footnotesize\ttfamily \label{group_8h_a9b939335f1394bfa95e55b3f4f8d0d58} 
+\#define SECP256\+K1\+\_\+\+GE\+\_\+\+CONST\+\_\+\+INFINITY~\{\mbox{\hyperlink{field__10x26_8h_a8c00ba3d97ea0d9b0d461463e890de15}{SECP256\+K1\+\_\+\+FE\+\_\+\+CONST}}(0, 0, 0, 0, 0, 0, 0, 0), \mbox{\hyperlink{field__10x26_8h_a8c00ba3d97ea0d9b0d461463e890de15}{SECP256\+K1\+\_\+\+FE\+\_\+\+CONST}}(0, 0, 0, 0, 0, 0, 0, 0), 1\}}
+
+
+
+Definition at line \mbox{\hyperlink{group_8h_source_l00023}{23}} of file \mbox{\hyperlink{group_8h_source}{group.\+h}}.
+
+\Hypertarget{group_8h_a01dc428f2a47a18098539b5c620834f1}\index{group.h@{group.h}!SECP256K1\_GE\_STORAGE\_CONST@{SECP256K1\_GE\_STORAGE\_CONST}}
+\index{SECP256K1\_GE\_STORAGE\_CONST@{SECP256K1\_GE\_STORAGE\_CONST}!group.h@{group.h}}
+\doxysubsubsection{\texorpdfstring{SECP256K1\_GE\_STORAGE\_CONST}{SECP256K1\_GE\_STORAGE\_CONST}}
+{\footnotesize\ttfamily \label{group_8h_a01dc428f2a47a18098539b5c620834f1} 
+\#define SECP256\+K1\+\_\+\+GE\+\_\+\+STORAGE\+\_\+\+CONST(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}}{, }\item[{}]{b}{, }\item[{}]{c}{, }\item[{}]{d}{, }\item[{}]{e}{, }\item[{}]{\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}}{, }\item[{}]{g}{, }\item[{}]{h}{, }\item[{}]{i}{, }\item[{}]{\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}}{, }\item[{}]{k}{, }\item[{}]{\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}}{, }\item[{}]{m}{, }\item[{}]{n}{, }\item[{}]{o}{, }\item[{}]{\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\{\mbox{\hyperlink{field__10x26_8h_ae6927483c41044bd04e5f8efb42f53ba}{SECP256K1\_FE\_STORAGE\_CONST}}((\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}),(b),(c),(d),(e),(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}),(g),(h)),\ \mbox{\hyperlink{field__10x26_8h_ae6927483c41044bd04e5f8efb42f53ba}{SECP256K1\_FE\_STORAGE\_CONST}}((i),(\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}),(k),(\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}),(m),(n),(o),(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}))\}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{group_8h_source_l00043}{43}} of file \mbox{\hyperlink{group_8h_source}{group.\+h}}.
+
+\Hypertarget{group_8h_adefefa4ed4193a466784391616bc2f9f}\index{group.h@{group.h}!SECP256K1\_GE\_STORAGE\_CONST\_GET@{SECP256K1\_GE\_STORAGE\_CONST\_GET}}
+\index{SECP256K1\_GE\_STORAGE\_CONST\_GET@{SECP256K1\_GE\_STORAGE\_CONST\_GET}!group.h@{group.h}}
+\doxysubsubsection{\texorpdfstring{SECP256K1\_GE\_STORAGE\_CONST\_GET}{SECP256K1\_GE\_STORAGE\_CONST\_GET}}
+{\footnotesize\ttfamily \label{group_8h_adefefa4ed4193a466784391616bc2f9f} 
+\#define SECP256\+K1\+\_\+\+GE\+\_\+\+STORAGE\+\_\+\+CONST\+\_\+\+GET(\begin{DoxyParamCaption}\item[{}]{t}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{field__10x26_8h_a07b67ff641d5db9df0691b14cdc29584}{SECP256K1\_FE\_STORAGE\_CONST\_GET}}(t.x),\ \mbox{\hyperlink{field__10x26_8h_a07b67ff641d5db9df0691b14cdc29584}{SECP256K1\_FE\_STORAGE\_CONST\_GET}}(t.y)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{group_8h_source_l00045}{45}} of file \mbox{\hyperlink{group_8h_source}{group.\+h}}.
+
+\Hypertarget{group_8h_af46c307c9174e2aa45dbf6f32e61ed21}\index{group.h@{group.h}!SECP256K1\_GEJ\_CONST@{SECP256K1\_GEJ\_CONST}}
+\index{SECP256K1\_GEJ\_CONST@{SECP256K1\_GEJ\_CONST}!group.h@{group.h}}
+\doxysubsubsection{\texorpdfstring{SECP256K1\_GEJ\_CONST}{SECP256K1\_GEJ\_CONST}}
+{\footnotesize\ttfamily \label{group_8h_af46c307c9174e2aa45dbf6f32e61ed21} 
+\#define SECP256\+K1\+\_\+\+GEJ\+\_\+\+CONST(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}}{, }\item[{}]{b}{, }\item[{}]{c}{, }\item[{}]{d}{, }\item[{}]{e}{, }\item[{}]{\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}}{, }\item[{}]{g}{, }\item[{}]{h}{, }\item[{}]{i}{, }\item[{}]{\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}}{, }\item[{}]{k}{, }\item[{}]{\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}}{, }\item[{}]{m}{, }\item[{}]{n}{, }\item[{}]{o}{, }\item[{}]{\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\{\mbox{\hyperlink{field__10x26_8h_a8c00ba3d97ea0d9b0d461463e890de15}{SECP256K1\_FE\_CONST}}((\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}),(b),(c),(d),(e),(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}),(g),(h)),\ \mbox{\hyperlink{field__10x26_8h_a8c00ba3d97ea0d9b0d461463e890de15}{SECP256K1\_FE\_CONST}}((i),(\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}),(k),(\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}),(m),(n),(o),(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})),\ \mbox{\hyperlink{field__10x26_8h_a8c00ba3d97ea0d9b0d461463e890de15}{SECP256K1\_FE\_CONST}}(0,\ 0,\ 0,\ 0,\ 0,\ 0,\ 0,\ 1),\ 0\}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{group_8h_source_l00035}{35}} of file \mbox{\hyperlink{group_8h_source}{group.\+h}}.
+
+\Hypertarget{group_8h_a0143422e1ce1601b00ff71c20c455ceb}\index{group.h@{group.h}!SECP256K1\_GEJ\_CONST\_INFINITY@{SECP256K1\_GEJ\_CONST\_INFINITY}}
+\index{SECP256K1\_GEJ\_CONST\_INFINITY@{SECP256K1\_GEJ\_CONST\_INFINITY}!group.h@{group.h}}
+\doxysubsubsection{\texorpdfstring{SECP256K1\_GEJ\_CONST\_INFINITY}{SECP256K1\_GEJ\_CONST\_INFINITY}}
+{\footnotesize\ttfamily \label{group_8h_a0143422e1ce1601b00ff71c20c455ceb} 
+\#define SECP256\+K1\+\_\+\+GEJ\+\_\+\+CONST\+\_\+\+INFINITY~\{\mbox{\hyperlink{field__10x26_8h_a8c00ba3d97ea0d9b0d461463e890de15}{SECP256\+K1\+\_\+\+FE\+\_\+\+CONST}}(0, 0, 0, 0, 0, 0, 0, 0), \mbox{\hyperlink{field__10x26_8h_a8c00ba3d97ea0d9b0d461463e890de15}{SECP256\+K1\+\_\+\+FE\+\_\+\+CONST}}(0, 0, 0, 0, 0, 0, 0, 0), \mbox{\hyperlink{field__10x26_8h_a8c00ba3d97ea0d9b0d461463e890de15}{SECP256\+K1\+\_\+\+FE\+\_\+\+CONST}}(0, 0, 0, 0, 0, 0, 0, 0), 1\}}
+
+
+
+Definition at line \mbox{\hyperlink{group_8h_source_l00036}{36}} of file \mbox{\hyperlink{group_8h_source}{group.\+h}}.
+

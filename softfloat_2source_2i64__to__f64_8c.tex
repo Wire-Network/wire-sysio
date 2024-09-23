@@ -1,0 +1,64 @@
+\doxysection{libraries/softfloat/source/i64\+\_\+to\+\_\+f64.c File Reference}
+\hypertarget{softfloat_2source_2i64__to__f64_8c}{}\label{softfloat_2source_2i64__to__f64_8c}\index{libraries/softfloat/source/i64\_to\_f64.c@{libraries/softfloat/source/i64\_to\_f64.c}}
+{\ttfamily \#include $<$stdbool.\+h$>$}\newline
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include "{}platform.\+h"{}}\newline
+{\ttfamily \#include "{}internals.\+h"{}}\newline
+{\ttfamily \#include "{}softfloat.\+h"{}}\newline
+Include dependency graph for i64\+\_\+to\+\_\+f64.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{softfloat_2source_2i64__to__f64_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structfloat64__t}{float64\+\_\+t}} \mbox{\hyperlink{softfloat_2source_2i64__to__f64_8c_a1f2a6a780ec8f54f4b9c6c15cd170880}{i64\+\_\+to\+\_\+f64}} (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{softfloat_2source_2i64__to__f64_8c_a1f2a6a780ec8f54f4b9c6c15cd170880}\index{i64\_to\_f64.c@{i64\_to\_f64.c}!i64\_to\_f64@{i64\_to\_f64}}
+\index{i64\_to\_f64@{i64\_to\_f64}!i64\_to\_f64.c@{i64\_to\_f64.c}}
+\doxysubsubsection{\texorpdfstring{i64\_to\_f64()}{i64\_to\_f64()}}
+{\footnotesize\ttfamily \label{softfloat_2source_2i64__to__f64_8c_a1f2a6a780ec8f54f4b9c6c15cd170880} 
+\mbox{\hyperlink{structfloat64__t}{float64\+\_\+t}} i64\+\_\+to\+\_\+f64 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}}]{a}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2i64__to__f64_8c_source_l00043}{43}} of file \mbox{\hyperlink{softfloat_2source_2i64__to__f64_8c_source}{i64\+\_\+to\+\_\+f64.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00044\ \{}
+\DoxyCodeLine{00045\ \ \ \ \ \textcolor{keywordtype}{bool}\ sign;}
+\DoxyCodeLine{00046\ \ \ \ \ \textcolor{keyword}{union\ }\mbox{\hyperlink{unionui64__f64}{ui64\_f64}}\ uZ;}
+\DoxyCodeLine{00047\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\_fast64\_t}}\ absA;}
+\DoxyCodeLine{00048\ }
+\DoxyCodeLine{00049\ \ \ \ \ sign\ =\ (\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ <\ 0);}
+\DoxyCodeLine{00050\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ !\ (\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ \&\ \mbox{\hyperlink{stdint_8h_a8da5373e041921aa34c2b6172ac3babc}{UINT64\_C}}(\ 0x7FFFFFFFFFFFFFFF\ ))\ )\ \{}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ uZ.ui\ =\ sign\ ?\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a9208cf27124750e308f3b03bacbba2c6}{packToF64UI}}(\ 1,\ 0x43E,\ 0\ )\ :\ 0;}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ uZ.f;}
+\DoxyCodeLine{00053\ \ \ \ \ \}}
+\DoxyCodeLine{00054\ \ \ \ \ absA\ =\ sign\ ?\ -\/(\mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\_fast64\_t}})\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ :\ (\mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\_fast64\_t}})\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}};}
+\DoxyCodeLine{00055\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a723e316685c33aa36bf857fa14da7d9e}{softfloat\_normRoundPackToF64}}(\ sign,\ 0x43C,\ absA\ );}
+\DoxyCodeLine{00056\ }
+\DoxyCodeLine{00057\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{softfloat_2source_2i64__to__f64_8c_a1f2a6a780ec8f54f4b9c6c15cd170880_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=321pt]{softfloat_2source_2i64__to__f64_8c_a1f2a6a780ec8f54f4b9c6c15cd170880_icgraph}
+\end{center}
+\end{figure}

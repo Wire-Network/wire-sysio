@@ -1,0 +1,354 @@
+\doxysection{sysio\+::trace\+\_\+api\+::test\+\_\+common Namespace Reference}
+\hypertarget{namespacesysio_1_1trace__api_1_1test__common}{}\label{namespacesysio_1_1trace__api_1_1test__common}\index{sysio::trace\_api::test\_common@{sysio::trace\_api::test\_common}}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1sha256}{fc\+::sha256}} \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_aa8cefa9541d16047b24ce70e8228c9cf}{operator"{}"{}\+\_\+h}} (const char \texorpdfstring{$\ast$}{*}input, std\+::size\+\_\+t)
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1name}{chain\+::name}} \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a46ce1598ffa6f9bf7a20c1804caf5b57}{operator"{}"{}\+\_\+n}} (const char \texorpdfstring{$\ast$}{*}input, std\+::size\+\_\+t)
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1asset}{chain\+::asset}} \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a344fa8330c585a912b7b6b0c45947f99}{operator"{}"{}\+\_\+t}} (const char \texorpdfstring{$\ast$}{*}input, std\+::size\+\_\+t)
+\item 
+auto \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a16234350cb54ef5623702dfb3a0d9624}{get\+\_\+private\+\_\+key}} (\mbox{\hyperlink{structsysio_1_1chain_1_1name}{chain\+::name}} keyname, std\+::string role="{}owner"{})
+\item 
+auto \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a9d8a6aa4b690e8cdddca915054a148a8}{get\+\_\+public\+\_\+key}} (\mbox{\hyperlink{structsysio_1_1chain_1_1name}{chain\+::name}} keyname, std\+::string role="{}owner"{})
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_ac6f5a1f1e061f000983f5d5f3ac25dfa}{chain\+::bytes}} \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_aab47dbcf73e5456e7109c9f0d25dd035}{make\+\_\+transfer\+\_\+data}} (\mbox{\hyperlink{structsysio_1_1chain_1_1name}{chain\+::name}} from, \mbox{\hyperlink{structsysio_1_1chain_1_1name}{chain\+::name}} to, \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{chain\+::asset}} quantity, std\+::string \&\&memo)
+\item 
+auto \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a7ad028261e9ab9a38fd557c8f7628615}{make\+\_\+block\+\_\+state}} (\mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{chain\+::block\+\_\+id\+\_\+type}} previous, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} height, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{yubihsm__pkcs11_8c_a0209f1d92740f251d8686fd2d2a989e1}{slot}}, \mbox{\hyperlink{structsysio_1_1chain_1_1name}{chain\+::name}} producer, std\+::vector$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1packed__transaction}{chain\+::packed\+\_\+transaction}} $>$ trxs)
+\item 
+void \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a485e23904f45344e9340a77a4289fefd}{to\+\_\+kv\+\_\+helper}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&v, std\+::function$<$ void(const std\+::string \&, const std\+::string \&)$>$ \&\&append)
+\item 
+auto \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a4684ce5b6bc8f5dd33e6a850719bfd4e}{to\+\_\+kv}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&v)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Utilities that make writing tests easier 
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacesysio_1_1trace__api_1_1test__common_a16234350cb54ef5623702dfb3a0d9624}\index{sysio::trace\_api::test\_common@{sysio::trace\_api::test\_common}!get\_private\_key@{get\_private\_key}}
+\index{get\_private\_key@{get\_private\_key}!sysio::trace\_api::test\_common@{sysio::trace\_api::test\_common}}
+\doxysubsubsection{\texorpdfstring{get\_private\_key()}{get\_private\_key()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1trace__api_1_1test__common_a16234350cb54ef5623702dfb3a0d9624} 
+auto sysio\+::trace\+\_\+api\+::test\+\_\+common\+::get\+\_\+private\+\_\+key (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1name}{chain\+::name}}}]{keyname}{, }\item[{std\+::string}]{role}{ = {\ttfamily "{}owner"{}}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__common_8hpp_source_l00034}{34}} of file \mbox{\hyperlink{test__common_8hpp_source}{test\+\_\+common.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ secret\ =\ \mbox{\hyperlink{classfc_1_1sha256_a474784de7d6213b855abd7e952df5e36}{fc::sha256::hash}}(\ keyname.\mbox{\hyperlink{structsysio_1_1chain_1_1name_ad1e96c77890d21207fc5cda532244019}{to\_string}}()\ +\ role\ );}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ chain::private\_key\_type::regenerate<fc::ecc::private\_key\_shim>(\ secret\ );}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1trace__api_1_1test__common_a16234350cb54ef5623702dfb3a0d9624_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1trace__api_1_1test__common_a16234350cb54ef5623702dfb3a0d9624_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacesysio_1_1trace__api_1_1test__common_a9d8a6aa4b690e8cdddca915054a148a8}\index{sysio::trace\_api::test\_common@{sysio::trace\_api::test\_common}!get\_public\_key@{get\_public\_key}}
+\index{get\_public\_key@{get\_public\_key}!sysio::trace\_api::test\_common@{sysio::trace\_api::test\_common}}
+\doxysubsubsection{\texorpdfstring{get\_public\_key()}{get\_public\_key()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1trace__api_1_1test__common_a9d8a6aa4b690e8cdddca915054a148a8} 
+auto sysio\+::trace\+\_\+api\+::test\+\_\+common\+::get\+\_\+public\+\_\+key (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1name}{chain\+::name}}}]{keyname}{, }\item[{std\+::string}]{role}{ = {\ttfamily "{}owner"{}}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__common_8hpp_source_l00039}{39}} of file \mbox{\hyperlink{test__common_8hpp_source}{test\+\_\+common.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a16234350cb54ef5623702dfb3a0d9624}{get\_private\_key}}(\ keyname,\ role\ ).get\_public\_key();}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1trace__api_1_1test__common_a9d8a6aa4b690e8cdddca915054a148a8_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1trace__api_1_1test__common_a9d8a6aa4b690e8cdddca915054a148a8_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacesysio_1_1trace__api_1_1test__common_a7ad028261e9ab9a38fd557c8f7628615}\index{sysio::trace\_api::test\_common@{sysio::trace\_api::test\_common}!make\_block\_state@{make\_block\_state}}
+\index{make\_block\_state@{make\_block\_state}!sysio::trace\_api::test\_common@{sysio::trace\_api::test\_common}}
+\doxysubsubsection{\texorpdfstring{make\_block\_state()}{make\_block\_state()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1trace__api_1_1test__common_a7ad028261e9ab9a38fd557c8f7628615} 
+auto sysio\+::trace\+\_\+api\+::test\+\_\+common\+::make\+\_\+block\+\_\+state (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{chain\+::block\+\_\+id\+\_\+type}}}]{previous}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{height}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{slot}{, }\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1name}{chain\+::name}}}]{producer}{, }\item[{std\+::vector$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1packed__transaction}{chain\+::packed\+\_\+transaction}} $>$}]{trxs}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__common_8hpp_source_l00055}{55}} of file \mbox{\hyperlink{test__common_8hpp_source}{test\+\_\+common.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_aa10ee348c57604b615bc8570f6685102}{chain::signed\_block\_ptr}}\ block\ =\ std::make\_shared<chain::signed\_block>();}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\&\ trx\ :\ trxs\ )\ \{}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ \ \ \ block-\/>transactions.emplace\_back(\ trx\ );}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \ block-\/>producer\ =\ producer;}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ block-\/>timestamp\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{chain::block\_timestamp\_type}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a0209f1d92740f251d8686fd2d2a989e1}{slot}});}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ make\ sure\ previous\ contains\ correct\ block\ \#\ so\ block\_header::block\_num()\ returns\ correct\ value}}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ previous\ ==\ \mbox{\hyperlink{classfc_1_1sha256}{chain::block\_id\_type}}()\ )\ \{}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ previous.\_hash[0]\ \&=\ 0xffffffff00000000;}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ \ \ previous.\_hash[0]\ +=\ \mbox{\hyperlink{namespacefc_afb668c55fd6ee73e1fcd67e77d8f6009}{fc::endian\_reverse\_u32}}(height\ -\/\ 1);}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ block-\/>previous\ =\ previous;}
+\DoxyCodeLine{00069\ }
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ priv\_key\ =\ get\_private\_key(\ block-\/>producer,\ \textcolor{stringliteral}{"{}active"{}}\ );}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ pub\_key\ =\ get\_public\_key(\ block-\/>producer,\ \textcolor{stringliteral}{"{}active"{}}\ );}
+\DoxyCodeLine{00072\ }
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ prev\ =\ std::make\_shared<chain::block\_state>();}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ header\_bmroot\ =\ chain::digest\_type::hash(\ std::make\_pair(\ block-\/>digest(),\ prev-\/>blockroot\_merkle.get\_root()));}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ sig\_digest\ =\ chain::digest\_type::hash(\ std::make\_pair(\ header\_bmroot,\ prev-\/>pending\_schedule.schedule\_hash\ ));}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ block-\/>producer\_signature\ =\ priv\_key.sign(\ sig\_digest\ );}
+\DoxyCodeLine{00077\ }
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ std::vector<chain::private\_key\_type>\ signing\_keys;}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ signing\_keys.emplace\_back(\ std::move(\ priv\_key\ ));}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ signer\ =\ [\&](\ \mbox{\hyperlink{classfc_1_1sha256}{chain::digest\_type}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ )\ \{}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \ \ \ std::vector<chain::signature\_type>\ result;}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \ \ \ result.reserve(\ signing\_keys.size());}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ k:\ signing\_keys\ )}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ result.emplace\_back(\ k.sign(\ d\ ));}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \ chain::pending\_block\_header\_state\ pbhs;}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ pbhs.producer\ =\ block-\/>producer;}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ pbhs.timestamp\ =\ block-\/>timestamp;}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ chain::producer\_authority\_schedule\ schedule\ =\ \{0,\ \{chain::producer\_authority\{block-\/>producer,}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ chain::block\_signing\_authority\_v0\{1,\ \{\{pub\_key,\ 1\}\}\}\}\}\};}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ pbhs.active\_schedule\ =\ schedule;}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ pbhs.valid\_block\_signing\_authority\ =\ chain::block\_signing\_authority\_v0\{1,\ \{\{pub\_key,\ 1\}\}\};}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ bsp\ =\ std::make\_shared<chain::block\_state>(}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \ \ \ std::move(\ pbhs\ ),}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \ \ \ std::move(\ block\ ),}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \ \ \ std::vector<chain::transaction\_metadata\_ptr>(),}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \ \ \ chain::protocol\_feature\_set(),}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ \ \ \ [](\ chain::block\_timestamp\_type\ timestamp,}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ fc::flat\_set<chain::digest\_type>\&\ cur\_features,}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::vector<chain::digest\_type>\&\ new\_features\ )\ \{\},}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \ \ \ signer}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ bsp-\/>block\_num\ =\ height;}
+\DoxyCodeLine{00105\ }
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ bsp;}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1trace__api_1_1test__common_a7ad028261e9ab9a38fd557c8f7628615_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1trace__api_1_1test__common_a7ad028261e9ab9a38fd557c8f7628615_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacesysio_1_1trace__api_1_1test__common_aab47dbcf73e5456e7109c9f0d25dd035}\index{sysio::trace\_api::test\_common@{sysio::trace\_api::test\_common}!make\_transfer\_data@{make\_transfer\_data}}
+\index{make\_transfer\_data@{make\_transfer\_data}!sysio::trace\_api::test\_common@{sysio::trace\_api::test\_common}}
+\doxysubsubsection{\texorpdfstring{make\_transfer\_data()}{make\_transfer\_data()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1trace__api_1_1test__common_aab47dbcf73e5456e7109c9f0d25dd035} 
+\mbox{\hyperlink{namespacesysio_1_1chain_ac6f5a1f1e061f000983f5d5f3ac25dfa}{chain\+::bytes}} sysio\+::trace\+\_\+api\+::test\+\_\+common\+::make\+\_\+transfer\+\_\+data (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1name}{chain\+::name}}}]{from}{, }\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1name}{chain\+::name}}}]{to}{, }\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1asset}{chain\+::asset}}}]{quantity}{, }\item[{std\+::string \&\&}]{memo}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__common_8hpp_source_l00043}{43}} of file \mbox{\hyperlink{test__common_8hpp_source}{test\+\_\+common.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1datastream}{fc::datastream<size\_t>}}\ ps;}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(ps,\ from,\ to,\ quantity,\ memo);}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1vector}{chain::bytes}}\ result(\ ps.tellp());}
+\DoxyCodeLine{00047\ }
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ result.size())\ \{}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1datastream}{fc::datastream<char\ *>}}\ ds(\ result.data(),\ \textcolor{keywordtype}{size\_t}(\ result.size()));}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(ds,\ from,\ to,\ quantity,\ memo);}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=340pt]{namespacesysio_1_1trace__api_1_1test__common_aab47dbcf73e5456e7109c9f0d25dd035_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1trace__api_1_1test__common_aab47dbcf73e5456e7109c9f0d25dd035_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacesysio_1_1trace__api_1_1test__common_aa8cefa9541d16047b24ce70e8228c9cf}\index{sysio::trace\_api::test\_common@{sysio::trace\_api::test\_common}!operator"{}"{}\_h@{operator""""\_h}}
+\index{operator"{}"{}\_h@{operator""""\_h}!sysio::trace\_api::test\_common@{sysio::trace\_api::test\_common}}
+\doxysubsubsection{\texorpdfstring{operator""""\_h()}{operator""\_h()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1trace__api_1_1test__common_aa8cefa9541d16047b24ce70e8228c9cf} 
+\mbox{\hyperlink{classfc_1_1sha256}{fc\+::sha256}} sysio\+::trace\+\_\+api\+::test\+\_\+common\+::operator"{}"{}\+\_\+h (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{input}{, }\item[{std\+::size\+\_\+t}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__common_8hpp_source_l00022}{22}} of file \mbox{\hyperlink{test__common_8hpp_source}{test\+\_\+common.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1sha256}{fc::sha256}}(input);}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacesysio_1_1trace__api_1_1test__common_a46ce1598ffa6f9bf7a20c1804caf5b57}\index{sysio::trace\_api::test\_common@{sysio::trace\_api::test\_common}!operator"{}"{}\_n@{operator""""\_n}}
+\index{operator"{}"{}\_n@{operator""""\_n}!sysio::trace\_api::test\_common@{sysio::trace\_api::test\_common}}
+\doxysubsubsection{\texorpdfstring{operator""""\_n()}{operator""\_n()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1trace__api_1_1test__common_a46ce1598ffa6f9bf7a20c1804caf5b57} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1name}{chain\+::name}} sysio\+::trace\+\_\+api\+::test\+\_\+common\+::operator"{}"{}\+\_\+n (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{input}{, }\item[{std\+::size\+\_\+t}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__common_8hpp_source_l00026}{26}} of file \mbox{\hyperlink{test__common_8hpp_source}{test\+\_\+common.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{chain::name}}(input);}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacesysio_1_1trace__api_1_1test__common_a344fa8330c585a912b7b6b0c45947f99}\index{sysio::trace\_api::test\_common@{sysio::trace\_api::test\_common}!operator"{}"{}\_t@{operator""""\_t}}
+\index{operator"{}"{}\_t@{operator""""\_t}!sysio::trace\_api::test\_common@{sysio::trace\_api::test\_common}}
+\doxysubsubsection{\texorpdfstring{operator""""\_t()}{operator""\_t()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1trace__api_1_1test__common_a344fa8330c585a912b7b6b0c45947f99} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1asset}{chain\+::asset}} sysio\+::trace\+\_\+api\+::test\+\_\+common\+::operator"{}"{}\+\_\+t (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{input}{, }\item[{std\+::size\+\_\+t}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__common_8hpp_source_l00030}{30}} of file \mbox{\hyperlink{test__common_8hpp_source}{test\+\_\+common.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ chain::asset::from\_string(input);}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1trace__api_1_1test__common_a344fa8330c585a912b7b6b0c45947f99_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacesysio_1_1trace__api_1_1test__common_a4684ce5b6bc8f5dd33e6a850719bfd4e}\index{sysio::trace\_api::test\_common@{sysio::trace\_api::test\_common}!to\_kv@{to\_kv}}
+\index{to\_kv@{to\_kv}!sysio::trace\_api::test\_common@{sysio::trace\_api::test\_common}}
+\doxysubsubsection{\texorpdfstring{to\_kv()}{to\_kv()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1trace__api_1_1test__common_a4684ce5b6bc8f5dd33e6a850719bfd4e} 
+auto sysio\+::trace\+\_\+api\+::test\+\_\+common\+::to\+\_\+kv (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&}]{v}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__common_8hpp_source_l00132}{132}} of file \mbox{\hyperlink{test__common_8hpp_source}{test\+\_\+common.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \ std::map<std::string,\ std::string>\ result;}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a485e23904f45344e9340a77a4289fefd}{to\_kv\_helper}}(v,\ [\&result](\textcolor{keyword}{const}\ std::string\&\ k,\ \textcolor{keyword}{const}\ std::string\&\ v)\{}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \ \ \ \ result.emplace(k,\ v);}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=344pt]{namespacesysio_1_1trace__api_1_1test__common_a4684ce5b6bc8f5dd33e6a850719bfd4e_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{namespacesysio_1_1trace__api_1_1test__common_a4684ce5b6bc8f5dd33e6a850719bfd4e_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacesysio_1_1trace__api_1_1test__common_a485e23904f45344e9340a77a4289fefd}\index{sysio::trace\_api::test\_common@{sysio::trace\_api::test\_common}!to\_kv\_helper@{to\_kv\_helper}}
+\index{to\_kv\_helper@{to\_kv\_helper}!sysio::trace\_api::test\_common@{sysio::trace\_api::test\_common}}
+\doxysubsubsection{\texorpdfstring{to\_kv\_helper()}{to\_kv\_helper()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1trace__api_1_1test__common_a485e23904f45344e9340a77a4289fefd} 
+void sysio\+::trace\+\_\+api\+::test\+\_\+common\+::to\+\_\+kv\+\_\+helper (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&}]{v}{, }\item[{std\+::function$<$ void(const std\+::string \&, const std\+::string \&)$>$ \&\&}]{append}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__common_8hpp_source_l00109}{109}} of file \mbox{\hyperlink{test__common_8hpp_source}{test\+\_\+common.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (v.is\_object()\ )\ \{}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ obj\ =\ v.get\_object();}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ std::string\ sep\ =\ \textcolor{stringliteral}{"{}."{}};}
+\DoxyCodeLine{00113\ }
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ entry:\ obj)\ \{}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a485e23904f45344e9340a77a4289fefd}{to\_kv\_helper}}(\ entry.value(),\ [\&append,\ \&entry](\textcolor{keyword}{const}\ std::string\&\ \mbox{\hyperlink{classfc_1_1path}{path}},\ \textcolor{keyword}{const}\ std::string\&\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})\{}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ append(sep\ +\ entry.key()\ +\ path,\ value);}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (v.is\_array())\ \{}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ arr\ =\ v.get\_array();}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ idx\ =\ 0;\ idx\ <\ arr.size();\ idx++)\ \{}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ entry\ =\ arr.at(idx);}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ to\_kv\_helper(\ entry,\ [\&append,\ idx](\textcolor{keyword}{const}\ std::string\&\ \mbox{\hyperlink{classfc_1_1path}{path}},\ \textcolor{keyword}{const}\ std::string\&\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})\{}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ append(std::string(\textcolor{stringliteral}{"{}["{}})\ +\ std::to\_string(idx)\ +\ std::string(\textcolor{stringliteral}{"{}]"{}})\ +\ \mbox{\hyperlink{classfc_1_1path}{path}},\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}});}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.is\_null())\ \{}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \ \ \ \ append(\textcolor{stringliteral}{"{}"{}},\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.as\_string());}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=200pt]{namespacesysio_1_1trace__api_1_1test__common_a485e23904f45344e9340a77a4289fefd_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1trace__api_1_1test__common_a485e23904f45344e9340a77a4289fefd_icgraph}
+\end{center}
+\end{figure}

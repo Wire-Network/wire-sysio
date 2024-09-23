@@ -1,0 +1,9 @@
+<map id="sysio::chain::legacy::snapshot_block_header_state_v2::schedule_info" name="sysio::chain::legacy::snapshot_block_header_state_v2::schedule_info">
+<area shape="rect" id="Node000001" title=" " alt="" coords="23,213,190,268"/>
+<area shape="rect" id="Node000002" href="$classfc_1_1sha256.html" title=" " alt="" coords="5,116,88,142"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="54,157,65,187,81,211,77,214,60,190,49,159"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1chain_1_1legacy_1_1producer__schedule__type.html" title=" " alt="" coords="112,109,282,150"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="176,164,155,190,134,214,130,211,151,187,172,160"/>
+<area shape="rect" id="Node000004" href="$classfc_1_1vector.html" title=" " alt="" coords="99,5,295,46"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="200,62,200,109,194,109,194,62"/>
+</map>

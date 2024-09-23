@@ -1,0 +1,128 @@
+\doxysection{catch\+\_\+config.\+hpp}
+\hypertarget{catch__config_8hpp_source}{}\label{catch__config_8hpp_source}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_config.hpp@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_config.hpp}}
+\mbox{\hyperlink{catch__config_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00002}00002\ \textcolor{comment}{\ *\ \ Created\ by\ Phil\ on\ 08/11/2010.}}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00003}00003\ \textcolor{comment}{\ *\ \ Copyright\ 2010\ Two\ Blue\ Cubes\ Ltd.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00004}00004\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00005}00005\ \textcolor{comment}{\ *\ \ Distributed\ under\ the\ Boost\ Software\ License,\ Version\ 1.0.\ (See\ accompanying}}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00006}00006\ \textcolor{comment}{\ *\ \ file\ LICENSE\_1\_0.txt\ or\ copy\ at\ http://www.boost.org/LICENSE\_1\_0.txt)}}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00007}00007\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00008}00008\ \textcolor{preprocessor}{\#ifndef\ TWOBLUECUBES\_CATCH\_CONFIG\_HPP\_INCLUDED}}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00009}00009\ \textcolor{preprocessor}{\#define\ TWOBLUECUBES\_CATCH\_CONFIG\_HPP\_INCLUDED}}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00011}00011\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__test__spec__parser_8h}{catch\_test\_spec\_parser.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00012}00012\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__interfaces__config_8h}{catch\_interfaces\_config.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00014}00014\ \textcolor{comment}{//\ Libstdc++\ doesn't\ like\ incomplete\ classes\ for\ unique\_ptr}}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00015}00015\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__stream_8h}{catch\_stream.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00017}00017\ \textcolor{preprocessor}{\#include\ <memory>}}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00018}00018\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00019}00019\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00021}00021\ \textcolor{preprocessor}{\#ifndef\ CATCH\_CONFIG\_CONSOLE\_WIDTH}}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00022}\mbox{\hyperlink{catch__config_8hpp_a6776b7d6e3810ce1414fe9bd8c305e5b}{00022}}\ \textcolor{preprocessor}{\#define\ CATCH\_CONFIG\_CONSOLE\_WIDTH\ 80}}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00023}00023\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00025}00025\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00027}00027\ \ \ \ \ \textcolor{keyword}{struct\ }IStream;}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00029}\mbox{\hyperlink{struct_catch_1_1_config_data}{00029}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_catch_1_1_config_data}{ConfigData}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00030}\mbox{\hyperlink{struct_catch_1_1_config_data_a0da0f6d493ef8f799273b4358d420a3a}{00030}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_catch_1_1_config_data_a0da0f6d493ef8f799273b4358d420a3a}{listTests}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00031}\mbox{\hyperlink{struct_catch_1_1_config_data_af780422bdef8d8b905204542855cf6b3}{00031}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_catch_1_1_config_data_af780422bdef8d8b905204542855cf6b3}{listTags}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00032}\mbox{\hyperlink{struct_catch_1_1_config_data_a4ba3618cae31b43237724f55359bfe95}{00032}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_catch_1_1_config_data_a4ba3618cae31b43237724f55359bfe95}{listReporters}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00033}\mbox{\hyperlink{struct_catch_1_1_config_data_abedaace37c0166fbc64ff25968aad944}{00033}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_catch_1_1_config_data_abedaace37c0166fbc64ff25968aad944}{listTestNamesOnly}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00035}\mbox{\hyperlink{struct_catch_1_1_config_data_aeb091ca2df2c654caaa2ad29c14578e5}{00035}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_catch_1_1_config_data_aeb091ca2df2c654caaa2ad29c14578e5}{showSuccessfulTests}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00036}\mbox{\hyperlink{struct_catch_1_1_config_data_afec8310b1904784edb292e143a602fba}{00036}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_catch_1_1_config_data_afec8310b1904784edb292e143a602fba}{shouldDebugBreak}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00037}\mbox{\hyperlink{struct_catch_1_1_config_data_a6dd23f8c9d9337f46187e7dbb6a8328e}{00037}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_catch_1_1_config_data_a6dd23f8c9d9337f46187e7dbb6a8328e}{noThrow}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00038}\mbox{\hyperlink{struct_catch_1_1_config_data_a12535241547dfc57e6864c4fc2cd4dd9}{00038}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_catch_1_1_config_data_a12535241547dfc57e6864c4fc2cd4dd9}{showHelp}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00039}\mbox{\hyperlink{struct_catch_1_1_config_data_a3c243de7a5957fa5311167039064379c}{00039}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_catch_1_1_config_data_a3c243de7a5957fa5311167039064379c}{showInvisibles}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00040}\mbox{\hyperlink{struct_catch_1_1_config_data_a4c582987ddd060919a6fd203661f9210}{00040}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_catch_1_1_config_data_a4c582987ddd060919a6fd203661f9210}{filenamesAsTags}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00041}\mbox{\hyperlink{struct_catch_1_1_config_data_a2cda9be1ee8b85e51c2e242330c99949}{00041}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_catch_1_1_config_data_a2cda9be1ee8b85e51c2e242330c99949}{libIdentify}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00043}\mbox{\hyperlink{struct_catch_1_1_config_data_a2d5505751aab745d5ae5e4ffe5c92c35}{00043}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{struct_catch_1_1_config_data_a2d5505751aab745d5ae5e4ffe5c92c35}{abortAfter}}\ =\ -\/1;}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00044}\mbox{\hyperlink{struct_catch_1_1_config_data_adc64e7994765fa481177d6f41d6875fa}{00044}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{struct_catch_1_1_config_data_adc64e7994765fa481177d6f41d6875fa}{rngSeed}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00045}\mbox{\hyperlink{struct_catch_1_1_config_data_af16d87b34e8ec22285b008fd7414574f}{00045}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{struct_catch_1_1_config_data_af16d87b34e8ec22285b008fd7414574f}{benchmarkResolutionMultiple}}\ =\ 100;}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00047}\mbox{\hyperlink{struct_catch_1_1_config_data_ab0e6ea949455438bfdc22ed25bab12f8}{00047}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_catch_af85c0d46dfe687d923a157362fd07737}{Verbosity}}\ \mbox{\hyperlink{struct_catch_1_1_config_data_ab0e6ea949455438bfdc22ed25bab12f8}{verbosity}}\ =\ \mbox{\hyperlink{namespace_catch_af85c0d46dfe687d923a157362fd07737a960b44c579bc2f6818d2daaf9e4c16f0}{Verbosity::Normal}};}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00048}\mbox{\hyperlink{struct_catch_1_1_config_data_af3a1c0b4a748b24799941b59bcd9c138}{00048}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_warn_about_ae3dde70ef78d700ea896eb29314e0fa3}{WarnAbout::What}}\ \mbox{\hyperlink{struct_catch_1_1_config_data_af3a1c0b4a748b24799941b59bcd9c138}{warnings}}\ =\ \mbox{\hyperlink{struct_catch_1_1_warn_about_ae3dde70ef78d700ea896eb29314e0fa3a19bca4df5e1b0f209a3292f3aa44b81e}{WarnAbout::Nothing}};}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00049}\mbox{\hyperlink{struct_catch_1_1_config_data_a26b02455c7cc772ab0be25af0ac12feb}{00049}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_show_durations_a82fa0174554187220c1eda175f122ee1}{ShowDurations::OrNot}}\ \mbox{\hyperlink{struct_catch_1_1_config_data_a26b02455c7cc772ab0be25af0ac12feb}{showDurations}}\ =\ \mbox{\hyperlink{struct_catch_1_1_show_durations_a82fa0174554187220c1eda175f122ee1a499ae4cb7799d1abb626152b73e448cc}{ShowDurations::DefaultForReporter}};}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00050}\mbox{\hyperlink{struct_catch_1_1_config_data_a452a207267820df047268e019f4517b9}{00050}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_run_tests_ab56bd851b1dd085869992d1a9d73dc5d}{RunTests::InWhatOrder}}\ \mbox{\hyperlink{struct_catch_1_1_config_data_a452a207267820df047268e019f4517b9}{runOrder}}\ =\ \mbox{\hyperlink{struct_catch_1_1_run_tests_ab56bd851b1dd085869992d1a9d73dc5da2d560e5cdf23ef60d728a816e9b01c61}{RunTests::InDeclarationOrder}};}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00051}\mbox{\hyperlink{struct_catch_1_1_config_data_abbc2f39fe99f73539752e8dfec0a7709}{00051}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_use_colour_a6aa78da0c2de7539bb9e3757e204a3f1}{UseColour::YesOrNo}}\ \mbox{\hyperlink{struct_catch_1_1_config_data_abbc2f39fe99f73539752e8dfec0a7709}{useColour}}\ =\ \mbox{\hyperlink{struct_catch_1_1_use_colour_a6aa78da0c2de7539bb9e3757e204a3f1a15ae4b6fc168cb49a577b958239ec68a}{UseColour::Auto}};}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00052}\mbox{\hyperlink{struct_catch_1_1_config_data_a923861968eaad4d3c2ac82e514c7cc81}{00052}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_wait_for_keypress_a2e8c4369d0a605d64e3e83b5af3399ba}{WaitForKeypress::When}}\ \mbox{\hyperlink{struct_catch_1_1_config_data_a923861968eaad4d3c2ac82e514c7cc81}{waitForKeypress}}\ =\ \mbox{\hyperlink{struct_catch_1_1_wait_for_keypress_a2e8c4369d0a605d64e3e83b5af3399baade2e4a722e5c78bb0d1d3871c4a491ee}{WaitForKeypress::Never}};}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00054}\mbox{\hyperlink{struct_catch_1_1_config_data_a6eaa8b628b7051824ac1717a5c2e8b5c}{00054}}\ \ \ \ \ \ \ \ \ std::string\ \mbox{\hyperlink{struct_catch_1_1_config_data_a6eaa8b628b7051824ac1717a5c2e8b5c}{outputFilename}};}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00055}\mbox{\hyperlink{struct_catch_1_1_config_data_a6c62e90478bc2911d032ec54c2e9d8df}{00055}}\ \ \ \ \ \ \ \ \ std::string\ \mbox{\hyperlink{struct_catch_1_1_config_data_a6c62e90478bc2911d032ec54c2e9d8df}{name}};}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00056}\mbox{\hyperlink{struct_catch_1_1_config_data_ac181ec69c5b6c925ac9bea9eaf7039c3}{00056}}\ \ \ \ \ \ \ \ \ std::string\ \mbox{\hyperlink{struct_catch_1_1_config_data_ac181ec69c5b6c925ac9bea9eaf7039c3}{processName}};}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00057}00057\ \textcolor{preprocessor}{\#ifndef\ CATCH\_CONFIG\_DEFAULT\_REPORTER}}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00058}\mbox{\hyperlink{catch__config_8hpp_a7eab4229e2315d499ef910d949e22ff6}{00058}}\ \textcolor{preprocessor}{\#define\ CATCH\_CONFIG\_DEFAULT\_REPORTER\ "{}console"{}}}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00059}00059\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00060}\mbox{\hyperlink{struct_catch_1_1_config_data_a86a1832b579b5b1728e3bd04dc03c35d}{00060}}\ \ \ \ \ \ \ \ \ std::string\ \mbox{\hyperlink{struct_catch_1_1_config_data_a86a1832b579b5b1728e3bd04dc03c35d}{reporterName}}\ =\ \mbox{\hyperlink{catch__config_8hpp_a7eab4229e2315d499ef910d949e22ff6}{CATCH\_CONFIG\_DEFAULT\_REPORTER}};}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00061}00061\ \textcolor{preprocessor}{\#undef\ CATCH\_CONFIG\_DEFAULT\_REPORTER}}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00062}00062\ }
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00063}\mbox{\hyperlink{struct_catch_1_1_config_data_aa40b0e5d2f78a7addbd5c8d16a111840}{00063}}\ \ \ \ \ \ \ \ \ std::vector<std::string>\ \mbox{\hyperlink{struct_catch_1_1_config_data_aa40b0e5d2f78a7addbd5c8d16a111840}{testsOrTags}};}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00064}\mbox{\hyperlink{struct_catch_1_1_config_data_a76026ccfbefe117a33dde6540161b113}{00064}}\ \ \ \ \ \ \ \ \ std::vector<std::string>\ \mbox{\hyperlink{struct_catch_1_1_config_data_a76026ccfbefe117a33dde6540161b113}{sectionsToRun}};}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00065}00065\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00067}00067\ }
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00068}\mbox{\hyperlink{class_catch_1_1_config}{00068}}\ \ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_catch_1_1_config}{Config}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{struct_catch_1_1_i_config}{IConfig}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00069}00069\ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00071}\mbox{\hyperlink{class_catch_1_1_config_aef773b055ffea632b300f9a44caac969}{00071}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_config_aef773b055ffea632b300f9a44caac969}{Config}}()\ =\ \textcolor{keywordflow}{default};}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00072}00072\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_config_aef773b055ffea632b300f9a44caac969}{Config}}(\ \mbox{\hyperlink{struct_catch_1_1_config_data}{ConfigData}}\ \textcolor{keyword}{const}\&\ data\ );}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00073}\mbox{\hyperlink{class_catch_1_1_config_a8d9e3b27beba3c957d4f75385d0cae49}{00073}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{class_catch_1_1_config_a8d9e3b27beba3c957d4f75385d0cae49}{\string~Config}}()\ =\ \textcolor{keywordflow}{default};}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00074}00074\ }
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00075}00075\ \ \ \ \ \ \ \ \ std::string\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{class_catch_1_1_config_a7ab6757592ffc73a7ceabd11e4a3ef15}{getFilename}}()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00076}00076\ }
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00077}00077\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_catch_1_1_config_a4717b0c64f13c6f7dc4afdaeb396b7b9}{listTests}}()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00078}00078\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_catch_1_1_config_a82aa3cb7e5cd1b0705abab7c46009855}{listTestNamesOnly}}()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00079}00079\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_catch_1_1_config_a87797a539ff81a7c3c0b302ede7ec9d3}{listTags}}()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00080}00080\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_catch_1_1_config_a4af3e61afbc5db0c2bb1138254a765ce}{listReporters}}()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00081}00081\ }
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00082}00082\ \ \ \ \ \ \ \ \ std::string\ \mbox{\hyperlink{class_catch_1_1_config_ad0fe41d317f0429eecc31cc3a8aa298c}{getProcessName}}()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00083}00083\ \ \ \ \ \ \ \ \ std::string\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{class_catch_1_1_config_add24f3b9307edb6f8168753fe3bdec6c}{getReporterName}}()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00084}00084\ }
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00085}00085\ \ \ \ \ \ \ \ \ std::vector<std::string>\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{class_catch_1_1_config_a0861c17ff4a01038f73eac5836d5c6fc}{getTestsOrTags}}()\ \textcolor{keyword}{const\ override};}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00086}00086\ \ \ \ \ \ \ \ \ std::vector<std::string>\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{class_catch_1_1_config_a32e48a3b9bbf4ce933a154545de13b3f}{getSectionsToRun}}()\ \textcolor{keyword}{const\ override};}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00087}00087\ }
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00088}00088\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_test_spec}{TestSpec}}\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{class_catch_1_1_config_a9444b56d6f7549c2c6aad594d1bc6423}{testSpec}}()\ \textcolor{keyword}{const\ override};}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00089}00089\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_catch_1_1_config_a25c21a50fd3ac97d55dd8a068d83a732}{hasTestFilters}}()\ \textcolor{keyword}{const\ override};}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00090}00090\ }
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00091}00091\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_catch_1_1_config_af86a5df3faae04019a4fcadaae412e06}{showHelp}}()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00092}00092\ }
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00093}00093\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ IConfig\ interface}}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00094}00094\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_catch_1_1_config_aeb09ac92356afabdd2adde43f188d80b}{allowThrows}}()\ \textcolor{keyword}{const\ override};}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00095}00095\ \ \ \ \ \ \ \ \ std::ostream\&\ \mbox{\hyperlink{class_catch_1_1_config_ad8ea5e9e3f59d3829cb50e5a8585ff3e}{stream}}()\ \textcolor{keyword}{const\ override};}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00096}00096\ \ \ \ \ \ \ \ \ std::string\ \mbox{\hyperlink{class_catch_1_1_config_a31a90838216993be7c9a8ce29a821293}{name}}()\ \textcolor{keyword}{const\ override};}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00097}00097\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_catch_1_1_config_a7f4f4c2b7bffa63026df5f47e845c526}{includeSuccessfulResults}}()\ \textcolor{keyword}{const\ override};}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00098}00098\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_catch_1_1_config_a517d35c4a4d9e8fd0009f22e85af1bea}{warnAboutMissingAssertions}}()\ \textcolor{keyword}{const\ override};}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00099}00099\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_catch_1_1_config_acc2ad529989a83e6066a9077906b02ba}{warnAboutNoTests}}()\ \textcolor{keyword}{const\ override};}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00100}00100\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_show_durations_a82fa0174554187220c1eda175f122ee1}{ShowDurations::OrNot}}\ \mbox{\hyperlink{class_catch_1_1_config_a7c377b4288f19502c5c848d2ab83e835}{showDurations}}()\ \textcolor{keyword}{const\ override};}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00101}00101\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_run_tests_ab56bd851b1dd085869992d1a9d73dc5d}{RunTests::InWhatOrder}}\ \mbox{\hyperlink{class_catch_1_1_config_ab6e21b9f22df4209a994045bb32a135f}{runOrder}}()\ \textcolor{keyword}{const\ override};}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00102}00102\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{class_catch_1_1_config_a4abe80a8070e3365ba1b7cd37dbf4cbe}{rngSeed}}()\ \textcolor{keyword}{const\ override};}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00103}00103\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{class_catch_1_1_config_a54f9341be3d7de2461bace24346da332}{benchmarkResolutionMultiple}}()\ \textcolor{keyword}{const\ override};}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00104}00104\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_use_colour_a6aa78da0c2de7539bb9e3757e204a3f1}{UseColour::YesOrNo}}\ \mbox{\hyperlink{class_catch_1_1_config_a77222e21f29817112a777546504f3930}{useColour}}()\ \textcolor{keyword}{const\ override};}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00105}00105\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_catch_1_1_config_aec665ed79cc298ea0eb88908870f8b44}{shouldDebugBreak}}()\ \textcolor{keyword}{const\ override};}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00106}00106\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{class_catch_1_1_config_acb7644621cf5d1f8221a6cb2cfe209a8}{abortAfter}}()\ \textcolor{keyword}{const\ override};}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00107}00107\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_catch_1_1_config_a692d44c3e1d5fa3cf6f19d4f7e317611}{showInvisibles}}()\ \textcolor{keyword}{const\ override};}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00108}00108\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_catch_af85c0d46dfe687d923a157362fd07737}{Verbosity}}\ \mbox{\hyperlink{class_catch_1_1_config_aa0ac4601dd8e5bedf7dc4c0761ec2097}{verbosity}}()\ \textcolor{keyword}{const\ override};}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00109}00109\ }
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00110}00110\ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00111}00111\ }
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00112}00112\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_i_stream}{IStream}}\ \textcolor{keyword}{const}*\ openStream();}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00113}00113\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_config_data}{ConfigData}}\ m\_data;}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00114}00114\ }
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00115}00115\ \ \ \ \ \ \ \ \ std::unique\_ptr<IStream\ const>\ m\_stream;}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00116}00116\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_test_spec}{TestSpec}}\ m\_testSpec;}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00117}00117\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ m\_hasTestFilters\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00118}00118\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00119}00119\ }
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00120}00120\ \}\ \textcolor{comment}{//\ end\ namespace\ Catch}}
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00121}00121\ }
+\DoxyCodeLine{\Hypertarget{catch__config_8hpp_source_l00122}00122\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ TWOBLUECUBES\_CATCH\_CONFIG\_HPP\_INCLUDED}}
+
+\end{DoxyCode}

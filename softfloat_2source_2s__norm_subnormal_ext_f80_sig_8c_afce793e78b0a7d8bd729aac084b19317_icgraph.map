@@ -1,0 +1,19 @@
+<map id="softfloat_normSubnormalExtF80Sig" name="softfloat_normSubnormalExtF80Sig">
+<area shape="rect" id="Node000001" title=" " alt="" coords="361,122,547,162"/>
+<area shape="rect" id="Node000002" href="$softfloat_2source_2ext_f80__div_8c.html#a741eedfa7d22ef1c630729f0ec3097af" title=" " alt="" coords="185,5,270,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="416,114,368,78,312,45,270,30,272,25,314,40,371,73,419,110"/>
+<area shape="rect" id="Node000003" href="$softfloat_2source_2ext_f80__mul_8c.html#af07b59868f36844b7f7e1c86c5c91ed7" title=" " alt="" coords="183,55,272,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="383,118,312,94,272,82,274,77,314,89,384,113"/>
+<area shape="rect" id="Node000004" href="$softfloat_2source_2ext_f80__rem_8c.html#ac6cadb3a4da28083b97be0f0393b4dc2" title=" " alt="" coords="183,104,273,130"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="345,133,273,125,274,119,346,127"/>
+<area shape="rect" id="Node000005" href="$softfloat_2source_2ext_f80__round_to_int_8c.html#a055a9c200d285a8aec2702e4263aa35e" title=" " alt="" coords="163,153,292,179"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="346,156,293,162,293,157,345,151"/>
+<area shape="rect" id="Node000006" href="$softfloat_2source_2ext_f80__sqrt_8c.html#a7b37fc99ef9354c647f7fb1047614e21" title=" " alt="" coords="183,203,273,228"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="383,171,314,194,274,206,272,201,312,189,381,166"/>
+<area shape="rect" id="Node000007" href="$softfloat_2source_2s__add_mags_ext_f80_8c.html#a0f927022e5e9f4d9a288db749ac16645" title=" " alt="" coords="143,252,313,278"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="419,175,371,210,314,243,287,254,285,249,312,238,368,206,416,170"/>
+<area shape="rect" id="Node000008" href="$softfloat_2source_2ext_f80__add_8c.html#a56e6d7b8048e43484e0494d6faa6b5d2" title=" " alt="" coords="5,227,95,252"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="127,253,95,248,96,243,128,248"/>
+<area shape="rect" id="Node000009" href="$softfloat_2source_2ext_f80__sub_8c.html#ad42214e94cb6c71daefbc8ed467e8ea8" title=" " alt="" coords="5,276,95,302"/>
+<area shape="poly" id="edge8_Node000007_Node000009" title=" " alt="" coords="128,281,96,285,95,280,127,276"/>
+</map>

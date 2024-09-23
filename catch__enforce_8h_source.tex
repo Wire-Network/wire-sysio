@@ -1,0 +1,48 @@
+\doxysection{catch\+\_\+enforce.\+h}
+\hypertarget{catch__enforce_8h_source}{}\label{catch__enforce_8h_source}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_enforce.h@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_enforce.h}}
+\mbox{\hyperlink{catch__enforce_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{catch__enforce_8h_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{catch__enforce_8h_source_l00002}00002\ \textcolor{comment}{\ *\ \ Created\ by\ Martin\ on\ 01/08/2017.}}
+\DoxyCodeLine{\Hypertarget{catch__enforce_8h_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{catch__enforce_8h_source_l00004}00004\ \textcolor{comment}{\ *\ \ Distributed\ under\ the\ Boost\ Software\ License,\ Version\ 1.0.\ (See\ accompanying}}
+\DoxyCodeLine{\Hypertarget{catch__enforce_8h_source_l00005}00005\ \textcolor{comment}{\ *\ \ file\ LICENSE\_1\_0.txt\ or\ copy\ at\ http://www.boost.org/LICENSE\_1\_0.txt)}}
+\DoxyCodeLine{\Hypertarget{catch__enforce_8h_source_l00006}00006\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{catch__enforce_8h_source_l00007}00007\ \textcolor{preprocessor}{\#ifndef\ TWOBLUECUBES\_CATCH\_ENFORCE\_H\_INCLUDED}}
+\DoxyCodeLine{\Hypertarget{catch__enforce_8h_source_l00008}00008\ \textcolor{preprocessor}{\#define\ TWOBLUECUBES\_CATCH\_ENFORCE\_H\_INCLUDED}}
+\DoxyCodeLine{\Hypertarget{catch__enforce_8h_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{catch__enforce_8h_source_l00010}00010\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__common_8h}{catch\_common.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__enforce_8h_source_l00011}00011\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__compiler__capabilities_8h}{catch\_compiler\_capabilities.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__enforce_8h_source_l00012}00012\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__stream_8h}{catch\_stream.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__enforce_8h_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{catch__enforce_8h_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{catch__enforce_8h_source_l00015}00015\ \textcolor{preprocessor}{\#include\ <stdexcept>}}
+\DoxyCodeLine{\Hypertarget{catch__enforce_8h_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{catch__enforce_8h_source_l00017}00017\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__enforce_8h_source_l00018}00018\ \textcolor{preprocessor}{\#if\ !defined(CATCH\_CONFIG\_DISABLE\_EXCEPTIONS)}}
+\DoxyCodeLine{\Hypertarget{catch__enforce_8h_source_l00019}00019\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ Ex>}
+\DoxyCodeLine{\Hypertarget{catch__enforce_8h_source_l00020}00020\ \ \ \ \ [[noreturn]]}
+\DoxyCodeLine{\Hypertarget{catch__enforce_8h_source_l00021}00021\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespace_catch_a3cbceeab9252d1b752f66a2826e92548}{throw\_exception}}(Ex\ \textcolor{keyword}{const}\&\ e)\ \{}
+\DoxyCodeLine{\Hypertarget{catch__enforce_8h_source_l00022}00022\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ e;}
+\DoxyCodeLine{\Hypertarget{catch__enforce_8h_source_l00023}00023\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__enforce_8h_source_l00024}00024\ \textcolor{preprocessor}{\#else\ }\textcolor{comment}{//\ \string^\string^\ Exceptions\ are\ enabled\ //\ \ Exceptions\ are\ disabled\ vv}}
+\DoxyCodeLine{\Hypertarget{catch__enforce_8h_source_l00025}00025\ \ \ \ \ [[noreturn]]}
+\DoxyCodeLine{\Hypertarget{catch__enforce_8h_source_l00026}00026\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespace_catch_a3cbceeab9252d1b752f66a2826e92548}{throw\_exception}}(std::exception\ \textcolor{keyword}{const}\&\ e);}
+\DoxyCodeLine{\Hypertarget{catch__enforce_8h_source_l00027}00027\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{catch__enforce_8h_source_l00028}00028\ \}\ \textcolor{comment}{//\ namespace\ Catch;}}
+\DoxyCodeLine{\Hypertarget{catch__enforce_8h_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{catch__enforce_8h_source_l00030}\mbox{\hyperlink{catch__enforce_8h_a01cc18e13c75ec7b18d2a58bf074cd97}{00030}}\ \textcolor{preprocessor}{\#define\ CATCH\_PREPARE\_EXCEPTION(\ type,\ msg\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{catch__enforce_8h_source_l00031}00031\ \textcolor{preprocessor}{\ \ \ \ type(\ (\ Catch::ReusableStringStream()\ <<\ msg\ ).str()\ )}}
+\DoxyCodeLine{\Hypertarget{catch__enforce_8h_source_l00032}\mbox{\hyperlink{catch__enforce_8h_a05b6c8a530fa2e5b397add8966522777}{00032}}\ \textcolor{preprocessor}{\#define\ CATCH\_INTERNAL\_ERROR(\ msg\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{catch__enforce_8h_source_l00033}00033\ \textcolor{preprocessor}{\ \ \ \ Catch::throw\_exception(CATCH\_PREPARE\_EXCEPTION(\ std::logic\_error,\ CATCH\_INTERNAL\_LINEINFO\ <<\ "{}:\ Internal\ Catch\ error:\ "{}\ <<\ msg))}}
+\DoxyCodeLine{\Hypertarget{catch__enforce_8h_source_l00034}\mbox{\hyperlink{catch__enforce_8h_adc6e1c0661c7c34fbb6033de06ec4833}{00034}}\ \textcolor{preprocessor}{\#define\ CATCH\_ERROR(\ msg\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{catch__enforce_8h_source_l00035}00035\ \textcolor{preprocessor}{\ \ \ \ Catch::throw\_exception(CATCH\_PREPARE\_EXCEPTION(\ std::domain\_error,\ msg\ ))}}
+\DoxyCodeLine{\Hypertarget{catch__enforce_8h_source_l00036}\mbox{\hyperlink{catch__enforce_8h_a6274a54d9b6da60d7c6e9033b310d8b2}{00036}}\ \textcolor{preprocessor}{\#define\ CATCH\_RUNTIME\_ERROR(\ msg\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{catch__enforce_8h_source_l00037}00037\ \textcolor{preprocessor}{\ \ \ \ Catch::throw\_exception(CATCH\_PREPARE\_EXCEPTION(\ std::runtime\_error,\ msg\ ))}}
+\DoxyCodeLine{\Hypertarget{catch__enforce_8h_source_l00038}\mbox{\hyperlink{catch__enforce_8h_aa4c5f453d4352f75712de56e5892849f}{00038}}\ \textcolor{preprocessor}{\#define\ CATCH\_ENFORCE(\ condition,\ msg\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{catch__enforce_8h_source_l00039}00039\ \textcolor{preprocessor}{\ \ \ \ do\{\ if(\ !(condition)\ )\ CATCH\_ERROR(\ msg\ );\ \}\ while(false)}}
+\DoxyCodeLine{\Hypertarget{catch__enforce_8h_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{catch__enforce_8h_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{catch__enforce_8h_source_l00042}00042\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ TWOBLUECUBES\_CATCH\_ENFORCE\_H\_INCLUDED}}
+
+\end{DoxyCode}

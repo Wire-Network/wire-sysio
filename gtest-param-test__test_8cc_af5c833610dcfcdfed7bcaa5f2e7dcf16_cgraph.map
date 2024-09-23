@@ -1,0 +1,7 @@
+<map id="TEST" name="TEST">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,61,31"/>
+<area shape="rect" id="Node000002" href="$gtest-param-test__test_8cc.html#a11c99cfbf44746868aa44105130887f7" title=" " alt="" coords="109,5,221,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="61,16,93,16,93,21,61,21"/>
+<area shape="rect" id="Node000003" href="$gtest-param-test__test_8cc.html#a4f874f103b3979e50bc676c7f6414dfc" title=" " alt="" coords="269,5,349,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="221,16,253,16,253,21,221,21"/>
+</map>

@@ -1,0 +1,429 @@
+\doxysection{sysio\+::chain\+::controller\+::config Struct Reference}
+\hypertarget{structsysio_1_1chain_1_1controller_1_1config}{}\label{structsysio_1_1chain_1_1controller_1_1config}\index{sysio::chain::controller::config@{sysio::chain::controller::config}}
+
+
+{\ttfamily \#include $<$controller.\+hpp$>$}
+
+
+
+Collaboration diagram for sysio\+::chain\+::controller\+::config\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1controller_1_1config__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+flat\+\_\+set$<$ \mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} $>$ \mbox{\hyperlink{structsysio_1_1chain_1_1controller_1_1config_a8440b353861fe179036cb8af088323ff}{sender\+\_\+bypass\+\_\+whiteblacklist}}
+\item 
+flat\+\_\+set$<$ \mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} $>$ \mbox{\hyperlink{structsysio_1_1chain_1_1controller_1_1config_a64ea139aa98e2d67dfed0a5c2f36eb77}{actor\+\_\+whitelist}}
+\item 
+flat\+\_\+set$<$ \mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} $>$ \mbox{\hyperlink{structsysio_1_1chain_1_1controller_1_1config_a5922ec305c682477fd9ef6ce74293c9d}{actor\+\_\+blacklist}}
+\item 
+flat\+\_\+set$<$ \mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} $>$ \mbox{\hyperlink{structsysio_1_1chain_1_1controller_1_1config_a0c34416a36f48ede90d9701b986d3487}{contract\+\_\+whitelist}}
+\item 
+flat\+\_\+set$<$ \mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} $>$ \mbox{\hyperlink{structsysio_1_1chain_1_1controller_1_1config_a71961d4eb70d927b9d0003f6255db95f}{contract\+\_\+blacklist}}
+\item 
+flat\+\_\+set$<$ pair$<$ \mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}}, \mbox{\hyperlink{namespacesysio_1_1chain_a7a1685bcc352cda9e45f055932069428}{action\+\_\+name}} $>$ $>$ \mbox{\hyperlink{structsysio_1_1chain_1_1controller_1_1config_a979219adeffbc78b1fe73460a8005e39}{action\+\_\+blacklist}}
+\item 
+flat\+\_\+set$<$ \mbox{\hyperlink{namespacesysio_1_1chain_a0628a11f388cd2e43b1ccc1260a1042f}{public\+\_\+key\+\_\+type}} $>$ \mbox{\hyperlink{structsysio_1_1chain_1_1controller_1_1config_ae36a724cde28ee8bc40c6b73206f8a61}{key\+\_\+blacklist}}
+\item 
+\mbox{\hyperlink{classfc_1_1path}{path}} \mbox{\hyperlink{structsysio_1_1chain_1_1controller_1_1config_a0ce8b10fa19639a7a1af30998590bb64}{blocks\+\_\+dir}} = chain\+::config\+::default\+\_\+blocks\+\_\+dir\+\_\+name
+\item 
+std\+::optional$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1block__log__prune__config}{block\+\_\+log\+\_\+prune\+\_\+config}} $>$ \mbox{\hyperlink{structsysio_1_1chain_1_1controller_1_1config_a4820736c3e3dfa62486e5df54b67e3d9}{prune\+\_\+config}}
+\item 
+\mbox{\hyperlink{classfc_1_1path}{path}} \mbox{\hyperlink{structsysio_1_1chain_1_1controller_1_1config_ad662107d9d3837c2e082b85ed524f001}{state\+\_\+dir}} = chain\+::config\+::default\+\_\+state\+\_\+dir\+\_\+name
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1controller_1_1config_a88eb8a7243705bc36c2e20e6ac603029}{state\+\_\+size}} = chain\+::config\+::default\+\_\+state\+\_\+size
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1controller_1_1config_ad9cbd88b44c6836cf784746c1262ecd8}{state\+\_\+guard\+\_\+size}} = chain\+::config\+::default\+\_\+state\+\_\+guard\+\_\+size
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1controller_1_1config_a681e42f55477a7b01ba14c05a76e9b18}{sig\+\_\+cpu\+\_\+bill\+\_\+pct}} = chain\+::config\+::default\+\_\+sig\+\_\+cpu\+\_\+bill\+\_\+pct
+\item 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1controller_1_1config_aa5cd88a8e95077bf25e9ad638cf46635}{thread\+\_\+pool\+\_\+size}} = chain\+::config\+::default\+\_\+controller\+\_\+thread\+\_\+pool\+\_\+size
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1controller_1_1config_a4d2c380225e08e243b817a492f46a0e9}{max\+\_\+nonprivileged\+\_\+inline\+\_\+action\+\_\+size}} = chain\+::config\+::default\+\_\+max\+\_\+nonprivileged\+\_\+inline\+\_\+action\+\_\+size
+\item 
+bool \mbox{\hyperlink{structsysio_1_1chain_1_1controller_1_1config_a0c7057e18dfb9024619a4dadceacaf4a}{read\+\_\+only}} = false
+\item 
+bool \mbox{\hyperlink{structsysio_1_1chain_1_1controller_1_1config_a5845874d26f30413374713814cde5749}{force\+\_\+all\+\_\+checks}} = false
+\item 
+bool \mbox{\hyperlink{structsysio_1_1chain_1_1controller_1_1config_a260bd9b7a83b919f6375a4d278d98464}{disable\+\_\+replay\+\_\+opts}} = false
+\item 
+bool \mbox{\hyperlink{structsysio_1_1chain_1_1controller_1_1config_a183ca783c6dc990783b9a7d3c3c89614}{contracts\+\_\+console}} = false
+\item 
+bool \mbox{\hyperlink{structsysio_1_1chain_1_1controller_1_1config_a8f89cb1d5ccb9e07759a489515fac58d}{allow\+\_\+ram\+\_\+billing\+\_\+in\+\_\+notify}} = false
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1controller_1_1config_aa6fd8f11c868ac2a84ee67e0f74a1bd7}{maximum\+\_\+variable\+\_\+signature\+\_\+length}} = chain\+::config\+::default\+\_\+max\+\_\+variable\+\_\+signature\+\_\+length
+\item 
+bool \mbox{\hyperlink{structsysio_1_1chain_1_1controller_1_1config_a8a187b3e9e45ffde8347bcc5ab5ed46c}{disable\+\_\+all\+\_\+subjective\+\_\+mitigations}} = false
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1controller_1_1config_a5352099a52d4b3f078ec78122393ba21}{terminate\+\_\+at\+\_\+block}} = 0
+\item 
+\mbox{\hyperlink{classsysio_1_1chain_1_1wasm__interface_a9053d9e65167e5f241f1f3f27b175f9c}{wasm\+\_\+interface\+::vm\+\_\+type}} \mbox{\hyperlink{structsysio_1_1chain_1_1controller_1_1config_af672f8fa95bc01cb0b64d54924d51f04}{wasm\+\_\+runtime}} = chain\+::config\+::default\+\_\+wasm\+\_\+runtime
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1config}{eosvmoc\+::config}} \mbox{\hyperlink{structsysio_1_1chain_1_1controller_1_1config_a964a85434193d8013df569eb23695b61}{eosvmoc\+\_\+config}}
+\item 
+bool \mbox{\hyperlink{structsysio_1_1chain_1_1controller_1_1config_ab8b3c8bdcd3ba1330843984266be435c}{eosvmoc\+\_\+tierup}} = false
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_af3e35f3e1b78dd00fa247009a2d9ba5e}{db\+\_\+read\+\_\+mode}} \mbox{\hyperlink{structsysio_1_1chain_1_1controller_1_1config_a9c4c1a10498f1e25f97704dfa83768db}{read\+\_\+mode}} = \mbox{\hyperlink{namespacesysio_1_1chain_af3e35f3e1b78dd00fa247009a2d9ba5ea26ca3b6826ca765f741f39ec4754d581}{db\+\_\+read\+\_\+mode\+::\+SPECULATIVE}}
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_a7d207c8c6bf978826102eca76da530e0}{validation\+\_\+mode}} \mbox{\hyperlink{structsysio_1_1chain_1_1controller_1_1config_a028f130174ba30796b49c7555192973a}{block\+\_\+validation\+\_\+mode}} = \mbox{\hyperlink{namespacesysio_1_1chain_a7d207c8c6bf978826102eca76da530e0aba7de5bc6888294e5884b024a4c894f1}{validation\+\_\+mode\+::\+FULL}}
+\item 
+\mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a7fe6684b11f441d2e971fe65166d7d5f}{pinnable\+\_\+mapped\+\_\+file\+::map\+\_\+mode}} \mbox{\hyperlink{structsysio_1_1chain_1_1controller_1_1config_a05788839762c2caecedc1eb860b8289c}{db\+\_\+map\+\_\+mode}} = \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a7fe6684b11f441d2e971fe65166d7d5fa65d636fa5a7029aaa40f1d93a52748b7}{pinnable\+\_\+mapped\+\_\+file\+::map\+\_\+mode\+::mapped}}
+\item 
+flat\+\_\+set$<$ \mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} $>$ \mbox{\hyperlink{structsysio_1_1chain_1_1controller_1_1config_a6a0f9e42591c1679f063e206f41a6d0d}{resource\+\_\+greylist}}
+\item 
+flat\+\_\+set$<$ \mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} $>$ \mbox{\hyperlink{structsysio_1_1chain_1_1controller_1_1config_aee4a7e63b501799283ac04db7a3b9002}{trusted\+\_\+producers}}
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1controller_1_1config_a9774d7dad315824b530d7fb30bca3db1}{greylist\+\_\+limit}} = chain\+::config\+::maximum\+\_\+elastic\+\_\+resource\+\_\+multiplier
+\item 
+flat\+\_\+set$<$ \mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} $>$ \mbox{\hyperlink{structsysio_1_1chain_1_1controller_1_1config_ae29bd6eccb9c6549a244e845e2d13936}{profile\+\_\+accounts}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{controller_8hpp_source_l00065}{65}} of file \mbox{\hyperlink{controller_8hpp_source}{controller.\+hpp}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1chain_1_1controller_1_1config_a979219adeffbc78b1fe73460a8005e39}\index{sysio::chain::controller::config@{sysio::chain::controller::config}!action\_blacklist@{action\_blacklist}}
+\index{action\_blacklist@{action\_blacklist}!sysio::chain::controller::config@{sysio::chain::controller::config}}
+\doxysubsubsection{\texorpdfstring{action\_blacklist}{action\_blacklist}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1controller_1_1config_a979219adeffbc78b1fe73460a8005e39} 
+flat\+\_\+set$<$ pair$<$\mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}}, \mbox{\hyperlink{namespacesysio_1_1chain_a7a1685bcc352cda9e45f055932069428}{action\+\_\+name}}$>$ $>$ sysio\+::chain\+::controller\+::config\+::action\+\_\+blacklist}
+
+
+
+Definition at line \mbox{\hyperlink{controller_8hpp_source_l00071}{71}} of file \mbox{\hyperlink{controller_8hpp_source}{controller.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1controller_1_1config_a5922ec305c682477fd9ef6ce74293c9d}\index{sysio::chain::controller::config@{sysio::chain::controller::config}!actor\_blacklist@{actor\_blacklist}}
+\index{actor\_blacklist@{actor\_blacklist}!sysio::chain::controller::config@{sysio::chain::controller::config}}
+\doxysubsubsection{\texorpdfstring{actor\_blacklist}{actor\_blacklist}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1controller_1_1config_a5922ec305c682477fd9ef6ce74293c9d} 
+flat\+\_\+set$<$\mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}}$>$ sysio\+::chain\+::controller\+::config\+::actor\+\_\+blacklist}
+
+
+
+Definition at line \mbox{\hyperlink{controller_8hpp_source_l00068}{68}} of file \mbox{\hyperlink{controller_8hpp_source}{controller.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1controller_1_1config_a64ea139aa98e2d67dfed0a5c2f36eb77}\index{sysio::chain::controller::config@{sysio::chain::controller::config}!actor\_whitelist@{actor\_whitelist}}
+\index{actor\_whitelist@{actor\_whitelist}!sysio::chain::controller::config@{sysio::chain::controller::config}}
+\doxysubsubsection{\texorpdfstring{actor\_whitelist}{actor\_whitelist}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1controller_1_1config_a64ea139aa98e2d67dfed0a5c2f36eb77} 
+flat\+\_\+set$<$\mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}}$>$ sysio\+::chain\+::controller\+::config\+::actor\+\_\+whitelist}
+
+
+
+Definition at line \mbox{\hyperlink{controller_8hpp_source_l00067}{67}} of file \mbox{\hyperlink{controller_8hpp_source}{controller.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1controller_1_1config_a8f89cb1d5ccb9e07759a489515fac58d}\index{sysio::chain::controller::config@{sysio::chain::controller::config}!allow\_ram\_billing\_in\_notify@{allow\_ram\_billing\_in\_notify}}
+\index{allow\_ram\_billing\_in\_notify@{allow\_ram\_billing\_in\_notify}!sysio::chain::controller::config@{sysio::chain::controller::config}}
+\doxysubsubsection{\texorpdfstring{allow\_ram\_billing\_in\_notify}{allow\_ram\_billing\_in\_notify}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1controller_1_1config_a8f89cb1d5ccb9e07759a489515fac58d} 
+bool sysio\+::chain\+::controller\+::config\+::allow\+\_\+ram\+\_\+billing\+\_\+in\+\_\+notify = false}
+
+
+
+Definition at line \mbox{\hyperlink{controller_8hpp_source_l00085}{85}} of file \mbox{\hyperlink{controller_8hpp_source}{controller.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1controller_1_1config_a028f130174ba30796b49c7555192973a}\index{sysio::chain::controller::config@{sysio::chain::controller::config}!block\_validation\_mode@{block\_validation\_mode}}
+\index{block\_validation\_mode@{block\_validation\_mode}!sysio::chain::controller::config@{sysio::chain::controller::config}}
+\doxysubsubsection{\texorpdfstring{block\_validation\_mode}{block\_validation\_mode}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1controller_1_1config_a028f130174ba30796b49c7555192973a} 
+\mbox{\hyperlink{namespacesysio_1_1chain_a7d207c8c6bf978826102eca76da530e0}{validation\+\_\+mode}} sysio\+::chain\+::controller\+::config\+::block\+\_\+validation\+\_\+mode = \mbox{\hyperlink{namespacesysio_1_1chain_a7d207c8c6bf978826102eca76da530e0aba7de5bc6888294e5884b024a4c894f1}{validation\+\_\+mode\+::\+FULL}}}
+
+
+
+Definition at line \mbox{\hyperlink{controller_8hpp_source_l00095}{95}} of file \mbox{\hyperlink{controller_8hpp_source}{controller.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1controller_1_1config_a0ce8b10fa19639a7a1af30998590bb64}\index{sysio::chain::controller::config@{sysio::chain::controller::config}!blocks\_dir@{blocks\_dir}}
+\index{blocks\_dir@{blocks\_dir}!sysio::chain::controller::config@{sysio::chain::controller::config}}
+\doxysubsubsection{\texorpdfstring{blocks\_dir}{blocks\_dir}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1controller_1_1config_a0ce8b10fa19639a7a1af30998590bb64} 
+\mbox{\hyperlink{classfc_1_1path}{path}} sysio\+::chain\+::controller\+::config\+::blocks\+\_\+dir = chain\+::config\+::default\+\_\+blocks\+\_\+dir\+\_\+name}
+
+
+
+Definition at line \mbox{\hyperlink{controller_8hpp_source_l00073}{73}} of file \mbox{\hyperlink{controller_8hpp_source}{controller.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1controller_1_1config_a71961d4eb70d927b9d0003f6255db95f}\index{sysio::chain::controller::config@{sysio::chain::controller::config}!contract\_blacklist@{contract\_blacklist}}
+\index{contract\_blacklist@{contract\_blacklist}!sysio::chain::controller::config@{sysio::chain::controller::config}}
+\doxysubsubsection{\texorpdfstring{contract\_blacklist}{contract\_blacklist}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1controller_1_1config_a71961d4eb70d927b9d0003f6255db95f} 
+flat\+\_\+set$<$\mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}}$>$ sysio\+::chain\+::controller\+::config\+::contract\+\_\+blacklist}
+
+
+
+Definition at line \mbox{\hyperlink{controller_8hpp_source_l00070}{70}} of file \mbox{\hyperlink{controller_8hpp_source}{controller.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1controller_1_1config_a0c34416a36f48ede90d9701b986d3487}\index{sysio::chain::controller::config@{sysio::chain::controller::config}!contract\_whitelist@{contract\_whitelist}}
+\index{contract\_whitelist@{contract\_whitelist}!sysio::chain::controller::config@{sysio::chain::controller::config}}
+\doxysubsubsection{\texorpdfstring{contract\_whitelist}{contract\_whitelist}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1controller_1_1config_a0c34416a36f48ede90d9701b986d3487} 
+flat\+\_\+set$<$\mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}}$>$ sysio\+::chain\+::controller\+::config\+::contract\+\_\+whitelist}
+
+
+
+Definition at line \mbox{\hyperlink{controller_8hpp_source_l00069}{69}} of file \mbox{\hyperlink{controller_8hpp_source}{controller.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1controller_1_1config_a183ca783c6dc990783b9a7d3c3c89614}\index{sysio::chain::controller::config@{sysio::chain::controller::config}!contracts\_console@{contracts\_console}}
+\index{contracts\_console@{contracts\_console}!sysio::chain::controller::config@{sysio::chain::controller::config}}
+\doxysubsubsection{\texorpdfstring{contracts\_console}{contracts\_console}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1controller_1_1config_a183ca783c6dc990783b9a7d3c3c89614} 
+bool sysio\+::chain\+::controller\+::config\+::contracts\+\_\+console = false}
+
+
+
+Definition at line \mbox{\hyperlink{controller_8hpp_source_l00084}{84}} of file \mbox{\hyperlink{controller_8hpp_source}{controller.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1controller_1_1config_a05788839762c2caecedc1eb860b8289c}\index{sysio::chain::controller::config@{sysio::chain::controller::config}!db\_map\_mode@{db\_map\_mode}}
+\index{db\_map\_mode@{db\_map\_mode}!sysio::chain::controller::config@{sysio::chain::controller::config}}
+\doxysubsubsection{\texorpdfstring{db\_map\_mode}{db\_map\_mode}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1controller_1_1config_a05788839762c2caecedc1eb860b8289c} 
+\mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a7fe6684b11f441d2e971fe65166d7d5f}{pinnable\+\_\+mapped\+\_\+file\+::map\+\_\+mode}} sysio\+::chain\+::controller\+::config\+::db\+\_\+map\+\_\+mode = \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a7fe6684b11f441d2e971fe65166d7d5fa65d636fa5a7029aaa40f1d93a52748b7}{pinnable\+\_\+mapped\+\_\+file\+::map\+\_\+mode\+::mapped}}}
+
+
+
+Definition at line \mbox{\hyperlink{controller_8hpp_source_l00097}{97}} of file \mbox{\hyperlink{controller_8hpp_source}{controller.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1controller_1_1config_a8a187b3e9e45ffde8347bcc5ab5ed46c}\index{sysio::chain::controller::config@{sysio::chain::controller::config}!disable\_all\_subjective\_mitigations@{disable\_all\_subjective\_mitigations}}
+\index{disable\_all\_subjective\_mitigations@{disable\_all\_subjective\_mitigations}!sysio::chain::controller::config@{sysio::chain::controller::config}}
+\doxysubsubsection{\texorpdfstring{disable\_all\_subjective\_mitigations}{disable\_all\_subjective\_mitigations}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1controller_1_1config_a8a187b3e9e45ffde8347bcc5ab5ed46c} 
+bool sysio\+::chain\+::controller\+::config\+::disable\+\_\+all\+\_\+subjective\+\_\+mitigations = false}
+
+
+
+Definition at line \mbox{\hyperlink{controller_8hpp_source_l00087}{87}} of file \mbox{\hyperlink{controller_8hpp_source}{controller.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1controller_1_1config_a260bd9b7a83b919f6375a4d278d98464}\index{sysio::chain::controller::config@{sysio::chain::controller::config}!disable\_replay\_opts@{disable\_replay\_opts}}
+\index{disable\_replay\_opts@{disable\_replay\_opts}!sysio::chain::controller::config@{sysio::chain::controller::config}}
+\doxysubsubsection{\texorpdfstring{disable\_replay\_opts}{disable\_replay\_opts}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1controller_1_1config_a260bd9b7a83b919f6375a4d278d98464} 
+bool sysio\+::chain\+::controller\+::config\+::disable\+\_\+replay\+\_\+opts = false}
+
+
+
+Definition at line \mbox{\hyperlink{controller_8hpp_source_l00083}{83}} of file \mbox{\hyperlink{controller_8hpp_source}{controller.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1controller_1_1config_a964a85434193d8013df569eb23695b61}\index{sysio::chain::controller::config@{sysio::chain::controller::config}!eosvmoc\_config@{eosvmoc\_config}}
+\index{eosvmoc\_config@{eosvmoc\_config}!sysio::chain::controller::config@{sysio::chain::controller::config}}
+\doxysubsubsection{\texorpdfstring{eosvmoc\_config}{eosvmoc\_config}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1controller_1_1config_a964a85434193d8013df569eb23695b61} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1config}{eosvmoc\+::config}} sysio\+::chain\+::controller\+::config\+::eosvmoc\+\_\+config}
+
+
+
+Definition at line \mbox{\hyperlink{controller_8hpp_source_l00091}{91}} of file \mbox{\hyperlink{controller_8hpp_source}{controller.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1controller_1_1config_ab8b3c8bdcd3ba1330843984266be435c}\index{sysio::chain::controller::config@{sysio::chain::controller::config}!eosvmoc\_tierup@{eosvmoc\_tierup}}
+\index{eosvmoc\_tierup@{eosvmoc\_tierup}!sysio::chain::controller::config@{sysio::chain::controller::config}}
+\doxysubsubsection{\texorpdfstring{eosvmoc\_tierup}{eosvmoc\_tierup}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1controller_1_1config_ab8b3c8bdcd3ba1330843984266be435c} 
+bool sysio\+::chain\+::controller\+::config\+::eosvmoc\+\_\+tierup = false}
+
+
+
+Definition at line \mbox{\hyperlink{controller_8hpp_source_l00092}{92}} of file \mbox{\hyperlink{controller_8hpp_source}{controller.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1controller_1_1config_a5845874d26f30413374713814cde5749}\index{sysio::chain::controller::config@{sysio::chain::controller::config}!force\_all\_checks@{force\_all\_checks}}
+\index{force\_all\_checks@{force\_all\_checks}!sysio::chain::controller::config@{sysio::chain::controller::config}}
+\doxysubsubsection{\texorpdfstring{force\_all\_checks}{force\_all\_checks}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1controller_1_1config_a5845874d26f30413374713814cde5749} 
+bool sysio\+::chain\+::controller\+::config\+::force\+\_\+all\+\_\+checks = false}
+
+
+
+Definition at line \mbox{\hyperlink{controller_8hpp_source_l00082}{82}} of file \mbox{\hyperlink{controller_8hpp_source}{controller.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1controller_1_1config_a9774d7dad315824b530d7fb30bca3db1}\index{sysio::chain::controller::config@{sysio::chain::controller::config}!greylist\_limit@{greylist\_limit}}
+\index{greylist\_limit@{greylist\_limit}!sysio::chain::controller::config@{sysio::chain::controller::config}}
+\doxysubsubsection{\texorpdfstring{greylist\_limit}{greylist\_limit}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1controller_1_1config_a9774d7dad315824b530d7fb30bca3db1} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::chain\+::controller\+::config\+::greylist\+\_\+limit = chain\+::config\+::maximum\+\_\+elastic\+\_\+resource\+\_\+multiplier}
+
+
+
+Definition at line \mbox{\hyperlink{controller_8hpp_source_l00101}{101}} of file \mbox{\hyperlink{controller_8hpp_source}{controller.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1controller_1_1config_ae36a724cde28ee8bc40c6b73206f8a61}\index{sysio::chain::controller::config@{sysio::chain::controller::config}!key\_blacklist@{key\_blacklist}}
+\index{key\_blacklist@{key\_blacklist}!sysio::chain::controller::config@{sysio::chain::controller::config}}
+\doxysubsubsection{\texorpdfstring{key\_blacklist}{key\_blacklist}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1controller_1_1config_ae36a724cde28ee8bc40c6b73206f8a61} 
+flat\+\_\+set$<$\mbox{\hyperlink{namespacesysio_1_1chain_a0628a11f388cd2e43b1ccc1260a1042f}{public\+\_\+key\+\_\+type}}$>$ sysio\+::chain\+::controller\+::config\+::key\+\_\+blacklist}
+
+
+
+Definition at line \mbox{\hyperlink{controller_8hpp_source_l00072}{72}} of file \mbox{\hyperlink{controller_8hpp_source}{controller.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1controller_1_1config_a4d2c380225e08e243b817a492f46a0e9}\index{sysio::chain::controller::config@{sysio::chain::controller::config}!max\_nonprivileged\_inline\_action\_size@{max\_nonprivileged\_inline\_action\_size}}
+\index{max\_nonprivileged\_inline\_action\_size@{max\_nonprivileged\_inline\_action\_size}!sysio::chain::controller::config@{sysio::chain::controller::config}}
+\doxysubsubsection{\texorpdfstring{max\_nonprivileged\_inline\_action\_size}{max\_nonprivileged\_inline\_action\_size}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1controller_1_1config_a4d2c380225e08e243b817a492f46a0e9} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::chain\+::controller\+::config\+::max\+\_\+nonprivileged\+\_\+inline\+\_\+action\+\_\+size = chain\+::config\+::default\+\_\+max\+\_\+nonprivileged\+\_\+inline\+\_\+action\+\_\+size}
+
+
+
+Definition at line \mbox{\hyperlink{controller_8hpp_source_l00080}{80}} of file \mbox{\hyperlink{controller_8hpp_source}{controller.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1controller_1_1config_aa6fd8f11c868ac2a84ee67e0f74a1bd7}\index{sysio::chain::controller::config@{sysio::chain::controller::config}!maximum\_variable\_signature\_length@{maximum\_variable\_signature\_length}}
+\index{maximum\_variable\_signature\_length@{maximum\_variable\_signature\_length}!sysio::chain::controller::config@{sysio::chain::controller::config}}
+\doxysubsubsection{\texorpdfstring{maximum\_variable\_signature\_length}{maximum\_variable\_signature\_length}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1controller_1_1config_aa6fd8f11c868ac2a84ee67e0f74a1bd7} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::chain\+::controller\+::config\+::maximum\+\_\+variable\+\_\+signature\+\_\+length = chain\+::config\+::default\+\_\+max\+\_\+variable\+\_\+signature\+\_\+length}
+
+
+
+Definition at line \mbox{\hyperlink{controller_8hpp_source_l00086}{86}} of file \mbox{\hyperlink{controller_8hpp_source}{controller.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1controller_1_1config_ae29bd6eccb9c6549a244e845e2d13936}\index{sysio::chain::controller::config@{sysio::chain::controller::config}!profile\_accounts@{profile\_accounts}}
+\index{profile\_accounts@{profile\_accounts}!sysio::chain::controller::config@{sysio::chain::controller::config}}
+\doxysubsubsection{\texorpdfstring{profile\_accounts}{profile\_accounts}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1controller_1_1config_ae29bd6eccb9c6549a244e845e2d13936} 
+flat\+\_\+set$<$\mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}}$>$ sysio\+::chain\+::controller\+::config\+::profile\+\_\+accounts}
+
+
+
+Definition at line \mbox{\hyperlink{controller_8hpp_source_l00103}{103}} of file \mbox{\hyperlink{controller_8hpp_source}{controller.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1controller_1_1config_a4820736c3e3dfa62486e5df54b67e3d9}\index{sysio::chain::controller::config@{sysio::chain::controller::config}!prune\_config@{prune\_config}}
+\index{prune\_config@{prune\_config}!sysio::chain::controller::config@{sysio::chain::controller::config}}
+\doxysubsubsection{\texorpdfstring{prune\_config}{prune\_config}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1controller_1_1config_a4820736c3e3dfa62486e5df54b67e3d9} 
+std\+::optional$<$\mbox{\hyperlink{structsysio_1_1chain_1_1block__log__prune__config}{block\+\_\+log\+\_\+prune\+\_\+config}}$>$ sysio\+::chain\+::controller\+::config\+::prune\+\_\+config}
+
+
+
+Definition at line \mbox{\hyperlink{controller_8hpp_source_l00074}{74}} of file \mbox{\hyperlink{controller_8hpp_source}{controller.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1controller_1_1config_a9c4c1a10498f1e25f97704dfa83768db}\index{sysio::chain::controller::config@{sysio::chain::controller::config}!read\_mode@{read\_mode}}
+\index{read\_mode@{read\_mode}!sysio::chain::controller::config@{sysio::chain::controller::config}}
+\doxysubsubsection{\texorpdfstring{read\_mode}{read\_mode}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1controller_1_1config_a9c4c1a10498f1e25f97704dfa83768db} 
+\mbox{\hyperlink{namespacesysio_1_1chain_af3e35f3e1b78dd00fa247009a2d9ba5e}{db\+\_\+read\+\_\+mode}} sysio\+::chain\+::controller\+::config\+::read\+\_\+mode = \mbox{\hyperlink{namespacesysio_1_1chain_af3e35f3e1b78dd00fa247009a2d9ba5ea26ca3b6826ca765f741f39ec4754d581}{db\+\_\+read\+\_\+mode\+::\+SPECULATIVE}}}
+
+
+
+Definition at line \mbox{\hyperlink{controller_8hpp_source_l00094}{94}} of file \mbox{\hyperlink{controller_8hpp_source}{controller.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1controller_1_1config_a0c7057e18dfb9024619a4dadceacaf4a}\index{sysio::chain::controller::config@{sysio::chain::controller::config}!read\_only@{read\_only}}
+\index{read\_only@{read\_only}!sysio::chain::controller::config@{sysio::chain::controller::config}}
+\doxysubsubsection{\texorpdfstring{read\_only}{read\_only}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1controller_1_1config_a0c7057e18dfb9024619a4dadceacaf4a} 
+bool sysio\+::chain\+::controller\+::config\+::read\+\_\+only = false}
+
+
+
+Definition at line \mbox{\hyperlink{controller_8hpp_source_l00081}{81}} of file \mbox{\hyperlink{controller_8hpp_source}{controller.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1controller_1_1config_a6a0f9e42591c1679f063e206f41a6d0d}\index{sysio::chain::controller::config@{sysio::chain::controller::config}!resource\_greylist@{resource\_greylist}}
+\index{resource\_greylist@{resource\_greylist}!sysio::chain::controller::config@{sysio::chain::controller::config}}
+\doxysubsubsection{\texorpdfstring{resource\_greylist}{resource\_greylist}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1controller_1_1config_a6a0f9e42591c1679f063e206f41a6d0d} 
+flat\+\_\+set$<$\mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}}$>$ sysio\+::chain\+::controller\+::config\+::resource\+\_\+greylist}
+
+
+
+Definition at line \mbox{\hyperlink{controller_8hpp_source_l00099}{99}} of file \mbox{\hyperlink{controller_8hpp_source}{controller.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1controller_1_1config_a8440b353861fe179036cb8af088323ff}\index{sysio::chain::controller::config@{sysio::chain::controller::config}!sender\_bypass\_whiteblacklist@{sender\_bypass\_whiteblacklist}}
+\index{sender\_bypass\_whiteblacklist@{sender\_bypass\_whiteblacklist}!sysio::chain::controller::config@{sysio::chain::controller::config}}
+\doxysubsubsection{\texorpdfstring{sender\_bypass\_whiteblacklist}{sender\_bypass\_whiteblacklist}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1controller_1_1config_a8440b353861fe179036cb8af088323ff} 
+flat\+\_\+set$<$\mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}}$>$ sysio\+::chain\+::controller\+::config\+::sender\+\_\+bypass\+\_\+whiteblacklist}
+
+
+
+Definition at line \mbox{\hyperlink{controller_8hpp_source_l00066}{66}} of file \mbox{\hyperlink{controller_8hpp_source}{controller.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1controller_1_1config_a681e42f55477a7b01ba14c05a76e9b18}\index{sysio::chain::controller::config@{sysio::chain::controller::config}!sig\_cpu\_bill\_pct@{sig\_cpu\_bill\_pct}}
+\index{sig\_cpu\_bill\_pct@{sig\_cpu\_bill\_pct}!sysio::chain::controller::config@{sysio::chain::controller::config}}
+\doxysubsubsection{\texorpdfstring{sig\_cpu\_bill\_pct}{sig\_cpu\_bill\_pct}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1controller_1_1config_a681e42f55477a7b01ba14c05a76e9b18} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::chain\+::controller\+::config\+::sig\+\_\+cpu\+\_\+bill\+\_\+pct = chain\+::config\+::default\+\_\+sig\+\_\+cpu\+\_\+bill\+\_\+pct}
+
+
+
+Definition at line \mbox{\hyperlink{controller_8hpp_source_l00078}{78}} of file \mbox{\hyperlink{controller_8hpp_source}{controller.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1controller_1_1config_ad662107d9d3837c2e082b85ed524f001}\index{sysio::chain::controller::config@{sysio::chain::controller::config}!state\_dir@{state\_dir}}
+\index{state\_dir@{state\_dir}!sysio::chain::controller::config@{sysio::chain::controller::config}}
+\doxysubsubsection{\texorpdfstring{state\_dir}{state\_dir}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1controller_1_1config_ad662107d9d3837c2e082b85ed524f001} 
+\mbox{\hyperlink{classfc_1_1path}{path}} sysio\+::chain\+::controller\+::config\+::state\+\_\+dir = chain\+::config\+::default\+\_\+state\+\_\+dir\+\_\+name}
+
+
+
+Definition at line \mbox{\hyperlink{controller_8hpp_source_l00075}{75}} of file \mbox{\hyperlink{controller_8hpp_source}{controller.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1controller_1_1config_ad9cbd88b44c6836cf784746c1262ecd8}\index{sysio::chain::controller::config@{sysio::chain::controller::config}!state\_guard\_size@{state\_guard\_size}}
+\index{state\_guard\_size@{state\_guard\_size}!sysio::chain::controller::config@{sysio::chain::controller::config}}
+\doxysubsubsection{\texorpdfstring{state\_guard\_size}{state\_guard\_size}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1controller_1_1config_ad9cbd88b44c6836cf784746c1262ecd8} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} sysio\+::chain\+::controller\+::config\+::state\+\_\+guard\+\_\+size = chain\+::config\+::default\+\_\+state\+\_\+guard\+\_\+size}
+
+
+
+Definition at line \mbox{\hyperlink{controller_8hpp_source_l00077}{77}} of file \mbox{\hyperlink{controller_8hpp_source}{controller.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1controller_1_1config_a88eb8a7243705bc36c2e20e6ac603029}\index{sysio::chain::controller::config@{sysio::chain::controller::config}!state\_size@{state\_size}}
+\index{state\_size@{state\_size}!sysio::chain::controller::config@{sysio::chain::controller::config}}
+\doxysubsubsection{\texorpdfstring{state\_size}{state\_size}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1controller_1_1config_a88eb8a7243705bc36c2e20e6ac603029} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} sysio\+::chain\+::controller\+::config\+::state\+\_\+size = chain\+::config\+::default\+\_\+state\+\_\+size}
+
+
+
+Definition at line \mbox{\hyperlink{controller_8hpp_source_l00076}{76}} of file \mbox{\hyperlink{controller_8hpp_source}{controller.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1controller_1_1config_a5352099a52d4b3f078ec78122393ba21}\index{sysio::chain::controller::config@{sysio::chain::controller::config}!terminate\_at\_block@{terminate\_at\_block}}
+\index{terminate\_at\_block@{terminate\_at\_block}!sysio::chain::controller::config@{sysio::chain::controller::config}}
+\doxysubsubsection{\texorpdfstring{terminate\_at\_block}{terminate\_at\_block}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1controller_1_1config_a5352099a52d4b3f078ec78122393ba21} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::chain\+::controller\+::config\+::terminate\+\_\+at\+\_\+block = 0}
+
+
+
+Definition at line \mbox{\hyperlink{controller_8hpp_source_l00088}{88}} of file \mbox{\hyperlink{controller_8hpp_source}{controller.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1controller_1_1config_aa5cd88a8e95077bf25e9ad638cf46635}\index{sysio::chain::controller::config@{sysio::chain::controller::config}!thread\_pool\_size@{thread\_pool\_size}}
+\index{thread\_pool\_size@{thread\_pool\_size}!sysio::chain::controller::config@{sysio::chain::controller::config}}
+\doxysubsubsection{\texorpdfstring{thread\_pool\_size}{thread\_pool\_size}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1controller_1_1config_aa5cd88a8e95077bf25e9ad638cf46635} 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} sysio\+::chain\+::controller\+::config\+::thread\+\_\+pool\+\_\+size = chain\+::config\+::default\+\_\+controller\+\_\+thread\+\_\+pool\+\_\+size}
+
+
+
+Definition at line \mbox{\hyperlink{controller_8hpp_source_l00079}{79}} of file \mbox{\hyperlink{controller_8hpp_source}{controller.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1controller_1_1config_aee4a7e63b501799283ac04db7a3b9002}\index{sysio::chain::controller::config@{sysio::chain::controller::config}!trusted\_producers@{trusted\_producers}}
+\index{trusted\_producers@{trusted\_producers}!sysio::chain::controller::config@{sysio::chain::controller::config}}
+\doxysubsubsection{\texorpdfstring{trusted\_producers}{trusted\_producers}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1controller_1_1config_aee4a7e63b501799283ac04db7a3b9002} 
+flat\+\_\+set$<$\mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}}$>$ sysio\+::chain\+::controller\+::config\+::trusted\+\_\+producers}
+
+
+
+Definition at line \mbox{\hyperlink{controller_8hpp_source_l00100}{100}} of file \mbox{\hyperlink{controller_8hpp_source}{controller.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1controller_1_1config_af672f8fa95bc01cb0b64d54924d51f04}\index{sysio::chain::controller::config@{sysio::chain::controller::config}!wasm\_runtime@{wasm\_runtime}}
+\index{wasm\_runtime@{wasm\_runtime}!sysio::chain::controller::config@{sysio::chain::controller::config}}
+\doxysubsubsection{\texorpdfstring{wasm\_runtime}{wasm\_runtime}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1controller_1_1config_af672f8fa95bc01cb0b64d54924d51f04} 
+\mbox{\hyperlink{classsysio_1_1chain_1_1wasm__interface_a9053d9e65167e5f241f1f3f27b175f9c}{wasm\+\_\+interface\+::vm\+\_\+type}} sysio\+::chain\+::controller\+::config\+::wasm\+\_\+runtime = chain\+::config\+::default\+\_\+wasm\+\_\+runtime}
+
+
+
+Definition at line \mbox{\hyperlink{controller_8hpp_source_l00090}{90}} of file \mbox{\hyperlink{controller_8hpp_source}{controller.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{controller_8hpp}{controller.\+hpp}}\end{DoxyCompactItemize}

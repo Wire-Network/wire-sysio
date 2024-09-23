@@ -1,0 +1,168 @@
+\doxysection{sysio\+::chain\+::eosvmoc\+::compile\+\_\+monitor Struct Reference}
+\hypertarget{structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor}{}\label{structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor}\index{sysio::chain::eosvmoc::compile\_monitor@{sysio::chain::eosvmoc::compile\_monitor}}
+
+
+Collaboration diagram for sysio\+::chain\+::eosvmoc\+::compile\+\_\+monitor\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=225pt]{structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor_a5c862c82ff729f4ebd6c3f05b735e5ea}{compile\+\_\+monitor}} (boost\+::asio\+::io\+\_\+context \&ctx, local\+::datagram\+\_\+protocol\+::socket \&\&n, \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1wrapped__fd}{wrapped\+\_\+fd}} \&\&t)
+\item 
+void \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor_af642188a969797828c1a3cf56ced16be}{wait\+\_\+for\+\_\+new\+\_\+incomming\+\_\+session}} (boost\+::asio\+::io\+\_\+context \&ctx)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+local\+::datagram\+\_\+protocol\+::socket \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor_ae6f9c23ec0c99b368507b7b0dfffc3ac}{\+\_\+nodeop\+\_\+socket}}
+\item 
+\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1wrapped__fd}{wrapped\+\_\+fd}} \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor_a95f3689850da124486fa84fe5575ab2a}{\+\_\+trampoline\+\_\+socket}}
+\item 
+std\+::list$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor__session}{compile\+\_\+monitor\+\_\+session}} $>$ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor_ac7d8f4cbd1096f7672428859e3485ac6}{\+\_\+compile\+\_\+sessions}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{compile__monitor_8cpp_source_l00185}{185}} of file \mbox{\hyperlink{compile__monitor_8cpp_source}{compile\+\_\+monitor.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor_a5c862c82ff729f4ebd6c3f05b735e5ea}\index{sysio::chain::eosvmoc::compile\_monitor@{sysio::chain::eosvmoc::compile\_monitor}!compile\_monitor@{compile\_monitor}}
+\index{compile\_monitor@{compile\_monitor}!sysio::chain::eosvmoc::compile\_monitor@{sysio::chain::eosvmoc::compile\_monitor}}
+\doxysubsubsection{\texorpdfstring{compile\_monitor()}{compile\_monitor()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor_a5c862c82ff729f4ebd6c3f05b735e5ea} 
+sysio\+::chain\+::eosvmoc\+::compile\+\_\+monitor\+::compile\+\_\+monitor (\begin{DoxyParamCaption}\item[{boost\+::asio\+::io\+\_\+context \&}]{ctx}{, }\item[{local\+::datagram\+\_\+protocol\+::socket \&\&}]{n}{, }\item[{\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1wrapped__fd}{wrapped\+\_\+fd}} \&\&}]{t}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{compile__monitor_8cpp_source_l00186}{186}} of file \mbox{\hyperlink{compile__monitor_8cpp_source}{compile\+\_\+monitor.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor_ae6f9c23ec0c99b368507b7b0dfffc3ac}{\_nodeop\_socket}}(std::move(n)),\ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor_a95f3689850da124486fa84fe5575ab2a}{\_trampoline\_socket}}(std::move(t))\ \{}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \textcolor{comment}{//the\ only\ duty\ of\ compile\_monitor\ is\ to\ create\ a\ compile\_monitor\_session\ when\ a\ code\_cache\ instance}}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \textcolor{comment}{//\ in\ nodeop\ wants\ one}}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor_af642188a969797828c1a3cf56ced16be}{wait\_for\_new\_incomming\_session}}(ctx);}
+\DoxyCodeLine{00190\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor_a5c862c82ff729f4ebd6c3f05b735e5ea_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor_af642188a969797828c1a3cf56ced16be}\index{sysio::chain::eosvmoc::compile\_monitor@{sysio::chain::eosvmoc::compile\_monitor}!wait\_for\_new\_incomming\_session@{wait\_for\_new\_incomming\_session}}
+\index{wait\_for\_new\_incomming\_session@{wait\_for\_new\_incomming\_session}!sysio::chain::eosvmoc::compile\_monitor@{sysio::chain::eosvmoc::compile\_monitor}}
+\doxysubsubsection{\texorpdfstring{wait\_for\_new\_incomming\_session()}{wait\_for\_new\_incomming\_session()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor_af642188a969797828c1a3cf56ced16be} 
+void sysio\+::chain\+::eosvmoc\+::compile\+\_\+monitor\+::wait\+\_\+for\+\_\+new\+\_\+incomming\+\_\+session (\begin{DoxyParamCaption}\item[{boost\+::asio\+::io\+\_\+context \&}]{ctx}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{compile__monitor_8cpp_source_l00192}{192}} of file \mbox{\hyperlink{compile__monitor_8cpp_source}{compile\+\_\+monitor.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor_ae6f9c23ec0c99b368507b7b0dfffc3ac}{\_nodeop\_socket}}.async\_wait(boost::asio::local::datagram\_protocol::socket::wait\_read,\ [\textcolor{keyword}{this},\ \&ctx](\textcolor{keyword}{auto}\ ec)\ \{}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(ec)\ \{}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ \ \ \ \ ctx.stop();}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ [\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a72ffd6653260a2dedcc4b55e39e10973a4e09c20e9a85794807a130e8283e8769}{success}},\ message,\ fds]\ =\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_aa65c4d6c02a0823262c6627a86cc74bc}{read\_message\_with\_fds}}(\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor_ae6f9c23ec0c99b368507b7b0dfffc3ac}{\_nodeop\_socket}});}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!success)\ \{\ \ \ \textcolor{comment}{//failure\ reading\ indicates\ that\ nodeop\ has\ shut\ down}}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \ \ \ \ ctx.stop();}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!std::holds\_alternative<initialize\_message>(message)\ ||\ fds.size()\ !=\ 2)\ \{}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ \ \ \ \ ctx.stop();}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \ \ \ \ \ \ local::datagram\_protocol::socket\ \_socket\_for\_comm(ctx);}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \ \ \ \ \ \ \_socket\_for\_comm.assign(local::datagram\_protocol(),\ fds[0].release());}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor_ac7d8f4cbd1096f7672428859e3485ac6}{\_compile\_sessions}}.emplace\_front(ctx,\ std::move(\_socket\_for\_comm),\ std::move(fds[1]),\ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor_a95f3689850da124486fa84fe5575ab2a}{\_trampoline\_socket}});}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor_ac7d8f4cbd1096f7672428859e3485ac6}{\_compile\_sessions}}.front().connection\_dead\_signal.connect([\&,\ it\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor_ac7d8f4cbd1096f7672428859e3485ac6}{\_compile\_sessions}}.begin()]()\ \{}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ctx.post([\&]()\ \{}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_compile\_sessions.erase(it);}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a8715d32fd2e6a4a668578ca0d946b58b}{write\_message\_with\_fds}}(\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor_ae6f9c23ec0c99b368507b7b0dfffc3ac}{\_nodeop\_socket}},\ initalize\_response\_message());}
+\DoxyCodeLine{00217\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00218\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{catch}(\textcolor{keyword}{const}\ std::exception\&\ e)\ \{}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a8715d32fd2e6a4a668578ca0d946b58b}{write\_message\_with\_fds}}(\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor_ae6f9c23ec0c99b368507b7b0dfffc3ac}{\_nodeop\_socket}},\ initalize\_response\_message\{e.what()\});}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{catch}(...)\ \{}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a8715d32fd2e6a4a668578ca0d946b58b}{write\_message\_with\_fds}}(\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor_ae6f9c23ec0c99b368507b7b0dfffc3ac}{\_nodeop\_socket}},\ initalize\_response\_message\{\textcolor{stringliteral}{"{}Failed\ to\ create\ compile\ process"{}}\});}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00224\ }
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor_af642188a969797828c1a3cf56ced16be}{wait\_for\_new\_incomming\_session}}(ctx);}
+\DoxyCodeLine{00226\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00227\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor_af642188a969797828c1a3cf56ced16be_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor_af642188a969797828c1a3cf56ced16be_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor_ac7d8f4cbd1096f7672428859e3485ac6}\index{sysio::chain::eosvmoc::compile\_monitor@{sysio::chain::eosvmoc::compile\_monitor}!\_compile\_sessions@{\_compile\_sessions}}
+\index{\_compile\_sessions@{\_compile\_sessions}!sysio::chain::eosvmoc::compile\_monitor@{sysio::chain::eosvmoc::compile\_monitor}}
+\doxysubsubsection{\texorpdfstring{\_compile\_sessions}{\_compile\_sessions}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor_ac7d8f4cbd1096f7672428859e3485ac6} 
+std\+::list$<$\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor__session}{compile\+\_\+monitor\+\_\+session}}$>$ sysio\+::chain\+::eosvmoc\+::compile\+\_\+monitor\+::\+\_\+compile\+\_\+sessions}
+
+
+
+Definition at line \mbox{\hyperlink{compile__monitor_8cpp_source_l00232}{232}} of file \mbox{\hyperlink{compile__monitor_8cpp_source}{compile\+\_\+monitor.\+cpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor_ae6f9c23ec0c99b368507b7b0dfffc3ac}\index{sysio::chain::eosvmoc::compile\_monitor@{sysio::chain::eosvmoc::compile\_monitor}!\_nodeop\_socket@{\_nodeop\_socket}}
+\index{\_nodeop\_socket@{\_nodeop\_socket}!sysio::chain::eosvmoc::compile\_monitor@{sysio::chain::eosvmoc::compile\_monitor}}
+\doxysubsubsection{\texorpdfstring{\_nodeop\_socket}{\_nodeop\_socket}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor_ae6f9c23ec0c99b368507b7b0dfffc3ac} 
+local\+::datagram\+\_\+protocol\+::socket sysio\+::chain\+::eosvmoc\+::compile\+\_\+monitor\+::\+\_\+nodeop\+\_\+socket}
+
+
+
+Definition at line \mbox{\hyperlink{compile__monitor_8cpp_source_l00229}{229}} of file \mbox{\hyperlink{compile__monitor_8cpp_source}{compile\+\_\+monitor.\+cpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor_a95f3689850da124486fa84fe5575ab2a}\index{sysio::chain::eosvmoc::compile\_monitor@{sysio::chain::eosvmoc::compile\_monitor}!\_trampoline\_socket@{\_trampoline\_socket}}
+\index{\_trampoline\_socket@{\_trampoline\_socket}!sysio::chain::eosvmoc::compile\_monitor@{sysio::chain::eosvmoc::compile\_monitor}}
+\doxysubsubsection{\texorpdfstring{\_trampoline\_socket}{\_trampoline\_socket}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor_a95f3689850da124486fa84fe5575ab2a} 
+\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1wrapped__fd}{wrapped\+\_\+fd}} sysio\+::chain\+::eosvmoc\+::compile\+\_\+monitor\+::\+\_\+trampoline\+\_\+socket}
+
+
+
+Definition at line \mbox{\hyperlink{compile__monitor_8cpp_source_l00230}{230}} of file \mbox{\hyperlink{compile__monitor_8cpp_source}{compile\+\_\+monitor.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/webassembly/runtimes/sys-\/vm-\/oc/\mbox{\hyperlink{compile__monitor_8cpp}{compile\+\_\+monitor.\+cpp}}\end{DoxyCompactItemize}

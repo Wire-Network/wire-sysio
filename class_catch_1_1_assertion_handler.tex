@@ -1,0 +1,528 @@
+\doxysection{Catch\+::Assertion\+Handler Class Reference}
+\hypertarget{class_catch_1_1_assertion_handler}{}\label{class_catch_1_1_assertion_handler}\index{Catch::AssertionHandler@{Catch::AssertionHandler}}
+
+
+{\ttfamily \#include $<$catch\+\_\+assertionhandler.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_catch_1_1_assertion_handler_a32efbb1b56b71d758d4c2094bac1f1a9}{Assertion\+Handler}} (\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} const \&macro\+Name, \mbox{\hyperlink{struct_catch_1_1_source_line_info}{Source\+Line\+Info}} const \&line\+Info, \mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} captured\+Expression, \mbox{\hyperlink{struct_catch_1_1_result_disposition_a3396cad6e2259af326b3aae93e23e9d8}{Result\+Disposition\+::\+Flags}} result\+Disposition)
+\item 
+\mbox{\hyperlink{class_catch_1_1_assertion_handler_a1e839d810f6ac0fa6d127fe8350175ed}{\texorpdfstring{$\sim$}{\string~}\+Assertion\+Handler}} ()
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{class_catch_1_1_assertion_handler_a2ef387e567bad90ec6e4b5bf5c367388}{handle\+Expr}} (\mbox{\hyperlink{class_catch_1_1_expr_lhs}{Expr\+Lhs}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ const \&expr)
+\item 
+void \mbox{\hyperlink{class_catch_1_1_assertion_handler_afe14d9cf1b1c7f70dae439fbdb51d0c4}{handle\+Expr}} (\mbox{\hyperlink{struct_catch_1_1_i_transient_expression}{ITransient\+Expression}} const \&expr)
+\item 
+void \mbox{\hyperlink{class_catch_1_1_assertion_handler_abdb4c180ed83ec2858b2fb87712c516d}{handle\+Message}} (\mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef}{Result\+Was\+::\+Of\+Type}} result\+Type, \mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} const \&message)
+\item 
+void \mbox{\hyperlink{class_catch_1_1_assertion_handler_ab6caf765764a4064e90fce829eec201d}{handle\+Exception\+Thrown\+As\+Expected}} ()
+\item 
+void \mbox{\hyperlink{class_catch_1_1_assertion_handler_a7764d0adb6ed5eeb10964f6abc02fab1}{handle\+Unexpected\+Exception\+Not\+Thrown}} ()
+\item 
+void \mbox{\hyperlink{class_catch_1_1_assertion_handler_a51e4936e3af43b74690cedae6d2e297a}{handle\+Exception\+Not\+Thrown\+As\+Expected}} ()
+\item 
+void \mbox{\hyperlink{class_catch_1_1_assertion_handler_a67a194d5518f307c4a16faa03a7f7442}{handle\+Throwing\+Call\+Skipped}} ()
+\item 
+void \mbox{\hyperlink{class_catch_1_1_assertion_handler_aa2504dad6a91f3645e5f52c932c11270}{handle\+Unexpected\+Inflight\+Exception}} ()
+\item 
+void \mbox{\hyperlink{class_catch_1_1_assertion_handler_a878a9eb828d8a1863c8dcb6575f6f40e}{complete}} ()
+\item 
+void \mbox{\hyperlink{class_catch_1_1_assertion_handler_a6756bd5395c0ddd28764a9fb4612d5e4}{set\+Completed}} ()
+\item 
+auto \mbox{\hyperlink{class_catch_1_1_assertion_handler_a193bb3999494c46457f3059184c6b251}{allow\+Throws}} () const -\/$>$ bool
+\item 
+\mbox{\hyperlink{class_catch_1_1_assertion_handler_a32efbb1b56b71d758d4c2094bac1f1a9}{Assertion\+Handler}} (\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} const \&macro\+Name, \mbox{\hyperlink{struct_catch_1_1_source_line_info}{Source\+Line\+Info}} const \&line\+Info, \mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} captured\+Expression, \mbox{\hyperlink{struct_catch_1_1_result_disposition_a3396cad6e2259af326b3aae93e23e9d8}{Result\+Disposition\+::\+Flags}} result\+Disposition)
+\item 
+\mbox{\hyperlink{class_catch_1_1_assertion_handler_a1e839d810f6ac0fa6d127fe8350175ed}{\texorpdfstring{$\sim$}{\string~}\+Assertion\+Handler}} ()
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{class_catch_1_1_assertion_handler_a2ef387e567bad90ec6e4b5bf5c367388}{handle\+Expr}} (\mbox{\hyperlink{class_catch_1_1_expr_lhs}{Expr\+Lhs}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ const \&expr)
+\item 
+void \mbox{\hyperlink{class_catch_1_1_assertion_handler_afe14d9cf1b1c7f70dae439fbdb51d0c4}{handle\+Expr}} (\mbox{\hyperlink{struct_catch_1_1_i_transient_expression}{ITransient\+Expression}} const \&expr)
+\item 
+void \mbox{\hyperlink{class_catch_1_1_assertion_handler_abdb4c180ed83ec2858b2fb87712c516d}{handle\+Message}} (\mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef}{Result\+Was\+::\+Of\+Type}} result\+Type, \mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} const \&message)
+\item 
+void \mbox{\hyperlink{class_catch_1_1_assertion_handler_ab6caf765764a4064e90fce829eec201d}{handle\+Exception\+Thrown\+As\+Expected}} ()
+\item 
+void \mbox{\hyperlink{class_catch_1_1_assertion_handler_a7764d0adb6ed5eeb10964f6abc02fab1}{handle\+Unexpected\+Exception\+Not\+Thrown}} ()
+\item 
+void \mbox{\hyperlink{class_catch_1_1_assertion_handler_a51e4936e3af43b74690cedae6d2e297a}{handle\+Exception\+Not\+Thrown\+As\+Expected}} ()
+\item 
+void \mbox{\hyperlink{class_catch_1_1_assertion_handler_a67a194d5518f307c4a16faa03a7f7442}{handle\+Throwing\+Call\+Skipped}} ()
+\item 
+void \mbox{\hyperlink{class_catch_1_1_assertion_handler_aa2504dad6a91f3645e5f52c932c11270}{handle\+Unexpected\+Inflight\+Exception}} ()
+\item 
+void \mbox{\hyperlink{class_catch_1_1_assertion_handler_a878a9eb828d8a1863c8dcb6575f6f40e}{complete}} ()
+\item 
+void \mbox{\hyperlink{class_catch_1_1_assertion_handler_a6756bd5395c0ddd28764a9fb4612d5e4}{set\+Completed}} ()
+\item 
+auto \mbox{\hyperlink{class_catch_1_1_assertion_handler_a193bb3999494c46457f3059184c6b251}{allow\+Throws}} () const -\/$>$ bool
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source_l02173}{2173}} of file \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source}{catch.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_catch_1_1_assertion_handler_a32efbb1b56b71d758d4c2094bac1f1a9}\index{Catch::AssertionHandler@{Catch::AssertionHandler}!AssertionHandler@{AssertionHandler}}
+\index{AssertionHandler@{AssertionHandler}!Catch::AssertionHandler@{Catch::AssertionHandler}}
+\doxysubsubsection{\texorpdfstring{AssertionHandler()}{AssertionHandler()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_assertion_handler_a32efbb1b56b71d758d4c2094bac1f1a9} 
+Catch\+::\+Assertion\+Handler\+::\+Assertion\+Handler (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} const \&}]{macro\+Name}{, }\item[{\mbox{\hyperlink{struct_catch_1_1_source_line_info}{Source\+Line\+Info}} const \&}]{line\+Info}{, }\item[{\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}}}]{captured\+Expression}{, }\item[{\mbox{\hyperlink{struct_catch_1_1_result_disposition_a3396cad6e2259af326b3aae93e23e9d8}{Result\+Disposition\+::\+Flags}}}]{result\+Disposition}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__assertionhandler_8cpp_source_l00054}{54}} of file \mbox{\hyperlink{catch__assertionhandler_8cpp_source}{catch\+\_\+assertionhandler.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00059\ \ \ \ \ :\ \ \ m\_assertionInfo\{\ macroName,\ lineInfo,\ capturedExpression,\ resultDisposition\ \},}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ m\_resultCapture(\ \mbox{\hyperlink{namespace_catch_af718eeab870712f292ed8dc6ee3f6488}{getResultCapture}}()\ )}
+\DoxyCodeLine{00061\ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_assertion_handler_a1e839d810f6ac0fa6d127fe8350175ed}\index{Catch::AssertionHandler@{Catch::AssertionHandler}!````~AssertionHandler@{\texorpdfstring{$\sim$}{\string~}AssertionHandler}}
+\index{````~AssertionHandler@{\texorpdfstring{$\sim$}{\string~}AssertionHandler}!Catch::AssertionHandler@{Catch::AssertionHandler}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}AssertionHandler()}{\string~AssertionHandler()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_assertion_handler_a1e839d810f6ac0fa6d127fe8350175ed} 
+Catch\+::\+Assertion\+Handler\+::\texorpdfstring{$\sim$}{\string~}\+Assertion\+Handler (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__assertionhandler_8h_source_l00056}{56}} of file \mbox{\hyperlink{catch__assertionhandler_8h_source}{catch\+\_\+assertionhandler.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ !m\_completed\ )\ \{}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_resultCapture.\mbox{\hyperlink{struct_catch_1_1_i_result_capture_a89b89372eb09cc44f8dcad363de6157d}{handleIncomplete}}(\ m\_assertionInfo\ );}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_assertion_handler_a1e839d810f6ac0fa6d127fe8350175ed_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_assertion_handler_a32efbb1b56b71d758d4c2094bac1f1a9}\index{Catch::AssertionHandler@{Catch::AssertionHandler}!AssertionHandler@{AssertionHandler}}
+\index{AssertionHandler@{AssertionHandler}!Catch::AssertionHandler@{Catch::AssertionHandler}}
+\doxysubsubsection{\texorpdfstring{AssertionHandler()}{AssertionHandler()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_assertion_handler_a32efbb1b56b71d758d4c2094bac1f1a9} 
+Catch\+::\+Assertion\+Handler\+::\+Assertion\+Handler (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} const \&}]{macro\+Name}{, }\item[{\mbox{\hyperlink{struct_catch_1_1_source_line_info}{Source\+Line\+Info}} const \&}]{line\+Info}{, }\item[{\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}}}]{captured\+Expression}{, }\item[{\mbox{\hyperlink{struct_catch_1_1_result_disposition_a3396cad6e2259af326b3aae93e23e9d8}{Result\+Disposition\+::\+Flags}}}]{result\+Disposition}{}\end{DoxyParamCaption})}
+
+\Hypertarget{class_catch_1_1_assertion_handler_a1e839d810f6ac0fa6d127fe8350175ed}\index{Catch::AssertionHandler@{Catch::AssertionHandler}!````~AssertionHandler@{\texorpdfstring{$\sim$}{\string~}AssertionHandler}}
+\index{````~AssertionHandler@{\texorpdfstring{$\sim$}{\string~}AssertionHandler}!Catch::AssertionHandler@{Catch::AssertionHandler}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}AssertionHandler()}{\string~AssertionHandler()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_assertion_handler_a1e839d810f6ac0fa6d127fe8350175ed} 
+Catch\+::\+Assertion\+Handler\+::\texorpdfstring{$\sim$}{\string~}\+Assertion\+Handler (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source_l02185}{2185}} of file \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source}{catch.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02185\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02186\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ !m\_completed\ )\ \{}
+\DoxyCodeLine{02187\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_resultCapture.\mbox{\hyperlink{struct_catch_1_1_i_result_capture_a89b89372eb09cc44f8dcad363de6157d}{handleIncomplete}}(\ m\_assertionInfo\ );}
+\DoxyCodeLine{02188\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{02189\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_assertion_handler_a1e839d810f6ac0fa6d127fe8350175ed_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_catch_1_1_assertion_handler_a193bb3999494c46457f3059184c6b251}\index{Catch::AssertionHandler@{Catch::AssertionHandler}!allowThrows@{allowThrows}}
+\index{allowThrows@{allowThrows}!Catch::AssertionHandler@{Catch::AssertionHandler}}
+\doxysubsubsection{\texorpdfstring{allowThrows()}{allowThrows()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_assertion_handler_a193bb3999494c46457f3059184c6b251} 
+auto Catch\+::\+Assertion\+Handler\+::allow\+Throws (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const -\/$>$ bool}
+
+
+
+Definition at line \mbox{\hyperlink{catch__assertionhandler_8cpp_source_l00070}{70}} of file \mbox{\hyperlink{catch__assertionhandler_8cpp_source}{catch\+\_\+assertionhandler.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_catch_a228a625318bb6183842e394eeba17d50}{getCurrentContext}}().\mbox{\hyperlink{struct_catch_1_1_i_context_ad72743ae753feab0a6f5505f26f79ced}{getConfig}}()-\/>allowThrows();}
+\DoxyCodeLine{00072\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_assertion_handler_a193bb3999494c46457f3059184c6b251_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_assertion_handler_a193bb3999494c46457f3059184c6b251}\index{Catch::AssertionHandler@{Catch::AssertionHandler}!allowThrows@{allowThrows}}
+\index{allowThrows@{allowThrows}!Catch::AssertionHandler@{Catch::AssertionHandler}}
+\doxysubsubsection{\texorpdfstring{allowThrows()}{allowThrows()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_assertion_handler_a193bb3999494c46457f3059184c6b251} 
+auto Catch\+::\+Assertion\+Handler\+::allow\+Throws (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const -\/$>$  bool}
+
+\Hypertarget{class_catch_1_1_assertion_handler_a878a9eb828d8a1863c8dcb6575f6f40e}\index{Catch::AssertionHandler@{Catch::AssertionHandler}!complete@{complete}}
+\index{complete@{complete}!Catch::AssertionHandler@{Catch::AssertionHandler}}
+\doxysubsubsection{\texorpdfstring{complete()}{complete()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_assertion_handler_a878a9eb828d8a1863c8dcb6575f6f40e} 
+void Catch\+::\+Assertion\+Handler\+::complete (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__assertionhandler_8cpp_source_l00074}{74}} of file \mbox{\hyperlink{catch__assertionhandler_8cpp_source}{catch\+\_\+assertionhandler.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_assertion_handler_a6756bd5395c0ddd28764a9fb4612d5e4}{setCompleted}}();}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ m\_reaction.\mbox{\hyperlink{struct_catch_1_1_assertion_reaction_adcf30fb90ff20d9789df78d424652497}{shouldDebugBreak}}\ )\ \{}
+\DoxyCodeLine{00077\ }
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ you\ find\ your\ debugger\ stopping\ you\ here\ then\ go\ one\ level\ up\ on\ the}}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ call-\/stack\ for\ the\ code\ that\ caused\ it\ (typically\ a\ failed\ assertion)}}
+\DoxyCodeLine{00080\ }
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ (To\ go\ back\ to\ the\ test\ and\ change\ execution,\ jump\ over\ the\ throw,\ next)}}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{catch__debugger_8h_a89636e916d8b61c85c63ea5a75b1e6fd}{CATCH\_BREAK\_INTO\_DEBUGGER}}();}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (m\_reaction.\mbox{\hyperlink{struct_catch_1_1_assertion_reaction_a82c8d95a2c1b6a331bde66982a8e090f}{shouldThrow}})\ \{}
+\DoxyCodeLine{00085\ \textcolor{preprocessor}{\#if\ !defined(CATCH\_CONFIG\_DISABLE\_EXCEPTIONS)}}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{struct_catch_1_1_test_failure_exception}{Catch::TestFailureException}}();}
+\DoxyCodeLine{00087\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{catch__enforce_8h_adc6e1c0661c7c34fbb6033de06ec4833}{CATCH\_ERROR}}(\ \textcolor{stringliteral}{"{}Test\ failure\ requires\ aborting\ test!"{}}\ );}
+\DoxyCodeLine{00089\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00091\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_assertion_handler_a878a9eb828d8a1863c8dcb6575f6f40e_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_assertion_handler_a878a9eb828d8a1863c8dcb6575f6f40e}\index{Catch::AssertionHandler@{Catch::AssertionHandler}!complete@{complete}}
+\index{complete@{complete}!Catch::AssertionHandler@{Catch::AssertionHandler}}
+\doxysubsubsection{\texorpdfstring{complete()}{complete()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_assertion_handler_a878a9eb828d8a1863c8dcb6575f6f40e} 
+void Catch\+::\+Assertion\+Handler\+::complete (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{class_catch_1_1_assertion_handler_a51e4936e3af43b74690cedae6d2e297a}\index{Catch::AssertionHandler@{Catch::AssertionHandler}!handleExceptionNotThrownAsExpected@{handleExceptionNotThrownAsExpected}}
+\index{handleExceptionNotThrownAsExpected@{handleExceptionNotThrownAsExpected}!Catch::AssertionHandler@{Catch::AssertionHandler}}
+\doxysubsubsection{\texorpdfstring{handleExceptionNotThrownAsExpected()}{handleExceptionNotThrownAsExpected()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_assertion_handler_a51e4936e3af43b74690cedae6d2e297a} 
+void Catch\+::\+Assertion\+Handler\+::handle\+Exception\+Not\+Thrown\+As\+Expected (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__assertionhandler_8cpp_source_l00103}{103}} of file \mbox{\hyperlink{catch__assertionhandler_8cpp_source}{catch\+\_\+assertionhandler.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ m\_resultCapture.\mbox{\hyperlink{struct_catch_1_1_i_result_capture_ab7dbdf8aa28427119583e24dbb302c63}{handleNonExpr}}(m\_assertionInfo,\ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efacff2783ae5a0ec92d7907d55233aa695}{ResultWas::Ok}},\ m\_reaction);}
+\DoxyCodeLine{00105\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_assertion_handler_a51e4936e3af43b74690cedae6d2e297a_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_assertion_handler_a51e4936e3af43b74690cedae6d2e297a}\index{Catch::AssertionHandler@{Catch::AssertionHandler}!handleExceptionNotThrownAsExpected@{handleExceptionNotThrownAsExpected}}
+\index{handleExceptionNotThrownAsExpected@{handleExceptionNotThrownAsExpected}!Catch::AssertionHandler@{Catch::AssertionHandler}}
+\doxysubsubsection{\texorpdfstring{handleExceptionNotThrownAsExpected()}{handleExceptionNotThrownAsExpected()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_assertion_handler_a51e4936e3af43b74690cedae6d2e297a} 
+void Catch\+::\+Assertion\+Handler\+::handle\+Exception\+Not\+Thrown\+As\+Expected (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{class_catch_1_1_assertion_handler_ab6caf765764a4064e90fce829eec201d}\index{Catch::AssertionHandler@{Catch::AssertionHandler}!handleExceptionThrownAsExpected@{handleExceptionThrownAsExpected}}
+\index{handleExceptionThrownAsExpected@{handleExceptionThrownAsExpected}!Catch::AssertionHandler@{Catch::AssertionHandler}}
+\doxysubsubsection{\texorpdfstring{handleExceptionThrownAsExpected()}{handleExceptionThrownAsExpected()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_assertion_handler_ab6caf765764a4064e90fce829eec201d} 
+void Catch\+::\+Assertion\+Handler\+::handle\+Exception\+Thrown\+As\+Expected (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__assertionhandler_8cpp_source_l00100}{100}} of file \mbox{\hyperlink{catch__assertionhandler_8cpp_source}{catch\+\_\+assertionhandler.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ m\_resultCapture.\mbox{\hyperlink{struct_catch_1_1_i_result_capture_ab7dbdf8aa28427119583e24dbb302c63}{handleNonExpr}}(m\_assertionInfo,\ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efacff2783ae5a0ec92d7907d55233aa695}{ResultWas::Ok}},\ m\_reaction);}
+\DoxyCodeLine{00102\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_assertion_handler_ab6caf765764a4064e90fce829eec201d_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_assertion_handler_ab6caf765764a4064e90fce829eec201d}\index{Catch::AssertionHandler@{Catch::AssertionHandler}!handleExceptionThrownAsExpected@{handleExceptionThrownAsExpected}}
+\index{handleExceptionThrownAsExpected@{handleExceptionThrownAsExpected}!Catch::AssertionHandler@{Catch::AssertionHandler}}
+\doxysubsubsection{\texorpdfstring{handleExceptionThrownAsExpected()}{handleExceptionThrownAsExpected()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_assertion_handler_ab6caf765764a4064e90fce829eec201d} 
+void Catch\+::\+Assertion\+Handler\+::handle\+Exception\+Thrown\+As\+Expected (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{class_catch_1_1_assertion_handler_a2ef387e567bad90ec6e4b5bf5c367388}\index{Catch::AssertionHandler@{Catch::AssertionHandler}!handleExpr@{handleExpr}}
+\index{handleExpr@{handleExpr}!Catch::AssertionHandler@{Catch::AssertionHandler}}
+\doxysubsubsection{\texorpdfstring{handleExpr()}{handleExpr()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_assertion_handler_a2ef387e567bad90ec6e4b5bf5c367388} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+void Catch\+::\+Assertion\+Handler\+::handle\+Expr (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_catch_1_1_expr_lhs}{Expr\+Lhs}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ const \&}]{expr}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__assertionhandler_8h_source_l00064}{64}} of file \mbox{\hyperlink{catch__assertionhandler_8h_source}{catch\+\_\+assertionhandler.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_assertion_handler_a2ef387e567bad90ec6e4b5bf5c367388}{handleExpr}}(\ expr.makeUnaryExpr()\ );}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_assertion_handler_a2ef387e567bad90ec6e4b5bf5c367388_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_assertion_handler_a2ef387e567bad90ec6e4b5bf5c367388_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_assertion_handler_a2ef387e567bad90ec6e4b5bf5c367388}\index{Catch::AssertionHandler@{Catch::AssertionHandler}!handleExpr@{handleExpr}}
+\index{handleExpr@{handleExpr}!Catch::AssertionHandler@{Catch::AssertionHandler}}
+\doxysubsubsection{\texorpdfstring{handleExpr()}{handleExpr()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_assertion_handler_a2ef387e567bad90ec6e4b5bf5c367388} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+void Catch\+::\+Assertion\+Handler\+::handle\+Expr (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_catch_1_1_expr_lhs}{Expr\+Lhs}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ const \&}]{expr}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source_l02192}{2192}} of file \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source}{catch.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02192\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02193\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_assertion_handler_a2ef387e567bad90ec6e4b5bf5c367388}{handleExpr}}(\ expr.makeUnaryExpr()\ );}
+\DoxyCodeLine{02194\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_assertion_handler_a2ef387e567bad90ec6e4b5bf5c367388_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_assertion_handler_afe14d9cf1b1c7f70dae439fbdb51d0c4}\index{Catch::AssertionHandler@{Catch::AssertionHandler}!handleExpr@{handleExpr}}
+\index{handleExpr@{handleExpr}!Catch::AssertionHandler@{Catch::AssertionHandler}}
+\doxysubsubsection{\texorpdfstring{handleExpr()}{handleExpr()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_assertion_handler_afe14d9cf1b1c7f70dae439fbdb51d0c4} 
+void Catch\+::\+Assertion\+Handler\+::handle\+Expr (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_i_transient_expression}{ITransient\+Expression}} const \&}]{expr}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__assertionhandler_8cpp_source_l00063}{63}} of file \mbox{\hyperlink{catch__assertionhandler_8cpp_source}{catch\+\_\+assertionhandler.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ m\_resultCapture.\mbox{\hyperlink{struct_catch_1_1_i_result_capture_a59a2b05391e464954575d2afb6d5d607}{handleExpr}}(\ m\_assertionInfo,\ expr,\ m\_reaction\ );}
+\DoxyCodeLine{00065\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_assertion_handler_afe14d9cf1b1c7f70dae439fbdb51d0c4_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_assertion_handler_afe14d9cf1b1c7f70dae439fbdb51d0c4}\index{Catch::AssertionHandler@{Catch::AssertionHandler}!handleExpr@{handleExpr}}
+\index{handleExpr@{handleExpr}!Catch::AssertionHandler@{Catch::AssertionHandler}}
+\doxysubsubsection{\texorpdfstring{handleExpr()}{handleExpr()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_assertion_handler_afe14d9cf1b1c7f70dae439fbdb51d0c4} 
+void Catch\+::\+Assertion\+Handler\+::handle\+Expr (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_i_transient_expression}{ITransient\+Expression}} const \&}]{expr}{}\end{DoxyParamCaption})}
+
+\Hypertarget{class_catch_1_1_assertion_handler_abdb4c180ed83ec2858b2fb87712c516d}\index{Catch::AssertionHandler@{Catch::AssertionHandler}!handleMessage@{handleMessage}}
+\index{handleMessage@{handleMessage}!Catch::AssertionHandler@{Catch::AssertionHandler}}
+\doxysubsubsection{\texorpdfstring{handleMessage()}{handleMessage()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_assertion_handler_abdb4c180ed83ec2858b2fb87712c516d} 
+void Catch\+::\+Assertion\+Handler\+::handle\+Message (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef}{Result\+Was\+::\+Of\+Type}}}]{result\+Type}{, }\item[{\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} const \&}]{message}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__assertionhandler_8cpp_source_l00066}{66}} of file \mbox{\hyperlink{catch__assertionhandler_8cpp_source}{catch\+\_\+assertionhandler.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ m\_resultCapture.\mbox{\hyperlink{struct_catch_1_1_i_result_capture_a21788ebc64571abf322b80c8cc51794d}{handleMessage}}(\ m\_assertionInfo,\ resultType,\ message,\ m\_reaction\ );}
+\DoxyCodeLine{00068\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_assertion_handler_abdb4c180ed83ec2858b2fb87712c516d_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_assertion_handler_abdb4c180ed83ec2858b2fb87712c516d}\index{Catch::AssertionHandler@{Catch::AssertionHandler}!handleMessage@{handleMessage}}
+\index{handleMessage@{handleMessage}!Catch::AssertionHandler@{Catch::AssertionHandler}}
+\doxysubsubsection{\texorpdfstring{handleMessage()}{handleMessage()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_assertion_handler_abdb4c180ed83ec2858b2fb87712c516d} 
+void Catch\+::\+Assertion\+Handler\+::handle\+Message (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef}{Result\+Was\+::\+Of\+Type}}}]{result\+Type}{, }\item[{\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} const \&}]{message}{}\end{DoxyParamCaption})}
+
+\Hypertarget{class_catch_1_1_assertion_handler_a67a194d5518f307c4a16faa03a7f7442}\index{Catch::AssertionHandler@{Catch::AssertionHandler}!handleThrowingCallSkipped@{handleThrowingCallSkipped}}
+\index{handleThrowingCallSkipped@{handleThrowingCallSkipped}!Catch::AssertionHandler@{Catch::AssertionHandler}}
+\doxysubsubsection{\texorpdfstring{handleThrowingCallSkipped()}{handleThrowingCallSkipped()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_assertion_handler_a67a194d5518f307c4a16faa03a7f7442} 
+void Catch\+::\+Assertion\+Handler\+::handle\+Throwing\+Call\+Skipped (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__assertionhandler_8cpp_source_l00111}{111}} of file \mbox{\hyperlink{catch__assertionhandler_8cpp_source}{catch\+\_\+assertionhandler.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ m\_resultCapture.\mbox{\hyperlink{struct_catch_1_1_i_result_capture_ab7dbdf8aa28427119583e24dbb302c63}{handleNonExpr}}(m\_assertionInfo,\ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efacff2783ae5a0ec92d7907d55233aa695}{ResultWas::Ok}},\ m\_reaction);}
+\DoxyCodeLine{00113\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_assertion_handler_a67a194d5518f307c4a16faa03a7f7442_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_assertion_handler_a67a194d5518f307c4a16faa03a7f7442}\index{Catch::AssertionHandler@{Catch::AssertionHandler}!handleThrowingCallSkipped@{handleThrowingCallSkipped}}
+\index{handleThrowingCallSkipped@{handleThrowingCallSkipped}!Catch::AssertionHandler@{Catch::AssertionHandler}}
+\doxysubsubsection{\texorpdfstring{handleThrowingCallSkipped()}{handleThrowingCallSkipped()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_assertion_handler_a67a194d5518f307c4a16faa03a7f7442} 
+void Catch\+::\+Assertion\+Handler\+::handle\+Throwing\+Call\+Skipped (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{class_catch_1_1_assertion_handler_a7764d0adb6ed5eeb10964f6abc02fab1}\index{Catch::AssertionHandler@{Catch::AssertionHandler}!handleUnexpectedExceptionNotThrown@{handleUnexpectedExceptionNotThrown}}
+\index{handleUnexpectedExceptionNotThrown@{handleUnexpectedExceptionNotThrown}!Catch::AssertionHandler@{Catch::AssertionHandler}}
+\doxysubsubsection{\texorpdfstring{handleUnexpectedExceptionNotThrown()}{handleUnexpectedExceptionNotThrown()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_assertion_handler_a7764d0adb6ed5eeb10964f6abc02fab1} 
+void Catch\+::\+Assertion\+Handler\+::handle\+Unexpected\+Exception\+Not\+Thrown (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__assertionhandler_8cpp_source_l00107}{107}} of file \mbox{\hyperlink{catch__assertionhandler_8cpp_source}{catch\+\_\+assertionhandler.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ m\_resultCapture.\mbox{\hyperlink{struct_catch_1_1_i_result_capture_a6382ed20486e2d9a020da971c6d5c53d}{handleUnexpectedExceptionNotThrown}}(\ m\_assertionInfo,\ m\_reaction\ );}
+\DoxyCodeLine{00109\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_assertion_handler_a7764d0adb6ed5eeb10964f6abc02fab1_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_assertion_handler_a7764d0adb6ed5eeb10964f6abc02fab1}\index{Catch::AssertionHandler@{Catch::AssertionHandler}!handleUnexpectedExceptionNotThrown@{handleUnexpectedExceptionNotThrown}}
+\index{handleUnexpectedExceptionNotThrown@{handleUnexpectedExceptionNotThrown}!Catch::AssertionHandler@{Catch::AssertionHandler}}
+\doxysubsubsection{\texorpdfstring{handleUnexpectedExceptionNotThrown()}{handleUnexpectedExceptionNotThrown()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_assertion_handler_a7764d0adb6ed5eeb10964f6abc02fab1} 
+void Catch\+::\+Assertion\+Handler\+::handle\+Unexpected\+Exception\+Not\+Thrown (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{class_catch_1_1_assertion_handler_aa2504dad6a91f3645e5f52c932c11270}\index{Catch::AssertionHandler@{Catch::AssertionHandler}!handleUnexpectedInflightException@{handleUnexpectedInflightException}}
+\index{handleUnexpectedInflightException@{handleUnexpectedInflightException}!Catch::AssertionHandler@{Catch::AssertionHandler}}
+\doxysubsubsection{\texorpdfstring{handleUnexpectedInflightException()}{handleUnexpectedInflightException()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_assertion_handler_aa2504dad6a91f3645e5f52c932c11270} 
+void Catch\+::\+Assertion\+Handler\+::handle\+Unexpected\+Inflight\+Exception (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__assertionhandler_8cpp_source_l00096}{96}} of file \mbox{\hyperlink{catch__assertionhandler_8cpp_source}{catch\+\_\+assertionhandler.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ m\_resultCapture.\mbox{\hyperlink{struct_catch_1_1_i_result_capture_afc97bc69829185222f955ebeef97adfe}{handleUnexpectedInflightException}}(\ m\_assertionInfo,\ \mbox{\hyperlink{namespace_catch_adafff91485eeeeb9e9333f317cc0e3b1}{Catch::translateActiveException}}(),\ m\_reaction\ );}
+\DoxyCodeLine{00098\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_assertion_handler_aa2504dad6a91f3645e5f52c932c11270_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_assertion_handler_aa2504dad6a91f3645e5f52c932c11270}\index{Catch::AssertionHandler@{Catch::AssertionHandler}!handleUnexpectedInflightException@{handleUnexpectedInflightException}}
+\index{handleUnexpectedInflightException@{handleUnexpectedInflightException}!Catch::AssertionHandler@{Catch::AssertionHandler}}
+\doxysubsubsection{\texorpdfstring{handleUnexpectedInflightException()}{handleUnexpectedInflightException()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_assertion_handler_aa2504dad6a91f3645e5f52c932c11270} 
+void Catch\+::\+Assertion\+Handler\+::handle\+Unexpected\+Inflight\+Exception (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{class_catch_1_1_assertion_handler_a6756bd5395c0ddd28764a9fb4612d5e4}\index{Catch::AssertionHandler@{Catch::AssertionHandler}!setCompleted@{setCompleted}}
+\index{setCompleted@{setCompleted}!Catch::AssertionHandler@{Catch::AssertionHandler}}
+\doxysubsubsection{\texorpdfstring{setCompleted()}{setCompleted()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_assertion_handler_a6756bd5395c0ddd28764a9fb4612d5e4} 
+void Catch\+::\+Assertion\+Handler\+::set\+Completed (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__assertionhandler_8cpp_source_l00092}{92}} of file \mbox{\hyperlink{catch__assertionhandler_8cpp_source}{catch\+\_\+assertionhandler.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ m\_completed\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00094\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_assertion_handler_a6756bd5395c0ddd28764a9fb4612d5e4_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_assertion_handler_a6756bd5395c0ddd28764a9fb4612d5e4}\index{Catch::AssertionHandler@{Catch::AssertionHandler}!setCompleted@{setCompleted}}
+\index{setCompleted@{setCompleted}!Catch::AssertionHandler@{Catch::AssertionHandler}}
+\doxysubsubsection{\texorpdfstring{setCompleted()}{setCompleted()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_assertion_handler_a6756bd5395c0ddd28764a9fb4612d5e4} 
+void Catch\+::\+Assertion\+Handler\+::set\+Completed (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__assertionhandler_8h}{catch\+\_\+assertionhandler.\+h}}\item 
+libraries/sys-\/vm/external/\+Catch2/single\+\_\+include/catch2/\mbox{\hyperlink{single__include_2catch2_2catch_8hpp}{catch.\+hpp}}\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__assertionhandler_8cpp}{catch\+\_\+assertionhandler.\+cpp}}\end{DoxyCompactItemize}

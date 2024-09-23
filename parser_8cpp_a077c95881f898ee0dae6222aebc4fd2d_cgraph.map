@@ -1,0 +1,7 @@
+<map id="BOOST_AUTO_TEST_CASE" name="BOOST_AUTO_TEST_CASE">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,13,202,38"/>
+<area shape="rect" id="Node000002" href="$namespacewebsocketpp_1_1http_1_1parser.html#a6c56e2f70369551a1dcd9816f3d4d2eb" title="Read and return the next token in the stream." alt="" coords="250,5,394,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="202,23,234,23,234,28,202,28"/>
+<area shape="rect" id="Node000003" href="$namespacewebsocketpp_1_1http.html#a45a9b60b72b68de7b32fb75d89ad4c04" title="Is the character a non&#45;token." alt="" coords="442,5,578,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="394,23,427,23,427,28,394,28"/>
+</map>

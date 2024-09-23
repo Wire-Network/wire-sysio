@@ -1,0 +1,44 @@
+\doxysection{catch\+\_\+clara.\+h}
+\hypertarget{catch__clara_8h_source}{}\label{catch__clara_8h_source}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_clara.h@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_clara.h}}
+\mbox{\hyperlink{catch__clara_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{catch__clara_8h_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{catch__clara_8h_source_l00002}00002\ \textcolor{comment}{\ *\ \ Created\ by\ Phil\ on\ 10/2/2014.}}
+\DoxyCodeLine{\Hypertarget{catch__clara_8h_source_l00003}00003\ \textcolor{comment}{\ *\ \ Copyright\ 2014\ Two\ Blue\ Cubes\ Ltd.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{catch__clara_8h_source_l00004}00004\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{catch__clara_8h_source_l00005}00005\ \textcolor{comment}{\ *\ \ Distributed\ under\ the\ Boost\ Software\ License,\ Version\ 1.0.\ (See\ accompanying}}
+\DoxyCodeLine{\Hypertarget{catch__clara_8h_source_l00006}00006\ \textcolor{comment}{\ *\ \ file\ LICENSE\_1\_0.txt\ or\ copy\ at\ http://www.boost.org/LICENSE\_1\_0.txt)}}
+\DoxyCodeLine{\Hypertarget{catch__clara_8h_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{catch__clara_8h_source_l00008}00008\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{catch__clara_8h_source_l00009}00009\ \textcolor{preprocessor}{\#ifndef\ TWOBLUECUBES\_CATCH\_CLARA\_H\_INCLUDED}}
+\DoxyCodeLine{\Hypertarget{catch__clara_8h_source_l00010}00010\ \textcolor{preprocessor}{\#define\ TWOBLUECUBES\_CATCH\_CLARA\_H\_INCLUDED}}
+\DoxyCodeLine{\Hypertarget{catch__clara_8h_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{catch__clara_8h_source_l00012}00012\ \textcolor{comment}{//\ Use\ Catch's\ value\ for\ console\ width\ (store\ Clara's\ off\ to\ the\ side,\ if\ present)}}
+\DoxyCodeLine{\Hypertarget{catch__clara_8h_source_l00013}00013\ \textcolor{preprocessor}{\#ifdef\ CLARA\_CONFIG\_CONSOLE\_WIDTH}}
+\DoxyCodeLine{\Hypertarget{catch__clara_8h_source_l00014}00014\ \textcolor{preprocessor}{\#define\ CATCH\_TEMP\_CLARA\_CONFIG\_CONSOLE\_WIDTH\ CATCH\_CLARA\_TEXTFLOW\_CONFIG\_CONSOLE\_WIDTH}}
+\DoxyCodeLine{\Hypertarget{catch__clara_8h_source_l00015}00015\ \textcolor{preprocessor}{\#undef\ CATCH\_CLARA\_TEXTFLOW\_CONFIG\_CONSOLE\_WIDTH}}
+\DoxyCodeLine{\Hypertarget{catch__clara_8h_source_l00016}00016\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{catch__clara_8h_source_l00017}\mbox{\hyperlink{catch__clara_8h_abce3e6073eb9847784aa3852bb0d1521}{00017}}\ \textcolor{preprocessor}{\#define\ CATCH\_CLARA\_TEXTFLOW\_CONFIG\_CONSOLE\_WIDTH\ CATCH\_CONFIG\_CONSOLE\_WIDTH-\/1}}
+\DoxyCodeLine{\Hypertarget{catch__clara_8h_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{catch__clara_8h_source_l00019}00019\ \textcolor{preprocessor}{\#ifdef\ \_\_clang\_\_}}
+\DoxyCodeLine{\Hypertarget{catch__clara_8h_source_l00020}00020\ \textcolor{preprocessor}{\#pragma\ clang\ diagnostic\ push}}
+\DoxyCodeLine{\Hypertarget{catch__clara_8h_source_l00021}00021\ \textcolor{preprocessor}{\#pragma\ clang\ diagnostic\ ignored\ "{}-\/Wweak-\/vtables"{}}}
+\DoxyCodeLine{\Hypertarget{catch__clara_8h_source_l00022}00022\ \textcolor{preprocessor}{\#pragma\ clang\ diagnostic\ ignored\ "{}-\/Wexit-\/time-\/destructors"{}}}
+\DoxyCodeLine{\Hypertarget{catch__clara_8h_source_l00023}00023\ \textcolor{preprocessor}{\#pragma\ clang\ diagnostic\ ignored\ "{}-\/Wshadow"{}}}
+\DoxyCodeLine{\Hypertarget{catch__clara_8h_source_l00024}00024\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{catch__clara_8h_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{catch__clara_8h_source_l00026}00026\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{include_2external_2clara_8hpp}{../external/clara.hpp}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__clara_8h_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{catch__clara_8h_source_l00028}00028\ \textcolor{preprocessor}{\#ifdef\ \_\_clang\_\_}}
+\DoxyCodeLine{\Hypertarget{catch__clara_8h_source_l00029}00029\ \textcolor{preprocessor}{\#pragma\ clang\ diagnostic\ pop}}
+\DoxyCodeLine{\Hypertarget{catch__clara_8h_source_l00030}00030\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{catch__clara_8h_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{catch__clara_8h_source_l00032}00032\ \textcolor{comment}{//\ Restore\ Clara's\ value\ for\ console\ width,\ if\ present}}
+\DoxyCodeLine{\Hypertarget{catch__clara_8h_source_l00033}00033\ \textcolor{preprocessor}{\#ifdef\ CATCH\_TEMP\_CLARA\_CONFIG\_CONSOLE\_WIDTH}}
+\DoxyCodeLine{\Hypertarget{catch__clara_8h_source_l00034}00034\ \textcolor{preprocessor}{\#define\ CATCH\_CLARA\_TEXTFLOW\_CONFIG\_CONSOLE\_WIDTH\ CATCH\_TEMP\_CLARA\_CONFIG\_CONSOLE\_WIDTH}}
+\DoxyCodeLine{\Hypertarget{catch__clara_8h_source_l00035}00035\ \textcolor{preprocessor}{\#undef\ CATCH\_TEMP\_CLARA\_CONFIG\_CONSOLE\_WIDTH}}
+\DoxyCodeLine{\Hypertarget{catch__clara_8h_source_l00036}00036\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{catch__clara_8h_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{catch__clara_8h_source_l00038}00038\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ TWOBLUECUBES\_CATCH\_CLARA\_H\_INCLUDED}}
+
+\end{DoxyCode}

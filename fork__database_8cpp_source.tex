@@ -1,0 +1,576 @@
+\doxysection{fork\+\_\+database.\+cpp}
+\hypertarget{fork__database_8cpp_source}{}\label{fork__database_8cpp_source}\index{libraries/chain/fork\_database.cpp@{libraries/chain/fork\_database.cpp}}
+\mbox{\hyperlink{fork__database_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{fork__database_8hpp}{sysio/chain/fork\_database.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp}{sysio/chain/exceptions.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <boost/multi\_index\_container.hpp>}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <boost/multi\_index/member.hpp>}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <boost/multi\_index/ordered\_index.hpp>}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <boost/multi\_index/hashed\_index.hpp>}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <boost/multi\_index/mem\_fun.hpp>}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <boost/multi\_index/global\_fun.hpp>}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ <boost/multi\_index/composite\_key.hpp>}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{fstream_8hpp}{fc/io/fstream.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00011}00011\ \textcolor{preprocessor}{\#include\ <fstream>}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00012}00012\ \textcolor{preprocessor}{\#include\ <shared\_mutex>}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00014}00014\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{\ \textcolor{keyword}{namespace\ }chain\ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00015}00015\ \ \ \ \textcolor{keyword}{using\ }boost::multi\_index\_container;}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00016}00016\ \ \ \ \textcolor{keyword}{using\ namespace\ }boost::multi\_index;}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00018}00018\ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a6649b0d3a5a88f5cea9d2f467601fe24}{fork\_database::magic\_number}}\ =\ 0x30510FDB;}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00020}00020\ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a849a1eb423d310b17ec5d899b48b80d7}{fork\_database::min\_supported\_version}}\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00021}00021\ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a04a97bab59df6c56c06101d431f06e84}{fork\_database::max\_supported\_version}}\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00023}00023\ \ \ \ \textcolor{comment}{//\ work\ around\ block\_state::is\_valid\ being\ private}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00024}\mbox{\hyperlink{structsysio_1_1chain_1_1block__state_a2bdaf0dc4427a3ebfb592021005f3ab0}{00024}}\ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacesysio_1_1chain_a2879f555341b6f05da08bb064081e44d}{block\_state\_is\_valid}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1block__state}{block\_state}}\&\ bs\ )\ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00025}00025\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ bs.is\_valid();}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00026}00026\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00033}00033\ \ \ \ \textcolor{keyword}{struct\ }by\_block\_id;}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00034}00034\ \ \ \ \textcolor{keyword}{struct\ }by\_lib\_block\_num;}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00035}00035\ \ \ \ \textcolor{keyword}{struct\ }by\_prev;}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00036}00036\ \ \ \ \textcolor{keyword}{typedef}\ multi\_index\_container<}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00037}00037\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\_state\_ptr}},}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00038}00038\ \ \ \ \ \ \ indexed\_by<}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00039}00039\ \ \ \ \ \ \ \ \ \ hashed\_unique<\ tag<by\_block\_id>,\ member<block\_header\_state,\ block\_id\_type,\ \&block\_header\_state::id>,\ std::hash<block\_id\_type>>,}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00040}00040\ \ \ \ \ \ \ \ \ \ ordered\_non\_unique<\ tag<by\_prev>,\ const\_mem\_fun<block\_header\_state,\ const\ block\_id\_type\&,\ \&block\_header\_state::prev>\ >,}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00041}00041\ \ \ \ \ \ \ \ \ \ ordered\_unique<\ tag<by\_lib\_block\_num>,}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00042}00042\ \ \ \ \ \ \ \ \ \ \ \ \ composite\_key<\ \mbox{\hyperlink{structsysio_1_1chain_1_1block__state}{block\_state}},}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00043}00043\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ global\_fun<const\ block\_state\&,\ \ \ \ \ \ \ \ \ \ \ \ bool,\ \ \ \ \ \ \ \ \ \ \&block\_state\_is\_valid>,}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00044}00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ member<detail::block\_header\_state\_common,\ uint32\_t,\ \ \ \ \ \ \&detail::block\_header\_state\_common::dpos\_irreversible\_blocknum>,}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00045}00045\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ member<detail::block\_header\_state\_common,\ uint32\_t,\ \ \ \ \ \ \&detail::block\_header\_state\_common::block\_num>,}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00046}00046\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ member<block\_header\_state,\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ block\_id\_type,\ \&block\_header\_state::id>}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00047}00047\ \ \ \ \ \ \ \ \ \ \ \ \ >,}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \ \ \ composite\_key\_compare<}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::greater<bool>,}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00050}00050\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::greater<uint32\_t>,}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00051}00051\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::greater<uint32\_t>,}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1sha256__less}{sha256\_less}}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \ \ \ >}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00054}00054\ \ \ \ \ \ \ \ \ \ >}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00055}00055\ \ \ \ \ \ \ >}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00056}\mbox{\hyperlink{namespacesysio_1_1chain_a41ae8badf840b6de83fb1a7697c0b583}{00056}}\ \ \ \ >\ \mbox{\hyperlink{namespacesysio_1_1chain_a41ae8badf840b6de83fb1a7697c0b583}{fork\_multi\_index\_type}};}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00058}\mbox{\hyperlink{namespacesysio_1_1chain_a4d023005b3b47d76c62beeaebc291fa3}{00058}}\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacesysio_1_1chain_a4d023005b3b47d76c62beeaebc291fa3}{first\_preferred}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1block__header__state}{block\_header\_state}}\&\ lhs,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1block__header__state}{block\_header\_state}}\&\ rhs\ )\ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00059}00059\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::tie(\ lhs.\mbox{\hyperlink{structsysio_1_1chain_1_1detail_1_1block__header__state__common_a3bdf45e437e6440790ee3ccedb1dda05}{dpos\_irreversible\_blocknum}},\ lhs.\mbox{\hyperlink{structsysio_1_1chain_1_1detail_1_1block__header__state__common_ae85e3375836639cb1e7543aea7cf0552}{block\_num}}\ )}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ >\ std::tie(\ rhs.\mbox{\hyperlink{structsysio_1_1chain_1_1detail_1_1block__header__state__common_a3bdf45e437e6440790ee3ccedb1dda05}{dpos\_irreversible\_blocknum}},\ rhs.\mbox{\hyperlink{structsysio_1_1chain_1_1detail_1_1block__header__state__common_ae85e3375836639cb1e7543aea7cf0552}{block\_num}}\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00061}00061\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00062}00062\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00063}\mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl}{00063}}\ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl}{fork\_database\_impl}}\ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00064}\mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_a778b2e0e8d3457e5cfc2d2780ebd49ba}{00064}}\ \ \ \ \ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_a778b2e0e8d3457e5cfc2d2780ebd49ba}{fork\_database\_impl}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1path}{fc::path}}\&\ data\_dir\ )}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00065}00065\ \ \ \ \ \ \ :\mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_a9da19bee8c2b0fd04ccc6263a0bafaad}{datadir}}(data\_dir)}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00066}00066\ \ \ \ \ \ \ \{\}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00067}00067\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00068}\mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_a2799d519da9d0e00d12dd368b04f8b41}{00068}}\ \ \ \ \ \ \ std::shared\_mutex\ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_a2799d519da9d0e00d12dd368b04f8b41}{mtx}};}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00069}\mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_afce88b79ad80446e7393c5f7a5f428ef}{00069}}\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_a41ae8badf840b6de83fb1a7697c0b583}{fork\_multi\_index\_type}}\ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_afce88b79ad80446e7393c5f7a5f428ef}{index}};}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00070}\mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_a2eacd40c2fc12431505346da61fbac32}{00070}}\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\_state\_ptr}}\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_a2eacd40c2fc12431505346da61fbac32}{root}};\ \textcolor{comment}{//\ Only\ uses\ the\ block\_header\_state\ portion}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00071}\mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_a1e62e12db374c811deab2822dc8bfa63}{00071}}\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\_state\_ptr}}\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_a1e62e12db374c811deab2822dc8bfa63}{head}};}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00072}\mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_a9da19bee8c2b0fd04ccc6263a0bafaad}{00072}}\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1path}{fc::path}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_a9da19bee8c2b0fd04ccc6263a0bafaad}{datadir}};}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00073}00073\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00074}00074\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_ab8bde04ebc49f6731e46ab330812bd00}{open\_impl}}(\ \textcolor{keyword}{const}\ std::function<\textcolor{keywordtype}{void}(\ \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{block\_timestamp\_type}},}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00075}00075\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ flat\_set<digest\_type>\&,}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1vector}{vector<digest\_type>}}\&\ )>\&\ validator\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00077}00077\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_a5c512f93416acdb500bf1814401b8282}{close\_impl}}();}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00080}00080\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_a918963c39fa6317556dca73276274e64}{block\_header\_state\_ptr}}\ \ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_a65a4578964babf603443cdf3c0726908}{get\_block\_header\_impl}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha256}{block\_id\_type}}\&\ \textcolor{keywordtype}{id}\ )\textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00081}00081\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\_state\_ptr}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_ab5a93206da8f421ced6d9f69ec2b9a27}{get\_block\_impl}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha256}{block\_id\_type}}\&\ \textcolor{keywordtype}{id}\ )\textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00082}00082\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_a0acb7aa1a0689cb15fb93145f9e5293c}{reset\_impl}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1block__header__state}{block\_header\_state}}\&\ root\_bhs\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00083}00083\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_adce8101013b4aa8279b778de6ba96a5e}{rollback\_head\_to\_root\_impl}}();}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00084}00084\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_a72f5006e98746559133d45653ba38afa}{advance\_root\_impl}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha256}{block\_id\_type}}\&\ \textcolor{keywordtype}{id}\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00085}00085\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_aded14555f97fc186af50537babc4995e}{remove\_impl}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha256}{block\_id\_type}}\&\ \textcolor{keywordtype}{id}\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00086}00086\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_a3b287e6c2d3717609273c999ef660dea}{branch\_type}}\ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_ac5cff58b9a2a775c9a96a17ba4638dfb}{fetch\_branch\_impl}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha256}{block\_id\_type}}\&\ h,\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ trim\_after\_block\_num\ )\textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00087}00087\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\_state\_ptr}}\ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_a514dc4c7bd5146928e30e32d7ebc918f}{search\_on\_branch\_impl}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha256}{block\_id\_type}}\&\ h,\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ block\_num\ )\textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00088}00088\ \ \ \ \ \ \ pair<branch\_type,\ branch\_type>\ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_a2b64c6ee2f61647756dfa79e450a412b}{fetch\_branch\_from\_impl}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha256}{block\_id\_type}}\&\ first,}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00089}00089\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha256}{block\_id\_type}}\&\ second\ )\textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00090}00090\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_ad569f7a3388b5a8e35f8c4ccb4a1c311}{mark\_valid\_impl}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\_state\_ptr}}\&\ h\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00091}00091\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00092}00092\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_a04a30379f1937bd83b8ced954d7a4ef7}{add\_impl}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\_state\_ptr}}\&\ n,}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00093}00093\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ ignore\_duplicate,\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacesysio_1_1chain_aa56956ceeec88a964737228174aec6d6}{validate}},}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00094}00094\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::function<\textcolor{keywordtype}{void}(\ \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{block\_timestamp\_type}},}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00095}00095\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ flat\_set<digest\_type>\&,}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00096}00096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1vector}{vector<digest\_type>}}\&\ )>\&\ validator\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00097}00097\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00098}00098\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00099}00099\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00100}\mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_acdd97cb223a90aac537ce1cd5684d388}{00100}}\ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_acdd97cb223a90aac537ce1cd5684d388}{fork\_database::fork\_database}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1path}{fc::path}}\&\ data\_dir\ )}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00101}00101\ \ \ \ :my(\ new\ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl}{fork\_database\_impl}}(\ data\_dir\ )\ )}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00102}00102\ \ \ \ \{\}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00103}00103\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00104}00104\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00105}\mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a378b089fe1ff7ac016ee51058ff52cb2}{00105}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a378b089fe1ff7ac016ee51058ff52cb2}{fork\_database::open}}(\ \textcolor{keyword}{const}\ std::function<\textcolor{keywordtype}{void}(\ \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{block\_timestamp\_type}},}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00106}00106\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ flat\_set<digest\_type>\&,}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00107}00107\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1vector}{vector<digest\_type>}}\&\ )>\&\ validator\ )}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00108}00108\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00109}00109\ \ \ \ \ \ \ std::lock\_guard\ g(\ my-\/>mtx\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00110}00110\ \ \ \ \ \ \ my-\/>open\_impl(\ validator\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00111}00111\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00112}00112\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00113}\mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_ab8bde04ebc49f6731e46ab330812bd00}{00113}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_ab8bde04ebc49f6731e46ab330812bd00}{fork\_database\_impl::open\_impl}}(\ \textcolor{keyword}{const}\ std::function<\textcolor{keywordtype}{void}(\ \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{block\_timestamp\_type}},}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00114}00114\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ flat\_set<digest\_type>\&,}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00115}00115\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1vector}{vector<digest\_type>}}\&\ )>\&\ validator\ )}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00116}00116\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00117}00117\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{namespacefc_ab123bfeadf918cc293ecad88bca7c499}{fc::is\_directory}}(\mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_a9da19bee8c2b0fd04ccc6263a0bafaad}{datadir}}))}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00118}00118\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a76b0787468a9f403087b71a894c07ce2}{fc::create\_directories}}(\mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_a9da19bee8c2b0fd04ccc6263a0bafaad}{datadir}});}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00119}00119\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00120}00120\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ fork\_db\_dat\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_a9da19bee8c2b0fd04ccc6263a0bafaad}{datadir}}\ /\ config::forkdb\_filename;}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00121}00121\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{namespacefc_a3fcf0d920aea28014aacae50a51d8485}{fc::exists}}(\ fork\_db\_dat\ )\ )\ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00122}00122\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00123}00123\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ content;}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00124}00124\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a23ea7ee1b75c710ca0ba138e94395ed1}{fc::read\_file\_contents}}(\ fork\_db\_dat,\ content\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00125}00125\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00126}00126\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1datastream}{fc::datastream<const\ char*>}}\ ds(\ content.data(),\ content.size()\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00127}00127\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00128}00128\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ validate\ totem}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00129}00129\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ totem\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00130}00130\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a0b442d98ceb22dd5a6ae84745e43ffab}{fc::raw::unpack}}(\ ds,\ totem\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00131}00131\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ totem\ ==\ \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a6649b0d3a5a88f5cea9d2f467601fe24}{fork\_database::magic\_number}},\ \mbox{\hyperlink{namespacesysio_1_1chain_acad19c1ca23d796138841046c67b3ea9}{fork\_database\_exception}},}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00132}00132\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Fork\ database\ file\ '\$\{filename\}'\ has\ unexpected\ magic\ number:\ \$\{actual\_totem\}.\ Expected\ \$\{expected\_totem\}"{}},}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00133}00133\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}filename"{}},\ fork\_db\_dat.generic\_string())}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00134}00134\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}actual\_totem"{}},\ totem)}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00135}00135\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}expected\_totem"{}},\ \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a6649b0d3a5a88f5cea9d2f467601fe24}{fork\_database::magic\_number}})}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00136}00136\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00137}00137\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00138}00138\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ validate\ version}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00139}00139\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ version\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00140}00140\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a0b442d98ceb22dd5a6ae84745e43ffab}{fc::raw::unpack}}(\ ds,\ version\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00141}00141\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ version\ >=\ \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a849a1eb423d310b17ec5d899b48b80d7}{fork\_database::min\_supported\_version}}\ \&\&\ version\ <=\ \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a04a97bab59df6c56c06101d431f06e84}{fork\_database::max\_supported\_version}},}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00142}00142\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_acad19c1ca23d796138841046c67b3ea9}{fork\_database\_exception}},}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00143}00143\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Unsupported\ version\ of\ fork\ database\ file\ '\$\{filename\}'.\ "{}}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00144}00144\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Fork\ database\ version\ is\ \$\{version\}\ while\ code\ supports\ version(s)\ [\$\{min\},\$\{max\}]"{}},}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00145}00145\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}filename"{}},\ fork\_db\_dat.generic\_string())}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00146}00146\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}version"{}},\ version)}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00147}00147\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}min"{}},\ \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a849a1eb423d310b17ec5d899b48b80d7}{fork\_database::min\_supported\_version}})}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00148}00148\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}max"{}},\ \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a04a97bab59df6c56c06101d431f06e84}{fork\_database::max\_supported\_version}})}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00149}00149\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00150}00150\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00151}00151\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1block__header__state}{block\_header\_state}}\ bhs;}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00152}00152\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a0b442d98ceb22dd5a6ae84745e43ffab}{fc::raw::unpack}}(\ ds,\ bhs\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00153}00153\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_a0acb7aa1a0689cb15fb93145f9e5293c}{reset\_impl}}(\ bhs\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00154}00154\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00155}00155\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1unsigned__int}{unsigned\_int}}\ size;\ \mbox{\hyperlink{namespacefc_1_1raw_a0b442d98ceb22dd5a6ae84745e43ffab}{fc::raw::unpack}}(\ ds,\ size\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00156}00156\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ i\ =\ 0,\ n\ =\ size.\mbox{\hyperlink{structfc_1_1unsigned__int_ac54ac972d3e38a5852616aaee955ff3f}{value}};\ i\ <\ n;\ ++i\ )\ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00157}00157\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1block__state}{block\_state}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00158}00158\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a0b442d98ceb22dd5a6ae84745e43ffab}{fc::raw::unpack}}(\ ds,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00159}00159\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ do\ not\ populate\ transaction\_metadatas,\ they\ will\ be\ created\ as\ needed\ in\ apply\_block\ with\ appropriate\ key\ recovery}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00160}00160\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.header\_exts\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.block-\/>validate\_and\_extract\_header\_extensions();}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00161}00161\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_a04a30379f1937bd83b8ced954d7a4ef7}{add\_impl}}(\ std::make\_shared<block\_state>(\ std::move(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ )\ ),\ \textcolor{keyword}{false},\ \textcolor{keyword}{true},\ validator\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00162}00162\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00163}00163\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1sha256}{block\_id\_type}}\ head\_id;}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00164}00164\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a0b442d98ceb22dd5a6ae84745e43ffab}{fc::raw::unpack}}(\ ds,\ head\_id\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00165}00165\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00166}00166\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ root-\/>id\ ==\ head\_id\ )\ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00167}00167\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_a1e62e12db374c811deab2822dc8bfa63}{head}}\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_a2eacd40c2fc12431505346da61fbac32}{root}};}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00168}00168\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00169}00169\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_a1e62e12db374c811deab2822dc8bfa63}{head}}\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_ab5a93206da8f421ced6d9f69ec2b9a27}{get\_block\_impl}}(\ head\_id\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00170}00170\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_a1e62e12db374c811deab2822dc8bfa63}{head}},\ \mbox{\hyperlink{namespacesysio_1_1chain_acad19c1ca23d796138841046c67b3ea9}{fork\_database\_exception}},}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00171}00171\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}could\ not\ find\ head\ while\ reconstructing\ fork\ database\ from\ file;\ '\$\{filename\}'\ is\ likely\ corrupted"{}},}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00172}00172\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}filename"{}},\ fork\_db\_dat.generic\_string())\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00173}00173\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00174}00174\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00175}00175\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ candidate\ =\ index.get<by\_lib\_block\_num>().begin();}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00176}00176\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ candidate\ ==\ index.get<by\_lib\_block\_num>().end()\ ||\ !(*candidate)-\/>is\_valid()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00177}00177\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_a1e62e12db374c811deab2822dc8bfa63}{head}}-\/>id\ ==\ root-\/>id,\ \mbox{\hyperlink{namespacesysio_1_1chain_acad19c1ca23d796138841046c67b3ea9}{fork\_database\_exception}},}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00178}00178\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}head\ not\ set\ to\ root\ despite\ no\ better\ option\ available;\ '\$\{filename\}'\ is\ likely\ corrupted"{}},}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00179}00179\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}filename"{}},\ fork\_db\_dat.generic\_string())\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00180}00180\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00181}00181\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ !\mbox{\hyperlink{namespacesysio_1_1chain_a4d023005b3b47d76c62beeaebc291fa3}{first\_preferred}}(\ **candidate,\ *\mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_a1e62e12db374c811deab2822dc8bfa63}{head}}\ ),\ \mbox{\hyperlink{namespacesysio_1_1chain_acad19c1ca23d796138841046c67b3ea9}{fork\_database\_exception}},}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00182}00182\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}head\ not\ set\ to\ best\ available\ option\ available;\ '\$\{filename\}'\ is\ likely\ corrupted"{}},}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00183}00183\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}filename"{}},\ fork\_db\_dat.generic\_string())\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00184}00184\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00185}00185\ \ \ \ \ \ \ \ \ \ \}\ \mbox{\hyperlink{exception_8hpp_a094902280cad82ad6529ebbd12a697eb}{FC\_CAPTURE\_AND\_RETHROW}}(\ (fork\_db\_dat)\ )}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00186}00186\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00187}00187\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a0db76f35dc060918029b16de918b1e84}{fc::remove}}(\ fork\_db\_dat\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00188}00188\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00189}00189\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00190}00190\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00191}\mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a8d84a8db51ed89315f80a7b251a38b8e}{00191}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a8d84a8db51ed89315f80a7b251a38b8e}{fork\_database::close}}()\ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00192}00192\ \ \ \ \ \ \ std::lock\_guard\ g(\ my-\/>mtx\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00193}00193\ \ \ \ \ \ \ my-\/>close\_impl();}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00194}00194\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00195}00195\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00196}\mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_a5c512f93416acdb500bf1814401b8282}{00196}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_a5c512f93416acdb500bf1814401b8282}{fork\_database\_impl::close\_impl}}()\ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00197}00197\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ fork\_db\_dat\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_a9da19bee8c2b0fd04ccc6263a0bafaad}{datadir}}\ /\ config::forkdb\_filename;}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00198}00198\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00199}00199\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !root\ )\ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00200}00200\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ index.size()\ >\ 0\ )\ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00201}00201\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}}(\ \textcolor{stringliteral}{"{}fork\_database\ is\ in\ a\ bad\ state\ when\ closing;\ not\ writing\ out\ '\$\{filename\}'"{}},}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00202}00202\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}filename"{}},\ fork\_db\_dat.generic\_string())\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00203}00203\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00204}00204\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00205}00205\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00206}00206\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00207}00207\ \ \ \ \ \ \ std::ofstream\ out(\ fork\_db\_dat.generic\_string().c\_str(),\ std::ios::out\ |\ std::ios::binary\ |\ std::ofstream::trunc\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00208}00208\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(\ out,\ \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a6649b0d3a5a88f5cea9d2f467601fe24}{fork\_database::magic\_number}}\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00209}00209\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(\ out,\ \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a04a97bab59df6c56c06101d431f06e84}{fork\_database::max\_supported\_version}}\ );\ \textcolor{comment}{//\ write\ out\ current\ version\ which\ is\ always\ max\_supported\_version}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00210}00210\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(\ out,\ *\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{structsysio_1_1chain_1_1block__header__state}{block\_header\_state}}*\textcolor{keyword}{>}(\&*root)\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00211}00211\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ num\_blocks\_in\_fork\_db\ =\ index.size();}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00212}00212\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(\ out,\ \mbox{\hyperlink{structfc_1_1unsigned__int}{unsigned\_int}}\{num\_blocks\_in\_fork\_db\}\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00213}00213\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00214}00214\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ indx\ =\ index.get<by\_lib\_block\_num>();}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00215}00215\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00216}00216\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ unvalidated\_itr\ =\ indx.rbegin();}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00217}00217\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ unvalidated\_end\ =\ boost::make\_reverse\_iterator(\ indx.lower\_bound(\ \textcolor{keyword}{false}\ )\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00218}00218\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00219}00219\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ validated\_itr\ =\ unvalidated\_end;}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00220}00220\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ validated\_end\ =\ indx.rend();}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00221}00221\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00222}00222\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \ \textcolor{keywordtype}{bool}\ unvalidated\_remaining\ =\ (unvalidated\_itr\ !=\ unvalidated\_end),}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00223}00223\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ validated\_remaining\ \ \ =\ (validated\_itr\ !=\ validated\_end);}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00224}00224\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00225}00225\ \ \ \ \ \ \ \ \ \ \ \ \ unvalidated\_remaining\ ||\ validated\_remaining;}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00226}00226\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00227}00227\ \ \ \ \ \ \ \ \ \ \ \ \ unvalidated\_remaining\ =\ (unvalidated\_itr\ !=\ unvalidated\_end),}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00228}00228\ \ \ \ \ \ \ \ \ \ \ \ \ validated\_remaining\ \ \ =\ (validated\_itr\ !=\ validated\_end)}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00229}00229\ \ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00230}00230\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00231}00231\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ (validated\_remaining\ ?\ validated\_itr\ :\ unvalidated\_itr);}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00232}00232\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00233}00233\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ unvalidated\_remaining\ \&\&\ validated\_remaining\ )\ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00234}00234\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{namespacesysio_1_1chain_a4d023005b3b47d76c62beeaebc291fa3}{first\_preferred}}(\ **validated\_itr,\ **unvalidated\_itr\ )\ )\ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00235}00235\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ itr\ =\ unvalidated\_itr;}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00236}00236\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++unvalidated\_itr;}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00237}00237\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00238}00238\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++validated\_itr;}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00239}00239\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00240}00240\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(\ unvalidated\_remaining\ )\ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00241}00241\ \ \ \ \ \ \ \ \ \ \ \ \ ++unvalidated\_itr;}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00242}00242\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00243}00243\ \ \ \ \ \ \ \ \ \ \ \ \ ++validated\_itr;}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00244}00244\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00245}00245\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00246}00246\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(\ out,\ *(*itr)\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00247}00247\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00248}00248\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00249}00249\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_a1e62e12db374c811deab2822dc8bfa63}{head}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00250}00250\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(\ out,\ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_a1e62e12db374c811deab2822dc8bfa63}{head}}-\/>id\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00251}00251\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00252}00252\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}}(\ \textcolor{stringliteral}{"{}head\ not\ set\ in\ fork\ database;\ '\$\{filename\}'\ will\ be\ corrupted"{}},}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00253}00253\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}filename"{}},\ fork\_db\_dat.generic\_string())\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00254}00254\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00255}00255\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00256}00256\ \ \ \ \ \ \ index.clear();}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00257}00257\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00258}00258\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00259}\mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a5eb28c8778610f360516341594997fc7}{00259}}\ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a5eb28c8778610f360516341594997fc7}{fork\_database::\string~fork\_database}}()\ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00260}00260\ \ \ \ \ \ \ my-\/>close\_impl();}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00261}00261\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00262}00262\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00263}\mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a7dd3012e6d7e68e24b2f223d5be09c02}{00263}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a7dd3012e6d7e68e24b2f223d5be09c02}{fork\_database::reset}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1block__header__state}{block\_header\_state}}\&\ root\_bhs\ )\ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00264}00264\ \ \ \ \ \ \ std::lock\_guard\ g(\ my-\/>mtx\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00265}00265\ \ \ \ \ \ \ my-\/>reset\_impl(root\_bhs);}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00266}00266\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00267}00267\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00268}\mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_a0acb7aa1a0689cb15fb93145f9e5293c}{00268}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_a0acb7aa1a0689cb15fb93145f9e5293c}{fork\_database\_impl::reset\_impl}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1block__header__state}{block\_header\_state}}\&\ root\_bhs\ )\ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00269}00269\ \ \ \ \ \ \ index.clear();}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00270}00270\ \ \ \ \ \ \ root\ =\ std::make\_shared<block\_state>();}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00271}00271\ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{structsysio_1_1chain_1_1block__header__state}{block\_header\_state}}\&\textcolor{keyword}{>}(*root)\ =\ root\_bhs;}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00272}00272\ \ \ \ \ \ \ root-\/>validated\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00273}00273\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_a1e62e12db374c811deab2822dc8bfa63}{head}}\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_a2eacd40c2fc12431505346da61fbac32}{root}};}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00274}00274\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00275}00275\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00276}\mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a611cc70b13dee823c43ffe99df5522d4}{00276}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a611cc70b13dee823c43ffe99df5522d4}{fork\_database::rollback\_head\_to\_root}}()\ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00277}00277\ \ \ \ \ \ \ std::lock\_guard\ g(\ my-\/>mtx\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00278}00278\ \ \ \ \ \ \ my-\/>rollback\_head\_to\_root\_impl();}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00279}00279\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00280}00280\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00281}\mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_adce8101013b4aa8279b778de6ba96a5e}{00281}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_adce8101013b4aa8279b778de6ba96a5e}{fork\_database\_impl::rollback\_head\_to\_root\_impl}}()\ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00282}00282\ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ by\_id\_idx\ =\ index.get<by\_block\_id>();}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00283}00283\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ by\_id\_idx.begin();}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00284}00284\ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (itr\ !=\ by\_id\_idx.end())\ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00285}00285\ \ \ \ \ \ \ \ \ \ by\_id\_idx.modify(\ itr,\ [\&](\ \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\_state\_ptr}}\&\ bsp\ )\ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00286}00286\ \ \ \ \ \ \ \ \ \ \ \ \ bsp-\/>validated\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00287}00287\ \ \ \ \ \ \ \ \ \ \}\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00288}00288\ \ \ \ \ \ \ \ \ \ ++itr;}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00289}00289\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00290}00290\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_a1e62e12db374c811deab2822dc8bfa63}{head}}\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_a2eacd40c2fc12431505346da61fbac32}{root}};}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00291}00291\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00292}00292\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00293}\mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_ae911acbc996994cb6dfd21fddfb89a45}{00293}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_ae911acbc996994cb6dfd21fddfb89a45}{fork\_database::advance\_root}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha256}{block\_id\_type}}\&\ \textcolor{keywordtype}{id}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00294}00294\ \ \ \ \ \ \ std::lock\_guard\ g(\ my-\/>mtx\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00295}00295\ \ \ \ \ \ \ my-\/>advance\_root\_impl(\ \textcolor{keywordtype}{id}\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00296}00296\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00297}00297\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00298}\mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_a72f5006e98746559133d45653ba38afa}{00298}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_a72f5006e98746559133d45653ba38afa}{fork\_database\_impl::advance\_root\_impl}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha256}{block\_id\_type}}\&\ \textcolor{keywordtype}{id}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00299}00299\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ root,\ \mbox{\hyperlink{namespacesysio_1_1chain_acad19c1ca23d796138841046c67b3ea9}{fork\_database\_exception}},\ \textcolor{stringliteral}{"{}root\ not\ yet\ set"{}}\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00300}00300\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00301}00301\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ new\_root\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_ab5a93206da8f421ced6d9f69ec2b9a27}{get\_block\_impl}}(\ \textcolor{keywordtype}{id}\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00302}00302\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ new\_root,\ \mbox{\hyperlink{namespacesysio_1_1chain_acad19c1ca23d796138841046c67b3ea9}{fork\_database\_exception}},}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00303}00303\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}cannot\ advance\ root\ to\ a\ block\ that\ does\ not\ exist\ in\ the\ fork\ database"{}}\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00304}00304\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ new\_root-\/>is\_valid(),\ \mbox{\hyperlink{namespacesysio_1_1chain_acad19c1ca23d796138841046c67b3ea9}{fork\_database\_exception}},}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00305}00305\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}cannot\ advance\ root\ to\ a\ block\ that\ has\ not\ yet\ been\ validated"{}}\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00306}00306\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00307}00307\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00308}00308\ \ \ \ \ \ \ deque<block\_id\_type>\ blocks\_to\_remove;}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00309}00309\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\ b\ =\ new\_root;\ b;\ )\ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00310}00310\ \ \ \ \ \ \ \ \ \ blocks\_to\_remove.emplace\_back(\ b-\/>header.previous\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00311}00311\ \ \ \ \ \ \ \ \ \ b\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_ab5a93206da8f421ced6d9f69ec2b9a27}{get\_block\_impl}}(\ blocks\_to\_remove.back()\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00312}00312\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ b\ ||\ blocks\_to\_remove.back()\ ==\ root-\/>id,\ \mbox{\hyperlink{namespacesysio_1_1chain_acad19c1ca23d796138841046c67b3ea9}{fork\_database\_exception}},\ \textcolor{stringliteral}{"{}invariant\ violation:\ orphaned\ branch\ was\ present\ in\ forked\ database"{}}\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00313}00313\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00314}00314\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00315}00315\ \ \ \ \ \ \ \textcolor{comment}{//\ The\ new\ root\ block\ should\ be\ erased\ from\ the\ fork\ database\ index\ individually\ rather\ than\ with\ the\ remove\ method,}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00316}00316\ \ \ \ \ \ \ \textcolor{comment}{//\ because\ we\ do\ not\ want\ the\ blocks\ branching\ off\ of\ it\ to\ be\ removed\ from\ the\ fork\ database.}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00317}00317\ \ \ \ \ \ \ index.erase(\ index.find(\ \textcolor{keywordtype}{id}\ )\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00318}00318\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00319}00319\ \ \ \ \ \ \ \textcolor{comment}{//\ The\ other\ blocks\ to\ be\ removed\ are\ removed\ using\ the\ remove\ method\ so\ that\ orphaned\ branches\ do\ not\ remain\ in\ the\ fork\ database.}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00320}00320\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ block\_id\ :\ blocks\_to\_remove\ )\ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00321}00321\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_aded14555f97fc186af50537babc4995e}{remove\_impl}}(\ block\_id\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00322}00322\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00323}00323\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00324}00324\ \ \ \ \ \ \ \textcolor{comment}{//\ Even\ though\ fork\ database\ no\ longer\ needs\ block\ or\ trxs\ when\ a\ block\ state\ becomes\ a\ root\ of\ the\ tree,}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00325}00325\ \ \ \ \ \ \ \textcolor{comment}{//\ avoid\ mutating\ the\ block\ state\ at\ all,\ for\ example\ clearing\ the\ block\ shared\ pointer,\ because\ other}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00326}00326\ \ \ \ \ \ \ \textcolor{comment}{//\ parts\ of\ the\ code\ which\ run\ asynchronously\ may\ later\ expect\ it\ remain\ unmodified.}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00327}00327\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00328}00328\ \ \ \ \ \ \ root\ =\ new\_root;}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00329}00329\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00330}00330\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00331}\mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a681f9146e0afd70a0e8c0421efb0a41f}{00331}}\ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_a918963c39fa6317556dca73276274e64}{block\_header\_state\_ptr}}\ \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a681f9146e0afd70a0e8c0421efb0a41f}{fork\_database::get\_block\_header}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha256}{block\_id\_type}}\&\ \textcolor{keywordtype}{id}\ )\textcolor{keyword}{const\ }\{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00332}00332\ \ \ \ \ \ \ std::shared\_lock\ g(\ my-\/>mtx\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00333}00333\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ my-\/>get\_block\_header\_impl(\ \textcolor{keywordtype}{id}\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00334}00334\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00335}00335\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00336}\mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_a65a4578964babf603443cdf3c0726908}{00336}}\ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_a918963c39fa6317556dca73276274e64}{block\_header\_state\_ptr}}\ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_a65a4578964babf603443cdf3c0726908}{fork\_database\_impl::get\_block\_header\_impl}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha256}{block\_id\_type}}\&\ \textcolor{keywordtype}{id}\ )\textcolor{keyword}{const\ }\{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00337}00337\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ root-\/>id\ ==\ \textcolor{keywordtype}{id}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00338}00338\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_a2eacd40c2fc12431505346da61fbac32}{root}};}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00339}00339\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00340}00340\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00341}00341\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ index.find(\ \textcolor{keywordtype}{id}\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00342}00342\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr\ !=\ index.end()\ )}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00343}00343\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *itr;}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00344}00344\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00345}00345\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacesysio_1_1chain_a918963c39fa6317556dca73276274e64}{block\_header\_state\_ptr}}();}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00346}00346\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00347}00347\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00348}\mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_a04a30379f1937bd83b8ced954d7a4ef7}{00348}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_a04a30379f1937bd83b8ced954d7a4ef7}{fork\_database\_impl::add\_impl}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\_state\_ptr}}\&\ n,}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00349}00349\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ ignore\_duplicate,\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacesysio_1_1chain_aa56956ceeec88a964737228174aec6d6}{validate}},}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00350}00350\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::function<\textcolor{keywordtype}{void}(\ \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{block\_timestamp\_type}},}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00351}00351\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ flat\_set<digest\_type>\&,}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00352}00352\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1vector}{vector<digest\_type>}}\&\ )>\&\ validator\ )}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00353}00353\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00354}00354\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ root,\ \mbox{\hyperlink{namespacesysio_1_1chain_acad19c1ca23d796138841046c67b3ea9}{fork\_database\_exception}},\ \textcolor{stringliteral}{"{}root\ not\ yet\ set"{}}\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00355}00355\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ n,\ \mbox{\hyperlink{namespacesysio_1_1chain_acad19c1ca23d796138841046c67b3ea9}{fork\_database\_exception}},\ \textcolor{stringliteral}{"{}attempt\ to\ add\ null\ block\ state"{}}\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00356}00356\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00357}00357\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ prev\_bh\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_a65a4578964babf603443cdf3c0726908}{get\_block\_header\_impl}}(\ n-\/>header.previous\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00358}00358\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00359}00359\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ prev\_bh,\ unlinkable\_block\_exception,}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00360}00360\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}unlinkable\ block"{}},\ (\textcolor{stringliteral}{"{}id"{}},\ n-\/>id)(\textcolor{stringliteral}{"{}previous"{}},\ n-\/>header.previous)\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00361}00361\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00362}00362\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{namespacesysio_1_1chain_aa56956ceeec88a964737228174aec6d6}{validate}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00363}00363\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00364}00364\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ exts\ =\ n-\/>header\_exts;}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00365}00365\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00366}00366\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ exts.count(\mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature__activation_a9b74efdc3ccf711443174ff0c9b535e3}{protocol\_feature\_activation::extension\_id}}())\ >\ 0\ )\ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00367}00367\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ new\_protocol\_features\ =\ std::get<protocol\_feature\_activation>(exts.lower\_bound(\mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature__activation_a9b74efdc3ccf711443174ff0c9b535e3}{protocol\_feature\_activation::extension\_id}}())-\/>second).protocol\_features;}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00368}00368\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ validator(\ n-\/>header.timestamp,\ prev\_bh-\/>activated\_protocol\_features-\/>protocol\_features,\ new\_protocol\_features\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00369}00369\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00370}00370\ \ \ \ \ \ \ \ \ \ \}\ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a43bd817895cb757183fcecafc6ae7dc1}{SYS\_RETHROW\_EXCEPTIONS}}(\ \mbox{\hyperlink{namespacesysio_1_1chain_acad19c1ca23d796138841046c67b3ea9}{fork\_database\_exception}},\ \textcolor{stringliteral}{"{}serialized\ fork\ database\ is\ incompatible\ with\ configured\ protocol\ features"{}}\ \ )}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00371}00371\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00372}00372\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00373}00373\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ inserted\ =\ index.insert(n);}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00374}00374\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !inserted.second\ )\ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00375}00375\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ ignore\_duplicate\ )\ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00376}00376\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a1bfa656552ea0534b2c91ee0fe33f850}{SYS\_THROW}}(\ \mbox{\hyperlink{namespacesysio_1_1chain_acad19c1ca23d796138841046c67b3ea9}{fork\_database\_exception}},\ \textcolor{stringliteral}{"{}duplicate\ block\ added"{}},\ (\textcolor{stringliteral}{"{}id"{}},\ n-\/>id)\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00377}00377\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00378}00378\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00379}00379\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ candidate\ =\ index.get<by\_lib\_block\_num>().begin();}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00380}00380\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ (*candidate)-\/>is\_valid()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00381}00381\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_a1e62e12db374c811deab2822dc8bfa63}{head}}\ =\ *candidate;}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00382}00382\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00383}00383\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00384}00384\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00385}\mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a97cf1402b71020048ae0054e4d7c8079}{00385}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a97cf1402b71020048ae0054e4d7c8079}{fork\_database::add}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\_state\_ptr}}\&\ n,\ \textcolor{keywordtype}{bool}\ ignore\_duplicate\ )\ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00386}00386\ \ \ \ \ \ \ std::lock\_guard\ g(\ my-\/>mtx\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00387}00387\ \ \ \ \ \ \ my-\/>add\_impl(\ n,\ ignore\_duplicate,\ \textcolor{keyword}{false},}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00388}00388\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [](\ \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{block\_timestamp\_type}}\ timestamp,}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00389}00389\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ flat\_set<digest\_type>\&\ cur\_features,}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00390}00390\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1vector}{vector<digest\_type>}}\&\ new\_features\ )}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00391}00391\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00392}00392\ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00393}00393\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00394}00394\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00395}\mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a31db3526cc966f5db1046cebcfc45219}{00395}}\ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\_state\_ptr}}\ \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a31db3526cc966f5db1046cebcfc45219}{fork\_database::root}}()\textcolor{keyword}{const\ }\{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00396}00396\ \ \ \ \ \ \ std::shared\_lock\ g(\ my-\/>mtx\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00397}00397\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ my-\/>root;}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00398}00398\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00399}00399\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00400}\mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a3b128a7d57c262ef6351d83c16cffae3}{00400}}\ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\_state\_ptr}}\ \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a3b128a7d57c262ef6351d83c16cffae3}{fork\_database::head}}()\textcolor{keyword}{const\ }\{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00401}00401\ \ \ \ \ \ \ std::shared\_lock\ g(\ my-\/>mtx\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00402}00402\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ my-\/>head;}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00403}00403\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00404}00404\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00405}\mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a16e619525d86741f3e5344b39ab91868}{00405}}\ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\_state\_ptr}}\ \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a16e619525d86741f3e5344b39ab91868}{fork\_database::pending\_head}}()\textcolor{keyword}{const\ }\{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00406}00406\ \ \ \ \ \ \ std::shared\_lock\ g(\ my-\/>mtx\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00407}00407\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ indx\ =\ my-\/>index.get<by\_lib\_block\_num>();}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00408}00408\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00409}00409\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ indx.lower\_bound(\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00410}00410\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr\ !=\ indx.end()\ \&\&\ !(*itr)-\/>is\_valid()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00411}00411\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{namespacesysio_1_1chain_a4d023005b3b47d76c62beeaebc291fa3}{first\_preferred}}(\ **itr,\ *my-\/>head\ )\ )}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00412}00412\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *itr;}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00413}00413\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00414}00414\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00415}00415\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ my-\/>head;}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00416}00416\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00417}00417\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00418}\mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a18e51b748469f97473d120ef69e1da22}{00418}}\ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_a3b287e6c2d3717609273c999ef660dea}{branch\_type}}\ \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a18e51b748469f97473d120ef69e1da22}{fork\_database::fetch\_branch}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha256}{block\_id\_type}}\&\ h,\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ trim\_after\_block\_num\ )\textcolor{keyword}{const\ }\{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00419}00419\ \ \ \ \ \ \ std::shared\_lock\ g(\ my-\/>mtx\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00420}00420\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ my-\/>fetch\_branch\_impl(\ h,\ trim\_after\_block\_num\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00421}00421\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00422}00422\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00423}\mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_ac5cff58b9a2a775c9a96a17ba4638dfb}{00423}}\ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_a3b287e6c2d3717609273c999ef660dea}{branch\_type}}\ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_ac5cff58b9a2a775c9a96a17ba4638dfb}{fork\_database\_impl::fetch\_branch\_impl}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha256}{block\_id\_type}}\&\ h,\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ trim\_after\_block\_num\ )\textcolor{keyword}{const\ }\{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00424}00424\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_a3b287e6c2d3717609273c999ef660dea}{branch\_type}}\ result;}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00425}00425\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_ab5a93206da8f421ced6d9f69ec2b9a27}{get\_block\_impl}}(h);\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_ab5a93206da8f421ced6d9f69ec2b9a27}{get\_block\_impl}}(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}-\/>header.previous\ )\ )\ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00426}00426\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}-\/>block\_num\ <=\ trim\_after\_block\_num\ )}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00427}00427\ \ \ \ \ \ \ \ \ \ \ \ \ \ result.push\_back(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00428}00428\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00429}00429\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00430}00430\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00431}00431\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00432}00432\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00433}\mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a17185d8543965b7cd40066019bbf5740}{00433}}\ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\_state\_ptr}}\ \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a17185d8543965b7cd40066019bbf5740}{fork\_database::search\_on\_branch}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha256}{block\_id\_type}}\&\ h,\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ block\_num\ )\textcolor{keyword}{const\ }\{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00434}00434\ \ \ \ \ \ \ std::shared\_lock\ g(\ my-\/>mtx\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00435}00435\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ my-\/>search\_on\_branch\_impl(\ h,\ block\_num\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00436}00436\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00437}00437\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00438}\mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_a514dc4c7bd5146928e30e32d7ebc918f}{00438}}\ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\_state\_ptr}}\ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_a514dc4c7bd5146928e30e32d7ebc918f}{fork\_database\_impl::search\_on\_branch\_impl}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha256}{block\_id\_type}}\&\ h,\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ block\_num\ )\textcolor{keyword}{const\ }\{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00439}00439\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_ab5a93206da8f421ced6d9f69ec2b9a27}{get\_block\_impl}}(h);\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_ab5a93206da8f421ced6d9f69ec2b9a27}{get\_block\_impl}}(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}-\/>header.previous\ )\ )\ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00440}00440\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}-\/>block\_num\ ==\ block\_num\ )}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00441}00441\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00442}00442\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00443}00443\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00444}00444\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{\};}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00445}00445\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00446}00446\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00451}\mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a77f152572f2703a40e9c198456fad748}{00451}}\ \ \ \ pair<\ branch\_type,\ branch\_type\ >\ \ \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a77f152572f2703a40e9c198456fad748}{fork\_database::fetch\_branch\_from}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha256}{block\_id\_type}}\&\ first,}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00452}00452\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha256}{block\_id\_type}}\&\ second\ )\textcolor{keyword}{const\ }\{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00453}00453\ \ \ \ \ \ \ std::shared\_lock\ g(\ my-\/>mtx\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00454}00454\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ my-\/>fetch\_branch\_from\_impl(\ first,\ second\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00455}00455\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00456}00456\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00457}\mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_a2b64c6ee2f61647756dfa79e450a412b}{00457}}\ \ \ \ pair<\ branch\_type,\ branch\_type\ >\ \ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_a2b64c6ee2f61647756dfa79e450a412b}{fork\_database\_impl::fetch\_branch\_from\_impl}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha256}{block\_id\_type}}\&\ first,}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00458}00458\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha256}{block\_id\_type}}\&\ second\ )\textcolor{keyword}{const\ }\{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00459}00459\ \ \ \ \ \ \ pair<branch\_type,branch\_type>\ result;}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00460}00460\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ first\_branch\ =\ (first\ ==\ root-\/>id)\ ?\ root\ :\ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_ab5a93206da8f421ced6d9f69ec2b9a27}{get\_block\_impl}}(first);}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00461}00461\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ second\_branch\ =\ (second\ ==\ root-\/>id)\ ?\ root\ :\ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_ab5a93206da8f421ced6d9f69ec2b9a27}{get\_block\_impl}}(second);}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00462}00462\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00463}00463\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(first\_branch,\ fork\_db\_block\_not\_found,\ \textcolor{stringliteral}{"{}block\ \$\{id\}\ does\ not\ exist"{}},\ (\textcolor{stringliteral}{"{}id"{}},\ first));}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00464}00464\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(second\_branch,\ fork\_db\_block\_not\_found,\ \textcolor{stringliteral}{"{}block\ \$\{id\}\ does\ not\ exist"{}},\ (\textcolor{stringliteral}{"{}id"{}},\ second));}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00465}00465\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00466}00466\ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\ first\_branch-\/>block\_num\ >\ second\_branch-\/>block\_num\ )}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00467}00467\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00468}00468\ \ \ \ \ \ \ \ \ \ result.first.push\_back(first\_branch);}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00469}00469\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ prev\ =\ first\_branch-\/>header.previous;}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00470}00470\ \ \ \ \ \ \ \ \ \ first\_branch\ =\ (prev\ ==\ root-\/>id)\ ?\ root\ :\ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_ab5a93206da8f421ced6d9f69ec2b9a27}{get\_block\_impl}}(\ prev\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00471}00471\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ first\_branch,\ fork\_db\_block\_not\_found,}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00472}00472\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}block\ \$\{id\}\ does\ not\ exist"{}},}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00473}00473\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}id"{}},\ prev)}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00474}00474\ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00475}00475\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00476}00476\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00477}00477\ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\ second\_branch-\/>block\_num\ >\ first\_branch-\/>block\_num\ )}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00478}00478\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00479}00479\ \ \ \ \ \ \ \ \ \ result.second.push\_back(\ second\_branch\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00480}00480\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ prev\ =\ second\_branch-\/>header.previous;}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00481}00481\ \ \ \ \ \ \ \ \ \ second\_branch\ =\ (prev\ ==\ root-\/>id)\ ?\ root\ :\ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_ab5a93206da8f421ced6d9f69ec2b9a27}{get\_block\_impl}}(\ prev\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00482}00482\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ second\_branch,\ fork\_db\_block\_not\_found,}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00483}00483\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}block\ \$\{id\}\ does\ not\ exist"{}},}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00484}00484\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}id"{}},\ prev)}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00485}00485\ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00486}00486\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00487}00487\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00488}00488\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (first\_branch-\/>id\ ==\ second\_branch-\/>id)\ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00489}00489\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00490}00490\ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\ first\_branch-\/>header.previous\ !=\ second\_branch-\/>header.previous\ )}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00491}00491\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00492}00492\ \ \ \ \ \ \ \ \ \ result.first.push\_back(first\_branch);}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00493}00493\ \ \ \ \ \ \ \ \ \ result.second.push\_back(second\_branch);}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00494}00494\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ \&first\_prev\ =\ first\_branch-\/>header.previous;}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00495}00495\ \ \ \ \ \ \ \ \ \ first\_branch\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_ab5a93206da8f421ced6d9f69ec2b9a27}{get\_block\_impl}}(\ first\_prev\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00496}00496\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ \&second\_prev\ =\ second\_branch-\/>header.previous;}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00497}00497\ \ \ \ \ \ \ \ \ \ second\_branch\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_ab5a93206da8f421ced6d9f69ec2b9a27}{get\_block\_impl}}(\ second\_prev\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00498}00498\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ first\_branch,\ fork\_db\_block\_not\_found,}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00499}00499\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}block\ \$\{id\}\ does\ not\ exist"{}},}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00500}00500\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}id"{}},\ first\_prev)}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00501}00501\ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00502}00502\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ second\_branch,\ fork\_db\_block\_not\_found,}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00503}00503\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}block\ \$\{id\}\ does\ not\ exist"{}},}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00504}00504\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}id"{}},\ second\_prev)}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00505}00505\ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00506}00506\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00507}00507\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00508}00508\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ first\_branch\ \&\&\ second\_branch\ )}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00509}00509\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00510}00510\ \ \ \ \ \ \ \ \ \ result.first.push\_back(first\_branch);}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00511}00511\ \ \ \ \ \ \ \ \ \ result.second.push\_back(second\_branch);}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00512}00512\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00513}00513\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00514}00514\ \ \ \ \}\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00515}00515\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00517}\mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a193f10ce12656c580b023d36193a5cdc}{00517}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a193f10ce12656c580b023d36193a5cdc}{fork\_database::remove}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha256}{block\_id\_type}}\&\ \textcolor{keywordtype}{id}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00518}00518\ \ \ \ \ \ \ std::lock\_guard\ g(\ my-\/>mtx\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00519}00519\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ my-\/>remove\_impl(\ \textcolor{keywordtype}{id}\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00520}00520\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00521}00521\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00522}\mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_aded14555f97fc186af50537babc4995e}{00522}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_aded14555f97fc186af50537babc4995e}{fork\_database\_impl::remove\_impl}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha256}{block\_id\_type}}\&\ \textcolor{keywordtype}{id}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00523}00523\ \ \ \ \ \ \ deque<block\_id\_type>\ remove\_queue\{\textcolor{keywordtype}{id}\};}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00524}00524\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ previdx\ =\ index.get<by\_prev>();}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00525}00525\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ head\_id\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_a1e62e12db374c811deab2822dc8bfa63}{head}}-\/>id;}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00526}00526\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00527}00527\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ i\ =\ 0;\ i\ <\ remove\_queue.size();\ ++i\ )\ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00528}00528\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ remove\_queue[i]\ !=\ head\_id,\ \mbox{\hyperlink{namespacesysio_1_1chain_acad19c1ca23d796138841046c67b3ea9}{fork\_database\_exception}},}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00529}00529\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}removing\ the\ block\ and\ its\ descendants\ would\ remove\ the\ current\ head\ block"{}}\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00530}00530\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00531}00531\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ previtr\ =\ previdx.lower\_bound(\ remove\_queue[i]\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00532}00532\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\ previtr\ !=\ previdx.end()\ \&\&\ (*previtr)-\/>header.previous\ ==\ remove\_queue[i]\ )\ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00533}00533\ \ \ \ \ \ \ \ \ \ \ \ \ remove\_queue.emplace\_back(\ (*previtr)-\/>id\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00534}00534\ \ \ \ \ \ \ \ \ \ \ \ \ ++previtr;}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00535}00535\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00536}00536\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00537}00537\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00538}00538\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ block\_id\ :\ remove\_queue\ )\ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00539}00539\ \ \ \ \ \ \ \ \ \ index.erase(\ block\_id\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00540}00540\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00541}00541\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00542}00542\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00543}\mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a764fc46000bb93901ba6440fec07b5f9}{00543}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_a764fc46000bb93901ba6440fec07b5f9}{fork\_database::mark\_valid}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\_state\_ptr}}\&\ h\ )\ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00544}00544\ \ \ \ \ \ \ std::lock\_guard\ g(\ my-\/>mtx\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00545}00545\ \ \ \ \ \ \ my-\/>mark\_valid\_impl(\ h\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00546}00546\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00547}00547\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00548}\mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_ad569f7a3388b5a8e35f8c4ccb4a1c311}{00548}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_ad569f7a3388b5a8e35f8c4ccb4a1c311}{fork\_database\_impl::mark\_valid\_impl}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\_state\_ptr}}\&\ h\ )\ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00549}00549\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ h-\/>validated\ )\ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00550}00550\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00551}00551\ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ by\_id\_idx\ =\ index.get<by\_block\_id>();}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00552}00552\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00553}00553\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ by\_id\_idx.find(\ h-\/>id\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00554}00554\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ itr\ !=\ by\_id\_idx.end(),\ \mbox{\hyperlink{namespacesysio_1_1chain_acad19c1ca23d796138841046c67b3ea9}{fork\_database\_exception}},}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00555}00555\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}block\ state\ not\ in\ fork\ database;\ cannot\ mark\ as\ valid"{}},}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00556}00556\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}id"{}},\ h-\/>id)\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00557}00557\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00558}00558\ \ \ \ \ \ \ by\_id\_idx.modify(\ itr,\ [](\ \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\_state\_ptr}}\&\ bsp\ )\ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00559}00559\ \ \ \ \ \ \ \ \ \ bsp-\/>validated\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00560}00560\ \ \ \ \ \ \ \}\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00561}00561\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00562}00562\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ candidate\ =\ index.get<by\_lib\_block\_num>().begin();}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00563}00563\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{namespacesysio_1_1chain_a4d023005b3b47d76c62beeaebc291fa3}{first\_preferred}}(\ **candidate,\ *\mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_a1e62e12db374c811deab2822dc8bfa63}{head}}\ )\ )\ \{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00564}00564\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_a1e62e12db374c811deab2822dc8bfa63}{head}}\ =\ *candidate;}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00565}00565\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00566}00566\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00567}00567\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00568}\mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_aee9daa00e2698a868ad36853e58d3908}{00568}}\ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\_state\_ptr}}\ \mbox{\hyperlink{classsysio_1_1chain_1_1fork__database_aee9daa00e2698a868ad36853e58d3908}{fork\_database::get\_block}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha256}{block\_id\_type}}\&\ \textcolor{keywordtype}{id})\textcolor{keyword}{const\ }\{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00569}00569\ \ \ \ \ \ \ std::shared\_lock\ g(\ my-\/>mtx\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00570}00570\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ my-\/>get\_block\_impl(\textcolor{keywordtype}{id});}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00571}00571\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00572}00572\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00573}\mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_ab5a93206da8f421ced6d9f69ec2b9a27}{00573}}\ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\_state\_ptr}}\ \mbox{\hyperlink{structsysio_1_1chain_1_1fork__database__impl_ab5a93206da8f421ced6d9f69ec2b9a27}{fork\_database\_impl::get\_block\_impl}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha256}{block\_id\_type}}\&\ \textcolor{keywordtype}{id})\textcolor{keyword}{const\ }\{}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00574}00574\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ index.find(\ \textcolor{keywordtype}{id}\ );}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00575}00575\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr\ !=\ index.end()\ )}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00576}00576\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *itr;}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00577}00577\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\_state\_ptr}}();}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00578}00578\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00579}00579\ }
+\DoxyCodeLine{\Hypertarget{fork__database_8cpp_source_l00580}00580\ \}\ \}\ }
+
+\end{DoxyCode}

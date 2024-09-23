@@ -1,0 +1,375 @@
+\doxysection{Catch\+::Matchers Namespace Reference}
+\hypertarget{namespace_catch_1_1_matchers}{}\label{namespace_catch_1_1_matchers}\index{Catch::Matchers@{Catch::Matchers}}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespace_catch_1_1_matchers_1_1_floating}{Floating}}
+\item 
+namespace \mbox{\hyperlink{namespace_catch_1_1_matchers_1_1_generic}{Generic}}
+\item 
+namespace \mbox{\hyperlink{namespace_catch_1_1_matchers_1_1_impl}{Impl}}
+\item 
+namespace \mbox{\hyperlink{namespace_catch_1_1_matchers_1_1_std_string}{Std\+String}}
+\item 
+namespace \mbox{\hyperlink{namespace_catch_1_1_matchers_1_1_vector}{Vector}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_catch_1_1_matchers_1_1_floating_1_1_within_ulps_matcher}{Floating\+::\+Within\+Ulps\+Matcher}} \mbox{\hyperlink{namespace_catch_1_1_matchers_ae895591bd78a7d0ce4cdf3cf40d89ab5}{Within\+ULP}} (double target, int max\+Ulp\+Diff)
+\item 
+\mbox{\hyperlink{struct_catch_1_1_matchers_1_1_floating_1_1_within_ulps_matcher}{Floating\+::\+Within\+Ulps\+Matcher}} \mbox{\hyperlink{namespace_catch_1_1_matchers_ab87ee77e5349fac450d1e631dee86496}{Within\+ULP}} (float target, int max\+Ulp\+Diff)
+\item 
+\mbox{\hyperlink{struct_catch_1_1_matchers_1_1_floating_1_1_within_abs_matcher}{Floating\+::\+Within\+Abs\+Matcher}} \mbox{\hyperlink{namespace_catch_1_1_matchers_a4c9ea76d47d02de0cf2d354c87c26e95}{Within\+Abs}} (double target, double margin)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{class_catch_1_1_matchers_1_1_generic_1_1_predicate_matcher}{Generic\+::\+Predicate\+Matcher}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \mbox{\hyperlink{namespace_catch_1_1_matchers_a70a7c65c44f6ea7f739402c0b6f28657}{Predicate}} (std\+::function$<$ bool(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const \&)$>$ const \&predicate, std\+::string const \&description="{}"{})
+\item 
+\mbox{\hyperlink{struct_catch_1_1_matchers_1_1_std_string_1_1_equals_matcher}{Std\+String\+::\+Equals\+Matcher}} \mbox{\hyperlink{namespace_catch_1_1_matchers_a7130e11f26473da0efe7cd340579a843}{Equals}} (std\+::string const \&str, \mbox{\hyperlink{struct_catch_1_1_case_sensitive_aad49d3aee2d97066642fffa919685c6a}{Case\+Sensitive\+::\+Choice}} case\+Sensitivity)
+\item 
+\mbox{\hyperlink{struct_catch_1_1_matchers_1_1_std_string_1_1_contains_matcher}{Std\+String\+::\+Contains\+Matcher}} \mbox{\hyperlink{namespace_catch_1_1_matchers_ad8512a47ca527107b9ffce3dcfbc509b}{Contains}} (std\+::string const \&str, \mbox{\hyperlink{struct_catch_1_1_case_sensitive_aad49d3aee2d97066642fffa919685c6a}{Case\+Sensitive\+::\+Choice}} case\+Sensitivity)
+\item 
+\mbox{\hyperlink{struct_catch_1_1_matchers_1_1_std_string_1_1_ends_with_matcher}{Std\+String\+::\+Ends\+With\+Matcher}} \mbox{\hyperlink{namespace_catch_1_1_matchers_a816ee41f265edf5fd94f55d2860c58bd}{Ends\+With}} (std\+::string const \&str, \mbox{\hyperlink{struct_catch_1_1_case_sensitive_aad49d3aee2d97066642fffa919685c6a}{Case\+Sensitive\+::\+Choice}} case\+Sensitivity)
+\item 
+\mbox{\hyperlink{struct_catch_1_1_matchers_1_1_std_string_1_1_starts_with_matcher}{Std\+String\+::\+Starts\+With\+Matcher}} \mbox{\hyperlink{namespace_catch_1_1_matchers_a65ef1c5c157aa7f3b2206b5165272ad8}{Starts\+With}} (std\+::string const \&str, \mbox{\hyperlink{struct_catch_1_1_case_sensitive_aad49d3aee2d97066642fffa919685c6a}{Case\+Sensitive\+::\+Choice}} case\+Sensitivity)
+\item 
+\mbox{\hyperlink{struct_catch_1_1_matchers_1_1_std_string_1_1_regex_matcher}{Std\+String\+::\+Regex\+Matcher}} \mbox{\hyperlink{namespace_catch_1_1_matchers_ae32cda4203111b8e4bb286c3e1adf8e6}{Matches}} (std\+::string const \&regex, \mbox{\hyperlink{struct_catch_1_1_case_sensitive_aad49d3aee2d97066642fffa919685c6a}{Case\+Sensitive\+::\+Choice}} case\+Sensitivity)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{struct_catch_1_1_matchers_1_1_vector_1_1_contains_matcher}{Vector\+::\+Contains\+Matcher}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \mbox{\hyperlink{namespace_catch_1_1_matchers_a9642f53726bc55c61464634ae8ddc0c6}{Contains}} (std\+::vector$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ const \&comparator)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{struct_catch_1_1_matchers_1_1_vector_1_1_contains_element_matcher}{Vector\+::\+Contains\+Element\+Matcher}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \mbox{\hyperlink{namespace_catch_1_1_matchers_a8affcb1de92aeae3c3e830786287040b}{Vector\+Contains}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const \&comparator)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{struct_catch_1_1_matchers_1_1_vector_1_1_equals_matcher}{Vector\+::\+Equals\+Matcher}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \mbox{\hyperlink{namespace_catch_1_1_matchers_a8a83e9c308999c4939ada89d0c86e415}{Equals}} (std\+::vector$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ const \&comparator)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{struct_catch_1_1_matchers_1_1_vector_1_1_approx_matcher}{Vector\+::\+Approx\+Matcher}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \mbox{\hyperlink{namespace_catch_1_1_matchers_a77e1f039c7bf0b316003768a3f436952}{Approx}} (std\+::vector$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ const \&comparator)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{struct_catch_1_1_matchers_1_1_vector_1_1_unordered_equals_matcher}{Vector\+::\+Unordered\+Equals\+Matcher}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \mbox{\hyperlink{namespace_catch_1_1_matchers_acd42da14d75497b3ef635e5e096b0c77}{Unordered\+Equals}} (std\+::vector$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ const \&target)
+\item 
+Impl\+::\+NSString\+Matchers\+::\+Equals \mbox{\hyperlink{namespace_catch_1_1_matchers_a0b82dc8519a4f672f5786c3bfe68162a}{Equals}} (NSString \texorpdfstring{$\ast$}{*}substr)
+\item 
+Impl\+::\+NSString\+Matchers\+::\+Contains \mbox{\hyperlink{namespace_catch_1_1_matchers_a458c4db31800afc7873ac3311b0e37a0}{Contains}} (NSString \texorpdfstring{$\ast$}{*}substr)
+\item 
+Impl\+::\+NSString\+Matchers\+::\+Starts\+With \mbox{\hyperlink{namespace_catch_1_1_matchers_ad222691d2ef1a4f130f749e2c3eff4a8}{Starts\+With}} (NSString \texorpdfstring{$\ast$}{*}substr)
+\item 
+Impl\+::\+NSString\+Matchers\+::\+Ends\+With \mbox{\hyperlink{namespace_catch_1_1_matchers_af89abc55e7425b46b7b47ac5cf839c28}{Ends\+With}} (NSString \texorpdfstring{$\ast$}{*}substr)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespace_catch_1_1_matchers_a77e1f039c7bf0b316003768a3f436952}\index{Catch::Matchers@{Catch::Matchers}!Approx@{Approx}}
+\index{Approx@{Approx}!Catch::Matchers@{Catch::Matchers}}
+\doxysubsubsection{\texorpdfstring{Approx()}{Approx()}}
+{\footnotesize\ttfamily \label{namespace_catch_1_1_matchers_a77e1f039c7bf0b316003768a3f436952} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{struct_catch_1_1_matchers_1_1_vector_1_1_approx_matcher}{Vector\+::\+Approx\+Matcher}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ Catch\+::\+Matchers\+::\+Approx (\begin{DoxyParamCaption}\item[{std\+::vector$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ const \&}]{comparator}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__matchers__vector_8h_source_l00170}{170}} of file \mbox{\hyperlink{catch__matchers__vector_8h_source}{catch\+\_\+matchers\+\_\+vector.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_vector_1_1_approx_matcher}{Vector::ApproxMatcher<T>}}(\ comparator\ );}
+\DoxyCodeLine{00172\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespace_catch_1_1_matchers_a458c4db31800afc7873ac3311b0e37a0}\index{Catch::Matchers@{Catch::Matchers}!Contains@{Contains}}
+\index{Contains@{Contains}!Catch::Matchers@{Catch::Matchers}}
+\doxysubsubsection{\texorpdfstring{Contains()}{Contains()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{namespace_catch_1_1_matchers_a458c4db31800afc7873ac3311b0e37a0} 
+Impl\+::\+NSString\+Matchers\+::\+Contains Catch\+::\+Matchers\+::\+Contains (\begin{DoxyParamCaption}\item[{NSString \texorpdfstring{$\ast$}{*}}]{substr}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__objc_8hpp_source_l00184}{184}} of file \mbox{\hyperlink{catch__objc_8hpp_source}{catch\+\_\+objc.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00184\ \{\ \textcolor{keywordflow}{return}\ Impl::NSStringMatchers::Contains(\ substr\ );\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespace_catch_1_1_matchers_ad8512a47ca527107b9ffce3dcfbc509b}\index{Catch::Matchers@{Catch::Matchers}!Contains@{Contains}}
+\index{Contains@{Contains}!Catch::Matchers@{Catch::Matchers}}
+\doxysubsubsection{\texorpdfstring{Contains()}{Contains()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{namespace_catch_1_1_matchers_ad8512a47ca527107b9ffce3dcfbc509b} 
+\mbox{\hyperlink{struct_catch_1_1_matchers_1_1_std_string_1_1_contains_matcher}{Std\+String\+::\+Contains\+Matcher}} Catch\+::\+Matchers\+::\+Contains (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{str}{, }\item[{\mbox{\hyperlink{struct_catch_1_1_case_sensitive_aad49d3aee2d97066642fffa919685c6a}{Case\+Sensitive\+::\+Choice}}}]{case\+Sensitivity}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__matchers__string_8cpp_source_l00103}{103}} of file \mbox{\hyperlink{catch__matchers__string_8cpp_source}{catch\+\_\+matchers\+\_\+string.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_std_string_1_1_contains_matcher}{StdString::ContainsMatcher}}(\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_std_string_1_1_cased_string}{StdString::CasedString}}(\ str,\ caseSensitivity)\ );}
+\DoxyCodeLine{00105\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespace_catch_1_1_matchers_a9642f53726bc55c61464634ae8ddc0c6}\index{Catch::Matchers@{Catch::Matchers}!Contains@{Contains}}
+\index{Contains@{Contains}!Catch::Matchers@{Catch::Matchers}}
+\doxysubsubsection{\texorpdfstring{Contains()}{Contains()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{namespace_catch_1_1_matchers_a9642f53726bc55c61464634ae8ddc0c6} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{struct_catch_1_1_matchers_1_1_vector_1_1_contains_matcher}{Vector\+::\+Contains\+Matcher}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ Catch\+::\+Matchers\+::\+Contains (\begin{DoxyParamCaption}\item[{std\+::vector$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ const \&}]{comparator}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__matchers__vector_8h_source_l00155}{155}} of file \mbox{\hyperlink{catch__matchers__vector_8h_source}{catch\+\_\+matchers\+\_\+vector.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_vector_1_1_contains_matcher}{Vector::ContainsMatcher<T>}}(\ comparator\ );}
+\DoxyCodeLine{00157\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespace_catch_1_1_matchers_af89abc55e7425b46b7b47ac5cf839c28}\index{Catch::Matchers@{Catch::Matchers}!EndsWith@{EndsWith}}
+\index{EndsWith@{EndsWith}!Catch::Matchers@{Catch::Matchers}}
+\doxysubsubsection{\texorpdfstring{EndsWith()}{EndsWith()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{namespace_catch_1_1_matchers_af89abc55e7425b46b7b47ac5cf839c28} 
+Impl\+::\+NSString\+Matchers\+::\+Ends\+With Catch\+::\+Matchers\+::\+Ends\+With (\begin{DoxyParamCaption}\item[{NSString \texorpdfstring{$\ast$}{*}}]{substr}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__objc_8hpp_source_l00190}{190}} of file \mbox{\hyperlink{catch__objc_8hpp_source}{catch\+\_\+objc.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00190\ \{\ \textcolor{keywordflow}{return}\ Impl::NSStringMatchers::EndsWith(\ substr\ );\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespace_catch_1_1_matchers_a816ee41f265edf5fd94f55d2860c58bd}\index{Catch::Matchers@{Catch::Matchers}!EndsWith@{EndsWith}}
+\index{EndsWith@{EndsWith}!Catch::Matchers@{Catch::Matchers}}
+\doxysubsubsection{\texorpdfstring{EndsWith()}{EndsWith()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{namespace_catch_1_1_matchers_a816ee41f265edf5fd94f55d2860c58bd} 
+\mbox{\hyperlink{struct_catch_1_1_matchers_1_1_std_string_1_1_ends_with_matcher}{Std\+String\+::\+Ends\+With\+Matcher}} Catch\+::\+Matchers\+::\+Ends\+With (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{str}{, }\item[{\mbox{\hyperlink{struct_catch_1_1_case_sensitive_aad49d3aee2d97066642fffa919685c6a}{Case\+Sensitive\+::\+Choice}}}]{case\+Sensitivity}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__matchers__string_8cpp_source_l00106}{106}} of file \mbox{\hyperlink{catch__matchers__string_8cpp_source}{catch\+\_\+matchers\+\_\+string.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_std_string_1_1_ends_with_matcher}{StdString::EndsWithMatcher}}(\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_std_string_1_1_cased_string}{StdString::CasedString}}(\ str,\ caseSensitivity)\ );}
+\DoxyCodeLine{00108\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespace_catch_1_1_matchers_a0b82dc8519a4f672f5786c3bfe68162a}\index{Catch::Matchers@{Catch::Matchers}!Equals@{Equals}}
+\index{Equals@{Equals}!Catch::Matchers@{Catch::Matchers}}
+\doxysubsubsection{\texorpdfstring{Equals()}{Equals()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{namespace_catch_1_1_matchers_a0b82dc8519a4f672f5786c3bfe68162a} 
+Impl\+::\+NSString\+Matchers\+::\+Equals Catch\+::\+Matchers\+::\+Equals (\begin{DoxyParamCaption}\item[{NSString \texorpdfstring{$\ast$}{*}}]{substr}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__objc_8hpp_source_l00181}{181}} of file \mbox{\hyperlink{catch__objc_8hpp_source}{catch\+\_\+objc.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00181\ \{\ \textcolor{keywordflow}{return}\ Impl::NSStringMatchers::Equals(\ substr\ );\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespace_catch_1_1_matchers_a7130e11f26473da0efe7cd340579a843}\index{Catch::Matchers@{Catch::Matchers}!Equals@{Equals}}
+\index{Equals@{Equals}!Catch::Matchers@{Catch::Matchers}}
+\doxysubsubsection{\texorpdfstring{Equals()}{Equals()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{namespace_catch_1_1_matchers_a7130e11f26473da0efe7cd340579a843} 
+\mbox{\hyperlink{struct_catch_1_1_matchers_1_1_std_string_1_1_equals_matcher}{Std\+String\+::\+Equals\+Matcher}} Catch\+::\+Matchers\+::\+Equals (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{str}{, }\item[{\mbox{\hyperlink{struct_catch_1_1_case_sensitive_aad49d3aee2d97066642fffa919685c6a}{Case\+Sensitive\+::\+Choice}}}]{case\+Sensitivity}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__matchers__string_8cpp_source_l00100}{100}} of file \mbox{\hyperlink{catch__matchers__string_8cpp_source}{catch\+\_\+matchers\+\_\+string.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_std_string_1_1_equals_matcher}{StdString::EqualsMatcher}}(\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_std_string_1_1_cased_string}{StdString::CasedString}}(\ str,\ caseSensitivity)\ );}
+\DoxyCodeLine{00102\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_catch_1_1_matchers_a7130e11f26473da0efe7cd340579a843_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_catch_1_1_matchers_a8a83e9c308999c4939ada89d0c86e415}\index{Catch::Matchers@{Catch::Matchers}!Equals@{Equals}}
+\index{Equals@{Equals}!Catch::Matchers@{Catch::Matchers}}
+\doxysubsubsection{\texorpdfstring{Equals()}{Equals()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{namespace_catch_1_1_matchers_a8a83e9c308999c4939ada89d0c86e415} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{struct_catch_1_1_matchers_1_1_vector_1_1_equals_matcher}{Vector\+::\+Equals\+Matcher}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ Catch\+::\+Matchers\+::\+Equals (\begin{DoxyParamCaption}\item[{std\+::vector$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ const \&}]{comparator}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__matchers__vector_8h_source_l00165}{165}} of file \mbox{\hyperlink{catch__matchers__vector_8h_source}{catch\+\_\+matchers\+\_\+vector.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_vector_1_1_equals_matcher}{Vector::EqualsMatcher<T>}}(\ comparator\ );}
+\DoxyCodeLine{00167\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespace_catch_1_1_matchers_ae32cda4203111b8e4bb286c3e1adf8e6}\index{Catch::Matchers@{Catch::Matchers}!Matches@{Matches}}
+\index{Matches@{Matches}!Catch::Matchers@{Catch::Matchers}}
+\doxysubsubsection{\texorpdfstring{Matches()}{Matches()}}
+{\footnotesize\ttfamily \label{namespace_catch_1_1_matchers_ae32cda4203111b8e4bb286c3e1adf8e6} 
+\mbox{\hyperlink{struct_catch_1_1_matchers_1_1_std_string_1_1_regex_matcher}{Std\+String\+::\+Regex\+Matcher}} Catch\+::\+Matchers\+::\+Matches (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{regex}{, }\item[{\mbox{\hyperlink{struct_catch_1_1_case_sensitive_aad49d3aee2d97066642fffa919685c6a}{Case\+Sensitive\+::\+Choice}}}]{case\+Sensitivity}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__matchers__string_8cpp_source_l00113}{113}} of file \mbox{\hyperlink{catch__matchers__string_8cpp_source}{catch\+\_\+matchers\+\_\+string.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_std_string_1_1_regex_matcher}{StdString::RegexMatcher}}(regex,\ caseSensitivity);}
+\DoxyCodeLine{00115\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespace_catch_1_1_matchers_a70a7c65c44f6ea7f739402c0b6f28657}\index{Catch::Matchers@{Catch::Matchers}!Predicate@{Predicate}}
+\index{Predicate@{Predicate}!Catch::Matchers@{Catch::Matchers}}
+\doxysubsubsection{\texorpdfstring{Predicate()}{Predicate()}}
+{\footnotesize\ttfamily \label{namespace_catch_1_1_matchers_a70a7c65c44f6ea7f739402c0b6f28657} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{class_catch_1_1_matchers_1_1_generic_1_1_predicate_matcher}{Generic\+::\+Predicate\+Matcher}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ Catch\+::\+Matchers\+::\+Predicate (\begin{DoxyParamCaption}\item[{std\+::function$<$ bool(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const \&)$>$ const \&}]{predicate}{, }\item[{std\+::string const \&}]{description}{ = {\ttfamily "{}"{}}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__matchers__generic_8hpp_source_l00051}{51}} of file \mbox{\hyperlink{catch__matchers__generic_8hpp_source}{catch\+\_\+matchers\+\_\+generic.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_catch_1_1_matchers_1_1_generic_1_1_predicate_matcher}{Generic::PredicateMatcher<T>}}(predicate,\ description);}
+\DoxyCodeLine{00053\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespace_catch_1_1_matchers_ad222691d2ef1a4f130f749e2c3eff4a8}\index{Catch::Matchers@{Catch::Matchers}!StartsWith@{StartsWith}}
+\index{StartsWith@{StartsWith}!Catch::Matchers@{Catch::Matchers}}
+\doxysubsubsection{\texorpdfstring{StartsWith()}{StartsWith()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{namespace_catch_1_1_matchers_ad222691d2ef1a4f130f749e2c3eff4a8} 
+Impl\+::\+NSString\+Matchers\+::\+Starts\+With Catch\+::\+Matchers\+::\+Starts\+With (\begin{DoxyParamCaption}\item[{NSString \texorpdfstring{$\ast$}{*}}]{substr}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__objc_8hpp_source_l00187}{187}} of file \mbox{\hyperlink{catch__objc_8hpp_source}{catch\+\_\+objc.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00187\ \{\ \textcolor{keywordflow}{return}\ Impl::NSStringMatchers::StartsWith(\ substr\ );\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespace_catch_1_1_matchers_a65ef1c5c157aa7f3b2206b5165272ad8}\index{Catch::Matchers@{Catch::Matchers}!StartsWith@{StartsWith}}
+\index{StartsWith@{StartsWith}!Catch::Matchers@{Catch::Matchers}}
+\doxysubsubsection{\texorpdfstring{StartsWith()}{StartsWith()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{namespace_catch_1_1_matchers_a65ef1c5c157aa7f3b2206b5165272ad8} 
+\mbox{\hyperlink{struct_catch_1_1_matchers_1_1_std_string_1_1_starts_with_matcher}{Std\+String\+::\+Starts\+With\+Matcher}} Catch\+::\+Matchers\+::\+Starts\+With (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{str}{, }\item[{\mbox{\hyperlink{struct_catch_1_1_case_sensitive_aad49d3aee2d97066642fffa919685c6a}{Case\+Sensitive\+::\+Choice}}}]{case\+Sensitivity}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__matchers__string_8cpp_source_l00109}{109}} of file \mbox{\hyperlink{catch__matchers__string_8cpp_source}{catch\+\_\+matchers\+\_\+string.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_std_string_1_1_starts_with_matcher}{StdString::StartsWithMatcher}}(\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_std_string_1_1_cased_string}{StdString::CasedString}}(\ str,\ caseSensitivity)\ );}
+\DoxyCodeLine{00111\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespace_catch_1_1_matchers_acd42da14d75497b3ef635e5e096b0c77}\index{Catch::Matchers@{Catch::Matchers}!UnorderedEquals@{UnorderedEquals}}
+\index{UnorderedEquals@{UnorderedEquals}!Catch::Matchers@{Catch::Matchers}}
+\doxysubsubsection{\texorpdfstring{UnorderedEquals()}{UnorderedEquals()}}
+{\footnotesize\ttfamily \label{namespace_catch_1_1_matchers_acd42da14d75497b3ef635e5e096b0c77} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{struct_catch_1_1_matchers_1_1_vector_1_1_unordered_equals_matcher}{Vector\+::\+Unordered\+Equals\+Matcher}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ Catch\+::\+Matchers\+::\+Unordered\+Equals (\begin{DoxyParamCaption}\item[{std\+::vector$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ const \&}]{target}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__matchers__vector_8h_source_l00175}{175}} of file \mbox{\hyperlink{catch__matchers__vector_8h_source}{catch\+\_\+matchers\+\_\+vector.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_vector_1_1_unordered_equals_matcher}{Vector::UnorderedEqualsMatcher<T>}}(target);}
+\DoxyCodeLine{00177\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespace_catch_1_1_matchers_a8affcb1de92aeae3c3e830786287040b}\index{Catch::Matchers@{Catch::Matchers}!VectorContains@{VectorContains}}
+\index{VectorContains@{VectorContains}!Catch::Matchers@{Catch::Matchers}}
+\doxysubsubsection{\texorpdfstring{VectorContains()}{VectorContains()}}
+{\footnotesize\ttfamily \label{namespace_catch_1_1_matchers_a8affcb1de92aeae3c3e830786287040b} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{struct_catch_1_1_matchers_1_1_vector_1_1_contains_element_matcher}{Vector\+::\+Contains\+Element\+Matcher}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ Catch\+::\+Matchers\+::\+Vector\+Contains (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const \&}]{comparator}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__matchers__vector_8h_source_l00160}{160}} of file \mbox{\hyperlink{catch__matchers__vector_8h_source}{catch\+\_\+matchers\+\_\+vector.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_vector_1_1_contains_element_matcher}{Vector::ContainsElementMatcher<T>}}(\ comparator\ );}
+\DoxyCodeLine{00162\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_catch_1_1_matchers_a8affcb1de92aeae3c3e830786287040b_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_catch_1_1_matchers_a4c9ea76d47d02de0cf2d354c87c26e95}\index{Catch::Matchers@{Catch::Matchers}!WithinAbs@{WithinAbs}}
+\index{WithinAbs@{WithinAbs}!Catch::Matchers@{Catch::Matchers}}
+\doxysubsubsection{\texorpdfstring{WithinAbs()}{WithinAbs()}}
+{\footnotesize\ttfamily \label{namespace_catch_1_1_matchers_a4c9ea76d47d02de0cf2d354c87c26e95} 
+\mbox{\hyperlink{struct_catch_1_1_matchers_1_1_floating_1_1_within_abs_matcher}{Floating\+::\+Within\+Abs\+Matcher}} Catch\+::\+Matchers\+::\+Within\+Abs (\begin{DoxyParamCaption}\item[{double}]{target}{, }\item[{double}]{margin}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__matchers__floating_8cpp_source_l00143}{143}} of file \mbox{\hyperlink{catch__matchers__floating_8cpp_source}{catch\+\_\+matchers\+\_\+floating.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00144\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_floating_1_1_within_abs_matcher}{Floating::WithinAbsMatcher}}(target,\ margin);}
+\DoxyCodeLine{00145\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespace_catch_1_1_matchers_ae895591bd78a7d0ce4cdf3cf40d89ab5}\index{Catch::Matchers@{Catch::Matchers}!WithinULP@{WithinULP}}
+\index{WithinULP@{WithinULP}!Catch::Matchers@{Catch::Matchers}}
+\doxysubsubsection{\texorpdfstring{WithinULP()}{WithinULP()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{namespace_catch_1_1_matchers_ae895591bd78a7d0ce4cdf3cf40d89ab5} 
+\mbox{\hyperlink{struct_catch_1_1_matchers_1_1_floating_1_1_within_ulps_matcher}{Floating\+::\+Within\+Ulps\+Matcher}} Catch\+::\+Matchers\+::\+Within\+ULP (\begin{DoxyParamCaption}\item[{double}]{target}{, }\item[{int}]{max\+Ulp\+Diff}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__matchers__floating_8cpp_source_l00135}{135}} of file \mbox{\hyperlink{catch__matchers__floating_8cpp_source}{catch\+\_\+matchers\+\_\+floating.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00136\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_floating_1_1_within_ulps_matcher}{Floating::WithinUlpsMatcher}}(target,\ maxUlpDiff,\ Floating::FloatingPointKind::Double);}
+\DoxyCodeLine{00137\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespace_catch_1_1_matchers_ab87ee77e5349fac450d1e631dee86496}\index{Catch::Matchers@{Catch::Matchers}!WithinULP@{WithinULP}}
+\index{WithinULP@{WithinULP}!Catch::Matchers@{Catch::Matchers}}
+\doxysubsubsection{\texorpdfstring{WithinULP()}{WithinULP()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{namespace_catch_1_1_matchers_ab87ee77e5349fac450d1e631dee86496} 
+\mbox{\hyperlink{struct_catch_1_1_matchers_1_1_floating_1_1_within_ulps_matcher}{Floating\+::\+Within\+Ulps\+Matcher}} Catch\+::\+Matchers\+::\+Within\+ULP (\begin{DoxyParamCaption}\item[{float}]{target}{, }\item[{int}]{max\+Ulp\+Diff}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__matchers__floating_8cpp_source_l00139}{139}} of file \mbox{\hyperlink{catch__matchers__floating_8cpp_source}{catch\+\_\+matchers\+\_\+floating.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00140\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_floating_1_1_within_ulps_matcher}{Floating::WithinUlpsMatcher}}(target,\ maxUlpDiff,\ Floating::FloatingPointKind::Float);}
+\DoxyCodeLine{00141\ \}}
+
+\end{DoxyCode}

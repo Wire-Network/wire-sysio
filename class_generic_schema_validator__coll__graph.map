@@ -1,0 +1,9 @@
+<map id="GenericSchemaValidator&lt; SchemaDocumentType, OutputHandler, StateAllocator &gt;" name="GenericSchemaValidator&lt; SchemaDocumentType, OutputHandler, StateAllocator &gt;">
+<area shape="rect" id="Node000001" title="JSON Schema Validator." alt="" coords="319,55,529,111"/>
+<area shape="rect" id="Node000002" href="$classinternal_1_1_i_schema_state_factory.html" title=" " alt="" coords="5,5,271,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="258,47,319,59,318,65,257,52"/>
+<area shape="rect" id="Node000003" href="$classinternal_1_1_i_schema_validator.html" title=" " alt="" coords="51,70,225,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="240,80,318,80,318,86,240,86"/>
+<area shape="rect" id="Node000004" href="$classinternal_1_1_i_validation_error_handler.html" title=" " alt="" coords="31,120,245,176"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="260,118,317,105,319,110,261,123"/>
+</map>

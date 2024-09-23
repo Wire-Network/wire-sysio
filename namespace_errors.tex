@@ -1,0 +1,125 @@
+\doxysection{Errors Namespace Reference}
+\hypertarget{namespace_errors}{}\label{namespace_errors}\index{Errors@{Errors}}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{namespace_errors_a719a329951edb01e45afe1443dfa2a92}{fatalf}} (const char \texorpdfstring{$\ast$}{*}message\+Format,...)
+\item 
+void \mbox{\hyperlink{namespace_errors_aee5daf469584435300f91503f83b09fe}{fatal}} (const char \texorpdfstring{$\ast$}{*}message)
+\item 
+void \mbox{\hyperlink{namespace_errors_a6959930ad6159fe3eb2e04ebf87c1b84}{unreachable}} ()
+\item 
+void \mbox{\hyperlink{namespace_errors_ab0f273d47003dc29d0ec0b995228e689}{unimplemented}} (const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{structcontext}{context}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespace_errors_aee5daf469584435300f91503f83b09fe}\index{Errors@{Errors}!fatal@{fatal}}
+\index{fatal@{fatal}!Errors@{Errors}}
+\doxysubsubsection{\texorpdfstring{fatal()}{fatal()}}
+{\footnotesize\ttfamily \label{namespace_errors_aee5daf469584435300f91503f83b09fe} 
+void Errors\+::fatal (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{message}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_errors_8h_source_l00021}{21}} of file \mbox{\hyperlink{_errors_8h_source}{Errors.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00021\ \{\ \mbox{\hyperlink{namespace_errors_a719a329951edb01e45afe1443dfa2a92}{fatalf}}(\textcolor{stringliteral}{"{}\%s\(\backslash\)n"{}},message);\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=253pt]{namespace_errors_aee5daf469584435300f91503f83b09fe_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_errors_aee5daf469584435300f91503f83b09fe_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_errors_a719a329951edb01e45afe1443dfa2a92}\index{Errors@{Errors}!fatalf@{fatalf}}
+\index{fatalf@{fatalf}!Errors@{Errors}}
+\doxysubsubsection{\texorpdfstring{fatalf()}{fatalf()}}
+{\footnotesize\ttfamily \label{namespace_errors_a719a329951edb01e45afe1443dfa2a92} 
+void Errors\+::fatalf (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{message\+Format}{, }\item[{}]{...}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_errors_8h_source_l00012}{12}} of file \mbox{\hyperlink{_errors_8h_source}{Errors.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00013\ \ \ \ \ \{}
+\DoxyCodeLine{00014\ \ \ \ \ \ \ \ \ va\_list\ varArgs;}
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \ \ va\_start(varArgs,messageFormat);}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \ \ std::vfprintf(stderr,messageFormat,varArgs);}
+\DoxyCodeLine{00017\ \ \ \ \ \ \ \ \ std::fflush(stderr);}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ va\_end(varArgs);}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ std::abort();}
+\DoxyCodeLine{00020\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_errors_a719a329951edb01e45afe1443dfa2a92_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_errors_ab0f273d47003dc29d0ec0b995228e689}\index{Errors@{Errors}!unimplemented@{unimplemented}}
+\index{unimplemented@{unimplemented}!Errors@{Errors}}
+\doxysubsubsection{\texorpdfstring{unimplemented()}{unimplemented()}}
+{\footnotesize\ttfamily \label{namespace_errors_ab0f273d47003dc29d0ec0b995228e689} 
+void Errors\+::unimplemented (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{context}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_errors_8h_source_l00023}{23}} of file \mbox{\hyperlink{_errors_8h_source}{Errors.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00023\ \{\ \mbox{\hyperlink{namespace_errors_a719a329951edb01e45afe1443dfa2a92}{fatalf}}(\textcolor{stringliteral}{"{}unimplemented:\ \%s\(\backslash\)n"{}},\mbox{\hyperlink{structcontext}{context}});\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=300pt]{namespace_errors_ab0f273d47003dc29d0ec0b995228e689_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_errors_a6959930ad6159fe3eb2e04ebf87c1b84}\index{Errors@{Errors}!unreachable@{unreachable}}
+\index{unreachable@{unreachable}!Errors@{Errors}}
+\doxysubsubsection{\texorpdfstring{unreachable()}{unreachable()}}
+{\footnotesize\ttfamily \label{namespace_errors_a6959930ad6159fe3eb2e04ebf87c1b84} 
+void Errors\+::unreachable (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_errors_8h_source_l00022}{22}} of file \mbox{\hyperlink{_errors_8h_source}{Errors.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00022\ \{\ \mbox{\hyperlink{namespace_errors_a719a329951edb01e45afe1443dfa2a92}{fatalf}}(\textcolor{stringliteral}{"{}reached\ unreachable\ code\(\backslash\)n"{}});\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=287pt]{namespace_errors_a6959930ad6159fe3eb2e04ebf87c1b84_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_errors_a6959930ad6159fe3eb2e04ebf87c1b84_icgraph}
+\end{center}
+\end{figure}

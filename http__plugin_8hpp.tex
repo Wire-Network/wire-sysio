@@ -1,0 +1,67 @@
+\doxysection{plugins/http\+\_\+plugin/include/sysio/http\+\_\+plugin/http\+\_\+plugin.hpp File Reference}
+\hypertarget{http__plugin_8hpp}{}\label{http__plugin_8hpp}\index{plugins/http\_plugin/include/sysio/http\_plugin/http\_plugin.hpp@{plugins/http\_plugin/include/sysio/http\_plugin/http\_plugin.hpp}}
+{\ttfamily \#include $<$appbase/application.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/exception/exception.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/reflect/reflect.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/io/json.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/exceptions.\+hpp$>$}\newline
+Include dependency graph for http\+\_\+plugin.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{http__plugin_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{http__plugin_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1http__plugin__defaults}{sysio\+::http\+\_\+plugin\+\_\+defaults}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1http__plugin}{sysio\+::http\+\_\+plugin}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1http__plugin_1_1get__supported__apis__result}{sysio\+::http\+\_\+plugin\+::get\+\_\+supported\+\_\+apis\+\_\+result}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1error__results}{sysio\+::error\+\_\+results}}
+\begin{DoxyCompactList}\small\item\em Structure used to create JSON error responses. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{structsysio_1_1error__results_1_1error__info}{sysio\+::error\+\_\+results\+::error\+\_\+info}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1error__results_1_1error__info_1_1error__detail}{sysio\+::error\+\_\+results\+::error\+\_\+info\+::error\+\_\+detail}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{namespacesysio_ababf376b47a253805b530a023df4768c}{sysio\+::url\+\_\+response\+\_\+callback}} = std\+::function$<$void(int,\mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}})$>$
+\begin{DoxyCompactList}\small\item\em \doxylink{struct_a}{A} callback function provided to a URL handler to allow it to specify the HTTP response code and body. \end{DoxyCompactList}\item 
+using \mbox{\hyperlink{namespacesysio_a99c82a51bf462442f89e68cd48f103a6}{sysio\+::url\+\_\+handler}} = std\+::function$<$void(\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}},\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}},\mbox{\hyperlink{namespacesysio_ababf376b47a253805b530a023df4768c}{url\+\_\+response\+\_\+callback}})$>$
+\begin{DoxyCompactList}\small\item\em Callback type for a URL handler. \end{DoxyCompactList}\item 
+using \mbox{\hyperlink{namespacesysio_a95297c7a33a0f2cd1b3a4673a4b8ff3c}{sysio\+::api\+\_\+description}} = std\+::map$<$\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}}, \mbox{\hyperlink{namespacesysio_a99c82a51bf462442f89e68cd48f103a6}{url\+\_\+handler}}$>$
+\begin{DoxyCompactList}\small\item\em An API, containing URLs and handlers. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum class \mbox{\hyperlink{namespacesysio_abf4a5fc3ea13f713d0a43bdbc8788cd7}{sysio\+::http\+\_\+params\+\_\+types}} \{ \mbox{\hyperlink{namespacesysio_abf4a5fc3ea13f713d0a43bdbc8788cd7a0e9a5336c90eefed9d98a345a024f19b}{sysio\+::no\+\_\+params}} = 0
+, \mbox{\hyperlink{namespacesysio_abf4a5fc3ea13f713d0a43bdbc8788cd7af4df8f1e5079096ea1bf20ed4616ebdf}{sysio\+::params\+\_\+required}} = 1
+, \mbox{\hyperlink{namespacesysio_abf4a5fc3ea13f713d0a43bdbc8788cd7a2b0c52326dd77c6307b66c4e53a36f53}{sysio\+::possible\+\_\+no\+\_\+params}} = 2
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+std\+::string\+\_\+view \mbox{\hyperlink{namespacesysio_ab130c0e642be21f97a497e01e3731c89}{sysio\+::make\+\_\+trimmed\+\_\+string\+\_\+view}} (const std\+::string \&body)
+\begin{DoxyCompactList}\small\item\em Used to trim whitespace from body. Returned string\+\_\+view valid only for lifetime of body. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{namespacesysio_a8dcbd40369d7ed378c27a2cc45494865}{sysio\+::is\+\_\+empty\+\_\+content}} (const std\+::string \&body)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , \mbox{\hyperlink{namespacesysio_abf4a5fc3ea13f713d0a43bdbc8788cd7}{http\+\_\+params\+\_\+types}} params\+\_\+type$>$ }\\\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{namespacesysio_ae109d11a69599661a434b345dcc2f62a}{sysio\+::parse\+\_\+params}} (const std\+::string \&body)
+\end{DoxyCompactItemize}

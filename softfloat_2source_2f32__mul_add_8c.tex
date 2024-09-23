@@ -1,0 +1,59 @@
+\doxysection{libraries/softfloat/source/f32\+\_\+mul\+Add.c File Reference}
+\hypertarget{softfloat_2source_2f32__mul_add_8c}{}\label{softfloat_2source_2f32__mul_add_8c}\index{libraries/softfloat/source/f32\_mulAdd.c@{libraries/softfloat/source/f32\_mulAdd.c}}
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include "{}platform.\+h"{}}\newline
+{\ttfamily \#include "{}internals.\+h"{}}\newline
+{\ttfamily \#include "{}softfloat.\+h"{}}\newline
+Include dependency graph for f32\+\_\+mul\+Add.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{softfloat_2source_2f32__mul_add_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structfloat32__t}{float32\+\_\+t}} \mbox{\hyperlink{softfloat_2source_2f32__mul_add_8c_a4ebab08cdac9dbea99a972aca73d9a58}{f32\+\_\+mul\+Add}} (\mbox{\hyperlink{structfloat32__t}{float32\+\_\+t}} \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, \mbox{\hyperlink{structfloat32__t}{float32\+\_\+t}} b, \mbox{\hyperlink{structfloat32__t}{float32\+\_\+t}} c)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{softfloat_2source_2f32__mul_add_8c_a4ebab08cdac9dbea99a972aca73d9a58}\index{f32\_mulAdd.c@{f32\_mulAdd.c}!f32\_mulAdd@{f32\_mulAdd}}
+\index{f32\_mulAdd@{f32\_mulAdd}!f32\_mulAdd.c@{f32\_mulAdd.c}}
+\doxysubsubsection{\texorpdfstring{f32\_mulAdd()}{f32\_mulAdd()}}
+{\footnotesize\ttfamily \label{softfloat_2source_2f32__mul_add_8c_a4ebab08cdac9dbea99a972aca73d9a58} 
+\mbox{\hyperlink{structfloat32__t}{float32\+\_\+t}} f32\+\_\+mul\+Add (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structfloat32__t}{float32\+\_\+t}}}]{a}{, }\item[{\mbox{\hyperlink{structfloat32__t}{float32\+\_\+t}}}]{b}{, }\item[{\mbox{\hyperlink{structfloat32__t}{float32\+\_\+t}}}]{c}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2f32__mul_add_8c_source_l00042}{42}} of file \mbox{\hyperlink{softfloat_2source_2f32__mul_add_8c_source}{f32\+\_\+mul\+Add.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00043\ \{}
+\DoxyCodeLine{00044\ \ \ \ \ \textcolor{keyword}{union\ }\mbox{\hyperlink{unionui32__f32}{ui32\_f32}}\ uA;}
+\DoxyCodeLine{00045\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a8f075c759c74e109e8184306c663809d}{uint\_fast32\_t}}\ uiA;}
+\DoxyCodeLine{00046\ \ \ \ \ \textcolor{keyword}{union\ }\mbox{\hyperlink{unionui32__f32}{ui32\_f32}}\ uB;}
+\DoxyCodeLine{00047\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a8f075c759c74e109e8184306c663809d}{uint\_fast32\_t}}\ uiB;}
+\DoxyCodeLine{00048\ \ \ \ \ \textcolor{keyword}{union\ }\mbox{\hyperlink{unionui32__f32}{ui32\_f32}}\ uC;}
+\DoxyCodeLine{00049\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a8f075c759c74e109e8184306c663809d}{uint\_fast32\_t}}\ uiC;}
+\DoxyCodeLine{00050\ }
+\DoxyCodeLine{00051\ \ \ \ \ uA.\mbox{\hyperlink{unionui32__f32_a8623a30ee66833362a71aafeb4ad94d0}{f}}\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}};}
+\DoxyCodeLine{00052\ \ \ \ \ uiA\ =\ uA.ui;}
+\DoxyCodeLine{00053\ \ \ \ \ uB.f\ =\ b;}
+\DoxyCodeLine{00054\ \ \ \ \ uiB\ =\ uB.ui;}
+\DoxyCodeLine{00055\ \ \ \ \ uC.f\ =\ c;}
+\DoxyCodeLine{00056\ \ \ \ \ uiC\ =\ uC.ui;}
+\DoxyCodeLine{00057\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a52747e11cdb84e22368603ecd501cb4f}{softfloat\_mulAddF32}}(\ uiA,\ uiB,\ uiC,\ 0\ );}
+\DoxyCodeLine{00058\ }
+\DoxyCodeLine{00059\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{softfloat_2source_2f32__mul_add_8c_a4ebab08cdac9dbea99a972aca73d9a58_cgraph}
+\end{center}
+\end{figure}

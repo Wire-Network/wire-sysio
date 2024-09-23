@@ -1,0 +1,57 @@
+\doxysection{libraries/sys-\/vm/external/softfloat/source/\+ARM-\/\+VFPv2-\/default\+Na\+N/s\+\_\+propagate\+Na\+NF128\+UI.c File Reference}
+\hypertarget{sys-vm_2external_2softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2s__propagate_na_n_f128_u_i_8c}{}\label{sys-vm_2external_2softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2s__propagate_na_n_f128_u_i_8c}\index{libraries/sys-\/vm/external/softfloat/source/ARM-\/VFPv2-\/defaultNaN/s\_propagateNaNF128UI.c@{libraries/sys-\/vm/external/softfloat/source/ARM-\/VFPv2-\/defaultNaN/s\_propagateNaNF128UI.c}}
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include "{}platform.\+h"{}}\newline
+{\ttfamily \#include "{}primitive\+Types.\+h"{}}\newline
+{\ttfamily \#include "{}specialize.\+h"{}}\newline
+{\ttfamily \#include "{}softfloat.\+h"{}}\newline
+Include dependency graph for s\+\_\+propagate\+Na\+NF128\+UI.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sys-vm_2external_2softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2s__propagate_na_n_f128_u_i_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+struct uint128 \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2s__propagate_na_n_f128_u_i_8c_a6bc082e0aa5040a81d9baf5162c5b6ca}{softfloat\+\_\+propagate\+Na\+NF128\+UI}} (\mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\+\_\+fast64\+\_\+t}} ui\+A64, \mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\+\_\+fast64\+\_\+t}} ui\+A0, \mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\+\_\+fast64\+\_\+t}} ui\+B64, \mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\+\_\+fast64\+\_\+t}} ui\+B0)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{sys-vm_2external_2softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2s__propagate_na_n_f128_u_i_8c_a6bc082e0aa5040a81d9baf5162c5b6ca}\index{s\_propagateNaNF128UI.c@{s\_propagateNaNF128UI.c}!softfloat\_propagateNaNF128UI@{softfloat\_propagateNaNF128UI}}
+\index{softfloat\_propagateNaNF128UI@{softfloat\_propagateNaNF128UI}!s\_propagateNaNF128UI.c@{s\_propagateNaNF128UI.c}}
+\doxysubsubsection{\texorpdfstring{softfloat\_propagateNaNF128UI()}{softfloat\_propagateNaNF128UI()}}
+{\footnotesize\ttfamily \label{sys-vm_2external_2softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2s__propagate_na_n_f128_u_i_8c_a6bc082e0aa5040a81d9baf5162c5b6ca} 
+struct uint128 softfloat\+\_\+propagate\+Na\+NF128\+UI (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\+\_\+fast64\+\_\+t}}}]{ui\+A64}{, }\item[{\mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\+\_\+fast64\+\_\+t}}}]{ui\+A0}{, }\item[{\mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\+\_\+fast64\+\_\+t}}}]{ui\+B64}{, }\item[{\mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\+\_\+fast64\+\_\+t}}}]{ui\+B0}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2s__propagate_na_n_f128_u_i_8c_source_l00053}{53}} of file \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2s__propagate_na_n_f128_u_i_8c_source}{s\+\_\+propagate\+Na\+NF128\+UI.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00059\ \{}
+\DoxyCodeLine{00060\ \ \ \ \ \textcolor{keyword}{struct\ }uint128\ uiZ;}
+\DoxyCodeLine{00061\ }
+\DoxyCodeLine{00062\ \ \ \ \ \textcolor{keywordflow}{if}\ (}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ softfloat\_isSigNaNF128UI(\ uiA64,\ uiA0\ )}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ ||\ softfloat\_isSigNaNF128UI(\ uiB64,\ uiB0\ )}
+\DoxyCodeLine{00065\ \ \ \ \ )\ \{}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2softfloat__raise_flags_8c_ac16bbf09eca0fe8ff91301d82c5a667f}{softfloat\_raiseFlags}}(\ \mbox{\hyperlink{softfloat_2source_2include_2softfloat_8h_a56a0f36da7f9eaaf54bd05cc2bf49173a191f069090c3d33752fb728272d9a4a9}{softfloat\_flag\_invalid}}\ );}
+\DoxyCodeLine{00067\ \ \ \ \ \}}
+\DoxyCodeLine{00068\ \ \ \ \ uiZ.v64\ =\ \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2specialize_8h_a148679c6f04fba2d44bec8fbb6273417}{defaultNaNF128UI64}};}
+\DoxyCodeLine{00069\ \ \ \ \ uiZ.v0\ \ =\ \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2specialize_8h_af0a06796d9f91e1ee4afbdac0bed3449}{defaultNaNF128UI0}};}
+\DoxyCodeLine{00070\ \ \ \ \ \textcolor{keywordflow}{return}\ uiZ;}
+\DoxyCodeLine{00071\ }
+\DoxyCodeLine{00072\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sys-vm_2external_2softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2s__propagate_na_n_f128_u_i_8c_a6bc082e0aa5040a81d9baf5162c5b6ca_cgraph}
+\end{center}
+\end{figure}

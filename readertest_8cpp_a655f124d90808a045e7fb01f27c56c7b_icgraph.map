@@ -1,0 +1,7 @@
+<map id="TestMultipleTrailingCommaErrors" name="TestMultipleTrailingCommaErrors">
+<area shape="rect" id="Node000001" title=" " alt="" coords="109,23,288,64"/>
+<area shape="rect" id="Node000002" href="$readertest_8cpp.html#a5f560a3f67d416d54dcfded7ecfbd04f" title=" " alt="" coords="5,5,61,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="93,30,61,25,62,20,93,25"/>
+<area shape="rect" id="Node000003" href="$readertest_8cpp.html#a41e6c386bd804991906f8e7420df4635" title=" " alt="" coords="5,55,61,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="93,61,62,66,61,61,93,56"/>
+</map>

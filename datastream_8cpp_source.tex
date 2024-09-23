@@ -1,0 +1,13 @@
+\doxysection{datastream.\+cpp}
+\hypertarget{datastream_8cpp_source}{}\label{datastream_8cpp_source}\index{libraries/fc/src/io/datastream.cpp@{libraries/fc/src/io/datastream.cpp}}
+\mbox{\hyperlink{datastream_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{datastream_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{datastream_8hpp}{fc/io/datastream.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{datastream_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{exception_8hpp}{fc/exception/exception.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{datastream_8cpp_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{datastream_8cpp_source_l00004}\mbox{\hyperlink{namespacefc_1_1detail_a20e12fc3683b005cd6430a4a3c066bc0}{00004}}\ \mbox{\hyperlink{utility_8hpp_a9bc43e3ee0ae83643b65e07fe1fd0132}{NO\_RETURN}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefc_1_1detail_a20e12fc3683b005cd6430a4a3c066bc0}{fc::detail::throw\_datastream\_range\_error}}(\textcolor{keywordtype}{char}\ \textcolor{keyword}{const}*\ method,\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ over)}
+\DoxyCodeLine{\Hypertarget{datastream_8cpp_source_l00005}00005\ \{}
+\DoxyCodeLine{\Hypertarget{datastream_8cpp_source_l00006}00006\ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ out\_of\_range\_exception,\ \textcolor{stringliteral}{"{}\$\{method\}\ datastream\ of\ length\ \$\{len\}\ over\ by\ \$\{over\}"{}},\ (\textcolor{stringliteral}{"{}method"{}},\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc::string}}(method))(\textcolor{stringliteral}{"{}len"{}},\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})(\textcolor{stringliteral}{"{}over"{}},over)\ );}
+\DoxyCodeLine{\Hypertarget{datastream_8cpp_source_l00007}00007\ \}}
+
+\end{DoxyCode}

@@ -1,0 +1,428 @@
+\doxysection{210-\/Evt-\/\+Event\+Listeners.cpp}
+\hypertarget{210-_evt-_event_listeners_8cpp_source}{}\label{210-_evt-_event_listeners_8cpp_source}\index{libraries/sys-\/vm/external/Catch2/examples/210-\/Evt-\/EventListeners.cpp@{libraries/sys-\/vm/external/Catch2/examples/210-\/Evt-\/EventListeners.cpp}}
+\mbox{\hyperlink{210-_evt-_event_listeners_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00001}00001\ \textcolor{comment}{//\ 210-\/Evt-\/EventListeners.cpp}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00003}00003\ \textcolor{comment}{//\ Contents:}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00004}00004\ \textcolor{comment}{//\ 1.\ Printing\ of\ listener\ data}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00005}00005\ \textcolor{comment}{//\ 2.\ My\ listener\ and\ registration}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00006}00006\ \textcolor{comment}{//\ 3.\ Test\ cases}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00008}00008\ \textcolor{comment}{//\ main()\ provided\ in\ 000-\/CatchMain.cpp}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00010}00010\ \textcolor{comment}{//\ Let\ Catch\ provide\ the\ required\ interfaces:}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00011}\mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a1bac874dd66e329219e5318a953f3d98}{00011}}\ \textcolor{preprocessor}{\#define\ CATCH\_CONFIG\_EXTERNAL\_INTERFACES}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00013}00013\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{single__include_2catch2_2catch_8hpp}{catch2/catch.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00014}00014\ \textcolor{preprocessor}{\#include\ <iostream>}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00016}00016\ \textcolor{comment}{//\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00017}00017\ \textcolor{comment}{//\ 1.\ Printing\ of\ listener\ data:}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00018}00018\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00020}\mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{00020}}\ std::string\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(\textcolor{keywordtype}{int}\ \textcolor{keyword}{const}\ level)\ \{}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00021}00021\ \ \ \ \ \textcolor{keywordflow}{return}\ std::string(\ 2\ *\ level,\ \textcolor{charliteral}{'\ '}\ );}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00022}00022\ \}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00024}00024\ \textcolor{keyword}{template}<\ \textcolor{keyword}{typename}\ T\ >}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00025}\mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aa5eae0b166f1e4c15bea3e82bfc42543}{00025}}\ std::ostream\&\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aa5eae0b166f1e4c15bea3e82bfc42543}{operator<<}}(\ std::ostream\&\ os,\ std::vector<T>\ \textcolor{keyword}{const}\&\ v\ )\ \{}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00026}00026\ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}\{\ "{}};}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00027}00027\ \ \ \ \ \textcolor{keywordflow}{for}\ (\ \textcolor{keyword}{auto}\ x\ :\ v\ )}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00028}00028\ \ \ \ \ \ \ \ \ os\ <<\ x\ <<\ \textcolor{stringliteral}{"{},\ "{}};}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00029}00029\ \ \ \ \ \textcolor{keywordflow}{return}\ os\ <<\ \textcolor{stringliteral}{"{}\}"{}};}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00030}00030\ \}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00032}00032\ \textcolor{comment}{//\ struct\ SourceLineInfo\ \{}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00033}00033\ \textcolor{comment}{//\ \ \ \ \ char\ const*\ file;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00034}00034\ \textcolor{comment}{//\ \ \ \ \ std::size\_t\ line;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00035}00035\ \textcolor{comment}{//\ \};}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00037}\mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{00037}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\ std::ostream\&\ os,\ \textcolor{keywordtype}{int}\ \textcolor{keyword}{const}\ level,\ std::string\ \textcolor{keyword}{const}\&\ title,\ \mbox{\hyperlink{struct_catch_1_1_source_line_info}{Catch::SourceLineInfo}}\ \textcolor{keyword}{const}\&\ info\ )\ \{}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00038}00038\ \ \ \ \ os\ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level\ \ )\ <<\ title\ <<\ \textcolor{stringliteral}{"{}:\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00039}00039\ \ \ \ \ \ \ \ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level+1)\ <<\ \textcolor{stringliteral}{"{}-\/\ file:\ "{}}\ <<\ info.file\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00040}00040\ \ \ \ \ \ \ \ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level+1)\ <<\ \textcolor{stringliteral}{"{}-\/\ line:\ "{}}\ <<\ info.line\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00041}00041\ \}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00043}00043\ \textcolor{comment}{//struct\ MessageInfo\ \{}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00044}00044\ \textcolor{comment}{//\ \ \ \ std::string\ macroName;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00045}00045\ \textcolor{comment}{//\ \ \ \ std::string\ message;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00046}00046\ \textcolor{comment}{//\ \ \ \ SourceLineInfo\ lineInfo;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00047}00047\ \textcolor{comment}{//\ \ \ \ ResultWas::OfType\ type;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00048}00048\ \textcolor{comment}{//\ \ \ \ unsigned\ int\ sequence;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00049}00049\ \textcolor{comment}{//\};}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00051}\mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a960d81b099b0dd14af49af4394671f37}{00051}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\ std::ostream\&\ os,\ \textcolor{keywordtype}{int}\ \textcolor{keyword}{const}\ level,\ \mbox{\hyperlink{struct_catch_1_1_message_info}{Catch::MessageInfo}}\ \textcolor{keyword}{const}\&\ info\ )\ \{}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00052}00052\ \ \ \ \ os\ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level+1)\ <<\ \textcolor{stringliteral}{"{}-\/\ macroName:\ '"{}}\ <<\ info.macroName\ <<\ \textcolor{stringliteral}{"{}'\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00053}00053\ \ \ \ \ \ \ \ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level+1)\ <<\ \textcolor{stringliteral}{"{}-\/\ message\ '"{}}\ \ \ \ <<\ info.message\ \ \ <<\ \textcolor{stringliteral}{"{}'\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00054}00054\ \ \ \ \ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\ os,level+1\ \ ,\ \textcolor{stringliteral}{"{}-\/\ lineInfo"{}},\ info.lineInfo\ );}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00055}00055\ \ \ \ \ os\ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level+1)\ <<\ \textcolor{stringliteral}{"{}-\/\ sequence\ "{}}\ \ \ \ <<\ info.sequence\ \ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00056}00056\ \}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00058}\mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a988e352b3c3a5def4e5855c96d827773}{00058}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\ std::ostream\&\ os,\ \textcolor{keywordtype}{int}\ \textcolor{keyword}{const}\ level,\ std::string\ \textcolor{keyword}{const}\&\ title,\ std::vector<Catch::MessageInfo>\ \textcolor{keyword}{const}\&\ v\ )\ \{}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00059}00059\ \ \ \ \ os\ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level\ \ )\ <<\ title\ <<\ \textcolor{stringliteral}{"{}:\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00060}00060\ \ \ \ \ \textcolor{keywordflow}{for}\ (\ \textcolor{keyword}{auto}\ x\ :\ v\ )}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00061}00061\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00062}00062\ \ \ \ \ \ \ \ \ os\ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level+1)\ <<\ \textcolor{stringliteral}{"{}\{\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00063}00063\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\ os,\ level+2,\ x\ );}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00064}00064\ \ \ \ \ \ \ \ \ os\ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level+1)\ <<\ \textcolor{stringliteral}{"{}\}\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00065}00065\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00066}00066\ \textcolor{comment}{//\ \ \ \ os\ <<\ ws(level+1)\ <<\ "{}\(\backslash\)n"{};}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00067}00067\ \}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00069}00069\ \textcolor{comment}{//\ struct\ TestRunInfo\ \{}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00070}00070\ \textcolor{comment}{//\ \ \ \ \ std::string\ name;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00071}00071\ \textcolor{comment}{//\ \};}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00073}\mbox{\hyperlink{210-_evt-_event_listeners_8cpp_afda85b06acd85281526ea7a7bc28b301}{00073}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\ std::ostream\&\ os,\ \textcolor{keywordtype}{int}\ \textcolor{keyword}{const}\ level,\ std::string\ \textcolor{keyword}{const}\&\ title,\ \mbox{\hyperlink{struct_catch_1_1_test_run_info}{Catch::TestRunInfo}}\ \textcolor{keyword}{const}\&\ info\ )\ \{}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00074}00074\ \ \ \ \ os\ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level\ \ )\ <<\ title\ <<\ \textcolor{stringliteral}{"{}:\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00075}00075\ \ \ \ \ \ \ \ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level+1)\ <<\ \textcolor{stringliteral}{"{}-\/\ name:\ "{}}\ <<\ info.name\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00076}00076\ \}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00077}00077\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00078}00078\ \textcolor{comment}{//\ struct\ Counts\ \{}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00079}00079\ \textcolor{comment}{//\ \ \ \ \ std::size\_t\ total()\ const;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00080}00080\ \textcolor{comment}{//\ \ \ \ \ bool\ allPassed()\ const;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00081}00081\ \textcolor{comment}{//\ \ \ \ \ bool\ allOk()\ const;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00082}00082\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00083}00083\ \textcolor{comment}{//\ \ \ \ \ std::size\_t\ passed\ =\ 0;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00084}00084\ \textcolor{comment}{//\ \ \ \ \ std::size\_t\ failed\ =\ 0;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00085}00085\ \textcolor{comment}{//\ \ \ \ \ std::size\_t\ failedButOk\ =\ 0;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00086}00086\ \textcolor{comment}{//\ \};}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00087}00087\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00088}\mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a5bf94f8326977aea354c9aa8b22084b1}{00088}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\ std::ostream\&\ os,\ \textcolor{keywordtype}{int}\ \textcolor{keyword}{const}\ level,\ std::string\ \textcolor{keyword}{const}\&\ title,\ \mbox{\hyperlink{struct_catch_1_1_counts}{Catch::Counts}}\ \textcolor{keyword}{const}\&\ info\ )\ \{}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00089}00089\ \ \ \ \ os\ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level\ \ )\ <<\ title\ <<\ \textcolor{stringliteral}{"{}:\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00090}00090\ \ \ \ \ \ \ \ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level+1)\ <<\ \textcolor{stringliteral}{"{}-\/\ total():\ "{}}\ \ \ \ \ <<\ info.total()\ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00091}00091\ \ \ \ \ \ \ \ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level+1)\ <<\ \textcolor{stringliteral}{"{}-\/\ allPassed():\ "{}}\ <<\ info.allPassed()\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00092}00092\ \ \ \ \ \ \ \ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level+1)\ <<\ \textcolor{stringliteral}{"{}-\/\ allOk():\ "{}}\ \ \ \ \ <<\ info.allOk()\ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00093}00093\ \ \ \ \ \ \ \ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level+1)\ <<\ \textcolor{stringliteral}{"{}-\/\ passed:\ "{}}\ \ \ \ \ \ <<\ info.passed\ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00094}00094\ \ \ \ \ \ \ \ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level+1)\ <<\ \textcolor{stringliteral}{"{}-\/\ failed:\ "{}}\ \ \ \ \ \ <<\ info.failed\ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00095}00095\ \ \ \ \ \ \ \ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level+1)\ <<\ \textcolor{stringliteral}{"{}-\/\ failedButOk:\ "{}}\ <<\ info.failedButOk\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00096}00096\ \}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00097}00097\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00098}00098\ \textcolor{comment}{//\ struct\ Totals\ \{}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00099}00099\ \textcolor{comment}{//\ \ \ \ \ Counts\ assertions;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00100}00100\ \textcolor{comment}{//\ \ \ \ \ Counts\ testCases;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00101}00101\ \textcolor{comment}{//\ \};}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00102}00102\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00103}\mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aa98cd1bc114aaa1a560a75209f5a5541}{00103}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\ std::ostream\&\ os,\ \textcolor{keywordtype}{int}\ \textcolor{keyword}{const}\ level,\ std::string\ \textcolor{keyword}{const}\&\ title,\ \mbox{\hyperlink{struct_catch_1_1_totals}{Catch::Totals}}\ \textcolor{keyword}{const}\&\ info\ )\ \{}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00104}00104\ \ \ \ \ os\ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level)\ <<\ title\ <<\ \textcolor{stringliteral}{"{}:\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00105}00105\ \ \ \ \ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\ os,\ level+1,\ \textcolor{stringliteral}{"{}-\/\ assertions"{}},\ info.assertions\ );}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00106}00106\ \ \ \ \ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\ os,\ level+1,\ \textcolor{stringliteral}{"{}-\/\ testCases"{}}\ ,\ info.testCases\ \ );}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00107}00107\ \}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00108}00108\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00109}00109\ \textcolor{comment}{//\ struct\ TestRunStats\ \{}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00110}00110\ \textcolor{comment}{//\ \ \ \ \ TestRunInfo\ runInfo;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00111}00111\ \textcolor{comment}{//\ \ \ \ \ Totals\ totals;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00112}00112\ \textcolor{comment}{//\ \ \ \ \ bool\ aborting;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00113}00113\ \textcolor{comment}{//\ \};}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00114}00114\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00115}\mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a25d70a27ac2e7ae5534a283b5654c33f}{00115}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\ std::ostream\&\ os,\ \textcolor{keywordtype}{int}\ \textcolor{keyword}{const}\ level,\ std::string\ \textcolor{keyword}{const}\&\ title,\ \mbox{\hyperlink{struct_catch_1_1_test_run_stats}{Catch::TestRunStats}}\ \textcolor{keyword}{const}\&\ info\ )\ \{}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00116}00116\ \ \ \ \ os\ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level)\ <<\ title\ <<\ \textcolor{stringliteral}{"{}:\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00117}00117\ \ \ \ \ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\ os,\ level+1\ ,\ \textcolor{stringliteral}{"{}-\/\ runInfo"{}},\ info.runInfo\ );}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00118}00118\ \ \ \ \ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\ os,\ level+1\ ,\ \textcolor{stringliteral}{"{}-\/\ totals"{}}\ ,\ info.totals\ \ );}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00119}00119\ \ \ \ \ os\ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level+1)\ <<\ \textcolor{stringliteral}{"{}-\/\ aborting:\ "{}}\ <<\ info.aborting\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00120}00120\ \}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00121}00121\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00122}00122\ \textcolor{comment}{//\ struct\ TestCaseInfo\ \{}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00123}00123\ \textcolor{comment}{//\ \ \ \ \ enum\ SpecialProperties\{}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00124}00124\ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ None\ =\ 0,}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00125}00125\ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ IsHidden\ =\ 1\ <<\ 1,}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00126}00126\ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ ShouldFail\ =\ 1\ <<\ 2,}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00127}00127\ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ MayFail\ =\ 1\ <<\ 3,}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00128}00128\ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ Throws\ =\ 1\ <<\ 4,}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00129}00129\ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ NonPortable\ =\ 1\ <<\ 5,}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00130}00130\ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ Benchmark\ =\ 1\ <<\ 6}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00131}00131\ \textcolor{comment}{//\ \ \ \ \ \};}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00132}00132\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00133}00133\ \textcolor{comment}{//\ \ \ \ \ bool\ isHidden()\ const;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00134}00134\ \textcolor{comment}{//\ \ \ \ \ bool\ throws()\ const;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00135}00135\ \textcolor{comment}{//\ \ \ \ \ bool\ okToFail()\ const;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00136}00136\ \textcolor{comment}{//\ \ \ \ \ bool\ expectedToFail()\ const;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00137}00137\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00138}00138\ \textcolor{comment}{//\ \ \ \ \ std::string\ tagsAsString()\ const;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00139}00139\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00140}00140\ \textcolor{comment}{//\ \ \ \ \ std::string\ name;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00141}00141\ \textcolor{comment}{//\ \ \ \ \ std::string\ className;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00142}00142\ \textcolor{comment}{//\ \ \ \ \ std::string\ description;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00143}00143\ \textcolor{comment}{//\ \ \ \ \ std::vector<std::string>\ tags;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00144}00144\ \textcolor{comment}{//\ \ \ \ \ std::vector<std::string>\ lcaseTags;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00145}00145\ \textcolor{comment}{//\ \ \ \ \ SourceLineInfo\ lineInfo;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00146}00146\ \textcolor{comment}{//\ \ \ \ \ SpecialProperties\ properties;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00147}00147\ \textcolor{comment}{//\ \};}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00148}00148\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00149}\mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a6e4c0f53dc75c52564bcc784dbca25c3}{00149}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\ std::ostream\&\ os,\ \textcolor{keywordtype}{int}\ \textcolor{keyword}{const}\ level,\ std::string\ \textcolor{keyword}{const}\&\ title,\ \mbox{\hyperlink{struct_catch_1_1_test_case_info}{Catch::TestCaseInfo}}\ \textcolor{keyword}{const}\&\ info\ )\ \{}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00150}00150\ \ \ \ \ os\ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level\ \ )\ <<\ title\ <<\ \textcolor{stringliteral}{"{}:\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00151}00151\ \ \ \ \ \ \ \ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level+1)\ <<\ \textcolor{stringliteral}{"{}-\/\ isHidden():\ "{}}\ \ \ \ \ \ \ <<\ info.isHidden()\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00152}00152\ \ \ \ \ \ \ \ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level+1)\ <<\ \textcolor{stringliteral}{"{}-\/\ throws():\ "{}}\ \ \ \ \ \ \ \ \ <<\ info.throws()\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00153}00153\ \ \ \ \ \ \ \ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level+1)\ <<\ \textcolor{stringliteral}{"{}-\/\ okToFail():\ "{}}\ \ \ \ \ \ \ <<\ info.okToFail()\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00154}00154\ \ \ \ \ \ \ \ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level+1)\ <<\ \textcolor{stringliteral}{"{}-\/\ expectedToFail():\ "{}}\ <<\ info.expectedToFail()\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00155}00155\ \ \ \ \ \ \ \ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level+1)\ <<\ \textcolor{stringliteral}{"{}-\/\ tagsAsString():\ '"{}}\ \ <<\ info.tagsAsString()\ <<\ \textcolor{stringliteral}{"{}'\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00156}00156\ \ \ \ \ \ \ \ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level+1)\ <<\ \textcolor{stringliteral}{"{}-\/\ name:\ '"{}}\ \ \ \ \ \ \ \ \ \ \ \ <<\ info.name\ <<\ \textcolor{stringliteral}{"{}'\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00157}00157\ \ \ \ \ \ \ \ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level+1)\ <<\ \textcolor{stringliteral}{"{}-\/\ className:\ '"{}}\ \ \ \ \ \ \ <<\ info.className\ <<\ \textcolor{stringliteral}{"{}'\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00158}00158\ \ \ \ \ \ \ \ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level+1)\ <<\ \textcolor{stringliteral}{"{}-\/\ description:\ '"{}}\ \ \ \ \ <<\ info.description\ <<\ \textcolor{stringliteral}{"{}'\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00159}00159\ \ \ \ \ \ \ \ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level+1)\ <<\ \textcolor{stringliteral}{"{}-\/\ tags:\ "{}}\ \ \ \ \ \ \ \ \ \ \ \ \ <<\ info.tags\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00160}00160\ \ \ \ \ \ \ \ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level+1)\ <<\ \textcolor{stringliteral}{"{}-\/\ lcaseTags:\ "{}}\ \ \ \ \ \ \ \ <<\ info.lcaseTags\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00161}00161\ \ \ \ \ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\ os,\ level+1\ ,\ \textcolor{stringliteral}{"{}-\/\ lineInfo"{}},\ info.lineInfo\ );}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00162}00162\ \ \ \ \ os\ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level+1)\ <<\ \textcolor{stringliteral}{"{}-\/\ properties\ (flags):\ 0x"{}}\ <<\ std::hex\ <<\ info.properties\ <<\ std::dec\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00163}00163\ \}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00164}00164\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00165}00165\ \textcolor{comment}{//\ struct\ TestCaseStats\ \{}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00166}00166\ \textcolor{comment}{//\ \ \ \ \ TestCaseInfo\ testInfo;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00167}00167\ \textcolor{comment}{//\ \ \ \ \ Totals\ totals;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00168}00168\ \textcolor{comment}{//\ \ \ \ \ std::string\ stdOut;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00169}00169\ \textcolor{comment}{//\ \ \ \ \ std::string\ stdErr;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00170}00170\ \textcolor{comment}{//\ \ \ \ \ bool\ aborting;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00171}00171\ \textcolor{comment}{//\ \};}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00172}00172\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00173}\mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a60e68b0289d1f7319c84e401ba879567}{00173}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\ std::ostream\&\ os,\ \textcolor{keywordtype}{int}\ \textcolor{keyword}{const}\ level,\ std::string\ \textcolor{keyword}{const}\&\ title,\ \mbox{\hyperlink{struct_catch_1_1_test_case_stats}{Catch::TestCaseStats}}\ \textcolor{keyword}{const}\&\ info\ )\ \{}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00174}00174\ \ \ \ \ os\ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level\ \ )\ <<\ title\ <<\ \textcolor{stringliteral}{"{}:\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00175}00175\ \ \ \ \ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\ os,\ level+1\ ,\ \textcolor{stringliteral}{"{}-\/\ testInfo"{}},\ info.testInfo\ );}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00176}00176\ \ \ \ \ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\ os,\ level+1\ ,\ \textcolor{stringliteral}{"{}-\/\ totals"{}}\ \ ,\ info.totals\ \ \ );}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00177}00177\ \ \ \ \ os\ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level+1)\ <<\ \textcolor{stringliteral}{"{}-\/\ stdOut:\ "{}}\ \ \ <<\ info.stdOut\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00178}00178\ \ \ \ \ \ \ \ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level+1)\ <<\ \textcolor{stringliteral}{"{}-\/\ stdErr:\ "{}}\ \ \ <<\ info.stdErr\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00179}00179\ \ \ \ \ \ \ \ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level+1)\ <<\ \textcolor{stringliteral}{"{}-\/\ aborting:\ "{}}\ <<\ info.aborting\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00180}00180\ \}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00181}00181\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00182}00182\ \textcolor{comment}{//\ struct\ SectionInfo\ \{}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00183}00183\ \textcolor{comment}{//\ \ \ \ \ std::string\ name;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00184}00184\ \textcolor{comment}{//\ \ \ \ \ std::string\ description;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00185}00185\ \textcolor{comment}{//\ \ \ \ \ SourceLineInfo\ lineInfo;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00186}00186\ \textcolor{comment}{//\ \};}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00187}00187\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00188}\mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaeae80b7aa1a97ce830685a9e2de0804}{00188}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\ std::ostream\&\ os,\ \textcolor{keywordtype}{int}\ \textcolor{keyword}{const}\ level,\ std::string\ \textcolor{keyword}{const}\&\ title,\ \mbox{\hyperlink{struct_catch_1_1_section_info}{Catch::SectionInfo}}\ \textcolor{keyword}{const}\&\ info\ )\ \{}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00189}00189\ \ \ \ \ os\ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level\ \ )\ <<\ title\ <<\ \textcolor{stringliteral}{"{}:\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00190}00190\ \ \ \ \ \ \ \ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level+1)\ <<\ \textcolor{stringliteral}{"{}-\/\ name:\ "{}}\ \ \ \ \ \ \ \ \ <<\ info.name\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00191}00191\ \ \ \ \ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\ os,\ level+1\ ,\ \textcolor{stringliteral}{"{}-\/\ lineInfo"{}},\ info.lineInfo\ );}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00192}00192\ \}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00193}00193\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00194}00194\ \textcolor{comment}{//\ struct\ SectionStats\ \{}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00195}00195\ \textcolor{comment}{//\ \ \ \ \ SectionInfo\ sectionInfo;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00196}00196\ \textcolor{comment}{//\ \ \ \ \ Counts\ assertions;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00197}00197\ \textcolor{comment}{//\ \ \ \ \ double\ durationInSeconds;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00198}00198\ \textcolor{comment}{//\ \ \ \ \ bool\ missingAssertions;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00199}00199\ \textcolor{comment}{//\ \};}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00200}00200\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00201}\mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a085f633ea4762d1d0a2a9398266ef692}{00201}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\ std::ostream\&\ os,\ \textcolor{keywordtype}{int}\ \textcolor{keyword}{const}\ level,\ std::string\ \textcolor{keyword}{const}\&\ title,\ \mbox{\hyperlink{struct_catch_1_1_section_stats}{Catch::SectionStats}}\ \textcolor{keyword}{const}\&\ info\ )\ \{}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00202}00202\ \ \ \ \ os\ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level\ \ )\ <<\ title\ <<\ \textcolor{stringliteral}{"{}:\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00203}00203\ \ \ \ \ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\ os,\ level+1\ ,\ \textcolor{stringliteral}{"{}-\/\ sectionInfo"{}},\ info.sectionInfo\ );}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00204}00204\ \ \ \ \ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\ os,\ level+1\ ,\ \textcolor{stringliteral}{"{}-\/\ assertions"{}}\ ,\ info.assertions\ );}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00205}00205\ \ \ \ \ os\ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level+1)\ <<\ \textcolor{stringliteral}{"{}-\/\ durationInSeconds:\ "{}}\ <<\ info.durationInSeconds\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00206}00206\ \ \ \ \ \ \ \ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level+1)\ <<\ \textcolor{stringliteral}{"{}-\/\ missingAssertions:\ "{}}\ <<\ info.missingAssertions\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00207}00207\ \}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00208}00208\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00209}00209\ \textcolor{comment}{//\ struct\ AssertionInfo}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00210}00210\ \textcolor{comment}{//\ \{}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00211}00211\ \textcolor{comment}{//\ \ \ \ \ StringRef\ macroName;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00212}00212\ \textcolor{comment}{//\ \ \ \ \ SourceLineInfo\ lineInfo;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00213}00213\ \textcolor{comment}{//\ \ \ \ \ StringRef\ capturedExpression;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00214}00214\ \textcolor{comment}{//\ \ \ \ \ ResultDisposition::Flags\ resultDisposition;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00215}00215\ \textcolor{comment}{//\ \};}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00216}00216\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00217}\mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a2c30c935e89648b9d45a630c73bf9127}{00217}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\ std::ostream\&\ os,\ \textcolor{keywordtype}{int}\ \textcolor{keyword}{const}\ level,\ std::string\ \textcolor{keyword}{const}\&\ title,\ \mbox{\hyperlink{struct_catch_1_1_assertion_info}{Catch::AssertionInfo}}\ \textcolor{keyword}{const}\&\ info\ )\ \{}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00218}00218\ \ \ \ \ os\ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level\ \ )\ <<\ title\ <<\ \textcolor{stringliteral}{"{}:\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00219}00219\ \ \ \ \ \ \ \ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level+1)\ <<\ \textcolor{stringliteral}{"{}-\/\ macroName:\ '"{}}\ \ <<\ info.macroName\ <<\ \textcolor{stringliteral}{"{}'\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00220}00220\ \ \ \ \ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\ os,\ level+1\ ,\ \textcolor{stringliteral}{"{}-\/\ lineInfo"{}}\ ,\ info.lineInfo\ );}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00221}00221\ \ \ \ \ os\ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level+1)\ <<\ \textcolor{stringliteral}{"{}-\/\ capturedExpression:\ '"{}}\ <<\ info.capturedExpression\ <<\ \textcolor{stringliteral}{"{}'\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00222}00222\ \ \ \ \ \ \ \ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level+1)\ <<\ \textcolor{stringliteral}{"{}-\/\ resultDisposition\ (flags):\ 0x"{}}\ <<\ std::hex\ <<\ info.resultDisposition\ \ <<\ std::dec\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00223}00223\ \}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00224}00224\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00225}00225\ \textcolor{comment}{//struct\ AssertionResultData}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00226}00226\ \textcolor{comment}{//\{}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00227}00227\ \textcolor{comment}{//\ \ \ \ std::string\ reconstructExpression()\ const;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00228}00228\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00229}00229\ \textcolor{comment}{//\ \ \ \ std::string\ message;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00230}00230\ \textcolor{comment}{//\ \ \ \ mutable\ std::string\ reconstructedExpression;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00231}00231\ \textcolor{comment}{//\ \ \ \ LazyExpression\ lazyExpression;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00232}00232\ \textcolor{comment}{//\ \ \ \ ResultWas::OfType\ resultType;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00233}00233\ \textcolor{comment}{//\};}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00234}00234\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00235}\mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a6dda4e6a55bff9f9f6b2605e56676ec1}{00235}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\ std::ostream\&\ os,\ \textcolor{keywordtype}{int}\ \textcolor{keyword}{const}\ level,\ std::string\ \textcolor{keyword}{const}\&\ title,\ \mbox{\hyperlink{struct_catch_1_1_assertion_result_data}{Catch::AssertionResultData}}\ \textcolor{keyword}{const}\&\ info\ )\ \{}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00236}00236\ \ \ \ \ os\ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level\ \ )\ <<\ title\ <<\ \textcolor{stringliteral}{"{}:\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00237}00237\ \ \ \ \ \ \ \ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level+1)\ <<\ \textcolor{stringliteral}{"{}-\/\ reconstructExpression():\ '"{}}\ <<\ \ \ info.reconstructExpression()\ <<\ \textcolor{stringliteral}{"{}'\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00238}00238\ \ \ \ \ \ \ \ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level+1)\ <<\ \textcolor{stringliteral}{"{}-\/\ message:\ '"{}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \ \ info.message\ <<\ \textcolor{stringliteral}{"{}'\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00239}00239\ \ \ \ \ \ \ \ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level+1)\ <<\ \textcolor{stringliteral}{"{}-\/\ lazyExpression:\ '"{}}\ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}(info.lazyExpression)"{}}\ <<\ \textcolor{stringliteral}{"{}'\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00240}00240\ \ \ \ \ \ \ \ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level+1)\ <<\ \textcolor{stringliteral}{"{}-\/\ resultType:\ '"{}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \ \ info.resultType\ <<\ \textcolor{stringliteral}{"{}'\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00241}00241\ \}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00242}00242\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00243}00243\ \textcolor{comment}{//class\ AssertionResult\ \{}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00244}00244\ \textcolor{comment}{//\ \ \ \ bool\ isOk()\ const;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00245}00245\ \textcolor{comment}{//\ \ \ \ bool\ succeeded()\ const;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00246}00246\ \textcolor{comment}{//\ \ \ \ ResultWas::OfType\ getResultType()\ const;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00247}00247\ \textcolor{comment}{//\ \ \ \ bool\ hasExpression()\ const;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00248}00248\ \textcolor{comment}{//\ \ \ \ bool\ hasMessage()\ const;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00249}00249\ \textcolor{comment}{//\ \ \ \ std::string\ getExpression()\ const;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00250}00250\ \textcolor{comment}{//\ \ \ \ std::string\ getExpressionInMacro()\ const;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00251}00251\ \textcolor{comment}{//\ \ \ \ bool\ hasExpandedExpression()\ const;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00252}00252\ \textcolor{comment}{//\ \ \ \ std::string\ getExpandedExpression()\ const;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00253}00253\ \textcolor{comment}{//\ \ \ \ std::string\ getMessage()\ const;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00254}00254\ \textcolor{comment}{//\ \ \ \ SourceLineInfo\ getSourceInfo()\ const;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00255}00255\ \textcolor{comment}{//\ \ \ \ std::string\ getTestMacroName()\ const;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00256}00256\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00257}00257\ \textcolor{comment}{//\ \ \ \ AssertionInfo\ m\_info;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00258}00258\ \textcolor{comment}{//\ \ \ \ AssertionResultData\ m\_resultData;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00259}00259\ \textcolor{comment}{//\};}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00260}00260\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00261}\mbox{\hyperlink{210-_evt-_event_listeners_8cpp_ab1667f970fa12a38558740e5899d8659}{00261}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\ std::ostream\&\ os,\ \textcolor{keywordtype}{int}\ \textcolor{keyword}{const}\ level,\ std::string\ \textcolor{keyword}{const}\&\ title,\ \mbox{\hyperlink{class_catch_1_1_assertion_result}{Catch::AssertionResult}}\ \textcolor{keyword}{const}\&\ info\ )\ \{}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00262}00262\ \ \ \ \ os\ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level\ \ )\ <<\ title\ <<\ \textcolor{stringliteral}{"{}:\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00263}00263\ \ \ \ \ \ \ \ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level+1)\ <<\ \textcolor{stringliteral}{"{}-\/\ isOk():\ "{}}\ \ <<\ info.isOk()\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00264}00264\ \ \ \ \ \ \ \ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level+1)\ <<\ \textcolor{stringliteral}{"{}-\/\ succeeded():\ "{}}\ \ <<\ info.succeeded()\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00265}00265\ \ \ \ \ \ \ \ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level+1)\ <<\ \textcolor{stringliteral}{"{}-\/\ getResultType():\ "{}}\ \ <<\ info.getResultType()\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00266}00266\ \ \ \ \ \ \ \ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level+1)\ <<\ \textcolor{stringliteral}{"{}-\/\ hasExpression():\ "{}}\ \ <<\ info.hasExpression()\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00267}00267\ \ \ \ \ \ \ \ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level+1)\ <<\ \textcolor{stringliteral}{"{}-\/\ hasMessage():\ "{}}\ \ <<\ info.hasMessage()\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00268}00268\ \ \ \ \ \ \ \ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level+1)\ <<\ \textcolor{stringliteral}{"{}-\/\ getExpression():\ '"{}}\ \ <<\ info.getExpression()\ <<\ \textcolor{stringliteral}{"{}'\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00269}00269\ \ \ \ \ \ \ \ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level+1)\ <<\ \textcolor{stringliteral}{"{}-\/\ getExpressionInMacro():\ '"{}}\ \ <<\ info.getExpressionInMacro()\ \ <<\ \textcolor{stringliteral}{"{}'\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00270}00270\ \ \ \ \ \ \ \ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level+1)\ <<\ \textcolor{stringliteral}{"{}-\/\ hasExpandedExpression():\ "{}}\ \ <<\ info.hasExpandedExpression()\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00271}00271\ \ \ \ \ \ \ \ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level+1)\ <<\ \textcolor{stringliteral}{"{}-\/\ getExpandedExpression():\ "{}}\ \ <<\ info.getExpandedExpression()\ <<\ \textcolor{stringliteral}{"{}'\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00272}00272\ \ \ \ \ \ \ \ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level+1)\ <<\ \textcolor{stringliteral}{"{}-\/\ getMessage():\ '"{}}\ \ <<\ info.getMessage()\ <<\ \textcolor{stringliteral}{"{}'\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00273}00273\ \ \ \ \ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\ os,\ level+1\ ,\ \textcolor{stringliteral}{"{}-\/\ getSourceInfo():\ "{}},\ info.getSourceInfo()\ );}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00274}00274\ \ \ \ \ os\ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level+1)\ <<\ \textcolor{stringliteral}{"{}-\/\ getTestMacroName():\ '"{}}\ \ <<\ info.getTestMacroName()\ <<\ \textcolor{stringliteral}{"{}'\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00275}00275\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00276}00276\ \textcolor{comment}{//\ \ \ \ print(\ os,\ level+1\ ,\ "{}-\/\ ***\ m\_info\ (AssertionInfo)"{},\ info.m\_info\ );}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00277}00277\ \textcolor{comment}{//\ \ \ \ print(\ os,\ level+1\ ,\ "{}-\/\ ***\ m\_resultData\ (AssertionResultData)"{},\ info.m\_resultData\ );}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00278}00278\ \}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00279}00279\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00280}00280\ \textcolor{comment}{//\ struct\ AssertionStats\ \{}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00281}00281\ \textcolor{comment}{//\ \ \ \ \ AssertionResult\ assertionResult;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00282}00282\ \textcolor{comment}{//\ \ \ \ \ std::vector<MessageInfo>\ infoMessages;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00283}00283\ \textcolor{comment}{//\ \ \ \ \ Totals\ totals;}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00284}00284\ \textcolor{comment}{//\ \};}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00285}00285\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00286}\mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aa08a3bc3bb5db084466f45440eb729b1}{00286}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\ std::ostream\&\ os,\ \textcolor{keywordtype}{int}\ \textcolor{keyword}{const}\ level,\ std::string\ \textcolor{keyword}{const}\&\ title,\ \mbox{\hyperlink{struct_catch_1_1_assertion_stats}{Catch::AssertionStats}}\ \textcolor{keyword}{const}\&\ info\ )\ \{}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00287}00287\ \ \ \ \ os\ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_aaf05ec28baf9169e247960554e9ffbcb}{ws}}(level\ \ )\ <<\ title\ <<\ \textcolor{stringliteral}{"{}:\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00288}00288\ \ \ \ \ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\ os,\ level+1\ ,\ \textcolor{stringliteral}{"{}-\/\ assertionResult"{}},\ info.assertionResult\ );}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00289}00289\ \ \ \ \ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\ os,\ level+1\ ,\ \textcolor{stringliteral}{"{}-\/\ infoMessages"{}},\ info.infoMessages\ );}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00290}00290\ \ \ \ \ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\ os,\ level+1\ ,\ \textcolor{stringliteral}{"{}-\/\ totals"{}},\ info.totals\ );}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00291}00291\ \}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00292}00292\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00293}00293\ \textcolor{comment}{//\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00294}00294\ \textcolor{comment}{//\ 2.\ My\ listener\ and\ registration:}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00295}00295\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00296}00296\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00297}\mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a5f7e82ed4a6c2ec19783e1239080b393}{00297}}\ \textcolor{keywordtype}{char}\ \textcolor{keyword}{const}\ *\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a5f7e82ed4a6c2ec19783e1239080b393}{dashed\_line}}\ =}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00298}00298\ \ \ \ \ \textcolor{stringliteral}{"{}-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/"{}};}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00299}00299\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00300}\mbox{\hyperlink{struct_my_listener}{00300}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_my_listener}{MyListener}}\ :\ \mbox{\hyperlink{struct_catch_1_1_test_event_listener_base}{Catch::TestEventListenerBase}}\ \{}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00301}00301\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00302}00302\ \ \ \ \ \textcolor{keyword}{using\ }TestEventListenerBase::TestEventListenerBase;\ \textcolor{comment}{//\ inherit\ constructor}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00303}00303\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00304}00304\ \ \ \ \ \textcolor{comment}{//\ Get\ rid\ of\ Wweak-\/tables}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00305}00305\ \ \ \ \ \mbox{\hyperlink{struct_my_listener_a3b9787163a01f402e458d16a7c293292}{\string~MyListener}}();}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00306}00306\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00307}00307\ \ \ \ \ \textcolor{comment}{//\ The\ whole\ test\ run\ starting}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00308}\mbox{\hyperlink{struct_my_listener_a8f1891cc05349bd5fc2951dd0a3b8c22}{00308}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_my_listener_a8f1891cc05349bd5fc2951dd0a3b8c22}{testRunStarting}}(\ \mbox{\hyperlink{struct_catch_1_1_test_run_info}{Catch::TestRunInfo}}\ \textcolor{keyword}{const}\&\ testRunInfo\ )\textcolor{keyword}{\ override\ }\{}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00309}00309\ \ \ \ \ \ \ \ \ std::cout}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00310}00310\ \ \ \ \ \ \ \ \ \ \ \ \ <<\ std::boolalpha}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00311}00311\ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\(\backslash\)nEvent:\ testRunStarting:\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00312}00312\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\ std::cout,\ 1,\ \textcolor{stringliteral}{"{}-\/\ testRunInfo"{}},\ testRunInfo\ );}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00313}00313\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00314}00314\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00315}00315\ \ \ \ \ \textcolor{comment}{//\ The\ whole\ test\ run\ ending}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00316}\mbox{\hyperlink{struct_my_listener_a2f04586d353bafd39cb0e6346643bfb0}{00316}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_my_listener_a2f04586d353bafd39cb0e6346643bfb0}{testRunEnded}}(\ \mbox{\hyperlink{struct_catch_1_1_test_run_stats}{Catch::TestRunStats}}\ \textcolor{keyword}{const}\&\ testRunStats\ )\textcolor{keyword}{\ override\ }\{}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00317}00317\ \ \ \ \ \ \ \ \ std::cout}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00318}00318\ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a5f7e82ed4a6c2ec19783e1239080b393}{dashed\_line}}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00319}00319\ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\(\backslash\)nEvent:\ testRunEnded:\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00320}00320\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\ std::cout,\ 1,\ \textcolor{stringliteral}{"{}-\/\ testRunStats"{}},\ testRunStats\ );}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00321}00321\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00322}00322\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00323}00323\ \ \ \ \ \textcolor{comment}{//\ A\ test\ is\ being\ skipped\ (because\ it\ is\ "{}hidden"{})}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00324}\mbox{\hyperlink{struct_my_listener_aacaccef0a332a73348768caaf440bede}{00324}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_my_listener_aacaccef0a332a73348768caaf440bede}{skipTest}}(\ \mbox{\hyperlink{struct_catch_1_1_test_case_info}{Catch::TestCaseInfo}}\ \textcolor{keyword}{const}\&\ testInfo\ )\textcolor{keyword}{\ override\ }\{}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00325}00325\ \ \ \ \ \ \ \ \ std::cout}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00326}00326\ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a5f7e82ed4a6c2ec19783e1239080b393}{dashed\_line}}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00327}00327\ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\(\backslash\)nEvent:\ skipTest:\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00328}00328\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\ std::cout,\ 1,\ \textcolor{stringliteral}{"{}-\/\ testInfo"{}},\ testInfo\ );}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00329}00329\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00330}00330\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00331}00331\ \ \ \ \ \textcolor{comment}{//\ Test\ cases\ starting}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00332}\mbox{\hyperlink{struct_my_listener_aa7ebbe560e34112beb30598196e5d728}{00332}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_my_listener_aa7ebbe560e34112beb30598196e5d728}{testCaseStarting}}(\ \mbox{\hyperlink{struct_catch_1_1_test_case_info}{Catch::TestCaseInfo}}\ \textcolor{keyword}{const}\&\ testInfo\ )\textcolor{keyword}{\ override\ }\{}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00333}00333\ \ \ \ \ \ \ \ \ std::cout}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00334}00334\ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a5f7e82ed4a6c2ec19783e1239080b393}{dashed\_line}}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00335}00335\ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\(\backslash\)nEvent:\ testCaseStarting:\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00336}00336\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\ std::cout,\ 1,\ \textcolor{stringliteral}{"{}-\/\ testInfo"{}},\ testInfo\ );}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00337}00337\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00338}00338\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00339}00339\ \ \ \ \ \textcolor{comment}{//\ Test\ cases\ ending}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00340}\mbox{\hyperlink{struct_my_listener_ad621d3e39e42d103f10e1f5f44b2cd9e}{00340}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_my_listener_ad621d3e39e42d103f10e1f5f44b2cd9e}{testCaseEnded}}(\ \mbox{\hyperlink{struct_catch_1_1_test_case_stats}{Catch::TestCaseStats}}\ \textcolor{keyword}{const}\&\ testCaseStats\ )\textcolor{keyword}{\ override\ }\{}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00341}00341\ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)nEvent:\ testCaseEnded:\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00342}00342\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\ std::cout,\ 1,\ \textcolor{stringliteral}{"{}testCaseStats"{}},\ testCaseStats\ );}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00343}00343\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00344}00344\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00345}00345\ \ \ \ \ \textcolor{comment}{//\ Sections\ starting}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00346}\mbox{\hyperlink{struct_my_listener_af5ded27f59b0a73bb87c6b761babc50c}{00346}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_my_listener_af5ded27f59b0a73bb87c6b761babc50c}{sectionStarting}}(\ \mbox{\hyperlink{struct_catch_1_1_section_info}{Catch::SectionInfo}}\ \textcolor{keyword}{const}\&\ sectionInfo\ )\textcolor{keyword}{\ override\ }\{}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00347}00347\ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)nEvent:\ sectionStarting:\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00348}00348\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\ std::cout,\ 1,\ \textcolor{stringliteral}{"{}-\/\ sectionInfo"{}},\ sectionInfo\ );}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00349}00349\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00350}00350\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00351}00351\ \ \ \ \ \textcolor{comment}{//\ Sections\ ending}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00352}\mbox{\hyperlink{struct_my_listener_ada23a11c27164a622cd01d35cb2d2432}{00352}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_my_listener_ada23a11c27164a622cd01d35cb2d2432}{sectionEnded}}(\ \mbox{\hyperlink{struct_catch_1_1_section_stats}{Catch::SectionStats}}\ \textcolor{keyword}{const}\&\ sectionStats\ )\textcolor{keyword}{\ override\ }\{}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00353}00353\ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)nEvent:\ sectionEnded:\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00354}00354\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\ std::cout,\ 1,\ \textcolor{stringliteral}{"{}-\/\ sectionStats"{}},\ sectionStats\ );}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00355}00355\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00356}00356\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00357}00357\ \ \ \ \ \textcolor{comment}{//\ Assertions\ before/\ after}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00358}\mbox{\hyperlink{struct_my_listener_a245c546dbffd4d9f75d436e9bc4184c4}{00358}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_my_listener_a245c546dbffd4d9f75d436e9bc4184c4}{assertionStarting}}(\ \mbox{\hyperlink{struct_catch_1_1_assertion_info}{Catch::AssertionInfo}}\ \textcolor{keyword}{const}\&\ assertionInfo\ )\textcolor{keyword}{\ override\ }\{}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00359}00359\ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)nEvent:\ assertionStarting:\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00360}00360\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\ std::cout,\ 1,\ \textcolor{stringliteral}{"{}-\/\ assertionInfo"{}},\ assertionInfo\ );}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00361}00361\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00362}00362\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00363}\mbox{\hyperlink{struct_my_listener_ad04e3bd8552d46cd015a1272060ea8df}{00363}}\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_my_listener_ad04e3bd8552d46cd015a1272060ea8df}{assertionEnded}}(\ \mbox{\hyperlink{struct_catch_1_1_assertion_stats}{Catch::AssertionStats}}\ \textcolor{keyword}{const}\&\ assertionStats\ )\textcolor{keyword}{\ override\ }\{}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00364}00364\ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)nEvent:\ assertionEnded:\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00365}00365\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\ std::cout,\ 1,\ \textcolor{stringliteral}{"{}-\/\ assertionStats"{}},\ assertionStats\ );}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00366}00366\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00367}00367\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00368}00368\ \};}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00369}00369\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00370}00370\ \mbox{\hyperlink{catch__reporter__registrars_8hpp_ad57e50d59b9dd4f10afa62824062758b}{CATCH\_REGISTER\_LISTENER}}(\ \mbox{\hyperlink{struct_my_listener}{MyListener}}\ )}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00371}00371\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00372}00372\ \textcolor{comment}{//\ Get\ rid\ of\ Wweak-\/tables}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00373}\mbox{\hyperlink{struct_my_listener_a3b9787163a01f402e458d16a7c293292}{00373}}\ \mbox{\hyperlink{struct_my_listener}{MyListener}}::\string~\mbox{\hyperlink{struct_my_listener}{MyListener}}()\ \{\}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00374}00374\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00375}00375\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00376}00376\ \textcolor{comment}{//\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00377}00377\ \textcolor{comment}{//\ 3.\ Test\ cases:}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00378}00378\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00379}00379\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00380}\mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a441dba5a076dc2a7277115ce78fcbfd3}{00380}}\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\ \textcolor{stringliteral}{"{}1:\ Hidden\ testcase"{}},\ \textcolor{stringliteral}{"{}[.hidden]"{}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00381}00381\ \}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00382}00382\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00383}\mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a7ce79d33dd7f8d9999c8f9f6fd023e03}{00383}}\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\ \textcolor{stringliteral}{"{}2:\ Testcase\ with\ sections"{}},\ \textcolor{stringliteral}{"{}[tag-\/A][tag-\/B]"{}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00384}00384\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00385}00385\ \ \ \ \ \textcolor{keywordtype}{int}\ i\ =\ 42;}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00386}00386\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00387}00387\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ i\ ==\ 42\ );}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00388}00388\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00389}00389\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\textcolor{stringliteral}{"{}Section\ 1"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00390}00390\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a3ae64706314066fdc8b6c8029a915aa7}{INFO}}(\textcolor{stringliteral}{"{}Section\ 1"{}});}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00391}00391\ \ \ \ \ \ \ \ \ i\ =\ 7;}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00392}00392\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\textcolor{stringliteral}{"{}Section\ 1.1"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00393}00393\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a3ae64706314066fdc8b6c8029a915aa7}{INFO}}(\textcolor{stringliteral}{"{}Section\ 1.1"{}});}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00394}00394\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ i\ ==\ 42\ );}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00395}00395\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00396}00396\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00397}00397\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00398}00398\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\textcolor{stringliteral}{"{}Section\ 2"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00399}00399\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a3ae64706314066fdc8b6c8029a915aa7}{INFO}}(\textcolor{stringliteral}{"{}Section\ 2"{}});}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00400}00400\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ i\ ==\ 42\ );}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00401}00401\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00402}00402\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a108d6c5c51dd46e82a62b262394f0242}{WARN}}(\textcolor{stringliteral}{"{}At\ end\ of\ test\ case"{}});}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00403}00403\ \}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00404}00404\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00405}\mbox{\hyperlink{struct_fixture}{00405}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_fixture}{Fixture}}\ \{}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00406}\mbox{\hyperlink{struct_fixture_ada6edd611b7d7b8897ea1b279a16c0f0}{00406}}\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{struct_fixture_ada6edd611b7d7b8897ea1b279a16c0f0}{fortytwo}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00407}00407\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 42;}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00408}00408\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00409}00409\ \};}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00410}00410\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00411}\mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a97415f439a46e41b3181a9f0efb94369}{00411}}\ \mbox{\hyperlink{include_2catch_8hpp_adf06142f54a9e271590fa0e270bc41d2}{TEST\_CASE\_METHOD}}(\ \mbox{\hyperlink{struct_fixture}{Fixture}},\ \textcolor{stringliteral}{"{}3:\ Testcase\ with\ class-\/based\ fixture"{}},\ \textcolor{stringliteral}{"{}[tag-\/C][tag-\/D]"{}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00412}00412\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ fortytwo()\ ==\ 42\ );}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00413}00413\ \}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00414}00414\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00415}00415\ \textcolor{comment}{//\ Compile\ \&\ run:}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00416}00416\ \textcolor{comment}{//\ -\/\ g++\ -\/std=c++11\ -\/Wall\ -\/I\$(CATCH\_SINGLE\_INCLUDE)\ -\/o\ 210-\/Evt-\/EventListeners\ 210-\/Evt-\/EventListeners.cpp\ 000-\/CatchMain.o\ \&\&\ 210-\/Evt-\/EventListeners\ -\/-\/success}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00417}00417\ \textcolor{comment}{//\ -\/\ cl\ -\/EHsc\ -\/I\%CATCH\_SINGLE\_INCLUDE\%\ 210-\/Evt-\/EventListeners.cpp\ 000-\/CatchMain.obj\ \&\&\ 210-\/Evt-\/EventListeners\ -\/-\/success}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00418}00418\ }
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00419}00419\ \textcolor{comment}{//\ Expected\ compact\ output\ (all\ assertions):}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00420}00420\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00421}00421\ \textcolor{comment}{//\ prompt>\ 210-\/Evt-\/EventListeners\ -\/-\/reporter\ compact\ -\/-\/success}}
+\DoxyCodeLine{\Hypertarget{210-_evt-_event_listeners_8cpp_source_l00422}00422\ \textcolor{comment}{//\ result\ omitted\ for\ brevity.}}
+
+\end{DoxyCode}

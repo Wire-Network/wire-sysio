@@ -1,0 +1,140 @@
+\doxysection{java\+\_\+api.\+cpp}
+\hypertarget{java__api_8cpp_source}{}\label{java__api_8cpp_source}\index{libraries/fc/libraries/ff/depends/ate-\/pairing/test/java\_api.cpp@{libraries/fc/libraries/ff/depends/ate-\/pairing/test/java\_api.cpp}}
+\mbox{\hyperlink{java__api_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00002}00002\ \textcolor{comment}{\ \ \ \ a\ new\ api\ of\ pairing\ for\ Java}}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00003}00003\ \textcolor{comment}{*/}}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{bn254__if_8hpp}{../java/bn254\_if.hpp}}"{}}}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <iostream>}}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00007}00007\ \textcolor{preprocessor}{\#undef\ PUT}}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00008}\mbox{\hyperlink{java__api_8cpp_af1474931d5774e22c1c9894d7bb3f6b3}{00008}}\ \textcolor{preprocessor}{\#define\ PUT(x)\ std::cout\ <<\ \#x\ "{}\(\backslash\)t="{}\ <<\ (x).toString()\ <<\ std::endl}}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00010}00010\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ errNum\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00012}\mbox{\hyperlink{java__api_8cpp_a1c25bf911de47951a9f09f983dac4a79}{00012}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{java__api_8cpp_a1c25bf911de47951a9f09f983dac4a79}{assertBool}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *msg,\ \textcolor{keywordtype}{bool}\ b)}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00013}00013\ \{}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00014}00014\ \ \ \ \ \textcolor{keywordflow}{if}\ (b)\ \{}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00015}00015\ \ \ \ \ \ \ \ \ printf(\textcolor{stringliteral}{"{}\%s\ :\ ok\(\backslash\)n"{}},\ msg);}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00016}00016\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00017}00017\ \ \ \ \ \ \ \ \ printf(\textcolor{stringliteral}{"{}\%s\ :\ ng\(\backslash\)n"{}},\ msg);}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00018}00018\ \ \ \ \ \ \ \ \ errNum++;}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00019}00019\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00020}00020\ \}}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00022}00022\ \textcolor{keyword}{template}<\textcolor{keyword}{class}\ T,\ \textcolor{keyword}{class}\ S>}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00023}\mbox{\hyperlink{java__api_8cpp_a861b5ce9f89e92d924e62ee78de7aa39}{00023}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{java__api_8cpp_a861b5ce9f89e92d924e62ee78de7aa39}{assertEqual}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *msg,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_s}{S}}\&\ b)}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00024}00024\ \{}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00025}00025\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.equals(b))\ \{}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00026}00026\ \ \ \ \ \ \ \ \ printf(\textcolor{stringliteral}{"{}\%s\ :\ ok\(\backslash\)n"{}},\ msg);}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00027}00027\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00028}00028\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{java__api_8cpp_af1474931d5774e22c1c9894d7bb3f6b3}{PUT}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00029}00029\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{java__api_8cpp_af1474931d5774e22c1c9894d7bb3f6b3}{PUT}}(b);}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00030}00030\ \ \ \ \ \ \ \ \ errNum++;}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00031}00031\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00032}00032\ \}}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00034}\mbox{\hyperlink{struct_g2}{00034}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_g2}{G2}}\ \{}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00035}\mbox{\hyperlink{struct_g2_a0cfc0b75b4b943190ca38d5f10351045}{00035}}\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{struct_g2_a0cfc0b75b4b943190ca38d5f10351045}{aa}};}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00036}\mbox{\hyperlink{struct_g2_a8b4c7892cafe9c020cdb531cd473bb80}{00036}}\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{struct_g2_a8b4c7892cafe9c020cdb531cd473bb80}{ab}};}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00037}\mbox{\hyperlink{struct_g2_afff1550f6e26186f66b3b522e59d85fe}{00037}}\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{struct_g2_afff1550f6e26186f66b3b522e59d85fe}{ba}};}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00038}\mbox{\hyperlink{struct_g2_af6a3b6e0f67f003a88e7458fb2eb76fb}{00038}}\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{struct_g2_af6a3b6e0f67f003a88e7458fb2eb76fb}{bb}};}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00039}00039\ \}\ \mbox{\hyperlink{java__api_8cpp_ad116f53bb8838272a3528de3c044eb97}{g2c}}\ =\ \{}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00040}00040\ \ \ \ \ \textcolor{stringliteral}{"{}12723517038133731887338407189719511622662176727675373276651903807414909099441"{}},}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00041}00041\ \ \ \ \ \textcolor{stringliteral}{"{}4168783608814932154536427934509895782246573715297911553964171371032945126671"{}},}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00042}00042\ \ \ \ \ \textcolor{stringliteral}{"{}13891744915211034074451795021214165905772212241412891944830863846330766296736"{}},}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00043}00043\ \ \ \ \ \textcolor{stringliteral}{"{}7937318970632701341203597196594272556916396164729705624521405069090520231616"{}},}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00044}\mbox{\hyperlink{java__api_8cpp_ad116f53bb8838272a3528de3c044eb97}{00044}}\ \};}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00046}\mbox{\hyperlink{java__api_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{00046}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{java__api_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}()}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00047}00047\ \{}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00048}00048\ \ \ \ \ \mbox{\hyperlink{bn254__if_8hpp_abd5a104987528829c883e7498602008f}{SystemInit}}();}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00049}00049\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_ec1}{Ec1}}\ g1(-\/1,\ 1);}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00050}00050\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_ec2}{Ec2}}\ g2(}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00051}00051\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_fp2}{Fp2}}(\mbox{\hyperlink{class_fp}{Fp}}(\mbox{\hyperlink{java__api_8cpp_ad116f53bb8838272a3528de3c044eb97}{g2c}}.aa),\ \mbox{\hyperlink{class_fp}{Fp}}(\mbox{\hyperlink{java__api_8cpp_ad116f53bb8838272a3528de3c044eb97}{g2c}}.ab)),}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00052}00052\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_fp2}{Fp2}}(\mbox{\hyperlink{class_fp}{Fp}}(\mbox{\hyperlink{java__api_8cpp_ad116f53bb8838272a3528de3c044eb97}{g2c}}.ba),\ \mbox{\hyperlink{class_fp}{Fp}}(\mbox{\hyperlink{java__api_8cpp_ad116f53bb8838272a3528de3c044eb97}{g2c}}.bb))}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00053}00053\ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00054}00054\ \ \ \ \ \textcolor{comment}{//\ assertBool\ g2\ and\ g1\ on\ curve}}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00055}00055\ \ \ \ \ \mbox{\hyperlink{java__api_8cpp_a1c25bf911de47951a9f09f983dac4a79}{assertBool}}(\textcolor{stringliteral}{"{}g1\ is\ on\ EC"{}},\ g1.\mbox{\hyperlink{class_ec1_a70985fcdb9380385de8809e5ed8e0310}{isValid}}());}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00056}00056\ \ \ \ \ \mbox{\hyperlink{java__api_8cpp_a1c25bf911de47951a9f09f983dac4a79}{assertBool}}(\textcolor{stringliteral}{"{}g2\ is\ on\ twist\ EC"{}},\ g2.\mbox{\hyperlink{class_ec2_a5e6bf9e7de6c2358140c60e19bce6759}{isValid}}());}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00057}00057\ \ \ \ \ puts(\textcolor{stringliteral}{"{}order\ of\ group"{}});}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00058}00058\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_mpz}{Mpz}}\&\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ =\ \mbox{\hyperlink{bn254__if_8hpp_aa656cea4654a90177f39622602551457}{GetParamR}}();}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00059}00059\ \ \ \ \ \mbox{\hyperlink{java__api_8cpp_af1474931d5774e22c1c9894d7bb3f6b3}{PUT}}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}});}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00060}00060\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00061}00061\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_ec1}{Ec1}}\ t\ =\ g1;}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00062}00062\ \ \ \ \ \ \ \ \ t.\mbox{\hyperlink{class_ec1_ab3a0beb9412c7a3b2992c65ed90f2028}{mul}}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}});}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00063}00063\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{java__api_8cpp_a1c25bf911de47951a9f09f983dac4a79}{assertBool}}(\textcolor{stringliteral}{"{}orgder\ of\ g1\ ==\ r"{}},\ t.\mbox{\hyperlink{class_ec1_a6f3a72b17e4fef78ecce04900f348072}{isZero}}());}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00064}00064\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00065}00065\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00066}00066\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_ec2}{Ec2}}\ t\ =\ g2;}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00067}00067\ \ \ \ \ \ \ \ \ t.\mbox{\hyperlink{class_ec2_ad05d82e70e2e9ae02d1964da54f2161a}{mul}}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}});}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00068}00068\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{java__api_8cpp_a1c25bf911de47951a9f09f983dac4a79}{assertBool}}(\textcolor{stringliteral}{"{}order\ of\ g2\ ==\ r"{}},\ t.\mbox{\hyperlink{class_ec2_ad66a05f76a354ead24d6a15b326baf4f}{isZero}}());}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00069}00069\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00070}00070\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_mpz}{Mpz}}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}(\textcolor{stringliteral}{"{}123456789012345"{}});}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00071}00071\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_mpz}{Mpz}}\ b(\textcolor{stringliteral}{"{}998752342342342342424242421"{}});}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00073}00073\ \ \ \ \ \textcolor{comment}{//\ scalar-\/multiplication\ sample}}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00074}00074\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00075}00075\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_mpz}{Mpz}}\ c\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}};}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00076}00076\ \ \ \ \ \ \ \ \ c.\mbox{\hyperlink{class_mpz_a61ae3a1cc67fbbd44c7db909689c49bc}{add}}(b);}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00077}00077\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_ec1}{Ec1}}\ Pa\ =\ g1;\ Pa.\mbox{\hyperlink{class_ec1_ab3a0beb9412c7a3b2992c65ed90f2028}{mul}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00078}00078\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_ec1}{Ec1}}\ Pb\ =\ g1;\ Pb.\mbox{\hyperlink{class_ec1_ab3a0beb9412c7a3b2992c65ed90f2028}{mul}}(b);}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00079}00079\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_ec1}{Ec1}}\ Pc\ =\ g1;\ Pc.\mbox{\hyperlink{class_ec1_ab3a0beb9412c7a3b2992c65ed90f2028}{mul}}(c);}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00080}00080\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_ec1}{Ec1}}\ out\ =\ Pa;}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00081}00081\ \ \ \ \ \ \ \ \ out.\mbox{\hyperlink{class_ec1_ada7653bee6a869fdf45b4a254d1fbb40}{add}}(Pb);}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00083}00083\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{java__api_8cpp_a861b5ce9f89e92d924e62ee78de7aa39}{assertEqual}}(\textcolor{stringliteral}{"{}check\ g1\ *\ c\ =\ g1\ *\ a\ +\ g1\ *\ b"{}},\ Pc,\ out);}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00084}00084\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00085}00085\ }
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00086}00086\ \ \ \ \ \mbox{\hyperlink{class_fp12}{Fp12}}\ e;}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00087}00087\ \ \ \ \ \textcolor{comment}{//\ calc\ e\ :\ G2\ x\ G1\ -\/>\ G3\ pairing}}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00088}00088\ \ \ \ \ e.\mbox{\hyperlink{class_fp12_a4976cc243715314ffa9ee8939e8e0f46}{pairing}}(g2,\ g1);\ \textcolor{comment}{//\ e\ =\ e(g2,\ g1)}}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00089}00089\ \ \ \ \ \mbox{\hyperlink{java__api_8cpp_af1474931d5774e22c1c9894d7bb3f6b3}{PUT}}(e);}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00090}00090\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00091}00091\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_fp12}{Fp12}}\ t\ =\ e;}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00092}00092\ \ \ \ \ \ \ \ \ t.\mbox{\hyperlink{class_fp12_ad6a32b66bcd128daaa0f8416b3dc5b53}{power}}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}});}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00093}00093\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{java__api_8cpp_a861b5ce9f89e92d924e62ee78de7aa39}{assertEqual}}(\textcolor{stringliteral}{"{}order\ of\ e\ ==\ r"{}},\ t,\ \mbox{\hyperlink{class_fp12}{Fp12}}(1));}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00094}00094\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00095}00095\ \ \ \ \ \mbox{\hyperlink{class_ec2}{Ec2}}\ g2a\ =\ g2;}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00096}00096\ \ \ \ \ g2a.\mbox{\hyperlink{class_ec2_ad05d82e70e2e9ae02d1964da54f2161a}{mul}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00097}00097\ \ \ \ \ \mbox{\hyperlink{class_fp12}{Fp12}}\ ea1;}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00098}00098\ \ \ \ \ ea1.\mbox{\hyperlink{class_fp12_a4976cc243715314ffa9ee8939e8e0f46}{pairing}}(g2a,\ g1);}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00099}00099\ \ \ \ \ \mbox{\hyperlink{class_fp12}{Fp12}}\ ea2\ =\ e;}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00100}00100\ \ \ \ \ ea2.\mbox{\hyperlink{class_fp12_ad6a32b66bcd128daaa0f8416b3dc5b53}{power}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});\ \textcolor{comment}{//\ ea2\ =\ e\string^a}}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00101}00101\ \ \ \ \ \mbox{\hyperlink{java__api_8cpp_a861b5ce9f89e92d924e62ee78de7aa39}{assertEqual}}(\textcolor{stringliteral}{"{}e(g2\ *\ a,\ g1)\ =\ e(g2,\ g1)\string^a"{}},\ ea1,\ ea2);}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00102}00102\ }
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00103}00103\ \ \ \ \ \mbox{\hyperlink{class_ec1}{Ec1}}\ g1b\ =\ g1;}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00104}00104\ \ \ \ \ g1b.\mbox{\hyperlink{class_ec1_ab3a0beb9412c7a3b2992c65ed90f2028}{mul}}(b);}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00105}00105\ \ \ \ \ \mbox{\hyperlink{class_fp12}{Fp12}}\ eb1;}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00106}00106\ \ \ \ \ eb1.\mbox{\hyperlink{class_fp12_a4976cc243715314ffa9ee8939e8e0f46}{pairing}}(g2,\ g1b);\ \textcolor{comment}{//\ eb1\ =\ e(g2,\ g1b)}}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00107}00107\ \ \ \ \ \mbox{\hyperlink{class_fp12}{Fp12}}\ eb2\ =\ e;}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00108}00108\ \ \ \ \ eb2.\mbox{\hyperlink{class_fp12_ad6a32b66bcd128daaa0f8416b3dc5b53}{power}}(b);\ \textcolor{comment}{//\ eb2\ =\ e\string^b}}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00109}00109\ \ \ \ \ \mbox{\hyperlink{java__api_8cpp_a861b5ce9f89e92d924e62ee78de7aa39}{assertEqual}}(\textcolor{stringliteral}{"{}e(g2a,\ g1\ *\ b)\ =\ e(g2,\ g1)\string^b"{}},\ eb1,\ eb2);}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00110}00110\ }
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00111}00111\ \ \ \ \ \mbox{\hyperlink{class_ec1}{Ec1}}\ q1\ =\ g1;}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00112}00112\ \ \ \ \ q1.\mbox{\hyperlink{class_ec1_ab3a0beb9412c7a3b2992c65ed90f2028}{mul}}(12345);}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00113}00113\ \ \ \ \ \mbox{\hyperlink{java__api_8cpp_a1c25bf911de47951a9f09f983dac4a79}{assertBool}}(\textcolor{stringliteral}{"{}q1\ is\ on\ EC"{}},\ q1.\mbox{\hyperlink{class_ec1_a70985fcdb9380385de8809e5ed8e0310}{isValid}}());}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00114}00114\ \ \ \ \ \mbox{\hyperlink{class_fp12}{Fp12}}\ e1,\ e2;}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00115}00115\ \ \ \ \ e1.\mbox{\hyperlink{class_fp12_a4976cc243715314ffa9ee8939e8e0f46}{pairing}}(g2,\ g1);\ \textcolor{comment}{//\ e1\ =\ e(g2,\ g1)}}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00116}00116\ \ \ \ \ e2.\mbox{\hyperlink{class_fp12_a4976cc243715314ffa9ee8939e8e0f46}{pairing}}(g2,\ q1);\ \textcolor{comment}{//\ e2\ =\ e(g2,\ q1)}}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00117}00117\ \ \ \ \ \mbox{\hyperlink{class_ec1}{Ec1}}\ q2\ =\ g1;}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00118}00118\ \ \ \ \ q2.\mbox{\hyperlink{class_ec1_ada7653bee6a869fdf45b4a254d1fbb40}{add}}(q1);}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00119}00119\ \ \ \ \ e.\mbox{\hyperlink{class_fp12_a4976cc243715314ffa9ee8939e8e0f46}{pairing}}(g2,\ q2);\ \textcolor{comment}{//\ e\ =\ e(g2,\ q2)}}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00120}00120\ \ \ \ \ e1.\mbox{\hyperlink{class_fp12_a120decc9bc6a64401de37f6cf2b3337e}{mul}}(e2);}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00121}00121\ \ \ \ \ \mbox{\hyperlink{java__api_8cpp_a861b5ce9f89e92d924e62ee78de7aa39}{assertEqual}}(\textcolor{stringliteral}{"{}e\ =\ e1\ *\ e2"{}},\ e,\ e1);}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00122}00122\ \ \ \ \ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00123}00123\ \textcolor{comment}{\ \ \ \ \ \ \ \ reduce\ one\ copy\ as\ the\ following}}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00124}00124\ \textcolor{comment}{\ \ \ \ */}}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00125}00125\ \ \ \ \ g2a\ =\ g2;}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00126}00126\ \ \ \ \ g2a.\mbox{\hyperlink{class_ec2_ad05d82e70e2e9ae02d1964da54f2161a}{mul}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00127}00127\ \ \ \ \ g1b\ =\ g1;}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00128}00128\ \ \ \ \ g1b.\mbox{\hyperlink{class_ec1_ab3a0beb9412c7a3b2992c65ed90f2028}{mul}}(b);}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00129}00129\ \ \ \ \ \mbox{\hyperlink{class_ec2}{Ec2}}\ g2at\ =\ g2;\ g2at.\mbox{\hyperlink{class_ec2_ad05d82e70e2e9ae02d1964da54f2161a}{mul}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00130}00130\ \ \ \ \ \mbox{\hyperlink{class_ec1}{Ec1}}\ g1bt\ =\ g1;\ g1bt.\mbox{\hyperlink{class_ec1_ab3a0beb9412c7a3b2992c65ed90f2028}{mul}}(b);}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00131}00131\ \ \ \ \ \mbox{\hyperlink{java__api_8cpp_a861b5ce9f89e92d924e62ee78de7aa39}{assertEqual}}(\textcolor{stringliteral}{"{}g2a\ ==\ g2\ *\ a"{}},\ g2a,\ g2at);}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00132}00132\ \ \ \ \ \mbox{\hyperlink{java__api_8cpp_a861b5ce9f89e92d924e62ee78de7aa39}{assertEqual}}(\textcolor{stringliteral}{"{}g1b\ ==\ g1\ *\ b"{}},\ g1b,\ g1bt);}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00133}00133\ \ \ \ \ printf(\textcolor{stringliteral}{"{}errNum\ =\ \%d\(\backslash\)n"{}},\ errNum);}
+\DoxyCodeLine{\Hypertarget{java__api_8cpp_source_l00134}00134\ \}}
+
+\end{DoxyCode}

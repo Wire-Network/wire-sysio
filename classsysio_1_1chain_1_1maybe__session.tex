@@ -1,0 +1,184 @@
+\doxysection{sysio\+::chain\+::maybe\+\_\+session Class Reference}
+\hypertarget{classsysio_1_1chain_1_1maybe__session}{}\label{classsysio_1_1chain_1_1maybe__session}\index{sysio::chain::maybe\_session@{sysio::chain::maybe\_session}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classsysio_1_1chain_1_1maybe__session_a58384b7d055e54178bda99e67c165878}{maybe\+\_\+session}} ()=default
+\item 
+\mbox{\hyperlink{classsysio_1_1chain_1_1maybe__session_afcc5601bfdefa774205a1dd4845eba73}{maybe\+\_\+session}} (\mbox{\hyperlink{classsysio_1_1chain_1_1maybe__session}{maybe\+\_\+session}} \&\&other)
+\item 
+\mbox{\hyperlink{classsysio_1_1chain_1_1maybe__session_a438e4a87d88afef121f9a2c9c89e30c8}{maybe\+\_\+session}} (\mbox{\hyperlink{classchainbase_1_1database}{database}} \&db)
+\item 
+\mbox{\hyperlink{classsysio_1_1chain_1_1maybe__session_aaba101b94bc3ac6f5f3a88b1ceba284a}{maybe\+\_\+session}} (const \mbox{\hyperlink{classsysio_1_1chain_1_1maybe__session}{maybe\+\_\+session}} \&)=delete
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1maybe__session_a1e5c5b89d2b1fac7f982ede7f0b1b545}{squash}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1maybe__session_a749517d619768ab8885fc8e2785e3b40}{undo}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1maybe__session_ab35e3889eb7fd6cd0c65d2d349111050}{push}} ()
+\item 
+\mbox{\hyperlink{classsysio_1_1chain_1_1maybe__session}{maybe\+\_\+session}} \& \mbox{\hyperlink{classsysio_1_1chain_1_1maybe__session_a142562a4ca875304802fc6d2cc41d669}{operator=}} (\mbox{\hyperlink{classsysio_1_1chain_1_1maybe__session}{maybe\+\_\+session}} \&\&mv)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{controller_8cpp_source_l00066}{66}} of file \mbox{\hyperlink{controller_8cpp_source}{controller.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classsysio_1_1chain_1_1maybe__session_a58384b7d055e54178bda99e67c165878}\index{sysio::chain::maybe\_session@{sysio::chain::maybe\_session}!maybe\_session@{maybe\_session}}
+\index{maybe\_session@{maybe\_session}!sysio::chain::maybe\_session@{sysio::chain::maybe\_session}}
+\doxysubsubsection{\texorpdfstring{maybe\_session()}{maybe\_session()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1maybe__session_a58384b7d055e54178bda99e67c165878} 
+sysio\+::chain\+::maybe\+\_\+session\+::maybe\+\_\+session (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [default]}}
+
+\Hypertarget{classsysio_1_1chain_1_1maybe__session_afcc5601bfdefa774205a1dd4845eba73}\index{sysio::chain::maybe\_session@{sysio::chain::maybe\_session}!maybe\_session@{maybe\_session}}
+\index{maybe\_session@{maybe\_session}!sysio::chain::maybe\_session@{sysio::chain::maybe\_session}}
+\doxysubsubsection{\texorpdfstring{maybe\_session()}{maybe\_session()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1maybe__session_afcc5601bfdefa774205a1dd4845eba73} 
+sysio\+::chain\+::maybe\+\_\+session\+::maybe\+\_\+session (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classsysio_1_1chain_1_1maybe__session}{maybe\+\_\+session}} \&\&}]{other}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{controller_8cpp_source_l00070}{70}} of file \mbox{\hyperlink{controller_8cpp_source}{controller.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ :\_session(move(\mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.\_session))}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1maybe__session_a438e4a87d88afef121f9a2c9c89e30c8}\index{sysio::chain::maybe\_session@{sysio::chain::maybe\_session}!maybe\_session@{maybe\_session}}
+\index{maybe\_session@{maybe\_session}!sysio::chain::maybe\_session@{sysio::chain::maybe\_session}}
+\doxysubsubsection{\texorpdfstring{maybe\_session()}{maybe\_session()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1maybe__session_a438e4a87d88afef121f9a2c9c89e30c8} 
+sysio\+::chain\+::maybe\+\_\+session\+::maybe\+\_\+session (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classchainbase_1_1database}{database}} \&}]{db}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{controller_8cpp_source_l00075}{75}} of file \mbox{\hyperlink{controller_8cpp_source}{controller.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \_session.emplace(db.start\_undo\_session(\textcolor{keyword}{true}));}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1maybe__session_a438e4a87d88afef121f9a2c9c89e30c8_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1maybe__session_aaba101b94bc3ac6f5f3a88b1ceba284a}\index{sysio::chain::maybe\_session@{sysio::chain::maybe\_session}!maybe\_session@{maybe\_session}}
+\index{maybe\_session@{maybe\_session}!sysio::chain::maybe\_session@{sysio::chain::maybe\_session}}
+\doxysubsubsection{\texorpdfstring{maybe\_session()}{maybe\_session()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1maybe__session_aaba101b94bc3ac6f5f3a88b1ceba284a} 
+sysio\+::chain\+::maybe\+\_\+session\+::maybe\+\_\+session (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classsysio_1_1chain_1_1maybe__session}{maybe\+\_\+session}} \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [delete]}}
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1chain_1_1maybe__session_a142562a4ca875304802fc6d2cc41d669}\index{sysio::chain::maybe\_session@{sysio::chain::maybe\_session}!operator=@{operator=}}
+\index{operator=@{operator=}!sysio::chain::maybe\_session@{sysio::chain::maybe\_session}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1maybe__session_a142562a4ca875304802fc6d2cc41d669} 
+\mbox{\hyperlink{classsysio_1_1chain_1_1maybe__session}{maybe\+\_\+session}} \& sysio\+::chain\+::maybe\+\_\+session\+::operator= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classsysio_1_1chain_1_1maybe__session}{maybe\+\_\+session}} \&\&}]{mv}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{controller_8cpp_source_l00096}{96}} of file \mbox{\hyperlink{controller_8cpp_source}{controller.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (mv.\_session)\ \{}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \ \ \ \_session.emplace(move(*mv.\_session));}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ \ \ \ mv.\_session.reset();}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \ \ \ \_session.reset();}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00103\ }
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \};}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1maybe__session_ab35e3889eb7fd6cd0c65d2d349111050}\index{sysio::chain::maybe\_session@{sysio::chain::maybe\_session}!push@{push}}
+\index{push@{push}!sysio::chain::maybe\_session@{sysio::chain::maybe\_session}}
+\doxysubsubsection{\texorpdfstring{push()}{push()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1maybe__session_ab35e3889eb7fd6cd0c65d2d349111050} 
+void sysio\+::chain\+::maybe\+\_\+session\+::push (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{controller_8cpp_source_l00091}{91}} of file \mbox{\hyperlink{controller_8cpp_source}{controller.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\_session)}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \ \ \_session-\/>push();}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=328pt]{classsysio_1_1chain_1_1maybe__session_ab35e3889eb7fd6cd0c65d2d349111050_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1maybe__session_a1e5c5b89d2b1fac7f982ede7f0b1b545}\index{sysio::chain::maybe\_session@{sysio::chain::maybe\_session}!squash@{squash}}
+\index{squash@{squash}!sysio::chain::maybe\_session@{sysio::chain::maybe\_session}}
+\doxysubsubsection{\texorpdfstring{squash()}{squash()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1maybe__session_a1e5c5b89d2b1fac7f982ede7f0b1b545} 
+void sysio\+::chain\+::maybe\+\_\+session\+::squash (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{controller_8cpp_source_l00081}{81}} of file \mbox{\hyperlink{controller_8cpp_source}{controller.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\_session)}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \ \ \ \_session-\/>squash();}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1maybe__session_a1e5c5b89d2b1fac7f982ede7f0b1b545_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1maybe__session_a749517d619768ab8885fc8e2785e3b40}\index{sysio::chain::maybe\_session@{sysio::chain::maybe\_session}!undo@{undo}}
+\index{undo@{undo}!sysio::chain::maybe\_session@{sysio::chain::maybe\_session}}
+\doxysubsubsection{\texorpdfstring{undo()}{undo()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1maybe__session_a749517d619768ab8885fc8e2785e3b40} 
+void sysio\+::chain\+::maybe\+\_\+session\+::undo (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{controller_8cpp_source_l00086}{86}} of file \mbox{\hyperlink{controller_8cpp_source}{controller.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\_session)}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \ \ \ \_session-\/>undo();}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/\mbox{\hyperlink{controller_8cpp}{controller.\+cpp}}\end{DoxyCompactItemize}

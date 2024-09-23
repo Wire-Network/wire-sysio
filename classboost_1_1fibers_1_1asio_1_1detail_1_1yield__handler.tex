@@ -1,0 +1,162 @@
+\doxysection{boost\+::fibers\+::asio\+::detail\+::yield\+\_\+handler\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classboost_1_1fibers_1_1asio_1_1detail_1_1yield__handler}{}\label{classboost_1_1fibers_1_1asio_1_1detail_1_1yield__handler}\index{boost::fibers::asio::detail::yield\_handler$<$ T $>$@{boost::fibers::asio::detail::yield\_handler$<$ T $>$}}
+
+
+{\ttfamily \#include $<$yield.\+hpp$>$}
+
+
+
+Inheritance diagram for boost\+::fibers\+::asio\+::detail\+::yield\+\_\+handler\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=215pt]{classboost_1_1fibers_1_1asio_1_1detail_1_1yield__handler__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for boost\+::fibers\+::asio\+::detail\+::yield\+\_\+handler\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=316pt]{classboost_1_1fibers_1_1asio_1_1detail_1_1yield__handler__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1detail_1_1yield__handler_aedacb32c8e27b1738b0682d0aa5ac848}{yield\+\_\+handler}} (\mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1yield__t}{yield\+\_\+t}} const \&y)
+\item 
+void \mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1detail_1_1yield__handler_af220a758767bf2d46032e3f520b488c2}{operator()}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} t)
+\item 
+void \mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1detail_1_1yield__handler_a1d0dc2d635f3efec48b90a42c1cc9398}{operator()}} (boost\+::system\+::error\+\_\+code const \&ec, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} t)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1detail_1_1yield__handler__base}{boost\+::fibers\+::asio\+::detail\+::yield\+\_\+handler\+\_\+base}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1detail_1_1yield__handler__base_a1f3fd71baf8faa1e58d2ffabb0e7c5ea}{yield\+\_\+handler\+\_\+base}} (\mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1yield__t}{yield\+\_\+t}} const \&y)
+\item 
+void \mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1detail_1_1yield__handler__base_a20b23f57f60946ff2216ae60ec778c83}{operator()}} (boost\+::system\+::error\+\_\+code const \&ec)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1detail_1_1yield__handler_a417039875ebdb98f5bbfcbba0bfda143}{value\+\_\+}} \{ nullptr \}
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes inherited from \mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1detail_1_1yield__handler__base}{boost\+::fibers\+::asio\+::detail\+::yield\+\_\+handler\+\_\+base}}}
+\begin{DoxyCompactItemize}
+\item 
+boost\+::fibers\+::context \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1detail_1_1yield__handler__base_a08d9217895e8f36500a1b9a8700728f5}{ctx\+\_\+}}
+\item 
+\mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1yield__t}{yield\+\_\+t}} \mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1detail_1_1yield__handler__base_ad31017b9fed6d3b631f6525539586003}{yt\+\_\+}}
+\item 
+\mbox{\hyperlink{structboost_1_1fibers_1_1asio_1_1detail_1_1yield__completion}{yield\+\_\+completion}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1detail_1_1yield__handler__base_a38b1a97a293fabe58dfd1815d26ddb2a}{ycomp\+\_\+}} \{ nullptr \}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$\newline
+class boost\+::fibers\+::asio\+::detail\+::yield\+\_\+handler$<$ T $>$}
+
+
+Definition at line \mbox{\hyperlink{detail_2yield_8hpp_source_l00114}{114}} of file \mbox{\hyperlink{detail_2yield_8hpp_source}{yield.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classboost_1_1fibers_1_1asio_1_1detail_1_1yield__handler_aedacb32c8e27b1738b0682d0aa5ac848}\index{boost::fibers::asio::detail::yield\_handler$<$ T $>$@{boost::fibers::asio::detail::yield\_handler$<$ T $>$}!yield\_handler@{yield\_handler}}
+\index{yield\_handler@{yield\_handler}!boost::fibers::asio::detail::yield\_handler$<$ T $>$@{boost::fibers::asio::detail::yield\_handler$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{yield\_handler()}{yield\_handler()}}
+{\footnotesize\ttfamily \label{classboost_1_1fibers_1_1asio_1_1detail_1_1yield__handler_aedacb32c8e27b1738b0682d0aa5ac848} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1detail_1_1yield__handler}{boost\+::fibers\+::asio\+::detail\+::yield\+\_\+handler}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::yield\+\_\+handler (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1yield__t}{yield\+\_\+t}} const \&}]{y}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{detail_2yield_8hpp_source_l00117}{117}} of file \mbox{\hyperlink{detail_2yield_8hpp_source}{yield.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1detail_1_1yield__handler__base_a1f3fd71baf8faa1e58d2ffabb0e7c5ea}{yield\_handler\_base}}\{\ \mbox{\hyperlink{namespacefc_ab199a7c94624123911206db59ebe45da}{y}}\ \}\ \{}
+\DoxyCodeLine{00119\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classboost_1_1fibers_1_1asio_1_1detail_1_1yield__handler_a1d0dc2d635f3efec48b90a42c1cc9398}\index{boost::fibers::asio::detail::yield\_handler$<$ T $>$@{boost::fibers::asio::detail::yield\_handler$<$ T $>$}!operator()@{operator()}}
+\index{operator()@{operator()}!boost::fibers::asio::detail::yield\_handler$<$ T $>$@{boost::fibers::asio::detail::yield\_handler$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classboost_1_1fibers_1_1asio_1_1detail_1_1yield__handler_a1d0dc2d635f3efec48b90a42c1cc9398} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+void \mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1detail_1_1yield__handler}{boost\+::fibers\+::asio\+::detail\+::yield\+\_\+handler}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::operator() (\begin{DoxyParamCaption}\item[{boost\+::system\+::error\+\_\+code const \&}]{ec}{, }\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}}]{t}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{detail_2yield_8hpp_source_l00128}{128}} of file \mbox{\hyperlink{detail_2yield_8hpp_source}{yield.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ BOOST\_ASSERT\_MSG(\ \mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1detail_1_1yield__handler_a417039875ebdb98f5bbfcbba0bfda143}{value\_}},}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Must\ inject\ value\ ptr\ "{}}}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}before\ caling\ yield\_handler<T>::operator()()"{}});}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ move\ the\ value\ to\ async\_result<>\ instance\ BEFORE\ waking\ up\ a}}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ suspended\ fiber}}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ *\ \mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1detail_1_1yield__handler_a417039875ebdb98f5bbfcbba0bfda143}{value\_}}\ =\ std::move(\ t);}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ forward\ the\ call\ to\ base-\/class\ completion\ handler}}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1detail_1_1yield__handler__base_a20b23f57f60946ff2216ae60ec778c83}{yield\_handler\_base::operator()}}(\ ec);}
+\DoxyCodeLine{00137\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=333pt]{classboost_1_1fibers_1_1asio_1_1detail_1_1yield__handler_a1d0dc2d635f3efec48b90a42c1cc9398_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classboost_1_1fibers_1_1asio_1_1detail_1_1yield__handler_af220a758767bf2d46032e3f520b488c2}\index{boost::fibers::asio::detail::yield\_handler$<$ T $>$@{boost::fibers::asio::detail::yield\_handler$<$ T $>$}!operator()@{operator()}}
+\index{operator()@{operator()}!boost::fibers::asio::detail::yield\_handler$<$ T $>$@{boost::fibers::asio::detail::yield\_handler$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classboost_1_1fibers_1_1asio_1_1detail_1_1yield__handler_af220a758767bf2d46032e3f520b488c2} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+void \mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1detail_1_1yield__handler}{boost\+::fibers\+::asio\+::detail\+::yield\+\_\+handler}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::operator() (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}}]{t}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{detail_2yield_8hpp_source_l00122}{122}} of file \mbox{\hyperlink{detail_2yield_8hpp_source}{yield.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ just\ like\ callback\ passing\ success\ error\_code}}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ (*this)(\ boost::system::error\_code(),\ std::move(t)\ );}
+\DoxyCodeLine{00125\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classboost_1_1fibers_1_1asio_1_1detail_1_1yield__handler_a417039875ebdb98f5bbfcbba0bfda143}\index{boost::fibers::asio::detail::yield\_handler$<$ T $>$@{boost::fibers::asio::detail::yield\_handler$<$ T $>$}!value\_@{value\_}}
+\index{value\_@{value\_}!boost::fibers::asio::detail::yield\_handler$<$ T $>$@{boost::fibers::asio::detail::yield\_handler$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{value\_}{value\_}}
+{\footnotesize\ttfamily \label{classboost_1_1fibers_1_1asio_1_1detail_1_1yield__handler_a417039875ebdb98f5bbfcbba0bfda143} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1detail_1_1yield__handler}{boost\+::fibers\+::asio\+::detail\+::yield\+\_\+handler}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::value\+\_\+ \{ nullptr \}}
+
+
+
+Definition at line \mbox{\hyperlink{detail_2yield_8hpp_source_l00142}{142}} of file \mbox{\hyperlink{detail_2yield_8hpp_source}{yield.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00142\ \{\ \textcolor{keyword}{nullptr}\ \};}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/src/thread/asio/detail/\mbox{\hyperlink{detail_2yield_8hpp}{yield.\+hpp}}\end{DoxyCompactItemize}

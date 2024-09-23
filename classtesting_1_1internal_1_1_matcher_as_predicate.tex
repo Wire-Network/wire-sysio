@@ -1,0 +1,89 @@
+\doxysection{testing\+::internal\+::Matcher\+As\+Predicate\texorpdfstring{$<$}{<} M \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classtesting_1_1internal_1_1_matcher_as_predicate}{}\label{classtesting_1_1internal_1_1_matcher_as_predicate}\index{testing::internal::MatcherAsPredicate$<$ M $>$@{testing::internal::MatcherAsPredicate$<$ M $>$}}
+
+
+{\ttfamily \#include $<$gmock-\/matchers.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_matcher_as_predicate_a2d8ad258929496dd3dea00fdb8ce3c8a}{Matcher\+As\+Predicate}} (M matcher)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\bool \mbox{\hyperlink{classtesting_1_1internal_1_1_matcher_as_predicate_ab4594a16ff5cdfd07acb5017b7aa54f3}{operator()}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&x) const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename M$>$\newline
+class testing\+::internal\+::\+Matcher\+As\+Predicate$<$ M $>$}
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l01992}{1992}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_matcher_as_predicate_a2d8ad258929496dd3dea00fdb8ce3c8a}\index{testing::internal::MatcherAsPredicate$<$ M $>$@{testing::internal::MatcherAsPredicate$<$ M $>$}!MatcherAsPredicate@{MatcherAsPredicate}}
+\index{MatcherAsPredicate@{MatcherAsPredicate}!testing::internal::MatcherAsPredicate$<$ M $>$@{testing::internal::MatcherAsPredicate$<$ M $>$}}
+\doxysubsubsection{\texorpdfstring{MatcherAsPredicate()}{MatcherAsPredicate()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_matcher_as_predicate_a2d8ad258929496dd3dea00fdb8ce3c8a} 
+template$<$typename M $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_matcher_as_predicate}{testing\+::internal\+::\+Matcher\+As\+Predicate}}$<$ M $>$\+::\+Matcher\+As\+Predicate (\begin{DoxyParamCaption}\item[{M}]{matcher}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l01994}{1994}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01994\ :\ matcher\_(matcher)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_matcher_as_predicate_ab4594a16ff5cdfd07acb5017b7aa54f3}\index{testing::internal::MatcherAsPredicate$<$ M $>$@{testing::internal::MatcherAsPredicate$<$ M $>$}!operator()@{operator()}}
+\index{operator()@{operator()}!testing::internal::MatcherAsPredicate$<$ M $>$@{testing::internal::MatcherAsPredicate$<$ M $>$}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_matcher_as_predicate_ab4594a16ff5cdfd07acb5017b7aa54f3} 
+template$<$typename M $>$ \\
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+bool \mbox{\hyperlink{classtesting_1_1internal_1_1_matcher_as_predicate}{testing\+::internal\+::\+Matcher\+As\+Predicate}}$<$ M $>$\+::operator() (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{x}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l02003}{2003}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02003\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02004\ \ \ \ \ \textcolor{comment}{//\ We\ let\ matcher\_\ commit\ to\ a\ particular\ type\ here\ instead\ of}}
+\DoxyCodeLine{02005\ \ \ \ \ \textcolor{comment}{//\ when\ the\ MatcherAsPredicate\ object\ was\ constructed.\ \ This}}
+\DoxyCodeLine{02006\ \ \ \ \ \textcolor{comment}{//\ allows\ us\ to\ write\ Matches(m)\ where\ m\ is\ a\ polymorphic\ matcher}}
+\DoxyCodeLine{02007\ \ \ \ \ \textcolor{comment}{//\ (e.g.\ Eq(5)).}}
+\DoxyCodeLine{02008\ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{02009\ \ \ \ \ \textcolor{comment}{//\ If\ we\ write\ Matcher<T>(matcher\_).Matches(x)\ here,\ it\ won't}}
+\DoxyCodeLine{02010\ \ \ \ \ \textcolor{comment}{//\ compile\ when\ matcher\_\ has\ type\ Matcher<const\ T\&>;\ if\ we\ write}}
+\DoxyCodeLine{02011\ \ \ \ \ \textcolor{comment}{//\ Matcher<const\ T\&>(matcher\_).Matches(x)\ here,\ it\ won't\ compile}}
+\DoxyCodeLine{02012\ \ \ \ \ \textcolor{comment}{//\ when\ matcher\_\ has\ type\ Matcher<T>;\ if\ we\ just\ write}}
+\DoxyCodeLine{02013\ \ \ \ \ \textcolor{comment}{//\ matcher\_.Matches(x),\ it\ won't\ compile\ when\ matcher\_\ is}}
+\DoxyCodeLine{02014\ \ \ \ \ \textcolor{comment}{//\ polymorphic,\ e.g.\ Eq(5).}}
+\DoxyCodeLine{02015\ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{02016\ \ \ \ \ \textcolor{comment}{//\ MatcherCast<const\ T\&>()\ is\ necessary\ for\ making\ the\ code\ work}}
+\DoxyCodeLine{02017\ \ \ \ \ \textcolor{comment}{//\ in\ all\ of\ the\ above\ situations.}}
+\DoxyCodeLine{02018\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetesting_ad2f5a342c05fd6806066682c234ca0bc}{MatcherCast<const\ T\&>}}(matcher\_).Matches(x);}
+\DoxyCodeLine{02019\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_matcher_as_predicate_ab4594a16ff5cdfd07acb5017b7aa54f3_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/include/gmock/\mbox{\hyperlink{gmock-matchers_8h}{gmock-\/matchers.\+h}}\end{DoxyCompactItemize}

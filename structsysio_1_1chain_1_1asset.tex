@@ -1,0 +1,727 @@
+\doxysection{sysio\+::chain\+::asset Struct Reference}
+\hypertarget{structsysio_1_1chain_1_1asset}{}\label{structsysio_1_1chain_1_1asset}\index{sysio::chain::asset@{sysio::chain::asset}}
+
+
+{\ttfamily \#include $<$asset.\+hpp$>$}
+
+
+
+Inheritance diagram for sysio\+::chain\+::asset\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=179pt]{structsysio_1_1chain_1_1asset__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for sysio\+::chain\+::asset\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=179pt]{structsysio_1_1chain_1_1asset__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1asset_ae1bdaa1519f4c6a01ae1e4ebea043818}{asset}} (\mbox{\hyperlink{namespacesysio_1_1chain_a5a0727cc491da226747ee12e49611a6e}{share\+\_\+type}} \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}=0, \mbox{\hyperlink{classsysio_1_1chain_1_1symbol}{symbol}} \mbox{\hyperlink{code__cache_8cpp_aa0efefe21f4700d78692edc823e763be}{id}}=\mbox{\hyperlink{classsysio_1_1chain_1_1symbol}{symbol}}(CORE\+\_\+\+SYMBOL))
+\item 
+bool \mbox{\hyperlink{structsysio_1_1chain_1_1asset_a0fb34915bbb8b149ec3e6f9ec19234ef}{is\+\_\+amount\+\_\+within\+\_\+range}} () const
+\item 
+bool \mbox{\hyperlink{structsysio_1_1chain_1_1asset_a058e4453f13add9098ecd2f2a9332181}{is\+\_\+valid}} () const
+\item 
+double \mbox{\hyperlink{structsysio_1_1chain_1_1asset_ae3c75f5e967d01930cf6fad1683f02df}{to\+\_\+real}} () const
+\item 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1asset_a58fe81c1851c659b8421de02fbf1d188}{decimals}} () const
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structsysio_1_1chain_1_1asset_a1808300b4460da11bebd5dbf7717e1e1}{symbol\+\_\+name}} () const
+\item 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1asset_a4cee270d5cd1e6a34ddf22beff6f902b}{precision}} () const
+\item 
+const \mbox{\hyperlink{classsysio_1_1chain_1_1symbol}{symbol}} \& \mbox{\hyperlink{structsysio_1_1chain_1_1asset_a807aa81522392e1869c5180289b3a41d}{get\+\_\+symbol}} () const
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_a5a0727cc491da226747ee12e49611a6e}{share\+\_\+type}} \mbox{\hyperlink{structsysio_1_1chain_1_1asset_acc87ca658e2775603c29c56536b5bacb}{get\+\_\+amount}} () const
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structsysio_1_1chain_1_1asset_a48c40a7e8e433a43b7af638d10a8debb}{to\+\_\+string}} () const
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \& \mbox{\hyperlink{structsysio_1_1chain_1_1asset_a72b7f3c81f37740a5898e90f2eb21f8f}{operator+=}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&o)
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \& \mbox{\hyperlink{structsysio_1_1chain_1_1asset_a1f26aea6d84328a7ab2a94d9657acf0e}{operator-\/=}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&o)
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \mbox{\hyperlink{structsysio_1_1chain_1_1asset_a5983ddd53f635e31e2b383ba5b65b6bb}{operator-\/}} () const
+\item 
+void \mbox{\hyperlink{structsysio_1_1chain_1_1asset_aca6134beae07f2b5899835f9bfa6c05a}{reflector\+\_\+init}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \mbox{\hyperlink{structsysio_1_1chain_1_1asset_aad314ec30220438cbed1dda47af3356e}{from\+\_\+string}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&from)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static constexpr \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1asset_a9f144840f97401501367e822f926335e}{max\+\_\+amount}} = (1LL $<$$<$ 62) -\/ 1
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1asset_a76c2e19b162496d23b5a156054d31267}{fc\+::reflector$<$ asset $>$}}
+\item 
+bool \mbox{\hyperlink{structsysio_1_1chain_1_1asset_a8c79ce3d3e367c6345a8c5cb75bab48d}{operator==}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&b)
+\item 
+bool \mbox{\hyperlink{structsysio_1_1chain_1_1asset_a4c5d8977b23e534426a070f568524d02}{operator$<$}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&b)
+\item 
+bool \mbox{\hyperlink{structsysio_1_1chain_1_1asset_a9d586e9b54232432779a91e2d6d8b78e}{operator$<$=}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&b)
+\item 
+bool \mbox{\hyperlink{structsysio_1_1chain_1_1asset_adb0577649f2f48023169390b0b78e234}{operator!=}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&b)
+\item 
+bool \mbox{\hyperlink{structsysio_1_1chain_1_1asset_a88d1352c1cf2b7377292377449a4ced8}{operator$>$}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&b)
+\item 
+bool \mbox{\hyperlink{structsysio_1_1chain_1_1asset_aa5ae6feb2c7097211820fc31cf24b5f5}{operator$>$=}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&b)
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \mbox{\hyperlink{structsysio_1_1chain_1_1asset_a101f03e631cf8c72d8094b91a5524207}{operator-\/}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&b)
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \mbox{\hyperlink{structsysio_1_1chain_1_1asset_a606c72fe4e28b359ba977a6043f56300}{operator+}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&b)
+\item 
+std\+::ostream \& \mbox{\hyperlink{structsysio_1_1chain_1_1asset_ab041046df3ca32f824c838021615dfcb}{operator$<$$<$}} (std\+::ostream \&out, const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+asset includes amount and currency symbol
+
+\doxylink{structsysio_1_1chain_1_1asset_aad314ec30220438cbed1dda47af3356e}{asset\+::from\+\_\+string} takes a string of the form "{}10.\+0000 CUR"{} and constructs an asset with amount = 10 and symbol(4,"{}\+CUR"{}) 
+
+Definition at line \mbox{\hyperlink{asset_8hpp_source_l00017}{17}} of file \mbox{\hyperlink{asset_8hpp_source}{asset.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structsysio_1_1chain_1_1asset_ae1bdaa1519f4c6a01ae1e4ebea043818}\index{sysio::chain::asset@{sysio::chain::asset}!asset@{asset}}
+\index{asset@{asset}!sysio::chain::asset@{sysio::chain::asset}}
+\doxysubsubsection{\texorpdfstring{asset()}{asset()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1asset_ae1bdaa1519f4c6a01ae1e4ebea043818} 
+sysio\+::chain\+::asset\+::asset (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacesysio_1_1chain_a5a0727cc491da226747ee12e49611a6e}{share\+\_\+type}}}]{a}{ = {\ttfamily 0}, }\item[{\mbox{\hyperlink{classsysio_1_1chain_1_1symbol}{symbol}}}]{id}{ = {\ttfamily \mbox{\hyperlink{classsysio_1_1chain_1_1symbol}{symbol}}(CORE\+\_\+SYMBOL)}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{asset_8hpp_source_l00021}{21}} of file \mbox{\hyperlink{asset_8hpp_source}{asset.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :amount(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}),\ sym(\textcolor{keywordtype}{id})\ \{}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset_a0fb34915bbb8b149ec3e6f9ec19234ef}{is\_amount\_within\_range}}(),\ asset\_type\_exception,\ \textcolor{stringliteral}{"{}magnitude\ of\ asset\ amount\ must\ be\ less\ than\ 2\string^62"{}}\ );}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ sym.\mbox{\hyperlink{classsysio_1_1chain_1_1symbol_a31f998c4cfde2fa9148ac3232b11a25d}{valid}}(),\ asset\_type\_exception,\ \textcolor{stringliteral}{"{}invalid\ symbol"{}}\ );}
+\DoxyCodeLine{00024\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1asset_ae1bdaa1519f4c6a01ae1e4ebea043818_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1asset_ae1bdaa1519f4c6a01ae1e4ebea043818_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1chain_1_1asset_a58fe81c1851c659b8421de02fbf1d188}\index{sysio::chain::asset@{sysio::chain::asset}!decimals@{decimals}}
+\index{decimals@{decimals}!sysio::chain::asset@{sysio::chain::asset}}
+\doxysubsubsection{\texorpdfstring{decimals()}{decimals()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1asset_a58fe81c1851c659b8421de02fbf1d188} 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} sysio\+::chain\+::asset\+::decimals (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{asset_8cpp_source_l00007}{7}} of file \mbox{\hyperlink{asset_8cpp_source}{asset.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00007\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00008\ \ \ \ \textcolor{keywordflow}{return}\ sym.\mbox{\hyperlink{classsysio_1_1chain_1_1symbol_a8e41beda74e6823bf4efe4d478440e88}{decimals}}();}
+\DoxyCodeLine{00009\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=321pt]{structsysio_1_1chain_1_1asset_a58fe81c1851c659b8421de02fbf1d188_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1asset_a58fe81c1851c659b8421de02fbf1d188_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1asset_aad314ec30220438cbed1dda47af3356e}\index{sysio::chain::asset@{sysio::chain::asset}!from\_string@{from\_string}}
+\index{from\_string@{from\_string}!sysio::chain::asset@{sysio::chain::asset}}
+\doxysubsubsection{\texorpdfstring{from\_string()}{from\_string()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1asset_aad314ec30220438cbed1dda47af3356e} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} sysio\+::chain\+::asset\+::from\+\_\+string (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&}]{from}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{asset_8cpp_source_l00031}{31}} of file \mbox{\hyperlink{asset_8cpp_source}{asset.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00032\ \{}
+\DoxyCodeLine{00033\ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ =\ \mbox{\hyperlink{namespacefc_af74120b9a0be3c409b63ff3ba526cffc}{fc::trim}}(from);}
+\DoxyCodeLine{00035\ }
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \textcolor{comment}{//\ Find\ space\ in\ order\ to\ split\ amount\ and\ symbol}}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ space\_pos\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.find(\textcolor{charliteral}{'\ '});}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}((space\_pos\ !=\ string::npos),\ asset\_type\_exception,\ \textcolor{stringliteral}{"{}Asset's\ amount\ and\ symbol\ should\ be\ separated\ with\ space"{}});}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ symbol\_str\ =\ \mbox{\hyperlink{namespacefc_af74120b9a0be3c409b63ff3ba526cffc}{fc::trim}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.substr(space\_pos\ +\ 1));}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ amount\_str\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.substr(0,\ space\_pos);}
+\DoxyCodeLine{00041\ }
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \textcolor{comment}{//\ Ensure\ that\ if\ decimal\ point\ is\ used\ (.),\ decimal\ fraction\ is\ specified}}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ dot\_pos\ =\ amount\_str.find(\textcolor{charliteral}{'.'});}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (dot\_pos\ !=\ string::npos)\ \{}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}((dot\_pos\ !=\ amount\_str.size()\ -\/\ 1),\ asset\_type\_exception,\ \textcolor{stringliteral}{"{}Missing\ decimal\ fraction\ after\ decimal\ point"{}});}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00047\ }
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \textcolor{comment}{//\ Parse\ symbol}}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ precision\_digit\_str;}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (dot\_pos\ !=\ string::npos)\ \{}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ precision\_digit\_str\ =\ \mbox{\hyperlink{namespacefc_a4e07b3870aa72f8c38bdd5f78044dad1}{sysio::chain::to\_string}}(amount\_str.size()\ -\/\ dot\_pos\ -\/\ 1);}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ precision\_digit\_str\ =\ \textcolor{stringliteral}{"{}0"{}};}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00055\ }
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ symbol\_part\ =\ precision\_digit\_str\ +\ \textcolor{charliteral}{','}\ +\ symbol\_str;}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ symbol\ sym\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1symbol_af67333e1badee3ae6d4b0c528a8f89e0}{symbol::from\_string}}(symbol\_part);}
+\DoxyCodeLine{00058\ }
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \textcolor{comment}{//\ Parse\ amount}}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ safe<int64\_t>\ int\_part,\ fract\_part;}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (dot\_pos\ !=\ string::npos)\ \{}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ int\_part\ =\ \mbox{\hyperlink{namespacefc_afe327b84123fcbda675ea00418471c9a}{fc::to\_int64}}(amount\_str.substr(0,\ dot\_pos));}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ fract\_part\ =\ \mbox{\hyperlink{namespacefc_afe327b84123fcbda675ea00418471c9a}{fc::to\_int64}}(amount\_str.substr(dot\_pos\ +\ 1));}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (amount\_str[0]\ ==\ \textcolor{charliteral}{'-\/'})\ fract\_part\ *=\ -\/1;}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ int\_part\ =\ \mbox{\hyperlink{namespacefc_afe327b84123fcbda675ea00418471c9a}{fc::to\_int64}}(amount\_str);}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00068\ }
+\DoxyCodeLine{00069\ \ \ \ \ \ \ safe<int64\_t>\ amount\ =\ int\_part;}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ amount\ *=\ safe<int64\_t>(sym.precision());}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ amount\ +=\ fract\_part;}
+\DoxyCodeLine{00072\ }
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset_ae1bdaa1519f4c6a01ae1e4ebea043818}{asset}}(amount.value,\ sym);}
+\DoxyCodeLine{00074\ \ \ \ \}}
+\DoxyCodeLine{00075\ \ \ \ \mbox{\hyperlink{exception_8hpp_ab46aa678a7742e0ed071b10eb88c615b}{FC\_CAPTURE\_LOG\_AND\_RETHROW}}(\ (from)\ )}
+\DoxyCodeLine{00076\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1asset_aad314ec30220438cbed1dda47af3356e_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1asset_aad314ec30220438cbed1dda47af3356e_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1asset_acc87ca658e2775603c29c56536b5bacb}\index{sysio::chain::asset@{sysio::chain::asset}!get\_amount@{get\_amount}}
+\index{get\_amount@{get\_amount}!sysio::chain::asset@{sysio::chain::asset}}
+\doxysubsubsection{\texorpdfstring{get\_amount()}{get\_amount()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1asset_acc87ca658e2775603c29c56536b5bacb} 
+\mbox{\hyperlink{namespacesysio_1_1chain_a5a0727cc491da226747ee12e49611a6e}{share\+\_\+type}} sysio\+::chain\+::asset\+::get\+\_\+amount (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{asset_8hpp_source_l00035}{35}} of file \mbox{\hyperlink{asset_8hpp_source}{asset.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00035\ \{\ \textcolor{keywordflow}{return}\ amount;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1asset_a807aa81522392e1869c5180289b3a41d}\index{sysio::chain::asset@{sysio::chain::asset}!get\_symbol@{get\_symbol}}
+\index{get\_symbol@{get\_symbol}!sysio::chain::asset@{sysio::chain::asset}}
+\doxysubsubsection{\texorpdfstring{get\_symbol()}{get\_symbol()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1asset_a807aa81522392e1869c5180289b3a41d} 
+const \mbox{\hyperlink{classsysio_1_1chain_1_1symbol}{symbol}} \& sysio\+::chain\+::asset\+::get\+\_\+symbol (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{asset_8hpp_source_l00034}{34}} of file \mbox{\hyperlink{asset_8hpp_source}{asset.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00034\ \{\ \textcolor{keywordflow}{return}\ sym;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1asset_a807aa81522392e1869c5180289b3a41d_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1asset_a0fb34915bbb8b149ec3e6f9ec19234ef}\index{sysio::chain::asset@{sysio::chain::asset}!is\_amount\_within\_range@{is\_amount\_within\_range}}
+\index{is\_amount\_within\_range@{is\_amount\_within\_range}!sysio::chain::asset@{sysio::chain::asset}}
+\doxysubsubsection{\texorpdfstring{is\_amount\_within\_range()}{is\_amount\_within\_range()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1asset_a0fb34915bbb8b149ec3e6f9ec19234ef} 
+bool sysio\+::chain\+::asset\+::is\+\_\+amount\+\_\+within\+\_\+range (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{asset_8hpp_source_l00026}{26}} of file \mbox{\hyperlink{asset_8hpp_source}{asset.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00026\ \{\ \textcolor{keywordflow}{return}\ -\/\mbox{\hyperlink{structsysio_1_1chain_1_1asset_a9f144840f97401501367e822f926335e}{max\_amount}}\ <=\ amount\ \&\&\ amount\ <=\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset_a9f144840f97401501367e822f926335e}{max\_amount}};\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1asset_a0fb34915bbb8b149ec3e6f9ec19234ef_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1asset_a058e4453f13add9098ecd2f2a9332181}\index{sysio::chain::asset@{sysio::chain::asset}!is\_valid@{is\_valid}}
+\index{is\_valid@{is\_valid}!sysio::chain::asset@{sysio::chain::asset}}
+\doxysubsubsection{\texorpdfstring{is\_valid()}{is\_valid()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1asset_a058e4453f13add9098ecd2f2a9332181} 
+bool sysio\+::chain\+::asset\+::is\+\_\+valid (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{asset_8hpp_source_l00027}{27}} of file \mbox{\hyperlink{asset_8hpp_source}{asset.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00027\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset_a0fb34915bbb8b149ec3e6f9ec19234ef}{is\_amount\_within\_range}}()\ \&\&\ sym.\mbox{\hyperlink{classsysio_1_1chain_1_1symbol_a31f998c4cfde2fa9148ac3232b11a25d}{valid}}();\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1asset_a058e4453f13add9098ecd2f2a9332181_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=323pt]{structsysio_1_1chain_1_1asset_a058e4453f13add9098ecd2f2a9332181_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1asset_a72b7f3c81f37740a5898e90f2eb21f8f}\index{sysio::chain::asset@{sysio::chain::asset}!operator+=@{operator+=}}
+\index{operator+=@{operator+=}!sysio::chain::asset@{sysio::chain::asset}}
+\doxysubsubsection{\texorpdfstring{operator+=()}{operator+=()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1asset_a72b7f3c81f37740a5898e90f2eb21f8f} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \& sysio\+::chain\+::asset\+::operator+= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&}]{o}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{asset_8hpp_source_l00040}{40}} of file \mbox{\hyperlink{asset_8hpp_source}{asset.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00041\ \ \ \ \{}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\mbox{\hyperlink{structsysio_1_1chain_1_1asset_a807aa81522392e1869c5180289b3a41d}{get\_symbol}}()\ ==\ o.get\_symbol(),\ asset\_type\_exception,\ \textcolor{stringliteral}{"{}addition\ between\ two\ different\ asset\ is\ not\ allowed"{}});}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ amount\ +=\ o.amount;}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00045\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=313pt]{structsysio_1_1chain_1_1asset_a72b7f3c81f37740a5898e90f2eb21f8f_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1asset_a5983ddd53f635e31e2b383ba5b65b6bb}\index{sysio::chain::asset@{sysio::chain::asset}!operator-\/@{operator-\/}}
+\index{operator-\/@{operator-\/}!sysio::chain::asset@{sysio::chain::asset}}
+\doxysubsubsection{\texorpdfstring{operator-\/()}{operator-()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1asset_a5983ddd53f635e31e2b383ba5b65b6bb} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} sysio\+::chain\+::asset\+::operator-\/ (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{asset_8hpp_source_l00053}{53}} of file \mbox{\hyperlink{asset_8hpp_source}{asset.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00053\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset_ae1bdaa1519f4c6a01ae1e4ebea043818}{asset}}(-\/amount,\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset_a807aa81522392e1869c5180289b3a41d}{get\_symbol}}());\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1asset_a5983ddd53f635e31e2b383ba5b65b6bb_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1asset_a1f26aea6d84328a7ab2a94d9657acf0e}\index{sysio::chain::asset@{sysio::chain::asset}!operator-\/=@{operator-\/=}}
+\index{operator-\/=@{operator-\/=}!sysio::chain::asset@{sysio::chain::asset}}
+\doxysubsubsection{\texorpdfstring{operator-\/=()}{operator-=()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1asset_a1f26aea6d84328a7ab2a94d9657acf0e} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \& sysio\+::chain\+::asset\+::operator-\/= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&}]{o}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{asset_8hpp_source_l00047}{47}} of file \mbox{\hyperlink{asset_8hpp_source}{asset.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00048\ \ \ \ \{}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\mbox{\hyperlink{structsysio_1_1chain_1_1asset_a807aa81522392e1869c5180289b3a41d}{get\_symbol}}()\ ==\ o.get\_symbol(),\ asset\_type\_exception,\ \textcolor{stringliteral}{"{}subtraction\ between\ two\ different\ asset\ is\ not\ allowed"{}});}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ amount\ -\/=\ o.amount;}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00052\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=313pt]{structsysio_1_1chain_1_1asset_a1f26aea6d84328a7ab2a94d9657acf0e_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1asset_a4cee270d5cd1e6a34ddf22beff6f902b}\index{sysio::chain::asset@{sysio::chain::asset}!precision@{precision}}
+\index{precision@{precision}!sysio::chain::asset@{sysio::chain::asset}}
+\doxysubsubsection{\texorpdfstring{precision()}{precision()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1asset_a4cee270d5cd1e6a34ddf22beff6f902b} 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} sysio\+::chain\+::asset\+::precision (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{asset_8cpp_source_l00015}{15}} of file \mbox{\hyperlink{asset_8cpp_source}{asset.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00016\ \ \ \ \textcolor{keywordflow}{return}\ sym.\mbox{\hyperlink{classsysio_1_1chain_1_1symbol_af3be1ca4481ef5adfc236cf94431e2f2}{precision}}();}
+\DoxyCodeLine{00017\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1asset_a4cee270d5cd1e6a34ddf22beff6f902b_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1asset_a4cee270d5cd1e6a34ddf22beff6f902b_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1asset_aca6134beae07f2b5899835f9bfa6c05a}\index{sysio::chain::asset@{sysio::chain::asset}!reflector\_init@{reflector\_init}}
+\index{reflector\_init@{reflector\_init}!sysio::chain::asset@{sysio::chain::asset}}
+\doxysubsubsection{\texorpdfstring{reflector\_init()}{reflector\_init()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1asset_aca6134beae07f2b5899835f9bfa6c05a} 
+void sysio\+::chain\+::asset\+::reflector\+\_\+init (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{asset_8hpp_source_l00083}{83}} of file \mbox{\hyperlink{asset_8hpp_source}{asset.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset_a0fb34915bbb8b149ec3e6f9ec19234ef}{is\_amount\_within\_range}}(),\ asset\_type\_exception,\ \textcolor{stringliteral}{"{}magnitude\ of\ asset\ amount\ must\ be\ less\ than\ 2\string^62"{}}\ );}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ sym.\mbox{\hyperlink{classsysio_1_1chain_1_1symbol_a31f998c4cfde2fa9148ac3232b11a25d}{valid}}(),\ asset\_type\_exception,\ \textcolor{stringliteral}{"{}invalid\ symbol"{}}\ );}
+\DoxyCodeLine{00086\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1asset_aca6134beae07f2b5899835f9bfa6c05a_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1asset_a1808300b4460da11bebd5dbf7717e1e1}\index{sysio::chain::asset@{sysio::chain::asset}!symbol\_name@{symbol\_name}}
+\index{symbol\_name@{symbol\_name}!sysio::chain::asset@{sysio::chain::asset}}
+\doxysubsubsection{\texorpdfstring{symbol\_name()}{symbol\_name()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1asset_a1808300b4460da11bebd5dbf7717e1e1} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::chain\+::asset\+::symbol\+\_\+name (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{asset_8cpp_source_l00011}{11}} of file \mbox{\hyperlink{asset_8cpp_source}{asset.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00011\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00012\ \ \ \ \textcolor{keywordflow}{return}\ sym.\mbox{\hyperlink{classsysio_1_1chain_1_1symbol_a067cd53c6a32da32671b1302a0c1909a}{name}}();}
+\DoxyCodeLine{00013\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=321pt]{structsysio_1_1chain_1_1asset_a1808300b4460da11bebd5dbf7717e1e1_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1asset_a1808300b4460da11bebd5dbf7717e1e1_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1asset_ae3c75f5e967d01930cf6fad1683f02df}\index{sysio::chain::asset@{sysio::chain::asset}!to\_real@{to\_real}}
+\index{to\_real@{to\_real}!sysio::chain::asset@{sysio::chain::asset}}
+\doxysubsubsection{\texorpdfstring{to\_real()}{to\_real()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1asset_ae3c75f5e967d01930cf6fad1683f02df} 
+double sysio\+::chain\+::asset\+::to\+\_\+real (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{asset_8hpp_source_l00029}{29}} of file \mbox{\hyperlink{asset_8hpp_source}{asset.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00029\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{double}\textcolor{keyword}{>}(amount)\ /\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset_a4cee270d5cd1e6a34ddf22beff6f902b}{precision}}();\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1asset_ae3c75f5e967d01930cf6fad1683f02df_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1asset_a48c40a7e8e433a43b7af638d10a8debb}\index{sysio::chain::asset@{sysio::chain::asset}!to\_string@{to\_string}}
+\index{to\_string@{to\_string}!sysio::chain::asset@{sysio::chain::asset}}
+\doxysubsubsection{\texorpdfstring{to\_string()}{to\_string()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1asset_a48c40a7e8e433a43b7af638d10a8debb} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::chain\+::asset\+::to\+\_\+string (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{asset_8cpp_source_l00019}{19}} of file \mbox{\hyperlink{asset_8cpp_source}{asset.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00020\ \ \ \ \textcolor{keywordtype}{string}\ sign\ =\ amount\ <\ 0\ ?\ \textcolor{stringliteral}{"{}-\/"{}}\ :\ \textcolor{stringliteral}{"{}"{}};}
+\DoxyCodeLine{00021\ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ abs\_amount\ =\ std::abs(amount);}
+\DoxyCodeLine{00022\ \ \ \ \textcolor{keywordtype}{string}\ result\ =\ \mbox{\hyperlink{namespacefc_a4e07b3870aa72f8c38bdd5f78044dad1}{fc::to\_string}}(\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\textcolor{keyword}{>}(abs\_amount)\ /\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset_a4cee270d5cd1e6a34ddf22beff6f902b}{precision}}());}
+\DoxyCodeLine{00023\ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset_a58fe81c1851c659b8421de02fbf1d188}{decimals}}()\ )}
+\DoxyCodeLine{00024\ \ \ \ \{}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ fract\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\textcolor{keyword}{>}(abs\_amount)\ \%\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset_a4cee270d5cd1e6a34ddf22beff6f902b}{precision}}();}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ result\ +=\ \textcolor{stringliteral}{"{}."{}}\ +\ \mbox{\hyperlink{namespacefc_a4e07b3870aa72f8c38bdd5f78044dad1}{fc::to\_string}}(\mbox{\hyperlink{structsysio_1_1chain_1_1asset_a4cee270d5cd1e6a34ddf22beff6f902b}{precision}}()\ +\ fract).erase(0,1);}
+\DoxyCodeLine{00027\ \ \ \ \}}
+\DoxyCodeLine{00028\ \ \ \ \textcolor{keywordflow}{return}\ sign\ +\ result\ +\ \textcolor{stringliteral}{"{}\ "{}}\ +\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset_a1808300b4460da11bebd5dbf7717e1e1}{symbol\_name}}();}
+\DoxyCodeLine{00029\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1asset_a48c40a7e8e433a43b7af638d10a8debb_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1asset_a48c40a7e8e433a43b7af638d10a8debb_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{structsysio_1_1chain_1_1asset_a76c2e19b162496d23b5a156054d31267}\index{sysio::chain::asset@{sysio::chain::asset}!fc::reflector$<$ asset $>$@{fc::reflector$<$ asset $>$}}
+\index{fc::reflector$<$ asset $>$@{fc::reflector$<$ asset $>$}!sysio::chain::asset@{sysio::chain::asset}}
+\doxysubsubsection{\texorpdfstring{fc::reflector$<$ asset $>$}{fc::reflector< asset >}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1asset_a76c2e19b162496d23b5a156054d31267} 
+friend struct \mbox{\hyperlink{structfc_1_1reflector}{fc\+::reflector}}$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} $>$\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{asset_8hpp_source_l00079}{79}} of file \mbox{\hyperlink{asset_8hpp_source}{asset.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1asset_adb0577649f2f48023169390b0b78e234}\index{sysio::chain::asset@{sysio::chain::asset}!operator"!=@{operator"!=}}
+\index{operator"!=@{operator"!=}!sysio::chain::asset@{sysio::chain::asset}}
+\doxysubsubsection{\texorpdfstring{operator"!=}{operator!=}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1asset_adb0577649f2f48023169390b0b78e234} 
+bool \mbox{\hyperlink{namespacefc_a40c368ac88294ae47b064cad937fdbf6}{operator!}}= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&}]{a}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&}]{b}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{asset_8hpp_source_l00065}{65}} of file \mbox{\hyperlink{asset_8hpp_source}{asset.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00065\ \{\ \textcolor{keywordflow}{return}\ !(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ ==\ b);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1asset_a606c72fe4e28b359ba977a6043f56300}\index{sysio::chain::asset@{sysio::chain::asset}!operator+@{operator+}}
+\index{operator+@{operator+}!sysio::chain::asset@{sysio::chain::asset}}
+\doxysubsubsection{\texorpdfstring{operator+}{operator+}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1asset_a606c72fe4e28b359ba977a6043f56300} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} operator+ (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&}]{a}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&}]{b}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{asset_8hpp_source_l00074}{74}} of file \mbox{\hyperlink{asset_8hpp_source}{asset.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.get\_symbol()\ ==\ b.get\_symbol(),\ asset\_type\_exception,\ \textcolor{stringliteral}{"{}addition\ between\ two\ different\ asset\ is\ not\ allowed"{}});}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset_ae1bdaa1519f4c6a01ae1e4ebea043818}{asset}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.amount\ +\ b.amount,\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.get\_symbol());}
+\DoxyCodeLine{00077\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1asset_a101f03e631cf8c72d8094b91a5524207}\index{sysio::chain::asset@{sysio::chain::asset}!operator-\/@{operator-\/}}
+\index{operator-\/@{operator-\/}!sysio::chain::asset@{sysio::chain::asset}}
+\doxysubsubsection{\texorpdfstring{operator-\/}{operator-}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1asset_a101f03e631cf8c72d8094b91a5524207} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} operator-\/ (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&}]{a}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&}]{b}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{asset_8hpp_source_l00069}{69}} of file \mbox{\hyperlink{asset_8hpp_source}{asset.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.get\_symbol()\ ==\ b.get\_symbol(),\ asset\_type\_exception,\ \textcolor{stringliteral}{"{}subtraction\ between\ two\ different\ asset\ is\ not\ allowed"{}});}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset_ae1bdaa1519f4c6a01ae1e4ebea043818}{asset}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.amount\ -\/\ b.amount,\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.get\_symbol());}
+\DoxyCodeLine{00072\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1asset_a4c5d8977b23e534426a070f568524d02}\index{sysio::chain::asset@{sysio::chain::asset}!operator$<$@{operator$<$}}
+\index{operator$<$@{operator$<$}!sysio::chain::asset@{sysio::chain::asset}}
+\doxysubsubsection{\texorpdfstring{operator$<$}{operator<}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1asset_a4c5d8977b23e534426a070f568524d02} 
+bool operator$<$ (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&}]{a}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&}]{b}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{asset_8hpp_source_l00059}{59}} of file \mbox{\hyperlink{asset_8hpp_source}{asset.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00060\ \ \ \ \{}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.get\_symbol()\ ==\ b.get\_symbol(),\ asset\_type\_exception,\ \textcolor{stringliteral}{"{}logical\ operation\ between\ two\ different\ asset\ is\ not\ allowed"{}});}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::tie(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.amount,\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.get\_symbol())\ <\ std::tie(b.amount,b.get\_symbol());}
+\DoxyCodeLine{00063\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1asset_ab041046df3ca32f824c838021615dfcb}\index{sysio::chain::asset@{sysio::chain::asset}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!sysio::chain::asset@{sysio::chain::asset}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$}{operator<<}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1asset_ab041046df3ca32f824c838021615dfcb} 
+std\+::ostream \& operator$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{out}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&}]{a}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{asset_8hpp_source_l00079}{79}} of file \mbox{\hyperlink{asset_8hpp_source}{asset.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00079\ \{\ \textcolor{keywordflow}{return}\ out\ <<\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.to\_string();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1asset_a9d586e9b54232432779a91e2d6d8b78e}\index{sysio::chain::asset@{sysio::chain::asset}!operator$<$=@{operator$<$=}}
+\index{operator$<$=@{operator$<$=}!sysio::chain::asset@{sysio::chain::asset}}
+\doxysubsubsection{\texorpdfstring{operator$<$=}{operator<=}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1asset_a9d586e9b54232432779a91e2d6d8b78e} 
+bool operator$<$= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&}]{a}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&}]{b}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{asset_8hpp_source_l00064}{64}} of file \mbox{\hyperlink{asset_8hpp_source}{asset.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00064\ \{\ \textcolor{keywordflow}{return}\ (\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ ==\ b)\ ||\ (\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ <\ b);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1asset_a8c79ce3d3e367c6345a8c5cb75bab48d}\index{sysio::chain::asset@{sysio::chain::asset}!operator==@{operator==}}
+\index{operator==@{operator==}!sysio::chain::asset@{sysio::chain::asset}}
+\doxysubsubsection{\texorpdfstring{operator==}{operator==}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1asset_a8c79ce3d3e367c6345a8c5cb75bab48d} 
+bool operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&}]{a}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&}]{b}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{asset_8hpp_source_l00055}{55}} of file \mbox{\hyperlink{asset_8hpp_source}{asset.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00056\ \ \ \ \{}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::tie(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.get\_symbol(),\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.amount)\ ==\ std::tie(b.get\_symbol(),\ b.amount);}
+\DoxyCodeLine{00058\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1asset_a88d1352c1cf2b7377292377449a4ced8}\index{sysio::chain::asset@{sysio::chain::asset}!operator$>$@{operator$>$}}
+\index{operator$>$@{operator$>$}!sysio::chain::asset@{sysio::chain::asset}}
+\doxysubsubsection{\texorpdfstring{operator$>$}{operator>}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1asset_a88d1352c1cf2b7377292377449a4ced8} 
+bool operator$>$ (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&}]{a}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&}]{b}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{asset_8hpp_source_l00066}{66}} of file \mbox{\hyperlink{asset_8hpp_source}{asset.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00066\ \{\ \textcolor{keywordflow}{return}\ !(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ <=\ b);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1asset_aa5ae6feb2c7097211820fc31cf24b5f5}\index{sysio::chain::asset@{sysio::chain::asset}!operator$>$=@{operator$>$=}}
+\index{operator$>$=@{operator$>$=}!sysio::chain::asset@{sysio::chain::asset}}
+\doxysubsubsection{\texorpdfstring{operator$>$=}{operator>=}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1asset_aa5ae6feb2c7097211820fc31cf24b5f5} 
+bool operator$>$= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&}]{a}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&}]{b}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{asset_8hpp_source_l00067}{67}} of file \mbox{\hyperlink{asset_8hpp_source}{asset.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00067\ \{\ \textcolor{keywordflow}{return}\ !(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ <\ b);\ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1chain_1_1asset_a9f144840f97401501367e822f926335e}\index{sysio::chain::asset@{sysio::chain::asset}!max\_amount@{max\_amount}}
+\index{max\_amount@{max\_amount}!sysio::chain::asset@{sysio::chain::asset}}
+\doxysubsubsection{\texorpdfstring{max\_amount}{max\_amount}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1asset_a9f144840f97401501367e822f926335e} 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} sysio\+::chain\+::asset\+::max\+\_\+amount = (1LL $<$$<$ 62) -\/ 1\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{asset_8hpp_source_l00019}{19}} of file \mbox{\hyperlink{asset_8hpp_source}{asset.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{asset_8hpp}{asset.\+hpp}}\item 
+libraries/chain/\mbox{\hyperlink{asset_8cpp}{asset.\+cpp}}\end{DoxyCompactItemize}

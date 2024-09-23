@@ -1,0 +1,9 @@
+<map id="sysio::chain::eosvmoc::LLVMJIT::EmitFunctionContext::current_memory" name="sysio::chain::eosvmoc::LLVMJIT::EmitFunctionContext::current_memory">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,63,216,119"/>
+<area shape="rect" id="Node000002" href="$namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t.html#af795eedea4eeeb05c14888495c44958d" title=" " alt="" coords="267,5,507,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="215,64,282,48,283,53,217,69"/>
+<area shape="rect" id="Node000003" href="$namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t.html#a3516e0069b55fd689270d7d866543bd4" title=" " alt="" coords="311,71,463,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="216,88,295,88,295,94,216,94"/>
+<area shape="rect" id="Node000004" href="$structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_emit_function_context.html#aafd0015ff5c31f2c944597b00913accd" title=" " alt="" coords="264,136,510,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="217,113,283,129,282,134,215,118"/>
+</map>

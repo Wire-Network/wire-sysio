@@ -1,0 +1,52 @@
+\doxysection{sysio\+::chain\+::block\+\_\+summary\+\_\+object Class Reference}
+\hypertarget{classsysio_1_1chain_1_1block__summary__object}{}\label{classsysio_1_1chain_1_1block__summary__object}\index{sysio::chain::block\_summary\_object@{sysio::chain::block\_summary\_object}}
+
+
+tracks minimal information about past blocks to implement Ta\+POS  
+
+
+
+
+{\ttfamily \#include $<$block\+\_\+summary\+\_\+object.\+hpp$>$}
+
+
+
+Inheritance diagram for sysio\+::chain\+::block\+\_\+summary\+\_\+object\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=236pt]{classsysio_1_1chain_1_1block__summary__object__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for sysio\+::chain\+::block\+\_\+summary\+\_\+object\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=236pt]{classsysio_1_1chain_1_1block__summary__object__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Public Types inherited from \mbox{\hyperlink{structchainbase_1_1object}{chainbase\+::object$<$ block\+\_\+summary\+\_\+object\+\_\+type, block\+\_\+summary\+\_\+object $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{classchainbase_1_1oid}{oid}}$<$ block\+\_\+summary\+\_\+object $>$ \mbox{\hyperlink{structchainbase_1_1object_a7c6a0efb95ee67d538a976cfa5be9df9}{id\+\_\+type}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Static Public Attributes inherited from \mbox{\hyperlink{structchainbase_1_1object}{chainbase\+::object$<$ block\+\_\+summary\+\_\+object\+\_\+type, block\+\_\+summary\+\_\+object $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+static const \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{structchainbase_1_1object_a30d3a5340e6fc59b4a2e044fcd42f0a2}{type\+\_\+id}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+When attempting to calculate the validity of a transaction we need to lookup a past block and check its block hash and the time it occurred so we can calculate whether the current transaction is valid and at what time it should expire. 
+
+Definition at line \mbox{\hyperlink{block__summary__object_8hpp_source_l00016}{16}} of file \mbox{\hyperlink{block__summary__object_8hpp_source}{block\+\_\+summary\+\_\+object.\+hpp}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{block__summary__object_8hpp}{block\+\_\+summary\+\_\+object.\+hpp}}\end{DoxyCompactItemize}

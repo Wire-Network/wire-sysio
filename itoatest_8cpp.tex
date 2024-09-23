@@ -1,0 +1,106 @@
+\doxysection{libraries/fc/include/fc/crypto/webauthn\+\_\+json/test/unittest/itoatest.cpp File Reference}
+\hypertarget{itoatest_8cpp}{}\label{itoatest_8cpp}\index{libraries/fc/include/fc/crypto/webauthn\_json/test/unittest/itoatest.cpp@{libraries/fc/include/fc/crypto/webauthn\_json/test/unittest/itoatest.cpp}}
+{\ttfamily \#include "{}unittest.\+h"{}}\newline
+{\ttfamily \#include "{}rapidjson/internal/itoa.\+h"{}}\newline
+Include dependency graph for itoatest.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{itoatest_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_traits}{Traits$<$ T $>$}}
+\item 
+struct \mbox{\hyperlink{struct_traits_3_01uint32__t_01_4}{Traits$<$ uint32\+\_\+t $>$}}
+\item 
+struct \mbox{\hyperlink{struct_traits_3_01int32__t_01_4}{Traits$<$ int32\+\_\+t $>$}}
+\item 
+struct \mbox{\hyperlink{struct_traits_3_01uint64__t_01_4}{Traits$<$ uint64\+\_\+t $>$}}
+\item 
+struct \mbox{\hyperlink{struct_traits_3_01int64__t_01_4}{Traits$<$ int64\+\_\+t $>$}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{itoatest_8cpp_aab6fbab0722f25c87c5e9cb0d9696a20}{TEST}} (itoa, u32toa)
+\item 
+\mbox{\hyperlink{itoatest_8cpp_aaf43fc934c335c9742249eb33b3b2493}{TEST}} (itoa, i32toa)
+\item 
+\mbox{\hyperlink{itoatest_8cpp_a05a08c46e0e982a8422e45fbd0e39763}{TEST}} (itoa, u64toa)
+\item 
+\mbox{\hyperlink{itoatest_8cpp_aa8c214271fbd243add7527072da63e2f}{TEST}} (itoa, i64toa)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{itoatest_8cpp_aaf43fc934c335c9742249eb33b3b2493}\index{itoatest.cpp@{itoatest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!itoatest.cpp@{itoatest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{itoatest_8cpp_aaf43fc934c335c9742249eb33b3b2493} 
+TEST (\begin{DoxyParamCaption}\item[{itoa}]{}{, }\item[{i32toa}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{itoatest_8cpp_source_l00146}{146}} of file \mbox{\hyperlink{itoatest_8cpp_source}{itoatest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00147\ \ \ \ \ Verify(i32toa\_naive,\ i32toa);}
+\DoxyCodeLine{00148\ \}}
+
+\end{DoxyCode}
+\Hypertarget{itoatest_8cpp_aa8c214271fbd243add7527072da63e2f}\index{itoatest.cpp@{itoatest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!itoatest.cpp@{itoatest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{itoatest_8cpp_aa8c214271fbd243add7527072da63e2f} 
+TEST (\begin{DoxyParamCaption}\item[{itoa}]{}{, }\item[{i64toa}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{itoatest_8cpp_source_l00154}{154}} of file \mbox{\hyperlink{itoatest_8cpp_source}{itoatest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00155\ \ \ \ \ Verify(i64toa\_naive,\ i64toa);}
+\DoxyCodeLine{00156\ \}}
+
+\end{DoxyCode}
+\Hypertarget{itoatest_8cpp_aab6fbab0722f25c87c5e9cb0d9696a20}\index{itoatest.cpp@{itoatest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!itoatest.cpp@{itoatest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{itoatest_8cpp_aab6fbab0722f25c87c5e9cb0d9696a20} 
+TEST (\begin{DoxyParamCaption}\item[{itoa}]{}{, }\item[{u32toa}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{itoatest_8cpp_source_l00142}{142}} of file \mbox{\hyperlink{itoatest_8cpp_source}{itoatest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00143\ \ \ \ \ Verify(u32toa\_naive,\ u32toa);}
+\DoxyCodeLine{00144\ \}}
+
+\end{DoxyCode}
+\Hypertarget{itoatest_8cpp_a05a08c46e0e982a8422e45fbd0e39763}\index{itoatest.cpp@{itoatest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!itoatest.cpp@{itoatest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{itoatest_8cpp_a05a08c46e0e982a8422e45fbd0e39763} 
+TEST (\begin{DoxyParamCaption}\item[{itoa}]{}{, }\item[{u64toa}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{itoatest_8cpp_source_l00150}{150}} of file \mbox{\hyperlink{itoatest_8cpp_source}{itoatest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00151\ \ \ \ \ Verify(u64toa\_naive,\ u64toa);}
+\DoxyCodeLine{00152\ \}}
+
+\end{DoxyCode}

@@ -1,0 +1,7 @@
+<map id="test_schnorrsig_taproot" name="test_schnorrsig_taproot">
+<area shape="rect" id="Node000001" title=" " alt="" coords="293,5,450,31"/>
+<area shape="rect" id="Node000002" href="$schnorrsig_2tests__impl_8h.html#ac157ab3450c7cca7e46cdc65e8019392" title=" " alt="" coords="103,5,245,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="278,21,246,21,246,16,278,16"/>
+<area shape="rect" id="Node000003" href="$tests_8c.html#a3c04138a5bfe5d72780bb7e82a18e627" title=" " alt="" coords="5,5,55,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="87,21,55,21,55,16,87,16"/>
+</map>

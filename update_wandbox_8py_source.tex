@@ -1,0 +1,53 @@
+\doxysection{update\+Wandbox.\+py}
+\hypertarget{update_wandbox_8py_source}{}\label{update_wandbox_8py_source}\index{libraries/sys-\/vm/external/Catch2/scripts/updateWandbox.py@{libraries/sys-\/vm/external/Catch2/scripts/updateWandbox.py}}
+\mbox{\hyperlink{update_wandbox_8py}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{update_wandbox_8py_source_l00001}\mbox{\hyperlink{namespaceupdate_wandbox}{00001}}\ \textcolor{comment}{\#!/usr/bin/env\ python}}
+\DoxyCodeLine{\Hypertarget{update_wandbox_8py_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{update_wandbox_8py_source_l00003}00003\ \textcolor{keyword}{import}\ json}
+\DoxyCodeLine{\Hypertarget{update_wandbox_8py_source_l00004}00004\ \textcolor{keyword}{import}\ os}
+\DoxyCodeLine{\Hypertarget{update_wandbox_8py_source_l00005}00005\ \textcolor{keyword}{import}\ urllib2}
+\DoxyCodeLine{\Hypertarget{update_wandbox_8py_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{update_wandbox_8py_source_l00007}00007\ \textcolor{keyword}{from}\ scriptCommon\ \textcolor{keyword}{import}\ catchPath}
+\DoxyCodeLine{\Hypertarget{update_wandbox_8py_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{update_wandbox_8py_source_l00009}\mbox{\hyperlink{namespaceupdate_wandbox_ad97a15c46266f14244df412881f84b72}{00009}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespaceupload}{upload}}(options):}
+\DoxyCodeLine{\Hypertarget{update_wandbox_8py_source_l00010}00010\ \ \ \ \ request\ =\ urllib2.Request(\textcolor{stringliteral}{'http://melpon.org/wandbox/api/compile.json'})}
+\DoxyCodeLine{\Hypertarget{update_wandbox_8py_source_l00011}00011\ \ \ \ \ request.add\_header(\textcolor{stringliteral}{'Content-\/Type'},\ \textcolor{stringliteral}{'application/json'})}
+\DoxyCodeLine{\Hypertarget{update_wandbox_8py_source_l00012}00012\ \ \ \ \ response\ =\ urllib2.urlopen(request,\ json.dumps(options))}
+\DoxyCodeLine{\Hypertarget{update_wandbox_8py_source_l00013}00013\ \ \ \ \ \textcolor{keywordflow}{return}\ json.loads(response.read())}
+\DoxyCodeLine{\Hypertarget{update_wandbox_8py_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{update_wandbox_8py_source_l00015}\mbox{\hyperlink{namespaceupdate_wandbox_a8daaaa80d4f4a621979c69993d134a19}{00015}}\ main\_file\ =\ \textcolor{stringliteral}{'''}}
+\DoxyCodeLine{\Hypertarget{update_wandbox_8py_source_l00016}00016\ \textcolor{stringliteral}{\#define\ CATCH\_CONFIG\_MAIN\ \ //\ This\ tells\ Catch\ to\ provide\ a\ main()\ -\/\ only\ do\ this\ in\ one\ cpp\ file}}
+\DoxyCodeLine{\Hypertarget{update_wandbox_8py_source_l00017}00017\ \textcolor{stringliteral}{\#include\ "{}catch.hpp"{}}}
+\DoxyCodeLine{\Hypertarget{update_wandbox_8py_source_l00018}00018\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{update_wandbox_8py_source_l00019}00019\ \textcolor{stringliteral}{unsigned\ int\ Factorial(\ unsigned\ int\ number\ )\ \{}}
+\DoxyCodeLine{\Hypertarget{update_wandbox_8py_source_l00020}00020\ \textcolor{stringliteral}{\ \ \ \ return\ number\ <=\ 1\ ?\ number\ :\ Factorial(number-\/1)*number;}}
+\DoxyCodeLine{\Hypertarget{update_wandbox_8py_source_l00021}00021\ \textcolor{stringliteral}{\}}}
+\DoxyCodeLine{\Hypertarget{update_wandbox_8py_source_l00022}00022\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{update_wandbox_8py_source_l00023}00023\ \textcolor{stringliteral}{TEST\_CASE(\ "{}Factorials\ are\ computed"{},\ "{}[factorial]"{}\ )\ \{}}
+\DoxyCodeLine{\Hypertarget{update_wandbox_8py_source_l00024}00024\ \textcolor{stringliteral}{\ \ \ \ REQUIRE(\ Factorial(1)\ ==\ 1\ );}}
+\DoxyCodeLine{\Hypertarget{update_wandbox_8py_source_l00025}00025\ \textcolor{stringliteral}{\ \ \ \ REQUIRE(\ Factorial(2)\ ==\ 2\ );}}
+\DoxyCodeLine{\Hypertarget{update_wandbox_8py_source_l00026}00026\ \textcolor{stringliteral}{\ \ \ \ REQUIRE(\ Factorial(3)\ ==\ 6\ );}}
+\DoxyCodeLine{\Hypertarget{update_wandbox_8py_source_l00027}00027\ \textcolor{stringliteral}{\ \ \ \ REQUIRE(\ Factorial(10)\ ==\ 3628800\ );}}
+\DoxyCodeLine{\Hypertarget{update_wandbox_8py_source_l00028}00028\ \textcolor{stringliteral}{\}}}
+\DoxyCodeLine{\Hypertarget{update_wandbox_8py_source_l00029}00029\ \textcolor{stringliteral}{'''}}
+\DoxyCodeLine{\Hypertarget{update_wandbox_8py_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{update_wandbox_8py_source_l00031}\mbox{\hyperlink{namespaceupdate_wandbox_aafd943f4137e2dc29b9d22e4fe8f5f05}{00031}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespaceupdate_wandbox_aafd943f4137e2dc29b9d22e4fe8f5f05}{uploadFiles}}():}
+\DoxyCodeLine{\Hypertarget{update_wandbox_8py_source_l00032}00032\ \ \ \ \ response\ =\ \mbox{\hyperlink{namespaceupload}{upload}}(\{}
+\DoxyCodeLine{\Hypertarget{update_wandbox_8py_source_l00033}00033\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'compiler'}:\ \textcolor{stringliteral}{'gcc-\/head'},}
+\DoxyCodeLine{\Hypertarget{update_wandbox_8py_source_l00034}00034\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'code'}:\ main\_file,}
+\DoxyCodeLine{\Hypertarget{update_wandbox_8py_source_l00035}00035\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'codes'}:\ [\{}
+\DoxyCodeLine{\Hypertarget{update_wandbox_8py_source_l00036}00036\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'file'}:\ \textcolor{stringliteral}{'catch.hpp'},}
+\DoxyCodeLine{\Hypertarget{update_wandbox_8py_source_l00037}00037\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'code'}:\ open(os.path.join(catchPath,\ \textcolor{stringliteral}{'single\_include'},\ \textcolor{stringliteral}{'catch2'},\ \textcolor{stringliteral}{'catch.hpp'})).read()}
+\DoxyCodeLine{\Hypertarget{update_wandbox_8py_source_l00038}00038\ \ \ \ \ \ \ \ \ \}],}
+\DoxyCodeLine{\Hypertarget{update_wandbox_8py_source_l00039}00039\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'options'}:\ \textcolor{stringliteral}{'c++11,cpp-\/no-\/pedantic,boost-\/nothing'},}
+\DoxyCodeLine{\Hypertarget{update_wandbox_8py_source_l00040}00040\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'compiler-\/option-\/raw'}:\ \textcolor{stringliteral}{'-\/DCATCH\_CONFIG\_FAST\_COMPILE'},}
+\DoxyCodeLine{\Hypertarget{update_wandbox_8py_source_l00041}00041\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'save'}:\ \textcolor{keyword}{True}}
+\DoxyCodeLine{\Hypertarget{update_wandbox_8py_source_l00042}00042\ \ \ \ \ \})}
+\DoxyCodeLine{\Hypertarget{update_wandbox_8py_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{update_wandbox_8py_source_l00044}00044\ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{stringliteral}{'status'}\ \textcolor{keywordflow}{in}\ response\ \textcolor{keywordflow}{and}\ \textcolor{stringliteral}{'compiler\_error'}\ \textcolor{keywordflow}{not}\ \textcolor{keywordflow}{in}\ response:}
+\DoxyCodeLine{\Hypertarget{update_wandbox_8py_source_l00045}00045\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{True},\ response[\textcolor{stringliteral}{'url'}]}
+\DoxyCodeLine{\Hypertarget{update_wandbox_8py_source_l00046}00046\ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{update_wandbox_8py_source_l00047}00047\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{False},\ response}
+
+\end{DoxyCode}

@@ -1,0 +1,53 @@
+\doxysection{real128.\+hpp}
+\hypertarget{real128_8hpp_source}{}\label{real128_8hpp_source}\index{libraries/fc/include/fc/real128.hpp@{libraries/fc/include/fc/real128.hpp}}
+\mbox{\hyperlink{real128_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{real128_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{real128_8hpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{uint128_8hpp}{fc/uint128.hpp}}>}\ \ \ }
+\DoxyCodeLine{\Hypertarget{real128_8hpp_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{real128_8hpp_source_l00004}\mbox{\hyperlink{real128_8hpp_ac7d6999aca6d173e118c185e3c4513db}{00004}}\ \textcolor{preprocessor}{\#define\ FC\_REAL128\_PRECISION\ (uint64\_t(1000000)\ *\ uint64\_t(1000000)\ *\ uint64\_t(1000000))}}
+\DoxyCodeLine{\Hypertarget{real128_8hpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{real128_8hpp_source_l00006}00006\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}\ \{}
+\DoxyCodeLine{\Hypertarget{real128_8hpp_source_l00007}00007\ \ \ \ \textcolor{keyword}{class\ }variant;}
+\DoxyCodeLine{\Hypertarget{real128_8hpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{real128_8hpp_source_l00014}\mbox{\hyperlink{classfc_1_1real128}{00014}}\ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classfc_1_1real128}{real128}}}
+\DoxyCodeLine{\Hypertarget{real128_8hpp_source_l00015}00015\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{real128_8hpp_source_l00016}00016\ \ \ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{real128_8hpp_source_l00017}00017\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1real128_a097da5b9bf1cf07153422781be41a16d}{real128}}(\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ integer\ =\ 0);}
+\DoxyCodeLine{\Hypertarget{real128_8hpp_source_l00018}00018\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classfc_1_1real128_a097da5b9bf1cf07153422781be41a16d}{real128}}(\ \textcolor{keyword}{const}\ std::string\&\ str\ );}
+\DoxyCodeLine{\Hypertarget{real128_8hpp_source_l00019}00019\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{operator}\ std::string()\textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{real128_8hpp_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{real128_8hpp_source_l00021}\mbox{\hyperlink{classfc_1_1real128_adec78a326c08146b52145ba1bf642948}{00021}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{friend}\ \mbox{\hyperlink{classfc_1_1real128}{real128}}\ \mbox{\hyperlink{classfc_1_1real128_adec78a326c08146b52145ba1bf642948}{operator\ *\ }}(\ \mbox{\hyperlink{classfc_1_1real128}{real128}}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1real128}{real128}}\&\ b\ )\ \{\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ *=\ b;\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}};\ \}}
+\DoxyCodeLine{\Hypertarget{real128_8hpp_source_l00022}\mbox{\hyperlink{classfc_1_1real128_a199a75624f94f1c33be967ec96012f1d}{00022}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{friend}\ \mbox{\hyperlink{classfc_1_1real128}{real128}}\ \mbox{\hyperlink{classfc_1_1real128_a199a75624f94f1c33be967ec96012f1d}{operator\ /\ }}(\ \mbox{\hyperlink{classfc_1_1real128}{real128}}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1real128}{real128}}\&\ b\ )\ \{\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ /=\ b;\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}};\ \}}
+\DoxyCodeLine{\Hypertarget{real128_8hpp_source_l00023}\mbox{\hyperlink{classfc_1_1real128_ab8a42837fad8441fec519a38ea2fa2da}{00023}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{friend}\ \mbox{\hyperlink{classfc_1_1real128}{real128}}\ \mbox{\hyperlink{classfc_1_1real128_ab8a42837fad8441fec519a38ea2fa2da}{operator\ +\ }}(\ \mbox{\hyperlink{classfc_1_1real128}{real128}}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1real128}{real128}}\&\ b\ )\ \{\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ +=\ b;\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}};\ \}}
+\DoxyCodeLine{\Hypertarget{real128_8hpp_source_l00024}\mbox{\hyperlink{classfc_1_1real128_a4c14234c69ef70cb9524c982aba14b7f}{00024}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{friend}\ \mbox{\hyperlink{classfc_1_1real128}{real128}}\ \mbox{\hyperlink{classfc_1_1real128_a4c14234c69ef70cb9524c982aba14b7f}{operator\ -\/\ }}(\ \mbox{\hyperlink{classfc_1_1real128}{real128}}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1real128}{real128}}\&\ b\ )\ \{\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ -\/=\ b;\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}};\ \}}
+\DoxyCodeLine{\Hypertarget{real128_8hpp_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{real128_8hpp_source_l00026}00026\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1real128}{real128}}\&\ \mbox{\hyperlink{classfc_1_1real128_a3b64577b2d9b3faa2ca42c89fe06a6d6}{operator\ +=\ }}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1real128}{real128}}\&\ o\ );}
+\DoxyCodeLine{\Hypertarget{real128_8hpp_source_l00027}00027\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1real128}{real128}}\&\ \mbox{\hyperlink{classfc_1_1real128_a62d973a4d6975e50aeee8d66af384bec}{operator\ -\/=\ }}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1real128}{real128}}\&\ o\ );}
+\DoxyCodeLine{\Hypertarget{real128_8hpp_source_l00028}00028\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1real128}{real128}}\&\ \mbox{\hyperlink{classfc_1_1real128_a6c68340169a8a565a94aaaf7765d0263}{operator\ /=\ }}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1real128}{real128}}\&\ o\ );}
+\DoxyCodeLine{\Hypertarget{real128_8hpp_source_l00029}00029\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1real128}{real128}}\&\ \mbox{\hyperlink{classfc_1_1real128_a22168634d6c0642f5298cb503d2916af}{operator\ *=\ }}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1real128}{real128}}\&\ o\ );}
+\DoxyCodeLine{\Hypertarget{real128_8hpp_source_l00030}00030\ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{real128_8hpp_source_l00031}00031\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classfc_1_1real128}{real128}}\ \mbox{\hyperlink{classfc_1_1real128_a89773971c76d0b6c18b734c20094e3c2}{from\_fixed}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1uint128}{uint128}}\&\ fixed\ );}
+\DoxyCodeLine{\Hypertarget{real128_8hpp_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{real128_8hpp_source_l00033}00033\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{classfc_1_1real128_acf80e4cd529988227f25e2e9f58923c0}{to\_uint64}}()\textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{real128_8hpp_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{real128_8hpp_source_l00035}00035\ \ \ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{real128_8hpp_source_l00036}00036\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1uint128}{uint128}}\ \ fixed;}
+\DoxyCodeLine{\Hypertarget{real128_8hpp_source_l00037}00037\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{real128_8hpp_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{real128_8hpp_source_l00039}00039\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefc_adea61f2343de94d0fbcb920a32332ad9}{to\_variant}}(\ \textcolor{keyword}{const}\ real128\&\ var,\ \ variant\&\ vo\ );}
+\DoxyCodeLine{\Hypertarget{real128_8hpp_source_l00040}00040\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefc_accef08adf4ee05c36ccc550d8101b08f}{from\_variant}}(\ \textcolor{keyword}{const}\ variant\&\ var,\ \ real128\&\ vo\ );}
+\DoxyCodeLine{\Hypertarget{real128_8hpp_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{real128_8hpp_source_l00042}00042\ \ \ \textcolor{keyword}{namespace\ }raw\ \ }
+\DoxyCodeLine{\Hypertarget{real128_8hpp_source_l00043}00043\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{real128_8hpp_source_l00044}00044\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ Stream>}
+\DoxyCodeLine{\Hypertarget{real128_8hpp_source_l00045}\mbox{\hyperlink{namespacefc_1_1raw_a2e1d77e36260124dbaee9b676929d885}{00045}}\ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{pack}}(\ \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}}\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1real128}{real128}}\&\ value\_to\_pack\ )\ \{\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.write(\ (\textcolor{keywordtype}{char}*)\&value\_to\_pack,\ \textcolor{keyword}{sizeof}(value\_to\_pack)\ );\ \}}
+\DoxyCodeLine{\Hypertarget{real128_8hpp_source_l00046}00046\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ Stream>}
+\DoxyCodeLine{\Hypertarget{real128_8hpp_source_l00047}\mbox{\hyperlink{namespacefc_1_1raw_a93159491c1c78328b6a639eed2071fff}{00047}}\ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefc_1_1raw_a0b442d98ceb22dd5a6ae84745e43ffab}{unpack}}(\ \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}}\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ \mbox{\hyperlink{classfc_1_1real128}{real128}}\&\ value\_to\_unpack\ )\ \{\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.read(\ (\textcolor{keywordtype}{char}*)\&value\_to\_unpack,\ \textcolor{keyword}{sizeof}(value\_to\_unpack)\ );\ \}}
+\DoxyCodeLine{\Hypertarget{real128_8hpp_source_l00048}00048\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{real128_8hpp_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{real128_8hpp_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{real128_8hpp_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{real128_8hpp_source_l00052}00052\ \}\ \textcolor{comment}{//\ namespace\ fc}}
+
+\end{DoxyCode}

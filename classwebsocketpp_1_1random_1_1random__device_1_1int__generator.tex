@@ -1,0 +1,111 @@
+\doxysection{websocketpp\+::random\+::random\+\_\+device\+::int\+\_\+generator\texorpdfstring{$<$}{<} int\+\_\+type, concurrency \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classwebsocketpp_1_1random_1_1random__device_1_1int__generator}{}\label{classwebsocketpp_1_1random_1_1random__device_1_1int__generator}\index{websocketpp::random::random\_device::int\_generator$<$ int\_type, concurrency $>$@{websocketpp::random::random\_device::int\_generator$<$ int\_type, concurrency $>$}}
+
+
+Thread safe non-\/deterministic random integer generator.  
+
+
+
+
+{\ttfamily \#include $<$random\+\_\+device.\+hpp$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef concurrency\+::scoped\+\_\+lock\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1random_1_1random__device_1_1int__generator_ae18780b907d5ac163c909d8c5907fe81}{scoped\+\_\+lock\+\_\+type}}
+\item 
+typedef concurrency\+::mutex\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1random_1_1random__device_1_1int__generator_a6f4e567047e05ccd00f44869885dfcd5}{mutex\+\_\+type}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classwebsocketpp_1_1random_1_1random__device_1_1int__generator_ac1752f1f3cb1c3cb6a98e252b6baac8a}{int\+\_\+generator}} ()
+\begin{DoxyCompactList}\small\item\em constructor \end{DoxyCompactList}\item 
+int\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1random_1_1random__device_1_1int__generator_a6e4fea3c83b876cc364f9d9370b0c5a1}{operator()}} ()
+\begin{DoxyCompactList}\small\item\em advances the engine\textquotesingle{}s state and returns the generated value \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename int\+\_\+type, typename concurrency$>$\newline
+class websocketpp\+::random\+::random\+\_\+device\+::int\+\_\+generator$<$ int\+\_\+type, concurrency $>$}
+This template class provides thread safe non-\/deterministic random integer generation. Numbers are produced in a uniformly distributed range from the smallest to largest value that int\+\_\+type can store.
+
+Thread-\/safety is provided via locking based on the concurrency template parameter.
+
+Non-\/deterministic RNG is provided via \doxylink{namespacewebsocketpp_1_1lib}{websocketpp\+::lib} which uses either C++11 or Boost 1.\+47+\textquotesingle{}s \doxylink{namespacewebsocketpp_1_1random_1_1random__device}{random\+\_\+device} class.
+
+\doxylink{struct_call}{Call} operator() to generate the next number 
+
+Definition at line \mbox{\hyperlink{random__device_8hpp_source_l00053}{53}} of file \mbox{\hyperlink{random__device_8hpp_source}{random\+\_\+device.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classwebsocketpp_1_1random_1_1random__device_1_1int__generator_a6f4e567047e05ccd00f44869885dfcd5}\index{websocketpp::random::random\_device::int\_generator$<$ int\_type, concurrency $>$@{websocketpp::random::random\_device::int\_generator$<$ int\_type, concurrency $>$}!mutex\_type@{mutex\_type}}
+\index{mutex\_type@{mutex\_type}!websocketpp::random::random\_device::int\_generator$<$ int\_type, concurrency $>$@{websocketpp::random::random\_device::int\_generator$<$ int\_type, concurrency $>$}}
+\doxysubsubsection{\texorpdfstring{mutex\_type}{mutex\_type}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1random_1_1random__device_1_1int__generator_a6f4e567047e05ccd00f44869885dfcd5} 
+template$<$typename int\+\_\+type , typename concurrency $>$ \\
+concurrency\+::mutex\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1random_1_1random__device_1_1int__generator}{websocketpp\+::random\+::random\+\_\+device\+::int\+\_\+generator}}$<$ int\+\_\+type, concurrency $>$\+::mutex\+\_\+type}
+
+
+
+Definition at line \mbox{\hyperlink{random__device_8hpp_source_l00056}{56}} of file \mbox{\hyperlink{random__device_8hpp_source}{random\+\_\+device.\+hpp}}.
+
+\Hypertarget{classwebsocketpp_1_1random_1_1random__device_1_1int__generator_ae18780b907d5ac163c909d8c5907fe81}\index{websocketpp::random::random\_device::int\_generator$<$ int\_type, concurrency $>$@{websocketpp::random::random\_device::int\_generator$<$ int\_type, concurrency $>$}!scoped\_lock\_type@{scoped\_lock\_type}}
+\index{scoped\_lock\_type@{scoped\_lock\_type}!websocketpp::random::random\_device::int\_generator$<$ int\_type, concurrency $>$@{websocketpp::random::random\_device::int\_generator$<$ int\_type, concurrency $>$}}
+\doxysubsubsection{\texorpdfstring{scoped\_lock\_type}{scoped\_lock\_type}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1random_1_1random__device_1_1int__generator_ae18780b907d5ac163c909d8c5907fe81} 
+template$<$typename int\+\_\+type , typename concurrency $>$ \\
+concurrency\+::scoped\+\_\+lock\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1random_1_1random__device_1_1int__generator}{websocketpp\+::random\+::random\+\_\+device\+::int\+\_\+generator}}$<$ int\+\_\+type, concurrency $>$\+::scoped\+\_\+lock\+\_\+type}
+
+
+
+Definition at line \mbox{\hyperlink{random__device_8hpp_source_l00055}{55}} of file \mbox{\hyperlink{random__device_8hpp_source}{random\+\_\+device.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classwebsocketpp_1_1random_1_1random__device_1_1int__generator_ac1752f1f3cb1c3cb6a98e252b6baac8a}\index{websocketpp::random::random\_device::int\_generator$<$ int\_type, concurrency $>$@{websocketpp::random::random\_device::int\_generator$<$ int\_type, concurrency $>$}!int\_generator@{int\_generator}}
+\index{int\_generator@{int\_generator}!websocketpp::random::random\_device::int\_generator$<$ int\_type, concurrency $>$@{websocketpp::random::random\_device::int\_generator$<$ int\_type, concurrency $>$}}
+\doxysubsubsection{\texorpdfstring{int\_generator()}{int\_generator()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1random_1_1random__device_1_1int__generator_ac1752f1f3cb1c3cb6a98e252b6baac8a} 
+template$<$typename int\+\_\+type , typename concurrency $>$ \\
+\mbox{\hyperlink{classwebsocketpp_1_1random_1_1random__device_1_1int__generator}{websocketpp\+::random\+::random\+\_\+device\+::int\+\_\+generator}}$<$ int\+\_\+type, concurrency $>$\+::int\+\_\+generator (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{random__device_8hpp_source_l00060}{60}} of file \mbox{\hyperlink{random__device_8hpp_source}{random\+\_\+device.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00060\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classwebsocketpp_1_1random_1_1random__device_1_1int__generator_a6e4fea3c83b876cc364f9d9370b0c5a1}\index{websocketpp::random::random\_device::int\_generator$<$ int\_type, concurrency $>$@{websocketpp::random::random\_device::int\_generator$<$ int\_type, concurrency $>$}!operator()@{operator()}}
+\index{operator()@{operator()}!websocketpp::random::random\_device::int\_generator$<$ int\_type, concurrency $>$@{websocketpp::random::random\_device::int\_generator$<$ int\_type, concurrency $>$}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1random_1_1random__device_1_1int__generator_a6e4fea3c83b876cc364f9d9370b0c5a1} 
+template$<$typename int\+\_\+type , typename concurrency $>$ \\
+int\+\_\+type \mbox{\hyperlink{classwebsocketpp_1_1random_1_1random__device_1_1int__generator}{websocketpp\+::random\+::random\+\_\+device\+::int\+\_\+generator}}$<$ int\+\_\+type, concurrency $>$\+::operator() (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{random__device_8hpp_source_l00063}{63}} of file \mbox{\hyperlink{random__device_8hpp_source}{random\+\_\+device.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1random_1_1random__device_1_1int__generator_ae18780b907d5ac163c909d8c5907fe81}{scoped\_lock\_type}}\ guard(m\_lock);}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_dis(m\_rng);}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/vendor/websocketpp/websocketpp/random/\mbox{\hyperlink{random__device_8hpp}{random\+\_\+device.\+hpp}}\end{DoxyCompactItemize}

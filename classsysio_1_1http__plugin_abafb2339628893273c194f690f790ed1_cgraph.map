@@ -1,0 +1,9 @@
+<map id="sysio::http_plugin::plugin_initialize" name="sysio::http_plugin::plugin_initialize">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,35,129,75"/>
+<area shape="rect" id="Node000002" href="$namespaceappbase.html#a99374dc23934f008a09f2f79be9eae40" title=" " alt="" coords="197,13,296,38"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="129,42,182,34,182,39,130,48"/>
+<area shape="rect" id="Node000004" href="$classappbase_1_1application.html#a5dfd3cfb1124c57963fa17b3f4aabbe1" title="Get data directory." alt="" coords="177,63,317,103"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="130,62,162,67,161,72,129,67"/>
+<area shape="rect" id="Node000003" href="$classappbase_1_1application.html#ac874b2659b400fe254f1ae4260d06ecf" title=" " alt="" coords="365,5,505,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="297,23,349,23,349,28,297,28"/>
+</map>

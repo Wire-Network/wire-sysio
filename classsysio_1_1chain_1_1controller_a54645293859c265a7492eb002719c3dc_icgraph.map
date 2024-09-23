@@ -1,0 +1,7 @@
+<map id="sysio::chain::controller::pending_producers" name="sysio::chain::controller::pending_producers">
+<area shape="rect" id="Node000001" title=" " alt="" coords="225,49,377,90"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1chain__apis_1_1read__only.html#afd9ddf40d495a3ce12310a2011906ca0" title=" " alt="" coords="11,5,171,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="209,56,171,50,172,44,210,51"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1chain_1_1controller.html#ab4cab73bf67a1686c6c595e08a63b632" title=" " alt="" coords="5,85,177,126"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="210,87,178,93,177,88,209,82"/>
+</map>

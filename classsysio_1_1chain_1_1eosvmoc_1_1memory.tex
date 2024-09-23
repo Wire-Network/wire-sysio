@@ -1,0 +1,344 @@
+\doxysection{sysio\+::chain\+::eosvmoc\+::memory Class Reference}
+\hypertarget{classsysio_1_1chain_1_1eosvmoc_1_1memory}{}\label{classsysio_1_1chain_1_1eosvmoc_1_1memory}\index{sysio::chain::eosvmoc::memory@{sysio::chain::eosvmoc::memory}}
+
+
+{\ttfamily \#include $<$memory.\+hpp$>$}
+
+
+
+Collaboration diagram for sysio\+::chain\+::eosvmoc\+::memory\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=194pt]{classsysio_1_1chain_1_1eosvmoc_1_1memory__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1memory_a3258c330efc6f8bccffdf348f0225e26}{memory}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} max\+\_\+pages)
+\item 
+\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1memory_a3bbd0e1e3622c07576fd61895fd8b8e4}{\texorpdfstring{$\sim$}{\string~}memory}} ()
+\item 
+\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1memory_a32f2107b86ca6a2d5f58e44e7798e82a}{memory}} (const \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1memory}{memory}} \&)=delete
+\item 
+\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1memory}{memory}} \& \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1memory_a5ec755bb8d582925da65c1b1548b9322}{operator=}} (const \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1memory}{memory}} \&)=delete
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1memory_aa335f7f165983f34b047eae68394d2d0}{reset}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} max\+\_\+pages)
+\item 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}const \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1memory_a71fda3a290693273210726cd4cd15acf}{zero\+\_\+page\+\_\+memory\+\_\+base}} () const
+\item 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}const \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1memory_a13783a10b7f9b6e29e3a29dcb14f389b}{full\+\_\+page\+\_\+memory\+\_\+base}} () const
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a7cfa050a8e417822975ca260ac344c98}{control\+\_\+block}} \texorpdfstring{$\ast$}{*}const \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1memory_a9043d56d3915019a7e8dc4d959fcebc5}{get\+\_\+control\+\_\+block}} () const
+\item 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}const \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1memory_a744f68f87731fdb93062f5120dc21c22}{start\+\_\+of\+\_\+memory\+\_\+slices}} () const
+\item 
+size\+\_\+t \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1memory_adb637213cf176be1b6f37dabd9123267}{size\+\_\+of\+\_\+memory\+\_\+slice\+\_\+mapping}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static constexpr size\+\_\+t \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1memory_a08924e50e0bd949e51e87ed562d57178}{stride}} = total\+\_\+memory\+\_\+per\+\_\+slice
+\item 
+static constexpr \mbox{\hyperlink{stdint_8h_a31b85deecb45924320becd11d3ee16ce}{uintptr\+\_\+t}} \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1memory_ab1b2f0d87e3ffc25a5a6d73473157bd9}{linear\+\_\+memory}} = 0
+\item 
+static constexpr \mbox{\hyperlink{stdint_8h_a31b85deecb45924320becd11d3ee16ce}{uintptr\+\_\+t}} \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1memory_a74ea75f2c5e285a08e86d4f82bfaf3bb}{cb\+\_\+offset}} = wcb\+\_\+allowance + mutable\+\_\+global\+\_\+size + table\+\_\+size
+\item 
+static constexpr \mbox{\hyperlink{stdint_8h_a31b85deecb45924320becd11d3ee16ce}{uintptr\+\_\+t}} \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1memory_a3ca9186ab4cbb5e78898f09b3b4ef349}{first\+\_\+intrinsic\+\_\+offset}} = \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1memory_a74ea75f2c5e285a08e86d4f82bfaf3bb}{cb\+\_\+offset}} + 8u
+\item 
+static constexpr \mbox{\hyperlink{stdint_8h_a31b85deecb45924320becd11d3ee16ce}{uintptr\+\_\+t}} \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1memory_aead91f2e971a46b02e86b9ed36f0e9b0}{max\+\_\+prologue\+\_\+size}} = mutable\+\_\+global\+\_\+size + table\+\_\+size
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{chain_2include_2sysio_2chain_2webassembly_2sys-vm-oc_2memory_8hpp_source_l00013}{13}} of file \mbox{\hyperlink{chain_2include_2sysio_2chain_2webassembly_2sys-vm-oc_2memory_8hpp_source}{memory.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classsysio_1_1chain_1_1eosvmoc_1_1memory_a3258c330efc6f8bccffdf348f0225e26}\index{sysio::chain::eosvmoc::memory@{sysio::chain::eosvmoc::memory}!memory@{memory}}
+\index{memory@{memory}!sysio::chain::eosvmoc::memory@{sysio::chain::eosvmoc::memory}}
+\doxysubsubsection{\texorpdfstring{memory()}{memory()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1eosvmoc_1_1memory_a3258c330efc6f8bccffdf348f0225e26} 
+sysio\+::chain\+::eosvmoc\+::memory\+::memory (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{max\+\_\+pages}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{runtimes_2sys-vm-oc_2memory_8cpp_source_l00014}{14}} of file \mbox{\hyperlink{runtimes_2sys-vm-oc_2memory_8cpp_source}{memory.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00014\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00015\ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ number\_slices\ =\ \mbox{\hyperlink{namespacesysio_1_1vm_a0ae6751a77293216df4656dee5081eb2a95b0fd1e8f1e450ae134af180be894f3}{max\_pages}}\ +\ 1;}
+\DoxyCodeLine{00016\ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ wasm\_memory\_size\ =\ \mbox{\hyperlink{namespacesysio_1_1vm_a0ae6751a77293216df4656dee5081eb2a95b0fd1e8f1e450ae134af180be894f3}{max\_pages}}\ *\ wasm\_constraints::wasm\_page\_size;}
+\DoxyCodeLine{00017\ \ \ \ \textcolor{keywordtype}{int}\ fd\ =\ syscall(SYS\_memfd\_create,\ \textcolor{stringliteral}{"{}eosvmoc\_mem"{}},\ MFD\_CLOEXEC);}
+\DoxyCodeLine{00018\ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(fd\ >=\ 0,\ \textcolor{stringliteral}{"{}Failed\ to\ create\ memory\ memfd"{}});}
+\DoxyCodeLine{00019\ \ \ \ \textcolor{keyword}{auto}\ cleanup\_fd\ =\ \mbox{\hyperlink{namespacefc_a23d89b54a8ffd84f7e7efeb21747d846}{fc::make\_scoped\_exit}}([\&fd]()\{\mbox{\hyperlink{integration_8cpp_af5b66d867a040d002fb57d645cae3fb4}{close}}(fd);\});}
+\DoxyCodeLine{00020\ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ ftruncate(fd,\ wasm\_memory\_size+memory\_prologue\_size);}
+\DoxyCodeLine{00021\ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(!\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}},\ \textcolor{stringliteral}{"{}Failed\ to\ grow\ memory\ memfd"{}});}
+\DoxyCodeLine{00022\ }
+\DoxyCodeLine{00023\ \ \ \ mapsize\ =\ total\_memory\_per\_slice*number\_slices;}
+\DoxyCodeLine{00024\ \ \ \ mapbase\ =\ (\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}*)mmap(\textcolor{keyword}{nullptr},\ mapsize,\ PROT\_NONE,\ MAP\_PRIVATE|MAP\_ANON,\ 0,\ 0);}
+\DoxyCodeLine{00025\ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(mapbase\ !=\ MAP\_FAILED,\ \textcolor{stringliteral}{"{}Failed\ to\ mmap\ memory"{}});}
+\DoxyCodeLine{00026\ }
+\DoxyCodeLine{00027\ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}*\ next\_slice\ =\ mapbase;}
+\DoxyCodeLine{00028\ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}*\ last;}
+\DoxyCodeLine{00029\ }
+\DoxyCodeLine{00030\ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ 0;\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ <\ number\_slices;\ ++\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})\ \{}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ last\ =\ (\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}*)mmap(next\_slice,\ memory\_prologue\_size+64u*1024u*\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\ PROT\_READ|PROT\_WRITE,\ MAP\_SHARED|MAP\_FIXED,\ fd,\ 0);}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(last\ !=\ MAP\_FAILED,\ \textcolor{stringliteral}{"{}Failed\ to\ mmap\ memory"{}});}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ next\_slice\ +=\ total\_memory\_per\_slice;}
+\DoxyCodeLine{00034\ \ \ \ \}}
+\DoxyCodeLine{00035\ }
+\DoxyCodeLine{00036\ \ \ \ zeropage\_base\ =\ mapbase\ +\ memory\_prologue\_size;}
+\DoxyCodeLine{00037\ \ \ \ fullpage\_base\ =\ last\ +\ memory\_prologue\_size;}
+\DoxyCodeLine{00038\ }
+\DoxyCodeLine{00039\ \ \ \ \textcolor{comment}{//layout\ the\ intrinsic\ jump\ table}}
+\DoxyCodeLine{00040\ \ \ \ \mbox{\hyperlink{stdint_8h_a31b85deecb45924320becd11d3ee16ce}{uintptr\_t}}*\ \textcolor{keyword}{const}\ intrinsic\_jump\_table\ =\ \textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{stdint_8h_a31b85deecb45924320becd11d3ee16ce}{uintptr\_t}}*\ \mbox{\hyperlink{namespaceupload_a985aa9a71de3eb507344df65700c696d}{const}}\textcolor{keyword}{>}(zeropage\_base\ -\/\ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1memory_a3ca9186ab4cbb5e78898f09b3b4ef349}{first\_intrinsic\_offset}});}
+\DoxyCodeLine{00041\ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_af63b1d984c58d1e5445a96eae8eccb59}{intrinsic\_map\_t}}\&\ intrinsics\ =\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_abe43c1d3ddfb344db0cd7dd5ab25f48c}{get\_intrinsic\_map}}();}
+\DoxyCodeLine{00042\ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ intrinsic\ :\ intrinsics)}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ intrinsic\_jump\_table[-\/intrinsic.second.ordinal]\ =\ (\mbox{\hyperlink{stdint_8h_a31b85deecb45924320becd11d3ee16ce}{uintptr\_t}})intrinsic.second.function\_ptr;}
+\DoxyCodeLine{00044\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=345pt]{classsysio_1_1chain_1_1eosvmoc_1_1memory_a3258c330efc6f8bccffdf348f0225e26_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1eosvmoc_1_1memory_a3bbd0e1e3622c07576fd61895fd8b8e4}\index{sysio::chain::eosvmoc::memory@{sysio::chain::eosvmoc::memory}!````~memory@{\texorpdfstring{$\sim$}{\string~}memory}}
+\index{````~memory@{\texorpdfstring{$\sim$}{\string~}memory}!sysio::chain::eosvmoc::memory@{sysio::chain::eosvmoc::memory}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}memory()}{\string~memory()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1eosvmoc_1_1memory_a3bbd0e1e3622c07576fd61895fd8b8e4} 
+sysio\+::chain\+::eosvmoc\+::memory\+::\texorpdfstring{$\sim$}{\string~}memory (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{runtimes_2sys-vm-oc_2memory_8cpp_source_l00056}{56}} of file \mbox{\hyperlink{runtimes_2sys-vm-oc_2memory_8cpp_source}{memory.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00057\ \ \ \ munmap(mapbase,\ mapsize);}
+\DoxyCodeLine{00058\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1eosvmoc_1_1memory_a32f2107b86ca6a2d5f58e44e7798e82a}\index{sysio::chain::eosvmoc::memory@{sysio::chain::eosvmoc::memory}!memory@{memory}}
+\index{memory@{memory}!sysio::chain::eosvmoc::memory@{sysio::chain::eosvmoc::memory}}
+\doxysubsubsection{\texorpdfstring{memory()}{memory()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1eosvmoc_1_1memory_a32f2107b86ca6a2d5f58e44e7798e82a} 
+sysio\+::chain\+::eosvmoc\+::memory\+::memory (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1memory}{memory}} \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [delete]}}
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1chain_1_1eosvmoc_1_1memory_a13783a10b7f9b6e29e3a29dcb14f389b}\index{sysio::chain::eosvmoc::memory@{sysio::chain::eosvmoc::memory}!full\_page\_memory\_base@{full\_page\_memory\_base}}
+\index{full\_page\_memory\_base@{full\_page\_memory\_base}!sysio::chain::eosvmoc::memory@{sysio::chain::eosvmoc::memory}}
+\doxysubsubsection{\texorpdfstring{full\_page\_memory\_base()}{full\_page\_memory\_base()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1eosvmoc_1_1memory_a13783a10b7f9b6e29e3a29dcb14f389b} 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}const sysio\+::chain\+::eosvmoc\+::memory\+::full\+\_\+page\+\_\+memory\+\_\+base (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{chain_2include_2sysio_2chain_2webassembly_2sys-vm-oc_2memory_8hpp_source_l00034}{34}} of file \mbox{\hyperlink{chain_2include_2sysio_2chain_2webassembly_2sys-vm-oc_2memory_8hpp_source}{memory.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00034\ \{\ \textcolor{keywordflow}{return}\ fullpage\_base;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1eosvmoc_1_1memory_a13783a10b7f9b6e29e3a29dcb14f389b_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1eosvmoc_1_1memory_a9043d56d3915019a7e8dc4d959fcebc5}\index{sysio::chain::eosvmoc::memory@{sysio::chain::eosvmoc::memory}!get\_control\_block@{get\_control\_block}}
+\index{get\_control\_block@{get\_control\_block}!sysio::chain::eosvmoc::memory@{sysio::chain::eosvmoc::memory}}
+\doxysubsubsection{\texorpdfstring{get\_control\_block()}{get\_control\_block()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1eosvmoc_1_1memory_a9043d56d3915019a7e8dc4d959fcebc5} 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a7cfa050a8e417822975ca260ac344c98}{control\+\_\+block}} \texorpdfstring{$\ast$}{*}const sysio\+::chain\+::eosvmoc\+::memory\+::get\+\_\+control\+\_\+block (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{chain_2include_2sysio_2chain_2webassembly_2sys-vm-oc_2memory_8hpp_source_l00036}{36}} of file \mbox{\hyperlink{chain_2include_2sysio_2chain_2webassembly_2sys-vm-oc_2memory_8hpp_source}{memory.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00036\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a7cfa050a8e417822975ca260ac344c98}{control\_block}}*\ \mbox{\hyperlink{namespaceupload_a985aa9a71de3eb507344df65700c696d}{const}}\textcolor{keyword}{>}(zeropage\_base\ -\/\ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1memory_a74ea75f2c5e285a08e86d4f82bfaf3bb}{cb\_offset}});\}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1eosvmoc_1_1memory_a9043d56d3915019a7e8dc4d959fcebc5_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1eosvmoc_1_1memory_a5ec755bb8d582925da65c1b1548b9322}\index{sysio::chain::eosvmoc::memory@{sysio::chain::eosvmoc::memory}!operator=@{operator=}}
+\index{operator=@{operator=}!sysio::chain::eosvmoc::memory@{sysio::chain::eosvmoc::memory}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1eosvmoc_1_1memory_a5ec755bb8d582925da65c1b1548b9322} 
+\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1memory}{memory}} \& sysio\+::chain\+::eosvmoc\+::memory\+::operator= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1memory}{memory}} \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [delete]}}
+
+\Hypertarget{classsysio_1_1chain_1_1eosvmoc_1_1memory_aa335f7f165983f34b047eae68394d2d0}\index{sysio::chain::eosvmoc::memory@{sysio::chain::eosvmoc::memory}!reset@{reset}}
+\index{reset@{reset}!sysio::chain::eosvmoc::memory@{sysio::chain::eosvmoc::memory}}
+\doxysubsubsection{\texorpdfstring{reset()}{reset()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1eosvmoc_1_1memory_aa335f7f165983f34b047eae68394d2d0} 
+void sysio\+::chain\+::eosvmoc\+::memory\+::reset (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{max\+\_\+pages}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{runtimes_2sys-vm-oc_2memory_8cpp_source_l00046}{46}} of file \mbox{\hyperlink{runtimes_2sys-vm-oc_2memory_8cpp_source}{memory.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00047\ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ old\_max\_pages\ =\ mapsize\ /\ memory::total\_memory\_per\_slice\ -\/\ 1;}
+\DoxyCodeLine{00048\ \ \ \ \textcolor{keywordflow}{if}(max\_pages\ ==\ old\_max\_pages)\ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00049\ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1memory_a3258c330efc6f8bccffdf348f0225e26}{memory}}\ new\_memory\{\mbox{\hyperlink{namespacesysio_1_1vm_a0ae6751a77293216df4656dee5081eb2a95b0fd1e8f1e450ae134af180be894f3}{max\_pages}}\};}
+\DoxyCodeLine{00050\ \ \ \ \mbox{\hyperlink{namespacestd_abb7e41c7063536ff6eeee4bb5f66de6c}{std::swap}}(mapbase,\ new\_memory.mapbase);}
+\DoxyCodeLine{00051\ \ \ \ \mbox{\hyperlink{namespacestd_abb7e41c7063536ff6eeee4bb5f66de6c}{std::swap}}(mapsize,\ new\_memory.mapsize);}
+\DoxyCodeLine{00052\ \ \ \ \mbox{\hyperlink{namespacestd_abb7e41c7063536ff6eeee4bb5f66de6c}{std::swap}}(zeropage\_base,\ new\_memory.zeropage\_base);}
+\DoxyCodeLine{00053\ \ \ \ \mbox{\hyperlink{namespacestd_abb7e41c7063536ff6eeee4bb5f66de6c}{std::swap}}(fullpage\_base,\ new\_memory.fullpage\_base);}
+\DoxyCodeLine{00054\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1eosvmoc_1_1memory_aa335f7f165983f34b047eae68394d2d0_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1eosvmoc_1_1memory_adb637213cf176be1b6f37dabd9123267}\index{sysio::chain::eosvmoc::memory@{sysio::chain::eosvmoc::memory}!size\_of\_memory\_slice\_mapping@{size\_of\_memory\_slice\_mapping}}
+\index{size\_of\_memory\_slice\_mapping@{size\_of\_memory\_slice\_mapping}!sysio::chain::eosvmoc::memory@{sysio::chain::eosvmoc::memory}}
+\doxysubsubsection{\texorpdfstring{size\_of\_memory\_slice\_mapping()}{size\_of\_memory\_slice\_mapping()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1eosvmoc_1_1memory_adb637213cf176be1b6f37dabd9123267} 
+size\+\_\+t sysio\+::chain\+::eosvmoc\+::memory\+::size\+\_\+of\+\_\+memory\+\_\+slice\+\_\+mapping (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{chain_2include_2sysio_2chain_2webassembly_2sys-vm-oc_2memory_8hpp_source_l00040}{40}} of file \mbox{\hyperlink{chain_2include_2sysio_2chain_2webassembly_2sys-vm-oc_2memory_8hpp_source}{memory.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00040\ \{\ \textcolor{keywordflow}{return}\ mapsize;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1eosvmoc_1_1memory_adb637213cf176be1b6f37dabd9123267_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1eosvmoc_1_1memory_a744f68f87731fdb93062f5120dc21c22}\index{sysio::chain::eosvmoc::memory@{sysio::chain::eosvmoc::memory}!start\_of\_memory\_slices@{start\_of\_memory\_slices}}
+\index{start\_of\_memory\_slices@{start\_of\_memory\_slices}!sysio::chain::eosvmoc::memory@{sysio::chain::eosvmoc::memory}}
+\doxysubsubsection{\texorpdfstring{start\_of\_memory\_slices()}{start\_of\_memory\_slices()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1eosvmoc_1_1memory_a744f68f87731fdb93062f5120dc21c22} 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}const sysio\+::chain\+::eosvmoc\+::memory\+::start\+\_\+of\+\_\+memory\+\_\+slices (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{chain_2include_2sysio_2chain_2webassembly_2sys-vm-oc_2memory_8hpp_source_l00039}{39}} of file \mbox{\hyperlink{chain_2include_2sysio_2chain_2webassembly_2sys-vm-oc_2memory_8hpp_source}{memory.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00039\ \{\ \textcolor{keywordflow}{return}\ mapbase;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1eosvmoc_1_1memory_a744f68f87731fdb93062f5120dc21c22_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1eosvmoc_1_1memory_a71fda3a290693273210726cd4cd15acf}\index{sysio::chain::eosvmoc::memory@{sysio::chain::eosvmoc::memory}!zero\_page\_memory\_base@{zero\_page\_memory\_base}}
+\index{zero\_page\_memory\_base@{zero\_page\_memory\_base}!sysio::chain::eosvmoc::memory@{sysio::chain::eosvmoc::memory}}
+\doxysubsubsection{\texorpdfstring{zero\_page\_memory\_base()}{zero\_page\_memory\_base()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1eosvmoc_1_1memory_a71fda3a290693273210726cd4cd15acf} 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}const sysio\+::chain\+::eosvmoc\+::memory\+::zero\+\_\+page\+\_\+memory\+\_\+base (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{chain_2include_2sysio_2chain_2webassembly_2sys-vm-oc_2memory_8hpp_source_l00033}{33}} of file \mbox{\hyperlink{chain_2include_2sysio_2chain_2webassembly_2sys-vm-oc_2memory_8hpp_source}{memory.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00033\ \{\ \textcolor{keywordflow}{return}\ zeropage\_base;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1eosvmoc_1_1memory_a71fda3a290693273210726cd4cd15acf_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classsysio_1_1chain_1_1eosvmoc_1_1memory_a74ea75f2c5e285a08e86d4f82bfaf3bb}\index{sysio::chain::eosvmoc::memory@{sysio::chain::eosvmoc::memory}!cb\_offset@{cb\_offset}}
+\index{cb\_offset@{cb\_offset}!sysio::chain::eosvmoc::memory@{sysio::chain::eosvmoc::memory}}
+\doxysubsubsection{\texorpdfstring{cb\_offset}{cb\_offset}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1eosvmoc_1_1memory_a74ea75f2c5e285a08e86d4f82bfaf3bb} 
+\mbox{\hyperlink{stdint_8h_a31b85deecb45924320becd11d3ee16ce}{uintptr\+\_\+t}} sysio\+::chain\+::eosvmoc\+::memory\+::cb\+\_\+offset = wcb\+\_\+allowance + mutable\+\_\+global\+\_\+size + table\+\_\+size\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{chain_2include_2sysio_2chain_2webassembly_2sys-vm-oc_2memory_8hpp_source_l00048}{48}} of file \mbox{\hyperlink{chain_2include_2sysio_2chain_2webassembly_2sys-vm-oc_2memory_8hpp_source}{memory.\+hpp}}.
+
+\Hypertarget{classsysio_1_1chain_1_1eosvmoc_1_1memory_a3ca9186ab4cbb5e78898f09b3b4ef349}\index{sysio::chain::eosvmoc::memory@{sysio::chain::eosvmoc::memory}!first\_intrinsic\_offset@{first\_intrinsic\_offset}}
+\index{first\_intrinsic\_offset@{first\_intrinsic\_offset}!sysio::chain::eosvmoc::memory@{sysio::chain::eosvmoc::memory}}
+\doxysubsubsection{\texorpdfstring{first\_intrinsic\_offset}{first\_intrinsic\_offset}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1eosvmoc_1_1memory_a3ca9186ab4cbb5e78898f09b3b4ef349} 
+\mbox{\hyperlink{stdint_8h_a31b85deecb45924320becd11d3ee16ce}{uintptr\+\_\+t}} sysio\+::chain\+::eosvmoc\+::memory\+::first\+\_\+intrinsic\+\_\+offset = \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1memory_a74ea75f2c5e285a08e86d4f82bfaf3bb}{cb\+\_\+offset}} + 8u\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{chain_2include_2sysio_2chain_2webassembly_2sys-vm-oc_2memory_8hpp_source_l00049}{49}} of file \mbox{\hyperlink{chain_2include_2sysio_2chain_2webassembly_2sys-vm-oc_2memory_8hpp_source}{memory.\+hpp}}.
+
+\Hypertarget{classsysio_1_1chain_1_1eosvmoc_1_1memory_ab1b2f0d87e3ffc25a5a6d73473157bd9}\index{sysio::chain::eosvmoc::memory@{sysio::chain::eosvmoc::memory}!linear\_memory@{linear\_memory}}
+\index{linear\_memory@{linear\_memory}!sysio::chain::eosvmoc::memory@{sysio::chain::eosvmoc::memory}}
+\doxysubsubsection{\texorpdfstring{linear\_memory}{linear\_memory}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1eosvmoc_1_1memory_ab1b2f0d87e3ffc25a5a6d73473157bd9} 
+\mbox{\hyperlink{stdint_8h_a31b85deecb45924320becd11d3ee16ce}{uintptr\+\_\+t}} sysio\+::chain\+::eosvmoc\+::memory\+::linear\+\_\+memory = 0\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{chain_2include_2sysio_2chain_2webassembly_2sys-vm-oc_2memory_8hpp_source_l00047}{47}} of file \mbox{\hyperlink{chain_2include_2sysio_2chain_2webassembly_2sys-vm-oc_2memory_8hpp_source}{memory.\+hpp}}.
+
+\Hypertarget{classsysio_1_1chain_1_1eosvmoc_1_1memory_aead91f2e971a46b02e86b9ed36f0e9b0}\index{sysio::chain::eosvmoc::memory@{sysio::chain::eosvmoc::memory}!max\_prologue\_size@{max\_prologue\_size}}
+\index{max\_prologue\_size@{max\_prologue\_size}!sysio::chain::eosvmoc::memory@{sysio::chain::eosvmoc::memory}}
+\doxysubsubsection{\texorpdfstring{max\_prologue\_size}{max\_prologue\_size}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1eosvmoc_1_1memory_aead91f2e971a46b02e86b9ed36f0e9b0} 
+\mbox{\hyperlink{stdint_8h_a31b85deecb45924320becd11d3ee16ce}{uintptr\+\_\+t}} sysio\+::chain\+::eosvmoc\+::memory\+::max\+\_\+prologue\+\_\+size = mutable\+\_\+global\+\_\+size + table\+\_\+size\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{chain_2include_2sysio_2chain_2webassembly_2sys-vm-oc_2memory_8hpp_source_l00051}{51}} of file \mbox{\hyperlink{chain_2include_2sysio_2chain_2webassembly_2sys-vm-oc_2memory_8hpp_source}{memory.\+hpp}}.
+
+\Hypertarget{classsysio_1_1chain_1_1eosvmoc_1_1memory_a08924e50e0bd949e51e87ed562d57178}\index{sysio::chain::eosvmoc::memory@{sysio::chain::eosvmoc::memory}!stride@{stride}}
+\index{stride@{stride}!sysio::chain::eosvmoc::memory@{sysio::chain::eosvmoc::memory}}
+\doxysubsubsection{\texorpdfstring{stride}{stride}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1eosvmoc_1_1memory_a08924e50e0bd949e51e87ed562d57178} 
+size\+\_\+t sysio\+::chain\+::eosvmoc\+::memory\+::stride = total\+\_\+memory\+\_\+per\+\_\+slice\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{chain_2include_2sysio_2chain_2webassembly_2sys-vm-oc_2memory_8hpp_source_l00044}{44}} of file \mbox{\hyperlink{chain_2include_2sysio_2chain_2webassembly_2sys-vm-oc_2memory_8hpp_source}{memory.\+hpp}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/webassembly/sys-\/vm-\/oc/\mbox{\hyperlink{chain_2include_2sysio_2chain_2webassembly_2sys-vm-oc_2memory_8hpp}{memory.\+hpp}}\item 
+libraries/chain/webassembly/runtimes/sys-\/vm-\/oc/\mbox{\hyperlink{runtimes_2sys-vm-oc_2memory_8cpp}{memory.\+cpp}}\end{DoxyCompactItemize}

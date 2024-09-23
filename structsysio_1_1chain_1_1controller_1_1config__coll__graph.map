@@ -1,0 +1,13 @@
+<map id="sysio::chain::controller::config" name="sysio::chain::controller::config">
+<area shape="rect" id="Node000001" title=" " alt="" coords="380,231,532,272"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="8,88,155,129"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="171,120,262,142,310,158,357,177,398,202,433,228,430,233,395,206,354,182,309,163,261,147,169,125"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="10,153,153,209"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="169,194,356,229,380,233,379,239,355,234,168,199"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="16,232,147,273"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="163,250,380,249,380,254,163,255"/>
+<area shape="rect" id="Node000005" href="$classfc_1_1path.html" title="wraps boost::filesystem::path to provide platform independent path manipulation." alt="" coords="49,300,114,326"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="130,310,234,304,295,296,355,285,405,270,407,275,356,291,296,302,234,309,130,315"/>
+<area shape="rect" id="Node000006" href="$structsysio_1_1chain_1_1eosvmoc_1_1config.html" title=" " alt="" coords="5,350,158,390"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="173,366,263,355,310,344,355,328,399,301,433,270,437,274,402,305,357,333,311,349,264,360,173,371"/>
+</map>

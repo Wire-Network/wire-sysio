@@ -1,0 +1,228 @@
+\doxysection{My\+String Class Reference}
+\hypertarget{class_my_string}{}\label{class_my_string}\index{MyString@{MyString}}
+
+
+{\ttfamily \#include $<$sample2.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_my_string_a1cb17852b83614394b59720779c5f918}{My\+String}} ()
+\item 
+\mbox{\hyperlink{class_my_string_a28134eb91b6698f46b12accefa157d0f}{My\+String}} (const char \texorpdfstring{$\ast$}{*}a\+\_\+c\+\_\+string)
+\item 
+\mbox{\hyperlink{class_my_string_ae24c7cf89a58dd2287303df2ac054c66}{My\+String}} (const \mbox{\hyperlink{class_my_string}{My\+String}} \&string)
+\item 
+\mbox{\hyperlink{class_my_string_a7bee4fe8ad82a0b7b8f65b02054b156b}{\texorpdfstring{$\sim$}{\string~}\+My\+String}} ()
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_my_string_a9aaa3c66a6f423219d7a9449699a30e8}{c\+\_\+string}} () const
+\item 
+size\+\_\+t \mbox{\hyperlink{class_my_string_a4eb168b1ec401a732b3859abe004d648}{Length}} () const
+\item 
+void \mbox{\hyperlink{class_my_string_a521c4cd7eccac6ce554d8a51505e4970}{Set}} (const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{class_my_string_a9aaa3c66a6f423219d7a9449699a30e8}{c\+\_\+string}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_my_string_a40753dcfa3314a8993f32bdd75d67ce2}{Clone\+CString}} (const char \texorpdfstring{$\ast$}{*}a\+\_\+c\+\_\+string)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{sample2_8h_source_l00041}{41}} of file \mbox{\hyperlink{sample2_8h_source}{sample2.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_my_string_a1cb17852b83614394b59720779c5f918}\index{MyString@{MyString}!MyString@{MyString}}
+\index{MyString@{MyString}!MyString@{MyString}}
+\doxysubsubsection{\texorpdfstring{MyString()}{MyString()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{class_my_string_a1cb17852b83614394b59720779c5f918} 
+My\+String\+::\+My\+String (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sample2_8h_source_l00055}{55}} of file \mbox{\hyperlink{sample2_8h_source}{sample2.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00055\ :\ c\_string\_(NULL)\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{class_my_string_a28134eb91b6698f46b12accefa157d0f}\index{MyString@{MyString}!MyString@{MyString}}
+\index{MyString@{MyString}!MyString@{MyString}}
+\doxysubsubsection{\texorpdfstring{MyString()}{MyString()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{class_my_string_a28134eb91b6698f46b12accefa157d0f} 
+My\+String\+::\+My\+String (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{a\+\_\+c\+\_\+string}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{sample2_8h_source_l00058}{58}} of file \mbox{\hyperlink{sample2_8h_source}{sample2.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ c\_string\_(NULL)\ \{}
+\DoxyCodeLine{00059\ \ \ \ \ \mbox{\hyperlink{class_my_string_a521c4cd7eccac6ce554d8a51505e4970}{Set}}(a\_c\_string);}
+\DoxyCodeLine{00060\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_my_string_a28134eb91b6698f46b12accefa157d0f_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_my_string_ae24c7cf89a58dd2287303df2ac054c66}\index{MyString@{MyString}!MyString@{MyString}}
+\index{MyString@{MyString}!MyString@{MyString}}
+\doxysubsubsection{\texorpdfstring{MyString()}{MyString()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{class_my_string_ae24c7cf89a58dd2287303df2ac054c66} 
+My\+String\+::\+My\+String (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_my_string}{My\+String}} \&}]{string}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sample2_8h_source_l00063}{63}} of file \mbox{\hyperlink{sample2_8h_source}{sample2.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ c\_string\_(NULL)\ \{}
+\DoxyCodeLine{00064\ \ \ \ \ \mbox{\hyperlink{class_my_string_a521c4cd7eccac6ce554d8a51505e4970}{Set}}(\textcolor{keywordtype}{string}.c\_string\_);}
+\DoxyCodeLine{00065\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_my_string_ae24c7cf89a58dd2287303df2ac054c66_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_my_string_a7bee4fe8ad82a0b7b8f65b02054b156b}\index{MyString@{MyString}!````~MyString@{\texorpdfstring{$\sim$}{\string~}MyString}}
+\index{````~MyString@{\texorpdfstring{$\sim$}{\string~}MyString}!MyString@{MyString}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}MyString()}{\string~MyString()}}
+{\footnotesize\ttfamily \label{class_my_string_a7bee4fe8ad82a0b7b8f65b02054b156b} 
+My\+String\+::\texorpdfstring{$\sim$}{\string~}\+My\+String (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sample2_8h_source_l00071}{71}} of file \mbox{\hyperlink{sample2_8h_source}{sample2.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00071\ \{\ \textcolor{keyword}{delete}[]\ c\_string\_;\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_my_string_a9aaa3c66a6f423219d7a9449699a30e8}\index{MyString@{MyString}!c\_string@{c\_string}}
+\index{c\_string@{c\_string}!MyString@{MyString}}
+\doxysubsubsection{\texorpdfstring{c\_string()}{c\_string()}}
+{\footnotesize\ttfamily \label{class_my_string_a9aaa3c66a6f423219d7a9449699a30e8} 
+const char \texorpdfstring{$\ast$}{*} My\+String\+::c\+\_\+string (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sample2_8h_source_l00074}{74}} of file \mbox{\hyperlink{sample2_8h_source}{sample2.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00074\ \{\ \textcolor{keywordflow}{return}\ c\_string\_;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_my_string_a40753dcfa3314a8993f32bdd75d67ce2}\index{MyString@{MyString}!CloneCString@{CloneCString}}
+\index{CloneCString@{CloneCString}!MyString@{MyString}}
+\doxysubsubsection{\texorpdfstring{CloneCString()}{CloneCString()}}
+{\footnotesize\ttfamily \label{class_my_string_a40753dcfa3314a8993f32bdd75d67ce2} 
+const char \texorpdfstring{$\ast$}{*} My\+String\+::\+Clone\+CString (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{a\+\_\+c\+\_\+string}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{sample2_8cc_source_l00039}{39}} of file \mbox{\hyperlink{sample2_8cc_source}{sample2.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00040\ \ \ \textcolor{keywordflow}{if}\ (a\_c\_string\ ==\ NULL)\ \textcolor{keywordflow}{return}\ NULL;}
+\DoxyCodeLine{00041\ }
+\DoxyCodeLine{00042\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ =\ strlen(a\_c\_string);}
+\DoxyCodeLine{00043\ \ \ \textcolor{keywordtype}{char}*\ \textcolor{keyword}{const}\ clone\ =\ \textcolor{keyword}{new}\ \textcolor{keywordtype}{char}[\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ +\ 1\ ];}
+\DoxyCodeLine{00044\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(clone,\ a\_c\_string,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ +\ 1);}
+\DoxyCodeLine{00045\ }
+\DoxyCodeLine{00046\ \ \ \textcolor{keywordflow}{return}\ clone;}
+\DoxyCodeLine{00047\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=289pt]{class_my_string_a40753dcfa3314a8993f32bdd75d67ce2_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_my_string_a40753dcfa3314a8993f32bdd75d67ce2_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_my_string_a4eb168b1ec401a732b3859abe004d648}\index{MyString@{MyString}!Length@{Length}}
+\index{Length@{Length}!MyString@{MyString}}
+\doxysubsubsection{\texorpdfstring{Length()}{Length()}}
+{\footnotesize\ttfamily \label{class_my_string_a4eb168b1ec401a732b3859abe004d648} 
+size\+\_\+t My\+String\+::\+Length (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sample2_8h_source_l00076}{76}} of file \mbox{\hyperlink{sample2_8h_source}{sample2.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00077\ \ \ \ \ \textcolor{keywordflow}{return}\ c\_string\_\ ==\ NULL\ ?\ 0\ :\ strlen(c\_string\_);}
+\DoxyCodeLine{00078\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_my_string_a521c4cd7eccac6ce554d8a51505e4970}\index{MyString@{MyString}!Set@{Set}}
+\index{Set@{Set}!MyString@{MyString}}
+\doxysubsubsection{\texorpdfstring{Set()}{Set()}}
+{\footnotesize\ttfamily \label{class_my_string_a521c4cd7eccac6ce554d8a51505e4970} 
+void My\+String\+::\+Set (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{c\+\_\+string}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sample2_8cc_source_l00051}{51}} of file \mbox{\hyperlink{sample2_8cc_source}{sample2.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00052\ \ \ \textcolor{comment}{//\ Makes\ sure\ this\ works\ when\ c\_string\ ==\ c\_string\_}}
+\DoxyCodeLine{00053\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \textcolor{keyword}{const}\ temp\ =\ \mbox{\hyperlink{class_my_string_a40753dcfa3314a8993f32bdd75d67ce2}{MyString::CloneCString}}(a\_c\_string);}
+\DoxyCodeLine{00054\ \ \ \textcolor{keyword}{delete}[]\ c\_string\_;}
+\DoxyCodeLine{00055\ \ \ c\_string\_\ =\ temp;}
+\DoxyCodeLine{00056\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_my_string_a521c4cd7eccac6ce554d8a51505e4970_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=292pt]{class_my_string_a521c4cd7eccac6ce554d8a51505e4970_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/samples/\mbox{\hyperlink{sample2_8h}{sample2.\+h}}\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/samples/\mbox{\hyperlink{sample2_8cc}{sample2.\+cc}}\end{DoxyCompactItemize}

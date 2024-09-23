@@ -1,0 +1,361 @@
+\doxysection{libraries/fc/include/fc/crypto/webauthn\+\_\+json/test/unittest/simdtest.cpp File Reference}
+\hypertarget{simdtest_8cpp}{}\label{simdtest_8cpp}\index{libraries/fc/include/fc/crypto/webauthn\_json/test/unittest/simdtest.cpp@{libraries/fc/include/fc/crypto/webauthn\_json/test/unittest/simdtest.cpp}}
+{\ttfamily \#include "{}unittest.\+h"{}}\newline
+{\ttfamily \#include "{}rapidjson/reader.\+h"{}}\newline
+{\ttfamily \#include "{}rapidjson/writer.\+h"{}}\newline
+Include dependency graph for simdtest.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{simdtest_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_scan_copy_unescaped_string_handler}{Scan\+Copy\+Unescaped\+String\+Handler}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{simdtest_8cpp_a743a79d3af927391fe3eb5c979136899}{RAPIDJSON\+\_\+\+NAMESPACE}}~rapidjson\+\_\+simd
+\item 
+\#define \mbox{\hyperlink{simdtest_8cpp_acdeb8bf1a2cf8ab5b4b520fdcf470958}{SIMD\+\_\+\+SUFFIX}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename Stream\+Type $>$ }\\void \mbox{\hyperlink{simdtest_8cpp_acffa70e0843e659bf15f93b26438bd38}{Test\+Skip\+Whitespace}} ()
+\item 
+\mbox{\hyperlink{simdtest_8cpp_a69700a632cac6acde801291ebe1b29c9}{TEST}} (SIMD, \mbox{\hyperlink{rapidjsontest_8cpp_acdeb8bf1a2cf8ab5b4b520fdcf470958}{SIMD\+\_\+\+SUFFIX}}(\mbox{\hyperlink{reader_8h_a60338858b2582eca23f3e509a2d82e0e}{Skip\+Whitespace}}))
+\item 
+\mbox{\hyperlink{simdtest_8cpp_ae7f0aedb98729c597500fa9df393dd15}{TEST}} (SIMD, \mbox{\hyperlink{rapidjsontest_8cpp_acdeb8bf1a2cf8ab5b4b520fdcf470958}{SIMD\+\_\+\+SUFFIX}}(Skip\+Whitespace\+\_\+\+Encoded\+Memory\+Stream))
+\item 
+{\footnotesize template$<$unsigned parse\+Flags, typename Stream\+Type $>$ }\\void \mbox{\hyperlink{simdtest_8cpp_a8bf5cd18d3ffd67114cbad66c2028559}{Test\+Scan\+Copy\+Unescaped\+String}} ()
+\item 
+\mbox{\hyperlink{simdtest_8cpp_a299c3f93bf758b2a5071da8b0e5d96f5}{TEST}} (SIMD, \mbox{\hyperlink{rapidjsontest_8cpp_acdeb8bf1a2cf8ab5b4b520fdcf470958}{SIMD\+\_\+\+SUFFIX}}(Scan\+Copy\+Unescaped\+String))
+\item 
+\mbox{\hyperlink{simdtest_8cpp_ae2f2b96b160c5836119ccab4286da2ea}{TEST}} (SIMD, \mbox{\hyperlink{rapidjsontest_8cpp_acdeb8bf1a2cf8ab5b4b520fdcf470958}{SIMD\+\_\+\+SUFFIX}}(Scan\+Write\+Unescaped\+String))
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{simdtest_8cpp_a743a79d3af927391fe3eb5c979136899}\index{simdtest.cpp@{simdtest.cpp}!RAPIDJSON\_NAMESPACE@{RAPIDJSON\_NAMESPACE}}
+\index{RAPIDJSON\_NAMESPACE@{RAPIDJSON\_NAMESPACE}!simdtest.cpp@{simdtest.cpp}}
+\doxysubsubsection{\texorpdfstring{RAPIDJSON\_NAMESPACE}{RAPIDJSON\_NAMESPACE}}
+{\footnotesize\ttfamily \label{simdtest_8cpp_a743a79d3af927391fe3eb5c979136899} 
+\#define RAPIDJSON\+\_\+\+NAMESPACE~rapidjson\+\_\+simd}
+
+
+
+Definition at line \mbox{\hyperlink{simdtest_8cpp_source_l00028}{28}} of file \mbox{\hyperlink{simdtest_8cpp_source}{simdtest.\+cpp}}.
+
+\Hypertarget{simdtest_8cpp_acdeb8bf1a2cf8ab5b4b520fdcf470958}\index{simdtest.cpp@{simdtest.cpp}!SIMD\_SUFFIX@{SIMD\_SUFFIX}}
+\index{SIMD\_SUFFIX@{SIMD\_SUFFIX}!simdtest.cpp@{simdtest.cpp}}
+\doxysubsubsection{\texorpdfstring{SIMD\_SUFFIX}{SIMD\_SUFFIX}}
+{\footnotesize\ttfamily \label{simdtest_8cpp_acdeb8bf1a2cf8ab5b4b520fdcf470958} 
+\#define SIMD\+\_\+\+SUFFIX(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{simdtest_8cpp_source_l00049}{49}} of file \mbox{\hyperlink{simdtest_8cpp_source}{simdtest.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{simdtest_8cpp_a299c3f93bf758b2a5071da8b0e5d96f5}\index{simdtest.cpp@{simdtest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!simdtest.cpp@{simdtest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{simdtest_8cpp_a299c3f93bf758b2a5071da8b0e5d96f5} 
+TEST (\begin{DoxyParamCaption}\item[{SIMD}]{}{, }\item[{\mbox{\hyperlink{rapidjsontest_8cpp_acdeb8bf1a2cf8ab5b4b520fdcf470958}{SIMD\+\_\+\+SUFFIX}}(Scan\+Copy\+Unescaped\+String)}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{simdtest_8cpp_source_l00164}{164}} of file \mbox{\hyperlink{simdtest_8cpp_source}{simdtest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00165\ \ \ \ \ \mbox{\hyperlink{simdtest_8cpp_a8bf5cd18d3ffd67114cbad66c2028559}{TestScanCopyUnescapedString<kParseDefaultFlags,\ StringStream>}}();}
+\DoxyCodeLine{00166\ \ \ \ \ \mbox{\hyperlink{simdtest_8cpp_a8bf5cd18d3ffd67114cbad66c2028559}{TestScanCopyUnescapedString<kParseInsituFlag,\ InsituStringStream>}}();}
+\DoxyCodeLine{00167\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{simdtest_8cpp_a299c3f93bf758b2a5071da8b0e5d96f5_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{simdtest_8cpp_ae2f2b96b160c5836119ccab4286da2ea}\index{simdtest.cpp@{simdtest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!simdtest.cpp@{simdtest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{simdtest_8cpp_ae2f2b96b160c5836119ccab4286da2ea} 
+TEST (\begin{DoxyParamCaption}\item[{SIMD}]{}{, }\item[{\mbox{\hyperlink{rapidjsontest_8cpp_acdeb8bf1a2cf8ab5b4b520fdcf470958}{SIMD\+\_\+\+SUFFIX}}(Scan\+Write\+Unescaped\+String)}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{simdtest_8cpp_source_l00169}{169}} of file \mbox{\hyperlink{simdtest_8cpp_source}{simdtest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00170\ \ \ \ \ \textcolor{keywordtype}{char}\ buffer[2048\ +\ 1\ +\ 32];}
+\DoxyCodeLine{00171\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ offset\ =\ 0;\ offset\ <\ 32;\ offset++)\ \{}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ step\ =\ 0;\ step\ <\ 1024;\ step++)\ \{}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ =\ buffer\ +\ offset;}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ step;\ i++)}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}++\ =\ \textcolor{stringliteral}{"{}ABCD"{}}[i\ \%\ 4];}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ escape\ =\ \textcolor{stringliteral}{"{}\(\backslash\)0\(\backslash\)n\(\backslash\)\(\backslash\)\(\backslash\)"{}"{}}[step\ \%\ 4];}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \ \ \ \ *\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}++\ =\ escape;}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ step;\ i++)}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}++\ =\ \textcolor{stringliteral}{"{}ABCD"{}}[i\ \%\ 4];}
+\DoxyCodeLine{00181\ }
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_string_buffer}{StringBuffer}}\ sb;}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_writer}{Writer<StringBuffer>}}\ writer(sb);}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ \ \ \ \ writer.String(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}(step\ *\ 2\ +\ 1));}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ q\ =\ sb.\mbox{\hyperlink{class_generic_string_buffer_a42079865bab1deb930c6cff7d491c719}{GetString}}();}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\textcolor{charliteral}{'\(\backslash\)"{}'},\ *q++);}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ step;\ i++)}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\textcolor{stringliteral}{"{}ABCD"{}}[i\ \%\ 4],\ *q++);}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (escape\ ==\ \textcolor{charliteral}{'\(\backslash\)0'})\ \{}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\textcolor{charliteral}{'\(\backslash\)\(\backslash\)'},\ *q++);}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\textcolor{charliteral}{'u'},\ *q++);}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\textcolor{charliteral}{'0'},\ *q++);}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\textcolor{charliteral}{'0'},\ *q++);}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\textcolor{charliteral}{'0'},\ *q++);}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\textcolor{charliteral}{'0'},\ *q++);}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (escape\ ==\ \textcolor{charliteral}{'\(\backslash\)n'})\ \{}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\textcolor{charliteral}{'\(\backslash\)\(\backslash\)'},\ *q++);}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\textcolor{charliteral}{'n'},\ *q++);}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (escape\ ==\ \textcolor{charliteral}{'\(\backslash\)\(\backslash\)'})\ \{}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\textcolor{charliteral}{'\(\backslash\)\(\backslash\)'},\ *q++);}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\textcolor{charliteral}{'\(\backslash\)\(\backslash\)'},\ *q++);}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (escape\ ==\ \textcolor{charliteral}{'\(\backslash\)"{}'})\ \{}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\textcolor{charliteral}{'\(\backslash\)\(\backslash\)'},\ *q++);}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\textcolor{charliteral}{'\(\backslash\)"{}'},\ *q++);}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ step;\ i++)}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\textcolor{stringliteral}{"{}ABCD"{}}[i\ \%\ 4],\ *q++);}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\textcolor{charliteral}{'\(\backslash\)"{}'},\ *q++);}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\textcolor{charliteral}{'\(\backslash\)0'},\ *q++);}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00214\ \ \ \ \ \}}
+\DoxyCodeLine{00215\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{simdtest_8cpp_ae2f2b96b160c5836119ccab4286da2ea_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{simdtest_8cpp_a69700a632cac6acde801291ebe1b29c9}\index{simdtest.cpp@{simdtest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!simdtest.cpp@{simdtest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{simdtest_8cpp_a69700a632cac6acde801291ebe1b29c9} 
+TEST (\begin{DoxyParamCaption}\item[{SIMD}]{}{, }\item[{\mbox{\hyperlink{rapidjsontest_8cpp_acdeb8bf1a2cf8ab5b4b520fdcf470958}{SIMD\+\_\+\+SUFFIX}}(\mbox{\hyperlink{reader_8h_a60338858b2582eca23f3e509a2d82e0e}{Skip\+Whitespace}})}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{simdtest_8cpp_source_l00075}{75}} of file \mbox{\hyperlink{simdtest_8cpp_source}{simdtest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00076\ \ \ \ \ \mbox{\hyperlink{simdtest_8cpp_acffa70e0843e659bf15f93b26438bd38}{TestSkipWhitespace<StringStream>}}();}
+\DoxyCodeLine{00077\ \ \ \ \ \mbox{\hyperlink{simdtest_8cpp_acffa70e0843e659bf15f93b26438bd38}{TestSkipWhitespace<InsituStringStream>}}();}
+\DoxyCodeLine{00078\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{simdtest_8cpp_a69700a632cac6acde801291ebe1b29c9_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{simdtest_8cpp_ae7f0aedb98729c597500fa9df393dd15}\index{simdtest.cpp@{simdtest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!simdtest.cpp@{simdtest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{simdtest_8cpp_ae7f0aedb98729c597500fa9df393dd15} 
+TEST (\begin{DoxyParamCaption}\item[{SIMD}]{}{, }\item[{\mbox{\hyperlink{rapidjsontest_8cpp_acdeb8bf1a2cf8ab5b4b520fdcf470958}{SIMD\+\_\+\+SUFFIX}}(Skip\+Whitespace\+\_\+\+Encoded\+Memory\+Stream)}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{simdtest_8cpp_source_l00080}{80}} of file \mbox{\hyperlink{simdtest_8cpp_source}{simdtest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00081\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ step\ =\ 1;\ step\ <\ 32;\ step++)\ \{}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ buffer[1024];}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ 1024;\ i++)}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \ \ \ buffer[i]\ =\ \textcolor{stringliteral}{"{}\ \(\backslash\)t\(\backslash\)r\(\backslash\)n"{}}[i\ \%\ 4];}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ 1024;\ i\ +=\ step)}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \ \ \ \ buffer[i]\ =\ \textcolor{charliteral}{'X'};}
+\DoxyCodeLine{00087\ }
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_memory_stream}{MemoryStream}}\ ms(buffer,\ 1024);}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_encoded_input_stream}{EncodedInputStream<UTF8<>}},\ \mbox{\hyperlink{struct_memory_stream}{MemoryStream}}>\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}(ms);}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ i\ =\ 0;}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (;;)\ \{}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{reader_8h_a60338858b2582eca23f3e509a2d82e0e}{SkipWhitespace}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.Peek()\ ==\ \textcolor{charliteral}{'\(\backslash\)0'})}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//EXPECT\_EQ(i,\ s.Tell());}}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\textcolor{charliteral}{'X'},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.Take());}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \ \ \ i\ +=\ step;}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00099\ \ \ \ \ \}}
+\DoxyCodeLine{00100\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=245pt]{simdtest_8cpp_ae7f0aedb98729c597500fa9df393dd15_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{simdtest_8cpp_a8bf5cd18d3ffd67114cbad66c2028559}\index{simdtest.cpp@{simdtest.cpp}!TestScanCopyUnescapedString@{TestScanCopyUnescapedString}}
+\index{TestScanCopyUnescapedString@{TestScanCopyUnescapedString}!simdtest.cpp@{simdtest.cpp}}
+\doxysubsubsection{\texorpdfstring{TestScanCopyUnescapedString()}{TestScanCopyUnescapedString()}}
+{\footnotesize\ttfamily \label{simdtest_8cpp_a8bf5cd18d3ffd67114cbad66c2028559} 
+template$<$unsigned parse\+Flags, typename Stream\+Type $>$ \\
+void Test\+Scan\+Copy\+Unescaped\+String (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{simdtest_8cpp_source_l00111}{111}} of file \mbox{\hyperlink{simdtest_8cpp_source}{simdtest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00112\ \ \ \ \ \textcolor{keywordtype}{char}\ buffer[1024u\ +\ 5\ +\ 32];}
+\DoxyCodeLine{00113\ \ \ \ \ \textcolor{keywordtype}{char}\ backup[1024u\ +\ 5\ +\ 32];}
+\DoxyCodeLine{00114\ }
+\DoxyCodeLine{00115\ \ \ \ \ \textcolor{comment}{//\ Test\ "{}ABCDABCD...\(\backslash\)\(\backslash\)"{}}}
+\DoxyCodeLine{00116\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ offset\ =\ 0;\ offset\ <\ 32;\ offset++)\ \{}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ step\ =\ 0;\ step\ <\ 1024;\ step++)\ \{}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}*\ json\ =\ buffer\ +\ offset;}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ json;}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ \ \ \ *\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}++\ =\ \textcolor{charliteral}{'\(\backslash\)"{}'};}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ step;\ i++)}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}++\ =\ \textcolor{stringliteral}{"{}ABCD"{}}[i\ \%\ 4];}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \ \ \ \ *\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}++\ =\ \textcolor{charliteral}{'\(\backslash\)\(\backslash\)'};}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \ \ \ \ *\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}++\ =\ \textcolor{charliteral}{'\(\backslash\)\(\backslash\)'};}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \ \ \ \ *\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}++\ =\ \textcolor{charliteral}{'\(\backslash\)"{}'};}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \ \ \ *\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}++\ =\ \textcolor{charliteral}{'\(\backslash\)0'};}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \ \ \ \ strcpy(backup,\ json);\ \textcolor{comment}{//\ insitu\ parsing\ will\ overwrite\ buffer,\ so\ need\ to\ backup\ first}}
+\DoxyCodeLine{00128\ }
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \ \ \ StreamType\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}(json);}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_reader}{Reader}}\ reader;}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_scan_copy_unescaped_string_handler}{ScanCopyUnescapedStringHandler}}\ h;}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \ \ \ reader.\mbox{\hyperlink{class_generic_reader_a0c450620d14ff1824e58bb7bd9b42099}{Parse}}<parseFlags>(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ h);}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(memcmp(h.\mbox{\hyperlink{struct_scan_copy_unescaped_string_handler_a8ae41ebb6b89eae12b71d5fc33a74559}{buffer}},\ backup\ +\ 1,\ step)\ ==\ 0);}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\textcolor{charliteral}{'\(\backslash\)\(\backslash\)'},\ h.\mbox{\hyperlink{struct_scan_copy_unescaped_string_handler_a8ae41ebb6b89eae12b71d5fc33a74559}{buffer}}[step]);\ \ \ \ \textcolor{comment}{//\ escaped}}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\textcolor{charliteral}{'\(\backslash\)0'},\ h.\mbox{\hyperlink{struct_scan_copy_unescaped_string_handler_a8ae41ebb6b89eae12b71d5fc33a74559}{buffer}}[step\ +\ 1]);}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00137\ \ \ \ \ \}}
+\DoxyCodeLine{00138\ }
+\DoxyCodeLine{00139\ \ \ \ \ \textcolor{comment}{//\ Test\ "{}\(\backslash\)\(\backslash\)ABCDABCD..."{}}}
+\DoxyCodeLine{00140\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ offset\ =\ 0;\ offset\ <\ 32;\ offset++)\ \{}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ step\ =\ 0;\ step\ <\ 1024;\ step++)\ \{}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}*\ json\ =\ buffer\ +\ offset;}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ json;}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ \ \ \ \ *\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}++\ =\ \textcolor{charliteral}{'\(\backslash\)"{}'};}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \ \ \ \ *\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}++\ =\ \textcolor{charliteral}{'\(\backslash\)\(\backslash\)'};}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \ \ \ \ *\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}++\ =\ \textcolor{charliteral}{'\(\backslash\)\(\backslash\)'};}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ step;\ i++)}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}++\ =\ \textcolor{stringliteral}{"{}ABCD"{}}[i\ \%\ 4];}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \ \ \ \ *\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}++\ =\ \textcolor{charliteral}{'\(\backslash\)"{}'};}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \ \ \ \ *\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}++\ =\ \textcolor{charliteral}{'\(\backslash\)0'};}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ \ \ \ \ strcpy(backup,\ json);\ \textcolor{comment}{//\ insitu\ parsing\ will\ overwrite\ buffer,\ so\ need\ to\ backup\ first}}
+\DoxyCodeLine{00152\ }
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \ \ \ \ StreamType\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}(json);}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_reader}{Reader}}\ reader;}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_scan_copy_unescaped_string_handler}{ScanCopyUnescapedStringHandler}}\ h;}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \ \ \ \ reader.\mbox{\hyperlink{class_generic_reader_a0c450620d14ff1824e58bb7bd9b42099}{Parse}}<parseFlags>(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ h);}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(memcmp(h.\mbox{\hyperlink{struct_scan_copy_unescaped_string_handler_a8ae41ebb6b89eae12b71d5fc33a74559}{buffer}}\ +\ 1,\ backup\ +\ 3,\ step)\ ==\ 0);}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\textcolor{charliteral}{'\(\backslash\)\(\backslash\)'},\ h.\mbox{\hyperlink{struct_scan_copy_unescaped_string_handler_a8ae41ebb6b89eae12b71d5fc33a74559}{buffer}}[0]);\ \ \ \ \textcolor{comment}{//\ escaped}}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\textcolor{charliteral}{'\(\backslash\)0'},\ h.\mbox{\hyperlink{struct_scan_copy_unescaped_string_handler_a8ae41ebb6b89eae12b71d5fc33a74559}{buffer}}[step\ +\ 1]);}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00161\ \ \ \ \ \}}
+\DoxyCodeLine{00162\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{simdtest_8cpp_a8bf5cd18d3ffd67114cbad66c2028559_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=313pt]{simdtest_8cpp_a8bf5cd18d3ffd67114cbad66c2028559_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{simdtest_8cpp_acffa70e0843e659bf15f93b26438bd38}\index{simdtest.cpp@{simdtest.cpp}!TestSkipWhitespace@{TestSkipWhitespace}}
+\index{TestSkipWhitespace@{TestSkipWhitespace}!simdtest.cpp@{simdtest.cpp}}
+\doxysubsubsection{\texorpdfstring{TestSkipWhitespace()}{TestSkipWhitespace()}}
+{\footnotesize\ttfamily \label{simdtest_8cpp_acffa70e0843e659bf15f93b26438bd38} 
+template$<$typename Stream\+Type $>$ \\
+void Test\+Skip\+Whitespace (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{simdtest_8cpp_source_l00053}{53}} of file \mbox{\hyperlink{simdtest_8cpp_source}{simdtest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00054\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ step\ =\ 1;\ step\ <\ 32;\ step++)\ \{}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ buffer[1025];}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ 1024;\ i++)}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ \ \ \ buffer[i]\ =\ \textcolor{stringliteral}{"{}\ \(\backslash\)t\(\backslash\)r\(\backslash\)n"{}}[i\ \%\ 4];}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ 1024;\ i\ +=\ step)}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ \ \ \ buffer[i]\ =\ \textcolor{charliteral}{'X'};}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ buffer[1024]\ =\ \textcolor{charliteral}{'\(\backslash\)0'};}
+\DoxyCodeLine{00061\ }
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ StreamType\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}(buffer);}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ i\ =\ 0;}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (;;)\ \{}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{reader_8h_a60338858b2582eca23f3e509a2d82e0e}{SkipWhitespace}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.Peek()\ ==\ \textcolor{charliteral}{'\(\backslash\)0'})}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(i,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.Tell());}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\textcolor{charliteral}{'X'},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.Take());}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \ \ \ i\ +=\ step;}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00072\ \ \ \ \ \}}
+\DoxyCodeLine{00073\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=309pt]{simdtest_8cpp_acffa70e0843e659bf15f93b26438bd38_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=264pt]{simdtest_8cpp_acffa70e0843e659bf15f93b26438bd38_icgraph}
+\end{center}
+\end{figure}

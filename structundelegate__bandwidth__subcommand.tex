@@ -1,0 +1,127 @@
+\doxysection{undelegate\+\_\+bandwidth\+\_\+subcommand Struct Reference}
+\hypertarget{structundelegate__bandwidth__subcommand}{}\label{structundelegate__bandwidth__subcommand}\index{undelegate\_bandwidth\_subcommand@{undelegate\_bandwidth\_subcommand}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structundelegate__bandwidth__subcommand_a536b6238ada347a9d2754c096e45556a}{undelegate\+\_\+bandwidth\+\_\+subcommand}} (\mbox{\hyperlink{class_c_l_i_1_1_app}{CLI\+::\+App}} \texorpdfstring{$\ast$}{*}action\+Root)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structundelegate__bandwidth__subcommand_acf1cc672952f8a9d3d59b616fd76f031}{from\+\_\+str}}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structundelegate__bandwidth__subcommand_af20852a8b98ec8fc27ca454b26b9e13f}{receiver\+\_\+str}}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structundelegate__bandwidth__subcommand_a2ae2397ff668a03148bb5c6c6c33addc}{unstake\+\_\+net\+\_\+amount}}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structundelegate__bandwidth__subcommand_a4b78003afeea452da3a37ea6e30f0de7}{unstake\+\_\+cpu\+\_\+amount}}
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structundelegate__bandwidth__subcommand_a2145de10b4ea6020a0b79e0572f7ddd6}{unstake\+\_\+storage\+\_\+bytes}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01563}{1563}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structundelegate__bandwidth__subcommand_a536b6238ada347a9d2754c096e45556a}\index{undelegate\_bandwidth\_subcommand@{undelegate\_bandwidth\_subcommand}!undelegate\_bandwidth\_subcommand@{undelegate\_bandwidth\_subcommand}}
+\index{undelegate\_bandwidth\_subcommand@{undelegate\_bandwidth\_subcommand}!undelegate\_bandwidth\_subcommand@{undelegate\_bandwidth\_subcommand}}
+\doxysubsubsection{\texorpdfstring{undelegate\_bandwidth\_subcommand()}{undelegate\_bandwidth\_subcommand()}}
+{\footnotesize\ttfamily \label{structundelegate__bandwidth__subcommand_a536b6238ada347a9d2754c096e45556a} 
+undelegate\+\_\+bandwidth\+\_\+subcommand\+::undelegate\+\_\+bandwidth\+\_\+subcommand (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_c_l_i_1_1_app}{CLI\+::\+App}} \texorpdfstring{$\ast$}{*}}]{action\+Root}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01570}{1570}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01570\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01571\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ undelegate\_bandwidth\ =\ actionRoot-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_a8b461d2233ec4121259011b5ed24b336}{add\_subcommand}}(\textcolor{stringliteral}{"{}undelegatebw"{}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}Undelegate\ bandwidth"{}}));}
+\DoxyCodeLine{01572\ \ \ \ \ \ \ undelegate\_bandwidth-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_a8c812d42c7720ecb5cd0aec41b5aa941}{add\_option}}(\textcolor{stringliteral}{"{}from"{}},\ \mbox{\hyperlink{structundelegate__bandwidth__subcommand_acf1cc672952f8a9d3d59b616fd76f031}{from\_str}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}The\ account\ undelegating\ bandwidth"{}}))-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a}{required}}();}
+\DoxyCodeLine{01573\ \ \ \ \ \ \ undelegate\_bandwidth-\/>add\_option(\textcolor{stringliteral}{"{}receiver"{}},\ \mbox{\hyperlink{structundelegate__bandwidth__subcommand_af20852a8b98ec8fc27ca454b26b9e13f}{receiver\_str}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}The\ account\ to\ undelegate\ bandwidth\ from"{}}))-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a}{required}}();}
+\DoxyCodeLine{01574\ \ \ \ \ \ \ undelegate\_bandwidth-\/>add\_option(\textcolor{stringliteral}{"{}unstake\_net\_quantity"{}},\ \mbox{\hyperlink{structundelegate__bandwidth__subcommand_a2ae2397ff668a03148bb5c6c6c33addc}{unstake\_net\_amount}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}The\ amount\ of\ tokens\ to\ undelegate\ for\ network\ bandwidth"{}}))-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a}{required}}();}
+\DoxyCodeLine{01575\ \ \ \ \ \ \ undelegate\_bandwidth-\/>add\_option(\textcolor{stringliteral}{"{}unstake\_cpu\_quantity"{}},\ \mbox{\hyperlink{structundelegate__bandwidth__subcommand_a4b78003afeea452da3a37ea6e30f0de7}{unstake\_cpu\_amount}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}The\ amount\ of\ tokens\ to\ undelegate\ for\ CPU\ bandwidth"{}}))-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a}{required}}();}
+\DoxyCodeLine{01576\ \ \ \ \ \ \ \mbox{\hyperlink{programs_2clio_2main_8cpp_aa5d53f41b83b5323c73622fbbb15e9cd}{add\_standard\_transaction\_options}}(undelegate\_bandwidth,\ \textcolor{stringliteral}{"{}from@active"{}});}
+\DoxyCodeLine{01577\ }
+\DoxyCodeLine{01578\ \ \ \ \ \ \ undelegate\_bandwidth-\/>callback([\textcolor{keyword}{this}]\ \{}
+\DoxyCodeLine{01579\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}\ act\_payload\ =\ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}()}
+\DoxyCodeLine{01580\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}from"{}},\ \mbox{\hyperlink{structundelegate__bandwidth__subcommand_acf1cc672952f8a9d3d59b616fd76f031}{from\_str}})}
+\DoxyCodeLine{01581\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}receiver"{}},\ \mbox{\hyperlink{structundelegate__bandwidth__subcommand_af20852a8b98ec8fc27ca454b26b9e13f}{receiver\_str}})}
+\DoxyCodeLine{01582\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}unstake\_net\_quantity"{}},\ \mbox{\hyperlink{programs_2clio_2main_8cpp_a1eaaa88d636c18502c1997d48cdbebb1}{to\_asset}}(\mbox{\hyperlink{structundelegate__bandwidth__subcommand_a2ae2397ff668a03148bb5c6c6c33addc}{unstake\_net\_amount}}))}
+\DoxyCodeLine{01583\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}unstake\_cpu\_quantity"{}},\ \mbox{\hyperlink{programs_2clio_2main_8cpp_a1eaaa88d636c18502c1997d48cdbebb1}{to\_asset}}(\mbox{\hyperlink{structundelegate__bandwidth__subcommand_a4b78003afeea452da3a37ea6e30f0de7}{unstake\_cpu\_amount}}));}
+\DoxyCodeLine{01584\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ accountPermissions\ =\ \mbox{\hyperlink{programs_2clio_2main_8cpp_a2b91ca5dbe7cc4ab287d0e44c3037552}{get\_account\_permissions}}(\mbox{\hyperlink{programs_2clio_2main_8cpp_ad552924cb151dcd5b60c73856d1ff706}{tx\_permission}},\ \{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(\mbox{\hyperlink{structundelegate__bandwidth__subcommand_acf1cc672952f8a9d3d59b616fd76f031}{from\_str}}),\ config::active\_name\});}
+\DoxyCodeLine{01585\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{programs_2clio_2main_8cpp_aaf784434864a29e4835be7465173d1ab}{send\_actions}}(\{\mbox{\hyperlink{programs_2clio_2main_8cpp_a067e20df5f65333b0c3cf5840bc37dea}{create\_action}}(accountPermissions,\ config::system\_account\_name,\ \textcolor{stringliteral}{"{}undelegatebw"{}}\_n,\ act\_payload)\});}
+\DoxyCodeLine{01586\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{01587\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structundelegate__bandwidth__subcommand_a536b6238ada347a9d2754c096e45556a_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structundelegate__bandwidth__subcommand_acf1cc672952f8a9d3d59b616fd76f031}\index{undelegate\_bandwidth\_subcommand@{undelegate\_bandwidth\_subcommand}!from\_str@{from\_str}}
+\index{from\_str@{from\_str}!undelegate\_bandwidth\_subcommand@{undelegate\_bandwidth\_subcommand}}
+\doxysubsubsection{\texorpdfstring{from\_str}{from\_str}}
+{\footnotesize\ttfamily \label{structundelegate__bandwidth__subcommand_acf1cc672952f8a9d3d59b616fd76f031} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} undelegate\+\_\+bandwidth\+\_\+subcommand\+::from\+\_\+str}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01564}{1564}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{structundelegate__bandwidth__subcommand_af20852a8b98ec8fc27ca454b26b9e13f}\index{undelegate\_bandwidth\_subcommand@{undelegate\_bandwidth\_subcommand}!receiver\_str@{receiver\_str}}
+\index{receiver\_str@{receiver\_str}!undelegate\_bandwidth\_subcommand@{undelegate\_bandwidth\_subcommand}}
+\doxysubsubsection{\texorpdfstring{receiver\_str}{receiver\_str}}
+{\footnotesize\ttfamily \label{structundelegate__bandwidth__subcommand_af20852a8b98ec8fc27ca454b26b9e13f} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} undelegate\+\_\+bandwidth\+\_\+subcommand\+::receiver\+\_\+str}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01565}{1565}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{structundelegate__bandwidth__subcommand_a4b78003afeea452da3a37ea6e30f0de7}\index{undelegate\_bandwidth\_subcommand@{undelegate\_bandwidth\_subcommand}!unstake\_cpu\_amount@{unstake\_cpu\_amount}}
+\index{unstake\_cpu\_amount@{unstake\_cpu\_amount}!undelegate\_bandwidth\_subcommand@{undelegate\_bandwidth\_subcommand}}
+\doxysubsubsection{\texorpdfstring{unstake\_cpu\_amount}{unstake\_cpu\_amount}}
+{\footnotesize\ttfamily \label{structundelegate__bandwidth__subcommand_a4b78003afeea452da3a37ea6e30f0de7} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} undelegate\+\_\+bandwidth\+\_\+subcommand\+::unstake\+\_\+cpu\+\_\+amount}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01567}{1567}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{structundelegate__bandwidth__subcommand_a2ae2397ff668a03148bb5c6c6c33addc}\index{undelegate\_bandwidth\_subcommand@{undelegate\_bandwidth\_subcommand}!unstake\_net\_amount@{unstake\_net\_amount}}
+\index{unstake\_net\_amount@{unstake\_net\_amount}!undelegate\_bandwidth\_subcommand@{undelegate\_bandwidth\_subcommand}}
+\doxysubsubsection{\texorpdfstring{unstake\_net\_amount}{unstake\_net\_amount}}
+{\footnotesize\ttfamily \label{structundelegate__bandwidth__subcommand_a2ae2397ff668a03148bb5c6c6c33addc} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} undelegate\+\_\+bandwidth\+\_\+subcommand\+::unstake\+\_\+net\+\_\+amount}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01566}{1566}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{structundelegate__bandwidth__subcommand_a2145de10b4ea6020a0b79e0572f7ddd6}\index{undelegate\_bandwidth\_subcommand@{undelegate\_bandwidth\_subcommand}!unstake\_storage\_bytes@{unstake\_storage\_bytes}}
+\index{unstake\_storage\_bytes@{unstake\_storage\_bytes}!undelegate\_bandwidth\_subcommand@{undelegate\_bandwidth\_subcommand}}
+\doxysubsubsection{\texorpdfstring{unstake\_storage\_bytes}{unstake\_storage\_bytes}}
+{\footnotesize\ttfamily \label{structundelegate__bandwidth__subcommand_a2145de10b4ea6020a0b79e0572f7ddd6} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} undelegate\+\_\+bandwidth\+\_\+subcommand\+::unstake\+\_\+storage\+\_\+bytes}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01568}{1568}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+programs/clio/\mbox{\hyperlink{programs_2clio_2main_8cpp}{main.\+cpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,85 @@
+\doxysection{sysio\+::detail\+::abstract\+\_\+conn Struct Reference}
+\hypertarget{structsysio_1_1detail_1_1abstract__conn}{}\label{structsysio_1_1detail_1_1abstract__conn}\index{sysio::detail::abstract\_conn@{sysio::detail::abstract\_conn}}
+
+
+Inheritance diagram for sysio\+::detail\+::abstract\+\_\+conn\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=216pt]{structsysio_1_1detail_1_1abstract__conn__inherit__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{structsysio_1_1detail_1_1abstract__conn_ab957c3e14e8c31e8ca5fe2f33fd18087}{\texorpdfstring{$\sim$}{\string~}abstract\+\_\+conn}} ()
+\item 
+virtual bool \mbox{\hyperlink{structsysio_1_1detail_1_1abstract__conn_a2a38362dd145af4fbe9e8630fa8b8df1}{verify\+\_\+max\+\_\+bytes\+\_\+in\+\_\+flight}} ()=0
+\item 
+virtual void \mbox{\hyperlink{structsysio_1_1detail_1_1abstract__conn_a3aef99a68a1e37b0e1c654100e503524}{handle\+\_\+exception}} ()=0
+\item 
+virtual void \mbox{\hyperlink{structsysio_1_1detail_1_1abstract__conn_a80e7bc852abf443527e72a7d90ad639b}{send\+\_\+response}} (std\+::string, int)=0
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+virtualized wrapper for the various underlying connection functions needed in req/resp processng 
+
+Definition at line \mbox{\hyperlink{http__plugin_8cpp_source_l00130}{130}} of file \mbox{\hyperlink{http__plugin_8cpp_source}{http\+\_\+plugin.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structsysio_1_1detail_1_1abstract__conn_ab957c3e14e8c31e8ca5fe2f33fd18087}\index{sysio::detail::abstract\_conn@{sysio::detail::abstract\_conn}!````~abstract\_conn@{\texorpdfstring{$\sim$}{\string~}abstract\_conn}}
+\index{````~abstract\_conn@{\texorpdfstring{$\sim$}{\string~}abstract\_conn}!sysio::detail::abstract\_conn@{sysio::detail::abstract\_conn}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}abstract\_conn()}{\string~abstract\_conn()}}
+{\footnotesize\ttfamily \label{structsysio_1_1detail_1_1abstract__conn_ab957c3e14e8c31e8ca5fe2f33fd18087} 
+virtual sysio\+::detail\+::abstract\+\_\+conn\+::\texorpdfstring{$\sim$}{\string~}abstract\+\_\+conn (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{http__plugin_8cpp_source_l00131}{131}} of file \mbox{\hyperlink{http__plugin_8cpp_source}{http\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00131\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1detail_1_1abstract__conn_a3aef99a68a1e37b0e1c654100e503524}\index{sysio::detail::abstract\_conn@{sysio::detail::abstract\_conn}!handle\_exception@{handle\_exception}}
+\index{handle\_exception@{handle\_exception}!sysio::detail::abstract\_conn@{sysio::detail::abstract\_conn}}
+\doxysubsubsection{\texorpdfstring{handle\_exception()}{handle\_exception()}}
+{\footnotesize\ttfamily \label{structsysio_1_1detail_1_1abstract__conn_a3aef99a68a1e37b0e1c654100e503524} 
+virtual void sysio\+::detail\+::abstract\+\_\+conn\+::handle\+\_\+exception (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{structsysio_1_1http__plugin__impl_1_1abstract__conn__impl_ad5aa277edc9e110da2050d05690fe85d}{sysio\+::http\+\_\+plugin\+\_\+impl\+::abstract\+\_\+conn\+\_\+impl$<$ T $>$}}.
+
+\Hypertarget{structsysio_1_1detail_1_1abstract__conn_a80e7bc852abf443527e72a7d90ad639b}\index{sysio::detail::abstract\_conn@{sysio::detail::abstract\_conn}!send\_response@{send\_response}}
+\index{send\_response@{send\_response}!sysio::detail::abstract\_conn@{sysio::detail::abstract\_conn}}
+\doxysubsubsection{\texorpdfstring{send\_response()}{send\_response()}}
+{\footnotesize\ttfamily \label{structsysio_1_1detail_1_1abstract__conn_a80e7bc852abf443527e72a7d90ad639b} 
+virtual void sysio\+::detail\+::abstract\+\_\+conn\+::send\+\_\+response (\begin{DoxyParamCaption}\item[{std\+::string}]{}{, }\item[{int}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{structsysio_1_1http__plugin__impl_1_1abstract__conn__impl_a79142fbd5b2b1771e998f93cccbbab30}{sysio\+::http\+\_\+plugin\+\_\+impl\+::abstract\+\_\+conn\+\_\+impl$<$ T $>$}}.
+
+\Hypertarget{structsysio_1_1detail_1_1abstract__conn_a2a38362dd145af4fbe9e8630fa8b8df1}\index{sysio::detail::abstract\_conn@{sysio::detail::abstract\_conn}!verify\_max\_bytes\_in\_flight@{verify\_max\_bytes\_in\_flight}}
+\index{verify\_max\_bytes\_in\_flight@{verify\_max\_bytes\_in\_flight}!sysio::detail::abstract\_conn@{sysio::detail::abstract\_conn}}
+\doxysubsubsection{\texorpdfstring{verify\_max\_bytes\_in\_flight()}{verify\_max\_bytes\_in\_flight()}}
+{\footnotesize\ttfamily \label{structsysio_1_1detail_1_1abstract__conn_a2a38362dd145af4fbe9e8630fa8b8df1} 
+virtual bool sysio\+::detail\+::abstract\+\_\+conn\+::verify\+\_\+max\+\_\+bytes\+\_\+in\+\_\+flight (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{structsysio_1_1http__plugin__impl_1_1abstract__conn__impl_a9cbb007316e018e82e1b6d2f069e9ad1}{sysio\+::http\+\_\+plugin\+\_\+impl\+::abstract\+\_\+conn\+\_\+impl$<$ T $>$}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+plugins/http\+\_\+plugin/\mbox{\hyperlink{http__plugin_8cpp}{http\+\_\+plugin.\+cpp}}\end{DoxyCompactItemize}

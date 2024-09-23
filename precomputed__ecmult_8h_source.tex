@@ -1,0 +1,41 @@
+\doxysection{precomputed\+\_\+ecmult.\+h}
+\hypertarget{precomputed__ecmult_8h_source}{}\label{precomputed__ecmult_8h_source}\index{libraries/fc/secp256k1/secp256k1/src/precomputed\_ecmult.h@{libraries/fc/secp256k1/secp256k1/src/precomputed\_ecmult.h}}
+\mbox{\hyperlink{precomputed__ecmult_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{precomputed__ecmult_8h_source_l00001}00001\ \textcolor{comment}{/*****************************************************************************************************}}
+\DoxyCodeLine{\Hypertarget{precomputed__ecmult_8h_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2013,\ 2014,\ 2017,\ 2021\ Pieter\ Wuille,\ Andrew\ Poelstra,\ Jonas\ Nick,\ Russell\ O'Connor\ *}}
+\DoxyCodeLine{\Hypertarget{precomputed__ecmult_8h_source_l00003}00003\ \textcolor{comment}{\ *\ Distributed\ under\ the\ MIT\ software\ license,\ see\ the\ accompanying\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{precomputed__ecmult_8h_source_l00004}00004\ \textcolor{comment}{\ *\ file\ COPYING\ or\ https://www.opensource.org/licenses/mit-\/license.php.\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{precomputed__ecmult_8h_source_l00005}00005\ \textcolor{comment}{\ *****************************************************************************************************/}}
+\DoxyCodeLine{\Hypertarget{precomputed__ecmult_8h_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{precomputed__ecmult_8h_source_l00007}00007\ \textcolor{preprocessor}{\#ifndef\ SECP256K1\_PRECOMPUTED\_ECMULT\_H}}
+\DoxyCodeLine{\Hypertarget{precomputed__ecmult_8h_source_l00008}00008\ \textcolor{preprocessor}{\#define\ SECP256K1\_PRECOMPUTED\_ECMULT\_H}}
+\DoxyCodeLine{\Hypertarget{precomputed__ecmult_8h_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{precomputed__ecmult_8h_source_l00010}00010\ \textcolor{preprocessor}{\#ifdef\ \_\_cplusplus}}
+\DoxyCodeLine{\Hypertarget{precomputed__ecmult_8h_source_l00011}00011\ \textcolor{keyword}{extern}\ \textcolor{stringliteral}{"{}C"{}}\ \{}
+\DoxyCodeLine{\Hypertarget{precomputed__ecmult_8h_source_l00012}00012\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{precomputed__ecmult_8h_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{precomputed__ecmult_8h_source_l00014}00014\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{group_8h}{group.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{precomputed__ecmult_8h_source_l00015}00015\ \textcolor{preprocessor}{\#if\ defined(EXHAUSTIVE\_TEST\_ORDER)}}
+\DoxyCodeLine{\Hypertarget{precomputed__ecmult_8h_source_l00016}00016\ \textcolor{preprocessor}{\#if\ EXHAUSTIVE\_TEST\_ORDER\ ==\ 13}}
+\DoxyCodeLine{\Hypertarget{precomputed__ecmult_8h_source_l00017}00017\ \textcolor{preprocessor}{\#\ \ \ \ \ \ \ \ define\ WINDOW\_G\ 4}}
+\DoxyCodeLine{\Hypertarget{precomputed__ecmult_8h_source_l00018}00018\ \textcolor{preprocessor}{\#\ \ \ \ elif\ EXHAUSTIVE\_TEST\_ORDER\ ==\ 199}}
+\DoxyCodeLine{\Hypertarget{precomputed__ecmult_8h_source_l00019}00019\ \textcolor{preprocessor}{\#\ \ \ \ \ \ \ \ define\ WINDOW\_G\ 8}}
+\DoxyCodeLine{\Hypertarget{precomputed__ecmult_8h_source_l00020}00020\ \textcolor{preprocessor}{\#\ \ \ \ else}}
+\DoxyCodeLine{\Hypertarget{precomputed__ecmult_8h_source_l00021}00021\ \textcolor{preprocessor}{\#\ \ \ \ \ \ \ \ error\ No\ known\ generator\ for\ the\ specified\ exhaustive\ test\ group\ order.}}
+\DoxyCodeLine{\Hypertarget{precomputed__ecmult_8h_source_l00022}00022\ \textcolor{preprocessor}{\#\ \ \ \ endif}}
+\DoxyCodeLine{\Hypertarget{precomputed__ecmult_8h_source_l00023}00023\ \textcolor{keyword}{static}\ \mbox{\hyperlink{structsecp256k1__ge__storage}{secp256k1\_ge\_storage}}\ \mbox{\hyperlink{precomputed__ecmult_8h_ab052c377e10c0ce101f47af9f6dcb4a7}{secp256k1\_pre\_g}}[\mbox{\hyperlink{ecmult_8h_a97c6c6e5aa98f202eec77c4c931e02f1}{ECMULT\_TABLE\_SIZE}}(\mbox{\hyperlink{precomputed__ecmult_8h_afe951ac62b5b06848cb4e6f4dbc69616}{WINDOW\_G}})];}
+\DoxyCodeLine{\Hypertarget{precomputed__ecmult_8h_source_l00024}00024\ \textcolor{keyword}{static}\ \mbox{\hyperlink{structsecp256k1__ge__storage}{secp256k1\_ge\_storage}}\ \mbox{\hyperlink{precomputed__ecmult_8h_ab047348edae9da6233f4d4a21eef0d0c}{secp256k1\_pre\_g\_128}}[\mbox{\hyperlink{ecmult_8h_a97c6c6e5aa98f202eec77c4c931e02f1}{ECMULT\_TABLE\_SIZE}}(\mbox{\hyperlink{precomputed__ecmult_8h_afe951ac62b5b06848cb4e6f4dbc69616}{WINDOW\_G}})];}
+\DoxyCodeLine{\Hypertarget{precomputed__ecmult_8h_source_l00025}00025\ \textcolor{preprocessor}{\#else\ }\textcolor{comment}{/*\ !defined(EXHAUSTIVE\_TEST\_ORDER)\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{\Hypertarget{precomputed__ecmult_8h_source_l00026}\mbox{\hyperlink{precomputed__ecmult_8h_afe951ac62b5b06848cb4e6f4dbc69616}{00026}}\ \textcolor{preprocessor}{\#\ \ \ \ define\ WINDOW\_G\ ECMULT\_WINDOW\_SIZE}}
+\DoxyCodeLine{\Hypertarget{precomputed__ecmult_8h_source_l00027}00027\ \textcolor{keyword}{extern}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__ge__storage}{secp256k1\_ge\_storage}}\ \mbox{\hyperlink{precomputed__ecmult_8h_ab052c377e10c0ce101f47af9f6dcb4a7}{secp256k1\_pre\_g}}[\mbox{\hyperlink{ecmult_8h_a97c6c6e5aa98f202eec77c4c931e02f1}{ECMULT\_TABLE\_SIZE}}(\mbox{\hyperlink{precomputed__ecmult_8h_afe951ac62b5b06848cb4e6f4dbc69616}{WINDOW\_G}})];}
+\DoxyCodeLine{\Hypertarget{precomputed__ecmult_8h_source_l00028}00028\ \textcolor{keyword}{extern}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__ge__storage}{secp256k1\_ge\_storage}}\ \mbox{\hyperlink{precomputed__ecmult_8h_ab047348edae9da6233f4d4a21eef0d0c}{secp256k1\_pre\_g\_128}}[\mbox{\hyperlink{ecmult_8h_a97c6c6e5aa98f202eec77c4c931e02f1}{ECMULT\_TABLE\_SIZE}}(\mbox{\hyperlink{precomputed__ecmult_8h_afe951ac62b5b06848cb4e6f4dbc69616}{WINDOW\_G}})];}
+\DoxyCodeLine{\Hypertarget{precomputed__ecmult_8h_source_l00029}00029\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{/*\ defined(EXHAUSTIVE\_TEST\_ORDER)\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{\Hypertarget{precomputed__ecmult_8h_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{precomputed__ecmult_8h_source_l00031}00031\ \textcolor{preprocessor}{\#ifdef\ \_\_cplusplus}}
+\DoxyCodeLine{\Hypertarget{precomputed__ecmult_8h_source_l00032}00032\ \}}
+\DoxyCodeLine{\Hypertarget{precomputed__ecmult_8h_source_l00033}00033\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{precomputed__ecmult_8h_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{precomputed__ecmult_8h_source_l00035}00035\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{/*\ SECP256K1\_PRECOMPUTED\_ECMULT\_H\ */}\textcolor{preprocessor}{}}
+
+\end{DoxyCode}

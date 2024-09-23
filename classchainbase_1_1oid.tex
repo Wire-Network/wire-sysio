@@ -1,0 +1,218 @@
+\doxysection{chainbase\+::oid\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classchainbase_1_1oid}{}\label{classchainbase_1_1oid}\index{chainbase::oid$<$ T $>$@{chainbase::oid$<$ T $>$}}
+
+
+{\ttfamily \#include $<$chainbase.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classchainbase_1_1oid_a58f27e29618d565529b542355c4e9fff}{oid}} (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} i=0)
+\item 
+\mbox{\hyperlink{classchainbase_1_1oid}{oid}} \& \mbox{\hyperlink{classchainbase_1_1oid_ade29137f6d4ec7f41d28246190af3cb3}{operator++}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{classchainbase_1_1oid_a572c4ef080a7db37d93631ab0fbb123a}{\+\_\+id}} = 0
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{classchainbase_1_1oid_a6d9c7528aadb2de19fed3a45e2879489}{operator$<$}} (const \mbox{\hyperlink{classchainbase_1_1oid}{oid}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, const \mbox{\hyperlink{classchainbase_1_1oid}{oid}} \&b)
+\item 
+bool \mbox{\hyperlink{classchainbase_1_1oid_a9d142ffef79ede7ed5cba5f2ceaf82d4}{operator$>$}} (const \mbox{\hyperlink{classchainbase_1_1oid}{oid}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, const \mbox{\hyperlink{classchainbase_1_1oid}{oid}} \&b)
+\item 
+bool \mbox{\hyperlink{classchainbase_1_1oid_a700683bf6af96d64cff713681c6dafd1}{operator$<$=}} (const \mbox{\hyperlink{classchainbase_1_1oid}{oid}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, const \mbox{\hyperlink{classchainbase_1_1oid}{oid}} \&b)
+\item 
+bool \mbox{\hyperlink{classchainbase_1_1oid_a1c5b9b83a3e6ba81d45bf2a7443da667}{operator$>$=}} (const \mbox{\hyperlink{classchainbase_1_1oid}{oid}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, const \mbox{\hyperlink{classchainbase_1_1oid}{oid}} \&b)
+\item 
+bool \mbox{\hyperlink{classchainbase_1_1oid_a38ea3ec2aef1c7b8b22256ec9d5d803c}{operator==}} (const \mbox{\hyperlink{classchainbase_1_1oid}{oid}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, const \mbox{\hyperlink{classchainbase_1_1oid}{oid}} \&b)
+\item 
+bool \mbox{\hyperlink{classchainbase_1_1oid_a2246a3405acf474936cad2ad58cea4f4}{operator!=}} (const \mbox{\hyperlink{classchainbase_1_1oid}{oid}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, const \mbox{\hyperlink{classchainbase_1_1oid}{oid}} \&b)
+\item 
+std\+::ostream \& \mbox{\hyperlink{classchainbase_1_1oid_a9062645a62029ef7e8a70fca1fa4884c}{operator$<$$<$}} (std\+::ostream \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, const \mbox{\hyperlink{classchainbase_1_1oid}{oid}} \&\mbox{\hyperlink{code__cache_8cpp_aa0efefe21f4700d78692edc823e763be}{id}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$\newline
+class chainbase\+::oid$<$ T $>$}
+Object ID type that includes the type of the object it references 
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00070}{70}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classchainbase_1_1oid_a58f27e29618d565529b542355c4e9fff}\index{chainbase::oid$<$ T $>$@{chainbase::oid$<$ T $>$}!oid@{oid}}
+\index{oid@{oid}!chainbase::oid$<$ T $>$@{chainbase::oid$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{oid()}{oid()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1oid_a58f27e29618d565529b542355c4e9fff} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{classchainbase_1_1oid}{chainbase\+::oid}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::oid (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}}]{i}{ = {\ttfamily 0}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00072}{72}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00072\ :\mbox{\hyperlink{classchainbase_1_1oid_a572c4ef080a7db37d93631ab0fbb123a}{\_id}}(i)\{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classchainbase_1_1oid_ade29137f6d4ec7f41d28246190af3cb3}\index{chainbase::oid$<$ T $>$@{chainbase::oid$<$ T $>$}!operator++@{operator++}}
+\index{operator++@{operator++}!chainbase::oid$<$ T $>$@{chainbase::oid$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{operator++()}{operator++()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1oid_ade29137f6d4ec7f41d28246190af3cb3} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{classchainbase_1_1oid}{oid}} \& \mbox{\hyperlink{classchainbase_1_1oid}{chainbase\+::oid}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::operator++ (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00074}{74}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00074\ \{\ ++\mbox{\hyperlink{classchainbase_1_1oid_a572c4ef080a7db37d93631ab0fbb123a}{\_id}};\ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{classchainbase_1_1oid_a2246a3405acf474936cad2ad58cea4f4}\index{chainbase::oid$<$ T $>$@{chainbase::oid$<$ T $>$}!operator"!=@{operator"!=}}
+\index{operator"!=@{operator"!=}!chainbase::oid$<$ T $>$@{chainbase::oid$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{operator"!=}{operator!=}}
+{\footnotesize\ttfamily \label{classchainbase_1_1oid_a2246a3405acf474936cad2ad58cea4f4} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+bool operator!= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classchainbase_1_1oid}{oid}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&}]{a}{, }\item[{const \mbox{\hyperlink{classchainbase_1_1oid}{oid}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&}]{b}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00081}{81}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00081\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.\_id\ !=\ b.\_id;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classchainbase_1_1oid_a6d9c7528aadb2de19fed3a45e2879489}\index{chainbase::oid$<$ T $>$@{chainbase::oid$<$ T $>$}!operator$<$@{operator$<$}}
+\index{operator$<$@{operator$<$}!chainbase::oid$<$ T $>$@{chainbase::oid$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{operator$<$}{operator<}}
+{\footnotesize\ttfamily \label{classchainbase_1_1oid_a6d9c7528aadb2de19fed3a45e2879489} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+bool operator$<$ (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classchainbase_1_1oid}{oid}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&}]{a}{, }\item[{const \mbox{\hyperlink{classchainbase_1_1oid}{oid}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&}]{b}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00076}{76}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00076\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.\_id\ <\ b.\_id;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classchainbase_1_1oid_a9062645a62029ef7e8a70fca1fa4884c}\index{chainbase::oid$<$ T $>$@{chainbase::oid$<$ T $>$}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!chainbase::oid$<$ T $>$@{chainbase::oid$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$}{operator<<}}
+{\footnotesize\ttfamily \label{classchainbase_1_1oid_a9062645a62029ef7e8a70fca1fa4884c} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+std\+::ostream \& operator$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{s}{, }\item[{const \mbox{\hyperlink{classchainbase_1_1oid}{oid}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&}]{id}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00082}{82}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ <<\ boost::core::demangle(\textcolor{keyword}{typeid}(\mbox{\hyperlink{classchainbase_1_1oid_a58f27e29618d565529b542355c4e9fff}{oid<T>}}).\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}())\ <<\ \textcolor{charliteral}{'('}\ <<\ \textcolor{keywordtype}{id}.\_id\ <<\ \textcolor{charliteral}{')'};\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classchainbase_1_1oid_a700683bf6af96d64cff713681c6dafd1}\index{chainbase::oid$<$ T $>$@{chainbase::oid$<$ T $>$}!operator$<$=@{operator$<$=}}
+\index{operator$<$=@{operator$<$=}!chainbase::oid$<$ T $>$@{chainbase::oid$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{operator$<$=}{operator<=}}
+{\footnotesize\ttfamily \label{classchainbase_1_1oid_a700683bf6af96d64cff713681c6dafd1} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+bool operator$<$= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classchainbase_1_1oid}{oid}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&}]{a}{, }\item[{const \mbox{\hyperlink{classchainbase_1_1oid}{oid}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&}]{b}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00078}{78}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00078\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.\_id\ <=\ b.\_id;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classchainbase_1_1oid_a38ea3ec2aef1c7b8b22256ec9d5d803c}\index{chainbase::oid$<$ T $>$@{chainbase::oid$<$ T $>$}!operator==@{operator==}}
+\index{operator==@{operator==}!chainbase::oid$<$ T $>$@{chainbase::oid$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{operator==}{operator==}}
+{\footnotesize\ttfamily \label{classchainbase_1_1oid_a38ea3ec2aef1c7b8b22256ec9d5d803c} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+bool operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classchainbase_1_1oid}{oid}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&}]{a}{, }\item[{const \mbox{\hyperlink{classchainbase_1_1oid}{oid}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&}]{b}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00080}{80}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00080\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.\_id\ ==\ b.\_id;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classchainbase_1_1oid_a9d142ffef79ede7ed5cba5f2ceaf82d4}\index{chainbase::oid$<$ T $>$@{chainbase::oid$<$ T $>$}!operator$>$@{operator$>$}}
+\index{operator$>$@{operator$>$}!chainbase::oid$<$ T $>$@{chainbase::oid$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{operator$>$}{operator>}}
+{\footnotesize\ttfamily \label{classchainbase_1_1oid_a9d142ffef79ede7ed5cba5f2ceaf82d4} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+bool operator$>$ (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classchainbase_1_1oid}{oid}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&}]{a}{, }\item[{const \mbox{\hyperlink{classchainbase_1_1oid}{oid}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&}]{b}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00077}{77}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00077\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.\_id\ >\ b.\_id;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classchainbase_1_1oid_a1c5b9b83a3e6ba81d45bf2a7443da667}\index{chainbase::oid$<$ T $>$@{chainbase::oid$<$ T $>$}!operator$>$=@{operator$>$=}}
+\index{operator$>$=@{operator$>$=}!chainbase::oid$<$ T $>$@{chainbase::oid$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{operator$>$=}{operator>=}}
+{\footnotesize\ttfamily \label{classchainbase_1_1oid_a1c5b9b83a3e6ba81d45bf2a7443da667} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+bool operator$>$= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classchainbase_1_1oid}{oid}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&}]{a}{, }\item[{const \mbox{\hyperlink{classchainbase_1_1oid}{oid}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&}]{b}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00079}{79}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00079\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.\_id\ >=\ b.\_id;\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classchainbase_1_1oid_a572c4ef080a7db37d93631ab0fbb123a}\index{chainbase::oid$<$ T $>$@{chainbase::oid$<$ T $>$}!\_id@{\_id}}
+\index{\_id@{\_id}!chainbase::oid$<$ T $>$@{chainbase::oid$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{\_id}{\_id}}
+{\footnotesize\ttfamily \label{classchainbase_1_1oid_a572c4ef080a7db37d93631ab0fbb123a} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{classchainbase_1_1oid}{chainbase\+::oid}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::\+\_\+id = 0}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00086}{86}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chainbase/include/chainbase/\mbox{\hyperlink{chainbase_8hpp}{chainbase.\+hpp}}\end{DoxyCompactItemize}

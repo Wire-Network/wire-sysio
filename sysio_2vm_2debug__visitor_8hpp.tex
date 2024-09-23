@@ -1,0 +1,86 @@
+\doxysection{libraries/sys-\/vm/include/sysio/sysio/vm/debug\+\_\+visitor.hpp File Reference}
+\hypertarget{sysio_2vm_2debug__visitor_8hpp}{}\label{sysio_2vm_2debug__visitor_8hpp}\index{libraries/sys-\/vm/include/sysio/sysio/vm/debug\_visitor.hpp@{libraries/sys-\/vm/include/sysio/sysio/vm/debug\_visitor.hpp}}
+{\ttfamily \#include $<$sysio/vm/interpret\+\_\+visitor.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/vm/opcodes.\+hpp$>$}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+Include dependency graph for debug\+\_\+visitor.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sysio_2vm_2debug__visitor_8hpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1debug__visitor}{sysio\+::vm\+::debug\+\_\+visitor$<$ Execution\+CTX $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1debug__visitor2}{sysio\+::vm\+::debug\+\_\+visitor2}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1vm}{sysio\+::vm}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{sysio_2vm_2debug__visitor_8hpp_addad3e9d17bd6ee30e8db7f12599decb}{DBG\+\_\+\+VISIT}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  code)
+\item 
+\#define \mbox{\hyperlink{sysio_2vm_2debug__visitor_8hpp_a4bf521f677724e6c376daaeb3f0a12a4}{DBG2\+\_\+\+VISIT}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  code)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{sysio_2vm_2debug__visitor_8hpp_a4bf521f677724e6c376daaeb3f0a12a4}\index{debug\_visitor.hpp@{debug\_visitor.hpp}!DBG2\_VISIT@{DBG2\_VISIT}}
+\index{DBG2\_VISIT@{DBG2\_VISIT}!debug\_visitor.hpp@{debug\_visitor.hpp}}
+\doxysubsubsection{\texorpdfstring{DBG2\_VISIT}{DBG2\_VISIT}}
+{\footnotesize\ttfamily \label{sysio_2vm_2debug__visitor_8hpp_a4bf521f677724e6c376daaeb3f0a12a4} 
+\#define DBG2\+\_\+\+VISIT(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{code}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \textcolor{keywordtype}{void}\ operator()(\textcolor{keyword}{const}\ \mbox{\hyperlink{sysio_2vm_2opcodes__def_8hpp_a01adfe88e6a9fb9241c97eb1fb4fdb14}{SYS\_VM\_OPCODE\_T}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})\&\ \mbox{\hyperlink{unionop}{op}})\ \{\ std::cout\ <<\ \textcolor{stringliteral}{"{}Found\ "{}}\ <<\ \#\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};\ \}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2debug__visitor_8hpp_source_l00015}{15}} of file \mbox{\hyperlink{sysio_2vm_2debug__visitor_8hpp_source}{debug\+\_\+visitor.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\#define\ DBG2\_VISIT(name,\ code)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\ \ \ void\ operator()(const\ SYS\_VM\_OPCODE\_T(name)\&\ op)\ \{\ std::cout\ <<\ "{}Found\ "{}\ <<\ \#name\ <<\ "{}\(\backslash\)n"{};\ \}}}
+
+\end{DoxyCode}
+\Hypertarget{sysio_2vm_2debug__visitor_8hpp_addad3e9d17bd6ee30e8db7f12599decb}\index{debug\_visitor.hpp@{debug\_visitor.hpp}!DBG\_VISIT@{DBG\_VISIT}}
+\index{DBG\_VISIT@{DBG\_VISIT}!debug\_visitor.hpp@{debug\_visitor.hpp}}
+\doxysubsubsection{\texorpdfstring{DBG\_VISIT}{DBG\_VISIT}}
+{\footnotesize\ttfamily \label{sysio_2vm_2debug__visitor_8hpp_addad3e9d17bd6ee30e8db7f12599decb} 
+\#define DBG\+\_\+\+VISIT(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{code}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \textcolor{keywordtype}{void}\ operator()(\textcolor{keyword}{const}\ \mbox{\hyperlink{sysio_2vm_2opcodes__def_8hpp_a01adfe88e6a9fb9241c97eb1fb4fdb14}{SYS\_VM\_OPCODE\_T}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})\&\ \mbox{\hyperlink{unionop}{op}})\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}Found\ "{}}\ <<\ \#\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ <<\ \textcolor{stringliteral}{"{}\ at\ "{}}\ <<\ get\_context().get\_pc()\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ interpret\_visitor<ExecutionCTX>::operator()(\mbox{\hyperlink{unionop}{op}});\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ get\_context().print\_stack();\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2debug__visitor_8hpp_source_l00008}{8}} of file \mbox{\hyperlink{sysio_2vm_2debug__visitor_8hpp_source}{debug\+\_\+visitor.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00008\ \textcolor{preprocessor}{\#define\ DBG\_VISIT(name,\ code)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00009\ \textcolor{preprocessor}{\ \ \ void\ operator()(const\ SYS\_VM\_OPCODE\_T(name)\&\ op)\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00010\ \textcolor{preprocessor}{\ \ \ \ \ \ std::cout\ <<\ "{}Found\ "{}\ <<\ \#name\ <<\ "{}\ at\ "{}\ <<\ get\_context().get\_pc()\ <<\ "{}\(\backslash\)n"{};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00011\ \textcolor{preprocessor}{\ \ \ \ \ \ interpret\_visitor<ExecutionCTX>::operator()(op);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00012\ \textcolor{preprocessor}{\ \ \ \ \ \ get\_context().print\_stack();\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00013\ \textcolor{preprocessor}{\ \ \ \}}}
+
+\end{DoxyCode}

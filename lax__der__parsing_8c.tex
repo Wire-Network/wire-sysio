@@ -1,0 +1,197 @@
+\doxysection{libraries/fc/secp256k1/secp256k1/contrib/lax\+\_\+der\+\_\+parsing.c File Reference}
+\hypertarget{lax__der__parsing_8c}{}\label{lax__der__parsing_8c}\index{libraries/fc/secp256k1/secp256k1/contrib/lax\_der\_parsing.c@{libraries/fc/secp256k1/secp256k1/contrib/lax\_der\_parsing.c}}
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include "{}lax\+\_\+der\+\_\+parsing.\+h"{}}\newline
+Include dependency graph for lax\+\_\+der\+\_\+parsing.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=238pt]{lax__der__parsing_8c__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=196pt]{lax__der__parsing_8c__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{lax__der__parsing_8c_aebc754e4d7457c16a922ea14977974a4}{ecdsa\+\_\+signature\+\_\+parse\+\_\+der\+\_\+lax}} (const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}ctx, \mbox{\hyperlink{structsecp256k1__ecdsa__signature}{secp256k1\+\_\+ecdsa\+\_\+signature}} \texorpdfstring{$\ast$}{*}sig, const unsigned char \texorpdfstring{$\ast$}{*}input, size\+\_\+t inputlen)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{lax__der__parsing_8c_aebc754e4d7457c16a922ea14977974a4}\index{lax\_der\_parsing.c@{lax\_der\_parsing.c}!ecdsa\_signature\_parse\_der\_lax@{ecdsa\_signature\_parse\_der\_lax}}
+\index{ecdsa\_signature\_parse\_der\_lax@{ecdsa\_signature\_parse\_der\_lax}!lax\_der\_parsing.c@{lax\_der\_parsing.c}}
+\doxysubsubsection{\texorpdfstring{ecdsa\_signature\_parse\_der\_lax()}{ecdsa\_signature\_parse\_der\_lax()}}
+{\footnotesize\ttfamily \label{lax__der__parsing_8c_aebc754e4d7457c16a922ea14977974a4} 
+int ecdsa\+\_\+signature\+\_\+parse\+\_\+der\+\_\+lax (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}}]{ctx}{, }\item[{\mbox{\hyperlink{structsecp256k1__ecdsa__signature}{secp256k1\+\_\+ecdsa\+\_\+signature}} \texorpdfstring{$\ast$}{*}}]{sig}{, }\item[{const unsigned char \texorpdfstring{$\ast$}{*}}]{input}{, }\item[{size\+\_\+t}]{inputlen}{}\end{DoxyParamCaption})}
+
+Parse a signature in "{}lax DER"{} format
+
+Returns\+: 1 when the signature could be parsed, 0 otherwise. Args\+: ctx\+: a secp256k1 context object Out\+: sig\+: a pointer to a signature object In\+: input\+: a pointer to the signature to be parsed inputlen\+: the length of the array pointed to be input
+
+This function will accept any valid DER encoded signature, even if the encoded numbers are out of range. In addition, it will accept signatures which violate the DER spec in various ways. Its purpose is to allow validation of the Bitcoin blockchain, which includes non-\/\+DER signatures from before the network rules were updated to enforce DER. Note that the set of supported violations is a strict subset of what Open\+SSL will accept.
+
+After the call, sig will always be initialized. If parsing failed or the encoded numbers are out of range, signature validation with it is guaranteed to fail for every message and public key. 
+
+Definition at line \mbox{\hyperlink{lax__der__parsing_8c_source_l00011}{11}} of file \mbox{\hyperlink{lax__der__parsing_8c_source}{lax\+\_\+der\+\_\+parsing.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00011\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00012\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ rpos,\ rlen,\ spos,\ slen;}
+\DoxyCodeLine{00013\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ pos\ =\ 0;}
+\DoxyCodeLine{00014\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ lenbyte;}
+\DoxyCodeLine{00015\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ tmpsig[64]\ =\ \{0\};}
+\DoxyCodeLine{00016\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a49aa97067a36875627e1380c3fb3833d}{overflow}}\ =\ 0;}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \ \ \ \ \textcolor{comment}{/*\ Hack\ to\ initialize\ sig\ with\ a\ correctly-\/parsed\ but\ invalid\ signature.\ */}}
+\DoxyCodeLine{00019\ \ \ \ \ \mbox{\hyperlink{secp256k1_8h_a2aff2802eca3d15ec54298e879579897}{secp256k1\_ecdsa\_signature\_parse\_compact}}(ctx,\ sig,\ tmpsig);}
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00021\ \ \ \ \ \textcolor{comment}{/*\ Sequence\ tag\ byte\ */}}
+\DoxyCodeLine{00022\ \ \ \ \ \textcolor{keywordflow}{if}\ (pos\ ==\ inputlen\ ||\ input[pos]\ !=\ 0x30)\ \{}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00024\ \ \ \ \ \}}
+\DoxyCodeLine{00025\ \ \ \ \ pos++;}
+\DoxyCodeLine{00026\ }
+\DoxyCodeLine{00027\ \ \ \ \ \textcolor{comment}{/*\ Sequence\ length\ bytes\ */}}
+\DoxyCodeLine{00028\ \ \ \ \ \textcolor{keywordflow}{if}\ (pos\ ==\ inputlen)\ \{}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00030\ \ \ \ \ \}}
+\DoxyCodeLine{00031\ \ \ \ \ lenbyte\ =\ input[pos++];}
+\DoxyCodeLine{00032\ \ \ \ \ \textcolor{keywordflow}{if}\ (lenbyte\ \&\ 0x80)\ \{}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ lenbyte\ -\/=\ 0x80;}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (lenbyte\ >\ inputlen\ -\/\ pos)\ \{}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ pos\ +=\ lenbyte;}
+\DoxyCodeLine{00038\ \ \ \ \ \}}
+\DoxyCodeLine{00039\ }
+\DoxyCodeLine{00040\ \ \ \ \ \textcolor{comment}{/*\ Integer\ tag\ byte\ for\ R\ */}}
+\DoxyCodeLine{00041\ \ \ \ \ \textcolor{keywordflow}{if}\ (pos\ ==\ inputlen\ ||\ input[pos]\ !=\ 0x02)\ \{}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00043\ \ \ \ \ \}}
+\DoxyCodeLine{00044\ \ \ \ \ pos++;}
+\DoxyCodeLine{00045\ }
+\DoxyCodeLine{00046\ \ \ \ \ \textcolor{comment}{/*\ Integer\ length\ for\ R\ */}}
+\DoxyCodeLine{00047\ \ \ \ \ \textcolor{keywordflow}{if}\ (pos\ ==\ inputlen)\ \{}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00049\ \ \ \ \ \}}
+\DoxyCodeLine{00050\ \ \ \ \ lenbyte\ =\ input[pos++];}
+\DoxyCodeLine{00051\ \ \ \ \ \textcolor{keywordflow}{if}\ (lenbyte\ \&\ 0x80)\ \{}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ lenbyte\ -\/=\ 0x80;}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (lenbyte\ >\ inputlen\ -\/\ pos)\ \{}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (lenbyte\ >\ 0\ \&\&\ input[pos]\ ==\ 0)\ \{}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ \ \ \ pos++;}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \ \ \ lenbyte-\/-\/;}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (lenbyte\ >=\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{size\_t}))\ \{}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ rlen\ =\ 0;}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (lenbyte\ >\ 0)\ \{}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ rlen\ =\ (rlen\ <<\ 8)\ +\ input[pos];}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ \ \ pos++;}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \ \ \ lenbyte-\/-\/;}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00069\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ rlen\ =\ lenbyte;}
+\DoxyCodeLine{00071\ \ \ \ \ \}}
+\DoxyCodeLine{00072\ \ \ \ \ \textcolor{keywordflow}{if}\ (rlen\ >\ inputlen\ -\/\ pos)\ \{}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00074\ \ \ \ \ \}}
+\DoxyCodeLine{00075\ \ \ \ \ rpos\ =\ pos;}
+\DoxyCodeLine{00076\ \ \ \ \ pos\ +=\ rlen;}
+\DoxyCodeLine{00077\ }
+\DoxyCodeLine{00078\ \ \ \ \ \textcolor{comment}{/*\ Integer\ tag\ byte\ for\ S\ */}}
+\DoxyCodeLine{00079\ \ \ \ \ \textcolor{keywordflow}{if}\ (pos\ ==\ inputlen\ ||\ input[pos]\ !=\ 0x02)\ \{}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00081\ \ \ \ \ \}}
+\DoxyCodeLine{00082\ \ \ \ \ pos++;}
+\DoxyCodeLine{00083\ }
+\DoxyCodeLine{00084\ \ \ \ \ \textcolor{comment}{/*\ Integer\ length\ for\ S\ */}}
+\DoxyCodeLine{00085\ \ \ \ \ \textcolor{keywordflow}{if}\ (pos\ ==\ inputlen)\ \{}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00087\ \ \ \ \ \}}
+\DoxyCodeLine{00088\ \ \ \ \ lenbyte\ =\ input[pos++];}
+\DoxyCodeLine{00089\ \ \ \ \ \textcolor{keywordflow}{if}\ (lenbyte\ \&\ 0x80)\ \{}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ lenbyte\ -\/=\ 0x80;}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (lenbyte\ >\ inputlen\ -\/\ pos)\ \{}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (lenbyte\ >\ 0\ \&\&\ input[pos]\ ==\ 0)\ \{}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \ \ \ pos++;}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \ \ \ lenbyte-\/-\/;}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (lenbyte\ >=\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{size\_t}))\ \{}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ slen\ =\ 0;}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (lenbyte\ >\ 0)\ \{}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \ \ \ slen\ =\ (slen\ <<\ 8)\ +\ input[pos];}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ \ \ \ pos++;}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \ \ \ lenbyte-\/-\/;}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00107\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ slen\ =\ lenbyte;}
+\DoxyCodeLine{00109\ \ \ \ \ \}}
+\DoxyCodeLine{00110\ \ \ \ \ \textcolor{keywordflow}{if}\ (slen\ >\ inputlen\ -\/\ pos)\ \{}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00112\ \ \ \ \ \}}
+\DoxyCodeLine{00113\ \ \ \ \ spos\ =\ pos;}
+\DoxyCodeLine{00114\ }
+\DoxyCodeLine{00115\ \ \ \ \ \textcolor{comment}{/*\ Ignore\ leading\ zeroes\ in\ R\ */}}
+\DoxyCodeLine{00116\ \ \ \ \ \textcolor{keywordflow}{while}\ (rlen\ >\ 0\ \&\&\ input[rpos]\ ==\ 0)\ \{}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ rlen-\/-\/;}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ rpos++;}
+\DoxyCodeLine{00119\ \ \ \ \ \}}
+\DoxyCodeLine{00120\ \ \ \ \ \textcolor{comment}{/*\ Copy\ R\ value\ */}}
+\DoxyCodeLine{00121\ \ \ \ \ \textcolor{keywordflow}{if}\ (rlen\ >\ 32)\ \{}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a49aa97067a36875627e1380c3fb3833d}{overflow}}\ =\ 1;}
+\DoxyCodeLine{00123\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (rlen)\ \{}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(tmpsig\ +\ 32\ -\/\ rlen,\ input\ +\ rpos,\ rlen);}
+\DoxyCodeLine{00125\ \ \ \ \ \}}
+\DoxyCodeLine{00126\ }
+\DoxyCodeLine{00127\ \ \ \ \ \textcolor{comment}{/*\ Ignore\ leading\ zeroes\ in\ S\ */}}
+\DoxyCodeLine{00128\ \ \ \ \ \textcolor{keywordflow}{while}\ (slen\ >\ 0\ \&\&\ input[spos]\ ==\ 0)\ \{}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ slen-\/-\/;}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ spos++;}
+\DoxyCodeLine{00131\ \ \ \ \ \}}
+\DoxyCodeLine{00132\ \ \ \ \ \textcolor{comment}{/*\ Copy\ S\ value\ */}}
+\DoxyCodeLine{00133\ \ \ \ \ \textcolor{keywordflow}{if}\ (slen\ >\ 32)\ \{}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a49aa97067a36875627e1380c3fb3833d}{overflow}}\ =\ 1;}
+\DoxyCodeLine{00135\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (slen)\ \{}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(tmpsig\ +\ 64\ -\/\ slen,\ input\ +\ spos,\ slen);}
+\DoxyCodeLine{00137\ \ \ \ \ \}}
+\DoxyCodeLine{00138\ }
+\DoxyCodeLine{00139\ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{yubihsm__pkcs11_8c_a49aa97067a36875627e1380c3fb3833d}{overflow}})\ \{}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a49aa97067a36875627e1380c3fb3833d}{overflow}}\ =\ !\mbox{\hyperlink{secp256k1_8h_a2aff2802eca3d15ec54298e879579897}{secp256k1\_ecdsa\_signature\_parse\_compact}}(ctx,\ sig,\ tmpsig);}
+\DoxyCodeLine{00141\ \ \ \ \ \}}
+\DoxyCodeLine{00142\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a49aa97067a36875627e1380c3fb3833d}{overflow}})\ \{}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(tmpsig,\ 0,\ 64);}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{secp256k1_8h_a2aff2802eca3d15ec54298e879579897}{secp256k1\_ecdsa\_signature\_parse\_compact}}(ctx,\ sig,\ tmpsig);}
+\DoxyCodeLine{00145\ \ \ \ \ \}}
+\DoxyCodeLine{00146\ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{00147\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{lax__der__parsing_8c_aebc754e4d7457c16a922ea14977974a4_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{lax__der__parsing_8c_aebc754e4d7457c16a922ea14977974a4_icgraph}
+\end{center}
+\end{figure}

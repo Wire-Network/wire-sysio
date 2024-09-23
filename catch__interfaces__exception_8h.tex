@@ -1,0 +1,95 @@
+\doxysection{libraries/sys-\/vm/external/\+Catch2/include/internal/catch\+\_\+interfaces\+\_\+exception.h File Reference}
+\hypertarget{catch__interfaces__exception_8h}{}\label{catch__interfaces__exception_8h}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_interfaces\_exception.h@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_interfaces\_exception.h}}
+{\ttfamily \#include "{}catch\+\_\+interfaces\+\_\+registry\+\_\+hub.\+h"{}}\newline
+{\ttfamily \#include $<$exception$>$}\newline
+{\ttfamily \#include $<$string$>$}\newline
+{\ttfamily \#include $<$vector$>$}\newline
+Include dependency graph for catch\+\_\+interfaces\+\_\+exception.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{catch__interfaces__exception_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{catch__interfaces__exception_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_catch_1_1_i_exception_translator}{Catch\+::\+IException\+Translator}}
+\item 
+struct \mbox{\hyperlink{struct_catch_1_1_i_exception_translator_registry}{Catch\+::\+IException\+Translator\+Registry}}
+\item 
+class \mbox{\hyperlink{class_catch_1_1_exception_translator_registrar}{Catch\+::\+Exception\+Translator\+Registrar}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespace_catch}{Catch}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{catch__interfaces__exception_8h_ab5314f401394dc4f7d1ac8b59370af09}{INTERNAL\+\_\+\+CATCH\+\_\+\+TRANSLATE\+\_\+\+EXCEPTION2}}(translator\+Name,  signature)
+\item 
+\#define \mbox{\hyperlink{catch__interfaces__exception_8h_a109d814750b0a695e2b66e9c53e748c0}{INTERNAL\+\_\+\+CATCH\+\_\+\+TRANSLATE\+\_\+\+EXCEPTION}}(signature)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{namespace_catch_ad62c5f867fc20c28dc4067a70afcdb7d}{Catch\+::exception\+Translate\+Function}} = std\+::string(\texorpdfstring{$\ast$}{*})()
+\item 
+using \mbox{\hyperlink{namespace_catch_a49b7a6b4679e1b57f1646f0ebda713b6}{Catch\+::\+Exception\+Translators}} = std\+::vector$<$std\+::unique\+\_\+ptr$<$\mbox{\hyperlink{struct_catch_1_1_i_exception_translator}{IException\+Translator}} const$>$$>$
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{catch__interfaces__exception_8h_a109d814750b0a695e2b66e9c53e748c0}\index{catch\_interfaces\_exception.h@{catch\_interfaces\_exception.h}!INTERNAL\_CATCH\_TRANSLATE\_EXCEPTION@{INTERNAL\_CATCH\_TRANSLATE\_EXCEPTION}}
+\index{INTERNAL\_CATCH\_TRANSLATE\_EXCEPTION@{INTERNAL\_CATCH\_TRANSLATE\_EXCEPTION}!catch\_interfaces\_exception.h@{catch\_interfaces\_exception.h}}
+\doxysubsubsection{\texorpdfstring{INTERNAL\_CATCH\_TRANSLATE\_EXCEPTION}{INTERNAL\_CATCH\_TRANSLATE\_EXCEPTION}}
+{\footnotesize\ttfamily \label{catch__interfaces__exception_8h_a109d814750b0a695e2b66e9c53e748c0} 
+\#define INTERNAL\+\_\+\+CATCH\+\_\+\+TRANSLATE\+\_\+\+EXCEPTION(\begin{DoxyParamCaption}\item[{}]{signature}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__interfaces__exception_8h_ab5314f401394dc4f7d1ac8b59370af09}{INTERNAL\_CATCH\_TRANSLATE\_EXCEPTION2}}(\ \mbox{\hyperlink{catch__common_8h_afe320ceec108fc8c160f9ac3938f1bc8}{INTERNAL\_CATCH\_UNIQUE\_NAME}}(\ catch\_internal\_ExceptionTranslator\ ),\ signature\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__interfaces__exception_8h_source_l00081}{81}} of file \mbox{\hyperlink{catch__interfaces__exception_8h_source}{catch\+\_\+interfaces\+\_\+exception.\+h}}.
+
+\Hypertarget{catch__interfaces__exception_8h_ab5314f401394dc4f7d1ac8b59370af09}\index{catch\_interfaces\_exception.h@{catch\_interfaces\_exception.h}!INTERNAL\_CATCH\_TRANSLATE\_EXCEPTION2@{INTERNAL\_CATCH\_TRANSLATE\_EXCEPTION2}}
+\index{INTERNAL\_CATCH\_TRANSLATE\_EXCEPTION2@{INTERNAL\_CATCH\_TRANSLATE\_EXCEPTION2}!catch\_interfaces\_exception.h@{catch\_interfaces\_exception.h}}
+\doxysubsubsection{\texorpdfstring{INTERNAL\_CATCH\_TRANSLATE\_EXCEPTION2}{INTERNAL\_CATCH\_TRANSLATE\_EXCEPTION2}}
+{\footnotesize\ttfamily \label{catch__interfaces__exception_8h_ab5314f401394dc4f7d1ac8b59370af09} 
+\#define INTERNAL\+\_\+\+CATCH\+\_\+\+TRANSLATE\+\_\+\+EXCEPTION2(\begin{DoxyParamCaption}\item[{}]{translator\+Name}{, }\item[{}]{signature}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{static}\ std::string\ translatorName(\ signature\ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ CATCH\_INTERNAL\_SUPPRESS\_GLOBALS\_WARNINGS\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ namespace\{\ \mbox{\hyperlink{class_catch_1_1_exception_translator_registrar}{Catch::ExceptionTranslatorRegistrar}}\ \mbox{\hyperlink{catch__common_8h_afe320ceec108fc8c160f9ac3938f1bc8}{INTERNAL\_CATCH\_UNIQUE\_NAME}}(\ catch\_internal\_ExceptionRegistrar\ )(\ \&translatorName\ );\ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ CATCH\_INTERNAL\_UNSUPPRESS\_GLOBALS\_WARNINGS\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ static\ std::string\ translatorName(\ signature\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__interfaces__exception_8h_source_l00074}{74}} of file \mbox{\hyperlink{catch__interfaces__exception_8h_source}{catch\+\_\+interfaces\+\_\+exception.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00074\ \textcolor{preprocessor}{\#define\ INTERNAL\_CATCH\_TRANSLATE\_EXCEPTION2(\ translatorName,\ signature\ )\ \(\backslash\)}}
+\DoxyCodeLine{00075\ \textcolor{preprocessor}{\ \ \ \ static\ std::string\ translatorName(\ signature\ );\ \(\backslash\)}}
+\DoxyCodeLine{00076\ \textcolor{preprocessor}{\ \ \ \ CATCH\_INTERNAL\_SUPPRESS\_GLOBALS\_WARNINGS\ \(\backslash\)}}
+\DoxyCodeLine{00077\ \textcolor{preprocessor}{\ \ \ \ namespace\{\ Catch::ExceptionTranslatorRegistrar\ INTERNAL\_CATCH\_UNIQUE\_NAME(\ catch\_internal\_ExceptionRegistrar\ )(\ \&translatorName\ );\ \}\ \(\backslash\)}}
+\DoxyCodeLine{00078\ \textcolor{preprocessor}{\ \ \ \ CATCH\_INTERNAL\_UNSUPPRESS\_GLOBALS\_WARNINGS\ \(\backslash\)}}
+\DoxyCodeLine{00079\ \textcolor{preprocessor}{\ \ \ \ static\ std::string\ translatorName(\ signature\ )}}
+
+\end{DoxyCode}

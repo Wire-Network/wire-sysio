@@ -1,0 +1,67 @@
+\doxysection{libraries/wasm-\/jit/\+Source/\+WAST/\+NFA.cpp File Reference}
+\hypertarget{_n_f_a_8cpp}{}\label{_n_f_a_8cpp}\index{libraries/wasm-\/jit/Source/WAST/NFA.cpp@{libraries/wasm-\/jit/Source/WAST/NFA.cpp}}
+{\ttfamily \#include "{}Inline/\+Basic\+Types.\+h"{}}\newline
+{\ttfamily \#include "{}Inline/\+Errors.\+h"{}}\newline
+{\ttfamily \#include "{}Inline/\+Timing.\+h"{}}\newline
+{\ttfamily \#include "{}Platform/\+Platform.\+h"{}}\newline
+{\ttfamily \#include "{}NFA.\+h"{}}\newline
+{\ttfamily \#include $<$set$>$}\newline
+{\ttfamily \#include $<$map$>$}\newline
+{\ttfamily \#include $<$string$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include $<$algorithm$>$}\newline
+Include dependency graph for NFA.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{_n_f_a_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_n_f_a_1_1_n_f_a_state}{NFA\+::\+NFAState}}
+\item 
+struct \mbox{\hyperlink{struct_n_f_a_1_1_builder}{NFA\+::\+Builder}}
+\item 
+struct \mbox{\hyperlink{struct_n_f_a_1_1_d_f_a_state}{NFA\+::\+DFAState}}
+\item 
+struct \mbox{\hyperlink{struct_n_f_a_1_1_state_transitions_by_char}{NFA\+::\+State\+Transitions\+By\+Char}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespace_n_f_a}{NFA}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef std\+::vector$<$ \mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{State\+Index}} $>$ \mbox{\hyperlink{namespace_n_f_a_a570d84ef0d5ae4e6a39b5c9477f5550a}{NFA\+::\+State\+Set}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename Element $>$ }\\void \mbox{\hyperlink{namespace_n_f_a_aee88df88a0f7b7a71e4f1f40ed4f2549}{NFA\+::add\+Unique}} (std\+::vector$<$ Element $>$ \&vector, const Element \&element)
+\item 
+\mbox{\hyperlink{struct_n_f_a_1_1_builder}{Builder}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_n_f_a_adf36678137843faef3c32d8f0a9dcb25}{NFA\+::create\+Builder}} ()
+\item 
+\mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{State\+Index}} \mbox{\hyperlink{namespace_n_f_a_aa1fa2de1cb3ea820ec7ae1994d624803}{NFA\+::add\+State}} (\mbox{\hyperlink{struct_n_f_a_1_1_builder}{Builder}} \texorpdfstring{$\ast$}{*}builder)
+\item 
+void \mbox{\hyperlink{namespace_n_f_a_a7fcfabbb0aaf904f594a4c6d72e9e54c}{NFA\+::add\+Edge}} (\mbox{\hyperlink{struct_n_f_a_1_1_builder}{Builder}} \texorpdfstring{$\ast$}{*}builder, \mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{State\+Index}} initial\+State, const \mbox{\hyperlink{namespace_n_f_a_aab46c702df98598c70d9290d164ffa99}{Char\+Set}} \&predicate, \mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{State\+Index}} next\+State)
+\item 
+void \mbox{\hyperlink{namespace_n_f_a_acfdce2879b3ebd805fc8512239d7dd44}{NFA\+::add\+Epsilon\+Edge}} (\mbox{\hyperlink{struct_n_f_a_1_1_builder}{Builder}} \texorpdfstring{$\ast$}{*}builder, \mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{State\+Index}} initial\+State, \mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{State\+Index}} next\+State)
+\item 
+\mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{State\+Index}} \mbox{\hyperlink{namespace_n_f_a_ad1e9e5dd3c2cdbefdf6ba97f12d26eae}{NFA\+::get\+Non\+Terminal\+Edge}} (\mbox{\hyperlink{struct_n_f_a_1_1_builder}{Builder}} \texorpdfstring{$\ast$}{*}builder, \mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{State\+Index}} initial\+State, char c)
+\item 
+std\+::vector$<$ \mbox{\hyperlink{struct_n_f_a_1_1_d_f_a_state}{DFAState}} $>$ \mbox{\hyperlink{namespace_n_f_a_a85f8760e97560d17b54b9d9404a28e8e}{NFA\+::convert\+To\+DFA}} (\mbox{\hyperlink{struct_n_f_a_1_1_builder}{Builder}} \texorpdfstring{$\ast$}{*}builder)
+\item 
+char \mbox{\hyperlink{namespace_n_f_a_a3ef97d19fa0e3344352c4d88f439b92d}{NFA\+::nibble\+To\+Hex\+Char}} (\mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+std\+::string \mbox{\hyperlink{namespace_n_f_a_abebdef6f328f9c9b95753bc0c3f24af7}{NFA\+::escape\+String}} (const std\+::string \&string)
+\item 
+std\+::string \mbox{\hyperlink{namespace_n_f_a_adc756f037e3d4d7c0de30430245cf6d2}{NFA\+::get\+Graph\+Edge\+Char\+Label}} (\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} char\+Index)
+\item 
+std\+::string \mbox{\hyperlink{namespace_n_f_a_a7386c58e4560679b7381ec2aa47f7933}{NFA\+::get\+Graph\+Edge\+Label}} (const \mbox{\hyperlink{namespace_n_f_a_aab46c702df98598c70d9290d164ffa99}{Char\+Set}} \&char\+Set)
+\item 
+std\+::string \mbox{\hyperlink{namespace_n_f_a_ad2bae1dc95f748e75ed2ef3d06b38868}{NFA\+::dump\+NFAGraph\+Viz}} (const \mbox{\hyperlink{struct_n_f_a_1_1_builder}{Builder}} \texorpdfstring{$\ast$}{*}builder)
+\end{DoxyCompactItemize}

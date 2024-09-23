@@ -1,0 +1,84 @@
+\doxysection{Linker.\+h}
+\hypertarget{_linker_8h_source}{}\label{_linker_8h_source}\index{libraries/wasm-\/jit/Include/Runtime/Linker.h@{libraries/wasm-\/jit/Include/Runtime/Linker.h}}
+\mbox{\hyperlink{_linker_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00003}00003\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_basic_types_8h}{Inline/BasicTypes.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00004}00004\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_runtime_8h}{Runtime.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <functional>}}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00008}00008\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_runtime}{Runtime}}}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00009}00009\ \{}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00010}00010\ \ \ \ \ \textcolor{comment}{//\ An\ abstract\ resolver:\ maps\ module+export\ name\ pairs\ to\ a\ Runtime::Object.}}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00011}\mbox{\hyperlink{struct_runtime_1_1_resolver}{00011}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_runtime_1_1_resolver}{Resolver}}}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00012}00012\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00013}\mbox{\hyperlink{struct_runtime_1_1_resolver_a8387253cf2addc917647cba230a00334}{00013}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_runtime_1_1_resolver_a8387253cf2addc917647cba230a00334}{resolve}}(\textcolor{keyword}{const}\ std::string\&\ moduleName,\textcolor{keyword}{const}\ std::string\&\ exportName,\mbox{\hyperlink{struct_i_r_1_1_object_type}{IR::ObjectType}}\ type,\mbox{\hyperlink{struct_runtime_1_1_object_instance}{ObjectInstance}}*\&\ outObject)\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00014}00014\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00016}00016\ \ \ \ \ \textcolor{comment}{//\ A\ resolver\ for\ intrinsics.}}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00017}\mbox{\hyperlink{struct_runtime_1_1_intrinsic_resolver}{00017}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_runtime_1_1_intrinsic_resolver}{IntrinsicResolver}}\ :\ \mbox{\hyperlink{struct_runtime_1_1_resolver}{Resolver}}}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00018}00018\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00019}\mbox{\hyperlink{struct_runtime_1_1_intrinsic_resolver_aedd78257585aeb8697fae5bc08254f47}{00019}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{_runtime_8h_aae02bf1df7927dd0f69c6412fce40fc4}{RUNTIME\_API}}\ \mbox{\hyperlink{struct_runtime_1_1_intrinsic_resolver}{IntrinsicResolver}}\ \mbox{\hyperlink{struct_runtime_1_1_intrinsic_resolver_aedd78257585aeb8697fae5bc08254f47}{singleton}};}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00020}00020\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_runtime_8h_aae02bf1df7927dd0f69c6412fce40fc4}{RUNTIME\_API}}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_runtime_1_1_intrinsic_resolver_a2a56dfa6a88e030be17a066d2907c763}{resolve}}(\textcolor{keyword}{const}\ std::string\&\ moduleName,\textcolor{keyword}{const}\ std::string\&\ exportName,\mbox{\hyperlink{struct_i_r_1_1_object_type}{IR::ObjectType}}\ type,\mbox{\hyperlink{struct_runtime_1_1_object_instance}{ObjectInstance}}*\&\ outObject)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00021}00021\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00023}00023\ \ \ \ \ \textcolor{comment}{//\ A\ resolver\ that\ ignores\ the\ moduleName,\ and\ looks\ for\ the\ exportName\ in\ a\ single\ module.}}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00024}\mbox{\hyperlink{struct_runtime_1_1_module_export_resolver}{00024}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_runtime_1_1_module_export_resolver}{ModuleExportResolver}}\ :\ \mbox{\hyperlink{struct_runtime_1_1_resolver}{Resolver}}}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00025}00025\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00026}\mbox{\hyperlink{struct_runtime_1_1_module_export_resolver_ab887e7d30d7e2ccde81f0737cdab1ad8}{00026}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_runtime_1_1_module_export_resolver_ab887e7d30d7e2ccde81f0737cdab1ad8}{ModuleExportResolver}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_i_r_1_1_module}{IR::Module}}\&\ inModule,\mbox{\hyperlink{struct_runtime_1_1_module_instance}{ModuleInstance}}*\ inModuleInstance):\ module(inModule),\ moduleInstance(inModuleInstance)\ \{\}}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00028}\mbox{\hyperlink{struct_runtime_1_1_module_export_resolver_af72a8f24c5c5c1501466dc94b57eb97f}{00028}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_runtime_1_1_module_export_resolver_af72a8f24c5c5c1501466dc94b57eb97f}{resolve}}(\textcolor{keyword}{const}\ std::string\&\ moduleName,\textcolor{keyword}{const}\ std::string\&\ exportName,\mbox{\hyperlink{struct_i_r_1_1_object_type}{IR::ObjectType}}\ type,\mbox{\hyperlink{struct_runtime_1_1_object_instance}{ObjectInstance}}*\&\ outObject)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00029}00029\ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00030}00030\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_i_r_1_1_module}{IR::Module}}\&\ module;}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00031}00031\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_runtime_1_1_module_instance}{ModuleInstance}}*\ moduleInstance;}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00032}00032\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00034}00034\ \ \ \ \ \textcolor{comment}{//\ A\ resolver\ that\ lazily\ creates\ an\ inner\ resolver\ when\ it's\ first\ used,\ then\ forwards\ all\ queries\ to\ the\ inner\ resolver.}}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00035}\mbox{\hyperlink{struct_runtime_1_1_lazy_resolver}{00035}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_runtime_1_1_lazy_resolver}{LazyResolver}}\ :\ \mbox{\hyperlink{struct_runtime_1_1_resolver}{Resolver}}}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00036}00036\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00037}\mbox{\hyperlink{struct_runtime_1_1_lazy_resolver_aa5bcb6ac1a7d1042c612ec60bc30cf35}{00037}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_runtime_1_1_lazy_resolver_aa5bcb6ac1a7d1042c612ec60bc30cf35}{LazyResolver}}(std::function<\mbox{\hyperlink{struct_runtime_1_1_resolver}{Resolver}}*()>\&\ inInnerResolverThunk)}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00038}00038\ \ \ \ \ \ \ \ \ :\ innerResolverThunk(\mbox{\hyperlink{namespacestd}{std}}::move(inInnerResolverThunk)),\ innerResolver(nullptr)\ \{\}}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00040}\mbox{\hyperlink{struct_runtime_1_1_lazy_resolver_a017b70308cc0fb38d2fcdbb372f74362}{00040}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_runtime_1_1_lazy_resolver_a017b70308cc0fb38d2fcdbb372f74362}{resolve}}(\textcolor{keyword}{const}\ std::string\&\ moduleName,\textcolor{keyword}{const}\ std::string\&\ exportName,\mbox{\hyperlink{struct_i_r_1_1_object_type}{IR::ObjectType}}\ type,\mbox{\hyperlink{struct_runtime_1_1_object_instance}{Runtime::ObjectInstance}}*\&\ outObject)\textcolor{keyword}{\ override}}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00041}00041\ \textcolor{keyword}{\ \ \ \ \ \ \ \ }\{}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00042}00042\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!innerResolver)\ \{\ innerResolver\ =\ innerResolverThunk();\ \}}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00043}00043\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ innerResolver-\/>\mbox{\hyperlink{struct_runtime_1_1_resolver_a8387253cf2addc917647cba230a00334}{resolve}}(moduleName,exportName,type,outObject);}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00044}00044\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00046}00046\ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00048}00048\ \ \ \ \ \ \ \ \ std::function<\mbox{\hyperlink{struct_runtime_1_1_resolver}{Resolver}}*()>\ innerResolverThunk;}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00049}00049\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_runtime_1_1_resolver}{Resolver}}*\ innerResolver;}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00050}00050\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00052}00052\ \ \ \ \ \textcolor{comment}{//\ A\ resolver\ that\ always\ returns\ failure.}}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00053}\mbox{\hyperlink{struct_runtime_1_1_null_resolver}{00053}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_runtime_1_1_null_resolver}{NullResolver}}\ :\ \mbox{\hyperlink{struct_runtime_1_1_resolver}{Resolver}}}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00054}00054\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00055}\mbox{\hyperlink{struct_runtime_1_1_null_resolver_a2a6e6891570ac79ad660c78e7b8ea042}{00055}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_runtime_1_1_null_resolver_a2a6e6891570ac79ad660c78e7b8ea042}{resolve}}(\textcolor{keyword}{const}\ std::string\&\ moduleName,\textcolor{keyword}{const}\ std::string\&\ exportName,\mbox{\hyperlink{struct_i_r_1_1_object_type}{IR::ObjectType}}\ type,\mbox{\hyperlink{struct_runtime_1_1_object_instance}{Runtime::ObjectInstance}}*\&\ outObject)\textcolor{keyword}{\ override}}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00056}00056\ \textcolor{keyword}{\ \ \ \ \ \ \ \ }\{}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00058}00058\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00059}00059\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00061}00061\ \ \ \ \ \textcolor{comment}{//\ Links\ a\ module\ using\ the\ given\ resolver,\ returning\ an\ array\ mapping\ import\ indices\ to\ objects.}}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00062}00062\ \ \ \ \ \textcolor{comment}{//\ If\ the\ resolver\ fails\ to\ resolve\ any\ imports,\ throws\ a\ LinkException.}}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00063}\mbox{\hyperlink{struct_runtime_1_1_link_result}{00063}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_runtime_1_1_link_result}{LinkResult}}}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00064}00064\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00065}\mbox{\hyperlink{struct_runtime_1_1_link_result_1_1_missing_import}{00065}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_runtime_1_1_link_result_1_1_missing_import}{MissingImport}}}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00066}00066\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00067}\mbox{\hyperlink{struct_runtime_1_1_link_result_1_1_missing_import_aed2d1900488c9cb9c347dd941695cfd6}{00067}}\ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ \mbox{\hyperlink{struct_runtime_1_1_link_result_1_1_missing_import_aed2d1900488c9cb9c347dd941695cfd6}{moduleName}};}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00068}\mbox{\hyperlink{struct_runtime_1_1_link_result_1_1_missing_import_a9c94f294ff5fccb290adab23ddaf0785}{00068}}\ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ \mbox{\hyperlink{struct_runtime_1_1_link_result_1_1_missing_import_a9c94f294ff5fccb290adab23ddaf0785}{exportName}};}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00069}\mbox{\hyperlink{struct_runtime_1_1_link_result_1_1_missing_import_af23f523b5a6a6ecf55c7c12d6a5d0678}{00069}}\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_i_r_1_1_object_type}{IR::ObjectType}}\ \mbox{\hyperlink{struct_runtime_1_1_link_result_1_1_missing_import_af23f523b5a6a6ecf55c7c12d6a5d0678}{type}};}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00070}00070\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00072}\mbox{\hyperlink{struct_runtime_1_1_link_result_a1536a51a79ba5e395fd5e7fb5dbebc2d}{00072}}\ \ \ \ \ \ \ \ \ std::vector<MissingImport>\ \mbox{\hyperlink{struct_runtime_1_1_link_result_a1536a51a79ba5e395fd5e7fb5dbebc2d}{missingImports}};}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00073}\mbox{\hyperlink{struct_runtime_1_1_link_result_adcdc7055d36a907b85059c418b0ba498}{00073}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_runtime_1_1_import_bindings}{ImportBindings}}\ \mbox{\hyperlink{struct_runtime_1_1_link_result_adcdc7055d36a907b85059c418b0ba498}{resolvedImports}};}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00074}\mbox{\hyperlink{struct_runtime_1_1_link_result_aaa99197bc06bcff6f0f29a57d4ea33bc}{00074}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_runtime_1_1_link_result_aaa99197bc06bcff6f0f29a57d4ea33bc}{success}};}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00075}00075\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00076}00076\ }
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00077}00077\ \ \ \ \ \mbox{\hyperlink{_runtime_8h_aae02bf1df7927dd0f69c6412fce40fc4}{RUNTIME\_API}}\ \mbox{\hyperlink{struct_runtime_1_1_link_result}{LinkResult}}\ \mbox{\hyperlink{namespace_runtime_a74a9b1ac9621ecedb5ea0c634211ccec}{linkModule}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_i_r_1_1_module}{IR::Module}}\&\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}},\mbox{\hyperlink{struct_runtime_1_1_resolver}{Resolver}}\&\ resolver);}
+\DoxyCodeLine{\Hypertarget{_linker_8h_source_l00078}00078\ \}}
+
+\end{DoxyCode}

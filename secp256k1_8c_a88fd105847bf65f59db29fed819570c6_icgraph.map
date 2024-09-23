@@ -1,0 +1,7 @@
+<map id="secp256k1_ec_pubkey_cmp" name="secp256k1_ec_pubkey_cmp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="313,5,499,31"/>
+<area shape="rect" id="Node000002" href="$tests_8c.html#a955332f914fb4ca4bf86767f3e901d99" title=" " alt="" coords="103,5,265,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="298,21,266,21,266,16,298,16"/>
+<area shape="rect" id="Node000003" href="$tests_8c.html#a3c04138a5bfe5d72780bb7e82a18e627" title=" " alt="" coords="5,5,55,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="87,21,55,21,55,16,87,16"/>
+</map>

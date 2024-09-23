@@ -1,0 +1,51 @@
+\doxysection{libraries/sys-\/vm/tests/parse\+\_\+tests.cpp File Reference}
+\hypertarget{parse__tests_8cpp}{}\label{parse__tests_8cpp}\index{libraries/sys-\/vm/tests/parse\_tests.cpp@{libraries/sys-\/vm/tests/parse\_tests.cpp}}
+{\ttfamily \#include $<$algorithm$>$}\newline
+{\ttfamily \#include $<$vector$>$}\newline
+{\ttfamily \#include $<$iterator$>$}\newline
+{\ttfamily \#include $<$cstdlib$>$}\newline
+{\ttfamily \#include $<$fstream$>$}\newline
+{\ttfamily \#include $<$string$>$}\newline
+{\ttfamily \#include "{}utils.\+hpp"{}}\newline
+{\ttfamily \#include $<$sysio/vm/backend.\+hpp$>$}\newline
+Include dependency graph for parse\+\_\+tests.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{parse__tests_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{parse__tests_8cpp_a49df642b1ed73b527cab5ec35cd328c2}{TEST\+\_\+\+CASE}} ("{}small parse test"{}, "{}\mbox{[}small\+\_\+parse\+\_\+test\mbox{]}"{})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{parse__tests_8cpp_a49df642b1ed73b527cab5ec35cd328c2}\index{parse\_tests.cpp@{parse\_tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!parse\_tests.cpp@{parse\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}}
+{\footnotesize\ttfamily \label{parse__tests_8cpp_a49df642b1ed73b527cab5ec35cd328c2} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}small parse test"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}small\+\_\+parse\+\_\+test\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{parse__tests_8cpp_source_l00015}{15}} of file \mbox{\hyperlink{parse__tests_8cpp_source}{parse\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00016\ \ \ \ \textcolor{keyword}{module}\ mod;}
+\DoxyCodeLine{00017\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1binary__parser}{binary\_parser}}\ \mbox{\hyperlink{namespace_xbyak_1_1util_aa8a7e90a7fce7c382d20fa2a7895cda3}{bp}}\{mod.allocator\};}
+\DoxyCodeLine{00018\ \ \ \ \mbox{\hyperlink{namespacesysio_1_1vm_a6ffa5796148f0f779a3d44799c3f0cce}{wasm\_code}}\ error\ =\ \{\ 0x01,\ 0x61,\ 0x73,\ 0x6D,\ 0x01,\ 0x00,\ 0x00,\ 0x00\ \};}
+\DoxyCodeLine{00019\ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1guarded__ptr}{wasm\_code\_ptr}}\ error\_ptr(\ error.data(),\ 4\ );}
+\DoxyCodeLine{00020\ \ \ \ \textcolor{keyword}{auto}\ n\ =\ \mbox{\hyperlink{namespace_xbyak_1_1util_aa8a7e90a7fce7c382d20fa2a7895cda3}{bp}}.parse\_magic(\ error\_ptr\ );}
+\DoxyCodeLine{00021\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(n\ !=\ constants::magic);}
+\DoxyCodeLine{00022\ \ \ \ \mbox{\hyperlink{namespacesysio_1_1vm_a6ffa5796148f0f779a3d44799c3f0cce}{wasm\_code}}\ correct\ =\ \{\ 0x00,\ 0x61,\ 0x73,\ 0x6D,\ 0x01,\ 0x00,\ 0x00,\ 0x00\ \};}
+\DoxyCodeLine{00023\ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1guarded__ptr}{wasm\_code\_ptr}}\ correct\_ptr(\ correct.data(),\ 4\ );}
+\DoxyCodeLine{00024\ \ \ \ n\ =\ \mbox{\hyperlink{namespace_xbyak_1_1util_aa8a7e90a7fce7c382d20fa2a7895cda3}{bp}}.parse\_magic(\ correct\_ptr\ );}
+\DoxyCodeLine{00025\ \ \ \ CHECKL(n\ ==\ constants::magic);}
+\DoxyCodeLine{00026\ \}}
+
+\end{DoxyCode}

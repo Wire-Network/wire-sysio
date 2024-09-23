@@ -1,0 +1,19 @@
+<map id="softfloat_roundToUI64" name="softfloat_roundToUI64">
+<area shape="rect" id="Node000001" title=" " alt="" coords="391,104,540,130"/>
+<area shape="rect" id="Node000002" href="$softfloat_2source_2ext_f80__to__ui64_8c.html#a84974acf6993edb82883778c38d711da" title=" " alt="" coords="233,5,343,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="431,98,342,45,320,34,322,29,344,40,433,93"/>
+<area shape="rect" id="Node000003" href="$softfloat_2source_2f128__to__ui64_8c.html#a27722ee7b13a2313a96a7b90d93c354b" title=" " alt="" coords="240,55,336,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="401,102,335,83,336,78,403,97"/>
+<area shape="rect" id="Node000005" href="$softfloat_2source_2f16__to__ui64_8c.html#a9a0ee0a7170baf10016f6ba77e438ecc" title=" " alt="" coords="244,104,332,130"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="376,120,332,120,332,114,376,114"/>
+<area shape="rect" id="Node000006" href="$softfloat_2source_2f32__to__ui64_8c.html#a10eaf8e2a37dbd5063a3fc6fb19e642b" title=" " alt="" coords="244,153,332,179"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="402,137,333,157,331,151,401,132"/>
+<area shape="rect" id="Node000008" href="$softfloat_2source_2f64__to__ui64_8c.html#a0e1be7b0e0510a4fb4dc86f3b624bbe4" title=" " alt="" coords="244,204,332,230"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="433,141,344,194,320,206,318,201,342,189,430,136"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1chain_1_1webassembly_1_1interface.html#a57d72d349c784b9e635c7d4622403ed9" title=" " alt="" coords="5,47,185,88"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="225,70,185,70,185,65,225,65"/>
+<area shape="rect" id="Node000007" href="$classsysio_1_1chain_1_1webassembly_1_1interface.html#a56997f7cc9aeca9388bc0877bf157f2f" title=" " alt="" coords="5,125,185,181"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="228,165,185,162,185,156,228,159"/>
+<area shape="rect" id="Node000009" href="$classsysio_1_1chain_1_1webassembly_1_1interface.html#a37ddf89c3f00f6cca407bdc7bfc696dd" title=" " alt="" coords="5,205,185,261"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="229,224,185,228,185,223,228,219"/>
+</map>

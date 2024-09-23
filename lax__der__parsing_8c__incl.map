@@ -1,0 +1,11 @@
+<map id="libraries/fc/secp256k1/secp256k1/contrib/lax_der_parsing.c" name="libraries/fc/secp256k1/secp256k1/contrib/lax_der_parsing.c">
+<area shape="rect" id="Node000001" title=" " alt="" coords="20,5,172,61"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,109,70,135"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="80,63,56,97,52,94,76,60"/>
+<area shape="rect" id="Node000003" href="$lax__der__parsing_8h.html" title=" " alt="" coords="93,109,216,135"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="117,60,140,94,136,97,112,63"/>
+<area shape="rect" id="Node000004" href="$secp256k1_8h.html" title=" " alt="" coords="107,183,202,208"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="158,135,158,167,152,167,152,135"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="121,256,189,282"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="158,209,158,241,152,241,152,209"/>
+</map>

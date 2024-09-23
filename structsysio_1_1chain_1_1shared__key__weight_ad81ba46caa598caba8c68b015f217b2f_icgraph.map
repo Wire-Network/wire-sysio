@@ -1,0 +1,7 @@
+<map id="sysio::chain::shared_key_weight::convert" name="sysio::chain::shared_key_weight::convert">
+<area shape="rect" id="Node000001" title=" " alt="" coords="201,41,346,82"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1shared__authority.html#adf98da48946bdf69398c5e6faa35876f" title=" " alt="" coords="8,5,150,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="185,48,150,41,151,36,186,43"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1chain_1_1block__signing__authority__v0.html#a4074d61254405da4a3aaf37afad869a9" title=" " alt="" coords="5,70,153,126"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="186,81,154,87,153,81,185,75"/>
+</map>

@@ -1,0 +1,25 @@
+<map id="sysio::chain_apis::read_only::get_producer_schedule" name="sysio::chain_apis::read_only::get_producer_schedule">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,96,166,152"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1chain_1_1controller.html#ae0a1946cc6f7b87bd0cfa94bc9aa20b7" title=" " alt="" coords="214,5,366,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="139,94,212,57,225,51,228,55,215,61,141,98"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1chain_1_1controller.html#a54645293859c265a7492eb002719c3dc" title=" " alt="" coords="214,71,366,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="166,109,198,103,199,109,166,114"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1chain_1_1controller.html#a3c16d661e137dbe654a1c40a972759d4" title=" " alt="" coords="214,136,366,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="166,134,199,139,198,145,166,140"/>
+<area shape="rect" id="Node000009" href="$namespacefc.html#adea61f2343de94d0fbcb920a32332ad9" title=" " alt="" coords="241,205,338,230"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="141,150,215,186,239,196,237,201,213,191,139,155"/>
+<area shape="rect" id="Node000005" href="$structsysio_1_1chain_1_1producer__authority__schedule.html#a4b0d95b22a8be15ac06dc3b105638c54" title=" " alt="" coords="414,56,585,112"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="350,133,401,115,403,120,352,138"/>
+<area shape="rect" id="Node000008" href="$classsysio_1_1chain_1_1controller.html#a0bb11e832a05b6437c79bf81758b1b7d" title=" " alt="" coords="424,136,576,177"/>
+<area shape="poly" id="edge7_Node000004_Node000008" title=" " alt="" coords="367,154,408,154,408,159,367,159"/>
+<area shape="rect" id="Node000006" href="$structsysio_1_1chain_1_1producer__authority.html#a1861665169e509d0bcf56bbf6064a1f9" title=" " alt="" coords="633,64,792,105"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="586,82,618,82,618,87,586,87"/>
+<area shape="rect" id="Node000007" href="$structsysio_1_1chain_1_1block__signing__authority__v0.html#a939082a81292f2aed3e844140b59461c" title=" " alt="" coords="840,56,987,112"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="792,82,824,82,824,87,792,87"/>
+<area shape="rect" id="Node000010" href="$structsysio_1_1chain_1_1shared__public__key.html#a328e4a70940629953f9087100c46b207" title=" " alt="" coords="426,201,574,242"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="339,216,410,217,410,223,339,221"/>
+<area shape="rect" id="Node000011" href="$classfc_1_1crypto_1_1public__key.html#ada5158a385e0d407268feb4790ba8646" title=" " alt="" coords="653,201,772,242"/>
+<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="574,219,638,219,638,224,574,224"/>
+<area shape="rect" id="Node000012" href="$classfc_1_1crypto_1_1public__key.html#aa96a2da856cbba914572aa8629c06c09" title=" " alt="" coords="854,201,972,242"/>
+<area shape="poly" id="edge11_Node000011_Node000012" title=" " alt="" coords="772,219,839,219,839,224,772,224"/>
+</map>

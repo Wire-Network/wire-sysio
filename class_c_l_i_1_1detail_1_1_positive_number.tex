@@ -1,0 +1,140 @@
+\doxysection{CLI\+::detail\+::Positive\+Number Class Reference}
+\hypertarget{class_c_l_i_1_1detail_1_1_positive_number}{}\label{class_c_l_i_1_1detail_1_1_positive_number}\index{CLI::detail::PositiveNumber@{CLI::detail::PositiveNumber}}
+
+
+Validate the argument is a number and greater than 0.  
+
+
+
+
+{\ttfamily \#include $<$CLI11.\+hpp$>$}
+
+
+
+Inheritance diagram for CLI\+::detail\+::Positive\+Number\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=217pt]{class_c_l_i_1_1detail_1_1_positive_number__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for CLI\+::detail\+::Positive\+Number\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=217pt]{class_c_l_i_1_1detail_1_1_positive_number__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_c_l_i_1_1detail_1_1_positive_number_ae4778813af1a6a79e97152239bc51694}{Positive\+Number}} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{class_c_l_i_1_1_validator}{CLI\+::\+Validator}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_c_l_i_1_1_validator_a918d82662319f6dc9dad53d580741569}{Validator}} ()=default
+\item 
+\mbox{\hyperlink{class_c_l_i_1_1_validator_a71df7c1c94c4abceee930eef957f5b76}{Validator}} (std\+::string validator\+\_\+desc)
+\begin{DoxyCompactList}\small\item\em Construct a \doxylink{class_c_l_i_1_1_validator}{Validator} with just the description string. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_c_l_i_1_1_validator_aede1b1a51a7f924342a92cbbd3ee41be}{Validator}} (std\+::function$<$ std\+::string(std\+::string \&)$>$ \mbox{\hyperlink{unionop}{op}}, std\+::string validator\+\_\+desc, std\+::string validator\+\_\+name="{}"{})
+\begin{DoxyCompactList}\small\item\em Construct \doxylink{class_c_l_i_1_1_validator}{Validator} from basic information. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_c_l_i_1_1_validator}{Validator}} \& \mbox{\hyperlink{class_c_l_i_1_1_validator_afc57c1bbaadbff4ce9c5772519818831}{operation}} (std\+::function$<$ std\+::string(std\+::string \&)$>$ \mbox{\hyperlink{unionop}{op}})
+\begin{DoxyCompactList}\small\item\em Set the \doxylink{class_c_l_i_1_1_validator}{Validator} operation function. \end{DoxyCompactList}\item 
+std\+::string \mbox{\hyperlink{class_c_l_i_1_1_validator_a97241be1f8ac1c8d2fabdcf2ec761f49}{operator()}} (std\+::string \&str) const
+\item 
+std\+::string \mbox{\hyperlink{class_c_l_i_1_1_validator_a3e4e7670d82455a43c0d3f8c9cc1db4f}{operator()}} (const std\+::string \&str) const
+\item 
+\mbox{\hyperlink{class_c_l_i_1_1_validator}{Validator}} \& \mbox{\hyperlink{class_c_l_i_1_1_validator_a35930c9b193bb0f7c5b7597dfe002e1f}{description}} (std\+::string validator\+\_\+desc)
+\begin{DoxyCompactList}\small\item\em Specify the type string. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_c_l_i_1_1_validator}{Validator}} \mbox{\hyperlink{class_c_l_i_1_1_validator_acb7942915861f00426ba4106c3fa1445}{description}} (std\+::string validator\+\_\+desc) const
+\begin{DoxyCompactList}\small\item\em Specify the type string. \end{DoxyCompactList}\item 
+std\+::string \mbox{\hyperlink{class_c_l_i_1_1_validator_a77c9d0a1f496ccaa4a8ef293a41bca78}{get\+\_\+description}} () const
+\begin{DoxyCompactList}\small\item\em Generate type description information for the \doxylink{class_c_l_i_1_1_validator}{Validator}. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_c_l_i_1_1_validator}{Validator}} \& \mbox{\hyperlink{class_c_l_i_1_1_validator_a8fc0ddaaa61f5dc5a7fa527d697991da}{name}} (std\+::string validator\+\_\+name)
+\begin{DoxyCompactList}\small\item\em Specify the type string. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_c_l_i_1_1_validator}{Validator}} \mbox{\hyperlink{class_c_l_i_1_1_validator_a56272c0571e4b28e5f1387787bee671c}{name}} (std\+::string validator\+\_\+name) const
+\begin{DoxyCompactList}\small\item\em Specify the type string. \end{DoxyCompactList}\item 
+const std\+::string \& \mbox{\hyperlink{class_c_l_i_1_1_validator_a688775a9b9dffb8f7e40cfb42af11697}{get\+\_\+name}} () const
+\begin{DoxyCompactList}\small\item\em Get the name of the \doxylink{class_c_l_i_1_1_validator}{Validator}. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_c_l_i_1_1_validator}{Validator}} \& \mbox{\hyperlink{class_c_l_i_1_1_validator_ac8f0bd247c6cca15729c2f0f5b822fe4}{active}} (bool active\+\_\+val=true)
+\begin{DoxyCompactList}\small\item\em Specify whether the \doxylink{class_c_l_i_1_1_validator}{Validator} is active or not. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_c_l_i_1_1_validator}{Validator}} \mbox{\hyperlink{class_c_l_i_1_1_validator_a98fa76ba029599613e3ab8609e25af4d}{active}} (bool active\+\_\+val=true) const
+\begin{DoxyCompactList}\small\item\em Specify whether the \doxylink{class_c_l_i_1_1_validator}{Validator} is active or not. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_c_l_i_1_1_validator}{Validator}} \& \mbox{\hyperlink{class_c_l_i_1_1_validator_a356d979d984dffff3489caf4baca9160}{non\+\_\+modifying}} (bool no\+\_\+modify=true)
+\begin{DoxyCompactList}\small\item\em Specify whether the \doxylink{class_c_l_i_1_1_validator}{Validator} can be modifying or not. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_c_l_i_1_1_validator}{Validator}} \& \mbox{\hyperlink{class_c_l_i_1_1_validator_ae24fb3eedf62301b733b3a20d2b93757}{application\+\_\+index}} (int app\+\_\+index)
+\begin{DoxyCompactList}\small\item\em Specify the application index of a validator. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_c_l_i_1_1_validator}{Validator}} \mbox{\hyperlink{class_c_l_i_1_1_validator_a5f621b1380d9a1a3694bc509a087d1cd}{application\+\_\+index}} (int app\+\_\+index) const
+\begin{DoxyCompactList}\small\item\em Specify the application index of a validator. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{class_c_l_i_1_1_validator_aa27699959ccccc236af305582d2b3e90}{get\+\_\+application\+\_\+index}} () const
+\begin{DoxyCompactList}\small\item\em Get the current value of the application index. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_c_l_i_1_1_validator_a1c08bcd3bca8c446e49e44d2c4e1413f}{get\+\_\+active}} () const
+\begin{DoxyCompactList}\small\item\em Get a boolean if the validator is active. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_c_l_i_1_1_validator_addb6df41feafbbbe6347a46151d55762}{get\+\_\+modifying}} () const
+\begin{DoxyCompactList}\small\item\em Get a boolean if the validator is allowed to modify the input returns true if it can modify the input. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_c_l_i_1_1_validator}{Validator}} \mbox{\hyperlink{class_c_l_i_1_1_validator_a52e52713e3e170d132a01bf91ea2b879}{operator\&}} (const \mbox{\hyperlink{class_c_l_i_1_1_validator}{Validator}} \&other) const
+\item 
+\mbox{\hyperlink{class_c_l_i_1_1_validator}{Validator}} \mbox{\hyperlink{class_c_l_i_1_1_validator_ac19919604a6ac47c5a1cbd34920991a4}{operator\texorpdfstring{$\vert$}{|}}} (const \mbox{\hyperlink{class_c_l_i_1_1_validator}{Validator}} \&other) const
+\item 
+\mbox{\hyperlink{class_c_l_i_1_1_validator}{Validator}} \mbox{\hyperlink{class_c_l_i_1_1_validator_ab113af781dbc286b22cdfeedd5204e68}{operator!}} () const
+\begin{DoxyCompactList}\small\item\em Create a validator that fails when a given validator succeeds. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Protected Attributes inherited from \mbox{\hyperlink{class_c_l_i_1_1_validator}{CLI\+::\+Validator}}}
+\begin{DoxyCompactItemize}
+\item 
+std\+::function$<$ std\+::string()$>$ \mbox{\hyperlink{class_c_l_i_1_1_validator_a9f00a86d01b79facfc300be76b7463d7}{desc\+\_\+function\+\_\+}} \{\mbox{[}$\,$\mbox{]}() \{ \mbox{\hyperlink{hello__driver_8cpp_a9717e7bbecb906637e86cef6da3d83c2}{return}} std\+::string\{\}; \}\}
+\begin{DoxyCompactList}\small\item\em This is the description function, if empty the description\+\_\+ will be used. \end{DoxyCompactList}\item 
+std\+::function$<$ std\+::string(std\+::string \&)$>$ \mbox{\hyperlink{class_c_l_i_1_1_validator_aa6c1eedd7839b91d88246539f2305ef3}{func\+\_\+}} \{\mbox{[}$\,$\mbox{]}(std\+::string \&) \{ \mbox{\hyperlink{hello__driver_8cpp_a9717e7bbecb906637e86cef6da3d83c2}{return}} std\+::string\{\}; \}\}
+\item 
+std\+::string \mbox{\hyperlink{class_c_l_i_1_1_validator_ac97b23ee16e15ae0b31253feb39706bf}{name\+\_\+}} \{\}
+\begin{DoxyCompactList}\small\item\em The name for search purposes of the \doxylink{class_c_l_i_1_1_validator}{Validator}. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{class_c_l_i_1_1_validator_a301ecf2851e4a7cdcad7c9b774598320}{application\+\_\+index\+\_\+}} = -\/1
+\begin{DoxyCompactList}\small\item\em \doxylink{struct_a}{A} \doxylink{class_c_l_i_1_1_validator}{Validator} will only apply to an indexed value (-\/1 is all elements) \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_c_l_i_1_1_validator_a558776377513d88bf637b5d775c4e31b}{active\+\_\+}} \{true\}
+\begin{DoxyCompactList}\small\item\em Enable for \doxylink{class_c_l_i_1_1_validator}{Validator} to allow it to be disabled if need be. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_c_l_i_1_1_validator_a60df532d1d80afc040ec0e8ed2736200}{non\+\_\+modifying\+\_\+}} \{false\}
+\begin{DoxyCompactList}\small\item\em specify that a validator should not modify the input \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l02438}{2438}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_c_l_i_1_1detail_1_1_positive_number_ae4778813af1a6a79e97152239bc51694}\index{CLI::detail::PositiveNumber@{CLI::detail::PositiveNumber}!PositiveNumber@{PositiveNumber}}
+\index{PositiveNumber@{PositiveNumber}!CLI::detail::PositiveNumber@{CLI::detail::PositiveNumber}}
+\doxysubsubsection{\texorpdfstring{PositiveNumber()}{PositiveNumber()}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1detail_1_1_positive_number_ae4778813af1a6a79e97152239bc51694} 
+CLI\+::detail\+::\+Positive\+Number\+::\+Positive\+Number (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l02440}{2440}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02440\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{class_c_l_i_1_1_validator_a918d82662319f6dc9dad53d580741569}{Validator}}(\textcolor{stringliteral}{"{}POSITIVE"{}})\ \{}
+\DoxyCodeLine{02441\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_c_l_i_1_1_validator_aa6c1eedd7839b91d88246539f2305ef3}{func\_}}\ =\ [](std::string\ \&number\_str)\ \{}
+\DoxyCodeLine{02442\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ number;}
+\DoxyCodeLine{02443\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!detail::lexical\_cast(number\_str,\ number))\ \{}
+\DoxyCodeLine{02444\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::string(\textcolor{stringliteral}{"{}Failed\ parsing\ number:\ ("{}})\ +\ number\_str\ +\ \textcolor{charliteral}{')'};}
+\DoxyCodeLine{02445\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{02446\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(number\ <=\ 0)\ \{}
+\DoxyCodeLine{02447\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::string(\textcolor{stringliteral}{"{}Number\ less\ or\ equal\ to\ 0:\ ("{}})\ +\ number\_str\ +\ \textcolor{charliteral}{')'};}
+\DoxyCodeLine{02448\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{02449\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::string();}
+\DoxyCodeLine{02450\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{02451\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+programs/clio/\mbox{\hyperlink{_c_l_i11_8hpp}{CLI11.\+hpp}}\end{DoxyCompactItemize}

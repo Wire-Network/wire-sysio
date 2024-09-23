@@ -1,0 +1,31 @@
+\doxysection{eckey.\+h}
+\hypertarget{eckey_8h_source}{}\label{eckey_8h_source}\index{libraries/fc/secp256k1/secp256k1/src/eckey.h@{libraries/fc/secp256k1/secp256k1/src/eckey.h}}
+\mbox{\hyperlink{eckey_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{eckey_8h_source_l00001}00001\ \textcolor{comment}{/***********************************************************************}}
+\DoxyCodeLine{\Hypertarget{eckey_8h_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2013,\ 2014\ Pieter\ Wuille\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{eckey_8h_source_l00003}00003\ \textcolor{comment}{\ *\ Distributed\ under\ the\ MIT\ software\ license,\ see\ the\ accompanying\ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{eckey_8h_source_l00004}00004\ \textcolor{comment}{\ *\ file\ COPYING\ or\ https://www.opensource.org/licenses/mit-\/license.php.*}}
+\DoxyCodeLine{\Hypertarget{eckey_8h_source_l00005}00005\ \textcolor{comment}{\ ***********************************************************************/}}
+\DoxyCodeLine{\Hypertarget{eckey_8h_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{eckey_8h_source_l00007}00007\ \textcolor{preprocessor}{\#ifndef\ SECP256K1\_ECKEY\_H}}
+\DoxyCodeLine{\Hypertarget{eckey_8h_source_l00008}00008\ \textcolor{preprocessor}{\#define\ SECP256K1\_ECKEY\_H}}
+\DoxyCodeLine{\Hypertarget{eckey_8h_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{eckey_8h_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <stddef.h>}}
+\DoxyCodeLine{\Hypertarget{eckey_8h_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{eckey_8h_source_l00012}00012\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{group_8h}{group.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{eckey_8h_source_l00013}00013\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{scalar_8h}{scalar.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{eckey_8h_source_l00014}00014\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ecmult_8h}{ecmult.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{eckey_8h_source_l00015}00015\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ecmult__gen_8h}{ecmult\_gen.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{eckey_8h_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{eckey_8h_source_l00017}00017\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ secp256k1\_eckey\_pubkey\_parse(\mbox{\hyperlink{structsecp256k1__ge}{secp256k1\_ge}}\ *elem,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *pub,\ \textcolor{keywordtype}{size\_t}\ size);}
+\DoxyCodeLine{\Hypertarget{eckey_8h_source_l00018}00018\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ secp256k1\_eckey\_pubkey\_serialize(\mbox{\hyperlink{structsecp256k1__ge}{secp256k1\_ge}}\ *elem,\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *pub,\ \textcolor{keywordtype}{size\_t}\ *size,\ \textcolor{keywordtype}{int}\ compressed);}
+\DoxyCodeLine{\Hypertarget{eckey_8h_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{eckey_8h_source_l00020}00020\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ secp256k1\_eckey\_privkey\_tweak\_add(\mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *key,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *tweak);}
+\DoxyCodeLine{\Hypertarget{eckey_8h_source_l00021}00021\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ secp256k1\_eckey\_pubkey\_tweak\_add(\mbox{\hyperlink{structsecp256k1__ge}{secp256k1\_ge}}\ *key,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *tweak);}
+\DoxyCodeLine{\Hypertarget{eckey_8h_source_l00022}00022\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ secp256k1\_eckey\_privkey\_tweak\_mul(\mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *key,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *tweak);}
+\DoxyCodeLine{\Hypertarget{eckey_8h_source_l00023}00023\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ secp256k1\_eckey\_pubkey\_tweak\_mul(\mbox{\hyperlink{structsecp256k1__ge}{secp256k1\_ge}}\ *key,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *tweak);}
+\DoxyCodeLine{\Hypertarget{eckey_8h_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{eckey_8h_source_l00025}00025\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{/*\ SECP256K1\_ECKEY\_H\ */}\textcolor{preprocessor}{}}
+
+\end{DoxyCode}

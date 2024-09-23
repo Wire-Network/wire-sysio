@@ -1,0 +1,126 @@
+\doxysection{Xbyak\+::Allocator Struct Reference}
+\hypertarget{struct_xbyak_1_1_allocator}{}\label{struct_xbyak_1_1_allocator}\index{Xbyak::Allocator@{Xbyak::Allocator}}
+
+
+{\ttfamily \#include $<$xbyak.\+h$>$}
+
+
+
+Inheritance diagram for Xbyak\+::Allocator\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=168pt]{struct_xbyak_1_1_allocator__inherit__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{normalize__prefix_8cpp_adde6aaee8457bee49c2a92621fe22b79}{uint8}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{struct_xbyak_1_1_allocator_a4adbb9f0cbdf45d2e6481b61303e5865}{alloc}} (size\+\_\+t size)
+\item 
+virtual void \mbox{\hyperlink{struct_xbyak_1_1_allocator_ae7ee203247d3eb99bbd177e98c8ffe20}{free}} (\mbox{\hyperlink{normalize__prefix_8cpp_adde6aaee8457bee49c2a92621fe22b79}{uint8}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})
+\item 
+virtual \mbox{\hyperlink{struct_xbyak_1_1_allocator_aa31445e1161668de5b8a87b08199a4b4}{\texorpdfstring{$\sim$}{\string~}\+Allocator}} ()
+\item 
+virtual bool \mbox{\hyperlink{struct_xbyak_1_1_allocator_a728cdd99f00af3b9c389bddd7c6572b2}{use\+Protect}} () const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00309}{309}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{struct_xbyak_1_1_allocator_aa31445e1161668de5b8a87b08199a4b4}\index{Xbyak::Allocator@{Xbyak::Allocator}!````~Allocator@{\texorpdfstring{$\sim$}{\string~}Allocator}}
+\index{````~Allocator@{\texorpdfstring{$\sim$}{\string~}Allocator}!Xbyak::Allocator@{Xbyak::Allocator}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}Allocator()}{\string~Allocator()}}
+{\footnotesize\ttfamily \label{struct_xbyak_1_1_allocator_aa31445e1161668de5b8a87b08199a4b4} 
+virtual Xbyak\+::\+Allocator\+::\texorpdfstring{$\sim$}{\string~}\+Allocator (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00312}{312}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00312\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_xbyak_1_1_allocator_a4adbb9f0cbdf45d2e6481b61303e5865}\index{Xbyak::Allocator@{Xbyak::Allocator}!alloc@{alloc}}
+\index{alloc@{alloc}!Xbyak::Allocator@{Xbyak::Allocator}}
+\doxysubsubsection{\texorpdfstring{alloc()}{alloc()}}
+{\footnotesize\ttfamily \label{struct_xbyak_1_1_allocator_a4adbb9f0cbdf45d2e6481b61303e5865} 
+virtual \mbox{\hyperlink{normalize__prefix_8cpp_adde6aaee8457bee49c2a92621fe22b79}{uint8}} \texorpdfstring{$\ast$}{*} Xbyak\+::\+Allocator\+::alloc (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{size}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{struct_my_allocator_a337d792819648b5c6720a0b2b0bc622c}{My\+Allocator}}.
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00310}{310}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00310\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{normalize__prefix_8cpp_adde6aaee8457bee49c2a92621fe22b79}{uint8}}*\textcolor{keyword}{>}(\mbox{\hyperlink{namespace_xbyak_acd5e5fdfad3f9247fe1fafc147c13f02}{AlignedMalloc}}(size,\ inner::ALIGN\_PAGE\_SIZE));\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=341pt]{struct_xbyak_1_1_allocator_a4adbb9f0cbdf45d2e6481b61303e5865_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_xbyak_1_1_allocator_ae7ee203247d3eb99bbd177e98c8ffe20}\index{Xbyak::Allocator@{Xbyak::Allocator}!free@{free}}
+\index{free@{free}!Xbyak::Allocator@{Xbyak::Allocator}}
+\doxysubsubsection{\texorpdfstring{free()}{free()}}
+{\footnotesize\ttfamily \label{struct_xbyak_1_1_allocator_ae7ee203247d3eb99bbd177e98c8ffe20} 
+virtual void Xbyak\+::\+Allocator\+::free (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{normalize__prefix_8cpp_adde6aaee8457bee49c2a92621fe22b79}{uint8}} \texorpdfstring{$\ast$}{*}}]{p}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{struct_my_allocator_aa7027489f3f1177073bdb97cb32fa13c}{My\+Allocator}}.
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00311}{311}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00311\ \{\ \mbox{\hyperlink{namespace_xbyak_a669e145d957208c83bfa93945998a2e8}{AlignedFree}}(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}});\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=328pt]{struct_xbyak_1_1_allocator_ae7ee203247d3eb99bbd177e98c8ffe20_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_xbyak_1_1_allocator_a728cdd99f00af3b9c389bddd7c6572b2}\index{Xbyak::Allocator@{Xbyak::Allocator}!useProtect@{useProtect}}
+\index{useProtect@{useProtect}!Xbyak::Allocator@{Xbyak::Allocator}}
+\doxysubsubsection{\texorpdfstring{useProtect()}{useProtect()}}
+{\footnotesize\ttfamily \label{struct_xbyak_1_1_allocator_a728cdd99f00af3b9c389bddd7c6572b2} 
+virtual bool Xbyak\+::\+Allocator\+::use\+Protect (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00314}{314}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00314\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/libraries/ff/depends/xbyak/xbyak/\mbox{\hyperlink{xbyak_8h}{xbyak.\+h}}\end{DoxyCompactItemize}

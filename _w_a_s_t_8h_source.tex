@@ -1,0 +1,51 @@
+\doxysection{WAST.\+h}
+\hypertarget{_w_a_s_t_8h_source}{}\label{_w_a_s_t_8h_source}\index{libraries/wasm-\/jit/Include/WAST/WAST.h@{libraries/wasm-\/jit/Include/WAST/WAST.h}}
+\mbox{\hyperlink{_w_a_s_t_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_w_a_s_t_8h_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{_w_a_s_t_8h_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_w_a_s_t_8h_source_l00003}00003\ \textcolor{preprocessor}{\#ifndef\ WAST\_API}}
+\DoxyCodeLine{\Hypertarget{_w_a_s_t_8h_source_l00004}\mbox{\hyperlink{_w_a_s_t_8h_a4d4cd62fee2b2e181ef87d58fe61064c}{00004}}\ \textcolor{preprocessor}{\ \ \ \ \#define\ WAST\_API\ DLL\_IMPORT}}
+\DoxyCodeLine{\Hypertarget{_w_a_s_t_8h_source_l00005}00005\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{_w_a_s_t_8h_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{_w_a_s_t_8h_source_l00007}00007\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_basic_types_8h}{Inline/BasicTypes.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_w_a_s_t_8h_source_l00008}00008\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_runtime_8h}{Runtime/Runtime.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_w_a_s_t_8h_source_l00009}00009\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_w_a_s_m_8h}{WASM/WASM.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_w_a_s_t_8h_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{_w_a_s_t_8h_source_l00011}00011\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_w_a_s_t}{WAST}}}
+\DoxyCodeLine{\Hypertarget{_w_a_s_t_8h_source_l00012}00012\ \{}
+\DoxyCodeLine{\Hypertarget{_w_a_s_t_8h_source_l00013}00013\ \ \ \ \ \textcolor{comment}{//\ A\ location\ in\ a\ text\ file.}}
+\DoxyCodeLine{\Hypertarget{_w_a_s_t_8h_source_l00014}\mbox{\hyperlink{struct_w_a_s_t_1_1_text_file_locus}{00014}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_w_a_s_t_1_1_text_file_locus}{TextFileLocus}}}
+\DoxyCodeLine{\Hypertarget{_w_a_s_t_8h_source_l00015}00015\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_w_a_s_t_8h_source_l00016}\mbox{\hyperlink{struct_w_a_s_t_1_1_text_file_locus_ab195429c5005d472161a01e7589a4e2b}{00016}}\ \ \ \ \ \ \ \ \ std::string\ \mbox{\hyperlink{struct_w_a_s_t_1_1_text_file_locus_ab195429c5005d472161a01e7589a4e2b}{sourceLine}};}
+\DoxyCodeLine{\Hypertarget{_w_a_s_t_8h_source_l00017}\mbox{\hyperlink{struct_w_a_s_t_1_1_text_file_locus_a336daf8b9f47f2dafcad2fe97ed15ae3}{00017}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}\ \mbox{\hyperlink{struct_w_a_s_t_1_1_text_file_locus_a336daf8b9f47f2dafcad2fe97ed15ae3}{newlines}};}
+\DoxyCodeLine{\Hypertarget{_w_a_s_t_8h_source_l00018}\mbox{\hyperlink{struct_w_a_s_t_1_1_text_file_locus_af8a4c8fb588e6e8869481c603a40f2c4}{00018}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}\ \mbox{\hyperlink{struct_w_a_s_t_1_1_text_file_locus_af8a4c8fb588e6e8869481c603a40f2c4}{tabs}};}
+\DoxyCodeLine{\Hypertarget{_w_a_s_t_8h_source_l00019}\mbox{\hyperlink{struct_w_a_s_t_1_1_text_file_locus_a3dfa23b789fc44bd8f91bdc2dcdcf4b6}{00019}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}\ \mbox{\hyperlink{struct_w_a_s_t_1_1_text_file_locus_a3dfa23b789fc44bd8f91bdc2dcdcf4b6}{characters}};}
+\DoxyCodeLine{\Hypertarget{_w_a_s_t_8h_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{_w_a_s_t_8h_source_l00021}\mbox{\hyperlink{struct_w_a_s_t_1_1_text_file_locus_a61f4009a38c48c77a044a05836de2fee}{00021}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_w_a_s_t_1_1_text_file_locus_a61f4009a38c48c77a044a05836de2fee}{TextFileLocus}}():\ \mbox{\hyperlink{struct_w_a_s_t_1_1_text_file_locus_a336daf8b9f47f2dafcad2fe97ed15ae3}{newlines}}(0),\ \mbox{\hyperlink{struct_w_a_s_t_1_1_text_file_locus_af8a4c8fb588e6e8869481c603a40f2c4}{tabs}}(0),\ \mbox{\hyperlink{struct_w_a_s_t_1_1_text_file_locus_a3dfa23b789fc44bd8f91bdc2dcdcf4b6}{characters}}(0)\ \{\}}
+\DoxyCodeLine{\Hypertarget{_w_a_s_t_8h_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{_w_a_s_t_8h_source_l00023}\mbox{\hyperlink{struct_w_a_s_t_1_1_text_file_locus_ae8fb5a9f1c5b36e80ad283768e0fbf45}{00023}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}\ \mbox{\hyperlink{struct_w_a_s_t_1_1_text_file_locus_ae8fb5a9f1c5b36e80ad283768e0fbf45}{lineNumber}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_w_a_s_t_1_1_text_file_locus_a336daf8b9f47f2dafcad2fe97ed15ae3}{newlines}}\ +\ 1;\ \}}
+\DoxyCodeLine{\Hypertarget{_w_a_s_t_8h_source_l00024}\mbox{\hyperlink{struct_w_a_s_t_1_1_text_file_locus_abd689a28a24904ee2993732abc9ed6e3}{00024}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}\ \mbox{\hyperlink{struct_w_a_s_t_1_1_text_file_locus_abd689a28a24904ee2993732abc9ed6e3}{column}}(\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}\ spacesPerTab\ =\ 4)\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_w_a_s_t_1_1_text_file_locus_af8a4c8fb588e6e8869481c603a40f2c4}{tabs}}\ *\ spacesPerTab\ +\ \mbox{\hyperlink{struct_w_a_s_t_1_1_text_file_locus_a3dfa23b789fc44bd8f91bdc2dcdcf4b6}{characters}}\ +\ 1;\ \}}
+\DoxyCodeLine{\Hypertarget{_w_a_s_t_8h_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{_w_a_s_t_8h_source_l00026}\mbox{\hyperlink{struct_w_a_s_t_1_1_text_file_locus_a6a1645bd22ae8a3b5f318b0975b5abd8}{00026}}\ \ \ \ \ \ \ \ \ std::string\ \mbox{\hyperlink{struct_w_a_s_t_1_1_text_file_locus_a6a1645bd22ae8a3b5f318b0975b5abd8}{describe}}(\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}\ spacesPerTab\ =\ 4)\textcolor{keyword}{\ const}}
+\DoxyCodeLine{\Hypertarget{_w_a_s_t_8h_source_l00027}00027\ \textcolor{keyword}{\ \ \ \ \ \ \ \ }\{}
+\DoxyCodeLine{\Hypertarget{_w_a_s_t_8h_source_l00028}00028\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::to\_string(\mbox{\hyperlink{struct_w_a_s_t_1_1_text_file_locus_ae8fb5a9f1c5b36e80ad283768e0fbf45}{lineNumber}}())\ +\ \textcolor{stringliteral}{"{}:"{}}\ +\ std::to\_string(\mbox{\hyperlink{struct_w_a_s_t_1_1_text_file_locus_abd689a28a24904ee2993732abc9ed6e3}{column}}(spacesPerTab));}
+\DoxyCodeLine{\Hypertarget{_w_a_s_t_8h_source_l00029}00029\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_w_a_s_t_8h_source_l00030}00030\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_w_a_s_t_8h_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{_w_a_s_t_8h_source_l00032}00032\ \ \ \ \ \textcolor{comment}{//\ A\ WAST\ parse\ error.}}
+\DoxyCodeLine{\Hypertarget{_w_a_s_t_8h_source_l00033}\mbox{\hyperlink{struct_w_a_s_t_1_1_error}{00033}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_w_a_s_t_1_1_error}{Error}}}
+\DoxyCodeLine{\Hypertarget{_w_a_s_t_8h_source_l00034}00034\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_w_a_s_t_8h_source_l00035}\mbox{\hyperlink{struct_w_a_s_t_1_1_error_a5ee3e34f79cd606064560b41b32074d0}{00035}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_w_a_s_t_1_1_text_file_locus}{TextFileLocus}}\ \mbox{\hyperlink{struct_w_a_s_t_1_1_error_a5ee3e34f79cd606064560b41b32074d0}{locus}};}
+\DoxyCodeLine{\Hypertarget{_w_a_s_t_8h_source_l00036}\mbox{\hyperlink{struct_w_a_s_t_1_1_error_a87fe9285176533d2c3b04d777cf17d3f}{00036}}\ \ \ \ \ \ \ \ \ std::string\ \mbox{\hyperlink{struct_w_a_s_t_1_1_error_a87fe9285176533d2c3b04d777cf17d3f}{message}};}
+\DoxyCodeLine{\Hypertarget{_w_a_s_t_8h_source_l00037}00037\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_w_a_s_t_8h_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{_w_a_s_t_8h_source_l00039}00039\ \ \ \ \ \textcolor{comment}{//\ Parse\ a\ module\ from\ a\ string.\ Returns\ true\ if\ it\ succeeds,\ and\ writes\ the\ module\ to\ outModule.}}
+\DoxyCodeLine{\Hypertarget{_w_a_s_t_8h_source_l00040}00040\ \ \ \ \ \textcolor{comment}{//\ If\ it\ fails,\ returns\ false\ and\ appends\ a\ list\ of\ errors\ to\ outErrors.}}
+\DoxyCodeLine{\Hypertarget{_w_a_s_t_8h_source_l00041}00041\ \ \ \ \ \mbox{\hyperlink{_w_a_s_t_8h_a4d4cd62fee2b2e181ef87d58fe61064c}{WAST\_API}}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespace_w_a_s_t_a6d93426db9bd262249b9ce93ddba7c87}{parseModule}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \textcolor{keywordtype}{string},\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ stringLength,\mbox{\hyperlink{struct_i_r_1_1_module}{IR::Module}}\&\ outModule,std::vector<Error>\&\ outErrors);}
+\DoxyCodeLine{\Hypertarget{_w_a_s_t_8h_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{_w_a_s_t_8h_source_l00043}00043\ \ \ \ \ \textcolor{comment}{//\ Prints\ a\ module\ in\ WAST\ format.}}
+\DoxyCodeLine{\Hypertarget{_w_a_s_t_8h_source_l00044}00044\ \ \ \ \ \mbox{\hyperlink{_w_a_s_t_8h_a4d4cd62fee2b2e181ef87d58fe61064c}{WAST\_API}}\ std::string\ \mbox{\hyperlink{namespace_w_a_s_t_aa6c1fd4b6c7ec43ba7e25dc6138d4899}{print}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_i_r_1_1_module}{IR::Module}}\&\ module);}
+\DoxyCodeLine{\Hypertarget{_w_a_s_t_8h_source_l00045}00045\ \}}
+
+\end{DoxyCode}

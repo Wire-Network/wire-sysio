@@ -1,0 +1,53 @@
+\doxysection{libraries/softfloat/source/f128\+M\+\_\+add.c File Reference}
+\hypertarget{softfloat_2source_2f128_m__add_8c}{}\label{softfloat_2source_2f128_m__add_8c}\index{libraries/softfloat/source/f128M\_add.c@{libraries/softfloat/source/f128M\_add.c}}
+{\ttfamily \#include $<$stdbool.\+h$>$}\newline
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include "{}platform.\+h"{}}\newline
+{\ttfamily \#include "{}internals.\+h"{}}\newline
+{\ttfamily \#include "{}softfloat.\+h"{}}\newline
+Include dependency graph for f128\+M\+\_\+add.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{softfloat_2source_2f128_m__add_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{softfloat_2source_2f128_m__add_8c_a9182240e3b07961fdc6140fb00d6d842}{f128\+M\+\_\+add}} (const \mbox{\hyperlink{structfloat128__t}{float128\+\_\+t}} \texorpdfstring{$\ast$}{*}a\+Ptr, const \mbox{\hyperlink{structfloat128__t}{float128\+\_\+t}} \texorpdfstring{$\ast$}{*}b\+Ptr, \mbox{\hyperlink{structfloat128__t}{float128\+\_\+t}} \texorpdfstring{$\ast$}{*}z\+Ptr)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{softfloat_2source_2f128_m__add_8c_a9182240e3b07961fdc6140fb00d6d842}\index{f128M\_add.c@{f128M\_add.c}!f128M\_add@{f128M\_add}}
+\index{f128M\_add@{f128M\_add}!f128M\_add.c@{f128M\_add.c}}
+\doxysubsubsection{\texorpdfstring{f128M\_add()}{f128M\_add()}}
+{\footnotesize\ttfamily \label{softfloat_2source_2f128_m__add_8c_a9182240e3b07961fdc6140fb00d6d842} 
+void f128\+M\+\_\+add (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structfloat128__t}{float128\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{a\+Ptr}{, }\item[{const \mbox{\hyperlink{structfloat128__t}{float128\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{b\+Ptr}{, }\item[{\mbox{\hyperlink{structfloat128__t}{float128\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{z\+Ptr}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2f128_m__add_8c_source_l00084}{84}} of file \mbox{\hyperlink{softfloat_2source_2f128_m__add_8c_source}{f128\+M\+\_\+add.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00085\ \{}
+\DoxyCodeLine{00086\ }
+\DoxyCodeLine{00087\ \ \ \ \ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a5f5376019abffd41df86568f97964830}{softfloat\_addF128M}}(}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ (\textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ *)\ aPtr,}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ (\textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ *)\ bPtr,}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ *)\ zPtr,}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \textcolor{keyword}{false}}
+\DoxyCodeLine{00092\ \ \ \ \ );}
+\DoxyCodeLine{00093\ }
+\DoxyCodeLine{00094\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{softfloat_2source_2f128_m__add_8c_a9182240e3b07961fdc6140fb00d6d842_cgraph}
+\end{center}
+\end{figure}

@@ -1,0 +1,7 @@
+<map id="sysio::state_history::trace_converter::pack" name="sysio::state_history::trace_converter::pack">
+<area shape="rect" id="Node000001" title=" " alt="" coords="488,5,643,46"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1state__history__plugin__impl.html#a2074796cb93f0dda90a98f2d5ef143ee" title=" " alt="" coords="267,5,440,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="472,28,440,28,440,23,472,23"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1state__history__plugin__impl.html#aaa0729b45ec2388fbc2b5feefde76292" title=" " alt="" coords="5,5,219,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="251,28,219,28,219,23,251,23"/>
+</map>

@@ -1,0 +1,79 @@
+\doxysection{websocketpp\+::lib\+::asio Namespace Reference}
+\hypertarget{namespacewebsocketpp_1_1lib_1_1asio}{}\label{namespacewebsocketpp_1_1lib_1_1asio}\index{websocketpp::lib::asio@{websocketpp::lib::asio}}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef boost\+::asio\+::deadline\+\_\+timer \mbox{\hyperlink{namespacewebsocketpp_1_1lib_1_1asio_a156f3dad489fb17e3bc79d2009d2656f}{steady\+\_\+timer}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\bool \mbox{\hyperlink{namespacewebsocketpp_1_1lib_1_1asio_a1096d9d4bcff306bf568ba95842142b5}{is\+\_\+neg}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} duration)
+\item 
+boost\+::posix\+\_\+time\+::time\+\_\+duration \mbox{\hyperlink{namespacewebsocketpp_1_1lib_1_1asio_a38ce6cba13c37a134a65f3623d00090e}{milliseconds}} (long duration)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{namespacewebsocketpp_1_1lib_1_1asio_a156f3dad489fb17e3bc79d2009d2656f}\index{websocketpp::lib::asio@{websocketpp::lib::asio}!steady\_timer@{steady\_timer}}
+\index{steady\_timer@{steady\_timer}!websocketpp::lib::asio@{websocketpp::lib::asio}}
+\doxysubsubsection{\texorpdfstring{steady\_timer}{steady\_timer}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1lib_1_1asio_a156f3dad489fb17e3bc79d2009d2656f} 
+typedef boost\+::asio\+::deadline\+\_\+timer \mbox{\hyperlink{namespacewebsocketpp_1_1lib_1_1asio_a156f3dad489fb17e3bc79d2009d2656f}{websocketpp\+::lib\+::asio\+::steady\+\_\+timer}}}
+
+
+
+Definition at line \mbox{\hyperlink{common_2asio_8hpp_source_l00111}{111}} of file \mbox{\hyperlink{common_2asio_8hpp_source}{asio.\+hpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacewebsocketpp_1_1lib_1_1asio_a1096d9d4bcff306bf568ba95842142b5}\index{websocketpp::lib::asio@{websocketpp::lib::asio}!is\_neg@{is\_neg}}
+\index{is\_neg@{is\_neg}!websocketpp::lib::asio@{websocketpp::lib::asio}}
+\doxysubsubsection{\texorpdfstring{is\_neg()}{is\_neg()}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1lib_1_1asio_a1096d9d4bcff306bf568ba95842142b5} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+bool websocketpp\+::lib\+::asio\+::is\+\_\+neg (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}}]{duration}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{common_2asio_8hpp_source_l00114}{114}} of file \mbox{\hyperlink{common_2asio_8hpp_source}{asio.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ duration.is\_negative();}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacewebsocketpp_1_1lib_1_1asio_a1096d9d4bcff306bf568ba95842142b5_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacewebsocketpp_1_1lib_1_1asio_a38ce6cba13c37a134a65f3623d00090e}\index{websocketpp::lib::asio@{websocketpp::lib::asio}!milliseconds@{milliseconds}}
+\index{milliseconds@{milliseconds}!websocketpp::lib::asio@{websocketpp::lib::asio}}
+\doxysubsubsection{\texorpdfstring{milliseconds()}{milliseconds()}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1lib_1_1asio_a38ce6cba13c37a134a65f3623d00090e} 
+boost\+::posix\+\_\+time\+::time\+\_\+duration websocketpp\+::lib\+::asio\+::milliseconds (\begin{DoxyParamCaption}\item[{long}]{duration}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{common_2asio_8hpp_source_l00117}{117}} of file \mbox{\hyperlink{common_2asio_8hpp_source}{asio.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ boost::posix\_time::milliseconds(duration);}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacewebsocketpp_1_1lib_1_1asio_a38ce6cba13c37a134a65f3623d00090e_icgraph}
+\end{center}
+\end{figure}

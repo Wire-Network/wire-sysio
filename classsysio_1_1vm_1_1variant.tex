@@ -1,0 +1,948 @@
+\doxysection{sysio\+::vm\+::variant\texorpdfstring{$<$}{<} Alternatives \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classsysio_1_1vm_1_1variant}{}\label{classsysio_1_1vm_1_1variant}\index{sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}}
+
+
+{\ttfamily \#include $<$variant.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classsysio_1_1vm_1_1variant_a6e15321a66cb0e76468d367228d31048}{variant}} ()=default
+\item 
+\mbox{\hyperlink{classsysio_1_1vm_1_1variant_a66c33236ddc36391f76734bc235cbdb9}{variant}} (const \mbox{\hyperlink{classsysio_1_1vm_1_1variant}{variant}} \&other)=default
+\item 
+\mbox{\hyperlink{classsysio_1_1vm_1_1variant_ae34bfeb289d3ac48bae15ec7283ca4d9}{variant}} (\mbox{\hyperlink{classsysio_1_1vm_1_1variant}{variant}} \&\&other)=default
+\item 
+\mbox{\hyperlink{classsysio_1_1vm_1_1variant}{variant}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1variant_a3451ecb903a5492d28d9ef78503d8cd9}{operator=}} (const \mbox{\hyperlink{classsysio_1_1vm_1_1variant}{variant}} \&other)=default
+\item 
+\mbox{\hyperlink{classsysio_1_1vm_1_1variant}{variant}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1variant_a8186e0b2418e76e7b2a554939c7027ab}{operator=}} (\mbox{\hyperlink{classsysio_1_1vm_1_1variant}{variant}} \&\&other)=default
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename  = std\+::enable\+\_\+if\+\_\+t$<$detail\+::is\+\_\+valid\+\_\+alternative\+\_\+v$<$std\+::decay\+\_\+t$<$\+T$>$, Alternatives...$>$$>$$>$ }\\constexpr \mbox{\hyperlink{classsysio_1_1vm_1_1variant_a5a034f5c95eda5e06ab5b9a6660eb914}{variant}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\&\mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4a34823136d0dd91d0f5d22db740f7679c}{alt}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename  = std\+::enable\+\_\+if\+\_\+t$<$detail\+::is\+\_\+valid\+\_\+alternative\+\_\+v$<$std\+::decay\+\_\+t$<$\+T$>$, Alternatives...$>$$>$$>$ }\\constexpr \mbox{\hyperlink{classsysio_1_1vm_1_1variant}{variant}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1variant_a9eb7d014a5dde68f93a986e78758bf23}{operator=}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\&\mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4a34823136d0dd91d0f5d22db740f7679c}{alt}})
+\item 
+constexpr \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{classsysio_1_1vm_1_1variant_a606ed6bf607d40519fba08417ab8bf84}{index}} () const
+\item 
+{\footnotesize template$<$size\+\_\+t Index$>$ }\\constexpr auto \&\& \mbox{\hyperlink{classsysio_1_1vm_1_1variant_a11adf0eb562fb16be61e9002f505528b}{get\+\_\+check}} ()
+\item 
+{\footnotesize template$<$size\+\_\+t Index$>$ }\\constexpr const auto \& \mbox{\hyperlink{classsysio_1_1vm_1_1variant_a103670098d49aaf3b2f5dffdc29d4635}{get}} () const \&
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{_regexp_8cpp_a5a887ac128ddf629616f8429bf78f30a}{Alt}} $>$ }\\constexpr const \mbox{\hyperlink{_regexp_8cpp_a5a887ac128ddf629616f8429bf78f30a}{Alt}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1variant_a69a4450ec1ba7cdef6da0a713dc1dcf0}{get}} () const \&
+\item 
+{\footnotesize template$<$size\+\_\+t Index$>$ }\\constexpr const auto \&\& \mbox{\hyperlink{classsysio_1_1vm_1_1variant_aaaa944ff06819d61d4c738fe043bf12c}{get}} () const \&\&
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{_regexp_8cpp_a5a887ac128ddf629616f8429bf78f30a}{Alt}} $>$ }\\constexpr const \mbox{\hyperlink{_regexp_8cpp_a5a887ac128ddf629616f8429bf78f30a}{Alt}} \&\& \mbox{\hyperlink{classsysio_1_1vm_1_1variant_a5af974e68d589fd092972c9a78ddafeb}{get}} () const \&\&
+\item 
+{\footnotesize template$<$size\+\_\+t Index$>$ }\\constexpr auto \&\& \mbox{\hyperlink{classsysio_1_1vm_1_1variant_a38da283590a28bf3a5b4021ea82bf004}{get}} () \&\&
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{_regexp_8cpp_a5a887ac128ddf629616f8429bf78f30a}{Alt}} $>$ }\\constexpr \mbox{\hyperlink{_regexp_8cpp_a5a887ac128ddf629616f8429bf78f30a}{Alt}} \&\& \mbox{\hyperlink{classsysio_1_1vm_1_1variant_a6458e8713f30c824c32b03d45d52533e}{get}} () \&\&
+\item 
+{\footnotesize template$<$size\+\_\+t Index$>$ }\\constexpr auto \& \mbox{\hyperlink{classsysio_1_1vm_1_1variant_a1d601c27e7ba372b62c573254faa38da}{get}} () \&
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{_regexp_8cpp_a5a887ac128ddf629616f8429bf78f30a}{Alt}} $>$ }\\constexpr \mbox{\hyperlink{_regexp_8cpp_a5a887ac128ddf629616f8429bf78f30a}{Alt}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1variant_aba6b44c953f5958ab0eac7c8dabfd282}{get}} () \&
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{_regexp_8cpp_a5a887ac128ddf629616f8429bf78f30a}{Alt}} $>$ }\\constexpr bool \mbox{\hyperlink{classsysio_1_1vm_1_1variant_a57c9afd27798658962bb49135cbb2ab6}{is\+\_\+a}} () const
+\item 
+constexpr void \mbox{\hyperlink{classsysio_1_1vm_1_1variant_a05c3c74304424259dfc58d985466b1ab}{toggle\+\_\+exiting\+\_\+which}} ()
+\item 
+constexpr void \mbox{\hyperlink{classsysio_1_1vm_1_1variant_a0301f0f2cedf82c295f44b1feb9aa44f}{clear\+\_\+exiting\+\_\+which}} ()
+\item 
+constexpr void \mbox{\hyperlink{classsysio_1_1vm_1_1variant_a5192f47f2bfba16c4c0a97ca0fc438d2}{set\+\_\+exiting\+\_\+which}} ()
+\item 
+\mbox{\hyperlink{classsysio_1_1vm_1_1variant_a6e15321a66cb0e76468d367228d31048}{variant}} ()=default
+\item 
+\mbox{\hyperlink{classsysio_1_1vm_1_1variant_a66c33236ddc36391f76734bc235cbdb9}{variant}} (const \mbox{\hyperlink{classsysio_1_1vm_1_1variant}{variant}} \&other)=default
+\item 
+\mbox{\hyperlink{classsysio_1_1vm_1_1variant_ae34bfeb289d3ac48bae15ec7283ca4d9}{variant}} (\mbox{\hyperlink{classsysio_1_1vm_1_1variant}{variant}} \&\&other)=default
+\item 
+\mbox{\hyperlink{classsysio_1_1vm_1_1variant}{variant}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1variant_a3451ecb903a5492d28d9ef78503d8cd9}{operator=}} (const \mbox{\hyperlink{classsysio_1_1vm_1_1variant}{variant}} \&other)=default
+\item 
+\mbox{\hyperlink{classsysio_1_1vm_1_1variant}{variant}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1variant_a8186e0b2418e76e7b2a554939c7027ab}{operator=}} (\mbox{\hyperlink{classsysio_1_1vm_1_1variant}{variant}} \&\&other)=default
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename  = std\+::enable\+\_\+if\+\_\+t$<$detail\+::is\+\_\+valid\+\_\+alternative\+\_\+v$<$std\+::decay\+\_\+t$<$\+T$>$, Alternatives...$>$$>$$>$ }\\constexpr \mbox{\hyperlink{classsysio_1_1vm_1_1variant_a5a034f5c95eda5e06ab5b9a6660eb914}{variant}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\&\mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4a34823136d0dd91d0f5d22db740f7679c}{alt}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename  = std\+::enable\+\_\+if\+\_\+t$<$detail\+::is\+\_\+valid\+\_\+alternative\+\_\+v$<$std\+::decay\+\_\+t$<$\+T$>$, Alternatives...$>$$>$$>$ }\\constexpr \mbox{\hyperlink{classsysio_1_1vm_1_1variant}{variant}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1variant_a9eb7d014a5dde68f93a986e78758bf23}{operator=}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\&\mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4a34823136d0dd91d0f5d22db740f7679c}{alt}})
+\item 
+constexpr \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{classsysio_1_1vm_1_1variant_a606ed6bf607d40519fba08417ab8bf84}{index}} () const
+\item 
+{\footnotesize template$<$size\+\_\+t Index$>$ }\\constexpr auto \&\& \mbox{\hyperlink{classsysio_1_1vm_1_1variant_a11adf0eb562fb16be61e9002f505528b}{get\+\_\+check}} ()
+\item 
+{\footnotesize template$<$size\+\_\+t Index$>$ }\\constexpr const auto \& \mbox{\hyperlink{classsysio_1_1vm_1_1variant_a103670098d49aaf3b2f5dffdc29d4635}{get}} () const \&
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{_regexp_8cpp_a5a887ac128ddf629616f8429bf78f30a}{Alt}} $>$ }\\constexpr const \mbox{\hyperlink{_regexp_8cpp_a5a887ac128ddf629616f8429bf78f30a}{Alt}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1variant_a69a4450ec1ba7cdef6da0a713dc1dcf0}{get}} () const \&
+\item 
+{\footnotesize template$<$size\+\_\+t Index$>$ }\\constexpr const auto \&\& \mbox{\hyperlink{classsysio_1_1vm_1_1variant_aaaa944ff06819d61d4c738fe043bf12c}{get}} () const \&\&
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{_regexp_8cpp_a5a887ac128ddf629616f8429bf78f30a}{Alt}} $>$ }\\constexpr const \mbox{\hyperlink{_regexp_8cpp_a5a887ac128ddf629616f8429bf78f30a}{Alt}} \&\& \mbox{\hyperlink{classsysio_1_1vm_1_1variant_a5af974e68d589fd092972c9a78ddafeb}{get}} () const \&\&
+\item 
+{\footnotesize template$<$size\+\_\+t Index$>$ }\\constexpr auto \&\& \mbox{\hyperlink{classsysio_1_1vm_1_1variant_a38da283590a28bf3a5b4021ea82bf004}{get}} () \&\&
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{_regexp_8cpp_a5a887ac128ddf629616f8429bf78f30a}{Alt}} $>$ }\\constexpr \mbox{\hyperlink{_regexp_8cpp_a5a887ac128ddf629616f8429bf78f30a}{Alt}} \&\& \mbox{\hyperlink{classsysio_1_1vm_1_1variant_a6458e8713f30c824c32b03d45d52533e}{get}} () \&\&
+\item 
+{\footnotesize template$<$size\+\_\+t Index$>$ }\\constexpr auto \& \mbox{\hyperlink{classsysio_1_1vm_1_1variant_a1d601c27e7ba372b62c573254faa38da}{get}} () \&
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{_regexp_8cpp_a5a887ac128ddf629616f8429bf78f30a}{Alt}} $>$ }\\constexpr \mbox{\hyperlink{_regexp_8cpp_a5a887ac128ddf629616f8429bf78f30a}{Alt}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1variant_aba6b44c953f5958ab0eac7c8dabfd282}{get}} () \&
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{_regexp_8cpp_a5a887ac128ddf629616f8429bf78f30a}{Alt}} $>$ }\\constexpr bool \mbox{\hyperlink{classsysio_1_1vm_1_1variant_a57c9afd27798658962bb49135cbb2ab6}{is\+\_\+a}} () const
+\item 
+constexpr void \mbox{\hyperlink{classsysio_1_1vm_1_1variant_a05c3c74304424259dfc58d985466b1ab}{toggle\+\_\+exiting\+\_\+which}} ()
+\item 
+constexpr void \mbox{\hyperlink{classsysio_1_1vm_1_1variant_a0301f0f2cedf82c295f44b1feb9aa44f}{clear\+\_\+exiting\+\_\+which}} ()
+\item 
+constexpr void \mbox{\hyperlink{classsysio_1_1vm_1_1variant_a5192f47f2bfba16c4c0a97ca0fc438d2}{set\+\_\+exiting\+\_\+which}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static constexpr size\+\_\+t \mbox{\hyperlink{classsysio_1_1vm_1_1variant_a164e721c673cdff789716e7c7c0b9671}{variant\+\_\+size}} ()
+\item 
+static constexpr size\+\_\+t \mbox{\hyperlink{classsysio_1_1vm_1_1variant_a164e721c673cdff789716e7c7c0b9671}{variant\+\_\+size}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename... Alternatives$>$\newline
+class sysio\+::vm\+::variant$<$ Alternatives $>$}
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2variant_8hpp_source_l00162}{162}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2variant_8hpp_source}{variant.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classsysio_1_1vm_1_1variant_a6e15321a66cb0e76468d367228d31048}\index{sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}!variant@{variant}}
+\index{variant@{variant}!sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}}
+\doxysubsubsection{\texorpdfstring{variant()}{variant()}\hspace{0.1cm}{\footnotesize\ttfamily [1/8]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1variant_a6e15321a66cb0e76468d367228d31048} 
+template$<$typename... Alternatives$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1variant}{sysio\+::vm\+::variant}}$<$ Alternatives $>$\+::variant (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [default]}}
+
+\Hypertarget{classsysio_1_1vm_1_1variant_a66c33236ddc36391f76734bc235cbdb9}\index{sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}!variant@{variant}}
+\index{variant@{variant}!sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}}
+\doxysubsubsection{\texorpdfstring{variant()}{variant()}\hspace{0.1cm}{\footnotesize\ttfamily [2/8]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1variant_a66c33236ddc36391f76734bc235cbdb9} 
+template$<$typename... Alternatives$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1variant}{sysio\+::vm\+::variant}}$<$ Alternatives $>$\+::variant (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classsysio_1_1vm_1_1variant}{variant}}$<$ Alternatives $>$ \&}]{other}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [default]}}
+
+\Hypertarget{classsysio_1_1vm_1_1variant_ae34bfeb289d3ac48bae15ec7283ca4d9}\index{sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}!variant@{variant}}
+\index{variant@{variant}!sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}}
+\doxysubsubsection{\texorpdfstring{variant()}{variant()}\hspace{0.1cm}{\footnotesize\ttfamily [3/8]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1variant_ae34bfeb289d3ac48bae15ec7283ca4d9} 
+template$<$typename... Alternatives$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1variant}{sysio\+::vm\+::variant}}$<$ Alternatives $>$\+::variant (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classsysio_1_1vm_1_1variant}{variant}}$<$ Alternatives $>$ \&\&}]{other}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [default]}}
+
+\Hypertarget{classsysio_1_1vm_1_1variant_a5a034f5c95eda5e06ab5b9a6660eb914}\index{sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}!variant@{variant}}
+\index{variant@{variant}!sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}}
+\doxysubsubsection{\texorpdfstring{variant()}{variant()}\hspace{0.1cm}{\footnotesize\ttfamily [4/8]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1variant_a5a034f5c95eda5e06ab5b9a6660eb914} 
+template$<$typename... Alternatives$>$ \\
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename  = std\+::enable\+\_\+if\+\_\+t$<$detail\+::is\+\_\+valid\+\_\+alternative\+\_\+v$<$std\+::decay\+\_\+t$<$\+T$>$, Alternatives...$>$$>$$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1variant}{sysio\+::vm\+::variant}}$<$ Alternatives $>$\+::variant (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\&}]{alt}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_source_l00178}{178}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_source}{variant.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \ \_which(\mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_abfb1fa37c13a32caf781c1e10139ac28}{detail::get\_alternatives\_index\_v}}<std::decay\_t<T>,\ Alternatives...>),}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \ \_storage(\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\&\textcolor{keyword}{>}(\mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4a34823136d0dd91d0f5d22db740f7679c}{alt}}))\ \{}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1variant_a6e15321a66cb0e76468d367228d31048}\index{sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}!variant@{variant}}
+\index{variant@{variant}!sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}}
+\doxysubsubsection{\texorpdfstring{variant()}{variant()}\hspace{0.1cm}{\footnotesize\ttfamily [5/8]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1variant_a6e15321a66cb0e76468d367228d31048} 
+template$<$typename... Alternatives$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1variant}{sysio\+::vm\+::variant}}$<$ Alternatives $>$\+::variant (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [default]}}
+
+\Hypertarget{classsysio_1_1vm_1_1variant_a66c33236ddc36391f76734bc235cbdb9}\index{sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}!variant@{variant}}
+\index{variant@{variant}!sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}}
+\doxysubsubsection{\texorpdfstring{variant()}{variant()}\hspace{0.1cm}{\footnotesize\ttfamily [6/8]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1variant_a66c33236ddc36391f76734bc235cbdb9} 
+template$<$typename... Alternatives$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1variant}{sysio\+::vm\+::variant}}$<$ Alternatives $>$\+::variant (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classsysio_1_1vm_1_1variant}{variant}}$<$ Alternatives $>$ \&}]{other}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [default]}}
+
+\Hypertarget{classsysio_1_1vm_1_1variant_ae34bfeb289d3ac48bae15ec7283ca4d9}\index{sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}!variant@{variant}}
+\index{variant@{variant}!sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}}
+\doxysubsubsection{\texorpdfstring{variant()}{variant()}\hspace{0.1cm}{\footnotesize\ttfamily [7/8]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1variant_ae34bfeb289d3ac48bae15ec7283ca4d9} 
+template$<$typename... Alternatives$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1variant}{sysio\+::vm\+::variant}}$<$ Alternatives $>$\+::variant (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classsysio_1_1vm_1_1variant}{variant}}$<$ Alternatives $>$ \&\&}]{other}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [default]}}
+
+\Hypertarget{classsysio_1_1vm_1_1variant_a5a034f5c95eda5e06ab5b9a6660eb914}\index{sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}!variant@{variant}}
+\index{variant@{variant}!sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}}
+\doxysubsubsection{\texorpdfstring{variant()}{variant()}\hspace{0.1cm}{\footnotesize\ttfamily [8/8]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1variant_a5a034f5c95eda5e06ab5b9a6660eb914} 
+template$<$typename... Alternatives$>$ \\
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename  = std\+::enable\+\_\+if\+\_\+t$<$detail\+::is\+\_\+valid\+\_\+alternative\+\_\+v$<$std\+::decay\+\_\+t$<$\+T$>$, Alternatives...$>$$>$$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1variant}{sysio\+::vm\+::variant}}$<$ Alternatives $>$\+::variant (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\&}]{alt}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2variant_8hpp_source_l00178}{178}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2variant_8hpp_source}{variant.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \ \_which(\mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_abfb1fa37c13a32caf781c1e10139ac28}{detail::get\_alternatives\_index\_v}}<std::decay\_t<T>,\ Alternatives...>),}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \ \_storage(\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\&\textcolor{keyword}{>}(\mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4a34823136d0dd91d0f5d22db740f7679c}{alt}}))\ \{}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1vm_1_1variant_a0301f0f2cedf82c295f44b1feb9aa44f}\index{sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}!clear\_exiting\_which@{clear\_exiting\_which}}
+\index{clear\_exiting\_which@{clear\_exiting\_which}!sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}}
+\doxysubsubsection{\texorpdfstring{clear\_exiting\_which()}{clear\_exiting\_which()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1variant_a0301f0f2cedf82c295f44b1feb9aa44f} 
+template$<$typename... Alternatives$>$ \\
+void \mbox{\hyperlink{classsysio_1_1vm_1_1variant}{sysio\+::vm\+::variant}}$<$ Alternatives $>$\+::clear\+\_\+exiting\+\_\+which (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_source_l00252}{252}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_source}{variant.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00252\ \{\ \_which\ \&=\ 0xFF;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1variant_a0301f0f2cedf82c295f44b1feb9aa44f}\index{sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}!clear\_exiting\_which@{clear\_exiting\_which}}
+\index{clear\_exiting\_which@{clear\_exiting\_which}!sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}}
+\doxysubsubsection{\texorpdfstring{clear\_exiting\_which()}{clear\_exiting\_which()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1variant_a0301f0f2cedf82c295f44b1feb9aa44f} 
+template$<$typename... Alternatives$>$ \\
+void \mbox{\hyperlink{classsysio_1_1vm_1_1variant}{sysio\+::vm\+::variant}}$<$ Alternatives $>$\+::clear\+\_\+exiting\+\_\+which (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2variant_8hpp_source_l00252}{252}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2variant_8hpp_source}{variant.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00252\ \{\ \_which\ \&=\ 0xFF;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1variant_a1d601c27e7ba372b62c573254faa38da}\index{sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}!get@{get}}
+\index{get@{get}!sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}}
+\doxysubsubsection{\texorpdfstring{get()}{get()}\hspace{0.1cm}{\footnotesize\ttfamily [1/16]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1variant_a1d601c27e7ba372b62c573254faa38da} 
+template$<$typename... Alternatives$>$ \\
+template$<$size\+\_\+t Index$>$ \\
+auto \& \mbox{\hyperlink{classsysio_1_1vm_1_1variant}{sysio\+::vm\+::variant}}$<$ Alternatives $>$\+::get (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) \&\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_source_l00238}{238}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_source}{variant.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00238\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a40bec98a962ef909354fcecae263abe9}{detail::variant\_storage\_get<Index>}}(\_storage);}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=331pt]{classsysio_1_1vm_1_1variant_a1d601c27e7ba372b62c573254faa38da_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1variant_aba6b44c953f5958ab0eac7c8dabfd282}\index{sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}!get@{get}}
+\index{get@{get}!sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}}
+\doxysubsubsection{\texorpdfstring{get()}{get()}\hspace{0.1cm}{\footnotesize\ttfamily [2/16]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1variant_aba6b44c953f5958ab0eac7c8dabfd282} 
+template$<$typename... Alternatives$>$ \\
+template$<$typename \mbox{\hyperlink{_regexp_8cpp_a5a887ac128ddf629616f8429bf78f30a}{Alt}} $>$ \\
+\mbox{\hyperlink{_regexp_8cpp_a5a887ac128ddf629616f8429bf78f30a}{Alt}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1variant}{sysio\+::vm\+::variant}}$<$ Alternatives $>$\+::get (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) \&\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_source_l00243}{243}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_source}{variant.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00243\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00244\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a40bec98a962ef909354fcecae263abe9}{detail::variant\_storage\_get}}<\mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_abfb1fa37c13a32caf781c1e10139ac28}{detail::get\_alternatives\_index\_v}}<\mbox{\hyperlink{_regexp_8cpp_a5a887ac128ddf629616f8429bf78f30a}{Alt}},\ Alternatives...>>(\_storage);}
+\DoxyCodeLine{00245\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=331pt]{classsysio_1_1vm_1_1variant_aba6b44c953f5958ab0eac7c8dabfd282_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1variant_a1d601c27e7ba372b62c573254faa38da}\index{sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}!get@{get}}
+\index{get@{get}!sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}}
+\doxysubsubsection{\texorpdfstring{get()}{get()}\hspace{0.1cm}{\footnotesize\ttfamily [3/16]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1variant_a1d601c27e7ba372b62c573254faa38da} 
+template$<$typename... Alternatives$>$ \\
+template$<$size\+\_\+t Index$>$ \\
+auto \& \mbox{\hyperlink{classsysio_1_1vm_1_1variant}{sysio\+::vm\+::variant}}$<$ Alternatives $>$\+::get (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) \&\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2variant_8hpp_source_l00238}{238}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2variant_8hpp_source}{variant.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00238\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a40bec98a962ef909354fcecae263abe9}{detail::variant\_storage\_get<Index>}}(\_storage);}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=331pt]{classsysio_1_1vm_1_1variant_a1d601c27e7ba372b62c573254faa38da_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1variant_aba6b44c953f5958ab0eac7c8dabfd282}\index{sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}!get@{get}}
+\index{get@{get}!sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}}
+\doxysubsubsection{\texorpdfstring{get()}{get()}\hspace{0.1cm}{\footnotesize\ttfamily [4/16]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1variant_aba6b44c953f5958ab0eac7c8dabfd282} 
+template$<$typename... Alternatives$>$ \\
+template$<$typename \mbox{\hyperlink{_regexp_8cpp_a5a887ac128ddf629616f8429bf78f30a}{Alt}} $>$ \\
+\mbox{\hyperlink{_regexp_8cpp_a5a887ac128ddf629616f8429bf78f30a}{Alt}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1variant}{sysio\+::vm\+::variant}}$<$ Alternatives $>$\+::get (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) \&\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2variant_8hpp_source_l00243}{243}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2variant_8hpp_source}{variant.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00243\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00244\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a40bec98a962ef909354fcecae263abe9}{detail::variant\_storage\_get}}<\mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_abfb1fa37c13a32caf781c1e10139ac28}{detail::get\_alternatives\_index\_v}}<\mbox{\hyperlink{_regexp_8cpp_a5a887ac128ddf629616f8429bf78f30a}{Alt}},\ Alternatives...>>(\_storage);}
+\DoxyCodeLine{00245\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=331pt]{classsysio_1_1vm_1_1variant_aba6b44c953f5958ab0eac7c8dabfd282_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1variant_a38da283590a28bf3a5b4021ea82bf004}\index{sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}!get@{get}}
+\index{get@{get}!sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}}
+\doxysubsubsection{\texorpdfstring{get()}{get()}\hspace{0.1cm}{\footnotesize\ttfamily [5/16]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1variant_a38da283590a28bf3a5b4021ea82bf004} 
+template$<$typename... Alternatives$>$ \\
+template$<$size\+\_\+t Index$>$ \\
+auto \&\& \mbox{\hyperlink{classsysio_1_1vm_1_1variant}{sysio\+::vm\+::variant}}$<$ Alternatives $>$\+::get (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) \&\&\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_source_l00228}{228}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_source}{variant.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00228\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00229\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a40bec98a962ef909354fcecae263abe9}{detail::variant\_storage\_get<Index>}}(std::move(\_storage));}
+\DoxyCodeLine{00230\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=331pt]{classsysio_1_1vm_1_1variant_a38da283590a28bf3a5b4021ea82bf004_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1variant_a6458e8713f30c824c32b03d45d52533e}\index{sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}!get@{get}}
+\index{get@{get}!sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}}
+\doxysubsubsection{\texorpdfstring{get()}{get()}\hspace{0.1cm}{\footnotesize\ttfamily [6/16]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1variant_a6458e8713f30c824c32b03d45d52533e} 
+template$<$typename... Alternatives$>$ \\
+template$<$typename \mbox{\hyperlink{_regexp_8cpp_a5a887ac128ddf629616f8429bf78f30a}{Alt}} $>$ \\
+\mbox{\hyperlink{_regexp_8cpp_a5a887ac128ddf629616f8429bf78f30a}{Alt}} \&\& \mbox{\hyperlink{classsysio_1_1vm_1_1variant}{sysio\+::vm\+::variant}}$<$ Alternatives $>$\+::get (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) \&\&\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_source_l00233}{233}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_source}{variant.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00233\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00234\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a40bec98a962ef909354fcecae263abe9}{detail::variant\_storage\_get}}<\mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_abfb1fa37c13a32caf781c1e10139ac28}{detail::get\_alternatives\_index\_v}}<\mbox{\hyperlink{_regexp_8cpp_a5a887ac128ddf629616f8429bf78f30a}{Alt}},\ Alternatives...>>(std::move(\_storage));}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=331pt]{classsysio_1_1vm_1_1variant_a6458e8713f30c824c32b03d45d52533e_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1variant_a38da283590a28bf3a5b4021ea82bf004}\index{sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}!get@{get}}
+\index{get@{get}!sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}}
+\doxysubsubsection{\texorpdfstring{get()}{get()}\hspace{0.1cm}{\footnotesize\ttfamily [7/16]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1variant_a38da283590a28bf3a5b4021ea82bf004} 
+template$<$typename... Alternatives$>$ \\
+template$<$size\+\_\+t Index$>$ \\
+auto \&\& \mbox{\hyperlink{classsysio_1_1vm_1_1variant}{sysio\+::vm\+::variant}}$<$ Alternatives $>$\+::get (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) \&\&\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2variant_8hpp_source_l00228}{228}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2variant_8hpp_source}{variant.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00228\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00229\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a40bec98a962ef909354fcecae263abe9}{detail::variant\_storage\_get<Index>}}(std::move(\_storage));}
+\DoxyCodeLine{00230\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=331pt]{classsysio_1_1vm_1_1variant_a38da283590a28bf3a5b4021ea82bf004_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1variant_a6458e8713f30c824c32b03d45d52533e}\index{sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}!get@{get}}
+\index{get@{get}!sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}}
+\doxysubsubsection{\texorpdfstring{get()}{get()}\hspace{0.1cm}{\footnotesize\ttfamily [8/16]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1variant_a6458e8713f30c824c32b03d45d52533e} 
+template$<$typename... Alternatives$>$ \\
+template$<$typename \mbox{\hyperlink{_regexp_8cpp_a5a887ac128ddf629616f8429bf78f30a}{Alt}} $>$ \\
+\mbox{\hyperlink{_regexp_8cpp_a5a887ac128ddf629616f8429bf78f30a}{Alt}} \&\& \mbox{\hyperlink{classsysio_1_1vm_1_1variant}{sysio\+::vm\+::variant}}$<$ Alternatives $>$\+::get (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) \&\&\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2variant_8hpp_source_l00233}{233}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2variant_8hpp_source}{variant.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00233\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00234\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a40bec98a962ef909354fcecae263abe9}{detail::variant\_storage\_get}}<\mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_abfb1fa37c13a32caf781c1e10139ac28}{detail::get\_alternatives\_index\_v}}<\mbox{\hyperlink{_regexp_8cpp_a5a887ac128ddf629616f8429bf78f30a}{Alt}},\ Alternatives...>>(std::move(\_storage));}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=331pt]{classsysio_1_1vm_1_1variant_a6458e8713f30c824c32b03d45d52533e_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1variant_a103670098d49aaf3b2f5dffdc29d4635}\index{sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}!get@{get}}
+\index{get@{get}!sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}}
+\doxysubsubsection{\texorpdfstring{get()}{get()}\hspace{0.1cm}{\footnotesize\ttfamily [9/16]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1variant_a103670098d49aaf3b2f5dffdc29d4635} 
+template$<$typename... Alternatives$>$ \\
+template$<$size\+\_\+t Index$>$ \\
+const auto \& \mbox{\hyperlink{classsysio_1_1vm_1_1variant}{sysio\+::vm\+::variant}}$<$ Alternatives $>$\+::get (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const \&\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_source_l00208}{208}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_source}{variant.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a40bec98a962ef909354fcecae263abe9}{detail::variant\_storage\_get<Index>}}(\_storage);}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=331pt]{classsysio_1_1vm_1_1variant_a103670098d49aaf3b2f5dffdc29d4635_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=342pt]{classsysio_1_1vm_1_1variant_a103670098d49aaf3b2f5dffdc29d4635_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1variant_a69a4450ec1ba7cdef6da0a713dc1dcf0}\index{sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}!get@{get}}
+\index{get@{get}!sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}}
+\doxysubsubsection{\texorpdfstring{get()}{get()}\hspace{0.1cm}{\footnotesize\ttfamily [10/16]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1variant_a69a4450ec1ba7cdef6da0a713dc1dcf0} 
+template$<$typename... Alternatives$>$ \\
+template$<$typename \mbox{\hyperlink{_regexp_8cpp_a5a887ac128ddf629616f8429bf78f30a}{Alt}} $>$ \\
+const \mbox{\hyperlink{_regexp_8cpp_a5a887ac128ddf629616f8429bf78f30a}{Alt}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1variant}{sysio\+::vm\+::variant}}$<$ Alternatives $>$\+::get (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const \&\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_source_l00213}{213}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_source}{variant.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a40bec98a962ef909354fcecae263abe9}{detail::variant\_storage\_get}}<\mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_abfb1fa37c13a32caf781c1e10139ac28}{detail::get\_alternatives\_index\_v}}<\mbox{\hyperlink{_regexp_8cpp_a5a887ac128ddf629616f8429bf78f30a}{Alt}},\ Alternatives...>>(\_storage);}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=331pt]{classsysio_1_1vm_1_1variant_a69a4450ec1ba7cdef6da0a713dc1dcf0_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1variant_a103670098d49aaf3b2f5dffdc29d4635}\index{sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}!get@{get}}
+\index{get@{get}!sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}}
+\doxysubsubsection{\texorpdfstring{get()}{get()}\hspace{0.1cm}{\footnotesize\ttfamily [11/16]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1variant_a103670098d49aaf3b2f5dffdc29d4635} 
+template$<$typename... Alternatives$>$ \\
+template$<$size\+\_\+t Index$>$ \\
+const auto \& \mbox{\hyperlink{classsysio_1_1vm_1_1variant}{sysio\+::vm\+::variant}}$<$ Alternatives $>$\+::get (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const \&\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2variant_8hpp_source_l00208}{208}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2variant_8hpp_source}{variant.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a40bec98a962ef909354fcecae263abe9}{detail::variant\_storage\_get<Index>}}(\_storage);}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=331pt]{classsysio_1_1vm_1_1variant_a103670098d49aaf3b2f5dffdc29d4635_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1variant_a69a4450ec1ba7cdef6da0a713dc1dcf0}\index{sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}!get@{get}}
+\index{get@{get}!sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}}
+\doxysubsubsection{\texorpdfstring{get()}{get()}\hspace{0.1cm}{\footnotesize\ttfamily [12/16]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1variant_a69a4450ec1ba7cdef6da0a713dc1dcf0} 
+template$<$typename... Alternatives$>$ \\
+template$<$typename \mbox{\hyperlink{_regexp_8cpp_a5a887ac128ddf629616f8429bf78f30a}{Alt}} $>$ \\
+const \mbox{\hyperlink{_regexp_8cpp_a5a887ac128ddf629616f8429bf78f30a}{Alt}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1variant}{sysio\+::vm\+::variant}}$<$ Alternatives $>$\+::get (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const \&\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2variant_8hpp_source_l00213}{213}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2variant_8hpp_source}{variant.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a40bec98a962ef909354fcecae263abe9}{detail::variant\_storage\_get}}<\mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_abfb1fa37c13a32caf781c1e10139ac28}{detail::get\_alternatives\_index\_v}}<\mbox{\hyperlink{_regexp_8cpp_a5a887ac128ddf629616f8429bf78f30a}{Alt}},\ Alternatives...>>(\_storage);}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=331pt]{classsysio_1_1vm_1_1variant_a69a4450ec1ba7cdef6da0a713dc1dcf0_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1variant_aaaa944ff06819d61d4c738fe043bf12c}\index{sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}!get@{get}}
+\index{get@{get}!sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}}
+\doxysubsubsection{\texorpdfstring{get()}{get()}\hspace{0.1cm}{\footnotesize\ttfamily [13/16]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1variant_aaaa944ff06819d61d4c738fe043bf12c} 
+template$<$typename... Alternatives$>$ \\
+template$<$size\+\_\+t Index$>$ \\
+const auto \&\& \mbox{\hyperlink{classsysio_1_1vm_1_1variant}{sysio\+::vm\+::variant}}$<$ Alternatives $>$\+::get (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const \&\&\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_source_l00218}{218}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_source}{variant.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00218\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a40bec98a962ef909354fcecae263abe9}{detail::variant\_storage\_get<Index>}}(std::move(\_storage));}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=331pt]{classsysio_1_1vm_1_1variant_aaaa944ff06819d61d4c738fe043bf12c_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1variant_a5af974e68d589fd092972c9a78ddafeb}\index{sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}!get@{get}}
+\index{get@{get}!sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}}
+\doxysubsubsection{\texorpdfstring{get()}{get()}\hspace{0.1cm}{\footnotesize\ttfamily [14/16]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1variant_a5af974e68d589fd092972c9a78ddafeb} 
+template$<$typename... Alternatives$>$ \\
+template$<$typename \mbox{\hyperlink{_regexp_8cpp_a5a887ac128ddf629616f8429bf78f30a}{Alt}} $>$ \\
+const \mbox{\hyperlink{_regexp_8cpp_a5a887ac128ddf629616f8429bf78f30a}{Alt}} \&\& \mbox{\hyperlink{classsysio_1_1vm_1_1variant}{sysio\+::vm\+::variant}}$<$ Alternatives $>$\+::get (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const \&\&\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_source_l00223}{223}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_source}{variant.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a40bec98a962ef909354fcecae263abe9}{detail::variant\_storage\_get}}<\mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_abfb1fa37c13a32caf781c1e10139ac28}{detail::get\_alternatives\_index\_v}}<\mbox{\hyperlink{_regexp_8cpp_a5a887ac128ddf629616f8429bf78f30a}{Alt}},\ Alternatives...>>(std::move(\_storage));}
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=331pt]{classsysio_1_1vm_1_1variant_a5af974e68d589fd092972c9a78ddafeb_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1variant_aaaa944ff06819d61d4c738fe043bf12c}\index{sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}!get@{get}}
+\index{get@{get}!sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}}
+\doxysubsubsection{\texorpdfstring{get()}{get()}\hspace{0.1cm}{\footnotesize\ttfamily [15/16]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1variant_aaaa944ff06819d61d4c738fe043bf12c} 
+template$<$typename... Alternatives$>$ \\
+template$<$size\+\_\+t Index$>$ \\
+const auto \&\& \mbox{\hyperlink{classsysio_1_1vm_1_1variant}{sysio\+::vm\+::variant}}$<$ Alternatives $>$\+::get (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const \&\&\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2variant_8hpp_source_l00218}{218}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2variant_8hpp_source}{variant.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00218\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a40bec98a962ef909354fcecae263abe9}{detail::variant\_storage\_get<Index>}}(std::move(\_storage));}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=331pt]{classsysio_1_1vm_1_1variant_aaaa944ff06819d61d4c738fe043bf12c_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1variant_a5af974e68d589fd092972c9a78ddafeb}\index{sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}!get@{get}}
+\index{get@{get}!sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}}
+\doxysubsubsection{\texorpdfstring{get()}{get()}\hspace{0.1cm}{\footnotesize\ttfamily [16/16]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1variant_a5af974e68d589fd092972c9a78ddafeb} 
+template$<$typename... Alternatives$>$ \\
+template$<$typename \mbox{\hyperlink{_regexp_8cpp_a5a887ac128ddf629616f8429bf78f30a}{Alt}} $>$ \\
+const \mbox{\hyperlink{_regexp_8cpp_a5a887ac128ddf629616f8429bf78f30a}{Alt}} \&\& \mbox{\hyperlink{classsysio_1_1vm_1_1variant}{sysio\+::vm\+::variant}}$<$ Alternatives $>$\+::get (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const \&\&\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2variant_8hpp_source_l00223}{223}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2variant_8hpp_source}{variant.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a40bec98a962ef909354fcecae263abe9}{detail::variant\_storage\_get}}<\mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_abfb1fa37c13a32caf781c1e10139ac28}{detail::get\_alternatives\_index\_v}}<\mbox{\hyperlink{_regexp_8cpp_a5a887ac128ddf629616f8429bf78f30a}{Alt}},\ Alternatives...>>(std::move(\_storage));}
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=331pt]{classsysio_1_1vm_1_1variant_a5af974e68d589fd092972c9a78ddafeb_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1variant_a11adf0eb562fb16be61e9002f505528b}\index{sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}!get\_check@{get\_check}}
+\index{get\_check@{get\_check}!sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}}
+\doxysubsubsection{\texorpdfstring{get\_check()}{get\_check()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1variant_a11adf0eb562fb16be61e9002f505528b} 
+template$<$typename... Alternatives$>$ \\
+template$<$size\+\_\+t Index$>$ \\
+auto \&\& \mbox{\hyperlink{classsysio_1_1vm_1_1variant}{sysio\+::vm\+::variant}}$<$ Alternatives $>$\+::get\+\_\+check (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_source_l00202}{202}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_source}{variant.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ TODO\ add\ outcome\ stuff}}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 3;}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1variant_a11adf0eb562fb16be61e9002f505528b}\index{sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}!get\_check@{get\_check}}
+\index{get\_check@{get\_check}!sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}}
+\doxysubsubsection{\texorpdfstring{get\_check()}{get\_check()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1variant_a11adf0eb562fb16be61e9002f505528b} 
+template$<$typename... Alternatives$>$ \\
+template$<$size\+\_\+t Index$>$ \\
+auto \&\& \mbox{\hyperlink{classsysio_1_1vm_1_1variant}{sysio\+::vm\+::variant}}$<$ Alternatives $>$\+::get\+\_\+check (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2variant_8hpp_source_l00202}{202}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2variant_8hpp_source}{variant.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ TODO\ add\ outcome\ stuff}}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 3;}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1variant_a606ed6bf607d40519fba08417ab8bf84}\index{sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}!index@{index}}
+\index{index@{index}!sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}}
+\doxysubsubsection{\texorpdfstring{index()}{index()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1variant_a606ed6bf607d40519fba08417ab8bf84} 
+template$<$typename... Alternatives$>$ \\
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{classsysio_1_1vm_1_1variant}{sysio\+::vm\+::variant}}$<$ Alternatives $>$\+::index (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_source_l00199}{199}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_source}{variant.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00199\ \{\ \textcolor{keywordflow}{return}\ \_which;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1variant_a606ed6bf607d40519fba08417ab8bf84}\index{sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}!index@{index}}
+\index{index@{index}!sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}}
+\doxysubsubsection{\texorpdfstring{index()}{index()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1variant_a606ed6bf607d40519fba08417ab8bf84} 
+template$<$typename... Alternatives$>$ \\
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{classsysio_1_1vm_1_1variant}{sysio\+::vm\+::variant}}$<$ Alternatives $>$\+::index (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2variant_8hpp_source_l00199}{199}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2variant_8hpp_source}{variant.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00199\ \{\ \textcolor{keywordflow}{return}\ \_which;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1variant_a57c9afd27798658962bb49135cbb2ab6}\index{sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}!is\_a@{is\_a}}
+\index{is\_a@{is\_a}!sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}}
+\doxysubsubsection{\texorpdfstring{is\_a()}{is\_a()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1variant_a57c9afd27798658962bb49135cbb2ab6} 
+template$<$typename... Alternatives$>$ \\
+template$<$typename \mbox{\hyperlink{_regexp_8cpp_a5a887ac128ddf629616f8429bf78f30a}{Alt}} $>$ \\
+bool \mbox{\hyperlink{classsysio_1_1vm_1_1variant}{sysio\+::vm\+::variant}}$<$ Alternatives $>$\+::is\+\_\+a (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_source_l00248}{248}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_source}{variant.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00248\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00249\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \_which\ ==\ \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_abfb1fa37c13a32caf781c1e10139ac28}{detail::get\_alternatives\_index\_v}}<\mbox{\hyperlink{_regexp_8cpp_a5a887ac128ddf629616f8429bf78f30a}{Alt}},\ Alternatives...>;}
+\DoxyCodeLine{00250\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1variant_a57c9afd27798658962bb49135cbb2ab6}\index{sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}!is\_a@{is\_a}}
+\index{is\_a@{is\_a}!sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}}
+\doxysubsubsection{\texorpdfstring{is\_a()}{is\_a()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1variant_a57c9afd27798658962bb49135cbb2ab6} 
+template$<$typename... Alternatives$>$ \\
+template$<$typename \mbox{\hyperlink{_regexp_8cpp_a5a887ac128ddf629616f8429bf78f30a}{Alt}} $>$ \\
+bool \mbox{\hyperlink{classsysio_1_1vm_1_1variant}{sysio\+::vm\+::variant}}$<$ Alternatives $>$\+::is\+\_\+a (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2variant_8hpp_source_l00248}{248}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2variant_8hpp_source}{variant.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00248\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00249\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \_which\ ==\ \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_abfb1fa37c13a32caf781c1e10139ac28}{detail::get\_alternatives\_index\_v}}<\mbox{\hyperlink{_regexp_8cpp_a5a887ac128ddf629616f8429bf78f30a}{Alt}},\ Alternatives...>;}
+\DoxyCodeLine{00250\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1variant_a3451ecb903a5492d28d9ef78503d8cd9}\index{sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}!operator=@{operator=}}
+\index{operator=@{operator=}!sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [1/6]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1variant_a3451ecb903a5492d28d9ef78503d8cd9} 
+template$<$typename... Alternatives$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1variant}{variant}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1variant}{sysio\+::vm\+::variant}}$<$ Alternatives $>$\+::operator= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classsysio_1_1vm_1_1variant}{variant}}$<$ Alternatives $>$ \&}]{other}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [default]}}
+
+\Hypertarget{classsysio_1_1vm_1_1variant_a3451ecb903a5492d28d9ef78503d8cd9}\index{sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}!operator=@{operator=}}
+\index{operator=@{operator=}!sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [2/6]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1variant_a3451ecb903a5492d28d9ef78503d8cd9} 
+template$<$typename... Alternatives$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1variant}{variant}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1variant}{sysio\+::vm\+::variant}}$<$ Alternatives $>$\+::operator= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classsysio_1_1vm_1_1variant}{variant}}$<$ Alternatives $>$ \&}]{other}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [default]}}
+
+\Hypertarget{classsysio_1_1vm_1_1variant_a9eb7d014a5dde68f93a986e78758bf23}\index{sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}!operator=@{operator=}}
+\index{operator=@{operator=}!sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [3/6]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1variant_a9eb7d014a5dde68f93a986e78758bf23} 
+template$<$typename... Alternatives$>$ \\
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename  = std\+::enable\+\_\+if\+\_\+t$<$detail\+::is\+\_\+valid\+\_\+alternative\+\_\+v$<$std\+::decay\+\_\+t$<$\+T$>$, Alternatives...$>$$>$$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1variant}{variant}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1variant}{sysio\+::vm\+::variant}}$<$ Alternatives $>$\+::operator= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\&}]{alt}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_source_l00185}{185}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_source}{variant.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00186\ \textcolor{preprocessor}{\#if\ (defined(\_\_GNUC\_\_)\ \&\&\ !defined(\_\_clang\_\_))}}
+\DoxyCodeLine{00187\ \textcolor{preprocessor}{\#pragma\ GCC\ diagnostic\ push}}
+\DoxyCodeLine{00188\ \textcolor{preprocessor}{\#pragma\ GCC\ diagnostic\ ignored\ "{}-\/Wmaybe-\/uninitialized"{}}}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ \ \_storage\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\&\textcolor{keyword}{>}(\mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4a34823136d0dd91d0f5d22db740f7679c}{alt}});}
+\DoxyCodeLine{00190\ \textcolor{preprocessor}{\#pragma\ GCC\ diagnostic\ pop}}
+\DoxyCodeLine{00191\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ \_storage\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\&\textcolor{keyword}{>}(\mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4a34823136d0dd91d0f5d22db740f7679c}{alt}});}
+\DoxyCodeLine{00193\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ \ \_which\ =\ \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_abfb1fa37c13a32caf781c1e10139ac28}{detail::get\_alternatives\_index\_v<std::decay\_t<T>}},\ Alternatives...>;}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1variant_a9eb7d014a5dde68f93a986e78758bf23}\index{sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}!operator=@{operator=}}
+\index{operator=@{operator=}!sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [4/6]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1variant_a9eb7d014a5dde68f93a986e78758bf23} 
+template$<$typename... Alternatives$>$ \\
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename  = std\+::enable\+\_\+if\+\_\+t$<$detail\+::is\+\_\+valid\+\_\+alternative\+\_\+v$<$std\+::decay\+\_\+t$<$\+T$>$, Alternatives...$>$$>$$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1variant}{variant}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1variant}{sysio\+::vm\+::variant}}$<$ Alternatives $>$\+::operator= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\&}]{alt}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2variant_8hpp_source_l00185}{185}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2variant_8hpp_source}{variant.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00186\ \textcolor{preprocessor}{\#if\ (defined(\_\_GNUC\_\_)\ \&\&\ !defined(\_\_clang\_\_))}}
+\DoxyCodeLine{00187\ \textcolor{preprocessor}{\#pragma\ GCC\ diagnostic\ push}}
+\DoxyCodeLine{00188\ \textcolor{preprocessor}{\#pragma\ GCC\ diagnostic\ ignored\ "{}-\/Wmaybe-\/uninitialized"{}}}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ \ \_storage\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\&\textcolor{keyword}{>}(\mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4a34823136d0dd91d0f5d22db740f7679c}{alt}});}
+\DoxyCodeLine{00190\ \textcolor{preprocessor}{\#pragma\ GCC\ diagnostic\ pop}}
+\DoxyCodeLine{00191\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ \_storage\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\&\textcolor{keyword}{>}(\mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4a34823136d0dd91d0f5d22db740f7679c}{alt}});}
+\DoxyCodeLine{00193\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ \ \_which\ =\ \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_abfb1fa37c13a32caf781c1e10139ac28}{detail::get\_alternatives\_index\_v<std::decay\_t<T>}},\ Alternatives...>;}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1variant_a8186e0b2418e76e7b2a554939c7027ab}\index{sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}!operator=@{operator=}}
+\index{operator=@{operator=}!sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [5/6]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1variant_a8186e0b2418e76e7b2a554939c7027ab} 
+template$<$typename... Alternatives$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1variant}{variant}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1variant}{sysio\+::vm\+::variant}}$<$ Alternatives $>$\+::operator= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classsysio_1_1vm_1_1variant}{variant}}$<$ Alternatives $>$ \&\&}]{other}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [default]}}
+
+\Hypertarget{classsysio_1_1vm_1_1variant_a8186e0b2418e76e7b2a554939c7027ab}\index{sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}!operator=@{operator=}}
+\index{operator=@{operator=}!sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [6/6]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1variant_a8186e0b2418e76e7b2a554939c7027ab} 
+template$<$typename... Alternatives$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1variant}{variant}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1variant}{sysio\+::vm\+::variant}}$<$ Alternatives $>$\+::operator= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classsysio_1_1vm_1_1variant}{variant}}$<$ Alternatives $>$ \&\&}]{other}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [default]}}
+
+\Hypertarget{classsysio_1_1vm_1_1variant_a5192f47f2bfba16c4c0a97ca0fc438d2}\index{sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}!set\_exiting\_which@{set\_exiting\_which}}
+\index{set\_exiting\_which@{set\_exiting\_which}!sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}}
+\doxysubsubsection{\texorpdfstring{set\_exiting\_which()}{set\_exiting\_which()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1variant_a5192f47f2bfba16c4c0a97ca0fc438d2} 
+template$<$typename... Alternatives$>$ \\
+void \mbox{\hyperlink{classsysio_1_1vm_1_1variant}{sysio\+::vm\+::variant}}$<$ Alternatives $>$\+::set\+\_\+exiting\+\_\+which (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_source_l00253}{253}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_source}{variant.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00253\ \{\ \_which\ |=\ 0x100;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1variant_a5192f47f2bfba16c4c0a97ca0fc438d2}\index{sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}!set\_exiting\_which@{set\_exiting\_which}}
+\index{set\_exiting\_which@{set\_exiting\_which}!sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}}
+\doxysubsubsection{\texorpdfstring{set\_exiting\_which()}{set\_exiting\_which()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1variant_a5192f47f2bfba16c4c0a97ca0fc438d2} 
+template$<$typename... Alternatives$>$ \\
+void \mbox{\hyperlink{classsysio_1_1vm_1_1variant}{sysio\+::vm\+::variant}}$<$ Alternatives $>$\+::set\+\_\+exiting\+\_\+which (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2variant_8hpp_source_l00253}{253}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2variant_8hpp_source}{variant.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00253\ \{\ \_which\ |=\ 0x100;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1variant_a05c3c74304424259dfc58d985466b1ab}\index{sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}!toggle\_exiting\_which@{toggle\_exiting\_which}}
+\index{toggle\_exiting\_which@{toggle\_exiting\_which}!sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}}
+\doxysubsubsection{\texorpdfstring{toggle\_exiting\_which()}{toggle\_exiting\_which()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1variant_a05c3c74304424259dfc58d985466b1ab} 
+template$<$typename... Alternatives$>$ \\
+void \mbox{\hyperlink{classsysio_1_1vm_1_1variant}{sysio\+::vm\+::variant}}$<$ Alternatives $>$\+::toggle\+\_\+exiting\+\_\+which (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_source_l00251}{251}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_source}{variant.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00251\ \{\ \_which\ \string^=\ 0x100;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1variant_a05c3c74304424259dfc58d985466b1ab}\index{sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}!toggle\_exiting\_which@{toggle\_exiting\_which}}
+\index{toggle\_exiting\_which@{toggle\_exiting\_which}!sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}}
+\doxysubsubsection{\texorpdfstring{toggle\_exiting\_which()}{toggle\_exiting\_which()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1variant_a05c3c74304424259dfc58d985466b1ab} 
+template$<$typename... Alternatives$>$ \\
+void \mbox{\hyperlink{classsysio_1_1vm_1_1variant}{sysio\+::vm\+::variant}}$<$ Alternatives $>$\+::toggle\+\_\+exiting\+\_\+which (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2variant_8hpp_source_l00251}{251}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2variant_8hpp_source}{variant.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00251\ \{\ \_which\ \string^=\ 0x100;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1variant_a164e721c673cdff789716e7c7c0b9671}\index{sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}!variant\_size@{variant\_size}}
+\index{variant\_size@{variant\_size}!sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}}
+\doxysubsubsection{\texorpdfstring{variant\_size()}{variant\_size()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1variant_a164e721c673cdff789716e7c7c0b9671} 
+template$<$typename... Alternatives$>$ \\
+static constexpr size\+\_\+t \mbox{\hyperlink{classsysio_1_1vm_1_1variant}{sysio\+::vm\+::variant}}$<$ Alternatives $>$\+::variant\+\_\+size (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_source_l00198}{198}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_source}{variant.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00198\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{sizeof}...(Alternatives);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1variant_a164e721c673cdff789716e7c7c0b9671}\index{sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}!variant\_size@{variant\_size}}
+\index{variant\_size@{variant\_size}!sysio::vm::variant$<$ Alternatives $>$@{sysio::vm::variant$<$ Alternatives $>$}}
+\doxysubsubsection{\texorpdfstring{variant\_size()}{variant\_size()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1variant_a164e721c673cdff789716e7c7c0b9671} 
+template$<$typename... Alternatives$>$ \\
+static constexpr size\+\_\+t \mbox{\hyperlink{classsysio_1_1vm_1_1variant}{sysio\+::vm\+::variant}}$<$ Alternatives $>$\+::variant\+\_\+size (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2variant_8hpp_source_l00198}{198}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2variant_8hpp_source}{variant.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00198\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{sizeof}...(Alternatives);\ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/include/sysio/sysio/vm/\mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp}{variant.\+hpp}}\item 
+libraries/sys-\/vm/include/sysio/vm/\mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2variant_8hpp}{variant.\+hpp}}\end{DoxyCompactItemize}

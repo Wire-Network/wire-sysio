@@ -1,0 +1,115 @@
+\doxysection{sysio.\+boot.\+hpp}
+\hypertarget{sysio_8boot_8hpp_source}{}\label{sysio_8boot_8hpp_source}\index{/Users/svetlasyrimis/Desktop/wire-\/network/WN-\/org/wire-\/system-\/contracts/contracts/sysio.boot/include/sysio.boot/sysio.boot.hpp@{/Users/svetlasyrimis/Desktop/wire-\/network/WN-\/org/wire-\/system-\/contracts/contracts/sysio.boot/include/sysio.boot/sysio.boot.hpp}}
+\mbox{\hyperlink{sysio_8boot_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <sysio/crypto.hpp>}}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <sysio/sysio.hpp>}}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00006}\mbox{\hyperlink{namespacesysioboot}{00006}}\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysioboot}{sysioboot}}\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00008}00008\ \ \ \ \textcolor{keyword}{using\ }sysio::action\_wrapper;}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00009}00009\ \ \ \ \textcolor{keyword}{using\ }sysio::check;}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00010}00010\ \ \ \ \textcolor{keyword}{using\ }sysio::checksum256;}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00011}00011\ \ \ \ \textcolor{keyword}{using\ }sysio::ignore;}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00012}00012\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{structsysio_1_1chain_1_1name}{sysio::name}};}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00013}00013\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{structsysio_1_1chain_1_1permission__level}{sysio::permission\_level}};}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00014}00014\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classfc_1_1crypto_1_1r1_1_1public__key}{sysio::public\_key}};}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00024}\mbox{\hyperlink{structsysioboot_1_1permission__level__weight}{00024}}\ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structsysioboot_1_1permission__level__weight}{permission\_level\_weight}}\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00025}\mbox{\hyperlink{structsysioboot_1_1permission__level__weight_ad3aa18ca89d5bd29140d12b313b99fa4}{00025}}\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1permission__level}{permission\_level}}\ \ \mbox{\hyperlink{structsysioboot_1_1permission__level__weight_ad3aa18ca89d5bd29140d12b313b99fa4}{permission}};}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00026}\mbox{\hyperlink{structsysioboot_1_1permission__level__weight_ae7d8af40613b5371b21e0cb9b44ffb39}{00026}}\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysioboot_1_1permission__level__weight_ae7d8af40613b5371b21e0cb9b44ffb39}{weight}};}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00028}00028\ \ \ \ \ \ \ \textcolor{comment}{//\ explicit\ serialization\ macro\ is\ not\ necessary,\ used\ here\ only\ to\ improve\ compilation\ time}}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00029}00029\ \ \ \ \ \ \ SYSLIB\_SERIALIZE(\ \mbox{\hyperlink{structsysioboot_1_1permission__level__weight}{permission\_level\_weight}},\ (permission)(\mbox{\hyperlink{structsysioboot_1_1permission__level__weight_ae7d8af40613b5371b21e0cb9b44ffb39}{weight}})\ )}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00030}00030\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00037}\mbox{\hyperlink{structsysioboot_1_1key__weight}{00037}}\ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structsysioboot_1_1key__weight}{key\_weight}}\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00038}\mbox{\hyperlink{structsysioboot_1_1key__weight_a3a61ece661ed74daae6d57930642e0ff}{00038}}\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1crypto_1_1r1_1_1public__key}{sysio::public\_key}}\ \ \mbox{\hyperlink{structsysioboot_1_1key__weight_a3a61ece661ed74daae6d57930642e0ff}{key}};}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00039}\mbox{\hyperlink{structsysioboot_1_1key__weight_ab1859ebea4321c035af20f9695e28b37}{00039}}\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysioboot_1_1key__weight_ab1859ebea4321c035af20f9695e28b37}{weight}};}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00041}00041\ \ \ \ \ \ \ \textcolor{comment}{//\ explicit\ serialization\ macro\ is\ not\ necessary,\ used\ here\ only\ to\ improve\ compilation\ time}}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00042}00042\ \ \ \ \ \ \ SYSLIB\_SERIALIZE(\ \mbox{\hyperlink{structsysioboot_1_1key__weight}{key\_weight}},\ (key)(\mbox{\hyperlink{structsysioboot_1_1key__weight_ab1859ebea4321c035af20f9695e28b37}{weight}})\ )}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00043}00043\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00050}\mbox{\hyperlink{structsysioboot_1_1wait__weight}{00050}}\ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structsysioboot_1_1wait__weight}{wait\_weight}}\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00051}\mbox{\hyperlink{structsysioboot_1_1wait__weight_a470bec71b3d31c2f30a0b6698ea1caf0}{00051}}\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysioboot_1_1wait__weight_a470bec71b3d31c2f30a0b6698ea1caf0}{wait\_sec}};}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00052}\mbox{\hyperlink{structsysioboot_1_1wait__weight_a6a7cccf58afebf1fc630a251e47acf66}{00052}}\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysioboot_1_1wait__weight_a6a7cccf58afebf1fc630a251e47acf66}{weight}};}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00054}00054\ \ \ \ \ \ \ \textcolor{comment}{//\ explicit\ serialization\ macro\ is\ not\ necessary,\ used\ here\ only\ to\ improve\ compilation\ time}}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00055}00055\ \ \ \ \ \ \ SYSLIB\_SERIALIZE(\ \mbox{\hyperlink{structsysioboot_1_1wait__weight}{wait\_weight}},\ (\mbox{\hyperlink{structsysioboot_1_1wait__weight_a470bec71b3d31c2f30a0b6698ea1caf0}{wait\_sec}})(\mbox{\hyperlink{structsysioboot_1_1wait__weight_a6a7cccf58afebf1fc630a251e47acf66}{weight}})\ )}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00056}00056\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00067}\mbox{\hyperlink{structsysioboot_1_1authority}{00067}}\ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structsysioboot_1_1authority}{authority}}\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00068}\mbox{\hyperlink{structsysioboot_1_1authority_ad60d34de50e2c00abe2f6894dede3eeb}{00068}}\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysioboot_1_1authority_ad60d34de50e2c00abe2f6894dede3eeb}{threshold}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00069}\mbox{\hyperlink{structsysioboot_1_1authority_ab5b51f2b2abb8633f8de0cc7b3f923a5}{00069}}\ \ \ \ \ \ \ std::vector<key\_weight>\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysioboot_1_1authority_ab5b51f2b2abb8633f8de0cc7b3f923a5}{keys}};}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00070}\mbox{\hyperlink{structsysioboot_1_1authority_af4e455f05f06515007c6b606bf23011f}{00070}}\ \ \ \ \ \ \ std::vector<permission\_level\_weight>\ \ \mbox{\hyperlink{structsysioboot_1_1authority_af4e455f05f06515007c6b606bf23011f}{accounts}};}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00071}\mbox{\hyperlink{structsysioboot_1_1authority_a657cce7bf6259e1028d9659983a64136}{00071}}\ \ \ \ \ \ \ std::vector<wait\_weight>\ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysioboot_1_1authority_a657cce7bf6259e1028d9659983a64136}{waits}};}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00073}00073\ \ \ \ \ \ \ \textcolor{comment}{//\ explicit\ serialization\ macro\ is\ not\ necessary,\ used\ here\ only\ to\ improve\ compilation\ time}}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00074}00074\ \ \ \ \ \ \ SYSLIB\_SERIALIZE(\ \mbox{\hyperlink{structsysioboot_1_1authority}{authority}},\ (\mbox{\hyperlink{structsysioboot_1_1authority_ad60d34de50e2c00abe2f6894dede3eeb}{threshold}})(keys)(\mbox{\hyperlink{structsysioboot_1_1authority_af4e455f05f06515007c6b606bf23011f}{accounts}})(\mbox{\hyperlink{structsysioboot_1_1authority_a657cce7bf6259e1028d9659983a64136}{waits}})\ )}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00075}00075\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00076}00076\ }
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00087}\mbox{\hyperlink{classsysioboot_1_1boot}{00087}}\ \ \ \ \textcolor{keyword}{class\ }[[sysio::contract(\textcolor{stringliteral}{"{}sysio.boot"{}})]]\ \mbox{\hyperlink{classsysioboot_1_1boot}{boot}}\ :\ \textcolor{keyword}{public}\ sysio::contract\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00088}00088\ \ \ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00089}00089\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ }contract::contract;}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00108}00108\ \ \ \ \ \ \ \ \ \ [[\mbox{\hyperlink{structsysio_1_1chain_1_1action}{sysio::action}}]]}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00109}\mbox{\hyperlink{classsysioboot_1_1boot_a3748cb076f803976abb10a0068ca6493}{00109}}\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysioboot_1_1boot_a3748cb076f803976abb10a0068ca6493}{newaccount}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\ \ \ \ \ \ \ \ \ \ \ \ \ creator,}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00110}00110\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}},}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00111}00111\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ignore<authority>\ owner,}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00112}00112\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ignore<authority>\ active)\ \{\}}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00123}00123\ \ \ \ \ \ \ \ \ \ [[\mbox{\hyperlink{structsysio_1_1chain_1_1action}{sysio::action}}]]}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00124}\mbox{\hyperlink{classsysioboot_1_1boot_affc23ef03b3fd06e92401e7628cda51d}{00124}}\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysioboot_1_1boot_affc23ef03b3fd06e92401e7628cda51d}{updateauth}}(\ \ ignore<name>\ \ account,}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00125}00125\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ignore<name>\ \ permission,}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00126}00126\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ignore<name>\ \ parent,}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00127}00127\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ignore<authority>\ auth\ )\ \{\}}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00128}00128\ }
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00137}00137\ \ \ \ \ \ \ \ \ \ [[\mbox{\hyperlink{structsysio_1_1chain_1_1action}{sysio::action}}]]}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00138}\mbox{\hyperlink{classsysioboot_1_1boot_ae3e3a3dc0c7cfa5a3acf85bebc9f267a}{00138}}\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysioboot_1_1boot_ae3e3a3dc0c7cfa5a3acf85bebc9f267a}{deleteauth}}(\ ignore<name>\ \ account,}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00139}00139\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ignore<name>\ \ permission\ )\ \{\}}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00140}00140\ }
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00158}00158\ \ \ \ \ \ \ \ \ \ [[\mbox{\hyperlink{structsysio_1_1chain_1_1action}{sysio::action}}]]}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00159}\mbox{\hyperlink{classsysioboot_1_1boot_ad12a094f7d04032eb4473afc484857fc}{00159}}\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysioboot_1_1boot_ad12a094f7d04032eb4473afc484857fc}{linkauth}}(\ \ ignore<name>\ \ \ \ account,}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00160}00160\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ignore<name>\ \ \ \ code,}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00161}00161\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ignore<name>\ \ \ \ type,}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00162}00162\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ignore<name>\ \ \ \ requirement\ \ )\ \{\}}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00163}00163\ }
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00173}00173\ \ \ \ \ \ \ \ \ \ [[\mbox{\hyperlink{structsysio_1_1chain_1_1action}{sysio::action}}]]}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00174}\mbox{\hyperlink{classsysioboot_1_1boot_adf7eeda25283fecc268159dcfd2e828f}{00174}}\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysioboot_1_1boot_adf7eeda25283fecc268159dcfd2e828f}{unlinkauth}}(\ ignore<name>\ \ account,}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00175}00175\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ignore<name>\ \ code,}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00176}00176\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ignore<name>\ \ type\ )\ \{\}}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00177}00177\ }
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00186}00186\ \ \ \ \ \ \ \ \ \ [[\mbox{\hyperlink{structsysio_1_1chain_1_1action}{sysio::action}}]]}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00187}\mbox{\hyperlink{classsysioboot_1_1boot_a2aa6af795940c18936985a5e987e4012}{00187}}\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysioboot_1_1boot_a2aa6af795940c18936985a5e987e4012}{canceldelay}}(\ ignore<permission\_level>\ canceling\_auth,\ ignore<checksum256>\ trx\_id\ )\ \{\}}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00188}00188\ }
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00199}00199\ \ \ \ \ \ \ \ \ \ [[\mbox{\hyperlink{structsysio_1_1chain_1_1action}{sysio::action}}]]}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00200}\mbox{\hyperlink{classsysioboot_1_1boot_a7e5311dab77b11c2e214489392de3481}{00200}}\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysioboot_1_1boot_a7e5311dab77b11c2e214489392de3481}{setcode}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\ account,\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ vmtype,\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ vmversion,\ \textcolor{keyword}{const}\ std::vector<char>\&\ code\ )\ \{\}}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00201}00201\ }
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00210}00210\ \ \ \ \ \ \ \ \ \ [[\mbox{\hyperlink{structsysio_1_1chain_1_1action}{sysio::action}}]]}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00211}\mbox{\hyperlink{classsysioboot_1_1boot_a93c1e31ab9867b298a81903bcec03059}{00211}}\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysioboot_1_1boot_a93c1e31ab9867b298a81903bcec03059}{setabi}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\ account,\ \textcolor{keyword}{const}\ std::vector<char>\&\ abi\ )\ \{\}}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00212}00212\ }
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00225}00225\ \ \ \ \ \ \ \ \ \ [[\mbox{\hyperlink{structsysio_1_1chain_1_1action}{sysio::action}}]]}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00226}00226\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ onerror(\ ignore<uint128\_t>\ sender\_id,\ ignore<std::vector<char>>\ sent\_trx\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00227}00227\ }
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00235}00235\ \ \ \ \ \ \ \ \ \ [[\mbox{\hyperlink{structsysio_1_1chain_1_1action}{sysio::action}}]]}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00236}00236\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ activate(\ \textcolor{keyword}{const}\ sysio::checksum256\&\ feature\_digest\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00237}00237\ }
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00245}00245\ \ \ \ \ \ \ \ \ \ [[\mbox{\hyperlink{structsysio_1_1chain_1_1action}{sysio::action}}]]}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00246}00246\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ reqactivated(\ \textcolor{keyword}{const}\ sysio::checksum256\&\ feature\_digest\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00247}00247\ }
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00248}\mbox{\hyperlink{classsysioboot_1_1boot_aed2433e778f1f1a8ba068ea09acf3985}{00248}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysioboot_1_1boot_aed2433e778f1f1a8ba068ea09acf3985}{newaccount\_action}}\ =\ action\_wrapper<\textcolor{stringliteral}{"{}newaccount"{}}\_n,\ \&boot::newaccount>;}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00249}\mbox{\hyperlink{classsysioboot_1_1boot_a11ee1942a1ce985fd489e80d1d643caa}{00249}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysioboot_1_1boot_a11ee1942a1ce985fd489e80d1d643caa}{updateauth\_action}}\ =\ action\_wrapper<\textcolor{stringliteral}{"{}updateauth"{}}\_n,\ \&boot::updateauth>;}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00250}\mbox{\hyperlink{classsysioboot_1_1boot_aae659e63c4ab9ff310de8ea4ac1abbac}{00250}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysioboot_1_1boot_aae659e63c4ab9ff310de8ea4ac1abbac}{deleteauth\_action}}\ =\ action\_wrapper<\textcolor{stringliteral}{"{}deleteauth"{}}\_n,\ \&boot::deleteauth>;}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00251}\mbox{\hyperlink{classsysioboot_1_1boot_aa642ca46c8b2ca08ae3aa8985be0644c}{00251}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysioboot_1_1boot_aa642ca46c8b2ca08ae3aa8985be0644c}{linkauth\_action}}\ =\ action\_wrapper<\textcolor{stringliteral}{"{}linkauth"{}}\_n,\ \&boot::linkauth>;}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00252}\mbox{\hyperlink{classsysioboot_1_1boot_aeca0b35e4b4b6844c6623b2bbe93f2c1}{00252}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysioboot_1_1boot_aeca0b35e4b4b6844c6623b2bbe93f2c1}{unlinkauth\_action}}\ =\ action\_wrapper<\textcolor{stringliteral}{"{}unlinkauth"{}}\_n,\ \&boot::unlinkauth>;}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00253}\mbox{\hyperlink{classsysioboot_1_1boot_a0ae866cd38506ea81185ce137ca68cc7}{00253}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysioboot_1_1boot_a0ae866cd38506ea81185ce137ca68cc7}{canceldelay\_action}}\ =\ action\_wrapper<\textcolor{stringliteral}{"{}canceldelay"{}}\_n,\ \&boot::canceldelay>;}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00254}\mbox{\hyperlink{classsysioboot_1_1boot_a942a421d7e8d40ba200cc00f9597a2f7}{00254}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysioboot_1_1boot_a942a421d7e8d40ba200cc00f9597a2f7}{setcode\_action}}\ =\ action\_wrapper<\textcolor{stringliteral}{"{}setcode"{}}\_n,\ \&boot::setcode>;}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00255}\mbox{\hyperlink{classsysioboot_1_1boot_a1063b5152beedd652e8e5adf5c90583f}{00255}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysioboot_1_1boot_a1063b5152beedd652e8e5adf5c90583f}{setabi\_action}}\ =\ action\_wrapper<\textcolor{stringliteral}{"{}setabi"{}}\_n,\ \&boot::setabi>;}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00256}\mbox{\hyperlink{classsysioboot_1_1boot_adf742388ea5f761635f21e3b4be273bf}{00256}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysioboot_1_1boot_adf742388ea5f761635f21e3b4be273bf}{activate\_action}}\ =\ action\_wrapper<\textcolor{stringliteral}{"{}activate"{}}\_n,\ \&boot::activate>;}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00257}\mbox{\hyperlink{classsysioboot_1_1boot_a1595ab21f2642fafe0cc0fcea588c26d}{00257}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysioboot_1_1boot_a1595ab21f2642fafe0cc0fcea588c26d}{reqactivated\_action}}\ =\ action\_wrapper<\textcolor{stringliteral}{"{}reqactivated"{}}\_n,\ \&boot::reqactivated>;}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00258}00258\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00259}00259\ \ \textcolor{comment}{//\ end\ of\ @defgroup\ sysioboot\ sysio.boot}}
+\DoxyCodeLine{\Hypertarget{sysio_8boot_8hpp_source_l00260}00260\ \}\ }
+
+\end{DoxyCode}

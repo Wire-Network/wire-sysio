@@ -1,0 +1,126 @@
+\doxysection{fc\+::scoped\+\_\+exit\texorpdfstring{$<$}{<} Callback \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classfc_1_1scoped__exit}{}\label{classfc_1_1scoped__exit}\index{fc::scoped\_exit$<$ Callback $>$@{fc::scoped\_exit$<$ Callback $>$}}
+
+
+{\ttfamily \#include $<$scoped\+\_\+exit.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename C $>$ }\\\mbox{\hyperlink{classfc_1_1scoped__exit_aa6a24dc43951f2b332486206c1fc3bdb}{scoped\+\_\+exit}} (C \&\&c)
+\item 
+\mbox{\hyperlink{classfc_1_1scoped__exit_ab382c169987f21fac06f219163e49234}{scoped\+\_\+exit}} (\mbox{\hyperlink{classfc_1_1scoped__exit}{scoped\+\_\+exit}} \&\&mv)
+\item 
+\mbox{\hyperlink{classfc_1_1scoped__exit_a5d14b4c57db95fe72f8396ad49b8116a}{scoped\+\_\+exit}} (const \mbox{\hyperlink{classfc_1_1scoped__exit}{scoped\+\_\+exit}} \&)=delete
+\item 
+\mbox{\hyperlink{classfc_1_1scoped__exit}{scoped\+\_\+exit}} \& \mbox{\hyperlink{classfc_1_1scoped__exit_a037cf0222e283dbd87250fc016e74582}{operator=}} (const \mbox{\hyperlink{classfc_1_1scoped__exit}{scoped\+\_\+exit}} \&)=delete
+\item 
+\mbox{\hyperlink{classfc_1_1scoped__exit_a31b875f39a2c12e7efcb0616b6e4e371}{\texorpdfstring{$\sim$}{\string~}scoped\+\_\+exit}} ()
+\item 
+void \mbox{\hyperlink{classfc_1_1scoped__exit_af44fc66a832e98b8e9183935528c41d9}{cancel}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Callback$>$\newline
+class fc\+::scoped\+\_\+exit$<$ Callback $>$}
+
+
+Definition at line \mbox{\hyperlink{scoped__exit_8hpp_source_l00008}{8}} of file \mbox{\hyperlink{scoped__exit_8hpp_source}{scoped\+\_\+exit.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1scoped__exit_aa6a24dc43951f2b332486206c1fc3bdb}\index{fc::scoped\_exit$<$ Callback $>$@{fc::scoped\_exit$<$ Callback $>$}!scoped\_exit@{scoped\_exit}}
+\index{scoped\_exit@{scoped\_exit}!fc::scoped\_exit$<$ Callback $>$@{fc::scoped\_exit$<$ Callback $>$}}
+\doxysubsubsection{\texorpdfstring{scoped\_exit()}{scoped\_exit()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{classfc_1_1scoped__exit_aa6a24dc43951f2b332486206c1fc3bdb} 
+template$<$typename Callback $>$ \\
+template$<$typename C $>$ \\
+\mbox{\hyperlink{classfc_1_1scoped__exit}{fc\+::scoped\+\_\+exit}}$<$ Callback $>$\+::scoped\+\_\+exit (\begin{DoxyParamCaption}\item[{C \&\&}]{c}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{scoped__exit_8hpp_source_l00011}{11}} of file \mbox{\hyperlink{scoped__exit_8hpp_source}{scoped\+\_\+exit.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00011\ :callback(\ std::forward<C>(c)\ )\{\}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1scoped__exit_ab382c169987f21fac06f219163e49234}\index{fc::scoped\_exit$<$ Callback $>$@{fc::scoped\_exit$<$ Callback $>$}!scoped\_exit@{scoped\_exit}}
+\index{scoped\_exit@{scoped\_exit}!fc::scoped\_exit$<$ Callback $>$@{fc::scoped\_exit$<$ Callback $>$}}
+\doxysubsubsection{\texorpdfstring{scoped\_exit()}{scoped\_exit()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{classfc_1_1scoped__exit_ab382c169987f21fac06f219163e49234} 
+template$<$typename Callback $>$ \\
+\mbox{\hyperlink{classfc_1_1scoped__exit}{fc\+::scoped\+\_\+exit}}$<$ Callback $>$\+::scoped\+\_\+exit (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1scoped__exit}{scoped\+\_\+exit}}$<$ Callback $>$ \&\&}]{mv}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{scoped__exit_8hpp_source_l00013}{13}} of file \mbox{\hyperlink{scoped__exit_8hpp_source}{scoped\+\_\+exit.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00014\ \ \ \ \ \ \ \ \ \ :callback(\ std::move(\ mv.callback\ )\ ),canceled(mv.canceled)}
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \ \ \ \ \ \ mv.canceled\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00017\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1scoped__exit_a5d14b4c57db95fe72f8396ad49b8116a}\index{fc::scoped\_exit$<$ Callback $>$@{fc::scoped\_exit$<$ Callback $>$}!scoped\_exit@{scoped\_exit}}
+\index{scoped\_exit@{scoped\_exit}!fc::scoped\_exit$<$ Callback $>$@{fc::scoped\_exit$<$ Callback $>$}}
+\doxysubsubsection{\texorpdfstring{scoped\_exit()}{scoped\_exit()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{classfc_1_1scoped__exit_a5d14b4c57db95fe72f8396ad49b8116a} 
+template$<$typename Callback $>$ \\
+\mbox{\hyperlink{classfc_1_1scoped__exit}{fc\+::scoped\+\_\+exit}}$<$ Callback $>$\+::scoped\+\_\+exit (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1scoped__exit}{scoped\+\_\+exit}}$<$ Callback $>$ \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [delete]}}
+
+\Hypertarget{classfc_1_1scoped__exit_a31b875f39a2c12e7efcb0616b6e4e371}\index{fc::scoped\_exit$<$ Callback $>$@{fc::scoped\_exit$<$ Callback $>$}!````~scoped\_exit@{\texorpdfstring{$\sim$}{\string~}scoped\_exit}}
+\index{````~scoped\_exit@{\texorpdfstring{$\sim$}{\string~}scoped\_exit}!fc::scoped\_exit$<$ Callback $>$@{fc::scoped\_exit$<$ Callback $>$}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}scoped\_exit()}{\string~scoped\_exit()}}
+{\footnotesize\ttfamily \label{classfc_1_1scoped__exit_a31b875f39a2c12e7efcb0616b6e4e371} 
+template$<$typename Callback $>$ \\
+\mbox{\hyperlink{classfc_1_1scoped__exit}{fc\+::scoped\+\_\+exit}}$<$ Callback $>$\+::\texorpdfstring{$\sim$}{\string~}\mbox{\hyperlink{classfc_1_1scoped__exit}{scoped\+\_\+exit}} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{scoped__exit_8hpp_source_l00022}{22}} of file \mbox{\hyperlink{scoped__exit_8hpp_source}{scoped\+\_\+exit.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!canceled)}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{\ callback();\ \}\ \textcolor{keywordflow}{catch}(\ ...\ )\ \{\}}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1scoped__exit_af44fc66a832e98b8e9183935528c41d9}\index{fc::scoped\_exit$<$ Callback $>$@{fc::scoped\_exit$<$ Callback $>$}!cancel@{cancel}}
+\index{cancel@{cancel}!fc::scoped\_exit$<$ Callback $>$@{fc::scoped\_exit$<$ Callback $>$}}
+\doxysubsubsection{\texorpdfstring{cancel()}{cancel()}}
+{\footnotesize\ttfamily \label{classfc_1_1scoped__exit_af44fc66a832e98b8e9183935528c41d9} 
+template$<$typename Callback $>$ \\
+void \mbox{\hyperlink{classfc_1_1scoped__exit}{fc\+::scoped\+\_\+exit}}$<$ Callback $>$\+::cancel (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{scoped__exit_8hpp_source_l00027}{27}} of file \mbox{\hyperlink{scoped__exit_8hpp_source}{scoped\+\_\+exit.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00027\ \{\ canceled\ =\ \textcolor{keyword}{true};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1scoped__exit_a037cf0222e283dbd87250fc016e74582}\index{fc::scoped\_exit$<$ Callback $>$@{fc::scoped\_exit$<$ Callback $>$}!operator=@{operator=}}
+\index{operator=@{operator=}!fc::scoped\_exit$<$ Callback $>$@{fc::scoped\_exit$<$ Callback $>$}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}}
+{\footnotesize\ttfamily \label{classfc_1_1scoped__exit_a037cf0222e283dbd87250fc016e74582} 
+template$<$typename Callback $>$ \\
+\mbox{\hyperlink{classfc_1_1scoped__exit}{scoped\+\_\+exit}} \& \mbox{\hyperlink{classfc_1_1scoped__exit}{fc\+::scoped\+\_\+exit}}$<$ Callback $>$\+::operator= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1scoped__exit}{scoped\+\_\+exit}}$<$ Callback $>$ \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [delete]}}
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/\mbox{\hyperlink{scoped__exit_8hpp}{scoped\+\_\+exit.\+hpp}}\end{DoxyCompactItemize}

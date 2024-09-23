@@ -1,0 +1,234 @@
+\doxysection{sysio\+::chain\+::eosvmoc\+::executor Class Reference}
+\hypertarget{classsysio_1_1chain_1_1eosvmoc_1_1executor}{}\label{classsysio_1_1chain_1_1eosvmoc_1_1executor}\index{sysio::chain::eosvmoc::executor@{sysio::chain::eosvmoc::executor}}
+
+
+{\ttfamily \#include $<$executor.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1executor_a7775dd291ec388bee1237d0005238516}{executor}} (const \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base}{code\+\_\+cache\+\_\+base}} \&cc)
+\item 
+\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1executor_a858180d7d233e64c6d6cd7664da632da}{\texorpdfstring{$\sim$}{\string~}executor}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1executor_a53e27b539f049d467aa2f64c5dccff93}{execute}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1code__descriptor}{code\+\_\+descriptor}} \&code, \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1memory}{memory}} \&mem, \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context}{apply\+\_\+context}} \&\mbox{\hyperlink{structcontext}{context}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{executor_8hpp_source_l00024}{24}} of file \mbox{\hyperlink{executor_8hpp_source}{executor.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classsysio_1_1chain_1_1eosvmoc_1_1executor_a7775dd291ec388bee1237d0005238516}\index{sysio::chain::eosvmoc::executor@{sysio::chain::eosvmoc::executor}!executor@{executor}}
+\index{executor@{executor}!sysio::chain::eosvmoc::executor@{sysio::chain::eosvmoc::executor}}
+\doxysubsubsection{\texorpdfstring{executor()}{executor()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1eosvmoc_1_1executor_a7775dd291ec388bee1237d0005238516} 
+sysio\+::chain\+::eosvmoc\+::executor\+::executor (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base}{code\+\_\+cache\+\_\+base}} \&}]{cc}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{executor_8cpp_source_l00136}{136}} of file \mbox{\hyperlink{executor_8cpp_source}{executor.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00137\ \ \ \ \textcolor{comment}{//if\ we're\ the\ first\ executor\ created,\ go\ setup\ the\ signal\ handling.\ For\ now\ we'll\ just\ leave\ this\ attached\ forever}}
+\DoxyCodeLine{00138\ \ \ \ \textcolor{keyword}{static}\ executor\_signal\_init\ the\_executor\_signal\_init;}
+\DoxyCodeLine{00139\ }
+\DoxyCodeLine{00140\ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ current\_gs;}
+\DoxyCodeLine{00141\ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{executor_8cpp_ac1ca206f7fd4a694348df869fd793c9c}{arch\_prctl}}(ARCH\_GET\_GS,\ \&current\_gs)\ ||\ current\_gs)}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a1759e5c9691d8ad754bdf5eff8bb23ac}{wlog}}(\textcolor{stringliteral}{"{}x86\_64\ GS\ register\ is\ not\ set\ as\ expected.\ SYS\ VM\ OC\ may\ not\ run\ correctly\ on\ this\ platform"{}});}
+\DoxyCodeLine{00143\ }
+\DoxyCodeLine{00144\ \ \ \ \textcolor{keyword}{struct\ }stat\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{00145\ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(fstat(cc.fd(),\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})\ ==\ 0,\ \textcolor{stringliteral}{"{}executor\ failed\ to\ get\ code\ cache\ size"{}});}
+\DoxyCodeLine{00146\ \ \ \ code\_mapping\ =\ (\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}*)mmap(\textcolor{keyword}{nullptr},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.st\_size,\ PROT\_EXEC|PROT\_READ,\ MAP\_SHARED,\ cc.fd(),\ 0);}
+\DoxyCodeLine{00147\ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(code\_mapping\ !=\ MAP\_FAILED,\ \textcolor{stringliteral}{"{}failed\ to\ map\ code\ cache\ in\ to\ executor"{}});}
+\DoxyCodeLine{00148\ \ \ \ code\_mapping\_size\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.st\_size;}
+\DoxyCodeLine{00149\ \ \ \ mapping\_is\_executable\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00150\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=345pt]{classsysio_1_1chain_1_1eosvmoc_1_1executor_a7775dd291ec388bee1237d0005238516_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1eosvmoc_1_1executor_a858180d7d233e64c6d6cd7664da632da}\index{sysio::chain::eosvmoc::executor@{sysio::chain::eosvmoc::executor}!````~executor@{\texorpdfstring{$\sim$}{\string~}executor}}
+\index{````~executor@{\texorpdfstring{$\sim$}{\string~}executor}!sysio::chain::eosvmoc::executor@{sysio::chain::eosvmoc::executor}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}executor()}{\string~executor()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1eosvmoc_1_1executor_a858180d7d233e64c6d6cd7664da632da} 
+sysio\+::chain\+::eosvmoc\+::executor\+::\texorpdfstring{$\sim$}{\string~}executor (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{executor_8cpp_source_l00265}{265}} of file \mbox{\hyperlink{executor_8cpp_source}{executor.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00265\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00266\ \ \ \ \mbox{\hyperlink{executor_8cpp_ac1ca206f7fd4a694348df869fd793c9c}{arch\_prctl}}(ARCH\_SET\_GS,\ \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{00267\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=289pt]{classsysio_1_1chain_1_1eosvmoc_1_1executor_a858180d7d233e64c6d6cd7664da632da_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1chain_1_1eosvmoc_1_1executor_a53e27b539f049d467aa2f64c5dccff93}\index{sysio::chain::eosvmoc::executor@{sysio::chain::eosvmoc::executor}!execute@{execute}}
+\index{execute@{execute}!sysio::chain::eosvmoc::executor@{sysio::chain::eosvmoc::executor}}
+\doxysubsubsection{\texorpdfstring{execute()}{execute()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1eosvmoc_1_1executor_a53e27b539f049d467aa2f64c5dccff93} 
+void sysio\+::chain\+::eosvmoc\+::executor\+::execute (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1code__descriptor}{code\+\_\+descriptor}} \&}]{code}{, }\item[{\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1memory}{memory}} \&}]{mem}{, }\item[{\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context}{apply\+\_\+context}} \&}]{context}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{executor_8cpp_source_l00152}{152}} of file \mbox{\hyperlink{executor_8cpp_source}{executor.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00153\ \ \ \ \textcolor{keywordflow}{if}(mapping\_is\_executable\ ==\ \textcolor{keyword}{false})\ \{}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ mprotect(code\_mapping,\ code\_mapping\_size,\ PROT\_EXEC|PROT\_READ);}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ mapping\_is\_executable\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00156\ \ \ \ \}}
+\DoxyCodeLine{00157\ }
+\DoxyCodeLine{00158\ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{namespacesysio_1_1vm_a0ae6751a77293216df4656dee5081eb2a2b205b0f9a2199e9e6bf7d96d768f15a}{max\_call\_depth}}\ =\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__constraints_ad5772dcb5e5f4668279c81a8a87e6f61}{sysio::chain::wasm\_constraints::maximum\_call\_depth}}+1;}
+\DoxyCodeLine{00159\ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{namespacesysio_1_1vm_a0ae6751a77293216df4656dee5081eb2a95b0fd1e8f1e450ae134af180be894f3}{max\_pages}}\ =\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__constraints_a39bdedb43d5976cf1ddad3fab6b3044c}{sysio::chain::wasm\_constraints::maximum\_linear\_memory}}/sysio::chain::wasm\_constraints::wasm\_page\_size;}
+\DoxyCodeLine{00160\ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{structcontext}{context}}.control.is\_builtin\_activated(\mbox{\hyperlink{namespacesysio_1_1chain_a406d45a184cdba0af316b5bf34bf56cfa3afd605f2e67ff58dfd806199c86cd5c}{builtin\_protocol\_feature\_t::configurable\_wasm\_limits}}))\ \{}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \textcolor{keyword}{const}\ wasm\_config\&\ \mbox{\hyperlink{classconfig}{config}}\ =\ \mbox{\hyperlink{structcontext}{context}}.control.get\_global\_properties().wasm\_configuration;}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1vm_a0ae6751a77293216df4656dee5081eb2a2b205b0f9a2199e9e6bf7d96d768f15a}{max\_call\_depth}}\ =\ \mbox{\hyperlink{classconfig}{config}}.max\_call\_depth;}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1vm_a0ae6751a77293216df4656dee5081eb2a95b0fd1e8f1e450ae134af180be894f3}{max\_pages}}\ =\ \mbox{\hyperlink{classconfig}{config}}.max\_pages;}
+\DoxyCodeLine{00164\ \ \ \ \}}
+\DoxyCodeLine{00165\ \ \ \ stack.\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack_af69753f37c77d1bd9cd4420a0acacd65}{reset}}(max\_call\_depth);}
+\DoxyCodeLine{00166\ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(code.starting\_memory\_pages\ <=\ (\textcolor{keywordtype}{int})max\_pages,\ wasm\_execution\_error,\ \textcolor{stringliteral}{"{}Initial\ memory\ out\ of\ range"{}});}
+\DoxyCodeLine{00167\ }
+\DoxyCodeLine{00168\ \ \ \ \textcolor{comment}{//prepare\ initial\ memory,\ mutable\ globals,\ and\ table\ data}}
+\DoxyCodeLine{00169\ \ \ \ \textcolor{keywordflow}{if}(code.starting\_memory\_pages\ >\ 0\ )\ \{}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ initial\_page\_offset\ =\ std::min(\textcolor{keyword}{static\_cast<}std::size\_t\textcolor{keyword}{>}(code.starting\_memory\_pages),\ mem.size\_of\_memory\_slice\_mapping()/\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1memory_a08924e50e0bd949e51e87ed562d57178}{memory::stride}}\ -\/\ 1);}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(initial\_page\_offset\ <\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\textcolor{keyword}{>}(code.starting\_memory\_pages))\ \{}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \ mprotect(mem.full\_page\_memory\_base()\ +\ initial\_page\_offset\ *\ sysio::chain::wasm\_constraints::wasm\_page\_size,}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (code.starting\_memory\_pages\ -\/\ initial\_page\_offset)\ *\ sysio::chain::wasm\_constraints::wasm\_page\_size,\ PROT\_READ\ |\ PROT\_WRITE);}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \mbox{\hyperlink{executor_8cpp_ac1ca206f7fd4a694348df869fd793c9c}{arch\_prctl}}(ARCH\_SET\_GS,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}*)(mem.zero\_page\_memory\_base()+initial\_page\_offset*\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1memory_a08924e50e0bd949e51e87ed562d57178}{memory::stride}}));}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(mem.full\_page\_memory\_base(),\ 0,\ 64u*1024u*code.starting\_memory\_pages);}
+\DoxyCodeLine{00177\ \ \ \ \}}
+\DoxyCodeLine{00178\ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \mbox{\hyperlink{executor_8cpp_ac1ca206f7fd4a694348df869fd793c9c}{arch\_prctl}}(ARCH\_SET\_GS,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}*)mem.zero\_page\_memory\_base());}
+\DoxyCodeLine{00180\ }
+\DoxyCodeLine{00181\ \ \ \ \textcolor{keywordtype}{void}*\ globals;}
+\DoxyCodeLine{00182\ \ \ \ \textcolor{keywordflow}{if}(code.initdata\_prologue\_size\ >\ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1memory_aead91f2e971a46b02e86b9ed36f0e9b0}{memory::max\_prologue\_size}})\ \{}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ globals\_buffer.resize(code.initdata\_prologue\_size);}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(globals\_buffer.data(),\ code\_mapping\ +\ code.initdata\_begin,\ code.initdata\_prologue\_size);}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(mem.full\_page\_memory\_base()\ -\/\ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1memory_aead91f2e971a46b02e86b9ed36f0e9b0}{memory::max\_prologue\_size}},}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ \ \ \ \ \ code\_mapping\ +\ code.initdata\_begin\ +\ code.initdata\_prologue\_size\ -\/\ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1memory_aead91f2e971a46b02e86b9ed36f0e9b0}{memory::max\_prologue\_size}},}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \ \ \ \ \ \ \ code.initdata\_size\ -\/\ code.initdata\_prologue\_size\ +\ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1memory_aead91f2e971a46b02e86b9ed36f0e9b0}{memory::max\_prologue\_size}});}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ globals\ =\ globals\_buffer.data()\ +\ globals\_buffer.size();}
+\DoxyCodeLine{00189\ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(mem.full\_page\_memory\_base()\ -\/\ code.initdata\_prologue\_size,\ code\_mapping\ +\ code.initdata\_begin,\ code.initdata\_size);}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ globals\ =\ mem.full\_page\_memory\_base();}
+\DoxyCodeLine{00192\ \ \ \ \}}
+\DoxyCodeLine{00193\ }
+\DoxyCodeLine{00194\ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a7cfa050a8e417822975ca260ac344c98}{control\_block}}*\ \textcolor{keyword}{const}\ cb\ =\ mem.get\_control\_block();}
+\DoxyCodeLine{00195\ \ \ \ cb-\/>\mbox{\hyperlink{structeos__vm__oc__control__block_acd9fce98948c290e0b88017d6f15a0ab}{magic}}\ =\ signal\_sentinel;}
+\DoxyCodeLine{00196\ \ \ \ cb-\/>execution\_thread\_code\_start\ =\ (\mbox{\hyperlink{stdint_8h_a31b85deecb45924320becd11d3ee16ce}{uintptr\_t}})code\_mapping;}
+\DoxyCodeLine{00197\ \ \ \ cb-\/>execution\_thread\_code\_length\ =\ code\_mapping\_size;}
+\DoxyCodeLine{00198\ \ \ \ cb-\/>execution\_thread\_memory\_start\ =\ (\mbox{\hyperlink{stdint_8h_a31b85deecb45924320becd11d3ee16ce}{uintptr\_t}})mem.start\_of\_memory\_slices();}
+\DoxyCodeLine{00199\ \ \ \ cb-\/>execution\_thread\_memory\_length\ =\ mem.size\_of\_memory\_slice\_mapping();}
+\DoxyCodeLine{00200\ \ \ \ cb-\/>ctx\ =\ \&\mbox{\hyperlink{programs_2clio_2main_8cpp_a7e8fab42307e75bda555628c7381f239}{context}};}
+\DoxyCodeLine{00201\ \ \ \ executors\_exception\_ptr\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00202\ \ \ \ cb-\/>eptr\ =\ \&executors\_exception\_ptr;}
+\DoxyCodeLine{00203\ \ \ \ cb-\/>current\_call\_depth\_remaining\ =\ \mbox{\hyperlink{namespacesysio_1_1vm_a0ae6751a77293216df4656dee5081eb2a2b205b0f9a2199e9e6bf7d96d768f15a}{max\_call\_depth}}\ +\ 1;}
+\DoxyCodeLine{00204\ \ \ \ cb-\/>current\_linear\_memory\_pages\ =\ code.starting\_memory\_pages;}
+\DoxyCodeLine{00205\ \ \ \ cb-\/>max\_linear\_memory\_pages\ =\ \mbox{\hyperlink{namespacesysio_1_1vm_a0ae6751a77293216df4656dee5081eb2a95b0fd1e8f1e450ae134af180be894f3}{max\_pages}};}
+\DoxyCodeLine{00206\ \ \ \ cb-\/>first\_invalid\_memory\_address\ =\ code.starting\_memory\_pages*64*1024;}
+\DoxyCodeLine{00207\ \ \ \ cb-\/>full\_linear\_memory\_start\ =\ (\textcolor{keywordtype}{char}*)mem.full\_page\_memory\_base();}
+\DoxyCodeLine{00208\ \ \ \ cb-\/>jmp\ =\ \&executors\_sigjmp\_buf;}
+\DoxyCodeLine{00209\ \ \ \ cb-\/>bounce\_buffers\ =\ \&executors\_bounce\_buffers;}
+\DoxyCodeLine{00210\ \ \ \ cb-\/>running\_code\_base\ =\ (\mbox{\hyperlink{stdint_8h_a31b85deecb45924320becd11d3ee16ce}{uintptr\_t}})(code\_mapping\ +\ code.code\_begin);}
+\DoxyCodeLine{00211\ \ \ \ cb-\/>is\_running\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00212\ \ \ \ cb-\/>globals\ =\ globals;}
+\DoxyCodeLine{00213\ }
+\DoxyCodeLine{00214\ \ \ \ \mbox{\hyperlink{structcontext}{context}}.trx\_context.transaction\_timer.set\_expiration\_callback([](\textcolor{keywordtype}{void}*\ user)\ \{}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1executor_a7775dd291ec388bee1237d0005238516}{executor}}*\ \mbox{\hyperlink{namespacesysio_a5c18cd9d34b8c5d3af8e2de75577673fa1f42b089b0bc1105b38f19140a65cc2a}{self}}\ =\ (\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1executor_a7775dd291ec388bee1237d0005238516}{executor}}*)user;}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ syscall(SYS\_mprotect,\ \mbox{\hyperlink{namespacesysio_a5c18cd9d34b8c5d3af8e2de75577673fa1f42b089b0bc1105b38f19140a65cc2a}{self}}-\/>code\_mapping,\ \mbox{\hyperlink{namespacesysio_a5c18cd9d34b8c5d3af8e2de75577673fa1f42b089b0bc1105b38f19140a65cc2a}{self}}-\/>code\_mapping\_size,\ PROT\_NONE);}
+\DoxyCodeLine{00217\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_a5c18cd9d34b8c5d3af8e2de75577673fa1f42b089b0bc1105b38f19140a65cc2a}{self}}-\/>mapping\_is\_executable\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00218\ \ \ \ \},\ \textcolor{keyword}{this});}
+\DoxyCodeLine{00219\ \ \ \ \mbox{\hyperlink{structcontext}{context}}.trx\_context.checktime();\ \textcolor{comment}{//catch\ any\ expiration\ that\ might\ have\ occurred\ before\ setting\ up\ callback}}
+\DoxyCodeLine{00220\ }
+\DoxyCodeLine{00221\ \ \ \ \textcolor{keyword}{auto}\ cleanup\ =\ \mbox{\hyperlink{namespacefc_a23d89b54a8ffd84f7e7efeb21747d846}{fc::make\_scoped\_exit}}([cb,\ \&tt=\mbox{\hyperlink{structcontext}{context}}.trx\_context.transaction\_timer,\ \&mem=mem]()\{}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ cb-\/>is\_running\ =\ false;}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ cb-\/>bounce\_buffers-\/>clear();}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ tt.set\_expiration\_callback(nullptr,\ nullptr);}
+\DoxyCodeLine{00225\ }
+\DoxyCodeLine{00226\ \ \ \ \ \ \ uint64\_t\ base\_pages\ =\ mem.size\_of\_memory\_slice\_mapping()/memory::stride\ -\/\ 1;}
+\DoxyCodeLine{00227\ \ \ \ \ \ \ if(cb-\/>current\_linear\_memory\_pages\ >\ base\_pages)\ \{}
+\DoxyCodeLine{00228\ \ \ \ \ \ \ \ \ \ mprotect(mem.full\_page\_memory\_base()\ +\ base\_pages\ *\ sysio::chain::wasm\_constraints::wasm\_page\_size,}
+\DoxyCodeLine{00229\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cb-\/>current\_linear\_memory\_pages\ -\/\ base\_pages)\ *\ sysio::chain::wasm\_constraints::wasm\_page\_size,\ PROT\_NONE);}
+\DoxyCodeLine{00230\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00231\ \ \ \ \});}
+\DoxyCodeLine{00232\ }
+\DoxyCodeLine{00233\ \ \ \ void(*apply\_func)(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}},\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}},\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})\ =\ (\textcolor{keywordtype}{void}(*)(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}},\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}},\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}))(cb-\/>running\_code\_base\ +\ code.apply\_offset);}
+\DoxyCodeLine{00234\ }
+\DoxyCodeLine{00235\ \ \ \ \textcolor{keywordflow}{switch}(sigsetjmp(*cb-\/>jmp,\ 0))\ \{}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ 0:}
+\DoxyCodeLine{00237\ \ \ \ \ \ \ \ \ \ stack.\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack_a92c542ea17b7cf3c51a2dc9cc507b2f7}{run}}([\&]\{}
+\DoxyCodeLine{00238\ \ \ \ \ \ \ \ \ \ \ \ \ std::visit(\mbox{\hyperlink{namespacesysio_1_1chain_ae5470abf94d0fdeff7866fda992ba844}{overloaded}}\ \{}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [\&](\textcolor{keyword}{const}\ no\_offset\&)\ \{\},}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [\&](\textcolor{keyword}{const}\ intrinsic\_ordinal\&\ i)\ \{}
+\DoxyCodeLine{00241\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ void(*start\_func)()\ =\ (\textcolor{keywordtype}{void}(*)())(*(\mbox{\hyperlink{stdint_8h_a31b85deecb45924320becd11d3ee16ce}{uintptr\_t}}*)((\mbox{\hyperlink{stdint_8h_a31b85deecb45924320becd11d3ee16ce}{uintptr\_t}})mem.zero\_page\_memory\_base()\ -\/\ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1memory_a3ca9186ab4cbb5e78898f09b3b4ef349}{memory::first\_intrinsic\_offset}}\ -\/\ i.ordinal*8));}
+\DoxyCodeLine{00242\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ start\_func();}
+\DoxyCodeLine{00243\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{00244\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [\&](\textcolor{keyword}{const}\ code\_offset\&\ offs)\ \{}
+\DoxyCodeLine{00245\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ void(*start\_func)()\ =\ (\textcolor{keywordtype}{void}(*)())(cb-\/>running\_code\_base\ +\ offs.offset);}
+\DoxyCodeLine{00246\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ start\_func();}
+\DoxyCodeLine{00247\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00248\ \ \ \ \ \ \ \ \ \ \ \ \ \},\ code.start);}
+\DoxyCodeLine{00249\ \ \ \ \ \ \ \ \ \ \ \ \ apply\_func(\mbox{\hyperlink{structcontext}{context}}.get\_receiver().to\_uint64\_t(),\ \mbox{\hyperlink{structcontext}{context}}.get\_action().account.to\_uint64\_t(),\ \mbox{\hyperlink{structcontext}{context}}.get\_action().name.to\_uint64\_t());}
+\DoxyCodeLine{00250\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00251\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00252\ \ \ \ \ \ \ \textcolor{comment}{//case\ 1:\ clean\ sysio\_exit}}
+\DoxyCodeLine{00253\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a1ddba067ecc18a3960be5ff756bc73f9ae19ad8f2c051431379110a731c1c6e9d}{SYSVMOC\_EXIT\_CHECKTIME\_FAIL}}:}
+\DoxyCodeLine{00254\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structcontext}{context}}.trx\_context.checktime();}
+\DoxyCodeLine{00255\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00256\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a1ddba067ecc18a3960be5ff756bc73f9a555f34533254a2280542ca9d53a83ca1}{SYSVMOC\_EXIT\_SEGV}}:}
+\DoxyCodeLine{00257\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\textcolor{keyword}{false},\ wasm\_execution\_error,\ \textcolor{stringliteral}{"{}access\ violation"{}});}
+\DoxyCodeLine{00258\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00259\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a1ddba067ecc18a3960be5ff756bc73f9aebd8c9bd1767539a42045512514f92dd}{SYSVMOC\_EXIT\_EXCEPTION}}:\ \textcolor{comment}{//exception}}
+\DoxyCodeLine{00260\ \ \ \ \ \ \ \ \ \ std::rethrow\_exception(*cb-\/>eptr);}
+\DoxyCodeLine{00261\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00262\ \ \ \ \}}
+\DoxyCodeLine{00263\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1eosvmoc_1_1executor_a53e27b539f049d467aa2f64c5dccff93_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1eosvmoc_1_1executor_a53e27b539f049d467aa2f64c5dccff93_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/webassembly/sys-\/vm-\/oc/\mbox{\hyperlink{executor_8hpp}{executor.\+hpp}}\item 
+libraries/chain/webassembly/runtimes/sys-\/vm-\/oc/\mbox{\hyperlink{executor_8cpp}{executor.\+cpp}}\end{DoxyCompactItemize}

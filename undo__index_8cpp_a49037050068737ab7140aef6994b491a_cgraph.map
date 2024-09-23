@@ -1,0 +1,20 @@
+<map id="EXCEPTION_TEST_CASE" name="EXCEPTION_TEST_CASE">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,177,190,203"/>
+<area shape="rect" id="Node000002" href="$undo__index_8cpp.html#abfb06a99989a2e51fcd0eecf89bef42d" title=" " alt="" coords="265,5,365,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="106,175,156,112,194,74,236,41,249,34,251,39,239,46,197,78,160,115,110,178"/>
+<area shape="rect" id="Node000003" href="$classchainbase_1_1undo__index.html#ae1352619b41f48ca4fa190bc3e5cf7c3" title=" " alt="" coords="238,55,392,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="122,174,236,112,257,101,260,106,239,117,124,179"/>
+<area shape="rect" id="Node000004" href="$classchainbase_1_1undo__index.html#a3df30d97485f2f3e314a118f9573a10d" title=" " alt="" coords="440,80,594,121"/>
+<area shape="poly" id="edge8_Node000001_Node000004" title=" " alt="" coords="155,174,237,156,424,116,425,122,238,161,156,179"/>
+<area shape="rect" id="Node000005" href="$classchainbase_1_1undo__index.html#afbb66ff111fb5674e688e9c645a4387a" title=" " alt="" coords="238,170,392,210"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="190,188,222,188,222,193,190,193"/>
+<area shape="rect" id="Node000007" href="$classchainbase_1_1undo__index.html#aee3ebb0d705e55252c5e32ed5d21e068" title=" " alt="" coords="238,235,392,276"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="144,201,231,228,229,233,142,206"/>
+<area shape="rect" id="Node000008" href="$classchainbase_1_1undo__index.html#a7b343e293e554f2797c6d703323e848c" title=" " alt="" coords="238,300,392,341"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="117,201,170,241,239,285,250,291,247,296,236,290,167,245,114,206"/>
+<area shape="rect" id="Node000009" href="$classchainbase_1_1undo__index.html#adc5e6e658a7578983547e8cef45f5bbb" title=" " alt="" coords="238,366,392,406"/>
+<area shape="poly" id="edge9_Node000001_Node000009" title=" " alt="" coords="109,202,159,271,197,313,239,351,246,356,243,360,236,355,193,317,155,274,105,205"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="393,83,425,87,425,92,392,88"/>
+<area shape="rect" id="Node000006" href="$namespacechainbase.html#a2f6d9d0be71ceec29f4addc19c04cf8e" title=" " alt="" coords="444,170,590,210"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="392,188,429,188,429,193,392,193"/>
+</map>

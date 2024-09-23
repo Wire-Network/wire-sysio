@@ -1,0 +1,202 @@
+\doxysection{libraries/sys-\/vm/external/\+Catch2/projects/\+Self\+Test/\+Usage\+Tests/\+To\+String\+Tuple.tests.\+cpp File Reference}
+\hypertarget{_to_string_tuple_8tests_8cpp}{}\label{_to_string_tuple_8tests_8cpp}\index{libraries/sys-\/vm/external/Catch2/projects/SelfTest/UsageTests/ToStringTuple.tests.cpp@{libraries/sys-\/vm/external/Catch2/projects/SelfTest/UsageTests/ToStringTuple.tests.cpp}}
+{\ttfamily \#include "{}catch.\+hpp"{}}\newline
+{\ttfamily \#include $<$tuple$>$}\newline
+Include dependency graph for To\+String\+Tuple.\+tests.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=258pt]{_to_string_tuple_8tests_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{_to_string_tuple_8tests_8cpp_a6ae28aaa2edef037031518939f42dd7d}{CATCH\+\_\+\+CONFIG\+\_\+\+ENABLE\+\_\+\+TUPLE\+\_\+\+STRINGMAKER}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{_to_string_tuple_8tests_8cpp_a0c6195a124a84acc61ef17939d637bcd}{TEST\+\_\+\+CASE}} ("{}tuple$<$$>$"{}, "{}\mbox{[}to\+String\mbox{]}\mbox{[}tuple\mbox{]}"{})
+\item 
+\mbox{\hyperlink{_to_string_tuple_8tests_8cpp_a77441294aeb2ab977465ce03991da0bc}{TEST\+\_\+\+CASE}} ("{}tuple$<$int$>$"{}, "{}\mbox{[}to\+String\mbox{]}\mbox{[}tuple\mbox{]}"{})
+\item 
+\mbox{\hyperlink{_to_string_tuple_8tests_8cpp_a9152445c082d36ca61b0b76295c5564c}{TEST\+\_\+\+CASE}} ("{}tuple$<$float,int$>$"{}, "{}\mbox{[}to\+String\mbox{]}\mbox{[}tuple\mbox{]}"{})
+\item 
+\mbox{\hyperlink{_to_string_tuple_8tests_8cpp_a28d3fce982101c0bfe5bf1af48c2002b}{TEST\+\_\+\+CASE}} ("{}tuple$<$string,string$>$"{}, "{}\mbox{[}to\+String\mbox{]}\mbox{[}tuple\mbox{]}"{})
+\item 
+\mbox{\hyperlink{_to_string_tuple_8tests_8cpp_a9b0de3bf3a8886e5e3ad0c0ce15b4f02}{TEST\+\_\+\+CASE}} ("{}tuple$<$tuple$<$int$>$,tuple$<$$>$,float$>$"{}, "{}\mbox{[}to\+String\mbox{]}\mbox{[}tuple\mbox{]}"{})
+\item 
+\mbox{\hyperlink{_to_string_tuple_8tests_8cpp_a1b26bd9e134c9c6eea6272f87a626768}{TEST\+\_\+\+CASE}} ("{}tuple$<$nullptr,int,const char \texorpdfstring{$\ast$}{*}$>$"{}, "{}\mbox{[}to\+String\mbox{]}\mbox{[}tuple\mbox{]}"{})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{_to_string_tuple_8tests_8cpp_a6ae28aaa2edef037031518939f42dd7d}\index{ToStringTuple.tests.cpp@{ToStringTuple.tests.cpp}!CATCH\_CONFIG\_ENABLE\_TUPLE\_STRINGMAKER@{CATCH\_CONFIG\_ENABLE\_TUPLE\_STRINGMAKER}}
+\index{CATCH\_CONFIG\_ENABLE\_TUPLE\_STRINGMAKER@{CATCH\_CONFIG\_ENABLE\_TUPLE\_STRINGMAKER}!ToStringTuple.tests.cpp@{ToStringTuple.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{CATCH\_CONFIG\_ENABLE\_TUPLE\_STRINGMAKER}{CATCH\_CONFIG\_ENABLE\_TUPLE\_STRINGMAKER}}
+{\footnotesize\ttfamily \label{_to_string_tuple_8tests_8cpp_a6ae28aaa2edef037031518939f42dd7d} 
+\#define CATCH\+\_\+\+CONFIG\+\_\+\+ENABLE\+\_\+\+TUPLE\+\_\+\+STRINGMAKER}
+
+
+
+Definition at line \mbox{\hyperlink{_to_string_tuple_8tests_8cpp_source_l00001}{1}} of file \mbox{\hyperlink{_to_string_tuple_8tests_8cpp_source}{To\+String\+Tuple.\+tests.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{_to_string_tuple_8tests_8cpp_a0c6195a124a84acc61ef17939d637bcd}\index{ToStringTuple.tests.cpp@{ToStringTuple.tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!ToStringTuple.tests.cpp@{ToStringTuple.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/6]}}
+{\footnotesize\ttfamily \label{_to_string_tuple_8tests_8cpp_a0c6195a124a84acc61ef17939d637bcd} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}tuple$<$$>$"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}to\+String\mbox{]}\mbox{[}tuple\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_to_string_tuple_8tests_8cpp_source_l00006}{6}} of file \mbox{\hyperlink{_to_string_tuple_8tests_8cpp_source}{To\+String\+Tuple.\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00007\ \{}
+\DoxyCodeLine{00008\ \ \ \ \ \textcolor{keyword}{typedef}\ std::tuple<>\ \mbox{\hyperlink{yubihsm_8h_a1d127017fb298b889f4ba24752d08b8e}{type}};}
+\DoxyCodeLine{00009\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ \textcolor{stringliteral}{"{}\{\ \}"{}}\ ==\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(type\{\})\ );}
+\DoxyCodeLine{00010\ \ \ \ \ type\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ \{\};}
+\DoxyCodeLine{00011\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ \textcolor{stringliteral}{"{}\{\ \}"{}}\ ==\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})\ );}
+\DoxyCodeLine{00012\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=305pt]{_to_string_tuple_8tests_8cpp_a0c6195a124a84acc61ef17939d637bcd_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{_to_string_tuple_8tests_8cpp_a9152445c082d36ca61b0b76295c5564c}\index{ToStringTuple.tests.cpp@{ToStringTuple.tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!ToStringTuple.tests.cpp@{ToStringTuple.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/6]}}
+{\footnotesize\ttfamily \label{_to_string_tuple_8tests_8cpp_a9152445c082d36ca61b0b76295c5564c} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}tuple$<$float,int$>$"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}to\+String\mbox{]}\mbox{[}tuple\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_to_string_tuple_8tests_8cpp_source_l00021}{21}} of file \mbox{\hyperlink{_to_string_tuple_8tests_8cpp_source}{To\+String\+Tuple.\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00022\ \{}
+\DoxyCodeLine{00023\ \ \ \ \ \textcolor{keyword}{typedef}\ std::tuple<float,int>\ \mbox{\hyperlink{yubihsm_8h_a1d127017fb298b889f4ba24752d08b8e}{type}};}
+\DoxyCodeLine{00024\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ \textcolor{stringliteral}{"{}1.2f"{}}\ ==\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(\textcolor{keywordtype}{float}(1.2))\ );}
+\DoxyCodeLine{00025\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ \textcolor{stringliteral}{"{}\{\ 1.2f,\ 0\ \}"{}}\ ==\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(type\{1.2f,0\})\ );}
+\DoxyCodeLine{00026\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=305pt]{_to_string_tuple_8tests_8cpp_a9152445c082d36ca61b0b76295c5564c_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{_to_string_tuple_8tests_8cpp_a77441294aeb2ab977465ce03991da0bc}\index{ToStringTuple.tests.cpp@{ToStringTuple.tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!ToStringTuple.tests.cpp@{ToStringTuple.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [3/6]}}
+{\footnotesize\ttfamily \label{_to_string_tuple_8tests_8cpp_a77441294aeb2ab977465ce03991da0bc} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}tuple$<$int$>$"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}to\+String\mbox{]}\mbox{[}tuple\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_to_string_tuple_8tests_8cpp_source_l00014}{14}} of file \mbox{\hyperlink{_to_string_tuple_8tests_8cpp_source}{To\+String\+Tuple.\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00015\ \{}
+\DoxyCodeLine{00016\ \ \ \ \ \textcolor{keyword}{typedef}\ std::tuple<int>\ \mbox{\hyperlink{yubihsm_8h_a1d127017fb298b889f4ba24752d08b8e}{type}};}
+\DoxyCodeLine{00017\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ \textcolor{stringliteral}{"{}\{\ 0\ \}"{}}\ ==\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(type\{0\})\ );}
+\DoxyCodeLine{00018\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=305pt]{_to_string_tuple_8tests_8cpp_a77441294aeb2ab977465ce03991da0bc_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{_to_string_tuple_8tests_8cpp_a1b26bd9e134c9c6eea6272f87a626768}\index{ToStringTuple.tests.cpp@{ToStringTuple.tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!ToStringTuple.tests.cpp@{ToStringTuple.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [4/6]}}
+{\footnotesize\ttfamily \label{_to_string_tuple_8tests_8cpp_a1b26bd9e134c9c6eea6272f87a626768} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}tuple$<$nullptr,int,const char \texorpdfstring{$\ast$}{*}$>$"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}to\+String\mbox{]}\mbox{[}tuple\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_to_string_tuple_8tests_8cpp_source_l00041}{41}} of file \mbox{\hyperlink{_to_string_tuple_8tests_8cpp_source}{To\+String\+Tuple.\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00042\ \{}
+\DoxyCodeLine{00043\ \ \ \ \ \textcolor{keyword}{typedef}\ std::tuple<std::nullptr\_t,int,const\ char\ *>\ \mbox{\hyperlink{yubihsm_8h_a1d127017fb298b889f4ba24752d08b8e}{type}};}
+\DoxyCodeLine{00044\ \ \ \ \ type\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ \{\ \textcolor{keyword}{nullptr},\ 42,\ \textcolor{stringliteral}{"{}Catch\ me"{}}\ \};}
+\DoxyCodeLine{00045\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ \textcolor{stringliteral}{"{}\{\ nullptr,\ 42,\ \(\backslash\)"{}Catch\ me\(\backslash\)"{}\ \}"{}}\ ==\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})\ );}
+\DoxyCodeLine{00046\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=305pt]{_to_string_tuple_8tests_8cpp_a1b26bd9e134c9c6eea6272f87a626768_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{_to_string_tuple_8tests_8cpp_a28d3fce982101c0bfe5bf1af48c2002b}\index{ToStringTuple.tests.cpp@{ToStringTuple.tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!ToStringTuple.tests.cpp@{ToStringTuple.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [5/6]}}
+{\footnotesize\ttfamily \label{_to_string_tuple_8tests_8cpp_a28d3fce982101c0bfe5bf1af48c2002b} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}tuple$<$string,string$>$"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}to\+String\mbox{]}\mbox{[}tuple\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_to_string_tuple_8tests_8cpp_source_l00028}{28}} of file \mbox{\hyperlink{_to_string_tuple_8tests_8cpp_source}{To\+String\+Tuple.\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00029\ \{}
+\DoxyCodeLine{00030\ \ \ \ \ \textcolor{keyword}{typedef}\ std::tuple<std::string,std::string>\ \mbox{\hyperlink{yubihsm_8h_a1d127017fb298b889f4ba24752d08b8e}{type}};}
+\DoxyCodeLine{00031\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ \textcolor{stringliteral}{"{}\{\ \(\backslash\)"{}hello\(\backslash\)"{},\ \(\backslash\)"{}world\(\backslash\)"{}\ \}"{}}\ ==\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(type\{\textcolor{stringliteral}{"{}hello"{}},\textcolor{stringliteral}{"{}world"{}}\})\ );}
+\DoxyCodeLine{00032\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=305pt]{_to_string_tuple_8tests_8cpp_a28d3fce982101c0bfe5bf1af48c2002b_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{_to_string_tuple_8tests_8cpp_a9b0de3bf3a8886e5e3ad0c0ce15b4f02}\index{ToStringTuple.tests.cpp@{ToStringTuple.tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!ToStringTuple.tests.cpp@{ToStringTuple.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [6/6]}}
+{\footnotesize\ttfamily \label{_to_string_tuple_8tests_8cpp_a9b0de3bf3a8886e5e3ad0c0ce15b4f02} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}tuple$<$tuple$<$int$>$,tuple$<$$>$,float$>$"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}to\+String\mbox{]}\mbox{[}tuple\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_to_string_tuple_8tests_8cpp_source_l00034}{34}} of file \mbox{\hyperlink{_to_string_tuple_8tests_8cpp_source}{To\+String\+Tuple.\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00035\ \{}
+\DoxyCodeLine{00036\ \ \ \ \ \textcolor{keyword}{typedef}\ std::tuple<std::tuple<int>,std::tuple<>,\textcolor{keywordtype}{float}>\ \mbox{\hyperlink{yubihsm_8h_a1d127017fb298b889f4ba24752d08b8e}{type}};}
+\DoxyCodeLine{00037\ \ \ \ \ type\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ \{\ std::tuple<int>\{42\},\ \{\},\ 1.2f\ \};}
+\DoxyCodeLine{00038\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ \textcolor{stringliteral}{"{}\{\ \{\ 42\ \},\ \{\ \},\ 1.2f\ \}"{}}\ ==\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})\ );}
+\DoxyCodeLine{00039\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=305pt]{_to_string_tuple_8tests_8cpp_a9b0de3bf3a8886e5e3ad0c0ce15b4f02_cgraph}
+\end{center}
+\end{figure}

@@ -1,0 +1,1199 @@
+\doxysection{libraries/chainbase/test/undo\+\_\+index.cpp File Reference}
+\hypertarget{undo__index_8cpp}{}\label{undo__index_8cpp}\index{libraries/chainbase/test/undo\_index.cpp@{libraries/chainbase/test/undo\_index.cpp}}
+{\ttfamily \#include $<$chainbase/undo\+\_\+index.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/multi\+\_\+index/member.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/multi\+\_\+index/ordered\+\_\+index.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/test/unit\+\_\+test.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/test/data/monomorphic.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/test/data/test\+\_\+case.\+hpp$>$}\newline
+Include dependency graph for undo\+\_\+index.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{undo__index_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structtest__element__t}{test\+\_\+element\+\_\+t}}
+\item 
+struct \mbox{\hyperlink{structconflict__element__t}{conflict\+\_\+element\+\_\+t}}
+\item 
+struct \mbox{\hyperlink{structby__secondary}{by\+\_\+secondary}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{undo__index_8cpp_aa31cf081a5d3204e802431ad32fdd450}{EXCEPTION\+\_\+\+TEST\+\_\+\+CASE}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{undo__index_8cpp_ae9edcfd8e52175384b424bc555cc96f5}{EXCEPTION\+\_\+\+TEST\+\_\+\+CASE}} (test\+\_\+simple)
+\item 
+{\footnotesize template$<$typename C $>$ }\\auto \mbox{\hyperlink{undo__index_8cpp_abfb06a99989a2e51fcd0eecf89bef42d}{capture\+\_\+state}} (const C \&index)
+\item 
+\mbox{\hyperlink{undo__index_8cpp_a5253dac4352aebd74ee3b998a4817c84}{EXCEPTION\+\_\+\+TEST\+\_\+\+CASE}} (test\+\_\+insert\+\_\+undo)
+\item 
+\mbox{\hyperlink{undo__index_8cpp_a1c523a85d8e8b9dda567457e7d7124ee}{EXCEPTION\+\_\+\+TEST\+\_\+\+CASE}} (test\+\_\+insert\+\_\+squash)
+\item 
+\mbox{\hyperlink{undo__index_8cpp_a49037050068737ab7140aef6994b491a}{EXCEPTION\+\_\+\+TEST\+\_\+\+CASE}} (test\+\_\+insert\+\_\+push)
+\item 
+\mbox{\hyperlink{undo__index_8cpp_a5edf87a5d1775d0edcda10adcd72cb89}{EXCEPTION\+\_\+\+TEST\+\_\+\+CASE}} (test\+\_\+modify\+\_\+undo)
+\item 
+\mbox{\hyperlink{undo__index_8cpp_a57d440011f63bde88372008127105d7c}{EXCEPTION\+\_\+\+TEST\+\_\+\+CASE}} (test\+\_\+modify\+\_\+squash)
+\item 
+\mbox{\hyperlink{undo__index_8cpp_ab9c902ca2f9b11f45ebac16840d11c1b}{EXCEPTION\+\_\+\+TEST\+\_\+\+CASE}} (test\+\_\+modify\+\_\+push)
+\item 
+\mbox{\hyperlink{undo__index_8cpp_a075f820800bdf2acc601c58b9ecde584}{EXCEPTION\+\_\+\+TEST\+\_\+\+CASE}} (test\+\_\+remove\+\_\+undo)
+\item 
+\mbox{\hyperlink{undo__index_8cpp_a86828350e699c267139b3f79bd0d3a20}{EXCEPTION\+\_\+\+TEST\+\_\+\+CASE}} (test\+\_\+remove\+\_\+squash)
+\item 
+\mbox{\hyperlink{undo__index_8cpp_acd92c7ff5fb095b161dfd57f50458253}{EXCEPTION\+\_\+\+TEST\+\_\+\+CASE}} (test\+\_\+remove\+\_\+push)
+\item 
+\mbox{\hyperlink{undo__index_8cpp_a1126d3f6309e1cfc2422b3ffe469b51e}{EXCEPTION\+\_\+\+TEST\+\_\+\+CASE}} (test\+\_\+insert\+\_\+modify)
+\item 
+\mbox{\hyperlink{undo__index_8cpp_a5bdceaa986df664988e19fa18b37e459}{EXCEPTION\+\_\+\+TEST\+\_\+\+CASE}} (test\+\_\+insert\+\_\+modify\+\_\+undo)
+\item 
+\mbox{\hyperlink{undo__index_8cpp_acb0bc2f5ed31de013ef5759cfd5193bf}{EXCEPTION\+\_\+\+TEST\+\_\+\+CASE}} (test\+\_\+insert\+\_\+modify\+\_\+squash)
+\item 
+\mbox{\hyperlink{undo__index_8cpp_a490a9776679927b25ab47bc260082fcc}{EXCEPTION\+\_\+\+TEST\+\_\+\+CASE}} (test\+\_\+insert\+\_\+remove\+\_\+undo)
+\item 
+\mbox{\hyperlink{undo__index_8cpp_afd62976cba8c646be4715906e8971638}{EXCEPTION\+\_\+\+TEST\+\_\+\+CASE}} (test\+\_\+insert\+\_\+remove\+\_\+squash)
+\item 
+\mbox{\hyperlink{undo__index_8cpp_aca764e359678c5ec9eeb19647299297e}{EXCEPTION\+\_\+\+TEST\+\_\+\+CASE}} (test\+\_\+modify\+\_\+modify\+\_\+undo)
+\item 
+\mbox{\hyperlink{undo__index_8cpp_a3f205022b7d0d63e828c8e5d68a133d3}{EXCEPTION\+\_\+\+TEST\+\_\+\+CASE}} (test\+\_\+modify\+\_\+modify\+\_\+squash)
+\item 
+\mbox{\hyperlink{undo__index_8cpp_a34160b481dabf97ef426c3e0dc2aec28}{EXCEPTION\+\_\+\+TEST\+\_\+\+CASE}} (test\+\_\+modify\+\_\+remove\+\_\+undo)
+\item 
+\mbox{\hyperlink{undo__index_8cpp_ad8cec93200fdc4d4dcd219a56a9c9c03}{EXCEPTION\+\_\+\+TEST\+\_\+\+CASE}} (test\+\_\+modify\+\_\+remove\+\_\+squash)
+\item 
+\mbox{\hyperlink{undo__index_8cpp_a5b6cc8baab9875dd6ddd8c66394ec8a6}{EXCEPTION\+\_\+\+TEST\+\_\+\+CASE}} (test\+\_\+squash\+\_\+one)
+\item 
+\mbox{\hyperlink{undo__index_8cpp_ae549385b1ec0463d3a36e36bbac95a22}{EXCEPTION\+\_\+\+TEST\+\_\+\+CASE}} (test\+\_\+insert\+\_\+non\+\_\+unique)
+\item 
+\mbox{\hyperlink{undo__index_8cpp_ade06c047298c551422cfe3fd33ad1ca0}{EXCEPTION\+\_\+\+TEST\+\_\+\+CASE}} (test\+\_\+modify\+\_\+conflict)
+\item 
+\mbox{\hyperlink{undo__index_8cpp_abfec847626d544bad9d639f07455484f}{BOOST\+\_\+\+DATA\+\_\+\+TEST\+\_\+\+CASE}} (test\+\_\+insert\+\_\+fail, boost\+::unit\+\_\+test\+::data\+::make(\{true, false\}), use\+\_\+undo)
+\item 
+\mbox{\hyperlink{undo__index_8cpp_a5f6f2f5e97f312c11b1acd2d55a9a7e1}{EXCEPTION\+\_\+\+TEST\+\_\+\+CASE}} (test\+\_\+modify\+\_\+fail)
+\item 
+\mbox{\hyperlink{undo__index_8cpp_ad2c851d4d6932a1b1e4686add49993b0}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (test\+\_\+project)
+\item 
+\mbox{\hyperlink{undo__index_8cpp_ada29d4e615e63998866339457b434107}{EXCEPTION\+\_\+\+TEST\+\_\+\+CASE}} (test\+\_\+remove\+\_\+tracking\+\_\+session)
+\item 
+\mbox{\hyperlink{undo__index_8cpp_ae72bc323eacfe322c18fe3e0de5575b4}{EXCEPTION\+\_\+\+TEST\+\_\+\+CASE}} (test\+\_\+remove\+\_\+tracking\+\_\+no\+\_\+session)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{undo__index_8cpp_aa31cf081a5d3204e802431ad32fdd450}\index{undo\_index.cpp@{undo\_index.cpp}!EXCEPTION\_TEST\_CASE@{EXCEPTION\_TEST\_CASE}}
+\index{EXCEPTION\_TEST\_CASE@{EXCEPTION\_TEST\_CASE}!undo\_index.cpp@{undo\_index.cpp}}
+\doxysubsubsection{\texorpdfstring{EXCEPTION\_TEST\_CASE}{EXCEPTION\_TEST\_CASE}}
+{\footnotesize\ttfamily \label{undo__index_8cpp_aa31cf081a5d3204e802431ad32fdd450} 
+\#define EXCEPTION\+\_\+\+TEST\+\_\+\+CASE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\#\#impl();\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ BOOST\_AUTO\_TEST\_CASE(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})\ \{\ test\_exceptions(\&\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\#\#impl);\ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\#\#impl\ ()}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{undo__index_8cpp_source_l00090}{90}} of file \mbox{\hyperlink{undo__index_8cpp_source}{undo\+\_\+index.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00090\ \textcolor{preprocessor}{\#define\ EXCEPTION\_TEST\_CASE(name)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00091\ \textcolor{preprocessor}{\ \ \ void\ name\#\#impl();\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00092\ \textcolor{preprocessor}{\ \ \ BOOST\_AUTO\_TEST\_CASE(name)\ \{\ test\_exceptions(\&name\#\#impl);\ \}\ \(\backslash\)}}
+\DoxyCodeLine{00093\ \textcolor{preprocessor}{\ \ \ void\ name\#\#impl\ ()}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{undo__index_8cpp_ad2c851d4d6932a1b1e4686add49993b0}\index{undo\_index.cpp@{undo\_index.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!undo\_index.cpp@{undo\_index.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}}
+{\footnotesize\ttfamily \label{undo__index_8cpp_ad2c851d4d6932a1b1e4686add49993b0} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{test\+\_\+project}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{undo__index_8cpp_source_l00598}{598}} of file \mbox{\hyperlink{undo__index_8cpp_source}{undo\+\_\+index.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00598\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00599\ \ \ \ \mbox{\hyperlink{classchainbase_1_1undo__index}{chainbase::undo\_index<test\_element\_t,\ test\_allocator<test\_element\_t>}},}
+\DoxyCodeLine{00600\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::multi\_index::ordered\_unique<key<\&test\_element\_t::id>>,}
+\DoxyCodeLine{00601\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::multi\_index::ordered\_unique<boost::multi\_index::tag<by\_secondary>,\ key<\&test\_element\_t::secondary>>>\ i0;}
+\DoxyCodeLine{00602\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_afbb66ff111fb5674e688e9c645a4387a}{emplace}}([](\mbox{\hyperlink{structtest__element__t}{test\_element\_t}}\&\ elem)\ \{\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.secondary\ =\ 42;\ \});}
+\DoxyCodeLine{00603\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_abfaeaa4fa0d39878c13deb03014a2eae}{project}}<\mbox{\hyperlink{structby__secondary}{by\_secondary}}>(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a0765240beff7f0758f7e0605c993644b}{begin}}())\ ==\ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a62d9841569299de97bc51db174967f8f}{get}}<\mbox{\hyperlink{structby__secondary}{by\_secondary}}>().begin());}
+\DoxyCodeLine{00604\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_abfaeaa4fa0d39878c13deb03014a2eae}{project}}<\mbox{\hyperlink{structby__secondary}{by\_secondary}}>(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_adbc73a9ea56c1158c495b230ca1c1e32}{end}}())\ ==\ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a62d9841569299de97bc51db174967f8f}{get}}<\mbox{\hyperlink{structby__secondary}{by\_secondary}}>().end());}
+\DoxyCodeLine{00605\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_abfaeaa4fa0d39878c13deb03014a2eae}{project}}<1>(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a0765240beff7f0758f7e0605c993644b}{begin}}())\ ==\ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a62d9841569299de97bc51db174967f8f}{get}}<\mbox{\hyperlink{structby__secondary}{by\_secondary}}>().begin());}
+\DoxyCodeLine{00606\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_abfaeaa4fa0d39878c13deb03014a2eae}{project}}<1>(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_adbc73a9ea56c1158c495b230ca1c1e32}{end}}())\ ==\ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a62d9841569299de97bc51db174967f8f}{get}}<\mbox{\hyperlink{structby__secondary}{by\_secondary}}>().end());}
+\DoxyCodeLine{00607\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{undo__index_8cpp_ad2c851d4d6932a1b1e4686add49993b0_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{undo__index_8cpp_abfec847626d544bad9d639f07455484f}\index{undo\_index.cpp@{undo\_index.cpp}!BOOST\_DATA\_TEST\_CASE@{BOOST\_DATA\_TEST\_CASE}}
+\index{BOOST\_DATA\_TEST\_CASE@{BOOST\_DATA\_TEST\_CASE}!undo\_index.cpp@{undo\_index.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_DATA\_TEST\_CASE()}{BOOST\_DATA\_TEST\_CASE()}}
+{\footnotesize\ttfamily \label{undo__index_8cpp_abfec847626d544bad9d639f07455484f} 
+BOOST\+\_\+\+DATA\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{test\+\_\+insert\+\_\+fail}]{}{, }\item[{boost\+::unit\+\_\+test\+::data\+::make(\{true, false\})}]{}{, }\item[{use\+\_\+undo}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{undo__index_8cpp_source_l00531}{531}} of file \mbox{\hyperlink{undo__index_8cpp_source}{undo\+\_\+index.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00531\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\textcolor{keyword}{true},\ \textcolor{keyword}{false}\}),\ use\_undo)\ \{}
+\DoxyCodeLine{00532\ \ \ \ \mbox{\hyperlink{classchainbase_1_1undo__index}{chainbase::undo\_index<conflict\_element\_t,\ test\_allocator<conflict\_element\_t>}},}
+\DoxyCodeLine{00533\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::multi\_index::ordered\_unique<key<\&conflict\_element\_t::id>>,}
+\DoxyCodeLine{00534\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::multi\_index::ordered\_unique<key<\&conflict\_element\_t::x0>>,}
+\DoxyCodeLine{00535\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::multi\_index::ordered\_unique<key<\&conflict\_element\_t::x1>>,}
+\DoxyCodeLine{00536\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::multi\_index::ordered\_unique<key<\&conflict\_element\_t::x2>>>\ i0;}
+\DoxyCodeLine{00537\ \ \ \ \textcolor{comment}{//\ insert\ 3\ elements}}
+\DoxyCodeLine{00538\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_afbb66ff111fb5674e688e9c645a4387a}{emplace}}([](\mbox{\hyperlink{structconflict__element__t}{conflict\_element\_t}}\&\ elem)\ \{\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.x0\ =\ 10;\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.x1\ =\ 10;\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.x2\ =\ 10;\ \});}
+\DoxyCodeLine{00539\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_afbb66ff111fb5674e688e9c645a4387a}{emplace}}([](\mbox{\hyperlink{structconflict__element__t}{conflict\_element\_t}}\&\ elem)\ \{\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.x0\ =\ 11;\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.x1\ =\ 11;\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.x2\ =\ 11;\ \});}
+\DoxyCodeLine{00540\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_afbb66ff111fb5674e688e9c645a4387a}{emplace}}([](\mbox{\hyperlink{structconflict__element__t}{conflict\_element\_t}}\&\ elem)\ \{\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.x0\ =\ 12;\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.x1\ =\ 12;\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.x2\ =\ 12;\ \});}
+\DoxyCodeLine{00541\ \ \ \ \{}
+\DoxyCodeLine{00542\ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}}\ =\ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_adc5e6e658a7578983547e8cef45f5bbb}{start\_undo\_session}}(\textcolor{keyword}{true});}
+\DoxyCodeLine{00543\ \ \ \ \textcolor{comment}{//\ Insert\ a\ value\ with\ a\ duplicate}}
+\DoxyCodeLine{00544\ \ \ \ BOOST\_CHECK\_THROW(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_afbb66ff111fb5674e688e9c645a4387a}{emplace}}([](\mbox{\hyperlink{structconflict__element__t}{conflict\_element\_t}}\&\ elem)\ \{\ elem.x0\ =\ 81;\ elem.x1\ =\ 11;\ elem.x2\ =\ 91;\ \}),\ std::logic\_error);}
+\DoxyCodeLine{00545\ \ \ \ \}}
+\DoxyCodeLine{00546\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0)-\/>x0\ ==\ 10);}
+\DoxyCodeLine{00547\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(1)-\/>x1\ ==\ 11);}
+\DoxyCodeLine{00548\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(2)-\/>x2\ ==\ 12);}
+\DoxyCodeLine{00549\ \ \ \ \textcolor{comment}{//\ Check\ lookup\ in\ the\ other\ indices}}
+\DoxyCodeLine{00550\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a62d9841569299de97bc51db174967f8f}{get}}<1>().find(10)-\/>x0\ ==\ 10);}
+\DoxyCodeLine{00551\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a62d9841569299de97bc51db174967f8f}{get}}<1>().find(11)-\/>x0\ ==\ 11);}
+\DoxyCodeLine{00552\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a62d9841569299de97bc51db174967f8f}{get}}<1>().find(12)-\/>x0\ ==\ 12);}
+\DoxyCodeLine{00553\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a62d9841569299de97bc51db174967f8f}{get}}<2>().find(10)-\/>x1\ ==\ 10);}
+\DoxyCodeLine{00554\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a62d9841569299de97bc51db174967f8f}{get}}<2>().find(11)-\/>x1\ ==\ 11);}
+\DoxyCodeLine{00555\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a62d9841569299de97bc51db174967f8f}{get}}<2>().find(12)-\/>x1\ ==\ 12);}
+\DoxyCodeLine{00556\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a62d9841569299de97bc51db174967f8f}{get}}<3>().find(10)-\/>x2\ ==\ 10);}
+\DoxyCodeLine{00557\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a62d9841569299de97bc51db174967f8f}{get}}<3>().find(11)-\/>x2\ ==\ 11);}
+\DoxyCodeLine{00558\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a62d9841569299de97bc51db174967f8f}{get}}<3>().find(12)-\/>x2\ ==\ 12);}
+\DoxyCodeLine{00559\ \}}
+
+\end{DoxyCode}
+\Hypertarget{undo__index_8cpp_abfb06a99989a2e51fcd0eecf89bef42d}\index{undo\_index.cpp@{undo\_index.cpp}!capture\_state@{capture\_state}}
+\index{capture\_state@{capture\_state}!undo\_index.cpp@{undo\_index.cpp}}
+\doxysubsubsection{\texorpdfstring{capture\_state()}{capture\_state()}}
+{\footnotesize\ttfamily \label{undo__index_8cpp_abfb06a99989a2e51fcd0eecf89bef42d} 
+template$<$typename C $>$ \\
+auto capture\+\_\+state (\begin{DoxyParamCaption}\item[{const C \&}]{index}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{undo__index_8cpp_source_l00122}{122}} of file \mbox{\hyperlink{undo__index_8cpp_source}{undo\+\_\+index.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00123\ \ \ \ std::vector<std::pair<test\_element\_t,\ const\ test\_element\_t*>>\ vec;}
+\DoxyCodeLine{00124\ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ elem\ :\ index)\ \{}
+\DoxyCodeLine{00125\ \ \ \ \ \ vec.emplace\_back(elem,\ \&elem);}
+\DoxyCodeLine{00126\ \ \ \ \}}
+\DoxyCodeLine{00127\ \ \ \ \textcolor{keywordflow}{return}\ scope\_fail\{[vec\ =\ std::move(vec),\ \&index]\{}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ BOOST\_TEST(index.size()\ ==\ vec.size());}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ [elem,\ ptr]\ :\ vec)\ \{}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ *\ actual0\ =\ index.find(\mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.id);}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ BOOST\_TEST(actual0\ ==\ ptr);\ \textcolor{comment}{//\ reference\ stability\ is\ guaranteed}}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (actual0\ !=\ \textcolor{keyword}{nullptr})\ \{}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_TEST(actual0-\/>id\ ==\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.id);}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_TEST(actual0-\/>secondary\ ==\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.secondary);}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ actual1iter\ =\ index.template\ get<1>().find(\mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.secondary);}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ BOOST\_TEST((actual1iter\ !=\ index.template\ get<1>().end()\ \&\&\ \&*actual1iter\ ==\ actual0));}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00139\ \ \ \ \}\};}
+\DoxyCodeLine{00140\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{undo__index_8cpp_abfb06a99989a2e51fcd0eecf89bef42d_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{undo__index_8cpp_a1126d3f6309e1cfc2422b3ffe469b51e}\index{undo\_index.cpp@{undo\_index.cpp}!EXCEPTION\_TEST\_CASE@{EXCEPTION\_TEST\_CASE}}
+\index{EXCEPTION\_TEST\_CASE@{EXCEPTION\_TEST\_CASE}!undo\_index.cpp@{undo\_index.cpp}}
+\doxysubsubsection{\texorpdfstring{EXCEPTION\_TEST\_CASE()}{EXCEPTION\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/25]}}
+{\footnotesize\ttfamily \label{undo__index_8cpp_a1126d3f6309e1cfc2422b3ffe469b51e} 
+EXCEPTION\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{test\+\_\+insert\+\_\+modify}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{undo__index_8cpp_source_l00298}{298}} of file \mbox{\hyperlink{undo__index_8cpp_source}{undo\+\_\+index.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00298\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00299\ \ \ \ \mbox{\hyperlink{classchainbase_1_1undo__index}{chainbase::undo\_index<test\_element\_t,\ test\_allocator<test\_element\_t>}},}
+\DoxyCodeLine{00300\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::multi\_index::ordered\_unique<key<\&test\_element\_t::id>>,}
+\DoxyCodeLine{00301\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::multi\_index::ordered\_unique<key<\&test\_element\_t::secondary>>>\ i0;}
+\DoxyCodeLine{00302\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_afbb66ff111fb5674e688e9c645a4387a}{emplace}}([](\mbox{\hyperlink{structtest__element__t}{test\_element\_t}}\&\ elem)\ \{\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.secondary\ =\ 42;\ \});}
+\DoxyCodeLine{00303\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0)-\/>secondary\ ==\ 42);}
+\DoxyCodeLine{00304\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_afbb66ff111fb5674e688e9c645a4387a}{emplace}}([](\mbox{\hyperlink{structtest__element__t}{test\_element\_t}}\&\ elem)\ \{\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.secondary\ =\ 12;\ \});}
+\DoxyCodeLine{00305\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(1)-\/>secondary\ ==\ 12);}
+\DoxyCodeLine{00306\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a31a8e53dc6969f383f655375f885b3f4}{modify}}(*i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(1),\ [](\mbox{\hyperlink{structtest__element__t}{test\_element\_t}}\&\ elem)\ \{\ elem.secondary\ =\ 24;\ \});}
+\DoxyCodeLine{00307\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(1)-\/>secondary\ ==\ 24);}
+\DoxyCodeLine{00308\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{undo__index_8cpp_a1126d3f6309e1cfc2422b3ffe469b51e_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{undo__index_8cpp_acb0bc2f5ed31de013ef5759cfd5193bf}\index{undo\_index.cpp@{undo\_index.cpp}!EXCEPTION\_TEST\_CASE@{EXCEPTION\_TEST\_CASE}}
+\index{EXCEPTION\_TEST\_CASE@{EXCEPTION\_TEST\_CASE}!undo\_index.cpp@{undo\_index.cpp}}
+\doxysubsubsection{\texorpdfstring{EXCEPTION\_TEST\_CASE()}{EXCEPTION\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/25]}}
+{\footnotesize\ttfamily \label{undo__index_8cpp_acb0bc2f5ed31de013ef5759cfd5193bf} 
+EXCEPTION\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{test\+\_\+insert\+\_\+modify\+\_\+squash}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{undo__index_8cpp_source_l00329}{329}} of file \mbox{\hyperlink{undo__index_8cpp_source}{undo\+\_\+index.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00329\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00330\ \ \ \ \mbox{\hyperlink{classchainbase_1_1undo__index}{chainbase::undo\_index<test\_element\_t,\ test\_allocator<test\_element\_t>}},}
+\DoxyCodeLine{00331\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::multi\_index::ordered\_unique<key<\&test\_element\_t::id>>,}
+\DoxyCodeLine{00332\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::multi\_index::ordered\_unique<key<\&test\_element\_t::secondary>>>\ i0;}
+\DoxyCodeLine{00333\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_afbb66ff111fb5674e688e9c645a4387a}{emplace}}([](\mbox{\hyperlink{structtest__element__t}{test\_element\_t}}\&\ elem)\ \{\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.secondary\ =\ 42;\ \});}
+\DoxyCodeLine{00334\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0)-\/>secondary\ ==\ 42);}
+\DoxyCodeLine{00335\ \ \ \ \{}
+\DoxyCodeLine{00336\ \ \ \ \textcolor{keyword}{auto}\ undo\_checker\ =\ \mbox{\hyperlink{undo__index_8cpp_abfb06a99989a2e51fcd0eecf89bef42d}{capture\_state}}(i0);}
+\DoxyCodeLine{00337\ \ \ \ \textcolor{keyword}{auto}\ session1\ =\ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_adc5e6e658a7578983547e8cef45f5bbb}{start\_undo\_session}}(\textcolor{keyword}{true});}
+\DoxyCodeLine{00338\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_afbb66ff111fb5674e688e9c645a4387a}{emplace}}([](\mbox{\hyperlink{structtest__element__t}{test\_element\_t}}\&\ elem)\ \{\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.secondary\ =\ 12;\ \});}
+\DoxyCodeLine{00339\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(1)-\/>secondary\ ==\ 12);}
+\DoxyCodeLine{00340\ \ \ \ \textcolor{keyword}{auto}\ session2\ =\ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_adc5e6e658a7578983547e8cef45f5bbb}{start\_undo\_session}}(\textcolor{keyword}{true});}
+\DoxyCodeLine{00341\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a31a8e53dc6969f383f655375f885b3f4}{modify}}(*i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(1),\ [](\mbox{\hyperlink{structtest__element__t}{test\_element\_t}}\&\ elem)\ \{\ elem.secondary\ =\ 24;\ \});}
+\DoxyCodeLine{00342\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(1)-\/>secondary\ ==\ 24);}
+\DoxyCodeLine{00343\ \ \ \ session2.squash();}
+\DoxyCodeLine{00344\ \ \ \ \}}
+\DoxyCodeLine{00345\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0)-\/>secondary\ ==\ 42);}
+\DoxyCodeLine{00346\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(1)\ ==\ \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{00347\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{undo__index_8cpp_acb0bc2f5ed31de013ef5759cfd5193bf_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{undo__index_8cpp_a5bdceaa986df664988e19fa18b37e459}\index{undo\_index.cpp@{undo\_index.cpp}!EXCEPTION\_TEST\_CASE@{EXCEPTION\_TEST\_CASE}}
+\index{EXCEPTION\_TEST\_CASE@{EXCEPTION\_TEST\_CASE}!undo\_index.cpp@{undo\_index.cpp}}
+\doxysubsubsection{\texorpdfstring{EXCEPTION\_TEST\_CASE()}{EXCEPTION\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [3/25]}}
+{\footnotesize\ttfamily \label{undo__index_8cpp_a5bdceaa986df664988e19fa18b37e459} 
+EXCEPTION\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{test\+\_\+insert\+\_\+modify\+\_\+undo}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{undo__index_8cpp_source_l00310}{310}} of file \mbox{\hyperlink{undo__index_8cpp_source}{undo\+\_\+index.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00310\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00311\ \ \ \ \mbox{\hyperlink{classchainbase_1_1undo__index}{chainbase::undo\_index<test\_element\_t,\ test\_allocator<test\_element\_t>}},}
+\DoxyCodeLine{00312\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::multi\_index::ordered\_unique<key<\&test\_element\_t::id>>,}
+\DoxyCodeLine{00313\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::multi\_index::ordered\_unique<key<\&test\_element\_t::secondary>>>\ i0;}
+\DoxyCodeLine{00314\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_afbb66ff111fb5674e688e9c645a4387a}{emplace}}([](\mbox{\hyperlink{structtest__element__t}{test\_element\_t}}\&\ elem)\ \{\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.secondary\ =\ 42;\ \});}
+\DoxyCodeLine{00315\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0)-\/>secondary\ ==\ 42);}
+\DoxyCodeLine{00316\ \ \ \ \{}
+\DoxyCodeLine{00317\ \ \ \ \textcolor{keyword}{auto}\ undo\_checker\ =\ \mbox{\hyperlink{undo__index_8cpp_abfb06a99989a2e51fcd0eecf89bef42d}{capture\_state}}(i0);}
+\DoxyCodeLine{00318\ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}}\ =\ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_adc5e6e658a7578983547e8cef45f5bbb}{start\_undo\_session}}(\textcolor{keyword}{true});}
+\DoxyCodeLine{00319\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_afbb66ff111fb5674e688e9c645a4387a}{emplace}}([](\mbox{\hyperlink{structtest__element__t}{test\_element\_t}}\&\ elem)\ \{\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.secondary\ =\ 12;\ \});}
+\DoxyCodeLine{00320\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(1)-\/>secondary\ ==\ 12);}
+\DoxyCodeLine{00321\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a31a8e53dc6969f383f655375f885b3f4}{modify}}(*i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(1),\ [](\mbox{\hyperlink{structtest__element__t}{test\_element\_t}}\&\ elem)\ \{\ elem.secondary\ =\ 24;\ \});}
+\DoxyCodeLine{00322\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(1)-\/>secondary\ ==\ 24);}
+\DoxyCodeLine{00323\ \ \ \ \}}
+\DoxyCodeLine{00324\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0)-\/>secondary\ ==\ 42);}
+\DoxyCodeLine{00325\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(1)\ ==\ \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{00326\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{undo__index_8cpp_a5bdceaa986df664988e19fa18b37e459_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{undo__index_8cpp_ae549385b1ec0463d3a36e36bbac95a22}\index{undo\_index.cpp@{undo\_index.cpp}!EXCEPTION\_TEST\_CASE@{EXCEPTION\_TEST\_CASE}}
+\index{EXCEPTION\_TEST\_CASE@{EXCEPTION\_TEST\_CASE}!undo\_index.cpp@{undo\_index.cpp}}
+\doxysubsubsection{\texorpdfstring{EXCEPTION\_TEST\_CASE()}{EXCEPTION\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [4/25]}}
+{\footnotesize\ttfamily \label{undo__index_8cpp_ae549385b1ec0463d3a36e36bbac95a22} 
+EXCEPTION\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{test\+\_\+insert\+\_\+non\+\_\+unique}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{undo__index_8cpp_source_l00475}{475}} of file \mbox{\hyperlink{undo__index_8cpp_source}{undo\+\_\+index.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00475\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00476\ \ \ \ \mbox{\hyperlink{classchainbase_1_1undo__index}{chainbase::undo\_index<test\_element\_t,\ test\_allocator<test\_element\_t>}},}
+\DoxyCodeLine{00477\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::multi\_index::ordered\_unique<key<\&test\_element\_t::id>>,}
+\DoxyCodeLine{00478\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::multi\_index::ordered\_unique<key<\&test\_element\_t::secondary>>>\ i0;}
+\DoxyCodeLine{00479\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_afbb66ff111fb5674e688e9c645a4387a}{emplace}}([](\mbox{\hyperlink{structtest__element__t}{test\_element\_t}}\&\ elem)\ \{\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.secondary\ =\ 42;\ \});}
+\DoxyCodeLine{00480\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0)-\/>secondary\ ==\ 42);}
+\DoxyCodeLine{00481\ \ \ \ BOOST\_CHECK\_THROW(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_afbb66ff111fb5674e688e9c645a4387a}{emplace}}([](\mbox{\hyperlink{structtest__element__t}{test\_element\_t}}\&\ elem)\ \{\ elem.secondary\ =\ 42;\ \}),\ \ std::exception);}
+\DoxyCodeLine{00482\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0)-\/>secondary\ ==\ 42);}
+\DoxyCodeLine{00483\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{undo__index_8cpp_ae549385b1ec0463d3a36e36bbac95a22_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{undo__index_8cpp_a49037050068737ab7140aef6994b491a}\index{undo\_index.cpp@{undo\_index.cpp}!EXCEPTION\_TEST\_CASE@{EXCEPTION\_TEST\_CASE}}
+\index{EXCEPTION\_TEST\_CASE@{EXCEPTION\_TEST\_CASE}!undo\_index.cpp@{undo\_index.cpp}}
+\doxysubsubsection{\texorpdfstring{EXCEPTION\_TEST\_CASE()}{EXCEPTION\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [5/25]}}
+{\footnotesize\ttfamily \label{undo__index_8cpp_a49037050068737ab7140aef6994b491a} 
+EXCEPTION\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{test\+\_\+insert\+\_\+push}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{undo__index_8cpp_source_l00177}{177}} of file \mbox{\hyperlink{undo__index_8cpp_source}{undo\+\_\+index.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00178\ \ \ \ \mbox{\hyperlink{classchainbase_1_1undo__index}{chainbase::undo\_index<test\_element\_t,\ test\_allocator<test\_element\_t>}},}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::multi\_index::ordered\_unique<key<\&test\_element\_t::id>>,}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::multi\_index::ordered\_unique<key<\&test\_element\_t::secondary>\ >\ >\ i0;}
+\DoxyCodeLine{00181\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_afbb66ff111fb5674e688e9c645a4387a}{emplace}}([](\mbox{\hyperlink{structtest__element__t}{test\_element\_t}}\&\ elem)\ \{\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.secondary\ =\ 42;\ \});}
+\DoxyCodeLine{00182\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0)-\/>secondary\ ==\ 42);}
+\DoxyCodeLine{00183\ \ \ \ \{}
+\DoxyCodeLine{00184\ \ \ \ \textcolor{keyword}{auto}\ undo\_checker\ =\ \mbox{\hyperlink{undo__index_8cpp_abfb06a99989a2e51fcd0eecf89bef42d}{capture\_state}}(i0);}
+\DoxyCodeLine{00185\ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}}\ =\ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_adc5e6e658a7578983547e8cef45f5bbb}{start\_undo\_session}}(\textcolor{keyword}{true});}
+\DoxyCodeLine{00186\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_afbb66ff111fb5674e688e9c645a4387a}{emplace}}([](\mbox{\hyperlink{structtest__element__t}{test\_element\_t}}\&\ elem)\ \{\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.secondary\ =\ 12;\ \});}
+\DoxyCodeLine{00187\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(1)-\/>secondary\ ==\ 12);}
+\DoxyCodeLine{00188\ \ \ \ \mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}}.push();}
+\DoxyCodeLine{00189\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_ae1352619b41f48ca4fa190bc3e5cf7c3}{commit}}(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a3df30d97485f2f3e314a118f9573a10d}{revision}}());}
+\DoxyCodeLine{00190\ \ \ \ \}}
+\DoxyCodeLine{00191\ \ \ \ BOOST\_TEST(!i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a7b343e293e554f2797c6d703323e848c}{has\_undo\_session}}());}
+\DoxyCodeLine{00192\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0)-\/>secondary\ ==\ 42);}
+\DoxyCodeLine{00193\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(1)-\/>secondary\ ==\ 12);}
+\DoxyCodeLine{00194\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{undo__index_8cpp_a49037050068737ab7140aef6994b491a_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{undo__index_8cpp_afd62976cba8c646be4715906e8971638}\index{undo\_index.cpp@{undo\_index.cpp}!EXCEPTION\_TEST\_CASE@{EXCEPTION\_TEST\_CASE}}
+\index{EXCEPTION\_TEST\_CASE@{EXCEPTION\_TEST\_CASE}!undo\_index.cpp@{undo\_index.cpp}}
+\doxysubsubsection{\texorpdfstring{EXCEPTION\_TEST\_CASE()}{EXCEPTION\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [6/25]}}
+{\footnotesize\ttfamily \label{undo__index_8cpp_afd62976cba8c646be4715906e8971638} 
+EXCEPTION\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{test\+\_\+insert\+\_\+remove\+\_\+squash}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{undo__index_8cpp_source_l00367}{367}} of file \mbox{\hyperlink{undo__index_8cpp_source}{undo\+\_\+index.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00367\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00368\ \ \ \ \mbox{\hyperlink{classchainbase_1_1undo__index}{chainbase::undo\_index<test\_element\_t,\ test\_allocator<test\_element\_t>}},}
+\DoxyCodeLine{00369\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::multi\_index::ordered\_unique<key<\&test\_element\_t::id>>,}
+\DoxyCodeLine{00370\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::multi\_index::ordered\_unique<key<\&test\_element\_t::secondary>>>\ i0;}
+\DoxyCodeLine{00371\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_afbb66ff111fb5674e688e9c645a4387a}{emplace}}([](\mbox{\hyperlink{structtest__element__t}{test\_element\_t}}\&\ elem)\ \{\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.secondary\ =\ 42;\ \});}
+\DoxyCodeLine{00372\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0)-\/>secondary\ ==\ 42);}
+\DoxyCodeLine{00373\ \ \ \ \{}
+\DoxyCodeLine{00374\ \ \ \ \textcolor{keyword}{auto}\ undo\_checker\ =\ \mbox{\hyperlink{undo__index_8cpp_abfb06a99989a2e51fcd0eecf89bef42d}{capture\_state}}(i0);}
+\DoxyCodeLine{00375\ \ \ \ \textcolor{keyword}{auto}\ session1\ =\ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_adc5e6e658a7578983547e8cef45f5bbb}{start\_undo\_session}}(\textcolor{keyword}{true});}
+\DoxyCodeLine{00376\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_afbb66ff111fb5674e688e9c645a4387a}{emplace}}([](\mbox{\hyperlink{structtest__element__t}{test\_element\_t}}\&\ elem)\ \{\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.secondary\ =\ 12;\ \});}
+\DoxyCodeLine{00377\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(1)-\/>secondary\ ==\ 12);}
+\DoxyCodeLine{00378\ \ \ \ \textcolor{keyword}{auto}\ session2\ =\ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_adc5e6e658a7578983547e8cef45f5bbb}{start\_undo\_session}}(\textcolor{keyword}{true});}
+\DoxyCodeLine{00379\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_afe2be6ce2b106da072497f383b86198d}{remove}}(*i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(1));}
+\DoxyCodeLine{00380\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(1)\ ==\ \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{00381\ \ \ \ session2.squash();}
+\DoxyCodeLine{00382\ \ \ \ \}}
+\DoxyCodeLine{00383\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0)-\/>secondary\ ==\ 42);}
+\DoxyCodeLine{00384\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(1)\ ==\ \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{00385\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{undo__index_8cpp_afd62976cba8c646be4715906e8971638_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{undo__index_8cpp_a490a9776679927b25ab47bc260082fcc}\index{undo\_index.cpp@{undo\_index.cpp}!EXCEPTION\_TEST\_CASE@{EXCEPTION\_TEST\_CASE}}
+\index{EXCEPTION\_TEST\_CASE@{EXCEPTION\_TEST\_CASE}!undo\_index.cpp@{undo\_index.cpp}}
+\doxysubsubsection{\texorpdfstring{EXCEPTION\_TEST\_CASE()}{EXCEPTION\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [7/25]}}
+{\footnotesize\ttfamily \label{undo__index_8cpp_a490a9776679927b25ab47bc260082fcc} 
+EXCEPTION\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{test\+\_\+insert\+\_\+remove\+\_\+undo}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{undo__index_8cpp_source_l00349}{349}} of file \mbox{\hyperlink{undo__index_8cpp_source}{undo\+\_\+index.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00349\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00350\ \ \ \ \mbox{\hyperlink{classchainbase_1_1undo__index}{chainbase::undo\_index<test\_element\_t,\ test\_allocator<test\_element\_t>}},}
+\DoxyCodeLine{00351\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::multi\_index::ordered\_unique<key<\&test\_element\_t::id>>,}
+\DoxyCodeLine{00352\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::multi\_index::ordered\_unique<key<\&test\_element\_t::secondary>>>\ i0;}
+\DoxyCodeLine{00353\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_afbb66ff111fb5674e688e9c645a4387a}{emplace}}([](\mbox{\hyperlink{structtest__element__t}{test\_element\_t}}\&\ elem)\ \{\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.secondary\ =\ 42;\ \});}
+\DoxyCodeLine{00354\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0)-\/>secondary\ ==\ 42);}
+\DoxyCodeLine{00355\ \ \ \ \{}
+\DoxyCodeLine{00356\ \ \ \ \textcolor{keyword}{auto}\ undo\_checker\ =\ \mbox{\hyperlink{undo__index_8cpp_abfb06a99989a2e51fcd0eecf89bef42d}{capture\_state}}(i0);}
+\DoxyCodeLine{00357\ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}}\ =\ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_adc5e6e658a7578983547e8cef45f5bbb}{start\_undo\_session}}(\textcolor{keyword}{true});}
+\DoxyCodeLine{00358\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_afbb66ff111fb5674e688e9c645a4387a}{emplace}}([](\mbox{\hyperlink{structtest__element__t}{test\_element\_t}}\&\ elem)\ \{\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.secondary\ =\ 12;\ \});}
+\DoxyCodeLine{00359\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(1)-\/>secondary\ ==\ 12);}
+\DoxyCodeLine{00360\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_afe2be6ce2b106da072497f383b86198d}{remove}}(*i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(1));}
+\DoxyCodeLine{00361\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(1)\ ==\ \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{00362\ \ \ \ \}}
+\DoxyCodeLine{00363\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0)-\/>secondary\ ==\ 42);}
+\DoxyCodeLine{00364\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(1)\ ==\ \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{00365\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{undo__index_8cpp_a490a9776679927b25ab47bc260082fcc_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{undo__index_8cpp_a1c523a85d8e8b9dda567457e7d7124ee}\index{undo\_index.cpp@{undo\_index.cpp}!EXCEPTION\_TEST\_CASE@{EXCEPTION\_TEST\_CASE}}
+\index{EXCEPTION\_TEST\_CASE@{EXCEPTION\_TEST\_CASE}!undo\_index.cpp@{undo\_index.cpp}}
+\doxysubsubsection{\texorpdfstring{EXCEPTION\_TEST\_CASE()}{EXCEPTION\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [8/25]}}
+{\footnotesize\ttfamily \label{undo__index_8cpp_a1c523a85d8e8b9dda567457e7d7124ee} 
+EXCEPTION\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{test\+\_\+insert\+\_\+squash}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{undo__index_8cpp_source_l00158}{158}} of file \mbox{\hyperlink{undo__index_8cpp_source}{undo\+\_\+index.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00159\ \ \ \ \mbox{\hyperlink{classchainbase_1_1undo__index}{chainbase::undo\_index<test\_element\_t,\ test\_allocator<test\_element\_t>}},}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::multi\_index::ordered\_unique<key<\&test\_element\_t::id>>,}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::multi\_index::ordered\_unique<key<\&test\_element\_t::secondary>\ >\ >\ i0;}
+\DoxyCodeLine{00162\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_afbb66ff111fb5674e688e9c645a4387a}{emplace}}([](\mbox{\hyperlink{structtest__element__t}{test\_element\_t}}\&\ elem)\ \{\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.secondary\ =\ 42;\ \});}
+\DoxyCodeLine{00163\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0)-\/>secondary\ ==\ 42);}
+\DoxyCodeLine{00164\ \ \ \ \{}
+\DoxyCodeLine{00165\ \ \ \ \textcolor{keyword}{auto}\ undo\_checker\ =\ \mbox{\hyperlink{undo__index_8cpp_abfb06a99989a2e51fcd0eecf89bef42d}{capture\_state}}(i0);}
+\DoxyCodeLine{00166\ \ \ \ \textcolor{keyword}{auto}\ session0\ =\ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_adc5e6e658a7578983547e8cef45f5bbb}{start\_undo\_session}}(\textcolor{keyword}{true});}
+\DoxyCodeLine{00167\ \ \ \ \textcolor{keyword}{auto}\ session1\ =\ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_adc5e6e658a7578983547e8cef45f5bbb}{start\_undo\_session}}(\textcolor{keyword}{true});}
+\DoxyCodeLine{00168\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_afbb66ff111fb5674e688e9c645a4387a}{emplace}}([](\mbox{\hyperlink{structtest__element__t}{test\_element\_t}}\&\ elem)\ \{\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.secondary\ =\ 12;\ \});}
+\DoxyCodeLine{00169\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(1)-\/>secondary\ ==\ 12);}
+\DoxyCodeLine{00170\ \ \ \ session1.squash();}
+\DoxyCodeLine{00171\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(1)-\/>secondary\ ==\ 12);}
+\DoxyCodeLine{00172\ \ \ \ \}}
+\DoxyCodeLine{00173\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0)-\/>secondary\ ==\ 42);}
+\DoxyCodeLine{00174\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(1)\ ==\ \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{00175\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{undo__index_8cpp_a1c523a85d8e8b9dda567457e7d7124ee_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{undo__index_8cpp_a5253dac4352aebd74ee3b998a4817c84}\index{undo\_index.cpp@{undo\_index.cpp}!EXCEPTION\_TEST\_CASE@{EXCEPTION\_TEST\_CASE}}
+\index{EXCEPTION\_TEST\_CASE@{EXCEPTION\_TEST\_CASE}!undo\_index.cpp@{undo\_index.cpp}}
+\doxysubsubsection{\texorpdfstring{EXCEPTION\_TEST\_CASE()}{EXCEPTION\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [9/25]}}
+{\footnotesize\ttfamily \label{undo__index_8cpp_a5253dac4352aebd74ee3b998a4817c84} 
+EXCEPTION\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{test\+\_\+insert\+\_\+undo}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{undo__index_8cpp_source_l00142}{142}} of file \mbox{\hyperlink{undo__index_8cpp_source}{undo\+\_\+index.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00143\ \ \ \ \mbox{\hyperlink{classchainbase_1_1undo__index}{chainbase::undo\_index<test\_element\_t,\ test\_allocator<test\_element\_t>}},}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::multi\_index::ordered\_unique<key<\&test\_element\_t::id>>,}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::multi\_index::ordered\_unique<key<\&test\_element\_t::secondary>\ >\ >\ i0;}
+\DoxyCodeLine{00146\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_afbb66ff111fb5674e688e9c645a4387a}{emplace}}([](\mbox{\hyperlink{structtest__element__t}{test\_element\_t}}\&\ elem)\ \{\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.secondary\ =\ 42;\ \});}
+\DoxyCodeLine{00147\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0)-\/>secondary\ ==\ 42);}
+\DoxyCodeLine{00148\ \ \ \ \{}
+\DoxyCodeLine{00149\ \ \ \ \textcolor{keyword}{auto}\ undo\_checker\ =\ \mbox{\hyperlink{undo__index_8cpp_abfb06a99989a2e51fcd0eecf89bef42d}{capture\_state}}(i0);}
+\DoxyCodeLine{00150\ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}}\ =\ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_adc5e6e658a7578983547e8cef45f5bbb}{start\_undo\_session}}(\textcolor{keyword}{true});}
+\DoxyCodeLine{00151\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_afbb66ff111fb5674e688e9c645a4387a}{emplace}}([](\mbox{\hyperlink{structtest__element__t}{test\_element\_t}}\&\ elem)\ \{\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.secondary\ =\ 12;\ \});}
+\DoxyCodeLine{00152\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(1)-\/>secondary\ ==\ 12);}
+\DoxyCodeLine{00153\ \ \ \ \}}
+\DoxyCodeLine{00154\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0)-\/>secondary\ ==\ 42);}
+\DoxyCodeLine{00155\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(1)\ ==\ \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{00156\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{undo__index_8cpp_a5253dac4352aebd74ee3b998a4817c84_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{undo__index_8cpp_ade06c047298c551422cfe3fd33ad1ca0}\index{undo\_index.cpp@{undo\_index.cpp}!EXCEPTION\_TEST\_CASE@{EXCEPTION\_TEST\_CASE}}
+\index{EXCEPTION\_TEST\_CASE@{EXCEPTION\_TEST\_CASE}!undo\_index.cpp@{undo\_index.cpp}}
+\doxysubsubsection{\texorpdfstring{EXCEPTION\_TEST\_CASE()}{EXCEPTION\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [10/25]}}
+{\footnotesize\ttfamily \label{undo__index_8cpp_ade06c047298c551422cfe3fd33ad1ca0} 
+EXCEPTION\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{test\+\_\+modify\+\_\+conflict}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{undo__index_8cpp_source_l00495}{495}} of file \mbox{\hyperlink{undo__index_8cpp_source}{undo\+\_\+index.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00495\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00496\ \ \ \ \mbox{\hyperlink{classchainbase_1_1undo__index}{chainbase::undo\_index<conflict\_element\_t,\ test\_allocator<conflict\_element\_t>}},}
+\DoxyCodeLine{00497\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::multi\_index::ordered\_unique<key<\&conflict\_element\_t::id>>,}
+\DoxyCodeLine{00498\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::multi\_index::ordered\_unique<key<\&conflict\_element\_t::x0>>,}
+\DoxyCodeLine{00499\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::multi\_index::ordered\_unique<key<\&conflict\_element\_t::x1>>,}
+\DoxyCodeLine{00500\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::multi\_index::ordered\_unique<key<\&conflict\_element\_t::x2>>>\ i0;}
+\DoxyCodeLine{00501\ \ \ \ \textcolor{comment}{//\ insert\ 3\ elements}}
+\DoxyCodeLine{00502\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_afbb66ff111fb5674e688e9c645a4387a}{emplace}}([](\mbox{\hyperlink{structconflict__element__t}{conflict\_element\_t}}\&\ elem)\ \{\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.x0\ =\ 0;\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.x1\ =\ 10;\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.x2\ =\ 10;\ \});}
+\DoxyCodeLine{00503\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_afbb66ff111fb5674e688e9c645a4387a}{emplace}}([](\mbox{\hyperlink{structconflict__element__t}{conflict\_element\_t}}\&\ elem)\ \{\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.x0\ =\ 11;\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.x1\ =\ 1;\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.x2\ =\ 11;\ \});}
+\DoxyCodeLine{00504\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_afbb66ff111fb5674e688e9c645a4387a}{emplace}}([](\mbox{\hyperlink{structconflict__element__t}{conflict\_element\_t}}\&\ elem)\ \{\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.x0\ =\ 12;\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.x1\ =\ 12;\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.x2\ =\ 2;\ \});}
+\DoxyCodeLine{00505\ \ \ \ \{}
+\DoxyCodeLine{00506\ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}}\ =\ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_adc5e6e658a7578983547e8cef45f5bbb}{start\_undo\_session}}(\textcolor{keyword}{true});}
+\DoxyCodeLine{00507\ \ \ \ \textcolor{comment}{//\ set\ them\ to\ a\ different\ value}}
+\DoxyCodeLine{00508\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a31a8e53dc6969f383f655375f885b3f4}{modify}}(*i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0),\ [](\mbox{\hyperlink{structconflict__element__t}{conflict\_element\_t}}\&\ elem)\ \{\ elem.x0\ =\ 10;\ elem.x1\ =\ 10;\ elem.x2\ =\ 10;\ \});}
+\DoxyCodeLine{00509\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a31a8e53dc6969f383f655375f885b3f4}{modify}}(*i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(1),\ [](\mbox{\hyperlink{structconflict__element__t}{conflict\_element\_t}}\&\ elem)\ \{\ elem.x0\ =\ 11;\ elem.x1\ =\ 11;\ elem.x2\ =\ 11;\ \});}
+\DoxyCodeLine{00510\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a31a8e53dc6969f383f655375f885b3f4}{modify}}(*i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(2),\ [](\mbox{\hyperlink{structconflict__element__t}{conflict\_element\_t}}\&\ elem)\ \{\ elem.x0\ =\ 12;\ elem.x1\ =\ 12;\ elem.x2\ =\ 12;\ \});}
+\DoxyCodeLine{00511\ \ \ \ \textcolor{comment}{//\ create\ a\ circular\ conflict\ with\ the\ original\ values}}
+\DoxyCodeLine{00512\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a31a8e53dc6969f383f655375f885b3f4}{modify}}(*i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0),\ [](\mbox{\hyperlink{structconflict__element__t}{conflict\_element\_t}}\&\ elem)\ \{\ elem.x0\ =\ 10;\ elem.x1\ =\ 1;\ elem.x2\ =\ 10;\ \});}
+\DoxyCodeLine{00513\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a31a8e53dc6969f383f655375f885b3f4}{modify}}(*i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(1),\ [](\mbox{\hyperlink{structconflict__element__t}{conflict\_element\_t}}\&\ elem)\ \{\ elem.x0\ =\ 11;\ elem.x1\ =\ 11;\ elem.x2\ =\ 2;\ \});}
+\DoxyCodeLine{00514\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a31a8e53dc6969f383f655375f885b3f4}{modify}}(*i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(2),\ [](\mbox{\hyperlink{structconflict__element__t}{conflict\_element\_t}}\&\ elem)\ \{\ elem.x0\ =\ 0;\ elem.x1\ =\ 12;\ elem.x2\ =\ 12;\ \});}
+\DoxyCodeLine{00515\ \ \ \ \}}
+\DoxyCodeLine{00516\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0)-\/>x0\ ==\ 0);}
+\DoxyCodeLine{00517\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(1)-\/>x1\ ==\ 1);}
+\DoxyCodeLine{00518\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(2)-\/>x2\ ==\ 2);}
+\DoxyCodeLine{00519\ \ \ \ \textcolor{comment}{//\ Check\ lookup\ in\ the\ other\ indices}}
+\DoxyCodeLine{00520\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a62d9841569299de97bc51db174967f8f}{get}}<1>().find(0)-\/>x0\ ==\ 0);}
+\DoxyCodeLine{00521\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a62d9841569299de97bc51db174967f8f}{get}}<1>().find(11)-\/>x0\ ==\ 11);}
+\DoxyCodeLine{00522\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a62d9841569299de97bc51db174967f8f}{get}}<1>().find(12)-\/>x0\ ==\ 12);}
+\DoxyCodeLine{00523\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a62d9841569299de97bc51db174967f8f}{get}}<2>().find(10)-\/>x1\ ==\ 10);}
+\DoxyCodeLine{00524\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a62d9841569299de97bc51db174967f8f}{get}}<2>().find(1)-\/>x1\ ==\ 1);}
+\DoxyCodeLine{00525\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a62d9841569299de97bc51db174967f8f}{get}}<2>().find(12)-\/>x1\ ==\ 12);}
+\DoxyCodeLine{00526\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a62d9841569299de97bc51db174967f8f}{get}}<3>().find(10)-\/>x2\ ==\ 10);}
+\DoxyCodeLine{00527\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a62d9841569299de97bc51db174967f8f}{get}}<3>().find(11)-\/>x2\ ==\ 11);}
+\DoxyCodeLine{00528\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a62d9841569299de97bc51db174967f8f}{get}}<3>().find(2)-\/>x2\ ==\ 2);}
+\DoxyCodeLine{00529\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{undo__index_8cpp_ade06c047298c551422cfe3fd33ad1ca0_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{undo__index_8cpp_a5f6f2f5e97f312c11b1acd2d55a9a7e1}\index{undo\_index.cpp@{undo\_index.cpp}!EXCEPTION\_TEST\_CASE@{EXCEPTION\_TEST\_CASE}}
+\index{EXCEPTION\_TEST\_CASE@{EXCEPTION\_TEST\_CASE}!undo\_index.cpp@{undo\_index.cpp}}
+\doxysubsubsection{\texorpdfstring{EXCEPTION\_TEST\_CASE()}{EXCEPTION\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [11/25]}}
+{\footnotesize\ttfamily \label{undo__index_8cpp_a5f6f2f5e97f312c11b1acd2d55a9a7e1} 
+EXCEPTION\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{test\+\_\+modify\+\_\+fail}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{undo__index_8cpp_source_l00561}{561}} of file \mbox{\hyperlink{undo__index_8cpp_source}{undo\+\_\+index.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00561\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00562\ \ \ \ \mbox{\hyperlink{classchainbase_1_1undo__index}{chainbase::undo\_index<conflict\_element\_t,\ test\_allocator<conflict\_element\_t>}},}
+\DoxyCodeLine{00563\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::multi\_index::ordered\_unique<key<\&conflict\_element\_t::id>>,}
+\DoxyCodeLine{00564\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::multi\_index::ordered\_unique<key<\&conflict\_element\_t::x0>>,}
+\DoxyCodeLine{00565\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::multi\_index::ordered\_unique<key<\&conflict\_element\_t::x1>>,}
+\DoxyCodeLine{00566\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::multi\_index::ordered\_unique<key<\&conflict\_element\_t::x2>>>\ i0;}
+\DoxyCodeLine{00567\ \ \ \ \textcolor{comment}{//\ insert\ 3\ elements}}
+\DoxyCodeLine{00568\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_afbb66ff111fb5674e688e9c645a4387a}{emplace}}([](\mbox{\hyperlink{structconflict__element__t}{conflict\_element\_t}}\&\ elem)\ \{\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.x0\ =\ 10;\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.x1\ =\ 10;\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.x2\ =\ 10;\ \});}
+\DoxyCodeLine{00569\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_afbb66ff111fb5674e688e9c645a4387a}{emplace}}([](\mbox{\hyperlink{structconflict__element__t}{conflict\_element\_t}}\&\ elem)\ \{\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.x0\ =\ 11;\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.x1\ =\ 11;\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.x2\ =\ 11;\ \});}
+\DoxyCodeLine{00570\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_afbb66ff111fb5674e688e9c645a4387a}{emplace}}([](\mbox{\hyperlink{structconflict__element__t}{conflict\_element\_t}}\&\ elem)\ \{\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.x0\ =\ 12;\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.x1\ =\ 12;\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.x2\ =\ 12;\ \});}
+\DoxyCodeLine{00571\ \ \ \ \{}
+\DoxyCodeLine{00572\ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}}\ =\ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_adc5e6e658a7578983547e8cef45f5bbb}{start\_undo\_session}}(\textcolor{keyword}{true});}
+\DoxyCodeLine{00573\ \ \ \ \textcolor{comment}{//\ Insert\ a\ value\ with\ a\ duplicate}}
+\DoxyCodeLine{00574\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_afbb66ff111fb5674e688e9c645a4387a}{emplace}}([](\mbox{\hyperlink{structconflict__element__t}{conflict\_element\_t}}\&\ elem)\ \{\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.x0\ =\ 71;\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.x1\ =\ 81;\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.x2\ =\ 91;\ \});}
+\DoxyCodeLine{00575\ \ \ \ BOOST\_CHECK\_THROW(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a31a8e53dc6969f383f655375f885b3f4}{modify}}(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a62d9841569299de97bc51db174967f8f}{get}}(3),\ [](\mbox{\hyperlink{structconflict__element__t}{conflict\_element\_t}}\&\ elem)\ \{\ elem.x0\ =\ 71;\ elem.x1\ =\ 10;\ elem.x2\ =\ 91;\ \}),\ std::logic\_error);}
+\DoxyCodeLine{00576\ \ \ \ \}}
+\DoxyCodeLine{00577\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a62d9841569299de97bc51db174967f8f}{get}}<0>().size()\ ==\ 3);}
+\DoxyCodeLine{00578\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a62d9841569299de97bc51db174967f8f}{get}}<1>().size()\ ==\ 3);}
+\DoxyCodeLine{00579\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a62d9841569299de97bc51db174967f8f}{get}}<2>().size()\ ==\ 3);}
+\DoxyCodeLine{00580\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a62d9841569299de97bc51db174967f8f}{get}}<3>().size()\ ==\ 3);}
+\DoxyCodeLine{00581\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0)-\/>x0\ ==\ 10);}
+\DoxyCodeLine{00582\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(1)-\/>x1\ ==\ 11);}
+\DoxyCodeLine{00583\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(2)-\/>x2\ ==\ 12);}
+\DoxyCodeLine{00584\ \ \ \ \textcolor{comment}{//\ Check\ lookup\ in\ the\ other\ indices}}
+\DoxyCodeLine{00585\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a62d9841569299de97bc51db174967f8f}{get}}<1>().find(10)-\/>x0\ ==\ 10);}
+\DoxyCodeLine{00586\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a62d9841569299de97bc51db174967f8f}{get}}<1>().find(11)-\/>x0\ ==\ 11);}
+\DoxyCodeLine{00587\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a62d9841569299de97bc51db174967f8f}{get}}<1>().find(12)-\/>x0\ ==\ 12);}
+\DoxyCodeLine{00588\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a62d9841569299de97bc51db174967f8f}{get}}<2>().find(10)-\/>x1\ ==\ 10);}
+\DoxyCodeLine{00589\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a62d9841569299de97bc51db174967f8f}{get}}<2>().find(11)-\/>x1\ ==\ 11);}
+\DoxyCodeLine{00590\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a62d9841569299de97bc51db174967f8f}{get}}<2>().find(12)-\/>x1\ ==\ 12);}
+\DoxyCodeLine{00591\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a62d9841569299de97bc51db174967f8f}{get}}<3>().find(10)-\/>x2\ ==\ 10);}
+\DoxyCodeLine{00592\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a62d9841569299de97bc51db174967f8f}{get}}<3>().find(11)-\/>x2\ ==\ 11);}
+\DoxyCodeLine{00593\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a62d9841569299de97bc51db174967f8f}{get}}<3>().find(12)-\/>x2\ ==\ 12);}
+\DoxyCodeLine{00594\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{undo__index_8cpp_a5f6f2f5e97f312c11b1acd2d55a9a7e1_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{undo__index_8cpp_a3f205022b7d0d63e828c8e5d68a133d3}\index{undo\_index.cpp@{undo\_index.cpp}!EXCEPTION\_TEST\_CASE@{EXCEPTION\_TEST\_CASE}}
+\index{EXCEPTION\_TEST\_CASE@{EXCEPTION\_TEST\_CASE}!undo\_index.cpp@{undo\_index.cpp}}
+\doxysubsubsection{\texorpdfstring{EXCEPTION\_TEST\_CASE()}{EXCEPTION\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [12/25]}}
+{\footnotesize\ttfamily \label{undo__index_8cpp_a3f205022b7d0d63e828c8e5d68a133d3} 
+EXCEPTION\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{test\+\_\+modify\+\_\+modify\+\_\+squash}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{undo__index_8cpp_source_l00404}{404}} of file \mbox{\hyperlink{undo__index_8cpp_source}{undo\+\_\+index.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00404\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00405\ \ \ \ \mbox{\hyperlink{classchainbase_1_1undo__index}{chainbase::undo\_index<test\_element\_t,\ test\_allocator<test\_element\_t>}},}
+\DoxyCodeLine{00406\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::multi\_index::ordered\_unique<key<\&test\_element\_t::id>>,}
+\DoxyCodeLine{00407\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::multi\_index::ordered\_unique<key<\&test\_element\_t::secondary>>>\ i0;}
+\DoxyCodeLine{00408\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_afbb66ff111fb5674e688e9c645a4387a}{emplace}}([](\mbox{\hyperlink{structtest__element__t}{test\_element\_t}}\&\ elem)\ \{\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.secondary\ =\ 42;\ \});}
+\DoxyCodeLine{00409\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0)-\/>secondary\ ==\ 42);}
+\DoxyCodeLine{00410\ \ \ \ \{}
+\DoxyCodeLine{00411\ \ \ \ \textcolor{keyword}{auto}\ undo\_checker\ =\ \mbox{\hyperlink{undo__index_8cpp_abfb06a99989a2e51fcd0eecf89bef42d}{capture\_state}}(i0);}
+\DoxyCodeLine{00412\ \ \ \ \textcolor{keyword}{auto}\ session1\ =\ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_adc5e6e658a7578983547e8cef45f5bbb}{start\_undo\_session}}(\textcolor{keyword}{true});}
+\DoxyCodeLine{00413\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a31a8e53dc6969f383f655375f885b3f4}{modify}}(*i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0),\ [](\mbox{\hyperlink{structtest__element__t}{test\_element\_t}}\&\ elem)\ \{\ elem.secondary\ =\ 18;\ \});}
+\DoxyCodeLine{00414\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0)-\/>secondary\ ==\ 18);}
+\DoxyCodeLine{00415\ \ \ \ \textcolor{keyword}{auto}\ session2\ =\ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_adc5e6e658a7578983547e8cef45f5bbb}{start\_undo\_session}}(\textcolor{keyword}{true});}
+\DoxyCodeLine{00416\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a31a8e53dc6969f383f655375f885b3f4}{modify}}(*i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0),\ [](\mbox{\hyperlink{structtest__element__t}{test\_element\_t}}\&\ elem)\ \{\ elem.secondary\ =\ 24;\ \});}
+\DoxyCodeLine{00417\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0)-\/>secondary\ ==\ 24);}
+\DoxyCodeLine{00418\ \ \ \ session2.squash();}
+\DoxyCodeLine{00419\ \ \ \ \}}
+\DoxyCodeLine{00420\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0)-\/>secondary\ ==\ 42);}
+\DoxyCodeLine{00421\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{undo__index_8cpp_a3f205022b7d0d63e828c8e5d68a133d3_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{undo__index_8cpp_aca764e359678c5ec9eeb19647299297e}\index{undo\_index.cpp@{undo\_index.cpp}!EXCEPTION\_TEST\_CASE@{EXCEPTION\_TEST\_CASE}}
+\index{EXCEPTION\_TEST\_CASE@{EXCEPTION\_TEST\_CASE}!undo\_index.cpp@{undo\_index.cpp}}
+\doxysubsubsection{\texorpdfstring{EXCEPTION\_TEST\_CASE()}{EXCEPTION\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [13/25]}}
+{\footnotesize\ttfamily \label{undo__index_8cpp_aca764e359678c5ec9eeb19647299297e} 
+EXCEPTION\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{test\+\_\+modify\+\_\+modify\+\_\+undo}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{undo__index_8cpp_source_l00387}{387}} of file \mbox{\hyperlink{undo__index_8cpp_source}{undo\+\_\+index.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00387\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00388\ \ \ \ \mbox{\hyperlink{classchainbase_1_1undo__index}{chainbase::undo\_index<test\_element\_t,\ test\_allocator<test\_element\_t>}},}
+\DoxyCodeLine{00389\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::multi\_index::ordered\_unique<key<\&test\_element\_t::id>>,}
+\DoxyCodeLine{00390\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::multi\_index::ordered\_unique<key<\&test\_element\_t::secondary>>>\ i0;}
+\DoxyCodeLine{00391\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_afbb66ff111fb5674e688e9c645a4387a}{emplace}}([](\mbox{\hyperlink{structtest__element__t}{test\_element\_t}}\&\ elem)\ \{\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.secondary\ =\ 42;\ \});}
+\DoxyCodeLine{00392\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0)-\/>secondary\ ==\ 42);}
+\DoxyCodeLine{00393\ \ \ \ \{}
+\DoxyCodeLine{00394\ \ \ \ \textcolor{keyword}{auto}\ undo\_checker\ =\ \mbox{\hyperlink{undo__index_8cpp_abfb06a99989a2e51fcd0eecf89bef42d}{capture\_state}}(i0);}
+\DoxyCodeLine{00395\ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}}\ =\ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_adc5e6e658a7578983547e8cef45f5bbb}{start\_undo\_session}}(\textcolor{keyword}{true});}
+\DoxyCodeLine{00396\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a31a8e53dc6969f383f655375f885b3f4}{modify}}(*i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0),\ [](\mbox{\hyperlink{structtest__element__t}{test\_element\_t}}\&\ elem)\ \{\ elem.secondary\ =\ 18;\ \});}
+\DoxyCodeLine{00397\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0)-\/>secondary\ ==\ 18);}
+\DoxyCodeLine{00398\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a31a8e53dc6969f383f655375f885b3f4}{modify}}(*i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0),\ [](\mbox{\hyperlink{structtest__element__t}{test\_element\_t}}\&\ elem)\ \{\ elem.secondary\ =\ 24;\ \});}
+\DoxyCodeLine{00399\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0)-\/>secondary\ ==\ 24);}
+\DoxyCodeLine{00400\ \ \ \ \}}
+\DoxyCodeLine{00401\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0)-\/>secondary\ ==\ 42);}
+\DoxyCodeLine{00402\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{undo__index_8cpp_aca764e359678c5ec9eeb19647299297e_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{undo__index_8cpp_ab9c902ca2f9b11f45ebac16840d11c1b}\index{undo\_index.cpp@{undo\_index.cpp}!EXCEPTION\_TEST\_CASE@{EXCEPTION\_TEST\_CASE}}
+\index{EXCEPTION\_TEST\_CASE@{EXCEPTION\_TEST\_CASE}!undo\_index.cpp@{undo\_index.cpp}}
+\doxysubsubsection{\texorpdfstring{EXCEPTION\_TEST\_CASE()}{EXCEPTION\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [14/25]}}
+{\footnotesize\ttfamily \label{undo__index_8cpp_ab9c902ca2f9b11f45ebac16840d11c1b} 
+EXCEPTION\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{test\+\_\+modify\+\_\+push}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{undo__index_8cpp_source_l00229}{229}} of file \mbox{\hyperlink{undo__index_8cpp_source}{undo\+\_\+index.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00229\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00230\ \ \ \ \mbox{\hyperlink{classchainbase_1_1undo__index}{chainbase::undo\_index<test\_element\_t,\ test\_allocator<test\_element\_t>}},}
+\DoxyCodeLine{00231\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::multi\_index::ordered\_unique<key<\&test\_element\_t::id>>,}
+\DoxyCodeLine{00232\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::multi\_index::ordered\_unique<key<\&test\_element\_t::secondary>>>\ i0;}
+\DoxyCodeLine{00233\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_afbb66ff111fb5674e688e9c645a4387a}{emplace}}([](\mbox{\hyperlink{structtest__element__t}{test\_element\_t}}\&\ elem)\ \{\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.secondary\ =\ 42;\ \});}
+\DoxyCodeLine{00234\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0)-\/>secondary\ ==\ 42);}
+\DoxyCodeLine{00235\ \ \ \ \{}
+\DoxyCodeLine{00236\ \ \ \ \textcolor{keyword}{auto}\ undo\_checker\ =\ \mbox{\hyperlink{undo__index_8cpp_abfb06a99989a2e51fcd0eecf89bef42d}{capture\_state}}(i0);}
+\DoxyCodeLine{00237\ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}}\ =\ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_adc5e6e658a7578983547e8cef45f5bbb}{start\_undo\_session}}(\textcolor{keyword}{true});}
+\DoxyCodeLine{00238\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a31a8e53dc6969f383f655375f885b3f4}{modify}}(*i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0),\ [](\mbox{\hyperlink{structtest__element__t}{test\_element\_t}}\&\ elem)\ \{\ elem.secondary\ =\ 18;\ \});}
+\DoxyCodeLine{00239\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0)-\/>secondary\ ==\ 18);}
+\DoxyCodeLine{00240\ \ \ \ \mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}}.push();}
+\DoxyCodeLine{00241\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_ae1352619b41f48ca4fa190bc3e5cf7c3}{commit}}(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a3df30d97485f2f3e314a118f9573a10d}{revision}}());}
+\DoxyCodeLine{00242\ \ \ \ \}}
+\DoxyCodeLine{00243\ \ \ \ BOOST\_TEST(!i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a7b343e293e554f2797c6d703323e848c}{has\_undo\_session}}());}
+\DoxyCodeLine{00244\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0)-\/>secondary\ ==\ 18);}
+\DoxyCodeLine{00245\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{undo__index_8cpp_ab9c902ca2f9b11f45ebac16840d11c1b_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{undo__index_8cpp_ad8cec93200fdc4d4dcd219a56a9c9c03}\index{undo\_index.cpp@{undo\_index.cpp}!EXCEPTION\_TEST\_CASE@{EXCEPTION\_TEST\_CASE}}
+\index{EXCEPTION\_TEST\_CASE@{EXCEPTION\_TEST\_CASE}!undo\_index.cpp@{undo\_index.cpp}}
+\doxysubsubsection{\texorpdfstring{EXCEPTION\_TEST\_CASE()}{EXCEPTION\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [15/25]}}
+{\footnotesize\ttfamily \label{undo__index_8cpp_ad8cec93200fdc4d4dcd219a56a9c9c03} 
+EXCEPTION\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{test\+\_\+modify\+\_\+remove\+\_\+squash}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{undo__index_8cpp_source_l00440}{440}} of file \mbox{\hyperlink{undo__index_8cpp_source}{undo\+\_\+index.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00440\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00441\ \ \ \ \mbox{\hyperlink{classchainbase_1_1undo__index}{chainbase::undo\_index<test\_element\_t,\ test\_allocator<test\_element\_t>}},}
+\DoxyCodeLine{00442\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::multi\_index::ordered\_unique<key<\&test\_element\_t::id>>,}
+\DoxyCodeLine{00443\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::multi\_index::ordered\_unique<key<\&test\_element\_t::secondary>>>\ i0;}
+\DoxyCodeLine{00444\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_afbb66ff111fb5674e688e9c645a4387a}{emplace}}([](\mbox{\hyperlink{structtest__element__t}{test\_element\_t}}\&\ elem)\ \{\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.secondary\ =\ 42;\ \});}
+\DoxyCodeLine{00445\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0)-\/>secondary\ ==\ 42);}
+\DoxyCodeLine{00446\ \ \ \ \{}
+\DoxyCodeLine{00447\ \ \ \ \textcolor{keyword}{auto}\ undo\_checker\ =\ \mbox{\hyperlink{undo__index_8cpp_abfb06a99989a2e51fcd0eecf89bef42d}{capture\_state}}(i0);}
+\DoxyCodeLine{00448\ \ \ \ \textcolor{keyword}{auto}\ session1\ =\ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_adc5e6e658a7578983547e8cef45f5bbb}{start\_undo\_session}}(\textcolor{keyword}{true});}
+\DoxyCodeLine{00449\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a31a8e53dc6969f383f655375f885b3f4}{modify}}(*i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0),\ [](\mbox{\hyperlink{structtest__element__t}{test\_element\_t}}\&\ elem)\ \{\ elem.secondary\ =\ 18;\ \});}
+\DoxyCodeLine{00450\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0)-\/>secondary\ ==\ 18);}
+\DoxyCodeLine{00451\ \ \ \ \textcolor{keyword}{auto}\ session2\ =\ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_adc5e6e658a7578983547e8cef45f5bbb}{start\_undo\_session}}(\textcolor{keyword}{true});}
+\DoxyCodeLine{00452\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_afe2be6ce2b106da072497f383b86198d}{remove}}(*i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0));}
+\DoxyCodeLine{00453\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0)\ ==\ \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{00454\ \ \ \ session2.squash();}
+\DoxyCodeLine{00455\ \ \ \ \}}
+\DoxyCodeLine{00456\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0)-\/>secondary\ ==\ 42);}
+\DoxyCodeLine{00457\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{undo__index_8cpp_ad8cec93200fdc4d4dcd219a56a9c9c03_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{undo__index_8cpp_a34160b481dabf97ef426c3e0dc2aec28}\index{undo\_index.cpp@{undo\_index.cpp}!EXCEPTION\_TEST\_CASE@{EXCEPTION\_TEST\_CASE}}
+\index{EXCEPTION\_TEST\_CASE@{EXCEPTION\_TEST\_CASE}!undo\_index.cpp@{undo\_index.cpp}}
+\doxysubsubsection{\texorpdfstring{EXCEPTION\_TEST\_CASE()}{EXCEPTION\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [16/25]}}
+{\footnotesize\ttfamily \label{undo__index_8cpp_a34160b481dabf97ef426c3e0dc2aec28} 
+EXCEPTION\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{test\+\_\+modify\+\_\+remove\+\_\+undo}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{undo__index_8cpp_source_l00423}{423}} of file \mbox{\hyperlink{undo__index_8cpp_source}{undo\+\_\+index.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00423\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00424\ \ \ \ \mbox{\hyperlink{classchainbase_1_1undo__index}{chainbase::undo\_index<test\_element\_t,\ test\_allocator<test\_element\_t>}},}
+\DoxyCodeLine{00425\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::multi\_index::ordered\_unique<key<\&test\_element\_t::id>>,}
+\DoxyCodeLine{00426\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::multi\_index::ordered\_unique<key<\&test\_element\_t::secondary>>>\ i0;}
+\DoxyCodeLine{00427\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_afbb66ff111fb5674e688e9c645a4387a}{emplace}}([](\mbox{\hyperlink{structtest__element__t}{test\_element\_t}}\&\ elem)\ \{\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.secondary\ =\ 42;\ \});}
+\DoxyCodeLine{00428\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0)-\/>secondary\ ==\ 42);}
+\DoxyCodeLine{00429\ \ \ \ \{}
+\DoxyCodeLine{00430\ \ \ \ \textcolor{keyword}{auto}\ undo\_checker\ =\ \mbox{\hyperlink{undo__index_8cpp_abfb06a99989a2e51fcd0eecf89bef42d}{capture\_state}}(i0);}
+\DoxyCodeLine{00431\ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}}\ =\ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_adc5e6e658a7578983547e8cef45f5bbb}{start\_undo\_session}}(\textcolor{keyword}{true});}
+\DoxyCodeLine{00432\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a31a8e53dc6969f383f655375f885b3f4}{modify}}(*i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0),\ [](\mbox{\hyperlink{structtest__element__t}{test\_element\_t}}\&\ elem)\ \{\ elem.secondary\ =\ 18;\ \});}
+\DoxyCodeLine{00433\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0)-\/>secondary\ ==\ 18);}
+\DoxyCodeLine{00434\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_afe2be6ce2b106da072497f383b86198d}{remove}}(*i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0));}
+\DoxyCodeLine{00435\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0)\ ==\ \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{00436\ \ \ \ \}}
+\DoxyCodeLine{00437\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0)-\/>secondary\ ==\ 42);}
+\DoxyCodeLine{00438\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{undo__index_8cpp_a34160b481dabf97ef426c3e0dc2aec28_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{undo__index_8cpp_a57d440011f63bde88372008127105d7c}\index{undo\_index.cpp@{undo\_index.cpp}!EXCEPTION\_TEST\_CASE@{EXCEPTION\_TEST\_CASE}}
+\index{EXCEPTION\_TEST\_CASE@{EXCEPTION\_TEST\_CASE}!undo\_index.cpp@{undo\_index.cpp}}
+\doxysubsubsection{\texorpdfstring{EXCEPTION\_TEST\_CASE()}{EXCEPTION\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [17/25]}}
+{\footnotesize\ttfamily \label{undo__index_8cpp_a57d440011f63bde88372008127105d7c} 
+EXCEPTION\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{test\+\_\+modify\+\_\+squash}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{undo__index_8cpp_source_l00211}{211}} of file \mbox{\hyperlink{undo__index_8cpp_source}{undo\+\_\+index.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00212\ \ \ \ \mbox{\hyperlink{classchainbase_1_1undo__index}{chainbase::undo\_index<test\_element\_t,\ test\_allocator<test\_element\_t>}},}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::multi\_index::ordered\_unique<key<\&test\_element\_t::id>>,}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::multi\_index::ordered\_unique<key<\&test\_element\_t::secondary>>>\ i0;}
+\DoxyCodeLine{00215\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_afbb66ff111fb5674e688e9c645a4387a}{emplace}}([](\mbox{\hyperlink{structtest__element__t}{test\_element\_t}}\&\ elem)\ \{\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.secondary\ =\ 42;\ \});}
+\DoxyCodeLine{00216\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0)-\/>secondary\ ==\ 42);}
+\DoxyCodeLine{00217\ \ \ \ \{}
+\DoxyCodeLine{00218\ \ \ \ \textcolor{keyword}{auto}\ undo\_checker\ =\ \mbox{\hyperlink{undo__index_8cpp_abfb06a99989a2e51fcd0eecf89bef42d}{capture\_state}}(i0);}
+\DoxyCodeLine{00219\ \ \ \ \textcolor{keyword}{auto}\ session0\ =\ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_adc5e6e658a7578983547e8cef45f5bbb}{start\_undo\_session}}(\textcolor{keyword}{true});}
+\DoxyCodeLine{00220\ \ \ \ \textcolor{keyword}{auto}\ session1\ =\ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_adc5e6e658a7578983547e8cef45f5bbb}{start\_undo\_session}}(\textcolor{keyword}{true});}
+\DoxyCodeLine{00221\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a31a8e53dc6969f383f655375f885b3f4}{modify}}(*i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0),\ [](\mbox{\hyperlink{structtest__element__t}{test\_element\_t}}\&\ elem)\ \{\ elem.secondary\ =\ 18;\ \});}
+\DoxyCodeLine{00222\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0)-\/>secondary\ ==\ 18);}
+\DoxyCodeLine{00223\ \ \ \ session1.squash();}
+\DoxyCodeLine{00224\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0)-\/>secondary\ ==\ 18);}
+\DoxyCodeLine{00225\ \ \ \ \}}
+\DoxyCodeLine{00226\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0)-\/>secondary\ ==\ 42);}
+\DoxyCodeLine{00227\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{undo__index_8cpp_a57d440011f63bde88372008127105d7c_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{undo__index_8cpp_a5edf87a5d1775d0edcda10adcd72cb89}\index{undo\_index.cpp@{undo\_index.cpp}!EXCEPTION\_TEST\_CASE@{EXCEPTION\_TEST\_CASE}}
+\index{EXCEPTION\_TEST\_CASE@{EXCEPTION\_TEST\_CASE}!undo\_index.cpp@{undo\_index.cpp}}
+\doxysubsubsection{\texorpdfstring{EXCEPTION\_TEST\_CASE()}{EXCEPTION\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [18/25]}}
+{\footnotesize\ttfamily \label{undo__index_8cpp_a5edf87a5d1775d0edcda10adcd72cb89} 
+EXCEPTION\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{test\+\_\+modify\+\_\+undo}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{undo__index_8cpp_source_l00196}{196}} of file \mbox{\hyperlink{undo__index_8cpp_source}{undo\+\_\+index.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00197\ \ \ \ \mbox{\hyperlink{classchainbase_1_1undo__index}{chainbase::undo\_index<test\_element\_t,\ test\_allocator<test\_element\_t>}},}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::multi\_index::ordered\_unique<key<\&test\_element\_t::id>>,}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::multi\_index::ordered\_unique<key<\&test\_element\_t::secondary>>>\ i0;}
+\DoxyCodeLine{00200\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_afbb66ff111fb5674e688e9c645a4387a}{emplace}}([](\mbox{\hyperlink{structtest__element__t}{test\_element\_t}}\&\ elem)\ \{\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.secondary\ =\ 42;\ \});}
+\DoxyCodeLine{00201\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0)-\/>secondary\ ==\ 42);}
+\DoxyCodeLine{00202\ \ \ \ \{}
+\DoxyCodeLine{00203\ \ \ \ \textcolor{keyword}{auto}\ undo\_checker\ =\ \mbox{\hyperlink{undo__index_8cpp_abfb06a99989a2e51fcd0eecf89bef42d}{capture\_state}}(i0);}
+\DoxyCodeLine{00204\ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}}\ =\ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_adc5e6e658a7578983547e8cef45f5bbb}{start\_undo\_session}}(\textcolor{keyword}{true});}
+\DoxyCodeLine{00205\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a31a8e53dc6969f383f655375f885b3f4}{modify}}(*i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0),\ [](\mbox{\hyperlink{structtest__element__t}{test\_element\_t}}\&\ elem)\ \{\ elem.secondary\ =\ 18;\ \});}
+\DoxyCodeLine{00206\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0)-\/>secondary\ ==\ 18);}
+\DoxyCodeLine{00207\ \ \ \ \}}
+\DoxyCodeLine{00208\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0)-\/>secondary\ ==\ 42);}
+\DoxyCodeLine{00209\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{undo__index_8cpp_a5edf87a5d1775d0edcda10adcd72cb89_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{undo__index_8cpp_acd92c7ff5fb095b161dfd57f50458253}\index{undo\_index.cpp@{undo\_index.cpp}!EXCEPTION\_TEST\_CASE@{EXCEPTION\_TEST\_CASE}}
+\index{EXCEPTION\_TEST\_CASE@{EXCEPTION\_TEST\_CASE}!undo\_index.cpp@{undo\_index.cpp}}
+\doxysubsubsection{\texorpdfstring{EXCEPTION\_TEST\_CASE()}{EXCEPTION\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [19/25]}}
+{\footnotesize\ttfamily \label{undo__index_8cpp_acd92c7ff5fb095b161dfd57f50458253} 
+EXCEPTION\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{test\+\_\+remove\+\_\+push}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{undo__index_8cpp_source_l00280}{280}} of file \mbox{\hyperlink{undo__index_8cpp_source}{undo\+\_\+index.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00280\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00281\ \ \ \ \mbox{\hyperlink{classchainbase_1_1undo__index}{chainbase::undo\_index<test\_element\_t,\ test\_allocator<test\_element\_t>}},}
+\DoxyCodeLine{00282\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::multi\_index::ordered\_unique<key<\&test\_element\_t::id>>,}
+\DoxyCodeLine{00283\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::multi\_index::ordered\_unique<key<\&test\_element\_t::secondary>>>\ i0;}
+\DoxyCodeLine{00284\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_afbb66ff111fb5674e688e9c645a4387a}{emplace}}([](\mbox{\hyperlink{structtest__element__t}{test\_element\_t}}\&\ elem)\ \{\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.secondary\ =\ 42;\ \});}
+\DoxyCodeLine{00285\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0)-\/>secondary\ ==\ 42);}
+\DoxyCodeLine{00286\ \ \ \ \{}
+\DoxyCodeLine{00287\ \ \ \ \textcolor{keyword}{auto}\ undo\_checker\ =\ \mbox{\hyperlink{undo__index_8cpp_abfb06a99989a2e51fcd0eecf89bef42d}{capture\_state}}(i0);}
+\DoxyCodeLine{00288\ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}}\ =\ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_adc5e6e658a7578983547e8cef45f5bbb}{start\_undo\_session}}(\textcolor{keyword}{true});}
+\DoxyCodeLine{00289\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_afe2be6ce2b106da072497f383b86198d}{remove}}(*i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0));}
+\DoxyCodeLine{00290\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0)\ ==\ \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{00291\ \ \ \ \mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}}.push();}
+\DoxyCodeLine{00292\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_ae1352619b41f48ca4fa190bc3e5cf7c3}{commit}}(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a3df30d97485f2f3e314a118f9573a10d}{revision}}());}
+\DoxyCodeLine{00293\ \ \ \ \}}
+\DoxyCodeLine{00294\ \ \ \ BOOST\_TEST(!i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a7b343e293e554f2797c6d703323e848c}{has\_undo\_session}}());}
+\DoxyCodeLine{00295\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0)\ ==\ \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{00296\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{undo__index_8cpp_acd92c7ff5fb095b161dfd57f50458253_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{undo__index_8cpp_a86828350e699c267139b3f79bd0d3a20}\index{undo\_index.cpp@{undo\_index.cpp}!EXCEPTION\_TEST\_CASE@{EXCEPTION\_TEST\_CASE}}
+\index{EXCEPTION\_TEST\_CASE@{EXCEPTION\_TEST\_CASE}!undo\_index.cpp@{undo\_index.cpp}}
+\doxysubsubsection{\texorpdfstring{EXCEPTION\_TEST\_CASE()}{EXCEPTION\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [20/25]}}
+{\footnotesize\ttfamily \label{undo__index_8cpp_a86828350e699c267139b3f79bd0d3a20} 
+EXCEPTION\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{test\+\_\+remove\+\_\+squash}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{undo__index_8cpp_source_l00262}{262}} of file \mbox{\hyperlink{undo__index_8cpp_source}{undo\+\_\+index.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00262\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00263\ \ \ \ \mbox{\hyperlink{classchainbase_1_1undo__index}{chainbase::undo\_index<test\_element\_t,\ test\_allocator<test\_element\_t>}},}
+\DoxyCodeLine{00264\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::multi\_index::ordered\_unique<key<\&test\_element\_t::id>>,}
+\DoxyCodeLine{00265\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::multi\_index::ordered\_unique<key<\&test\_element\_t::secondary>>>\ i0;}
+\DoxyCodeLine{00266\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_afbb66ff111fb5674e688e9c645a4387a}{emplace}}([](\mbox{\hyperlink{structtest__element__t}{test\_element\_t}}\&\ elem)\ \{\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.secondary\ =\ 42;\ \});}
+\DoxyCodeLine{00267\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0)-\/>secondary\ ==\ 42);}
+\DoxyCodeLine{00268\ \ \ \ \{}
+\DoxyCodeLine{00269\ \ \ \ \textcolor{keyword}{auto}\ undo\_checker\ =\ \mbox{\hyperlink{undo__index_8cpp_abfb06a99989a2e51fcd0eecf89bef42d}{capture\_state}}(i0);}
+\DoxyCodeLine{00270\ \ \ \ \textcolor{keyword}{auto}\ session0\ =\ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_adc5e6e658a7578983547e8cef45f5bbb}{start\_undo\_session}}(\textcolor{keyword}{true});}
+\DoxyCodeLine{00271\ \ \ \ \textcolor{keyword}{auto}\ session1\ =\ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_adc5e6e658a7578983547e8cef45f5bbb}{start\_undo\_session}}(\textcolor{keyword}{true});}
+\DoxyCodeLine{00272\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_afe2be6ce2b106da072497f383b86198d}{remove}}(*i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0));}
+\DoxyCodeLine{00273\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0)\ ==\ \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{00274\ \ \ \ session1.squash();}
+\DoxyCodeLine{00275\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0)\ ==\ \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{00276\ \ \ \ \}}
+\DoxyCodeLine{00277\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0)-\/>secondary\ ==\ 42);}
+\DoxyCodeLine{00278\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{undo__index_8cpp_a86828350e699c267139b3f79bd0d3a20_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{undo__index_8cpp_ae72bc323eacfe322c18fe3e0de5575b4}\index{undo\_index.cpp@{undo\_index.cpp}!EXCEPTION\_TEST\_CASE@{EXCEPTION\_TEST\_CASE}}
+\index{EXCEPTION\_TEST\_CASE@{EXCEPTION\_TEST\_CASE}!undo\_index.cpp@{undo\_index.cpp}}
+\doxysubsubsection{\texorpdfstring{EXCEPTION\_TEST\_CASE()}{EXCEPTION\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [21/25]}}
+{\footnotesize\ttfamily \label{undo__index_8cpp_ae72bc323eacfe322c18fe3e0de5575b4} 
+EXCEPTION\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{test\+\_\+remove\+\_\+tracking\+\_\+no\+\_\+session}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{undo__index_8cpp_source_l00629}{629}} of file \mbox{\hyperlink{undo__index_8cpp_source}{undo\+\_\+index.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00629\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00630\ \ \ \ \mbox{\hyperlink{classchainbase_1_1undo__index}{chainbase::undo\_index<test\_element\_t,\ test\_allocator<test\_element\_t>}},}
+\DoxyCodeLine{00631\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::multi\_index::ordered\_unique<key<\&test\_element\_t::id>>,}
+\DoxyCodeLine{00632\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::multi\_index::ordered\_unique<key<\&test\_element\_t::secondary>>>\ i0;}
+\DoxyCodeLine{00633\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_afbb66ff111fb5674e688e9c645a4387a}{emplace}}([](\mbox{\hyperlink{structtest__element__t}{test\_element\_t}}\&\ elem)\ \{\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.secondary\ =\ 20;\ \});}
+\DoxyCodeLine{00634\ \ \ \ \textcolor{keyword}{auto}\ tracker\ =\ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a121754d1428e7e8f7989fcb566ebd2ea}{track\_removed}}();}
+\DoxyCodeLine{00635\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_afbb66ff111fb5674e688e9c645a4387a}{emplace}}([](\mbox{\hyperlink{structtest__element__t}{test\_element\_t}}\&\ elem)\ \{\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.secondary\ =\ 21;\ \});}
+\DoxyCodeLine{00636\ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structtest__element__t}{test\_element\_t}}\&\ elem0\ =\ *i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0);}
+\DoxyCodeLine{00637\ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structtest__element__t}{test\_element\_t}}\&\ elem1\ =\ *i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(1);}
+\DoxyCodeLine{00638\ \ \ \ BOOST\_CHECK(!tracker.is\_removed(elem0));}
+\DoxyCodeLine{00639\ \ \ \ BOOST\_CHECK(!tracker.is\_removed(elem1));}
+\DoxyCodeLine{00640\ \ \ \ tracker.remove(elem0);}
+\DoxyCodeLine{00641\ \ \ \ tracker.remove(elem1);}
+\DoxyCodeLine{00642\ \ \ \ BOOST\_CHECK(tracker.is\_removed(elem0));}
+\DoxyCodeLine{00643\ \ \ \ BOOST\_CHECK(tracker.is\_removed(elem1));}
+\DoxyCodeLine{00644\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{undo__index_8cpp_ae72bc323eacfe322c18fe3e0de5575b4_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{undo__index_8cpp_ada29d4e615e63998866339457b434107}\index{undo\_index.cpp@{undo\_index.cpp}!EXCEPTION\_TEST\_CASE@{EXCEPTION\_TEST\_CASE}}
+\index{EXCEPTION\_TEST\_CASE@{EXCEPTION\_TEST\_CASE}!undo\_index.cpp@{undo\_index.cpp}}
+\doxysubsubsection{\texorpdfstring{EXCEPTION\_TEST\_CASE()}{EXCEPTION\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [22/25]}}
+{\footnotesize\ttfamily \label{undo__index_8cpp_ada29d4e615e63998866339457b434107} 
+EXCEPTION\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{test\+\_\+remove\+\_\+tracking\+\_\+session}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{undo__index_8cpp_source_l00610}{610}} of file \mbox{\hyperlink{undo__index_8cpp_source}{undo\+\_\+index.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00610\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00611\ \ \ \ \mbox{\hyperlink{classchainbase_1_1undo__index}{chainbase::undo\_index<test\_element\_t,\ test\_allocator<test\_element\_t>}},}
+\DoxyCodeLine{00612\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::multi\_index::ordered\_unique<key<\&test\_element\_t::id>>,}
+\DoxyCodeLine{00613\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::multi\_index::ordered\_unique<key<\&test\_element\_t::secondary>>>\ i0;}
+\DoxyCodeLine{00614\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_afbb66ff111fb5674e688e9c645a4387a}{emplace}}([](\mbox{\hyperlink{structtest__element__t}{test\_element\_t}}\&\ elem)\ \{\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.secondary\ =\ 20;\ \});}
+\DoxyCodeLine{00615\ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}}\ =\ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_adc5e6e658a7578983547e8cef45f5bbb}{start\_undo\_session}}(\textcolor{keyword}{true});}
+\DoxyCodeLine{00616\ \ \ \ \textcolor{keyword}{auto}\ tracker\ =\ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a121754d1428e7e8f7989fcb566ebd2ea}{track\_removed}}();}
+\DoxyCodeLine{00617\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_afbb66ff111fb5674e688e9c645a4387a}{emplace}}([](\mbox{\hyperlink{structtest__element__t}{test\_element\_t}}\&\ elem)\ \{\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.secondary\ =\ 21;\ \});}
+\DoxyCodeLine{00618\ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structtest__element__t}{test\_element\_t}}\&\ elem0\ =\ *i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0);}
+\DoxyCodeLine{00619\ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structtest__element__t}{test\_element\_t}}\&\ elem1\ =\ *i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(1);}
+\DoxyCodeLine{00620\ \ \ \ BOOST\_CHECK(!tracker.is\_removed(elem0));}
+\DoxyCodeLine{00621\ \ \ \ BOOST\_CHECK(!tracker.is\_removed(elem1));}
+\DoxyCodeLine{00622\ \ \ \ tracker.remove(elem0);}
+\DoxyCodeLine{00623\ \ \ \ tracker.remove(elem1);}
+\DoxyCodeLine{00624\ \ \ \ BOOST\_CHECK(tracker.is\_removed(elem0));}
+\DoxyCodeLine{00625\ \ \ \ BOOST\_CHECK(tracker.is\_removed(elem1));}
+\DoxyCodeLine{00626\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{undo__index_8cpp_ada29d4e615e63998866339457b434107_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{undo__index_8cpp_a075f820800bdf2acc601c58b9ecde584}\index{undo\_index.cpp@{undo\_index.cpp}!EXCEPTION\_TEST\_CASE@{EXCEPTION\_TEST\_CASE}}
+\index{EXCEPTION\_TEST\_CASE@{EXCEPTION\_TEST\_CASE}!undo\_index.cpp@{undo\_index.cpp}}
+\doxysubsubsection{\texorpdfstring{EXCEPTION\_TEST\_CASE()}{EXCEPTION\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [23/25]}}
+{\footnotesize\ttfamily \label{undo__index_8cpp_a075f820800bdf2acc601c58b9ecde584} 
+EXCEPTION\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{test\+\_\+remove\+\_\+undo}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{undo__index_8cpp_source_l00247}{247}} of file \mbox{\hyperlink{undo__index_8cpp_source}{undo\+\_\+index.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00247\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00248\ \ \ \ \mbox{\hyperlink{classchainbase_1_1undo__index}{chainbase::undo\_index<test\_element\_t,\ test\_allocator<test\_element\_t>}},}
+\DoxyCodeLine{00249\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::multi\_index::ordered\_unique<key<\&test\_element\_t::id>>,}
+\DoxyCodeLine{00250\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::multi\_index::ordered\_unique<key<\&test\_element\_t::secondary>>>\ i0;}
+\DoxyCodeLine{00251\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_afbb66ff111fb5674e688e9c645a4387a}{emplace}}([](\mbox{\hyperlink{structtest__element__t}{test\_element\_t}}\&\ elem)\ \{\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.secondary\ =\ 42;\ \});}
+\DoxyCodeLine{00252\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0)-\/>secondary\ ==\ 42);}
+\DoxyCodeLine{00253\ \ \ \ \{}
+\DoxyCodeLine{00254\ \ \ \ \textcolor{keyword}{auto}\ undo\_checker\ =\ \mbox{\hyperlink{undo__index_8cpp_abfb06a99989a2e51fcd0eecf89bef42d}{capture\_state}}(i0);}
+\DoxyCodeLine{00255\ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}}\ =\ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_adc5e6e658a7578983547e8cef45f5bbb}{start\_undo\_session}}(\textcolor{keyword}{true});}
+\DoxyCodeLine{00256\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_afe2be6ce2b106da072497f383b86198d}{remove}}(*i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0));}
+\DoxyCodeLine{00257\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0)\ ==\ \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{00258\ \ \ \ \}}
+\DoxyCodeLine{00259\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0)-\/>secondary\ ==\ 42);}
+\DoxyCodeLine{00260\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{undo__index_8cpp_a075f820800bdf2acc601c58b9ecde584_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{undo__index_8cpp_ae9edcfd8e52175384b424bc555cc96f5}\index{undo\_index.cpp@{undo\_index.cpp}!EXCEPTION\_TEST\_CASE@{EXCEPTION\_TEST\_CASE}}
+\index{EXCEPTION\_TEST\_CASE@{EXCEPTION\_TEST\_CASE}!undo\_index.cpp@{undo\_index.cpp}}
+\doxysubsubsection{\texorpdfstring{EXCEPTION\_TEST\_CASE()}{EXCEPTION\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [24/25]}}
+{\footnotesize\ttfamily \label{undo__index_8cpp_ae9edcfd8e52175384b424bc555cc96f5} 
+EXCEPTION\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{test\+\_\+simple}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{undo__index_8cpp_source_l00095}{95}} of file \mbox{\hyperlink{undo__index_8cpp_source}{undo\+\_\+index.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00096\ \ \ \ \mbox{\hyperlink{classchainbase_1_1undo__index}{chainbase::undo\_index<basic\_element\_t,\ test\_allocator<basic\_element\_t>}},\ boost::multi\_index::ordered\_unique<key<\&basic\_element\_t::id>>>\ i0;}
+\DoxyCodeLine{00097\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_afbb66ff111fb5674e688e9c645a4387a}{emplace}}([](basic\_element\_t\&\ elem)\ \{\});}
+\DoxyCodeLine{00098\ \ \ \ \textcolor{keyword}{const}\ basic\_element\_t*\ element\ =\ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0);}
+\DoxyCodeLine{00099\ \ \ \ BOOST\_TEST((element\ !=\ \textcolor{keyword}{nullptr}\ \&\&\ element-\/>id\ ==\ 0));}
+\DoxyCodeLine{00100\ \ \ \ \textcolor{keyword}{const}\ basic\_element\_t*\ e1\ =\ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(1);}
+\DoxyCodeLine{00101\ \ \ \ BOOST\_TEST(e1\ ==\ \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{00102\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_afbb66ff111fb5674e688e9c645a4387a}{emplace}}([](basic\_element\_t\&\ elem)\ \{\});}
+\DoxyCodeLine{00103\ \ \ \ \textcolor{keyword}{const}\ basic\_element\_t*\ e2\ =\ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(1);}
+\DoxyCodeLine{00104\ \ \ \ BOOST\_TEST((e2\ !=\ \textcolor{keyword}{nullptr}\ \&\&\ e2-\/>id\ ==\ 1));}
+\DoxyCodeLine{00105\ }
+\DoxyCodeLine{00106\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a31a8e53dc6969f383f655375f885b3f4}{modify}}(*element,\ [](basic\_element\_t\&\ elem)\ \{\});}
+\DoxyCodeLine{00107\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_afe2be6ce2b106da072497f383b86198d}{remove}}(*element);}
+\DoxyCodeLine{00108\ \ \ \ element\ =\ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0);}
+\DoxyCodeLine{00109\ \ \ \ BOOST\_TEST(element\ ==\ \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{00110\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{undo__index_8cpp_ae9edcfd8e52175384b424bc555cc96f5_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{undo__index_8cpp_a5b6cc8baab9875dd6ddd8c66394ec8a6}\index{undo\_index.cpp@{undo\_index.cpp}!EXCEPTION\_TEST\_CASE@{EXCEPTION\_TEST\_CASE}}
+\index{EXCEPTION\_TEST\_CASE@{EXCEPTION\_TEST\_CASE}!undo\_index.cpp@{undo\_index.cpp}}
+\doxysubsubsection{\texorpdfstring{EXCEPTION\_TEST\_CASE()}{EXCEPTION\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [25/25]}}
+{\footnotesize\ttfamily \label{undo__index_8cpp_a5b6cc8baab9875dd6ddd8c66394ec8a6} 
+EXCEPTION\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{test\+\_\+squash\+\_\+one}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{undo__index_8cpp_source_l00459}{459}} of file \mbox{\hyperlink{undo__index_8cpp_source}{undo\+\_\+index.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00459\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00460\ \ \ \ \mbox{\hyperlink{classchainbase_1_1undo__index}{chainbase::undo\_index<test\_element\_t,\ test\_allocator<test\_element\_t>}},}
+\DoxyCodeLine{00461\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::multi\_index::ordered\_unique<key<\&test\_element\_t::id>>,}
+\DoxyCodeLine{00462\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::multi\_index::ordered\_unique<key<\&test\_element\_t::secondary>>>\ i0;}
+\DoxyCodeLine{00463\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_afbb66ff111fb5674e688e9c645a4387a}{emplace}}([](\mbox{\hyperlink{structtest__element__t}{test\_element\_t}}\&\ elem)\ \{\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}.secondary\ =\ 42;\ \});}
+\DoxyCodeLine{00464\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0)-\/>secondary\ ==\ 42);}
+\DoxyCodeLine{00465\ \ \ \ \{}
+\DoxyCodeLine{00466\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_a31a8e53dc6969f383f655375f885b3f4}{modify}}(*i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0),\ [](\mbox{\hyperlink{structtest__element__t}{test\_element\_t}}\&\ elem)\ \{\ elem.secondary\ =\ 18;\ \});}
+\DoxyCodeLine{00467\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0)-\/>secondary\ ==\ 18);}
+\DoxyCodeLine{00468\ \ \ \ \textcolor{keyword}{auto}\ session2\ =\ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_adc5e6e658a7578983547e8cef45f5bbb}{start\_undo\_session}}(\textcolor{keyword}{true});}
+\DoxyCodeLine{00469\ \ \ \ i0.\mbox{\hyperlink{classchainbase_1_1undo__index_afe2be6ce2b106da072497f383b86198d}{remove}}(*i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0));}
+\DoxyCodeLine{00470\ \ \ \ BOOST\_TEST(i0.\mbox{\hyperlink{classchainbase_1_1undo__index_aee3ebb0d705e55252c5e32ed5d21e068}{find}}(0)\ ==\ \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{00471\ \ \ \ session2.squash();}
+\DoxyCodeLine{00472\ \ \ \ \}}
+\DoxyCodeLine{00473\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{undo__index_8cpp_a5b6cc8baab9875dd6ddd8c66394ec8a6_cgraph}
+\end{center}
+\end{figure}

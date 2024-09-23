@@ -1,0 +1,172 @@
+\doxysection{WAST\+::Name Struct Reference}
+\hypertarget{struct_w_a_s_t_1_1_name}{}\label{struct_w_a_s_t_1_1_name}\index{WAST::Name@{WAST::Name}}
+
+
+{\ttfamily \#include $<$Parse.\+h$>$}
+
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_w_a_s_t_1_1_name_1_1_hasher}{Hasher}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_w_a_s_t_1_1_name_af9ee6fb43785ab6d92b9297edbea6de4}{Name}} ()
+\item 
+\mbox{\hyperlink{struct_w_a_s_t_1_1_name_a68f2457abeaacbfe8588a8b06f57ecbc}{Name}} (const char \texorpdfstring{$\ast$}{*}in\+Begin, \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}} in\+Num\+Chars)
+\item 
+\mbox{\hyperlink{struct_w_a_s_t_1_1_name_a6994b941937a146252c3655fbc60b8b4}{operator bool}} () const
+\item 
+std\+::string \mbox{\hyperlink{struct_w_a_s_t_1_1_name_acaddef876eb6fe1caf5c67998c3cc9b1}{get\+String}} () const
+\item 
+\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} \mbox{\hyperlink{struct_w_a_s_t_1_1_name_ab3c55e55bf620d048145d0215389ac1e}{get\+Char\+Offset}} (const char \texorpdfstring{$\ast$}{*}string) const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{struct_w_a_s_t_1_1_name_a32df73b17ea53322340af95b243e2cb6}{operator==}} (const \mbox{\hyperlink{struct_w_a_s_t_1_1_name}{Name}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, const \mbox{\hyperlink{struct_w_a_s_t_1_1_name}{Name}} \&b)
+\item 
+bool \mbox{\hyperlink{struct_w_a_s_t_1_1_name_a3fbfda14e91c2c3076d73d5411034800}{operator!=}} (const \mbox{\hyperlink{struct_w_a_s_t_1_1_name}{Name}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, const \mbox{\hyperlink{struct_w_a_s_t_1_1_name}{Name}} \&b)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{_parse_8h_source_l00048}{48}} of file \mbox{\hyperlink{_parse_8h_source}{Parse.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{struct_w_a_s_t_1_1_name_af9ee6fb43785ab6d92b9297edbea6de4}\index{WAST::Name@{WAST::Name}!Name@{Name}}
+\index{Name@{Name}!WAST::Name@{WAST::Name}}
+\doxysubsubsection{\texorpdfstring{Name()}{Name()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{struct_w_a_s_t_1_1_name_af9ee6fb43785ab6d92b9297edbea6de4} 
+WAST\+::\+Name\+::\+Name (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_8h_source_l00050}{50}} of file \mbox{\hyperlink{_parse_8h_source}{Parse.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00050\ :\ begin(\textcolor{keyword}{nullptr}),\ numChars(0),\ hash(0)\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{struct_w_a_s_t_1_1_name_a68f2457abeaacbfe8588a8b06f57ecbc}\index{WAST::Name@{WAST::Name}!Name@{Name}}
+\index{Name@{Name}!WAST::Name@{WAST::Name}}
+\doxysubsubsection{\texorpdfstring{Name()}{Name()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{struct_w_a_s_t_1_1_name_a68f2457abeaacbfe8588a8b06f57ecbc} 
+WAST\+::\+Name\+::\+Name (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{in\+Begin}{, }\item[{\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}}]{in\+Num\+Chars}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_8h_source_l00051}{51}} of file \mbox{\hyperlink{_parse_8h_source}{Parse.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ :\ begin(inBegin)}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ ,\ numChars(inNumChars)}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ ,\ hash(calcHash(inBegin,inNumChars))}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_w_a_s_t_1_1_name_ab3c55e55bf620d048145d0215389ac1e}\index{WAST::Name@{WAST::Name}!getCharOffset@{getCharOffset}}
+\index{getCharOffset@{getCharOffset}!WAST::Name@{WAST::Name}}
+\doxysubsubsection{\texorpdfstring{getCharOffset()}{getCharOffset()}}
+{\footnotesize\ttfamily \label{struct_w_a_s_t_1_1_name_ab3c55e55bf620d048145d0215389ac1e} 
+\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} WAST\+::\+Name\+::get\+Char\+Offset (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{string}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_8h_source_l00059}{59}} of file \mbox{\hyperlink{_parse_8h_source}{Parse.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00059\ \{\ \textcolor{keywordflow}{return}\ begin\ -\/\ string;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_w_a_s_t_1_1_name_acaddef876eb6fe1caf5c67998c3cc9b1}\index{WAST::Name@{WAST::Name}!getString@{getString}}
+\index{getString@{getString}!WAST::Name@{WAST::Name}}
+\doxysubsubsection{\texorpdfstring{getString()}{getString()}}
+{\footnotesize\ttfamily \label{struct_w_a_s_t_1_1_name_acaddef876eb6fe1caf5c67998c3cc9b1} 
+std\+::string WAST\+::\+Name\+::get\+String (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_8h_source_l00058}{58}} of file \mbox{\hyperlink{_parse_8h_source}{Parse.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00058\ \{\ \textcolor{keywordflow}{return}\ begin\ ?\ std::string(begin\ +\ 1,numChars\ -\/\ 1)\ :\ \mbox{\hyperlink{namespacestd}{std}}::string();\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_w_a_s_t_1_1_name_acaddef876eb6fe1caf5c67998c3cc9b1_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_w_a_s_t_1_1_name_a6994b941937a146252c3655fbc60b8b4}\index{WAST::Name@{WAST::Name}!operator bool@{operator bool}}
+\index{operator bool@{operator bool}!WAST::Name@{WAST::Name}}
+\doxysubsubsection{\texorpdfstring{operator bool()}{operator bool()}}
+{\footnotesize\ttfamily \label{struct_w_a_s_t_1_1_name_a6994b941937a146252c3655fbc60b8b4} 
+WAST\+::\+Name\+::operator bool (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_8h_source_l00057}{57}} of file \mbox{\hyperlink{_parse_8h_source}{Parse.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00057\ \{\ \textcolor{keywordflow}{return}\ begin\ !=\ \textcolor{keyword}{nullptr};\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{struct_w_a_s_t_1_1_name_a3fbfda14e91c2c3076d73d5411034800}\index{WAST::Name@{WAST::Name}!operator"!=@{operator"!=}}
+\index{operator"!=@{operator"!=}!WAST::Name@{WAST::Name}}
+\doxysubsubsection{\texorpdfstring{operator"!=}{operator!=}}
+{\footnotesize\ttfamily \label{struct_w_a_s_t_1_1_name_a3fbfda14e91c2c3076d73d5411034800} 
+bool operator!= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct_w_a_s_t_1_1_name}{Name}} \&}]{a}{, }\item[{const \mbox{\hyperlink{struct_w_a_s_t_1_1_name}{Name}} \&}]{b}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_8h_source_l00065}{65}} of file \mbox{\hyperlink{_parse_8h_source}{Parse.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ ==\ b);}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_w_a_s_t_1_1_name_a32df73b17ea53322340af95b243e2cb6}\index{WAST::Name@{WAST::Name}!operator==@{operator==}}
+\index{operator==@{operator==}!WAST::Name@{WAST::Name}}
+\doxysubsubsection{\texorpdfstring{operator==}{operator==}}
+{\footnotesize\ttfamily \label{struct_w_a_s_t_1_1_name_a32df73b17ea53322340af95b243e2cb6} 
+bool operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct_w_a_s_t_1_1_name}{Name}} \&}]{a}{, }\item[{const \mbox{\hyperlink{struct_w_a_s_t_1_1_name}{Name}} \&}]{b}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_8h_source_l00061}{61}} of file \mbox{\hyperlink{_parse_8h_source}{Parse.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.hash\ ==\ b.hash\ \&\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.numChars\ ==\ b.numChars\ \&\&\ memcmp(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.begin,b.begin,\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.numChars)\ ==\ 0;}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/wasm-\/jit/\+Source/\+WAST/\mbox{\hyperlink{_parse_8h}{Parse.\+h}}\item 
+libraries/wasm-\/jit/\+Source/\+WAST/\mbox{\hyperlink{_parse_8cpp}{Parse.\+cpp}}\end{DoxyCompactItemize}

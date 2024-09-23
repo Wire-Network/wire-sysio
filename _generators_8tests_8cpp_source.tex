@@ -1,0 +1,214 @@
+\doxysection{Generators.\+tests.\+cpp}
+\hypertarget{_generators_8tests_8cpp_source}{}\label{_generators_8tests_8cpp_source}\index{libraries/sys-\/vm/external/Catch2/projects/SelfTest/UsageTests/Generators.tests.cpp@{libraries/sys-\/vm/external/Catch2/projects/SelfTest/UsageTests/Generators.tests.cpp}}
+\mbox{\hyperlink{_generators_8tests_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ "{}catch.hpp"{}}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <cstring>}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00006}00006\ \textcolor{comment}{//\ Generators\ and\ sections\ can\ be\ nested\ freely}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00007}\mbox{\hyperlink{_generators_8tests_8cpp_a8bba8a9ec44430e3323ebcd4e87c4dde}{00007}}\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\textcolor{stringliteral}{"{}Generators\ -\/-\/\ simple"{}},\ \textcolor{stringliteral}{"{}[generators]"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00008}00008\ \ \ \ \ \textcolor{keyword}{auto}\ i\ =\ \mbox{\hyperlink{catch__generators_8hpp_a4941c6427cfa36ee7c52d734e460f9df}{GENERATE}}(1,\ 2,\ 3);}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00009}00009\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\textcolor{stringliteral}{"{}one"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00010}00010\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ =\ \mbox{\hyperlink{catch__generators_8hpp_a4941c6427cfa36ee7c52d734e460f9df}{GENERATE}}(values(\{\ -\/3,\ -\/2,\ -\/1\ \}));}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00011}00011\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ <\ i);}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00012}00012\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00014}00014\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\textcolor{stringliteral}{"{}two"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00015}00015\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ You\ can\ also\ explicitly\ set\ type\ for\ generators\ via\ Catch::Generators::as}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00016}00016\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ str\ =\ \mbox{\hyperlink{catch__generators_8hpp_a4941c6427cfa36ee7c52d734e460f9df}{GENERATE}}(as<std::string>\{\},\ \textcolor{stringliteral}{"{}a"{}},\ \textcolor{stringliteral}{"{}bb"{}},\ \textcolor{stringliteral}{"{}ccc"{}});}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00017}00017\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(4u\ *\ i\ >\ str.size());}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00018}00018\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00019}00019\ \}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00021}00021\ \textcolor{comment}{//\ You\ can\ create\ a\ cartesian-\/product\ of\ generators\ by\ creating\ multiple\ ones}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00022}\mbox{\hyperlink{_generators_8tests_8cpp_ad7c3d8015365a380b5a62164a6accb45}{00022}}\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\textcolor{stringliteral}{"{}3x3x3\ ints"{}},\ \textcolor{stringliteral}{"{}[generators]"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00023}00023\ \ \ \ \ \textcolor{keyword}{auto}\ x\ =\ \mbox{\hyperlink{catch__generators_8hpp_a4941c6427cfa36ee7c52d734e460f9df}{GENERATE}}(1,\ 2,\ 3);}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00024}00024\ \ \ \ \ \textcolor{keyword}{auto}\ y\ =\ \mbox{\hyperlink{catch__generators_8hpp_a4941c6427cfa36ee7c52d734e460f9df}{GENERATE}}(4,\ 5,\ 6);}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00025}00025\ \ \ \ \ \textcolor{keyword}{auto}\ z\ =\ \mbox{\hyperlink{catch__generators_8hpp_a4941c6427cfa36ee7c52d734e460f9df}{GENERATE}}(7,\ 8,\ 9);}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00026}00026\ \ \ \ \ \textcolor{comment}{//\ These\ assertions\ will\ be\ run\ 27\ times\ (3x3x3)}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00027}00027\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(x\ <\ y);}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00028}00028\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(y\ <\ z);}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00029}00029\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(x\ <\ z);}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00030}00030\ \}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00032}00032\ \textcolor{comment}{//\ You\ can\ also\ create\ data\ tuples}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00033}\mbox{\hyperlink{_generators_8tests_8cpp_a6d771e2fd2465a5274129d1725fa5e99}{00033}}\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\textcolor{stringliteral}{"{}tables"{}},\ \textcolor{stringliteral}{"{}[generators]"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00034}00034\ \ \ \ \ \textcolor{comment}{//\ Note\ that\ this\ will\ not\ compile\ with\ libstdc++\ older\ than\ libstdc++6}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00035}00035\ \ \ \ \ \textcolor{comment}{//\ See\ https://stackoverflow.com/questions/12436586/tuple-\/vector-\/and-\/initializer-\/list}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00036}00036\ \ \ \ \ \textcolor{comment}{//\ for\ possible\ workarounds}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00037}00037\ \ \ \ \ \textcolor{comment}{//\ \ \ \ auto\ data\ =\ GENERATE(table<char\ const*,\ int>(\{}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00038}00038\ \ \ \ \ \textcolor{comment}{//\ \ \ \ \ \ \ \ \{"{}first"{},\ 5\},}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00039}00039\ \ \ \ \ \textcolor{comment}{//\ \ \ \ \ \ \ \ \{"{}second"{},\ 6\},}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00040}00040\ \ \ \ \ \textcolor{comment}{//\ \ \ \ \ \ \ \ \{"{}third"{},\ 5\},}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00041}00041\ \ \ \ \ \textcolor{comment}{//\ \ \ \ \ \ \ \ \{"{}etc..."{},\ 6\}}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00042}00042\ \ \ \ \ \textcolor{comment}{//\ \ \ \ \}));}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00044}00044\ \ \ \ \ \textcolor{comment}{//\ Workaround\ for\ the\ libstdc++\ bug\ mentioned\ above}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00045}00045\ \ \ \ \ \textcolor{keyword}{using\ }tuple\_type\ =\ std::tuple<char\ const*,\ int>;}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00046}00046\ \ \ \ \ \textcolor{keyword}{auto}\ data\ =\ \mbox{\hyperlink{catch__generators_8hpp_a4941c6427cfa36ee7c52d734e460f9df}{GENERATE}}(table<char\ const*,\ int>(\{}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00047}00047\ \ \ \ \ \ \ \ \ tuple\_type\{\textcolor{stringliteral}{"{}first"{}},\ 5\},}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00048}00048\ \ \ \ \ \ \ \ \ tuple\_type\{\textcolor{stringliteral}{"{}second"{}},\ 6\},}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00049}00049\ \ \ \ \ \ \ \ \ tuple\_type\{\textcolor{stringliteral}{"{}third"{}},\ 5\},}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00050}00050\ \ \ \ \ \ \ \ \ tuple\_type\{\textcolor{stringliteral}{"{}etc..."{}},\ 6\}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00051}00051\ \ \ \ \ \}));}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00052}00052\ }
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00053}00053\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(strlen(std::get<0>(data))\ ==\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(std::get<1>(data)));}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00054}00054\ \}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00057}00057\ \textcolor{preprocessor}{\#ifdef\ \_\_cpp\_structured\_bindings}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00059}00059\ \textcolor{comment}{//\ Structured\ bindings\ make\ the\ table\ utility\ much\ nicer\ to\ use}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00060}00060\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\ \textcolor{stringliteral}{"{}strlen2"{}},\ \textcolor{stringliteral}{"{}[approvals][generators]"{}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00061}00061\ \ \ \ \ \textcolor{keyword}{auto}\ [test\_input,\ expected]\ =\ \mbox{\hyperlink{catch__generators_8hpp_a4941c6427cfa36ee7c52d734e460f9df}{GENERATE}}(\ table<std::string,\ size\_t>(\{}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00062}00062\ \ \ \ \ \ \ \ \ \ \ \ \ \{\textcolor{stringliteral}{"{}one"{}},\ 3\},}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \ \ \ \{\textcolor{stringliteral}{"{}two"{}},\ 3\},}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00064}00064\ \ \ \ \ \ \ \ \ \ \ \ \ \{\textcolor{stringliteral}{"{}three"{}},\ 5\},}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00065}00065\ \ \ \ \ \ \ \ \ \ \ \ \ \{\textcolor{stringliteral}{"{}four"{}},\ 4\}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00066}00066\ \ \ \ \ \ \ \ \ \}));}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00067}00067\ }
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00068}00068\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ test\_input.size()\ ==\ expected\ );}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00069}00069\ \}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00070}00070\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00073}00073\ \textcolor{comment}{//\ An\ alternate\ way\ of\ doing\ data\ tables\ without\ structured\ bindings}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00074}\mbox{\hyperlink{struct_data_ac3c2f07e1739feefa1f8106cc504c3d2}{00074}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_data}{Data}}\ \{\ std::string\ \mbox{\hyperlink{struct_data_a4d40e1394840a17930a6da4547e3b74a}{str}};\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{struct_data_ac3c2f07e1739feefa1f8106cc504c3d2}{len}};\ \};}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00075}00075\ }
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00076}\mbox{\hyperlink{_generators_8tests_8cpp_a76b81a6c2b20c7cf48665a639dc9f936}{00076}}\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\ \textcolor{stringliteral}{"{}strlen3"{}},\ \textcolor{stringliteral}{"{}[generators]"{}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00077}00077\ \ \ \ \ \textcolor{keyword}{auto}\ data\ =\ \mbox{\hyperlink{catch__generators_8hpp_a4941c6427cfa36ee7c52d734e460f9df}{GENERATE}}(\ values<Data>(\{}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00078}00078\ \ \ \ \ \ \ \ \ \ \ \ \ \{\textcolor{stringliteral}{"{}one"{}},\ 3\},}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \ \ \ \{\textcolor{stringliteral}{"{}two"{}},\ 3\},}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00080}00080\ \ \ \ \ \ \ \ \ \ \ \ \ \{\textcolor{stringliteral}{"{}three"{}},\ 5\},}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00081}00081\ \ \ \ \ \ \ \ \ \ \ \ \ \{\textcolor{stringliteral}{"{}four"{}},\ 4\}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00082}00082\ \ \ \ \ \ \ \ \ \}));}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00083}00083\ }
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00084}00084\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ data.str.size()\ ==\ data.len\ );}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00085}00085\ \}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00086}00086\ }
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00087}00087\ }
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00088}00088\ }
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00089}00089\ \textcolor{preprocessor}{\#ifdef\ \_\_cpp\_structured\_bindings}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00090}00090\ }
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00091}00091\ \textcolor{comment}{//\ Based\ on\ example\ from\ https://docs.cucumber.io/gherkin/reference/\#scenario-\/outline}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00092}00092\ \textcolor{comment}{//\ (thanks\ to\ https://github.com/catchorg/Catch2/issues/850\#issuecomment-\/399504851)}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00093}00093\ }
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00094}00094\ \textcolor{comment}{//\ Note\ that\ GIVEN,\ WHEN,\ and\ THEN\ now\ forward\ onto\ DYNAMIC\_SECTION\ instead\ of\ SECTION.}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00095}00095\ \textcolor{comment}{//\ DYNAMIC\_SECTION\ takes\ its\ name\ as\ a\ stringstream-\/style\ expression,\ so\ can\ be\ formatted\ using}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00096}00096\ \textcolor{comment}{//\ variables\ in\ scope\ -\/\ such\ as\ the\ generated\ variables\ here.\ This\ reads\ quite\ nicely\ in\ the}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00097}00097\ \textcolor{comment}{//\ test\ name\ output\ (the\ full\ scenario\ description).}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00098}00098\ }
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00099}00099\ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ eatCucumbers(\ \textcolor{keywordtype}{int}\ start,\ \textcolor{keywordtype}{int}\ eat\ )\ -\/>\ \textcolor{keywordtype}{int}\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103aea2b2676c28c0db26d39331a336c6b92}{start}}-\/eat;\ \}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00100}00100\ }
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00101}00101\ \mbox{\hyperlink{include_2catch_8hpp_acf8f441c7b9d70251ccbb7ccd8b83183}{SCENARIO}}(\textcolor{stringliteral}{"{}Eating\ cucumbers"{}},\ \textcolor{stringliteral}{"{}[generators][approvals]"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00102}00102\ }
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00103}00103\ \ \ \ \ \textcolor{keyword}{auto}\ [\mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103aea2b2676c28c0db26d39331a336c6b92}{start}},\ eat,\ left]\ =\ \mbox{\hyperlink{catch__generators_8hpp_a4941c6427cfa36ee7c52d734e460f9df}{GENERATE}}(\ table<int,int,int>\ (\{}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00104}00104\ \ \ \ \ \ \ \ \ \ \ \ \ \{\ 12,\ 5,\ 7\ \},}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00105}00105\ \ \ \ \ \ \ \ \ \ \ \ \ \{\ 20,\ 5,\ 15\ \}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00106}00106\ \ \ \ \ \ \ \ \ \}));}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00107}00107\ }
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00108}00108\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a2b70c603786d759242856d883dbe93bd}{GIVEN}}(\ \textcolor{stringliteral}{"{}there\ are\ "{}}\ <<\ start\ <<\ \textcolor{stringliteral}{"{}\ cucumbers"{}}\ )}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00109}00109\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ab09e9b8186233f676ce6a23aebe89d6e}{WHEN}}(\ "{}I\ eat\ "{}\ <<\ eat\ <<\ "{}\ cucumbers"{}\ )}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00110}00110\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a27987092139727fd7a471b5f74dc62de}{THEN}}(\ "{}I\ should\ have\ "{}\ <<\ left\ <<\ "{}\ cucumbers"{}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00111}00111\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ eatCucumbers(\ start,\ eat\ )\ ==\ left\ );}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00112}00112\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00113}00113\ \}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00114}00114\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00115}00115\ }
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00116}00116\ \textcolor{comment}{//\ There\ are\ also\ some\ generic\ generator\ manipulators}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00117}\mbox{\hyperlink{_generators_8tests_8cpp_a3ade5e0369a2375dd642b71af413068f}{00117}}\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\textcolor{stringliteral}{"{}Generators\ -\/-\/\ adapters"{}},\ \textcolor{stringliteral}{"{}[generators][generic]"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00118}00118\ \ \ \ \ \textcolor{comment}{//\ TODO:\ This\ won't\ work\ yet,\ introduce\ GENERATE\_VAR?}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00119}00119\ \ \ \ \ \textcolor{comment}{//auto\ numbers\ =\ Catch::Generators::values(\{\ 1,\ 2,\ 3,\ 4,\ 5,\ 6\ \});}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00120}00120\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\textcolor{stringliteral}{"{}Filtering\ by\ predicate"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00121}00121\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\textcolor{stringliteral}{"{}Basic\ usage"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00122}00122\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ This\ filters\ out\ all\ odd\ (false)\ numbers,\ giving\ [2,\ 4,\ 6]}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00123}00123\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ i\ =\ \mbox{\hyperlink{catch__generators_8hpp_a4941c6427cfa36ee7c52d734e460f9df}{GENERATE}}(filter([]\ (\textcolor{keywordtype}{int}\ val)\ \{\ \textcolor{keywordflow}{return}\ val\ \%\ 2\ ==\ 0;\ \},\ values(\{\ 1,\ 2,\ 3,\ 4,\ 5,\ 6\ \})));}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00124}00124\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(i\ \%\ 2\ ==\ 0);}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00125}00125\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00126}00126\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\textcolor{stringliteral}{"{}Throws\ if\ there\ are\ no\ matching\ values"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00127}00127\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespace_catch_1_1_generators}{Catch::Generators}};}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00128}00128\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ae24a059e3c28ff3eea69be48282f5f81}{REQUIRE\_THROWS\_AS}}(filter([]\ (\textcolor{keywordtype}{int})\ \{\textcolor{keywordflow}{return}\ \textcolor{keyword}{false};\ \},\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}(1)),\ \mbox{\hyperlink{class_catch_1_1_generator_exception}{Catch::GeneratorException}});}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00129}00129\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00130}00130\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00131}00131\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\textcolor{stringliteral}{"{}Shortening\ a\ range"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00132}00132\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ This\ takes\ the\ first\ 3\ elements\ from\ the\ values,\ giving\ back\ [1,\ 2,\ 3]}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00133}00133\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ i\ =\ \mbox{\hyperlink{catch__generators_8hpp_a4941c6427cfa36ee7c52d734e460f9df}{GENERATE}}(take(3,\ values(\{\ 1,\ 2,\ 3,\ 4,\ 5,\ 6\ \})));}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00134}00134\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(i\ <\ 4);}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00135}00135\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00136}00136\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\textcolor{stringliteral}{"{}Transforming\ elements"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00137}00137\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\textcolor{stringliteral}{"{}Same\ type"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00138}00138\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ This\ doubles\ values\ [1,\ 2,\ 3]\ into\ [2,\ 4,\ 6]}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00139}00139\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ i\ =\ \mbox{\hyperlink{catch__generators_8hpp_a4941c6427cfa36ee7c52d734e460f9df}{GENERATE}}(map([]\ (\textcolor{keywordtype}{int}\ val)\ \{\ \textcolor{keywordflow}{return}\ val\ *\ 2;\ \},\ values(\{\ 1,\ 2,\ 3\ \})));}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00140}00140\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(i\ \%\ 2\ ==\ 0);}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00141}00141\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00142}00142\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\textcolor{stringliteral}{"{}Different\ type"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00143}00143\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ This\ takes\ a\ generator\ that\ returns\ ints\ and\ maps\ them\ into\ strings}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00144}00144\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ i\ =\ \mbox{\hyperlink{catch__generators_8hpp_a4941c6427cfa36ee7c52d734e460f9df}{GENERATE}}(map<std::string>([]\ (\textcolor{keywordtype}{int}\ val)\ \{\ \textcolor{keywordflow}{return}\ std::to\_string(val);\ \},\ values(\{\ 1,\ 2,\ 3\ \})));}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00145}00145\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(i.size()\ ==\ 1);}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00146}00146\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00147}00147\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\textcolor{stringliteral}{"{}Different\ deduced\ type"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00148}00148\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ This\ takes\ a\ generator\ that\ returns\ ints\ and\ maps\ them\ into\ strings}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00149}00149\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ i\ =\ \mbox{\hyperlink{catch__generators_8hpp_a4941c6427cfa36ee7c52d734e460f9df}{GENERATE}}(map([]\ (\textcolor{keywordtype}{int}\ val)\ \{\ \textcolor{keywordflow}{return}\ std::to\_string(val);\ \},\ values(\{\ 1,\ 2,\ 3\ \})));}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00150}00150\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(i.size()\ ==\ 1);}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00151}00151\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00152}00152\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00153}00153\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\textcolor{stringliteral}{"{}Repeating\ a\ generator"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00154}00154\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ This\ will\ return\ values\ [1,\ 2,\ 3,\ 1,\ 2,\ 3]}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00155}00155\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ =\ \mbox{\hyperlink{catch__generators_8hpp_a4941c6427cfa36ee7c52d734e460f9df}{GENERATE}}(repeat(2,\ values(\{\ 1,\ 2,\ 3\ \})));}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00156}00156\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ >\ 0);}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00157}00157\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00158}00158\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\textcolor{stringliteral}{"{}Chunking\ a\ generator\ into\ sized\ pieces"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00159}00159\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\textcolor{stringliteral}{"{}Number\ of\ elements\ in\ source\ is\ divisible\ by\ chunk\ size"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00160}00160\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ chunk2\ =\ \mbox{\hyperlink{catch__generators_8hpp_a4941c6427cfa36ee7c52d734e460f9df}{GENERATE}}(chunk(2,\ values(\{\ 1,\ 1,\ 2,\ 2,\ 3,\ 3\ \})));}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00161}00161\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(chunk2.size()\ ==\ 2);}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00162}00162\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(chunk2.front()\ ==\ chunk2.back());}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00163}00163\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00164}00164\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\textcolor{stringliteral}{"{}Number\ of\ elements\ in\ source\ is\ not\ divisible\ by\ chunk\ size"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00165}00165\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ chunk2\ =\ \mbox{\hyperlink{catch__generators_8hpp_a4941c6427cfa36ee7c52d734e460f9df}{GENERATE}}(chunk(2,\ values(\{\ 1,\ 1,\ 2,\ 2,\ 3\ \})));}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00166}00166\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(chunk2.size()\ ==\ 2);}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00167}00167\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(chunk2.front()\ ==\ chunk2.back());}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00168}00168\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(chunk2.front()\ <\ 3);}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00169}00169\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00170}00170\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\textcolor{stringliteral}{"{}Throws\ on\ too\ small\ generators"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00171}00171\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespace_catch_1_1_generators}{Catch::Generators}};}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00172}00172\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ae24a059e3c28ff3eea69be48282f5f81}{REQUIRE\_THROWS\_AS}}(chunk(2,\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}(1)),\ \mbox{\hyperlink{class_catch_1_1_generator_exception}{Catch::GeneratorException}});}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00173}00173\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00174}00174\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00175}00175\ \}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00176}00176\ }
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00177}00177\ \textcolor{comment}{//\ Note\ that\ because\ of\ the\ non-\/reproducibility\ of\ distributions,}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00178}00178\ \textcolor{comment}{//\ anything\ involving\ the\ random\ generators\ cannot\ be\ part\ of\ approvals}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00179}\mbox{\hyperlink{_generators_8tests_8cpp_addcab25ff178f57752b6bbb8afe6e0c1}{00179}}\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\textcolor{stringliteral}{"{}Random\ generator"{}},\ \textcolor{stringliteral}{"{}[generators][.][approvals]"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00180}00180\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\textcolor{stringliteral}{"{}Infer\ int\ from\ integral\ arguments"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00181}00181\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ val\ =\ \mbox{\hyperlink{catch__generators_8hpp_a4941c6427cfa36ee7c52d734e460f9df}{GENERATE}}(take(4,\ \mbox{\hyperlink{yubico__otp_8c_a7ba1784f91d04c32f9b3139bc6fd8137}{random}}(0,\ 1)));}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00182}00182\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_abad9ff23b730469f209b010e0ac4687c}{STATIC\_REQUIRE}}(std::is\_same<\textcolor{keyword}{decltype}(val),\ \textcolor{keywordtype}{int}>\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{::value}});}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00183}00183\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{void}\textcolor{keyword}{>}(val);\ \textcolor{comment}{//\ Silence\ VS\ 2015\ unused\ variable\ warning}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00184}00184\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00185}00185\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\textcolor{stringliteral}{"{}Infer\ double\ from\ double\ arguments"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00186}00186\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ val\ =\ \mbox{\hyperlink{catch__generators_8hpp_a4941c6427cfa36ee7c52d734e460f9df}{GENERATE}}(take(4,\ \mbox{\hyperlink{yubico__otp_8c_a7ba1784f91d04c32f9b3139bc6fd8137}{random}}(0.,\ 1.)));}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00187}00187\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_abad9ff23b730469f209b010e0ac4687c}{STATIC\_REQUIRE}}(std::is\_same<\textcolor{keyword}{decltype}(val),\ \textcolor{keywordtype}{double}>\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{::value}});}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00188}00188\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{void}\textcolor{keyword}{>}(val);\ \textcolor{comment}{//\ Silence\ VS\ 2015\ unused\ variable\ warning}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00189}00189\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00190}00190\ \}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00191}00191\ }
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00192}00192\ }
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00193}\mbox{\hyperlink{_generators_8tests_8cpp_ae57be069f420c7112469992e278378c7}{00193}}\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\textcolor{stringliteral}{"{}Nested\ generators\ and\ captured\ variables"{}},\ \textcolor{stringliteral}{"{}[generators]"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00194}00194\ \ \ \ \ \textcolor{comment}{//\ Workaround\ for\ old\ libstdc++}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00195}00195\ \ \ \ \ \textcolor{keyword}{using\ }record\ =\ std::tuple<int,\ int>;}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00196}00196\ \ \ \ \ \textcolor{comment}{//\ Set\ up\ 3\ ranges\ to\ generate\ numbers\ from}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00197}00197\ \ \ \ \ \textcolor{keyword}{auto}\ extent\ =\ \mbox{\hyperlink{catch__generators_8hpp_a4941c6427cfa36ee7c52d734e460f9df}{GENERATE}}(table<int,\ int>(\{}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00198}00198\ \ \ \ \ \ \ \ \ record\{3,\ 7\},}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00199}00199\ \ \ \ \ \ \ \ \ record\{-\/5,\ -\/3\},}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00200}00200\ \ \ \ \ \ \ \ \ record\{90,\ 100\}}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00201}00201\ \ \ \ \ \}));}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00202}00202\ }
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00203}00203\ \ \ \ \ \textcolor{keyword}{auto}\ from\ =\ std::get<0>(extent);}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00204}00204\ \ \ \ \ \textcolor{keyword}{auto}\ to\ =\ std::get<1>(extent);}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00205}00205\ }
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00206}00206\ \ \ \ \ \textcolor{keyword}{auto}\ values\ =\ \mbox{\hyperlink{catch__generators_8hpp_a44e2fff00253a218f0a392ad6abac624}{GENERATE\_COPY}}(range(from,\ to));}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00207}00207\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(values\ >\ -\/6);}
+\DoxyCodeLine{\Hypertarget{_generators_8tests_8cpp_source_l00208}00208\ \}}
+
+\end{DoxyCode}

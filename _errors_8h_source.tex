@@ -1,0 +1,37 @@
+\doxysection{Errors.\+h}
+\hypertarget{_errors_8h_source}{}\label{_errors_8h_source}\index{libraries/wasm-\/jit/Include/Inline/Errors.h@{libraries/wasm-\/jit/Include/Inline/Errors.h}}
+\mbox{\hyperlink{_errors_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_errors_8h_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{_errors_8h_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_errors_8h_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <stdarg.h>}}
+\DoxyCodeLine{\Hypertarget{_errors_8h_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <assert.h>}}
+\DoxyCodeLine{\Hypertarget{_errors_8h_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <cstdio>}}
+\DoxyCodeLine{\Hypertarget{_errors_8h_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <cstdlib>}}
+\DoxyCodeLine{\Hypertarget{_errors_8h_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <stdexcept>}}
+\DoxyCodeLine{\Hypertarget{_errors_8h_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{_errors_8h_source_l00009}\mbox{\hyperlink{namespace_errors}{00009}}\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_errors}{Errors}}}
+\DoxyCodeLine{\Hypertarget{_errors_8h_source_l00010}00010\ \{}
+\DoxyCodeLine{\Hypertarget{_errors_8h_source_l00011}00011\ \ \ \ \ \textcolor{comment}{//\ Fatal\ error\ handling.}}
+\DoxyCodeLine{\Hypertarget{_errors_8h_source_l00012}\mbox{\hyperlink{namespace_errors_a719a329951edb01e45afe1443dfa2a92}{00012}}\ \ \ \ \ [[noreturn]]\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespace_errors_a719a329951edb01e45afe1443dfa2a92}{fatalf}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ messageFormat,...)}
+\DoxyCodeLine{\Hypertarget{_errors_8h_source_l00013}00013\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_errors_8h_source_l00014}00014\ \ \ \ \ \ \ \ \ va\_list\ varArgs;}
+\DoxyCodeLine{\Hypertarget{_errors_8h_source_l00015}00015\ \ \ \ \ \ \ \ \ va\_start(varArgs,messageFormat);}
+\DoxyCodeLine{\Hypertarget{_errors_8h_source_l00016}00016\ \ \ \ \ \ \ \ \ std::vfprintf(stderr,messageFormat,varArgs);}
+\DoxyCodeLine{\Hypertarget{_errors_8h_source_l00017}00017\ \ \ \ \ \ \ \ \ std::fflush(stderr);}
+\DoxyCodeLine{\Hypertarget{_errors_8h_source_l00018}00018\ \ \ \ \ \ \ \ \ va\_end(varArgs);}
+\DoxyCodeLine{\Hypertarget{_errors_8h_source_l00019}00019\ \ \ \ \ \ \ \ \ std::abort();}
+\DoxyCodeLine{\Hypertarget{_errors_8h_source_l00020}00020\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_errors_8h_source_l00021}\mbox{\hyperlink{namespace_errors_aee5daf469584435300f91503f83b09fe}{00021}}\ \ \ \ \ [[noreturn]]\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespace_errors_aee5daf469584435300f91503f83b09fe}{fatal}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ message)\ \{\ \mbox{\hyperlink{namespace_errors_a719a329951edb01e45afe1443dfa2a92}{fatalf}}(\textcolor{stringliteral}{"{}\%s\(\backslash\)n"{}},message);\ \}}
+\DoxyCodeLine{\Hypertarget{_errors_8h_source_l00022}\mbox{\hyperlink{namespace_errors_a6959930ad6159fe3eb2e04ebf87c1b84}{00022}}\ \ \ \ \ [[noreturn]]\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespace_errors_a6959930ad6159fe3eb2e04ebf87c1b84}{unreachable}}()\ \{\ \mbox{\hyperlink{namespace_errors_a719a329951edb01e45afe1443dfa2a92}{fatalf}}(\textcolor{stringliteral}{"{}reached\ unreachable\ code\(\backslash\)n"{}});\ \}}
+\DoxyCodeLine{\Hypertarget{_errors_8h_source_l00023}\mbox{\hyperlink{namespace_errors_ab0f273d47003dc29d0ec0b995228e689}{00023}}\ \ \ \ \ [[noreturn]]\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespace_errors_ab0f273d47003dc29d0ec0b995228e689}{unimplemented}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{structcontext}{context}})\ \{\ \mbox{\hyperlink{namespace_errors_a719a329951edb01e45afe1443dfa2a92}{fatalf}}(\textcolor{stringliteral}{"{}unimplemented:\ \%s\(\backslash\)n"{}},\mbox{\hyperlink{structcontext}{context}});\ \}}
+\DoxyCodeLine{\Hypertarget{_errors_8h_source_l00024}00024\ \}}
+\DoxyCodeLine{\Hypertarget{_errors_8h_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{_errors_8h_source_l00026}00026\ \textcolor{comment}{//\ Like\ assert,\ but\ is\ never\ removed\ in\ any\ build\ configuration.}}
+\DoxyCodeLine{\Hypertarget{_errors_8h_source_l00027}\mbox{\hyperlink{_errors_8h_a36d7655d01d72167969992b17b772507}{00027}}\ \textcolor{preprocessor}{\#define\ errorUnless(condition)\ if(!(condition))\ \{\ Errors::fatalf("{}errorUnless(\%s)\ failed\(\backslash\)n"{},\#condition);\ \}}}
+\DoxyCodeLine{\Hypertarget{_errors_8h_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{_errors_8h_source_l00029}\mbox{\hyperlink{_errors_8h_a03bec6af3af0dd492e348b40cbe40a46}{00029}}\ \textcolor{preprocessor}{\#define\ WAVM\_ASSERT\_THROW(cond)\ (\{\ if(\ !(cond)\ )\ throw\ std::runtime\_error\{"{}wavm\ assert:\ "{}\ \#cond\};\ \})}}
+\DoxyCodeLine{\Hypertarget{_errors_8h_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{_errors_8h_source_l00031}\mbox{\hyperlink{_errors_8h_ad57cbc2f5c193d8f4002ee66d63eb952}{00031}}\ \textcolor{preprocessor}{\#define\ WAVM\_ASSERT\_TERMINATE(cond)\ (\{\ if(\ !(cond)\ )\ \{\ fprintf(stderr,\ "{}wavm\ assert\ in\ destructor:\ \%s"{},\ \#cond);\ std::terminate();\ \}\ \})}}
+
+\end{DoxyCode}

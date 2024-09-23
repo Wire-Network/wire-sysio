@@ -1,0 +1,47 @@
+<map id="CLI::App::App" name="CLI::App::App">
+<area shape="rect" id="Node000001" title="Special private constructor for subcommand." alt="" coords="5,308,110,333"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_option.html#a6298f2354e3e02d262f1f6815621639a" title="Get the description." alt="" coords="158,177,342,202"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="65,305,101,259,127,233,156,211,165,207,167,211,159,216,130,237,105,263,70,309"/>
+<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_option.html#ab84751fbf9037efaed5b64fed17fe57f" title="Gets a comma separated list of names. Will include / prefer the positional name if positional is true..." alt="" coords="173,226,326,252"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="89,304,202,256,205,261,91,309"/>
+<area shape="rect" id="Node000016" href="$class_c_l_i_1_1_app.html#aa43461449f0f3c3d7bb8fd807d0cc72c" title="Set a help all flag, replaced the existing one if present." alt="" coords="185,353,315,394"/>
+<area shape="poly" id="edge18_Node000001_Node000016" title=" " alt="" coords="107,331,170,349,169,354,106,336"/>
+<area shape="rect" id="Node000020" href="$class_c_l_i_1_1_app.html#a3c50003e414891b24dc21455b5ccafbf" title="Set a help flag, replace the existing one if present." alt="" coords="171,418,329,444"/>
+<area shape="poly" id="edge22_Node000001_Node000020" title=" " alt="" coords="72,331,109,367,159,403,173,410,171,415,156,408,105,371,68,335"/>
+<area shape="rect" id="Node000004" href="$class_c_l_i_1_1_option.html#a4d2329268bae134aa58e704fa61f4b57" title="Requires &quot;&#45;&#45;&quot; to be removed from string." alt="" coords="422,251,554,291"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="327,247,408,258,407,263,327,252"/>
+<area shape="rect" id="Node000010" href="$class_c_l_i_1_1_option.html#af5677ee4a55c2a85784f64198db6b452" title="True if the option was not passed." alt="" coords="422,316,554,341"/>
+<area shape="poly" id="edge11_Node000003_Node000010" title=" " alt="" coords="278,250,329,275,391,300,415,308,413,313,389,306,327,280,276,255"/>
+<area shape="rect" id="Node000011" href="$class_c_l_i_1_1_option.html#a4eb6212ac30a0b139da52d258a3a1790" title=" " alt="" coords="417,185,559,226"/>
+<area shape="poly" id="edge12_Node000003_Node000011" title=" " alt="" coords="327,226,401,215,402,220,327,231"/>
+<area shape="rect" id="Node000012" href="$class_c_l_i_1_1_option_base.html#ad824d0f4f973675beece17d6b5ad9d00" title=" " alt="" coords="404,5,572,46"/>
+<area shape="poly" id="edge14_Node000003_Node000012" title=" " alt="" coords="325,224,340,213,355,195,362,176,364,138,366,98,373,77,388,57,392,54,396,57,392,61,378,80,371,99,369,138,367,177,359,197,344,217,328,228"/>
+<area shape="rect" id="Node000013" href="$class_c_l_i_1_1_option.html#afe31a608506cbe75d40d6cced342be11" title="The total min number of expected string values to be used." alt="" coords="412,71,565,111"/>
+<area shape="poly" id="edge15_Node000003_Node000013" title=" " alt="" coords="323,223,340,213,357,191,364,169,370,145,388,121,397,115,400,119,392,125,375,147,369,170,362,194,344,217,326,228"/>
+<area shape="rect" id="Node000015" href="$namespace_c_l_i_1_1detail.html#ab351f13ec104e2cba19ec6baf4a552f6" title="Simple function to join a string." alt="" coords="434,136,543,161"/>
+<area shape="poly" id="edge17_Node000003_Node000015" title=" " alt="" coords="316,223,341,213,355,203,364,193,374,182,389,171,417,160,419,165,391,176,377,186,368,196,358,207,343,217,318,228"/>
+<area shape="rect" id="Node000005" href="$namespace_c_l_i_1_1detail.html#a356b9c9cc904af2b0a918fd55e86cd9c" title="Check if a string is a member of a list of strings and optionally ignore case or ignore underscores." alt="" coords="634,225,799,250"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="554,259,619,249,619,255,555,264"/>
+<area shape="rect" id="Node000006" href="$namespace_c_l_i.html#a0c52326d2681814c22aa1a93ce43375e" title="Helper function to allow ignore_case to be passed to IsMember or Transform." alt="" coords="865,200,985,225"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="799,225,849,219,849,224,799,230"/>
+<area shape="rect" id="Node000007" href="$namespace_c_l_i_1_1detail.html#ae83709ec148057ec53df4383645727e9" title="Return a lower case version of a string." alt="" coords="1051,186,1189,212"/>
+<area shape="poly" id="edge10_Node000005_Node000007" title=" " alt="" coords="743,222,790,201,846,184,895,178,944,177,1036,183,1035,188,944,182,895,184,847,190,792,206,745,227"/>
+<area shape="rect" id="Node000008" href="$namespace_c_l_i.html#a111b6f05d21b9b84e7ba933ade79884c" title="Helper function to allow ignore_underscore to be passed to IsMember or Transform." alt="" coords="847,301,1003,326"/>
+<area shape="poly" id="edge7_Node000005_Node000008" title=" " alt="" coords="755,249,874,293,872,298,753,254"/>
+<area shape="rect" id="Node000009" href="$namespace_c_l_i_1_1detail.html#a5359a7a0e33366a12e15523b100f591a" title="remove underscores from a string" alt="" coords="1054,257,1186,298"/>
+<area shape="poly" id="edge9_Node000005_Node000009" title=" " alt="" coords="799,243,1039,267,1038,272,799,248"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="985,206,1035,202,1036,207,986,211"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="997,298,1038,290,1039,295,998,303"/>
+<area shape="poly" id="edge13_Node000011_Node000005" title=" " alt="" coords="560,213,619,221,619,227,559,218"/>
+<area shape="rect" id="Node000014" href="$class_c_l_i_1_1_option.html#af87dffed2cb245673312c993e563710e" title="The total min number of expected string values to be used." alt="" coords="640,71,793,111"/>
+<area shape="poly" id="edge16_Node000013_Node000014" title=" " alt="" coords="565,88,624,88,624,94,565,94"/>
+<area shape="rect" id="Node000017" href="$class_c_l_i_1_1_app.html#a5fef22317a182fa5db1d7b1af4c89c68" title="Add a flag with no description or variable assignment." alt="" coords="423,365,553,390"/>
+<area shape="poly" id="edge19_Node000016_Node000017" title=" " alt="" coords="316,372,407,374,407,379,316,377"/>
+<area shape="rect" id="Node000018" href="$class_c_l_i_1_1_option_base.html#a618d6a4f8137bec3272a04d848106046" title="Allow in a configuration file." alt="" coords="390,414,586,440"/>
+<area shape="poly" id="edge20_Node000016_Node000018" title=" " alt="" coords="316,386,413,408,412,413,315,391"/>
+<area shape="rect" id="Node000019" href="$class_c_l_i_1_1_app.html#a3058b128735eec0813589b56c5453115" title="Removes an option from the App. Takes an option pointer. Returns true if found and removed." alt="" coords="405,464,571,489"/>
+<area shape="poly" id="edge21_Node000016_Node000019" title=" " alt="" coords="317,390,343,403,358,416,368,428,377,439,391,450,401,455,399,460,389,455,373,443,364,431,355,419,341,408,314,395"/>
+<area shape="poly" id="edge23_Node000020_Node000017" title=" " alt="" coords="310,415,412,392,413,397,311,420"/>
+<area shape="poly" id="edge24_Node000020_Node000018" title=" " alt="" coords="330,427,374,426,374,432,330,432"/>
+<area shape="poly" id="edge25_Node000020_Node000019" title=" " alt="" coords="322,442,403,457,402,463,321,447"/>
+</map>

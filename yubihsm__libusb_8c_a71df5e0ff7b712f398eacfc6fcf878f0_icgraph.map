@@ -1,0 +1,7 @@
+<map id="usb_close" name="usb_close">
+<area shape="rect" id="Node000001" title=" " alt="" coords="176,31,256,56"/>
+<area shape="rect" id="Node000002" href="$yubihsm__libusb_8c.html#a5c7d1af3985bcf7fd85536f9d109e837" title=" " alt="" coords="20,5,113,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="160,37,113,29,113,23,161,31"/>
+<area shape="rect" id="Node000003" href="$yubihsm__libusb_8c.html#ab7b5c16cf1c8af0f6ce8b8623b612689" title=" " alt="" coords="5,55,128,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="161,55,129,60,128,55,160,50"/>
+</map>

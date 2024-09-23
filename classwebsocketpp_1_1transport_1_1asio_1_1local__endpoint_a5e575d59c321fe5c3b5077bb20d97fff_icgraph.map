@@ -1,0 +1,5 @@
+<map id="websocketpp::transport::asio::local_endpoint::set_tcp_pre_init_handler" name="websocketpp::transport::asio::local_endpoint::set_tcp_pre_init_handler">
+<area shape="rect" id="Node000001" title="Sets the tcp pre init handler." alt="" coords="211,5,381,61"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1transport_1_1asio_1_1local__endpoint.html#ac477a637e51f1d58658bc8c93b086f67" title="Sets the tcp pre init handler (deprecated)" alt="" coords="5,5,163,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="195,36,163,36,163,30,195,30"/>
+</map>

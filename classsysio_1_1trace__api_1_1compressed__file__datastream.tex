@@ -1,0 +1,160 @@
+\doxysection{sysio\+::trace\+\_\+api\+::compressed\+\_\+file\+\_\+datastream Class Reference}
+\hypertarget{classsysio_1_1trace__api_1_1compressed__file__datastream}{}\label{classsysio_1_1trace__api_1_1compressed__file__datastream}\index{sysio::trace\_api::compressed\_file\_datastream@{sysio::trace\_api::compressed\_file\_datastream}}
+
+
+{\ttfamily \#include $<$compressed\+\_\+file.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file__datastream_a3e3ef371ef84daba4206f34f9c284a82}{compressed\+\_\+file\+\_\+datastream}} (\mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file}{compressed\+\_\+file}} \&cf)
+\item 
+void \mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file__datastream_a238358d8e084ea494c83da72393ff107}{skip}} (size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\item 
+bool \mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file__datastream_a55bd3c1d338283533a68326e380c85d4}{read}} (char \texorpdfstring{$\ast$}{*}d, size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\item 
+bool \mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file__datastream_ad3c1a5566f4f6d79ee51bf3bc3eb6539}{get}} (unsigned char \&c)
+\item 
+bool \mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file__datastream_a1c0d56b1c688f6e0aa79aa59d9f78833}{get}} (char \&c)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{compressed__file_8hpp_source_l00133}{133}} of file \mbox{\hyperlink{compressed__file_8hpp_source}{compressed\+\_\+file.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classsysio_1_1trace__api_1_1compressed__file__datastream_a3e3ef371ef84daba4206f34f9c284a82}\index{sysio::trace\_api::compressed\_file\_datastream@{sysio::trace\_api::compressed\_file\_datastream}!compressed\_file\_datastream@{compressed\_file\_datastream}}
+\index{compressed\_file\_datastream@{compressed\_file\_datastream}!sysio::trace\_api::compressed\_file\_datastream@{sysio::trace\_api::compressed\_file\_datastream}}
+\doxysubsubsection{\texorpdfstring{compressed\_file\_datastream()}{compressed\_file\_datastream()}}
+{\footnotesize\ttfamily \label{classsysio_1_1trace__api_1_1compressed__file__datastream_a3e3ef371ef84daba4206f34f9c284a82} 
+sysio\+::trace\+\_\+api\+::compressed\+\_\+file\+\_\+datastream\+::compressed\+\_\+file\+\_\+datastream (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file}{compressed\+\_\+file}} \&}]{cf}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{compressed__file_8hpp_source_l00135}{135}} of file \mbox{\hyperlink{compressed__file_8hpp_source}{compressed\+\_\+file.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00135\ :\ cf(cf)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1trace__api_1_1compressed__file__datastream_a1c0d56b1c688f6e0aa79aa59d9f78833}\index{sysio::trace\_api::compressed\_file\_datastream@{sysio::trace\_api::compressed\_file\_datastream}!get@{get}}
+\index{get@{get}!sysio::trace\_api::compressed\_file\_datastream@{sysio::trace\_api::compressed\_file\_datastream}}
+\doxysubsubsection{\texorpdfstring{get()}{get()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1trace__api_1_1compressed__file__datastream_a1c0d56b1c688f6e0aa79aa59d9f78833} 
+bool sysio\+::trace\+\_\+api\+::compressed\+\_\+file\+\_\+datastream\+::get (\begin{DoxyParamCaption}\item[{char \&}]{c}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{compressed__file_8hpp_source_l00149}{149}} of file \mbox{\hyperlink{compressed__file_8hpp_source}{compressed\+\_\+file.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00149\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file__datastream_a55bd3c1d338283533a68326e380c85d4}{read}}(\&c,\ 1);\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1trace__api_1_1compressed__file__datastream_a1c0d56b1c688f6e0aa79aa59d9f78833_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1trace__api_1_1compressed__file__datastream_ad3c1a5566f4f6d79ee51bf3bc3eb6539}\index{sysio::trace\_api::compressed\_file\_datastream@{sysio::trace\_api::compressed\_file\_datastream}!get@{get}}
+\index{get@{get}!sysio::trace\_api::compressed\_file\_datastream@{sysio::trace\_api::compressed\_file\_datastream}}
+\doxysubsubsection{\texorpdfstring{get()}{get()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1trace__api_1_1compressed__file__datastream_ad3c1a5566f4f6d79ee51bf3bc3eb6539} 
+bool sysio\+::trace\+\_\+api\+::compressed\+\_\+file\+\_\+datastream\+::get (\begin{DoxyParamCaption}\item[{unsigned char \&}]{c}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{compressed__file_8hpp_source_l00147}{147}} of file \mbox{\hyperlink{compressed__file_8hpp_source}{compressed\+\_\+file.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00147\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file__datastream_ad3c1a5566f4f6d79ee51bf3bc3eb6539}{get}}(\ *(\textcolor{keywordtype}{char}*)\&c\ );\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=224pt]{classsysio_1_1trace__api_1_1compressed__file__datastream_ad3c1a5566f4f6d79ee51bf3bc3eb6539_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=224pt]{classsysio_1_1trace__api_1_1compressed__file__datastream_ad3c1a5566f4f6d79ee51bf3bc3eb6539_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1trace__api_1_1compressed__file__datastream_a55bd3c1d338283533a68326e380c85d4}\index{sysio::trace\_api::compressed\_file\_datastream@{sysio::trace\_api::compressed\_file\_datastream}!read@{read}}
+\index{read@{read}!sysio::trace\_api::compressed\_file\_datastream@{sysio::trace\_api::compressed\_file\_datastream}}
+\doxysubsubsection{\texorpdfstring{read()}{read()}}
+{\footnotesize\ttfamily \label{classsysio_1_1trace__api_1_1compressed__file__datastream_a55bd3c1d338283533a68326e380c85d4} 
+bool sysio\+::trace\+\_\+api\+::compressed\+\_\+file\+\_\+datastream\+::read (\begin{DoxyParamCaption}\item[{char \texorpdfstring{$\ast$}{*}}]{d}{, }\item[{size\+\_\+t}]{s}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{compressed__file_8hpp_source_l00142}{142}} of file \mbox{\hyperlink{compressed__file_8hpp_source}{compressed\+\_\+file.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \ cf.\mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file_ace042e7a3a61ed1d44a78e4b379fd961}{read}}(\ d,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ );}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1trace__api_1_1compressed__file__datastream_a55bd3c1d338283533a68326e380c85d4_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1trace__api_1_1compressed__file__datastream_a55bd3c1d338283533a68326e380c85d4_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1trace__api_1_1compressed__file__datastream_a238358d8e084ea494c83da72393ff107}\index{sysio::trace\_api::compressed\_file\_datastream@{sysio::trace\_api::compressed\_file\_datastream}!skip@{skip}}
+\index{skip@{skip}!sysio::trace\_api::compressed\_file\_datastream@{sysio::trace\_api::compressed\_file\_datastream}}
+\doxysubsubsection{\texorpdfstring{skip()}{skip()}}
+{\footnotesize\ttfamily \label{classsysio_1_1trace__api_1_1compressed__file__datastream_a238358d8e084ea494c83da72393ff107} 
+void sysio\+::trace\+\_\+api\+::compressed\+\_\+file\+\_\+datastream\+::skip (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{s}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{compressed__file_8hpp_source_l00137}{137}} of file \mbox{\hyperlink{compressed__file_8hpp_source}{compressed\+\_\+file.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \ std::vector<char>\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ );}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file__datastream_a55bd3c1d338283533a68326e380c85d4}{read}}(\ \&d[0],\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ );}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1trace__api_1_1compressed__file__datastream_a238358d8e084ea494c83da72393ff107_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+plugins/trace\+\_\+api\+\_\+plugin/include/sysio/trace\+\_\+api/\mbox{\hyperlink{compressed__file_8hpp}{compressed\+\_\+file.\+hpp}}\end{DoxyCompactItemize}

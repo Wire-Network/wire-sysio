@@ -1,0 +1,218 @@
+\doxysection{Serialization\+::Input\+Stream Struct Reference}
+\hypertarget{struct_serialization_1_1_input_stream}{}\label{struct_serialization_1_1_input_stream}\index{Serialization::InputStream@{Serialization::InputStream}}
+
+
+{\ttfamily \#include $<$Serialization.\+h$>$}
+
+
+
+Inheritance diagram for Serialization\+::Input\+Stream\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=212pt]{struct_serialization_1_1_input_stream__inherit__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \{ \mbox{\hyperlink{struct_serialization_1_1_input_stream_a08472b9b8291abc571588af8862669afac94823bb11cb319cf6c9ceb9f1ac01a6}{is\+Input}} = true
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_serialization_1_1_input_stream_aab2721dd35672f8484a4e4045fd03e9f}{Input\+Stream}} (const \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} \texorpdfstring{$\ast$}{*}in\+Next, const \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} \texorpdfstring{$\ast$}{*}in\+End)
+\item 
+virtual \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} \mbox{\hyperlink{struct_serialization_1_1_input_stream_a960a261ed276a5f6e81472739c0958ca}{capacity}} () const =0
+\item 
+const \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{struct_serialization_1_1_input_stream_a172b7a3fd8d2e702daf092b8860c0946}{advance}} (\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} num\+Bytes)
+\item 
+const \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{struct_serialization_1_1_input_stream_a663d3d04bc19c80453a729e5a09a03cb}{peek}} (\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} num\+Bytes)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual void \mbox{\hyperlink{struct_serialization_1_1_input_stream_a888d6a1c0486a2bd4024f1f5c9be2d22}{get\+More\+Data}} (\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} num\+Bytes)=0
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+const \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{struct_serialization_1_1_input_stream_a3b710216e24ed9386dcf28ead395ef0d}{next}}
+\item 
+const \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{struct_serialization_1_1_input_stream_ac94b47818b240805db6babfe91814000}{end}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{_serialization_8h_source_l00088}{88}} of file \mbox{\hyperlink{_serialization_8h_source}{Serialization.\+h}}.
+
+
+
+\doxysubsection{Member Enumeration Documentation}
+\Hypertarget{struct_serialization_1_1_input_stream_a08472b9b8291abc571588af8862669af}\doxysubsubsection{\texorpdfstring{anonymous enum}{anonymous enum}}
+{\footnotesize\ttfamily \label{struct_serialization_1_1_input_stream_a08472b9b8291abc571588af8862669af} 
+anonymous enum}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{isInput@{isInput}!Serialization::InputStream@{Serialization::InputStream}}\index{Serialization::InputStream@{Serialization::InputStream}!isInput@{isInput}}}\Hypertarget{struct_serialization_1_1_input_stream_a08472b9b8291abc571588af8862669afac94823bb11cb319cf6c9ceb9f1ac01a6}\label{struct_serialization_1_1_input_stream_a08472b9b8291abc571588af8862669af} 
+is\+Input&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{_serialization_8h_source_l00090}{90}} of file \mbox{\hyperlink{_serialization_8h_source}{Serialization.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00090\ \{\ \mbox{\hyperlink{struct_serialization_1_1_input_stream_a08472b9b8291abc571588af8862669afac94823bb11cb319cf6c9ceb9f1ac01a6}{isInput}}\ =\ \textcolor{keyword}{true}\ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{struct_serialization_1_1_input_stream_aab2721dd35672f8484a4e4045fd03e9f}\index{Serialization::InputStream@{Serialization::InputStream}!InputStream@{InputStream}}
+\index{InputStream@{InputStream}!Serialization::InputStream@{Serialization::InputStream}}
+\doxysubsubsection{\texorpdfstring{InputStream()}{InputStream()}}
+{\footnotesize\ttfamily \label{struct_serialization_1_1_input_stream_aab2721dd35672f8484a4e4045fd03e9f} 
+Serialization\+::\+Input\+Stream\+::\+Input\+Stream (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} \texorpdfstring{$\ast$}{*}}]{in\+Next}{, }\item[{const \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} \texorpdfstring{$\ast$}{*}}]{in\+End}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_serialization_8h_source_l00092}{92}} of file \mbox{\hyperlink{_serialization_8h_source}{Serialization.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00092\ :\ \mbox{\hyperlink{struct_serialization_1_1_input_stream_a3b710216e24ed9386dcf28ead395ef0d}{next}}(inNext),\ \mbox{\hyperlink{struct_serialization_1_1_input_stream_ac94b47818b240805db6babfe91814000}{end}}(inEnd)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_serialization_1_1_input_stream_a172b7a3fd8d2e702daf092b8860c0946}\index{Serialization::InputStream@{Serialization::InputStream}!advance@{advance}}
+\index{advance@{advance}!Serialization::InputStream@{Serialization::InputStream}}
+\doxysubsubsection{\texorpdfstring{advance()}{advance()}}
+{\footnotesize\ttfamily \label{struct_serialization_1_1_input_stream_a172b7a3fd8d2e702daf092b8860c0946} 
+const \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} \texorpdfstring{$\ast$}{*} Serialization\+::\+Input\+Stream\+::advance (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}}]{num\+Bytes}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_serialization_8h_source_l00097}{97}} of file \mbox{\hyperlink{_serialization_8h_source}{Serialization.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{struct_serialization_1_1_input_stream_a3b710216e24ed9386dcf28ead395ef0d}{next}}\ +\ numBytes\ >\ end)\ \{\ \mbox{\hyperlink{struct_serialization_1_1_input_stream_a888d6a1c0486a2bd4024f1f5c9be2d22}{getMoreData}}(numBytes);\ \}}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}*\ data\ =\ \mbox{\hyperlink{struct_serialization_1_1_input_stream_a3b710216e24ed9386dcf28ead395ef0d}{next}};}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_serialization_1_1_input_stream_a3b710216e24ed9386dcf28ead395ef0d}{next}}\ +=\ numBytes;}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ data;}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_serialization_1_1_input_stream_a172b7a3fd8d2e702daf092b8860c0946_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_serialization_1_1_input_stream_a172b7a3fd8d2e702daf092b8860c0946_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_serialization_1_1_input_stream_a960a261ed276a5f6e81472739c0958ca}\index{Serialization::InputStream@{Serialization::InputStream}!capacity@{capacity}}
+\index{capacity@{capacity}!Serialization::InputStream@{Serialization::InputStream}}
+\doxysubsubsection{\texorpdfstring{capacity()}{capacity()}}
+{\footnotesize\ttfamily \label{struct_serialization_1_1_input_stream_a960a261ed276a5f6e81472739c0958ca} 
+virtual \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} Serialization\+::\+Input\+Stream\+::capacity (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{struct_serialization_1_1_memory_input_stream_a23beec28239d63e3ed3623c7a224dc7c}{Serialization\+::\+Memory\+Input\+Stream}}.
+
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_serialization_1_1_input_stream_a960a261ed276a5f6e81472739c0958ca_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_serialization_1_1_input_stream_a888d6a1c0486a2bd4024f1f5c9be2d22}\index{Serialization::InputStream@{Serialization::InputStream}!getMoreData@{getMoreData}}
+\index{getMoreData@{getMoreData}!Serialization::InputStream@{Serialization::InputStream}}
+\doxysubsubsection{\texorpdfstring{getMoreData()}{getMoreData()}}
+{\footnotesize\ttfamily \label{struct_serialization_1_1_input_stream_a888d6a1c0486a2bd4024f1f5c9be2d22} 
+virtual void Serialization\+::\+Input\+Stream\+::get\+More\+Data (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}}]{num\+Bytes}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [pure virtual]}}
+
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_serialization_1_1_input_stream_a888d6a1c0486a2bd4024f1f5c9be2d22_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_serialization_1_1_input_stream_a663d3d04bc19c80453a729e5a09a03cb}\index{Serialization::InputStream@{Serialization::InputStream}!peek@{peek}}
+\index{peek@{peek}!Serialization::InputStream@{Serialization::InputStream}}
+\doxysubsubsection{\texorpdfstring{peek()}{peek()}}
+{\footnotesize\ttfamily \label{struct_serialization_1_1_input_stream_a663d3d04bc19c80453a729e5a09a03cb} 
+const \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} \texorpdfstring{$\ast$}{*} Serialization\+::\+Input\+Stream\+::peek (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}}]{num\+Bytes}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_serialization_8h_source_l00106}{106}} of file \mbox{\hyperlink{_serialization_8h_source}{Serialization.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{struct_serialization_1_1_input_stream_a3b710216e24ed9386dcf28ead395ef0d}{next}}\ +\ numBytes\ >\ end)\ \{\ \mbox{\hyperlink{struct_serialization_1_1_input_stream_a888d6a1c0486a2bd4024f1f5c9be2d22}{getMoreData}}(numBytes);\ \}}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_serialization_1_1_input_stream_a3b710216e24ed9386dcf28ead395ef0d}{next}};}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_serialization_1_1_input_stream_a663d3d04bc19c80453a729e5a09a03cb_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_serialization_1_1_input_stream_a663d3d04bc19c80453a729e5a09a03cb_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_serialization_1_1_input_stream_ac94b47818b240805db6babfe91814000}\index{Serialization::InputStream@{Serialization::InputStream}!end@{end}}
+\index{end@{end}!Serialization::InputStream@{Serialization::InputStream}}
+\doxysubsubsection{\texorpdfstring{end}{end}}
+{\footnotesize\ttfamily \label{struct_serialization_1_1_input_stream_ac94b47818b240805db6babfe91814000} 
+const \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}\texorpdfstring{$\ast$}{*} Serialization\+::\+Input\+Stream\+::end\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{_serialization_8h_source_l00115}{115}} of file \mbox{\hyperlink{_serialization_8h_source}{Serialization.\+h}}.
+
+\Hypertarget{struct_serialization_1_1_input_stream_a3b710216e24ed9386dcf28ead395ef0d}\index{Serialization::InputStream@{Serialization::InputStream}!next@{next}}
+\index{next@{next}!Serialization::InputStream@{Serialization::InputStream}}
+\doxysubsubsection{\texorpdfstring{next}{next}}
+{\footnotesize\ttfamily \label{struct_serialization_1_1_input_stream_a3b710216e24ed9386dcf28ead395ef0d} 
+const \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}\texorpdfstring{$\ast$}{*} Serialization\+::\+Input\+Stream\+::next\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{_serialization_8h_source_l00114}{114}} of file \mbox{\hyperlink{_serialization_8h_source}{Serialization.\+h}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/wasm-\/jit/\+Include/\+Inline/\mbox{\hyperlink{_serialization_8h}{Serialization.\+h}}\end{DoxyCompactItemize}

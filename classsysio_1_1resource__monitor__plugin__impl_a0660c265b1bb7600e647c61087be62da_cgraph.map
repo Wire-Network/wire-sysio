@@ -1,0 +1,11 @@
+<map id="sysio::resource_monitor_plugin_impl::plugin_initialize" name="sysio::resource_monitor_plugin_impl::plugin_initialize">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,133,195,174"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1resource__monitor_1_1file__space__handler.html#ac0f510cb0298b9cefe68102772fc5db7" title=" " alt="" coords="243,5,429,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="134,130,241,71,252,66,254,70,244,76,137,135"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1resource__monitor_1_1file__space__handler.html#af1ad683111aac7f94733e3866db0149e" title=" " alt="" coords="256,85,416,141"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="195,134,240,127,241,132,196,140"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1resource__monitor_1_1file__space__handler.html#a51eaff9443b1a88e06cbbd1344a78071" title=" " alt="" coords="256,165,416,221"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="196,167,241,174,240,180,195,172"/>
+<area shape="rect" id="Node000005" href="$classsysio_1_1resource__monitor_1_1file__space__handler.html#a5465fcb7ca6562cdb3622c5ef09b29a9" title=" " alt="" coords="256,245,416,301"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="137,172,244,231,254,236,252,241,241,236,134,176"/>
+</map>

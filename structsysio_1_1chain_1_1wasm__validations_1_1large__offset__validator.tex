@@ -1,0 +1,81 @@
+\doxysection{sysio\+::chain\+::wasm\+\_\+validations\+::large\+\_\+offset\+\_\+validator\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>} Struct Template Reference}
+\hypertarget{structsysio_1_1chain_1_1wasm__validations_1_1large__offset__validator}{}\label{structsysio_1_1chain_1_1wasm__validations_1_1large__offset__validator}\index{sysio::chain::wasm\_validations::large\_offset\_validator$<$ T $>$@{sysio::chain::wasm\_validations::large\_offset\_validator$<$ T $>$}}
+
+
+{\ttfamily \#include $<$wasm\+\_\+sysio\+\_\+validation.\+hpp$>$}
+
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static void \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__validations_1_1large__offset__validator_a3471a095ae94a1d9c6565b4f9a9ffc7f}{accept}} (\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1instr}{wasm\+\_\+ops\+::instr}} \texorpdfstring{$\ast$}{*}inst, \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1visitor__arg}{wasm\+\_\+ops\+::visitor\+\_\+arg}} \&arg)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static constexpr bool \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__validations_1_1large__offset__validator_a030edbe5edb8bfc62ce13f02e1882c0f}{kills}} = true
+\item 
+static constexpr bool \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__validations_1_1large__offset__validator_a71907ed6ec1fe5c3b18ce23f27bec8ac}{post}} = false
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$\newline
+struct sysio\+::chain\+::wasm\+\_\+validations\+::large\+\_\+offset\+\_\+validator$<$ T $>$}
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__validation_8hpp_source_l00068}{68}} of file \mbox{\hyperlink{wasm__sysio__validation_8hpp_source}{wasm\+\_\+sysio\+\_\+validation.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1chain_1_1wasm__validations_1_1large__offset__validator_a3471a095ae94a1d9c6565b4f9a9ffc7f}\index{sysio::chain::wasm\_validations::large\_offset\_validator$<$ T $>$@{sysio::chain::wasm\_validations::large\_offset\_validator$<$ T $>$}!accept@{accept}}
+\index{accept@{accept}!sysio::chain::wasm\_validations::large\_offset\_validator$<$ T $>$@{sysio::chain::wasm\_validations::large\_offset\_validator$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{accept()}{accept()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__validations_1_1large__offset__validator_a3471a095ae94a1d9c6565b4f9a9ffc7f} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+static void \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__validations_1_1large__offset__validator}{sysio\+::chain\+::wasm\+\_\+validations\+::large\+\_\+offset\+\_\+validator}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::accept (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1instr}{wasm\+\_\+ops\+::instr}} \texorpdfstring{$\ast$}{*}}]{inst}{, }\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1visitor__arg}{wasm\+\_\+ops\+::visitor\+\_\+arg}} \&}]{arg}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__validation_8hpp_source_l00071}{71}} of file \mbox{\hyperlink{wasm__sysio__validation_8hpp_source}{wasm\+\_\+sysio\+\_\+validation.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ cast\ to\ a\ type\ that\ has\ a\ memarg\ field}}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ memarg\_instr\ =\ \textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\textcolor{keyword}{>}(inst);}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(memarg\_instr-\/>field.o\ >=\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__constraints_a39bdedb43d5976cf1ddad3fab6b3044c}{wasm\_constraints::maximum\_linear\_memory}})}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(wasm\_execution\_error,\ \textcolor{stringliteral}{"{}Smart\ contract\ used\ an\ invalid\ large\ memory\ store/load\ offset"{}});}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1chain_1_1wasm__validations_1_1large__offset__validator_a030edbe5edb8bfc62ce13f02e1882c0f}\index{sysio::chain::wasm\_validations::large\_offset\_validator$<$ T $>$@{sysio::chain::wasm\_validations::large\_offset\_validator$<$ T $>$}!kills@{kills}}
+\index{kills@{kills}!sysio::chain::wasm\_validations::large\_offset\_validator$<$ T $>$@{sysio::chain::wasm\_validations::large\_offset\_validator$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{kills}{kills}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__validations_1_1large__offset__validator_a030edbe5edb8bfc62ce13f02e1882c0f} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+bool \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__validations_1_1large__offset__validator}{sysio\+::chain\+::wasm\+\_\+validations\+::large\+\_\+offset\+\_\+validator}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::kills = true\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__validation_8hpp_source_l00069}{69}} of file \mbox{\hyperlink{wasm__sysio__validation_8hpp_source}{wasm\+\_\+sysio\+\_\+validation.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__validations_1_1large__offset__validator_a71907ed6ec1fe5c3b18ce23f27bec8ac}\index{sysio::chain::wasm\_validations::large\_offset\_validator$<$ T $>$@{sysio::chain::wasm\_validations::large\_offset\_validator$<$ T $>$}!post@{post}}
+\index{post@{post}!sysio::chain::wasm\_validations::large\_offset\_validator$<$ T $>$@{sysio::chain::wasm\_validations::large\_offset\_validator$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{post}{post}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__validations_1_1large__offset__validator_a71907ed6ec1fe5c3b18ce23f27bec8ac} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+bool \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__validations_1_1large__offset__validator}{sysio\+::chain\+::wasm\+\_\+validations\+::large\+\_\+offset\+\_\+validator}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::post = false\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__validation_8hpp_source_l00070}{70}} of file \mbox{\hyperlink{wasm__sysio__validation_8hpp_source}{wasm\+\_\+sysio\+\_\+validation.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{wasm__sysio__validation_8hpp}{wasm\+\_\+sysio\+\_\+validation.\+hpp}}\end{DoxyCompactItemize}

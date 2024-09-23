@@ -1,0 +1,17 @@
+<map id="sysio::vm::import_type" name="sysio::vm::import_type">
+<area shape="rect" id="Node000001" title=" " alt="" coords="191,288,345,313"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1vm_1_1table__type.html" title=" " alt="" coords="195,199,341,225"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="271,240,271,287,265,287,265,240"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1vm_1_1resizable__limits.html" title=" " alt="" coords="32,95,170,136"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="151,142,248,196,245,201,148,146"/>
+<area shape="rect" id="Node000006" href="$structsysio_1_1vm_1_1memory__type.html" title=" " alt="" coords="5,199,171,225"/>
+<area shape="poly" id="edge7_Node000006_Node000003" title=" " alt="" coords="99,152,92,199,87,198,94,151"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1vm_1_1managed__vector.html" title=" " alt="" coords="198,95,338,136"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="271,151,271,199,265,199,265,151"/>
+<area shape="rect" id="Node000005" href="$classsysio_1_1vm_1_1detail_1_1vector.html" title=" " alt="" coords="175,5,361,46"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="262,61,263,95,258,95,257,62"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="279,62,278,95,273,95,274,61"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="128,229,244,285,242,289,126,234"/>
+<area shape="rect" id="Node000007" href="$structsysio_1_1vm_1_1global__type.html" title=" " alt="" coords="365,199,518,225"/>
+<area shape="poly" id="edge8_Node000001_Node000007" title=" " alt="" coords="405,234,294,289,291,285,402,230"/>
+</map>

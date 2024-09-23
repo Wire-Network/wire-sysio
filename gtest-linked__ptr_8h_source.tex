@@ -1,0 +1,249 @@
+\doxysection{gtest-\/linked\+\_\+ptr.h}
+\hypertarget{gtest-linked__ptr_8h_source}{}\label{gtest-linked__ptr_8h_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/include/gtest/internal/gtest-\/linked\_ptr.h@{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/include/gtest/internal/gtest-\/linked\_ptr.h}}
+\mbox{\hyperlink{gtest-linked__ptr_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00001}00001\ \textcolor{comment}{//\ Copyright\ 2003\ Google\ Inc.}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00002}00002\ \textcolor{comment}{//\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00003}00003\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00004}00004\ \textcolor{comment}{//\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00005}00005\ \textcolor{comment}{//\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00006}00006\ \textcolor{comment}{//\ met:}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00007}00007\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00008}00008\ \textcolor{comment}{//\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00009}00009\ \textcolor{comment}{//\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00010}00010\ \textcolor{comment}{//\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00011}00011\ \textcolor{comment}{//\ copyright\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00012}00012\ \textcolor{comment}{//\ in\ the\ documentation\ and/or\ other\ materials\ provided\ with\ the}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00013}00013\ \textcolor{comment}{//\ distribution.}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00014}00014\ \textcolor{comment}{//\ \ \ \ \ *\ Neither\ the\ name\ of\ Google\ Inc.\ nor\ the\ names\ of\ its}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00015}00015\ \textcolor{comment}{//\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products\ derived\ from}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00016}00016\ \textcolor{comment}{//\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00017}00017\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00018}00018\ \textcolor{comment}{//\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00019}00019\ \textcolor{comment}{//\ "{}AS\ IS"{}\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00020}00020\ \textcolor{comment}{//\ LIMITED\ TO,\ THE\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00021}00021\ \textcolor{comment}{//\ A\ PARTICULAR\ PURPOSE\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ THE\ COPYRIGHT}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00022}00022\ \textcolor{comment}{//\ OWNER\ OR\ CONTRIBUTORS\ BE\ LIABLE\ FOR\ ANY\ DIRECT,\ INDIRECT,\ INCIDENTAL,}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00023}00023\ \textcolor{comment}{//\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES\ (INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00024}00024\ \textcolor{comment}{//\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;\ LOSS\ OF\ USE,}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00025}00025\ \textcolor{comment}{//\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND\ ON\ ANY}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00026}00026\ \textcolor{comment}{//\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00027}00027\ \textcolor{comment}{//\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00028}00028\ \textcolor{comment}{//\ OF\ THIS\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00029}00029\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00030}00030\ \textcolor{comment}{//\ Authors:\ Dan\ Egnor\ (egnor@google.com)}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00031}00031\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00032}00032\ \textcolor{comment}{//\ A\ "{}smart"{}\ pointer\ type\ with\ reference\ tracking.\ \ Every\ pointer\ to\ a}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00033}00033\ \textcolor{comment}{//\ particular\ object\ is\ kept\ on\ a\ circular\ linked\ list.\ \ When\ the\ last\ pointer}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00034}00034\ \textcolor{comment}{//\ to\ an\ object\ is\ destroyed\ or\ reassigned,\ the\ object\ is\ deleted.}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00035}00035\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00036}00036\ \textcolor{comment}{//\ Used\ properly,\ this\ deletes\ the\ object\ when\ the\ last\ reference\ goes\ away.}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00037}00037\ \textcolor{comment}{//\ There\ are\ several\ caveats:}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00038}00038\ \textcolor{comment}{//\ -\/\ Like\ all\ reference\ counting\ schemes,\ cycles\ lead\ to\ leaks.}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00039}00039\ \textcolor{comment}{//\ -\/\ Each\ smart\ pointer\ is\ actually\ two\ pointers\ (8\ bytes\ instead\ of\ 4).}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00040}00040\ \textcolor{comment}{//\ -\/\ Every\ time\ a\ pointer\ is\ assigned,\ the\ entire\ list\ of\ pointers\ to\ that}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00041}00041\ \textcolor{comment}{//\ \ \ object\ is\ traversed.\ \ This\ class\ is\ therefore\ NOT\ SUITABLE\ when\ there}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00042}00042\ \textcolor{comment}{//\ \ \ will\ often\ be\ more\ than\ two\ or\ three\ pointers\ to\ a\ particular\ object.}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00043}00043\ \textcolor{comment}{//\ -\/\ References\ are\ only\ tracked\ as\ long\ as\ linked\_ptr<>\ objects\ are\ copied.}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00044}00044\ \textcolor{comment}{//\ \ \ If\ a\ linked\_ptr<>\ is\ converted\ to\ a\ raw\ pointer\ and\ back,\ BAD\ THINGS}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00045}00045\ \textcolor{comment}{//\ \ \ will\ happen\ (double\ deletion).}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00046}00046\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00047}00047\ \textcolor{comment}{//\ A\ good\ use\ of\ this\ class\ is\ storing\ object\ references\ in\ STL\ containers.}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00048}00048\ \textcolor{comment}{//\ You\ can\ safely\ put\ linked\_ptr<>\ in\ a\ vector<>.}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00049}00049\ \textcolor{comment}{//\ Other\ uses\ may\ not\ be\ as\ good.}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00050}00050\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00051}00051\ \textcolor{comment}{//\ Note:\ If\ you\ use\ an\ incomplete\ type\ with\ linked\_ptr<>,\ the\ class}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00052}00052\ \textcolor{comment}{//\ *containing*\ linked\_ptr<>\ must\ have\ a\ constructor\ and\ destructor\ (even}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00053}00053\ \textcolor{comment}{//\ if\ they\ do\ nothing!).}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00054}00054\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00055}00055\ \textcolor{comment}{//\ Bill\ Gibbons\ suggested\ we\ use\ something\ like\ this.}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00056}00056\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00057}00057\ \textcolor{comment}{//\ Thread\ Safety:}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00058}00058\ \textcolor{comment}{//\ \ \ Unlike\ other\ linked\_ptr\ implementations,\ in\ this\ implementation}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00059}00059\ \textcolor{comment}{//\ \ \ a\ linked\_ptr\ object\ is\ thread-\/safe\ in\ the\ sense\ that:}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00060}00060\ \textcolor{comment}{//\ \ \ \ \ -\/\ it's\ safe\ to\ copy\ linked\_ptr\ objects\ concurrently,}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00061}00061\ \textcolor{comment}{//\ \ \ \ \ -\/\ it's\ safe\ to\ copy\ *from*\ a\ linked\_ptr\ and\ read\ its\ underlying}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00062}00062\ \textcolor{comment}{//\ \ \ \ \ \ \ raw\ pointer\ (e.g.\ via\ get())\ concurrently,\ and}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00063}00063\ \textcolor{comment}{//\ \ \ \ \ -\/\ it's\ safe\ to\ write\ to\ two\ linked\_ptrs\ that\ point\ to\ the\ same}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00064}00064\ \textcolor{comment}{//\ \ \ \ \ \ \ shared\ object\ concurrently.}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00065}00065\ \textcolor{comment}{//\ TODO(wan@google.com):\ rename\ this\ to\ safe\_linked\_ptr\ to\ avoid}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00066}00066\ \textcolor{comment}{//\ confusion\ with\ normal\ linked\_ptr.}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00067}00067\ }
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00068}00068\ \textcolor{preprocessor}{\#ifndef\ GTEST\_INCLUDE\_GTEST\_INTERNAL\_GTEST\_LINKED\_PTR\_H\_}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00069}00069\ \textcolor{preprocessor}{\#define\ GTEST\_INCLUDE\_GTEST\_INTERNAL\_GTEST\_LINKED\_PTR\_H\_}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00071}00071\ \textcolor{preprocessor}{\#include\ <stdlib.h>}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00072}00072\ \textcolor{preprocessor}{\#include\ <assert.h>}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00073}00073\ }
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00074}00074\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{gtest-port_8h}{gtest/internal/gtest-\/port.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00075}00075\ }
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00076}00076\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetesting}{testing}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00077}00077\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceinternal}{internal}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00079}00079\ \textcolor{comment}{//\ Protects\ copying\ of\ all\ linked\_ptr\ objects.}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00080}\mbox{\hyperlink{namespacetesting_1_1internal_ad7c5625384cf5f6b714188f274537ef6}{00080}}\ \mbox{\hyperlink{gtest-port_8h_aa73be6f0ba4a7456180a94904ce17790}{GTEST\_API\_}}\ \mbox{\hyperlink{gtest-port_8h_af0970cdea09f16dbb1dbfccdaa693eeb}{GTEST\_DECLARE\_STATIC\_MUTEX\_}}(g\_linked\_ptr\_mutex);}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00081}00081\ }
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00082}00082\ \textcolor{comment}{//\ This\ is\ used\ internally\ by\ all\ instances\ of\ linked\_ptr<>.\ \ It\ needs\ to\ be}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00083}00083\ \textcolor{comment}{//\ a\ non-\/template\ class\ because\ different\ types\ of\ linked\_ptr<>\ can\ refer\ to}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00084}00084\ \textcolor{comment}{//\ the\ same\ object\ (linked\_ptr<Superclass>(obj)\ vs\ linked\_ptr<Subclass>(obj)).}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00085}00085\ \textcolor{comment}{//\ So,\ it\ needs\ to\ be\ possible\ for\ different\ types\ of\ linked\_ptr\ to\ participate}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00086}00086\ \textcolor{comment}{//\ in\ the\ same\ circular\ linked\ list,\ so\ we\ need\ a\ single\ class\ type\ here.}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00087}00087\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00088}00088\ \textcolor{comment}{//\ DO\ NOT\ USE\ THIS\ CLASS\ DIRECTLY\ YOURSELF.\ \ Use\ linked\_ptr<T>.}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00089}\mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr__internal}{00089}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr__internal}{linked\_ptr\_internal}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00090}00090\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00091}00091\ \ \ \textcolor{comment}{//\ Create\ a\ new\ circle\ that\ includes\ only\ this\ instance.}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00092}\mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr__internal_a742af1f65df2d5e2b7198a1b74264a83}{00092}}\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr__internal_a742af1f65df2d5e2b7198a1b74264a83}{join\_new}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00093}00093\ \ \ \ \ next\_\ =\ \textcolor{keyword}{this};}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00094}00094\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00095}00095\ }
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00096}00096\ \ \ \textcolor{comment}{//\ Many\ linked\_ptr\ operations\ may\ change\ p.link\_\ for\ some\ linked\_ptr}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00097}00097\ \ \ \textcolor{comment}{//\ variable\ p\ in\ the\ same\ circle\ as\ this\ object.\ \ Therefore\ we\ need}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00098}00098\ \ \ \textcolor{comment}{//\ to\ prevent\ two\ such\ operations\ from\ occurring\ concurrently.}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00099}00099\ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00100}00100\ \ \ \textcolor{comment}{//\ Note\ that\ different\ types\ of\ linked\_ptr\ objects\ can\ coexist\ in\ a}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00101}00101\ \ \ \textcolor{comment}{//\ circle\ (e.g.\ linked\_ptr<Base>,\ linked\_ptr<Derived1>,\ and}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00102}00102\ \ \ \textcolor{comment}{//\ linked\_ptr<Derived2>).\ \ Therefore\ we\ must\ use\ a\ single\ mutex\ to}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00103}00103\ \ \ \textcolor{comment}{//\ protect\ all\ linked\_ptr\ objects.\ \ This\ can\ create\ serious}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00104}00104\ \ \ \textcolor{comment}{//\ contention\ in\ production\ code,\ but\ is\ acceptable\ in\ a\ testing}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00105}00105\ \ \ \textcolor{comment}{//\ framework.}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00106}00106\ }
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00107}00107\ \ \ \textcolor{comment}{//\ Join\ an\ existing\ circle.}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00108}\mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr__internal_acd5a341459f7e81b10b4112d8c764e2a}{00108}}\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr__internal_acd5a341459f7e81b10b4112d8c764e2a}{join}}(\mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr__internal}{linked\_ptr\_internal}}\ \textcolor{keyword}{const}*\ ptr)}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00109}00109\ \ \ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_a69abff5a4efdd07bd5faebe3dd318d06}{GTEST\_LOCK\_EXCLUDED\_}}(g\_linked\_ptr\_mutex)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00110}00110\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_g_test_mutex_lock}{MutexLock}}\ \mbox{\hyperlink{xbyak__mnemonic_8h_aa81aed607133209dade63a226818224d}{lock}}(\&g\_linked\_ptr\_mutex);}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00111}00111\ }
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00112}00112\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr__internal}{linked\_ptr\_internal}}\ \textcolor{keyword}{const}*\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ ptr;}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00113}00113\ \ \ \ \ \textcolor{keywordflow}{while}\ (\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}-\/>next\_\ !=\ ptr)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00114}00114\ \ \ \ \ \ \ assert(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}-\/>next\_\ !=\ \textcolor{keyword}{this}\ \&\&}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00115}00115\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Trying\ to\ join()\ a\ linked\ ring\ we\ are\ already\ in.\ "{}}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00116}00116\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Is\ GMock\ thread\ safety\ enabled?"{}});}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00117}00117\ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}-\/>next\_;}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00118}00118\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00119}00119\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}-\/>next\_\ =\ \textcolor{keyword}{this};}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00120}00120\ \ \ \ \ next\_\ =\ ptr;}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00121}00121\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00122}00122\ }
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00123}00123\ \ \ \textcolor{comment}{//\ Leave\ whatever\ circle\ we're\ part\ of.\ \ Returns\ true\ if\ we\ were\ the}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00124}00124\ \ \ \textcolor{comment}{//\ last\ member\ of\ the\ circle.\ \ Once\ this\ is\ done,\ you\ can\ join()\ another.}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00125}\mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr__internal_a8699e539d9702d363ef0351012d1b3ca}{00125}}\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr__internal_a8699e539d9702d363ef0351012d1b3ca}{depart}}()}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00126}00126\ \ \ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_a69abff5a4efdd07bd5faebe3dd318d06}{GTEST\_LOCK\_EXCLUDED\_}}(g\_linked\_ptr\_mutex)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00127}00127\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_g_test_mutex_lock}{MutexLock}}\ \mbox{\hyperlink{xbyak__mnemonic_8h_aa81aed607133209dade63a226818224d}{lock}}(\&g\_linked\_ptr\_mutex);}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00128}00128\ }
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00129}00129\ \ \ \ \ \textcolor{keywordflow}{if}\ (next\_\ ==\ \textcolor{keyword}{this})\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00130}00130\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr__internal}{linked\_ptr\_internal}}\ \textcolor{keyword}{const}*\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ next\_;}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00131}00131\ \ \ \ \ \textcolor{keywordflow}{while}\ (\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}-\/>next\_\ !=\ \textcolor{keyword}{this})\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00132}00132\ \ \ \ \ \ \ assert(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}-\/>next\_\ !=\ next\_\ \&\&}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00133}00133\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Trying\ to\ depart()\ a\ linked\ ring\ we\ are\ not\ in.\ "{}}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00134}00134\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Is\ GMock\ thread\ safety\ enabled?"{}});}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00135}00135\ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}-\/>next\_;}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00136}00136\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00137}00137\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}-\/>next\_\ =\ next\_;}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00138}00138\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00139}00139\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00140}00140\ }
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00141}00141\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00142}00142\ \ \ \textcolor{keyword}{mutable}\ \mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr__internal}{linked\_ptr\_internal}}\ \textcolor{keyword}{const}*\ next\_;}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00143}00143\ \};}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00144}00144\ }
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00145}00145\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00146}\mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr}{00146}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr}{linked\_ptr}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00147}00147\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00148}\mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr_ad8cfb5d7a383a539dace2b8950bc5ec5}{00148}}\ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr_ad8cfb5d7a383a539dace2b8950bc5ec5}{element\_type}};}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00149}00149\ }
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00150}00150\ \ \ \textcolor{comment}{//\ Take\ over\ ownership\ of\ a\ raw\ pointer.\ \ This\ should\ happen\ as\ soon\ as}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00151}00151\ \ \ \textcolor{comment}{//\ possible\ after\ the\ object\ is\ created.}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00152}\mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr_ae805418b9f03f14ff49649e710475dba}{00152}}\ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr_ae805418b9f03f14ff49649e710475dba}{linked\_ptr}}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ ptr\ =\ NULL)\ \{\ capture(ptr);\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00153}\mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr_af99460fd09ca0f83e061ea480ef1a45e}{00153}}\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr_af99460fd09ca0f83e061ea480ef1a45e}{\string~linked\_ptr}}()\ \{\ depart();\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00154}00154\ }
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00155}00155\ \ \ \textcolor{comment}{//\ Copy\ an\ existing\ linked\_ptr<>,\ adding\ ourselves\ to\ the\ list\ of\ references.}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00156}\mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr_a7597ed91006edd0467c99bd1aaab07f5}{00156}}\ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ U>\ \mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr_a7597ed91006edd0467c99bd1aaab07f5}{linked\_ptr}}(\mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr}{linked\_ptr<U>}}\ \textcolor{keyword}{const}\&\ ptr)\ \{\ copy(\&ptr);\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00157}\mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr_abc076b5678cc7f64306d5ecfefc93aff}{00157}}\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr_abc076b5678cc7f64306d5ecfefc93aff}{linked\_ptr}}(\mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr}{linked\_ptr}}\ \textcolor{keyword}{const}\&\ ptr)\ \{\ \ \textcolor{comment}{//\ NOLINT}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00158}00158\ \ \ \ \ assert(\&ptr\ !=\ \textcolor{keyword}{this});}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00159}00159\ \ \ \ \ copy(\&ptr);}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00160}00160\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00161}00161\ }
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00162}00162\ \ \ \textcolor{comment}{//\ Assignment\ releases\ the\ old\ value\ and\ acquires\ the\ new.}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00163}\mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr_a0d3b295e93e7dce1b7c70301a3c87a75}{00163}}\ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ U>\ \mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr}{linked\_ptr}}\&\ \mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr_a0d3b295e93e7dce1b7c70301a3c87a75}{operator=}}(\mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr}{linked\_ptr<U>}}\ \textcolor{keyword}{const}\&\ ptr)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00164}00164\ \ \ \ \ depart();}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00165}00165\ \ \ \ \ copy(\&ptr);}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00166}00166\ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00167}00167\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00168}00168\ }
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00169}\mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr_a4bf7f2180b29505b85f8e84bf5819a86}{00169}}\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr}{linked\_ptr}}\&\ \mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr_a4bf7f2180b29505b85f8e84bf5819a86}{operator=}}(\mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr}{linked\_ptr}}\ \textcolor{keyword}{const}\&\ ptr)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00170}00170\ \ \ \ \ \textcolor{keywordflow}{if}\ (\&ptr\ !=\ \textcolor{keyword}{this})\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00171}00171\ \ \ \ \ \ \ depart();}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00172}00172\ \ \ \ \ \ \ copy(\&ptr);}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00173}00173\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00174}00174\ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00175}00175\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00176}00176\ }
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00177}00177\ \ \ \textcolor{comment}{//\ Smart\ pointer\ members.}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00178}\mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr_a95ba3b7b66ed0193c779976c6e126ab6}{00178}}\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr_a95ba3b7b66ed0193c779976c6e126ab6}{reset}}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ ptr\ =\ NULL)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00179}00179\ \ \ \ \ depart();}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00180}00180\ \ \ \ \ capture(ptr);}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00181}00181\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00182}\mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr_aca6bc39c9d73278fb495804fa508ad73}{00182}}\ \ \ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ \mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr_aca6bc39c9d73278fb495804fa508ad73}{get}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ value\_;\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00183}\mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr_a982abffe8701d73a5411d2c8b3929c54}{00183}}\ \ \ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ \mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr_a982abffe8701d73a5411d2c8b3929c54}{operator-\/>}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ value\_;\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00184}\mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr_a778fb0f0b4ee9c46097014a65274e371}{00184}}\ \ \ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ \mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr_a778fb0f0b4ee9c46097014a65274e371}{operator*}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ *value\_;\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00185}00185\ }
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00186}\mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr_ad87ac8ff5543b6fad66e2f3c9844581a}{00186}}\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr_ad87ac8ff5543b6fad66e2f3c9844581a}{operator==}}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ value\_\ ==\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}};\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00187}\mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr_a10305395af92bd2fec7bca085cabc99c}{00187}}\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr_a10305395af92bd2fec7bca085cabc99c}{operator!=}}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ value\_\ !=\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}};\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00188}00188\ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ U>}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00189}\mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr_a79306e959a4ae7b3a9da641d2ba06ce6}{00189}}\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr_a79306e959a4ae7b3a9da641d2ba06ce6}{operator==}}(\mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr}{linked\_ptr<U>}}\ \textcolor{keyword}{const}\&\ ptr)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00190}00190\ \ \ \ \ \textcolor{keywordflow}{return}\ value\_\ ==\ ptr.\mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr_aca6bc39c9d73278fb495804fa508ad73}{get}}();}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00191}00191\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00192}00192\ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ U>}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00193}\mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr_a4801114a83a9e12b08f90e0d28318f26}{00193}}\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr_a4801114a83a9e12b08f90e0d28318f26}{operator!=}}(\mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr}{linked\_ptr<U>}}\ \textcolor{keyword}{const}\&\ ptr)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00194}00194\ \ \ \ \ \textcolor{keywordflow}{return}\ value\_\ !=\ ptr.\mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr_aca6bc39c9d73278fb495804fa508ad73}{get}}();}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00195}00195\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00196}00196\ }
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00197}00197\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00198}00198\ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ U>}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00199}\mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr_a7763f286ca03a7f7363a033d996c8c1c}{00199}}\ \ \ \textcolor{keyword}{friend}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr}{linked\_ptr}};}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00200}00200\ }
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00201}00201\ \ \ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ value\_;}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00202}00202\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr__internal}{linked\_ptr\_internal}}\ link\_;}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00203}00203\ }
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00204}00204\ \ \ \textcolor{keywordtype}{void}\ depart()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00205}00205\ \ \ \ \ \textcolor{keywordflow}{if}\ (link\_.\mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr__internal_a8699e539d9702d363ef0351012d1b3ca}{depart}}())\ \textcolor{keyword}{delete}\ value\_;}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00206}00206\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00207}00207\ }
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00208}00208\ \ \ \textcolor{keywordtype}{void}\ capture(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ ptr)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00209}00209\ \ \ \ \ value\_\ =\ ptr;}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00210}00210\ \ \ \ \ link\_.\mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr__internal_a742af1f65df2d5e2b7198a1b74264a83}{join\_new}}();}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00211}00211\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00212}00212\ }
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00213}00213\ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ U>\ \textcolor{keywordtype}{void}\ copy(\mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr_a7763f286ca03a7f7363a033d996c8c1c}{linked\_ptr<U>}}\ \textcolor{keyword}{const}*\ ptr)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00214}00214\ \ \ \ \ value\_\ =\ ptr-\/>get();}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00215}00215\ \ \ \ \ \textcolor{keywordflow}{if}\ (value\_)}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00216}00216\ \ \ \ \ \ \ link\_.\mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr__internal_acd5a341459f7e81b10b4112d8c764e2a}{join}}(\&ptr-\/>link\_);}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00217}00217\ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00218}00218\ \ \ \ \ \ \ link\_.\mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr__internal_a742af1f65df2d5e2b7198a1b74264a83}{join\_new}}();}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00219}00219\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00220}00220\ \};}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00221}00221\ }
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00222}00222\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>\ \textcolor{keyword}{inline}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00223}\mbox{\hyperlink{namespacetesting_1_1internal_ad1cb54a206a209ddace17a05359d38ae}{00223}}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacetesting_1_1internal_ad1cb54a206a209ddace17a05359d38ae}{operator==}}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ ptr,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr}{linked\_ptr<T>}}\&\ x)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00224}00224\ \ \ \textcolor{keywordflow}{return}\ ptr\ ==\ x.\mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr_aca6bc39c9d73278fb495804fa508ad73}{get}}();}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00225}00225\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00226}00226\ }
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00227}00227\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>\ \textcolor{keyword}{inline}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00228}\mbox{\hyperlink{namespacetesting_1_1internal_a6910869259f8f31825b471e9190fa09a}{00228}}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacetesting_1_1internal_a6910869259f8f31825b471e9190fa09a}{operator!=}}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ ptr,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr}{linked\_ptr<T>}}\&\ x)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00229}00229\ \ \ \textcolor{keywordflow}{return}\ ptr\ !=\ x.\mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr_aca6bc39c9d73278fb495804fa508ad73}{get}}();}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00230}00230\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00231}00231\ }
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00232}00232\ \textcolor{comment}{//\ A\ function\ to\ convert\ T*\ into\ linked\_ptr<T>}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00233}00233\ \textcolor{comment}{//\ Doing\ e.g.\ make\_linked\_ptr(new\ FooBarBaz<type>(arg))\ is\ a\ shorter\ notation}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00234}00234\ \textcolor{comment}{//\ for\ linked\_ptr<FooBarBaz<type>\ >(new\ FooBarBaz<type>(arg))}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00235}00235\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00236}\mbox{\hyperlink{namespacetesting_1_1internal_aca9262dd7699d1674693a51c554d7229}{00236}}\ \mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr}{linked\_ptr<T>}}\ \mbox{\hyperlink{namespacetesting_1_1internal_aca9262dd7699d1674693a51c554d7229}{make\_linked\_ptr}}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ ptr)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00237}00237\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr}{linked\_ptr<T>}}(ptr);}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00238}00238\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00239}00239\ }
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00240}00240\ \}\ \ \textcolor{comment}{//\ namespace\ internal}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00241}00241\ \}\ \ \textcolor{comment}{//\ namespace\ testing}}
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00242}00242\ }
+\DoxyCodeLine{\Hypertarget{gtest-linked__ptr_8h_source_l00243}00243\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_INCLUDE\_GTEST\_INTERNAL\_GTEST\_LINKED\_PTR\_H\_}}
+
+\end{DoxyCode}

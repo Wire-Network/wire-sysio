@@ -1,0 +1,98 @@
+\doxysection{appbase\+::first\+\_\+success\+\_\+policy\texorpdfstring{$<$}{<} Ret(Args...)\texorpdfstring{$>$}{>} Struct Template Reference}
+\hypertarget{structappbase_1_1first__success__policy_3_01_ret_07_args_8_8_8_08_4}{}\label{structappbase_1_1first__success__policy_3_01_ret_07_args_8_8_8_08_4}\index{appbase::first\_success\_policy$<$ Ret(Args...)$>$@{appbase::first\_success\_policy$<$ Ret(Args...)$>$}}
+
+
+{\ttfamily \#include $<$method.\+hpp$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{structappbase_1_1first__success__policy_3_01_ret_07_args_8_8_8_08_4_a6d05b707e14e07ff977e06a917b0d6eb}{result\+\_\+type}} = Ret
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename Input\+Iterator $>$ }\\Ret \mbox{\hyperlink{structappbase_1_1first__success__policy_3_01_ret_07_args_8_8_8_08_4_a4d90bd01043c328cc7c9f067e57ddfdc}{operator()}} (Input\+Iterator first, Input\+Iterator last)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Ret, typename ... Args$>$\newline
+struct appbase\+::first\+\_\+success\+\_\+policy$<$ Ret(\+Args...)$>$}
+
+
+Definition at line \mbox{\hyperlink{method_8hpp_source_l00022}{22}} of file \mbox{\hyperlink{method_8hpp_source}{method.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{structappbase_1_1first__success__policy_3_01_ret_07_args_8_8_8_08_4_a6d05b707e14e07ff977e06a917b0d6eb}\index{appbase::first\_success\_policy$<$ Ret(Args...)$>$@{appbase::first\_success\_policy$<$ Ret(Args...)$>$}!result\_type@{result\_type}}
+\index{result\_type@{result\_type}!appbase::first\_success\_policy$<$ Ret(Args...)$>$@{appbase::first\_success\_policy$<$ Ret(Args...)$>$}}
+\doxysubsubsection{\texorpdfstring{result\_type}{result\_type}}
+{\footnotesize\ttfamily \label{structappbase_1_1first__success__policy_3_01_ret_07_args_8_8_8_08_4_a6d05b707e14e07ff977e06a917b0d6eb} 
+template$<$typename Ret , typename ... Args$>$ \\
+using \mbox{\hyperlink{structappbase_1_1first__success__policy}{appbase\+::first\+\_\+success\+\_\+policy}}$<$ Ret(Args...)$>$\+::result\+\_\+type = Ret}
+
+
+
+Definition at line \mbox{\hyperlink{method_8hpp_source_l00023}{23}} of file \mbox{\hyperlink{method_8hpp_source}{method.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structappbase_1_1first__success__policy_3_01_ret_07_args_8_8_8_08_4_a4d90bd01043c328cc7c9f067e57ddfdc}\index{appbase::first\_success\_policy$<$ Ret(Args...)$>$@{appbase::first\_success\_policy$<$ Ret(Args...)$>$}!operator()@{operator()}}
+\index{operator()@{operator()}!appbase::first\_success\_policy$<$ Ret(Args...)$>$@{appbase::first\_success\_policy$<$ Ret(Args...)$>$}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}}
+{\footnotesize\ttfamily \label{structappbase_1_1first__success__policy_3_01_ret_07_args_8_8_8_08_4_a4d90bd01043c328cc7c9f067e57ddfdc} 
+template$<$typename Ret , typename ... Args$>$ \\
+template$<$typename Input\+Iterator $>$ \\
+Ret \mbox{\hyperlink{structappbase_1_1first__success__policy}{appbase\+::first\+\_\+success\+\_\+policy}}$<$ Ret(Args...)$>$\+::operator() (\begin{DoxyParamCaption}\item[{Input\+Iterator}]{first}{, }\item[{Input\+Iterator}]{last}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Iterate through the providers, calling (dereferencing) each if the provider throws, then store then try the next provider if none succeed throw an error with the aggregated error descriptions
+
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em Input\+Iterator} & \\
+\hline
+\end{DoxyTemplParams}
+
+\begin{DoxyParams}{Parameters}
+{\em first} & \\
+\hline
+{\em last} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{method_8hpp_source_l00036}{36}} of file \mbox{\hyperlink{method_8hpp_source}{method.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ std::string\ err;}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (first\ !=\ last)\ \{}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *first;\ \textcolor{comment}{//\ de-\/referencing\ the\ iterator\ causes\ the\ provider\ to\ run}}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!err.empty())\ \{}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ err\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)"{},\(\backslash\)"{}"{}};}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00045\ }
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ err\ +=\ boost::current\_exception\_diagnostic\_information();}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00048\ }
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \ \ \ \ ++first;}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00051\ }
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::length\_error(std::string(\textcolor{stringliteral}{"{}No\ Result\ Available,\ All\ providers\ returned\ exceptions["{}})\ +\ err\ +\ \textcolor{stringliteral}{"{}]"{}});}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/appbase/include/appbase/\mbox{\hyperlink{method_8hpp}{method.\+hpp}}\end{DoxyCompactItemize}

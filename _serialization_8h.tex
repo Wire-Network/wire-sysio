@@ -1,0 +1,100 @@
+\doxysection{libraries/wasm-\/jit/\+Include/\+Inline/\+Serialization.h File Reference}
+\hypertarget{_serialization_8h}{}\label{_serialization_8h}\index{libraries/wasm-\/jit/Include/Inline/Serialization.h@{libraries/wasm-\/jit/Include/Inline/Serialization.h}}
+{\ttfamily \#include "{}Platform/\+Platform.\+h"{}}\newline
+{\ttfamily \#include "{}../../../chain/include/sysio/chain/wasm\+\_\+sysio\+\_\+constraints.\+hpp"{}}\newline
+{\ttfamily \#include $<$string$>$}\newline
+{\ttfamily \#include $<$vector$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include $<$algorithm$>$}\newline
+Include dependency graph for Serialization.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{_serialization_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{_serialization_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_serialization_1_1_fatal_serialization_exception}{Serialization\+::\+Fatal\+Serialization\+Exception}}
+\item 
+struct \mbox{\hyperlink{struct_serialization_1_1_output_stream}{Serialization\+::\+Output\+Stream}}
+\item 
+struct \mbox{\hyperlink{struct_serialization_1_1_array_output_stream}{Serialization\+::\+Array\+Output\+Stream}}
+\item 
+struct \mbox{\hyperlink{struct_serialization_1_1_input_stream}{Serialization\+::\+Input\+Stream}}
+\item 
+struct \mbox{\hyperlink{struct_serialization_1_1_memory_input_stream}{Serialization\+::\+Memory\+Input\+Stream}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespace_w_a_s_m}{WASM}}
+\item 
+namespace \mbox{\hyperlink{namespace_serialization}{Serialization}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_a724fb9f82013c782db5c3c12ea36aac8}{FORCEINLINE}} void \mbox{\hyperlink{namespace_serialization_aee190f414695b837a7b75cd86adc516f}{Serialization\+::serialize\+Bytes}} (\mbox{\hyperlink{struct_serialization_1_1_output_stream}{Output\+Stream}} \&stream, const \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} \texorpdfstring{$\ast$}{*}bytes, \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} num\+Bytes)
+\item 
+\mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_a724fb9f82013c782db5c3c12ea36aac8}{FORCEINLINE}} void \mbox{\hyperlink{namespace_serialization_ab3502c43ba150270c3c65b4e7c87080e}{Serialization\+::serialize\+Bytes}} (\mbox{\hyperlink{struct_serialization_1_1_input_stream}{Input\+Stream}} \&stream, \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} \texorpdfstring{$\ast$}{*}bytes, \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} num\+Bytes)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} $>$ }\\\mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_a724fb9f82013c782db5c3c12ea36aac8}{FORCEINLINE}} void \mbox{\hyperlink{namespace_serialization_acbd5d61d25bec4a37a4ecc33f7734155}{Serialization\+::serialize\+Native\+Value}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespace_serialization_a2a05c5aff4847073ca0fb887d20ac485}{Serialization\+::serialize}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} \&i)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespace_serialization_aa8a7b1baac3660bd63f2418dbbd61efe}{Serialization\+::serialize}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}} \&i)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespace_serialization_a4ac446f43ac33663fbfb891e78049e0f}{Serialization\+::serialize}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, \mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}} \&i)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespace_serialization_a4354d6cf14b1ce6de06039ef97269365}{Serialization\+::serialize}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, \mbox{\hyperlink{_basic_types_8h_a33c92dd47950aa8c1d6df7e1c163e5a6}{I8}} \&i)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespace_serialization_afb8810a09bbf513478059c7abafbf891}{Serialization\+::serialize}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, \mbox{\hyperlink{_basic_types_8h_a2f1a62071dd7dc3f6ef85c1b7612dc35}{I32}} \&i)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespace_serialization_ad66c33ddcb4f0294cbbf939530f192ee}{Serialization\+::serialize}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, \mbox{\hyperlink{_basic_types_8h_a416b74ff5b1dc365af5713a3f48fb8b9}{I64}} \&i)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespace_serialization_a10e426850f78156cd8c3bcf355f85e08}{Serialization\+::serialize}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, \mbox{\hyperlink{_basic_types_8h_a841d3674577a1e86afdc2f4845f46c4b}{F32}} \&\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespace_serialization_a855a29de6a26c8f99d47c22f11804a5f}{Serialization\+::serialize}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, \mbox{\hyperlink{_basic_types_8h_adc9896ee12db3bb116fc63b3464c72c7}{F64}} \&\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} , \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} max\+Bits$>$ }\\\mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_a724fb9f82013c782db5c3c12ea36aac8}{FORCEINLINE}} void \mbox{\hyperlink{namespace_serialization_a7542db4eecbd9af4bc8398241da2614d}{Serialization\+::serialize\+Var\+Int}} (\mbox{\hyperlink{struct_serialization_1_1_output_stream}{Output\+Stream}} \&stream, \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} \&in\+Value, \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} min\+Value, \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} max\+Value)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} , \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} max\+Bits$>$ }\\\mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_a724fb9f82013c782db5c3c12ea36aac8}{FORCEINLINE}} void \mbox{\hyperlink{namespace_serialization_a3999d7df48f01a86a1c743401da00fc6}{Serialization\+::serialize\+Var\+Int}} (\mbox{\hyperlink{struct_serialization_1_1_input_stream}{Input\+Stream}} \&stream, \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}, \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} min\+Value, \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} max\+Value)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} $>$ }\\void \mbox{\hyperlink{namespace_serialization_a46462b1f33100cfe651e13e844827dec}{Serialization\+::serialize\+Var\+UInt1}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} $>$ }\\void \mbox{\hyperlink{namespace_serialization_af14a3f6c258b4253ad4d75a57827d41e}{Serialization\+::serialize\+Var\+UInt7}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} $>$ }\\void \mbox{\hyperlink{namespace_serialization_a1ea6ecb2f4de00340f936648398f4f66}{Serialization\+::serialize\+Var\+UInt32}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} $>$ }\\void \mbox{\hyperlink{namespace_serialization_a4ac33cb15215c7dbaae4eb516786aba4}{Serialization\+::serialize\+Var\+UInt64}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} $>$ }\\void \mbox{\hyperlink{namespace_serialization_aa3a610a68eadc6fc16175ae3b4e3a829}{Serialization\+::serialize\+Var\+Int7}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} $>$ }\\void \mbox{\hyperlink{namespace_serialization_ad134d54737dffbb61803344f6ffbd778}{Serialization\+::serialize\+Var\+Int32}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} $>$ }\\void \mbox{\hyperlink{namespace_serialization_aa9ecd5c87d12b25bb872a2f822d0b729}{Serialization\+::serialize\+Var\+Int64}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+{\footnotesize template$<$typename Constant $>$ }\\void \mbox{\hyperlink{namespace_serialization_a1b9abe1b3bbe0732eb1f8d900be0f3aa}{Serialization\+::serialize\+Constant}} (\mbox{\hyperlink{struct_serialization_1_1_input_stream}{Input\+Stream}} \&stream, const char \texorpdfstring{$\ast$}{*}constant\+Mismatch\+Message, Constant constant)
+\item 
+{\footnotesize template$<$typename Constant $>$ }\\void \mbox{\hyperlink{namespace_serialization_aa8b915b1069c6ce250def8c15606cbbf}{Serialization\+::serialize\+Constant}} (\mbox{\hyperlink{struct_serialization_1_1_output_stream}{Output\+Stream}} \&stream, const char \texorpdfstring{$\ast$}{*}constant\+Mismatch\+Message, Constant constant)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespace_serialization_a9af40bc27e193e72b3946d97f4f40cb2}{Serialization\+::serialize}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, std\+::string \&string)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename Element , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} , typename Serialize\+Element $>$ }\\void \mbox{\hyperlink{namespace_serialization_a4eb4f7ddb9c392ea5af0205ef8e4e987}{Serialization\+::serialize\+Array}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, std\+::vector$<$ Element, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \&vector, Serialize\+Element serialize\+Element)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename Element , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ }\\void \mbox{\hyperlink{namespace_serialization_a28ab1a84c8ac0af04f22000d514e17b5}{Serialization\+::serialize}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, std\+::vector$<$ Element, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \&vector)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{namespace_w_a_s_m_a5c8e6887571b126ae374d7cb5c38eac4}{WASM\+::check\+\_\+limits}} = true
+\end{DoxyCompactItemize}

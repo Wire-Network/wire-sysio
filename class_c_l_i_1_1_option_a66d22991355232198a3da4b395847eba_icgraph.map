@@ -1,0 +1,15 @@
+<map id="CLI::Option::expected" name="CLI::Option::expected">
+<area shape="rect" id="Node000001" title="Set the number of expected arguments." alt="" coords="367,63,516,88"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_app.html#a27ca8c7e673f9fdac9a5a80c1a0704ea" title="Add option for assigning to a variable." alt="" coords="175,5,319,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="380,60,292,34,294,29,382,55"/>
+<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_app.html#a199d89ab0bbb8eedaf23bea5ca27a3e1" title="Add option for a callback of a specific type." alt="" coords="175,55,319,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="352,78,320,78,320,73,352,73"/>
+<area shape="rect" id="Node000004" href="$namespace_c_l_i.html#a36cfe4a6a80bf143735c0b80960bc252" title="Helper function to mark an option as retired." alt="" coords="186,120,308,146"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="382,96,294,122,292,117,380,91"/>
+<area shape="rect" id="Node000005" href="$namespace_c_l_i.html#a77cd1a3639a91dea33a7d144ea476df6" title="Helper function to mark an option as retired." alt="" coords="5,71,127,96"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="181,118,115,100,117,94,183,113"/>
+<area shape="rect" id="Node000006" href="$namespace_c_l_i.html#a52390f850f663cf38a27e134c1a39b61" title="Helper function to mark an option as retired." alt="" coords="5,120,127,146"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="170,136,127,136,127,130,170,130"/>
+<area shape="rect" id="Node000007" href="$namespace_c_l_i.html#ad9ac23b01e2ef840ec123f5a115302ab" title="Helper function to mark an option as retired." alt="" coords="5,169,127,195"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="183,153,117,171,115,166,181,148"/>
+</map>

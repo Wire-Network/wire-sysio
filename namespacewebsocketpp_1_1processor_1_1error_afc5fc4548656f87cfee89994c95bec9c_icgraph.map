@@ -1,0 +1,40 @@
+<map id="websocketpp::processor::error::make_error_code" name="websocketpp::processor::error::make_error_code">
+<area shape="rect" id="Node000001" title="Create an error code with the given value and the processor category." alt="" coords="494,260,657,300"/>
+<area shape="rect" id="Node000002" href="$hybi13_8cpp.html#aa81ce66bd74d7c83e4c6bc32514cb3a8" title=" " alt="" coords="5,118,202,143"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="556,247,537,216,512,182,481,150,445,126,408,112,369,104,328,100,288,100,213,107,152,120,151,114,213,102,288,94,329,95,369,99,409,107,447,121,485,146,516,178,542,213,560,244"/>
+<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1processor_1_1hybi00.html#a5f88e94fc52da9be8ba718889b5c093f" title="Fill in a set of request headers for a client connection request." alt="" coords="260,5,436,61"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="557,247,513,166,481,121,444,82,418,64,421,59,448,78,486,118,518,163,562,244"/>
+<area shape="rect" id="Node000005" href="$classwebsocketpp_1_1processor_1_1hybi07.html#a9742c622a7b1b5d54daa03a2fe0b060b" title="Fill in a set of request headers for a client connection request." alt="" coords="260,136,436,192"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="528,254,445,206,420,195,422,190,447,201,531,249"/>
+<area shape="rect" id="Node000006" href="$classwebsocketpp_1_1processor_1_1hybi08.html#a9509cba08ab3a15ea2ff34276b2582cb" title="Fill in a set of request headers for a client connection request." alt="" coords="260,216,436,272"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="478,267,436,260,437,255,479,262"/>
+<area shape="rect" id="Node000007" href="$classwebsocketpp_1_1processor_1_1hybi00.html#ab7b5ff7d3a174454404fe97314ed4717" title="Extracts requested subprotocols from a handshake request." alt="" coords="250,296,446,336"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="479,298,447,303,446,298,478,292"/>
+<area shape="rect" id="Node000012" href="$classwebsocketpp_1_1processor_1_1hybi13.html#a3d3b0e51df97cd7c8dcde00fb3003a34" title="Extracts requested subprotocols from a handshake request." alt="" coords="250,361,446,402"/>
+<area shape="poly" id="edge12_Node000001_Node000012" title=" " alt="" coords="527,310,447,350,415,363,413,358,445,345,524,306"/>
+<area shape="rect" id="Node000013" href="$classwebsocketpp_1_1processor_1_1hybi00.html#a8c7e9edc5eec497d908095ab7a848f2e" title="Validate the server&#39;s response to an outgoing handshake request." alt="" coords="266,431,430,486"/>
+<area shape="poly" id="edge13_Node000001_Node000013" title=" " alt="" coords="551,314,506,365,448,415,420,432,417,428,444,411,502,361,547,310"/>
+<area shape="rect" id="Node000019" href="$classwebsocketpp_1_1processor_1_1hybi13.html#a8b3cea2f1526b4982e0836c5705584a8" title="Validate the server&#39;s response to an outgoing handshake request." alt="" coords="266,511,430,566"/>
+<area shape="poly" id="edge19_Node000001_Node000019" title=" " alt="" coords="565,315,547,357,522,406,489,456,448,500,431,512,428,508,444,497,484,453,517,404,542,355,560,313"/>
+<area shape="rect" id="Node000004" href="$hybi13_8cpp.html#ae71b3d5940e72a22996ab38556e61b74" title=" " alt="" coords="5,20,202,46"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="244,36,202,36,202,30,244,30"/>
+<area shape="poly" id="edge9_Node000007_Node000002" title=" " alt="" coords="252,289,248,286,229,261,222,237,216,213,200,188,169,164,137,146,139,141,172,159,204,185,220,211,227,236,234,259,252,282,255,285"/>
+<area shape="rect" id="Node000008" href="$hybi00_8cpp.html#a78b1f99d01e714be5a1f69517cbd995e" title=" " alt="" coords="5,347,202,373"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="235,339,179,349,178,344,234,334"/>
+<area shape="rect" id="Node000009" href="$hybi13_8cpp.html#a3b48fcf441b161c0f1652936cfefc2ab" title=" " alt="" coords="5,199,202,225"/>
+<area shape="poly" id="edge8_Node000007_Node000009" title=" " alt="" coords="257,291,248,286,233,274,224,261,215,249,200,238,176,228,178,223,203,234,219,245,228,258,237,270,251,282,259,286"/>
+<area shape="rect" id="Node000010" href="$hybi13_8cpp.html#aadca76141c5781ac204fc974bd93d97a" title=" " alt="" coords="5,248,202,274"/>
+<area shape="poly" id="edge10_Node000007_Node000010" title=" " alt="" coords="238,294,164,277,165,272,239,289"/>
+<area shape="rect" id="Node000011" href="$hybi13_8cpp.html#ac5fb5cd780c134dae40dd025879238ac" title=" " alt="" coords="5,298,202,323"/>
+<area shape="poly" id="edge11_Node000007_Node000011" title=" " alt="" coords="234,316,202,315,202,310,234,311"/>
+<area shape="rect" id="Node000014" href="$hybi13_8cpp.html#a179dbaba417ad6d154b7a488d6cc5fba" title=" " alt="" coords="5,446,202,471"/>
+<area shape="poly" id="edge14_Node000013_Node000014" title=" " alt="" coords="251,461,202,461,202,456,251,456"/>
+<area shape="rect" id="Node000015" href="$hybi13_8cpp.html#acc5f6ba7659c10b9ac9ff459921e032a" title=" " alt="" coords="5,495,202,521"/>
+<area shape="poly" id="edge15_Node000013_Node000015" title=" " alt="" coords="252,481,171,497,170,492,250,475"/>
+<area shape="rect" id="Node000016" href="$hybi13_8cpp.html#ae8e3663a31c85ad34b9df23916a74c40" title=" " alt="" coords="5,544,202,570"/>
+<area shape="poly" id="edge16_Node000013_Node000016" title=" " alt="" coords="260,496,251,501,228,519,203,536,174,546,172,541,200,531,224,514,248,496,258,491"/>
+<area shape="rect" id="Node000017" href="$hybi13_8cpp.html#a2152b3bfaab7e9b4c0a0c7bbd41d1e38" title=" " alt="" coords="5,594,202,619"/>
+<area shape="poly" id="edge17_Node000013_Node000017" title=" " alt="" coords="255,497,252,500,236,521,229,542,221,564,203,585,184,596,182,591,200,580,217,561,224,541,231,519,248,497,252,493"/>
+<area shape="rect" id="Node000018" href="$hybi13_8cpp.html#ad30b1dedaaf5ea3e45daa2e0f71a0c30" title=" " alt="" coords="5,396,202,422"/>
+<area shape="poly" id="edge18_Node000013_Node000018" title=" " alt="" coords="250,442,170,425,171,420,252,436"/>
+</map>

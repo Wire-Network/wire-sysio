@@ -1,0 +1,29 @@
+<map id="Writer::WriteDouble" name="Writer::WriteDouble">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,235,140,260"/>
+<area shape="rect" id="Node000002" href="$namespaceinternal.html#a38ffd2dab9bb216948f828f3a36c801f" title=" " alt="" coords="188,185,284,211"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="117,231,176,213,177,219,119,237"/>
+<area shape="rect" id="Node000013" href="$stream_8h.html#aa817b00a466bb84d96c5de1616436c95" title="Reserve n characters for writing to a stream." alt="" coords="191,235,281,260"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="140,245,175,245,175,250,140,250"/>
+<area shape="rect" id="Node000014" href="$stream_8h.html#ad57ba7f2912c5509924b69dec7db4396" title="Write character to a stream, presuming buffer is reserved." alt="" coords="194,284,278,310"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="119,258,181,277,179,283,117,264"/>
+<area shape="rect" id="Node000003" href="$namespaceinternal.html#aeb7b6c0784b644968003cbd1b9da57e3" title=" " alt="" coords="334,161,443,187"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="284,188,318,183,319,188,285,193"/>
+<area shape="rect" id="Node000010" href="$namespaceinternal.html#a4b194248657212e94cc3f244b09dbeae" title=" " alt="" coords="332,211,445,236"/>
+<area shape="poly" id="edge9_Node000002_Node000010" title=" " alt="" coords="285,203,317,209,316,214,284,209"/>
+<area shape="rect" id="Node000004" href="$namespaceinternal.html#a47be9aea8d0f9cae49dc03dc046d2450" title=" " alt="" coords="519,80,642,106"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="420,158,533,110,535,115,422,163"/>
+<area shape="rect" id="Node000008" href="$namespaceinternal.html#abac3dbfa1070756c37725829148f6038" title=" " alt="" coords="493,161,668,187"/>
+<area shape="poly" id="edge7_Node000003_Node000008" title=" " alt="" coords="444,172,477,172,477,177,444,177"/>
+<area shape="rect" id="Node000005" href="$namespaceinternal.html#a8aae11dbb46da9ac99e116aa2a6dbfc9" title=" " alt="" coords="716,5,911,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="613,77,715,40,739,33,740,38,716,45,615,82"/>
+<area shape="rect" id="Node000006" href="$namespaceinternal.html#a234e10bef097ccb2f202b7a133086e71" title=" " alt="" coords="743,55,884,80"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="642,84,727,74,728,79,643,89"/>
+<area shape="rect" id="Node000007" href="$030-_asn-_require-_check_8cpp.html#a94c3399fbf75a3c798e148d5238ad242" title=" " alt="" coords="792,104,834,130"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="643,96,777,111,777,116,642,102"/>
+<area shape="rect" id="Node000009" href="$namespaceinternal.html#a3e95f043ed6c40cda1c1bc33c2f0ece2" title=" " alt="" coords="726,154,900,194"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="668,172,710,172,710,177,668,177"/>
+<area shape="rect" id="Node000011" href="$namespaceinternal.html#aadc1fd5929c1c67a56c8ba480c587bac" title=" " alt="" coords="502,215,659,240"/>
+<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="446,222,487,223,487,228,446,227"/>
+<area shape="rect" id="Node000012" href="$namespaceinternal.html#a76ad2b55668f695effde1971d53a5ce1" title=" " alt="" coords="741,219,886,244"/>
+<area shape="poly" id="edge11_Node000011_Node000012" title=" " alt="" coords="659,226,726,227,726,233,659,232"/>
+</map>

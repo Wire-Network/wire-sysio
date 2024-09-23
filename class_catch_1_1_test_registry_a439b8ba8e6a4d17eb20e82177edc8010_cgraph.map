@@ -1,0 +1,11 @@
+<map id="Catch::TestRegistry::registerTest" name="Catch::TestRegistry::registerTest">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,87,144,127"/>
+<area shape="poly" id="edge2_Node000001_Node000001" title=" " alt="" coords="32,87,30,77,37,68,52,62,75,60,99,62,114,69,111,74,98,68,74,65,53,67,40,72,35,78,37,85"/>
+<area shape="rect" id="Node000002" href="$class_catch_1_1_test_case.html#a804d0a6a5dc92b219e724f1390c25c7f" title=" " alt="" coords="215,5,386,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="121,84,191,55,210,49,212,54,193,60,123,89"/>
+<area shape="rect" id="Node000003" href="$class_catch_1_1_reusable_string_stream.html#a0e9ecf260b2a5d35f4886ef0d51f6270" title=" " alt="" coords="192,94,410,120"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="144,104,176,104,176,110,144,110"/>
+<area shape="rect" id="Node000004" href="$class_catch_1_1_test_case.html#a0812e8a216d09b087d5874687009f0d6" title=" " alt="" coords="207,144,394,169"/>
+<area shape="poly" id="edge5_Node000001_Node000004" title=" " alt="" coords="145,119,224,137,223,142,144,125"/>
+<area shape="poly" id="edge4_Node000003_Node000003" title=" " alt="" coords="263,95,256,86,260,76,276,70,301,68,328,70,343,77,340,82,327,75,301,73,277,75,264,80,261,85,267,92"/>
+</map>

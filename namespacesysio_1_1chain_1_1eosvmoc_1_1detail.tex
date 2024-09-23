@@ -1,0 +1,35 @@
+\doxysection{sysio\+::chain\+::eosvmoc\+::detail Namespace Reference}
+\hypertarget{namespacesysio_1_1chain_1_1eosvmoc_1_1detail}{}\label{namespacesysio_1_1chain_1_1eosvmoc_1_1detail}\index{sysio::chain::eosvmoc::detail@{sysio::chain::eosvmoc::detail}}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename... Args$>$ }\\constexpr auto \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1detail_ac025d056b200fb2a6da4210e7ba6edb5}{generate\+\_\+table}} (Args \&\&... args)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_1_1detail_ac025d056b200fb2a6da4210e7ba6edb5}\index{sysio::chain::eosvmoc::detail@{sysio::chain::eosvmoc::detail}!generate\_table@{generate\_table}}
+\index{generate\_table@{generate\_table}!sysio::chain::eosvmoc::detail@{sysio::chain::eosvmoc::detail}}
+\doxysubsubsection{\texorpdfstring{generate\_table()}{generate\_table()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_1_1detail_ac025d056b200fb2a6da4210e7ba6edb5} 
+template$<$typename... Args$>$ \\
+auto sysio\+::chain\+::eosvmoc\+::detail\+::generate\+\_\+table (\begin{DoxyParamCaption}\item[{Args \&\&...}]{args}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{intrinsic__mapping_8hpp_source_l00012}{12}} of file \mbox{\hyperlink{intrinsic__mapping_8hpp_source}{intrinsic\+\_\+mapping.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00012\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00013\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::array<std::string\_view,\ \textcolor{keyword}{sizeof}...(Args)>\ \{\ args...\ \};}
+\DoxyCodeLine{00014\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1chain_1_1eosvmoc_1_1detail_ac025d056b200fb2a6da4210e7ba6edb5_icgraph}
+\end{center}
+\end{figure}

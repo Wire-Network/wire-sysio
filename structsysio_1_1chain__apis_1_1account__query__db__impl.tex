@@ -1,0 +1,796 @@
+\doxysection{sysio\+::chain\+\_\+apis\+::account\+\_\+query\+\_\+db\+\_\+impl Struct Reference}
+\hypertarget{structsysio_1_1chain__apis_1_1account__query__db__impl}{}\label{structsysio_1_1chain__apis_1_1account__query__db__impl}\index{sysio::chain\_apis::account\_query\_db\_impl@{sysio::chain\_apis::account\_query\_db\_impl}}
+
+
+Collaboration diagram for sysio\+::chain\+\_\+apis\+::account\+\_\+query\+\_\+db\+\_\+impl\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain__apis_1_1account__query__db__impl__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_a80e7966e67f2a780ce1f804ca2239f4c}{permission\+\_\+set\+\_\+t}} = std\+::set$<$\mbox{\hyperlink{structsysio_1_1chain_1_1permission__level}{chain\+::permission\+\_\+level}}$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_af147fd6d9ed179c6f379965feb0579a6}{cached\+\_\+trace\+\_\+map\+\_\+t}} = std\+::map$<$\mbox{\hyperlink{namespacesysio_1_1chain_aa85a3b49b3b219d1e3840567579e7e63}{chain\+::transaction\+\_\+id\+\_\+type}}, \mbox{\hyperlink{namespacesysio_1_1chain_a4ee2867a6bec961c7a78b203cfd76be9}{chain\+::transaction\+\_\+trace\+\_\+ptr}}$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_abdd57326fce804f4a467539158816e88}{onblock\+\_\+trace\+\_\+t}} = std\+::optional$<$\mbox{\hyperlink{namespacesysio_1_1chain_a4ee2867a6bec961c7a78b203cfd76be9}{chain\+::transaction\+\_\+trace\+\_\+ptr}}$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_ab624636989896e7e7aac983cd4eb12ec}{time\+\_\+map\+\_\+t}} = std\+::map$<$\mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}}, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_abebad38a4e12d41c47569dc60125cdcd}{name\+\_\+bimap\+\_\+t}} = bimap$<$multiset\+\_\+of$<$weighted$<$\mbox{\hyperlink{structsysio_1_1chain_1_1permission__level}{chain\+::permission\+\_\+level}}$>$$>$, multiset\+\_\+of$<$permission\+\_\+info\+::cref$>$$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_aea2e43cf58e004caaac0c903a10a076d}{key\+\_\+bimap\+\_\+t}} = bimap$<$multiset\+\_\+of$<$weighted$<$\mbox{\hyperlink{namespacesysio_1_1chain_a0628a11f388cd2e43b1ccc1260a1042f}{chain\+::public\+\_\+key\+\_\+type}}$>$$>$, multiset\+\_\+of$<$permission\+\_\+info\+::cref$>$$>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_a7159b63787fb0ccdda7f45536bbbdf03}{account\+\_\+query\+\_\+db\+\_\+impl}} (const \mbox{\hyperlink{classsysio_1_1chain_1_1controller}{chain\+::controller}} \&\mbox{\hyperlink{classsysio_1_1chain_1_1controller}{controller}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_a9e19a7f902401bfa1de26cb0924c380f}{build\+\_\+account\+\_\+query\+\_\+map}} ()
+\item 
+void \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_a8fda1043cb0c69e99385511e8a23c50f}{add\+\_\+to\+\_\+bimaps}} (const permission\+\_\+info \&pi, const \mbox{\hyperlink{classsysio_1_1chain_1_1permission__object}{chain\+::permission\+\_\+object}} \&po)
+\item 
+void \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_a91acce27e2dee3eee42bc63d1d589919}{remove\+\_\+from\+\_\+bimaps}} (const permission\+\_\+info \&pi)
+\item 
+bool \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_a0f81334b9ee80d92a1971d03e0bb0e36}{is\+\_\+rollback\+\_\+required}} (const \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{chain\+::block\+\_\+state\+\_\+ptr}} \&bsp) const
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_a2789aac6391a10191d5aeb728fbe6410}{last\+\_\+updated\+\_\+time\+\_\+to\+\_\+height}} (const \mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}} \&last\+\_\+updated)
+\item 
+void \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_a55b5594b7d59cd2c7c38207cb988a44c}{rollback\+\_\+to\+\_\+before}} (const \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{chain\+::block\+\_\+state\+\_\+ptr}} \&bsp)
+\item 
+void \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_af06f4fce80c950b9b1c20a552b4a2a15}{cache\+\_\+transaction\+\_\+trace}} (const \mbox{\hyperlink{namespacesysio_1_1chain_a4ee2867a6bec961c7a78b203cfd76be9}{chain\+::transaction\+\_\+trace\+\_\+ptr}} \&trace)
+\item 
+auto \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_aa224e5ba2c6565d1626adbd9cc9d997a}{commit\+\_\+block\+\_\+prelock}} (const \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{chain\+::block\+\_\+state\+\_\+ptr}} \&bsp) const
+\item 
+void \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_aa184af1bc686f0c89bb5837f05ef30fb}{commit\+\_\+block}} (const \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{chain\+::block\+\_\+state\+\_\+ptr}} \&bsp)
+\item 
+\mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__result}{account\+\_\+query\+\_\+db\+::get\+\_\+accounts\+\_\+by\+\_\+authorizers\+\_\+result}} \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_a12a133f315d14e1fda76e6ee64e0c078}{get\+\_\+accounts\+\_\+by\+\_\+authorizers}} (const \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params}{account\+\_\+query\+\_\+db\+::get\+\_\+accounts\+\_\+by\+\_\+authorizers\+\_\+params}} \&args) const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+const \mbox{\hyperlink{classsysio_1_1chain_1_1controller}{chain\+::controller}} \& \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_a0eaaa63915f583ca51f38307d557f7e9}{controller}}
+\begin{DoxyCompactList}\small\item\em the controller to read data from \end{DoxyCompactList}\item 
+\mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_af147fd6d9ed179c6f379965feb0579a6}{cached\+\_\+trace\+\_\+map\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_acfb769f3aefd6346ad9172f6726d253d}{cached\+\_\+trace\+\_\+map}}
+\begin{DoxyCompactList}\small\item\em temporary cache of uncommitted traces \end{DoxyCompactList}\item 
+\mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_abdd57326fce804f4a467539158816e88}{onblock\+\_\+trace\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_a6a6e477d5ab8af17385632e6cc16bbdd}{onblock\+\_\+trace}}
+\begin{DoxyCompactList}\small\item\em temporary cache of on\+\_\+block trace \end{DoxyCompactList}\item 
+\mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_ab624636989896e7e7aac983cd4eb12ec}{time\+\_\+map\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_adf9eb275a2909c7f837e9514146468d5}{time\+\_\+to\+\_\+block\+\_\+num}}
+\item 
+permission\+\_\+info\+\_\+index\+\_\+t \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_aba57026fbb7d549b2431c788a5bd3a2d}{permission\+\_\+info\+\_\+index}}
+\begin{DoxyCompactList}\small\item\em multi-\/index that holds ephemeral indices \end{DoxyCompactList}\item 
+\mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_abebad38a4e12d41c47569dc60125cdcd}{name\+\_\+bimap\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_a6bf2e9f0ed9cd1f0762888b22ad55024}{name\+\_\+bimap}}
+\begin{DoxyCompactList}\small\item\em many\+:many bimap of names\+:permission\+\_\+infos \end{DoxyCompactList}\item 
+\mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_aea2e43cf58e004caaac0c903a10a076d}{key\+\_\+bimap\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_adaaa7d466a003a720717341ca7fda6c5}{key\+\_\+bimap}}
+\begin{DoxyCompactList}\small\item\em many\+:many bimap of keys\+:permission\+\_\+infos \end{DoxyCompactList}\item 
+std\+::shared\+\_\+mutex \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_ad111bde83946593be763eeb7e3541fdf}{rw\+\_\+mutex}}
+\begin{DoxyCompactList}\small\item\em mutex for read/write locking on the Multi-\/index and bimaps \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Implementation details of the account query DB 
+
+Definition at line \mbox{\hyperlink{account__query__db_8cpp_source_l00131}{131}} of file \mbox{\hyperlink{account__query__db_8cpp_source}{account\+\_\+query\+\_\+db.\+cpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{structsysio_1_1chain__apis_1_1account__query__db__impl_af147fd6d9ed179c6f379965feb0579a6}\index{sysio::chain\_apis::account\_query\_db\_impl@{sysio::chain\_apis::account\_query\_db\_impl}!cached\_trace\_map\_t@{cached\_trace\_map\_t}}
+\index{cached\_trace\_map\_t@{cached\_trace\_map\_t}!sysio::chain\_apis::account\_query\_db\_impl@{sysio::chain\_apis::account\_query\_db\_impl}}
+\doxysubsubsection{\texorpdfstring{cached\_trace\_map\_t}{cached\_trace\_map\_t}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain__apis_1_1account__query__db__impl_af147fd6d9ed179c6f379965feb0579a6} 
+using \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_af147fd6d9ed179c6f379965feb0579a6}{sysio\+::chain\+\_\+apis\+::account\+\_\+query\+\_\+db\+\_\+impl\+::cached\+\_\+trace\+\_\+map\+\_\+t}} = std\+::map$<$\mbox{\hyperlink{namespacesysio_1_1chain_aa85a3b49b3b219d1e3840567579e7e63}{chain\+::transaction\+\_\+id\+\_\+type}}, \mbox{\hyperlink{namespacesysio_1_1chain_a4ee2867a6bec961c7a78b203cfd76be9}{chain\+::transaction\+\_\+trace\+\_\+ptr}}$>$}
+
+Convenience aliases 
+
+Definition at line \mbox{\hyperlink{account__query__db_8cpp_source_l00482}{482}} of file \mbox{\hyperlink{account__query__db_8cpp_source}{account\+\_\+query\+\_\+db.\+cpp}}.
+
+\Hypertarget{structsysio_1_1chain__apis_1_1account__query__db__impl_aea2e43cf58e004caaac0c903a10a076d}\index{sysio::chain\_apis::account\_query\_db\_impl@{sysio::chain\_apis::account\_query\_db\_impl}!key\_bimap\_t@{key\_bimap\_t}}
+\index{key\_bimap\_t@{key\_bimap\_t}!sysio::chain\_apis::account\_query\_db\_impl@{sysio::chain\_apis::account\_query\_db\_impl}}
+\doxysubsubsection{\texorpdfstring{key\_bimap\_t}{key\_bimap\_t}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain__apis_1_1account__query__db__impl_aea2e43cf58e004caaac0c903a10a076d} 
+using \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_aea2e43cf58e004caaac0c903a10a076d}{sysio\+::chain\+\_\+apis\+::account\+\_\+query\+\_\+db\+\_\+impl\+::key\+\_\+bimap\+\_\+t}} = bimap$<$multiset\+\_\+of$<$weighted$<$\mbox{\hyperlink{namespacesysio_1_1chain_a0628a11f388cd2e43b1ccc1260a1042f}{chain\+::public\+\_\+key\+\_\+type}}$>$$>$, multiset\+\_\+of$<$permission\+\_\+info\+::cref$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{account__query__db_8cpp_source_l00495}{495}} of file \mbox{\hyperlink{account__query__db_8cpp_source}{account\+\_\+query\+\_\+db.\+cpp}}.
+
+\Hypertarget{structsysio_1_1chain__apis_1_1account__query__db__impl_abebad38a4e12d41c47569dc60125cdcd}\index{sysio::chain\_apis::account\_query\_db\_impl@{sysio::chain\_apis::account\_query\_db\_impl}!name\_bimap\_t@{name\_bimap\_t}}
+\index{name\_bimap\_t@{name\_bimap\_t}!sysio::chain\_apis::account\_query\_db\_impl@{sysio::chain\_apis::account\_query\_db\_impl}}
+\doxysubsubsection{\texorpdfstring{name\_bimap\_t}{name\_bimap\_t}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain__apis_1_1account__query__db__impl_abebad38a4e12d41c47569dc60125cdcd} 
+using \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_abebad38a4e12d41c47569dc60125cdcd}{sysio\+::chain\+\_\+apis\+::account\+\_\+query\+\_\+db\+\_\+impl\+::name\+\_\+bimap\+\_\+t}} = bimap$<$multiset\+\_\+of$<$weighted$<$\mbox{\hyperlink{structsysio_1_1chain_1_1permission__level}{chain\+::permission\+\_\+level}}$>$$>$, multiset\+\_\+of$<$permission\+\_\+info\+::cref$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{account__query__db_8cpp_source_l00494}{494}} of file \mbox{\hyperlink{account__query__db_8cpp_source}{account\+\_\+query\+\_\+db.\+cpp}}.
+
+\Hypertarget{structsysio_1_1chain__apis_1_1account__query__db__impl_abdd57326fce804f4a467539158816e88}\index{sysio::chain\_apis::account\_query\_db\_impl@{sysio::chain\_apis::account\_query\_db\_impl}!onblock\_trace\_t@{onblock\_trace\_t}}
+\index{onblock\_trace\_t@{onblock\_trace\_t}!sysio::chain\_apis::account\_query\_db\_impl@{sysio::chain\_apis::account\_query\_db\_impl}}
+\doxysubsubsection{\texorpdfstring{onblock\_trace\_t}{onblock\_trace\_t}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain__apis_1_1account__query__db__impl_abdd57326fce804f4a467539158816e88} 
+using \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_abdd57326fce804f4a467539158816e88}{sysio\+::chain\+\_\+apis\+::account\+\_\+query\+\_\+db\+\_\+impl\+::onblock\+\_\+trace\+\_\+t}} = std\+::optional$<$\mbox{\hyperlink{namespacesysio_1_1chain_a4ee2867a6bec961c7a78b203cfd76be9}{chain\+::transaction\+\_\+trace\+\_\+ptr}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{account__query__db_8cpp_source_l00483}{483}} of file \mbox{\hyperlink{account__query__db_8cpp_source}{account\+\_\+query\+\_\+db.\+cpp}}.
+
+\Hypertarget{structsysio_1_1chain__apis_1_1account__query__db__impl_a80e7966e67f2a780ce1f804ca2239f4c}\index{sysio::chain\_apis::account\_query\_db\_impl@{sysio::chain\_apis::account\_query\_db\_impl}!permission\_set\_t@{permission\_set\_t}}
+\index{permission\_set\_t@{permission\_set\_t}!sysio::chain\_apis::account\_query\_db\_impl@{sysio::chain\_apis::account\_query\_db\_impl}}
+\doxysubsubsection{\texorpdfstring{permission\_set\_t}{permission\_set\_t}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain__apis_1_1account__query__db__impl_a80e7966e67f2a780ce1f804ca2239f4c} 
+using \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_a80e7966e67f2a780ce1f804ca2239f4c}{sysio\+::chain\+\_\+apis\+::account\+\_\+query\+\_\+db\+\_\+impl\+::permission\+\_\+set\+\_\+t}} = std\+::set$<$\mbox{\hyperlink{structsysio_1_1chain_1_1permission__level}{chain\+::permission\+\_\+level}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{account__query__db_8cpp_source_l00302}{302}} of file \mbox{\hyperlink{account__query__db_8cpp_source}{account\+\_\+query\+\_\+db.\+cpp}}.
+
+\Hypertarget{structsysio_1_1chain__apis_1_1account__query__db__impl_ab624636989896e7e7aac983cd4eb12ec}\index{sysio::chain\_apis::account\_query\_db\_impl@{sysio::chain\_apis::account\_query\_db\_impl}!time\_map\_t@{time\_map\_t}}
+\index{time\_map\_t@{time\_map\_t}!sysio::chain\_apis::account\_query\_db\_impl@{sysio::chain\_apis::account\_query\_db\_impl}}
+\doxysubsubsection{\texorpdfstring{time\_map\_t}{time\_map\_t}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain__apis_1_1account__query__db__impl_ab624636989896e7e7aac983cd4eb12ec} 
+using \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_ab624636989896e7e7aac983cd4eb12ec}{sysio\+::chain\+\_\+apis\+::account\+\_\+query\+\_\+db\+\_\+impl\+::time\+\_\+map\+\_\+t}} = std\+::map$<$\mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}}, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{account__query__db_8cpp_source_l00489}{489}} of file \mbox{\hyperlink{account__query__db_8cpp_source}{account\+\_\+query\+\_\+db.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structsysio_1_1chain__apis_1_1account__query__db__impl_a7159b63787fb0ccdda7f45536bbbdf03}\index{sysio::chain\_apis::account\_query\_db\_impl@{sysio::chain\_apis::account\_query\_db\_impl}!account\_query\_db\_impl@{account\_query\_db\_impl}}
+\index{account\_query\_db\_impl@{account\_query\_db\_impl}!sysio::chain\_apis::account\_query\_db\_impl@{sysio::chain\_apis::account\_query\_db\_impl}}
+\doxysubsubsection{\texorpdfstring{account\_query\_db\_impl()}{account\_query\_db\_impl()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain__apis_1_1account__query__db__impl_a7159b63787fb0ccdda7f45536bbbdf03} 
+sysio\+::chain\+\_\+apis\+::account\+\_\+query\+\_\+db\+\_\+impl\+::account\+\_\+query\+\_\+db\+\_\+impl (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classsysio_1_1chain_1_1controller}{chain\+::controller}} \&}]{controller}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{account__query__db_8cpp_source_l00132}{132}} of file \mbox{\hyperlink{account__query__db_8cpp_source}{account\+\_\+query\+\_\+db.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ :\mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_a0eaaa63915f583ca51f38307d557f7e9}{controller}}(\mbox{\hyperlink{classsysio_1_1chain_1_1controller}{controller}})}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1chain__apis_1_1account__query__db__impl_a8fda1043cb0c69e99385511e8a23c50f}\index{sysio::chain\_apis::account\_query\_db\_impl@{sysio::chain\_apis::account\_query\_db\_impl}!add\_to\_bimaps@{add\_to\_bimaps}}
+\index{add\_to\_bimaps@{add\_to\_bimaps}!sysio::chain\_apis::account\_query\_db\_impl@{sysio::chain\_apis::account\_query\_db\_impl}}
+\doxysubsubsection{\texorpdfstring{add\_to\_bimaps()}{add\_to\_bimaps()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain__apis_1_1account__query__db__impl_a8fda1043cb0c69e99385511e8a23c50f} 
+void sysio\+::chain\+\_\+apis\+::account\+\_\+query\+\_\+db\+\_\+impl\+::add\+\_\+to\+\_\+bimaps (\begin{DoxyParamCaption}\item[{const permission\+\_\+info \&}]{pi}{, }\item[{const \mbox{\hyperlink{classsysio_1_1chain_1_1permission__object}{chain\+::permission\+\_\+object}} \&}]{po}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Add a permission to the bimaps for keys and accounts 
+\begin{DoxyParams}{Parameters}
+{\em pi} & -\/ the ephemeral permission info structure being added \\
+\hline
+{\em po} & -\/ the chain data associted with this permission \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{account__query__db_8cpp_source_l00171}{171}} of file \mbox{\hyperlink{account__query__db_8cpp_source}{account\+\_\+query\+\_\+db.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ For\ each\ account,\ add\ this\ permission\ info's\ non-\/owning\ reference\ to\ the\ bimap\ for\ accounts}}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ :\ po.auth.accounts)\ \{}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_a6bf2e9f0ed9cd1f0762888b22ad55024}{name\_bimap}}.insert(name\_bimap\_t::value\_type\ \{\{\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.permission,\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.weight\},\ pi\});}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00176\ }
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ for\ each\ key,\ add\ this\ permission\ info's\ non-\/owning\ reference\ to\ the\ bimap\ for\ keys}}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ k:\ po.auth.keys)\ \{}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_a0628a11f388cd2e43b1ccc1260a1042f}{chain::public\_key\_type}}\ key\ =\ k.key;}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_adaaa7d466a003a720717341ca7fda6c5}{key\_bimap}}.insert(key\_bimap\_t::value\_type\ \{\{std::move(key),\ k.weight\},\ pi\});}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain__apis_1_1account__query__db__impl_a8fda1043cb0c69e99385511e8a23c50f_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain__apis_1_1account__query__db__impl_a9e19a7f902401bfa1de26cb0924c380f}\index{sysio::chain\_apis::account\_query\_db\_impl@{sysio::chain\_apis::account\_query\_db\_impl}!build\_account\_query\_map@{build\_account\_query\_map}}
+\index{build\_account\_query\_map@{build\_account\_query\_map}!sysio::chain\_apis::account\_query\_db\_impl@{sysio::chain\_apis::account\_query\_db\_impl}}
+\doxysubsubsection{\texorpdfstring{build\_account\_query\_map()}{build\_account\_query\_map()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain__apis_1_1account__query__db__impl_a9e19a7f902401bfa1de26cb0924c380f} 
+void sysio\+::chain\+\_\+apis\+::account\+\_\+query\+\_\+db\+\_\+impl\+::build\+\_\+account\+\_\+query\+\_\+map (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Build the initial database from the chain controller by extracting the information contained in the blockchain state at the current HEAD 
+
+Definition at line \mbox{\hyperlink{account__query__db_8cpp_source_l00140}{140}} of file \mbox{\hyperlink{account__query__db_8cpp_source}{account\+\_\+query\+\_\+db.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \ std::unique\_lock\ write\_lock(\mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_ad111bde83946593be763eeb7e3541fdf}{rw\_mutex}});}
+\DoxyCodeLine{00142\ }
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\textcolor{stringliteral}{"{}Building\ account\ query\ DB"{}});}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103aea2b2676c28c0db26d39331a336c6b92}{start}}\ =\ \mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{fc::time\_point::now}}();}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ index\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1controller}{controller}}.\mbox{\hyperlink{classsysio_1_1chain_1_1controller_a0c79d00dae8c0d90efc18f4d091b2391}{db}}().\mbox{\hyperlink{classchainbase_1_1database_a4d5297635dcf70be481d9b600da9bc13}{get\_index}}<\mbox{\hyperlink{namespacesysio_1_1chain_a4e24a1668746342d40487d1019880986}{chain::permission\_index}}>().indices().get<by\_id>();}
+\DoxyCodeLine{00146\ }
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ build\ a\ initial\ time\ to\ block\ number\ map}}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ lib\_num\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1controller}{controller}}.\mbox{\hyperlink{classsysio_1_1chain_1_1controller_a53495de416021a4e56e889e771b25a52}{last\_irreversible\_block\_num}}();}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ head\_num\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1controller}{controller}}.\mbox{\hyperlink{classsysio_1_1chain_1_1controller_a33704b4936bb9bbd2ea6b0874ca521b4}{head\_block\_num}}();}
+\DoxyCodeLine{00150\ }
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ block\_num\ =\ lib\_num\ +\ 1;\ block\_num\ <=\ head\_num;\ block\_num++)\ \{}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ block\_p\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1controller}{controller}}.\mbox{\hyperlink{classsysio_1_1chain_1_1controller_a1379e43325b7e517a058bddce15571eb}{fetch\_block\_by\_number}}(block\_num);}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(block\_p,\ chain::plugin\_exception,\ \textcolor{stringliteral}{"{}cannot\ fetch\ reversible\ block\ \$\{block\_num\},\ required\ for\ account\_db\ initialization"{}},\ (\textcolor{stringliteral}{"{}block\_num"{}},\ block\_num));}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_adf9eb275a2909c7f837e9514146468d5}{time\_to\_block\_num}}.emplace(block\_p-\/>timestamp.to\_time\_point(),\ block\_num);}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00156\ }
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ po\ :\ index\ )\ \{}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ last\_updated\_height\ =\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_a2789aac6391a10191d5aeb728fbe6410}{last\_updated\_time\_to\_height}}(po.last\_updated);}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ pi\ =\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_aba57026fbb7d549b2431c788a5bd3a2d}{permission\_info\_index}}.emplace(\ permission\_info\{\ po.owner,\ po.name,\ last\_updated\_height,\ po.auth.threshold\ \}\ ).first;}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_a8fda1043cb0c69e99385511e8a23c50f}{add\_to\_bimaps}}(*pi,\ po);}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ duration\ =\ \mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{fc::time\_point::now}}()\ -\/\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103aea2b2676c28c0db26d39331a336c6b92}{start}};}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\textcolor{stringliteral}{"{}Finished\ building\ account\ query\ DB\ in\ \$\{sec\}"{}},\ (\textcolor{stringliteral}{"{}sec"{}},\ (duration.count()\ /\ 1'000'000.0\ )));}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain__apis_1_1account__query__db__impl_a9e19a7f902401bfa1de26cb0924c380f_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain__apis_1_1account__query__db__impl_af06f4fce80c950b9b1c20a552b4a2a15}\index{sysio::chain\_apis::account\_query\_db\_impl@{sysio::chain\_apis::account\_query\_db\_impl}!cache\_transaction\_trace@{cache\_transaction\_trace}}
+\index{cache\_transaction\_trace@{cache\_transaction\_trace}!sysio::chain\_apis::account\_query\_db\_impl@{sysio::chain\_apis::account\_query\_db\_impl}}
+\doxysubsubsection{\texorpdfstring{cache\_transaction\_trace()}{cache\_transaction\_trace()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain__apis_1_1account__query__db__impl_af06f4fce80c950b9b1c20a552b4a2a15} 
+void sysio\+::chain\+\_\+apis\+::account\+\_\+query\+\_\+db\+\_\+impl\+::cache\+\_\+transaction\+\_\+trace (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_a4ee2867a6bec961c7a78b203cfd76be9}{chain\+::transaction\+\_\+trace\+\_\+ptr}} \&}]{trace}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Store a potentially relevant transaction trace in a short lived cache so that it can be processed if its committed to by a block 
+\begin{DoxyParams}{Parameters}
+{\em trace} & \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{account__query__db_8cpp_source_l00286}{286}} of file \mbox{\hyperlink{account__query__db_8cpp_source}{account\+\_\+query\+\_\+db.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00286\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00287\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !trace-\/>receipt\ )\ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00288\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ include\ only\ executed\ transactions;\ soft\_fail\ included\ so\ that\ onerror\ (and\ any\ inlines\ via\ onerror)\ are\ included}}
+\DoxyCodeLine{00289\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}((trace-\/>receipt-\/>status\ !=\ \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__receipt__header_a2bb00bac16048e6f624c2ded867ebf55a7a6de58f1f84063a5f85bbfb59b43608}{chain::transaction\_receipt\_header::executed}}\ \&\&}
+\DoxyCodeLine{00290\ \ \ \ \ \ \ \ \ \ \ \ \ \ trace-\/>receipt-\/>status\ !=\ \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__receipt__header_a2bb00bac16048e6f624c2ded867ebf55a98d0df834b74445e549f5d2123443b4e}{chain::transaction\_receipt\_header::soft\_fail}}))\ \{}
+\DoxyCodeLine{00291\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00292\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00293\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{namespacesysio_1_1chain_a9a9946a27c3832394b9b2b3911e0733c}{is\_onblock}}(\ trace\ ))\ \{}
+\DoxyCodeLine{00294\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_a6a6e477d5ab8af17385632e6cc16bbdd}{onblock\_trace}}.emplace(\ trace\ );}
+\DoxyCodeLine{00295\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(\ trace-\/>failed\_dtrx\_trace\ )\ \{}
+\DoxyCodeLine{00296\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_acfb769f3aefd6346ad9172f6726d253d}{cached\_trace\_map}}[trace-\/>failed\_dtrx\_trace-\/>id]\ =\ trace;}
+\DoxyCodeLine{00297\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00298\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_acfb769f3aefd6346ad9172f6726d253d}{cached\_trace\_map}}[trace-\/>id]\ =\ trace;}
+\DoxyCodeLine{00299\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00300\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain__apis_1_1account__query__db__impl_af06f4fce80c950b9b1c20a552b4a2a15_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain__apis_1_1account__query__db__impl_aa184af1bc686f0c89bb5837f05ef30fb}\index{sysio::chain\_apis::account\_query\_db\_impl@{sysio::chain\_apis::account\_query\_db\_impl}!commit\_block@{commit\_block}}
+\index{commit\_block@{commit\_block}!sysio::chain\_apis::account\_query\_db\_impl@{sysio::chain\_apis::account\_query\_db\_impl}}
+\doxysubsubsection{\texorpdfstring{commit\_block()}{commit\_block()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain__apis_1_1account__query__db__impl_aa184af1bc686f0c89bb5837f05ef30fb} 
+void sysio\+::chain\+\_\+apis\+::account\+\_\+query\+\_\+db\+\_\+impl\+::commit\+\_\+block (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{chain\+::block\+\_\+state\+\_\+ptr}} \&}]{bsp}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Commit a block of transactions to the account query DB transaction traces need to be in the cache prior to this call 
+\begin{DoxyParams}{Parameters}
+{\em bsp} & \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{account__query__db_8cpp_source_l00363}{363}} of file \mbox{\hyperlink{account__query__db_8cpp_source}{account\+\_\+query\+\_\+db.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00363\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00364\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_a80e7966e67f2a780ce1f804ca2239f4c}{permission\_set\_t}}\ updated;}
+\DoxyCodeLine{00365\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_a80e7966e67f2a780ce1f804ca2239f4c}{permission\_set\_t}}\ deleted;}
+\DoxyCodeLine{00366\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ rollback\_required\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00367\ }
+\DoxyCodeLine{00368\ \ \ \ \ \ \ \ \ \ std::tie(updated,\ deleted,\ rollback\_required)\ =\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_aa224e5ba2c6565d1626adbd9cc9d997a}{commit\_block\_prelock}}(bsp);}
+\DoxyCodeLine{00369\ }
+\DoxyCodeLine{00370\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ optimistic\ skip\ of\ locking\ section\ if\ there\ is\ nothing\ to\ do}}
+\DoxyCodeLine{00371\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!updated.empty()\ ||\ !deleted.empty()\ ||\ rollback\_required)\ \{}
+\DoxyCodeLine{00372\ \ \ \ \ \ \ \ \ \ \ \ \ std::unique\_lock\ write\_lock(\mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_ad111bde83946593be763eeb7e3541fdf}{rw\_mutex}});}
+\DoxyCodeLine{00373\ }
+\DoxyCodeLine{00374\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_a55b5594b7d59cd2c7c38207cb988a44c}{rollback\_to\_before}}(bsp);}
+\DoxyCodeLine{00375\ }
+\DoxyCodeLine{00376\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ insert\ this\ blocks\ time\ into\ the\ time\ map}}
+\DoxyCodeLine{00377\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_adf9eb275a2909c7f837e9514146468d5}{time\_to\_block\_num}}.emplace(bsp-\/>header.timestamp,\ bsp-\/>block\_num);}
+\DoxyCodeLine{00378\ }
+\DoxyCodeLine{00379\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ bnum\ =\ bsp-\/>block\_num;}
+\DoxyCodeLine{00380\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ index\ =\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_aba57026fbb7d549b2431c788a5bd3a2d}{permission\_info\_index}}.get<by\_owner\_name>();}
+\DoxyCodeLine{00381\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ permission\_by\_owner\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1controller}{controller}}.\mbox{\hyperlink{classsysio_1_1chain_1_1controller_a0c79d00dae8c0d90efc18f4d091b2391}{db}}().\mbox{\hyperlink{classchainbase_1_1database_a4d5297635dcf70be481d9b600da9bc13}{get\_index}}<\mbox{\hyperlink{namespacesysio_1_1chain_a4e24a1668746342d40487d1019880986}{chain::permission\_index}}>().indices().get<chain::by\_owner>();}
+\DoxyCodeLine{00382\ }
+\DoxyCodeLine{00383\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ for\ each\ updated\ permission,\ find\ the\ new\ values\ and\ update\ the\ account\ query\ db}}
+\DoxyCodeLine{00384\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ up:\ updated)\ \{}
+\DoxyCodeLine{00385\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ key\ =\ std::make\_tuple(up.actor,\ up.permission);}
+\DoxyCodeLine{00386\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ source\_itr\ =\ permission\_by\_owner.find(key);}
+\DoxyCodeLine{00387\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(source\_itr\ !=\ permission\_by\_owner.end(),\ chain::plugin\_exception,\ \textcolor{stringliteral}{"{}chain\ data\ is\ missing"{}});}
+\DoxyCodeLine{00388\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ index.find(key);}
+\DoxyCodeLine{00389\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (itr\ ==\ index.end())\ \{}
+\DoxyCodeLine{00390\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ po\ =\ *source\_itr;}
+\DoxyCodeLine{00391\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ itr\ =\ index.emplace(permission\_info\{\ po.owner,\ po.name,\ bnum,\ po.auth.threshold\ \}).first;}
+\DoxyCodeLine{00392\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00393\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_a91acce27e2dee3eee42bc63d1d589919}{remove\_from\_bimaps}}(*itr);}
+\DoxyCodeLine{00394\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ index.modify(itr,\ [\&](\textcolor{keyword}{auto}\&\ mutable\_pi)\{}
+\DoxyCodeLine{00395\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ mutable\_pi.last\_updated\_height\ =\ bnum;}
+\DoxyCodeLine{00396\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ mutable\_pi.threshold\ =\ source\_itr-\/>auth.threshold;}
+\DoxyCodeLine{00397\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00398\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00399\ }
+\DoxyCodeLine{00400\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_a8fda1043cb0c69e99385511e8a23c50f}{add\_to\_bimaps}}(*itr,\ *source\_itr);}
+\DoxyCodeLine{00401\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00402\ }
+\DoxyCodeLine{00403\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ for\ all\ deleted\ permissions,\ process\ their\ removal\ from\ the\ account\ query\ DB}}
+\DoxyCodeLine{00404\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ dp:\ deleted)\ \{}
+\DoxyCodeLine{00405\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ key\ =\ std::make\_tuple(dp.actor,\ dp.permission);}
+\DoxyCodeLine{00406\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ index.find(key);}
+\DoxyCodeLine{00407\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (itr\ !=\ index.end())\ \{}
+\DoxyCodeLine{00408\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_a91acce27e2dee3eee42bc63d1d589919}{remove\_from\_bimaps}}(*itr);}
+\DoxyCodeLine{00409\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ index.erase(itr);}
+\DoxyCodeLine{00410\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00411\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00412\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00413\ }
+\DoxyCodeLine{00414\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ drop\ any\ unprocessed\ cached\ traces}}
+\DoxyCodeLine{00415\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_acfb769f3aefd6346ad9172f6726d253d}{cached\_trace\_map}}.clear();}
+\DoxyCodeLine{00416\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_a6a6e477d5ab8af17385632e6cc16bbdd}{onblock\_trace}}.reset();}
+\DoxyCodeLine{00417\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain__apis_1_1account__query__db__impl_aa184af1bc686f0c89bb5837f05ef30fb_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain__apis_1_1account__query__db__impl_aa224e5ba2c6565d1626adbd9cc9d997a}\index{sysio::chain\_apis::account\_query\_db\_impl@{sysio::chain\_apis::account\_query\_db\_impl}!commit\_block\_prelock@{commit\_block\_prelock}}
+\index{commit\_block\_prelock@{commit\_block\_prelock}!sysio::chain\_apis::account\_query\_db\_impl@{sysio::chain\_apis::account\_query\_db\_impl}}
+\doxysubsubsection{\texorpdfstring{commit\_block\_prelock()}{commit\_block\_prelock()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain__apis_1_1account__query__db__impl_aa224e5ba2c6565d1626adbd9cc9d997a} 
+auto sysio\+::chain\+\_\+apis\+::account\+\_\+query\+\_\+db\+\_\+impl\+::commit\+\_\+block\+\_\+prelock (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{chain\+::block\+\_\+state\+\_\+ptr}} \&}]{bsp}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+Pre-\/\+Commit step with const qualifier to guarantee it does not mutate the thread-\/safe data set 
+\begin{DoxyParams}{Parameters}
+{\em bsp} & \\
+\hline
+\end{DoxyParams}
+process traces to find {\ttfamily updateauth} and {\ttfamily deleteauth} calls maintaining a final set of permissions to either update or delete. Intra-\/block changes are discarded
+
+Definition at line \mbox{\hyperlink{account__query__db_8cpp_source_l00308}{308}} of file \mbox{\hyperlink{account__query__db_8cpp_source}{account\+\_\+query\+\_\+db.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00308\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00309\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_a80e7966e67f2a780ce1f804ca2239f4c}{permission\_set\_t}}\ updated;}
+\DoxyCodeLine{00310\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_a80e7966e67f2a780ce1f804ca2239f4c}{permission\_set\_t}}\ deleted;}
+\DoxyCodeLine{00311\ }
+\DoxyCodeLine{00316\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ process\_trace\ =\ [\&](\textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_a4ee2867a6bec961c7a78b203cfd76be9}{chain::transaction\_trace\_ptr}}\&\ trace)\ \{}
+\DoxyCodeLine{00317\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ at\ :\ trace-\/>action\_traces\ )\ \{}
+\DoxyCodeLine{00318\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (std::tie(at.receiver,\ at.act.account)\ !=\ std::tie(chain::config::system\_account\_name,chain::config::system\_account\_name))\ \{}
+\DoxyCodeLine{00319\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{00320\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00321\ }
+\DoxyCodeLine{00322\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (at.act.name\ ==\ \mbox{\hyperlink{structsysio_1_1chain_1_1updateauth_afc31c0680242885924f64fc347780814}{chain::updateauth::get\_name}}())\ \{}
+\DoxyCodeLine{00323\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ data\ =\ at.act.data\_as<chain::updateauth>();}
+\DoxyCodeLine{00324\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ updated.emplace(chain::permission\_level\{data.account,\ data.permission\}).first;}
+\DoxyCodeLine{00325\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ deleted.erase(*itr);}
+\DoxyCodeLine{00326\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (at.act.name\ ==\ \mbox{\hyperlink{structsysio_1_1chain_1_1deleteauth_add712cbf63b55d0e2db2b874dca6576d}{chain::deleteauth::get\_name}}())\ \{}
+\DoxyCodeLine{00327\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ data\ =\ at.act.data\_as<chain::deleteauth>();}
+\DoxyCodeLine{00328\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ deleted.emplace(chain::permission\_level\{data.account,\ data.permission\}).first;}
+\DoxyCodeLine{00329\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ updated.erase(*itr);}
+\DoxyCodeLine{00330\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (at.act.name\ ==\ \mbox{\hyperlink{structsysio_1_1chain_1_1newaccount_a962c693e8d73cb4314453c348ababbde}{chain::newaccount::get\_name}}())\ \{}
+\DoxyCodeLine{00331\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ data\ =\ at.act.data\_as<chain::newaccount>();}
+\DoxyCodeLine{00332\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ updated.emplace(chain::permission\_level\{data.name,\ \textcolor{stringliteral}{"{}owner"{}}\_n\});}
+\DoxyCodeLine{00333\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ updated.emplace(chain::permission\_level\{data.name,\ \textcolor{stringliteral}{"{}active"{}}\_n\});}
+\DoxyCodeLine{00334\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00335\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00336\ \ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00337\ }
+\DoxyCodeLine{00338\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_a6a6e477d5ab8af17385632e6cc16bbdd}{onblock\_trace}}\ )}
+\DoxyCodeLine{00339\ \ \ \ \ \ \ \ \ \ \ \ \ process\_trace(*\mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_a6a6e477d5ab8af17385632e6cc16bbdd}{onblock\_trace}});}
+\DoxyCodeLine{00340\ }
+\DoxyCodeLine{00341\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ :\ bsp-\/>block-\/>transactions\ )\ \{}
+\DoxyCodeLine{00342\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_aa85a3b49b3b219d1e3840567579e7e63}{chain::transaction\_id\_type}}\ \mbox{\hyperlink{code__cache_8cpp_aa0efefe21f4700d78692edc823e763be}{id}};}
+\DoxyCodeLine{00343\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ std::holds\_alternative<chain::transaction\_id\_type>(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.trx))\ \{}
+\DoxyCodeLine{00344\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{id}\ =\ std::get<chain::transaction\_id\_type>(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.trx);}
+\DoxyCodeLine{00345\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00346\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{id}\ =\ std::get<chain::packed\_transaction>(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.trx).id();}
+\DoxyCodeLine{00347\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00348\ }
+\DoxyCodeLine{00349\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ it\ =\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_acfb769f3aefd6346ad9172f6726d253d}{cached\_trace\_map}}.find(\ \textcolor{keywordtype}{id}\ );}
+\DoxyCodeLine{00350\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ it\ !=\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_acfb769f3aefd6346ad9172f6726d253d}{cached\_trace\_map}}.end()\ )\ \{}
+\DoxyCodeLine{00351\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ process\_trace(\ it-\/>second\ );}
+\DoxyCodeLine{00352\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00353\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00354\ }
+\DoxyCodeLine{00355\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::make\_tuple(std::move(updated),\ std::move(deleted),\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_a0f81334b9ee80d92a1971d03e0bb0e36}{is\_rollback\_required}}(bsp));}
+\DoxyCodeLine{00356\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain__apis_1_1account__query__db__impl_aa224e5ba2c6565d1626adbd9cc9d997a_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain__apis_1_1account__query__db__impl_aa224e5ba2c6565d1626adbd9cc9d997a_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain__apis_1_1account__query__db__impl_a12a133f315d14e1fda76e6ee64e0c078}\index{sysio::chain\_apis::account\_query\_db\_impl@{sysio::chain\_apis::account\_query\_db\_impl}!get\_accounts\_by\_authorizers@{get\_accounts\_by\_authorizers}}
+\index{get\_accounts\_by\_authorizers@{get\_accounts\_by\_authorizers}!sysio::chain\_apis::account\_query\_db\_impl@{sysio::chain\_apis::account\_query\_db\_impl}}
+\doxysubsubsection{\texorpdfstring{get\_accounts\_by\_authorizers()}{get\_accounts\_by\_authorizers()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain__apis_1_1account__query__db__impl_a12a133f315d14e1fda76e6ee64e0c078} 
+\mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__result}{account\+\_\+query\+\_\+db\+::get\+\_\+accounts\+\_\+by\+\_\+authorizers\+\_\+result}} sysio\+::chain\+\_\+apis\+::account\+\_\+query\+\_\+db\+\_\+impl\+::get\+\_\+accounts\+\_\+by\+\_\+authorizers (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params}{account\+\_\+query\+\_\+db\+::get\+\_\+accounts\+\_\+by\+\_\+authorizers\+\_\+params}} \&}]{args}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+Add a range of results
+
+Definition at line \mbox{\hyperlink{account__query__db_8cpp_source_l00420}{420}} of file \mbox{\hyperlink{account__query__db_8cpp_source}{account\+\_\+query\+\_\+db.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00420\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00421\ \ \ \ \ \ \ \ \ \ std::shared\_lock\ \mbox{\hyperlink{namespacechainbase_af9c751cb717344c32889e0a797c50803}{read\_lock}}(\mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_ad111bde83946593be763eeb7e3541fdf}{rw\_mutex}});}
+\DoxyCodeLine{00422\ }
+\DoxyCodeLine{00423\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ }result\_t\ =\ account\_query\_db::get\_accounts\_by\_authorizers\_result;}
+\DoxyCodeLine{00424\ \ \ \ \ \ \ \ \ \ result\_t\ result;}
+\DoxyCodeLine{00425\ }
+\DoxyCodeLine{00426\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ deduplicate\ inputs}}
+\DoxyCodeLine{00427\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ account\_set\ =\ std::set<chain::permission\_level>(\mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.accounts.begin(),\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.accounts.end());}
+\DoxyCodeLine{00428\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ key\_set\ =\ std::set<chain::public\_key\_type>(\mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.keys.begin(),\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.keys.end());}
+\DoxyCodeLine{00429\ }
+\DoxyCodeLine{00433\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ push\_results\ =\ [\&result](\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ begin,\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ end)\ \{}
+\DoxyCodeLine{00434\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\ itr\ =\ begin;\ itr\ !=\ end;\ ++itr)\ \{}
+\DoxyCodeLine{00435\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ pi\ =\ itr-\/>second.get();}
+\DoxyCodeLine{00436\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ authorizer\ =\ itr-\/>first.value;}
+\DoxyCodeLine{00437\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ weight\ =\ itr-\/>first.weight;}
+\DoxyCodeLine{00438\ }
+\DoxyCodeLine{00439\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ result.accounts.emplace\_back(result\_t::account\_result\{}
+\DoxyCodeLine{00440\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ pi.owner,}
+\DoxyCodeLine{00441\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ pi.name,}
+\DoxyCodeLine{00442\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ make\_optional\_authorizer<chain::permission\_level>(authorizer),}
+\DoxyCodeLine{00443\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ make\_optional\_authorizer<chain::public\_key\_type>(authorizer),}
+\DoxyCodeLine{00444\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ weight,}
+\DoxyCodeLine{00445\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ pi.threshold}
+\DoxyCodeLine{00446\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00447\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00448\ \ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00449\ }
+\DoxyCodeLine{00450\ }
+\DoxyCodeLine{00451\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}:\ account\_set)\ \{}
+\DoxyCodeLine{00452\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.permission.empty())\ \{}
+\DoxyCodeLine{00453\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ empty\ permission\ is\ a\ wildcard}}
+\DoxyCodeLine{00454\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ construct\ a\ range\ between\ the\ lower\ bound\ of\ the\ given\ account\ and\ the\ lower\ bound\ of\ the}}
+\DoxyCodeLine{00455\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ next\ possible\ account\ name}}
+\DoxyCodeLine{00456\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ begin\ =\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_a6bf2e9f0ed9cd1f0762888b22ad55024}{name\_bimap}}.left.lower\_bound(weighted<chain::permission\_level>::lower\_bound\_for(\{\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.actor,\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.permission\}));}
+\DoxyCodeLine{00457\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ next\_account\_name\ =\ chain::name(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.actor.to\_uint64\_t()\ +\ 1);}
+\DoxyCodeLine{00458\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ end\ =\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_a6bf2e9f0ed9cd1f0762888b22ad55024}{name\_bimap}}.left.lower\_bound(weighted<chain::permission\_level>::lower\_bound\_for(\{next\_account\_name,\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.permission\}));}
+\DoxyCodeLine{00459\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ push\_results(begin,\ end);}
+\DoxyCodeLine{00460\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00461\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ construct\ a\ range\ of\ all\ possible\ weights\ for\ an\ account/permission\ pair}}
+\DoxyCodeLine{00462\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ chain::permission\_level\{\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.actor,\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.permission\};}
+\DoxyCodeLine{00463\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ begin\ =\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_a6bf2e9f0ed9cd1f0762888b22ad55024}{name\_bimap}}.left.lower\_bound(weighted<chain::permission\_level>::lower\_bound\_for(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}));}
+\DoxyCodeLine{00464\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ end\ =\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_a6bf2e9f0ed9cd1f0762888b22ad55024}{name\_bimap}}.left.upper\_bound(weighted<chain::permission\_level>::upper\_bound\_for(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}));}
+\DoxyCodeLine{00465\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ push\_results(begin,\ end);}
+\DoxyCodeLine{00466\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00467\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00468\ }
+\DoxyCodeLine{00469\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ k:\ key\_set)\ \{}
+\DoxyCodeLine{00470\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ construct\ a\ range\ of\ all\ possible\ weights\ for\ a\ key}}
+\DoxyCodeLine{00471\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ begin\ =\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_adaaa7d466a003a720717341ca7fda6c5}{key\_bimap}}.left.lower\_bound(weighted<chain::public\_key\_type>::lower\_bound\_for(k));}
+\DoxyCodeLine{00472\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ end\ =\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_adaaa7d466a003a720717341ca7fda6c5}{key\_bimap}}.left.upper\_bound(weighted<chain::public\_key\_type>::upper\_bound\_for(k));}
+\DoxyCodeLine{00473\ \ \ \ \ \ \ \ \ \ \ \ \ push\_results(begin,\ end);}
+\DoxyCodeLine{00474\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00475\ }
+\DoxyCodeLine{00476\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00477\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain__apis_1_1account__query__db__impl_a0f81334b9ee80d92a1971d03e0bb0e36}\index{sysio::chain\_apis::account\_query\_db\_impl@{sysio::chain\_apis::account\_query\_db\_impl}!is\_rollback\_required@{is\_rollback\_required}}
+\index{is\_rollback\_required@{is\_rollback\_required}!sysio::chain\_apis::account\_query\_db\_impl@{sysio::chain\_apis::account\_query\_db\_impl}}
+\doxysubsubsection{\texorpdfstring{is\_rollback\_required()}{is\_rollback\_required()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain__apis_1_1account__query__db__impl_a0f81334b9ee80d92a1971d03e0bb0e36} 
+bool sysio\+::chain\+\_\+apis\+::account\+\_\+query\+\_\+db\+\_\+impl\+::is\+\_\+rollback\+\_\+required (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{chain\+::block\+\_\+state\+\_\+ptr}} \&}]{bsp}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{account__query__db_8cpp_source_l00198}{198}} of file \mbox{\hyperlink{account__query__db_8cpp_source}{account\+\_\+query\+\_\+db.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ \ std::shared\_lock\ \mbox{\hyperlink{namespacechainbase_af9c751cb717344c32889e0a797c50803}{read\_lock}}(\mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_ad111bde83946593be763eeb7e3541fdf}{rw\_mutex}});}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ bnum\ =\ bsp-\/>block-\/>block\_num();}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ index\ =\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_aba57026fbb7d549b2431c788a5bd3a2d}{permission\_info\_index}}.get<by\_last\_updated\_height>();}
+\DoxyCodeLine{00202\ }
+\DoxyCodeLine{00203\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (index.empty())\ \{}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ pi\ =\ (*index.rbegin());}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (pi.last\_updated\_height\ <\ bnum)\ \{}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00211\ }
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain__apis_1_1account__query__db__impl_a0f81334b9ee80d92a1971d03e0bb0e36_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain__apis_1_1account__query__db__impl_a2789aac6391a10191d5aeb728fbe6410}\index{sysio::chain\_apis::account\_query\_db\_impl@{sysio::chain\_apis::account\_query\_db\_impl}!last\_updated\_time\_to\_height@{last\_updated\_time\_to\_height}}
+\index{last\_updated\_time\_to\_height@{last\_updated\_time\_to\_height}!sysio::chain\_apis::account\_query\_db\_impl@{sysio::chain\_apis::account\_query\_db\_impl}}
+\doxysubsubsection{\texorpdfstring{last\_updated\_time\_to\_height()}{last\_updated\_time\_to\_height()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain__apis_1_1account__query__db__impl_a2789aac6391a10191d5aeb728fbe6410} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::chain\+\_\+apis\+::account\+\_\+query\+\_\+db\+\_\+impl\+::last\+\_\+updated\+\_\+time\+\_\+to\+\_\+height (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}} \&}]{last\+\_\+updated}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{account__query__db_8cpp_source_l00215}{215}} of file \mbox{\hyperlink{account__query__db_8cpp_source}{account\+\_\+query\+\_\+db.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ lib\_num\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1controller}{controller}}.\mbox{\hyperlink{classsysio_1_1chain_1_1controller_a53495de416021a4e56e889e771b25a52}{last\_irreversible\_block\_num}}();}
+\DoxyCodeLine{00217\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ lib\_time\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1controller}{controller}}.\mbox{\hyperlink{classsysio_1_1chain_1_1controller_a878ff6368c473051417382a9d485030d}{last\_irreversible\_block\_time}}();}
+\DoxyCodeLine{00218\ }
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ last\_updated\_height\ =\ lib\_num;}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (last\_updated\ >\ lib\_time)\ \{}
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ iter\ =\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_adf9eb275a2909c7f837e9514146468d5}{time\_to\_block\_num}}.find(last\_updated);}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(iter\ !=\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_adf9eb275a2909c7f837e9514146468d5}{time\_to\_block\_num}}.end(),\ chain::plugin\_exception,\ \textcolor{stringliteral}{"{}invalid\ block\ time\ encountered\ in\ on-\/chain\ accounts\ \$\{time\}"{}},\ (\textcolor{stringliteral}{"{}time"{}},\ last\_updated));}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \ \ \ \ \ \ last\_updated\_height\ =\ iter-\/>second;}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00225\ }
+\DoxyCodeLine{00226\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ last\_updated\_height;}
+\DoxyCodeLine{00227\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain__apis_1_1account__query__db__impl_a2789aac6391a10191d5aeb728fbe6410_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain__apis_1_1account__query__db__impl_a2789aac6391a10191d5aeb728fbe6410_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain__apis_1_1account__query__db__impl_a91acce27e2dee3eee42bc63d1d589919}\index{sysio::chain\_apis::account\_query\_db\_impl@{sysio::chain\_apis::account\_query\_db\_impl}!remove\_from\_bimaps@{remove\_from\_bimaps}}
+\index{remove\_from\_bimaps@{remove\_from\_bimaps}!sysio::chain\_apis::account\_query\_db\_impl@{sysio::chain\_apis::account\_query\_db\_impl}}
+\doxysubsubsection{\texorpdfstring{remove\_from\_bimaps()}{remove\_from\_bimaps()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain__apis_1_1account__query__db__impl_a91acce27e2dee3eee42bc63d1d589919} 
+void sysio\+::chain\+\_\+apis\+::account\+\_\+query\+\_\+db\+\_\+impl\+::remove\+\_\+from\+\_\+bimaps (\begin{DoxyParamCaption}\item[{const permission\+\_\+info \&}]{pi}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Remove a permission from the bimaps for keys and accounts 
+\begin{DoxyParams}{Parameters}
+{\em pi} & -\/ the ephemeral permission info structure being removed \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{account__query__db_8cpp_source_l00188}{188}} of file \mbox{\hyperlink{account__query__db_8cpp_source}{account\+\_\+query\+\_\+db.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ remove\ all\ entries\ from\ the\ name\ bimap\ that\ refer\ to\ this\ permission\_info's\ reference}}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ name\_range\ =\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_a6bf2e9f0ed9cd1f0762888b22ad55024}{name\_bimap}}.right.equal\_range(pi);}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_a6bf2e9f0ed9cd1f0762888b22ad55024}{name\_bimap}}.right.erase(name\_range.first,\ name\_range.second);}
+\DoxyCodeLine{00192\ }
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ remove\ all\ entries\ from\ the\ key\ bimap\ that\ refer\ to\ this\ permission\_info's\ reference}}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ key\_range\ =\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_adaaa7d466a003a720717341ca7fda6c5}{key\_bimap}}.right.equal\_range(pi);}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_adaaa7d466a003a720717341ca7fda6c5}{key\_bimap}}.right.erase(key\_range.first,\ key\_range.second);}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain__apis_1_1account__query__db__impl_a91acce27e2dee3eee42bc63d1d589919_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain__apis_1_1account__query__db__impl_a55b5594b7d59cd2c7c38207cb988a44c}\index{sysio::chain\_apis::account\_query\_db\_impl@{sysio::chain\_apis::account\_query\_db\_impl}!rollback\_to\_before@{rollback\_to\_before}}
+\index{rollback\_to\_before@{rollback\_to\_before}!sysio::chain\_apis::account\_query\_db\_impl@{sysio::chain\_apis::account\_query\_db\_impl}}
+\doxysubsubsection{\texorpdfstring{rollback\_to\_before()}{rollback\_to\_before()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain__apis_1_1account__query__db__impl_a55b5594b7d59cd2c7c38207cb988a44c} 
+void sysio\+::chain\+\_\+apis\+::account\+\_\+query\+\_\+db\+\_\+impl\+::rollback\+\_\+to\+\_\+before (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{chain\+::block\+\_\+state\+\_\+ptr}} \&}]{bsp}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Given a block number, remove all permissions that were last updated at or after that block number this will effectively roll back the database to just before the incoming block
+
+For each removed entry, this will create a new entry if there exists an equivalent \{owner, name\} permission at the HEAD state of the chain. 
+\begin{DoxyParams}{Parameters}
+{\em bsp} & -\/ the block to rollback before \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{account__query__db_8cpp_source_l00237}{237}} of file \mbox{\hyperlink{account__query__db_8cpp_source}{account\+\_\+query\+\_\+db.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00237\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00238\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ bnum\ =\ bsp-\/>block-\/>block\_num();}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ index\ =\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_aba57026fbb7d549b2431c788a5bd3a2d}{permission\_info\_index}}.get<by\_last\_updated\_height>();}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ permission\_by\_owner\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1controller}{controller}}.\mbox{\hyperlink{classsysio_1_1chain_1_1controller_a0c79d00dae8c0d90efc18f4d091b2391}{db}}().\mbox{\hyperlink{classchainbase_1_1database_a4d5297635dcf70be481d9b600da9bc13}{get\_index}}<\mbox{\hyperlink{namespacesysio_1_1chain_a4e24a1668746342d40487d1019880986}{chain::permission\_index}}>().indices().get<chain::by\_owner>();}
+\DoxyCodeLine{00241\ }
+\DoxyCodeLine{00242\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ roll\ back\ time-\/map}}
+\DoxyCodeLine{00243\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ time\_iter\ =\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_adf9eb275a2909c7f837e9514146468d5}{time\_to\_block\_num}}.rbegin();}
+\DoxyCodeLine{00244\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (time\_iter\ !=\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_adf9eb275a2909c7f837e9514146468d5}{time\_to\_block\_num}}.rend()\ \&\&\ time\_iter-\/>second\ >=\ bnum)\ \{}
+\DoxyCodeLine{00245\ \ \ \ \ \ \ \ \ \ \ \ \ time\_iter\ =\ \textcolor{keyword}{decltype}(time\_iter)\{\mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_adf9eb275a2909c7f837e9514146468d5}{time\_to\_block\_num}}.erase(\ std::next(time\_iter).base()\ )\};}
+\DoxyCodeLine{00246\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00247\ }
+\DoxyCodeLine{00248\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ curr\_iter\ =\ index.rbegin();}
+\DoxyCodeLine{00249\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (!index.empty())\ \{}
+\DoxyCodeLine{00250\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (curr\_iter\ ==\ index.rend())\ \{}
+\DoxyCodeLine{00251\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00252\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00253\ }
+\DoxyCodeLine{00254\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ pi\ =\ (*curr\_iter);}
+\DoxyCodeLine{00255\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (pi.last\_updated\_height\ <\ bnum)\ \{}
+\DoxyCodeLine{00256\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00257\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00258\ }
+\DoxyCodeLine{00259\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ remove\ this\ entry\ from\ the\ bimaps}}
+\DoxyCodeLine{00260\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_a91acce27e2dee3eee42bc63d1d589919}{remove\_from\_bimaps}}(pi);}
+\DoxyCodeLine{00261\ }
+\DoxyCodeLine{00262\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ permission\_by\_owner.find(std::make\_tuple(pi.owner,\ pi.name));}
+\DoxyCodeLine{00263\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (itr\ ==\ permission\_by\_owner.end())\ \{}
+\DoxyCodeLine{00264\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ this\ permission\ does\ not\ exist\ at\ this\ point\ in\ the\ chains\ history}}
+\DoxyCodeLine{00265\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ curr\_iter\ =\ \textcolor{keyword}{decltype}(curr\_iter)(\ index.erase(index.iterator\_to(pi))\ );}
+\DoxyCodeLine{00266\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00267\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ po\ =\ *itr;}
+\DoxyCodeLine{00268\ }
+\DoxyCodeLine{00269\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ last\_updated\_height\ =\ po.last\_updated\ ==\ bsp-\/>header.timestamp\ ?\ bsp-\/>block\_num\ :\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_a2789aac6391a10191d5aeb728fbe6410}{last\_updated\_time\_to\_height}}(po.last\_updated);}
+\DoxyCodeLine{00270\ }
+\DoxyCodeLine{00271\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ index.modify(index.iterator\_to(pi),\ [\&po,\ last\_updated\_height](\textcolor{keyword}{auto}\&\ mutable\_pi)\ \{}
+\DoxyCodeLine{00272\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ mutable\_pi.last\_updated\_height\ =\ last\_updated\_height;}
+\DoxyCodeLine{00273\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ mutable\_pi.threshold\ =\ po.auth.threshold;}
+\DoxyCodeLine{00274\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00275\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_a8fda1043cb0c69e99385511e8a23c50f}{add\_to\_bimaps}}(pi,\ po);}
+\DoxyCodeLine{00276\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++curr\_iter;}
+\DoxyCodeLine{00277\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00278\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00279\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain__apis_1_1account__query__db__impl_a55b5594b7d59cd2c7c38207cb988a44c_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain__apis_1_1account__query__db__impl_a55b5594b7d59cd2c7c38207cb988a44c_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1chain__apis_1_1account__query__db__impl_acfb769f3aefd6346ad9172f6726d253d}\index{sysio::chain\_apis::account\_query\_db\_impl@{sysio::chain\_apis::account\_query\_db\_impl}!cached\_trace\_map@{cached\_trace\_map}}
+\index{cached\_trace\_map@{cached\_trace\_map}!sysio::chain\_apis::account\_query\_db\_impl@{sysio::chain\_apis::account\_query\_db\_impl}}
+\doxysubsubsection{\texorpdfstring{cached\_trace\_map}{cached\_trace\_map}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain__apis_1_1account__query__db__impl_acfb769f3aefd6346ad9172f6726d253d} 
+\mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_af147fd6d9ed179c6f379965feb0579a6}{cached\+\_\+trace\+\_\+map\+\_\+t}} sysio\+::chain\+\_\+apis\+::account\+\_\+query\+\_\+db\+\_\+impl\+::cached\+\_\+trace\+\_\+map}
+
+
+
+Definition at line \mbox{\hyperlink{account__query__db_8cpp_source_l00486}{486}} of file \mbox{\hyperlink{account__query__db_8cpp_source}{account\+\_\+query\+\_\+db.\+cpp}}.
+
+\Hypertarget{structsysio_1_1chain__apis_1_1account__query__db__impl_a0eaaa63915f583ca51f38307d557f7e9}\index{sysio::chain\_apis::account\_query\_db\_impl@{sysio::chain\_apis::account\_query\_db\_impl}!controller@{controller}}
+\index{controller@{controller}!sysio::chain\_apis::account\_query\_db\_impl@{sysio::chain\_apis::account\_query\_db\_impl}}
+\doxysubsubsection{\texorpdfstring{controller}{controller}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain__apis_1_1account__query__db__impl_a0eaaa63915f583ca51f38307d557f7e9} 
+const \mbox{\hyperlink{classsysio_1_1chain_1_1controller}{chain\+::controller}}\& sysio\+::chain\+\_\+apis\+::account\+\_\+query\+\_\+db\+\_\+impl\+::controller}
+
+
+
+Definition at line \mbox{\hyperlink{account__query__db_8cpp_source_l00485}{485}} of file \mbox{\hyperlink{account__query__db_8cpp_source}{account\+\_\+query\+\_\+db.\+cpp}}.
+
+\Hypertarget{structsysio_1_1chain__apis_1_1account__query__db__impl_adaaa7d466a003a720717341ca7fda6c5}\index{sysio::chain\_apis::account\_query\_db\_impl@{sysio::chain\_apis::account\_query\_db\_impl}!key\_bimap@{key\_bimap}}
+\index{key\_bimap@{key\_bimap}!sysio::chain\_apis::account\_query\_db\_impl@{sysio::chain\_apis::account\_query\_db\_impl}}
+\doxysubsubsection{\texorpdfstring{key\_bimap}{key\_bimap}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain__apis_1_1account__query__db__impl_adaaa7d466a003a720717341ca7fda6c5} 
+\mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_aea2e43cf58e004caaac0c903a10a076d}{key\+\_\+bimap\+\_\+t}} sysio\+::chain\+\_\+apis\+::account\+\_\+query\+\_\+db\+\_\+impl\+::key\+\_\+bimap}
+
+
+
+Definition at line \mbox{\hyperlink{account__query__db_8cpp_source_l00503}{503}} of file \mbox{\hyperlink{account__query__db_8cpp_source}{account\+\_\+query\+\_\+db.\+cpp}}.
+
+\Hypertarget{structsysio_1_1chain__apis_1_1account__query__db__impl_a6bf2e9f0ed9cd1f0762888b22ad55024}\index{sysio::chain\_apis::account\_query\_db\_impl@{sysio::chain\_apis::account\_query\_db\_impl}!name\_bimap@{name\_bimap}}
+\index{name\_bimap@{name\_bimap}!sysio::chain\_apis::account\_query\_db\_impl@{sysio::chain\_apis::account\_query\_db\_impl}}
+\doxysubsubsection{\texorpdfstring{name\_bimap}{name\_bimap}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain__apis_1_1account__query__db__impl_a6bf2e9f0ed9cd1f0762888b22ad55024} 
+\mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_abebad38a4e12d41c47569dc60125cdcd}{name\+\_\+bimap\+\_\+t}} sysio\+::chain\+\_\+apis\+::account\+\_\+query\+\_\+db\+\_\+impl\+::name\+\_\+bimap}
+
+
+
+Definition at line \mbox{\hyperlink{account__query__db_8cpp_source_l00502}{502}} of file \mbox{\hyperlink{account__query__db_8cpp_source}{account\+\_\+query\+\_\+db.\+cpp}}.
+
+\Hypertarget{structsysio_1_1chain__apis_1_1account__query__db__impl_a6a6e477d5ab8af17385632e6cc16bbdd}\index{sysio::chain\_apis::account\_query\_db\_impl@{sysio::chain\_apis::account\_query\_db\_impl}!onblock\_trace@{onblock\_trace}}
+\index{onblock\_trace@{onblock\_trace}!sysio::chain\_apis::account\_query\_db\_impl@{sysio::chain\_apis::account\_query\_db\_impl}}
+\doxysubsubsection{\texorpdfstring{onblock\_trace}{onblock\_trace}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain__apis_1_1account__query__db__impl_a6a6e477d5ab8af17385632e6cc16bbdd} 
+\mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_abdd57326fce804f4a467539158816e88}{onblock\+\_\+trace\+\_\+t}} sysio\+::chain\+\_\+apis\+::account\+\_\+query\+\_\+db\+\_\+impl\+::onblock\+\_\+trace}
+
+
+
+Definition at line \mbox{\hyperlink{account__query__db_8cpp_source_l00487}{487}} of file \mbox{\hyperlink{account__query__db_8cpp_source}{account\+\_\+query\+\_\+db.\+cpp}}.
+
+\Hypertarget{structsysio_1_1chain__apis_1_1account__query__db__impl_aba57026fbb7d549b2431c788a5bd3a2d}\index{sysio::chain\_apis::account\_query\_db\_impl@{sysio::chain\_apis::account\_query\_db\_impl}!permission\_info\_index@{permission\_info\_index}}
+\index{permission\_info\_index@{permission\_info\_index}!sysio::chain\_apis::account\_query\_db\_impl@{sysio::chain\_apis::account\_query\_db\_impl}}
+\doxysubsubsection{\texorpdfstring{permission\_info\_index}{permission\_info\_index}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain__apis_1_1account__query__db__impl_aba57026fbb7d549b2431c788a5bd3a2d} 
+permission\+\_\+info\+\_\+index\+\_\+t sysio\+::chain\+\_\+apis\+::account\+\_\+query\+\_\+db\+\_\+impl\+::permission\+\_\+info\+\_\+index}
+
+
+
+Definition at line \mbox{\hyperlink{account__query__db_8cpp_source_l00501}{501}} of file \mbox{\hyperlink{account__query__db_8cpp_source}{account\+\_\+query\+\_\+db.\+cpp}}.
+
+\Hypertarget{structsysio_1_1chain__apis_1_1account__query__db__impl_ad111bde83946593be763eeb7e3541fdf}\index{sysio::chain\_apis::account\_query\_db\_impl@{sysio::chain\_apis::account\_query\_db\_impl}!rw\_mutex@{rw\_mutex}}
+\index{rw\_mutex@{rw\_mutex}!sysio::chain\_apis::account\_query\_db\_impl@{sysio::chain\_apis::account\_query\_db\_impl}}
+\doxysubsubsection{\texorpdfstring{rw\_mutex}{rw\_mutex}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain__apis_1_1account__query__db__impl_ad111bde83946593be763eeb7e3541fdf} 
+std\+::shared\+\_\+mutex sysio\+::chain\+\_\+apis\+::account\+\_\+query\+\_\+db\+\_\+impl\+::rw\+\_\+mutex\hspace{0.3cm}{\ttfamily [mutable]}}
+
+
+
+Definition at line \mbox{\hyperlink{account__query__db_8cpp_source_l00505}{505}} of file \mbox{\hyperlink{account__query__db_8cpp_source}{account\+\_\+query\+\_\+db.\+cpp}}.
+
+\Hypertarget{structsysio_1_1chain__apis_1_1account__query__db__impl_adf9eb275a2909c7f837e9514146468d5}\index{sysio::chain\_apis::account\_query\_db\_impl@{sysio::chain\_apis::account\_query\_db\_impl}!time\_to\_block\_num@{time\_to\_block\_num}}
+\index{time\_to\_block\_num@{time\_to\_block\_num}!sysio::chain\_apis::account\_query\_db\_impl@{sysio::chain\_apis::account\_query\_db\_impl}}
+\doxysubsubsection{\texorpdfstring{time\_to\_block\_num}{time\_to\_block\_num}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain__apis_1_1account__query__db__impl_adf9eb275a2909c7f837e9514146468d5} 
+\mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db__impl_ab624636989896e7e7aac983cd4eb12ec}{time\+\_\+map\+\_\+t}} sysio\+::chain\+\_\+apis\+::account\+\_\+query\+\_\+db\+\_\+impl\+::time\+\_\+to\+\_\+block\+\_\+num}
+
+
+
+Definition at line \mbox{\hyperlink{account__query__db_8cpp_source_l00490}{490}} of file \mbox{\hyperlink{account__query__db_8cpp_source}{account\+\_\+query\+\_\+db.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+plugins/chain\+\_\+plugin/\mbox{\hyperlink{account__query__db_8cpp}{account\+\_\+query\+\_\+db.\+cpp}}\end{DoxyCompactItemize}

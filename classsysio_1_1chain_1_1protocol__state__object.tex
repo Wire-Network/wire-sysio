@@ -1,0 +1,118 @@
+\doxysection{sysio\+::chain\+::protocol\+\_\+state\+\_\+object Class Reference}
+\hypertarget{classsysio_1_1chain_1_1protocol__state__object}{}\label{classsysio_1_1chain_1_1protocol__state__object}\index{sysio::chain::protocol\_state\_object@{sysio::chain::protocol\_state\_object}}
+
+
+Maintains global state information about consensus protocol rules.  
+
+
+
+
+{\ttfamily \#include $<$protocol\+\_\+state\+\_\+object.\+hpp$>$}
+
+
+
+Inheritance diagram for sysio\+::chain\+::protocol\+\_\+state\+\_\+object\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=192pt]{classsysio_1_1chain_1_1protocol__state__object__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for sysio\+::chain\+::protocol\+\_\+state\+\_\+object\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=192pt]{classsysio_1_1chain_1_1protocol__state__object__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structchainbase_1_1object_a7c6a0efb95ee67d538a976cfa5be9df9}{id\+\_\+type}} \mbox{\hyperlink{classsysio_1_1chain_1_1protocol__state__object_a12875f142a05e0f6c94ae2b0b91f111e}{id}}
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_a915de5728df4a4ce45da87438053ee90}{shared\+\_\+vector}}$<$ activated\+\_\+protocol\+\_\+feature $>$ \mbox{\hyperlink{classsysio_1_1chain_1_1protocol__state__object_ae9694b005b07756cdb14eadf6f09a0af}{activated\+\_\+protocol\+\_\+features}}
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_a915de5728df4a4ce45da87438053ee90}{shared\+\_\+vector}}$<$ \mbox{\hyperlink{namespacesysio_1_1chain_a357fd9478475457e5bb386a3143079b6}{digest\+\_\+type}} $>$ \mbox{\hyperlink{classsysio_1_1chain_1_1protocol__state__object_af9aaf45cddecb84f71b527784984b83a}{preactivated\+\_\+protocol\+\_\+features}}
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_ab67e634f02d35e09950917271779b2ff}{whitelisted\+\_\+intrinsics\+\_\+type}} \mbox{\hyperlink{classsysio_1_1chain_1_1protocol__state__object_adbd826ce4a0506926501474dbd56be60}{whitelisted\+\_\+intrinsics}}
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classsysio_1_1chain_1_1protocol__state__object_af0f14fd2383a20afd49de85013402cdc}{num\+\_\+supported\+\_\+key\+\_\+types}} = 0
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Public Types inherited from \mbox{\hyperlink{structchainbase_1_1object}{chainbase\+::object$<$ protocol\+\_\+state\+\_\+object\+\_\+type, protocol\+\_\+state\+\_\+object $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{classchainbase_1_1oid}{oid}}$<$ protocol\+\_\+state\+\_\+object $>$ \mbox{\hyperlink{structchainbase_1_1object_a7c6a0efb95ee67d538a976cfa5be9df9}{id\+\_\+type}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Static Public Attributes inherited from \mbox{\hyperlink{structchainbase_1_1object}{chainbase\+::object$<$ protocol\+\_\+state\+\_\+object\+\_\+type, protocol\+\_\+state\+\_\+object $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+static const \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{structchainbase_1_1object_a30d3a5340e6fc59b4a2e044fcd42f0a2}{type\+\_\+id}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{protocol__state__object_8hpp_source_l00017}{17}} of file \mbox{\hyperlink{protocol__state__object_8hpp_source}{protocol\+\_\+state\+\_\+object.\+hpp}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classsysio_1_1chain_1_1protocol__state__object_ae9694b005b07756cdb14eadf6f09a0af}\index{sysio::chain::protocol\_state\_object@{sysio::chain::protocol\_state\_object}!activated\_protocol\_features@{activated\_protocol\_features}}
+\index{activated\_protocol\_features@{activated\_protocol\_features}!sysio::chain::protocol\_state\_object@{sysio::chain::protocol\_state\_object}}
+\doxysubsubsection{\texorpdfstring{activated\_protocol\_features}{activated\_protocol\_features}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1protocol__state__object_ae9694b005b07756cdb14eadf6f09a0af} 
+\mbox{\hyperlink{namespacesysio_1_1chain_a915de5728df4a4ce45da87438053ee90}{shared\+\_\+vector}}$<$activated\+\_\+protocol\+\_\+feature$>$ sysio\+::chain\+::protocol\+\_\+state\+\_\+object\+::activated\+\_\+protocol\+\_\+features}
+
+
+
+Definition at line \mbox{\hyperlink{protocol__state__object_8hpp_source_l00040}{40}} of file \mbox{\hyperlink{protocol__state__object_8hpp_source}{protocol\+\_\+state\+\_\+object.\+hpp}}.
+
+\Hypertarget{classsysio_1_1chain_1_1protocol__state__object_a12875f142a05e0f6c94ae2b0b91f111e}\index{sysio::chain::protocol\_state\_object@{sysio::chain::protocol\_state\_object}!id@{id}}
+\index{id@{id}!sysio::chain::protocol\_state\_object@{sysio::chain::protocol\_state\_object}}
+\doxysubsubsection{\texorpdfstring{id}{id}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1protocol__state__object_a12875f142a05e0f6c94ae2b0b91f111e} 
+\mbox{\hyperlink{structchainbase_1_1object_a7c6a0efb95ee67d538a976cfa5be9df9}{id\+\_\+type}} sysio\+::chain\+::protocol\+\_\+state\+\_\+object\+::id}
+
+
+
+Definition at line \mbox{\hyperlink{protocol__state__object_8hpp_source_l00039}{39}} of file \mbox{\hyperlink{protocol__state__object_8hpp_source}{protocol\+\_\+state\+\_\+object.\+hpp}}.
+
+\Hypertarget{classsysio_1_1chain_1_1protocol__state__object_af0f14fd2383a20afd49de85013402cdc}\index{sysio::chain::protocol\_state\_object@{sysio::chain::protocol\_state\_object}!num\_supported\_key\_types@{num\_supported\_key\_types}}
+\index{num\_supported\_key\_types@{num\_supported\_key\_types}!sysio::chain::protocol\_state\_object@{sysio::chain::protocol\_state\_object}}
+\doxysubsubsection{\texorpdfstring{num\_supported\_key\_types}{num\_supported\_key\_types}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1protocol__state__object_af0f14fd2383a20afd49de85013402cdc} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::chain\+::protocol\+\_\+state\+\_\+object\+::num\+\_\+supported\+\_\+key\+\_\+types = 0}
+
+
+
+Definition at line \mbox{\hyperlink{protocol__state__object_8hpp_source_l00043}{43}} of file \mbox{\hyperlink{protocol__state__object_8hpp_source}{protocol\+\_\+state\+\_\+object.\+hpp}}.
+
+\Hypertarget{classsysio_1_1chain_1_1protocol__state__object_af9aaf45cddecb84f71b527784984b83a}\index{sysio::chain::protocol\_state\_object@{sysio::chain::protocol\_state\_object}!preactivated\_protocol\_features@{preactivated\_protocol\_features}}
+\index{preactivated\_protocol\_features@{preactivated\_protocol\_features}!sysio::chain::protocol\_state\_object@{sysio::chain::protocol\_state\_object}}
+\doxysubsubsection{\texorpdfstring{preactivated\_protocol\_features}{preactivated\_protocol\_features}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1protocol__state__object_af9aaf45cddecb84f71b527784984b83a} 
+\mbox{\hyperlink{namespacesysio_1_1chain_a915de5728df4a4ce45da87438053ee90}{shared\+\_\+vector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_a357fd9478475457e5bb386a3143079b6}{digest\+\_\+type}}$>$ sysio\+::chain\+::protocol\+\_\+state\+\_\+object\+::preactivated\+\_\+protocol\+\_\+features}
+
+
+
+Definition at line \mbox{\hyperlink{protocol__state__object_8hpp_source_l00041}{41}} of file \mbox{\hyperlink{protocol__state__object_8hpp_source}{protocol\+\_\+state\+\_\+object.\+hpp}}.
+
+\Hypertarget{classsysio_1_1chain_1_1protocol__state__object_adbd826ce4a0506926501474dbd56be60}\index{sysio::chain::protocol\_state\_object@{sysio::chain::protocol\_state\_object}!whitelisted\_intrinsics@{whitelisted\_intrinsics}}
+\index{whitelisted\_intrinsics@{whitelisted\_intrinsics}!sysio::chain::protocol\_state\_object@{sysio::chain::protocol\_state\_object}}
+\doxysubsubsection{\texorpdfstring{whitelisted\_intrinsics}{whitelisted\_intrinsics}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1protocol__state__object_adbd826ce4a0506926501474dbd56be60} 
+\mbox{\hyperlink{namespacesysio_1_1chain_ab67e634f02d35e09950917271779b2ff}{whitelisted\+\_\+intrinsics\+\_\+type}} sysio\+::chain\+::protocol\+\_\+state\+\_\+object\+::whitelisted\+\_\+intrinsics}
+
+
+
+Definition at line \mbox{\hyperlink{protocol__state__object_8hpp_source_l00042}{42}} of file \mbox{\hyperlink{protocol__state__object_8hpp_source}{protocol\+\_\+state\+\_\+object.\+hpp}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{protocol__state__object_8hpp}{protocol\+\_\+state\+\_\+object.\+hpp}}\end{DoxyCompactItemize}

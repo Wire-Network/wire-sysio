@@ -1,0 +1,260 @@
+\doxysection{fc\+::iobuffer Class Reference}
+\hypertarget{classfc_1_1iobuffer}{}\label{classfc_1_1iobuffer}\index{fc::iobuffer@{fc::iobuffer}}
+
+
+{\ttfamily \#include $<$iobuffer.\+hpp$>$}
+
+
+
+Inheritance diagram for fc\+::iobuffer\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=148pt]{classfc_1_1iobuffer__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for fc\+::iobuffer\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=148pt]{classfc_1_1iobuffer__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1iobuffer_aa3f2dcd33ae96f405bc5a6db337efa15}{iobuffer}} (size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\item 
+size\+\_\+t \mbox{\hyperlink{classfc_1_1iobuffer_a29c646846e914c20ff0bde867a2f0f78}{size}} () const
+\item 
+size\+\_\+t \mbox{\hyperlink{classfc_1_1iobuffer_afa4d1ec3b4d64b001df17892552401b5}{pos}} () const
+\item 
+size\+\_\+t \mbox{\hyperlink{classfc_1_1iobuffer_a67df9fe367da2100489c5b6fb1edc590}{seek}} (size\+\_\+t \mbox{\hyperlink{classfc_1_1iobuffer_afa4d1ec3b4d64b001df17892552401b5}{pos}})
+\item 
+virtual size\+\_\+t \mbox{\hyperlink{classfc_1_1iobuffer_a3fed1791ec6e6d8d129426549569fd33}{readsome}} (char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}, size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})
+\item 
+char \mbox{\hyperlink{classfc_1_1iobuffer_a0fba1dc12428ca55e7ed8810534b1fc3}{peek}} () const
+\item 
+virtual size\+\_\+t \mbox{\hyperlink{classfc_1_1iobuffer_a0960b07106d328865bff43abd3982961}{writesome}} (const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}, size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})
+\item 
+char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classfc_1_1iobuffer_a3eff4531ef3c72db9b6c34840e8d502d}{data}} ()
+\item 
+virtual void \mbox{\hyperlink{classfc_1_1iobuffer_aa1c346803447c6f86bf1e6eb01e63f51}{close}} ()
+\item 
+virtual void \mbox{\hyperlink{classfc_1_1iobuffer_a75c44be3a5ce018f6e7d714da34917fd}{flush}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{iobuffer_8hpp_source_l00032}{32}} of file \mbox{\hyperlink{iobuffer_8hpp_source}{iobuffer.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1iobuffer_aa3f2dcd33ae96f405bc5a6db337efa15}\index{fc::iobuffer@{fc::iobuffer}!iobuffer@{iobuffer}}
+\index{iobuffer@{iobuffer}!fc::iobuffer@{fc::iobuffer}}
+\doxysubsubsection{\texorpdfstring{iobuffer()}{iobuffer()}}
+{\footnotesize\ttfamily \label{classfc_1_1iobuffer_aa3f2dcd33ae96f405bc5a6db337efa15} 
+fc\+::iobuffer\+::iobuffer (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{s}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{iobuffer_8hpp_source_l00035}{35}} of file \mbox{\hyperlink{iobuffer_8hpp_source}{iobuffer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ :\_data(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})\{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1iobuffer_aa1c346803447c6f86bf1e6eb01e63f51}\index{fc::iobuffer@{fc::iobuffer}!close@{close}}
+\index{close@{close}!fc::iobuffer@{fc::iobuffer}}
+\doxysubsubsection{\texorpdfstring{close()}{close()}}
+{\footnotesize\ttfamily \label{classfc_1_1iobuffer_aa1c346803447c6f86bf1e6eb01e63f51} 
+virtual void fc\+::iobuffer\+::close (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{iobuffer_8hpp_source_l00073}{73}} of file \mbox{\hyperlink{iobuffer_8hpp_source}{iobuffer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00073\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1iobuffer_a3eff4531ef3c72db9b6c34840e8d502d}\index{fc::iobuffer@{fc::iobuffer}!data@{data}}
+\index{data@{data}!fc::iobuffer@{fc::iobuffer}}
+\doxysubsubsection{\texorpdfstring{data()}{data()}}
+{\footnotesize\ttfamily \label{classfc_1_1iobuffer_a3eff4531ef3c72db9b6c34840e8d502d} 
+char \texorpdfstring{$\ast$}{*} fc\+::iobuffer\+::data (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{iobuffer_8hpp_source_l00071}{71}} of file \mbox{\hyperlink{iobuffer_8hpp_source}{iobuffer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00071\ \{\ \textcolor{keywordflow}{return}\ \_data.data();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1iobuffer_a75c44be3a5ce018f6e7d714da34917fd}\index{fc::iobuffer@{fc::iobuffer}!flush@{flush}}
+\index{flush@{flush}!fc::iobuffer@{fc::iobuffer}}
+\doxysubsubsection{\texorpdfstring{flush()}{flush()}}
+{\footnotesize\ttfamily \label{classfc_1_1iobuffer_a75c44be3a5ce018f6e7d714da34917fd} 
+virtual void fc\+::iobuffer\+::flush (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{iobuffer_8hpp_source_l00074}{74}} of file \mbox{\hyperlink{iobuffer_8hpp_source}{iobuffer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00074\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1iobuffer_a0fba1dc12428ca55e7ed8810534b1fc3}\index{fc::iobuffer@{fc::iobuffer}!peek@{peek}}
+\index{peek@{peek}!fc::iobuffer@{fc::iobuffer}}
+\doxysubsubsection{\texorpdfstring{peek()}{peek()}}
+{\footnotesize\ttfamily \label{classfc_1_1iobuffer_a0fba1dc12428ca55e7ed8810534b1fc3} 
+char fc\+::iobuffer\+::peek (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+This method may block until at least 1 character is available. 
+
+Definition at line \mbox{\hyperlink{iobuffer_8hpp_source_l00057}{57}} of file \mbox{\hyperlink{iobuffer_8hpp_source}{iobuffer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \{\ }
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \_pos\ ==\ \_data.size()\ )\ \textcolor{keywordflow}{throw}\ fc::eof\_exception();}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \_data[\_pos];\ }
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1iobuffer_afa4d1ec3b4d64b001df17892552401b5}\index{fc::iobuffer@{fc::iobuffer}!pos@{pos}}
+\index{pos@{pos}!fc::iobuffer@{fc::iobuffer}}
+\doxysubsubsection{\texorpdfstring{pos()}{pos()}}
+{\footnotesize\ttfamily \label{classfc_1_1iobuffer_afa4d1ec3b4d64b001df17892552401b5} 
+size\+\_\+t fc\+::iobuffer\+::pos (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{iobuffer_8hpp_source_l00039}{39}} of file \mbox{\hyperlink{iobuffer_8hpp_source}{iobuffer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00039\ \{\ \textcolor{keywordflow}{return}\ \_pos;\ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=290pt]{classfc_1_1iobuffer_afa4d1ec3b4d64b001df17892552401b5_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1iobuffer_a3fed1791ec6e6d8d129426549569fd33}\index{fc::iobuffer@{fc::iobuffer}!readsome@{readsome}}
+\index{readsome@{readsome}!fc::iobuffer@{fc::iobuffer}}
+\doxysubsubsection{\texorpdfstring{readsome()}{readsome()}}
+{\footnotesize\ttfamily \label{classfc_1_1iobuffer_a3fed1791ec6e6d8d129426549569fd33} 
+virtual size\+\_\+t fc\+::iobuffer\+::readsome (\begin{DoxyParamCaption}\item[{char \texorpdfstring{$\ast$}{*}}]{buf}{, }\item[{size\+\_\+t}]{len}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{iobuffer_8hpp_source_l00045}{45}} of file \mbox{\hyperlink{iobuffer_8hpp_source}{iobuffer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ avail\ =\ std::min<size\_t>(\ \_data.size()-\/\_pos,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ );}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ avail\ ==\ 0\ )\ \textcolor{keywordflow}{throw}\ fc::eof\_exception();}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ \_data.data()+\_pos,\ avail\ );}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \ \_pos\ +=\ avail;}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ avail;}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=281pt]{classfc_1_1iobuffer_a3fed1791ec6e6d8d129426549569fd33_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1iobuffer_a67df9fe367da2100489c5b6fb1edc590}\index{fc::iobuffer@{fc::iobuffer}!seek@{seek}}
+\index{seek@{seek}!fc::iobuffer@{fc::iobuffer}}
+\doxysubsubsection{\texorpdfstring{seek()}{seek()}}
+{\footnotesize\ttfamily \label{classfc_1_1iobuffer_a67df9fe367da2100489c5b6fb1edc590} 
+size\+\_\+t fc\+::iobuffer\+::seek (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{pos}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{iobuffer_8hpp_source_l00040}{40}} of file \mbox{\hyperlink{iobuffer_8hpp_source}{iobuffer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \{\ }
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \_pos\ =\ std::min<size\_t>(\_data.size(),\mbox{\hyperlink{classfc_1_1iobuffer_afa4d1ec3b4d64b001df17892552401b5}{pos}});\ }
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=290pt]{classfc_1_1iobuffer_a67df9fe367da2100489c5b6fb1edc590_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1iobuffer_a29c646846e914c20ff0bde867a2f0f78}\index{fc::iobuffer@{fc::iobuffer}!size@{size}}
+\index{size@{size}!fc::iobuffer@{fc::iobuffer}}
+\doxysubsubsection{\texorpdfstring{size()}{size()}}
+{\footnotesize\ttfamily \label{classfc_1_1iobuffer_a29c646846e914c20ff0bde867a2f0f78} 
+size\+\_\+t fc\+::iobuffer\+::size (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{iobuffer_8hpp_source_l00038}{38}} of file \mbox{\hyperlink{iobuffer_8hpp_source}{iobuffer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00038\ \{\ \textcolor{keywordflow}{return}\ \_data.size();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1iobuffer_a0960b07106d328865bff43abd3982961}\index{fc::iobuffer@{fc::iobuffer}!writesome@{writesome}}
+\index{writesome@{writesome}!fc::iobuffer@{fc::iobuffer}}
+\doxysubsubsection{\texorpdfstring{writesome()}{writesome()}}
+{\footnotesize\ttfamily \label{classfc_1_1iobuffer_a0960b07106d328865bff43abd3982961} 
+virtual size\+\_\+t fc\+::iobuffer\+::writesome (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{buf}{, }\item[{size\+\_\+t}]{len}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{iobuffer_8hpp_source_l00063}{63}} of file \mbox{\hyperlink{iobuffer_8hpp_source}{iobuffer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ avail\ =\ std::max<size\_t>(\ \_data.size(),\ \_pos\ +\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ );}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \_data.resize(avail);}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(\ \_data.data()+\_pos,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ );}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \_pos\ +=\ avail;}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ avail;}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=283pt]{classfc_1_1iobuffer_a0960b07106d328865bff43abd3982961_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/io/\mbox{\hyperlink{iobuffer_8hpp}{iobuffer.\+hpp}}\end{DoxyCompactItemize}

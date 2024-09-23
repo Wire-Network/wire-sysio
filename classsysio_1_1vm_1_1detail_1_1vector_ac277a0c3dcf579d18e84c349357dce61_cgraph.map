@@ -1,0 +1,8 @@
+<map id="sysio::vm::detail::vector::copy" name="sysio::vm::detail::vector::copy">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,35,131,75"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1vm_1_1detail_1_1vector.html#afc1d102d8b0144266a1adbc474bbdb40" title=" " alt="" coords="179,5,304,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="130,42,163,36,164,41,131,47"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1vm_1_1detail_1_1vector.html#aff0b6c2a0666cc8d6ec1f1e64cdd9036" title=" " alt="" coords="352,35,477,75"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="131,54,179,55,304,55,336,54,336,60,304,60,179,60,131,59"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="305,34,338,39,337,45,304,39"/>
+</map>

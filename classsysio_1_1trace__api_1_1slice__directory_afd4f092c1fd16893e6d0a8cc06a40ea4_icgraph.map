@@ -1,0 +1,23 @@
+<map id="sysio::trace_api::slice_directory::find_trx_id_slice" name="sysio::trace_api::slice_directory::find_trx_id_slice">
+<area shape="rect" id="Node000001" title=" " alt="" coords="780,140,961,181"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1trace__api_1_1slice__directory.html#aaa86b5afdb3d46491da2af321f6b54bd" title=" " alt="" coords="536,52,704,108"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="790,137,704,110,706,105,791,132"/>
+<area shape="rect" id="Node000005" href="$classsysio_1_1trace__api_1_1store__provider.html#a22f36ae69988e2b50a48dbe604f09bf9" title=" " alt="" coords="540,132,700,188"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="764,163,701,163,701,158,764,158"/>
+<area shape="rect" id="Node000006" href="$classsysio_1_1trace__api_1_1slice__directory.html#a8b15d66d020bfc67d541e6cf09404ab9" title=" " alt="" coords="508,212,732,253"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="784,188,733,203,695,214,694,209,732,198,782,183"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1trace__api_1_1store__provider.html#a34a4fdef03a4b354b005e73e383d7e59" title=" " alt="" coords="276,5,426,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="520,63,426,44,427,38,521,58"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1trace__api_1_1store__provider.html#a03c9a6e4e79e019651c9a8f8a16ff4bf" title=" " alt="" coords="266,71,436,111"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="520,87,437,90,437,85,520,82"/>
+<area shape="rect" id="Node000007" href="$test__trace__file_8cpp.html#a66729e2b0f8ef9a605dab627b7e99dc1" title=" " alt="" coords="243,158,460,184"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="515,211,459,198,413,187,414,182,461,192,517,205"/>
+<area shape="rect" id="Node000008" href="$test__trace__file_8cpp.html#a87483942b91385d216d42689d0af1535" title=" " alt="" coords="243,208,460,233"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="492,229,460,228,461,223,493,224"/>
+<area shape="rect" id="Node000009" href="$test__trace__file_8cpp.html#ae06d4153674bd514a96d7a5e6f743f16" title=" " alt="" coords="243,257,460,282"/>
+<area shape="poly" id="edge8_Node000006_Node000009" title=" " alt="" coords="493,253,449,259,448,254,492,247"/>
+<area shape="rect" id="Node000010" href="$classsysio_1_1trace__api_1_1slice__directory.html#a7c7ccb0852100b5ab21daef4ac3133cc" title=" " alt="" coords="255,307,448,363"/>
+<area shape="poly" id="edge9_Node000006_Node000010" title=" " alt="" coords="553,261,461,297,430,309,429,304,459,293,551,256"/>
+<area shape="rect" id="Node000011" href="$classsysio_1_1trace__api_1_1store__provider.html#afbe277e7852b60426b1cad9b7fb81c4a" title=" " alt="" coords="5,307,195,363"/>
+<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="239,338,195,338,195,332,239,332"/>
+</map>

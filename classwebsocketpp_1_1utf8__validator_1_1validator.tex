@@ -1,0 +1,190 @@
+\doxysection{websocketpp\+::utf8\+\_\+validator\+::validator Class Reference}
+\hypertarget{classwebsocketpp_1_1utf8__validator_1_1validator}{}\label{classwebsocketpp_1_1utf8__validator_1_1validator}\index{websocketpp::utf8\_validator::validator@{websocketpp::utf8\_validator::validator}}
+
+
+Provides streaming \doxylink{struct_u_t_f8}{UTF8} validation functionality.  
+
+
+
+
+{\ttfamily \#include $<$utf8\+\_\+validator.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classwebsocketpp_1_1utf8__validator_1_1validator_a41ea90fb7c6b34d41a8e6e71a6b04346}{validator}} ()
+\begin{DoxyCompactList}\small\item\em Construct and initialize the validator. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classwebsocketpp_1_1utf8__validator_1_1validator_ada7f6cdd4261d848d51d7ba0bd9d28b4}{consume}} (\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} byte)
+\begin{DoxyCompactList}\small\item\em Advance the state of the validator with the next input byte. \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename iterator\+\_\+type $>$ }\\bool \mbox{\hyperlink{classwebsocketpp_1_1utf8__validator_1_1validator_a2cde6cad6f1a0f66674010848ec80fba}{decode}} (iterator\+\_\+type begin, iterator\+\_\+type end)
+\begin{DoxyCompactList}\small\item\em Advance validator state with input from an iterator pair. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classwebsocketpp_1_1utf8__validator_1_1validator_a89deb3bdfd8b94da908b806e543491ba}{complete}} ()
+\begin{DoxyCompactList}\small\item\em Return whether the input sequence ended on a valid \doxylink{namespaceutf8}{utf8} codepoint. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1utf8__validator_1_1validator_a98aa3058213a650997bd832cc003da75}{reset}} ()
+\begin{DoxyCompactList}\small\item\em \doxylink{struct_reset}{Reset} the validator to decode another message. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{utf8__validator_8hpp_source_l00081}{81}} of file \mbox{\hyperlink{utf8__validator_8hpp_source}{utf8\+\_\+validator.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classwebsocketpp_1_1utf8__validator_1_1validator_a41ea90fb7c6b34d41a8e6e71a6b04346}\index{websocketpp::utf8\_validator::validator@{websocketpp::utf8\_validator::validator}!validator@{validator}}
+\index{validator@{validator}!websocketpp::utf8\_validator::validator@{websocketpp::utf8\_validator::validator}}
+\doxysubsubsection{\texorpdfstring{validator()}{validator()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1utf8__validator_1_1validator_a41ea90fb7c6b34d41a8e6e71a6b04346} 
+websocketpp\+::utf8\+\_\+validator\+::validator\+::validator (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{utf8__validator_8hpp_source_l00084}{84}} of file \mbox{\hyperlink{utf8__validator_8hpp_source}{utf8\+\_\+validator.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00084\ :\ m\_state(utf8\_accept),m\_codepoint(0)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classwebsocketpp_1_1utf8__validator_1_1validator_a89deb3bdfd8b94da908b806e543491ba}\index{websocketpp::utf8\_validator::validator@{websocketpp::utf8\_validator::validator}!complete@{complete}}
+\index{complete@{complete}!websocketpp::utf8\_validator::validator@{websocketpp::utf8\_validator::validator}}
+\doxysubsubsection{\texorpdfstring{complete()}{complete()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1utf8__validator_1_1validator_a89deb3bdfd8b94da908b806e543491ba} 
+bool websocketpp\+::utf8\+\_\+validator\+::validator\+::complete (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\begin{DoxyReturn}{Returns}
+Whether or not the input sequence ended on a valid codepoint. 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{utf8__validator_8hpp_source_l00124}{124}} of file \mbox{\hyperlink{utf8__validator_8hpp_source}{utf8\+\_\+validator.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_state\ ==\ utf8\_accept;}
+\DoxyCodeLine{00126\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1utf8__validator_1_1validator_a89deb3bdfd8b94da908b806e543491ba_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1utf8__validator_1_1validator_ada7f6cdd4261d848d51d7ba0bd9d28b4}\index{websocketpp::utf8\_validator::validator@{websocketpp::utf8\_validator::validator}!consume@{consume}}
+\index{consume@{consume}!websocketpp::utf8\_validator::validator@{websocketpp::utf8\_validator::validator}}
+\doxysubsubsection{\texorpdfstring{consume()}{consume()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1utf8__validator_1_1validator_ada7f6cdd4261d848d51d7ba0bd9d28b4} 
+bool websocketpp\+::utf8\+\_\+validator\+::validator\+::consume (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}}}]{byte}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+\begin{DoxyParams}{Parameters}
+{\em byte} & The byte to advance the validation state with \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Whether or not the byte resulted in a validation error. 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{utf8__validator_8hpp_source_l00091}{91}} of file \mbox{\hyperlink{utf8__validator_8hpp_source}{utf8\+\_\+validator.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacewebsocketpp_1_1utf8__validator_ae6dab1acad72af0396e2448394a07d98}{utf8\_validator::decode}}(\&m\_state,\&m\_codepoint,\textcolor{keywordtype}{byte})\ ==\ utf8\_reject)\ \{}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00096\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1utf8__validator_1_1validator_ada7f6cdd4261d848d51d7ba0bd9d28b4_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1utf8__validator_1_1validator_a2cde6cad6f1a0f66674010848ec80fba}\index{websocketpp::utf8\_validator::validator@{websocketpp::utf8\_validator::validator}!decode@{decode}}
+\index{decode@{decode}!websocketpp::utf8\_validator::validator@{websocketpp::utf8\_validator::validator}}
+\doxysubsubsection{\texorpdfstring{decode()}{decode()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1utf8__validator_1_1validator_a2cde6cad6f1a0f66674010848ec80fba} 
+template$<$typename iterator\+\_\+type $>$ \\
+bool websocketpp\+::utf8\+\_\+validator\+::validator\+::decode (\begin{DoxyParamCaption}\item[{iterator\+\_\+type}]{begin}{, }\item[{iterator\+\_\+type}]{end}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+\begin{DoxyParams}{Parameters}
+{\em begin} & Input iterator to the start of the input range \\
+\hline
+{\em end} & Input iterator to the end of the input range \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Whether or not decoding the bytes resulted in a validation error. 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{utf8__validator_8hpp_source_l00105}{105}} of file \mbox{\hyperlink{utf8__validator_8hpp_source}{utf8\+\_\+validator.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (iterator\_type\ it\ =\ begin;\ it\ !=\ end;\ ++it)\ \{}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ result\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1utf8__validator_ae6dab1acad72af0396e2448394a07d98}{utf8\_validator::decode}}(}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&m\_state,}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&m\_codepoint,}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\textcolor{keyword}{>}(*it)}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00112\ }
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (result\ ==\ utf8\_reject)\ \{}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00118\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1utf8__validator_1_1validator_a2cde6cad6f1a0f66674010848ec80fba_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1utf8__validator_1_1validator_a2cde6cad6f1a0f66674010848ec80fba_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1utf8__validator_1_1validator_a98aa3058213a650997bd832cc003da75}\index{websocketpp::utf8\_validator::validator@{websocketpp::utf8\_validator::validator}!reset@{reset}}
+\index{reset@{reset}!websocketpp::utf8\_validator::validator@{websocketpp::utf8\_validator::validator}}
+\doxysubsubsection{\texorpdfstring{reset()}{reset()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1utf8__validator_1_1validator_a98aa3058213a650997bd832cc003da75} 
+void websocketpp\+::utf8\+\_\+validator\+::validator\+::reset (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{utf8__validator_8hpp_source_l00129}{129}} of file \mbox{\hyperlink{utf8__validator_8hpp_source}{utf8\+\_\+validator.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ m\_state\ =\ utf8\_accept;}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ m\_codepoint\ =\ 0;}
+\DoxyCodeLine{00132\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/vendor/websocketpp/websocketpp/\mbox{\hyperlink{utf8__validator_8hpp}{utf8\+\_\+validator.\+hpp}}\end{DoxyCompactItemize}

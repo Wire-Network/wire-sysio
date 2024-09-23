@@ -1,0 +1,38 @@
+\doxysection{libraries/fc/src/exception.cpp File Reference}
+\hypertarget{exception_8cpp}{}\label{exception_8cpp}\index{libraries/fc/src/exception.cpp@{libraries/fc/src/exception.cpp}}
+{\ttfamily \#include $<$fc/exception/exception.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/exception/all.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/log/logger.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/io/json.\+hpp$>$}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+Include dependency graph for exception.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{exception_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacefc}{fc}}
+\begin{DoxyCompactList}\small\item\em namespace \doxylink{namespacesysio_1_1chain}{sysio\+::chain} \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+file\+\_\+not\+\_\+found\+\_\+exception parse\+\_\+error\+\_\+exception invalid\+\_\+arg\+\_\+exception invalid\+\_\+operation\+\_\+exception key\+\_\+not\+\_\+found\+\_\+exception bad\+\_\+cast\+\_\+exception out\+\_\+of\+\_\+range\+\_\+exception canceled\+\_\+exception assert\+\_\+exception eof\+\_\+exception unknown\+\_\+host\+\_\+exception null\+\_\+optional udt\+\_\+exception aes\+\_\+exception overflow\+\_\+exception \mbox{\hyperlink{namespacefc_ac04422061abe7cb036ece1333fdd7345}{fc\+::underflow\+\_\+exception}} (divide\+\_\+by\+\_\+zero\+\_\+exception)) namespace detail
+\item 
+void \mbox{\hyperlink{namespacefc_a884f9614b8437dc47cb85485135768d9}{fc\+::to\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1exception}{exception}} \&e, \mbox{\hyperlink{classfc_1_1variant}{variant}} \&v)
+\item 
+void \mbox{\hyperlink{namespacefc_a6be167428413d111e9d85be8fe4fd260}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{variant}} \&e, \mbox{\hyperlink{classfc_1_1exception}{exception}} \&ll)
+\item 
+std\+::string \mbox{\hyperlink{namespacefc_a2bbff129626558fab1e343fcd5ad8bc5}{fc\+::except\+\_\+str}} ()
+\item 
+void \mbox{\hyperlink{namespacefc_a68077fb0265729efb10412aa4261628c}{fc\+::throw\+\_\+bad\+\_\+enum\+\_\+cast}} (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} i, const char \texorpdfstring{$\ast$}{*}e)
+\item 
+void \mbox{\hyperlink{namespacefc_ad235d09561c970aa9a8de9d5b75bd487}{fc\+::throw\+\_\+bad\+\_\+enum\+\_\+cast}} (const char \texorpdfstring{$\ast$}{*}k, const char \texorpdfstring{$\ast$}{*}e)
+\item 
+bool \mbox{\hyperlink{namespacefc_a502c84013067df84967aefc8a3adad0d}{fc\+::assert\+\_\+optional}} (bool is\+\_\+valid)
+\item 
+void \mbox{\hyperlink{namespacefc_a4e83f6ac6009aff9e3cef3db1cc6b605}{fc\+::record\+\_\+assert\+\_\+trip}} (const char \texorpdfstring{$\ast$}{*}filename, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} lineno, const char \texorpdfstring{$\ast$}{*}expr)
+\end{DoxyCompactItemize}

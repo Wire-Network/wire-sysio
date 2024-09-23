@@ -1,0 +1,308 @@
+\doxysection{Xbyak\+::Xmm Struct Reference}
+\hypertarget{struct_xbyak_1_1_xmm}{}\label{struct_xbyak_1_1_xmm}\index{Xbyak::Xmm@{Xbyak::Xmm}}
+
+
+{\ttfamily \#include $<$xbyak.\+h$>$}
+
+
+
+Inheritance diagram for Xbyak\+::Xmm\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=167pt]{struct_xbyak_1_1_xmm__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Xbyak\+::Xmm\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=167pt]{struct_xbyak_1_1_xmm__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_xbyak_1_1_xmm_a1ad35c8d4c79af02abf93fb8f5c76bb3}{Xmm}} (int idx=0, \mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933b}{Kind}} kind=\mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933ba974504afdac8c2f752da0fc0df5f9ae2}{Operand\+::\+XMM}}, int \mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}}=128)
+\item 
+\mbox{\hyperlink{struct_xbyak_1_1_xmm_a9e538d47c29e1bb0cf79bd0c938f0789}{Xmm}} (\mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933b}{Kind}} kind, int idx)
+\item 
+\mbox{\hyperlink{struct_xbyak_1_1_xmm}{Xmm}} \mbox{\hyperlink{struct_xbyak_1_1_xmm_a49847153d7a0a6702551ebc6bba50ed9}{operator\texorpdfstring{$\vert$}{|}}} (const \mbox{\hyperlink{struct_xbyak_1_1_evex_modifier_rounding}{Evex\+Modifier\+Rounding}} \&emr) const
+\item 
+\mbox{\hyperlink{struct_xbyak_1_1_xmm}{Xmm}} \mbox{\hyperlink{struct_xbyak_1_1_xmm_a3af5296c8be05a6773b3d7e57e5c78d4}{copy\+And\+Set\+Idx}} (int idx) const
+\item 
+\mbox{\hyperlink{struct_xbyak_1_1_xmm}{Xmm}} \mbox{\hyperlink{struct_xbyak_1_1_xmm_a640a26e6b8028443fa3b319a56874d10}{copy\+And\+Set\+Kind}} (\mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933b}{Operand\+::\+Kind}} kind) const
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{struct_xbyak_1_1_mmx}{Xbyak\+::\+Mmx}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_xbyak_1_1_mmx_a2ad022cb98fe247938ccf7b411ec5a1b}{Mmx}} (int idx=0, \mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933b}{Kind}} kind=\mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933ba0bdf21ff8b7e1d36c6fa48fd394c0a54}{Operand\+::\+MMX}}, int \mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}}=64)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{class_xbyak_1_1_reg}{Xbyak\+::\+Reg}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_xbyak_1_1_reg_a724d9790244821816e475dba7e2db492}{Reg}} ()
+\item 
+\mbox{\hyperlink{class_xbyak_1_1_reg_a72d988aace3e01081eb428be837eb7d5}{Reg}} (int idx, \mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933b}{Kind}} kind, int \mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}}=0, bool ext8bit=false)
+\item 
+\mbox{\hyperlink{class_xbyak_1_1_reg}{Reg}} \mbox{\hyperlink{class_xbyak_1_1_reg_a7f2634fdd8b876a9bab2f207b1815051}{change\+Bit}} (int \mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}}) const
+\item 
+\mbox{\hyperlink{normalize__prefix_8cpp_adde6aaee8457bee49c2a92621fe22b79}{uint8}} \mbox{\hyperlink{class_xbyak_1_1_reg_ac340b6cc64a07bb6a29d7de8fc76bc9f}{get\+RexW}} () const
+\item 
+\mbox{\hyperlink{normalize__prefix_8cpp_adde6aaee8457bee49c2a92621fe22b79}{uint8}} \mbox{\hyperlink{class_xbyak_1_1_reg_addd2fc0f5a32496fb06343b121acf62c}{get\+RexR}} () const
+\item 
+\mbox{\hyperlink{normalize__prefix_8cpp_adde6aaee8457bee49c2a92621fe22b79}{uint8}} \mbox{\hyperlink{class_xbyak_1_1_reg_a95aef03c473024b08fea9dd74d2ed38e}{get\+RexX}} () const
+\item 
+\mbox{\hyperlink{normalize__prefix_8cpp_adde6aaee8457bee49c2a92621fe22b79}{uint8}} \mbox{\hyperlink{class_xbyak_1_1_reg_ade8f58e5ece3423f552408ec9bf82a84}{get\+RexB}} () const
+\item 
+\mbox{\hyperlink{normalize__prefix_8cpp_adde6aaee8457bee49c2a92621fe22b79}{uint8}} \mbox{\hyperlink{class_xbyak_1_1_reg_aa6642aaaeccf4cadece2818f1d44f9fe}{get\+Rex}} (const \mbox{\hyperlink{class_xbyak_1_1_reg}{Reg}} \&base=\mbox{\hyperlink{class_xbyak_1_1_reg}{Reg}}()) const
+\item 
+\mbox{\hyperlink{struct_xbyak_1_1_reg8}{Reg8}} \mbox{\hyperlink{class_xbyak_1_1_reg_a02f51b665b7dbad1c1ee8fc8bf40b02c}{cvt8}} () const
+\item 
+\mbox{\hyperlink{struct_xbyak_1_1_reg16}{Reg16}} \mbox{\hyperlink{class_xbyak_1_1_reg_adde49ae0d65cbc5053f0a66dc9e5671f}{cvt16}} () const
+\item 
+\mbox{\hyperlink{struct_xbyak_1_1_reg32}{Reg32}} \mbox{\hyperlink{class_xbyak_1_1_reg_ae66f085d2a7431d3de640492984c49bb}{cvt32}} () const
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{class_xbyak_1_1_operand}{Xbyak\+::\+Operand}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_xbyak_1_1_operand_acf1e02ccf35af769d8d4f3cfa4c00a31}{Operand}} ()
+\item 
+\mbox{\hyperlink{class_xbyak_1_1_operand_a78c8c4d23855cdab33d769e950c7d242}{Operand}} (int idx, \mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933b}{Kind}} kind, int \mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}}, bool ext8bit=0)
+\item 
+\mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933b}{Kind}} \mbox{\hyperlink{class_xbyak_1_1_operand_a209c322fcecff9f02e62462ec754fa6f}{get\+Kind}} () const
+\item 
+int \mbox{\hyperlink{class_xbyak_1_1_operand_a9722a98c75928e06e3be3198b7aaa426}{get\+Idx}} () const
+\item 
+bool \mbox{\hyperlink{class_xbyak_1_1_operand_af83a6a5fbcad1f4ac74ee3fde5070b0c}{is\+None}} () const
+\item 
+bool \mbox{\hyperlink{class_xbyak_1_1_operand_a5306a21d9e3c6305703faf108dd6357e}{is\+MMX}} () const
+\item 
+bool \mbox{\hyperlink{class_xbyak_1_1_operand_a8483cb23fc2fcba13e05f0fcd279d7b0}{is\+XMM}} () const
+\item 
+bool \mbox{\hyperlink{class_xbyak_1_1_operand_a7eecec4168018f49a4de1fca690daf82}{is\+YMM}} () const
+\item 
+bool \mbox{\hyperlink{class_xbyak_1_1_operand_a84f556436fcca82114f31a11fa1c8d6d}{is\+ZMM}} () const
+\item 
+bool \mbox{\hyperlink{class_xbyak_1_1_operand_ab4812fc1303247fa863643ca1c971b48}{is\+XMEM}} () const
+\item 
+bool \mbox{\hyperlink{class_xbyak_1_1_operand_a0b9b5d66efcd55697ad382d449b9f015}{is\+YMEM}} () const
+\item 
+bool \mbox{\hyperlink{class_xbyak_1_1_operand_ae1166f22d239ee0164830e3c418ba9da}{is\+ZMEM}} () const
+\item 
+bool \mbox{\hyperlink{class_xbyak_1_1_operand_a2cb3c6e9e8025e1dd8348cbf4f4c0dfc}{is\+OPMASK}} () const
+\item 
+bool \mbox{\hyperlink{class_xbyak_1_1_operand_ad58425431c023d3dfdd8efcbd68ce463}{is\+BNDREG}} () const
+\item 
+bool \mbox{\hyperlink{class_xbyak_1_1_operand_a4029ea538d06b3cea1afd3a0ebb99435}{is\+REG}} (int \mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}}=0) const
+\item 
+bool \mbox{\hyperlink{class_xbyak_1_1_operand_ac19f160ee96afdf829f4154ffd9fe1fc}{is\+MEM}} (int \mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}}=0) const
+\item 
+bool \mbox{\hyperlink{class_xbyak_1_1_operand_a4376cef05826332bd486095a4e5eac6f}{is\+FPU}} () const
+\item 
+bool \mbox{\hyperlink{class_xbyak_1_1_operand_a0fd53f9394841224652bf009be2173b3}{is\+Ext8bit}} () const
+\item 
+bool \mbox{\hyperlink{class_xbyak_1_1_operand_ae0e37428afb23c2827d368e23a250ef9}{is\+Ext\+Idx}} () const
+\item 
+bool \mbox{\hyperlink{class_xbyak_1_1_operand_a08c30697005cb69a10e16251e2f04280}{is\+Ext\+Idx2}} () const
+\item 
+bool \mbox{\hyperlink{class_xbyak_1_1_operand_ab1d912dc190e8fb6845400c2c3fe984b}{has\+Evex}} () const
+\item 
+bool \mbox{\hyperlink{class_xbyak_1_1_operand_af45f32fe9206c761ea3c230b5e049548}{has\+Rex}} () const
+\item 
+bool \mbox{\hyperlink{class_xbyak_1_1_operand_adf4bc2c35ff0f6af393a4686bccc3c3e}{has\+Zero}} () const
+\item 
+int \mbox{\hyperlink{class_xbyak_1_1_operand_aa948d58929e477691fa5e3a855134dfd}{get\+Opmask\+Idx}} () const
+\item 
+int \mbox{\hyperlink{class_xbyak_1_1_operand_a1c2de351f77e1f2ebb070c99aedc752c}{get\+Rounding}} () const
+\item 
+void \mbox{\hyperlink{class_xbyak_1_1_operand_ae4566ecb8f753309634f398e38815f3a}{set\+Kind}} (\mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933b}{Kind}} kind)
+\item 
+void \mbox{\hyperlink{class_xbyak_1_1_operand_abf0d6e2e262fe0cf98a90aaf69ed0f6c}{set\+Bit}} (int \mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}})
+\item 
+void \mbox{\hyperlink{class_xbyak_1_1_operand_aa2f69fb69466ecd3f61ff6c14bfe03e7}{set\+Opmask\+Idx}} (int idx, bool ignore\+\_\+idx0=false)
+\item 
+void \mbox{\hyperlink{class_xbyak_1_1_operand_a7c798c092b9be49260b0c84415b14070}{set\+Rounding}} (int idx)
+\item 
+void \mbox{\hyperlink{class_xbyak_1_1_operand_ada51176315e62e6497bd2fdefc5b749a}{set\+Zero}} ()
+\item 
+bool \mbox{\hyperlink{class_xbyak_1_1_operand_aa0ff6015e7d58df1fbef621b31eb28d0}{is\+High8bit}} () const
+\item 
+bool \mbox{\hyperlink{class_xbyak_1_1_operand_a771d8a1ae5c59167f53598d96a8e2de4}{is}} (int kind, \mbox{\hyperlink{namespace_xbyak_a880d0e902046fa68ba57ae3fbc4acdf3}{uint32}} \mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}}=0) const
+\item 
+bool \mbox{\hyperlink{class_xbyak_1_1_operand_ab7597e16695f902c54b47f3e57d938b5}{is\+Bit}} (\mbox{\hyperlink{namespace_xbyak_a880d0e902046fa68ba57ae3fbc4acdf3}{uint32}} \mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}}) const
+\item 
+\mbox{\hyperlink{namespace_xbyak_a880d0e902046fa68ba57ae3fbc4acdf3}{uint32}} \mbox{\hyperlink{class_xbyak_1_1_operand_ab855bd6658a3e238422d2bcf81f96873}{get\+Bit}} () const
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_xbyak_1_1_operand_a91b31d592d0a980789f0627f4e06654c}{to\+String}} () const
+\item 
+bool \mbox{\hyperlink{class_xbyak_1_1_operand_aaa7b0308352959ba27ec00fad2e83838}{is\+Equal\+If\+Not\+Inherited}} (const \mbox{\hyperlink{class_xbyak_1_1_operand}{Operand}} \&rhs) const
+\item 
+bool \mbox{\hyperlink{class_xbyak_1_1_operand_a8230601a350974bfc06f29aa44743aa4}{operator==}} (const \mbox{\hyperlink{class_xbyak_1_1_operand}{Operand}} \&rhs) const
+\item 
+bool \mbox{\hyperlink{class_xbyak_1_1_operand_ac4a7ca3effed46ac88686ca9568364a3}{operator!=}} (const \mbox{\hyperlink{class_xbyak_1_1_operand}{Operand}} \&rhs) const
+\item 
+const \mbox{\hyperlink{class_xbyak_1_1_address}{Address}} \& \mbox{\hyperlink{class_xbyak_1_1_operand_a553e665bd1e551fa299a78c7c48e3d39}{get\+Address}} () const
+\item 
+const \mbox{\hyperlink{class_xbyak_1_1_reg}{Reg}} \& \mbox{\hyperlink{class_xbyak_1_1_operand_aeb5b6b64bea046f5966c947425a6703b}{get\+Reg}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Public Types inherited from \mbox{\hyperlink{class_xbyak_1_1_operand}{Xbyak\+::\+Operand}}}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933b}{Kind}} \{ \newline
+\mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933ba6bbbc7e33ffa1256e35eaa63205c6daa}{NONE}} = 0
+, \mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933ba986b99f1b072c0821e0077bd9a469ad0}{MEM}} = 1 \texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<} 0
+, \mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933ba5cee5588c3a23aee8620236a677ff3f5}{REG}} = 1 \texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<} 1
+, \mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933ba0bdf21ff8b7e1d36c6fa48fd394c0a54}{MMX}} = 1 \texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<} 2
+, \newline
+\mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933ba1769e4d0acbf4fe129429537a960f9bc}{FPU}} = 1 \texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<} 3
+, \mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933ba974504afdac8c2f752da0fc0df5f9ae2}{XMM}} = 1 \texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<} 4
+, \mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933baa1754a37db134c90663f28c713a5ad04}{YMM}} = 1 \texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<} 5
+, \mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933ba779c9b07696cb348f7b5768894569d4e}{ZMM}} = 1 \texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<} 6
+, \newline
+\mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933ba3957facc59122051f2df89f7d934ad86}{OPMASK}} = 1 \texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<} 7
+, \mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933bae150704056abed48b380559e57b1ecdd}{BNDREG}} = 1 \texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<} 8
+ \}
+\item 
+enum \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846}{Code}} \{ \newline
+\mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a4cd6657e958297a35479ad6583520a67}{EAX}} = 0
+, \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a0633f76397deb9e17330a08c7b410a8c}{ECX}}
+, \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a8726c2f76163e0f35d2601750be37f12}{EDX}}
+, \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846ae4800c083bb2d2a087da1ff14990079a}{EBX}}
+, \newline
+\mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a1027bc617f8f52395078e43b96d0bb5a}{ESP}}
+, \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a47841e8c6ddcbad4f6ae4f437857e31d}{EBP}}
+, \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846aae18a2d599bea597e539fd7e1fb415cb}{ESI}}
+, \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846ae11bd14e6dd6ca1cb53693b4c2cd361e}{EDI}}
+, \newline
+\mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a6f5695b5f7c18a0e7579938d91de33bb}{AX}} = 0
+, \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846af7097c7ec6f30389c72b0c6ac4f0a3d5}{CX}}
+, \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846aa156e6e53bc2fd23aa8861a62e82f6b9}{DX}}
+, \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a6d365ab314220693f54e50c007cfd754}{BX}}
+, \newline
+\mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846ad64ca664228a615bd9ac634ec75c8298}{SP}}
+, \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a4b2755d2928db8d373758329652cc304}{BP}}
+, \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846af7751921bd4a1b1a8e71d324cf259465}{SI}}
+, \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846ad258a74b07663cf87b60db9f8d1c434b}{DI}}
+, \newline
+\mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a2dd47887596c69d9f015a43fa9f31e5c}{AL}} = 0
+, \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a5fbb58c96231af5a3c9f1020f3e1373f}{CL}}
+, \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a2df878df007d2207b8ea47f51ae867cb}{DL}}
+, \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a3fd98f8da96f6918a6b872184444434a}{BL}}
+, \newline
+\mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a7ed297782033727d617c17eacbd7f286}{AH}}
+, \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846a1d9d0e733e8f9f0096bda6b23dd4145c}{CH}}
+, \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846ade9d568528a9b679fc4885ebf0ecaa88}{DH}}
+, \mbox{\hyperlink{class_xbyak_1_1_operand_a115996ccf547e0f01f2385bf34fb1846aebbcac94094b13a323ac2e1f327ba12e}{BH}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Member Functions inherited from \mbox{\hyperlink{class_xbyak_1_1_operand}{Xbyak\+::\+Operand}}}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{class_xbyak_1_1_operand_a84e995df5368e19ee64caa02f3a66926}{set\+Idx}} (int idx)
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Attributes inherited from \mbox{\hyperlink{class_xbyak_1_1_operand}{Xbyak\+::\+Operand}}}
+\begin{DoxyCompactItemize}
+\item 
+unsigned int \mbox{\hyperlink{class_xbyak_1_1_operand_af80f4a4e3502e05cfbf4ba54329946f2}{zero\+\_\+}}\+:1
+\item 
+unsigned int \mbox{\hyperlink{class_xbyak_1_1_operand_aca73d80838ec810e51d7fec7f8a28abe}{mask\+\_\+}}\+:3
+\item 
+unsigned int \mbox{\hyperlink{class_xbyak_1_1_operand_ae1caaf8be40d1a0ea84e8da7849b37cc}{rounding\+\_\+}}\+:3
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00571}{571}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{struct_xbyak_1_1_xmm_a1ad35c8d4c79af02abf93fb8f5c76bb3}\index{Xbyak::Xmm@{Xbyak::Xmm}!Xmm@{Xmm}}
+\index{Xmm@{Xmm}!Xbyak::Xmm@{Xbyak::Xmm}}
+\doxysubsubsection{\texorpdfstring{Xmm()}{Xmm()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{struct_xbyak_1_1_xmm_a1ad35c8d4c79af02abf93fb8f5c76bb3} 
+Xbyak\+::\+Xmm\+::\+Xmm (\begin{DoxyParamCaption}\item[{int}]{idx}{ = {\ttfamily 0}, }\item[{\mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933b}{Kind}}}]{kind}{ = {\ttfamily \mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933ba974504afdac8c2f752da0fc0df5f9ae2}{Operand\+::\+XMM}}}, }\item[{int}]{bit}{ = {\ttfamily 128}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00572}{572}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00572\ :\ \mbox{\hyperlink{struct_xbyak_1_1_mmx_a2ad022cb98fe247938ccf7b411ec5a1b}{Mmx}}(idx,\ kind,\ \mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}})\ \{\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_xbyak_1_1_xmm_a9e538d47c29e1bb0cf79bd0c938f0789}\index{Xbyak::Xmm@{Xbyak::Xmm}!Xmm@{Xmm}}
+\index{Xmm@{Xmm}!Xbyak::Xmm@{Xbyak::Xmm}}
+\doxysubsubsection{\texorpdfstring{Xmm()}{Xmm()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{struct_xbyak_1_1_xmm_a9e538d47c29e1bb0cf79bd0c938f0789} 
+Xbyak\+::\+Xmm\+::\+Xmm (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933b}{Kind}}}]{kind}{, }\item[{int}]{idx}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00573}{573}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00573\ :\ \mbox{\hyperlink{struct_xbyak_1_1_mmx_a2ad022cb98fe247938ccf7b411ec5a1b}{Mmx}}(idx,\ kind,\ kind\ ==\ \mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933ba974504afdac8c2f752da0fc0df5f9ae2}{XMM}}\ ?\ 128\ :\ kind\ ==\ \mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933baa1754a37db134c90663f28c713a5ad04}{YMM}}\ ?\ 256\ :\ 512)\ \{\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_xbyak_1_1_xmm_a3af5296c8be05a6773b3d7e57e5c78d4}\index{Xbyak::Xmm@{Xbyak::Xmm}!copyAndSetIdx@{copyAndSetIdx}}
+\index{copyAndSetIdx@{copyAndSetIdx}!Xbyak::Xmm@{Xbyak::Xmm}}
+\doxysubsubsection{\texorpdfstring{copyAndSetIdx()}{copyAndSetIdx()}}
+{\footnotesize\ttfamily \label{struct_xbyak_1_1_xmm_a3af5296c8be05a6773b3d7e57e5c78d4} 
+\mbox{\hyperlink{struct_xbyak_1_1_xmm}{Xmm}} Xbyak\+::\+Xmm\+::copy\+And\+Set\+Idx (\begin{DoxyParamCaption}\item[{int}]{idx}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00575}{575}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00575\ \{\ \mbox{\hyperlink{struct_xbyak_1_1_xmm_a1ad35c8d4c79af02abf93fb8f5c76bb3}{Xmm}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}(*\textcolor{keyword}{this});\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.setIdx(idx);\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_xbyak_1_1_xmm_a640a26e6b8028443fa3b319a56874d10}\index{Xbyak::Xmm@{Xbyak::Xmm}!copyAndSetKind@{copyAndSetKind}}
+\index{copyAndSetKind@{copyAndSetKind}!Xbyak::Xmm@{Xbyak::Xmm}}
+\doxysubsubsection{\texorpdfstring{copyAndSetKind()}{copyAndSetKind()}}
+{\footnotesize\ttfamily \label{struct_xbyak_1_1_xmm_a640a26e6b8028443fa3b319a56874d10} 
+\mbox{\hyperlink{struct_xbyak_1_1_xmm}{Xmm}} Xbyak\+::\+Xmm\+::copy\+And\+Set\+Kind (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_xbyak_1_1_operand_a1923fb92fb9969d0a949d45cb0ba933b}{Operand\+::\+Kind}}}]{kind}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00576}{576}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00576\ \{\ \mbox{\hyperlink{struct_xbyak_1_1_xmm_a1ad35c8d4c79af02abf93fb8f5c76bb3}{Xmm}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}(*\textcolor{keyword}{this});\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.setKind(kind);\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_xbyak_1_1_xmm_a49847153d7a0a6702551ebc6bba50ed9}\index{Xbyak::Xmm@{Xbyak::Xmm}!operator\texttt{"|}@{operator\texttt{"|}}}
+\index{operator\texttt{"|}@{operator\texttt{"|}}!Xbyak::Xmm@{Xbyak::Xmm}}
+\doxysubsubsection{\texorpdfstring{operator\texttt{"|}()}{operator|()}}
+{\footnotesize\ttfamily \label{struct_xbyak_1_1_xmm_a49847153d7a0a6702551ebc6bba50ed9} 
+\mbox{\hyperlink{struct_xbyak_1_1_xmm}{Xmm}} Xbyak\+::\+Xmm\+::operator\texorpdfstring{$\vert$}{|} (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct_xbyak_1_1_evex_modifier_rounding}{Evex\+Modifier\+Rounding}} \&}]{emr}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l00574}{574}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00574\ \{\ \mbox{\hyperlink{struct_xbyak_1_1_xmm_a1ad35c8d4c79af02abf93fb8f5c76bb3}{Xmm}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}(*\textcolor{keyword}{this});\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.setRounding(emr.rounding);\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};\ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/libraries/ff/depends/xbyak/xbyak/\mbox{\hyperlink{xbyak_8h}{xbyak.\+h}}\end{DoxyCompactItemize}

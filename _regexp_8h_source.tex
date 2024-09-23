@@ -1,0 +1,17 @@
+\doxysection{Regexp.\+h}
+\hypertarget{_regexp_8h_source}{}\label{_regexp_8h_source}\index{libraries/wasm-\/jit/Source/WAST/Regexp.h@{libraries/wasm-\/jit/Source/WAST/Regexp.h}}
+\mbox{\hyperlink{_regexp_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_regexp_8h_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{_regexp_8h_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_regexp_8h_source_l00003}00003\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_basic_types_8h}{Inline/BasicTypes.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_regexp_8h_source_l00004}00004\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_n_f_a_8h}{NFA.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_regexp_8h_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{_regexp_8h_source_l00006}00006\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_regexp}{Regexp}}}
+\DoxyCodeLine{\Hypertarget{_regexp_8h_source_l00007}00007\ \{}
+\DoxyCodeLine{\Hypertarget{_regexp_8h_source_l00008}00008\ \ \ \ \ \textcolor{comment}{//\ Parses\ a\ regular\ expression\ from\ a\ string,\ and\ adds\ a\ recognizer\ for\ it\ to\ the\ given\ NFA}}
+\DoxyCodeLine{\Hypertarget{_regexp_8h_source_l00009}00009\ \ \ \ \ \textcolor{comment}{//\ The\ recognizer\ will\ start\ from\ initialState,\ and\ end\ in\ finalState\ when\ the\ regular\ expression\ has\ been\ completely\ matched.}}
+\DoxyCodeLine{\Hypertarget{_regexp_8h_source_l00010}00010\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespace_regexp_aadd46f06c56abd08dd3844b0eac3d28e}{addToNFA}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ regexpString,\mbox{\hyperlink{struct_n_f_a_1_1_builder}{NFA::Builder}}*\ nfaBuilder,\mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{NFA::StateIndex}}\ initialState,\mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{NFA::StateIndex}}\ finalState);}
+\DoxyCodeLine{\Hypertarget{_regexp_8h_source_l00011}00011\ \};}
+
+\end{DoxyCode}

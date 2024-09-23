@@ -1,0 +1,44 @@
+\doxysection{testrand.\+h}
+\hypertarget{testrand_8h_source}{}\label{testrand_8h_source}\index{libraries/fc/secp256k1/secp256k1/src/testrand.h@{libraries/fc/secp256k1/secp256k1/src/testrand.h}}
+\mbox{\hyperlink{testrand_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{testrand_8h_source_l00001}00001\ \textcolor{comment}{/***********************************************************************}}
+\DoxyCodeLine{\Hypertarget{testrand_8h_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2013,\ 2014\ Pieter\ Wuille\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{testrand_8h_source_l00003}00003\ \textcolor{comment}{\ *\ Distributed\ under\ the\ MIT\ software\ license,\ see\ the\ accompanying\ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{testrand_8h_source_l00004}00004\ \textcolor{comment}{\ *\ file\ COPYING\ or\ https://www.opensource.org/licenses/mit-\/license.php.*}}
+\DoxyCodeLine{\Hypertarget{testrand_8h_source_l00005}00005\ \textcolor{comment}{\ ***********************************************************************/}}
+\DoxyCodeLine{\Hypertarget{testrand_8h_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{testrand_8h_source_l00007}00007\ \textcolor{preprocessor}{\#ifndef\ SECP256K1\_TESTRAND\_H}}
+\DoxyCodeLine{\Hypertarget{testrand_8h_source_l00008}00008\ \textcolor{preprocessor}{\#define\ SECP256K1\_TESTRAND\_H}}
+\DoxyCodeLine{\Hypertarget{testrand_8h_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{testrand_8h_source_l00010}00010\ \textcolor{preprocessor}{\#if\ defined\ HAVE\_CONFIG\_H}}
+\DoxyCodeLine{\Hypertarget{testrand_8h_source_l00011}00011\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{libsecp256k1-config_8h}{libsecp256k1-\/config.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{testrand_8h_source_l00012}00012\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{testrand_8h_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{testrand_8h_source_l00014}00014\ \textcolor{comment}{/*\ A\ non-\/cryptographic\ RNG\ used\ only\ for\ test\ infrastructure.\ */}}
+\DoxyCodeLine{\Hypertarget{testrand_8h_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{testrand_8h_source_l00017}00017\ \mbox{\hyperlink{secp256k1_8h_a7ddc487fd46aee88f21cabedb7268b1e}{SECP256K1\_INLINE}}\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_testrand\_seed(\textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *seed16);}
+\DoxyCodeLine{\Hypertarget{testrand_8h_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{testrand_8h_source_l00020}00020\ \mbox{\hyperlink{secp256k1_8h_a7ddc487fd46aee88f21cabedb7268b1e}{SECP256K1\_INLINE}}\ \textcolor{keyword}{static}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ secp256k1\_testrand32(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{\Hypertarget{testrand_8h_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{testrand_8h_source_l00023}00023\ \mbox{\hyperlink{secp256k1_8h_a7ddc487fd46aee88f21cabedb7268b1e}{SECP256K1\_INLINE}}\ \textcolor{keyword}{static}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ secp256k1\_testrand64(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{\Hypertarget{testrand_8h_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{testrand_8h_source_l00027}00027\ \mbox{\hyperlink{secp256k1_8h_a7ddc487fd46aee88f21cabedb7268b1e}{SECP256K1\_INLINE}}\ \textcolor{keyword}{static}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ secp256k1\_testrand\_bits(\textcolor{keywordtype}{int}\ bits);}
+\DoxyCodeLine{\Hypertarget{testrand_8h_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{testrand_8h_source_l00030}00030\ \textcolor{keyword}{static}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ secp256k1\_testrand\_int(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ range);}
+\DoxyCodeLine{\Hypertarget{testrand_8h_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{testrand_8h_source_l00033}00033\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_testrand256(\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *b32);}
+\DoxyCodeLine{\Hypertarget{testrand_8h_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{testrand_8h_source_l00036}00036\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_testrand256\_test(\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *b32);}
+\DoxyCodeLine{\Hypertarget{testrand_8h_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{testrand_8h_source_l00039}00039\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_testrand\_bytes\_test(\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *bytes,\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}});}
+\DoxyCodeLine{\Hypertarget{testrand_8h_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{testrand_8h_source_l00042}00042\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_testrand\_flip(\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *b,\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}});}
+\DoxyCodeLine{\Hypertarget{testrand_8h_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{testrand_8h_source_l00045}00045\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_testrand\_init(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ hexseed);}
+\DoxyCodeLine{\Hypertarget{testrand_8h_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{testrand_8h_source_l00048}00048\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_testrand\_finish(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{\Hypertarget{testrand_8h_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{testrand_8h_source_l00050}00050\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{/*\ SECP256K1\_TESTRAND\_H\ */}\textcolor{preprocessor}{}}
+
+\end{DoxyCode}

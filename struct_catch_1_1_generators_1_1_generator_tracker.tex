@@ -1,0 +1,334 @@
+\doxysection{Catch\+::Generators\+::Generator\+Tracker Struct Reference}
+\hypertarget{struct_catch_1_1_generators_1_1_generator_tracker}{}\label{struct_catch_1_1_generators_1_1_generator_tracker}\index{Catch::Generators::GeneratorTracker@{Catch::Generators::GeneratorTracker}}
+
+
+Inheritance diagram for Catch\+::Generators\+::Generator\+Tracker\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_catch_1_1_generators_1_1_generator_tracker__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Catch\+::Generators\+::Generator\+Tracker\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_catch_1_1_generators_1_1_generator_tracker__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_catch_1_1_generators_1_1_generator_tracker_aa70d62ac075d47401cfad669fbb15057}{Generator\+Tracker}} (\mbox{\hyperlink{struct_catch_1_1_test_case_tracking_1_1_name_and_location}{Test\+Case\+Tracking\+::\+Name\+And\+Location}} const \&\mbox{\hyperlink{class_catch_1_1_test_case_tracking_1_1_tracker_base_a7a54f86908113aba82b1ce281ea5dfd8}{name\+And\+Location}}, \mbox{\hyperlink{class_catch_1_1_test_case_tracking_1_1_tracker_context}{Tracker\+Context}} \&ctx, \mbox{\hyperlink{struct_catch_1_1_test_case_tracking_1_1_i_tracker}{ITracker}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{class_catch_1_1_test_case_tracking_1_1_tracker_base_a9ba6dc47eee2715654476763cdbc1994}{parent}})
+\item 
+\mbox{\hyperlink{struct_catch_1_1_generators_1_1_generator_tracker_a6a1b4eaa1b6c180048f8784f0ce3970d}{\texorpdfstring{$\sim$}{\string~}\+Generator\+Tracker}} ()
+\item 
+bool \mbox{\hyperlink{struct_catch_1_1_generators_1_1_generator_tracker_a58f3a500872cec6bfd1c9e605c06294f}{is\+Generator\+Tracker}} () const override
+\item 
+auto \mbox{\hyperlink{struct_catch_1_1_generators_1_1_generator_tracker_ae798faa657dc7eba5b1e866cfe824a4b}{has\+Generator}} () const -\/$>$ bool override
+\item 
+void \mbox{\hyperlink{struct_catch_1_1_generators_1_1_generator_tracker_afb933cbb4007f63adb137bd961836165}{close}} () override
+\item 
+auto \mbox{\hyperlink{struct_catch_1_1_generators_1_1_generator_tracker_a902884030ef21d5eca2e7b78e36750c5}{get\+Generator}} () const -\/$>$ \mbox{\hyperlink{namespace_catch_1_1_generators_a67c85264b84d2f97fe62751edef453ad}{Generator\+Base\+Ptr}} const \&override
+\item 
+void \mbox{\hyperlink{struct_catch_1_1_generators_1_1_generator_tracker_a89ebb06a194997b2870e258b609ea296}{set\+Generator}} (\mbox{\hyperlink{namespace_catch_1_1_generators_a67c85264b84d2f97fe62751edef453ad}{Generator\+Base\+Ptr}} \&\&generator) override
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{class_catch_1_1_test_case_tracking_1_1_tracker_base}{Catch\+::\+Test\+Case\+Tracking\+::\+Tracker\+Base}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_catch_1_1_test_case_tracking_1_1_tracker_base_a8c741397b2f728f841e4282ede26dcc1}{Tracker\+Base}} (\mbox{\hyperlink{struct_catch_1_1_test_case_tracking_1_1_name_and_location}{Name\+And\+Location}} const \&\mbox{\hyperlink{class_catch_1_1_test_case_tracking_1_1_tracker_base_a7a54f86908113aba82b1ce281ea5dfd8}{name\+And\+Location}}, \mbox{\hyperlink{class_catch_1_1_test_case_tracking_1_1_tracker_context}{Tracker\+Context}} \&ctx, \mbox{\hyperlink{struct_catch_1_1_test_case_tracking_1_1_i_tracker}{ITracker}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{class_catch_1_1_test_case_tracking_1_1_tracker_base_a9ba6dc47eee2715654476763cdbc1994}{parent}})
+\item 
+\mbox{\hyperlink{struct_catch_1_1_test_case_tracking_1_1_name_and_location}{Name\+And\+Location}} const \& \mbox{\hyperlink{class_catch_1_1_test_case_tracking_1_1_tracker_base_a7a54f86908113aba82b1ce281ea5dfd8}{name\+And\+Location}} () const override
+\item 
+bool \mbox{\hyperlink{class_catch_1_1_test_case_tracking_1_1_tracker_base_a1e624d09e19b813365d2be9adcf4d375}{is\+Complete}} () const override
+\item 
+bool \mbox{\hyperlink{class_catch_1_1_test_case_tracking_1_1_tracker_base_a86b618e0a93eefd9ac33acfca3ffce6f}{is\+Successfully\+Completed}} () const override
+\item 
+bool \mbox{\hyperlink{class_catch_1_1_test_case_tracking_1_1_tracker_base_a8e11aafab367449527a17f19d505c994}{is\+Open}} () const override
+\item 
+bool \mbox{\hyperlink{class_catch_1_1_test_case_tracking_1_1_tracker_base_aa70499a1e3ca9b70d95a7459fcfa151c}{has\+Children}} () const override
+\item 
+void \mbox{\hyperlink{class_catch_1_1_test_case_tracking_1_1_tracker_base_a235d4d712f108f8725c46d1035e6a6a0}{add\+Child}} (\mbox{\hyperlink{namespace_catch_1_1_test_case_tracking_a1e9d3903bd38427a088cfb1bfe184757}{ITracker\+Ptr}} const \&child) override
+\item 
+\mbox{\hyperlink{namespace_catch_1_1_test_case_tracking_a1e9d3903bd38427a088cfb1bfe184757}{ITracker\+Ptr}} \mbox{\hyperlink{class_catch_1_1_test_case_tracking_1_1_tracker_base_a0347d9eed2d9d90bf1443be330d9ba33}{find\+Child}} (\mbox{\hyperlink{struct_catch_1_1_test_case_tracking_1_1_name_and_location}{Name\+And\+Location}} const \&\mbox{\hyperlink{class_catch_1_1_test_case_tracking_1_1_tracker_base_a7a54f86908113aba82b1ce281ea5dfd8}{name\+And\+Location}}) override
+\item 
+\mbox{\hyperlink{struct_catch_1_1_test_case_tracking_1_1_i_tracker}{ITracker}} \& \mbox{\hyperlink{class_catch_1_1_test_case_tracking_1_1_tracker_base_a9ba6dc47eee2715654476763cdbc1994}{parent}} () override
+\item 
+void \mbox{\hyperlink{class_catch_1_1_test_case_tracking_1_1_tracker_base_ad857e553f6ae60acba2bf602ff8e5761}{open\+Child}} () override
+\item 
+bool \mbox{\hyperlink{class_catch_1_1_test_case_tracking_1_1_tracker_base_a48a94d3e58e99433b519292487374ec2}{is\+Section\+Tracker}} () const override
+\item 
+bool \mbox{\hyperlink{class_catch_1_1_test_case_tracking_1_1_tracker_base_a0ccd471bb0dd4e6c338b5d00b838c633}{is\+Generator\+Tracker}} () const override
+\item 
+void \mbox{\hyperlink{class_catch_1_1_test_case_tracking_1_1_tracker_base_a4f9492c807ab90bead8cfabdb3c84c75}{open}} ()
+\item 
+void \mbox{\hyperlink{class_catch_1_1_test_case_tracking_1_1_tracker_base_a4358ef70d36e295bdd23779a13ba9f50}{close}} () override
+\item 
+void \mbox{\hyperlink{class_catch_1_1_test_case_tracking_1_1_tracker_base_a9d3b83917defd2bebd987aac85ad253c}{fail}} () override
+\item 
+void \mbox{\hyperlink{class_catch_1_1_test_case_tracking_1_1_tracker_base_a1ad2b8bb8ea8a43d6dff0c7d3ba2f2e1}{mark\+As\+Needing\+Another\+Run}} () override
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{struct_catch_1_1_test_case_tracking_1_1_i_tracker}{Catch\+::\+Test\+Case\+Tracking\+::\+ITracker}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{struct_catch_1_1_test_case_tracking_1_1_i_tracker_ad3a01cd31573358a04897bc25e5c3fd7}{\texorpdfstring{$\sim$}{\string~}\+ITracker}} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{struct_catch_1_1_i_generator_tracker}{Catch\+::\+IGenerator\+Tracker}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{struct_catch_1_1_i_generator_tracker_ae48542e221a0931482ba61e6d30462c3}{\texorpdfstring{$\sim$}{\string~}\+IGenerator\+Tracker}} ()
+\item 
+virtual \mbox{\hyperlink{struct_catch_1_1_i_generator_tracker_a20b3c82baa68f821c180d6dac1234eb1}{\texorpdfstring{$\sim$}{\string~}\+IGenerator\+Tracker}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static \mbox{\hyperlink{struct_catch_1_1_generators_1_1_generator_tracker}{Generator\+Tracker}} \& \mbox{\hyperlink{struct_catch_1_1_generators_1_1_generator_tracker_a3842dbd70ae3fc1c3b97fe3ebb3fdd1f}{acquire}} (\mbox{\hyperlink{class_catch_1_1_test_case_tracking_1_1_tracker_context}{Tracker\+Context}} \&ctx, \mbox{\hyperlink{struct_catch_1_1_test_case_tracking_1_1_name_and_location}{Test\+Case\+Tracking\+::\+Name\+And\+Location}} const \&\mbox{\hyperlink{class_catch_1_1_test_case_tracking_1_1_tracker_base_a7a54f86908113aba82b1ce281ea5dfd8}{name\+And\+Location}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespace_catch_1_1_generators_a67c85264b84d2f97fe62751edef453ad}{Generator\+Base\+Ptr}} \mbox{\hyperlink{struct_catch_1_1_generators_1_1_generator_tracker_a498ea8e6ace9976202f69600f00a3df2}{m\+\_\+generator}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Protected Types inherited from \mbox{\hyperlink{class_catch_1_1_test_case_tracking_1_1_tracker_base}{Catch\+::\+Test\+Case\+Tracking\+::\+Tracker\+Base}}}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{class_catch_1_1_test_case_tracking_1_1_tracker_base_a45b2b5722f9b9bf31a4dc3c98bcb9609}{Cycle\+State}} \{ \newline
+\mbox{\hyperlink{class_catch_1_1_test_case_tracking_1_1_tracker_base_a45b2b5722f9b9bf31a4dc3c98bcb9609afcad6c34928fc7e9f7053989e0ebcada}{Not\+Started}}
+, \mbox{\hyperlink{class_catch_1_1_test_case_tracking_1_1_tracker_base_a45b2b5722f9b9bf31a4dc3c98bcb9609afe8ef0752365dd9645df6ff126a37c03}{Executing}}
+, \mbox{\hyperlink{class_catch_1_1_test_case_tracking_1_1_tracker_base_a45b2b5722f9b9bf31a4dc3c98bcb9609a88bca3fa53561604126bcea3997bd2e4}{Executing\+Children}}
+, \mbox{\hyperlink{class_catch_1_1_test_case_tracking_1_1_tracker_base_a45b2b5722f9b9bf31a4dc3c98bcb9609a219651ee38b7c878aa9d660678849c5e}{Needs\+Another\+Run}}
+, \newline
+\mbox{\hyperlink{class_catch_1_1_test_case_tracking_1_1_tracker_base_a45b2b5722f9b9bf31a4dc3c98bcb9609ab96072dffcc417caf17540bd159ad2a9}{Completed\+Successfully}}
+, \mbox{\hyperlink{class_catch_1_1_test_case_tracking_1_1_tracker_base_a45b2b5722f9b9bf31a4dc3c98bcb9609a44ec477165c97a7d0d1970ab9f9c051b}{Failed}}
+ \}
+\item 
+using \mbox{\hyperlink{class_catch_1_1_test_case_tracking_1_1_tracker_base_ac3b19bf8b0eadd9a5500cfe468331b44}{Children}} = std\+::vector$<$\mbox{\hyperlink{namespace_catch_1_1_test_case_tracking_a1e9d3903bd38427a088cfb1bfe184757}{ITracker\+Ptr}}$>$
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Attributes inherited from \mbox{\hyperlink{class_catch_1_1_test_case_tracking_1_1_tracker_base}{Catch\+::\+Test\+Case\+Tracking\+::\+Tracker\+Base}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_catch_1_1_test_case_tracking_1_1_name_and_location}{Name\+And\+Location}} \mbox{\hyperlink{class_catch_1_1_test_case_tracking_1_1_tracker_base_a1136b1093681e450eead0ec78bba408a}{m\+\_\+name\+And\+Location}}
+\item 
+\mbox{\hyperlink{class_catch_1_1_test_case_tracking_1_1_tracker_context}{Tracker\+Context}} \& \mbox{\hyperlink{class_catch_1_1_test_case_tracking_1_1_tracker_base_a39d5f7ef8ffbea3ce03f9320c558704f}{m\+\_\+ctx}}
+\item 
+\mbox{\hyperlink{struct_catch_1_1_test_case_tracking_1_1_i_tracker}{ITracker}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_catch_1_1_test_case_tracking_1_1_tracker_base_abc7676ef4a0f67a16f4980a9760b46f8}{m\+\_\+parent}}
+\item 
+\mbox{\hyperlink{class_catch_1_1_test_case_tracking_1_1_tracker_base_ac3b19bf8b0eadd9a5500cfe468331b44}{Children}} \mbox{\hyperlink{class_catch_1_1_test_case_tracking_1_1_tracker_base_ad1f294c7d506fd73c2367c007b9a155d}{m\+\_\+children}}
+\item 
+\mbox{\hyperlink{class_catch_1_1_test_case_tracking_1_1_tracker_base_a45b2b5722f9b9bf31a4dc3c98bcb9609}{Cycle\+State}} \mbox{\hyperlink{class_catch_1_1_test_case_tracking_1_1_tracker_base_ae43ff15dbfc73b597094f8689d6e8255}{m\+\_\+run\+State}} = \mbox{\hyperlink{class_catch_1_1_test_case_tracking_1_1_tracker_base_a45b2b5722f9b9bf31a4dc3c98bcb9609afcad6c34928fc7e9f7053989e0ebcada}{Not\+Started}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{catch__run__context_8cpp_source_l00016}{16}} of file \mbox{\hyperlink{catch__run__context_8cpp_source}{catch\+\_\+run\+\_\+context.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{struct_catch_1_1_generators_1_1_generator_tracker_aa70d62ac075d47401cfad669fbb15057}\index{Catch::Generators::GeneratorTracker@{Catch::Generators::GeneratorTracker}!GeneratorTracker@{GeneratorTracker}}
+\index{GeneratorTracker@{GeneratorTracker}!Catch::Generators::GeneratorTracker@{Catch::Generators::GeneratorTracker}}
+\doxysubsubsection{\texorpdfstring{GeneratorTracker()}{GeneratorTracker()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_generators_1_1_generator_tracker_aa70d62ac075d47401cfad669fbb15057} 
+Catch\+::\+Generators\+::\+Generator\+Tracker\+::\+Generator\+Tracker (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_test_case_tracking_1_1_name_and_location}{Test\+Case\+Tracking\+::\+Name\+And\+Location}} const \&}]{name\+And\+Location}{, }\item[{\mbox{\hyperlink{class_catch_1_1_test_case_tracking_1_1_tracker_context}{Tracker\+Context}} \&}]{ctx}{, }\item[{\mbox{\hyperlink{struct_catch_1_1_test_case_tracking_1_1_i_tracker}{ITracker}} \texorpdfstring{$\ast$}{*}}]{parent}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__run__context_8cpp_source_l00019}{19}} of file \mbox{\hyperlink{catch__run__context_8cpp_source}{catch\+\_\+run\+\_\+context.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \ \ \ \ :\ \ \ \mbox{\hyperlink{class_catch_1_1_test_case_tracking_1_1_tracker_base_a8c741397b2f728f841e4282ede26dcc1}{TrackerBase}}(\ \mbox{\hyperlink{class_catch_1_1_test_case_tracking_1_1_tracker_base_a7a54f86908113aba82b1ce281ea5dfd8}{nameAndLocation}},\ ctx,\ parent\ )}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{struct_catch_1_1_generators_1_1_generator_tracker_a6a1b4eaa1b6c180048f8784f0ce3970d}\index{Catch::Generators::GeneratorTracker@{Catch::Generators::GeneratorTracker}!````~GeneratorTracker@{\texorpdfstring{$\sim$}{\string~}GeneratorTracker}}
+\index{````~GeneratorTracker@{\texorpdfstring{$\sim$}{\string~}GeneratorTracker}!Catch::Generators::GeneratorTracker@{Catch::Generators::GeneratorTracker}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}GeneratorTracker()}{\string~GeneratorTracker()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_generators_1_1_generator_tracker_a6a1b4eaa1b6c180048f8784f0ce3970d} 
+Catch\+::\+Generators\+::\+Generator\+Tracker\+::\texorpdfstring{$\sim$}{\string~}\+Generator\+Tracker (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__run__context_8cpp_source_l00067}{67}} of file \mbox{\hyperlink{catch__run__context_8cpp_source}{catch\+\_\+run\+\_\+context.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00067\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_catch_1_1_generators_1_1_generator_tracker_a3842dbd70ae3fc1c3b97fe3ebb3fdd1f}\index{Catch::Generators::GeneratorTracker@{Catch::Generators::GeneratorTracker}!acquire@{acquire}}
+\index{acquire@{acquire}!Catch::Generators::GeneratorTracker@{Catch::Generators::GeneratorTracker}}
+\doxysubsubsection{\texorpdfstring{acquire()}{acquire()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_generators_1_1_generator_tracker_a3842dbd70ae3fc1c3b97fe3ebb3fdd1f} 
+static \mbox{\hyperlink{struct_catch_1_1_generators_1_1_generator_tracker}{Generator\+Tracker}} \& Catch\+::\+Generators\+::\+Generator\+Tracker\+::acquire (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_catch_1_1_test_case_tracking_1_1_tracker_context}{Tracker\+Context}} \&}]{ctx}{, }\item[{\mbox{\hyperlink{struct_catch_1_1_test_case_tracking_1_1_name_and_location}{Test\+Case\+Tracking\+::\+Name\+And\+Location}} const \&}]{name\+And\+Location}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__run__context_8cpp_source_l00024}{24}} of file \mbox{\hyperlink{catch__run__context_8cpp_source}{catch\+\_\+run\+\_\+context.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::shared\_ptr<GeneratorTracker>\ tracker;}
+\DoxyCodeLine{00026\ }
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ITracker\&\ currentTracker\ =\ ctx.currentTracker();}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{namespace_catch_1_1_test_case_tracking_a1e9d3903bd38427a088cfb1bfe184757}{TestCaseTracking::ITrackerPtr}}\ childTracker\ =\ currentTracker.findChild(\ \mbox{\hyperlink{class_catch_1_1_test_case_tracking_1_1_tracker_base_a7a54f86908113aba82b1ce281ea5dfd8}{nameAndLocation}}\ )\ )\ \{}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ assert(\ childTracker\ );}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ assert(\ childTracker-\/>isGeneratorTracker()\ );}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ tracker\ =\ std::static\_pointer\_cast<GeneratorTracker>(\ childTracker\ );}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ tracker\ =\ std::make\_shared<GeneratorTracker>(\ \mbox{\hyperlink{class_catch_1_1_test_case_tracking_1_1_tracker_base_a7a54f86908113aba82b1ce281ea5dfd8}{nameAndLocation}},\ ctx,\ \&currentTracker\ );}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ currentTracker.addChild(\ tracker\ );}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00037\ }
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !ctx.completedCycle()\ \&\&\ !tracker-\/>isComplete()\ )\ \{}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ tracker-\/>open();}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00041\ }
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *tracker;}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_catch_1_1_generators_1_1_generator_tracker_a3842dbd70ae3fc1c3b97fe3ebb3fdd1f_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_catch_1_1_generators_1_1_generator_tracker_afb933cbb4007f63adb137bd961836165}\index{Catch::Generators::GeneratorTracker@{Catch::Generators::GeneratorTracker}!close@{close}}
+\index{close@{close}!Catch::Generators::GeneratorTracker@{Catch::Generators::GeneratorTracker}}
+\doxysubsubsection{\texorpdfstring{close()}{close()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_generators_1_1_generator_tracker_afb933cbb4007f63adb137bd961836165} 
+void Catch\+::\+Generators\+::\+Generator\+Tracker\+::close (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_test_case_tracking_1_1_i_tracker_a64d18c92b66ff001fcbdb1c3d839b2c5}{Catch\+::\+Test\+Case\+Tracking\+::\+ITracker}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__run__context_8cpp_source_l00050}{50}} of file \mbox{\hyperlink{catch__run__context_8cpp_source}{catch\+\_\+run\+\_\+context.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ TrackerBase::close();}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Generator\ interface\ only\ finds\ out\ if\ it\ has\ another\ item\ on\ atual\ move}}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_catch_1_1_test_case_tracking_1_1_tracker_base_ae43ff15dbfc73b597094f8689d6e8255}{m\_runState}}\ ==\ \mbox{\hyperlink{class_catch_1_1_test_case_tracking_1_1_tracker_base_a45b2b5722f9b9bf31a4dc3c98bcb9609ab96072dffcc417caf17540bd159ad2a9}{CompletedSuccessfully}}\ \&\&\ \mbox{\hyperlink{struct_catch_1_1_generators_1_1_generator_tracker_a498ea8e6ace9976202f69600f00a3df2}{m\_generator}}-\/>next())\ \{}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_test_case_tracking_1_1_tracker_base_ad1f294c7d506fd73c2367c007b9a155d}{m\_children}}.clear();}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_test_case_tracking_1_1_tracker_base_ae43ff15dbfc73b597094f8689d6e8255}{m\_runState}}\ =\ \mbox{\hyperlink{class_catch_1_1_test_case_tracking_1_1_tracker_base_a45b2b5722f9b9bf31a4dc3c98bcb9609afe8ef0752365dd9645df6ff126a37c03}{Executing}};}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_catch_1_1_generators_1_1_generator_tracker_a902884030ef21d5eca2e7b78e36750c5}\index{Catch::Generators::GeneratorTracker@{Catch::Generators::GeneratorTracker}!getGenerator@{getGenerator}}
+\index{getGenerator@{getGenerator}!Catch::Generators::GeneratorTracker@{Catch::Generators::GeneratorTracker}}
+\doxysubsubsection{\texorpdfstring{getGenerator()}{getGenerator()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_generators_1_1_generator_tracker_a902884030ef21d5eca2e7b78e36750c5} 
+auto Catch\+::\+Generators\+::\+Generator\+Tracker\+::get\+Generator (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const -\/$>$ \mbox{\hyperlink{namespace_catch_1_1_generators_a67c85264b84d2f97fe62751edef453ad}{Generator\+Base\+Ptr}} const\&\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_i_generator_tracker_a23be942fc51672598bfa02c678c3078a}{Catch\+::\+IGenerator\+Tracker}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__run__context_8cpp_source_l00060}{60}} of file \mbox{\hyperlink{catch__run__context_8cpp_source}{catch\+\_\+run\+\_\+context.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_catch_1_1_generators_1_1_generator_tracker_a498ea8e6ace9976202f69600f00a3df2}{m\_generator}};}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_catch_1_1_generators_1_1_generator_tracker_ae798faa657dc7eba5b1e866cfe824a4b}\index{Catch::Generators::GeneratorTracker@{Catch::Generators::GeneratorTracker}!hasGenerator@{hasGenerator}}
+\index{hasGenerator@{hasGenerator}!Catch::Generators::GeneratorTracker@{Catch::Generators::GeneratorTracker}}
+\doxysubsubsection{\texorpdfstring{hasGenerator()}{hasGenerator()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_generators_1_1_generator_tracker_ae798faa657dc7eba5b1e866cfe824a4b} 
+auto Catch\+::\+Generators\+::\+Generator\+Tracker\+::has\+Generator (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const -\/$>$ bool\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_i_generator_tracker_ae88084f9af27c8b9a5d5775b9c148498}{Catch\+::\+IGenerator\+Tracker}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__run__context_8cpp_source_l00047}{47}} of file \mbox{\hyperlink{catch__run__context_8cpp_source}{catch\+\_\+run\+\_\+context.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !!\mbox{\hyperlink{struct_catch_1_1_generators_1_1_generator_tracker_a498ea8e6ace9976202f69600f00a3df2}{m\_generator}};}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_catch_1_1_generators_1_1_generator_tracker_a58f3a500872cec6bfd1c9e605c06294f}\index{Catch::Generators::GeneratorTracker@{Catch::Generators::GeneratorTracker}!isGeneratorTracker@{isGeneratorTracker}}
+\index{isGeneratorTracker@{isGeneratorTracker}!Catch::Generators::GeneratorTracker@{Catch::Generators::GeneratorTracker}}
+\doxysubsubsection{\texorpdfstring{isGeneratorTracker()}{isGeneratorTracker()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_generators_1_1_generator_tracker_a58f3a500872cec6bfd1c9e605c06294f} 
+bool Catch\+::\+Generators\+::\+Generator\+Tracker\+::is\+Generator\+Tracker (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_test_case_tracking_1_1_i_tracker_a5b8a771b1d41a76b73895d1f2428b009}{Catch\+::\+Test\+Case\+Tracking\+::\+ITracker}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__run__context_8cpp_source_l00046}{46}} of file \mbox{\hyperlink{catch__run__context_8cpp_source}{catch\+\_\+run\+\_\+context.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00046\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_catch_1_1_generators_1_1_generator_tracker_a89ebb06a194997b2870e258b609ea296}\index{Catch::Generators::GeneratorTracker@{Catch::Generators::GeneratorTracker}!setGenerator@{setGenerator}}
+\index{setGenerator@{setGenerator}!Catch::Generators::GeneratorTracker@{Catch::Generators::GeneratorTracker}}
+\doxysubsubsection{\texorpdfstring{setGenerator()}{setGenerator()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_generators_1_1_generator_tracker_a89ebb06a194997b2870e258b609ea296} 
+void Catch\+::\+Generators\+::\+Generator\+Tracker\+::set\+Generator (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespace_catch_1_1_generators_a67c85264b84d2f97fe62751edef453ad}{Generator\+Base\+Ptr}} \&\&}]{generator}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_i_generator_tracker_a9945eff42219edc5a7071eebd8b0419e}{Catch\+::\+IGenerator\+Tracker}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__run__context_8cpp_source_l00063}{63}} of file \mbox{\hyperlink{catch__run__context_8cpp_source}{catch\+\_\+run\+\_\+context.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_generators_1_1_generator_tracker_a498ea8e6ace9976202f69600f00a3df2}{m\_generator}}\ =\ std::move(\ generator\ );}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_catch_1_1_generators_1_1_generator_tracker_a498ea8e6ace9976202f69600f00a3df2}\index{Catch::Generators::GeneratorTracker@{Catch::Generators::GeneratorTracker}!m\_generator@{m\_generator}}
+\index{m\_generator@{m\_generator}!Catch::Generators::GeneratorTracker@{Catch::Generators::GeneratorTracker}}
+\doxysubsubsection{\texorpdfstring{m\_generator}{m\_generator}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_generators_1_1_generator_tracker_a498ea8e6ace9976202f69600f00a3df2} 
+\mbox{\hyperlink{namespace_catch_1_1_generators_a67c85264b84d2f97fe62751edef453ad}{Generator\+Base\+Ptr}} Catch\+::\+Generators\+::\+Generator\+Tracker\+::m\+\_\+generator}
+
+
+
+Definition at line \mbox{\hyperlink{catch__run__context_8cpp_source_l00017}{17}} of file \mbox{\hyperlink{catch__run__context_8cpp_source}{catch\+\_\+run\+\_\+context.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__run__context_8cpp}{catch\+\_\+run\+\_\+context.\+cpp}}\end{DoxyCompactItemize}

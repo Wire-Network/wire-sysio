@@ -1,0 +1,9 @@
+<map id="sysio::chain_apis::trx_finality_status_processing::trx_state" name="sysio::chain_apis::trx_finality_status_processing::trx_state">
+<area shape="rect" id="Node000001" title=" " alt="" coords="87,124,238,180"/>
+<area shape="rect" id="Node000002" href="$classfc_1_1sha256.html" title=" " alt="" coords="5,5,88,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="64,42,107,98,131,121,127,125,103,102,60,46"/>
+<area shape="rect" id="Node000003" href="$classfc_1_1time__point.html" title=" " alt="" coords="112,5,213,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="165,47,165,124,160,124,160,47"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="269,5,322,31"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="294,47,285,75,268,102,238,125,235,121,265,98,280,73,289,45"/>
+</map>

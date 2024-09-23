@@ -1,0 +1,552 @@
+\doxysection{rapidjsontest.\+cpp}
+\hypertarget{rapidjsontest_8cpp_source}{}\label{rapidjsontest_8cpp_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/test/perftest/rapidjsontest.cpp@{libraries/fc/include/fc/crypto/webauthn\_json/test/perftest/rapidjsontest.cpp}}
+\mbox{\hyperlink{rapidjsontest_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00001}00001\ \textcolor{comment}{//\ Tencent\ is\ pleased\ to\ support\ the\ open\ source\ community\ by\ making\ RapidJSON\ available.}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00002}00002\ \textcolor{comment}{//\ }}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00003}00003\ \textcolor{comment}{//\ Copyright\ (C)\ 2015\ THL\ A29\ Limited,\ a\ Tencent\ company,\ and\ Milo\ Yip.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00004}00004\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00005}00005\ \textcolor{comment}{//\ Licensed\ under\ the\ MIT\ License\ (the\ "{}License"{});\ you\ may\ not\ use\ this\ file\ except}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00006}00006\ \textcolor{comment}{//\ in\ compliance\ with\ the\ License.\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00007}00007\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00008}00008\ \textcolor{comment}{//\ http://opensource.org/licenses/MIT}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00009}00009\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00010}00010\ \textcolor{comment}{//\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software\ distributed\ }}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00011}00011\ \textcolor{comment}{//\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,\ WITHOUT\ WARRANTIES\ OR\ }}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00012}00012\ \textcolor{comment}{//\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.\ See\ the\ License\ for\ the\ }}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00013}00013\ \textcolor{comment}{//\ specific\ language\ governing\ permissions\ and\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00015}00015\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{perftest_8h}{perftest.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00017}00017\ \textcolor{preprocessor}{\#if\ TEST\_RAPIDJSON}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00019}00019\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{rapidjson_8h}{rapidjson/rapidjson.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00020}00020\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{document_8h}{rapidjson/document.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00021}00021\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{prettywriter_8h}{rapidjson/prettywriter.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00022}00022\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{stringbuffer_8h}{rapidjson/stringbuffer.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00023}00023\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{filereadstream_8h}{rapidjson/filereadstream.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00024}00024\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{istreamwrapper_8h}{rapidjson/istreamwrapper.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00025}00025\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{encodedstream_8h}{rapidjson/encodedstream.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00026}00026\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{memorystream_8h}{rapidjson/memorystream.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00028}00028\ \textcolor{preprocessor}{\#include\ <fstream>}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00030}00030\ \textcolor{preprocessor}{\#ifdef\ RAPIDJSON\_SSE2}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00031}00031\ \textcolor{preprocessor}{\#define\ SIMD\_SUFFIX(name)\ name\#\#\_SSE2}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00032}00032\ \textcolor{preprocessor}{\#elif\ defined(RAPIDJSON\_SSE42)}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00033}00033\ \textcolor{preprocessor}{\#define\ SIMD\_SUFFIX(name)\ name\#\#\_SSE42}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00034}00034\ \textcolor{preprocessor}{\#elif\ defined(RAPIDJSON\_NEON)}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00035}00035\ \textcolor{preprocessor}{\#define\ SIMD\_SUFFIX(name)\ name\#\#\_NEON}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00036}00036\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00037}\mbox{\hyperlink{rapidjsontest_8cpp_acdeb8bf1a2cf8ab5b4b520fdcf470958}{00037}}\ \textcolor{preprocessor}{\#define\ SIMD\_SUFFIX(name)\ name}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00038}00038\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00040}00040\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacerapidjson}{rapidjson}};}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00042}\mbox{\hyperlink{class_rapid_json}{00042}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_rapid_json}{RapidJson}}\ :\ \textcolor{keyword}{public}\ PerfTest\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00043}00043\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00044}\mbox{\hyperlink{class_rapid_json_a5bd86d58d01d92ae83938bc3e09192d5}{00044}}\ \ \ \ \ \mbox{\hyperlink{class_rapid_json_a5bd86d58d01d92ae83938bc3e09192d5}{RapidJson}}()\ :\ \mbox{\hyperlink{class_rapid_json_a03764452de8099f9fc03e5c7666dd5af}{temp\_}}(),\ \mbox{\hyperlink{class_rapid_json_ab3e1ab7e5ed74284ebb9d9a4a6de0bcf}{doc\_}}()\ \{\}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00046}\mbox{\hyperlink{class_rapid_json_ae4e7e160193b9cac9c22f226e3d2b20e}{00046}}\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_rapid_json_ae4e7e160193b9cac9c22f226e3d2b20e}{SetUp}}()\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00047}00047\ \ \ \ \ \ \ \ \ PerfTest::SetUp();}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ temp\ buffer\ for\ insitu\ parsing.}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00050}00050\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_rapid_json_a03764452de8099f9fc03e5c7666dd5af}{temp\_}}\ =\ (\textcolor{keywordtype}{char}\ *)malloc(length\_\ +\ 1);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00052}00052\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Parse\ as\ a\ document}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(\mbox{\hyperlink{class_rapid_json_ab3e1ab7e5ed74284ebb9d9a4a6de0bcf}{doc\_}}.\mbox{\hyperlink{class_generic_document_a901db1678f99a1b550003eed75bc380a}{Parse}}(json\_).\mbox{\hyperlink{class_generic_document_a510a0588db4eb372f5d81bc3646578fb}{HasParseError}}());}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00054}00054\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00055}00055\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ 7;\ i++)}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(\mbox{\hyperlink{class_rapid_json_af0f2f377ad71e864a8d0b44da52ff2ae}{typesDoc\_}}[i].Parse(types\_[i]).HasParseError());}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00057}00057\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00059}\mbox{\hyperlink{class_rapid_json_ac89662f7dc5847e43237fe7c4121e2e4}{00059}}\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_rapid_json_ac89662f7dc5847e43237fe7c4121e2e4}{TearDown}}()\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00060}00060\ \ \ \ \ \ \ \ \ PerfTest::TearDown();}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00061}00061\ \ \ \ \ \ \ \ \ free(\mbox{\hyperlink{class_rapid_json_a03764452de8099f9fc03e5c7666dd5af}{temp\_}});}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00062}00062\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00064}00064\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00065}00065\ \ \ \ \ \mbox{\hyperlink{class_rapid_json_a5bd86d58d01d92ae83938bc3e09192d5}{RapidJson}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{class_rapid_json}{RapidJson}}\&);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00066}00066\ \ \ \ \ \mbox{\hyperlink{class_rapid_json}{RapidJson}}\&\ operator=(\textcolor{keyword}{const}\ \mbox{\hyperlink{class_rapid_json}{RapidJson}}\&);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00067}00067\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00068}00068\ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00069}\mbox{\hyperlink{class_rapid_json_a03764452de8099f9fc03e5c7666dd5af}{00069}}\ \ \ \ \ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{class_rapid_json_a03764452de8099f9fc03e5c7666dd5af}{temp\_}};}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00070}\mbox{\hyperlink{class_rapid_json_ab3e1ab7e5ed74284ebb9d9a4a6de0bcf}{00070}}\ \ \ \ \ \mbox{\hyperlink{class_generic_document}{Document}}\ \mbox{\hyperlink{class_rapid_json_ab3e1ab7e5ed74284ebb9d9a4a6de0bcf}{doc\_}};}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00071}\mbox{\hyperlink{class_rapid_json_af0f2f377ad71e864a8d0b44da52ff2ae}{00071}}\ \ \ \ \ \mbox{\hyperlink{class_generic_document}{Document}}\ \mbox{\hyperlink{class_rapid_json_af0f2f377ad71e864a8d0b44da52ff2ae}{typesDoc\_}}[7];}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00072}00072\ \};}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00073}00073\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00074}\mbox{\hyperlink{rapidjsontest_8cpp_a7e724ce6c8f6f3fb095afa0a00ee9f1f}{00074}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{class_rapid_json}{RapidJson}},\ \mbox{\hyperlink{rapidjsontest_8cpp_acdeb8bf1a2cf8ab5b4b520fdcf470958}{SIMD\_SUFFIX}}(ReaderParseInsitu\_DummyHandler))\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00075}00075\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ kTrialCount;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00076}00076\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(temp\_,\ json\_,\ length\_\ +\ 1);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00077}00077\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_generic_insitu_string_stream}{InsituStringStream}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}(temp\_);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00078}00078\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_base_reader_handler}{BaseReaderHandler<>}}\ h;}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00079}00079\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_reader}{Reader}}\ reader;}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00080}00080\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(reader.\mbox{\hyperlink{class_generic_reader_a0c450620d14ff1824e58bb7bd9b42099}{Parse}}<\mbox{\hyperlink{reader_8h_ab7be7dabe6ffcba60fad441505583450a13188bd483b4df0b6582bebe2aeb5b01}{kParseInsituFlag}}>(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ h));}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00081}00081\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00082}00082\ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00083}00083\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00084}\mbox{\hyperlink{rapidjsontest_8cpp_ac416532c31a62b0c44e621bc61546c18}{00084}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{class_rapid_json}{RapidJson}},\ \mbox{\hyperlink{rapidjsontest_8cpp_acdeb8bf1a2cf8ab5b4b520fdcf470958}{SIMD\_SUFFIX}}(ReaderParseInsitu\_DummyHandler\_ValidateEncoding))\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00085}00085\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ kTrialCount;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00086}00086\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(temp\_,\ json\_,\ length\_\ +\ 1);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00087}00087\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_generic_insitu_string_stream}{InsituStringStream}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}(temp\_);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00088}00088\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_base_reader_handler}{BaseReaderHandler<>}}\ h;}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00089}00089\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_reader}{Reader}}\ reader;}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00090}00090\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(reader.\mbox{\hyperlink{class_generic_reader_a0c450620d14ff1824e58bb7bd9b42099}{Parse}}<\mbox{\hyperlink{reader_8h_ab7be7dabe6ffcba60fad441505583450a13188bd483b4df0b6582bebe2aeb5b01}{kParseInsituFlag}}\ |\ \mbox{\hyperlink{reader_8h_ab7be7dabe6ffcba60fad441505583450a9b3baa16346575d2dc072b23a88e1928}{kParseValidateEncodingFlag}}>(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ h));}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00091}00091\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00092}00092\ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00093}00093\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00094}\mbox{\hyperlink{rapidjsontest_8cpp_a5c4da49db46044172dd84750e942b8d5}{00094}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{class_rapid_json}{RapidJson}},\ \mbox{\hyperlink{rapidjsontest_8cpp_acdeb8bf1a2cf8ab5b4b520fdcf470958}{SIMD\_SUFFIX}}(ReaderParse\_DummyHandler))\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00095}00095\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ kTrialCount;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00096}00096\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_generic_string_stream}{StringStream}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}(json\_);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00097}00097\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_base_reader_handler}{BaseReaderHandler<>}}\ h;}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00098}00098\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_reader}{Reader}}\ reader;}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00099}00099\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(reader.\mbox{\hyperlink{class_generic_reader_a0c450620d14ff1824e58bb7bd9b42099}{Parse}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ h));}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00100}00100\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00101}00101\ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00102}00102\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00103}\mbox{\hyperlink{rapidjsontest_8cpp_ae81a4befe2b9452fb97758328a5ee633}{00103}}\ \textcolor{preprocessor}{\#define\ TEST\_TYPED(index,\ Name)\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00104}00104\ \textcolor{preprocessor}{TEST\_F(RapidJson,\ SIMD\_SUFFIX(ReaderParse\_DummyHandler\_\#\#Name))\ \{\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00105}00105\ \textcolor{preprocessor}{\ \ \ \ for\ (size\_t\ i\ =\ 0;\ i\ <\ kTrialCount\ *\ 10;\ i++)\ \{\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00106}00106\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ StringStream\ s(types\_[index]);\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00107}00107\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ BaseReaderHandler<>\ h;\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00108}00108\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ Reader\ reader;\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00109}00109\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ EXPECT\_TRUE(reader.Parse(s,\ h));\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00110}00110\ \textcolor{preprocessor}{\ \ \ \ \}\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00111}00111\ \textcolor{preprocessor}{\}\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00112}00112\ \textcolor{preprocessor}{TEST\_F(RapidJson,\ SIMD\_SUFFIX(ReaderParseInsitu\_DummyHandler\_\#\#Name))\ \{\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00113}00113\ \textcolor{preprocessor}{\ \ \ \ for\ (size\_t\ i\ =\ 0;\ i\ <\ kTrialCount\ *\ 10;\ i++)\ \{\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00114}00114\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ memcpy(temp\_,\ types\_[index],\ typesLength\_[index]\ +\ 1);\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00115}00115\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ InsituStringStream\ s(temp\_);\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00116}00116\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ BaseReaderHandler<>\ h;\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00117}00117\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ Reader\ reader;\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00118}00118\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ EXPECT\_TRUE(reader.Parse<kParseInsituFlag>(s,\ h));\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00119}00119\ \textcolor{preprocessor}{\ \ \ \ \}\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00120}00120\ \textcolor{preprocessor}{\}}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00121}00121\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00122}00122\ \mbox{\hyperlink{rapidjsontest_8cpp_ae81a4befe2b9452fb97758328a5ee633}{TEST\_TYPED}}(0,\ Booleans)}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00123}00123\ \mbox{\hyperlink{rapidjsontest_8cpp_ae81a4befe2b9452fb97758328a5ee633}{TEST\_TYPED}}(1,\ \mbox{\hyperlink{namespace_floats}{Floats}})}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00124}00124\ \mbox{\hyperlink{rapidjsontest_8cpp_ae81a4befe2b9452fb97758328a5ee633}{TEST\_TYPED}}(2,\ Guids)}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00125}00125\ \mbox{\hyperlink{rapidjsontest_8cpp_ae81a4befe2b9452fb97758328a5ee633}{TEST\_TYPED}}(3,\ Integers)}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00126}00126\ \mbox{\hyperlink{rapidjsontest_8cpp_ae81a4befe2b9452fb97758328a5ee633}{TEST\_TYPED}}(4,\ Mixed)}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00127}00127\ \mbox{\hyperlink{rapidjsontest_8cpp_ae81a4befe2b9452fb97758328a5ee633}{TEST\_TYPED}}(5,\ Nulls)}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00128}00128\ \mbox{\hyperlink{rapidjsontest_8cpp_ae81a4befe2b9452fb97758328a5ee633}{TEST\_TYPED}}(6,\ Paragraphs)}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00129}00129\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00130}00130\ \textcolor{preprocessor}{\#undef\ TEST\_TYPED}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00131}00131\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00132}\mbox{\hyperlink{rapidjsontest_8cpp_a509df972ce4104de1a4037a2104b5a3c}{00132}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{class_rapid_json}{RapidJson}},\ \mbox{\hyperlink{rapidjsontest_8cpp_acdeb8bf1a2cf8ab5b4b520fdcf470958}{SIMD\_SUFFIX}}(ReaderParse\_DummyHandler\_FullPrecision))\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00133}00133\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ kTrialCount;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00134}00134\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_generic_string_stream}{StringStream}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}(json\_);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00135}00135\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_base_reader_handler}{BaseReaderHandler<>}}\ h;}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00136}00136\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_reader}{Reader}}\ reader;}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00137}00137\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(reader.\mbox{\hyperlink{class_generic_reader_a0c450620d14ff1824e58bb7bd9b42099}{Parse}}<\mbox{\hyperlink{reader_8h_ab7be7dabe6ffcba60fad441505583450a057fbeacafb16bb7d24c9998262cae46}{kParseFullPrecisionFlag}}>(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ h));}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00138}00138\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00139}00139\ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00140}00140\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00141}\mbox{\hyperlink{rapidjsontest_8cpp_a9ec5a4cb11f28ae3b27ad05f79658d07}{00141}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{class_rapid_json}{RapidJson}},\ \mbox{\hyperlink{rapidjsontest_8cpp_acdeb8bf1a2cf8ab5b4b520fdcf470958}{SIMD\_SUFFIX}}(ReaderParseIterative\_DummyHandler))\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00142}00142\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ kTrialCount;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00143}00143\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_generic_string_stream}{StringStream}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}(json\_);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00144}00144\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_base_reader_handler}{BaseReaderHandler<>}}\ h;}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00145}00145\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_reader}{Reader}}\ reader;}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00146}00146\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(reader.\mbox{\hyperlink{class_generic_reader_a0c450620d14ff1824e58bb7bd9b42099}{Parse}}<\mbox{\hyperlink{reader_8h_ab7be7dabe6ffcba60fad441505583450aadb14f5a3b6b33e28055e913a2eae5e9}{kParseIterativeFlag}}>(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ h));}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00147}00147\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00148}00148\ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00149}00149\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00150}\mbox{\hyperlink{rapidjsontest_8cpp_a29e2ade76e0630e68be012847c2baae9}{00150}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{class_rapid_json}{RapidJson}},\ \mbox{\hyperlink{rapidjsontest_8cpp_acdeb8bf1a2cf8ab5b4b520fdcf470958}{SIMD\_SUFFIX}}(ReaderParseIterativeInsitu\_DummyHandler))\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00151}00151\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ kTrialCount;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00152}00152\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(temp\_,\ json\_,\ length\_\ +\ 1);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00153}00153\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_generic_insitu_string_stream}{InsituStringStream}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}(temp\_);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00154}00154\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_base_reader_handler}{BaseReaderHandler<>}}\ h;}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00155}00155\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_reader}{Reader}}\ reader;}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00156}00156\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(reader.\mbox{\hyperlink{class_generic_reader_a0c450620d14ff1824e58bb7bd9b42099}{Parse}}<\mbox{\hyperlink{reader_8h_ab7be7dabe6ffcba60fad441505583450aadb14f5a3b6b33e28055e913a2eae5e9}{kParseIterativeFlag}}|\mbox{\hyperlink{reader_8h_ab7be7dabe6ffcba60fad441505583450a13188bd483b4df0b6582bebe2aeb5b01}{kParseInsituFlag}}>(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ h));}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00157}00157\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00158}00158\ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00159}00159\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00160}\mbox{\hyperlink{rapidjsontest_8cpp_ae9f355efa759013fb88ce867af8534b5}{00160}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{class_rapid_json}{RapidJson}},\ \mbox{\hyperlink{rapidjsontest_8cpp_acdeb8bf1a2cf8ab5b4b520fdcf470958}{SIMD\_SUFFIX}}(ReaderParseIterativePull\_DummyHandler))\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00161}00161\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ kTrialCount;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00162}00162\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_generic_string_stream}{StringStream}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}(json\_);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00163}00163\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_base_reader_handler}{BaseReaderHandler<>}}\ h;}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00164}00164\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_reader}{Reader}}\ reader;}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00165}00165\ \ \ \ \ \ \ \ \ reader.\mbox{\hyperlink{class_generic_reader_a7de472eda2ad9de13cfd8c1de74f1754}{IterativeParseInit}}();}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00166}00166\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (!reader.\mbox{\hyperlink{class_generic_reader_aa1e9e1eef614fde971550ed2f955151d}{IterativeParseComplete}}())\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00167}00167\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!reader.\mbox{\hyperlink{class_generic_reader_a257891331e0c259903e7066fb4cebf92}{IterativeParseNext}}<\mbox{\hyperlink{reader_8h_ab7be7dabe6ffcba60fad441505583450a9104b0946d648e9467cb7a967401ec80}{kParseDefaultFlags}}>(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ h))}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00168}00168\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00169}00169\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00170}00170\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(reader.\mbox{\hyperlink{class_generic_reader_ac417441794477ea747b63adb6d3653a9}{HasParseError}}());}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00171}00171\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00172}00172\ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00173}00173\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00174}\mbox{\hyperlink{rapidjsontest_8cpp_a05a7bbdf647c72c2d8e75cd3ee31c57f}{00174}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{class_rapid_json}{RapidJson}},\ \mbox{\hyperlink{rapidjsontest_8cpp_acdeb8bf1a2cf8ab5b4b520fdcf470958}{SIMD\_SUFFIX}}(ReaderParseIterativePullInsitu\_DummyHandler))\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00175}00175\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ kTrialCount;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00176}00176\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(temp\_,\ json\_,\ length\_\ +\ 1);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00177}00177\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_generic_insitu_string_stream}{InsituStringStream}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}(temp\_);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00178}00178\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_base_reader_handler}{BaseReaderHandler<>}}\ h;}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00179}00179\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_reader}{Reader}}\ reader;}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00180}00180\ \ \ \ \ \ \ \ \ reader.\mbox{\hyperlink{class_generic_reader_a7de472eda2ad9de13cfd8c1de74f1754}{IterativeParseInit}}();}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00181}00181\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (!reader.\mbox{\hyperlink{class_generic_reader_aa1e9e1eef614fde971550ed2f955151d}{IterativeParseComplete}}())\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00182}00182\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!reader.\mbox{\hyperlink{class_generic_reader_a257891331e0c259903e7066fb4cebf92}{IterativeParseNext}}<\mbox{\hyperlink{reader_8h_ab7be7dabe6ffcba60fad441505583450a9104b0946d648e9467cb7a967401ec80}{kParseDefaultFlags}}|\mbox{\hyperlink{reader_8h_ab7be7dabe6ffcba60fad441505583450a13188bd483b4df0b6582bebe2aeb5b01}{kParseInsituFlag}}>(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ h))}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00183}00183\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00184}00184\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00185}00185\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(reader.\mbox{\hyperlink{class_generic_reader_ac417441794477ea747b63adb6d3653a9}{HasParseError}}());}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00186}00186\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00187}00187\ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00188}00188\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00189}\mbox{\hyperlink{rapidjsontest_8cpp_a610733b1c473d4125c41e28f47330b87}{00189}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{class_rapid_json}{RapidJson}},\ \mbox{\hyperlink{rapidjsontest_8cpp_acdeb8bf1a2cf8ab5b4b520fdcf470958}{SIMD\_SUFFIX}}(ReaderParse\_DummyHandler\_ValidateEncoding))\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00190}00190\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ kTrialCount;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00191}00191\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_generic_string_stream}{StringStream}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}(json\_);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00192}00192\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_base_reader_handler}{BaseReaderHandler<>}}\ h;}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00193}00193\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_reader}{Reader}}\ reader;}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00194}00194\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(reader.\mbox{\hyperlink{class_generic_reader_a0c450620d14ff1824e58bb7bd9b42099}{Parse}}<\mbox{\hyperlink{reader_8h_ab7be7dabe6ffcba60fad441505583450a9b3baa16346575d2dc072b23a88e1928}{kParseValidateEncodingFlag}}>(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ h));}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00195}00195\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00196}00196\ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00197}00197\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00198}\mbox{\hyperlink{rapidjsontest_8cpp_a8d33c9dfd7bb9a1848d3fa4b8b89d5c6}{00198}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{class_rapid_json}{RapidJson}},\ \mbox{\hyperlink{rapidjsontest_8cpp_acdeb8bf1a2cf8ab5b4b520fdcf470958}{SIMD\_SUFFIX}}(DocumentParseInsitu\_MemoryPoolAllocator))\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00199}00199\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ kTrialCount;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00200}00200\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(temp\_,\ json\_,\ length\_\ +\ 1);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00201}00201\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_document}{Document}}\ doc;}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00202}00202\ \ \ \ \ \ \ \ \ doc.\mbox{\hyperlink{class_generic_document_a13f68b1896a24eea4cdbc03a3916225f}{ParseInsitu}}(temp\_);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00203}00203\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(doc.IsObject());}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00204}00204\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00205}00205\ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00206}00206\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00207}\mbox{\hyperlink{rapidjsontest_8cpp_a362d87248c7e945df452bb3b8f3fbbf9}{00207}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{class_rapid_json}{RapidJson}},\ \mbox{\hyperlink{rapidjsontest_8cpp_acdeb8bf1a2cf8ab5b4b520fdcf470958}{SIMD\_SUFFIX}}(DocumentParseIterativeInsitu\_MemoryPoolAllocator))\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00208}00208\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ kTrialCount;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00209}00209\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(temp\_,\ json\_,\ length\_\ +\ 1);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00210}00210\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_document}{Document}}\ doc;}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00211}00211\ \ \ \ \ \ \ \ \ doc.\mbox{\hyperlink{class_generic_document_a13f68b1896a24eea4cdbc03a3916225f}{ParseInsitu}}<\mbox{\hyperlink{reader_8h_ab7be7dabe6ffcba60fad441505583450aadb14f5a3b6b33e28055e913a2eae5e9}{kParseIterativeFlag}}>(temp\_);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00212}00212\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(doc.IsObject());}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00213}00213\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00214}00214\ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00215}00215\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00216}\mbox{\hyperlink{rapidjsontest_8cpp_a83c1d0fe86cff05d80f01062603e5685}{00216}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{class_rapid_json}{RapidJson}},\ \mbox{\hyperlink{rapidjsontest_8cpp_acdeb8bf1a2cf8ab5b4b520fdcf470958}{SIMD\_SUFFIX}}(DocumentParse\_MemoryPoolAllocator))\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00217}00217\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ kTrialCount;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00218}00218\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_document}{Document}}\ doc;}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00219}00219\ \ \ \ \ \ \ \ \ doc.\mbox{\hyperlink{class_generic_document_a901db1678f99a1b550003eed75bc380a}{Parse}}(json\_);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00220}00220\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(doc.IsObject());}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00221}00221\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00222}00222\ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00223}00223\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00224}\mbox{\hyperlink{rapidjsontest_8cpp_a5077a48271eeb5a0a5c3fe5158626dba}{00224}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{class_rapid_json}{RapidJson}},\ \mbox{\hyperlink{rapidjsontest_8cpp_acdeb8bf1a2cf8ab5b4b520fdcf470958}{SIMD\_SUFFIX}}(DocumentParseLength\_MemoryPoolAllocator))\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00225}00225\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ kTrialCount;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00226}00226\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_document}{Document}}\ doc;}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00227}00227\ \ \ \ \ \ \ \ \ doc.\mbox{\hyperlink{class_generic_document_a901db1678f99a1b550003eed75bc380a}{Parse}}(json\_,\ length\_);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00228}00228\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(doc.IsObject());}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00229}00229\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00230}00230\ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00231}00231\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00232}00232\ \textcolor{preprocessor}{\#if\ RAPIDJSON\_HAS\_STDSTRING}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00233}\mbox{\hyperlink{rapidjsontest_8cpp_a179d9510510b8a35d756b8320c78123b}{00233}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{class_rapid_json}{RapidJson}},\ \mbox{\hyperlink{rapidjsontest_8cpp_acdeb8bf1a2cf8ab5b4b520fdcf470958}{SIMD\_SUFFIX}}(DocumentParseStdString\_MemoryPoolAllocator))\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00234}00234\ \ \ \ \ \textcolor{keyword}{const}\ std::string\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}(json\_,\ length\_);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00235}00235\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ kTrialCount;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00236}00236\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_document}{Document}}\ doc;}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00237}00237\ \ \ \ \ \ \ \ \ doc.\mbox{\hyperlink{class_generic_document_a901db1678f99a1b550003eed75bc380a}{Parse}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00238}00238\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(doc.IsObject());}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00239}00239\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00240}00240\ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00241}00241\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00242}00242\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00243}\mbox{\hyperlink{rapidjsontest_8cpp_a7b6ae3b0826983eda5b282d9539e2d63}{00243}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{class_rapid_json}{RapidJson}},\ \mbox{\hyperlink{rapidjsontest_8cpp_acdeb8bf1a2cf8ab5b4b520fdcf470958}{SIMD\_SUFFIX}}(DocumentParseIterative\_MemoryPoolAllocator))\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00244}00244\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ kTrialCount;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00245}00245\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_document}{Document}}\ doc;}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00246}00246\ \ \ \ \ \ \ \ \ doc.\mbox{\hyperlink{class_generic_document_a901db1678f99a1b550003eed75bc380a}{Parse}}<\mbox{\hyperlink{reader_8h_ab7be7dabe6ffcba60fad441505583450aadb14f5a3b6b33e28055e913a2eae5e9}{kParseIterativeFlag}}>(json\_);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00247}00247\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(doc.IsObject());}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00248}00248\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00249}00249\ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00250}00250\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00251}\mbox{\hyperlink{rapidjsontest_8cpp_abe383995a368245e577231d56f4a2bfe}{00251}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{class_rapid_json}{RapidJson}},\ \mbox{\hyperlink{rapidjsontest_8cpp_acdeb8bf1a2cf8ab5b4b520fdcf470958}{SIMD\_SUFFIX}}(DocumentParse\_CrtAllocator))\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00252}00252\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ kTrialCount;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00253}00253\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(temp\_,\ json\_,\ length\_\ +\ 1);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00254}00254\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_document}{GenericDocument<UTF8<>}},\ \mbox{\hyperlink{class_crt_allocator}{CrtAllocator}}>\ doc;}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00255}00255\ \ \ \ \ \ \ \ \ doc.\mbox{\hyperlink{class_generic_document_a901db1678f99a1b550003eed75bc380a}{Parse}}(temp\_);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00256}00256\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(doc.IsObject());}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00257}00257\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00258}00258\ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00259}00259\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00260}\mbox{\hyperlink{rapidjsontest_8cpp_a490588a7375741a24695d645ff6f0b11}{00260}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{class_rapid_json}{RapidJson}},\ \mbox{\hyperlink{rapidjsontest_8cpp_acdeb8bf1a2cf8ab5b4b520fdcf470958}{SIMD\_SUFFIX}}(DocumentParseEncodedInputStream\_MemoryStream))\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00261}00261\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ kTrialCount;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00262}00262\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_memory_stream}{MemoryStream}}\ ms(json\_,\ length\_);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00263}00263\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_encoded_input_stream}{EncodedInputStream<UTF8<>}},\ \mbox{\hyperlink{struct_memory_stream}{MemoryStream}}>\ is(ms);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00264}00264\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_document}{Document}}\ doc;}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00265}00265\ \ \ \ \ \ \ \ \ doc.\mbox{\hyperlink{class_generic_document_a7bc1827a7ab04de4789fe46237f0e921}{ParseStream}}<0,\ \mbox{\hyperlink{struct_u_t_f8}{UTF8<>}}\ >(is);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00266}00266\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(doc.IsObject());}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00267}00267\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00268}00268\ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00269}00269\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00270}\mbox{\hyperlink{rapidjsontest_8cpp_a3f65d904fae20e0a4bf35f7a76e427af}{00270}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{class_rapid_json}{RapidJson}},\ \mbox{\hyperlink{rapidjsontest_8cpp_acdeb8bf1a2cf8ab5b4b520fdcf470958}{SIMD\_SUFFIX}}(DocumentParseAutoUTFInputStream\_MemoryStream))\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00271}00271\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ kTrialCount;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00272}00272\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_memory_stream}{MemoryStream}}\ ms(json\_,\ length\_);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00273}00273\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_auto_u_t_f_input_stream}{AutoUTFInputStream<unsigned,\ MemoryStream>}}\ is(ms);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00274}00274\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_document}{Document}}\ doc;}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00275}00275\ \ \ \ \ \ \ \ \ doc.\mbox{\hyperlink{class_generic_document_a7bc1827a7ab04de4789fe46237f0e921}{ParseStream}}<0,\ \mbox{\hyperlink{struct_auto_u_t_f}{AutoUTF<unsigned>}}\ >(is);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00276}00276\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(doc.IsObject());}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00277}00277\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00278}00278\ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00279}00279\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00280}00280\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00281}\mbox{\hyperlink{rapidjsontest_8cpp_af9d33af8023a2f15d5e4b40cc41acf68}{00281}}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{rapidjsontest_8cpp_af9d33af8023a2f15d5e4b40cc41acf68}{Traverse}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00282}00282\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00283}00283\ \ \ \ \ \textcolor{keywordflow}{switch}(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}.GetType())\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00284}00284\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7a146f46700e905e8df96a6a90b5c7640f}{kObjectType}}:}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00285}00285\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{typename}\ T::ConstMemberIterator\ itr\ =\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}.MemberBegin();\ itr\ !=\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}.MemberEnd();\ ++itr)\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00286}00286\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}++;\ \ \ \ \textcolor{comment}{//\ name}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00287}00287\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ +=\ \mbox{\hyperlink{rapidjsontest_8cpp_af9d33af8023a2f15d5e4b40cc41acf68}{Traverse}}(itr-\/>value);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00288}00288\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00289}00289\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00290}00290\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00291}00291\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7af41527d6925efa3c5c3dadb23dfef7c8}{kArrayType}}:}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00292}00292\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{typename}\ T::ConstValueIterator\ itr\ =\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}.Begin();\ itr\ !=\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}.End();\ ++itr)}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00293}00293\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ +=\ \mbox{\hyperlink{rapidjsontest_8cpp_af9d33af8023a2f15d5e4b40cc41acf68}{Traverse}}(*itr);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00294}00294\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00295}00295\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00296}00296\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00297}00297\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Do\ nothing.}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00298}00298\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00299}00299\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00300}00300\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}};}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00301}00301\ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00302}00302\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00303}\mbox{\hyperlink{rapidjsontest_8cpp_a93f2bfd63a35e72ffe1101f4fff144d7}{00303}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{class_rapid_json}{RapidJson}},\ DocumentTraverse)\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00304}00304\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ kTrialCount;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00305}00305\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ =\ \mbox{\hyperlink{rapidjsontest_8cpp_af9d33af8023a2f15d5e4b40cc41acf68}{Traverse}}(doc\_);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00306}00306\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(4339u,\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}});}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00307}00307\ \ \ \ \ \ \ \ \ \textcolor{comment}{//if\ (i\ ==\ 0)}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00308}00308\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ \ std::cout\ <<\ count\ <<\ std::endl;}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00309}00309\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00310}00310\ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00311}00311\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00312}00312\ \textcolor{preprocessor}{\#ifdef\ \_\_GNUC\_\_}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00313}00313\ RAPIDJSON\_DIAG\_PUSH}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00314}00314\ RAPIDJSON\_DIAG\_OFF(effc++)}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00315}00315\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00316}00316\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00317}\mbox{\hyperlink{struct_value_counter}{00317}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_value_counter}{ValueCounter}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{struct_base_reader_handler}{BaseReaderHandler}}<>\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00318}\mbox{\hyperlink{struct_value_counter_a05f8468b0095bc67022219da8f2a3727}{00318}}\ \ \ \ \ \mbox{\hyperlink{struct_value_counter_a05f8468b0095bc67022219da8f2a3727}{ValueCounter}}()\ :\ \mbox{\hyperlink{struct_value_counter_a91a3e1a166d86d269efeea502946e3da}{count\_}}(1)\ \{\}\ \ \ \textcolor{comment}{//\ root}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00319}00319\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00320}\mbox{\hyperlink{struct_value_counter_aa3bdd686be53d1978d491ac4da4a3593}{00320}}\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_value_counter_aa3bdd686be53d1978d491ac4da4a3593}{EndObject}}(\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\ memberCount)\ \{\ \mbox{\hyperlink{struct_value_counter_a91a3e1a166d86d269efeea502946e3da}{count\_}}\ +=\ memberCount\ *\ 2;\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00321}\mbox{\hyperlink{struct_value_counter_a54a92e4c244e7148bcb3d054f0ecfdda}{00321}}\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_value_counter_a54a92e4c244e7148bcb3d054f0ecfdda}{EndArray}}(\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\ elementCount)\ \{\ \mbox{\hyperlink{struct_value_counter_a91a3e1a166d86d269efeea502946e3da}{count\_}}\ +=\ elementCount;\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00322}00322\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00323}\mbox{\hyperlink{struct_value_counter_a91a3e1a166d86d269efeea502946e3da}{00323}}\ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\ \mbox{\hyperlink{struct_value_counter_a91a3e1a166d86d269efeea502946e3da}{count\_}};}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00324}00324\ \};}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00325}00325\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00326}00326\ \textcolor{preprocessor}{\#ifdef\ \_\_GNUC\_\_}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00327}00327\ RAPIDJSON\_DIAG\_POP}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00328}00328\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00329}00329\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00330}\mbox{\hyperlink{rapidjsontest_8cpp_ad10d99603afdb6113f09dc3d3a4ff34a}{00330}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{class_rapid_json}{RapidJson}},\ DocumentAccept)\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00331}00331\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ kTrialCount;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00332}00332\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_value_counter}{ValueCounter}}\ counter;}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00333}00333\ \ \ \ \ \ \ \ \ doc\_.Accept(counter);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00334}00334\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(4339u,\ counter.\mbox{\hyperlink{struct_value_counter_a91a3e1a166d86d269efeea502946e3da}{count\_}});}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00335}00335\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00336}00336\ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00337}00337\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00338}\mbox{\hyperlink{struct_null_stream}{00338}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_null_stream}{NullStream}}\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00339}\mbox{\hyperlink{struct_null_stream_a15188554aa4d461816192a5d7e24d832}{00339}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{struct_null_stream_a15188554aa4d461816192a5d7e24d832}{Ch}};}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00340}00340\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00341}\mbox{\hyperlink{struct_null_stream_ab0d616a614956971c8389ddb6367cb51}{00341}}\ \ \ \ \ \mbox{\hyperlink{struct_null_stream_ab0d616a614956971c8389ddb6367cb51}{NullStream}}()\ \textcolor{comment}{/*:\ length\_(0)*/}\ \{\}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00342}\mbox{\hyperlink{struct_null_stream_afb69c2362a2745716285da8784a1d0af}{00342}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_null_stream_afb69c2362a2745716285da8784a1d0af}{Put}}(\mbox{\hyperlink{struct_null_stream_a15188554aa4d461816192a5d7e24d832}{Ch}})\ \{\ \textcolor{comment}{/*++length\_;*/}\ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00343}\mbox{\hyperlink{struct_null_stream_ad83125678bf1ee3278fefa5cbef3f7ed}{00343}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_null_stream_ad83125678bf1ee3278fefa5cbef3f7ed}{Flush}}()\ \{\}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00344}00344\ \ \ \ \ \textcolor{comment}{//size\_t\ length\_;}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00345}00345\ \};}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00346}00346\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00347}\mbox{\hyperlink{rapidjsontest_8cpp_ab6ab26a19c3a30bc0f9ba15cbfb316f5}{00347}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{class_rapid_json}{RapidJson}},\ Writer\_NullStream)\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00348}00348\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ kTrialCount;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00349}00349\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_null_stream}{NullStream}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00350}00350\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_writer}{Writer<NullStream>}}\ writer(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00351}00351\ \ \ \ \ \ \ \ \ doc\_.Accept(writer);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00352}00352\ \ \ \ \ \ \ \ \ \textcolor{comment}{//if\ (i\ ==\ 0)}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00353}00353\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ \ std::cout\ <<\ s.length\_\ <<\ std::endl;}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00354}00354\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00355}00355\ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00356}00356\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00357}\mbox{\hyperlink{rapidjsontest_8cpp_a0c64eabfbfc2cd8615130026e1a9d9a2}{00357}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{class_rapid_json}{RapidJson}},\ \mbox{\hyperlink{rapidjsontest_8cpp_acdeb8bf1a2cf8ab5b4b520fdcf470958}{SIMD\_SUFFIX}}(Writer\_StringBuffer))\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00358}00358\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ kTrialCount;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00359}00359\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_string_buffer}{StringBuffer}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}(0,\ 1024\ *\ 1024);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00360}00360\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_writer}{Writer<StringBuffer>}}\ writer(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00361}00361\ \ \ \ \ \ \ \ \ doc\_.Accept(writer);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00362}00362\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ str\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.GetString();}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00363}00363\ \ \ \ \ \ \ \ \ (void)str;}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00364}00364\ \ \ \ \ \ \ \ \ \textcolor{comment}{//if\ (i\ ==\ 0)}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00365}00365\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ \ std::cout\ <<\ strlen(str)\ <<\ std::endl;}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00366}00366\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00367}00367\ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00368}00368\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00369}00369\ \textcolor{preprocessor}{\#define\ TEST\_TYPED(index,\ Name)\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00370}00370\ \textcolor{preprocessor}{TEST\_F(RapidJson,\ SIMD\_SUFFIX(Writer\_StringBuffer\_\#\#Name))\ \{\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00371}00371\ \textcolor{preprocessor}{\ \ \ \ for\ (size\_t\ i\ =\ 0;\ i\ <\ kTrialCount\ *\ 10;\ i++)\ \{\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00372}00372\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ StringBuffer\ s(0,\ 1024\ *\ 1024);\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00373}00373\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ Writer<StringBuffer>\ writer(s);\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00374}00374\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ typesDoc\_[index].Accept(writer);\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00375}00375\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ const\ char*\ str\ =\ s.GetString();\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00376}00376\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ (void)str;\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00377}00377\ \textcolor{preprocessor}{\ \ \ \ \}\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00378}00378\ \textcolor{preprocessor}{\}}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00379}00379\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00380}00380\ \mbox{\hyperlink{rapidjsontest_8cpp_ae81a4befe2b9452fb97758328a5ee633}{TEST\_TYPED}}(0,\ Booleans)}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00381}00381\ \mbox{\hyperlink{rapidjsontest_8cpp_ae81a4befe2b9452fb97758328a5ee633}{TEST\_TYPED}}(1,\ \mbox{\hyperlink{namespace_floats}{Floats}})}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00382}00382\ \mbox{\hyperlink{rapidjsontest_8cpp_ae81a4befe2b9452fb97758328a5ee633}{TEST\_TYPED}}(2,\ Guids)}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00383}00383\ \mbox{\hyperlink{rapidjsontest_8cpp_ae81a4befe2b9452fb97758328a5ee633}{TEST\_TYPED}}(3,\ Integers)}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00384}00384\ \mbox{\hyperlink{rapidjsontest_8cpp_ae81a4befe2b9452fb97758328a5ee633}{TEST\_TYPED}}(4,\ Mixed)}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00385}00385\ \mbox{\hyperlink{rapidjsontest_8cpp_ae81a4befe2b9452fb97758328a5ee633}{TEST\_TYPED}}(5,\ Nulls)}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00386}00386\ \mbox{\hyperlink{rapidjsontest_8cpp_ae81a4befe2b9452fb97758328a5ee633}{TEST\_TYPED}}(6,\ Paragraphs)}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00387}00387\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00388}00388\ \textcolor{preprocessor}{\#undef\ TEST\_TYPED}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00389}00389\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00390}\mbox{\hyperlink{rapidjsontest_8cpp_a2133e33675a85073c826dfba6b7b07d8}{00390}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{class_rapid_json}{RapidJson}},\ \mbox{\hyperlink{rapidjsontest_8cpp_acdeb8bf1a2cf8ab5b4b520fdcf470958}{SIMD\_SUFFIX}}(PrettyWriter\_StringBuffer))\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00391}00391\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ kTrialCount;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00392}00392\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_string_buffer}{StringBuffer}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}(0,\ 2048\ *\ 1024);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00393}00393\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_pretty_writer}{PrettyWriter<StringBuffer>}}\ writer(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00394}00394\ \ \ \ \ \ \ \ \ writer.\mbox{\hyperlink{class_pretty_writer_abbdc83ce02cf4a811a7355aa3879b45a}{SetIndent}}(\textcolor{charliteral}{'\ '},\ 1);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00395}00395\ \ \ \ \ \ \ \ \ doc\_.Accept(writer);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00396}00396\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ str\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.GetString();}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00397}00397\ \ \ \ \ \ \ \ \ (void)str;}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00398}00398\ \ \ \ \ \ \ \ \ \textcolor{comment}{//if\ (i\ ==\ 0)}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00399}00399\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ \ std::cout\ <<\ strlen(str)\ <<\ std::endl;}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00400}00400\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00401}00401\ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00402}00402\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00403}\mbox{\hyperlink{rapidjsontest_8cpp_ae857c8073b2a1aa721b533f79cf25e37}{00403}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{class_rapid_json}{RapidJson}},\ internal\_Pow10)\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00404}00404\ \ \ \ \ \textcolor{keywordtype}{double}\ sum\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00405}00405\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ kTrialCount\ *\ kTrialCount;\ i++)}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00406}00406\ \ \ \ \ \ \ \ \ sum\ +=\ \mbox{\hyperlink{namespaceinternal_af01c41d045d596e2f8d1888cf6fbecb6}{internal::Pow10}}(\textcolor{keywordtype}{int}(i\ \&\ 255));}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00407}00407\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aa8bc8320813e1abb0016129b636e3b27}{EXPECT\_GT}}(sum,\ 0.0);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00408}00408\ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00409}00409\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00410}\mbox{\hyperlink{rapidjsontest_8cpp_a0be9d103f6c0660995f3c836184c4aa6}{00410}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{class_rapid_json}{RapidJson}},\ SkipWhitespace\_Basic)\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00411}00411\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ kTrialCount;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00412}00412\ \ \ \ \ \ \ \ \ rapidjson::StringStream\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}(whitespace\_);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00413}00413\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.Peek()\ ==\ \textcolor{charliteral}{'\ '}\ ||\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.Peek()\ ==\ \textcolor{charliteral}{'\(\backslash\)n'}\ ||\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.Peek()\ ==\ \textcolor{charliteral}{'\(\backslash\)r'}\ ||\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.Peek()\ ==\ \textcolor{charliteral}{'\(\backslash\)t'})}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00414}00414\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.Take();}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00415}00415\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a1a6db8b1338ee7040329322b77779086}{ASSERT\_EQ}}(\textcolor{charliteral}{'['},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.Peek());}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00416}00416\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00417}00417\ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00418}00418\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00419}\mbox{\hyperlink{rapidjsontest_8cpp_ada56e6952daca0eee7b4042b94fc074f}{00419}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{class_rapid_json}{RapidJson}},\ \mbox{\hyperlink{rapidjsontest_8cpp_acdeb8bf1a2cf8ab5b4b520fdcf470958}{SIMD\_SUFFIX}}(\mbox{\hyperlink{reader_8h_a60338858b2582eca23f3e509a2d82e0e}{SkipWhitespace}}))\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00420}00420\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ kTrialCount;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00421}00421\ \ \ \ \ \ \ \ \ rapidjson::StringStream\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}(whitespace\_);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00422}00422\ \ \ \ \ \ \ \ \ rapidjson::SkipWhitespace(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00423}00423\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a1a6db8b1338ee7040329322b77779086}{ASSERT\_EQ}}(\textcolor{charliteral}{'['},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.Peek());}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00424}00424\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00425}00425\ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00426}00426\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00427}\mbox{\hyperlink{rapidjsontest_8cpp_a151f2ae17ac9f36edbb883570448b32a}{00427}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{class_rapid_json}{RapidJson}},\ SkipWhitespace\_strspn)\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00428}00428\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ kTrialCount;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00429}00429\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ =\ whitespace\_\ +\ std::strspn(whitespace\_,\ \textcolor{stringliteral}{"{}\ \(\backslash\)t\(\backslash\)r\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00430}00430\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a1a6db8b1338ee7040329322b77779086}{ASSERT\_EQ}}(\textcolor{charliteral}{'['},\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00431}00431\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00432}00432\ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00433}00433\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00434}\mbox{\hyperlink{rapidjsontest_8cpp_a7182b72d16b823573c12d79999f73ffc}{00434}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{class_rapid_json}{RapidJson}},\ UTF8\_Validate)\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00435}00435\ \ \ \ \ \mbox{\hyperlink{struct_null_stream}{NullStream}}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}};}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00436}00436\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00437}00437\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ kTrialCount;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00438}00438\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_generic_string_stream}{StringStream}}\ is(json\_);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00439}00439\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ result\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00440}00440\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (is.Peek()\ !=\ \textcolor{charliteral}{'\(\backslash\)0'})}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00441}00441\ \ \ \ \ \ \ \ \ \ \ \ \ result\ \&=\ \mbox{\hyperlink{struct_u_t_f8}{UTF8<>::Validate}}(is,\ os);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00442}00442\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(result);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00443}00443\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00444}00444\ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00445}00445\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00446}\mbox{\hyperlink{rapidjsontest_8cpp_ace05756eaf9f09ee243463f45ba6c42e}{00446}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{class_rapid_json}{RapidJson}},\ \mbox{\hyperlink{class_file_read_stream}{FileReadStream}})\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00447}00447\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ kTrialCount;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00448}00448\ \ \ \ \ \ \ \ \ FILE\ *fp\ =\ fopen(filename\_,\ \textcolor{stringliteral}{"{}rb"{}});}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00449}00449\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ buffer[65536];}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00450}00450\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_file_read_stream}{FileReadStream}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}(fp,\ buffer,\ \textcolor{keyword}{sizeof}(buffer));}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00451}00451\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.Take()\ !=\ \textcolor{charliteral}{'\(\backslash\)0'})}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00452}00452\ \ \ \ \ \ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00453}00453\ \ \ \ \ \ \ \ \ fclose(fp);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00454}00454\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00455}00455\ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00456}00456\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00457}\mbox{\hyperlink{rapidjsontest_8cpp_a3ebb608772c889020d0fd63bea73b8ea}{00457}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{class_rapid_json}{RapidJson}},\ \mbox{\hyperlink{rapidjsontest_8cpp_acdeb8bf1a2cf8ab5b4b520fdcf470958}{SIMD\_SUFFIX}}(ReaderParse\_DummyHandler\_FileReadStream))\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00458}00458\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ kTrialCount;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00459}00459\ \ \ \ \ \ \ \ \ FILE\ *fp\ =\ fopen(filename\_,\ \textcolor{stringliteral}{"{}rb"{}});}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00460}00460\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ buffer[65536];}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00461}00461\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_file_read_stream}{FileReadStream}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}(fp,\ buffer,\ \textcolor{keyword}{sizeof}(buffer));}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00462}00462\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_base_reader_handler}{BaseReaderHandler<>}}\ h;}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00463}00463\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_reader}{Reader}}\ reader;}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00464}00464\ \ \ \ \ \ \ \ \ reader.\mbox{\hyperlink{class_generic_reader_a0c450620d14ff1824e58bb7bd9b42099}{Parse}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ h);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00465}00465\ \ \ \ \ \ \ \ \ fclose(fp);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00466}00466\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00467}00467\ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00468}00468\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00469}\mbox{\hyperlink{rapidjsontest_8cpp_a06cc4ad2ab6f651379c14cd8a8c7b7cd}{00469}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{class_rapid_json}{RapidJson}},\ \mbox{\hyperlink{class_i_stream_wrapper}{IStreamWrapper}})\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00470}00470\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ kTrialCount;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00471}00471\ \ \ \ \ \ \ \ \ std::ifstream\ is(filename\_,\ std::ios::in\ |\ std::ios::binary);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00472}00472\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ buffer[65536];}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00473}00473\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_i_stream_wrapper}{IStreamWrapper}}\ isw(is,\ buffer,\ \textcolor{keyword}{sizeof}(buffer));}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00474}00474\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (isw.\mbox{\hyperlink{class_i_stream_wrapper_a992cd4a65ad4b6fbccbd5a2006fb38cf}{Take}}()\ !=\ \textcolor{charliteral}{'\(\backslash\)0'})}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00475}00475\ \ \ \ \ \ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00476}00476\ \ \ \ \ \ \ \ \ is.close();}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00477}00477\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00478}00478\ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00479}00479\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00480}\mbox{\hyperlink{rapidjsontest_8cpp_a7f86ee31336d3d12540c837de9e2e699}{00480}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{class_rapid_json}{RapidJson}},\ IStreamWrapper\_Unbuffered)\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00481}00481\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ kTrialCount;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00482}00482\ \ \ \ \ \ \ \ \ std::ifstream\ is(filename\_,\ std::ios::in\ |\ std::ios::binary);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00483}00483\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_i_stream_wrapper}{IStreamWrapper}}\ isw(is);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00484}00484\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (isw.\mbox{\hyperlink{class_i_stream_wrapper_a992cd4a65ad4b6fbccbd5a2006fb38cf}{Take}}()\ !=\ \textcolor{charliteral}{'\(\backslash\)0'})}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00485}00485\ \ \ \ \ \ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00486}00486\ \ \ \ \ \ \ \ \ is.close();}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00487}00487\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00488}00488\ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00489}00489\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00490}\mbox{\hyperlink{rapidjsontest_8cpp_a6372368807ad302478937a5fad2ac188}{00490}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{class_rapid_json}{RapidJson}},\ IStreamWrapper\_Setbuffered)\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00491}00491\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ kTrialCount;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00492}00492\ \ \ \ \ \ \ \ \ std::ifstream\ is;}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00493}00493\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ buffer[65536];}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00494}00494\ \ \ \ \ \ \ \ \ is.rdbuf()-\/>pubsetbuf(buffer,\ \textcolor{keyword}{sizeof}(buffer));}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00495}00495\ \ \ \ \ \ \ \ \ is.open(filename\_,\ std::ios::in\ |\ std::ios::binary);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00496}00496\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_i_stream_wrapper}{IStreamWrapper}}\ isw(is);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00497}00497\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (isw.\mbox{\hyperlink{class_i_stream_wrapper_a992cd4a65ad4b6fbccbd5a2006fb38cf}{Take}}()\ !=\ \textcolor{charliteral}{'\(\backslash\)0'})}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00498}00498\ \ \ \ \ \ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00499}00499\ \ \ \ \ \ \ \ \ is.close();}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00500}00500\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00501}00501\ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00502}00502\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00503}\mbox{\hyperlink{rapidjsontest_8cpp_ade385e9ec32bd32f1690280a746a663b}{00503}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{class_rapid_json}{RapidJson}},\ \mbox{\hyperlink{rapidjsontest_8cpp_acdeb8bf1a2cf8ab5b4b520fdcf470958}{SIMD\_SUFFIX}}(ReaderParse\_DummyHandler\_IStreamWrapper))\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00504}00504\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ kTrialCount;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00505}00505\ \ \ \ \ \ \ \ \ std::ifstream\ is(filename\_,\ std::ios::in\ |\ std::ios::binary);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00506}00506\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ buffer[65536];}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00507}00507\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_i_stream_wrapper}{IStreamWrapper}}\ isw(is,\ buffer,\ \textcolor{keyword}{sizeof}(buffer));}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00508}00508\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_base_reader_handler}{BaseReaderHandler<>}}\ h;}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00509}00509\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_reader}{Reader}}\ reader;}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00510}00510\ \ \ \ \ \ \ \ \ reader.\mbox{\hyperlink{class_generic_reader_a0c450620d14ff1824e58bb7bd9b42099}{Parse}}(isw,\ h);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00511}00511\ \ \ \ \ \ \ \ \ is.close();}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00512}00512\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00513}00513\ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00514}00514\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00515}\mbox{\hyperlink{rapidjsontest_8cpp_a4c765ff3cc2dbed0fe4b59509272bdc9}{00515}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{class_rapid_json}{RapidJson}},\ \mbox{\hyperlink{rapidjsontest_8cpp_acdeb8bf1a2cf8ab5b4b520fdcf470958}{SIMD\_SUFFIX}}(ReaderParse\_DummyHandler\_IStreamWrapper\_Unbuffered))\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00516}00516\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ kTrialCount;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00517}00517\ \ \ \ \ \ \ \ \ std::ifstream\ is(filename\_,\ std::ios::in\ |\ std::ios::binary);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00518}00518\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_i_stream_wrapper}{IStreamWrapper}}\ isw(is);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00519}00519\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_base_reader_handler}{BaseReaderHandler<>}}\ h;}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00520}00520\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_reader}{Reader}}\ reader;}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00521}00521\ \ \ \ \ \ \ \ \ reader.\mbox{\hyperlink{class_generic_reader_a0c450620d14ff1824e58bb7bd9b42099}{Parse}}(isw,\ h);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00522}00522\ \ \ \ \ \ \ \ \ is.close();}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00523}00523\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00524}00524\ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00525}00525\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00526}\mbox{\hyperlink{rapidjsontest_8cpp_a468dd3d8d3db254455a83503d48ecff3}{00526}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{class_rapid_json}{RapidJson}},\ \mbox{\hyperlink{rapidjsontest_8cpp_acdeb8bf1a2cf8ab5b4b520fdcf470958}{SIMD\_SUFFIX}}(ReaderParse\_DummyHandler\_IStreamWrapper\_Setbuffered))\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00527}00527\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ kTrialCount;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00528}00528\ \ \ \ \ \ \ \ \ std::ifstream\ is;}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00529}00529\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ buffer[65536];}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00530}00530\ \ \ \ \ \ \ \ \ is.rdbuf()-\/>pubsetbuf(buffer,\ \textcolor{keyword}{sizeof}(buffer));}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00531}00531\ \ \ \ \ \ \ \ \ is.open(filename\_,\ std::ios::in\ |\ std::ios::binary);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00532}00532\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_i_stream_wrapper}{IStreamWrapper}}\ isw(is);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00533}00533\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_base_reader_handler}{BaseReaderHandler<>}}\ h;}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00534}00534\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_reader}{Reader}}\ reader;}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00535}00535\ \ \ \ \ \ \ \ \ reader.\mbox{\hyperlink{class_generic_reader_a0c450620d14ff1824e58bb7bd9b42099}{Parse}}(isw,\ h);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00536}00536\ \ \ \ \ \ \ \ \ is.close();}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00537}00537\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00538}00538\ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00539}00539\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00540}\mbox{\hyperlink{rapidjsontest_8cpp_a0f38c4daa432d3b8b275790f12642103}{00540}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{class_rapid_json}{RapidJson}},\ \mbox{\hyperlink{class_generic_string_buffer}{StringBuffer}})\ \{}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00541}00541\ \ \ \ \ \mbox{\hyperlink{class_generic_string_buffer}{StringBuffer}}\ sb;}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00542}00542\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ 32\ *\ 1024\ *\ 1024;\ i++)}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00543}00543\ \ \ \ \ \ \ \ \ sb.\mbox{\hyperlink{class_generic_string_buffer_a8be5c8fadccacdcf40e20220f38e0afa}{Put}}(i\ \&\ 0x7f);}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00544}00544\ \}}
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00545}00545\ }
+\DoxyCodeLine{\Hypertarget{rapidjsontest_8cpp_source_l00546}00546\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ TEST\_RAPIDJSON}}
+
+\end{DoxyCode}

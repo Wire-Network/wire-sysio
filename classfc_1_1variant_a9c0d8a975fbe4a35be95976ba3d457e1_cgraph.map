@@ -1,0 +1,13 @@
+<map id="fc::variant::variant" name="fc::variant::variant">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,132,56"/>
+<area shape="rect" id="Node000002" href="$yubihsm__pkcs11_8c.html#adc4bd59a60361844aa0e852efa210105" title=" " alt="" coords="194,5,262,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="132,31,179,23,179,29,132,36"/>
+<area shape="rect" id="Node000003" href="$namespacefc.html#adea61f2343de94d0fbcb920a32332ad9" title=" " alt="" coords="180,55,277,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="132,50,165,55,164,61,132,56"/>
+<area shape="rect" id="Node000004" href="$structsysio_1_1chain_1_1shared__public__key.html#a328e4a70940629953f9087100c46b207" title=" " alt="" coords="325,47,473,88"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="277,65,310,65,310,70,277,70"/>
+<area shape="rect" id="Node000005" href="$classfc_1_1crypto_1_1public__key.html#ada5158a385e0d407268feb4790ba8646" title=" " alt="" coords="521,47,640,88"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="474,65,506,65,506,70,474,70"/>
+<area shape="rect" id="Node000006" href="$classfc_1_1crypto_1_1public__key.html#aa96a2da856cbba914572aa8629c06c09" title=" " alt="" coords="688,47,806,88"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="640,65,672,65,672,70,640,70"/>
+</map>

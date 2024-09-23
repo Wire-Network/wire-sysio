@@ -1,0 +1,25 @@
+<map id="sysio::chain::resource_limits::impl::downgrade_cast" name="sysio::chain::resource_limits::impl::downgrade_cast">
+<area shape="rect" id="Node000001" title=" " alt="" coords="764,158,959,199"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__decay__accumulator.html#a7c43f1116b19642adb82bf15209b7e7d" title=" " alt="" coords="245,85,415,141"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="781,156,716,141,637,130,557,123,415,116,416,111,557,118,637,125,717,136,782,151"/>
+<area shape="rect" id="Node000004" href="$structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator.html#aa0e71fca059e77ca32875a373e446f67" title=" " alt="" coords="486,151,716,206"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="749,181,717,181,717,176,749,176"/>
+<area shape="rect" id="Node000005" href="$classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager.html#a2dc85a639cfd3a5e0238142d3ed3c53f" title=" " alt="" coords="508,230,694,300"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="784,207,695,237,693,232,783,202"/>
+<area shape="rect" id="Node000007" href="$classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager.html#afa522b2321b49a3f55beba024129e000" title=" " alt="" coords="510,324,692,395"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="834,213,782,263,718,314,694,328,692,323,715,310,779,260,830,209"/>
+<area shape="rect" id="Node000009" href="$structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__decay__accumulator.html#abc4ee547b6c671caa718c2a761be9ebb" title=" " alt="" coords="492,20,711,76"/>
+<area shape="poly" id="edge9_Node000001_Node000009" title=" " alt="" coords="814,152,715,97,675,79,677,74,718,92,816,148"/>
+<area shape="rect" id="Node000003" href="$classvalidate__reflection_1_1_empty_scope.html#a1fb4f76506790294268dc078986d7430" title=" " alt="" coords="5,125,174,166"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="229,129,175,137,174,131,229,124"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="470,173,174,153,174,148,471,167"/>
+<area shape="rect" id="Node000006" href="$classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager.html#a43b17296f9507b5d046c5bf57568d8b2" title=" " alt="" coords="222,237,438,293"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="493,268,438,268,438,262,493,262"/>
+<area shape="rect" id="Node000008" href="$classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager.html#a6ee64e0876365e3c6e2aeec83591a9ef" title=" " alt="" coords="223,332,436,388"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="495,362,437,362,437,357,495,357"/>
+<area shape="poly" id="edge10_Node000009_Node000002" title=" " alt="" coords="477,81,416,95,415,90,475,75"/>
+<area shape="rect" id="Node000010" href="$structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__decay__accumulator.html#a810496e2ab1c59b8967e8e961ab3403a" title=" " alt="" coords="231,5,429,61"/>
+<area shape="poly" id="edge11_Node000009_Node000010" title=" " alt="" coords="476,44,429,41,430,36,476,38"/>
+<area shape="rect" id="Node000011" href="$classsysio_1_1subjective__billing.html#a24c7829695461e95f71a1e209b3bda1f" title=" " alt="" coords="10,13,169,54"/>
+<area shape="poly" id="edge12_Node000010_Node000011" title=" " alt="" coords="215,36,170,36,170,30,215,30"/>
+</map>

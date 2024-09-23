@@ -1,0 +1,120 @@
+\doxysection{set\+\_\+action\+\_\+permission\+\_\+subcommand Struct Reference}
+\hypertarget{structset__action__permission__subcommand}{}\label{structset__action__permission__subcommand}\index{set\_action\_permission\_subcommand@{set\_action\_permission\_subcommand}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structset__action__permission__subcommand_a21e2eff93402582965baf60440fb85b0}{set\+\_\+action\+\_\+permission\+\_\+subcommand}} (\mbox{\hyperlink{class_c_l_i_1_1_app}{CLI\+::\+App}} \texorpdfstring{$\ast$}{*}action\+Root)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structset__action__permission__subcommand_a19502b8e613dc2fc4f86e2583b04890c}{account\+Str}}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structset__action__permission__subcommand_af7f56bf710dd0532b918e9ba68e272ec}{code\+Str}}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structset__action__permission__subcommand_abe45d0fe0fe2f85e116e1ab5db3de828}{type\+Str}}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structset__action__permission__subcommand_aa780d520bd42512a47d21a46708f5696}{requirement\+Str}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l00978}{978}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structset__action__permission__subcommand_a21e2eff93402582965baf60440fb85b0}\index{set\_action\_permission\_subcommand@{set\_action\_permission\_subcommand}!set\_action\_permission\_subcommand@{set\_action\_permission\_subcommand}}
+\index{set\_action\_permission\_subcommand@{set\_action\_permission\_subcommand}!set\_action\_permission\_subcommand@{set\_action\_permission\_subcommand}}
+\doxysubsubsection{\texorpdfstring{set\_action\_permission\_subcommand()}{set\_action\_permission\_subcommand()}}
+{\footnotesize\ttfamily \label{structset__action__permission__subcommand_a21e2eff93402582965baf60440fb85b0} 
+set\+\_\+action\+\_\+permission\+\_\+subcommand\+::set\+\_\+action\+\_\+permission\+\_\+subcommand (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_c_l_i_1_1_app}{CLI\+::\+App}} \texorpdfstring{$\ast$}{*}}]{action\+Root}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l00984}{984}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00984\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00985\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ permissions\ =\ actionRoot-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_a8b461d2233ec4121259011b5ed24b336}{add\_subcommand}}(\textcolor{stringliteral}{"{}permission"{}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}set\ parmaters\ dealing\ with\ account\ permissions"{}}));}
+\DoxyCodeLine{00986\ \ \ \ \ \ \ permissions-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_a8c812d42c7720ecb5cd0aec41b5aa941}{add\_option}}(\textcolor{stringliteral}{"{}account"{}},\ \mbox{\hyperlink{structset__action__permission__subcommand_a19502b8e613dc2fc4f86e2583b04890c}{accountStr}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}The\ account\ to\ set/delete\ a\ permission\ authority\ for"{}}))-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a}{required}}();}
+\DoxyCodeLine{00987\ \ \ \ \ \ \ permissions-\/>add\_option(\textcolor{stringliteral}{"{}code"{}},\ \mbox{\hyperlink{structset__action__permission__subcommand_af7f56bf710dd0532b918e9ba68e272ec}{codeStr}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}The\ account\ that\ owns\ the\ code\ for\ the\ action"{}}))-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a}{required}}();}
+\DoxyCodeLine{00988\ \ \ \ \ \ \ permissions-\/>add\_option(\textcolor{stringliteral}{"{}type"{}},\ \mbox{\hyperlink{structset__action__permission__subcommand_abe45d0fe0fe2f85e116e1ab5db3de828}{typeStr}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}The\ type\ of\ the\ action"{}}))-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a}{required}}();}
+\DoxyCodeLine{00989\ \ \ \ \ \ \ permissions-\/>add\_option(\textcolor{stringliteral}{"{}requirement"{}},\ \mbox{\hyperlink{structset__action__permission__subcommand_aa780d520bd42512a47d21a46708f5696}{requirementStr}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}[delete]\ NULL,\ [set/update]\ The\ permission\ name\ require\ for\ executing\ the\ given\ action"{}}))-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a}{required}}();}
+\DoxyCodeLine{00990\ }
+\DoxyCodeLine{00991\ \ \ \ \ \ \ \mbox{\hyperlink{programs_2clio_2main_8cpp_aa5d53f41b83b5323c73622fbbb15e9cd}{add\_standard\_transaction\_options}}(permissions,\ \textcolor{stringliteral}{"{}account@active"{}});}
+\DoxyCodeLine{00992\ }
+\DoxyCodeLine{00993\ \ \ \ \ \ \ permissions-\/>callback([\textcolor{keyword}{this}]\ \{}
+\DoxyCodeLine{00994\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\ account\ =\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(\mbox{\hyperlink{structset__action__permission__subcommand_a19502b8e613dc2fc4f86e2583b04890c}{accountStr}});}
+\DoxyCodeLine{00995\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\ code\ =\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(\mbox{\hyperlink{structset__action__permission__subcommand_af7f56bf710dd0532b918e9ba68e272ec}{codeStr}});}
+\DoxyCodeLine{00996\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\ type\ =\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(\mbox{\hyperlink{structset__action__permission__subcommand_abe45d0fe0fe2f85e116e1ab5db3de828}{typeStr}});}
+\DoxyCodeLine{00997\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ is\_delete\ =\ boost::iequals(\mbox{\hyperlink{structset__action__permission__subcommand_aa780d520bd42512a47d21a46708f5696}{requirementStr}},\ \textcolor{stringliteral}{"{}null"{}});}
+\DoxyCodeLine{00998\ }
+\DoxyCodeLine{00999\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_delete)\ \{}
+\DoxyCodeLine{01000\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{programs_2clio_2main_8cpp_aaf784434864a29e4835be7465173d1ab}{send\_actions}}(\{\mbox{\hyperlink{programs_2clio_2main_8cpp_a9e2e3d87f5264529deabe3cac39ce57e}{create\_unlinkauth}}(account,\ code,\ type)\});}
+\DoxyCodeLine{01001\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{01002\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\ requirement\ =\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(\mbox{\hyperlink{structset__action__permission__subcommand_aa780d520bd42512a47d21a46708f5696}{requirementStr}});}
+\DoxyCodeLine{01003\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{programs_2clio_2main_8cpp_aaf784434864a29e4835be7465173d1ab}{send\_actions}}(\{\mbox{\hyperlink{programs_2clio_2main_8cpp_a7a4d40801cad71c78959641b5f99155f}{create\_linkauth}}(account,\ code,\ type,\ requirement)\});}
+\DoxyCodeLine{01004\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01005\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{01006\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structset__action__permission__subcommand_a21e2eff93402582965baf60440fb85b0_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structset__action__permission__subcommand_a19502b8e613dc2fc4f86e2583b04890c}\index{set\_action\_permission\_subcommand@{set\_action\_permission\_subcommand}!accountStr@{accountStr}}
+\index{accountStr@{accountStr}!set\_action\_permission\_subcommand@{set\_action\_permission\_subcommand}}
+\doxysubsubsection{\texorpdfstring{accountStr}{accountStr}}
+{\footnotesize\ttfamily \label{structset__action__permission__subcommand_a19502b8e613dc2fc4f86e2583b04890c} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} set\+\_\+action\+\_\+permission\+\_\+subcommand\+::account\+Str}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l00979}{979}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{structset__action__permission__subcommand_af7f56bf710dd0532b918e9ba68e272ec}\index{set\_action\_permission\_subcommand@{set\_action\_permission\_subcommand}!codeStr@{codeStr}}
+\index{codeStr@{codeStr}!set\_action\_permission\_subcommand@{set\_action\_permission\_subcommand}}
+\doxysubsubsection{\texorpdfstring{codeStr}{codeStr}}
+{\footnotesize\ttfamily \label{structset__action__permission__subcommand_af7f56bf710dd0532b918e9ba68e272ec} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} set\+\_\+action\+\_\+permission\+\_\+subcommand\+::code\+Str}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l00980}{980}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{structset__action__permission__subcommand_aa780d520bd42512a47d21a46708f5696}\index{set\_action\_permission\_subcommand@{set\_action\_permission\_subcommand}!requirementStr@{requirementStr}}
+\index{requirementStr@{requirementStr}!set\_action\_permission\_subcommand@{set\_action\_permission\_subcommand}}
+\doxysubsubsection{\texorpdfstring{requirementStr}{requirementStr}}
+{\footnotesize\ttfamily \label{structset__action__permission__subcommand_aa780d520bd42512a47d21a46708f5696} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} set\+\_\+action\+\_\+permission\+\_\+subcommand\+::requirement\+Str}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l00982}{982}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{structset__action__permission__subcommand_abe45d0fe0fe2f85e116e1ab5db3de828}\index{set\_action\_permission\_subcommand@{set\_action\_permission\_subcommand}!typeStr@{typeStr}}
+\index{typeStr@{typeStr}!set\_action\_permission\_subcommand@{set\_action\_permission\_subcommand}}
+\doxysubsubsection{\texorpdfstring{typeStr}{typeStr}}
+{\footnotesize\ttfamily \label{structset__action__permission__subcommand_abe45d0fe0fe2f85e116e1ab5db3de828} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} set\+\_\+action\+\_\+permission\+\_\+subcommand\+::type\+Str}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l00981}{981}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+programs/clio/\mbox{\hyperlink{programs_2clio_2main_8cpp}{main.\+cpp}}\end{DoxyCompactItemize}

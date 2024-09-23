@@ -1,0 +1,136 @@
+\doxysection{websocketpp\+::lib\+::net Namespace Reference}
+\hypertarget{namespacewebsocketpp_1_1lib_1_1net}{}\label{namespacewebsocketpp_1_1lib_1_1net}\index{websocketpp::lib::net@{websocketpp::lib::net}}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{namespacewebsocketpp_1_1lib_1_1net_a321373761665b77eaf5d78ff5e535941}{is\+\_\+little\+\_\+endian}} ()
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{namespacewebsocketpp_1_1lib_1_1net_ab3e62ef8d23c6e35b1d726fa1fa1c537}{\+\_\+htonll}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} src)
+\begin{DoxyCompactList}\small\item\em Convert 64 bit value to network byte order. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{namespacewebsocketpp_1_1lib_1_1net_ae2011914840da1dcbcac7266213a8709}{\+\_\+ntohll}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} src)
+\begin{DoxyCompactList}\small\item\em Convert 64 bit value to host byte order. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacewebsocketpp_1_1lib_1_1net_ab3e62ef8d23c6e35b1d726fa1fa1c537}\index{websocketpp::lib::net@{websocketpp::lib::net}!\_htonll@{\_htonll}}
+\index{\_htonll@{\_htonll}!websocketpp::lib::net@{websocketpp::lib::net}}
+\doxysubsubsection{\texorpdfstring{\_htonll()}{\_htonll()}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1lib_1_1net_ab3e62ef8d23c6e35b1d726fa1fa1c537} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} websocketpp\+::lib\+::net\+::\+\_\+htonll (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{src}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+This method is prefixed to avoid conflicts with operating system level macros for this functionality.
+
+TODO\+: figure out if it would be beneficial to use operating system level macros for this.
+
+
+\begin{DoxyParams}{Parameters}
+{\em src} & The integer in host byte order \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+src converted to network byte order 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{network_8hpp_source_l00066}{66}} of file \mbox{\hyperlink{network_8hpp_source}{network.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00067\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ typ\ =\ \mbox{\hyperlink{network_8hpp_a9b9b272ba46c18c861eb8792bba29ab6}{TYP\_INIT}};}
+\DoxyCodeLine{00068\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ c;}
+\DoxyCodeLine{00069\ \ \ \ \ \textcolor{keyword}{union\ }\{}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ ull;}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ c[8];}
+\DoxyCodeLine{00072\ \ \ \ \ \}\ x;}
+\DoxyCodeLine{00073\ \ \ \ \ \textcolor{keywordflow}{if}\ (typ\ ==\ \mbox{\hyperlink{network_8hpp_a9b9b272ba46c18c861eb8792bba29ab6}{TYP\_INIT}})\ \{}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ x.ull\ =\ 0x01;}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ typ\ =\ (x.c[7]\ ==\ 0x01ULL)\ ?\ \mbox{\hyperlink{network_8hpp_a1636e6653469718780dbfe0fa77e9aba}{TYP\_BIGE}}\ :\ \mbox{\hyperlink{network_8hpp_a936f22510637d64998aac686f9748a4d}{TYP\_SMLE}};}
+\DoxyCodeLine{00076\ \ \ \ \ \}}
+\DoxyCodeLine{00077\ \ \ \ \ \textcolor{keywordflow}{if}\ (typ\ ==\ \mbox{\hyperlink{network_8hpp_a1636e6653469718780dbfe0fa77e9aba}{TYP\_BIGE}})}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ src;}
+\DoxyCodeLine{00079\ \ \ \ \ x.ull\ =\ src;}
+\DoxyCodeLine{00080\ \ \ \ \ c\ =\ x.c[0];\ x.c[0]\ =\ x.c[7];\ x.c[7]\ =\ c;}
+\DoxyCodeLine{00081\ \ \ \ \ c\ =\ x.c[1];\ x.c[1]\ =\ x.c[6];\ x.c[6]\ =\ c;}
+\DoxyCodeLine{00082\ \ \ \ \ c\ =\ x.c[2];\ x.c[2]\ =\ x.c[5];\ x.c[5]\ =\ c;}
+\DoxyCodeLine{00083\ \ \ \ \ c\ =\ x.c[3];\ x.c[3]\ =\ x.c[4];\ x.c[4]\ =\ c;}
+\DoxyCodeLine{00084\ \ \ \ \ \textcolor{keywordflow}{return}\ x.ull;}
+\DoxyCodeLine{00085\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacewebsocketpp_1_1lib_1_1net_ab3e62ef8d23c6e35b1d726fa1fa1c537_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacewebsocketpp_1_1lib_1_1net_ae2011914840da1dcbcac7266213a8709}\index{websocketpp::lib::net@{websocketpp::lib::net}!\_ntohll@{\_ntohll}}
+\index{\_ntohll@{\_ntohll}!websocketpp::lib::net@{websocketpp::lib::net}}
+\doxysubsubsection{\texorpdfstring{\_ntohll()}{\_ntohll()}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1lib_1_1net_ae2011914840da1dcbcac7266213a8709} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} websocketpp\+::lib\+::net\+::\+\_\+ntohll (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{src}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+This method is prefixed to avoid conflicts with operating system level macros for this functionality.
+
+TODO\+: figure out if it would be beneficial to use operating system level macros for this.
+
+
+\begin{DoxyParams}{Parameters}
+{\em src} & The integer in network byte order \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+src converted to host byte order 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{network_8hpp_source_l00098}{98}} of file \mbox{\hyperlink{network_8hpp_source}{network.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00099\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacewebsocketpp_1_1lib_1_1net_ab3e62ef8d23c6e35b1d726fa1fa1c537}{\_htonll}}(src);}
+\DoxyCodeLine{00100\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=334pt]{namespacewebsocketpp_1_1lib_1_1net_ae2011914840da1dcbcac7266213a8709_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacewebsocketpp_1_1lib_1_1net_ae2011914840da1dcbcac7266213a8709_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacewebsocketpp_1_1lib_1_1net_a321373761665b77eaf5d78ff5e535941}\index{websocketpp::lib::net@{websocketpp::lib::net}!is\_little\_endian@{is\_little\_endian}}
+\index{is\_little\_endian@{is\_little\_endian}!websocketpp::lib::net@{websocketpp::lib::net}}
+\doxysubsubsection{\texorpdfstring{is\_little\_endian()}{is\_little\_endian()}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1lib_1_1net_a321373761665b77eaf5d78ff5e535941} 
+bool websocketpp\+::lib\+::net\+::is\+\_\+little\+\_\+endian (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{network_8hpp_source_l00045}{45}} of file \mbox{\hyperlink{network_8hpp_source}{network.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00046\ \ \ \ \ \textcolor{keywordtype}{short}\ \textcolor{keywordtype}{int}\ val\ =\ 0x1;}
+\DoxyCodeLine{00047\ \ \ \ \ \textcolor{keywordtype}{char}\ *ptr\ =\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{char}\ *\textcolor{keyword}{>}(\&val);}
+\DoxyCodeLine{00048\ \ \ \ \ \textcolor{keywordflow}{return}\ (ptr[0]\ ==\ 1);}
+\DoxyCodeLine{00049\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacewebsocketpp_1_1lib_1_1net_a321373761665b77eaf5d78ff5e535941_icgraph}
+\end{center}
+\end{figure}

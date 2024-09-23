@@ -1,0 +1,93 @@
+\doxysection{test\+\_\+configuration\+\_\+utils.\+cpp}
+\hypertarget{test__configuration__utils_8cpp_source}{}\label{test__configuration__utils_8cpp_source}\index{plugins/trace\_api\_plugin/test/test\_configuration\_utils.cpp@{plugins/trace\_api\_plugin/test/test\_configuration\_utils.cpp}}
+\mbox{\hyperlink{test__configuration__utils_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00001}\mbox{\hyperlink{test__configuration__utils_8cpp_a6b2a3852db8bb19ab6909bac01859985}{00001}}\ \textcolor{preprocessor}{\#define\ BOOST\_TEST\_MODULE\ trace\_configuration\_utils}}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <boost/test/included/unit\_test.hpp>}}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <list>}}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <boost/filesystem.hpp>}}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <boost/filesystem/fstream.hpp>}}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{configuration__utils_8hpp}{sysio/trace\_api/configuration\_utils.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{test__common_8hpp}{sysio/trace\_api/test\_common.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00010}00010\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}};}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00011}00011\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacesysio_1_1trace__api_1_1configuration__utils}{sysio::trace\_api::configuration\_utils}};}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00013}00013\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceboost_1_1filesystem}{bfs}}\ =\ \mbox{\hyperlink{namespaceboost_1_1filesystem}{boost::filesystem}};}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00015}00015\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structtemp__file__fixture}{temp\_file\_fixture}}\ \{}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00016}\mbox{\hyperlink{structtemp__file__fixture_a58f5d52e16991c9190b499fb5ca3a5a8}{00016}}\ \ \ \ \mbox{\hyperlink{structtemp__file__fixture_a58f5d52e16991c9190b499fb5ca3a5a8}{temp\_file\_fixture}}()\ \{\}}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00018}\mbox{\hyperlink{structtemp__file__fixture_a69439d16caa94c68351e3298374b7c83}{00018}}\ \ \ \ \mbox{\hyperlink{structtemp__file__fixture_a69439d16caa94c68351e3298374b7c83}{\string~temp\_file\_fixture}}()\ \{}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00019}00019\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}:\ \mbox{\hyperlink{structtemp__file__fixture_a8641500328301e32a05bce0f9d737560}{paths}})\ \{}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00020}00020\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (bfs::exists(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}))\ \{}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00021}00021\ \ \ \ \ \ \ \ \ \ \ \ \ bfs::remove(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}});}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00022}00022\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00023}00023\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00024}00024\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00026}\mbox{\hyperlink{structtemp__file__fixture_a21628eec6c32716a967c1f8a50ade61f}{00026}}\ \ \ \ std::string\ \mbox{\hyperlink{structtemp__file__fixture_a21628eec6c32716a967c1f8a50ade61f}{create\_temp\_file}}(\ \textcolor{keyword}{const}\ std::string\&\ contents\ )\ \{}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00027}00027\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{classfc_1_1path}{path}}\ =\ bfs::temp\_directory\_path()\ /\ bfs::unique\_path();}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00028}00028\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ os\ =\ bfs::ofstream(\mbox{\hyperlink{classfc_1_1path}{path}},\ std::ios\_base::out);}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00029}00029\ \ \ \ \ \ \ os\ <<\ contents;}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00030}00030\ \ \ \ \ \ \ os.close();}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00031}00031\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structtemp__file__fixture_a8641500328301e32a05bce0f9d737560}{paths}}.emplace\_back(std::move(\mbox{\hyperlink{classfc_1_1path}{path}})).generic\_string();}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00032}00032\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00034}00034\ \ \ \ std::list<bfs::path>\ \mbox{\hyperlink{structtemp__file__fixture_a8641500328301e32a05bce0f9d737560}{paths}};}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00035}00035\ \};}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00037}00037\ BOOST\_AUTO\_TEST\_SUITE(configuration\_utils\_tests)}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00038}\mbox{\hyperlink{test__configuration__utils_8cpp_ab196ea5cdfde9600d99e1abd208ab402}{00038}}\ \ \ \ \mbox{\hyperlink{test__configuration__utils_8cpp_ab196ea5cdfde9600d99e1abd208ab402}{BOOST\_AUTO\_TEST\_CASE}}(parse\_kv\_pairs\_test)}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00039}00039\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00040}00040\ \ \ \ \ \ \ \textcolor{keyword}{using\ }spair\ =\ std::pair<std::string,\ std::string>;}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00042}00042\ \ \ \ \ \ \ \textcolor{comment}{//\ basic}}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00043}00043\ \ \ \ \ \ \ BOOST\_TEST(\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1configuration__utils_a1d240ad24c2e4abfb7daa4fa19ac36bf}{parse\_kv\_pairs}}(\textcolor{stringliteral}{"{}a=b"{}})\ ==\ spair(\textcolor{stringliteral}{"{}a"{}},\ \textcolor{stringliteral}{"{}b"{}})\ );}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00044}00044\ \ \ \ \ \ \ BOOST\_TEST(\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1configuration__utils_a1d240ad24c2e4abfb7daa4fa19ac36bf}{parse\_kv\_pairs}}(\textcolor{stringliteral}{"{}a==b"{}})\ ==\ spair(\textcolor{stringliteral}{"{}a"{}},\ \textcolor{stringliteral}{"{}=b"{}})\ );}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00045}00045\ \ \ \ \ \ \ BOOST\_TEST(\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1configuration__utils_a1d240ad24c2e4abfb7daa4fa19ac36bf}{parse\_kv\_pairs}}(\textcolor{stringliteral}{"{}a=\{\}:\(\backslash\)"{}="{}})\ ==\ spair(\textcolor{stringliteral}{"{}a"{}},\ \textcolor{stringliteral}{"{}\{\}:\(\backslash\)"{}="{}})\ );}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00046}00046\ \ \ \ \ \ \ BOOST\_TEST(\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1configuration__utils_a1d240ad24c2e4abfb7daa4fa19ac36bf}{parse\_kv\_pairs}}(\textcolor{stringliteral}{"{}\{\}:\(\backslash\)"{}=a"{}})\ ==\ spair(\textcolor{stringliteral}{"{}\{\}:\(\backslash\)"{}"{}},\ \textcolor{stringliteral}{"{}a"{}})\ );}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00048}00048\ \ \ \ \ \ \ \textcolor{comment}{//\ missing\ key\ not\ OK}}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00049}00049\ \ \ \ \ \ \ BOOST\_REQUIRE\_THROW(\mbox{\hyperlink{namespacesysio_1_1trace__api_1_1configuration__utils_a1d240ad24c2e4abfb7daa4fa19ac36bf}{parse\_kv\_pairs}}(\textcolor{stringliteral}{"{}=b"{}}),\ chain::plugin\_config\_exception);}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00051}00051\ \ \ \ \ \ \ \textcolor{comment}{//\ missing\ value\ not\ OK}}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00052}00052\ \ \ \ \ \ \ BOOST\_REQUIRE\_THROW(\mbox{\hyperlink{namespacesysio_1_1trace__api_1_1configuration__utils_a1d240ad24c2e4abfb7daa4fa19ac36bf}{parse\_kv\_pairs}}(\textcolor{stringliteral}{"{}a="{}}),\ chain::plugin\_config\_exception);}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00054}00054\ \ \ \ \ \ \ \textcolor{comment}{//\ missing\ =\ not\ OK}}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00055}00055\ \ \ \ \ \ \ BOOST\_REQUIRE\_THROW(\mbox{\hyperlink{namespacesysio_1_1trace__api_1_1configuration__utils_a1d240ad24c2e4abfb7daa4fa19ac36bf}{parse\_kv\_pairs}}(\textcolor{stringliteral}{"{}a"{}}),\ chain::plugin\_config\_exception);}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00057}00057\ \ \ \ \ \ \ \textcolor{comment}{//\ emptynot\ OK}}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00058}00058\ \ \ \ \ \ \ BOOST\_REQUIRE\_THROW(\mbox{\hyperlink{namespacesysio_1_1trace__api_1_1configuration__utils_a1d240ad24c2e4abfb7daa4fa19ac36bf}{parse\_kv\_pairs}}(\textcolor{stringliteral}{"{}"{}}),\ chain::plugin\_config\_exception);}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00060}00060\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00062}\mbox{\hyperlink{test__configuration__utils_8cpp_a595a81017330a8960029d489fd8595cc}{00062}}\ \ \ \ \mbox{\hyperlink{test__configuration__utils_8cpp_a595a81017330a8960029d489fd8595cc}{BOOST\_FIXTURE\_TEST\_CASE}}(abi\_def\_from\_file\_test,\ \mbox{\hyperlink{structtemp__file__fixture}{temp\_file\_fixture}})}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00063}00063\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00064}00064\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ data\_dir\ =\ \mbox{\hyperlink{classfc_1_1path}{fc::path}}(bfs::temp\_directory\_path());}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00065}00065\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ good\_json\ =\ std::string(\textcolor{stringliteral}{"{}\{\(\backslash\)"{}version\(\backslash\)"{}\ :\ \(\backslash\)"{}test\ string\ please\ ignore\(\backslash\)"{}\}"{}});}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00066}00066\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ good\_json\_filename\ =\ create\_temp\_file(good\_json);}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00067}00067\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ relative\_json\_filename\ =\ bfs::path(good\_json\_filename).filename().generic\_string();}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00069}00069\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ good\_abi\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1abi__def}{chain::abi\_def}}();}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00070}00070\ \ \ \ \ \ \ good\_abi.version\ =\ \textcolor{stringliteral}{"{}test\ string\ please\ ignore"{}};}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00072}00072\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ bad\_json\ \ =\ std::string(\textcolor{stringliteral}{"{}\{\{\(\backslash\)"{}version\(\backslash\)"{}:oops\(\backslash\)"{}\}"{}});}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00073}00073\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ bad\_json\_filename\ =\ create\_temp\_file(bad\_json);}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00074}00074\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ bad\_filename\ =\ (bfs::temp\_directory\_path()\ /\ bfs::unique\_path()).generic\_string();}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00075}00075\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ directory\_name\ =\ bfs::temp\_directory\_path().generic\_string();}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00076}00076\ }
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00077}00077\ \ \ \ \ \ \ \textcolor{comment}{//\ good\ cases}}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00078}00078\ \ \ \ \ \ \ BOOST\_TEST(\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1configuration__utils_af66eb1c8879c8d045ad82f33233aed66}{abi\_def\_from\_file}}(good\_json\_filename,\ data\_dir)\ ==\ good\_abi\ );}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00079}00079\ \ \ \ \ \ \ BOOST\_TEST(\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1configuration__utils_af66eb1c8879c8d045ad82f33233aed66}{abi\_def\_from\_file}}(relative\_json\_filename,\ data\_dir)\ ==\ good\_abi\ );}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00080}00080\ }
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00081}00081\ \ \ \ \ \ \ \textcolor{comment}{//\ bad\ cases}}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00082}00082\ \ \ \ \ \ \ BOOST\_REQUIRE\_THROW(\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1configuration__utils_af66eb1c8879c8d045ad82f33233aed66}{abi\_def\_from\_file}}(bad\_json\_filename,\ data\_dir),\ chain::json\_parse\_exception\ );}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00083}00083\ \ \ \ \ \ \ BOOST\_REQUIRE\_THROW(\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1configuration__utils_af66eb1c8879c8d045ad82f33233aed66}{abi\_def\_from\_file}}(bad\_filename,\ data\_dir),\ chain::plugin\_config\_exception\ );}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00084}00084\ \ \ \ \ \ \ BOOST\_REQUIRE\_THROW(\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1configuration__utils_af66eb1c8879c8d045ad82f33233aed66}{abi\_def\_from\_file}}(directory\_name,\ data\_dir),\ chain::plugin\_config\_exception\ );}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00085}00085\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00086}00086\ }
+\DoxyCodeLine{\Hypertarget{test__configuration__utils_8cpp_source_l00087}00087\ BOOST\_AUTO\_TEST\_SUITE\_END()}
+
+\end{DoxyCode}

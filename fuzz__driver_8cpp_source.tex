@@ -1,0 +1,20 @@
+\doxysection{fuzz\+\_\+driver.\+cpp}
+\hypertarget{fuzz__driver_8cpp_source}{}\label{fuzz__driver_8cpp_source}\index{libraries/sys-\/vm/tests/fuzz/fuzz\_driver.cpp@{libraries/sys-\/vm/tests/fuzz/fuzz\_driver.cpp}}
+\mbox{\hyperlink{fuzz__driver_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{fuzz__driver_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <sysio/wasm\_backend/backend.hpp>}}
+\DoxyCodeLine{\Hypertarget{fuzz__driver_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <sysio/vm/watchdog.hpp>}}
+\DoxyCodeLine{\Hypertarget{fuzz__driver_8cpp_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{fuzz__driver_8cpp_source_l00004}00004\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}};}
+\DoxyCodeLine{\Hypertarget{fuzz__driver_8cpp_source_l00005}00005\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacesysio_1_1wasm__backend}{sysio::wasm\_backend}};}
+\DoxyCodeLine{\Hypertarget{fuzz__driver_8cpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{fuzz__driver_8cpp_source_l00007}\mbox{\hyperlink{fuzz__driver_8cpp_a91ce7c16e9840492202299da2b451e60}{00007}}\ \textcolor{keyword}{extern}\ \textcolor{stringliteral}{"{}C"{}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{fuzz__driver_8cpp_a91ce7c16e9840492202299da2b451e60}{LLVMFuzzerTestOneInput}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}*\ data,\ \textcolor{keywordtype}{size\_t}\ size\ )\ \{}
+\DoxyCodeLine{\Hypertarget{fuzz__driver_8cpp_source_l00008}00008\ \ \ \ wasm\_allocator\ \mbox{\hyperlink{allow__code__after__function__end__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}};}
+\DoxyCodeLine{\Hypertarget{fuzz__driver_8cpp_source_l00009}00009\ \ \ \ wasm\_code\ wc;\ }
+\DoxyCodeLine{\Hypertarget{fuzz__driver_8cpp_source_l00010}00010\ \ \ \ wc.resize(size);}
+\DoxyCodeLine{\Hypertarget{fuzz__driver_8cpp_source_l00011}00011\ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}((\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}*)wc.data(),\ data,\ size);}
+\DoxyCodeLine{\Hypertarget{fuzz__driver_8cpp_source_l00012}00012\ \ \ \ backend<std::nullptr\_t>\ \mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}(\ wc\ );}
+\DoxyCodeLine{\Hypertarget{fuzz__driver_8cpp_source_l00013}00013\ \ \ \ \mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_a6a3fbbc16a719762e15001d75ed3a6d0}{execute\_all}}(null\_watchdog());}
+\DoxyCodeLine{\Hypertarget{fuzz__driver_8cpp_source_l00014}00014\ \}}
+
+\end{DoxyCode}

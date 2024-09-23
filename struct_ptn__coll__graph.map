@@ -1,0 +1,17 @@
+<map id="Ptn" name="Ptn">
+<area shape="rect" id="Node000001" title=" " alt="" coords="119,343,160,369"/>
+<area shape="rect" id="Node000002" href="$struct_xbyak_1_1_reg8.html" title=" " alt="" coords="5,205,103,231"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="72,243,134,342,130,344,67,245"/>
+<area shape="rect" id="Node000003" href="$class_xbyak_1_1_reg.html" title=" " alt="" coords="113,80,203,106"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="140,120,66,206,62,203,136,116"/>
+<area shape="rect" id="Node000005" href="$struct_xbyak_1_1_reg16.html" title=" " alt="" coords="110,205,214,231"/>
+<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="162,122,164,204,159,204,156,122"/>
+<area shape="rect" id="Node000007" href="$struct_xbyak_1_1_reg32e.html" title=" " alt="" coords="196,155,307,181"/>
+<area shape="poly" id="edge8_Node000007_Node000003" title=" " alt="" coords="187,113,238,153,235,157,184,118"/>
+<area shape="rect" id="Node000004" href="$class_xbyak_1_1_operand.html" title=" " alt="" coords="100,5,216,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="161,46,161,80,155,80,155,46"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="156,246,154,255,143,343,137,343,149,254,151,245"/>
+<area shape="rect" id="Node000006" href="$struct_xbyak_1_1_reg32.html" title=" " alt="" coords="199,255,304,280"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="226,292,157,345,154,341,222,288"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="254,196,254,254,249,254,249,196"/>
+</map>

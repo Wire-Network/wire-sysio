@@ -1,0 +1,232 @@
+\doxysection{fc\+::tcp\+\_\+socket\+::impl Class Reference}
+\hypertarget{classfc_1_1tcp__socket_1_1impl}{}\label{classfc_1_1tcp__socket_1_1impl}\index{fc::tcp\_socket::impl@{fc::tcp\_socket::impl}}
+
+
+Inheritance diagram for fc\+::tcp\+\_\+socket\+::impl\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=188pt]{classfc_1_1tcp__socket_1_1impl__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for fc\+::tcp\+\_\+socket\+::impl\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=311pt]{classfc_1_1tcp__socket_1_1impl__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1tcp__socket_1_1impl_a58f9aa3ed7aa2159d17be5dccb47bca4}{impl}} ()
+\item 
+\mbox{\hyperlink{classfc_1_1tcp__socket_1_1impl_afd552d51b85a29c5b7b4115a45bcc389}{\texorpdfstring{$\sim$}{\string~}impl}} ()
+\item 
+virtual size\+\_\+t \mbox{\hyperlink{classfc_1_1tcp__socket_1_1impl_a227d73b46fe2857e60370ae8e6a8b281}{readsome}} (boost\+::asio\+::ip\+::tcp\+::socket \&socket, char \texorpdfstring{$\ast$}{*}buffer, size\+\_\+t length) override
+\item 
+virtual size\+\_\+t \mbox{\hyperlink{classfc_1_1tcp__socket_1_1impl_ab2755393e3ba9ee2de7db230d7f98e47}{readsome}} (boost\+::asio\+::ip\+::tcp\+::socket \&socket, const std\+::shared\+\_\+ptr$<$ char $>$ \&buffer, size\+\_\+t length, size\+\_\+t offset) override
+\item 
+virtual size\+\_\+t \mbox{\hyperlink{classfc_1_1tcp__socket_1_1impl_af400365fe77a5d4bcf65f2c3b469ad7a}{writesome}} (boost\+::asio\+::ip\+::tcp\+::socket \&socket, const char \texorpdfstring{$\ast$}{*}buffer, size\+\_\+t length) override
+\item 
+virtual size\+\_\+t \mbox{\hyperlink{classfc_1_1tcp__socket_1_1impl_adf212edc6d5e21ffde8524b47f8566a8}{writesome}} (boost\+::asio\+::ip\+::tcp\+::socket \&socket, const std\+::shared\+\_\+ptr$<$ const char $>$ \&buffer, size\+\_\+t length, size\+\_\+t offset) override
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+future$<$ size\+\_\+t $>$ \mbox{\hyperlink{classfc_1_1tcp__socket_1_1impl_a6a27944b846b60683fc76c0722ab0b3d}{\+\_\+write\+\_\+in\+\_\+progress}}
+\item 
+future$<$ size\+\_\+t $>$ \mbox{\hyperlink{classfc_1_1tcp__socket_1_1impl_a8cba3c5b6af202d8d2c41ab98ff11747}{\+\_\+read\+\_\+in\+\_\+progress}}
+\item 
+boost\+::asio\+::ip\+::tcp\+::socket \mbox{\hyperlink{classfc_1_1tcp__socket_1_1impl_ac4695f911178daec324a35c6ff0ac265}{\+\_\+sock}}
+\item 
+tcp\+\_\+socket\+\_\+io\+\_\+hooks \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classfc_1_1tcp__socket_1_1impl_af5804ebfc87107a3e4a596d307a35158}{\+\_\+io\+\_\+hooks}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{tcp__socket_8cpp_source_l00022}{22}} of file \mbox{\hyperlink{tcp__socket_8cpp_source}{tcp\+\_\+socket.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1tcp__socket_1_1impl_a58f9aa3ed7aa2159d17be5dccb47bca4}\index{fc::tcp\_socket::impl@{fc::tcp\_socket::impl}!impl@{impl}}
+\index{impl@{impl}!fc::tcp\_socket::impl@{fc::tcp\_socket::impl}}
+\doxysubsubsection{\texorpdfstring{impl()}{impl()}}
+{\footnotesize\ttfamily \label{classfc_1_1tcp__socket_1_1impl_a58f9aa3ed7aa2159d17be5dccb47bca4} 
+fc\+::tcp\+\_\+socket\+::impl\+::impl (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{tcp__socket_8cpp_source_l00024}{24}} of file \mbox{\hyperlink{tcp__socket_8cpp_source}{tcp\+\_\+socket.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \ \ \ \ \ :}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1tcp__socket_1_1impl_ac4695f911178daec324a35c6ff0ac265}{\_sock}}(fc::asio::default\_io\_service()),}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1tcp__socket_1_1impl_af5804ebfc87107a3e4a596d307a35158}{\_io\_hooks}}(\textcolor{keyword}{this})}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1tcp__socket_1_1impl_afd552d51b85a29c5b7b4115a45bcc389}\index{fc::tcp\_socket::impl@{fc::tcp\_socket::impl}!````~impl@{\texorpdfstring{$\sim$}{\string~}impl}}
+\index{````~impl@{\texorpdfstring{$\sim$}{\string~}impl}!fc::tcp\_socket::impl@{fc::tcp\_socket::impl}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}impl()}{\string~impl()}}
+{\footnotesize\ttfamily \label{classfc_1_1tcp__socket_1_1impl_afd552d51b85a29c5b7b4115a45bcc389} 
+fc\+::tcp\+\_\+socket\+::impl\+::\texorpdfstring{$\sim$}{\string~}impl (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{tcp__socket_8cpp_source_l00028}{28}} of file \mbox{\hyperlink{tcp__socket_8cpp_source}{tcp\+\_\+socket.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{classfc_1_1tcp__socket_1_1impl_ac4695f911178daec324a35c6ff0ac265}{\_sock}}.is\_open()\ )\ }
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1tcp__socket_1_1impl_ac4695f911178daec324a35c6ff0ac265}{\_sock}}.close();}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{catch}(\ ...\ )}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ \ \{\}}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{classfc_1_1tcp__socket_1_1impl_a8cba3c5b6af202d8d2c41ab98ff11747}{\_read\_in\_progress}}.valid()\ )}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ }
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \{\ }
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1tcp__socket_1_1impl_a8cba3c5b6af202d8d2c41ab98ff11747}{\_read\_in\_progress}}.get();}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{catch}\ (\ ...\ )}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{classfc_1_1tcp__socket_1_1impl_a6a27944b846b60683fc76c0722ab0b3d}{\_write\_in\_progress}}.valid()\ )}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ }
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \ \{\ }
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1tcp__socket_1_1impl_a6a27944b846b60683fc76c0722ab0b3d}{\_write\_in\_progress}}.get();}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \ \ \}\ }
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{catch}\ (\ ...\ )}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1tcp__socket_1_1impl_a227d73b46fe2857e60370ae8e6a8b281}\index{fc::tcp\_socket::impl@{fc::tcp\_socket::impl}!readsome@{readsome}}
+\index{readsome@{readsome}!fc::tcp\_socket::impl@{fc::tcp\_socket::impl}}
+\doxysubsubsection{\texorpdfstring{readsome()}{readsome()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1tcp__socket_1_1impl_a227d73b46fe2857e60370ae8e6a8b281} 
+size\+\_\+t fc\+::tcp\+\_\+socket\+::impl\+::readsome (\begin{DoxyParamCaption}\item[{boost\+::asio\+::ip\+::tcp\+::socket \&}]{socket}{, }\item[{char \texorpdfstring{$\ast$}{*}}]{buffer}{, }\item[{size\+\_\+t}]{length}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{tcp__socket_8cpp_source_l00065}{65}} of file \mbox{\hyperlink{tcp__socket_8cpp_source}{tcp\+\_\+socket.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00066\ \ \ \{}
+\DoxyCodeLine{00067\ \ \ \ \ \textcolor{keywordflow}{return}\ (\mbox{\hyperlink{classfc_1_1tcp__socket_1_1impl_a8cba3c5b6af202d8d2c41ab98ff11747}{\_read\_in\_progress}}\ =\ fc::asio::read\_some(socket,\ buffer,\ length)).get();}
+\DoxyCodeLine{00068\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1tcp__socket_1_1impl_ab2755393e3ba9ee2de7db230d7f98e47}\index{fc::tcp\_socket::impl@{fc::tcp\_socket::impl}!readsome@{readsome}}
+\index{readsome@{readsome}!fc::tcp\_socket::impl@{fc::tcp\_socket::impl}}
+\doxysubsubsection{\texorpdfstring{readsome()}{readsome()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1tcp__socket_1_1impl_ab2755393e3ba9ee2de7db230d7f98e47} 
+size\+\_\+t fc\+::tcp\+\_\+socket\+::impl\+::readsome (\begin{DoxyParamCaption}\item[{boost\+::asio\+::ip\+::tcp\+::socket \&}]{socket}{, }\item[{const std\+::shared\+\_\+ptr$<$ char $>$ \&}]{buffer}{, }\item[{size\+\_\+t}]{length}{, }\item[{size\+\_\+t}]{offset}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{tcp__socket_8cpp_source_l00069}{69}} of file \mbox{\hyperlink{tcp__socket_8cpp_source}{tcp\+\_\+socket.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00070\ \ \ \{}
+\DoxyCodeLine{00071\ \ \ \ \ \textcolor{keywordflow}{return}\ (\mbox{\hyperlink{classfc_1_1tcp__socket_1_1impl_a8cba3c5b6af202d8d2c41ab98ff11747}{\_read\_in\_progress}}\ =\ fc::asio::read\_some(socket,\ buffer,\ length,\ offset)).get();}
+\DoxyCodeLine{00072\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1tcp__socket_1_1impl_af400365fe77a5d4bcf65f2c3b469ad7a}\index{fc::tcp\_socket::impl@{fc::tcp\_socket::impl}!writesome@{writesome}}
+\index{writesome@{writesome}!fc::tcp\_socket::impl@{fc::tcp\_socket::impl}}
+\doxysubsubsection{\texorpdfstring{writesome()}{writesome()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1tcp__socket_1_1impl_af400365fe77a5d4bcf65f2c3b469ad7a} 
+size\+\_\+t fc\+::tcp\+\_\+socket\+::impl\+::writesome (\begin{DoxyParamCaption}\item[{boost\+::asio\+::ip\+::tcp\+::socket \&}]{socket}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{buffer}{, }\item[{size\+\_\+t}]{length}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{tcp__socket_8cpp_source_l00073}{73}} of file \mbox{\hyperlink{tcp__socket_8cpp_source}{tcp\+\_\+socket.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00074\ \ \ \{}
+\DoxyCodeLine{00075\ \ \ \ \ \textcolor{keywordflow}{return}\ (\mbox{\hyperlink{classfc_1_1tcp__socket_1_1impl_a6a27944b846b60683fc76c0722ab0b3d}{\_write\_in\_progress}}\ =\ fc::asio::write\_some(socket,\ buffer,\ length)).get();}
+\DoxyCodeLine{00076\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1tcp__socket_1_1impl_adf212edc6d5e21ffde8524b47f8566a8}\index{fc::tcp\_socket::impl@{fc::tcp\_socket::impl}!writesome@{writesome}}
+\index{writesome@{writesome}!fc::tcp\_socket::impl@{fc::tcp\_socket::impl}}
+\doxysubsubsection{\texorpdfstring{writesome()}{writesome()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1tcp__socket_1_1impl_adf212edc6d5e21ffde8524b47f8566a8} 
+size\+\_\+t fc\+::tcp\+\_\+socket\+::impl\+::writesome (\begin{DoxyParamCaption}\item[{boost\+::asio\+::ip\+::tcp\+::socket \&}]{socket}{, }\item[{const std\+::shared\+\_\+ptr$<$ const char $>$ \&}]{buffer}{, }\item[{size\+\_\+t}]{length}{, }\item[{size\+\_\+t}]{offset}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{tcp__socket_8cpp_source_l00077}{77}} of file \mbox{\hyperlink{tcp__socket_8cpp_source}{tcp\+\_\+socket.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00078\ \ \ \{}
+\DoxyCodeLine{00079\ \ \ \ \ \textcolor{keywordflow}{return}\ (\mbox{\hyperlink{classfc_1_1tcp__socket_1_1impl_a6a27944b846b60683fc76c0722ab0b3d}{\_write\_in\_progress}}\ =\ fc::asio::write\_some(socket,\ buffer,\ length,\ offset)).get();}
+\DoxyCodeLine{00080\ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classfc_1_1tcp__socket_1_1impl_af5804ebfc87107a3e4a596d307a35158}\index{fc::tcp\_socket::impl@{fc::tcp\_socket::impl}!\_io\_hooks@{\_io\_hooks}}
+\index{\_io\_hooks@{\_io\_hooks}!fc::tcp\_socket::impl@{fc::tcp\_socket::impl}}
+\doxysubsubsection{\texorpdfstring{\_io\_hooks}{\_io\_hooks}}
+{\footnotesize\ttfamily \label{classfc_1_1tcp__socket_1_1impl_af5804ebfc87107a3e4a596d307a35158} 
+tcp\+\_\+socket\+\_\+io\+\_\+hooks\texorpdfstring{$\ast$}{*} fc\+::tcp\+\_\+socket\+::impl\+::\+\_\+io\+\_\+hooks}
+
+
+
+Definition at line \mbox{\hyperlink{tcp__socket_8cpp_source_l00062}{62}} of file \mbox{\hyperlink{tcp__socket_8cpp_source}{tcp\+\_\+socket.\+cpp}}.
+
+\Hypertarget{classfc_1_1tcp__socket_1_1impl_a8cba3c5b6af202d8d2c41ab98ff11747}\index{fc::tcp\_socket::impl@{fc::tcp\_socket::impl}!\_read\_in\_progress@{\_read\_in\_progress}}
+\index{\_read\_in\_progress@{\_read\_in\_progress}!fc::tcp\_socket::impl@{fc::tcp\_socket::impl}}
+\doxysubsubsection{\texorpdfstring{\_read\_in\_progress}{\_read\_in\_progress}}
+{\footnotesize\ttfamily \label{classfc_1_1tcp__socket_1_1impl_a8cba3c5b6af202d8d2c41ab98ff11747} 
+future$<$size\+\_\+t$>$ fc\+::tcp\+\_\+socket\+::impl\+::\+\_\+read\+\_\+in\+\_\+progress}
+
+
+
+Definition at line \mbox{\hyperlink{tcp__socket_8cpp_source_l00060}{60}} of file \mbox{\hyperlink{tcp__socket_8cpp_source}{tcp\+\_\+socket.\+cpp}}.
+
+\Hypertarget{classfc_1_1tcp__socket_1_1impl_ac4695f911178daec324a35c6ff0ac265}\index{fc::tcp\_socket::impl@{fc::tcp\_socket::impl}!\_sock@{\_sock}}
+\index{\_sock@{\_sock}!fc::tcp\_socket::impl@{fc::tcp\_socket::impl}}
+\doxysubsubsection{\texorpdfstring{\_sock}{\_sock}}
+{\footnotesize\ttfamily \label{classfc_1_1tcp__socket_1_1impl_ac4695f911178daec324a35c6ff0ac265} 
+boost\+::asio\+::ip\+::tcp\+::socket fc\+::tcp\+\_\+socket\+::impl\+::\+\_\+sock}
+
+
+
+Definition at line \mbox{\hyperlink{tcp__socket_8cpp_source_l00061}{61}} of file \mbox{\hyperlink{tcp__socket_8cpp_source}{tcp\+\_\+socket.\+cpp}}.
+
+\Hypertarget{classfc_1_1tcp__socket_1_1impl_a6a27944b846b60683fc76c0722ab0b3d}\index{fc::tcp\_socket::impl@{fc::tcp\_socket::impl}!\_write\_in\_progress@{\_write\_in\_progress}}
+\index{\_write\_in\_progress@{\_write\_in\_progress}!fc::tcp\_socket::impl@{fc::tcp\_socket::impl}}
+\doxysubsubsection{\texorpdfstring{\_write\_in\_progress}{\_write\_in\_progress}}
+{\footnotesize\ttfamily \label{classfc_1_1tcp__socket_1_1impl_a6a27944b846b60683fc76c0722ab0b3d} 
+future$<$size\+\_\+t$>$ fc\+::tcp\+\_\+socket\+::impl\+::\+\_\+write\+\_\+in\+\_\+progress}
+
+
+
+Definition at line \mbox{\hyperlink{tcp__socket_8cpp_source_l00059}{59}} of file \mbox{\hyperlink{tcp__socket_8cpp_source}{tcp\+\_\+socket.\+cpp}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/src/network/\mbox{\hyperlink{tcp__socket_8cpp}{tcp\+\_\+socket.\+cpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,5 @@
+<map id="sysio::chain_apis::read_only::abi_bin_to_json_result" name="sysio::chain_apis::read_only::abi_bin_to_json_result">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,94,150,150"/>
+<area shape="rect" id="Node000002" href="$classfc_1_1variant.html" title="stores null, int64, uint64, double, bool, string, std::vector&lt;variant&gt;, and variant_object&#39;s." alt="" coords="38,5,117,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="80,47,80,93,75,93,75,47"/>
+</map>

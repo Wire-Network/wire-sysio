@@ -1,0 +1,773 @@
+\chapter{The safegcd implementation in libsecp256k1 explained}
+\hypertarget{md_libraries_2fc_2secp256k1_2secp256k1_2doc_2safegcd__implementation}{}\label{md_libraries_2fc_2secp256k1_2secp256k1_2doc_2safegcd__implementation}\index{The safegcd implementation in libsecp256k1 explained@{The safegcd implementation in libsecp256k1 explained}}
+This document explains the modular inverse implementation in the {\ttfamily src/modinv\texorpdfstring{$\ast$}{*}.h} files. It is based on the paper \href{https://gcd.cr.yp.to/papers.html\#safegcd}{\texttt{ "{}\+Fast constant-\/time gcd computation and modular inversion"{}}} by Daniel J. Bernstein and Bo-\/\+Yin Yang. The references below are for the Date\+: 2019.\+04.\+13 version.
+
+The actual implementation is in C of course, but for demonstration purposes Python3 is used here. Most implementation aspects and optimizations are explained, except those that depend on the specific number representation used in the C code.
+
+\doxysection*{1. Computing the Greatest Common Divisor (GCD) using divsteps}
+
+The algorithm from the paper (section 11), at a very high level, is this\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{def\ }gcd(f,\ g):}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Compute\ the\ GCD\ of\ an\ odd\ integer\ f\ and\ another\ integer\ g."{}"{}"{}}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{assert}\ f\ \&\ 1\ \ \textcolor{comment}{\#\ require\ f\ to\ be\ odd}}
+\DoxyCodeLine{\ \ \ \ delta\ =\ 1\ \ \ \ \ \textcolor{comment}{\#\ additional\ state\ variable}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{while}\ g\ !=\ 0:}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keyword}{assert}\ f\ \&\ 1\ \ \textcolor{comment}{\#\ f\ will\ be\ odd\ in\ every\ iteration}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ delta\ >\ 0\ \textcolor{keywordflow}{and}\ g\ \&\ 1:}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ delta,\ f,\ g\ =\ 1\ -\/\ delta,\ g,\ (g\ -\/\ f)\ //\ 2}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{elif}\ g\ \&\ 1:}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ delta,\ f,\ g\ =\ 1\ +\ delta,\ f,\ (g\ +\ f)\ //\ 2}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ delta,\ f,\ g\ =\ 1\ +\ delta,\ f,\ (g\ \ \ \ )\ //\ 2}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{return}\ abs(f)}
+
+\end{DoxyCode}
+
+
+It computes the greatest common divisor of an odd integer {\itshape f} and any integer {\itshape g}. Its inner loop keeps rewriting the variables {\itshape f} and {\itshape g} alongside a state variable {\itshape {$\delta$}} that starts at {\itshape 1}, until {\itshape g=0} is reached. At that point, \texorpdfstring{$\ast$}{*}\texorpdfstring{$\vert$}{|}f\texorpdfstring{$\vert$}{|}\texorpdfstring{$\ast$}{*} gives the GCD. Each of the transitions in the loop is called a "{}division step"{} (referred to as divstep in what follows).
+
+For example, {\itshape gcd(21, 14)} would be computed as\+:
+\begin{DoxyItemize}
+\item Start with {\itshape {$\delta$}=1 f=21 g=14}
+\item Take the third branch\+: {\itshape {$\delta$}=2 f=21 g=7}
+\item Take the first branch\+: {\itshape {$\delta$}=-\/1 f=7 g=-\/7}
+\item Take the second branch\+: {\itshape {$\delta$}=0 f=7 g=0}
+\item The answer \texorpdfstring{$\ast$}{*}\texorpdfstring{$\vert$}{|}f\texorpdfstring{$\vert$}{|} = 7\texorpdfstring{$\ast$}{*}.
+\end{DoxyItemize}
+
+Why it works\+:
+\begin{DoxyItemize}
+\item Divsteps can be decomposed into two steps (see paragraph 8.\+2 in the paper)\+:
+\begin{DoxyItemize}
+\item (a) If {\itshape g} is odd, replace {\itshape (f,g)} with {\itshape (g,g-\/f)} or (f,g+f), resulting in an even {\itshape g}.
+\item (b) Replace {\itshape (f,g)} with {\itshape (f,g/2)} (where {\itshape g} is guaranteed to be even).
+\end{DoxyItemize}
+\item Neither of those two operations change the GCD\+:
+\begin{DoxyItemize}
+\item For (a), assume {\itshape gcd(f,g)=c}, then it must be the case that {\itshape f=a\,c} and {\itshape g=b\,c} for some integers {\itshape a} and {\itshape b}. As {\itshape (g,g-\/f)=(b\,c,(b-\/a)c)} and {\itshape (f,f+g)=(a\,c,(a+b)c)}, the result clearly still has common factor {\itshape c}. Reasoning in the other direction shows that no common factor can be added by doing so either.
+\item For (b), we know that {\itshape f} is odd, so {\itshape gcd(f,g)} clearly has no factor {\itshape 2}, and we can remove it from {\itshape g}.
+\end{DoxyItemize}
+\item The algorithm will eventually converge to {\itshape g=0}. This is proven in the paper (see theorem G.\+3).
+\item It follows that eventually we find a final value {\itshape f\textquotesingle{}} for which {\itshape gcd(f,g) = gcd(f\textquotesingle{},0)}. As the gcd of {\itshape f\textquotesingle{}} and {\itshape 0} is \texorpdfstring{$\ast$}{*}\texorpdfstring{$\vert$}{|}f\textquotesingle{}\texorpdfstring{$\vert$}{|}\texorpdfstring{$\ast$}{*} by definition, that is our answer.
+\end{DoxyItemize}
+
+Compared to more \href{https://en.wikipedia.org/wiki/Euclidean_algorithm}{\texttt{ traditional GCD algorithms}}, this one has the property of only ever looking at the low-\/order bits of the variables to decide the next steps, and being easy to make constant-\/time (in more low-\/level languages than Python). The {\itshape {$\delta$}} parameter is necessary to guide the algorithm towards shrinking the numbers\textquotesingle{} magnitudes without explicitly needing to look at high order bits.
+
+Properties that will become important later\+:
+\begin{DoxyItemize}
+\item Performing more divsteps than needed is not a problem, as {\itshape f} does not change anymore after {\itshape g=0}.
+\item Only even numbers are divided by {\itshape 2}. This means that when reasoning about it algebraically we do not need to worry about rounding.
+\item At every point during the algorithm\textquotesingle{}s execution the next {\itshape N} steps only depend on the bottom {\itshape N} bits of {\itshape f} and {\itshape g}, and on {\itshape {$\delta$}}.
+\end{DoxyItemize}
+
+\doxysection*{2. From GCDs to modular inverses}
+
+We want an algorithm to compute the inverse {\itshape a} of {\itshape x} modulo {\itshape M}, i.\+e. the number a such that {\itshape a\,x=1 mod M}. This inverse only exists if the GCD of {\itshape x} and {\itshape M} is {\itshape 1}, but that is always the case if {\itshape M} is prime and {\itshape 0 \texorpdfstring{$<$}{<} x \texorpdfstring{$<$}{<} M}. In what follows, assume that the modular inverse exists. It turns out this inverse can be computed as a side effect of computing the GCD by keeping track of how the internal variables can be written as linear combinations of the inputs at every step (see the \href{https://en.wikipedia.org/wiki/Extended_Euclidean_algorithm}{\texttt{ extended Euclidean algorithm}}). Since the GCD is {\itshape 1}, such an algorithm will compute numbers {\itshape a} and {\itshape b} such that a\,x + b\,M = 1\texorpdfstring{$\ast$}{*}. Taking that expression {\itshape mod M} gives {\itshape a\,x mod M = 1}, and we see that {\itshape a} is the modular inverse of {\itshape x mod M}.
+
+\doxylink{struct_a}{A} similar approach can be used to calculate modular inverses using the divsteps-\/based GCD algorithm shown above, if the modulus {\itshape M} is odd. To do so, compute {\itshape gcd(f=M,g=x)}, while keeping track of extra variables {\itshape d} and {\itshape e}, for which at every step {\itshape d = f/x (mod M)} and {\itshape e = g/x (mod M)}. {\itshape f/x} here means the number which multiplied with {\itshape x} gives {\itshape f mod M}. As {\itshape f} and {\itshape g} are initialized to {\itshape M} and {\itshape x} respectively, {\itshape d} and {\itshape e} just start off being {\itshape 0} ({\itshape M/x mod M = 0/x mod M = 0}) and {\itshape 1} ({\itshape x/x mod M = 1}).
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{def\ }div2(M,\ x):}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Helper\ routine\ to\ compute\ x/2\ mod\ M\ (where\ M\ is\ odd)."{}"{}"{}}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{assert}\ M\ \&\ 1}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{if}\ x\ \&\ 1:\ \textcolor{comment}{\#\ If\ x\ is\ odd,\ make\ it\ even\ by\ adding\ M.}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ x\ +=\ M}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{\#\ x\ must\ be\ even\ now,\ so\ a\ clean\ division\ by\ 2\ is\ possible.}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{return}\ x\ //\ 2}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{def\ }modinv(M,\ x):}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Compute\ the\ inverse\ of\ x\ mod\ M\ (given\ that\ it\ exists,\ and\ M\ is\ odd)."{}"{}"{}}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{assert}\ M\ \&\ 1}
+\DoxyCodeLine{\ \ \ \ delta,\ f,\ g,\ d,\ e\ =\ 1,\ M,\ x,\ 0,\ 1}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{while}\ g\ !=\ 0:}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Note\ that\ while\ division\ by\ two\ for\ f\ and\ g\ is\ only\ ever\ done\ on\ even\ inputs,\ this\ is}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{comment}{\#\ not\ true\ for\ d\ and\ e,\ so\ we\ need\ the\ div2\ helper\ function.}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ delta\ >\ 0\ \textcolor{keywordflow}{and}\ g\ \&\ 1:}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ delta,\ f,\ g,\ d,\ e\ =\ 1\ -\/\ delta,\ g,\ (g\ -\/\ f)\ //\ 2,\ e,\ div2(M,\ e\ -\/\ d)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{elif}\ g\ \&\ 1:}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ delta,\ f,\ g,\ d,\ e\ =\ 1\ +\ delta,\ f,\ (g\ +\ f)\ //\ 2,\ d,\ div2(M,\ e\ +\ d)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ delta,\ f,\ g,\ d,\ e\ =\ 1\ +\ delta,\ f,\ (g\ \ \ \ )\ //\ 2,\ d,\ div2(M,\ e\ \ \ \ )}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Verify\ that\ the\ invariants\ d=f/x\ mod\ M,\ e=g/x\ mod\ M\ are\ maintained.}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keyword}{assert}\ f\ \%\ M\ ==\ (d\ *\ x)\ \%\ M}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keyword}{assert}\ g\ \%\ M\ ==\ (e\ *\ x)\ \%\ M}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{assert}\ f\ ==\ 1\ \textcolor{keywordflow}{or}\ f\ ==\ -\/1\ \ \textcolor{comment}{\#\ |f|\ is\ the\ GCD,\ it\ must\ be\ 1}}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{\#\ Because\ of\ invariant\ d\ =\ f/x\ (mod\ M),\ 1/x\ =\ d/f\ (mod\ M).\ As\ |f|=1,\ d/f\ =\ d*f.}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{return}\ (d\ *\ f)\ \%\ M}
+
+\end{DoxyCode}
+
+
+Also note that this approach to track {\itshape d} and {\itshape e} throughout the computation to determine the inverse is different from the paper. There (see paragraph 12.\+1 in the paper) a transition matrix for the entire computation is determined (see section 3 below) and the inverse is computed from that. The approach here avoids the need for 2x2 matrix multiplications of various sizes, and appears to be faster at the level of optimization we\textquotesingle{}re able to do in C.
+
+\doxysection*{3. Batching multiple divsteps}
+
+Every divstep can be expressed as a matrix multiplication, applying a transition matrix {\itshape (1/2 t)} to both vectors {\itshape \mbox{[}f, g\mbox{]}} and {\itshape \mbox{[}d, e\mbox{]}} (see paragraph 8.\+1 in the paper)\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{t\ =\ [\ u,\ \ v\ ]}
+\DoxyCodeLine{\ \ \ \ [\ q,\ \ r\ ]}
+\DoxyCodeLine{}
+\DoxyCodeLine{[\ out\_f\ ]\ =\ (1/2\ *\ t)\ *\ [\ in\_f\ ]}
+\DoxyCodeLine{[\ out\_g\ ]\ =\ \ \ \ \ \ \ \ \ \ \ \ \ [\ in\_g\ ]}
+\DoxyCodeLine{}
+\DoxyCodeLine{[\ out\_d\ ]\ =\ (1/2\ *\ t)\ *\ [\ in\_d\ ]\ \ (mod\ M)}
+\DoxyCodeLine{[\ out\_e\ ]\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [\ in\_e\ ]}
+
+\end{DoxyCode}
+
+
+where {\itshape (u, v, q, r)} is {\itshape (0, 2, -\/1, 1)}, {\itshape (2, 0, 1, 1)}, or {\itshape (2, 0, 0, 1)}, depending on which branch is taken. As above, the resulting {\itshape f} and {\itshape g} are always integers.
+
+Performing multiple divsteps corresponds to a multiplication with the product of all the individual divsteps\textquotesingle{} transition matrices. As each transition matrix consists of integers divided by {\itshape 2}, the product of these matrices will consist of integers divided by \texorpdfstring{$\ast$}{*}2\textsuperscript{N}\texorpdfstring{$\ast$}{*} (see also theorem 9.\+2 in the paper). These divisions are expensive when updating {\itshape d} and {\itshape e}, so we delay them\+: we compute the integer coefficients of the combined transition matrix scaled by \texorpdfstring{$\ast$}{*}2\textsuperscript{N}\texorpdfstring{$\ast$}{*}, and do one division by \texorpdfstring{$\ast$}{*}2\textsuperscript{N}\texorpdfstring{$\ast$}{*} as a final step\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{def\ }divsteps\_n\_matrix(delta,\ f,\ g):}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Compute\ delta\ and\ transition\ matrix\ t\ after\ N\ divsteps\ (multiplied\ by\ 2\string^N)."{}"{}"{}}}
+\DoxyCodeLine{\ \ \ \ u,\ v,\ q,\ r\ =\ 1,\ 0,\ 0,\ 1\ \textcolor{comment}{\#\ start\ with\ identity\ matrix}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{for}\ \_\ \textcolor{keywordflow}{in}\ range(N):}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ delta\ >\ 0\ \textcolor{keywordflow}{and}\ g\ \&\ 1:}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ delta,\ f,\ g,\ u,\ v,\ q,\ r\ =\ 1\ -\/\ delta,\ g,\ (g\ -\/\ f)\ //\ 2,\ 2*q,\ 2*r,\ q-\/u,\ r-\/v}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{elif}\ g\ \&\ 1:}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ delta,\ f,\ g,\ u,\ v,\ q,\ r\ =\ 1\ +\ delta,\ f,\ (g\ +\ f)\ //\ 2,\ 2*u,\ 2*v,\ q+u,\ r+v}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ delta,\ f,\ g,\ u,\ v,\ q,\ r\ =\ 1\ +\ delta,\ f,\ (g\ \ \ \ )\ //\ 2,\ 2*u,\ 2*v,\ q\ \ ,\ r}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{return}\ delta,\ (u,\ v,\ q,\ r)}
+
+\end{DoxyCode}
+
+
+As the branches in the divsteps are completely determined by the bottom {\itshape N} bits of {\itshape f} and {\itshape g}, this function to compute the transition matrix only needs to see those bottom bits. Furthermore all intermediate results and outputs fit in {\itshape (N+1)}-\/bit numbers (unsigned for {\itshape f} and {\itshape g}; signed for {\itshape u}, {\itshape v}, {\itshape q}, and {\itshape r}) (see also paragraph 8.\+3 in the paper). This means that an implementation using 64-\/bit integers could set {\itshape N=62} and compute the full transition matrix for 62 steps at once without any big integer arithmetic at all. This is the reason why this algorithm is efficient\+: it only needs to update the full-\/size {\itshape f}, {\itshape g}, {\itshape d}, and {\itshape e} numbers once every {\itshape N} steps.
+
+We still need functions to compute\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{[\ out\_f\ ]\ =\ (1/2\string^N\ *\ [\ u,\ \ v\ ])\ *\ [\ in\_f\ ]}
+\DoxyCodeLine{[\ out\_g\ ]\ \ \ (\ \ \ \ \ \ \ \ [\ q,\ \ r\ ])\ \ \ [\ in\_g\ ]}
+\DoxyCodeLine{}
+\DoxyCodeLine{[\ out\_d\ ]\ =\ (1/2\string^N\ *\ [\ u,\ \ v\ ])\ *\ [\ in\_d\ ]\ \ (mod\ M)}
+\DoxyCodeLine{[\ out\_e\ ]\ \ \ (\ \ \ \ \ \ \ \ [\ q,\ \ r\ ])\ \ \ [\ in\_e\ ]}
+
+\end{DoxyCode}
+
+
+Because the divsteps transformation only ever divides even numbers by two, the result of {\itshape t\,\mbox{[}f,g\mbox{]}} is always even. When {\itshape t} is a composition of {\itshape N} divsteps, it follows that the resulting {\itshape f} and {\itshape g} will be multiple of \texorpdfstring{$\ast$}{*}2\textsuperscript{N}\texorpdfstring{$\ast$}{*}, and division by \texorpdfstring{$\ast$}{*}2\textsuperscript{N}\texorpdfstring{$\ast$}{*} is simply shifting them down\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{def\ }update\_fg(f,\ g,\ t):}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Multiply\ matrix\ t/2\string^N\ with\ [f,\ g]."{}"{}"{}}}
+\DoxyCodeLine{\ \ \ \ u,\ v,\ q,\ r\ =\ t}
+\DoxyCodeLine{\ \ \ \ cf,\ cg\ =\ u*f\ +\ v*g,\ q*f\ +\ r*g}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{\#\ (t\ /\ 2\string^N)\ should\ cleanly\ apply\ to\ [f,g]\ so\ the\ result\ of\ t*[f,g]\ should\ have\ N\ zero}}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{\#\ bottom\ bits.}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{assert}\ cf\ \%\ 2**N\ ==\ 0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{assert}\ cg\ \%\ 2**N\ ==\ 0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{return}\ cf\ >>\ N,\ cg\ >>\ N}
+
+\end{DoxyCode}
+
+
+The same is not true for {\itshape d} and {\itshape e}, and we need an equivalent of the {\ttfamily div2} function for division by \texorpdfstring{$\ast$}{*}2\textsuperscript{N} mod M\texorpdfstring{$\ast$}{*}. This is easy if we have precomputed \texorpdfstring{$\ast$}{*}1/M mod 2\textsuperscript{N}\texorpdfstring{$\ast$}{*} (which always exists for odd {\itshape M})\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{def\ }div2n(M,\ Mi,\ x):}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Compute\ x/2\string^N\ mod\ M,\ given\ Mi\ =\ 1/M\ mod\ 2\string^N."{}"{}"{}}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{assert}\ (M\ *\ Mi)\ \%\ 2**N\ ==\ 1}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{\#\ Find\ a\ factor\ m\ such\ that\ m*M\ has\ the\ same\ bottom\ N\ bits\ as\ x.\ We\ want:}}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{\#\ \ \ \ \ (m\ *\ M)\ mod\ 2\string^N\ =\ x\ mod\ 2\string^N}}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{\#\ <=>\ m\ mod\ 2\string^N\ =\ (x\ /\ M)\ mod\ 2\string^N}}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{\#\ <=>\ m\ mod\ 2\string^N\ =\ (x\ *\ Mi)\ mod\ 2\string^N}}
+\DoxyCodeLine{\ \ \ \ m\ =\ (Mi\ *\ x)\ \%\ 2**N}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{\#\ Subtract\ that\ multiple\ from\ x,\ cancelling\ its\ bottom\ N\ bits.}}
+\DoxyCodeLine{\ \ \ \ x\ -\/=\ m\ *\ M}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{\#\ Now\ a\ clean\ division\ by\ 2\string^N\ is\ possible.}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{assert}\ x\ \%\ 2**N\ ==\ 0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{return}\ (x\ >>\ N)\ \%\ M}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{def\ }update\_de(d,\ e,\ t,\ M,\ Mi):}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Multiply\ matrix\ t/2\string^N\ with\ [d,\ e],\ modulo\ M."{}"{}"{}}}
+\DoxyCodeLine{\ \ \ \ u,\ v,\ q,\ r\ =\ t}
+\DoxyCodeLine{\ \ \ \ cd,\ ce\ =\ u*d\ +\ v*e,\ q*d\ +\ r*e}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{return}\ div2n(M,\ Mi,\ cd),\ div2n(M,\ Mi,\ ce)}
+
+\end{DoxyCode}
+
+
+With all of those, we can write a version of {\ttfamily modinv} that performs {\itshape N} divsteps at once\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ 3}
+\DoxyCodeLine{\textcolor{keyword}{def\ }modinv(M,\ Mi,\ x):}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Compute\ the\ modular\ inverse\ of\ x\ mod\ M,\ given\ Mi=1/M\ mod\ 2\string^N."{}"{}"{}}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{assert}\ M\ \&\ 1}
+\DoxyCodeLine{\ \ \ \ delta,\ f,\ g,\ d,\ e\ =\ 1,\ M,\ x,\ 0,\ 1}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{while}\ g\ !=\ 0:}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Compute\ the\ delta\ and\ transition\ matrix\ t\ for\ the\ next\ N\ divsteps\ (this\ only\ needs}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{comment}{\#\ (N+1)-\/bit\ signed\ integer\ arithmetic).}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ delta,\ t\ =\ divsteps\_n\_matrix(delta,\ f\ \%\ 2**N,\ g\ \%\ 2**N)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Apply\ the\ transition\ matrix\ t\ to\ [f,\ g]:}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ f,\ g\ =\ update\_fg(f,\ g,\ t)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Apply\ the\ transition\ matrix\ t\ to\ [d,\ e]:}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ d,\ e\ =\ update\_de(d,\ e,\ t,\ M,\ Mi)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{return}\ (d\ *\ f)\ \%\ M}
+
+\end{DoxyCode}
+
+
+This means that in practice we\textquotesingle{}ll always perform a multiple of {\itshape N} divsteps. This is not a problem because once {\itshape g=0}, further divsteps do not affect {\itshape f}, {\itshape g}, {\itshape d}, or {\itshape e} anymore (only {\itshape {$\delta$}} keeps increasing). For variable time code such excess iterations will be mostly optimized away in later sections.
+
+\doxysection*{4. Avoiding modulus operations}
+
+So far, there are two places where we compute a remainder of big numbers modulo {\itshape M}\+: at the end of {\ttfamily div2n} in every {\ttfamily update\+\_\+de}, and at the very end of {\ttfamily modinv} after potentially negating {\itshape d} due to the sign of {\itshape f}. These are relatively expensive operations when done generically.
+
+To deal with the modulus operation in {\ttfamily div2n}, we simply stop requiring {\itshape d} and {\itshape e} to be in range {\itshape \mbox{[}0,M)} all the time. Let\textquotesingle{}s start by inlining {\ttfamily div2n} into {\ttfamily update\+\_\+de}, and dropping the modulus operation at the end\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{def\ }update\_de(d,\ e,\ t,\ M,\ Mi):}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Multiply\ matrix\ t/2\string^N\ with\ [d,\ e]\ mod\ M,\ given\ Mi=1/M\ mod\ 2\string^N."{}"{}"{}}}
+\DoxyCodeLine{\ \ \ \ u,\ v,\ q,\ r\ =\ t}
+\DoxyCodeLine{\ \ \ \ cd,\ ce\ =\ u*d\ +\ v*e,\ q*d\ +\ r*e}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{\#\ Cancel\ out\ bottom\ N\ bits\ of\ cd\ and\ ce.}}
+\DoxyCodeLine{\ \ \ \ md\ =\ -\/((Mi\ *\ cd)\ \%\ 2**N)}
+\DoxyCodeLine{\ \ \ \ me\ =\ -\/((Mi\ *\ ce)\ \%\ 2**N)}
+\DoxyCodeLine{\ \ \ \ cd\ +=\ md\ *\ M}
+\DoxyCodeLine{\ \ \ \ ce\ +=\ me\ *\ M}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{\#\ And\ cleanly\ divide\ by\ 2**N.}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{return}\ cd\ >>\ N,\ ce\ >>\ N}
+
+\end{DoxyCode}
+
+
+Let\textquotesingle{}s look at bounds on the ranges of these numbers. It can be shown that \texorpdfstring{$\ast$}{*}\texorpdfstring{$\vert$}{|}u\texorpdfstring{$\vert$}{|}+\texorpdfstring{$\vert$}{|}v\texorpdfstring{$\vert$}{|}\texorpdfstring{$\ast$}{*} and \texorpdfstring{$\ast$}{*}\texorpdfstring{$\vert$}{|}q\texorpdfstring{$\vert$}{|}+\texorpdfstring{$\vert$}{|}r\texorpdfstring{$\vert$}{|}\texorpdfstring{$\ast$}{*} never exceed \texorpdfstring{$\ast$}{*}2\textsuperscript{N}\texorpdfstring{$\ast$}{*} (see paragraph 8.\+3 in the paper), and thus a multiplication with {\itshape t} will have outputs whose absolute values are at most \texorpdfstring{$\ast$}{*}2\textsuperscript{N}\texorpdfstring{$\ast$}{*} times the maximum absolute input value. In case the inputs {\itshape d} and {\itshape e} are in {\itshape (-\/M,M)}, which is certainly true for the initial values {\itshape d=0} and {\itshape e=1} assuming {\itshape M \texorpdfstring{$>$}{>} 1}, the multiplication results in numbers in range \texorpdfstring{$\ast$}{*}(-\/2\textsuperscript{N}M,2\textsuperscript{N}M)\texorpdfstring{$\ast$}{*}. Subtracting less than \texorpdfstring{$\ast$}{*}2\textsuperscript{N}\texorpdfstring{$\ast$}{*} times {\itshape M} to cancel out {\itshape N} bits brings that up to \texorpdfstring{$\ast$}{*}(-\/2\textsuperscript{N+1}M,2\textsuperscript{N}M)\texorpdfstring{$\ast$}{*}, and dividing by \texorpdfstring{$\ast$}{*}2\textsuperscript{N}\texorpdfstring{$\ast$}{*} at the end takes it to {\itshape (-\/2M,M)}. Another application of {\ttfamily update\+\_\+de} would take that to {\itshape (-\/3M,2M)}, and so forth. This progressive expansion of the variables\textquotesingle{} ranges can be counteracted by incrementing {\itshape d} and {\itshape e} by {\itshape M} whenever they\textquotesingle{}re negative\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{...}
+\DoxyCodeLine{\textcolor{keywordflow}{if}\ d\ <\ 0:}
+\DoxyCodeLine{\ \ \ \ d\ +=\ M}
+\DoxyCodeLine{\textcolor{keywordflow}{if}\ e\ <\ 0:}
+\DoxyCodeLine{\ \ \ \ e\ +=\ M}
+\DoxyCodeLine{cd,\ ce\ =\ u*d\ +\ v*e,\ q*d\ +\ r*e}
+\DoxyCodeLine{\textcolor{comment}{\#\ Cancel\ out\ bottom\ N\ bits\ of\ cd\ and\ ce.}}
+\DoxyCodeLine{...}
+
+\end{DoxyCode}
+
+
+With inputs in {\itshape (-\/2M,M)}, they will first be shifted into range {\itshape (-\/M,M)}, which means that the output will again be in {\itshape (-\/2M,M)}, and this remains the case regardless of how many {\ttfamily update\+\_\+de} invocations there are. In what follows, we will try to make this more efficient.
+
+Note that increasing {\itshape d} by {\itshape M} is equal to incrementing {\itshape cd} by {\itshape u\,M} and {\itshape ce} by {\itshape q\,M}. Similarly, increasing {\itshape e} by {\itshape M} is equal to incrementing {\itshape cd} by {\itshape v\,M} and {\itshape ce} by {\itshape r\,M}. So we could instead write\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{...}
+\DoxyCodeLine{cd,\ ce\ =\ u*d\ +\ v*e,\ q*d\ +\ r*e}
+\DoxyCodeLine{\textcolor{comment}{\#\ Perform\ the\ equivalent\ of\ incrementing\ d,\ e\ by\ M\ when\ they're\ negative.}}
+\DoxyCodeLine{\textcolor{keywordflow}{if}\ d\ <\ 0:}
+\DoxyCodeLine{\ \ \ \ cd\ +=\ u*M}
+\DoxyCodeLine{\ \ \ \ ce\ +=\ q*M}
+\DoxyCodeLine{\textcolor{keywordflow}{if}\ e\ <\ 0:}
+\DoxyCodeLine{\ \ \ \ cd\ +=\ v*M}
+\DoxyCodeLine{\ \ \ \ ce\ +=\ r*M}
+\DoxyCodeLine{\textcolor{comment}{\#\ Cancel\ out\ bottom\ N\ bits\ of\ cd\ and\ ce.}}
+\DoxyCodeLine{md\ =\ -\/((Mi\ *\ cd)\ \%\ 2**N)}
+\DoxyCodeLine{me\ =\ -\/((Mi\ *\ ce)\ \%\ 2**N)}
+\DoxyCodeLine{cd\ +=\ md\ *\ M}
+\DoxyCodeLine{ce\ +=\ me\ *\ M}
+\DoxyCodeLine{...}
+
+\end{DoxyCode}
+
+
+Now note that we have two steps of corrections to {\itshape cd} and {\itshape ce} that add multiples of {\itshape M}\+: this increment, and the decrement that cancels out bottom bits. The second one depends on the first one, but they can still be efficiently combined by only computing the bottom bits of {\itshape cd} and {\itshape ce} at first, and using that to compute the final {\itshape md}, {\itshape me} values\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{def\ }update\_de(d,\ e,\ t,\ M,\ Mi):}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Multiply\ matrix\ t/2\string^N\ with\ [d,\ e],\ modulo\ M."{}"{}"{}}}
+\DoxyCodeLine{\ \ \ \ u,\ v,\ q,\ r\ =\ t}
+\DoxyCodeLine{\ \ \ \ md,\ me\ =\ 0,\ 0}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{\#\ Compute\ what\ multiples\ of\ M\ to\ add\ to\ cd\ and\ ce.}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{if}\ d\ <\ 0:}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ md\ +=\ u}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ me\ +=\ q}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{if}\ e\ <\ 0:}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ md\ +=\ v}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ me\ +=\ r}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{\#\ Compute\ bottom\ N\ bits\ of\ t*[d,e]\ +\ M*[md,me].}}
+\DoxyCodeLine{\ \ \ \ cd,\ ce\ =\ (u*d\ +\ v*e\ +\ md*M)\ \%\ 2**N,\ (q*d\ +\ r*e\ +\ me*M)\ \%\ 2**N}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{\#\ Correct\ md\ and\ me\ such\ that\ the\ bottom\ N\ bits\ of\ t*[d,e]\ +\ M*[md,me]\ are\ zero.}}
+\DoxyCodeLine{\ \ \ \ md\ -\/=\ (Mi\ *\ cd)\ \%\ 2**N}
+\DoxyCodeLine{\ \ \ \ me\ -\/=\ (Mi\ *\ ce)\ \%\ 2**N}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{\#\ Do\ the\ full\ computation.}}
+\DoxyCodeLine{\ \ \ \ cd,\ ce\ =\ u*d\ +\ v*e\ +\ md*M,\ q*d\ +\ r*e\ +\ me*M}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{\#\ And\ cleanly\ divide\ by\ 2**N.}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{return}\ cd\ >>\ N,\ ce\ >>\ N}
+
+\end{DoxyCode}
+
+
+One last optimization\+: we can avoid the {\itshape md\,M} and {\itshape me\,M} multiplications in the bottom bits of {\itshape cd} and {\itshape ce} by moving them to the {\itshape md} and {\itshape me} correction\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{...}
+\DoxyCodeLine{\textcolor{comment}{\#\ Compute\ bottom\ N\ bits\ of\ t*[d,e].}}
+\DoxyCodeLine{cd,\ ce\ =\ (u*d\ +\ v*e)\ \%\ 2**N,\ (q*d\ +\ r*e)\ \%\ 2**N}
+\DoxyCodeLine{\textcolor{comment}{\#\ Correct\ md\ and\ me\ such\ that\ the\ bottom\ N\ bits\ of\ t*[d,e]+M*[md,me]\ are\ zero.}}
+\DoxyCodeLine{\textcolor{comment}{\#\ Note\ that\ this\ is\ not\ the\ same\ as\ \{md\ =\ (-\/Mi\ *\ cd)\ \%\ 2**N\}\ etc.\ That\ would\ also\ result\ in\ N}}
+\DoxyCodeLine{\textcolor{comment}{\#\ zero\ bottom\ bits,\ but\ isn't\ guaranteed\ to\ be\ a\ reduction\ of\ [0,2\string^N)\ compared\ to\ the}}
+\DoxyCodeLine{\textcolor{comment}{\#\ previous\ md\ and\ me\ values,\ and\ thus\ would\ violate\ our\ bounds\ analysis.}}
+\DoxyCodeLine{md\ -\/=\ (Mi*cd\ +\ md)\ \%\ 2**N}
+\DoxyCodeLine{me\ -\/=\ (Mi*ce\ +\ me)\ \%\ 2**N}
+\DoxyCodeLine{...}
+
+\end{DoxyCode}
+
+
+The resulting function takes {\itshape d} and {\itshape e} in range {\itshape (-\/2M,M)} as inputs, and outputs values in the same range. That also means that the {\itshape d} value at the end of {\ttfamily modinv} will be in that range, while we want a result in {\itshape \mbox{[}0,M)}. To do that, we need a normalization function. It\textquotesingle{}s easy to integrate the conditional negation of {\itshape d} (based on the sign of {\itshape f}) into it as well\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{def\ }\mbox{\hyperlink{normalize__prefix_8cpp_a359b1f30b0a9553a0e1ce551ddb7e9a6}{normalize}}(sign,\ v,\ M):}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Compute\ sign*v\ mod\ M,\ where\ v\ is\ in\ range\ (-\/2*M,M);\ output\ in\ [0,M)."{}"{}"{}}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{assert}\ sign\ ==\ 1\ \textcolor{keywordflow}{or}\ sign\ ==\ -\/1}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{\#\ v\ in\ (-\/2*M,M)}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{if}\ v\ <\ 0:}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ v\ +=\ M}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{\#\ v\ in\ (-\/M,M).\ Now\ multiply\ v\ with\ sign\ (which\ can\ only\ be\ 1\ or\ -\/1).}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{if}\ sign\ ==\ -\/1:}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ v\ =\ -\/v}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{\#\ v\ in\ (-\/M,M)}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{if}\ v\ <\ 0:}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ v\ +=\ M}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{\#\ v\ in\ [0,M)}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{return}\ v}
+
+\end{DoxyCode}
+
+
+And calling it in {\ttfamily modinv} is simply\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{...}
+\DoxyCodeLine{\textcolor{keywordflow}{return}\ \mbox{\hyperlink{normalize__prefix_8cpp_a359b1f30b0a9553a0e1ce551ddb7e9a6}{normalize}}(f,\ d,\ M)}
+
+\end{DoxyCode}
+
+
+\doxysection*{5. Constant-\/time operation}
+
+The primary selling point of the algorithm is fast constant-\/time operation. What code flow still depends on the input data so far?
+
+
+\begin{DoxyItemize}
+\item the number of iterations of the while {\itshape g {$\ne$} 0} loop in {\ttfamily modinv}
+\item the branches inside {\ttfamily divsteps\+\_\+n\+\_\+matrix}
+\item the sign checks in {\ttfamily update\+\_\+de}
+\item the sign checks in {\ttfamily normalize}
+\end{DoxyItemize}
+
+To make the while loop in {\ttfamily modinv} constant time it can be replaced with a constant number of iterations. The paper proves (Theorem 11.\+2) that {\itshape 741} divsteps are sufficient for any {\itshape 256}-\/bit inputs, and \href{https://github.com/sipa/safegcd-bounds}{\texttt{ safegcd-\/bounds}} shows that the slightly better bound {\itshape 724} is sufficient even. Given that every loop iteration performs {\itshape N} divsteps, it will run a total of {\itshape {$\lceil$}724/N{$\rceil$}} times.
+
+To deal with the branches in {\ttfamily divsteps\+\_\+n\+\_\+matrix} we will replace them with constant-\/time bitwise operations (and hope the C compiler isn\textquotesingle{}t smart enough to turn them back into branches; see {\ttfamily \doxylink{valgrind__ctime__test_8c}{valgrind\+\_\+ctime\+\_\+test.\+c}} for automated tests that this isn\textquotesingle{}t the case). To do so, observe that a divstep can be written instead as (compare to the inner loop of {\ttfamily gcd} in section 1).
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{x\ =\ -\/f\ \textcolor{keywordflow}{if}\ delta\ >\ 0\ \textcolor{keywordflow}{else}\ f\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ set\ x\ equal\ to\ (input)\ -\/f\ or\ f}}
+\DoxyCodeLine{\textcolor{keywordflow}{if}\ g\ \&\ 1:}
+\DoxyCodeLine{\ \ \ \ g\ +=\ x\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ set\ g\ to\ (input)\ g-\/f\ or\ g+f}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{if}\ delta\ >\ 0:}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ delta\ =\ -\/delta}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ f\ +=\ g\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ set\ f\ to\ (input)\ g\ (note\ that\ g\ was\ set\ to\ g-\/f\ before)}}
+\DoxyCodeLine{delta\ +=\ 1}
+\DoxyCodeLine{g\ >>=\ 1}
+
+\end{DoxyCode}
+
+
+To convert the above to bitwise operations, we rely on a trick to negate conditionally\+: per the definition of negative numbers in two\textquotesingle{}s complement, ({\itshape -\/v == \texorpdfstring{$\sim$}{\string~}v + 1}) holds for every number {\itshape v}. As {\itshape -\/1} in two\textquotesingle{}s complement is all {\itshape 1} bits, bitflipping can be expressed as xor with {\itshape -\/1}. It follows that {\itshape -\/v == (v \texorpdfstring{$^\wedge$}{\string^} -\/1) -\/ (-\/1)}. Thus, if we have a variable {\itshape c} that takes on values {\itshape 0} or {\itshape -\/1}, then {\itshape (v \texorpdfstring{$^\wedge$}{\string^} c) -\/ c} is {\itshape v} if {\itshape c=0} and {\itshape -\/v} if {\itshape c=-\/1}.
+
+Using this we can write\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{x\ =\ -\/f\ \textcolor{keywordflow}{if}\ delta\ >\ 0\ \textcolor{keywordflow}{else}\ f}
+
+\end{DoxyCode}
+
+
+in constant-\/time form as\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{c1\ =\ (-\/delta)\ >>\ 63}
+\DoxyCodeLine{\textcolor{comment}{\#\ Conditionally\ negate\ f\ based\ on\ c1:}}
+\DoxyCodeLine{x\ =\ (f\ \string^\ c1)\ -\/\ c1}
+
+\end{DoxyCode}
+
+
+To use that trick, we need a helper mask variable {\itshape c1} that resolves the condition {\itshape {$\delta$}\texorpdfstring{$>$}{>}0} to {\itshape -\/1} (if true) or {\itshape 0} (if false). We compute {\itshape c1} using right shifting, which is equivalent to dividing by the specified power of {\itshape 2} and rounding down (in Python, and also in C under the assumption of a typical two\textquotesingle{}s complement system; see {\ttfamily \doxylink{assumptions_8h}{assumptions.\+h}} for tests that this is the case). Right shifting by {\itshape 63} thus maps all numbers in range \texorpdfstring{$\ast$}{*}\mbox{[}-\/2\textsuperscript{63},0)\texorpdfstring{$\ast$}{*} to {\itshape -\/1}, and numbers in range \texorpdfstring{$\ast$}{*}\mbox{[}0,2\textsuperscript{63})\texorpdfstring{$\ast$}{*} to {\itshape 0}.
+
+Using the facts that {\itshape x\&0=0} and {\itshape x\&(-\/1)=x} (on two\textquotesingle{}s complement systems again), we can write\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordflow}{if}\ g\ \&\ 1:}
+\DoxyCodeLine{\ \ \ \ g\ +=\ x}
+
+\end{DoxyCode}
+
+
+as\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{comment}{\#\ Compute\ c2=0\ if\ g\ is\ even\ and\ c2=-\/1\ if\ g\ is\ odd.}}
+\DoxyCodeLine{c2\ =\ -\/(g\ \&\ 1)}
+\DoxyCodeLine{\textcolor{comment}{\#\ This\ masks\ out\ x\ if\ g\ is\ even,\ and\ leaves\ x\ be\ if\ g\ is\ odd.}}
+\DoxyCodeLine{g\ +=\ x\ \&\ c2}
+
+\end{DoxyCode}
+
+
+Using the conditional negation trick again we can write\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordflow}{if}\ g\ \&\ 1:}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{if}\ delta\ >\ 0:}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ delta\ =\ -\/delta}
+
+\end{DoxyCode}
+
+
+as\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{comment}{\#\ Compute\ c3=-\/1\ if\ g\ is\ odd\ and\ delta>0,\ and\ 0\ otherwise.}}
+\DoxyCodeLine{c3\ =\ c1\ \&\ c2}
+\DoxyCodeLine{\textcolor{comment}{\#\ Conditionally\ negate\ delta\ based\ on\ c3:}}
+\DoxyCodeLine{delta\ =\ (delta\ \string^\ c3)\ -\/\ c3}
+
+\end{DoxyCode}
+
+
+Finally\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordflow}{if}\ g\ \&\ 1:}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{if}\ delta\ >\ 0:}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ f\ +=\ g}
+
+\end{DoxyCode}
+
+
+becomes\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{f\ +=\ g\ \&\ c3}
+
+\end{DoxyCode}
+
+
+It turns out that this can be implemented more efficiently by applying the substitution {\itshape {$\eta$}=-\/{$\delta$}}. In this representation, negating {\itshape {$\delta$}} corresponds to negating {\itshape {$\eta$}}, and incrementing {\itshape {$\delta$}} corresponds to decrementing {\itshape {$\eta$}}. This allows us to remove the negation in the {\itshape c1} computation\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{comment}{\#\ Compute\ a\ mask\ c1\ for\ eta\ <\ 0,\ and\ compute\ the\ conditional\ negation\ x\ of\ f:}}
+\DoxyCodeLine{c1\ =\ eta\ >>\ 63}
+\DoxyCodeLine{x\ =\ (f\ \string^\ c1)\ -\/\ c1}
+\DoxyCodeLine{\textcolor{comment}{\#\ Compute\ a\ mask\ c2\ for\ odd\ g,\ and\ conditionally\ add\ x\ to\ g:}}
+\DoxyCodeLine{c2\ =\ -\/(g\ \&\ 1)}
+\DoxyCodeLine{g\ +=\ x\ \&\ c2}
+\DoxyCodeLine{\textcolor{comment}{\#\ Compute\ a\ mask\ c\ for\ (eta\ <\ 0)\ and\ odd\ (input)\ g,\ and\ use\ it\ to\ conditionally\ negate\ eta,}}
+\DoxyCodeLine{\textcolor{comment}{\#\ and\ add\ g\ to\ f:}}
+\DoxyCodeLine{c3\ =\ c1\ \&\ c2}
+\DoxyCodeLine{eta\ =\ (eta\ \string^\ c3)\ -\/\ c3}
+\DoxyCodeLine{f\ +=\ g\ \&\ c3}
+\DoxyCodeLine{\textcolor{comment}{\#\ Incrementing\ delta\ corresponds\ to\ decrementing\ eta.}}
+\DoxyCodeLine{eta\ -\/=\ 1}
+\DoxyCodeLine{g\ >>=\ 1}
+
+\end{DoxyCode}
+
+
+\doxylink{struct_a}{A} variant of divsteps with better worst-\/case performance can be used instead\+: starting {\itshape {$\delta$}} at {\itshape 1/2} instead of {\itshape 1}. This reduces the worst case number of iterations to {\itshape 590} for {\itshape 256}-\/bit inputs (which can be shown using convex hull analysis). In this case, the substitution {\itshape {$\zeta$}=-\/({$\delta$}+1/2)} is used instead to keep the variable integral. Incrementing {\itshape {$\delta$}} by {\itshape 1} still translates to decrementing {\itshape {$\zeta$}} by {\itshape 1}, but negating {\itshape {$\delta$}} now corresponds to going from {\itshape {$\zeta$}} to {\itshape -\/({$\zeta$}+1)}, or \texorpdfstring{$\ast$}{*}\texorpdfstring{$\sim$}{\string~}{$\zeta$}{\itshape . Doing that conditionally based on \texorpdfstring{$\ast$}{*}c3} is simply\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{...}
+\DoxyCodeLine{c3\ =\ c1\ \&\ c2}
+\DoxyCodeLine{zeta\ \string^=\ c3}
+\DoxyCodeLine{...}
+
+\end{DoxyCode}
+
+
+By replacing the loop in {\ttfamily divsteps\+\_\+n\+\_\+matrix} with a variant of the divstep code above (extended to also apply all {\itshape f} operations to {\itshape u}, {\itshape v} and all {\itshape g} operations to {\itshape q}, {\itshape r}), a constant-\/time version of {\ttfamily divsteps\+\_\+n\+\_\+matrix} is obtained. The full code will be in section 7.
+
+These bit fiddling tricks can also be used to make the conditional negations and additions in {\ttfamily update\+\_\+de} and {\ttfamily normalize} constant-\/time.
+
+\doxysection*{6. Variable-\/time optimizations}
+
+In section 5, we modified the {\ttfamily divsteps\+\_\+n\+\_\+matrix} function (and a few others) to be constant time. Constant time operations are only necessary when computing modular inverses of secret data. In other cases, it slows down calculations unnecessarily. In this section, we will construct a faster non-\/constant time {\ttfamily divsteps\+\_\+n\+\_\+matrix} function.
+
+To do so, first consider yet another way of writing the inner loop of divstep operations in {\ttfamily gcd} from section 1. This decomposition is also explained in the paper in section 8.\+2. We use the original version with initial {\itshape {$\delta$}=1} and {\itshape {$\eta$}=-\/{$\delta$}} here.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordflow}{for}\ \_\ \textcolor{keywordflow}{in}\ range(N):}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{if}\ g\ \&\ 1\ \textcolor{keywordflow}{and}\ eta\ <\ 0:}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ eta,\ f,\ g\ =\ -\/eta,\ g,\ -\/f}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{if}\ g\ \&\ 1:}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ g\ +=\ f}
+\DoxyCodeLine{\ \ \ \ eta\ -\/=\ 1}
+\DoxyCodeLine{\ \ \ \ g\ >>=\ 1}
+
+\end{DoxyCode}
+
+
+Whenever {\itshape g} is even, the loop only shifts {\itshape g} down and decreases {\itshape {$\eta$}}. When {\itshape g} ends in multiple zero bits, these iterations can be consolidated into one step. This requires counting the bottom zero bits efficiently, which is possible on most platforms; it is abstracted here as the function {\ttfamily count\+\_\+trailing\+\_\+zeros}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{def\ }count\_trailing\_zeros(v):}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\textcolor{stringliteral}{\ \ \ \ When\ v\ is\ zero,\ consider\ all\ N\ zero\ bits\ as\ "{}trailing"{}.}}
+\DoxyCodeLine{\textcolor{stringliteral}{\ \ \ \ For\ a\ non-\/zero\ value\ v,\ find\ z\ such\ that\ v=(d<<z)\ for\ some\ odd\ d.}}
+\DoxyCodeLine{\textcolor{stringliteral}{\ \ \ \ "{}"{}"{}}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{if}\ v\ ==\ 0:}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ N}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (v\ \&\ -\/v).bit\_length()\ -\/\ 1}
+\DoxyCodeLine{}
+\DoxyCodeLine{i\ =\ N\ \textcolor{comment}{\#\ divsteps\ left\ to\ do}}
+\DoxyCodeLine{\textcolor{keywordflow}{while}\ \textcolor{keyword}{True}:}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{\#\ Get\ rid\ of\ all\ bottom\ zeros\ at\ once.\ In\ the\ first\ iteration,\ g\ may\ be\ odd\ and\ the\ following}}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{\#\ lines\ have\ no\ effect\ (until\ "{}if\ eta\ <\ 0"{}).}}
+\DoxyCodeLine{\ \ \ \ zeros\ =\ min(i,\ count\_trailing\_zeros(g))}
+\DoxyCodeLine{\ \ \ \ eta\ -\/=\ zeros}
+\DoxyCodeLine{\ \ \ \ g\ >>=\ zeros}
+\DoxyCodeLine{\ \ \ \ i\ -\/=\ zeros}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{if}\ i\ ==\ 0:}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{break}}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{\#\ We\ know\ g\ is\ odd\ now}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{if}\ eta\ <\ 0:}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ eta,\ f,\ g\ =\ -\/eta,\ g,\ -\/f}
+\DoxyCodeLine{\ \ \ \ g\ +=\ f}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{\#\ g\ is\ even\ now,\ and\ the\ eta\ decrement\ and\ g\ shift\ will\ happen\ in\ the\ next\ loop.}}
+
+\end{DoxyCode}
+
+
+We can now remove multiple bottom {\itshape 0} bits from {\itshape g} at once, but still need a full iteration whenever there is a bottom {\itshape 1} bit. In what follows, we will get rid of multiple {\itshape 1} bits simultaneously as well.
+
+Observe that as long as {\itshape {$\eta$} \&geq; 0}, the loop does not modify {\itshape f}. Instead, it cancels out bottom bits of {\itshape g} and shifts them out, and decreases {\itshape {$\eta$}} and {\itshape i} accordingly -\/ interrupting only when {\itshape {$\eta$}} becomes negative, or when {\itshape i} reaches {\itshape 0}. Combined, this is equivalent to adding a multiple of {\itshape f} to {\itshape g} to cancel out multiple bottom bits, and then shifting them out.
+
+It is easy to find what that multiple is\+: we want a number {\itshape w} such that {\itshape g+w\,f} has a few bottom zero bits. If that number of bits is {\itshape L}, we want \texorpdfstring{$\ast$}{*}g+w\,f mod 2\textsuperscript{L} = 0\texorpdfstring{$\ast$}{*}, or \texorpdfstring{$\ast$}{*}w = -\/g/f mod 2\textsuperscript{L}{\itshape . Since \texorpdfstring{$\ast$}{*}f} is odd, such a {\itshape w} exists for any {\itshape L}. {\itshape L} cannot be more than {\itshape i} steps (as we\textquotesingle{}d finish the loop before doing more) or more than {\itshape {$\eta$}+1} steps (as we\textquotesingle{}d run {\ttfamily eta, f, g = -\/eta, g, -\/f} at that point), but apart from that, we\textquotesingle{}re only limited by the complexity of computing {\itshape w}.
+
+This code demonstrates how to cancel up to 4 bits per step\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{NEGINV16\ =\ [15,\ 5,\ 3,\ 9,\ 7,\ 13,\ 11,\ 1]\ \textcolor{comment}{\#\ NEGINV16[n//2]\ =\ (-\/n)\string^-\/1\ mod\ 16,\ for\ odd\ n}}
+\DoxyCodeLine{i\ =\ N}
+\DoxyCodeLine{\textcolor{keywordflow}{while}\ \textcolor{keyword}{True}:}
+\DoxyCodeLine{\ \ \ \ zeros\ =\ min(i,\ count\_trailing\_zeros(g))}
+\DoxyCodeLine{\ \ \ \ eta\ -\/=\ zeros}
+\DoxyCodeLine{\ \ \ \ g\ >>=\ zeros}
+\DoxyCodeLine{\ \ \ \ i\ -\/=\ zeros}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{if}\ i\ ==\ 0:}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{break}}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{\#\ We\ know\ g\ is\ odd\ now}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{if}\ eta\ <\ 0:}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ eta,\ f,\ g\ =\ -\/eta,\ g,\ -\/f}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{\#\ Compute\ limit\ on\ number\ of\ bits\ to\ cancel}}
+\DoxyCodeLine{\ \ \ \ limit\ =\ min(min(eta\ +\ 1,\ i),\ 4)}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{\#\ Compute\ w\ =\ -\/g/f\ mod\ 2**limit,\ using\ the\ table\ value\ for\ -\/1/f\ mod\ 2**4.\ Note\ that\ f\ is}}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{\#\ always\ odd,\ so\ its\ inverse\ modulo\ a\ power\ of\ two\ always\ exists.}}
+\DoxyCodeLine{\ \ \ \ w\ =\ (g\ *\ NEGINV16[(f\ \&\ 15)\ //\ 2])\ \%\ (2**limit)}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{\#\ As\ w\ =\ -\/g/f\ mod\ (2**limit),\ g+w*f\ mod\ 2**limit\ =\ 0\ mod\ 2**limit.}}
+\DoxyCodeLine{\ \ \ \ g\ +=\ w\ *\ f}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{assert}\ g\ \%\ (2**limit)\ ==\ 0}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{\#\ The\ next\ iteration\ will\ now\ shift\ out\ at\ least\ limit\ bottom\ zero\ bits\ from\ g.}}
+
+\end{DoxyCode}
+
+
+By using a bigger table more bits can be cancelled at once. The table can also be implemented as a formula. Several formulas are known for computing modular inverses modulo powers of two; some can be found in Hacker\textquotesingle{}s Delight second edition by Henry \doxylink{struct_s}{S}. Warren, Jr. pages 245-\/247. Here we need the negated modular inverse, which is a simple transformation of those\+:
+
+
+\begin{DoxyItemize}
+\item Instead of a 3-\/bit table\+:
+\begin{DoxyItemize}
+\item {\itshape -\/f} or {\itshape f \texorpdfstring{$^\wedge$}{\string^} 6}
+\end{DoxyItemize}
+\item Instead of a 4-\/bit table\+:
+\begin{DoxyItemize}
+\item {\itshape 1 -\/ f(f + 1)}
+\item {\itshape -\/(f + (((f + 1) \& 4) \texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<} 1))}
+\end{DoxyItemize}
+\item For larger tables the following technique can be used\+: if \texorpdfstring{$\ast$}{*}w=-\/1/f mod 2\textsuperscript{L}{\itshape , then \texorpdfstring{$\ast$}{*}w(w\,f+2)} is \texorpdfstring{$\ast$}{*}-\/1/f mod 2\textsuperscript{2L}\texorpdfstring{$\ast$}{*}. This allows extending the previous formulas (or tables). In particular we have this 6-\/bit function (based on the 3-\/bit function above)\+:
+\begin{DoxyItemize}
+\item \texorpdfstring{$\ast$}{*}f(f\textsuperscript{2} -\/ 2)\texorpdfstring{$\ast$}{*}
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+This loop, again extended to also handle {\itshape u}, {\itshape v}, {\itshape q}, and {\itshape r} alongside {\itshape f} and {\itshape g}, placed in {\ttfamily divsteps\+\_\+n\+\_\+matrix}, gives a significantly faster, but non-\/constant time version.
+
+\doxysection*{7. Final Python version}
+
+All together we need the following functions\+:
+
+
+\begin{DoxyItemize}
+\item \doxylink{struct_a}{A} way to compute the transition matrix in constant time, using the {\ttfamily divsteps\+\_\+n\+\_\+matrix} function from section 2, but with its loop replaced by a variant of the constant-\/time divstep from section 5, extended to handle {\itshape u}, {\itshape v}, {\itshape q}, {\itshape r}\+:
+\end{DoxyItemize}
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{def\ }divsteps\_n\_matrix(zeta,\ f,\ g):}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Compute\ zeta\ and\ transition\ matrix\ t\ after\ N\ divsteps\ (multiplied\ by\ 2\string^N)."{}"{}"{}}}
+\DoxyCodeLine{\ \ \ \ u,\ v,\ q,\ r\ =\ 1,\ 0,\ 0,\ 1\ \textcolor{comment}{\#\ start\ with\ identity\ matrix}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{for}\ \_\ \textcolor{keywordflow}{in}\ range(N):}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ c1\ =\ zeta\ >>\ 63}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Compute\ x,\ y,\ z\ as\ conditionally-\/negated\ versions\ of\ f,\ u,\ v.}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ x,\ y,\ z\ =\ (f\ \string^\ c1)\ -\/\ c1,\ (u\ \string^\ c1)\ -\/\ c1,\ (v\ \string^\ c1)\ -\/\ c1}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ c2\ =\ -\/(g\ \&\ 1)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Conditionally\ add\ x,\ y,\ z\ to\ g,\ q,\ r.}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ g,\ q,\ r\ =\ g\ +\ (x\ \&\ c2),\ q\ +\ (y\ \&\ c2),\ r\ +\ (z\ \&\ c2)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ c1\ \&=\ c2\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ reusing\ c1\ here\ for\ the\ earlier\ c3\ variable}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ zeta\ =\ (zeta\ \string^\ c1)\ -\/\ 1\ \ \ \ \ \ \ \textcolor{comment}{\#\ inlining\ the\ unconditional\ zeta\ decrement\ here}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Conditionally\ add\ g,\ q,\ r\ to\ f,\ u,\ v.}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ f,\ u,\ v\ =\ f\ +\ (g\ \&\ c1),\ u\ +\ (q\ \&\ c1),\ v\ +\ (r\ \&\ c1)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{comment}{\#\ When\ shifting\ g\ down,\ don't\ shift\ q,\ r,\ as\ we\ construct\ a\ transition\ matrix\ multiplied}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{comment}{\#\ by\ 2\string^N.\ Instead,\ shift\ f's\ coefficients\ u\ and\ v\ up.}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ g,\ u,\ v\ =\ g\ >>\ 1,\ u\ <<\ 1,\ v\ <<\ 1}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{return}\ zeta,\ (u,\ v,\ q,\ r)}
+
+\end{DoxyCode}
+
+
+
+\begin{DoxyItemize}
+\item The functions to update {\itshape f} and {\itshape g}, and {\itshape d} and {\itshape e}, from section 2 and section 4, with the constant-\/time changes to {\ttfamily update\+\_\+de} from section 5\+:
+\end{DoxyItemize}
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{def\ }update\_fg(f,\ g,\ t):}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Multiply\ matrix\ t/2\string^N\ with\ [f,\ g]."{}"{}"{}}}
+\DoxyCodeLine{\ \ \ \ u,\ v,\ q,\ r\ =\ t}
+\DoxyCodeLine{\ \ \ \ cf,\ cg\ =\ u*f\ +\ v*g,\ q*f\ +\ r*g}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{return}\ cf\ >>\ N,\ cg\ >>\ N}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{def\ }update\_de(d,\ e,\ t,\ M,\ Mi):}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Multiply\ matrix\ t/2\string^N\ with\ [d,\ e],\ modulo\ M."{}"{}"{}}}
+\DoxyCodeLine{\ \ \ \ u,\ v,\ q,\ r\ =\ t}
+\DoxyCodeLine{\ \ \ \ d\_sign,\ e\_sign\ =\ d\ >>\ 257,\ e\ >>\ 257}
+\DoxyCodeLine{\ \ \ \ md,\ me\ =\ (u\ \&\ d\_sign)\ +\ (v\ \&\ e\_sign),\ (q\ \&\ d\_sign)\ +\ (r\ \&\ e\_sign)}
+\DoxyCodeLine{\ \ \ \ cd,\ ce\ =\ (u*d\ +\ v*e)\ \%\ 2**N,\ (q*d\ +\ r*e)\ \%\ 2**N}
+\DoxyCodeLine{\ \ \ \ md\ -\/=\ (Mi*cd\ +\ md)\ \%\ 2**N}
+\DoxyCodeLine{\ \ \ \ me\ -\/=\ (Mi*ce\ +\ me)\ \%\ 2**N}
+\DoxyCodeLine{\ \ \ \ cd,\ ce\ =\ u*d\ +\ v*e\ +\ M*md,\ q*d\ +\ r*e\ +\ M*me}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{return}\ cd\ >>\ N,\ ce\ >>\ N}
+
+\end{DoxyCode}
+
+
+
+\begin{DoxyItemize}
+\item The {\ttfamily normalize} function from section 4, made constant time as well\+:
+\end{DoxyItemize}
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{def\ }\mbox{\hyperlink{normalize__prefix_8cpp_a359b1f30b0a9553a0e1ce551ddb7e9a6}{normalize}}(sign,\ v,\ M):}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Compute\ sign*v\ mod\ M,\ where\ v\ in\ (-\/2*M,M);\ output\ in\ [0,M)."{}"{}"{}}}
+\DoxyCodeLine{\ \ \ \ v\_sign\ =\ v\ >>\ 257}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{\#\ Conditionally\ add\ M\ to\ v.}}
+\DoxyCodeLine{\ \ \ \ v\ +=\ M\ \&\ v\_sign}
+\DoxyCodeLine{\ \ \ \ c\ =\ (sign\ -\/\ 1)\ >>\ 1}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{\#\ Conditionally\ negate\ v.}}
+\DoxyCodeLine{\ \ \ \ v\ =\ (v\ \string^\ c)\ -\/\ c}
+\DoxyCodeLine{\ \ \ \ v\_sign\ =\ v\ >>\ 257}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{\#\ Conditionally\ add\ M\ to\ v\ again.}}
+\DoxyCodeLine{\ \ \ \ v\ +=\ M\ \&\ v\_sign}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{return}\ v}
+
+\end{DoxyCode}
+
+
+
+\begin{DoxyItemize}
+\item And finally the {\ttfamily modinv} function too, adapted to use {\itshape {$\zeta$}} instead of {\itshape {$\delta$}}, and using the fixed iteration count from section 5\+:
+\end{DoxyItemize}
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{def\ }modinv(M,\ Mi,\ x):}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Compute\ the\ modular\ inverse\ of\ x\ mod\ M,\ given\ Mi=1/M\ mod\ 2\string^N."{}"{}"{}}}
+\DoxyCodeLine{\ \ \ \ zeta,\ f,\ g,\ d,\ e\ =\ -\/1,\ M,\ x,\ 0,\ 1}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{for}\ \_\ \textcolor{keywordflow}{in}\ range((590\ +\ N\ -\/\ 1)\ //\ N):}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ zeta,\ t\ =\ divsteps\_n\_matrix(zeta,\ f\ \%\ 2**N,\ g\ \%\ 2**N)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ f,\ g\ =\ update\_fg(f,\ g,\ t)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ d,\ e\ =\ update\_de(d,\ e,\ t,\ M,\ Mi)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{normalize__prefix_8cpp_a359b1f30b0a9553a0e1ce551ddb7e9a6}{normalize}}(f,\ d,\ M)}
+
+\end{DoxyCode}
+
+
+
+\begin{DoxyItemize}
+\item To get a variable time version, replace the {\ttfamily divsteps\+\_\+n\+\_\+matrix} function with one that uses the divsteps loop from section 5, and a {\ttfamily modinv} version that calls it without the fixed iteration count\+:
+\end{DoxyItemize}
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{NEGINV16\ =\ [15,\ 5,\ 3,\ 9,\ 7,\ 13,\ 11,\ 1]\ \textcolor{comment}{\#\ NEGINV16[n//2]\ =\ (-\/n)\string^-\/1\ mod\ 16,\ for\ odd\ n}}
+\DoxyCodeLine{\textcolor{keyword}{def\ }divsteps\_n\_matrix\_var(eta,\ f,\ g):}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Compute\ eta\ and\ transition\ matrix\ t\ after\ N\ divsteps\ (multiplied\ by\ 2\string^N)."{}"{}"{}}}
+\DoxyCodeLine{\ \ \ \ u,\ v,\ q,\ r\ =\ 1,\ 0,\ 0,\ 1}
+\DoxyCodeLine{\ \ \ \ i\ =\ N}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{while}\ \textcolor{keyword}{True}:}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ zeros\ =\ min(i,\ count\_trailing\_zeros(g))}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ eta,\ i\ =\ eta\ -\/\ zeros,\ i\ -\/\ zeros}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ g,\ u,\ v\ =\ g\ >>\ zeros,\ u\ <<\ zeros,\ v\ <<\ zeros}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ i\ ==\ 0:}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ eta\ <\ 0:}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ eta,\ f,\ u,\ v,\ g,\ q,\ r\ =\ -\/eta,\ g,\ q,\ r,\ -\/f,\ -\/u,\ -\/v}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ limit\ =\ min(min(eta\ +\ 1,\ i),\ 4)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ w\ =\ (g\ *\ NEGINV16[(f\ \&\ 15)\ //\ 2])\ \%\ (2**limit)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ g,\ q,\ r\ =\ g\ +\ w*f,\ q\ +\ w*u,\ r\ +\ w*v}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{return}\ eta,\ (u,\ v,\ q,\ r)}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{def\ }modinv\_var(M,\ Mi,\ x):}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Compute\ the\ modular\ inverse\ of\ x\ mod\ M,\ given\ Mi\ =\ 1/M\ mod\ 2\string^N."{}"{}"{}}}
+\DoxyCodeLine{\ \ \ \ eta,\ f,\ g,\ d,\ e\ =\ -\/1,\ M,\ x,\ 0,\ 1}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{while}\ g\ !=\ 0:}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ eta,\ t\ =\ divsteps\_n\_matrix\_var(eta,\ f\ \%\ 2**N,\ g\ \%\ 2**N)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ f,\ g\ =\ update\_fg(f,\ g,\ t)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ d,\ e\ =\ update\_de(d,\ e,\ t,\ M,\ Mi)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{normalize__prefix_8cpp_a359b1f30b0a9553a0e1ce551ddb7e9a6}{normalize}}(f,\ d,\ Mi)}
+
+\end{DoxyCode}
+ 

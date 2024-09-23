@@ -1,0 +1,70 @@
+\doxysection{libraries/fc/include/fc/crypto/webauthn\+\_\+json/example/capitalize/capitalize.cpp File Reference}
+\hypertarget{capitalize_8cpp}{}\label{capitalize_8cpp}\index{libraries/fc/include/fc/crypto/webauthn\_json/example/capitalize/capitalize.cpp@{libraries/fc/include/fc/crypto/webauthn\_json/example/capitalize/capitalize.cpp}}
+{\ttfamily \#include "{}rapidjson/reader.\+h"{}}\newline
+{\ttfamily \#include "{}rapidjson/writer.\+h"{}}\newline
+{\ttfamily \#include "{}rapidjson/filereadstream.\+h"{}}\newline
+{\ttfamily \#include "{}rapidjson/filewritestream.\+h"{}}\newline
+{\ttfamily \#include "{}rapidjson/error/en.\+h"{}}\newline
+{\ttfamily \#include $<$vector$>$}\newline
+{\ttfamily \#include $<$cctype$>$}\newline
+Include dependency graph for capitalize.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{capitalize_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_capitalize_filter}{Capitalize\+Filter$<$ Output\+Handler $>$}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{capitalize_8cpp_a81ce304348a420752ee080480d2b3095}{main}} (int, char \texorpdfstring{$\ast$}{*}\mbox{[}$\,$\mbox{]})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{capitalize_8cpp_a81ce304348a420752ee080480d2b3095}\index{capitalize.cpp@{capitalize.cpp}!main@{main}}
+\index{main@{main}!capitalize.cpp@{capitalize.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{capitalize_8cpp_a81ce304348a420752ee080480d2b3095} 
+int main (\begin{DoxyParamCaption}\item[{int}]{}{, }\item[{char \texorpdfstring{$\ast$}{*}}]{}{\mbox{[}$\,$\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{capitalize_8cpp_source_l00048}{48}} of file \mbox{\hyperlink{capitalize_8cpp_source}{capitalize.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00049\ \ \ \ \ \textcolor{comment}{//\ Prepare\ JSON\ reader\ and\ input\ stream.}}
+\DoxyCodeLine{00050\ \ \ \ \ \mbox{\hyperlink{class_generic_reader}{Reader}}\ reader;}
+\DoxyCodeLine{00051\ \ \ \ \ \textcolor{keywordtype}{char}\ readBuffer[65536];}
+\DoxyCodeLine{00052\ \ \ \ \ \mbox{\hyperlink{class_file_read_stream}{FileReadStream}}\ is(stdin,\ readBuffer,\ \textcolor{keyword}{sizeof}(readBuffer));}
+\DoxyCodeLine{00053\ }
+\DoxyCodeLine{00054\ \ \ \ \ \textcolor{comment}{//\ Prepare\ JSON\ writer\ and\ output\ stream.}}
+\DoxyCodeLine{00055\ \ \ \ \ \textcolor{keywordtype}{char}\ writeBuffer[65536];}
+\DoxyCodeLine{00056\ \ \ \ \ \mbox{\hyperlink{class_file_write_stream}{FileWriteStream}}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}(stdout,\ writeBuffer,\ \textcolor{keyword}{sizeof}(writeBuffer));}
+\DoxyCodeLine{00057\ \ \ \ \ \mbox{\hyperlink{class_writer}{Writer<FileWriteStream>}}\ writer(os);}
+\DoxyCodeLine{00058\ }
+\DoxyCodeLine{00059\ \ \ \ \ \textcolor{comment}{//\ JSON\ reader\ parse\ from\ the\ input\ stream\ and\ let\ writer\ generate\ the\ output.}}
+\DoxyCodeLine{00060\ \ \ \ \ \mbox{\hyperlink{struct_capitalize_filter}{CapitalizeFilter<Writer<FileWriteStream>}}\ >\ filter(writer);}
+\DoxyCodeLine{00061\ \ \ \ \ \textcolor{keywordflow}{if}\ (!reader.\mbox{\hyperlink{class_generic_reader_a0c450620d14ff1824e58bb7bd9b42099}{Parse}}(is,\ filter))\ \{}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}\(\backslash\)nError(\%u):\ \%s\(\backslash\)n"{}},\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\textcolor{keyword}{>}(reader.\mbox{\hyperlink{class_generic_reader_ae9008523ccd06d839a57335835cb4091}{GetErrorOffset}}()),\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_ga28835eb93d2c3c07bbea13515eb31415}{GetParseError\_En}}(reader.\mbox{\hyperlink{class_generic_reader_a937bf90919f50e1c370b312cee5833e8}{GetParseErrorCode}}()));}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{00064\ \ \ \ \ \}}
+\DoxyCodeLine{00065\ }
+\DoxyCodeLine{00066\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00067\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{capitalize_8cpp_a81ce304348a420752ee080480d2b3095_cgraph}
+\end{center}
+\end{figure}

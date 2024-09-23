@@ -1,0 +1,91 @@
+\doxysection{external\+\_\+io\+\_\+service.\+cpp}
+\hypertarget{external__io__service_8cpp_source}{}\label{external__io__service_8cpp_source}\index{libraries/fc/vendor/websocketpp/examples/external\_io\_service/external\_io\_service.cpp@{libraries/fc/vendor/websocketpp/examples/external\_io\_service/external\_io\_service.cpp}}
+\mbox{\hyperlink{external__io__service_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2015,\ Peter\ Thorson.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00004}00004\ \textcolor{comment}{\ *\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00005}00005\ \textcolor{comment}{\ *\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are\ met:}}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00006}00006\ \textcolor{comment}{\ *\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00007}00007\ \textcolor{comment}{\ *\ \ \ \ \ \ \ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00008}00008\ \textcolor{comment}{\ *\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00009}00009\ \textcolor{comment}{\ *\ \ \ \ \ \ \ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer\ in\ the}}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00010}00010\ \textcolor{comment}{\ *\ \ \ \ \ \ \ documentation\ and/or\ other\ materials\ provided\ with\ the\ distribution.}}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00011}00011\ \textcolor{comment}{\ *\ \ \ \ \ *\ Neither\ the\ name\ of\ the\ WebSocket++\ Project\ nor\ the}}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00012}00012\ \textcolor{comment}{\ *\ \ \ \ \ \ \ names\ of\ its\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products}}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00013}00013\ \textcolor{comment}{\ *\ \ \ \ \ \ \ derived\ from\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00014}00014\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00015}00015\ \textcolor{comment}{\ *\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS\ "{}AS\ IS"{}}}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00016}00016\ \textcolor{comment}{\ *\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ THE}}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00017}00017\ \textcolor{comment}{\ *\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR\ A\ PARTICULAR\ PURPOSE}}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00018}00018\ \textcolor{comment}{\ *\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ PETER\ THORSON\ BE\ LIABLE\ FOR\ ANY}}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00019}00019\ \textcolor{comment}{\ *\ DIRECT,\ INDIRECT,\ INCIDENTAL,\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES}}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00020}00020\ \textcolor{comment}{\ *\ (INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;}}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00021}00021\ \textcolor{comment}{\ *\ LOSS\ OF\ USE,\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND}}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00022}00022\ \textcolor{comment}{\ *\ ON\ ANY\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00023}00023\ \textcolor{comment}{\ *\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE\ OF\ THIS}}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00024}00024\ \textcolor{comment}{\ *\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00025}00025\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00027}00027\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{tcp__echo__server_8hpp}{tcp\_echo\_server.hpp}}"{}}}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00029}00029\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{asio__no__tls_8hpp}{websocketpp/config/asio\_no\_tls.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00030}00030\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{server_8hpp}{websocketpp/server.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00032}00032\ \textcolor{preprocessor}{\#include\ <iostream>}}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00034}00034\ \textcolor{keyword}{using\ }websocketpp::lib::placeholders::\_1;}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00035}00035\ \textcolor{keyword}{using\ }websocketpp::lib::placeholders::\_2;}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00036}00036\ \textcolor{keyword}{using\ }websocketpp::lib::bind;}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00038}\mbox{\hyperlink{external__io__service_8cpp_a64447228e52deac9360a1f0c21ecf3ab}{00038}}\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1server}{websocketpp::server<websocketpp::config::asio>}}\ \mbox{\hyperlink{external__io__service_8cpp_a64447228e52deac9360a1f0c21ecf3ab}{ws\_echo\_server}};}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00040}00040\ \textcolor{comment}{//\ Define\ a\ callback\ to\ handle\ incoming\ messages}}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00041}\mbox{\hyperlink{external__io__service_8cpp_a366cfe1a1010723a15a6001cd1a8bf60}{00041}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{external__io__service_8cpp_a366cfe1a1010723a15a6001cd1a8bf60}{on\_message}}(\mbox{\hyperlink{classwebsocketpp_1_1server}{ws\_echo\_server}}*\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ \mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{websocketpp::connection\_hdl}}\ hdl,\ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a8097edab4feb0c36a69601c3786f0062}{ws\_echo\_server::message\_ptr}}\ msg)\ \{}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00042}00042\ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}on\_message\ called\ with\ hdl:\ "{}}\ <<\ hdl.lock().get()}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00043}00043\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\ and\ message:\ "{}}\ <<\ msg-\/>get\_payload()}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00044}00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00046}00046\ \ \ \ \ \textcolor{comment}{//\ check\ for\ a\ special\ command\ to\ instruct\ the\ server\ to\ stop\ listening\ so}}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00047}00047\ \ \ \ \ \textcolor{comment}{//\ it\ can\ be\ cleanly\ exited.}}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00048}00048\ \ \ \ \ \textcolor{keywordflow}{if}\ (msg-\/>get\_payload()\ ==\ \textcolor{stringliteral}{"{}stop-\/listening"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}-\/>stop\_listening();}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00050}00050\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00051}00051\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00052}00052\ }
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00053}00053\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00054}00054\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}-\/>send(hdl,\ msg-\/>get\_payload(),\ msg-\/>get\_opcode());}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00055}00055\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (websocketpp::lib::error\_code\ \textcolor{keyword}{const}\ \&\ e)\ \{}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00056}00056\ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}Echo\ failed\ because:\ "{}}\ <<\ e}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}("{}}\ <<\ e.message()\ <<\ \textcolor{stringliteral}{"{})"{}}\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00058}00058\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00059}00059\ \}}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00061}\mbox{\hyperlink{external__io__service_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{00061}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{external__io__service_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}()\ \{}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00062}00062\ \ \ \ \ asio::io\_service\ service;}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00064}00064\ \ \ \ \ \textcolor{comment}{//\ Add\ a\ TCP\ echo\ server\ on\ port\ 9003}}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00065}00065\ \ \ \ \ \mbox{\hyperlink{structtcp__echo__server}{tcp\_echo\_server}}\ custom\_http\_server(service,\ 9003);}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00067}00067\ \ \ \ \ \textcolor{comment}{//\ Add\ a\ WebSocket\ echo\ server\ on\ port\ 9002}}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00068}00068\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1server}{ws\_echo\_server}}\ ws\_server;}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00069}00069\ \ \ \ \ ws\_server.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a5d7da609ebd2f797e5e67b6d050ebc59}{set\_access\_channels}}(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a853aa0b8976e53f3181af3bc398d493e}{websocketpp::log::alevel::all}});}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00070}00070\ \ \ \ \ ws\_server.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a3fe357b3c6434273a9965eb52902575d}{clear\_access\_channels}}(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_aa38cfdf7a82f33cac319438462707e90}{websocketpp::log::alevel::frame\_payload}});}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00072}00072\ \ \ \ \ \textcolor{comment}{//\ The\ only\ difference\ in\ this\ code\ between\ an\ internal\ and\ external}}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00073}00073\ \ \ \ \ \textcolor{comment}{//\ io\_service\ is\ the\ different\ constructor\ to\ init\_asio}}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00074}00074\ \ \ \ \ ws\_server.init\_asio(\&service);}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00075}00075\ }
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00076}00076\ \ \ \ \ \textcolor{comment}{//\ Register\ our\ message\ handler}}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00077}00077\ \ \ \ \ ws\_server.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a34a3a8351bff65ba878975be471cab85}{set\_message\_handler}}(bind(\&\mbox{\hyperlink{external__io__service_8cpp_a366cfe1a1010723a15a6001cd1a8bf60}{on\_message}},\&ws\_server,::\_1,::\_2));}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00078}00078\ \ \ \ \ ws\_server.listen(9002);}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00079}00079\ \ \ \ \ ws\_server.\mbox{\hyperlink{classwebsocketpp_1_1server_a0204a7d444144f7ea5b8bbcf14689fc1}{start\_accept}}();}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00080}00080\ }
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00081}00081\ \ \ \ \ \textcolor{comment}{//\ TODO:\ add\ a\ timer?}}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00083}00083\ \ \ \ \ \textcolor{comment}{//\ Start\ the\ Asio\ io\_service\ run\ loop\ for\ all}}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00084}00084\ \ \ \ \ service.run();}
+\DoxyCodeLine{\Hypertarget{external__io__service_8cpp_source_l00085}00085\ \}}
+
+\end{DoxyCode}

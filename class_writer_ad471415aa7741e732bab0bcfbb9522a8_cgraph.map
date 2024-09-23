@@ -1,0 +1,25 @@
+<map id="Writer::Int" name="Writer::Int">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,104,84,130"/>
+<area shape="rect" id="Node000002" href="$class_writer.html#adc1cadbabc309d31f19cf7463251d879" title=" " alt="" coords="132,55,250,80"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="83,101,135,83,137,88,85,106"/>
+<area shape="rect" id="Node000005" href="$class_writer.html#a1fc40f8b9f3abc2548c0c5782ce1755d" title=" " alt="" coords="142,104,240,130"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="84,114,127,114,127,120,84,120"/>
+<area shape="rect" id="Node000007" href="$class_writer.html#a31d0feda654ca245c41462be7dc59998" title=" " alt="" coords="137,177,245,203"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="73,128,151,168,149,172,71,133"/>
+<area shape="rect" id="Node000003" href="$classinternal_1_1_stack.html#a2b8bda380e33838a99e3c73ff9785f03" title=" " alt="" coords="302,5,454,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="242,51,311,33,313,38,243,57"/>
+<area shape="rect" id="Node000004" href="$class_writer.html#a8ca4e364c546b2eb526caa68dde011d2" title="Flush the output stream." alt="" coords="330,55,426,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="251,65,315,65,315,70,251,70"/>
+<area shape="rect" id="Node000006" href="$classinternal_1_1_stack.html#ac484468a2791bd3e9ba609bd1600ab48" title=" " alt="" coords="298,104,458,130"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="240,114,282,114,282,120,240,120"/>
+<area shape="rect" id="Node000008" href="$namespaceinternal.html#ac6c7d763acc9ca9f15a759241640328e" title=" " alt="" coords="325,153,431,179"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="245,181,309,172,310,178,246,186"/>
+<area shape="rect" id="Node000011" href="$stream_8h.html#aa817b00a466bb84d96c5de1616436c95" title="Reserve n characters for writing to a stream." alt="" coords="333,203,423,228"/>
+<area shape="poly" id="edge10_Node000007_Node000011" title=" " alt="" coords="246,195,318,205,318,210,245,200"/>
+<area shape="rect" id="Node000012" href="$stream_8h.html#ad57ba7f2912c5509924b69dec7db4396" title="Write character to a stream, presuming buffer is reserved." alt="" coords="336,252,420,278"/>
+<area shape="poly" id="edge11_Node000007_Node000012" title=" " alt="" coords="218,201,299,238,323,247,321,252,297,243,216,206"/>
+<area shape="rect" id="Node000009" href="$namespaceinternal.html#a90e3cb218b557548f361e99dc718b4b1" title=" " alt="" coords="506,153,617,179"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="432,164,491,164,491,169,432,169"/>
+<area shape="rect" id="Node000010" href="$namespaceinternal.html#a76ad2b55668f695effde1971d53a5ce1" title=" " alt="" coords="665,153,809,179"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="617,164,649,164,649,169,617,169"/>
+</map>

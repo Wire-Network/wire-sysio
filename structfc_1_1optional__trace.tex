@@ -1,0 +1,78 @@
+\doxysection{fc\+::optional\+\_\+trace Struct Reference}
+\hypertarget{structfc_1_1optional__trace}{}\label{structfc_1_1optional__trace}\index{fc::optional\_trace@{fc::optional\_trace}}
+
+
+{\ttfamily \#include $<$zipkin.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+constexpr \mbox{\hyperlink{structfc_1_1optional__trace_a8c310b735013f0e80f3cc8952715fcf2}{operator bool}} () const noexcept
+\item 
+\mbox{\hyperlink{structfc_1_1zipkin__span_1_1token}{zipkin\+\_\+span\+::token}} \mbox{\hyperlink{structfc_1_1optional__trace_a001c1b5c3837bbe24765392fdf1f4bbf}{get\+\_\+token}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::optional$<$ \mbox{\hyperlink{structfc_1_1zipkin__trace}{zipkin\+\_\+trace}} $>$ \mbox{\hyperlink{structfc_1_1optional__trace_abe9636e187d56a747e5e9e1ac20de583}{opt}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{zipkin_8hpp_source_l00165}{165}} of file \mbox{\hyperlink{zipkin_8hpp_source}{zipkin.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structfc_1_1optional__trace_a001c1b5c3837bbe24765392fdf1f4bbf}\index{fc::optional\_trace@{fc::optional\_trace}!get\_token@{get\_token}}
+\index{get\_token@{get\_token}!fc::optional\_trace@{fc::optional\_trace}}
+\doxysubsubsection{\texorpdfstring{get\_token()}{get\_token()}}
+{\footnotesize\ttfamily \label{structfc_1_1optional__trace_a001c1b5c3837bbe24765392fdf1f4bbf} 
+\mbox{\hyperlink{structfc_1_1zipkin__span_1_1token}{zipkin\+\_\+span\+::token}} fc\+::optional\+\_\+trace\+::get\+\_\+token (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [nodiscard]}}
+
+
+
+Definition at line \mbox{\hyperlink{zipkin_8hpp_source_l00170}{170}} of file \mbox{\hyperlink{zipkin_8hpp_source}{zipkin.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structfc_1_1optional__trace_abe9636e187d56a747e5e9e1ac20de583}{opt}}\ ?\ \mbox{\hyperlink{structfc_1_1optional__trace_abe9636e187d56a747e5e9e1ac20de583}{opt}}-\/>get\_token()\ :\ zipkin\_span::token(\ 0\ );}
+\DoxyCodeLine{00172\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structfc_1_1optional__trace_a8c310b735013f0e80f3cc8952715fcf2}\index{fc::optional\_trace@{fc::optional\_trace}!operator bool@{operator bool}}
+\index{operator bool@{operator bool}!fc::optional\_trace@{fc::optional\_trace}}
+\doxysubsubsection{\texorpdfstring{operator bool()}{operator bool()}}
+{\footnotesize\ttfamily \label{structfc_1_1optional__trace_a8c310b735013f0e80f3cc8952715fcf2} 
+fc\+::optional\+\_\+trace\+::operator bool (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}, {\ttfamily [constexpr]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{zipkin_8hpp_source_l00168}{168}} of file \mbox{\hyperlink{zipkin_8hpp_source}{zipkin.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00168\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structfc_1_1optional__trace_abe9636e187d56a747e5e9e1ac20de583}{opt}}.has\_value();\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structfc_1_1optional__trace_abe9636e187d56a747e5e9e1ac20de583}\index{fc::optional\_trace@{fc::optional\_trace}!opt@{opt}}
+\index{opt@{opt}!fc::optional\_trace@{fc::optional\_trace}}
+\doxysubsubsection{\texorpdfstring{opt}{opt}}
+{\footnotesize\ttfamily \label{structfc_1_1optional__trace_abe9636e187d56a747e5e9e1ac20de583} 
+std\+::optional$<$\mbox{\hyperlink{structfc_1_1zipkin__trace}{zipkin\+\_\+trace}}$>$ fc\+::optional\+\_\+trace\+::opt}
+
+
+
+Definition at line \mbox{\hyperlink{zipkin_8hpp_source_l00166}{166}} of file \mbox{\hyperlink{zipkin_8hpp_source}{zipkin.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/log/\mbox{\hyperlink{zipkin_8hpp}{zipkin.\+hpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,9 @@
+<map id="CLI::OptionAlreadyAdded" name="CLI::OptionAlreadyAdded">
+<area shape="rect" id="Node000001" title="Thrown when an option already exists." alt="" coords="5,226,175,252"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_construction_error.html" title="Construction errors (not in parsing)" alt="" coords="14,153,166,178"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="93,194,93,226,87,226,87,194"/>
+<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_error.html" title="All errors derive from this one." alt="" coords="51,79,129,105"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="93,120,93,152,87,152,87,120"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="28,5,152,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="93,46,93,79,87,79,87,46"/>
+</map>

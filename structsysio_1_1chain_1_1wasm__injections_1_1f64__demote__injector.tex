@@ -1,0 +1,101 @@
+\doxysection{sysio\+::chain\+::wasm\+\_\+injections\+::f64\+\_\+demote\+\_\+injector Struct Reference}
+\hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1f64__demote__injector}{}\label{structsysio_1_1chain_1_1wasm__injections_1_1f64__demote__injector}\index{sysio::chain::wasm\_injections::f64\_demote\_injector@{sysio::chain::wasm\_injections::f64\_demote\_injector}}
+
+
+{\ttfamily \#include $<$wasm\+\_\+sysio\+\_\+injection.\+hpp$>$}
+
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static void \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f64__demote__injector_a5fe9ce7b7373d8cc67572589ec126b77}{init}} ()
+\item 
+static void \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f64__demote__injector_ac3b4e03d4170f679a5526029747d4925}{accept}} (\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1instr}{wasm\+\_\+ops\+::instr}} \texorpdfstring{$\ast$}{*}inst, \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1visitor__arg}{wasm\+\_\+ops\+::visitor\+\_\+arg}} \&arg)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static constexpr bool \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f64__demote__injector_a0672c2de5bbf6462f1538b79d0120ef2}{kills}} = true
+\item 
+static constexpr bool \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f64__demote__injector_a0dc459d7b2ef15d3475c34b139623f0c}{post}} = false
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00493}{493}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1f64__demote__injector_ac3b4e03d4170f679a5526029747d4925}\index{sysio::chain::wasm\_injections::f64\_demote\_injector@{sysio::chain::wasm\_injections::f64\_demote\_injector}!accept@{accept}}
+\index{accept@{accept}!sysio::chain::wasm\_injections::f64\_demote\_injector@{sysio::chain::wasm\_injections::f64\_demote\_injector}}
+\doxysubsubsection{\texorpdfstring{accept()}{accept()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1f64__demote__injector_ac3b4e03d4170f679a5526029747d4925} 
+static void sysio\+::chain\+::wasm\+\_\+injections\+::f64\+\_\+demote\+\_\+injector\+::accept (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1instr}{wasm\+\_\+ops\+::instr}} \texorpdfstring{$\ast$}{*}}]{inst}{, }\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1visitor__arg}{wasm\+\_\+ops\+::visitor\+\_\+arg}} \&}]{arg}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00497}{497}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00497\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00498\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}}\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}};}
+\DoxyCodeLine{00499\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils_a0d64aed18f7e4000e625f7d069316b28}{injector\_utils::add\_import<ResultType::f32,\ ValueType::f64>}}(\ *(arg.module),\ u8\textcolor{stringliteral}{"{}\_sysio\_f64\_demote"{}},\ idx\ );}
+\DoxyCodeLine{00500\ \ \ \ \ \ \ \ \ \ wasm\_ops::op\_types<>::call\_t\ f32promote;}
+\DoxyCodeLine{00501\ \ \ \ \ \ \ \ \ \ f32promote.field\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}};}
+\DoxyCodeLine{00502\ \ \ \ \ \ \ \ \ \ f32promote.pack(arg.new\_code);}
+\DoxyCodeLine{00503\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1wasm__injections_1_1f64__demote__injector_ac3b4e03d4170f679a5526029747d4925_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1f64__demote__injector_a5fe9ce7b7373d8cc67572589ec126b77}\index{sysio::chain::wasm\_injections::f64\_demote\_injector@{sysio::chain::wasm\_injections::f64\_demote\_injector}!init@{init}}
+\index{init@{init}!sysio::chain::wasm\_injections::f64\_demote\_injector@{sysio::chain::wasm\_injections::f64\_demote\_injector}}
+\doxysubsubsection{\texorpdfstring{init()}{init()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1f64__demote__injector_a5fe9ce7b7373d8cc67572589ec126b77} 
+static void sysio\+::chain\+::wasm\+\_\+injections\+::f64\+\_\+demote\+\_\+injector\+::init (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00496}{496}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00496\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1f64__demote__injector_a0672c2de5bbf6462f1538b79d0120ef2}\index{sysio::chain::wasm\_injections::f64\_demote\_injector@{sysio::chain::wasm\_injections::f64\_demote\_injector}!kills@{kills}}
+\index{kills@{kills}!sysio::chain::wasm\_injections::f64\_demote\_injector@{sysio::chain::wasm\_injections::f64\_demote\_injector}}
+\doxysubsubsection{\texorpdfstring{kills}{kills}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1f64__demote__injector_a0672c2de5bbf6462f1538b79d0120ef2} 
+bool sysio\+::chain\+::wasm\+\_\+injections\+::f64\+\_\+demote\+\_\+injector\+::kills = true\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00494}{494}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1f64__demote__injector_a0dc459d7b2ef15d3475c34b139623f0c}\index{sysio::chain::wasm\_injections::f64\_demote\_injector@{sysio::chain::wasm\_injections::f64\_demote\_injector}!post@{post}}
+\index{post@{post}!sysio::chain::wasm\_injections::f64\_demote\_injector@{sysio::chain::wasm\_injections::f64\_demote\_injector}}
+\doxysubsubsection{\texorpdfstring{post}{post}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1f64__demote__injector_a0dc459d7b2ef15d3475c34b139623f0c} 
+bool sysio\+::chain\+::wasm\+\_\+injections\+::f64\+\_\+demote\+\_\+injector\+::post = false\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00495}{495}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{wasm__sysio__injection_8hpp}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,183 @@
+\doxysection{internal\+::Generic\+Regex\texorpdfstring{$<$}{<} Encoding, Allocator \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classinternal_1_1_generic_regex}{}\label{classinternal_1_1_generic_regex}\index{internal::GenericRegex$<$ Encoding, Allocator $>$@{internal::GenericRegex$<$ Encoding, Allocator $>$}}
+
+
+Regular expression engine with subset of ECMAscript grammar.  
+
+
+
+
+{\ttfamily \#include $<$regex.\+h$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} \mbox{\hyperlink{classinternal_1_1_generic_regex_a18e1e45197581d9e9ff164fb828ed2b6}{Encoding\+Type}}
+\item 
+typedef Encoding\+::\+Ch \mbox{\hyperlink{classinternal_1_1_generic_regex_a919ff15f0f4bc952a15c0fdd403b2c08}{Ch}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classinternal_1_1_generic_regex_a35c3a49bc4545a991ab039858227df0f}{Generic\+Regex}} (const \mbox{\hyperlink{classinternal_1_1_generic_regex_a919ff15f0f4bc952a15c0fdd403b2c08}{Ch}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} \texorpdfstring{$\ast$}{*}allocator=0)
+\item 
+\mbox{\hyperlink{classinternal_1_1_generic_regex_a6a4956c0391bccbf8580b2e047d5bc35}{\texorpdfstring{$\sim$}{\string~}\+Generic\+Regex}} ()
+\item 
+bool \mbox{\hyperlink{classinternal_1_1_generic_regex_a34ddb18fa3a2c70203d0fb740443c2a8}{Is\+Valid}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename , typename $>$ }\\\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classinternal_1_1_generic_regex_a919008cc046ab9f1c09609f1fc143986}{Generic\+Regex\+Search}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} = Crt\+Allocator$>$\newline
+class internal\+::\+Generic\+Regex$<$ Encoding, Allocator $>$}
+Supported regular expression syntax\+:
+\begin{DoxyItemize}
+\item {\ttfamily ab} Concatenation
+\item {\ttfamily a\texorpdfstring{$\vert$}{|}b} Alternation
+\item {\ttfamily a}? Zero or one
+\item {\ttfamily a\texorpdfstring{$\ast$}{*}} Zero or more
+\item {\ttfamily a+} One or more
+\item {\ttfamily a\{3\}} Exactly 3 times
+\item {\ttfamily a\{3},\} At least 3 times
+\item {\ttfamily a\{3},5\} 3 to 5 times
+\item {\ttfamily }(ab) Grouping
+\item {\ttfamily \texorpdfstring{$^\wedge$}{\string^}a} At the beginning
+\item {\ttfamily a\$} At the end
+\item {\ttfamily }. Any character
+\item {\ttfamily }\mbox{[}abc\mbox{]} Character classes
+\item {\ttfamily }\mbox{[}a-\/c\mbox{]} Character class range
+\item {\ttfamily }\mbox{[}a-\/z0-\/9\+\_\+\mbox{]} Character class combination
+\item {\ttfamily }\mbox{[}\texorpdfstring{$^\wedge$}{\string^}abc\mbox{]} Negated character classes
+\item {\ttfamily }\mbox{[}\texorpdfstring{$^\wedge$}{\string^}a-\/c\mbox{]} Negated character class range
+\item {\ttfamily }\mbox{[}{\bfseries{}}\mbox{]} Backspace (U+0008)
+\item {\ttfamily \textbackslash{}}\texorpdfstring{$\vert$}{|} \textbackslash{}\textbackslash{} ... Escape characters
+\item {\ttfamily \textbackslash{}f} Form feed (U+000C)
+\item {\ttfamily \textbackslash{}n} Line feed (U+000A)
+\item {\ttfamily \textbackslash{}r} Carriage return (U+000D)
+\item {\ttfamily \textbackslash{}t} Tab (U+0009)
+\item {\ttfamily \textbackslash{}v} Vertical tab (U+000B)
+\end{DoxyItemize}
+
+\begin{DoxyNote}{Note}
+This is a Thompson \doxylink{namespace_n_f_a}{NFA} engine, implemented with reference to Cox, Russ. "{}\+Regular Expression Matching Can Be Simple And Fast (but is slow in Java, Perl, PHP, Python, Ruby,...)."{}, \href{https://swtch.com/~rsc/regexp/regexp1.html}{\texttt{ https\+://swtch.\+com/\texorpdfstring{$\sim$}{\string~}rsc/regexp/regexp1.\+html}} 
+\end{DoxyNote}
+
+
+Definition at line \mbox{\hyperlink{regex_8h_source_l00114}{114}} of file \mbox{\hyperlink{regex_8h_source}{regex.\+h}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classinternal_1_1_generic_regex_a919ff15f0f4bc952a15c0fdd403b2c08}\index{internal::GenericRegex$<$ Encoding, Allocator $>$@{internal::GenericRegex$<$ Encoding, Allocator $>$}!Ch@{Ch}}
+\index{Ch@{Ch}!internal::GenericRegex$<$ Encoding, Allocator $>$@{internal::GenericRegex$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{Ch}{Ch}}
+{\footnotesize\ttfamily \label{classinternal_1_1_generic_regex_a919ff15f0f4bc952a15c0fdd403b2c08} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Crt\+Allocator$>$ \\
+Encoding\+::\+Ch \mbox{\hyperlink{classinternal_1_1_generic_regex}{internal\+::\+Generic\+Regex}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Ch}
+
+
+
+Definition at line \mbox{\hyperlink{regex_8h_source_l00117}{117}} of file \mbox{\hyperlink{regex_8h_source}{regex.\+h}}.
+
+\Hypertarget{classinternal_1_1_generic_regex_a18e1e45197581d9e9ff164fb828ed2b6}\index{internal::GenericRegex$<$ Encoding, Allocator $>$@{internal::GenericRegex$<$ Encoding, Allocator $>$}!EncodingType@{EncodingType}}
+\index{EncodingType@{EncodingType}!internal::GenericRegex$<$ Encoding, Allocator $>$@{internal::GenericRegex$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{EncodingType}{EncodingType}}
+{\footnotesize\ttfamily \label{classinternal_1_1_generic_regex_a18e1e45197581d9e9ff164fb828ed2b6} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Crt\+Allocator$>$ \\
+\mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} \mbox{\hyperlink{classinternal_1_1_generic_regex}{internal\+::\+Generic\+Regex}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Encoding\+Type}
+
+
+
+Definition at line \mbox{\hyperlink{regex_8h_source_l00116}{116}} of file \mbox{\hyperlink{regex_8h_source}{regex.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classinternal_1_1_generic_regex_a35c3a49bc4545a991ab039858227df0f}\index{internal::GenericRegex$<$ Encoding, Allocator $>$@{internal::GenericRegex$<$ Encoding, Allocator $>$}!GenericRegex@{GenericRegex}}
+\index{GenericRegex@{GenericRegex}!internal::GenericRegex$<$ Encoding, Allocator $>$@{internal::GenericRegex$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{GenericRegex()}{GenericRegex()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_generic_regex_a35c3a49bc4545a991ab039858227df0f} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Crt\+Allocator$>$ \\
+\mbox{\hyperlink{classinternal_1_1_generic_regex}{internal\+::\+Generic\+Regex}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Generic\+Regex (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classinternal_1_1_generic_regex_a919ff15f0f4bc952a15c0fdd403b2c08}{Ch}} \texorpdfstring{$\ast$}{*}}]{source}{, }\item[{\mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} \texorpdfstring{$\ast$}{*}}]{allocator}{ = {\ttfamily 0}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{regex_8h_source_l00120}{120}} of file \mbox{\hyperlink{regex_8h_source}{regex.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ }
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ ownAllocator\_(allocator\ ?\ 0\ :\ \mbox{\hyperlink{rapidjson_8h_abdc7cd7902748ffe6626d71c59a73c3b}{RAPIDJSON\_NEW}}(\mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}})()),\ allocator\_(allocator\ ?\ allocator\ :\ ownAllocator\_),\ }
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ states\_(allocator\_,\ 256),\ ranges\_(allocator\_,\ 256),\ root\_(kRegexInvalidState),\ stateCount\_(),\ rangeCount\_(),\ }
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ anchorBegin\_(),\ anchorEnd\_()}
+\DoxyCodeLine{00124\ \ \ \ \ \{}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_generic_string_stream}{GenericStringStream<Encoding>}}\ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}(\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}});}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ DecodedStream<GenericStringStream<Encoding>,\ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}>\ \mbox{\hyperlink{namespace_xbyak_1_1util_a4b2aef26182d21706896022467868f7c}{ds}}(ss);}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ Parse(ds);}
+\DoxyCodeLine{00128\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classinternal_1_1_generic_regex_a6a4956c0391bccbf8580b2e047d5bc35}\index{internal::GenericRegex$<$ Encoding, Allocator $>$@{internal::GenericRegex$<$ Encoding, Allocator $>$}!````~GenericRegex@{\texorpdfstring{$\sim$}{\string~}GenericRegex}}
+\index{````~GenericRegex@{\texorpdfstring{$\sim$}{\string~}GenericRegex}!internal::GenericRegex$<$ Encoding, Allocator $>$@{internal::GenericRegex$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}GenericRegex()}{\string~GenericRegex()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_generic_regex_a6a4956c0391bccbf8580b2e047d5bc35} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Crt\+Allocator$>$ \\
+\mbox{\hyperlink{classinternal_1_1_generic_regex}{internal\+::\+Generic\+Regex}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\texorpdfstring{$\sim$}{\string~}\mbox{\hyperlink{classinternal_1_1_generic_regex}{Generic\+Regex}} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{regex_8h_source_l00130}{130}} of file \mbox{\hyperlink{regex_8h_source}{regex.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00131\ \ \ \ \ \{}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_a52c941c3fdd646527cdcd42aa846a28a}{RAPIDJSON\_DELETE}}(ownAllocator\_);}
+\DoxyCodeLine{00133\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classinternal_1_1_generic_regex_a34ddb18fa3a2c70203d0fb740443c2a8}\index{internal::GenericRegex$<$ Encoding, Allocator $>$@{internal::GenericRegex$<$ Encoding, Allocator $>$}!IsValid@{IsValid}}
+\index{IsValid@{IsValid}!internal::GenericRegex$<$ Encoding, Allocator $>$@{internal::GenericRegex$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{IsValid()}{IsValid()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_generic_regex_a34ddb18fa3a2c70203d0fb740443c2a8} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Crt\+Allocator$>$ \\
+bool \mbox{\hyperlink{classinternal_1_1_generic_regex}{internal\+::\+Generic\+Regex}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Is\+Valid (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{regex_8h_source_l00135}{135}} of file \mbox{\hyperlink{regex_8h_source}{regex.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ root\_\ !=\ kRegexInvalidState;}
+\DoxyCodeLine{00137\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{classinternal_1_1_generic_regex_a919008cc046ab9f1c09609f1fc143986}\index{internal::GenericRegex$<$ Encoding, Allocator $>$@{internal::GenericRegex$<$ Encoding, Allocator $>$}!GenericRegexSearch@{GenericRegexSearch}}
+\index{GenericRegexSearch@{GenericRegexSearch}!internal::GenericRegex$<$ Encoding, Allocator $>$@{internal::GenericRegex$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{GenericRegexSearch}{GenericRegexSearch}}
+{\footnotesize\ttfamily \label{classinternal_1_1_generic_regex_a919008cc046ab9f1c09609f1fc143986} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Crt\+Allocator$>$ \\
+template$<$typename , typename $>$ \\
+friend \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classinternal_1_1_generic_regex_search}{Generic\+Regex\+Search}}\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{regex_8h_source_l00118}{118}} of file \mbox{\hyperlink{regex_8h_source}{regex.\+h}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/internal/\mbox{\hyperlink{regex_8h}{regex.\+h}}\end{DoxyCompactItemize}

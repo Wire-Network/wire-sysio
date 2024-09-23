@@ -1,0 +1,94 @@
+\doxysection{debug\+\_\+lib.\+h}
+\hypertarget{debug__lib_8h_source}{}\label{debug__lib_8h_source}\index{libraries/yubihsm/lib/debug\_lib.h@{libraries/yubihsm/lib/debug\_lib.h}}
+\mbox{\hyperlink{debug__lib_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ 2015-\/2018\ Yubico\ AB}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00004}00004\ \textcolor{comment}{\ *\ Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00005}00005\ \textcolor{comment}{\ *\ you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00006}00006\ \textcolor{comment}{\ *\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00008}00008\ \textcolor{comment}{\ *\ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00009}00009\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00010}00010\ \textcolor{comment}{\ *\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00011}00011\ \textcolor{comment}{\ *\ distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00012}00012\ \textcolor{comment}{\ *\ WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00013}00013\ \textcolor{comment}{\ *\ See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00014}00014\ \textcolor{comment}{\ *\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00015}00015\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00017}00017\ \textcolor{preprocessor}{\#ifndef\ DEBUG\_LIB\_H}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00018}00018\ \textcolor{preprocessor}{\#define\ DEBUG\_LIB\_H}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00020}00020\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{stdint_8h}{stdint.h}}>}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00021}00021\ \textcolor{preprocessor}{\#include\ <stdio.h>}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00022}00022\ \textcolor{preprocessor}{\#include\ <sys/time.h>}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00023}00023\ \textcolor{preprocessor}{\#include\ <time.h>}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00025}00025\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{yubihsm_8h}{yubihsm.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00027}00027\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{debug_8h}{../common/debug.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00029}00029\ \textcolor{keyword}{extern}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \mbox{\hyperlink{debug__lib_8h_a4ba5f59460a312e3f5f14926f4b2299e}{\_yh\_verbosity}};}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00030}00030\ \textcolor{keyword}{extern}\ FILE\ *\mbox{\hyperlink{debug__lib_8h_a76ba6bc136c2b38b71a9e3c56282cd3a}{\_yh\_output}};}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00032}\mbox{\hyperlink{debug__lib_8h_ac68efa88be623a0493a9c659a1bf7e44}{00032}}\ \textcolor{preprocessor}{\#define\ DUMPIF(var,\ len,\ lev)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00033}00033\ \textcolor{preprocessor}{\ \ do\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00034}00034\ \textcolor{preprocessor}{\ \ \ \ if\ (\_yh\_verbosity\ \&\ lev)\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00035}00035\ \textcolor{preprocessor}{\ \ \ \ \ \ dump\_hex(\_yh\_output,\ var,\ len);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00036}00036\ \textcolor{preprocessor}{\ \ \ \ \ \ fprintf(\_yh\_output,\ "{}\(\backslash\)n"{});\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00037}00037\ \textcolor{preprocessor}{\ \ \ \ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00038}00038\ \textcolor{preprocessor}{\ \ \}\ while\ (0)}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00040}\mbox{\hyperlink{debug__lib_8h_a81b33f0d4ec623bff78e988d14388d60}{00040}}\ \textcolor{preprocessor}{\#define\ DBG\_INT(var,\ len,\ ...)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00041}00041\ \textcolor{preprocessor}{\ \ do\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00042}00042\ \textcolor{preprocessor}{\ \ \ \ D(\_yh\_verbosity\ \&YH\_VERB\_INTERMEDIATE,\ \_yh\_output,\ ANSI\_YELLOW,\ "{}LIB"{},\ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00043}00043\ \textcolor{preprocessor}{\ \ \ \ \ \ "{}INT"{},\ \_\_VA\_ARGS\_\_);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00044}00044\ \textcolor{preprocessor}{\ \ \ \ DUMPIF(var,\ len,\ YH\_VERB\_INTERMEDIATE);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00045}00045\ \textcolor{preprocessor}{\ \ \}\ while\ (0)}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00047}\mbox{\hyperlink{debug__lib_8h_a567baf014162396366a921080a14318e}{00047}}\ \textcolor{preprocessor}{\#define\ DBG\_CRYPTO(var,\ len,\ ...)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00048}00048\ \textcolor{preprocessor}{\ \ do\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00049}00049\ \textcolor{preprocessor}{\ \ \ \ D(\_yh\_verbosity\ \&YH\_VERB\_CRYPTO,\ \_yh\_output,\ ANSI\_GREEN,\ "{}LIB"{},\ "{}CRY"{},\ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00050}00050\ \textcolor{preprocessor}{\ \ \ \ \ \ \_\_VA\_ARGS\_\_);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00051}00051\ \textcolor{preprocessor}{\ \ \ \ DUMPIF(var,\ len,\ YH\_VERB\_CRYPTO);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00052}00052\ \textcolor{preprocessor}{\ \ \}\ while\ (0)}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00054}\mbox{\hyperlink{debug__lib_8h_a7f31540b938d64a11c983358db9dabb3}{00054}}\ \textcolor{preprocessor}{\#define\ DBG\_NET(var,\ dump)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00055}00055\ \textcolor{preprocessor}{\ \ do\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00056}00056\ \textcolor{preprocessor}{\ \ \ \ D(\_yh\_verbosity\ \&YH\_VERB\_RAW,\ \_yh\_output,\ ANSI\_MAGENTA,\ "{}LIB"{},\ "{}NET"{},\ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00057}00057\ \textcolor{preprocessor}{\ \ \ \ \ \ "{}\ "{});\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00058}00058\ \textcolor{preprocessor}{\ \ \ \ if\ (\_yh\_verbosity\ \&\ YH\_VERB\_RAW)\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00059}00059\ \textcolor{preprocessor}{\ \ \ \ \ \ dump(\_yh\_output,\ (var));\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00060}00060\ \textcolor{preprocessor}{\ \ \ \ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00061}00061\ \textcolor{preprocessor}{\ \ \}\ while\ (0)}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00062}00062\ }
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00063}\mbox{\hyperlink{debug__lib_8h_a8c4742440a149ad8bcb5d58ae76c5ed3}{00063}}\ \textcolor{preprocessor}{\#define\ DBG\_INFO(...)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00064}00064\ \textcolor{preprocessor}{\ \ do\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00065}00065\ \textcolor{preprocessor}{\ \ \ \ DLN(\_yh\_verbosity\ \&YH\_VERB\_INFO,\ \_yh\_output,\ ANSI\_BLUE,\ "{}LIB"{},\ "{}INF"{},\ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00066}00066\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \_\_VA\_ARGS\_\_);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00067}00067\ \textcolor{preprocessor}{\ \ \}\ while\ (0)}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00069}\mbox{\hyperlink{debug__lib_8h_ac9fd02aaaf96a535c1d73aefb379e4d6}{00069}}\ \textcolor{preprocessor}{\#define\ DBG\_DUMPINFO(var,\ len,\ ...)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00070}00070\ \textcolor{preprocessor}{\ \ do\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00071}00071\ \textcolor{preprocessor}{\ \ \ \ D(\_yh\_verbosity\ \&YH\_VERB\_INFO,\ \_yh\_output,\ ANSI\_BLUE,\ "{}LIB"{},\ "{}INF"{},\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00072}00072\ \textcolor{preprocessor}{\ \ \ \ \ \ \_\_VA\_ARGS\_\_);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00073}00073\ \textcolor{preprocessor}{\ \ \ \ DUMPIF(var,\ len,\ YH\_VERB\_INFO);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00074}00074\ \textcolor{preprocessor}{\ \ \}\ while\ (0)}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00075}00075\ }
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00076}\mbox{\hyperlink{debug__lib_8h_a2e3ed21e5ffba18d940d164aaec64a2a}{00076}}\ \textcolor{preprocessor}{\#define\ DBG\_ERR(...)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00077}00077\ \textcolor{preprocessor}{\ \ do\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00078}00078\ \textcolor{preprocessor}{\ \ \ \ DLN(\_yh\_verbosity\ \&YH\_VERB\_ERR,\ \_yh\_output,\ ANSI\_RED,\ "{}LIB"{},\ "{}ERR"{},\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00079}00079\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \_\_VA\_ARGS\_\_);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00080}00080\ \textcolor{preprocessor}{\ \ \}\ while\ (0)}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00081}00081\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00083}\mbox{\hyperlink{debug__lib_8h_a741bf237335f48769194bd9e625c1d53}{00083}}\ \textcolor{preprocessor}{\#define\ DBG\_DUMPERR(var,\ len,\ ...)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00084}00084\ \textcolor{preprocessor}{\ \ do\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00085}00085\ \textcolor{preprocessor}{\ \ \ \ D(\_yh\_verbosity\ \&YH\_VERB\_ERR,\ \_yh\_output,\ ANSI\_RED,\ "{}LIB"{},\ "{}ERR"{},\ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00086}00086\ \textcolor{preprocessor}{\ \ \ \ \ \ \_\_VA\_ARGS\_\_);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00087}00087\ \textcolor{preprocessor}{\ \ \ \ DUMPIF(var,\ len,\ YH\_VERB\_ERR);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{debug__lib_8h_source_l00088}00088\ \textcolor{preprocessor}{\ \ \}\ while\ (0)}}
+
+\end{DoxyCode}

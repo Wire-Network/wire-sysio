@@ -1,0 +1,43 @@
+\doxysection{ecmult.\+h}
+\hypertarget{ecmult_8h_source}{}\label{ecmult_8h_source}\index{libraries/fc/secp256k1/secp256k1/src/ecmult.h@{libraries/fc/secp256k1/secp256k1/src/ecmult.h}}
+\mbox{\hyperlink{ecmult_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{ecmult_8h_source_l00001}00001\ \textcolor{comment}{/***********************************************************************}}
+\DoxyCodeLine{\Hypertarget{ecmult_8h_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2013,\ 2014,\ 2017\ Pieter\ Wuille,\ Andrew\ Poelstra\ \ \ \ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{ecmult_8h_source_l00003}00003\ \textcolor{comment}{\ *\ Distributed\ under\ the\ MIT\ software\ license,\ see\ the\ accompanying\ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{ecmult_8h_source_l00004}00004\ \textcolor{comment}{\ *\ file\ COPYING\ or\ https://www.opensource.org/licenses/mit-\/license.php.*}}
+\DoxyCodeLine{\Hypertarget{ecmult_8h_source_l00005}00005\ \textcolor{comment}{\ ***********************************************************************/}}
+\DoxyCodeLine{\Hypertarget{ecmult_8h_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{ecmult_8h_source_l00007}00007\ \textcolor{preprocessor}{\#ifndef\ SECP256K1\_ECMULT\_H}}
+\DoxyCodeLine{\Hypertarget{ecmult_8h_source_l00008}00008\ \textcolor{preprocessor}{\#define\ SECP256K1\_ECMULT\_H}}
+\DoxyCodeLine{\Hypertarget{ecmult_8h_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{ecmult_8h_source_l00010}00010\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{group_8h}{group.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{ecmult_8h_source_l00011}00011\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{scalar_8h}{scalar.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{ecmult_8h_source_l00012}00012\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{scratch_8h}{scratch.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{ecmult_8h_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{ecmult_8h_source_l00014}00014\ \textcolor{comment}{/*\ Noone\ will\ ever\ need\ more\ than\ a\ window\ size\ of\ 24.\ The\ code\ might}}
+\DoxyCodeLine{\Hypertarget{ecmult_8h_source_l00015}00015\ \textcolor{comment}{\ *\ be\ correct\ for\ larger\ values\ of\ ECMULT\_WINDOW\_SIZE\ but\ this\ is\ not}}
+\DoxyCodeLine{\Hypertarget{ecmult_8h_source_l00016}00016\ \textcolor{comment}{\ *\ tested.}}
+\DoxyCodeLine{\Hypertarget{ecmult_8h_source_l00017}00017\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{ecmult_8h_source_l00018}00018\ \textcolor{comment}{\ *\ The\ following\ limitations\ are\ known,\ and\ there\ are\ probably\ more:}}
+\DoxyCodeLine{\Hypertarget{ecmult_8h_source_l00019}00019\ \textcolor{comment}{\ *\ If\ WINDOW\_G\ >\ 27\ and\ size\_t\ has\ 32\ bits,\ then\ the\ code\ is\ incorrect}}
+\DoxyCodeLine{\Hypertarget{ecmult_8h_source_l00020}00020\ \textcolor{comment}{\ *\ because\ the\ size\ of\ the\ memory\ object\ that\ we\ allocate\ (in\ bytes)}}
+\DoxyCodeLine{\Hypertarget{ecmult_8h_source_l00021}00021\ \textcolor{comment}{\ *\ will\ not\ fit\ in\ a\ size\_t.}}
+\DoxyCodeLine{\Hypertarget{ecmult_8h_source_l00022}00022\ \textcolor{comment}{\ *\ If\ WINDOW\_G\ >\ 31\ and\ int\ has\ 32\ bits,\ then\ the\ code\ is\ incorrect}}
+\DoxyCodeLine{\Hypertarget{ecmult_8h_source_l00023}00023\ \textcolor{comment}{\ *\ because\ certain\ expressions\ will\ overflow.}}
+\DoxyCodeLine{\Hypertarget{ecmult_8h_source_l00024}00024\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{ecmult_8h_source_l00025}00025\ \textcolor{preprocessor}{\#if\ ECMULT\_WINDOW\_SIZE\ <\ 2\ ||\ ECMULT\_WINDOW\_SIZE\ >\ 24}}
+\DoxyCodeLine{\Hypertarget{ecmult_8h_source_l00026}00026\ \textcolor{preprocessor}{\#\ \ error\ Set\ ECMULT\_WINDOW\_SIZE\ to\ an\ integer\ in\ range\ [2..24].}}
+\DoxyCodeLine{\Hypertarget{ecmult_8h_source_l00027}00027\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{ecmult_8h_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{ecmult_8h_source_l00030}\mbox{\hyperlink{ecmult_8h_a97c6c6e5aa98f202eec77c4c931e02f1}{00030}}\ \textcolor{preprocessor}{\#define\ ECMULT\_TABLE\_SIZE(w)\ (1L\ <<\ ((w)-\/2))}}
+\DoxyCodeLine{\Hypertarget{ecmult_8h_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{ecmult_8h_source_l00033}00033\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_ecmult(\mbox{\hyperlink{structsecp256k1__gej}{secp256k1\_gej}}\ *\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__gej}{secp256k1\_gej}}\ *\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *na,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *ng);}
+\DoxyCodeLine{\Hypertarget{ecmult_8h_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{ecmult_8h_source_l00035}\mbox{\hyperlink{ecmult_8h_a0f127c89ba0f17e7992666f3d789e58e}{00035}}\ \textcolor{keyword}{typedef}\ int\ (\mbox{\hyperlink{ecmult_8h_a0f127c89ba0f17e7992666f3d789e58e}{secp256k1\_ecmult\_multi\_callback}})(\mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *sc,\ \mbox{\hyperlink{structsecp256k1__ge}{secp256k1\_ge}}\ *pt,\ \textcolor{keywordtype}{size\_t}\ idx,\ \textcolor{keywordtype}{void}\ *data);}
+\DoxyCodeLine{\Hypertarget{ecmult_8h_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{ecmult_8h_source_l00048}00048\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ secp256k1\_ecmult\_multi\_var(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__callback}{secp256k1\_callback}}*\ error\_callback,\ \mbox{\hyperlink{structsecp256k1__scratch__space__struct}{secp256k1\_scratch}}\ *scratch,\ \mbox{\hyperlink{structsecp256k1__gej}{secp256k1\_gej}}\ *\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *inp\_g\_sc,\ \mbox{\hyperlink{ecmult_8h_a0f127c89ba0f17e7992666f3d789e58e}{secp256k1\_ecmult\_multi\_callback}}\ cb,\ \textcolor{keywordtype}{void}\ *cbdata,\ \textcolor{keywordtype}{size\_t}\ n);}
+\DoxyCodeLine{\Hypertarget{ecmult_8h_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{ecmult_8h_source_l00050}00050\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{/*\ SECP256K1\_ECMULT\_H\ */}\textcolor{preprocessor}{}}
+
+\end{DoxyCode}

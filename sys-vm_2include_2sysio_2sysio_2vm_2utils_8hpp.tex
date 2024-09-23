@@ -1,0 +1,145 @@
+\doxysection{libraries/sys-\/vm/include/sysio/sysio/vm/utils.hpp File Reference}
+\hypertarget{sys-vm_2include_2sysio_2sysio_2vm_2utils_8hpp}{}\label{sys-vm_2include_2sysio_2sysio_2vm_2utils_8hpp}\index{libraries/sys-\/vm/include/sysio/sysio/vm/utils.hpp@{libraries/sys-\/vm/include/sysio/sysio/vm/utils.hpp}}
+{\ttfamily \#include $<$cstdlib$>$}\newline
+{\ttfamily \#include $<$functional$>$}\newline
+{\ttfamily \#include $<$fstream$>$}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$optional$>$}\newline
+{\ttfamily \#include $<$string$>$}\newline
+{\ttfamily \#include $<$memory$>$}\newline
+{\ttfamily \#include $<$vector$>$}\newline
+{\ttfamily \#include $<$cxxabi.\+h$>$}\newline
+Include dependency graph for utils.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sys-vm_2include_2sysio_2sysio_2vm_2utils_8hpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1overloaded}{sysio\+::vm\+::overloaded$<$ Ts $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1maybe__void__t}{sysio\+::vm\+::maybe\+\_\+void\+\_\+t}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1scope__guard}{sysio\+::vm\+::scope\+\_\+guard$<$ F $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1subtuple__impl_3_01_n_00_01_i_00_01std_1_1tuple_3_01_t_00_01_ts_8_8_8_01_4_01_4}{sysio\+::vm\+::detail\+::subtuple\+\_\+impl$<$ N, I, std\+::tuple$<$ T, Ts... $>$ $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1subtuple__impl_3_01_n_00_01_n_00_01std_1_1tuple_3_01_t_00_01_ts_8_8_8_01_4_01_4}{sysio\+::vm\+::detail\+::subtuple\+\_\+impl$<$ N, N, std\+::tuple$<$ T, Ts... $>$ $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1generate__subtuples__impl_3_01std_1_1tuple_3_01_t_00_01_ts_8_8_8_01_4_01_4}{sysio\+::vm\+::detail\+::generate\+\_\+subtuples\+\_\+impl$<$ std\+::tuple$<$ T, Ts... $>$ $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1generate__all__subtuples__impl_3_01std_1_1tuple_3_01_t_00_01_ts_8_8_8_01_4_01_4}{sysio\+::vm\+::detail\+::generate\+\_\+all\+\_\+subtuples\+\_\+impl$<$ std\+::tuple$<$ T, Ts... $>$ $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1generate__all__subtuples__impl_3_01std_1_1tuple_3_4_01_4}{sysio\+::vm\+::detail\+::generate\+\_\+all\+\_\+subtuples\+\_\+impl$<$ std\+::tuple$<$$>$ $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1tuple__index}{sysio\+::vm\+::detail\+::tuple\+\_\+index$<$ N $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1insert__type}{sysio\+::vm\+::detail\+::insert\+\_\+type$<$ N, I, Insert, Tuple $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1insert__type_3_01_n_00_01_i_00_01_insert_00_01_tuple_3_01_t_00_01_ts_8_8_8_01_4_01_4}{sysio\+::vm\+::detail\+::insert\+\_\+type$<$ N, I, Insert, Tuple$<$ T, Ts... $>$ $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1insert__type_3_01_n_00_01_n_00_01_insert_00_01_tuple_3_01_t_00_01_ts_8_8_8_01_4_01_4}{sysio\+::vm\+::detail\+::insert\+\_\+type$<$ N, N, Insert, Tuple$<$ T, Ts... $>$ $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1index__inserter}{sysio\+::vm\+::detail\+::index\+\_\+inserter$<$ N, I, Tuple, Indices $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1tuple__trim_3_01_n_00_01_i_00_01_tuple_3_01_t_00_01_ts_8_8_8_01_4_01_4}{sysio\+::vm\+::detail\+::tuple\+\_\+trim$<$ N, I, Tuple$<$ T, Ts... $>$ $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1tuple__trim_3_01_n_00_01_n_00_01_tuple_3_01_t_00_01_ts_8_8_8_01_4_01_4}{sysio\+::vm\+::detail\+::tuple\+\_\+trim$<$ N, N, Tuple$<$ T, Ts... $>$ $>$}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1vm}{sysio\+::vm}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail}{sysio\+::vm\+::detail}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2utils_8hpp_affde14445f49f65ff4f5b592e44ee71a}{LIKELY}}(x)
+\item 
+\#define \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2utils_8hpp_ab10d0a221f4d7a706701b806c8135fd7}{UNLIKELY}}(x)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$size\+\_\+t N, typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\using \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a857851c5576526ad54ed2ac2047e5ee6}{sysio\+::vm\+::detail\+::subtuple\+\_\+t}} = typename \mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1subtuple__impl}{subtuple\+\_\+impl}}$<$\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}, 0, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$\+::type
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\using \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a4a6c144ecc0dc13318930f7eccd269b9}{sysio\+::vm\+::detail\+::generate\+\_\+subtuples\+\_\+t}} = decltype(\mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1generate__subtuples__impl}{generate\+\_\+subtuples\+\_\+impl}}$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}}( std\+::make\+\_\+index\+\_\+sequence$<$std\+::tuple\+\_\+size\+\_\+v$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$$>$\{\} ))
+\item 
+{\footnotesize template$<$size\+\_\+t N, typename Insert , typename Tuple $>$ }\\using \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a7a1b542e652b98fe42bb8f9173575cfd}{sysio\+::vm\+::detail\+::insert\+\_\+type\+\_\+t}} = typename \mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1insert__type}{insert\+\_\+type}}$<$\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}, 0, Insert, Tuple$>$\+::type
+\item 
+{\footnotesize template$<$size\+\_\+t N, typename Tuple , typename Indices $>$ }\\using \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_abae5c6245b11505d93772b0f1a9c6711}{sysio\+::vm\+::detail\+::index\+\_\+insert\+\_\+t}} = decltype(\mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1index__inserter}{index\+\_\+inserter}}$<$\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}, 0, Tuple, Indices$>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}}())
+\item 
+{\footnotesize template$<$typename Tuple , typename Indices $>$ }\\using \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_ac3c7e1e1196fc587a90471b41cd6e564}{sysio\+::vm\+::detail\+::reorder\+\_\+tuple\+\_\+t}} = decltype(\mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_aa3d829812ced1fb631fdd61e27c68f6b}{reorder\+\_\+tuple}}$<$Tuple, Indices$>$(std\+::make\+\_\+index\+\_\+sequence$<$std\+::tuple\+\_\+size\+\_\+v$<$Indices$>$-\/1$>$\{\}))
+\item 
+{\footnotesize template$<$typename Tuple $>$ }\\using \mbox{\hyperlink{namespacesysio_1_1vm_a979fe7c1c1587d38ee824721161fa5bc}{sysio\+::vm\+::generate\+\_\+all\+\_\+subtuples\+\_\+t}} = decltype(\mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a9f0828f804eedf7a4b773be1a9d53746}{detail\+::generate\+\_\+all\+\_\+subtuples}}(std\+::declval$<$Tuple$>$()))
+\item 
+{\footnotesize template$<$typename Tuple $>$ }\\using \mbox{\hyperlink{namespacesysio_1_1vm_a77f92e49fed5522a75222fb5b5bbbf6f}{sysio\+::vm\+::tuple\+\_\+sort\+\_\+t}} = decltype(\mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a7b092c612a7e8f5eccb930b6eb768c0b}{detail\+::tuple\+\_\+sort}}$<$std\+::tuple\+\_\+size\+\_\+v$<$Tuple$>$-\/1, 0, Tuple, std\+::tuple$<$$>$$>$())
+\item 
+{\footnotesize template$<$size\+\_\+t N, typename Tuple $>$ }\\using \mbox{\hyperlink{namespacesysio_1_1vm_a434d0a600c1e9daaaf688f2f8a7eaaac}{sysio\+::vm\+::tuple\+\_\+trim\+\_\+t}} = typename \mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1tuple__trim}{detail\+::tuple\+\_\+trim}}$<$\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}, 0, Tuple$>$\+::type
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+std\+::vector$<$ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} $>$ \mbox{\hyperlink{namespacesysio_1_1vm_a962c97bda1b30dbf62f4f9a50abe6f99}{sysio\+::vm\+::read\+\_\+wasm}} (const std\+::string \&fname)
+\item 
+{\footnotesize template$<$typename Stack\+Elem $>$ }\\void \mbox{\hyperlink{namespacesysio_1_1vm_a1d50633c37818e583597429fcf1a468d}{sysio\+::vm\+::print\+\_\+result}} (const std\+::optional$<$ Stack\+Elem $>$ \&result)
+\item 
+{\footnotesize template$<$class... Ts$>$ }\\\mbox{\hyperlink{namespacesysio_1_1vm_a07c051cf9ffb8cd688a5b74858a4a127}{sysio\+::vm\+::overloaded}} (Ts...) -\/$>$ overloaded$<$ Ts... $>$
+\item 
+{\footnotesize template$<$typename... T$>$ }\\void \mbox{\hyperlink{namespacesysio_1_1vm_a54ec5a188f3bccc28c33687d74736bdf}{sysio\+::vm\+::ignore\+\_\+unused\+\_\+variable\+\_\+warning}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&...)
+\item 
+{\footnotesize template$<$typename Tuple $>$ }\\constexpr auto \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a9f0828f804eedf7a4b773be1a9d53746}{sysio\+::vm\+::detail\+::generate\+\_\+all\+\_\+subtuples}} (Tuple \&\&tup)
+\item 
+{\footnotesize template$<$size\+\_\+t I, typename Tuple , typename Indices $>$ }\\constexpr auto \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a132e98e46f8cd41937fac8db7c3fe112}{sysio\+::vm\+::detail\+::get\+\_\+tuple\+\_\+size\+\_\+from\+\_\+index}} ()
+\item 
+{\footnotesize template$<$size\+\_\+t I, typename Tuple $>$ }\\constexpr auto \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a3f91b7517240832137f6cfce742d0ced}{sysio\+::vm\+::detail\+::get\+\_\+tuple\+\_\+size}} ()
+\item 
+{\footnotesize template$<$typename Tuple , typename Indices , size\+\_\+t... Is$>$ }\\constexpr auto \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_aa3d829812ced1fb631fdd61e27c68f6b}{sysio\+::vm\+::detail\+::reorder\+\_\+tuple}} (std\+::index\+\_\+sequence$<$ Is... $>$)
+\item 
+{\footnotesize template$<$size\+\_\+t N, size\+\_\+t I, typename Tuple , typename Indices $>$ }\\constexpr auto \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a7b092c612a7e8f5eccb930b6eb768c0b}{sysio\+::vm\+::detail\+::tuple\+\_\+sort}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1vm_1_1maybe__void__t}{maybe\+\_\+void\+\_\+t}} \mbox{\hyperlink{namespacesysio_1_1vm_a7d2d7da9af88d81ecb873397ac1f8dbe}{sysio\+::vm\+::maybe\+\_\+void}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{sys-vm_2include_2sysio_2sysio_2vm_2utils_8hpp_affde14445f49f65ff4f5b592e44ee71a}\index{utils.hpp@{utils.hpp}!LIKELY@{LIKELY}}
+\index{LIKELY@{LIKELY}!utils.hpp@{utils.hpp}}
+\doxysubsubsection{\texorpdfstring{LIKELY}{LIKELY}}
+{\footnotesize\ttfamily \label{sys-vm_2include_2sysio_2sysio_2vm_2utils_8hpp_affde14445f49f65ff4f5b592e44ee71a} 
+\#define LIKELY(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{!!(x)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2utils_8hpp_source_l00023}{23}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2utils_8hpp_source}{utils.\+hpp}}.
+
+\Hypertarget{sys-vm_2include_2sysio_2sysio_2vm_2utils_8hpp_ab10d0a221f4d7a706701b806c8135fd7}\index{utils.hpp@{utils.hpp}!UNLIKELY@{UNLIKELY}}
+\index{UNLIKELY@{UNLIKELY}!utils.hpp@{utils.hpp}}
+\doxysubsubsection{\texorpdfstring{UNLIKELY}{UNLIKELY}}
+{\footnotesize\ttfamily \label{sys-vm_2include_2sysio_2sysio_2vm_2utils_8hpp_ab10d0a221f4d7a706701b806c8135fd7} 
+\#define UNLIKELY(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{!!(x)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2utils_8hpp_source_l00024}{24}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2utils_8hpp_source}{utils.\+hpp}}.
+

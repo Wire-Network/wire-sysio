@@ -1,0 +1,302 @@
+\doxysection{eosd\+\_\+def Class Reference}
+\hypertarget{classeosd__def}{}\label{classeosd__def}\index{eosd\_def@{eosd\_def}}
+
+
+Collaboration diagram for eosd\+\_\+def\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classeosd__def__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classeosd__def_a9a7021cf29eae485bf5c9ed1028fb4c8}{eosd\+\_\+def}} ()
+\item 
+void \mbox{\hyperlink{classeosd__def_a889bc102e780ac29b2224d8f5ff86efc}{set\+\_\+host}} (\mbox{\hyperlink{classhost__def}{host\+\_\+def}} \texorpdfstring{$\ast$}{*}h, bool is\+\_\+bios)
+\item 
+void \mbox{\hyperlink{classeosd__def_a1c8ec66e116734a4ec0a56ba104b9769}{mk\+\_\+dot\+\_\+label}} ()
+\item 
+const string \& \mbox{\hyperlink{classeosd__def_a9b90613096f5dad279d462805cce6010}{dot\+\_\+label}} ()
+\item 
+string \mbox{\hyperlink{classeosd__def_a2ce48001d4ef2750baf0a791c1521744}{get\+\_\+node\+\_\+num}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+string \mbox{\hyperlink{classeosd__def_a2b0e5560d8740df24078c2bd69eeeb5e}{config\+\_\+dir\+\_\+name}}
+\item 
+string \mbox{\hyperlink{classeosd__def_afa3eec67417e8ea7239182fb11b36ee3}{data\+\_\+dir\+\_\+name}}
+\item 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{classeosd__def_af7e087103ea972bc98bc135bcc24970d}{p2p\+\_\+port}}
+\item 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{classeosd__def_af00099700968db5cc2ba0460039ca013}{http\+\_\+port}}
+\item 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{classeosd__def_a47455d95b71f6c3dc26dd76fb5486609}{file\+\_\+size}}
+\item 
+string \mbox{\hyperlink{classeosd__def_aa9cdf51a291c9243e1057a788f3c9642}{name}}
+\item 
+\mbox{\hyperlink{classtn__node__def}{tn\+\_\+node\+\_\+def}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classeosd__def_acb560fb7969422b1e8001e195bce8e2a}{node}}
+\item 
+string \mbox{\hyperlink{classeosd__def_ac1f0929b1ddfb5484250aa39c0cec105}{host}}
+\item 
+string \mbox{\hyperlink{classeosd__def_ac013d5af6168b0bc78f491477a2dccc5}{p2p\+\_\+endpoint}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source_l00195}{195}} of file \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classeosd__def_a9a7021cf29eae485bf5c9ed1028fb4c8}\index{eosd\_def@{eosd\_def}!eosd\_def@{eosd\_def}}
+\index{eosd\_def@{eosd\_def}!eosd\_def@{eosd\_def}}
+\doxysubsubsection{\texorpdfstring{eosd\_def()}{eosd\_def()}}
+{\footnotesize\ttfamily \label{classeosd__def_a9a7021cf29eae485bf5c9ed1028fb4c8} 
+eosd\+\_\+def\+::eosd\+\_\+def (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source_l00197}{197}} of file \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00198\ \ \ \ \ :\ \mbox{\hyperlink{classeosd__def_a2b0e5560d8740df24078c2bd69eeeb5e}{config\_dir\_name}}\ (),}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \mbox{\hyperlink{classeosd__def_afa3eec67417e8ea7239182fb11b36ee3}{data\_dir\_name}}\ (),}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \mbox{\hyperlink{classeosd__def_af7e087103ea972bc98bc135bcc24970d}{p2p\_port}}(),}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \mbox{\hyperlink{classeosd__def_af00099700968db5cc2ba0460039ca013}{http\_port}}(),}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \mbox{\hyperlink{classeosd__def_a47455d95b71f6c3dc26dd76fb5486609}{file\_size}}(),}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ \mbox{\hyperlink{classeosd__def_aa9cdf51a291c9243e1057a788f3c9642}{name}}(),}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \mbox{\hyperlink{classeosd__def_acb560fb7969422b1e8001e195bce8e2a}{node}}(),}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \mbox{\hyperlink{classeosd__def_ac1f0929b1ddfb5484250aa39c0cec105}{host}}(),}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \mbox{\hyperlink{classeosd__def_ac013d5af6168b0bc78f491477a2dccc5}{p2p\_endpoint}}()\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classeosd__def_a9b90613096f5dad279d462805cce6010}\index{eosd\_def@{eosd\_def}!dot\_label@{dot\_label}}
+\index{dot\_label@{dot\_label}!eosd\_def@{eosd\_def}}
+\doxysubsubsection{\texorpdfstring{dot\_label()}{dot\_label()}}
+{\footnotesize\ttfamily \label{classeosd__def_a9b90613096f5dad279d462805cce6010} 
+const string \& eosd\+\_\+def\+::dot\+\_\+label (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source_l00222}{222}} of file \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00223\ \ \ \ \ \textcolor{keywordflow}{if}\ (dot\_label\_str.empty()\ )\ \{}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \mbox{\hyperlink{classeosd__def_a1c8ec66e116734a4ec0a56ba104b9769}{mk\_dot\_label}}();}
+\DoxyCodeLine{00225\ \ \ \ \ \}}
+\DoxyCodeLine{00226\ \ \ \ \ \textcolor{keywordflow}{return}\ dot\_label\_str;}
+\DoxyCodeLine{00227\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=336pt]{classeosd__def_a9b90613096f5dad279d462805cce6010_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classeosd__def_a2ce48001d4ef2750baf0a791c1521744}\index{eosd\_def@{eosd\_def}!get\_node\_num@{get\_node\_num}}
+\index{get\_node\_num@{get\_node\_num}!eosd\_def@{eosd\_def}}
+\doxysubsubsection{\texorpdfstring{get\_node\_num()}{get\_node\_num()}}
+{\footnotesize\ttfamily \label{classeosd__def_a2ce48001d4ef2750baf0a791c1521744} 
+string eosd\+\_\+def\+::get\+\_\+node\+\_\+num (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source_l00229}{229}} of file \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00229\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00230\ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classeosd__def_aa9cdf51a291c9243e1057a788f3c9642}{name}}.substr(\ \mbox{\hyperlink{classeosd__def_aa9cdf51a291c9243e1057a788f3c9642}{name}}.length()\ -\/\ 2\ );}
+\DoxyCodeLine{00231\ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classeosd__def_a2ce48001d4ef2750baf0a791c1521744_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classeosd__def_a1c8ec66e116734a4ec0a56ba104b9769}\index{eosd\_def@{eosd\_def}!mk\_dot\_label@{mk\_dot\_label}}
+\index{mk\_dot\_label@{mk\_dot\_label}!eosd\_def@{eosd\_def}}
+\doxysubsubsection{\texorpdfstring{mk\_dot\_label()}{mk\_dot\_label()}}
+{\footnotesize\ttfamily \label{classeosd__def_a1c8ec66e116734a4ec0a56ba104b9769} 
+void eosd\+\_\+def\+::mk\+\_\+dot\+\_\+label (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source_l00248}{248}} of file \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00248\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00249\ \ \ dot\_label\_str\ =\ \mbox{\hyperlink{classeosd__def_aa9cdf51a291c9243e1057a788f3c9642}{name}}\ +\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)nprod="{}};}
+\DoxyCodeLine{00250\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classeosd__def_acb560fb7969422b1e8001e195bce8e2a}{node}}\ ==\ 0\ ||\ \mbox{\hyperlink{classeosd__def_acb560fb7969422b1e8001e195bce8e2a}{node}}-\/>\mbox{\hyperlink{classtn__node__def_aeb61f31e08df2ddcc5725187e59bb5bd}{producers}}.empty())\ \{}
+\DoxyCodeLine{00251\ \ \ \ \ dot\_label\_str\ +=\ \textcolor{stringliteral}{"{}<none>"{}};}
+\DoxyCodeLine{00252\ \ \ \}}
+\DoxyCodeLine{00253\ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00254\ \ \ \ \ \textcolor{keywordtype}{bool}\ docomma\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00255\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\ \&prod:\ \mbox{\hyperlink{classeosd__def_acb560fb7969422b1e8001e195bce8e2a}{node}}-\/>\mbox{\hyperlink{classtn__node__def_aeb61f31e08df2ddcc5725187e59bb5bd}{producers}})\ \{}
+\DoxyCodeLine{00256\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (docomma)}
+\DoxyCodeLine{00257\ \ \ \ \ \ \ \ \ dot\_label\_str\ +=\ \textcolor{stringliteral}{"{},"{}};}
+\DoxyCodeLine{00258\ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00259\ \ \ \ \ \ \ \ \ docomma\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00260\ \ \ \ \ \ \ dot\_label\_str\ +=\ prod;}
+\DoxyCodeLine{00261\ \ \ \ \ \}}
+\DoxyCodeLine{00262\ \ \ \}}
+\DoxyCodeLine{00263\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=336pt]{classeosd__def_a1c8ec66e116734a4ec0a56ba104b9769_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classeosd__def_a889bc102e780ac29b2224d8f5ff86efc}\index{eosd\_def@{eosd\_def}!set\_host@{set\_host}}
+\index{set\_host@{set\_host}!eosd\_def@{eosd\_def}}
+\doxysubsubsection{\texorpdfstring{set\_host()}{set\_host()}}
+{\footnotesize\ttfamily \label{classeosd__def_a889bc102e780ac29b2224d8f5ff86efc} 
+void eosd\+\_\+def\+::set\+\_\+host (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classhost__def}{host\+\_\+def}} \texorpdfstring{$\ast$}{*}}]{h}{, }\item[{bool}]{is\+\_\+bios}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source_l00266}{266}} of file \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00266\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00267\ \ \ host\ =\ h-\/>\mbox{\hyperlink{classhost__def_a2390479e008b3219330faeec62c0dd8d}{host\_name}};}
+\DoxyCodeLine{00268\ \ \ \mbox{\hyperlink{classeosd__def_af7e087103ea972bc98bc135bcc24970d}{p2p\_port}}\ =\ is\_bios\ ?\ h-\/>\mbox{\hyperlink{classhost__def_a07bacf8fc3c2ad46a12dd118fc65afdc}{p2p\_bios\_port}}()\ :\ h-\/>\mbox{\hyperlink{classhost__def_a49d47ba5ca76ad18b09ca32901531635}{p2p\_port}}();}
+\DoxyCodeLine{00269\ \ \ \mbox{\hyperlink{classeosd__def_af00099700968db5cc2ba0460039ca013}{http\_port}}\ =\ is\_bios\ ?\ h-\/>\mbox{\hyperlink{classhost__def_af4b3afa70decb059df5b4e936b361fba}{http\_bios\_port}}()\ :\ h-\/>\mbox{\hyperlink{classhost__def_a17cffb6914e7a4043c61edad887d6fd5}{http\_port}}();}
+\DoxyCodeLine{00270\ \ \ \mbox{\hyperlink{classeosd__def_a47455d95b71f6c3dc26dd76fb5486609}{file\_size}}\ =\ h-\/>\mbox{\hyperlink{classhost__def_ad63399de51f510a467adaee242756d9e}{def\_file\_size}};}
+\DoxyCodeLine{00271\ \ \ \mbox{\hyperlink{classeosd__def_ac013d5af6168b0bc78f491477a2dccc5}{p2p\_endpoint}}\ =\ h-\/>\mbox{\hyperlink{classhost__def_af3513833c3e552feacc7b868c2bd782d}{public\_name}}\ +\ \textcolor{stringliteral}{"{}:"{}}\ +\ boost::lexical\_cast<string,\ uint16\_t>(\mbox{\hyperlink{classeosd__def_af7e087103ea972bc98bc135bcc24970d}{p2p\_port}});}
+\DoxyCodeLine{00272\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=336pt]{classeosd__def_a889bc102e780ac29b2224d8f5ff86efc_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classeosd__def_a889bc102e780ac29b2224d8f5ff86efc_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classeosd__def_a2b0e5560d8740df24078c2bd69eeeb5e}\index{eosd\_def@{eosd\_def}!config\_dir\_name@{config\_dir\_name}}
+\index{config\_dir\_name@{config\_dir\_name}!eosd\_def@{eosd\_def}}
+\doxysubsubsection{\texorpdfstring{config\_dir\_name}{config\_dir\_name}}
+{\footnotesize\ttfamily \label{classeosd__def_a2b0e5560d8740df24078c2bd69eeeb5e} 
+string eosd\+\_\+def\+::config\+\_\+dir\+\_\+name}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source_l00210}{210}} of file \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{classeosd__def_afa3eec67417e8ea7239182fb11b36ee3}\index{eosd\_def@{eosd\_def}!data\_dir\_name@{data\_dir\_name}}
+\index{data\_dir\_name@{data\_dir\_name}!eosd\_def@{eosd\_def}}
+\doxysubsubsection{\texorpdfstring{data\_dir\_name}{data\_dir\_name}}
+{\footnotesize\ttfamily \label{classeosd__def_afa3eec67417e8ea7239182fb11b36ee3} 
+string eosd\+\_\+def\+::data\+\_\+dir\+\_\+name}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source_l00211}{211}} of file \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{classeosd__def_a47455d95b71f6c3dc26dd76fb5486609}\index{eosd\_def@{eosd\_def}!file\_size@{file\_size}}
+\index{file\_size@{file\_size}!eosd\_def@{eosd\_def}}
+\doxysubsubsection{\texorpdfstring{file\_size}{file\_size}}
+{\footnotesize\ttfamily \label{classeosd__def_a47455d95b71f6c3dc26dd76fb5486609} 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} eosd\+\_\+def\+::file\+\_\+size}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source_l00214}{214}} of file \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{classeosd__def_ac1f0929b1ddfb5484250aa39c0cec105}\index{eosd\_def@{eosd\_def}!host@{host}}
+\index{host@{host}!eosd\_def@{eosd\_def}}
+\doxysubsubsection{\texorpdfstring{host}{host}}
+{\footnotesize\ttfamily \label{classeosd__def_ac1f0929b1ddfb5484250aa39c0cec105} 
+string eosd\+\_\+def\+::host}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source_l00217}{217}} of file \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{classeosd__def_af00099700968db5cc2ba0460039ca013}\index{eosd\_def@{eosd\_def}!http\_port@{http\_port}}
+\index{http\_port@{http\_port}!eosd\_def@{eosd\_def}}
+\doxysubsubsection{\texorpdfstring{http\_port}{http\_port}}
+{\footnotesize\ttfamily \label{classeosd__def_af00099700968db5cc2ba0460039ca013} 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} eosd\+\_\+def\+::http\+\_\+port}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source_l00213}{213}} of file \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{classeosd__def_aa9cdf51a291c9243e1057a788f3c9642}\index{eosd\_def@{eosd\_def}!name@{name}}
+\index{name@{name}!eosd\_def@{eosd\_def}}
+\doxysubsubsection{\texorpdfstring{name}{name}}
+{\footnotesize\ttfamily \label{classeosd__def_aa9cdf51a291c9243e1057a788f3c9642} 
+string eosd\+\_\+def\+::name}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source_l00215}{215}} of file \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{classeosd__def_acb560fb7969422b1e8001e195bce8e2a}\index{eosd\_def@{eosd\_def}!node@{node}}
+\index{node@{node}!eosd\_def@{eosd\_def}}
+\doxysubsubsection{\texorpdfstring{node}{node}}
+{\footnotesize\ttfamily \label{classeosd__def_acb560fb7969422b1e8001e195bce8e2a} 
+\mbox{\hyperlink{classtn__node__def}{tn\+\_\+node\+\_\+def}}\texorpdfstring{$\ast$}{*} eosd\+\_\+def\+::node}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source_l00216}{216}} of file \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{classeosd__def_ac013d5af6168b0bc78f491477a2dccc5}\index{eosd\_def@{eosd\_def}!p2p\_endpoint@{p2p\_endpoint}}
+\index{p2p\_endpoint@{p2p\_endpoint}!eosd\_def@{eosd\_def}}
+\doxysubsubsection{\texorpdfstring{p2p\_endpoint}{p2p\_endpoint}}
+{\footnotesize\ttfamily \label{classeosd__def_ac013d5af6168b0bc78f491477a2dccc5} 
+string eosd\+\_\+def\+::p2p\+\_\+endpoint}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source_l00218}{218}} of file \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{classeosd__def_af7e087103ea972bc98bc135bcc24970d}\index{eosd\_def@{eosd\_def}!p2p\_port@{p2p\_port}}
+\index{p2p\_port@{p2p\_port}!eosd\_def@{eosd\_def}}
+\doxysubsubsection{\texorpdfstring{p2p\_port}{p2p\_port}}
+{\footnotesize\ttfamily \label{classeosd__def_af7e087103ea972bc98bc135bcc24970d} 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} eosd\+\_\+def\+::p2p\+\_\+port}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source_l00212}{212}} of file \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+programs/sysio-\/launcher/\mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp}{main.\+cpp}}\end{DoxyCompactItemize}

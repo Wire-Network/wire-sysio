@@ -1,0 +1,9 @@
+<map id="libraries/yubihsm/pkcs11/debug_p11.h" name="libraries/yubihsm/pkcs11/debug_p11.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="195,5,360,46"/>
+<area shape="rect" id="Node000002" href="$debug__p11_8c.html" title=" " alt="" coords="5,94,171,135"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="222,55,132,96,130,91,220,50"/>
+<area shape="rect" id="Node000003" href="$util__pkcs11_8c.html" title=" " alt="" coords="195,94,360,135"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="280,62,280,94,275,94,275,62"/>
+<area shape="rect" id="Node000004" href="$yubihsm__pkcs11_8c.html" title=" " alt="" coords="384,94,549,135"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="335,50,425,91,423,96,333,55"/>
+</map>

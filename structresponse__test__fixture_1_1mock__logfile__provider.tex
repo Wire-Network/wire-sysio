@@ -1,0 +1,100 @@
+\doxysection{response\+\_\+test\+\_\+fixture\+::mock\+\_\+logfile\+\_\+provider Struct Reference}
+\hypertarget{structresponse__test__fixture_1_1mock__logfile__provider}{}\label{structresponse__test__fixture_1_1mock__logfile__provider}\index{response\_test\_fixture::mock\_logfile\_provider@{response\_test\_fixture::mock\_logfile\_provider}}
+
+
+Collaboration diagram for response\+\_\+test\+\_\+fixture\+::mock\+\_\+logfile\+\_\+provider\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structresponse__test__fixture_1_1mock__logfile__provider__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structresponse__test__fixture_1_1mock__logfile__provider_a12591aeae09e971b46bd618570bdf808}{mock\+\_\+logfile\+\_\+provider}} (\mbox{\hyperlink{structresponse__test__fixture}{response\+\_\+test\+\_\+fixture}} \&\mbox{\hyperlink{structresponse__test__fixture_1_1mock__logfile__provider_ae513b9c97653cd45efd911493fad1266}{fixture}})
+\item 
+\mbox{\hyperlink{namespacesysio_1_1trace__api_a4fe812fd823fbfebfe869a30ef75a248}{get\+\_\+block\+\_\+t}} \mbox{\hyperlink{structresponse__test__fixture_1_1mock__logfile__provider_a8f53dba330ff757881a96441d1e86e43}{get\+\_\+block}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} height, const \mbox{\hyperlink{namespacesysio_1_1trace__api_a24d1d2b642518b3d627011e7ef39ae9a}{yield\+\_\+function}} \&yield=\{\})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structresponse__test__fixture}{response\+\_\+test\+\_\+fixture}} \& \mbox{\hyperlink{structresponse__test__fixture_1_1mock__logfile__provider_ae513b9c97653cd45efd911493fad1266}{fixture}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+MOCK implementation of the logfile input API 
+
+Definition at line \mbox{\hyperlink{test__responses_8cpp_source_l00017}{17}} of file \mbox{\hyperlink{test__responses_8cpp_source}{test\+\_\+responses.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structresponse__test__fixture_1_1mock__logfile__provider_a12591aeae09e971b46bd618570bdf808}\index{response\_test\_fixture::mock\_logfile\_provider@{response\_test\_fixture::mock\_logfile\_provider}!mock\_logfile\_provider@{mock\_logfile\_provider}}
+\index{mock\_logfile\_provider@{mock\_logfile\_provider}!response\_test\_fixture::mock\_logfile\_provider@{response\_test\_fixture::mock\_logfile\_provider}}
+\doxysubsubsection{\texorpdfstring{mock\_logfile\_provider()}{mock\_logfile\_provider()}}
+{\footnotesize\ttfamily \label{structresponse__test__fixture_1_1mock__logfile__provider_a12591aeae09e971b46bd618570bdf808} 
+response\+\_\+test\+\_\+fixture\+::mock\+\_\+logfile\+\_\+provider\+::mock\+\_\+logfile\+\_\+provider (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structresponse__test__fixture}{response\+\_\+test\+\_\+fixture}} \&}]{fixture}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{test__responses_8cpp_source_l00018}{18}} of file \mbox{\hyperlink{test__responses_8cpp_source}{test\+\_\+responses.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ :\mbox{\hyperlink{structresponse__test__fixture_1_1mock__logfile__provider_ae513b9c97653cd45efd911493fad1266}{fixture}}(\mbox{\hyperlink{structresponse__test__fixture_1_1mock__logfile__provider_ae513b9c97653cd45efd911493fad1266}{fixture}})}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structresponse__test__fixture_1_1mock__logfile__provider_a8f53dba330ff757881a96441d1e86e43}\index{response\_test\_fixture::mock\_logfile\_provider@{response\_test\_fixture::mock\_logfile\_provider}!get\_block@{get\_block}}
+\index{get\_block@{get\_block}!response\_test\_fixture::mock\_logfile\_provider@{response\_test\_fixture::mock\_logfile\_provider}}
+\doxysubsubsection{\texorpdfstring{get\_block()}{get\_block()}}
+{\footnotesize\ttfamily \label{structresponse__test__fixture_1_1mock__logfile__provider_a8f53dba330ff757881a96441d1e86e43} 
+\mbox{\hyperlink{namespacesysio_1_1trace__api_a4fe812fd823fbfebfe869a30ef75a248}{get\+\_\+block\+\_\+t}} response\+\_\+test\+\_\+fixture\+::mock\+\_\+logfile\+\_\+provider\+::get\+\_\+block (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{height}{, }\item[{const \mbox{\hyperlink{namespacesysio_1_1trace__api_a24d1d2b642518b3d627011e7ef39ae9a}{yield\+\_\+function}} \&}]{yield}{ = {\ttfamily \{\}}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Read the trace for a given block 
+\begin{DoxyParams}{Parameters}
+{\em block\+\_\+height} & \+: the height of the data being read \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+empty optional if the data cannot be read OTHERWISE optional containing a 2-\/tuple of the block\+\_\+trace and a flag indicating irreversibility 
+\end{DoxyReturn}
+
+\begin{DoxyExceptions}{Exceptions}
+{\em bad\+\_\+data\+\_\+exception} & \+: if the data is corrupt in some way \\
+\hline
+\end{DoxyExceptions}
+
+
+Definition at line \mbox{\hyperlink{test__responses_8cpp_source_l00029}{29}} of file \mbox{\hyperlink{test__responses_8cpp_source}{test\+\_\+responses.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\})\ \{}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structresponse__test__fixture_1_1mock__logfile__provider_ae513b9c97653cd45efd911493fad1266}{fixture}}.\mbox{\hyperlink{structresponse__test__fixture_ac06be021bdeb4334dfbc8dacda756279}{mock\_get\_block}}(height,\ yield);}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structresponse__test__fixture_1_1mock__logfile__provider_ae513b9c97653cd45efd911493fad1266}\index{response\_test\_fixture::mock\_logfile\_provider@{response\_test\_fixture::mock\_logfile\_provider}!fixture@{fixture}}
+\index{fixture@{fixture}!response\_test\_fixture::mock\_logfile\_provider@{response\_test\_fixture::mock\_logfile\_provider}}
+\doxysubsubsection{\texorpdfstring{fixture}{fixture}}
+{\footnotesize\ttfamily \label{structresponse__test__fixture_1_1mock__logfile__provider_ae513b9c97653cd45efd911493fad1266} 
+\mbox{\hyperlink{structresponse__test__fixture}{response\+\_\+test\+\_\+fixture}}\& response\+\_\+test\+\_\+fixture\+::mock\+\_\+logfile\+\_\+provider\+::fixture}
+
+
+
+Definition at line \mbox{\hyperlink{test__responses_8cpp_source_l00032}{32}} of file \mbox{\hyperlink{test__responses_8cpp_source}{test\+\_\+responses.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+plugins/trace\+\_\+api\+\_\+plugin/test/\mbox{\hyperlink{test__responses_8cpp}{test\+\_\+responses.\+cpp}}\end{DoxyCompactItemize}

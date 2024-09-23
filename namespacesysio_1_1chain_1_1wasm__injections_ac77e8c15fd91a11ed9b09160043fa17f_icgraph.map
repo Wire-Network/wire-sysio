@@ -1,0 +1,31 @@
+<map id="sysio::chain::wasm_injections::inject_which_op" name="sysio::chain::wasm_injections::inject_which_op">
+<area shape="rect" id="Node000001" title=" " alt="" coords="212,525,346,581"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1wasm__injections_1_1f32__binop__injector.html#ab8e67767006f342e8edf52e75c52ad5a" title=" " alt="" coords="11,5,158,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="276,510,273,422,258,308,243,247,223,186,196,128,162,75,150,63,154,60,166,71,201,125,228,184,248,245,263,307,278,422,281,510"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1chain_1_1wasm__injections_1_1f32__relop__injector.html#a169272d5cdd77b2ece99f39e1ce67cd5" title=" " alt="" coords="12,85,157,141"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="273,510,266,436,248,342,234,293,215,244,191,197,162,155,150,144,154,140,166,151,196,195,220,242,239,291,254,341,272,435,279,510"/>
+<area shape="rect" id="Node000004" href="$structsysio_1_1chain_1_1wasm__injections_1_1f32__trunc__i32__injector.html#a33a8d72008114045b70a2c2f9f68be45" title=" " alt="" coords="12,165,157,221"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="270,510,259,450,238,378,207,302,186,267,162,235,149,224,153,220,166,231,191,264,212,300,243,376,264,449,275,509"/>
+<area shape="rect" id="Node000005" href="$structsysio_1_1chain_1_1wasm__injections_1_1f32__trunc__i64__injector.html#a25c6bd9cc3fc5aaa388fc32601149c01" title=" " alt="" coords="12,245,157,301"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="264,511,249,466,227,415,198,362,162,315,148,304,152,299,166,311,203,359,232,412,254,464,269,509"/>
+<area shape="rect" id="Node000006" href="$structsysio_1_1chain_1_1wasm__injections_1_1f32__unop__injector.html#ad5e6ec608abc1d555bc686bf8bf0eee1" title=" " alt="" coords="12,325,157,381"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="254,514,215,454,190,423,162,395,146,384,150,379,165,391,194,419,219,451,258,511"/>
+<area shape="rect" id="Node000007" href="$structsysio_1_1chain_1_1wasm__injections_1_1f64__binop__injector.html#a813df92a0aee5914c28967fbdc612425" title=" " alt="" coords="11,405,158,461"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="226,518,162,475,142,464,145,459,165,471,229,514"/>
+<area shape="rect" id="Node000008" href="$structsysio_1_1chain_1_1wasm__injections_1_1f64__relop__injector.html#ae6d732dba85440af84e1cb64a438f70f" title=" " alt="" coords="12,485,157,541"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="196,539,156,531,157,525,197,534"/>
+<area shape="rect" id="Node000009" href="$structsysio_1_1chain_1_1wasm__injections_1_1f64__trunc__i32__injector.html#aeea8ed025e7a53b17d2660fde09c5734" title=" " alt="" coords="12,565,157,621"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="197,573,158,581,157,576,196,568"/>
+<area shape="rect" id="Node000010" href="$structsysio_1_1chain_1_1wasm__injections_1_1f64__trunc__i64__injector.html#aa848c760fb38d4e2c288f0fce1e09355" title=" " alt="" coords="12,645,157,701"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="229,593,165,635,145,647,142,642,162,631,226,588"/>
+<area shape="rect" id="Node000011" href="$structsysio_1_1chain_1_1wasm__injections_1_1f64__unop__injector.html#a8b04cf3659ae3704cbc334c8dfc4d9cf" title=" " alt="" coords="12,725,157,781"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="258,596,219,656,194,687,165,715,150,727,146,723,162,711,190,683,215,653,254,593"/>
+<area shape="rect" id="Node000012" href="$structsysio_1_1chain_1_1wasm__injections_1_1i32__convert__f32__injector.html#aade07da739d0a26d2b36c6b50bef4f64" title=" " alt="" coords="5,805,164,861"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="269,597,254,642,232,694,203,747,166,795,152,807,148,803,162,791,198,744,227,692,249,640,264,595"/>
+<area shape="rect" id="Node000013" href="$structsysio_1_1chain_1_1wasm__injections_1_1i32__convert__f64__injector.html#a44298adbf1a27da3334dfc2ec6151534" title=" " alt="" coords="5,885,164,941"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="275,597,264,657,243,730,212,806,191,842,166,875,153,887,149,883,162,871,186,839,207,804,238,729,259,656,270,596"/>
+<area shape="rect" id="Node000014" href="$structsysio_1_1chain_1_1wasm__injections_1_1i64__convert__f32__injector.html#abf3062d5121b7bf2d88424a759ce5471" title=" " alt="" coords="5,965,164,1021"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="279,597,272,671,254,765,239,815,220,865,196,912,166,955,154,967,150,963,162,951,191,909,215,862,234,813,248,764,266,670,273,596"/>
+<area shape="rect" id="Node000015" href="$structsysio_1_1chain_1_1wasm__injections_1_1i64__convert__f64__injector.html#acb3785a7bdd6702c88fa820e2f8c1ea4" title=" " alt="" coords="5,1045,164,1101"/>
+<area shape="poly" id="edge14_Node000001_Node000015" title=" " alt="" coords="281,597,278,685,263,800,248,861,228,923,201,981,166,1035,154,1047,150,1043,162,1031,196,979,223,921,243,860,258,799,273,684,276,596"/>
+</map>

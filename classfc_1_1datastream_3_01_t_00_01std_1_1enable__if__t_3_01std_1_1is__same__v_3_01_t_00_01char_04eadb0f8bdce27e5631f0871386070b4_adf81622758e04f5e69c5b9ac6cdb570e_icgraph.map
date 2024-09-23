@@ -1,0 +1,4 @@
+<map id="fc::datastream&lt; T, std::enable_if_t&lt; std::is_same_v&lt; T, char * &gt;||std::is_same_v&lt; T, const char * &gt;||std::is_same_v&lt; T, const unsigned char * &gt; &gt; &gt;::get" name="fc::datastream&lt; T, std::enable_if_t&lt; std::is_same_v&lt; T, char * &gt;||std::is_same_v&lt; T, const char * &gt;||std::is_same_v&lt; T, const unsigned char * &gt; &gt; &gt;::get">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,29,194,145"/>
+<area shape="poly" id="edge1_Node000001_Node000001" title=" " alt="" coords="126,18,115,11,99,8,87,10,78,14,67,30,63,27,74,10,85,5,100,3,117,6,129,13"/>
+</map>

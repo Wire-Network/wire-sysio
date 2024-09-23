@@ -1,0 +1,95 @@
+\doxysection{sysio\+::chain\+::detail\+::abstract\+\_\+snapshot\+\_\+row\+\_\+writer Struct Reference}
+\hypertarget{structsysio_1_1chain_1_1detail_1_1abstract__snapshot__row__writer}{}\label{structsysio_1_1chain_1_1detail_1_1abstract__snapshot__row__writer}\index{sysio::chain::detail::abstract\_snapshot\_row\_writer@{sysio::chain::detail::abstract\_snapshot\_row\_writer}}
+
+
+{\ttfamily \#include $<$snapshot.\+hpp$>$}
+
+
+
+Inheritance diagram for sysio\+::chain\+::detail\+::abstract\+\_\+snapshot\+\_\+row\+\_\+writer\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=216pt]{structsysio_1_1chain_1_1detail_1_1abstract__snapshot__row__writer__inherit__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual void \mbox{\hyperlink{structsysio_1_1chain_1_1detail_1_1abstract__snapshot__row__writer_a0d19dfcf76f7e990c87baa7c4045b679}{write}} (\mbox{\hyperlink{structsysio_1_1chain_1_1detail_1_1ostream__wrapper}{ostream\+\_\+wrapper}} \&out) const =0
+\item 
+virtual void \mbox{\hyperlink{structsysio_1_1chain_1_1detail_1_1abstract__snapshot__row__writer_a67eb493594507254dd60198f934f3f09}{write}} (\mbox{\hyperlink{classfc_1_1sha256_1_1encoder}{fc\+::sha256\+::encoder}} \&out) const =0
+\item 
+virtual \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \mbox{\hyperlink{structsysio_1_1chain_1_1detail_1_1abstract__snapshot__row__writer_ace6ab3c86ae12b25701aff8243929c7c}{to\+\_\+variant}} () const =0
+\item 
+virtual std\+::string \mbox{\hyperlink{structsysio_1_1chain_1_1detail_1_1abstract__snapshot__row__writer_ae18ac93e23ed5746303c7edd59e3dfa2}{row\+\_\+type\+\_\+name}} () const =0
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{snapshot_8hpp_source_l00071}{71}} of file \mbox{\hyperlink{snapshot_8hpp_source}{snapshot.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1chain_1_1detail_1_1abstract__snapshot__row__writer_ae18ac93e23ed5746303c7edd59e3dfa2}\index{sysio::chain::detail::abstract\_snapshot\_row\_writer@{sysio::chain::detail::abstract\_snapshot\_row\_writer}!row\_type\_name@{row\_type\_name}}
+\index{row\_type\_name@{row\_type\_name}!sysio::chain::detail::abstract\_snapshot\_row\_writer@{sysio::chain::detail::abstract\_snapshot\_row\_writer}}
+\doxysubsubsection{\texorpdfstring{row\_type\_name()}{row\_type\_name()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1detail_1_1abstract__snapshot__row__writer_ae18ac93e23ed5746303c7edd59e3dfa2} 
+virtual std\+::string sysio\+::chain\+::detail\+::abstract\+\_\+snapshot\+\_\+row\+\_\+writer\+::row\+\_\+type\+\_\+name (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{structsysio_1_1chain_1_1detail_1_1snapshot__row__writer_aa5f850da3e4c3f57d6fb22319aaed306}{sysio\+::chain\+::detail\+::snapshot\+\_\+row\+\_\+writer$<$ T $>$}}.
+
+\Hypertarget{structsysio_1_1chain_1_1detail_1_1abstract__snapshot__row__writer_ace6ab3c86ae12b25701aff8243929c7c}\index{sysio::chain::detail::abstract\_snapshot\_row\_writer@{sysio::chain::detail::abstract\_snapshot\_row\_writer}!to\_variant@{to\_variant}}
+\index{to\_variant@{to\_variant}!sysio::chain::detail::abstract\_snapshot\_row\_writer@{sysio::chain::detail::abstract\_snapshot\_row\_writer}}
+\doxysubsubsection{\texorpdfstring{to\_variant()}{to\_variant()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1detail_1_1abstract__snapshot__row__writer_ace6ab3c86ae12b25701aff8243929c7c} 
+virtual \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} sysio\+::chain\+::detail\+::abstract\+\_\+snapshot\+\_\+row\+\_\+writer\+::to\+\_\+variant (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{structsysio_1_1chain_1_1detail_1_1snapshot__row__writer_aef7ca4445cec1660c756b1e6640ae766}{sysio\+::chain\+::detail\+::snapshot\+\_\+row\+\_\+writer$<$ T $>$}}.
+
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1detail_1_1abstract__snapshot__row__writer_ace6ab3c86ae12b25701aff8243929c7c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1detail_1_1abstract__snapshot__row__writer_a67eb493594507254dd60198f934f3f09}\index{sysio::chain::detail::abstract\_snapshot\_row\_writer@{sysio::chain::detail::abstract\_snapshot\_row\_writer}!write@{write}}
+\index{write@{write}!sysio::chain::detail::abstract\_snapshot\_row\_writer@{sysio::chain::detail::abstract\_snapshot\_row\_writer}}
+\doxysubsubsection{\texorpdfstring{write()}{write()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1detail_1_1abstract__snapshot__row__writer_a67eb493594507254dd60198f934f3f09} 
+virtual void sysio\+::chain\+::detail\+::abstract\+\_\+snapshot\+\_\+row\+\_\+writer\+::write (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1sha256_1_1encoder}{fc\+::sha256\+::encoder}} \&}]{out}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{structsysio_1_1chain_1_1detail_1_1snapshot__row__writer_a2b909b58166b8523338860ed4a91b255}{sysio\+::chain\+::detail\+::snapshot\+\_\+row\+\_\+writer$<$ T $>$}}.
+
+\Hypertarget{structsysio_1_1chain_1_1detail_1_1abstract__snapshot__row__writer_a0d19dfcf76f7e990c87baa7c4045b679}\index{sysio::chain::detail::abstract\_snapshot\_row\_writer@{sysio::chain::detail::abstract\_snapshot\_row\_writer}!write@{write}}
+\index{write@{write}!sysio::chain::detail::abstract\_snapshot\_row\_writer@{sysio::chain::detail::abstract\_snapshot\_row\_writer}}
+\doxysubsubsection{\texorpdfstring{write()}{write()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1detail_1_1abstract__snapshot__row__writer_a0d19dfcf76f7e990c87baa7c4045b679} 
+virtual void sysio\+::chain\+::detail\+::abstract\+\_\+snapshot\+\_\+row\+\_\+writer\+::write (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1detail_1_1ostream__wrapper}{ostream\+\_\+wrapper}} \&}]{out}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{structsysio_1_1chain_1_1detail_1_1snapshot__row__writer_a85aa630d98d2bd515f5824c203c8ab79}{sysio\+::chain\+::detail\+::snapshot\+\_\+row\+\_\+writer$<$ T $>$}}.
+
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1detail_1_1abstract__snapshot__row__writer_a0d19dfcf76f7e990c87baa7c4045b679_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{snapshot_8hpp}{snapshot.\+hpp}}\end{DoxyCompactItemize}

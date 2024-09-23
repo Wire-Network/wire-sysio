@@ -1,0 +1,18 @@
+<map id="blocklog::initialize" name="blocklog::initialize">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,104,130,130"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1chain_1_1block__log.html#a65b017352bcd2bdea5ed9d68af7215d1" title=" " alt="" coords="178,96,311,137"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="130,114,162,114,162,120,130,120"/>
+<area shape="rect" id="Node000003" href="$classfc_1_1cfile.html#a9e01adaeee108420312ed271133a2d7d" title=" " alt="" coords="382,55,482,80"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="311,97,366,82,368,87,312,102"/>
+<area shape="rect" id="Node000006" href="$classfc_1_1cfile.html#ac4a0191d7846c07a907d3c7eb35e848d" title=" " alt="" coords="359,104,505,130"/>
+<area shape="poly" id="edge7_Node000002_Node000006" title=" " alt="" coords="311,114,344,114,344,120,311,120"/>
+<area shape="rect" id="Node000007" href="$namespacefc_1_1raw.html#a0b442d98ceb22dd5a6ae84745e43ffab" title=" " alt="" coords="376,177,488,203"/>
+<area shape="poly" id="edge8_Node000002_Node000007" title=" " alt="" coords="299,135,384,169,382,174,297,140"/>
+<area shape="rect" id="Node000004" href="$classfc_1_1cfile.html#a3b11f29f74860527a8bba66e4ae0317d" title=" " alt="" coords="553,29,657,55"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="482,58,537,49,538,55,483,63"/>
+<area shape="rect" id="Node000005" href="$classfc_1_1path.html#ab1eae2062df4ea01435348ec52fb3784" title=" " alt="" coords="705,55,859,80"/>
+<area shape="poly" id="edge6_Node000003_Node000005" title=" " alt="" coords="483,65,689,65,689,70,483,70"/>
+<area shape="poly" id="edge4_Node000004_Node000004" title=" " alt="" coords="576,30,570,21,573,11,585,5,605,3,626,5,637,12,634,16,624,10,605,8,587,10,577,15,575,20,580,28"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="658,47,689,52,689,57,657,52"/>
+<area shape="poly" id="edge9_Node000007_Node000007" title=" " alt="" coords="403,178,397,169,401,159,413,153,432,151,453,153,464,160,461,164,451,158,432,156,414,158,405,163,403,168,407,176"/>
+</map>

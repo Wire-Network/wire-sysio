@@ -1,0 +1,177 @@
+\doxysection{207-\/Rpt-\/\+Team\+City\+Reporter.cpp}
+\hypertarget{207-_rpt-_team_city_reporter_8cpp_source}{}\label{207-_rpt-_team_city_reporter_8cpp_source}\index{libraries/sys-\/vm/external/Catch2/examples/207-\/Rpt-\/TeamCityReporter.cpp@{libraries/sys-\/vm/external/Catch2/examples/207-\/Rpt-\/TeamCityReporter.cpp}}
+\mbox{\hyperlink{207-_rpt-_team_city_reporter_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00001}00001\ \textcolor{comment}{//\ 207-\/Rpt-\/TeamCityReporter.cpp}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00003}00003\ \textcolor{comment}{//\ Catch\ has\ built-\/in\ and\ external\ reporters:}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00004}00004\ \textcolor{comment}{//\ Built-\/in:}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00005}00005\ \textcolor{comment}{//\ -\/\ compact}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00006}00006\ \textcolor{comment}{//\ -\/\ console}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00007}00007\ \textcolor{comment}{//\ -\/\ junit}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00008}00008\ \textcolor{comment}{//\ -\/\ xml}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00009}00009\ \textcolor{comment}{//\ External:}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00010}00010\ \textcolor{comment}{//\ -\/\ automake}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00011}00011\ \textcolor{comment}{//\ -\/\ tap}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00012}00012\ \textcolor{comment}{//\ -\/\ teamcity\ (this\ example)}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00014}00014\ \textcolor{comment}{//\ main()\ and\ reporter\ code\ provided\ in\ 200-\/Rpt-\/CatchMain.cpp}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00016}00016\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{single__include_2catch2_2catch_8hpp}{catch2/catch.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00018}00018\ \textcolor{preprocessor}{\#ifdef\ \_MSC\_VER}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00019}00019\ \textcolor{preprocessor}{\#\ pragma\ warning\ (disable\ :\ 4702)\ }\textcolor{comment}{//\ Disable\ warning:\ unreachable\ code}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00020}00020\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00022}\mbox{\hyperlink{207-_rpt-_team_city_reporter_8cpp_a41156cabcfd777e48fd6f3803668848e}{00022}}\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\ \textcolor{stringliteral}{"{}TeamCity\ passes\ unconditionally\ succeeding\ assertion"{}},\ \textcolor{stringliteral}{"{}[teamcity]"{}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00024}00024\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a75adcdf89f69b0b615e395daafc315af}{SUCCEED}}();}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00025}00025\ \}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00027}\mbox{\hyperlink{207-_rpt-_team_city_reporter_8cpp_a40b6bf9e4ad873c0c73b7908251bb583}{00027}}\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\ \textcolor{stringliteral}{"{}TeamCity\ reports\ unconditionally\ failing\ assertion"{}},\ \textcolor{stringliteral}{"{}[teamcity]"{}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00029}00029\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a3e26a8d27caa386ed0ea7ce9d5b7c4ed}{FAIL}}();}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00030}00030\ \}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00032}\mbox{\hyperlink{207-_rpt-_team_city_reporter_8cpp_a7c15d226c6118143d37c865b0406d73d}{00032}}\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\ \textcolor{stringliteral}{"{}TeamCity\ reports\ failing\ check"{}},\ \textcolor{stringliteral}{"{}[teamcity]"{}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00034}00034\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ 3\ ==\ 7\ );}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00035}00035\ \}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00037}\mbox{\hyperlink{207-_rpt-_team_city_reporter_8cpp_ad7f437feea7e70a1d5dc8bbd0911b4d7}{00037}}\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\ \textcolor{stringliteral}{"{}TeamCity\ reports\ failing\ check-\/false"{}},\ \textcolor{stringliteral}{"{}[teamcity]"{}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00039}00039\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ada5065594bafc152162761ace47c1dcb}{REQUIRE\_FALSE}}(\ 3\ ==\ 3\ );}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00040}00040\ \}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00042}\mbox{\hyperlink{207-_rpt-_team_city_reporter_8cpp_a8cd373ffc1c99e16adff99ec527b869d}{00042}}\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\ \textcolor{stringliteral}{"{}TeamCity\ reports\ failing\ check-\/that"{}},\ \textcolor{stringliteral}{"{}[teamcity]"{}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00044}00044\ \ \ \ \ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}};}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00046}00046\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ac1354db6f3e9c1e0a8eda0eea7ff1f0a}{REQUIRE\_THAT}}(\ \textcolor{stringliteral}{"{}hello"{}},\ Contains(\ \textcolor{stringliteral}{"{}world"{}}\ )\ );}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00047}00047\ \}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00049}\mbox{\hyperlink{207-_rpt-_team_city_reporter_8cpp_a89a198e1b9300d695565b77e326a4813}{00049}}\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\ \textcolor{stringliteral}{"{}TeamCity\ reports\ unexpected\ exception"{}},\ \textcolor{stringliteral}{"{}[teamcity]"{}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00051}00051\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ (\textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}surprise!"{}}),\ \textcolor{keyword}{true})\ );}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00052}00052\ \}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00054}\mbox{\hyperlink{207-_rpt-_team_city_reporter_8cpp_a72531d67e40fe4a5952428222bd28ef9}{00054}}\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\ \textcolor{stringliteral}{"{}TeamCity\ reports\ undesired\ exception"{}},\ \textcolor{stringliteral}{"{}[teamcity]"{}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00056}00056\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ab0148f0dfca438f7aa01974e9c33216a}{REQUIRE\_NOTHROW}}(\ (\textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}surprise!"{}}),\ \textcolor{keyword}{true})\ );}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00057}00057\ \}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00059}\mbox{\hyperlink{207-_rpt-_team_city_reporter_8cpp_af3e41d8973bcdf214991a9e8795c1eb7}{00059}}\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\ \textcolor{stringliteral}{"{}TeamCity\ reports\ missing\ expected\ exception"{}},\ \textcolor{stringliteral}{"{}[teamcity]"{}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00061}00061\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ae3c33faa1d31a2bb0811dac74b994e3e}{REQUIRE\_THROWS}}(\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00062}00062\ \}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00064}\mbox{\hyperlink{207-_rpt-_team_city_reporter_8cpp_a6df5e7520f44c45bb2c6857f295bf596}{00064}}\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\ \textcolor{stringliteral}{"{}TeamCity\ reports\ missing\ specific\ expected\ exception"{}},\ \textcolor{stringliteral}{"{}[teamcity]"{}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00066}00066\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ae24a059e3c28ff3eea69be48282f5f81}{REQUIRE\_THROWS\_AS}}(\ \textcolor{keywordflow}{throw}\ std::bad\_alloc(),\ std::runtime\_error\ );}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00067}00067\ \}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00069}\mbox{\hyperlink{207-_rpt-_team_city_reporter_8cpp_a38760194f8663efafe252981fefdb7c8}{00069}}\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\ \textcolor{stringliteral}{"{}TeamCity\ reports\ unexpected\ message\ in\ expected\ exception"{}},\ \textcolor{stringliteral}{"{}[teamcity]"{}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00071}00071\ \ \ \ \ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}};}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00073}00073\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a4903733490f526b58053836575e99066}{CHECK\_THROWS\_WITH}}(\ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}hello"{}}),\ \textcolor{stringliteral}{"{}world"{}}\ );}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00074}00074\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a4903733490f526b58053836575e99066}{CHECK\_THROWS\_WITH}}(\ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}hello"{}}),\ Contains(\textcolor{stringliteral}{"{}world"{}})\ );}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00075}00075\ \}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00076}00076\ }
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00077}\mbox{\hyperlink{struct_my_exception}{00077}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_my_exception}{MyException}}:\ \textcolor{keyword}{public}\ std::runtime\_error}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00078}00078\ \{}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00079}\mbox{\hyperlink{struct_my_exception_ae57d9d1003afdb5d775eb6ed6669b463}{00079}}\ \ \ \ \ \mbox{\hyperlink{struct_my_exception_ae57d9d1003afdb5d775eb6ed6669b463}{MyException}}(\ \textcolor{keywordtype}{char}\ \textcolor{keyword}{const}\ *\ text\ )}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00080}00080\ \ \ \ \ :\ \mbox{\hyperlink{namespacestd}{std}}::runtime\_error(\ text\ )\ \{\}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00081}00081\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00082}\mbox{\hyperlink{struct_my_exception_ab3243e9181ca05bae34ee7b14e0653e4}{00082}}\ \ \ \ \ \mbox{\hyperlink{struct_my_exception_ab3243e9181ca05bae34ee7b14e0653e4}{\string~MyException}}()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00083}00083\ \};}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00084}00084\ }
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00085}00085\ \textcolor{comment}{//\ prevent\ -\/Wweak-\/vtables:}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00086}00086\ \mbox{\hyperlink{struct_my_exception_ab3243e9181ca05bae34ee7b14e0653e4}{MyException::\string~MyException}}()\ =\ \textcolor{keywordflow}{default};}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00087}00087\ }
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00088}\mbox{\hyperlink{struct_my_exception_matcher}{00088}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_my_exception_matcher}{MyExceptionMatcher}}\ :\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_matcher_base}{Catch::MatcherBase}}<\ std::runtime\_error\ >}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00089}00089\ \{}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00090}\mbox{\hyperlink{struct_my_exception_matcher_ad0f00368cd6920439e9a0e24596a5411}{00090}}\ \ \ \ \ std::string\ \mbox{\hyperlink{struct_my_exception_matcher_ad0f00368cd6920439e9a0e24596a5411}{m\_text}};}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00091}00091\ }
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00092}\mbox{\hyperlink{struct_my_exception_matcher_a5711699a68acc7d4500d3985633727cc}{00092}}\ \ \ \ \ \mbox{\hyperlink{struct_my_exception_matcher_a5711699a68acc7d4500d3985633727cc}{MyExceptionMatcher}}(\ \textcolor{keywordtype}{char}\ \textcolor{keyword}{const}\ *\ text\ )}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00093}00093\ \ \ \ \ :\ \mbox{\hyperlink{struct_my_exception_matcher_ad0f00368cd6920439e9a0e24596a5411}{m\_text}}(\ text\ )}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00094}00094\ \ \ \ \ \{\}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00095}00095\ }
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00096}\mbox{\hyperlink{struct_my_exception_matcher_a44f0daf1dda0ad65669a29ae4686d105}{00096}}\ \ \ \ \ \mbox{\hyperlink{struct_my_exception_matcher_a44f0daf1dda0ad65669a29ae4686d105}{\string~MyExceptionMatcher}}()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00097}00097\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00098}\mbox{\hyperlink{struct_my_exception_matcher_a5ffc384fb60d656faace3e1b3c45b5af}{00098}}\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_my_exception_matcher_a5ffc384fb60d656faace3e1b3c45b5af}{match}}(\ std::runtime\_error\ \textcolor{keyword}{const}\ \&\ arg\ )\textcolor{keyword}{\ const\ override}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00099}00099\ \textcolor{keyword}{\ \ \ \ }\{\ }
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00100}00100\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_my_exception_matcher_ad0f00368cd6920439e9a0e24596a5411}{m\_text}}\ ==\ arg.what()\ ;\ }
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00101}00101\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00102}00102\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00103}\mbox{\hyperlink{struct_my_exception_matcher_a124e395d04ee0a3436b2485604257618}{00103}}\ \ \ \ \ std::string\ \mbox{\hyperlink{struct_my_exception_matcher_a124e395d04ee0a3436b2485604257618}{describe}}()\textcolor{keyword}{\ const\ override\ }}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00104}00104\ \textcolor{keyword}{\ \ \ \ }\{\ }
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00105}00105\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}it's\ me"{}};}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00106}00106\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00107}00107\ \};}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00108}00108\ }
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00109}00109\ \textcolor{comment}{//\ prevent\ -\/Wweak-\/vtables:}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00110}00110\ \mbox{\hyperlink{struct_my_exception_matcher_a44f0daf1dda0ad65669a29ae4686d105}{MyExceptionMatcher::\string~MyExceptionMatcher}}()\ =\ \textcolor{keywordflow}{default};}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00111}00111\ }
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00112}\mbox{\hyperlink{207-_rpt-_team_city_reporter_8cpp_a73672d3b84a18c90ed4fe40ea72e716d}{00112}}\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\ \textcolor{stringliteral}{"{}TeamCity\ failing\ check-\/throws-\/matches"{}},\ \textcolor{stringliteral}{"{}[teamcity]"{}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00113}00113\ }
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00114}00114\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a74fcc14d39e8cc35ff39f69c5b60e375}{CHECK\_THROWS\_MATCHES}}(\ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{struct_my_exception}{MyException}}(\textcolor{stringliteral}{"{}hello"{}}),\ \mbox{\hyperlink{struct_my_exception}{MyException}},\ \mbox{\hyperlink{struct_my_exception_matcher}{MyExceptionMatcher}}(\textcolor{stringliteral}{"{}world"{}})\ );}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00115}00115\ \}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00116}00116\ }
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00117}00117\ \textcolor{comment}{//\ [!throws]\ -\/\ lets\ Catch\ know\ that\ this\ test\ is\ likely\ to\ throw\ an\ exception\ even\ if\ successful.\ }}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00118}00118\ \textcolor{comment}{//\ This\ causes\ the\ test\ to\ be\ excluded\ when\ running\ with\ -\/e\ or\ -\/-\/nothrow.}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00119}00119\ }
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00120}00120\ \textcolor{comment}{//\ No\ special\ effects\ for\ the\ reporter.}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00121}00121\ }
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00122}\mbox{\hyperlink{207-_rpt-_team_city_reporter_8cpp_a65688d20d90dd251590343f1208ae4c6}{00122}}\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\ \textcolor{stringliteral}{"{}TeamCity\ throwing\ exception\ with\ tag\ [!throws]"{}},\ \textcolor{stringliteral}{"{}[teamcity][!throws]"{}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00123}00123\ }
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00124}00124\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ae3c33faa1d31a2bb0811dac74b994e3e}{REQUIRE\_THROWS}}(\ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}unsurprisingly"{}})\ );}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00125}00125\ \}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00126}00126\ }
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00127}00127\ \textcolor{comment}{//\ [!mayfail]\ -\/\ doesn't\ fail\ the\ test\ if\ any\ given\ assertion\ fails\ (but\ still\ reports\ it).\ This\ can\ be\ useful\ to\ flag\ a\ work-\/in-\/progress,\ or\ a\ known\ issue\ that\ you\ don't\ want\ to\ immediately\ fix\ but\ still\ want\ to\ track\ in\ your\ tests.}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00128}00128\ }
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00129}\mbox{\hyperlink{207-_rpt-_team_city_reporter_8cpp_a040a8f2f8502e3d0ab96bee3f5b438d7}{00129}}\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\ \textcolor{stringliteral}{"{}TeamCity\ failing\ assertion\ with\ tag\ [!mayfail]"{}},\ \textcolor{stringliteral}{"{}[teamcity][!mayfail]\ "{}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00130}00130\ }
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00131}00131\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ 3\ ==\ 7\ );\ \ \textcolor{comment}{//\ doesn't\ fail\ test\ case\ this\ time,\ reports:\ testIgnored}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00132}00132\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ 3\ ==\ 3\ );}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00133}00133\ \}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00134}00134\ }
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00135}00135\ \textcolor{comment}{//\ [!shouldfail]\ -\/\ like\ [!mayfail]\ but\ fails\ the\ test\ if\ it\ passes.\ }}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00136}00136\ \textcolor{comment}{//\ This\ can\ be\ useful\ if\ you\ want\ to\ be\ notified\ of\ accidental,\ or\ third-\/party,\ fixes.}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00137}00137\ }
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00138}\mbox{\hyperlink{207-_rpt-_team_city_reporter_8cpp_aa82e03a4b9c8c25d89431ef939125601}{00138}}\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\ \textcolor{stringliteral}{"{}TeamCity\ succeeding\ assertion\ with\ tag\ [!shouldfail]"{}},\ \textcolor{stringliteral}{"{}[teamcity][!shouldfail]"{}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00139}00139\ }
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00140}00140\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a75adcdf89f69b0b615e395daafc315af}{SUCCEED}}(\ \textcolor{stringliteral}{"{}Marked\ [!shouldfail]"{}}\ );}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00141}00141\ \}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00142}00142\ }
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00143}00143\ \textcolor{comment}{//\ Compile\ \&\ run:}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00144}00144\ \textcolor{comment}{//\ -\/\ g++\ -\/std=c++11\ -\/Wall\ -\/I\$(CATCH\_ROOT)\ -\/DCATCH\_EXAMPLE\_RPT\_1=\(\backslash\)"{}include/reporters/catch\_reporter\_teamcity.hpp\(\backslash\)"{}\ -\/o\ 200-\/Rpt-\/CatchMainTeamCity.o\ -\/c\ 200-\/Rpt-\/CatchMain.cpp}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00145}00145\ \textcolor{comment}{//\ -\/\ g++\ -\/std=c++11\ -\/Wall\ -\/I\$(CATCH\_ROOT)\ -\/o\ 207-\/Rpt-\/TeamCityReporter\ 207-\/Rpt-\/TeamCityReporter.cpp\ 200-\/Rpt-\/CatchMainTeamCity.o\ \&\&\ 207-\/Rpt-\/TeamCityReporter\ -\/-\/list-\/reporters}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00146}00146\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00147}00147\ \textcolor{comment}{//\ -\/\ cl\ -\/EHsc\ -\/I\%CATCH\_ROOT\%\ -\/DCATCH\_EXAMPLE\_RPT\_1=\(\backslash\)"{}include/reporters/catch\_reporter\_teamcity.hpp\(\backslash\)"{}\ -\/Fo200-\/Rpt-\/CatchMainTeamCity.obj\ -\/c\ 200-\/Rpt-\/CatchMain.cpp}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00148}00148\ \textcolor{comment}{//\ -\/\ cl\ -\/EHsc\ -\/I\%CATCH\_ROOT\%\ 207-\/Rpt-\/TeamCityReporter.cpp\ 200-\/Rpt-\/CatchMainTeamCity.o\ \&\&\ 207-\/Rpt-\/TeamCityReporter\ -\/-\/list-\/reporters}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00149}00149\ }
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00150}00150\ \textcolor{comment}{//\ Compilation\ output\ (-\/-\/list-\/reporters):}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00151}00151\ \textcolor{comment}{//\ Available\ reporters:}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00152}00152\ \textcolor{comment}{//\ \ \ compact:\ \ \ Reports\ test\ results\ on\ a\ single\ line,\ suitable\ for\ IDEs}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00153}00153\ \textcolor{comment}{//\ \ \ console:\ \ \ Reports\ test\ results\ as\ plain\ lines\ of\ text}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00154}00154\ \textcolor{comment}{//\ \ \ junit:\ \ \ \ \ Reports\ test\ results\ in\ an\ XML\ format\ that\ looks\ like\ Ant's}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00155}00155\ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ junitreport\ target}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00156}00156\ \textcolor{comment}{//\ \ \ teamcity:\ \ Reports\ test\ results\ as\ TeamCity\ service\ messages}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00157}00157\ \textcolor{comment}{//\ \ \ xml:\ \ \ \ \ \ \ Reports\ test\ results\ as\ an\ XML\ document}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00158}00158\ }
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00159}00159\ \textcolor{comment}{//\ Expected\ output\ (abbreviated\ and\ broken\ into\ shorter\ lines):}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00160}00160\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00161}00161\ \textcolor{comment}{//\ prompt>\ 207-\/Rpt-\/TeamCityReporter.exe\ -\/-\/reporter\ teamcity}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00162}00162\ \textcolor{comment}{//\ \#\#teamcity[testSuiteStarted\ name='207-\/Rpt-\/TeamCityReporter.exe']}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00163}00163\ \textcolor{comment}{//\ \#\#teamcity[testStarted\ name='TeamCity\ passes\ unconditionally\ succeeding\ assertion']}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00164}00164\ \textcolor{comment}{//\ \#\#teamcity[testFinished\ name='TeamCity\ passes\ unconditionally\ succeeding\ assertion'\ duration='1']}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00165}00165\ \textcolor{comment}{//\ \#\#teamcity[testStarted\ name='TeamCity\ reports\ unconditionally\ failing\ assertion']}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00166}00166\ \textcolor{comment}{//\ \#\#teamcity[testFailed\ name='TeamCity\ reports\ unconditionally\ failing\ assertion'\ /}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00167}00167\ \textcolor{comment}{//\ message='.../examples/207-\/Rpt-\/TeamCityReporter.cpp:23|n/}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00168}00168\ \textcolor{comment}{//\ ...............................................................................|n|n/}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00169}00169\ \textcolor{comment}{//\ .../examples/207-\/Rpt-\/TeamCityReporter.cpp:25|nexplicit\ failure']}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00170}00170\ \textcolor{comment}{//\ \#\#teamcity[testFinished\ name='TeamCity\ reports\ unconditionally\ failing\ assertion'\ duration='3']}}
+\DoxyCodeLine{\Hypertarget{207-_rpt-_team_city_reporter_8cpp_source_l00171}00171\ \textcolor{comment}{//\ ...}}
+
+\end{DoxyCode}

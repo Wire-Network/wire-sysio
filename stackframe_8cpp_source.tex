@@ -1,0 +1,35 @@
+\doxysection{stackframe.\+cpp}
+\hypertarget{stackframe_8cpp_source}{}\label{stackframe_8cpp_source}\index{libraries/fc/libraries/ff/depends/xbyak/sample/stackframe.cpp@{libraries/fc/libraries/ff/depends/xbyak/sample/stackframe.cpp}}
+\mbox{\hyperlink{stackframe_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{stackframe_8cpp_source_l00001}\mbox{\hyperlink{stackframe_8cpp_a3ede98665532cce0e33f614fac5150f9}{00001}}\ \textcolor{preprocessor}{\#define\ XBYAK\_NO\_OP\_NAMES}}
+\DoxyCodeLine{\Hypertarget{stackframe_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{xbyak__util_8h}{xbyak/xbyak\_util.h}}>}}
+\DoxyCodeLine{\Hypertarget{stackframe_8cpp_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{stackframe_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#ifdef\ XBYAK32}}
+\DoxyCodeLine{\Hypertarget{stackframe_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\ \ \ \ \#error\ "{}this\ sample\ is\ for\ only\ 64-\/bit\ mode"{}}}
+\DoxyCodeLine{\Hypertarget{stackframe_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{stackframe_8cpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{stackframe_8cpp_source_l00008}00008\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_code}{Code}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{class_xbyak_1_1_code_generator}{Xbyak::CodeGenerator}}\ \{}
+\DoxyCodeLine{\Hypertarget{stackframe_8cpp_source_l00009}\mbox{\hyperlink{struct_code_a3605683bd8fd54691437ff05ba4431b9}{00009}}\ \ \ \ \ \mbox{\hyperlink{struct_code_a3605683bd8fd54691437ff05ba4431b9}{Code}}()}
+\DoxyCodeLine{\Hypertarget{stackframe_8cpp_source_l00010}00010\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{stackframe_8cpp_source_l00011}00011\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ see\ xbyak/sample/sf\_test.cpp\ for\ how\ to\ use\ other\ parameter}}
+\DoxyCodeLine{\Hypertarget{stackframe_8cpp_source_l00012}00012\ \ \ \ \ \ \ \ \ Xbyak::util::StackFrame\ sf(\textcolor{keyword}{this},\ 3);}
+\DoxyCodeLine{\Hypertarget{stackframe_8cpp_source_l00013}00013\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_code_generator_ac01f285f4da251eb2fa144d5c49c9e3e}{mov}}(rax,\ sf.p[0]);}
+\DoxyCodeLine{\Hypertarget{stackframe_8cpp_source_l00014}00014\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_code_generator_a85fe10a4f726797de78179d535bcb626}{add}}(rax,\ sf.p[1]);}
+\DoxyCodeLine{\Hypertarget{stackframe_8cpp_source_l00015}00015\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_code_generator_a85fe10a4f726797de78179d535bcb626}{add}}(rax,\ sf.p[2]);}
+\DoxyCodeLine{\Hypertarget{stackframe_8cpp_source_l00016}00016\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{stackframe_8cpp_source_l00017}00017\ \};}
+\DoxyCodeLine{\Hypertarget{stackframe_8cpp_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{stackframe_8cpp_source_l00019}\mbox{\hyperlink{stackframe_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{00019}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{stackframe_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}()}
+\DoxyCodeLine{\Hypertarget{stackframe_8cpp_source_l00020}00020\ \{}
+\DoxyCodeLine{\Hypertarget{stackframe_8cpp_source_l00021}00021\ \ \ \ \ \mbox{\hyperlink{struct_code}{Code}}\ c;}
+\DoxyCodeLine{\Hypertarget{stackframe_8cpp_source_l00022}00022\ \ \ \ \ int\ (*\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})(int,\ int,\ int)\ =\ c.\mbox{\hyperlink{class_xbyak_1_1_code_array_a9ad8a38842d1e0de9045338e460f58ce}{getCode}}<\textcolor{keywordtype}{int}(*)\ (int,\ int,\ int)>();}
+\DoxyCodeLine{\Hypertarget{stackframe_8cpp_source_l00023}00023\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}(3,\ 5,\ 2);}
+\DoxyCodeLine{\Hypertarget{stackframe_8cpp_source_l00024}00024\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ ==\ 3\ +\ 5\ +\ 2)\ \{}
+\DoxyCodeLine{\Hypertarget{stackframe_8cpp_source_l00025}00025\ \ \ \ \ \ \ \ \ puts(\textcolor{stringliteral}{"{}ok"{}});}
+\DoxyCodeLine{\Hypertarget{stackframe_8cpp_source_l00026}00026\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{stackframe_8cpp_source_l00027}00027\ \ \ \ \ \ \ \ \ puts(\textcolor{stringliteral}{"{}ng"{}});}
+\DoxyCodeLine{\Hypertarget{stackframe_8cpp_source_l00028}00028\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{stackframe_8cpp_source_l00029}00029\ \}}
+
+\end{DoxyCode}

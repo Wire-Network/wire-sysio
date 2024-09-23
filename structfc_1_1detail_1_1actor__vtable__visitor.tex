@@ -1,0 +1,101 @@
+\doxysection{fc\+::detail\+::actor\+\_\+vtable\+\_\+visitor\texorpdfstring{$<$}{<} This\+Ptr \texorpdfstring{$>$}{>} Struct Template Reference}
+\hypertarget{structfc_1_1detail_1_1actor__vtable__visitor}{}\label{structfc_1_1detail_1_1actor__vtable__visitor}\index{fc::detail::actor\_vtable\_visitor$<$ ThisPtr $>$@{fc::detail::actor\_vtable\_visitor$<$ ThisPtr $>$}}
+
+
+{\ttfamily \#include $<$actor.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{union_u}{U}} $>$ }\\\mbox{\hyperlink{structfc_1_1detail_1_1actor__vtable__visitor_a9a55fc5c21e4d994d7839db4b2095bb7}{actor\+\_\+vtable\+\_\+visitor}} (fc\+::thread \texorpdfstring{$\ast$}{*}t, \mbox{\hyperlink{union_u}{U}} \&\&u)
+\item 
+{\footnotesize template$<$typename Function , typename Member\+Ptr $>$ }\\void \mbox{\hyperlink{structfc_1_1detail_1_1actor__vtable__visitor_a69b200fad555a154df4bbb758144a478}{operator()}} (const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}, Function \&memb, Member\+Ptr m) const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+fc\+::thread \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structfc_1_1detail_1_1actor__vtable__visitor_abcd3fa0772477177db2d689dc819a9f5}{\+\_\+thread}}
+\item 
+This\+Ptr \mbox{\hyperlink{structfc_1_1detail_1_1actor__vtable__visitor_a845f7dc3fb69779853797d73c8b66227}{\+\_\+this}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename This\+Ptr$>$\newline
+struct fc\+::detail\+::actor\+\_\+vtable\+\_\+visitor$<$ This\+Ptr $>$}
+
+
+Definition at line \mbox{\hyperlink{actor_8hpp_source_l00035}{35}} of file \mbox{\hyperlink{actor_8hpp_source}{actor.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structfc_1_1detail_1_1actor__vtable__visitor_a9a55fc5c21e4d994d7839db4b2095bb7}\index{fc::detail::actor\_vtable\_visitor$<$ ThisPtr $>$@{fc::detail::actor\_vtable\_visitor$<$ ThisPtr $>$}!actor\_vtable\_visitor@{actor\_vtable\_visitor}}
+\index{actor\_vtable\_visitor@{actor\_vtable\_visitor}!fc::detail::actor\_vtable\_visitor$<$ ThisPtr $>$@{fc::detail::actor\_vtable\_visitor$<$ ThisPtr $>$}}
+\doxysubsubsection{\texorpdfstring{actor\_vtable\_visitor()}{actor\_vtable\_visitor()}}
+{\footnotesize\ttfamily \label{structfc_1_1detail_1_1actor__vtable__visitor_a9a55fc5c21e4d994d7839db4b2095bb7} 
+template$<$typename This\+Ptr $>$ \\
+template$<$typename \mbox{\hyperlink{union_u}{U}} $>$ \\
+\mbox{\hyperlink{structfc_1_1detail_1_1actor__vtable__visitor}{fc\+::detail\+::actor\+\_\+vtable\+\_\+visitor}}$<$ This\+Ptr $>$\+::actor\+\_\+vtable\+\_\+visitor (\begin{DoxyParamCaption}\item[{fc\+::thread \texorpdfstring{$\ast$}{*}}]{t}{, }\item[{\mbox{\hyperlink{union_u}{U}} \&\&}]{u}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{actor_8hpp_source_l00037}{37}} of file \mbox{\hyperlink{actor_8hpp_source}{actor.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00037\ :\mbox{\hyperlink{structfc_1_1detail_1_1actor__vtable__visitor_abcd3fa0772477177db2d689dc819a9f5}{\_thread}}(t),\mbox{\hyperlink{structfc_1_1detail_1_1actor__vtable__visitor_a845f7dc3fb69779853797d73c8b66227}{\_this}}(\ fc::forward<U>(u)\ )\{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structfc_1_1detail_1_1actor__vtable__visitor_a69b200fad555a154df4bbb758144a478}\index{fc::detail::actor\_vtable\_visitor$<$ ThisPtr $>$@{fc::detail::actor\_vtable\_visitor$<$ ThisPtr $>$}!operator()@{operator()}}
+\index{operator()@{operator()}!fc::detail::actor\_vtable\_visitor$<$ ThisPtr $>$@{fc::detail::actor\_vtable\_visitor$<$ ThisPtr $>$}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}}
+{\footnotesize\ttfamily \label{structfc_1_1detail_1_1actor__vtable__visitor_a69b200fad555a154df4bbb758144a478} 
+template$<$typename This\+Ptr $>$ \\
+template$<$typename Function , typename Member\+Ptr $>$ \\
+void \mbox{\hyperlink{structfc_1_1detail_1_1actor__vtable__visitor}{fc\+::detail\+::actor\+\_\+vtable\+\_\+visitor}}$<$ This\+Ptr $>$\+::operator() (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{name}{, }\item[{Function \&}]{memb}{, }\item[{Member\+Ptr}]{m}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{actor_8hpp_source_l00040}{40}} of file \mbox{\hyperlink{actor_8hpp_source}{actor.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \ memb\ =\ actor\_member::functor(\ \mbox{\hyperlink{structfc_1_1detail_1_1actor__vtable__visitor_a845f7dc3fb69779853797d73c8b66227}{\_this}},\ m,\ \mbox{\hyperlink{structfc_1_1detail_1_1actor__vtable__visitor_abcd3fa0772477177db2d689dc819a9f5}{\_thread}}\ );}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structfc_1_1detail_1_1actor__vtable__visitor_a845f7dc3fb69779853797d73c8b66227}\index{fc::detail::actor\_vtable\_visitor$<$ ThisPtr $>$@{fc::detail::actor\_vtable\_visitor$<$ ThisPtr $>$}!\_this@{\_this}}
+\index{\_this@{\_this}!fc::detail::actor\_vtable\_visitor$<$ ThisPtr $>$@{fc::detail::actor\_vtable\_visitor$<$ ThisPtr $>$}}
+\doxysubsubsection{\texorpdfstring{\_this}{\_this}}
+{\footnotesize\ttfamily \label{structfc_1_1detail_1_1actor__vtable__visitor_a845f7dc3fb69779853797d73c8b66227} 
+template$<$typename This\+Ptr $>$ \\
+This\+Ptr \mbox{\hyperlink{structfc_1_1detail_1_1actor__vtable__visitor}{fc\+::detail\+::actor\+\_\+vtable\+\_\+visitor}}$<$ This\+Ptr $>$\+::\+\_\+this}
+
+
+
+Definition at line \mbox{\hyperlink{actor_8hpp_source_l00044}{44}} of file \mbox{\hyperlink{actor_8hpp_source}{actor.\+hpp}}.
+
+\Hypertarget{structfc_1_1detail_1_1actor__vtable__visitor_abcd3fa0772477177db2d689dc819a9f5}\index{fc::detail::actor\_vtable\_visitor$<$ ThisPtr $>$@{fc::detail::actor\_vtable\_visitor$<$ ThisPtr $>$}!\_thread@{\_thread}}
+\index{\_thread@{\_thread}!fc::detail::actor\_vtable\_visitor$<$ ThisPtr $>$@{fc::detail::actor\_vtable\_visitor$<$ ThisPtr $>$}}
+\doxysubsubsection{\texorpdfstring{\_thread}{\_thread}}
+{\footnotesize\ttfamily \label{structfc_1_1detail_1_1actor__vtable__visitor_abcd3fa0772477177db2d689dc819a9f5} 
+template$<$typename This\+Ptr $>$ \\
+fc\+::thread\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structfc_1_1detail_1_1actor__vtable__visitor}{fc\+::detail\+::actor\+\_\+vtable\+\_\+visitor}}$<$ This\+Ptr $>$\+::\+\_\+thread}
+
+
+
+Definition at line \mbox{\hyperlink{actor_8hpp_source_l00043}{43}} of file \mbox{\hyperlink{actor_8hpp_source}{actor.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/\mbox{\hyperlink{actor_8hpp}{actor.\+hpp}}\end{DoxyCompactItemize}

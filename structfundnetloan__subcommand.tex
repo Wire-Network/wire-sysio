@@ -1,0 +1,126 @@
+\doxysection{fundnetloan\+\_\+subcommand Struct Reference}
+\hypertarget{structfundnetloan__subcommand}{}\label{structfundnetloan__subcommand}\index{fundnetloan\_subcommand@{fundnetloan\_subcommand}}
+
+
+Collaboration diagram for fundnetloan\+\_\+subcommand\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=210pt]{structfundnetloan__subcommand__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structfundnetloan__subcommand_ac97f567b337e95ad71f1c5ebaeee1aa3}{fundnetloan\+\_\+subcommand}} (\mbox{\hyperlink{class_c_l_i_1_1_app}{CLI\+::\+App}} \texorpdfstring{$\ast$}{*}action\+Root)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structfundnetloan__subcommand_a56f84c6b9e3a31a0b8bde54b555353d5}{from\+\_\+str}}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structfundnetloan__subcommand_a74662a67e569184bcc3ece729c029d23}{loan\+\_\+num\+\_\+str}}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structfundnetloan__subcommand_a4bc98f3a4fe6b1b5e683e23193556809}{payment\+\_\+str}}
+\item 
+const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \mbox{\hyperlink{structfundnetloan__subcommand_afbbf3509737f61b9fcbc0e9cc6572c13}{act\+\_\+name}} \{ "{}fundnetloan"{}\+\_\+n \}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l02034}{2034}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structfundnetloan__subcommand_ac97f567b337e95ad71f1c5ebaeee1aa3}\index{fundnetloan\_subcommand@{fundnetloan\_subcommand}!fundnetloan\_subcommand@{fundnetloan\_subcommand}}
+\index{fundnetloan\_subcommand@{fundnetloan\_subcommand}!fundnetloan\_subcommand@{fundnetloan\_subcommand}}
+\doxysubsubsection{\texorpdfstring{fundnetloan\_subcommand()}{fundnetloan\_subcommand()}}
+{\footnotesize\ttfamily \label{structfundnetloan__subcommand_ac97f567b337e95ad71f1c5ebaeee1aa3} 
+fundnetloan\+\_\+subcommand\+::fundnetloan\+\_\+subcommand (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_c_l_i_1_1_app}{CLI\+::\+App}} \texorpdfstring{$\ast$}{*}}]{action\+Root}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l02040}{2040}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02040\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02041\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ fundnetloan\ =\ actionRoot-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_a8b461d2233ec4121259011b5ed24b336}{add\_subcommand}}(\textcolor{stringliteral}{"{}fundnetloan"{}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}Deposit\ into\ a\ Network\ loan\ fund"{}}));}
+\DoxyCodeLine{02042\ \ \ \ \ \ \ fundnetloan-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_a8c812d42c7720ecb5cd0aec41b5aa941}{add\_option}}(\textcolor{stringliteral}{"{}from"{}},\ \ \ \ \ \mbox{\hyperlink{structfundnetloan__subcommand_a56f84c6b9e3a31a0b8bde54b555353d5}{from\_str}},\ \ \ \ \ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}Loan\ owner"{}}))-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a}{required}}();}
+\DoxyCodeLine{02043\ \ \ \ \ \ \ fundnetloan-\/>add\_option(\textcolor{stringliteral}{"{}loan\_num"{}},\ \mbox{\hyperlink{structfundnetloan__subcommand_a74662a67e569184bcc3ece729c029d23}{loan\_num\_str}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}Loan\ ID"{}}))-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a}{required}}();}
+\DoxyCodeLine{02044\ \ \ \ \ \ \ fundnetloan-\/>add\_option(\textcolor{stringliteral}{"{}payment"{}},\ \ \mbox{\hyperlink{structfundnetloan__subcommand_a4bc98f3a4fe6b1b5e683e23193556809}{payment\_str}},\ \ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}Amount\ to\ be\ deposited"{}}))-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a}{required}}();}
+\DoxyCodeLine{02045\ \ \ \ \ \ \ \mbox{\hyperlink{programs_2clio_2main_8cpp_aa5d53f41b83b5323c73622fbbb15e9cd}{add\_standard\_transaction\_options}}(fundnetloan,\ \textcolor{stringliteral}{"{}from@active"{}});}
+\DoxyCodeLine{02046\ \ \ \ \ \ \ fundnetloan-\/>callback([\textcolor{keyword}{this}]\ \{}
+\DoxyCodeLine{02047\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}\ act\_payload\ =\ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}()}
+\DoxyCodeLine{02048\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}from"{}},\ \ \ \ \ \mbox{\hyperlink{structfundnetloan__subcommand_a56f84c6b9e3a31a0b8bde54b555353d5}{from\_str}})}
+\DoxyCodeLine{02049\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}loan\_num"{}},\ \mbox{\hyperlink{structfundnetloan__subcommand_a74662a67e569184bcc3ece729c029d23}{loan\_num\_str}})}
+\DoxyCodeLine{02050\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}payment"{}},\ \ \mbox{\hyperlink{structfundnetloan__subcommand_a4bc98f3a4fe6b1b5e683e23193556809}{payment\_str}});}
+\DoxyCodeLine{02051\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ accountPermissions\ =\ \mbox{\hyperlink{programs_2clio_2main_8cpp_a2b91ca5dbe7cc4ab287d0e44c3037552}{get\_account\_permissions}}(\mbox{\hyperlink{programs_2clio_2main_8cpp_ad552924cb151dcd5b60c73856d1ff706}{tx\_permission}},\ \{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(\mbox{\hyperlink{structfundnetloan__subcommand_a56f84c6b9e3a31a0b8bde54b555353d5}{from\_str}}),\ config::active\_name\});}
+\DoxyCodeLine{02052\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{programs_2clio_2main_8cpp_aaf784434864a29e4835be7465173d1ab}{send\_actions}}(\{\mbox{\hyperlink{programs_2clio_2main_8cpp_a067e20df5f65333b0c3cf5840bc37dea}{create\_action}}(accountPermissions,\ config::system\_account\_name,\ \mbox{\hyperlink{structfundnetloan__subcommand_afbbf3509737f61b9fcbc0e9cc6572c13}{act\_name}},\ act\_payload)\});}
+\DoxyCodeLine{02053\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{02054\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structfundnetloan__subcommand_ac97f567b337e95ad71f1c5ebaeee1aa3_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structfundnetloan__subcommand_afbbf3509737f61b9fcbc0e9cc6572c13}\index{fundnetloan\_subcommand@{fundnetloan\_subcommand}!act\_name@{act\_name}}
+\index{act\_name@{act\_name}!fundnetloan\_subcommand@{fundnetloan\_subcommand}}
+\doxysubsubsection{\texorpdfstring{act\_name}{act\_name}}
+{\footnotesize\ttfamily \label{structfundnetloan__subcommand_afbbf3509737f61b9fcbc0e9cc6572c13} 
+const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} fundnetloan\+\_\+subcommand\+::act\+\_\+name \{ "{}fundnetloan"{}\+\_\+n \}}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l02038}{2038}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02038\ \{\ \textcolor{stringliteral}{"{}fundnetloan"{}}\_n\ \};}
+
+\end{DoxyCode}
+\Hypertarget{structfundnetloan__subcommand_a56f84c6b9e3a31a0b8bde54b555353d5}\index{fundnetloan\_subcommand@{fundnetloan\_subcommand}!from\_str@{from\_str}}
+\index{from\_str@{from\_str}!fundnetloan\_subcommand@{fundnetloan\_subcommand}}
+\doxysubsubsection{\texorpdfstring{from\_str}{from\_str}}
+{\footnotesize\ttfamily \label{structfundnetloan__subcommand_a56f84c6b9e3a31a0b8bde54b555353d5} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} fundnetloan\+\_\+subcommand\+::from\+\_\+str}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l02035}{2035}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{structfundnetloan__subcommand_a74662a67e569184bcc3ece729c029d23}\index{fundnetloan\_subcommand@{fundnetloan\_subcommand}!loan\_num\_str@{loan\_num\_str}}
+\index{loan\_num\_str@{loan\_num\_str}!fundnetloan\_subcommand@{fundnetloan\_subcommand}}
+\doxysubsubsection{\texorpdfstring{loan\_num\_str}{loan\_num\_str}}
+{\footnotesize\ttfamily \label{structfundnetloan__subcommand_a74662a67e569184bcc3ece729c029d23} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} fundnetloan\+\_\+subcommand\+::loan\+\_\+num\+\_\+str}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l02036}{2036}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{structfundnetloan__subcommand_a4bc98f3a4fe6b1b5e683e23193556809}\index{fundnetloan\_subcommand@{fundnetloan\_subcommand}!payment\_str@{payment\_str}}
+\index{payment\_str@{payment\_str}!fundnetloan\_subcommand@{fundnetloan\_subcommand}}
+\doxysubsubsection{\texorpdfstring{payment\_str}{payment\_str}}
+{\footnotesize\ttfamily \label{structfundnetloan__subcommand_a4bc98f3a4fe6b1b5e683e23193556809} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} fundnetloan\+\_\+subcommand\+::payment\+\_\+str}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l02037}{2037}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+programs/clio/\mbox{\hyperlink{programs_2clio_2main_8cpp}{main.\+cpp}}\end{DoxyCompactItemize}

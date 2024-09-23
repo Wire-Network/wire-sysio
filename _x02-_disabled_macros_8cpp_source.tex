@@ -1,0 +1,37 @@
+\doxysection{X02-\/\+Disabled\+Macros.cpp}
+\hypertarget{_x02-_disabled_macros_8cpp_source}{}\label{_x02-_disabled_macros_8cpp_source}\index{libraries/sys-\/vm/external/Catch2/projects/ExtraTests/X02-\/DisabledMacros.cpp@{libraries/sys-\/vm/external/Catch2/projects/ExtraTests/X02-\/DisabledMacros.cpp}}
+\mbox{\hyperlink{_x02-_disabled_macros_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_x02-_disabled_macros_8cpp_source_l00001}00001\ \textcolor{comment}{//\ X02-\/DisabledMacros.cpp}}
+\DoxyCodeLine{\Hypertarget{_x02-_disabled_macros_8cpp_source_l00002}00002\ \textcolor{comment}{//\ Test\ that\ CATCH\_CONFIG\_DISABLE\ turns\ off\ TEST\_CASE\ autoregistration}}
+\DoxyCodeLine{\Hypertarget{_x02-_disabled_macros_8cpp_source_l00003}00003\ \textcolor{comment}{//\ and\ expressions\ in\ assertion\ macros\ are\ not\ run.}}
+\DoxyCodeLine{\Hypertarget{_x02-_disabled_macros_8cpp_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{_x02-_disabled_macros_8cpp_source_l00005}\mbox{\hyperlink{_x02-_disabled_macros_8cpp_a656eb5868e824d59f489f910db438420}{00005}}\ \textcolor{preprocessor}{\#define\ CATCH\_CONFIG\_MAIN}}
+\DoxyCodeLine{\Hypertarget{_x02-_disabled_macros_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{single__include_2catch2_2catch_8hpp}{catch2/catch.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{_x02-_disabled_macros_8cpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{_x02-_disabled_macros_8cpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{_x02-_disabled_macros_8cpp_source_l00009}00009\ \textcolor{comment}{//\ CATCH\_CONFIG\_DISABLE\ also\ prevents\ reporter\ registration.}}
+\DoxyCodeLine{\Hypertarget{_x02-_disabled_macros_8cpp_source_l00010}00010\ \textcolor{comment}{//\ We\ need\ to\ manually\ register\ at\ least\ one\ reporter\ for\ our\ tests}}
+\DoxyCodeLine{\Hypertarget{_x02-_disabled_macros_8cpp_source_l00011}00011\ \textcolor{keyword}{static}\ \mbox{\hyperlink{class_catch_1_1_reporter_registrar}{Catch::ReporterRegistrar<Catch::ConsoleReporter>}}\ temporary(\ \textcolor{stringliteral}{"{}console"{}}\ );}
+\DoxyCodeLine{\Hypertarget{_x02-_disabled_macros_8cpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{_x02-_disabled_macros_8cpp_source_l00013}00013\ \textcolor{preprocessor}{\#include\ <iostream>}}
+\DoxyCodeLine{\Hypertarget{_x02-_disabled_macros_8cpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{_x02-_disabled_macros_8cpp_source_l00015}\mbox{\hyperlink{structfoo}{00015}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{namespacefoo}{foo}}\ \{}
+\DoxyCodeLine{\Hypertarget{_x02-_disabled_macros_8cpp_source_l00016}\mbox{\hyperlink{structfoo_a905fd02ee1fc2fbf1c7474d913d588c8}{00016}}\ \ \ \ \ \mbox{\hyperlink{structfoo_a905fd02ee1fc2fbf1c7474d913d588c8}{foo}}()\{}
+\DoxyCodeLine{\Hypertarget{_x02-_disabled_macros_8cpp_source_l00017}00017\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ab0148f0dfca438f7aa01974e9c33216a}{REQUIRE\_NOTHROW}}(\ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}()\ );}
+\DoxyCodeLine{\Hypertarget{_x02-_disabled_macros_8cpp_source_l00018}00018\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_x02-_disabled_macros_8cpp_source_l00019}\mbox{\hyperlink{structfoo_a015c8a4344be7778ed226be7068ae513}{00019}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structfoo_a015c8a4344be7778ed226be7068ae513}{print}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{_x02-_disabled_macros_8cpp_source_l00020}00020\ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}This\ should\ not\ happen\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{_x02-_disabled_macros_8cpp_source_l00021}00021\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_x02-_disabled_macros_8cpp_source_l00022}00022\ \};}
+\DoxyCodeLine{\Hypertarget{_x02-_disabled_macros_8cpp_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{_x02-_disabled_macros_8cpp_source_l00024}00024\ \textcolor{comment}{//\ Construct\ foo,\ but\ \`{}foo::print`\ should\ not\ be\ run}}
+\DoxyCodeLine{\Hypertarget{_x02-_disabled_macros_8cpp_source_l00025}\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{00025}}\ \mbox{\hyperlink{namespacefoo}{foo}}\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}};}
+\DoxyCodeLine{\Hypertarget{_x02-_disabled_macros_8cpp_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{_x02-_disabled_macros_8cpp_source_l00027}00027\ \textcolor{comment}{//\ This\ test\ should\ not\ be\ run,\ because\ it\ won't\ be\ registered}}
+\DoxyCodeLine{\Hypertarget{_x02-_disabled_macros_8cpp_source_l00028}\mbox{\hyperlink{_x02-_disabled_macros_8cpp_a9d292455678668405403655a02468674}{00028}}\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\ \textcolor{stringliteral}{"{}Disabled\ Macros"{}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{_x02-_disabled_macros_8cpp_source_l00029}00029\ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}This\ should\ not\ happen\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{_x02-_disabled_macros_8cpp_source_l00030}00030\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a3e26a8d27caa386ed0ea7ce9d5b7c4ed}{FAIL}}();}
+\DoxyCodeLine{\Hypertarget{_x02-_disabled_macros_8cpp_source_l00031}00031\ \}}
+
+\end{DoxyCode}

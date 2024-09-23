@@ -1,0 +1,61 @@
+\doxysection{libraries/fc/include/fc/crypto/webauthn\+\_\+json/example/simpledom/simpledom.cpp File Reference}
+\hypertarget{simpledom_8cpp}{}\label{simpledom_8cpp}\index{libraries/fc/include/fc/crypto/webauthn\_json/example/simpledom/simpledom.cpp@{libraries/fc/include/fc/crypto/webauthn\_json/example/simpledom/simpledom.cpp}}
+{\ttfamily \#include "{}rapidjson/document.\+h"{}}\newline
+{\ttfamily \#include "{}rapidjson/writer.\+h"{}}\newline
+{\ttfamily \#include "{}rapidjson/stringbuffer.\+h"{}}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+Include dependency graph for simpledom.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{simpledom_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{simpledom_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{simpledom_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}\index{simpledom.cpp@{simpledom.cpp}!main@{main}}
+\index{main@{main}!simpledom.cpp@{simpledom.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{simpledom_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4} 
+int main (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{simpledom_8cpp_source_l00011}{11}} of file \mbox{\hyperlink{simpledom_8cpp_source}{simpledom.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00011\ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00012\ \ \ \ \ \textcolor{comment}{//\ 1.\ Parse\ a\ JSON\ string\ into\ DOM.}}
+\DoxyCodeLine{00013\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ json\ =\ \textcolor{stringliteral}{"{}\{\(\backslash\)"{}project\(\backslash\)"{}:\(\backslash\)"{}rapidjson\(\backslash\)"{},\(\backslash\)"{}stars\(\backslash\)"{}:10\}"{}};}
+\DoxyCodeLine{00014\ \ \ \ \ \mbox{\hyperlink{class_generic_document}{Document}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}};}
+\DoxyCodeLine{00015\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.Parse(json);}
+\DoxyCodeLine{00016\ }
+\DoxyCodeLine{00017\ \ \ \ \ \textcolor{comment}{//\ 2.\ Modify\ it\ by\ DOM.}}
+\DoxyCodeLine{00018\ \ \ \ \ \mbox{\hyperlink{class_generic_value}{Value}}\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}[\textcolor{stringliteral}{"{}stars"{}}];}
+\DoxyCodeLine{00019\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.SetInt(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.GetInt()\ +\ 1);}
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00021\ \ \ \ \ \textcolor{comment}{//\ 3.\ Stringify\ the\ DOM}}
+\DoxyCodeLine{00022\ \ \ \ \ \mbox{\hyperlink{class_generic_string_buffer}{StringBuffer}}\ buffer;}
+\DoxyCodeLine{00023\ \ \ \ \ \mbox{\hyperlink{class_writer}{Writer<StringBuffer>}}\ writer(buffer);}
+\DoxyCodeLine{00024\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.Accept(writer);}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \ \ \ \ \textcolor{comment}{//\ Output\ \{"{}project"{}:"{}rapidjson"{},"{}stars"{}:11\}}}
+\DoxyCodeLine{00027\ \ \ \ \ std::cout\ <<\ buffer.\mbox{\hyperlink{class_generic_string_buffer_a42079865bab1deb930c6cff7d491c719}{GetString}}()\ <<\ std::endl;}
+\DoxyCodeLine{00028\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00029\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{simpledom_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4_cgraph}
+\end{center}
+\end{figure}

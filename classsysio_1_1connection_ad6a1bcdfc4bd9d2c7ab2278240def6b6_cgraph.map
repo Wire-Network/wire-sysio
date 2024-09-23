@@ -1,0 +1,13 @@
+<map id="sysio::connection::enqueue" name="sysio::connection::enqueue">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,39,137,79"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1buffer__factory.html#a480d021121170a01b8148078a6f4e29f" title="caches result for subsequent calls, only provide same net_message instance for each invocation" alt="" coords="185,5,325,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="137,44,169,39,170,44,138,50"/>
+<area shape="rect" id="Node000003" href="$namespacesysio.html#a19cc0c616331757f980d857722b4e07e" title=" " alt="" coords="187,71,322,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="138,68,172,74,171,79,137,73"/>
+<area shape="rect" id="Node000004" href="$namespaceappbase.html#a99374dc23934f008a09f2f79be9eae40" title=" " alt="" coords="394,49,493,74"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="322,78,378,69,379,74,323,83"/>
+<area shape="rect" id="Node000006" href="$classappbase_1_1application.html#a81aa58d3f94570b7976145039155fc46" title=" " alt="" coords="373,99,513,139"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="323,98,358,104,357,109,322,104"/>
+<area shape="rect" id="Node000005" href="$classappbase_1_1application.html#ac874b2659b400fe254f1ae4260d06ecf" title=" " alt="" coords="561,41,702,82"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="493,59,546,59,546,64,493,64"/>
+</map>

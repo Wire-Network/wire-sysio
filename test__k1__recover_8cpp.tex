@@ -1,0 +1,122 @@
+\doxysection{libraries/fc/test/crypto/test\+\_\+k1\+\_\+recover.cpp File Reference}
+\hypertarget{test__k1__recover_8cpp}{}\label{test__k1__recover_8cpp}\index{libraries/fc/test/crypto/test\_k1\_recover.cpp@{libraries/fc/test/crypto/test\_k1\_recover.cpp}}
+{\ttfamily \#include $<$boost/test/included/unit\+\_\+test.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/exception/exception.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/crypto/hex.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/crypto/k1\+\_\+recover.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/utility.\+hpp$>$}\newline
+{\ttfamily \#include "{}test\+\_\+utils.\+hpp"{}}\newline
+Include dependency graph for test\+\_\+k1\+\_\+recover.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__k1__recover_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacestd}{std}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{test__k1__recover_8cpp_a6b2a3852db8bb19ab6909bac01859985}{BOOST\+\_\+\+TEST\+\_\+\+MODULE}}~blake2
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+std\+::ostream \& \mbox{\hyperlink{namespacestd_a70b9dc361b22eaf5f539699b9d2ff4a4}{std\+::operator$<$$<$}} (std\+::ostream \&st, const std\+::variant$<$ \mbox{\hyperlink{namespacefc_a97e49922a2f755b551da706c89c774f2}{fc\+::k1\+\_\+recover\+\_\+error}}, \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}} $>$ \&err)
+\item 
+\mbox{\hyperlink{test__k1__recover_8cpp_a24886974083c123b90ef271565b828e1}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (recover)
+\item 
+\mbox{\hyperlink{test__k1__recover_8cpp_ae70bfa24f5a3bc0917382b3c17fc033c}{FC\+\_\+\+LOG\+\_\+\+AND\+\_\+\+RETHROW}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{test__k1__recover_8cpp_a6b2a3852db8bb19ab6909bac01859985}\index{test\_k1\_recover.cpp@{test\_k1\_recover.cpp}!BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}}
+\index{BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}!test\_k1\_recover.cpp@{test\_k1\_recover.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_TEST\_MODULE}{BOOST\_TEST\_MODULE}}
+{\footnotesize\ttfamily \label{test__k1__recover_8cpp_a6b2a3852db8bb19ab6909bac01859985} 
+\#define BOOST\+\_\+\+TEST\+\_\+\+MODULE~blake2}
+
+
+
+Definition at line \mbox{\hyperlink{test__k1__recover_8cpp_source_l00001}{1}} of file \mbox{\hyperlink{test__k1__recover_8cpp_source}{test\+\_\+k1\+\_\+recover.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{test__k1__recover_8cpp_a24886974083c123b90ef271565b828e1}\index{test\_k1\_recover.cpp@{test\_k1\_recover.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!test\_k1\_recover.cpp@{test\_k1\_recover.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}}
+{\footnotesize\ttfamily \label{test__k1__recover_8cpp_a24886974083c123b90ef271565b828e1} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{recover}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__k1__recover_8cpp_source_l00025}{25}} of file \mbox{\hyperlink{test__k1__recover_8cpp_source}{test\+\_\+k1\+\_\+recover.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00026\ }
+\DoxyCodeLine{00027\ \ \ \ \textcolor{keyword}{using\ }test\_k1\_recover\ =\ std::tuple<std::string,\ std::string,\ std::variant<fc::k1\_recover\_error,\ bytes>>;}
+\DoxyCodeLine{00028\ \ \ \ \textcolor{keyword}{const}\ std::vector<test\_k1\_recover>\ tests\ \{}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \textcolor{comment}{//test}}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}1b323dd47a1dd5592c296ee2ee12e0af38974087a475e99098a440284f19c1f7642fa0baa10a8a3ab800dfdbe987dee68a09b6fa3db45a5cc4f3a5835a1671d4dd"{}},}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}92390316873c5a9d520b28aba61e7a8f00025ac069acd9c4d2a71d775a55fa5f"{}},}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{test__utils_8hpp_af42811e238a2a23276bd4200e2b40dde}{to\_bytes}}(\textcolor{stringliteral}{"{}044424982f5c4044aaf27444965d15b53f219c8ad332bf98a98a902ebfb05d46cb86ea6fe663aa83fd4ce0a383855dfae9bf7a07b779d34c84c347fec79d04c51e"{}})}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \},}
+\DoxyCodeLine{00035\ }
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \textcolor{comment}{//test\ (invalid\ signature\ v)}}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}01174de755b55bd29026d626f7313a5560353dc5175f29c78d79d961b81a0c04360d833ca789bc16d4ee714a6d1a19461d890966e0ec5c074f67be67e631d33aa7"{}},}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}45fd65f6dd062fe7020f11d19fe5c35dc4d425e1479c0968c8e932c208f25399"{}},}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a97e49922a2f755b551da706c89c774f2a12c527ffd45868061a192960b352b5d9}{fc::k1\_recover\_error::invalid\_signature}}}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \},}
+\DoxyCodeLine{00042\ }
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \textcolor{comment}{//test\ (invalid\ signature\ len)}}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}174de755b55bd29026d626f7313a5560353dc5175f29c78d79d961b81a0c04360d833ca789bc16d4ee714a6d1a19461d890966e0ec5c074f67be67e631d33aa7"{}},}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}45fd65f6dd062fe7020f11d19fe5c35dc4d425e1479c0968c8e932c208f25399"{}},}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a97e49922a2f755b551da706c89c774f2afcf739c019873c68ec4e3dd5ee56ddc2}{fc::k1\_recover\_error::input\_error}}}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \},}
+\DoxyCodeLine{00049\ }
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \textcolor{comment}{//test\ (invalid\ digest\ len)}}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}00174de755b55bd29026d626f7313a5560353dc5175f29c78d79d961b81a0c04360d833ca789bc16d4ee714a6d1a19461d890966e0ec5c074f67be67e631d33aa7"{}},}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}fd65f6dd062fe7020f11d19fe5c35dc4d425e1479c0968c8e932c208f25399"{}},}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a97e49922a2f755b551da706c89c774f2afcf739c019873c68ec4e3dd5ee56ddc2}{fc::k1\_recover\_error::input\_error}}}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \},}
+\DoxyCodeLine{00056\ }
+\DoxyCodeLine{00057\ \ \ \ \};}
+\DoxyCodeLine{00058\ }
+\DoxyCodeLine{00059\ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ test\ :\ tests)\ \{}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{namespacefc_a50190ee8a24af6929033b058b16158c4}{signature}}\ \ \ \ \ \ \ =\ \mbox{\hyperlink{test__utils_8hpp_af42811e238a2a23276bd4200e2b40dde}{to\_bytes}}(std::get<0>(test));}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{namespacefc_a150ca4cd9c0318ca45dc0dc7df5d58b9}{digest}}\ \ \ \ \ \ \ \ \ \ =\ \mbox{\hyperlink{test__utils_8hpp_af42811e238a2a23276bd4200e2b40dde}{to\_bytes}}(std::get<1>(test));}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{ssh_8c_a2cd19dc464a5cf91cd7c2e717b9dffd7}{expected\_result}}\ =\ std::get<2>(test);}
+\DoxyCodeLine{00064\ }
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ res\ =\ \mbox{\hyperlink{namespacefc_ad33908e48c447780b71e5e4ba567d523}{fc::k1\_recover}}(\mbox{\hyperlink{namespacefc_a50190ee8a24af6929033b058b16158c4}{signature}},\ \mbox{\hyperlink{namespacefc_a150ca4cd9c0318ca45dc0dc7df5d58b9}{digest}});}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(res,\ \mbox{\hyperlink{ssh_8c_a2cd19dc464a5cf91cd7c2e717b9dffd7}{expected\_result}});}
+\DoxyCodeLine{00067\ \ \ \ \ \}}
+\DoxyCodeLine{00068\ }
+\DoxyCodeLine{00069\ \}\ \mbox{\hyperlink{test__k1__recover_8cpp_ae70bfa24f5a3bc0917382b3c17fc033c}{FC\_LOG\_AND\_RETHROW}}();}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__k1__recover_8cpp_a24886974083c123b90ef271565b828e1_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__k1__recover_8cpp_ae70bfa24f5a3bc0917382b3c17fc033c}\index{test\_k1\_recover.cpp@{test\_k1\_recover.cpp}!FC\_LOG\_AND\_RETHROW@{FC\_LOG\_AND\_RETHROW}}
+\index{FC\_LOG\_AND\_RETHROW@{FC\_LOG\_AND\_RETHROW}!test\_k1\_recover.cpp@{test\_k1\_recover.cpp}}
+\doxysubsubsection{\texorpdfstring{FC\_LOG\_AND\_RETHROW()}{FC\_LOG\_AND\_RETHROW()}}
+{\footnotesize\ttfamily \label{test__k1__recover_8cpp_ae70bfa24f5a3bc0917382b3c17fc033c} 
+FC\+\_\+\+LOG\+\_\+\+AND\+\_\+\+RETHROW (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+

@@ -1,0 +1,85 @@
+\doxysection{block\+\_\+state.\+cpp}
+\hypertarget{block__state_8cpp_source}{}\label{block__state_8cpp_source}\index{libraries/chain/block\_state.cpp@{libraries/chain/block\_state.cpp}}
+\mbox{\hyperlink{block__state_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{block__state_8hpp}{sysio/chain/block\_state.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp}{sysio/chain/exceptions.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00004}00004\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{\ \textcolor{keyword}{namespace\ }chain\ \{}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00006}00006\ \ \ \ \textcolor{keyword}{namespace\ }\{}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00007}00007\ \ \ \ \ \ \ \textcolor{keyword}{constexpr}\ \textcolor{keyword}{auto}\ additional\_sigs\_eid\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1additional__block__signatures__extension_a202e9ff0637bf93f78d3f1a2b151e58e}{additional\_block\_signatures\_extension::extension\_id}}();}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00018}00018\ \ \ \ \ \ \ vector<signature\_type>\ extract\_additional\_signatures(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_aa10ee348c57604b615bc8570f6685102}{signed\_block\_ptr}}\&\ b,}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00019}00019\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ protocol\_feature\_set\&\ pfs,}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00020}00020\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_ac8b5d89808934345baf62f978b6b7a63}{protocol\_feature\_activation\_set\_ptr}}\&\ pfa\ )}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00021}00021\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00022}00022\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ exts\ =\ b-\/>validate\_and\_extract\_extensions();}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00024}00024\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ exts.count(additional\_sigs\_eid)\ >\ 0\ )\ \{}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00025}00025\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ additional\_sigs\ =\ std::get<additional\_block\_signatures\_extension>(exts.lower\_bound(additional\_sigs\_eid)-\/>second);}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00027}00027\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::move(additional\_sigs.signatures);}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00028}00028\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00030}00030\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{\};}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00031}00031\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00049}00049\ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ ...Extras>}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00050}00050\ \ \ \ \ \ \ block\_header\_state\ inject\_additional\_signatures(\ pending\_block\_header\_state\&\&\ cur,}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00051}00051\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ signed\_block\&\ b,}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ protocol\_feature\_set\&\ pfs,}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Extras\&\&\ ...\ extras\ )}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00054}00054\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ pfa\ =\ cur.prev\_activated\_protocol\_features;}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00056}00056\ \ \ \ \ \ \ \ \ \ block\_header\_state\ result\ =\ std::move(cur).finish\_next(b,\ pfs,\ std::forward<Extras>(extras)...);}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!result.additional\_signatures.empty())\ \{}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00059}00059\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ wtmsig\_enabled\ =\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1detail_ad7f3ac7b970f7c5d559e3f176461a579}{detail::is\_builtin\_activated}}(pfa,\ pfs,\ \mbox{\hyperlink{namespacesysio_1_1chain_a406d45a184cdba0af316b5bf34bf56cfa7b954b3171199b0f02767ac3556e7f0f}{builtin\_protocol\_feature\_t::wtmsig\_block\_signatures}});}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00061}00061\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(wtmsig\_enabled,\ \mbox{\hyperlink{namespacesysio_1_1chain_a910243f6a0327fb2d4fc80f7e89f103e}{block\_validate\_exception}},}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00062}00062\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Block\ has\ multiple\ signatures\ before\ activation\ of\ WTMsig\ Block\ Signatures"{}});}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00064}00064\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ as\ an\ optimization\ we\ don't\ copy\ this\ out\ into\ the\ legitimate\ extension\ structure\ as\ it\ serializes}}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00065}00065\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ the\ same\ way\ as\ the\ vector\ of\ signatures}}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00066}00066\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_assert}(\mbox{\hyperlink{structfc_1_1reflector}{fc::reflector<additional\_block\_signatures\_extension>::total\_member\_count}}\ ==\ 1);}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00067}00067\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_assert}(std::is\_same\_v<\textcolor{keyword}{decltype}(\mbox{\hyperlink{structsysio_1_1chain_1_1additional__block__signatures__extension_a4fccf1131dd37aacb53b8da4271b2c0a}{additional\_block\_signatures\_extension::signatures}}),\ std::vector<signature\_type>>);}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_a4e167bafac72001dee047e0f198bb689}{emplace\_extension}}(b.block\_extensions,\ additional\_sigs\_eid,\ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(\ result.additional\_signatures\ ));}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00073}00073\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00074}00074\ }
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00075}00075\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00076}00076\ }
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00077}\mbox{\hyperlink{structsysio_1_1chain_1_1block__state_aa287d2703300dd9a656a8f355953ce2c}{00077}}\ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1block__state_adda90ba2fcd3cef50e560b2871d97dc4}{block\_state::block\_state}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1block__header__state}{block\_header\_state}}\&\ prev,}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00078}00078\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_aa10ee348c57604b615bc8570f6685102}{signed\_block\_ptr}}\ b,}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1chain_1_1protocol__feature__set}{protocol\_feature\_set}}\&\ pfs,}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00080}00080\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::function<\textcolor{keywordtype}{void}(\ \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{block\_timestamp\_type}},}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00081}00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ flat\_set<digest\_type>\&,}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00082}00082\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1vector}{vector<digest\_type>}}\&\ )>\&\ validator,}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00083}00083\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ skip\_validate\_signee}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00084}00084\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00085}00085\ \ \ \ :\mbox{\hyperlink{structsysio_1_1chain_1_1block__header__state}{block\_header\_state}}(\ prev.next(\ *b,\ extract\_additional\_signatures(b,\ pfs,\ prev.activated\_protocol\_features),\ pfs,\ validator,\ skip\_validate\_signee\ )\ )}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00086}00086\ \ \ \ ,block(\ \mbox{\hyperlink{namespacestd}{std}}::move(b)\ )}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00087}00087\ \ \ \ \{\}}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00088}00088\ }
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00089}\mbox{\hyperlink{structsysio_1_1chain_1_1block__state_a1182e4a1eaed724945b60352fecbe25d}{00089}}\ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1block__state_adda90ba2fcd3cef50e560b2871d97dc4}{block\_state::block\_state}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1pending__block__header__state}{pending\_block\_header\_state}}\&\&\ cur,}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00090}00090\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_aa10ee348c57604b615bc8570f6685102}{signed\_block\_ptr}}\&\&\ b,}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00091}00091\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1vector}{vector<transaction\_metadata\_ptr>}}\&\&\ trx\_metas,}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00092}00092\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1chain_1_1protocol__feature__set}{protocol\_feature\_set}}\&\ pfs,}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00093}00093\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::function<\textcolor{keywordtype}{void}(\ \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{block\_timestamp\_type}},}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00094}00094\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ flat\_set<digest\_type>\&,}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00095}00095\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1vector}{vector<digest\_type>}}\&\ )>\&\ validator,}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00096}00096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_a2cfc12be90aaa9b98843b120fecc71b0}{signer\_callback\_type}}\&\ signer}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00097}00097\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00098}00098\ \ \ \ :\mbox{\hyperlink{structsysio_1_1chain_1_1block__header__state}{block\_header\_state}}(\ inject\_additional\_signatures(\ \mbox{\hyperlink{namespacestd}{std}}::move(cur),\ *b,\ pfs,\ validator,\ signer\ )\ )}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00099}00099\ \ \ \ ,block(\ \mbox{\hyperlink{namespacestd}{std}}::move(b)\ )}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00100}00100\ \ \ \ ,\_pub\_keys\_recovered(\ true\ )\ \textcolor{comment}{//\ called\ by\ produce\_block\ so\ signature\ recovery\ of\ trxs\ must\ have\ been\ done}}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00101}00101\ \ \ \ ,\_cached\_trxs(\ \mbox{\hyperlink{namespacestd}{std}}::move(trx\_metas)\ )}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00102}00102\ \ \ \ \{\}}
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00103}00103\ }
+\DoxyCodeLine{\Hypertarget{block__state_8cpp_source_l00104}00104\ \}\ \}\ }
+
+\end{DoxyCode}

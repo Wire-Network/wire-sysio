@@ -1,0 +1,43 @@
+\doxysection{catch\+\_\+leak\+\_\+detector.\+cpp}
+\hypertarget{catch__leak__detector_8cpp_source}{}\label{catch__leak__detector_8cpp_source}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_leak\_detector.cpp@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_leak\_detector.cpp}}
+\mbox{\hyperlink{catch__leak__detector_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{catch__leak__detector_8cpp_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{catch__leak__detector_8cpp_source_l00002}00002\ \textcolor{comment}{\ *\ \ Created\ by\ Martin\ on\ 12/07/2017.}}
+\DoxyCodeLine{\Hypertarget{catch__leak__detector_8cpp_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{catch__leak__detector_8cpp_source_l00004}00004\ \textcolor{comment}{\ *\ \ Distributed\ under\ the\ Boost\ Software\ License,\ Version\ 1.0.\ (See\ accompanying}}
+\DoxyCodeLine{\Hypertarget{catch__leak__detector_8cpp_source_l00005}00005\ \textcolor{comment}{\ *\ \ file\ LICENSE\_1\_0.txt\ or\ copy\ at\ http://www.boost.org/LICENSE\_1\_0.txt)}}
+\DoxyCodeLine{\Hypertarget{catch__leak__detector_8cpp_source_l00006}00006\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{catch__leak__detector_8cpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{catch__leak__detector_8cpp_source_l00008}00008\ \textcolor{preprocessor}{\ \#include\ "{}\mbox{\hyperlink{catch__leak__detector_8h}{catch\_leak\_detector.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__leak__detector_8cpp_source_l00009}00009\ \textcolor{preprocessor}{\ \#include\ "{}\mbox{\hyperlink{catch__interfaces__registry__hub_8h}{catch\_interfaces\_registry\_hub.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__leak__detector_8cpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{catch__leak__detector_8cpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{catch__leak__detector_8cpp_source_l00012}00012\ \textcolor{preprocessor}{\#ifdef\ CATCH\_CONFIG\_WINDOWS\_CRTDBG}}
+\DoxyCodeLine{\Hypertarget{catch__leak__detector_8cpp_source_l00013}00013\ \textcolor{preprocessor}{\#include\ <crtdbg.h>}}
+\DoxyCodeLine{\Hypertarget{catch__leak__detector_8cpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{catch__leak__detector_8cpp_source_l00015}00015\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__leak__detector_8cpp_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{catch__leak__detector_8cpp_source_l00017}00017\ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_leak_detector_a1a2eafceb04f9f5e4f6aea1ac6098bb0}{LeakDetector::LeakDetector}}()\ \{}
+\DoxyCodeLine{\Hypertarget{catch__leak__detector_8cpp_source_l00018}00018\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ flag\ =\ \_CrtSetDbgFlag(\_CRTDBG\_REPORT\_FLAG);}
+\DoxyCodeLine{\Hypertarget{catch__leak__detector_8cpp_source_l00019}00019\ \ \ \ \ \ \ \ \ flag\ |=\ \_CRTDBG\_LEAK\_CHECK\_DF;}
+\DoxyCodeLine{\Hypertarget{catch__leak__detector_8cpp_source_l00020}00020\ \ \ \ \ \ \ \ \ flag\ |=\ \_CRTDBG\_ALLOC\_MEM\_DF;}
+\DoxyCodeLine{\Hypertarget{catch__leak__detector_8cpp_source_l00021}00021\ \ \ \ \ \ \ \ \ \_CrtSetDbgFlag(flag);}
+\DoxyCodeLine{\Hypertarget{catch__leak__detector_8cpp_source_l00022}00022\ \ \ \ \ \ \ \ \ \_CrtSetReportMode(\_CRT\_WARN,\ \_CRTDBG\_MODE\_FILE\ |\ \_CRTDBG\_MODE\_DEBUG);}
+\DoxyCodeLine{\Hypertarget{catch__leak__detector_8cpp_source_l00023}00023\ \ \ \ \ \ \ \ \ \_CrtSetReportFile(\_CRT\_WARN,\ \_CRTDBG\_FILE\_STDERR);}
+\DoxyCodeLine{\Hypertarget{catch__leak__detector_8cpp_source_l00024}00024\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Change\ this\ to\ leaking\ allocation's\ number\ to\ break\ there}}
+\DoxyCodeLine{\Hypertarget{catch__leak__detector_8cpp_source_l00025}00025\ \ \ \ \ \ \ \ \ \_CrtSetBreakAlloc(-\/1);}
+\DoxyCodeLine{\Hypertarget{catch__leak__detector_8cpp_source_l00026}00026\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__leak__detector_8cpp_source_l00027}00027\ \}}
+\DoxyCodeLine{\Hypertarget{catch__leak__detector_8cpp_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{catch__leak__detector_8cpp_source_l00029}00029\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{catch__leak__detector_8cpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{catch__leak__detector_8cpp_source_l00031}\mbox{\hyperlink{struct_catch_1_1_leak_detector_a1a2eafceb04f9f5e4f6aea1ac6098bb0}{00031}}\ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_leak_detector_a1a2eafceb04f9f5e4f6aea1ac6098bb0}{Catch::LeakDetector::LeakDetector}}()\ \{\}}
+\DoxyCodeLine{\Hypertarget{catch__leak__detector_8cpp_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{catch__leak__detector_8cpp_source_l00033}00033\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{catch__leak__detector_8cpp_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{catch__leak__detector_8cpp_source_l00035}\mbox{\hyperlink{struct_catch_1_1_leak_detector_af9848cb5a17e799361aaf9722daa54be}{00035}}\ \mbox{\hyperlink{struct_catch_1_1_leak_detector_af9848cb5a17e799361aaf9722daa54be}{Catch::LeakDetector::\string~LeakDetector}}()\ \{}
+\DoxyCodeLine{\Hypertarget{catch__leak__detector_8cpp_source_l00036}00036\ \ \ \ \ \mbox{\hyperlink{namespace_catch_a0f78e9afdebc6d4512d18e76fbf54b8c}{Catch::cleanUp}}();}
+\DoxyCodeLine{\Hypertarget{catch__leak__detector_8cpp_source_l00037}00037\ \}}
+
+\end{DoxyCode}

@@ -1,0 +1,5 @@
+<map id="websocketpp::base64_encode" name="websocketpp::base64_encode">
+<area shape="rect" id="Node000001" title="Encode a string into a base64 string." alt="" coords="5,5,154,46"/>
+<area shape="rect" id="Node000002" href="$namespacewebsocketpp.html#aff36d40583424a2c879df02219133af8" title="Encode a char buffer into a base64 string." alt="" coords="202,5,350,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="154,23,186,23,186,28,154,28"/>
+</map>

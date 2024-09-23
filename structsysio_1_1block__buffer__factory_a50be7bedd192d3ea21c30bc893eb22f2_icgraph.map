@@ -1,0 +1,7 @@
+<map id="sysio::block_buffer_factory::get_send_buffer" name="sysio::block_buffer_factory::get_send_buffer">
+<area shape="rect" id="Node000001" title="caches result for subsequent calls, only provide same signed_block_ptr instance for each invocation." alt="" coords="220,39,389,79"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1dispatch__manager.html#a629f48b0f6f0ade1cc21324ee78c5267" title=" " alt="" coords="5,5,172,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="204,46,172,41,173,36,205,41"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1connection.html#af8cc5bf70b8c46a2325c5021a3fd06fb" title=" " alt="" coords="23,71,154,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="205,76,155,84,154,79,204,71"/>
+</map>

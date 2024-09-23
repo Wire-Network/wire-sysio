@@ -1,0 +1,101 @@
+\doxysection{IR\+::Function\+Type\+Map\+::Key Struct Reference}
+\hypertarget{struct_i_r_1_1_function_type_map_1_1_key}{}\label{struct_i_r_1_1_function_type_map_1_1_key}\index{IR::FunctionTypeMap::Key@{IR::FunctionTypeMap::Key}}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespace_i_r_ac56fb5355b338ad4a167c48ec539b90b}{Result\+Type}} \mbox{\hyperlink{struct_i_r_1_1_function_type_map_1_1_key_a83bdeee267729ef2fb396c3ff1a19cdb}{ret}}
+\item 
+std\+::vector$<$ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{Value\+Type}} $>$ \mbox{\hyperlink{struct_i_r_1_1_function_type_map_1_1_key_a84103ba67a22768e9c3748fda0039706}{parameters}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{struct_i_r_1_1_function_type_map_1_1_key_a481c0209a586f90210cb198aa311f8c6}{operator==}} (const \mbox{\hyperlink{struct_i_r_1_1_function_type_map_1_1_key}{Key}} \&left, const \mbox{\hyperlink{struct_i_r_1_1_function_type_map_1_1_key}{Key}} \&right)
+\item 
+bool \mbox{\hyperlink{struct_i_r_1_1_function_type_map_1_1_key_a99e738313f5addc1dfe0d6cc9221d391}{operator!=}} (const \mbox{\hyperlink{struct_i_r_1_1_function_type_map_1_1_key}{Key}} \&left, const \mbox{\hyperlink{struct_i_r_1_1_function_type_map_1_1_key}{Key}} \&right)
+\item 
+bool \mbox{\hyperlink{struct_i_r_1_1_function_type_map_1_1_key_a3f90f7845a6aab918d452a18cdfcd145}{operator$<$}} (const \mbox{\hyperlink{struct_i_r_1_1_function_type_map_1_1_key}{Key}} \&left, const \mbox{\hyperlink{struct_i_r_1_1_function_type_map_1_1_key}{Key}} \&right)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{_types_8cpp_source_l00009}{9}} of file \mbox{\hyperlink{_types_8cpp_source}{Types.\+cpp}}.
+
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{struct_i_r_1_1_function_type_map_1_1_key_a99e738313f5addc1dfe0d6cc9221d391}\index{IR::FunctionTypeMap::Key@{IR::FunctionTypeMap::Key}!operator"!=@{operator"!=}}
+\index{operator"!=@{operator"!=}!IR::FunctionTypeMap::Key@{IR::FunctionTypeMap::Key}}
+\doxysubsubsection{\texorpdfstring{operator"!=}{operator!=}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_function_type_map_1_1_key_a99e738313f5addc1dfe0d6cc9221d391} 
+bool operator!= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct_i_r_1_1_function_type_map_1_1_key}{Key}} \&}]{left}{, }\item[{const \mbox{\hyperlink{struct_i_r_1_1_function_type_map_1_1_key}{Key}} \&}]{right}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{_types_8cpp_source_l00015}{15}} of file \mbox{\hyperlink{_types_8cpp_source}{Types.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00015\ \{\ \textcolor{keywordflow}{return}\ left.ret\ !=\ right.ret\ ||\ left.parameters\ !=\ right.parameters;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_i_r_1_1_function_type_map_1_1_key_a3f90f7845a6aab918d452a18cdfcd145}\index{IR::FunctionTypeMap::Key@{IR::FunctionTypeMap::Key}!operator$<$@{operator$<$}}
+\index{operator$<$@{operator$<$}!IR::FunctionTypeMap::Key@{IR::FunctionTypeMap::Key}}
+\doxysubsubsection{\texorpdfstring{operator$<$}{operator<}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_function_type_map_1_1_key_a3f90f7845a6aab918d452a18cdfcd145} 
+bool operator$<$ (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct_i_r_1_1_function_type_map_1_1_key}{Key}} \&}]{left}{, }\item[{const \mbox{\hyperlink{struct_i_r_1_1_function_type_map_1_1_key}{Key}} \&}]{right}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{_types_8cpp_source_l00016}{16}} of file \mbox{\hyperlink{_types_8cpp_source}{Types.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00016\ \{\ \textcolor{keywordflow}{return}\ left.ret\ <\ right.ret\ ||\ (left.ret\ ==\ right.ret\ \&\&\ left.parameters\ <\ right.parameters);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_i_r_1_1_function_type_map_1_1_key_a481c0209a586f90210cb198aa311f8c6}\index{IR::FunctionTypeMap::Key@{IR::FunctionTypeMap::Key}!operator==@{operator==}}
+\index{operator==@{operator==}!IR::FunctionTypeMap::Key@{IR::FunctionTypeMap::Key}}
+\doxysubsubsection{\texorpdfstring{operator==}{operator==}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_function_type_map_1_1_key_a481c0209a586f90210cb198aa311f8c6} 
+bool operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct_i_r_1_1_function_type_map_1_1_key}{Key}} \&}]{left}{, }\item[{const \mbox{\hyperlink{struct_i_r_1_1_function_type_map_1_1_key}{Key}} \&}]{right}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{_types_8cpp_source_l00014}{14}} of file \mbox{\hyperlink{_types_8cpp_source}{Types.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00014\ \{\ \textcolor{keywordflow}{return}\ left.ret\ ==\ right.ret\ \&\&\ left.parameters\ ==\ right.parameters;\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_i_r_1_1_function_type_map_1_1_key_a84103ba67a22768e9c3748fda0039706}\index{IR::FunctionTypeMap::Key@{IR::FunctionTypeMap::Key}!parameters@{parameters}}
+\index{parameters@{parameters}!IR::FunctionTypeMap::Key@{IR::FunctionTypeMap::Key}}
+\doxysubsubsection{\texorpdfstring{parameters}{parameters}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_function_type_map_1_1_key_a84103ba67a22768e9c3748fda0039706} 
+std\+::vector$<$\mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{Value\+Type}}$>$ IR\+::\+Function\+Type\+Map\+::\+Key\+::parameters}
+
+
+
+Definition at line \mbox{\hyperlink{_types_8cpp_source_l00012}{12}} of file \mbox{\hyperlink{_types_8cpp_source}{Types.\+cpp}}.
+
+\Hypertarget{struct_i_r_1_1_function_type_map_1_1_key_a83bdeee267729ef2fb396c3ff1a19cdb}\index{IR::FunctionTypeMap::Key@{IR::FunctionTypeMap::Key}!ret@{ret}}
+\index{ret@{ret}!IR::FunctionTypeMap::Key@{IR::FunctionTypeMap::Key}}
+\doxysubsubsection{\texorpdfstring{ret}{ret}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_function_type_map_1_1_key_a83bdeee267729ef2fb396c3ff1a19cdb} 
+\mbox{\hyperlink{namespace_i_r_ac56fb5355b338ad4a167c48ec539b90b}{Result\+Type}} IR\+::\+Function\+Type\+Map\+::\+Key\+::ret}
+
+
+
+Definition at line \mbox{\hyperlink{_types_8cpp_source_l00011}{11}} of file \mbox{\hyperlink{_types_8cpp_source}{Types.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/wasm-\/jit/\+Source/\+IR/\mbox{\hyperlink{_types_8cpp}{Types.\+cpp}}\end{DoxyCompactItemize}

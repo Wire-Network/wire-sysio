@@ -1,0 +1,121 @@
+\doxysection{sysiosystem\+::refund\+\_\+request Struct Reference}
+\hypertarget{structsysiosystem_1_1refund__request}{}\label{structsysiosystem_1_1refund__request}\index{sysiosystem::refund\_request@{sysiosystem::refund\_request}}
+
+
+{\ttfamily \#include $<$sysio.\+system.\+hpp$>$}
+
+
+
+Collaboration diagram for sysiosystem\+::refund\+\_\+request\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysiosystem_1_1refund__request__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{structsysiosystem_1_1refund__request_a7b8f2e382e5d83c06b86b3ce7ede6912}{is\+\_\+empty}} () const
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1refund__request_a39dbb4941ac4feb711af3f40c32cc6f6}{primary\+\_\+key}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \mbox{\hyperlink{structsysiosystem_1_1refund__request_a1414d952a626137c7d4bd31fd7c5b6e4}{owner}}
+\item 
+\mbox{\hyperlink{classfc_1_1time__point__sec}{time\+\_\+point\+\_\+sec}} \mbox{\hyperlink{structsysiosystem_1_1refund__request_a790cfb48927ffa02cb95d06a2a1ad346}{request\+\_\+time}}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1asset}{sysio\+::asset}} \mbox{\hyperlink{structsysiosystem_1_1refund__request_a4ef68b09784fe37132ce3f1e69881dcc}{net\+\_\+amount}}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1asset}{sysio\+::asset}} \mbox{\hyperlink{structsysiosystem_1_1refund__request_aa1e92e1181e43aba233fb25af3cb8c47}{cpu\+\_\+amount}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00369}{369}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysiosystem_1_1refund__request_a7b8f2e382e5d83c06b86b3ce7ede6912}\index{sysiosystem::refund\_request@{sysiosystem::refund\_request}!is\_empty@{is\_empty}}
+\index{is\_empty@{is\_empty}!sysiosystem::refund\_request@{sysiosystem::refund\_request}}
+\doxysubsubsection{\texorpdfstring{is\_empty()}{is\_empty()}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1refund__request_a7b8f2e382e5d83c06b86b3ce7ede6912} 
+bool sysiosystem\+::refund\+\_\+request\+::is\+\_\+empty (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00375}{375}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00375\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysiosystem_1_1refund__request_a4ef68b09784fe37132ce3f1e69881dcc}{net\_amount}}.amount\ ==\ 0\ \&\&\ \mbox{\hyperlink{structsysiosystem_1_1refund__request_aa1e92e1181e43aba233fb25af3cb8c47}{cpu\_amount}}.amount\ ==\ 0;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysiosystem_1_1refund__request_a39dbb4941ac4feb711af3f40c32cc6f6}\index{sysiosystem::refund\_request@{sysiosystem::refund\_request}!primary\_key@{primary\_key}}
+\index{primary\_key@{primary\_key}!sysiosystem::refund\_request@{sysiosystem::refund\_request}}
+\doxysubsubsection{\texorpdfstring{primary\_key()}{primary\_key()}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1refund__request_a39dbb4941ac4feb711af3f40c32cc6f6} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} sysiosystem\+::refund\+\_\+request\+::primary\+\_\+key (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00376}{376}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00376\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysiosystem_1_1refund__request_a1414d952a626137c7d4bd31fd7c5b6e4}{owner}}.value;\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysiosystem_1_1refund__request_aa1e92e1181e43aba233fb25af3cb8c47}\index{sysiosystem::refund\_request@{sysiosystem::refund\_request}!cpu\_amount@{cpu\_amount}}
+\index{cpu\_amount@{cpu\_amount}!sysiosystem::refund\_request@{sysiosystem::refund\_request}}
+\doxysubsubsection{\texorpdfstring{cpu\_amount}{cpu\_amount}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1refund__request_aa1e92e1181e43aba233fb25af3cb8c47} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1asset}{sysio\+::asset}} sysiosystem\+::refund\+\_\+request\+::cpu\+\_\+amount}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00373}{373}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1refund__request_a4ef68b09784fe37132ce3f1e69881dcc}\index{sysiosystem::refund\_request@{sysiosystem::refund\_request}!net\_amount@{net\_amount}}
+\index{net\_amount@{net\_amount}!sysiosystem::refund\_request@{sysiosystem::refund\_request}}
+\doxysubsubsection{\texorpdfstring{net\_amount}{net\_amount}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1refund__request_a4ef68b09784fe37132ce3f1e69881dcc} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1asset}{sysio\+::asset}} sysiosystem\+::refund\+\_\+request\+::net\+\_\+amount}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00372}{372}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1refund__request_a1414d952a626137c7d4bd31fd7c5b6e4}\index{sysiosystem::refund\_request@{sysiosystem::refund\_request}!owner@{owner}}
+\index{owner@{owner}!sysiosystem::refund\_request@{sysiosystem::refund\_request}}
+\doxysubsubsection{\texorpdfstring{owner}{owner}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1refund__request_a1414d952a626137c7d4bd31fd7c5b6e4} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} sysiosystem\+::refund\+\_\+request\+::owner}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00370}{370}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1refund__request_a790cfb48927ffa02cb95d06a2a1ad346}\index{sysiosystem::refund\_request@{sysiosystem::refund\_request}!request\_time@{request\_time}}
+\index{request\_time@{request\_time}!sysiosystem::refund\_request@{sysiosystem::refund\_request}}
+\doxysubsubsection{\texorpdfstring{request\_time}{request\_time}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1refund__request_a790cfb48927ffa02cb95d06a2a1ad346} 
+\mbox{\hyperlink{classfc_1_1time__point__sec}{time\+\_\+point\+\_\+sec}} sysiosystem\+::refund\+\_\+request\+::request\+\_\+time}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00371}{371}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/svetlasyrimis/\+Desktop/wire-\/network/\+WN-\/org/wire-\/system-\/contracts/contracts/sysio.\+system/include/sysio.\+system/\mbox{\hyperlink{sysio_8system_8hpp}{sysio.\+system.\+hpp}}\end{DoxyCompactItemize}

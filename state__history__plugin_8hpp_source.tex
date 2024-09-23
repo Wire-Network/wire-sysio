@@ -1,0 +1,40 @@
+\doxysection{state\+\_\+history\+\_\+plugin.\+hpp}
+\hypertarget{state__history__plugin_8hpp_source}{}\label{state__history__plugin_8hpp_source}\index{plugins/state\_history\_plugin/include/sysio/state\_history\_plugin/state\_history\_plugin.hpp@{plugins/state\_history\_plugin/include/sysio/state\_history\_plugin/state\_history\_plugin.hpp}}
+\mbox{\hyperlink{state__history__plugin_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{state__history__plugin_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{state__history__plugin_8hpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{application_8hpp}{appbase/application.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{state__history__plugin_8hpp_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{state__history__plugin_8hpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{chain__plugin_8hpp}{sysio/chain\_plugin/chain\_plugin.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{state__history__plugin_8hpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{state__history_2include_2sysio_2state__history_2types_8hpp}{sysio/state\_history/types.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{state__history__plugin_8hpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{state__history__plugin_8hpp_source_l00007}00007\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}\ \{}
+\DoxyCodeLine{\Hypertarget{state__history__plugin_8hpp_source_l00008}00008\ \textcolor{keyword}{class\ }variant;}
+\DoxyCodeLine{\Hypertarget{state__history__plugin_8hpp_source_l00009}00009\ \}}
+\DoxyCodeLine{\Hypertarget{state__history__plugin_8hpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{state__history__plugin_8hpp_source_l00011}00011\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{}
+\DoxyCodeLine{\Hypertarget{state__history__plugin_8hpp_source_l00012}00012\ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacesysio_1_1chain_ac6f5a1f1e061f000983f5d5f3ac25dfa}{chain::bytes}};}
+\DoxyCodeLine{\Hypertarget{state__history__plugin_8hpp_source_l00013}00013\ \textcolor{keyword}{using\ }std::shared\_ptr;}
+\DoxyCodeLine{\Hypertarget{state__history__plugin_8hpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{state__history__plugin_8hpp_source_l00015}\mbox{\hyperlink{namespacesysio_ab8d74a00ca2549a2ccc359ad5f00c7cb}{00015}}\ \textcolor{keyword}{typedef}\ shared\_ptr<struct\ state\_history\_plugin\_impl>\ \mbox{\hyperlink{namespacesysio_ab8d74a00ca2549a2ccc359ad5f00c7cb}{state\_history\_ptr}};}
+\DoxyCodeLine{\Hypertarget{state__history__plugin_8hpp_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{state__history__plugin_8hpp_source_l00017}\mbox{\hyperlink{classsysio_1_1state__history__plugin}{00017}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1state__history__plugin}{state\_history\_plugin}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classappbase_1_1plugin}{plugin}}<state\_history\_plugin>\ \{}
+\DoxyCodeLine{\Hypertarget{state__history__plugin_8hpp_source_l00018}00018\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{state__history__plugin_8hpp_source_l00019}00019\ \ \ \ \mbox{\hyperlink{plugin_8hpp_ae81793dd38463b82491d75a9ccd209e1}{APPBASE\_PLUGIN\_REQUIRES}}((\mbox{\hyperlink{classsysio_1_1chain__plugin}{chain\_plugin}}))}
+\DoxyCodeLine{\Hypertarget{state__history__plugin_8hpp_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{state__history__plugin_8hpp_source_l00021}00021\ \ \ \ \mbox{\hyperlink{classsysio_1_1state__history__plugin_a014eff48cf9f6aa978c6926bad90f202}{state\_history\_plugin}}();}
+\DoxyCodeLine{\Hypertarget{state__history__plugin_8hpp_source_l00022}00022\ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classsysio_1_1state__history__plugin_ab402c5996a8de4e054c8e7959482a930}{\string~state\_history\_plugin}}();}
+\DoxyCodeLine{\Hypertarget{state__history__plugin_8hpp_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{state__history__plugin_8hpp_source_l00024}00024\ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1state__history__plugin_a475b7467d5410fc8c53e6ad38503fbda}{set\_program\_options}}(options\_description\&\ \mbox{\hyperlink{xbyak__mnemonic_8h_a4229a9b84f8b8673326f12bd41acd27c}{cli}},\ options\_description\&\ cfg)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{state__history__plugin_8hpp_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{state__history__plugin_8hpp_source_l00026}00026\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1state__history__plugin_a77b01db68c4deb416c61cebfce6c987a}{plugin\_initialize}}(\textcolor{keyword}{const}\ variables\_map\&\ options);}
+\DoxyCodeLine{\Hypertarget{state__history__plugin_8hpp_source_l00027}00027\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1state__history__plugin_a11806ee15ae9ff7d0b21e098da8fc1b3}{plugin\_startup}}();}
+\DoxyCodeLine{\Hypertarget{state__history__plugin_8hpp_source_l00028}00028\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1state__history__plugin_afea0692da6ca1e8c15dfab9d8adbbb18}{plugin\_shutdown}}();}
+\DoxyCodeLine{\Hypertarget{state__history__plugin_8hpp_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{state__history__plugin_8hpp_source_l00030}00030\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{state__history__plugin_8hpp_source_l00031}00031\ \ \ \ \mbox{\hyperlink{namespacesysio_ab8d74a00ca2549a2ccc359ad5f00c7cb}{state\_history\_ptr}}\ my;}
+\DoxyCodeLine{\Hypertarget{state__history__plugin_8hpp_source_l00032}00032\ \};}
+\DoxyCodeLine{\Hypertarget{state__history__plugin_8hpp_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{state__history__plugin_8hpp_source_l00034}00034\ \}\ \textcolor{comment}{//\ namespace\ sysio}}
+
+\end{DoxyCode}

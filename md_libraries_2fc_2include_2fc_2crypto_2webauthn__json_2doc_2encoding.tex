@@ -1,0 +1,135 @@
+\chapter{Encoding}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2encoding}{}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2encoding}\index{Encoding@{Encoding}}
+According to \href{http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf}{\texttt{ ECMA-\/404}},
+
+\begin{quote}
+(in Introduction) JSON text is a sequence of Unicode code points. \end{quote}
+The earlier \href{http://www.ietf.org/rfc/rfc4627.txt}{\texttt{ RFC4627}} stated that,
+
+\begin{quote}
+(in §3) JSON text SHALL be encoded in Unicode. The default encoding is UTF-\/8. \end{quote}
+\begin{quote}
+(in §6) JSON may be represented using UTF-\/8, UTF-\/16, or UTF-\/32. When JSON is written in UTF-\/8, JSON is 8bit compatible. When JSON is written in UTF-\/16 or UTF-\/32, the binary content-\/transfer-\/encoding must be used. \end{quote}
+Rapid\+JSON supports various encodings. It can also validate the encodings of JSON, and transcoding JSON among encodings. All these features are implemented internally, without the need for external libraries (e.\+g. \href{http://site.icu-project.org/}{\texttt{ ICU}}).\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2encoding_8zh-cn_Unicode}{}\doxysection{\texorpdfstring{Unicode}{Unicode}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2encoding_8zh-cn_Unicode}
+From \href{http://www.unicode.org/standard/WhatIsUnicode.html}{\texttt{ Unicode\textquotesingle{}s official website}}\+: \begin{quote}
+Unicode provides a unique number for every character, no matter what the platform, no matter what the program, no matter what the language. \end{quote}
+Those unique numbers are called code points, which is in the range {\ttfamily 0x0} to {\ttfamily 0x10\+FFFF}.\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2encoding_8zh-cn_UTF}{}\doxysubsection{\texorpdfstring{Unicode Transformation Format}{Unicode Transformation Format}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2encoding_8zh-cn_UTF}
+There are various encodings for storing Unicode code points. These are called Unicode Transformation Format (UTF). Rapid\+JSON supports the most commonly used UTFs, including
+
+
+\begin{DoxyItemize}
+\item UTF-\/8\+: 8-\/bit variable-\/width encoding. It maps a code point to 1–4 bytes.
+\item UTF-\/16\+: 16-\/bit variable-\/width encoding. It maps a code point to 1–2 16-\/bit code units (i.\+e., 2–4 bytes).
+\item UTF-\/32\+: 32-\/bit fixed-\/width encoding. It directly maps a code point to a single 32-\/bit code unit (i.\+e. 4 bytes).
+\end{DoxyItemize}
+
+For UTF-\/16 and UTF-\/32, the byte order (endianness) does matter. Within computer memory, they are often stored in the computer\textquotesingle{}s endianness. However, when it is stored in file or transferred over network, we need to state the byte order of the byte sequence, either little-\/endian (LE) or big-\/endian (BE).
+
+Rapid\+JSON provide these encodings via the structs in {\ttfamily \doxylink{encodings_8h}{rapidjson/encodings.\+h}}\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacerapidjson}{rapidjson}}\ \{}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{template}<\textcolor{keyword}{typename}\ CharType\ =\ \textcolor{keywordtype}{char}>}
+\DoxyCodeLine{\textcolor{keyword}{struct\ }\mbox{\hyperlink{namespace_u_t_f8}{UTF8}};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{template}<\textcolor{keyword}{typename}\ CharType\ =\ \textcolor{keywordtype}{wchar\_t}>}
+\DoxyCodeLine{\textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_u_t_f16}{UTF16}};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{template}<\textcolor{keyword}{typename}\ CharType\ =\ \textcolor{keywordtype}{wchar\_t}>}
+\DoxyCodeLine{\textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_u_t_f16_l_e}{UTF16LE}};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{template}<\textcolor{keyword}{typename}\ CharType\ =\ \textcolor{keywordtype}{wchar\_t}>}
+\DoxyCodeLine{\textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_u_t_f16_b_e}{UTF16BE}};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{template}<\textcolor{keyword}{typename}\ CharType\ =\ \textcolor{keywordtype}{unsigned}>}
+\DoxyCodeLine{\textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_u_t_f32}{UTF32}};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{template}<\textcolor{keyword}{typename}\ CharType\ =\ \textcolor{keywordtype}{unsigned}>}
+\DoxyCodeLine{\textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_u_t_f32_l_e}{UTF32LE}};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{template}<\textcolor{keyword}{typename}\ CharType\ =\ \textcolor{keywordtype}{unsigned}>}
+\DoxyCodeLine{\textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_u_t_f32_b_e}{UTF32BE}};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\}\ \textcolor{comment}{//\ namespace\ rapidjson}}
+
+\end{DoxyCode}
+
+
+For processing text in memory, we normally use {\ttfamily \doxylink{struct_u_t_f8}{UTF8}}, {\ttfamily \doxylink{struct_u_t_f16}{UTF16}} or {\ttfamily \doxylink{struct_u_t_f32}{UTF32}}. For processing text via I/O, we may use {\ttfamily \doxylink{struct_u_t_f8}{UTF8}}, {\ttfamily \doxylink{struct_u_t_f16_l_e}{UTF16\+LE}}, {\ttfamily \doxylink{struct_u_t_f16_b_e}{UTF16\+BE}}, {\ttfamily \doxylink{struct_u_t_f32_l_e}{UTF32\+LE}} or {\ttfamily \doxylink{struct_u_t_f32_b_e}{UTF32\+BE}}.
+
+When using the DOM-\/style API, the {\ttfamily Encoding} template parameter in {\ttfamily \doxylink{class_generic_value}{Generic\+Value}\texorpdfstring{$<$}{<}Encoding\texorpdfstring{$>$}{>}} and {\ttfamily \doxylink{class_generic_document}{Generic\+Document}\texorpdfstring{$<$}{<}Encoding\texorpdfstring{$>$}{>}} indicates the encoding to be used to represent JSON string in memory. So normally we will use {\ttfamily \doxylink{struct_u_t_f8}{UTF8}}, {\ttfamily \doxylink{struct_u_t_f16}{UTF16}} or {\ttfamily \doxylink{struct_u_t_f32}{UTF32}} for this template parameter. The choice depends on operating systems and other libraries that the application is using. For example, Windows API represents Unicode characters in UTF-\/16, while most Linux distributions and applications prefer UTF-\/8.
+
+Example of UTF-\/16 DOM declaration\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{typedef}\ \mbox{\hyperlink{class_generic_document}{GenericDocument<UTF16<>}}\ >\ WDocument;}
+\DoxyCodeLine{\textcolor{keyword}{typedef}\ \mbox{\hyperlink{class_generic_value}{GenericValue<UTF16<>}}\ >\ WValue;}
+
+\end{DoxyCode}
+
+
+For a detail example, please check the example in \doxylink{stream_8md}{DOM\textquotesingle{}s Encoding} section.\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2encoding_8zh-cn_CharacterType}{}\doxysubsection{\texorpdfstring{Character Type}{Character Type}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2encoding_8zh-cn_CharacterType}
+As shown in the declaration, each encoding has a {\ttfamily Char\+Type} template parameter. Actually, it may be a little bit confusing, but each {\ttfamily Char\+Type} stores a code unit, not a character (code point). As mentioned in previous section, a code point may be encoded to 1–4 code units for UTF-\/8.
+
+For {\ttfamily \doxylink{struct_u_t_f16}{UTF16}(LE\texorpdfstring{$\vert$}{|}\+BE)}, {\ttfamily \doxylink{struct_u_t_f32}{UTF32}(LE\texorpdfstring{$\vert$}{|}\+BE)}, the {\ttfamily Char\+Type} must be integer type of at least 2 and 4 bytes respectively.
+
+Note that C++11 introduces {\ttfamily char16\+\_\+t} and {\ttfamily char32\+\_\+t}, which can be used for {\ttfamily \doxylink{struct_u_t_f16}{UTF16}} and {\ttfamily \doxylink{struct_u_t_f32}{UTF32}} respectively.\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2encoding_8zh-cn_AutoUTF}{}\doxysubsection{\texorpdfstring{Auto\+UTF}{Auto\+UTF}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2encoding_8zh-cn_AutoUTF}
+Previous encodings are statically bound in compile-\/time. In other words, user must know exactly which encodings will be used in the memory or streams. However, sometimes we may need to read/write files of different encodings. The encoding needed to be decided in runtime.
+
+{\ttfamily \doxylink{struct_auto_u_t_f}{Auto\+UTF}} is an encoding designed for this purpose. It chooses which encoding to be used according to the input or output stream. Currently, it should be used with {\ttfamily \doxylink{class_encoded_input_stream}{Encoded\+Input\+Stream}} and {\ttfamily \doxylink{class_encoded_output_stream}{Encoded\+Output\+Stream}}.\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2encoding_8zh-cn_ASCII}{}\doxysubsection{\texorpdfstring{ASCII}{ASCII}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2encoding_8zh-cn_ASCII}
+Although the JSON standards did not mention about \href{http://en.wikipedia.org/wiki/ASCII}{\texttt{ ASCII}}, sometimes we would like to write 7-\/bit \doxylink{struct_a_s_c_i_i}{ASCII} JSON for applications that cannot handle UTF-\/8. Since any JSON can represent unicode characters in escaped sequence {\ttfamily \textbackslash{}u\+XXXX}, JSON can always be encoded in \doxylink{struct_a_s_c_i_i}{ASCII}.
+
+Here is an example for writing a UTF-\/8 DOM into \doxylink{struct_a_s_c_i_i}{ASCII}\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacerapidjson}{rapidjson}};}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_document}{Document}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}};\ \textcolor{comment}{//\ UTF8<>}}
+\DoxyCodeLine{\textcolor{comment}{//\ ...}}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_string_buffer}{StringBuffer}}\ buffer;}
+\DoxyCodeLine{\mbox{\hyperlink{class_writer}{Writer<StringBuffer,\ Document::EncodingType,\ ASCII<>}}\ >\ writer(buffer);}
+\DoxyCodeLine{\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.Accept(writer);}
+\DoxyCodeLine{std::cout\ <<\ buffer.\mbox{\hyperlink{class_generic_string_buffer_a42079865bab1deb930c6cff7d491c719}{GetString}}();}
+
+\end{DoxyCode}
+
+
+\doxylink{struct_a_s_c_i_i}{ASCII} can be used in input stream. If the input stream contains bytes with values above 127, it will cause {\ttfamily k\+Parse\+Error\+String\+Invalid\+Encoding} error.
+
+\doxylink{struct_a_s_c_i_i}{ASCII} {\itshape cannot} be used in memory (encoding of {\ttfamily Document} or target encoding of {\ttfamily Reader}), as it cannot represent Unicode code points.\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2encoding_8zh-cn_ValidationTranscoding}{}\doxysection{\texorpdfstring{Validation \& Transcoding}{Validation \& Transcoding}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2encoding_8zh-cn_ValidationTranscoding}
+When Rapid\+JSON parses a JSON, it can validate the input JSON, whether it is a valid sequence of a specified encoding. This option can be turned on by adding {\ttfamily k\+Parse\+Validate\+Encoding\+Flag} in {\ttfamily parse\+Flags} template parameter.
+
+If the input encoding and output encoding is different, {\ttfamily Reader} and {\ttfamily \doxylink{class_writer}{Writer}} will automatically transcode (convert) the text. In this case, {\ttfamily k\+Parse\+Validate\+Encoding\+Flag} is not necessary, as it must decode the input sequence. And if the sequence was unable to be decoded, it must be invalid.\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2encoding_8zh-cn_Transcoder}{}\doxysubsection{\texorpdfstring{Transcoder}{Transcoder}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2encoding_8zh-cn_Transcoder}
+Although the encoding functions in Rapid\+JSON are designed for JSON parsing/generation, user may abuse them for transcoding of non-\/\+JSON strings.
+
+Here is an example for transcoding a string from UTF-\/8 to UTF-\/16\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{encodings_8h}{rapidjson/encodings.h}}"{}}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacerapidjson}{rapidjson}};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ =\ \textcolor{stringliteral}{"{}..."{}};\ \textcolor{comment}{//\ UTF-\/8\ string}}
+\DoxyCodeLine{\mbox{\hyperlink{struct_generic_string_stream}{StringStream}}\ \mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_string_buffer}{GenericStringBuffer<UTF16<>}}\ >\ target;}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keywordtype}{bool}\ hasError\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\textcolor{keywordflow}{while}\ (\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}}.Peek()\ !=\ \textcolor{charliteral}{'\(\backslash\)0'})}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{struct_transcoder}{Transcoder}}<\mbox{\hyperlink{struct_u_t_f8}{UTF8<>}},\ \mbox{\hyperlink{struct_u_t_f16}{UTF16<>}}\ >::Transcode(\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}},\ target))\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ hasError\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keywordflow}{if}\ (!hasError)\ \{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{wchar\_t}*\ t\ =\ target.\mbox{\hyperlink{class_generic_string_buffer_a42079865bab1deb930c6cff7d491c719}{GetString}}();}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ ...}}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+You may also use {\ttfamily \doxylink{struct_auto_u_t_f}{Auto\+UTF}} and the associated streams for setting source/target encoding in runtime. 

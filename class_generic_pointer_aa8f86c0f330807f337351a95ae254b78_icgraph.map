@@ -1,0 +1,7 @@
+<map id="GenericPointer::Append" name="GenericPointer::Append">
+<area shape="rect" id="Node000001" title="Append a token and return a new Pointer." alt="" coords="213,31,372,56"/>
+<area shape="rect" id="Node000002" href="$class_generic_pointer.html#a9f8a1711f5b8e0d951c25c6c65326f77" title="Append a name token with length, and return a new Pointer." alt="" coords="5,5,165,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="197,35,165,31,165,25,198,29"/>
+<area shape="rect" id="Node000003" href="$pointertest_8cpp.html#a443fb02eea9b29b59f04f505a27d9419" title=" " alt="" coords="57,55,113,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="198,57,113,67,113,62,197,52"/>
+</map>

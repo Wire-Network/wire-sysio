@@ -1,0 +1,275 @@
+\doxysection{fc\+::bloom\+\_\+parameters Class Reference}
+\hypertarget{classfc_1_1bloom__parameters}{}\label{classfc_1_1bloom__parameters}\index{fc::bloom\_parameters@{fc::bloom\_parameters}}
+
+
+{\ttfamily \#include $<$bloom\+\_\+filter.\+hpp$>$}
+
+
+
+Collaboration diagram for fc\+::bloom\+\_\+parameters\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1bloom__parameters__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structfc_1_1bloom__parameters_1_1optimal__parameters__t}{optimal\+\_\+parameters\+\_\+t}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1bloom__parameters_ab6afde615b642799c732ca75cde33ace}{bloom\+\_\+parameters}} ()
+\item 
+virtual \mbox{\hyperlink{classfc_1_1bloom__parameters_a0ad64f027beec7e126fbd0623be2bc34}{\texorpdfstring{$\sim$}{\string~}bloom\+\_\+parameters}} ()
+\item 
+bool \mbox{\hyperlink{classfc_1_1bloom__parameters_a025f422def06d21c3c81f7fdcfe7d2fd}{operator!}} ()
+\item 
+virtual bool \mbox{\hyperlink{classfc_1_1bloom__parameters_a9326bb497296d12119fd1f55bd5273b3}{compute\+\_\+optimal\+\_\+parameters}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+unsigned long long int \mbox{\hyperlink{classfc_1_1bloom__parameters_ae15368c79b3db9bca7be74366427cec4}{minimum\+\_\+size}}
+\item 
+unsigned long long int \mbox{\hyperlink{classfc_1_1bloom__parameters_a0b7eb28568022eee7b121dc2408f9609}{maximum\+\_\+size}}
+\item 
+unsigned int \mbox{\hyperlink{classfc_1_1bloom__parameters_ad8e06579adc96b2bc5b77afccf2ea7a0}{minimum\+\_\+number\+\_\+of\+\_\+hashes}}
+\item 
+unsigned int \mbox{\hyperlink{classfc_1_1bloom__parameters_aaf04cb34dca7cff777b669a870c06839}{maximum\+\_\+number\+\_\+of\+\_\+hashes}}
+\item 
+unsigned long long int \mbox{\hyperlink{classfc_1_1bloom__parameters_a5fe45e27cfb6da91e99cf8001c063a7b}{projected\+\_\+element\+\_\+count}}
+\item 
+double \mbox{\hyperlink{classfc_1_1bloom__parameters_a8b233dcb59ab35d000673c6c99f135ea}{false\+\_\+positive\+\_\+probability}}
+\item 
+unsigned long long int \mbox{\hyperlink{classfc_1_1bloom__parameters_a4cf047e8014a53cbacb96755cad0c805}{random\+\_\+seed}}
+\item 
+\mbox{\hyperlink{structfc_1_1bloom__parameters_1_1optimal__parameters__t}{optimal\+\_\+parameters\+\_\+t}} \mbox{\hyperlink{classfc_1_1bloom__parameters_a67b1a7f1a897fd60c84ade0c732c73dd}{optimal\+\_\+parameters}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{bloom__filter_8hpp_source_l00046}{46}} of file \mbox{\hyperlink{bloom__filter_8hpp_source}{bloom\+\_\+filter.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1bloom__parameters_ab6afde615b642799c732ca75cde33ace}\index{fc::bloom\_parameters@{fc::bloom\_parameters}!bloom\_parameters@{bloom\_parameters}}
+\index{bloom\_parameters@{bloom\_parameters}!fc::bloom\_parameters@{fc::bloom\_parameters}}
+\doxysubsubsection{\texorpdfstring{bloom\_parameters()}{bloom\_parameters()}}
+{\footnotesize\ttfamily \label{classfc_1_1bloom__parameters_ab6afde615b642799c732ca75cde33ace} 
+fc\+::bloom\+\_\+parameters\+::bloom\+\_\+parameters (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bloom__filter_8hpp_source_l00050}{50}} of file \mbox{\hyperlink{bloom__filter_8hpp_source}{bloom\+\_\+filter.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00051\ \ \ \ :\ \mbox{\hyperlink{classfc_1_1bloom__parameters_ae15368c79b3db9bca7be74366427cec4}{minimum\_size}}(1),}
+\DoxyCodeLine{00052\ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bloom__parameters_a0b7eb28568022eee7b121dc2408f9609}{maximum\_size}}(std::numeric\_limits<unsigned\ long\ long\ int>::max()),}
+\DoxyCodeLine{00053\ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bloom__parameters_ad8e06579adc96b2bc5b77afccf2ea7a0}{minimum\_number\_of\_hashes}}(1),}
+\DoxyCodeLine{00054\ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bloom__parameters_aaf04cb34dca7cff777b669a870c06839}{maximum\_number\_of\_hashes}}(std::numeric\_limits<unsigned\ int>::max()),}
+\DoxyCodeLine{00055\ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bloom__parameters_a5fe45e27cfb6da91e99cf8001c063a7b}{projected\_element\_count}}(10000),}
+\DoxyCodeLine{00056\ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bloom__parameters_a8b233dcb59ab35d000673c6c99f135ea}{false\_positive\_probability}}(1.0\ /\ \mbox{\hyperlink{classfc_1_1bloom__parameters_a5fe45e27cfb6da91e99cf8001c063a7b}{projected\_element\_count}}),}
+\DoxyCodeLine{00057\ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bloom__parameters_a4cf047e8014a53cbacb96755cad0c805}{random\_seed}}(0xA5A5A5A55A5A5A5AULL)}
+\DoxyCodeLine{00058\ \ \ \ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1bloom__parameters_a0ad64f027beec7e126fbd0623be2bc34}\index{fc::bloom\_parameters@{fc::bloom\_parameters}!````~bloom\_parameters@{\texorpdfstring{$\sim$}{\string~}bloom\_parameters}}
+\index{````~bloom\_parameters@{\texorpdfstring{$\sim$}{\string~}bloom\_parameters}!fc::bloom\_parameters@{fc::bloom\_parameters}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}bloom\_parameters()}{\string~bloom\_parameters()}}
+{\footnotesize\ttfamily \label{classfc_1_1bloom__parameters_a0ad64f027beec7e126fbd0623be2bc34} 
+virtual fc\+::bloom\+\_\+parameters\+::\texorpdfstring{$\sim$}{\string~}bloom\+\_\+parameters (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{bloom__filter_8hpp_source_l00060}{60}} of file \mbox{\hyperlink{bloom__filter_8hpp_source}{bloom\+\_\+filter.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00061\ \ \ \ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1bloom__parameters_a9326bb497296d12119fd1f55bd5273b3}\index{fc::bloom\_parameters@{fc::bloom\_parameters}!compute\_optimal\_parameters@{compute\_optimal\_parameters}}
+\index{compute\_optimal\_parameters@{compute\_optimal\_parameters}!fc::bloom\_parameters@{fc::bloom\_parameters}}
+\doxysubsubsection{\texorpdfstring{compute\_optimal\_parameters()}{compute\_optimal\_parameters()}}
+{\footnotesize\ttfamily \label{classfc_1_1bloom__parameters_a9326bb497296d12119fd1f55bd5273b3} 
+virtual bool fc\+::bloom\+\_\+parameters\+::compute\+\_\+optimal\+\_\+parameters (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{bloom__filter_8hpp_source_l00109}{109}} of file \mbox{\hyperlink{bloom__filter_8hpp_source}{bloom\+\_\+filter.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00110\ \ \ \ \{}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \textcolor{comment}{/*}}
+\DoxyCodeLine{00112\ \textcolor{comment}{\ \ \ \ \ \ \ \ Note:}}
+\DoxyCodeLine{00113\ \textcolor{comment}{\ \ \ \ \ \ \ \ The\ following\ will\ attempt\ to\ find\ the\ number\ of\ hash\ functions}}
+\DoxyCodeLine{00114\ \textcolor{comment}{\ \ \ \ \ \ \ \ and\ minimum\ amount\ of\ storage\ bits\ required\ to\ construct\ a\ bloom}}
+\DoxyCodeLine{00115\ \textcolor{comment}{\ \ \ \ \ \ \ \ filter\ consistent\ with\ the\ user\ defined\ false\ positive\ probability}}
+\DoxyCodeLine{00116\ \textcolor{comment}{\ \ \ \ \ \ \ \ and\ estimated\ element\ insertion\ count.}}
+\DoxyCodeLine{00117\ \textcolor{comment}{\ \ \ \ \ \ */}}
+\DoxyCodeLine{00118\ }
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!(*\textcolor{keyword}{this}))}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00121\ }
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ min\_m\ =\ std::numeric\_limits<double>::infinity();}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ min\_k\ =\ 0.0;}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ curr\_m\ =\ 0.0;}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ k\ =\ 1.0;}
+\DoxyCodeLine{00126\ }
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (k\ <\ 1000.0)}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ numerator\ \ \ =\ (-\/\ k\ *\ \mbox{\hyperlink{classfc_1_1bloom__parameters_a5fe45e27cfb6da91e99cf8001c063a7b}{projected\_element\_count}});}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ denominator\ =\ std::log(1.0\ -\/\ std::pow(\mbox{\hyperlink{classfc_1_1bloom__parameters_a8b233dcb59ab35d000673c6c99f135ea}{false\_positive\_probability}},\ 1.0\ /\ k));}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ curr\_m\ =\ numerator\ /\ denominator;}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (curr\_m\ <\ min\_m)}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \ \ \ \ min\_m\ =\ curr\_m;}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \ \ \ \ min\_k\ =\ k;}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ k\ +=\ 1.0;}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00139\ }
+\DoxyCodeLine{00140\ \ \ \ \ \ \ optimal\_parameters\_t\&\ optp\ =\ \mbox{\hyperlink{classfc_1_1bloom__parameters_a67b1a7f1a897fd60c84ade0c732c73dd}{optimal\_parameters}};}
+\DoxyCodeLine{00141\ }
+\DoxyCodeLine{00142\ \ \ \ \ \ \ optp.\mbox{\hyperlink{structfc_1_1bloom__parameters_1_1optimal__parameters__t_ac688801825a52e79db45876a07287b0c}{number\_of\_hashes}}\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\textcolor{keyword}{>}(min\_k);}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ optp.table\_size\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ \textcolor{keywordtype}{long}\ \textcolor{keywordtype}{int}\textcolor{keyword}{>}(min\_m);}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ optp.table\_size\ +=\ (((optp.table\_size\ \%\ bits\_per\_char)\ !=\ 0)\ ?\ (bits\_per\_char\ -\/\ (optp.table\_size\ \%\ bits\_per\_char))\ :\ 0);}
+\DoxyCodeLine{00145\ }
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (optp.number\_of\_hashes\ <\ \mbox{\hyperlink{classfc_1_1bloom__parameters_ad8e06579adc96b2bc5b77afccf2ea7a0}{minimum\_number\_of\_hashes}})}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \ optp.number\_of\_hashes\ =\ \mbox{\hyperlink{classfc_1_1bloom__parameters_ad8e06579adc96b2bc5b77afccf2ea7a0}{minimum\_number\_of\_hashes}};}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (optp.number\_of\_hashes\ >\ \mbox{\hyperlink{classfc_1_1bloom__parameters_aaf04cb34dca7cff777b669a870c06839}{maximum\_number\_of\_hashes}})}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \ optp.number\_of\_hashes\ =\ \mbox{\hyperlink{classfc_1_1bloom__parameters_aaf04cb34dca7cff777b669a870c06839}{maximum\_number\_of\_hashes}};}
+\DoxyCodeLine{00150\ }
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (optp.table\_size\ <\ \mbox{\hyperlink{classfc_1_1bloom__parameters_ae15368c79b3db9bca7be74366427cec4}{minimum\_size}})}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \ optp.table\_size\ =\ \mbox{\hyperlink{classfc_1_1bloom__parameters_ae15368c79b3db9bca7be74366427cec4}{minimum\_size}};}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (optp.table\_size\ >\ \mbox{\hyperlink{classfc_1_1bloom__parameters_a0b7eb28568022eee7b121dc2408f9609}{maximum\_size}})}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \ optp.table\_size\ =\ \mbox{\hyperlink{classfc_1_1bloom__parameters_a0b7eb28568022eee7b121dc2408f9609}{maximum\_size}};}
+\DoxyCodeLine{00155\ }
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00157\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1bloom__parameters_a025f422def06d21c3c81f7fdcfe7d2fd}\index{fc::bloom\_parameters@{fc::bloom\_parameters}!operator"!@{operator"!}}
+\index{operator"!@{operator"!}!fc::bloom\_parameters@{fc::bloom\_parameters}}
+\doxysubsubsection{\texorpdfstring{operator"!()}{operator!()}}
+{\footnotesize\ttfamily \label{classfc_1_1bloom__parameters_a025f422def06d21c3c81f7fdcfe7d2fd} 
+bool fc\+::bloom\+\_\+parameters\+::operator! (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bloom__filter_8hpp_source_l00063}{63}} of file \mbox{\hyperlink{bloom__filter_8hpp_source}{bloom\+\_\+filter.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00064\ \ \ \ \{}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (\mbox{\hyperlink{classfc_1_1bloom__parameters_ae15368c79b3db9bca7be74366427cec4}{minimum\_size}}\ >\ \mbox{\hyperlink{classfc_1_1bloom__parameters_a0b7eb28568022eee7b121dc2408f9609}{maximum\_size}})\ \ \ \ \ \ ||}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{classfc_1_1bloom__parameters_ad8e06579adc96b2bc5b77afccf2ea7a0}{minimum\_number\_of\_hashes}}\ >\ \mbox{\hyperlink{classfc_1_1bloom__parameters_aaf04cb34dca7cff777b669a870c06839}{maximum\_number\_of\_hashes}})\ ||}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{classfc_1_1bloom__parameters_ad8e06579adc96b2bc5b77afccf2ea7a0}{minimum\_number\_of\_hashes}}\ <\ 1)\ \ \ \ \ ||}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \ \ \ \ (0\ ==\ \mbox{\hyperlink{classfc_1_1bloom__parameters_aaf04cb34dca7cff777b669a870c06839}{maximum\_number\_of\_hashes}})\ \ \ \ ||}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ (0\ ==\ \mbox{\hyperlink{classfc_1_1bloom__parameters_a5fe45e27cfb6da91e99cf8001c063a7b}{projected\_element\_count}})\ \ \ \ \ ||}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{classfc_1_1bloom__parameters_a8b233dcb59ab35d000673c6c99f135ea}{false\_positive\_probability}}\ <\ 0.0)\ ||}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \ \ \ \ (std::numeric\_limits<double>::infinity()\ ==\ std::abs(\mbox{\hyperlink{classfc_1_1bloom__parameters_a8b233dcb59ab35d000673c6c99f135ea}{false\_positive\_probability}}))\ ||}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ \ \ \ \ (0\ ==\ \mbox{\hyperlink{classfc_1_1bloom__parameters_a4cf047e8014a53cbacb96755cad0c805}{random\_seed}})\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ||}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \ \ \ \ (0xFFFFFFFFFFFFFFFFULL\ ==\ random\_seed);}
+\DoxyCodeLine{00074\ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classfc_1_1bloom__parameters_a8b233dcb59ab35d000673c6c99f135ea}\index{fc::bloom\_parameters@{fc::bloom\_parameters}!false\_positive\_probability@{false\_positive\_probability}}
+\index{false\_positive\_probability@{false\_positive\_probability}!fc::bloom\_parameters@{fc::bloom\_parameters}}
+\doxysubsubsection{\texorpdfstring{false\_positive\_probability}{false\_positive\_probability}}
+{\footnotesize\ttfamily \label{classfc_1_1bloom__parameters_a8b233dcb59ab35d000673c6c99f135ea} 
+double fc\+::bloom\+\_\+parameters\+::false\+\_\+positive\+\_\+probability}
+
+
+
+Definition at line \mbox{\hyperlink{bloom__filter_8hpp_source_l00092}{92}} of file \mbox{\hyperlink{bloom__filter_8hpp_source}{bloom\+\_\+filter.\+hpp}}.
+
+\Hypertarget{classfc_1_1bloom__parameters_aaf04cb34dca7cff777b669a870c06839}\index{fc::bloom\_parameters@{fc::bloom\_parameters}!maximum\_number\_of\_hashes@{maximum\_number\_of\_hashes}}
+\index{maximum\_number\_of\_hashes@{maximum\_number\_of\_hashes}!fc::bloom\_parameters@{fc::bloom\_parameters}}
+\doxysubsubsection{\texorpdfstring{maximum\_number\_of\_hashes}{maximum\_number\_of\_hashes}}
+{\footnotesize\ttfamily \label{classfc_1_1bloom__parameters_aaf04cb34dca7cff777b669a870c06839} 
+unsigned int fc\+::bloom\+\_\+parameters\+::maximum\+\_\+number\+\_\+of\+\_\+hashes}
+
+
+
+Definition at line \mbox{\hyperlink{bloom__filter_8hpp_source_l00082}{82}} of file \mbox{\hyperlink{bloom__filter_8hpp_source}{bloom\+\_\+filter.\+hpp}}.
+
+\Hypertarget{classfc_1_1bloom__parameters_a0b7eb28568022eee7b121dc2408f9609}\index{fc::bloom\_parameters@{fc::bloom\_parameters}!maximum\_size@{maximum\_size}}
+\index{maximum\_size@{maximum\_size}!fc::bloom\_parameters@{fc::bloom\_parameters}}
+\doxysubsubsection{\texorpdfstring{maximum\_size}{maximum\_size}}
+{\footnotesize\ttfamily \label{classfc_1_1bloom__parameters_a0b7eb28568022eee7b121dc2408f9609} 
+unsigned long long int fc\+::bloom\+\_\+parameters\+::maximum\+\_\+size}
+
+
+
+Definition at line \mbox{\hyperlink{bloom__filter_8hpp_source_l00078}{78}} of file \mbox{\hyperlink{bloom__filter_8hpp_source}{bloom\+\_\+filter.\+hpp}}.
+
+\Hypertarget{classfc_1_1bloom__parameters_ad8e06579adc96b2bc5b77afccf2ea7a0}\index{fc::bloom\_parameters@{fc::bloom\_parameters}!minimum\_number\_of\_hashes@{minimum\_number\_of\_hashes}}
+\index{minimum\_number\_of\_hashes@{minimum\_number\_of\_hashes}!fc::bloom\_parameters@{fc::bloom\_parameters}}
+\doxysubsubsection{\texorpdfstring{minimum\_number\_of\_hashes}{minimum\_number\_of\_hashes}}
+{\footnotesize\ttfamily \label{classfc_1_1bloom__parameters_ad8e06579adc96b2bc5b77afccf2ea7a0} 
+unsigned int fc\+::bloom\+\_\+parameters\+::minimum\+\_\+number\+\_\+of\+\_\+hashes}
+
+
+
+Definition at line \mbox{\hyperlink{bloom__filter_8hpp_source_l00081}{81}} of file \mbox{\hyperlink{bloom__filter_8hpp_source}{bloom\+\_\+filter.\+hpp}}.
+
+\Hypertarget{classfc_1_1bloom__parameters_ae15368c79b3db9bca7be74366427cec4}\index{fc::bloom\_parameters@{fc::bloom\_parameters}!minimum\_size@{minimum\_size}}
+\index{minimum\_size@{minimum\_size}!fc::bloom\_parameters@{fc::bloom\_parameters}}
+\doxysubsubsection{\texorpdfstring{minimum\_size}{minimum\_size}}
+{\footnotesize\ttfamily \label{classfc_1_1bloom__parameters_ae15368c79b3db9bca7be74366427cec4} 
+unsigned long long int fc\+::bloom\+\_\+parameters\+::minimum\+\_\+size}
+
+
+
+Definition at line \mbox{\hyperlink{bloom__filter_8hpp_source_l00077}{77}} of file \mbox{\hyperlink{bloom__filter_8hpp_source}{bloom\+\_\+filter.\+hpp}}.
+
+\Hypertarget{classfc_1_1bloom__parameters_a67b1a7f1a897fd60c84ade0c732c73dd}\index{fc::bloom\_parameters@{fc::bloom\_parameters}!optimal\_parameters@{optimal\_parameters}}
+\index{optimal\_parameters@{optimal\_parameters}!fc::bloom\_parameters@{fc::bloom\_parameters}}
+\doxysubsubsection{\texorpdfstring{optimal\_parameters}{optimal\_parameters}}
+{\footnotesize\ttfamily \label{classfc_1_1bloom__parameters_a67b1a7f1a897fd60c84ade0c732c73dd} 
+\mbox{\hyperlink{structfc_1_1bloom__parameters_1_1optimal__parameters__t}{optimal\+\_\+parameters\+\_\+t}} fc\+::bloom\+\_\+parameters\+::optimal\+\_\+parameters}
+
+
+
+Definition at line \mbox{\hyperlink{bloom__filter_8hpp_source_l00107}{107}} of file \mbox{\hyperlink{bloom__filter_8hpp_source}{bloom\+\_\+filter.\+hpp}}.
+
+\Hypertarget{classfc_1_1bloom__parameters_a5fe45e27cfb6da91e99cf8001c063a7b}\index{fc::bloom\_parameters@{fc::bloom\_parameters}!projected\_element\_count@{projected\_element\_count}}
+\index{projected\_element\_count@{projected\_element\_count}!fc::bloom\_parameters@{fc::bloom\_parameters}}
+\doxysubsubsection{\texorpdfstring{projected\_element\_count}{projected\_element\_count}}
+{\footnotesize\ttfamily \label{classfc_1_1bloom__parameters_a5fe45e27cfb6da91e99cf8001c063a7b} 
+unsigned long long int fc\+::bloom\+\_\+parameters\+::projected\+\_\+element\+\_\+count}
+
+
+
+Definition at line \mbox{\hyperlink{bloom__filter_8hpp_source_l00087}{87}} of file \mbox{\hyperlink{bloom__filter_8hpp_source}{bloom\+\_\+filter.\+hpp}}.
+
+\Hypertarget{classfc_1_1bloom__parameters_a4cf047e8014a53cbacb96755cad0c805}\index{fc::bloom\_parameters@{fc::bloom\_parameters}!random\_seed@{random\_seed}}
+\index{random\_seed@{random\_seed}!fc::bloom\_parameters@{fc::bloom\_parameters}}
+\doxysubsubsection{\texorpdfstring{random\_seed}{random\_seed}}
+{\footnotesize\ttfamily \label{classfc_1_1bloom__parameters_a4cf047e8014a53cbacb96755cad0c805} 
+unsigned long long int fc\+::bloom\+\_\+parameters\+::random\+\_\+seed}
+
+
+
+Definition at line \mbox{\hyperlink{bloom__filter_8hpp_source_l00094}{94}} of file \mbox{\hyperlink{bloom__filter_8hpp_source}{bloom\+\_\+filter.\+hpp}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/\mbox{\hyperlink{bloom__filter_8hpp}{bloom\+\_\+filter.\+hpp}}\end{DoxyCompactItemize}

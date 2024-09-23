@@ -1,0 +1,142 @@
+\doxysection{IR\+::Operator\+Decoder\+Stream Struct Reference}
+\hypertarget{struct_i_r_1_1_operator_decoder_stream}{}\label{struct_i_r_1_1_operator_decoder_stream}\index{IR::OperatorDecoderStream@{IR::OperatorDecoderStream}}
+
+
+{\ttfamily \#include $<$Operators.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_i_r_1_1_operator_decoder_stream_a2408751c97a2f3643b36f8d2fea4e541}{Operator\+Decoder\+Stream}} (const std\+::vector$<$ \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} $>$ \&code\+Bytes)
+\item 
+\mbox{\hyperlink{struct_i_r_1_1_operator_decoder_stream_a863e05862d2e4c19136c04eb73a7fa84}{operator bool}} () const
+\item 
+{\footnotesize template$<$typename Visitor $>$ }\\Visitor\+::\+Result \mbox{\hyperlink{struct_i_r_1_1_operator_decoder_stream_a7b680638c09ef51617652259c47bd7db}{decode\+Op}} (Visitor \&visitor)
+\item 
+{\footnotesize template$<$typename Visitor $>$ }\\Visitor\+::\+Result \mbox{\hyperlink{struct_i_r_1_1_operator_decoder_stream_a6b57501a0b3ca612c59e2c15ddc2edd5}{decode\+Op\+Without\+Consume}} (Visitor \&visitor)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{_operators_8h_source_l00613}{613}} of file \mbox{\hyperlink{_operators_8h_source}{Operators.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{struct_i_r_1_1_operator_decoder_stream_a2408751c97a2f3643b36f8d2fea4e541}\index{IR::OperatorDecoderStream@{IR::OperatorDecoderStream}!OperatorDecoderStream@{OperatorDecoderStream}}
+\index{OperatorDecoderStream@{OperatorDecoderStream}!IR::OperatorDecoderStream@{IR::OperatorDecoderStream}}
+\doxysubsubsection{\texorpdfstring{OperatorDecoderStream()}{OperatorDecoderStream()}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_operator_decoder_stream_a2408751c97a2f3643b36f8d2fea4e541} 
+IR\+::\+Operator\+Decoder\+Stream\+::\+Operator\+Decoder\+Stream (\begin{DoxyParamCaption}\item[{const std\+::vector$<$ \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} $>$ \&}]{code\+Bytes}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_operators_8h_source_l00615}{615}} of file \mbox{\hyperlink{_operators_8h_source}{Operators.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00616\ \ \ \ \ \ \ \ \ :\ nextByte(codeBytes.data()),\ end(codeBytes.data()+codeBytes.size())\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_i_r_1_1_operator_decoder_stream_a7b680638c09ef51617652259c47bd7db}\index{IR::OperatorDecoderStream@{IR::OperatorDecoderStream}!decodeOp@{decodeOp}}
+\index{decodeOp@{decodeOp}!IR::OperatorDecoderStream@{IR::OperatorDecoderStream}}
+\doxysubsubsection{\texorpdfstring{decodeOp()}{decodeOp()}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_operator_decoder_stream_a7b680638c09ef51617652259c47bd7db} 
+template$<$typename Visitor $>$ \\
+Visitor\+::\+Result IR\+::\+Operator\+Decoder\+Stream\+::decode\+Op (\begin{DoxyParamCaption}\item[{Visitor \&}]{visitor}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_operators_8h_source_l00621}{621}} of file \mbox{\hyperlink{_operators_8h_source}{Operators.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00622\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00623\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_errors_8h_a03bec6af3af0dd492e348b40cbe40a46}{WAVM\_ASSERT\_THROW}}(nextByte\ +\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{namespace_i_r_a59653fd60bb296de971e5f945c66933a}{Opcode}})\ <=\ end);}
+\DoxyCodeLine{00624\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_i_r_a59653fd60bb296de971e5f945c66933a}{Opcode}}\ \mbox{\hyperlink{namespacesysio_1_1vm_af1bb7d8ae2889df51b65eaef31f1ea74}{opcode}}\ =\ *(\mbox{\hyperlink{namespace_i_r_a59653fd60bb296de971e5f945c66933a}{Opcode}}*)nextByte;}
+\DoxyCodeLine{00625\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(opcode)}
+\DoxyCodeLine{00626\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00627\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \#define\ VISIT\_OPCODE(opcode,name,nameString,Imm,...)\ \(\backslash\)}}
+\DoxyCodeLine{00628\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ case\ Opcode::name:\ \(\backslash\)}}
+\DoxyCodeLine{00629\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ \(\backslash\)}}
+\DoxyCodeLine{00630\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ WAVM\_ASSERT\_THROW(nextByte\ +\ sizeof(OpcodeAndImm<Imm>)\ <=\ end);\ \(\backslash\)}}
+\DoxyCodeLine{00631\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ OpcodeAndImm<Imm>*\ encodedOperator\ =\ (OpcodeAndImm<Imm>*)nextByte;\ \(\backslash\)}}
+\DoxyCodeLine{00632\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ nextByte\ +=\ sizeof(OpcodeAndImm<Imm>);\ \(\backslash\)}}
+\DoxyCodeLine{00633\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ return\ visitor.name(encodedOperator-\/>imm);\ \(\backslash\)}}
+\DoxyCodeLine{00634\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}}
+\DoxyCodeLine{00635\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_operators_8h_a8b6ca1413466de9d4478329c481520a4}{ENUM\_OPERATORS}}(\mbox{\hyperlink{namespace_i_r_a59653fd60bb296de971e5f945c66933aa275346406ff338dd8adf063f9a066141}{VISIT\_OPCODE}})}
+\DoxyCodeLine{00636\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{preprocessor}{\#undef\ VISIT\_OPCODE}}
+\DoxyCodeLine{00637\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00638\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ nextByte\ +=\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{namespace_i_r_a59653fd60bb296de971e5f945c66933a}{Opcode}});}
+\DoxyCodeLine{00639\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ visitor.unknown(opcode);}
+\DoxyCodeLine{00640\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00641\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_i_r_1_1_operator_decoder_stream_a7b680638c09ef51617652259c47bd7db_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_i_r_1_1_operator_decoder_stream_a6b57501a0b3ca612c59e2c15ddc2edd5}\index{IR::OperatorDecoderStream@{IR::OperatorDecoderStream}!decodeOpWithoutConsume@{decodeOpWithoutConsume}}
+\index{decodeOpWithoutConsume@{decodeOpWithoutConsume}!IR::OperatorDecoderStream@{IR::OperatorDecoderStream}}
+\doxysubsubsection{\texorpdfstring{decodeOpWithoutConsume()}{decodeOpWithoutConsume()}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_operator_decoder_stream_a6b57501a0b3ca612c59e2c15ddc2edd5} 
+template$<$typename Visitor $>$ \\
+Visitor\+::\+Result IR\+::\+Operator\+Decoder\+Stream\+::decode\+Op\+Without\+Consume (\begin{DoxyParamCaption}\item[{Visitor \&}]{visitor}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_operators_8h_source_l00644}{644}} of file \mbox{\hyperlink{_operators_8h_source}{Operators.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00645\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00646\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}*\ savedNextByte\ =\ nextByte;}
+\DoxyCodeLine{00647\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typename}\ Visitor::Result\ result\ =\ \mbox{\hyperlink{struct_i_r_1_1_operator_decoder_stream_a7b680638c09ef51617652259c47bd7db}{decodeOp}}(visitor);}
+\DoxyCodeLine{00648\ \ \ \ \ \ \ \ \ \ \ \ \ nextByte\ =\ savedNextByte;}
+\DoxyCodeLine{00649\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00650\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_i_r_1_1_operator_decoder_stream_a6b57501a0b3ca612c59e2c15ddc2edd5_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_i_r_1_1_operator_decoder_stream_a6b57501a0b3ca612c59e2c15ddc2edd5_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_i_r_1_1_operator_decoder_stream_a863e05862d2e4c19136c04eb73a7fa84}\index{IR::OperatorDecoderStream@{IR::OperatorDecoderStream}!operator bool@{operator bool}}
+\index{operator bool@{operator bool}!IR::OperatorDecoderStream@{IR::OperatorDecoderStream}}
+\doxysubsubsection{\texorpdfstring{operator bool()}{operator bool()}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_operator_decoder_stream_a863e05862d2e4c19136c04eb73a7fa84} 
+IR\+::\+Operator\+Decoder\+Stream\+::operator bool (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_operators_8h_source_l00618}{618}} of file \mbox{\hyperlink{_operators_8h_source}{Operators.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00618\ \{\ \textcolor{keywordflow}{return}\ nextByte\ <\ end;\ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/wasm-\/jit/\+Include/\+IR/\mbox{\hyperlink{_operators_8h}{Operators.\+h}}\end{DoxyCompactItemize}

@@ -1,0 +1,108 @@
+\doxysection{debug\+\_\+info.\+hpp}
+\hypertarget{vm_2debug__info_8hpp_source}{}\label{vm_2debug__info_8hpp_source}\index{libraries/sys-\/vm/include/sysio/vm/debug\_info.hpp@{libraries/sys-\/vm/include/sysio/vm/debug\_info.hpp}}
+\mbox{\hyperlink{vm_2debug__info_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <utility>}}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <cstdint>}}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <cstddef>}}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <algorithm>}}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00009}00009\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio_1_1vm}{sysio::vm}}\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00011}\mbox{\hyperlink{structsysio_1_1vm_1_1null__debug__info}{00011}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structsysio_1_1vm_1_1null__debug__info}{null\_debug\_info}}\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00012}00012\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{structsysio_1_1vm_1_1null__debug__info}{builder}}\ =\ \mbox{\hyperlink{structsysio_1_1vm_1_1null__debug__info}{null\_debug\_info}};}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00013}\mbox{\hyperlink{structsysio_1_1vm_1_1null__debug__info_a8c9af0af6fababa0d171a82e98a22097}{00013}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structsysio_1_1vm_1_1null__debug__info_a8c9af0af6fababa0d171a82e98a22097}{on\_code\_start}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{void}*\ compiled\_base,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{void}*\ wasm\_code\_start)\ \{\}}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00014}\mbox{\hyperlink{structsysio_1_1vm_1_1null__debug__info_a7d9df47a5643c06574e15cf55ecc8771}{00014}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structsysio_1_1vm_1_1null__debug__info_a7d9df47a5643c06574e15cf55ecc8771}{on\_function\_start}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{void}*\ code\_addr,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{void}*\ wasm\_addr)\ \{\}}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00015}\mbox{\hyperlink{structsysio_1_1vm_1_1null__debug__info_a5a27a243ca4e0f8bb8b05596d2934e3e}{00015}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structsysio_1_1vm_1_1null__debug__info_a5a27a243ca4e0f8bb8b05596d2934e3e}{on\_instr\_start}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{void}*\ code\_addr,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{void}*\ wasm\_addr)\ \{\}}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00016}\mbox{\hyperlink{structsysio_1_1vm_1_1null__debug__info_aacfedcca4f684408582093084dbddea3}{00016}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structsysio_1_1vm_1_1null__debug__info_aacfedcca4f684408582093084dbddea3}{on\_code\_end}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{void}*\ code\_addr,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{void}*\ wasm\_addr)\ \{\}}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00017}\mbox{\hyperlink{structsysio_1_1vm_1_1null__debug__info_aca18e8c19340963b499e9b93f669e7a4}{00017}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structsysio_1_1vm_1_1null__debug__info_aca18e8c19340963b499e9b93f669e7a4}{set}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1vm_1_1null__debug__info}{null\_debug\_info}}\&)\ \{\}}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00018}\mbox{\hyperlink{structsysio_1_1vm_1_1null__debug__info_a383c63a54d6ba959864389d36dfe8d75}{00018}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structsysio_1_1vm_1_1null__debug__info_a383c63a54d6ba959864389d36dfe8d75}{relocate}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{void}*)\ \{\}}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00019}00019\ \};}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00021}00021\ \textcolor{comment}{//\ Maps\ a\ contiguous\ region\ of\ code\ to\ offsets\ onto\ the\ code\ section\ of\ the\ original\ wasm.}}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00022}\mbox{\hyperlink{classsysio_1_1vm_1_1profile__instr__map}{00022}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1vm_1_1profile__instr__map}{profile\_instr\_map}}\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00023}00023\ \ \ \ \textcolor{keyword}{struct\ }addr\_entry\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00024}00024\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ offset;}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00025}00025\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ wasm\_addr;}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00026}00026\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00028}00028\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00030}\mbox{\hyperlink{structsysio_1_1vm_1_1profile__instr__map_1_1builder}{00030}}\ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structsysio_1_1vm_1_1profile__instr__map_1_1builder}{builder}}\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00031}\mbox{\hyperlink{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a3fb7feea8948a463eb6ae89d3bfd4522}{00031}}\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a3fb7feea8948a463eb6ae89d3bfd4522}{on\_code\_start}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{void}*\ compiled\_base,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{void}*\ wasm\_code\_start)\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00032}00032\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a670341269f86b024e1b80a7ab6f47527}{code\_base}}\ =\ compiled\_base;}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00033}00033\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a8318bc2518c39a1935b2e89f375dcab2}{wasm\_base}}\ =\ wasm\_code\_start;}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00034}00034\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00035}\mbox{\hyperlink{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a9f52fba311fd7ef5b9247c15863750af}{00035}}\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a9f52fba311fd7ef5b9247c15863750af}{on\_function\_start}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{void}*\ code\_addr,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{void}*\ wasm\_addr)\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00036}00036\ \ \ \ \ \ \ \ \ \ data.push\_back(\{}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00037}00037\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}std::uint32\_t\textcolor{keyword}{>}(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(code\_addr)\ -\/\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(\mbox{\hyperlink{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a670341269f86b024e1b80a7ab6f47527}{code\_base}})),}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00038}00038\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}std::uint32\_t\textcolor{keyword}{>}(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(wasm\_addr)\ -\/\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(\mbox{\hyperlink{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a8318bc2518c39a1935b2e89f375dcab2}{wasm\_base}}))}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00039}00039\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00040}00040\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00041}\mbox{\hyperlink{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a243335a21b7989b23faebd6a070aadce}{00041}}\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a243335a21b7989b23faebd6a070aadce}{on\_instr\_start}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{void}*\ code\_addr,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{void}*\ wasm\_addr)\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00042}00042\ \ \ \ \ \ \ \ \ \ data.push\_back(\{}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00043}00043\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}std::uint32\_t\textcolor{keyword}{>}(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(code\_addr)\ -\/\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(\mbox{\hyperlink{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a670341269f86b024e1b80a7ab6f47527}{code\_base}})),}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00044}00044\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}std::uint32\_t\textcolor{keyword}{>}(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(wasm\_addr)\ -\/\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(\mbox{\hyperlink{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a8318bc2518c39a1935b2e89f375dcab2}{wasm\_base}}))}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00045}00045\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00046}00046\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00047}\mbox{\hyperlink{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a1ad7a9a92953f32c206745fb0f3b115d}{00047}}\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a1ad7a9a92953f32c206745fb0f3b115d}{on\_code\_end}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{void}*\ code\_addr,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{void}*\ wasm\_addr)\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a9993cb4b6cd13f69ba5a39bcf7590644}{code\_end}}\ =\ code\_addr;}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00049}00049\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00051}00051\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{void}*\ \mbox{\hyperlink{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a670341269f86b024e1b80a7ab6f47527}{code\_base}}\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00052}00052\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{void}*\ \mbox{\hyperlink{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a8318bc2518c39a1935b2e89f375dcab2}{wasm\_base}}\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00053}00053\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{void}*\ \mbox{\hyperlink{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a9993cb4b6cd13f69ba5a39bcf7590644}{code\_end}}\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00054}00054\ \ \ \ \ \ \ std::vector<addr\_entry>\ \mbox{\hyperlink{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a79a6cec0b393378e883d1eebecd430bc}{data}};}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00055}00055\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00057}\mbox{\hyperlink{classsysio_1_1vm_1_1profile__instr__map_a1b7a38f7bfd65430d73e51b7a4793f72}{00057}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1vm_1_1profile__instr__map_a1b7a38f7bfd65430d73e51b7a4793f72}{set}}(\mbox{\hyperlink{structsysio_1_1vm_1_1profile__instr__map_1_1builder}{builder}}\&\&\ b)\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00058}00058\ \ \ \ \ \ \ data\ =\ std::move(b.data);}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00059}00059\ \ \ \ \ \ \ std::sort(data.begin(),\ data.end(),\ [](\textcolor{keyword}{const}\ addr\_entry\&\ lhs,\ \textcolor{keyword}{const}\ addr\_entry\&\ rhs)\{\ return\ lhs.offset\ <\ rhs.offset;\ \});}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00060}00060\ \ \ \ \ \ \ base\_address\ =\ b.code\_base;}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00061}00061\ \ \ \ \ \ \ code\_size\ =\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(b.code\_end)\ -\/\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(base\_address);}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00062}00062\ \ \ \ \ \ \ offset\_to\_addr\ =\ data.data();}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00063}00063\ \ \ \ \ \ \ offset\_to\_addr\_len\ =\ data.size();}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00064}00064\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00066}\mbox{\hyperlink{classsysio_1_1vm_1_1profile__instr__map_a754ea7d047174e0d6b66c4aad1b27601}{00066}}\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1profile__instr__map_a754ea7d047174e0d6b66c4aad1b27601}{profile\_instr\_map}}()\ =\ \textcolor{keywordflow}{default};}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00067}\mbox{\hyperlink{classsysio_1_1vm_1_1profile__instr__map_ad5ba2f65154c10d969bd40328f568e36}{00067}}\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1profile__instr__map_ad5ba2f65154c10d969bd40328f568e36}{profile\_instr\_map}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1vm_1_1profile__instr__map}{profile\_instr\_map}}\&)\ =\ \textcolor{keyword}{delete};}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00068}\mbox{\hyperlink{classsysio_1_1vm_1_1profile__instr__map_a752dfc4c58bbf2d9138ee72f656e95df}{00068}}\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1profile__instr__map}{profile\_instr\_map}}\&\ \mbox{\hyperlink{classsysio_1_1vm_1_1profile__instr__map_a752dfc4c58bbf2d9138ee72f656e95df}{operator=}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1vm_1_1profile__instr__map}{profile\_instr\_map}}\&)\ =\ \textcolor{keyword}{delete};}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00069}00069\ }
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00070}00070\ \ \ \ \textcolor{comment}{//\ Indicate\ that\ the\ executable\ code\ was\ moved/copied/mmapped/etc\ to\ another\ location}}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00071}\mbox{\hyperlink{classsysio_1_1vm_1_1profile__instr__map_a7ae6f91b318409495fea2848c67e2495}{00071}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1vm_1_1profile__instr__map_a7ae6f91b318409495fea2848c67e2495}{relocate}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{void}*\ new\_base)\ \{\ base\_address\ =\ new\_base;\ \}}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00073}00073\ \ \ \ \textcolor{comment}{//\ Cannot\ use\ most\ of\ the\ standard\ library\ as\ the\ STL\ is\ not\ async-\/signal-\/safe}}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00074}\mbox{\hyperlink{classsysio_1_1vm_1_1profile__instr__map_adadbdd6c2aec68d70b6be11317cf92b3}{00074}}\ \ \ \ std::uint32\_t\ \mbox{\hyperlink{classsysio_1_1vm_1_1profile__instr__map_adadbdd6c2aec68d70b6be11317cf92b3}{translate}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{void}*\ pc)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00075}00075\ \ \ \ \ \ \ std::size\_t\ \mbox{\hyperlink{jmp_8cpp_aca9876635a5afd01576dae38f10dc723}{diff}}\ =\ (\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(pc)\ -\/\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(base\_address));\ \textcolor{comment}{//\ negative\ values\ wrap}}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00076}00076\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{jmp_8cpp_aca9876635a5afd01576dae38f10dc723}{diff}}\ >=\ code\_size\ ||\ \mbox{\hyperlink{jmp_8cpp_aca9876635a5afd01576dae38f10dc723}{diff}}\ <\ offset\_to\_addr[0].offset)\ \textcolor{keywordflow}{return}\ 0xFFFFFFFFu;}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00077}00077\ \ \ \ \ \ \ std::uint32\_t\ offset\ =\ \mbox{\hyperlink{jmp_8cpp_aca9876635a5afd01576dae38f10dc723}{diff}};}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00079}00079\ \ \ \ \ \ \ \textcolor{comment}{//\ Loop\ invariant:\ offset\_to\_addr[lower].offset\ <=\ offset\ <\ offset\_to\_addr[upper].offset}}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00080}00080\ \ \ \ \ \ \ std::size\_t\ lower\ =\ 0,\ upper\ =\ offset\_to\_addr\_len;}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00081}00081\ \ \ \ \ \ \ \textcolor{keywordflow}{while}(upper\ -\/\ lower\ >\ 1)\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00082}00082\ \ \ \ \ \ \ \ \ \ std::size\_t\ mid\ =\ lower\ +\ (upper\ -\/\ lower)\ /\ 2;}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00083}00083\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(offset\_to\_addr[mid].offset\ <=\ offset)\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00084}00084\ \ \ \ \ \ \ \ \ \ \ \ \ lower\ =\ mid;}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00085}00085\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00086}00086\ \ \ \ \ \ \ \ \ \ \ \ \ upper\ =\ mid;}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00087}00087\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00088}00088\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00089}00089\ }
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00090}00090\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ offset\_to\_addr[lower].wasm\_addr;}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00091}00091\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00092}00092\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00093}00093\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{void}*\ base\_address\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00094}00094\ \ \ \ std::size\_t\ code\_size\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00095}00095\ }
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00096}00096\ \ \ \ addr\_entry*\ offset\_to\_addr\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00097}00097\ \ \ \ std::size\_t\ offset\_to\_addr\_len\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00098}00098\ }
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00099}00099\ \ \ \ std::vector<addr\_entry>\ data;}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00100}00100\ \};}
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00101}00101\ }
+\DoxyCodeLine{\Hypertarget{vm_2debug__info_8hpp_source_l00102}00102\ \}}
+
+\end{DoxyCode}

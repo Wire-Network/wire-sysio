@@ -1,0 +1,515 @@
+\doxysection{fuse\+\_\+gmock\+\_\+files Namespace Reference}
+\hypertarget{namespacefuse__gmock__files}{}\label{namespacefuse__gmock__files}\index{fuse\_gmock\_files@{fuse\_gmock\_files}}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacefuse__gmock__files_a5dbe055d6af58d0d95d8f12312c7091f}{Get\+GTest\+Root\+Dir}} (gmock\+\_\+root)
+\item 
+\mbox{\hyperlink{namespacefuse__gmock__files_ab911d1f96b031f57e7d28c4025fb0505}{Validate\+GMock\+Root\+Dir}} (gmock\+\_\+root)
+\item 
+\mbox{\hyperlink{namespacefuse__gmock__files_a97ab00d3faec16c6574a8f548001294e}{Validate\+Output\+Dir}} (output\+\_\+dir)
+\item 
+\mbox{\hyperlink{namespacefuse__gmock__files_a8ecbbf6248e41609d85b32776508f419}{Fuse\+GMockH}} (gmock\+\_\+root, output\+\_\+dir)
+\item 
+\mbox{\hyperlink{namespacefuse__gmock__files_a17d95bfd0ac56b67262de63d085ab503}{Fuse\+GMock\+All\+Cc\+To\+File}} (gmock\+\_\+root, output\+\_\+file)
+\item 
+\mbox{\hyperlink{namespacefuse__gmock__files_aca6794aa64f1e2a30e5f2fbb05e37083}{Fuse\+GMock\+GTest\+All\+Cc}} (gmock\+\_\+root, output\+\_\+dir)
+\item 
+\mbox{\hyperlink{namespacefuse__gmock__files_aeab42ce30edaf4f4bdffec3a6ae74c33}{Fuse\+GMock}} (gmock\+\_\+root, output\+\_\+dir)
+\item 
+\mbox{\hyperlink{namespacefuse__gmock__files_a040a956c1856db183cc64326a5391e5d}{main}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacefuse__gmock__files_a900b64b34e20c7430b72252192a3c7ed}{DEFAULT\+\_\+\+GMOCK\+\_\+\+ROOT\+\_\+\+DIR}} = os.\+path.\+join(os.\+path.\+dirname(\+\_\+\+\_\+file\+\_\+\+\_\+), \textquotesingle{}..\textquotesingle{})
+\item 
+\mbox{\hyperlink{namespacefuse__gmock__files_a3fb36dbe8d361f9ecc54e1aa4b94b068}{gtest}} = fuse\+\_\+gtest\+\_\+files
+\item 
+\mbox{\hyperlink{namespacefuse__gmock__files_aeb4457451f878d6bc8a42f7ff3e5f6cf}{INCLUDE\+\_\+\+GMOCK\+\_\+\+FILE\+\_\+\+REGEX}} = re.\+compile(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\textquotesingle{}\texorpdfstring{$^\wedge$}{\string^}\textbackslash{}\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\texorpdfstring{$\ast$}{*}\#\textbackslash{}\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\texorpdfstring{$\ast$}{*}include\textbackslash{}s\texorpdfstring{$\ast$}{*}"{}(gmock/.+)"{}\textquotesingle{})
+\item 
+str \mbox{\hyperlink{namespacefuse__gmock__files_a97ee2dfa0e0df8426b1dcadcba74060b}{GMOCK\+\_\+\+H\+\_\+\+SEED}} = \textquotesingle{}include/gmock/gmock.\+h\textquotesingle{}
+\item 
+str \mbox{\hyperlink{namespacefuse__gmock__files_afe8e67a915b4f19d7f9b69b4c109403f}{GMOCK\+\_\+\+ALL\+\_\+\+CC\+\_\+\+SEED}} = \textquotesingle{}src/gmock-\/all.\+cc\textquotesingle{}
+\item 
+str \mbox{\hyperlink{namespacefuse__gmock__files_a47742af71dda33b3da2f1fc6da90ac48}{GTEST\+\_\+\+H\+\_\+\+OUTPUT}} = \textquotesingle{}\mbox{\hyperlink{namespacefuse__gmock__files_a3fb36dbe8d361f9ecc54e1aa4b94b068}{gtest}}/gtest.\+h\textquotesingle{}
+\item 
+str \mbox{\hyperlink{namespacefuse__gmock__files_a94c0785996934b48537f271a3e9031a3}{GMOCK\+\_\+\+H\+\_\+\+OUTPUT}} = \textquotesingle{}gmock/gmock.\+h\textquotesingle{}
+\item 
+str \mbox{\hyperlink{namespacefuse__gmock__files_a26c573e973fe80ab03a7dc3ff5093f78}{GMOCK\+\_\+\+GTEST\+\_\+\+ALL\+\_\+\+CC\+\_\+\+OUTPUT}} = \textquotesingle{}gmock-\/\mbox{\hyperlink{namespacefuse__gmock__files_a3fb36dbe8d361f9ecc54e1aa4b94b068}{gtest}}-\/all.\+cc\textquotesingle{}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\begin{DoxyVerb}fuse_gmock_files.py v0.1.0
+Fuses Google Mock and Google Test source code into two .h files and a .cc file.
+
+SYNOPSIS
+       fuse_gmock_files.py [GMOCK_ROOT_DIR] OUTPUT_DIR
+
+       Scans GMOCK_ROOT_DIR for Google Mock and Google Test source
+       code, assuming Google Test is in the GMOCK_ROOT_DIR/../googletest
+       directory, and generates three files:
+       OUTPUT_DIR/gtest/gtest.h, OUTPUT_DIR/gmock/gmock.h, and
+       OUTPUT_DIR/gmock-gtest-all.cc.  Then you can build your tests
+       by adding OUTPUT_DIR to the include search path and linking
+       with OUTPUT_DIR/gmock-gtest-all.cc.  These three files contain
+       everything you need to use Google Mock.  Hence you can
+       "install" Google Mock by copying them to wherever you want.
+
+       GMOCK_ROOT_DIR can be omitted and defaults to the parent
+       directory of the directory holding this script.
+
+EXAMPLES
+       ./fuse_gmock_files.py fused_gmock
+       ./fuse_gmock_files.py path/to/unpacked/gmock fused_gmock
+
+This tool is experimental.  In particular, it assumes that there is no
+conditional inclusion of Google Mock or Google Test headers.  Please
+report any problems to googlemock@googlegroups.com.  You can read
+https://github.com/google/googletest/blob/master/googlemock/docs/CookBook.md for more
+information.
+\end{DoxyVerb}
+ 
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacefuse__gmock__files_aeab42ce30edaf4f4bdffec3a6ae74c33}\index{fuse\_gmock\_files@{fuse\_gmock\_files}!FuseGMock@{FuseGMock}}
+\index{FuseGMock@{FuseGMock}!fuse\_gmock\_files@{fuse\_gmock\_files}}
+\doxysubsubsection{\texorpdfstring{FuseGMock()}{FuseGMock()}}
+{\footnotesize\ttfamily \label{namespacefuse__gmock__files_aeab42ce30edaf4f4bdffec3a6ae74c33} 
+fuse\+\_\+gmock\+\_\+files.\+Fuse\+GMock (\begin{DoxyParamCaption}\item[{}]{gmock\+\_\+root}{, }\item[{}]{output\+\_\+dir}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Fuses gtest.h, gmock.h, and gmock-gtest-all.h.\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{fuse__gmock__files_8py_source_l00215}{215}} of file \mbox{\hyperlink{fuse__gmock__files_8py_source}{fuse\+\_\+gmock\+\_\+files.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00215\ \textcolor{keyword}{def\ }FuseGMock(gmock\_root,\ output\_dir):}
+\DoxyCodeLine{00216\ \ \ \textcolor{stringliteral}{"{}"{}"{}Fuses\ gtest.h,\ gmock.h,\ and\ gmock-\/gtest-\/all.h."{}"{}"{}}}
+\DoxyCodeLine{00217\ }
+\DoxyCodeLine{00218\ \ \ ValidateGMockRootDir(gmock\_root)}
+\DoxyCodeLine{00219\ \ \ ValidateOutputDir(output\_dir)}
+\DoxyCodeLine{00220\ }
+\DoxyCodeLine{00221\ \ \ gtest.FuseGTestH(GetGTestRootDir(gmock\_root),\ output\_dir)}
+\DoxyCodeLine{00222\ \ \ FuseGMockH(gmock\_root,\ output\_dir)}
+\DoxyCodeLine{00223\ \ \ FuseGMockGTestAllCc(gmock\_root,\ output\_dir)}
+\DoxyCodeLine{00224\ }
+\DoxyCodeLine{00225\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacefuse__gmock__files_aeab42ce30edaf4f4bdffec3a6ae74c33_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacefuse__gmock__files_aeab42ce30edaf4f4bdffec3a6ae74c33_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacefuse__gmock__files_a17d95bfd0ac56b67262de63d085ab503}\index{fuse\_gmock\_files@{fuse\_gmock\_files}!FuseGMockAllCcToFile@{FuseGMockAllCcToFile}}
+\index{FuseGMockAllCcToFile@{FuseGMockAllCcToFile}!fuse\_gmock\_files@{fuse\_gmock\_files}}
+\doxysubsubsection{\texorpdfstring{FuseGMockAllCcToFile()}{FuseGMockAllCcToFile()}}
+{\footnotesize\ttfamily \label{namespacefuse__gmock__files_a17d95bfd0ac56b67262de63d085ab503} 
+fuse\+\_\+gmock\+\_\+files.\+Fuse\+GMock\+All\+Cc\+To\+File (\begin{DoxyParamCaption}\item[{}]{gmock\+\_\+root}{, }\item[{}]{output\+\_\+file}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Scans folder gmock_root to fuse gmock-all.cc into output_file.\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{fuse__gmock__files_8py_source_l00159}{159}} of file \mbox{\hyperlink{fuse__gmock__files_8py_source}{fuse\+\_\+gmock\+\_\+files.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00159\ \textcolor{keyword}{def\ }FuseGMockAllCcToFile(gmock\_root,\ output\_file):}
+\DoxyCodeLine{00160\ \ \ \textcolor{stringliteral}{"{}"{}"{}Scans\ folder\ gmock\_root\ to\ fuse\ gmock-\/all.cc\ into\ output\_file."{}"{}"{}}}
+\DoxyCodeLine{00161\ }
+\DoxyCodeLine{00162\ \ \ processed\_files\ =\ sets.Set()}
+\DoxyCodeLine{00163\ }
+\DoxyCodeLine{00164\ \ \ \textcolor{keyword}{def\ }ProcessFile(gmock\_source\_file):}
+\DoxyCodeLine{00165\ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Processes\ the\ given\ gmock\ source\ file."{}"{}"{}}}
+\DoxyCodeLine{00166\ }
+\DoxyCodeLine{00167\ \ \ \ \ \textcolor{comment}{\#\ We\ don't\ process\ the\ same\ \#included\ file\ twice.}}
+\DoxyCodeLine{00168\ \ \ \ \ \textcolor{keywordflow}{if}\ gmock\_source\_file\ \textcolor{keywordflow}{in}\ processed\_files:}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \textcolor{keywordflow}{return}}
+\DoxyCodeLine{00170\ }
+\DoxyCodeLine{00171\ \ \ \ \ processed\_files.add(gmock\_source\_file)}
+\DoxyCodeLine{00172\ }
+\DoxyCodeLine{00173\ \ \ \ \ \textcolor{comment}{\#\ Reads\ each\ line\ in\ the\ given\ gmock\ source\ file.}}
+\DoxyCodeLine{00174\ \ \ \ \ \textcolor{keywordflow}{for}\ line\ \textcolor{keywordflow}{in}\ file(os.path.join(gmock\_root,\ gmock\_source\_file),\ \textcolor{stringliteral}{'r'}):}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ m\ =\ INCLUDE\_GMOCK\_FILE\_REGEX.match(line)}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ m:}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ It's\ '\#include\ "{}gmock/foo.h"{}'.\ \ We\ treat\ it\ as\ '\#include}}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ "{}gmock/gmock.h"{}',\ as\ all\ other\ gmock\ headers\ are\ being\ fused}}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ into\ gmock.h\ and\ cannot\ be\ \#included\ directly.}}
+\DoxyCodeLine{00180\ }
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ There\ is\ no\ need\ to\ \#include\ "{}gmock/gmock.h"{}\ more\ than\ once.}}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keywordflow}{not}\ GMOCK\_H\_SEED\ \textcolor{keywordflow}{in}\ processed\_files:}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \ \ \ \ processed\_files.add(GMOCK\_H\_SEED)}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ \ \ output\_file.write(\textcolor{stringliteral}{'\#include\ "{}\%s"{}\(\backslash\)n'}\ \%\ (GMOCK\_H\_OUTPUT,))}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ m\ =\ gtest.INCLUDE\_GTEST\_FILE\_REGEX.match(line)}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ m:}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ It's\ '\#include\ "{}gtest/..."{}'.}}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ There\ is\ no\ need\ to\ \#include\ gtest.h\ as\ it\ has\ been}}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ \#included\ by\ gtest-\/all.cc.}}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{pass}}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \ \ \ \ m\ =\ gtest.INCLUDE\_SRC\_FILE\_REGEX.match(line)}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ m:}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ It's\ '\#include\ "{}src/foo"{}'\ -\/\ let's\ process\ it\ recursively.}}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \ \ \ \ ProcessFile(m.group(1))}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Otherwise\ we\ copy\ the\ line\ unchanged\ to\ the\ output\ file.}}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ \ \ \ \ output\_file.write(line)}
+\DoxyCodeLine{00200\ }
+\DoxyCodeLine{00201\ \ \ ProcessFile(GMOCK\_ALL\_CC\_SEED)}
+\DoxyCodeLine{00202\ }
+\DoxyCodeLine{00203\ }
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacefuse__gmock__files_a17d95bfd0ac56b67262de63d085ab503_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacefuse__gmock__files_aca6794aa64f1e2a30e5f2fbb05e37083}\index{fuse\_gmock\_files@{fuse\_gmock\_files}!FuseGMockGTestAllCc@{FuseGMockGTestAllCc}}
+\index{FuseGMockGTestAllCc@{FuseGMockGTestAllCc}!fuse\_gmock\_files@{fuse\_gmock\_files}}
+\doxysubsubsection{\texorpdfstring{FuseGMockGTestAllCc()}{FuseGMockGTestAllCc()}}
+{\footnotesize\ttfamily \label{namespacefuse__gmock__files_aca6794aa64f1e2a30e5f2fbb05e37083} 
+fuse\+\_\+gmock\+\_\+files.\+Fuse\+GMock\+GTest\+All\+Cc (\begin{DoxyParamCaption}\item[{}]{gmock\+\_\+root}{, }\item[{}]{output\+\_\+dir}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Scans folder gmock_root to generate gmock-gtest-all.cc in output_dir.\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{fuse__gmock__files_8py_source_l00204}{204}} of file \mbox{\hyperlink{fuse__gmock__files_8py_source}{fuse\+\_\+gmock\+\_\+files.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00204\ \textcolor{keyword}{def\ }FuseGMockGTestAllCc(gmock\_root,\ output\_dir):}
+\DoxyCodeLine{00205\ \ \ \textcolor{stringliteral}{"{}"{}"{}Scans\ folder\ gmock\_root\ to\ generate\ gmock-\/gtest-\/all.cc\ in\ output\_dir."{}"{}"{}}}
+\DoxyCodeLine{00206\ }
+\DoxyCodeLine{00207\ \ \ output\_file\ =\ file(os.path.join(output\_dir,\ GMOCK\_GTEST\_ALL\_CC\_OUTPUT),\ \textcolor{stringliteral}{'w'})}
+\DoxyCodeLine{00208\ \ \ \textcolor{comment}{\#\ First,\ fuse\ gtest-\/all.cc\ into\ gmock-\/gtest-\/all.cc.}}
+\DoxyCodeLine{00209\ \ \ gtest.FuseGTestAllCcToFile(GetGTestRootDir(gmock\_root),\ output\_file)}
+\DoxyCodeLine{00210\ \ \ \textcolor{comment}{\#\ Next,\ append\ fused\ gmock-\/all.cc\ to\ gmock-\/gtest-\/all.cc.}}
+\DoxyCodeLine{00211\ \ \ FuseGMockAllCcToFile(gmock\_root,\ output\_file)}
+\DoxyCodeLine{00212\ \ \ output\_file.close()}
+\DoxyCodeLine{00213\ }
+\DoxyCodeLine{00214\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacefuse__gmock__files_aca6794aa64f1e2a30e5f2fbb05e37083_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacefuse__gmock__files_aca6794aa64f1e2a30e5f2fbb05e37083_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacefuse__gmock__files_a8ecbbf6248e41609d85b32776508f419}\index{fuse\_gmock\_files@{fuse\_gmock\_files}!FuseGMockH@{FuseGMockH}}
+\index{FuseGMockH@{FuseGMockH}!fuse\_gmock\_files@{fuse\_gmock\_files}}
+\doxysubsubsection{\texorpdfstring{FuseGMockH()}{FuseGMockH()}}
+{\footnotesize\ttfamily \label{namespacefuse__gmock__files_a8ecbbf6248e41609d85b32776508f419} 
+fuse\+\_\+gmock\+\_\+files.\+Fuse\+GMockH (\begin{DoxyParamCaption}\item[{}]{gmock\+\_\+root}{, }\item[{}]{output\+\_\+dir}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Scans folder gmock_root to generate gmock/gmock.h in output_dir.\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{fuse__gmock__files_8py_source_l00119}{119}} of file \mbox{\hyperlink{fuse__gmock__files_8py_source}{fuse\+\_\+gmock\+\_\+files.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00119\ \textcolor{keyword}{def\ }FuseGMockH(gmock\_root,\ output\_dir):}
+\DoxyCodeLine{00120\ \ \ \textcolor{stringliteral}{"{}"{}"{}Scans\ folder\ gmock\_root\ to\ generate\ gmock/gmock.h\ in\ output\_dir."{}"{}"{}}}
+\DoxyCodeLine{00121\ }
+\DoxyCodeLine{00122\ \ \ output\_file\ =\ file(os.path.join(output\_dir,\ GMOCK\_H\_OUTPUT),\ \textcolor{stringliteral}{'w'})}
+\DoxyCodeLine{00123\ \ \ processed\_files\ =\ sets.Set()\ \ \textcolor{comment}{\#\ Holds\ all\ gmock\ headers\ we've\ processed.}}
+\DoxyCodeLine{00124\ }
+\DoxyCodeLine{00125\ \ \ \textcolor{keyword}{def\ }ProcessFile(gmock\_header\_path):}
+\DoxyCodeLine{00126\ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Processes\ the\ given\ gmock\ header\ file."{}"{}"{}}}
+\DoxyCodeLine{00127\ }
+\DoxyCodeLine{00128\ \ \ \ \ \textcolor{comment}{\#\ We\ don't\ process\ the\ same\ header\ twice.}}
+\DoxyCodeLine{00129\ \ \ \ \ \textcolor{keywordflow}{if}\ gmock\_header\_path\ \textcolor{keywordflow}{in}\ processed\_files:}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \textcolor{keywordflow}{return}}
+\DoxyCodeLine{00131\ }
+\DoxyCodeLine{00132\ \ \ \ \ processed\_files.add(gmock\_header\_path)}
+\DoxyCodeLine{00133\ }
+\DoxyCodeLine{00134\ \ \ \ \ \textcolor{comment}{\#\ Reads\ each\ line\ in\ the\ given\ gmock\ header.}}
+\DoxyCodeLine{00135\ \ \ \ \ \textcolor{keywordflow}{for}\ line\ \textcolor{keywordflow}{in}\ file(os.path.join(gmock\_root,\ gmock\_header\_path),\ \textcolor{stringliteral}{'r'}):}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ m\ =\ INCLUDE\_GMOCK\_FILE\_REGEX.match(line)}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ m:}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ It's\ '\#include\ "{}gmock/..."{}'\ -\/\ let's\ process\ it\ recursively.}}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ ProcessFile(\textcolor{stringliteral}{'include/'}\ +\ m.group(1))}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ m\ =\ gtest.INCLUDE\_GTEST\_FILE\_REGEX.match(line)}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ m:}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ It's\ '\#include\ "{}gtest/foo.h"{}'.\ \ We\ translate\ it\ to}}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ "{}gtest/gtest.h"{},\ regardless\ of\ what\ foo\ is,\ since\ all}}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ gtest\ headers\ are\ fused\ into\ gtest/gtest.h.}}
+\DoxyCodeLine{00146\ }
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ There\ is\ no\ need\ to\ \#include\ gtest.h\ twice.}}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keywordflow}{not}\ gtest.GTEST\_H\_SEED\ \textcolor{keywordflow}{in}\ processed\_files:}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \ \ \ \ processed\_files.add(gtest.GTEST\_H\_SEED)}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \ \ \ \ output\_file.write(\textcolor{stringliteral}{'\#include\ "{}\%s"{}\(\backslash\)n'}\ \%\ (gtest.GTEST\_H\_OUTPUT,))}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Otherwise\ we\ copy\ the\ line\ unchanged\ to\ the\ output\ file.}}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \ \ output\_file.write(line)}
+\DoxyCodeLine{00154\ }
+\DoxyCodeLine{00155\ \ \ ProcessFile(GMOCK\_H\_SEED)}
+\DoxyCodeLine{00156\ \ \ output\_file.close()}
+\DoxyCodeLine{00157\ }
+\DoxyCodeLine{00158\ }
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacefuse__gmock__files_a8ecbbf6248e41609d85b32776508f419_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacefuse__gmock__files_a5dbe055d6af58d0d95d8f12312c7091f}\index{fuse\_gmock\_files@{fuse\_gmock\_files}!GetGTestRootDir@{GetGTestRootDir}}
+\index{GetGTestRootDir@{GetGTestRootDir}!fuse\_gmock\_files@{fuse\_gmock\_files}}
+\doxysubsubsection{\texorpdfstring{GetGTestRootDir()}{GetGTestRootDir()}}
+{\footnotesize\ttfamily \label{namespacefuse__gmock__files_a5dbe055d6af58d0d95d8f12312c7091f} 
+fuse\+\_\+gmock\+\_\+files.\+Get\+GTest\+Root\+Dir (\begin{DoxyParamCaption}\item[{}]{gmock\+\_\+root}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Returns the root directory of Google Test.\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{fuse__gmock__files_8py_source_l00091}{91}} of file \mbox{\hyperlink{fuse__gmock__files_8py_source}{fuse\+\_\+gmock\+\_\+files.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00091\ \textcolor{keyword}{def\ }GetGTestRootDir(gmock\_root):}
+\DoxyCodeLine{00092\ \ \ \textcolor{stringliteral}{"{}"{}"{}Returns\ the\ root\ directory\ of\ Google\ Test."{}"{}"{}}}
+\DoxyCodeLine{00093\ }
+\DoxyCodeLine{00094\ \ \ \textcolor{keywordflow}{return}\ os.path.join(gmock\_root,\ \textcolor{stringliteral}{'../googletest'})}
+\DoxyCodeLine{00095\ }
+\DoxyCodeLine{00096\ }
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacefuse__gmock__files_a5dbe055d6af58d0d95d8f12312c7091f_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacefuse__gmock__files_a040a956c1856db183cc64326a5391e5d}\index{fuse\_gmock\_files@{fuse\_gmock\_files}!main@{main}}
+\index{main@{main}!fuse\_gmock\_files@{fuse\_gmock\_files}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{namespacefuse__gmock__files_a040a956c1856db183cc64326a5391e5d} 
+fuse\+\_\+gmock\+\_\+files.\+main (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{fuse__gmock__files_8py_source_l00226}{226}} of file \mbox{\hyperlink{fuse__gmock__files_8py_source}{fuse\+\_\+gmock\+\_\+files.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00226\ \textcolor{keyword}{def\ }\mbox{\hyperlink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}():}
+\DoxyCodeLine{00227\ \ \ argc\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}(sys.argv)}
+\DoxyCodeLine{00228\ \ \ \textcolor{keywordflow}{if}\ argc\ ==\ 2:}
+\DoxyCodeLine{00229\ \ \ \ \ \textcolor{comment}{\#\ fuse\_gmock\_files.py\ OUTPUT\_DIR}}
+\DoxyCodeLine{00230\ \ \ \ \ FuseGMock(DEFAULT\_GMOCK\_ROOT\_DIR,\ sys.argv[1])}
+\DoxyCodeLine{00231\ \ \ \textcolor{keywordflow}{elif}\ argc\ ==\ 3:}
+\DoxyCodeLine{00232\ \ \ \ \ \textcolor{comment}{\#\ fuse\_gmock\_files.py\ GMOCK\_ROOT\_DIR\ OUTPUT\_DIR}}
+\DoxyCodeLine{00233\ \ \ \ \ FuseGMock(sys.argv[1],\ sys.argv[2])}
+\DoxyCodeLine{00234\ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{00235\ \ \ \ \ \textcolor{keywordflow}{print}\ \_\_doc\_\_}
+\DoxyCodeLine{00236\ \ \ \ \ sys.exit(1)}
+\DoxyCodeLine{00237\ }
+\DoxyCodeLine{00238\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacefuse__gmock__files_a040a956c1856db183cc64326a5391e5d_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=197pt]{namespacefuse__gmock__files_a040a956c1856db183cc64326a5391e5d_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacefuse__gmock__files_ab911d1f96b031f57e7d28c4025fb0505}\index{fuse\_gmock\_files@{fuse\_gmock\_files}!ValidateGMockRootDir@{ValidateGMockRootDir}}
+\index{ValidateGMockRootDir@{ValidateGMockRootDir}!fuse\_gmock\_files@{fuse\_gmock\_files}}
+\doxysubsubsection{\texorpdfstring{ValidateGMockRootDir()}{ValidateGMockRootDir()}}
+{\footnotesize\ttfamily \label{namespacefuse__gmock__files_ab911d1f96b031f57e7d28c4025fb0505} 
+fuse\+\_\+gmock\+\_\+files.\+Validate\+GMock\+Root\+Dir (\begin{DoxyParamCaption}\item[{}]{gmock\+\_\+root}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Makes sure gmock_root points to a valid gmock root directory.
+
+The function aborts the program on failure.
+\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{fuse__gmock__files_8py_source_l00097}{97}} of file \mbox{\hyperlink{fuse__gmock__files_8py_source}{fuse\+\_\+gmock\+\_\+files.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00097\ \textcolor{keyword}{def\ }ValidateGMockRootDir(gmock\_root):}
+\DoxyCodeLine{00098\ \ \ \textcolor{stringliteral}{"{}"{}"{}Makes\ sure\ gmock\_root\ points\ to\ a\ valid\ gmock\ root\ directory.}}
+\DoxyCodeLine{00099\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00100\ \textcolor{stringliteral}{\ \ The\ function\ aborts\ the\ program\ on\ failure.}}
+\DoxyCodeLine{00101\ \textcolor{stringliteral}{\ \ "{}"{}"{}}}
+\DoxyCodeLine{00102\ }
+\DoxyCodeLine{00103\ \ \ gtest.ValidateGTestRootDir(GetGTestRootDir(gmock\_root))}
+\DoxyCodeLine{00104\ \ \ gtest.VerifyFileExists(gmock\_root,\ GMOCK\_H\_SEED)}
+\DoxyCodeLine{00105\ \ \ gtest.VerifyFileExists(gmock\_root,\ GMOCK\_ALL\_CC\_SEED)}
+\DoxyCodeLine{00106\ }
+\DoxyCodeLine{00107\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacefuse__gmock__files_ab911d1f96b031f57e7d28c4025fb0505_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacefuse__gmock__files_ab911d1f96b031f57e7d28c4025fb0505_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacefuse__gmock__files_a97ab00d3faec16c6574a8f548001294e}\index{fuse\_gmock\_files@{fuse\_gmock\_files}!ValidateOutputDir@{ValidateOutputDir}}
+\index{ValidateOutputDir@{ValidateOutputDir}!fuse\_gmock\_files@{fuse\_gmock\_files}}
+\doxysubsubsection{\texorpdfstring{ValidateOutputDir()}{ValidateOutputDir()}}
+{\footnotesize\ttfamily \label{namespacefuse__gmock__files_a97ab00d3faec16c6574a8f548001294e} 
+fuse\+\_\+gmock\+\_\+files.\+Validate\+Output\+Dir (\begin{DoxyParamCaption}\item[{}]{output\+\_\+dir}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Makes sure output_dir points to a valid output directory.
+
+The function aborts the program on failure.
+\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{fuse__gmock__files_8py_source_l00108}{108}} of file \mbox{\hyperlink{fuse__gmock__files_8py_source}{fuse\+\_\+gmock\+\_\+files.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00108\ \textcolor{keyword}{def\ }ValidateOutputDir(output\_dir):}
+\DoxyCodeLine{00109\ \ \ \textcolor{stringliteral}{"{}"{}"{}Makes\ sure\ output\_dir\ points\ to\ a\ valid\ output\ directory.}}
+\DoxyCodeLine{00110\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00111\ \textcolor{stringliteral}{\ \ The\ function\ aborts\ the\ program\ on\ failure.}}
+\DoxyCodeLine{00112\ \textcolor{stringliteral}{\ \ "{}"{}"{}}}
+\DoxyCodeLine{00113\ }
+\DoxyCodeLine{00114\ \ \ gtest.VerifyOutputFile(output\_dir,\ gtest.GTEST\_H\_OUTPUT)}
+\DoxyCodeLine{00115\ \ \ gtest.VerifyOutputFile(output\_dir,\ GMOCK\_H\_OUTPUT)}
+\DoxyCodeLine{00116\ \ \ gtest.VerifyOutputFile(output\_dir,\ GMOCK\_GTEST\_ALL\_CC\_OUTPUT)}
+\DoxyCodeLine{00117\ }
+\DoxyCodeLine{00118\ }
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacefuse__gmock__files_a97ab00d3faec16c6574a8f548001294e_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{namespacefuse__gmock__files_a900b64b34e20c7430b72252192a3c7ed}\index{fuse\_gmock\_files@{fuse\_gmock\_files}!DEFAULT\_GMOCK\_ROOT\_DIR@{DEFAULT\_GMOCK\_ROOT\_DIR}}
+\index{DEFAULT\_GMOCK\_ROOT\_DIR@{DEFAULT\_GMOCK\_ROOT\_DIR}!fuse\_gmock\_files@{fuse\_gmock\_files}}
+\doxysubsubsection{\texorpdfstring{DEFAULT\_GMOCK\_ROOT\_DIR}{DEFAULT\_GMOCK\_ROOT\_DIR}}
+{\footnotesize\ttfamily \label{namespacefuse__gmock__files_a900b64b34e20c7430b72252192a3c7ed} 
+fuse\+\_\+gmock\+\_\+files.\+DEFAULT\+\_\+\+GMOCK\+\_\+\+ROOT\+\_\+\+DIR = os.\+path.\+join(os.\+path.\+dirname(\+\_\+\+\_\+file\+\_\+\+\_\+), \textquotesingle{}..\textquotesingle{})}
+
+
+
+Definition at line \mbox{\hyperlink{fuse__gmock__files_8py_source_l00071}{71}} of file \mbox{\hyperlink{fuse__gmock__files_8py_source}{fuse\+\_\+gmock\+\_\+files.\+py}}.
+
+\Hypertarget{namespacefuse__gmock__files_afe8e67a915b4f19d7f9b69b4c109403f}\index{fuse\_gmock\_files@{fuse\_gmock\_files}!GMOCK\_ALL\_CC\_SEED@{GMOCK\_ALL\_CC\_SEED}}
+\index{GMOCK\_ALL\_CC\_SEED@{GMOCK\_ALL\_CC\_SEED}!fuse\_gmock\_files@{fuse\_gmock\_files}}
+\doxysubsubsection{\texorpdfstring{GMOCK\_ALL\_CC\_SEED}{GMOCK\_ALL\_CC\_SEED}}
+{\footnotesize\ttfamily \label{namespacefuse__gmock__files_afe8e67a915b4f19d7f9b69b4c109403f} 
+str fuse\+\_\+gmock\+\_\+files.\+GMOCK\+\_\+\+ALL\+\_\+\+CC\+\_\+\+SEED = \textquotesingle{}src/gmock-\/all.\+cc\textquotesingle{}}
+
+
+
+Definition at line \mbox{\hyperlink{fuse__gmock__files_8py_source_l00083}{83}} of file \mbox{\hyperlink{fuse__gmock__files_8py_source}{fuse\+\_\+gmock\+\_\+files.\+py}}.
+
+\Hypertarget{namespacefuse__gmock__files_a26c573e973fe80ab03a7dc3ff5093f78}\index{fuse\_gmock\_files@{fuse\_gmock\_files}!GMOCK\_GTEST\_ALL\_CC\_OUTPUT@{GMOCK\_GTEST\_ALL\_CC\_OUTPUT}}
+\index{GMOCK\_GTEST\_ALL\_CC\_OUTPUT@{GMOCK\_GTEST\_ALL\_CC\_OUTPUT}!fuse\_gmock\_files@{fuse\_gmock\_files}}
+\doxysubsubsection{\texorpdfstring{GMOCK\_GTEST\_ALL\_CC\_OUTPUT}{GMOCK\_GTEST\_ALL\_CC\_OUTPUT}}
+{\footnotesize\ttfamily \label{namespacefuse__gmock__files_a26c573e973fe80ab03a7dc3ff5093f78} 
+str fuse\+\_\+gmock\+\_\+files.\+GMOCK\+\_\+\+GTEST\+\_\+\+ALL\+\_\+\+CC\+\_\+\+OUTPUT = \textquotesingle{}gmock-\/\mbox{\hyperlink{namespacefuse__gmock__files_a3fb36dbe8d361f9ecc54e1aa4b94b068}{gtest}}-\/all.\+cc\textquotesingle{}}
+
+
+
+Definition at line \mbox{\hyperlink{fuse__gmock__files_8py_source_l00088}{88}} of file \mbox{\hyperlink{fuse__gmock__files_8py_source}{fuse\+\_\+gmock\+\_\+files.\+py}}.
+
+\Hypertarget{namespacefuse__gmock__files_a94c0785996934b48537f271a3e9031a3}\index{fuse\_gmock\_files@{fuse\_gmock\_files}!GMOCK\_H\_OUTPUT@{GMOCK\_H\_OUTPUT}}
+\index{GMOCK\_H\_OUTPUT@{GMOCK\_H\_OUTPUT}!fuse\_gmock\_files@{fuse\_gmock\_files}}
+\doxysubsubsection{\texorpdfstring{GMOCK\_H\_OUTPUT}{GMOCK\_H\_OUTPUT}}
+{\footnotesize\ttfamily \label{namespacefuse__gmock__files_a94c0785996934b48537f271a3e9031a3} 
+str fuse\+\_\+gmock\+\_\+files.\+GMOCK\+\_\+\+H\+\_\+\+OUTPUT = \textquotesingle{}gmock/gmock.\+h\textquotesingle{}}
+
+
+
+Definition at line \mbox{\hyperlink{fuse__gmock__files_8py_source_l00087}{87}} of file \mbox{\hyperlink{fuse__gmock__files_8py_source}{fuse\+\_\+gmock\+\_\+files.\+py}}.
+
+\Hypertarget{namespacefuse__gmock__files_a97ee2dfa0e0df8426b1dcadcba74060b}\index{fuse\_gmock\_files@{fuse\_gmock\_files}!GMOCK\_H\_SEED@{GMOCK\_H\_SEED}}
+\index{GMOCK\_H\_SEED@{GMOCK\_H\_SEED}!fuse\_gmock\_files@{fuse\_gmock\_files}}
+\doxysubsubsection{\texorpdfstring{GMOCK\_H\_SEED}{GMOCK\_H\_SEED}}
+{\footnotesize\ttfamily \label{namespacefuse__gmock__files_a97ee2dfa0e0df8426b1dcadcba74060b} 
+str fuse\+\_\+gmock\+\_\+files.\+GMOCK\+\_\+\+H\+\_\+\+SEED = \textquotesingle{}include/gmock/gmock.\+h\textquotesingle{}}
+
+
+
+Definition at line \mbox{\hyperlink{fuse__gmock__files_8py_source_l00082}{82}} of file \mbox{\hyperlink{fuse__gmock__files_8py_source}{fuse\+\_\+gmock\+\_\+files.\+py}}.
+
+\Hypertarget{namespacefuse__gmock__files_a3fb36dbe8d361f9ecc54e1aa4b94b068}\index{fuse\_gmock\_files@{fuse\_gmock\_files}!gtest@{gtest}}
+\index{gtest@{gtest}!fuse\_gmock\_files@{fuse\_gmock\_files}}
+\doxysubsubsection{\texorpdfstring{gtest}{gtest}}
+{\footnotesize\ttfamily \label{namespacefuse__gmock__files_a3fb36dbe8d361f9ecc54e1aa4b94b068} 
+fuse\+\_\+gmock\+\_\+files.\+gtest = fuse\+\_\+gtest\+\_\+files}
+
+
+
+Definition at line \mbox{\hyperlink{fuse__gmock__files_8py_source_l00076}{76}} of file \mbox{\hyperlink{fuse__gmock__files_8py_source}{fuse\+\_\+gmock\+\_\+files.\+py}}.
+
+\Hypertarget{namespacefuse__gmock__files_a47742af71dda33b3da2f1fc6da90ac48}\index{fuse\_gmock\_files@{fuse\_gmock\_files}!GTEST\_H\_OUTPUT@{GTEST\_H\_OUTPUT}}
+\index{GTEST\_H\_OUTPUT@{GTEST\_H\_OUTPUT}!fuse\_gmock\_files@{fuse\_gmock\_files}}
+\doxysubsubsection{\texorpdfstring{GTEST\_H\_OUTPUT}{GTEST\_H\_OUTPUT}}
+{\footnotesize\ttfamily \label{namespacefuse__gmock__files_a47742af71dda33b3da2f1fc6da90ac48} 
+str fuse\+\_\+gmock\+\_\+files.\+GTEST\+\_\+\+H\+\_\+\+OUTPUT = \textquotesingle{}\mbox{\hyperlink{namespacefuse__gmock__files_a3fb36dbe8d361f9ecc54e1aa4b94b068}{gtest}}/gtest.\+h\textquotesingle{}}
+
+
+
+Definition at line \mbox{\hyperlink{fuse__gmock__files_8py_source_l00086}{86}} of file \mbox{\hyperlink{fuse__gmock__files_8py_source}{fuse\+\_\+gmock\+\_\+files.\+py}}.
+
+\Hypertarget{namespacefuse__gmock__files_aeb4457451f878d6bc8a42f7ff3e5f6cf}\index{fuse\_gmock\_files@{fuse\_gmock\_files}!INCLUDE\_GMOCK\_FILE\_REGEX@{INCLUDE\_GMOCK\_FILE\_REGEX}}
+\index{INCLUDE\_GMOCK\_FILE\_REGEX@{INCLUDE\_GMOCK\_FILE\_REGEX}!fuse\_gmock\_files@{fuse\_gmock\_files}}
+\doxysubsubsection{\texorpdfstring{INCLUDE\_GMOCK\_FILE\_REGEX}{INCLUDE\_GMOCK\_FILE\_REGEX}}
+{\footnotesize\ttfamily \label{namespacefuse__gmock__files_aeb4457451f878d6bc8a42f7ff3e5f6cf} 
+fuse\+\_\+gmock\+\_\+files.\+INCLUDE\+\_\+\+GMOCK\+\_\+\+FILE\+\_\+\+REGEX = re.\+compile(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\textquotesingle{}\texorpdfstring{$^\wedge$}{\string^}\textbackslash{}\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\texorpdfstring{$\ast$}{*}\#\textbackslash{}\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\texorpdfstring{$\ast$}{*}include\textbackslash{}s\texorpdfstring{$\ast$}{*}"{}(gmock/.+)"{}\textquotesingle{})}
+
+
+
+Definition at line \mbox{\hyperlink{fuse__gmock__files_8py_source_l00079}{79}} of file \mbox{\hyperlink{fuse__gmock__files_8py_source}{fuse\+\_\+gmock\+\_\+files.\+py}}.
+

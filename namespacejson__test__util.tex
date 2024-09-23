@@ -1,0 +1,238 @@
+\doxysection{json\+\_\+test\+\_\+util Namespace Reference}
+\hypertarget{namespacejson__test__util}{}\label{namespacejson__test__util}\index{json\_test\_util@{json\_test\_util}}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+const std\+::string \mbox{\hyperlink{namespacejson__test__util_ad6bad2ec8fd89dc114b6599ca0416dc9}{repeat\+\_\+chars}} (\mbox{\hyperlink{namespacejson__test__util_aca7d837defed360c051388763cb7f97b}{repeat\+\_\+char\+\_\+num}}, \textquotesingle{}\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\textquotesingle{})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+constexpr size\+\_\+t \mbox{\hyperlink{namespacejson__test__util_a833dc54843a301f60cbf9763b9ea85ab}{exception\+\_\+limit\+\_\+size}} = 250
+\item 
+const json\+::yield\+\_\+function\+\_\+t \mbox{\hyperlink{namespacejson__test__util_a60038ccb3db7302bd3d8d4d609d95bf0}{yield\+\_\+deadline\+\_\+exception\+\_\+at\+\_\+start}}
+\item 
+const json\+::yield\+\_\+function\+\_\+t \mbox{\hyperlink{namespacejson__test__util_a5853467a7c801e3b9435ea0968547fc5}{yield\+\_\+deadline\+\_\+exception\+\_\+in\+\_\+mid}}
+\item 
+const json\+::yield\+\_\+function\+\_\+t \mbox{\hyperlink{namespacejson__test__util_a80ef3394249c0f81b96431022b7e35f6}{yield\+\_\+length\+\_\+exception}}
+\item 
+const json\+::yield\+\_\+function\+\_\+t \mbox{\hyperlink{namespacejson__test__util_a8059bee23fb1d9a620cd07a1fadd0494}{yield\+\_\+no\+\_\+limitation}}
+\item 
+const auto \mbox{\hyperlink{namespacejson__test__util_a9d1e4b2c8886716c2b0f2a669d8e3c7f}{time\+\_\+except\+\_\+verf\+\_\+func}}
+\item 
+const auto \mbox{\hyperlink{namespacejson__test__util_a82dbdaa15a0f3c178a264a8e5a24c805}{length\+\_\+limit\+\_\+except\+\_\+verf\+\_\+func}}
+\item 
+constexpr size\+\_\+t \mbox{\hyperlink{namespacejson__test__util_aca7d837defed360c051388763cb7f97b}{repeat\+\_\+char\+\_\+num}} = 512
+\item 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacejson__test__util_ab040b504922fea186b59a23c84b7b6c0}{escape\+\_\+input\+\_\+str}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacejson__test__util_ad6bad2ec8fd89dc114b6599ca0416dc9}\index{json\_test\_util@{json\_test\_util}!repeat\_chars@{repeat\_chars}}
+\index{repeat\_chars@{repeat\_chars}!json\_test\_util@{json\_test\_util}}
+\doxysubsubsection{\texorpdfstring{repeat\_chars()}{repeat\_chars()}}
+{\footnotesize\ttfamily \label{namespacejson__test__util_ad6bad2ec8fd89dc114b6599ca0416dc9} 
+const std\+::string json\+\_\+test\+\_\+util\+::repeat\+\_\+chars (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacejson__test__util_aca7d837defed360c051388763cb7f97b}{repeat\+\_\+char\+\_\+num}}}]{}{, }\item[{\textquotesingle{}\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\textquotesingle{}}]{}{}\end{DoxyParamCaption})}
+
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=187pt]{namespacejson__test__util_ad6bad2ec8fd89dc114b6599ca0416dc9_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacejson__test__util_ad6bad2ec8fd89dc114b6599ca0416dc9_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{namespacejson__test__util_ab040b504922fea186b59a23c84b7b6c0}\index{json\_test\_util@{json\_test\_util}!escape\_input\_str@{escape\_input\_str}}
+\index{escape\_input\_str@{escape\_input\_str}!json\_test\_util@{json\_test\_util}}
+\doxysubsubsection{\texorpdfstring{escape\_input\_str}{escape\_input\_str}}
+{\footnotesize\ttfamily \label{namespacejson__test__util_ab040b504922fea186b59a23c84b7b6c0} 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} json\+\_\+test\+\_\+util\+::escape\+\_\+input\+\_\+str}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)b\(\backslash\)\(\backslash\)f\(\backslash\)\(\backslash\)n\(\backslash\)\(\backslash\)r\(\backslash\)\(\backslash\)t-\/\(\backslash\)\(\backslash\)-\/\(\backslash\)\(\backslash\)\(\backslash\)\(\backslash\)-\/\(\backslash\)\(\backslash\)x0\(\backslash\)\(\backslash\)x01\(\backslash\)\(\backslash\)x02\(\backslash\)\(\backslash\)x03\(\backslash\)\(\backslash\)x04\(\backslash\)\(\backslash\)x05\(\backslash\)\(\backslash\)x06\(\backslash\)\(\backslash\)x07\(\backslash\)\(\backslash\)x08\(\backslash\)\(\backslash\)x09\(\backslash\)\(\backslash\)x0a\(\backslash\)\(\backslash\)x0b\(\backslash\)\(\backslash\)x0c\(\backslash\)\(\backslash\)x0d\(\backslash\)\(\backslash\)x0e\(\backslash\)\(\backslash\)x0f"{}}\ \ }
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)x10\(\backslash\)\(\backslash\)x11\(\backslash\)\(\backslash\)x12\(\backslash\)\(\backslash\)x13\(\backslash\)\(\backslash\)x14\(\backslash\)\(\backslash\)x15\(\backslash\)\(\backslash\)x16\(\backslash\)\(\backslash\)x17\(\backslash\)\(\backslash\)x18\(\backslash\)\(\backslash\)x19\(\backslash\)\(\backslash\)x1a\(\backslash\)\(\backslash\)x1b\(\backslash\)\(\backslash\)x1c\(\backslash\)\(\backslash\)x1d\(\backslash\)\(\backslash\)x1e\(\backslash\)\(\backslash\)x1f-\/"{}}\ +\ \mbox{\hyperlink{namespacejson__test__util_ad6bad2ec8fd89dc114b6599ca0416dc9}{repeat\_chars}}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{test__json_8cpp_source_l00042}{42}} of file \mbox{\hyperlink{test__json_8cpp_source}{test\+\_\+json.\+cpp}}.
+
+\Hypertarget{namespacejson__test__util_a833dc54843a301f60cbf9763b9ea85ab}\index{json\_test\_util@{json\_test\_util}!exception\_limit\_size@{exception\_limit\_size}}
+\index{exception\_limit\_size@{exception\_limit\_size}!json\_test\_util@{json\_test\_util}}
+\doxysubsubsection{\texorpdfstring{exception\_limit\_size}{exception\_limit\_size}}
+{\footnotesize\ttfamily \label{namespacejson__test__util_a833dc54843a301f60cbf9763b9ea85ab} 
+size\+\_\+t json\+\_\+test\+\_\+util\+::exception\+\_\+limit\+\_\+size = 250\hspace{0.3cm}{\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{test__json_8cpp_source_l00012}{12}} of file \mbox{\hyperlink{test__json_8cpp_source}{test\+\_\+json.\+cpp}}.
+
+\Hypertarget{namespacejson__test__util_a82dbdaa15a0f3c178a264a8e5a24c805}\index{json\_test\_util@{json\_test\_util}!length\_limit\_except\_verf\_func@{length\_limit\_except\_verf\_func}}
+\index{length\_limit\_except\_verf\_func@{length\_limit\_except\_verf\_func}!json\_test\_util@{json\_test\_util}}
+\doxysubsubsection{\texorpdfstring{length\_limit\_except\_verf\_func}{length\_limit\_except\_verf\_func}}
+{\footnotesize\ttfamily \label{namespacejson__test__util_a82dbdaa15a0f3c178a264a8e5a24c805} 
+const auto json\+\_\+test\+\_\+util\+::length\+\_\+limit\+\_\+except\+\_\+verf\+\_\+func}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=\ [](\textcolor{keyword}{const}\ fc::assert\_exception\&\ ex)\ -\/>\ \textcolor{keywordtype}{bool}\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keywordflow}{return}\ (\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(ex.code\_value)\ ==\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(\mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca0609f726018df8d223cd932c85d31b6c}{fc::exception\_code::assert\_exception\_code}}));}
+\DoxyCodeLine{\ \ \ \}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{test__json_8cpp_source_l00036}{36}} of file \mbox{\hyperlink{test__json_8cpp_source}{test\+\_\+json.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(ex.code\_value)\ ==\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(\mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca0609f726018df8d223cd932c85d31b6c}{fc::exception\_code::assert\_exception\_code}}));}
+\DoxyCodeLine{00038\ \ \ \ \};}
+
+\end{DoxyCode}
+\Hypertarget{namespacejson__test__util_aca7d837defed360c051388763cb7f97b}\index{json\_test\_util@{json\_test\_util}!repeat\_char\_num@{repeat\_char\_num}}
+\index{repeat\_char\_num@{repeat\_char\_num}!json\_test\_util@{json\_test\_util}}
+\doxysubsubsection{\texorpdfstring{repeat\_char\_num}{repeat\_char\_num}}
+{\footnotesize\ttfamily \label{namespacejson__test__util_aca7d837defed360c051388763cb7f97b} 
+size\+\_\+t json\+\_\+test\+\_\+util\+::repeat\+\_\+char\+\_\+num = 512\hspace{0.3cm}{\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{test__json_8cpp_source_l00040}{40}} of file \mbox{\hyperlink{test__json_8cpp_source}{test\+\_\+json.\+cpp}}.
+
+\Hypertarget{namespacejson__test__util_a9d1e4b2c8886716c2b0f2a669d8e3c7f}\index{json\_test\_util@{json\_test\_util}!time\_except\_verf\_func@{time\_except\_verf\_func}}
+\index{time\_except\_verf\_func@{time\_except\_verf\_func}!json\_test\_util@{json\_test\_util}}
+\doxysubsubsection{\texorpdfstring{time\_except\_verf\_func}{time\_except\_verf\_func}}
+{\footnotesize\ttfamily \label{namespacejson__test__util_a9d1e4b2c8886716c2b0f2a669d8e3c7f} 
+const auto json\+\_\+test\+\_\+util\+::time\+\_\+except\+\_\+verf\+\_\+func}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=\ [](\textcolor{keyword}{const}\ fc::timeout\_exception\&\ ex)\ -\/>\ \textcolor{keywordtype}{bool}\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keywordflow}{return}\ (\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(ex.code\_value)\ ==\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(\mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca0269f214acef1ad4c7531974bc011893}{fc::exception\_code::timeout\_exception\_code}}));}
+\DoxyCodeLine{\ \ \ \}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{test__json_8cpp_source_l00032}{32}} of file \mbox{\hyperlink{test__json_8cpp_source}{test\+\_\+json.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(ex.code\_value)\ ==\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(\mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca0269f214acef1ad4c7531974bc011893}{fc::exception\_code::timeout\_exception\_code}}));}
+\DoxyCodeLine{00034\ \ \ \ \};}
+
+\end{DoxyCode}
+\Hypertarget{namespacejson__test__util_a60038ccb3db7302bd3d8d4d609d95bf0}\index{json\_test\_util@{json\_test\_util}!yield\_deadline\_exception\_at\_start@{yield\_deadline\_exception\_at\_start}}
+\index{yield\_deadline\_exception\_at\_start@{yield\_deadline\_exception\_at\_start}!json\_test\_util@{json\_test\_util}}
+\doxysubsubsection{\texorpdfstring{yield\_deadline\_exception\_at\_start}{yield\_deadline\_exception\_at\_start}}
+{\footnotesize\ttfamily \label{namespacejson__test__util_a60038ccb3db7302bd3d8d4d609d95bf0} 
+const json\+::yield\+\_\+function\+\_\+t json\+\_\+test\+\_\+util\+::yield\+\_\+deadline\+\_\+exception\+\_\+at\+\_\+start}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=\ [](\textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a03f2a3185ee8e8b39a309dfd336b64b5}{FC\_CHECK\_DEADLINE}}(\mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{fc::time\_point::now}}()\ -\/\ \mbox{\hyperlink{namespacefc_a76ae235ec7e9b8862e70740058d7eb1b}{fc::milliseconds}}(1));}
+\DoxyCodeLine{\ \ \ \}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{test__json_8cpp_source_l00014}{14}} of file \mbox{\hyperlink{test__json_8cpp_source}{test\+\_\+json.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00014\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a03f2a3185ee8e8b39a309dfd336b64b5}{FC\_CHECK\_DEADLINE}}(\mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{fc::time\_point::now}}()\ -\/\ \mbox{\hyperlink{namespacefc_a76ae235ec7e9b8862e70740058d7eb1b}{fc::milliseconds}}(1));}
+\DoxyCodeLine{00016\ \ \ \ \};}
+
+\end{DoxyCode}
+\Hypertarget{namespacejson__test__util_a5853467a7c801e3b9435ea0968547fc5}\index{json\_test\_util@{json\_test\_util}!yield\_deadline\_exception\_in\_mid@{yield\_deadline\_exception\_in\_mid}}
+\index{yield\_deadline\_exception\_in\_mid@{yield\_deadline\_exception\_in\_mid}!json\_test\_util@{json\_test\_util}}
+\doxysubsubsection{\texorpdfstring{yield\_deadline\_exception\_in\_mid}{yield\_deadline\_exception\_in\_mid}}
+{\footnotesize\ttfamily \label{namespacejson__test__util_a5853467a7c801e3b9435ea0968547fc5} 
+const json\+::yield\+\_\+function\+\_\+t json\+\_\+test\+\_\+util\+::yield\+\_\+deadline\+\_\+exception\+\_\+in\+\_\+mid}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=\ [](\textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ >=\ exception\_limit\_size)\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ fc::timeout\_exception(\mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca0269f214acef1ad4c7531974bc011893}{fc::exception\_code::timeout\_exception\_code}},\ \textcolor{stringliteral}{"{}timeout\_exception"{}},\ \textcolor{stringliteral}{"{}execution\ timed\ out"{}}\ );}
+\DoxyCodeLine{\ \ \ \ \ \ \}}
+\DoxyCodeLine{\ \ \ \}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{test__json_8cpp_source_l00018}{18}} of file \mbox{\hyperlink{test__json_8cpp_source}{test\+\_\+json.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ >=\ exception\_limit\_size)\ \{}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ fc::timeout\_exception(\mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca0269f214acef1ad4c7531974bc011893}{fc::exception\_code::timeout\_exception\_code}},\ \textcolor{stringliteral}{"{}timeout\_exception"{}},\ \textcolor{stringliteral}{"{}execution\ timed\ out"{}}\ );}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00022\ \ \ \ \};}
+
+\end{DoxyCode}
+\Hypertarget{namespacejson__test__util_a80ef3394249c0f81b96431022b7e35f6}\index{json\_test\_util@{json\_test\_util}!yield\_length\_exception@{yield\_length\_exception}}
+\index{yield\_length\_exception@{yield\_length\_exception}!json\_test\_util@{json\_test\_util}}
+\doxysubsubsection{\texorpdfstring{yield\_length\_exception}{yield\_length\_exception}}
+{\footnotesize\ttfamily \label{namespacejson__test__util_a80ef3394249c0f81b96431022b7e35f6} 
+const json\+::yield\+\_\+function\+\_\+t json\+\_\+test\+\_\+util\+::yield\+\_\+length\+\_\+exception}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=\ [](\textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ <=\ exception\_limit\_size\ );}
+\DoxyCodeLine{\ \ \ \}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{test__json_8cpp_source_l00024}{24}} of file \mbox{\hyperlink{test__json_8cpp_source}{test\+\_\+json.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ <=\ exception\_limit\_size\ );}
+\DoxyCodeLine{00026\ \ \ \ \};}
+
+\end{DoxyCode}
+\Hypertarget{namespacejson__test__util_a8059bee23fb1d9a620cd07a1fadd0494}\index{json\_test\_util@{json\_test\_util}!yield\_no\_limitation@{yield\_no\_limitation}}
+\index{yield\_no\_limitation@{yield\_no\_limitation}!json\_test\_util@{json\_test\_util}}
+\doxysubsubsection{\texorpdfstring{yield\_no\_limitation}{yield\_no\_limitation}}
+{\footnotesize\ttfamily \label{namespacejson__test__util_a8059bee23fb1d9a620cd07a1fadd0494} 
+const json\+::yield\+\_\+function\+\_\+t json\+\_\+test\+\_\+util\+::yield\+\_\+no\+\_\+limitation}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=\ [](\textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ }
+\DoxyCodeLine{\ \ \ \}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{test__json_8cpp_source_l00028}{28}} of file \mbox{\hyperlink{test__json_8cpp_source}{test\+\_\+json.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \textcolor{comment}{//\ no\ limitation}}
+\DoxyCodeLine{00030\ \ \ \ \};}
+
+\end{DoxyCode}

@@ -1,0 +1,182 @@
+\doxysection{parsebyparts.\+cpp}
+\hypertarget{parsebyparts_8cpp_source}{}\label{parsebyparts_8cpp_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/example/parsebyparts/parsebyparts.cpp@{libraries/fc/include/fc/crypto/webauthn\_json/example/parsebyparts/parsebyparts.cpp}}
+\mbox{\hyperlink{parsebyparts_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00001}00001\ \textcolor{comment}{//\ Example\ of\ parsing\ JSON\ to\ document\ by\ parts.}}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00003}00003\ \textcolor{comment}{//\ Using\ C++11\ threads}}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00004}00004\ \textcolor{comment}{//\ Temporarily\ disable\ for\ clang\ (older\ version)\ due\ to\ incompatibility\ with\ libstdc++}}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#if\ (\_\_cplusplus\ >=\ 201103L\ ||\ (defined(\_MSC\_VER)\ \&\&\ \_MSC\_VER\ >=\ 1700))\ \&\&\ !defined(\_\_clang\_\_)}}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{document_8h}{rapidjson/document.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{en_8h}{rapidjson/error/en.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{writer_8h}{rapidjson/writer.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ostreamwrapper_8h}{rapidjson/ostreamwrapper.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00011}00011\ \textcolor{preprocessor}{\#include\ <condition\_variable>}}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00012}00012\ \textcolor{preprocessor}{\#include\ <iostream>}}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00013}00013\ \textcolor{preprocessor}{\#include\ <mutex>}}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00014}00014\ \textcolor{preprocessor}{\#include\ <thread>}}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00016}00016\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacerapidjson}{rapidjson}};}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00018}00018\ \textcolor{keyword}{template}<\textcolor{keywordtype}{unsigned}\ parseFlags\ =\ kParseDefaultFlags>}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00019}00019\ \textcolor{keyword}{class\ }AsyncDocumentParser\ \{}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00020}00020\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00021}00021\ \ \ \ \ AsyncDocumentParser(\mbox{\hyperlink{class_generic_document}{Document}}\&\ d)}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00022}00022\ \ \ \ \ \ \ \ \ :\ stream\_(*this)}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00023}00023\ \ \ \ \ \ \ \ \ ,\ d\_(\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}})}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00024}00024\ \ \ \ \ \ \ \ \ ,\ parseThread\_()}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00025}00025\ \ \ \ \ \ \ \ \ ,\ mutex\_()}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00026}00026\ \ \ \ \ \ \ \ \ ,\ notEmpty\_()}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00027}00027\ \ \ \ \ \ \ \ \ ,\ finish\_()}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00028}00028\ \ \ \ \ \ \ \ \ ,\ completed\_()}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00029}00029\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00030}00030\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Create\ and\ execute\ thread\ after\ all\ member\ variables\ are\ initialized.}}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00031}00031\ \ \ \ \ \ \ \ \ parseThread\_\ =\ std::thread(\&AsyncDocumentParser::Parse,\ \textcolor{keyword}{this});}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00032}00032\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00034}00034\ \ \ \ \ \string~AsyncDocumentParser()\ \{}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00035}00035\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!parseThread\_.joinable())}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00036}00036\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00038}00038\ \ \ \ \ \ \ \ \ \{\ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00039}00039\ \ \ \ \ \ \ \ \ \ \ \ \ std::unique\_lock<std::mutex>\ \mbox{\hyperlink{xbyak__mnemonic_8h_aa81aed607133209dade63a226818224d}{lock}}(mutex\_);}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00041}00041\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Wait\ until\ the\ buffer\ is\ read\ up\ (or\ parsing\ is\ completed)}}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00042}00042\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (!stream\_.Empty()\ \&\&\ !completed\_)}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00043}00043\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ finish\_.wait(lock);}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00045}00045\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Automatically\ append\ '\(\backslash\)0'\ as\ the\ terminator\ in\ the\ stream.}}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00046}00046\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ terminator[]\ =\ \textcolor{stringliteral}{"{}"{}};}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00047}00047\ \ \ \ \ \ \ \ \ \ \ \ \ stream\_.src\_\ =\ terminator;}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \ \ \ stream\_.end\_\ =\ terminator\ +\ 1;}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \ \ \ \ notEmpty\_.notify\_one();\ \textcolor{comment}{//\ unblock\ the\ AsyncStringStream}}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00050}00050\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00052}00052\ \ \ \ \ \ \ \ \ parseThread\_.join();}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00053}00053\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00054}00054\ }
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00055}00055\ \ \ \ \ \textcolor{keywordtype}{void}\ ParsePart(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ buffer,\ \textcolor{keywordtype}{size\_t}\ length)\ \{}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00056}00056\ \ \ \ \ \ \ \ \ std::unique\_lock<std::mutex>\ \mbox{\hyperlink{xbyak__mnemonic_8h_aa81aed607133209dade63a226818224d}{lock}}(mutex\_);}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00057}00057\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00058}00058\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Wait\ until\ the\ buffer\ is\ read\ up\ (or\ parsing\ is\ completed)}}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00059}00059\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (!stream\_.Empty()\ \&\&\ !completed\_)}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \ \ \ finish\_.wait(lock);}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00062}00062\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Stop\ further\ parsing\ if\ the\ parsing\ process\ is\ completed.}}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00063}00063\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (completed\_)}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00064}00064\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00066}00066\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Set\ the\ buffer\ to\ stream\ and\ unblock\ the\ AsyncStringStream}}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00067}00067\ \ \ \ \ \ \ \ \ stream\_.src\_\ =\ buffer;}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00068}00068\ \ \ \ \ \ \ \ \ stream\_.end\_\ =\ buffer\ +\ length;}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00069}00069\ \ \ \ \ \ \ \ \ notEmpty\_.notify\_one();}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00070}00070\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00072}00072\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00073}00073\ \ \ \ \ \textcolor{keywordtype}{void}\ Parse()\ \{}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00074}00074\ \ \ \ \ \ \ \ \ d\_.ParseStream<parseFlags>(stream\_);}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00075}00075\ }
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00076}00076\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ The\ stream\ may\ not\ be\ fully\ read,\ notify\ finish\ anyway\ to\ unblock\ ParsePart()}}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00077}00077\ \ \ \ \ \ \ \ \ std::unique\_lock<std::mutex>\ \mbox{\hyperlink{xbyak__mnemonic_8h_aa81aed607133209dade63a226818224d}{lock}}(mutex\_);}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00078}00078\ \ \ \ \ \ \ \ \ completed\_\ =\ \textcolor{keyword}{true};\ \ \ \ \ \ \textcolor{comment}{//\ Parsing\ process\ is\ completed}}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00079}00079\ \ \ \ \ \ \ \ \ finish\_.notify\_one();\ \ \ \textcolor{comment}{//\ Unblock\ ParsePart()\ or\ destructor\ if\ they\ are\ waiting.}}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00080}00080\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00081}00081\ }
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00082}00082\ \ \ \ \ \textcolor{keyword}{struct\ }AsyncStringStream\ \{}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00083}00083\ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}};}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00084}00084\ }
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00085}00085\ \ \ \ \ \ \ \ \ AsyncStringStream(AsyncDocumentParser\&\ parser)\ :\ parser\_(\mbox{\hyperlink{namespaceupload_af9e508d19dc2dd9cdb7c642dde0bdd21}{parser}}),\ src\_(),\ end\_(),\ count\_()\ \{\}}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00086}00086\ }
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00087}00087\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ Peek()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00088}00088\ \ \ \ \ \ \ \ \ \ \ \ \ std::unique\_lock<std::mutex>\ \mbox{\hyperlink{xbyak__mnemonic_8h_aa81aed607133209dade63a226818224d}{lock}}(parser\_.mutex\_);}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00089}00089\ }
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00090}00090\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ nothing\ in\ stream,\ block\ to\ wait.}}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00091}00091\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (Empty())}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00092}00092\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ parser\_.notEmpty\_.wait(lock);}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00093}00093\ }
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00094}00094\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *src\_;}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00095}00095\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00096}00096\ }
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00097}00097\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ Take()\ \{}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00098}00098\ \ \ \ \ \ \ \ \ \ \ \ \ std::unique\_lock<std::mutex>\ \mbox{\hyperlink{xbyak__mnemonic_8h_aa81aed607133209dade63a226818224d}{lock}}(parser\_.mutex\_);}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00099}00099\ }
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00100}00100\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ nothing\ in\ stream,\ block\ to\ wait.}}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00101}00101\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (Empty())}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00102}00102\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ parser\_.notEmpty\_.wait(lock);}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00103}00103\ }
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00104}00104\ \ \ \ \ \ \ \ \ \ \ \ \ count\_++;}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00105}00105\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ c\ =\ *src\_++;}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00106}00106\ }
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00107}00107\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ all\ stream\ is\ read\ up,\ notify\ that\ the\ stream\ is\ finish.}}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00108}00108\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (Empty())}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00109}00109\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ parser\_.finish\_.notify\_one();}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00110}00110\ }
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00111}00111\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ c;}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00112}00112\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00113}00113\ }
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00114}00114\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ Tell()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ count\_;\ \}}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00115}00115\ }
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00116}00116\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Not\ implemented}}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00117}00117\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}*\ PutBegin()\ \{\ \textcolor{keywordflow}{return}\ 0;\ \}}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00118}00118\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{bench_8cpp_a8496465558c5f8a68e4583295fb89c7d}{Put}}(\textcolor{keywordtype}{char})\ \{\}}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00119}00119\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ Flush()\ \{\}}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00120}00120\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ PutEnd(\textcolor{keywordtype}{char}*)\ \{\ \textcolor{keywordflow}{return}\ 0;\ \}}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00121}00121\ }
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00122}00122\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ Empty()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ src\_\ ==\ end\_;\ \}}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00123}00123\ }
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00124}00124\ \ \ \ \ \ \ \ \ AsyncDocumentParser\&\ parser\_;}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00125}00125\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ src\_;\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00126}00126\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ end\_;\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00127}00127\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ count\_;\ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00128}00128\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00129}00129\ }
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00130}00130\ \ \ \ \ AsyncStringStream\ stream\_;}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00131}00131\ \ \ \ \ \mbox{\hyperlink{class_generic_document}{Document}}\&\ d\_;}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00132}00132\ \ \ \ \ std::thread\ parseThread\_;}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00133}00133\ \ \ \ \ std::mutex\ mutex\_;}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00134}00134\ \ \ \ \ std::condition\_variable\ notEmpty\_;}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00135}00135\ \ \ \ \ std::condition\_variable\ finish\_;}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00136}00136\ \ \ \ \ \textcolor{keywordtype}{bool}\ completed\_;}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00137}00137\ \};}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00138}00138\ }
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00139}00139\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{parsebyparts_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}()\ \{}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00140}00140\ \ \ \ \ \mbox{\hyperlink{class_generic_document}{Document}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}};}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00141}00141\ }
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00142}00142\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00143}00143\ \ \ \ \ \ \ \ \ AsyncDocumentParser<>\ \mbox{\hyperlink{namespaceupload_af9e508d19dc2dd9cdb7c642dde0bdd21}{parser}}(d);}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00144}00144\ }
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00145}00145\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ json1[]\ =\ \textcolor{stringliteral}{"{}\ \{\ \(\backslash\)"{}hello\(\backslash\)"{}\ :\ \(\backslash\)"{}world\(\backslash\)"{},\ \(\backslash\)"{}t\(\backslash\)"{}\ :\ tr"{}};}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00146}00146\ \ \ \ \ \ \ \ \ \textcolor{comment}{//const\ char\ json1[]\ =\ "{}\ \{\ \(\backslash\)"{}hello\(\backslash\)"{}\ :\ \(\backslash\)"{}world\(\backslash\)"{},\ \(\backslash\)"{}t\(\backslash\)"{}\ :\ trX"{};\ //\ For\ test\ parsing\ error}}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00147}00147\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ json2[]\ =\ \textcolor{stringliteral}{"{}ue,\ \(\backslash\)"{}f\(\backslash\)"{}\ :\ false,\ \(\backslash\)"{}n\(\backslash\)"{}:\ null,\ \(\backslash\)"{}i\(\backslash\)"{}:123,\ \(\backslash\)"{}pi\(\backslash\)"{}:\ 3.14"{}};}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00148}00148\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ json3[]\ =\ \textcolor{stringliteral}{"{}16,\ \(\backslash\)"{}a\(\backslash\)"{}:[1,\ 2,\ 3,\ 4]\ \}\ "{}};}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00149}00149\ }
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00150}00150\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceupload_af9e508d19dc2dd9cdb7c642dde0bdd21}{parser}}.ParsePart(json1,\ \textcolor{keyword}{sizeof}(json1)\ -\/\ 1);}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00151}00151\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceupload_af9e508d19dc2dd9cdb7c642dde0bdd21}{parser}}.ParsePart(json2,\ \textcolor{keyword}{sizeof}(json2)\ -\/\ 1);}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00152}00152\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceupload_af9e508d19dc2dd9cdb7c642dde0bdd21}{parser}}.ParsePart(json3,\ \textcolor{keyword}{sizeof}(json3)\ -\/\ 1);}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00153}00153\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00154}00154\ }
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00155}00155\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.HasParseError())\ \{}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00156}00156\ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}Error\ at\ offset\ "{}}\ <<\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.GetErrorOffset()\ <<\ \textcolor{stringliteral}{"{}:\ "{}}\ <<\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_ga28835eb93d2c3c07bbea13515eb31415}{GetParseError\_En}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.GetParseError())\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00157}00157\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ EXIT\_FAILURE;}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00158}00158\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00159}00159\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00160}00160\ \ \ \ \ \textcolor{comment}{//\ Stringify\ the\ JSON\ to\ cout}}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00161}00161\ \ \ \ \ \mbox{\hyperlink{class_o_stream_wrapper}{OStreamWrapper}}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}(std::cout);}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00162}00162\ \ \ \ \ \mbox{\hyperlink{class_writer}{Writer<OStreamWrapper>}}\ writer(os);}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00163}00163\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.Accept(writer);}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00164}00164\ \ \ \ \ std::cout\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00165}00165\ }
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00166}00166\ \ \ \ \ \textcolor{keywordflow}{return}\ EXIT\_SUCCESS;}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00167}00167\ \}}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00168}00168\ }
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00169}00169\ \textcolor{preprocessor}{\#else\ }\textcolor{comment}{//\ Not\ supporting\ C++11\ }}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00170}00170\ }
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00171}00171\ \textcolor{preprocessor}{\#include\ <iostream>}}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00172}\mbox{\hyperlink{parsebyparts_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{00172}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{parsebyparts_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}()\ \{}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00173}00173\ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}This\ example\ requires\ C++11\ compiler"{}}\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00174}00174\ \}}
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00175}00175\ }
+\DoxyCodeLine{\Hypertarget{parsebyparts_8cpp_source_l00176}00176\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

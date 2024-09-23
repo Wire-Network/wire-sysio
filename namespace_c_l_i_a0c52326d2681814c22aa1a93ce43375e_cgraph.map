@@ -1,0 +1,5 @@
+<map id="CLI::ignore_case" name="CLI::ignore_case">
+<area shape="rect" id="Node000001" title="Helper function to allow ignore_case to be passed to IsMember or Transform." alt="" coords="5,5,126,31"/>
+<area shape="rect" id="Node000002" href="$namespace_c_l_i_1_1detail.html#ae83709ec148057ec53df4383645727e9" title="Return a lower case version of a string." alt="" coords="174,5,312,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="126,16,158,16,158,21,126,21"/>
+</map>

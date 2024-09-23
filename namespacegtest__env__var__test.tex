@@ -1,0 +1,208 @@
+\doxysection{gtest\+\_\+env\+\_\+var\+\_\+test Namespace Reference}
+\hypertarget{namespacegtest__env__var__test}{}\label{namespacegtest__env__var__test}\index{gtest\_env\_var\_test@{gtest\_env\_var\_test}}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classgtest__env__var__test_1_1_g_test_env_var_test}{GTest\+Env\+Var\+Test}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacegtest__env__var__test_ac4a8856394e4ad2a2713b5fa3f00b2bc}{Assert\+Eq}} (expected, actual)
+\item 
+\mbox{\hyperlink{namespacegtest__env__var__test_a40e62e67f868d808b57a684321e45dce}{Set\+Env\+Var}} (env\+\_\+var, \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+\mbox{\hyperlink{namespacegtest__env__var__test_a4074ed41dcab1a74333ae4647fdcc714}{Get\+Flag}} (flag)
+\item 
+\mbox{\hyperlink{namespacegtest__env__var__test_a2a6c11a8f4e2c76755c17e639a01ba7e}{Test\+Flag}} (flag, test\+\_\+val, default\+\_\+val)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+str \mbox{\hyperlink{namespacegtest__env__var__test_a5b4f8b565cc669753171d9c25de65579}{IS\+\_\+\+WINDOWS}} = \textquotesingle{}nt\textquotesingle{}
+\item 
+str \mbox{\hyperlink{namespacegtest__env__var__test_aa9e582d24038ce524776a1a4235be063}{IS\+\_\+\+LINUX}} = \textquotesingle{}Linux\textquotesingle{}
+\item 
+\mbox{\hyperlink{namespacegtest__env__var__test_a36e02e39934750d022966df31c568a53}{COMMAND}} = \mbox{\hyperlink{namespacegtest__test__utils_a239f43ff0e44144cb5a1e14f3453c273}{gtest\+\_\+test\+\_\+utils.\+Get\+Test\+Executable\+Path}}(\textquotesingle{}gtest\+\_\+env\+\_\+var\+\_\+test\+\_\+\textquotesingle{})
+\item 
+\mbox{\hyperlink{namespacegtest__env__var__test_ac671a59c1b805f7e9511e91380865cda}{environ}} = os.\+environ.\+copy()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\begin{DoxyVerb}Verifies that Google Test correctly parses environment variables.\end{DoxyVerb}
+ 
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacegtest__env__var__test_ac4a8856394e4ad2a2713b5fa3f00b2bc}\index{gtest\_env\_var\_test@{gtest\_env\_var\_test}!AssertEq@{AssertEq}}
+\index{AssertEq@{AssertEq}!gtest\_env\_var\_test@{gtest\_env\_var\_test}}
+\doxysubsubsection{\texorpdfstring{AssertEq()}{AssertEq()}}
+{\footnotesize\ttfamily \label{namespacegtest__env__var__test_ac4a8856394e4ad2a2713b5fa3f00b2bc} 
+gtest\+\_\+env\+\_\+var\+\_\+test.\+Assert\+Eq (\begin{DoxyParamCaption}\item[{}]{expected}{, }\item[{}]{actual}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest__env__var__test_8py_source_l00048}{48}} of file \mbox{\hyperlink{gtest__env__var__test_8py_source}{gtest\+\_\+env\+\_\+var\+\_\+test.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00048\ \textcolor{keyword}{def\ }AssertEq(expected,\ actual):}
+\DoxyCodeLine{00049\ \ \ \textcolor{keywordflow}{if}\ expected\ !=\ actual:}
+\DoxyCodeLine{00050\ \ \ \ \ \textcolor{keywordflow}{print}\ \textcolor{stringliteral}{'Expected:\ \%s'}\ \%\ (expected,)}
+\DoxyCodeLine{00051\ \ \ \ \ \textcolor{keywordflow}{print}\ \textcolor{stringliteral}{'\ \ Actual:\ \%s'}\ \%\ (actual,)}
+\DoxyCodeLine{00052\ \ \ \ \ \textcolor{keywordflow}{raise}\ AssertionError}
+\DoxyCodeLine{00053\ }
+\DoxyCodeLine{00054\ }
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacegtest__env__var__test_ac4a8856394e4ad2a2713b5fa3f00b2bc_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacegtest__env__var__test_a4074ed41dcab1a74333ae4647fdcc714}\index{gtest\_env\_var\_test@{gtest\_env\_var\_test}!GetFlag@{GetFlag}}
+\index{GetFlag@{GetFlag}!gtest\_env\_var\_test@{gtest\_env\_var\_test}}
+\doxysubsubsection{\texorpdfstring{GetFlag()}{GetFlag()}}
+{\footnotesize\ttfamily \label{namespacegtest__env__var__test_a4074ed41dcab1a74333ae4647fdcc714} 
+gtest\+\_\+env\+\_\+var\+\_\+test.\+Get\+Flag (\begin{DoxyParamCaption}\item[{}]{flag}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Runs gtest_env_var_test_ and returns its output.\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{gtest__env__var__test_8py_source_l00064}{64}} of file \mbox{\hyperlink{gtest__env__var__test_8py_source}{gtest\+\_\+env\+\_\+var\+\_\+test.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00064\ \textcolor{keyword}{def\ }GetFlag(flag):}
+\DoxyCodeLine{00065\ \ \ \textcolor{stringliteral}{"{}"{}"{}Runs\ gtest\_env\_var\_test\_\ and\ returns\ its\ output."{}"{}"{}}}
+\DoxyCodeLine{00066\ }
+\DoxyCodeLine{00067\ \ \ args\ =\ [COMMAND]}
+\DoxyCodeLine{00068\ \ \ \textcolor{keywordflow}{if}\ flag\ \textcolor{keywordflow}{is}\ \textcolor{keywordflow}{not}\ \textcolor{keywordtype}{None}:}
+\DoxyCodeLine{00069\ \ \ \ \ args\ +=\ [flag]}
+\DoxyCodeLine{00070\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classgtest__test__utils_1_1_subprocess}{gtest\_test\_utils.Subprocess}}(args,\ env=environ).output}
+\DoxyCodeLine{00071\ }
+\DoxyCodeLine{00072\ }
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacegtest__env__var__test_a4074ed41dcab1a74333ae4647fdcc714_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacegtest__env__var__test_a40e62e67f868d808b57a684321e45dce}\index{gtest\_env\_var\_test@{gtest\_env\_var\_test}!SetEnvVar@{SetEnvVar}}
+\index{SetEnvVar@{SetEnvVar}!gtest\_env\_var\_test@{gtest\_env\_var\_test}}
+\doxysubsubsection{\texorpdfstring{SetEnvVar()}{SetEnvVar()}}
+{\footnotesize\ttfamily \label{namespacegtest__env__var__test_a40e62e67f868d808b57a684321e45dce} 
+gtest\+\_\+env\+\_\+var\+\_\+test.\+Set\+Env\+Var (\begin{DoxyParamCaption}\item[{}]{env\+\_\+var}{, }\item[{}]{value}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Sets the env variable to 'value'; unsets it when 'value' is None.\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{gtest__env__var__test_8py_source_l00055}{55}} of file \mbox{\hyperlink{gtest__env__var__test_8py_source}{gtest\+\_\+env\+\_\+var\+\_\+test.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00055\ \textcolor{keyword}{def\ }SetEnvVar(env\_var,\ value):}
+\DoxyCodeLine{00056\ \ \ \textcolor{stringliteral}{"{}"{}"{}Sets\ the\ env\ variable\ to\ 'value';\ unsets\ it\ when\ 'value'\ is\ None."{}"{}"{}}}
+\DoxyCodeLine{00057\ }
+\DoxyCodeLine{00058\ \ \ \textcolor{keywordflow}{if}\ value\ \textcolor{keywordflow}{is}\ \textcolor{keywordflow}{not}\ \textcolor{keywordtype}{None}:}
+\DoxyCodeLine{00059\ \ \ \ \ environ[env\_var]\ =\ value}
+\DoxyCodeLine{00060\ \ \ \textcolor{keywordflow}{elif}\ env\_var\ \textcolor{keywordflow}{in}\ environ:}
+\DoxyCodeLine{00061\ \ \ \ \ del\ environ[env\_var]}
+\DoxyCodeLine{00062\ }
+\DoxyCodeLine{00063\ }
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacegtest__env__var__test_a40e62e67f868d808b57a684321e45dce_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacegtest__env__var__test_a2a6c11a8f4e2c76755c17e639a01ba7e}\index{gtest\_env\_var\_test@{gtest\_env\_var\_test}!TestFlag@{TestFlag}}
+\index{TestFlag@{TestFlag}!gtest\_env\_var\_test@{gtest\_env\_var\_test}}
+\doxysubsubsection{\texorpdfstring{TestFlag()}{TestFlag()}}
+{\footnotesize\ttfamily \label{namespacegtest__env__var__test_a2a6c11a8f4e2c76755c17e639a01ba7e} 
+gtest\+\_\+env\+\_\+var\+\_\+test.\+Test\+Flag (\begin{DoxyParamCaption}\item[{}]{flag}{, }\item[{}]{test\+\_\+val}{, }\item[{}]{default\+\_\+val}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Verifies that the given flag is affected by the corresponding env var.\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{gtest__env__var__test_8py_source_l00073}{73}} of file \mbox{\hyperlink{gtest__env__var__test_8py_source}{gtest\+\_\+env\+\_\+var\+\_\+test.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00073\ \textcolor{keyword}{def\ }TestFlag(flag,\ test\_val,\ default\_val):}
+\DoxyCodeLine{00074\ \ \ \textcolor{stringliteral}{"{}"{}"{}Verifies\ that\ the\ given\ flag\ is\ affected\ by\ the\ corresponding\ env\ var."{}"{}"{}}}
+\DoxyCodeLine{00075\ }
+\DoxyCodeLine{00076\ \ \ env\_var\ =\ \textcolor{stringliteral}{'GTEST\_'}\ +\ flag.upper()}
+\DoxyCodeLine{00077\ \ \ SetEnvVar(env\_var,\ test\_val)}
+\DoxyCodeLine{00078\ \ \ AssertEq(test\_val,\ GetFlag(flag))}
+\DoxyCodeLine{00079\ \ \ SetEnvVar(env\_var,\ \textcolor{keywordtype}{None})}
+\DoxyCodeLine{00080\ \ \ AssertEq(default\_val,\ GetFlag(flag))}
+\DoxyCodeLine{00081\ }
+\DoxyCodeLine{00082\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacegtest__env__var__test_a2a6c11a8f4e2c76755c17e639a01ba7e_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacegtest__env__var__test_a2a6c11a8f4e2c76755c17e639a01ba7e_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{namespacegtest__env__var__test_a36e02e39934750d022966df31c568a53}\index{gtest\_env\_var\_test@{gtest\_env\_var\_test}!COMMAND@{COMMAND}}
+\index{COMMAND@{COMMAND}!gtest\_env\_var\_test@{gtest\_env\_var\_test}}
+\doxysubsubsection{\texorpdfstring{COMMAND}{COMMAND}}
+{\footnotesize\ttfamily \label{namespacegtest__env__var__test_a36e02e39934750d022966df31c568a53} 
+gtest\+\_\+env\+\_\+var\+\_\+test.\+COMMAND = \mbox{\hyperlink{namespacegtest__test__utils_a239f43ff0e44144cb5a1e14f3453c273}{gtest\+\_\+test\+\_\+utils.\+Get\+Test\+Executable\+Path}}(\textquotesingle{}gtest\+\_\+env\+\_\+var\+\_\+test\+\_\+\textquotesingle{})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest__env__var__test_8py_source_l00043}{43}} of file \mbox{\hyperlink{gtest__env__var__test_8py_source}{gtest\+\_\+env\+\_\+var\+\_\+test.\+py}}.
+
+\Hypertarget{namespacegtest__env__var__test_ac671a59c1b805f7e9511e91380865cda}\index{gtest\_env\_var\_test@{gtest\_env\_var\_test}!environ@{environ}}
+\index{environ@{environ}!gtest\_env\_var\_test@{gtest\_env\_var\_test}}
+\doxysubsubsection{\texorpdfstring{environ}{environ}}
+{\footnotesize\ttfamily \label{namespacegtest__env__var__test_ac671a59c1b805f7e9511e91380865cda} 
+gtest\+\_\+env\+\_\+var\+\_\+test.\+environ = os.\+environ.\+copy()}
+
+
+
+Definition at line \mbox{\hyperlink{gtest__env__var__test_8py_source_l00045}{45}} of file \mbox{\hyperlink{gtest__env__var__test_8py_source}{gtest\+\_\+env\+\_\+var\+\_\+test.\+py}}.
+
+\Hypertarget{namespacegtest__env__var__test_aa9e582d24038ce524776a1a4235be063}\index{gtest\_env\_var\_test@{gtest\_env\_var\_test}!IS\_LINUX@{IS\_LINUX}}
+\index{IS\_LINUX@{IS\_LINUX}!gtest\_env\_var\_test@{gtest\_env\_var\_test}}
+\doxysubsubsection{\texorpdfstring{IS\_LINUX}{IS\_LINUX}}
+{\footnotesize\ttfamily \label{namespacegtest__env__var__test_aa9e582d24038ce524776a1a4235be063} 
+str gtest\+\_\+env\+\_\+var\+\_\+test.\+IS\+\_\+\+LINUX = \textquotesingle{}Linux\textquotesingle{}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest__env__var__test_8py_source_l00041}{41}} of file \mbox{\hyperlink{gtest__env__var__test_8py_source}{gtest\+\_\+env\+\_\+var\+\_\+test.\+py}}.
+
+\Hypertarget{namespacegtest__env__var__test_a5b4f8b565cc669753171d9c25de65579}\index{gtest\_env\_var\_test@{gtest\_env\_var\_test}!IS\_WINDOWS@{IS\_WINDOWS}}
+\index{IS\_WINDOWS@{IS\_WINDOWS}!gtest\_env\_var\_test@{gtest\_env\_var\_test}}
+\doxysubsubsection{\texorpdfstring{IS\_WINDOWS}{IS\_WINDOWS}}
+{\footnotesize\ttfamily \label{namespacegtest__env__var__test_a5b4f8b565cc669753171d9c25de65579} 
+str gtest\+\_\+env\+\_\+var\+\_\+test.\+IS\+\_\+\+WINDOWS = \textquotesingle{}nt\textquotesingle{}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest__env__var__test_8py_source_l00040}{40}} of file \mbox{\hyperlink{gtest__env__var__test_8py_source}{gtest\+\_\+env\+\_\+var\+\_\+test.\+py}}.
+

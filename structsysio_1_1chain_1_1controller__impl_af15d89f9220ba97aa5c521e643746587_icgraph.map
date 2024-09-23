@@ -1,0 +1,12 @@
+<map id="sysio::chain::controller_impl::maybe_switch_forks" name="sysio::chain::controller_impl::maybe_switch_forks">
+<area shape="rect" id="Node000001" title=" " alt="" coords="622,23,803,64"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1controller__impl.html#a9efbc515682ae5dede91184c36af73f7" title=" " alt="" coords="5,27,158,68"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="620,22,574,14,461,8,347,12,243,23,158,36,158,31,243,18,347,7,461,3,575,9,621,17"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1chain_1_1controller__impl.html#ac2d3794f1bd0ff1bd5837d8ead15d289" title=" " alt="" coords="414,23,566,64"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="607,46,567,46,567,41,607,41"/>
+<area shape="rect" id="Node000004" href="$structsysio_1_1chain_1_1controller__impl.html#a2fe4194f0202db6c18bc17572b2adaa2" title=" " alt="" coords="406,88,574,129"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="627,71,563,90,561,85,626,66"/>
+<area shape="rect" id="Node000005" href="$structsysio_1_1chain_1_1controller__impl.html#a9a9e4b6fe15eb93e63ac98af9f170647" title=" " alt="" coords="206,55,358,96"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="390,95,358,90,359,85,391,90"/>
+<area shape="poly" id="edge5_Node000005_Node000002" title=" " alt="" coords="190,65,158,61,158,55,190,60"/>
+</map>

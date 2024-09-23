@@ -1,0 +1,380 @@
+\doxysection{Catch\+::Detail Namespace Reference}
+\hypertarget{namespace_catch_1_1_detail}{}\label{namespace_catch_1_1_detail}\index{Catch::Detail@{Catch::Detail}}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{class_catch_1_1_detail_1_1_approx}{Approx}}
+\item 
+struct \mbox{\hyperlink{struct_catch_1_1_detail_1_1_enum_info}{Enum\+Info}}
+\item 
+class \mbox{\hyperlink{class_catch_1_1_detail_1_1_enum_values_registry}{Enum\+Values\+Registry}}
+\item 
+class \mbox{\hyperlink{class_catch_1_1_detail_1_1_is_stream_insertable}{Is\+Stream\+Insertable}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+std\+::vector$<$ std\+::string $>$ \mbox{\hyperlink{namespace_catch_1_1_detail_a96ec2978e267cd753ef55dd734270334}{parse\+Enums}} (\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} enums)
+\item 
+std\+::unique\+\_\+ptr$<$ \mbox{\hyperlink{struct_catch_1_1_detail_1_1_enum_info}{Enum\+Info}} $>$ \mbox{\hyperlink{namespace_catch_1_1_detail_a4acecf5ffe0667c5c3f7723843d518ac}{make\+Enum\+Info}} (\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} enum\+Name, \mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} all\+Value\+Names, std\+::vector$<$ int $>$ const \&values)
+\item 
+std\+::string \mbox{\hyperlink{namespace_catch_1_1_detail_a76e0b8b7e795c2c04e0affe4102bafa0}{get\+Annotation}} (Class cls, std\+::string const \&annotation\+Name, std\+::string const \&test\+Case\+Name)
+\item 
+std\+::string \mbox{\hyperlink{namespace_catch_1_1_detail_ac5d6c510e565ee5bddcc2236194ce29e}{raw\+Memory\+To\+String}} (const void \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}, std\+::size\+\_\+t size)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\std\+::string \mbox{\hyperlink{namespace_catch_1_1_detail_a371620ed524abfcae5c3772bf49b563a}{raw\+Memory\+To\+String}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}})
+\item 
+{\footnotesize template$<$typename E $>$ }\\std\+::string \mbox{\hyperlink{namespace_catch_1_1_detail_a242396de537c5176710d680cc9ca6b93}{convert\+Unknown\+Enum\+To\+String}} (E e)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\std\+::enable\+\_\+if$<$!std\+::is\+\_\+enum$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}} \&\&!std\+::is\+\_\+base\+\_\+of$<$ std\+::exception, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}}, std\+::string $>$\+::type \mbox{\hyperlink{namespace_catch_1_1_detail_aa4fbd846029625d08378606ffe9ebc3b}{convert\+Unstreamable}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const \&)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\std\+::enable\+\_\+if$<$!std\+::is\+\_\+enum$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}} \&\&std\+::is\+\_\+base\+\_\+of$<$ std\+::exception, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}}, std\+::string $>$\+::type \mbox{\hyperlink{namespace_catch_1_1_detail_a669969ab020f5a314d6fa97749a99f56}{convert\+Unstreamable}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const \&ex)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\std\+::enable\+\_\+if$<$ std\+::is\+\_\+enum$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}}, std\+::string $>$\+::type \mbox{\hyperlink{namespace_catch_1_1_detail_af5310e4687d8c000e7911b91164756e6}{convert\+Unstreamable}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\std\+::string \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{stringify}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&e)
+\item 
+{\footnotesize template$<$typename Input\+Iterator $>$ }\\std\+::string \mbox{\hyperlink{namespace_catch_1_1_detail_a6650a1dff325bf29962ff15ae73fd972}{range\+To\+String}} (Input\+Iterator first, Input\+Iterator last)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+const std\+::string \mbox{\hyperlink{namespace_catch_1_1_detail_a466775f4eec29ffef29ab334cd885136}{unprintable\+String}} = "{}\{?\}"{}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespace_catch_1_1_detail_a242396de537c5176710d680cc9ca6b93}\index{Catch::Detail@{Catch::Detail}!convertUnknownEnumToString@{convertUnknownEnumToString}}
+\index{convertUnknownEnumToString@{convertUnknownEnumToString}!Catch::Detail@{Catch::Detail}}
+\doxysubsubsection{\texorpdfstring{convertUnknownEnumToString()}{convertUnknownEnumToString()}}
+{\footnotesize\ttfamily \label{namespace_catch_1_1_detail_a242396de537c5176710d680cc9ca6b93} 
+template$<$typename E $>$ \\
+std\+::string Catch\+::\+Detail\+::convert\+Unknown\+Enum\+To\+String (\begin{DoxyParamCaption}\item[{E}]{e}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__tostring_8h_source_l00133}{133}} of file \mbox{\hyperlink{catch__tostring_8h_source}{catch\+\_\+tostring.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \ \ \ \ return\ ::Catch::Detail::stringify(\textcolor{keyword}{static\_cast<}typename\ std::underlying\_type<E>::type\textcolor{keyword}{>}(e));}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_catch_1_1_detail_a242396de537c5176710d680cc9ca6b93_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_catch_1_1_detail_aa4fbd846029625d08378606ffe9ebc3b}\index{Catch::Detail@{Catch::Detail}!convertUnstreamable@{convertUnstreamable}}
+\index{convertUnstreamable@{convertUnstreamable}!Catch::Detail@{Catch::Detail}}
+\doxysubsubsection{\texorpdfstring{convertUnstreamable()}{convertUnstreamable()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{namespace_catch_1_1_detail_aa4fbd846029625d08378606ffe9ebc3b} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+std\+::enable\+\_\+if$<$!std\+::is\+\_\+enum$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}} \&\&!std\+::is\+\_\+base\+\_\+of$<$ std\+::exception, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}}, std\+::string $>$\+::type Catch\+::\+Detail\+::convert\+Unstreamable (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const \&}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__tostring_8h_source_l00064}{64}} of file \mbox{\hyperlink{catch__tostring_8h_source}{catch\+\_\+tostring.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Detail::unprintableString;}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_catch_1_1_detail_aa4fbd846029625d08378606ffe9ebc3b_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_catch_1_1_detail_a669969ab020f5a314d6fa97749a99f56}\index{Catch::Detail@{Catch::Detail}!convertUnstreamable@{convertUnstreamable}}
+\index{convertUnstreamable@{convertUnstreamable}!Catch::Detail@{Catch::Detail}}
+\doxysubsubsection{\texorpdfstring{convertUnstreamable()}{convertUnstreamable()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{namespace_catch_1_1_detail_a669969ab020f5a314d6fa97749a99f56} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+std\+::enable\+\_\+if$<$!std\+::is\+\_\+enum$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}} \&\&std\+::is\+\_\+base\+\_\+of$<$ std\+::exception, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}}, std\+::string $>$\+::type Catch\+::\+Detail\+::convert\+Unstreamable (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const \&}]{ex}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__tostring_8h_source_l00070}{70}} of file \mbox{\hyperlink{catch__tostring_8h_source}{catch\+\_\+tostring.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ex.what();}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespace_catch_1_1_detail_af5310e4687d8c000e7911b91164756e6}\index{Catch::Detail@{Catch::Detail}!convertUnstreamable@{convertUnstreamable}}
+\index{convertUnstreamable@{convertUnstreamable}!Catch::Detail@{Catch::Detail}}
+\doxysubsubsection{\texorpdfstring{convertUnstreamable()}{convertUnstreamable()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{namespace_catch_1_1_detail_af5310e4687d8c000e7911b91164756e6} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+std\+::enable\+\_\+if$<$ std\+::is\+\_\+enum$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}}, std\+::string $>$\+::type Catch\+::\+Detail\+::convert\+Unstreamable (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const \&}]{value}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__tostring_8h_source_l00078}{78}} of file \mbox{\hyperlink{catch__tostring_8h_source}{catch\+\_\+tostring.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_catch_1_1_detail_a242396de537c5176710d680cc9ca6b93}{convertUnknownEnumToString}}(\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ );}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_catch_1_1_detail_af5310e4687d8c000e7911b91164756e6_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_catch_1_1_detail_a76e0b8b7e795c2c04e0affe4102bafa0}\index{Catch::Detail@{Catch::Detail}!getAnnotation@{getAnnotation}}
+\index{getAnnotation@{getAnnotation}!Catch::Detail@{Catch::Detail}}
+\doxysubsubsection{\texorpdfstring{getAnnotation()}{getAnnotation()}}
+{\footnotesize\ttfamily \label{namespace_catch_1_1_detail_a76e0b8b7e795c2c04e0affe4102bafa0} 
+std\+::string Catch\+::\+Detail\+::get\+Annotation (\begin{DoxyParamCaption}\item[{Class}]{cls}{, }\item[{std\+::string const \&}]{annotation\+Name}{, }\item[{std\+::string const \&}]{test\+Case\+Name}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__objc_8hpp_source_l00062}{62}} of file \mbox{\hyperlink{catch__objc_8hpp_source}{catch\+\_\+objc.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ NSString*\ selStr\ =\ [[NSString\ alloc]\ initWithFormat:@"{}Catch\_\%s\_\%s"{},\ annotationName.c\_str(),\ testCaseName.c\_str()];}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{SEL}\ sel\ =\ NSSelectorFromString(\ selStr\ );}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{catch__objc__arc_8hpp_a1f6b4a44e1eaaa87534d1f28669897dc}{arcSafeRelease}}(\ selStr\ );}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{id}\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ =\ \mbox{\hyperlink{catch__objc__arc_8hpp_a2e982f858537aef4c41489fee41bdd91}{performOptionalSelector}}(\ cls,\ sel\ );}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ )}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [(NSString*)value\ UTF8String];}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}"{}};}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_catch_1_1_detail_a76e0b8b7e795c2c04e0affe4102bafa0_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_catch_1_1_detail_a76e0b8b7e795c2c04e0affe4102bafa0_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_catch_1_1_detail_a4acecf5ffe0667c5c3f7723843d518ac}\index{Catch::Detail@{Catch::Detail}!makeEnumInfo@{makeEnumInfo}}
+\index{makeEnumInfo@{makeEnumInfo}!Catch::Detail@{Catch::Detail}}
+\doxysubsubsection{\texorpdfstring{makeEnumInfo()}{makeEnumInfo()}}
+{\footnotesize\ttfamily \label{namespace_catch_1_1_detail_a4acecf5ffe0667c5c3f7723843d518ac} 
+std\+::unique\+\_\+ptr$<$ \mbox{\hyperlink{struct_catch_1_1_detail_1_1_enum_info}{Enum\+Info}} $>$ Catch\+::\+Detail\+::make\+Enum\+Info (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}}}]{enum\+Name}{, }\item[{\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}}}]{all\+Value\+Names}{, }\item[{std\+::vector$<$ int $>$ const \&}]{values}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__enum__values__registry_8cpp_source_l00042}{42}} of file \mbox{\hyperlink{catch__enum__values__registry_8cpp_source}{catch\+\_\+enum\+\_\+values\+\_\+registry.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \ \ \ std::unique\_ptr<EnumInfo>\ enumInfo(\ \textcolor{keyword}{new}\ \mbox{\hyperlink{struct_catch_1_1_detail_1_1_enum_info}{EnumInfo}}\ );}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \ \ \ enumInfo-\/>m\_name\ =\ enumName;}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \ \ \ enumInfo-\/>m\_values.reserve(\ values.size()\ );}
+\DoxyCodeLine{00046\ }
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ valueNames\ =\ \mbox{\hyperlink{namespace_catch_1_1_detail_a96ec2978e267cd753ef55dd734270334}{Catch::Detail::parseEnums}}(\ allValueNames\ );}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \ \ \ assert(\ valueNames.size()\ ==\ values.size()\ );}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \ \ \ \ std::size\_t\ i\ =\ 0;}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ :\ values\ )}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ enumInfo-\/>m\_values.push\_back(\{\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\ valueNames[i++]\ \});}
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ enumInfo;}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_catch_1_1_detail_a4acecf5ffe0667c5c3f7723843d518ac_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_catch_1_1_detail_a96ec2978e267cd753ef55dd734270334}\index{Catch::Detail@{Catch::Detail}!parseEnums@{parseEnums}}
+\index{parseEnums@{parseEnums}!Catch::Detail@{Catch::Detail}}
+\doxysubsubsection{\texorpdfstring{parseEnums()}{parseEnums()}}
+{\footnotesize\ttfamily \label{namespace_catch_1_1_detail_a96ec2978e267cd753ef55dd734270334} 
+std\+::vector$<$ std\+::string $>$ Catch\+::\+Detail\+::parse\+Enums (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}}}]{enums}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__enum__values__registry_8cpp_source_l00021}{21}} of file \mbox{\hyperlink{catch__enum__values__registry_8cpp_source}{catch\+\_\+enum\+\_\+values\+\_\+registry.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ enumValues\ =\ \mbox{\hyperlink{namespace_catch_a678e3c779388970bb3ec5802245f93d7}{splitStringRef}}(\ enums,\ \textcolor{charliteral}{','}\ );}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \ \ \ \ std::vector<std::string>\ parsed;}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \ \ \ \ parsed.reserve(\ enumValues.size()\ );}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\ \textcolor{keyword}{const}\&\ enumValue\ :\ enumValues\ )\ \{}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ identifiers\ =\ \mbox{\hyperlink{namespace_catch_a678e3c779388970bb3ec5802245f93d7}{splitStringRef}}(\ enumValue,\ \textcolor{charliteral}{':'}\ );}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ parsed.push\_back(\ \mbox{\hyperlink{namespace_catch_a084108b47f37d8bfd5db51c50c7451b3}{Catch::trim}}(\ identifiers.back()\ )\ );}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ parsed;}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_catch_1_1_detail_a96ec2978e267cd753ef55dd734270334_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_catch_1_1_detail_a96ec2978e267cd753ef55dd734270334_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_catch_1_1_detail_a6650a1dff325bf29962ff15ae73fd972}\index{Catch::Detail@{Catch::Detail}!rangeToString@{rangeToString}}
+\index{rangeToString@{rangeToString}!Catch::Detail@{Catch::Detail}}
+\doxysubsubsection{\texorpdfstring{rangeToString()}{rangeToString()}}
+{\footnotesize\ttfamily \label{namespace_catch_1_1_detail_a6650a1dff325bf29962ff15ae73fd972} 
+template$<$typename Input\+Iterator $>$ \\
+std\+::string Catch\+::\+Detail\+::range\+To\+String (\begin{DoxyParamCaption}\item[{Input\+Iterator}]{first}{, }\item[{Input\+Iterator}]{last}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__tostring_8h_source_l00304}{304}} of file \mbox{\hyperlink{catch__tostring_8h_source}{catch\+\_\+tostring.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00304\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00305\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_reusable_string_stream}{ReusableStringStream}}\ rss;}
+\DoxyCodeLine{00306\ \ \ \ \ \ \ \ \ \ \ \ \ rss\ <<\ \textcolor{stringliteral}{"{}\{\ "{}};}
+\DoxyCodeLine{00307\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (first\ !=\ last)\ \{}
+\DoxyCodeLine{00308\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ rss\ <<\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(*first);}
+\DoxyCodeLine{00309\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (++first;\ first\ !=\ last;\ ++first)}
+\DoxyCodeLine{00310\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ rss\ <<\ \textcolor{stringliteral}{"{},\ "{}}\ <<\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(*first);}
+\DoxyCodeLine{00311\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00312\ \ \ \ \ \ \ \ \ \ \ \ \ rss\ <<\ \textcolor{stringliteral}{"{}\ \}"{}};}
+\DoxyCodeLine{00313\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ rss.\mbox{\hyperlink{class_catch_1_1_reusable_string_stream_a0e9ecf260b2a5d35f4886ef0d51f6270}{str}}();}
+\DoxyCodeLine{00314\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_catch_1_1_detail_a6650a1dff325bf29962ff15ae73fd972_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_catch_1_1_detail_a371620ed524abfcae5c3772bf49b563a}\index{Catch::Detail@{Catch::Detail}!rawMemoryToString@{rawMemoryToString}}
+\index{rawMemoryToString@{rawMemoryToString}!Catch::Detail@{Catch::Detail}}
+\doxysubsubsection{\texorpdfstring{rawMemoryToString()}{rawMemoryToString()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{namespace_catch_1_1_detail_a371620ed524abfcae5c3772bf49b563a} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+std\+::string Catch\+::\+Detail\+::raw\+Memory\+To\+String (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{object}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__tostring_8h_source_l00041}{41}} of file \mbox{\hyperlink{catch__tostring_8h_source}{catch\+\_\+tostring.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_catch_1_1_detail_ac5d6c510e565ee5bddcc2236194ce29e}{rawMemoryToString}}(\ \&\textcolor{keywordtype}{object},\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{object})\ );}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_catch_1_1_detail_a371620ed524abfcae5c3772bf49b563a_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_catch_1_1_detail_ac5d6c510e565ee5bddcc2236194ce29e}\index{Catch::Detail@{Catch::Detail}!rawMemoryToString@{rawMemoryToString}}
+\index{rawMemoryToString@{rawMemoryToString}!Catch::Detail@{Catch::Detail}}
+\doxysubsubsection{\texorpdfstring{rawMemoryToString()}{rawMemoryToString()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{namespace_catch_1_1_detail_ac5d6c510e565ee5bddcc2236194ce29e} 
+std\+::string Catch\+::\+Detail\+::raw\+Memory\+To\+String (\begin{DoxyParamCaption}\item[{const void \texorpdfstring{$\ast$}{*}}]{object}{, }\item[{std\+::size\+\_\+t}]{size}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__tostring_8cpp_source_l00052}{52}} of file \mbox{\hyperlink{catch__tostring_8cpp_source}{catch\+\_\+tostring.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Reverse\ order\ for\ little\ endian\ architectures}}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ i\ =\ 0,\ end\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(\ size\ ),\ \mbox{\hyperlink{xbyak__mnemonic_8h_a3fcef0f14d1a07b69383c0c2999868ea}{inc}}\ =\ 1;}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ Endianness::which()\ ==\ Endianness::Little\ )\ \{}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ \ \ \ i\ =\ end-\/1;}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ \ \ \ end\ =\ \mbox{\hyperlink{xbyak__mnemonic_8h_a3fcef0f14d1a07b69383c0c2999868ea}{inc}}\ =\ -\/1;}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00059\ }
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ \textcolor{keyword}{const}\ *bytes\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ \textcolor{keyword}{const\ }*\textcolor{keyword}{>}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}});}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_reusable_string_stream}{ReusableStringStream}}\ rss;}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ rss\ <<\ \textcolor{stringliteral}{"{}0x"{}}\ <<\ std::setfill(\textcolor{charliteral}{'0'})\ <<\ std::hex;}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ ;\ i\ !=\ end;\ i\ +=\ \mbox{\hyperlink{xbyak__mnemonic_8h_a3fcef0f14d1a07b69383c0c2999868ea}{inc}}\ )}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \ \ \ \ rss\ <<\ std::setw(2)\ <<\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\textcolor{keyword}{>}(bytes[i]);}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ rss.\mbox{\hyperlink{class_catch_1_1_reusable_string_stream_a0e9ecf260b2a5d35f4886ef0d51f6270}{str}}();}
+\DoxyCodeLine{00066\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_catch_1_1_detail_ac5d6c510e565ee5bddcc2236194ce29e_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_catch_1_1_detail_ac5d6c510e565ee5bddcc2236194ce29e_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}\index{Catch::Detail@{Catch::Detail}!stringify@{stringify}}
+\index{stringify@{stringify}!Catch::Detail@{Catch::Detail}}
+\doxysubsubsection{\texorpdfstring{stringify()}{stringify()}}
+{\footnotesize\ttfamily \label{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+std\+::string Catch\+::\+Detail\+::stringify (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{e}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__tostring_8h_source_l00128}{128}} of file \mbox{\hyperlink{catch__tostring_8h_source}{catch\+\_\+tostring.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \ \ \ return\ ::Catch::StringMaker<typename\ std::remove\_cv<typename\ std::remove\_reference<T>::type>::type>::convert(e);}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{namespace_catch_1_1_detail_a466775f4eec29ffef29ab334cd885136}\index{Catch::Detail@{Catch::Detail}!unprintableString@{unprintableString}}
+\index{unprintableString@{unprintableString}!Catch::Detail@{Catch::Detail}}
+\doxysubsubsection{\texorpdfstring{unprintableString}{unprintableString}}
+{\footnotesize\ttfamily \label{namespace_catch_1_1_detail_a466775f4eec29ffef29ab334cd885136} 
+const std\+::string Catch\+::\+Detail\+::unprintable\+String = "{}\{?\}"{}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__tostring_8cpp_source_l00032}{32}} of file \mbox{\hyperlink{catch__tostring_8cpp_source}{catch\+\_\+tostring.\+cpp}}.
+

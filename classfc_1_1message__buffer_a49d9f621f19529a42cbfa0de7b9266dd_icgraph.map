@@ -1,0 +1,17 @@
+<map id="fc::message_buffer::reset" name="fc::message_buffer::reset">
+<area shape="rect" id="Node000001" title=" " alt="" coords="675,136,809,177"/>
+<area shape="rect" id="Node000002" href="$classfc_1_1message__buffer.html#aaf26c3308fd006fad3860f4f2c4111aa" title=" " alt="" coords="494,79,627,120"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="661,134,626,123,628,118,662,129"/>
+<area shape="rect" id="Node000004" href="$test__message__buffer_8cpp.html#a6687d4ea18cd8c8a2244e87202a36dfe" title=" " alt="" coords="250,144,446,170"/>
+<area shape="poly" id="edge7_Node000001_Node000004" title=" " alt="" coords="660,160,447,160,447,154,660,154"/>
+<area shape="rect" id="Node000007" href="$classsysio_1_1connection.html#a4bb332843c0924e4597fe1d992367232" title=" " alt="" coords="495,194,626,234"/>
+<area shape="poly" id="edge8_Node000001_Node000007" title=" " alt="" coords="662,185,627,196,626,191,660,180"/>
+<area shape="rect" id="Node000003" href="$test__message__buffer_8cpp.html#ac64fd5998672b472a05dead509a6e008" title="Test buffer growth and shrinking." alt="" coords="250,5,446,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="507,74,445,46,407,34,409,29,447,41,510,69"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="480,125,447,134,402,146,401,141,445,129,478,120"/>
+<area shape="rect" id="Node000005" href="$classfc_1_1message__buffer.html#a535ef4f901ac8e5f9008524eafad9447" title=" " alt="" coords="281,79,414,120"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="478,102,415,102,415,97,478,97"/>
+<area shape="poly" id="edge6_Node000005_Node000005" title=" " alt="" coords="382,66,370,60,348,58,328,60,315,64,311,70,313,78,308,79,306,69,312,60,326,55,348,53,371,55,385,61"/>
+<area shape="rect" id="Node000006" href="$test__message__buffer_8cpp.html#ae9f66dfac041e0941e63b810d0cb5315" title="Test peek and read across multiple buffers." alt="" coords="5,87,202,112"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="266,102,202,102,202,97,266,97"/>
+</map>

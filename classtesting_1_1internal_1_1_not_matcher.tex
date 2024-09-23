@@ -1,0 +1,75 @@
+\doxysection{testing\+::internal\+::Not\+Matcher\texorpdfstring{$<$}{<} Inner\+Matcher \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classtesting_1_1internal_1_1_not_matcher}{}\label{classtesting_1_1internal_1_1_not_matcher}\index{testing::internal::NotMatcher$<$ InnerMatcher $>$@{testing::internal::NotMatcher$<$ InnerMatcher $>$}}
+
+
+{\ttfamily \#include $<$gmock-\/matchers.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_not_matcher_a77bd397c9974e4e49acb84eeb624dce1}{Not\+Matcher}} (Inner\+Matcher matcher)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{classtesting_1_1internal_1_1_not_matcher_a87ad7beadf9def58cc053229e99e8625}{operator Matcher$<$ T $>$}} () const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Inner\+Matcher$>$\newline
+class testing\+::internal\+::\+Not\+Matcher$<$ Inner\+Matcher $>$}
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l01699}{1699}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_not_matcher_a77bd397c9974e4e49acb84eeb624dce1}\index{testing::internal::NotMatcher$<$ InnerMatcher $>$@{testing::internal::NotMatcher$<$ InnerMatcher $>$}!NotMatcher@{NotMatcher}}
+\index{NotMatcher@{NotMatcher}!testing::internal::NotMatcher$<$ InnerMatcher $>$@{testing::internal::NotMatcher$<$ InnerMatcher $>$}}
+\doxysubsubsection{\texorpdfstring{NotMatcher()}{NotMatcher()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_not_matcher_a77bd397c9974e4e49acb84eeb624dce1} 
+template$<$typename Inner\+Matcher $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_not_matcher}{testing\+::internal\+::\+Not\+Matcher}}$<$ Inner\+Matcher $>$\+::\+Not\+Matcher (\begin{DoxyParamCaption}\item[{Inner\+Matcher}]{matcher}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l01701}{1701}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01701\ :\ matcher\_(matcher)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_not_matcher_a87ad7beadf9def58cc053229e99e8625}\index{testing::internal::NotMatcher$<$ InnerMatcher $>$@{testing::internal::NotMatcher$<$ InnerMatcher $>$}!operator Matcher$<$ T $>$@{operator Matcher$<$ T $>$}}
+\index{operator Matcher$<$ T $>$@{operator Matcher$<$ T $>$}!testing::internal::NotMatcher$<$ InnerMatcher $>$@{testing::internal::NotMatcher$<$ InnerMatcher $>$}}
+\doxysubsubsection{\texorpdfstring{operator Matcher$<$ T $>$()}{operator Matcher< T >()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_not_matcher_a87ad7beadf9def58cc053229e99e8625} 
+template$<$typename Inner\+Matcher $>$ \\
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_not_matcher}{testing\+::internal\+::\+Not\+Matcher}}$<$ Inner\+Matcher $>$\+::operator \mbox{\hyperlink{classtesting_1_1_matcher}{Matcher}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l01706}{1706}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01706\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01707\ \ \ \ \ \textcolor{keywordflow}{return}\ Matcher<T>(\textcolor{keyword}{new}\ NotMatcherImpl<T>(\mbox{\hyperlink{namespacetesting_ad49d22f0e87778e2b97a88ee851dcea3}{SafeMatcherCast<T>}}(matcher\_)));}
+\DoxyCodeLine{01708\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_not_matcher_a87ad7beadf9def58cc053229e99e8625_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/include/gmock/\mbox{\hyperlink{gmock-matchers_8h}{gmock-\/matchers.\+h}}\end{DoxyCompactItemize}

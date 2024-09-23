@@ -1,0 +1,164 @@
+\doxysection{Timing\+::Timer Struct Reference}
+\hypertarget{struct_timing_1_1_timer}{}\label{struct_timing_1_1_timer}\index{Timing::Timer@{Timing::Timer}}
+
+
+{\ttfamily \#include $<$Timing.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_timing_1_1_timer_a5a3bc617db2ac4678b75948f2342776f}{Timer}} ()
+\item 
+void \mbox{\hyperlink{struct_timing_1_1_timer_a4603a572adbb48e1cadcf95c5846de75}{stop}} ()
+\item 
+\mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}} \mbox{\hyperlink{struct_timing_1_1_timer_ac760ddd9eabf7c5b14bba1e792ec5ed6}{get\+Microseconds}} ()
+\item 
+\mbox{\hyperlink{_basic_types_8h_adc9896ee12db3bb116fc63b3464c72c7}{F64}} \mbox{\hyperlink{struct_timing_1_1_timer_ae6ed9f702858e72d8a5b3df42b35537a}{get\+Milliseconds}} ()
+\item 
+\mbox{\hyperlink{_basic_types_8h_adc9896ee12db3bb116fc63b3464c72c7}{F64}} \mbox{\hyperlink{struct_timing_1_1_timer_a3c7d59a2483864e161bd18d0b66e4d06}{get\+Seconds}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{_timing_8h_source_l00010}{10}} of file \mbox{\hyperlink{_timing_8h_source}{Timing.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{struct_timing_1_1_timer_a5a3bc617db2ac4678b75948f2342776f}\index{Timing::Timer@{Timing::Timer}!Timer@{Timer}}
+\index{Timer@{Timer}!Timing::Timer@{Timing::Timer}}
+\doxysubsubsection{\texorpdfstring{Timer()}{Timer()}}
+{\footnotesize\ttfamily \label{struct_timing_1_1_timer_a5a3bc617db2ac4678b75948f2342776f} 
+Timing\+::\+Timer\+::\+Timer (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_timing_8h_source_l00012}{12}} of file \mbox{\hyperlink{_timing_8h_source}{Timing.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00012\ :\ startTime(std::chrono::high\_resolution\_clock::now()),\ isStopped(\textcolor{keyword}{false})\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_timing_1_1_timer_ac760ddd9eabf7c5b14bba1e792ec5ed6}\index{Timing::Timer@{Timing::Timer}!getMicroseconds@{getMicroseconds}}
+\index{getMicroseconds@{getMicroseconds}!Timing::Timer@{Timing::Timer}}
+\doxysubsubsection{\texorpdfstring{getMicroseconds()}{getMicroseconds()}}
+{\footnotesize\ttfamily \label{struct_timing_1_1_timer_ac760ddd9eabf7c5b14bba1e792ec5ed6} 
+\mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}} Timing\+::\+Timer\+::get\+Microseconds (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_timing_8h_source_l00014}{14}} of file \mbox{\hyperlink{_timing_8h_source}{Timing.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!isStopped)\ \{\ \mbox{\hyperlink{struct_timing_1_1_timer_a4603a572adbb48e1cadcf95c5846de75}{stop}}();\ \}}
+\DoxyCodeLine{00017\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::chrono::duration\_cast<std::chrono::microseconds>(endTime\ -\/\ startTime).count();}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_timing_1_1_timer_ac760ddd9eabf7c5b14bba1e792ec5ed6_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_timing_1_1_timer_ac760ddd9eabf7c5b14bba1e792ec5ed6_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_timing_1_1_timer_ae6ed9f702858e72d8a5b3df42b35537a}\index{Timing::Timer@{Timing::Timer}!getMilliseconds@{getMilliseconds}}
+\index{getMilliseconds@{getMilliseconds}!Timing::Timer@{Timing::Timer}}
+\doxysubsubsection{\texorpdfstring{getMilliseconds()}{getMilliseconds()}}
+{\footnotesize\ttfamily \label{struct_timing_1_1_timer_ae6ed9f702858e72d8a5b3df42b35537a} 
+\mbox{\hyperlink{_basic_types_8h_adc9896ee12db3bb116fc63b3464c72c7}{F64}} Timing\+::\+Timer\+::get\+Milliseconds (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_timing_8h_source_l00019}{19}} of file \mbox{\hyperlink{_timing_8h_source}{Timing.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00019\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_timing_1_1_timer_ac760ddd9eabf7c5b14bba1e792ec5ed6}{getMicroseconds}}()\ /\ 1000.0;\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_timing_1_1_timer_ae6ed9f702858e72d8a5b3df42b35537a_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_timing_1_1_timer_ae6ed9f702858e72d8a5b3df42b35537a_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_timing_1_1_timer_a3c7d59a2483864e161bd18d0b66e4d06}\index{Timing::Timer@{Timing::Timer}!getSeconds@{getSeconds}}
+\index{getSeconds@{getSeconds}!Timing::Timer@{Timing::Timer}}
+\doxysubsubsection{\texorpdfstring{getSeconds()}{getSeconds()}}
+{\footnotesize\ttfamily \label{struct_timing_1_1_timer_a3c7d59a2483864e161bd18d0b66e4d06} 
+\mbox{\hyperlink{_basic_types_8h_adc9896ee12db3bb116fc63b3464c72c7}{F64}} Timing\+::\+Timer\+::get\+Seconds (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_timing_8h_source_l00020}{20}} of file \mbox{\hyperlink{_timing_8h_source}{Timing.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00020\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_timing_1_1_timer_ac760ddd9eabf7c5b14bba1e792ec5ed6}{getMicroseconds}}()\ /\ 1000000.0;\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_timing_1_1_timer_a3c7d59a2483864e161bd18d0b66e4d06_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_timing_1_1_timer_a3c7d59a2483864e161bd18d0b66e4d06_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_timing_1_1_timer_a4603a572adbb48e1cadcf95c5846de75}\index{Timing::Timer@{Timing::Timer}!stop@{stop}}
+\index{stop@{stop}!Timing::Timer@{Timing::Timer}}
+\doxysubsubsection{\texorpdfstring{stop()}{stop()}}
+{\footnotesize\ttfamily \label{struct_timing_1_1_timer_a4603a572adbb48e1cadcf95c5846de75} 
+void Timing\+::\+Timer\+::stop (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_timing_8h_source_l00013}{13}} of file \mbox{\hyperlink{_timing_8h_source}{Timing.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00013\ \{\ endTime\ =\ std::chrono::high\_resolution\_clock::now();\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_timing_1_1_timer_a4603a572adbb48e1cadcf95c5846de75_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/wasm-\/jit/\+Include/\+Inline/\mbox{\hyperlink{_timing_8h}{Timing.\+h}}\end{DoxyCompactItemize}

@@ -1,0 +1,152 @@
+\doxysection{system\+\_\+contracts\+::testing\+::test\+\_\+contracts\+::blockinfo\+\_\+tester\+::latest\+\_\+block\+\_\+batch\+\_\+info\+\_\+result Struct Reference}
+\hypertarget{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result}{}\label{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result}\index{system\_contracts::testing::test\_contracts::blockinfo\_tester::latest\_block\_batch\_info\_result@{system\_contracts::testing::test\_contracts::blockinfo\_tester::latest\_block\_batch\_info\_result}}
+
+
+Output data structure for {\ttfamily \doxylink{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1get__latest__block__batch__info}{get\+\_\+latest\+\_\+block\+\_\+batch\+\_\+info}} RPC.  
+
+
+
+
+{\ttfamily \#include $<$blockinfo\+\_\+tester.\+hpp$>$}
+
+
+
+Collaboration diagram for system\+\_\+contracts\+::testing\+::test\+\_\+contracts\+::blockinfo\+\_\+tester\+::latest\+\_\+block\+\_\+batch\+\_\+info\+\_\+result\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=214pt]{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_aeb9f839d5c51488952f8f1381f89a64a}{error\+\_\+code\+\_\+enum}} \+: uint32\+\_\+t \{ \mbox{\hyperlink{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_aeb9f839d5c51488952f8f1381f89a64aa2a1d4c1c3cfc5a05f9cea814b5cb5987}{no\+\_\+error}}
+, \mbox{\hyperlink{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_aeb9f839d5c51488952f8f1381f89a64aa47d347c195a1c26fdbce91210f28a157}{invalid\+\_\+input}}
+, \mbox{\hyperlink{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_aeb9f839d5c51488952f8f1381f89a64aabaabaf67659e847cf8aac8c9b9cafeca}{unsupported\+\_\+version}}
+, \mbox{\hyperlink{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_aeb9f839d5c51488952f8f1381f89a64aaf18cb9d59b963ddb71352e9cf8f03bc8}{insufficient\+\_\+data}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_a8c36a77acb6436c335c075939e5ffc0d}{has\+\_\+error}} () const
+\item 
+\mbox{\hyperlink{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_aeb9f839d5c51488952f8f1381f89a64a}{error\+\_\+code\+\_\+enum}} \mbox{\hyperlink{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_a98a9efbd6bbda91e666bd57e16095adb}{get\+\_\+error}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::optional$<$ \mbox{\hyperlink{structsysiosystem_1_1block__info_1_1block__batch__info}{block\+\_\+batch\+\_\+info}} $>$ \mbox{\hyperlink{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_a6bef31839eb6c99ff3bb5f69bbb8b7a5}{result}}
+\item 
+\mbox{\hyperlink{namespacesystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_a2aa5b65d4eca5bfc75fca6cfea60b36f}{varint}} \mbox{\hyperlink{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_aa3bf20610c6a68ed0a5e3261cbdb5808}{error\+\_\+code}} = \mbox{\hyperlink{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_aeb9f839d5c51488952f8f1381f89a64aa2a1d4c1c3cfc5a05f9cea814b5cb5987}{no\+\_\+error}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{blockinfo__tester_8hpp_source_l00066}{66}} of file \mbox{\hyperlink{blockinfo__tester_8hpp_source}{blockinfo\+\_\+tester.\+hpp}}.
+
+
+
+\doxysubsection{Member Enumeration Documentation}
+\Hypertarget{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_aeb9f839d5c51488952f8f1381f89a64a}\index{system\_contracts::testing::test\_contracts::blockinfo\_tester::latest\_block\_batch\_info\_result@{system\_contracts::testing::test\_contracts::blockinfo\_tester::latest\_block\_batch\_info\_result}!error\_code\_enum@{error\_code\_enum}}
+\index{error\_code\_enum@{error\_code\_enum}!system\_contracts::testing::test\_contracts::blockinfo\_tester::latest\_block\_batch\_info\_result@{system\_contracts::testing::test\_contracts::blockinfo\_tester::latest\_block\_batch\_info\_result}}
+\doxysubsubsection{\texorpdfstring{error\_code\_enum}{error\_code\_enum}}
+{\footnotesize\ttfamily \label{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_aeb9f839d5c51488952f8f1381f89a64a} 
+enum \mbox{\hyperlink{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_aeb9f839d5c51488952f8f1381f89a64a}{system\+\_\+contracts\+::testing\+::test\+\_\+contracts\+::blockinfo\+\_\+tester\+::latest\+\_\+block\+\_\+batch\+\_\+info\+\_\+result\+::error\+\_\+code\+\_\+enum}} \+: \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{no\_error@{no\_error}!system\_contracts::testing::test\_contracts::blockinfo\_tester::latest\_block\_batch\_info\_result@{system\_contracts::testing::test\_contracts::blockinfo\_tester::latest\_block\_batch\_info\_result}}\index{system\_contracts::testing::test\_contracts::blockinfo\_tester::latest\_block\_batch\_info\_result@{system\_contracts::testing::test\_contracts::blockinfo\_tester::latest\_block\_batch\_info\_result}!no\_error@{no\_error}}}\Hypertarget{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_aeb9f839d5c51488952f8f1381f89a64aa2a1d4c1c3cfc5a05f9cea814b5cb5987}\label{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_aeb9f839d5c51488952f8f1381f89a64a} 
+no\+\_\+error&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{invalid\_input@{invalid\_input}!system\_contracts::testing::test\_contracts::blockinfo\_tester::latest\_block\_batch\_info\_result@{system\_contracts::testing::test\_contracts::blockinfo\_tester::latest\_block\_batch\_info\_result}}\index{system\_contracts::testing::test\_contracts::blockinfo\_tester::latest\_block\_batch\_info\_result@{system\_contracts::testing::test\_contracts::blockinfo\_tester::latest\_block\_batch\_info\_result}!invalid\_input@{invalid\_input}}}\Hypertarget{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_aeb9f839d5c51488952f8f1381f89a64aa47d347c195a1c26fdbce91210f28a157}\label{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_aeb9f839d5c51488952f8f1381f89a64a} 
+invalid\+\_\+input&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{unsupported\_version@{unsupported\_version}!system\_contracts::testing::test\_contracts::blockinfo\_tester::latest\_block\_batch\_info\_result@{system\_contracts::testing::test\_contracts::blockinfo\_tester::latest\_block\_batch\_info\_result}}\index{system\_contracts::testing::test\_contracts::blockinfo\_tester::latest\_block\_batch\_info\_result@{system\_contracts::testing::test\_contracts::blockinfo\_tester::latest\_block\_batch\_info\_result}!unsupported\_version@{unsupported\_version}}}\Hypertarget{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_aeb9f839d5c51488952f8f1381f89a64aabaabaf67659e847cf8aac8c9b9cafeca}\label{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_aeb9f839d5c51488952f8f1381f89a64a} 
+unsupported\+\_\+version&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{insufficient\_data@{insufficient\_data}!system\_contracts::testing::test\_contracts::blockinfo\_tester::latest\_block\_batch\_info\_result@{system\_contracts::testing::test\_contracts::blockinfo\_tester::latest\_block\_batch\_info\_result}}\index{system\_contracts::testing::test\_contracts::blockinfo\_tester::latest\_block\_batch\_info\_result@{system\_contracts::testing::test\_contracts::blockinfo\_tester::latest\_block\_batch\_info\_result}!insufficient\_data@{insufficient\_data}}}\Hypertarget{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_aeb9f839d5c51488952f8f1381f89a64aaf18cb9d59b963ddb71352e9cf8f03bc8}\label{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_aeb9f839d5c51488952f8f1381f89a64a} 
+insufficient\+\_\+data&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{blockinfo__tester_8hpp_source_l00068}{68}} of file \mbox{\hyperlink{blockinfo__tester_8hpp_source}{blockinfo\+\_\+tester.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00069\ \ \ \ \{}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \mbox{\hyperlink{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_aeb9f839d5c51488952f8f1381f89a64aa2a1d4c1c3cfc5a05f9cea814b5cb5987}{no\_error}},}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \mbox{\hyperlink{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_aeb9f839d5c51488952f8f1381f89a64aa47d347c195a1c26fdbce91210f28a157}{invalid\_input}},}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \mbox{\hyperlink{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_aeb9f839d5c51488952f8f1381f89a64aabaabaf67659e847cf8aac8c9b9cafeca}{unsupported\_version}},}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \mbox{\hyperlink{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_aeb9f839d5c51488952f8f1381f89a64aaf18cb9d59b963ddb71352e9cf8f03bc8}{insufficient\_data}}}
+\DoxyCodeLine{00074\ \ \ \ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_a98a9efbd6bbda91e666bd57e16095adb}\index{system\_contracts::testing::test\_contracts::blockinfo\_tester::latest\_block\_batch\_info\_result@{system\_contracts::testing::test\_contracts::blockinfo\_tester::latest\_block\_batch\_info\_result}!get\_error@{get\_error}}
+\index{get\_error@{get\_error}!system\_contracts::testing::test\_contracts::blockinfo\_tester::latest\_block\_batch\_info\_result@{system\_contracts::testing::test\_contracts::blockinfo\_tester::latest\_block\_batch\_info\_result}}
+\doxysubsubsection{\texorpdfstring{get\_error()}{get\_error()}}
+{\footnotesize\ttfamily \label{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_a98a9efbd6bbda91e666bd57e16095adb} 
+\mbox{\hyperlink{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_aeb9f839d5c51488952f8f1381f89a64a}{error\+\_\+code\+\_\+enum}} system\+\_\+contracts\+::testing\+::test\+\_\+contracts\+::blockinfo\+\_\+tester\+::latest\+\_\+block\+\_\+batch\+\_\+info\+\_\+result\+::get\+\_\+error (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{blockinfo__tester_8hpp_source_l00081}{81}} of file \mbox{\hyperlink{blockinfo__tester_8hpp_source}{blockinfo\+\_\+tester.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00081\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_aeb9f839d5c51488952f8f1381f89a64a}{error\_code\_enum}}\textcolor{keyword}{>}(error\_code.value);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_a8c36a77acb6436c335c075939e5ffc0d}\index{system\_contracts::testing::test\_contracts::blockinfo\_tester::latest\_block\_batch\_info\_result@{system\_contracts::testing::test\_contracts::blockinfo\_tester::latest\_block\_batch\_info\_result}!has\_error@{has\_error}}
+\index{has\_error@{has\_error}!system\_contracts::testing::test\_contracts::blockinfo\_tester::latest\_block\_batch\_info\_result@{system\_contracts::testing::test\_contracts::blockinfo\_tester::latest\_block\_batch\_info\_result}}
+\doxysubsubsection{\texorpdfstring{has\_error()}{has\_error()}}
+{\footnotesize\ttfamily \label{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_a8c36a77acb6436c335c075939e5ffc0d} 
+bool system\+\_\+contracts\+::testing\+::test\+\_\+contracts\+::blockinfo\+\_\+tester\+::latest\+\_\+block\+\_\+batch\+\_\+info\+\_\+result\+::has\+\_\+error (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{blockinfo__tester_8hpp_source_l00079}{79}} of file \mbox{\hyperlink{blockinfo__tester_8hpp_source}{blockinfo\+\_\+tester.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00079\ \{\ \textcolor{keywordflow}{return}\ !(error\_code.value\ ==\ \mbox{\hyperlink{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_aeb9f839d5c51488952f8f1381f89a64aa2a1d4c1c3cfc5a05f9cea814b5cb5987}{no\_error}}\ \&\&\ \mbox{\hyperlink{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_a6bef31839eb6c99ff3bb5f69bbb8b7a5}{result}}.has\_value());\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_aa3bf20610c6a68ed0a5e3261cbdb5808}\index{system\_contracts::testing::test\_contracts::blockinfo\_tester::latest\_block\_batch\_info\_result@{system\_contracts::testing::test\_contracts::blockinfo\_tester::latest\_block\_batch\_info\_result}!error\_code@{error\_code}}
+\index{error\_code@{error\_code}!system\_contracts::testing::test\_contracts::blockinfo\_tester::latest\_block\_batch\_info\_result@{system\_contracts::testing::test\_contracts::blockinfo\_tester::latest\_block\_batch\_info\_result}}
+\doxysubsubsection{\texorpdfstring{error\_code}{error\_code}}
+{\footnotesize\ttfamily \label{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_aa3bf20610c6a68ed0a5e3261cbdb5808} 
+\mbox{\hyperlink{namespacesystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_a2aa5b65d4eca5bfc75fca6cfea60b36f}{varint}} system\+\_\+contracts\+::testing\+::test\+\_\+contracts\+::blockinfo\+\_\+tester\+::latest\+\_\+block\+\_\+batch\+\_\+info\+\_\+result\+::error\+\_\+code = \mbox{\hyperlink{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_aeb9f839d5c51488952f8f1381f89a64aa2a1d4c1c3cfc5a05f9cea814b5cb5987}{no\+\_\+error}}}
+
+
+
+Definition at line \mbox{\hyperlink{blockinfo__tester_8hpp_source_l00077}{77}} of file \mbox{\hyperlink{blockinfo__tester_8hpp_source}{blockinfo\+\_\+tester.\+hpp}}.
+
+\Hypertarget{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_a6bef31839eb6c99ff3bb5f69bbb8b7a5}\index{system\_contracts::testing::test\_contracts::blockinfo\_tester::latest\_block\_batch\_info\_result@{system\_contracts::testing::test\_contracts::blockinfo\_tester::latest\_block\_batch\_info\_result}!result@{result}}
+\index{result@{result}!system\_contracts::testing::test\_contracts::blockinfo\_tester::latest\_block\_batch\_info\_result@{system\_contracts::testing::test\_contracts::blockinfo\_tester::latest\_block\_batch\_info\_result}}
+\doxysubsubsection{\texorpdfstring{result}{result}}
+{\footnotesize\ttfamily \label{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result_a6bef31839eb6c99ff3bb5f69bbb8b7a5} 
+std\+::optional$<$\mbox{\hyperlink{structsysiosystem_1_1block__info_1_1block__batch__info}{block\+\_\+batch\+\_\+info}}$>$ system\+\_\+contracts\+::testing\+::test\+\_\+contracts\+::blockinfo\+\_\+tester\+::latest\+\_\+block\+\_\+batch\+\_\+info\+\_\+result\+::result}
+
+
+
+Definition at line \mbox{\hyperlink{blockinfo__tester_8hpp_source_l00076}{76}} of file \mbox{\hyperlink{blockinfo__tester_8hpp_source}{blockinfo\+\_\+tester.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/svetlasyrimis/\+Desktop/wire-\/network/\+WN-\/org/wire-\/system-\/contracts/contracts/test\+\_\+contracts/blockinfo\+\_\+tester/include/blockinfo\+\_\+tester/\mbox{\hyperlink{blockinfo__tester_8hpp}{blockinfo\+\_\+tester.\+hpp}}\end{DoxyCompactItemize}

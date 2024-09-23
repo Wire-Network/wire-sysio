@@ -1,0 +1,1073 @@
+\doxysection{gtest\+\_\+output\+\_\+test\+\_\+.\+cc}
+\hypertarget{gtest__output__test___8cc_source}{}\label{gtest__output__test___8cc_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/test/gtest\_output\_test\_.cc@{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/test/gtest\_output\_test\_.cc}}
+\mbox{\hyperlink{gtest__output__test___8cc}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00001}00001\ \textcolor{comment}{//\ Copyright\ 2005,\ Google\ Inc.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00002}00002\ \textcolor{comment}{//\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00003}00003\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00004}00004\ \textcolor{comment}{//\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00005}00005\ \textcolor{comment}{//\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00006}00006\ \textcolor{comment}{//\ met:}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00007}00007\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00008}00008\ \textcolor{comment}{//\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00009}00009\ \textcolor{comment}{//\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00010}00010\ \textcolor{comment}{//\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00011}00011\ \textcolor{comment}{//\ copyright\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00012}00012\ \textcolor{comment}{//\ in\ the\ documentation\ and/or\ other\ materials\ provided\ with\ the}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00013}00013\ \textcolor{comment}{//\ distribution.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00014}00014\ \textcolor{comment}{//\ \ \ \ \ *\ Neither\ the\ name\ of\ Google\ Inc.\ nor\ the\ names\ of\ its}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00015}00015\ \textcolor{comment}{//\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products\ derived\ from}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00016}00016\ \textcolor{comment}{//\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00017}00017\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00018}00018\ \textcolor{comment}{//\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00019}00019\ \textcolor{comment}{//\ "{}AS\ IS"{}\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00020}00020\ \textcolor{comment}{//\ LIMITED\ TO,\ THE\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00021}00021\ \textcolor{comment}{//\ A\ PARTICULAR\ PURPOSE\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ THE\ COPYRIGHT}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00022}00022\ \textcolor{comment}{//\ OWNER\ OR\ CONTRIBUTORS\ BE\ LIABLE\ FOR\ ANY\ DIRECT,\ INDIRECT,\ INCIDENTAL,}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00023}00023\ \textcolor{comment}{//\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES\ (INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00024}00024\ \textcolor{comment}{//\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;\ LOSS\ OF\ USE,}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00025}00025\ \textcolor{comment}{//\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND\ ON\ ANY}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00026}00026\ \textcolor{comment}{//\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00027}00027\ \textcolor{comment}{//\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00028}00028\ \textcolor{comment}{//\ OF\ THIS\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00029}00029\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00030}00030\ \textcolor{comment}{//\ The\ purpose\ of\ this\ file\ is\ to\ generate\ Google\ Test\ output\ under}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00031}00031\ \textcolor{comment}{//\ various\ conditions.\ \ The\ output\ will\ then\ be\ verified\ by}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00032}00032\ \textcolor{comment}{//\ gtest\_output\_test.py\ to\ ensure\ that\ Google\ Test\ generates\ the}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00033}00033\ \textcolor{comment}{//\ desired\ messages.\ \ Therefore,\ most\ tests\ in\ this\ file\ are\ MEANT\ TO}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00034}00034\ \textcolor{comment}{//\ FAIL.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00035}00035\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00036}00036\ \textcolor{comment}{//\ Author:\ wan@google.com\ (Zhanyong\ Wan)}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00038}00038\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{gtest-spi_8h}{gtest/gtest-\/spi.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00039}00039\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{gtest_8h}{gtest/gtest.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00040}00040\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{gtest-internal-inl_8h}{src/gtest-\/internal-\/inl.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00042}00042\ \textcolor{preprocessor}{\#include\ <stdlib.h>}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00044}00044\ \textcolor{preprocessor}{\#if\ GTEST\_IS\_THREADSAFE}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00045}00045\ \textcolor{keyword}{using\ }\mbox{\hyperlink{classtesting_1_1_scoped_fake_test_part_result_reporter}{testing::ScopedFakeTestPartResultReporter}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00046}00046\ \textcolor{keyword}{using\ }\mbox{\hyperlink{classtesting_1_1_test_part_result_array}{testing::TestPartResultArray}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00048}00048\ \textcolor{keyword}{using\ }testing::internal::Notification;}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00049}00049\ \textcolor{keyword}{using\ }testing::internal::ThreadWithParam;}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00050}00050\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00052}00052\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetesting_1_1internal_1_1posix}{posix}}\ =\ ::testing::internal::posix;}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00054}00054\ \textcolor{comment}{//\ Tests\ catching\ fatal\ failures.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00056}00056\ \textcolor{comment}{//\ A\ subroutine\ used\ by\ the\ following\ test.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00057}\mbox{\hyperlink{gtest__output__test___8cc_a8f28d985b030c6dd2714d1e884c62c41}{00057}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{gtest__output__test___8cc_a8f28d985b030c6dd2714d1e884c62c41}{TestEq1}}(\textcolor{keywordtype}{int}\ x)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00058}00058\ \ \ \mbox{\hyperlink{gtest_8h_a1a6db8b1338ee7040329322b77779086}{ASSERT\_EQ}}(1,\ x);}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00059}00059\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00061}00061\ \textcolor{comment}{//\ This\ function\ calls\ a\ test\ subroutine,\ catches\ the\ fatal\ failure\ it}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00062}00062\ \textcolor{comment}{//\ generates,\ and\ then\ returns\ early.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00063}\mbox{\hyperlink{gtest__output__test___8cc_a14e796981ca8d3c71dbd2b839c1ce784}{00063}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{gtest__output__test___8cc_a14e796981ca8d3c71dbd2b839c1ce784}{TryTestSubroutine}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00064}00064\ \ \ \textcolor{comment}{//\ Calls\ a\ subrountine\ that\ yields\ a\ fatal\ failure.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00065}00065\ \ \ \mbox{\hyperlink{gtest__output__test___8cc_a8f28d985b030c6dd2714d1e884c62c41}{TestEq1}}(2);}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00067}00067\ \ \ \textcolor{comment}{//\ Catches\ the\ fatal\ failure\ and\ aborts\ the\ test.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00068}00068\ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00069}00069\ \ \ \textcolor{comment}{//\ The\ testing::Test::\ prefix\ is\ necessary\ when\ calling}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00070}00070\ \ \ \textcolor{comment}{//\ HasFatalFailure()\ outside\ of\ a\ TEST,\ TEST\_F,\ or\ test\ fixture.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00071}00071\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classtesting_1_1_test_a5e83604628ef542af888d631566ff60c}{testing::Test::HasFatalFailure}}())\ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00073}00073\ \ \ \textcolor{comment}{//\ If\ we\ get\ here,\ something\ is\ wrong.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00074}00074\ \ \ \mbox{\hyperlink{gtest_8h_a3e26a8d27caa386ed0ea7ce9d5b7c4ed}{FAIL}}()\ <<\ \textcolor{stringliteral}{"{}This\ should\ never\ be\ reached."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00075}00075\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00076}00076\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00077}\mbox{\hyperlink{gtest__output__test___8cc_a62f1870b5f6ce5c731fe0606a944da39}{00077}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(PassingTest,\ PassingTest1)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00078}00078\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00080}\mbox{\hyperlink{gtest__output__test___8cc_aaf792b2d65c4aeb1e2f1804e2319afd2}{00080}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(PassingTest,\ PassingTest2)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00081}00081\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00083}00083\ \textcolor{comment}{//\ Tests\ that\ parameters\ of\ failing\ parameterized\ tests\ are\ printed\ in\ the}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00084}00084\ \textcolor{comment}{//\ failing\ test\ summary.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00085}\mbox{\hyperlink{class_failing_param_test}{00085}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_failing_param_test}{FailingParamTest}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1_test_with_param}{testing::TestWithParam}}<int>\ \{\};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00086}00086\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00087}\mbox{\hyperlink{gtest__output__test___8cc_a680b45844b58c5367da52c5383aea03a}{00087}}\ \mbox{\hyperlink{gtest-param-test_8h_abd3bb216dafbffa36044a6030216ecda}{TEST\_P}}(\mbox{\hyperlink{class_failing_param_test}{FailingParamTest}},\ Fails)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00088}00088\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(1,\ GetParam());}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00089}00089\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00090}00090\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00091}00091\ \textcolor{comment}{//\ This\ generates\ a\ test\ which\ will\ fail.\ Google\ Test\ is\ expected\ to\ print}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00092}00092\ \textcolor{comment}{//\ its\ parameter\ when\ it\ outputs\ the\ list\ of\ all\ failed\ tests.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00093}\mbox{\hyperlink{gtest__output__test___8cc_a738114469b574e436c868a48d831f334}{00093}}\ \mbox{\hyperlink{gtest-param-test_8h_a9e411d086a08ba0cd14b73fb2f8d028f}{INSTANTIATE\_TEST\_CASE\_P}}(PrintingFailingParams,}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00094}00094\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_failing_param_test}{FailingParamTest}},}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00095}00095\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_a0c5a07d0439f323cd4353c718e277a10}{testing::Values}}(2));}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00096}00096\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00097}00097\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ kGoldenString[]\ =\ \textcolor{stringliteral}{"{}\(\backslash\)"{}Line\(\backslash\)0\ 1\(\backslash\)"{}\(\backslash\)nLine\ 2"{}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00098}00098\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00099}\mbox{\hyperlink{gtest__output__test___8cc_a1ae5db2b27aea7d9f321f52002d4a501}{00099}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(NonfatalFailureTest,\ EscapesStringOperands)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00100}00100\ \ \ std::string\ actual\ =\ \textcolor{stringliteral}{"{}actual\ \(\backslash\)"{}string\(\backslash\)"{}"{}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00101}00101\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(kGoldenString,\ actual);}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00102}00102\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00103}00103\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ golden\ =\ kGoldenString;}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00104}00104\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(golden,\ actual);}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00105}00105\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00106}00106\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00107}\mbox{\hyperlink{gtest__output__test___8cc_aaa6c1704a62b7412fd5e053614f47650}{00107}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(NonfatalFailureTest,\ DiffForLongStrings)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00108}00108\ \ \ std::string\ golden\_str(kGoldenString,\ \textcolor{keyword}{sizeof}(kGoldenString)\ -\/\ 1);}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00109}00109\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(golden\_str,\ \textcolor{stringliteral}{"{}Line\ 2"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00110}00110\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00111}00111\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00112}00112\ \textcolor{comment}{//\ Tests\ catching\ a\ fatal\ failure\ in\ a\ subroutine.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00113}\mbox{\hyperlink{gtest__output__test___8cc_a6076f79ee5f9e8982bba181cbbebb0ed}{00113}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(FatalFailureTest,\ FatalFailureInSubroutine)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00114}00114\ \ \ printf(\textcolor{stringliteral}{"{}(expecting\ a\ failure\ that\ x\ should\ be\ 1)\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00115}00115\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00116}00116\ \ \ \mbox{\hyperlink{gtest__output__test___8cc_a14e796981ca8d3c71dbd2b839c1ce784}{TryTestSubroutine}}();}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00117}00117\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00118}00118\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00119}00119\ \textcolor{comment}{//\ Tests\ catching\ a\ fatal\ failure\ in\ a\ nested\ subroutine.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00120}\mbox{\hyperlink{gtest__output__test___8cc_a8763e3844bd21de9bd7126658a4279c5}{00120}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(FatalFailureTest,\ FatalFailureInNestedSubroutine)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00121}00121\ \ \ printf(\textcolor{stringliteral}{"{}(expecting\ a\ failure\ that\ x\ should\ be\ 1)\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00122}00122\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00123}00123\ \ \ \textcolor{comment}{//\ Calls\ a\ subrountine\ that\ yields\ a\ fatal\ failure.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00124}00124\ \ \ \mbox{\hyperlink{gtest__output__test___8cc_a14e796981ca8d3c71dbd2b839c1ce784}{TryTestSubroutine}}();}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00125}00125\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00126}00126\ \ \ \textcolor{comment}{//\ Catches\ the\ fatal\ failure\ and\ aborts\ the\ test.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00127}00127\ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00128}00128\ \ \ \textcolor{comment}{//\ When\ calling\ HasFatalFailure()\ inside\ a\ TEST,\ TEST\_F,\ or\ test}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00129}00129\ \ \ \textcolor{comment}{//\ fixture,\ the\ testing::Test::\ prefix\ is\ not\ needed.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00130}00130\ \ \ \textcolor{keywordflow}{if}\ (HasFatalFailure())\ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00131}00131\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00132}00132\ \ \ \textcolor{comment}{//\ If\ we\ get\ here,\ something\ is\ wrong.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00133}00133\ \ \ \mbox{\hyperlink{gtest_8h_a3e26a8d27caa386ed0ea7ce9d5b7c4ed}{FAIL}}()\ <<\ \textcolor{stringliteral}{"{}This\ should\ never\ be\ reached."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00134}00134\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00135}00135\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00136}00136\ \textcolor{comment}{//\ Tests\ HasFatalFailure()\ after\ a\ failed\ EXPECT\ check.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00137}\mbox{\hyperlink{gtest__output__test___8cc_afe609aef34a68a2ab9809eb48112c5cc}{00137}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(FatalFailureTest,\ NonfatalFailureInSubroutine)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00138}00138\ \ \ printf(\textcolor{stringliteral}{"{}(expecting\ a\ failure\ on\ false)\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00139}00139\ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\textcolor{keyword}{false});\ \ \textcolor{comment}{//\ Generates\ a\ nonfatal\ failure}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00140}00140\ \ \ \mbox{\hyperlink{gtest_8h_a8197fa52f3538588d20d8af4834c9003}{ASSERT\_FALSE}}(HasFatalFailure());\ \ \textcolor{comment}{//\ This\ should\ succeed.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00141}00141\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00142}00142\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00143}00143\ \textcolor{comment}{//\ Tests\ interleaving\ user\ logging\ and\ Google\ Test\ assertions.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00144}\mbox{\hyperlink{gtest__output__test___8cc_ad9bbf46060935b29c42d3116ddbc3566}{00144}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(LoggingTest,\ InterleavingLoggingAndAssertions)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00145}00145\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}[4]\ =\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00146}00146\ \ \ \ \ 3,\ 9,\ 2,\ 6}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00147}00147\ \ \ \};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00148}00148\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00149}00149\ \ \ printf(\textcolor{stringliteral}{"{}(expecting\ 2\ failures\ on\ (3)\ >=\ (a[i]))\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00150}00150\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ static\_cast<int>(\textcolor{keyword}{sizeof}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})/\textcolor{keyword}{sizeof}(*\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}));\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00151}00151\ \ \ \ \ printf(\textcolor{stringliteral}{"{}i\ ==\ \%d\(\backslash\)n"{}},\ i);}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00152}00152\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ab7a0ff4bfa4d9b27baa118d8b0756ca0}{EXPECT\_GE}}(3,\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}[i]);}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00153}00153\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00154}00154\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00155}00155\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00156}00156\ \textcolor{comment}{//\ Tests\ the\ SCOPED\_TRACE\ macro.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00157}00157\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00158}00158\ \textcolor{comment}{//\ A\ helper\ function\ for\ testing\ SCOPED\_TRACE.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00159}\mbox{\hyperlink{gtest__output__test___8cc_a7e222b468bbde7215ce826f10993e746}{00159}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{gtest__output__test___8cc_a7e222b468bbde7215ce826f10993e746}{SubWithoutTrace}}(\textcolor{keywordtype}{int}\ n)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00160}00160\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(1,\ n);}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00161}00161\ \ \ \mbox{\hyperlink{gtest_8h_a1a6db8b1338ee7040329322b77779086}{ASSERT\_EQ}}(2,\ n);}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00162}00162\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00163}00163\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00164}00164\ \textcolor{comment}{//\ Another\ helper\ function\ for\ testing\ SCOPED\_TRACE.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00165}\mbox{\hyperlink{gtest__output__test___8cc_a543ee38e0824e47113bb12c3277e09ae}{00165}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{gtest__output__test___8cc_a543ee38e0824e47113bb12c3277e09ae}{SubWithTrace}}(\textcolor{keywordtype}{int}\ n)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00166}00166\ \ \ \mbox{\hyperlink{gtest_8h_a4dac08f15adc8cb1ee0e5c1bfb0f440d}{SCOPED\_TRACE}}(\mbox{\hyperlink{classtesting_1_1_message}{testing::Message}}()\ <<\ \textcolor{stringliteral}{"{}n\ =\ "{}}\ <<\ n);}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00167}00167\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00168}00168\ \ \ \mbox{\hyperlink{gtest__output__test___8cc_a7e222b468bbde7215ce826f10993e746}{SubWithoutTrace}}(n);}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00169}00169\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00170}00170\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00171}\mbox{\hyperlink{gtest__output__test___8cc_a81f7d012241339866fccb3c3750b553b}{00171}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(SCOPED\_TRACETest,\ AcceptedValues)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00172}00172\ \ \ \mbox{\hyperlink{gtest_8h_a4dac08f15adc8cb1ee0e5c1bfb0f440d}{SCOPED\_TRACE}}(\textcolor{stringliteral}{"{}literal\ string"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00173}00173\ \ \ \mbox{\hyperlink{gtest_8h_a4dac08f15adc8cb1ee0e5c1bfb0f440d}{SCOPED\_TRACE}}(std::string(\textcolor{stringliteral}{"{}std::string"{}}));}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00174}00174\ \ \ \mbox{\hyperlink{gtest_8h_a4dac08f15adc8cb1ee0e5c1bfb0f440d}{SCOPED\_TRACE}}(1337);\ \ \textcolor{comment}{//\ streamable\ type}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00175}00175\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ null\_value\ =\ NULL;}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00176}00176\ \ \ \mbox{\hyperlink{gtest_8h_a4dac08f15adc8cb1ee0e5c1bfb0f440d}{SCOPED\_TRACE}}(null\_value);}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00177}00177\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00178}00178\ \ \ \mbox{\hyperlink{gtest_8h_adc16b5b0a740c39084ea5c9e960e3063}{ADD\_FAILURE}}()\ <<\ \textcolor{stringliteral}{"{}Just\ checking\ that\ all\ these\ values\ work\ fine."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00179}00179\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00180}00180\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00181}00181\ \textcolor{comment}{//\ Tests\ that\ SCOPED\_TRACE()\ obeys\ lexical\ scopes.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00182}\mbox{\hyperlink{gtest__output__test___8cc_a82f82f6a7caa426cccf8d20113f897c0}{00182}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(SCOPED\_TRACETest,\ ObeysScopes)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00183}00183\ \ \ printf(\textcolor{stringliteral}{"{}(expected\ to\ fail)\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00184}00184\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00185}00185\ \ \ \textcolor{comment}{//\ There\ should\ be\ no\ trace\ before\ SCOPED\_TRACE()\ is\ invoked.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00186}00186\ \ \ \mbox{\hyperlink{gtest_8h_adc16b5b0a740c39084ea5c9e960e3063}{ADD\_FAILURE}}()\ <<\ \textcolor{stringliteral}{"{}This\ failure\ is\ expected,\ and\ shouldn't\ have\ a\ trace."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00187}00187\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00188}00188\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00189}00189\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4dac08f15adc8cb1ee0e5c1bfb0f440d}{SCOPED\_TRACE}}(\textcolor{stringliteral}{"{}Expected\ trace"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00190}00190\ \ \ \ \ \textcolor{comment}{//\ After\ SCOPED\_TRACE(),\ a\ failure\ in\ the\ current\ scope\ should\ contain}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00191}00191\ \ \ \ \ \textcolor{comment}{//\ the\ trace.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00192}00192\ \ \ \ \ \mbox{\hyperlink{gtest_8h_adc16b5b0a740c39084ea5c9e960e3063}{ADD\_FAILURE}}()\ <<\ \textcolor{stringliteral}{"{}This\ failure\ is\ expected,\ and\ should\ have\ a\ trace."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00193}00193\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00194}00194\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00195}00195\ \ \ \textcolor{comment}{//\ Once\ the\ control\ leaves\ the\ scope\ of\ the\ SCOPED\_TRACE(),\ there}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00196}00196\ \ \ \textcolor{comment}{//\ should\ be\ no\ trace\ again.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00197}00197\ \ \ \mbox{\hyperlink{gtest_8h_adc16b5b0a740c39084ea5c9e960e3063}{ADD\_FAILURE}}()\ <<\ \textcolor{stringliteral}{"{}This\ failure\ is\ expected,\ and\ shouldn't\ have\ a\ trace."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00198}00198\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00199}00199\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00200}00200\ \textcolor{comment}{//\ Tests\ that\ SCOPED\_TRACE\ works\ inside\ a\ loop.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00201}\mbox{\hyperlink{gtest__output__test___8cc_a46dcedbe67765adaebc7740ee17a88de}{00201}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(SCOPED\_TRACETest,\ WorksInLoop)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00202}00202\ \ \ printf(\textcolor{stringliteral}{"{}(expected\ to\ fail)\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00203}00203\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00204}00204\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 1;\ i\ <=\ 2;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00205}00205\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4dac08f15adc8cb1ee0e5c1bfb0f440d}{SCOPED\_TRACE}}(\mbox{\hyperlink{classtesting_1_1_message}{testing::Message}}()\ <<\ \textcolor{stringliteral}{"{}i\ =\ "{}}\ <<\ i);}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00206}00206\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00207}00207\ \ \ \ \ \mbox{\hyperlink{gtest__output__test___8cc_a7e222b468bbde7215ce826f10993e746}{SubWithoutTrace}}(i);}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00208}00208\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00209}00209\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00210}00210\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00211}00211\ \textcolor{comment}{//\ Tests\ that\ SCOPED\_TRACE\ works\ in\ a\ subroutine.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00212}\mbox{\hyperlink{gtest__output__test___8cc_a492695898501cea9f99ccd690c2b3991}{00212}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(SCOPED\_TRACETest,\ WorksInSubroutine)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00213}00213\ \ \ printf(\textcolor{stringliteral}{"{}(expected\ to\ fail)\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00214}00214\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00215}00215\ \ \ \mbox{\hyperlink{gtest__output__test___8cc_a543ee38e0824e47113bb12c3277e09ae}{SubWithTrace}}(1);}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00216}00216\ \ \ \mbox{\hyperlink{gtest__output__test___8cc_a543ee38e0824e47113bb12c3277e09ae}{SubWithTrace}}(2);}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00217}00217\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00218}00218\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00219}00219\ \textcolor{comment}{//\ Tests\ that\ SCOPED\_TRACE\ can\ be\ nested.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00220}\mbox{\hyperlink{gtest__output__test___8cc_ae402e91f305e54f5f14a172a0fb0831b}{00220}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(SCOPED\_TRACETest,\ CanBeNested)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00221}00221\ \ \ printf(\textcolor{stringliteral}{"{}(expected\ to\ fail)\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00222}00222\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00223}00223\ \ \ \mbox{\hyperlink{gtest_8h_a4dac08f15adc8cb1ee0e5c1bfb0f440d}{SCOPED\_TRACE}}(\textcolor{stringliteral}{"{}"{}});\ \ \textcolor{comment}{//\ A\ trace\ without\ a\ message.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00224}00224\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00225}00225\ \ \ \mbox{\hyperlink{gtest__output__test___8cc_a543ee38e0824e47113bb12c3277e09ae}{SubWithTrace}}(2);}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00226}00226\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00227}00227\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00228}00228\ \textcolor{comment}{//\ Tests\ that\ multiple\ SCOPED\_TRACEs\ can\ be\ used\ in\ the\ same\ scope.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00229}\mbox{\hyperlink{gtest__output__test___8cc_a49c4610eeb41adaa369f9dce003d5198}{00229}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(SCOPED\_TRACETest,\ CanBeRepeated)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00230}00230\ \ \ printf(\textcolor{stringliteral}{"{}(expected\ to\ fail)\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00231}00231\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00232}00232\ \ \ \mbox{\hyperlink{gtest_8h_a4dac08f15adc8cb1ee0e5c1bfb0f440d}{SCOPED\_TRACE}}(\textcolor{stringliteral}{"{}A"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00233}00233\ \ \ \mbox{\hyperlink{gtest_8h_adc16b5b0a740c39084ea5c9e960e3063}{ADD\_FAILURE}}()}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00234}00234\ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}This\ failure\ is\ expected,\ and\ should\ contain\ trace\ point\ A."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00235}00235\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00236}00236\ \ \ \mbox{\hyperlink{gtest_8h_a4dac08f15adc8cb1ee0e5c1bfb0f440d}{SCOPED\_TRACE}}(\textcolor{stringliteral}{"{}B"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00237}00237\ \ \ \mbox{\hyperlink{gtest_8h_adc16b5b0a740c39084ea5c9e960e3063}{ADD\_FAILURE}}()}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00238}00238\ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}This\ failure\ is\ expected,\ and\ should\ contain\ trace\ point\ A\ and\ B."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00239}00239\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00240}00240\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00241}00241\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4dac08f15adc8cb1ee0e5c1bfb0f440d}{SCOPED\_TRACE}}(\textcolor{stringliteral}{"{}C"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00242}00242\ \ \ \ \ \mbox{\hyperlink{gtest_8h_adc16b5b0a740c39084ea5c9e960e3063}{ADD\_FAILURE}}()\ <<\ \textcolor{stringliteral}{"{}This\ failure\ is\ expected,\ and\ should\ "{}}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00243}00243\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}contain\ trace\ point\ A,\ B,\ and\ C."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00244}00244\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00245}00245\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00246}00246\ \ \ \mbox{\hyperlink{gtest_8h_a4dac08f15adc8cb1ee0e5c1bfb0f440d}{SCOPED\_TRACE}}(\textcolor{stringliteral}{"{}D"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00247}00247\ \ \ \mbox{\hyperlink{gtest_8h_adc16b5b0a740c39084ea5c9e960e3063}{ADD\_FAILURE}}()\ <<\ \textcolor{stringliteral}{"{}This\ failure\ is\ expected,\ and\ should\ "{}}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00248}00248\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}contain\ trace\ point\ A,\ B,\ and\ D."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00249}00249\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00250}00250\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00251}00251\ \textcolor{preprocessor}{\#if\ GTEST\_IS\_THREADSAFE}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00252}00252\ \textcolor{comment}{//\ Tests\ that\ SCOPED\_TRACE()s\ can\ be\ used\ concurrently\ from\ multiple}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00253}00253\ \textcolor{comment}{//\ threads.\ \ Namely,\ an\ assertion\ should\ be\ affected\ by}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00254}00254\ \textcolor{comment}{//\ SCOPED\_TRACE()s\ in\ its\ own\ thread\ only.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00255}00255\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00256}00256\ \textcolor{comment}{//\ Here's\ the\ sequence\ of\ actions\ that\ happen\ in\ the\ test:}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00257}00257\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00258}00258\ \textcolor{comment}{//\ \ \ Thread\ A\ (main)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ Thread\ B\ (spawned)}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00259}00259\ \textcolor{comment}{//\ \ \ ===============================|================================}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00260}00260\ \textcolor{comment}{//\ \ \ spawns\ thread\ B\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00261}00261\ \textcolor{comment}{//\ \ \ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/+-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00262}00262\ \textcolor{comment}{//\ \ \ waits\ for\ n1\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ SCOPED\_TRACE("{}Trace\ B"{});}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00263}00263\ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ generates\ failure\ \#1}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00264}00264\ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ notifies\ n1}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00265}00265\ \textcolor{comment}{//\ \ \ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/+-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00266}00266\ \textcolor{comment}{//\ \ \ SCOPED\_TRACE("{}Trace\ A"{});\ \ \ \ \ \ \ |\ waits\ for\ n2}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00267}00267\ \textcolor{comment}{//\ \ \ generates\ failure\ \#2\ \ \ \ \ \ \ \ \ \ \ |}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00268}00268\ \textcolor{comment}{//\ \ \ notifies\ n2\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00269}00269\ \textcolor{comment}{//\ \ \ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/|-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00270}00270\ \textcolor{comment}{//\ \ \ waits\ for\ n3\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ generates\ failure\ \#3}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00271}00271\ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ trace\ B\ dies}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00272}00272\ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ generates\ failure\ \#4}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00273}00273\ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ notifies\ n3}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00274}00274\ \textcolor{comment}{//\ \ \ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/|-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00275}00275\ \textcolor{comment}{//\ \ \ generates\ failure\ \#5\ \ \ \ \ \ \ \ \ \ \ |\ finishes}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00276}00276\ \textcolor{comment}{//\ \ \ trace\ A\ dies\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00277}00277\ \textcolor{comment}{//\ \ \ generates\ failure\ \#6\ \ \ \ \ \ \ \ \ \ \ |}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00278}00278\ \textcolor{comment}{//\ \ \ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/|-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00279}00279\ \textcolor{comment}{//\ \ \ waits\ for\ thread\ B\ to\ finish\ \ \ |}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00280}00280\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00281}00281\ \textcolor{keyword}{struct\ }CheckPoints\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00282}00282\ \ \ Notification\ n1;}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00283}00283\ \ \ Notification\ n2;}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00284}00284\ \ \ Notification\ n3;}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00285}00285\ \};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00286}00286\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00287}00287\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ ThreadWithScopedTrace(CheckPoints*\ check\_points)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00288}00288\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00289}00289\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4dac08f15adc8cb1ee0e5c1bfb0f440d}{SCOPED\_TRACE}}(\textcolor{stringliteral}{"{}Trace\ B"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00290}00290\ \ \ \ \ \mbox{\hyperlink{gtest_8h_adc16b5b0a740c39084ea5c9e960e3063}{ADD\_FAILURE}}()}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00291}00291\ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}Expected\ failure\ \#1\ (in\ thread\ B,\ only\ trace\ B\ alive)."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00292}00292\ \ \ \ \ check\_points-\/>n1.Notify();}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00293}00293\ \ \ \ \ check\_points-\/>n2.WaitForNotification();}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00294}00294\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00295}00295\ \ \ \ \ \mbox{\hyperlink{gtest_8h_adc16b5b0a740c39084ea5c9e960e3063}{ADD\_FAILURE}}()}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00296}00296\ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}Expected\ failure\ \#3\ (in\ thread\ B,\ trace\ A\ \&\ B\ both\ alive)."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00297}00297\ \ \ \}\ \ \textcolor{comment}{//\ Trace\ B\ dies\ here.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00298}00298\ \ \ \mbox{\hyperlink{gtest_8h_adc16b5b0a740c39084ea5c9e960e3063}{ADD\_FAILURE}}()}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00299}00299\ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}Expected\ failure\ \#4\ (in\ thread\ B,\ only\ trace\ A\ alive)."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00300}00300\ \ \ check\_points-\/>n3.Notify();}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00301}00301\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00302}00302\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00303}00303\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(SCOPED\_TRACETest,\ WorksConcurrently)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00304}00304\ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}(expecting\ 6\ failures)\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00305}00305\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00306}00306\ \ \ CheckPoints\ check\_points;}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00307}00307\ \ \ ThreadWithParam<CheckPoints*>\ thread(\&ThreadWithScopedTrace,}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00308}00308\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&check\_points,}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00309}00309\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ NULL);}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00310}00310\ \ \ check\_points.n1.WaitForNotification();}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00311}00311\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00312}00312\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00313}00313\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4dac08f15adc8cb1ee0e5c1bfb0f440d}{SCOPED\_TRACE}}(\textcolor{stringliteral}{"{}Trace\ A"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00314}00314\ \ \ \ \ \mbox{\hyperlink{gtest_8h_adc16b5b0a740c39084ea5c9e960e3063}{ADD\_FAILURE}}()}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00315}00315\ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}Expected\ failure\ \#2\ (in\ thread\ A,\ trace\ A\ \&\ B\ both\ alive)."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00316}00316\ \ \ \ \ check\_points.n2.Notify();}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00317}00317\ \ \ \ \ check\_points.n3.WaitForNotification();}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00318}00318\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00319}00319\ \ \ \ \ \mbox{\hyperlink{gtest_8h_adc16b5b0a740c39084ea5c9e960e3063}{ADD\_FAILURE}}()}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00320}00320\ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}Expected\ failure\ \#5\ (in\ thread\ A,\ only\ trace\ A\ alive)."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00321}00321\ \ \ \}\ \ \textcolor{comment}{//\ Trace\ A\ dies\ here.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00322}00322\ \ \ \mbox{\hyperlink{gtest_8h_adc16b5b0a740c39084ea5c9e960e3063}{ADD\_FAILURE}}()}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00323}00323\ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}Expected\ failure\ \#6\ (in\ thread\ A,\ no\ trace\ alive)."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00324}00324\ \ \ thread.Join();}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00325}00325\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00326}00326\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_IS\_THREADSAFE}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00327}00327\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00328}00328\ \textcolor{comment}{//\ Tests\ basic\ functionality\ of\ the\ ScopedTrace\ utility\ (most\ of\ its\ features}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00329}00329\ \textcolor{comment}{//\ are\ already\ tested\ in\ SCOPED\_TRACETest).}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00330}\mbox{\hyperlink{gtest__output__test___8cc_aff587c2c7d3e81f4d94425987ca07bc1}{00330}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(ScopedTraceTest,\ WithExplicitFileAndLine)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00331}00331\ \ \ \mbox{\hyperlink{classtesting_1_1_scoped_trace}{testing::ScopedTrace}}\ trace(\textcolor{stringliteral}{"{}explicit\_file.cc"{}},\ 123,\ \textcolor{stringliteral}{"{}expected\ trace\ message"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00332}00332\ \ \ \mbox{\hyperlink{gtest_8h_adc16b5b0a740c39084ea5c9e960e3063}{ADD\_FAILURE}}()\ <<\ \textcolor{stringliteral}{"{}Check\ that\ the\ trace\ is\ attached\ to\ a\ particular\ location."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00333}00333\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00334}00334\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00335}\mbox{\hyperlink{gtest__output__test___8cc_a2bdac0e0076d65fa77a967c0fdb46e2a}{00335}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(DisabledTestsWarningTest,}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00336}00336\ \ \ \ \ \ DISABLED\_AlsoRunDisabledTestsFlagSuppressesWarning)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00337}00337\ \ \ \textcolor{comment}{//\ This\ test\ body\ is\ intentionally\ empty.\ \ Its\ sole\ purpose\ is\ for}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00338}00338\ \ \ \textcolor{comment}{//\ verifying\ that\ the\ -\/-\/gtest\_also\_run\_disabled\_tests\ flag}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00339}00339\ \ \ \textcolor{comment}{//\ suppresses\ the\ "{}YOU\ HAVE\ 12\ DISABLED\ TESTS"{}\ warning\ at\ the\ end\ of}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00340}00340\ \ \ \textcolor{comment}{//\ the\ test\ output.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00341}00341\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00342}00342\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00343}00343\ \textcolor{comment}{//\ Tests\ using\ assertions\ outside\ of\ TEST\ and\ TEST\_F.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00344}00344\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00345}00345\ \textcolor{comment}{//\ This\ function\ creates\ two\ failures\ intentionally.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00346}\mbox{\hyperlink{gtest__output__test___8cc_a36cd4d21174efaa3066237d716028d49}{00346}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{gtest__output__test___8cc_a36cd4d21174efaa3066237d716028d49}{AdHocTest}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00347}00347\ \ \ printf(\textcolor{stringliteral}{"{}The\ non-\/test\ part\ of\ the\ code\ is\ expected\ to\ have\ 2\ failures.\(\backslash\)n\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00348}00348\ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00349}00349\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(2,\ 3);}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00350}00350\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00351}00351\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00352}00352\ \textcolor{comment}{//\ Runs\ all\ TESTs,\ all\ TEST\_Fs,\ and\ the\ ad\ hoc\ test.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00353}\mbox{\hyperlink{gtest__output__test___8cc_ae0ca194f6b730e168850ce3179ad4f63}{00353}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{gtest__output__test___8cc_ae0ca194f6b730e168850ce3179ad4f63}{RunAllTests}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00354}00354\ \ \ \mbox{\hyperlink{gtest__output__test___8cc_a36cd4d21174efaa3066237d716028d49}{AdHocTest}}();}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00355}00355\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{gtest_8h_a853a3792807489591d3d4a2f2ff9359f}{RUN\_ALL\_TESTS}}();}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00356}00356\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00357}00357\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00358}00358\ \textcolor{comment}{//\ Tests\ non-\/fatal\ failures\ in\ the\ fixture\ constructor.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00359}\mbox{\hyperlink{class_non_fatal_failure_in_fixture_constructor_test}{00359}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_non_fatal_failure_in_fixture_constructor_test}{NonFatalFailureInFixtureConstructorTest}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1_test}{testing::Test}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00360}00360\ \ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00361}\mbox{\hyperlink{class_non_fatal_failure_in_fixture_constructor_test_a87a70e2b18b981c627c43f2af85a9345}{00361}}\ \ \ \mbox{\hyperlink{class_non_fatal_failure_in_fixture_constructor_test_a87a70e2b18b981c627c43f2af85a9345}{NonFatalFailureInFixtureConstructorTest}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00362}00362\ \ \ \ \ printf(\textcolor{stringliteral}{"{}(expecting\ 5\ failures)\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00363}00363\ \ \ \ \ \mbox{\hyperlink{gtest_8h_adc16b5b0a740c39084ea5c9e960e3063}{ADD\_FAILURE}}()\ <<\ \textcolor{stringliteral}{"{}Expected\ failure\ \#1,\ in\ the\ test\ fixture\ c'tor."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00364}00364\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00365}00365\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00366}\mbox{\hyperlink{class_non_fatal_failure_in_fixture_constructor_test_a732fa961c4bb68b3390e4a49a8375619}{00366}}\ \ \ \mbox{\hyperlink{class_non_fatal_failure_in_fixture_constructor_test_a732fa961c4bb68b3390e4a49a8375619}{\string~NonFatalFailureInFixtureConstructorTest}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00367}00367\ \ \ \ \ \mbox{\hyperlink{gtest_8h_adc16b5b0a740c39084ea5c9e960e3063}{ADD\_FAILURE}}()\ <<\ \textcolor{stringliteral}{"{}Expected\ failure\ \#5,\ in\ the\ test\ fixture\ d'tor."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00368}00368\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00369}00369\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00370}\mbox{\hyperlink{class_non_fatal_failure_in_fixture_constructor_test_a7d951f8fbf7b2ac5046be8d8ee7b03d3}{00370}}\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_non_fatal_failure_in_fixture_constructor_test_a7d951f8fbf7b2ac5046be8d8ee7b03d3}{SetUp}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00371}00371\ \ \ \ \ \mbox{\hyperlink{gtest_8h_adc16b5b0a740c39084ea5c9e960e3063}{ADD\_FAILURE}}()\ <<\ \textcolor{stringliteral}{"{}Expected\ failure\ \#2,\ in\ SetUp()."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00372}00372\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00373}00373\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00374}\mbox{\hyperlink{class_non_fatal_failure_in_fixture_constructor_test_ab76d79c346d9a378d625fde5739e8ad6}{00374}}\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_non_fatal_failure_in_fixture_constructor_test_ab76d79c346d9a378d625fde5739e8ad6}{TearDown}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00375}00375\ \ \ \ \ \mbox{\hyperlink{gtest_8h_adc16b5b0a740c39084ea5c9e960e3063}{ADD\_FAILURE}}()\ <<\ \textcolor{stringliteral}{"{}Expected\ failure\ \#4,\ in\ TearDown."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00376}00376\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00377}00377\ \};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00378}00378\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00379}\mbox{\hyperlink{gtest__output__test___8cc_ad122def39d78da61690433e185611737}{00379}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{class_non_fatal_failure_in_fixture_constructor_test}{NonFatalFailureInFixtureConstructorTest}},\ FailureInConstructor)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00380}00380\ \ \ \mbox{\hyperlink{gtest_8h_adc16b5b0a740c39084ea5c9e960e3063}{ADD\_FAILURE}}()\ <<\ \textcolor{stringliteral}{"{}Expected\ failure\ \#3,\ in\ the\ test\ body."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00381}00381\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00382}00382\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00383}00383\ \textcolor{comment}{//\ Tests\ fatal\ failures\ in\ the\ fixture\ constructor.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00384}\mbox{\hyperlink{class_fatal_failure_in_fixture_constructor_test}{00384}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_fatal_failure_in_fixture_constructor_test}{FatalFailureInFixtureConstructorTest}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1_test}{testing::Test}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00385}00385\ \ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00386}\mbox{\hyperlink{class_fatal_failure_in_fixture_constructor_test_a1dc9a5fcf0e1f22d614990a0fe2cb504}{00386}}\ \ \ \mbox{\hyperlink{class_fatal_failure_in_fixture_constructor_test_a1dc9a5fcf0e1f22d614990a0fe2cb504}{FatalFailureInFixtureConstructorTest}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00387}00387\ \ \ \ \ printf(\textcolor{stringliteral}{"{}(expecting\ 2\ failures)\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00388}00388\ \ \ \ \ \mbox{\hyperlink{struct_init}{Init}}();}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00389}00389\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00390}00390\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00391}\mbox{\hyperlink{class_fatal_failure_in_fixture_constructor_test_a514709af7159172a12193a7508683c46}{00391}}\ \ \ \mbox{\hyperlink{class_fatal_failure_in_fixture_constructor_test_a514709af7159172a12193a7508683c46}{\string~FatalFailureInFixtureConstructorTest}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00392}00392\ \ \ \ \ \mbox{\hyperlink{gtest_8h_adc16b5b0a740c39084ea5c9e960e3063}{ADD\_FAILURE}}()\ <<\ \textcolor{stringliteral}{"{}Expected\ failure\ \#2,\ in\ the\ test\ fixture\ d'tor."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00393}00393\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00394}00394\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00395}\mbox{\hyperlink{class_fatal_failure_in_fixture_constructor_test_a006d3ac0e7a4ad3c469c3b41dc7c42c3}{00395}}\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_fatal_failure_in_fixture_constructor_test_a006d3ac0e7a4ad3c469c3b41dc7c42c3}{SetUp}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00396}00396\ \ \ \ \ \mbox{\hyperlink{gtest_8h_adc16b5b0a740c39084ea5c9e960e3063}{ADD\_FAILURE}}()\ <<\ \textcolor{stringliteral}{"{}UNEXPECTED\ failure\ in\ SetUp().\ \ "{}}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00397}00397\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}We\ should\ never\ get\ here,\ as\ the\ test\ fixture\ c'tor\ "{}}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00398}00398\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}had\ a\ fatal\ failure."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00399}00399\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00400}00400\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00401}\mbox{\hyperlink{class_fatal_failure_in_fixture_constructor_test_a2763026a557e1fce4e59bd16c4eced57}{00401}}\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_fatal_failure_in_fixture_constructor_test_a2763026a557e1fce4e59bd16c4eced57}{TearDown}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00402}00402\ \ \ \ \ \mbox{\hyperlink{gtest_8h_adc16b5b0a740c39084ea5c9e960e3063}{ADD\_FAILURE}}()\ <<\ \textcolor{stringliteral}{"{}UNEXPECTED\ failure\ in\ TearDown().\ \ "{}}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00403}00403\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}We\ should\ never\ get\ here,\ as\ the\ test\ fixture\ c'tor\ "{}}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00404}00404\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}had\ a\ fatal\ failure."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00405}00405\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00406}00406\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00407}00407\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00408}00408\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_init}{Init}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00409}00409\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a3e26a8d27caa386ed0ea7ce9d5b7c4ed}{FAIL}}()\ <<\ \textcolor{stringliteral}{"{}Expected\ failure\ \#1,\ in\ the\ test\ fixture\ c'tor."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00410}00410\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00411}00411\ \};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00412}00412\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00413}\mbox{\hyperlink{gtest__output__test___8cc_a858b341fa0b2298c1534b1325fedf797}{00413}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{class_fatal_failure_in_fixture_constructor_test}{FatalFailureInFixtureConstructorTest}},\ FailureInConstructor)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00414}00414\ \ \ \mbox{\hyperlink{gtest_8h_adc16b5b0a740c39084ea5c9e960e3063}{ADD\_FAILURE}}()\ <<\ \textcolor{stringliteral}{"{}UNEXPECTED\ failure\ in\ the\ test\ body.\ \ "{}}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00415}00415\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}We\ should\ never\ get\ here,\ as\ the\ test\ fixture\ c'tor\ "{}}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00416}00416\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}had\ a\ fatal\ failure."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00417}00417\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00418}00418\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00419}00419\ \textcolor{comment}{//\ Tests\ non-\/fatal\ failures\ in\ SetUp().}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00420}\mbox{\hyperlink{class_non_fatal_failure_in_set_up_test}{00420}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_non_fatal_failure_in_set_up_test}{NonFatalFailureInSetUpTest}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1_test}{testing::Test}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00421}00421\ \ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00422}\mbox{\hyperlink{class_non_fatal_failure_in_set_up_test_ae4b4ee1812e3427cf82b155256547442}{00422}}\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{class_non_fatal_failure_in_set_up_test_ae4b4ee1812e3427cf82b155256547442}{\string~NonFatalFailureInSetUpTest}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00423}00423\ \ \ \ \ Deinit();}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00424}00424\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00425}00425\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00426}\mbox{\hyperlink{class_non_fatal_failure_in_set_up_test_ae24c724bae1fcd2601f58fa9c26adca3}{00426}}\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_non_fatal_failure_in_set_up_test_ae24c724bae1fcd2601f58fa9c26adca3}{SetUp}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00427}00427\ \ \ \ \ printf(\textcolor{stringliteral}{"{}(expecting\ 4\ failures)\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00428}00428\ \ \ \ \ \mbox{\hyperlink{gtest_8h_adc16b5b0a740c39084ea5c9e960e3063}{ADD\_FAILURE}}()\ <<\ \textcolor{stringliteral}{"{}Expected\ failure\ \#1,\ in\ SetUp()."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00429}00429\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00430}00430\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00431}\mbox{\hyperlink{class_non_fatal_failure_in_set_up_test_a36abc808b11afc6a9bfa20dac5c28c30}{00431}}\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_non_fatal_failure_in_set_up_test_a36abc808b11afc6a9bfa20dac5c28c30}{TearDown}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00432}00432\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a3e26a8d27caa386ed0ea7ce9d5b7c4ed}{FAIL}}()\ <<\ \textcolor{stringliteral}{"{}Expected\ failure\ \#3,\ in\ TearDown()."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00433}00433\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00434}00434\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00435}00435\ \ \ \textcolor{keywordtype}{void}\ Deinit()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00436}00436\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a3e26a8d27caa386ed0ea7ce9d5b7c4ed}{FAIL}}()\ <<\ \textcolor{stringliteral}{"{}Expected\ failure\ \#4,\ in\ the\ test\ fixture\ d'tor."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00437}00437\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00438}00438\ \};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00439}00439\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00440}\mbox{\hyperlink{gtest__output__test___8cc_aaa9d6fcc5d9910aedb42ff3db3cc313c}{00440}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{class_non_fatal_failure_in_set_up_test}{NonFatalFailureInSetUpTest}},\ FailureInSetUp)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00441}00441\ \ \ \mbox{\hyperlink{gtest_8h_a3e26a8d27caa386ed0ea7ce9d5b7c4ed}{FAIL}}()\ <<\ \textcolor{stringliteral}{"{}Expected\ failure\ \#2,\ in\ the\ test\ function."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00442}00442\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00443}00443\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00444}00444\ \textcolor{comment}{//\ Tests\ fatal\ failures\ in\ SetUp().}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00445}\mbox{\hyperlink{class_fatal_failure_in_set_up_test}{00445}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_fatal_failure_in_set_up_test}{FatalFailureInSetUpTest}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1_test}{testing::Test}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00446}00446\ \ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00447}\mbox{\hyperlink{class_fatal_failure_in_set_up_test_a915ca362b046259c3586c1ab72bb0a93}{00447}}\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{class_fatal_failure_in_set_up_test_a915ca362b046259c3586c1ab72bb0a93}{\string~FatalFailureInSetUpTest}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00448}00448\ \ \ \ \ Deinit();}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00449}00449\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00450}00450\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00451}\mbox{\hyperlink{class_fatal_failure_in_set_up_test_a455696f86fb5f5393624221ccb79b373}{00451}}\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_fatal_failure_in_set_up_test_a455696f86fb5f5393624221ccb79b373}{SetUp}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00452}00452\ \ \ \ \ printf(\textcolor{stringliteral}{"{}(expecting\ 3\ failures)\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00453}00453\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a3e26a8d27caa386ed0ea7ce9d5b7c4ed}{FAIL}}()\ <<\ \textcolor{stringliteral}{"{}Expected\ failure\ \#1,\ in\ SetUp()."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00454}00454\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00455}00455\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00456}\mbox{\hyperlink{class_fatal_failure_in_set_up_test_a457707161063e08f7b6600ec5db449e4}{00456}}\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_fatal_failure_in_set_up_test_a457707161063e08f7b6600ec5db449e4}{TearDown}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00457}00457\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a3e26a8d27caa386ed0ea7ce9d5b7c4ed}{FAIL}}()\ <<\ \textcolor{stringliteral}{"{}Expected\ failure\ \#2,\ in\ TearDown()."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00458}00458\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00459}00459\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00460}00460\ \ \ \textcolor{keywordtype}{void}\ Deinit()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00461}00461\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a3e26a8d27caa386ed0ea7ce9d5b7c4ed}{FAIL}}()\ <<\ \textcolor{stringliteral}{"{}Expected\ failure\ \#3,\ in\ the\ test\ fixture\ d'tor."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00462}00462\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00463}00463\ \};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00464}00464\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00465}\mbox{\hyperlink{gtest__output__test___8cc_a52057afc95d69adbae1fbe0ef92b29d7}{00465}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{class_fatal_failure_in_set_up_test}{FatalFailureInSetUpTest}},\ FailureInSetUp)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00466}00466\ \ \ \mbox{\hyperlink{gtest_8h_a3e26a8d27caa386ed0ea7ce9d5b7c4ed}{FAIL}}()\ <<\ \textcolor{stringliteral}{"{}UNEXPECTED\ failure\ in\ the\ test\ function.\ \ "{}}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00467}00467\ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}We\ should\ never\ get\ here,\ as\ SetUp()\ failed."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00468}00468\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00469}00469\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00470}\mbox{\hyperlink{gtest__output__test___8cc_a62631ea26f8f98f3f19dc03f950dc197}{00470}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(AddFailureAtTest,\ MessageContainsSpecifiedFileAndLineNumber)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00471}00471\ \ \ \mbox{\hyperlink{gtest_8h_a448d7e5105b640e892fd8153fbee0b7f}{ADD\_FAILURE\_AT}}(\textcolor{stringliteral}{"{}foo.cc"{}},\ 42)\ <<\ \textcolor{stringliteral}{"{}Expected\ failure\ in\ foo.cc"{}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00472}00472\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00473}00473\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00474}00474\ \textcolor{preprocessor}{\#if\ GTEST\_IS\_THREADSAFE}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00475}00475\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00476}00476\ \textcolor{comment}{//\ A\ unary\ function\ that\ may\ die.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00477}00477\ \textcolor{keywordtype}{void}\ DieIf(\textcolor{keywordtype}{bool}\ should\_die)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00478}00478\ \ \ \mbox{\hyperlink{gtest-port_8h_ab54343f0a36dc4cb0ce8a478dd7847b8}{GTEST\_CHECK\_}}(!should\_die)\ <<\ \textcolor{stringliteral}{"{}\ -\/\ death\ inside\ DieIf()."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00479}00479\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00480}00480\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00481}00481\ \textcolor{comment}{//\ Tests\ running\ death\ tests\ in\ a\ multi-\/threaded\ context.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00482}00482\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00483}00483\ \textcolor{comment}{//\ Used\ for\ coordination\ between\ the\ main\ and\ the\ spawn\ thread.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00484}00484\ \textcolor{keyword}{struct\ }SpawnThreadNotifications\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00485}00485\ \ \ SpawnThreadNotifications()\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00486}00486\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00487}00487\ \ \ Notification\ spawn\_thread\_started;}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00488}00488\ \ \ Notification\ spawn\_thread\_ok\_to\_terminate;}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00489}00489\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00490}00490\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00491}00491\ \ \ \mbox{\hyperlink{gtest-port_8h_aed8c1888c32b588b0681e88b95031e29}{GTEST\_DISALLOW\_COPY\_AND\_ASSIGN\_}}(SpawnThreadNotifications);}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00492}00492\ \};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00493}00493\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00494}00494\ \textcolor{comment}{//\ The\ function\ to\ be\ executed\ in\ the\ thread\ spawn\ by\ the}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00495}00495\ \textcolor{comment}{//\ MultipleThreads\ test\ (below).}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00496}00496\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ ThreadRoutine(SpawnThreadNotifications*\ notifications)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00497}00497\ \ \ \textcolor{comment}{//\ Signals\ the\ main\ thread\ that\ this\ thread\ has\ started.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00498}00498\ \ \ notifications-\/>spawn\_thread\_started.Notify();}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00499}00499\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00500}00500\ \ \ \textcolor{comment}{//\ Waits\ for\ permission\ to\ finish\ from\ the\ main\ thread.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00501}00501\ \ \ notifications-\/>spawn\_thread\_ok\_to\_terminate.WaitForNotification();}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00502}00502\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00503}00503\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00504}00504\ \textcolor{comment}{//\ This\ is\ a\ death-\/test\ test,\ but\ it's\ not\ named\ with\ a\ DeathTest}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00505}00505\ \textcolor{comment}{//\ suffix.\ \ It\ starts\ threads\ which\ might\ interfere\ with\ later}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00506}00506\ \textcolor{comment}{//\ death\ tests,\ so\ it\ must\ run\ after\ all\ other\ death\ tests.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00507}00507\ \textcolor{keyword}{class\ }DeathTestAndMultiThreadsTest\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1_test}{testing::Test}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00508}00508\ \ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00509}00509\ \ \ \textcolor{comment}{//\ Starts\ a\ thread\ and\ waits\ for\ it\ to\ begin.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00510}00510\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1_test_a190315150c303ddf801313fd1a777733}{SetUp}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00511}00511\ \ \ \ \ thread\_.reset(\textcolor{keyword}{new}\ ThreadWithParam<SpawnThreadNotifications*>(}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00512}00512\ \ \ \ \ \ \ \ \ \&ThreadRoutine,\ \&notifications\_,\ NULL));}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00513}00513\ \ \ \ \ notifications\_.spawn\_thread\_started.WaitForNotification();}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00514}00514\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00515}00515\ \ \ \textcolor{comment}{//\ Tells\ the\ thread\ to\ finish,\ and\ reaps\ it.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00516}00516\ \ \ \textcolor{comment}{//\ Depending\ on\ the\ version\ of\ the\ thread\ library\ in\ use,}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00517}00517\ \ \ \textcolor{comment}{//\ a\ manager\ thread\ might\ still\ be\ left\ running\ that\ will\ interfere}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00518}00518\ \ \ \textcolor{comment}{//\ with\ later\ death\ tests.\ \ This\ is\ unfortunate,\ but\ this\ class}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00519}00519\ \ \ \textcolor{comment}{//\ cleans\ up\ after\ itself\ as\ best\ it\ can.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00520}00520\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1_test_a5f0ab439802cbe0ef7552f1a9f791923}{TearDown}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00521}00521\ \ \ \ \ notifications\_.spawn\_thread\_ok\_to\_terminate.Notify();}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00522}00522\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00523}00523\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00524}00524\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00525}00525\ \ \ SpawnThreadNotifications\ notifications\_;}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00526}00526\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1scoped__ptr}{testing::internal::scoped\_ptr<ThreadWithParam<SpawnThreadNotifications*>}}\ >}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00527}00527\ \ \ \ \ \ \ thread\_;}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00528}00528\ \};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00529}00529\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00530}00530\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_IS\_THREADSAFE}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00531}00531\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00532}00532\ \textcolor{comment}{//\ The\ MixedUpTestCaseTest\ test\ case\ verifies\ that\ Google\ Test\ will\ fail\ a}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00533}00533\ \textcolor{comment}{//\ test\ if\ it\ uses\ a\ different\ fixture\ class\ than\ what\ other\ tests\ in}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00534}00534\ \textcolor{comment}{//\ the\ same\ test\ case\ use.\ \ It\ deliberately\ contains\ two\ fixture}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00535}00535\ \textcolor{comment}{//\ classes\ with\ the\ same\ name\ but\ defined\ in\ different\ namespaces.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00536}00536\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00537}00537\ \textcolor{comment}{//\ The\ MixedUpTestCaseWithSameTestNameTest\ test\ case\ verifies\ that}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00538}00538\ \textcolor{comment}{//\ when\ the\ user\ defines\ two\ tests\ with\ the\ same\ test\ case\ name\ AND}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00539}00539\ \textcolor{comment}{//\ same\ test\ name\ (but\ in\ different\ namespaces),\ the\ second\ test\ will}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00540}00540\ \textcolor{comment}{//\ fail.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00541}00541\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00542}00542\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefoo}{foo}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00543}00543\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00544}\mbox{\hyperlink{classfoo_1_1_mixed_up_test_case_test}{00544}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classfoo_1_1_mixed_up_test_case_test}{MixedUpTestCaseTest}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1_test}{testing::Test}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00545}00545\ \};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00546}00546\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00547}\mbox{\hyperlink{namespacefoo_a0d50eecc97df56ae625078848ba9c98a}{00547}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{classfoo_1_1_mixed_up_test_case_test}{MixedUpTestCaseTest}},\ FirstTestFromNamespaceFoo)\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00548}\mbox{\hyperlink{namespacefoo_a7911fd62b6ae405016caed779b2f95dc}{00548}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{classfoo_1_1_mixed_up_test_case_test}{MixedUpTestCaseTest}},\ SecondTestFromNamespaceFoo)\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00549}00549\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00550}\mbox{\hyperlink{classfoo_1_1_mixed_up_test_case_with_same_test_name_test}{00550}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classfoo_1_1_mixed_up_test_case_with_same_test_name_test}{MixedUpTestCaseWithSameTestNameTest}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1_test}{testing::Test}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00551}00551\ \};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00552}00552\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00553}\mbox{\hyperlink{namespacefoo_a2bc2a2547ff38da0ecf68676e75583cd}{00553}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{classfoo_1_1_mixed_up_test_case_with_same_test_name_test}{MixedUpTestCaseWithSameTestNameTest}},}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00554}00554\ \ \ \ \ \ \ \ TheSecondTestWithThisNameShouldFail)\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00555}00555\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00556}00556\ \}\ \ \textcolor{comment}{//\ namespace\ foo}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00557}00557\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00558}\mbox{\hyperlink{namespacebar}{00558}}\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacebar}{bar}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00559}00559\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00560}\mbox{\hyperlink{classbar_1_1_mixed_up_test_case_test}{00560}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classbar_1_1_mixed_up_test_case_test}{MixedUpTestCaseTest}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1_test}{testing::Test}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00561}00561\ \};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00562}00562\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00563}00563\ \textcolor{comment}{//\ The\ following\ two\ tests\ are\ expected\ to\ fail.\ \ We\ rely\ on\ the}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00564}00564\ \textcolor{comment}{//\ golden\ file\ to\ check\ that\ Google\ Test\ generates\ the\ right\ error\ message.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00565}\mbox{\hyperlink{namespacebar_a0e342ef00f400f593f866279689c55ac}{00565}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{classbar_1_1_mixed_up_test_case_test}{MixedUpTestCaseTest}},\ ThisShouldFail)\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00566}\mbox{\hyperlink{namespacebar_adf88eb6e7ed65a5bd641aa80b237ea2c}{00566}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{classbar_1_1_mixed_up_test_case_test}{MixedUpTestCaseTest}},\ ThisShouldFailToo)\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00567}00567\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00568}\mbox{\hyperlink{classbar_1_1_mixed_up_test_case_with_same_test_name_test}{00568}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classbar_1_1_mixed_up_test_case_with_same_test_name_test}{MixedUpTestCaseWithSameTestNameTest}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1_test}{testing::Test}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00569}00569\ \};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00570}00570\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00571}00571\ \textcolor{comment}{//\ Expected\ to\ fail.\ \ We\ rely\ on\ the\ golden\ file\ to\ check\ that\ Google\ Test}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00572}00572\ \textcolor{comment}{//\ generates\ the\ right\ error\ message.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00573}\mbox{\hyperlink{namespacebar_a600f9a0c34015b598089fb6b69adc63a}{00573}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{classbar_1_1_mixed_up_test_case_with_same_test_name_test}{MixedUpTestCaseWithSameTestNameTest}},}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00574}00574\ \ \ \ \ \ \ \ TheSecondTestWithThisNameShouldFail)\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00575}00575\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00576}00576\ \}\ \ \textcolor{comment}{//\ namespace\ bar}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00577}00577\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00578}00578\ \textcolor{comment}{//\ The\ following\ two\ test\ cases\ verify\ that\ Google\ Test\ catches\ the\ user}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00579}00579\ \textcolor{comment}{//\ error\ of\ mixing\ TEST\ and\ TEST\_F\ in\ the\ same\ test\ case.\ \ The\ first}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00580}00580\ \textcolor{comment}{//\ test\ case\ checks\ the\ scenario\ where\ TEST\_F\ appears\ before\ TEST,\ and}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00581}00581\ \textcolor{comment}{//\ the\ second\ one\ checks\ where\ TEST\ appears\ before\ TEST\_F.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00582}00582\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00583}\mbox{\hyperlink{class_t_e_s_t___f__before___t_e_s_t__in__same__test__case}{00583}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_t_e_s_t___f__before___t_e_s_t__in__same__test__case}{TEST\_F\_before\_TEST\_in\_same\_test\_case}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1_test}{testing::Test}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00584}00584\ \};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00585}00585\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00586}\mbox{\hyperlink{gtest__output__test___8cc_ae71a8d4934e768af615b9b09418f15c3}{00586}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{class_t_e_s_t___f__before___t_e_s_t__in__same__test__case}{TEST\_F\_before\_TEST\_in\_same\_test\_case}},\ DefinedUsingTEST\_F)\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00587}00587\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00588}00588\ \textcolor{comment}{//\ Expected\ to\ fail.\ \ We\ rely\ on\ the\ golden\ file\ to\ check\ that\ Google\ Test}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00589}00589\ \textcolor{comment}{//\ generates\ the\ right\ error\ message.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00590}\mbox{\hyperlink{gtest__output__test___8cc_a4b026b84b5a6dcbfa586f406e7c6b79c}{00590}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(\mbox{\hyperlink{class_t_e_s_t___f__before___t_e_s_t__in__same__test__case}{TEST\_F\_before\_TEST\_in\_same\_test\_case}},\ DefinedUsingTESTAndShouldFail)\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00591}00591\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00592}\mbox{\hyperlink{class_t_e_s_t__before___t_e_s_t___f__in__same__test__case}{00592}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_t_e_s_t__before___t_e_s_t___f__in__same__test__case}{TEST\_before\_TEST\_F\_in\_same\_test\_case}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1_test}{testing::Test}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00593}00593\ \};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00594}00594\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00595}\mbox{\hyperlink{gtest__output__test___8cc_a80bcd554d66913b961ad814266a403a8}{00595}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(\mbox{\hyperlink{class_t_e_s_t__before___t_e_s_t___f__in__same__test__case}{TEST\_before\_TEST\_F\_in\_same\_test\_case}},\ DefinedUsingTEST)\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00596}00596\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00597}00597\ \textcolor{comment}{//\ Expected\ to\ fail.\ \ We\ rely\ on\ the\ golden\ file\ to\ check\ that\ Google\ Test}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00598}00598\ \textcolor{comment}{//\ generates\ the\ right\ error\ message.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00599}\mbox{\hyperlink{gtest__output__test___8cc_aa0ba9be79b1b05ddadfc8d25c099df31}{00599}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{class_t_e_s_t__before___t_e_s_t___f__in__same__test__case}{TEST\_before\_TEST\_F\_in\_same\_test\_case}},\ DefinedUsingTEST\_FAndShouldFail)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00600}00600\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00601}00601\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00602}00602\ \textcolor{comment}{//\ Used\ for\ testing\ EXPECT\_NONFATAL\_FAILURE()\ and\ EXPECT\_FATAL\_FAILURE().}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00603}\mbox{\hyperlink{gtest__output__test___8cc_a81be7f35ea2573ecc7ca08b26b56bccf}{00603}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{gtest__output__test___8cc_a81be7f35ea2573ecc7ca08b26b56bccf}{global\_integer}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00604}00604\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00605}00605\ \textcolor{comment}{//\ Tests\ that\ EXPECT\_NONFATAL\_FAILURE()\ can\ reference\ global\ variables.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00606}\mbox{\hyperlink{gtest__output__test___8cc_a3dd01f9996bd85dd50bd7632f58cbf8c}{00606}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(ExpectNonfatalFailureTest,\ CanReferenceGlobalVariables)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00607}00607\ \ \ \mbox{\hyperlink{gtest__output__test___8cc_a81be7f35ea2573ecc7ca08b26b56bccf}{global\_integer}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00608}00608\ \ \ \mbox{\hyperlink{gtest-spi_8h_a8376fd6821bd88fd806697355e79e138}{EXPECT\_NONFATAL\_FAILURE}}(\{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00609}00609\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(1,\ \mbox{\hyperlink{gtest__output__test___8cc_a81be7f35ea2573ecc7ca08b26b56bccf}{global\_integer}})\ <<\ \textcolor{stringliteral}{"{}Expected\ non-\/fatal\ failure."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00610}00610\ \ \ \},\ \textcolor{stringliteral}{"{}Expected\ non-\/fatal\ failure."{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00611}00611\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00612}00612\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00613}00613\ \textcolor{comment}{//\ Tests\ that\ EXPECT\_NONFATAL\_FAILURE()\ can\ reference\ local\ variables}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00614}00614\ \textcolor{comment}{//\ (static\ or\ not).}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00615}\mbox{\hyperlink{gtest__output__test___8cc_afe7af77e310ee1a7599e2bc1f0f14354}{00615}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(ExpectNonfatalFailureTest,\ CanReferenceLocalVariables)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00616}00616\ \ \ \textcolor{keywordtype}{int}\ m\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00617}00617\ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ n;}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00618}00618\ \ \ n\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00619}00619\ \ \ \mbox{\hyperlink{gtest-spi_8h_a8376fd6821bd88fd806697355e79e138}{EXPECT\_NONFATAL\_FAILURE}}(\{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00620}00620\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(m,\ n)\ <<\ \textcolor{stringliteral}{"{}Expected\ non-\/fatal\ failure."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00621}00621\ \ \ \},\ \textcolor{stringliteral}{"{}Expected\ non-\/fatal\ failure."{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00622}00622\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00623}00623\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00624}00624\ \textcolor{comment}{//\ Tests\ that\ EXPECT\_NONFATAL\_FAILURE()\ succeeds\ when\ there\ is\ exactly}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00625}00625\ \textcolor{comment}{//\ one\ non-\/fatal\ failure\ and\ no\ fatal\ failure.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00626}\mbox{\hyperlink{gtest__output__test___8cc_ac144593aa4a95ae47c0bb03def354f66}{00626}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(ExpectNonfatalFailureTest,\ SucceedsWhenThereIsOneNonfatalFailure)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00627}00627\ \ \ \mbox{\hyperlink{gtest-spi_8h_a8376fd6821bd88fd806697355e79e138}{EXPECT\_NONFATAL\_FAILURE}}(\{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00628}00628\ \ \ \ \ \mbox{\hyperlink{gtest_8h_adc16b5b0a740c39084ea5c9e960e3063}{ADD\_FAILURE}}()\ <<\ \textcolor{stringliteral}{"{}Expected\ non-\/fatal\ failure."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00629}00629\ \ \ \},\ \textcolor{stringliteral}{"{}Expected\ non-\/fatal\ failure."{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00630}00630\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00631}00631\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00632}00632\ \textcolor{comment}{//\ Tests\ that\ EXPECT\_NONFATAL\_FAILURE()\ fails\ when\ there\ is\ no}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00633}00633\ \textcolor{comment}{//\ non-\/fatal\ failure.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00634}\mbox{\hyperlink{gtest__output__test___8cc_a3984cefae98995e99cc3de7251998c34}{00634}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(ExpectNonfatalFailureTest,\ FailsWhenThereIsNoNonfatalFailure)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00635}00635\ \ \ printf(\textcolor{stringliteral}{"{}(expecting\ a\ failure)\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00636}00636\ \ \ \mbox{\hyperlink{gtest-spi_8h_a8376fd6821bd88fd806697355e79e138}{EXPECT\_NONFATAL\_FAILURE}}(\{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00637}00637\ \ \ \},\ \textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00638}00638\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00639}00639\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00640}00640\ \textcolor{comment}{//\ Tests\ that\ EXPECT\_NONFATAL\_FAILURE()\ fails\ when\ there\ are\ two}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00641}00641\ \textcolor{comment}{//\ non-\/fatal\ failures.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00642}\mbox{\hyperlink{gtest__output__test___8cc_a17f835822727dac7b75b74ed70d2fbd2}{00642}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(ExpectNonfatalFailureTest,\ FailsWhenThereAreTwoNonfatalFailures)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00643}00643\ \ \ printf(\textcolor{stringliteral}{"{}(expecting\ a\ failure)\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00644}00644\ \ \ \mbox{\hyperlink{gtest-spi_8h_a8376fd6821bd88fd806697355e79e138}{EXPECT\_NONFATAL\_FAILURE}}(\{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00645}00645\ \ \ \ \ \mbox{\hyperlink{gtest_8h_adc16b5b0a740c39084ea5c9e960e3063}{ADD\_FAILURE}}()\ <<\ \textcolor{stringliteral}{"{}Expected\ non-\/fatal\ failure\ 1."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00646}00646\ \ \ \ \ \mbox{\hyperlink{gtest_8h_adc16b5b0a740c39084ea5c9e960e3063}{ADD\_FAILURE}}()\ <<\ \textcolor{stringliteral}{"{}Expected\ non-\/fatal\ failure\ 2."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00647}00647\ \ \ \},\ \textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00648}00648\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00649}00649\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00650}00650\ \textcolor{comment}{//\ Tests\ that\ EXPECT\_NONFATAL\_FAILURE()\ fails\ when\ there\ is\ one\ fatal}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00651}00651\ \textcolor{comment}{//\ failure.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00652}\mbox{\hyperlink{gtest__output__test___8cc_ab9c67cf52ef031fdf619d61283da1ca7}{00652}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(ExpectNonfatalFailureTest,\ FailsWhenThereIsOneFatalFailure)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00653}00653\ \ \ printf(\textcolor{stringliteral}{"{}(expecting\ a\ failure)\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00654}00654\ \ \ \mbox{\hyperlink{gtest-spi_8h_a8376fd6821bd88fd806697355e79e138}{EXPECT\_NONFATAL\_FAILURE}}(\{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00655}00655\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a3e26a8d27caa386ed0ea7ce9d5b7c4ed}{FAIL}}()\ <<\ \textcolor{stringliteral}{"{}Expected\ fatal\ failure."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00656}00656\ \ \ \},\ \textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00657}00657\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00658}00658\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00659}00659\ \textcolor{comment}{//\ Tests\ that\ EXPECT\_NONFATAL\_FAILURE()\ fails\ when\ the\ statement\ being}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00660}00660\ \textcolor{comment}{//\ tested\ returns.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00661}\mbox{\hyperlink{gtest__output__test___8cc_aa5976cbca1620f7fea18689a3cbf5333}{00661}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(ExpectNonfatalFailureTest,\ FailsWhenStatementReturns)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00662}00662\ \ \ printf(\textcolor{stringliteral}{"{}(expecting\ a\ failure)\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00663}00663\ \ \ \mbox{\hyperlink{gtest-spi_8h_a8376fd6821bd88fd806697355e79e138}{EXPECT\_NONFATAL\_FAILURE}}(\{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00664}00664\ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00665}00665\ \ \ \},\ \textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00666}00666\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00667}00667\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00668}00668\ \textcolor{preprocessor}{\#if\ GTEST\_HAS\_EXCEPTIONS}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00669}00669\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00670}00670\ \textcolor{comment}{//\ Tests\ that\ EXPECT\_NONFATAL\_FAILURE()\ fails\ when\ the\ statement\ being}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00671}00671\ \textcolor{comment}{//\ tested\ throws.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00672}00672\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(ExpectNonfatalFailureTest,\ FailsWhenStatementThrows)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00673}00673\ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}(expecting\ a\ failure)\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00674}00674\ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00675}00675\ \ \ \ \ \mbox{\hyperlink{gtest-spi_8h_a8376fd6821bd88fd806697355e79e138}{EXPECT\_NONFATAL\_FAILURE}}(\{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00676}00676\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00677}00677\ \ \ \ \ \},\ \textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00678}00678\ \ \ \}\ \textcolor{keywordflow}{catch}(\textcolor{keywordtype}{int})\ \{\ \ \textcolor{comment}{//\ NOLINT}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00679}00679\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00680}00680\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00681}00681\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00682}00682\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_HAS\_EXCEPTIONS}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00683}00683\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00684}00684\ \textcolor{comment}{//\ Tests\ that\ EXPECT\_FATAL\_FAILURE()\ can\ reference\ global\ variables.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00685}\mbox{\hyperlink{gtest__output__test___8cc_a4b06191d54fb76270da3d3dd497e62b6}{00685}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(ExpectFatalFailureTest,\ CanReferenceGlobalVariables)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00686}00686\ \ \ \mbox{\hyperlink{gtest__output__test___8cc_a81be7f35ea2573ecc7ca08b26b56bccf}{global\_integer}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00687}00687\ \ \ \mbox{\hyperlink{gtest-spi_8h_a819a3fd7f8b8cf24b6f1b3a26708973d}{EXPECT\_FATAL\_FAILURE}}(\{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00688}00688\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a1a6db8b1338ee7040329322b77779086}{ASSERT\_EQ}}(1,\ \mbox{\hyperlink{gtest__output__test___8cc_a81be7f35ea2573ecc7ca08b26b56bccf}{global\_integer}})\ <<\ \textcolor{stringliteral}{"{}Expected\ fatal\ failure."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00689}00689\ \ \ \},\ \textcolor{stringliteral}{"{}Expected\ fatal\ failure."{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00690}00690\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00691}00691\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00692}00692\ \textcolor{comment}{//\ Tests\ that\ EXPECT\_FATAL\_FAILURE()\ can\ reference\ local\ static}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00693}00693\ \textcolor{comment}{//\ variables.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00694}\mbox{\hyperlink{gtest__output__test___8cc_ac6646aa5f6d4ea21c0528259118754a4}{00694}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(ExpectFatalFailureTest,\ CanReferenceLocalStaticVariables)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00695}00695\ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ n;}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00696}00696\ \ \ n\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00697}00697\ \ \ \mbox{\hyperlink{gtest-spi_8h_a819a3fd7f8b8cf24b6f1b3a26708973d}{EXPECT\_FATAL\_FAILURE}}(\{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00698}00698\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a1a6db8b1338ee7040329322b77779086}{ASSERT\_EQ}}(0,\ n)\ <<\ \textcolor{stringliteral}{"{}Expected\ fatal\ failure."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00699}00699\ \ \ \},\ \textcolor{stringliteral}{"{}Expected\ fatal\ failure."{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00700}00700\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00701}00701\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00702}00702\ \textcolor{comment}{//\ Tests\ that\ EXPECT\_FATAL\_FAILURE()\ succeeds\ when\ there\ is\ exactly}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00703}00703\ \textcolor{comment}{//\ one\ fatal\ failure\ and\ no\ non-\/fatal\ failure.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00704}\mbox{\hyperlink{gtest__output__test___8cc_a0d894cc9ae86412b4c156748602a23a7}{00704}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(ExpectFatalFailureTest,\ SucceedsWhenThereIsOneFatalFailure)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00705}00705\ \ \ \mbox{\hyperlink{gtest-spi_8h_a819a3fd7f8b8cf24b6f1b3a26708973d}{EXPECT\_FATAL\_FAILURE}}(\{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00706}00706\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a3e26a8d27caa386ed0ea7ce9d5b7c4ed}{FAIL}}()\ <<\ \textcolor{stringliteral}{"{}Expected\ fatal\ failure."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00707}00707\ \ \ \},\ \textcolor{stringliteral}{"{}Expected\ fatal\ failure."{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00708}00708\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00709}00709\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00710}00710\ \textcolor{comment}{//\ Tests\ that\ EXPECT\_FATAL\_FAILURE()\ fails\ when\ there\ is\ no\ fatal}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00711}00711\ \textcolor{comment}{//\ failure.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00712}\mbox{\hyperlink{gtest__output__test___8cc_af8e8545243605b2ba121e253ec48785e}{00712}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(ExpectFatalFailureTest,\ FailsWhenThereIsNoFatalFailure)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00713}00713\ \ \ printf(\textcolor{stringliteral}{"{}(expecting\ a\ failure)\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00714}00714\ \ \ \mbox{\hyperlink{gtest-spi_8h_a819a3fd7f8b8cf24b6f1b3a26708973d}{EXPECT\_FATAL\_FAILURE}}(\{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00715}00715\ \ \ \},\ \textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00716}00716\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00717}00717\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00718}00718\ \textcolor{comment}{//\ A\ helper\ for\ generating\ a\ fatal\ failure.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00719}\mbox{\hyperlink{gtest__output__test___8cc_acdca9b16622e8a506a39240c8809af38}{00719}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{gtest__output__test___8cc_acdca9b16622e8a506a39240c8809af38}{FatalFailure}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00720}00720\ \ \ \mbox{\hyperlink{gtest_8h_a3e26a8d27caa386ed0ea7ce9d5b7c4ed}{FAIL}}()\ <<\ \textcolor{stringliteral}{"{}Expected\ fatal\ failure."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00721}00721\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00722}00722\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00723}00723\ \textcolor{comment}{//\ Tests\ that\ EXPECT\_FATAL\_FAILURE()\ fails\ when\ there\ are\ two}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00724}00724\ \textcolor{comment}{//\ fatal\ failures.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00725}\mbox{\hyperlink{gtest__output__test___8cc_a4fd11a245bf0e8eb46d78c8dc14c730e}{00725}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(ExpectFatalFailureTest,\ FailsWhenThereAreTwoFatalFailures)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00726}00726\ \ \ printf(\textcolor{stringliteral}{"{}(expecting\ a\ failure)\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00727}00727\ \ \ \mbox{\hyperlink{gtest-spi_8h_a819a3fd7f8b8cf24b6f1b3a26708973d}{EXPECT\_FATAL\_FAILURE}}(\{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00728}00728\ \ \ \ \ \mbox{\hyperlink{gtest__output__test___8cc_acdca9b16622e8a506a39240c8809af38}{FatalFailure}}();}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00729}00729\ \ \ \ \ \mbox{\hyperlink{gtest__output__test___8cc_acdca9b16622e8a506a39240c8809af38}{FatalFailure}}();}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00730}00730\ \ \ \},\ \textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00731}00731\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00732}00732\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00733}00733\ \textcolor{comment}{//\ Tests\ that\ EXPECT\_FATAL\_FAILURE()\ fails\ when\ there\ is\ one\ non-\/fatal}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00734}00734\ \textcolor{comment}{//\ failure.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00735}\mbox{\hyperlink{gtest__output__test___8cc_a35fafc42558ee14c42320b359c270026}{00735}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(ExpectFatalFailureTest,\ FailsWhenThereIsOneNonfatalFailure)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00736}00736\ \ \ printf(\textcolor{stringliteral}{"{}(expecting\ a\ failure)\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00737}00737\ \ \ \mbox{\hyperlink{gtest-spi_8h_a819a3fd7f8b8cf24b6f1b3a26708973d}{EXPECT\_FATAL\_FAILURE}}(\{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00738}00738\ \ \ \ \ \mbox{\hyperlink{gtest_8h_adc16b5b0a740c39084ea5c9e960e3063}{ADD\_FAILURE}}()\ <<\ \textcolor{stringliteral}{"{}Expected\ non-\/fatal\ failure."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00739}00739\ \ \ \},\ \textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00740}00740\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00741}00741\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00742}00742\ \textcolor{comment}{//\ Tests\ that\ EXPECT\_FATAL\_FAILURE()\ fails\ when\ the\ statement\ being}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00743}00743\ \textcolor{comment}{//\ tested\ returns.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00744}\mbox{\hyperlink{gtest__output__test___8cc_aca5344af5eed2eefc512c555acbe5511}{00744}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(ExpectFatalFailureTest,\ FailsWhenStatementReturns)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00745}00745\ \ \ printf(\textcolor{stringliteral}{"{}(expecting\ a\ failure)\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00746}00746\ \ \ \mbox{\hyperlink{gtest-spi_8h_a819a3fd7f8b8cf24b6f1b3a26708973d}{EXPECT\_FATAL\_FAILURE}}(\{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00747}00747\ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00748}00748\ \ \ \},\ \textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00749}00749\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00750}00750\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00751}00751\ \textcolor{preprocessor}{\#if\ GTEST\_HAS\_EXCEPTIONS}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00752}00752\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00753}00753\ \textcolor{comment}{//\ Tests\ that\ EXPECT\_FATAL\_FAILURE()\ fails\ when\ the\ statement\ being}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00754}00754\ \textcolor{comment}{//\ tested\ throws.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00755}00755\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(ExpectFatalFailureTest,\ FailsWhenStatementThrows)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00756}00756\ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}(expecting\ a\ failure)\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00757}00757\ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00758}00758\ \ \ \ \ \mbox{\hyperlink{gtest-spi_8h_a819a3fd7f8b8cf24b6f1b3a26708973d}{EXPECT\_FATAL\_FAILURE}}(\{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00759}00759\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00760}00760\ \ \ \ \ \},\ \textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00761}00761\ \ \ \}\ \textcolor{keywordflow}{catch}(\textcolor{keywordtype}{int})\ \{\ \ \textcolor{comment}{//\ NOLINT}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00762}00762\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00763}00763\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00764}00764\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00765}00765\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_HAS\_EXCEPTIONS}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00766}00766\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00767}00767\ \textcolor{comment}{//\ This\ \#ifdef\ block\ tests\ the\ output\ of\ value-\/parameterized\ tests.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00768}00768\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00769}\mbox{\hyperlink{gtest__output__test___8cc_a61c686cb1c0f8f19c100ff975482ec7a}{00769}}\ std::string\ \mbox{\hyperlink{gtest__output__test___8cc_a61c686cb1c0f8f19c100ff975482ec7a}{ParamNameFunc}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structtesting_1_1_test_param_info}{testing::TestParamInfo<std::string>}}\&\ info)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00770}00770\ \ \ \textcolor{keywordflow}{return}\ info.param;}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00771}00771\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00772}00772\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00773}\mbox{\hyperlink{class_param_test}{00773}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_param_test}{ParamTest}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1_test_with_param}{testing::TestWithParam}}<std::string>\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00774}00774\ \};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00775}00775\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00776}\mbox{\hyperlink{gtest__output__test___8cc_a4e7fc7682f9a8a168b78d53b05fab8bf}{00776}}\ \mbox{\hyperlink{gtest-param-test_8h_abd3bb216dafbffa36044a6030216ecda}{TEST\_P}}(ParamTest,\ Success)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00777}00777\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\textcolor{stringliteral}{"{}a"{}},\ GetParam());}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00778}00778\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00779}00779\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00780}\mbox{\hyperlink{gtest__output__test___8cc_a0847a99be23b980115e2dd88a1bd60cc}{00780}}\ \mbox{\hyperlink{gtest-param-test_8h_abd3bb216dafbffa36044a6030216ecda}{TEST\_P}}(ParamTest,\ Failure)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00781}00781\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\textcolor{stringliteral}{"{}b"{}},\ GetParam())\ <<\ \textcolor{stringliteral}{"{}Expected\ failure"{}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00782}00782\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00783}00783\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00784}\mbox{\hyperlink{gtest__output__test___8cc_a00b51dcd9ffaced8ceefcc4caf87c334}{00784}}\ \mbox{\hyperlink{gtest-param-test_8h_a9e411d086a08ba0cd14b73fb2f8d028f}{INSTANTIATE\_TEST\_CASE\_P}}(PrintingStrings,}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00785}00785\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ParamTest,}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00786}00786\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_a0c5a07d0439f323cd4353c718e277a10}{testing::Values}}(std::string(\textcolor{stringliteral}{"{}a"{}})),}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00787}00787\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest__output__test___8cc_a61c686cb1c0f8f19c100ff975482ec7a}{ParamNameFunc}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00788}00788\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00789}00789\ \textcolor{comment}{//\ This\ \#ifdef\ block\ tests\ the\ output\ of\ typed\ tests.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00790}00790\ \textcolor{preprocessor}{\#if\ GTEST\_HAS\_TYPED\_TEST}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00791}00791\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00792}00792\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00793}00793\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_typed_test}{TypedTest}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1_test}{testing::Test}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00794}00794\ \};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00795}00795\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00796}00796\ \mbox{\hyperlink{gtest__list__tests__unittest___8cc_a862ed8944c2b3e4827e95002d20c45d3}{TYPED\_TEST\_CASE}}(\mbox{\hyperlink{class_typed_test}{TypedTest}},\ testing::Types<int>);}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00797}00797\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00798}00798\ \mbox{\hyperlink{gtest__list__tests__unittest___8cc_a83ec84c5fac9fdffa59a16e5d043bd66}{TYPED\_TEST}}(\mbox{\hyperlink{class_typed_test}{TypedTest}},\ Success)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00799}00799\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0,\ TypeParam());}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00800}00800\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00801}00801\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00802}00802\ \mbox{\hyperlink{gtest__list__tests__unittest___8cc_a83ec84c5fac9fdffa59a16e5d043bd66}{TYPED\_TEST}}(\mbox{\hyperlink{class_typed_test}{TypedTest}},\ Failure)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00803}00803\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(1,\ TypeParam())\ <<\ \textcolor{stringliteral}{"{}Expected\ failure"{}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00804}00804\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00805}00805\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00806}00806\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_HAS\_TYPED\_TEST}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00807}00807\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00808}00808\ \textcolor{comment}{//\ This\ \#ifdef\ block\ tests\ the\ output\ of\ type-\/parameterized\ tests.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00809}00809\ \textcolor{preprocessor}{\#if\ GTEST\_HAS\_TYPED\_TEST\_P}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00810}00810\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00811}00811\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00812}00812\ \textcolor{keyword}{class\ }TypedTestP\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1_test}{testing::Test}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00813}00813\ \};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00814}00814\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00815}00815\ \mbox{\hyperlink{gtest__list__tests__unittest___8cc_a8f36af28829ba875ca3675b4054f48b6}{TYPED\_TEST\_CASE\_P}}(TypedTestP);}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00816}00816\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00817}00817\ \mbox{\hyperlink{gtest__list__tests__unittest___8cc_aadd51dfff9d63b5e0faa0130697684c1}{TYPED\_TEST\_P}}(TypedTestP,\ Success)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00818}00818\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0\mbox{\hyperlink{union_u}{U}},\ TypeParam());}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00819}00819\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00820}00820\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00821}00821\ \mbox{\hyperlink{gtest__list__tests__unittest___8cc_aadd51dfff9d63b5e0faa0130697684c1}{TYPED\_TEST\_P}}(TypedTestP,\ Failure)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00822}00822\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(1U,\ TypeParam())\ <<\ \textcolor{stringliteral}{"{}Expected\ failure"{}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00823}00823\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00824}00824\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00825}00825\ \mbox{\hyperlink{gtest__list__tests__unittest___8cc_a3316a9dc1c581f96a50ec10e0c116e5c}{REGISTER\_TYPED\_TEST\_CASE\_P}}(TypedTestP,\ Success,\ Failure);}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00826}00826\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00827}00827\ \textcolor{keyword}{typedef}\ testing::Types<unsigned\ char,\ unsigned\ int>\ UnsignedTypes;}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00828}00828\ \mbox{\hyperlink{gtest__list__tests__unittest___8cc_abace4e22d147fb69e2be527b355a2316}{INSTANTIATE\_TYPED\_TEST\_CASE\_P}}(Unsigned,\ TypedTestP,\ UnsignedTypes);}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00829}00829\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00830}00830\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_HAS\_TYPED\_TEST\_P}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00831}00831\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00832}00832\ \textcolor{preprocessor}{\#if\ GTEST\_HAS\_DEATH\_TEST}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00833}00833\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00834}00834\ \textcolor{comment}{//\ We\ rely\ on\ the\ golden\ file\ to\ verify\ that\ tests\ whose\ test\ case}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00835}00835\ \textcolor{comment}{//\ name\ ends\ with\ DeathTest\ are\ run\ first.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00836}00836\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00837}00837\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(ADeathTest,\ ShouldRunFirst)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00838}00838\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00839}00839\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00840}00840\ \textcolor{preprocessor}{\#\ if\ GTEST\_HAS\_TYPED\_TEST}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00841}00841\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00842}00842\ \textcolor{comment}{//\ We\ rely\ on\ the\ golden\ file\ to\ verify\ that\ typed\ tests\ whose\ test}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00843}00843\ \textcolor{comment}{//\ case\ name\ ends\ with\ DeathTest\ are\ run\ first.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00844}00844\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00845}00845\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00846}00846\ \textcolor{keyword}{class\ }ATypedDeathTest\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1_test}{testing::Test}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00847}00847\ \};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00848}00848\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00849}00849\ \textcolor{keyword}{typedef}\ testing::Types<int,\ double>\ NumericTypes;}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00850}00850\ \mbox{\hyperlink{gtest__list__tests__unittest___8cc_a862ed8944c2b3e4827e95002d20c45d3}{TYPED\_TEST\_CASE}}(ATypedDeathTest,\ NumericTypes);}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00851}00851\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00852}00852\ \mbox{\hyperlink{gtest__list__tests__unittest___8cc_a83ec84c5fac9fdffa59a16e5d043bd66}{TYPED\_TEST}}(ATypedDeathTest,\ ShouldRunFirst)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00853}00853\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00854}00854\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00855}00855\ \textcolor{preprocessor}{\#\ endif\ \ }\textcolor{comment}{//\ GTEST\_HAS\_TYPED\_TEST}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00856}00856\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00857}00857\ \textcolor{preprocessor}{\#\ if\ GTEST\_HAS\_TYPED\_TEST\_P}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00858}00858\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00859}00859\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00860}00860\ \textcolor{comment}{//\ We\ rely\ on\ the\ golden\ file\ to\ verify\ that\ type-\/parameterized\ tests}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00861}00861\ \textcolor{comment}{//\ whose\ test\ case\ name\ ends\ with\ DeathTest\ are\ run\ first.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00862}00862\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00863}00863\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00864}00864\ \textcolor{keyword}{class\ }ATypeParamDeathTest\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1_test}{testing::Test}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00865}00865\ \};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00866}00866\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00867}00867\ \mbox{\hyperlink{gtest__list__tests__unittest___8cc_a8f36af28829ba875ca3675b4054f48b6}{TYPED\_TEST\_CASE\_P}}(ATypeParamDeathTest);}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00868}00868\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00869}00869\ \mbox{\hyperlink{gtest__list__tests__unittest___8cc_aadd51dfff9d63b5e0faa0130697684c1}{TYPED\_TEST\_P}}(ATypeParamDeathTest,\ ShouldRunFirst)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00870}00870\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00871}00871\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00872}00872\ \mbox{\hyperlink{gtest__list__tests__unittest___8cc_a3316a9dc1c581f96a50ec10e0c116e5c}{REGISTER\_TYPED\_TEST\_CASE\_P}}(ATypeParamDeathTest,\ ShouldRunFirst);}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00873}00873\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00874}00874\ \mbox{\hyperlink{gtest__list__tests__unittest___8cc_abace4e22d147fb69e2be527b355a2316}{INSTANTIATE\_TYPED\_TEST\_CASE\_P}}(My,\ ATypeParamDeathTest,\ NumericTypes);}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00875}00875\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00876}00876\ \textcolor{preprocessor}{\#\ endif\ \ }\textcolor{comment}{//\ GTEST\_HAS\_TYPED\_TEST\_P}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00877}00877\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00878}00878\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_HAS\_DEATH\_TEST}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00879}00879\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00880}00880\ \textcolor{comment}{//\ Tests\ various\ failure\ conditions\ of}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00881}00881\ \textcolor{comment}{//\ EXPECT\_\{,NON\}FATAL\_FAILURE\{,\_ON\_ALL\_THREADS\}.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00882}\mbox{\hyperlink{class_expect_failure_test}{00882}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_expect_failure_test}{ExpectFailureTest}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1_test}{testing::Test}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00883}00883\ \ \textcolor{keyword}{public}:\ \ \textcolor{comment}{//\ Must\ be\ public\ and\ not\ protected\ due\ to\ a\ bug\ in\ g++\ 3.4.2.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00884}\mbox{\hyperlink{class_expect_failure_test_aad05da10bb15d21a434eba3b37011406}{00884}}\ \ \ \textcolor{keyword}{enum}\ \mbox{\hyperlink{class_expect_failure_test_aad05da10bb15d21a434eba3b37011406}{FailureMode}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00885}\mbox{\hyperlink{class_expect_failure_test_aad05da10bb15d21a434eba3b37011406a3d618496b7e2a2c256e02186bddee4ec}{00885}}\ \ \ \ \ \mbox{\hyperlink{class_expect_failure_test_aad05da10bb15d21a434eba3b37011406a3d618496b7e2a2c256e02186bddee4ec}{FATAL\_FAILURE}},}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00886}00886\ \ \ \ \ \mbox{\hyperlink{class_expect_failure_test_aad05da10bb15d21a434eba3b37011406aeabdbecc0c4550d4f46cd44ac62fb92b}{NONFATAL\_FAILURE}}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00887}\mbox{\hyperlink{class_expect_failure_test_aad05da10bb15d21a434eba3b37011406aeabdbecc0c4550d4f46cd44ac62fb92b}{00887}}\ \ \ \};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00888}\mbox{\hyperlink{class_expect_failure_test_ab9aeb7820ff7953fc2975ecc5abd046b}{00888}}\ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_expect_failure_test_ab9aeb7820ff7953fc2975ecc5abd046b}{AddFailure}}(\mbox{\hyperlink{class_expect_failure_test_aad05da10bb15d21a434eba3b37011406}{FailureMode}}\ failure)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00889}00889\ \ \ \ \ \textcolor{keywordflow}{if}\ (failure\ ==\ \mbox{\hyperlink{class_expect_failure_test_aad05da10bb15d21a434eba3b37011406a3d618496b7e2a2c256e02186bddee4ec}{FATAL\_FAILURE}})\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00890}00890\ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a3e26a8d27caa386ed0ea7ce9d5b7c4ed}{FAIL}}()\ <<\ \textcolor{stringliteral}{"{}Expected\ fatal\ failure."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00891}00891\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00892}00892\ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_adc16b5b0a740c39084ea5c9e960e3063}{ADD\_FAILURE}}()\ <<\ \textcolor{stringliteral}{"{}Expected\ non-\/fatal\ failure."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00893}00893\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00894}00894\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00895}00895\ \};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00896}00896\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00897}\mbox{\hyperlink{gtest__output__test___8cc_ae7459e6b9516821fd0e77eb3aa9b7413}{00897}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{class_expect_failure_test}{ExpectFailureTest}},\ ExpectFatalFailure)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00898}00898\ \ \ \textcolor{comment}{//\ Expected\ fatal\ failure,\ but\ succeeds.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00899}00899\ \ \ printf(\textcolor{stringliteral}{"{}(expecting\ 1\ failure)\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00900}00900\ \ \ \mbox{\hyperlink{gtest-spi_8h_a819a3fd7f8b8cf24b6f1b3a26708973d}{EXPECT\_FATAL\_FAILURE}}(\mbox{\hyperlink{gtest_8h_a75adcdf89f69b0b615e395daafc315af}{SUCCEED}}(),\ \textcolor{stringliteral}{"{}Expected\ fatal\ failure."{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00901}00901\ \ \ \textcolor{comment}{//\ Expected\ fatal\ failure,\ but\ got\ a\ non-\/fatal\ failure.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00902}00902\ \ \ printf(\textcolor{stringliteral}{"{}(expecting\ 1\ failure)\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00903}00903\ \ \ \mbox{\hyperlink{gtest-spi_8h_a819a3fd7f8b8cf24b6f1b3a26708973d}{EXPECT\_FATAL\_FAILURE}}(AddFailure(NONFATAL\_FAILURE),\ \textcolor{stringliteral}{"{}Expected\ non-\/fatal\ "{}}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00904}00904\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}failure."{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00905}00905\ \ \ \textcolor{comment}{//\ Wrong\ message.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00906}00906\ \ \ printf(\textcolor{stringliteral}{"{}(expecting\ 1\ failure)\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00907}00907\ \ \ \mbox{\hyperlink{gtest-spi_8h_a819a3fd7f8b8cf24b6f1b3a26708973d}{EXPECT\_FATAL\_FAILURE}}(AddFailure(FATAL\_FAILURE),\ \textcolor{stringliteral}{"{}Some\ other\ fatal\ failure\ "{}}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00908}00908\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}expected."{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00909}00909\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00910}00910\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00911}\mbox{\hyperlink{gtest__output__test___8cc_abec150ac715359c89fde1102cfc300d2}{00911}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{class_expect_failure_test}{ExpectFailureTest}},\ ExpectNonFatalFailure)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00912}00912\ \ \ \textcolor{comment}{//\ Expected\ non-\/fatal\ failure,\ but\ succeeds.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00913}00913\ \ \ printf(\textcolor{stringliteral}{"{}(expecting\ 1\ failure)\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00914}00914\ \ \ \mbox{\hyperlink{gtest-spi_8h_a8376fd6821bd88fd806697355e79e138}{EXPECT\_NONFATAL\_FAILURE}}(\mbox{\hyperlink{gtest_8h_a75adcdf89f69b0b615e395daafc315af}{SUCCEED}}(),\ \textcolor{stringliteral}{"{}Expected\ non-\/fatal\ failure."{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00915}00915\ \ \ \textcolor{comment}{//\ Expected\ non-\/fatal\ failure,\ but\ got\ a\ fatal\ failure.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00916}00916\ \ \ printf(\textcolor{stringliteral}{"{}(expecting\ 1\ failure)\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00917}00917\ \ \ \mbox{\hyperlink{gtest-spi_8h_a8376fd6821bd88fd806697355e79e138}{EXPECT\_NONFATAL\_FAILURE}}(AddFailure(FATAL\_FAILURE),\ \textcolor{stringliteral}{"{}Expected\ fatal\ failure."{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00918}00918\ \ \ \textcolor{comment}{//\ Wrong\ message.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00919}00919\ \ \ printf(\textcolor{stringliteral}{"{}(expecting\ 1\ failure)\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00920}00920\ \ \ \mbox{\hyperlink{gtest-spi_8h_a8376fd6821bd88fd806697355e79e138}{EXPECT\_NONFATAL\_FAILURE}}(AddFailure(NONFATAL\_FAILURE),\ \textcolor{stringliteral}{"{}Some\ other\ non-\/fatal\ "{}}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00921}00921\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}failure."{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00922}00922\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00923}00923\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00924}00924\ \textcolor{preprocessor}{\#if\ GTEST\_IS\_THREADSAFE}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00925}00925\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00926}00926\ \textcolor{keyword}{class\ }ExpectFailureWithThreadsTest\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{class_expect_failure_test}{ExpectFailureTest}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00927}00927\ \ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00928}00928\ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ AddFailureInOtherThread(FailureMode\ failure)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00929}00929\ \ \ \ \ ThreadWithParam<FailureMode>\ thread(\&AddFailure,\ failure,\ NULL);}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00930}00930\ \ \ \ \ thread.Join();}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00931}00931\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00932}00932\ \};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00933}00933\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00934}00934\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(ExpectFailureWithThreadsTest,\ ExpectFatalFailure)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00935}00935\ \ \ \textcolor{comment}{//\ We\ only\ intercept\ the\ current\ thread.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00936}00936\ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}(expecting\ 2\ failures)\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00937}00937\ \ \ \mbox{\hyperlink{gtest-spi_8h_a819a3fd7f8b8cf24b6f1b3a26708973d}{EXPECT\_FATAL\_FAILURE}}(AddFailureInOtherThread(FATAL\_FAILURE),}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00938}00938\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Expected\ fatal\ failure."{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00939}00939\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00940}00940\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00941}00941\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(ExpectFailureWithThreadsTest,\ ExpectNonFatalFailure)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00942}00942\ \ \ \textcolor{comment}{//\ We\ only\ intercept\ the\ current\ thread.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00943}00943\ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}(expecting\ 2\ failures)\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00944}00944\ \ \ \mbox{\hyperlink{gtest-spi_8h_a8376fd6821bd88fd806697355e79e138}{EXPECT\_NONFATAL\_FAILURE}}(AddFailureInOtherThread(NONFATAL\_FAILURE),}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00945}00945\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Expected\ non-\/fatal\ failure."{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00946}00946\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00947}00947\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00948}00948\ \textcolor{keyword}{typedef}\ ExpectFailureWithThreadsTest\ ScopedFakeTestPartResultReporterTest;}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00949}00949\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00950}00950\ \textcolor{comment}{//\ Tests\ that\ the\ ScopedFakeTestPartResultReporter\ only\ catches\ failures\ from}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00951}00951\ \textcolor{comment}{//\ the\ current\ thread\ if\ it\ is\ instantiated\ with\ INTERCEPT\_ONLY\_CURRENT\_THREAD.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00952}00952\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(ScopedFakeTestPartResultReporterTest,\ InterceptOnlyCurrentThread)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00953}00953\ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}(expecting\ 2\ failures)\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00954}00954\ \ \ TestPartResultArray\ \mbox{\hyperlink{test__account__query__db_8cpp_a33f2983ff61d9343e424c440190d8610}{results}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00955}00955\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00956}00956\ \ \ \ \ ScopedFakeTestPartResultReporter\ reporter(}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00957}00957\ \ \ \ \ \ \ \ \ ScopedFakeTestPartResultReporter::INTERCEPT\_ONLY\_CURRENT\_THREAD,}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00958}00958\ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{test__account__query__db_8cpp_a33f2983ff61d9343e424c440190d8610}{results}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00959}00959\ \ \ \ \ AddFailureInOtherThread(FATAL\_FAILURE);}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00960}00960\ \ \ \ \ AddFailureInOtherThread(NONFATAL\_FAILURE);}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00961}00961\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00962}00962\ \ \ \textcolor{comment}{//\ The\ two\ failures\ should\ not\ have\ been\ intercepted.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00963}00963\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0,\ \mbox{\hyperlink{test__account__query__db_8cpp_a33f2983ff61d9343e424c440190d8610}{results}}.size())\ <<\ \textcolor{stringliteral}{"{}This\ shouldn't\ fail."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00964}00964\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00965}00965\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00966}00966\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_IS\_THREADSAFE}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00967}00967\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00968}\mbox{\hyperlink{gtest__output__test___8cc_a1f29562e9248524dda90aa6d641d77ea}{00968}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{class_expect_failure_test}{ExpectFailureTest}},\ ExpectFatalFailureOnAllThreads)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00969}00969\ \ \ \textcolor{comment}{//\ Expected\ fatal\ failure,\ but\ succeeds.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00970}00970\ \ \ printf(\textcolor{stringliteral}{"{}(expecting\ 1\ failure)\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00971}00971\ \ \ \mbox{\hyperlink{gtest-spi_8h_ad8aac5bc859b2ddc07583636ae4f45cf}{EXPECT\_FATAL\_FAILURE\_ON\_ALL\_THREADS}}(\mbox{\hyperlink{gtest_8h_a75adcdf89f69b0b615e395daafc315af}{SUCCEED}}(),\ \textcolor{stringliteral}{"{}Expected\ fatal\ failure."{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00972}00972\ \ \ \textcolor{comment}{//\ Expected\ fatal\ failure,\ but\ got\ a\ non-\/fatal\ failure.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00973}00973\ \ \ printf(\textcolor{stringliteral}{"{}(expecting\ 1\ failure)\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00974}00974\ \ \ \mbox{\hyperlink{gtest-spi_8h_ad8aac5bc859b2ddc07583636ae4f45cf}{EXPECT\_FATAL\_FAILURE\_ON\_ALL\_THREADS}}(AddFailure(NONFATAL\_FAILURE),}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00975}00975\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Expected\ non-\/fatal\ failure."{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00976}00976\ \ \ \textcolor{comment}{//\ Wrong\ message.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00977}00977\ \ \ printf(\textcolor{stringliteral}{"{}(expecting\ 1\ failure)\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00978}00978\ \ \ \mbox{\hyperlink{gtest-spi_8h_ad8aac5bc859b2ddc07583636ae4f45cf}{EXPECT\_FATAL\_FAILURE\_ON\_ALL\_THREADS}}(AddFailure(FATAL\_FAILURE),}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00979}00979\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Some\ other\ fatal\ failure\ expected."{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00980}00980\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00981}00981\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00982}\mbox{\hyperlink{gtest__output__test___8cc_a7714d1899711a604704737897595e7c3}{00982}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{class_expect_failure_test}{ExpectFailureTest}},\ ExpectNonFatalFailureOnAllThreads)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00983}00983\ \ \ \textcolor{comment}{//\ Expected\ non-\/fatal\ failure,\ but\ succeeds.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00984}00984\ \ \ printf(\textcolor{stringliteral}{"{}(expecting\ 1\ failure)\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00985}00985\ \ \ \mbox{\hyperlink{gtest-spi_8h_a9f4cf1f150fe9facfc4cbf0bae646ee9}{EXPECT\_NONFATAL\_FAILURE\_ON\_ALL\_THREADS}}(\mbox{\hyperlink{gtest_8h_a75adcdf89f69b0b615e395daafc315af}{SUCCEED}}(),\ \textcolor{stringliteral}{"{}Expected\ non-\/fatal\ "{}}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00986}00986\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}failure."{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00987}00987\ \ \ \textcolor{comment}{//\ Expected\ non-\/fatal\ failure,\ but\ got\ a\ fatal\ failure.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00988}00988\ \ \ printf(\textcolor{stringliteral}{"{}(expecting\ 1\ failure)\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00989}00989\ \ \ \mbox{\hyperlink{gtest-spi_8h_a9f4cf1f150fe9facfc4cbf0bae646ee9}{EXPECT\_NONFATAL\_FAILURE\_ON\_ALL\_THREADS}}(AddFailure(FATAL\_FAILURE),}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00990}00990\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Expected\ fatal\ failure."{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00991}00991\ \ \ \textcolor{comment}{//\ Wrong\ message.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00992}00992\ \ \ printf(\textcolor{stringliteral}{"{}(expecting\ 1\ failure)\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00993}00993\ \ \ \mbox{\hyperlink{gtest-spi_8h_a9f4cf1f150fe9facfc4cbf0bae646ee9}{EXPECT\_NONFATAL\_FAILURE\_ON\_ALL\_THREADS}}(AddFailure(NONFATAL\_FAILURE),}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00994}00994\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Some\ other\ non-\/fatal\ failure."{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00995}00995\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00996}00996\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00997}00997\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00998}00998\ \textcolor{comment}{//\ Two\ test\ environments\ for\ testing\ testing::AddGlobalTestEnvironment().}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l00999}00999\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01000}\mbox{\hyperlink{class_foo_environment}{01000}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_foo_environment}{FooEnvironment}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1_environment}{testing::Environment}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01001}01001\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01002}\mbox{\hyperlink{class_foo_environment_a7db8d8b312805aff437ae8534132a56d}{01002}}\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_foo_environment_a7db8d8b312805aff437ae8534132a56d}{SetUp}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01003}01003\ \ \ \ \ printf(\textcolor{stringliteral}{"{}\%s"{}},\ \textcolor{stringliteral}{"{}FooEnvironment::SetUp()\ called.\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01004}01004\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01005}01005\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01006}\mbox{\hyperlink{class_foo_environment_a99a2c9df52106cce9e7a4bdda53df802}{01006}}\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_foo_environment_a99a2c9df52106cce9e7a4bdda53df802}{TearDown}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01007}01007\ \ \ \ \ printf(\textcolor{stringliteral}{"{}\%s"{}},\ \textcolor{stringliteral}{"{}FooEnvironment::TearDown()\ called.\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01008}01008\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a3e26a8d27caa386ed0ea7ce9d5b7c4ed}{FAIL}}()\ <<\ \textcolor{stringliteral}{"{}Expected\ fatal\ failure."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01009}01009\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01010}01010\ \};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01011}01011\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01012}\mbox{\hyperlink{class_bar_environment}{01012}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_bar_environment}{BarEnvironment}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1_environment}{testing::Environment}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01013}01013\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01014}\mbox{\hyperlink{class_bar_environment_a88e17c5dd1dcea7a4538f2f3c6bf7bdd}{01014}}\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_bar_environment_a88e17c5dd1dcea7a4538f2f3c6bf7bdd}{SetUp}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01015}01015\ \ \ \ \ printf(\textcolor{stringliteral}{"{}\%s"{}},\ \textcolor{stringliteral}{"{}BarEnvironment::SetUp()\ called.\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01016}01016\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01017}01017\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01018}\mbox{\hyperlink{class_bar_environment_a384f951da72a2a18bb0c2b3506376b09}{01018}}\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_bar_environment_a384f951da72a2a18bb0c2b3506376b09}{TearDown}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01019}01019\ \ \ \ \ printf(\textcolor{stringliteral}{"{}\%s"{}},\ \textcolor{stringliteral}{"{}BarEnvironment::TearDown()\ called.\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01020}01020\ \ \ \ \ \mbox{\hyperlink{gtest_8h_adc16b5b0a740c39084ea5c9e960e3063}{ADD\_FAILURE}}()\ <<\ \textcolor{stringliteral}{"{}Expected\ non-\/fatal\ failure."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01021}01021\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01022}01022\ \};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01023}01023\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01024}01024\ \textcolor{comment}{//\ The\ main\ function.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01025}01025\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01026}01026\ \textcolor{comment}{//\ The\ idea\ is\ to\ use\ Google\ Test\ to\ run\ all\ the\ tests\ we\ have\ defined\ (some}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01027}01027\ \textcolor{comment}{//\ of\ them\ are\ intended\ to\ fail),\ and\ then\ compare\ the\ test\ results}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01028}01028\ \textcolor{comment}{//\ with\ the\ "{}golden"{}\ file.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01029}\mbox{\hyperlink{gtest__output__test___8cc_a3c04138a5bfe5d72780bb7e82a18e627}{01029}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}(\textcolor{keywordtype}{int}\ argc,\ \textcolor{keywordtype}{char}\ **\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}})\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01030}01030\ \ \ testing::GTEST\_FLAG(print\_time)\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01031}01031\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01032}01032\ \ \ \textcolor{comment}{//\ We\ just\ run\ the\ tests,\ knowing\ some\ of\ them\ are\ intended\ to\ fail.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01033}01033\ \ \ \textcolor{comment}{//\ We\ will\ use\ a\ separate\ Python\ script\ to\ compare\ the\ output\ of}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01034}01034\ \ \ \textcolor{comment}{//\ this\ program\ with\ the\ golden\ file.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01035}01035\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01036}01036\ \ \ \textcolor{comment}{//\ It's\ hard\ to\ test\ InitGoogleTest()\ directly,\ as\ it\ has\ many}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01037}01037\ \ \ \textcolor{comment}{//\ global\ side\ effects.\ \ The\ following\ line\ serves\ as\ a\ sanity\ test}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01038}01038\ \ \ \textcolor{comment}{//\ for\ it.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01039}01039\ \ \ \mbox{\hyperlink{namespacetesting_afd726ae08c9bd16dc52f78c822d9946b}{testing::InitGoogleTest}}(\&argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01040}01040\ \ \ \textcolor{keywordtype}{bool}\ internal\_skip\_environment\_and\_ad\_hoc\_tests\ =}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01041}01041\ \ \ \ \ \ \ std::count(\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}\ +\ argc,}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01042}01042\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::string(\textcolor{stringliteral}{"{}internal\_skip\_environment\_and\_ad\_hoc\_tests"{}}))\ >\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01043}01043\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01044}01044\ \textcolor{preprocessor}{\#if\ GTEST\_HAS\_DEATH\_TEST}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01045}01045\ \ \ \textcolor{keywordflow}{if}\ (testing::internal::GTEST\_FLAG(internal\_run\_death\_test)\ !=\ \textcolor{stringliteral}{"{}"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01046}01046\ \ \ \ \ \textcolor{comment}{//\ Skip\ the\ usual\ output\ capturing\ if\ we're\ running\ as\ the\ child}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01047}01047\ \ \ \ \ \textcolor{comment}{//\ process\ of\ an\ threadsafe-\/style\ death\ test.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01048}01048\ \textcolor{preprocessor}{\#\ if\ GTEST\_OS\_WINDOWS}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01049}01049\ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_1_1posix_a7428e40e37fc1798e36804eafc11680b}{posix::FReopen}}(\textcolor{stringliteral}{"{}nul:"{}},\ \textcolor{stringliteral}{"{}w"{}},\ stdout);}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01050}01050\ \textcolor{preprocessor}{\#\ else}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01051}01051\ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_1_1posix_a7428e40e37fc1798e36804eafc11680b}{posix::FReopen}}(\textcolor{stringliteral}{"{}/dev/null"{}},\ \textcolor{stringliteral}{"{}w"{}},\ stdout);}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01052}01052\ \textcolor{preprocessor}{\#\ endif\ \ }\textcolor{comment}{//\ GTEST\_OS\_WINDOWS}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01053}01053\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{gtest_8h_a853a3792807489591d3d4a2f2ff9359f}{RUN\_ALL\_TESTS}}();}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01054}01054\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01055}01055\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_HAS\_DEATH\_TEST}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01056}01056\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01057}01057\ \ \ \textcolor{keywordflow}{if}\ (internal\_skip\_environment\_and\_ad\_hoc\_tests)}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01058}01058\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{gtest_8h_a853a3792807489591d3d4a2f2ff9359f}{RUN\_ALL\_TESTS}}();}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01059}01059\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01060}01060\ \ \ \textcolor{comment}{//\ Registers\ two\ global\ test\ environments.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01061}01061\ \ \ \textcolor{comment}{//\ The\ golden\ file\ verifies\ that\ they\ are\ set\ up\ in\ the\ order\ they}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01062}01062\ \ \ \textcolor{comment}{//\ are\ registered,\ and\ torn\ down\ in\ the\ reverse\ order.}}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01063}01063\ \ \ \mbox{\hyperlink{namespacetesting_a224caeebdb6586b728d204367fea1087}{testing::AddGlobalTestEnvironment}}(\textcolor{keyword}{new}\ \mbox{\hyperlink{class_foo_environment}{FooEnvironment}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01064}01064\ \ \ \mbox{\hyperlink{namespacetesting_a224caeebdb6586b728d204367fea1087}{testing::AddGlobalTestEnvironment}}(\textcolor{keyword}{new}\ \mbox{\hyperlink{class_bar_environment}{BarEnvironment}});}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01065}01065\ }
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01066}01066\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{gtest__output__test___8cc_ae0ca194f6b730e168850ce3179ad4f63}{RunAllTests}}();}
+\DoxyCodeLine{\Hypertarget{gtest__output__test___8cc_source_l01067}01067\ \}}
+
+\end{DoxyCode}

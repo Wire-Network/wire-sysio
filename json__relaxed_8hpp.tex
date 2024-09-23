@@ -1,0 +1,61 @@
+\doxysection{libraries/fc/include/fc/io/json\+\_\+relaxed.hpp File Reference}
+\hypertarget{json__relaxed_8hpp}{}\label{json__relaxed_8hpp}\index{libraries/fc/include/fc/io/json\_relaxed.hpp@{libraries/fc/include/fc/io/json\_relaxed.hpp}}
+{\ttfamily \#include $<$fc/io/json.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/exception/exception.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/log/logger.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/string.\+hpp$>$}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$fstream$>$}\newline
+{\ttfamily \#include $<$sstream$>$}\newline
+{\ttfamily \#include $<$boost/filesystem/fstream.\+hpp$>$}\newline
+Include dependency graph for json\+\_\+relaxed.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{json__relaxed_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=194pt]{json__relaxed_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structfc_1_1json__relaxed_1_1_char_value_table}{fc\+::json\+\_\+relaxed\+::\+Char\+Value\+Table}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacefc}{fc}}
+\begin{DoxyCompactList}\small\item\em namespace \doxylink{namespacesysio_1_1chain}{sysio\+::chain} \end{DoxyCompactList}\item 
+namespace \mbox{\hyperlink{namespacefc_1_1json__relaxed}{fc\+::json\+\_\+relaxed}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , bool strict$>$ }\\\mbox{\hyperlink{classfc_1_1variant}{variant}} \mbox{\hyperlink{namespacefc_1_1json__relaxed_a93f8ed4a8dfc1215a360508b01460758}{fc\+::json\+\_\+relaxed\+::variant\+\_\+from\+\_\+stream}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&in, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} max\+\_\+depth)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\std\+::string \mbox{\hyperlink{namespacefc_1_1json__relaxed_ab8adad286397169b103cfc3174b08ac0}{fc\+::json\+\_\+relaxed\+::token\+From\+Stream}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&in)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , bool strict, bool allow\+\_\+escape$>$ }\\std\+::string \mbox{\hyperlink{namespacefc_1_1json__relaxed_a060702680aabbfdda1ea3a9ebba4cb47}{fc\+::json\+\_\+relaxed\+::quote\+String\+From\+Stream}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&in)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , bool strict$>$ }\\std\+::string \mbox{\hyperlink{namespacefc_1_1json__relaxed_a740e0f5fe18f8883bf3ddc221a088fb1}{fc\+::json\+\_\+relaxed\+::string\+From\+Stream}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&in)
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} base$>$ }\\\mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \mbox{\hyperlink{namespacefc_1_1json__relaxed_ab9f74ca1d69a24b9426673da82b53b89}{fc\+::json\+\_\+relaxed\+::parse\+Int}} (const std\+::string \&token, size\+\_\+t start)
+\item 
+{\footnotesize template$<$bool strict, \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} base$>$ }\\\mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \mbox{\hyperlink{namespacefc_1_1json__relaxed_a651f065bc345928a9d703a33779e3b36}{fc\+::json\+\_\+relaxed\+::maybe\+Parse\+Int}} (const std\+::string \&token, size\+\_\+t start)
+\item 
+{\footnotesize template$<$bool strict$>$ }\\\mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \mbox{\hyperlink{namespacefc_1_1json__relaxed_a5dfa268437a1c87f9a3fccaca20f4f66}{fc\+::json\+\_\+relaxed\+::parse\+Number\+Or\+Str}} (const std\+::string \&token)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , bool strict$>$ }\\\mbox{\hyperlink{classfc_1_1variant__object}{variant\+\_\+object}} \mbox{\hyperlink{namespacefc_1_1json__relaxed_a70b5ca49066241be221209bf30a1747b}{fc\+::json\+\_\+relaxed\+::object\+From\+Stream}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&in, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} max\+\_\+depth)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , bool strict$>$ }\\\mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}} \mbox{\hyperlink{namespacefc_1_1json__relaxed_a088ff48c6ecf622230a5ce1c173d2812}{fc\+::json\+\_\+relaxed\+::array\+From\+Stream}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&in, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} max\+\_\+depth)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , bool strict$>$ }\\\mbox{\hyperlink{classfc_1_1variant}{variant}} \mbox{\hyperlink{namespacefc_1_1json__relaxed_ad82c2c19cb73ba37be92ee358503d460}{fc\+::json\+\_\+relaxed\+::number\+From\+Stream}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&in)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , bool strict$>$ }\\\mbox{\hyperlink{classfc_1_1variant}{variant}} \mbox{\hyperlink{namespacefc_1_1json__relaxed_a8d50031ff7024c06ab8f355b25501434}{fc\+::json\+\_\+relaxed\+::word\+From\+Stream}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&in)
+\end{DoxyCompactItemize}

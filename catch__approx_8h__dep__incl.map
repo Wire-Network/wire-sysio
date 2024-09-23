@@ -1,0 +1,22 @@
+<map id="libraries/sys&#45;vm/external/Catch2/include/internal/catch_approx.h" name="libraries/sys&#45;vm/external/Catch2/include/internal/catch_approx.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="216,5,379,61"/>
+<area shape="rect" id="Node000002" href="$include_2catch_8hpp.html" title=" " alt="" coords="8,324,182,364"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="243,72,202,111,165,167,137,227,103,324,98,323,132,225,161,165,198,107,239,69"/>
+<area shape="rect" id="Node000004" href="$catch__approx_8cpp.html" title=" " alt="" coords="487,213,650,268"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="347,68,534,210,531,214,344,73"/>
+<area shape="rect" id="Node000006" href="$catch__matchers__vector_8h.html" title=" " alt="" coords="212,109,383,165"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="300,77,300,108,295,108,295,77"/>
+<area shape="rect" id="Node000003" href="$catch__with__main_8hpp.html" title=" " alt="" coords="5,420,185,476"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="98,380,98,419,92,419,92,380"/>
+<area shape="rect" id="Node000005" href="$catch__objc__impl_8mm.html" title=" " alt="" coords="412,420,607,476"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="603,279,616,301,625,325,628,349,621,373,600,401,572,422,569,417,596,397,617,371,623,349,620,326,611,303,599,282"/>
+<area shape="rect" id="Node000007" href="$catch__capture__matchers_8h.html" title=" " alt="" coords="208,213,387,268"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="300,180,300,212,295,212,295,180"/>
+<area shape="poly" id="edge7_Node000007_Node000002" title=" " alt="" coords="231,278,135,326,133,321,229,273"/>
+<area shape="rect" id="Node000008" href="$catch__assertionhandler_8cpp.html" title=" " alt="" coords="206,316,389,372"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="300,284,300,316,295,316,295,284"/>
+<area shape="rect" id="Node000009" href="$catch__capture__matchers_8cpp.html" title=" " alt="" coords="413,316,606,372"/>
+<area shape="poly" id="edge10_Node000007_Node000009" title=" " alt="" coords="369,273,454,313,452,318,367,278"/>
+<area shape="poly" id="edge9_Node000008_Node000005" title=" " alt="" coords="369,377,454,417,452,422,367,381"/>
+<area shape="poly" id="edge11_Node000009_Node000005" title=" " alt="" coords="512,388,512,419,507,419,507,388"/>
+</map>

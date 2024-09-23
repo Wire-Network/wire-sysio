@@ -1,0 +1,75 @@
+\doxysection{testing\+::internal\+::Comparison\+Base\texorpdfstring{$<$}{<} D, Rhs, Op \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classtesting_1_1internal_1_1_comparison_base}{}\label{classtesting_1_1internal_1_1_comparison_base}\index{testing::internal::ComparisonBase$<$ D, Rhs, Op $>$@{testing::internal::ComparisonBase$<$ D, Rhs, Op $>$}}
+
+
+{\ttfamily \#include $<$gmock-\/matchers.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_comparison_base_a365f20e35a604195c869ec0c0bc4c3a3}{Comparison\+Base}} (const Rhs \&rhs)
+\item 
+{\footnotesize template$<$typename Lhs $>$ }\\\mbox{\hyperlink{classtesting_1_1internal_1_1_comparison_base_a071cdd47406c2e8df9c89bb99302eab9}{operator Matcher$<$ Lhs $>$}} () const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{debug_8h_a6a96826afbc53984fc8331e32328fb3b}{D}}, typename Rhs, typename Op$>$\newline
+class testing\+::internal\+::\+Comparison\+Base$<$ D, Rhs, Op $>$}
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l01062}{1062}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_comparison_base_a365f20e35a604195c869ec0c0bc4c3a3}\index{testing::internal::ComparisonBase$<$ D, Rhs, Op $>$@{testing::internal::ComparisonBase$<$ D, Rhs, Op $>$}!ComparisonBase@{ComparisonBase}}
+\index{ComparisonBase@{ComparisonBase}!testing::internal::ComparisonBase$<$ D, Rhs, Op $>$@{testing::internal::ComparisonBase$<$ D, Rhs, Op $>$}}
+\doxysubsubsection{\texorpdfstring{ComparisonBase()}{ComparisonBase()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_comparison_base_a365f20e35a604195c869ec0c0bc4c3a3} 
+template$<$typename \mbox{\hyperlink{debug_8h_a6a96826afbc53984fc8331e32328fb3b}{D}} , typename Rhs , typename Op $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_comparison_base}{testing\+::internal\+::\+Comparison\+Base}}$<$ \mbox{\hyperlink{debug_8h_a6a96826afbc53984fc8331e32328fb3b}{D}}, Rhs, Op $>$\+::\+Comparison\+Base (\begin{DoxyParamCaption}\item[{const Rhs \&}]{rhs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l01064}{1064}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01064\ :\ rhs\_(rhs)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_comparison_base_a071cdd47406c2e8df9c89bb99302eab9}\index{testing::internal::ComparisonBase$<$ D, Rhs, Op $>$@{testing::internal::ComparisonBase$<$ D, Rhs, Op $>$}!operator Matcher$<$ Lhs $>$@{operator Matcher$<$ Lhs $>$}}
+\index{operator Matcher$<$ Lhs $>$@{operator Matcher$<$ Lhs $>$}!testing::internal::ComparisonBase$<$ D, Rhs, Op $>$@{testing::internal::ComparisonBase$<$ D, Rhs, Op $>$}}
+\doxysubsubsection{\texorpdfstring{operator Matcher$<$ Lhs $>$()}{operator Matcher< Lhs >()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_comparison_base_a071cdd47406c2e8df9c89bb99302eab9} 
+template$<$typename \mbox{\hyperlink{debug_8h_a6a96826afbc53984fc8331e32328fb3b}{D}} , typename Rhs , typename Op $>$ \\
+template$<$typename Lhs $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_comparison_base}{testing\+::internal\+::\+Comparison\+Base}}$<$ \mbox{\hyperlink{debug_8h_a6a96826afbc53984fc8331e32328fb3b}{D}}, Rhs, Op $>$\+::operator \mbox{\hyperlink{classtesting_1_1_matcher}{Matcher}}$<$ Lhs $>$ (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l01066}{1066}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01066\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01067\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetesting_aca6c4c4fdf7fb7257ea4fc76971cb82c}{MakeMatcher}}(\textcolor{keyword}{new}\ Impl<Lhs>(rhs\_));}
+\DoxyCodeLine{01068\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_comparison_base_a071cdd47406c2e8df9c89bb99302eab9_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/include/gmock/\mbox{\hyperlink{gmock-matchers_8h}{gmock-\/matchers.\+h}}\end{DoxyCompactItemize}

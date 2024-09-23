@@ -1,0 +1,348 @@
+\doxysection{websocketpp\+::frame\+::opcode Namespace Reference}
+\hypertarget{namespacewebsocketpp_1_1frame_1_1opcode}{}\label{namespacewebsocketpp_1_1frame_1_1opcode}\index{websocketpp::frame::opcode@{websocketpp::frame::opcode}}
+
+
+Constants and utility functions related to Web\+Socket opcodes.  
+
+
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e}{value}} \{ \newline
+\mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5eafa255413b3fad4339e5fb92cdda184e8}{continuation}} = 0x0
+, \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea6b65f28626b19b2eef447744c564e727}{text}} = 0x1
+, \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5eabe7c19fe7e9744d6a0f041e4c99f120f}{binary}} = 0x2
+, \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea046ac63536b1b5d630a69e824941cad7}{rsv3}} = 0x3
+, \newline
+\mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea502c0edad09e78ad5d6e66dc51748ae8}{rsv4}} = 0x4
+, \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5eae30622ede63836d1a4eb6c2a1bcff0f2}{rsv5}} = 0x5
+, \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea8512f47a57a13cf579a6fa9335cc7f3d}{rsv6}} = 0x6
+, \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea928573e394ac0cdf341c75111e902d35}{rsv7}} = 0x7
+, \newline
+\mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5eaf986267b7c0c7a3d02fe5a90ab2706fe}{close}} = 0x8
+, \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea132afac4d63241cda9be0000077ac562}{ping}} = 0x9
+, \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5eafae865784f281d6947b13dceebfb9461}{pong}} = 0xA
+, \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5eac313da4fe68298bf10e31806be65fafc}{control\+\_\+rsvb}} = 0xB
+, \newline
+\mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea1033ac7aaacf006bb90939ef998e2705}{control\+\_\+rsvc}} = 0xC
+, \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ead8c7d72c6a3ed12452b4eb1bb34a1105}{control\+\_\+rsvd}} = 0xD
+, \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5eae8af11825adb0e415d274143d75ddd6c}{control\+\_\+rsve}} = 0xE
+, \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5eae2d12db12aa471e7c8e190b66e70507f}{control\+\_\+rsvf}} = 0xF
+, \newline
+\mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea71e8a91139096779a7723c3cc85b5c2d}{CONTINUATION}} = 0x0
+, \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea35faaee264826923566fc05bdfd76b72}{TEXT}} = 0x1
+, \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea64e5cad7d9f3971f1e42e41f9a2bf544}{BINARY}} = 0x2
+, \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5eaee85326f7187447fb31d2486a97c0f6e}{RSV3}} = 0x3
+, \newline
+\mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea7f11095a2f6dedf812d3e5fcf1a73a48}{RSV4}} = 0x4
+, \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea6116326f39a9a638eec2520b23074ce1}{RSV5}} = 0x5
+, \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea913fe1dc9279360d3b7bb1c8ad09af0c}{RSV6}} = 0x6
+, \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5eabc95631f1ee784aa958c5926c6985d47}{RSV7}} = 0x7
+, \newline
+\mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5eafc878334b78f2baf96d5dbf9e9652066}{CLOSE}} = 0x8
+, \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea384ec7a09356db47fdf1646f954aa208}{PING}} = 0x9
+, \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea8674aa04d991121443c8f063e7144284}{PONG}} = 0xA
+, \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5eaa8b3e9a69bec8282022a781097d45ac0}{CONTROL\+\_\+\+RSVB}} = 0xB
+, \newline
+\mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5eaa625016e0ed6c7d91c2fbaa95184d6ff}{CONTROL\+\_\+\+RSVC}} = 0xC
+, \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ead578077807048ee628834cd8b52d858f}{CONTROL\+\_\+\+RSVD}} = 0xD
+, \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5eacb597737349176a6e62f952038ca1bc5}{CONTROL\+\_\+\+RSVE}} = 0xE
+, \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5eaa215bffb215a2c7759a5eaa36fa2ef25}{CONTROL\+\_\+\+RSVF}} = 0xF
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_a9890345367f4c8bdf565d62e00afbc61}{reserved}} (\mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e}{value}} v)
+\begin{DoxyCompactList}\small\item\em Check if an opcode is reserved. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_a6f451ade60e2cca4caac58347643443a}{invalid}} (\mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e}{value}} v)
+\begin{DoxyCompactList}\small\item\em Check if an opcode is invalid. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_aa5e7f94a35f8fb59a925fa01636f08ad}{is\+\_\+control}} (\mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e}{value}} v)
+\begin{DoxyCompactList}\small\item\em Check if an opcode is for a control frame. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Web\+Socket Opcodes are 4 bits. See RFC6455 section 5.\+2. 
+
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e}\index{websocketpp::frame::opcode@{websocketpp::frame::opcode}!value@{value}}
+\index{value@{value}!websocketpp::frame::opcode@{websocketpp::frame::opcode}}
+\doxysubsubsection{\texorpdfstring{value}{value}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e} 
+enum \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e}{websocketpp\+::frame\+::opcode\+::value}}}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{continuation@{continuation}!websocketpp::frame::opcode@{websocketpp::frame::opcode}}\index{websocketpp::frame::opcode@{websocketpp::frame::opcode}!continuation@{continuation}}}\Hypertarget{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5eafa255413b3fad4339e5fb92cdda184e8}\label{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e} 
+continuation&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{text@{text}!websocketpp::frame::opcode@{websocketpp::frame::opcode}}\index{websocketpp::frame::opcode@{websocketpp::frame::opcode}!text@{text}}}\Hypertarget{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea6b65f28626b19b2eef447744c564e727}\label{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e} 
+text&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{binary@{binary}!websocketpp::frame::opcode@{websocketpp::frame::opcode}}\index{websocketpp::frame::opcode@{websocketpp::frame::opcode}!binary@{binary}}}\Hypertarget{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5eabe7c19fe7e9744d6a0f041e4c99f120f}\label{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e} 
+binary&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{rsv3@{rsv3}!websocketpp::frame::opcode@{websocketpp::frame::opcode}}\index{websocketpp::frame::opcode@{websocketpp::frame::opcode}!rsv3@{rsv3}}}\Hypertarget{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea046ac63536b1b5d630a69e824941cad7}\label{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e} 
+rsv3&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{rsv4@{rsv4}!websocketpp::frame::opcode@{websocketpp::frame::opcode}}\index{websocketpp::frame::opcode@{websocketpp::frame::opcode}!rsv4@{rsv4}}}\Hypertarget{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea502c0edad09e78ad5d6e66dc51748ae8}\label{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e} 
+rsv4&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{rsv5@{rsv5}!websocketpp::frame::opcode@{websocketpp::frame::opcode}}\index{websocketpp::frame::opcode@{websocketpp::frame::opcode}!rsv5@{rsv5}}}\Hypertarget{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5eae30622ede63836d1a4eb6c2a1bcff0f2}\label{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e} 
+rsv5&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{rsv6@{rsv6}!websocketpp::frame::opcode@{websocketpp::frame::opcode}}\index{websocketpp::frame::opcode@{websocketpp::frame::opcode}!rsv6@{rsv6}}}\Hypertarget{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea8512f47a57a13cf579a6fa9335cc7f3d}\label{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e} 
+rsv6&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{rsv7@{rsv7}!websocketpp::frame::opcode@{websocketpp::frame::opcode}}\index{websocketpp::frame::opcode@{websocketpp::frame::opcode}!rsv7@{rsv7}}}\Hypertarget{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea928573e394ac0cdf341c75111e902d35}\label{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e} 
+rsv7&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{close@{close}!websocketpp::frame::opcode@{websocketpp::frame::opcode}}\index{websocketpp::frame::opcode@{websocketpp::frame::opcode}!close@{close}}}\Hypertarget{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5eaf986267b7c0c7a3d02fe5a90ab2706fe}\label{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e} 
+close&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ping@{ping}!websocketpp::frame::opcode@{websocketpp::frame::opcode}}\index{websocketpp::frame::opcode@{websocketpp::frame::opcode}!ping@{ping}}}\Hypertarget{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea132afac4d63241cda9be0000077ac562}\label{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e} 
+ping&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{pong@{pong}!websocketpp::frame::opcode@{websocketpp::frame::opcode}}\index{websocketpp::frame::opcode@{websocketpp::frame::opcode}!pong@{pong}}}\Hypertarget{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5eafae865784f281d6947b13dceebfb9461}\label{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e} 
+pong&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{control\_rsvb@{control\_rsvb}!websocketpp::frame::opcode@{websocketpp::frame::opcode}}\index{websocketpp::frame::opcode@{websocketpp::frame::opcode}!control\_rsvb@{control\_rsvb}}}\Hypertarget{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5eac313da4fe68298bf10e31806be65fafc}\label{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e} 
+control\+\_\+rsvb&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{control\_rsvc@{control\_rsvc}!websocketpp::frame::opcode@{websocketpp::frame::opcode}}\index{websocketpp::frame::opcode@{websocketpp::frame::opcode}!control\_rsvc@{control\_rsvc}}}\Hypertarget{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea1033ac7aaacf006bb90939ef998e2705}\label{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e} 
+control\+\_\+rsvc&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{control\_rsvd@{control\_rsvd}!websocketpp::frame::opcode@{websocketpp::frame::opcode}}\index{websocketpp::frame::opcode@{websocketpp::frame::opcode}!control\_rsvd@{control\_rsvd}}}\Hypertarget{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ead8c7d72c6a3ed12452b4eb1bb34a1105}\label{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e} 
+control\+\_\+rsvd&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{control\_rsve@{control\_rsve}!websocketpp::frame::opcode@{websocketpp::frame::opcode}}\index{websocketpp::frame::opcode@{websocketpp::frame::opcode}!control\_rsve@{control\_rsve}}}\Hypertarget{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5eae8af11825adb0e415d274143d75ddd6c}\label{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e} 
+control\+\_\+rsve&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{control\_rsvf@{control\_rsvf}!websocketpp::frame::opcode@{websocketpp::frame::opcode}}\index{websocketpp::frame::opcode@{websocketpp::frame::opcode}!control\_rsvf@{control\_rsvf}}}\Hypertarget{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5eae2d12db12aa471e7c8e190b66e70507f}\label{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e} 
+control\+\_\+rsvf&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{CONTINUATION@{CONTINUATION}!websocketpp::frame::opcode@{websocketpp::frame::opcode}}\index{websocketpp::frame::opcode@{websocketpp::frame::opcode}!CONTINUATION@{CONTINUATION}}}\Hypertarget{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea71e8a91139096779a7723c3cc85b5c2d}\label{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e} 
+CONTINUATION&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{TEXT@{TEXT}!websocketpp::frame::opcode@{websocketpp::frame::opcode}}\index{websocketpp::frame::opcode@{websocketpp::frame::opcode}!TEXT@{TEXT}}}\Hypertarget{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea35faaee264826923566fc05bdfd76b72}\label{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e} 
+TEXT&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{BINARY@{BINARY}!websocketpp::frame::opcode@{websocketpp::frame::opcode}}\index{websocketpp::frame::opcode@{websocketpp::frame::opcode}!BINARY@{BINARY}}}\Hypertarget{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea64e5cad7d9f3971f1e42e41f9a2bf544}\label{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e} 
+BINARY&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{RSV3@{RSV3}!websocketpp::frame::opcode@{websocketpp::frame::opcode}}\index{websocketpp::frame::opcode@{websocketpp::frame::opcode}!RSV3@{RSV3}}}\Hypertarget{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5eaee85326f7187447fb31d2486a97c0f6e}\label{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e} 
+RSV3&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{RSV4@{RSV4}!websocketpp::frame::opcode@{websocketpp::frame::opcode}}\index{websocketpp::frame::opcode@{websocketpp::frame::opcode}!RSV4@{RSV4}}}\Hypertarget{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea7f11095a2f6dedf812d3e5fcf1a73a48}\label{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e} 
+RSV4&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{RSV5@{RSV5}!websocketpp::frame::opcode@{websocketpp::frame::opcode}}\index{websocketpp::frame::opcode@{websocketpp::frame::opcode}!RSV5@{RSV5}}}\Hypertarget{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea6116326f39a9a638eec2520b23074ce1}\label{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e} 
+RSV5&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{RSV6@{RSV6}!websocketpp::frame::opcode@{websocketpp::frame::opcode}}\index{websocketpp::frame::opcode@{websocketpp::frame::opcode}!RSV6@{RSV6}}}\Hypertarget{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea913fe1dc9279360d3b7bb1c8ad09af0c}\label{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e} 
+RSV6&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{RSV7@{RSV7}!websocketpp::frame::opcode@{websocketpp::frame::opcode}}\index{websocketpp::frame::opcode@{websocketpp::frame::opcode}!RSV7@{RSV7}}}\Hypertarget{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5eabc95631f1ee784aa958c5926c6985d47}\label{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e} 
+RSV7&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{CLOSE@{CLOSE}!websocketpp::frame::opcode@{websocketpp::frame::opcode}}\index{websocketpp::frame::opcode@{websocketpp::frame::opcode}!CLOSE@{CLOSE}}}\Hypertarget{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5eafc878334b78f2baf96d5dbf9e9652066}\label{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e} 
+CLOSE&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PING@{PING}!websocketpp::frame::opcode@{websocketpp::frame::opcode}}\index{websocketpp::frame::opcode@{websocketpp::frame::opcode}!PING@{PING}}}\Hypertarget{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea384ec7a09356db47fdf1646f954aa208}\label{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e} 
+PING&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PONG@{PONG}!websocketpp::frame::opcode@{websocketpp::frame::opcode}}\index{websocketpp::frame::opcode@{websocketpp::frame::opcode}!PONG@{PONG}}}\Hypertarget{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea8674aa04d991121443c8f063e7144284}\label{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e} 
+PONG&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{CONTROL\_RSVB@{CONTROL\_RSVB}!websocketpp::frame::opcode@{websocketpp::frame::opcode}}\index{websocketpp::frame::opcode@{websocketpp::frame::opcode}!CONTROL\_RSVB@{CONTROL\_RSVB}}}\Hypertarget{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5eaa8b3e9a69bec8282022a781097d45ac0}\label{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e} 
+CONTROL\+\_\+\+RSVB&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{CONTROL\_RSVC@{CONTROL\_RSVC}!websocketpp::frame::opcode@{websocketpp::frame::opcode}}\index{websocketpp::frame::opcode@{websocketpp::frame::opcode}!CONTROL\_RSVC@{CONTROL\_RSVC}}}\Hypertarget{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5eaa625016e0ed6c7d91c2fbaa95184d6ff}\label{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e} 
+CONTROL\+\_\+\+RSVC&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{CONTROL\_RSVD@{CONTROL\_RSVD}!websocketpp::frame::opcode@{websocketpp::frame::opcode}}\index{websocketpp::frame::opcode@{websocketpp::frame::opcode}!CONTROL\_RSVD@{CONTROL\_RSVD}}}\Hypertarget{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ead578077807048ee628834cd8b52d858f}\label{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e} 
+CONTROL\+\_\+\+RSVD&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{CONTROL\_RSVE@{CONTROL\_RSVE}!websocketpp::frame::opcode@{websocketpp::frame::opcode}}\index{websocketpp::frame::opcode@{websocketpp::frame::opcode}!CONTROL\_RSVE@{CONTROL\_RSVE}}}\Hypertarget{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5eacb597737349176a6e62f952038ca1bc5}\label{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e} 
+CONTROL\+\_\+\+RSVE&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{CONTROL\_RSVF@{CONTROL\_RSVF}!websocketpp::frame::opcode@{websocketpp::frame::opcode}}\index{websocketpp::frame::opcode@{websocketpp::frame::opcode}!CONTROL\_RSVF@{CONTROL\_RSVF}}}\Hypertarget{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5eaa215bffb215a2c7759a5eaa36fa2ef25}\label{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e} 
+CONTROL\+\_\+\+RSVF&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{frame_8hpp_source_l00077}{77}} of file \mbox{\hyperlink{frame_8hpp_source}{frame.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5eafa255413b3fad4339e5fb92cdda184e8}{continuation}}\ =\ 0x0,}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea6b65f28626b19b2eef447744c564e727}{text}}\ =\ 0x1,}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5eabe7c19fe7e9744d6a0f041e4c99f120f}{binary}}\ =\ 0x2,}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea046ac63536b1b5d630a69e824941cad7}{rsv3}}\ =\ 0x3,}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea502c0edad09e78ad5d6e66dc51748ae8}{rsv4}}\ =\ 0x4,}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5eae30622ede63836d1a4eb6c2a1bcff0f2}{rsv5}}\ =\ 0x5,}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea8512f47a57a13cf579a6fa9335cc7f3d}{rsv6}}\ =\ 0x6,}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea928573e394ac0cdf341c75111e902d35}{rsv7}}\ =\ 0x7,}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{integration_8cpp_af5b66d867a040d002fb57d645cae3fb4}{close}}\ =\ 0x8,}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea132afac4d63241cda9be0000077ac562}{ping}}\ =\ 0x9,}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5eafae865784f281d6947b13dceebfb9461}{pong}}\ =\ 0xA,}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5eac313da4fe68298bf10e31806be65fafc}{control\_rsvb}}\ =\ 0xB,}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea1033ac7aaacf006bb90939ef998e2705}{control\_rsvc}}\ =\ 0xC,}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ead8c7d72c6a3ed12452b4eb1bb34a1105}{control\_rsvd}}\ =\ 0xD,}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5eae8af11825adb0e415d274143d75ddd6c}{control\_rsve}}\ =\ 0xE,}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5eae2d12db12aa471e7c8e190b66e70507f}{control\_rsvf}}\ =\ 0xF,}
+\DoxyCodeLine{00094\ }
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea71e8a91139096779a7723c3cc85b5c2d}{CONTINUATION}}\ =\ 0x0,}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea35faaee264826923566fc05bdfd76b72}{TEXT}}\ =\ 0x1,}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_validate_8cpp_aaaf4ef40e88fd195e8b6bdb9b572b83d}{BINARY}}\ =\ 0x2,}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5eaee85326f7187447fb31d2486a97c0f6e}{RSV3}}\ =\ 0x3,}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea7f11095a2f6dedf812d3e5fcf1a73a48}{RSV4}}\ =\ 0x4,}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea6116326f39a9a638eec2520b23074ce1}{RSV5}}\ =\ 0x5,}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea913fe1dc9279360d3b7bb1c8ad09af0c}{RSV6}}\ =\ 0x6,}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5eabc95631f1ee784aa958c5926c6985d47}{RSV7}}\ =\ 0x7,}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5eafc878334b78f2baf96d5dbf9e9652066}{CLOSE}}\ =\ 0x8,}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea384ec7a09356db47fdf1646f954aa208}{PING}}\ =\ 0x9,}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea8674aa04d991121443c8f063e7144284}{PONG}}\ =\ 0xA,}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5eaa8b3e9a69bec8282022a781097d45ac0}{CONTROL\_RSVB}}\ =\ 0xB,}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5eaa625016e0ed6c7d91c2fbaa95184d6ff}{CONTROL\_RSVC}}\ =\ 0xC,}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ead578077807048ee628834cd8b52d858f}{CONTROL\_RSVD}}\ =\ 0xD,}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5eacb597737349176a6e62f952038ca1bc5}{CONTROL\_RSVE}}\ =\ 0xE,}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5eaa215bffb215a2c7759a5eaa36fa2ef25}{CONTROL\_RSVF}}\ =\ 0xF}
+\DoxyCodeLine{00111\ \ \ \ \ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacewebsocketpp_1_1frame_1_1opcode_a6f451ade60e2cca4caac58347643443a}\index{websocketpp::frame::opcode@{websocketpp::frame::opcode}!invalid@{invalid}}
+\index{invalid@{invalid}!websocketpp::frame::opcode@{websocketpp::frame::opcode}}
+\doxysubsubsection{\texorpdfstring{invalid()}{invalid()}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1frame_1_1opcode_a6f451ade60e2cca4caac58347643443a} 
+bool websocketpp\+::frame\+::opcode\+::invalid (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e}{value}}}]{v}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Invalid opcodes are negative or require greater than 4 bits to store.
+
+
+\begin{DoxyParams}{Parameters}
+{\em v} & The opcode to test. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Whether or not the opcode is invalid. 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{frame_8hpp_source_l00130}{130}} of file \mbox{\hyperlink{frame_8hpp_source}{frame.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (v\ >\ 0xF\ ||\ v\ <\ 0);}
+\DoxyCodeLine{00132\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacewebsocketpp_1_1frame_1_1opcode_a6f451ade60e2cca4caac58347643443a_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacewebsocketpp_1_1frame_1_1opcode_aa5e7f94a35f8fb59a925fa01636f08ad}\index{websocketpp::frame::opcode@{websocketpp::frame::opcode}!is\_control@{is\_control}}
+\index{is\_control@{is\_control}!websocketpp::frame::opcode@{websocketpp::frame::opcode}}
+\doxysubsubsection{\texorpdfstring{is\_control()}{is\_control()}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1frame_1_1opcode_aa5e7f94a35f8fb59a925fa01636f08ad} 
+bool websocketpp\+::frame\+::opcode\+::is\+\_\+control (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e}{value}}}]{v}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+\begin{DoxyParams}{Parameters}
+{\em v} & The opcode to test. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Whether or not the opcode is a control opcode. 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{frame_8hpp_source_l00139}{139}} of file \mbox{\hyperlink{frame_8hpp_source}{frame.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ v\ >=\ 0x8;}
+\DoxyCodeLine{00141\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacewebsocketpp_1_1frame_1_1opcode_aa5e7f94a35f8fb59a925fa01636f08ad_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacewebsocketpp_1_1frame_1_1opcode_a9890345367f4c8bdf565d62e00afbc61}\index{websocketpp::frame::opcode@{websocketpp::frame::opcode}!reserved@{reserved}}
+\index{reserved@{reserved}!websocketpp::frame::opcode@{websocketpp::frame::opcode}}
+\doxysubsubsection{\texorpdfstring{reserved()}{reserved()}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1frame_1_1opcode_a9890345367f4c8bdf565d62e00afbc61} 
+bool websocketpp\+::frame\+::opcode\+::reserved (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e}{value}}}]{v}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+\begin{DoxyParams}{Parameters}
+{\em v} & The opcode to test. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Whether or not the opcode is reserved. 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{frame_8hpp_source_l00118}{118}} of file \mbox{\hyperlink{frame_8hpp_source}{frame.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (v\ >=\ rsv3\ \&\&\ v\ <=\ rsv7)\ ||}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (v\ >=\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5eac313da4fe68298bf10e31806be65fafc}{control\_rsvb}}\ \&\&\ v\ <=\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5eae2d12db12aa471e7c8e190b66e70507f}{control\_rsvf}});}
+\DoxyCodeLine{00121\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacewebsocketpp_1_1frame_1_1opcode_a9890345367f4c8bdf565d62e00afbc61_icgraph}
+\end{center}
+\end{figure}

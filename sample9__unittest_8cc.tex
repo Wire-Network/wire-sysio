@@ -1,0 +1,93 @@
+\doxysection{libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/samples/sample9\+\_\+unittest.cc File Reference}
+\hypertarget{sample9__unittest_8cc}{}\label{sample9__unittest_8cc}\index{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/samples/sample9\_unittest.cc@{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/samples/sample9\_unittest.cc}}
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include "{}gtest/gtest.\+h"{}}\newline
+Include dependency graph for sample9\+\_\+unittest.\+cc\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sample9__unittest_8cc__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{sample9__unittest_8cc_a3c04138a5bfe5d72780bb7e82a18e627}{main}} (int argc, char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{sample9__unittest_8cc_a3c04138a5bfe5d72780bb7e82a18e627}\index{sample9\_unittest.cc@{sample9\_unittest.cc}!main@{main}}
+\index{main@{main}!sample9\_unittest.cc@{sample9\_unittest.cc}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{sample9__unittest_8cc_a3c04138a5bfe5d72780bb7e82a18e627} 
+int main (\begin{DoxyParamCaption}\item[{int}]{argc}{, }\item[{char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{argv}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sample9__unittest_8cc_source_l00105}{105}} of file \mbox{\hyperlink{sample9__unittest_8cc_source}{sample9\+\_\+unittest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00106\ \ \ \mbox{\hyperlink{namespacetesting_afd726ae08c9bd16dc52f78c822d9946b}{InitGoogleTest}}(\&argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}});}
+\DoxyCodeLine{00107\ }
+\DoxyCodeLine{00108\ \ \ \textcolor{keywordtype}{bool}\ terse\_output\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00109\ \ \ \textcolor{keywordflow}{if}\ (argc\ >\ 1\ \&\&\ strcmp(\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[1],\ \textcolor{stringliteral}{"{}-\/-\/terse\_output"{}})\ ==\ 0\ )}
+\DoxyCodeLine{00110\ \ \ \ \ terse\_output\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00111\ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00112\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\%s\(\backslash\)n"{}},\ \textcolor{stringliteral}{"{}Run\ this\ program\ with\ -\/-\/terse\_output\ to\ change\ the\ way\ "{}}}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}it\ prints\ its\ output."{}});}
+\DoxyCodeLine{00114\ }
+\DoxyCodeLine{00115\ \ \ UnitTest\&\ unit\_test\ =\ *UnitTest::GetInstance();}
+\DoxyCodeLine{00116\ }
+\DoxyCodeLine{00117\ \ \ \textcolor{comment}{//\ If\ we\ are\ given\ the\ -\/-\/terse\_output\ command\ line\ flag,\ suppresses\ the}}
+\DoxyCodeLine{00118\ \ \ \textcolor{comment}{//\ standard\ output\ and\ attaches\ own\ result\ printer.}}
+\DoxyCodeLine{00119\ \ \ \textcolor{keywordflow}{if}\ (terse\_output)\ \{}
+\DoxyCodeLine{00120\ \ \ \ \ TestEventListeners\&\ listeners\ =\ unit\_test.listeners();}
+\DoxyCodeLine{00121\ }
+\DoxyCodeLine{00122\ \ \ \ \ \textcolor{comment}{//\ Removes\ the\ default\ console\ output\ listener\ from\ the\ list\ so\ it\ will}}
+\DoxyCodeLine{00123\ \ \ \ \ \textcolor{comment}{//\ not\ receive\ events\ from\ Google\ Test\ and\ won't\ print\ any\ output.\ Since}}
+\DoxyCodeLine{00124\ \ \ \ \ \textcolor{comment}{//\ this\ operation\ transfers\ ownership\ of\ the\ listener\ to\ the\ caller\ we}}
+\DoxyCodeLine{00125\ \ \ \ \ \textcolor{comment}{//\ have\ to\ delete\ it\ as\ well.}}
+\DoxyCodeLine{00126\ \ \ \ \ \textcolor{keyword}{delete}\ listeners.Release(listeners.default\_result\_printer());}
+\DoxyCodeLine{00127\ }
+\DoxyCodeLine{00128\ \ \ \ \ \textcolor{comment}{//\ Adds\ the\ custom\ output\ listener\ to\ the\ list.\ It\ will\ now\ receive}}
+\DoxyCodeLine{00129\ \ \ \ \ \textcolor{comment}{//\ events\ from\ Google\ Test\ and\ print\ the\ alternative\ output.\ We\ don't}}
+\DoxyCodeLine{00130\ \ \ \ \ \textcolor{comment}{//\ have\ to\ worry\ about\ deleting\ it\ since\ Google\ Test\ assumes\ ownership}}
+\DoxyCodeLine{00131\ \ \ \ \ \textcolor{comment}{//\ over\ it\ after\ adding\ it\ to\ the\ list.}}
+\DoxyCodeLine{00132\ \ \ \ \ listeners.Append(\textcolor{keyword}{new}\ TersePrinter);}
+\DoxyCodeLine{00133\ \ \ \}}
+\DoxyCodeLine{00134\ \ \ \textcolor{keywordtype}{int}\ ret\_val\ =\ \mbox{\hyperlink{gtest_8h_a853a3792807489591d3d4a2f2ff9359f}{RUN\_ALL\_TESTS}}();}
+\DoxyCodeLine{00135\ }
+\DoxyCodeLine{00136\ \ \ \textcolor{comment}{//\ This\ is\ an\ example\ of\ using\ the\ UnitTest\ reflection\ API\ to\ inspect\ test}}
+\DoxyCodeLine{00137\ \ \ \textcolor{comment}{//\ results.\ Here\ we\ discount\ failures\ from\ the\ tests\ we\ expected\ to\ fail.}}
+\DoxyCodeLine{00138\ \ \ \textcolor{keywordtype}{int}\ unexpectedly\_failed\_tests\ =\ 0;}
+\DoxyCodeLine{00139\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ unit\_test.total\_test\_case\_count();\ ++i)\ \{}
+\DoxyCodeLine{00140\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacegmock__test__utils_a959c5af591e4d49b6d35745205b64509}{TestCase}}\&\ test\_case\ =\ *unit\_test.GetTestCase(i);}
+\DoxyCodeLine{00141\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ =\ 0;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ <\ test\_case.total\_test\_count();\ ++\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}})\ \{}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \textcolor{keyword}{const}\ TestInfo\&\ test\_info\ =\ *test\_case.GetTestInfo(\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}});}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \textcolor{comment}{//\ Counts\ failed\ tests\ that\ were\ not\ meant\ to\ fail\ (those\ without}}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \textcolor{comment}{//\ 'Fails'\ in\ the\ name).}}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (test\_info.result()-\/>Failed()\ \&\&}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \ \ strcmp(test\_info.name(),\ \textcolor{stringliteral}{"{}Fails"{}})\ !=\ 0)\ \{}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ unexpectedly\_failed\_tests++;}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00149\ \ \ \ \ \}}
+\DoxyCodeLine{00150\ \ \ \}}
+\DoxyCodeLine{00151\ }
+\DoxyCodeLine{00152\ \ \ \textcolor{comment}{//\ Test\ that\ were\ meant\ to\ fail\ should\ not\ affect\ the\ test\ program\ outcome.}}
+\DoxyCodeLine{00153\ \ \ \textcolor{keywordflow}{if}\ (unexpectedly\_failed\_tests\ ==\ 0)}
+\DoxyCodeLine{00154\ \ \ \ \ ret\_val\ =\ 0;}
+\DoxyCodeLine{00155\ }
+\DoxyCodeLine{00156\ \ \ \textcolor{keywordflow}{return}\ ret\_val;}
+\DoxyCodeLine{00157\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=252pt]{sample9__unittest_8cc_a3c04138a5bfe5d72780bb7e82a18e627_cgraph}
+\end{center}
+\end{figure}

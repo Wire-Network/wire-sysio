@@ -1,0 +1,81 @@
+\doxysection{libraries/chain/include/sysio/chain/symbol.hpp File Reference}
+\hypertarget{symbol_8hpp}{}\label{symbol_8hpp}\index{libraries/chain/include/sysio/chain/symbol.hpp@{libraries/chain/include/sysio/chain/symbol.hpp}}
+{\ttfamily \#include $<$fc/exception/exception.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/types.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/core\+\_\+symbol.\+hpp$>$}\newline
+{\ttfamily \#include $<$string$>$}\newline
+{\ttfamily \#include $<$functional$>$}\newline
+Include dependency graph for symbol.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{symbol_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{symbol_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1symbol__code}{sysio\+::chain\+::symbol\+\_\+code}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1chain_1_1symbol}{sysio\+::chain\+::symbol}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1extended__symbol}{sysio\+::chain\+::extended\+\_\+symbol}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain}{sysio\+::chain}}
+\item 
+namespace \mbox{\hyperlink{namespacefc}{fc}}
+\begin{DoxyCompactList}\small\item\em namespace \doxylink{namespacesysio_1_1chain}{sysio\+::chain} \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{symbol_8hpp_a44451d6dd393819d8f58094aab826f7e}{SY}}(\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}},  \mbox{\hyperlink{lib_8h_a3f9003cfa8b6fa038820ae2e2e077ffa}{X}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{namespacesysio_1_1chain_a1883fa2c3c4ddf286d96fb67646fb9fa}{sysio\+::chain\+::operator==}} (const \mbox{\hyperlink{classsysio_1_1chain_1_1symbol}{symbol}} \&lhs, const \mbox{\hyperlink{classsysio_1_1chain_1_1symbol}{symbol}} \&rhs)
+\item 
+bool \mbox{\hyperlink{namespacesysio_1_1chain_a45111fe4390f645b2b1fa9c1da88e7ab}{sysio\+::chain\+::operator!=}} (const \mbox{\hyperlink{classsysio_1_1chain_1_1symbol}{symbol}} \&lhs, const \mbox{\hyperlink{classsysio_1_1chain_1_1symbol}{symbol}} \&rhs)
+\item 
+bool \mbox{\hyperlink{namespacesysio_1_1chain_aab724e950ea9bb601674bc2a8b97005f}{sysio\+::chain\+::operator$<$}} (const \mbox{\hyperlink{classsysio_1_1chain_1_1symbol}{symbol}} \&lhs, const \mbox{\hyperlink{classsysio_1_1chain_1_1symbol}{symbol}} \&rhs)
+\item 
+bool \mbox{\hyperlink{namespacesysio_1_1chain_a5f223d248e1c758b24db216e609e47be}{sysio\+::chain\+::operator$>$}} (const \mbox{\hyperlink{classsysio_1_1chain_1_1symbol}{symbol}} \&lhs, const \mbox{\hyperlink{classsysio_1_1chain_1_1symbol}{symbol}} \&rhs)
+\item 
+void \mbox{\hyperlink{namespacefc_abedfb0db6e250c134df7e6f51a7814e1}{fc\+::to\+\_\+variant}} (const \mbox{\hyperlink{classsysio_1_1chain_1_1symbol}{sysio\+::chain\+::symbol}} \&var, \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&vo)
+\item 
+void \mbox{\hyperlink{namespacefc_a7daf7b16cd12c650dba5d6d1b60b2d6d}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&var, \mbox{\hyperlink{classsysio_1_1chain_1_1symbol}{sysio\+::chain\+::symbol}} \&vo)
+\item 
+void \mbox{\hyperlink{namespacefc_a418040e4d601e768f259e992694de1ef}{fc\+::to\+\_\+variant}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1symbol__code}{sysio\+::chain\+::symbol\+\_\+code}} \&var, \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&vo)
+\item 
+void \mbox{\hyperlink{namespacefc_ad335f82bccd991dd7ba9d6ae4f12bf78}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&var, \mbox{\hyperlink{structsysio_1_1chain_1_1symbol__code}{sysio\+::chain\+::symbol\+\_\+code}} \&vo)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{symbol_8hpp_a44451d6dd393819d8f58094aab826f7e}\index{symbol.hpp@{symbol.hpp}!SY@{SY}}
+\index{SY@{SY}!symbol.hpp@{symbol.hpp}}
+\doxysubsubsection{\texorpdfstring{SY}{SY}}
+{\footnotesize\ttfamily \label{symbol_8hpp_a44451d6dd393819d8f58094aab826f7e} 
+\#define SY(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}}}{, }\item[{}]{\mbox{\hyperlink{lib_8h_a3f9003cfa8b6fa038820ae2e2e077ffa}{X}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{::sysio::chain::string\_to\_symbol\_c(\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}},\#\mbox{\hyperlink{struct_x_t}{X}})}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{symbol_8hpp_source_l00034}{34}} of file \mbox{\hyperlink{symbol_8hpp_source}{symbol.\+hpp}}.
+

@@ -1,0 +1,208 @@
+\doxysection{libraries/fc/vendor/websocketpp/examples/sip\+\_\+client/sip\+\_\+client.cpp File Reference}
+\hypertarget{sip__client_8cpp}{}\label{sip__client_8cpp}\index{libraries/fc/vendor/websocketpp/examples/sip\_client/sip\_client.cpp@{libraries/fc/vendor/websocketpp/examples/sip\_client/sip\_client.cpp}}
+{\ttfamily \#include $<$condition\+\_\+variable$>$}\newline
+{\ttfamily \#include $<$websocketpp/config/asio\+\_\+no\+\_\+tls\+\_\+client.\+hpp$>$}\newline
+{\ttfamily \#include $<$websocketpp/client.\+hpp$>$}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$boost/thread/thread.\+hpp$>$}\newline
+Include dependency graph for sip\+\_\+client.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sip__client_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1client}{websocketpp\+::client}}$<$ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio__client}{websocketpp\+::config\+::asio\+\_\+client}} $>$ \mbox{\hyperlink{sip__client_8cpp_aff8c62b83a9c8aefc476f96166656b76}{client}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{sip__client_8cpp_a9602fc6fab09cf0b8aa1fbe3973de3ad}{on\+\_\+open}} (\mbox{\hyperlink{debug__client_8cpp_aff8c62b83a9c8aefc476f96166656b76}{client}} \texorpdfstring{$\ast$}{*}c, \mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{websocketpp\+::connection\+\_\+hdl}} hdl)
+\item 
+void \mbox{\hyperlink{sip__client_8cpp_a8c13595a4801a15825ae3f8c8bb37ed4}{on\+\_\+message}} (\mbox{\hyperlink{debug__client_8cpp_aff8c62b83a9c8aefc476f96166656b76}{client}} \texorpdfstring{$\ast$}{*}c, \mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{websocketpp\+::connection\+\_\+hdl}} hdl, \mbox{\hyperlink{debug__client_8cpp_a08398c4d31a4dc3e42d1b9a9ef64c6ad}{message\+\_\+ptr}} msg)
+\item 
+int \mbox{\hyperlink{sip__client_8cpp_a0ddf1224851353fc92bfbff6f499fa97}{main}} (int argc, char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}\mbox{[}$\,$\mbox{]})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{debug__client_8cpp_aff8c62b83a9c8aefc476f96166656b76}{client}} \mbox{\hyperlink{sip__client_8cpp_a25a83214e5578f123d0ca4281c6de6e5}{sip\+\_\+client}}
+\item 
+bool \mbox{\hyperlink{sip__client_8cpp_a6dbe87354d47906dcbb42c7ba634b102}{received}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{sip__client_8cpp_aff8c62b83a9c8aefc476f96166656b76}\index{sip\_client.cpp@{sip\_client.cpp}!client@{client}}
+\index{client@{client}!sip\_client.cpp@{sip\_client.cpp}}
+\doxysubsubsection{\texorpdfstring{client}{client}}
+{\footnotesize\ttfamily \label{sip__client_8cpp_aff8c62b83a9c8aefc476f96166656b76} 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1client}{websocketpp\+::client}}$<$\mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio__client}{websocketpp\+::config\+::asio\+\_\+client}}$>$ \mbox{\hyperlink{debug__client_8cpp_aff8c62b83a9c8aefc476f96166656b76}{client}}}
+
+
+
+Definition at line \mbox{\hyperlink{sip__client_8cpp_source_l00011}{11}} of file \mbox{\hyperlink{sip__client_8cpp_source}{sip\+\_\+client.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{sip__client_8cpp_a0ddf1224851353fc92bfbff6f499fa97}\index{sip\_client.cpp@{sip\_client.cpp}!main@{main}}
+\index{main@{main}!sip\_client.cpp@{sip\_client.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{sip__client_8cpp_a0ddf1224851353fc92bfbff6f499fa97} 
+int main (\begin{DoxyParamCaption}\item[{int}]{argc}{, }\item[{char \texorpdfstring{$\ast$}{*}}]{argv}{\mbox{[}$\,$\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sip__client_8cpp_source_l00044}{44}} of file \mbox{\hyperlink{sip__client_8cpp_source}{sip\+\_\+client.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00045\ }
+\DoxyCodeLine{00046\ \ \ \ \ std::string\ uri\ =\ \textcolor{stringliteral}{"{}ws://localhost:9001"{}};}
+\DoxyCodeLine{00047\ }
+\DoxyCodeLine{00048\ \ \ \ \ \textcolor{keywordflow}{if}\ (argc\ ==\ 2)\ \{}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ uri\ =\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[1];}
+\DoxyCodeLine{00050\ \ \ \ \ \}}
+\DoxyCodeLine{00051\ }
+\DoxyCodeLine{00052\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ We\ expect\ there\ to\ be\ a\ lot\ of\ errors,\ so\ suppress\ them}}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sip__client_8cpp_a25a83214e5578f123d0ca4281c6de6e5}{sip\_client}}.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a3fe357b3c6434273a9965eb52902575d}{clear\_access\_channels}}(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a853aa0b8976e53f3181af3bc398d493e}{websocketpp::log::alevel::all}});}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sip__client_8cpp_a25a83214e5578f123d0ca4281c6de6e5}{sip\_client}}.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a8cefa4fc37c0df4eb6ed0bcf04bb0da5}{clear\_error\_channels}}(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1elevel_a9b31ff708c221d314f9f4eb3ff2b1ad7}{websocketpp::log::elevel::all}});}
+\DoxyCodeLine{00056\ }
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Initialize\ ASIO}}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sip__client_8cpp_a25a83214e5578f123d0ca4281c6de6e5}{sip\_client}}.init\_asio();}
+\DoxyCodeLine{00059\ }
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Register\ our\ handlers}}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sip__client_8cpp_a25a83214e5578f123d0ca4281c6de6e5}{sip\_client}}.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a5753d9848aefc04ee91da401c0cc65b8}{set\_open\_handler}}(bind(\&\mbox{\hyperlink{sip__client_8cpp_a9602fc6fab09cf0b8aa1fbe3973de3ad}{on\_open}},\&\mbox{\hyperlink{sip__client_8cpp_a25a83214e5578f123d0ca4281c6de6e5}{sip\_client}},::\_1));}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sip__client_8cpp_a25a83214e5578f123d0ca4281c6de6e5}{sip\_client}}.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a34a3a8351bff65ba878975be471cab85}{set\_message\_handler}}(bind(\&\mbox{\hyperlink{sip__client_8cpp_a8c13595a4801a15825ae3f8c8bb37ed4}{on\_message}},\&\mbox{\hyperlink{sip__client_8cpp_a25a83214e5578f123d0ca4281c6de6e5}{sip\_client}},::\_1,::\_2));}
+\DoxyCodeLine{00063\ }
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ websocketpp::lib::error\_code\ ec;}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1client_ad9e541a43023d33d5cd5669d62a13edc}{client::connection\_ptr}}\ con\ =\ \mbox{\hyperlink{sip__client_8cpp_a25a83214e5578f123d0ca4281c6de6e5}{sip\_client}}.\mbox{\hyperlink{classwebsocketpp_1_1client_aa95cec974921e32bc37a61c683ae240d}{get\_connection}}(uri,\ ec);}
+\DoxyCodeLine{00066\ }
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Specify\ the\ SIP\ subprotocol:}}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ con-\/>add\_subprotocol(\textcolor{stringliteral}{"{}sip"{}});}
+\DoxyCodeLine{00069\ }
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sip__client_8cpp_a25a83214e5578f123d0ca4281c6de6e5}{sip\_client}}.\mbox{\hyperlink{classwebsocketpp_1_1client_a818c30343180123bf1fee6dc21524bae}{connect}}(con);}
+\DoxyCodeLine{00071\ }
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Start\ the\ ASIO\ io\_service\ run\ loop}}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sip__client_8cpp_a25a83214e5578f123d0ca4281c6de6e5}{sip\_client}}.run();}
+\DoxyCodeLine{00074\ }
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(!\mbox{\hyperlink{sip__client_8cpp_a6dbe87354d47906dcbb42c7ba634b102}{received}})\ \{}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ boost::this\_thread::sleep(boost::posix\_time::milliseconds(100));}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00078\ }
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}done"{}}\ <<\ std::endl;}
+\DoxyCodeLine{00080\ }
+\DoxyCodeLine{00081\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\mbox{\hyperlink{classwebsocketpp_1_1exception}{websocketpp::exception}}\ \textcolor{keyword}{const}\ \&\ e)\ \{}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ std::cout\ <<\ e.\mbox{\hyperlink{classwebsocketpp_1_1exception_a62dabd977bc59faaca6dc268744a6089}{what}}()\ <<\ std::endl;}
+\DoxyCodeLine{00083\ \ \ \ \ \}}
+\DoxyCodeLine{00084\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sip__client_8cpp_a0ddf1224851353fc92bfbff6f499fa97_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{sip__client_8cpp_a8c13595a4801a15825ae3f8c8bb37ed4}\index{sip\_client.cpp@{sip\_client.cpp}!on\_message@{on\_message}}
+\index{on\_message@{on\_message}!sip\_client.cpp@{sip\_client.cpp}}
+\doxysubsubsection{\texorpdfstring{on\_message()}{on\_message()}}
+{\footnotesize\ttfamily \label{sip__client_8cpp_a8c13595a4801a15825ae3f8c8bb37ed4} 
+void on\+\_\+message (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{debug__client_8cpp_aff8c62b83a9c8aefc476f96166656b76}{client}} \texorpdfstring{$\ast$}{*}}]{c}{, }\item[{\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{websocketpp\+::connection\+\_\+hdl}}}]{hdl}{, }\item[{\mbox{\hyperlink{debug__client_8cpp_a08398c4d31a4dc3e42d1b9a9ef64c6ad}{message\+\_\+ptr}}}]{msg}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sip__client_8cpp_source_l00036}{36}} of file \mbox{\hyperlink{sip__client_8cpp_source}{sip\+\_\+client.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00037\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1client_ad9e541a43023d33d5cd5669d62a13edc}{client::connection\_ptr}}\ con\ =\ \mbox{\hyperlink{sip__client_8cpp_a25a83214e5578f123d0ca4281c6de6e5}{sip\_client}}.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a0fe4457427d4124abe7ca022ba7afbb4}{get\_con\_from\_hdl}}(hdl);}
+\DoxyCodeLine{00038\ }
+\DoxyCodeLine{00039\ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}Received\ a\ reply:"{}}\ <<\ std::endl;}
+\DoxyCodeLine{00040\ \ \ \ \ fwrite(msg-\/>get\_payload().c\_str(),\ msg-\/>get\_payload().size(),\ 1,\ stdout);}
+\DoxyCodeLine{00041\ \ \ \ \ \mbox{\hyperlink{sip__client_8cpp_a6dbe87354d47906dcbb42c7ba634b102}{received}}=\textcolor{keyword}{true};}
+\DoxyCodeLine{00042\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sip__client_8cpp_a8c13595a4801a15825ae3f8c8bb37ed4_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=225pt]{sip__client_8cpp_a8c13595a4801a15825ae3f8c8bb37ed4_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{sip__client_8cpp_a9602fc6fab09cf0b8aa1fbe3973de3ad}\index{sip\_client.cpp@{sip\_client.cpp}!on\_open@{on\_open}}
+\index{on\_open@{on\_open}!sip\_client.cpp@{sip\_client.cpp}}
+\doxysubsubsection{\texorpdfstring{on\_open()}{on\_open()}}
+{\footnotesize\ttfamily \label{sip__client_8cpp_a9602fc6fab09cf0b8aa1fbe3973de3ad} 
+void on\+\_\+open (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{debug__client_8cpp_aff8c62b83a9c8aefc476f96166656b76}{client}} \texorpdfstring{$\ast$}{*}}]{c}{, }\item[{\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{websocketpp\+::connection\+\_\+hdl}}}]{hdl}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sip__client_8cpp_source_l00026}{26}} of file \mbox{\hyperlink{sip__client_8cpp_source}{sip\+\_\+client.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00027\ \ \ \ \ \textcolor{comment}{//\ now\ it\ is\ safe\ to\ use\ the\ connection}}
+\DoxyCodeLine{00028\ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}connection\ ready"{}}\ <<\ std::endl;}
+\DoxyCodeLine{00029\ }
+\DoxyCodeLine{00030\ \ \ \ \ \mbox{\hyperlink{sip__client_8cpp_a6dbe87354d47906dcbb42c7ba634b102}{received}}=\textcolor{keyword}{false};}
+\DoxyCodeLine{00031\ \ \ \ \ \textcolor{comment}{//\ Send\ a\ SIP\ OPTIONS\ message\ to\ the\ server:}}
+\DoxyCodeLine{00032\ \ \ \ \ std::string\ SIP\_msg=\textcolor{stringliteral}{"{}OPTIONS\ sip:carol@chicago.com\ SIP/2.0\(\backslash\)r\(\backslash\)nVia:\ SIP/2.0/WS\ df7jal23ls0d.invalid;rport;branch=z9hG4bKhjhs8ass877\(\backslash\)r\(\backslash\)nMax-\/Forwards:\ 70\(\backslash\)r\(\backslash\)nTo:\ <sip:carol@chicago.com>\(\backslash\)r\(\backslash\)nFrom:\ Alice\ <sip:alice@atlanta.com>;tag=1928301774\(\backslash\)r\(\backslash\)nCall-\/ID:\ a84b4c76e66710\(\backslash\)r\(\backslash\)nCSeq:\ 63104\ OPTIONS\(\backslash\)r\(\backslash\)nContact:\ <sip:alice@pc33.atlanta.com>\(\backslash\)r\(\backslash\)nAccept:\ application/sdp\(\backslash\)r\(\backslash\)nContent-\/Length:\ 0\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)n"{}};}
+\DoxyCodeLine{00033\ \ \ \ \ \mbox{\hyperlink{sip__client_8cpp_a25a83214e5578f123d0ca4281c6de6e5}{sip\_client}}.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a5341f59de7ef1a565a2fd93daba212d5}{send}}(hdl,\ SIP\_msg.c\_str(),\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea6b65f28626b19b2eef447744c564e727}{websocketpp::frame::opcode::text}});}
+\DoxyCodeLine{00034\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=285pt]{sip__client_8cpp_a9602fc6fab09cf0b8aa1fbe3973de3ad_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=206pt]{sip__client_8cpp_a9602fc6fab09cf0b8aa1fbe3973de3ad_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{sip__client_8cpp_a6dbe87354d47906dcbb42c7ba634b102}\index{sip\_client.cpp@{sip\_client.cpp}!received@{received}}
+\index{received@{received}!sip\_client.cpp@{sip\_client.cpp}}
+\doxysubsubsection{\texorpdfstring{received}{received}}
+{\footnotesize\ttfamily \label{sip__client_8cpp_a6dbe87354d47906dcbb42c7ba634b102} 
+bool received}
+
+
+
+Definition at line \mbox{\hyperlink{sip__client_8cpp_source_l00024}{24}} of file \mbox{\hyperlink{sip__client_8cpp_source}{sip\+\_\+client.\+cpp}}.
+
+\Hypertarget{sip__client_8cpp_a25a83214e5578f123d0ca4281c6de6e5}\index{sip\_client.cpp@{sip\_client.cpp}!sip\_client@{sip\_client}}
+\index{sip\_client@{sip\_client}!sip\_client.cpp@{sip\_client.cpp}}
+\doxysubsubsection{\texorpdfstring{sip\_client}{sip\_client}}
+{\footnotesize\ttfamily \label{sip__client_8cpp_a25a83214e5578f123d0ca4281c6de6e5} 
+\mbox{\hyperlink{debug__client_8cpp_aff8c62b83a9c8aefc476f96166656b76}{client}} sip\+\_\+client}
+
+
+
+Definition at line \mbox{\hyperlink{sip__client_8cpp_source_l00021}{21}} of file \mbox{\hyperlink{sip__client_8cpp_source}{sip\+\_\+client.\+cpp}}.
+

@@ -1,0 +1,78 @@
+\doxysection{libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/samples/sample1.cc File Reference}
+\hypertarget{sample1_8cc}{}\label{sample1_8cc}\index{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/samples/sample1.cc@{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/samples/sample1.cc}}
+{\ttfamily \#include "{}sample1.\+h"{}}\newline
+Include dependency graph for sample1.\+cc\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=212pt]{sample1_8cc__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{sample1_8cc_a0e7da4d7a69c5b5afb707807aa177017}{Factorial}} (int n)
+\item 
+bool \mbox{\hyperlink{sample1_8cc_a7093217f5edc11fe277d03bd064e5f11}{Is\+Prime}} (int n)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{sample1_8cc_a0e7da4d7a69c5b5afb707807aa177017}\index{sample1.cc@{sample1.cc}!Factorial@{Factorial}}
+\index{Factorial@{Factorial}!sample1.cc@{sample1.cc}}
+\doxysubsubsection{\texorpdfstring{Factorial()}{Factorial()}}
+{\footnotesize\ttfamily \label{sample1_8cc_a0e7da4d7a69c5b5afb707807aa177017} 
+int Factorial (\begin{DoxyParamCaption}\item[{int}]{n}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sample1_8cc_source_l00037}{37}} of file \mbox{\hyperlink{sample1_8cc_source}{sample1.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00038\ \ \ \textcolor{keywordtype}{int}\ result\ =\ 1;}
+\DoxyCodeLine{00039\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 1;\ i\ <=\ n;\ i++)\ \{}
+\DoxyCodeLine{00040\ \ \ \ \ result\ *=\ i;}
+\DoxyCodeLine{00041\ \ \ \}}
+\DoxyCodeLine{00042\ }
+\DoxyCodeLine{00043\ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00044\ \}}
+
+\end{DoxyCode}
+\Hypertarget{sample1_8cc_a7093217f5edc11fe277d03bd064e5f11}\index{sample1.cc@{sample1.cc}!IsPrime@{IsPrime}}
+\index{IsPrime@{IsPrime}!sample1.cc@{sample1.cc}}
+\doxysubsubsection{\texorpdfstring{IsPrime()}{IsPrime()}}
+{\footnotesize\ttfamily \label{sample1_8cc_a7093217f5edc11fe277d03bd064e5f11} 
+bool Is\+Prime (\begin{DoxyParamCaption}\item[{int}]{n}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sample1_8cc_source_l00047}{47}} of file \mbox{\hyperlink{sample1_8cc_source}{sample1.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00048\ \ \ \textcolor{comment}{//\ Trivial\ case\ 1:\ small\ numbers}}
+\DoxyCodeLine{00049\ \ \ \textcolor{keywordflow}{if}\ (n\ <=\ 1)\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00050\ }
+\DoxyCodeLine{00051\ \ \ \textcolor{comment}{//\ Trivial\ case\ 2:\ even\ numbers}}
+\DoxyCodeLine{00052\ \ \ \textcolor{keywordflow}{if}\ (n\ \%\ 2\ ==\ 0)\ \textcolor{keywordflow}{return}\ n\ ==\ 2;}
+\DoxyCodeLine{00053\ }
+\DoxyCodeLine{00054\ \ \ \textcolor{comment}{//\ Now,\ we\ have\ that\ n\ is\ odd\ and\ n\ >=\ 3.}}
+\DoxyCodeLine{00055\ }
+\DoxyCodeLine{00056\ \ \ \textcolor{comment}{//\ Try\ to\ divide\ n\ by\ every\ odd\ number\ i,\ starting\ from\ 3}}
+\DoxyCodeLine{00057\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 3;\ ;\ i\ +=\ 2)\ \{}
+\DoxyCodeLine{00058\ \ \ \ \ \textcolor{comment}{//\ We\ only\ have\ to\ try\ i\ up\ to\ the\ square\ root\ of\ n}}
+\DoxyCodeLine{00059\ \ \ \ \ \textcolor{keywordflow}{if}\ (i\ >\ n/i)\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00060\ }
+\DoxyCodeLine{00061\ \ \ \ \ \textcolor{comment}{//\ Now,\ we\ have\ i\ <=\ n/i\ <\ n.}}
+\DoxyCodeLine{00062\ \ \ \ \ \textcolor{comment}{//\ If\ n\ is\ divisible\ by\ i,\ n\ is\ not\ prime.}}
+\DoxyCodeLine{00063\ \ \ \ \ \textcolor{keywordflow}{if}\ (n\ \%\ i\ ==\ 0)\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00064\ \ \ \}}
+\DoxyCodeLine{00065\ }
+\DoxyCodeLine{00066\ \ \ \textcolor{comment}{//\ n\ has\ no\ integer\ factor\ in\ the\ range\ (1,\ n),\ and\ thus\ is\ prime.}}
+\DoxyCodeLine{00067\ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00068\ \}}
+
+\end{DoxyCode}

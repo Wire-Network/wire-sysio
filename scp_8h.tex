@@ -1,0 +1,277 @@
+\doxysection{libraries/yubihsm/lib/scp.h File Reference}
+\hypertarget{scp_8h}{}\label{scp_8h}\index{libraries/yubihsm/lib/scp.h@{libraries/yubihsm/lib/scp.h}}
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include $<$stdbool.\+h$>$}\newline
+Include dependency graph for scp.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=235pt]{scp_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{scp_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+union \mbox{\hyperlink{union___msg}{\+\_\+\+Msg}}
+\item 
+struct \mbox{\hyperlink{struct_scp__ctx}{Scp\+\_\+ctx}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{scp_8h_a7e24e08cc1bb8ad34d1b7016bdef195b}{SCP\+\_\+\+CARD\+\_\+\+CRYPTOGRAM}}~0x00
+\item 
+\#define \mbox{\hyperlink{scp_8h_ad5723ce4d78de90a38fd090a833fd7e3}{SCP\+\_\+\+HOST\+\_\+\+CRYPTOGRAM}}~0x01
+\item 
+\#define \mbox{\hyperlink{scp_8h_ab6d04dcaed0075fa4247a560273c1108}{SCP\+\_\+\+CARD\+\_\+\+CHALLENGE}}~0x02
+\item 
+\#define \mbox{\hyperlink{scp_8h_aa5299032812d3274d208ff3b7a8953ae}{SCP\+\_\+\+S\+\_\+\+ENC\+\_\+\+DERIVATION}}~0x04
+\item 
+\#define \mbox{\hyperlink{scp_8h_a8d9b13667d43e31afde591cd054dbf60}{SCP\+\_\+\+S\+\_\+\+MAC\+\_\+\+DERIVATION}}~0x06
+\item 
+\#define \mbox{\hyperlink{scp_8h_a18c28fa29fad6513199b92e31a4e9d9e}{SCP\+\_\+\+S\+\_\+\+RMAC\+\_\+\+DERIVATION}}~0x07
+\item 
+\#define \mbox{\hyperlink{scp_8h_a241f094f3b6ba7ec6d190568247b41aa}{AES\+\_\+128\+\_\+\+KEY\+\_\+\+LEN}}~16
+\item 
+\#define \mbox{\hyperlink{scp_8h_a69b5c8002b833d55f5b2ff5271ff429d}{AES\+\_\+192\+\_\+\+KEY\+\_\+\+LEN}}~24
+\item 
+\#define \mbox{\hyperlink{scp_8h_afdc3c9f91fda0de0029266fa37157fc5}{AES\+\_\+256\+\_\+\+KEY\+\_\+\+LEN}}~32
+\item 
+\#define \mbox{\hyperlink{scp_8h_a25905234f13446437b28c85d0504216d}{SCP\+\_\+\+KEY\+\_\+\+LEN}}~(\mbox{\hyperlink{scp_8h_a241f094f3b6ba7ec6d190568247b41aa}{AES\+\_\+128\+\_\+\+KEY\+\_\+\+LEN}})
+\item 
+\#define \mbox{\hyperlink{scp_8h_a8f01665a0470dd4125b6518bd77e3328}{SCP\+\_\+\+PRF\+\_\+\+LEN}}~16
+\item 
+\#define \mbox{\hyperlink{scp_8h_aa341425f7d11b792662ebc93abf38cde}{SCP\+\_\+\+CARD\+\_\+\+CHAL\+\_\+\+LEN}}~8
+\item 
+\#define \mbox{\hyperlink{scp_8h_ac8a88e113e5d7d245aeb27e841214563}{SCP\+\_\+\+HOST\+\_\+\+CHAL\+\_\+\+LEN}}~8
+\item 
+\#define \mbox{\hyperlink{scp_8h_afa9d0a3bb1ce2a7951ca1b5f9f06dbe7}{SCP\+\_\+\+CARD\+\_\+\+CRYPTO\+\_\+\+LEN}}~8
+\item 
+\#define \mbox{\hyperlink{scp_8h_ab69c4b9b326bc5bd847773167ca5c969}{SCP\+\_\+\+HOST\+\_\+\+CRYPTO\+\_\+\+LEN}}~8
+\item 
+\#define \mbox{\hyperlink{scp_8h_a4b017661aafe8f0a0bde0ff377684303}{SCP\+\_\+\+MAC\+\_\+\+LEN}}~8
+\item 
+\#define \mbox{\hyperlink{scp_8h_a2a7a1f4b618c112a923cf452cdb1f506}{SCP\+\_\+\+CONTEXT\+\_\+\+LEN}}~16
+\item 
+\#define \mbox{\hyperlink{scp_8h_aaa32e6b7edd5513108f1410315fa594e}{SCP\+\_\+\+AUTHKEY\+\_\+\+ID\+\_\+\+LEN}}~2
+\item 
+\#define \mbox{\hyperlink{scp_8h_ab34d7a732259f8803a741b84924cd64e}{SCP\+\_\+\+MSG\+\_\+\+BUF\+\_\+\+SIZE}}~2048
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef union \mbox{\hyperlink{union___msg}{\+\_\+\+Msg}} \mbox{\hyperlink{scp_8h_a2026a4fe4ea2811a4929044067ea1718}{Msg}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{scp_8h_a241f094f3b6ba7ec6d190568247b41aa}\index{scp.h@{scp.h}!AES\_128\_KEY\_LEN@{AES\_128\_KEY\_LEN}}
+\index{AES\_128\_KEY\_LEN@{AES\_128\_KEY\_LEN}!scp.h@{scp.h}}
+\doxysubsubsection{\texorpdfstring{AES\_128\_KEY\_LEN}{AES\_128\_KEY\_LEN}}
+{\footnotesize\ttfamily \label{scp_8h_a241f094f3b6ba7ec6d190568247b41aa} 
+\#define AES\+\_\+128\+\_\+\+KEY\+\_\+\+LEN~16}
+
+
+
+Definition at line \mbox{\hyperlink{scp_8h_source_l00034}{34}} of file \mbox{\hyperlink{scp_8h_source}{scp.\+h}}.
+
+\Hypertarget{scp_8h_a69b5c8002b833d55f5b2ff5271ff429d}\index{scp.h@{scp.h}!AES\_192\_KEY\_LEN@{AES\_192\_KEY\_LEN}}
+\index{AES\_192\_KEY\_LEN@{AES\_192\_KEY\_LEN}!scp.h@{scp.h}}
+\doxysubsubsection{\texorpdfstring{AES\_192\_KEY\_LEN}{AES\_192\_KEY\_LEN}}
+{\footnotesize\ttfamily \label{scp_8h_a69b5c8002b833d55f5b2ff5271ff429d} 
+\#define AES\+\_\+192\+\_\+\+KEY\+\_\+\+LEN~24}
+
+
+
+Definition at line \mbox{\hyperlink{scp_8h_source_l00035}{35}} of file \mbox{\hyperlink{scp_8h_source}{scp.\+h}}.
+
+\Hypertarget{scp_8h_afdc3c9f91fda0de0029266fa37157fc5}\index{scp.h@{scp.h}!AES\_256\_KEY\_LEN@{AES\_256\_KEY\_LEN}}
+\index{AES\_256\_KEY\_LEN@{AES\_256\_KEY\_LEN}!scp.h@{scp.h}}
+\doxysubsubsection{\texorpdfstring{AES\_256\_KEY\_LEN}{AES\_256\_KEY\_LEN}}
+{\footnotesize\ttfamily \label{scp_8h_afdc3c9f91fda0de0029266fa37157fc5} 
+\#define AES\+\_\+256\+\_\+\+KEY\+\_\+\+LEN~32}
+
+
+
+Definition at line \mbox{\hyperlink{scp_8h_source_l00036}{36}} of file \mbox{\hyperlink{scp_8h_source}{scp.\+h}}.
+
+\Hypertarget{scp_8h_aaa32e6b7edd5513108f1410315fa594e}\index{scp.h@{scp.h}!SCP\_AUTHKEY\_ID\_LEN@{SCP\_AUTHKEY\_ID\_LEN}}
+\index{SCP\_AUTHKEY\_ID\_LEN@{SCP\_AUTHKEY\_ID\_LEN}!scp.h@{scp.h}}
+\doxysubsubsection{\texorpdfstring{SCP\_AUTHKEY\_ID\_LEN}{SCP\_AUTHKEY\_ID\_LEN}}
+{\footnotesize\ttfamily \label{scp_8h_aaa32e6b7edd5513108f1410315fa594e} 
+\#define SCP\+\_\+\+AUTHKEY\+\_\+\+ID\+\_\+\+LEN~2}
+
+
+
+Definition at line \mbox{\hyperlink{scp_8h_source_l00050}{50}} of file \mbox{\hyperlink{scp_8h_source}{scp.\+h}}.
+
+\Hypertarget{scp_8h_aa341425f7d11b792662ebc93abf38cde}\index{scp.h@{scp.h}!SCP\_CARD\_CHAL\_LEN@{SCP\_CARD\_CHAL\_LEN}}
+\index{SCP\_CARD\_CHAL\_LEN@{SCP\_CARD\_CHAL\_LEN}!scp.h@{scp.h}}
+\doxysubsubsection{\texorpdfstring{SCP\_CARD\_CHAL\_LEN}{SCP\_CARD\_CHAL\_LEN}}
+{\footnotesize\ttfamily \label{scp_8h_aa341425f7d11b792662ebc93abf38cde} 
+\#define SCP\+\_\+\+CARD\+\_\+\+CHAL\+\_\+\+LEN~8}
+
+
+
+Definition at line \mbox{\hyperlink{scp_8h_source_l00040}{40}} of file \mbox{\hyperlink{scp_8h_source}{scp.\+h}}.
+
+\Hypertarget{scp_8h_ab6d04dcaed0075fa4247a560273c1108}\index{scp.h@{scp.h}!SCP\_CARD\_CHALLENGE@{SCP\_CARD\_CHALLENGE}}
+\index{SCP\_CARD\_CHALLENGE@{SCP\_CARD\_CHALLENGE}!scp.h@{scp.h}}
+\doxysubsubsection{\texorpdfstring{SCP\_CARD\_CHALLENGE}{SCP\_CARD\_CHALLENGE}}
+{\footnotesize\ttfamily \label{scp_8h_ab6d04dcaed0075fa4247a560273c1108} 
+\#define SCP\+\_\+\+CARD\+\_\+\+CHALLENGE~0x02}
+
+
+
+Definition at line \mbox{\hyperlink{scp_8h_source_l00027}{27}} of file \mbox{\hyperlink{scp_8h_source}{scp.\+h}}.
+
+\Hypertarget{scp_8h_afa9d0a3bb1ce2a7951ca1b5f9f06dbe7}\index{scp.h@{scp.h}!SCP\_CARD\_CRYPTO\_LEN@{SCP\_CARD\_CRYPTO\_LEN}}
+\index{SCP\_CARD\_CRYPTO\_LEN@{SCP\_CARD\_CRYPTO\_LEN}!scp.h@{scp.h}}
+\doxysubsubsection{\texorpdfstring{SCP\_CARD\_CRYPTO\_LEN}{SCP\_CARD\_CRYPTO\_LEN}}
+{\footnotesize\ttfamily \label{scp_8h_afa9d0a3bb1ce2a7951ca1b5f9f06dbe7} 
+\#define SCP\+\_\+\+CARD\+\_\+\+CRYPTO\+\_\+\+LEN~8}
+
+
+
+Definition at line \mbox{\hyperlink{scp_8h_source_l00043}{43}} of file \mbox{\hyperlink{scp_8h_source}{scp.\+h}}.
+
+\Hypertarget{scp_8h_a7e24e08cc1bb8ad34d1b7016bdef195b}\index{scp.h@{scp.h}!SCP\_CARD\_CRYPTOGRAM@{SCP\_CARD\_CRYPTOGRAM}}
+\index{SCP\_CARD\_CRYPTOGRAM@{SCP\_CARD\_CRYPTOGRAM}!scp.h@{scp.h}}
+\doxysubsubsection{\texorpdfstring{SCP\_CARD\_CRYPTOGRAM}{SCP\_CARD\_CRYPTOGRAM}}
+{\footnotesize\ttfamily \label{scp_8h_a7e24e08cc1bb8ad34d1b7016bdef195b} 
+\#define SCP\+\_\+\+CARD\+\_\+\+CRYPTOGRAM~0x00}
+
+
+
+Definition at line \mbox{\hyperlink{scp_8h_source_l00024}{24}} of file \mbox{\hyperlink{scp_8h_source}{scp.\+h}}.
+
+\Hypertarget{scp_8h_a2a7a1f4b618c112a923cf452cdb1f506}\index{scp.h@{scp.h}!SCP\_CONTEXT\_LEN@{SCP\_CONTEXT\_LEN}}
+\index{SCP\_CONTEXT\_LEN@{SCP\_CONTEXT\_LEN}!scp.h@{scp.h}}
+\doxysubsubsection{\texorpdfstring{SCP\_CONTEXT\_LEN}{SCP\_CONTEXT\_LEN}}
+{\footnotesize\ttfamily \label{scp_8h_a2a7a1f4b618c112a923cf452cdb1f506} 
+\#define SCP\+\_\+\+CONTEXT\+\_\+\+LEN~16}
+
+
+
+Definition at line \mbox{\hyperlink{scp_8h_source_l00048}{48}} of file \mbox{\hyperlink{scp_8h_source}{scp.\+h}}.
+
+\Hypertarget{scp_8h_ac8a88e113e5d7d245aeb27e841214563}\index{scp.h@{scp.h}!SCP\_HOST\_CHAL\_LEN@{SCP\_HOST\_CHAL\_LEN}}
+\index{SCP\_HOST\_CHAL\_LEN@{SCP\_HOST\_CHAL\_LEN}!scp.h@{scp.h}}
+\doxysubsubsection{\texorpdfstring{SCP\_HOST\_CHAL\_LEN}{SCP\_HOST\_CHAL\_LEN}}
+{\footnotesize\ttfamily \label{scp_8h_ac8a88e113e5d7d245aeb27e841214563} 
+\#define SCP\+\_\+\+HOST\+\_\+\+CHAL\+\_\+\+LEN~8}
+
+
+
+Definition at line \mbox{\hyperlink{scp_8h_source_l00041}{41}} of file \mbox{\hyperlink{scp_8h_source}{scp.\+h}}.
+
+\Hypertarget{scp_8h_ab69c4b9b326bc5bd847773167ca5c969}\index{scp.h@{scp.h}!SCP\_HOST\_CRYPTO\_LEN@{SCP\_HOST\_CRYPTO\_LEN}}
+\index{SCP\_HOST\_CRYPTO\_LEN@{SCP\_HOST\_CRYPTO\_LEN}!scp.h@{scp.h}}
+\doxysubsubsection{\texorpdfstring{SCP\_HOST\_CRYPTO\_LEN}{SCP\_HOST\_CRYPTO\_LEN}}
+{\footnotesize\ttfamily \label{scp_8h_ab69c4b9b326bc5bd847773167ca5c969} 
+\#define SCP\+\_\+\+HOST\+\_\+\+CRYPTO\+\_\+\+LEN~8}
+
+
+
+Definition at line \mbox{\hyperlink{scp_8h_source_l00044}{44}} of file \mbox{\hyperlink{scp_8h_source}{scp.\+h}}.
+
+\Hypertarget{scp_8h_ad5723ce4d78de90a38fd090a833fd7e3}\index{scp.h@{scp.h}!SCP\_HOST\_CRYPTOGRAM@{SCP\_HOST\_CRYPTOGRAM}}
+\index{SCP\_HOST\_CRYPTOGRAM@{SCP\_HOST\_CRYPTOGRAM}!scp.h@{scp.h}}
+\doxysubsubsection{\texorpdfstring{SCP\_HOST\_CRYPTOGRAM}{SCP\_HOST\_CRYPTOGRAM}}
+{\footnotesize\ttfamily \label{scp_8h_ad5723ce4d78de90a38fd090a833fd7e3} 
+\#define SCP\+\_\+\+HOST\+\_\+\+CRYPTOGRAM~0x01}
+
+
+
+Definition at line \mbox{\hyperlink{scp_8h_source_l00025}{25}} of file \mbox{\hyperlink{scp_8h_source}{scp.\+h}}.
+
+\Hypertarget{scp_8h_a25905234f13446437b28c85d0504216d}\index{scp.h@{scp.h}!SCP\_KEY\_LEN@{SCP\_KEY\_LEN}}
+\index{SCP\_KEY\_LEN@{SCP\_KEY\_LEN}!scp.h@{scp.h}}
+\doxysubsubsection{\texorpdfstring{SCP\_KEY\_LEN}{SCP\_KEY\_LEN}}
+{\footnotesize\ttfamily \label{scp_8h_a25905234f13446437b28c85d0504216d} 
+\#define SCP\+\_\+\+KEY\+\_\+\+LEN~(\mbox{\hyperlink{scp_8h_a241f094f3b6ba7ec6d190568247b41aa}{AES\+\_\+128\+\_\+\+KEY\+\_\+\+LEN}})}
+
+
+
+Definition at line \mbox{\hyperlink{scp_8h_source_l00037}{37}} of file \mbox{\hyperlink{scp_8h_source}{scp.\+h}}.
+
+\Hypertarget{scp_8h_a4b017661aafe8f0a0bde0ff377684303}\index{scp.h@{scp.h}!SCP\_MAC\_LEN@{SCP\_MAC\_LEN}}
+\index{SCP\_MAC\_LEN@{SCP\_MAC\_LEN}!scp.h@{scp.h}}
+\doxysubsubsection{\texorpdfstring{SCP\_MAC\_LEN}{SCP\_MAC\_LEN}}
+{\footnotesize\ttfamily \label{scp_8h_a4b017661aafe8f0a0bde0ff377684303} 
+\#define SCP\+\_\+\+MAC\+\_\+\+LEN~8}
+
+
+
+Definition at line \mbox{\hyperlink{scp_8h_source_l00046}{46}} of file \mbox{\hyperlink{scp_8h_source}{scp.\+h}}.
+
+\Hypertarget{scp_8h_ab34d7a732259f8803a741b84924cd64e}\index{scp.h@{scp.h}!SCP\_MSG\_BUF\_SIZE@{SCP\_MSG\_BUF\_SIZE}}
+\index{SCP\_MSG\_BUF\_SIZE@{SCP\_MSG\_BUF\_SIZE}!scp.h@{scp.h}}
+\doxysubsubsection{\texorpdfstring{SCP\_MSG\_BUF\_SIZE}{SCP\_MSG\_BUF\_SIZE}}
+{\footnotesize\ttfamily \label{scp_8h_ab34d7a732259f8803a741b84924cd64e} 
+\#define SCP\+\_\+\+MSG\+\_\+\+BUF\+\_\+\+SIZE~2048}
+
+
+
+Definition at line \mbox{\hyperlink{scp_8h_source_l00052}{52}} of file \mbox{\hyperlink{scp_8h_source}{scp.\+h}}.
+
+\Hypertarget{scp_8h_a8f01665a0470dd4125b6518bd77e3328}\index{scp.h@{scp.h}!SCP\_PRF\_LEN@{SCP\_PRF\_LEN}}
+\index{SCP\_PRF\_LEN@{SCP\_PRF\_LEN}!scp.h@{scp.h}}
+\doxysubsubsection{\texorpdfstring{SCP\_PRF\_LEN}{SCP\_PRF\_LEN}}
+{\footnotesize\ttfamily \label{scp_8h_a8f01665a0470dd4125b6518bd77e3328} 
+\#define SCP\+\_\+\+PRF\+\_\+\+LEN~16}
+
+
+
+Definition at line \mbox{\hyperlink{scp_8h_source_l00038}{38}} of file \mbox{\hyperlink{scp_8h_source}{scp.\+h}}.
+
+\Hypertarget{scp_8h_aa5299032812d3274d208ff3b7a8953ae}\index{scp.h@{scp.h}!SCP\_S\_ENC\_DERIVATION@{SCP\_S\_ENC\_DERIVATION}}
+\index{SCP\_S\_ENC\_DERIVATION@{SCP\_S\_ENC\_DERIVATION}!scp.h@{scp.h}}
+\doxysubsubsection{\texorpdfstring{SCP\_S\_ENC\_DERIVATION}{SCP\_S\_ENC\_DERIVATION}}
+{\footnotesize\ttfamily \label{scp_8h_aa5299032812d3274d208ff3b7a8953ae} 
+\#define SCP\+\_\+\+S\+\_\+\+ENC\+\_\+\+DERIVATION~0x04}
+
+
+
+Definition at line \mbox{\hyperlink{scp_8h_source_l00029}{29}} of file \mbox{\hyperlink{scp_8h_source}{scp.\+h}}.
+
+\Hypertarget{scp_8h_a8d9b13667d43e31afde591cd054dbf60}\index{scp.h@{scp.h}!SCP\_S\_MAC\_DERIVATION@{SCP\_S\_MAC\_DERIVATION}}
+\index{SCP\_S\_MAC\_DERIVATION@{SCP\_S\_MAC\_DERIVATION}!scp.h@{scp.h}}
+\doxysubsubsection{\texorpdfstring{SCP\_S\_MAC\_DERIVATION}{SCP\_S\_MAC\_DERIVATION}}
+{\footnotesize\ttfamily \label{scp_8h_a8d9b13667d43e31afde591cd054dbf60} 
+\#define SCP\+\_\+\+S\+\_\+\+MAC\+\_\+\+DERIVATION~0x06}
+
+
+
+Definition at line \mbox{\hyperlink{scp_8h_source_l00030}{30}} of file \mbox{\hyperlink{scp_8h_source}{scp.\+h}}.
+
+\Hypertarget{scp_8h_a18c28fa29fad6513199b92e31a4e9d9e}\index{scp.h@{scp.h}!SCP\_S\_RMAC\_DERIVATION@{SCP\_S\_RMAC\_DERIVATION}}
+\index{SCP\_S\_RMAC\_DERIVATION@{SCP\_S\_RMAC\_DERIVATION}!scp.h@{scp.h}}
+\doxysubsubsection{\texorpdfstring{SCP\_S\_RMAC\_DERIVATION}{SCP\_S\_RMAC\_DERIVATION}}
+{\footnotesize\ttfamily \label{scp_8h_a18c28fa29fad6513199b92e31a4e9d9e} 
+\#define SCP\+\_\+\+S\+\_\+\+RMAC\+\_\+\+DERIVATION~0x07}
+
+
+
+Definition at line \mbox{\hyperlink{scp_8h_source_l00031}{31}} of file \mbox{\hyperlink{scp_8h_source}{scp.\+h}}.
+
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{scp_8h_a2026a4fe4ea2811a4929044067ea1718}\index{scp.h@{scp.h}!Msg@{Msg}}
+\index{Msg@{Msg}!scp.h@{scp.h}}
+\doxysubsubsection{\texorpdfstring{Msg}{Msg}}
+{\footnotesize\ttfamily \label{scp_8h_a2026a4fe4ea2811a4929044067ea1718} 
+typedef union \mbox{\hyperlink{union___msg}{\+\_\+\+Msg}} \mbox{\hyperlink{scp_8h_a2026a4fe4ea2811a4929044067ea1718}{Msg}}}
+
+
+
+Definition at line \mbox{\hyperlink{scp_8h_source_l00066}{66}} of file \mbox{\hyperlink{scp_8h_source}{scp.\+h}}.
+

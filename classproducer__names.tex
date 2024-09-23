@@ -1,0 +1,73 @@
+\doxysection{producer\+\_\+names Class Reference}
+\hypertarget{classproducer__names}{}\label{classproducer__names}\index{producer\_names@{producer\_names}}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static string \mbox{\hyperlink{classproducer__names_a9569f75b271757118cd2e463590f7e8d}{producer\+\_\+name}} (unsigned int producer\+\_\+number, bool shared\+\_\+producer=false)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source_l00340}{340}} of file \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classproducer__names_a9569f75b271757118cd2e463590f7e8d}\index{producer\_names@{producer\_names}!producer\_name@{producer\_name}}
+\index{producer\_name@{producer\_name}!producer\_names@{producer\_names}}
+\doxysubsubsection{\texorpdfstring{producer\_name()}{producer\_name()}}
+{\footnotesize\ttfamily \label{classproducer__names_a9569f75b271757118cd2e463590f7e8d} 
+string producer\+\_\+names\+::producer\+\_\+name (\begin{DoxyParamCaption}\item[{unsigned int}]{producer\+\_\+number}{, }\item[{bool}]{shared\+\_\+producer}{ = {\ttfamily false}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source_l00354}{354}} of file \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00354\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00355\ \ \ \ \textcolor{comment}{//\ keeping\ legacy\ "{}defproducer[a-\/z]"{},\ but\ if\ greater\ than\ valid\_char\_range,\ will\ use\ "{}defpraaaaaaa"{}}}
+\DoxyCodeLine{00356\ \ \ \ \textcolor{comment}{//\ shared\_producer\ will\ appear\ in\ all\ nodes'\ config}}
+\DoxyCodeLine{00357\ \ \ \ \textcolor{keywordtype}{char}\ prod\_name[]\ =\ \textcolor{stringliteral}{"{}defproducera"{}};}
+\DoxyCodeLine{00358\ \ \ \ \textcolor{keywordflow}{if}\ (producer\_number\ >\ valid\_char\_range)\ \{}
+\DoxyCodeLine{00359\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ current\_char\_loc\ =\ 5;\ current\_char\_loc\ <\ total\_chars;\ ++current\_char\_loc)\ \{}
+\DoxyCodeLine{00360\ \ \ \ \ \ \ \ \ \ prod\_name[current\_char\_loc]\ =\ slot\_chars[0];}
+\DoxyCodeLine{00361\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00362\ \ \ \ \}}
+\DoxyCodeLine{00363\ }
+\DoxyCodeLine{00364\ \ \ \ prod\_name[total\_chars]\ =\ \textcolor{charliteral}{'\(\backslash\)0'};}
+\DoxyCodeLine{00365\ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ current\_char\_loc\ =\ total\_chars\ -\/\ 1;\ current\_char\_loc\ >=\ 0;\ -\/-\/current\_char\_loc)\ \{}
+\DoxyCodeLine{00366\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ slot\_value\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{char}\textcolor{keyword}{>}(producer\_number\ \%\ valid\_char\_range);}
+\DoxyCodeLine{00367\ \ \ \ \ \ \ producer\_number\ /=\ valid\_char\_range;}
+\DoxyCodeLine{00368\ \ \ \ \ \ \ prod\_name[current\_char\_loc]\ =\ slot\_chars[slot\_value];}
+\DoxyCodeLine{00369\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!producer\_number)}
+\DoxyCodeLine{00370\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00371\ \ \ \ \}}
+\DoxyCodeLine{00372\ }
+\DoxyCodeLine{00373\ \ \ \ \textcolor{comment}{//\ make\ sure\ we\ haven't\ cycled\ back\ to\ the\ first\ 26\ names\ (some\ time\ after\ 26\string^6)}}
+\DoxyCodeLine{00374\ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keywordtype}{string}(prod\_name)\ ==\ \textcolor{stringliteral}{"{}defproducera"{}}\ \&\&\ producer\_number\ !=\ 0)}
+\DoxyCodeLine{00375\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\ \textcolor{stringliteral}{"{}launcher\ not\ designed\ to\ handle\ numbers\ this\ large\ "{}}\ );}
+\DoxyCodeLine{00376\ }
+\DoxyCodeLine{00377\ \ \ \ \textcolor{keywordflow}{if}\ (shared\_producer)\ \{}
+\DoxyCodeLine{00378\ \ \ \ \ \ \ prod\_name[0]\ =\ \textcolor{charliteral}{'s'};}
+\DoxyCodeLine{00379\ \ \ \ \ \ \ prod\_name[1]\ =\ \textcolor{charliteral}{'h'};}
+\DoxyCodeLine{00380\ \ \ \ \ \ \ prod\_name[2]\ =\ \textcolor{charliteral}{'r'};}
+\DoxyCodeLine{00381\ \ \ \ \}}
+\DoxyCodeLine{00382\ \ \ \ \textcolor{keywordflow}{return}\ prod\_name;}
+\DoxyCodeLine{00383\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classproducer__names_a9569f75b271757118cd2e463590f7e8d_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+programs/sysio-\/launcher/\mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp}{main.\+cpp}}\end{DoxyCompactItemize}

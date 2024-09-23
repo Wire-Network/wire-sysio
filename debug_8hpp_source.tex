@@ -1,0 +1,182 @@
+\doxysection{debug.\+hpp}
+\hypertarget{debug_8hpp_source}{}\label{debug_8hpp_source}\index{libraries/fc/vendor/websocketpp/websocketpp/config/debug.hpp@{libraries/fc/vendor/websocketpp/websocketpp/config/debug.hpp}}
+\mbox{\hyperlink{debug_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2014,\ Peter\ Thorson.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00004}00004\ \textcolor{comment}{\ *\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00005}00005\ \textcolor{comment}{\ *\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are\ met:}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00006}00006\ \textcolor{comment}{\ *\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00007}00007\ \textcolor{comment}{\ *\ \ \ \ \ \ \ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00008}00008\ \textcolor{comment}{\ *\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00009}00009\ \textcolor{comment}{\ *\ \ \ \ \ \ \ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer\ in\ the}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00010}00010\ \textcolor{comment}{\ *\ \ \ \ \ \ \ documentation\ and/or\ other\ materials\ provided\ with\ the\ distribution.}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00011}00011\ \textcolor{comment}{\ *\ \ \ \ \ *\ Neither\ the\ name\ of\ the\ WebSocket++\ Project\ nor\ the}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00012}00012\ \textcolor{comment}{\ *\ \ \ \ \ \ \ names\ of\ its\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00013}00013\ \textcolor{comment}{\ *\ \ \ \ \ \ \ derived\ from\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00014}00014\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00015}00015\ \textcolor{comment}{\ *\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS\ "{}AS\ IS"{}}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00016}00016\ \textcolor{comment}{\ *\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ THE}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00017}00017\ \textcolor{comment}{\ *\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR\ A\ PARTICULAR\ PURPOSE}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00018}00018\ \textcolor{comment}{\ *\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ PETER\ THORSON\ BE\ LIABLE\ FOR\ ANY}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00019}00019\ \textcolor{comment}{\ *\ DIRECT,\ INDIRECT,\ INCIDENTAL,\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00020}00020\ \textcolor{comment}{\ *\ (INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00021}00021\ \textcolor{comment}{\ *\ LOSS\ OF\ USE,\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00022}00022\ \textcolor{comment}{\ *\ ON\ ANY\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00023}00023\ \textcolor{comment}{\ *\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE\ OF\ THIS}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00024}00024\ \textcolor{comment}{\ *\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00025}00025\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00026}00026\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00028}00028\ \textcolor{preprocessor}{\#ifndef\ WEBSOCKETPP\_CONFIG\_DEBUG\_HPP}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00029}00029\ \textcolor{preprocessor}{\#define\ WEBSOCKETPP\_CONFIG\_DEBUG\_HPP}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00033}00033\ \textcolor{comment}{//\ Non-\/Policy\ common\ stuff}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00034}00034\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{cpp11_8hpp}{websocketpp/common/cpp11.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00035}00035\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{stdint_8hpp}{websocketpp/common/stdint.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00037}00037\ \textcolor{comment}{//\ Concurrency}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00038}00038\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{concurrency_2basic_8hpp}{websocketpp/concurrency/basic.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00040}00040\ \textcolor{comment}{//\ Transport}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00041}00041\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{transport_2iostream_2endpoint_8hpp}{websocketpp/transport/iostream/endpoint.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00043}00043\ \textcolor{comment}{//\ HTTP}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00044}00044\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{request_8hpp}{websocketpp/http/request.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00045}00045\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{response_8hpp}{websocketpp/http/response.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00047}00047\ \textcolor{comment}{//\ Messages}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00048}00048\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{message_8hpp}{websocketpp/message\_buffer/message.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00049}00049\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{alloc_8hpp}{websocketpp/message\_buffer/alloc.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00051}00051\ \textcolor{comment}{//\ Loggers}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00052}00052\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{logger_2basic_8hpp}{websocketpp/logger/basic.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00054}00054\ \textcolor{comment}{//\ RNG}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00055}00055\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{random_2none_8hpp}{websocketpp/random/none.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00057}00057\ \textcolor{comment}{//\ User\ stub\ base\ classes}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00058}00058\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{endpoint__base_8hpp}{websocketpp/endpoint\_base.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00059}00059\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{connection__base_8hpp}{websocketpp/connection\_base.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00061}00061\ \textcolor{comment}{//\ Extensions}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00062}00062\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{disabled_8hpp}{websocketpp/extensions/permessage\_deflate/disabled.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00064}00064\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacewebsocketpp}{websocketpp}}\ \{}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00065}00065\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{classconfig}{config}}\ \{}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00068}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core}{00068}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core}{debug\_core}}\ \{}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00069}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_a315f1bee89d5e783fe5ee1ed4beaed1f}{00069}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core}{debug\_core}}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_a315f1bee89d5e783fe5ee1ed4beaed1f}{type}};}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00071}00071\ \ \ \ \ \textcolor{comment}{//\ Concurrency\ policy}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00072}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_a54c7e5b25aefca325691558d0fcde0b2}{00072}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1concurrency_1_1basic}{websocketpp::concurrency::basic}}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_a54c7e5b25aefca325691558d0fcde0b2}{concurrency\_type}};}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00073}00073\ }
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00074}00074\ \ \ \ \ \textcolor{comment}{//\ HTTP\ Parser\ Policies}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00075}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_afcd2d7acfe670a9efa3a8c3e3c1cacfd}{00075}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1request}{http::parser::request}}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_afcd2d7acfe670a9efa3a8c3e3c1cacfd}{request\_type}};}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00076}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_aec7fe7660f1c32a9a371c15e8935e5e1}{00076}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1response}{http::parser::response}}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_aec7fe7660f1c32a9a371c15e8935e5e1}{response\_type}};}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00077}00077\ }
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00078}00078\ \ \ \ \ \textcolor{comment}{//\ Message\ Policies}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00079}00079\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message}{message\_buffer::message<message\_buffer::alloc::con\_msg\_manager>}}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00080}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_a9201e05699f678eacf82a9fbb42be2b8}{00080}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_a9201e05699f678eacf82a9fbb42be2b8}{message\_type}};}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00081}00081\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1alloc_1_1con__msg__manager}{message\_buffer::alloc::con\_msg\_manager<message\_type>}}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00082}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_ae9453b36680e0a1d4fa82ee3e19ae2ce}{00082}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_ae9453b36680e0a1d4fa82ee3e19ae2ce}{con\_msg\_manager\_type}};}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00083}00083\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1alloc_1_1endpoint__msg__manager}{message\_buffer::alloc::endpoint\_msg\_manager<con\_msg\_manager\_type>}}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00084}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_a683085fb334720a48dab3bc8f37c070b}{00084}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_a683085fb334720a48dab3bc8f37c070b}{endpoint\_msg\_manager\_type}};}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00085}00085\ }
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00087}00087\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic}{websocketpp::log::basic}}<\mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_a54c7e5b25aefca325691558d0fcde0b2}{concurrency\_type}},}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00088}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_afc9f3236b1917e50b9715708ba65eef9}{00088}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structwebsocketpp_1_1log_1_1elevel}{websocketpp::log::elevel}}>\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_afc9f3236b1917e50b9715708ba65eef9}{elog\_type}};}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00089}00089\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic}{websocketpp::log::basic}}<\mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_a54c7e5b25aefca325691558d0fcde0b2}{concurrency\_type}},}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00090}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_a5d3f82901022ce15723f3d8d8edad323}{00090}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel}{websocketpp::log::alevel}}>\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_a5d3f82901022ce15723f3d8d8edad323}{alog\_type}};}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00091}00091\ }
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00093}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_a5dfbf34d0c88e1c0c7c662a7b24e9b7e}{00093}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1random_1_1none_1_1int__generator}{websocketpp::random::none::int\_generator<uint32\_t>}}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_a5dfbf34d0c88e1c0c7c662a7b24e9b7e}{rng\_type}};}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00094}00094\ }
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00098}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_acbf3aa1de5fc4dacbdb7866375791409}{00098}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{bool}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_acbf3aa1de5fc4dacbdb7866375791409}{enable\_multithreading}}\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00099}00099\ }
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00100}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_1_1transport__config}{00100}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_1_1transport__config}{transport\_config}}\ \{}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00101}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_1_1transport__config_a26a2dd3f5ed572386fa0634f4dcd3503}{00101}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1concurrency_1_1basic}{type::concurrency\_type}}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_1_1transport__config_a26a2dd3f5ed572386fa0634f4dcd3503}{concurrency\_type}};}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00102}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_1_1transport__config_a3d9ce910dc1eca6e344ebeccd78b401b}{00102}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic}{type::elog\_type}}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_1_1transport__config_a3d9ce910dc1eca6e344ebeccd78b401b}{elog\_type}};}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00103}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_1_1transport__config_aa73ac5edfe0e0ff28acb503e1e471223}{00103}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1log_1_1basic}{type::alog\_type}}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_1_1transport__config_aa73ac5edfe0e0ff28acb503e1e471223}{alog\_type}};}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00104}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_1_1transport__config_a0ab982977d58195c8f7291b4bea6d0d8}{00104}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1request}{type::request\_type}}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_1_1transport__config_a0ab982977d58195c8f7291b4bea6d0d8}{request\_type}};}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00105}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_1_1transport__config_a1a539df4ee0c2407618a684bbb523441}{00105}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1response}{type::response\_type}}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_1_1transport__config_a1a539df4ee0c2407618a684bbb523441}{response\_type}};}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00106}00106\ }
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00110}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_1_1transport__config_a082f02f956f0e82ff8646967a7c79e4a}{00110}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{bool}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_1_1transport__config_a082f02f956f0e82ff8646967a7c79e4a}{enable\_multithreading}}\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00111}00111\ }
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00113}00113\ }
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00115}00115\ }
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00118}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_1_1transport__config_a4935338debd7b6e1434a471c94d8abda}{00118}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_1_1transport__config_a4935338debd7b6e1434a471c94d8abda}{timeout\_socket\_pre\_init}}\ =\ 5000;}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00119}00119\ }
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00121}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_1_1transport__config_a0507e22be26d0e96170b3e3ef2fe8ff6}{00121}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_1_1transport__config_a0507e22be26d0e96170b3e3ef2fe8ff6}{timeout\_proxy}}\ =\ 5000;}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00122}00122\ }
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00124}00124\ }
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00128}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_1_1transport__config_ad2a5a0b0dcc45899356e0ba7df49860d}{00128}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_1_1transport__config_ad2a5a0b0dcc45899356e0ba7df49860d}{timeout\_socket\_post\_init}}\ =\ 5000;}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00129}00129\ }
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00131}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_1_1transport__config_ad794c743717ee26be023e88c7db07163}{00131}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_1_1transport__config_ad794c743717ee26be023e88c7db07163}{timeout\_dns\_resolve}}\ =\ 5000;}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00132}00132\ }
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00134}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_1_1transport__config_a467d99957d7b4d5c098f3b916bd97b25}{00134}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_1_1transport__config_a467d99957d7b4d5c098f3b916bd97b25}{timeout\_connect}}\ =\ 5000;}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00135}00135\ }
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00137}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_1_1transport__config_a8d8f7daa43c1fd23d227f3f20e71ceb5}{00137}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_1_1transport__config_a8d8f7daa43c1fd23d227f3f20e71ceb5}{timeout\_socket\_shutdown}}\ =\ 5000;}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00138}00138\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00139}00139\ }
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00141}00141\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1endpoint}{websocketpp::transport::iostream::endpoint<transport\_config>}}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00142}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_a30110a80a1318105747c4513a1884bf0}{00142}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_a30110a80a1318105747c4513a1884bf0}{transport\_type}};}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00143}00143\ }
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00145}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_a9b6b464d5b1490e3073ab65097bc71e2}{00145}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1endpoint__base}{websocketpp::endpoint\_base}}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_a9b6b464d5b1490e3073ab65097bc71e2}{endpoint\_base}};}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00147}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_a080173fd50cd1bdf4f03b63d62f137f5}{00147}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1connection__base}{websocketpp::connection\_base}}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_a080173fd50cd1bdf4f03b63d62f137f5}{connection\_base}};}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00148}00148\ }
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00150}00150\ }
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00152}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_a99182b8a1b9b1d62075d414705165117}{00152}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_a99182b8a1b9b1d62075d414705165117}{timeout\_open\_handshake}}\ =\ 5000;}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00154}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_abb65f538323f3f7c58378d973fd7dcec}{00154}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_abb65f538323f3f7c58378d973fd7dcec}{timeout\_close\_handshake}}\ =\ 5000;}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00156}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_a5d7acfccc65f4a8146b223d101ed1c7b}{00156}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_a5d7acfccc65f4a8146b223d101ed1c7b}{timeout\_pong}}\ =\ 5000;}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00157}00157\ }
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00159}00159\ }
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00164}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_a2749c03e9600b76c6ee5c1184919f2f7}{00164}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_a2749c03e9600b76c6ee5c1184919f2f7}{client\_version}}\ =\ 13;\ \textcolor{comment}{//\ RFC6455}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00165}00165\ }
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00167}00167\ }
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00176}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_a0f2c26586b53faefef4386473092886e}{00176}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{websocketpp::log::level}}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_a0f2c26586b53faefef4386473092886e}{elog\_level}}\ =}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00177}00177\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structwebsocketpp_1_1log_1_1elevel_a9b31ff708c221d314f9f4eb3ff2b1ad7}{websocketpp::log::elevel::all}};}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00178}00178\ }
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00180}00180\ }
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00189}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_afed6fcfe2f8950b959713c7459e3645c}{00189}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{websocketpp::log::level}}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_afed6fcfe2f8950b959713c7459e3645c}{alog\_level}}\ =}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00190}00190\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a853aa0b8976e53f3181af3bc398d493e}{websocketpp::log::alevel::all}};}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00191}00191\ }
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00193}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_a7980b627f735f03d4e48d39d949dcb0a}{00193}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_a7980b627f735f03d4e48d39d949dcb0a}{connection\_read\_buffer\_size}}\ =\ 16384;}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00194}00194\ }
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00196}00196\ }
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00202}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_a0f046a730b161555c644dc40df9ea870}{00202}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_a0f046a730b161555c644dc40df9ea870}{drop\_on\_protocol\_error}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00203}00203\ }
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00205}00205\ }
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00217}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_a961630bca024033059ef50863d1fc174}{00217}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_a961630bca024033059ef50863d1fc174}{silent\_close}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00218}00218\ }
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00220}00220\ }
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00229}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_a2c46fa8d65f3a6a69ccec42bd0e91e20}{00229}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_a2c46fa8d65f3a6a69ccec42bd0e91e20}{max\_message\_size}}\ =\ 32000000;}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00230}00230\ }
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00232}00232\ }
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00241}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_a95ea7d50bc0617bc447d98dca1ea7e0d}{00241}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_a95ea7d50bc0617bc447d98dca1ea7e0d}{max\_http\_body\_size}}\ =\ 32000000;}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00242}00242\ }
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00244}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_a483b9b5f8929dddf7389f6a751400406}{00244}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_a483b9b5f8929dddf7389f6a751400406}{enable\_extensions}}\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00245}00245\ }
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00247}00247\ }
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00249}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_1_1permessage__deflate__config}{00249}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_1_1permessage__deflate__config}{permessage\_deflate\_config}}\ \{}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00250}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_1_1permessage__deflate__config_af1bc092aab4481e5e5fe4669b7e501e6}{00250}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1request}{type::request\_type}}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_1_1permessage__deflate__config_af1bc092aab4481e5e5fe4669b7e501e6}{request\_type}};}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00251}00251\ }
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00254}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_1_1permessage__deflate__config_a2c214b49d880b8ca1ebcce9c92d1dec6}{00254}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_1_1permessage__deflate__config_a2c214b49d880b8ca1ebcce9c92d1dec6}{allow\_disabling\_context\_takeover}}\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00255}00255\ }
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00261}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_1_1permessage__deflate__config_ae9ce7b9a7a002339d80dca046e940867}{00261}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_1_1permessage__deflate__config_ae9ce7b9a7a002339d80dca046e940867}{minimum\_outgoing\_window\_bits}}\ =\ 8;}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00262}00262\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00263}00263\ }
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00264}00264\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1disabled}{websocketpp::extensions::permessage\_deflate::disabled}}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00265}\mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_ab296a5ea8cb2710efa4acfc98cc79d11}{00265}}\ \ \ \ \ \ \ \ \ <\mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_1_1permessage__deflate__config}{permessage\_deflate\_config}}>\ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1debug__core_ab296a5ea8cb2710efa4acfc98cc79d11}{permessage\_deflate\_type}};}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00266}00266\ }
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00268}00268\ }
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00280}00280\ \ \ \ \ \textcolor{comment}{//static\ const\ bool\ autonegotiate\_compression\ =\ false;}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00281}00281\ \};}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00282}00282\ }
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00283}00283\ \}\ \textcolor{comment}{//\ namespace\ config}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00284}00284\ \}\ \textcolor{comment}{//\ namespace\ websocketpp}}
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00285}00285\ }
+\DoxyCodeLine{\Hypertarget{debug_8hpp_source_l00286}00286\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ WEBSOCKETPP\_CONFIG\_CORE\_HPP}}
+
+\end{DoxyCode}

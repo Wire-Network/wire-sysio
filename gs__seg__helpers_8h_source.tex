@@ -1,0 +1,38 @@
+\doxysection{gs\+\_\+seg\+\_\+helpers.\+h}
+\hypertarget{gs__seg__helpers_8h_source}{}\label{gs__seg__helpers_8h_source}\index{libraries/chain/include/sysio/chain/webassembly/sys-\/vm-\/oc/gs\_seg\_helpers.h@{libraries/chain/include/sysio/chain/webassembly/sys-\/vm-\/oc/gs\_seg\_helpers.h}}
+\mbox{\hyperlink{gs__seg__helpers_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8h_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8h_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8h_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{stdint_8h}{stdint.h}}>}}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8h_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <setjmp.h>}}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8h_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <string.h>}}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8h_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8h_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{sys-vm-oc_8h}{sysio/chain/webassembly/sys-\/vm-\/oc/sys-\/vm-\/oc.h}}>}}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8h_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8h_source_l00009}00009\ \textcolor{preprocessor}{\#ifdef\ \_\_clang\_\_}}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8h_source_l00010}00010\ \textcolor{preprocessor}{\ \ \ \#define\ GS\_PTR\ \_\_attribute\_\_((address\_space(256)))}}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8h_source_l00011}00011\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8h_source_l00012}\mbox{\hyperlink{gs__seg__helpers_8h_a3fefb33397868842aacd0a7bbb0e26c5}{00012}}\ \textcolor{preprocessor}{\ \ \ \#define\ GS\_PTR\ \_\_seg\_gs}}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8h_source_l00013}00013\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8h_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8h_source_l00015}00015\ \textcolor{comment}{//This\ is\ really\ rather\ unfortunate,\ but\ on\ the\ upside\ it\ does\ allow\ a\ static\ assert\ to\ know\ if}}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8h_source_l00016}00016\ \textcolor{comment}{//the\ values\ ever\ slide\ which\ would\ be\ a\ PIC\ breaking\ event\ we'd\ want\ to\ know\ about\ at\ compile}}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8h_source_l00017}00017\ \textcolor{comment}{//time.}}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8h_source_l00018}\mbox{\hyperlink{gs__seg__helpers_8h_a1edd53bdee214a76b92b8f408b614fc8}{00018}}\ \textcolor{preprocessor}{\#define\ EOS\_VM\_OC\_CONTROL\_BLOCK\_OFFSET\ (-\/18944)}}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8h_source_l00019}\mbox{\hyperlink{gs__seg__helpers_8h_aebe81eb85a49691a28997eaa4d6dce8f}{00019}}\ \textcolor{preprocessor}{\#define\ EOS\_VM\_OC\_MEMORY\_STRIDE\ (UINT64\_C(8589963264))}}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8h_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8h_source_l00021}00021\ \textcolor{preprocessor}{\#ifdef\ \_\_cplusplus}}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8h_source_l00022}00022\ \textcolor{keyword}{extern}\ \textcolor{stringliteral}{"{}C"{}}\ \{}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8h_source_l00023}00023\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8h_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8h_source_l00025}00025\ \mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}}\ \mbox{\hyperlink{gs__seg__helpers_8h_ae68a4f81029eccfca26fd55002e5caa9}{eos\_vm\_oc\_grow\_memory}}(\mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}}\ grow,\ \mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}}\ max);}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8h_source_l00026}00026\ sigjmp\_buf*\ \mbox{\hyperlink{gs__seg__helpers_8h_a5b567c03bc74b2639ba506dc3700930d}{eos\_vm\_oc\_get\_jmp\_buf}}();}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8h_source_l00027}00027\ \textcolor{keywordtype}{void}*\ \mbox{\hyperlink{gs__seg__helpers_8h_a78b2433e9a5fa3e8e6d3312b251a0152}{eos\_vm\_oc\_get\_exception\_ptr}}();}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8h_source_l00028}00028\ \textcolor{keywordtype}{void}*\ \mbox{\hyperlink{gs__seg__helpers_8h_afbc04a665423590aed4936410345e7f8}{eos\_vm\_oc\_get\_bounce\_buffer\_list}}();}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8h_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8h_source_l00030}00030\ \textcolor{preprocessor}{\#ifdef\ \_\_cplusplus}}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8h_source_l00031}00031\ \}}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8h_source_l00032}00032\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

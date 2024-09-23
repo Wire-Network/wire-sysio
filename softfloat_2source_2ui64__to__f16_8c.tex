@@ -1,0 +1,56 @@
+\doxysection{libraries/softfloat/source/ui64\+\_\+to\+\_\+f16.c File Reference}
+\hypertarget{softfloat_2source_2ui64__to__f16_8c}{}\label{softfloat_2source_2ui64__to__f16_8c}\index{libraries/softfloat/source/ui64\_to\_f16.c@{libraries/softfloat/source/ui64\_to\_f16.c}}
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include "{}platform.\+h"{}}\newline
+{\ttfamily \#include "{}internals.\+h"{}}\newline
+{\ttfamily \#include "{}softfloat.\+h"{}}\newline
+Include dependency graph for ui64\+\_\+to\+\_\+f16.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{softfloat_2source_2ui64__to__f16_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structfloat16__t}{float16\+\_\+t}} \mbox{\hyperlink{softfloat_2source_2ui64__to__f16_8c_aa04e80d9e136e6fb82fced91c6103aa1}{ui64\+\_\+to\+\_\+f16}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{softfloat_2source_2ui64__to__f16_8c_aa04e80d9e136e6fb82fced91c6103aa1}\index{ui64\_to\_f16.c@{ui64\_to\_f16.c}!ui64\_to\_f16@{ui64\_to\_f16}}
+\index{ui64\_to\_f16@{ui64\_to\_f16}!ui64\_to\_f16.c@{ui64\_to\_f16.c}}
+\doxysubsubsection{\texorpdfstring{ui64\_to\_f16()}{ui64\_to\_f16()}}
+{\footnotesize\ttfamily \label{softfloat_2source_2ui64__to__f16_8c_aa04e80d9e136e6fb82fced91c6103aa1} 
+\mbox{\hyperlink{structfloat16__t}{float16\+\_\+t}} ui64\+\_\+to\+\_\+f16 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{a}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2ui64__to__f16_8c_source_l00042}{42}} of file \mbox{\hyperlink{softfloat_2source_2ui64__to__f16_8c_source}{ui64\+\_\+to\+\_\+f16.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00043\ \{}
+\DoxyCodeLine{00044\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a880ed9ceb8621521452c81d03bd08cfb}{int\_fast8\_t}}\ shiftDist;}
+\DoxyCodeLine{00045\ \ \ \ \ \textcolor{keyword}{union\ }\mbox{\hyperlink{unionui16__f16}{ui16\_f16}}\ u;}
+\DoxyCodeLine{00046\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a6ed085329b153773ff76afa0702cf897}{uint\_fast16\_t}}\ sig;}
+\DoxyCodeLine{00047\ }
+\DoxyCodeLine{00048\ \ \ \ \ shiftDist\ =\ \mbox{\hyperlink{softfloat_2source_2s__count_leading_zeros64_8c_aa7f029cdc05ad078461581da52b91bef}{softfloat\_countLeadingZeros64}}(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ )\ -\/\ 53;}
+\DoxyCodeLine{00049\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ 0\ <=\ shiftDist\ )\ \{}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ u.ui\ =}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ ?\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_aef53759f15608c79a740393f04f1866b}{packToF16UI}}(}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0,\ 0x18\ -\/\ shiftDist,\ (\mbox{\hyperlink{stdint_8h_a6ed085329b153773ff76afa0702cf897}{uint\_fast16\_t}})\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}<<shiftDist\ )}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ 0;}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ u.f;}
+\DoxyCodeLine{00055\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ shiftDist\ +=\ 4;}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ sig\ =}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \ \ \ (shiftDist\ <\ 0)\ ?\ \mbox{\hyperlink{softfloat_2source_2include_2primitives_8h_a2ea3f16ccc33498d3efe192489acc380}{softfloat\_shortShiftRightJam64}}(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ -\/shiftDist\ )}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ (\mbox{\hyperlink{stdint_8h_a6ed085329b153773ff76afa0702cf897}{uint\_fast16\_t}})\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}<<shiftDist;}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a44c2c937de2fe95e72bd833d712b2a58}{softfloat\_roundPackToF16}}(\ 0,\ 0x1C\ -\/\ shiftDist,\ sig\ );}
+\DoxyCodeLine{00061\ \ \ \ \ \}}
+\DoxyCodeLine{00062\ }
+\DoxyCodeLine{00063\ \}}
+
+\end{DoxyCode}

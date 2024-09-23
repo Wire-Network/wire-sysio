@@ -1,0 +1,48 @@
+\doxysection{libraries/fc/src/crypto/elliptic\+\_\+r1.cpp File Reference}
+\hypertarget{elliptic__r1_8cpp}{}\label{elliptic__r1_8cpp}\index{libraries/fc/src/crypto/elliptic\_r1.cpp@{libraries/fc/src/crypto/elliptic\_r1.cpp}}
+{\ttfamily \#include $<$fc/crypto/elliptic\+\_\+r1.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/crypto/base58.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/crypto/openssl.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/fwd\+\_\+impl.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/exception/exception.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/log/logger.\+hpp$>$}\newline
+Include dependency graph for elliptic\+\_\+r1.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{elliptic__r1_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classfc_1_1crypto_1_1r1_1_1detail_1_1public__key__impl}{fc\+::crypto\+::r1\+::detail\+::public\+\_\+key\+\_\+impl}}
+\item 
+class \mbox{\hyperlink{classfc_1_1crypto_1_1r1_1_1detail_1_1private__key__impl}{fc\+::crypto\+::r1\+::detail\+::private\+\_\+key\+\_\+impl}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacefc}{fc}}
+\begin{DoxyCompactList}\small\item\em namespace \doxylink{namespacesysio_1_1chain}{sysio\+::chain} \end{DoxyCompactList}\item 
+namespace \mbox{\hyperlink{namespacefc_1_1crypto}{fc\+::crypto}}
+\item 
+namespace \mbox{\hyperlink{namespacefc_1_1crypto_1_1r1}{fc\+::crypto\+::r1}}
+\item 
+namespace \mbox{\hyperlink{namespacefc_1_1crypto_1_1r1_1_1detail}{fc\+::crypto\+::r1\+::detail}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{namespacefc_1_1crypto_1_1r1_a2f84ba4f539e39bff64fd02cc1ca326e}{fc\+::crypto\+::r1\+::\+ECDSA\+\_\+\+SIG\+\_\+recover\+\_\+key\+\_\+\+GFp}} (EC\+\_\+\+KEY \texorpdfstring{$\ast$}{*}eckey, ECDSA\+\_\+\+SIG \texorpdfstring{$\ast$}{*}ecsig, const unsigned char \texorpdfstring{$\ast$}{*}msg, int msglen, int recid, int check)
+\item 
+\mbox{\hyperlink{namespacefc_1_1crypto_1_1r1_ae05a9b8a3e71b719d56c0a87c491a8f6}{compact\+\_\+signature}} \mbox{\hyperlink{namespacefc_1_1crypto_1_1r1_a69fb535e6486039f3d86e9d5dd3ab954}{fc\+::crypto\+::r1\+::signature\+\_\+from\+\_\+ecdsa}} (const EC\+\_\+\+KEY \texorpdfstring{$\ast$}{*}key, const \mbox{\hyperlink{namespacefc_1_1crypto_1_1r1_a2bfc308262de40acfc2a5e7c725bbe3f}{public\+\_\+key\+\_\+data}} \&pub, fc\+::ecdsa\+\_\+sig \&sig, const \mbox{\hyperlink{classfc_1_1sha256}{fc\+::sha256}} \&d)
+\item 
+void \mbox{\hyperlink{namespacefc_aba68c5966033307cdd8a92b5bce2241a}{fc\+::to\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1crypto_1_1r1_1_1private__key}{crypto\+::r1\+::private\+\_\+key}} \&var, \mbox{\hyperlink{classfc_1_1variant}{variant}} \&vo)
+\item 
+void \mbox{\hyperlink{namespacefc_a2c5928040aa8f58911b9f977aac56108}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{variant}} \&var, \mbox{\hyperlink{classfc_1_1crypto_1_1r1_1_1private__key}{crypto\+::r1\+::private\+\_\+key}} \&vo)
+\item 
+void \mbox{\hyperlink{namespacefc_a76c04110e74473afe1c5378b9e1e2232}{fc\+::to\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1crypto_1_1r1_1_1public__key}{crypto\+::r1\+::public\+\_\+key}} \&var, \mbox{\hyperlink{classfc_1_1variant}{variant}} \&vo)
+\item 
+void \mbox{\hyperlink{namespacefc_a37fabf2794eb855bf5c196696fe49d4a}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{variant}} \&var, \mbox{\hyperlink{classfc_1_1crypto_1_1r1_1_1public__key}{crypto\+::r1\+::public\+\_\+key}} \&vo)
+\end{DoxyCompactItemize}

@@ -1,0 +1,17 @@
+<map id="sysio::chain::resource_limits::resource_limits_manager::process_account_limit_updates" name="sysio::chain::resource_limits::resource_limits_manager::process_account_limit_updates">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,12,191,82"/>
+<area shape="rect" id="Node000002" href="$classchainbase_1_1database.html#afcfe00f81a526c1376d4f51197dd3a9a" title=" " alt="" coords="617,13,785,38"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="191,34,238,30,404,19,569,19,602,20,602,25,569,24,404,24,239,35,191,39"/>
+<area shape="rect" id="Node000005" href="$classchainbase_1_1database.html#afaea057692a8bbbf3f506b64c60308b6" title=" " alt="" coords="428,33,569,74"/>
+<area shape="poly" id="edge6_Node000001_Node000005" title=" " alt="" coords="191,46,413,50,413,55,191,51"/>
+<area shape="rect" id="Node000006" href="$classchainbase_1_1database.html#a9ebc006075e8fc2e84357a0e068b58d4" title=" " alt="" coords="239,84,380,125"/>
+<area shape="poly" id="edge8_Node000001_Node000006" title=" " alt="" coords="192,70,225,79,223,84,190,75"/>
+<area shape="rect" id="Node000003" href="$classchainbase_1_1database.html#aa5a2ca0da0092693ac49b36b7ec6817a" title=" " alt="" coords="833,5,974,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="785,32,817,32,817,37,785,37"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="832,20,800,19,800,14,832,14"/>
+<area shape="rect" id="Node000004" href="$classchainbase_1_1database.html#a4d5297635dcf70be481d9b600da9bc13" title=" " alt="" coords="1022,35,1163,75"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="975,34,1007,39,1007,44,974,39"/>
+<area shape="poly" id="edge5_Node000004_Node000002" title=" " alt="" coords="1022,60,974,60,903,63,832,60,760,46,761,41,833,55,903,58,974,55,1022,54"/>
+<area shape="poly" id="edge7_Node000005_Node000002" title=" " alt="" coords="569,41,601,37,602,42,570,47"/>
+<area shape="poly" id="edge9_Node000006_Node000005" title=" " alt="" coords="379,83,412,74,414,79,381,88"/>
+</map>

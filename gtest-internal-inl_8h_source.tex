@@ -1,0 +1,1181 @@
+\doxysection{gtest-\/internal-\/inl.h}
+\hypertarget{gtest-internal-inl_8h_source}{}\label{gtest-internal-inl_8h_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/src/gtest-\/internal-\/inl.h@{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/src/gtest-\/internal-\/inl.h}}
+\mbox{\hyperlink{gtest-internal-inl_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00001}00001\ \textcolor{comment}{//\ Copyright\ 2005,\ Google\ Inc.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00002}00002\ \textcolor{comment}{//\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00003}00003\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00004}00004\ \textcolor{comment}{//\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00005}00005\ \textcolor{comment}{//\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00006}00006\ \textcolor{comment}{//\ met:}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00007}00007\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00008}00008\ \textcolor{comment}{//\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00009}00009\ \textcolor{comment}{//\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00010}00010\ \textcolor{comment}{//\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00011}00011\ \textcolor{comment}{//\ copyright\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00012}00012\ \textcolor{comment}{//\ in\ the\ documentation\ and/or\ other\ materials\ provided\ with\ the}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00013}00013\ \textcolor{comment}{//\ distribution.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00014}00014\ \textcolor{comment}{//\ \ \ \ \ *\ Neither\ the\ name\ of\ Google\ Inc.\ nor\ the\ names\ of\ its}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00015}00015\ \textcolor{comment}{//\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products\ derived\ from}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00016}00016\ \textcolor{comment}{//\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00017}00017\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00018}00018\ \textcolor{comment}{//\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00019}00019\ \textcolor{comment}{//\ "{}AS\ IS"{}\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00020}00020\ \textcolor{comment}{//\ LIMITED\ TO,\ THE\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00021}00021\ \textcolor{comment}{//\ A\ PARTICULAR\ PURPOSE\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ THE\ COPYRIGHT}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00022}00022\ \textcolor{comment}{//\ OWNER\ OR\ CONTRIBUTORS\ BE\ LIABLE\ FOR\ ANY\ DIRECT,\ INDIRECT,\ INCIDENTAL,}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00023}00023\ \textcolor{comment}{//\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES\ (INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00024}00024\ \textcolor{comment}{//\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;\ LOSS\ OF\ USE,}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00025}00025\ \textcolor{comment}{//\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND\ ON\ ANY}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00026}00026\ \textcolor{comment}{//\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00027}00027\ \textcolor{comment}{//\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00028}00028\ \textcolor{comment}{//\ OF\ THIS\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00030}00030\ \textcolor{comment}{//\ Utility\ functions\ and\ classes\ used\ by\ the\ Google\ C++\ testing\ framework.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00031}00031\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00032}00032\ \textcolor{comment}{//\ Author:\ wan@google.com\ (Zhanyong\ Wan)}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00033}00033\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00034}00034\ \textcolor{comment}{//\ This\ file\ contains\ purely\ Google\ Test's\ internal\ implementation.\ \ Please}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00035}00035\ \textcolor{comment}{//\ DO\ NOT\ \#INCLUDE\ IT\ IN\ A\ USER\ PROGRAM.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00037}00037\ \textcolor{preprocessor}{\#ifndef\ GTEST\_SRC\_GTEST\_INTERNAL\_INL\_H\_}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00038}00038\ \textcolor{preprocessor}{\#define\ GTEST\_SRC\_GTEST\_INTERNAL\_INL\_H\_}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00040}00040\ \textcolor{preprocessor}{\#ifndef\ \_WIN32\_WCE}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00041}00041\ \textcolor{preprocessor}{\#\ include\ <errno.h>}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00042}00042\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ !\_WIN32\_WCE}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00043}00043\ \textcolor{preprocessor}{\#include\ <stddef.h>}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00044}00044\ \textcolor{preprocessor}{\#include\ <stdlib.h>}\ \ \textcolor{comment}{//\ For\ strtoll/\_strtoul64/malloc/free.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00045}00045\ \textcolor{preprocessor}{\#include\ <string.h>}\ \ \textcolor{comment}{//\ For\ memmove.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00047}00047\ \textcolor{preprocessor}{\#include\ <algorithm>}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00048}00048\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00049}00049\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00051}00051\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{gtest-port_8h}{gtest/internal/gtest-\/port.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00052}00052\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00053}00053\ \textcolor{preprocessor}{\#if\ GTEST\_CAN\_STREAM\_RESULTS\_}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00054}00054\ \textcolor{preprocessor}{\#\ include\ <arpa/inet.h>}\ \ \textcolor{comment}{//\ NOLINT}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00055}00055\ \textcolor{preprocessor}{\#\ include\ <netdb.h>}\ \ \textcolor{comment}{//\ NOLINT}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00056}00056\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00058}00058\ \textcolor{preprocessor}{\#if\ GTEST\_OS\_WINDOWS}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00059}00059\ \textcolor{preprocessor}{\#\ include\ <windows.h>}\ \ \textcolor{comment}{//\ NOLINT}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00060}00060\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_OS\_WINDOWS}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00062}00062\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{gtest_8h}{gtest/gtest.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00063}00063\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{gtest-spi_8h}{gtest/gtest-\/spi.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00065}00065\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetesting}{testing}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00067}00067\ \textcolor{comment}{//\ Declares\ the\ flags.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00068}00068\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00069}00069\ \textcolor{comment}{//\ We\ don't\ want\ the\ users\ to\ modify\ this\ flag\ in\ the\ code,\ but\ want}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00070}00070\ \textcolor{comment}{//\ Google\ Test's\ own\ unit\ tests\ to\ be\ able\ to\ access\ it.\ Therefore\ we}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00071}00071\ \textcolor{comment}{//\ declare\ it\ here\ as\ opposed\ to\ in\ gtest.h.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00072}\mbox{\hyperlink{namespacetesting_a534f0743e7c42c55d27dcd0dd3d38f18}{00072}}\ \mbox{\hyperlink{gtest-port_8h_a14eb0e9c6e0df765d1fbfd2db6966d14}{GTEST\_DECLARE\_bool\_}}(death\_test\_use\_fork);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00073}00073\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00074}00074\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceinternal}{internal}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00075}00075\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00076}00076\ \textcolor{comment}{//\ The\ value\ of\ GetTestTypeId()\ as\ seen\ from\ within\ the\ Google\ Test}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00077}00077\ \textcolor{comment}{//\ library.\ \ This\ is\ solely\ for\ testing\ GetTestTypeId().}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00078}00078\ \mbox{\hyperlink{gtest-port_8h_aa73be6f0ba4a7456180a94904ce17790}{GTEST\_API\_}}\ \textcolor{keyword}{extern}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacetesting_1_1internal_ab1114197d3c657d8b7f8e0c5caa12d00}{TypeId}}\ \mbox{\hyperlink{namespacetesting_1_1internal_acac7993efabbd9dd62c1e9c7d143a72f}{kTestTypeIdInGoogleTest}};}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00080}00080\ \textcolor{comment}{//\ Names\ of\ the\ flags\ (needed\ for\ parsing\ Google\ Test\ flags).}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00081}\mbox{\hyperlink{namespacetesting_1_1internal_ad5882ed0ceadc0f23090f0f08b5d495b}{00081}}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{namespacetesting_1_1internal_ad5882ed0ceadc0f23090f0f08b5d495b}{kAlsoRunDisabledTestsFlag}}[]\ =\ \textcolor{stringliteral}{"{}also\_run\_disabled\_tests"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00082}\mbox{\hyperlink{namespacetesting_1_1internal_a804c907155bfee3a6616ae3ca04048d0}{00082}}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{namespacetesting_1_1internal_a804c907155bfee3a6616ae3ca04048d0}{kBreakOnFailureFlag}}[]\ =\ \textcolor{stringliteral}{"{}break\_on\_failure"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00083}\mbox{\hyperlink{namespacetesting_1_1internal_af4bb309802e83df0927097e6e4201a38}{00083}}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{namespacetesting_1_1internal_af4bb309802e83df0927097e6e4201a38}{kCatchExceptionsFlag}}[]\ =\ \textcolor{stringliteral}{"{}catch\_exceptions"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00084}\mbox{\hyperlink{namespacetesting_1_1internal_a884ff13b75232fbe7daa0caf46f1de66}{00084}}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{namespacetesting_1_1internal_a884ff13b75232fbe7daa0caf46f1de66}{kColorFlag}}[]\ =\ \textcolor{stringliteral}{"{}color"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00085}\mbox{\hyperlink{namespacetesting_1_1internal_a8cb8ee7fe7659e6916a0108dffa2f7dc}{00085}}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{namespacetesting_1_1internal_a8cb8ee7fe7659e6916a0108dffa2f7dc}{kFilterFlag}}[]\ =\ \textcolor{stringliteral}{"{}filter"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00086}\mbox{\hyperlink{namespacetesting_1_1internal_a1d3cfebffefbf35f7033d4941493a8ff}{00086}}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{namespacetesting_1_1internal_a1d3cfebffefbf35f7033d4941493a8ff}{kListTestsFlag}}[]\ =\ \textcolor{stringliteral}{"{}list\_tests"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00087}\mbox{\hyperlink{namespacetesting_1_1internal_abd5368e00a31d175c6696cf76cbbde10}{00087}}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{namespacetesting_1_1internal_abd5368e00a31d175c6696cf76cbbde10}{kOutputFlag}}[]\ =\ \textcolor{stringliteral}{"{}output"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00088}\mbox{\hyperlink{namespacetesting_1_1internal_aa6c13109bb4c78740ddb082b1ec0de56}{00088}}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{namespacetesting_1_1internal_aa6c13109bb4c78740ddb082b1ec0de56}{kPrintTimeFlag}}[]\ =\ \textcolor{stringliteral}{"{}print\_time"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00089}\mbox{\hyperlink{namespacetesting_1_1internal_aad7d54fe4cdc9d06d18aeaa808659319}{00089}}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{namespacetesting_1_1internal_aad7d54fe4cdc9d06d18aeaa808659319}{kPrintUTF8Flag}}[]\ =\ \textcolor{stringliteral}{"{}print\_utf8"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00090}\mbox{\hyperlink{namespacetesting_1_1internal_a964ad71443cfda304b3208bf5d2daa75}{00090}}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{namespacetesting_1_1internal_a964ad71443cfda304b3208bf5d2daa75}{kRandomSeedFlag}}[]\ =\ \textcolor{stringliteral}{"{}random\_seed"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00091}\mbox{\hyperlink{namespacetesting_1_1internal_a764ee423d39ebb8e10c53ab9b685cd9b}{00091}}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{namespacetesting_1_1internal_a764ee423d39ebb8e10c53ab9b685cd9b}{kRepeatFlag}}[]\ =\ \textcolor{stringliteral}{"{}repeat"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00092}\mbox{\hyperlink{namespacetesting_1_1internal_affd2c1118505cb97d8ff728c95fc722b}{00092}}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{namespacetesting_1_1internal_affd2c1118505cb97d8ff728c95fc722b}{kShuffleFlag}}[]\ =\ \textcolor{stringliteral}{"{}shuffle"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00093}\mbox{\hyperlink{namespacetesting_1_1internal_ad6f90e66d431ca3a9084408878c2cc77}{00093}}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{namespacetesting_1_1internal_ad6f90e66d431ca3a9084408878c2cc77}{kStackTraceDepthFlag}}[]\ =\ \textcolor{stringliteral}{"{}stack\_trace\_depth"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00094}\mbox{\hyperlink{namespacetesting_1_1internal_a84f8a2102d45c8b2b35be06d14ffefb8}{00094}}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{namespacetesting_1_1internal_a84f8a2102d45c8b2b35be06d14ffefb8}{kStreamResultToFlag}}[]\ =\ \textcolor{stringliteral}{"{}stream\_result\_to"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00095}\mbox{\hyperlink{namespacetesting_1_1internal_ad9efcf363de3483afd91c7393a4fefb8}{00095}}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{namespacetesting_1_1internal_ad9efcf363de3483afd91c7393a4fefb8}{kThrowOnFailureFlag}}[]\ =\ \textcolor{stringliteral}{"{}throw\_on\_failure"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00096}\mbox{\hyperlink{namespacetesting_1_1internal_aa1ffe15dea227d4dded912e43a8eed84}{00096}}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{namespacetesting_1_1internal_aa1ffe15dea227d4dded912e43a8eed84}{kFlagfileFlag}}[]\ =\ \textcolor{stringliteral}{"{}flagfile"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00097}00097\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00098}00098\ \textcolor{comment}{//\ A\ valid\ random\ seed\ must\ be\ in\ [1,\ kMaxRandomSeed].}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00099}\mbox{\hyperlink{namespacetesting_1_1internal_a41bd421ace53d23dbe85d9618c3afaee}{00099}}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ kMaxRandomSeed\ =\ 99999;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00100}00100\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00101}00101\ \textcolor{comment}{//\ g\_help\_flag\ is\ true\ iff\ the\ -\/-\/help\ flag\ or\ an\ equivalent\ form\ is}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00102}00102\ \textcolor{comment}{//\ specified\ on\ the\ command\ line.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00103}00103\ \mbox{\hyperlink{gtest-port_8h_aa73be6f0ba4a7456180a94904ce17790}{GTEST\_API\_}}\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacetesting_1_1internal_a93a772f5e51973b105d91cbb66a203f4}{g\_help\_flag}};}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00104}00104\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00105}00105\ \textcolor{comment}{//\ Returns\ the\ current\ time\ in\ milliseconds.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00106}00106\ \mbox{\hyperlink{gtest-port_8h_aa73be6f0ba4a7456180a94904ce17790}{GTEST\_API\_}}\ \mbox{\hyperlink{namespacetesting_1_1internal_a66a845df404b38fe85c5e14a069f255a}{TimeInMillis}}\ \mbox{\hyperlink{namespacetesting_1_1internal_ae66b46943a429e6efb1db456d4cae90c}{GetTimeInMillis}}();}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00107}00107\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00108}00108\ \textcolor{comment}{//\ Returns\ true\ iff\ Google\ Test\ should\ use\ colors\ in\ the\ output.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00109}00109\ \mbox{\hyperlink{gtest-port_8h_aa73be6f0ba4a7456180a94904ce17790}{GTEST\_API\_}}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacetesting_1_1internal_ac1db1b4603967a6c4404f31cbbac31a6}{ShouldUseColor}}(\textcolor{keywordtype}{bool}\ stdout\_is\_tty);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00110}00110\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00111}00111\ \textcolor{comment}{//\ Formats\ the\ given\ time\ in\ milliseconds\ as\ seconds.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00112}00112\ \mbox{\hyperlink{gtest-port_8h_aa73be6f0ba4a7456180a94904ce17790}{GTEST\_API\_}}\ std::string\ \mbox{\hyperlink{namespacetesting_1_1internal_a904485f27a54be8a5a92856e2d838797}{FormatTimeInMillisAsSeconds}}(\mbox{\hyperlink{namespacetesting_1_1internal_a66a845df404b38fe85c5e14a069f255a}{TimeInMillis}}\ ms);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00113}00113\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00114}00114\ \textcolor{comment}{//\ Converts\ the\ given\ time\ in\ milliseconds\ to\ a\ date\ string\ in\ the\ ISO\ 8601}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00115}00115\ \textcolor{comment}{//\ format,\ without\ the\ timezone\ information.\ \ N.B.:\ due\ to\ the\ use\ the}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00116}00116\ \textcolor{comment}{//\ non-\/reentrant\ localtime()\ function,\ this\ function\ is\ not\ thread\ safe.\ \ Do}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00117}00117\ \textcolor{comment}{//\ not\ use\ it\ in\ any\ code\ that\ can\ be\ called\ from\ multiple\ threads.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00118}00118\ \mbox{\hyperlink{gtest-port_8h_aa73be6f0ba4a7456180a94904ce17790}{GTEST\_API\_}}\ std::string\ \mbox{\hyperlink{namespacetesting_1_1internal_a5ef227c4a610e7ff638b12dfb25b068e}{FormatEpochTimeInMillisAsIso8601}}(\mbox{\hyperlink{namespacetesting_1_1internal_a66a845df404b38fe85c5e14a069f255a}{TimeInMillis}}\ ms);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00119}00119\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00120}00120\ \textcolor{comment}{//\ Parses\ a\ string\ for\ an\ Int32\ flag,\ in\ the\ form\ of\ "{}-\/-\/flag=value"{}.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00121}00121\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00122}00122\ \textcolor{comment}{//\ On\ success,\ stores\ the\ value\ of\ the\ flag\ in\ *value,\ and\ returns}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00123}00123\ \textcolor{comment}{//\ true.\ \ On\ failure,\ returns\ false\ without\ changing\ *value.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00124}00124\ \mbox{\hyperlink{gtest-port_8h_aa73be6f0ba4a7456180a94904ce17790}{GTEST\_API\_}}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacetesting_1_1internal_ae3449e173767750b613114ceac6d916a}{ParseInt32Flag}}(}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00125}00125\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ str,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ flag,\ \mbox{\hyperlink{namespacetesting_1_1internal_a8ee38faaf875f133358abaf9bc056cec}{Int32}}*\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}});}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00126}00126\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00127}00127\ \textcolor{comment}{//\ Returns\ a\ random\ seed\ in\ range\ [1,\ kMaxRandomSeed]\ based\ on\ the}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00128}00128\ \textcolor{comment}{//\ given\ -\/-\/gtest\_random\_seed\ flag\ value.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00129}\mbox{\hyperlink{namespacetesting_1_1internal_ae74fedbdaebaac8d1202192266243b9e}{00129}}\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetesting_1_1internal_ae74fedbdaebaac8d1202192266243b9e}{GetRandomSeedFromFlag}}(\mbox{\hyperlink{namespacetesting_1_1internal_a8ee38faaf875f133358abaf9bc056cec}{Int32}}\ random\_seed\_flag)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00130}00130\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ raw\_seed\ =\ (random\_seed\_flag\ ==\ 0)\ ?}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00131}00131\ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\textcolor{keyword}{>}(\mbox{\hyperlink{namespacetesting_1_1internal_ae66b46943a429e6efb1db456d4cae90c}{GetTimeInMillis}}())\ :}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00132}00132\ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\textcolor{keyword}{>}(random\_seed\_flag);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00133}00133\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00134}00134\ \ \ \textcolor{comment}{//\ Normalizes\ the\ actual\ seed\ to\ range\ [1,\ kMaxRandomSeed]\ such\ that}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00135}00135\ \ \ \textcolor{comment}{//\ it's\ easy\ to\ type.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00136}00136\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ normalized\_seed\ =}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00137}00137\ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}((raw\_seed\ -\/\ 1U)\ \%}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00138}00138\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\textcolor{keyword}{>}(\mbox{\hyperlink{namespacetesting_1_1internal_a41bd421ace53d23dbe85d9618c3afaee}{kMaxRandomSeed}}))\ +\ 1;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00139}00139\ \ \ \textcolor{keywordflow}{return}\ normalized\_seed;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00140}00140\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00141}00141\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00142}00142\ \textcolor{comment}{//\ Returns\ the\ first\ valid\ random\ seed\ after\ 'seed'.\ \ The\ behavior\ is}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00143}00143\ \textcolor{comment}{//\ undefined\ if\ 'seed'\ is\ invalid.\ \ The\ seed\ after\ kMaxRandomSeed\ is}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00144}00144\ \textcolor{comment}{//\ considered\ to\ be\ 1.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00145}\mbox{\hyperlink{namespacetesting_1_1internal_a6e07a655cb987d131cd8fbeba9a7f1eb}{00145}}\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetesting_1_1internal_a6e07a655cb987d131cd8fbeba9a7f1eb}{GetNextRandomSeed}}(\textcolor{keywordtype}{int}\ seed)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00146}00146\ \ \ \mbox{\hyperlink{gtest-port_8h_ab54343f0a36dc4cb0ce8a478dd7847b8}{GTEST\_CHECK\_}}(1\ <=\ seed\ \&\&\ seed\ <=\ kMaxRandomSeed)}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00147}00147\ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}Invalid\ random\ seed\ "{}}\ <<\ seed\ <<\ \textcolor{stringliteral}{"{}\ -\/\ must\ be\ in\ [1,\ "{}}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00148}00148\ \ \ \ \ \ \ <<\ kMaxRandomSeed\ <<\ \textcolor{stringliteral}{"{}]."{}};}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00149}00149\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ next\_seed\ =\ seed\ +\ 1;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00150}00150\ \ \ \textcolor{keywordflow}{return}\ (next\_seed\ >\ kMaxRandomSeed)\ ?\ 1\ :\ next\_seed;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00151}00151\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00152}00152\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00153}00153\ \textcolor{comment}{//\ This\ class\ saves\ the\ values\ of\ all\ Google\ Test\ flags\ in\ its\ c'tor,\ and}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00154}00154\ \textcolor{comment}{//\ restores\ them\ in\ its\ d'tor.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00155}\mbox{\hyperlink{classtesting_1_1internal_1_1_g_test_flag_saver}{00155}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classtesting_1_1internal_1_1_g_test_flag_saver}{GTestFlagSaver}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00156}00156\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00157}00157\ \ \ \textcolor{comment}{//\ The\ c'tor.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00158}\mbox{\hyperlink{classtesting_1_1internal_1_1_g_test_flag_saver_ad94262f7765927bbe9a08e25f9c67530}{00158}}\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_g_test_flag_saver_ad94262f7765927bbe9a08e25f9c67530}{GTestFlagSaver}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00159}00159\ \ \ \ \ also\_run\_disabled\_tests\_\ =\ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(also\_run\_disabled\_tests);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00160}00160\ \ \ \ \ break\_on\_failure\_\ =\ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(break\_on\_failure);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00161}00161\ \ \ \ \ catch\_exceptions\_\ =\ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(catch\_exceptions);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00162}00162\ \ \ \ \ color\_\ =\ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(color);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00163}00163\ \ \ \ \ death\_test\_style\_\ =\ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(death\_test\_style);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00164}00164\ \ \ \ \ death\_test\_use\_fork\_\ =\ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(death\_test\_use\_fork);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00165}00165\ \ \ \ \ filter\_\ =\ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(filter);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00166}00166\ \ \ \ \ internal\_run\_death\_test\_\ =\ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(internal\_run\_death\_test);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00167}00167\ \ \ \ \ list\_tests\_\ =\ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(list\_tests);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00168}00168\ \ \ \ \ output\_\ =\ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(output);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00169}00169\ \ \ \ \ print\_time\_\ =\ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(print\_time);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00170}00170\ \ \ \ \ print\_utf8\_\ =\ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(print\_utf8);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00171}00171\ \ \ \ \ random\_seed\_\ =\ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(random\_seed);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00172}00172\ \ \ \ \ repeat\_\ =\ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(repeat);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00173}00173\ \ \ \ \ shuffle\_\ =\ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(shuffle);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00174}00174\ \ \ \ \ stack\_trace\_depth\_\ =\ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(stack\_trace\_depth);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00175}00175\ \ \ \ \ stream\_result\_to\_\ =\ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(stream\_result\_to);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00176}00176\ \ \ \ \ throw\_on\_failure\_\ =\ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(throw\_on\_failure);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00177}00177\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00178}00178\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00179}00179\ \ \ \textcolor{comment}{//\ The\ d'tor\ is\ not\ virtual.\ \ DO\ NOT\ INHERIT\ FROM\ THIS\ CLASS.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00180}\mbox{\hyperlink{classtesting_1_1internal_1_1_g_test_flag_saver_a5f00786b5c9045fd5dd7c42fd7dd1476}{00180}}\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_g_test_flag_saver_a5f00786b5c9045fd5dd7c42fd7dd1476}{\string~GTestFlagSaver}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00181}00181\ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(also\_run\_disabled\_tests)\ =\ also\_run\_disabled\_tests\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00182}00182\ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(break\_on\_failure)\ =\ break\_on\_failure\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00183}00183\ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(catch\_exceptions)\ =\ catch\_exceptions\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00184}00184\ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(color)\ =\ color\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00185}00185\ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(death\_test\_style)\ =\ death\_test\_style\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00186}00186\ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(death\_test\_use\_fork)\ =\ death\_test\_use\_fork\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00187}00187\ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(filter)\ =\ filter\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00188}00188\ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(internal\_run\_death\_test)\ =\ internal\_run\_death\_test\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00189}00189\ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(list\_tests)\ =\ list\_tests\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00190}00190\ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(output)\ =\ output\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00191}00191\ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(print\_time)\ =\ print\_time\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00192}00192\ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(print\_utf8)\ =\ print\_utf8\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00193}00193\ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(random\_seed)\ =\ random\_seed\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00194}00194\ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(repeat)\ =\ repeat\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00195}00195\ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(shuffle)\ =\ shuffle\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00196}00196\ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(stack\_trace\_depth)\ =\ stack\_trace\_depth\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00197}00197\ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(stream\_result\_to)\ =\ stream\_result\_to\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00198}00198\ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(throw\_on\_failure)\ =\ throw\_on\_failure\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00199}00199\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00200}00200\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00201}00201\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00202}00202\ \ \ \textcolor{comment}{//\ Fields\ for\ saving\ the\ original\ values\ of\ flags.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00203}00203\ \ \ \textcolor{keywordtype}{bool}\ also\_run\_disabled\_tests\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00204}00204\ \ \ \textcolor{keywordtype}{bool}\ break\_on\_failure\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00205}00205\ \ \ \textcolor{keywordtype}{bool}\ catch\_exceptions\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00206}00206\ \ \ std::string\ color\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00207}00207\ \ \ std::string\ death\_test\_style\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00208}00208\ \ \ \textcolor{keywordtype}{bool}\ death\_test\_use\_fork\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00209}00209\ \ \ std::string\ filter\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00210}00210\ \ \ std::string\ internal\_run\_death\_test\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00211}00211\ \ \ \textcolor{keywordtype}{bool}\ list\_tests\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00212}00212\ \ \ std::string\ output\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00213}00213\ \ \ \textcolor{keywordtype}{bool}\ print\_time\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00214}00214\ \ \ \textcolor{keywordtype}{bool}\ print\_utf8\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00215}00215\ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a8ee38faaf875f133358abaf9bc056cec}{internal::Int32}}\ random\_seed\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00216}00216\ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a8ee38faaf875f133358abaf9bc056cec}{internal::Int32}}\ repeat\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00217}00217\ \ \ \textcolor{keywordtype}{bool}\ shuffle\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00218}00218\ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a8ee38faaf875f133358abaf9bc056cec}{internal::Int32}}\ stack\_trace\_depth\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00219}00219\ \ \ std::string\ stream\_result\_to\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00220}00220\ \ \ \textcolor{keywordtype}{bool}\ throw\_on\_failure\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00221}\mbox{\hyperlink{namespacetesting_1_1internal_a581ac897511489c75a06aa328dcfb62f}{00221}}\ \}\ \mbox{\hyperlink{namespacetesting_1_1internal_a581ac897511489c75a06aa328dcfb62f}{GTEST\_ATTRIBUTE\_UNUSED\_}};}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00222}00222\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00223}00223\ \textcolor{comment}{//\ Converts\ a\ Unicode\ code\ point\ to\ a\ narrow\ string\ in\ UTF-\/8\ encoding.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00224}00224\ \textcolor{comment}{//\ code\_point\ parameter\ is\ of\ type\ UInt32\ because\ wchar\_t\ may\ not\ be}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00225}00225\ \textcolor{comment}{//\ wide\ enough\ to\ contain\ a\ code\ point.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00226}00226\ \textcolor{comment}{//\ If\ the\ code\_point\ is\ not\ a\ valid\ Unicode\ code\ point}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00227}00227\ \textcolor{comment}{//\ (i.e.\ outside\ of\ Unicode\ range\ U+0\ to\ U+10FFFF)\ it\ will\ be\ converted}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00228}00228\ \textcolor{comment}{//\ to\ "{}(Invalid\ Unicode\ 0xXXXXXXXX)"{}.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00229}00229\ \mbox{\hyperlink{gtest-port_8h_aa73be6f0ba4a7456180a94904ce17790}{GTEST\_API\_}}\ std::string\ \mbox{\hyperlink{namespacetesting_1_1internal_a0c0f9558efb9abb965851c4738cdc725}{CodePointToUtf8}}(\mbox{\hyperlink{namespacetesting_1_1internal_a40d4fffcd2bf56f18b1c380615aa85e3}{UInt32}}\ code\_point);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00230}00230\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00231}00231\ \textcolor{comment}{//\ Converts\ a\ wide\ string\ to\ a\ narrow\ string\ in\ UTF-\/8\ encoding.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00232}00232\ \textcolor{comment}{//\ The\ wide\ string\ is\ assumed\ to\ have\ the\ following\ encoding:}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00233}00233\ \textcolor{comment}{//\ \ \ UTF-\/16\ if\ sizeof(wchar\_t)\ ==\ 2\ (on\ Windows,\ Cygwin,\ Symbian\ OS)}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00234}00234\ \textcolor{comment}{//\ \ \ UTF-\/32\ if\ sizeof(wchar\_t)\ ==\ 4\ (on\ Linux)}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00235}00235\ \textcolor{comment}{//\ Parameter\ str\ points\ to\ a\ null-\/terminated\ wide\ string.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00236}00236\ \textcolor{comment}{//\ Parameter\ num\_chars\ may\ additionally\ limit\ the\ number}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00237}00237\ \textcolor{comment}{//\ of\ wchar\_t\ characters\ processed.\ -\/1\ is\ used\ when\ the\ entire\ string}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00238}00238\ \textcolor{comment}{//\ should\ be\ processed.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00239}00239\ \textcolor{comment}{//\ If\ the\ string\ contains\ code\ points\ that\ are\ not\ valid\ Unicode\ code\ points}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00240}00240\ \textcolor{comment}{//\ (i.e.\ outside\ of\ Unicode\ range\ U+0\ to\ U+10FFFF)\ they\ will\ be\ output}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00241}00241\ \textcolor{comment}{//\ as\ '(Invalid\ Unicode\ 0xXXXXXXXX)'.\ If\ the\ string\ is\ in\ UTF16\ encoding}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00242}00242\ \textcolor{comment}{//\ and\ contains\ invalid\ UTF-\/16\ surrogate\ pairs,\ values\ in\ those\ pairs}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00243}00243\ \textcolor{comment}{//\ will\ be\ encoded\ as\ individual\ Unicode\ characters\ from\ Basic\ Normal\ Plane.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00244}00244\ \mbox{\hyperlink{gtest-port_8h_aa73be6f0ba4a7456180a94904ce17790}{GTEST\_API\_}}\ std::string\ \mbox{\hyperlink{namespacetesting_1_1internal_a05b8c86ff38243f34d8f839a0eadefb1}{WideStringToUtf8}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{wchar\_t}*\ str,\ \textcolor{keywordtype}{int}\ num\_chars);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00245}00245\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00246}00246\ \textcolor{comment}{//\ Reads\ the\ GTEST\_SHARD\_STATUS\_FILE\ environment\ variable,\ and\ creates\ the\ file}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00247}00247\ \textcolor{comment}{//\ if\ the\ variable\ is\ present.\ If\ a\ file\ already\ exists\ at\ this\ location,\ this}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00248}00248\ \textcolor{comment}{//\ function\ will\ write\ over\ it.\ If\ the\ variable\ is\ present,\ but\ the\ file\ cannot}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00249}00249\ \textcolor{comment}{//\ be\ created,\ prints\ an\ error\ and\ exits.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00250}00250\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetesting_1_1internal_a19b35b39782d41e6ef76e1910a3a502e}{WriteToShardStatusFileIfNeeded}}();}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00251}00251\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00252}00252\ \textcolor{comment}{//\ Checks\ whether\ sharding\ is\ enabled\ by\ examining\ the\ relevant}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00253}00253\ \textcolor{comment}{//\ environment\ variable\ values.\ If\ the\ variables\ are\ present,}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00254}00254\ \textcolor{comment}{//\ but\ inconsistent\ (e.g.,\ shard\_index\ >=\ total\_shards),\ prints}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00255}00255\ \textcolor{comment}{//\ an\ error\ and\ exits.\ If\ in\_subprocess\_for\_death\_test,\ sharding\ is}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00256}00256\ \textcolor{comment}{//\ disabled\ because\ it\ must\ only\ be\ applied\ to\ the\ original\ test}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00257}00257\ \textcolor{comment}{//\ process.\ Otherwise,\ we\ could\ filter\ out\ death\ tests\ we\ intended\ to\ execute.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00258}00258\ \mbox{\hyperlink{gtest-port_8h_aa73be6f0ba4a7456180a94904ce17790}{GTEST\_API\_}}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacetesting_1_1internal_a0fe41657b1d1ab7ec4e37ec07403ee6c}{ShouldShard}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ total\_shards\_str,}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00259}00259\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ shard\_index\_str,}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00260}00260\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ in\_subprocess\_for\_death\_test);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00261}00261\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00262}00262\ \textcolor{comment}{//\ Parses\ the\ environment\ variable\ var\ as\ an\ Int32.\ If\ it\ is\ unset,}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00263}00263\ \textcolor{comment}{//\ returns\ default\_val.\ If\ it\ is\ not\ an\ Int32,\ prints\ an\ error\ and}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00264}00264\ \textcolor{comment}{//\ and\ aborts.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00265}00265\ \mbox{\hyperlink{gtest-port_8h_aa73be6f0ba4a7456180a94904ce17790}{GTEST\_API\_}}\ \mbox{\hyperlink{namespacetesting_1_1internal_a8ee38faaf875f133358abaf9bc056cec}{Int32}}\ \mbox{\hyperlink{namespacetesting_1_1internal_aaa576613655c2f380278c255c3ec5fef}{Int32FromEnvOrDie}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ env\_var,\ \mbox{\hyperlink{namespacetesting_1_1internal_a8ee38faaf875f133358abaf9bc056cec}{Int32}}\ default\_val);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00266}00266\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00267}00267\ \textcolor{comment}{//\ Given\ the\ total\ number\ of\ shards,\ the\ shard\ index,\ and\ the\ test\ id,}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00268}00268\ \textcolor{comment}{//\ returns\ true\ iff\ the\ test\ should\ be\ run\ on\ this\ shard.\ The\ test\ id\ is}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00269}00269\ \textcolor{comment}{//\ some\ arbitrary\ but\ unique\ non-\/negative\ integer\ assigned\ to\ each\ test}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00270}00270\ \textcolor{comment}{//\ method.\ Assumes\ that\ 0\ <=\ shard\_index\ <\ total\_shards.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00271}00271\ \mbox{\hyperlink{gtest-port_8h_aa73be6f0ba4a7456180a94904ce17790}{GTEST\_API\_}}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacetesting_1_1internal_a437bd89f5bc532778d7467600e210395}{ShouldRunTestOnShard}}(}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00272}00272\ \ \ \ \ \textcolor{keywordtype}{int}\ total\_shards,\ \textcolor{keywordtype}{int}\ shard\_index,\ \textcolor{keywordtype}{int}\ test\_id);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00273}00273\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00274}00274\ \textcolor{comment}{//\ STL\ container\ utilities.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00275}00275\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00276}00276\ \textcolor{comment}{//\ Returns\ the\ number\ of\ elements\ in\ the\ given\ container\ that\ satisfy}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00277}00277\ \textcolor{comment}{//\ the\ given\ predicate.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00278}00278\ \textcolor{keyword}{template}\ <\textcolor{keyword}{class}\ Container,\ \textcolor{keyword}{typename}\ Predicate>}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00279}\mbox{\hyperlink{namespacetesting_1_1internal_a1e77a774d910346eff11a86d8df783a5}{00279}}\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetesting_1_1internal_a1e77a774d910346eff11a86d8df783a5}{CountIf}}(\textcolor{keyword}{const}\ Container\&\ c,\ Predicate\ predicate)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00280}00280\ \ \ \textcolor{comment}{//\ Implemented\ as\ an\ explicit\ loop\ since\ std::count\_if()\ in\ libCstd\ on}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00281}00281\ \ \ \textcolor{comment}{//\ Solaris\ has\ a\ non-\/standard\ signature.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00282}00282\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00283}00283\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{typename}\ Container::const\_iterator\ it\ =\ c.begin();\ it\ !=\ c.end();\ ++it)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00284}00284\ \ \ \ \ \textcolor{keywordflow}{if}\ (predicate(*it))}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00285}00285\ \ \ \ \ \ \ ++\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}};}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00286}00286\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00287}00287\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}};}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00288}00288\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00289}00289\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00290}00290\ \textcolor{comment}{//\ Applies\ a\ function/functor\ to\ each\ element\ in\ the\ container.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00291}00291\ \textcolor{keyword}{template}\ <\textcolor{keyword}{class}\ Container,\ \textcolor{keyword}{typename}\ Functor>}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00292}\mbox{\hyperlink{namespacetesting_1_1internal_a52f5504ed65d116201ccb8f99a44fd7e}{00292}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetesting_1_1internal_a52f5504ed65d116201ccb8f99a44fd7e}{ForEach}}(\textcolor{keyword}{const}\ Container\&\ c,\ Functor\ functor)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00293}00293\ \ \ std::for\_each(c.begin(),\ c.end(),\ functor);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00294}00294\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00295}00295\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00296}00296\ \textcolor{comment}{//\ Returns\ the\ i-\/th\ element\ of\ the\ vector,\ or\ default\_value\ if\ i\ is\ not}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00297}00297\ \textcolor{comment}{//\ in\ range\ [0,\ v.size()).}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00298}00298\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ E>}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00299}\mbox{\hyperlink{namespacetesting_1_1internal_a71fdd20a0686bea3dc0cdcd95e0bca1c}{00299}}\ \textcolor{keyword}{inline}\ E\ \mbox{\hyperlink{namespacetesting_1_1internal_a71fdd20a0686bea3dc0cdcd95e0bca1c}{GetElementOr}}(\textcolor{keyword}{const}\ std::vector<E>\&\ v,\ \textcolor{keywordtype}{int}\ i,\ E\ default\_value)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00300}00300\ \ \ \textcolor{keywordflow}{return}\ (i\ <\ 0\ ||\ i\ >=\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(v.size()))\ ?\ default\_value\ :\ v[i];}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00301}00301\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00302}00302\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00303}00303\ \textcolor{comment}{//\ Performs\ an\ in-\/place\ shuffle\ of\ a\ range\ of\ the\ vector's\ elements.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00304}00304\ \textcolor{comment}{//\ 'begin'\ and\ 'end'\ are\ element\ indices\ as\ an\ STL-\/style\ range;}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00305}00305\ \textcolor{comment}{//\ i.e.\ [begin,\ end)\ are\ shuffled,\ where\ 'end'\ ==\ size()\ means\ to}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00306}00306\ \textcolor{comment}{//\ shuffle\ to\ the\ end\ of\ the\ vector.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00307}00307\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ E>}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00308}\mbox{\hyperlink{namespacetesting_1_1internal_a0e1d3dc36138a591769412d4c7779861}{00308}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetesting_1_1internal_a0e1d3dc36138a591769412d4c7779861}{ShuffleRange}}(\mbox{\hyperlink{classtesting_1_1internal_1_1_random}{internal::Random}}*\ \mbox{\hyperlink{yubico__otp_8c_a7ba1784f91d04c32f9b3139bc6fd8137}{random}},\ \textcolor{keywordtype}{int}\ begin,\ \textcolor{keywordtype}{int}\ end,}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00309}00309\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::vector<E>*\ v)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00310}00310\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ size\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(v-\/>size());}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00311}00311\ \ \ \mbox{\hyperlink{gtest-port_8h_ab54343f0a36dc4cb0ce8a478dd7847b8}{GTEST\_CHECK\_}}(0\ <=\ begin\ \&\&\ begin\ <=\ size)}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00312}00312\ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}Invalid\ shuffle\ range\ start\ "{}}\ <<\ begin\ <<\ \textcolor{stringliteral}{"{}:\ must\ be\ in\ range\ [0,\ "{}}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00313}00313\ \ \ \ \ \ \ <<\ size\ <<\ \textcolor{stringliteral}{"{}]."{}};}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00314}00314\ \ \ \mbox{\hyperlink{gtest-port_8h_ab54343f0a36dc4cb0ce8a478dd7847b8}{GTEST\_CHECK\_}}(begin\ <=\ end\ \&\&\ end\ <=\ size)}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00315}00315\ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}Invalid\ shuffle\ range\ finish\ "{}}\ <<\ end\ <<\ \textcolor{stringliteral}{"{}:\ must\ be\ in\ range\ ["{}}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00316}00316\ \ \ \ \ \ \ <<\ begin\ <<\ \textcolor{stringliteral}{"{},\ "{}}\ <<\ size\ <<\ \textcolor{stringliteral}{"{}]."{}};}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00317}00317\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00318}00318\ \ \ \textcolor{comment}{//\ Fisher-\/Yates\ shuffle,\ from}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00319}00319\ \ \ \textcolor{comment}{//\ http://en.wikipedia.org/wiki/Fisher-\/Yates\_shuffle}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00320}00320\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ range\_width\ =\ end\ -\/\ begin;\ range\_width\ >=\ 2;\ range\_width-\/-\/)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00321}00321\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ last\_in\_range\ =\ begin\ +\ range\_width\ -\/\ 1;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00322}00322\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ selected\ =\ begin\ +\ \mbox{\hyperlink{yubico__otp_8c_a7ba1784f91d04c32f9b3139bc6fd8137}{random}}-\/>Generate(range\_width);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00323}00323\ \ \ \ \ \mbox{\hyperlink{namespacestd_abb7e41c7063536ff6eeee4bb5f66de6c}{std::swap}}((*v)[selected],\ (*v)[last\_in\_range]);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00324}00324\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00325}00325\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00326}00326\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00327}00327\ \textcolor{comment}{//\ Performs\ an\ in-\/place\ shuffle\ of\ the\ vector's\ elements.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00328}00328\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ E>}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00329}\mbox{\hyperlink{namespacetesting_1_1internal_a90d9e6ffe8522a7eb1b2ce9b1a0c4673}{00329}}\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetesting_1_1internal_a90d9e6ffe8522a7eb1b2ce9b1a0c4673}{Shuffle}}(\mbox{\hyperlink{classtesting_1_1internal_1_1_random}{internal::Random}}*\ \mbox{\hyperlink{yubico__otp_8c_a7ba1784f91d04c32f9b3139bc6fd8137}{random}},\ std::vector<E>*\ v)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00330}00330\ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a0e1d3dc36138a591769412d4c7779861}{ShuffleRange}}(\mbox{\hyperlink{yubico__otp_8c_a7ba1784f91d04c32f9b3139bc6fd8137}{random}},\ 0,\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(v-\/>size()),\ v);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00331}00331\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00332}00332\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00333}00333\ \textcolor{comment}{//\ A\ function\ for\ deleting\ an\ object.\ \ Handy\ for\ being\ used\ as\ a}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00334}00334\ \textcolor{comment}{//\ functor.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00335}00335\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00336}00336\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ Delete(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ x)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00337}00337\ \ \ \textcolor{keyword}{delete}\ x;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00338}00338\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00339}00339\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00340}00340\ \textcolor{comment}{//\ A\ predicate\ that\ checks\ the\ key\ of\ a\ TestProperty\ against\ a\ known\ key.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00341}00341\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00342}00342\ \textcolor{comment}{//\ TestPropertyKeyIs\ is\ copyable.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00343}\mbox{\hyperlink{classtesting_1_1internal_1_1_test_property_key_is}{00343}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classtesting_1_1internal_1_1_test_property_key_is}{TestPropertyKeyIs}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00344}00344\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00345}00345\ \ \ \textcolor{comment}{//\ Constructor.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00346}00346\ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00347}00347\ \ \ \textcolor{comment}{//\ TestPropertyKeyIs\ has\ NO\ default\ constructor.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00348}\mbox{\hyperlink{classtesting_1_1internal_1_1_test_property_key_is_a509ed1271caa1032e40c5d811b3da385}{00348}}\ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_test_property_key_is_a509ed1271caa1032e40c5d811b3da385}{TestPropertyKeyIs}}(\textcolor{keyword}{const}\ std::string\&\ key)\ :\ key\_(key)\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00349}00349\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00350}00350\ \ \ \textcolor{comment}{//\ Returns\ true\ iff\ the\ test\ name\ of\ test\ property\ matches\ on\ key\_.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00351}\mbox{\hyperlink{classtesting_1_1internal_1_1_test_property_key_is_abf5eb5bf22065e0614ffe36d093e885e}{00351}}\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_test_property_key_is_abf5eb5bf22065e0614ffe36d093e885e}{operator()}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1_test_property}{TestProperty}}\&\ test\_property)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00352}00352\ \ \ \ \ \textcolor{keywordflow}{return}\ test\_property.\mbox{\hyperlink{classtesting_1_1_test_property_a76de43828e3ac38d01f8e7bd9e4f99bc}{key}}()\ ==\ key\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00353}00353\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00354}00354\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00355}00355\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00356}00356\ \ \ std::string\ key\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00357}00357\ \};}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00358}00358\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00359}00359\ \textcolor{comment}{//\ Class\ UnitTestOptions.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00360}00360\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00361}00361\ \textcolor{comment}{//\ This\ class\ contains\ functions\ for\ processing\ options\ the\ user}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00362}00362\ \textcolor{comment}{//\ specifies\ when\ running\ the\ tests.\ \ It\ has\ only\ static\ members.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00363}00363\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00364}00364\ \textcolor{comment}{//\ In\ most\ cases,\ the\ user\ can\ specify\ an\ option\ using\ either\ an}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00365}00365\ \textcolor{comment}{//\ environment\ variable\ or\ a\ command\ line\ flag.\ \ E.g.\ you\ can\ set\ the}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00366}00366\ \textcolor{comment}{//\ test\ filter\ using\ either\ GTEST\_FILTER\ or\ -\/-\/gtest\_filter.\ \ If\ both}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00367}00367\ \textcolor{comment}{//\ the\ variable\ and\ the\ flag\ are\ present,\ the\ latter\ overrides\ the}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00368}00368\ \textcolor{comment}{//\ former.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00369}\mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_options}{00369}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{gtest-port_8h_aa73be6f0ba4a7456180a94904ce17790}{GTEST\_API\_}}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_options}{UnitTestOptions}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00370}00370\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00371}00371\ \ \ \textcolor{comment}{//\ Functions\ for\ processing\ the\ gtest\_output\ flag.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00372}00372\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00373}00373\ \ \ \textcolor{comment}{//\ Returns\ the\ output\ format,\ or\ "{}"{}\ for\ normal\ printed\ output.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00374}00374\ \ \ \textcolor{keyword}{static}\ std::string\ GetOutputFormat();}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00375}00375\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00376}00376\ \ \ \textcolor{comment}{//\ Returns\ the\ absolute\ path\ of\ the\ requested\ output\ file,\ or\ the}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00377}00377\ \ \ \textcolor{comment}{//\ default\ (test\_detail.xml\ in\ the\ original\ working\ directory)\ if}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00378}00378\ \ \ \textcolor{comment}{//\ none\ was\ explicitly\ specified.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00379}00379\ \ \ \textcolor{keyword}{static}\ std::string\ GetAbsolutePathToOutputFile();}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00380}00380\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00381}00381\ \ \ \textcolor{comment}{//\ Functions\ for\ processing\ the\ gtest\_filter\ flag.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00382}00382\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00383}00383\ \ \ \textcolor{comment}{//\ Returns\ true\ iff\ the\ wildcard\ pattern\ matches\ the\ string.\ \ The}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00384}00384\ \ \ \textcolor{comment}{//\ first\ ':'\ or\ '\(\backslash\)0'\ character\ in\ pattern\ marks\ the\ end\ of\ it.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00385}00385\ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00386}00386\ \ \ \textcolor{comment}{//\ This\ recursive\ algorithm\ isn't\ very\ efficient,\ but\ is\ clear\ and}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00387}00387\ \ \ \textcolor{comment}{//\ works\ well\ enough\ for\ matching\ test\ names,\ which\ are\ short.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00388}00388\ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{bool}\ PatternMatchesString(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *pattern,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *str);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00389}00389\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00390}00390\ \ \ \textcolor{comment}{//\ Returns\ true\ iff\ the\ user-\/specified\ filter\ matches\ the\ test\ case}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00391}00391\ \ \ \textcolor{comment}{//\ name\ and\ the\ test\ name.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00392}00392\ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{bool}\ FilterMatchesTest(\textcolor{keyword}{const}\ std::string\ \&test\_case\_name,}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00393}00393\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::string\ \&test\_name);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00394}00394\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00395}00395\ \textcolor{preprocessor}{\#if\ GTEST\_OS\_WINDOWS}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00396}00396\ \ \ \textcolor{comment}{//\ Function\ for\ supporting\ the\ gtest\_catch\_exception\ flag.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00397}00397\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00398}00398\ \ \ \textcolor{comment}{//\ Returns\ EXCEPTION\_EXECUTE\_HANDLER\ if\ Google\ Test\ should\ handle\ the}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00399}00399\ \ \ \textcolor{comment}{//\ given\ SEH\ exception,\ or\ EXCEPTION\_CONTINUE\_SEARCH\ otherwise.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00400}00400\ \ \ \textcolor{comment}{//\ This\ function\ is\ useful\ as\ an\ \_\_except\ condition.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00401}00401\ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ GTestShouldProcessSEH(DWORD\ exception\_code);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00402}00402\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_OS\_WINDOWS}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00403}00403\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00404}00404\ \ \ \textcolor{comment}{//\ Returns\ true\ if\ "{}name"{}\ matches\ the\ ':'\ separated\ list\ of\ glob-\/style}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00405}00405\ \ \ \textcolor{comment}{//\ filters\ in\ "{}filter"{}.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00406}00406\ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{bool}\ MatchesFilter(\textcolor{keyword}{const}\ std::string\&\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ filter);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00407}00407\ \};}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00408}00408\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00409}00409\ \textcolor{comment}{//\ Returns\ the\ current\ application's\ name,\ removing\ directory\ path\ if\ that}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00410}00410\ \textcolor{comment}{//\ is\ present.\ \ Used\ by\ UnitTestOptions::GetOutputFile.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00411}00411\ \mbox{\hyperlink{gtest-port_8h_aa73be6f0ba4a7456180a94904ce17790}{GTEST\_API\_}}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{FilePath}}\ \mbox{\hyperlink{namespacetesting_1_1internal_a7a2bbf069f75bc99873976ad6fc356ad}{GetCurrentExecutableName}}();}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00412}00412\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00413}00413\ \textcolor{comment}{//\ The\ role\ interface\ for\ getting\ the\ OS\ stack\ trace\ as\ a\ string.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00414}\mbox{\hyperlink{classtesting_1_1internal_1_1_os_stack_trace_getter_interface}{00414}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classtesting_1_1internal_1_1_os_stack_trace_getter_interface}{OsStackTraceGetterInterface}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00415}00415\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00416}\mbox{\hyperlink{classtesting_1_1internal_1_1_os_stack_trace_getter_interface_afbe9eb0ca8775fbb98ff0720011b6708}{00416}}\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_os_stack_trace_getter_interface_afbe9eb0ca8775fbb98ff0720011b6708}{OsStackTraceGetterInterface}}()\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00417}\mbox{\hyperlink{classtesting_1_1internal_1_1_os_stack_trace_getter_interface_a193f4a1de4af9b78010c659912df5a15}{00417}}\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_os_stack_trace_getter_interface_a193f4a1de4af9b78010c659912df5a15}{\string~OsStackTraceGetterInterface}}()\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00418}00418\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00419}00419\ \ \ \textcolor{comment}{//\ Returns\ the\ current\ OS\ stack\ trace\ as\ an\ std::string.\ \ Parameters:}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00420}00420\ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00421}00421\ \ \ \textcolor{comment}{//\ \ \ max\_depth\ \ -\/\ the\ maximum\ number\ of\ stack\ frames\ to\ be\ included}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00422}00422\ \ \ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ in\ the\ trace.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00423}00423\ \ \ \textcolor{comment}{//\ \ \ skip\_count\ -\/\ the\ number\ of\ top\ frames\ to\ be\ skipped;\ doesn't\ count}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00424}00424\ \ \ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ against\ max\_depth.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00425}\mbox{\hyperlink{classtesting_1_1internal_1_1_os_stack_trace_getter_interface_a0c41724e4e47647a7fe2ace8e70c0ec7}{00425}}\ \ \ \textcolor{keyword}{virtual}\ std::string\ \mbox{\hyperlink{classtesting_1_1internal_1_1_os_stack_trace_getter_interface_a0c41724e4e47647a7fe2ace8e70c0ec7}{CurrentStackTrace}}(\textcolor{keywordtype}{int}\ max\_depth,\ \textcolor{keywordtype}{int}\ skip\_count)\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00426}00426\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00427}00427\ \ \ \textcolor{comment}{//\ UponLeavingGTest()\ should\ be\ called\ immediately\ before\ Google\ Test\ calls}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00428}00428\ \ \ \textcolor{comment}{//\ user\ code.\ It\ saves\ some\ information\ about\ the\ current\ stack\ that}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00429}00429\ \ \ \textcolor{comment}{//\ CurrentStackTrace()\ will\ use\ to\ find\ and\ hide\ Google\ Test\ stack\ frames.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00430}\mbox{\hyperlink{classtesting_1_1internal_1_1_os_stack_trace_getter_interface_a791bd120428b5a53d5eeba1b27296a39}{00430}}\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_os_stack_trace_getter_interface_a791bd120428b5a53d5eeba1b27296a39}{UponLeavingGTest}}()\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00431}00431\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00432}00432\ \ \ \textcolor{comment}{//\ This\ string\ is\ inserted\ in\ place\ of\ stack\ frames\ that\ are\ part\ of}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00433}00433\ \ \ \textcolor{comment}{//\ Google\ Test's\ implementation.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00434}\mbox{\hyperlink{classtesting_1_1internal_1_1_os_stack_trace_getter_interface_a669c49ce9ae05935e70bddb35a81ceb8}{00434}}\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_os_stack_trace_getter_interface_a669c49ce9ae05935e70bddb35a81ceb8}{kElidedFramesMarker}};}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00435}00435\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00436}00436\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00437}00437\ \ \ \mbox{\hyperlink{gtest-port_8h_aed8c1888c32b588b0681e88b95031e29}{GTEST\_DISALLOW\_COPY\_AND\_ASSIGN\_}}(\mbox{\hyperlink{classtesting_1_1internal_1_1_os_stack_trace_getter_interface}{OsStackTraceGetterInterface}});}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00438}00438\ \};}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00439}00439\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00440}00440\ \textcolor{comment}{//\ A\ working\ implementation\ of\ the\ OsStackTraceGetterInterface\ interface.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00441}\mbox{\hyperlink{classtesting_1_1internal_1_1_os_stack_trace_getter}{00441}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classtesting_1_1internal_1_1_os_stack_trace_getter}{OsStackTraceGetter}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_os_stack_trace_getter_interface}{OsStackTraceGetterInterface}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00442}00442\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00443}\mbox{\hyperlink{classtesting_1_1internal_1_1_os_stack_trace_getter_aa40b3120c0ae4ec640de8b577ab7da17}{00443}}\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_os_stack_trace_getter_aa40b3120c0ae4ec640de8b577ab7da17}{OsStackTraceGetter}}()\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00444}00444\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00445}00445\ \ \ \textcolor{keyword}{virtual}\ std::string\ \mbox{\hyperlink{classtesting_1_1internal_1_1_os_stack_trace_getter_a48bb58971e05251159a590398132a0f8}{CurrentStackTrace}}(\textcolor{keywordtype}{int}\ max\_depth,\ \textcolor{keywordtype}{int}\ skip\_count);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00446}00446\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_os_stack_trace_getter_a8ae0237629b6b5672b4b5ef8e292205c}{UponLeavingGTest}}();}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00447}00447\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00448}00448\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00449}00449\ \ \ \mbox{\hyperlink{gtest-port_8h_aed8c1888c32b588b0681e88b95031e29}{GTEST\_DISALLOW\_COPY\_AND\_ASSIGN\_}}(\mbox{\hyperlink{classtesting_1_1internal_1_1_os_stack_trace_getter}{OsStackTraceGetter}});}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00450}00450\ \};}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00451}00451\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00452}00452\ \textcolor{comment}{//\ Information\ about\ a\ Google\ Test\ trace\ point.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00453}\mbox{\hyperlink{structtesting_1_1internal_1_1_trace_info}{00453}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structtesting_1_1internal_1_1_trace_info}{TraceInfo}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00454}\mbox{\hyperlink{structtesting_1_1internal_1_1_trace_info_a5d801209d3c0840aa55cfd4b67504254}{00454}}\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{structtesting_1_1internal_1_1_trace_info_a5d801209d3c0840aa55cfd4b67504254}{file}};}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00455}\mbox{\hyperlink{structtesting_1_1internal_1_1_trace_info_ae9d269de1b77f4a3180d0d34acb4d7ff}{00455}}\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{structtesting_1_1internal_1_1_trace_info_ae9d269de1b77f4a3180d0d34acb4d7ff}{line}};}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00456}\mbox{\hyperlink{structtesting_1_1internal_1_1_trace_info_a39e74f39ce6d5fdbac799abdb1c27f90}{00456}}\ \ \ std::string\ \mbox{\hyperlink{structtesting_1_1internal_1_1_trace_info_a39e74f39ce6d5fdbac799abdb1c27f90}{message}};}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00457}00457\ \};}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00458}00458\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00459}00459\ \textcolor{comment}{//\ This\ is\ the\ default\ global\ test\ part\ result\ reporter\ used\ in\ UnitTestImpl.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00460}00460\ \textcolor{comment}{//\ This\ class\ should\ only\ be\ used\ by\ UnitTestImpl.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00461}\mbox{\hyperlink{classtesting_1_1internal_1_1_default_global_test_part_result_reporter}{00461}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classtesting_1_1internal_1_1_default_global_test_part_result_reporter}{DefaultGlobalTestPartResultReporter}}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00462}00462\ \ \ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1_test_part_result_reporter_interface}{TestPartResultReporterInterface}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00463}00463\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00464}00464\ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_default_global_test_part_result_reporter_a3900ea7f34b34afd48c7d1d0312a1488}{DefaultGlobalTestPartResultReporter}}(\mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl}{UnitTestImpl}}*\ unit\_test);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00465}00465\ \ \ \textcolor{comment}{//\ Implements\ the\ TestPartResultReporterInterface.\ Reports\ the\ test\ part}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00466}00466\ \ \ \textcolor{comment}{//\ result\ in\ the\ current\ test.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00467}00467\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_default_global_test_part_result_reporter_a6081576a23b964cfecab1e424d8044fc}{ReportTestPartResult}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1_test_part_result}{TestPartResult}}\&\ result);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00468}00468\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00469}00469\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00470}00470\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl}{UnitTestImpl}}*\ \textcolor{keyword}{const}\ unit\_test\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00471}00471\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00472}00472\ \ \ \mbox{\hyperlink{gtest-port_8h_aed8c1888c32b588b0681e88b95031e29}{GTEST\_DISALLOW\_COPY\_AND\_ASSIGN\_}}(\mbox{\hyperlink{classtesting_1_1internal_1_1_default_global_test_part_result_reporter}{DefaultGlobalTestPartResultReporter}});}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00473}00473\ \};}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00474}00474\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00475}00475\ \textcolor{comment}{//\ This\ is\ the\ default\ per\ thread\ test\ part\ result\ reporter\ used\ in}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00476}00476\ \textcolor{comment}{//\ UnitTestImpl.\ This\ class\ should\ only\ be\ used\ by\ UnitTestImpl.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00477}\mbox{\hyperlink{classtesting_1_1internal_1_1_default_per_thread_test_part_result_reporter}{00477}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classtesting_1_1internal_1_1_default_per_thread_test_part_result_reporter}{DefaultPerThreadTestPartResultReporter}}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00478}00478\ \ \ \ \ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1_test_part_result_reporter_interface}{TestPartResultReporterInterface}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00479}00479\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00480}00480\ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_default_per_thread_test_part_result_reporter_a968a846e5a90d2ffea8b2ce2746099bd}{DefaultPerThreadTestPartResultReporter}}(\mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl}{UnitTestImpl}}*\ unit\_test);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00481}00481\ \ \ \textcolor{comment}{//\ Implements\ the\ TestPartResultReporterInterface.\ The\ implementation\ just}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00482}00482\ \ \ \textcolor{comment}{//\ delegates\ to\ the\ current\ global\ test\ part\ result\ reporter\ of\ *unit\_test\_.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00483}00483\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_default_per_thread_test_part_result_reporter_ac6dc08eadc4e5a2a64a91d0b6c6b3aad}{ReportTestPartResult}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1_test_part_result}{TestPartResult}}\&\ result);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00484}00484\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00485}00485\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00486}00486\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl}{UnitTestImpl}}*\ \textcolor{keyword}{const}\ unit\_test\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00487}00487\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00488}00488\ \ \ \mbox{\hyperlink{gtest-port_8h_aed8c1888c32b588b0681e88b95031e29}{GTEST\_DISALLOW\_COPY\_AND\_ASSIGN\_}}(\mbox{\hyperlink{classtesting_1_1internal_1_1_default_per_thread_test_part_result_reporter}{DefaultPerThreadTestPartResultReporter}});}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00489}00489\ \};}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00490}00490\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00491}00491\ \textcolor{comment}{//\ The\ private\ implementation\ of\ the\ UnitTest\ class.\ \ We\ don't\ protect}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00492}00492\ \textcolor{comment}{//\ the\ methods\ under\ a\ mutex,\ as\ this\ class\ is\ not\ accessible\ by\ a}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00493}00493\ \textcolor{comment}{//\ user\ and\ the\ UnitTest\ class\ that\ delegates\ work\ to\ this\ class\ does}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00494}00494\ \textcolor{comment}{//\ proper\ locking.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00495}\mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl}{00495}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{gtest-port_8h_aa73be6f0ba4a7456180a94904ce17790}{GTEST\_API\_}}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl}{UnitTestImpl}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00496}00496\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00497}00497\ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl}{UnitTestImpl}}(\mbox{\hyperlink{classtesting_1_1_unit_test}{UnitTest}}*\ parent);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00498}00498\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl}{\string~UnitTestImpl}}();}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00499}00499\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00500}00500\ \ \ \textcolor{comment}{//\ There\ are\ two\ different\ ways\ to\ register\ your\ own\ TestPartResultReporter.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00501}00501\ \ \ \textcolor{comment}{//\ You\ can\ register\ your\ own\ repoter\ to\ listen\ either\ only\ for\ test\ results}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00502}00502\ \ \ \textcolor{comment}{//\ from\ the\ current\ thread\ or\ for\ results\ from\ all\ threads.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00503}00503\ \ \ \textcolor{comment}{//\ By\ default,\ each\ per-\/thread\ test\ result\ repoter\ just\ passes\ a\ new}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00504}00504\ \ \ \textcolor{comment}{//\ TestPartResult\ to\ the\ global\ test\ result\ reporter,\ which\ registers\ the}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00505}00505\ \ \ \textcolor{comment}{//\ test\ part\ result\ for\ the\ currently\ running\ test.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00506}00506\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00507}00507\ \ \ \textcolor{comment}{//\ Returns\ the\ global\ test\ part\ result\ reporter.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00508}00508\ \ \ \mbox{\hyperlink{classtesting_1_1_test_part_result_reporter_interface}{TestPartResultReporterInterface}}*\ GetGlobalTestPartResultReporter();}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00509}00509\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00510}00510\ \ \ \textcolor{comment}{//\ Sets\ the\ global\ test\ part\ result\ reporter.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00511}00511\ \ \ \textcolor{keywordtype}{void}\ SetGlobalTestPartResultReporter(}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00512}00512\ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1_test_part_result_reporter_interface}{TestPartResultReporterInterface}}*\ reporter);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00513}00513\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00514}00514\ \ \ \textcolor{comment}{//\ Returns\ the\ test\ part\ result\ reporter\ for\ the\ current\ thread.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00515}00515\ \ \ \mbox{\hyperlink{classtesting_1_1_test_part_result_reporter_interface}{TestPartResultReporterInterface}}*\ GetTestPartResultReporterForCurrentThread();}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00516}00516\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00517}00517\ \ \ \textcolor{comment}{//\ Sets\ the\ test\ part\ result\ reporter\ for\ the\ current\ thread.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00518}00518\ \ \ \textcolor{keywordtype}{void}\ SetTestPartResultReporterForCurrentThread(}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00519}00519\ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1_test_part_result_reporter_interface}{TestPartResultReporterInterface}}*\ reporter);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00520}00520\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00521}00521\ \ \ \textcolor{comment}{//\ Gets\ the\ number\ of\ successful\ test\ cases.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00522}00522\ \ \ \textcolor{keywordtype}{int}\ successful\_test\_case\_count()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00523}00523\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00524}00524\ \ \ \textcolor{comment}{//\ Gets\ the\ number\ of\ failed\ test\ cases.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00525}00525\ \ \ \textcolor{keywordtype}{int}\ failed\_test\_case\_count()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00526}00526\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00527}00527\ \ \ \textcolor{comment}{//\ Gets\ the\ number\ of\ all\ test\ cases.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00528}00528\ \ \ \textcolor{keywordtype}{int}\ total\_test\_case\_count()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00529}00529\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00530}00530\ \ \ \textcolor{comment}{//\ Gets\ the\ number\ of\ all\ test\ cases\ that\ contain\ at\ least\ one\ test}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00531}00531\ \ \ \textcolor{comment}{//\ that\ should\ run.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00532}00532\ \ \ \textcolor{keywordtype}{int}\ test\_case\_to\_run\_count()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00533}00533\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00534}00534\ \ \ \textcolor{comment}{//\ Gets\ the\ number\ of\ successful\ tests.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00535}00535\ \ \ \textcolor{keywordtype}{int}\ successful\_test\_count()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00536}00536\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00537}00537\ \ \ \textcolor{comment}{//\ Gets\ the\ number\ of\ failed\ tests.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00538}00538\ \ \ \textcolor{keywordtype}{int}\ failed\_test\_count()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00539}00539\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00540}00540\ \ \ \textcolor{comment}{//\ Gets\ the\ number\ of\ disabled\ tests\ that\ will\ be\ reported\ in\ the\ XML\ report.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00541}00541\ \ \ \textcolor{keywordtype}{int}\ reportable\_disabled\_test\_count()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00542}00542\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00543}00543\ \ \ \textcolor{comment}{//\ Gets\ the\ number\ of\ disabled\ tests.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00544}00544\ \ \ \textcolor{keywordtype}{int}\ disabled\_test\_count()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00545}00545\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00546}00546\ \ \ \textcolor{comment}{//\ Gets\ the\ number\ of\ tests\ to\ be\ printed\ in\ the\ XML\ report.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00547}00547\ \ \ \textcolor{keywordtype}{int}\ reportable\_test\_count()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00548}00548\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00549}00549\ \ \ \textcolor{comment}{//\ Gets\ the\ number\ of\ all\ tests.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00550}00550\ \ \ \textcolor{keywordtype}{int}\ total\_test\_count()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00551}00551\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00552}00552\ \ \ \textcolor{comment}{//\ Gets\ the\ number\ of\ tests\ that\ should\ run.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00553}00553\ \ \ \textcolor{keywordtype}{int}\ test\_to\_run\_count()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00554}00554\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00555}00555\ \ \ \textcolor{comment}{//\ Gets\ the\ time\ of\ the\ test\ program\ start,\ in\ ms\ from\ the\ start\ of\ the}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00556}00556\ \ \ \textcolor{comment}{//\ UNIX\ epoch.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00557}\mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl_abb02dfd689760c6323acec725d9631d5}{00557}}\ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a66a845df404b38fe85c5e14a069f255a}{TimeInMillis}}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl_abb02dfd689760c6323acec725d9631d5}{start\_timestamp}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ start\_timestamp\_;\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00558}00558\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00559}00559\ \ \ \textcolor{comment}{//\ Gets\ the\ elapsed\ time,\ in\ milliseconds.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00560}\mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl_a4376881063f945dcc8ec4dbb38b5ecc1}{00560}}\ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a66a845df404b38fe85c5e14a069f255a}{TimeInMillis}}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl_a4376881063f945dcc8ec4dbb38b5ecc1}{elapsed\_time}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ elapsed\_time\_;\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00561}00561\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00562}00562\ \ \ \textcolor{comment}{//\ Returns\ true\ iff\ the\ unit\ test\ passed\ (i.e.\ all\ test\ cases\ passed).}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00563}\mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl_ae8e461369acfec902da382bc02297fe5}{00563}}\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl_ae8e461369acfec902da382bc02297fe5}{Passed}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ !Failed();\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00564}00564\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00565}00565\ \ \ \textcolor{comment}{//\ Returns\ true\ iff\ the\ unit\ test\ failed\ (i.e.\ some\ test\ case\ failed}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00566}00566\ \ \ \textcolor{comment}{//\ or\ something\ outside\ of\ all\ tests\ failed).}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00567}\mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl_a0c95d1b56b5f33057afc516db05ac313}{00567}}\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl_a0c95d1b56b5f33057afc516db05ac313}{Failed}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00568}00568\ \ \ \ \ \textcolor{keywordflow}{return}\ failed\_test\_case\_count()\ >\ 0\ ||\ ad\_hoc\_test\_result()-\/>Failed();}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00569}00569\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00570}00570\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00571}00571\ \ \ \textcolor{comment}{//\ Gets\ the\ i-\/th\ test\ case\ among\ all\ the\ test\ cases.\ i\ can\ range\ from\ 0\ to}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00572}00572\ \ \ \textcolor{comment}{//\ total\_test\_case\_count()\ -\/\ 1.\ If\ i\ is\ not\ in\ that\ range,\ returns\ NULL.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00573}\mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl_ac068f08191712109d720fb4b020cb79f}{00573}}\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1_test_case}{TestCase}}*\ \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl_ac068f08191712109d720fb4b020cb79f}{GetTestCase}}(\textcolor{keywordtype}{int}\ i)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00574}00574\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ index\ =\ GetElementOr(test\_case\_indices\_,\ i,\ -\/1);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00575}00575\ \ \ \ \ \textcolor{keywordflow}{return}\ index\ <\ 0\ ?\ NULL\ :\ test\_cases\_[i];}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00576}00576\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00577}00577\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00578}00578\ \ \ \textcolor{comment}{//\ Gets\ the\ i-\/th\ test\ case\ among\ all\ the\ test\ cases.\ i\ can\ range\ from\ 0\ to}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00579}00579\ \ \ \textcolor{comment}{//\ total\_test\_case\_count()\ -\/\ 1.\ If\ i\ is\ not\ in\ that\ range,\ returns\ NULL.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00580}\mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl_a0afbf2899759cf7ffeda65a0c828eac7}{00580}}\ \ \ \mbox{\hyperlink{classtesting_1_1_test_case}{TestCase}}*\ \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl_a0afbf2899759cf7ffeda65a0c828eac7}{GetMutableTestCase}}(\textcolor{keywordtype}{int}\ i)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00581}00581\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ index\ =\ GetElementOr(test\_case\_indices\_,\ i,\ -\/1);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00582}00582\ \ \ \ \ \textcolor{keywordflow}{return}\ index\ <\ 0\ ?\ NULL\ :\ test\_cases\_[index];}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00583}00583\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00584}00584\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00585}00585\ \ \ \textcolor{comment}{//\ Provides\ access\ to\ the\ event\ listener\ list.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00586}\mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl_a22544d28679e9d1e2eaa3735607c8b63}{00586}}\ \ \ \mbox{\hyperlink{classtesting_1_1_test_event_listeners}{TestEventListeners}}*\ \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl_a22544d28679e9d1e2eaa3735607c8b63}{listeners}}()\ \{\ \textcolor{keywordflow}{return}\ \&listeners\_;\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00587}00587\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00588}00588\ \ \ \textcolor{comment}{//\ Returns\ the\ TestResult\ for\ the\ test\ that's\ currently\ running,\ or}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00589}00589\ \ \ \textcolor{comment}{//\ the\ TestResult\ for\ the\ ad\ hoc\ test\ if\ no\ test\ is\ running.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00590}00590\ \ \ \mbox{\hyperlink{classtesting_1_1_test_result}{TestResult}}*\ current\_test\_result();}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00591}00591\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00592}00592\ \ \ \textcolor{comment}{//\ Returns\ the\ TestResult\ for\ the\ ad\ hoc\ test.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00593}\mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl_a79b8b8c8b89e361faf2e9a3028447407}{00593}}\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1_test_result}{TestResult}}*\ \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl_a79b8b8c8b89e361faf2e9a3028447407}{ad\_hoc\_test\_result}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \&ad\_hoc\_test\_result\_;\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00594}00594\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00595}00595\ \ \ \textcolor{comment}{//\ Sets\ the\ OS\ stack\ trace\ getter.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00596}00596\ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00597}00597\ \ \ \textcolor{comment}{//\ Does\ nothing\ if\ the\ input\ and\ the\ current\ OS\ stack\ trace\ getter}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00598}00598\ \ \ \textcolor{comment}{//\ are\ the\ same;\ otherwise,\ deletes\ the\ old\ getter\ and\ makes\ the}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00599}00599\ \ \ \textcolor{comment}{//\ input\ the\ current\ getter.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00600}00600\ \ \ \textcolor{keywordtype}{void}\ set\_os\_stack\_trace\_getter(\mbox{\hyperlink{classtesting_1_1internal_1_1_os_stack_trace_getter_interface}{OsStackTraceGetterInterface}}*\ getter);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00601}00601\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00602}00602\ \ \ \textcolor{comment}{//\ Returns\ the\ current\ OS\ stack\ trace\ getter\ if\ it\ is\ not\ NULL;}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00603}00603\ \ \ \textcolor{comment}{//\ otherwise,\ creates\ an\ OsStackTraceGetter,\ makes\ it\ the\ current}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00604}00604\ \ \ \textcolor{comment}{//\ getter,\ and\ returns\ it.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00605}00605\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_os_stack_trace_getter_interface}{OsStackTraceGetterInterface}}*\ os\_stack\_trace\_getter();}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00606}00606\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00607}00607\ \ \ \textcolor{comment}{//\ Returns\ the\ current\ OS\ stack\ trace\ as\ an\ std::string.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00608}00608\ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00609}00609\ \ \ \textcolor{comment}{//\ The\ maximum\ number\ of\ stack\ frames\ to\ be\ included\ is\ specified\ by}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00610}00610\ \ \ \textcolor{comment}{//\ the\ gtest\_stack\_trace\_depth\ flag.\ \ The\ skip\_count\ parameter}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00611}00611\ \ \ \textcolor{comment}{//\ specifies\ the\ number\ of\ top\ frames\ to\ be\ skipped,\ which\ doesn't}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00612}00612\ \ \ \textcolor{comment}{//\ count\ against\ the\ number\ of\ frames\ to\ be\ included.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00613}00613\ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00614}00614\ \ \ \textcolor{comment}{//\ For\ example,\ if\ Foo()\ calls\ Bar(),\ which\ in\ turn\ calls}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00615}00615\ \ \ \textcolor{comment}{//\ CurrentOsStackTraceExceptTop(1),\ Foo()\ will\ be\ included\ in\ the}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00616}00616\ \ \ \textcolor{comment}{//\ trace\ but\ Bar()\ and\ CurrentOsStackTraceExceptTop()\ won't.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00617}00617\ \ \ std::string\ CurrentOsStackTraceExceptTop(\textcolor{keywordtype}{int}\ skip\_count)\ \mbox{\hyperlink{gtest-port_8h_a9945cbd967fbccb15f8de711f58955c7}{GTEST\_NO\_INLINE\_}};}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00618}00618\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00619}00619\ \ \ \textcolor{comment}{//\ Finds\ and\ returns\ a\ TestCase\ with\ the\ given\ name.\ \ If\ one\ doesn't}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00620}00620\ \ \ \textcolor{comment}{//\ exist,\ creates\ one\ and\ returns\ it.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00621}00621\ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00622}00622\ \ \ \textcolor{comment}{//\ Arguments:}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00623}00623\ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00624}00624\ \ \ \textcolor{comment}{//\ \ \ test\_case\_name:\ name\ of\ the\ test\ case}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00625}00625\ \ \ \textcolor{comment}{//\ \ \ type\_param:\ \ \ \ \ the\ name\ of\ the\ test's\ type\ parameter,\ or\ NULL\ if}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00626}00626\ \ \ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ this\ is\ not\ a\ typed\ or\ a\ type-\/parameterized\ test.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00627}00627\ \ \ \textcolor{comment}{//\ \ \ set\_up\_tc:\ \ \ \ \ \ pointer\ to\ the\ function\ that\ sets\ up\ the\ test\ case}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00628}00628\ \ \ \textcolor{comment}{//\ \ \ tear\_down\_tc:\ \ \ pointer\ to\ the\ function\ that\ tears\ down\ the\ test\ case}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00629}00629\ \ \ \mbox{\hyperlink{classtesting_1_1_test_case}{TestCase}}*\ GetTestCase(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ test\_case\_name,}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00630}00630\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ type\_param,}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00631}00631\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1_test_a36171f8ba2144d4b490bf2e8730532ca}{Test::SetUpTestCaseFunc}}\ set\_up\_tc,}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00632}00632\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1_test_aa28aa27f32f86d8575435b36c4088d81}{Test::TearDownTestCaseFunc}}\ tear\_down\_tc);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00633}00633\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00634}00634\ \ \ \textcolor{comment}{//\ Adds\ a\ TestInfo\ to\ the\ unit\ test.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00635}00635\ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00636}00636\ \ \ \textcolor{comment}{//\ Arguments:}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00637}00637\ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00638}00638\ \ \ \textcolor{comment}{//\ \ \ set\_up\_tc:\ \ \ \ pointer\ to\ the\ function\ that\ sets\ up\ the\ test\ case}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00639}00639\ \ \ \textcolor{comment}{//\ \ \ tear\_down\_tc:\ pointer\ to\ the\ function\ that\ tears\ down\ the\ test\ case}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00640}00640\ \ \ \textcolor{comment}{//\ \ \ test\_info:\ \ \ \ the\ TestInfo\ object}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00641}\mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl_a1cc87dfc91377ebec4a3ff4192dfcba9}{00641}}\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl_a1cc87dfc91377ebec4a3ff4192dfcba9}{AddTestInfo}}(\mbox{\hyperlink{classtesting_1_1_test_a36171f8ba2144d4b490bf2e8730532ca}{Test::SetUpTestCaseFunc}}\ set\_up\_tc,}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00642}00642\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1_test_aa28aa27f32f86d8575435b36c4088d81}{Test::TearDownTestCaseFunc}}\ tear\_down\_tc,}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00643}00643\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1_test_info}{TestInfo}}*\ test\_info)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00644}00644\ \ \ \ \ \textcolor{comment}{//\ In\ order\ to\ support\ thread-\/safe\ death\ tests,\ we\ need\ to}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00645}00645\ \ \ \ \ \textcolor{comment}{//\ remember\ the\ original\ working\ directory\ when\ the\ test\ program}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00646}00646\ \ \ \ \ \textcolor{comment}{//\ was\ first\ invoked.\ \ We\ cannot\ do\ this\ in\ RUN\_ALL\_TESTS(),\ as}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00647}00647\ \ \ \ \ \textcolor{comment}{//\ the\ user\ may\ have\ changed\ the\ current\ directory\ before\ calling}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00648}00648\ \ \ \ \ \textcolor{comment}{//\ RUN\_ALL\_TESTS().\ \ Therefore\ we\ capture\ the\ current\ directory\ in}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00649}00649\ \ \ \ \ \textcolor{comment}{//\ AddTestInfo(),\ which\ is\ called\ to\ register\ a\ TEST\ or\ TEST\_F}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00650}00650\ \ \ \ \ \textcolor{comment}{//\ before\ main()\ is\ reached.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00651}00651\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{gtest-options__test_8cc_aa5f13fd18a275d0a3117700f30bfb9ff}{original\_working\_dir\_}}.IsEmpty())\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00652}00652\ \ \ \ \ \ \ \mbox{\hyperlink{gtest-options__test_8cc_aa5f13fd18a275d0a3117700f30bfb9ff}{original\_working\_dir\_}}.Set(FilePath::GetCurrentDir());}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00653}00653\ \ \ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_ab54343f0a36dc4cb0ce8a478dd7847b8}{GTEST\_CHECK\_}}(!\mbox{\hyperlink{gtest-options__test_8cc_aa5f13fd18a275d0a3117700f30bfb9ff}{original\_working\_dir\_}}.IsEmpty())}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00654}00654\ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}Failed\ to\ get\ the\ current\ working\ directory."{}};}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00655}00655\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00656}00656\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00657}00657\ \ \ \ \ GetTestCase(test\_info-\/>\mbox{\hyperlink{classtesting_1_1_test_info_ac71103172113839fc53bfab7a2323dda}{test\_case\_name}}(),}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00658}00658\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ test\_info-\/>\mbox{\hyperlink{classtesting_1_1_test_info_a8b356adc702a00bd710fa861fdba7585}{type\_param}}(),}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00659}00659\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ set\_up\_tc,}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00660}00660\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ tear\_down\_tc)-\/>AddTestInfo(test\_info);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00661}00661\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00662}00662\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00663}00663\ \ \ \textcolor{comment}{//\ Returns\ ParameterizedTestCaseRegistry\ object\ used\ to\ keep\ track\ of}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00664}00664\ \ \ \textcolor{comment}{//\ value-\/parameterized\ tests\ and\ instantiate\ and\ register\ them.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00665}\mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl_ad45bee54aab5c07a3a689a6efd5ec3a9}{00665}}\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_registry}{internal::ParameterizedTestCaseRegistry}}\&\ \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl_ad45bee54aab5c07a3a689a6efd5ec3a9}{parameterized\_test\_registry}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00666}00666\ \ \ \ \ \textcolor{keywordflow}{return}\ parameterized\_test\_registry\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00667}00667\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00668}00668\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00669}00669\ \ \ \textcolor{comment}{//\ Sets\ the\ TestCase\ object\ for\ the\ test\ that's\ currently\ running.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00670}\mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl_a7f0e79bdabd28819cc857e316a36a350}{00670}}\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl_a7f0e79bdabd28819cc857e316a36a350}{set\_current\_test\_case}}(\mbox{\hyperlink{classtesting_1_1_test_case}{TestCase}}*\ a\_current\_test\_case)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00671}00671\ \ \ \ \ current\_test\_case\_\ =\ a\_current\_test\_case;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00672}00672\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00673}00673\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00674}00674\ \ \ \textcolor{comment}{//\ Sets\ the\ TestInfo\ object\ for\ the\ test\ that's\ currently\ running.\ \ If}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00675}00675\ \ \ \textcolor{comment}{//\ current\_test\_info\ is\ NULL,\ the\ assertion\ results\ will\ be\ stored\ in}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00676}00676\ \ \ \textcolor{comment}{//\ ad\_hoc\_test\_result\_.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00677}\mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl_ab72211c99ce4427dfb472d6ecea62989}{00677}}\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl_ab72211c99ce4427dfb472d6ecea62989}{set\_current\_test\_info}}(\mbox{\hyperlink{classtesting_1_1_test_info}{TestInfo}}*\ a\_current\_test\_info)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00678}00678\ \ \ \ \ current\_test\_info\_\ =\ a\_current\_test\_info;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00679}00679\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00680}00680\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00681}00681\ \ \ \textcolor{comment}{//\ Registers\ all\ parameterized\ tests\ defined\ using\ TEST\_P\ and}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00682}00682\ \ \ \textcolor{comment}{//\ INSTANTIATE\_TEST\_CASE\_P,\ creating\ regular\ tests\ for\ each\ test/parameter}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00683}00683\ \ \ \textcolor{comment}{//\ combination.\ This\ method\ can\ be\ called\ more\ then\ once;\ it\ has\ guards}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00684}00684\ \ \ \textcolor{comment}{//\ protecting\ from\ registering\ the\ tests\ more\ then\ once.\ \ If}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00685}00685\ \ \ \textcolor{comment}{//\ value-\/parameterized\ tests\ are\ disabled,\ RegisterParameterizedTests\ is}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00686}00686\ \ \ \textcolor{comment}{//\ present\ but\ does\ nothing.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00687}00687\ \ \ \textcolor{keywordtype}{void}\ RegisterParameterizedTests();}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00688}00688\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00689}00689\ \ \ \textcolor{comment}{//\ Runs\ all\ tests\ in\ this\ UnitTest\ object,\ prints\ the\ result,\ and}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00690}00690\ \ \ \textcolor{comment}{//\ returns\ true\ if\ all\ tests\ are\ successful.\ \ If\ any\ exception\ is}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00691}00691\ \ \ \textcolor{comment}{//\ thrown\ during\ a\ test,\ this\ test\ is\ considered\ to\ be\ failed,\ but}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00692}00692\ \ \ \textcolor{comment}{//\ the\ rest\ of\ the\ tests\ will\ still\ be\ run.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00693}00693\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{gtest__output__test___8cc_ae0ca194f6b730e168850ce3179ad4f63}{RunAllTests}}();}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00694}00694\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00695}00695\ \ \ \textcolor{comment}{//\ Clears\ the\ results\ of\ all\ tests,\ except\ the\ ad\ hoc\ tests.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00696}\mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl_a96c2a5b23541ef01020c402644563ba1}{00696}}\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl_a96c2a5b23541ef01020c402644563ba1}{ClearNonAdHocTestResult}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00697}00697\ \ \ \ \ ForEach(test\_cases\_,\ TestCase::ClearTestCaseResult);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00698}00698\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00699}00699\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00700}00700\ \ \ \textcolor{comment}{//\ Clears\ the\ results\ of\ ad-\/hoc\ test\ assertions.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00701}\mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl_ac44629cc4fa12b788779d4aa76939510}{00701}}\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl_ac44629cc4fa12b788779d4aa76939510}{ClearAdHocTestResult}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00702}00702\ \ \ \ \ ad\_hoc\_test\_result\_.Clear();}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00703}00703\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00704}00704\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00705}00705\ \ \ \textcolor{comment}{//\ Adds\ a\ TestProperty\ to\ the\ current\ TestResult\ object\ when\ invoked\ in\ a}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00706}00706\ \ \ \textcolor{comment}{//\ context\ of\ a\ test\ or\ a\ test\ case,\ or\ to\ the\ global\ property\ set.\ If\ the}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00707}00707\ \ \ \textcolor{comment}{//\ result\ already\ contains\ a\ property\ with\ the\ same\ key,\ the\ value\ will\ be}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00708}00708\ \ \ \textcolor{comment}{//\ updated.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00709}00709\ \ \ \textcolor{keywordtype}{void}\ RecordProperty(\textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1_test_property}{TestProperty}}\&\ test\_property);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00710}00710\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00711}\mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl_acc5ffd3f9bc2e87bb3dba4218f58af43}{00711}}\ \ \ \textcolor{keyword}{enum}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl_acc5ffd3f9bc2e87bb3dba4218f58af43}{ReactionToSharding}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00712}\mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl_acc5ffd3f9bc2e87bb3dba4218f58af43abec11f1c4bb8a3e2b99fa8328bccd58c}{00712}}\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl_acc5ffd3f9bc2e87bb3dba4218f58af43abec11f1c4bb8a3e2b99fa8328bccd58c}{HONOR\_SHARDING\_PROTOCOL}},}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00713}00713\ \ \ \ \ IGNORE\_SHARDING\_PROTOCOL}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00714}\mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl_acc5ffd3f9bc2e87bb3dba4218f58af43a68bd0b7e6a7bead14c93d1a42144095a}{00714}}\ \ \ \};}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00715}00715\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00716}00716\ \ \ \textcolor{comment}{//\ Matches\ the\ full\ name\ of\ each\ test\ against\ the\ user-\/specified}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00717}00717\ \ \ \textcolor{comment}{//\ filter\ to\ decide\ whether\ the\ test\ should\ run,\ then\ records\ the}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00718}00718\ \ \ \textcolor{comment}{//\ result\ in\ each\ TestCase\ and\ TestInfo\ object.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00719}00719\ \ \ \textcolor{comment}{//\ If\ shard\_tests\ ==\ HONOR\_SHARDING\_PROTOCOL,\ further\ filters\ tests}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00720}00720\ \ \ \textcolor{comment}{//\ based\ on\ sharding\ variables\ in\ the\ environment.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00721}00721\ \ \ \textcolor{comment}{//\ Returns\ the\ number\ of\ tests\ that\ should\ run.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00722}00722\ \ \ \textcolor{keywordtype}{int}\ FilterTests(ReactionToSharding\ shard\_tests);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00723}00723\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00724}00724\ \ \ \textcolor{comment}{//\ Prints\ the\ names\ of\ the\ tests\ matching\ the\ user-\/specified\ filter\ flag.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00725}00725\ \ \ \textcolor{keywordtype}{void}\ ListTestsMatchingFilter();}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00726}00726\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00727}\mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl_af16ec9a7a57d4a198fe10fa93852dac9}{00727}}\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1_test_case}{TestCase}}*\ \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl_af16ec9a7a57d4a198fe10fa93852dac9}{current\_test\_case}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ current\_test\_case\_;\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00728}\mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl_aae2009f581b6c1129ae084d8a2c1e781}{00728}}\ \ \ \mbox{\hyperlink{classtesting_1_1_test_info}{TestInfo}}*\ \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl_aae2009f581b6c1129ae084d8a2c1e781}{current\_test\_info}}()\ \{\ \textcolor{keywordflow}{return}\ current\_test\_info\_;\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00729}\mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl_ab0c759ee568a1ff6ed5cfd54dbd25646}{00729}}\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1_test_info}{TestInfo}}*\ \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl_ab0c759ee568a1ff6ed5cfd54dbd25646}{current\_test\_info}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ current\_test\_info\_;\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00730}00730\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00731}00731\ \ \ \textcolor{comment}{//\ Returns\ the\ vector\ of\ environments\ that\ need\ to\ be\ set-\/up/torn-\/down}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00732}00732\ \ \ \textcolor{comment}{//\ before/after\ the\ tests\ are\ run.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00733}\mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl_ac0756bc092288072201acda0903b4a82}{00733}}\ \ \ std::vector<Environment*>\&\ \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl_ac0756bc092288072201acda0903b4a82}{environments}}()\ \{\ \textcolor{keywordflow}{return}\ environments\_;\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00734}00734\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00735}00735\ \ \ \textcolor{comment}{//\ Getters\ for\ the\ per-\/thread\ Google\ Test\ trace\ stack.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00736}\mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl_ac6212d90a1321cf51035a09b5bdede46}{00736}}\ \ \ std::vector<TraceInfo>\&\ \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl_ac6212d90a1321cf51035a09b5bdede46}{gtest\_trace\_stack}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00737}00737\ \ \ \ \ \textcolor{keywordflow}{return}\ *(gtest\_trace\_stack\_.pointer());}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00738}00738\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00739}\mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl_a0480e61a32e930aafb0681494e8ac893}{00739}}\ \ \ \textcolor{keyword}{const}\ std::vector<TraceInfo>\&\ \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl_a0480e61a32e930aafb0681494e8ac893}{gtest\_trace\_stack}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00740}00740\ \ \ \ \ \textcolor{keywordflow}{return}\ gtest\_trace\_stack\_.get();}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00741}00741\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00742}00742\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00743}00743\ \textcolor{preprocessor}{\#if\ GTEST\_HAS\_DEATH\_TEST}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00744}00744\ \ \ \textcolor{keywordtype}{void}\ InitDeathTestSubprocessControlInfo()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00745}00745\ \ \ \ \ internal\_run\_death\_test\_flag\_.reset(ParseInternalRunDeathTestFlag());}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00746}00746\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00747}00747\ \ \ \textcolor{comment}{//\ Returns\ a\ pointer\ to\ the\ parsed\ -\/-\/gtest\_internal\_run\_death\_test}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00748}00748\ \ \ \textcolor{comment}{//\ flag,\ or\ NULL\ if\ that\ flag\ was\ not\ specified.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00749}00749\ \ \ \textcolor{comment}{//\ This\ information\ is\ useful\ only\ in\ a\ death\ test\ child\ process.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00750}00750\ \ \ \textcolor{comment}{//\ Must\ not\ be\ called\ before\ a\ call\ to\ InitGoogleTest.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00751}00751\ \ \ \textcolor{keyword}{const}\ InternalRunDeathTestFlag*\ internal\_run\_death\_test\_flag()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00752}00752\ \ \ \ \ \textcolor{keywordflow}{return}\ internal\_run\_death\_test\_flag\_.get();}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00753}00753\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00754}00754\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00755}00755\ \ \ \textcolor{comment}{//\ Returns\ a\ pointer\ to\ the\ current\ death\ test\ factory.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00756}00756\ \ \ internal::DeathTestFactory*\ death\_test\_factory()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00757}00757\ \ \ \ \ \textcolor{keywordflow}{return}\ death\_test\_factory\_.get();}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00758}00758\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00759}00759\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00760}00760\ \ \ \textcolor{keywordtype}{void}\ SuppressTestEventsIfInSubprocess();}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00761}00761\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00762}00762\ \ \ \textcolor{keyword}{friend}\ \textcolor{keyword}{class\ }ReplaceDeathTestFactory;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00763}00763\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_HAS\_DEATH\_TEST}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00764}00764\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00765}00765\ \ \ \textcolor{comment}{//\ Initializes\ the\ event\ listener\ performing\ XML\ output\ as\ specified\ by}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00766}00766\ \ \ \textcolor{comment}{//\ UnitTestOptions.\ Must\ not\ be\ called\ before\ InitGoogleTest.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00767}00767\ \ \ \textcolor{keywordtype}{void}\ ConfigureXmlOutput();}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00768}00768\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00769}00769\ \textcolor{preprocessor}{\#if\ GTEST\_CAN\_STREAM\_RESULTS\_}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00770}00770\ \ \ \textcolor{comment}{//\ Initializes\ the\ event\ listener\ for\ streaming\ test\ results\ to\ a\ socket.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00771}00771\ \ \ \textcolor{comment}{//\ Must\ not\ be\ called\ before\ InitGoogleTest.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00772}00772\ \ \ \textcolor{keywordtype}{void}\ ConfigureStreamingOutput();}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00773}00773\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00774}00774\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00775}00775\ \ \ \textcolor{comment}{//\ Performs\ initialization\ dependent\ upon\ flag\ values\ obtained\ in}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00776}00776\ \ \ \textcolor{comment}{//\ ParseGoogleTestFlagsOnly.\ \ Is\ called\ from\ InitGoogleTest\ after\ the\ call\ to}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00777}00777\ \ \ \textcolor{comment}{//\ ParseGoogleTestFlagsOnly.\ \ In\ case\ a\ user\ neglects\ to\ call\ InitGoogleTest}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00778}00778\ \ \ \textcolor{comment}{//\ this\ function\ is\ also\ called\ from\ RunAllTests.\ \ Since\ this\ function\ can\ be}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00779}00779\ \ \ \textcolor{comment}{//\ called\ more\ than\ once,\ it\ has\ to\ be\ idempotent.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00780}00780\ \ \ \textcolor{keywordtype}{void}\ PostFlagParsingInit();}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00781}00781\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00782}00782\ \ \ \textcolor{comment}{//\ Gets\ the\ random\ seed\ used\ at\ the\ start\ of\ the\ current\ test\ iteration.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00783}\mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl_a625b9fb6d17b008c44fc902255e6343c}{00783}}\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl_a625b9fb6d17b008c44fc902255e6343c}{random\_seed}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ random\_seed\_;\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00784}00784\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00785}00785\ \ \ \textcolor{comment}{//\ Gets\ the\ random\ number\ generator.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00786}\mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl_a0df7a76078e9b91e3bbb3c13024b51a7}{00786}}\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_random}{internal::Random}}*\ \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl_a0df7a76078e9b91e3bbb3c13024b51a7}{random}}()\ \{\ \textcolor{keywordflow}{return}\ \&random\_;\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00787}00787\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00788}00788\ \ \ \textcolor{comment}{//\ Shuffles\ all\ test\ cases,\ and\ the\ tests\ within\ each\ test\ case,}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00789}00789\ \ \ \textcolor{comment}{//\ making\ sure\ that\ death\ tests\ are\ still\ run\ first.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00790}00790\ \ \ \textcolor{keywordtype}{void}\ ShuffleTests();}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00791}00791\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00792}00792\ \ \ \textcolor{comment}{//\ Restores\ the\ test\ cases\ and\ tests\ to\ their\ order\ before\ the\ first\ shuffle.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00793}00793\ \ \ \textcolor{keywordtype}{void}\ UnshuffleTests();}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00794}00794\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00795}00795\ \ \ \textcolor{comment}{//\ Returns\ the\ value\ of\ GTEST\_FLAG(catch\_exceptions)\ at\ the\ moment}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00796}00796\ \ \ \textcolor{comment}{//\ UnitTest::Run()\ starts.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00797}\mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl_aa311b980783a9cfb547831f7b19e3f3a}{00797}}\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl_aa311b980783a9cfb547831f7b19e3f3a}{catch\_exceptions}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ catch\_exceptions\_;\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00798}00798\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00799}00799\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00800}\mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl_a893404438388dec058dc5c02e8f9a014}{00800}}\ \ \ \textcolor{keyword}{friend}\ class\ ::testing::UnitTest;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00801}00801\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00802}00802\ \ \ \textcolor{comment}{//\ Used\ by\ UnitTest::Run()\ to\ capture\ the\ state\ of}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00803}00803\ \ \ \textcolor{comment}{//\ GTEST\_FLAG(catch\_exceptions)\ at\ the\ moment\ it\ starts.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00804}00804\ \ \ \textcolor{keywordtype}{void}\ set\_catch\_exceptions(\textcolor{keywordtype}{bool}\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})\ \{\ catch\_exceptions\_\ =\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}};\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00805}00805\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00806}00806\ \ \ \textcolor{comment}{//\ The\ UnitTest\ object\ that\ owns\ this\ implementation\ object.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00807}00807\ \ \ \mbox{\hyperlink{classtesting_1_1_unit_test}{UnitTest}}*\ \textcolor{keyword}{const}\ parent\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00808}00808\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00809}00809\ \ \ \textcolor{comment}{//\ The\ working\ directory\ when\ the\ first\ TEST()\ or\ TEST\_F()\ was}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00810}00810\ \ \ \textcolor{comment}{//\ executed.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00811}00811\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{internal::FilePath}}\ \mbox{\hyperlink{gtest-options__test_8cc_aa5f13fd18a275d0a3117700f30bfb9ff}{original\_working\_dir\_}};}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00812}00812\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00813}00813\ \ \ \textcolor{comment}{//\ The\ default\ test\ part\ result\ reporters.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00814}00814\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_default_global_test_part_result_reporter}{DefaultGlobalTestPartResultReporter}}\ default\_global\_test\_part\_result\_reporter\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00815}00815\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_default_per_thread_test_part_result_reporter}{DefaultPerThreadTestPartResultReporter}}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00816}00816\ \ \ \ \ \ \ default\_per\_thread\_test\_part\_result\_reporter\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00817}00817\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00818}00818\ \ \ \textcolor{comment}{//\ Points\ to\ (but\ doesn't\ own)\ the\ global\ test\ part\ result\ reporter.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00819}00819\ \ \ \mbox{\hyperlink{classtesting_1_1_test_part_result_reporter_interface}{TestPartResultReporterInterface}}*\ global\_test\_part\_result\_repoter\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00820}00820\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00821}00821\ \ \ \textcolor{comment}{//\ Protects\ read\ and\ write\ access\ to\ global\_test\_part\_result\_reporter\_.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00822}00822\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_mutex}{internal::Mutex}}\ global\_test\_part\_result\_reporter\_mutex\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00823}00823\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00824}00824\ \ \ \textcolor{comment}{//\ Points\ to\ (but\ doesn't\ own)\ the\ per-\/thread\ test\ part\ result\ reporter.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00825}00825\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_thread_local}{internal::ThreadLocal<TestPartResultReporterInterface*>}}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00826}00826\ \ \ \ \ \ \ per\_thread\_test\_part\_result\_reporter\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00827}00827\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00828}00828\ \ \ \textcolor{comment}{//\ The\ vector\ of\ environments\ that\ need\ to\ be\ set-\/up/torn-\/down}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00829}00829\ \ \ \textcolor{comment}{//\ before/after\ the\ tests\ are\ run.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00830}00830\ \ \ std::vector<Environment*>\ environments\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00831}00831\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00832}00832\ \ \ \textcolor{comment}{//\ The\ vector\ of\ TestCases\ in\ their\ original\ order.\ \ It\ owns\ the}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00833}00833\ \ \ \textcolor{comment}{//\ elements\ in\ the\ vector.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00834}00834\ \ \ std::vector<TestCase*>\ test\_cases\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00835}00835\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00836}00836\ \ \ \textcolor{comment}{//\ Provides\ a\ level\ of\ indirection\ for\ the\ test\ case\ list\ to\ allow}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00837}00837\ \ \ \textcolor{comment}{//\ easy\ shuffling\ and\ restoring\ the\ test\ case\ order.\ \ The\ i-\/th}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00838}00838\ \ \ \textcolor{comment}{//\ element\ of\ this\ vector\ is\ the\ index\ of\ the\ i-\/th\ test\ case\ in\ the}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00839}00839\ \ \ \textcolor{comment}{//\ shuffled\ order.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00840}00840\ \ \ std::vector<int>\ test\_case\_indices\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00841}00841\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00842}00842\ \ \ \textcolor{comment}{//\ ParameterizedTestRegistry\ object\ used\ to\ register\ value-\/parameterized}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00843}00843\ \ \ \textcolor{comment}{//\ tests.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00844}00844\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_registry}{internal::ParameterizedTestCaseRegistry}}\ parameterized\_test\_registry\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00845}00845\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00846}00846\ \ \ \textcolor{comment}{//\ Indicates\ whether\ RegisterParameterizedTests()\ has\ been\ called\ already.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00847}00847\ \ \ \textcolor{keywordtype}{bool}\ parameterized\_tests\_registered\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00848}00848\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00849}00849\ \ \ \textcolor{comment}{//\ Index\ of\ the\ last\ death\ test\ case\ registered.\ \ Initially\ -\/1.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00850}00850\ \ \ \textcolor{keywordtype}{int}\ last\_death\_test\_case\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00851}00851\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00852}00852\ \ \ \textcolor{comment}{//\ This\ points\ to\ the\ TestCase\ for\ the\ currently\ running\ test.\ \ It}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00853}00853\ \ \ \textcolor{comment}{//\ changes\ as\ Google\ Test\ goes\ through\ one\ test\ case\ after\ another.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00854}00854\ \ \ \textcolor{comment}{//\ When\ no\ test\ is\ running,\ this\ is\ set\ to\ NULL\ and\ Google\ Test}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00855}00855\ \ \ \textcolor{comment}{//\ stores\ assertion\ results\ in\ ad\_hoc\_test\_result\_.\ \ Initially\ NULL.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00856}00856\ \ \ \mbox{\hyperlink{classtesting_1_1_test_case}{TestCase}}*\ current\_test\_case\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00857}00857\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00858}00858\ \ \ \textcolor{comment}{//\ This\ points\ to\ the\ TestInfo\ for\ the\ currently\ running\ test.\ \ It}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00859}00859\ \ \ \textcolor{comment}{//\ changes\ as\ Google\ Test\ goes\ through\ one\ test\ after\ another.\ \ When}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00860}00860\ \ \ \textcolor{comment}{//\ no\ test\ is\ running,\ this\ is\ set\ to\ NULL\ and\ Google\ Test\ stores}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00861}00861\ \ \ \textcolor{comment}{//\ assertion\ results\ in\ ad\_hoc\_test\_result\_.\ \ Initially\ NULL.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00862}00862\ \ \ \mbox{\hyperlink{classtesting_1_1_test_info}{TestInfo}}*\ current\_test\_info\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00863}00863\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00864}00864\ \ \ \textcolor{comment}{//\ Normally,\ a\ user\ only\ writes\ assertions\ inside\ a\ TEST\ or\ TEST\_F,}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00865}00865\ \ \ \textcolor{comment}{//\ or\ inside\ a\ function\ called\ by\ a\ TEST\ or\ TEST\_F.\ \ Since\ Google}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00866}00866\ \ \ \textcolor{comment}{//\ Test\ keeps\ track\ of\ which\ test\ is\ current\ running,\ it\ can}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00867}00867\ \ \ \textcolor{comment}{//\ associate\ such\ an\ assertion\ with\ the\ test\ it\ belongs\ to.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00868}00868\ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00869}00869\ \ \ \textcolor{comment}{//\ If\ an\ assertion\ is\ encountered\ when\ no\ TEST\ or\ TEST\_F\ is\ running,}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00870}00870\ \ \ \textcolor{comment}{//\ Google\ Test\ attributes\ the\ assertion\ result\ to\ an\ imaginary\ "{}ad\ hoc"{}}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00871}00871\ \ \ \textcolor{comment}{//\ test,\ and\ records\ the\ result\ in\ ad\_hoc\_test\_result\_.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00872}00872\ \ \ \mbox{\hyperlink{classtesting_1_1_test_result}{TestResult}}\ ad\_hoc\_test\_result\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00873}00873\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00874}00874\ \ \ \textcolor{comment}{//\ The\ list\ of\ event\ listeners\ that\ can\ be\ used\ to\ track\ events\ inside}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00875}00875\ \ \ \textcolor{comment}{//\ Google\ Test.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00876}00876\ \ \ \mbox{\hyperlink{classtesting_1_1_test_event_listeners}{TestEventListeners}}\ listeners\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00877}00877\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00878}00878\ \ \ \textcolor{comment}{//\ The\ OS\ stack\ trace\ getter.\ \ Will\ be\ deleted\ when\ the\ UnitTest}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00879}00879\ \ \ \textcolor{comment}{//\ object\ is\ destructed.\ \ By\ default,\ an\ OsStackTraceGetter\ is\ used,}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00880}00880\ \ \ \textcolor{comment}{//\ but\ the\ user\ can\ set\ this\ field\ to\ use\ a\ custom\ getter\ if\ that\ is}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00881}00881\ \ \ \textcolor{comment}{//\ desired.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00882}00882\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_os_stack_trace_getter_interface}{OsStackTraceGetterInterface}}*\ os\_stack\_trace\_getter\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00883}00883\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00884}00884\ \ \ \textcolor{comment}{//\ True\ iff\ PostFlagParsingInit()\ has\ been\ called.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00885}00885\ \ \ \textcolor{keywordtype}{bool}\ post\_flag\_parse\_init\_performed\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00886}00886\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00887}00887\ \ \ \textcolor{comment}{//\ The\ random\ number\ seed\ used\ at\ the\ beginning\ of\ the\ test\ run.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00888}00888\ \ \ \textcolor{keywordtype}{int}\ random\_seed\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00889}00889\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00890}00890\ \ \ \textcolor{comment}{//\ Our\ random\ number\ generator.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00891}00891\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_random}{internal::Random}}\ random\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00892}00892\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00893}00893\ \ \ \textcolor{comment}{//\ The\ time\ of\ the\ test\ program\ start,\ in\ ms\ from\ the\ start\ of\ the}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00894}00894\ \ \ \textcolor{comment}{//\ UNIX\ epoch.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00895}00895\ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a66a845df404b38fe85c5e14a069f255a}{TimeInMillis}}\ start\_timestamp\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00896}00896\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00897}00897\ \ \ \textcolor{comment}{//\ How\ long\ the\ test\ took\ to\ run,\ in\ milliseconds.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00898}00898\ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a66a845df404b38fe85c5e14a069f255a}{TimeInMillis}}\ elapsed\_time\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00899}00899\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00900}00900\ \textcolor{preprocessor}{\#if\ GTEST\_HAS\_DEATH\_TEST}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00901}00901\ \ \ \textcolor{comment}{//\ The\ decomposed\ components\ of\ the\ gtest\_internal\_run\_death\_test\ flag,}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00902}00902\ \ \ \textcolor{comment}{//\ parsed\ when\ RUN\_ALL\_TESTS\ is\ called.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00903}00903\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1scoped__ptr}{internal::scoped\_ptr<InternalRunDeathTestFlag>}}\ internal\_run\_death\_test\_flag\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00904}00904\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1scoped__ptr}{internal::scoped\_ptr<internal::DeathTestFactory>}}\ death\_test\_factory\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00905}00905\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_HAS\_DEATH\_TEST}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00906}00906\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00907}00907\ \ \ \textcolor{comment}{//\ A\ per-\/thread\ stack\ of\ traces\ created\ by\ the\ SCOPED\_TRACE()\ macro.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00908}00908\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_thread_local}{internal::ThreadLocal<std::vector<TraceInfo>}}\ >\ gtest\_trace\_stack\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00909}00909\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00910}00910\ \ \ \textcolor{comment}{//\ The\ value\ of\ GTEST\_FLAG(catch\_exceptions)\ at\ the\ moment\ RunAllTests()}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00911}00911\ \ \ \textcolor{comment}{//\ starts.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00912}00912\ \ \ \textcolor{keywordtype}{bool}\ catch\_exceptions\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00913}00913\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00914}00914\ \ \ \mbox{\hyperlink{gtest-port_8h_aed8c1888c32b588b0681e88b95031e29}{GTEST\_DISALLOW\_COPY\_AND\_ASSIGN\_}}(\mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl}{UnitTestImpl}});}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00915}00915\ \};\ \ \textcolor{comment}{//\ class\ UnitTestImpl}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00916}00916\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00917}00917\ \textcolor{comment}{//\ Convenience\ function\ for\ accessing\ the\ global\ UnitTest}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00918}00918\ \textcolor{comment}{//\ implementation\ object.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00919}\mbox{\hyperlink{namespacetesting_1_1internal_a9bd0caf5d16512de38b39599c13ee634}{00919}}\ \textcolor{keyword}{inline}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl}{UnitTestImpl}}*\ \mbox{\hyperlink{namespacetesting_1_1internal_a9bd0caf5d16512de38b39599c13ee634}{GetUnitTestImpl}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00920}00920\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtesting_1_1_unit_test_a24192400b70b3b946746954e9574fb8e}{UnitTest::GetInstance}}()-\/>impl();}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00921}00921\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00922}00922\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00923}00923\ \textcolor{preprocessor}{\#if\ GTEST\_USES\_SIMPLE\_RE}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00924}00924\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00925}00925\ \textcolor{comment}{//\ Internal\ helper\ functions\ for\ implementing\ the\ simple\ regular}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00926}00926\ \textcolor{comment}{//\ expression\ matcher.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00927}00927\ \mbox{\hyperlink{gtest-port_8h_aa73be6f0ba4a7456180a94904ce17790}{GTEST\_API\_}}\ \textcolor{keywordtype}{bool}\ IsInSet(\textcolor{keywordtype}{char}\ ch,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ str);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00928}00928\ \mbox{\hyperlink{gtest-port_8h_aa73be6f0ba4a7456180a94904ce17790}{GTEST\_API\_}}\ \textcolor{keywordtype}{bool}\ IsAsciiDigit(\textcolor{keywordtype}{char}\ ch);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00929}00929\ \mbox{\hyperlink{gtest-port_8h_aa73be6f0ba4a7456180a94904ce17790}{GTEST\_API\_}}\ \textcolor{keywordtype}{bool}\ IsAsciiPunct(\textcolor{keywordtype}{char}\ ch);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00930}00930\ \mbox{\hyperlink{gtest-port_8h_aa73be6f0ba4a7456180a94904ce17790}{GTEST\_API\_}}\ \textcolor{keywordtype}{bool}\ IsRepeat(\textcolor{keywordtype}{char}\ ch);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00931}00931\ \mbox{\hyperlink{gtest-port_8h_aa73be6f0ba4a7456180a94904ce17790}{GTEST\_API\_}}\ \textcolor{keywordtype}{bool}\ IsAsciiWhiteSpace(\textcolor{keywordtype}{char}\ ch);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00932}00932\ \mbox{\hyperlink{gtest-port_8h_aa73be6f0ba4a7456180a94904ce17790}{GTEST\_API\_}}\ \textcolor{keywordtype}{bool}\ IsAsciiWordChar(\textcolor{keywordtype}{char}\ ch);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00933}00933\ \mbox{\hyperlink{gtest-port_8h_aa73be6f0ba4a7456180a94904ce17790}{GTEST\_API\_}}\ \textcolor{keywordtype}{bool}\ IsValidEscape(\textcolor{keywordtype}{char}\ ch);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00934}00934\ \mbox{\hyperlink{gtest-port_8h_aa73be6f0ba4a7456180a94904ce17790}{GTEST\_API\_}}\ \textcolor{keywordtype}{bool}\ AtomMatchesChar(\textcolor{keywordtype}{bool}\ escaped,\ \textcolor{keywordtype}{char}\ pattern,\ \textcolor{keywordtype}{char}\ ch);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00935}00935\ \mbox{\hyperlink{gtest-port_8h_aa73be6f0ba4a7456180a94904ce17790}{GTEST\_API\_}}\ \textcolor{keywordtype}{bool}\ ValidateRegex(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ regex);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00936}00936\ \mbox{\hyperlink{gtest-port_8h_aa73be6f0ba4a7456180a94904ce17790}{GTEST\_API\_}}\ \textcolor{keywordtype}{bool}\ MatchRegexAtHead(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ regex,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ str);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00937}00937\ \mbox{\hyperlink{gtest-port_8h_aa73be6f0ba4a7456180a94904ce17790}{GTEST\_API\_}}\ \textcolor{keywordtype}{bool}\ MatchRepetitionAndRegexAtHead(}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00938}00938\ \ \ \ \ \textcolor{keywordtype}{bool}\ escaped,\ \textcolor{keywordtype}{char}\ ch,\ \textcolor{keywordtype}{char}\ repeat,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ regex,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ str);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00939}00939\ \mbox{\hyperlink{gtest-port_8h_aa73be6f0ba4a7456180a94904ce17790}{GTEST\_API\_}}\ \textcolor{keywordtype}{bool}\ MatchRegexAnywhere(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ regex,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ str);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00940}00940\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00941}00941\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_USES\_SIMPLE\_RE}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00942}00942\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00943}00943\ \textcolor{comment}{//\ Parses\ the\ command\ line\ for\ Google\ Test\ flags,\ without\ initializing}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00944}00944\ \textcolor{comment}{//\ other\ parts\ of\ Google\ Test.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00945}00945\ \mbox{\hyperlink{gtest-port_8h_aa73be6f0ba4a7456180a94904ce17790}{GTEST\_API\_}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetesting_1_1internal_a472880afbcc592a41e3d623e2dec8412}{ParseGoogleTestFlagsOnly}}(\textcolor{keywordtype}{int}*\ argc,\ \textcolor{keywordtype}{char}**\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}});}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00946}00946\ \mbox{\hyperlink{gtest-port_8h_aa73be6f0ba4a7456180a94904ce17790}{GTEST\_API\_}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetesting_1_1internal_a472880afbcc592a41e3d623e2dec8412}{ParseGoogleTestFlagsOnly}}(\textcolor{keywordtype}{int}*\ argc,\ \textcolor{keywordtype}{wchar\_t}**\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}});}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00947}00947\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00948}00948\ \textcolor{preprocessor}{\#if\ GTEST\_HAS\_DEATH\_TEST}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00949}00949\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00950}00950\ \textcolor{comment}{//\ Returns\ the\ message\ describing\ the\ last\ system\ error,\ regardless\ of\ the}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00951}00951\ \textcolor{comment}{//\ platform.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00952}00952\ \mbox{\hyperlink{gtest-port_8h_aa73be6f0ba4a7456180a94904ce17790}{GTEST\_API\_}}\ std::string\ GetLastErrnoDescription();}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00953}00953\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00954}00954\ \textcolor{comment}{//\ Attempts\ to\ parse\ a\ string\ into\ a\ positive\ integer\ pointed\ to\ by\ the}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00955}00955\ \textcolor{comment}{//\ number\ parameter.\ \ Returns\ true\ if\ that\ is\ possible.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00956}00956\ \textcolor{comment}{//\ GTEST\_HAS\_DEATH\_TEST\ implies\ that\ we\ have\ ::std::string,\ so\ we\ can\ use}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00957}00957\ \textcolor{comment}{//\ it\ here.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00958}00958\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ Integer>}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00959}00959\ \textcolor{keywordtype}{bool}\ ParseNaturalNumber(const\ ::std::string\&\ str,\ Integer*\ number)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00960}00960\ \ \ \textcolor{comment}{//\ Fail\ fast\ if\ the\ given\ string\ does\ not\ begin\ with\ a\ digit;}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00961}00961\ \ \ \textcolor{comment}{//\ this\ bypasses\ strtoXXX's\ "{}optional\ leading\ whitespace\ and\ plus}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00962}00962\ \ \ \textcolor{comment}{//\ or\ minus\ sign"{}\ semantics,\ which\ are\ undesirable\ here.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00963}00963\ \ \ \textcolor{keywordflow}{if}\ (str.empty()\ ||\ !\mbox{\hyperlink{namespacetesting_1_1internal_a4bd96b7fa6486802d33ddc217af55a39}{IsDigit}}(str[0]))\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00964}00964\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00965}00965\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00966}00966\ \ \ errno\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00967}00967\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00968}00968\ \ \ \textcolor{keywordtype}{char}*\ end;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00969}00969\ \ \ \textcolor{comment}{//\ BiggestConvertible\ is\ the\ largest\ integer\ type\ that\ system-\/provided}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00970}00970\ \ \ \textcolor{comment}{//\ string-\/to-\/number\ conversion\ routines\ can\ return.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00971}00971\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00972}00972\ \textcolor{preprocessor}{\#\ if\ GTEST\_OS\_WINDOWS\ \&\&\ !defined(\_\_GNUC\_\_)}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00973}00973\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00974}00974\ \ \ \textcolor{comment}{//\ MSVC\ and\ C++\ Builder\ define\ \_\_int64\ instead\ of\ the\ standard\ long\ long.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00975}00975\ \ \ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{unsigned}\ \_\_int64\ BiggestConvertible;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00976}00976\ \ \ \textcolor{keyword}{const}\ BiggestConvertible\ parsed\ =\ \_strtoui64(str.c\_str(),\ \&end,\ 10);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00977}00977\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00978}00978\ \textcolor{preprocessor}{\#\ else}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00979}00979\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00980}00980\ \ \ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ \textcolor{keywordtype}{long}\ BiggestConvertible;\ \ \textcolor{comment}{//\ NOLINT}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00981}00981\ \ \ \textcolor{keyword}{const}\ BiggestConvertible\ parsed\ =\ strtoull(str.c\_str(),\ \&end,\ 10);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00982}00982\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00983}00983\ \textcolor{preprocessor}{\#\ endif\ \ }\textcolor{comment}{//\ GTEST\_OS\_WINDOWS\ \&\&\ !defined(\_\_GNUC\_\_)}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00984}00984\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00985}00985\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ parse\_success\ =\ *end\ ==\ \textcolor{charliteral}{'\(\backslash\)0'}\ \&\&\ errno\ ==\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00986}00986\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00987}00987\ \ \ \textcolor{comment}{//\ TODO(vladl@google.com):\ Convert\ this\ to\ compile\ time\ assertion\ when\ it\ is}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00988}00988\ \ \ \textcolor{comment}{//\ available.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00989}00989\ \ \ \mbox{\hyperlink{gtest-port_8h_ab54343f0a36dc4cb0ce8a478dd7847b8}{GTEST\_CHECK\_}}(\textcolor{keyword}{sizeof}(Integer)\ <=\ \textcolor{keyword}{sizeof}(parsed));}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00990}00990\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00991}00991\ \ \ \textcolor{keyword}{const}\ Integer\ result\ =\ \textcolor{keyword}{static\_cast<}Integer\textcolor{keyword}{>}(parsed);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00992}00992\ \ \ \textcolor{keywordflow}{if}\ (parse\_success\ \&\&\ \textcolor{keyword}{static\_cast<}BiggestConvertible\textcolor{keyword}{>}(result)\ ==\ parsed)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00993}00993\ \ \ \ \ *number\ =\ result;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00994}00994\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00995}00995\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00996}00996\ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00997}00997\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00998}00998\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_HAS\_DEATH\_TEST}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l00999}00999\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01000}01000\ \textcolor{comment}{//\ TestResult\ contains\ some\ private\ methods\ that\ should\ be\ hidden\ from}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01001}01001\ \textcolor{comment}{//\ Google\ Test\ user\ but\ are\ required\ for\ testing.\ This\ class\ allow\ our\ tests}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01002}01002\ \textcolor{comment}{//\ to\ access\ them.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01003}01003\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01004}01004\ \textcolor{comment}{//\ This\ class\ is\ supplied\ only\ for\ the\ purpose\ of\ testing\ Google\ Test's\ own}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01005}01005\ \textcolor{comment}{//\ constructs.\ Do\ not\ use\ it\ in\ user\ tests,\ either\ directly\ or\ indirectly.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01006}\mbox{\hyperlink{classtesting_1_1internal_1_1_test_result_accessor}{01006}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classtesting_1_1internal_1_1_test_result_accessor}{TestResultAccessor}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01007}01007\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01008}\mbox{\hyperlink{classtesting_1_1internal_1_1_test_result_accessor_abcc4b32d1b201eeef92f0ec0ae161cf9}{01008}}\ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_test_result_accessor_abcc4b32d1b201eeef92f0ec0ae161cf9}{RecordProperty}}(\mbox{\hyperlink{classtesting_1_1_test_result}{TestResult}}*\ test\_result,}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01009}01009\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::string\&\ xml\_element,}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01010}01010\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1_test_property}{TestProperty}}\&\ property)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01011}01011\ \ \ \ \ test\_result-\/>RecordProperty(xml\_element,\ property);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01012}01012\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01013}01013\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01014}\mbox{\hyperlink{classtesting_1_1internal_1_1_test_result_accessor_a53c626632bac65d82d88e432072b866b}{01014}}\ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_test_result_accessor_a53c626632bac65d82d88e432072b866b}{ClearTestPartResults}}(\mbox{\hyperlink{classtesting_1_1_test_result}{TestResult}}*\ test\_result)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01015}01015\ \ \ \ \ test\_result-\/>ClearTestPartResults();}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01016}01016\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01017}01017\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01018}\mbox{\hyperlink{classtesting_1_1internal_1_1_test_result_accessor_ab3e3abe2186c23ebc4428cabb7ba6479}{01018}}\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ std::vector<testing::TestPartResult>\&\ \mbox{\hyperlink{classtesting_1_1internal_1_1_test_result_accessor_ab3e3abe2186c23ebc4428cabb7ba6479}{test\_part\_results}}(}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01019}01019\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1_test_result}{TestResult}}\&\ test\_result)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01020}01020\ \ \ \ \ \textcolor{keywordflow}{return}\ test\_result.test\_part\_results();}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01021}01021\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01022}01022\ \};}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01023}01023\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01024}01024\ \textcolor{preprocessor}{\#if\ GTEST\_CAN\_STREAM\_RESULTS\_}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01025}01025\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01026}01026\ \textcolor{comment}{//\ Streams\ test\ results\ to\ the\ given\ port\ on\ the\ given\ host\ machine.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01027}01027\ \textcolor{keyword}{class\ }StreamingListener\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1_empty_test_event_listener}{EmptyTestEventListener}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01028}01028\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01029}01029\ \ \ \textcolor{comment}{//\ Abstract\ base\ class\ for\ writing\ strings\ to\ a\ socket.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01030}01030\ \ \ \textcolor{keyword}{class\ }AbstractSocketWriter\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01031}01031\ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01032}01032\ \ \ \ \ \textcolor{keyword}{virtual}\ \string~AbstractSocketWriter()\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01033}01033\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01034}01034\ \ \ \ \ \textcolor{comment}{//\ Sends\ a\ string\ to\ the\ socket.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01035}01035\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ Send(\textcolor{keyword}{const}\ std::string\&\ message)\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01036}01036\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01037}01037\ \ \ \ \ \textcolor{comment}{//\ Closes\ the\ socket.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01038}01038\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ CloseConnection()\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01039}01039\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01040}01040\ \ \ \ \ \textcolor{comment}{//\ Sends\ a\ string\ and\ a\ newline\ to\ the\ socket.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01041}01041\ \ \ \ \ \textcolor{keywordtype}{void}\ SendLn(\textcolor{keyword}{const}\ std::string\&\ message)\ \{\ Send(message\ +\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}});\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01042}01042\ \ \ \};}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01043}01043\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01044}01044\ \ \ \textcolor{comment}{//\ Concrete\ class\ for\ actually\ writing\ strings\ to\ a\ socket.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01045}01045\ \ \ \textcolor{keyword}{class\ }SocketWriter\ :\ \textcolor{keyword}{public}\ AbstractSocketWriter\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01046}01046\ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01047}01047\ \ \ \ \ SocketWriter(\textcolor{keyword}{const}\ std::string\&\ host,\ \textcolor{keyword}{const}\ std::string\&\ port)}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01048}01048\ \ \ \ \ \ \ \ \ :\ sockfd\_(-\/1),\ host\_name\_(host),\ port\_num\_(port)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01049}01049\ \ \ \ \ \ \ MakeConnection();}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01050}01050\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01051}01051\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01052}01052\ \ \ \ \ \textcolor{keyword}{virtual}\ \string~SocketWriter()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01053}01053\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (sockfd\_\ !=\ -\/1)}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01054}01054\ \ \ \ \ \ \ \ \ CloseConnection();}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01055}01055\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01056}01056\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01057}01057\ \ \ \ \ \textcolor{comment}{//\ Sends\ a\ string\ to\ the\ socket.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01058}01058\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ Send(\textcolor{keyword}{const}\ std::string\&\ message)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01059}01059\ \ \ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_ab54343f0a36dc4cb0ce8a478dd7847b8}{GTEST\_CHECK\_}}(sockfd\_\ !=\ -\/1)}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01060}01060\ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}Send()\ can\ be\ called\ only\ when\ there\ is\ a\ connection."{}};}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01061}01061\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01062}01062\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(message.length());}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01063}01063\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (write(sockfd\_,\ message.c\_str(),\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})\ !=\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01064}01064\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_a8ef4cb4c465db8c15464aecc6d9510ef}{GTEST\_LOG\_}}(WARNING)}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01065}01065\ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}stream\_result\_to:\ failed\ to\ stream\ to\ "{}}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01066}01066\ \ \ \ \ \ \ \ \ \ \ \ \ <<\ host\_name\_\ <<\ \textcolor{stringliteral}{"{}:"{}}\ <<\ port\_num\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01067}01067\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01068}01068\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01069}01069\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01070}01070\ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01071}01071\ \ \ \ \ \textcolor{comment}{//\ Creates\ a\ client\ socket\ and\ connects\ to\ the\ server.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01072}01072\ \ \ \ \ \textcolor{keywordtype}{void}\ MakeConnection();}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01073}01073\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01074}01074\ \ \ \ \ \textcolor{comment}{//\ Closes\ the\ socket.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01075}01075\ \ \ \ \ \textcolor{keywordtype}{void}\ CloseConnection()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01076}01076\ \ \ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_ab54343f0a36dc4cb0ce8a478dd7847b8}{GTEST\_CHECK\_}}(sockfd\_\ !=\ -\/1)}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01077}01077\ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}CloseConnection()\ can\ be\ called\ only\ when\ there\ is\ a\ connection."{}};}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01078}01078\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01079}01079\ \ \ \ \ \ \ \mbox{\hyperlink{integration_8cpp_af5b66d867a040d002fb57d645cae3fb4}{close}}(sockfd\_);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01080}01080\ \ \ \ \ \ \ sockfd\_\ =\ -\/1;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01081}01081\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01082}01082\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01083}01083\ \ \ \ \ \textcolor{keywordtype}{int}\ sockfd\_;\ \ \textcolor{comment}{//\ socket\ file\ descriptor}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01084}01084\ \ \ \ \ \textcolor{keyword}{const}\ std::string\ host\_name\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01085}01085\ \ \ \ \ \textcolor{keyword}{const}\ std::string\ port\_num\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01086}01086\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01087}01087\ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_aed8c1888c32b588b0681e88b95031e29}{GTEST\_DISALLOW\_COPY\_AND\_ASSIGN\_}}(SocketWriter);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01088}01088\ \ \ \};\ \ \textcolor{comment}{//\ class\ SocketWriter}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01089}01089\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01090}01090\ \ \ \textcolor{comment}{//\ Escapes\ '=',\ '\&',\ '\%',\ and\ '\(\backslash\)n'\ characters\ in\ str\ as\ "{}\%xx"{}.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01091}01091\ \ \ \textcolor{keyword}{static}\ std::string\ UrlEncode(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ str);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01092}01092\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01093}01093\ \ \ StreamingListener(\textcolor{keyword}{const}\ std::string\&\ host,\ \textcolor{keyword}{const}\ std::string\&\ port)}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01094}01094\ \ \ \ \ \ \ :\ socket\_writer\_(new\ SocketWriter(host,\ port))\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01095}01095\ \ \ \ \ Start();}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01096}01096\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01097}01097\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01098}01098\ \ \ \textcolor{keyword}{explicit}\ StreamingListener(AbstractSocketWriter*\ socket\_writer)}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01099}01099\ \ \ \ \ \ \ :\ socket\_writer\_(socket\_writer)\ \{\ Start();\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01100}01100\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01101}01101\ \ \ \textcolor{keywordtype}{void}\ OnTestProgramStart(\textcolor{keyword}{const}\ UnitTest\&\ \textcolor{comment}{/*\ unit\_test\ */})\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01102}01102\ \ \ \ \ SendLn(\textcolor{stringliteral}{"{}event=TestProgramStart"{}});}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01103}01103\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01104}01104\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01105}01105\ \ \ \textcolor{keywordtype}{void}\ OnTestProgramEnd(\textcolor{keyword}{const}\ UnitTest\&\ unit\_test)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01106}01106\ \ \ \ \ \textcolor{comment}{//\ Note\ that\ Google\ Test\ current\ only\ report\ elapsed\ time\ for\ each}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01107}01107\ \ \ \ \ \textcolor{comment}{//\ test\ iteration,\ not\ for\ the\ entire\ test\ program.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01108}01108\ \ \ \ \ SendLn(\textcolor{stringliteral}{"{}event=TestProgramEnd\&passed="{}}\ +\ FormatBool(unit\_test.Passed()));}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01109}01109\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01110}01110\ \ \ \ \ \textcolor{comment}{//\ Notify\ the\ streaming\ server\ to\ stop.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01111}01111\ \ \ \ \ socket\_writer\_-\/>CloseConnection();}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01112}01112\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01113}01113\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01114}01114\ \ \ \textcolor{keywordtype}{void}\ OnTestIterationStart(\textcolor{keyword}{const}\ UnitTest\&\ \textcolor{comment}{/*\ unit\_test\ */},\ \textcolor{keywordtype}{int}\ iteration)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01115}01115\ \ \ \ \ SendLn(\textcolor{stringliteral}{"{}event=TestIterationStart\&iteration="{}}\ +}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01116}01116\ \ \ \ \ \ \ \ \ \ \ \ StreamableToString(iteration));}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01117}01117\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01118}01118\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01119}01119\ \ \ \textcolor{keywordtype}{void}\ OnTestIterationEnd(\textcolor{keyword}{const}\ UnitTest\&\ unit\_test,\ \textcolor{keywordtype}{int}\ \textcolor{comment}{/*\ iteration\ */})\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01120}01120\ \ \ \ \ SendLn(\textcolor{stringliteral}{"{}event=TestIterationEnd\&passed="{}}\ +}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01121}01121\ \ \ \ \ \ \ \ \ \ \ \ FormatBool(unit\_test.Passed())\ +\ \textcolor{stringliteral}{"{}\&elapsed\_time="{}}\ +}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01122}01122\ \ \ \ \ \ \ \ \ \ \ \ StreamableToString(unit\_test.elapsed\_time())\ +\ \textcolor{stringliteral}{"{}ms"{}});}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01123}01123\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01124}01124\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01125}01125\ \ \ \textcolor{keywordtype}{void}\ OnTestCaseStart(\textcolor{keyword}{const}\ TestCase\&\ test\_case)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01126}01126\ \ \ \ \ SendLn(std::string(\textcolor{stringliteral}{"{}event=TestCaseStart\&name="{}})\ +\ test\_case.name());}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01127}01127\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01128}01128\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01129}01129\ \ \ \textcolor{keywordtype}{void}\ OnTestCaseEnd(\textcolor{keyword}{const}\ TestCase\&\ test\_case)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01130}01130\ \ \ \ \ SendLn(\textcolor{stringliteral}{"{}event=TestCaseEnd\&passed="{}}\ +\ FormatBool(test\_case.Passed())}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01131}01131\ \ \ \ \ \ \ \ \ \ \ \ +\ \textcolor{stringliteral}{"{}\&elapsed\_time="{}}\ +\ StreamableToString(test\_case.elapsed\_time())}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01132}01132\ \ \ \ \ \ \ \ \ \ \ \ +\ \textcolor{stringliteral}{"{}ms"{}});}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01133}01133\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01134}01134\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01135}01135\ \ \ \textcolor{keywordtype}{void}\ OnTestStart(\textcolor{keyword}{const}\ TestInfo\&\ test\_info)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01136}01136\ \ \ \ \ SendLn(std::string(\textcolor{stringliteral}{"{}event=TestStart\&name="{}})\ +\ test\_info.name());}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01137}01137\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01138}01138\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01139}01139\ \ \ \textcolor{keywordtype}{void}\ OnTestEnd(\textcolor{keyword}{const}\ TestInfo\&\ test\_info)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01140}01140\ \ \ \ \ SendLn(\textcolor{stringliteral}{"{}event=TestEnd\&passed="{}}\ +}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01141}01141\ \ \ \ \ \ \ \ \ \ \ \ FormatBool((test\_info.result())-\/>Passed())\ +}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01142}01142\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\&elapsed\_time="{}}\ +}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01143}01143\ \ \ \ \ \ \ \ \ \ \ \ StreamableToString((test\_info.result())-\/>elapsed\_time())\ +\ \textcolor{stringliteral}{"{}ms"{}});}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01144}01144\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01145}01145\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01146}01146\ \ \ \textcolor{keywordtype}{void}\ OnTestPartResult(\textcolor{keyword}{const}\ TestPartResult\&\ test\_part\_result)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01147}01147\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ file\_name\ =\ test\_part\_result.file\_name();}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01148}01148\ \ \ \ \ \textcolor{keywordflow}{if}\ (file\_name\ ==\ NULL)}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01149}01149\ \ \ \ \ \ \ file\_name\ =\ \textcolor{stringliteral}{"{}"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01150}01150\ \ \ \ \ SendLn(\textcolor{stringliteral}{"{}event=TestPartResult\&file="{}}\ +\ UrlEncode(file\_name)\ +}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01151}01151\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\&line="{}}\ +\ StreamableToString(test\_part\_result.line\_number())\ +}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01152}01152\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\&message="{}}\ +\ UrlEncode(test\_part\_result.message()));}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01153}01153\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01154}01154\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01155}01155\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01156}01156\ \ \ \textcolor{comment}{//\ Sends\ the\ given\ message\ and\ a\ newline\ to\ the\ socket.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01157}01157\ \ \ \textcolor{keywordtype}{void}\ SendLn(\textcolor{keyword}{const}\ std::string\&\ message)\ \{\ socket\_writer\_-\/>SendLn(message);\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01158}01158\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01159}01159\ \ \ \textcolor{comment}{//\ Called\ at\ the\ start\ of\ streaming\ to\ notify\ the\ receiver\ what}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01160}01160\ \ \ \textcolor{comment}{//\ protocol\ we\ are\ using.}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01161}01161\ \ \ \textcolor{keywordtype}{void}\ Start()\ \{\ SendLn(\textcolor{stringliteral}{"{}gtest\_streaming\_protocol\_version=1.0"{}});\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01162}01162\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01163}01163\ \ \ std::string\ FormatBool(\textcolor{keywordtype}{bool}\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ ?\ \textcolor{stringliteral}{"{}1"{}}\ :\ \textcolor{stringliteral}{"{}0"{}};\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01164}01164\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01165}01165\ \ \ \textcolor{keyword}{const}\ scoped\_ptr<AbstractSocketWriter>\ socket\_writer\_;}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01166}01166\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01167}01167\ \ \ \mbox{\hyperlink{gtest-port_8h_aed8c1888c32b588b0681e88b95031e29}{GTEST\_DISALLOW\_COPY\_AND\_ASSIGN\_}}(StreamingListener);}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01168}01168\ \};\ \ \textcolor{comment}{//\ class\ StreamingListener}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01169}01169\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01170}01170\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_CAN\_STREAM\_RESULTS\_}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01171}01171\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01172}01172\ \}\ \ \textcolor{comment}{//\ namespace\ internal}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01173}01173\ \}\ \ \textcolor{comment}{//\ namespace\ testing}}
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01174}01174\ }
+\DoxyCodeLine{\Hypertarget{gtest-internal-inl_8h_source_l01175}01175\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_SRC\_GTEST\_INTERNAL\_INL\_H\_}}
+
+\end{DoxyCode}

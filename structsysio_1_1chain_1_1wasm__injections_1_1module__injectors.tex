@@ -1,0 +1,71 @@
+\doxysection{sysio\+::chain\+::wasm\+\_\+injections\+::module\+\_\+injectors\texorpdfstring{$<$}{<} Visitors \texorpdfstring{$>$}{>} Struct Template Reference}
+\hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1module__injectors}{}\label{structsysio_1_1chain_1_1wasm__injections_1_1module__injectors}\index{sysio::chain::wasm\_injections::module\_injectors$<$ Visitors $>$@{sysio::chain::wasm\_injections::module\_injectors$<$ Visitors $>$}}
+
+
+{\ttfamily \#include $<$wasm\+\_\+sysio\+\_\+injection.\+hpp$>$}
+
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static void \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1module__injectors_a5edd6b4521834c6ff9fe0f36f2e980d9}{inject}} (\mbox{\hyperlink{struct_i_r_1_1_module}{IR\+::\+Module}} \&m)
+\item 
+static void \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1module__injectors_a180ff7abac262771d0765bade8edf479}{init}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename ... Visitors$>$\newline
+struct sysio\+::chain\+::wasm\+\_\+injections\+::module\+\_\+injectors$<$ Visitors $>$}
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00584}{584}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1module__injectors_a180ff7abac262771d0765bade8edf479}\index{sysio::chain::wasm\_injections::module\_injectors$<$ Visitors $>$@{sysio::chain::wasm\_injections::module\_injectors$<$ Visitors $>$}!init@{init}}
+\index{init@{init}!sysio::chain::wasm\_injections::module\_injectors$<$ Visitors $>$@{sysio::chain::wasm\_injections::module\_injectors$<$ Visitors $>$}}
+\doxysubsubsection{\texorpdfstring{init()}{init()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1module__injectors_a180ff7abac262771d0765bade8edf479} 
+template$<$typename ... Visitors$>$ \\
+static void \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1module__injectors}{sysio\+::chain\+::wasm\+\_\+injections\+::module\+\_\+injectors}}$<$ Visitors $>$\+::init (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00590}{590}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00590\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00591\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ place\ initial\ values\ for\ static\ fields\ of\ injectors\ here}}
+\DoxyCodeLine{00592\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\ \textcolor{keyword}{auto}\ initializer\ :\ \{\ Visitors::initializer...\ \}\ )\ \{}
+\DoxyCodeLine{00593\ \ \ \ \ \ \ \ \ \ \ \ \ initializer();}
+\DoxyCodeLine{00594\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00595\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1module__injectors_a5edd6b4521834c6ff9fe0f36f2e980d9}\index{sysio::chain::wasm\_injections::module\_injectors$<$ Visitors $>$@{sysio::chain::wasm\_injections::module\_injectors$<$ Visitors $>$}!inject@{inject}}
+\index{inject@{inject}!sysio::chain::wasm\_injections::module\_injectors$<$ Visitors $>$@{sysio::chain::wasm\_injections::module\_injectors$<$ Visitors $>$}}
+\doxysubsubsection{\texorpdfstring{inject()}{inject()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1module__injectors_a5edd6b4521834c6ff9fe0f36f2e980d9} 
+template$<$typename ... Visitors$>$ \\
+static void \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1module__injectors}{sysio\+::chain\+::wasm\+\_\+injections\+::module\+\_\+injectors}}$<$ Visitors $>$\+::inject (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_i_r_1_1_module}{IR\+::\+Module}} \&}]{m}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00585}{585}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00585\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00586\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\ \textcolor{keyword}{auto}\ injector\ :\ \{\ Visitors::inject...\ \}\ )\ \{}
+\DoxyCodeLine{00587\ \ \ \ \ \ \ \ \ \ \ \ \ injector(\ m\ );}
+\DoxyCodeLine{00588\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00589\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{wasm__sysio__injection_8hpp}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}\end{DoxyCompactItemize}

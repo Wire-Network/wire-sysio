@@ -1,0 +1,179 @@
+\doxysection{testing\+::internal\+::Mock\+Spec\texorpdfstring{$<$}{<} F \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classtesting_1_1internal_1_1_mock_spec}{}\label{classtesting_1_1internal_1_1_mock_spec}\index{testing::internal::MockSpec$<$ F $>$@{testing::internal::MockSpec$<$ F $>$}}
+
+
+{\ttfamily \#include $<$gmock-\/spec-\/builders.\+h$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{structtesting_1_1internal_1_1_function}{internal\+::\+Function}}$<$ F $>$\+::\+Argument\+Tuple \mbox{\hyperlink{classtesting_1_1internal_1_1_mock_spec_ab4f943ff3aebf0a0269f3963b1298262}{Argument\+Tuple}}
+\item 
+typedef \mbox{\hyperlink{structtesting_1_1internal_1_1_function}{internal\+::\+Function}}$<$ F $>$\+::\+Argument\+Matcher\+Tuple \mbox{\hyperlink{classtesting_1_1internal_1_1_mock_spec_a8bcb2c367ed3cdaaf51f0579a00c53d5}{Argument\+Matcher\+Tuple}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_mock_spec_a6029fca9b87bb3b4391682589863dbe9}{Mock\+Spec}} (\mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base}{internal\+::\+Function\+Mocker\+Base}}$<$ F $>$ \texorpdfstring{$\ast$}{*}function\+\_\+mocker, const \mbox{\hyperlink{classtesting_1_1internal_1_1_mock_spec_a8bcb2c367ed3cdaaf51f0579a00c53d5}{Argument\+Matcher\+Tuple}} \&matchers)
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_on_call_spec}{internal\+::\+On\+Call\+Spec}}$<$ F $>$ \& \mbox{\hyperlink{classtesting_1_1internal_1_1_mock_spec_a44741bbfe9cbb2c26b48f83280143658}{Internal\+Default\+Action\+Set\+At}} (const char \texorpdfstring{$\ast$}{*}file, int line, const char \texorpdfstring{$\ast$}{*}obj, const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{programs_2clio_2main_8cpp_af931af8e9f099860a2670931f8d3ad2c}{call}})
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_typed_expectation}{internal\+::\+Typed\+Expectation}}$<$ F $>$ \& \mbox{\hyperlink{classtesting_1_1internal_1_1_mock_spec_a8d198d6bc95a3f3e885ae1def6d0d15e}{Internal\+Expected\+At}} (const char \texorpdfstring{$\ast$}{*}file, int line, const char \texorpdfstring{$\ast$}{*}obj, const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{programs_2clio_2main_8cpp_af931af8e9f099860a2670931f8d3ad2c}{call}})
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_mock_spec}{Mock\+Spec}}$<$ F $>$ \& \mbox{\hyperlink{classtesting_1_1internal_1_1_mock_spec_a21d937f48eebe32140c2d4c6add41803}{operator()}} (const \mbox{\hyperlink{classtesting_1_1internal_1_1_without_matchers}{internal\+::\+Without\+Matchers}} \&, void \texorpdfstring{$\ast$}{*}const)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{structtesting_1_1internal_1_1_function}{Function}} $>$ }\\\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classtesting_1_1internal_1_1_mock_spec_a6980863fff8693124aff79c507f87d45}{internal\+::\+Function\+Mocker}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename F$>$\newline
+class testing\+::internal\+::\+Mock\+Spec$<$ F $>$}
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l01253}{1253}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_mock_spec_a8bcb2c367ed3cdaaf51f0579a00c53d5}\index{testing::internal::MockSpec$<$ F $>$@{testing::internal::MockSpec$<$ F $>$}!ArgumentMatcherTuple@{ArgumentMatcherTuple}}
+\index{ArgumentMatcherTuple@{ArgumentMatcherTuple}!testing::internal::MockSpec$<$ F $>$@{testing::internal::MockSpec$<$ F $>$}}
+\doxysubsubsection{\texorpdfstring{ArgumentMatcherTuple}{ArgumentMatcherTuple}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_mock_spec_a8bcb2c367ed3cdaaf51f0579a00c53d5} 
+template$<$typename F $>$ \\
+\mbox{\hyperlink{structtesting_1_1internal_1_1_function}{internal\+::\+Function}}$<$F$>$\+::\+Argument\+Matcher\+Tuple \mbox{\hyperlink{classtesting_1_1internal_1_1_mock_spec}{testing\+::internal\+::\+Mock\+Spec}}$<$ F $>$\+::\+Argument\+Matcher\+Tuple}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l01257}{1257}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+\Hypertarget{classtesting_1_1internal_1_1_mock_spec_ab4f943ff3aebf0a0269f3963b1298262}\index{testing::internal::MockSpec$<$ F $>$@{testing::internal::MockSpec$<$ F $>$}!ArgumentTuple@{ArgumentTuple}}
+\index{ArgumentTuple@{ArgumentTuple}!testing::internal::MockSpec$<$ F $>$@{testing::internal::MockSpec$<$ F $>$}}
+\doxysubsubsection{\texorpdfstring{ArgumentTuple}{ArgumentTuple}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_mock_spec_ab4f943ff3aebf0a0269f3963b1298262} 
+template$<$typename F $>$ \\
+\mbox{\hyperlink{structtesting_1_1internal_1_1_function}{internal\+::\+Function}}$<$F$>$\+::\+Argument\+Tuple \mbox{\hyperlink{classtesting_1_1internal_1_1_mock_spec}{testing\+::internal\+::\+Mock\+Spec}}$<$ F $>$\+::\+Argument\+Tuple}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l01255}{1255}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_mock_spec_a6029fca9b87bb3b4391682589863dbe9}\index{testing::internal::MockSpec$<$ F $>$@{testing::internal::MockSpec$<$ F $>$}!MockSpec@{MockSpec}}
+\index{MockSpec@{MockSpec}!testing::internal::MockSpec$<$ F $>$@{testing::internal::MockSpec$<$ F $>$}}
+\doxysubsubsection{\texorpdfstring{MockSpec()}{MockSpec()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_mock_spec_a6029fca9b87bb3b4391682589863dbe9} 
+template$<$typename F $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_mock_spec}{testing\+::internal\+::\+Mock\+Spec}}$<$ F $>$\+::\+Mock\+Spec (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker_base}{internal\+::\+Function\+Mocker\+Base}}$<$ F $>$ \texorpdfstring{$\ast$}{*}}]{function\+\_\+mocker}{, }\item[{const \mbox{\hyperlink{classtesting_1_1internal_1_1_mock_spec_a8bcb2c367ed3cdaaf51f0579a00c53d5}{Argument\+Matcher\+Tuple}} \&}]{matchers}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l01261}{1261}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01263\ \ \ \ \ \ \ :\ function\_mocker\_(function\_mocker),\ matchers\_(matchers)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_mock_spec_a44741bbfe9cbb2c26b48f83280143658}\index{testing::internal::MockSpec$<$ F $>$@{testing::internal::MockSpec$<$ F $>$}!InternalDefaultActionSetAt@{InternalDefaultActionSetAt}}
+\index{InternalDefaultActionSetAt@{InternalDefaultActionSetAt}!testing::internal::MockSpec$<$ F $>$@{testing::internal::MockSpec$<$ F $>$}}
+\doxysubsubsection{\texorpdfstring{InternalDefaultActionSetAt()}{InternalDefaultActionSetAt()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_mock_spec_a44741bbfe9cbb2c26b48f83280143658} 
+template$<$typename F $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_on_call_spec}{internal\+::\+On\+Call\+Spec}}$<$ F $>$ \& \mbox{\hyperlink{classtesting_1_1internal_1_1_mock_spec}{testing\+::internal\+::\+Mock\+Spec}}$<$ F $>$\+::\+Internal\+Default\+Action\+Set\+At (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{file}{, }\item[{int}]{line}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{obj}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{call}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l01267}{1267}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01268\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01269\ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a07f4411f23f8b1b731858be9dda3fdcc}{LogWithLocation}}(\mbox{\hyperlink{namespacetesting_1_1internal_a203d1a8a2147a53d12bbdae40d443914a396aacfaee2849eaab7c1de9773d624d}{internal::kInfo}},\ file,\ line,}
+\DoxyCodeLine{01270\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::string(\textcolor{stringliteral}{"{}ON\_CALL("{}})\ +\ obj\ +\ \textcolor{stringliteral}{"{},\ "{}}\ +\ \mbox{\hyperlink{programs_2clio_2main_8cpp_af931af8e9f099860a2670931f8d3ad2c}{call}}\ +\ \textcolor{stringliteral}{"{})\ invoked"{}});}
+\DoxyCodeLine{01271\ \ \ \ \ \textcolor{keywordflow}{return}\ function\_mocker\_-\/>AddNewOnCallSpec(file,\ line,\ matchers\_);}
+\DoxyCodeLine{01272\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_mock_spec_a44741bbfe9cbb2c26b48f83280143658_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_mock_spec_a8d198d6bc95a3f3e885ae1def6d0d15e}\index{testing::internal::MockSpec$<$ F $>$@{testing::internal::MockSpec$<$ F $>$}!InternalExpectedAt@{InternalExpectedAt}}
+\index{InternalExpectedAt@{InternalExpectedAt}!testing::internal::MockSpec$<$ F $>$@{testing::internal::MockSpec$<$ F $>$}}
+\doxysubsubsection{\texorpdfstring{InternalExpectedAt()}{InternalExpectedAt()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_mock_spec_a8d198d6bc95a3f3e885ae1def6d0d15e} 
+template$<$typename F $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_typed_expectation}{internal\+::\+Typed\+Expectation}}$<$ F $>$ \& \mbox{\hyperlink{classtesting_1_1internal_1_1_mock_spec}{testing\+::internal\+::\+Mock\+Spec}}$<$ F $>$\+::\+Internal\+Expected\+At (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{file}{, }\item[{int}]{line}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{obj}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{call}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l01276}{1276}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01277\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01278\ \ \ \ \ \textcolor{keyword}{const}\ std::string\ source\_text(std::string(\textcolor{stringliteral}{"{}EXPECT\_CALL("{}})\ +\ obj\ +\ \textcolor{stringliteral}{"{},\ "{}}\ +}
+\DoxyCodeLine{01279\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{programs_2clio_2main_8cpp_af931af8e9f099860a2670931f8d3ad2c}{call}}\ +\ \textcolor{stringliteral}{"{})"{}});}
+\DoxyCodeLine{01280\ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a07f4411f23f8b1b731858be9dda3fdcc}{LogWithLocation}}(\mbox{\hyperlink{namespacetesting_1_1internal_a203d1a8a2147a53d12bbdae40d443914a396aacfaee2849eaab7c1de9773d624d}{internal::kInfo}},\ file,\ line,\ source\_text\ +\ \textcolor{stringliteral}{"{}\ invoked"{}});}
+\DoxyCodeLine{01281\ \ \ \ \ \textcolor{keywordflow}{return}\ function\_mocker\_-\/>AddNewExpectation(}
+\DoxyCodeLine{01282\ \ \ \ \ \ \ \ \ file,\ line,\ source\_text,\ matchers\_);}
+\DoxyCodeLine{01283\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_mock_spec_a8d198d6bc95a3f3e885ae1def6d0d15e_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_mock_spec_a21d937f48eebe32140c2d4c6add41803}\index{testing::internal::MockSpec$<$ F $>$@{testing::internal::MockSpec$<$ F $>$}!operator()@{operator()}}
+\index{operator()@{operator()}!testing::internal::MockSpec$<$ F $>$@{testing::internal::MockSpec$<$ F $>$}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_mock_spec_a21d937f48eebe32140c2d4c6add41803} 
+template$<$typename F $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_mock_spec}{Mock\+Spec}}$<$ F $>$ \& \mbox{\hyperlink{classtesting_1_1internal_1_1_mock_spec}{testing\+::internal\+::\+Mock\+Spec}}$<$ F $>$\+::operator() (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classtesting_1_1internal_1_1_without_matchers}{internal\+::\+Without\+Matchers}} \&}]{}{, }\item[{void \texorpdfstring{$\ast$}{*} const}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l01288}{1288}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01288\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01289\ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{01290\ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_mock_spec_a6980863fff8693124aff79c507f87d45}\index{testing::internal::MockSpec$<$ F $>$@{testing::internal::MockSpec$<$ F $>$}!internal::FunctionMocker@{internal::FunctionMocker}}
+\index{internal::FunctionMocker@{internal::FunctionMocker}!testing::internal::MockSpec$<$ F $>$@{testing::internal::MockSpec$<$ F $>$}}
+\doxysubsubsection{\texorpdfstring{internal::FunctionMocker}{internal::FunctionMocker}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_mock_spec_a6980863fff8693124aff79c507f87d45} 
+template$<$typename F $>$ \\
+template$<$typename \mbox{\hyperlink{structtesting_1_1internal_1_1_function}{Function}} $>$ \\
+friend \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classtesting_1_1internal_1_1_function_mocker}{internal\+::\+Function\+Mocker}}\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l01294}{1294}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/include/gmock/\mbox{\hyperlink{gmock-spec-builders_8h}{gmock-\/spec-\/builders.\+h}}\end{DoxyCompactItemize}

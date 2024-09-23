@@ -1,0 +1,122 @@
+\doxysection{opts-\/\+GCC.h}
+\hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source}{}\label{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source}\index{libraries/sys-\/vm/external/softfloat/source/include/opts-\/GCC.h@{libraries/sys-\/vm/external/softfloat/source/include/opts-\/GCC.h}}
+\mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00001}00001\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00002}00002\ \textcolor{comment}{/*============================================================================}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00003}00003\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00004}00004\ \textcolor{comment}{This\ C\ header\ file\ is\ part\ of\ the\ SoftFloat\ IEEE\ Floating-\/Point\ Arithmetic}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00005}00005\ \textcolor{comment}{Package,\ Release\ 3e,\ by\ John\ R.\ Hauser.}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00006}00006\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00007}00007\ \textcolor{comment}{Copyright\ 2017\ The\ Regents\ of\ the\ University\ of\ California.\ \ All\ rights}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00008}00008\ \textcolor{comment}{reserved.}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00009}00009\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00010}00010\ \textcolor{comment}{Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00011}00011\ \textcolor{comment}{modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are\ met:}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00012}00012\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00013}00013\ \textcolor{comment}{\ 1.\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright\ notice,}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00014}00014\ \textcolor{comment}{\ \ \ \ this\ list\ of\ conditions,\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00015}00015\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00016}00016\ \textcolor{comment}{\ 2.\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above\ copyright\ notice,}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00017}00017\ \textcolor{comment}{\ \ \ \ this\ list\ of\ conditions,\ and\ the\ following\ disclaimer\ in\ the\ documentation}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00018}00018\ \textcolor{comment}{\ \ \ \ and/or\ other\ materials\ provided\ with\ the\ distribution.}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00019}00019\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00020}00020\ \textcolor{comment}{\ 3.\ Neither\ the\ name\ of\ the\ University\ nor\ the\ names\ of\ its\ contributors\ may}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00021}00021\ \textcolor{comment}{\ \ \ \ be\ used\ to\ endorse\ or\ promote\ products\ derived\ from\ this\ software\ without}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00022}00022\ \textcolor{comment}{\ \ \ \ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00023}00023\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00024}00024\ \textcolor{comment}{THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ REGENTS\ AND\ CONTRIBUTORS\ "{}AS\ IS"{},\ AND\ ANY}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00025}00025\ \textcolor{comment}{EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ THE\ IMPLIED}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00026}00026\ \textcolor{comment}{WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR\ A\ PARTICULAR\ PURPOSE,\ ARE}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00027}00027\ \textcolor{comment}{DISCLAIMED.\ \ IN\ NO\ EVENT\ SHALL\ THE\ REGENTS\ OR\ CONTRIBUTORS\ BE\ LIABLE\ FOR\ ANY}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00028}00028\ \textcolor{comment}{DIRECT,\ INDIRECT,\ INCIDENTAL,\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00029}00029\ \textcolor{comment}{(INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00030}00030\ \textcolor{comment}{LOSS\ OF\ USE,\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00031}00031\ \textcolor{comment}{ON\ ANY\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00032}00032\ \textcolor{comment}{(INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE\ OF\ THIS}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00033}00033\ \textcolor{comment}{SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00034}00034\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00035}00035\ \textcolor{comment}{=============================================================================*/}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00037}00037\ \textcolor{preprocessor}{\#ifndef\ opts\_GCC\_h}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00038}00038\ \textcolor{preprocessor}{\#define\ opts\_GCC\_h\ 1}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00040}00040\ \textcolor{preprocessor}{\#if\ 0}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00041}00041\ \textcolor{preprocessor}{\#ifdef\ INLINE}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00043}00043\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{stdint_8h}{stdint.h}}>}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00044}00044\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h}{primitiveTypes.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00046}00046\ \textcolor{preprocessor}{\#ifdef\ SOFTFLOAT\_BUILTIN\_CLZ}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00048}00048\ \mbox{\hyperlink{softfloat_2build_2_linux-386-_g_c_c_2platform_8h_a2eb6f9e0395b47b8d5e3eeae4fe0c116}{INLINE}}\ \mbox{\hyperlink{stdint_8h_ad0fca8b15c218d2c687f8c373a71d228}{uint\_fast8\_t}}\ \mbox{\hyperlink{softfloat_2source_2s__count_leading_zeros16_8c_a945c3dfcb3e1a5a92be75fd284b165f4}{softfloat\_countLeadingZeros16}}(\ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ )}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00049}00049\ \ \ \ \ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ ?\ \_\_builtin\_clz(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ )\ -\/\ 16\ :\ 16;\ \}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00050}00050\ \textcolor{preprocessor}{\#define\ softfloat\_countLeadingZeros16\ softfloat\_countLeadingZeros16}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00052}00052\ \mbox{\hyperlink{softfloat_2build_2_linux-386-_g_c_c_2platform_8h_a2eb6f9e0395b47b8d5e3eeae4fe0c116}{INLINE}}\ \mbox{\hyperlink{stdint_8h_ad0fca8b15c218d2c687f8c373a71d228}{uint\_fast8\_t}}\ \mbox{\hyperlink{softfloat_2source_2s__count_leading_zeros32_8c_a20e06c2785548bfc8a5351e7e241e351}{softfloat\_countLeadingZeros32}}(\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ )}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00053}00053\ \ \ \ \ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ ?\ \_\_builtin\_clz(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ )\ :\ 32;\ \}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00054}00054\ \textcolor{preprocessor}{\#define\ softfloat\_countLeadingZeros32\ softfloat\_countLeadingZeros32}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00056}00056\ \mbox{\hyperlink{softfloat_2build_2_linux-386-_g_c_c_2platform_8h_a2eb6f9e0395b47b8d5e3eeae4fe0c116}{INLINE}}\ \mbox{\hyperlink{stdint_8h_ad0fca8b15c218d2c687f8c373a71d228}{uint\_fast8\_t}}\ \mbox{\hyperlink{softfloat_2source_2s__count_leading_zeros64_8c_aa7f029cdc05ad078461581da52b91bef}{softfloat\_countLeadingZeros64}}(\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ )}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00057}00057\ \ \ \ \ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ ?\ \_\_builtin\_clzll(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ )\ :\ 64;\ \}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00058}00058\ \textcolor{preprocessor}{\#define\ softfloat\_countLeadingZeros64\ softfloat\_countLeadingZeros64}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00060}00060\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00062}00062\ \textcolor{preprocessor}{\#ifdef\ SOFTFLOAT\_INTRINSIC\_INT128}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00064}00064\ \mbox{\hyperlink{softfloat_2build_2_linux-386-_g_c_c_2platform_8h_a2eb6f9e0395b47b8d5e3eeae4fe0c116}{INLINE}}\ \textcolor{keyword}{struct\ }uint128\ \mbox{\hyperlink{softfloat_2source_2s__mul64_by_shifted32_to128_8c_ab62896cc026932569fbb176c2ea283b4}{softfloat\_mul64ByShifted32To128}}(\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ b\ )}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00065}00065\ \{}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00066}00066\ \ \ \ \ \textcolor{keyword}{union\ }\{\ \textcolor{keywordtype}{unsigned}\ \_\_int128\ ui;\ \textcolor{keyword}{struct\ }uint128\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};\ \}\ uZ;}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00067}00067\ \ \ \ \ uZ.ui\ =\ (\textcolor{keywordtype}{unsigned}\ \_\_int128)\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ *\ ((\mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\_fast64\_t}})\ b<<32);}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00068}00068\ \ \ \ \ \textcolor{keywordflow}{return}\ uZ.s;}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00069}00069\ \}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00070}00070\ \textcolor{preprocessor}{\#define\ softfloat\_mul64ByShifted32To128\ softfloat\_mul64ByShifted32To128}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00072}00072\ \mbox{\hyperlink{softfloat_2build_2_linux-386-_g_c_c_2platform_8h_a2eb6f9e0395b47b8d5e3eeae4fe0c116}{INLINE}}\ \textcolor{keyword}{struct\ }uint128\ \mbox{\hyperlink{softfloat_2source_2s__mul64_to128_8c_a8eb61b71e753ca77e880683f56e63dc3}{softfloat\_mul64To128}}(\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ b\ )}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00073}00073\ \{}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00074}00074\ \ \ \ \ \textcolor{keyword}{union\ }\{\ \textcolor{keywordtype}{unsigned}\ \_\_int128\ ui;\ \textcolor{keyword}{struct\ }uint128\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};\ \}\ uZ;}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00075}00075\ \ \ \ \ uZ.ui\ =\ (\textcolor{keywordtype}{unsigned}\ \_\_int128)\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ *\ b;}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00076}00076\ \ \ \ \ \textcolor{keywordflow}{return}\ uZ.s;}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00077}00077\ \}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00078}00078\ \textcolor{preprocessor}{\#define\ softfloat\_mul64To128\ softfloat\_mul64To128}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00080}00080\ \mbox{\hyperlink{softfloat_2build_2_linux-386-_g_c_c_2platform_8h_a2eb6f9e0395b47b8d5e3eeae4fe0c116}{INLINE}}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00081}00081\ \textcolor{keyword}{struct\ }uint128\ \mbox{\hyperlink{softfloat_2source_2s__mul128_by32_8c_a469e2374cbc3cdd8b408c45d9d5908ec}{softfloat\_mul128By32}}(\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ a64,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ a0,\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ b\ )}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00082}00082\ \{}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00083}00083\ \ \ \ \ \textcolor{keyword}{union\ }\{\ \textcolor{keywordtype}{unsigned}\ \_\_int128\ ui;\ \textcolor{keyword}{struct\ }uint128\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};\ \}\ uZ;}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00084}00084\ \ \ \ \ uZ.ui\ =\ ((\textcolor{keywordtype}{unsigned}\ \_\_int128)\ a64<<64\ |\ a0)\ *\ b;}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00085}00085\ \ \ \ \ \textcolor{keywordflow}{return}\ uZ.s;}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00086}00086\ \}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00087}00087\ \textcolor{preprocessor}{\#define\ softfloat\_mul128By32\ softfloat\_mul128By32}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00088}00088\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00089}00089\ \mbox{\hyperlink{softfloat_2build_2_linux-386-_g_c_c_2platform_8h_a2eb6f9e0395b47b8d5e3eeae4fe0c116}{INLINE}}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00090}00090\ \textcolor{keywordtype}{void}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00091}00091\ \ \mbox{\hyperlink{softfloat_2source_2s__mul128_to256_m_8c_a9bbafedcc4cf1bc469fb1b8c72c9e439}{softfloat\_mul128To256M}}(}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00092}00092\ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ a64,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ a0,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ b64,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ b0,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ *zPtr\ )}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00093}00093\ \{}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00094}00094\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \_\_int128\ z0,\ mid1,\ mid,\ z128;}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00095}00095\ \ \ \ \ z0\ =\ (\textcolor{keywordtype}{unsigned}\ \_\_int128)\ a0\ *\ b0;}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00096}00096\ \ \ \ \ mid1\ =\ (\textcolor{keywordtype}{unsigned}\ \_\_int128)\ a64\ *\ b0;}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00097}00097\ \ \ \ \ mid\ =\ mid1\ +\ (\textcolor{keywordtype}{unsigned}\ \_\_int128)\ a0\ *\ b64;}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00098}00098\ \ \ \ \ z128\ =\ (\textcolor{keywordtype}{unsigned}\ \_\_int128)\ a64\ *\ b64;}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00099}00099\ \ \ \ \ z128\ +=\ (\textcolor{keywordtype}{unsigned}\ \_\_int128)\ (mid\ <\ mid1)<<64\ |\ mid>>64;}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00100}00100\ \ \ \ \ mid\ <<=\ 64;}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00101}00101\ \ \ \ \ z0\ +=\ mid;}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00102}00102\ \ \ \ \ z128\ +=\ (z0\ <\ mid);}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00103}00103\ \ \ \ \ zPtr[\mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a49446dd1193996f92b1e5bb62eaa4689}{indexWord}}(\ 4,\ 0\ )]\ =\ z0;}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00104}00104\ \ \ \ \ zPtr[\mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a49446dd1193996f92b1e5bb62eaa4689}{indexWord}}(\ 4,\ 1\ )]\ =\ z0>>64;}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00105}00105\ \ \ \ \ zPtr[\mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a49446dd1193996f92b1e5bb62eaa4689}{indexWord}}(\ 4,\ 2\ )]\ =\ z128;}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00106}00106\ \ \ \ \ zPtr[\mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a49446dd1193996f92b1e5bb62eaa4689}{indexWord}}(\ 4,\ 3\ )]\ =\ z128>>64;}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00107}00107\ \}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00108}00108\ \textcolor{preprocessor}{\#define\ softfloat\_mul128To256M\ softfloat\_mul128To256M}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00109}00109\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00110}00110\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00111}00111\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00112}00112\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00113}00113\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00114}00114\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00115}00115\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2opts-_g_c_c_8h_source_l00116}00116\ }
+
+\end{DoxyCode}

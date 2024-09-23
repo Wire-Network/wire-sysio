@@ -1,0 +1,799 @@
+\doxysection{websocketpp\+::message\+\_\+buffer\+::message\texorpdfstring{$<$}{<} con\+\_\+msg\+\_\+manager \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classwebsocketpp_1_1message__buffer_1_1message}{}\label{classwebsocketpp_1_1message__buffer_1_1message}\index{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}}
+
+
+Represents a buffer for a single Web\+Socket message.  
+
+
+
+
+{\ttfamily \#include $<$message.\+hpp$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef lib\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message}{message}} $>$ \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message_a665ccc8a3883dbea049aef85c46efe7f}{ptr}}
+\item 
+typedef con\+\_\+msg\+\_\+manager$<$ \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message}{message}} $>$ \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message_a7877860af37d51cd20276664c06dc644}{con\+\_\+msg\+\_\+man\+\_\+type}}
+\item 
+typedef con\+\_\+msg\+\_\+man\+\_\+type\+::ptr \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message_ac8f2c5b209245c30622fd729409298d0}{con\+\_\+msg\+\_\+man\+\_\+ptr}}
+\item 
+typedef con\+\_\+msg\+\_\+man\+\_\+type\+::weak\+\_\+ptr \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message_ab927af4c061fc5c290c118905663d0dd}{con\+\_\+msg\+\_\+man\+\_\+weak\+\_\+ptr}}
+\item 
+typedef con\+\_\+msg\+\_\+manager\+::weak\+\_\+ptr \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message_a4b5839be6f4218059a802c63e398cad2}{con\+\_\+msg\+\_\+man\+\_\+ptr}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message_ae3cb82d2876aebcf9909d87858e0f4af}{message}} (const \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message_ac8f2c5b209245c30622fd729409298d0}{con\+\_\+msg\+\_\+man\+\_\+ptr}} manager)
+\begin{DoxyCompactList}\small\item\em Construct an empty message. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message_a09c574d6d92b28629bed43bbbc674db1}{message}} (const \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message_ac8f2c5b209245c30622fd729409298d0}{con\+\_\+msg\+\_\+man\+\_\+ptr}} manager, \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e}{frame\+::opcode\+::value}} \mbox{\hyperlink{unionop}{op}}, size\+\_\+t size=128)
+\begin{DoxyCompactList}\small\item\em Construct a message and fill in some values. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message_ac1f947fbff19cf93d6fc19e21aff0e10}{get\+\_\+prepared}} () const
+\begin{DoxyCompactList}\small\item\em Return whether or not the message has been prepared for sending. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message_a9b17bf5adb8607c44774a96b340ee55b}{set\+\_\+prepared}} (bool \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\begin{DoxyCompactList}\small\item\em Set or clear the flag that indicates that the message has been prepared. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message_a2ed58d11ccdedad8b6f9123897cff071}{get\+\_\+compressed}} () const
+\begin{DoxyCompactList}\small\item\em Return whether or not the message is flagged as compressed. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message_addf63a081902e981a293823606b548cb}{set\+\_\+compressed}} (bool \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\begin{DoxyCompactList}\small\item\em Set or clear the compression flag. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message_a45e39497d283ec38d1360b60a5879e32}{get\+\_\+terminal}} () const
+\begin{DoxyCompactList}\small\item\em Get whether or not the message is terminal. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message_abcc812dfce52ff72f57a0d0908d33867}{set\+\_\+terminal}} (bool \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\begin{DoxyCompactList}\small\item\em Set the terminal flag. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message_a8546e56c8a4c6d7f9f37510183874fba}{get\+\_\+fin}} () const
+\begin{DoxyCompactList}\small\item\em Read the fin bit. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message_ae726efab2bc95acf7a1fcd327a8e85b9}{set\+\_\+fin}} (bool \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\begin{DoxyCompactList}\small\item\em Set the fin bit. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e}{frame\+::opcode\+::value}} \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message_aa8f82b2e145e1d52ce4a537c3df40389}{get\+\_\+opcode}} () const
+\begin{DoxyCompactList}\small\item\em Return the message opcode. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message_a96571972bb7dfaf1ffcae2fbedb07bbe}{set\+\_\+opcode}} (\mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e}{frame\+::opcode\+::value}} \mbox{\hyperlink{unionop}{op}})
+\begin{DoxyCompactList}\small\item\em Set the opcode. \end{DoxyCompactList}\item 
+std\+::string const \& \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message_a57ec54b4b065db6f481d0a018e8ec454}{get\+\_\+header}} () const
+\begin{DoxyCompactList}\small\item\em Return the prepared frame header. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message_a230b36c0cd2572cfce1f218a15bc534e}{set\+\_\+header}} (std\+::string const \&header)
+\begin{DoxyCompactList}\small\item\em Set prepared frame header. \end{DoxyCompactList}\item 
+std\+::string const \& \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message_a08fcdd1ab6f1e9ef6fed28fcab61c185}{get\+\_\+extension\+\_\+data}} () const
+\item 
+std\+::string const \& \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message_aec6739265d90c17cfd7f3af67d355eff}{get\+\_\+payload}} () const
+\begin{DoxyCompactList}\small\item\em Get a reference to the payload string. \end{DoxyCompactList}\item 
+std\+::string \& \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message_a1d7f82051a02ac24385d233e3403a6e0}{get\+\_\+raw\+\_\+payload}} ()
+\begin{DoxyCompactList}\small\item\em Get a non-\/const reference to the payload string. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message_a349d38ec257bde2f6f657cb31af80ced}{set\+\_\+payload}} (std\+::string const \&payload)
+\begin{DoxyCompactList}\small\item\em Set payload data. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message_a714fd661ca04196d2e5b5834f83512aa}{set\+\_\+payload}} (void const \texorpdfstring{$\ast$}{*}payload, size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})
+\begin{DoxyCompactList}\small\item\em Set payload data. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message_addb7f631d522de382d5dd668a1b66020}{append\+\_\+payload}} (std\+::string const \&payload)
+\begin{DoxyCompactList}\small\item\em Append payload data. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message_a85cbf746725a6e34fef2b51604a29c71}{append\+\_\+payload}} (void const \texorpdfstring{$\ast$}{*}payload, size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})
+\begin{DoxyCompactList}\small\item\em Append payload data. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message_a2c19e247389598d9f81c9447ddcfba51}{recycle}} ()
+\begin{DoxyCompactList}\small\item\em Recycle the message. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message_ae5708790af579115f87466d958160d9e}{message}} (\mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message_ac8f2c5b209245c30622fd729409298d0}{con\+\_\+msg\+\_\+man\+\_\+ptr}} manager, size\+\_\+t size=128)
+\item 
+\mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e}{frame\+::opcode\+::value}} \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message_aa8f82b2e145e1d52ce4a537c3df40389}{get\+\_\+opcode}} () const
+\item 
+const std\+::string \& \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message_a3407c3c905f938d9cf72487b488c5055}{get\+\_\+header}} () const
+\item 
+const std\+::string \& \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message_a4ad97116c6202a87d16f8b09d1f3ea41}{get\+\_\+extension\+\_\+data}} () const
+\item 
+const std\+::string \& \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message_ad650528e426cca4e428156be30e35072}{get\+\_\+payload}} () const
+\item 
+bool \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message_a2c19e247389598d9f81c9447ddcfba51}{recycle}} ()
+\begin{DoxyCompactList}\small\item\em Recycle the message. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename con\+\_\+msg\+\_\+manager$>$\newline
+class websocketpp\+::message\+\_\+buffer\+::message$<$ con\+\_\+msg\+\_\+manager $>$}
+
+
+Definition at line \mbox{\hyperlink{pool_8hpp_source_l00101}{101}} of file \mbox{\hyperlink{pool_8hpp_source}{pool.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classwebsocketpp_1_1message__buffer_1_1message_ac8f2c5b209245c30622fd729409298d0}\index{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}!con\_msg\_man\_ptr@{con\_msg\_man\_ptr}}
+\index{con\_msg\_man\_ptr@{con\_msg\_man\_ptr}!websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}}
+\doxysubsubsection{\texorpdfstring{con\_msg\_man\_ptr}{con\_msg\_man\_ptr}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1message__buffer_1_1message_ac8f2c5b209245c30622fd729409298d0} 
+template$<$typename con\+\_\+msg\+\_\+manager $>$ \\
+con\+\_\+msg\+\_\+man\+\_\+type\+::ptr \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message}{websocketpp\+::message\+\_\+buffer\+::message}}$<$ con\+\_\+msg\+\_\+manager $>$\+::con\+\_\+msg\+\_\+man\+\_\+ptr}
+
+
+
+Definition at line \mbox{\hyperlink{message_8hpp_source_l00089}{89}} of file \mbox{\hyperlink{message_8hpp_source}{message.\+hpp}}.
+
+\Hypertarget{classwebsocketpp_1_1message__buffer_1_1message_a4b5839be6f4218059a802c63e398cad2}\index{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}!con\_msg\_man\_ptr@{con\_msg\_man\_ptr}}
+\index{con\_msg\_man\_ptr@{con\_msg\_man\_ptr}!websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}}
+\doxysubsubsection{\texorpdfstring{con\_msg\_man\_ptr}{con\_msg\_man\_ptr}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1message__buffer_1_1message_a4b5839be6f4218059a802c63e398cad2} 
+template$<$typename con\+\_\+msg\+\_\+manager $>$ \\
+con\+\_\+msg\+\_\+manager\+::weak\+\_\+ptr \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message}{websocketpp\+::message\+\_\+buffer\+::message}}$<$ con\+\_\+msg\+\_\+manager $>$\+::con\+\_\+msg\+\_\+man\+\_\+ptr}
+
+
+
+Definition at line \mbox{\hyperlink{pool_8hpp_source_l00105}{105}} of file \mbox{\hyperlink{pool_8hpp_source}{pool.\+hpp}}.
+
+\Hypertarget{classwebsocketpp_1_1message__buffer_1_1message_a7877860af37d51cd20276664c06dc644}\index{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}!con\_msg\_man\_type@{con\_msg\_man\_type}}
+\index{con\_msg\_man\_type@{con\_msg\_man\_type}!websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}}
+\doxysubsubsection{\texorpdfstring{con\_msg\_man\_type}{con\_msg\_man\_type}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1message__buffer_1_1message_a7877860af37d51cd20276664c06dc644} 
+template$<$typename con\+\_\+msg\+\_\+manager $>$ \\
+con\+\_\+msg\+\_\+manager$<$\mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message}{message}}$>$ \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message}{websocketpp\+::message\+\_\+buffer\+::message}}$<$ con\+\_\+msg\+\_\+manager $>$\+::con\+\_\+msg\+\_\+man\+\_\+type}
+
+
+
+Definition at line \mbox{\hyperlink{message_8hpp_source_l00088}{88}} of file \mbox{\hyperlink{message_8hpp_source}{message.\+hpp}}.
+
+\Hypertarget{classwebsocketpp_1_1message__buffer_1_1message_ab927af4c061fc5c290c118905663d0dd}\index{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}!con\_msg\_man\_weak\_ptr@{con\_msg\_man\_weak\_ptr}}
+\index{con\_msg\_man\_weak\_ptr@{con\_msg\_man\_weak\_ptr}!websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}}
+\doxysubsubsection{\texorpdfstring{con\_msg\_man\_weak\_ptr}{con\_msg\_man\_weak\_ptr}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1message__buffer_1_1message_ab927af4c061fc5c290c118905663d0dd} 
+template$<$typename con\+\_\+msg\+\_\+manager $>$ \\
+con\+\_\+msg\+\_\+man\+\_\+type\+::weak\+\_\+ptr \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message}{websocketpp\+::message\+\_\+buffer\+::message}}$<$ con\+\_\+msg\+\_\+manager $>$\+::con\+\_\+msg\+\_\+man\+\_\+weak\+\_\+ptr}
+
+
+
+Definition at line \mbox{\hyperlink{message_8hpp_source_l00090}{90}} of file \mbox{\hyperlink{message_8hpp_source}{message.\+hpp}}.
+
+\Hypertarget{classwebsocketpp_1_1message__buffer_1_1message_a665ccc8a3883dbea049aef85c46efe7f}\index{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}!ptr@{ptr}}
+\index{ptr@{ptr}!websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}}
+\doxysubsubsection{\texorpdfstring{ptr}{ptr}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1message__buffer_1_1message_a665ccc8a3883dbea049aef85c46efe7f} 
+template$<$typename con\+\_\+msg\+\_\+manager $>$ \\
+typedef lib\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message}{message}} $>$ \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message}{websocketpp\+::message\+\_\+buffer\+::message}}$<$ con\+\_\+msg\+\_\+manager $>$\+::ptr}
+
+
+
+Definition at line \mbox{\hyperlink{message_8hpp_source_l00086}{86}} of file \mbox{\hyperlink{message_8hpp_source}{message.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classwebsocketpp_1_1message__buffer_1_1message_ae3cb82d2876aebcf9909d87858e0f4af}\index{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}!message@{message}}
+\index{message@{message}!websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}}
+\doxysubsubsection{\texorpdfstring{message()}{message()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1message__buffer_1_1message_ae3cb82d2876aebcf9909d87858e0f4af} 
+template$<$typename con\+\_\+msg\+\_\+manager $>$ \\
+\mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message}{websocketpp\+::message\+\_\+buffer\+::message}}$<$ con\+\_\+msg\+\_\+manager $>$\+::message (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message_ac8f2c5b209245c30622fd729409298d0}{con\+\_\+msg\+\_\+man\+\_\+ptr}}}]{manager}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Construct an empty message 
+
+Definition at line \mbox{\hyperlink{message_8hpp_source_l00096}{96}} of file \mbox{\hyperlink{message_8hpp_source}{message.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ :\ m\_manager(manager)}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ ,\ m\_prepared(\textcolor{keyword}{false})}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ ,\ m\_fin(\textcolor{keyword}{true})}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ ,\ m\_terminal(\textcolor{keyword}{false})}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ ,\ m\_compressed(\textcolor{keyword}{false})\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1message__buffer_1_1message_a09c574d6d92b28629bed43bbbc674db1}\index{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}!message@{message}}
+\index{message@{message}!websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}}
+\doxysubsubsection{\texorpdfstring{message()}{message()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1message__buffer_1_1message_a09c574d6d92b28629bed43bbbc674db1} 
+template$<$typename con\+\_\+msg\+\_\+manager $>$ \\
+\mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message}{websocketpp\+::message\+\_\+buffer\+::message}}$<$ con\+\_\+msg\+\_\+manager $>$\+::message (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message_ac8f2c5b209245c30622fd729409298d0}{con\+\_\+msg\+\_\+man\+\_\+ptr}}}]{manager}{, }\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e}{frame\+::opcode\+::value}}}]{op}{, }\item[{size\+\_\+t}]{size}{ = {\ttfamily 128}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{message_8hpp_source_l00107}{107}} of file \mbox{\hyperlink{message_8hpp_source}{message.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ :\ m\_manager(manager)}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ ,\ m\_opcode(\mbox{\hyperlink{unionop}{op}})}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ ,\ m\_prepared(\textcolor{keyword}{false})}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ ,\ m\_fin(\textcolor{keyword}{true})}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ ,\ m\_terminal(\textcolor{keyword}{false})}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ ,\ m\_compressed(\textcolor{keyword}{false})}
+\DoxyCodeLine{00114\ \ \ \ \ \{}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ m\_payload.reserve(size);}
+\DoxyCodeLine{00116\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1message__buffer_1_1message_ae5708790af579115f87466d958160d9e}\index{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}!message@{message}}
+\index{message@{message}!websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}}
+\doxysubsubsection{\texorpdfstring{message()}{message()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1message__buffer_1_1message_ae5708790af579115f87466d958160d9e} 
+template$<$typename con\+\_\+msg\+\_\+manager $>$ \\
+\mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message}{websocketpp\+::message\+\_\+buffer\+::message}}$<$ con\+\_\+msg\+\_\+manager $>$\+::message (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message_ac8f2c5b209245c30622fd729409298d0}{con\+\_\+msg\+\_\+man\+\_\+ptr}}}]{manager}{, }\item[{size\+\_\+t}]{size}{ = {\ttfamily 128}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{pool_8hpp_source_l00107}{107}} of file \mbox{\hyperlink{pool_8hpp_source}{pool.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ :\ m\_manager(manager)}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ ,\ m\_payload(size)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classwebsocketpp_1_1message__buffer_1_1message_addb7f631d522de382d5dd668a1b66020}\index{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}!append\_payload@{append\_payload}}
+\index{append\_payload@{append\_payload}!websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}}
+\doxysubsubsection{\texorpdfstring{append\_payload()}{append\_payload()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1message__buffer_1_1message_addb7f631d522de382d5dd668a1b66020} 
+template$<$typename con\+\_\+msg\+\_\+manager $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message}{websocketpp\+::message\+\_\+buffer\+::message}}$<$ con\+\_\+msg\+\_\+manager $>$\+::append\+\_\+payload (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{payload}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Append data to the message buffer\textquotesingle{}s payload.
+
+
+\begin{DoxyParams}{Parameters}
+{\em payload} & \doxylink{struct_a}{A} string containing the data array to append. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{message_8hpp_source_l00287}{287}} of file \mbox{\hyperlink{message_8hpp_source}{message.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00287\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00288\ \ \ \ \ \ \ \ \ m\_payload.append(payload);}
+\DoxyCodeLine{00289\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1message__buffer_1_1message_a85cbf746725a6e34fef2b51604a29c71}\index{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}!append\_payload@{append\_payload}}
+\index{append\_payload@{append\_payload}!websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}}
+\doxysubsubsection{\texorpdfstring{append\_payload()}{append\_payload()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1message__buffer_1_1message_a85cbf746725a6e34fef2b51604a29c71} 
+template$<$typename con\+\_\+msg\+\_\+manager $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message}{websocketpp\+::message\+\_\+buffer\+::message}}$<$ con\+\_\+msg\+\_\+manager $>$\+::append\+\_\+payload (\begin{DoxyParamCaption}\item[{void const \texorpdfstring{$\ast$}{*}}]{payload}{, }\item[{size\+\_\+t}]{len}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Append data to the message buffer\textquotesingle{}s payload.
+
+
+\begin{DoxyParams}{Parameters}
+{\em payload} & \doxylink{struct_a}{A} pointer to a data array to append \\
+\hline
+{\em len} & The length of payload in bytes \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{message_8hpp_source_l00298}{298}} of file \mbox{\hyperlink{message_8hpp_source}{message.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00298\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00299\ \ \ \ \ \ \ \ \ m\_payload.reserve(m\_payload.size()+\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}});}
+\DoxyCodeLine{00300\ \ \ \ \ \ \ \ \ m\_payload.append(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{char}\ \textcolor{keyword}{const\ }*\textcolor{keyword}{>}(payload),\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}});}
+\DoxyCodeLine{00301\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1message__buffer_1_1message_a2ed58d11ccdedad8b6f9123897cff071}\index{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}!get\_compressed@{get\_compressed}}
+\index{get\_compressed@{get\_compressed}!websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}}
+\doxysubsubsection{\texorpdfstring{get\_compressed()}{get\_compressed()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1message__buffer_1_1message_a2ed58d11ccdedad8b6f9123897cff071} 
+template$<$typename con\+\_\+msg\+\_\+manager $>$ \\
+bool \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message}{websocketpp\+::message\+\_\+buffer\+::message}}$<$ con\+\_\+msg\+\_\+manager $>$\+::get\+\_\+compressed (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+\begin{DoxyReturn}{Returns}
+whether or not the message is/should be compressed 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{message_8hpp_source_l00143}{143}} of file \mbox{\hyperlink{message_8hpp_source}{message.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_compressed;}
+\DoxyCodeLine{00145\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1message__buffer_1_1message_a08fcdd1ab6f1e9ef6fed28fcab61c185}\index{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}!get\_extension\_data@{get\_extension\_data}}
+\index{get\_extension\_data@{get\_extension\_data}!websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}}
+\doxysubsubsection{\texorpdfstring{get\_extension\_data()}{get\_extension\_data()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1message__buffer_1_1message_a08fcdd1ab6f1e9ef6fed28fcab61c185} 
+template$<$typename con\+\_\+msg\+\_\+manager $>$ \\
+std\+::string const  \& \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message}{websocketpp\+::message\+\_\+buffer\+::message}}$<$ con\+\_\+msg\+\_\+manager $>$\+::get\+\_\+extension\+\_\+data (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{message_8hpp_source_l00238}{238}} of file \mbox{\hyperlink{message_8hpp_source}{message.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00238\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_extension\_data;}
+\DoxyCodeLine{00240\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1message__buffer_1_1message_a4ad97116c6202a87d16f8b09d1f3ea41}\index{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}!get\_extension\_data@{get\_extension\_data}}
+\index{get\_extension\_data@{get\_extension\_data}!websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}}
+\doxysubsubsection{\texorpdfstring{get\_extension\_data()}{get\_extension\_data()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1message__buffer_1_1message_a4ad97116c6202a87d16f8b09d1f3ea41} 
+template$<$typename con\+\_\+msg\+\_\+manager $>$ \\
+const std\+::string \& \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message}{websocketpp\+::message\+\_\+buffer\+::message}}$<$ con\+\_\+msg\+\_\+manager $>$\+::get\+\_\+extension\+\_\+data (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{pool_8hpp_source_l00117}{117}} of file \mbox{\hyperlink{pool_8hpp_source}{pool.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_extension\_data;}
+\DoxyCodeLine{00119\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1message__buffer_1_1message_a8546e56c8a4c6d7f9f37510183874fba}\index{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}!get\_fin@{get\_fin}}
+\index{get\_fin@{get\_fin}!websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}}
+\doxysubsubsection{\texorpdfstring{get\_fin()}{get\_fin()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1message__buffer_1_1message_a8546e56c8a4c6d7f9f37510183874fba} 
+template$<$typename con\+\_\+msg\+\_\+manager $>$ \\
+bool \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message}{websocketpp\+::message\+\_\+buffer\+::message}}$<$ con\+\_\+msg\+\_\+manager $>$\+::get\+\_\+fin (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+\doxylink{struct_a}{A} message with the fin bit set will be sent as the last message of its sequence. \doxylink{struct_a}{A} message with the fin bit cleared will require subsequent frames of opcode continuation until one of them has the fin bit set.
+
+The remote end likely will not deliver any bytes until the frame with the fin bit set has been received.
+
+\begin{DoxyReturn}{Returns}
+Whether or not the fin bit is set 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{message_8hpp_source_l00195}{195}} of file \mbox{\hyperlink{message_8hpp_source}{message.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_fin;}
+\DoxyCodeLine{00197\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1message__buffer_1_1message_a57ec54b4b065db6f481d0a018e8ec454}\index{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}!get\_header@{get\_header}}
+\index{get\_header@{get\_header}!websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}}
+\doxysubsubsection{\texorpdfstring{get\_header()}{get\_header()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1message__buffer_1_1message_a57ec54b4b065db6f481d0a018e8ec454} 
+template$<$typename con\+\_\+msg\+\_\+manager $>$ \\
+std\+::string const  \& \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message}{websocketpp\+::message\+\_\+buffer\+::message}}$<$ con\+\_\+msg\+\_\+manager $>$\+::get\+\_\+header (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+This value is typically set by a websocket protocol processor and shouldn\textquotesingle{}t be tampered with. 
+
+Definition at line \mbox{\hyperlink{message_8hpp_source_l00224}{224}} of file \mbox{\hyperlink{message_8hpp_source}{message.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_header;}
+\DoxyCodeLine{00226\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1message__buffer_1_1message_a3407c3c905f938d9cf72487b488c5055}\index{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}!get\_header@{get\_header}}
+\index{get\_header@{get\_header}!websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}}
+\doxysubsubsection{\texorpdfstring{get\_header()}{get\_header()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1message__buffer_1_1message_a3407c3c905f938d9cf72487b488c5055} 
+template$<$typename con\+\_\+msg\+\_\+manager $>$ \\
+const std\+::string \& \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message}{websocketpp\+::message\+\_\+buffer\+::message}}$<$ con\+\_\+msg\+\_\+manager $>$\+::get\+\_\+header (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{pool_8hpp_source_l00114}{114}} of file \mbox{\hyperlink{pool_8hpp_source}{pool.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_header;}
+\DoxyCodeLine{00116\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1message__buffer_1_1message_aa8f82b2e145e1d52ce4a537c3df40389}\index{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}!get\_opcode@{get\_opcode}}
+\index{get\_opcode@{get\_opcode}!websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}}
+\doxysubsubsection{\texorpdfstring{get\_opcode()}{get\_opcode()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1message__buffer_1_1message_aa8f82b2e145e1d52ce4a537c3df40389} 
+template$<$typename con\+\_\+msg\+\_\+manager $>$ \\
+\mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e}{frame\+::opcode\+::value}} \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message}{websocketpp\+::message\+\_\+buffer\+::message}}$<$ con\+\_\+msg\+\_\+manager $>$\+::get\+\_\+opcode (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{message_8hpp_source_l00210}{210}} of file \mbox{\hyperlink{message_8hpp_source}{message.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_opcode;}
+\DoxyCodeLine{00212\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1message__buffer_1_1message_aa8f82b2e145e1d52ce4a537c3df40389}\index{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}!get\_opcode@{get\_opcode}}
+\index{get\_opcode@{get\_opcode}!websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}}
+\doxysubsubsection{\texorpdfstring{get\_opcode()}{get\_opcode()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1message__buffer_1_1message_aa8f82b2e145e1d52ce4a537c3df40389} 
+template$<$typename con\+\_\+msg\+\_\+manager $>$ \\
+\mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e}{frame\+::opcode\+::value}} \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message}{websocketpp\+::message\+\_\+buffer\+::message}}$<$ con\+\_\+msg\+\_\+manager $>$\+::get\+\_\+opcode (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{pool_8hpp_source_l00111}{111}} of file \mbox{\hyperlink{pool_8hpp_source}{pool.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_opcode;}
+\DoxyCodeLine{00113\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1message__buffer_1_1message_aec6739265d90c17cfd7f3af67d355eff}\index{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}!get\_payload@{get\_payload}}
+\index{get\_payload@{get\_payload}!websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}}
+\doxysubsubsection{\texorpdfstring{get\_payload()}{get\_payload()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1message__buffer_1_1message_aec6739265d90c17cfd7f3af67d355eff} 
+template$<$typename con\+\_\+msg\+\_\+manager $>$ \\
+std\+::string const  \& \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message}{websocketpp\+::message\+\_\+buffer\+::message}}$<$ con\+\_\+msg\+\_\+manager $>$\+::get\+\_\+payload (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+\begin{DoxyReturn}{Returns}
+\doxylink{struct_a}{A} const reference to the message\textquotesingle{}s payload string 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{message_8hpp_source_l00246}{246}} of file \mbox{\hyperlink{message_8hpp_source}{message.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00246\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00247\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_payload;}
+\DoxyCodeLine{00248\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1message__buffer_1_1message_ad650528e426cca4e428156be30e35072}\index{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}!get\_payload@{get\_payload}}
+\index{get\_payload@{get\_payload}!websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}}
+\doxysubsubsection{\texorpdfstring{get\_payload()}{get\_payload()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1message__buffer_1_1message_ad650528e426cca4e428156be30e35072} 
+template$<$typename con\+\_\+msg\+\_\+manager $>$ \\
+const std\+::string \& \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message}{websocketpp\+::message\+\_\+buffer\+::message}}$<$ con\+\_\+msg\+\_\+manager $>$\+::get\+\_\+payload (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{pool_8hpp_source_l00120}{120}} of file \mbox{\hyperlink{pool_8hpp_source}{pool.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_payload;}
+\DoxyCodeLine{00122\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1message__buffer_1_1message_ac1f947fbff19cf93d6fc19e21aff0e10}\index{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}!get\_prepared@{get\_prepared}}
+\index{get\_prepared@{get\_prepared}!websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}}
+\doxysubsubsection{\texorpdfstring{get\_prepared()}{get\_prepared()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1message__buffer_1_1message_ac1f947fbff19cf93d6fc19e21aff0e10} 
+template$<$typename con\+\_\+msg\+\_\+manager $>$ \\
+bool \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message}{websocketpp\+::message\+\_\+buffer\+::message}}$<$ con\+\_\+msg\+\_\+manager $>$\+::get\+\_\+prepared (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+The prepared flag indicates that the message has been prepared by a websocket protocol processor and is ready to be written to the wire.
+
+\begin{DoxyReturn}{Returns}
+whether or not the message has been prepared for sending 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{message_8hpp_source_l00125}{125}} of file \mbox{\hyperlink{message_8hpp_source}{message.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_prepared;}
+\DoxyCodeLine{00127\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1message__buffer_1_1message_a1d7f82051a02ac24385d233e3403a6e0}\index{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}!get\_raw\_payload@{get\_raw\_payload}}
+\index{get\_raw\_payload@{get\_raw\_payload}!websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}}
+\doxysubsubsection{\texorpdfstring{get\_raw\_payload()}{get\_raw\_payload()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1message__buffer_1_1message_a1d7f82051a02ac24385d233e3403a6e0} 
+template$<$typename con\+\_\+msg\+\_\+manager $>$ \\
+std\+::string \& \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message}{websocketpp\+::message\+\_\+buffer\+::message}}$<$ con\+\_\+msg\+\_\+manager $>$\+::get\+\_\+raw\+\_\+payload (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\begin{DoxyReturn}{Returns}
+\doxylink{struct_a}{A} reference to the message\textquotesingle{}s payload string 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{message_8hpp_source_l00254}{254}} of file \mbox{\hyperlink{message_8hpp_source}{message.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00254\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00255\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_payload;}
+\DoxyCodeLine{00256\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1message__buffer_1_1message_a45e39497d283ec38d1360b60a5879e32}\index{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}!get\_terminal@{get\_terminal}}
+\index{get\_terminal@{get\_terminal}!websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}}
+\doxysubsubsection{\texorpdfstring{get\_terminal()}{get\_terminal()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1message__buffer_1_1message_a45e39497d283ec38d1360b60a5879e32} 
+template$<$typename con\+\_\+msg\+\_\+manager $>$ \\
+bool \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message}{websocketpp\+::message\+\_\+buffer\+::message}}$<$ con\+\_\+msg\+\_\+manager $>$\+::get\+\_\+terminal (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+Messages can be flagged as terminal, which results in the connection being close after they are written rather than the implementation going on to the next message in the queue. This is typically used internally for close messages only.
+
+\begin{DoxyReturn}{Returns}
+Whether or not this message is marked terminal 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{message_8hpp_source_l00169}{169}} of file \mbox{\hyperlink{message_8hpp_source}{message.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_terminal;}
+\DoxyCodeLine{00171\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1message__buffer_1_1message_a2c19e247389598d9f81c9447ddcfba51}\index{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}!recycle@{recycle}}
+\index{recycle@{recycle}!websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}}
+\doxysubsubsection{\texorpdfstring{recycle()}{recycle()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1message__buffer_1_1message_a2c19e247389598d9f81c9447ddcfba51} 
+template$<$typename con\+\_\+msg\+\_\+manager $>$ \\
+bool \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message}{websocketpp\+::message\+\_\+buffer\+::message}}$<$ con\+\_\+msg\+\_\+manager $>$\+::recycle (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\doxylink{struct_a}{A} request to recycle this message was received. Forward that request to the connection message manager for processing. \doxylink{namespace_errors}{Errors} and exceptions from the manager\textquotesingle{}s recycle member function should be passed back up the call chain. The caller to \doxylink{classwebsocketpp_1_1message__buffer_1_1message_a2c19e247389598d9f81c9447ddcfba51}{message\+::recycle} will deal with them.
+
+Recycle must {\itshape only} be called by the message shared\+\_\+ptr\textquotesingle{}s destructor. Once recycled successfully, ownership of the memory has been passed to another system and must not be accessed again.
+
+\begin{DoxyReturn}{Returns}
+true if the message was successfully recycled, false otherwise. 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{message_8hpp_source_l00316}{316}} of file \mbox{\hyperlink{message_8hpp_source}{message.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00316\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00317\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message_ac8f2c5b209245c30622fd729409298d0}{con\_msg\_man\_ptr}}\ shared\ =\ m\_manager.lock();}
+\DoxyCodeLine{00318\ }
+\DoxyCodeLine{00319\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (shared)\ \{}
+\DoxyCodeLine{00320\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ shared-\/>recycle(\textcolor{keyword}{this});}
+\DoxyCodeLine{00321\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00322\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00323\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00324\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1message__buffer_1_1message_a2c19e247389598d9f81c9447ddcfba51}\index{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}!recycle@{recycle}}
+\index{recycle@{recycle}!websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}}
+\doxysubsubsection{\texorpdfstring{recycle()}{recycle()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1message__buffer_1_1message_a2c19e247389598d9f81c9447ddcfba51} 
+template$<$typename con\+\_\+msg\+\_\+manager $>$ \\
+bool \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message}{websocketpp\+::message\+\_\+buffer\+::message}}$<$ con\+\_\+msg\+\_\+manager $>$\+::recycle (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\doxylink{struct_a}{A} request to recycle this message was received. Forward that request to the connection message manager for processing. \doxylink{namespace_errors}{Errors} and exceptions from the manager\textquotesingle{}s recycle member function should be passed back up the call chain. The caller to \doxylink{classwebsocketpp_1_1message__buffer_1_1message_a2c19e247389598d9f81c9447ddcfba51}{message\+::recycle} will deal with them.
+
+Recycle must {\itshape only} be called by the message shared\+\_\+ptr\textquotesingle{}s destructor. Once recycled successfully, ownership of the memory has been passed to another system and must not be accessed again.
+
+\begin{DoxyReturn}{Returns}
+true if the message was successfully recycled, false otherwise. 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{pool_8hpp_source_l00137}{137}} of file \mbox{\hyperlink{pool_8hpp_source}{pool.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \textcolor{keyword}{typename}\ con\_msg\_manager::ptr\ shared\ =\ m\_manager.lock();}
+\DoxyCodeLine{00139\ }
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (shared)\ \{}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ shared-\/>(recycle(\textcolor{keyword}{this}));}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00145\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1message__buffer_1_1message_addf63a081902e981a293823606b548cb}\index{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}!set\_compressed@{set\_compressed}}
+\index{set\_compressed@{set\_compressed}!websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}}
+\doxysubsubsection{\texorpdfstring{set\_compressed()}{set\_compressed()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1message__buffer_1_1message_addf63a081902e981a293823606b548cb} 
+template$<$typename con\+\_\+msg\+\_\+manager $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message}{websocketpp\+::message\+\_\+buffer\+::message}}$<$ con\+\_\+msg\+\_\+manager $>$\+::set\+\_\+compressed (\begin{DoxyParamCaption}\item[{bool}]{value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Setting the compression flag indicates that the data in this message would benefit from compression. If both endpoints negotiate a compression extension Web\+Socket++ will attempt to compress messages with this flag. Setting this flag does not guarantee that the message will be compressed.
+
+
+\begin{DoxyParams}{Parameters}
+{\em value} & The value to set the compressed flag to \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{message_8hpp_source_l00156}{156}} of file \mbox{\hyperlink{message_8hpp_source}{message.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ m\_compressed\ =\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}};}
+\DoxyCodeLine{00158\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1message__buffer_1_1message_ae726efab2bc95acf7a1fcd327a8e85b9}\index{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}!set\_fin@{set\_fin}}
+\index{set\_fin@{set\_fin}!websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}}
+\doxysubsubsection{\texorpdfstring{set\_fin()}{set\_fin()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1message__buffer_1_1message_ae726efab2bc95acf7a1fcd327a8e85b9} 
+template$<$typename con\+\_\+msg\+\_\+manager $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message}{websocketpp\+::message\+\_\+buffer\+::message}}$<$ con\+\_\+msg\+\_\+manager $>$\+::set\+\_\+fin (\begin{DoxyParamCaption}\item[{bool}]{value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\begin{DoxySeeAlso}{See also}
+\doxylink{classwebsocketpp_1_1message__buffer_1_1message_a8546e56c8a4c6d7f9f37510183874fba}{get\+\_\+fin} for \doxylink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a} more detailed explaination of the fin \doxylink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}
+\end{DoxySeeAlso}
+
+\begin{DoxyParams}{Parameters}
+{\em value} & The value to set the fin bit to. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{message_8hpp_source_l00205}{205}} of file \mbox{\hyperlink{message_8hpp_source}{message.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ m\_fin\ =\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}};}
+\DoxyCodeLine{00207\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1message__buffer_1_1message_a230b36c0cd2572cfce1f218a15bc534e}\index{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}!set\_header@{set\_header}}
+\index{set\_header@{set\_header}!websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}}
+\doxysubsubsection{\texorpdfstring{set\_header()}{set\_header()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1message__buffer_1_1message_a230b36c0cd2572cfce1f218a15bc534e} 
+template$<$typename con\+\_\+msg\+\_\+manager $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message}{websocketpp\+::message\+\_\+buffer\+::message}}$<$ con\+\_\+msg\+\_\+manager $>$\+::set\+\_\+header (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{header}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Under normal circumstances this should not be called by end users
+
+
+\begin{DoxyParams}{Parameters}
+{\em header} & \doxylink{struct_a}{A} string to set the header to. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{message_8hpp_source_l00234}{234}} of file \mbox{\hyperlink{message_8hpp_source}{message.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00234\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \ \ m\_header\ =\ header;}
+\DoxyCodeLine{00236\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1message__buffer_1_1message_a96571972bb7dfaf1ffcae2fbedb07bbe}\index{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}!set\_opcode@{set\_opcode}}
+\index{set\_opcode@{set\_opcode}!websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}}
+\doxysubsubsection{\texorpdfstring{set\_opcode()}{set\_opcode()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1message__buffer_1_1message_a96571972bb7dfaf1ffcae2fbedb07bbe} 
+template$<$typename con\+\_\+msg\+\_\+manager $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message}{websocketpp\+::message\+\_\+buffer\+::message}}$<$ con\+\_\+msg\+\_\+manager $>$\+::set\+\_\+opcode (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e}{frame\+::opcode\+::value}}}]{op}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{message_8hpp_source_l00215}{215}} of file \mbox{\hyperlink{message_8hpp_source}{message.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ m\_opcode\ =\ \mbox{\hyperlink{unionop}{op}};}
+\DoxyCodeLine{00217\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1message__buffer_1_1message_a349d38ec257bde2f6f657cb31af80ced}\index{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}!set\_payload@{set\_payload}}
+\index{set\_payload@{set\_payload}!websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}}
+\doxysubsubsection{\texorpdfstring{set\_payload()}{set\_payload()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1message__buffer_1_1message_a349d38ec257bde2f6f657cb31af80ced} 
+template$<$typename con\+\_\+msg\+\_\+manager $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message}{websocketpp\+::message\+\_\+buffer\+::message}}$<$ con\+\_\+msg\+\_\+manager $>$\+::set\+\_\+payload (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{payload}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Set the message buffer\textquotesingle{}s payload to the given value.
+
+
+\begin{DoxyParams}{Parameters}
+{\em payload} & \doxylink{struct_a}{A} string to set the payload to. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{message_8hpp_source_l00264}{264}} of file \mbox{\hyperlink{message_8hpp_source}{message.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00264\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00265\ \ \ \ \ \ \ \ \ m\_payload\ =\ payload;}
+\DoxyCodeLine{00266\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1message__buffer_1_1message_a714fd661ca04196d2e5b5834f83512aa}\index{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}!set\_payload@{set\_payload}}
+\index{set\_payload@{set\_payload}!websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}}
+\doxysubsubsection{\texorpdfstring{set\_payload()}{set\_payload()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1message__buffer_1_1message_a714fd661ca04196d2e5b5834f83512aa} 
+template$<$typename con\+\_\+msg\+\_\+manager $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message}{websocketpp\+::message\+\_\+buffer\+::message}}$<$ con\+\_\+msg\+\_\+manager $>$\+::set\+\_\+payload (\begin{DoxyParamCaption}\item[{void const \texorpdfstring{$\ast$}{*}}]{payload}{, }\item[{size\+\_\+t}]{len}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Set the message buffer\textquotesingle{}s payload to the given value.
+
+
+\begin{DoxyParams}{Parameters}
+{\em payload} & \doxylink{struct_a}{A} pointer to a data array to set to. \\
+\hline
+{\em len} & The length of new payload in bytes. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{message_8hpp_source_l00275}{275}} of file \mbox{\hyperlink{message_8hpp_source}{message.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00275\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00276\ \ \ \ \ \ \ \ \ m\_payload.reserve(\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}});}
+\DoxyCodeLine{00277\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ \textcolor{keyword}{const}\ *\ pl\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{char}\ \textcolor{keyword}{const\ }*\textcolor{keyword}{>}(payload);}
+\DoxyCodeLine{00278\ \ \ \ \ \ \ \ \ m\_payload.assign(pl,\ pl\ +\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}});}
+\DoxyCodeLine{00279\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1message__buffer_1_1message_a9b17bf5adb8607c44774a96b340ee55b}\index{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}!set\_prepared@{set\_prepared}}
+\index{set\_prepared@{set\_prepared}!websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}}
+\doxysubsubsection{\texorpdfstring{set\_prepared()}{set\_prepared()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1message__buffer_1_1message_a9b17bf5adb8607c44774a96b340ee55b} 
+template$<$typename con\+\_\+msg\+\_\+manager $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message}{websocketpp\+::message\+\_\+buffer\+::message}}$<$ con\+\_\+msg\+\_\+manager $>$\+::set\+\_\+prepared (\begin{DoxyParamCaption}\item[{bool}]{value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+This flag should not be set by end user code without a very good reason.
+
+
+\begin{DoxyParams}{Parameters}
+{\em value} & The value to set the prepared flag to \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{message_8hpp_source_l00135}{135}} of file \mbox{\hyperlink{message_8hpp_source}{message.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ m\_prepared\ =\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}};}
+\DoxyCodeLine{00137\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1message__buffer_1_1message_abcc812dfce52ff72f57a0d0908d33867}\index{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}!set\_terminal@{set\_terminal}}
+\index{set\_terminal@{set\_terminal}!websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$@{websocketpp::message\_buffer::message$<$ con\_msg\_manager $>$}}
+\doxysubsubsection{\texorpdfstring{set\_terminal()}{set\_terminal()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1message__buffer_1_1message_abcc812dfce52ff72f57a0d0908d33867} 
+template$<$typename con\+\_\+msg\+\_\+manager $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message}{websocketpp\+::message\+\_\+buffer\+::message}}$<$ con\+\_\+msg\+\_\+manager $>$\+::set\+\_\+terminal (\begin{DoxyParamCaption}\item[{bool}]{value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+This flag should not be set by end user code without a very good reason.
+
+\begin{DoxySeeAlso}{See also}
+\doxylink{classwebsocketpp_1_1message__buffer_1_1message_a45e39497d283ec38d1360b60a5879e32}{get\+\_\+terminal()}
+\end{DoxySeeAlso}
+
+\begin{DoxyParams}{Parameters}
+{\em value} & The value to set the terminal flag to. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{message_8hpp_source_l00181}{181}} of file \mbox{\hyperlink{message_8hpp_source}{message.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ m\_terminal\ =\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}};}
+\DoxyCodeLine{00183\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/vendor/websocketpp/websocketpp/message\+\_\+buffer/\mbox{\hyperlink{message_8hpp}{message.\+hpp}}\item 
+libraries/fc/vendor/websocketpp/websocketpp/message\+\_\+buffer/\mbox{\hyperlink{pool_8hpp}{pool.\+hpp}}\end{DoxyCompactItemize}

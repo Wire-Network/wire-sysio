@@ -1,0 +1,103 @@
+\doxysection{libraries/fc/libraries/ff/libff/common/serialization.hpp File Reference}
+\hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp}{}\label{fc_2libraries_2ff_2libff_2common_2serialization_8hpp}\index{libraries/fc/libraries/ff/libff/common/serialization.hpp@{libraries/fc/libraries/ff/libff/common/serialization.hpp}}
+{\ttfamily \#include $<$istream$>$}\newline
+{\ttfamily \#include $<$map$>$}\newline
+{\ttfamily \#include $<$ostream$>$}\newline
+{\ttfamily \#include $<$set$>$}\newline
+{\ttfamily \#include $<$vector$>$}\newline
+{\ttfamily \#include $<$libff/common/serialization.\+tcc$>$}\newline
+Include dependency graph for serialization.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{fc_2libraries_2ff_2libff_2common_2serialization_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{fc_2libraries_2ff_2libff_2common_2serialization_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacelibff}{libff}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_a770cd1596be261bee8d26c55e31589e0}{OUTPUT\+\_\+\+NEWLINE}}~"{}\textbackslash{}n"{}
+\item 
+\#define \mbox{\hyperlink{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_ad80cfbe7456c7d029544e8bc2cec16c8}{OUTPUT\+\_\+\+SEPARATOR}}~"{} "{}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{namespacelibff_adf450a87fdc5eb1a37422fabcba95023}{libff\+::consume\+\_\+newline}} (std\+::istream \&in)
+\item 
+void \mbox{\hyperlink{namespacelibff_a1cde4f28fdf0349673d1361daf4298d4}{libff\+::consume\+\_\+\+OUTPUT\+\_\+\+NEWLINE}} (std\+::istream \&in)
+\item 
+void \mbox{\hyperlink{namespacelibff_a3b7a446329c9be967e16ab1c04f260e6}{libff\+::consume\+\_\+\+OUTPUT\+\_\+\+SEPARATOR}} (std\+::istream \&in)
+\item 
+void \mbox{\hyperlink{namespacelibff_a0988a8f3ba5456beaeb5ec85997a1806}{libff\+::output\+\_\+bool}} (std\+::ostream \&out, const bool b)
+\item 
+void \mbox{\hyperlink{namespacelibff_a7f9b202395818e2991485cf13ac26cff}{libff\+::input\+\_\+bool}} (std\+::istream \&in, bool \&b)
+\item 
+void \mbox{\hyperlink{namespacelibff_afd2d62a584bc219a57bfa568bfbe23f3}{libff\+::output\+\_\+bool\+\_\+vector}} (std\+::ostream \&out, const std\+::vector$<$ bool $>$ \&v)
+\item 
+void \mbox{\hyperlink{namespacelibff_ad0035ea66b0c095b71fc2bda79096ea4}{libff\+::input\+\_\+bool\+\_\+vector}} (std\+::istream \&in, std\+::vector$<$ bool $>$ \&v)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{namespacelibff_a0a19876fdeb681006eed9c4da061a22d}{libff\+::reserialize}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&obj)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\std\+::ostream \& \mbox{\hyperlink{namespacelibff_a28a206a971cb5d01305b1aba19d2b8b7}{libff\+::operator$<$$<$}} (std\+::ostream \&out, const std\+::vector$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&v)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\std\+::istream \& \mbox{\hyperlink{namespacelibff_a883b4dea06a45104195dfa4db3c3bb35}{libff\+::operator$>$$>$}} (std\+::ostream \&out, std\+::vector$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&v)
+\item 
+{\footnotesize template$<$typename T1 , typename T2 $>$ }\\std\+::ostream \& \mbox{\hyperlink{namespacelibff_aa3cb76cab37de5de3efe59ad56799078}{libff\+::operator$<$$<$}} (std\+::ostream \&out, const std\+::map$<$ T1, T2 $>$ \&m)
+\item 
+{\footnotesize template$<$typename T1 , typename T2 $>$ }\\std\+::istream \& \mbox{\hyperlink{namespacelibff_a19a5463b7c9920d8a8e105eabaf5905a}{libff\+::operator$>$$>$}} (std\+::istream \&in, std\+::map$<$ T1, T2 $>$ \&m)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\std\+::ostream \& \mbox{\hyperlink{namespacelibff_a07751239b830657c244e1c8aadf18d09}{libff\+::operator$<$$<$}} (std\+::ostream \&out, const std\+::set$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\std\+::istream \& \mbox{\hyperlink{namespacelibff_a9b854ce5eb2642604b311c1ddef6e729}{libff\+::operator$>$$>$}} (std\+::istream \&in, std\+::set$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Declaration of serialization routines and constants.
+
+\begin{DoxyAuthor}{Author}
+This file is part of libff, developed by SCIPR Lab and contributors (see AUTHORS). 
+\end{DoxyAuthor}
+\begin{DoxyCopyright}{Copyright}
+MIT license (see LICENSE file) 
+\end{DoxyCopyright}
+
+
+Definition in file \mbox{\hyperlink{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source}{serialization.\+hpp}}.
+
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_a770cd1596be261bee8d26c55e31589e0}\index{serialization.hpp@{serialization.hpp}!OUTPUT\_NEWLINE@{OUTPUT\_NEWLINE}}
+\index{OUTPUT\_NEWLINE@{OUTPUT\_NEWLINE}!serialization.hpp@{serialization.hpp}}
+\doxysubsubsection{\texorpdfstring{OUTPUT\_NEWLINE}{OUTPUT\_NEWLINE}}
+{\footnotesize\ttfamily \label{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_a770cd1596be261bee8d26c55e31589e0} 
+\#define OUTPUT\+\_\+\+NEWLINE~"{}\textbackslash{}n"{}}
+
+
+
+Definition at line \mbox{\hyperlink{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00067}{67}} of file \mbox{\hyperlink{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source}{serialization.\+hpp}}.
+
+\Hypertarget{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_ad80cfbe7456c7d029544e8bc2cec16c8}\index{serialization.hpp@{serialization.hpp}!OUTPUT\_SEPARATOR@{OUTPUT\_SEPARATOR}}
+\index{OUTPUT\_SEPARATOR@{OUTPUT\_SEPARATOR}!serialization.hpp@{serialization.hpp}}
+\doxysubsubsection{\texorpdfstring{OUTPUT\_SEPARATOR}{OUTPUT\_SEPARATOR}}
+{\footnotesize\ttfamily \label{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_ad80cfbe7456c7d029544e8bc2cec16c8} 
+\#define OUTPUT\+\_\+\+SEPARATOR~"{} "{}}
+
+
+
+Definition at line \mbox{\hyperlink{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source_l00068}{68}} of file \mbox{\hyperlink{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_source}{serialization.\+hpp}}.
+

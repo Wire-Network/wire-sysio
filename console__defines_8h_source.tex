@@ -1,0 +1,160 @@
+\doxysection{console\+\_\+defines.\+h}
+\hypertarget{console__defines_8h_source}{}\label{console__defines_8h_source}\index{libraries/fc/src/log/console\_defines.h@{libraries/fc/src/log/console\_defines.h}}
+\mbox{\hyperlink{console__defines_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00001}00001\ \textcolor{preprocessor}{\#ifndef\ \_MACE\_CMT\_CONSOLE\_DEFINES\_H\_}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00002}00002\ \textcolor{preprocessor}{\#define\ \_MACE\_CMT\_CONSOLE\_DEFINES\_H\_}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00021}00021\ \textcolor{preprocessor}{\#if\ COLOR\_CONSOLE}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00023}00023\ \textcolor{preprocessor}{\#ifndef\ WIN32}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00031}00031\ \textcolor{preprocessor}{\#define\ CONSOLE\_DEFAULT\ "{}\(\backslash\)033[0m"{}}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00039}00039\ \textcolor{preprocessor}{\#define\ CONSOLE\_BOLD\ "{}\(\backslash\)033[1m"{}}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00048}00048\ \textcolor{preprocessor}{\#define\ CONSOLE\_HALF\_BRIGHT\ "{}\(\backslash\)033[2m"{}}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00059}00059\ \textcolor{preprocessor}{\#define\ CONSOLE\_ITALIC\ "{}\(\backslash\)033[3m"{}}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00068}00068\ \textcolor{preprocessor}{\#define\ CONSOLE\_UNDERLINE\ "{}\(\backslash\)033[4m"{}}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00069}00069\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00077}00077\ \textcolor{preprocessor}{\#define\ CONSOLE\_BLINK\ "{}\(\backslash\)033[5m"{}}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00085}00085\ \textcolor{preprocessor}{\#define\ CONSOLE\_RAPID\_BLINK\ "{}\(\backslash\)033[6m"{}}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00086}00086\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00094}00094\ \textcolor{preprocessor}{\#define\ CONSOLE\_REVERSED\ "{}\(\backslash\)033[7m"{}}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00095}00095\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00103}00103\ \textcolor{preprocessor}{\#define\ CONSOLE\_CONCEALED\ "{}\(\backslash\)033[8m"{}}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00104}00104\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00112}00112\ \textcolor{preprocessor}{\#define\ CONSOLE\_STRIKETHROUGH\ "{}\(\backslash\)033[9m"{}}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00113}00113\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00115}00115\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00116}00116\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00135}00135\ \textcolor{preprocessor}{\#define\ CONSOLE\_BLACK\ "{}\(\backslash\)033[30m"{}}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00136}00136\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00144}00144\ \textcolor{preprocessor}{\#define\ CONSOLE\_RED\ "{}\(\backslash\)033[31m"{}}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00145}00145\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00153}00153\ \textcolor{preprocessor}{\#define\ CONSOLE\_GREEN\ "{}\(\backslash\)033[32m"{}}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00154}00154\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00162}00162\ \textcolor{preprocessor}{\#define\ CONSOLE\_BROWN\ "{}\(\backslash\)033[33m"{}}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00163}00163\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00171}00171\ \textcolor{preprocessor}{\#define\ CONSOLE\_BLUE\ "{}\(\backslash\)033[34m"{}}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00172}00172\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00180}00180\ \textcolor{preprocessor}{\#define\ CONSOLE\_MAGENTA\ "{}\(\backslash\)033[35m"{}}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00181}00181\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00189}00189\ \textcolor{preprocessor}{\#define\ CONSOLE\_CYAN\ "{}\(\backslash\)033[36m"{}}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00190}00190\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00198}00198\ \textcolor{preprocessor}{\#define\ CONSOLE\_WHITE\ "{}\(\backslash\)033[37m"{}}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00199}00199\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00207}00207\ \textcolor{preprocessor}{\#define\ CONSOLE\_BLACK\_BG\ "{}\(\backslash\)033[40m"{}}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00208}00208\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00216}00216\ \textcolor{preprocessor}{\#define\ CONSOLE\_RED\_BG\ "{}\(\backslash\)033[41m"{}}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00217}00217\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00225}00225\ \textcolor{preprocessor}{\#define\ CONSOLE\_GREEN\_BG\ "{}\(\backslash\)033[42m"{}}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00226}00226\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00234}00234\ \textcolor{preprocessor}{\#define\ CONSOLE\_BROWN\_BG\ "{}\(\backslash\)033[43m"{}}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00235}00235\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00243}00243\ \textcolor{preprocessor}{\#define\ CONSOLE\_BLUE\_BG\ "{}\(\backslash\)033[44m"{}}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00244}00244\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00252}00252\ \textcolor{preprocessor}{\#define\ CONSOLE\_MAGENTA\_BG\ "{}\(\backslash\)033[45m"{}}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00253}00253\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00261}00261\ \textcolor{preprocessor}{\#define\ CONSOLE\_CYAN\_BG\ "{}\(\backslash\)033[46m"{}}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00262}00262\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00270}00270\ \textcolor{preprocessor}{\#define\ CONSOLE\_WHITE\_BG\ "{}\(\backslash\)033[47m"{}}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00271}00271\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00272}00272\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00273}00273\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00274}00274\ \textcolor{preprocessor}{\#else\ }\textcolor{comment}{//\ WIN32}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00275}00275\ \textcolor{preprocessor}{\#include\ <winsock2.h>}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00276}00276\ \textcolor{preprocessor}{\#include\ <windows.h>}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00277}00277\ \textcolor{comment}{//\#include\ <stdlib.h>}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00278}00278\ \textcolor{preprocessor}{\#include\ <conio.h>}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00279}00279\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00286}00286\ \textcolor{preprocessor}{\#define\ CONSOLE\_DEFAULT\ (FOREGROUND\_BLUE\ |\ FOREGROUND\_RED\ |\ FOREGROUND\_GREEN)}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00294}00294\ \textcolor{preprocessor}{\#define\ CONSOLE\_BOLD\ FOREGROUND\_INTENSITY}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00295}00295\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00303}00303\ \textcolor{preprocessor}{\#define\ CONSOLE\_HALF\_BRIGHT\ }}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00304}00304\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00314}00314\ \textcolor{preprocessor}{\#define\ CONSOLE\_ITALIC\ }}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00315}00315\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00323}00323\ \textcolor{preprocessor}{\#define\ CONSOLE\_UNDERLINE\ COMMON\_LVB\_UNDERSCORE}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00324}00324\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00332}00332\ \textcolor{preprocessor}{\#define\ CONSOLE\_BLINK\ }}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00333}00333\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00340}00340\ \textcolor{preprocessor}{\#define\ CONSOLE\_RAPID\_BLINK\ }}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00341}00341\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00349}00349\ \textcolor{preprocessor}{\#define\ CONSOLE\_REVERSED\ CONSOLE\_LVB\_REVERSE\_VIDEO}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00350}00350\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00358}00358\ \textcolor{preprocessor}{\#define\ CONSOLE\_CONCEALED\ }}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00359}00359\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00367}00367\ \textcolor{preprocessor}{\#define\ CONSOLE\_STRIKETHROUGH\ }}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00368}00368\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00370}00370\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00371}00371\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00390}00390\ \textcolor{preprocessor}{\#define\ CONSOLE\_BLACK\ 0}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00391}00391\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00399}00399\ \textcolor{preprocessor}{\#define\ CONSOLE\_RED\ FOREGROUND\_RED}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00400}00400\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00408}00408\ \textcolor{preprocessor}{\#define\ CONSOLE\_GREEN\ FOREGROUND\_GREEN}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00409}00409\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00417}00417\ \textcolor{preprocessor}{\#define\ CONSOLE\_BROWN\ (FOREGROUND\_RED\ |\ FOREGROUND\_GREEN)}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00418}00418\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00426}00426\ \textcolor{preprocessor}{\#define\ CONSOLE\_BLUE\ FOREGROUND\_BLUE}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00427}00427\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00435}00435\ \textcolor{preprocessor}{\#define\ CONSOLE\_MAGENTA\ (CONSOLE\_RED\ |\ CONSOLE\_BLUE)}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00436}00436\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00444}00444\ \textcolor{preprocessor}{\#define\ CONSOLE\_CYAN\ (CONSOLE\_BLUE\ |\ CONSOLE\_GREEN)}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00445}00445\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00453}00453\ \textcolor{preprocessor}{\#define\ CONSOLE\_WHITE\ (CONSOLE\_RED\ |\ CONSOLE\_BLUE\ |\ CONSOLE\_GREEN)}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00454}00454\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00462}00462\ \textcolor{preprocessor}{\#define\ CONSOLE\_BLACK\_BG\ 0}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00463}00463\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00471}00471\ \textcolor{preprocessor}{\#define\ CONSOLE\_RED\_BG\ (BACKGROUND\_RED)}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00472}00472\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00480}00480\ \textcolor{preprocessor}{\#define\ CONSOLE\_GREEN\_BG\ (BACKGROUND\_GREEN)}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00481}00481\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00489}00489\ \textcolor{preprocessor}{\#define\ CONSOLE\_BROWN\_BG\ (BACKGROUND\_RED\ |\ BACKGROUND\_GREEN)}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00490}00490\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00498}00498\ \textcolor{preprocessor}{\#define\ CONSOLE\_BLUE\_BG\ (BACKGROUND\_BLUE)}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00499}00499\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00507}00507\ \textcolor{preprocessor}{\#define\ CONSOLE\_MAGENTA\_BG\ "{}\(\backslash\)033[45m"{}}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00508}00508\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00516}00516\ \textcolor{preprocessor}{\#define\ CONSOLE\_CYAN\_BG\ "{}\(\backslash\)033[46m"{}}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00517}00517\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00525}00525\ \textcolor{preprocessor}{\#define\ CONSOLE\_WHITE\_BG\ "{}\(\backslash\)033[47m"{}}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00526}00526\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00527}00527\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00528}00528\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00530}00530\ \textcolor{preprocessor}{\#else\ }\textcolor{comment}{//\ On\ Window's\ no\ color\ output\ WIN32}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00531}00531\ \textcolor{preprocessor}{\#define\ CONSOLE\_DEFAULT\ "{}"{}}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00532}00532\ \textcolor{preprocessor}{\#define\ CONSOLE\_BOLD\ "{}"{}}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00533}00533\ \textcolor{preprocessor}{\#define\ CONSOLE\_HALF\_BRIGHT\ "{}"{}}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00534}00534\ \textcolor{preprocessor}{\#define\ CONSOLE\_ITALIC\ "{}"{}}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00535}00535\ \textcolor{preprocessor}{\#define\ CONSOLE\_UNDERLINE\ "{}"{}}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00536}00536\ \textcolor{preprocessor}{\#define\ CONSOLE\_BLINK\ "{}"{}}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00537}00537\ \textcolor{preprocessor}{\#define\ CONSOLE\_RAPID\_BLINK\ "{}"{}\ }}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00538}00538\ \textcolor{preprocessor}{\#define\ CONSOLE\_REVERSED\ "{}"{}}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00539}00539\ \textcolor{preprocessor}{\#define\ CONSOLE\_CONCEALED\ "{}"{}}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00540}00540\ \textcolor{preprocessor}{\#define\ CONSOLE\_STRIKETHROUGH\ "{}"{}}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00541}00541\ \textcolor{preprocessor}{\#define\ CONSOLE\_BLACK\ "{}"{}}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00542}00542\ \textcolor{preprocessor}{\#define\ CONSOLE\_RED\ "{}"{}}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00543}00543\ \textcolor{preprocessor}{\#define\ CONSOLE\_GREEN\ "{}"{}}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00544}00544\ \textcolor{preprocessor}{\#define\ CONSOLE\_BROWN\ "{}"{}}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00545}00545\ \textcolor{preprocessor}{\#define\ CONSOLE\_BLUE\ "{}"{}}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00546}00546\ \textcolor{preprocessor}{\#define\ CONSOLE\_MAGENTA\ "{}"{}}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00547}00547\ \textcolor{preprocessor}{\#define\ CONSOLE\_CYAN\ "{}"{}}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00548}00548\ \textcolor{preprocessor}{\#define\ CONSOLE\_WHITE\ "{}"{}}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00549}00549\ \textcolor{preprocessor}{\#define\ CONSOLE\_BLACK\_BG\ "{}"{}}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00550}00550\ \textcolor{preprocessor}{\#define\ CONSOLE\_RED\_BG\ "{}"{}}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00551}00551\ \textcolor{preprocessor}{\#define\ CONSOLE\_GREEN\_BG\ "{}"{}}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00552}00552\ \textcolor{preprocessor}{\#define\ CONSOLE\_BROWN\_BG\ "{}"{}}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00553}00553\ \textcolor{preprocessor}{\#define\ CONSOLE\_BLUE\_BG\ \ "{}"{}}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00554}00554\ \textcolor{preprocessor}{\#define\ CONSOLE\_MAGENTA\_BG\ \ "{}"{}}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00555}00555\ \textcolor{preprocessor}{\#define\ CONSOLE\_CYAN\_BG\ \ "{}"{}}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00556}00556\ \textcolor{preprocessor}{\#define\ CONSOLE\_WHITE\_BG\ \ "{}"{}}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00557}00557\ }
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00560}00560\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ NOT\ DEFINED\ WIN32}}
+\DoxyCodeLine{\Hypertarget{console__defines_8h_source_l00561}00561\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ \_BOOST\_CMT\_CONSOLE\_DEFINES\_H\_}}
+
+\end{DoxyCode}

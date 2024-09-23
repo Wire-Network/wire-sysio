@@ -1,0 +1,1365 @@
+\doxysection{sysio\+::vm\+::backend\texorpdfstring{$<$}{<} Host\+Functions, Impl, Options, Debug\+Info \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classsysio_1_1vm_1_1backend}{}\label{classsysio_1_1vm_1_1backend}\index{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}}
+
+
+{\ttfamily \#include $<$backend.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classsysio_1_1vm_1_1backend_a303d8f9c9da58c130abf8439b3376cbf}{backend}} (\mbox{\hyperlink{namespacesysio_1_1vm_a6ffa5796148f0f779a3d44799c3f0cce}{wasm\+\_\+code}} \&\&code, host\+\_\+t \&host, \mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator}{wasm\+\_\+allocator}} \texorpdfstring{$\ast$}{*}alloc, const Options \&\mbox{\hyperlink{structsysio_1_1vm_1_1options}{options}}=Options\{\})
+\item 
+\mbox{\hyperlink{classsysio_1_1vm_1_1backend_a58541fc2403c49819de9522f0dc00e7d}{backend}} (\mbox{\hyperlink{namespacesysio_1_1vm_a6ffa5796148f0f779a3d44799c3f0cce}{wasm\+\_\+code}} \&\&code, \mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator}{wasm\+\_\+allocator}} \texorpdfstring{$\ast$}{*}alloc, const Options \&\mbox{\hyperlink{structsysio_1_1vm_1_1options}{options}}=Options\{\})
+\item 
+\mbox{\hyperlink{classsysio_1_1vm_1_1backend_a06d4fbcf702978a02b5b1e79ebdc97f8}{backend}} (\mbox{\hyperlink{namespacesysio_1_1vm_a6ffa5796148f0f779a3d44799c3f0cce}{wasm\+\_\+code}} \&code, host\+\_\+t \&host, \mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator}{wasm\+\_\+allocator}} \texorpdfstring{$\ast$}{*}alloc, const Options \&\mbox{\hyperlink{structsysio_1_1vm_1_1options}{options}}=Options\{\})
+\item 
+\mbox{\hyperlink{classsysio_1_1vm_1_1backend_a327dcb8568c96507646d09e7460a8444}{backend}} (\mbox{\hyperlink{namespacesysio_1_1vm_a6ffa5796148f0f779a3d44799c3f0cce}{wasm\+\_\+code}} \&code, \mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator}{wasm\+\_\+allocator}} \texorpdfstring{$\ast$}{*}alloc, const Options \&\mbox{\hyperlink{structsysio_1_1vm_1_1options}{options}}=Options\{\})
+\item 
+\mbox{\hyperlink{classsysio_1_1vm_1_1backend_a7d5f827e5f840a336de09a3f2616aa6c}{backend}} (\mbox{\hyperlink{namespacesysio_1_1vm_a9ec5735264f754f4960b35edb8693bfa}{wasm\+\_\+code\+\_\+ptr}} \&ptr, size\+\_\+t sz, host\+\_\+t \&host, \mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator}{wasm\+\_\+allocator}} \texorpdfstring{$\ast$}{*}alloc, const Options \&\mbox{\hyperlink{structsysio_1_1vm_1_1options}{options}}=Options\{\})
+\item 
+\mbox{\hyperlink{classsysio_1_1vm_1_1backend_a327e5d9eea878fd511963f6d9fff3053}{backend}} (\mbox{\hyperlink{namespacesysio_1_1vm_a9ec5735264f754f4960b35edb8693bfa}{wasm\+\_\+code\+\_\+ptr}} \&ptr, size\+\_\+t sz, \mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator}{wasm\+\_\+allocator}} \texorpdfstring{$\ast$}{*}alloc, const Options \&\mbox{\hyperlink{structsysio_1_1vm_1_1options}{options}}=Options\{\})
+\item 
+{\footnotesize template$<$typename... Args$>$ }\\auto \mbox{\hyperlink{classsysio_1_1vm_1_1backend_a7b0a91d17aecbc26a90fb08bdb981028}{operator()}} (host\+\_\+t \&host, const std\+::string\+\_\+view \&mod, const std\+::string\+\_\+view \&\mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2}{func}}, Args... args)
+\item 
+{\footnotesize template$<$typename... Args$>$ }\\bool \mbox{\hyperlink{classsysio_1_1vm_1_1backend_ae45a5566f9d4747e5616c4a09f50e247}{operator()}} (const std\+::string\+\_\+view \&mod, const std\+::string\+\_\+view \&\mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2}{func}}, Args... args)
+\item 
+\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1backend_ad9fabfa0081daaedb3fbe3a62b42bd01}{initialize}} (host\+\_\+t \texorpdfstring{$\ast$}{*}host, const Options \&new\+\_\+options)
+\item 
+\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1backend_a575d6f6942440f7a6cce881d5e84eb56}{initialize}} (host\+\_\+t \texorpdfstring{$\ast$}{*}host=nullptr)
+\item 
+\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1backend_a79b302a46e626928691f082b31e084ec}{initialize}} (host\+\_\+t \&host)
+\item 
+{\footnotesize template$<$typename... Args$>$ }\\bool \mbox{\hyperlink{classsysio_1_1vm_1_1backend_a295902c35e6934580b18a1d30c3458db}{call\+\_\+indirect}} (host\+\_\+t \texorpdfstring{$\ast$}{*}host, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} func\+\_\+index, Args... args)
+\item 
+{\footnotesize template$<$typename... Args$>$ }\\bool \mbox{\hyperlink{classsysio_1_1vm_1_1backend_a63fc40356b116cdac6cd50788b25eab1}{call}} (host\+\_\+t \texorpdfstring{$\ast$}{*}host, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} func\+\_\+index, Args... args)
+\item 
+{\footnotesize template$<$typename... Args$>$ }\\bool \mbox{\hyperlink{classsysio_1_1vm_1_1backend_ad6d88177a9449485839de2072c0118d2}{call}} (host\+\_\+t \&host, const std\+::string\+\_\+view \&mod, const std\+::string\+\_\+view \&\mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2}{func}}, Args... args)
+\item 
+{\footnotesize template$<$typename... Args$>$ }\\bool \mbox{\hyperlink{classsysio_1_1vm_1_1backend_a8e6c9070cfddd2d3cd967aecb312b2f3}{call}} (const std\+::string\+\_\+view \&mod, const std\+::string\+\_\+view \&\mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2}{func}}, Args... args)
+\item 
+{\footnotesize template$<$typename... Args$>$ }\\auto \mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\+\_\+with\+\_\+return}} (host\+\_\+t \&host, const std\+::string\+\_\+view \&mod, const std\+::string\+\_\+view \&\mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2}{func}}, Args... args)
+\item 
+{\footnotesize template$<$typename... Args$>$ }\\auto \mbox{\hyperlink{classsysio_1_1vm_1_1backend_a25aaa68d74e7cce372dae096aff9b826}{call\+\_\+with\+\_\+return}} (const std\+::string\+\_\+view \&mod, const std\+::string\+\_\+view \&\mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2}{func}}, Args... args)
+\item 
+{\footnotesize template$<$typename Watchdog , typename F $>$ }\\void \mbox{\hyperlink{classsysio_1_1vm_1_1backend_aac266fa12bedfb6b4a9ab2f73c2bdebf}{timed\+\_\+run}} (Watchdog \&\&\mbox{\hyperlink{hello__driver_8cpp_aa199bff2581e446e3865732d06d873f0}{wd}}, F \&\&\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})
+\item 
+{\footnotesize template$<$typename Watchdog $>$ }\\void \mbox{\hyperlink{classsysio_1_1vm_1_1backend_a6a3fbbc16a719762e15001d75ed3a6d0}{execute\+\_\+all}} (Watchdog \&\&\mbox{\hyperlink{hello__driver_8cpp_aa199bff2581e446e3865732d06d873f0}{wd}}, host\+\_\+t \&host)
+\item 
+{\footnotesize template$<$typename Watchdog $>$ }\\void \mbox{\hyperlink{classsysio_1_1vm_1_1backend_a4dd6cd3a6027ebb0300fbd3075070f5b}{execute\+\_\+all}} (Watchdog \&\&\mbox{\hyperlink{hello__driver_8cpp_aa199bff2581e446e3865732d06d873f0}{wd}})
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1backend_afb52bdfbf023f8e042d9228928ed93b7}{set\+\_\+wasm\+\_\+allocator}} (\mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator}{wasm\+\_\+allocator}} \texorpdfstring{$\ast$}{*}alloc)
+\item 
+\mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator}{wasm\+\_\+allocator}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classsysio_1_1vm_1_1backend_ae93d8385608b8dc7bcd378f005519a54}{get\+\_\+wasm\+\_\+allocator}} ()
+\item 
+\mbox{\hyperlink{structsysio_1_1vm_1_1module}{module}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1backend_af2bdf6918391f431538eb92100389eab}{get\+\_\+module}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1backend_a9f9f05d3aef7b2e1791612036c5385dc}{exit}} (const std\+::error\+\_\+code \&ec)
+\item 
+auto \& \mbox{\hyperlink{classsysio_1_1vm_1_1backend_a84feaa0031467bf9822b0741e08f9a67}{get\+\_\+context}} ()
+\item 
+const Debug\+Info \& \mbox{\hyperlink{classsysio_1_1vm_1_1backend_a0a9b5731e930eb3cfcce51b293ec6cdf}{get\+\_\+debug}} () const
+\item 
+\mbox{\hyperlink{classsysio_1_1vm_1_1backend_a303d8f9c9da58c130abf8439b3376cbf}{backend}} (\mbox{\hyperlink{namespacesysio_1_1vm_a6ffa5796148f0f779a3d44799c3f0cce}{wasm\+\_\+code}} \&\&code, host\+\_\+t \&host, \mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator}{wasm\+\_\+allocator}} \texorpdfstring{$\ast$}{*}alloc, const Options \&\mbox{\hyperlink{structsysio_1_1vm_1_1options}{options}}=Options\{\})
+\item 
+\mbox{\hyperlink{classsysio_1_1vm_1_1backend_a58541fc2403c49819de9522f0dc00e7d}{backend}} (\mbox{\hyperlink{namespacesysio_1_1vm_a6ffa5796148f0f779a3d44799c3f0cce}{wasm\+\_\+code}} \&\&code, \mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator}{wasm\+\_\+allocator}} \texorpdfstring{$\ast$}{*}alloc, const Options \&\mbox{\hyperlink{structsysio_1_1vm_1_1options}{options}}=Options\{\})
+\item 
+\mbox{\hyperlink{classsysio_1_1vm_1_1backend_a06d4fbcf702978a02b5b1e79ebdc97f8}{backend}} (\mbox{\hyperlink{namespacesysio_1_1vm_a6ffa5796148f0f779a3d44799c3f0cce}{wasm\+\_\+code}} \&code, host\+\_\+t \&host, \mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator}{wasm\+\_\+allocator}} \texorpdfstring{$\ast$}{*}alloc, const Options \&\mbox{\hyperlink{structsysio_1_1vm_1_1options}{options}}=Options\{\})
+\item 
+\mbox{\hyperlink{classsysio_1_1vm_1_1backend_a327dcb8568c96507646d09e7460a8444}{backend}} (\mbox{\hyperlink{namespacesysio_1_1vm_a6ffa5796148f0f779a3d44799c3f0cce}{wasm\+\_\+code}} \&code, \mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator}{wasm\+\_\+allocator}} \texorpdfstring{$\ast$}{*}alloc, const Options \&\mbox{\hyperlink{structsysio_1_1vm_1_1options}{options}}=Options\{\})
+\item 
+\mbox{\hyperlink{classsysio_1_1vm_1_1backend_a7d5f827e5f840a336de09a3f2616aa6c}{backend}} (\mbox{\hyperlink{namespacesysio_1_1vm_a9ec5735264f754f4960b35edb8693bfa}{wasm\+\_\+code\+\_\+ptr}} \&ptr, size\+\_\+t sz, host\+\_\+t \&host, \mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator}{wasm\+\_\+allocator}} \texorpdfstring{$\ast$}{*}alloc, const Options \&\mbox{\hyperlink{structsysio_1_1vm_1_1options}{options}}=Options\{\})
+\item 
+\mbox{\hyperlink{classsysio_1_1vm_1_1backend_a327e5d9eea878fd511963f6d9fff3053}{backend}} (\mbox{\hyperlink{namespacesysio_1_1vm_a9ec5735264f754f4960b35edb8693bfa}{wasm\+\_\+code\+\_\+ptr}} \&ptr, size\+\_\+t sz, \mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator}{wasm\+\_\+allocator}} \texorpdfstring{$\ast$}{*}alloc, const Options \&\mbox{\hyperlink{structsysio_1_1vm_1_1options}{options}}=Options\{\})
+\item 
+{\footnotesize template$<$typename... Args$>$ }\\auto \mbox{\hyperlink{classsysio_1_1vm_1_1backend_a7b0a91d17aecbc26a90fb08bdb981028}{operator()}} (host\+\_\+t \&host, const std\+::string\+\_\+view \&mod, const std\+::string\+\_\+view \&\mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2}{func}}, Args... args)
+\item 
+{\footnotesize template$<$typename... Args$>$ }\\bool \mbox{\hyperlink{classsysio_1_1vm_1_1backend_ae45a5566f9d4747e5616c4a09f50e247}{operator()}} (const std\+::string\+\_\+view \&mod, const std\+::string\+\_\+view \&\mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2}{func}}, Args... args)
+\item 
+\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1backend_ad9fabfa0081daaedb3fbe3a62b42bd01}{initialize}} (host\+\_\+t \texorpdfstring{$\ast$}{*}host, const Options \&new\+\_\+options)
+\item 
+\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1backend_a575d6f6942440f7a6cce881d5e84eb56}{initialize}} (host\+\_\+t \texorpdfstring{$\ast$}{*}host=nullptr)
+\item 
+\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1backend_a79b302a46e626928691f082b31e084ec}{initialize}} (host\+\_\+t \&host)
+\item 
+{\footnotesize template$<$typename... Args$>$ }\\bool \mbox{\hyperlink{classsysio_1_1vm_1_1backend_a295902c35e6934580b18a1d30c3458db}{call\+\_\+indirect}} (host\+\_\+t \texorpdfstring{$\ast$}{*}host, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} func\+\_\+index, Args... args)
+\item 
+{\footnotesize template$<$typename... Args$>$ }\\bool \mbox{\hyperlink{classsysio_1_1vm_1_1backend_a63fc40356b116cdac6cd50788b25eab1}{call}} (host\+\_\+t \texorpdfstring{$\ast$}{*}host, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} func\+\_\+index, Args... args)
+\item 
+{\footnotesize template$<$typename... Args$>$ }\\bool \mbox{\hyperlink{classsysio_1_1vm_1_1backend_ad6d88177a9449485839de2072c0118d2}{call}} (host\+\_\+t \&host, const std\+::string\+\_\+view \&mod, const std\+::string\+\_\+view \&\mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2}{func}}, Args... args)
+\item 
+{\footnotesize template$<$typename... Args$>$ }\\bool \mbox{\hyperlink{classsysio_1_1vm_1_1backend_a8e6c9070cfddd2d3cd967aecb312b2f3}{call}} (const std\+::string\+\_\+view \&mod, const std\+::string\+\_\+view \&\mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2}{func}}, Args... args)
+\item 
+{\footnotesize template$<$typename... Args$>$ }\\auto \mbox{\hyperlink{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}{call\+\_\+with\+\_\+return}} (host\+\_\+t \&host, const std\+::string\+\_\+view \&mod, const std\+::string\+\_\+view \&\mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2}{func}}, Args... args)
+\item 
+{\footnotesize template$<$typename... Args$>$ }\\auto \mbox{\hyperlink{classsysio_1_1vm_1_1backend_a25aaa68d74e7cce372dae096aff9b826}{call\+\_\+with\+\_\+return}} (const std\+::string\+\_\+view \&mod, const std\+::string\+\_\+view \&\mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2}{func}}, Args... args)
+\item 
+{\footnotesize template$<$typename Watchdog , typename F $>$ }\\void \mbox{\hyperlink{classsysio_1_1vm_1_1backend_aac266fa12bedfb6b4a9ab2f73c2bdebf}{timed\+\_\+run}} (Watchdog \&\&\mbox{\hyperlink{hello__driver_8cpp_aa199bff2581e446e3865732d06d873f0}{wd}}, F \&\&\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})
+\item 
+{\footnotesize template$<$typename Watchdog $>$ }\\void \mbox{\hyperlink{classsysio_1_1vm_1_1backend_a6a3fbbc16a719762e15001d75ed3a6d0}{execute\+\_\+all}} (Watchdog \&\&\mbox{\hyperlink{hello__driver_8cpp_aa199bff2581e446e3865732d06d873f0}{wd}}, host\+\_\+t \&host)
+\item 
+{\footnotesize template$<$typename Watchdog $>$ }\\void \mbox{\hyperlink{classsysio_1_1vm_1_1backend_a4dd6cd3a6027ebb0300fbd3075070f5b}{execute\+\_\+all}} (Watchdog \&\&\mbox{\hyperlink{hello__driver_8cpp_aa199bff2581e446e3865732d06d873f0}{wd}})
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1backend_afb52bdfbf023f8e042d9228928ed93b7}{set\+\_\+wasm\+\_\+allocator}} (\mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator}{wasm\+\_\+allocator}} \texorpdfstring{$\ast$}{*}alloc)
+\item 
+\mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator}{wasm\+\_\+allocator}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classsysio_1_1vm_1_1backend_ae93d8385608b8dc7bcd378f005519a54}{get\+\_\+wasm\+\_\+allocator}} ()
+\item 
+\mbox{\hyperlink{structsysio_1_1vm_1_1module}{module}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1backend_af2bdf6918391f431538eb92100389eab}{get\+\_\+module}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1backend_a9f9f05d3aef7b2e1791612036c5385dc}{exit}} (const std\+::error\+\_\+code \&ec)
+\item 
+auto \& \mbox{\hyperlink{classsysio_1_1vm_1_1backend_a84feaa0031467bf9822b0741e08f9a67}{get\+\_\+context}} ()
+\item 
+const Debug\+Info \& \mbox{\hyperlink{classsysio_1_1vm_1_1backend_a0a9b5731e930eb3cfcce51b293ec6cdf}{get\+\_\+debug}} () const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Host\+Functions = std\+::nullptr\+\_\+t, typename Impl = interpreter, typename Options = default\+\_\+options, typename Debug\+Info = null\+\_\+debug\+\_\+info$>$\newline
+class sysio\+::vm\+::backend$<$ Host\+Functions, Impl, Options, Debug\+Info $>$}
+
+
+Definition at line \mbox{\hyperlink{vm_2backend_8hpp_source_l00062}{62}} of file \mbox{\hyperlink{vm_2backend_8hpp_source}{backend.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classsysio_1_1vm_1_1backend_a303d8f9c9da58c130abf8439b3376cbf}\index{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}!backend@{backend}}
+\index{backend@{backend}!sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}}
+\doxysubsubsection{\texorpdfstring{backend()}{backend()}\hspace{0.1cm}{\footnotesize\ttfamily [1/12]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1backend_a303d8f9c9da58c130abf8439b3376cbf} 
+template$<$typename Host\+Functions  = std\+::nullptr\+\_\+t, typename Impl  = interpreter, typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio\+::vm\+::backend}}$<$ Host\+Functions, Impl, Options, Debug\+Info $>$\+::backend (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacesysio_1_1vm_a6ffa5796148f0f779a3d44799c3f0cce}{wasm\+\_\+code}} \&\&}]{code}{, }\item[{host\+\_\+t \&}]{host}{, }\item[{\mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator}{wasm\+\_\+allocator}} \texorpdfstring{$\ast$}{*}}]{alloc}{, }\item[{const Options \&}]{options}{ = {\ttfamily Options\{\}}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2backend_8hpp_source_l00076}{76}} of file \mbox{\hyperlink{sysio_2vm_2backend_8hpp_source}{backend.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\})}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ :\ memory\_alloc(alloc),\ ctx(parser\_t\{\ mod.\mbox{\hyperlink{namespacechainbase_add7d4cf66ab3f2808fe613e6b0343b89}{allocator}},\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}\ \}.parse\_module(code,\ mod,\ debug),\ \mbox{\hyperlink{namespacedetail}{detail}}::get\_max\_call\_depth(\mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}))\ \{}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ ctx.set\_max\_pages(detail::get\_max\_pages(options));}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ construct(\&host);}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1backend_a58541fc2403c49819de9522f0dc00e7d}\index{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}!backend@{backend}}
+\index{backend@{backend}!sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}}
+\doxysubsubsection{\texorpdfstring{backend()}{backend()}\hspace{0.1cm}{\footnotesize\ttfamily [2/12]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1backend_a58541fc2403c49819de9522f0dc00e7d} 
+template$<$typename Host\+Functions  = std\+::nullptr\+\_\+t, typename Impl  = interpreter, typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio\+::vm\+::backend}}$<$ Host\+Functions, Impl, Options, Debug\+Info $>$\+::backend (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacesysio_1_1vm_a6ffa5796148f0f779a3d44799c3f0cce}{wasm\+\_\+code}} \&\&}]{code}{, }\item[{\mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator}{wasm\+\_\+allocator}} \texorpdfstring{$\ast$}{*}}]{alloc}{, }\item[{const Options \&}]{options}{ = {\ttfamily Options\{\}}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2backend_8hpp_source_l00081}{81}} of file \mbox{\hyperlink{sysio_2vm_2backend_8hpp_source}{backend.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\})}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ :\ memory\_alloc(alloc),\ ctx(parser\_t\{\ mod.\mbox{\hyperlink{namespacechainbase_add7d4cf66ab3f2808fe613e6b0343b89}{allocator}},\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}\ \}.parse\_module(code,\ mod,\ debug),\ \mbox{\hyperlink{namespacedetail}{detail}}::get\_max\_call\_depth(\mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}))\ \{}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ ctx.set\_max\_pages(detail::get\_max\_pages(options));}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ construct();}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1backend_a06d4fbcf702978a02b5b1e79ebdc97f8}\index{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}!backend@{backend}}
+\index{backend@{backend}!sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}}
+\doxysubsubsection{\texorpdfstring{backend()}{backend()}\hspace{0.1cm}{\footnotesize\ttfamily [3/12]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1backend_a06d4fbcf702978a02b5b1e79ebdc97f8} 
+template$<$typename Host\+Functions  = std\+::nullptr\+\_\+t, typename Impl  = interpreter, typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio\+::vm\+::backend}}$<$ Host\+Functions, Impl, Options, Debug\+Info $>$\+::backend (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacesysio_1_1vm_a6ffa5796148f0f779a3d44799c3f0cce}{wasm\+\_\+code}} \&}]{code}{, }\item[{host\+\_\+t \&}]{host}{, }\item[{\mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator}{wasm\+\_\+allocator}} \texorpdfstring{$\ast$}{*}}]{alloc}{, }\item[{const Options \&}]{options}{ = {\ttfamily Options\{\}}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2backend_8hpp_source_l00086}{86}} of file \mbox{\hyperlink{sysio_2vm_2backend_8hpp_source}{backend.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\})}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \ :\ memory\_alloc(alloc),\ ctx(parser\_t\{\ mod.\mbox{\hyperlink{namespacechainbase_add7d4cf66ab3f2808fe613e6b0343b89}{allocator}},\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}\ \}.parse\_module(code,\ mod,\ debug),\ \mbox{\hyperlink{namespacedetail}{detail}}::get\_max\_call\_depth(\mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}))\ \{}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ ctx.set\_max\_pages(detail::get\_max\_pages(options));}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ construct(\&host);}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1backend_a327dcb8568c96507646d09e7460a8444}\index{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}!backend@{backend}}
+\index{backend@{backend}!sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}}
+\doxysubsubsection{\texorpdfstring{backend()}{backend()}\hspace{0.1cm}{\footnotesize\ttfamily [4/12]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1backend_a327dcb8568c96507646d09e7460a8444} 
+template$<$typename Host\+Functions  = std\+::nullptr\+\_\+t, typename Impl  = interpreter, typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio\+::vm\+::backend}}$<$ Host\+Functions, Impl, Options, Debug\+Info $>$\+::backend (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacesysio_1_1vm_a6ffa5796148f0f779a3d44799c3f0cce}{wasm\+\_\+code}} \&}]{code}{, }\item[{\mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator}{wasm\+\_\+allocator}} \texorpdfstring{$\ast$}{*}}]{alloc}{, }\item[{const Options \&}]{options}{ = {\ttfamily Options\{\}}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2backend_8hpp_source_l00091}{91}} of file \mbox{\hyperlink{sysio_2vm_2backend_8hpp_source}{backend.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\})}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ :\ memory\_alloc(alloc),\ ctx(parser\_t\{\ mod.\mbox{\hyperlink{namespacechainbase_add7d4cf66ab3f2808fe613e6b0343b89}{allocator}},\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}\ \}.parse\_module(code,\ mod,\ debug),\ \mbox{\hyperlink{namespacedetail}{detail}}::get\_max\_call\_depth(\mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}))\ \{}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ ctx.set\_max\_pages(detail::get\_max\_pages(options));}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ construct();}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1backend_a7d5f827e5f840a336de09a3f2616aa6c}\index{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}!backend@{backend}}
+\index{backend@{backend}!sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}}
+\doxysubsubsection{\texorpdfstring{backend()}{backend()}\hspace{0.1cm}{\footnotesize\ttfamily [5/12]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1backend_a7d5f827e5f840a336de09a3f2616aa6c} 
+template$<$typename Host\+Functions  = std\+::nullptr\+\_\+t, typename Impl  = interpreter, typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio\+::vm\+::backend}}$<$ Host\+Functions, Impl, Options, Debug\+Info $>$\+::backend (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacesysio_1_1vm_a9ec5735264f754f4960b35edb8693bfa}{wasm\+\_\+code\+\_\+ptr}} \&}]{ptr}{, }\item[{size\+\_\+t}]{sz}{, }\item[{host\+\_\+t \&}]{host}{, }\item[{\mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator}{wasm\+\_\+allocator}} \texorpdfstring{$\ast$}{*}}]{alloc}{, }\item[{const Options \&}]{options}{ = {\ttfamily Options\{\}}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2backend_8hpp_source_l00096}{96}} of file \mbox{\hyperlink{sysio_2vm_2backend_8hpp_source}{backend.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\})}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ :\ memory\_alloc(alloc),\ ctx(parser\_t\{\ mod.\mbox{\hyperlink{namespacechainbase_add7d4cf66ab3f2808fe613e6b0343b89}{allocator}},\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}\ \}.parse\_module2(ptr,\ sz,\ mod,\ debug),\ \mbox{\hyperlink{namespacedetail}{detail}}::get\_max\_call\_depth(\mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}))\ \{}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ ctx.set\_max\_pages(detail::get\_max\_pages(options));}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ construct(\&host);}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1backend_a327e5d9eea878fd511963f6d9fff3053}\index{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}!backend@{backend}}
+\index{backend@{backend}!sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}}
+\doxysubsubsection{\texorpdfstring{backend()}{backend()}\hspace{0.1cm}{\footnotesize\ttfamily [6/12]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1backend_a327e5d9eea878fd511963f6d9fff3053} 
+template$<$typename Host\+Functions  = std\+::nullptr\+\_\+t, typename Impl  = interpreter, typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio\+::vm\+::backend}}$<$ Host\+Functions, Impl, Options, Debug\+Info $>$\+::backend (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacesysio_1_1vm_a9ec5735264f754f4960b35edb8693bfa}{wasm\+\_\+code\+\_\+ptr}} \&}]{ptr}{, }\item[{size\+\_\+t}]{sz}{, }\item[{\mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator}{wasm\+\_\+allocator}} \texorpdfstring{$\ast$}{*}}]{alloc}{, }\item[{const Options \&}]{options}{ = {\ttfamily Options\{\}}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2backend_8hpp_source_l00101}{101}} of file \mbox{\hyperlink{sysio_2vm_2backend_8hpp_source}{backend.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\})}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ :\ memory\_alloc(alloc),\ ctx(parser\_t\{\ mod.\mbox{\hyperlink{namespacechainbase_add7d4cf66ab3f2808fe613e6b0343b89}{allocator}},\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}\ \}.parse\_module2(ptr,\ sz,\ mod,\ debug),\ \mbox{\hyperlink{namespacedetail}{detail}}::get\_max\_call\_depth(\mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}))\ \{}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ ctx.set\_max\_pages(detail::get\_max\_pages(options));}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ construct();}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1backend_a303d8f9c9da58c130abf8439b3376cbf}\index{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}!backend@{backend}}
+\index{backend@{backend}!sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}}
+\doxysubsubsection{\texorpdfstring{backend()}{backend()}\hspace{0.1cm}{\footnotesize\ttfamily [7/12]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1backend_a303d8f9c9da58c130abf8439b3376cbf} 
+template$<$typename Host\+Functions  = std\+::nullptr\+\_\+t, typename Impl  = interpreter, typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio\+::vm\+::backend}}$<$ Host\+Functions, Impl, Options, Debug\+Info $>$\+::backend (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacesysio_1_1vm_a6ffa5796148f0f779a3d44799c3f0cce}{wasm\+\_\+code}} \&\&}]{code}{, }\item[{host\+\_\+t \&}]{host}{, }\item[{\mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator}{wasm\+\_\+allocator}} \texorpdfstring{$\ast$}{*}}]{alloc}{, }\item[{const Options \&}]{options}{ = {\ttfamily Options\{\}}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2backend_8hpp_source_l00076}{76}} of file \mbox{\hyperlink{vm_2backend_8hpp_source}{backend.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\})}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ :\ memory\_alloc(alloc),\ ctx(parser\_t\{\ mod.\mbox{\hyperlink{namespacechainbase_add7d4cf66ab3f2808fe613e6b0343b89}{allocator}},\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}\ \}.parse\_module(code,\ mod,\ debug),\ \mbox{\hyperlink{namespacedetail}{detail}}::get\_max\_call\_depth(\mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}))\ \{}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ ctx.set\_max\_pages(detail::get\_max\_pages(options));}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ construct(\&host);}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1backend_a58541fc2403c49819de9522f0dc00e7d}\index{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}!backend@{backend}}
+\index{backend@{backend}!sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}}
+\doxysubsubsection{\texorpdfstring{backend()}{backend()}\hspace{0.1cm}{\footnotesize\ttfamily [8/12]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1backend_a58541fc2403c49819de9522f0dc00e7d} 
+template$<$typename Host\+Functions  = std\+::nullptr\+\_\+t, typename Impl  = interpreter, typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio\+::vm\+::backend}}$<$ Host\+Functions, Impl, Options, Debug\+Info $>$\+::backend (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacesysio_1_1vm_a6ffa5796148f0f779a3d44799c3f0cce}{wasm\+\_\+code}} \&\&}]{code}{, }\item[{\mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator}{wasm\+\_\+allocator}} \texorpdfstring{$\ast$}{*}}]{alloc}{, }\item[{const Options \&}]{options}{ = {\ttfamily Options\{\}}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2backend_8hpp_source_l00081}{81}} of file \mbox{\hyperlink{vm_2backend_8hpp_source}{backend.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\})}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ :\ memory\_alloc(alloc),\ ctx(parser\_t\{\ mod.\mbox{\hyperlink{namespacechainbase_add7d4cf66ab3f2808fe613e6b0343b89}{allocator}},\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}\ \}.parse\_module(code,\ mod,\ debug),\ \mbox{\hyperlink{namespacedetail}{detail}}::get\_max\_call\_depth(\mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}))\ \{}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ ctx.set\_max\_pages(detail::get\_max\_pages(options));}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ construct();}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1backend_a06d4fbcf702978a02b5b1e79ebdc97f8}\index{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}!backend@{backend}}
+\index{backend@{backend}!sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}}
+\doxysubsubsection{\texorpdfstring{backend()}{backend()}\hspace{0.1cm}{\footnotesize\ttfamily [9/12]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1backend_a06d4fbcf702978a02b5b1e79ebdc97f8} 
+template$<$typename Host\+Functions  = std\+::nullptr\+\_\+t, typename Impl  = interpreter, typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio\+::vm\+::backend}}$<$ Host\+Functions, Impl, Options, Debug\+Info $>$\+::backend (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacesysio_1_1vm_a6ffa5796148f0f779a3d44799c3f0cce}{wasm\+\_\+code}} \&}]{code}{, }\item[{host\+\_\+t \&}]{host}{, }\item[{\mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator}{wasm\+\_\+allocator}} \texorpdfstring{$\ast$}{*}}]{alloc}{, }\item[{const Options \&}]{options}{ = {\ttfamily Options\{\}}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2backend_8hpp_source_l00086}{86}} of file \mbox{\hyperlink{vm_2backend_8hpp_source}{backend.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\})}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \ :\ memory\_alloc(alloc),\ ctx(parser\_t\{\ mod.\mbox{\hyperlink{namespacechainbase_add7d4cf66ab3f2808fe613e6b0343b89}{allocator}},\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}\ \}.parse\_module(code,\ mod,\ debug),\ \mbox{\hyperlink{namespacedetail}{detail}}::get\_max\_call\_depth(\mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}))\ \{}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ ctx.set\_max\_pages(detail::get\_max\_pages(options));}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ construct(\&host);}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1backend_a327dcb8568c96507646d09e7460a8444}\index{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}!backend@{backend}}
+\index{backend@{backend}!sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}}
+\doxysubsubsection{\texorpdfstring{backend()}{backend()}\hspace{0.1cm}{\footnotesize\ttfamily [10/12]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1backend_a327dcb8568c96507646d09e7460a8444} 
+template$<$typename Host\+Functions  = std\+::nullptr\+\_\+t, typename Impl  = interpreter, typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio\+::vm\+::backend}}$<$ Host\+Functions, Impl, Options, Debug\+Info $>$\+::backend (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacesysio_1_1vm_a6ffa5796148f0f779a3d44799c3f0cce}{wasm\+\_\+code}} \&}]{code}{, }\item[{\mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator}{wasm\+\_\+allocator}} \texorpdfstring{$\ast$}{*}}]{alloc}{, }\item[{const Options \&}]{options}{ = {\ttfamily Options\{\}}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2backend_8hpp_source_l00091}{91}} of file \mbox{\hyperlink{vm_2backend_8hpp_source}{backend.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\})}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ :\ memory\_alloc(alloc),\ ctx(parser\_t\{\ mod.\mbox{\hyperlink{namespacechainbase_add7d4cf66ab3f2808fe613e6b0343b89}{allocator}},\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}\ \}.parse\_module(code,\ mod,\ debug),\ \mbox{\hyperlink{namespacedetail}{detail}}::get\_max\_call\_depth(\mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}))\ \{}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ ctx.set\_max\_pages(detail::get\_max\_pages(options));}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ construct();}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1backend_a7d5f827e5f840a336de09a3f2616aa6c}\index{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}!backend@{backend}}
+\index{backend@{backend}!sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}}
+\doxysubsubsection{\texorpdfstring{backend()}{backend()}\hspace{0.1cm}{\footnotesize\ttfamily [11/12]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1backend_a7d5f827e5f840a336de09a3f2616aa6c} 
+template$<$typename Host\+Functions  = std\+::nullptr\+\_\+t, typename Impl  = interpreter, typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio\+::vm\+::backend}}$<$ Host\+Functions, Impl, Options, Debug\+Info $>$\+::backend (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacesysio_1_1vm_a9ec5735264f754f4960b35edb8693bfa}{wasm\+\_\+code\+\_\+ptr}} \&}]{ptr}{, }\item[{size\+\_\+t}]{sz}{, }\item[{host\+\_\+t \&}]{host}{, }\item[{\mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator}{wasm\+\_\+allocator}} \texorpdfstring{$\ast$}{*}}]{alloc}{, }\item[{const Options \&}]{options}{ = {\ttfamily Options\{\}}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2backend_8hpp_source_l00096}{96}} of file \mbox{\hyperlink{vm_2backend_8hpp_source}{backend.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\})}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ :\ memory\_alloc(alloc),\ ctx(parser\_t\{\ mod.\mbox{\hyperlink{namespacechainbase_add7d4cf66ab3f2808fe613e6b0343b89}{allocator}},\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}\ \}.parse\_module2(ptr,\ sz,\ mod,\ debug),\ \mbox{\hyperlink{namespacedetail}{detail}}::get\_max\_call\_depth(\mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}))\ \{}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ ctx.set\_max\_pages(detail::get\_max\_pages(options));}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ construct(\&host);}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1backend_a327e5d9eea878fd511963f6d9fff3053}\index{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}!backend@{backend}}
+\index{backend@{backend}!sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}}
+\doxysubsubsection{\texorpdfstring{backend()}{backend()}\hspace{0.1cm}{\footnotesize\ttfamily [12/12]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1backend_a327e5d9eea878fd511963f6d9fff3053} 
+template$<$typename Host\+Functions  = std\+::nullptr\+\_\+t, typename Impl  = interpreter, typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio\+::vm\+::backend}}$<$ Host\+Functions, Impl, Options, Debug\+Info $>$\+::backend (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacesysio_1_1vm_a9ec5735264f754f4960b35edb8693bfa}{wasm\+\_\+code\+\_\+ptr}} \&}]{ptr}{, }\item[{size\+\_\+t}]{sz}{, }\item[{\mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator}{wasm\+\_\+allocator}} \texorpdfstring{$\ast$}{*}}]{alloc}{, }\item[{const Options \&}]{options}{ = {\ttfamily Options\{\}}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2backend_8hpp_source_l00101}{101}} of file \mbox{\hyperlink{vm_2backend_8hpp_source}{backend.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\})}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ :\ memory\_alloc(alloc),\ ctx(parser\_t\{\ mod.\mbox{\hyperlink{namespacechainbase_add7d4cf66ab3f2808fe613e6b0343b89}{allocator}},\ \mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}\ \}.parse\_module2(ptr,\ sz,\ mod,\ debug),\ \mbox{\hyperlink{namespacedetail}{detail}}::get\_max\_call\_depth(\mbox{\hyperlink{namespacebenchmark_compile_acf738bbf3b8391aa78929ceeceb8a03b}{options}}))\ \{}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ ctx.set\_max\_pages(detail::get\_max\_pages(options));}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ construct();}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1vm_1_1backend_a8e6c9070cfddd2d3cd967aecb312b2f3}\index{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}!call@{call}}
+\index{call@{call}!sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}}
+\doxysubsubsection{\texorpdfstring{call()}{call()}\hspace{0.1cm}{\footnotesize\ttfamily [1/6]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1backend_a8e6c9070cfddd2d3cd967aecb312b2f3} 
+template$<$typename Host\+Functions  = std\+::nullptr\+\_\+t, typename Impl  = interpreter, typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+template$<$typename... Args$>$ \\
+bool \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio\+::vm\+::backend}}$<$ Host\+Functions, Impl, Options, Debug\+Info $>$\+::call (\begin{DoxyParamCaption}\item[{const std\+::string\+\_\+view \&}]{mod}{, }\item[{const std\+::string\+\_\+view \&}]{func}{, }\item[{Args...}]{args}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2backend_8hpp_source_l00168}{168}} of file \mbox{\hyperlink{sysio_2vm_2backend_8hpp_source}{backend.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keyword}{constexpr}\ (\mbox{\hyperlink{namespacesysio_1_1vm_a0d45725098444708753594d0d210ad27}{eos\_vm\_debug}})\ \{}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \ \ \ \ ctx.execute(\textcolor{keyword}{nullptr},\ debug\_visitor(ctx),\ \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2}{func}},\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}...);}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \ \ \ \ ctx.execute(\textcolor{keyword}{nullptr},\ interpret\_visitor(ctx),\ \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2}{func}},\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}...);}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1backend_a8e6c9070cfddd2d3cd967aecb312b2f3}\index{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}!call@{call}}
+\index{call@{call}!sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}}
+\doxysubsubsection{\texorpdfstring{call()}{call()}\hspace{0.1cm}{\footnotesize\ttfamily [2/6]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1backend_a8e6c9070cfddd2d3cd967aecb312b2f3} 
+template$<$typename Host\+Functions  = std\+::nullptr\+\_\+t, typename Impl  = interpreter, typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+template$<$typename... Args$>$ \\
+bool \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio\+::vm\+::backend}}$<$ Host\+Functions, Impl, Options, Debug\+Info $>$\+::call (\begin{DoxyParamCaption}\item[{const std\+::string\+\_\+view \&}]{mod}{, }\item[{const std\+::string\+\_\+view \&}]{func}{, }\item[{Args...}]{args}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2backend_8hpp_source_l00168}{168}} of file \mbox{\hyperlink{vm_2backend_8hpp_source}{backend.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keyword}{constexpr}\ (\mbox{\hyperlink{namespacesysio_1_1vm_a0d45725098444708753594d0d210ad27}{eos\_vm\_debug}})\ \{}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \ \ \ \ ctx.execute(\textcolor{keyword}{nullptr},\ debug\_visitor(ctx),\ \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2}{func}},\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}...);}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \ \ \ \ ctx.execute(\textcolor{keyword}{nullptr},\ interpret\_visitor(ctx),\ \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2}{func}},\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}...);}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1backend_ad6d88177a9449485839de2072c0118d2}\index{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}!call@{call}}
+\index{call@{call}!sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}}
+\doxysubsubsection{\texorpdfstring{call()}{call()}\hspace{0.1cm}{\footnotesize\ttfamily [3/6]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1backend_ad6d88177a9449485839de2072c0118d2} 
+template$<$typename Host\+Functions  = std\+::nullptr\+\_\+t, typename Impl  = interpreter, typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+template$<$typename... Args$>$ \\
+bool \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio\+::vm\+::backend}}$<$ Host\+Functions, Impl, Options, Debug\+Info $>$\+::call (\begin{DoxyParamCaption}\item[{host\+\_\+t \&}]{host}{, }\item[{const std\+::string\+\_\+view \&}]{mod}{, }\item[{const std\+::string\+\_\+view \&}]{func}{, }\item[{Args...}]{args}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2backend_8hpp_source_l00158}{158}} of file \mbox{\hyperlink{sysio_2vm_2backend_8hpp_source}{backend.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keyword}{constexpr}\ (\mbox{\hyperlink{namespacesysio_1_1vm_a0d45725098444708753594d0d210ad27}{eos\_vm\_debug}})\ \{}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \ \ \ \ ctx.execute(\&host,\ debug\_visitor(ctx),\ \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2}{func}},\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}...);}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \ \ \ \ \ \ ctx.execute(\&host,\ interpret\_visitor(ctx),\ \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2}{func}},\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}...);}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1backend_ad6d88177a9449485839de2072c0118d2}\index{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}!call@{call}}
+\index{call@{call}!sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}}
+\doxysubsubsection{\texorpdfstring{call()}{call()}\hspace{0.1cm}{\footnotesize\ttfamily [4/6]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1backend_ad6d88177a9449485839de2072c0118d2} 
+template$<$typename Host\+Functions  = std\+::nullptr\+\_\+t, typename Impl  = interpreter, typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+template$<$typename... Args$>$ \\
+bool \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio\+::vm\+::backend}}$<$ Host\+Functions, Impl, Options, Debug\+Info $>$\+::call (\begin{DoxyParamCaption}\item[{host\+\_\+t \&}]{host}{, }\item[{const std\+::string\+\_\+view \&}]{mod}{, }\item[{const std\+::string\+\_\+view \&}]{func}{, }\item[{Args...}]{args}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2backend_8hpp_source_l00158}{158}} of file \mbox{\hyperlink{vm_2backend_8hpp_source}{backend.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keyword}{constexpr}\ (\mbox{\hyperlink{namespacesysio_1_1vm_a0d45725098444708753594d0d210ad27}{eos\_vm\_debug}})\ \{}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \ \ \ \ ctx.execute(\&host,\ debug\_visitor(ctx),\ \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2}{func}},\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}...);}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \ \ \ \ \ \ ctx.execute(\&host,\ interpret\_visitor(ctx),\ \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2}{func}},\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}...);}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1backend_a63fc40356b116cdac6cd50788b25eab1}\index{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}!call@{call}}
+\index{call@{call}!sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}}
+\doxysubsubsection{\texorpdfstring{call()}{call()}\hspace{0.1cm}{\footnotesize\ttfamily [5/6]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1backend_a63fc40356b116cdac6cd50788b25eab1} 
+template$<$typename Host\+Functions  = std\+::nullptr\+\_\+t, typename Impl  = interpreter, typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+template$<$typename... Args$>$ \\
+bool \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio\+::vm\+::backend}}$<$ Host\+Functions, Impl, Options, Debug\+Info $>$\+::call (\begin{DoxyParamCaption}\item[{host\+\_\+t \texorpdfstring{$\ast$}{*}}]{host}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{func\+\_\+index}{, }\item[{Args...}]{args}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2backend_8hpp_source_l00148}{148}} of file \mbox{\hyperlink{sysio_2vm_2backend_8hpp_source}{backend.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keyword}{constexpr}\ (\mbox{\hyperlink{namespacesysio_1_1vm_a0d45725098444708753594d0d210ad27}{eos\_vm\_debug}})\ \{}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \ \ \ \ ctx.execute(host,\ debug\_visitor(ctx),\ func\_index,\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}...);}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \ \ \ \ ctx.execute(host,\ interpret\_visitor(ctx),\ func\_index,\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}...);}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1vm_1_1backend_a63fc40356b116cdac6cd50788b25eab1_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1backend_a63fc40356b116cdac6cd50788b25eab1}\index{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}!call@{call}}
+\index{call@{call}!sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}}
+\doxysubsubsection{\texorpdfstring{call()}{call()}\hspace{0.1cm}{\footnotesize\ttfamily [6/6]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1backend_a63fc40356b116cdac6cd50788b25eab1} 
+template$<$typename Host\+Functions  = std\+::nullptr\+\_\+t, typename Impl  = interpreter, typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+template$<$typename... Args$>$ \\
+bool \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio\+::vm\+::backend}}$<$ Host\+Functions, Impl, Options, Debug\+Info $>$\+::call (\begin{DoxyParamCaption}\item[{host\+\_\+t \texorpdfstring{$\ast$}{*}}]{host}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{func\+\_\+index}{, }\item[{Args...}]{args}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2backend_8hpp_source_l00148}{148}} of file \mbox{\hyperlink{vm_2backend_8hpp_source}{backend.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keyword}{constexpr}\ (\mbox{\hyperlink{namespacesysio_1_1vm_a0d45725098444708753594d0d210ad27}{eos\_vm\_debug}})\ \{}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \ \ \ \ ctx.execute(host,\ debug\_visitor(ctx),\ func\_index,\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}...);}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \ \ \ \ ctx.execute(host,\ interpret\_visitor(ctx),\ func\_index,\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}...);}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1backend_a295902c35e6934580b18a1d30c3458db}\index{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}!call\_indirect@{call\_indirect}}
+\index{call\_indirect@{call\_indirect}!sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}}
+\doxysubsubsection{\texorpdfstring{call\_indirect()}{call\_indirect()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1backend_a295902c35e6934580b18a1d30c3458db} 
+template$<$typename Host\+Functions  = std\+::nullptr\+\_\+t, typename Impl  = interpreter, typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+template$<$typename... Args$>$ \\
+bool \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio\+::vm\+::backend}}$<$ Host\+Functions, Impl, Options, Debug\+Info $>$\+::call\+\_\+indirect (\begin{DoxyParamCaption}\item[{host\+\_\+t \texorpdfstring{$\ast$}{*}}]{host}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{func\+\_\+index}{, }\item[{Args...}]{args}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2backend_8hpp_source_l00138}{138}} of file \mbox{\hyperlink{sysio_2vm_2backend_8hpp_source}{backend.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keyword}{constexpr}\ (\mbox{\hyperlink{namespacesysio_1_1vm_a0d45725098444708753594d0d210ad27}{eos\_vm\_debug}})\ \{}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \ \ \ \ ctx.execute\_func\_table(host,\ debug\_visitor(ctx),\ func\_index,\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}...);}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \ \ \ \ ctx.execute\_func\_table(host,\ interpret\_visitor(ctx),\ func\_index,\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}...);}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1backend_a295902c35e6934580b18a1d30c3458db}\index{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}!call\_indirect@{call\_indirect}}
+\index{call\_indirect@{call\_indirect}!sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}}
+\doxysubsubsection{\texorpdfstring{call\_indirect()}{call\_indirect()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1backend_a295902c35e6934580b18a1d30c3458db} 
+template$<$typename Host\+Functions  = std\+::nullptr\+\_\+t, typename Impl  = interpreter, typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+template$<$typename... Args$>$ \\
+bool \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio\+::vm\+::backend}}$<$ Host\+Functions, Impl, Options, Debug\+Info $>$\+::call\+\_\+indirect (\begin{DoxyParamCaption}\item[{host\+\_\+t \texorpdfstring{$\ast$}{*}}]{host}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{func\+\_\+index}{, }\item[{Args...}]{args}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2backend_8hpp_source_l00138}{138}} of file \mbox{\hyperlink{vm_2backend_8hpp_source}{backend.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keyword}{constexpr}\ (\mbox{\hyperlink{namespacesysio_1_1vm_a0d45725098444708753594d0d210ad27}{eos\_vm\_debug}})\ \{}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \ \ \ \ ctx.execute\_func\_table(host,\ debug\_visitor(ctx),\ func\_index,\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}...);}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \ \ \ \ ctx.execute\_func\_table(host,\ interpret\_visitor(ctx),\ func\_index,\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}...);}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1backend_a25aaa68d74e7cce372dae096aff9b826}\index{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}!call\_with\_return@{call\_with\_return}}
+\index{call\_with\_return@{call\_with\_return}!sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}}
+\doxysubsubsection{\texorpdfstring{call\_with\_return()}{call\_with\_return()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1backend_a25aaa68d74e7cce372dae096aff9b826} 
+template$<$typename Host\+Functions  = std\+::nullptr\+\_\+t, typename Impl  = interpreter, typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+template$<$typename... Args$>$ \\
+auto \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio\+::vm\+::backend}}$<$ Host\+Functions, Impl, Options, Debug\+Info $>$\+::call\+\_\+with\+\_\+return (\begin{DoxyParamCaption}\item[{const std\+::string\+\_\+view \&}]{mod}{, }\item[{const std\+::string\+\_\+view \&}]{func}{, }\item[{Args...}]{args}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2backend_8hpp_source_l00187}{187}} of file \mbox{\hyperlink{sysio_2vm_2backend_8hpp_source}{backend.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keyword}{constexpr}\ (\mbox{\hyperlink{namespacesysio_1_1vm_a0d45725098444708753594d0d210ad27}{eos\_vm\_debug}})\ \{}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ctx.execute(\textcolor{keyword}{nullptr},\ debug\_visitor(ctx),\ \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2}{func}},\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}...);}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ctx.execute(\textcolor{keyword}{nullptr},\ interpret\_visitor(ctx),\ \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2}{func}},\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}...);}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1backend_a25aaa68d74e7cce372dae096aff9b826}\index{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}!call\_with\_return@{call\_with\_return}}
+\index{call\_with\_return@{call\_with\_return}!sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}}
+\doxysubsubsection{\texorpdfstring{call\_with\_return()}{call\_with\_return()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1backend_a25aaa68d74e7cce372dae096aff9b826} 
+template$<$typename Host\+Functions  = std\+::nullptr\+\_\+t, typename Impl  = interpreter, typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+template$<$typename... Args$>$ \\
+auto \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio\+::vm\+::backend}}$<$ Host\+Functions, Impl, Options, Debug\+Info $>$\+::call\+\_\+with\+\_\+return (\begin{DoxyParamCaption}\item[{const std\+::string\+\_\+view \&}]{mod}{, }\item[{const std\+::string\+\_\+view \&}]{func}{, }\item[{Args...}]{args}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2backend_8hpp_source_l00187}{187}} of file \mbox{\hyperlink{vm_2backend_8hpp_source}{backend.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keyword}{constexpr}\ (\mbox{\hyperlink{namespacesysio_1_1vm_a0d45725098444708753594d0d210ad27}{eos\_vm\_debug}})\ \{}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ctx.execute(\textcolor{keyword}{nullptr},\ debug\_visitor(ctx),\ \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2}{func}},\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}...);}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ctx.execute(\textcolor{keyword}{nullptr},\ interpret\_visitor(ctx),\ \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2}{func}},\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}...);}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}\index{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}!call\_with\_return@{call\_with\_return}}
+\index{call\_with\_return@{call\_with\_return}!sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}}
+\doxysubsubsection{\texorpdfstring{call\_with\_return()}{call\_with\_return()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b} 
+template$<$typename Host\+Functions  = std\+::nullptr\+\_\+t, typename Impl  = interpreter, typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+template$<$typename... Args$>$ \\
+auto \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio\+::vm\+::backend}}$<$ Host\+Functions, Impl, Options, Debug\+Info $>$\+::call\+\_\+with\+\_\+return (\begin{DoxyParamCaption}\item[{host\+\_\+t \&}]{host}{, }\item[{const std\+::string\+\_\+view \&}]{mod}{, }\item[{const std\+::string\+\_\+view \&}]{func}{, }\item[{Args...}]{args}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2backend_8hpp_source_l00178}{178}} of file \mbox{\hyperlink{sysio_2vm_2backend_8hpp_source}{backend.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keyword}{constexpr}\ (\mbox{\hyperlink{namespacesysio_1_1vm_a0d45725098444708753594d0d210ad27}{eos\_vm\_debug}})\ \{}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ctx.execute(\&host,\ debug\_visitor(ctx),\ \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2}{func}},\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}...);}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ctx.execute(\&host,\ interpret\_visitor(ctx),\ \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2}{func}},\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}...);}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b}\index{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}!call\_with\_return@{call\_with\_return}}
+\index{call\_with\_return@{call\_with\_return}!sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}}
+\doxysubsubsection{\texorpdfstring{call\_with\_return()}{call\_with\_return()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1backend_af29cdd921ffee448bca95066accfb73b} 
+template$<$typename Host\+Functions  = std\+::nullptr\+\_\+t, typename Impl  = interpreter, typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+template$<$typename... Args$>$ \\
+auto \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio\+::vm\+::backend}}$<$ Host\+Functions, Impl, Options, Debug\+Info $>$\+::call\+\_\+with\+\_\+return (\begin{DoxyParamCaption}\item[{host\+\_\+t \&}]{host}{, }\item[{const std\+::string\+\_\+view \&}]{mod}{, }\item[{const std\+::string\+\_\+view \&}]{func}{, }\item[{Args...}]{args}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2backend_8hpp_source_l00178}{178}} of file \mbox{\hyperlink{vm_2backend_8hpp_source}{backend.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keyword}{constexpr}\ (\mbox{\hyperlink{namespacesysio_1_1vm_a0d45725098444708753594d0d210ad27}{eos\_vm\_debug}})\ \{}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ctx.execute(\&host,\ debug\_visitor(ctx),\ \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2}{func}},\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}...);}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ctx.execute(\&host,\ interpret\_visitor(ctx),\ \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2}{func}},\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}...);}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1backend_a4dd6cd3a6027ebb0300fbd3075070f5b}\index{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}!execute\_all@{execute\_all}}
+\index{execute\_all@{execute\_all}!sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}}
+\doxysubsubsection{\texorpdfstring{execute\_all()}{execute\_all()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1backend_a4dd6cd3a6027ebb0300fbd3075070f5b} 
+template$<$typename Host\+Functions  = std\+::nullptr\+\_\+t, typename Impl  = interpreter, typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+template$<$typename Watchdog $>$ \\
+void \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio\+::vm\+::backend}}$<$ Host\+Functions, Impl, Options, Debug\+Info $>$\+::execute\+\_\+all (\begin{DoxyParamCaption}\item[{Watchdog \&\&}]{wd}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2backend_8hpp_source_l00231}{231}} of file \mbox{\hyperlink{sysio_2vm_2backend_8hpp_source}{backend.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00231\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00232\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend_aac266fa12bedfb6b4a9ab2f73c2bdebf}{timed\_run}}(\textcolor{keyword}{static\_cast<}Watchdog\&\&\textcolor{keyword}{>}(\mbox{\hyperlink{hello__driver_8cpp_aa199bff2581e446e3865732d06d873f0}{wd}}),\ [\&]()\ \{}
+\DoxyCodeLine{00233\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ mod.exports.size();\ i++)\ \{}
+\DoxyCodeLine{00234\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (mod.exports[i].kind\ ==\ external\_kind::Function)\ \{}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\{\ (\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*)mod.exports[i].field\_str.raw(),\ mod.exports[i].field\_str.size()\ \};}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ctx.execute(\textcolor{keyword}{nullptr},\ interpret\_visitor(ctx),\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{00237\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00238\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=319pt]{classsysio_1_1vm_1_1backend_a4dd6cd3a6027ebb0300fbd3075070f5b_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1backend_a4dd6cd3a6027ebb0300fbd3075070f5b}\index{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}!execute\_all@{execute\_all}}
+\index{execute\_all@{execute\_all}!sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}}
+\doxysubsubsection{\texorpdfstring{execute\_all()}{execute\_all()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1backend_a4dd6cd3a6027ebb0300fbd3075070f5b} 
+template$<$typename Host\+Functions  = std\+::nullptr\+\_\+t, typename Impl  = interpreter, typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+template$<$typename Watchdog $>$ \\
+void \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio\+::vm\+::backend}}$<$ Host\+Functions, Impl, Options, Debug\+Info $>$\+::execute\+\_\+all (\begin{DoxyParamCaption}\item[{Watchdog \&\&}]{wd}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2backend_8hpp_source_l00231}{231}} of file \mbox{\hyperlink{vm_2backend_8hpp_source}{backend.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00231\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00232\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend_aac266fa12bedfb6b4a9ab2f73c2bdebf}{timed\_run}}(\textcolor{keyword}{static\_cast<}Watchdog\&\&\textcolor{keyword}{>}(\mbox{\hyperlink{hello__driver_8cpp_aa199bff2581e446e3865732d06d873f0}{wd}}),\ [\&]()\ \{}
+\DoxyCodeLine{00233\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ mod.exports.size();\ i++)\ \{}
+\DoxyCodeLine{00234\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (mod.exports[i].kind\ ==\ external\_kind::Function)\ \{}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\{\ (\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*)mod.exports[i].field\_str.raw(),\ mod.exports[i].field\_str.size()\ \};}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ctx.execute(\textcolor{keyword}{nullptr},\ interpret\_visitor(ctx),\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{00237\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00238\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=319pt]{classsysio_1_1vm_1_1backend_a4dd6cd3a6027ebb0300fbd3075070f5b_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1backend_a6a3fbbc16a719762e15001d75ed3a6d0}\index{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}!execute\_all@{execute\_all}}
+\index{execute\_all@{execute\_all}!sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}}
+\doxysubsubsection{\texorpdfstring{execute\_all()}{execute\_all()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1backend_a6a3fbbc16a719762e15001d75ed3a6d0} 
+template$<$typename Host\+Functions  = std\+::nullptr\+\_\+t, typename Impl  = interpreter, typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+template$<$typename Watchdog $>$ \\
+void \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio\+::vm\+::backend}}$<$ Host\+Functions, Impl, Options, Debug\+Info $>$\+::execute\+\_\+all (\begin{DoxyParamCaption}\item[{Watchdog \&\&}]{wd}{, }\item[{host\+\_\+t \&}]{host}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2backend_8hpp_source_l00219}{219}} of file \mbox{\hyperlink{sysio_2vm_2backend_8hpp_source}{backend.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend_aac266fa12bedfb6b4a9ab2f73c2bdebf}{timed\_run}}(\textcolor{keyword}{static\_cast<}Watchdog\&\&\textcolor{keyword}{>}(\mbox{\hyperlink{hello__driver_8cpp_aa199bff2581e446e3865732d06d873f0}{wd}}),\ [\&]()\ \{}
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ mod.exports.size();\ i++)\ \{}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (mod.exports[i].kind\ ==\ external\_kind::Function)\ \{}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\{\ (\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*)mod.exports[i].field\_str.raw(),\ mod.exports[i].field\_str.size()\ \};}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ctx.execute(host,\ interpret\_visitor(ctx),\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00226\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00227\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00228\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=319pt]{classsysio_1_1vm_1_1backend_a6a3fbbc16a719762e15001d75ed3a6d0_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=347pt]{classsysio_1_1vm_1_1backend_a6a3fbbc16a719762e15001d75ed3a6d0_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1backend_a6a3fbbc16a719762e15001d75ed3a6d0}\index{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}!execute\_all@{execute\_all}}
+\index{execute\_all@{execute\_all}!sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}}
+\doxysubsubsection{\texorpdfstring{execute\_all()}{execute\_all()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1backend_a6a3fbbc16a719762e15001d75ed3a6d0} 
+template$<$typename Host\+Functions  = std\+::nullptr\+\_\+t, typename Impl  = interpreter, typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+template$<$typename Watchdog $>$ \\
+void \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio\+::vm\+::backend}}$<$ Host\+Functions, Impl, Options, Debug\+Info $>$\+::execute\+\_\+all (\begin{DoxyParamCaption}\item[{Watchdog \&\&}]{wd}{, }\item[{host\+\_\+t \&}]{host}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2backend_8hpp_source_l00219}{219}} of file \mbox{\hyperlink{vm_2backend_8hpp_source}{backend.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend_aac266fa12bedfb6b4a9ab2f73c2bdebf}{timed\_run}}(\textcolor{keyword}{static\_cast<}Watchdog\&\&\textcolor{keyword}{>}(\mbox{\hyperlink{hello__driver_8cpp_aa199bff2581e446e3865732d06d873f0}{wd}}),\ [\&]()\ \{}
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ mod.exports.size();\ i++)\ \{}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (mod.exports[i].kind\ ==\ external\_kind::Function)\ \{}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\{\ (\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*)mod.exports[i].field\_str.raw(),\ mod.exports[i].field\_str.size()\ \};}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ctx.execute(host,\ interpret\_visitor(ctx),\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00226\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00227\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00228\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=319pt]{classsysio_1_1vm_1_1backend_a6a3fbbc16a719762e15001d75ed3a6d0_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1backend_a9f9f05d3aef7b2e1791612036c5385dc}\index{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}!exit@{exit}}
+\index{exit@{exit}!sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}}
+\doxysubsubsection{\texorpdfstring{exit()}{exit()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1backend_a9f9f05d3aef7b2e1791612036c5385dc} 
+template$<$typename Host\+Functions  = std\+::nullptr\+\_\+t, typename Impl  = interpreter, typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+void \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio\+::vm\+::backend}}$<$ Host\+Functions, Impl, Options, Debug\+Info $>$\+::exit (\begin{DoxyParamCaption}\item[{const std\+::error\+\_\+code \&}]{ec}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2backend_8hpp_source_l00249}{249}} of file \mbox{\hyperlink{sysio_2vm_2backend_8hpp_source}{backend.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00249\ \{\ ctx.exit(ec);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1backend_a9f9f05d3aef7b2e1791612036c5385dc}\index{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}!exit@{exit}}
+\index{exit@{exit}!sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}}
+\doxysubsubsection{\texorpdfstring{exit()}{exit()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1backend_a9f9f05d3aef7b2e1791612036c5385dc} 
+template$<$typename Host\+Functions  = std\+::nullptr\+\_\+t, typename Impl  = interpreter, typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+void \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio\+::vm\+::backend}}$<$ Host\+Functions, Impl, Options, Debug\+Info $>$\+::exit (\begin{DoxyParamCaption}\item[{const std\+::error\+\_\+code \&}]{ec}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2backend_8hpp_source_l00249}{249}} of file \mbox{\hyperlink{vm_2backend_8hpp_source}{backend.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00249\ \{\ ctx.exit(ec);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1backend_a84feaa0031467bf9822b0741e08f9a67}\index{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}!get\_context@{get\_context}}
+\index{get\_context@{get\_context}!sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}}
+\doxysubsubsection{\texorpdfstring{get\_context()}{get\_context()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1backend_a84feaa0031467bf9822b0741e08f9a67} 
+template$<$typename Host\+Functions  = std\+::nullptr\+\_\+t, typename Impl  = interpreter, typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+auto \& \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio\+::vm\+::backend}}$<$ Host\+Functions, Impl, Options, Debug\+Info $>$\+::get\+\_\+context (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2backend_8hpp_source_l00250}{250}} of file \mbox{\hyperlink{sysio_2vm_2backend_8hpp_source}{backend.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00250\ \{\ \textcolor{keywordflow}{return}\ ctx;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1vm_1_1backend_a84feaa0031467bf9822b0741e08f9a67_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1backend_a84feaa0031467bf9822b0741e08f9a67}\index{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}!get\_context@{get\_context}}
+\index{get\_context@{get\_context}!sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}}
+\doxysubsubsection{\texorpdfstring{get\_context()}{get\_context()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1backend_a84feaa0031467bf9822b0741e08f9a67} 
+template$<$typename Host\+Functions  = std\+::nullptr\+\_\+t, typename Impl  = interpreter, typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+auto \& \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio\+::vm\+::backend}}$<$ Host\+Functions, Impl, Options, Debug\+Info $>$\+::get\+\_\+context (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2backend_8hpp_source_l00250}{250}} of file \mbox{\hyperlink{vm_2backend_8hpp_source}{backend.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00250\ \{\ \textcolor{keywordflow}{return}\ ctx;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1backend_a0a9b5731e930eb3cfcce51b293ec6cdf}\index{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}!get\_debug@{get\_debug}}
+\index{get\_debug@{get\_debug}!sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}}
+\doxysubsubsection{\texorpdfstring{get\_debug()}{get\_debug()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1backend_a0a9b5731e930eb3cfcce51b293ec6cdf} 
+template$<$typename Host\+Functions  = std\+::nullptr\+\_\+t, typename Impl  = interpreter, typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+const Debug\+Info \& \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio\+::vm\+::backend}}$<$ Host\+Functions, Impl, Options, Debug\+Info $>$\+::get\+\_\+debug (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2backend_8hpp_source_l00252}{252}} of file \mbox{\hyperlink{sysio_2vm_2backend_8hpp_source}{backend.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00252\ \{\ \textcolor{keywordflow}{return}\ debug;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1backend_a0a9b5731e930eb3cfcce51b293ec6cdf}\index{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}!get\_debug@{get\_debug}}
+\index{get\_debug@{get\_debug}!sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}}
+\doxysubsubsection{\texorpdfstring{get\_debug()}{get\_debug()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1backend_a0a9b5731e930eb3cfcce51b293ec6cdf} 
+template$<$typename Host\+Functions  = std\+::nullptr\+\_\+t, typename Impl  = interpreter, typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+const Debug\+Info \& \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio\+::vm\+::backend}}$<$ Host\+Functions, Impl, Options, Debug\+Info $>$\+::get\+\_\+debug (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2backend_8hpp_source_l00252}{252}} of file \mbox{\hyperlink{vm_2backend_8hpp_source}{backend.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00252\ \{\ \textcolor{keywordflow}{return}\ debug;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1backend_af2bdf6918391f431538eb92100389eab}\index{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}!get\_module@{get\_module}}
+\index{get\_module@{get\_module}!sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}}
+\doxysubsubsection{\texorpdfstring{get\_module()}{get\_module()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1backend_af2bdf6918391f431538eb92100389eab} 
+template$<$typename Host\+Functions  = std\+::nullptr\+\_\+t, typename Impl  = interpreter, typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+\mbox{\hyperlink{structsysio_1_1vm_1_1module}{module}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio\+::vm\+::backend}}$<$ Host\+Functions, Impl, Options, Debug\+Info $>$\+::get\+\_\+module (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2backend_8hpp_source_l00248}{248}} of file \mbox{\hyperlink{sysio_2vm_2backend_8hpp_source}{backend.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00248\ \{\ \textcolor{keywordflow}{return}\ mod;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1vm_1_1backend_af2bdf6918391f431538eb92100389eab_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1backend_af2bdf6918391f431538eb92100389eab}\index{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}!get\_module@{get\_module}}
+\index{get\_module@{get\_module}!sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}}
+\doxysubsubsection{\texorpdfstring{get\_module()}{get\_module()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1backend_af2bdf6918391f431538eb92100389eab} 
+template$<$typename Host\+Functions  = std\+::nullptr\+\_\+t, typename Impl  = interpreter, typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+\mbox{\hyperlink{structsysio_1_1vm_1_1module}{module}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio\+::vm\+::backend}}$<$ Host\+Functions, Impl, Options, Debug\+Info $>$\+::get\+\_\+module (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2backend_8hpp_source_l00248}{248}} of file \mbox{\hyperlink{vm_2backend_8hpp_source}{backend.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00248\ \{\ \textcolor{keywordflow}{return}\ mod;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1backend_ae93d8385608b8dc7bcd378f005519a54}\index{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}!get\_wasm\_allocator@{get\_wasm\_allocator}}
+\index{get\_wasm\_allocator@{get\_wasm\_allocator}!sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}}
+\doxysubsubsection{\texorpdfstring{get\_wasm\_allocator()}{get\_wasm\_allocator()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1backend_ae93d8385608b8dc7bcd378f005519a54} 
+template$<$typename Host\+Functions  = std\+::nullptr\+\_\+t, typename Impl  = interpreter, typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator}{wasm\+\_\+allocator}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio\+::vm\+::backend}}$<$ Host\+Functions, Impl, Options, Debug\+Info $>$\+::get\+\_\+wasm\+\_\+allocator (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2backend_8hpp_source_l00247}{247}} of file \mbox{\hyperlink{sysio_2vm_2backend_8hpp_source}{backend.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00247\ \{\ \textcolor{keywordflow}{return}\ memory\_alloc;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1backend_ae93d8385608b8dc7bcd378f005519a54}\index{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}!get\_wasm\_allocator@{get\_wasm\_allocator}}
+\index{get\_wasm\_allocator@{get\_wasm\_allocator}!sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}}
+\doxysubsubsection{\texorpdfstring{get\_wasm\_allocator()}{get\_wasm\_allocator()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1backend_ae93d8385608b8dc7bcd378f005519a54} 
+template$<$typename Host\+Functions  = std\+::nullptr\+\_\+t, typename Impl  = interpreter, typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator}{wasm\+\_\+allocator}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio\+::vm\+::backend}}$<$ Host\+Functions, Impl, Options, Debug\+Info $>$\+::get\+\_\+wasm\+\_\+allocator (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2backend_8hpp_source_l00247}{247}} of file \mbox{\hyperlink{vm_2backend_8hpp_source}{backend.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00247\ \{\ \textcolor{keywordflow}{return}\ memory\_alloc;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1backend_a79b302a46e626928691f082b31e084ec}\index{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}!initialize@{initialize}}
+\index{initialize@{initialize}!sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}}
+\doxysubsubsection{\texorpdfstring{initialize()}{initialize()}\hspace{0.1cm}{\footnotesize\ttfamily [1/6]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1backend_a79b302a46e626928691f082b31e084ec} 
+template$<$typename Host\+Functions  = std\+::nullptr\+\_\+t, typename Impl  = interpreter, typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio\+::vm\+::backend}}$<$ Host\+Functions, Impl, Options, Debug\+Info $>$\+::initialize (\begin{DoxyParamCaption}\item[{host\+\_\+t \&}]{host}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2backend_8hpp_source_l00133}{133}} of file \mbox{\hyperlink{sysio_2vm_2backend_8hpp_source}{backend.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend_ad9fabfa0081daaedb3fbe3a62b42bd01}{initialize}}(\&host);}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=319pt]{classsysio_1_1vm_1_1backend_a79b302a46e626928691f082b31e084ec_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1backend_a79b302a46e626928691f082b31e084ec}\index{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}!initialize@{initialize}}
+\index{initialize@{initialize}!sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}}
+\doxysubsubsection{\texorpdfstring{initialize()}{initialize()}\hspace{0.1cm}{\footnotesize\ttfamily [2/6]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1backend_a79b302a46e626928691f082b31e084ec} 
+template$<$typename Host\+Functions  = std\+::nullptr\+\_\+t, typename Impl  = interpreter, typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio\+::vm\+::backend}}$<$ Host\+Functions, Impl, Options, Debug\+Info $>$\+::initialize (\begin{DoxyParamCaption}\item[{host\+\_\+t \&}]{host}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2backend_8hpp_source_l00133}{133}} of file \mbox{\hyperlink{vm_2backend_8hpp_source}{backend.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend_ad9fabfa0081daaedb3fbe3a62b42bd01}{initialize}}(\&host);}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=319pt]{classsysio_1_1vm_1_1backend_a79b302a46e626928691f082b31e084ec_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1backend_ad9fabfa0081daaedb3fbe3a62b42bd01}\index{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}!initialize@{initialize}}
+\index{initialize@{initialize}!sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}}
+\doxysubsubsection{\texorpdfstring{initialize()}{initialize()}\hspace{0.1cm}{\footnotesize\ttfamily [3/6]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1backend_ad9fabfa0081daaedb3fbe3a62b42bd01} 
+template$<$typename Host\+Functions  = std\+::nullptr\+\_\+t, typename Impl  = interpreter, typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio\+::vm\+::backend}}$<$ Host\+Functions, Impl, Options, Debug\+Info $>$\+::initialize (\begin{DoxyParamCaption}\item[{host\+\_\+t \texorpdfstring{$\ast$}{*}}]{host}{, }\item[{const Options \&}]{new\+\_\+options}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2backend_8hpp_source_l00118}{118}} of file \mbox{\hyperlink{sysio_2vm_2backend_8hpp_source}{backend.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ ctx.set\_max\_call\_depth(detail::get\_max\_call\_depth(new\_options));}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ ctx.set\_max\_pages(detail::get\_max\_pages(new\_options));}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend_ad9fabfa0081daaedb3fbe3a62b42bd01}{initialize}}(host);}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=182pt]{classsysio_1_1vm_1_1backend_ad9fabfa0081daaedb3fbe3a62b42bd01_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=347pt]{classsysio_1_1vm_1_1backend_ad9fabfa0081daaedb3fbe3a62b42bd01_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1backend_ad9fabfa0081daaedb3fbe3a62b42bd01}\index{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}!initialize@{initialize}}
+\index{initialize@{initialize}!sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}}
+\doxysubsubsection{\texorpdfstring{initialize()}{initialize()}\hspace{0.1cm}{\footnotesize\ttfamily [4/6]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1backend_ad9fabfa0081daaedb3fbe3a62b42bd01} 
+template$<$typename Host\+Functions  = std\+::nullptr\+\_\+t, typename Impl  = interpreter, typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio\+::vm\+::backend}}$<$ Host\+Functions, Impl, Options, Debug\+Info $>$\+::initialize (\begin{DoxyParamCaption}\item[{host\+\_\+t \texorpdfstring{$\ast$}{*}}]{host}{, }\item[{const Options \&}]{new\+\_\+options}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2backend_8hpp_source_l00118}{118}} of file \mbox{\hyperlink{vm_2backend_8hpp_source}{backend.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ ctx.set\_max\_call\_depth(detail::get\_max\_call\_depth(new\_options));}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ ctx.set\_max\_pages(detail::get\_max\_pages(new\_options));}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend_ad9fabfa0081daaedb3fbe3a62b42bd01}{initialize}}(host);}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=182pt]{classsysio_1_1vm_1_1backend_ad9fabfa0081daaedb3fbe3a62b42bd01_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1backend_a575d6f6942440f7a6cce881d5e84eb56}\index{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}!initialize@{initialize}}
+\index{initialize@{initialize}!sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}}
+\doxysubsubsection{\texorpdfstring{initialize()}{initialize()}\hspace{0.1cm}{\footnotesize\ttfamily [5/6]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1backend_a575d6f6942440f7a6cce881d5e84eb56} 
+template$<$typename Host\+Functions  = std\+::nullptr\+\_\+t, typename Impl  = interpreter, typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio\+::vm\+::backend}}$<$ Host\+Functions, Impl, Options, Debug\+Info $>$\+::initialize (\begin{DoxyParamCaption}\item[{host\+\_\+t \texorpdfstring{$\ast$}{*}}]{host}{ = {\ttfamily nullptr}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2backend_8hpp_source_l00125}{125}} of file \mbox{\hyperlink{sysio_2vm_2backend_8hpp_source}{backend.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (memory\_alloc)\ \{}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \ \ \ \ ctx.reset();}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \ \ \ \ ctx.execute\_start(host,\ interpret\_visitor(ctx));}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1backend_a575d6f6942440f7a6cce881d5e84eb56}\index{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}!initialize@{initialize}}
+\index{initialize@{initialize}!sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}}
+\doxysubsubsection{\texorpdfstring{initialize()}{initialize()}\hspace{0.1cm}{\footnotesize\ttfamily [6/6]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1backend_a575d6f6942440f7a6cce881d5e84eb56} 
+template$<$typename Host\+Functions  = std\+::nullptr\+\_\+t, typename Impl  = interpreter, typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio\+::vm\+::backend}}$<$ Host\+Functions, Impl, Options, Debug\+Info $>$\+::initialize (\begin{DoxyParamCaption}\item[{host\+\_\+t \texorpdfstring{$\ast$}{*}}]{host}{ = {\ttfamily nullptr}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2backend_8hpp_source_l00125}{125}} of file \mbox{\hyperlink{vm_2backend_8hpp_source}{backend.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (memory\_alloc)\ \{}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \ \ \ \ ctx.reset();}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \ \ \ \ ctx.execute\_start(host,\ interpret\_visitor(ctx));}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1backend_ae45a5566f9d4747e5616c4a09f50e247}\index{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}!operator()@{operator()}}
+\index{operator()@{operator()}!sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1backend_ae45a5566f9d4747e5616c4a09f50e247} 
+template$<$typename Host\+Functions  = std\+::nullptr\+\_\+t, typename Impl  = interpreter, typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+template$<$typename... Args$>$ \\
+bool \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio\+::vm\+::backend}}$<$ Host\+Functions, Impl, Options, Debug\+Info $>$\+::operator() (\begin{DoxyParamCaption}\item[{const std\+::string\+\_\+view \&}]{mod}{, }\item[{const std\+::string\+\_\+view \&}]{func}{, }\item[{Args...}]{args}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2backend_8hpp_source_l00113}{113}} of file \mbox{\hyperlink{sysio_2vm_2backend_8hpp_source}{backend.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend_a63fc40356b116cdac6cd50788b25eab1}{call}}(mod,\ \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2}{func}},\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}...);}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=319pt]{classsysio_1_1vm_1_1backend_ae45a5566f9d4747e5616c4a09f50e247_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1backend_ae45a5566f9d4747e5616c4a09f50e247}\index{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}!operator()@{operator()}}
+\index{operator()@{operator()}!sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1backend_ae45a5566f9d4747e5616c4a09f50e247} 
+template$<$typename Host\+Functions  = std\+::nullptr\+\_\+t, typename Impl  = interpreter, typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+template$<$typename... Args$>$ \\
+bool \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio\+::vm\+::backend}}$<$ Host\+Functions, Impl, Options, Debug\+Info $>$\+::operator() (\begin{DoxyParamCaption}\item[{const std\+::string\+\_\+view \&}]{mod}{, }\item[{const std\+::string\+\_\+view \&}]{func}{, }\item[{Args...}]{args}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2backend_8hpp_source_l00113}{113}} of file \mbox{\hyperlink{vm_2backend_8hpp_source}{backend.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend_a63fc40356b116cdac6cd50788b25eab1}{call}}(mod,\ \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2}{func}},\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}...);}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=319pt]{classsysio_1_1vm_1_1backend_ae45a5566f9d4747e5616c4a09f50e247_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1backend_a7b0a91d17aecbc26a90fb08bdb981028}\index{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}!operator()@{operator()}}
+\index{operator()@{operator()}!sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1backend_a7b0a91d17aecbc26a90fb08bdb981028} 
+template$<$typename Host\+Functions  = std\+::nullptr\+\_\+t, typename Impl  = interpreter, typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+template$<$typename... Args$>$ \\
+auto \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio\+::vm\+::backend}}$<$ Host\+Functions, Impl, Options, Debug\+Info $>$\+::operator() (\begin{DoxyParamCaption}\item[{host\+\_\+t \&}]{host}{, }\item[{const std\+::string\+\_\+view \&}]{mod}{, }\item[{const std\+::string\+\_\+view \&}]{func}{, }\item[{Args...}]{args}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2backend_8hpp_source_l00108}{108}} of file \mbox{\hyperlink{sysio_2vm_2backend_8hpp_source}{backend.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend_a63fc40356b116cdac6cd50788b25eab1}{call}}(host,\ mod,\ \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2}{func}},\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}...);}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=319pt]{classsysio_1_1vm_1_1backend_a7b0a91d17aecbc26a90fb08bdb981028_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1backend_a7b0a91d17aecbc26a90fb08bdb981028}\index{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}!operator()@{operator()}}
+\index{operator()@{operator()}!sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1backend_a7b0a91d17aecbc26a90fb08bdb981028} 
+template$<$typename Host\+Functions  = std\+::nullptr\+\_\+t, typename Impl  = interpreter, typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+template$<$typename... Args$>$ \\
+auto \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio\+::vm\+::backend}}$<$ Host\+Functions, Impl, Options, Debug\+Info $>$\+::operator() (\begin{DoxyParamCaption}\item[{host\+\_\+t \&}]{host}{, }\item[{const std\+::string\+\_\+view \&}]{mod}{, }\item[{const std\+::string\+\_\+view \&}]{func}{, }\item[{Args...}]{args}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2backend_8hpp_source_l00108}{108}} of file \mbox{\hyperlink{vm_2backend_8hpp_source}{backend.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend_a63fc40356b116cdac6cd50788b25eab1}{call}}(host,\ mod,\ \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2}{func}},\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}...);}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=319pt]{classsysio_1_1vm_1_1backend_a7b0a91d17aecbc26a90fb08bdb981028_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1backend_afb52bdfbf023f8e042d9228928ed93b7}\index{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}!set\_wasm\_allocator@{set\_wasm\_allocator}}
+\index{set\_wasm\_allocator@{set\_wasm\_allocator}!sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}}
+\doxysubsubsection{\texorpdfstring{set\_wasm\_allocator()}{set\_wasm\_allocator()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1backend_afb52bdfbf023f8e042d9228928ed93b7} 
+template$<$typename Host\+Functions  = std\+::nullptr\+\_\+t, typename Impl  = interpreter, typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+void \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio\+::vm\+::backend}}$<$ Host\+Functions, Impl, Options, Debug\+Info $>$\+::set\+\_\+wasm\+\_\+allocator (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator}{wasm\+\_\+allocator}} \texorpdfstring{$\ast$}{*}}]{alloc}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2backend_8hpp_source_l00242}{242}} of file \mbox{\hyperlink{sysio_2vm_2backend_8hpp_source}{backend.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00242\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00243\ \ \ \ \ \ \ \ \ \ memory\_alloc\ =\ alloc;}
+\DoxyCodeLine{00244\ \ \ \ \ \ \ \ \ \ ctx.set\_wasm\_allocator(memory\_alloc);}
+\DoxyCodeLine{00245\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1vm_1_1backend_afb52bdfbf023f8e042d9228928ed93b7_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1backend_afb52bdfbf023f8e042d9228928ed93b7}\index{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}!set\_wasm\_allocator@{set\_wasm\_allocator}}
+\index{set\_wasm\_allocator@{set\_wasm\_allocator}!sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}}
+\doxysubsubsection{\texorpdfstring{set\_wasm\_allocator()}{set\_wasm\_allocator()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1backend_afb52bdfbf023f8e042d9228928ed93b7} 
+template$<$typename Host\+Functions  = std\+::nullptr\+\_\+t, typename Impl  = interpreter, typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+void \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio\+::vm\+::backend}}$<$ Host\+Functions, Impl, Options, Debug\+Info $>$\+::set\+\_\+wasm\+\_\+allocator (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator}{wasm\+\_\+allocator}} \texorpdfstring{$\ast$}{*}}]{alloc}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2backend_8hpp_source_l00242}{242}} of file \mbox{\hyperlink{vm_2backend_8hpp_source}{backend.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00242\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00243\ \ \ \ \ \ \ \ \ \ memory\_alloc\ =\ alloc;}
+\DoxyCodeLine{00244\ \ \ \ \ \ \ \ \ \ ctx.set\_wasm\_allocator(memory\_alloc);}
+\DoxyCodeLine{00245\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1backend_aac266fa12bedfb6b4a9ab2f73c2bdebf}\index{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}!timed\_run@{timed\_run}}
+\index{timed\_run@{timed\_run}!sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}}
+\doxysubsubsection{\texorpdfstring{timed\_run()}{timed\_run()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1backend_aac266fa12bedfb6b4a9ab2f73c2bdebf} 
+template$<$typename Host\+Functions  = std\+::nullptr\+\_\+t, typename Impl  = interpreter, typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+template$<$typename Watchdog , typename F $>$ \\
+void \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio\+::vm\+::backend}}$<$ Host\+Functions, Impl, Options, Debug\+Info $>$\+::timed\+\_\+run (\begin{DoxyParamCaption}\item[{Watchdog \&\&}]{wd}{, }\item[{F \&\&}]{f}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2backend_8hpp_source_l00196}{196}} of file \mbox{\hyperlink{sysio_2vm_2backend_8hpp_source}{backend.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \ std::atomic<bool>\ \ \ \ \ \ \ \_timed\_out\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ reenable\_code\ =\ scope\_guard\{[\&]()\{}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\_timed\_out)\ \{}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ mod.allocator.enable\_code(Impl::is\_jit);}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \ \ \ \}\};}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ wd\_guard\ =\ \mbox{\hyperlink{hello__driver_8cpp_aa199bff2581e446e3865732d06d873f0}{wd}}.scoped\_run([\textcolor{keyword}{this},\&\_timed\_out]()\ \{}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_timed\_out\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ mod.allocator.disable\_code();}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}F\&\&\textcolor{keyword}{>}(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})();}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}(wasm\_memory\_exception\&)\ \{}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\_timed\_out)\ \{}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ timeout\_exception\{\ \textcolor{stringliteral}{"{}execution\ timed\ out"{}}\ \};}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw};}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1vm_1_1backend_aac266fa12bedfb6b4a9ab2f73c2bdebf_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1backend_aac266fa12bedfb6b4a9ab2f73c2bdebf}\index{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}!timed\_run@{timed\_run}}
+\index{timed\_run@{timed\_run}!sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$@{sysio::vm::backend$<$ HostFunctions, Impl, Options, DebugInfo $>$}}
+\doxysubsubsection{\texorpdfstring{timed\_run()}{timed\_run()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1backend_aac266fa12bedfb6b4a9ab2f73c2bdebf} 
+template$<$typename Host\+Functions  = std\+::nullptr\+\_\+t, typename Impl  = interpreter, typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+template$<$typename Watchdog , typename F $>$ \\
+void \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio\+::vm\+::backend}}$<$ Host\+Functions, Impl, Options, Debug\+Info $>$\+::timed\+\_\+run (\begin{DoxyParamCaption}\item[{Watchdog \&\&}]{wd}{, }\item[{F \&\&}]{f}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2backend_8hpp_source_l00196}{196}} of file \mbox{\hyperlink{vm_2backend_8hpp_source}{backend.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \ std::atomic<bool>\ \ \ \ \ \ \ \_timed\_out\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ reenable\_code\ =\ scope\_guard\{[\&]()\{}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\_timed\_out)\ \{}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ mod.allocator.enable\_code(Impl::is\_jit);}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \ \ \ \}\};}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ wd\_guard\ =\ \mbox{\hyperlink{hello__driver_8cpp_aa199bff2581e446e3865732d06d873f0}{wd}}.scoped\_run([\textcolor{keyword}{this},\&\_timed\_out]()\ \{}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_timed\_out\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ mod.allocator.disable\_code();}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}F\&\&\textcolor{keyword}{>}(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})();}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}(wasm\_memory\_exception\&)\ \{}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\_timed\_out)\ \{}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ timeout\_exception\{\ \textcolor{stringliteral}{"{}execution\ timed\ out"{}}\ \};}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw};}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/include/sysio/sysio/vm/\mbox{\hyperlink{sysio_2vm_2backend_8hpp}{backend.\+hpp}}\item 
+libraries/sys-\/vm/include/sysio/vm/\mbox{\hyperlink{vm_2backend_8hpp}{backend.\+hpp}}\end{DoxyCompactItemize}

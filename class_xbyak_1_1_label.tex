@@ -1,0 +1,214 @@
+\doxysection{Xbyak\+::Label Class Reference}
+\hypertarget{class_xbyak_1_1_label}{}\label{class_xbyak_1_1_label}\index{Xbyak::Label@{Xbyak::Label}}
+
+
+{\ttfamily \#include $<$xbyak.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_xbyak_1_1_label_a43c971ea9d83dc598c4ca875184a2483}{Label}} ()
+\item 
+\mbox{\hyperlink{class_xbyak_1_1_label_a18f651b13ddefe5f184884cc5aae5553}{Label}} (const \mbox{\hyperlink{class_xbyak_1_1_label}{Label}} \&rhs)
+\item 
+\mbox{\hyperlink{class_xbyak_1_1_label}{Label}} \& \mbox{\hyperlink{class_xbyak_1_1_label_a85cf842c02ba41ffa9c5eff034958140}{operator=}} (const \mbox{\hyperlink{class_xbyak_1_1_label}{Label}} \&rhs)
+\item 
+\mbox{\hyperlink{class_xbyak_1_1_label_ab8defcc96e4f45679fe7acd6f1b29808}{\texorpdfstring{$\sim$}{\string~}\+Label}} ()
+\item 
+int \mbox{\hyperlink{class_xbyak_1_1_label_a34c4d24c950013cf00389b043796eccc}{get\+Id}} () const
+\item 
+const \mbox{\hyperlink{normalize__prefix_8cpp_adde6aaee8457bee49c2a92621fe22b79}{uint8}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_xbyak_1_1_label_a4ca971e4a21630a5cf2f9a247a7eabb1}{get\+Address}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static std\+::string \mbox{\hyperlink{class_xbyak_1_1_label_a4aa42ff5b4da52f5b6e535a167fc24a3}{to\+Str}} (int num)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{class_xbyak_1_1_label_aeef8fce269b9ba7203aa2e6b3cd93774}{Label\+Manager}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l01090}{1090}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_xbyak_1_1_label_a43c971ea9d83dc598c4ca875184a2483}\index{Xbyak::Label@{Xbyak::Label}!Label@{Label}}
+\index{Label@{Label}!Xbyak::Label@{Xbyak::Label}}
+\doxysubsubsection{\texorpdfstring{Label()}{Label()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_label_a43c971ea9d83dc598c4ca875184a2483} 
+Xbyak\+::\+Label\+::\+Label (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l01095}{1095}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01095\ :\ mgr(0),\ id(0)\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{class_xbyak_1_1_label_a18f651b13ddefe5f184884cc5aae5553}\index{Xbyak::Label@{Xbyak::Label}!Label@{Label}}
+\index{Label@{Label}!Xbyak::Label@{Xbyak::Label}}
+\doxysubsubsection{\texorpdfstring{Label()}{Label()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_label_a18f651b13ddefe5f184884cc5aae5553} 
+Xbyak\+::\+Label\+::\+Label (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_xbyak_1_1_label}{Label}} \&}]{rhs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l01313}{1313}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01314\ \{}
+\DoxyCodeLine{01315\ \ \ \ \ \textcolor{keywordtype}{id}\ =\ rhs.id;}
+\DoxyCodeLine{01316\ \ \ \ \ mgr\ =\ rhs.mgr;}
+\DoxyCodeLine{01317\ \ \ \ \ \textcolor{keywordflow}{if}\ (mgr)\ mgr-\/>incRefCount(\textcolor{keywordtype}{id});}
+\DoxyCodeLine{01318\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_xbyak_1_1_label_ab8defcc96e4f45679fe7acd6f1b29808}\index{Xbyak::Label@{Xbyak::Label}!````~Label@{\texorpdfstring{$\sim$}{\string~}Label}}
+\index{````~Label@{\texorpdfstring{$\sim$}{\string~}Label}!Xbyak::Label@{Xbyak::Label}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}Label()}{\string~Label()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_label_ab8defcc96e4f45679fe7acd6f1b29808} 
+Xbyak\+::\+Label\+::\texorpdfstring{$\sim$}{\string~}\+Label (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l01327}{1327}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01328\ \{}
+\DoxyCodeLine{01329\ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keywordtype}{id}\ \&\&\ mgr)\ mgr-\/>decRefCount(\textcolor{keywordtype}{id});}
+\DoxyCodeLine{01330\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_xbyak_1_1_label_a4ca971e4a21630a5cf2f9a247a7eabb1}\index{Xbyak::Label@{Xbyak::Label}!getAddress@{getAddress}}
+\index{getAddress@{getAddress}!Xbyak::Label@{Xbyak::Label}}
+\doxysubsubsection{\texorpdfstring{getAddress()}{getAddress()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_label_a4ca971e4a21630a5cf2f9a247a7eabb1} 
+const \mbox{\hyperlink{normalize__prefix_8cpp_adde6aaee8457bee49c2a92621fe22b79}{uint8}} \texorpdfstring{$\ast$}{*} Xbyak\+::\+Label\+::get\+Address (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l01331}{1331}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01332\ \{}
+\DoxyCodeLine{01333\ \ \ \ \ \textcolor{keywordflow}{if}\ (mgr\ ==\ 0\ ||\ !mgr-\/>\mbox{\hyperlink{class_xbyak_1_1_label_manager_a3e840eddc04433d433ca0abbcabd4fc8}{isReady}}())\ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{01334\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ offset;}
+\DoxyCodeLine{01335\ \ \ \ \ \textcolor{keywordflow}{if}\ (!mgr-\/>\mbox{\hyperlink{class_xbyak_1_1_label_manager_a7bd744062d2a3ab899e21b865d750bb5}{getOffset}}(\&offset,\ *\textcolor{keyword}{this}))\ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{01336\ \ \ \ \ \textcolor{keywordflow}{return}\ mgr-\/>\mbox{\hyperlink{class_xbyak_1_1_label_manager_aecf66c9ad7f39297b6d82e5060b3b17a}{getCode}}()\ +\ offset;}
+\DoxyCodeLine{01337\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_xbyak_1_1_label_a4ca971e4a21630a5cf2f9a247a7eabb1_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_xbyak_1_1_label_a4ca971e4a21630a5cf2f9a247a7eabb1_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_xbyak_1_1_label_a34c4d24c950013cf00389b043796eccc}\index{Xbyak::Label@{Xbyak::Label}!getId@{getId}}
+\index{getId@{getId}!Xbyak::Label@{Xbyak::Label}}
+\doxysubsubsection{\texorpdfstring{getId()}{getId()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_label_a34c4d24c950013cf00389b043796eccc} 
+int Xbyak\+::\+Label\+::get\+Id (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l01099}{1099}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01099\ \{\ \textcolor{keywordflow}{return}\ id;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_xbyak_1_1_label_a85cf842c02ba41ffa9c5eff034958140}\index{Xbyak::Label@{Xbyak::Label}!operator=@{operator=}}
+\index{operator=@{operator=}!Xbyak::Label@{Xbyak::Label}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_label_a85cf842c02ba41ffa9c5eff034958140} 
+\mbox{\hyperlink{class_xbyak_1_1_label}{Label}} \& Xbyak\+::\+Label\+::operator= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_xbyak_1_1_label}{Label}} \&}]{rhs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l01319}{1319}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01320\ \{}
+\DoxyCodeLine{01321\ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keywordtype}{id})\ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{calc_8cpp_a2c3e4bb40f36b262a5214e2da2bca9c5}{Error}}(\mbox{\hyperlink{namespace_xbyak_a032df0d38632bd776af6589f25127c06ab5cabef7104ab6d8bd964e469cc647a8}{ERR\_LABEL\_IS\_ALREADY\_SET\_BY\_L}});}
+\DoxyCodeLine{01322\ \ \ \ \ \textcolor{keywordtype}{id}\ =\ rhs.id;}
+\DoxyCodeLine{01323\ \ \ \ \ mgr\ =\ rhs.mgr;}
+\DoxyCodeLine{01324\ \ \ \ \ \textcolor{keywordflow}{if}\ (mgr)\ mgr-\/>incRefCount(\textcolor{keywordtype}{id});}
+\DoxyCodeLine{01325\ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{01326\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_xbyak_1_1_label_a4aa42ff5b4da52f5b6e535a167fc24a3}\index{Xbyak::Label@{Xbyak::Label}!toStr@{toStr}}
+\index{toStr@{toStr}!Xbyak::Label@{Xbyak::Label}}
+\doxysubsubsection{\texorpdfstring{toStr()}{toStr()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_label_a4aa42ff5b4da52f5b6e535a167fc24a3} 
+static std\+::string Xbyak\+::\+Label\+::to\+Str (\begin{DoxyParamCaption}\item[{int}]{num}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l01103}{1103}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01104\ \ \ \ \ \{}
+\DoxyCodeLine{01105\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}[16];}
+\DoxyCodeLine{01106\ \textcolor{preprocessor}{\#if\ defined(\_MSC\_VER)\ \&\&\ (\_MSC\_VER\ <\ 1900)}}
+\DoxyCodeLine{01107\ \ \ \ \ \ \ \ \ \_snprintf\_s}
+\DoxyCodeLine{01108\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{01109\ \ \ \ \ \ \ \ \ snprintf}
+\DoxyCodeLine{01110\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{01111\ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}),\ \textcolor{stringliteral}{"{}.\%08x"{}},\ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6a0fc3cfbc27e91ea60a787de13dae3e3c}{num}});}
+\DoxyCodeLine{01112\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}};}
+\DoxyCodeLine{01113\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_xbyak_1_1_label_a4aa42ff5b4da52f5b6e535a167fc24a3_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{class_xbyak_1_1_label_aeef8fce269b9ba7203aa2e6b3cd93774}\index{Xbyak::Label@{Xbyak::Label}!LabelManager@{LabelManager}}
+\index{LabelManager@{LabelManager}!Xbyak::Label@{Xbyak::Label}}
+\doxysubsubsection{\texorpdfstring{LabelManager}{LabelManager}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_label_aeef8fce269b9ba7203aa2e6b3cd93774} 
+friend \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{class_xbyak_1_1_label_manager}{Label\+Manager}}\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l01093}{1093}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/libraries/ff/depends/xbyak/xbyak/\mbox{\hyperlink{xbyak_8h}{xbyak.\+h}}\end{DoxyCompactItemize}

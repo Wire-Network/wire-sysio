@@ -1,0 +1,20 @@
+<map id="libraries/builtins/fixtfti.c" name="libraries/builtins/fixtfti.c">
+<area shape="rect" id="Node000001" title=" " alt="" coords="27,5,138,46"/>
+<area shape="rect" id="Node000002" href="$fp128_8h.html" title=" " alt="" coords="50,94,114,120"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="85,46,85,78,80,78,80,46"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,404,69,429"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="83,121,44,389,38,388,78,120"/>
+<area shape="rect" id="Node000004" href="$stdint_8h.html" title=" " alt="" coords="97,330,161,356"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="87,120,126,314,121,315,82,121"/>
+<area shape="rect" id="Node000006" href="$softfloat_2source_2include_2softfloat_8h.html" title=" " alt="" coords="132,168,260,208"/>
+<area shape="poly" id="edge6_Node000002_Node000006" title=" " alt="" coords="101,118,157,157,154,161,98,122"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="115,358,66,396,63,392,112,354"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="96,404,162,429"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="132,356,132,388,126,388,126,356"/>
+<area shape="poly" id="edge8_Node000006_Node000004" title=" " alt="" coords="186,210,161,257,139,316,134,314,156,255,181,208"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="170,256,245,282"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="201,208,206,240,201,241,196,209"/>
+<area shape="rect" id="Node000008" href="$softfloat_2source_2include_2softfloat__types_8h.html" title=" " alt="" coords="268,256,387,282"/>
+<area shape="poly" id="edge9_Node000006_Node000008" title=" " alt="" coords="230,207,296,246,293,250,227,211"/>
+<area shape="poly" id="edge10_Node000008_Node000004" title=" " alt="" coords="295,285,177,327,175,322,293,280"/>
+</map>

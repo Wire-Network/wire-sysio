@@ -1,0 +1,195 @@
+\doxysection{plugins/resource\+\_\+monitor\+\_\+plugin/test/test\+\_\+monitor\+\_\+loop.cpp File Reference}
+\hypertarget{test__monitor__loop_8cpp}{}\label{test__monitor__loop_8cpp}\index{plugins/resource\_monitor\_plugin/test/test\_monitor\_loop.cpp@{plugins/resource\_monitor\_plugin/test/test\_monitor\_loop.cpp}}
+{\ttfamily \#include $<$boost/test/included/unit\+\_\+test.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/variant\+\_\+object.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/resource\+\_\+monitor\+\_\+plugin/file\+\_\+space\+\_\+handler.\+hpp$>$}\newline
+Include dependency graph for test\+\_\+monitor\+\_\+loop.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__monitor__loop_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structspace__handler__fixture}{space\+\_\+handler\+\_\+fixture}}
+\item 
+struct \mbox{\hyperlink{structspace__handler__fixture_1_1mock__space__provider}{space\+\_\+handler\+\_\+fixture\+::mock\+\_\+space\+\_\+provider}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{test__monitor__loop_8cpp_a6b2a3852db8bb19ab6909bac01859985}{BOOST\+\_\+\+TEST\+\_\+\+MODULE}}~monitor\+\_\+loop
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{test__monitor__loop_8cpp_a661d9a1ec8301321ca0ef24be50eac27}{BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE}} (zero\+\_\+loop, \mbox{\hyperlink{structspace__handler__fixture}{space\+\_\+handler\+\_\+fixture}})
+\item 
+\mbox{\hyperlink{test__monitor__loop_8cpp_a1ae2d0e9e865330f9b06e1863159c704}{BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE}} (one\+\_\+loop\+\_\+1\+\_\+secs\+\_\+interval, \mbox{\hyperlink{structspace__handler__fixture}{space\+\_\+handler\+\_\+fixture}})
+\item 
+\mbox{\hyperlink{test__monitor__loop_8cpp_a64402128c0e7b932a2080f2b34443d9c}{BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE}} (two\+\_\+loops\+\_\+1\+\_\+sec\+\_\+interval, \mbox{\hyperlink{structspace__handler__fixture}{space\+\_\+handler\+\_\+fixture}})
+\item 
+\mbox{\hyperlink{test__monitor__loop_8cpp_a86c7129af9f5c238099f186fe9e68e1c}{BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE}} (ten\+\_\+loops\+\_\+1\+\_\+sec\+\_\+interval, \mbox{\hyperlink{structspace__handler__fixture}{space\+\_\+handler\+\_\+fixture}})
+\item 
+\mbox{\hyperlink{test__monitor__loop_8cpp_ae6d2f716820ddf34a07a1fb9897be344}{BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE}} (one\+\_\+loop\+\_\+5\+\_\+secs\+\_\+interval, \mbox{\hyperlink{structspace__handler__fixture}{space\+\_\+handler\+\_\+fixture}})
+\item 
+\mbox{\hyperlink{test__monitor__loop_8cpp_af7ff6f6bc7bdb247644313cef4f90549}{BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE}} (two\+\_\+loops\+\_\+5\+\_\+sec\+\_\+interval, \mbox{\hyperlink{structspace__handler__fixture}{space\+\_\+handler\+\_\+fixture}})
+\item 
+\mbox{\hyperlink{test__monitor__loop_8cpp_abbc4fbb221a1b566e40c88827d774c71}{BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE}} (ten\+\_\+loops\+\_\+5\+\_\+sec\+\_\+interval, \mbox{\hyperlink{structspace__handler__fixture}{space\+\_\+handler\+\_\+fixture}})
+\item 
+\mbox{\hyperlink{test__monitor__loop_8cpp_a7b3ea7d8e308f3feb243806e426cd21d}{BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE}} (one\+\_\+hundred\+\_\+twenty\+\_\+loops\+\_\+1\+\_\+sec\+\_\+interval, \mbox{\hyperlink{structspace__handler__fixture}{space\+\_\+handler\+\_\+fixture}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{test__monitor__loop_8cpp_a6b2a3852db8bb19ab6909bac01859985}\index{test\_monitor\_loop.cpp@{test\_monitor\_loop.cpp}!BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}}
+\index{BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}!test\_monitor\_loop.cpp@{test\_monitor\_loop.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_TEST\_MODULE}{BOOST\_TEST\_MODULE}}
+{\footnotesize\ttfamily \label{test__monitor__loop_8cpp_a6b2a3852db8bb19ab6909bac01859985} 
+\#define BOOST\+\_\+\+TEST\+\_\+\+MODULE~monitor\+\_\+loop}
+
+
+
+Definition at line \mbox{\hyperlink{test__monitor__loop_8cpp_source_l00001}{1}} of file \mbox{\hyperlink{test__monitor__loop_8cpp_source}{test\+\_\+monitor\+\_\+loop.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{test__monitor__loop_8cpp_a7b3ea7d8e308f3feb243806e426cd21d}\index{test\_monitor\_loop.cpp@{test\_monitor\_loop.cpp}!BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}}
+\index{BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}!test\_monitor\_loop.cpp@{test\_monitor\_loop.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_FIXTURE\_TEST\_CASE()}{BOOST\_FIXTURE\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/8]}}
+{\footnotesize\ttfamily \label{test__monitor__loop_8cpp_a7b3ea7d8e308f3feb243806e426cd21d} 
+BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{one\+\_\+hundred\+\_\+twenty\+\_\+loops\+\_\+1\+\_\+sec\+\_\+interval}]{}{, }\item[{\mbox{\hyperlink{structspace__handler__fixture}{space\+\_\+handler\+\_\+fixture}}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__monitor__loop_8cpp_source_l00154}{154}} of file \mbox{\hyperlink{test__monitor__loop_8cpp_source}{test\+\_\+monitor\+\_\+loop.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00155\ \ \ \ \{}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ BOOST\_TEST(\ test\_loop\_common(120,\ 1)\ );}
+\DoxyCodeLine{00157\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{test__monitor__loop_8cpp_a1ae2d0e9e865330f9b06e1863159c704}\index{test\_monitor\_loop.cpp@{test\_monitor\_loop.cpp}!BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}}
+\index{BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}!test\_monitor\_loop.cpp@{test\_monitor\_loop.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_FIXTURE\_TEST\_CASE()}{BOOST\_FIXTURE\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/8]}}
+{\footnotesize\ttfamily \label{test__monitor__loop_8cpp_a1ae2d0e9e865330f9b06e1863159c704} 
+BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{one\+\_\+loop\+\_\+1\+\_\+secs\+\_\+interval}]{}{, }\item[{\mbox{\hyperlink{structspace__handler__fixture}{space\+\_\+handler\+\_\+fixture}}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__monitor__loop_8cpp_source_l00124}{124}} of file \mbox{\hyperlink{test__monitor__loop_8cpp_source}{test\+\_\+monitor\+\_\+loop.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00125\ \ \ \ \{}
+\DoxyCodeLine{00126\ \ \ \ \ \ BOOST\_TEST(\ test\_loop\_common(1,\ 1)\ );}
+\DoxyCodeLine{00127\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{test__monitor__loop_8cpp_ae6d2f716820ddf34a07a1fb9897be344}\index{test\_monitor\_loop.cpp@{test\_monitor\_loop.cpp}!BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}}
+\index{BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}!test\_monitor\_loop.cpp@{test\_monitor\_loop.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_FIXTURE\_TEST\_CASE()}{BOOST\_FIXTURE\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [3/8]}}
+{\footnotesize\ttfamily \label{test__monitor__loop_8cpp_ae6d2f716820ddf34a07a1fb9897be344} 
+BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{one\+\_\+loop\+\_\+5\+\_\+secs\+\_\+interval}]{}{, }\item[{\mbox{\hyperlink{structspace__handler__fixture}{space\+\_\+handler\+\_\+fixture}}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__monitor__loop_8cpp_source_l00139}{139}} of file \mbox{\hyperlink{test__monitor__loop_8cpp_source}{test\+\_\+monitor\+\_\+loop.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00140\ \ \ \ \{}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ BOOST\_TEST(\ test\_loop\_common(1,\ 5)\ );}
+\DoxyCodeLine{00142\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{test__monitor__loop_8cpp_a86c7129af9f5c238099f186fe9e68e1c}\index{test\_monitor\_loop.cpp@{test\_monitor\_loop.cpp}!BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}}
+\index{BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}!test\_monitor\_loop.cpp@{test\_monitor\_loop.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_FIXTURE\_TEST\_CASE()}{BOOST\_FIXTURE\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [4/8]}}
+{\footnotesize\ttfamily \label{test__monitor__loop_8cpp_a86c7129af9f5c238099f186fe9e68e1c} 
+BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{ten\+\_\+loops\+\_\+1\+\_\+sec\+\_\+interval}]{}{, }\item[{\mbox{\hyperlink{structspace__handler__fixture}{space\+\_\+handler\+\_\+fixture}}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__monitor__loop_8cpp_source_l00134}{134}} of file \mbox{\hyperlink{test__monitor__loop_8cpp_source}{test\+\_\+monitor\+\_\+loop.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00135\ \ \ \ \{}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ BOOST\_TEST(\ test\_loop\_common(10,\ 1)\ );}
+\DoxyCodeLine{00137\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{test__monitor__loop_8cpp_abbc4fbb221a1b566e40c88827d774c71}\index{test\_monitor\_loop.cpp@{test\_monitor\_loop.cpp}!BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}}
+\index{BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}!test\_monitor\_loop.cpp@{test\_monitor\_loop.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_FIXTURE\_TEST\_CASE()}{BOOST\_FIXTURE\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [5/8]}}
+{\footnotesize\ttfamily \label{test__monitor__loop_8cpp_abbc4fbb221a1b566e40c88827d774c71} 
+BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{ten\+\_\+loops\+\_\+5\+\_\+sec\+\_\+interval}]{}{, }\item[{\mbox{\hyperlink{structspace__handler__fixture}{space\+\_\+handler\+\_\+fixture}}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__monitor__loop_8cpp_source_l00149}{149}} of file \mbox{\hyperlink{test__monitor__loop_8cpp_source}{test\+\_\+monitor\+\_\+loop.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00150\ \ \ \ \{}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ BOOST\_TEST(\ test\_loop\_common(10,\ 5)\ );}
+\DoxyCodeLine{00152\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{test__monitor__loop_8cpp_a64402128c0e7b932a2080f2b34443d9c}\index{test\_monitor\_loop.cpp@{test\_monitor\_loop.cpp}!BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}}
+\index{BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}!test\_monitor\_loop.cpp@{test\_monitor\_loop.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_FIXTURE\_TEST\_CASE()}{BOOST\_FIXTURE\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [6/8]}}
+{\footnotesize\ttfamily \label{test__monitor__loop_8cpp_a64402128c0e7b932a2080f2b34443d9c} 
+BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{two\+\_\+loops\+\_\+1\+\_\+sec\+\_\+interval}]{}{, }\item[{\mbox{\hyperlink{structspace__handler__fixture}{space\+\_\+handler\+\_\+fixture}}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__monitor__loop_8cpp_source_l00129}{129}} of file \mbox{\hyperlink{test__monitor__loop_8cpp_source}{test\+\_\+monitor\+\_\+loop.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00130\ \ \ \ \{}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ BOOST\_TEST(\ test\_loop\_common(2,\ 1)\ );}
+\DoxyCodeLine{00132\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{test__monitor__loop_8cpp_af7ff6f6bc7bdb247644313cef4f90549}\index{test\_monitor\_loop.cpp@{test\_monitor\_loop.cpp}!BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}}
+\index{BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}!test\_monitor\_loop.cpp@{test\_monitor\_loop.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_FIXTURE\_TEST\_CASE()}{BOOST\_FIXTURE\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [7/8]}}
+{\footnotesize\ttfamily \label{test__monitor__loop_8cpp_af7ff6f6bc7bdb247644313cef4f90549} 
+BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{two\+\_\+loops\+\_\+5\+\_\+sec\+\_\+interval}]{}{, }\item[{\mbox{\hyperlink{structspace__handler__fixture}{space\+\_\+handler\+\_\+fixture}}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__monitor__loop_8cpp_source_l00144}{144}} of file \mbox{\hyperlink{test__monitor__loop_8cpp_source}{test\+\_\+monitor\+\_\+loop.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00145\ \ \ \ \{}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ BOOST\_TEST(\ test\_loop\_common(2,\ 5)\ );}
+\DoxyCodeLine{00147\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{test__monitor__loop_8cpp_a661d9a1ec8301321ca0ef24be50eac27}\index{test\_monitor\_loop.cpp@{test\_monitor\_loop.cpp}!BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}}
+\index{BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}!test\_monitor\_loop.cpp@{test\_monitor\_loop.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_FIXTURE\_TEST\_CASE()}{BOOST\_FIXTURE\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [8/8]}}
+{\footnotesize\ttfamily \label{test__monitor__loop_8cpp_a661d9a1ec8301321ca0ef24be50eac27} 
+BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{zero\+\_\+loop}]{}{, }\item[{\mbox{\hyperlink{structspace__handler__fixture}{space\+\_\+handler\+\_\+fixture}}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__monitor__loop_8cpp_source_l00119}{119}} of file \mbox{\hyperlink{test__monitor__loop_8cpp_source}{test\+\_\+monitor\+\_\+loop.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00120\ \ \ \ \{}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ BOOST\_TEST(\ test\_loop\_common(0,\ 1)\ );}
+\DoxyCodeLine{00122\ \ \ \ \}}
+
+\end{DoxyCode}

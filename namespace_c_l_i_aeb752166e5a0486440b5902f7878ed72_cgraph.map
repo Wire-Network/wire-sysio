@@ -1,0 +1,5 @@
+<map id="CLI::TriggerOff" name="CLI::TriggerOff">
+<area shape="rect" id="Node000001" title="Helper function to disable one option group/subcommand when another is used." alt="" coords="5,13,114,38"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_app.html#a94045b9a983dd80d8fa1b477422c7849" title=" " alt="" coords="162,5,293,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="114,23,146,23,146,28,114,28"/>
+</map>

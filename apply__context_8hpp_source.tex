@@ -1,0 +1,615 @@
+\doxysection{apply\+\_\+context.\+hpp}
+\hypertarget{apply__context_8hpp_source}{}\label{apply__context_8hpp_source}\index{libraries/chain/include/sysio/chain/apply\_context.hpp@{libraries/chain/include/sysio/chain/apply\_context.hpp}}
+\mbox{\hyperlink{apply__context_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{controller_8hpp}{sysio/chain/controller.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{transaction_8hpp}{sysio/chain/transaction.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{contract__table__objects_8hpp}{sysio/chain/contract\_table\_objects.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{deep__mind_8hpp}{sysio/chain/deep\_mind.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{utility_8hpp}{fc/utility.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <sstream>}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <algorithm>}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ <set>}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00011}\mbox{\hyperlink{namespacechainbase}{00011}}\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacechainbase}{chainbase}}\ \{\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classchainbase_1_1database}{database}};\ \}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00013}00013\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{\ \textcolor{keyword}{namespace\ }chain\ \{}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00015}00015\ \textcolor{keyword}{class\ }controller;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00016}00016\ \textcolor{keyword}{class\ }transaction\_context;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00018}\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context}{00018}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context}{apply\_context}}\ \{}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00019}00019\ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00020}00020\ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00021}00021\ \ \ \ \ \ \ \textcolor{keyword}{class\ }iterator\_cache\ \{}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00022}00022\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00023}00023\ \ \ \ \ \ \ \ \ \ \ \ \ iterator\_cache()\{}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00024}00024\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_end\_iterator\_to\_table.reserve(8);}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00025}00025\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_iterator\_to\_object.reserve(32);}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00026}00026\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00029}00029\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ cache\_table(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1chain_1_1table__id__object}{table\_id\_object}}\&\ tobj\ )\ \{}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00030}00030\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ \_table\_cache.find(tobj.id);}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00031}00031\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr\ !=\ \_table\_cache.end()\ )}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00032}00032\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ itr-\/>second.second;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00034}00034\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ ei\ =\ index\_to\_end\_iterator(\_end\_iterator\_to\_table.size());}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00035}00035\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_end\_iterator\_to\_table.push\_back(\ \&tobj\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00036}00036\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_table\_cache.emplace(\ tobj.id,\ make\_pair(\&tobj,\ ei)\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00037}00037\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ei;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00038}00038\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00040}00040\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1chain_1_1table__id__object}{table\_id\_object}}\&\ get\_table(\ \mbox{\hyperlink{classchainbase_1_1oid}{table\_id\_object::id\_type}}\ i\ )\textcolor{keyword}{const\ }\{}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00041}00041\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ \_table\_cache.find(i);}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00042}00042\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ itr\ !=\ \_table\_cache.end(),\ table\_not\_in\_cache,\ \textcolor{stringliteral}{"{}an\ invariant\ was\ broken,\ table\ should\ be\ in\ cache"{}}\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00043}00043\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *itr-\/>second.first;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00044}00044\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00046}00046\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ get\_end\_iterator\_by\_table\_id(\ \mbox{\hyperlink{classchainbase_1_1oid}{table\_id\_object::id\_type}}\ i\ )\textcolor{keyword}{const\ }\{}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00047}00047\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ \_table\_cache.find(i);}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ itr\ !=\ \_table\_cache.end(),\ table\_not\_in\_cache,\ \textcolor{stringliteral}{"{}an\ invariant\ was\ broken,\ table\ should\ be\ in\ cache"{}}\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ itr-\/>second.second;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00050}00050\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1chain_1_1table__id__object}{table\_id\_object}}*\ find\_table\_by\_end\_iterator(\ \textcolor{keywordtype}{int}\ ei\ )\textcolor{keyword}{const\ }\{}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ ei\ <\ -\/1,\ invalid\_table\_iterator,\ \textcolor{stringliteral}{"{}not\ an\ end\ iterator"{}}\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ indx\ =\ end\_iterator\_to\_index(ei);}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ indx\ >=\ \_end\_iterator\_to\_table.size()\ )\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \_end\_iterator\_to\_table[indx];}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00059}00059\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ get(\ \textcolor{keywordtype}{int}\ iterator\ )\ \{}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ iterator\ !=\ -\/1,\ invalid\_table\_iterator,\ \textcolor{stringliteral}{"{}invalid\ iterator"{}}\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00061}00061\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ iterator\ >=\ 0,\ table\_operation\_not\_permitted,\ \textcolor{stringliteral}{"{}dereference\ of\ end\ iterator"{}}\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00062}00062\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ (\textcolor{keywordtype}{size\_t})iterator\ <\ \_iterator\_to\_object.size(),\ invalid\_table\_iterator,\ \textcolor{stringliteral}{"{}iterator\ out\ of\ range"{}}\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ result\ =\ \_iterator\_to\_object[iterator];}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00064}00064\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ result,\ table\_operation\_not\_permitted,\ \textcolor{stringliteral}{"{}dereference\ of\ deleted\ object"{}}\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00065}00065\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *result;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00066}00066\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00067}00067\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ remove(\ \textcolor{keywordtype}{int}\ iterator\ )\ \{}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ iterator\ !=\ -\/1,\ invalid\_table\_iterator,\ \textcolor{stringliteral}{"{}invalid\ iterator"{}}\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ iterator\ >=\ 0,\ table\_operation\_not\_permitted,\ \textcolor{stringliteral}{"{}cannot\ call\ remove\ on\ end\ iterators"{}}\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00071}00071\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ (\textcolor{keywordtype}{size\_t})iterator\ <\ \_iterator\_to\_object.size(),\ invalid\_table\_iterator,\ \textcolor{stringliteral}{"{}iterator\ out\ of\ range"{}}\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00073}00073\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ obj\_ptr\ =\ \_iterator\_to\_object[iterator];}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00074}00074\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !obj\_ptr\ )\ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00075}00075\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_iterator\_to\_object[iterator]\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_object\_to\_iterator.erase(\ obj\_ptr\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ add(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ obj\ )\ \{}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00080}00080\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ \_object\_to\_iterator.find(\ \&obj\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00081}00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr\ !=\ \_object\_to\_iterator.end()\ )}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00082}00082\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ itr-\/>second;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00083}00083\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00084}00084\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_iterator\_to\_object.push\_back(\ \&obj\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00085}00085\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_object\_to\_iterator[\&obj]\ =\ \_iterator\_to\_object.size()\ -\/\ 1;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00086}00086\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00087}00087\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \_iterator\_to\_object.size()\ -\/\ 1;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00088}00088\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00089}00089\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00090}00090\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00091}00091\ \ \ \ \ \ \ \ \ \ \ \ \ map<table\_id\_object::id\_type,\ pair<const\ table\_id\_object*,\ int>>\ \_table\_cache;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00092}00092\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1vector}{vector<const\ table\_id\_object*>}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_end\_iterator\_to\_table;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00093}00093\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1vector}{vector<const\ T*>}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_iterator\_to\_object;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00094}00094\ \ \ \ \ \ \ \ \ \ \ \ \ map<const\ T*,int>\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_object\_to\_iterator;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00095}00095\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00098}00098\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{size\_t}\ end\_iterator\_to\_index(\ \textcolor{keywordtype}{int}\ ei\ )\textcolor{keyword}{const\ }\{\ \textcolor{keywordflow}{return}\ (-\/ei\ -\/\ 2);\ \}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00100}00100\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{int}\ index\_to\_end\_iterator(\ \textcolor{keywordtype}{size\_t}\ indx\ )\textcolor{keyword}{const\ }\{\ \textcolor{keywordflow}{return}\ -\/(indx\ +\ 2);\ \}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00101}00101\ \ \ \ \ \ \ \};\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00102}00102\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00103}00103\ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}>}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00104}00104\ \ \ \ \ \ \ \textcolor{keyword}{struct\ }array\_size;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00105}00105\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00106}00106\ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T,\ \textcolor{keywordtype}{size\_t}\ N>}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00107}00107\ \ \ \ \ \ \ \textcolor{keyword}{struct\ }array\_size<\ \mbox{\hyperlink{namespacestd}{std}}::\mbox{\hyperlink{classfc_1_1array}{array}}<T,N>\ >\ \{}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00108}00108\ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{size\_t}\ size\ =\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}};}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00109}00109\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00110}00110\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00111}00111\ \ \ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ SecondaryKey,\ \textcolor{keyword}{typename}\ SecondaryKeyProxy,\ \textcolor{keyword}{typename}\ SecondaryKeyProxyConst,\ \textcolor{keyword}{typename}\ Enable\ =\ \textcolor{keywordtype}{void}>}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00112}00112\ \ \ \ \ \ \ \textcolor{keyword}{class\ }secondary\_key\_helper;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00113}00113\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00114}00114\ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ SecondaryKey,\ \textcolor{keyword}{typename}\ SecondaryKeyProxy,\ \textcolor{keyword}{typename}\ SecondaryKeyProxyConst>}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00115}00115\ \ \ \ \ \ \ \textcolor{keyword}{class\ }secondary\_key\_helper<SecondaryKey,\ SecondaryKeyProxy,\ SecondaryKeyProxyConst,}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00116}00116\ \ \ \ \ \ \ \ \ \ typename\ \mbox{\hyperlink{namespacestd}{std}}::enable\_if<std::is\_same<SecondaryKey,\ typename\ std::decay<SecondaryKeyProxy>::type>::value>::type\ >}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00117}00117\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00118}00118\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00119}00119\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ SecondaryKey\ secondary\_key\_type;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00120}00120\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00121}00121\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a893468abdce45d586a5b659094a25e6c}{set}}(secondary\_key\_type\&\ sk\_in\_table,\ \textcolor{keyword}{const}\ secondary\_key\_type\&\ sk\_from\_wasm)\ \{}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00122}00122\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sk\_in\_table\ =\ sk\_from\_wasm;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00123}00123\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00124}00124\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00125}00125\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ get(secondary\_key\_type\&\ sk\_from\_wasm,\ \textcolor{keyword}{const}\ secondary\_key\_type\&\ sk\_in\_table\ )\ \{}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00126}00126\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sk\_from\_wasm\ =\ sk\_in\_table;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00127}00127\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00128}00128\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00129}00129\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ create\_tuple(\textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1chain_1_1table__id__object}{table\_id\_object}}\&\ tab,\ \textcolor{keyword}{const}\ secondary\_key\_type\&\ secondary)\ \{}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00130}00130\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ boost::make\_tuple(\ tab.id,\ secondary\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00131}00131\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00132}00132\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00133}00133\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00134}00134\ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ SecondaryKey,\ \textcolor{keyword}{typename}\ SecondaryKeyProxy,\ \textcolor{keyword}{typename}\ SecondaryKeyProxyConst>}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00135}00135\ \ \ \ \ \ \ \textcolor{keyword}{class\ }secondary\_key\_helper<SecondaryKey,\ SecondaryKeyProxy,\ SecondaryKeyProxyConst,}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00136}00136\ \ \ \ \ \ \ \ \ \ typename\ \mbox{\hyperlink{namespacestd}{std}}::enable\_if<!std::is\_same<SecondaryKey,\ typename\ std::decay<SecondaryKeyProxy>::type>::value\ \&\&}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00137}00137\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::is\_pointer<typename\ std::decay<SecondaryKeyProxy>::type>::value>::type\ >}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00138}00138\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00139}00139\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00140}00140\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ SecondaryKey\ \ \ \ \ \ secondary\_key\_type;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00141}00141\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ SecondaryKeyProxy\ secondary\_key\_proxy\_type;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00142}00142\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ SecondaryKeyProxyConst\ secondary\_key\_proxy\_const\_type;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00143}00143\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00144}00144\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\ =\ array\_size<SecondaryKey>::size;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00145}00145\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00146}00146\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a893468abdce45d586a5b659094a25e6c}{set}}(secondary\_key\_type\&\ sk\_in\_table,\ secondary\_key\_proxy\_const\_type\ sk\_from\_wasm)\ \{}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00147}00147\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::copy(sk\_from\_wasm,\ sk\_from\_wasm\ +\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}},\ sk\_in\_table.begin());}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00148}00148\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00149}00149\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00150}00150\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ get(secondary\_key\_proxy\_type\ sk\_from\_wasm,\ \textcolor{keyword}{const}\ secondary\_key\_type\&\ sk\_in\_table)\ \{}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00151}00151\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::copy(sk\_in\_table.begin(),\ sk\_in\_table.end(),\ sk\_from\_wasm);}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00152}00152\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00153}00153\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00154}00154\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ create\_tuple(\textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1chain_1_1table__id__object}{table\_id\_object}}\&\ tab,\ secondary\_key\_proxy\_const\_type\ sk\_from\_wasm)\ \{}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00155}00155\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ secondary\_key\_type\ secondary;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00156}00156\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::copy(sk\_from\_wasm,\ sk\_from\_wasm\ +\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}},\ secondary.begin());}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00157}00157\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ boost::make\_tuple(\ tab.id,\ secondary\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00158}00158\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00159}00159\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00160}00160\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00161}00161\ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00162}00162\ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ ObjectType,}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00163}00163\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typename}\ SecondaryKeyProxy\ =\ \textcolor{keyword}{typename}\ std::add\_lvalue\_reference<typename\ ObjectType::secondary\_key\_type>::type,}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00164}00164\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typename}\ SecondaryKeyProxyConst\ =\ \textcolor{keyword}{typename}\ std::add\_lvalue\_reference<}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00165}00165\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typename}\ std::add\_const<typename\ ObjectType::secondary\_key\_type>::type>::type\ >}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00166}\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index}{00166}}\ \ \ \ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index}{generic\_index}}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00167}00167\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00168}00168\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00169}\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_a1c9871d3f98bee2fb18b463d3f0cab57}{00169}}\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{typename}\ ObjectType::secondary\_key\_type\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_a1c9871d3f98bee2fb18b463d3f0cab57}{secondary\_key\_type}};}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00170}\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_acfa8f5772dddbaea038435d2136b8a5a}{00170}}\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ SecondaryKeyProxy\ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_acfa8f5772dddbaea038435d2136b8a5a}{secondary\_key\_proxy\_type}};}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00171}\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_a8dd024499302ed645150802b342074e4}{00171}}\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ SecondaryKeyProxyConst\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_a8dd024499302ed645150802b342074e4}{secondary\_key\_proxy\_const\_type}};}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00172}00172\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00173}\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_a4326ffcaf34f23e4c0382832e6a93619}{00173}}\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_a4326ffcaf34f23e4c0382832e6a93619}{secondary\_key\_helper\_t}}\ =\ secondary\_key\_helper<secondary\_key\_type,\ secondary\_key\_proxy\_type,\ secondary\_key\_proxy\_const\_type>;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00174}00174\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00175}\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_aa163d059e04eef60f674e912cab2dbde}{00175}}\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_aa163d059e04eef60f674e912cab2dbde}{generic\_index}}(\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context}{apply\_context}}\&\ c\ ):\mbox{\hyperlink{structcontext}{context}}(c)\{\}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00176}00176\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00177}\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_ae7d0c1a61f88980193ccd274271c8c0c}{00177}}\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_ae7d0c1a61f88980193ccd274271c8c0c}{store}}(\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ scope,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ table,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{account\_name}}\&\ payer,}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00178}00178\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \textcolor{keywordtype}{id},\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_a8dd024499302ed645150802b342074e4}{secondary\_key\_proxy\_const\_type}}\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ )}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00179}00179\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00180}00180\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ payer\ !=\ \mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\_name}}(),\ invalid\_table\_payer,\ \textcolor{stringliteral}{"{}must\ specify\ a\ valid\ account\ to\ pay\ for\ new\ record"{}}\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00181}00181\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00182}00182\ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ context.require\_write\_lock(\ scope\ );}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00183}00183\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00184}00184\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ tab\ =\ \mbox{\hyperlink{structcontext}{context}}.find\_or\_create\_table(\ \mbox{\hyperlink{structcontext}{context}}.receiver,\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}(scope),\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(table),\ payer\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00185}00185\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00186}00186\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ obj\ =\ \mbox{\hyperlink{structcontext}{context}}.db.create<ObjectType>(\ [\&](\ \textcolor{keyword}{auto}\&\ o\ )\{}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00187}00187\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ o.t\_id\ \ \ \ \ \ \ \ \ \ =\ tab.id;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00188}00188\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ o.primary\_key\ \ \ =\ \mbox{\hyperlink{code__cache_8cpp_aa0efefe21f4700d78692edc823e763be}{id}};}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00189}00189\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ secondary\_key\_helper\_t::set(o.secondary\_key,\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}});}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00190}00190\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ o.payer\ \ \ \ \ \ \ \ \ =\ payer;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00191}00191\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00192}00192\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00193}00193\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structcontext}{context}}.db.modify(\ tab,\ [\&](\ \textcolor{keyword}{auto}\&\ t\ )\ \{}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00194}00194\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++t.count;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00195}00195\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00196}00196\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{auto}\ dm\_logger\ =\ \mbox{\hyperlink{structcontext}{context}}.control.get\_deep\_mind\_logger())\ \{}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00197}00197\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ event\_id\ =\ \mbox{\hyperlink{deep__mind_8hpp_aaaa2f1dbd522de03ccbaa73f01db5f50}{RAM\_EVENT\_ID}}(\textcolor{stringliteral}{"{}\$\{code\}:\$\{scope\}:\$\{table\}:\$\{index\_name\}"{}},}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00198}00198\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}code"{}},\ t.code)}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00199}00199\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}scope"{}},\ t.scope)}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00200}00200\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}table"{}},\ t.table)}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00201}00201\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}index\_name"{}},\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}(\textcolor{keywordtype}{id}))}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00202}00202\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00203}00203\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ dm\_logger-\/>on\_ram\_trace(std::move(event\_id),\ \textcolor{stringliteral}{"{}secondary\_index"{}},\ \textcolor{stringliteral}{"{}add"{}},\ \textcolor{stringliteral}{"{}secondary\_index\_add"{}});}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00204}00204\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00205}00205\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00206}00206\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00207}00207\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structcontext}{context}}.update\_db\_usage(\ payer,\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a2772c77657b1f6fda680bbe8f7282d13}{config::billable\_size\_v<ObjectType>}}\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00208}00208\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00209}00209\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ itr\_cache.cache\_table(\ tab\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00210}00210\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ itr\_cache.add(\ obj\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00211}00211\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00212}00212\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00213}\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_afde92a06e6e55e639af34a78497fdde0}{00213}}\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_afde92a06e6e55e639af34a78497fdde0}{remove}}(\ \textcolor{keywordtype}{int}\ iterator\ )\ \{}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00214}00214\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ obj\ =\ itr\_cache.get(\ iterator\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00215}00215\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00216}00216\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ table\_obj\ =\ itr\_cache.get\_table(\ obj.t\_id\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00217}00217\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ table\_obj.code\ ==\ \mbox{\hyperlink{structcontext}{context}}.receiver,\ table\_access\_violation,\ \textcolor{stringliteral}{"{}db\ access\ violation"{}}\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00218}00218\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00219}00219\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{auto}\ dm\_logger\ =\ \mbox{\hyperlink{structcontext}{context}}.control.get\_deep\_mind\_logger())\ \{}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00220}00220\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ event\_id\ =\ \mbox{\hyperlink{deep__mind_8hpp_aaaa2f1dbd522de03ccbaa73f01db5f50}{RAM\_EVENT\_ID}}(\textcolor{stringliteral}{"{}\$\{code\}:\$\{scope\}:\$\{table\}:\$\{index\_name\}"{}},}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00221}00221\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}code"{}},\ table\_obj.code)}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00222}00222\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}scope"{}},\ table\_obj.scope)}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00223}00223\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}table"{}},\ table\_obj.table)}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00224}00224\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}index\_name"{}},\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}(obj.primary\_key))}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00225}00225\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00226}00226\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ dm\_logger-\/>on\_ram\_trace(std::move(event\_id),\ \textcolor{stringliteral}{"{}secondary\_index"{}},\ \textcolor{stringliteral}{"{}remove"{}},\ \textcolor{stringliteral}{"{}secondary\_index\_remove"{}});}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00227}00227\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00228}00228\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00229}00229\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structcontext}{context}}.update\_db\_usage(\ obj.payer,\ -\/(\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a2772c77657b1f6fda680bbe8f7282d13}{config::billable\_size\_v<ObjectType>}}\ )\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00230}00230\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00231}00231\ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ context.require\_write\_lock(\ table\_obj.scope\ );}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00232}00232\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00233}00233\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structcontext}{context}}.db.modify(\ table\_obj,\ [\&](\ \textcolor{keyword}{auto}\&\ t\ )\ \{}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00234}00234\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/-\/t.count;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00235}00235\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00236}00236\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structcontext}{context}}.db.remove(\ obj\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00237}00237\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00238}00238\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (table\_obj.count\ ==\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00239}00239\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structcontext}{context}}.remove\_table(table\_obj);}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00240}00240\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00241}00241\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00242}00242\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ itr\_cache.remove(\ iterator\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00243}00243\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00244}00244\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00245}\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_a12898aaf953c5e776be5ec4e5aa553aa}{00245}}\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_a12898aaf953c5e776be5ec4e5aa553aa}{update}}(\ \textcolor{keywordtype}{int}\ iterator,\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{account\_name}}\ payer,\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_a8dd024499302ed645150802b342074e4}{secondary\_key\_proxy\_const\_type}}\ secondary\ )\ \{}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00246}00246\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ obj\ =\ itr\_cache.get(\ iterator\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00247}00247\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00248}00248\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ table\_obj\ =\ itr\_cache.get\_table(\ obj.t\_id\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00249}00249\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ table\_obj.code\ ==\ \mbox{\hyperlink{structcontext}{context}}.receiver,\ table\_access\_violation,\ \textcolor{stringliteral}{"{}db\ access\ violation"{}}\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00250}00250\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00251}00251\ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ context.require\_write\_lock(\ table\_obj.scope\ );}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00252}00252\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00253}00253\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ payer\ ==\ \mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\_name}}()\ )\ payer\ =\ obj.payer;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00254}00254\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00255}00255\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ billing\_size\ =\ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a2772c77657b1f6fda680bbe8f7282d13}{config::billable\_size\_v<ObjectType>}};}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00256}00256\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00257}00257\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ event\_id;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00258}00258\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structcontext}{context}}.control.get\_deep\_mind\_logger()\ !=\ \textcolor{keyword}{nullptr})\ \{}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00259}00259\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ event\_id\ =\ \mbox{\hyperlink{deep__mind_8hpp_aaaa2f1dbd522de03ccbaa73f01db5f50}{RAM\_EVENT\_ID}}(\textcolor{stringliteral}{"{}\$\{code\}:\$\{scope\}:\$\{table\}:\$\{index\_name\}"{}},}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00260}00260\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}code"{}},\ table\_obj.code)}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00261}00261\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}scope"{}},\ table\_obj.scope)}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00262}00262\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}table"{}},\ table\_obj.table)}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00263}00263\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}index\_name"{}},\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}(obj.primary\_key))}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00264}00264\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00265}00265\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00266}00266\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00267}00267\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ obj.payer\ !=\ payer\ )\ \{}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00268}00268\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{auto}\ dm\_logger\ =\ \mbox{\hyperlink{structcontext}{context}}.control.get\_deep\_mind\_logger())}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00269}00269\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00270}00270\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ dm\_logger-\/>on\_ram\_trace(std::string(event\_id),\ \textcolor{stringliteral}{"{}secondary\_index"{}},\ \textcolor{stringliteral}{"{}remove"{}},\ \textcolor{stringliteral}{"{}secondary\_index\_remove"{}});}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00271}00271\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00272}00272\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structcontext}{context}}.update\_db\_usage(\ obj.payer,\ -\/(billing\_size)\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00273}00273\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{auto}\ dm\_logger\ =\ \mbox{\hyperlink{structcontext}{context}}.control.get\_deep\_mind\_logger())}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00274}00274\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00275}00275\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ dm\_logger-\/>on\_ram\_trace(std::move(event\_id),\ \textcolor{stringliteral}{"{}secondary\_index"{}},\ \textcolor{stringliteral}{"{}add"{}},\ \textcolor{stringliteral}{"{}secondary\_index\_update\_add\_new\_payer"{}});}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00276}00276\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00277}00277\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structcontext}{context}}.update\_db\_usage(\ payer,\ +(billing\_size)\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00278}00278\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00279}00279\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00280}00280\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structcontext}{context}}.db.modify(\ obj,\ [\&](\ \textcolor{keyword}{auto}\&\ o\ )\ \{}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00281}00281\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ secondary\_key\_helper\_t::set(o.secondary\_key,\ secondary);}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00282}00282\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ o.payer\ =\ payer;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00283}00283\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00284}00284\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00285}00285\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00286}\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_a72c9f02ac4c3097ead87a75a96fcf3bc}{00286}}\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_a72c9f02ac4c3097ead87a75a96fcf3bc}{find\_secondary}}(\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ code,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ scope,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ table,\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_a8dd024499302ed645150802b342074e4}{secondary\_key\_proxy\_const\_type}}\ secondary,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\&\ primary\ )\ \{}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00287}00287\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ tab\ =\ \mbox{\hyperlink{structcontext}{context}}.find\_table(\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(code),\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(scope),\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(table)\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00288}00288\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !tab\ )\ \textcolor{keywordflow}{return}\ -\/1;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00289}00289\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00290}00290\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ table\_end\_itr\ =\ itr\_cache.cache\_table(\ *tab\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00291}00291\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00292}00292\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}*\ obj\ =\ \mbox{\hyperlink{structcontext}{context}}.db.find<ObjectType,\ \mbox{\hyperlink{structby__secondary}{by\_secondary}}>(\ secondary\_key\_helper\_t::create\_tuple(\ *tab,\ secondary\ )\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00293}00293\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !obj\ )\ \textcolor{keywordflow}{return}\ table\_end\_itr;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00294}00294\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00295}00295\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ primary\ =\ obj-\/>primary\_key;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00296}00296\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00297}00297\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ itr\_cache.add(\ *obj\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00298}00298\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00299}00299\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00300}\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_a55bfe099c362c65dcfddf789ce7e0644}{00300}}\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_a55bfe099c362c65dcfddf789ce7e0644}{lowerbound\_secondary}}(\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ code,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ scope,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ table,\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_acfa8f5772dddbaea038435d2136b8a5a}{secondary\_key\_proxy\_type}}\ secondary,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\&\ primary\ )\ \{}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00301}00301\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ tab\ =\ \mbox{\hyperlink{structcontext}{context}}.find\_table(\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(code),\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(scope),\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(table)\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00302}00302\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !tab\ )\ \textcolor{keywordflow}{return}\ -\/1;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00303}00303\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00304}00304\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ table\_end\_itr\ =\ itr\_cache.cache\_table(\ *tab\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00305}00305\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00306}00306\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ idx\ =\ \mbox{\hyperlink{structcontext}{context}}.db.get\_index<\ \textcolor{keyword}{typename}\ \mbox{\hyperlink{structchainbase_1_1get__index__type}{chainbase::get\_index\_type<ObjectType>::type}},\ \mbox{\hyperlink{structby__secondary}{by\_secondary}}\ >();}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00307}00307\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ idx.lower\_bound(\ secondary\_key\_helper\_t::create\_tuple(\ *tab,\ secondary\ )\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00308}00308\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr\ ==\ idx.end()\ )\ \textcolor{keywordflow}{return}\ table\_end\_itr;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00309}00309\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr-\/>t\_id\ !=\ tab-\/>id\ )\ \textcolor{keywordflow}{return}\ table\_end\_itr;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00310}00310\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00311}00311\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ primary\ =\ itr-\/>primary\_key;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00312}00312\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ secondary\_key\_helper\_t::get(secondary,\ itr-\/>secondary\_key);}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00313}00313\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00314}00314\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ itr\_cache.add(\ *itr\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00315}00315\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00316}00316\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00317}\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_a40c918a736dea9e083eeb8555bbbb38c}{00317}}\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_a40c918a736dea9e083eeb8555bbbb38c}{upperbound\_secondary}}(\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ code,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ scope,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ table,\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_acfa8f5772dddbaea038435d2136b8a5a}{secondary\_key\_proxy\_type}}\ secondary,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\&\ primary\ )\ \{}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00318}00318\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ tab\ =\ \mbox{\hyperlink{structcontext}{context}}.find\_table(\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(code),\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(scope),\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(table)\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00319}00319\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !tab\ )\ \textcolor{keywordflow}{return}\ -\/1;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00320}00320\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00321}00321\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ table\_end\_itr\ =\ itr\_cache.cache\_table(\ *tab\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00322}00322\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00323}00323\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ idx\ =\ \mbox{\hyperlink{structcontext}{context}}.db.get\_index<\ \textcolor{keyword}{typename}\ \mbox{\hyperlink{structchainbase_1_1get__index__type}{chainbase::get\_index\_type<ObjectType>::type}},\ \mbox{\hyperlink{structby__secondary}{by\_secondary}}\ >();}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00324}00324\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ idx.upper\_bound(\ secondary\_key\_helper\_t::create\_tuple(\ *tab,\ secondary\ )\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00325}00325\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr\ ==\ idx.end()\ )\ \textcolor{keywordflow}{return}\ table\_end\_itr;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00326}00326\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr-\/>t\_id\ !=\ tab-\/>id\ )\ \textcolor{keywordflow}{return}\ table\_end\_itr;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00327}00327\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00328}00328\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ primary\ =\ itr-\/>primary\_key;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00329}00329\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ secondary\_key\_helper\_t::get(secondary,\ itr-\/>secondary\_key);}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00330}00330\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00331}00331\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ itr\_cache.add(\ *itr\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00332}00332\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00333}00333\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00334}\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_a4b2b3df3ef950b7103b785f66b66ff1f}{00334}}\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_a4b2b3df3ef950b7103b785f66b66ff1f}{end\_secondary}}(\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ code,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ scope,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ table\ )\ \{}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00335}00335\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ tab\ =\ \mbox{\hyperlink{structcontext}{context}}.find\_table(\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(code),\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(scope),\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(table)\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00336}00336\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !tab\ )\ \textcolor{keywordflow}{return}\ -\/1;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00337}00337\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00338}00338\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ itr\_cache.cache\_table(\ *tab\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00339}00339\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00340}00340\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00341}\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_aea51e4cd9cd94d318f62ce672f59de39}{00341}}\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_aea51e4cd9cd94d318f62ce672f59de39}{next\_secondary}}(\ \textcolor{keywordtype}{int}\ iterator,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\&\ primary\ )\ \{}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00342}00342\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ iterator\ <\ -\/1\ )\ \textcolor{keywordflow}{return}\ -\/1;\ \textcolor{comment}{//\ cannot\ increment\ past\ end\ iterator\ of\ index}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00343}00343\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00344}00344\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ obj\ =\ itr\_cache.get(iterator);\ \textcolor{comment}{//\ Check\ for\ iterator\ !=\ -\/1\ happens\ in\ this\ call}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00345}00345\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ idx\ =\ \mbox{\hyperlink{structcontext}{context}}.db.get\_index<\textcolor{keyword}{typename}\ \mbox{\hyperlink{structchainbase_1_1get__index__type}{chainbase::get\_index\_type<ObjectType>::type}},\ \mbox{\hyperlink{structby__secondary}{by\_secondary}}>();}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00346}00346\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00347}00347\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ idx.iterator\_to(obj);}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00348}00348\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++itr;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00349}00349\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00350}00350\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr\ ==\ idx.end()\ ||\ itr-\/>t\_id\ !=\ obj.t\_id\ )\ \textcolor{keywordflow}{return}\ itr\_cache.get\_end\_iterator\_by\_table\_id(obj.t\_id);}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00351}00351\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00352}00352\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ primary\ =\ itr-\/>primary\_key;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00353}00353\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ itr\_cache.add(*itr);}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00354}00354\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00355}00355\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00356}\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_a9a2c075e4dc356ff50a7997f15b46a9c}{00356}}\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_a9a2c075e4dc356ff50a7997f15b46a9c}{previous\_secondary}}(\ \textcolor{keywordtype}{int}\ iterator,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\&\ primary\ )\ \{}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00357}00357\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ idx\ =\ \mbox{\hyperlink{structcontext}{context}}.db.get\_index<\textcolor{keyword}{typename}\ \mbox{\hyperlink{structchainbase_1_1get__index__type}{chainbase::get\_index\_type<ObjectType>::type}},\ \mbox{\hyperlink{structby__secondary}{by\_secondary}}>();}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00358}00358\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00359}00359\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ iterator\ <\ -\/1\ )\ \textcolor{comment}{//\ is\ end\ iterator}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00360}00360\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00361}00361\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ tab\ =\ itr\_cache.find\_table\_by\_end\_iterator(iterator);}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00362}00362\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ tab,\ invalid\_table\_iterator,\ \textcolor{stringliteral}{"{}not\ a\ valid\ end\ iterator"{}}\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00363}00363\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00364}00364\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ idx.upper\_bound(tab-\/>id);}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00365}00365\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ idx.begin()\ ==\ idx.end()\ ||\ itr\ ==\ idx.begin()\ )\ \textcolor{keywordflow}{return}\ -\/1;\ \textcolor{comment}{//\ Empty\ index}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00366}00366\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00367}00367\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/-\/itr;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00368}00368\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00369}00369\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr-\/>t\_id\ !=\ tab-\/>id\ )\ \textcolor{keywordflow}{return}\ -\/1;\ \textcolor{comment}{//\ Empty\ index}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00370}00370\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00371}00371\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ primary\ =\ itr-\/>primary\_key;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00372}00372\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ itr\_cache.add(*itr);}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00373}00373\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00374}00374\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00375}00375\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ obj\ =\ itr\_cache.get(iterator);\ \textcolor{comment}{//\ Check\ for\ iterator\ !=\ -\/1\ happens\ in\ this\ call}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00376}00376\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00377}00377\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ idx.iterator\_to(obj);}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00378}00378\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr\ ==\ idx.begin()\ )\ \textcolor{keywordflow}{return}\ -\/1;\ \textcolor{comment}{//\ cannot\ decrement\ past\ beginning\ iterator\ of\ index}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00379}00379\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00380}00380\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/-\/itr;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00381}00381\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00382}00382\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr-\/>t\_id\ !=\ obj.t\_id\ )\ \textcolor{keywordflow}{return}\ -\/1;\ \textcolor{comment}{//\ cannot\ decrement\ past\ beginning\ iterator\ of\ index}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00383}00383\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00384}00384\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ primary\ =\ itr-\/>primary\_key;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00385}00385\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ itr\_cache.add(*itr);}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00386}00386\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00387}00387\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00388}\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_a66b28dae52a27292011575ca5ab3fa9c}{00388}}\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_a66b28dae52a27292011575ca5ab3fa9c}{find\_primary}}(\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ code,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ scope,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ table,\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_acfa8f5772dddbaea038435d2136b8a5a}{secondary\_key\_proxy\_type}}\ secondary,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ primary\ )\ \{}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00389}00389\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ tab\ =\ \mbox{\hyperlink{structcontext}{context}}.find\_table(\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(code),\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(scope),\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(table)\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00390}00390\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !tab\ )\ \textcolor{keywordflow}{return}\ -\/1;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00391}00391\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00392}00392\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ table\_end\_itr\ =\ itr\_cache.cache\_table(\ *tab\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00393}00393\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00394}00394\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}*\ obj\ =\ \mbox{\hyperlink{structcontext}{context}}.db.find<ObjectType,\ by\_primary>(\ boost::make\_tuple(\ tab-\/>id,\ primary\ )\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00395}00395\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !obj\ )\ \textcolor{keywordflow}{return}\ table\_end\_itr;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00396}00396\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ secondary\_key\_helper\_t::get(secondary,\ obj-\/>secondary\_key);}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00397}00397\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00398}00398\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ itr\_cache.add(\ *obj\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00399}00399\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00400}00400\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00401}\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_a462e5ee835141095a5f68eed9ff2f5e6}{00401}}\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_a462e5ee835141095a5f68eed9ff2f5e6}{lowerbound\_primary}}(\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ code,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ scope,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ table,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ primary\ )\ \{}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00402}00402\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ tab\ =\ \mbox{\hyperlink{structcontext}{context}}.find\_table(\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(code),\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(scope),\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(table)\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00403}00403\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!tab)\ \textcolor{keywordflow}{return}\ -\/1;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00404}00404\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00405}00405\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ table\_end\_itr\ =\ itr\_cache.cache\_table(\ *tab\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00406}00406\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00407}00407\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ idx\ =\ \mbox{\hyperlink{structcontext}{context}}.db.get\_index<\textcolor{keyword}{typename}\ \mbox{\hyperlink{structchainbase_1_1get__index__type}{chainbase::get\_index\_type<ObjectType>::type}},\ by\_primary>();}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00408}00408\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ idx.lower\_bound(boost::make\_tuple(tab-\/>id,\ primary));}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00409}00409\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (itr\ ==\ idx.end())\ \textcolor{keywordflow}{return}\ table\_end\_itr;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00410}00410\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (itr-\/>t\_id\ !=\ tab-\/>id)\ \textcolor{keywordflow}{return}\ table\_end\_itr;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00411}00411\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00412}00412\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ itr\_cache.add(*itr);}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00413}00413\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00414}00414\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00415}\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_a6ff8f70b48656eaadfafea194a11602e}{00415}}\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_a6ff8f70b48656eaadfafea194a11602e}{upperbound\_primary}}(\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ code,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ scope,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ table,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ primary\ )\ \{}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00416}00416\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ tab\ =\ \mbox{\hyperlink{structcontext}{context}}.find\_table(\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(code),\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(scope),\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(table)\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00417}00417\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ !tab\ )\ \textcolor{keywordflow}{return}\ -\/1;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00418}00418\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00419}00419\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ table\_end\_itr\ =\ itr\_cache.cache\_table(\ *tab\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00420}00420\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00421}00421\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ idx\ =\ \mbox{\hyperlink{structcontext}{context}}.db.get\_index<\textcolor{keyword}{typename}\ \mbox{\hyperlink{structchainbase_1_1get__index__type}{chainbase::get\_index\_type<ObjectType>::type}},\ by\_primary>();}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00422}00422\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ idx.upper\_bound(boost::make\_tuple(tab-\/>id,\ primary));}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00423}00423\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (itr\ ==\ idx.end())\ \textcolor{keywordflow}{return}\ table\_end\_itr;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00424}00424\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (itr-\/>t\_id\ !=\ tab-\/>id)\ \textcolor{keywordflow}{return}\ table\_end\_itr;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00425}00425\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00426}00426\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ itr\_cache.cache\_table(*tab);}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00427}00427\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ itr\_cache.add(*itr);}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00428}00428\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00429}00429\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00430}\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_acb2637427c124b3956ff70ff38aec97d}{00430}}\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_acb2637427c124b3956ff70ff38aec97d}{next\_primary}}(\ \textcolor{keywordtype}{int}\ iterator,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\&\ primary\ )\ \{}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00431}00431\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ iterator\ <\ -\/1\ )\ \textcolor{keywordflow}{return}\ -\/1;\ \textcolor{comment}{//\ cannot\ increment\ past\ end\ iterator\ of\ table}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00432}00432\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00433}00433\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ obj\ =\ itr\_cache.get(iterator);\ \textcolor{comment}{//\ Check\ for\ iterator\ !=\ -\/1\ happens\ in\ this\ call}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00434}00434\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ idx\ =\ \mbox{\hyperlink{structcontext}{context}}.db.get\_index<\textcolor{keyword}{typename}\ \mbox{\hyperlink{structchainbase_1_1get__index__type}{chainbase::get\_index\_type<ObjectType>::type}},\ by\_primary>();}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00435}00435\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00436}00436\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ idx.iterator\_to(obj);}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00437}00437\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++itr;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00438}00438\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00439}00439\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr\ ==\ idx.end()\ ||\ itr-\/>t\_id\ !=\ obj.t\_id\ )\ \textcolor{keywordflow}{return}\ itr\_cache.get\_end\_iterator\_by\_table\_id(obj.t\_id);}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00440}00440\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00441}00441\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ primary\ =\ itr-\/>primary\_key;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00442}00442\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ itr\_cache.add(*itr);}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00443}00443\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00444}00444\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00445}\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_a58586003c8097053f5c0801813a5cfdd}{00445}}\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_a58586003c8097053f5c0801813a5cfdd}{previous\_primary}}(\ \textcolor{keywordtype}{int}\ iterator,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\&\ primary\ )\ \{}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00446}00446\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ idx\ =\ \mbox{\hyperlink{structcontext}{context}}.db.get\_index<\textcolor{keyword}{typename}\ \mbox{\hyperlink{structchainbase_1_1get__index__type}{chainbase::get\_index\_type<ObjectType>::type}},\ by\_primary>();}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00447}00447\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00448}00448\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ iterator\ <\ -\/1\ )\ \textcolor{comment}{//\ is\ end\ iterator}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00449}00449\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00450}00450\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ tab\ =\ itr\_cache.find\_table\_by\_end\_iterator(iterator);}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00451}00451\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ tab,\ invalid\_table\_iterator,\ \textcolor{stringliteral}{"{}not\ a\ valid\ end\ iterator"{}}\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00452}00452\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00453}00453\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ idx.upper\_bound(tab-\/>id);}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00454}00454\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ idx.begin()\ ==\ idx.end()\ ||\ itr\ ==\ idx.begin()\ )\ \textcolor{keywordflow}{return}\ -\/1;\ \textcolor{comment}{//\ Empty\ table}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00455}00455\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00456}00456\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/-\/itr;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00457}00457\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00458}00458\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr-\/>t\_id\ !=\ tab-\/>id\ )\ \textcolor{keywordflow}{return}\ -\/1;\ \textcolor{comment}{//\ Empty\ table}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00459}00459\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00460}00460\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ primary\ =\ itr-\/>primary\_key;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00461}00461\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ itr\_cache.add(*itr);}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00462}00462\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00463}00463\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00464}00464\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ obj\ =\ itr\_cache.get(iterator);\ \textcolor{comment}{//\ Check\ for\ iterator\ !=\ -\/1\ happens\ in\ this\ call}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00465}00465\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00466}00466\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ idx.iterator\_to(obj);}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00467}00467\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr\ ==\ idx.begin()\ )\ \textcolor{keywordflow}{return}\ -\/1;\ \textcolor{comment}{//\ cannot\ decrement\ past\ beginning\ iterator\ of\ table}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00468}00468\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00469}00469\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/-\/itr;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00470}00470\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00471}00471\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr-\/>t\_id\ !=\ obj.t\_id\ )\ \textcolor{keywordflow}{return}\ -\/1;\ \textcolor{comment}{//\ cannot\ decrement\ past\ beginning\ iterator\ of\ index}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00472}00472\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00473}00473\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ primary\ =\ itr-\/>primary\_key;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00474}00474\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ itr\_cache.add(*itr);}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00475}00475\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00476}00476\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00477}\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_a05e187455e430f91ff29ac7ced8a6756}{00477}}\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_a05e187455e430f91ff29ac7ced8a6756}{get}}(\ \textcolor{keywordtype}{int}\ iterator,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\&\ primary,\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_acfa8f5772dddbaea038435d2136b8a5a}{secondary\_key\_proxy\_type}}\ secondary\ )\ \{}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00478}00478\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ obj\ =\ itr\_cache.get(\ iterator\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00479}00479\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ primary\ \ \ =\ obj.primary\_key;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00480}00480\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ secondary\_key\_helper\_t::get(secondary,\ obj.secondary\_key);}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00481}00481\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00482}00482\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00483}00483\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00484}00484\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context}{apply\_context}}\&\ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structcontext}{context}};}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00485}00485\ \ \ \ \ \ \ \ \ \ \ \ \ iterator\_cache<ObjectType>\ \ itr\_cache;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00486}00486\ \ \ \ \ \ \ \};\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00487}00487\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00488}00488\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00490}00490\ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00491}00491\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_a87005d2140a4c7884277d2c775a86000}{apply\_context}}(\mbox{\hyperlink{classsysio_1_1chain_1_1controller}{controller}}\&\ con,\ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context}{transaction\_context}}\&\ trx\_ctx,\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ action\_ordinal,\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ depth=0);}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00492}00492\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00494}00494\ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00495}00495\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00496}00496\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_a3d55f08ae8c014eb7cca9d36b43e8220}{exec\_one}}();}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00497}00497\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_aac87c3bc66a6e05318bfd25c3373fee5}{exec}}();}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00498}00498\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_a95ccf1ed89aab0118938c309fbf91d1f}{execute\_inline}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1action}{action}}\&\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00499}00499\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_aeacd5c6ae20ee332af568149057df884}{execute\_context\_free\_inline}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1action}{action}}\&\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00500}00500\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_ac09c8f3118154bb22b0bd50526e138fa}{schedule\_deferred\_transaction}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_a896515137d9a7844105786ee3a6b1d47}{uint128\_t}}\&\ sender\_id,\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{account\_name}}\ payer,\ \mbox{\hyperlink{structsysio_1_1chain_1_1transaction}{transaction}}\&\&\ trx,\ \textcolor{keywordtype}{bool}\ replace\_existing\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00501}00501\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_a2310a1978f97847e770f7525391d0abc}{cancel\_deferred\_transaction}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_a896515137d9a7844105786ee3a6b1d47}{uint128\_t}}\&\ sender\_id,\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{account\_name}}\ sender\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00502}\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_a11dd9c8743b410d5007894bbc786f4ce}{00502}}\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_a11dd9c8743b410d5007894bbc786f4ce}{cancel\_deferred\_transaction}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_a896515137d9a7844105786ee3a6b1d47}{uint128\_t}}\&\ sender\_id\ )\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_a11dd9c8743b410d5007894bbc786f4ce}{cancel\_deferred\_transaction}}(sender\_id,\ receiver);\ \}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00503}00503\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00504}00504\ \ \ \ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00505}00505\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_a15f2962cf55ed75da1cae67309e844d5}{schedule\_action}}(\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ ordinal\_of\_action\_to\_schedule,\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{account\_name}}\ receiver,\ \textcolor{keywordtype}{bool}\ context\_free\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00506}00506\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_a15f2962cf55ed75da1cae67309e844d5}{schedule\_action}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1action}{action}}\&\&\ act\_to\_schedule,\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{account\_name}}\ receiver,\ \textcolor{keywordtype}{bool}\ context\_free\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00507}00507\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00508}00508\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00510}00510\ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00511}00511\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00521}00521\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_a7dbd347239af8b3540db7830b6e2f11e}{require\_authorization}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{account\_name}}\&\ account);}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00522}00522\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_a87b5bd0a6ac8461dd9c1486561a0c314}{has\_authorization}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{account\_name}}\&\ account)\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00523}00523\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_a7dbd347239af8b3540db7830b6e2f11e}{require\_authorization}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{account\_name}}\&\ account,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{permission\_name}}\&\ permission);}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00524}00524\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00528}00528\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_aa3b1a676573b8e03823646f92da39365}{is\_account}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{account\_name}}\&\ account)\textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00529}00529\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00530}00530\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacesysio_1_1chain_a406d45a184cdba0af316b5bf34bf56cfa47b372aeb97f49fd5861d48bd3f94a38}{get\_code\_hash}}(}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00531}00531\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{account\_name}}\ account,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\&\ code\_sequence,\ \mbox{\hyperlink{classfc_1_1sha256}{fc::sha256}}\&\ code\_hash,\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\&\ \mbox{\hyperlink{classsysio_1_1chain_1_1wasm__interface_a9053d9e65167e5f241f1f3f27b175f9c}{vm\_type}},\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\&\ vm\_version)\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00532}00532\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00536}00536\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_a00a749f7d122e141a87aab3767d3349c}{require\_recipient}}(\mbox{\hyperlink{structsysio_1_1chain_1_1name}{account\_name}}\ account);}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00537}00537\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00542}00542\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_adecf61df18e643021f05df3cdfb97127}{has\_recipient}}(\mbox{\hyperlink{structsysio_1_1chain_1_1name}{account\_name}}\ account)\textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00543}00543\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00545}00545\ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00546}00546\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00547}\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_ae25be4ae1a013df520cc4855e64921f2}{00547}}\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_ae25be4ae1a013df520cc4855e64921f2}{console\_append}}(\ std::string\_view\ val\ )\ \{}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00548}00548\ \ \ \ \ \ \ \ \ \ \_pending\_console\_output\ +=\ val;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00549}00549\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00550}00550\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00552}00552\ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00553}00553\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00554}00554\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_a49f2feb0d0ce2cb21c74f871432392e9}{update\_db\_usage}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{account\_name}}\&\ payer,\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ delta\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00555}00555\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00556}00556\ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_a525b0d91b1afb457e7371ff689fcefda}{db\_store\_i64}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\ scope,\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\ table,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{account\_name}}\&\ payer,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \textcolor{keywordtype}{id},\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ buffer,\ \textcolor{keywordtype}{size\_t}\ buffer\_size\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00557}00557\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_ab42c195679823907132298609509f36c}{db\_update\_i64}}(\ \textcolor{keywordtype}{int}\ iterator,\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{account\_name}}\ payer,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ buffer,\ \textcolor{keywordtype}{size\_t}\ buffer\_size\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00558}00558\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_abd131f26bc83416fb97a05392ae68429}{db\_remove\_i64}}(\ \textcolor{keywordtype}{int}\ iterator\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00559}00559\ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_a5fb0e439b9a43df576ddea6c944759c1}{db\_get\_i64}}(\ \textcolor{keywordtype}{int}\ iterator,\ \textcolor{keywordtype}{char}*\ buffer,\ \textcolor{keywordtype}{size\_t}\ buffer\_size\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00560}00560\ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_a78451562bdb87ec31112731f61acde2e}{db\_next\_i64}}(\ \textcolor{keywordtype}{int}\ iterator,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\&\ primary\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00561}00561\ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_ab6bf0461d3d359d5da63bf8d0338ccab}{db\_previous\_i64}}(\ \textcolor{keywordtype}{int}\ iterator,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\&\ primary\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00562}00562\ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_a4a6ba829713d78125e8f5b5cc7296137}{db\_find\_i64}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\ code,\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\ scope,\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\ table,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \textcolor{keywordtype}{id}\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00563}00563\ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_a253f4304ce47515f5a74bd4fa3f95368}{db\_lowerbound\_i64}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\ code,\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\ scope,\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\ table,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \textcolor{keywordtype}{id}\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00564}00564\ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_a6b0aadc926e14c0a8a5f6cc3441ad00c}{db\_upperbound\_i64}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\ code,\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\ scope,\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\ table,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \textcolor{keywordtype}{id}\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00565}00565\ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_ad9d6d21fd254111b1845499ad82982d2}{db\_end\_i64}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\ code,\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\ scope,\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\ table\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00566}00566\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00567}00567\ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00568}00568\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00569}00569\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1chain_1_1table__id__object}{table\_id\_object}}*\ find\_table(\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\ code,\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\ scope,\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\ table\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00570}00570\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1chain_1_1table__id__object}{table\_id\_object}}\&\ find\_or\_create\_table(\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\ code,\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\ scope,\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\ table,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{account\_name}}\ \&payer\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00571}00571\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ remove\_table(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1chain_1_1table__id__object}{table\_id\_object}}\&\ tid\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00572}00572\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00573}00573\ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_a525b0d91b1afb457e7371ff689fcefda}{db\_store\_i64}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\ code,\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\ scope,\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\ table,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{account\_name}}\&\ payer,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \textcolor{keywordtype}{id},\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ buffer,\ \textcolor{keywordtype}{size\_t}\ buffer\_size\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00574}00574\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00575}00575\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00577}00577\ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00578}00578\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00579}00579\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00580}00580\ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_a2d651027c7e796f25382b24e58def3ef}{get\_action}}(\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ type,\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ index,\ \textcolor{keywordtype}{char}*\ buffer,\ \textcolor{keywordtype}{size\_t}\ buffer\_size\ )\textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00581}00581\ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_a4e7c7a187705892ae97250316ca9b38f}{get\_context\_free\_data}}(\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ index,\ \textcolor{keywordtype}{char}*\ buffer,\ \textcolor{keywordtype}{size\_t}\ buffer\_size\ )\textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00582}00582\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1vector}{vector<account\_name>}}\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_a2252a9a9740608f9dea5071a929cfe8f}{get\_active\_producers}}()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00583}00583\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00584}00584\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_a2ef781fcd0596791a3edb004b4f5c8c5}{next\_global\_sequence}}();}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00585}00585\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_acb20a8d75fff438efadb4976a6fdce31}{next\_recv\_sequence}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1chain_1_1account__metadata__object}{account\_metadata\_object}}\&\ receiver\_account\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00586}00586\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_aa5a5520ad95838d777834dd408a2c71d}{next\_auth\_sequence}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{account\_name}}\ \mbox{\hyperlink{classfc_1_1actor}{actor}}\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00587}00587\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00588}00588\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_a18d1df4bf3df1229cbfd0bcdce63c06c}{add\_ram\_usage}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{account\_name}}\ account,\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ ram\_delta\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00589}00589\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_a89069192fcd50a9ebbe656f8868e7b90}{finalize\_trace}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1action__trace}{action\_trace}}\&\ trace,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1time__point}{fc::time\_point}}\&\ start\ );}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00590}00590\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00591}\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_a6d7b2bfa2d819a34e9b5ba2ba709290a}{00591}}\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_a6d7b2bfa2d819a34e9b5ba2ba709290a}{is\_context\_free}}()\textcolor{keyword}{const\ }\{\ \textcolor{keywordflow}{return}\ context\_free;\ \}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00592}\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_a47102cc1544ba9fd37577eba8265ce2c}{00592}}\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_a47102cc1544ba9fd37577eba8265ce2c}{is\_privileged}}()\textcolor{keyword}{const\ }\{\ \textcolor{keywordflow}{return}\ privileged;\ \}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00593}\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_acdf53b50a5ac7b57b79ab281bcf24b23}{00593}}\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_a7a1685bcc352cda9e45f055932069428}{action\_name}}\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_acdf53b50a5ac7b57b79ab281bcf24b23}{get\_receiver}}()\textcolor{keyword}{const\ }\{\ \textcolor{keywordflow}{return}\ receiver;\ \}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00594}\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_a2d651027c7e796f25382b24e58def3ef}{00594}}\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1action}{action}}\&\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_a2d651027c7e796f25382b24e58def3ef}{get\_action}}()\textcolor{keyword}{const\ }\{\ \textcolor{keywordflow}{return}\ *act;\ \}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00595}00595\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00596}00596\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_a7a1685bcc352cda9e45f055932069428}{action\_name}}\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_ab4925e2f0208b9a6bd084c1d25ee218d}{get\_sender}}()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00597}00597\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00599}00599\ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00600}00600\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00601}\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_a6596cb3266655d307e7bc7d2a663aa4f}{00601}}\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1controller}{controller}}\&\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_a6596cb3266655d307e7bc7d2a663aa4f}{control}};}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00602}\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_ac3b6e6353b5ecebcb305e1d3dcfac4eb}{00602}}\ \ \ \ \ \ \ \mbox{\hyperlink{classchainbase_1_1database}{chainbase::database}}\&\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_ac3b6e6353b5ecebcb305e1d3dcfac4eb}{db}};\ \ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00603}\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_aa4a6bbc72218ef25b15cfc91176d9765}{00603}}\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context}{transaction\_context}}\&\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_aa4a6bbc72218ef25b15cfc91176d9765}{trx\_context}};\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00604}00604\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00605}00605\ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00606}00606\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1action}{action}}*\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ act\ =\ \textcolor{keyword}{nullptr};\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00607}00607\ \ \ \ \ \ \ \textcolor{comment}{//\ act\ pointer\ may\ be\ invalidated\ on\ call\ to\ trx\_context.schedule\_action}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00608}00608\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{account\_name}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ receiver;\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00609}00609\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ recurse\_depth;\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00610}00610\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ first\_receiver\_action\_ordinal\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00611}00611\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ action\_ordinal\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00612}00612\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ privileged\ \ \ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00613}00613\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ context\_free\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00614}00614\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00615}00615\ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00616}\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_a1c52613df7c14b4120213492f01a6dac}{00616}}\ \ \ \ \ \ \ std::vector<char>\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_a1c52613df7c14b4120213492f01a6dac}{action\_return\_value}};}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00617}\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_afdf8013faed3968597f89ea864295e9e}{00617}}\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index}{generic\_index<index64\_object>}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_afdf8013faed3968597f89ea864295e9e}{idx64}};}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00618}\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_a8ed72869a07898bf164ce4a276812b4f}{00618}}\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index}{generic\_index<index128\_object>}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_a8ed72869a07898bf164ce4a276812b4f}{idx128}};}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00619}\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_af166128976eea68e664566554667d043}{00619}}\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index}{generic\_index<index256\_object,\ uint128\_t*,\ const\ uint128\_t*>}}\ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_af166128976eea68e664566554667d043}{idx256}};}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00620}\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_a5987dcbf745594e73592c9bee4bdb126}{00620}}\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index}{generic\_index<index\_double\_object>}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_a5987dcbf745594e73592c9bee4bdb126}{idx\_double}};}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00621}\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_a36b3d29222bf2b1305189c30596b2622}{00621}}\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index}{generic\_index<index\_long\_double\_object>}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_a36b3d29222bf2b1305189c30596b2622}{idx\_long\_double}};}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00622}00622\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00623}00623\ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00624}00624\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00625}00625\ \ \ \ \ \ \ iterator\_cache<key\_value\_object>\ \ \ \ keyval\_cache;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00626}00626\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1vector}{vector<\ std::pair<account\_name,\ uint32\_t>}}\ >\ \_notified;\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00627}00627\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1vector}{vector<uint32\_t>}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_inline\_actions;\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00628}00628\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1vector}{vector<uint32\_t>}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_cfa\_inline\_actions;\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00629}00629\ \ \ \ \ \ \ std::string\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_pending\_console\_output;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00630}00630\ \ \ \ \ \ \ flat\_set<account\_delta>\ \ \ \ \ \ \ \ \ \ \ \ \ \_account\_ram\_deltas;\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00631}00631\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00632}00632\ \ \ \ \ \ \ \textcolor{comment}{//bytes\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_cached\_trx;}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00633}00633\ \};}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00634}00634\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00635}\mbox{\hyperlink{namespacesysio_1_1chain_ab143988ae1cae85e839b01eb768804c3}{00635}}\ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacesysio_1_1chain_ab143988ae1cae85e839b01eb768804c3}{apply\_handler}}\ =\ std::function<void(\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context}{apply\_context}}\&)>;}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00636}00636\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00637}00637\ \}\ \}\ \textcolor{comment}{//\ namespace\ sysio::chain}}
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00638}00638\ }
+\DoxyCodeLine{\Hypertarget{apply__context_8hpp_source_l00639}00639\ \textcolor{comment}{//FC\_REFLECT(sysio::chain::apply\_context::apply\_results,\ (applied\_actions)(deferred\_transaction\_requests)(deferred\_transactions\_count))}}
+
+\end{DoxyCode}

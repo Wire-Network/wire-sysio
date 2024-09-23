@@ -1,0 +1,171 @@
+\doxysection{sysio\+::chain\+::resource\+\_\+limits Namespace Reference}
+\hypertarget{namespacesysio_1_1chain_1_1resource__limits}{}\label{namespacesysio_1_1chain_1_1resource__limits}\index{sysio::chain::resource\_limits@{sysio::chain::resource\_limits}}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain_1_1resource__limits_1_1impl}{impl}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1account__resource__limit}{account\+\_\+resource\+\_\+limit}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1elastic__limit__parameters}{elastic\+\_\+limit\+\_\+parameters}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__config__object}{resource\+\_\+limits\+\_\+config\+\_\+object}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager}{resource\+\_\+limits\+\_\+manager}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1resource__limits__object}{resource\+\_\+limits\+\_\+object}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__state__object}{resource\+\_\+limits\+\_\+state\+\_\+object}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1resource__usage__object}{resource\+\_\+usage\+\_\+object}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1resource__limits_acbeb3d309e353ed8190a55b47d484868}{ratio}} = \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1ratio}{impl\+::ratio}}$<$\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}$>$
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1resource__limits_a52b51399935db8e58d8757c7b51b3f3d}{usage\+\_\+accumulator}} = \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator}{impl\+::exponential\+\_\+moving\+\_\+average\+\_\+accumulator}}$<$$>$
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1resource__limits_a46a650001834ee5948b425f2e83cf948}{resource\+\_\+limits\+\_\+index}}
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1resource__limits_a0b3297439198d69fd3b3bb4cb9eefa6d}{resource\+\_\+usage\+\_\+index}}
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1resource__limits_af0e92e61b12c4eb0ff352f44ca9fbe09}{resource\+\_\+limits\+\_\+config\+\_\+index}}
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1resource__limits_ac8c3fe48e6c4c00d12cb2f55913798ca}{resource\+\_\+limits\+\_\+state\+\_\+index}}
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1resource__limits_a052fc90c1a27445ea69fad79d361d90f}{resource\+\_\+index\+\_\+set}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{namespacesysio_1_1chain_1_1resource__limits_acbeb3d309e353ed8190a55b47d484868}\index{sysio::chain::resource\_limits@{sysio::chain::resource\_limits}!ratio@{ratio}}
+\index{ratio@{ratio}!sysio::chain::resource\_limits@{sysio::chain::resource\_limits}}
+\doxysubsubsection{\texorpdfstring{ratio}{ratio}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1resource__limits_acbeb3d309e353ed8190a55b47d484868} 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1resource__limits_acbeb3d309e353ed8190a55b47d484868}{sysio\+::chain\+::resource\+\_\+limits\+::ratio}} = \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1ratio}{impl\+::ratio}}$<$\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{resource__limits_8hpp_source_l00032}{32}} of file \mbox{\hyperlink{resource__limits_8hpp_source}{resource\+\_\+limits.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1chain_1_1resource__limits_a052fc90c1a27445ea69fad79d361d90f}\index{sysio::chain::resource\_limits@{sysio::chain::resource\_limits}!resource\_index\_set@{resource\_index\_set}}
+\index{resource\_index\_set@{resource\_index\_set}!sysio::chain::resource\_limits@{sysio::chain::resource\_limits}}
+\doxysubsubsection{\texorpdfstring{resource\_index\_set}{resource\_index\_set}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1resource__limits_a052fc90c1a27445ea69fad79d361d90f} 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1resource__limits_a052fc90c1a27445ea69fad79d361d90f}{sysio\+::chain\+::resource\+\_\+limits\+::resource\+\_\+index\+\_\+set}}}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ index\_set<}
+\DoxyCodeLine{\ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1resource__limits_a46a650001834ee5948b425f2e83cf948}{resource\_limits\_index}},}
+\DoxyCodeLine{\ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1resource__limits_a0b3297439198d69fd3b3bb4cb9eefa6d}{resource\_usage\_index}},}
+\DoxyCodeLine{\ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1resource__limits_ac8c3fe48e6c4c00d12cb2f55913798ca}{resource\_limits\_state\_index}},}
+\DoxyCodeLine{\ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1resource__limits_af0e92e61b12c4eb0ff352f44ca9fbe09}{resource\_limits\_config\_index}}}
+\DoxyCodeLine{>}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{resource__limits_8cpp_source_l00013}{13}} of file \mbox{\hyperlink{resource__limits_8cpp_source}{resource\+\_\+limits.\+cpp}}.
+
+\Hypertarget{namespacesysio_1_1chain_1_1resource__limits_af0e92e61b12c4eb0ff352f44ca9fbe09}\index{sysio::chain::resource\_limits@{sysio::chain::resource\_limits}!resource\_limits\_config\_index@{resource\_limits\_config\_index}}
+\index{resource\_limits\_config\_index@{resource\_limits\_config\_index}!sysio::chain::resource\_limits@{sysio::chain::resource\_limits}}
+\doxysubsubsection{\texorpdfstring{resource\_limits\_config\_index}{resource\_limits\_config\_index}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1resource__limits_af0e92e61b12c4eb0ff352f44ca9fbe09} 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1resource__limits_af0e92e61b12c4eb0ff352f44ca9fbe09}{sysio\+::chain\+::resource\+\_\+limits\+::resource\+\_\+limits\+\_\+config\+\_\+index}}}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \mbox{\hyperlink{namespacechainbase_aba1e047495dcaa4e0d32ff25b8705f1f}{chainbase::shared\_multi\_index\_container}}<}
+\DoxyCodeLine{\ \ \ \ \ \ resource\_limits\_config\_object,}
+\DoxyCodeLine{\ \ \ \ \ \ indexed\_by<}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ ordered\_unique<tag<by\_id>,\ member<resource\_limits\_config\_object,\ resource\_limits\_config\_object::id\_type,\ \&resource\_limits\_config\_object::id>>}
+\DoxyCodeLine{\ \ \ \ \ \ >}
+\DoxyCodeLine{\ \ \ >}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{resource__limits__private_8hpp_source_l00265}{265}} of file \mbox{\hyperlink{resource__limits__private_8hpp_source}{resource\+\_\+limits\+\_\+private.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1chain_1_1resource__limits_a46a650001834ee5948b425f2e83cf948}\index{sysio::chain::resource\_limits@{sysio::chain::resource\_limits}!resource\_limits\_index@{resource\_limits\_index}}
+\index{resource\_limits\_index@{resource\_limits\_index}!sysio::chain::resource\_limits@{sysio::chain::resource\_limits}}
+\doxysubsubsection{\texorpdfstring{resource\_limits\_index}{resource\_limits\_index}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1resource__limits_a46a650001834ee5948b425f2e83cf948} 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1resource__limits_a46a650001834ee5948b425f2e83cf948}{sysio\+::chain\+::resource\+\_\+limits\+::resource\+\_\+limits\+\_\+index}}}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \mbox{\hyperlink{namespacechainbase_aba1e047495dcaa4e0d32ff25b8705f1f}{chainbase::shared\_multi\_index\_container}}<}
+\DoxyCodeLine{\ \ \ \ \ \ resource\_limits\_object,}
+\DoxyCodeLine{\ \ \ \ \ \ indexed\_by<}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ ordered\_unique<tag<by\_id>,\ member<resource\_limits\_object,\ resource\_limits\_object::id\_type,\ \&resource\_limits\_object::id>>,}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ ordered\_unique<tag<by\_owner>,}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ composite\_key<resource\_limits\_object,}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_MULTI\_INDEX\_MEMBER(resource\_limits\_object,\ \textcolor{keywordtype}{bool},\ pending),}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ >}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ >}
+\DoxyCodeLine{\ \ \ \ \ \ >}
+\DoxyCodeLine{\ \ \ >}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{resource__limits__private_8hpp_source_l00214}{214}} of file \mbox{\hyperlink{resource__limits__private_8hpp_source}{resource\+\_\+limits\+\_\+private.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1chain_1_1resource__limits_ac8c3fe48e6c4c00d12cb2f55913798ca}\index{sysio::chain::resource\_limits@{sysio::chain::resource\_limits}!resource\_limits\_state\_index@{resource\_limits\_state\_index}}
+\index{resource\_limits\_state\_index@{resource\_limits\_state\_index}!sysio::chain::resource\_limits@{sysio::chain::resource\_limits}}
+\doxysubsubsection{\texorpdfstring{resource\_limits\_state\_index}{resource\_limits\_state\_index}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1resource__limits_ac8c3fe48e6c4c00d12cb2f55913798ca} 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1resource__limits_ac8c3fe48e6c4c00d12cb2f55913798ca}{sysio\+::chain\+::resource\+\_\+limits\+::resource\+\_\+limits\+\_\+state\+\_\+index}}}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \mbox{\hyperlink{namespacechainbase_aba1e047495dcaa4e0d32ff25b8705f1f}{chainbase::shared\_multi\_index\_container}}<}
+\DoxyCodeLine{\ \ \ \ \ \ resource\_limits\_state\_object,}
+\DoxyCodeLine{\ \ \ \ \ \ indexed\_by<}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ ordered\_unique<tag<by\_id>,\ member<resource\_limits\_state\_object,\ resource\_limits\_state\_object::id\_type,\ \&resource\_limits\_state\_object::id>>}
+\DoxyCodeLine{\ \ \ \ \ \ >}
+\DoxyCodeLine{\ \ \ >}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{resource__limits__private_8hpp_source_l00320}{320}} of file \mbox{\hyperlink{resource__limits__private_8hpp_source}{resource\+\_\+limits\+\_\+private.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1chain_1_1resource__limits_a0b3297439198d69fd3b3bb4cb9eefa6d}\index{sysio::chain::resource\_limits@{sysio::chain::resource\_limits}!resource\_usage\_index@{resource\_usage\_index}}
+\index{resource\_usage\_index@{resource\_usage\_index}!sysio::chain::resource\_limits@{sysio::chain::resource\_limits}}
+\doxysubsubsection{\texorpdfstring{resource\_usage\_index}{resource\_usage\_index}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1resource__limits_a0b3297439198d69fd3b3bb4cb9eefa6d} 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1resource__limits_a0b3297439198d69fd3b3bb4cb9eefa6d}{sysio\+::chain\+::resource\+\_\+limits\+::resource\+\_\+usage\+\_\+index}}}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \mbox{\hyperlink{namespacechainbase_aba1e047495dcaa4e0d32ff25b8705f1f}{chainbase::shared\_multi\_index\_container}}<}
+\DoxyCodeLine{\ \ \ \ \ \ resource\_usage\_object,}
+\DoxyCodeLine{\ \ \ \ \ \ indexed\_by<}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ ordered\_unique<tag<by\_id>,\ member<resource\_usage\_object,\ resource\_usage\_object::id\_type,\ \&resource\_usage\_object::id>>,}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ ordered\_unique<tag<by\_owner>,\ member<resource\_usage\_object,\ account\_name,\ \&resource\_usage\_object::owner>\ >}
+\DoxyCodeLine{\ \ \ \ \ \ >}
+\DoxyCodeLine{\ \ \ >}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{resource__limits__private_8hpp_source_l00239}{239}} of file \mbox{\hyperlink{resource__limits__private_8hpp_source}{resource\+\_\+limits\+\_\+private.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1chain_1_1resource__limits_a52b51399935db8e58d8757c7b51b3f3d}\index{sysio::chain::resource\_limits@{sysio::chain::resource\_limits}!usage\_accumulator@{usage\_accumulator}}
+\index{usage\_accumulator@{usage\_accumulator}!sysio::chain::resource\_limits@{sysio::chain::resource\_limits}}
+\doxysubsubsection{\texorpdfstring{usage\_accumulator}{usage\_accumulator}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1resource__limits_a52b51399935db8e58d8757c7b51b3f3d} 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1resource__limits_a52b51399935db8e58d8757c7b51b3f3d}{sysio\+::chain\+::resource\+\_\+limits\+::usage\+\_\+accumulator}} = \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1exponential__moving__average__accumulator}{impl\+::exponential\+\_\+moving\+\_\+average\+\_\+accumulator}}$<$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{resource__limits__private_8hpp_source_l00191}{191}} of file \mbox{\hyperlink{resource__limits__private_8hpp_source}{resource\+\_\+limits\+\_\+private.\+hpp}}.
+

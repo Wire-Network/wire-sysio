@@ -1,0 +1,7 @@
+<map id="testStream" name="testStream">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,91,56"/>
+<area shape="rect" id="Node000002" href="$classmie_1_1_vsint_t.html#afb5d2b64ce04687f16c66f85b06eae5c" title=" " alt="" coords="139,5,251,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="91,34,123,28,124,33,91,39"/>
+<area shape="rect" id="Node000003" href="$structmie_1_1_vuint_t.html#a9b13f3a0e184b1983fd68d07c081e0a6" title=" " alt="" coords="139,55,251,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="91,48,124,53,123,58,91,53"/>
+</map>

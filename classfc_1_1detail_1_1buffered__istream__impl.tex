@@ -1,0 +1,96 @@
+\doxysection{fc\+::detail\+::buffered\+\_\+istream\+\_\+impl Class Reference}
+\hypertarget{classfc_1_1detail_1_1buffered__istream__impl}{}\label{classfc_1_1detail_1_1buffered__istream__impl}\index{fc::detail::buffered\_istream\_impl@{fc::detail::buffered\_istream\_impl}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1detail_1_1buffered__istream__impl_af20f26d197bdb35d0d6ecff86af7bad1}{buffered\+\_\+istream\+\_\+impl}} (istream\+\_\+ptr is)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+istream\+\_\+ptr \mbox{\hyperlink{classfc_1_1detail_1_1buffered__istream__impl_a4c7e115dea44a4c4304c25957987474f}{\+\_\+istr}}
+\item 
+boost\+::asio\+::streambuf \mbox{\hyperlink{classfc_1_1detail_1_1buffered__istream__impl_a478e492b90bded062eeef5880d60d621}{\+\_\+rdbuf}}
+\item 
+std\+::shared\+\_\+ptr$<$ char $>$ \mbox{\hyperlink{classfc_1_1detail_1_1buffered__istream__impl_a9ba5510d813e3206c1052ff069a1929a}{\+\_\+shared\+\_\+read\+\_\+buffer}}
+\item 
+bool \mbox{\hyperlink{classfc_1_1detail_1_1buffered__istream__impl_adf0f33b0bdafe179e2206ef2b5e6baed}{\+\_\+shared\+\_\+read\+\_\+buffer\+\_\+in\+\_\+use}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{buffered__iostream_8cpp_source_l00012}{12}} of file \mbox{\hyperlink{buffered__iostream_8cpp_source}{buffered\+\_\+iostream.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1detail_1_1buffered__istream__impl_af20f26d197bdb35d0d6ecff86af7bad1}\index{fc::detail::buffered\_istream\_impl@{fc::detail::buffered\_istream\_impl}!buffered\_istream\_impl@{buffered\_istream\_impl}}
+\index{buffered\_istream\_impl@{buffered\_istream\_impl}!fc::detail::buffered\_istream\_impl@{fc::detail::buffered\_istream\_impl}}
+\doxysubsubsection{\texorpdfstring{buffered\_istream\_impl()}{buffered\_istream\_impl()}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1buffered__istream__impl_af20f26d197bdb35d0d6ecff86af7bad1} 
+fc\+::detail\+::buffered\+\_\+istream\+\_\+impl\+::buffered\+\_\+istream\+\_\+impl (\begin{DoxyParamCaption}\item[{istream\+\_\+ptr}]{is}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{buffered__iostream_8cpp_source_l00015}{15}} of file \mbox{\hyperlink{buffered__iostream_8cpp_source}{buffered\+\_\+iostream.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1buffered__istream__impl_a4c7e115dea44a4c4304c25957987474f}{\_istr}}(fc::move(is))}
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\#ifndef\ NDEBUG}}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ,\mbox{\hyperlink{classfc_1_1detail_1_1buffered__istream__impl_adf0f33b0bdafe179e2206ef2b5e6baed}{\_shared\_read\_buffer\_in\_use}}(\textcolor{keyword}{false})}
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classfc_1_1detail_1_1buffered__istream__impl_a4c7e115dea44a4c4304c25957987474f}\index{fc::detail::buffered\_istream\_impl@{fc::detail::buffered\_istream\_impl}!\_istr@{\_istr}}
+\index{\_istr@{\_istr}!fc::detail::buffered\_istream\_impl@{fc::detail::buffered\_istream\_impl}}
+\doxysubsubsection{\texorpdfstring{\_istr}{\_istr}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1buffered__istream__impl_a4c7e115dea44a4c4304c25957987474f} 
+istream\+\_\+ptr fc\+::detail\+::buffered\+\_\+istream\+\_\+impl\+::\+\_\+istr}
+
+
+
+Definition at line \mbox{\hyperlink{buffered__iostream_8cpp_source_l00022}{22}} of file \mbox{\hyperlink{buffered__iostream_8cpp_source}{buffered\+\_\+iostream.\+cpp}}.
+
+\Hypertarget{classfc_1_1detail_1_1buffered__istream__impl_a478e492b90bded062eeef5880d60d621}\index{fc::detail::buffered\_istream\_impl@{fc::detail::buffered\_istream\_impl}!\_rdbuf@{\_rdbuf}}
+\index{\_rdbuf@{\_rdbuf}!fc::detail::buffered\_istream\_impl@{fc::detail::buffered\_istream\_impl}}
+\doxysubsubsection{\texorpdfstring{\_rdbuf}{\_rdbuf}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1buffered__istream__impl_a478e492b90bded062eeef5880d60d621} 
+boost\+::asio\+::streambuf fc\+::detail\+::buffered\+\_\+istream\+\_\+impl\+::\+\_\+rdbuf}
+
+
+
+Definition at line \mbox{\hyperlink{buffered__iostream_8cpp_source_l00023}{23}} of file \mbox{\hyperlink{buffered__iostream_8cpp_source}{buffered\+\_\+iostream.\+cpp}}.
+
+\Hypertarget{classfc_1_1detail_1_1buffered__istream__impl_a9ba5510d813e3206c1052ff069a1929a}\index{fc::detail::buffered\_istream\_impl@{fc::detail::buffered\_istream\_impl}!\_shared\_read\_buffer@{\_shared\_read\_buffer}}
+\index{\_shared\_read\_buffer@{\_shared\_read\_buffer}!fc::detail::buffered\_istream\_impl@{fc::detail::buffered\_istream\_impl}}
+\doxysubsubsection{\texorpdfstring{\_shared\_read\_buffer}{\_shared\_read\_buffer}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1buffered__istream__impl_a9ba5510d813e3206c1052ff069a1929a} 
+std\+::shared\+\_\+ptr$<$char$>$ fc\+::detail\+::buffered\+\_\+istream\+\_\+impl\+::\+\_\+shared\+\_\+read\+\_\+buffer}
+
+
+
+Definition at line \mbox{\hyperlink{buffered__iostream_8cpp_source_l00024}{24}} of file \mbox{\hyperlink{buffered__iostream_8cpp_source}{buffered\+\_\+iostream.\+cpp}}.
+
+\Hypertarget{classfc_1_1detail_1_1buffered__istream__impl_adf0f33b0bdafe179e2206ef2b5e6baed}\index{fc::detail::buffered\_istream\_impl@{fc::detail::buffered\_istream\_impl}!\_shared\_read\_buffer\_in\_use@{\_shared\_read\_buffer\_in\_use}}
+\index{\_shared\_read\_buffer\_in\_use@{\_shared\_read\_buffer\_in\_use}!fc::detail::buffered\_istream\_impl@{fc::detail::buffered\_istream\_impl}}
+\doxysubsubsection{\texorpdfstring{\_shared\_read\_buffer\_in\_use}{\_shared\_read\_buffer\_in\_use}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1buffered__istream__impl_adf0f33b0bdafe179e2206ef2b5e6baed} 
+bool fc\+::detail\+::buffered\+\_\+istream\+\_\+impl\+::\+\_\+shared\+\_\+read\+\_\+buffer\+\_\+in\+\_\+use}
+
+
+
+Definition at line \mbox{\hyperlink{buffered__iostream_8cpp_source_l00026}{26}} of file \mbox{\hyperlink{buffered__iostream_8cpp_source}{buffered\+\_\+iostream.\+cpp}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/src/io/\mbox{\hyperlink{buffered__iostream_8cpp}{buffered\+\_\+iostream.\+cpp}}\end{DoxyCompactItemize}

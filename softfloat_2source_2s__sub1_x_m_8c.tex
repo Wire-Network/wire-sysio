@@ -1,0 +1,48 @@
+\doxysection{libraries/softfloat/source/s\+\_\+sub1\+XM.c File Reference}
+\hypertarget{softfloat_2source_2s__sub1_x_m_8c}{}\label{softfloat_2source_2s__sub1_x_m_8c}\index{libraries/softfloat/source/s\_sub1XM.c@{libraries/softfloat/source/s\_sub1XM.c}}
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include "{}platform.\+h"{}}\newline
+{\ttfamily \#include "{}primitive\+Types.\+h"{}}\newline
+Include dependency graph for s\+\_\+sub1\+XM.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=343pt]{softfloat_2source_2s__sub1_x_m_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{softfloat_2source_2s__sub1_x_m_8c_acfd0c4d42546a99d5e9ae0bec9ed24b8}{softfloat\+\_\+sub1\+XM}} (\mbox{\hyperlink{stdint_8h_ad0fca8b15c218d2c687f8c373a71d228}{uint\+\_\+fast8\+\_\+t}} size\+\_\+words, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*}z\+Ptr)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{softfloat_2source_2s__sub1_x_m_8c_acfd0c4d42546a99d5e9ae0bec9ed24b8}\index{s\_sub1XM.c@{s\_sub1XM.c}!softfloat\_sub1XM@{softfloat\_sub1XM}}
+\index{softfloat\_sub1XM@{softfloat\_sub1XM}!s\_sub1XM.c@{s\_sub1XM.c}}
+\doxysubsubsection{\texorpdfstring{softfloat\_sub1XM()}{softfloat\_sub1XM()}}
+{\footnotesize\ttfamily \label{softfloat_2source_2s__sub1_x_m_8c_acfd0c4d42546a99d5e9ae0bec9ed24b8} 
+void softfloat\+\_\+sub1\+XM (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_ad0fca8b15c218d2c687f8c373a71d228}{uint\+\_\+fast8\+\_\+t}}}]{size\+\_\+words}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{z\+Ptr}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2s__sub1_x_m_8c_source_l00043}{43}} of file \mbox{\hyperlink{softfloat_2source_2s__sub1_x_m_8c_source}{s\+\_\+sub1\+XM.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00044\ \{}
+\DoxyCodeLine{00045\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ index,\ lastIndex;}
+\DoxyCodeLine{00046\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ wordA;}
+\DoxyCodeLine{00047\ }
+\DoxyCodeLine{00048\ \ \ \ \ index\ =\ \mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a28a8ad1b8455a20d428c59cf01e36a66}{indexWordLo}}(\ size\_words\ );}
+\DoxyCodeLine{00049\ \ \ \ \ lastIndex\ =\ \mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_aa3af452dd34ad7a607f4ad31c234fda7}{indexWordHi}}(\ size\_words\ );}
+\DoxyCodeLine{00050\ \ \ \ \ \textcolor{keywordflow}{for}\ (;;)\ \{}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ wordA\ =\ zPtr[index];}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ zPtr[index]\ =\ wordA\ -\/\ 1;}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ wordA\ ||\ (index\ ==\ lastIndex)\ )\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ index\ +=\ \mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a22ffd10aefa829eef57da03cff970e45}{wordIncr}};}
+\DoxyCodeLine{00055\ \ \ \ \ \}}
+\DoxyCodeLine{00056\ }
+\DoxyCodeLine{00057\ \}}
+
+\end{DoxyCode}

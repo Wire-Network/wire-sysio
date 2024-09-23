@@ -1,0 +1,9 @@
+<map id="launcher_def::next_ndx" name="launcher_def::next_ndx">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,29,162,55"/>
+<area shape="poly" id="edge2_Node000001_Node000001" title=" " alt="" coords="49,31,43,21,47,11,61,5,84,3,109,5,121,12,119,17,107,10,83,8,62,10,50,15,48,20,54,27"/>
+<area shape="rect" id="Node000002" href="$structlauncher__def.html#ac0e3968f40fee377535b9b5b0a063f47" title=" " alt="" coords="415,29,587,55"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="162,40,399,40,399,45,162,45"/>
+<area shape="rect" id="Node000003" href="$structlauncher__def.html#a938ddf2e57d2b843911ff88678100ea1" title=" " alt="" coords="210,55,367,80"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="162,49,194,53,194,59,162,54"/>
+<area shape="poly" id="edge4_Node000003_Node000002" title=" " alt="" coords="367,55,399,52,400,57,368,61"/>
+</map>

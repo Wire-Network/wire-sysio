@@ -1,0 +1,117 @@
+\doxysection{Separate\+Instance\+Test Class Reference}
+\hypertarget{class_separate_instance_test}{}\label{class_separate_instance_test}\index{SeparateInstanceTest@{SeparateInstanceTest}}
+
+
+Inheritance diagram for Separate\+Instance\+Test\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=192pt]{class_separate_instance_test__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Separate\+Instance\+Test\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=192pt]{class_separate_instance_test__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_separate_instance_test_a50a822b67bbc10d44701d213c2849b09}{Separate\+Instance\+Test}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static void \mbox{\hyperlink{class_separate_instance_test_a7c4a72843a7c4a9be56adef27ecd33c7}{Tear\+Down\+Test\+Case}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{class_separate_instance_test_a04af1b3b711671ecb0778af1330a740f}{count\+\_\+}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static int \mbox{\hyperlink{class_separate_instance_test_a79db6d4cdd6c99b256439cc020f782ef}{global\+\_\+count\+\_\+}} = 0
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{gtest-param-test__test_8cc_source_l00805}{805}} of file \mbox{\hyperlink{gtest-param-test__test_8cc_source}{gtest-\/param-\/test\+\_\+test.\+cc}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_separate_instance_test_a50a822b67bbc10d44701d213c2849b09}\index{SeparateInstanceTest@{SeparateInstanceTest}!SeparateInstanceTest@{SeparateInstanceTest}}
+\index{SeparateInstanceTest@{SeparateInstanceTest}!SeparateInstanceTest@{SeparateInstanceTest}}
+\doxysubsubsection{\texorpdfstring{SeparateInstanceTest()}{SeparateInstanceTest()}}
+{\footnotesize\ttfamily \label{class_separate_instance_test_a50a822b67bbc10d44701d213c2849b09} 
+Separate\+Instance\+Test\+::\+Separate\+Instance\+Test (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-param-test__test_8cc_source_l00807}{807}} of file \mbox{\hyperlink{gtest-param-test__test_8cc_source}{gtest-\/param-\/test\+\_\+test.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00807\ :\ \mbox{\hyperlink{class_separate_instance_test_a04af1b3b711671ecb0778af1330a740f}{count\_}}(0)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_separate_instance_test_a7c4a72843a7c4a9be56adef27ecd33c7}\index{SeparateInstanceTest@{SeparateInstanceTest}!TearDownTestCase@{TearDownTestCase}}
+\index{TearDownTestCase@{TearDownTestCase}!SeparateInstanceTest@{SeparateInstanceTest}}
+\doxysubsubsection{\texorpdfstring{TearDownTestCase()}{TearDownTestCase()}}
+{\footnotesize\ttfamily \label{class_separate_instance_test_a7c4a72843a7c4a9be56adef27ecd33c7} 
+static void Separate\+Instance\+Test\+::\+Tear\+Down\+Test\+Case (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-param-test__test_8cc_source_l00809}{809}} of file \mbox{\hyperlink{gtest-param-test__test_8cc_source}{gtest-\/param-\/test\+\_\+test.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00809\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00810\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ab7a0ff4bfa4d9b27baa118d8b0756ca0}{EXPECT\_GE}}(\mbox{\hyperlink{class_separate_instance_test_a79db6d4cdd6c99b256439cc020f782ef}{global\_count\_}},\ 2)}
+\DoxyCodeLine{00811\ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}If\ some\ (but\ not\ all)\ SeparateInstanceTest\ tests\ have\ been\ "{}}}
+\DoxyCodeLine{00812\ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}filtered\ out\ this\ test\ will\ fail.\ Make\ sure\ that\ all\ "{}}}
+\DoxyCodeLine{00813\ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}GeneratorEvaluationTest\ are\ selected\ or\ de-\/selected\ together\ "{}}}
+\DoxyCodeLine{00814\ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}by\ the\ test\ filter."{}};}
+\DoxyCodeLine{00815\ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{class_separate_instance_test_a04af1b3b711671ecb0778af1330a740f}\index{SeparateInstanceTest@{SeparateInstanceTest}!count\_@{count\_}}
+\index{count\_@{count\_}!SeparateInstanceTest@{SeparateInstanceTest}}
+\doxysubsubsection{\texorpdfstring{count\_}{count\_}}
+{\footnotesize\ttfamily \label{class_separate_instance_test_a04af1b3b711671ecb0778af1330a740f} 
+int Separate\+Instance\+Test\+::count\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-param-test__test_8cc_source_l00818}{818}} of file \mbox{\hyperlink{gtest-param-test__test_8cc_source}{gtest-\/param-\/test\+\_\+test.\+cc}}.
+
+\Hypertarget{class_separate_instance_test_a79db6d4cdd6c99b256439cc020f782ef}\index{SeparateInstanceTest@{SeparateInstanceTest}!global\_count\_@{global\_count\_}}
+\index{global\_count\_@{global\_count\_}!SeparateInstanceTest@{SeparateInstanceTest}}
+\doxysubsubsection{\texorpdfstring{global\_count\_}{global\_count\_}}
+{\footnotesize\ttfamily \label{class_separate_instance_test_a79db6d4cdd6c99b256439cc020f782ef} 
+int Separate\+Instance\+Test\+::global\+\_\+count\+\_\+ = 0\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-param-test__test_8cc_source_l00819}{819}} of file \mbox{\hyperlink{gtest-param-test__test_8cc_source}{gtest-\/param-\/test\+\_\+test.\+cc}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/test/\mbox{\hyperlink{gtest-param-test__test_8cc}{gtest-\/param-\/test\+\_\+test.\+cc}}\end{DoxyCompactItemize}

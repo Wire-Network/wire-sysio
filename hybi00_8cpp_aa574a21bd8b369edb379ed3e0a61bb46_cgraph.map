@@ -1,0 +1,29 @@
+<map id="BOOST_AUTO_TEST_CASE" name="BOOST_AUTO_TEST_CASE">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,173,202,198"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1processor_1_1hybi00.html#aa490b9d9905915023b5f2e42aac59127" title="Extracts client uri from a handshake request." alt="" coords="490,189,653,230"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="202,188,474,202,474,207,202,193"/>
+<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1processor_1_1hybi00.html#a9e3f451bd48b1072a377108eba0cf0f5" title="Get the protocol version of this processor." alt="" coords="264,71,427,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="134,170,249,122,268,115,270,120,251,127,136,175"/>
+<area shape="rect" id="Node000004" href="$namespacewebsocketpp_1_1processor.html#a1a0e5e7b10b24ff5ab836dc543826934" title="Extract the version from a WebSocket handshake request." alt="" coords="262,136,428,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="202,171,246,166,247,171,202,176"/>
+<area shape="rect" id="Node000005" href="$namespacewebsocketpp_1_1processor.html#a9ff3159b48cf4be2e7cb79c81b155d53" title="Determine whether or not a generic HTTP request is a WebSocket handshake." alt="" coords="256,5,435,46"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="115,170,169,116,207,85,248,57,260,50,263,55,251,61,210,89,173,120,119,174"/>
+<area shape="rect" id="Node000007" href="$classwebsocketpp_1_1processor_1_1hybi00.html#a29c4300aa053e7028ee5a46601319afd" title="Calculate the appropriate response for this websocket request." alt="" coords="250,251,441,291"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="143,196,272,243,271,248,141,202"/>
+<area shape="rect" id="Node000013" href="$classwebsocketpp_1_1processor_1_1hybi00.html#a9458e35fabf2b39bd9e09523ad60c22c" title="validate a WebSocket handshake request for this version" alt="" coords="250,316,440,357"/>
+<area shape="poly" id="edge14_Node000001_Node000013" title=" " alt="" coords="120,197,175,247,211,275,251,301,263,307,261,312,248,305,208,280,171,251,116,201"/>
+<area shape="rect" id="Node000006" href="$namespacewebsocketpp_1_1utility.html#a484f1287b93cf58cc6514e46eed41568" title="Find substring (case insensitive)" alt="" coords="502,5,640,46"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="436,23,487,23,487,28,436,28"/>
+<area shape="poly" id="edge7_Node000007_Node000002" title=" " alt="" coords="422,247,478,232,480,237,424,253"/>
+<area shape="rect" id="Node000008" href="$namespacewebsocketpp_1_1md5.html#ab445cdc2367665afb8fd4e983a354e0f" title=" " alt="" coords="489,255,653,295"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="441,270,473,271,473,276,441,275"/>
+<area shape="rect" id="Node000012" href="$classwebsocketpp_1_1uri.html#ad684773687e2b92f2c0d0c9bcad48a17" title=" " alt="" coords="500,320,643,345"/>
+<area shape="poly" id="edge13_Node000007_Node000012" title=" " alt="" coords="424,289,507,312,505,317,422,295"/>
+<area shape="rect" id="Node000009" href="$namespacewebsocketpp_1_1md5.html#afd827a71255e45a8293b9df13342ceb3" title=" " alt="" coords="938,227,1102,267"/>
+<area shape="poly" id="edge9_Node000008_Node000009" title=" " alt="" coords="654,267,922,250,922,256,654,273"/>
+<area shape="rect" id="Node000010" href="$namespacewebsocketpp_1_1md5.html#a29e7adb892ae2de7d2c4853bc7ace034" title=" " alt="" coords="713,197,878,238"/>
+<area shape="poly" id="edge10_Node000008_Node000010" title=" " alt="" coords="652,252,698,240,699,245,654,257"/>
+<area shape="rect" id="Node000011" href="$namespacewebsocketpp_1_1md5.html#a73499ae9912f813cdbb98d27b6487112" title=" " alt="" coords="701,313,890,338"/>
+<area shape="poly" id="edge12_Node000008_Node000011" title=" " alt="" coords="654,291,721,306,720,311,653,296"/>
+<area shape="poly" id="edge11_Node000010_Node000009" title=" " alt="" coords="878,226,922,232,922,237,878,231"/>
+</map>

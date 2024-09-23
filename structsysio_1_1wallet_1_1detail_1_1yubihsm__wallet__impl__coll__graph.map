@@ -1,0 +1,24 @@
+<map id="sysio::wallet::detail::yubihsm_wallet_impl" name="sysio::wallet::detail::yubihsm_wallet_impl">
+<area shape="rect" id="Node000001" title=" " alt="" coords="451,266,601,306"/>
+<area shape="rect" id="Node000002" href="$structyh__connector.html" title=" " alt="" coords="191,137,290,163"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="291,167,428,228,492,263,489,268,426,233,289,172"/>
+<area shape="rect" id="Node000004" href="$structstate.html" title=" " alt="" coords="501,75,551,100"/>
+<area shape="poly" id="edge5_Node000004_Node000002" title=" " alt="" coords="304,134,500,90,501,95,306,139"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="13,137,67,163"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="83,148,190,148,190,153,83,153"/>
+<area shape="poly" id="edge6_Node000004_Node000003" title=" " alt="" coords="81,133,98,128,219,100,342,86,429,83,501,84,500,89,429,88,342,91,220,105,99,133,82,138"/>
+<area shape="rect" id="Node000006" href="$structyh__session.html" title=" " alt="" coords="197,323,284,348"/>
+<area shape="poly" id="edge8_Node000006_Node000003" title=" " alt="" coords="57,175,99,243,129,279,164,309,197,325,195,329,161,314,125,282,95,246,52,178"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="500,112,467,134,428,152,392,159,356,162,290,160,290,154,356,157,392,154,426,147,465,130,497,108"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="218,5,263,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="279,20,349,31,428,49,502,75,500,80,426,54,348,37,278,26"/>
+<area shape="poly" id="edge7_Node000001_Node000006" title=" " alt="" coords="299,325,427,304,450,299,451,305,427,309,300,330"/>
+<area shape="rect" id="Node000007" href="$struct_scp__ctx.html" title=" " alt="" coords="5,323,75,348"/>
+<area shape="poly" id="edge9_Node000006_Node000007" title=" " alt="" coords="90,333,196,333,196,338,90,338"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="214,372,267,398"/>
+<area shape="poly" id="edge10_Node000001_Node000008" title=" " alt="" coords="282,376,350,361,426,337,491,305,493,309,428,342,352,366,283,381"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="163,208,318,249"/>
+<area shape="poly" id="edge11_Node000001_Node000009" title=" " alt="" coords="334,245,451,269,450,274,333,250"/>
+<area shape="rect" id="Node000010" href="$structyh__capabilities.html" title="Capabilities representation." alt="" coords="187,273,294,299"/>
+<area shape="poly" id="edge12_Node000001_Node000010" title=" " alt="" coords="309,284,451,284,451,289,309,289"/>
+</map>

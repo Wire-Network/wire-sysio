@@ -1,0 +1,116 @@
+\doxysection{libraries/chainbase/include/chainbase/undo\+\_\+index.hpp File Reference}
+\hypertarget{undo__index_8hpp}{}\label{undo__index_8hpp}\index{libraries/chainbase/include/chainbase/undo\_index.hpp@{libraries/chainbase/include/chainbase/undo\_index.hpp}}
+{\ttfamily \#include $<$boost/multi\+\_\+index\+\_\+container\+\_\+fwd.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/intrusive/set.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/intrusive/avltree.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/intrusive/slist.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/container/deque.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/throw\+\_\+exception.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/mpl/fold.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/mp11/list.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/mp11/algorithm.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/iterator/transform\+\_\+iterator.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/lexical\+\_\+cast.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/core/demangle.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/interprocess/interprocess\+\_\+fwd.\+hpp$>$}\newline
+{\ttfamily \#include $<$cassert$>$}\newline
+{\ttfamily \#include $<$memory$>$}\newline
+{\ttfamily \#include $<$type\+\_\+traits$>$}\newline
+{\ttfamily \#include $<$sstream$>$}\newline
+Include dependency graph for undo\+\_\+index.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{undo__index_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{undo__index_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structchainbase_1_1scope__exit}{chainbase\+::scope\+\_\+exit$<$ F $>$}}
+\item 
+struct \mbox{\hyperlink{structchainbase_1_1get__key}{chainbase\+::get\+\_\+key$<$ Key\+Extractor, T $>$}}
+\item 
+struct \mbox{\hyperlink{structchainbase_1_1value__holder}{chainbase\+::value\+\_\+holder$<$ T $>$}}
+\item 
+struct \mbox{\hyperlink{structchainbase_1_1offset__node__base}{chainbase\+::offset\+\_\+node\+\_\+base$<$ Tag $>$}}
+\item 
+struct \mbox{\hyperlink{structchainbase_1_1offset__node__traits}{chainbase\+::offset\+\_\+node\+\_\+traits$<$ Tag $>$}}
+\item 
+struct \mbox{\hyperlink{structchainbase_1_1offset__node__value__traits}{chainbase\+::offset\+\_\+node\+\_\+value\+\_\+traits$<$ Node, Tag $>$}}
+\item 
+struct \mbox{\hyperlink{structchainbase_1_1index__tag__impl}{chainbase\+::index\+\_\+tag\+\_\+impl$<$ Index $>$}}
+\item 
+struct \mbox{\hyperlink{structchainbase_1_1index__tag__impl_3_01_index_3_01boost_1_1multi__index_1_1tag_3_01_tag_01_4_00_01_t_8_8_8_01_4_01_4}{chainbase\+::index\+\_\+tag\+\_\+impl$<$ Index$<$ boost\+::multi\+\_\+index\+::tag$<$ Tag $>$, T... $>$ $>$}}
+\item 
+struct \mbox{\hyperlink{structchainbase_1_1set__impl}{chainbase\+::set\+\_\+impl$<$ Node, Ordered\+Index $>$}}
+\item 
+class \mbox{\hyperlink{classchainbase_1_1undo__index}{chainbase\+::undo\+\_\+index$<$ T, Allocator, Indices $>$}}
+\item 
+struct \mbox{\hyperlink{structchainbase_1_1undo__index_1_1node}{chainbase\+::undo\+\_\+index$<$ T, Allocator, Indices $>$\+::node}}
+\item 
+struct \mbox{\hyperlink{structchainbase_1_1undo__index_1_1old__node}{chainbase\+::undo\+\_\+index$<$ T, Allocator, Indices $>$\+::old\+\_\+node}}
+\item 
+struct \mbox{\hyperlink{structchainbase_1_1undo__index_1_1undo__state}{chainbase\+::undo\+\_\+index$<$ T, Allocator, Indices $>$\+::undo\+\_\+state}}
+\item 
+class \mbox{\hyperlink{classchainbase_1_1undo__index_1_1removed__nodes__tracker}{chainbase\+::undo\+\_\+index$<$ T, Allocator, Indices $>$\+::removed\+\_\+nodes\+\_\+tracker}}
+\item 
+class \mbox{\hyperlink{classchainbase_1_1undo__index_1_1session}{chainbase\+::undo\+\_\+index$<$ T, Allocator, Indices $>$\+::session}}
+\item 
+struct \mbox{\hyperlink{structchainbase_1_1undo__index_1_1delta}{chainbase\+::undo\+\_\+index$<$ T, Allocator, Indices $>$\+::delta}}
+\item 
+struct \mbox{\hyperlink{structchainbase_1_1mi__to__ui__ii_3_01_t_00_01boost_1_1mp11_1_1mp__list_3_01_i_8_8_8_01_4_00_01_a_01_4}{chainbase\+::mi\+\_\+to\+\_\+ui\+\_\+ii$<$ T, boost\+::mp11\+::mp\+\_\+list$<$ I... $>$, A $>$}}
+\item 
+struct \mbox{\hyperlink{structchainbase_1_1to__mp11}{chainbase\+::to\+\_\+mp11}}
+\item 
+struct \mbox{\hyperlink{structchainbase_1_1multi__index__to__undo__index__impl_3_01boost_1_1multi__index__container_3_01_t_00_01_i_00_01_a_01_4_01_4}{chainbase\+::multi\+\_\+index\+\_\+to\+\_\+undo\+\_\+index\+\_\+impl$<$ boost\+::multi\+\_\+index\+\_\+container$<$ T, I, A $>$ $>$}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacechainbase}{chainbase}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} , typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\using \mbox{\hyperlink{namespacechainbase_ab393a73784cf7c18f134020f89ec4d8e}{chainbase\+::rebind\+\_\+alloc\+\_\+t}} = typename std\+::allocator\+\_\+traits$<$\mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}$>$\mbox{\hyperlink{yubihsm__pkcs11_8c_a53ef06e29c840024a683512c1acd791a}{\+::template}} rebind\+\_\+alloc$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$
+\item 
+{\footnotesize template$<$typename Index $>$ }\\using \mbox{\hyperlink{namespacechainbase_a53a1a10db2a565e854e5e3a1f25623ac}{chainbase\+::index\+\_\+tag}} = typename \mbox{\hyperlink{structchainbase_1_1index__tag__impl}{index\+\_\+tag\+\_\+impl}}$<$Index$>$\+::type
+\item 
+{\footnotesize template$<$typename Tag , typename... Indices$>$ }\\using \mbox{\hyperlink{namespacechainbase_a724422843d7f02bc2b77bbb03169f530}{chainbase\+::find\+\_\+tag}} = boost\+::mp11\+::mp\+\_\+find$<$boost\+::mp11\+::mp\+\_\+list$<$\mbox{\hyperlink{namespacechainbase_a53a1a10db2a565e854e5e3a1f25623ac}{index\+\_\+tag}}$<$Indices$>$...$>$, Tag$>$
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{make__512_8cpp_a3d4e997ddc51e0c06c306fe4862826c0}{K}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ }\\using \mbox{\hyperlink{namespacechainbase_aeccf7abd24979f2c4c91764b42473a25}{chainbase\+::hook}} = \mbox{\hyperlink{structchainbase_1_1offset__node__base}{offset\+\_\+node\+\_\+base}}$<$\mbox{\hyperlink{make__512_8cpp_a3d4e997ddc51e0c06c306fe4862826c0}{K}}$>$
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{struct_node}{Node}} , typename Ordered\+Index $>$ }\\using \mbox{\hyperlink{namespacechainbase_a33abc5322d42584391451ecb393b69ef}{chainbase\+::set\+\_\+base}}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{struct_node}{Node}} , typename Tag $>$ }\\using \mbox{\hyperlink{namespacechainbase_a83f750f92c09e4b3046069370df53cb3}{chainbase\+::list\+\_\+base}}
+\item 
+{\footnotesize template$<$typename Multi\+Index\+Container $>$ }\\using \mbox{\hyperlink{namespacechainbase_a8f797a59401f3deae45451f837bd6ebe}{chainbase\+::multi\+\_\+index\+\_\+to\+\_\+undo\+\_\+index}} = typename \mbox{\hyperlink{structchainbase_1_1multi__index__to__undo__index__impl}{multi\+\_\+index\+\_\+to\+\_\+undo\+\_\+index\+\_\+impl}}$<$Multi\+Index\+Container$>$\+::type
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename L , typename It , typename Pred , typename Disposer $>$ }\\void \mbox{\hyperlink{namespacechainbase_aec4740f07ccecf1428a4b8e9afbfddd8}{chainbase\+::remove\+\_\+if\+\_\+after\+\_\+and\+\_\+dispose}} (L \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}, It it, It end, Pred \&\&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}, Disposer \&\&d)
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a53ef06e29c840024a683512c1acd791a}{template}}$<$ typename $>$ \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} A, typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\auto \& \mbox{\hyperlink{namespacechainbase_a2f6d9d0be71ceec29f4addc19c04cf8e}{chainbase\+::propagate\+\_\+allocator}} (\mbox{\hyperlink{struct_a}{A}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{struct_s}{S}} $>$ }\\auto \& \mbox{\hyperlink{namespacechainbase_a19f53993eadfa12c519b5b76cc896274}{chainbase\+::propagate\+\_\+allocator}} (boost\+::interprocess\+::allocator$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{struct_s}{S}} $>$ \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{struct_s}{S}} , std\+::size\+\_\+t N$>$ }\\auto \mbox{\hyperlink{namespacechainbase_a96c38a4337e82e2dfb3fdee13209a5d6}{chainbase\+::propagate\+\_\+allocator}} (boost\+::interprocess\+::node\+\_\+allocator$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{struct_s}{S}}, \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}} $>$ \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{struct_s}{S}} , std\+::size\+\_\+t N$>$ }\\auto \mbox{\hyperlink{namespacechainbase_ab8bf024c26382945b93ab51037b650ab}{chainbase\+::propagate\+\_\+allocator}} (boost\+::interprocess\+::private\+\_\+node\+\_\+allocator$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{struct_s}{S}}, \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}} $>$ \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{struct_s}{S}} $>$ }\\auto \mbox{\hyperlink{namespacechainbase_a761257075b1f3b6833f0e4a9df22cdaa}{chainbase\+::propagate\+\_\+allocator}} (\mbox{\hyperlink{classchainbase_1_1chainbase__node__allocator}{chainbase\+::chainbase\+\_\+node\+\_\+allocator}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{struct_s}{S}} $>$ \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename Ordered\+Index $>$ }\\constexpr bool \mbox{\hyperlink{namespacechainbase_a90a397df3938592d7f8b76c0d4d3c4a6}{chainbase\+::is\+\_\+valid\+\_\+index}} = false
+\end{DoxyCompactItemize}

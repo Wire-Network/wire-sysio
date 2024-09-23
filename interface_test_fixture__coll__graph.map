@@ -1,0 +1,10 @@
+<map id="TestFixture" name="TestFixture">
+<area shape="rect" id="Node000001" title=" " alt="" coords="56,169,142,195"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,84,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="47,47,50,75,56,105,73,140,92,167,87,170,68,142,51,107,44,76,42,47"/>
+<area shape="rect" id="Node000004" href="$interface_test_obj.html" title=" " alt="" coords="66,80,132,106"/>
+<area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="65,42,92,79,88,82,61,45"/>
+<area shape="rect" id="Node000003" href="$protocol_oc_fixture-p.html" title=" " alt="" coords="156,80,250,106"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="179,118,115,171,112,167,176,114"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="102,122,102,169,96,169,96,122"/>
+</map>

@@ -1,0 +1,199 @@
+\chapter{test-\/cases-\/and-\/sections}
+\hypertarget{md_libraries_2sys-vm_2external_2_catch2_2docs_2test-cases-and-sections}{}\label{md_libraries_2sys-vm_2external_2_catch2_2docs_2test-cases-and-sections}\index{test-\/cases-\/and-\/sections@{test-\/cases-\/and-\/sections}}
+\label{_top}%
+ \doxysection*{\doxylink{class_test}{Test} cases and sections}
+
+{\bfseries{Contents}}~\newline
+ Tags~\newline
+ Tag aliases~\newline
+ BDD-\/style test cases~\newline
+ Type parametrised test cases~\newline
+
+
+While \doxylink{namespace_catch}{Catch} fully supports the traditional, x\+Unit, style of class-\/based fixtures containing test case methods this is not the preferred style.
+
+Instead \doxylink{namespace_catch}{Catch} provides a powerful mechanism for nesting test case sections within a test case. For a more detailed discussion see the \href{tutorial.md\#test-cases-and-sections}{\texttt{ tutorial}}.
+
+\doxylink{class_test}{Test} cases and sections are very easy to use in practice\+:
+
+
+\begin{DoxyItemize}
+\item {\bfseries{TEST\+\_\+\+CASE(\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*} {\itshape test name} \mbox{[}, {\itshape tags} \mbox{]} \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*})}}
+\item {\bfseries{SECTION(\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*} {\itshape section name} \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*})}}
+\end{DoxyItemize}
+
+{\itshape test name} and {\itshape section name} are free form, quoted, strings. The optional {\itshape tags} argument is a quoted string containing one or more tags enclosed in square brackets. Tags are discussed below. \doxylink{class_test}{Test} names must be unique within the \doxylink{namespace_catch}{Catch} executable.
+
+For examples see the \href{tutorial.md\#top}{\texttt{ Tutorial}}
+
+\doxysubsection*{Tags}
+
+Tags allow an arbitrary number of additional strings to be associated with a test case. \doxylink{class_test}{Test} cases can be selected (for running, or just for listing) by tag -\/ or even by an expression that combines several tags. At their most basic level they provide a simple way to group several related tests together.
+
+As an example -\/ given the following test cases\+: \begin{DoxyVerb}TEST_CASE( "A", "[widget]" ) { /* ... */ }
+TEST_CASE( "B", "[widget]" ) { /* ... */ }
+TEST_CASE( "C", "[gadget]" ) { /* ... */ }
+TEST_CASE( "D", "[widget][gadget]" ) { /* ... */ }
+\end{DoxyVerb}
+
+
+The tag expression, {\ttfamily "{}\mbox{[}widget\mbox{]}"{}} selects \doxylink{struct_a}{A}, \doxylink{namespace_b}{B} \& D. {\ttfamily "{}\mbox{[}gadget\mbox{]}"{}} selects C \& D. {\ttfamily "{}\mbox{[}widget\mbox{]}\mbox{[}gadget\mbox{]}"{}} selects just D and {\ttfamily "{}\mbox{[}widget\mbox{]},\mbox{[}gadget\mbox{]}"{}} selects all four test cases.
+
+For more detail on command line selection see \href{command-line.md\#specifying-which-tests-to-run}{\texttt{ the command line docs}}
+
+Tag names are not case sensitive and can contain any \doxylink{struct_a_s_c_i_i}{ASCII} characters. This means that tags {\ttfamily \mbox{[}tag with spaces\mbox{]}} and {\ttfamily \mbox{[}I said "{}good day"{}\mbox{]}} are both allowed tags and can be filtered on. Escapes are not supported however and {\ttfamily \mbox{[}\textbackslash{}\mbox{]}\mbox{]}} is not a valid tag.
+
+\doxysubsubsection*{Special Tags}
+
+All tag names beginning with non-\/alphanumeric characters are reserved by \doxylink{namespace_catch}{Catch}. \doxylink{namespace_catch}{Catch} defines a number of "{}special"{} tags, which have meaning to the test runner itself. These special tags all begin with a symbol character. Following is a list of currently defined special tags and their meanings.
+
+
+\begin{DoxyItemize}
+\item {\ttfamily \mbox{[}!hide\mbox{]}} or {\ttfamily \mbox{[}.\mbox{]}} -\/ causes test cases to be skipped from the default list (i.\+e. when no test cases have been explicitly selected through tag expressions or name wildcards). The hide tag is often combined with another, user, tag (for example {\ttfamily \mbox{[}.\mbox{]}\mbox{[}integration\mbox{]}} -\/ so all integration tests are excluded from the default run but can be run by passing {\ttfamily \mbox{[}integration\mbox{]}} on the command line). As a short-\/cut you can combine these by simply prefixing your user tag with a {\ttfamily .} -\/ e.\+g. {\ttfamily \mbox{[}.integration\mbox{]}}. Because the hide tag has evolved to have several forms, all forms are added as tags if you use one of them.
+\item {\ttfamily \mbox{[}!throws\mbox{]}} -\/ lets \doxylink{namespace_catch}{Catch} know that this test is likely to throw an exception even if successful. This causes the test to be excluded when running with {\ttfamily -\/e} or {\ttfamily -\/-\/nothrow}.
+\item {\ttfamily \mbox{[}!mayfail\mbox{]}} -\/ doesn\textquotesingle{}t fail the test if any given assertion fails (but still reports it). This can be useful to flag a work-\/in-\/progress, or a known issue that you don\textquotesingle{}t want to immediately fix but still want to track in your tests.
+\item {\ttfamily \mbox{[}!shouldfail\mbox{]}} -\/ like {\ttfamily \mbox{[}!mayfail\mbox{]}} but {\itshape fails} the test if it {\itshape passes}. This can be useful if you want to be notified of accidental, or third-\/party, fixes.
+\item {\ttfamily \mbox{[}!nonportable\mbox{]}} -\/ Indicates that behaviour may vary between platforms or compilers.
+\item {\ttfamily \mbox{[}\#\texorpdfstring{$<$}{<}filename\texorpdfstring{$>$}{>}\mbox{]}} -\/ running with {\ttfamily -\/\#} or {\ttfamily -\/-\/filenames-\/as-\/tags} causes \doxylink{namespace_catch}{Catch} to add the filename, prefixed with {\ttfamily \#} (and with any extension stripped), as a tag to all contained tests, e.\+g. tests in testfile.\+cpp would all be tagged {\ttfamily \mbox{[}\#testfile\mbox{]}}.
+\item {\ttfamily \mbox{[}@\texorpdfstring{$<$}{<}alias\texorpdfstring{$>$}{>}\mbox{]}} -\/ tag aliases all begin with {\ttfamily @} (see below).
+\item {\ttfamily \mbox{[}!benchmark\mbox{]}} -\/ this test case is actually a benchmark. This is an experimental feature, and currently has no documentation. If you want to try it out, look at {\ttfamily projects/\+Self\+Test/\+Benchmark.\+tests.\+cpp} for details.
+\end{DoxyItemize}
+
+\doxysubsection*{Tag aliases}
+
+Between tag expressions and wildcarded test names (as well as combinations of the two) quite complex patterns can be constructed to direct which test cases are run. If a complex pattern is used often it is convenient to be able to create an alias for the expression. This can be done, in code, using the following form\+: \begin{DoxyVerb}CATCH_REGISTER_TAG_ALIAS( <alias string>, <tag expression> )
+\end{DoxyVerb}
+
+
+Aliases must begin with the {\ttfamily @} character. An example of a tag alias is\+: \begin{DoxyVerb}CATCH_REGISTER_TAG_ALIAS( "[@nhf]", "[failing]~[.]" )
+\end{DoxyVerb}
+
+
+Now when {\ttfamily \mbox{[}@nhf\mbox{]}} is used on the command line this matches all tests that are tagged {\ttfamily \mbox{[}failing\mbox{]}}, but which are not also hidden.
+
+\doxysubsection*{BDD-\/style test cases}
+
+In addition to \doxylink{namespace_catch}{Catch}\textquotesingle{}s take on the classic style of test cases, \doxylink{namespace_catch}{Catch} supports an alternative syntax that allow tests to be written as "{}executable specifications"{} (one of the early goals of \href{http://dannorth.net/introducing-bdd/}{\texttt{ Behaviour Driven Development}}). This set of macros map on to {\ttfamily TEST\+\_\+\+CASE}s and {\ttfamily SECTION}s, with a little internal support to make them smoother to work with.
+
+
+\begin{DoxyItemize}
+\item {\bfseries{SCENARIO(\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*} {\itshape scenario name} \mbox{[}, {\itshape tags} \mbox{]} \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*})}}
+\end{DoxyItemize}
+
+This macro maps onto {\ttfamily TEST\+\_\+\+CASE} and works in the same way, except that the test case name will be prefixed by "{}\+Scenario\+: "{}
+
+
+\begin{DoxyItemize}
+\item {\bfseries{GIVEN(\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*} {\itshape something} \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*})}}
+\item {\bfseries{WHEN(\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*} {\itshape something} \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*})}}
+\item {\bfseries{THEN(\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*} {\itshape something} \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*})}}
+\end{DoxyItemize}
+
+These macros map onto {\ttfamily SECTION}s except that the section names are the \+\_\+something\+\_\+s prefixed by "{}given\+: "{}, "{}when\+: "{} or "{}then\+: "{} respectively.
+
+
+\begin{DoxyItemize}
+\item {\bfseries{AND\+\_\+\+WHEN(\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*} {\itshape something} \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*})}}
+\item {\bfseries{AND\+\_\+\+THEN(\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*} {\itshape something} \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*})}}
+\end{DoxyItemize}
+
+Similar to {\ttfamily WHEN} and {\ttfamily THEN} except that the prefixes start with "{}and "{}. These are used to chain {\ttfamily WHEN}s and {\ttfamily THEN}s together.
+
+When any of these macros are used the console reporter recognises them and formats the test case header such that the Givens, Whens and Thens are aligned to aid readability.
+
+Other than the additional prefixes and the formatting in the console reporter these macros behave exactly as {\ttfamily TEST\+\_\+\+CASE}s and {\ttfamily SECTION}s. As such there is nothing enforcing the correct sequencing of these macros -\/ that\textquotesingle{}s up to the programmer!
+
+\doxysubsection*{Type parametrised test cases}
+
+In addition to {\ttfamily TEST\+\_\+\+CASE}s, Catch2 also supports test cases parametrised by types, in the form of {\ttfamily TEMPLATE\+\_\+\+TEST\+\_\+\+CASE} and {\ttfamily TEMPLATE\+\_\+\+PRODUCT\+\_\+\+TEST\+\_\+\+CASE}.
+
+
+\begin{DoxyItemize}
+\item {\bfseries{TEMPLATE\+\_\+\+TEST\+\_\+\+CASE(\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*} {\itshape test name} , {\itshape tags}, {\itshape type1}, {\itshape type2}, ..., {\itshape typen} \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*})}}
+\end{DoxyItemize}
+
+{\itshape test name} and {\itshape tag} are exactly the same as they are in {\ttfamily TEST\+\_\+\+CASE}, with the difference that the tag string must be provided (however, it can be empty). {\itshape type1} through {\itshape typen} is the list of types for which this test case should run, and, inside the test code, the current type is available as the {\ttfamily Test\+Type} type.
+
+Because of limitations of the C++ preprocessor, if you want to specify a type with multiple template parameters, you need to enclose it in parentheses, e.\+g. {\ttfamily std\+::map\texorpdfstring{$<$}{<}int, std\+::string\texorpdfstring{$>$}{>}} needs to be passed as {\ttfamily (std\+::map\texorpdfstring{$<$}{<}int, std\+::string\texorpdfstring{$>$}{>})}.
+
+Example\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{include_2catch_8hpp_a9a88d21bfca0d58782cc5f0811801303}{TEMPLATE\_TEST\_CASE}}(\ \textcolor{stringliteral}{"{}vectors\ can\ be\ sized\ and\ resized"{}},\ \textcolor{stringliteral}{"{}[vector][template]"{}},\ \textcolor{keywordtype}{int},\ std::string,\ (std::tuple<int,float>)\ )\ \{}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ std::vector<TestType>\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}(\ 5\ );}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.size()\ ==\ 5\ );}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.capacity()\ >=\ 5\ );}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\ \textcolor{stringliteral}{"{}resizing\ bigger\ changes\ size\ and\ capacity"{}}\ )\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.resize(\ 10\ );}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.size()\ ==\ 10\ );}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.capacity()\ >=\ 10\ );}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\ \textcolor{stringliteral}{"{}resizing\ smaller\ changes\ size\ but\ not\ capacity"{}}\ )\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.resize(\ 0\ );}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.size()\ ==\ 0\ );}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.capacity()\ >=\ 5\ );}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\ \textcolor{stringliteral}{"{}We\ can\ use\ the\ 'swap\ trick'\ to\ reset\ the\ capacity"{}}\ )\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ std::vector<TestType>\ empty;}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ empty.swap(\ v\ );}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.capacity()\ ==\ 0\ );}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\ \textcolor{stringliteral}{"{}reserving\ smaller\ does\ not\ change\ size\ or\ capacity"{}}\ )\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.reserve(\ 0\ );}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.size()\ ==\ 5\ );}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.capacity()\ >=\ 5\ );}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+
+\begin{DoxyItemize}
+\item {\bfseries{TEMPLATE\+\_\+\+PRODUCT\+\_\+\+TEST\+\_\+\+CASE(\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*} {\itshape test name} , {\itshape tags}, ({\itshape template-\/type1}, {\itshape template-\/type2}, ..., {\itshape template-\/typen}), ({\itshape template-\/arg1}, {\itshape template-\/arg2}, ..., {\itshape template-\/argm}) \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*})}}
+\end{DoxyItemize}
+
+{\itshape template-\/type1} through {\itshape template-\/typen} is list of template template types which should be combined with each of {\itshape template-\/arg1} through {\itshape template-\/argm}, resulting in {\itshape n \texorpdfstring{$\ast$}{*} m} test cases. Inside the test case, the resulting type is available under the name of {\ttfamily Test\+Type}.
+
+To specify more than 1 type as a single {\itshape template-\/type} or {\itshape template-\/arg}, you must enclose the types in an additional set of parentheses, e.\+g. {\ttfamily ((int, float), (char, double))} specifies 2 template-\/args, each consisting of 2 concrete types ({\ttfamily int}, {\ttfamily float} and {\ttfamily char}, {\ttfamily double} respectively). You can also omit the outer set of parentheses if you specify only one type as the full set of either the {\itshape template-\/types}, or the {\itshape template-\/args}.
+
+Example\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{template}<\ \textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_foo}{Foo}}\ \{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{size\_t}\ size()\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{\};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\mbox{\hyperlink{include_2catch_8hpp_a76578a19e481e4ccdb928e68a17478d5}{TEMPLATE\_PRODUCT\_TEST\_CASE}}(\textcolor{stringliteral}{"{}A\ Template\ product\ test\ case"{}},\ \textcolor{stringliteral}{"{}[template][product]"{}},\ (std::vector,\ \mbox{\hyperlink{struct_foo}{Foo}}),\ (\textcolor{keywordtype}{int},\ \textcolor{keywordtype}{float}))\ \{}
+\DoxyCodeLine{\ \ \ \ TestType\ x;}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(x.size()\ ==\ 0);}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+You can also have different arities in the {\itshape template-\/arg} packs\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{include_2catch_8hpp_a76578a19e481e4ccdb928e68a17478d5}{TEMPLATE\_PRODUCT\_TEST\_CASE}}(\textcolor{stringliteral}{"{}Product\ with\ differing\ arities"{}},\ \textcolor{stringliteral}{"{}[template][product]"{}},\ std::tuple,\ (\textcolor{keywordtype}{int},\ (\textcolor{keywordtype}{int},\ \textcolor{keywordtype}{double}),\ (\textcolor{keywordtype}{int},\ \textcolor{keywordtype}{double},\ \textcolor{keywordtype}{float})))\ \{}
+\DoxyCodeLine{\ \ \ \ TestType\ x;}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(std::tuple\_size<TestType>::value\ >=\ 1);}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+{\itshape While there is an upper limit on the number of types you can specify in single {\ttfamily TEMPLATE\+\_\+\+TEST\+\_\+\+CASE} or {\ttfamily TEMPLATE\+\_\+\+PRODUCT\+\_\+\+TEST\+\_\+\+CASE}, the limit is very high and should not be encountered in practice.}
+
+\DoxyHorRuler{0}
+
+
+\href{Readme.md\#top}{\texttt{ Home}} 

@@ -1,0 +1,11 @@
+<map id="create_session" name="create_session">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,55,115,80"/>
+<area shape="rect" id="Node000002" href="$list_8c.html#a06a2b45f704182a7d152c88d0507700c" title=" " alt="" coords="163,5,250,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="100,51,151,34,152,39,101,57"/>
+<area shape="rect" id="Node000004" href="$list_8c.html#ac6c8b33b4100dfc73c933f3e936f86a1" title=" " alt="" coords="166,55,247,80"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="115,65,150,65,150,70,115,70"/>
+<area shape="rect" id="Node000005" href="$yubihsm__pkcs11_8c.html#adc4bd59a60361844aa0e852efa210105" title=" " alt="" coords="172,104,240,130"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="101,78,158,98,157,103,100,84"/>
+<area shape="rect" id="Node000003" href="$yubihsm__pkcs11_8c.html#ae785d5badbf1f08b491af31f32a135a1" title=" " alt="" coords="298,5,369,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="251,16,283,16,283,21,251,21"/>
+</map>

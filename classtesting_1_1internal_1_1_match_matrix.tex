@@ -1,0 +1,271 @@
+\doxysection{testing\+::internal\+::Match\+Matrix Class Reference}
+\hypertarget{classtesting_1_1internal_1_1_match_matrix}{}\label{classtesting_1_1internal_1_1_match_matrix}\index{testing::internal::MatchMatrix@{testing::internal::MatchMatrix}}
+
+
+{\ttfamily \#include $<$gmock-\/matchers.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_match_matrix_afa3313976a69b2a954b2f8b8840c37bb}{Match\+Matrix}} (size\+\_\+t num\+\_\+elements, size\+\_\+t num\+\_\+matchers)
+\item 
+size\+\_\+t \mbox{\hyperlink{classtesting_1_1internal_1_1_match_matrix_a337d9793c61d985dbc1be166e34eed61}{Lhs\+Size}} () const
+\item 
+size\+\_\+t \mbox{\hyperlink{classtesting_1_1internal_1_1_match_matrix_aff068e9fed3a42466c5da8766ac43134}{Rhs\+Size}} () const
+\item 
+bool \mbox{\hyperlink{classtesting_1_1internal_1_1_match_matrix_a94c7641a932739734cb2207b1bca4036}{Has\+Edge}} (size\+\_\+t ilhs, size\+\_\+t irhs) const
+\item 
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_match_matrix_aac7e9c6e0e4b51e6b1334829a0781021}{Set\+Edge}} (size\+\_\+t ilhs, size\+\_\+t irhs, bool b)
+\item 
+bool \mbox{\hyperlink{classtesting_1_1internal_1_1_match_matrix_a3a35e2d6107c225537d7e776465a7893}{Next\+Graph}} ()
+\item 
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_match_matrix_aff1f0ae748f4a5c96117c0f27b493ac6}{Randomize}} ()
+\item 
+std\+::string \mbox{\hyperlink{classtesting_1_1internal_1_1_match_matrix_a37c7a88ac2e9d5012a1ecf1b19869c6c}{Debug\+String}} () const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l03609}{3609}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_match_matrix_afa3313976a69b2a954b2f8b8840c37bb}\index{testing::internal::MatchMatrix@{testing::internal::MatchMatrix}!MatchMatrix@{MatchMatrix}}
+\index{MatchMatrix@{MatchMatrix}!testing::internal::MatchMatrix@{testing::internal::MatchMatrix}}
+\doxysubsubsection{\texorpdfstring{MatchMatrix()}{MatchMatrix()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_match_matrix_afa3313976a69b2a954b2f8b8840c37bb} 
+testing\+::internal\+::\+Match\+Matrix\+::\+Match\+Matrix (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{num\+\_\+elements}{, }\item[{size\+\_\+t}]{num\+\_\+matchers}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l03611}{3611}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03612\ \ \ \ \ \ \ :\ num\_elements\_(num\_elements),}
+\DoxyCodeLine{03613\ \ \ \ \ \ \ \ \ num\_matchers\_(num\_matchers),}
+\DoxyCodeLine{03614\ \ \ \ \ \ \ \ \ matched\_(num\_elements\_*\ num\_matchers\_,\ 0)\ \{}
+\DoxyCodeLine{03615\ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_match_matrix_a37c7a88ac2e9d5012a1ecf1b19869c6c}\index{testing::internal::MatchMatrix@{testing::internal::MatchMatrix}!DebugString@{DebugString}}
+\index{DebugString@{DebugString}!testing::internal::MatchMatrix@{testing::internal::MatchMatrix}}
+\doxysubsubsection{\texorpdfstring{DebugString()}{DebugString()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_match_matrix_a37c7a88ac2e9d5012a1ecf1b19869c6c} 
+std\+::string testing\+::internal\+::\+Match\+Matrix\+::\+Debug\+String (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8cc_source_l00381}{381}} of file \mbox{\hyperlink{gmock-matchers_8cc_source}{gmock-\/matchers.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00381\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00382\ \ \ ::std::stringstream\ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}};}
+\DoxyCodeLine{00383\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ sep\ =\ \textcolor{stringliteral}{"{}"{}};}
+\DoxyCodeLine{00384\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{classtesting_1_1internal_1_1_match_matrix_a337d9793c61d985dbc1be166e34eed61}{LhsSize}}();\ ++i)\ \{}
+\DoxyCodeLine{00385\ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}\ <<\ sep;}
+\DoxyCodeLine{00386\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ =\ 0;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ <\ \mbox{\hyperlink{classtesting_1_1internal_1_1_match_matrix_aff068e9fed3a42466c5da8766ac43134}{RhsSize}}();\ ++\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}})\ \{}
+\DoxyCodeLine{00387\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}\ <<\ \mbox{\hyperlink{classtesting_1_1internal_1_1_match_matrix_a94c7641a932739734cb2207b1bca4036}{HasEdge}}(i,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}});}
+\DoxyCodeLine{00388\ \ \ \ \ \}}
+\DoxyCodeLine{00389\ \ \ \ \ sep\ =\ \textcolor{stringliteral}{"{};"{}};}
+\DoxyCodeLine{00390\ \ \ \}}
+\DoxyCodeLine{00391\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}.str();}
+\DoxyCodeLine{00392\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_match_matrix_a37c7a88ac2e9d5012a1ecf1b19869c6c_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_match_matrix_a37c7a88ac2e9d5012a1ecf1b19869c6c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_match_matrix_a94c7641a932739734cb2207b1bca4036}\index{testing::internal::MatchMatrix@{testing::internal::MatchMatrix}!HasEdge@{HasEdge}}
+\index{HasEdge@{HasEdge}!testing::internal::MatchMatrix@{testing::internal::MatchMatrix}}
+\doxysubsubsection{\texorpdfstring{HasEdge()}{HasEdge()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_match_matrix_a94c7641a932739734cb2207b1bca4036} 
+bool testing\+::internal\+::\+Match\+Matrix\+::\+Has\+Edge (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{ilhs}{, }\item[{size\+\_\+t}]{irhs}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l03619}{3619}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03619\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{03620\ \ \ \ \ \textcolor{keywordflow}{return}\ matched\_[SpaceIndex(ilhs,\ irhs)]\ ==\ 1;}
+\DoxyCodeLine{03621\ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_match_matrix_a94c7641a932739734cb2207b1bca4036_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_match_matrix_a337d9793c61d985dbc1be166e34eed61}\index{testing::internal::MatchMatrix@{testing::internal::MatchMatrix}!LhsSize@{LhsSize}}
+\index{LhsSize@{LhsSize}!testing::internal::MatchMatrix@{testing::internal::MatchMatrix}}
+\doxysubsubsection{\texorpdfstring{LhsSize()}{LhsSize()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_match_matrix_a337d9793c61d985dbc1be166e34eed61} 
+size\+\_\+t testing\+::internal\+::\+Match\+Matrix\+::\+Lhs\+Size (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l03617}{3617}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03617\ \{\ \textcolor{keywordflow}{return}\ num\_elements\_;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_match_matrix_a337d9793c61d985dbc1be166e34eed61_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_match_matrix_a3a35e2d6107c225537d7e776465a7893}\index{testing::internal::MatchMatrix@{testing::internal::MatchMatrix}!NextGraph@{NextGraph}}
+\index{NextGraph@{NextGraph}!testing::internal::MatchMatrix@{testing::internal::MatchMatrix}}
+\doxysubsubsection{\texorpdfstring{NextGraph()}{NextGraph()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_match_matrix_a3a35e2d6107c225537d7e776465a7893} 
+bool testing\+::internal\+::\+Match\+Matrix\+::\+Next\+Graph (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8cc_source_l00358}{358}} of file \mbox{\hyperlink{gmock-matchers_8cc_source}{gmock-\/matchers.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00358\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00359\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ ilhs\ =\ 0;\ ilhs\ <\ \mbox{\hyperlink{classtesting_1_1internal_1_1_match_matrix_a337d9793c61d985dbc1be166e34eed61}{LhsSize}}();\ ++ilhs)\ \{}
+\DoxyCodeLine{00360\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ irhs\ =\ 0;\ irhs\ <\ \mbox{\hyperlink{classtesting_1_1internal_1_1_match_matrix_aff068e9fed3a42466c5da8766ac43134}{RhsSize}}();\ ++irhs)\ \{}
+\DoxyCodeLine{00361\ \ \ \ \ \ \ \textcolor{keywordtype}{char}\&\ b\ =\ matched\_[SpaceIndex(ilhs,\ irhs)];}
+\DoxyCodeLine{00362\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!b)\ \{}
+\DoxyCodeLine{00363\ \ \ \ \ \ \ \ \ b\ =\ 1;}
+\DoxyCodeLine{00364\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00365\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00366\ \ \ \ \ \ \ b\ =\ 0;}
+\DoxyCodeLine{00367\ \ \ \ \ \}}
+\DoxyCodeLine{00368\ \ \ \}}
+\DoxyCodeLine{00369\ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00370\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_match_matrix_a3a35e2d6107c225537d7e776465a7893_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_match_matrix_a3a35e2d6107c225537d7e776465a7893_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_match_matrix_aff1f0ae748f4a5c96117c0f27b493ac6}\index{testing::internal::MatchMatrix@{testing::internal::MatchMatrix}!Randomize@{Randomize}}
+\index{Randomize@{Randomize}!testing::internal::MatchMatrix@{testing::internal::MatchMatrix}}
+\doxysubsubsection{\texorpdfstring{Randomize()}{Randomize()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_match_matrix_aff1f0ae748f4a5c96117c0f27b493ac6} 
+void testing\+::internal\+::\+Match\+Matrix\+::\+Randomize (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8cc_source_l00372}{372}} of file \mbox{\hyperlink{gmock-matchers_8cc_source}{gmock-\/matchers.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00372\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00373\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ ilhs\ =\ 0;\ ilhs\ <\ \mbox{\hyperlink{classtesting_1_1internal_1_1_match_matrix_a337d9793c61d985dbc1be166e34eed61}{LhsSize}}();\ ++ilhs)\ \{}
+\DoxyCodeLine{00374\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ irhs\ =\ 0;\ irhs\ <\ \mbox{\hyperlink{classtesting_1_1internal_1_1_match_matrix_aff068e9fed3a42466c5da8766ac43134}{RhsSize}}();\ ++irhs)\ \{}
+\DoxyCodeLine{00375\ \ \ \ \ \ \ \textcolor{keywordtype}{char}\&\ b\ =\ matched\_[SpaceIndex(ilhs,\ irhs)];}
+\DoxyCodeLine{00376\ \ \ \ \ \ \ b\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{char}\textcolor{keyword}{>}(rand()\ \&\ 1);\ \ \textcolor{comment}{//\ NOLINT}}
+\DoxyCodeLine{00377\ \ \ \ \ \}}
+\DoxyCodeLine{00378\ \ \ \}}
+\DoxyCodeLine{00379\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_match_matrix_aff1f0ae748f4a5c96117c0f27b493ac6_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_match_matrix_aff1f0ae748f4a5c96117c0f27b493ac6_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_match_matrix_aff068e9fed3a42466c5da8766ac43134}\index{testing::internal::MatchMatrix@{testing::internal::MatchMatrix}!RhsSize@{RhsSize}}
+\index{RhsSize@{RhsSize}!testing::internal::MatchMatrix@{testing::internal::MatchMatrix}}
+\doxysubsubsection{\texorpdfstring{RhsSize()}{RhsSize()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_match_matrix_aff068e9fed3a42466c5da8766ac43134} 
+size\+\_\+t testing\+::internal\+::\+Match\+Matrix\+::\+Rhs\+Size (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l03618}{3618}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03618\ \{\ \textcolor{keywordflow}{return}\ num\_matchers\_;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_match_matrix_aff068e9fed3a42466c5da8766ac43134_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_match_matrix_aac7e9c6e0e4b51e6b1334829a0781021}\index{testing::internal::MatchMatrix@{testing::internal::MatchMatrix}!SetEdge@{SetEdge}}
+\index{SetEdge@{SetEdge}!testing::internal::MatchMatrix@{testing::internal::MatchMatrix}}
+\doxysubsubsection{\texorpdfstring{SetEdge()}{SetEdge()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_match_matrix_aac7e9c6e0e4b51e6b1334829a0781021} 
+void testing\+::internal\+::\+Match\+Matrix\+::\+Set\+Edge (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{ilhs}{, }\item[{size\+\_\+t}]{irhs}{, }\item[{bool}]{b}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l03622}{3622}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03622\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{03623\ \ \ \ \ matched\_[SpaceIndex(ilhs,\ irhs)]\ =\ b\ ?\ 1\ :\ 0;}
+\DoxyCodeLine{03624\ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_match_matrix_aac7e9c6e0e4b51e6b1334829a0781021_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/include/gmock/\mbox{\hyperlink{gmock-matchers_8h}{gmock-\/matchers.\+h}}\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/src/\mbox{\hyperlink{gmock-matchers_8cc}{gmock-\/matchers.\+cc}}\end{DoxyCompactItemize}

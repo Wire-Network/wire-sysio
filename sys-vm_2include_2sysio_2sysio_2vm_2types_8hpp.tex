@@ -1,0 +1,132 @@
+\doxysection{libraries/sys-\/vm/include/sysio/sysio/vm/types.hpp File Reference}
+\hypertarget{sys-vm_2include_2sysio_2sysio_2vm_2types_8hpp}{}\label{sys-vm_2include_2sysio_2sysio_2vm_2types_8hpp}\index{libraries/sys-\/vm/include/sysio/sysio/vm/types.hpp@{libraries/sys-\/vm/include/sysio/sysio/vm/types.hpp}}
+{\ttfamily \#include $<$sysio/vm/allocator.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/vm/guarded\+\_\+ptr.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/vm/opcodes.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/vm/vector.\+hpp$>$}\newline
+{\ttfamily \#include $<$algorithm$>$}\newline
+{\ttfamily \#include $<$cstdint$>$}\newline
+{\ttfamily \#include $<$cstring$>$}\newline
+{\ttfamily \#include $<$limits$>$}\newline
+{\ttfamily \#include $<$string\+\_\+view$>$}\newline
+{\ttfamily \#include $<$vector$>$}\newline
+Include dependency graph for types.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sys-vm_2include_2sysio_2sysio_2vm_2types_8hpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1activation__frame}{sysio\+::vm\+::activation\+\_\+frame}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1resizable__limits}{sysio\+::vm\+::resizable\+\_\+limits}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1func__type}{sysio\+::vm\+::func\+\_\+type}}
+\item 
+union \mbox{\hyperlink{unionsysio_1_1vm_1_1expr__value}{sysio\+::vm\+::expr\+\_\+value}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1init__expr}{sysio\+::vm\+::init\+\_\+expr}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1global__type}{sysio\+::vm\+::global\+\_\+type}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1global__variable}{sysio\+::vm\+::global\+\_\+variable}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1table__type}{sysio\+::vm\+::table\+\_\+type}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1memory__type}{sysio\+::vm\+::memory\+\_\+type}}
+\item 
+union \mbox{\hyperlink{unionsysio_1_1vm_1_1import__type}{sysio\+::vm\+::import\+\_\+type}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1import__entry}{sysio\+::vm\+::import\+\_\+entry}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1export__entry}{sysio\+::vm\+::export\+\_\+entry}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1elem__segment}{sysio\+::vm\+::elem\+\_\+segment}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1local__entry}{sysio\+::vm\+::local\+\_\+entry}}
+\item 
+union \mbox{\hyperlink{unionsysio_1_1vm_1_1native__value}{sysio\+::vm\+::native\+\_\+value}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1function__body}{sysio\+::vm\+::function\+\_\+body}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1data__segment}{sysio\+::vm\+::data\+\_\+segment}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1name__assoc}{sysio\+::vm\+::name\+\_\+assoc}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1indirect__name__assoc}{sysio\+::vm\+::indirect\+\_\+name\+\_\+assoc}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1name__section}{sysio\+::vm\+::name\+\_\+section}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1vm_1_1module}{sysio\+::vm\+::module}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1vm}{sysio\+::vm}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{namespacesysio_1_1vm_a02dd74e0c1b6b8c3de7da007dae71bf5}{sysio\+::vm\+::value\+\_\+type}}
+\item 
+typedef \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{namespacesysio_1_1vm_a2bc2c48b12e98299a2a525da500cd3cb}{sysio\+::vm\+::block\+\_\+type}}
+\item 
+typedef \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{namespacesysio_1_1vm_aa6e4d27af40be16eaa2ef213045af2ec}{sysio\+::vm\+::elem\+\_\+type}}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\using \mbox{\hyperlink{namespacesysio_1_1vm_a4e7c9f9a80391b4f980c64238a1feaaf}{sysio\+::vm\+::guarded\+\_\+vector}} = \mbox{\hyperlink{classsysio_1_1vm_1_1managed__vector}{managed\+\_\+vector}}$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator}{growable\+\_\+allocator}}$>$
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1vm_a6ffa5796148f0f779a3d44799c3f0cce}{sysio\+::vm\+::wasm\+\_\+code}} = std\+::vector$<$\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}}$>$
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1vm_a9ec5735264f754f4960b35edb8693bfa}{sysio\+::vm\+::wasm\+\_\+code\+\_\+ptr}} = \mbox{\hyperlink{structsysio_1_1vm_1_1guarded__ptr}{guarded\+\_\+ptr}}$<$\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}}$>$
+\item 
+typedef std\+::uint32\+\_\+t \mbox{\hyperlink{namespacesysio_1_1vm_a82e706727e849ccc38e1c8e7888c1609}{sysio\+::vm\+::wasm\+\_\+ptr\+\_\+t}}
+\item 
+typedef std\+::uint32\+\_\+t \mbox{\hyperlink{namespacesysio_1_1vm_ab7d81f47e123ef4970d3e643196660ea}{sysio\+::vm\+::wasm\+\_\+size\+\_\+t}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55}{sysio\+::vm\+::types}} \{ \newline
+\mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a92daad2923cccf614e49762dfec06413}{sysio\+::vm\+::i32}} = 0x7f
+, \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55ab99a2242df60834800f4d1ddae2e1098}{sysio\+::vm\+::i64}} = 0x7e
+, \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55abe4b7040744e061573d139d21eaab385}{sysio\+::vm\+::f32}} = 0x7d
+, \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a44ae1089ba06a14a59c168d259bff806}{sysio\+::vm\+::f64}} = 0x7c
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a2ed607c3743ae1615d76e8b2f0a9958d}{sysio\+::vm\+::anyfunc}} = 0x70
+, \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2}{sysio\+::vm\+::func}} = 0x60
+, \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a3c3c04c92df1bb7a1eaba20976ae3c80}{sysio\+::vm\+::pseudo}} = 0x40
+, \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a2baebc1c597686dbedb77767fb389541}{sysio\+::vm\+::ret\+\_\+void}}
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a92daad2923cccf614e49762dfec06413}{sysio\+::vm\+::i32}} = 0x7f
+, \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55ab99a2242df60834800f4d1ddae2e1098}{sysio\+::vm\+::i64}} = 0x7e
+, \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55abe4b7040744e061573d139d21eaab385}{sysio\+::vm\+::f32}} = 0x7d
+, \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a44ae1089ba06a14a59c168d259bff806}{sysio\+::vm\+::f64}} = 0x7c
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a2ed607c3743ae1615d76e8b2f0a9958d}{sysio\+::vm\+::anyfunc}} = 0x70
+, \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2}{sysio\+::vm\+::func}} = 0x60
+, \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a3c3c04c92df1bb7a1eaba20976ae3c80}{sysio\+::vm\+::pseudo}} = 0x40
+, \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a2baebc1c597686dbedb77767fb389541}{sysio\+::vm\+::ret\+\_\+void}}
+ \}
+\item 
+enum \mbox{\hyperlink{namespacesysio_1_1vm_a6906e0db8d0142b181d3b8f0b77b5124}{sysio\+::vm\+::external\+\_\+kind}} \{ \newline
+\mbox{\hyperlink{namespacesysio_1_1vm_a6906e0db8d0142b181d3b8f0b77b5124ad5e2a019709e6fe68af6b3c4fd0f17d8}{sysio\+::vm\+::\+Function}} = 0
+, \mbox{\hyperlink{namespacesysio_1_1vm_a6906e0db8d0142b181d3b8f0b77b5124a73ce7538d087a053b1e2439ac2fb07b4}{sysio\+::vm\+::\+Table}} = 1
+, \mbox{\hyperlink{namespacesysio_1_1vm_a6906e0db8d0142b181d3b8f0b77b5124a42a9ebb53ade8661b3e9464a119443be}{sysio\+::vm\+::\+Memory}} = 2
+, \mbox{\hyperlink{namespacesysio_1_1vm_a6906e0db8d0142b181d3b8f0b77b5124a954cd2635cfb98b5a316ee4d46e46a35}{sysio\+::vm\+::\+Global}} = 3
+, \newline
+\mbox{\hyperlink{namespacesysio_1_1vm_a6906e0db8d0142b181d3b8f0b77b5124ad5e2a019709e6fe68af6b3c4fd0f17d8}{sysio\+::vm\+::\+Function}} = 0
+, \mbox{\hyperlink{namespacesysio_1_1vm_a6906e0db8d0142b181d3b8f0b77b5124a73ce7538d087a053b1e2439ac2fb07b4}{sysio\+::vm\+::\+Table}} = 1
+, \mbox{\hyperlink{namespacesysio_1_1vm_a6906e0db8d0142b181d3b8f0b77b5124a42a9ebb53ade8661b3e9464a119443be}{sysio\+::vm\+::\+Memory}} = 2
+, \mbox{\hyperlink{namespacesysio_1_1vm_a6906e0db8d0142b181d3b8f0b77b5124a954cd2635cfb98b5a316ee4d46e46a35}{sysio\+::vm\+::\+Global}} = 3
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{namespacesysio_1_1vm_a3582d972ad78c3bd854c80574f2032e9}{sysio\+::vm\+::operator==}} (const \mbox{\hyperlink{structsysio_1_1vm_1_1func__type}{func\+\_\+type}} \&lhs, const \mbox{\hyperlink{structsysio_1_1vm_1_1func__type}{func\+\_\+type}} \&rhs)
+\end{DoxyCompactItemize}

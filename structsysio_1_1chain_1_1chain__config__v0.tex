@@ -1,0 +1,607 @@
+\doxysection{sysio\+::chain\+::chain\+\_\+config\+\_\+v0 Struct Reference}
+\hypertarget{structsysio_1_1chain_1_1chain__config__v0}{}\label{structsysio_1_1chain_1_1chain__config__v0}\index{sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}}
+
+
+Producer-\/voted blockchain configuration parameters.  
+
+
+
+
+{\ttfamily \#include $<$chain\+\_\+config.\+hpp$>$}
+
+
+
+Inheritance diagram for sysio\+::chain\+::chain\+\_\+config\+\_\+v0\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=178pt]{structsysio_1_1chain_1_1chain__config__v0__inherit__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \{ \newline
+\mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1a45bfc96a932cb311b1b7b44da0df5afe}{max\+\_\+block\+\_\+net\+\_\+usage\+\_\+id}}
+, \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1ac9d8e5a4f63c520dd96018bfc0c46794}{target\+\_\+block\+\_\+net\+\_\+usage\+\_\+pct\+\_\+id}}
+, \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1a6fd3688c394f7c4a80afa034033dabcd}{max\+\_\+transaction\+\_\+net\+\_\+usage\+\_\+id}}
+, \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1a844ad237a8a02d01db9fa0403f05e2cd}{base\+\_\+per\+\_\+transaction\+\_\+net\+\_\+usage\+\_\+id}}
+, \newline
+\mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1aede059e4202b5adee31185a63b8bcd4d}{net\+\_\+usage\+\_\+leeway\+\_\+id}}
+, \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1aabbda820e0f7068f4fe1eec2c97dfa11}{context\+\_\+free\+\_\+discount\+\_\+net\+\_\+usage\+\_\+num\+\_\+id}}
+, \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1abdf8121d6911bc5414604c3841659ada}{context\+\_\+free\+\_\+discount\+\_\+net\+\_\+usage\+\_\+den\+\_\+id}}
+, \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1af8ba42549917640b9e076d59cf120aab}{max\+\_\+block\+\_\+cpu\+\_\+usage\+\_\+id}}
+, \newline
+\mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1a316dff7e583be251da8fb7dfd539593d}{target\+\_\+block\+\_\+cpu\+\_\+usage\+\_\+pct\+\_\+id}}
+, \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1a71585d613d327b79a39e1b7c3b92e2f7}{max\+\_\+transaction\+\_\+cpu\+\_\+usage\+\_\+id}}
+, \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1a2abbce92086e253939039c625acf3e49}{min\+\_\+transaction\+\_\+cpu\+\_\+usage\+\_\+id}}
+, \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1a9cdff63dd1610c357f2e2f739a6aae3a}{max\+\_\+transaction\+\_\+lifetime\+\_\+id}}
+, \newline
+\mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1ad3fd0393bc997d48d0ae89b96c49d2b1}{deferred\+\_\+trx\+\_\+expiration\+\_\+window\+\_\+id}}
+, \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1af65bc5f7ba0c30175ec949351333b739}{max\+\_\+transaction\+\_\+delay\+\_\+id}}
+, \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1aad5922d4ae7fd737134eea72aa765118}{max\+\_\+inline\+\_\+action\+\_\+size\+\_\+id}}
+, \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1a9321581c1673cde45ad180f9fbc955a9}{max\+\_\+inline\+\_\+action\+\_\+depth\+\_\+id}}
+, \newline
+\mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1a45f2199603e2f0c911f01df8f16b588d}{max\+\_\+authority\+\_\+depth\+\_\+id}}
+, \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1a4e0622771c1b20555a45772e5c7d7508}{PARAMS\+\_\+\+COUNT}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_ae96e3222e7161e113ef4182829823595}{validate}} () const
+\item 
+const \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0}{chain\+\_\+config\+\_\+v0}} \& \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a0043dd2e7395c5354b77e0b66d704fa0}{v0}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a796dada63527fcff40f838efc42a04ec}{max\+\_\+block\+\_\+net\+\_\+usage}}
+\begin{DoxyCompactList}\small\item\em the maxiumum net usage in instructions for a block \end{DoxyCompactList}\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a216d150c1c6ad9ea64aaf82d86926d19}{target\+\_\+block\+\_\+net\+\_\+usage\+\_\+pct}}
+\begin{DoxyCompactList}\small\item\em the target percent (1\% == 100, 100\%= 10,000) of maximum net usage; exceeding this triggers congestion handling \end{DoxyCompactList}\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_ab817deae6ddf13840297eae4fe6f8345}{max\+\_\+transaction\+\_\+net\+\_\+usage}}
+\begin{DoxyCompactList}\small\item\em the maximum objectively measured net usage that the chain will allow regardless of account limits \end{DoxyCompactList}\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_ad96077f2371a87e736383b1ae63a2942}{base\+\_\+per\+\_\+transaction\+\_\+net\+\_\+usage}}
+\begin{DoxyCompactList}\small\item\em the base amount of net usage billed for a transaction to cover incidentals \end{DoxyCompactList}\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a964d9d4fe4d9a1bb658e3dc840b62ca8}{net\+\_\+usage\+\_\+leeway}}
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a216d6c8dad55925ff3eebde858a30fef}{context\+\_\+free\+\_\+discount\+\_\+net\+\_\+usage\+\_\+num}}
+\begin{DoxyCompactList}\small\item\em the numerator for the discount on net usage of context-\/free data \end{DoxyCompactList}\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_ab6eca0d78bfbc7a23b250ce38a527d43}{context\+\_\+free\+\_\+discount\+\_\+net\+\_\+usage\+\_\+den}}
+\begin{DoxyCompactList}\small\item\em the denominator for the discount on net usage of context-\/free data \end{DoxyCompactList}\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a292759d9e893bccf78a5d22279fb5752}{max\+\_\+block\+\_\+cpu\+\_\+usage}}
+\begin{DoxyCompactList}\small\item\em the maxiumum billable cpu usage (in microseconds) for a block \end{DoxyCompactList}\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_af2b14c2153bc64969ca85c8df8fbb7f9}{target\+\_\+block\+\_\+cpu\+\_\+usage\+\_\+pct}}
+\begin{DoxyCompactList}\small\item\em the target percent (1\% == 100, 100\%= 10,000) of maximum cpu usage; exceeding this triggers congestion handling \end{DoxyCompactList}\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a27ec75a65de87237c8f7ed2728db3ba5}{max\+\_\+transaction\+\_\+cpu\+\_\+usage}}
+\begin{DoxyCompactList}\small\item\em the maximum billable cpu usage (in microseconds) that the chain will allow regardless of account limits \end{DoxyCompactList}\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a460f6b269c9da35d40b1cc5927c2205a}{min\+\_\+transaction\+\_\+cpu\+\_\+usage}}
+\begin{DoxyCompactList}\small\item\em the minimum billable cpu usage (in microseconds) that the chain requires \end{DoxyCompactList}\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a05237a51dab031f2c76ec9c3a42fec5d}{max\+\_\+transaction\+\_\+lifetime}}
+\begin{DoxyCompactList}\small\item\em the maximum number of seconds that an input transaction\textquotesingle{}s expiration can be ahead of the time of the block in which it is first included \end{DoxyCompactList}\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a6ab303c6326dc33d1280e0b8d13eed68}{deferred\+\_\+trx\+\_\+expiration\+\_\+window}}
+\begin{DoxyCompactList}\small\item\em the number of seconds after the time a deferred transaction can first execute until it expires \end{DoxyCompactList}\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_ad98015ab0842f0258be2df72e7ace5e3}{max\+\_\+transaction\+\_\+delay}}
+\begin{DoxyCompactList}\small\item\em the maximum number of seconds that can be imposed as a delay requirement by authorization checks \end{DoxyCompactList}\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_afb8514589814c9672abd5d0f9c7297cb}{max\+\_\+inline\+\_\+action\+\_\+size}}
+\begin{DoxyCompactList}\small\item\em maximum allowed size (in bytes) of an inline action \end{DoxyCompactList}\item 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a007444fa5297c0950b749d4ca2b64e2c}{max\+\_\+inline\+\_\+action\+\_\+depth}}
+\begin{DoxyCompactList}\small\item\em recursion depth limit on sending inline actions \end{DoxyCompactList}\item 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_ab919615c14dd47bfb30dea47443e8f6a}{max\+\_\+authority\+\_\+depth}}
+\begin{DoxyCompactList}\small\item\em recursion depth limit for checking if an authority is satisfied \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \& \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a840d8c6785472f77182425c924ecbd6a}{log}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&out) const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \& \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a98a230667333069cbfaeece779105302}{operator$<$$<$}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&out, const \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0}{chain\+\_\+config\+\_\+v0}} \&c)
+\item 
+bool \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a748ac32641f6de762984813f5c8d0c98}{operator==}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0}{chain\+\_\+config\+\_\+v0}} \&lhs, const \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0}{chain\+\_\+config\+\_\+v0}} \&rhs)
+\item 
+bool \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a0642e994c9b599cc7c482a9232ba80a7}{operator!=}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0}{chain\+\_\+config\+\_\+v0}} \&lhs, const \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0}{chain\+\_\+config\+\_\+v0}} \&rhs)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+This object stores the blockchain configuration, which is set by the block producers. Block producers each vote for their preference for each of the parameters in this object, and the blockchain runs according to the median of the values specified by the producers. 
+
+Definition at line \mbox{\hyperlink{chain__config_8hpp_source_l00016}{16}} of file \mbox{\hyperlink{chain__config_8hpp_source}{chain\+\_\+config.\+hpp}}.
+
+
+
+\doxysubsection{Member Enumeration Documentation}
+\Hypertarget{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1}\doxysubsubsection{\texorpdfstring{anonymous enum}{anonymous enum}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1} 
+anonymous enum}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{max\_block\_net\_usage\_id@{max\_block\_net\_usage\_id}!sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}}\index{sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}!max\_block\_net\_usage\_id@{max\_block\_net\_usage\_id}}}\Hypertarget{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1a45bfc96a932cb311b1b7b44da0df5afe}\label{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1} 
+max\+\_\+block\+\_\+net\+\_\+usage\+\_\+id&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{target\_block\_net\_usage\_pct\_id@{target\_block\_net\_usage\_pct\_id}!sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}}\index{sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}!target\_block\_net\_usage\_pct\_id@{target\_block\_net\_usage\_pct\_id}}}\Hypertarget{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1ac9d8e5a4f63c520dd96018bfc0c46794}\label{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1} 
+target\+\_\+block\+\_\+net\+\_\+usage\+\_\+pct\+\_\+id&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{max\_transaction\_net\_usage\_id@{max\_transaction\_net\_usage\_id}!sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}}\index{sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}!max\_transaction\_net\_usage\_id@{max\_transaction\_net\_usage\_id}}}\Hypertarget{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1a6fd3688c394f7c4a80afa034033dabcd}\label{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1} 
+max\+\_\+transaction\+\_\+net\+\_\+usage\+\_\+id&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{base\_per\_transaction\_net\_usage\_id@{base\_per\_transaction\_net\_usage\_id}!sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}}\index{sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}!base\_per\_transaction\_net\_usage\_id@{base\_per\_transaction\_net\_usage\_id}}}\Hypertarget{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1a844ad237a8a02d01db9fa0403f05e2cd}\label{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1} 
+base\+\_\+per\+\_\+transaction\+\_\+net\+\_\+usage\+\_\+id&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{net\_usage\_leeway\_id@{net\_usage\_leeway\_id}!sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}}\index{sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}!net\_usage\_leeway\_id@{net\_usage\_leeway\_id}}}\Hypertarget{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1aede059e4202b5adee31185a63b8bcd4d}\label{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1} 
+net\+\_\+usage\+\_\+leeway\+\_\+id&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{context\_free\_discount\_net\_usage\_num\_id@{context\_free\_discount\_net\_usage\_num\_id}!sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}}\index{sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}!context\_free\_discount\_net\_usage\_num\_id@{context\_free\_discount\_net\_usage\_num\_id}}}\Hypertarget{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1aabbda820e0f7068f4fe1eec2c97dfa11}\label{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1} 
+context\+\_\+free\+\_\+discount\+\_\+net\+\_\+usage\+\_\+num\+\_\+id&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{context\_free\_discount\_net\_usage\_den\_id@{context\_free\_discount\_net\_usage\_den\_id}!sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}}\index{sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}!context\_free\_discount\_net\_usage\_den\_id@{context\_free\_discount\_net\_usage\_den\_id}}}\Hypertarget{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1abdf8121d6911bc5414604c3841659ada}\label{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1} 
+context\+\_\+free\+\_\+discount\+\_\+net\+\_\+usage\+\_\+den\+\_\+id&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{max\_block\_cpu\_usage\_id@{max\_block\_cpu\_usage\_id}!sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}}\index{sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}!max\_block\_cpu\_usage\_id@{max\_block\_cpu\_usage\_id}}}\Hypertarget{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1af8ba42549917640b9e076d59cf120aab}\label{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1} 
+max\+\_\+block\+\_\+cpu\+\_\+usage\+\_\+id&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{target\_block\_cpu\_usage\_pct\_id@{target\_block\_cpu\_usage\_pct\_id}!sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}}\index{sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}!target\_block\_cpu\_usage\_pct\_id@{target\_block\_cpu\_usage\_pct\_id}}}\Hypertarget{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1a316dff7e583be251da8fb7dfd539593d}\label{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1} 
+target\+\_\+block\+\_\+cpu\+\_\+usage\+\_\+pct\+\_\+id&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{max\_transaction\_cpu\_usage\_id@{max\_transaction\_cpu\_usage\_id}!sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}}\index{sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}!max\_transaction\_cpu\_usage\_id@{max\_transaction\_cpu\_usage\_id}}}\Hypertarget{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1a71585d613d327b79a39e1b7c3b92e2f7}\label{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1} 
+max\+\_\+transaction\+\_\+cpu\+\_\+usage\+\_\+id&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{min\_transaction\_cpu\_usage\_id@{min\_transaction\_cpu\_usage\_id}!sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}}\index{sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}!min\_transaction\_cpu\_usage\_id@{min\_transaction\_cpu\_usage\_id}}}\Hypertarget{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1a2abbce92086e253939039c625acf3e49}\label{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1} 
+min\+\_\+transaction\+\_\+cpu\+\_\+usage\+\_\+id&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{max\_transaction\_lifetime\_id@{max\_transaction\_lifetime\_id}!sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}}\index{sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}!max\_transaction\_lifetime\_id@{max\_transaction\_lifetime\_id}}}\Hypertarget{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1a9cdff63dd1610c357f2e2f739a6aae3a}\label{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1} 
+max\+\_\+transaction\+\_\+lifetime\+\_\+id&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{deferred\_trx\_expiration\_window\_id@{deferred\_trx\_expiration\_window\_id}!sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}}\index{sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}!deferred\_trx\_expiration\_window\_id@{deferred\_trx\_expiration\_window\_id}}}\Hypertarget{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1ad3fd0393bc997d48d0ae89b96c49d2b1}\label{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1} 
+deferred\+\_\+trx\+\_\+expiration\+\_\+window\+\_\+id&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{max\_transaction\_delay\_id@{max\_transaction\_delay\_id}!sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}}\index{sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}!max\_transaction\_delay\_id@{max\_transaction\_delay\_id}}}\Hypertarget{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1af65bc5f7ba0c30175ec949351333b739}\label{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1} 
+max\+\_\+transaction\+\_\+delay\+\_\+id&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{max\_inline\_action\_size\_id@{max\_inline\_action\_size\_id}!sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}}\index{sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}!max\_inline\_action\_size\_id@{max\_inline\_action\_size\_id}}}\Hypertarget{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1aad5922d4ae7fd737134eea72aa765118}\label{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1} 
+max\+\_\+inline\+\_\+action\+\_\+size\+\_\+id&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{max\_inline\_action\_depth\_id@{max\_inline\_action\_depth\_id}!sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}}\index{sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}!max\_inline\_action\_depth\_id@{max\_inline\_action\_depth\_id}}}\Hypertarget{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1a9321581c1673cde45ad180f9fbc955a9}\label{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1} 
+max\+\_\+inline\+\_\+action\+\_\+depth\+\_\+id&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{max\_authority\_depth\_id@{max\_authority\_depth\_id}!sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}}\index{sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}!max\_authority\_depth\_id@{max\_authority\_depth\_id}}}\Hypertarget{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1a45f2199603e2f0c911f01df8f16b588d}\label{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1} 
+max\+\_\+authority\+\_\+depth\+\_\+id&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PARAMS\_COUNT@{PARAMS\_COUNT}!sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}}\index{sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}!PARAMS\_COUNT@{PARAMS\_COUNT}}}\Hypertarget{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1a4e0622771c1b20555a45772e5c7d7508}\label{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1} 
+PARAMS\+\_\+\+COUNT&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{chain__config_8hpp_source_l00019}{19}} of file \mbox{\hyperlink{chain__config_8hpp_source}{chain\+\_\+config.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1a45bfc96a932cb311b1b7b44da0df5afe}{max\_block\_net\_usage\_id}},}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1ac9d8e5a4f63c520dd96018bfc0c46794}{target\_block\_net\_usage\_pct\_id}},}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1a6fd3688c394f7c4a80afa034033dabcd}{max\_transaction\_net\_usage\_id}},}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1a844ad237a8a02d01db9fa0403f05e2cd}{base\_per\_transaction\_net\_usage\_id}},}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1aede059e4202b5adee31185a63b8bcd4d}{net\_usage\_leeway\_id}},}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1aabbda820e0f7068f4fe1eec2c97dfa11}{context\_free\_discount\_net\_usage\_num\_id}},}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1abdf8121d6911bc5414604c3841659ada}{context\_free\_discount\_net\_usage\_den\_id}},}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1af8ba42549917640b9e076d59cf120aab}{max\_block\_cpu\_usage\_id}},}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1a316dff7e583be251da8fb7dfd539593d}{target\_block\_cpu\_usage\_pct\_id}},}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1a71585d613d327b79a39e1b7c3b92e2f7}{max\_transaction\_cpu\_usage\_id}},}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1a2abbce92086e253939039c625acf3e49}{min\_transaction\_cpu\_usage\_id}},}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1a9cdff63dd1610c357f2e2f739a6aae3a}{max\_transaction\_lifetime\_id}},}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1ad3fd0393bc997d48d0ae89b96c49d2b1}{deferred\_trx\_expiration\_window\_id}},}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1af65bc5f7ba0c30175ec949351333b739}{max\_transaction\_delay\_id}},}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1aad5922d4ae7fd737134eea72aa765118}{max\_inline\_action\_size\_id}},}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1a9321581c1673cde45ad180f9fbc955a9}{max\_inline\_action\_depth\_id}},}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1a45f2199603e2f0c911f01df8f16b588d}{max\_authority\_depth\_id}},}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a7d98bf1e547fff42acd27b6e8ab8d3d1a4e0622771c1b20555a45772e5c7d7508}{PARAMS\_COUNT}}}
+\DoxyCodeLine{00038\ \ \ \ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1chain_1_1chain__config__v0_a840d8c6785472f77182425c924ecbd6a}\index{sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}!log@{log}}
+\index{log@{log}!sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}}
+\doxysubsubsection{\texorpdfstring{log()}{log()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1chain__config__v0_a840d8c6785472f77182425c924ecbd6a} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ \\
+\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \& sysio\+::chain\+::chain\+\_\+config\+\_\+v0\+::log (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&}]{out}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{chain__config_8hpp_source_l00115}{115}} of file \mbox{\hyperlink{chain__config_8hpp_source}{chain\+\_\+config.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ out\ <<\ \textcolor{stringliteral}{"{}Max\ Block\ Net\ Usage:\ "{}}\ <<\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a796dada63527fcff40f838efc42a04ec}{max\_block\_net\_usage}}\ <<\ \textcolor{stringliteral}{"{},\ "{}}}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}Target\ Block\ Net\ Usage\ Percent:\ "{}}\ <<\ ((double)\mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a216d150c1c6ad9ea64aaf82d86926d19}{target\_block\_net\_usage\_pct}}\ /\ (double)config::percent\_1)\ <<\ \textcolor{stringliteral}{"{}\%,\ "{}}}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}Max\ Transaction\ Net\ Usage:\ "{}}\ <<\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_ab817deae6ddf13840297eae4fe6f8345}{max\_transaction\_net\_usage}}\ <<\ \textcolor{stringliteral}{"{},\ "{}}}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}Base\ Per-\/Transaction\ Net\ Usage:\ "{}}\ <<\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_ad96077f2371a87e736383b1ae63a2942}{base\_per\_transaction\_net\_usage}}\ <<\ \textcolor{stringliteral}{"{},\ "{}}}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}Net\ Usage\ Leeway:\ "{}}\ <<\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a964d9d4fe4d9a1bb658e3dc840b62ca8}{net\_usage\_leeway}}\ <<\ \textcolor{stringliteral}{"{},\ "{}}}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}Context-\/Free\ Data\ Net\ Usage\ Discount:\ "{}}\ <<\ (\textcolor{keywordtype}{double})\mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a216d6c8dad55925ff3eebde858a30fef}{context\_free\_discount\_net\_usage\_num}}\ *\ 100.0\ /\ (double)\mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_ab6eca0d78bfbc7a23b250ce38a527d43}{context\_free\_discount\_net\_usage\_den}}\ <<\ \textcolor{stringliteral}{"{}\%\ ,\ "{}}}
+\DoxyCodeLine{00122\ }
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}Max\ Block\ CPU\ Usage:\ "{}}\ <<\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a292759d9e893bccf78a5d22279fb5752}{max\_block\_cpu\_usage}}\ <<\ \textcolor{stringliteral}{"{},\ "{}}}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}Target\ Block\ CPU\ Usage\ Percent:\ "{}}\ <<\ ((\textcolor{keywordtype}{double})\mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_af2b14c2153bc64969ca85c8df8fbb7f9}{target\_block\_cpu\_usage\_pct}}\ /\ (\textcolor{keywordtype}{double})config::percent\_1)\ <<\ \textcolor{stringliteral}{"{}\%,\ "{}}}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}Max\ Transaction\ CPU\ Usage:\ "{}}\ <<\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a27ec75a65de87237c8f7ed2728db3ba5}{max\_transaction\_cpu\_usage}}\ <<\ \textcolor{stringliteral}{"{},\ "{}}}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}Min\ Transaction\ CPU\ Usage:\ "{}}\ <<\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a460f6b269c9da35d40b1cc5927c2205a}{min\_transaction\_cpu\_usage}}\ <<\ \textcolor{stringliteral}{"{},\ "{}}}
+\DoxyCodeLine{00127\ }
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}Max\ Transaction\ Lifetime:\ "{}}\ <<\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a05237a51dab031f2c76ec9c3a42fec5d}{max\_transaction\_lifetime}}\ <<\ \textcolor{stringliteral}{"{},\ "{}}}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}Deferred\ Transaction\ Expiration\ Window:\ "{}}\ <<\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a6ab303c6326dc33d1280e0b8d13eed68}{deferred\_trx\_expiration\_window}}\ <<\ \textcolor{stringliteral}{"{},\ "{}}}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}Max\ Transaction\ Delay:\ "{}}\ <<\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_ad98015ab0842f0258be2df72e7ace5e3}{max\_transaction\_delay}}\ <<\ \textcolor{stringliteral}{"{},\ "{}}}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}Max\ Inline\ Action\ Size:\ "{}}\ <<\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_afb8514589814c9672abd5d0f9c7297cb}{max\_inline\_action\_size}}\ <<\ \textcolor{stringliteral}{"{},\ "{}}}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}Max\ Inline\ Action\ Depth:\ "{}}\ <<\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a007444fa5297c0950b749d4ca2b64e2c}{max\_inline\_action\_depth}}\ <<\ \textcolor{stringliteral}{"{},\ "{}}}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}Max\ Authority\ Depth:\ "{}}\ <<\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_ab919615c14dd47bfb30dea47443e8f6a}{max\_authority\_depth}};}
+\DoxyCodeLine{00134\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=312pt]{structsysio_1_1chain_1_1chain__config__v0_a840d8c6785472f77182425c924ecbd6a_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1chain__config__v0_a0043dd2e7395c5354b77e0b66d704fa0}\index{sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}!v0@{v0}}
+\index{v0@{v0}!sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}}
+\doxysubsubsection{\texorpdfstring{v0()}{v0()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1chain__config__v0_a0043dd2e7395c5354b77e0b66d704fa0} 
+const \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0}{chain\+\_\+config\+\_\+v0}} \& sysio\+::chain\+::chain\+\_\+config\+\_\+v0\+::v0 (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{chain__config_8hpp_source_l00062}{62}} of file \mbox{\hyperlink{chain__config_8hpp_source}{chain\+\_\+config.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00064\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1chain__config__v0_ae96e3222e7161e113ef4182829823595}\index{sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}!validate@{validate}}
+\index{validate@{validate}!sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}}
+\doxysubsubsection{\texorpdfstring{validate()}{validate()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1chain__config__v0_ae96e3222e7161e113ef4182829823595} 
+void sysio\+::chain\+::chain\+\_\+config\+\_\+v0\+::validate (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{chain__config_8cpp_source_l00007}{7}} of file \mbox{\hyperlink{chain__config_8cpp_source}{chain\+\_\+config.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00007\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00008\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a216d150c1c6ad9ea64aaf82d86926d19}{target\_block\_net\_usage\_pct}}\ <=\ config::percent\_100,\ \mbox{\hyperlink{namespacesysio_1_1chain_a764b50974b9b72a0e233e72176913d6b}{action\_validate\_exception}},}
+\DoxyCodeLine{00009\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}target\ block\ net\ usage\ percentage\ cannot\ exceed\ 100\%"{}}\ );}
+\DoxyCodeLine{00010\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a216d150c1c6ad9ea64aaf82d86926d19}{target\_block\_net\_usage\_pct}}\ >=\ config::percent\_1/10,\ \mbox{\hyperlink{namespacesysio_1_1chain_a764b50974b9b72a0e233e72176913d6b}{action\_validate\_exception}},}
+\DoxyCodeLine{00011\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}target\ block\ net\ usage\ percentage\ must\ be\ at\ least\ 0.1\%"{}}\ );}
+\DoxyCodeLine{00012\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_af2b14c2153bc64969ca85c8df8fbb7f9}{target\_block\_cpu\_usage\_pct}}\ <=\ config::percent\_100,\ \mbox{\hyperlink{namespacesysio_1_1chain_a764b50974b9b72a0e233e72176913d6b}{action\_validate\_exception}},}
+\DoxyCodeLine{00013\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}target\ block\ cpu\ usage\ percentage\ cannot\ exceed\ 100\%"{}}\ );}
+\DoxyCodeLine{00014\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_af2b14c2153bc64969ca85c8df8fbb7f9}{target\_block\_cpu\_usage\_pct}}\ >=\ config::percent\_1/10,\ \mbox{\hyperlink{namespacesysio_1_1chain_a764b50974b9b72a0e233e72176913d6b}{action\_validate\_exception}},}
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}target\ block\ cpu\ usage\ percentage\ must\ be\ at\ least\ 0.1\%"{}}\ );}
+\DoxyCodeLine{00016\ }
+\DoxyCodeLine{00017\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_ab817deae6ddf13840297eae4fe6f8345}{max\_transaction\_net\_usage}}\ <\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a796dada63527fcff40f838efc42a04ec}{max\_block\_net\_usage}},\ \mbox{\hyperlink{namespacesysio_1_1chain_a764b50974b9b72a0e233e72176913d6b}{action\_validate\_exception}},}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}max\ transaction\ net\ usage\ must\ be\ less\ than\ max\ block\ net\ usage"{}}\ );}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a27ec75a65de87237c8f7ed2728db3ba5}{max\_transaction\_cpu\_usage}}\ <\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a292759d9e893bccf78a5d22279fb5752}{max\_block\_cpu\_usage}},\ \mbox{\hyperlink{namespacesysio_1_1chain_a764b50974b9b72a0e233e72176913d6b}{action\_validate\_exception}},}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}max\ transaction\ cpu\ usage\ must\ be\ less\ than\ max\ block\ cpu\ usage"{}}\ );}
+\DoxyCodeLine{00021\ }
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_ad96077f2371a87e736383b1ae63a2942}{base\_per\_transaction\_net\_usage}}\ <\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_ab817deae6ddf13840297eae4fe6f8345}{max\_transaction\_net\_usage}},\ \mbox{\hyperlink{namespacesysio_1_1chain_a764b50974b9b72a0e233e72176913d6b}{action\_validate\_exception}},}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}base\ net\ usage\ per\ transaction\ must\ be\ less\ than\ the\ max\ transaction\ net\ usage"{}}\ );}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ (\mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_ab817deae6ddf13840297eae4fe6f8345}{max\_transaction\_net\_usage}}\ -\/\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_ad96077f2371a87e736383b1ae63a2942}{base\_per\_transaction\_net\_usage}})\ >=\ config::min\_net\_usage\_delta\_between\_base\_and\_max\_for\_trx,}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_a764b50974b9b72a0e233e72176913d6b}{action\_validate\_exception}},}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}max\ transaction\ net\ usage\ must\ be\ at\ least\ \$\{delta\}\ bytes\ larger\ than\ base\ net\ usage\ per\ transaction"{}},}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}delta"{}},\ config::min\_net\_usage\_delta\_between\_base\_and\_max\_for\_trx)\ );}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_ab6eca0d78bfbc7a23b250ce38a527d43}{context\_free\_discount\_net\_usage\_den}}\ >\ 0,\ \mbox{\hyperlink{namespacesysio_1_1chain_a764b50974b9b72a0e233e72176913d6b}{action\_validate\_exception}},}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}net\ usage\ discount\ ratio\ for\ context\ free\ data\ cannot\ have\ a\ 0\ denominator"{}}\ );}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a216d6c8dad55925ff3eebde858a30fef}{context\_free\_discount\_net\_usage\_num}}\ <=\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_ab6eca0d78bfbc7a23b250ce38a527d43}{context\_free\_discount\_net\_usage\_den}},\ \mbox{\hyperlink{namespacesysio_1_1chain_a764b50974b9b72a0e233e72176913d6b}{action\_validate\_exception}},}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}net\ usage\ discount\ ratio\ for\ context\ free\ data\ cannot\ exceed\ 1"{}}\ );}
+\DoxyCodeLine{00032\ }
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a460f6b269c9da35d40b1cc5927c2205a}{min\_transaction\_cpu\_usage}}\ <=\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a27ec75a65de87237c8f7ed2728db3ba5}{max\_transaction\_cpu\_usage}},\ \mbox{\hyperlink{namespacesysio_1_1chain_a764b50974b9b72a0e233e72176913d6b}{action\_validate\_exception}},}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}min\ transaction\ cpu\ usage\ cannot\ exceed\ max\ transaction\ cpu\ usage"{}}\ );}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a27ec75a65de87237c8f7ed2728db3ba5}{max\_transaction\_cpu\_usage}}\ <\ (\mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a292759d9e893bccf78a5d22279fb5752}{max\_block\_cpu\_usage}}\ -\/\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_a460f6b269c9da35d40b1cc5927c2205a}{min\_transaction\_cpu\_usage}}),\ \mbox{\hyperlink{namespacesysio_1_1chain_a764b50974b9b72a0e233e72176913d6b}{action\_validate\_exception}},}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}max\ transaction\ cpu\ usage\ must\ be\ at\ less\ than\ the\ difference\ between\ the\ max\ block\ cpu\ usage\ and\ the\ min\ transaction\ cpu\ usage"{}}\ );}
+\DoxyCodeLine{00037\ }
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ 1\ <=\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_ab919615c14dd47bfb30dea47443e8f6a}{max\_authority\_depth}},\ \mbox{\hyperlink{namespacesysio_1_1chain_a764b50974b9b72a0e233e72176913d6b}{action\_validate\_exception}},}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}max\ authority\ depth\ should\ be\ at\ least\ 1"{}}\ );}
+\DoxyCodeLine{00040\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1chain__config__v0_ae96e3222e7161e113ef4182829823595_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{structsysio_1_1chain_1_1chain__config__v0_a0642e994c9b599cc7c482a9232ba80a7}\index{sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}!operator"!=@{operator"!=}}
+\index{operator"!=@{operator"!=}!sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}}
+\doxysubsubsection{\texorpdfstring{operator"!=}{operator!=}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1chain__config__v0_a0642e994c9b599cc7c482a9232ba80a7} 
+bool \mbox{\hyperlink{namespacefc_a40c368ac88294ae47b064cad937fdbf6}{operator!}}= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0}{chain\+\_\+config\+\_\+v0}} \&}]{lhs}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0}{chain\+\_\+config\+\_\+v0}} \&}]{rhs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{chain__config_8hpp_source_l00111}{111}} of file \mbox{\hyperlink{chain__config_8hpp_source}{chain\+\_\+config.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00111\ \{\ \textcolor{keywordflow}{return}\ !(lhs\ ==\ rhs);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1chain__config__v0_a98a230667333069cbfaeece779105302}\index{sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$}{operator<<}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1chain__config__v0_a98a230667333069cbfaeece779105302} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ \\
+\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \& operator$<$$<$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&}]{out}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0}{chain\+\_\+config\+\_\+v0}} \&}]{c}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{chain__config_8hpp_source_l00067}{67}} of file \mbox{\hyperlink{chain__config_8hpp_source}{chain\+\_\+config.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ c.log(out)\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{00069\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1chain__config__v0_a748ac32641f6de762984813f5c8d0c98}\index{sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}!operator==@{operator==}}
+\index{operator==@{operator==}!sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}}
+\doxysubsubsection{\texorpdfstring{operator==}{operator==}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1chain__config__v0_a748ac32641f6de762984813f5c8d0c98} 
+bool operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0}{chain\+\_\+config\+\_\+v0}} \&}]{lhs}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0}{chain\+\_\+config\+\_\+v0}} \&}]{rhs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{chain__config_8hpp_source_l00071}{71}} of file \mbox{\hyperlink{chain__config_8hpp_source}{chain\+\_\+config.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \ \ std::tie(\ \ \ lhs.max\_block\_net\_usage,}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lhs.target\_block\_net\_usage\_pct,}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lhs.max\_transaction\_net\_usage,}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lhs.base\_per\_transaction\_net\_usage,}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lhs.net\_usage\_leeway,}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lhs.context\_free\_discount\_net\_usage\_num,}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lhs.context\_free\_discount\_net\_usage\_den,}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lhs.max\_block\_cpu\_usage,}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lhs.target\_block\_cpu\_usage\_pct,}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lhs.max\_transaction\_cpu\_usage,}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lhs.max\_transaction\_cpu\_usage,}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lhs.max\_transaction\_lifetime,}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lhs.deferred\_trx\_expiration\_window,}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lhs.max\_transaction\_delay,}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lhs.max\_inline\_action\_size,}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lhs.max\_inline\_action\_depth,}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lhs.max\_authority\_depth}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ==}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::tie(\ \ \ rhs.max\_block\_net\_usage,}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ rhs.target\_block\_net\_usage\_pct,}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ rhs.max\_transaction\_net\_usage,}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ rhs.base\_per\_transaction\_net\_usage,}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ rhs.net\_usage\_leeway,}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ rhs.context\_free\_discount\_net\_usage\_num,}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ rhs.context\_free\_discount\_net\_usage\_den,}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ rhs.max\_block\_cpu\_usage,}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ rhs.target\_block\_cpu\_usage\_pct,}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ rhs.max\_transaction\_cpu\_usage,}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ rhs.max\_transaction\_cpu\_usage,}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ rhs.max\_transaction\_lifetime,}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ rhs.deferred\_trx\_expiration\_window,}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ rhs.max\_transaction\_delay,}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ rhs.max\_inline\_action\_size,}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ rhs.max\_inline\_action\_depth,}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ rhs.max\_authority\_depth}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00109\ \ \ \ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1chain_1_1chain__config__v0_ad96077f2371a87e736383b1ae63a2942}\index{sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}!base\_per\_transaction\_net\_usage@{base\_per\_transaction\_net\_usage}}
+\index{base\_per\_transaction\_net\_usage@{base\_per\_transaction\_net\_usage}!sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}}
+\doxysubsubsection{\texorpdfstring{base\_per\_transaction\_net\_usage}{base\_per\_transaction\_net\_usage}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1chain__config__v0_ad96077f2371a87e736383b1ae63a2942} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::chain\+::chain\+\_\+config\+\_\+v0\+::base\+\_\+per\+\_\+transaction\+\_\+net\+\_\+usage}
+
+
+
+Definition at line \mbox{\hyperlink{chain__config_8hpp_source_l00043}{43}} of file \mbox{\hyperlink{chain__config_8hpp_source}{chain\+\_\+config.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1chain__config__v0_ab6eca0d78bfbc7a23b250ce38a527d43}\index{sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}!context\_free\_discount\_net\_usage\_den@{context\_free\_discount\_net\_usage\_den}}
+\index{context\_free\_discount\_net\_usage\_den@{context\_free\_discount\_net\_usage\_den}!sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}}
+\doxysubsubsection{\texorpdfstring{context\_free\_discount\_net\_usage\_den}{context\_free\_discount\_net\_usage\_den}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1chain__config__v0_ab6eca0d78bfbc7a23b250ce38a527d43} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::chain\+::chain\+\_\+config\+\_\+v0\+::context\+\_\+free\+\_\+discount\+\_\+net\+\_\+usage\+\_\+den}
+
+
+
+Definition at line \mbox{\hyperlink{chain__config_8hpp_source_l00046}{46}} of file \mbox{\hyperlink{chain__config_8hpp_source}{chain\+\_\+config.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1chain__config__v0_a216d6c8dad55925ff3eebde858a30fef}\index{sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}!context\_free\_discount\_net\_usage\_num@{context\_free\_discount\_net\_usage\_num}}
+\index{context\_free\_discount\_net\_usage\_num@{context\_free\_discount\_net\_usage\_num}!sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}}
+\doxysubsubsection{\texorpdfstring{context\_free\_discount\_net\_usage\_num}{context\_free\_discount\_net\_usage\_num}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1chain__config__v0_a216d6c8dad55925ff3eebde858a30fef} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::chain\+::chain\+\_\+config\+\_\+v0\+::context\+\_\+free\+\_\+discount\+\_\+net\+\_\+usage\+\_\+num}
+
+
+
+Definition at line \mbox{\hyperlink{chain__config_8hpp_source_l00045}{45}} of file \mbox{\hyperlink{chain__config_8hpp_source}{chain\+\_\+config.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1chain__config__v0_a6ab303c6326dc33d1280e0b8d13eed68}\index{sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}!deferred\_trx\_expiration\_window@{deferred\_trx\_expiration\_window}}
+\index{deferred\_trx\_expiration\_window@{deferred\_trx\_expiration\_window}!sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}}
+\doxysubsubsection{\texorpdfstring{deferred\_trx\_expiration\_window}{deferred\_trx\_expiration\_window}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1chain__config__v0_a6ab303c6326dc33d1280e0b8d13eed68} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::chain\+::chain\+\_\+config\+\_\+v0\+::deferred\+\_\+trx\+\_\+expiration\+\_\+window}
+
+
+
+Definition at line \mbox{\hyperlink{chain__config_8hpp_source_l00054}{54}} of file \mbox{\hyperlink{chain__config_8hpp_source}{chain\+\_\+config.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1chain__config__v0_ab919615c14dd47bfb30dea47443e8f6a}\index{sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}!max\_authority\_depth@{max\_authority\_depth}}
+\index{max\_authority\_depth@{max\_authority\_depth}!sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}}
+\doxysubsubsection{\texorpdfstring{max\_authority\_depth}{max\_authority\_depth}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1chain__config__v0_ab919615c14dd47bfb30dea47443e8f6a} 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} sysio\+::chain\+::chain\+\_\+config\+\_\+v0\+::max\+\_\+authority\+\_\+depth}
+
+
+
+Definition at line \mbox{\hyperlink{chain__config_8hpp_source_l00058}{58}} of file \mbox{\hyperlink{chain__config_8hpp_source}{chain\+\_\+config.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1chain__config__v0_a292759d9e893bccf78a5d22279fb5752}\index{sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}!max\_block\_cpu\_usage@{max\_block\_cpu\_usage}}
+\index{max\_block\_cpu\_usage@{max\_block\_cpu\_usage}!sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}}
+\doxysubsubsection{\texorpdfstring{max\_block\_cpu\_usage}{max\_block\_cpu\_usage}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1chain__config__v0_a292759d9e893bccf78a5d22279fb5752} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::chain\+::chain\+\_\+config\+\_\+v0\+::max\+\_\+block\+\_\+cpu\+\_\+usage}
+
+
+
+Definition at line \mbox{\hyperlink{chain__config_8hpp_source_l00048}{48}} of file \mbox{\hyperlink{chain__config_8hpp_source}{chain\+\_\+config.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1chain__config__v0_a796dada63527fcff40f838efc42a04ec}\index{sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}!max\_block\_net\_usage@{max\_block\_net\_usage}}
+\index{max\_block\_net\_usage@{max\_block\_net\_usage}!sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}}
+\doxysubsubsection{\texorpdfstring{max\_block\_net\_usage}{max\_block\_net\_usage}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1chain__config__v0_a796dada63527fcff40f838efc42a04ec} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} sysio\+::chain\+::chain\+\_\+config\+\_\+v0\+::max\+\_\+block\+\_\+net\+\_\+usage}
+
+
+
+Definition at line \mbox{\hyperlink{chain__config_8hpp_source_l00040}{40}} of file \mbox{\hyperlink{chain__config_8hpp_source}{chain\+\_\+config.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1chain__config__v0_a007444fa5297c0950b749d4ca2b64e2c}\index{sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}!max\_inline\_action\_depth@{max\_inline\_action\_depth}}
+\index{max\_inline\_action\_depth@{max\_inline\_action\_depth}!sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}}
+\doxysubsubsection{\texorpdfstring{max\_inline\_action\_depth}{max\_inline\_action\_depth}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1chain__config__v0_a007444fa5297c0950b749d4ca2b64e2c} 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} sysio\+::chain\+::chain\+\_\+config\+\_\+v0\+::max\+\_\+inline\+\_\+action\+\_\+depth}
+
+
+
+Definition at line \mbox{\hyperlink{chain__config_8hpp_source_l00057}{57}} of file \mbox{\hyperlink{chain__config_8hpp_source}{chain\+\_\+config.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1chain__config__v0_afb8514589814c9672abd5d0f9c7297cb}\index{sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}!max\_inline\_action\_size@{max\_inline\_action\_size}}
+\index{max\_inline\_action\_size@{max\_inline\_action\_size}!sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}}
+\doxysubsubsection{\texorpdfstring{max\_inline\_action\_size}{max\_inline\_action\_size}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1chain__config__v0_afb8514589814c9672abd5d0f9c7297cb} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::chain\+::chain\+\_\+config\+\_\+v0\+::max\+\_\+inline\+\_\+action\+\_\+size}
+
+
+
+Definition at line \mbox{\hyperlink{chain__config_8hpp_source_l00056}{56}} of file \mbox{\hyperlink{chain__config_8hpp_source}{chain\+\_\+config.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1chain__config__v0_a27ec75a65de87237c8f7ed2728db3ba5}\index{sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}!max\_transaction\_cpu\_usage@{max\_transaction\_cpu\_usage}}
+\index{max\_transaction\_cpu\_usage@{max\_transaction\_cpu\_usage}!sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}}
+\doxysubsubsection{\texorpdfstring{max\_transaction\_cpu\_usage}{max\_transaction\_cpu\_usage}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1chain__config__v0_a27ec75a65de87237c8f7ed2728db3ba5} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::chain\+::chain\+\_\+config\+\_\+v0\+::max\+\_\+transaction\+\_\+cpu\+\_\+usage}
+
+
+
+Definition at line \mbox{\hyperlink{chain__config_8hpp_source_l00050}{50}} of file \mbox{\hyperlink{chain__config_8hpp_source}{chain\+\_\+config.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1chain__config__v0_ad98015ab0842f0258be2df72e7ace5e3}\index{sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}!max\_transaction\_delay@{max\_transaction\_delay}}
+\index{max\_transaction\_delay@{max\_transaction\_delay}!sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}}
+\doxysubsubsection{\texorpdfstring{max\_transaction\_delay}{max\_transaction\_delay}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1chain__config__v0_ad98015ab0842f0258be2df72e7ace5e3} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::chain\+::chain\+\_\+config\+\_\+v0\+::max\+\_\+transaction\+\_\+delay}
+
+
+
+Definition at line \mbox{\hyperlink{chain__config_8hpp_source_l00055}{55}} of file \mbox{\hyperlink{chain__config_8hpp_source}{chain\+\_\+config.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1chain__config__v0_a05237a51dab031f2c76ec9c3a42fec5d}\index{sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}!max\_transaction\_lifetime@{max\_transaction\_lifetime}}
+\index{max\_transaction\_lifetime@{max\_transaction\_lifetime}!sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}}
+\doxysubsubsection{\texorpdfstring{max\_transaction\_lifetime}{max\_transaction\_lifetime}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1chain__config__v0_a05237a51dab031f2c76ec9c3a42fec5d} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::chain\+::chain\+\_\+config\+\_\+v0\+::max\+\_\+transaction\+\_\+lifetime}
+
+
+
+Definition at line \mbox{\hyperlink{chain__config_8hpp_source_l00053}{53}} of file \mbox{\hyperlink{chain__config_8hpp_source}{chain\+\_\+config.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1chain__config__v0_ab817deae6ddf13840297eae4fe6f8345}\index{sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}!max\_transaction\_net\_usage@{max\_transaction\_net\_usage}}
+\index{max\_transaction\_net\_usage@{max\_transaction\_net\_usage}!sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}}
+\doxysubsubsection{\texorpdfstring{max\_transaction\_net\_usage}{max\_transaction\_net\_usage}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1chain__config__v0_ab817deae6ddf13840297eae4fe6f8345} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::chain\+::chain\+\_\+config\+\_\+v0\+::max\+\_\+transaction\+\_\+net\+\_\+usage}
+
+
+
+Definition at line \mbox{\hyperlink{chain__config_8hpp_source_l00042}{42}} of file \mbox{\hyperlink{chain__config_8hpp_source}{chain\+\_\+config.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1chain__config__v0_a460f6b269c9da35d40b1cc5927c2205a}\index{sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}!min\_transaction\_cpu\_usage@{min\_transaction\_cpu\_usage}}
+\index{min\_transaction\_cpu\_usage@{min\_transaction\_cpu\_usage}!sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}}
+\doxysubsubsection{\texorpdfstring{min\_transaction\_cpu\_usage}{min\_transaction\_cpu\_usage}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1chain__config__v0_a460f6b269c9da35d40b1cc5927c2205a} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::chain\+::chain\+\_\+config\+\_\+v0\+::min\+\_\+transaction\+\_\+cpu\+\_\+usage}
+
+
+
+Definition at line \mbox{\hyperlink{chain__config_8hpp_source_l00051}{51}} of file \mbox{\hyperlink{chain__config_8hpp_source}{chain\+\_\+config.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1chain__config__v0_a964d9d4fe4d9a1bb658e3dc840b62ca8}\index{sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}!net\_usage\_leeway@{net\_usage\_leeway}}
+\index{net\_usage\_leeway@{net\_usage\_leeway}!sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}}
+\doxysubsubsection{\texorpdfstring{net\_usage\_leeway}{net\_usage\_leeway}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1chain__config__v0_a964d9d4fe4d9a1bb658e3dc840b62ca8} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::chain\+::chain\+\_\+config\+\_\+v0\+::net\+\_\+usage\+\_\+leeway}
+
+
+
+Definition at line \mbox{\hyperlink{chain__config_8hpp_source_l00044}{44}} of file \mbox{\hyperlink{chain__config_8hpp_source}{chain\+\_\+config.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1chain__config__v0_af2b14c2153bc64969ca85c8df8fbb7f9}\index{sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}!target\_block\_cpu\_usage\_pct@{target\_block\_cpu\_usage\_pct}}
+\index{target\_block\_cpu\_usage\_pct@{target\_block\_cpu\_usage\_pct}!sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}}
+\doxysubsubsection{\texorpdfstring{target\_block\_cpu\_usage\_pct}{target\_block\_cpu\_usage\_pct}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1chain__config__v0_af2b14c2153bc64969ca85c8df8fbb7f9} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::chain\+::chain\+\_\+config\+\_\+v0\+::target\+\_\+block\+\_\+cpu\+\_\+usage\+\_\+pct}
+
+
+
+Definition at line \mbox{\hyperlink{chain__config_8hpp_source_l00049}{49}} of file \mbox{\hyperlink{chain__config_8hpp_source}{chain\+\_\+config.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1chain__config__v0_a216d150c1c6ad9ea64aaf82d86926d19}\index{sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}!target\_block\_net\_usage\_pct@{target\_block\_net\_usage\_pct}}
+\index{target\_block\_net\_usage\_pct@{target\_block\_net\_usage\_pct}!sysio::chain::chain\_config\_v0@{sysio::chain::chain\_config\_v0}}
+\doxysubsubsection{\texorpdfstring{target\_block\_net\_usage\_pct}{target\_block\_net\_usage\_pct}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1chain__config__v0_a216d150c1c6ad9ea64aaf82d86926d19} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::chain\+::chain\+\_\+config\+\_\+v0\+::target\+\_\+block\+\_\+net\+\_\+usage\+\_\+pct}
+
+
+
+Definition at line \mbox{\hyperlink{chain__config_8hpp_source_l00041}{41}} of file \mbox{\hyperlink{chain__config_8hpp_source}{chain\+\_\+config.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{chain__config_8hpp}{chain\+\_\+config.\+hpp}}\item 
+libraries/chain/\mbox{\hyperlink{chain__config_8cpp}{chain\+\_\+config.\+cpp}}\end{DoxyCompactItemize}

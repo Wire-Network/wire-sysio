@@ -1,0 +1,104 @@
+\doxysection{Catch\+::Singleton\texorpdfstring{$<$}{<} Singleton\+ImplT, InterfaceT, Mutable\+InterfaceT \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{class_catch_1_1_singleton}{}\label{class_catch_1_1_singleton}\index{Catch::Singleton$<$ SingletonImplT, InterfaceT, MutableInterfaceT $>$@{Catch::Singleton$<$ SingletonImplT, InterfaceT, MutableInterfaceT $>$}}
+
+
+{\ttfamily \#include $<$catch\+\_\+singletons.\+hpp$>$}
+
+
+
+Inheritance diagram for Catch\+::Singleton\texorpdfstring{$<$}{<} Singleton\+ImplT, InterfaceT, Mutable\+InterfaceT \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=272pt]{class_catch_1_1_singleton__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Catch\+::Singleton\texorpdfstring{$<$}{<} Singleton\+ImplT, InterfaceT, Mutable\+InterfaceT \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=272pt]{class_catch_1_1_singleton__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static auto \mbox{\hyperlink{class_catch_1_1_singleton_aa1b2bb002acd8838489a225dbbaf2865}{get}} () -\/$>$ InterfaceT const \&
+\item 
+static auto \mbox{\hyperlink{class_catch_1_1_singleton_a8c18286fe40405813c5bab05e20ce4f0}{get\+Mutable}} () -\/$>$ Mutable\+InterfaceT \&
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{struct_catch_1_1_i_singleton}{Catch\+::\+ISingleton}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{struct_catch_1_1_i_singleton_a17edca318d45b74b977a780c0183e5c3}{\texorpdfstring{$\sim$}{\string~}\+ISingleton}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Singleton\+ImplT, typename InterfaceT = Singleton\+ImplT, typename Mutable\+InterfaceT = InterfaceT$>$\newline
+class Catch\+::\+Singleton$<$ Singleton\+Impl\+T, Interface\+T, Mutable\+Interface\+T $>$}
+
+
+Definition at line \mbox{\hyperlink{catch__singletons_8hpp_source_l00022}{22}} of file \mbox{\hyperlink{catch__singletons_8hpp_source}{catch\+\_\+singletons.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_catch_1_1_singleton_aa1b2bb002acd8838489a225dbbaf2865}\index{Catch::Singleton$<$ SingletonImplT, InterfaceT, MutableInterfaceT $>$@{Catch::Singleton$<$ SingletonImplT, InterfaceT, MutableInterfaceT $>$}!get@{get}}
+\index{get@{get}!Catch::Singleton$<$ SingletonImplT, InterfaceT, MutableInterfaceT $>$@{Catch::Singleton$<$ SingletonImplT, InterfaceT, MutableInterfaceT $>$}}
+\doxysubsubsection{\texorpdfstring{get()}{get()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_singleton_aa1b2bb002acd8838489a225dbbaf2865} 
+template$<$typename Singleton\+ImplT , typename InterfaceT  = Singleton\+ImplT, typename Mutable\+InterfaceT  = InterfaceT$>$ \\
+static auto \mbox{\hyperlink{class_catch_1_1_singleton}{Catch\+::\+Singleton}}$<$ Singleton\+ImplT, InterfaceT, Mutable\+InterfaceT $>$\+::get (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) -\/$>$ InterfaceT const\& \hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__singletons_8hpp_source_l00034}{34}} of file \mbox{\hyperlink{catch__singletons_8hpp_source}{catch\+\_\+singletons.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *getInternal();}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_singleton_aa1b2bb002acd8838489a225dbbaf2865_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_singleton_a8c18286fe40405813c5bab05e20ce4f0}\index{Catch::Singleton$<$ SingletonImplT, InterfaceT, MutableInterfaceT $>$@{Catch::Singleton$<$ SingletonImplT, InterfaceT, MutableInterfaceT $>$}!getMutable@{getMutable}}
+\index{getMutable@{getMutable}!Catch::Singleton$<$ SingletonImplT, InterfaceT, MutableInterfaceT $>$@{Catch::Singleton$<$ SingletonImplT, InterfaceT, MutableInterfaceT $>$}}
+\doxysubsubsection{\texorpdfstring{getMutable()}{getMutable()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_singleton_a8c18286fe40405813c5bab05e20ce4f0} 
+template$<$typename Singleton\+ImplT , typename InterfaceT  = Singleton\+ImplT, typename Mutable\+InterfaceT  = InterfaceT$>$ \\
+static auto \mbox{\hyperlink{class_catch_1_1_singleton}{Catch\+::\+Singleton}}$<$ Singleton\+ImplT, InterfaceT, Mutable\+InterfaceT $>$\+::get\+Mutable (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) -\/$>$ Mutable\+InterfaceT\& \hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__singletons_8hpp_source_l00037}{37}} of file \mbox{\hyperlink{catch__singletons_8hpp_source}{catch\+\_\+singletons.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *getInternal();}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_singleton_a8c18286fe40405813c5bab05e20ce4f0_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__singletons_8hpp}{catch\+\_\+singletons.\+hpp}}\end{DoxyCompactItemize}

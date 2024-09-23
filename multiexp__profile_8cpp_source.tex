@@ -1,0 +1,134 @@
+\doxysection{multiexp\+\_\+profile.\+cpp}
+\hypertarget{multiexp__profile_8cpp_source}{}\label{multiexp__profile_8cpp_source}\index{libraries/fc/libraries/ff/libff/algebra/scalar\_multiplication/multiexp\_profile.cpp@{libraries/fc/libraries/ff/libff/algebra/scalar\_multiplication/multiexp\_profile.cpp}}
+\mbox{\hyperlink{multiexp__profile_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <cstdio>}}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{bn128__pp_8hpp}{libff/algebra/curves/bn128/bn128\_pp.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{multiexp_8hpp}{libff/algebra/scalar\_multiplication/multiexp.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{profiling_8hpp}{libff/common/profiling.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{rng_8hpp}{libff/common/rng.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00009}00009\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacelibff}{libff}};}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00011}00011\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ GroupT>}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00012}\mbox{\hyperlink{multiexp__profile_8cpp_a374880438c838689dc195b4884b4dd16}{00012}}\ \textcolor{keyword}{using\ }\mbox{\hyperlink{multiexp__profile_8cpp_a374880438c838689dc195b4884b4dd16}{run\_result\_t}}\ =\ std::pair<long\ long,\ std::vector<GroupT>\ >;}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00014}00014\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00015}\mbox{\hyperlink{multiexp__profile_8cpp_a5acd4ff1e7a344b55c71dcbd6e9cf01b}{00015}}\ \textcolor{keyword}{using\ }\mbox{\hyperlink{multiexp__profile_8cpp_a5acd4ff1e7a344b55c71dcbd6e9cf01b}{test\_instances\_t}}\ =\ std::vector<std::vector<T>\ >;}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00017}00017\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ GroupT>}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00018}\mbox{\hyperlink{multiexp__profile_8cpp_afaf7a343cff3466e9fbbc089792e863e}{00018}}\ \mbox{\hyperlink{multiexp__profile_8cpp_a5acd4ff1e7a344b55c71dcbd6e9cf01b}{test\_instances\_t<GroupT>}}\ \mbox{\hyperlink{multiexp__profile_8cpp_afaf7a343cff3466e9fbbc089792e863e}{generate\_group\_elements}}(\textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}},\ \textcolor{keywordtype}{size\_t}\ size)}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00019}00019\ \{}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00020}00020\ \ \ \ \ \textcolor{comment}{//\ generating\ a\ random\ group\ element\ is\ expensive,}}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00021}00021\ \ \ \ \ \textcolor{comment}{//\ so\ for\ now\ we\ only\ generate\ a\ single\ one\ and\ repeat\ it}}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00022}00022\ \ \ \ \ \mbox{\hyperlink{multiexp__profile_8cpp_a5acd4ff1e7a344b55c71dcbd6e9cf01b}{test\_instances\_t<GroupT>}}\ result(\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}});}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00024}00024\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}};\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00025}00025\ \ \ \ \ \ \ \ \ GroupT\ x\ =\ GroupT::random\_element();}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00026}00026\ \ \ \ \ \ \ \ \ x.to\_special();\ \textcolor{comment}{//\ djb\ requires\ input\ to\ be\ in\ special\ form}}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00027}00027\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ =\ 0;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ <\ size;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}++)\ \{}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00028}00028\ \ \ \ \ \ \ \ \ \ \ \ \ result[i].push\_back(x);}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00029}00029\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ result[i].push\_back(GroupT::random\_element());}}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00030}00030\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00031}00031\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00033}00033\ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00034}00034\ \}}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00036}00036\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ FieldT>}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00037}\mbox{\hyperlink{multiexp__profile_8cpp_ae02794cf54d8b475ca170925187837a0}{00037}}\ \mbox{\hyperlink{multiexp__profile_8cpp_a5acd4ff1e7a344b55c71dcbd6e9cf01b}{test\_instances\_t<FieldT>}}\ \mbox{\hyperlink{multiexp__profile_8cpp_ae02794cf54d8b475ca170925187837a0}{generate\_scalars}}(\textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}},\ \textcolor{keywordtype}{size\_t}\ size)}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00038}00038\ \{}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00039}00039\ \ \ \ \ \textcolor{comment}{//\ we\ use\ SHA512\_rng\ because\ it\ is\ much\ faster\ than}}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00040}00040\ \ \ \ \ \textcolor{comment}{//\ FieldT::random\_element()}}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00041}00041\ \ \ \ \ \mbox{\hyperlink{multiexp__profile_8cpp_a5acd4ff1e7a344b55c71dcbd6e9cf01b}{test\_instances\_t<FieldT>}}\ result(\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}});}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00043}00043\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}};\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00044}00044\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ =\ 0;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ <\ size;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}++)\ \{}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00045}00045\ \ \ \ \ \ \ \ \ \ \ \ \ result[i].push\_back(\mbox{\hyperlink{namespacelibff_ac97862c35064df387d87ccf3cbc2af1d}{SHA512\_rng<FieldT>}}(i\ *\ size\ +\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}));}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00046}00046\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00047}00047\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00049}00049\ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00050}00050\ \}}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00052}00052\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ GroupT,\ \textcolor{keyword}{typename}\ FieldT,\ multi\_exp\_method\ Method>}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00053}\mbox{\hyperlink{multiexp__profile_8cpp_aba4aee414fcfab68d0803154b25c0553}{00053}}\ \mbox{\hyperlink{multiexp__profile_8cpp_a374880438c838689dc195b4884b4dd16}{run\_result\_t<GroupT>}}\ \mbox{\hyperlink{multiexp__profile_8cpp_aba4aee414fcfab68d0803154b25c0553}{profile\_multiexp}}(}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00054}00054\ \ \ \ \ \mbox{\hyperlink{multiexp__profile_8cpp_a5acd4ff1e7a344b55c71dcbd6e9cf01b}{test\_instances\_t<GroupT>}}\ group\_elements,}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00055}00055\ \ \ \ \ \mbox{\hyperlink{multiexp__profile_8cpp_a5acd4ff1e7a344b55c71dcbd6e9cf01b}{test\_instances\_t<FieldT>}}\ scalars)}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00056}00056\ \{}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00057}00057\ \ \ \ \ \textcolor{keywordtype}{long}\ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{namespacelibff_af8ae91a4bcbdd7c4e71db45703edaae3}{start\_time}}\ =\ \mbox{\hyperlink{namespacelibff_a81e225ed671a1a00f2dfe5753f89b6cf}{get\_nsec\_time}}();}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00059}00059\ \ \ \ \ std::vector<GroupT>\ answers;}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00060}00060\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ group\_elements.size();\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00061}00061\ \ \ \ \ \ \ \ \ answers.push\_back(\mbox{\hyperlink{namespacelibff_a909c5131f90d7c9c35b61ca332f08f3a}{multi\_exp<GroupT,\ FieldT,\ Method>}}(}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00062}00062\ \ \ \ \ \ \ \ \ \ \ \ \ group\_elements[i].cbegin(),\ group\_elements[i].cend(),}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \ \ \ scalars[i].cbegin(),\ scalars[i].cend(),}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00064}00064\ \ \ \ \ \ \ \ \ \ \ \ \ 1));}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00065}00065\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00067}00067\ \ \ \ \ \textcolor{keywordtype}{long}\ \textcolor{keywordtype}{long}\ time\_delta\ =\ \mbox{\hyperlink{namespacelibff_a81e225ed671a1a00f2dfe5753f89b6cf}{get\_nsec\_time}}()\ -\/\ \mbox{\hyperlink{namespacelibff_af8ae91a4bcbdd7c4e71db45703edaae3}{start\_time}};}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00069}00069\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{multiexp__profile_8cpp_a374880438c838689dc195b4884b4dd16}{run\_result\_t<GroupT>}}(time\_delta,\ answers);}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00070}00070\ \}}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00072}00072\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ GroupT,\ \textcolor{keyword}{typename}\ FieldT>}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00073}\mbox{\hyperlink{multiexp__profile_8cpp_acb0d9f2af0ecc08a78d3d05b1b2a990f}{00073}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{multiexp__profile_8cpp_acb0d9f2af0ecc08a78d3d05b1b2a990f}{print\_performance\_csv}}(}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00074}00074\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ expn\_start,}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00075}00075\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ expn\_end\_fast,}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00076}00076\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ expn\_end\_naive,}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00077}00077\ \ \ \ \ \textcolor{keywordtype}{bool}\ compare\_answers)}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00078}00078\ \{}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00079}00079\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ expn\ =\ expn\_start;\ expn\ <=\ expn\_end\_fast;\ expn++)\ \{}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00080}00080\ \ \ \ \ \ \ \ \ printf(\textcolor{stringliteral}{"{}\%ld"{}},\ expn);\ fflush(stdout);}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00081}00081\ }
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00082}00082\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{multiexp__profile_8cpp_a5acd4ff1e7a344b55c71dcbd6e9cf01b}{test\_instances\_t<GroupT>}}\ group\_elements\ =}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00083}00083\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{multiexp__profile_8cpp_afaf7a343cff3466e9fbbc089792e863e}{generate\_group\_elements<GroupT>}}(10,\ 1\ <<\ expn);}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00084}00084\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{multiexp__profile_8cpp_a5acd4ff1e7a344b55c71dcbd6e9cf01b}{test\_instances\_t<FieldT>}}\ scalars\ =}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00085}00085\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{multiexp__profile_8cpp_ae02794cf54d8b475ca170925187837a0}{generate\_scalars<FieldT>}}(10,\ 1\ <<\ expn);}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00086}00086\ }
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00087}00087\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{multiexp__profile_8cpp_a374880438c838689dc195b4884b4dd16}{run\_result\_t<GroupT>}}\ result\_bos\_coster\ =}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00088}00088\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{multiexp__profile_8cpp_aba4aee414fcfab68d0803154b25c0553}{profile\_multiexp<GroupT,\ FieldT,\ multi\_exp\_method\_bos\_coster>}}(}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00089}00089\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ group\_elements,\ scalars);}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00090}00090\ \ \ \ \ \ \ \ \ printf(\textcolor{stringliteral}{"{}\(\backslash\)t\%lld"{}},\ result\_bos\_coster.first);\ fflush(stdout);}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00091}00091\ }
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00092}00092\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{multiexp__profile_8cpp_a374880438c838689dc195b4884b4dd16}{run\_result\_t<GroupT>}}\ result\_djb\ =}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00093}00093\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{multiexp__profile_8cpp_aba4aee414fcfab68d0803154b25c0553}{profile\_multiexp<GroupT,\ FieldT,\ multi\_exp\_method\_BDLO12>}}(}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00094}00094\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ group\_elements,\ scalars);}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00095}00095\ \ \ \ \ \ \ \ \ printf(\textcolor{stringliteral}{"{}\(\backslash\)t\%lld"{}},\ result\_djb.first);\ fflush(stdout);}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00096}00096\ }
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00097}00097\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (compare\_answers\ \&\&\ (result\_bos\_coster.second\ !=\ result\_djb.second))\ \{}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00098}00098\ \ \ \ \ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Answers\ NOT\ MATCHING\ (bos\ coster\ !=\ djb)\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00099}00099\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00100}00100\ }
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00101}00101\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (expn\ <=\ expn\_end\_naive)\ \{}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00102}00102\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{multiexp__profile_8cpp_a374880438c838689dc195b4884b4dd16}{run\_result\_t<GroupT>}}\ result\_naive\ =}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00103}00103\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{multiexp__profile_8cpp_aba4aee414fcfab68d0803154b25c0553}{profile\_multiexp<GroupT,\ FieldT,\ multi\_exp\_method\_naive>}}(}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00104}00104\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ group\_elements,\ scalars);}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00105}00105\ \ \ \ \ \ \ \ \ \ \ \ \ printf(\textcolor{stringliteral}{"{}\(\backslash\)t\%lld"{}},\ result\_naive.first);\ fflush(stdout);}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00106}00106\ }
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00107}00107\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (compare\_answers\ \&\&\ (result\_bos\_coster.second\ !=\ result\_naive.second))\ \{}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00108}00108\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Answers\ NOT\ MATCHING\ (bos\ coster\ !=\ naive)\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00109}00109\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00110}00110\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00111}00111\ }
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00112}00112\ \ \ \ \ \ \ \ \ printf(\textcolor{stringliteral}{"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00113}00113\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00114}00114\ \}}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00115}00115\ }
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00116}\mbox{\hyperlink{multiexp__profile_8cpp_a840291bc02cba5474a4cb46a9b9566fe}{00116}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{multiexp__profile_8cpp_a840291bc02cba5474a4cb46a9b9566fe}{main}}(\textcolor{keywordtype}{void})}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00117}00117\ \{}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00118}00118\ \ \ \ \ \mbox{\hyperlink{namespacelibff_ae2b657d337cbf53d4ce21b530b76efc5}{print\_compilation\_info}}();}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00119}00119\ }
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00120}00120\ \ \ \ \ printf(\textcolor{stringliteral}{"{}Profiling\ BN128\_G1\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00121}00121\ \ \ \ \ \mbox{\hyperlink{classlibff_1_1bn128__pp_ae44372429d5c8f7d85e87d6ddeb10a19}{bn128\_pp::init\_public\_params}}();}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00122}00122\ \ \ \ \ \mbox{\hyperlink{multiexp__profile_8cpp_acb0d9f2af0ecc08a78d3d05b1b2a990f}{print\_performance\_csv<G1<bn128\_pp>}},\ \mbox{\hyperlink{namespacelibff_a4d9ee1177daeded24b60e6425e5370d3}{Fr<bn128\_pp>}}\ >(2,\ 20,\ 14,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00123}00123\ }
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00124}00124\ \ \ \ \ printf(\textcolor{stringliteral}{"{}Profiling\ BN128\_G2\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00125}00125\ \ \ \ \ \mbox{\hyperlink{multiexp__profile_8cpp_acb0d9f2af0ecc08a78d3d05b1b2a990f}{print\_performance\_csv<G2<bn128\_pp>}},\ \mbox{\hyperlink{namespacelibff_a4d9ee1177daeded24b60e6425e5370d3}{Fr<bn128\_pp>}}\ >(2,\ 20,\ 14,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00126}00126\ }
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00127}00127\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{multiexp__profile_8cpp_source_l00128}00128\ \}}
+
+\end{DoxyCode}

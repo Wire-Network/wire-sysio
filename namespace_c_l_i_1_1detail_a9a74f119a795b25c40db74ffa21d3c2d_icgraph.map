@@ -1,0 +1,9 @@
+<map id="CLI::detail::value_string" name="CLI::detail::value_string">
+<area shape="rect" id="Node000001" title="get a string as a convertible value for arithmetic types" alt="" coords="252,63,372,103"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_checked_transformer.html#af11e8936b4c0707ff94338908622e111" title=" " alt="" coords="18,5,191,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="236,65,180,49,181,44,238,60"/>
+<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_is_member.html#a778da19fa2481912c7fcfe6b3c8b453a" title=" " alt="" coords="17,70,192,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="236,86,192,86,192,80,236,80"/>
+<area shape="rect" id="Node000004" href="$class_c_l_i_1_1_transformer.html#aef311ee89c54f64e3e78651bd2db826c" title=" " alt="" coords="5,120,204,145"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="237,103,162,121,161,116,236,98"/>
+</map>

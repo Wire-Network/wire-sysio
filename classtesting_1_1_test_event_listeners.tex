@@ -1,0 +1,265 @@
+\doxysection{testing\+::Test\+Event\+Listeners Class Reference}
+\hypertarget{classtesting_1_1_test_event_listeners}{}\label{classtesting_1_1_test_event_listeners}\index{testing::TestEventListeners@{testing::TestEventListeners}}
+
+
+{\ttfamily \#include $<$gtest.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1_test_event_listeners_af0716e4067a6f357ee5ea18802a591dd}{Test\+Event\+Listeners}} ()
+\item 
+\mbox{\hyperlink{classtesting_1_1_test_event_listeners_abe9fbbbedf7f55fa898abfae60aa4913}{\texorpdfstring{$\sim$}{\string~}\+Test\+Event\+Listeners}} ()
+\item 
+void \mbox{\hyperlink{classtesting_1_1_test_event_listeners_a1207dce74d64c1c39ffa6105560536a0}{Append}} (\mbox{\hyperlink{classtesting_1_1_test_event_listener}{Test\+Event\+Listener}} \texorpdfstring{$\ast$}{*}listener)
+\item 
+\mbox{\hyperlink{classtesting_1_1_test_event_listener}{Test\+Event\+Listener}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classtesting_1_1_test_event_listeners_a038c9fa1975f84d6f3d25b52bc7bccdd}{Release}} (\mbox{\hyperlink{classtesting_1_1_test_event_listener}{Test\+Event\+Listener}} \texorpdfstring{$\ast$}{*}listener)
+\item 
+\mbox{\hyperlink{classtesting_1_1_test_event_listener}{Test\+Event\+Listener}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classtesting_1_1_test_event_listeners_a98e6523edf5df8733c06ca7febe7f284}{default\+\_\+result\+\_\+printer}} () const
+\item 
+\mbox{\hyperlink{classtesting_1_1_test_event_listener}{Test\+Event\+Listener}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classtesting_1_1_test_event_listeners_ae291de106a0fe256ac21653fe437e59f}{default\+\_\+xml\+\_\+generator}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classtesting_1_1_test_event_listeners_aff779e55b06adfa7c0088bd10253f0f0}{Test\+Case}}
+\item 
+\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classtesting_1_1_test_event_listeners_a4c49c2cdb6c328e6b709b4542f23de3c}{Test\+Info}}
+\item 
+\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classtesting_1_1_test_event_listeners_abae39633da9932847b41cb80efd62115}{internal\+::\+Default\+Global\+Test\+Part\+Result\+Reporter}}
+\item 
+\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classtesting_1_1_test_event_listeners_afddba49fdf3f493532b4d5efb9814f4e}{internal\+::\+No\+Exec\+Death\+Test}}
+\item 
+\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classtesting_1_1_test_event_listeners_addbc107b6b445617c880182bd4f44cf9}{internal\+::\+Test\+Event\+Listeners\+Accessor}}
+\item 
+\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classtesting_1_1_test_event_listeners_acc0a5e7573fd6ae7ad1878613bb86853}{internal\+::\+Unit\+Test\+Impl}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{gtest_8h_source_l01107}{1107}} of file \mbox{\hyperlink{gtest_8h_source}{gtest.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1_test_event_listeners_af0716e4067a6f357ee5ea18802a591dd}\index{testing::TestEventListeners@{testing::TestEventListeners}!TestEventListeners@{TestEventListeners}}
+\index{TestEventListeners@{TestEventListeners}!testing::TestEventListeners@{testing::TestEventListeners}}
+\doxysubsubsection{\texorpdfstring{TestEventListeners()}{TestEventListeners()}}
+{\footnotesize\ttfamily \label{classtesting_1_1_test_event_listeners_af0716e4067a6f357ee5ea18802a591dd} 
+testing\+::\+Test\+Event\+Listeners\+::\+Test\+Event\+Listeners (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8cc_source_l04292}{4292}} of file \mbox{\hyperlink{gtest_8cc_source}{gtest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{04293\ \ \ \ \ :\ repeater\_(\textcolor{keyword}{new}\ internal::TestEventRepeater()),}
+\DoxyCodeLine{04294\ \ \ \ \ \ \ default\_result\_printer\_(NULL),}
+\DoxyCodeLine{04295\ \ \ \ \ \ \ default\_xml\_generator\_(NULL)\ \{}
+\DoxyCodeLine{04296\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1_test_event_listeners_abe9fbbbedf7f55fa898abfae60aa4913}\index{testing::TestEventListeners@{testing::TestEventListeners}!````~TestEventListeners@{\texorpdfstring{$\sim$}{\string~}TestEventListeners}}
+\index{````~TestEventListeners@{\texorpdfstring{$\sim$}{\string~}TestEventListeners}!testing::TestEventListeners@{testing::TestEventListeners}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}TestEventListeners()}{\string~TestEventListeners()}}
+{\footnotesize\ttfamily \label{classtesting_1_1_test_event_listeners_abe9fbbbedf7f55fa898abfae60aa4913} 
+testing\+::\+Test\+Event\+Listeners\+::\texorpdfstring{$\sim$}{\string~}\+Test\+Event\+Listeners (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8cc_source_l04298}{4298}} of file \mbox{\hyperlink{gtest_8cc_source}{gtest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{04298\ \{\ \textcolor{keyword}{delete}\ repeater\_;\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1_test_event_listeners_a1207dce74d64c1c39ffa6105560536a0}\index{testing::TestEventListeners@{testing::TestEventListeners}!Append@{Append}}
+\index{Append@{Append}!testing::TestEventListeners@{testing::TestEventListeners}}
+\doxysubsubsection{\texorpdfstring{Append()}{Append()}}
+{\footnotesize\ttfamily \label{classtesting_1_1_test_event_listeners_a1207dce74d64c1c39ffa6105560536a0} 
+void testing\+::\+Test\+Event\+Listeners\+::\+Append (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classtesting_1_1_test_event_listener}{Test\+Event\+Listener}} \texorpdfstring{$\ast$}{*}}]{listener}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8cc_source_l04304}{4304}} of file \mbox{\hyperlink{gtest_8cc_source}{gtest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{04304\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{04305\ \ \ repeater\_-\/>\mbox{\hyperlink{classtesting_1_1internal_1_1_test_event_repeater_ad154ce021881721a5c46994316b14cb1}{Append}}(listener);}
+\DoxyCodeLine{04306\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1_test_event_listeners_a1207dce74d64c1c39ffa6105560536a0_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1_test_event_listeners_a1207dce74d64c1c39ffa6105560536a0_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1_test_event_listeners_a98e6523edf5df8733c06ca7febe7f284}\index{testing::TestEventListeners@{testing::TestEventListeners}!default\_result\_printer@{default\_result\_printer}}
+\index{default\_result\_printer@{default\_result\_printer}!testing::TestEventListeners@{testing::TestEventListeners}}
+\doxysubsubsection{\texorpdfstring{default\_result\_printer()}{default\_result\_printer()}}
+{\footnotesize\ttfamily \label{classtesting_1_1_test_event_listeners_a98e6523edf5df8733c06ca7febe7f284} 
+\mbox{\hyperlink{classtesting_1_1_test_event_listener}{Test\+Event\+Listener}} \texorpdfstring{$\ast$}{*} testing\+::\+Test\+Event\+Listeners\+::default\+\_\+result\+\_\+printer (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8h_source_l01127}{1127}} of file \mbox{\hyperlink{gtest_8h_source}{gtest.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01127\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01128\ \ \ \ \ \textcolor{keywordflow}{return}\ default\_result\_printer\_;}
+\DoxyCodeLine{01129\ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=293pt]{classtesting_1_1_test_event_listeners_a98e6523edf5df8733c06ca7febe7f284_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1_test_event_listeners_ae291de106a0fe256ac21653fe437e59f}\index{testing::TestEventListeners@{testing::TestEventListeners}!default\_xml\_generator@{default\_xml\_generator}}
+\index{default\_xml\_generator@{default\_xml\_generator}!testing::TestEventListeners@{testing::TestEventListeners}}
+\doxysubsubsection{\texorpdfstring{default\_xml\_generator()}{default\_xml\_generator()}}
+{\footnotesize\ttfamily \label{classtesting_1_1_test_event_listeners_ae291de106a0fe256ac21653fe437e59f} 
+\mbox{\hyperlink{classtesting_1_1_test_event_listener}{Test\+Event\+Listener}} \texorpdfstring{$\ast$}{*} testing\+::\+Test\+Event\+Listeners\+::default\+\_\+xml\+\_\+generator (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8h_source_l01138}{1138}} of file \mbox{\hyperlink{gtest_8h_source}{gtest.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01138\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01139\ \ \ \ \ \textcolor{keywordflow}{return}\ default\_xml\_generator\_;}
+\DoxyCodeLine{01140\ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=293pt]{classtesting_1_1_test_event_listeners_ae291de106a0fe256ac21653fe437e59f_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1_test_event_listeners_a038c9fa1975f84d6f3d25b52bc7bccdd}\index{testing::TestEventListeners@{testing::TestEventListeners}!Release@{Release}}
+\index{Release@{Release}!testing::TestEventListeners@{testing::TestEventListeners}}
+\doxysubsubsection{\texorpdfstring{Release()}{Release()}}
+{\footnotesize\ttfamily \label{classtesting_1_1_test_event_listeners_a038c9fa1975f84d6f3d25b52bc7bccdd} 
+\mbox{\hyperlink{classtesting_1_1_test_event_listener}{Test\+Event\+Listener}} \texorpdfstring{$\ast$}{*} testing\+::\+Test\+Event\+Listeners\+::\+Release (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classtesting_1_1_test_event_listener}{Test\+Event\+Listener}} \texorpdfstring{$\ast$}{*}}]{listener}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8cc_source_l04311}{4311}} of file \mbox{\hyperlink{gtest_8cc_source}{gtest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{04311\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{04312\ \ \ \textcolor{keywordflow}{if}\ (listener\ ==\ default\_result\_printer\_)}
+\DoxyCodeLine{04313\ \ \ \ \ default\_result\_printer\_\ =\ NULL;}
+\DoxyCodeLine{04314\ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (listener\ ==\ default\_xml\_generator\_)}
+\DoxyCodeLine{04315\ \ \ \ \ default\_xml\_generator\_\ =\ NULL;}
+\DoxyCodeLine{04316\ \ \ \textcolor{keywordflow}{return}\ repeater\_-\/>\mbox{\hyperlink{classtesting_1_1internal_1_1_test_event_repeater_ac77a3d127e4726e11694e4ee9cf3b793}{Release}}(listener);}
+\DoxyCodeLine{04317\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1_test_event_listeners_a038c9fa1975f84d6f3d25b52bc7bccdd_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=293pt]{classtesting_1_1_test_event_listeners_a038c9fa1975f84d6f3d25b52bc7bccdd_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{classtesting_1_1_test_event_listeners_abae39633da9932847b41cb80efd62115}\index{testing::TestEventListeners@{testing::TestEventListeners}!internal::DefaultGlobalTestPartResultReporter@{internal::DefaultGlobalTestPartResultReporter}}
+\index{internal::DefaultGlobalTestPartResultReporter@{internal::DefaultGlobalTestPartResultReporter}!testing::TestEventListeners@{testing::TestEventListeners}}
+\doxysubsubsection{\texorpdfstring{internal::DefaultGlobalTestPartResultReporter}{internal::DefaultGlobalTestPartResultReporter}}
+{\footnotesize\ttfamily \label{classtesting_1_1_test_event_listeners_abae39633da9932847b41cb80efd62115} 
+friend \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classtesting_1_1internal_1_1_default_global_test_part_result_reporter}{internal\+::\+Default\+Global\+Test\+Part\+Result\+Reporter}}\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8h_source_l01145}{1145}} of file \mbox{\hyperlink{gtest_8h_source}{gtest.\+h}}.
+
+\Hypertarget{classtesting_1_1_test_event_listeners_afddba49fdf3f493532b4d5efb9814f4e}\index{testing::TestEventListeners@{testing::TestEventListeners}!internal::NoExecDeathTest@{internal::NoExecDeathTest}}
+\index{internal::NoExecDeathTest@{internal::NoExecDeathTest}!testing::TestEventListeners@{testing::TestEventListeners}}
+\doxysubsubsection{\texorpdfstring{internal::NoExecDeathTest}{internal::NoExecDeathTest}}
+{\footnotesize\ttfamily \label{classtesting_1_1_test_event_listeners_afddba49fdf3f493532b4d5efb9814f4e} 
+friend \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} internal\+::\+No\+Exec\+Death\+Test\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8h_source_l01146}{1146}} of file \mbox{\hyperlink{gtest_8h_source}{gtest.\+h}}.
+
+\Hypertarget{classtesting_1_1_test_event_listeners_addbc107b6b445617c880182bd4f44cf9}\index{testing::TestEventListeners@{testing::TestEventListeners}!internal::TestEventListenersAccessor@{internal::TestEventListenersAccessor}}
+\index{internal::TestEventListenersAccessor@{internal::TestEventListenersAccessor}!testing::TestEventListeners@{testing::TestEventListeners}}
+\doxysubsubsection{\texorpdfstring{internal::TestEventListenersAccessor}{internal::TestEventListenersAccessor}}
+{\footnotesize\ttfamily \label{classtesting_1_1_test_event_listeners_addbc107b6b445617c880182bd4f44cf9} 
+friend \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classtesting_1_1internal_1_1_test_event_listeners_accessor}{internal\+::\+Test\+Event\+Listeners\+Accessor}}\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8h_source_l01147}{1147}} of file \mbox{\hyperlink{gtest_8h_source}{gtest.\+h}}.
+
+\Hypertarget{classtesting_1_1_test_event_listeners_acc0a5e7573fd6ae7ad1878613bb86853}\index{testing::TestEventListeners@{testing::TestEventListeners}!internal::UnitTestImpl@{internal::UnitTestImpl}}
+\index{internal::UnitTestImpl@{internal::UnitTestImpl}!testing::TestEventListeners@{testing::TestEventListeners}}
+\doxysubsubsection{\texorpdfstring{internal::UnitTestImpl}{internal::UnitTestImpl}}
+{\footnotesize\ttfamily \label{classtesting_1_1_test_event_listeners_acc0a5e7573fd6ae7ad1878613bb86853} 
+friend \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl}{internal\+::\+Unit\+Test\+Impl}}\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8h_source_l01148}{1148}} of file \mbox{\hyperlink{gtest_8h_source}{gtest.\+h}}.
+
+\Hypertarget{classtesting_1_1_test_event_listeners_aff779e55b06adfa7c0088bd10253f0f0}\index{testing::TestEventListeners@{testing::TestEventListeners}!TestCase@{TestCase}}
+\index{TestCase@{TestCase}!testing::TestEventListeners@{testing::TestEventListeners}}
+\doxysubsubsection{\texorpdfstring{TestCase}{TestCase}}
+{\footnotesize\ttfamily \label{classtesting_1_1_test_event_listeners_aff779e55b06adfa7c0088bd10253f0f0} 
+friend \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classtesting_1_1_test_case}{Test\+Case}}\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8h_source_l01143}{1143}} of file \mbox{\hyperlink{gtest_8h_source}{gtest.\+h}}.
+
+\Hypertarget{classtesting_1_1_test_event_listeners_a4c49c2cdb6c328e6b709b4542f23de3c}\index{testing::TestEventListeners@{testing::TestEventListeners}!TestInfo@{TestInfo}}
+\index{TestInfo@{TestInfo}!testing::TestEventListeners@{testing::TestEventListeners}}
+\doxysubsubsection{\texorpdfstring{TestInfo}{TestInfo}}
+{\footnotesize\ttfamily \label{classtesting_1_1_test_event_listeners_a4c49c2cdb6c328e6b709b4542f23de3c} 
+friend \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classtesting_1_1_test_info}{Test\+Info}}\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8h_source_l01144}{1144}} of file \mbox{\hyperlink{gtest_8h_source}{gtest.\+h}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/include/gtest/\mbox{\hyperlink{gtest_8h}{gtest.\+h}}\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/src/\mbox{\hyperlink{gtest_8cc}{gtest.\+cc}}\end{DoxyCompactItemize}

@@ -1,0 +1,10 @@
+<map id="TEST" name="TEST">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,78,61,104"/>
+<area shape="rect" id="Node000002" href="$class_generic_string_buffer.html#ad324b8154be3354dda3aa4a0a7361499" title="Get the length of string in Ch in the string buffer." alt="" coords="109,5,244,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="60,76,115,51,117,55,62,81"/>
+<area shape="rect" id="Node000003" href="$class_generic_string_buffer.html#a725e862b9a78375f5363b0b61ad789f3" title="Get the size of string in bytes in the string buffer." alt="" coords="109,71,244,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="61,88,93,88,93,94,61,94"/>
+<area shape="rect" id="Node000004" href="$class_generic_string_buffer.html#a80af78c43da93126a940a40d1889278a" title=" " alt="" coords="109,160,244,201"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="57,102,131,149,128,154,54,106"/>
+<area shape="poly" id="edge4_Node000004_Node000004" title=" " alt="" coords="148,160,147,150,151,141,161,135,176,133,192,136,202,142,199,147,190,141,176,139,163,140,155,145,152,151,154,159"/>
+</map>

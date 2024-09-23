@@ -1,0 +1,23 @@
+<map id="bn::components::precomputeG2" name="bn::components::precomputeG2">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,99,213,124"/>
+<area shape="rect" id="Node000002" href="$namespacebn_1_1ecop.html#aecdd2b15dc57403600d49afb5bc6ac57" title=" " alt="" coords="737,11,928,36"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="129,96,186,63,222,47,260,34,320,22,382,13,506,4,623,4,722,9,722,15,623,9,507,9,383,18,321,27,261,39,224,51,188,68,131,100"/>
+<area shape="rect" id="Node000004" href="$namespacebn_1_1ecop.html#a5de8f9e367f80bcfab0d2c5294613666" title=" " alt="" coords="499,48,689,74"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="140,95,195,75,260,58,317,51,375,48,483,49,483,55,375,53,318,56,261,63,197,80,142,100"/>
+<area shape="rect" id="Node000005" href="$structbn_1_1_fp2_t.html#a486698952735cda99a54294541373aac" title=" " alt="" coords="782,124,883,150"/>
+<area shape="poly" id="edge8_Node000001_Node000005" title=" " alt="" coords="213,112,767,132,766,137,213,118"/>
+<area shape="rect" id="Node000006" href="$namespacebn_1_1ecop.html#aca919beee5940012257273d038039c54" title=" " alt="" coords="261,73,451,99"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="213,98,245,95,246,100,213,103"/>
+<area shape="rect" id="Node000007" href="$namespacebn_1_1ecop.html#a699ba608398adde415b5ec415d4bf100" title=" " alt="" coords="276,175,436,200"/>
+<area shape="poly" id="edge9_Node000001_Node000007" title=" " alt="" coords="154,122,298,167,296,172,153,127"/>
+<area shape="rect" id="Node000009" href="$structbn_1_1_fp6_t.html#afa102f154f72ee54cf7a27df541e9401" title=" " alt="" coords="504,224,684,265"/>
+<area shape="poly" id="edge11_Node000001_Node000009" title=" " alt="" coords="126,123,183,168,221,191,262,210,318,227,377,237,488,245,488,250,376,242,317,232,260,215,218,196,180,172,123,127"/>
+<area shape="rect" id="Node000003" href="$structbn_1_1_fp2_t.html#a64726a683dee9dda5dc335ea810a6bc4" title=" " alt="" coords="976,11,1112,36"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="928,21,960,21,960,26,928,26"/>
+<area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="680,45,731,37,732,42,681,50"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="638,72,776,116,774,121,636,77"/>
+<area shape="poly" id="edge7_Node000006_Node000004" title=" " alt="" coords="451,73,483,70,484,75,452,79"/>
+<area shape="rect" id="Node000008" href="$namespacebn_1_1ecop.html#a4a6928bb915f1eef461635202d2e4c30" title=" " alt="" coords="540,175,648,200"/>
+<area shape="poly" id="edge10_Node000007_Node000008" title=" " alt="" coords="436,185,525,185,525,190,436,190"/>
+<area shape="poly" id="edge12_Node000009_Node000005" title=" " alt="" coords="660,221,688,210,745,183,795,155,797,160,747,188,690,215,662,226"/>
+</map>

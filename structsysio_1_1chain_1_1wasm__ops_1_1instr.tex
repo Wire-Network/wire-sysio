@@ -1,0 +1,132 @@
+\doxysection{sysio\+::chain\+::wasm\+\_\+ops\+::instr Struct Reference}
+\hypertarget{structsysio_1_1chain_1_1wasm__ops_1_1instr}{}\label{structsysio_1_1chain_1_1wasm__ops_1_1instr}\index{sysio::chain::wasm\_ops::instr@{sysio::chain::wasm\_ops::instr}}
+
+
+{\ttfamily \#include $<$wasm\+\_\+sysio\+\_\+binary\+\_\+ops.\+hpp$>$}
+
+
+
+Inheritance diagram for sysio\+::chain\+::wasm\+\_\+ops\+::instr\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=224pt]{structsysio_1_1chain_1_1wasm__ops_1_1instr__inherit__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual std\+::string \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1instr_a0a55a4b7e64093dbff81fc9e31b18b81}{to\+\_\+string}} ()
+\item 
+virtual \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1instr_aa819b4496619269b505c9e03fb1b71c4}{get\+\_\+code}} ()=0
+\item 
+virtual void \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1instr_a70d791209d1bc021f5eeca023f8cd124}{visit}} (\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1visitor__arg}{visitor\+\_\+arg}} \&\&arg)=0
+\item 
+virtual int \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1instr_ace7547e2df9c16b877fc032a87b8cf69}{skip\+\_\+ahead}} ()=0
+\item 
+virtual void \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1instr_ad94788a34343a9be1e674908f1e3b020}{unpack}} (char \texorpdfstring{$\ast$}{*}opcode)=0
+\item 
+virtual void \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1instr_a6f9d8bd069054ad9a78fae0d2220102c}{pack}} (\mbox{\hyperlink{classsysio_1_1chain_1_1wasm__ops_1_1instruction__stream}{instruction\+\_\+stream}} \texorpdfstring{$\ast$}{*}stream)=0
+\item 
+virtual bool \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1instr_a41b09599f11d2f54099e3fa8639cb2ed}{is\+\_\+kill}} ()=0
+\item 
+virtual bool \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1instr_a6047b46921f90d2cb904be19394c2ec8}{is\+\_\+post}} ()=0
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_source_l00532}{532}} of file \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_source}{wasm\+\_\+sysio\+\_\+binary\+\_\+ops.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1chain_1_1wasm__ops_1_1instr_aa819b4496619269b505c9e03fb1b71c4}\index{sysio::chain::wasm\_ops::instr@{sysio::chain::wasm\_ops::instr}!get\_code@{get\_code}}
+\index{get\_code@{get\_code}!sysio::chain::wasm\_ops::instr@{sysio::chain::wasm\_ops::instr}}
+\doxysubsubsection{\texorpdfstring{get\_code()}{get\_code()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__ops_1_1instr_aa819b4496619269b505c9e03fb1b71c4} 
+virtual \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} sysio\+::chain\+::wasm\+\_\+ops\+::instr\+::get\+\_\+code (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=327pt]{structsysio_1_1chain_1_1wasm__ops_1_1instr_aa819b4496619269b505c9e03fb1b71c4_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1wasm__ops_1_1instr_a41b09599f11d2f54099e3fa8639cb2ed}\index{sysio::chain::wasm\_ops::instr@{sysio::chain::wasm\_ops::instr}!is\_kill@{is\_kill}}
+\index{is\_kill@{is\_kill}!sysio::chain::wasm\_ops::instr@{sysio::chain::wasm\_ops::instr}}
+\doxysubsubsection{\texorpdfstring{is\_kill()}{is\_kill()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__ops_1_1instr_a41b09599f11d2f54099e3fa8639cb2ed} 
+virtual bool sysio\+::chain\+::wasm\+\_\+ops\+::instr\+::is\+\_\+kill (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1instr__base_a82b4ed099da7ef9704cba64432872942}{sysio\+::chain\+::wasm\+\_\+ops\+::instr\+\_\+base$<$ Mutators $>$}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__ops_1_1instr_a6047b46921f90d2cb904be19394c2ec8}\index{sysio::chain::wasm\_ops::instr@{sysio::chain::wasm\_ops::instr}!is\_post@{is\_post}}
+\index{is\_post@{is\_post}!sysio::chain::wasm\_ops::instr@{sysio::chain::wasm\_ops::instr}}
+\doxysubsubsection{\texorpdfstring{is\_post()}{is\_post()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__ops_1_1instr_a6047b46921f90d2cb904be19394c2ec8} 
+virtual bool sysio\+::chain\+::wasm\+\_\+ops\+::instr\+::is\+\_\+post (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1instr__base_ac2494d1de5ac3466bb829472772bf662}{sysio\+::chain\+::wasm\+\_\+ops\+::instr\+\_\+base$<$ Mutators $>$}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__ops_1_1instr_a6f9d8bd069054ad9a78fae0d2220102c}\index{sysio::chain::wasm\_ops::instr@{sysio::chain::wasm\_ops::instr}!pack@{pack}}
+\index{pack@{pack}!sysio::chain::wasm\_ops::instr@{sysio::chain::wasm\_ops::instr}}
+\doxysubsubsection{\texorpdfstring{pack()}{pack()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__ops_1_1instr_a6f9d8bd069054ad9a78fae0d2220102c} 
+virtual void sysio\+::chain\+::wasm\+\_\+ops\+::instr\+::pack (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classsysio_1_1chain_1_1wasm__ops_1_1instruction__stream}{instruction\+\_\+stream}} \texorpdfstring{$\ast$}{*}}]{stream}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__ops_1_1instr_ace7547e2df9c16b877fc032a87b8cf69}\index{sysio::chain::wasm\_ops::instr@{sysio::chain::wasm\_ops::instr}!skip\_ahead@{skip\_ahead}}
+\index{skip\_ahead@{skip\_ahead}!sysio::chain::wasm\_ops::instr@{sysio::chain::wasm\_ops::instr}}
+\doxysubsubsection{\texorpdfstring{skip\_ahead()}{skip\_ahead()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__ops_1_1instr_ace7547e2df9c16b877fc032a87b8cf69} 
+virtual int sysio\+::chain\+::wasm\+\_\+ops\+::instr\+::skip\+\_\+ahead (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__ops_1_1instr_a0a55a4b7e64093dbff81fc9e31b18b81}\index{sysio::chain::wasm\_ops::instr@{sysio::chain::wasm\_ops::instr}!to\_string@{to\_string}}
+\index{to\_string@{to\_string}!sysio::chain::wasm\_ops::instr@{sysio::chain::wasm\_ops::instr}}
+\doxysubsubsection{\texorpdfstring{to\_string()}{to\_string()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__ops_1_1instr_a0a55a4b7e64093dbff81fc9e31b18b81} 
+virtual std\+::string sysio\+::chain\+::wasm\+\_\+ops\+::instr\+::to\+\_\+string (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_source_l00533}{533}} of file \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_source}{wasm\+\_\+sysio\+\_\+binary\+\_\+ops.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00533\ \{\ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}instr"{}};\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=331pt]{structsysio_1_1chain_1_1wasm__ops_1_1instr_a0a55a4b7e64093dbff81fc9e31b18b81_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1wasm__ops_1_1instr_ad94788a34343a9be1e674908f1e3b020}\index{sysio::chain::wasm\_ops::instr@{sysio::chain::wasm\_ops::instr}!unpack@{unpack}}
+\index{unpack@{unpack}!sysio::chain::wasm\_ops::instr@{sysio::chain::wasm\_ops::instr}}
+\doxysubsubsection{\texorpdfstring{unpack()}{unpack()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__ops_1_1instr_ad94788a34343a9be1e674908f1e3b020} 
+virtual void sysio\+::chain\+::wasm\+\_\+ops\+::instr\+::unpack (\begin{DoxyParamCaption}\item[{char \texorpdfstring{$\ast$}{*}}]{opcode}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__ops_1_1instr_a70d791209d1bc021f5eeca023f8cd124}\index{sysio::chain::wasm\_ops::instr@{sysio::chain::wasm\_ops::instr}!visit@{visit}}
+\index{visit@{visit}!sysio::chain::wasm\_ops::instr@{sysio::chain::wasm\_ops::instr}}
+\doxysubsubsection{\texorpdfstring{visit()}{visit()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__ops_1_1instr_a70d791209d1bc021f5eeca023f8cd124} 
+virtual void sysio\+::chain\+::wasm\+\_\+ops\+::instr\+::visit (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1visitor__arg}{visitor\+\_\+arg}} \&\&}]{arg}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1instr__base_a79ef303b36577f3a2f0b7b4650532bb5}{sysio\+::chain\+::wasm\+\_\+ops\+::instr\+\_\+base$<$ Mutators $>$}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{wasm__sysio__binary__ops_8hpp}{wasm\+\_\+sysio\+\_\+binary\+\_\+ops.\+hpp}}\end{DoxyCompactItemize}

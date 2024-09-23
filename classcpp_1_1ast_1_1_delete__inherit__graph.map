@@ -1,0 +1,9 @@
+<map id="cpp.ast.Delete" name="cpp.ast.Delete">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,226,112,252"/>
+<area shape="rect" id="Node000002" href="$classcpp_1_1ast_1_1_expr.html" title=" " alt="" coords="11,153,106,178"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="61,194,61,226,56,226,56,194"/>
+<area shape="rect" id="Node000003" href="$classcpp_1_1ast_1_1_node.html" title=" " alt="" coords="9,79,108,105"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="61,120,61,152,56,152,56,120"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="30,5,87,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="61,46,61,79,56,79,56,46"/>
+</map>

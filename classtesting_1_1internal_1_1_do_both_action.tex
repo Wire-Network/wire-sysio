@@ -1,0 +1,68 @@
+\doxysection{testing\+::internal\+::Do\+Both\+Action\texorpdfstring{$<$}{<} Action1, Action2 \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classtesting_1_1internal_1_1_do_both_action}{}\label{classtesting_1_1internal_1_1_do_both_action}\index{testing::internal::DoBothAction$<$ Action1, Action2 $>$@{testing::internal::DoBothAction$<$ Action1, Action2 $>$}}
+
+
+{\ttfamily \#include $<$gmock-\/actions.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_do_both_action_a55727c4dbdc1816ba6f1fe124e96088b}{Do\+Both\+Action}} (Action1 action1, Action2 action2)
+\item 
+{\footnotesize template$<$typename F $>$ }\\\mbox{\hyperlink{classtesting_1_1internal_1_1_do_both_action_a35733e2f117daad110bfbd3de84634a6}{operator Action$<$ F $>$}} () const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Action1, typename Action2$>$\newline
+class testing\+::internal\+::\+Do\+Both\+Action$<$ Action1, Action2 $>$}
+
+
+Definition at line \mbox{\hyperlink{gmock-actions_8h_source_l01023}{1023}} of file \mbox{\hyperlink{gmock-actions_8h_source}{gmock-\/actions.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_do_both_action_a55727c4dbdc1816ba6f1fe124e96088b}\index{testing::internal::DoBothAction$<$ Action1, Action2 $>$@{testing::internal::DoBothAction$<$ Action1, Action2 $>$}!DoBothAction@{DoBothAction}}
+\index{DoBothAction@{DoBothAction}!testing::internal::DoBothAction$<$ Action1, Action2 $>$@{testing::internal::DoBothAction$<$ Action1, Action2 $>$}}
+\doxysubsubsection{\texorpdfstring{DoBothAction()}{DoBothAction()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_do_both_action_a55727c4dbdc1816ba6f1fe124e96088b} 
+template$<$typename Action1 , typename Action2 $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_do_both_action}{testing\+::internal\+::\+Do\+Both\+Action}}$<$ Action1, Action2 $>$\+::\+Do\+Both\+Action (\begin{DoxyParamCaption}\item[{Action1}]{action1}{, }\item[{Action2}]{action2}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-actions_8h_source_l01025}{1025}} of file \mbox{\hyperlink{gmock-actions_8h_source}{gmock-\/actions.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01026\ \ \ \ \ \ \ :\ action1\_(action1),\ action2\_(action2)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_do_both_action_a35733e2f117daad110bfbd3de84634a6}\index{testing::internal::DoBothAction$<$ Action1, Action2 $>$@{testing::internal::DoBothAction$<$ Action1, Action2 $>$}!operator Action$<$ F $>$@{operator Action$<$ F $>$}}
+\index{operator Action$<$ F $>$@{operator Action$<$ F $>$}!testing::internal::DoBothAction$<$ Action1, Action2 $>$@{testing::internal::DoBothAction$<$ Action1, Action2 $>$}}
+\doxysubsubsection{\texorpdfstring{operator Action$<$ F $>$()}{operator Action< F >()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_do_both_action_a35733e2f117daad110bfbd3de84634a6} 
+template$<$typename Action1 , typename Action2 $>$ \\
+template$<$typename F $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_do_both_action}{testing\+::internal\+::\+Do\+Both\+Action}}$<$ Action1, Action2 $>$\+::operator \mbox{\hyperlink{classtesting_1_1_action}{Action}}$<$ F $>$ (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-actions_8h_source_l01031}{1031}} of file \mbox{\hyperlink{gmock-actions_8h_source}{gmock-\/actions.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01031\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01032\ \ \ \ \ \textcolor{keywordflow}{return}\ Action<F>(\textcolor{keyword}{new}\ Impl<F>(action1\_,\ action2\_));}
+\DoxyCodeLine{01033\ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/include/gmock/\mbox{\hyperlink{gmock-actions_8h}{gmock-\/actions.\+h}}\end{DoxyCompactItemize}

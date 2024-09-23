@@ -1,0 +1,479 @@
+\doxysection{Generic\+String\+Buffer\texorpdfstring{$<$}{<} Encoding, Allocator \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{class_generic_string_buffer}{}\label{class_generic_string_buffer}\index{GenericStringBuffer$<$ Encoding, Allocator $>$@{GenericStringBuffer$<$ Encoding, Allocator $>$}}
+
+
+Represents an in-\/memory output stream.  
+
+
+
+
+{\ttfamily \#include $<$stringbuffer.\+h$>$}
+
+
+
+Collaboration diagram for Generic\+String\+Buffer\texorpdfstring{$<$}{<} Encoding, Allocator \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=268pt]{class_generic_string_buffer__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef Encoding\+::\+Ch \mbox{\hyperlink{class_generic_string_buffer_a7fea544a5ae79d8a9dbb4ceb6d134b06}{Ch}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_generic_string_buffer_a62f5ea1a53a2a3f98088f8c152b6183e}{Generic\+String\+Buffer}} (\mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} \texorpdfstring{$\ast$}{*}allocator=0, size\+\_\+t capacity=\mbox{\hyperlink{class_generic_string_buffer_ae74f9df854dd5a7db4315ef44b016d22}{k\+Default\+Capacity}})
+\item 
+void \mbox{\hyperlink{class_generic_string_buffer_a8be5c8fadccacdcf40e20220f38e0afa}{Put}} (\mbox{\hyperlink{class_generic_string_buffer_a7fea544a5ae79d8a9dbb4ceb6d134b06}{Ch}} c)
+\item 
+void \mbox{\hyperlink{class_generic_string_buffer_a9225468d11fdddfc3a9a4e48bf4d3ba4}{Put\+Unsafe}} (\mbox{\hyperlink{class_generic_string_buffer_a7fea544a5ae79d8a9dbb4ceb6d134b06}{Ch}} c)
+\item 
+void \mbox{\hyperlink{class_generic_string_buffer_a28bb539487db17b07314a532f3b8847c}{Flush}} ()
+\item 
+void \mbox{\hyperlink{class_generic_string_buffer_a42f15c959046d899cb74c3120a6995f9}{Clear}} ()
+\item 
+void \mbox{\hyperlink{class_generic_string_buffer_a0dbdb77489b95923795011a24f705be5}{Shrink\+To\+Fit}} ()
+\item 
+void \mbox{\hyperlink{class_generic_string_buffer_a4d6becae201b98c122746298882a318f}{Reserve}} (size\+\_\+t \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}})
+\item 
+\mbox{\hyperlink{class_generic_string_buffer_a7fea544a5ae79d8a9dbb4ceb6d134b06}{Ch}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_generic_string_buffer_a80af78c43da93126a940a40d1889278a}{Push}} (size\+\_\+t \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}})
+\item 
+\mbox{\hyperlink{class_generic_string_buffer_a7fea544a5ae79d8a9dbb4ceb6d134b06}{Ch}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_generic_string_buffer_a67bbdeb1f0f7c539f85ca36857a62ca3}{Push\+Unsafe}} (size\+\_\+t \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}})
+\item 
+void \mbox{\hyperlink{class_generic_string_buffer_a0038e53ba03c271bc4cbbac403ec4de4}{Pop}} (size\+\_\+t \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}})
+\item 
+const \mbox{\hyperlink{class_generic_string_buffer_a7fea544a5ae79d8a9dbb4ceb6d134b06}{Ch}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_generic_string_buffer_a42079865bab1deb930c6cff7d491c719}{Get\+String}} () const
+\item 
+size\+\_\+t \mbox{\hyperlink{class_generic_string_buffer_a725e862b9a78375f5363b0b61ad789f3}{Get\+Size}} () const
+\begin{DoxyCompactList}\small\item\em Get the size of string in bytes in the string buffer. \end{DoxyCompactList}\item 
+size\+\_\+t \mbox{\hyperlink{class_generic_string_buffer_ad324b8154be3354dda3aa4a0a7361499}{Get\+Length}} () const
+\begin{DoxyCompactList}\small\item\em Get the length of string in Ch in the string buffer. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classinternal_1_1_stack}{internal\+::\+Stack}}$<$ \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \mbox{\hyperlink{class_generic_string_buffer_aaef716643febb9de5957dbf8ff904409}{stack\+\_\+}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static const size\+\_\+t \mbox{\hyperlink{class_generic_string_buffer_ae74f9df854dd5a7db4315ef44b016d22}{k\+Default\+Capacity}} = 256
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} = Crt\+Allocator$>$\newline
+class Generic\+String\+Buffer$<$ Encoding, Allocator $>$}
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em Encoding} & Encoding of the stream. \\
+\hline
+{\em Allocator} & type for allocating memory buffer. \\
+\hline
+\end{DoxyTemplParams}
+\begin{DoxyNote}{Note}
+implements Stream concept 
+\end{DoxyNote}
+
+
+Definition at line \mbox{\hyperlink{stringbuffer_8h_source_l00041}{41}} of file \mbox{\hyperlink{stringbuffer_8h_source}{stringbuffer.\+h}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{class_generic_string_buffer_a7fea544a5ae79d8a9dbb4ceb6d134b06}\index{GenericStringBuffer$<$ Encoding, Allocator $>$@{GenericStringBuffer$<$ Encoding, Allocator $>$}!Ch@{Ch}}
+\index{Ch@{Ch}!GenericStringBuffer$<$ Encoding, Allocator $>$@{GenericStringBuffer$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{Ch}{Ch}}
+{\footnotesize\ttfamily \label{class_generic_string_buffer_a7fea544a5ae79d8a9dbb4ceb6d134b06} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Crt\+Allocator$>$ \\
+Encoding\+::\+Ch \mbox{\hyperlink{class_generic_string_buffer}{Generic\+String\+Buffer}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Ch}
+
+
+
+Definition at line \mbox{\hyperlink{stringbuffer_8h_source_l00043}{43}} of file \mbox{\hyperlink{stringbuffer_8h_source}{stringbuffer.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_generic_string_buffer_a62f5ea1a53a2a3f98088f8c152b6183e}\index{GenericStringBuffer$<$ Encoding, Allocator $>$@{GenericStringBuffer$<$ Encoding, Allocator $>$}!GenericStringBuffer@{GenericStringBuffer}}
+\index{GenericStringBuffer@{GenericStringBuffer}!GenericStringBuffer$<$ Encoding, Allocator $>$@{GenericStringBuffer$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{GenericStringBuffer()}{GenericStringBuffer()}}
+{\footnotesize\ttfamily \label{class_generic_string_buffer_a62f5ea1a53a2a3f98088f8c152b6183e} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Crt\+Allocator$>$ \\
+\mbox{\hyperlink{class_generic_string_buffer}{Generic\+String\+Buffer}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\mbox{\hyperlink{class_generic_string_buffer}{\+::\+Generic\+String\+Buffer}} (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} \texorpdfstring{$\ast$}{*}}]{allocator}{ = {\ttfamily 0}, }\item[{size\+\_\+t}]{capacity}{ = {\ttfamily \mbox{\hyperlink{class_generic_string_buffer_ae74f9df854dd5a7db4315ef44b016d22}{k\+Default\+Capacity}}}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{stringbuffer_8h_source_l00045}{45}} of file \mbox{\hyperlink{stringbuffer_8h_source}{stringbuffer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00045\ :\ \mbox{\hyperlink{class_generic_string_buffer_aaef716643febb9de5957dbf8ff904409}{stack\_}}(allocator,\ capacity)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_generic_string_buffer_a42f15c959046d899cb74c3120a6995f9}\index{GenericStringBuffer$<$ Encoding, Allocator $>$@{GenericStringBuffer$<$ Encoding, Allocator $>$}!Clear@{Clear}}
+\index{Clear@{Clear}!GenericStringBuffer$<$ Encoding, Allocator $>$@{GenericStringBuffer$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{Clear()}{Clear()}}
+{\footnotesize\ttfamily \label{class_generic_string_buffer_a42f15c959046d899cb74c3120a6995f9} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Crt\+Allocator$>$ \\
+void \mbox{\hyperlink{class_generic_string_buffer}{Generic\+String\+Buffer}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Clear (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{stringbuffer_8h_source_l00060}{60}} of file \mbox{\hyperlink{stringbuffer_8h_source}{stringbuffer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00060\ \{\ \mbox{\hyperlink{class_generic_string_buffer_aaef716643febb9de5957dbf8ff904409}{stack\_}}.Clear();\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=309pt]{class_generic_string_buffer_a42f15c959046d899cb74c3120a6995f9_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_string_buffer_a28bb539487db17b07314a532f3b8847c}\index{GenericStringBuffer$<$ Encoding, Allocator $>$@{GenericStringBuffer$<$ Encoding, Allocator $>$}!Flush@{Flush}}
+\index{Flush@{Flush}!GenericStringBuffer$<$ Encoding, Allocator $>$@{GenericStringBuffer$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{Flush()}{Flush()}}
+{\footnotesize\ttfamily \label{class_generic_string_buffer_a28bb539487db17b07314a532f3b8847c} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Crt\+Allocator$>$ \\
+void \mbox{\hyperlink{class_generic_string_buffer}{Generic\+String\+Buffer}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Flush (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{stringbuffer_8h_source_l00058}{58}} of file \mbox{\hyperlink{stringbuffer_8h_source}{stringbuffer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00058\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{class_generic_string_buffer_ad324b8154be3354dda3aa4a0a7361499}\index{GenericStringBuffer$<$ Encoding, Allocator $>$@{GenericStringBuffer$<$ Encoding, Allocator $>$}!GetLength@{GetLength}}
+\index{GetLength@{GetLength}!GenericStringBuffer$<$ Encoding, Allocator $>$@{GenericStringBuffer$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{GetLength()}{GetLength()}}
+{\footnotesize\ttfamily \label{class_generic_string_buffer_ad324b8154be3354dda3aa4a0a7361499} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Crt\+Allocator$>$ \\
+size\+\_\+t \mbox{\hyperlink{class_generic_string_buffer}{Generic\+String\+Buffer}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Get\+Length (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{stringbuffer_8h_source_l00085}{85}} of file \mbox{\hyperlink{stringbuffer_8h_source}{stringbuffer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00085\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_generic_string_buffer_aaef716643febb9de5957dbf8ff904409}{stack\_}}.GetSize()\ /\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{class_generic_string_buffer_a7fea544a5ae79d8a9dbb4ceb6d134b06}{Ch}});\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=259pt]{class_generic_string_buffer_ad324b8154be3354dda3aa4a0a7361499_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_string_buffer_a725e862b9a78375f5363b0b61ad789f3}\index{GenericStringBuffer$<$ Encoding, Allocator $>$@{GenericStringBuffer$<$ Encoding, Allocator $>$}!GetSize@{GetSize}}
+\index{GetSize@{GetSize}!GenericStringBuffer$<$ Encoding, Allocator $>$@{GenericStringBuffer$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{GetSize()}{GetSize()}}
+{\footnotesize\ttfamily \label{class_generic_string_buffer_a725e862b9a78375f5363b0b61ad789f3} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Crt\+Allocator$>$ \\
+size\+\_\+t \mbox{\hyperlink{class_generic_string_buffer}{Generic\+String\+Buffer}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Get\+Size (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{stringbuffer_8h_source_l00082}{82}} of file \mbox{\hyperlink{stringbuffer_8h_source}{stringbuffer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00082\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_generic_string_buffer_aaef716643febb9de5957dbf8ff904409}{stack\_}}.GetSize();\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=259pt]{class_generic_string_buffer_a725e862b9a78375f5363b0b61ad789f3_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_string_buffer_a42079865bab1deb930c6cff7d491c719}\index{GenericStringBuffer$<$ Encoding, Allocator $>$@{GenericStringBuffer$<$ Encoding, Allocator $>$}!GetString@{GetString}}
+\index{GetString@{GetString}!GenericStringBuffer$<$ Encoding, Allocator $>$@{GenericStringBuffer$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{GetString()}{GetString()}}
+{\footnotesize\ttfamily \label{class_generic_string_buffer_a42079865bab1deb930c6cff7d491c719} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Crt\+Allocator$>$ \\
+const \mbox{\hyperlink{class_generic_string_buffer_a7fea544a5ae79d8a9dbb4ceb6d134b06}{Ch}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_generic_string_buffer}{Generic\+String\+Buffer}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Get\+String (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{stringbuffer_8h_source_l00073}{73}} of file \mbox{\hyperlink{stringbuffer_8h_source}{stringbuffer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Push\ and\ pop\ a\ null\ terminator.\ This\ is\ safe.}}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ *\mbox{\hyperlink{class_generic_string_buffer_aaef716643febb9de5957dbf8ff904409}{stack\_}}.template\ \mbox{\hyperlink{class_generic_string_buffer_a80af78c43da93126a940a40d1889278a}{Push<Ch>}}()\ =\ \textcolor{charliteral}{'\(\backslash\)0'};}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_string_buffer_aaef716643febb9de5957dbf8ff904409}{stack\_}}.template\ \mbox{\hyperlink{class_generic_string_buffer_a0038e53ba03c271bc4cbbac403ec4de4}{Pop<Ch>}}(1);}
+\DoxyCodeLine{00077\ }
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_generic_string_buffer_aaef716643febb9de5957dbf8ff904409}{stack\_}}.template\ Bottom<Ch>();}
+\DoxyCodeLine{00079\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=342pt]{class_generic_string_buffer_a42079865bab1deb930c6cff7d491c719_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{class_generic_string_buffer_a42079865bab1deb930c6cff7d491c719_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_string_buffer_a0038e53ba03c271bc4cbbac403ec4de4}\index{GenericStringBuffer$<$ Encoding, Allocator $>$@{GenericStringBuffer$<$ Encoding, Allocator $>$}!Pop@{Pop}}
+\index{Pop@{Pop}!GenericStringBuffer$<$ Encoding, Allocator $>$@{GenericStringBuffer$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{Pop()}{Pop()}}
+{\footnotesize\ttfamily \label{class_generic_string_buffer_a0038e53ba03c271bc4cbbac403ec4de4} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Crt\+Allocator$>$ \\
+void \mbox{\hyperlink{class_generic_string_buffer}{Generic\+String\+Buffer}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Pop (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{count}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{stringbuffer_8h_source_l00071}{71}} of file \mbox{\hyperlink{stringbuffer_8h_source}{stringbuffer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00071\ \{\ \mbox{\hyperlink{class_generic_string_buffer_aaef716643febb9de5957dbf8ff904409}{stack\_}}.template\ \mbox{\hyperlink{class_generic_string_buffer_a0038e53ba03c271bc4cbbac403ec4de4}{Pop<Ch>}}(\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}});\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=205pt]{class_generic_string_buffer_a0038e53ba03c271bc4cbbac403ec4de4_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{class_generic_string_buffer_a0038e53ba03c271bc4cbbac403ec4de4_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_string_buffer_a80af78c43da93126a940a40d1889278a}\index{GenericStringBuffer$<$ Encoding, Allocator $>$@{GenericStringBuffer$<$ Encoding, Allocator $>$}!Push@{Push}}
+\index{Push@{Push}!GenericStringBuffer$<$ Encoding, Allocator $>$@{GenericStringBuffer$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{Push()}{Push()}}
+{\footnotesize\ttfamily \label{class_generic_string_buffer_a80af78c43da93126a940a40d1889278a} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Crt\+Allocator$>$ \\
+\mbox{\hyperlink{class_generic_string_buffer_a7fea544a5ae79d8a9dbb4ceb6d134b06}{Ch}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_generic_string_buffer}{Generic\+String\+Buffer}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Push (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{count}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{stringbuffer_8h_source_l00069}{69}} of file \mbox{\hyperlink{stringbuffer_8h_source}{stringbuffer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00069\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_generic_string_buffer_aaef716643febb9de5957dbf8ff904409}{stack\_}}.template\ \mbox{\hyperlink{class_generic_string_buffer_a80af78c43da93126a940a40d1889278a}{Push<Ch>}}(\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}});\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=182pt]{class_generic_string_buffer_a80af78c43da93126a940a40d1889278a_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{class_generic_string_buffer_a80af78c43da93126a940a40d1889278a_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_string_buffer_a67bbdeb1f0f7c539f85ca36857a62ca3}\index{GenericStringBuffer$<$ Encoding, Allocator $>$@{GenericStringBuffer$<$ Encoding, Allocator $>$}!PushUnsafe@{PushUnsafe}}
+\index{PushUnsafe@{PushUnsafe}!GenericStringBuffer$<$ Encoding, Allocator $>$@{GenericStringBuffer$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{PushUnsafe()}{PushUnsafe()}}
+{\footnotesize\ttfamily \label{class_generic_string_buffer_a67bbdeb1f0f7c539f85ca36857a62ca3} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Crt\+Allocator$>$ \\
+\mbox{\hyperlink{class_generic_string_buffer_a7fea544a5ae79d8a9dbb4ceb6d134b06}{Ch}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_generic_string_buffer}{Generic\+String\+Buffer}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Push\+Unsafe (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{count}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{stringbuffer_8h_source_l00070}{70}} of file \mbox{\hyperlink{stringbuffer_8h_source}{stringbuffer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00070\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_generic_string_buffer_aaef716643febb9de5957dbf8ff904409}{stack\_}}.template\ \mbox{\hyperlink{class_generic_string_buffer_a67bbdeb1f0f7c539f85ca36857a62ca3}{PushUnsafe<Ch>}}(\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}});\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=182pt]{class_generic_string_buffer_a67bbdeb1f0f7c539f85ca36857a62ca3_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=319pt]{class_generic_string_buffer_a67bbdeb1f0f7c539f85ca36857a62ca3_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_string_buffer_a8be5c8fadccacdcf40e20220f38e0afa}\index{GenericStringBuffer$<$ Encoding, Allocator $>$@{GenericStringBuffer$<$ Encoding, Allocator $>$}!Put@{Put}}
+\index{Put@{Put}!GenericStringBuffer$<$ Encoding, Allocator $>$@{GenericStringBuffer$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{Put()}{Put()}}
+{\footnotesize\ttfamily \label{class_generic_string_buffer_a8be5c8fadccacdcf40e20220f38e0afa} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Crt\+Allocator$>$ \\
+void \mbox{\hyperlink{class_generic_string_buffer}{Generic\+String\+Buffer}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Put (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_generic_string_buffer_a7fea544a5ae79d8a9dbb4ceb6d134b06}{Ch}}}]{c}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{stringbuffer_8h_source_l00056}{56}} of file \mbox{\hyperlink{stringbuffer_8h_source}{stringbuffer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00056\ \{\ *\mbox{\hyperlink{class_generic_string_buffer_aaef716643febb9de5957dbf8ff904409}{stack\_}}.template\ \mbox{\hyperlink{class_generic_string_buffer_a80af78c43da93126a940a40d1889278a}{Push<Ch>}}()\ =\ c;\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=340pt]{class_generic_string_buffer_a8be5c8fadccacdcf40e20220f38e0afa_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=330pt]{class_generic_string_buffer_a8be5c8fadccacdcf40e20220f38e0afa_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_string_buffer_a9225468d11fdddfc3a9a4e48bf4d3ba4}\index{GenericStringBuffer$<$ Encoding, Allocator $>$@{GenericStringBuffer$<$ Encoding, Allocator $>$}!PutUnsafe@{PutUnsafe}}
+\index{PutUnsafe@{PutUnsafe}!GenericStringBuffer$<$ Encoding, Allocator $>$@{GenericStringBuffer$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{PutUnsafe()}{PutUnsafe()}}
+{\footnotesize\ttfamily \label{class_generic_string_buffer_a9225468d11fdddfc3a9a4e48bf4d3ba4} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Crt\+Allocator$>$ \\
+void \mbox{\hyperlink{class_generic_string_buffer}{Generic\+String\+Buffer}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Put\+Unsafe (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_generic_string_buffer_a7fea544a5ae79d8a9dbb4ceb6d134b06}{Ch}}}]{c}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{stringbuffer_8h_source_l00057}{57}} of file \mbox{\hyperlink{stringbuffer_8h_source}{stringbuffer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00057\ \{\ *\mbox{\hyperlink{class_generic_string_buffer_aaef716643febb9de5957dbf8ff904409}{stack\_}}.template\ \mbox{\hyperlink{class_generic_string_buffer_a67bbdeb1f0f7c539f85ca36857a62ca3}{PushUnsafe<Ch>}}()\ =\ c;\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=319pt]{class_generic_string_buffer_a9225468d11fdddfc3a9a4e48bf4d3ba4_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_string_buffer_a4d6becae201b98c122746298882a318f}\index{GenericStringBuffer$<$ Encoding, Allocator $>$@{GenericStringBuffer$<$ Encoding, Allocator $>$}!Reserve@{Reserve}}
+\index{Reserve@{Reserve}!GenericStringBuffer$<$ Encoding, Allocator $>$@{GenericStringBuffer$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{Reserve()}{Reserve()}}
+{\footnotesize\ttfamily \label{class_generic_string_buffer_a4d6becae201b98c122746298882a318f} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Crt\+Allocator$>$ \\
+void \mbox{\hyperlink{class_generic_string_buffer}{Generic\+String\+Buffer}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Reserve (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{count}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{stringbuffer_8h_source_l00068}{68}} of file \mbox{\hyperlink{stringbuffer_8h_source}{stringbuffer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00068\ \{\ \mbox{\hyperlink{class_generic_string_buffer_aaef716643febb9de5957dbf8ff904409}{stack\_}}.template\ \mbox{\hyperlink{class_generic_string_buffer_a4d6becae201b98c122746298882a318f}{Reserve<Ch>}}(\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}});\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=182pt]{class_generic_string_buffer_a4d6becae201b98c122746298882a318f_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=182pt]{class_generic_string_buffer_a4d6becae201b98c122746298882a318f_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_generic_string_buffer_a0dbdb77489b95923795011a24f705be5}\index{GenericStringBuffer$<$ Encoding, Allocator $>$@{GenericStringBuffer$<$ Encoding, Allocator $>$}!ShrinkToFit@{ShrinkToFit}}
+\index{ShrinkToFit@{ShrinkToFit}!GenericStringBuffer$<$ Encoding, Allocator $>$@{GenericStringBuffer$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{ShrinkToFit()}{ShrinkToFit()}}
+{\footnotesize\ttfamily \label{class_generic_string_buffer_a0dbdb77489b95923795011a24f705be5} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Crt\+Allocator$>$ \\
+void \mbox{\hyperlink{class_generic_string_buffer}{Generic\+String\+Buffer}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Shrink\+To\+Fit (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{stringbuffer_8h_source_l00061}{61}} of file \mbox{\hyperlink{stringbuffer_8h_source}{stringbuffer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Push\ and\ pop\ a\ null\ terminator.\ This\ is\ safe.}}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ *\mbox{\hyperlink{class_generic_string_buffer_aaef716643febb9de5957dbf8ff904409}{stack\_}}.template\ \mbox{\hyperlink{class_generic_string_buffer_a80af78c43da93126a940a40d1889278a}{Push<Ch>}}()\ =\ \textcolor{charliteral}{'\(\backslash\)0'};}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_string_buffer_aaef716643febb9de5957dbf8ff904409}{stack\_}}.ShrinkToFit();}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_string_buffer_aaef716643febb9de5957dbf8ff904409}{stack\_}}.template\ \mbox{\hyperlink{class_generic_string_buffer_a0038e53ba03c271bc4cbbac403ec4de4}{Pop<Ch>}}(1);}
+\DoxyCodeLine{00066\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=342pt]{class_generic_string_buffer_a0dbdb77489b95923795011a24f705be5_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=259pt]{class_generic_string_buffer_a0dbdb77489b95923795011a24f705be5_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{class_generic_string_buffer_ae74f9df854dd5a7db4315ef44b016d22}\index{GenericStringBuffer$<$ Encoding, Allocator $>$@{GenericStringBuffer$<$ Encoding, Allocator $>$}!kDefaultCapacity@{kDefaultCapacity}}
+\index{kDefaultCapacity@{kDefaultCapacity}!GenericStringBuffer$<$ Encoding, Allocator $>$@{GenericStringBuffer$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{kDefaultCapacity}{kDefaultCapacity}}
+{\footnotesize\ttfamily \label{class_generic_string_buffer_ae74f9df854dd5a7db4315ef44b016d22} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Crt\+Allocator$>$ \\
+const size\+\_\+t \mbox{\hyperlink{class_generic_string_buffer}{Generic\+String\+Buffer}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::k\+Default\+Capacity = 256\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{stringbuffer_8h_source_l00087}{87}} of file \mbox{\hyperlink{stringbuffer_8h_source}{stringbuffer.\+h}}.
+
+\Hypertarget{class_generic_string_buffer_aaef716643febb9de5957dbf8ff904409}\index{GenericStringBuffer$<$ Encoding, Allocator $>$@{GenericStringBuffer$<$ Encoding, Allocator $>$}!stack\_@{stack\_}}
+\index{stack\_@{stack\_}!GenericStringBuffer$<$ Encoding, Allocator $>$@{GenericStringBuffer$<$ Encoding, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{stack\_}{stack\_}}
+{\footnotesize\ttfamily \label{class_generic_string_buffer_aaef716643febb9de5957dbf8ff904409} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}  = Crt\+Allocator$>$ \\
+\mbox{\hyperlink{classinternal_1_1_stack}{internal\+::\+Stack}}$<$\mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}$>$ \mbox{\hyperlink{class_generic_string_buffer}{Generic\+String\+Buffer}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::stack\+\_\+\hspace{0.3cm}{\ttfamily [mutable]}}
+
+
+
+Definition at line \mbox{\hyperlink{stringbuffer_8h_source_l00088}{88}} of file \mbox{\hyperlink{stringbuffer_8h_source}{stringbuffer.\+h}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/\mbox{\hyperlink{fwd_8h}{fwd.\+h}}\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/\mbox{\hyperlink{stringbuffer_8h}{stringbuffer.\+h}}\end{DoxyCompactItemize}

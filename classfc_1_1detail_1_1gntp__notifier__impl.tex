@@ -1,0 +1,271 @@
+\doxysection{fc\+::detail\+::gntp\+\_\+notifier\+\_\+impl Class Reference}
+\hypertarget{classfc_1_1detail_1_1gntp__notifier__impl}{}\label{classfc_1_1detail_1_1gntp__notifier__impl}\index{fc::detail::gntp\_notifier\_impl@{fc::detail::gntp\_notifier\_impl}}
+
+
+Collaboration diagram for fc\+::detail\+::gntp\+\_\+notifier\+\_\+impl\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=227pt]{classfc_1_1detail_1_1gntp__notifier__impl__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1detail_1_1gntp__notifier__impl_a5419c1ea80b0e47a4ad4a0dad0d55266}{gntp\+\_\+notifier\+\_\+impl}} (const std\+::string \&host\+\_\+to\+\_\+notify="{}127.\+0.\+0.\+1"{}, \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{classfc_1_1detail_1_1gntp__notifier__impl_ac862ea3578144e0ec8c26cb12b769113}{port}}=23053, const std\+::optional$<$ std\+::string $>$ \&\mbox{\hyperlink{classfc_1_1detail_1_1gntp__notifier__impl_ae39aeca24af87716b163c4580c90a90d}{password}}=std\+::optional$<$ std\+::string $>$())
+\item 
+void \mbox{\hyperlink{classfc_1_1detail_1_1gntp__notifier__impl_acbf0038b3e167f072237cd201c4fcbcf}{send\+\_\+gntp\+\_\+message}} (const std\+::string \&message)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::string \mbox{\hyperlink{classfc_1_1detail_1_1gntp__notifier__impl_a254914fafc612bd8b1a0b9ab23a6d20f}{hostname}}
+\item 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{classfc_1_1detail_1_1gntp__notifier__impl_ac862ea3578144e0ec8c26cb12b769113}{port}}
+\item 
+std\+::optional$<$ std\+::string $>$ \mbox{\hyperlink{classfc_1_1detail_1_1gntp__notifier__impl_ae39aeca24af87716b163c4580c90a90d}{password}}
+\item 
+std\+::string \mbox{\hyperlink{classfc_1_1detail_1_1gntp__notifier__impl_afa33620f1d1ab42dcf66dc1d21e24a92}{application\+\_\+name}}
+\item 
+gntp\+\_\+icon\+\_\+ptr \mbox{\hyperlink{classfc_1_1detail_1_1gntp__notifier__impl_afa555aae5646b6a5bbb9a9574727f384}{application\+\_\+icon}}
+\item 
+gntp\+\_\+notification\+\_\+type\+\_\+list \mbox{\hyperlink{classfc_1_1detail_1_1gntp__notifier__impl_ac9bda0980c694aef50bab27666fb9a2e}{notification\+\_\+types}}
+\item 
+std\+::optional$<$ boost\+::asio\+::ip\+::tcp\+::endpoint $>$ \mbox{\hyperlink{classfc_1_1detail_1_1gntp__notifier__impl_a23c8872fcff7f6f965dd0634b19d86ef}{endpoint}}
+\item 
+bool \mbox{\hyperlink{classfc_1_1detail_1_1gntp__notifier__impl_a162d9c0c8dfae3cbd296ca23f32616c7}{connection\+\_\+failed}}
+\item 
+bool \mbox{\hyperlink{classfc_1_1detail_1_1gntp__notifier__impl_a7d8edce34878938665c010ee8a42fa2b}{is\+\_\+registered}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{gntp_8cpp_source_l00045}{45}} of file \mbox{\hyperlink{gntp_8cpp_source}{gntp.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1detail_1_1gntp__notifier__impl_a5419c1ea80b0e47a4ad4a0dad0d55266}\index{fc::detail::gntp\_notifier\_impl@{fc::detail::gntp\_notifier\_impl}!gntp\_notifier\_impl@{gntp\_notifier\_impl}}
+\index{gntp\_notifier\_impl@{gntp\_notifier\_impl}!fc::detail::gntp\_notifier\_impl@{fc::detail::gntp\_notifier\_impl}}
+\doxysubsubsection{\texorpdfstring{gntp\_notifier\_impl()}{gntp\_notifier\_impl()}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1gntp__notifier__impl_a5419c1ea80b0e47a4ad4a0dad0d55266} 
+fc\+::detail\+::gntp\+\_\+notifier\+\_\+impl\+::gntp\+\_\+notifier\+\_\+impl (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{host\+\_\+to\+\_\+notify}{ = {\ttfamily "{}127.0.0.1"{}}, }\item[{\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}}}]{port}{ = {\ttfamily 23053}, }\item[{const std\+::optional$<$ std\+::string $>$ \&}]{password}{ = {\ttfamily std\+:\+:optional$<$std\+:\+:string$>$()}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gntp_8cpp_source_l00068}{68}} of file \mbox{\hyperlink{gntp_8cpp_source}{gntp.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1gntp__notifier__impl_a254914fafc612bd8b1a0b9ab23a6d20f}{hostname}}(host\_to\_notify),}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1gntp__notifier__impl_ac862ea3578144e0ec8c26cb12b769113}{port}}(\mbox{\hyperlink{classfc_1_1detail_1_1gntp__notifier__impl_ac862ea3578144e0ec8c26cb12b769113}{port}}),}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1gntp__notifier__impl_ae39aeca24af87716b163c4580c90a90d}{password}}(password),}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1gntp__notifier__impl_a162d9c0c8dfae3cbd296ca23f32616c7}{connection\_failed}}(\textcolor{keyword}{false}),}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1gntp__notifier__impl_a7d8edce34878938665c010ee8a42fa2b}{is\_registered}}(\textcolor{keyword}{false})}
+\DoxyCodeLine{00075\ \ \ \ \ \{}
+\DoxyCodeLine{00076\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1detail_1_1gntp__notifier__impl_acbf0038b3e167f072237cd201c4fcbcf}\index{fc::detail::gntp\_notifier\_impl@{fc::detail::gntp\_notifier\_impl}!send\_gntp\_message@{send\_gntp\_message}}
+\index{send\_gntp\_message@{send\_gntp\_message}!fc::detail::gntp\_notifier\_impl@{fc::detail::gntp\_notifier\_impl}}
+\doxysubsubsection{\texorpdfstring{send\_gntp\_message()}{send\_gntp\_message()}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1gntp__notifier__impl_acbf0038b3e167f072237cd201c4fcbcf} 
+void fc\+::detail\+::gntp\+\_\+notifier\+\_\+impl\+::send\+\_\+gntp\+\_\+message (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{message}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gntp_8cpp_source_l00078}{78}} of file \mbox{\hyperlink{gntp_8cpp_source}{gntp.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00079\ \ \ \ \ \{}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ std::shared\_ptr<boost::asio::ip::tcp::socket>\ sock(\textcolor{keyword}{new}\ boost::asio::ip::tcp::socket(asio::default\_io\_service()));}
+\DoxyCodeLine{00081\ }
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ connected\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classfc_1_1detail_1_1gntp__notifier__impl_a23c8872fcff7f6f965dd0634b19d86ef}{endpoint}})}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ we've\ successfully\ connected\ before,\ connect\ to\ the\ same\ endpoint\ that\ worked\ last\ time}}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \ asio::tcp::connect(*sock,\ *\mbox{\hyperlink{classfc_1_1detail_1_1gntp__notifier__impl_a23c8872fcff7f6f965dd0634b19d86ef}{endpoint}});}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ connected\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{catch}\ (exception\&\ er)}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\textcolor{stringliteral}{"{}Failed\ to\ connect\ to\ GNTP\ service\ using\ an\ endpoint\ that\ previously\ worked:\ \$\{error\_report\}"{}},\ }
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}error\_report"{}},\ er.to\_detail\_string()));}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \ sock-\/>close();}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ clear\ the\ cached\ endpoint\ and\ fall\ through\ to\ the\ full\ connection\ procedure}}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1gntp__notifier__impl_a23c8872fcff7f6f965dd0634b19d86ef}{endpoint}}\ =\ std::optional<boost::asio::ip::tcp::endpoint>();}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{catch}\ (...)}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\textcolor{stringliteral}{"{}Failed\ to\ connect\ to\ GNTP\ service\ using\ an\ endpoint\ that\ previously\ worked"{}});}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \ sock-\/>close();}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ clear\ the\ cached\ endpoint\ and\ fall\ through\ to\ the\ full\ connection\ procedure}}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1gntp__notifier__impl_a23c8872fcff7f6f965dd0634b19d86ef}{endpoint}}\ =\ std::optional<boost::asio::ip::tcp::endpoint>();}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!connected)}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ do\ the\ full\ connection\ procedure}}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ eps\ =\ asio::tcp::resolve(\mbox{\hyperlink{classfc_1_1detail_1_1gntp__notifier__impl_a254914fafc612bd8b1a0b9ab23a6d20f}{hostname}},\ boost::lexical\_cast<std::string>(\mbox{\hyperlink{classfc_1_1detail_1_1gntp__notifier__impl_ac862ea3578144e0ec8c26cb12b769113}{port}}));}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (eps.size()\ ==\ 0)}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a3a1fa84768603c99866fe61af96c9f36}{FC\_THROW}}(\textcolor{stringliteral}{"{}Unable\ to\ resolve\ host\ '\$\{host\}'"{}},\ (\textcolor{stringliteral}{"{}host"{}},\ \mbox{\hyperlink{classfc_1_1detail_1_1gntp__notifier__impl_a254914fafc612bd8b1a0b9ab23a6d20f}{hostname}}));}
+\DoxyCodeLine{00113\ }
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ i\ =\ 0;\ i\ <\ eps.size();\ ++i)}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ }
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ boost::system::error\_code\ ec;}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\textcolor{stringliteral}{"{}Attempting\ to\ connect\ to\ GNTP\ srvice"{}});}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ \ \ \ asio::tcp::connect(*sock,\ eps[i]);}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1gntp__notifier__impl_a23c8872fcff7f6f965dd0634b19d86ef}{endpoint}}\ =\ eps[i];}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \ \ \ \ connected\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{catch}\ (\textcolor{keyword}{const}\ exception\&\ er)\ }
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\textcolor{stringliteral}{"{}Failed\ to\ connect\ to\ GNTP\ service:\ \$\{error\_reprot\}"{}},\ }
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}error\_report"{}},\ er.to\_detail\_string())\ );}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \ \ \ sock-\/>close();}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{catch}\ (...)}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\textcolor{stringliteral}{"{}Failed\ to\ connect\ to\ GNTP\ service"{}});}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \ \ \ \ sock-\/>close();}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!connected)}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a3a1fa84768603c99866fe61af96c9f36}{FC\_THROW}}(\textcolor{stringliteral}{"{}Unable\ to\ connect\ to\ any\ resolved\ endpoint\ for\ \$\{host\}:\$\{port\}"{}},\ }
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}host"{}},\ \mbox{\hyperlink{classfc_1_1detail_1_1gntp__notifier__impl_a254914fafc612bd8b1a0b9ab23a6d20f}{hostname}})(\textcolor{stringliteral}{"{}port"{}},\ \mbox{\hyperlink{classfc_1_1detail_1_1gntp__notifier__impl_ac862ea3578144e0ec8c26cb12b769113}{port}}));}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \textcolor{keywordflow}{try}}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ asio::ostream<boost::asio::ip::tcp::socket>\ write\_stream(sock);}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ write\_stream.write(message.c\_str(),\ message.size());}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ write\_stream.flush();}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ write\_stream.close();}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \textcolor{keywordflow}{catch}\ (exception\&\ er)}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_ad1d295500555ec25b5cc63a27c2eaa59}{FC\_RETHROW\_EXCEPTION}}(er,\ warn,\ \textcolor{stringliteral}{"{}Caught\ an\ exception\ while\ sending\ data\ to\ GNTP\ service"{}});}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \textcolor{keywordflow}{catch}\ (...)}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a3a1fa84768603c99866fe61af96c9f36}{FC\_THROW}}(\textcolor{stringliteral}{"{}Caught\ an\ exception\ while\ sending\ data\ to\ GNTP\ service"{}});}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00156\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1detail_1_1gntp__notifier__impl_acbf0038b3e167f072237cd201c4fcbcf_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classfc_1_1detail_1_1gntp__notifier__impl_afa555aae5646b6a5bbb9a9574727f384}\index{fc::detail::gntp\_notifier\_impl@{fc::detail::gntp\_notifier\_impl}!application\_icon@{application\_icon}}
+\index{application\_icon@{application\_icon}!fc::detail::gntp\_notifier\_impl@{fc::detail::gntp\_notifier\_impl}}
+\doxysubsubsection{\texorpdfstring{application\_icon}{application\_icon}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1gntp__notifier__impl_afa555aae5646b6a5bbb9a9574727f384} 
+gntp\+\_\+icon\+\_\+ptr fc\+::detail\+::gntp\+\_\+notifier\+\_\+impl\+::application\+\_\+icon}
+
+
+
+Definition at line \mbox{\hyperlink{gntp_8cpp_source_l00056}{56}} of file \mbox{\hyperlink{gntp_8cpp_source}{gntp.\+cpp}}.
+
+\Hypertarget{classfc_1_1detail_1_1gntp__notifier__impl_afa33620f1d1ab42dcf66dc1d21e24a92}\index{fc::detail::gntp\_notifier\_impl@{fc::detail::gntp\_notifier\_impl}!application\_name@{application\_name}}
+\index{application\_name@{application\_name}!fc::detail::gntp\_notifier\_impl@{fc::detail::gntp\_notifier\_impl}}
+\doxysubsubsection{\texorpdfstring{application\_name}{application\_name}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1gntp__notifier__impl_afa33620f1d1ab42dcf66dc1d21e24a92} 
+std\+::string fc\+::detail\+::gntp\+\_\+notifier\+\_\+impl\+::application\+\_\+name}
+
+
+
+Definition at line \mbox{\hyperlink{gntp_8cpp_source_l00055}{55}} of file \mbox{\hyperlink{gntp_8cpp_source}{gntp.\+cpp}}.
+
+\Hypertarget{classfc_1_1detail_1_1gntp__notifier__impl_a162d9c0c8dfae3cbd296ca23f32616c7}\index{fc::detail::gntp\_notifier\_impl@{fc::detail::gntp\_notifier\_impl}!connection\_failed@{connection\_failed}}
+\index{connection\_failed@{connection\_failed}!fc::detail::gntp\_notifier\_impl@{fc::detail::gntp\_notifier\_impl}}
+\doxysubsubsection{\texorpdfstring{connection\_failed}{connection\_failed}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1gntp__notifier__impl_a162d9c0c8dfae3cbd296ca23f32616c7} 
+bool fc\+::detail\+::gntp\+\_\+notifier\+\_\+impl\+::connection\+\_\+failed}
+
+
+
+Definition at line \mbox{\hyperlink{gntp_8cpp_source_l00062}{62}} of file \mbox{\hyperlink{gntp_8cpp_source}{gntp.\+cpp}}.
+
+\Hypertarget{classfc_1_1detail_1_1gntp__notifier__impl_a23c8872fcff7f6f965dd0634b19d86ef}\index{fc::detail::gntp\_notifier\_impl@{fc::detail::gntp\_notifier\_impl}!endpoint@{endpoint}}
+\index{endpoint@{endpoint}!fc::detail::gntp\_notifier\_impl@{fc::detail::gntp\_notifier\_impl}}
+\doxysubsubsection{\texorpdfstring{endpoint}{endpoint}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1gntp__notifier__impl_a23c8872fcff7f6f965dd0634b19d86ef} 
+std\+::optional$<$boost\+::asio\+::ip\+::tcp\+::endpoint$>$ fc\+::detail\+::gntp\+\_\+notifier\+\_\+impl\+::endpoint}
+
+
+
+Definition at line \mbox{\hyperlink{gntp_8cpp_source_l00060}{60}} of file \mbox{\hyperlink{gntp_8cpp_source}{gntp.\+cpp}}.
+
+\Hypertarget{classfc_1_1detail_1_1gntp__notifier__impl_a254914fafc612bd8b1a0b9ab23a6d20f}\index{fc::detail::gntp\_notifier\_impl@{fc::detail::gntp\_notifier\_impl}!hostname@{hostname}}
+\index{hostname@{hostname}!fc::detail::gntp\_notifier\_impl@{fc::detail::gntp\_notifier\_impl}}
+\doxysubsubsection{\texorpdfstring{hostname}{hostname}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1gntp__notifier__impl_a254914fafc612bd8b1a0b9ab23a6d20f} 
+std\+::string fc\+::detail\+::gntp\+\_\+notifier\+\_\+impl\+::hostname}
+
+
+
+Definition at line \mbox{\hyperlink{gntp_8cpp_source_l00051}{51}} of file \mbox{\hyperlink{gntp_8cpp_source}{gntp.\+cpp}}.
+
+\Hypertarget{classfc_1_1detail_1_1gntp__notifier__impl_a7d8edce34878938665c010ee8a42fa2b}\index{fc::detail::gntp\_notifier\_impl@{fc::detail::gntp\_notifier\_impl}!is\_registered@{is\_registered}}
+\index{is\_registered@{is\_registered}!fc::detail::gntp\_notifier\_impl@{fc::detail::gntp\_notifier\_impl}}
+\doxysubsubsection{\texorpdfstring{is\_registered}{is\_registered}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1gntp__notifier__impl_a7d8edce34878938665c010ee8a42fa2b} 
+bool fc\+::detail\+::gntp\+\_\+notifier\+\_\+impl\+::is\+\_\+registered}
+
+
+
+Definition at line \mbox{\hyperlink{gntp_8cpp_source_l00063}{63}} of file \mbox{\hyperlink{gntp_8cpp_source}{gntp.\+cpp}}.
+
+\Hypertarget{classfc_1_1detail_1_1gntp__notifier__impl_ac9bda0980c694aef50bab27666fb9a2e}\index{fc::detail::gntp\_notifier\_impl@{fc::detail::gntp\_notifier\_impl}!notification\_types@{notification\_types}}
+\index{notification\_types@{notification\_types}!fc::detail::gntp\_notifier\_impl@{fc::detail::gntp\_notifier\_impl}}
+\doxysubsubsection{\texorpdfstring{notification\_types}{notification\_types}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1gntp__notifier__impl_ac9bda0980c694aef50bab27666fb9a2e} 
+gntp\+\_\+notification\+\_\+type\+\_\+list fc\+::detail\+::gntp\+\_\+notifier\+\_\+impl\+::notification\+\_\+types}
+
+
+
+Definition at line \mbox{\hyperlink{gntp_8cpp_source_l00058}{58}} of file \mbox{\hyperlink{gntp_8cpp_source}{gntp.\+cpp}}.
+
+\Hypertarget{classfc_1_1detail_1_1gntp__notifier__impl_ae39aeca24af87716b163c4580c90a90d}\index{fc::detail::gntp\_notifier\_impl@{fc::detail::gntp\_notifier\_impl}!password@{password}}
+\index{password@{password}!fc::detail::gntp\_notifier\_impl@{fc::detail::gntp\_notifier\_impl}}
+\doxysubsubsection{\texorpdfstring{password}{password}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1gntp__notifier__impl_ae39aeca24af87716b163c4580c90a90d} 
+std\+::optional$<$std\+::string$>$ fc\+::detail\+::gntp\+\_\+notifier\+\_\+impl\+::password}
+
+
+
+Definition at line \mbox{\hyperlink{gntp_8cpp_source_l00053}{53}} of file \mbox{\hyperlink{gntp_8cpp_source}{gntp.\+cpp}}.
+
+\Hypertarget{classfc_1_1detail_1_1gntp__notifier__impl_ac862ea3578144e0ec8c26cb12b769113}\index{fc::detail::gntp\_notifier\_impl@{fc::detail::gntp\_notifier\_impl}!port@{port}}
+\index{port@{port}!fc::detail::gntp\_notifier\_impl@{fc::detail::gntp\_notifier\_impl}}
+\doxysubsubsection{\texorpdfstring{port}{port}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1gntp__notifier__impl_ac862ea3578144e0ec8c26cb12b769113} 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} fc\+::detail\+::gntp\+\_\+notifier\+\_\+impl\+::port}
+
+
+
+Definition at line \mbox{\hyperlink{gntp_8cpp_source_l00052}{52}} of file \mbox{\hyperlink{gntp_8cpp_source}{gntp.\+cpp}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/src/network/\mbox{\hyperlink{gntp_8cpp}{gntp.\+cpp}}\end{DoxyCompactItemize}

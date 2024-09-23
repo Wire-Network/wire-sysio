@@ -1,0 +1,9 @@
+<map id="ECDSA_SIG_set0" name="ECDSA_SIG_set0">
+<area shape="rect" id="Node000001" title=" " alt="" coords="215,78,345,104"/>
+<area shape="rect" id="Node000002" href="$classfc_1_1crypto_1_1r1_1_1public__key.html#a0bf76a0d48a64d28e4d7665fcaffdb59" title=" " alt="" coords="17,5,155,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="224,75,148,49,149,44,226,70"/>
+<area shape="rect" id="Node000003" href="$classfc_1_1crypto_1_1webauthn_1_1public__key.html#aa592832abc76bc39b1fa664d548a1fc9" title=" " alt="" coords="5,71,167,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="199,94,167,94,167,88,199,88"/>
+<area shape="rect" id="Node000004" href="$structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl.html#a8987016445813c0391f04894e9bdb002" title=" " alt="" coords="11,135,161,191"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="230,112,162,138,161,133,228,107"/>
+</map>

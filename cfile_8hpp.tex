@@ -1,0 +1,67 @@
+\doxysection{libraries/fc/include/fc/io/cfile.hpp File Reference}
+\hypertarget{cfile_8hpp}{}\label{cfile_8hpp}\index{libraries/fc/include/fc/io/cfile.hpp@{libraries/fc/include/fc/io/cfile.hpp}}
+{\ttfamily \#include $<$fc/filesystem.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/io/datastream.\+hpp$>$}\newline
+{\ttfamily \#include $<$cstdio$>$}\newline
+{\ttfamily \#include $<$ios$>$}\newline
+{\ttfamily \#include $<$fcntl.\+h$>$}\newline
+{\ttfamily \#include $<$sys/stat.\+h$>$}\newline
+{\ttfamily \#include $<$boost/interprocess/file\+\_\+mapping.\+hpp$>$}\newline
+Include dependency graph for cfile.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{cfile_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{cfile_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classfc_1_1cfile}{fc\+::cfile}}
+\item 
+class \mbox{\hyperlink{classfc_1_1cfile__datastream}{fc\+::cfile\+\_\+datastream}}
+\item 
+class \mbox{\hyperlink{classfc_1_1datastream_3_01fc_1_1cfile_00_01void_01_4}{fc\+::datastream$<$ fc\+::cfile, void $>$}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacefc}{fc}}
+\begin{DoxyCompactList}\small\item\em namespace \doxylink{namespacesysio_1_1chain}{sysio\+::chain} \end{DoxyCompactList}\item 
+namespace \mbox{\hyperlink{namespacefc_1_1detail}{fc\+::detail}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{cfile_8hpp_a61f5167b6b67be986af6e081a925267f}{FC\+\_\+\+FOPEN}}(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},  m)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{namespacefc_1_1detail_a0b895e56d816b54371406077aafe4272}{fc\+::detail\+::unique\+\_\+file}} = std\+::unique\+\_\+ptr$<$FILE, decltype( \&fclose )$>$
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{cfile_8hpp_a61f5167b6b67be986af6e081a925267f}\index{cfile.hpp@{cfile.hpp}!FC\_FOPEN@{FC\_FOPEN}}
+\index{FC\_FOPEN@{FC\_FOPEN}!cfile.hpp@{cfile.hpp}}
+\doxysubsubsection{\texorpdfstring{FC\_FOPEN}{FC\_FOPEN}}
+{\footnotesize\ttfamily \label{cfile_8hpp_a61f5167b6b67be986af6e081a925267f} 
+\#define FC\+\_\+\+FOPEN(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}}{, }\item[{}]{m}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{fopen(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\ m)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{cfile_8hpp_source_l00012}{12}} of file \mbox{\hyperlink{cfile_8hpp_source}{cfile.\+hpp}}.
+

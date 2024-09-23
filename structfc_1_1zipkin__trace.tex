@@ -1,0 +1,193 @@
+\doxysection{fc\+::zipkin\+\_\+trace Struct Reference}
+\hypertarget{structfc_1_1zipkin__trace}{}\label{structfc_1_1zipkin__trace}\index{fc::zipkin\_trace@{fc::zipkin\_trace}}
+
+
+{\ttfamily \#include $<$zipkin.\+hpp$>$}
+
+
+
+Inheritance diagram for fc\+::zipkin\+\_\+trace\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=163pt]{structfc_1_1zipkin__trace__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for fc\+::zipkin\+\_\+trace\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=331pt]{structfc_1_1zipkin__trace__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+std\+::optional$<$ \mbox{\hyperlink{structfc_1_1zipkin__span}{zipkin\+\_\+span}} $>$ \mbox{\hyperlink{structfc_1_1zipkin__trace_a5908d7ea3d27a6f696f72224f983735b}{create\+\_\+span}} (std\+::string \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}) const
+\item 
+\mbox{\hyperlink{structfc_1_1zipkin__trace_af2027d101bc566ffa50c6f2cd26a9ae2}{zipkin\+\_\+span}} (std\+::string \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} parent\+\_\+id=0)
+\item 
+\mbox{\hyperlink{structfc_1_1zipkin__trace_a45eefc5bd1076ae87a629cac8a812836}{zipkin\+\_\+span}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{code__cache_8cpp_aa0efefe21f4700d78692edc823e763be}{id}}, std\+::string \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} parent\+\_\+id=0)
+\item 
+\mbox{\hyperlink{structfc_1_1zipkin__trace_ada4ef13a09e1fe9b824bea29a458c971}{zipkin\+\_\+span}} (const \mbox{\hyperlink{structfc_1_1zipkin__span}{zipkin\+\_\+span}} \&)=delete
+\item 
+\mbox{\hyperlink{structfc_1_1zipkin__trace_a4918a3757250d97f1b3f0b51855783bd}{zipkin\+\_\+span}} (\mbox{\hyperlink{structfc_1_1zipkin__span}{zipkin\+\_\+span}} \&\&rhs) noexcept
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{structfc_1_1zipkin__span}{fc\+::zipkin\+\_\+span}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structfc_1_1zipkin__span_af2027d101bc566ffa50c6f2cd26a9ae2}{zipkin\+\_\+span}} (std\+::string \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} parent\+\_\+id=0)
+\item 
+\mbox{\hyperlink{structfc_1_1zipkin__span_a45eefc5bd1076ae87a629cac8a812836}{zipkin\+\_\+span}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{code__cache_8cpp_aa0efefe21f4700d78692edc823e763be}{id}}, std\+::string \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} parent\+\_\+id=0)
+\item 
+\mbox{\hyperlink{structfc_1_1zipkin__span_ada4ef13a09e1fe9b824bea29a458c971}{zipkin\+\_\+span}} (const \mbox{\hyperlink{structfc_1_1zipkin__span}{zipkin\+\_\+span}} \&)=delete
+\item 
+\mbox{\hyperlink{structfc_1_1zipkin__span}{zipkin\+\_\+span}} \& \mbox{\hyperlink{structfc_1_1zipkin__span_accd101de29cf4a57de07a4638bab0e15}{operator=}} (const \mbox{\hyperlink{structfc_1_1zipkin__span}{zipkin\+\_\+span}} \&)=delete
+\item 
+\mbox{\hyperlink{structfc_1_1zipkin__span}{zipkin\+\_\+span}} \& \mbox{\hyperlink{structfc_1_1zipkin__span_a16d91220ce80b4ff3b0daef4737bb7e6}{operator=}} (\mbox{\hyperlink{structfc_1_1zipkin__span}{zipkin\+\_\+span}} \&\&)=delete
+\item 
+\mbox{\hyperlink{structfc_1_1zipkin__span_a4918a3757250d97f1b3f0b51855783bd}{zipkin\+\_\+span}} (\mbox{\hyperlink{structfc_1_1zipkin__span}{zipkin\+\_\+span}} \&\&rhs) noexcept
+\item 
+\mbox{\hyperlink{structfc_1_1zipkin__span_ae3fef6e20268796fac93c736a3e51a57}{\texorpdfstring{$\sim$}{\string~}zipkin\+\_\+span}} ()
+\item 
+void \mbox{\hyperlink{structfc_1_1zipkin__span_ad54039ec426609667c4a8e3ee5a38489}{add\+\_\+tag}} (const std\+::string \&key, const std\+::string \&var)
+\item 
+void \mbox{\hyperlink{structfc_1_1zipkin__span_a5d609899b2de96ba8c9ae131971a141e}{add\+\_\+tag}} (const std\+::string \&key, const char \texorpdfstring{$\ast$}{*}var)
+\item 
+void \mbox{\hyperlink{structfc_1_1zipkin__span_a62a094a768f90e2936046205ed11613a}{add\+\_\+tag}} (const std\+::string \&key, bool v)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\std\+::enable\+\_\+if\+\_\+t$<$ std\+::is\+\_\+arithmetic\+\_\+v$<$ std\+::remove\+\_\+reference\+\_\+t$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ $>$, void $>$ \mbox{\hyperlink{structfc_1_1zipkin__span_ad16186a20092fe65c58a473d715ec6ab}{add\+\_\+tag}} (const std\+::string \&key, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\&var)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\std\+::enable\+\_\+if\+\_\+t$<$!std\+::is\+\_\+arithmetic\+\_\+v$<$ std\+::remove\+\_\+reference\+\_\+t$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ $>$, void $>$ \mbox{\hyperlink{structfc_1_1zipkin__span_a555fe0c21d9fdb8073bc3fb153f92cde}{add\+\_\+tag}} (const std\+::string \&key, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\&var)
+\item 
+\mbox{\hyperlink{structfc_1_1zipkin__span_1_1token}{token}} \mbox{\hyperlink{structfc_1_1zipkin__span_ab982c2f5aa6b04fbbbbafe23d5cbe2b5}{get\+\_\+token}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static std\+::optional$<$ \mbox{\hyperlink{structfc_1_1zipkin__span}{zipkin\+\_\+span}} $>$ \mbox{\hyperlink{structfc_1_1zipkin__trace_a90ed1bbf2670b5f4ccce83893c79030a}{create\+\_\+span\+\_\+from\+\_\+token}} (\mbox{\hyperlink{structfc_1_1zipkin__span_1_1token}{zipkin\+\_\+span\+::token}} \mbox{\hyperlink{structfc_1_1zipkin__span_1_1token}{token}}, std\+::string \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})
+\end{DoxyCompactItemize}
+\doxysubsection*{Static Public Member Functions inherited from \mbox{\hyperlink{structfc_1_1zipkin__span}{fc\+::zipkin\+\_\+span}}}
+\begin{DoxyCompactItemize}
+\item 
+static \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structfc_1_1zipkin__span_a1e1aa1cb977283138fa30280158384a7}{to\+\_\+id}} (const \mbox{\hyperlink{classfc_1_1sha256}{fc\+::sha256}} \&\mbox{\hyperlink{code__cache_8cpp_aa0efefe21f4700d78692edc823e763be}{id}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\static \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structfc_1_1zipkin__span_a8b1a316dff6439327b75649d3e4c0ad5}{to\+\_\+id}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\mbox{\hyperlink{code__cache_8cpp_aa0efefe21f4700d78692edc823e763be}{id}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Public Attributes inherited from \mbox{\hyperlink{structfc_1_1zipkin__span}{fc\+::zipkin\+\_\+span}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structfc_1_1zipkin__span_1_1span__data}{span\+\_\+data}} \mbox{\hyperlink{structfc_1_1zipkin__span_a9e8a0a3042c5b85417025b182dce8d8d}{data}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{zipkin_8hpp_source_l00152}{152}} of file \mbox{\hyperlink{zipkin_8hpp_source}{zipkin.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structfc_1_1zipkin__trace_a5908d7ea3d27a6f696f72224f983735b}\index{fc::zipkin\_trace@{fc::zipkin\_trace}!create\_span@{create\_span}}
+\index{create\_span@{create\_span}!fc::zipkin\_trace@{fc::zipkin\_trace}}
+\doxysubsubsection{\texorpdfstring{create\_span()}{create\_span()}}
+{\footnotesize\ttfamily \label{structfc_1_1zipkin__trace_a5908d7ea3d27a6f696f72224f983735b} 
+std\+::optional$<$ \mbox{\hyperlink{structfc_1_1zipkin__span}{zipkin\+\_\+span}} $>$ fc\+::zipkin\+\_\+trace\+::create\+\_\+span (\begin{DoxyParamCaption}\item[{std\+::string}]{name}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [nodiscard]}}
+
+
+
+Definition at line \mbox{\hyperlink{zipkin_8hpp_source_l00155}{155}} of file \mbox{\hyperlink{zipkin_8hpp_source}{zipkin.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structfc_1_1zipkin__trace_af2027d101bc566ffa50c6f2cd26a9ae2}{zipkin\_span}}\{std::move(\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ ),\ \mbox{\hyperlink{structfc_1_1zipkin__span_ab982c2f5aa6b04fbbbbafe23d5cbe2b5}{get\_token}}().id\};}
+\DoxyCodeLine{00157\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structfc_1_1zipkin__trace_a5908d7ea3d27a6f696f72224f983735b_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structfc_1_1zipkin__trace_a90ed1bbf2670b5f4ccce83893c79030a}\index{fc::zipkin\_trace@{fc::zipkin\_trace}!create\_span\_from\_token@{create\_span\_from\_token}}
+\index{create\_span\_from\_token@{create\_span\_from\_token}!fc::zipkin\_trace@{fc::zipkin\_trace}}
+\doxysubsubsection{\texorpdfstring{create\_span\_from\_token()}{create\_span\_from\_token()}}
+{\footnotesize\ttfamily \label{structfc_1_1zipkin__trace_a90ed1bbf2670b5f4ccce83893c79030a} 
+static std\+::optional$<$ \mbox{\hyperlink{structfc_1_1zipkin__span}{zipkin\+\_\+span}} $>$ fc\+::zipkin\+\_\+trace\+::create\+\_\+span\+\_\+from\+\_\+token (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structfc_1_1zipkin__span_1_1token}{zipkin\+\_\+span\+::token}}}]{token}{, }\item[{std\+::string}]{name}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}, {\ttfamily [nodiscard]}}
+
+
+
+Definition at line \mbox{\hyperlink{zipkin_8hpp_source_l00160}{160}} of file \mbox{\hyperlink{zipkin_8hpp_source}{zipkin.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structfc_1_1zipkin__trace_af2027d101bc566ffa50c6f2cd26a9ae2}{zipkin\_span}}\{std::move(\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ ),\ token.id\};}
+\DoxyCodeLine{00162\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structfc_1_1zipkin__trace_ada4ef13a09e1fe9b824bea29a458c971}\index{fc::zipkin\_trace@{fc::zipkin\_trace}!zipkin\_span@{zipkin\_span}}
+\index{zipkin\_span@{zipkin\_span}!fc::zipkin\_trace@{fc::zipkin\_trace}}
+\doxysubsubsection{\texorpdfstring{zipkin\_span()}{zipkin\_span()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{structfc_1_1zipkin__trace_ada4ef13a09e1fe9b824bea29a458c971} 
+fc\+::zipkin\+\_\+span\+::zipkin\+\_\+span (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structfc_1_1zipkin__span}{zipkin\+\_\+span}} \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [delete]}}
+
+\Hypertarget{structfc_1_1zipkin__trace_af2027d101bc566ffa50c6f2cd26a9ae2}\index{fc::zipkin\_trace@{fc::zipkin\_trace}!zipkin\_span@{zipkin\_span}}
+\index{zipkin\_span@{zipkin\_span}!fc::zipkin\_trace@{fc::zipkin\_trace}}
+\doxysubsubsection{\texorpdfstring{zipkin\_span()}{zipkin\_span()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{structfc_1_1zipkin__trace_af2027d101bc566ffa50c6f2cd26a9ae2} 
+fc\+::zipkin\+\_\+span\+::zipkin\+\_\+span (\begin{DoxyParamCaption}\item[{std\+::string}]{name}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{parent\+\_\+id}{ = {\ttfamily 0}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{zipkin_8hpp_source_l00061}{61}} of file \mbox{\hyperlink{zipkin_8hpp_source}{zipkin.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{structfc_1_1zipkin__span_a9e8a0a3042c5b85417025b182dce8d8d}{data}}(\ std::move(\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ ),\ parent\_id\ )\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{structfc_1_1zipkin__trace_a45eefc5bd1076ae87a629cac8a812836}\index{fc::zipkin\_trace@{fc::zipkin\_trace}!zipkin\_span@{zipkin\_span}}
+\index{zipkin\_span@{zipkin\_span}!fc::zipkin\_trace@{fc::zipkin\_trace}}
+\doxysubsubsection{\texorpdfstring{zipkin\_span()}{zipkin\_span()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{structfc_1_1zipkin__trace_a45eefc5bd1076ae87a629cac8a812836} 
+fc\+::zipkin\+\_\+span\+::zipkin\+\_\+span (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{id}{, }\item[{std\+::string}]{name}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{parent\+\_\+id}{ = {\ttfamily 0}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{zipkin_8hpp_source_l00064}{64}} of file \mbox{\hyperlink{zipkin_8hpp_source}{zipkin.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{structfc_1_1zipkin__span_a9e8a0a3042c5b85417025b182dce8d8d}{data}}(\ \textcolor{keywordtype}{id},\ std::move(\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ ),\ parent\_id\ )\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{structfc_1_1zipkin__trace_a4918a3757250d97f1b3f0b51855783bd}\index{fc::zipkin\_trace@{fc::zipkin\_trace}!zipkin\_span@{zipkin\_span}}
+\index{zipkin\_span@{zipkin\_span}!fc::zipkin\_trace@{fc::zipkin\_trace}}
+\doxysubsubsection{\texorpdfstring{zipkin\_span()}{zipkin\_span()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{structfc_1_1zipkin__trace_a4918a3757250d97f1b3f0b51855783bd} 
+fc\+::zipkin\+\_\+span\+::zipkin\+\_\+span (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structfc_1_1zipkin__span}{zipkin\+\_\+span}} \&\&}]{rhs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{zipkin_8hpp_source_l00071}{71}} of file \mbox{\hyperlink{zipkin_8hpp_source}{zipkin.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{structfc_1_1zipkin__span_a9e8a0a3042c5b85417025b182dce8d8d}{data}}(\ std::move(\ rhs.data\ )\ )\ \{}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ rhs.data.\mbox{\hyperlink{structfc_1_1zipkin__span_1_1span__data_a8f6cfdba8a16bfe950b45da04d7bf278}{id}}\ =\ 0;}
+\DoxyCodeLine{00074\ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/log/\mbox{\hyperlink{zipkin_8hpp}{zipkin.\+hpp}}\end{DoxyCompactItemize}

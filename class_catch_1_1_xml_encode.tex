@@ -1,0 +1,217 @@
+\doxysection{Catch\+::Xml\+Encode Class Reference}
+\hypertarget{class_catch_1_1_xml_encode}{}\label{class_catch_1_1_xml_encode}\index{Catch::XmlEncode@{Catch::XmlEncode}}
+
+
+{\ttfamily \#include $<$catch\+\_\+xmlwriter.\+h$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{class_catch_1_1_xml_encode_a81ed50fe458d1aae3481781b4d599b7a}{For\+What}} \{ \mbox{\hyperlink{class_catch_1_1_xml_encode_a81ed50fe458d1aae3481781b4d599b7aafebf4db23809cd7925a3bdaaa4249de1}{For\+Text\+Nodes}}
+, \mbox{\hyperlink{class_catch_1_1_xml_encode_a81ed50fe458d1aae3481781b4d599b7aa3cdd995cc66ae405a4793a98db186005}{For\+Attributes}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_catch_1_1_xml_encode_a4c156028e2f94e7629a69d1cb10a6a44}{Xml\+Encode}} (std\+::string const \&str, \mbox{\hyperlink{class_catch_1_1_xml_encode_a81ed50fe458d1aae3481781b4d599b7a}{For\+What}} for\+What=\mbox{\hyperlink{class_catch_1_1_xml_encode_a81ed50fe458d1aae3481781b4d599b7aafebf4db23809cd7925a3bdaaa4249de1}{For\+Text\+Nodes}})
+\item 
+void \mbox{\hyperlink{class_catch_1_1_xml_encode_a030fe9de7193fcdbdc06ade38f0113ce}{encode\+To}} (std\+::ostream \&os) const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+std\+::ostream \& \mbox{\hyperlink{class_catch_1_1_xml_encode_a6c7a42b7cf01392f7e3d856cb72d4131}{operator$<$$<$}} (std\+::ostream \&os, \mbox{\hyperlink{class_catch_1_1_xml_encode}{Xml\+Encode}} const \&xml\+Encode)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{catch__xmlwriter_8h_source_l00018}{18}} of file \mbox{\hyperlink{catch__xmlwriter_8h_source}{catch\+\_\+xmlwriter.\+h}}.
+
+
+
+\doxysubsection{Member Enumeration Documentation}
+\Hypertarget{class_catch_1_1_xml_encode_a81ed50fe458d1aae3481781b4d599b7a}\index{Catch::XmlEncode@{Catch::XmlEncode}!ForWhat@{ForWhat}}
+\index{ForWhat@{ForWhat}!Catch::XmlEncode@{Catch::XmlEncode}}
+\doxysubsubsection{\texorpdfstring{ForWhat}{ForWhat}}
+{\footnotesize\ttfamily \label{class_catch_1_1_xml_encode_a81ed50fe458d1aae3481781b4d599b7a} 
+enum \mbox{\hyperlink{class_catch_1_1_xml_encode_a81ed50fe458d1aae3481781b4d599b7a}{Catch\+::\+Xml\+Encode\+::\+For\+What}}}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ForTextNodes@{ForTextNodes}!Catch::XmlEncode@{Catch::XmlEncode}}\index{Catch::XmlEncode@{Catch::XmlEncode}!ForTextNodes@{ForTextNodes}}}\Hypertarget{class_catch_1_1_xml_encode_a81ed50fe458d1aae3481781b4d599b7aafebf4db23809cd7925a3bdaaa4249de1}\label{class_catch_1_1_xml_encode_a81ed50fe458d1aae3481781b4d599b7a} 
+For\+Text\+Nodes&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ForAttributes@{ForAttributes}!Catch::XmlEncode@{Catch::XmlEncode}}\index{Catch::XmlEncode@{Catch::XmlEncode}!ForAttributes@{ForAttributes}}}\Hypertarget{class_catch_1_1_xml_encode_a81ed50fe458d1aae3481781b4d599b7aa3cdd995cc66ae405a4793a98db186005}\label{class_catch_1_1_xml_encode_a81ed50fe458d1aae3481781b4d599b7a} 
+For\+Attributes&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{catch__xmlwriter_8h_source_l00020}{20}} of file \mbox{\hyperlink{catch__xmlwriter_8h_source}{catch\+\_\+xmlwriter.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00020\ \{\ \mbox{\hyperlink{class_catch_1_1_xml_encode_a81ed50fe458d1aae3481781b4d599b7aafebf4db23809cd7925a3bdaaa4249de1}{ForTextNodes}},\ \mbox{\hyperlink{class_catch_1_1_xml_encode_a81ed50fe458d1aae3481781b4d599b7aa3cdd995cc66ae405a4793a98db186005}{ForAttributes}}\ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_catch_1_1_xml_encode_a4c156028e2f94e7629a69d1cb10a6a44}\index{Catch::XmlEncode@{Catch::XmlEncode}!XmlEncode@{XmlEncode}}
+\index{XmlEncode@{XmlEncode}!Catch::XmlEncode@{Catch::XmlEncode}}
+\doxysubsubsection{\texorpdfstring{XmlEncode()}{XmlEncode()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_xml_encode_a4c156028e2f94e7629a69d1cb10a6a44} 
+Catch\+::\+Xml\+Encode\+::\+Xml\+Encode (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{str}{, }\item[{\mbox{\hyperlink{class_catch_1_1_xml_encode_a81ed50fe458d1aae3481781b4d599b7a}{For\+What}}}]{for\+What}{ = {\ttfamily \mbox{\hyperlink{class_catch_1_1_xml_encode_a81ed50fe458d1aae3481781b4d599b7aafebf4db23809cd7925a3bdaaa4249de1}{For\+Text\+Nodes}}}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{include_2internal_2catch__xmlwriter_8cpp_source_l00056}{56}} of file \mbox{\hyperlink{include_2internal_2catch__xmlwriter_8cpp_source}{catch\+\_\+xmlwriter.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00057\ \ \ \ \ :\ \ \ m\_str(\ str\ ),}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ m\_forWhat(\ forWhat\ )}
+\DoxyCodeLine{00059\ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_catch_1_1_xml_encode_a030fe9de7193fcdbdc06ade38f0113ce}\index{Catch::XmlEncode@{Catch::XmlEncode}!encodeTo@{encodeTo}}
+\index{encodeTo@{encodeTo}!Catch::XmlEncode@{Catch::XmlEncode}}
+\doxysubsubsection{\texorpdfstring{encodeTo()}{encodeTo()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_xml_encode_a030fe9de7193fcdbdc06ade38f0113ce} 
+void Catch\+::\+Xml\+Encode\+::encode\+To (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{os}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{include_2internal_2catch__xmlwriter_8cpp_source_l00061}{61}} of file \mbox{\hyperlink{include_2internal_2catch__xmlwriter_8cpp_source}{catch\+\_\+xmlwriter.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Apostrophe\ escaping\ not\ necessary\ if\ we\ always\ use\ "{}\ to\ write\ attributes}}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ (see:\ http://www.w3.org/TR/xml/\#syntax)}}
+\DoxyCodeLine{00064\ }
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ std::size\_t\ idx\ =\ 0;\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ <\ m\_str.size();\ ++\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ )\ \{}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2internal_2catch__xmlwriter_8cpp_ae48ac2456c5ad6c956fef86e7bef3a21}{uchar}}\ c\ =\ m\_str[\mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}];}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (c)\ \{}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'<'}:\ \ \ os\ <<\ \textcolor{stringliteral}{"{}\&lt;"{}};\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\&'}:\ \ \ os\ <<\ \textcolor{stringliteral}{"{}\&amp;"{}};\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00070\ }
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'>'}:}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ See:\ http://www.w3.org/TR/xml/\#syntax}}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (idx\ >\ 2\ \&\&\ m\_str[idx\ -\/\ 1]\ ==\ \textcolor{charliteral}{']'}\ \&\&\ m\_str[idx\ -\/\ 2]\ ==\ \textcolor{charliteral}{']'})}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}\&gt;"{}};}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ c;}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00078\ }
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)"{}'}:}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (m\_forWhat\ ==\ \mbox{\hyperlink{class_catch_1_1_xml_encode_a81ed50fe458d1aae3481781b4d599b7aa3cdd995cc66ae405a4793a98db186005}{ForAttributes}})}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}\&quot;"{}};}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ c;}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00085\ }
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Check\ for\ control\ characters\ and\ invalid\ utf-\/8}}
+\DoxyCodeLine{00088\ }
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Escape\ control\ characters\ in\ standard\ ascii}}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ see\ http://stackoverflow.com/questions/404107/why-\/are-\/control-\/characters-\/illegal-\/in-\/xml-\/1-\/0}}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (c\ <\ 0x09\ ||\ (c\ >\ 0x0D\ \&\&\ c\ <\ 0x20)\ ||\ c\ ==\ 0x7F)\ \{}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ hexEscapeChar(os,\ c);}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00095\ }
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Plain\ ASCII:\ Write\ it\ to\ stream}}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (c\ <\ 0x7F)\ \{}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ c;}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00101\ }
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ UTF-\/8\ territory}}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Check\ if\ the\ encoding\ is\ valid\ and\ if\ it\ is\ not,\ hex\ escape\ bytes.}}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Important:\ We\ do\ not\ check\ the\ exact\ decoded\ values\ for\ validity,\ only\ the\ encoding\ format}}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ First\ check\ that\ this\ bytes\ is\ a\ valid\ lead\ byte:}}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ This\ means\ that\ it\ is\ not\ encoded\ as\ 1111\ 1XXX}}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Or\ as\ 10XX\ XXXX}}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (c\ <\ \ 0xC0\ ||}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ c\ >=\ 0xF8)\ \{}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ hexEscapeChar(os,\ c);}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00113\ }
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ encBytes\ =\ trailingBytes(c);}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Are\ there\ enough\ bytes\ left\ to\ avoid\ accessing\ out-\/of-\/bounds\ memory?}}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (idx\ +\ encBytes\ -\/\ 1\ >=\ m\_str.size())\ \{}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ hexEscapeChar(os,\ c);}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ The\ header\ is\ valid,\ check\ data}}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ The\ next\ encBytes\ bytes\ must\ together\ be\ a\ valid\ utf-\/8}}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ This\ means:\ bitpattern\ 10XX\ XXXX\ and\ the\ extracted\ value\ is\ sane\ (ish)}}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ valid\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ =\ headerValue(c);}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (std::size\_t\ n\ =\ 1;\ n\ <\ encBytes;\ ++n)\ \{}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2internal_2catch__xmlwriter_8cpp_ae48ac2456c5ad6c956fef86e7bef3a21}{uchar}}\ nc\ =\ m\_str[\mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ +\ n];}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ valid\ \&=\ ((nc\ \&\ 0xC0)\ ==\ 0x80);}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ =\ (\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ <<\ 6)\ |\ (nc\ \&\ 0x3F);}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00130\ }
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Wrong\ bit\ pattern\ of\ following\ bytes}}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (!valid)\ ||}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Overlong\ encodings}}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ <\ 0x80)\ ||}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (0x80\ <=\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ \&\&\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value\ <\ 0x800\ \ \ \&\&\ encBytes\ >}}\ 2)\ ||}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (0x800\ <\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ \&\&\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value\ <\ 0x10000\ \&\&\ encBytes\ >}}\ 3)\ ||}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Encoded\ value\ out\ of\ range}}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ >=\ 0x110000)}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ )\ \{}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ hexEscapeChar(os,\ c);}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00144\ }
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ we\ got\ here,\ this\ is\ in\ fact\ a\ valid(ish)\ utf-\/8\ sequence}}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (std::size\_t\ n\ =\ 0;\ n\ <\ encBytes;\ ++n)\ \{}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ m\_str[\mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ +\ n];}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ +=\ encBytes\ -\/\ 1;}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00153\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{class_catch_1_1_xml_encode_a6c7a42b7cf01392f7e3d856cb72d4131}\index{Catch::XmlEncode@{Catch::XmlEncode}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!Catch::XmlEncode@{Catch::XmlEncode}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$}{operator<<}}
+{\footnotesize\ttfamily \label{class_catch_1_1_xml_encode_a6c7a42b7cf01392f7e3d856cb72d4131} 
+std\+::ostream \& operator$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{os}{, }\item[{\mbox{\hyperlink{class_catch_1_1_xml_encode}{Xml\+Encode}} const \&}]{xml\+Encode}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{include_2internal_2catch__xmlwriter_8cpp_source_l00155}{155}} of file \mbox{\hyperlink{include_2internal_2catch__xmlwriter_8cpp_source}{catch\+\_\+xmlwriter.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ xmlEncode.encodeTo(\ os\ );}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}};}
+\DoxyCodeLine{00158\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__xmlwriter_8h}{catch\+\_\+xmlwriter.\+h}}\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{include_2internal_2catch__xmlwriter_8cpp}{catch\+\_\+xmlwriter.\+cpp}}\end{DoxyCompactItemize}

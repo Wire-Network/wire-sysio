@@ -1,0 +1,108 @@
+\doxysection{fixed size key sorted lexicographically}
+\hypertarget{group__fixed__key}{}\label{group__fixed__key}\index{fixed size key sorted lexicographically@{fixed size key sorted lexicographically}}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classsysio_1_1fixed__key}{sysio\+::fixed\+\_\+key$<$ Size $>$}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$size\+\_\+t Size$>$ }\\bool \mbox{\hyperlink{group__fixed__key_ga2a904cf1b888ae7b339e8bd3f0251dd5}{sysio\+::operator==}} (const \mbox{\hyperlink{classsysio_1_1fixed__key}{fixed\+\_\+key}}$<$ Size $>$ \&c1, const \mbox{\hyperlink{classsysio_1_1fixed__key}{fixed\+\_\+key}}$<$ Size $>$ \&c2)
+\begin{DoxyCompactList}\small\item\em Compares two \doxylink{classsysio_1_1fixed__key}{fixed\+\_\+key} variables c1 and c2. \end{DoxyCompactList}\item 
+{\footnotesize template$<$size\+\_\+t Size$>$ }\\bool \mbox{\hyperlink{group__fixed__key_ga597950aad3a2d79036be8fe52e5e3128}{sysio\+::operator!=}} (const \mbox{\hyperlink{classsysio_1_1fixed__key}{fixed\+\_\+key}}$<$ Size $>$ \&c1, const \mbox{\hyperlink{classsysio_1_1fixed__key}{fixed\+\_\+key}}$<$ Size $>$ \&c2)
+\begin{DoxyCompactList}\small\item\em Compares two \doxylink{classsysio_1_1fixed__key}{fixed\+\_\+key} variables c1 and c2. \end{DoxyCompactList}\item 
+{\footnotesize template$<$size\+\_\+t Size$>$ }\\bool \mbox{\hyperlink{group__fixed__key_ga48ed054afa32d69ac0eeb2de0947ce20}{sysio\+::operator$>$}} (const \mbox{\hyperlink{classsysio_1_1fixed__key}{fixed\+\_\+key}}$<$ Size $>$ \&c1, const \mbox{\hyperlink{classsysio_1_1fixed__key}{fixed\+\_\+key}}$<$ Size $>$ \&c2)
+\begin{DoxyCompactList}\small\item\em Compares two \doxylink{classsysio_1_1fixed__key}{fixed\+\_\+key} variables c1 and c2. \end{DoxyCompactList}\item 
+{\footnotesize template$<$size\+\_\+t Size$>$ }\\bool \mbox{\hyperlink{group__fixed__key_gadb0affeda9326c0d5881f03251f4ad64}{sysio\+::operator$<$}} (const \mbox{\hyperlink{classsysio_1_1fixed__key}{fixed\+\_\+key}}$<$ Size $>$ \&c1, const \mbox{\hyperlink{classsysio_1_1fixed__key}{fixed\+\_\+key}}$<$ Size $>$ \&c2)
+\begin{DoxyCompactList}\small\item\em Compares two \doxylink{classsysio_1_1fixed__key}{fixed\+\_\+key} variables c1 and c2. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{group__fixed__key_ga597950aad3a2d79036be8fe52e5e3128}\index{fixed size key sorted lexicographically@{fixed size key sorted lexicographically}!operator"!=@{operator"!=}}
+\index{operator"!=@{operator"!=}!fixed size key sorted lexicographically@{fixed size key sorted lexicographically}}
+\doxysubsubsection{\texorpdfstring{operator"!=()}{operator!=()}}
+{\footnotesize\ttfamily \label{group__fixed__key_ga597950aad3a2d79036be8fe52e5e3128} 
+template$<$size\+\_\+t Size$>$ \\
+bool \mbox{\hyperlink{namespacefc_a40c368ac88294ae47b064cad937fdbf6}{sysio\+::operator!}}= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classsysio_1_1fixed__key}{fixed\+\_\+key}}$<$ Size $>$ \&}]{c1}{, }\item[{const \mbox{\hyperlink{classsysio_1_1fixed__key}{fixed\+\_\+key}}$<$ Size $>$ \&}]{c2}{}\end{DoxyParamCaption})}
+
+Lexicographically compares two \doxylink{classsysio_1_1fixed__key}{fixed\+\_\+key} variables c1 and c2 \begin{DoxyReturn}{Returns}
+if c1 != c2, return true, otherwise false 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{fixed__key_8hpp_source_l00193}{193}} of file \mbox{\hyperlink{fixed__key_8hpp_source}{fixed\+\_\+key.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ c1.\_data\ !=\ c2.\_data;}
+\DoxyCodeLine{00195\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{group__fixed__key_gadb0affeda9326c0d5881f03251f4ad64}\index{fixed size key sorted lexicographically@{fixed size key sorted lexicographically}!operator$<$@{operator$<$}}
+\index{operator$<$@{operator$<$}!fixed size key sorted lexicographically@{fixed size key sorted lexicographically}}
+\doxysubsubsection{\texorpdfstring{operator$<$()}{operator<()}}
+{\footnotesize\ttfamily \label{group__fixed__key_gadb0affeda9326c0d5881f03251f4ad64} 
+template$<$size\+\_\+t Size$>$ \\
+bool sysio\+::operator$<$ (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classsysio_1_1fixed__key}{fixed\+\_\+key}}$<$ Size $>$ \&}]{c1}{, }\item[{const \mbox{\hyperlink{classsysio_1_1fixed__key}{fixed\+\_\+key}}$<$ Size $>$ \&}]{c2}{}\end{DoxyParamCaption})}
+
+Lexicographically compares two \doxylink{classsysio_1_1fixed__key}{fixed\+\_\+key} variables c1 and c2 \begin{DoxyReturn}{Returns}
+if c1 \texorpdfstring{$<$}{<} c2, return true, otherwise false 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{fixed__key_8hpp_source_l00215}{215}} of file \mbox{\hyperlink{fixed__key_8hpp_source}{fixed\+\_\+key.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ c1.\_data\ <\ c2.\_data;}
+\DoxyCodeLine{00217\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{group__fixed__key_ga2a904cf1b888ae7b339e8bd3f0251dd5}\index{fixed size key sorted lexicographically@{fixed size key sorted lexicographically}!operator==@{operator==}}
+\index{operator==@{operator==}!fixed size key sorted lexicographically@{fixed size key sorted lexicographically}}
+\doxysubsubsection{\texorpdfstring{operator==()}{operator==()}}
+{\footnotesize\ttfamily \label{group__fixed__key_ga2a904cf1b888ae7b339e8bd3f0251dd5} 
+template$<$size\+\_\+t Size$>$ \\
+bool sysio\+::operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classsysio_1_1fixed__key}{fixed\+\_\+key}}$<$ Size $>$ \&}]{c1}{, }\item[{const \mbox{\hyperlink{classsysio_1_1fixed__key}{fixed\+\_\+key}}$<$ Size $>$ \&}]{c2}{}\end{DoxyParamCaption})}
+
+Lexicographically compares two \doxylink{classsysio_1_1fixed__key}{fixed\+\_\+key} variables c1 and c2 \begin{DoxyReturn}{Returns}
+if c1 == c2, return true, otherwise false 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{fixed__key_8hpp_source_l00182}{182}} of file \mbox{\hyperlink{fixed__key_8hpp_source}{fixed\+\_\+key.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ c1.\_data\ ==\ c2.\_data;}
+\DoxyCodeLine{00184\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{group__fixed__key_ga48ed054afa32d69ac0eeb2de0947ce20}\index{fixed size key sorted lexicographically@{fixed size key sorted lexicographically}!operator$>$@{operator$>$}}
+\index{operator$>$@{operator$>$}!fixed size key sorted lexicographically@{fixed size key sorted lexicographically}}
+\doxysubsubsection{\texorpdfstring{operator$>$()}{operator>()}}
+{\footnotesize\ttfamily \label{group__fixed__key_ga48ed054afa32d69ac0eeb2de0947ce20} 
+template$<$size\+\_\+t Size$>$ \\
+bool sysio\+::operator$>$ (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classsysio_1_1fixed__key}{fixed\+\_\+key}}$<$ Size $>$ \&}]{c1}{, }\item[{const \mbox{\hyperlink{classsysio_1_1fixed__key}{fixed\+\_\+key}}$<$ Size $>$ \&}]{c2}{}\end{DoxyParamCaption})}
+
+Lexicographically compares two \doxylink{classsysio_1_1fixed__key}{fixed\+\_\+key} variables c1 and c2 \begin{DoxyReturn}{Returns}
+if c1 \texorpdfstring{$>$}{>} c2, return true, otherwise false 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{fixed__key_8hpp_source_l00204}{204}} of file \mbox{\hyperlink{fixed__key_8hpp_source}{fixed\+\_\+key.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ c1.\_data\ >\ c2.\_data;}
+\DoxyCodeLine{00206\ \ \ \ \}}
+
+\end{DoxyCode}

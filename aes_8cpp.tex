@@ -1,0 +1,50 @@
+\doxysection{libraries/fc/src/crypto/aes.cpp File Reference}
+\hypertarget{aes_8cpp}{}\label{aes_8cpp}\index{libraries/fc/src/crypto/aes.cpp@{libraries/fc/src/crypto/aes.cpp}}
+{\ttfamily \#include $<$fc/crypto/aes.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/crypto/openssl.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/exception/exception.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/fwd\+\_\+impl.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/io/raw.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/log/logger.\+hpp$>$}\newline
+{\ttfamily \#include $<$openssl/opensslconf.\+h$>$}\newline
+{\ttfamily \#include $<$openssl/crypto.\+h$>$}\newline
+{\ttfamily \#include $<$thread$>$}\newline
+{\ttfamily \#include $<$mutex$>$}\newline
+{\ttfamily \#include $<$fstream$>$}\newline
+{\ttfamily \#include $<$functional$>$}\newline
+Include dependency graph for aes.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{aes_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structfc_1_1aes__encoder_1_1impl}{fc\+::aes\+\_\+encoder\+::impl}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1aes__decoder_1_1impl}{fc\+::aes\+\_\+decoder\+::impl}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacefc}{fc}}
+\begin{DoxyCompactList}\small\item\em namespace \doxylink{namespacesysio_1_1chain}{sysio\+::chain} \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+unsigned \mbox{\hyperlink{namespacefc_a71eea521fccf7c6c7a01402d66de6a3f}{fc\+::aes\+\_\+encrypt}} (unsigned char \texorpdfstring{$\ast$}{*}plaintext, int plaintext\+\_\+len, unsigned char \texorpdfstring{$\ast$}{*}key, unsigned char \texorpdfstring{$\ast$}{*}iv, unsigned char \texorpdfstring{$\ast$}{*}ciphertext)
+\item 
+unsigned \mbox{\hyperlink{namespacefc_a17a540884c97b458fd605c12222e8070}{fc\+::aes\+\_\+decrypt}} (unsigned char \texorpdfstring{$\ast$}{*}ciphertext, int ciphertext\+\_\+len, unsigned char \texorpdfstring{$\ast$}{*}key, unsigned char \texorpdfstring{$\ast$}{*}iv, unsigned char \texorpdfstring{$\ast$}{*}plaintext)
+\item 
+unsigned \mbox{\hyperlink{namespacefc_a34e6438dfb3596540f7bf52faf97bbd2}{fc\+::aes\+\_\+cfb\+\_\+decrypt}} (unsigned char \texorpdfstring{$\ast$}{*}ciphertext, int ciphertext\+\_\+len, unsigned char \texorpdfstring{$\ast$}{*}key, unsigned char \texorpdfstring{$\ast$}{*}iv, unsigned char \texorpdfstring{$\ast$}{*}plaintext)
+\item 
+std\+::vector$<$ char $>$ \mbox{\hyperlink{namespacefc_af00401a48f0a79a846a8f6db60591d47}{fc\+::aes\+\_\+encrypt}} (const \mbox{\hyperlink{classfc_1_1sha512}{fc\+::sha512}} \&key, const std\+::vector$<$ char $>$ \&plain\+\_\+text)
+\item 
+std\+::vector$<$ char $>$ \mbox{\hyperlink{namespacefc_abaec8d5ba81a275a867004314358730c}{fc\+::aes\+\_\+decrypt}} (const \mbox{\hyperlink{classfc_1_1sha512}{fc\+::sha512}} \&key, const std\+::vector$<$ char $>$ \&cipher\+\_\+text)
+\item 
+void \mbox{\hyperlink{namespacefc_a8373bafd21e20c371b433c3a4ea2161f}{fc\+::aes\+\_\+save}} (const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&file, const \mbox{\hyperlink{classfc_1_1sha512}{fc\+::sha512}} \&key, std\+::vector$<$ char $>$ plain\+\_\+text)
+\item 
+std\+::vector$<$ char $>$ \mbox{\hyperlink{namespacefc_a971e5743b54d7c728f068af266a9e6f1}{fc\+::aes\+\_\+load}} (const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&file, const \mbox{\hyperlink{classfc_1_1sha512}{fc\+::sha512}} \&key)
+\end{DoxyCompactItemize}

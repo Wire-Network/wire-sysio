@@ -1,0 +1,98 @@
+\doxysection{ostreamwrappertest.\+cpp}
+\hypertarget{ostreamwrappertest_8cpp_source}{}\label{ostreamwrappertest_8cpp_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/test/unittest/ostreamwrappertest.cpp@{libraries/fc/include/fc/crypto/webauthn\_json/test/unittest/ostreamwrappertest.cpp}}
+\mbox{\hyperlink{ostreamwrappertest_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00001}00001\ \textcolor{comment}{//\ Tencent\ is\ pleased\ to\ support\ the\ open\ source\ community\ by\ making\ RapidJSON\ available.}}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00002}00002\ \textcolor{comment}{//\ }}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00003}00003\ \textcolor{comment}{//\ Copyright\ (C)\ 2015\ THL\ A29\ Limited,\ a\ Tencent\ company,\ and\ Milo\ Yip.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00004}00004\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00005}00005\ \textcolor{comment}{//\ Licensed\ under\ the\ MIT\ License\ (the\ "{}License"{});\ you\ may\ not\ use\ this\ file\ except}}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00006}00006\ \textcolor{comment}{//\ in\ compliance\ with\ the\ License.\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00007}00007\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00008}00008\ \textcolor{comment}{//\ http://opensource.org/licenses/MIT}}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00009}00009\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00010}00010\ \textcolor{comment}{//\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software\ distributed\ }}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00011}00011\ \textcolor{comment}{//\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,\ WITHOUT\ WARRANTIES\ OR\ }}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00012}00012\ \textcolor{comment}{//\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.\ See\ the\ License\ for\ the\ }}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00013}00013\ \textcolor{comment}{//\ specific\ language\ governing\ permissions\ and\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00015}00015\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{unittest_8h}{unittest.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00017}00017\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ostreamwrapper_8h}{rapidjson/ostreamwrapper.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00018}00018\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{encodedstream_8h}{rapidjson/encodedstream.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00019}00019\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{document_8h}{rapidjson/document.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00020}00020\ \textcolor{preprocessor}{\#include\ <sstream>}}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00021}00021\ \textcolor{preprocessor}{\#include\ <fstream>}}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00023}00023\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacerapidjson}{rapidjson}};}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00024}00024\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacestd}{std}};}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00026}00026\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ StringStreamType>}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00027}00027\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ TestStringStream()\ \{}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00028}00028\ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{typename}\ StringStreamType::char\_type\ \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}};}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00030}00030\ \ \ \ \ \mbox{\hyperlink{hash__impl_8h_ab0a0d1ad13c7e4d3cb38c89f7127c85a}{Ch}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}[]\ =\ \{\ \textcolor{charliteral}{'A'},\ \textcolor{charliteral}{'B'},\ \textcolor{charliteral}{'C'},\ \textcolor{charliteral}{'\(\backslash\)0'}\ \};}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00031}00031\ \ \ \ \ StringStreamType\ oss(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00032}00032\ \ \ \ \ \mbox{\hyperlink{class_basic_o_stream_wrapper}{BasicOStreamWrapper<StringStreamType>}}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}(oss);}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00033}00033\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ 3;\ i++)}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00034}00034\ \ \ \ \ \ \ \ \ os.Put(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}[i]);}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00035}00035\ \ \ \ \ os.Flush();}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00036}00036\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ 3;\ i++)}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00037}00037\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}[i],\ oss.str()[i]);}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00038}00038\ \}}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00040}\mbox{\hyperlink{ostreamwrappertest_8cpp_aebb89d881f588a9a902f348de94ed6cd}{00040}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(\mbox{\hyperlink{class_o_stream_wrapper}{OStreamWrapper}},\ ostringstream)\ \{}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00041}00041\ \ \ \ \ TestStringStream<ostringstream>();}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00042}00042\ \}}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00044}\mbox{\hyperlink{ostreamwrappertest_8cpp_aadf939ee7c96aa3a629d1bb7686ba823}{00044}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(\mbox{\hyperlink{class_o_stream_wrapper}{OStreamWrapper}},\ stringstream)\ \{}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00045}00045\ \ \ \ \ TestStringStream<stringstream>();}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00046}00046\ \}}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00048}\mbox{\hyperlink{ostreamwrappertest_8cpp_a220dfe938e8cf505067fb2f426f8c425}{00048}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(\mbox{\hyperlink{class_o_stream_wrapper}{OStreamWrapper}},\ wostringstream)\ \{}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00049}00049\ \ \ \ \ TestStringStream<wostringstream>();}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00050}00050\ \}}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00052}\mbox{\hyperlink{ostreamwrappertest_8cpp_a21ebd54589e4f28bac98322c7ee4f8fe}{00052}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(\mbox{\hyperlink{class_o_stream_wrapper}{OStreamWrapper}},\ wstringstream)\ \{}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00053}00053\ \ \ \ \ TestStringStream<wstringstream>();}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00054}00054\ \}}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00056}\mbox{\hyperlink{ostreamwrappertest_8cpp_ad34c7e1109dc3bb0e7307e762b09b818}{00056}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(\mbox{\hyperlink{class_o_stream_wrapper}{OStreamWrapper}},\ cout)\ \{}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00057}00057\ \ \ \ \ \mbox{\hyperlink{class_o_stream_wrapper}{OStreamWrapper}}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}(cout);}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00058}00058\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ =\ \textcolor{stringliteral}{"{}Hello\ World!\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00059}00059\ \ \ \ \ \textcolor{keywordflow}{while}\ (*\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00060}00060\ \ \ \ \ \ \ \ \ os.Put(*\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}++);}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00061}00061\ \ \ \ \ os.Flush();}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00062}00062\ \}}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00064}00064\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ FileStreamType>}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00065}00065\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ TestFileStream()\ \{}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00066}00066\ \ \ \ \ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{namespaceembed_clara_a1e1bd594f85f58f5dca6c41c0ac720fb}{filename}}[L\_tmpnam];}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00067}00067\ \ \ \ \ FILE*\ fp\ =\ \mbox{\hyperlink{unittest_8h_acb6251ae9b44050f1fcabf8d3c2e792b}{TempFile}}(filename);}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00068}00068\ \ \ \ \ fclose(fp);}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00069}00069\ }
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00070}00070\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ =\ \textcolor{stringliteral}{"{}Hello\ World!\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00071}00071\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00072}00072\ \ \ \ \ \ \ \ \ FileStreamType\ ofs(filename,\ ios::out\ |\ ios::binary);}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00073}00073\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_basic_o_stream_wrapper}{BasicOStreamWrapper<FileStreamType>}}\ osw(ofs);}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00074}00074\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};\ *\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}};\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}++)}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00075}00075\ \ \ \ \ \ \ \ \ \ \ \ \ osw.Put(*\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}});}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00076}00076\ \ \ \ \ \ \ \ \ osw.Flush();}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00077}00077\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00079}00079\ \ \ \ \ fp\ =\ fopen(filename,\ \textcolor{stringliteral}{"{}r"{}});}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00080}00080\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(\ fp\ !=\ NULL\ );}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00081}00081\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};\ *\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}};\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}++)}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00082}00082\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(*\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{char}\textcolor{keyword}{>}(fgetc(fp)));}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00083}00083\ \ \ \ \ fclose(fp);}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00084}00084\ \}}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00085}00085\ }
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00086}\mbox{\hyperlink{ostreamwrappertest_8cpp_a6c6684f857411534af3e4859b2f519ce}{00086}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(\mbox{\hyperlink{class_o_stream_wrapper}{OStreamWrapper}},\ ofstream)\ \{}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00087}00087\ \ \ \ \ TestFileStream<ofstream>();}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00088}00088\ \}}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00089}00089\ }
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00090}\mbox{\hyperlink{ostreamwrappertest_8cpp_af2c8de40081d03e8df9fca1a7f52e15f}{00090}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(\mbox{\hyperlink{class_o_stream_wrapper}{OStreamWrapper}},\ fstream)\ \{}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00091}00091\ \ \ \ \ TestFileStream<fstream>();}
+\DoxyCodeLine{\Hypertarget{ostreamwrappertest_8cpp_source_l00092}00092\ \}}
+
+\end{DoxyCode}

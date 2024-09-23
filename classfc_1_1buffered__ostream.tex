@@ -1,0 +1,249 @@
+\doxysection{fc\+::buffered\+\_\+ostream Class Reference}
+\hypertarget{classfc_1_1buffered__ostream}{}\label{classfc_1_1buffered__ostream}\index{fc::buffered\_ostream@{fc::buffered\_ostream}}
+
+
+{\ttfamily \#include $<$buffered\+\_\+iostream.\+hpp$>$}
+
+
+
+Inheritance diagram for fc\+::buffered\+\_\+ostream\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=186pt]{classfc_1_1buffered__ostream__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for fc\+::buffered\+\_\+ostream\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=186pt]{classfc_1_1buffered__ostream__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1buffered__ostream_a4367cbee8f5059b5e7e35a23b1304170}{buffered\+\_\+ostream}} (ostream\+\_\+ptr o, size\+\_\+t bufsize=4096)
+\item 
+\mbox{\hyperlink{classfc_1_1buffered__ostream_a14ece07d037569bcb5eccc00fcd2ad67}{buffered\+\_\+ostream}} (\mbox{\hyperlink{classfc_1_1buffered__ostream}{buffered\+\_\+ostream}} \&\&m)
+\item 
+\mbox{\hyperlink{classfc_1_1buffered__ostream_a16fb3f4b8780d6b83f08d603b7e5f350}{\texorpdfstring{$\sim$}{\string~}buffered\+\_\+ostream}} ()
+\item 
+\mbox{\hyperlink{classfc_1_1buffered__ostream}{buffered\+\_\+ostream}} \& \mbox{\hyperlink{classfc_1_1buffered__ostream_ac6b4fd3956ec31f976ad50da28bbef2b}{operator=}} (\mbox{\hyperlink{classfc_1_1buffered__ostream}{buffered\+\_\+ostream}} \&\&m)
+\item 
+virtual size\+\_\+t \mbox{\hyperlink{classfc_1_1buffered__ostream_a97aa6bcd47b0506a080779840fffd493}{writesome}} (const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}, size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})
+\item 
+virtual size\+\_\+t \mbox{\hyperlink{classfc_1_1buffered__ostream_a5cb49f9fc76f6de2ff3014fc35c46d50}{writesome}} (const std\+::shared\+\_\+ptr$<$ const char $>$ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}, size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}, size\+\_\+t offset)
+\item 
+virtual void \mbox{\hyperlink{classfc_1_1buffered__ostream_a6eb86db89b1da6af7fd4cbe52c24a0ed}{close}} ()
+\item 
+virtual void \mbox{\hyperlink{classfc_1_1buffered__ostream_a2701105d24596d7990e73ec940b134ab}{flush}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{buffered__iostream_8hpp_source_l00052}{52}} of file \mbox{\hyperlink{buffered__iostream_8hpp_source}{buffered\+\_\+iostream.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1buffered__ostream_a4367cbee8f5059b5e7e35a23b1304170}\index{fc::buffered\_ostream@{fc::buffered\_ostream}!buffered\_ostream@{buffered\_ostream}}
+\index{buffered\_ostream@{buffered\_ostream}!fc::buffered\_ostream@{fc::buffered\_ostream}}
+\doxysubsubsection{\texorpdfstring{buffered\_ostream()}{buffered\_ostream()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1buffered__ostream_a4367cbee8f5059b5e7e35a23b1304170} 
+fc\+::buffered\+\_\+ostream\+::buffered\+\_\+ostream (\begin{DoxyParamCaption}\item[{ostream\+\_\+ptr}]{o}{, }\item[{size\+\_\+t}]{bufsize}{ = {\ttfamily 4096}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{buffered__iostream_8cpp_source_l00153}{153}} of file \mbox{\hyperlink{buffered__iostream_8cpp_source}{buffered\+\_\+iostream.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00154\ \ \ \ \ :my(\ \textcolor{keyword}{new}\ detail::buffered\_ostream\_impl(\ fc::move(os)\ )\ )}
+\DoxyCodeLine{00155\ \ \ \ \ \{}
+\DoxyCodeLine{00156\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1buffered__ostream_a14ece07d037569bcb5eccc00fcd2ad67}\index{fc::buffered\_ostream@{fc::buffered\_ostream}!buffered\_ostream@{buffered\_ostream}}
+\index{buffered\_ostream@{buffered\_ostream}!fc::buffered\_ostream@{fc::buffered\_ostream}}
+\doxysubsubsection{\texorpdfstring{buffered\_ostream()}{buffered\_ostream()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1buffered__ostream_a14ece07d037569bcb5eccc00fcd2ad67} 
+fc\+::buffered\+\_\+ostream\+::buffered\+\_\+ostream (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1buffered__ostream}{buffered\+\_\+ostream}} \&\&}]{m}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{buffered__iostream_8cpp_source_l00158}{158}} of file \mbox{\hyperlink{buffered__iostream_8cpp_source}{buffered\+\_\+iostream.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00159\ \ \ \ \ :my(\ fc::move(o.my)\ )\{\}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1buffered__ostream_a16fb3f4b8780d6b83f08d603b7e5f350}\index{fc::buffered\_ostream@{fc::buffered\_ostream}!````~buffered\_ostream@{\texorpdfstring{$\sim$}{\string~}buffered\_ostream}}
+\index{````~buffered\_ostream@{\texorpdfstring{$\sim$}{\string~}buffered\_ostream}!fc::buffered\_ostream@{fc::buffered\_ostream}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}buffered\_ostream()}{\string~buffered\_ostream()}}
+{\footnotesize\ttfamily \label{classfc_1_1buffered__ostream_a16fb3f4b8780d6b83f08d603b7e5f350} 
+fc\+::buffered\+\_\+ostream\+::\texorpdfstring{$\sim$}{\string~}buffered\+\_\+ostream (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{buffered__iostream_8cpp_source_l00167}{167}} of file \mbox{\hyperlink{buffered__iostream_8cpp_source}{buffered\+\_\+iostream.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00167\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1buffered__ostream_a6eb86db89b1da6af7fd4cbe52c24a0ed}\index{fc::buffered\_ostream@{fc::buffered\_ostream}!close@{close}}
+\index{close@{close}!fc::buffered\_ostream@{fc::buffered\_ostream}}
+\doxysubsubsection{\texorpdfstring{close()}{close()}}
+{\footnotesize\ttfamily \label{classfc_1_1buffered__ostream_a6eb86db89b1da6af7fd4cbe52c24a0ed} 
+void fc\+::buffered\+\_\+ostream\+::close (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{buffered__iostream_8cpp_source_l00202}{202}} of file \mbox{\hyperlink{buffered__iostream_8cpp_source}{buffered\+\_\+iostream.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00203\ \ \ \ \ \{}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1buffered__ostream_a2701105d24596d7990e73ec940b134ab}{flush}}();}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ my-\/>\_ostr-\/>close();}
+\DoxyCodeLine{00206\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=328pt]{classfc_1_1buffered__ostream_a6eb86db89b1da6af7fd4cbe52c24a0ed_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1buffered__ostream_a2701105d24596d7990e73ec940b134ab}\index{fc::buffered\_ostream@{fc::buffered\_ostream}!flush@{flush}}
+\index{flush@{flush}!fc::buffered\_ostream@{fc::buffered\_ostream}}
+\doxysubsubsection{\texorpdfstring{flush()}{flush()}}
+{\footnotesize\ttfamily \label{classfc_1_1buffered__ostream_a2701105d24596d7990e73ec940b134ab} 
+void fc\+::buffered\+\_\+ostream\+::flush (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{buffered__iostream_8cpp_source_l00181}{181}} of file \mbox{\hyperlink{buffered__iostream_8cpp_source}{buffered\+\_\+iostream.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00182\ \ \ \ \ \{}
+\DoxyCodeLine{00183\ \textcolor{preprocessor}{\#ifndef\ NDEBUG}}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ This\ code\ was\ written\ with\ the\ assumption\ that\ you'd\ only\ be\ making\ one\ call\ to\ flush\ }}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ at\ a\ time\ so\ it\ reuses\ \_shared\_write\_buffer.\ \ If\ you\ really\ need\ to\ make\ concurrent\ calls\ to\ }}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ flush(),\ you'll\ need\ to\ prevent\ reusing\ \_shared\_write\_buffer\ here}}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \ \ \textcolor{keyword}{struct\ }check\_buffer\_in\_use\ \{}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\&\ \_buffer\_in\_use;}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ \ \ check\_buffer\_in\_use(\textcolor{keywordtype}{bool}\&\ buffer\_in\_use)\ :\ \_buffer\_in\_use(buffer\_in\_use)\ \{\ assert(!\_buffer\_in\_use);\ \_buffer\_in\_use\ =\ \textcolor{keyword}{true};\ \}}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ \ \ \string~check\_buffer\_in\_use()\ \{\ assert(\_buffer\_in\_use);\ \_buffer\_in\_use\ =\ \textcolor{keyword}{false};\ \}}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ \}\ buffer\_in\_use\_checker(my-\/>\_shared\_write\_buffer\_in\_use);}
+\DoxyCodeLine{00192\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ write\_buffer\_size\ =\ 2048;}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!my-\/>\_shared\_write\_buffer)}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ \ \ my-\/>\_shared\_write\_buffer.reset(\textcolor{keyword}{new}\ \textcolor{keywordtype}{char}[write\_buffer\_size],\ [](\textcolor{keywordtype}{char}*\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})\{\ \textcolor{keyword}{delete}[]\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}};\ \});}
+\DoxyCodeLine{00196\ }
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\ \textcolor{keywordtype}{size\_t}\ bytes\_from\_rdbuf\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(my-\/>\_rdbuf.sgetn(my-\/>\_shared\_write\_buffer.get(),\ write\_buffer\_size))\ )}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \ \ \ my-\/>\_ostr-\/>write(\ my-\/>\_shared\_write\_buffer,\ bytes\_from\_rdbuf\ );}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ my-\/>\_ostr-\/>flush();}
+\DoxyCodeLine{00200\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1buffered__ostream_a2701105d24596d7990e73ec940b134ab_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1buffered__ostream_ac6b4fd3956ec31f976ad50da28bbef2b}\index{fc::buffered\_ostream@{fc::buffered\_ostream}!operator=@{operator=}}
+\index{operator=@{operator=}!fc::buffered\_ostream@{fc::buffered\_ostream}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}}
+{\footnotesize\ttfamily \label{classfc_1_1buffered__ostream_ac6b4fd3956ec31f976ad50da28bbef2b} 
+\mbox{\hyperlink{classfc_1_1buffered__ostream}{buffered\+\_\+ostream}} \& fc\+::buffered\+\_\+ostream\+::operator= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1buffered__ostream}{buffered\+\_\+ostream}} \&\&}]{m}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{buffered__iostream_8cpp_source_l00161}{161}} of file \mbox{\hyperlink{buffered__iostream_8cpp_source}{buffered\+\_\+iostream.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00162\ \ \ \ \ \{}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ my\ =\ fc::move(i.my);}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00165\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1buffered__ostream_a97aa6bcd47b0506a080779840fffd493}\index{fc::buffered\_ostream@{fc::buffered\_ostream}!writesome@{writesome}}
+\index{writesome@{writesome}!fc::buffered\_ostream@{fc::buffered\_ostream}}
+\doxysubsubsection{\texorpdfstring{writesome()}{writesome()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1buffered__ostream_a97aa6bcd47b0506a080779840fffd493} 
+size\+\_\+t fc\+::buffered\+\_\+ostream\+::writesome (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{buf}{, }\item[{size\+\_\+t}]{len}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+This method will return immediately unless the buffer is full, in which case it will flush which may block. 
+
+Definition at line \mbox{\hyperlink{buffered__iostream_8cpp_source_l00169}{169}} of file \mbox{\hyperlink{buffered__iostream_8cpp_source}{buffered\+\_\+iostream.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00170\ \ \ \ \ \{}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ written\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(my-\/>\_rdbuf.sputn(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ ));}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ written\ <\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ )\ \{\ \mbox{\hyperlink{classfc_1_1buffered__ostream_a2701105d24596d7990e73ec940b134ab}{flush}}();\ \}}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ written\ +\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(my-\/>\_rdbuf.sputn(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}+written,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}-\/written\ ));}
+\DoxyCodeLine{00174\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=328pt]{classfc_1_1buffered__ostream_a97aa6bcd47b0506a080779840fffd493_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=328pt]{classfc_1_1buffered__ostream_a97aa6bcd47b0506a080779840fffd493_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1buffered__ostream_a5cb49f9fc76f6de2ff3014fc35c46d50}\index{fc::buffered\_ostream@{fc::buffered\_ostream}!writesome@{writesome}}
+\index{writesome@{writesome}!fc::buffered\_ostream@{fc::buffered\_ostream}}
+\doxysubsubsection{\texorpdfstring{writesome()}{writesome()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1buffered__ostream_a5cb49f9fc76f6de2ff3014fc35c46d50} 
+size\+\_\+t fc\+::buffered\+\_\+ostream\+::writesome (\begin{DoxyParamCaption}\item[{const std\+::shared\+\_\+ptr$<$ const char $>$ \&}]{buf}{, }\item[{size\+\_\+t}]{len}{, }\item[{size\+\_\+t}]{offset}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{buffered__iostream_8cpp_source_l00176}{176}} of file \mbox{\hyperlink{buffered__iostream_8cpp_source}{buffered\+\_\+iostream.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00177\ \ \ \ \ \{}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1buffered__ostream_a97aa6bcd47b0506a080779840fffd493}{writesome}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}.get()\ +\ offset,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}});}
+\DoxyCodeLine{00179\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1buffered__ostream_a5cb49f9fc76f6de2ff3014fc35c46d50_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/io/\mbox{\hyperlink{buffered__iostream_8hpp}{buffered\+\_\+iostream.\+hpp}}\item 
+libraries/fc/src/io/\mbox{\hyperlink{buffered__iostream_8cpp}{buffered\+\_\+iostream.\+cpp}}\end{DoxyCompactItemize}

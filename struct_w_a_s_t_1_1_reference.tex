@@ -1,0 +1,206 @@
+\doxysection{WAST\+::Reference Struct Reference}
+\hypertarget{struct_w_a_s_t_1_1_reference}{}\label{struct_w_a_s_t_1_1_reference}\index{WAST::Reference@{WAST::Reference}}
+
+
+{\ttfamily \#include $<$Parse.\+h$>$}
+
+
+
+Collaboration diagram for WAST\+::Reference\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=174pt]{struct_w_a_s_t_1_1_reference__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum class \mbox{\hyperlink{struct_w_a_s_t_1_1_reference_a89f893631191c7d9100fada8522b5f60}{Type}} \{ \mbox{\hyperlink{struct_w_a_s_t_1_1_reference_a89f893631191c7d9100fada8522b5f60afedb2d84cafe20862cb4399751a8a7e3}{invalid}}
+, \mbox{\hyperlink{struct_w_a_s_t_1_1_reference_a89f893631191c7d9100fada8522b5f60ab068931cc450442b63f5b3d276ea4297}{name}}
+, \mbox{\hyperlink{struct_w_a_s_t_1_1_reference_a89f893631191c7d9100fada8522b5f60a6a992d5529f459a44fee58c733255e86}{index}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_w_a_s_t_1_1_reference_a137b1552cb354800b9f58197fdeaf100}{Reference}} (const \mbox{\hyperlink{struct_w_a_s_t_1_1_name}{Name}} \&in\+Name)
+\item 
+\mbox{\hyperlink{struct_w_a_s_t_1_1_reference_ac76ec6a426abfa4a7e78f67fcda1502d}{Reference}} (\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}} in\+Index)
+\item 
+\mbox{\hyperlink{struct_w_a_s_t_1_1_reference_a25157610d69580a6d18657f434eb8d71}{Reference}} ()
+\item 
+\mbox{\hyperlink{struct_w_a_s_t_1_1_reference_ade3e7a977af30d401193864c83900801}{operator bool}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_w_a_s_t_1_1_reference_a89f893631191c7d9100fada8522b5f60}{Type}} \mbox{\hyperlink{struct_w_a_s_t_1_1_reference_acfd4670d22a4c21f5aa8918a0d14f599}{type}}
+\item 
+\begin{tabbing}
+xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=\kill
+union \{\\
+\>\mbox{\hyperlink{struct_w_a_s_t_1_1_name}{Name}} \mbox{\hyperlink{struct_w_a_s_t_1_1_reference_a5cf0db51e258f551a0d12892056522a0}{name}}\\
+\>\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}} \mbox{\hyperlink{struct_w_a_s_t_1_1_reference_a636568c708a85b40e965083a2eb0e371}{index}}\\
+\}; \\
+
+\end{tabbing}\item 
+const Token \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{struct_w_a_s_t_1_1_reference_a98e8e176b1812f626d9e8e1d83a63486}{token}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{_parse_8h_source_l00091}{91}} of file \mbox{\hyperlink{_parse_8h_source}{Parse.\+h}}.
+
+
+
+\doxysubsection{Member Enumeration Documentation}
+\Hypertarget{struct_w_a_s_t_1_1_reference_a89f893631191c7d9100fada8522b5f60}\index{WAST::Reference@{WAST::Reference}!Type@{Type}}
+\index{Type@{Type}!WAST::Reference@{WAST::Reference}}
+\doxysubsubsection{\texorpdfstring{Type}{Type}}
+{\footnotesize\ttfamily \label{struct_w_a_s_t_1_1_reference_a89f893631191c7d9100fada8522b5f60} 
+enum \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{struct_w_a_s_t_1_1_reference_a89f893631191c7d9100fada8522b5f60}{WAST\+::\+Reference\+::\+Type}}\hspace{0.3cm}{\ttfamily [strong]}}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{invalid@{invalid}!WAST::Reference@{WAST::Reference}}\index{WAST::Reference@{WAST::Reference}!invalid@{invalid}}}\Hypertarget{struct_w_a_s_t_1_1_reference_a89f893631191c7d9100fada8522b5f60afedb2d84cafe20862cb4399751a8a7e3}\label{struct_w_a_s_t_1_1_reference_a89f893631191c7d9100fada8522b5f60} 
+invalid&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{name@{name}!WAST::Reference@{WAST::Reference}}\index{WAST::Reference@{WAST::Reference}!name@{name}}}\Hypertarget{struct_w_a_s_t_1_1_reference_a89f893631191c7d9100fada8522b5f60ab068931cc450442b63f5b3d276ea4297}\label{struct_w_a_s_t_1_1_reference_a89f893631191c7d9100fada8522b5f60} 
+name&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{index@{index}!WAST::Reference@{WAST::Reference}}\index{WAST::Reference@{WAST::Reference}!index@{index}}}\Hypertarget{struct_w_a_s_t_1_1_reference_a89f893631191c7d9100fada8522b5f60a6a992d5529f459a44fee58c733255e86}\label{struct_w_a_s_t_1_1_reference_a89f893631191c7d9100fada8522b5f60} 
+index&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{_parse_8h_source_l00093}{93}} of file \mbox{\hyperlink{_parse_8h_source}{Parse.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00093\ \{\ \mbox{\hyperlink{struct_w_a_s_t_1_1_reference_a89f893631191c7d9100fada8522b5f60afedb2d84cafe20862cb4399751a8a7e3}{invalid}},\ \mbox{\hyperlink{struct_w_a_s_t_1_1_reference_a5cf0db51e258f551a0d12892056522a0}{name}},\ index\ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{struct_w_a_s_t_1_1_reference_a137b1552cb354800b9f58197fdeaf100}\index{WAST::Reference@{WAST::Reference}!Reference@{Reference}}
+\index{Reference@{Reference}!WAST::Reference@{WAST::Reference}}
+\doxysubsubsection{\texorpdfstring{Reference()}{Reference()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{struct_w_a_s_t_1_1_reference_a137b1552cb354800b9f58197fdeaf100} 
+WAST\+::\+Reference\+::\+Reference (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct_w_a_s_t_1_1_name}{Name}} \&}]{in\+Name}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_8h_source_l00101}{101}} of file \mbox{\hyperlink{_parse_8h_source}{Parse.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00101\ :\ \mbox{\hyperlink{struct_w_a_s_t_1_1_reference_acfd4670d22a4c21f5aa8918a0d14f599}{type}}(\mbox{\hyperlink{struct_w_a_s_t_1_1_reference_a89f893631191c7d9100fada8522b5f60ab068931cc450442b63f5b3d276ea4297}{Type::name}}),\ \mbox{\hyperlink{struct_w_a_s_t_1_1_reference_a5cf0db51e258f551a0d12892056522a0}{name}}(inName)\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{struct_w_a_s_t_1_1_reference_ac76ec6a426abfa4a7e78f67fcda1502d}\index{WAST::Reference@{WAST::Reference}!Reference@{Reference}}
+\index{Reference@{Reference}!WAST::Reference@{WAST::Reference}}
+\doxysubsubsection{\texorpdfstring{Reference()}{Reference()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{struct_w_a_s_t_1_1_reference_ac76ec6a426abfa4a7e78f67fcda1502d} 
+WAST\+::\+Reference\+::\+Reference (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}}]{in\+Index}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_8h_source_l00102}{102}} of file \mbox{\hyperlink{_parse_8h_source}{Parse.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00102\ :\ \mbox{\hyperlink{struct_w_a_s_t_1_1_reference_acfd4670d22a4c21f5aa8918a0d14f599}{type}}(\mbox{\hyperlink{struct_w_a_s_t_1_1_reference_a89f893631191c7d9100fada8522b5f60a6a992d5529f459a44fee58c733255e86}{Type::index}}),\ \mbox{\hyperlink{struct_w_a_s_t_1_1_reference_a636568c708a85b40e965083a2eb0e371}{index}}(inIndex)\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{struct_w_a_s_t_1_1_reference_a25157610d69580a6d18657f434eb8d71}\index{WAST::Reference@{WAST::Reference}!Reference@{Reference}}
+\index{Reference@{Reference}!WAST::Reference@{WAST::Reference}}
+\doxysubsubsection{\texorpdfstring{Reference()}{Reference()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{struct_w_a_s_t_1_1_reference_a25157610d69580a6d18657f434eb8d71} 
+WAST\+::\+Reference\+::\+Reference (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_8h_source_l00103}{103}} of file \mbox{\hyperlink{_parse_8h_source}{Parse.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00103\ :\ \mbox{\hyperlink{struct_w_a_s_t_1_1_reference_acfd4670d22a4c21f5aa8918a0d14f599}{type}}(\mbox{\hyperlink{struct_w_a_s_t_1_1_reference_a89f893631191c7d9100fada8522b5f60afedb2d84cafe20862cb4399751a8a7e3}{Type::invalid}}),\ \mbox{\hyperlink{struct_w_a_s_t_1_1_reference_a98e8e176b1812f626d9e8e1d83a63486}{token}}(\textcolor{keyword}{nullptr})\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_w_a_s_t_1_1_reference_ade3e7a977af30d401193864c83900801}\index{WAST::Reference@{WAST::Reference}!operator bool@{operator bool}}
+\index{operator bool@{operator bool}!WAST::Reference@{WAST::Reference}}
+\doxysubsubsection{\texorpdfstring{operator bool()}{operator bool()}}
+{\footnotesize\ttfamily \label{struct_w_a_s_t_1_1_reference_ade3e7a977af30d401193864c83900801} 
+WAST\+::\+Reference\+::operator bool (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_8h_source_l00104}{104}} of file \mbox{\hyperlink{_parse_8h_source}{Parse.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00104\ \{\ \textcolor{keywordflow}{return}\ type\ !=\ \mbox{\hyperlink{struct_w_a_s_t_1_1_reference_a89f893631191c7d9100fada8522b5f60afedb2d84cafe20862cb4399751a8a7e3}{Type::invalid}};\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_w_a_s_t_1_1_reference_af180b3d4b4afcc468e21c8fb21ef9c66}\doxysubsubsection{\texorpdfstring{[union]}{[union]}}
+{\footnotesize\ttfamily \label{struct_w_a_s_t_1_1_reference_af180b3d4b4afcc468e21c8fb21ef9c66} 
+union  \{ ... \}  \mbox{\hyperlink{struct_w_a_s_t_1_1_reference}{WAST\+::\+Reference}}}
+
+\Hypertarget{struct_w_a_s_t_1_1_reference_a636568c708a85b40e965083a2eb0e371}\index{WAST::Reference@{WAST::Reference}!index@{index}}
+\index{index@{index}!WAST::Reference@{WAST::Reference}}
+\doxysubsubsection{\texorpdfstring{index}{index}}
+{\footnotesize\ttfamily \label{struct_w_a_s_t_1_1_reference_a636568c708a85b40e965083a2eb0e371} 
+\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}} WAST\+::\+Reference\+::index}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_8h_source_l00098}{98}} of file \mbox{\hyperlink{_parse_8h_source}{Parse.\+h}}.
+
+\Hypertarget{struct_w_a_s_t_1_1_reference_a5cf0db51e258f551a0d12892056522a0}\index{WAST::Reference@{WAST::Reference}!name@{name}}
+\index{name@{name}!WAST::Reference@{WAST::Reference}}
+\doxysubsubsection{\texorpdfstring{name}{name}}
+{\footnotesize\ttfamily \label{struct_w_a_s_t_1_1_reference_a5cf0db51e258f551a0d12892056522a0} 
+\mbox{\hyperlink{struct_w_a_s_t_1_1_name}{Name}} WAST\+::\+Reference\+::name}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_8h_source_l00097}{97}} of file \mbox{\hyperlink{_parse_8h_source}{Parse.\+h}}.
+
+\Hypertarget{struct_w_a_s_t_1_1_reference_a98e8e176b1812f626d9e8e1d83a63486}\index{WAST::Reference@{WAST::Reference}!token@{token}}
+\index{token@{token}!WAST::Reference@{WAST::Reference}}
+\doxysubsubsection{\texorpdfstring{token}{token}}
+{\footnotesize\ttfamily \label{struct_w_a_s_t_1_1_reference_a98e8e176b1812f626d9e8e1d83a63486} 
+const Token\texorpdfstring{$\ast$}{*} WAST\+::\+Reference\+::token}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_8h_source_l00100}{100}} of file \mbox{\hyperlink{_parse_8h_source}{Parse.\+h}}.
+
+\Hypertarget{struct_w_a_s_t_1_1_reference_acfd4670d22a4c21f5aa8918a0d14f599}\index{WAST::Reference@{WAST::Reference}!type@{type}}
+\index{type@{type}!WAST::Reference@{WAST::Reference}}
+\doxysubsubsection{\texorpdfstring{type}{type}}
+{\footnotesize\ttfamily \label{struct_w_a_s_t_1_1_reference_acfd4670d22a4c21f5aa8918a0d14f599} 
+\mbox{\hyperlink{struct_w_a_s_t_1_1_reference_a89f893631191c7d9100fada8522b5f60}{Type}} WAST\+::\+Reference\+::type}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_8h_source_l00094}{94}} of file \mbox{\hyperlink{_parse_8h_source}{Parse.\+h}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/wasm-\/jit/\+Source/\+WAST/\mbox{\hyperlink{_parse_8h}{Parse.\+h}}\end{DoxyCompactItemize}

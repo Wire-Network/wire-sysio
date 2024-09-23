@@ -1,0 +1,56 @@
+\doxysection{sysio\+::chain\+::webassembly\+::host\+\_\+function\+\_\+registrator\texorpdfstring{$<$}{<} Host\+Function, Preconditions \texorpdfstring{$>$}{>} Struct Template Reference}
+\hypertarget{structsysio_1_1chain_1_1webassembly_1_1host__function__registrator}{}\label{structsysio_1_1chain_1_1webassembly_1_1host__function__registrator}\index{sysio::chain::webassembly::host\_function\_registrator$<$ HostFunction, Preconditions $>$@{sysio::chain::webassembly::host\_function\_registrator$<$ HostFunction, Preconditions $>$}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename Mod , typename Name $>$ }\\constexpr \mbox{\hyperlink{structsysio_1_1chain_1_1webassembly_1_1host__function__registrator_a8373c77aa3ef9e367a25f8f52c55ea7d}{host\+\_\+function\+\_\+registrator}} (Mod mod\+\_\+name, Name fn\+\_\+name)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$auto Host\+Function, typename... Preconditions$>$\newline
+struct sysio\+::chain\+::webassembly\+::host\+\_\+function\+\_\+registrator$<$ Host\+Function, Preconditions $>$}
+
+
+Definition at line \mbox{\hyperlink{sys-vm_8cpp_source_l00288}{288}} of file \mbox{\hyperlink{sys-vm_8cpp_source}{sys-\/vm.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structsysio_1_1chain_1_1webassembly_1_1host__function__registrator_a8373c77aa3ef9e367a25f8f52c55ea7d}\index{sysio::chain::webassembly::host\_function\_registrator$<$ HostFunction, Preconditions $>$@{sysio::chain::webassembly::host\_function\_registrator$<$ HostFunction, Preconditions $>$}!host\_function\_registrator@{host\_function\_registrator}}
+\index{host\_function\_registrator@{host\_function\_registrator}!sysio::chain::webassembly::host\_function\_registrator$<$ HostFunction, Preconditions $>$@{sysio::chain::webassembly::host\_function\_registrator$<$ HostFunction, Preconditions $>$}}
+\doxysubsubsection{\texorpdfstring{host\_function\_registrator()}{host\_function\_registrator()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1webassembly_1_1host__function__registrator_a8373c77aa3ef9e367a25f8f52c55ea7d} 
+template$<$auto Host\+Function, typename... Preconditions$>$ \\
+template$<$typename Mod , typename Name $>$ \\
+\mbox{\hyperlink{structsysio_1_1chain_1_1webassembly_1_1host__function__registrator}{sysio\+::chain\+::webassembly\+::host\+\_\+function\+\_\+registrator}}$<$ Host\+Function, Preconditions $>$\+::host\+\_\+function\+\_\+registrator (\begin{DoxyParamCaption}\item[{Mod}]{mod\+\_\+name}{, }\item[{Name}]{fn\+\_\+name}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_8cpp_source_l00290}{290}} of file \mbox{\hyperlink{sys-vm_8cpp_source}{sys-\/vm.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00290\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00291\ \ \ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{structsysio_1_1vm_1_1registered__host__functions}{rhf\_t}}\ =\ \mbox{\hyperlink{namespacesysio_1_1chain_a91759da2646c40537849fc779d1fbaed}{eos\_vm\_host\_functions\_t}};}
+\DoxyCodeLine{00292\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1registered__host__functions_a11ed5e893c0eb9af80290f9024485be2}{rhf\_t::add}}<HostFunction,\ Preconditions...>(mod\_name.c\_str(),\ fn\_name.c\_str());}
+\DoxyCodeLine{00293\ \textcolor{preprocessor}{\#ifdef\ SYSIO\_SYS\_VM\_OC\_RUNTIME\_ENABLED}}
+\DoxyCodeLine{00294\ \ \ \ \ \ \ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{bool}\ is\_injected\ =\ (Mod()\ ==\ BOOST\_HANA\_STRING(\mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2webassembly_2common_8hpp_aae5a8b77b3dce5df71e1c16ef2f4cac3}{SYSIO\_INJECTED\_MODULE\_NAME}}));}
+\DoxyCodeLine{00295\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_1_1eosvmoc_a6efa174d4d38f5f348b1a3dc0c9d9c0b}{eosvmoc::register\_eosvm\_oc}}<HostFunction,\ is\_injected,\ std::tuple<Preconditions...>>(}
+\DoxyCodeLine{00296\ \ \ \ \ \ \ \ \ \ \ mod\_name\ +\ BOOST\_HANA\_STRING(\textcolor{stringliteral}{"{}."{}})\ +\ fn\_name);}
+\DoxyCodeLine{00297\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00298\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1webassembly_1_1host__function__registrator_a8373c77aa3ef9e367a25f8f52c55ea7d_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/webassembly/runtimes/\mbox{\hyperlink{sys-vm_8cpp}{sys-\/vm.\+cpp}}\end{DoxyCompactItemize}

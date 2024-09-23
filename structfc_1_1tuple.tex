@@ -1,0 +1,44 @@
+\doxysection{fc\+::tuple\texorpdfstring{$<$}{<}\texorpdfstring{$>$}{>} Struct Template Reference}
+\hypertarget{structfc_1_1tuple}{}\label{structfc_1_1tuple}\index{fc::tuple$<$$>$@{fc::tuple$<$$>$}}
+
+
+{\ttfamily \#include $<$tuple.\+hpp$>$}
+
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$BOOST\+\_\+\+PP\+\_\+\+ENUM\+\_\+\+PARAMS\+\_\+\+WITH\+\_\+\+A\+\_\+\+DEFAULT(9, typename \mbox{\hyperlink{struct_a}{A}}, void)$>$\newline
+struct fc\+::tuple$<$$>$}
+\begin{DoxyVerb}Provides a fast-compiling tuple that doesn't use fancy meta-programming
+techniques.  It is limited to 4 parameters which is sufficient for most 
+methods argument lists which is the primary use case for this tuple. Methods
+that require more than 4 parameters are probably better served by defining
+a struct.
+
+The members of the tuple are easily visited with a simple visitor functor 
+of the form:
+@code
+struct visitor {
+  template<typename MemberType>
+  void operator()( MemberType& m );
+
+  template<typename MemberType>
+  void operator()( const MemberType& m );
+};
+@endcode
+\end{DoxyVerb}
+ template$<$typename A=void, typename B=void,typename C=void, typename D=void$>$$>$ struct tuple \{ tuple()\{\} enum size\+\_\+enum \{ size = 4 \};
+
+template$<$typename AA, typename BB, typename CC, typename DD$>$ tuple( AA\&\& aa, BB\&\& bb, CC\&\& cc, DD\&\& dd ) \+:\doxylink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a( fc\+::forward$<$\+AA$>$(aa) )}, b( fc\+::forward$<$\+BB$>$(bb) ), c( fc\+::forward$<$\+CC$>$(cc) ), d( fc\+::forward$<$\+DD$>$(dd) ) \{\}
+
+template$<$typename V$>$ void visit( V\&\& v ) \{ v(a); v(b); v(c); v(d); \} template$<$typename V$>$ void visit( V\&\& v )const \{ v(a); v(b); v(c); v(d); \}
+
+\doxylink{struct_a}{A} a; \doxylink{namespace_b}{B} b; C c; D d; \}; 
+
+Definition at line \mbox{\hyperlink{tuple_8hpp_source_l00055}{55}} of file \mbox{\hyperlink{tuple_8hpp_source}{tuple.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/\mbox{\hyperlink{tuple_8hpp}{tuple.\+hpp}}\end{DoxyCompactItemize}

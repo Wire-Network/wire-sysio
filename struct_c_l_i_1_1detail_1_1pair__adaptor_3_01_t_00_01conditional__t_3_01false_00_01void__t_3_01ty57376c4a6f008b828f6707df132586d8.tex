@@ -1,0 +1,131 @@
+\doxysection{CLI\+::detail\+::pair\+\_\+adaptor\texorpdfstring{$<$}{<} T, conditional\+\_\+t\texorpdfstring{$<$}{<} false, void\+\_\+t\texorpdfstring{$<$}{<} typename T\+::value\+\_\+type\+::first\+\_\+type, typename T\+::value\+\_\+type\+::second\+\_\+type \texorpdfstring{$>$}{>}, void \texorpdfstring{$>$}{>} \texorpdfstring{$>$}{>} Struct Template Reference}
+\hypertarget{struct_c_l_i_1_1detail_1_1pair__adaptor_3_01_t_00_01conditional__t_3_01false_00_01void__t_3_01ty57376c4a6f008b828f6707df132586d8}{}\label{struct_c_l_i_1_1detail_1_1pair__adaptor_3_01_t_00_01conditional__t_3_01false_00_01void__t_3_01ty57376c4a6f008b828f6707df132586d8}\index{CLI::detail::pair\_adaptor$<$ T, conditional\_t$<$ false, void\_t$<$ typename T::value\_type::first\_type, typename T::value\_type::second\_type $>$, void $>$ $>$@{CLI::detail::pair\_adaptor$<$ T, conditional\_t$<$ false, void\_t$<$ typename T::value\_type::first\_type, typename T::value\_type::second\_type $>$, void $>$ $>$}}
+
+
+{\ttfamily \#include $<$CLI11.\+hpp$>$}
+
+
+
+Inheritance diagram for CLI\+::detail\+::pair\+\_\+adaptor\texorpdfstring{$<$}{<} T, conditional\+\_\+t\texorpdfstring{$<$}{<} false, void\+\_\+t\texorpdfstring{$<$}{<} typename T\+::value\+\_\+type\+::first\+\_\+type, typename T\+::value\+\_\+type\+::second\+\_\+type \texorpdfstring{$>$}{>}, void \texorpdfstring{$>$}{>} \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=218pt]{struct_c_l_i_1_1detail_1_1pair__adaptor_3_01_t_00_01conditional__t_3_01false_00_01void__t_3_01ty343840fd8833732ab72cb08f831adf5f}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for CLI\+::detail\+::pair\+\_\+adaptor\texorpdfstring{$<$}{<} T, conditional\+\_\+t\texorpdfstring{$<$}{<} false, void\+\_\+t\texorpdfstring{$<$}{<} typename T\+::value\+\_\+type\+::first\+\_\+type, typename T\+::value\+\_\+type\+::second\+\_\+type \texorpdfstring{$>$}{>}, void \texorpdfstring{$>$}{>} \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=218pt]{struct_c_l_i_1_1detail_1_1pair__adaptor_3_01_t_00_01conditional__t_3_01false_00_01void__t_3_01ty2307f5b43e3e077bd3d8e13ca839b7d1}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1pair__adaptor_3_01_t_00_01conditional__t_3_01false_00_01void__t_3_01ty57376c4a6f008b828f6707df132586d8_a61174c6fee6a788f6bc8385ba39477e0}{value\+\_\+type}} = typename T\+::value\+\_\+type
+\item 
+using \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1pair__adaptor_3_01_t_00_01conditional__t_3_01false_00_01void__t_3_01ty57376c4a6f008b828f6707df132586d8_a0a49df2a80091b7be7df2213a0d1385b}{first\+\_\+type}} = typename std\+::remove\+\_\+const$<$typename value\+\_\+type\+::first\+\_\+type$>$\+::type
+\item 
+using \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1pair__adaptor_3_01_t_00_01conditional__t_3_01false_00_01void__t_3_01ty57376c4a6f008b828f6707df132586d8_aaed4768da6bb83654140126447f507f9}{second\+\_\+type}} = typename std\+::remove\+\_\+const$<$typename value\+\_\+type\+::second\+\_\+type$>$\+::type
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename Q $>$ }\\static auto \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1pair__adaptor_3_01_t_00_01conditional__t_3_01false_00_01void__t_3_01ty57376c4a6f008b828f6707df132586d8_a305e9696d1b794a8e46221babab3ef4c}{first}} (Q \&\&pair\+\_\+value) -\/$>$ decltype(std\+::get$<$ 0 $>$(std\+::forward$<$ Q $>$(pair\+\_\+value)))
+\begin{DoxyCompactList}\small\item\em Get the first value (really just the underlying value) \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename Q $>$ }\\static auto \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1pair__adaptor_3_01_t_00_01conditional__t_3_01false_00_01void__t_3_01ty57376c4a6f008b828f6707df132586d8_a5cb5e4d48ab28379b28c310daea1c2fc}{second}} (Q \&\&pair\+\_\+value) -\/$>$ decltype(std\+::get$<$ 1 $>$(std\+::forward$<$ Q $>$(pair\+\_\+value)))
+\begin{DoxyCompactList}\small\item\em Get the second value (really just the underlying value) \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$\newline
+struct CLI\+::detail\+::pair\+\_\+adaptor$<$ T, conditional\+\_\+t$<$ false, void\+\_\+t$<$ typename T\+::value\+\_\+type\+::first\+\_\+type, typename T\+::value\+\_\+type\+::second\+\_\+type $>$, void $>$ $>$}
+Adaptor for map-\/like structure (true version, must have key\+\_\+type and mapped\+\_\+type). This wraps a mapped container in a few utilities access it in a general way. 
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l00947}{947}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{struct_c_l_i_1_1detail_1_1pair__adaptor_3_01_t_00_01conditional__t_3_01false_00_01void__t_3_01ty57376c4a6f008b828f6707df132586d8_a0a49df2a80091b7be7df2213a0d1385b}\index{CLI::detail::pair\_adaptor$<$ T, conditional\_t$<$ false, void\_t$<$ typename T::value\_type::first\_type, typename T::value\_type::second\_type $>$, void $>$ $>$@{CLI::detail::pair\_adaptor$<$ T, conditional\_t$<$ false, void\_t$<$ typename T::value\_type::first\_type, typename T::value\_type::second\_type $>$, void $>$ $>$}!first\_type@{first\_type}}
+\index{first\_type@{first\_type}!CLI::detail::pair\_adaptor$<$ T, conditional\_t$<$ false, void\_t$<$ typename T::value\_type::first\_type, typename T::value\_type::second\_type $>$, void $>$ $>$@{CLI::detail::pair\_adaptor$<$ T, conditional\_t$<$ false, void\_t$<$ typename T::value\_type::first\_type, typename T::value\_type::second\_type $>$, void $>$ $>$}}
+\doxysubsubsection{\texorpdfstring{first\_type}{first\_type}}
+{\footnotesize\ttfamily \label{struct_c_l_i_1_1detail_1_1pair__adaptor_3_01_t_00_01conditional__t_3_01false_00_01void__t_3_01ty57376c4a6f008b828f6707df132586d8_a0a49df2a80091b7be7df2213a0d1385b} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+using \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1pair__adaptor}{CLI\+::detail\+::pair\+\_\+adaptor}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{namespace_c_l_i_ac092ca4f58943edb3d71c563b3e7c953}{conditional\+\_\+t}}$<$ false, \mbox{\hyperlink{namespace_c_l_i_a202e774b5850d92a2b5650ad79b5d418}{void\+\_\+t}}$<$ typename T\+::value\+\_\+type\+::first\+\_\+type, typename T\+::value\+\_\+type\+::second\+\_\+type $>$, void $>$ $>$\+::first\+\_\+type = typename std\+::remove\+\_\+const$<$typename value\+\_\+type\+::first\+\_\+type$>$\+::type}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l00952}{952}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+\Hypertarget{struct_c_l_i_1_1detail_1_1pair__adaptor_3_01_t_00_01conditional__t_3_01false_00_01void__t_3_01ty57376c4a6f008b828f6707df132586d8_aaed4768da6bb83654140126447f507f9}\index{CLI::detail::pair\_adaptor$<$ T, conditional\_t$<$ false, void\_t$<$ typename T::value\_type::first\_type, typename T::value\_type::second\_type $>$, void $>$ $>$@{CLI::detail::pair\_adaptor$<$ T, conditional\_t$<$ false, void\_t$<$ typename T::value\_type::first\_type, typename T::value\_type::second\_type $>$, void $>$ $>$}!second\_type@{second\_type}}
+\index{second\_type@{second\_type}!CLI::detail::pair\_adaptor$<$ T, conditional\_t$<$ false, void\_t$<$ typename T::value\_type::first\_type, typename T::value\_type::second\_type $>$, void $>$ $>$@{CLI::detail::pair\_adaptor$<$ T, conditional\_t$<$ false, void\_t$<$ typename T::value\_type::first\_type, typename T::value\_type::second\_type $>$, void $>$ $>$}}
+\doxysubsubsection{\texorpdfstring{second\_type}{second\_type}}
+{\footnotesize\ttfamily \label{struct_c_l_i_1_1detail_1_1pair__adaptor_3_01_t_00_01conditional__t_3_01false_00_01void__t_3_01ty57376c4a6f008b828f6707df132586d8_aaed4768da6bb83654140126447f507f9} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+using \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1pair__adaptor}{CLI\+::detail\+::pair\+\_\+adaptor}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{namespace_c_l_i_ac092ca4f58943edb3d71c563b3e7c953}{conditional\+\_\+t}}$<$ false, \mbox{\hyperlink{namespace_c_l_i_a202e774b5850d92a2b5650ad79b5d418}{void\+\_\+t}}$<$ typename T\+::value\+\_\+type\+::first\+\_\+type, typename T\+::value\+\_\+type\+::second\+\_\+type $>$, void $>$ $>$\+::second\+\_\+type = typename std\+::remove\+\_\+const$<$typename value\+\_\+type\+::second\+\_\+type$>$\+::type}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l00953}{953}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+\Hypertarget{struct_c_l_i_1_1detail_1_1pair__adaptor_3_01_t_00_01conditional__t_3_01false_00_01void__t_3_01ty57376c4a6f008b828f6707df132586d8_a61174c6fee6a788f6bc8385ba39477e0}\index{CLI::detail::pair\_adaptor$<$ T, conditional\_t$<$ false, void\_t$<$ typename T::value\_type::first\_type, typename T::value\_type::second\_type $>$, void $>$ $>$@{CLI::detail::pair\_adaptor$<$ T, conditional\_t$<$ false, void\_t$<$ typename T::value\_type::first\_type, typename T::value\_type::second\_type $>$, void $>$ $>$}!value\_type@{value\_type}}
+\index{value\_type@{value\_type}!CLI::detail::pair\_adaptor$<$ T, conditional\_t$<$ false, void\_t$<$ typename T::value\_type::first\_type, typename T::value\_type::second\_type $>$, void $>$ $>$@{CLI::detail::pair\_adaptor$<$ T, conditional\_t$<$ false, void\_t$<$ typename T::value\_type::first\_type, typename T::value\_type::second\_type $>$, void $>$ $>$}}
+\doxysubsubsection{\texorpdfstring{value\_type}{value\_type}}
+{\footnotesize\ttfamily \label{struct_c_l_i_1_1detail_1_1pair__adaptor_3_01_t_00_01conditional__t_3_01false_00_01void__t_3_01ty57376c4a6f008b828f6707df132586d8_a61174c6fee6a788f6bc8385ba39477e0} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+using \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1pair__adaptor}{CLI\+::detail\+::pair\+\_\+adaptor}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{namespace_c_l_i_ac092ca4f58943edb3d71c563b3e7c953}{conditional\+\_\+t}}$<$ false, \mbox{\hyperlink{namespace_c_l_i_a202e774b5850d92a2b5650ad79b5d418}{void\+\_\+t}}$<$ typename T\+::value\+\_\+type\+::first\+\_\+type, typename T\+::value\+\_\+type\+::second\+\_\+type $>$, void $>$ $>$\+::value\+\_\+type = typename T\+::value\+\_\+type}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l00951}{951}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_c_l_i_1_1detail_1_1pair__adaptor_3_01_t_00_01conditional__t_3_01false_00_01void__t_3_01ty57376c4a6f008b828f6707df132586d8_a305e9696d1b794a8e46221babab3ef4c}\index{CLI::detail::pair\_adaptor$<$ T, conditional\_t$<$ false, void\_t$<$ typename T::value\_type::first\_type, typename T::value\_type::second\_type $>$, void $>$ $>$@{CLI::detail::pair\_adaptor$<$ T, conditional\_t$<$ false, void\_t$<$ typename T::value\_type::first\_type, typename T::value\_type::second\_type $>$, void $>$ $>$}!first@{first}}
+\index{first@{first}!CLI::detail::pair\_adaptor$<$ T, conditional\_t$<$ false, void\_t$<$ typename T::value\_type::first\_type, typename T::value\_type::second\_type $>$, void $>$ $>$@{CLI::detail::pair\_adaptor$<$ T, conditional\_t$<$ false, void\_t$<$ typename T::value\_type::first\_type, typename T::value\_type::second\_type $>$, void $>$ $>$}}
+\doxysubsubsection{\texorpdfstring{first()}{first()}}
+{\footnotesize\ttfamily \label{struct_c_l_i_1_1detail_1_1pair__adaptor_3_01_t_00_01conditional__t_3_01false_00_01void__t_3_01ty57376c4a6f008b828f6707df132586d8_a305e9696d1b794a8e46221babab3ef4c} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+template$<$typename Q $>$ \\
+static auto \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1pair__adaptor}{CLI\+::detail\+::pair\+\_\+adaptor}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{namespace_c_l_i_ac092ca4f58943edb3d71c563b3e7c953}{conditional\+\_\+t}}$<$ false, \mbox{\hyperlink{namespace_c_l_i_a202e774b5850d92a2b5650ad79b5d418}{void\+\_\+t}}$<$ typename T\+::value\+\_\+type\+::first\+\_\+type, typename T\+::value\+\_\+type\+::second\+\_\+type $>$, void $>$ $>$\+::first (\begin{DoxyParamCaption}\item[{Q \&\&}]{pair\+\_\+value}{}\end{DoxyParamCaption}) -\/$>$ decltype(std\+::get$<$0$>$(std\+::forward$<$Q$>$(pair\+\_\+value))) \hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l00956}{956}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00956\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00957\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::get<0>(std::forward<Q>(pair\_value));}
+\DoxyCodeLine{00958\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_c_l_i_1_1detail_1_1pair__adaptor_3_01_t_00_01conditional__t_3_01false_00_01void__t_3_01ty57376c4a6f008b828f6707df132586d8_a5cb5e4d48ab28379b28c310daea1c2fc}\index{CLI::detail::pair\_adaptor$<$ T, conditional\_t$<$ false, void\_t$<$ typename T::value\_type::first\_type, typename T::value\_type::second\_type $>$, void $>$ $>$@{CLI::detail::pair\_adaptor$<$ T, conditional\_t$<$ false, void\_t$<$ typename T::value\_type::first\_type, typename T::value\_type::second\_type $>$, void $>$ $>$}!second@{second}}
+\index{second@{second}!CLI::detail::pair\_adaptor$<$ T, conditional\_t$<$ false, void\_t$<$ typename T::value\_type::first\_type, typename T::value\_type::second\_type $>$, void $>$ $>$@{CLI::detail::pair\_adaptor$<$ T, conditional\_t$<$ false, void\_t$<$ typename T::value\_type::first\_type, typename T::value\_type::second\_type $>$, void $>$ $>$}}
+\doxysubsubsection{\texorpdfstring{second()}{second()}}
+{\footnotesize\ttfamily \label{struct_c_l_i_1_1detail_1_1pair__adaptor_3_01_t_00_01conditional__t_3_01false_00_01void__t_3_01ty57376c4a6f008b828f6707df132586d8_a5cb5e4d48ab28379b28c310daea1c2fc} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+template$<$typename Q $>$ \\
+static auto \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1pair__adaptor}{CLI\+::detail\+::pair\+\_\+adaptor}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{namespace_c_l_i_ac092ca4f58943edb3d71c563b3e7c953}{conditional\+\_\+t}}$<$ false, \mbox{\hyperlink{namespace_c_l_i_a202e774b5850d92a2b5650ad79b5d418}{void\+\_\+t}}$<$ typename T\+::value\+\_\+type\+::first\+\_\+type, typename T\+::value\+\_\+type\+::second\+\_\+type $>$, void $>$ $>$\+::second (\begin{DoxyParamCaption}\item[{Q \&\&}]{pair\+\_\+value}{}\end{DoxyParamCaption}) -\/$>$ decltype(std\+::get$<$1$>$(std\+::forward$<$Q$>$(pair\+\_\+value))) \hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l00960}{960}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00960\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00961\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::get<1>(std::forward<Q>(pair\_value));}
+\DoxyCodeLine{00962\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+programs/clio/\mbox{\hyperlink{_c_l_i11_8hpp}{CLI11.\+hpp}}\end{DoxyCompactItemize}

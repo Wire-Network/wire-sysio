@@ -1,0 +1,80 @@
+\doxysection{catch\+\_\+timer.\+cpp}
+\hypertarget{catch__timer_8cpp_source}{}\label{catch__timer_8cpp_source}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_timer.cpp@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_timer.cpp}}
+\mbox{\hyperlink{catch__timer_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00002}00002\ \textcolor{comment}{\ *\ \ Created\ by\ Phil\ on\ 05/08/2013.}}
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00003}00003\ \textcolor{comment}{\ *\ \ Copyright\ 2013\ Two\ Blue\ Cubes\ Ltd.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00004}00004\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00005}00005\ \textcolor{comment}{\ *\ \ Distributed\ under\ the\ Boost\ Software\ License,\ Version\ 1.0.\ (See\ accompanying}}
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00006}00006\ \textcolor{comment}{\ *\ \ file\ LICENSE\_1\_0.txt\ or\ copy\ at\ http://www.boost.org/LICENSE\_1\_0.txt)}}
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00007}00007\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__timer_8h}{catch\_timer.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00011}00011\ \textcolor{preprocessor}{\#include\ <chrono>}}
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00013}00013\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ nanosecondsInSecond\ =\ 1000000000;}
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00015}00015\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00017}\mbox{\hyperlink{namespace_catch_a98d058468488c486a9cb5c8463f3ba29}{00017}}\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespace_catch_a98d058468488c486a9cb5c8463f3ba29}{getCurrentNanosecondsSinceEpoch}}()\ -\/>\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00018}00018\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::chrono::duration\_cast<std::chrono::nanoseconds>(\ std::chrono::high\_resolution\_clock::now().time\_since\_epoch()\ ).count();}
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00019}00019\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00021}00021\ \ \ \ \ \textcolor{keyword}{namespace\ }\{}
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00022}00022\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ estimateClockResolution()\ -\/>\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00023}00023\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ sum\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00024}00024\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ iterations\ =\ 1000000;}
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00026}00026\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ startTime\ =\ \mbox{\hyperlink{namespace_catch_a98d058468488c486a9cb5c8463f3ba29}{getCurrentNanosecondsSinceEpoch}}();}
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00028}00028\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ std::size\_t\ i\ =\ 0;\ i\ <\ iterations;\ ++i\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00030}00030\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ ticks;}
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00031}00031\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ baseTicks\ =\ \mbox{\hyperlink{namespace_catch_a98d058468488c486a9cb5c8463f3ba29}{getCurrentNanosecondsSinceEpoch}}();}
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00032}00032\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{do}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00033}00033\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ticks\ =\ \mbox{\hyperlink{namespace_catch_a98d058468488c486a9cb5c8463f3ba29}{getCurrentNanosecondsSinceEpoch}}();}
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00034}00034\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{while}(\ ticks\ ==\ baseTicks\ );}
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00036}00036\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ delta\ =\ ticks\ -\/\ baseTicks;}
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00037}00037\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sum\ +=\ delta;}
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00039}00039\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ we\ have\ been\ calibrating\ for\ over\ 3\ seconds\ -\/-\/\ the\ clock}}
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00040}00040\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ is\ terrible\ and\ we\ should\ move\ on.}}
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00041}00041\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ TBD:\ How\ to\ signal\ that\ the\ measured\ resolution\ is\ probably\ wrong?}}
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00042}00042\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ticks\ >\ startTime\ +\ 3\ *\ nanosecondsInSecond)\ \{}
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00043}00043\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ sum\ /\ (\ i\ +\ 1u\ );}
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00044}00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00045}00045\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00047}00047\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ We're\ just\ taking\ the\ mean,\ here.\ To\ do\ better\ we\ could\ take\ the\ std.\ dev\ and\ exclude\ outliers}}
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ -\/\ and\ potentially\ do\ more\ iterations\ if\ there's\ a\ high\ variance.}}
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ sum/iterations;}
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00050}00050\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00051}00051\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00052}\mbox{\hyperlink{namespace_catch_ac8e1ed37624bd0d97b2c0d4ec099d31f}{00052}}\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespace_catch_ac8e1ed37624bd0d97b2c0d4ec099d31f}{getEstimatedClockResolution}}()\ -\/>\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ s\_resolution\ =\ estimateClockResolution();}
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00054}00054\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ s\_resolution;}
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00055}00055\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00057}\mbox{\hyperlink{class_catch_1_1_timer_a0a56e879e43f36c102bf9ea8b5fc8b72}{00057}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_timer_a0a56e879e43f36c102bf9ea8b5fc8b72}{Timer::start}}()\ \{}
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00058}00058\ \ \ \ \ \ \ \ m\_nanoseconds\ =\ \mbox{\hyperlink{namespace_catch_a98d058468488c486a9cb5c8463f3ba29}{getCurrentNanosecondsSinceEpoch}}();}
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00059}00059\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00060}\mbox{\hyperlink{class_catch_1_1_timer_a57be5d17ca868a2d6fb1eea84de665cf}{00060}}\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{class_catch_1_1_timer_a57be5d17ca868a2d6fb1eea84de665cf}{Timer::getElapsedNanoseconds}}()\ const\ -\/>\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00061}00061\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_catch_a98d058468488c486a9cb5c8463f3ba29}{getCurrentNanosecondsSinceEpoch}}()\ -\/\ m\_nanoseconds;}
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00062}00062\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00063}\mbox{\hyperlink{class_catch_1_1_timer_a545de17a61a6fee1dbe3de5b0723e5fa}{00063}}\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{class_catch_1_1_timer_a545de17a61a6fee1dbe3de5b0723e5fa}{Timer::getElapsedMicroseconds}}()\ const\ -\/>\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00064}00064\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_catch_1_1_timer_a57be5d17ca868a2d6fb1eea84de665cf}{getElapsedNanoseconds}}()/1000;}
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00065}00065\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00066}\mbox{\hyperlink{class_catch_1_1_timer_a30aaf458dbb59dd8ac8971c9c62e0eac}{00066}}\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{class_catch_1_1_timer_a30aaf458dbb59dd8ac8971c9c62e0eac}{Timer::getElapsedMilliseconds}}()\ const\ -\/>\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00067}00067\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\textcolor{keyword}{>}(\mbox{\hyperlink{class_catch_1_1_timer_a545de17a61a6fee1dbe3de5b0723e5fa}{getElapsedMicroseconds}}()/1000);}
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00068}00068\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00069}\mbox{\hyperlink{class_catch_1_1_timer_a065e37e3c9eb16bd4dcf41971d8deedc}{00069}}\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{class_catch_1_1_timer_a065e37e3c9eb16bd4dcf41971d8deedc}{Timer::getElapsedSeconds}}()\ const\ -\/>\ \textcolor{keywordtype}{double}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00070}00070\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_catch_1_1_timer_a545de17a61a6fee1dbe3de5b0723e5fa}{getElapsedMicroseconds}}()/1000000.0;}
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00071}00071\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00073}00073\ }
+\DoxyCodeLine{\Hypertarget{catch__timer_8cpp_source_l00074}00074\ \}\ \textcolor{comment}{//\ namespace\ Catch}}
+
+\end{DoxyCode}

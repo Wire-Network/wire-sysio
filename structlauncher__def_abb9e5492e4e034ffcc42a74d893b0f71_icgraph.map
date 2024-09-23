@@ -1,0 +1,7 @@
+<map id="launcher_def::init_genesis" name="launcher_def::init_genesis">
+<area shape="rect" id="Node000001" title=" " alt="" coords="304,5,424,46"/>
+<area shape="rect" id="Node000002" href="$structlauncher__def.html#aba7038ee47ccc688104d0d527fa99843" title=" " alt="" coords="103,13,256,38"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="288,28,256,28,256,23,288,23"/>
+<area shape="rect" id="Node000003" href="$programs_2sysio-launcher_2main_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97" title=" " alt="" coords="5,13,55,38"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="87,28,55,28,55,23,87,23"/>
+</map>

@@ -1,0 +1,11 @@
+<map id="testing::A" name="testing::A">
+<area shape="rect" id="Node000001" title=" " alt="" coords="444,78,521,104"/>
+<area shape="rect" id="Node000002" href="$namespacetesting.html#a0c4ebe6cf5aa536a6ba653c71f6a8952" title=" " alt="" coords="267,13,351,38"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="441,73,395,53,351,39,352,34,397,49,443,69"/>
+<area shape="rect" id="Node000004" href="$classtesting_1_1internal_1_1_anything_matcher.html#ae98ebd3352f996a7fb01679917365474" title=" " alt="" coords="222,63,396,119"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="428,94,396,94,396,88,428,88"/>
+<area shape="rect" id="Node000005" href="$namespacetesting_1_1gmock__matchers__test.html#af15da53cdc65283b8ca688a03801fd12" title=" " alt="" coords="225,143,393,183"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="442,113,397,133,369,145,367,140,395,129,439,109"/>
+<area shape="rect" id="Node000003" href="$namespacetesting_1_1gmock__matchers__test.html#a15bf6771986d1e9f675f29861f7551c1" title=" " alt="" coords="5,5,174,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="251,28,174,28,174,23,251,23"/>
+</map>

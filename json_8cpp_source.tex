@@ -1,0 +1,860 @@
+\doxysection{json.\+cpp}
+\hypertarget{json_8cpp_source}{}\label{json_8cpp_source}\index{libraries/fc/src/io/json.cpp@{libraries/fc/src/io/json.cpp}}
+\mbox{\hyperlink{json_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{json_8hpp}{fc/io/json.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00002}00002\ \textcolor{comment}{//\#include\ <fc/io/fstream.hpp>}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00003}00003\ \textcolor{comment}{//\#include\ <fc/io/sstream.hpp>}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{logger_8hpp}{fc/log/logger.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00005}00005\ \textcolor{comment}{//\#include\ <utfcpp/utf8.h>}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{utf8_8hpp}{fc/utf8.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <iostream>}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <fstream>}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ <sstream>}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00011}00011\ \textcolor{preprocessor}{\#include\ <boost/filesystem/fstream.hpp>}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00013}00013\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00014}00014\ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00015}00015\ \ \ \ \ \textcolor{comment}{//\ forward\ declarations\ of\ provided\ functions}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00016}00016\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T,\ json::parse\_type\ parser\_type>\ variant\ \mbox{\hyperlink{namespacefc_aea26b5fef1951af5f8c449fb5c2b9ef3}{variant\_from\_stream}}(\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ in,\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ max\_depth\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00017}00017\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{namespacefc_a14df350f499648f14f6314a87800f3c5}{parseEscape}}(\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ in\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00018}00018\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>\ std::string\ \mbox{\hyperlink{namespacefc_a3a42171e4b78e7fb2dfab0eaf45dc762}{stringFromStream}}(\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ in\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00019}00019\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacefc_aa2bf8a06a5740fdc38da162192bb1f5a}{skip\_white\_space}}(\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ in\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00020}00020\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>\ std::string\ \mbox{\hyperlink{namespacefc_a233581b53962f2a0925100f06e89bfc1}{stringFromToken}}(\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ in\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00021}00021\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T,\ json::parse\_type\ parser\_type>\ variant\_object\ \mbox{\hyperlink{namespacefc_a853baf1524aff74fc7d3c9666af6c7bd}{objectFromStream}}(\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ in,\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ max\_depth\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00022}00022\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T,\ json::parse\_type\ parser\_type>\ \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}\ \mbox{\hyperlink{namespacefc_ab9c4cf7a7f9ed120510d9a692ff914b4}{arrayFromStream}}(\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ in,\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ max\_depth\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00023}00023\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T,\ json::parse\_type\ parser\_type>\ variant\ \mbox{\hyperlink{namespacefc_a1a45bd4f160e97bde0e5460fd2984da6}{number\_from\_stream}}(\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ in\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00024}00024\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>\ variant\ \mbox{\hyperlink{namespacefc_ab330b9b42588c2bf0021cf177ee49ca6}{token\_from\_stream}}(\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ in\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00025}00025\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefc_af9bea69c5790941ddc601fcd96cce071}{to\_stream}}(\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ os,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1json_ab3f3e006979a528f3f56acd4e43fe8bc}{json::yield\_function\_t}}\&\ yield,\ \mbox{\hyperlink{classfc_1_1json_afb6b3878fb58ad18c6c85f2f964bd998}{json::output\_formatting}}\ \mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00026}00026\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefc_af9bea69c5790941ddc601fcd96cce071}{to\_stream}}(\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ os,\ \textcolor{keyword}{const}\ variant\_object\&\ o,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1json_ab3f3e006979a528f3f56acd4e43fe8bc}{json::yield\_function\_t}}\&\ yield,\ \mbox{\hyperlink{classfc_1_1json_afb6b3878fb58ad18c6c85f2f964bd998}{json::output\_formatting}}\ \mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00027}00027\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefc_af9bea69c5790941ddc601fcd96cce071}{to\_stream}}(\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ os,\ \textcolor{keyword}{const}\ variant\&\ v,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1json_ab3f3e006979a528f3f56acd4e43fe8bc}{json::yield\_function\_t}}\&\ yield,\ \mbox{\hyperlink{classfc_1_1json_afb6b3878fb58ad18c6c85f2f964bd998}{json::output\_formatting}}\ \mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00028}00028\ \ \ \ \ std::string\ \mbox{\hyperlink{namespacefc_ac11f6266177ed5f42e899ccc37550181}{pretty\_print}}(\ \textcolor{keyword}{const}\ std::string\&\ v,\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ indent\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00029}00029\ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00031}00031\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{json__relaxed_8hpp}{fc/io/json\_relaxed.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00033}00033\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00034}00034\ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00035}00035\ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00036}\mbox{\hyperlink{namespacefc_a14df350f499648f14f6314a87800f3c5}{00036}}\ \ \ \ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{namespacefc_a14df350f499648f14f6314a87800f3c5}{parseEscape}}(\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ in\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00037}00037\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00038}00038\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ in.peek()\ ==\ \textcolor{charliteral}{'\(\backslash\)\(\backslash\)'}\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00039}00039\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00040}00040\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00041}00041\ \ \ \ \ \ \ \ \ \ \ \ \ in.get();}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00042}00042\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(\ in.peek()\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00043}00043\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00044}00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'t'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00045}00045\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ in.get();}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00046}00046\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{charliteral}{'\(\backslash\)t'};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00047}00047\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'n'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ in.get();}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{charliteral}{'\(\backslash\)n'};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00050}00050\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'r'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00051}00051\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ in.get();}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{charliteral}{'\(\backslash\)r'};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)\(\backslash\)'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ in.get();}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{charliteral}{'\(\backslash\)\(\backslash\)'};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ in.get();}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00059}00059\ \ \ \ \ \ \ \ \ \ \}\ \mbox{\hyperlink{exception_8hpp_af3731d6e3beb140d9e652adf7a18113b}{FC\_RETHROW\_EXCEPTIONS}}(\ info,\ \textcolor{stringliteral}{"{}Stream\ ended\ with\ '\(\backslash\)\(\backslash\)'"{}}\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00060}00060\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00061}00061\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}Expected\ '\(\backslash\)\(\backslash\)'"{}}\ \ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00062}00062\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00064}00064\ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00065}\mbox{\hyperlink{namespacefc_aa2bf8a06a5740fdc38da162192bb1f5a}{00065}}\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacefc_aa2bf8a06a5740fdc38da162192bb1f5a}{skip\_white\_space}}(\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ in\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00066}00066\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00067}00067\ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ skipped\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00068}00068\ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\ \textcolor{keyword}{true}\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00069}00069\ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(\ in.peek()\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00071}00071\ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\ '}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00073}00073\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)t'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00074}00074\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)n'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00075}00075\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)r'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ skipped\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ in.get();}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00078}00078\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)0'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00080}00080\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ eof\_exception,\ \textcolor{stringliteral}{"{}unexpected\ end\ of\ file"{}}\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00081}00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00082}00082\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00083}00083\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ skipped;}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00084}00084\ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00085}00085\ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00086}00086\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00087}00087\ }
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00088}00088\ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00089}\mbox{\hyperlink{namespacefc_a3a42171e4b78e7fb2dfab0eaf45dc762}{00089}}\ \ \ \ std::string\ \mbox{\hyperlink{namespacefc_a3a42171e4b78e7fb2dfab0eaf45dc762}{stringFromStream}}(\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ in\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00090}00090\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00091}00091\ \ \ \ \ \ \ std::stringstream\ token;}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00092}00092\ \ \ \ \ \ \ \textcolor{keywordflow}{try}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00093}00093\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00094}00094\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ c\ =\ in.peek();}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00095}00095\ }
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00096}00096\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ c\ !=\ \textcolor{charliteral}{'"{}'}\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00097}00097\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00098}00098\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Expected\ '\(\backslash\)"{}'\ but\ read\ '\$\{char\}'"{}},}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00099}00099\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}char"{}},\ \textcolor{keywordtype}{string}(\&c,\ (\&c)\ +\ 1)\ )\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00100}00100\ \ \ \ \ \ \ \ \ \ in.get();}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00101}00101\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\ !in.eof()\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00102}00102\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00103}00103\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(\ c\ =\ in.peek()\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00104}00104\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00105}00105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)\(\backslash\)'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00106}00106\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ token\ <<\ \mbox{\hyperlink{namespacefc_a14df350f499648f14f6314a87800f3c5}{parseEscape}}(\ in\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00107}00107\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00108}00108\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ 0x04:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00109}00109\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}EOF\ before\ closing\ '\(\backslash\)"{}'\ in\ string\ '\$\{token\}'"{}},}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00110}00110\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}token"{}},\ token.str()\ )\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00111}00111\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'"{}'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00112}00112\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ in.get();}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00113}00113\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ token.str();}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00114}00114\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00115}00115\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ token\ <<\ c;}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00116}00116\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ in.get();}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00117}00117\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00118}00118\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00119}00119\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}EOF\ before\ closing\ '\(\backslash\)"{}'\ in\ string\ '\$\{token\}'"{}},}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00120}00120\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}token"{}},\ token.str()\ )\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00121}00121\ \ \ \ \ \ \ \ \}\ \mbox{\hyperlink{exception_8hpp_af3731d6e3beb140d9e652adf7a18113b}{FC\_RETHROW\_EXCEPTIONS}}(\ warn,\ \textcolor{stringliteral}{"{}while\ parsing\ token\ '\$\{token\}'"{}},}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00122}00122\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}token"{}},\ token.str()\ )\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00123}00123\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00124}00124\ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00125}\mbox{\hyperlink{namespacefc_a233581b53962f2a0925100f06e89bfc1}{00125}}\ \ \ \ std::string\ \mbox{\hyperlink{namespacefc_a233581b53962f2a0925100f06e89bfc1}{stringFromToken}}(\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ in\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00126}00126\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00127}00127\ \ \ \ \ \ \ std::stringstream\ token;}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00128}00128\ \ \ \ \ \ \ \textcolor{keywordflow}{try}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00129}00129\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00130}00130\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ c\ =\ in.peek();}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00131}00131\ }
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00132}00132\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\ !in.eof()\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00133}00133\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00134}00134\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(\ c\ =\ in.peek()\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00135}00135\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00136}00136\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)\(\backslash\)'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00137}00137\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ token\ <<\ \mbox{\hyperlink{namespacefc_a14df350f499648f14f6314a87800f3c5}{parseEscape}}(\ in\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00138}00138\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00139}00139\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)t'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00140}00140\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\ '}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00141}00141\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)n'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00142}00142\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ in.get();}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00143}00143\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ token.str();}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00144}00144\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)0'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00145}00145\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ eof\_exception,\ \textcolor{stringliteral}{"{}unexpected\ end\ of\ file"{}}\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00146}00146\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00147}00147\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ isalnum(\ c\ )\ ||\ c\ ==\ \textcolor{charliteral}{'\_'}\ ||\ c\ ==\ \textcolor{charliteral}{'-\/'}\ ||\ c\ ==\ \textcolor{charliteral}{'.'}\ ||\ c\ ==\ \textcolor{charliteral}{':'}\ ||\ c\ ==\ \textcolor{charliteral}{'/'}\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00148}00148\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00149}00149\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ token\ <<\ c;}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00150}00150\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ in.get();}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00151}00151\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00152}00152\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{return}\ token.str();}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00153}00153\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00154}00154\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00155}00155\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ token.str();}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00156}00156\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00157}00157\ \ \ \ \ \ \ \textcolor{keywordflow}{catch}(\ \textcolor{keyword}{const}\ fc::eof\_exception\&\ eof\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00158}00158\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00159}00159\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ token.str();}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00160}00160\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00161}00161\ \ \ \ \ \ \ \textcolor{keywordflow}{catch}\ (\textcolor{keyword}{const}\ std::ios\_base::failure\&)}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00162}00162\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00163}00163\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ token.str();}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00164}00164\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00165}00165\ }
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00166}00166\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_af3731d6e3beb140d9e652adf7a18113b}{FC\_RETHROW\_EXCEPTIONS}}(\ warn,\ \textcolor{stringliteral}{"{}while\ parsing\ token\ '\$\{token\}'"{}},}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00167}00167\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}token"{}},\ token.str()\ )\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00168}00168\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00169}00169\ }
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00170}00170\ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T,\ json::parse\_type\ parser\_type>}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00171}\mbox{\hyperlink{namespacefc_a853baf1524aff74fc7d3c9666af6c7bd}{00171}}\ \ \ \ \mbox{\hyperlink{classfc_1_1variant__object}{variant\_object}}\ \mbox{\hyperlink{namespacefc_a853baf1524aff74fc7d3c9666af6c7bd}{objectFromStream}}(\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ in,\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ max\_depth\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00172}00172\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00173}00173\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\_variant\_object}}\ obj;}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00174}00174\ \ \ \ \ \ \ \textcolor{keywordflow}{try}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00175}00175\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00176}00176\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ c\ =\ in.peek();}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00177}00177\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ c\ !=\ \textcolor{charliteral}{'\{'}\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00178}00178\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00179}00179\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Expected\ '\{',\ but\ read\ '\$\{char\}'"{}},}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00180}00180\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}char"{}},\textcolor{keywordtype}{string}(\&c,\ \&c\ +\ 1))\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00181}00181\ \ \ \ \ \ \ \ \ \ in.get();}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00182}00182\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\ in.peek()\ !=\ \textcolor{charliteral}{'\}'}\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00183}00183\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00184}00184\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ in.peek()\ ==\ \textcolor{charliteral}{','}\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00185}00185\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00186}00186\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ in.get();}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00187}00187\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00188}00188\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00189}00189\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{namespacefc_aa2bf8a06a5740fdc38da162192bb1f5a}{skip\_white\_space}}(in)\ )\ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00190}00190\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ key\ =\ \mbox{\hyperlink{namespacefc_a3a42171e4b78e7fb2dfab0eaf45dc762}{stringFromStream}}(\ in\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00191}00191\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_aa2bf8a06a5740fdc38da162192bb1f5a}{skip\_white\_space}}(in);}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00192}00192\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ in.peek()\ !=\ \textcolor{charliteral}{':'}\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00193}00193\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00194}00194\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}Expected\ ':'\ after\ key\ \(\backslash\)"{}\$\{key\}\(\backslash\)"{}"{}},}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00195}00195\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}key"{}},\ key)\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00196}00196\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00197}00197\ \ \ \ \ \ \ \ \ \ \ \ \ in.get();}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00198}00198\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ val\ =\ \mbox{\hyperlink{namespacefc_aea26b5fef1951af5f8c449fb5c2b9ef3}{variant\_from\_stream<T,\ parser\_type>}}(\ in,\ max\_depth\ -\/\ 1\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00199}00199\ }
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00200}00200\ \ \ \ \ \ \ \ \ \ \ \ \ obj(std::move(key),std::move(val));}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00201}00201\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//skip\_white\_space(in);}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00202}00202\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00203}00203\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ in.peek()\ ==\ \textcolor{charliteral}{'\}'}\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00204}00204\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00205}00205\ \ \ \ \ \ \ \ \ \ \ \ \ in.get();}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00206}00206\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ obj;}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00207}00207\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00208}00208\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}Expected\ '\}'\ after\ \$\{variant\}"{}},\ (\textcolor{stringliteral}{"{}variant"{}},\ obj\ )\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00209}00209\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00210}00210\ \ \ \ \ \ \ \textcolor{keywordflow}{catch}(\ \textcolor{keyword}{const}\ fc::eof\_exception\&\ e\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00211}00211\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00212}00212\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}Unexpected\ EOF:\ \$\{e\}"{}},\ (\textcolor{stringliteral}{"{}e"{}},\ e.to\_detail\_string()\ )\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00213}00213\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00214}00214\ \ \ \ \ \ \ \textcolor{keywordflow}{catch}(\ \textcolor{keyword}{const}\ std::ios\_base::failure\&\ e\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00215}00215\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00216}00216\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}Unexpected\ EOF:\ \$\{e\}"{}},\ (\textcolor{stringliteral}{"{}e"{}},\ e.what()\ )\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00217}00217\ \ \ \ \ \ \ \}\ \mbox{\hyperlink{exception_8hpp_af3731d6e3beb140d9e652adf7a18113b}{FC\_RETHROW\_EXCEPTIONS}}(\ warn,\ \textcolor{stringliteral}{"{}Error\ parsing\ object"{}}\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00218}00218\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00219}00219\ }
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00220}00220\ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T,\ json::parse\_type\ parser\_type>}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00221}\mbox{\hyperlink{namespacefc_ab9c4cf7a7f9ed120510d9a692ff914b4}{00221}}\ \ \ \ \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}\ \mbox{\hyperlink{namespacefc_ab9c4cf7a7f9ed120510d9a692ff914b4}{arrayFromStream}}(\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ in,\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ max\_depth\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00222}00222\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00223}00223\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}\ ar;}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00224}00224\ \ \ \ \ \ \ \textcolor{keywordflow}{try}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00225}00225\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00226}00226\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ in.peek()\ !=\ \textcolor{charliteral}{'['}\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00227}00227\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}Expected\ '['"{}}\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00228}00228\ \ \ \ \ \ \ \ \ in.get();}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00229}00229\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_aa2bf8a06a5740fdc38da162192bb1f5a}{skip\_white\_space}}(in);}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00230}00230\ }
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00231}00231\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\ in.peek()\ !=\ \textcolor{charliteral}{']'}\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00232}00232\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00233}00233\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ in.peek()\ ==\ \textcolor{charliteral}{','}\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00234}00234\ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00235}00235\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ in.get();}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00236}00236\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00237}00237\ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00238}00238\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{namespacefc_aa2bf8a06a5740fdc38da162192bb1f5a}{skip\_white\_space}}(in)\ )\ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00239}00239\ \ \ \ \ \ \ \ \ \ \ \ ar.push\_back(\ \mbox{\hyperlink{namespacefc_aea26b5fef1951af5f8c449fb5c2b9ef3}{variant\_from\_stream<T,\ parser\_type>}}(\ in,\ max\_depth\ -\/\ 1)\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00240}00240\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_aa2bf8a06a5740fdc38da162192bb1f5a}{skip\_white\_space}}(in);}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00241}00241\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00242}00242\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ in.peek()\ !=\ \textcolor{charliteral}{']'}\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00243}00243\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}Expected\ ']'\ after\ parsing\ \$\{variant\}"{}},}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00244}00244\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}variant"{}},\ ar)\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00245}00245\ }
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00246}00246\ \ \ \ \ \ \ \ \ in.get();}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00247}00247\ \ \ \ \ \ \ \}\ \mbox{\hyperlink{exception_8hpp_af3731d6e3beb140d9e652adf7a18113b}{FC\_RETHROW\_EXCEPTIONS}}(\ warn,\ \textcolor{stringliteral}{"{}Attempting\ to\ parse\ array\ \$\{array\}"{}},}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00248}00248\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}array"{}},\ ar\ )\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00249}00249\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ar;}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00250}00250\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00251}00251\ }
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00252}00252\ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T,\ json::parse\_type\ parser\_type>}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00253}\mbox{\hyperlink{namespacefc_a1a45bd4f160e97bde0e5460fd2984da6}{00253}}\ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{variant}}\ \mbox{\hyperlink{namespacefc_a1a45bd4f160e97bde0e5460fd2984da6}{number\_from\_stream}}(\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ in\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00254}00254\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00255}00255\ \ \ \ \ \ \ std::stringstream\ ss;}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00256}00256\ }
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00257}00257\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \ dot\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00258}00258\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \ \mbox{\hyperlink{xbyak__mnemonic_8h_a60e985d483cb1cb6e46b5d464f61297a}{neg}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00259}00259\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ in.peek()\ ==\ \textcolor{charliteral}{'-\/'})}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00260}00260\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00261}00261\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{xbyak__mnemonic_8h_a60e985d483cb1cb6e46b5d464f61297a}{neg}}\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00262}00262\ \ \ \ \ \ \ \ \ ss.put(\ in.get()\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00263}00263\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00264}00264\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ done\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00265}00265\ }
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00266}00266\ \ \ \ \ \ \ \textcolor{keywordflow}{try}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00267}00267\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00268}00268\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\ !done\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00269}00269\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00270}00270\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ c\ =\ in.peek();}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00271}00271\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(\ c\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00272}00272\ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00273}00273\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'.'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00274}00274\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (dot)}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00275}00275\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(parse\_error\_exception,\ \textcolor{stringliteral}{"{}Can't\ parse\ a\ number\ with\ two\ decimal\ places"{}});}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00276}00276\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ dot\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00277}00277\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'0'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00278}00278\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'1'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00279}00279\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'2'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00280}00280\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'3'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00281}00281\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'4'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00282}00282\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'5'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00283}00283\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'6'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00284}00284\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'7'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00285}00285\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'8'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00286}00286\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'9'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00287}00287\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ss.put(\ in.get()\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00288}00288\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00289}00289\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)0'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00290}00290\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ eof\_exception,\ \textcolor{stringliteral}{"{}unexpected\ end\ of\ file"{}}\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00291}00291\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00292}00292\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ isalnum(\ c\ )\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00293}00293\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00294}00294\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ss.str()\ +\ \mbox{\hyperlink{namespacefc_a233581b53962f2a0925100f06e89bfc1}{stringFromToken}}(\ in\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00295}00295\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00296}00296\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ done\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00297}00297\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00298}00298\ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00299}00299\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00300}00300\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00301}00301\ \ \ \ \ \ \ \textcolor{keywordflow}{catch}\ (fc::eof\_exception\&)}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00302}00302\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00303}00303\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00304}00304\ \ \ \ \ \ \ \textcolor{keywordflow}{catch}\ (\textcolor{keyword}{const}\ std::ios\_base::failure\&)}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00305}00305\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00306}00306\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00307}00307\ \ \ \ \ \ \ std::string\ str\ =\ ss.str();}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00308}00308\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (str\ ==\ \textcolor{stringliteral}{"{}-\/."{}}\ ||\ str\ ==\ \textcolor{stringliteral}{"{}."{}}\ ||\ str\ ==\ \textcolor{stringliteral}{"{}-\/"{}})\ \textcolor{comment}{//\ check\ the\ obviously\ wrong\ things\ we\ could\ have\ encountered}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00309}00309\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(parse\_error\_exception,\ \textcolor{stringliteral}{"{}Can't\ parse\ token\ \(\backslash\)"{}\$\{token\}\(\backslash\)"{}\ as\ a\ JSON\ numeric\ constant"{}},\ (\textcolor{stringliteral}{"{}token"{}},\ str));}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00310}00310\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ dot\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00311}00311\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ parser\_type\ ==\ \mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788ad00f2b912d7e65fd24ae34f52cd14a38}{json::parse\_type::legacy\_parser\_with\_string\_doubles}}\ ?\ \mbox{\hyperlink{classfc_1_1variant}{variant}}(str)\ :\ \mbox{\hyperlink{classfc_1_1variant}{variant}}(\mbox{\hyperlink{namespacefc_aafd3b0e6ae1093d8678f3973faf39a38}{to\_double}}(str));}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00312}00312\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{xbyak__mnemonic_8h_a60e985d483cb1cb6e46b5d464f61297a}{neg}}\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00313}00313\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_afe327b84123fcbda675ea00418471c9a}{to\_int64}}(str);}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00314}00314\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_ab20c9acf886f89fabeb8a0d9ebc9abb8}{to\_uint64}}(str);}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00315}00315\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00316}00316\ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00317}\mbox{\hyperlink{namespacefc_ab330b9b42588c2bf0021cf177ee49ca6}{00317}}\ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{variant}}\ \mbox{\hyperlink{namespacefc_ab330b9b42588c2bf0021cf177ee49ca6}{token\_from\_stream}}(\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ in\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00318}00318\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00319}00319\ \ \ \ \ \ \ std::stringstream\ ss;}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00320}00320\ \ \ \ \ \ \ ss.exceptions(\ std::ifstream::badbit\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00321}00321\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ received\_eof\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00322}00322\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ done\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00323}00323\ }
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00324}00324\ \ \ \ \ \ \ \textcolor{keywordflow}{try}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00325}00325\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00326}00326\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ c;}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00327}00327\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}((c\ =\ in.peek())\ \&\&\ !done)}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00328}00328\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00329}00329\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(\ c\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00330}00330\ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00331}00331\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'n'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00332}00332\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'u'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00333}00333\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'l'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00334}00334\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'t'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00335}00335\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'r'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00336}00336\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'e'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00337}00337\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'f'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00338}00338\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'a'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00339}00339\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'s'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00340}00340\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ss.put(\ in.get()\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00341}00341\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00342}00342\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00343}00343\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ done\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00344}00344\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00345}00345\ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00346}00346\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00347}00347\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00348}00348\ \ \ \ \ \ \ \textcolor{keywordflow}{catch}\ (fc::eof\_exception\&)}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00349}00349\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00350}00350\ \ \ \ \ \ \ \ \ received\_eof\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00351}00351\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00352}00352\ \ \ \ \ \ \ \textcolor{keywordflow}{catch}\ (\textcolor{keyword}{const}\ std::ios\_base::failure\&)}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00353}00353\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00354}00354\ \ \ \ \ \ \ \ \ received\_eof\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00355}00355\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00356}00356\ }
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00357}00357\ \ \ \ \ \ \ \textcolor{comment}{//\ we\ can\ get\ here\ either\ by\ processing\ a\ delimiter\ as\ in\ "{}null,"{}}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00358}00358\ \ \ \ \ \ \ \textcolor{comment}{//\ an\ EOF\ like\ "{}null<EOF>"{},\ or\ an\ invalid\ token\ like\ "{}nullZ"{}}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00359}00359\ \ \ \ \ \ \ std::string\ str\ =\ ss.str();}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00360}00360\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ str\ ==\ \textcolor{stringliteral}{"{}null"{}}\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00361}00361\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1variant}{variant}}();}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00362}00362\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ str\ ==\ \textcolor{stringliteral}{"{}true"{}}\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00363}00363\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00364}00364\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ str\ ==\ \textcolor{stringliteral}{"{}false"{}}\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00365}00365\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00366}00366\ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00367}00367\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00368}00368\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (received\_eof)}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00369}00369\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00370}00370\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (str.empty())}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00371}00371\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}Unexpected\ EOF"{}}\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00372}00372\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00373}00373\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ str;}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00374}00374\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00375}00375\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00376}00376\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00377}00377\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ if\ we've\ reached\ this\ point,\ we've\ either\ seen\ a\ partial}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00378}00378\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ token\ ("{}tru<EOF>"{})\ or\ something\ our\ simple\ parser\ couldn't}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00379}00379\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ make\ out\ ("{}falfe"{})}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00380}00380\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ A\ strict\ JSON\ parser\ would\ signal\ this\ as\ an\ error,\ but\ we}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00381}00381\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ will\ just\ treat\ the\ malformed\ token\ as\ an\ un-\/quoted\ string.}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00382}00382\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ str\ +\ \mbox{\hyperlink{namespacefc_a233581b53962f2a0925100f06e89bfc1}{stringFromToken}}(in);;}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00383}00383\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00384}00384\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00385}00385\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00386}00386\ }
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00387}00387\ }
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00388}00388\ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T,\ json::parse\_type\ parser\_type>}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00389}\mbox{\hyperlink{namespacefc_aea26b5fef1951af5f8c449fb5c2b9ef3}{00389}}\ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{variant}}\ \mbox{\hyperlink{namespacefc_aea26b5fef1951af5f8c449fb5c2b9ef3}{variant\_from\_stream}}(\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ in,\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ max\_depth\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00390}00390\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00391}00391\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ max\_depth\ ==\ 0\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00392}00392\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}Too\ many\ nested\ items\ in\ JSON\ input!"{}}\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00393}00393\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_aa2bf8a06a5740fdc38da162192bb1f5a}{skip\_white\_space}}(in);}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00394}00394\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{variant}}\ var;}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00395}00395\ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\ 1\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00396}00396\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00397}00397\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{signed}\ \textcolor{keywordtype}{char}\ c\ =\ in.peek();}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00398}00398\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(\ c\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00399}00399\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00400}00400\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\ '}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00401}00401\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)t'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00402}00402\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)n'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00403}00403\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)r'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00404}00404\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ in.get();}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00405}00405\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00406}00406\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'"{}'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00407}00407\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_a3a42171e4b78e7fb2dfab0eaf45dc762}{stringFromStream}}(\ in\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00408}00408\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\{'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00409}00409\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_a853baf1524aff74fc7d3c9666af6c7bd}{objectFromStream<T,\ parser\_type>}}(\ in,\ max\_depth\ -\/\ 1\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00410}00410\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'['}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00411}00411\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_ab9c4cf7a7f9ed120510d9a692ff914b4}{arrayFromStream<T,\ parser\_type>}}(\ in,\ max\_depth\ -\/\ 1\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00412}00412\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'-\/'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00413}00413\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'.'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00414}00414\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'0'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00415}00415\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'1'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00416}00416\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'2'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00417}00417\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'3'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00418}00418\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'4'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00419}00419\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'5'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00420}00420\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'6'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00421}00421\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'7'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00422}00422\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'8'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00423}00423\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'9'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00424}00424\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_a1a45bd4f160e97bde0e5460fd2984da6}{number\_from\_stream<T,\ parser\_type>}}(\ in\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00425}00425\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ null,\ true,\ false,\ or\ 'warning'\ /\ string}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00426}00426\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'n'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00427}00427\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'t'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00428}00428\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'f'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00429}00429\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_ab330b9b42588c2bf0021cf177ee49ca6}{token\_from\_stream}}(\ in\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00430}00430\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ 0x04:\ \textcolor{comment}{//\ \string^D\ end\ of\ transmission}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00431}00431\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ EOF:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00432}00432\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)0'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00433}00433\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ eof\_exception,\ \textcolor{stringliteral}{"{}unexpected\ end\ of\ file"{}}\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00434}00434\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00435}00435\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}Unexpected\ char\ '\$\{c\}'\ in\ \(\backslash\)"{}\$\{s\}\(\backslash\)"{}"{}},}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00436}00436\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}c"{}},\ c)(\textcolor{stringliteral}{"{}s"{}},\ \mbox{\hyperlink{namespacefc_a233581b53962f2a0925100f06e89bfc1}{stringFromToken}}(in))\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00437}00437\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00438}00438\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00439}00439\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1variant}{variant}}();}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00440}00440\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00441}00441\ }
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00442}\mbox{\hyperlink{classfc_1_1json_afad69f9f9c2a9f0105aae99f532f90cb}{00442}}\ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{variant}}\ \mbox{\hyperlink{classfc_1_1json_afad69f9f9c2a9f0105aae99f532f90cb}{json::from\_string}}(\ \textcolor{keyword}{const}\ std::string\&\ utf8\_str,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788}{json::parse\_type}}\ ptype,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ max\_depth\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00443}00443\ \ \ \ \{\ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00444}00444\ \ \ \ \ \ \ std::stringstream\ in(\ utf8\_str\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00445}00445\ \ \ \ \ \ \ \textcolor{comment}{//in.exceptions(\ std::ifstream::eofbit\ );}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00446}00446\ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(\ ptype\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00447}00447\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00448}00448\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788aa7d2f7881e4fbc4c5aae78d9b67beebe}{parse\_type::legacy\_parser}}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00449}00449\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_aea26b5fef1951af5f8c449fb5c2b9ef3}{variant\_from\_stream<std::stringstream,\ json::parse\_type::legacy\_parser>}}(\ in,\ max\_depth\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00450}00450\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788ad00f2b912d7e65fd24ae34f52cd14a38}{parse\_type::legacy\_parser\_with\_string\_doubles}}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00451}00451\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_aea26b5fef1951af5f8c449fb5c2b9ef3}{variant\_from\_stream<std::stringstream,\ json::parse\_type::legacy\_parser\_with\_string\_doubles>}}(\ in,\ max\_depth\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00452}00452\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788a5fc1d56a3deaf9031e0d974ccc08a63e}{parse\_type::strict\_parser}}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00453}00453\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_1_1json__relaxed_a93f8ed4a8dfc1215a360508b01460758}{json\_relaxed::variant\_from\_stream<std::stringstream,\ true>}}(\ in,\ max\_depth\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00454}00454\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788a843ff9a876d06313fa83ab6b39086170}{parse\_type::relaxed\_parser}}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00455}00455\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_1_1json__relaxed_a93f8ed4a8dfc1215a360508b01460758}{json\_relaxed::variant\_from\_stream<std::stringstream,\ false>}}(\ in,\ max\_depth\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00456}00456\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00457}00457\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ \textcolor{keyword}{false},\ \textcolor{stringliteral}{"{}Unknown\ JSON\ parser\ type\ \{ptype\}"{}},\ (\textcolor{stringliteral}{"{}ptype"{}},\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(ptype))\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00458}00458\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00459}00459\ \ \ \ \}\ \mbox{\hyperlink{exception_8hpp_af3731d6e3beb140d9e652adf7a18113b}{FC\_RETHROW\_EXCEPTIONS}}(\ warn,\ \textcolor{stringliteral}{"{}"{}},\ (\textcolor{stringliteral}{"{}str"{}},utf8\_str)\ )\ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00460}00460\ }
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00461}\mbox{\hyperlink{classfc_1_1json_aaea4012545c444aa3919baa0192504e8}{00461}}\ \ \ \ \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}\ \mbox{\hyperlink{classfc_1_1json_aaea4012545c444aa3919baa0192504e8}{json::variants\_from\_string}}(\ \textcolor{keyword}{const}\ std::string\&\ utf8\_str,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788}{json::parse\_type}}\ ptype,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ max\_depth\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00462}00462\ \ \ \ \{\ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00463}00463\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}\ result;}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00464}00464\ \ \ \ \ \ \ std::stringstream\ in(\ utf8\_str\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00465}00465\ \ \ \ \ \ \ \textcolor{comment}{//in.exceptions(\ std::ifstream::eofbit\ );}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00466}00466\ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00467}00467\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\ \textcolor{keyword}{true}\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00468}00468\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00469}00469\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ result.push\_back(\ variant\_from\_stream(\ in\ ));}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00470}00470\ \ \ \ \ \ \ \ \ \ \ \ result.push\_back(\mbox{\hyperlink{namespacefc_1_1json__relaxed_a93f8ed4a8dfc1215a360508b01460758}{json\_relaxed::variant\_from\_stream<std::stringstream,\ false>}}(\ in,\ max\_depth\ ));}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00471}00471\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00472}00472\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\ \textcolor{keyword}{const}\ fc::eof\_exception\&\ )\{\}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00473}00473\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00474}00474\ \ \ \ \}\ \mbox{\hyperlink{exception_8hpp_af3731d6e3beb140d9e652adf7a18113b}{FC\_RETHROW\_EXCEPTIONS}}(\ warn,\ \textcolor{stringliteral}{"{}"{}},\ (\textcolor{stringliteral}{"{}str"{}},utf8\_str)\ )\ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00475}00475\ \ \ \ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00476}00476\ \textcolor{comment}{\ \ \ void\ toUTF8(\ const\ char\ str,\ std::ostream\&\ os\ )}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00477}00477\ \textcolor{comment}{\ \ \ \{}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00478}00478\ \textcolor{comment}{\ \ \ \ \ \ //\ validate\ str\ ==\ valid\ utf8}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00479}00479\ \textcolor{comment}{\ \ \ \ \ \ utf8::replace\_invalid(\ \&str,\ \&str\ +\ 1,\ std::ostream\_iterator<char>(os)\ );}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00480}00480\ \textcolor{comment}{\ \ \ \}}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00481}00481\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00482}00482\ \textcolor{comment}{\ \ \ void\ toUTF8(\ const\ wchar\_t\ c,\ std::ostream\&\ os\ )}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00483}00483\ \textcolor{comment}{\ \ \ \{}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00484}00484\ \textcolor{comment}{\ \ \ \ \ \ utf8::utf16to8(\ \&c,\ (\&c)+1,\ std::ostream\_iterator<char>(os)\ );}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00485}00485\ \textcolor{comment}{\ \ \ \}}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00486}00486\ \textcolor{comment}{\ \ \ */}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00487}00487\ }
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00495}\mbox{\hyperlink{namespacefc_aee7bbe89bfe8d6273f5212938cc1d458}{00495}}\ \ \ \ std::string\ \mbox{\hyperlink{namespacefc_aee7bbe89bfe8d6273f5212938cc1d458}{escape\_string}}(\ \textcolor{keyword}{const}\ std::string\_view\&\ str,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1optional__delegate}{json::yield\_function\_t}}\&\ yield,\ \textcolor{keywordtype}{bool}\ escape\_control\_chars\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00496}00496\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00497}00497\ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00498}00498\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ init\_size\ =\ str.size();}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00499}00499\ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.reserve(\ init\_size\ +\ 13\ );\ \textcolor{comment}{//\ allow\ for\ a\ few\ escapes}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00500}00500\ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ i\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00501}00501\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\ itr\ =\ str.begin();\ itr\ !=\ str.end();\ ++i,++itr\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00502}00502\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00503}00503\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ i\ \%\ \mbox{\hyperlink{classfc_1_1json_a9aa90f1a72da7a0221ed61bc941dfcd7}{json::escape\_string\_yield\_check\_count}}\ ==\ 0\ )\ yield(\ init\_size\ +\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.\mbox{\hyperlink{structmie_1_1_vuint_t_a1be409ac9e110dc4b60234ce37cbf0c8}{size}}()\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00504}00504\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(\ *itr\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00505}00505\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00506}00506\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'\(\backslash\)x00'}:\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)u0000"{}};\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00507}00507\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'\(\backslash\)x01'}:\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)u0001"{}};\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00508}00508\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'\(\backslash\)x02'}:\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)u0002"{}};\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00509}00509\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'\(\backslash\)x03'}:\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)u0003"{}};\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00510}00510\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'\(\backslash\)x04'}:\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)u0004"{}};\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00511}00511\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'\(\backslash\)x05'}:\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)u0005"{}};\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00512}00512\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'\(\backslash\)x06'}:\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)u0006"{}};\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00513}00513\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'\(\backslash\)x07'}:\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)u0007"{}};\ \textcolor{keywordflow}{break};\ \textcolor{comment}{//\ \(\backslash\)a\ is\ not\ valid\ JSON}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00514}00514\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'\(\backslash\)x08'}:\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)u0008"{}};\ \textcolor{keywordflow}{break};\ \textcolor{comment}{//\ \(\backslash\)b}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00515}00515\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ case\ '\(\backslash\)x09':\ r\ +=\ "{}\(\backslash\)\(\backslash\)u0009"{};\ break;\ //\ \(\backslash\)t}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00516}00516\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ case\ '\(\backslash\)x0a':\ r\ +=\ "{}\(\backslash\)\(\backslash\)u000a"{};\ break;\ //\ \(\backslash\)n}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00517}00517\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'\(\backslash\)x0b'}:\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)u000b"{}};\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00518}00518\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'\(\backslash\)x0c'}:\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)u000c"{}};\ \textcolor{keywordflow}{break};\ \textcolor{comment}{//\ \(\backslash\)f}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00519}00519\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ case\ '\(\backslash\)x0d':\ r\ +=\ "{}\(\backslash\)\(\backslash\)u000d"{};\ break;\ //\ \(\backslash\)r}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00520}00520\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'\(\backslash\)x0e'}:\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)u000e"{}};\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00521}00521\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'\(\backslash\)x0f'}:\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)u000f"{}};\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00522}00522\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'\(\backslash\)x10'}:\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)u0010"{}};\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00523}00523\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'\(\backslash\)x11'}:\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)u0011"{}};\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00524}00524\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'\(\backslash\)x12'}:\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)u0012"{}};\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00525}00525\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'\(\backslash\)x13'}:\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)u0013"{}};\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00526}00526\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'\(\backslash\)x14'}:\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)u0014"{}};\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00527}00527\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'\(\backslash\)x15'}:\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)u0015"{}};\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00528}00528\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'\(\backslash\)x16'}:\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)u0016"{}};\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00529}00529\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'\(\backslash\)x17'}:\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)u0017"{}};\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00530}00530\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'\(\backslash\)x18'}:\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)u0018"{}};\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00531}00531\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'\(\backslash\)x19'}:\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)u0019"{}};\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00532}00532\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'\(\backslash\)x1a'}:\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)u001a"{}};\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00533}00533\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'\(\backslash\)x1b'}:\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)u001b"{}};\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00534}00534\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'\(\backslash\)x1c'}:\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)u001c"{}};\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00535}00535\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'\(\backslash\)x1d'}:\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)u001d"{}};\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00536}00536\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'\(\backslash\)x1e'}:\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)u001e"{}};\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00537}00537\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'\(\backslash\)x1f'}:\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)u001f"{}};\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00538}00538\ }
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00539}00539\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'\(\backslash\)x7f'}:\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)u007f"{}};\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00540}00540\ }
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00541}00541\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ if\ escape\_control\_chars=true\ these\ fall-\/through\ to\ default}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00542}00542\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)t'}:\ \ \ \ \ \ \ \ \textcolor{comment}{//\ \(\backslash\)x09}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00543}00543\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ escape\_control\_chars\ )\ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00544}00544\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)t"{}};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00545}00545\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00546}00546\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00547}00547\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)n'}:\ \ \ \ \ \ \ \ \textcolor{comment}{//\ \(\backslash\)x0a}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00548}00548\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ escape\_control\_chars\ )\ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00549}00549\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00550}00550\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00551}00551\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00552}00552\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)r'}:\ \ \ \ \ \ \ \ \textcolor{comment}{//\ \(\backslash\)x0d}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00553}00553\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ escape\_control\_chars\ )\ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00554}00554\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)r"{}};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00555}00555\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00556}00556\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00557}00557\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)\(\backslash\)'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00558}00558\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ escape\_control\_chars\ )\ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00559}00559\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)\(\backslash\)\(\backslash\)"{}};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00560}00560\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00561}00561\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00562}00562\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)"{}'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00563}00563\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ escape\_control\_chars\ )\ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00564}00564\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)\(\backslash\)"{}"{}};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00565}00565\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00566}00566\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00567}00567\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00568}00568\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ +=\ *itr;}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00569}00569\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00570}00570\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00571}00571\ }
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00572}00572\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_a47ce6fdd4f18f7f06601e820866d54ec}{is\_valid\_utf8}}(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ )\ ?\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ :\ \mbox{\hyperlink{namespacefc_afdef7bae8756a2c4ba14524f5913d485}{prune\_invalid\_utf8}}(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00573}00573\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00574}00574\ }
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00575}00575\ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00576}\mbox{\hyperlink{namespacefc_af9bea69c5790941ddc601fcd96cce071}{00576}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefc_af9bea69c5790941ddc601fcd96cce071}{to\_stream}}(\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ os,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1optional__delegate}{json::yield\_function\_t}}\&\ yield,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1json_afb6b3878fb58ad18c6c85f2f964bd998}{json::output\_formatting}}\ \mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00577}00577\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00578}00578\ \ \ \ \ \ \ yield(os.tellp());}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00579}00579\ \ \ \ \ \ \ os\ <<\ \textcolor{charliteral}{'['};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00580}00580\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.begin();}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00581}00581\ }
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00582}00582\ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\ itr\ !=\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.end()\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00583}00583\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00584}00584\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_af9bea69c5790941ddc601fcd96cce071}{to\_stream}}(\ os,\ *itr,\ yield,\ \mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00585}00585\ \ \ \ \ \ \ \ \ \ ++itr;}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00586}00586\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr\ !=\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.end()\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00587}00587\ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{charliteral}{','};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00588}00588\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00589}00589\ \ \ \ \ \ \ os\ <<\ \textcolor{charliteral}{']'};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00590}00590\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00591}00591\ }
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00592}00592\ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00593}\mbox{\hyperlink{namespacefc_ad2f8ee5f972c1a1846475cfc8fc35d9a}{00593}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefc_af9bea69c5790941ddc601fcd96cce071}{to\_stream}}(\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ os,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1variant__object}{variant\_object}}\&\ o,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1optional__delegate}{json::yield\_function\_t}}\&\ yield,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1json_afb6b3878fb58ad18c6c85f2f964bd998}{json::output\_formatting}}\ \mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00594}00594\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00595}00595\ \ \ \ \ \ \ \ yield(os.tellp());}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00596}00596\ \ \ \ \ \ \ \ os\ <<\ \textcolor{charliteral}{'\{'};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00597}00597\ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ o.\mbox{\hyperlink{classfc_1_1variant__object_ae0b10525c519de4e4ea077505cb09ac8}{begin}}();}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00598}00598\ }
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00599}00599\ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\ itr\ !=\ o.\mbox{\hyperlink{classfc_1_1variant__object_a804706455398e249f6272b3ff19cef5d}{end}}()\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00600}00600\ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00601}00601\ \ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{charliteral}{'"{}'}\ <<\ \mbox{\hyperlink{namespacefc_aee7bbe89bfe8d6273f5212938cc1d458}{escape\_string}}(\ itr-\/>key(),\ yield\ )\ <<\ \textcolor{charliteral}{'"{}'};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00602}00602\ \ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{charliteral}{':'};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00603}00603\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_af9bea69c5790941ddc601fcd96cce071}{to\_stream}}(\ os,\ itr-\/>value(),\ yield,\ \mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00604}00604\ \ \ \ \ \ \ \ \ \ \ ++itr;}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00605}00605\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr\ !=\ o.\mbox{\hyperlink{classfc_1_1variant__object_a804706455398e249f6272b3ff19cef5d}{end}}()\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00606}00606\ \ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{charliteral}{','};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00607}00607\ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00608}00608\ \ \ \ \ \ \ \ os\ <<\ \textcolor{charliteral}{'\}'};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00609}00609\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00610}00610\ }
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00611}00611\ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00612}\mbox{\hyperlink{namespacefc_affbbcfada72afda18a33a8c07fc97fb9}{00612}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefc_af9bea69c5790941ddc601fcd96cce071}{to\_stream}}(\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ os,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1variant}{variant}}\&\ v,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1optional__delegate}{json::yield\_function\_t}}\&\ yield,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1json_afb6b3878fb58ad18c6c85f2f964bd998}{json::output\_formatting}}\ \mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00613}00613\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00614}00614\ \ \ \ \ \ \ yield(os.tellp());}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00615}00615\ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(\ v.get\_type()\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00616}00616\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00617}00617\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa5e16cde26441090f51ebd51c04d7a185}{variant::null\_type}}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00618}00618\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}null"{}};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00619}00619\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00620}00620\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fab2547aa70d744fdd14790e31df14bbe7}{variant::int64\_type}}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00621}00621\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00622}00622\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ i\ =\ v.as\_int64();}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00623}00623\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}\ ==\ \mbox{\hyperlink{classfc_1_1json_afb6b3878fb58ad18c6c85f2f964bd998a600e70d661c425431c4bf2dc28b57acf}{json::output\_formatting::stringify\_large\_ints\_and\_doubles}}\ \&\&}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00624}00624\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i\ >\ 0xffffffff\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00625}00625\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{charliteral}{'"{}'}<<v.as\_string()<<\textcolor{charliteral}{'"{}'};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00626}00626\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00627}00627\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ i;}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00628}00628\ }
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00629}00629\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00630}00630\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00631}00631\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa99f1bd3c719716a47670a71a406eff6c}{variant::uint64\_type}}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00632}00632\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00633}00633\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ i\ =\ v.as\_uint64();}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00634}00634\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}\ ==\ \mbox{\hyperlink{classfc_1_1json_afb6b3878fb58ad18c6c85f2f964bd998a600e70d661c425431c4bf2dc28b57acf}{json::output\_formatting::stringify\_large\_ints\_and\_doubles}}\ \&\&}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00635}00635\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i\ >\ 0xffffffff\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00636}00636\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{charliteral}{'"{}'}<<v.as\_string()<<\textcolor{charliteral}{'"{}'};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00637}00637\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00638}00638\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ i;}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00639}00639\ }
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00640}00640\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00641}00641\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00642}00642\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa6c6595f9a12c6ca1664b2e5ad286bce9}{variant::double\_type}}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00643}00643\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}\ ==\ \mbox{\hyperlink{classfc_1_1json_afb6b3878fb58ad18c6c85f2f964bd998a600e70d661c425431c4bf2dc28b57acf}{json::output\_formatting::stringify\_large\_ints\_and\_doubles}})}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00644}00644\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{charliteral}{'"{}'}<<v.as\_string()<<\textcolor{charliteral}{'"{}'};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00645}00645\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00646}00646\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ v.as\_string();}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00647}00647\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00648}00648\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fafd4bc66170646a108792cdb339b23872}{variant::bool\_type}}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00649}00649\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ v.as\_string();}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00650}00650\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00651}00651\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa23b1f70051406849b91e76a91ab291e2}{variant::string\_type}}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00652}00652\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{charliteral}{'"{}'}\ <<\ \mbox{\hyperlink{namespacefc_aee7bbe89bfe8d6273f5212938cc1d458}{escape\_string}}(\ v.get\_string(),\ yield\ )\ <<\ \textcolor{charliteral}{'"{}'};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00653}00653\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00654}00654\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa57823fd7445ab1ebc8571811e76de5f5}{variant::blob\_type}}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00655}00655\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{charliteral}{'"{}'}\ <<\ \mbox{\hyperlink{namespacefc_aee7bbe89bfe8d6273f5212938cc1d458}{escape\_string}}(\ v.as\_string(),\ yield\ )\ <<\ \textcolor{charliteral}{'"{}'};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00656}00656\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00657}00657\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5faaf4b658450fa70459033b77c0cae75af}{variant::array\_type}}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00658}00658\ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00659}00659\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}\&\ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ =\ v.get\_array();}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00660}00660\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_af9bea69c5790941ddc601fcd96cce071}{to\_stream}}(\ os,\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ yield,\ \mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00661}00661\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00662}00662\ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00663}00663\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1variant_a8e472a4f69eccec5336dde2646c69c5fa44a37e1c4fe41b08ad5ea8ef8f480ecf}{variant::object\_type}}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00664}00664\ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00665}00665\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1variant__object}{variant\_object}}\&\ o\ =\ \ v.get\_object();}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00666}00666\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_af9bea69c5790941ddc601fcd96cce071}{to\_stream}}(os,\ o,\ yield,\ \mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00667}00667\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00668}00668\ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00669}00669\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00670}00670\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ fc::invalid\_arg\_exception,\ \textcolor{stringliteral}{"{}Unsupported\ variant\ type:\ "{}}\ +\ std::to\_string(\ v.get\_type()\ )\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00671}00671\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00672}00672\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00673}00673\ }
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00674}\mbox{\hyperlink{classfc_1_1json_aa6541960d7f05567559b866cfaf88dfa}{00674}}\ \ \ \ std::string\ \ \ \mbox{\hyperlink{classfc_1_1json_aa6541960d7f05567559b866cfaf88dfa}{json::to\_string}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1variant}{variant}}\&\ v,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1optional__delegate}{json::yield\_function\_t}}\&\ yield,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1json_afb6b3878fb58ad18c6c85f2f964bd998}{json::output\_formatting}}\ \mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00675}00675\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00676}00676\ \ \ \ \ \ \ std::stringstream\ ss;}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00677}00677\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_af9bea69c5790941ddc601fcd96cce071}{fc::to\_stream}}(\ ss,\ v,\ yield,\ \mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00678}00678\ \ \ \ \ \ \ yield(ss.tellp());}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00679}00679\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ss.str();}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00680}00680\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00681}00681\ }
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00682}\mbox{\hyperlink{namespacefc_ac11f6266177ed5f42e899ccc37550181}{00682}}\ \ \ \ std::string\ \mbox{\hyperlink{namespacefc_ac11f6266177ed5f42e899ccc37550181}{pretty\_print}}(\ \textcolor{keyword}{const}\ std::string\&\ v,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ indent\ )\ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00683}00683\ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ level\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00684}00684\ \ \ \ \ \ \ std::stringstream\ ss;}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00685}00685\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ first\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00686}00686\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ quote\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00687}00687\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ escape\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00688}00688\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ i\ =\ 0;\ i\ <\ v.size();\ ++i\ )\ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00689}00689\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(\ v[i]\ )\ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00690}00690\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)\(\backslash\)'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00691}00691\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !escape\ )\ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00692}00692\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ quote\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00693}00693\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ escape\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00694}00694\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{\ escape\ =\ \textcolor{keyword}{false};\ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00695}00695\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ss<<v[i];}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00696}00696\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00697}00697\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{':'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00698}00698\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !quote\ )\ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00699}00699\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ss<<\textcolor{stringliteral}{"{}:\ "{}};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00700}00700\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00701}00701\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ss<<\textcolor{charliteral}{':'};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00702}00702\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00703}00703\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00704}00704\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'"{}'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00705}00705\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ first\ )\ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00706}00706\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ss<<\textcolor{charliteral}{'\(\backslash\)n'};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00707}00707\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ level*indent;\ ++i\ )\ ss<<\textcolor{charliteral}{'\ '};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00708}00708\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ first\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00709}00709\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00710}00710\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !escape\ )\ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00711}00711\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ quote\ =\ !quote;}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00712}00712\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00713}00713\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ escape\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00714}00714\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ss<<\textcolor{charliteral}{'"{}'};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00715}00715\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00716}00716\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\{'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00717}00717\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'['}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00718}00718\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ss<<v[i];}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00719}00719\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !quote\ )\ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00720}00720\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++level;}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00721}00721\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ first\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00722}00722\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00723}00723\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ escape\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00724}00724\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00725}00725\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00726}00726\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\}'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00727}00727\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{']'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00728}00728\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !quote\ )\ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00729}00729\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ v[i-\/1]\ !=\ \textcolor{charliteral}{'['}\ \&\&\ v[i-\/1]\ !=\ \textcolor{charliteral}{'\{'}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00730}00730\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ss<<\textcolor{charliteral}{'\(\backslash\)n'};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00731}00731\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00732}00732\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/-\/level;}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00733}00733\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !first\ )\ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00734}00734\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ level*indent;\ ++i\ )\ ss<<\textcolor{charliteral}{'\ '};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00735}00735\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00736}00736\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ first\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00737}00737\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ss<<v[i];}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00738}00738\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00739}00739\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00740}00740\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ escape\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00741}00741\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ss<<v[i];}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00742}00742\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00743}00743\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00744}00744\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{','}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00745}00745\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !quote\ )\ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00746}00746\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ss<<\textcolor{charliteral}{','};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00747}00747\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ first\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00748}00748\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00749}00749\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ escape\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00750}00750\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ss<<\textcolor{charliteral}{','};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00751}00751\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00752}00752\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00753}00753\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'n'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00754}00754\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//If\ we're\ in\ quotes\ and\ see\ a\ \(\backslash\)n,\ \(\backslash\)b,\ \(\backslash\)f,\ \(\backslash\)r,\ \(\backslash\)t,\ or\ \(\backslash\)u,\ just\ print\ it\ literally\ but\ unset\ the\ escape\ flag.}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00755}00755\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'b'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00756}00756\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'f'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00757}00757\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'r'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00758}00758\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'t'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00759}00759\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'u'}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00760}00760\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ quote\ \&\&\ escape\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00761}00761\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ escape\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00762}00762\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//No\ break;\ fall\ through\ to\ default\ case}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00763}00763\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00764}00764\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ first\ )\ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00765}00765\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ss<<\textcolor{charliteral}{'\(\backslash\)n'};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00766}00766\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ level*indent;\ ++i\ )\ ss<<\textcolor{charliteral}{'\ '};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00767}00767\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ first\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00768}00768\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00769}00769\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ss\ <<\ v[i];}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00770}00770\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00771}00771\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00772}00772\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ss.str();}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00773}00773\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00774}00774\ }
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00775}\mbox{\hyperlink{classfc_1_1json_ae6c022ab581a9552ae2c97ff5d73aaf8}{00775}}\ \ \ \ std::string\ \mbox{\hyperlink{classfc_1_1json_ae6c022ab581a9552ae2c97ff5d73aaf8}{json::to\_pretty\_string}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1variant}{variant}}\&\ v,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1optional__delegate}{json::yield\_function\_t}}\&\ yield,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1json_afb6b3878fb58ad18c6c85f2f964bd998}{json::output\_formatting}}\ \mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00776}00776\ }
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00777}00777\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ =\ \mbox{\hyperlink{classfc_1_1json_aa6541960d7f05567559b866cfaf88dfa}{to\_string}}(v,\ yield,\ \mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}});}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00778}00778\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_ac11f6266177ed5f42e899ccc37550181}{pretty\_print}}(\ std::move(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ ),\ 2);}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00779}00779\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00780}00780\ }
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00781}\mbox{\hyperlink{classfc_1_1json_af7a9b05ad5ada8666928af2aa139ed5e}{00781}}\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classfc_1_1json_a7d6bb8dc49fecafcf96688c5202b22e5}{json::save\_to\_file}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1variant}{variant}}\&\ v,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1path}{fc::path}}\&\ fi,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ pretty,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1json_afb6b3878fb58ad18c6c85f2f964bd998}{json::output\_formatting}}\ \mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00782}00782\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00783}00783\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ pretty\ )\ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00784}00784\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ str\ =\ \mbox{\hyperlink{classfc_1_1json_ae6c022ab581a9552ae2c97ff5d73aaf8}{json::to\_pretty\_string}}(\ v,\ \mbox{\hyperlink{classfc_1_1time__point_aeccf1b70aa34b132c5269313b8a50573}{fc::time\_point::maximum}}(),\ \mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}},\ \mbox{\hyperlink{classfc_1_1json_ae336bf3cde4ed97f08f768736fa1e278}{max\_length\_limit}}\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00785}00785\ \ \ \ \ \ \ \ \ \ std::ofstream\ o(fi.\mbox{\hyperlink{classfc_1_1path_ab1eae2062df4ea01435348ec52fb3784}{generic\_string}}().c\_str());}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00786}00786\ \ \ \ \ \ \ \ \ \ o.write(\ str.c\_str(),\ str.size()\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00787}00787\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ o.good();}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00788}00788\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00789}00789\ \ \ \ \ \ \ \ \ \ std::ofstream\ o(fi.\mbox{\hyperlink{classfc_1_1path_ab1eae2062df4ea01435348ec52fb3784}{generic\_string}}().c\_str());}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00790}00790\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ yield\ =\ [\&](\textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})\ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00791}00791\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ no\ limitation}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00792}00792\ \ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00793}00793\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_af9bea69c5790941ddc601fcd96cce071}{fc::to\_stream}}(\ o,\ v,\ yield,\ \mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00794}00794\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ o.good();}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00795}00795\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00796}00796\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00797}\mbox{\hyperlink{classfc_1_1json_a0b324722ac4eb4541d50ddaeed2dcb65}{00797}}\ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{variant}}\ \mbox{\hyperlink{classfc_1_1json_a0b324722ac4eb4541d50ddaeed2dcb65}{json::from\_file}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1path}{fc::path}}\&\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788}{json::parse\_type}}\ ptype,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ max\_depth\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00798}00798\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00799}00799\ \ \ \ \ \ \ \textcolor{comment}{//auto\ tmp\ =\ std::make\_shared<fc::ifstream>(\ p,\ ifstream::binary\ );}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00800}00800\ \ \ \ \ \ \ \textcolor{comment}{//auto\ tmp\ =\ std::make\_shared<std::ifstream>(\ p.generic\_string().c\_str(),\ std::ios::binary\ );}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00801}00801\ \ \ \ \ \ \ \textcolor{comment}{//buffered\_istream\ bi(\ tmp\ );}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00802}00802\ \ \ \ \ \ \ boost::filesystem::ifstream\ bi(\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\ std::ios::binary\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00803}00803\ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(\ ptype\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00804}00804\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00805}00805\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788aa7d2f7881e4fbc4c5aae78d9b67beebe}{json::parse\_type::legacy\_parser}}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00806}00806\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_aea26b5fef1951af5f8c449fb5c2b9ef3}{variant\_from\_stream<boost::filesystem::ifstream,\ json::parse\_type::legacy\_parser>}}(\ bi,\ max\_depth\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00807}00807\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788ad00f2b912d7e65fd24ae34f52cd14a38}{json::parse\_type::legacy\_parser\_with\_string\_doubles}}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00808}00808\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_aea26b5fef1951af5f8c449fb5c2b9ef3}{variant\_from\_stream<boost::filesystem::ifstream,\ json::parse\_type::legacy\_parser\_with\_string\_doubles>}}(\ bi,\ max\_depth\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00809}00809\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788a5fc1d56a3deaf9031e0d974ccc08a63e}{json::parse\_type::strict\_parser}}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00810}00810\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_1_1json__relaxed_a93f8ed4a8dfc1215a360508b01460758}{json\_relaxed::variant\_from\_stream<boost::filesystem::ifstream,\ true>}}(\ bi,\ max\_depth\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00811}00811\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788a843ff9a876d06313fa83ab6b39086170}{json::parse\_type::relaxed\_parser}}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00812}00812\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_1_1json__relaxed_a93f8ed4a8dfc1215a360508b01460758}{json\_relaxed::variant\_from\_stream<boost::filesystem::ifstream,\ false>}}(\ bi,\ max\_depth\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00813}00813\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00814}00814\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ \textcolor{keyword}{false},\ \textcolor{stringliteral}{"{}Unknown\ JSON\ parser\ type\ \{ptype\}"{}},\ (\textcolor{stringliteral}{"{}ptype"{}},\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(ptype))\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00815}00815\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00816}00816\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00817}00817\ \ \ \ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00818}00818\ \textcolor{comment}{\ \ \ variant\ json::from\_stream(\ buffered\_istream\&\ in,\ parse\_type\ ptype,\ uint32\_t\ max\_depth\ )}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00819}00819\ \textcolor{comment}{\ \ \ \{}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00820}00820\ \textcolor{comment}{\ \ \ \ \ \ switch(\ ptype\ )}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00821}00821\ \textcolor{comment}{\ \ \ \ \ \ \{}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00822}00822\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ case\ legacy\_parser:}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00823}00823\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ return\ variant\_from\_stream<fc::buffered\_istream,\ legacy\_parser>(\ in,\ max\_depth\ );}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00824}00824\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ case\ legacy\_parser\_with\_string\_doubles:}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00825}00825\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ return\ variant\_from\_stream<fc::buffered\_istream,\ legacy\_parser\_with\_string\_doubles>(\ in,\ max\_depth\ );}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00826}00826\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ case\ strict\_parser:}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00827}00827\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ return\ json\_relaxed::variant\_from\_stream<buffered\_istream,\ true>(\ in,\ max\_depth\ );}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00828}00828\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ case\ relaxed\_parser:}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00829}00829\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ return\ json\_relaxed::variant\_from\_stream<buffered\_istream,\ false>(\ in,\ max\_depth\ );}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00830}00830\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ default:}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00831}00831\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ FC\_ASSERT(\ false,\ "{}Unknown\ JSON\ parser\ type\ \{ptype\}"{},\ ("{}ptype"{},\ ptype)\ );}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00832}00832\ \textcolor{comment}{\ \ \ \ \ \ \}}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00833}00833\ \textcolor{comment}{\ \ \ \}}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00834}00834\ \textcolor{comment}{\ \ \ */}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00835}00835\ }
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00836}\mbox{\hyperlink{classfc_1_1json_a16e86479a3669137ca26e4b96572d70f}{00836}}\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classfc_1_1json_a16e86479a3669137ca26e4b96572d70f}{json::is\_valid}}(\ \textcolor{keyword}{const}\ std::string\&\ utf8\_str,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788}{json::parse\_type}}\ ptype,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ max\_depth\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00837}00837\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00838}00838\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ utf8\_str.size()\ ==\ 0\ )\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00839}00839\ \ \ \ \ \ \ std::stringstream\ in(\ utf8\_str\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00840}00840\ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(\ ptype\ )}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00841}00841\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00842}00842\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788aa7d2f7881e4fbc4c5aae78d9b67beebe}{json::parse\_type::legacy\_parser}}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00843}00843\ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_aea26b5fef1951af5f8c449fb5c2b9ef3}{variant\_from\_stream<std::stringstream,\ json::parse\_type::legacy\_parser>}}(\ in,\ max\_depth\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00844}00844\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00845}00845\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788ad00f2b912d7e65fd24ae34f52cd14a38}{json::parse\_type::legacy\_parser\_with\_string\_doubles}}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00846}00846\ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_aea26b5fef1951af5f8c449fb5c2b9ef3}{variant\_from\_stream<std::stringstream,\ json::parse\_type::legacy\_parser\_with\_string\_doubles>}}(\ in,\ max\_depth\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00847}00847\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00848}00848\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788a5fc1d56a3deaf9031e0d974ccc08a63e}{json::parse\_type::strict\_parser}}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00849}00849\ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1json__relaxed_a93f8ed4a8dfc1215a360508b01460758}{json\_relaxed::variant\_from\_stream<std::stringstream,\ true>}}(\ in,\ max\_depth\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00850}00850\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00851}00851\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classfc_1_1json_a546990cddee52518f7dea5e4c5c85788a843ff9a876d06313fa83ab6b39086170}{json::parse\_type::relaxed\_parser}}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00852}00852\ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1json__relaxed_a93f8ed4a8dfc1215a360508b01460758}{json\_relaxed::variant\_from\_stream<std::stringstream,\ false>}}(\ in,\ max\_depth\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00853}00853\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00854}00854\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00855}00855\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ \textcolor{keyword}{false},\ \textcolor{stringliteral}{"{}Unknown\ JSON\ parser\ type\ \{ptype\}"{}},\ (\textcolor{stringliteral}{"{}ptype"{}},\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(ptype))\ );}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00856}00856\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00857}00857\ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{\ in.peek();\ \}\ \textcolor{keywordflow}{catch}\ (\ \textcolor{keyword}{const}\ eof\_exception\&\ e\ )\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00858}00858\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00859}00859\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00860}00860\ }
+\DoxyCodeLine{\Hypertarget{json_8cpp_source_l00861}00861\ \}\ \textcolor{comment}{//\ fc}}
+
+\end{DoxyCode}

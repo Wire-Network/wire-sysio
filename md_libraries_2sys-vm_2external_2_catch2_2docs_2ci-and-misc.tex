@@ -1,0 +1,134 @@
+\chapter{ci-\/and-\/misc}
+\hypertarget{md_libraries_2sys-vm_2external_2_catch2_2docs_2ci-and-misc}{}\label{md_libraries_2sys-vm_2external_2_catch2_2docs_2ci-and-misc}\index{ci-\/and-\/misc@{ci-\/and-\/misc}}
+\label{_top}%
+ \doxysection*{CI and other odd pieces}
+
+{\bfseries{Contents}}~\newline
+ Continuous Integration systems~\newline
+ Other reporters~\newline
+ Low-\/level tools~\newline
+ CMake~\newline
+
+
+This page talks about how \doxylink{namespace_catch}{Catch} integrates with Continuous Integration Build Systems may refer to low-\/level tools, like CMake, or larger systems that run on servers, like Jenkins or Team\+City. This page will talk about both.
+
+\doxysubsection*{Continuous Integration systems}
+
+Probably the most important aspect to using \doxylink{namespace_catch}{Catch} with a build server is the use of different reporters. \doxylink{namespace_catch}{Catch} comes bundled with three reporters that should cover the majority of build servers out there -\/ although adding more for better integration with some is always a possibility (currently we also offer Team\+City, TAP and Automake reporters).
+
+Two of these reporters are built in (XML and JUnit) and the third (Team\+City) is included as a separate header. It\textquotesingle{}s possible that the other two may be split out in the future too -\/ as that would make the core of \doxylink{namespace_catch}{Catch} smaller for those that don\textquotesingle{}t need them.
+
+\doxysubsubsection*{XML Reporter}
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{-\/r\ xml}
+
+\end{DoxyCode}
+
+
+The XML Reporter writes in an XML format that is specific to \doxylink{namespace_catch}{Catch}.
+
+The advantage of this format is that it corresponds well to the way \doxylink{namespace_catch}{Catch} works (especially the more unusual features, such as nested sections) and is a fully streaming format -\/ that is it writes output as it goes, without having to store up all its results before it can start writing.
+
+The disadvantage is that, being specific to \doxylink{namespace_catch}{Catch}, no existing build servers understand the format natively. It can be used as input to an XSLT transformation that could convert it to, say, HTML -\/ although this loses the streaming advantage, of course.
+
+\doxysubsubsection*{JUnit Reporter}
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{-\/r\ junit}
+
+\end{DoxyCode}
+
+
+The JUnit Reporter writes in an XML format that mimics the JUnit ANT schema.
+
+The advantage of this format is that the JUnit Ant schema is widely understood by most build servers and so can usually be consumed with no additional work.
+
+The disadvantage is that this schema was designed to correspond to how JUnit works -\/ and there is a significant mismatch with how \doxylink{namespace_catch}{Catch} works. Additionally the format is not streamable (because opening elements hold counts of failed and passing tests as attributes) -\/ so the whole test run must complete before it can be written.
+
+\doxysubsection*{Other reporters}
+
+Other reporters are not part of the single-\/header distribution and need to be downloaded and included separately. All reporters are stored in {\ttfamily single\+\_\+include} directory in the git repository, and are named {\ttfamily catch\+\_\+reporter\+\_\+\texorpdfstring{$\ast$}{*}.hpp}. For example, to use the Team\+City reporter you need to download {\ttfamily single\+\_\+include/catch\+\_\+reporter\+\_\+teamcity.\+hpp} and include it after \doxylink{namespace_catch}{Catch} itself.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{preprocessor}{\#define\ CATCH\_CONFIG\_MAIN}}
+\DoxyCodeLine{\textcolor{preprocessor}{\#include\ "{}catch.hpp"{}}}
+\DoxyCodeLine{\textcolor{preprocessor}{\#include\ "{}catch\_reporter\_teamcity.hpp"{}}}
+
+\end{DoxyCode}
+
+
+\doxysubsubsection*{Team\+City Reporter}
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{-\/r\ teamcity}
+
+\end{DoxyCode}
+
+
+The Team\+City Reporter writes Team\+City service messages to stdout. In order to be able to use this reporter an additional header must also be included.
+
+Being specific to Team\+City this is the best reporter to use with it -\/ but it is completely unsuitable for any other purpose. It is a streaming format (it writes as it goes) -\/ although test results don\textquotesingle{}t appear in the Team\+City interface until the completion of a suite (usually the whole test run).
+
+\doxysubsubsection*{Automake Reporter}
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{-\/r\ automake}
+
+\end{DoxyCode}
+
+
+The Automake Reporter writes out the \href{https://www.gnu.org/software/automake/manual/html_node/Log-files-generation-and-test-results-recording.html\#Log-files-generation-and-test-results-recording}{\texttt{ meta tags}} expected by automake via {\ttfamily make check}.
+
+\doxysubsubsection*{TAP (\doxylink{class_test}{Test} Anything Protocol) Reporter}
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{-\/r\ tap}
+
+\end{DoxyCode}
+
+
+Because of the incremental nature of \doxylink{namespace_catch}{Catch}\textquotesingle{}s test suites and ability to run specific tests, our implementation of TAP reporter writes out the number of tests in a suite last.
+
+\doxysubsection*{Low-\/level tools}
+
+\doxysubsubsection*{Precompiled headers (PCHs)}
+
+\doxylink{namespace_catch}{Catch} offers prototypal support for being included in precompiled headers, but because of its single-\/header nature it does need some actions by the user\+:
+\begin{DoxyItemize}
+\item The precompiled header needs to define {\ttfamily CATCH\+\_\+\+CONFIG\+\_\+\+ALL\+\_\+\+PARTS}
+\item The implementation file needs to
+\begin{DoxyItemize}
+\item undefine {\ttfamily TWOBLUECUBES\+\_\+\+SINGLE\+\_\+\+INCLUDE\+\_\+\+CATCH\+\_\+\+HPP\+\_\+\+INCLUDED}
+\item define {\ttfamily CATCH\+\_\+\+CONFIG\+\_\+\+IMPL\+\_\+\+ONLY}
+\item define {\ttfamily CATCH\+\_\+\+CONFIG\+\_\+\+MAIN} or {\ttfamily CATCH\+\_\+\+CONFIG\+\_\+\+RUNNER}
+\item include "{}catch.\+hpp"{} again
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+\doxysubsubsection*{Code\+Coverage module (GCOV, LCOV...)}
+
+If you are using GCOV tool to get testing coverage of your code, and are not sure how to integrate it with CMake and \doxylink{namespace_catch}{Catch}, there should be an external example over at \href{https://github.com/fkromer/catch_cmake_coverage}{\texttt{ https\+://github.\+com/fkromer/catch\+\_\+cmake\+\_\+coverage}}
+
+\doxysubsubsection*{pkg-\/config}
+
+Catch2 provides a rudimentary pkg-\/config integration, by registering itself under the name {\ttfamily catch2}. This means that after Catch2 is installed, you can use {\ttfamily pkg-\/config} to get its include path\+: {\ttfamily pkg-\/config -\/-\/cflags catch2}.
+
+\doxysubsubsection*{gdb and lldb scripts}
+
+Catch2\textquotesingle{}s {\ttfamily contrib} folder also contains two simple debugger scripts, {\ttfamily gdbinit} for {\ttfamily gdb} and {\ttfamily lldbinit} for {\ttfamily lldb}. If loaded into their respective debugger, these will tell it to step over Catch2\textquotesingle{}s internals when stepping through code.
+
+\doxysubsection*{CMake}
+
+\href{cmake-integration.md\#top}{\texttt{ As it has been getting kinda long, the documentation of Catch2\textquotesingle{}s integration with CMake has been moved to its own page.}}
+
+\DoxyHorRuler{0}
+
+
+\href{Readme.md\#top}{\texttt{ Home}} 

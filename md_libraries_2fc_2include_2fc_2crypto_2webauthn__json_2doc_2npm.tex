@@ -1,0 +1,33 @@
+\chapter{NPM}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2npm}{}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2npm}\index{NPM@{NPM}}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2npm_package}{}\doxysection{\texorpdfstring{package.\+json}{package.\+json}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2npm_package}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\{}
+\DoxyCodeLine{\ \ ...}
+\DoxyCodeLine{\ \ "{}dependencies"{}:\ \{}
+\DoxyCodeLine{\ \ \ \ ...}
+\DoxyCodeLine{\ \ \ \ "{}rapidjson"{}:\ "{}git@github.com:Tencent/rapidjson.git"{}}
+\DoxyCodeLine{\ \ \},}
+\DoxyCodeLine{\ \ ...}
+\DoxyCodeLine{\ \ "{}gypfile"{}:\ true}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2npm_binding}{}\doxysection{\texorpdfstring{binding.\+gyp}{binding.\+gyp}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2npm_binding}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\{}
+\DoxyCodeLine{\ \ ...}
+\DoxyCodeLine{\ \ 'targets':\ [}
+\DoxyCodeLine{\ \ \ \ \{}
+\DoxyCodeLine{\ \ \ \ \ \ ...}
+\DoxyCodeLine{\ \ \ \ \ \ 'include\_dirs':\ [}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ '<!(node\ -\/e\ \(\backslash\)'require("{}rapidjson"{})\(\backslash\)')'}
+\DoxyCodeLine{\ \ \ \ \ \ ]}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{\ \ ]}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+ 

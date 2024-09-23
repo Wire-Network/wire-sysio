@@ -1,0 +1,117 @@
+\doxysection{register\+\_\+producer\+\_\+subcommand Struct Reference}
+\hypertarget{structregister__producer__subcommand}{}\label{structregister__producer__subcommand}\index{register\_producer\_subcommand@{register\_producer\_subcommand}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structregister__producer__subcommand_a593d7c502ade331c0c82e52d82840bd8}{register\+\_\+producer\+\_\+subcommand}} (\mbox{\hyperlink{class_c_l_i_1_1_app}{CLI\+::\+App}} \texorpdfstring{$\ast$}{*}action\+Root)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structregister__producer__subcommand_ad6e612da2ad9d6fa179b45d995a2a13e}{producer\+\_\+str}}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structregister__producer__subcommand_ab4722d7b39c42b2ed6b3981e2d18d72b}{producer\+\_\+key\+\_\+str}}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structregister__producer__subcommand_a55f9a312b5d5f27d6f4b219b2baa4028}{url}}
+\item 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{structregister__producer__subcommand_a47c68fb26c79774987c993b973249c53}{loc}} = 0
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01100}{1100}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structregister__producer__subcommand_a593d7c502ade331c0c82e52d82840bd8}\index{register\_producer\_subcommand@{register\_producer\_subcommand}!register\_producer\_subcommand@{register\_producer\_subcommand}}
+\index{register\_producer\_subcommand@{register\_producer\_subcommand}!register\_producer\_subcommand@{register\_producer\_subcommand}}
+\doxysubsubsection{\texorpdfstring{register\_producer\_subcommand()}{register\_producer\_subcommand()}}
+{\footnotesize\ttfamily \label{structregister__producer__subcommand_a593d7c502ade331c0c82e52d82840bd8} 
+register\+\_\+producer\+\_\+subcommand\+::register\+\_\+producer\+\_\+subcommand (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_c_l_i_1_1_app}{CLI\+::\+App}} \texorpdfstring{$\ast$}{*}}]{action\+Root}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01106}{1106}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01106\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01107\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ register\_producer\ =\ actionRoot-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_a8b461d2233ec4121259011b5ed24b336}{add\_subcommand}}(\textcolor{stringliteral}{"{}regproducer"{}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}Register\ a\ new\ producer"{}}));}
+\DoxyCodeLine{01108\ \ \ \ \ \ \ register\_producer-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_a8c812d42c7720ecb5cd0aec41b5aa941}{add\_option}}(\textcolor{stringliteral}{"{}account"{}},\ \mbox{\hyperlink{structregister__producer__subcommand_ad6e612da2ad9d6fa179b45d995a2a13e}{producer\_str}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}The\ account\ to\ register\ as\ a\ producer"{}}))-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a}{required}}();}
+\DoxyCodeLine{01109\ \ \ \ \ \ \ register\_producer-\/>add\_option(\textcolor{stringliteral}{"{}producer\_key"{}},\ \mbox{\hyperlink{structregister__producer__subcommand_ab4722d7b39c42b2ed6b3981e2d18d72b}{producer\_key\_str}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}The\ producer's\ public\ key"{}}))-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a}{required}}();}
+\DoxyCodeLine{01110\ \ \ \ \ \ \ register\_producer-\/>add\_option(\textcolor{stringliteral}{"{}url"{}},\ \mbox{\hyperlink{classfc_1_1url}{url}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}The\ URL\ where\ info\ about\ producer\ can\ be\ found"{}}),\ \textcolor{keyword}{true});}
+\DoxyCodeLine{01111\ \ \ \ \ \ \ register\_producer-\/>add\_option(\textcolor{stringliteral}{"{}location"{}},\ \mbox{\hyperlink{structregister__producer__subcommand_a47c68fb26c79774987c993b973249c53}{loc}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}Relative\ location\ for\ purpose\ of\ nearest\ neighbor\ scheduling"{}}),\ \textcolor{keyword}{true});}
+\DoxyCodeLine{01112\ \ \ \ \ \ \ \mbox{\hyperlink{programs_2clio_2main_8cpp_aa5d53f41b83b5323c73622fbbb15e9cd}{add\_standard\_transaction\_options}}(register\_producer,\ \textcolor{stringliteral}{"{}account@active"{}});}
+\DoxyCodeLine{01113\ }
+\DoxyCodeLine{01114\ }
+\DoxyCodeLine{01115\ \ \ \ \ \ \ register\_producer-\/>callback([\textcolor{keyword}{this}]\ \{}
+\DoxyCodeLine{01116\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1crypto_1_1public__key}{public\_key\_type}}\ producer\_key;}
+\DoxyCodeLine{01117\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{01118\ \ \ \ \ \ \ \ \ \ \ \ \ producer\_key\ =\ \mbox{\hyperlink{namespacesysio_1_1chain_a0628a11f388cd2e43b1ccc1260a1042f}{public\_key\_type}}(\mbox{\hyperlink{structregister__producer__subcommand_ab4722d7b39c42b2ed6b3981e2d18d72b}{producer\_key\_str}});}
+\DoxyCodeLine{01119\ \ \ \ \ \ \ \ \ \ \}\ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a43bd817895cb757183fcecafc6ae7dc1}{SYS\_RETHROW\_EXCEPTIONS}}(public\_key\_type\_exception,\ \textcolor{stringliteral}{"{}Invalid\ producer\ public\ key:\ \$\{public\_key\}"{}},\ (\textcolor{stringliteral}{"{}public\_key"{}},\ \mbox{\hyperlink{structregister__producer__subcommand_ab4722d7b39c42b2ed6b3981e2d18d72b}{producer\_key\_str}}))}
+\DoxyCodeLine{01120\ }
+\DoxyCodeLine{01121\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ regprod\_var\ =\ \mbox{\hyperlink{programs_2clio_2main_8cpp_af2df112948a2156f3f4924b981eddf9e}{regproducer\_variant}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(\mbox{\hyperlink{structregister__producer__subcommand_ad6e612da2ad9d6fa179b45d995a2a13e}{producer\_str}}),\ producer\_key,\ \mbox{\hyperlink{classfc_1_1url}{url}},\ \mbox{\hyperlink{structregister__producer__subcommand_a47c68fb26c79774987c993b973249c53}{loc}}\ );}
+\DoxyCodeLine{01122\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ accountPermissions\ =\ \mbox{\hyperlink{programs_2clio_2main_8cpp_a2b91ca5dbe7cc4ab287d0e44c3037552}{get\_account\_permissions}}(\mbox{\hyperlink{programs_2clio_2main_8cpp_ad552924cb151dcd5b60c73856d1ff706}{tx\_permission}},\ \{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(\mbox{\hyperlink{structregister__producer__subcommand_ad6e612da2ad9d6fa179b45d995a2a13e}{producer\_str}}),\ config::active\_name\});}
+\DoxyCodeLine{01123\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{programs_2clio_2main_8cpp_aaf784434864a29e4835be7465173d1ab}{send\_actions}}(\{\mbox{\hyperlink{programs_2clio_2main_8cpp_a067e20df5f65333b0c3cf5840bc37dea}{create\_action}}(accountPermissions,\ config::system\_account\_name,\ \textcolor{stringliteral}{"{}regproducer"{}}\_n,\ regprod\_var)\});}
+\DoxyCodeLine{01124\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{01125\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structregister__producer__subcommand_a593d7c502ade331c0c82e52d82840bd8_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structregister__producer__subcommand_a47c68fb26c79774987c993b973249c53}\index{register\_producer\_subcommand@{register\_producer\_subcommand}!loc@{loc}}
+\index{loc@{loc}!register\_producer\_subcommand@{register\_producer\_subcommand}}
+\doxysubsubsection{\texorpdfstring{loc}{loc}}
+{\footnotesize\ttfamily \label{structregister__producer__subcommand_a47c68fb26c79774987c993b973249c53} 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} register\+\_\+producer\+\_\+subcommand\+::loc = 0}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01104}{1104}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{structregister__producer__subcommand_ab4722d7b39c42b2ed6b3981e2d18d72b}\index{register\_producer\_subcommand@{register\_producer\_subcommand}!producer\_key\_str@{producer\_key\_str}}
+\index{producer\_key\_str@{producer\_key\_str}!register\_producer\_subcommand@{register\_producer\_subcommand}}
+\doxysubsubsection{\texorpdfstring{producer\_key\_str}{producer\_key\_str}}
+{\footnotesize\ttfamily \label{structregister__producer__subcommand_ab4722d7b39c42b2ed6b3981e2d18d72b} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} register\+\_\+producer\+\_\+subcommand\+::producer\+\_\+key\+\_\+str}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01102}{1102}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{structregister__producer__subcommand_ad6e612da2ad9d6fa179b45d995a2a13e}\index{register\_producer\_subcommand@{register\_producer\_subcommand}!producer\_str@{producer\_str}}
+\index{producer\_str@{producer\_str}!register\_producer\_subcommand@{register\_producer\_subcommand}}
+\doxysubsubsection{\texorpdfstring{producer\_str}{producer\_str}}
+{\footnotesize\ttfamily \label{structregister__producer__subcommand_ad6e612da2ad9d6fa179b45d995a2a13e} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} register\+\_\+producer\+\_\+subcommand\+::producer\+\_\+str}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01101}{1101}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{structregister__producer__subcommand_a55f9a312b5d5f27d6f4b219b2baa4028}\index{register\_producer\_subcommand@{register\_producer\_subcommand}!url@{url}}
+\index{url@{url}!register\_producer\_subcommand@{register\_producer\_subcommand}}
+\doxysubsubsection{\texorpdfstring{url}{url}}
+{\footnotesize\ttfamily \label{structregister__producer__subcommand_a55f9a312b5d5f27d6f4b219b2baa4028} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} register\+\_\+producer\+\_\+subcommand\+::url}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01103}{1103}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+programs/clio/\mbox{\hyperlink{programs_2clio_2main_8cpp}{main.\+cpp}}\end{DoxyCompactItemize}

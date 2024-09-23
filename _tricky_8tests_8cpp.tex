@@ -1,0 +1,715 @@
+\doxysection{libraries/sys-\/vm/external/\+Catch2/projects/\+Self\+Test/\+Usage\+Tests/\+Tricky.tests.\+cpp File Reference}
+\hypertarget{_tricky_8tests_8cpp}{}\label{_tricky_8tests_8cpp}\index{libraries/sys-\/vm/external/Catch2/projects/SelfTest/UsageTests/Tricky.tests.cpp@{libraries/sys-\/vm/external/Catch2/projects/SelfTest/UsageTests/Tricky.tests.cpp}}
+{\ttfamily \#include "{}catch.\+hpp"{}}\newline
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$sstream$>$}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$memory$>$}\newline
+Include dependency graph for Tricky.\+tests.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{_tricky_8tests_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_opaque}{Opaque}}
+\item 
+struct \mbox{\hyperlink{struct_a_1_1_x}{A\+::X}}
+\item 
+struct \mbox{\hyperlink{struct_b_1_1_y}{B\+::Y}}
+\item 
+struct \mbox{\hyperlink{struct_object_with_conversions_1_1_object}{Object\+With\+Conversions\+::\+Object}}
+\item 
+struct \mbox{\hyperlink{struct_obj}{Obj}}
+\item 
+struct \mbox{\hyperlink{structis__true}{is\+\_\+true$<$ B $>$}}
+\item 
+struct \mbox{\hyperlink{struct_awkward}{Awkward}}
+\item 
+struct \mbox{\hyperlink{struct_s}{S}}
+\item 
+class \mbox{\hyperlink{class_class_name}{Class\+Name}}
+\item 
+struct \mbox{\hyperlink{struct_test_class}{Test\+Class}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespace_a}{A}}
+\item 
+namespace \mbox{\hyperlink{namespace_b}{B}}
+\item 
+namespace \mbox{\hyperlink{namespace_object_with_conversions}{Object\+With\+Conversions}}
+\item 
+namespace \mbox{\hyperlink{namespace_enum_bit_field_tests}{Enum\+Bit\+Field\+Tests}}
+\item 
+namespace \mbox{\hyperlink{namespaceutility}{utility}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef void(\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{_tricky_8tests_8cpp_a9fc6d2a92e107036442629b3dcfe9571}{fooptr\+\_\+t}}) ()
+\item 
+using \mbox{\hyperlink{_tricky_8tests_8cpp_a10971f8da8cdeae9b5961bb498080b06}{signal\+\_\+t}} = void (\texorpdfstring{$\ast$}{*}) (void\texorpdfstring{$\ast$}{*})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{namespace_enum_bit_field_tests_a14341e127cf33ad4602b47114ea5fe52}{Enum\+Bit\+Field\+Tests\+::\+Bits}} \+: uint32\+\_\+t \{ \newline
+\mbox{\hyperlink{namespace_enum_bit_field_tests_a14341e127cf33ad4602b47114ea5fe52afd8e42a39dbceeca5c1fa8aaf998de4e}{Enum\+Bit\+Field\+Tests\+::bit0}} = 0x0001
+, \mbox{\hyperlink{namespace_enum_bit_field_tests_a14341e127cf33ad4602b47114ea5fe52a11dfe6b388fb73eb1908092366611f09}{Enum\+Bit\+Field\+Tests\+::bit1}} = 0x0002
+, \mbox{\hyperlink{namespace_enum_bit_field_tests_a14341e127cf33ad4602b47114ea5fe52a851f76d59b77fa747e8770a8c5b344e6}{Enum\+Bit\+Field\+Tests\+::bit2}} = 0x0004
+, \mbox{\hyperlink{namespace_enum_bit_field_tests_a14341e127cf33ad4602b47114ea5fe52a3707dceff1630cd7b21923aabc053667}{Enum\+Bit\+Field\+Tests\+::bit3}} = 0x0008
+, \newline
+\mbox{\hyperlink{namespace_enum_bit_field_tests_a14341e127cf33ad4602b47114ea5fe52a399af9c8dfb25019d4b6354d9724e70a}{Enum\+Bit\+Field\+Tests\+::bit1and2}} = bit1 \texorpdfstring{$\vert$}{|} bit2
+, \mbox{\hyperlink{namespace_enum_bit_field_tests_a14341e127cf33ad4602b47114ea5fe52af74872ff5fde281c3fb3dd8e69a2b3c6}{Enum\+Bit\+Field\+Tests\+::bit30}} = 0x40000000
+, \mbox{\hyperlink{namespace_enum_bit_field_tests_a14341e127cf33ad4602b47114ea5fe52a534ec140b73246e45d6957a0cdc92c5a}{Enum\+Bit\+Field\+Tests\+::bit31}} = 0x80000000
+, \mbox{\hyperlink{namespace_enum_bit_field_tests_a14341e127cf33ad4602b47114ea5fe52aee6a39a2248490a5e1e64f5fc14135c6}{Enum\+Bit\+Field\+Tests\+::bit30and31}} = bit30 \texorpdfstring{$\vert$}{|} bit31
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{_tricky_8tests_8cpp_aa44e4a7f9fdf4289a441ad35fcc2444e}{TEST\+\_\+\+CASE}} ("{}Where there is more to the expression after the RHS"{}, "{}\mbox{[}Tricky\mbox{]}\mbox{[}failing\mbox{]}\mbox{[}.\mbox{]}"{})
+\item 
+\mbox{\hyperlink{_tricky_8tests_8cpp_aaeeec71d1dbd45ccba389e3a9dd8fcf3}{TEST\+\_\+\+CASE}} ("{}Where the LHS is not \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}} simple value"{}, "{}\mbox{[}Tricky\mbox{]}\mbox{[}failing\mbox{]}\mbox{[}.\mbox{]}"{})
+\item 
+\mbox{\hyperlink{_tricky_8tests_8cpp_a865184281ea8cc3dc0918df26df03a59}{TEST\+\_\+\+CASE}} ("{}A failing expression with \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}} non streamable type is still captured"{}, "{}\mbox{[}Tricky\mbox{]}\mbox{[}failing\mbox{]}\mbox{[}.\mbox{]}"{})
+\item 
+\mbox{\hyperlink{_tricky_8tests_8cpp_adad3c4b1ad35d177f9f73c6b13a018ea}{TEST\+\_\+\+CASE}} ("{}string literals of different sizes can be compared"{}, "{}\mbox{[}Tricky\mbox{]}\mbox{[}failing\mbox{]}\mbox{[}.\mbox{]}"{})
+\item 
+\mbox{\hyperlink{_tricky_8tests_8cpp_a88d782095516cd11c216c575a82ed9f1}{TEST\+\_\+\+CASE}} ("{}An expression with side-\/effects should only be evaluated once"{}, "{}\mbox{[}Tricky\mbox{]}"{})
+\item 
+bool \mbox{\hyperlink{_tricky_8tests_8cpp_a5d7fdde1ba7c7edc622d679fff79949a}{operator==}} (const \mbox{\hyperlink{struct_a_1_1_x}{A\+::X}} \&lhs, const \mbox{\hyperlink{struct_b_1_1_y}{B\+::Y}} \&rhs)
+\item 
+bool \mbox{\hyperlink{_tricky_8tests_8cpp_a3368bbec389c9cd58a8c63c6384ef2dc}{operator==}} (const \mbox{\hyperlink{struct_b_1_1_y}{B\+::Y}} \&lhs, const \mbox{\hyperlink{struct_a_1_1_x}{A\+::X}} \&rhs)
+\item 
+\mbox{\hyperlink{namespace_object_with_conversions_a37e32bcbdf2f8f152949aad053beed5f}{Object\+With\+Conversions\+::\+TEST\+\_\+\+CASE}} ("{}Implicit conversions are supported inside assertion macros"{}, "{}\mbox{[}Tricky\mbox{]}\mbox{[}approvals\mbox{]}"{})
+\item 
+\mbox{\hyperlink{namespace_enum_bit_field_tests_a523cdd608df5474b15ef35928037cf6e}{Enum\+Bit\+Field\+Tests\+::\+TEST\+\_\+\+CASE}} ("{}Test enum \mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}} values"{}, "{}\mbox{[}Tricky\mbox{]}"{})
+\item 
+\mbox{\hyperlink{_tricky_8tests_8cpp_a96e1136104bcceb9069c8cbb1e32ca7f}{TEST\+\_\+\+CASE}} ("{}boolean member"{}, "{}\mbox{[}Tricky\mbox{]}"{})
+\item 
+\mbox{\hyperlink{_tricky_8tests_8cpp_a202a5fa8641b7482d673bcb964da524a}{TEST\+\_\+\+CASE}} ("{}Objects that evaluated in boolean contexts can be checked"{}, "{}\mbox{[}Tricky\mbox{]}\mbox{[}Safe\+Bool\mbox{]}"{})
+\item 
+\mbox{\hyperlink{_tricky_8tests_8cpp_a26712a64d3bc5f88cecd912574f475cf}{TEST\+\_\+\+CASE}} ("{}Assertions then sections"{}, "{}\mbox{[}Tricky\mbox{]}"{})
+\item 
+\mbox{\hyperlink{_tricky_8tests_8cpp_a4aef7d8eac965be219932a45ded7021b}{TEST\+\_\+\+CASE}} ("{}non streamable -\/ with conv. op"{}, "{}\mbox{[}Tricky\mbox{]}"{})
+\item 
+void \mbox{\hyperlink{_tricky_8tests_8cpp_ac07863d69ae41a4e395b31f73b35fbcd}{foo}} ()
+\item 
+\mbox{\hyperlink{_tricky_8tests_8cpp_a6584cb04c116fa01e74bb29968ad1613}{TEST\+\_\+\+CASE}} ("{}Comparing function pointers"{}, "{}\mbox{[}Tricky\mbox{]}\mbox{[}function \mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}}\mbox{]}"{})
+\item 
+\mbox{\hyperlink{_tricky_8tests_8cpp_a3fcf793f72586b7bf0ff126cabe7e2e2}{TEST\+\_\+\+CASE}} ("{}Comparing member function pointers"{}, "{}\mbox{[}Tricky\mbox{]}\mbox{[}member function \mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}}\mbox{]}\mbox{[}approvals\mbox{]}"{})
+\item 
+\mbox{\hyperlink{_tricky_8tests_8cpp_a4ab4acb35378cbdabc47ca4721fdfc38}{TEST\+\_\+\+CASE}} ("{}pointer to class"{}, "{}\mbox{[}Tricky\mbox{]}"{})
+\item 
+\mbox{\hyperlink{_tricky_8tests_8cpp_a199cf1fd8d1751e2ea9dbd8df7b2f7f3}{TEST\+\_\+\+CASE}} ("{}null\+\_\+ptr"{}, "{}\mbox{[}Tricky\mbox{]}"{})
+\item 
+\mbox{\hyperlink{_tricky_8tests_8cpp_a9f00b27737f5d7a266a2d49ec571b93d}{TEST\+\_\+\+CASE}} ("{}X/level/0/a"{}, "{}\mbox{[}Tricky\mbox{]}"{})
+\item 
+\mbox{\hyperlink{_tricky_8tests_8cpp_a47965ce21b703de899c6f51a99ef37c2}{TEST\+\_\+\+CASE}} ("{}X/level/0/b"{}, "{}\mbox{[}Tricky\mbox{]}\mbox{[}fizz\mbox{]}"{})
+\item 
+\mbox{\hyperlink{_tricky_8tests_8cpp_adc02ac7504843af7f4f1fa723d317e3a}{TEST\+\_\+\+CASE}} ("{}X/level/1/a"{}, "{}\mbox{[}Tricky\mbox{]}"{})
+\item 
+\mbox{\hyperlink{_tricky_8tests_8cpp_a79370bda6e69e0e683a09178a12c15c6}{TEST\+\_\+\+CASE}} ("{}X/level/1/b"{}, "{}\mbox{[}Tricky\mbox{]}"{})
+\item 
+\mbox{\hyperlink{_tricky_8tests_8cpp_af76bbc82dbc4f2657dcf358d09f8e2cf}{TEST\+\_\+\+CASE}} ("{}has printf"{})
+\item 
+\mbox{\hyperlink{_tricky_8tests_8cpp_a1b1a60e8ac87222303ad6de3b28c6a92}{TEST\+\_\+\+CASE}} ("{}Commas in various macros are allowed"{})
+\item 
+\mbox{\hyperlink{_tricky_8tests_8cpp_a43a447aecd1289c1274a6dcb38746255}{TEST\+\_\+\+CASE}} ("{}null deref"{}, "{}\mbox{[}.\mbox{]}\mbox{[}failing\mbox{]}\mbox{[}!nonportable\mbox{]}"{})
+\item 
+\mbox{\hyperlink{_tricky_8tests_8cpp_ab77bcd1e24af4fe39fee02f3d619f303}{TEST\+\_\+\+CASE}} ("{}non-\/copyable objects"{}, "{}\mbox{[}.\mbox{]}\mbox{[}failing\mbox{]}"{})
+\item 
+\mbox{\hyperlink{_tricky_8tests_8cpp_ae13be071500234d37918c3005d90f4c4}{TEST\+\_\+\+CASE}} ("{}\#925\+: comparing function \mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}} to function address failed to compile"{}, "{}\mbox{[}!nonportable\mbox{]}"{})
+\item 
+\mbox{\hyperlink{_tricky_8tests_8cpp_a5bb3e4f09a00365deebe88f4427a7c60}{TEST\+\_\+\+CASE}} ("{}Bitfields can be captured (\#1027)"{})
+\item 
+\mbox{\hyperlink{_tricky_8tests_8cpp_a6fd213c252af175764b098a79b83b5ee}{TEST\+\_\+\+CASE}} ("{}\#1514\+: stderr/stdout is not captured in tests aborted by an exception"{}, "{}\mbox{[}output-\/capture\mbox{]}\mbox{[}regression\mbox{]}\mbox{[}.\mbox{]}"{})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{_tricky_8tests_8cpp_a9fc6d2a92e107036442629b3dcfe9571}\index{Tricky.tests.cpp@{Tricky.tests.cpp}!fooptr\_t@{fooptr\_t}}
+\index{fooptr\_t@{fooptr\_t}!Tricky.tests.cpp@{Tricky.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{fooptr\_t}{fooptr\_t}}
+{\footnotesize\ttfamily \label{_tricky_8tests_8cpp_a9fc6d2a92e107036442629b3dcfe9571} 
+typedef void(\texorpdfstring{$\ast$}{*} fooptr\+\_\+t) ()}
+
+
+
+Definition at line \mbox{\hyperlink{_tricky_8tests_8cpp_source_l00313}{313}} of file \mbox{\hyperlink{_tricky_8tests_8cpp_source}{Tricky.\+tests.\+cpp}}.
+
+\Hypertarget{_tricky_8tests_8cpp_a10971f8da8cdeae9b5961bb498080b06}\index{Tricky.tests.cpp@{Tricky.tests.cpp}!signal\_t@{signal\_t}}
+\index{signal\_t@{signal\_t}!Tricky.tests.cpp@{Tricky.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{signal\_t}{signal\_t}}
+{\footnotesize\ttfamily \label{_tricky_8tests_8cpp_a10971f8da8cdeae9b5961bb498080b06} 
+using \mbox{\hyperlink{_tricky_8tests_8cpp_a10971f8da8cdeae9b5961bb498080b06}{signal\+\_\+t}} = void (\texorpdfstring{$\ast$}{*}) (void\texorpdfstring{$\ast$}{*})}
+
+
+
+Definition at line \mbox{\hyperlink{_tricky_8tests_8cpp_source_l00406}{406}} of file \mbox{\hyperlink{_tricky_8tests_8cpp_source}{Tricky.\+tests.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{_tricky_8tests_8cpp_ac07863d69ae41a4e395b31f73b35fbcd}\index{Tricky.tests.cpp@{Tricky.tests.cpp}!foo@{foo}}
+\index{foo@{foo}!Tricky.tests.cpp@{Tricky.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{foo()}{foo()}}
+{\footnotesize\ttfamily \label{_tricky_8tests_8cpp_ac07863d69ae41a4e395b31f73b35fbcd} 
+void foo (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_tricky_8tests_8cpp_source_l00311}{311}} of file \mbox{\hyperlink{_tricky_8tests_8cpp_source}{Tricky.\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00311\ \{\}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=220pt]{_tricky_8tests_8cpp_ac07863d69ae41a4e395b31f73b35fbcd_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{_tricky_8tests_8cpp_a5d7fdde1ba7c7edc622d679fff79949a}\index{Tricky.tests.cpp@{Tricky.tests.cpp}!operator==@{operator==}}
+\index{operator==@{operator==}!Tricky.tests.cpp@{Tricky.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{operator==()}{operator==()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{_tricky_8tests_8cpp_a5d7fdde1ba7c7edc622d679fff79949a} 
+bool operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct_a_1_1_x}{A\+::X}} \&}]{lhs}{, }\item[{const \mbox{\hyperlink{struct_b_1_1_y}{B\+::Y}} \&}]{rhs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_tricky_8tests_8cpp_source_l00124}{124}} of file \mbox{\hyperlink{_tricky_8tests_8cpp_source}{Tricky.\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00125\ \{}
+\DoxyCodeLine{00126\ \ \ \ \ \textcolor{keywordflow}{return}\ (lhs.\mbox{\hyperlink{struct_a_1_1_x_a70ffad2e1f7470ffc312aaf8608eed23}{a}}\ ==\ rhs.\mbox{\hyperlink{struct_b_1_1_y_a0164c358c5273098b0e29b8ef1a1d12d}{a}});}
+\DoxyCodeLine{00127\ \}}
+
+\end{DoxyCode}
+\Hypertarget{_tricky_8tests_8cpp_a3368bbec389c9cd58a8c63c6384ef2dc}\index{Tricky.tests.cpp@{Tricky.tests.cpp}!operator==@{operator==}}
+\index{operator==@{operator==}!Tricky.tests.cpp@{Tricky.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{operator==()}{operator==()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{_tricky_8tests_8cpp_a3368bbec389c9cd58a8c63c6384ef2dc} 
+bool operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct_b_1_1_y}{B\+::Y}} \&}]{lhs}{, }\item[{const \mbox{\hyperlink{struct_a_1_1_x}{A\+::X}} \&}]{rhs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_tricky_8tests_8cpp_source_l00129}{129}} of file \mbox{\hyperlink{_tricky_8tests_8cpp_source}{Tricky.\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00130\ \{}
+\DoxyCodeLine{00131\ \ \ \ \ \textcolor{keywordflow}{return}\ (lhs.\mbox{\hyperlink{struct_b_1_1_y_a0164c358c5273098b0e29b8ef1a1d12d}{a}}\ ==\ rhs.\mbox{\hyperlink{struct_a_1_1_x_a70ffad2e1f7470ffc312aaf8608eed23}{a}});}
+\DoxyCodeLine{00132\ \}}
+
+\end{DoxyCode}
+\Hypertarget{_tricky_8tests_8cpp_a6fd213c252af175764b098a79b83b5ee}\index{Tricky.tests.cpp@{Tricky.tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!Tricky.tests.cpp@{Tricky.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/24]}}
+{\footnotesize\ttfamily \label{_tricky_8tests_8cpp_a6fd213c252af175764b098a79b83b5ee} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}\#1514\+: stderr/stdout is not captured in tests aborted by an exception"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}output-\/capture\mbox{]}\mbox{[}regression\mbox{]}\mbox{[}.\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_tricky_8tests_8cpp_source_l00431}{431}} of file \mbox{\hyperlink{_tricky_8tests_8cpp_source}{Tricky.\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00431\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ stderr/stdout\ is\ not\ captured\ in\ tests\ \mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3ac065ca1b36da471ff7499ebeed558fb6}{aborted}}\ by\ an\ exception\textcolor{stringliteral}{"{},\ "{}}[output-\/\mbox{\hyperlink{namespace_c_l_i_a474d5665894fe9a318ddbdb9ebf194d4ad7ba9bbfda42b9657f14ee37ef76150b}{capture}}][regression][.]\textcolor{stringliteral}{"{})\ \{}}
+\DoxyCodeLine{00432\ \textcolor{stringliteral}{\ \ \ \ std::cout\ <<\ "{}}This\ would\ not\ be\ caught\ previously\(\backslash\)n\textcolor{stringliteral}{"{}\ <<\ std::flush;}}
+\DoxyCodeLine{00433\ \textcolor{stringliteral}{\ \ \ \ std::clog\ <<\ "{}}Nor\ would\ this\(\backslash\)n\textcolor{stringliteral}{"{}\ <<\ std::flush;}}
+\DoxyCodeLine{00434\ \textcolor{stringliteral}{\ \ \ \ //\ FAIL\ aborts\ the\ test\ by\ throwing\ a\ Catch\ exception}}
+\DoxyCodeLine{00435\ \textcolor{stringliteral}{\ \ \ \ FAIL("{}}1514\textcolor{stringliteral}{"{});}}
+\DoxyCodeLine{00436\ \textcolor{stringliteral}{\}}}
+
+\end{DoxyCode}
+\Hypertarget{_tricky_8tests_8cpp_ae13be071500234d37918c3005d90f4c4}\index{Tricky.tests.cpp@{Tricky.tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!Tricky.tests.cpp@{Tricky.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/24]}}
+{\footnotesize\ttfamily \label{_tricky_8tests_8cpp_ae13be071500234d37918c3005d90f4c4} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}\#925\+: comparing function \mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}} to function address failed to compile"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}!nonportable\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_tricky_8tests_8cpp_source_l00416}{416}} of file \mbox{\hyperlink{_tricky_8tests_8cpp_source}{Tricky.\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00416\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ comparing\ function\ \mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}}\ to\ function\ address\ failed\ to\ compile\textcolor{stringliteral}{"{},\ "{}}[!nonportable]\textcolor{stringliteral}{"{}\ )\ \{}}
+\DoxyCodeLine{00417\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00418\ \textcolor{stringliteral}{\ \ \ \ TestClass\ test;}}
+\DoxyCodeLine{00419\ \textcolor{stringliteral}{\ \ \ \ REQUIRE(utility::synchronizing\_callback\ !=\ test.testMethod\_uponComplete\_arg);}}
+\DoxyCodeLine{00420\ \textcolor{stringliteral}{\}}}
+
+\end{DoxyCode}
+\Hypertarget{_tricky_8tests_8cpp_a865184281ea8cc3dc0918df26df03a59}\index{Tricky.tests.cpp@{Tricky.tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!Tricky.tests.cpp@{Tricky.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [3/24]}}
+{\footnotesize\ttfamily \label{_tricky_8tests_8cpp_a865184281ea8cc3dc0918df26df03a59} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}A failing expression with \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}} non streamable type is still captured"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}\+Tricky\mbox{]}\mbox{[}failing\mbox{]}\mbox{[}.\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_tricky_8tests_8cpp_source_l00062}{62}} of file \mbox{\hyperlink{_tricky_8tests_8cpp_source}{Tricky.\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00067\ \{}
+\DoxyCodeLine{00068\ }
+\DoxyCodeLine{00069\ \ \ \ \ \mbox{\hyperlink{struct_opaque}{Opaque}}\ o1,\ o2;}
+\DoxyCodeLine{00070\ \ \ \ \ o1.\mbox{\hyperlink{struct_opaque_aede4eeec4da998fd877736d3a2c8c84a}{val}}\ =\ 7;}
+\DoxyCodeLine{00071\ \ \ \ \ o2.\mbox{\hyperlink{struct_opaque_aede4eeec4da998fd877736d3a2c8c84a}{val}}\ =\ 8;}
+\DoxyCodeLine{00072\ }
+\DoxyCodeLine{00073\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ \&o1\ ==\ \&o2\ );}
+\DoxyCodeLine{00074\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ o1\ ==\ o2\ );}
+\DoxyCodeLine{00075\ \}}
+
+\end{DoxyCode}
+\Hypertarget{_tricky_8tests_8cpp_a88d782095516cd11c216c575a82ed9f1}\index{Tricky.tests.cpp@{Tricky.tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!Tricky.tests.cpp@{Tricky.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [4/24]}}
+{\footnotesize\ttfamily \label{_tricky_8tests_8cpp_a88d782095516cd11c216c575a82ed9f1} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}An expression with side-\/effects should only be evaluated once"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}\+Tricky\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_tricky_8tests_8cpp_source_l00089}{89}} of file \mbox{\hyperlink{_tricky_8tests_8cpp_source}{Tricky.\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00094\ \{}
+\DoxyCodeLine{00095\ \ \ \ \ \textcolor{keywordtype}{int}\ i\ =\ 7;}
+\DoxyCodeLine{00096\ }
+\DoxyCodeLine{00097\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ i++\ ==\ 7\ );}
+\DoxyCodeLine{00098\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ i++\ ==\ 8\ );}
+\DoxyCodeLine{00099\ }
+\DoxyCodeLine{00100\ \}}
+
+\end{DoxyCode}
+\Hypertarget{_tricky_8tests_8cpp_a26712a64d3bc5f88cecd912574f475cf}\index{Tricky.tests.cpp@{Tricky.tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!Tricky.tests.cpp@{Tricky.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [5/24]}}
+{\footnotesize\ttfamily \label{_tricky_8tests_8cpp_a26712a64d3bc5f88cecd912574f475cf} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Assertions then sections"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}\+Tricky\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_tricky_8tests_8cpp_source_l00277}{277}} of file \mbox{\hyperlink{_tricky_8tests_8cpp_source}{Tricky.\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00278\ \{}
+\DoxyCodeLine{00279\ \ \ \ \ \textcolor{comment}{//\ This\ was\ causing\ a\ failure\ due\ to\ the\ way\ the\ console\ reporter\ was\ handling}}
+\DoxyCodeLine{00280\ \ \ \ \ \textcolor{comment}{//\ the\ current\ section}}
+\DoxyCodeLine{00281\ }
+\DoxyCodeLine{00282\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{00283\ }
+\DoxyCodeLine{00284\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\ \textcolor{stringliteral}{"{}A\ section"{}}\ )}
+\DoxyCodeLine{00285\ \ \ \ \ \{}
+\DoxyCodeLine{00286\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{00287\ }
+\DoxyCodeLine{00288\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\ \textcolor{stringliteral}{"{}Another\ section"{}}\ )}
+\DoxyCodeLine{00289\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00290\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{00291\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00292\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\ \textcolor{stringliteral}{"{}Another\ other\ section"{}}\ )}
+\DoxyCodeLine{00293\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00294\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{00295\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00296\ \ \ \ \ \}}
+\DoxyCodeLine{00297\ \}}
+
+\end{DoxyCode}
+\Hypertarget{_tricky_8tests_8cpp_a5bb3e4f09a00365deebe88f4427a7c60}\index{Tricky.tests.cpp@{Tricky.tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!Tricky.tests.cpp@{Tricky.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [6/24]}}
+{\footnotesize\ttfamily \label{_tricky_8tests_8cpp_a5bb3e4f09a00365deebe88f4427a7c60} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Bitfields can be captured (\#1027)"{}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_tricky_8tests_8cpp_source_l00422}{422}} of file \mbox{\hyperlink{_tricky_8tests_8cpp_source}{Tricky.\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00422\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00423\ \ \ \ \ \textcolor{keyword}{struct\ }Y\ \{}
+\DoxyCodeLine{00424\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ :\ 1;}
+\DoxyCodeLine{00425\ \ \ \ \ \};}
+\DoxyCodeLine{00426\ \ \ \ \ Y\ \mbox{\hyperlink{namespacefc_ab199a7c94624123911206db59ebe45da}{y}}\{\ 0\ \};}
+\DoxyCodeLine{00427\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{namespacefc_ab199a7c94624123911206db59ebe45da}{y}}.v\ ==\ 0\ );}
+\DoxyCodeLine{00428\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ 0\ ==\ \mbox{\hyperlink{namespacefc_ab199a7c94624123911206db59ebe45da}{y}}.v\ );}
+\DoxyCodeLine{00429\ \}}
+
+\end{DoxyCode}
+\Hypertarget{_tricky_8tests_8cpp_a96e1136104bcceb9069c8cbb1e32ca7f}\index{Tricky.tests.cpp@{Tricky.tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!Tricky.tests.cpp@{Tricky.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [7/24]}}
+{\footnotesize\ttfamily \label{_tricky_8tests_8cpp_a96e1136104bcceb9069c8cbb1e32ca7f} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}boolean member"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}\+Tricky\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_tricky_8tests_8cpp_source_l00195}{195}} of file \mbox{\hyperlink{_tricky_8tests_8cpp_source}{Tricky.\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00196\ \{}
+\DoxyCodeLine{00197\ \ \ \ \ \mbox{\hyperlink{struct_obj}{Obj}}\ obj;}
+\DoxyCodeLine{00198\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ obj.\mbox{\hyperlink{struct_obj_a4413d7c019286e011104f7afee67802b}{prop}}\ !=\ \textcolor{keyword}{nullptr}\ );}
+\DoxyCodeLine{00199\ \}}
+
+\end{DoxyCode}
+\Hypertarget{_tricky_8tests_8cpp_a1b1a60e8ac87222303ad6de3b28c6a92}\index{Tricky.tests.cpp@{Tricky.tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!Tricky.tests.cpp@{Tricky.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [8/24]}}
+{\footnotesize\ttfamily \label{_tricky_8tests_8cpp_a1b1a60e8ac87222303ad6de3b28c6a92} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Commas in various macros are allowed"{}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_tricky_8tests_8cpp_source_l00374}{374}} of file \mbox{\hyperlink{_tricky_8tests_8cpp_source}{Tricky.\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00374\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00375\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ae3c33faa1d31a2bb0811dac74b994e3e}{REQUIRE\_THROWS}}(\ std::vector<constructor\_throws>\{constructor\_throws\{\},\ constructor\_throws\{\}\}\ );}
+\DoxyCodeLine{00376\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a5c646dfe831e596b59073014c1c8b9e5}{CHECK\_THROWS}}(\ std::vector<constructor\_throws>\{constructor\_throws\{\},\ constructor\_throws\{\}\}\ );}
+\DoxyCodeLine{00377\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ab0148f0dfca438f7aa01974e9c33216a}{REQUIRE\_NOTHROW}}(\ std::vector<int>\{1,\ 2,\ 3\}\ ==\ std::vector<int>\{1,\ 2,\ 3\}\ );}
+\DoxyCodeLine{00378\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a78e70f011f20c4ade1d1ac2b8fd33626}{CHECK\_NOTHROW}}(\ std::vector<int>\{1,\ 2,\ 3\}\ ==\ std::vector<int>\{1,\ 2,\ 3\}\ );}
+\DoxyCodeLine{00379\ }
+\DoxyCodeLine{00380\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(std::vector<int>\{1,\ 2\}\ ==\ std::vector<int>\{1,\ 2\});}
+\DoxyCodeLine{00381\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ std::vector<int>\{1,\ 2\}\ ==\ std::vector<int>\{1,\ 2\}\ );}
+\DoxyCodeLine{00382\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ada5065594bafc152162761ace47c1dcb}{REQUIRE\_FALSE}}(std::vector<int>\{1,\ 2\}\ ==\ std::vector<int>\{1,\ 2,\ 3\});}
+\DoxyCodeLine{00383\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a7bf095d8512cb180f8ff3a2258a6eaac}{CHECK\_FALSE}}(\ std::vector<int>\{1,\ 2\}\ ==\ std::vector<int>\{1,\ 2,\ 3\}\ );}
+\DoxyCodeLine{00384\ }
+\DoxyCodeLine{00385\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a13c6feaf82c3c419104c50dbb8caa3ef}{CHECK\_NOFAIL}}(\ std::vector<int>\{1,\ 2\}\ ==\ std::vector<int>\{1,\ 2\}\ );}
+\DoxyCodeLine{00386\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a354466c7b989ec55784c02d74013263c}{CHECKED\_IF}}(\ std::vector<int>\{1,\ 2\}\ ==\ std::vector<int>\{1,\ 2\}\ )\ \{}
+\DoxyCodeLine{00387\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\textcolor{keyword}{true});}
+\DoxyCodeLine{00388\ \ \ \ \ \}\ \mbox{\hyperlink{include_2catch_8hpp_a5fa42bb950a65e22eac778c86b27d832}{CHECKED\_ELSE}}(\ std::vector<int>\{1,\ 2\}\ ==\ std::vector<int>\{1,\ 2\}\ )\ \{}
+\DoxyCodeLine{00389\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\textcolor{keyword}{true});}
+\DoxyCodeLine{00390\ \ \ \ \ \}}
+\DoxyCodeLine{00391\ \}}
+
+\end{DoxyCode}
+\Hypertarget{_tricky_8tests_8cpp_a6584cb04c116fa01e74bb29968ad1613}\index{Tricky.tests.cpp@{Tricky.tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!Tricky.tests.cpp@{Tricky.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [9/24]}}
+{\footnotesize\ttfamily \label{_tricky_8tests_8cpp_a6584cb04c116fa01e74bb29968ad1613} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Comparing function pointers"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}\+Tricky\mbox{]}\mbox{[}function pointer\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_tricky_8tests_8cpp_source_l00315}{315}} of file \mbox{\hyperlink{_tricky_8tests_8cpp_source}{Tricky.\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00316\ \{}
+\DoxyCodeLine{00317\ \ \ \ \ \textcolor{comment}{//\ This\ was\ giving\ a\ warning\ in\ VS2010}}
+\DoxyCodeLine{00318\ \ \ \ \ \textcolor{comment}{//\ \#179}}
+\DoxyCodeLine{00319\ \ \ \ \ \mbox{\hyperlink{_tricky_8tests_8cpp_a9fc6d2a92e107036442629b3dcfe9571}{fooptr\_t}}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ =\ \mbox{\hyperlink{_tricky_8tests_8cpp_ac07863d69ae41a4e395b31f73b35fbcd}{foo}};}
+\DoxyCodeLine{00320\ }
+\DoxyCodeLine{00321\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ );}
+\DoxyCodeLine{00322\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ ==\ \&\mbox{\hyperlink{namespacefoo}{foo}}\ );}
+\DoxyCodeLine{00323\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=220pt]{_tricky_8tests_8cpp_a6584cb04c116fa01e74bb29968ad1613_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{_tricky_8tests_8cpp_a3fcf793f72586b7bf0ff126cabe7e2e2}\index{Tricky.tests.cpp@{Tricky.tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!Tricky.tests.cpp@{Tricky.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [10/24]}}
+{\footnotesize\ttfamily \label{_tricky_8tests_8cpp_a3fcf793f72586b7bf0ff126cabe7e2e2} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Comparing member function pointers"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}\+Tricky\mbox{]}\mbox{[}member function pointer\mbox{]}\mbox{[}approvals\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_tricky_8tests_8cpp_source_l00331}{331}} of file \mbox{\hyperlink{_tricky_8tests_8cpp_source}{Tricky.\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00332\ \{}
+\DoxyCodeLine{00333\ \ \ \ \ \textcolor{keyword}{typedef}\ void\ (\mbox{\hyperlink{struct_s}{S}}::*MF)();}
+\DoxyCodeLine{00334\ \ \ \ \ MF\ m\ =\ \&\mbox{\hyperlink{struct_s_a4e43a38979808833f28867a8e489fba4}{S::f}};}
+\DoxyCodeLine{00335\ }
+\DoxyCodeLine{00336\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ m\ ==\ \&S::f\ );}
+\DoxyCodeLine{00337\ \}}
+
+\end{DoxyCode}
+\Hypertarget{_tricky_8tests_8cpp_af76bbc82dbc4f2657dcf358d09f8e2cf}\index{Tricky.tests.cpp@{Tricky.tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!Tricky.tests.cpp@{Tricky.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [11/24]}}
+{\footnotesize\ttfamily \label{_tricky_8tests_8cpp_af76bbc82dbc4f2657dcf358d09f8e2cf} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}has printf"{}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_tricky_8tests_8cpp_source_l00360}{360}} of file \mbox{\hyperlink{_tricky_8tests_8cpp_source}{Tricky.\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00360\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00361\ }
+\DoxyCodeLine{00362\ \ \ \ \ \textcolor{comment}{//\ This\ can\ cause\ problems\ as,\ currently,\ stdout\ itself\ is\ not\ redirected\ -\/\ only\ the\ cout\ (and\ cerr)\ buffer}}
+\DoxyCodeLine{00363\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\ \textcolor{stringliteral}{"{}loose\ text\ artifact\(\backslash\)n"{}}\ );}
+\DoxyCodeLine{00364\ \}}
+
+\end{DoxyCode}
+\Hypertarget{_tricky_8tests_8cpp_a4aef7d8eac965be219932a45ded7021b}\index{Tricky.tests.cpp@{Tricky.tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!Tricky.tests.cpp@{Tricky.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [12/24]}}
+{\footnotesize\ttfamily \label{_tricky_8tests_8cpp_a4aef7d8eac965be219932a45ded7021b} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}non streamable -\/ with conv. op"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}\+Tricky\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_tricky_8tests_8cpp_source_l00304}{304}} of file \mbox{\hyperlink{_tricky_8tests_8cpp_source}{Tricky.\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00305\ \{}
+\DoxyCodeLine{00306\ \ \ \ \ \mbox{\hyperlink{struct_awkward}{Awkward}}\ awkward;}
+\DoxyCodeLine{00307\ \ \ \ \ std::string\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ =\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(\ awkward\ );}
+\DoxyCodeLine{00308\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ ==\ \textcolor{stringliteral}{"{}7"{}}\ );}
+\DoxyCodeLine{00309\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=305pt]{_tricky_8tests_8cpp_a4aef7d8eac965be219932a45ded7021b_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{_tricky_8tests_8cpp_ab77bcd1e24af4fe39fee02f3d619f303}\index{Tricky.tests.cpp@{Tricky.tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!Tricky.tests.cpp@{Tricky.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [13/24]}}
+{\footnotesize\ttfamily \label{_tricky_8tests_8cpp_ab77bcd1e24af4fe39fee02f3d619f303} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}non-\/copyable objects"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}.\mbox{]}\mbox{[}failing\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_tricky_8tests_8cpp_source_l00399}{399}} of file \mbox{\hyperlink{_tricky_8tests_8cpp_source}{Tricky.\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00399\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00400\ \ \ \ \ \textcolor{comment}{//\ Thanks\ to\ Agustin\ Bergé\ (@k-\/ballo\ on\ the\ cpplang\ Slack)\ for\ raising\ this}}
+\DoxyCodeLine{00401\ \ \ \ \ std::type\_info\ \textcolor{keyword}{const}\&\ ti\ =\ \textcolor{keyword}{typeid}(int);}
+\DoxyCodeLine{00402\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ ti\ ==\ \textcolor{keyword}{typeid}(\textcolor{keywordtype}{int})\ );}
+\DoxyCodeLine{00403\ \}}
+
+\end{DoxyCode}
+\Hypertarget{_tricky_8tests_8cpp_a43a447aecd1289c1274a6dcb38746255}\index{Tricky.tests.cpp@{Tricky.tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!Tricky.tests.cpp@{Tricky.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [14/24]}}
+{\footnotesize\ttfamily \label{_tricky_8tests_8cpp_a43a447aecd1289c1274a6dcb38746255} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}null deref"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}.\mbox{]}\mbox{[}failing\mbox{]}\mbox{[}!nonportable\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_tricky_8tests_8cpp_source_l00393}{393}} of file \mbox{\hyperlink{_tricky_8tests_8cpp_source}{Tricky.\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00393\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00394\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{00395\ \ \ \ \ \textcolor{keywordtype}{int}\ *x\ =\ NULL;}
+\DoxyCodeLine{00396\ \ \ \ \ *x\ =\ 1;}
+\DoxyCodeLine{00397\ \}}
+
+\end{DoxyCode}
+\Hypertarget{_tricky_8tests_8cpp_a199cf1fd8d1751e2ea9dbd8df7b2f7f3}\index{Tricky.tests.cpp@{Tricky.tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!Tricky.tests.cpp@{Tricky.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [15/24]}}
+{\footnotesize\ttfamily \label{_tricky_8tests_8cpp_a199cf1fd8d1751e2ea9dbd8df7b2f7f3} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}null\+\_\+ptr"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}\+Tricky\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_tricky_8tests_8cpp_source_l00349}{349}} of file \mbox{\hyperlink{_tricky_8tests_8cpp_source}{Tricky.\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00350\ \{}
+\DoxyCodeLine{00351\ \ \ \ \ std::unique\_ptr<int>\ ptr;}
+\DoxyCodeLine{00352\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(ptr.get()\ ==\ \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{00353\ \}}
+
+\end{DoxyCode}
+\Hypertarget{_tricky_8tests_8cpp_a202a5fa8641b7482d673bcb964da524a}\index{Tricky.tests.cpp@{Tricky.tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!Tricky.tests.cpp@{Tricky.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [16/24]}}
+{\footnotesize\ttfamily \label{_tricky_8tests_8cpp_a202a5fa8641b7482d673bcb964da524a} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Objects that evaluated in boolean contexts can be checked"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}\+Tricky\mbox{]}\mbox{[}\+Safe\+Bool\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_tricky_8tests_8cpp_source_l00267}{267}} of file \mbox{\hyperlink{_tricky_8tests_8cpp_source}{Tricky.\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00268\ \{}
+\DoxyCodeLine{00269\ \ \ \ \ Boolable\ True(\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{00270\ \ \ \ \ Boolable\ False(\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{00271\ }
+\DoxyCodeLine{00272\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ True\ );}
+\DoxyCodeLine{00273\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ !False\ );}
+\DoxyCodeLine{00274\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a7bf095d8512cb180f8ff3a2258a6eaac}{CHECK\_FALSE}}(\ False\ );}
+\DoxyCodeLine{00275\ \}}
+
+\end{DoxyCode}
+\Hypertarget{_tricky_8tests_8cpp_a4ab4acb35378cbdabc47ca4721fdfc38}\index{Tricky.tests.cpp@{Tricky.tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!Tricky.tests.cpp@{Tricky.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [17/24]}}
+{\footnotesize\ttfamily \label{_tricky_8tests_8cpp_a4ab4acb35378cbdabc47ca4721fdfc38} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}pointer to class"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}\+Tricky\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_tricky_8tests_8cpp_source_l00341}{341}} of file \mbox{\hyperlink{_tricky_8tests_8cpp_source}{Tricky.\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00342\ \{}
+\DoxyCodeLine{00343\ \ \ \ \mbox{\hyperlink{class_class_name}{ClassName}}\ *\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ 0;}
+\DoxyCodeLine{00344\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ ==\ 0\ );}
+\DoxyCodeLine{00345\ \}}
+
+\end{DoxyCode}
+\Hypertarget{_tricky_8tests_8cpp_adad3c4b1ad35d177f9f73c6b13a018ea}\index{Tricky.tests.cpp@{Tricky.tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!Tricky.tests.cpp@{Tricky.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [18/24]}}
+{\footnotesize\ttfamily \label{_tricky_8tests_8cpp_adad3c4b1ad35d177f9f73c6b13a018ea} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}string literals of different sizes can be compared"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}\+Tricky\mbox{]}\mbox{[}failing\mbox{]}\mbox{[}.\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_tricky_8tests_8cpp_source_l00078}{78}} of file \mbox{\hyperlink{_tricky_8tests_8cpp_source}{Tricky.\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00083\ \{}
+\DoxyCodeLine{00084\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ std::string(\ \textcolor{stringliteral}{"{}first"{}}\ )\ ==\ \textcolor{stringliteral}{"{}second"{}}\ );}
+\DoxyCodeLine{00085\ }
+\DoxyCodeLine{00086\ \}}
+
+\end{DoxyCode}
+\Hypertarget{_tricky_8tests_8cpp_aaeeec71d1dbd45ccba389e3a9dd8fcf3}\index{Tricky.tests.cpp@{Tricky.tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!Tricky.tests.cpp@{Tricky.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [19/24]}}
+{\footnotesize\ttfamily \label{_tricky_8tests_8cpp_aaeeec71d1dbd45ccba389e3a9dd8fcf3} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Where the LHS is not \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}} simple value"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}\+Tricky\mbox{]}\mbox{[}failing\mbox{]}\mbox{[}.\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_tricky_8tests_8cpp_source_l00036}{36}} of file \mbox{\hyperlink{_tricky_8tests_8cpp_source}{Tricky.\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00041\ \{}
+\DoxyCodeLine{00042\ \ \ \ \ \textcolor{comment}{/*}}
+\DoxyCodeLine{00043\ \textcolor{comment}{\ \ \ \ int\ a\ =\ 1;}}
+\DoxyCodeLine{00044\ \textcolor{comment}{\ \ \ \ int\ b\ =\ 2;}}
+\DoxyCodeLine{00045\ \textcolor{comment}{}}
+\DoxyCodeLine{00046\ \textcolor{comment}{\ \ \ \ //\ This\ only\ captures\ part\ of\ the\ expression,\ but\ issues\ a\ warning\ about\ the\ rest}}
+\DoxyCodeLine{00047\ \textcolor{comment}{\ \ \ \ REQUIRE(\ a+1\ ==\ b-\/1\ );}}
+\DoxyCodeLine{00048\ \textcolor{comment}{\ \ \ \ */}}
+\DoxyCodeLine{00049\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a108d6c5c51dd46e82a62b262394f0242}{WARN}}(\ \textcolor{stringliteral}{"{}Uncomment\ the\ code\ in\ this\ test\ to\ check\ that\ it\ gives\ a\ sensible\ compiler\ error"{}}\ );}
+\DoxyCodeLine{00050\ \}}
+
+\end{DoxyCode}
+\Hypertarget{_tricky_8tests_8cpp_aa44e4a7f9fdf4289a441ad35fcc2444e}\index{Tricky.tests.cpp@{Tricky.tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!Tricky.tests.cpp@{Tricky.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [20/24]}}
+{\footnotesize\ttfamily \label{_tricky_8tests_8cpp_aa44e4a7f9fdf4289a441ad35fcc2444e} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Where there is more to the expression after the RHS"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}\+Tricky\mbox{]}\mbox{[}failing\mbox{]}\mbox{[}.\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_tricky_8tests_8cpp_source_l00025}{25}} of file \mbox{\hyperlink{_tricky_8tests_8cpp_source}{Tricky.\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00030\ \{}
+\DoxyCodeLine{00031\ \textcolor{comment}{//\ \ \ \ int\ a\ =\ 1,\ b\ =\ 2;}}
+\DoxyCodeLine{00032\ \textcolor{comment}{//\ \ \ \ REQUIRE(\ a\ ==\ 2\ ||\ b\ ==\ 2\ );}}
+\DoxyCodeLine{00033\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a108d6c5c51dd46e82a62b262394f0242}{WARN}}(\ \textcolor{stringliteral}{"{}Uncomment\ the\ code\ in\ this\ test\ to\ check\ that\ it\ gives\ a\ sensible\ compiler\ error"{}}\ );}
+\DoxyCodeLine{00034\ \}}
+
+\end{DoxyCode}
+\Hypertarget{_tricky_8tests_8cpp_a9f00b27737f5d7a266a2d49ec571b93d}\index{Tricky.tests.cpp@{Tricky.tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!Tricky.tests.cpp@{Tricky.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [21/24]}}
+{\footnotesize\ttfamily \label{_tricky_8tests_8cpp_a9f00b27737f5d7a266a2d49ec571b93d} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}X/level/0/a"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}\+Tricky\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_tricky_8tests_8cpp_source_l00355}{355}} of file \mbox{\hyperlink{_tricky_8tests_8cpp_source}{Tricky.\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00355\ \{\ \mbox{\hyperlink{gtest_8h_a75adcdf89f69b0b615e395daafc315af}{SUCCEED}}(\textcolor{stringliteral}{"{}"{}});\ \}}
+
+\end{DoxyCode}
+\Hypertarget{_tricky_8tests_8cpp_a47965ce21b703de899c6f51a99ef37c2}\index{Tricky.tests.cpp@{Tricky.tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!Tricky.tests.cpp@{Tricky.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [22/24]}}
+{\footnotesize\ttfamily \label{_tricky_8tests_8cpp_a47965ce21b703de899c6f51a99ef37c2} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}X/level/0/b"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}\+Tricky\mbox{]}\mbox{[}fizz\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_tricky_8tests_8cpp_source_l00356}{356}} of file \mbox{\hyperlink{_tricky_8tests_8cpp_source}{Tricky.\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00356\ \{\ \mbox{\hyperlink{gtest_8h_a75adcdf89f69b0b615e395daafc315af}{SUCCEED}}(\textcolor{stringliteral}{"{}"{}});\ \}}
+
+\end{DoxyCode}
+\Hypertarget{_tricky_8tests_8cpp_adc02ac7504843af7f4f1fa723d317e3a}\index{Tricky.tests.cpp@{Tricky.tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!Tricky.tests.cpp@{Tricky.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [23/24]}}
+{\footnotesize\ttfamily \label{_tricky_8tests_8cpp_adc02ac7504843af7f4f1fa723d317e3a} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}X/level/1/a"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}\+Tricky\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_tricky_8tests_8cpp_source_l00357}{357}} of file \mbox{\hyperlink{_tricky_8tests_8cpp_source}{Tricky.\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00357\ \{\ \mbox{\hyperlink{gtest_8h_a75adcdf89f69b0b615e395daafc315af}{SUCCEED}}(\textcolor{stringliteral}{"{}"{}});\ \}}
+
+\end{DoxyCode}
+\Hypertarget{_tricky_8tests_8cpp_a79370bda6e69e0e683a09178a12c15c6}\index{Tricky.tests.cpp@{Tricky.tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!Tricky.tests.cpp@{Tricky.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [24/24]}}
+{\footnotesize\ttfamily \label{_tricky_8tests_8cpp_a79370bda6e69e0e683a09178a12c15c6} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}X/level/1/b"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}\+Tricky\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_tricky_8tests_8cpp_source_l00358}{358}} of file \mbox{\hyperlink{_tricky_8tests_8cpp_source}{Tricky.\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00358\ \{\ \mbox{\hyperlink{gtest_8h_a75adcdf89f69b0b615e395daafc315af}{SUCCEED}}(\textcolor{stringliteral}{"{}"{}});\ \}}
+
+\end{DoxyCode}

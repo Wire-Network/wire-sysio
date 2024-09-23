@@ -1,0 +1,169 @@
+\doxysection{gtest\+\_\+break\+\_\+on\+\_\+failure\+\_\+unittest Namespace Reference}
+\hypertarget{namespacegtest__break__on__failure__unittest}{}\label{namespacegtest__break__on__failure__unittest}\index{gtest\_break\_on\_failure\_unittest@{gtest\_break\_on\_failure\_unittest}}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classgtest__break__on__failure__unittest_1_1_g_test_break_on_failure_unit_test}{GTest\+Break\+On\+Failure\+Unit\+Test}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacegtest__break__on__failure__unittest_a79d81fcd2832c8f582e494ed9b27396c}{Run}} (command)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+str \mbox{\hyperlink{namespacegtest__break__on__failure__unittest_a398ffa27445229d651bdcb89b6ad8c83}{IS\+\_\+\+WINDOWS}} = \textquotesingle{}nt\textquotesingle{}
+\item 
+str \mbox{\hyperlink{namespacegtest__break__on__failure__unittest_a6162a5909f35739ffeadfbf736cb0e5c}{BREAK\+\_\+\+ON\+\_\+\+FAILURE\+\_\+\+ENV\+\_\+\+VAR}} = \textquotesingle{}GTEST\+\_\+\+BREAK\+\_\+\+ON\+\_\+\+FAILURE\textquotesingle{}
+\item 
+str \mbox{\hyperlink{namespacegtest__break__on__failure__unittest_a4f954859c263211a067e3473720a981f}{BREAK\+\_\+\+ON\+\_\+\+FAILURE\+\_\+\+FLAG}} = \textquotesingle{}gtest\+\_\+break\+\_\+on\+\_\+failure\textquotesingle{}
+\item 
+str \mbox{\hyperlink{namespacegtest__break__on__failure__unittest_af7b5c468843b3de1d291fccda851f870}{THROW\+\_\+\+ON\+\_\+\+FAILURE\+\_\+\+ENV\+\_\+\+VAR}} = \textquotesingle{}GTEST\+\_\+\+THROW\+\_\+\+ON\+\_\+\+FAILURE\textquotesingle{}
+\item 
+str \mbox{\hyperlink{namespacegtest__break__on__failure__unittest_a888592189baa221b63b95727e3a0898e}{CATCH\+\_\+\+EXCEPTIONS\+\_\+\+ENV\+\_\+\+VAR}} = \textquotesingle{}GTEST\+\_\+\+CATCH\+\_\+\+EXCEPTIONS\textquotesingle{}
+\item 
+\mbox{\hyperlink{namespacegtest__break__on__failure__unittest_a4c5b1b2e2a550d75bf9f38ef24e76702}{EXE\+\_\+\+PATH}}
+\item 
+\mbox{\hyperlink{namespacegtest__break__on__failure__unittest_a6d74240e4ea26e0a68e1025f9b8c878d}{environ}} = gtest\+\_\+test\+\_\+utils.\+environ
+\item 
+\mbox{\hyperlink{namespacegtest__break__on__failure__unittest_a6d10069714f75f3f755c1d2c9c0ddd15}{Set\+Env\+Var}} = gtest\+\_\+test\+\_\+utils.\+Set\+Env\+Var
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\begin{DoxyVerb}Unit test for Google Test's break-on-failure mode.
+
+A user can ask Google Test to seg-fault when an assertion fails, using
+either the GTEST_BREAK_ON_FAILURE environment variable or the
+--gtest_break_on_failure flag.  This script tests such functionality
+by invoking gtest_break_on_failure_unittest_ (a program written with
+Google Test) with different environments and command line flags.
+\end{DoxyVerb}
+ 
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacegtest__break__on__failure__unittest_a79d81fcd2832c8f582e494ed9b27396c}\index{gtest\_break\_on\_failure\_unittest@{gtest\_break\_on\_failure\_unittest}!Run@{Run}}
+\index{Run@{Run}!gtest\_break\_on\_failure\_unittest@{gtest\_break\_on\_failure\_unittest}}
+\doxysubsubsection{\texorpdfstring{Run()}{Run()}}
+{\footnotesize\ttfamily \label{namespacegtest__break__on__failure__unittest_a79d81fcd2832c8f582e494ed9b27396c} 
+gtest\+\_\+break\+\_\+on\+\_\+failure\+\_\+unittest.\+Run (\begin{DoxyParamCaption}\item[{}]{command}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Runs a command; returns 1 if it was killed by a signal, or 0 otherwise.\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{gtest__break__on__failure__unittest_8py_source_l00078}{78}} of file \mbox{\hyperlink{gtest__break__on__failure__unittest_8py_source}{gtest\+\_\+break\+\_\+on\+\_\+failure\+\_\+unittest.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00078\ \textcolor{keyword}{def\ }Run(command):}
+\DoxyCodeLine{00079\ \ \ \textcolor{stringliteral}{"{}"{}"{}Runs\ a\ command;\ returns\ 1\ if\ it\ was\ killed\ by\ a\ signal,\ or\ 0\ otherwise."{}"{}"{}}}
+\DoxyCodeLine{00080\ }
+\DoxyCodeLine{00081\ \ \ p\ =\ \mbox{\hyperlink{classgtest__test__utils_1_1_subprocess}{gtest\_test\_utils.Subprocess}}(command,\ env=environ)}
+\DoxyCodeLine{00082\ \ \ \textcolor{keywordflow}{if}\ p.terminated\_by\_signal:}
+\DoxyCodeLine{00083\ \ \ \ \ \textcolor{keywordflow}{return}\ 1}
+\DoxyCodeLine{00084\ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{00085\ \ \ \ \ \textcolor{keywordflow}{return}\ 0}
+\DoxyCodeLine{00086\ }
+\DoxyCodeLine{00087\ }
+\DoxyCodeLine{00088\ \textcolor{comment}{\#\ The\ tests.}}
+\DoxyCodeLine{00089\ }
+\DoxyCodeLine{00090\ }
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{namespacegtest__break__on__failure__unittest_a79d81fcd2832c8f582e494ed9b27396c_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{namespacegtest__break__on__failure__unittest_a6162a5909f35739ffeadfbf736cb0e5c}\index{gtest\_break\_on\_failure\_unittest@{gtest\_break\_on\_failure\_unittest}!BREAK\_ON\_FAILURE\_ENV\_VAR@{BREAK\_ON\_FAILURE\_ENV\_VAR}}
+\index{BREAK\_ON\_FAILURE\_ENV\_VAR@{BREAK\_ON\_FAILURE\_ENV\_VAR}!gtest\_break\_on\_failure\_unittest@{gtest\_break\_on\_failure\_unittest}}
+\doxysubsubsection{\texorpdfstring{BREAK\_ON\_FAILURE\_ENV\_VAR}{BREAK\_ON\_FAILURE\_ENV\_VAR}}
+{\footnotesize\ttfamily \label{namespacegtest__break__on__failure__unittest_a6162a5909f35739ffeadfbf736cb0e5c} 
+str gtest\+\_\+break\+\_\+on\+\_\+failure\+\_\+unittest.\+BREAK\+\_\+\+ON\+\_\+\+FAILURE\+\_\+\+ENV\+\_\+\+VAR = \textquotesingle{}GTEST\+\_\+\+BREAK\+\_\+\+ON\+\_\+\+FAILURE\textquotesingle{}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest__break__on__failure__unittest_8py_source_l00051}{51}} of file \mbox{\hyperlink{gtest__break__on__failure__unittest_8py_source}{gtest\+\_\+break\+\_\+on\+\_\+failure\+\_\+unittest.\+py}}.
+
+\Hypertarget{namespacegtest__break__on__failure__unittest_a4f954859c263211a067e3473720a981f}\index{gtest\_break\_on\_failure\_unittest@{gtest\_break\_on\_failure\_unittest}!BREAK\_ON\_FAILURE\_FLAG@{BREAK\_ON\_FAILURE\_FLAG}}
+\index{BREAK\_ON\_FAILURE\_FLAG@{BREAK\_ON\_FAILURE\_FLAG}!gtest\_break\_on\_failure\_unittest@{gtest\_break\_on\_failure\_unittest}}
+\doxysubsubsection{\texorpdfstring{BREAK\_ON\_FAILURE\_FLAG}{BREAK\_ON\_FAILURE\_FLAG}}
+{\footnotesize\ttfamily \label{namespacegtest__break__on__failure__unittest_a4f954859c263211a067e3473720a981f} 
+str gtest\+\_\+break\+\_\+on\+\_\+failure\+\_\+unittest.\+BREAK\+\_\+\+ON\+\_\+\+FAILURE\+\_\+\+FLAG = \textquotesingle{}gtest\+\_\+break\+\_\+on\+\_\+failure\textquotesingle{}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest__break__on__failure__unittest_8py_source_l00054}{54}} of file \mbox{\hyperlink{gtest__break__on__failure__unittest_8py_source}{gtest\+\_\+break\+\_\+on\+\_\+failure\+\_\+unittest.\+py}}.
+
+\Hypertarget{namespacegtest__break__on__failure__unittest_a888592189baa221b63b95727e3a0898e}\index{gtest\_break\_on\_failure\_unittest@{gtest\_break\_on\_failure\_unittest}!CATCH\_EXCEPTIONS\_ENV\_VAR@{CATCH\_EXCEPTIONS\_ENV\_VAR}}
+\index{CATCH\_EXCEPTIONS\_ENV\_VAR@{CATCH\_EXCEPTIONS\_ENV\_VAR}!gtest\_break\_on\_failure\_unittest@{gtest\_break\_on\_failure\_unittest}}
+\doxysubsubsection{\texorpdfstring{CATCH\_EXCEPTIONS\_ENV\_VAR}{CATCH\_EXCEPTIONS\_ENV\_VAR}}
+{\footnotesize\ttfamily \label{namespacegtest__break__on__failure__unittest_a888592189baa221b63b95727e3a0898e} 
+str gtest\+\_\+break\+\_\+on\+\_\+failure\+\_\+unittest.\+CATCH\+\_\+\+EXCEPTIONS\+\_\+\+ENV\+\_\+\+VAR = \textquotesingle{}GTEST\+\_\+\+CATCH\+\_\+\+EXCEPTIONS\textquotesingle{}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest__break__on__failure__unittest_8py_source_l00060}{60}} of file \mbox{\hyperlink{gtest__break__on__failure__unittest_8py_source}{gtest\+\_\+break\+\_\+on\+\_\+failure\+\_\+unittest.\+py}}.
+
+\Hypertarget{namespacegtest__break__on__failure__unittest_a6d74240e4ea26e0a68e1025f9b8c878d}\index{gtest\_break\_on\_failure\_unittest@{gtest\_break\_on\_failure\_unittest}!environ@{environ}}
+\index{environ@{environ}!gtest\_break\_on\_failure\_unittest@{gtest\_break\_on\_failure\_unittest}}
+\doxysubsubsection{\texorpdfstring{environ}{environ}}
+{\footnotesize\ttfamily \label{namespacegtest__break__on__failure__unittest_a6d74240e4ea26e0a68e1025f9b8c878d} 
+gtest\+\_\+break\+\_\+on\+\_\+failure\+\_\+unittest.\+environ = gtest\+\_\+test\+\_\+utils.\+environ}
+
+
+
+Definition at line \mbox{\hyperlink{gtest__break__on__failure__unittest_8py_source_l00067}{67}} of file \mbox{\hyperlink{gtest__break__on__failure__unittest_8py_source}{gtest\+\_\+break\+\_\+on\+\_\+failure\+\_\+unittest.\+py}}.
+
+\Hypertarget{namespacegtest__break__on__failure__unittest_a4c5b1b2e2a550d75bf9f38ef24e76702}\index{gtest\_break\_on\_failure\_unittest@{gtest\_break\_on\_failure\_unittest}!EXE\_PATH@{EXE\_PATH}}
+\index{EXE\_PATH@{EXE\_PATH}!gtest\_break\_on\_failure\_unittest@{gtest\_break\_on\_failure\_unittest}}
+\doxysubsubsection{\texorpdfstring{EXE\_PATH}{EXE\_PATH}}
+{\footnotesize\ttfamily \label{namespacegtest__break__on__failure__unittest_a4c5b1b2e2a550d75bf9f38ef24e76702} 
+gtest\+\_\+break\+\_\+on\+\_\+failure\+\_\+unittest.\+EXE\+\_\+\+PATH}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ =\ \ \mbox{\hyperlink{namespacegtest__test__utils_a239f43ff0e44144cb5a1e14f3453c273}{gtest\_test\_utils.GetTestExecutablePath}}(}
+\DoxyCodeLine{00002\ \ \ \ \ \textcolor{stringliteral}{'gtest\_break\_on\_failure\_unittest\_'})}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{gtest__break__on__failure__unittest_8py_source_l00063}{63}} of file \mbox{\hyperlink{gtest__break__on__failure__unittest_8py_source}{gtest\+\_\+break\+\_\+on\+\_\+failure\+\_\+unittest.\+py}}.
+
+\Hypertarget{namespacegtest__break__on__failure__unittest_a398ffa27445229d651bdcb89b6ad8c83}\index{gtest\_break\_on\_failure\_unittest@{gtest\_break\_on\_failure\_unittest}!IS\_WINDOWS@{IS\_WINDOWS}}
+\index{IS\_WINDOWS@{IS\_WINDOWS}!gtest\_break\_on\_failure\_unittest@{gtest\_break\_on\_failure\_unittest}}
+\doxysubsubsection{\texorpdfstring{IS\_WINDOWS}{IS\_WINDOWS}}
+{\footnotesize\ttfamily \label{namespacegtest__break__on__failure__unittest_a398ffa27445229d651bdcb89b6ad8c83} 
+str gtest\+\_\+break\+\_\+on\+\_\+failure\+\_\+unittest.\+IS\+\_\+\+WINDOWS = \textquotesingle{}nt\textquotesingle{}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest__break__on__failure__unittest_8py_source_l00048}{48}} of file \mbox{\hyperlink{gtest__break__on__failure__unittest_8py_source}{gtest\+\_\+break\+\_\+on\+\_\+failure\+\_\+unittest.\+py}}.
+
+\Hypertarget{namespacegtest__break__on__failure__unittest_a6d10069714f75f3f755c1d2c9c0ddd15}\index{gtest\_break\_on\_failure\_unittest@{gtest\_break\_on\_failure\_unittest}!SetEnvVar@{SetEnvVar}}
+\index{SetEnvVar@{SetEnvVar}!gtest\_break\_on\_failure\_unittest@{gtest\_break\_on\_failure\_unittest}}
+\doxysubsubsection{\texorpdfstring{SetEnvVar}{SetEnvVar}}
+{\footnotesize\ttfamily \label{namespacegtest__break__on__failure__unittest_a6d10069714f75f3f755c1d2c9c0ddd15} 
+gtest\+\_\+break\+\_\+on\+\_\+failure\+\_\+unittest.\+Set\+Env\+Var = gtest\+\_\+test\+\_\+utils.\+Set\+Env\+Var}
+
+
+
+Definition at line \mbox{\hyperlink{gtest__break__on__failure__unittest_8py_source_l00068}{68}} of file \mbox{\hyperlink{gtest__break__on__failure__unittest_8py_source}{gtest\+\_\+break\+\_\+on\+\_\+failure\+\_\+unittest.\+py}}.
+
+\Hypertarget{namespacegtest__break__on__failure__unittest_af7b5c468843b3de1d291fccda851f870}\index{gtest\_break\_on\_failure\_unittest@{gtest\_break\_on\_failure\_unittest}!THROW\_ON\_FAILURE\_ENV\_VAR@{THROW\_ON\_FAILURE\_ENV\_VAR}}
+\index{THROW\_ON\_FAILURE\_ENV\_VAR@{THROW\_ON\_FAILURE\_ENV\_VAR}!gtest\_break\_on\_failure\_unittest@{gtest\_break\_on\_failure\_unittest}}
+\doxysubsubsection{\texorpdfstring{THROW\_ON\_FAILURE\_ENV\_VAR}{THROW\_ON\_FAILURE\_ENV\_VAR}}
+{\footnotesize\ttfamily \label{namespacegtest__break__on__failure__unittest_af7b5c468843b3de1d291fccda851f870} 
+str gtest\+\_\+break\+\_\+on\+\_\+failure\+\_\+unittest.\+THROW\+\_\+\+ON\+\_\+\+FAILURE\+\_\+\+ENV\+\_\+\+VAR = \textquotesingle{}GTEST\+\_\+\+THROW\+\_\+\+ON\+\_\+\+FAILURE\textquotesingle{}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest__break__on__failure__unittest_8py_source_l00057}{57}} of file \mbox{\hyperlink{gtest__break__on__failure__unittest_8py_source}{gtest\+\_\+break\+\_\+on\+\_\+failure\+\_\+unittest.\+py}}.
+

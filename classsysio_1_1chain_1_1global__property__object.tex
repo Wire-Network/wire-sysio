@@ -1,0 +1,241 @@
+\doxysection{sysio\+::chain\+::global\+\_\+property\+\_\+object Class Reference}
+\hypertarget{classsysio_1_1chain_1_1global__property__object}{}\label{classsysio_1_1chain_1_1global__property__object}\index{sysio::chain::global\_property\_object@{sysio::chain::global\_property\_object}}
+
+
+Maintains global state information about block producer schedules and chain configuration parameters.  
+
+
+
+
+{\ttfamily \#include $<$global\+\_\+property\+\_\+object.\+hpp$>$}
+
+
+
+Inheritance diagram for sysio\+::chain\+::global\+\_\+property\+\_\+object\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=197pt]{classsysio_1_1chain_1_1global__property__object__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for sysio\+::chain\+::global\+\_\+property\+\_\+object\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1global__property__object__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1global__property__object_ab9e11f9c9fcc9f77204088b2e0deb187}{initalize\+\_\+from}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1legacy_1_1snapshot__global__property__object__v2}{legacy\+::snapshot\+\_\+global\+\_\+property\+\_\+object\+\_\+v2}} \&legacy, const \mbox{\hyperlink{structsysio_1_1chain_1_1chain__id__type}{chain\+\_\+id\+\_\+type}} \&chain\+\_\+id\+\_\+val, const \mbox{\hyperlink{structsysio_1_1chain_1_1kv__database__config}{kv\+\_\+database\+\_\+config}} \&kv\+\_\+config\+\_\+val, const \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config}{wasm\+\_\+config}} \&wasm\+\_\+config\+\_\+val)
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1global__property__object_a3c4aff03aad8222b7beb9f626f349955}{initalize\+\_\+from}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1legacy_1_1snapshot__global__property__object__v3}{legacy\+::snapshot\+\_\+global\+\_\+property\+\_\+object\+\_\+v3}} \&legacy, const \mbox{\hyperlink{structsysio_1_1chain_1_1kv__database__config}{kv\+\_\+database\+\_\+config}} \&kv\+\_\+config\+\_\+val, const \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config}{wasm\+\_\+config}} \&wasm\+\_\+config\+\_\+val)
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1global__property__object_ae4f01aec23162081b1145a2dc0f842ec}{initalize\+\_\+from}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1legacy_1_1snapshot__global__property__object__v4}{legacy\+::snapshot\+\_\+global\+\_\+property\+\_\+object\+\_\+v4}} \&legacy)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structchainbase_1_1object_a7c6a0efb95ee67d538a976cfa5be9df9}{id\+\_\+type}} \mbox{\hyperlink{classsysio_1_1chain_1_1global__property__object_abe7d305d1e37e520e7d0b06f01c63f97}{id}}
+\item 
+std\+::optional$<$ \mbox{\hyperlink{namespacesysio_1_1chain_aa7dec331abc416574479c64c2b384696}{block\+\_\+num\+\_\+type}} $>$ \mbox{\hyperlink{classsysio_1_1chain_1_1global__property__object_ac1dcf28dc4429879014b36216ba78b70}{proposed\+\_\+schedule\+\_\+block\+\_\+num}}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1shared__producer__authority__schedule}{shared\+\_\+producer\+\_\+authority\+\_\+schedule}} \mbox{\hyperlink{classsysio_1_1chain_1_1global__property__object_aa4ff1534c4ae09456e017614113b9dba}{proposed\+\_\+schedule}}
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_a99c6aa941a16bc629e8051a0a656dea7}{chain\+\_\+config}} \mbox{\hyperlink{classsysio_1_1chain_1_1global__property__object_a7f149fcf87034217c899838eb4430496}{configuration}}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1chain__id__type}{chain\+\_\+id\+\_\+type}} \mbox{\hyperlink{classsysio_1_1chain_1_1global__property__object_a71784879ffa9c855f44a06a758a44381}{chain\+\_\+id}}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1kv__database__config}{kv\+\_\+database\+\_\+config}} \mbox{\hyperlink{classsysio_1_1chain_1_1global__property__object_aa6dc5bd994e3e6179d267f3932edceda}{kv\+\_\+configuration}}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config}{wasm\+\_\+config}} \mbox{\hyperlink{classsysio_1_1chain_1_1global__property__object_aa3f6dc0594e69fa49962e2df2cb44fc8}{wasm\+\_\+configuration}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Public Types inherited from \mbox{\hyperlink{structchainbase_1_1object}{chainbase\+::object$<$ global\+\_\+property\+\_\+object\+\_\+type, global\+\_\+property\+\_\+object $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{classchainbase_1_1oid}{oid}}$<$ global\+\_\+property\+\_\+object $>$ \mbox{\hyperlink{structchainbase_1_1object_a7c6a0efb95ee67d538a976cfa5be9df9}{id\+\_\+type}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Static Public Attributes inherited from \mbox{\hyperlink{structchainbase_1_1object}{chainbase\+::object$<$ global\+\_\+property\+\_\+object\+\_\+type, global\+\_\+property\+\_\+object $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+static const \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{structchainbase_1_1object_a30d3a5340e6fc59b4a2e044fcd42f0a2}{type\+\_\+id}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{global__property__object_8hpp_source_l00063}{63}} of file \mbox{\hyperlink{global__property__object_8hpp_source}{global\+\_\+property\+\_\+object.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1chain_1_1global__property__object_ab9e11f9c9fcc9f77204088b2e0deb187}\index{sysio::chain::global\_property\_object@{sysio::chain::global\_property\_object}!initalize\_from@{initalize\_from}}
+\index{initalize\_from@{initalize\_from}!sysio::chain::global\_property\_object@{sysio::chain::global\_property\_object}}
+\doxysubsubsection{\texorpdfstring{initalize\_from()}{initalize\_from()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1global__property__object_ab9e11f9c9fcc9f77204088b2e0deb187} 
+void sysio\+::chain\+::global\+\_\+property\+\_\+object\+::initalize\+\_\+from (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1legacy_1_1snapshot__global__property__object__v2}{legacy\+::snapshot\+\_\+global\+\_\+property\+\_\+object\+\_\+v2}} \&}]{legacy}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1chain__id__type}{chain\+\_\+id\+\_\+type}} \&}]{chain\+\_\+id\+\_\+val}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1kv__database__config}{kv\+\_\+database\+\_\+config}} \&}]{kv\+\_\+config\+\_\+val}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config}{wasm\+\_\+config}} \&}]{wasm\+\_\+config\+\_\+val}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{global__property__object_8hpp_source_l00076}{76}} of file \mbox{\hyperlink{global__property__object_8hpp_source}{global\+\_\+property\+\_\+object.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1global__property__object_ac1dcf28dc4429879014b36216ba78b70}{proposed\_schedule\_block\_num}}\ =\ legacy.proposed\_schedule\_block\_num;}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1global__property__object_aa4ff1534c4ae09456e017614113b9dba}{proposed\_schedule}}\ =\ producer\_authority\_schedule(legacy.proposed\_schedule).to\_shared(\mbox{\hyperlink{classsysio_1_1chain_1_1global__property__object_aa4ff1534c4ae09456e017614113b9dba}{proposed\_schedule}}.\mbox{\hyperlink{structsysio_1_1chain_1_1shared__producer__authority__schedule_a303d4ea6f46ba5e38c5e951ae0151ca9}{producers}}.get\_allocator());}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ configuration\ =\ legacy.configuration;}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1global__property__object_a71784879ffa9c855f44a06a758a44381}{chain\_id}}\ =\ chain\_id\_val;}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1global__property__object_aa6dc5bd994e3e6179d267f3932edceda}{kv\_configuration}}\ =\ kv\_config\_val;}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1global__property__object_aa3f6dc0594e69fa49962e2df2cb44fc8}{wasm\_configuration}}\ =\ wasm\_config\_val;}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1global__property__object_ab9e11f9c9fcc9f77204088b2e0deb187_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1global__property__object_a3c4aff03aad8222b7beb9f626f349955}\index{sysio::chain::global\_property\_object@{sysio::chain::global\_property\_object}!initalize\_from@{initalize\_from}}
+\index{initalize\_from@{initalize\_from}!sysio::chain::global\_property\_object@{sysio::chain::global\_property\_object}}
+\doxysubsubsection{\texorpdfstring{initalize\_from()}{initalize\_from()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1global__property__object_a3c4aff03aad8222b7beb9f626f349955} 
+void sysio\+::chain\+::global\+\_\+property\+\_\+object\+::initalize\+\_\+from (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1legacy_1_1snapshot__global__property__object__v3}{legacy\+::snapshot\+\_\+global\+\_\+property\+\_\+object\+\_\+v3}} \&}]{legacy}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1kv__database__config}{kv\+\_\+database\+\_\+config}} \&}]{kv\+\_\+config\+\_\+val}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config}{wasm\+\_\+config}} \&}]{wasm\+\_\+config\+\_\+val}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{global__property__object_8hpp_source_l00085}{85}} of file \mbox{\hyperlink{global__property__object_8hpp_source}{global\+\_\+property\+\_\+object.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1global__property__object_ac1dcf28dc4429879014b36216ba78b70}{proposed\_schedule\_block\_num}}\ =\ legacy.proposed\_schedule\_block\_num;}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1global__property__object_aa4ff1534c4ae09456e017614113b9dba}{proposed\_schedule}}\ =\ legacy.proposed\_schedule.to\_shared(\mbox{\hyperlink{classsysio_1_1chain_1_1global__property__object_aa4ff1534c4ae09456e017614113b9dba}{proposed\_schedule}}.\mbox{\hyperlink{structsysio_1_1chain_1_1shared__producer__authority__schedule_a303d4ea6f46ba5e38c5e951ae0151ca9}{producers}}.get\_allocator());}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ configuration\ =\ legacy.configuration;}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1global__property__object_a71784879ffa9c855f44a06a758a44381}{chain\_id}}\ =\ legacy.chain\_id;}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1global__property__object_aa6dc5bd994e3e6179d267f3932edceda}{kv\_configuration}}\ =\ kv\_config\_val;}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1global__property__object_aa3f6dc0594e69fa49962e2df2cb44fc8}{wasm\_configuration}}\ =\ wasm\_config\_val;}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1global__property__object_a3c4aff03aad8222b7beb9f626f349955_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1global__property__object_ae4f01aec23162081b1145a2dc0f842ec}\index{sysio::chain::global\_property\_object@{sysio::chain::global\_property\_object}!initalize\_from@{initalize\_from}}
+\index{initalize\_from@{initalize\_from}!sysio::chain::global\_property\_object@{sysio::chain::global\_property\_object}}
+\doxysubsubsection{\texorpdfstring{initalize\_from()}{initalize\_from()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1global__property__object_ae4f01aec23162081b1145a2dc0f842ec} 
+void sysio\+::chain\+::global\+\_\+property\+\_\+object\+::initalize\+\_\+from (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1legacy_1_1snapshot__global__property__object__v4}{legacy\+::snapshot\+\_\+global\+\_\+property\+\_\+object\+\_\+v4}} \&}]{legacy}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{global__property__object_8hpp_source_l00094}{94}} of file \mbox{\hyperlink{global__property__object_8hpp_source}{global\+\_\+property\+\_\+object.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1global__property__object_ac1dcf28dc4429879014b36216ba78b70}{proposed\_schedule\_block\_num}}\ =\ legacy.proposed\_schedule\_block\_num;}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1global__property__object_aa4ff1534c4ae09456e017614113b9dba}{proposed\_schedule}}\ =\ legacy.proposed\_schedule.to\_shared(\mbox{\hyperlink{classsysio_1_1chain_1_1global__property__object_aa4ff1534c4ae09456e017614113b9dba}{proposed\_schedule}}.\mbox{\hyperlink{structsysio_1_1chain_1_1shared__producer__authority__schedule_a303d4ea6f46ba5e38c5e951ae0151ca9}{producers}}.get\_allocator());}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ configuration\ =\ legacy.configuration;}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1global__property__object_a71784879ffa9c855f44a06a758a44381}{chain\_id}}\ =\ legacy.chain\_id;}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1global__property__object_aa6dc5bd994e3e6179d267f3932edceda}{kv\_configuration}}\ =\ legacy.kv\_configuration;}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1global__property__object_aa3f6dc0594e69fa49962e2df2cb44fc8}{wasm\_configuration}}\ =\ legacy.wasm\_configuration;}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1global__property__object_ae4f01aec23162081b1145a2dc0f842ec_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classsysio_1_1chain_1_1global__property__object_a71784879ffa9c855f44a06a758a44381}\index{sysio::chain::global\_property\_object@{sysio::chain::global\_property\_object}!chain\_id@{chain\_id}}
+\index{chain\_id@{chain\_id}!sysio::chain::global\_property\_object@{sysio::chain::global\_property\_object}}
+\doxysubsubsection{\texorpdfstring{chain\_id}{chain\_id}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1global__property__object_a71784879ffa9c855f44a06a758a44381} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1chain__id__type}{chain\+\_\+id\+\_\+type}} sysio\+::chain\+::global\+\_\+property\+\_\+object\+::chain\+\_\+id}
+
+
+
+Definition at line \mbox{\hyperlink{global__property__object_8hpp_source_l00072}{72}} of file \mbox{\hyperlink{global__property__object_8hpp_source}{global\+\_\+property\+\_\+object.\+hpp}}.
+
+\Hypertarget{classsysio_1_1chain_1_1global__property__object_a7f149fcf87034217c899838eb4430496}\index{sysio::chain::global\_property\_object@{sysio::chain::global\_property\_object}!configuration@{configuration}}
+\index{configuration@{configuration}!sysio::chain::global\_property\_object@{sysio::chain::global\_property\_object}}
+\doxysubsubsection{\texorpdfstring{configuration}{configuration}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1global__property__object_a7f149fcf87034217c899838eb4430496} 
+\mbox{\hyperlink{namespacesysio_1_1chain_a99c6aa941a16bc629e8051a0a656dea7}{chain\+\_\+config}} sysio\+::chain\+::global\+\_\+property\+\_\+object\+::configuration}
+
+
+
+Definition at line \mbox{\hyperlink{global__property__object_8hpp_source_l00071}{71}} of file \mbox{\hyperlink{global__property__object_8hpp_source}{global\+\_\+property\+\_\+object.\+hpp}}.
+
+\Hypertarget{classsysio_1_1chain_1_1global__property__object_abe7d305d1e37e520e7d0b06f01c63f97}\index{sysio::chain::global\_property\_object@{sysio::chain::global\_property\_object}!id@{id}}
+\index{id@{id}!sysio::chain::global\_property\_object@{sysio::chain::global\_property\_object}}
+\doxysubsubsection{\texorpdfstring{id}{id}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1global__property__object_abe7d305d1e37e520e7d0b06f01c63f97} 
+\mbox{\hyperlink{structchainbase_1_1object_a7c6a0efb95ee67d538a976cfa5be9df9}{id\+\_\+type}} sysio\+::chain\+::global\+\_\+property\+\_\+object\+::id}
+
+
+
+Definition at line \mbox{\hyperlink{global__property__object_8hpp_source_l00068}{68}} of file \mbox{\hyperlink{global__property__object_8hpp_source}{global\+\_\+property\+\_\+object.\+hpp}}.
+
+\Hypertarget{classsysio_1_1chain_1_1global__property__object_aa6dc5bd994e3e6179d267f3932edceda}\index{sysio::chain::global\_property\_object@{sysio::chain::global\_property\_object}!kv\_configuration@{kv\_configuration}}
+\index{kv\_configuration@{kv\_configuration}!sysio::chain::global\_property\_object@{sysio::chain::global\_property\_object}}
+\doxysubsubsection{\texorpdfstring{kv\_configuration}{kv\_configuration}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1global__property__object_aa6dc5bd994e3e6179d267f3932edceda} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1kv__database__config}{kv\+\_\+database\+\_\+config}} sysio\+::chain\+::global\+\_\+property\+\_\+object\+::kv\+\_\+configuration}
+
+
+
+Definition at line \mbox{\hyperlink{global__property__object_8hpp_source_l00073}{73}} of file \mbox{\hyperlink{global__property__object_8hpp_source}{global\+\_\+property\+\_\+object.\+hpp}}.
+
+\Hypertarget{classsysio_1_1chain_1_1global__property__object_aa4ff1534c4ae09456e017614113b9dba}\index{sysio::chain::global\_property\_object@{sysio::chain::global\_property\_object}!proposed\_schedule@{proposed\_schedule}}
+\index{proposed\_schedule@{proposed\_schedule}!sysio::chain::global\_property\_object@{sysio::chain::global\_property\_object}}
+\doxysubsubsection{\texorpdfstring{proposed\_schedule}{proposed\_schedule}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1global__property__object_aa4ff1534c4ae09456e017614113b9dba} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1shared__producer__authority__schedule}{shared\+\_\+producer\+\_\+authority\+\_\+schedule}} sysio\+::chain\+::global\+\_\+property\+\_\+object\+::proposed\+\_\+schedule}
+
+
+
+Definition at line \mbox{\hyperlink{global__property__object_8hpp_source_l00070}{70}} of file \mbox{\hyperlink{global__property__object_8hpp_source}{global\+\_\+property\+\_\+object.\+hpp}}.
+
+\Hypertarget{classsysio_1_1chain_1_1global__property__object_ac1dcf28dc4429879014b36216ba78b70}\index{sysio::chain::global\_property\_object@{sysio::chain::global\_property\_object}!proposed\_schedule\_block\_num@{proposed\_schedule\_block\_num}}
+\index{proposed\_schedule\_block\_num@{proposed\_schedule\_block\_num}!sysio::chain::global\_property\_object@{sysio::chain::global\_property\_object}}
+\doxysubsubsection{\texorpdfstring{proposed\_schedule\_block\_num}{proposed\_schedule\_block\_num}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1global__property__object_ac1dcf28dc4429879014b36216ba78b70} 
+std\+::optional$<$\mbox{\hyperlink{namespacesysio_1_1chain_aa7dec331abc416574479c64c2b384696}{block\+\_\+num\+\_\+type}}$>$ sysio\+::chain\+::global\+\_\+property\+\_\+object\+::proposed\+\_\+schedule\+\_\+block\+\_\+num}
+
+
+
+Definition at line \mbox{\hyperlink{global__property__object_8hpp_source_l00069}{69}} of file \mbox{\hyperlink{global__property__object_8hpp_source}{global\+\_\+property\+\_\+object.\+hpp}}.
+
+\Hypertarget{classsysio_1_1chain_1_1global__property__object_aa3f6dc0594e69fa49962e2df2cb44fc8}\index{sysio::chain::global\_property\_object@{sysio::chain::global\_property\_object}!wasm\_configuration@{wasm\_configuration}}
+\index{wasm\_configuration@{wasm\_configuration}!sysio::chain::global\_property\_object@{sysio::chain::global\_property\_object}}
+\doxysubsubsection{\texorpdfstring{wasm\_configuration}{wasm\_configuration}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1global__property__object_aa3f6dc0594e69fa49962e2df2cb44fc8} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config}{wasm\+\_\+config}} sysio\+::chain\+::global\+\_\+property\+\_\+object\+::wasm\+\_\+configuration}
+
+
+
+Definition at line \mbox{\hyperlink{global__property__object_8hpp_source_l00074}{74}} of file \mbox{\hyperlink{global__property__object_8hpp_source}{global\+\_\+property\+\_\+object.\+hpp}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{global__property__object_8hpp}{global\+\_\+property\+\_\+object.\+hpp}}\end{DoxyCompactItemize}

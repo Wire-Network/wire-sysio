@@ -1,0 +1,7 @@
+<map id="BOOST_AUTO_TEST_CASE" name="BOOST_AUTO_TEST_CASE">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,46,202,72"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1processor_1_1hybi00.html#a8065338a7a9c760a92ce24d736a3dff2" title="Process new websocket connection bytes." alt="" coords="286,5,449,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="202,44,270,35,271,41,202,49"/>
+<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1processor_1_1processor.html#ad412d33b168539dfbfa1d7e89908c5d1" title="Set maximum message size." alt="" coords="250,71,485,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="202,68,234,72,234,77,202,74"/>
+</map>

@@ -1,0 +1,290 @@
+\doxysection{testing\+::internal\+::Pointwise\+Matcher\texorpdfstring{$<$}{<} Tuple\+Matcher, Rhs\+Container \texorpdfstring{$>$}{>}\+::Impl\texorpdfstring{$<$}{<} Lhs\+Container \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classtesting_1_1internal_1_1_pointwise_matcher_1_1_impl}{}\label{classtesting_1_1internal_1_1_pointwise_matcher_1_1_impl}\index{testing::internal::PointwiseMatcher$<$ TupleMatcher, RhsContainer $>$::Impl$<$ LhsContainer $>$@{testing::internal::PointwiseMatcher$<$ TupleMatcher, RhsContainer $>$::Impl$<$ LhsContainer $>$}}
+
+
+{\ttfamily \#include $<$gmock-\/matchers.\+h$>$}
+
+
+
+Inheritance diagram for testing\+::internal\+::Pointwise\+Matcher\texorpdfstring{$<$}{<} Tuple\+Matcher, Rhs\+Container \texorpdfstring{$>$}{>}\+::Impl\texorpdfstring{$<$}{<} Lhs\+Container \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=269pt]{classtesting_1_1internal_1_1_pointwise_matcher_1_1_impl__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for testing\+::internal\+::Pointwise\+Matcher\texorpdfstring{$<$}{<} Tuple\+Matcher, Rhs\+Container \texorpdfstring{$>$}{>}\+::Impl\texorpdfstring{$<$}{<} Lhs\+Container \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=269pt]{classtesting_1_1internal_1_1_pointwise_matcher_1_1_impl__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{classtesting_1_1internal_1_1_stl_container_view}{internal\+::\+Stl\+Container\+View}}$<$ \mbox{\hyperlink{gtest-internal_8h_a874567b176266188fabfffb8393267ce}{GTEST\+\_\+\+REMOVE\+\_\+\+REFERENCE\+\_\+\+AND\+\_\+\+CONST\+\_\+}}(Lhs\+Container)$>$ \mbox{\hyperlink{classtesting_1_1internal_1_1_pointwise_matcher_1_1_impl_a3960aa7f38799080420ab738a53b8eaf}{Lhs\+View}}
+\item 
+typedef \mbox{\hyperlink{classtesting_1_1internal_1_1_stl_container_view_a8b797669a0d88851ba60c1e736ed9ba2}{Lhs\+View\+::type}} \mbox{\hyperlink{classtesting_1_1internal_1_1_pointwise_matcher_1_1_impl_a79e8cd9d3014c1fea58035db6530ca42}{Lhs\+Stl\+Container}}
+\item 
+typedef \mbox{\hyperlink{classtesting_1_1internal_1_1_stl_container_view_a6d09823f4962be6fa2b76c179ea5c166}{Lhs\+View\+::const\+\_\+reference}} \mbox{\hyperlink{classtesting_1_1internal_1_1_pointwise_matcher_1_1_impl_a3a5a101d6cc84df24a0a478cd8bcd272}{Lhs\+Stl\+Container\+Reference}}
+\item 
+typedef Lhs\+Stl\+Container\+::value\+\_\+type \mbox{\hyperlink{classtesting_1_1internal_1_1_pointwise_matcher_1_1_impl_ac5701812402aa0c44a110fd5dc04e84e}{Lhs\+Value}}
+\item 
+typedef \+::testing\+::tuple$<$ const \mbox{\hyperlink{classtesting_1_1internal_1_1_pointwise_matcher_1_1_impl_ac5701812402aa0c44a110fd5dc04e84e}{Lhs\+Value}} \&, const \mbox{\hyperlink{classtesting_1_1internal_1_1_pointwise_matcher_afac86d98389ab055899a03f963b0d5a9}{Rhs\+Value}} \& $>$ \mbox{\hyperlink{classtesting_1_1internal_1_1_pointwise_matcher_1_1_impl_a55cae50306d00b8861eeb565f5567d72}{Inner\+Matcher\+Arg}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_pointwise_matcher_1_1_impl_aaf6841b254ef78395919dfc5705dd152}{Impl}} (const Tuple\+Matcher \&tuple\+\_\+matcher, const \mbox{\hyperlink{classtesting_1_1internal_1_1_pointwise_matcher_a9ead9a6a8977458951f2cf33a4a30918}{Rhs\+Stl\+Container}} \&rhs)
+\item 
+virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_pointwise_matcher_1_1_impl_a0c699f62bbd02595471b793baa9cc75e}{Describe\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}os) const
+\item 
+virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_pointwise_matcher_1_1_impl_a26d3a829149e4c497aaced42aad7b247}{Describe\+Negation\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}os) const
+\item 
+virtual bool \mbox{\hyperlink{classtesting_1_1internal_1_1_pointwise_matcher_1_1_impl_a4253946989f3743c4dd983909f2d062b}{Match\+And\+Explain}} (Lhs\+Container lhs, \mbox{\hyperlink{classtesting_1_1_match_result_listener}{Match\+Result\+Listener}} \texorpdfstring{$\ast$}{*}listener) const
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classtesting_1_1_matcher_interface}{testing\+::\+Matcher\+Interface$<$ Lhs\+Container $>$}}}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classtesting_1_1_matcher_describer_interface}{testing\+::\+Matcher\+Describer\+Interface}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{classtesting_1_1_matcher_describer_interface_ae2236a56ad2cc35cad10efc1208854f4}{\texorpdfstring{$\sim$}{\string~}\+Matcher\+Describer\+Interface}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Tuple\+Matcher, typename Rhs\+Container$>$\newline
+template$<$typename Lhs\+Container$>$\newline
+class testing\+::internal\+::\+Pointwise\+Matcher$<$ Tuple\+Matcher, Rhs\+Container $>$\+::\+Impl$<$ Lhs\+Container $>$}
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l03018}{3018}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_pointwise_matcher_1_1_impl_a55cae50306d00b8861eeb565f5567d72}\index{testing::internal::PointwiseMatcher$<$ TupleMatcher, RhsContainer $>$::Impl$<$ LhsContainer $>$@{testing::internal::PointwiseMatcher$<$ TupleMatcher, RhsContainer $>$::Impl$<$ LhsContainer $>$}!InnerMatcherArg@{InnerMatcherArg}}
+\index{InnerMatcherArg@{InnerMatcherArg}!testing::internal::PointwiseMatcher$<$ TupleMatcher, RhsContainer $>$::Impl$<$ LhsContainer $>$@{testing::internal::PointwiseMatcher$<$ TupleMatcher, RhsContainer $>$::Impl$<$ LhsContainer $>$}}
+\doxysubsubsection{\texorpdfstring{InnerMatcherArg}{InnerMatcherArg}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_pointwise_matcher_1_1_impl_a55cae50306d00b8861eeb565f5567d72} 
+template$<$typename Tuple\+Matcher , typename Rhs\+Container $>$ \\
+template$<$typename Lhs\+Container $>$ \\
+\+::testing\+::tuple$<$const \mbox{\hyperlink{classtesting_1_1internal_1_1_pointwise_matcher_1_1_impl_ac5701812402aa0c44a110fd5dc04e84e}{Lhs\+Value}}\&, const \mbox{\hyperlink{classtesting_1_1internal_1_1_pointwise_matcher_afac86d98389ab055899a03f963b0d5a9}{Rhs\+Value}}\&$>$ \mbox{\hyperlink{classtesting_1_1internal_1_1_pointwise_matcher}{testing\+::internal\+::\+Pointwise\+Matcher}}$<$ Tuple\+Matcher, Rhs\+Container $>$\mbox{\hyperlink{classtesting_1_1internal_1_1_pointwise_matcher_1_1_impl_aaf6841b254ef78395919dfc5705dd152}{\+::\+Impl}}$<$ Lhs\+Container $>$\+::\+Inner\+Matcher\+Arg}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l03029}{3029}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+\Hypertarget{classtesting_1_1internal_1_1_pointwise_matcher_1_1_impl_a79e8cd9d3014c1fea58035db6530ca42}\index{testing::internal::PointwiseMatcher$<$ TupleMatcher, RhsContainer $>$::Impl$<$ LhsContainer $>$@{testing::internal::PointwiseMatcher$<$ TupleMatcher, RhsContainer $>$::Impl$<$ LhsContainer $>$}!LhsStlContainer@{LhsStlContainer}}
+\index{LhsStlContainer@{LhsStlContainer}!testing::internal::PointwiseMatcher$<$ TupleMatcher, RhsContainer $>$::Impl$<$ LhsContainer $>$@{testing::internal::PointwiseMatcher$<$ TupleMatcher, RhsContainer $>$::Impl$<$ LhsContainer $>$}}
+\doxysubsubsection{\texorpdfstring{LhsStlContainer}{LhsStlContainer}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_pointwise_matcher_1_1_impl_a79e8cd9d3014c1fea58035db6530ca42} 
+template$<$typename Tuple\+Matcher , typename Rhs\+Container $>$ \\
+template$<$typename Lhs\+Container $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_stl_container_view_a8b797669a0d88851ba60c1e736ed9ba2}{Lhs\+View\+::type}} \mbox{\hyperlink{classtesting_1_1internal_1_1_pointwise_matcher}{testing\+::internal\+::\+Pointwise\+Matcher}}$<$ Tuple\+Matcher, Rhs\+Container $>$\mbox{\hyperlink{classtesting_1_1internal_1_1_pointwise_matcher_1_1_impl_aaf6841b254ef78395919dfc5705dd152}{\+::\+Impl}}$<$ Lhs\+Container $>$\+::\+Lhs\+Stl\+Container}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l03022}{3022}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+\Hypertarget{classtesting_1_1internal_1_1_pointwise_matcher_1_1_impl_a3a5a101d6cc84df24a0a478cd8bcd272}\index{testing::internal::PointwiseMatcher$<$ TupleMatcher, RhsContainer $>$::Impl$<$ LhsContainer $>$@{testing::internal::PointwiseMatcher$<$ TupleMatcher, RhsContainer $>$::Impl$<$ LhsContainer $>$}!LhsStlContainerReference@{LhsStlContainerReference}}
+\index{LhsStlContainerReference@{LhsStlContainerReference}!testing::internal::PointwiseMatcher$<$ TupleMatcher, RhsContainer $>$::Impl$<$ LhsContainer $>$@{testing::internal::PointwiseMatcher$<$ TupleMatcher, RhsContainer $>$::Impl$<$ LhsContainer $>$}}
+\doxysubsubsection{\texorpdfstring{LhsStlContainerReference}{LhsStlContainerReference}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_pointwise_matcher_1_1_impl_a3a5a101d6cc84df24a0a478cd8bcd272} 
+template$<$typename Tuple\+Matcher , typename Rhs\+Container $>$ \\
+template$<$typename Lhs\+Container $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_stl_container_view_a6d09823f4962be6fa2b76c179ea5c166}{Lhs\+View\+::const\+\_\+reference}} \mbox{\hyperlink{classtesting_1_1internal_1_1_pointwise_matcher}{testing\+::internal\+::\+Pointwise\+Matcher}}$<$ Tuple\+Matcher, Rhs\+Container $>$\mbox{\hyperlink{classtesting_1_1internal_1_1_pointwise_matcher_1_1_impl_aaf6841b254ef78395919dfc5705dd152}{\+::\+Impl}}$<$ Lhs\+Container $>$\+::\+Lhs\+Stl\+Container\+Reference}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l03023}{3023}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+\Hypertarget{classtesting_1_1internal_1_1_pointwise_matcher_1_1_impl_ac5701812402aa0c44a110fd5dc04e84e}\index{testing::internal::PointwiseMatcher$<$ TupleMatcher, RhsContainer $>$::Impl$<$ LhsContainer $>$@{testing::internal::PointwiseMatcher$<$ TupleMatcher, RhsContainer $>$::Impl$<$ LhsContainer $>$}!LhsValue@{LhsValue}}
+\index{LhsValue@{LhsValue}!testing::internal::PointwiseMatcher$<$ TupleMatcher, RhsContainer $>$::Impl$<$ LhsContainer $>$@{testing::internal::PointwiseMatcher$<$ TupleMatcher, RhsContainer $>$::Impl$<$ LhsContainer $>$}}
+\doxysubsubsection{\texorpdfstring{LhsValue}{LhsValue}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_pointwise_matcher_1_1_impl_ac5701812402aa0c44a110fd5dc04e84e} 
+template$<$typename Tuple\+Matcher , typename Rhs\+Container $>$ \\
+template$<$typename Lhs\+Container $>$ \\
+Lhs\+Stl\+Container\+::value\+\_\+type \mbox{\hyperlink{classtesting_1_1internal_1_1_pointwise_matcher}{testing\+::internal\+::\+Pointwise\+Matcher}}$<$ Tuple\+Matcher, Rhs\+Container $>$\mbox{\hyperlink{classtesting_1_1internal_1_1_pointwise_matcher_1_1_impl_aaf6841b254ef78395919dfc5705dd152}{\+::\+Impl}}$<$ Lhs\+Container $>$\+::\+Lhs\+Value}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l03024}{3024}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+\Hypertarget{classtesting_1_1internal_1_1_pointwise_matcher_1_1_impl_a3960aa7f38799080420ab738a53b8eaf}\index{testing::internal::PointwiseMatcher$<$ TupleMatcher, RhsContainer $>$::Impl$<$ LhsContainer $>$@{testing::internal::PointwiseMatcher$<$ TupleMatcher, RhsContainer $>$::Impl$<$ LhsContainer $>$}!LhsView@{LhsView}}
+\index{LhsView@{LhsView}!testing::internal::PointwiseMatcher$<$ TupleMatcher, RhsContainer $>$::Impl$<$ LhsContainer $>$@{testing::internal::PointwiseMatcher$<$ TupleMatcher, RhsContainer $>$::Impl$<$ LhsContainer $>$}}
+\doxysubsubsection{\texorpdfstring{LhsView}{LhsView}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_pointwise_matcher_1_1_impl_a3960aa7f38799080420ab738a53b8eaf} 
+template$<$typename Tuple\+Matcher , typename Rhs\+Container $>$ \\
+template$<$typename Lhs\+Container $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_stl_container_view}{internal\+::\+Stl\+Container\+View}}$<$ \mbox{\hyperlink{gtest-internal_8h_a874567b176266188fabfffb8393267ce}{GTEST\+\_\+\+REMOVE\+\_\+\+REFERENCE\+\_\+\+AND\+\_\+\+CONST\+\_\+}}(Lhs\+Container)$>$ \mbox{\hyperlink{classtesting_1_1internal_1_1_pointwise_matcher}{testing\+::internal\+::\+Pointwise\+Matcher}}$<$ Tuple\+Matcher, Rhs\+Container $>$\mbox{\hyperlink{classtesting_1_1internal_1_1_pointwise_matcher_1_1_impl_aaf6841b254ef78395919dfc5705dd152}{\+::\+Impl}}$<$ Lhs\+Container $>$\+::\+Lhs\+View}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l03021}{3021}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_pointwise_matcher_1_1_impl_aaf6841b254ef78395919dfc5705dd152}\index{testing::internal::PointwiseMatcher$<$ TupleMatcher, RhsContainer $>$::Impl$<$ LhsContainer $>$@{testing::internal::PointwiseMatcher$<$ TupleMatcher, RhsContainer $>$::Impl$<$ LhsContainer $>$}!Impl@{Impl}}
+\index{Impl@{Impl}!testing::internal::PointwiseMatcher$<$ TupleMatcher, RhsContainer $>$::Impl$<$ LhsContainer $>$@{testing::internal::PointwiseMatcher$<$ TupleMatcher, RhsContainer $>$::Impl$<$ LhsContainer $>$}}
+\doxysubsubsection{\texorpdfstring{Impl()}{Impl()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_pointwise_matcher_1_1_impl_aaf6841b254ef78395919dfc5705dd152} 
+template$<$typename Tuple\+Matcher , typename Rhs\+Container $>$ \\
+template$<$typename Lhs\+Container $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_pointwise_matcher}{testing\+::internal\+::\+Pointwise\+Matcher}}$<$ Tuple\+Matcher, Rhs\+Container $>$\+::\+Impl$<$ Lhs\+Container $>$\+::\+Impl (\begin{DoxyParamCaption}\item[{const Tuple\+Matcher \&}]{tuple\+\_\+matcher}{, }\item[{const \mbox{\hyperlink{classtesting_1_1internal_1_1_pointwise_matcher_a9ead9a6a8977458951f2cf33a4a30918}{Rhs\+Stl\+Container}} \&}]{rhs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l03031}{3031}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03033\ \ \ \ \ \ \ \ \ :\ mono\_tuple\_matcher\_(\mbox{\hyperlink{namespacetesting_ad49d22f0e87778e2b97a88ee851dcea3}{SafeMatcherCast<InnerMatcherArg>}}(tuple\_matcher)),}
+\DoxyCodeLine{03034\ \ \ \ \ \ \ \ \ \ \ rhs\_(rhs)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_pointwise_matcher_1_1_impl_a26d3a829149e4c497aaced42aad7b247}\index{testing::internal::PointwiseMatcher$<$ TupleMatcher, RhsContainer $>$::Impl$<$ LhsContainer $>$@{testing::internal::PointwiseMatcher$<$ TupleMatcher, RhsContainer $>$::Impl$<$ LhsContainer $>$}!DescribeNegationTo@{DescribeNegationTo}}
+\index{DescribeNegationTo@{DescribeNegationTo}!testing::internal::PointwiseMatcher$<$ TupleMatcher, RhsContainer $>$::Impl$<$ LhsContainer $>$@{testing::internal::PointwiseMatcher$<$ TupleMatcher, RhsContainer $>$::Impl$<$ LhsContainer $>$}}
+\doxysubsubsection{\texorpdfstring{DescribeNegationTo()}{DescribeNegationTo()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_pointwise_matcher_1_1_impl_a26d3a829149e4c497aaced42aad7b247} 
+template$<$typename Tuple\+Matcher , typename Rhs\+Container $>$ \\
+template$<$typename Lhs\+Container $>$ \\
+virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_pointwise_matcher}{testing\+::internal\+::\+Pointwise\+Matcher}}$<$ Tuple\+Matcher, Rhs\+Container $>$\mbox{\hyperlink{classtesting_1_1internal_1_1_pointwise_matcher_1_1_impl_aaf6841b254ef78395919dfc5705dd152}{\+::\+Impl}}$<$ Lhs\+Container $>$\+::\+Describe\+Negation\+To (\begin{DoxyParamCaption}\item[{\+::std\+::ostream \texorpdfstring{$\ast$}{*}}]{os}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classtesting_1_1_matcher_describer_interface_a2071afbc47097c4d1c0064275af34db0}{testing\+::\+Matcher\+Describer\+Interface}}.
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l03043}{3043}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03043\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{03044\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}doesn't\ contain\ exactly\ "{}}\ <<\ rhs\_.size()}
+\DoxyCodeLine{03045\ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\ values,\ or\ contains\ a\ value\ x\ at\ some\ index\ i"{}}}
+\DoxyCodeLine{03046\ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\ where\ x\ and\ the\ i-\/th\ value\ of\ "{}};}
+\DoxyCodeLine{03047\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a30708fa2bacf11895b03bdb21eb72309}{UniversalPrint}}(rhs\_,\ os);}
+\DoxyCodeLine{03048\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}\ "{}};}
+\DoxyCodeLine{03049\ \ \ \ \ \ \ mono\_tuple\_matcher\_.\mbox{\hyperlink{classtesting_1_1internal_1_1_matcher_base_ac1089d49b6b8a381900618985cd69b7f}{DescribeNegationTo}}(os);}
+\DoxyCodeLine{03050\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_pointwise_matcher_1_1_impl_a26d3a829149e4c497aaced42aad7b247_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_pointwise_matcher_1_1_impl_a0c699f62bbd02595471b793baa9cc75e}\index{testing::internal::PointwiseMatcher$<$ TupleMatcher, RhsContainer $>$::Impl$<$ LhsContainer $>$@{testing::internal::PointwiseMatcher$<$ TupleMatcher, RhsContainer $>$::Impl$<$ LhsContainer $>$}!DescribeTo@{DescribeTo}}
+\index{DescribeTo@{DescribeTo}!testing::internal::PointwiseMatcher$<$ TupleMatcher, RhsContainer $>$::Impl$<$ LhsContainer $>$@{testing::internal::PointwiseMatcher$<$ TupleMatcher, RhsContainer $>$::Impl$<$ LhsContainer $>$}}
+\doxysubsubsection{\texorpdfstring{DescribeTo()}{DescribeTo()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_pointwise_matcher_1_1_impl_a0c699f62bbd02595471b793baa9cc75e} 
+template$<$typename Tuple\+Matcher , typename Rhs\+Container $>$ \\
+template$<$typename Lhs\+Container $>$ \\
+virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_pointwise_matcher}{testing\+::internal\+::\+Pointwise\+Matcher}}$<$ Tuple\+Matcher, Rhs\+Container $>$\mbox{\hyperlink{classtesting_1_1internal_1_1_pointwise_matcher_1_1_impl_aaf6841b254ef78395919dfc5705dd152}{\+::\+Impl}}$<$ Lhs\+Container $>$\+::\+Describe\+To (\begin{DoxyParamCaption}\item[{\+::std\+::ostream \texorpdfstring{$\ast$}{*}}]{os}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classtesting_1_1_matcher_describer_interface_ad9f861588bd969b6e3e717f13bb94e7b}{testing\+::\+Matcher\+Describer\+Interface}}.
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l03036}{3036}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03036\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{03037\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}contains\ "{}}\ <<\ rhs\_.size()}
+\DoxyCodeLine{03038\ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\ values,\ where\ each\ value\ and\ its\ corresponding\ value\ in\ "{}};}
+\DoxyCodeLine{03039\ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_universal_printer_aecec021e1abbaa260b701e24e3fe33eb}{UniversalPrinter<RhsStlContainer>::Print}}(rhs\_,\ os);}
+\DoxyCodeLine{03040\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}\ "{}};}
+\DoxyCodeLine{03041\ \ \ \ \ \ \ mono\_tuple\_matcher\_.\mbox{\hyperlink{classtesting_1_1internal_1_1_matcher_base_a7e0c883c7745e0d646463077ef1c1267}{DescribeTo}}(os);}
+\DoxyCodeLine{03042\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_pointwise_matcher_1_1_impl_a0c699f62bbd02595471b793baa9cc75e_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_pointwise_matcher_1_1_impl_a4253946989f3743c4dd983909f2d062b}\index{testing::internal::PointwiseMatcher$<$ TupleMatcher, RhsContainer $>$::Impl$<$ LhsContainer $>$@{testing::internal::PointwiseMatcher$<$ TupleMatcher, RhsContainer $>$::Impl$<$ LhsContainer $>$}!MatchAndExplain@{MatchAndExplain}}
+\index{MatchAndExplain@{MatchAndExplain}!testing::internal::PointwiseMatcher$<$ TupleMatcher, RhsContainer $>$::Impl$<$ LhsContainer $>$@{testing::internal::PointwiseMatcher$<$ TupleMatcher, RhsContainer $>$::Impl$<$ LhsContainer $>$}}
+\doxysubsubsection{\texorpdfstring{MatchAndExplain()}{MatchAndExplain()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_pointwise_matcher_1_1_impl_a4253946989f3743c4dd983909f2d062b} 
+template$<$typename Tuple\+Matcher , typename Rhs\+Container $>$ \\
+template$<$typename Lhs\+Container $>$ \\
+virtual bool \mbox{\hyperlink{classtesting_1_1internal_1_1_pointwise_matcher}{testing\+::internal\+::\+Pointwise\+Matcher}}$<$ Tuple\+Matcher, Rhs\+Container $>$\mbox{\hyperlink{classtesting_1_1internal_1_1_pointwise_matcher_1_1_impl_aaf6841b254ef78395919dfc5705dd152}{\+::\+Impl}}$<$ Lhs\+Container $>$\+::\+Match\+And\+Explain (\begin{DoxyParamCaption}\item[{Lhs\+Container}]{lhs}{, }\item[{\mbox{\hyperlink{classtesting_1_1_match_result_listener}{Match\+Result\+Listener}} \texorpdfstring{$\ast$}{*}}]{listener}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classtesting_1_1_matcher_interface_a296b43607cd99d60365f0e6a762777cf}{testing\+::\+Matcher\+Interface$<$ Lhs\+Container $>$}}.
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l03052}{3052}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03053\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{03054\ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_pointwise_matcher_1_1_impl_a3a5a101d6cc84df24a0a478cd8bcd272}{LhsStlContainerReference}}\ lhs\_stl\_container\ =\ \mbox{\hyperlink{classtesting_1_1internal_1_1_stl_container_view_a36eccf53329730f6e55c12002128bf25}{LhsView::ConstReference}}(lhs);}
+\DoxyCodeLine{03055\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ actual\_size\ =\ lhs\_stl\_container.size();}
+\DoxyCodeLine{03056\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (actual\_size\ !=\ rhs\_.size())\ \{}
+\DoxyCodeLine{03057\ \ \ \ \ \ \ \ \ *listener\ <<\ \textcolor{stringliteral}{"{}which\ contains\ "{}}\ <<\ actual\_size\ <<\ \textcolor{stringliteral}{"{}\ values"{}};}
+\DoxyCodeLine{03058\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{03059\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{03060\ }
+\DoxyCodeLine{03061\ \ \ \ \ \ \ \textcolor{keyword}{typename}\ LhsStlContainer::const\_iterator\ left\ =\ lhs\_stl\_container.begin();}
+\DoxyCodeLine{03062\ \ \ \ \ \ \ \textcolor{keyword}{typename}\ RhsStlContainer::const\_iterator\ right\ =\ rhs\_.begin();}
+\DoxyCodeLine{03063\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ !=\ actual\_size;\ ++i,\ ++left,\ ++right)\ \{}
+\DoxyCodeLine{03064\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (listener-\/>IsInterested())\ \{}
+\DoxyCodeLine{03065\ \ \ \ \ \ \ \ \ \ \ StringMatchResultListener\ inner\_listener;}
+\DoxyCodeLine{03066\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Create\ InnerMatcherArg\ as\ a\ temporarily\ object\ to\ avoid\ it\ outlives}}
+\DoxyCodeLine{03067\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ *left\ and\ *right.\ Dereference\ or\ the\ conversion\ to\ \`{}const\ T\&`\ may}}
+\DoxyCodeLine{03068\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ return\ temp\ objects,\ e.g\ for\ vector<bool>.}}
+\DoxyCodeLine{03069\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!mono\_tuple\_matcher\_.\mbox{\hyperlink{classtesting_1_1internal_1_1_matcher_base_aab88b1d23b6b94a8495ce6a0e0c576ce}{MatchAndExplain}}(}
+\DoxyCodeLine{03070\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_pointwise_matcher_1_1_impl_a55cae50306d00b8861eeb565f5567d72}{InnerMatcherArg}}(\mbox{\hyperlink{namespacetesting_1_1internal_a982df3f369643b175f79cda4048bc3b9}{ImplicitCast\_<const\ LhsValue\&>}}(*left),}
+\DoxyCodeLine{03071\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a982df3f369643b175f79cda4048bc3b9}{ImplicitCast\_<const\ RhsValue\&>}}(*right)),}
+\DoxyCodeLine{03072\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&inner\_listener))\ \{}
+\DoxyCodeLine{03073\ \ \ \ \ \ \ \ \ \ \ \ \ *listener\ <<\ \textcolor{stringliteral}{"{}where\ the\ value\ pair\ ("{}};}
+\DoxyCodeLine{03074\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a30708fa2bacf11895b03bdb21eb72309}{UniversalPrint}}(*left,\ listener-\/>stream());}
+\DoxyCodeLine{03075\ \ \ \ \ \ \ \ \ \ \ \ \ *listener\ <<\ \textcolor{stringliteral}{"{},\ "{}};}
+\DoxyCodeLine{03076\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a30708fa2bacf11895b03bdb21eb72309}{UniversalPrint}}(*right,\ listener-\/>stream());}
+\DoxyCodeLine{03077\ \ \ \ \ \ \ \ \ \ \ \ \ *listener\ <<\ \textcolor{stringliteral}{"{})\ at\ index\ \#"{}}\ <<\ i\ <<\ \textcolor{stringliteral}{"{}\ don't\ match"{}};}
+\DoxyCodeLine{03078\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_ad609eb8bac84ab487464a3449c57640a}{PrintIfNotEmpty}}(inner\_listener.str(),\ listener-\/>stream());}
+\DoxyCodeLine{03079\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{03080\ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{03081\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{03082\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!mono\_tuple\_matcher\_.\mbox{\hyperlink{classtesting_1_1internal_1_1_matcher_base_abc0dbefa4daff0a49943ca8740e987a6}{Matches}}(}
+\DoxyCodeLine{03083\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_pointwise_matcher_1_1_impl_a55cae50306d00b8861eeb565f5567d72}{InnerMatcherArg}}(\mbox{\hyperlink{namespacetesting_1_1internal_a982df3f369643b175f79cda4048bc3b9}{ImplicitCast\_<const\ LhsValue\&>}}(*left),}
+\DoxyCodeLine{03084\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a982df3f369643b175f79cda4048bc3b9}{ImplicitCast\_<const\ RhsValue\&>}}(*right))))}
+\DoxyCodeLine{03085\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{03086\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{03087\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{03088\ }
+\DoxyCodeLine{03089\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{03090\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_pointwise_matcher_1_1_impl_a4253946989f3743c4dd983909f2d062b_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/include/gmock/\mbox{\hyperlink{gmock-matchers_8h}{gmock-\/matchers.\+h}}\end{DoxyCompactItemize}

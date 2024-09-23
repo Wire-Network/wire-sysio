@@ -1,0 +1,11 @@
+<map id="sysio::vm::invoke_with_signal_handler" name="sysio::vm::invoke_with_signal_handler">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,39,161,79"/>
+<area shape="rect" id="Node000002" href="$namespacesysio_1_1vm.html#a2bf040912c32fbb2ea68f5338bb304fe" title=" " alt="" coords="209,39,368,79"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="161,56,193,56,193,62,161,62"/>
+<area shape="rect" id="Node000003" href="$namespacesysio_1_1vm.html#a54ec5a188f3bccc28c33687d74736bdf" title=" " alt="" coords="416,5,586,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="368,44,400,39,401,44,369,49"/>
+<area shape="rect" id="Node000004" href="$namespacesysio_1_1vm.html#a3b729c87be5c09baca1dec359fad785b" title=" " alt="" coords="422,71,581,111"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="369,68,406,74,405,79,368,74"/>
+<area shape="rect" id="Node000005" href="$namespacesysio_1_1vm.html#aa2e30fac0f99c3450ef6d78aa934490f" title=" " alt="" coords="634,78,804,104"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="581,88,619,88,619,94,581,94"/>
+</map>

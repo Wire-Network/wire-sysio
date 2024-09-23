@@ -1,0 +1,27 @@
+<map id="GenericStringBuffer::GetSize" name="GenericStringBuffer::GetSize">
+<area shape="rect" id="Node000001" title="Get the size of string in bytes in the string buffer." alt="" coords="109,270,244,310"/>
+<area shape="rect" id="Node000002" href="$documenttest_8cpp.html#abc733bb1c7a165b4968eabd73d8ce542" title=" " alt="" coords="5,5,61,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="161,256,122,157,93,99,59,44,49,33,53,30,63,41,98,96,127,155,166,254"/>
+<area shape="rect" id="Node000003" href="$documenttest_8cpp.html#a9ae1e8ae8f6953e75a060b1f15a24f61" title=" " alt="" coords="5,55,61,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="157,257,116,179,89,135,59,93,49,83,53,79,63,90,93,132,121,177,162,255"/>
+<area shape="rect" id="Node000004" href="$namespacetest_8cpp.html#a6228e1447cd0572a116561d46c73ceb1" title=" " alt="" coords="5,104,61,130"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="150,259,109,203,59,143,48,132,52,128,63,139,113,200,154,256"/>
+<area shape="rect" id="Node000005" href="$pointertest_8cpp.html#a42d16691830cb00339e59301ea2b7c8a" title=" " alt="" coords="5,153,61,179"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="139,262,48,181,51,177,142,258"/>
+<area shape="rect" id="Node000006" href="$stringbuffertest_8cpp.html#a58e114f4cdf292eb2d79fd07d8075624" title=" " alt="" coords="5,203,61,228"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="121,265,58,231,61,226,124,260"/>
+<area shape="rect" id="Node000007" href="$stringbuffertest_8cpp.html#aff5a30dd9e07bc4095de5ff9304c0323" title=" " alt="" coords="5,252,61,278"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="93,278,61,272,62,267,94,273"/>
+<area shape="rect" id="Node000008" href="$stringbuffertest_8cpp.html#a6f92b34ed62474587cb34b64162d5878" title=" " alt="" coords="5,301,61,327"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="94,307,62,312,61,307,93,301"/>
+<area shape="rect" id="Node000009" href="$stringbuffertest_8cpp.html#a01d80f83d15918d8b15eb382abe0ba29" title=" " alt="" coords="5,351,61,376"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="123,320,61,352,59,348,120,316"/>
+<area shape="rect" id="Node000010" href="$stringbuffertest_8cpp.html#a2a076022dd05a90d4537ba48032212c4" title=" " alt="" coords="5,400,61,426"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="142,323,51,402,48,398,138,319"/>
+<area shape="rect" id="Node000011" href="$stringbuffertest_8cpp.html#a35396fd51e755e78dcd41d821fec4818" title=" " alt="" coords="5,449,61,475"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="154,324,113,380,63,440,52,451,48,447,59,436,109,376,150,321"/>
+<area shape="rect" id="Node000012" href="$stringbuffertest_8cpp.html#a7655c9b98a62e2c2baf27f414edea796" title=" " alt="" coords="5,499,61,524"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="161,326,120,403,93,447,63,489,53,500,49,496,59,486,89,444,116,401,157,324"/>
+<area shape="rect" id="Node000013" href="$writertest_8cpp.html#aa264cd0f1fed39bec0fc98c9a9c45229" title=" " alt="" coords="5,548,61,574"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="166,326,127,425,98,483,63,538,53,549,49,546,59,535,93,481,122,423,161,324"/>
+</map>

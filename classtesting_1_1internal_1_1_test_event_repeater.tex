@@ -1,0 +1,368 @@
+\doxysection{testing\+::internal\+::Test\+Event\+Repeater Class Reference}
+\hypertarget{classtesting_1_1internal_1_1_test_event_repeater}{}\label{classtesting_1_1internal_1_1_test_event_repeater}\index{testing::internal::TestEventRepeater@{testing::internal::TestEventRepeater}}
+
+
+Inheritance diagram for testing\+::internal\+::Test\+Event\+Repeater\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=210pt]{classtesting_1_1internal_1_1_test_event_repeater__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for testing\+::internal\+::Test\+Event\+Repeater\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=210pt]{classtesting_1_1internal_1_1_test_event_repeater__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_test_event_repeater_a97dc3b08bd62c615f16e4c73ed0b3894}{Test\+Event\+Repeater}} ()
+\item 
+virtual \mbox{\hyperlink{classtesting_1_1internal_1_1_test_event_repeater_a0f7129002fc4a33e29ce76a3b6df8d1b}{\texorpdfstring{$\sim$}{\string~}\+Test\+Event\+Repeater}} ()
+\item 
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_test_event_repeater_ad154ce021881721a5c46994316b14cb1}{Append}} (\mbox{\hyperlink{classtesting_1_1_test_event_listener}{Test\+Event\+Listener}} \texorpdfstring{$\ast$}{*}listener)
+\item 
+\mbox{\hyperlink{classtesting_1_1_test_event_listener}{Test\+Event\+Listener}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classtesting_1_1internal_1_1_test_event_repeater_ac77a3d127e4726e11694e4ee9cf3b793}{Release}} (\mbox{\hyperlink{classtesting_1_1_test_event_listener}{Test\+Event\+Listener}} \texorpdfstring{$\ast$}{*}listener)
+\item 
+bool \mbox{\hyperlink{classtesting_1_1internal_1_1_test_event_repeater_abaf2bfc453fc0e1005fcfb0f95deac4c}{forwarding\+\_\+enabled}} () const
+\item 
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_test_event_repeater_a86c52e311b70598a385a0589277e92e0}{set\+\_\+forwarding\+\_\+enabled}} (bool enable)
+\item 
+virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_test_event_repeater_a15ee2ff051063088d3a89a266d5ffcc4}{On\+Test\+Program\+Start}} (const \mbox{\hyperlink{classtesting_1_1_unit_test}{Unit\+Test}} \&unit\+\_\+test)
+\item 
+virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_test_event_repeater_a4062b3f070bb6531ab8494c13d3635d3}{On\+Test\+Iteration\+Start}} (const \mbox{\hyperlink{classtesting_1_1_unit_test}{Unit\+Test}} \&unit\+\_\+test, int iteration)
+\item 
+virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_test_event_repeater_ae71819925adec0471fa7abc5072b8244}{On\+Environments\+Set\+Up\+Start}} (const \mbox{\hyperlink{classtesting_1_1_unit_test}{Unit\+Test}} \&unit\+\_\+test)
+\item 
+virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_test_event_repeater_a3a92696df942dc92f985e52fddd6d303}{On\+Environments\+Set\+Up\+End}} (const \mbox{\hyperlink{classtesting_1_1_unit_test}{Unit\+Test}} \&unit\+\_\+test)
+\item 
+virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_test_event_repeater_a70124c738caa338bcd723eb2a51c8b3e}{On\+Test\+Case\+Start}} (const \mbox{\hyperlink{classtesting_1_1_test_case}{Test\+Case}} \&test\+\_\+case)
+\item 
+virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_test_event_repeater_a70d694ca5010cc86cd458f7f529e6fbe}{On\+Test\+Start}} (const \mbox{\hyperlink{classtesting_1_1_test_info}{Test\+Info}} \&test\+\_\+info)
+\item 
+virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_test_event_repeater_ac8fb21da6802b1ebab9cad3eee9150eb}{On\+Test\+Part\+Result}} (const \mbox{\hyperlink{classtesting_1_1_test_part_result}{Test\+Part\+Result}} \&result)
+\item 
+virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_test_event_repeater_aa0f13bded9369aae1c78583d7276f8b1}{On\+Test\+End}} (const \mbox{\hyperlink{classtesting_1_1_test_info}{Test\+Info}} \&test\+\_\+info)
+\item 
+virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_test_event_repeater_a0a335e1c3957a8c699ed56e37ea7b978}{On\+Test\+Case\+End}} (const \mbox{\hyperlink{classtesting_1_1_test_case}{Test\+Case}} \&test\+\_\+case)
+\item 
+virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_test_event_repeater_a30db75df2d9a65d787f31e16004613c2}{On\+Environments\+Tear\+Down\+Start}} (const \mbox{\hyperlink{classtesting_1_1_unit_test}{Unit\+Test}} \&unit\+\_\+test)
+\item 
+virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_test_event_repeater_a8428220c4cf9f0cea2dfd9a70f07ab7f}{On\+Environments\+Tear\+Down\+End}} (const \mbox{\hyperlink{classtesting_1_1_unit_test}{Unit\+Test}} \&unit\+\_\+test)
+\item 
+virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_test_event_repeater_a94253e3c11753328e8a031f39352708f}{On\+Test\+Iteration\+End}} (const \mbox{\hyperlink{classtesting_1_1_unit_test}{Unit\+Test}} \&unit\+\_\+test, int iteration)
+\item 
+virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_test_event_repeater_a4622616259747dbcc23f5ee39ef99ec0}{On\+Test\+Program\+End}} (const \mbox{\hyperlink{classtesting_1_1_unit_test}{Unit\+Test}} \&unit\+\_\+test)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classtesting_1_1_test_event_listener}{testing\+::\+Test\+Event\+Listener}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{classtesting_1_1_test_event_listener_a4512d19e7a108ec4926239ec1ea85d63}{\texorpdfstring{$\sim$}{\string~}\+Test\+Event\+Listener}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{gtest_8cc_source_l03279}{3279}} of file \mbox{\hyperlink{gtest_8cc_source}{gtest.\+cc}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_test_event_repeater_a97dc3b08bd62c615f16e4c73ed0b3894}\index{testing::internal::TestEventRepeater@{testing::internal::TestEventRepeater}!TestEventRepeater@{TestEventRepeater}}
+\index{TestEventRepeater@{TestEventRepeater}!testing::internal::TestEventRepeater@{testing::internal::TestEventRepeater}}
+\doxysubsubsection{\texorpdfstring{TestEventRepeater()}{TestEventRepeater()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_test_event_repeater_a97dc3b08bd62c615f16e4c73ed0b3894} 
+testing\+::internal\+::\+Test\+Event\+Repeater\+::\+Test\+Event\+Repeater (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8cc_source_l03281}{3281}} of file \mbox{\hyperlink{gtest_8cc_source}{gtest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03281\ :\ forwarding\_enabled\_(\textcolor{keyword}{true})\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1internal_1_1_test_event_repeater_a0f7129002fc4a33e29ce76a3b6df8d1b}\index{testing::internal::TestEventRepeater@{testing::internal::TestEventRepeater}!````~TestEventRepeater@{\texorpdfstring{$\sim$}{\string~}TestEventRepeater}}
+\index{````~TestEventRepeater@{\texorpdfstring{$\sim$}{\string~}TestEventRepeater}!testing::internal::TestEventRepeater@{testing::internal::TestEventRepeater}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}TestEventRepeater()}{\string~TestEventRepeater()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_test_event_repeater_a0f7129002fc4a33e29ce76a3b6df8d1b} 
+testing\+::internal\+::\+Test\+Event\+Repeater\+::\texorpdfstring{$\sim$}{\string~}\+Test\+Event\+Repeater (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8cc_source_l03315}{3315}} of file \mbox{\hyperlink{gtest_8cc_source}{gtest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03315\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{03316\ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a52f5504ed65d116201ccb8f99a44fd7e}{ForEach}}(listeners\_,\ Delete<TestEventListener>);}
+\DoxyCodeLine{03317\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=311pt]{classtesting_1_1internal_1_1_test_event_repeater_a0f7129002fc4a33e29ce76a3b6df8d1b_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_test_event_repeater_ad154ce021881721a5c46994316b14cb1}\index{testing::internal::TestEventRepeater@{testing::internal::TestEventRepeater}!Append@{Append}}
+\index{Append@{Append}!testing::internal::TestEventRepeater@{testing::internal::TestEventRepeater}}
+\doxysubsubsection{\texorpdfstring{Append()}{Append()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_test_event_repeater_ad154ce021881721a5c46994316b14cb1} 
+void testing\+::internal\+::\+Test\+Event\+Repeater\+::\+Append (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classtesting_1_1_test_event_listener}{Test\+Event\+Listener}} \texorpdfstring{$\ast$}{*}}]{listener}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8cc_source_l03319}{3319}} of file \mbox{\hyperlink{gtest_8cc_source}{gtest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03319\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{03320\ \ \ listeners\_.push\_back(listener);}
+\DoxyCodeLine{03321\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_test_event_repeater_ad154ce021881721a5c46994316b14cb1_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_test_event_repeater_abaf2bfc453fc0e1005fcfb0f95deac4c}\index{testing::internal::TestEventRepeater@{testing::internal::TestEventRepeater}!forwarding\_enabled@{forwarding\_enabled}}
+\index{forwarding\_enabled@{forwarding\_enabled}!testing::internal::TestEventRepeater@{testing::internal::TestEventRepeater}}
+\doxysubsubsection{\texorpdfstring{forwarding\_enabled()}{forwarding\_enabled()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_test_event_repeater_abaf2bfc453fc0e1005fcfb0f95deac4c} 
+bool testing\+::internal\+::\+Test\+Event\+Repeater\+::forwarding\+\_\+enabled (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8cc_source_l03288}{3288}} of file \mbox{\hyperlink{gtest_8cc_source}{gtest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03288\ \{\ \textcolor{keywordflow}{return}\ forwarding\_enabled\_;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1internal_1_1_test_event_repeater_a3a92696df942dc92f985e52fddd6d303}\index{testing::internal::TestEventRepeater@{testing::internal::TestEventRepeater}!OnEnvironmentsSetUpEnd@{OnEnvironmentsSetUpEnd}}
+\index{OnEnvironmentsSetUpEnd@{OnEnvironmentsSetUpEnd}!testing::internal::TestEventRepeater@{testing::internal::TestEventRepeater}}
+\doxysubsubsection{\texorpdfstring{OnEnvironmentsSetUpEnd()}{OnEnvironmentsSetUpEnd()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_test_event_repeater_a3a92696df942dc92f985e52fddd6d303} 
+virtual void testing\+::internal\+::\+Test\+Event\+Repeater\+::\+On\+Environments\+Set\+Up\+End (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classtesting_1_1_unit_test}{Unit\+Test}} \&}]{unit\+\_\+test}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classtesting_1_1_test_event_listener_aaa1021d75f5dbf3f05c829c1cc520341}{testing\+::\+Test\+Event\+Listener}}.
+
+\Hypertarget{classtesting_1_1internal_1_1_test_event_repeater_ae71819925adec0471fa7abc5072b8244}\index{testing::internal::TestEventRepeater@{testing::internal::TestEventRepeater}!OnEnvironmentsSetUpStart@{OnEnvironmentsSetUpStart}}
+\index{OnEnvironmentsSetUpStart@{OnEnvironmentsSetUpStart}!testing::internal::TestEventRepeater@{testing::internal::TestEventRepeater}}
+\doxysubsubsection{\texorpdfstring{OnEnvironmentsSetUpStart()}{OnEnvironmentsSetUpStart()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_test_event_repeater_ae71819925adec0471fa7abc5072b8244} 
+virtual void testing\+::internal\+::\+Test\+Event\+Repeater\+::\+On\+Environments\+Set\+Up\+Start (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classtesting_1_1_unit_test}{Unit\+Test}} \&}]{unit\+\_\+test}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classtesting_1_1_test_event_listener_aa6502e534919605be45f26a6daf9a40c}{testing\+::\+Test\+Event\+Listener}}.
+
+\Hypertarget{classtesting_1_1internal_1_1_test_event_repeater_a8428220c4cf9f0cea2dfd9a70f07ab7f}\index{testing::internal::TestEventRepeater@{testing::internal::TestEventRepeater}!OnEnvironmentsTearDownEnd@{OnEnvironmentsTearDownEnd}}
+\index{OnEnvironmentsTearDownEnd@{OnEnvironmentsTearDownEnd}!testing::internal::TestEventRepeater@{testing::internal::TestEventRepeater}}
+\doxysubsubsection{\texorpdfstring{OnEnvironmentsTearDownEnd()}{OnEnvironmentsTearDownEnd()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_test_event_repeater_a8428220c4cf9f0cea2dfd9a70f07ab7f} 
+virtual void testing\+::internal\+::\+Test\+Event\+Repeater\+::\+On\+Environments\+Tear\+Down\+End (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classtesting_1_1_unit_test}{Unit\+Test}} \&}]{unit\+\_\+test}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classtesting_1_1_test_event_listener_a9ea04fa7f447865ba76df35e12ba2092}{testing\+::\+Test\+Event\+Listener}}.
+
+\Hypertarget{classtesting_1_1internal_1_1_test_event_repeater_a30db75df2d9a65d787f31e16004613c2}\index{testing::internal::TestEventRepeater@{testing::internal::TestEventRepeater}!OnEnvironmentsTearDownStart@{OnEnvironmentsTearDownStart}}
+\index{OnEnvironmentsTearDownStart@{OnEnvironmentsTearDownStart}!testing::internal::TestEventRepeater@{testing::internal::TestEventRepeater}}
+\doxysubsubsection{\texorpdfstring{OnEnvironmentsTearDownStart()}{OnEnvironmentsTearDownStart()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_test_event_repeater_a30db75df2d9a65d787f31e16004613c2} 
+virtual void testing\+::internal\+::\+Test\+Event\+Repeater\+::\+On\+Environments\+Tear\+Down\+Start (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classtesting_1_1_unit_test}{Unit\+Test}} \&}]{unit\+\_\+test}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classtesting_1_1_test_event_listener_a468b5e6701bcb86cb2c956caadbba5e4}{testing\+::\+Test\+Event\+Listener}}.
+
+\Hypertarget{classtesting_1_1internal_1_1_test_event_repeater_a0a335e1c3957a8c699ed56e37ea7b978}\index{testing::internal::TestEventRepeater@{testing::internal::TestEventRepeater}!OnTestCaseEnd@{OnTestCaseEnd}}
+\index{OnTestCaseEnd@{OnTestCaseEnd}!testing::internal::TestEventRepeater@{testing::internal::TestEventRepeater}}
+\doxysubsubsection{\texorpdfstring{OnTestCaseEnd()}{OnTestCaseEnd()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_test_event_repeater_a0a335e1c3957a8c699ed56e37ea7b978} 
+virtual void testing\+::internal\+::\+Test\+Event\+Repeater\+::\+On\+Test\+Case\+End (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classtesting_1_1_test_case}{Test\+Case}} \&}]{test\+\_\+case}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classtesting_1_1_test_event_listener_ae61985e2ef76ac78379b077be57a9c36}{testing\+::\+Test\+Event\+Listener}}.
+
+\Hypertarget{classtesting_1_1internal_1_1_test_event_repeater_a70124c738caa338bcd723eb2a51c8b3e}\index{testing::internal::TestEventRepeater@{testing::internal::TestEventRepeater}!OnTestCaseStart@{OnTestCaseStart}}
+\index{OnTestCaseStart@{OnTestCaseStart}!testing::internal::TestEventRepeater@{testing::internal::TestEventRepeater}}
+\doxysubsubsection{\texorpdfstring{OnTestCaseStart()}{OnTestCaseStart()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_test_event_repeater_a70124c738caa338bcd723eb2a51c8b3e} 
+virtual void testing\+::internal\+::\+Test\+Event\+Repeater\+::\+On\+Test\+Case\+Start (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classtesting_1_1_test_case}{Test\+Case}} \&}]{test\+\_\+case}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classtesting_1_1_test_event_listener_ab4ed885d63f5bbff8076c1329b3dfe36}{testing\+::\+Test\+Event\+Listener}}.
+
+\Hypertarget{classtesting_1_1internal_1_1_test_event_repeater_aa0f13bded9369aae1c78583d7276f8b1}\index{testing::internal::TestEventRepeater@{testing::internal::TestEventRepeater}!OnTestEnd@{OnTestEnd}}
+\index{OnTestEnd@{OnTestEnd}!testing::internal::TestEventRepeater@{testing::internal::TestEventRepeater}}
+\doxysubsubsection{\texorpdfstring{OnTestEnd()}{OnTestEnd()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_test_event_repeater_aa0f13bded9369aae1c78583d7276f8b1} 
+virtual void testing\+::internal\+::\+Test\+Event\+Repeater\+::\+On\+Test\+End (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classtesting_1_1_test_info}{Test\+Info}} \&}]{test\+\_\+info}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classtesting_1_1_test_event_listener_abb1c44525ef038500608b5dc2f17099b}{testing\+::\+Test\+Event\+Listener}}.
+
+\Hypertarget{classtesting_1_1internal_1_1_test_event_repeater_a94253e3c11753328e8a031f39352708f}\index{testing::internal::TestEventRepeater@{testing::internal::TestEventRepeater}!OnTestIterationEnd@{OnTestIterationEnd}}
+\index{OnTestIterationEnd@{OnTestIterationEnd}!testing::internal::TestEventRepeater@{testing::internal::TestEventRepeater}}
+\doxysubsubsection{\texorpdfstring{OnTestIterationEnd()}{OnTestIterationEnd()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_test_event_repeater_a94253e3c11753328e8a031f39352708f} 
+void testing\+::internal\+::\+Test\+Event\+Repeater\+::\+On\+Test\+Iteration\+End (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classtesting_1_1_unit_test}{Unit\+Test}} \&}]{unit\+\_\+test}{, }\item[{int}]{iteration}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classtesting_1_1_test_event_listener_a550fdb3e55726e4cefa09f5697941425}{testing\+::\+Test\+Event\+Listener}}.
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8cc_source_l03380}{3380}} of file \mbox{\hyperlink{gtest_8cc_source}{gtest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03381\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{03382\ \ \ \textcolor{keywordflow}{if}\ (forwarding\_enabled\_)\ \{}
+\DoxyCodeLine{03383\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(listeners\_.size())\ -\/\ 1;\ i\ >=\ 0;\ i-\/-\/)\ \{}
+\DoxyCodeLine{03384\ \ \ \ \ \ \ listeners\_[i]-\/>OnTestIterationEnd(unit\_test,\ iteration);}
+\DoxyCodeLine{03385\ \ \ \ \ \}}
+\DoxyCodeLine{03386\ \ \ \}}
+\DoxyCodeLine{03387\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1internal_1_1_test_event_repeater_a4062b3f070bb6531ab8494c13d3635d3}\index{testing::internal::TestEventRepeater@{testing::internal::TestEventRepeater}!OnTestIterationStart@{OnTestIterationStart}}
+\index{OnTestIterationStart@{OnTestIterationStart}!testing::internal::TestEventRepeater@{testing::internal::TestEventRepeater}}
+\doxysubsubsection{\texorpdfstring{OnTestIterationStart()}{OnTestIterationStart()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_test_event_repeater_a4062b3f070bb6531ab8494c13d3635d3} 
+void testing\+::internal\+::\+Test\+Event\+Repeater\+::\+On\+Test\+Iteration\+Start (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classtesting_1_1_unit_test}{Unit\+Test}} \&}]{unit\+\_\+test}{, }\item[{int}]{iteration}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classtesting_1_1_test_event_listener_a60cc09b7907cb329d152eb5e7133bdeb}{testing\+::\+Test\+Event\+Listener}}.
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8cc_source_l03371}{3371}} of file \mbox{\hyperlink{gtest_8cc_source}{gtest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03372\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{03373\ \ \ \textcolor{keywordflow}{if}\ (forwarding\_enabled\_)\ \{}
+\DoxyCodeLine{03374\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ listeners\_.size();\ i++)\ \{}
+\DoxyCodeLine{03375\ \ \ \ \ \ \ listeners\_[i]-\/>OnTestIterationStart(unit\_test,\ iteration);}
+\DoxyCodeLine{03376\ \ \ \ \ \}}
+\DoxyCodeLine{03377\ \ \ \}}
+\DoxyCodeLine{03378\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1internal_1_1_test_event_repeater_ac8fb21da6802b1ebab9cad3eee9150eb}\index{testing::internal::TestEventRepeater@{testing::internal::TestEventRepeater}!OnTestPartResult@{OnTestPartResult}}
+\index{OnTestPartResult@{OnTestPartResult}!testing::internal::TestEventRepeater@{testing::internal::TestEventRepeater}}
+\doxysubsubsection{\texorpdfstring{OnTestPartResult()}{OnTestPartResult()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_test_event_repeater_ac8fb21da6802b1ebab9cad3eee9150eb} 
+virtual void testing\+::internal\+::\+Test\+Event\+Repeater\+::\+On\+Test\+Part\+Result (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classtesting_1_1_test_part_result}{Test\+Part\+Result}} \&}]{result}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classtesting_1_1_test_event_listener_a054f8705c883fa120b91473aff38f2ee}{testing\+::\+Test\+Event\+Listener}}.
+
+\Hypertarget{classtesting_1_1internal_1_1_test_event_repeater_a4622616259747dbcc23f5ee39ef99ec0}\index{testing::internal::TestEventRepeater@{testing::internal::TestEventRepeater}!OnTestProgramEnd@{OnTestProgramEnd}}
+\index{OnTestProgramEnd@{OnTestProgramEnd}!testing::internal::TestEventRepeater@{testing::internal::TestEventRepeater}}
+\doxysubsubsection{\texorpdfstring{OnTestProgramEnd()}{OnTestProgramEnd()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_test_event_repeater_a4622616259747dbcc23f5ee39ef99ec0} 
+virtual void testing\+::internal\+::\+Test\+Event\+Repeater\+::\+On\+Test\+Program\+End (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classtesting_1_1_unit_test}{Unit\+Test}} \&}]{unit\+\_\+test}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classtesting_1_1_test_event_listener_ad15b6246d94c268e233487a86463ef3d}{testing\+::\+Test\+Event\+Listener}}.
+
+\Hypertarget{classtesting_1_1internal_1_1_test_event_repeater_a15ee2ff051063088d3a89a266d5ffcc4}\index{testing::internal::TestEventRepeater@{testing::internal::TestEventRepeater}!OnTestProgramStart@{OnTestProgramStart}}
+\index{OnTestProgramStart@{OnTestProgramStart}!testing::internal::TestEventRepeater@{testing::internal::TestEventRepeater}}
+\doxysubsubsection{\texorpdfstring{OnTestProgramStart()}{OnTestProgramStart()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_test_event_repeater_a15ee2ff051063088d3a89a266d5ffcc4} 
+virtual void testing\+::internal\+::\+Test\+Event\+Repeater\+::\+On\+Test\+Program\+Start (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classtesting_1_1_unit_test}{Unit\+Test}} \&}]{unit\+\_\+test}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classtesting_1_1_test_event_listener_a5f6c84f39851e8a603a2d2e10063816b}{testing\+::\+Test\+Event\+Listener}}.
+
+\Hypertarget{classtesting_1_1internal_1_1_test_event_repeater_a70d694ca5010cc86cd458f7f529e6fbe}\index{testing::internal::TestEventRepeater@{testing::internal::TestEventRepeater}!OnTestStart@{OnTestStart}}
+\index{OnTestStart@{OnTestStart}!testing::internal::TestEventRepeater@{testing::internal::TestEventRepeater}}
+\doxysubsubsection{\texorpdfstring{OnTestStart()}{OnTestStart()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_test_event_repeater_a70d694ca5010cc86cd458f7f529e6fbe} 
+virtual void testing\+::internal\+::\+Test\+Event\+Repeater\+::\+On\+Test\+Start (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classtesting_1_1_test_info}{Test\+Info}} \&}]{test\+\_\+info}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classtesting_1_1_test_event_listener_ab4f6a0ca16ae75daf385b3b5914e1048}{testing\+::\+Test\+Event\+Listener}}.
+
+\Hypertarget{classtesting_1_1internal_1_1_test_event_repeater_ac77a3d127e4726e11694e4ee9cf3b793}\index{testing::internal::TestEventRepeater@{testing::internal::TestEventRepeater}!Release@{Release}}
+\index{Release@{Release}!testing::internal::TestEventRepeater@{testing::internal::TestEventRepeater}}
+\doxysubsubsection{\texorpdfstring{Release()}{Release()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_test_event_repeater_ac77a3d127e4726e11694e4ee9cf3b793} 
+\mbox{\hyperlink{classtesting_1_1_test_event_listener}{Test\+Event\+Listener}} \texorpdfstring{$\ast$}{*} testing\+::internal\+::\+Test\+Event\+Repeater\+::\+Release (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classtesting_1_1_test_event_listener}{Test\+Event\+Listener}} \texorpdfstring{$\ast$}{*}}]{listener}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8cc_source_l03324}{3324}} of file \mbox{\hyperlink{gtest_8cc_source}{gtest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03324\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{03325\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ listeners\_.size();\ ++i)\ \{}
+\DoxyCodeLine{03326\ \ \ \ \ \textcolor{keywordflow}{if}\ (listeners\_[i]\ ==\ listener)\ \{}
+\DoxyCodeLine{03327\ \ \ \ \ \ \ listeners\_.erase(listeners\_.begin()\ +\ i);}
+\DoxyCodeLine{03328\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ listener;}
+\DoxyCodeLine{03329\ \ \ \ \ \}}
+\DoxyCodeLine{03330\ \ \ \}}
+\DoxyCodeLine{03331\ }
+\DoxyCodeLine{03332\ \ \ \textcolor{keywordflow}{return}\ NULL;}
+\DoxyCodeLine{03333\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_test_event_repeater_ac77a3d127e4726e11694e4ee9cf3b793_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_test_event_repeater_a86c52e311b70598a385a0589277e92e0}\index{testing::internal::TestEventRepeater@{testing::internal::TestEventRepeater}!set\_forwarding\_enabled@{set\_forwarding\_enabled}}
+\index{set\_forwarding\_enabled@{set\_forwarding\_enabled}!testing::internal::TestEventRepeater@{testing::internal::TestEventRepeater}}
+\doxysubsubsection{\texorpdfstring{set\_forwarding\_enabled()}{set\_forwarding\_enabled()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_test_event_repeater_a86c52e311b70598a385a0589277e92e0} 
+void testing\+::internal\+::\+Test\+Event\+Repeater\+::set\+\_\+forwarding\+\_\+enabled (\begin{DoxyParamCaption}\item[{bool}]{enable}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8cc_source_l03289}{3289}} of file \mbox{\hyperlink{gtest_8cc_source}{gtest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03289\ \{\ forwarding\_enabled\_\ =\ enable;\ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/src/\mbox{\hyperlink{gtest_8cc}{gtest.\+cc}}\end{DoxyCompactItemize}

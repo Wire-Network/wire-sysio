@@ -1,0 +1,7 @@
+<map id="sysio::chain::webassembly::interface::get_account_creation_time" name="sysio::chain::webassembly::interface::get_account_creation_time">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,20,185,75"/>
+<area shape="rect" id="Node000002" href="$classfc_1_1microseconds.html#a20fba59ec7e1f50c6b8f2c9443cc9b92" title=" " alt="" coords="233,5,394,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="185,33,217,28,218,34,186,38"/>
+<area shape="rect" id="Node000003" href="$classfc_1_1time__point.html#abfea5efbe9ef58024cda814395ee9945" title=" " alt="" coords="247,55,380,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="186,56,232,62,231,68,185,62"/>
+</map>

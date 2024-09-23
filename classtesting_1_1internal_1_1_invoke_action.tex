@@ -1,0 +1,68 @@
+\doxysection{testing\+::internal\+::Invoke\+Action\texorpdfstring{$<$}{<} Function\+Impl \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classtesting_1_1internal_1_1_invoke_action}{}\label{classtesting_1_1internal_1_1_invoke_action}\index{testing::internal::InvokeAction$<$ FunctionImpl $>$@{testing::internal::InvokeAction$<$ FunctionImpl $>$}}
+
+
+{\ttfamily \#include $<$gmock-\/more-\/actions.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_invoke_action_a786ce772624fc87a31891f465df7ce61}{Invoke\+Action}} (Function\+Impl function\+\_\+impl)
+\item 
+{\footnotesize template$<$typename Result , typename Argument\+Tuple $>$ }\\Result \mbox{\hyperlink{classtesting_1_1internal_1_1_invoke_action_af357ce691795b3520de1fda4ab8af8b2}{Perform}} (const Argument\+Tuple \&args)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Function\+Impl$>$\newline
+class testing\+::internal\+::\+Invoke\+Action$<$ Function\+Impl $>$}
+
+
+Definition at line \mbox{\hyperlink{gmock-more-actions_8h_source_l00052}{52}} of file \mbox{\hyperlink{gmock-more-actions_8h_source}{gmock-\/more-\/actions.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_invoke_action_a786ce772624fc87a31891f465df7ce61}\index{testing::internal::InvokeAction$<$ FunctionImpl $>$@{testing::internal::InvokeAction$<$ FunctionImpl $>$}!InvokeAction@{InvokeAction}}
+\index{InvokeAction@{InvokeAction}!testing::internal::InvokeAction$<$ FunctionImpl $>$@{testing::internal::InvokeAction$<$ FunctionImpl $>$}}
+\doxysubsubsection{\texorpdfstring{InvokeAction()}{InvokeAction()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_invoke_action_a786ce772624fc87a31891f465df7ce61} 
+template$<$typename Function\+Impl $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_invoke_action}{testing\+::internal\+::\+Invoke\+Action}}$<$ Function\+Impl $>$\+::\+Invoke\+Action (\begin{DoxyParamCaption}\item[{Function\+Impl}]{function\+\_\+impl}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-more-actions_8h_source_l00056}{56}} of file \mbox{\hyperlink{gmock-more-actions_8h_source}{gmock-\/more-\/actions.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ :\ function\_impl\_(function\_impl)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_invoke_action_af357ce691795b3520de1fda4ab8af8b2}\index{testing::internal::InvokeAction$<$ FunctionImpl $>$@{testing::internal::InvokeAction$<$ FunctionImpl $>$}!Perform@{Perform}}
+\index{Perform@{Perform}!testing::internal::InvokeAction$<$ FunctionImpl $>$@{testing::internal::InvokeAction$<$ FunctionImpl $>$}}
+\doxysubsubsection{\texorpdfstring{Perform()}{Perform()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_invoke_action_af357ce691795b3520de1fda4ab8af8b2} 
+template$<$typename Function\+Impl $>$ \\
+template$<$typename Result , typename Argument\+Tuple $>$ \\
+Result \mbox{\hyperlink{classtesting_1_1internal_1_1_invoke_action}{testing\+::internal\+::\+Invoke\+Action}}$<$ Function\+Impl $>$\+::\+Perform (\begin{DoxyParamCaption}\item[{const Argument\+Tuple \&}]{args}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-more-actions_8h_source_l00060}{60}} of file \mbox{\hyperlink{gmock-more-actions_8h_source}{gmock-\/more-\/actions.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00061\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_invoke_helper}{InvokeHelper<Result,\ ArgumentTuple>::Invoke}}(function\_impl\_,\ args);}
+\DoxyCodeLine{00062\ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/include/gmock/\mbox{\hyperlink{gmock-more-actions_8h}{gmock-\/more-\/actions.\+h}}\end{DoxyCompactItemize}

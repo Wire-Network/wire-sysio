@@ -1,0 +1,89 @@
+\doxysection{powup\+\_\+results Class Reference}
+\hypertarget{classpowup__results}{}\label{classpowup__results}\index{powup\_results@{powup\_results}}
+
+
+{\ttfamily \#include $<$powerup.\+results.\+hpp$>$}
+
+
+
+Inheritance diagram for powup\+\_\+results\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=159pt]{classpowup__results__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for powup\+\_\+results\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=159pt]{classpowup__results__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{classpowup__results_ae4f1bef5f6315e7d3e2757279c22d23e}{powupresult\+\_\+action}} = action\+\_\+wrapper$<$"{}powupresult"{}\+\_\+n, \&\mbox{\hyperlink{classpowup__results_a92bf8a4505d35524f2708a7984d5df59}{powup\+\_\+results\+::powupresult}}$>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{classpowup__results_a92bf8a4505d35524f2708a7984d5df59}{powupresult}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&fee, const \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} powup\+\_\+net, const \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} powup\+\_\+cpu)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+The action {\ttfamily powupresult} is a no-\/op. It is added as an inline convenience action to {\ttfamily powerup} reservation. This inline convenience action does not have any effect, however, its data includes the result of the parent action and appears in its trace. 
+
+Definition at line \mbox{\hyperlink{powerup_8results_8hpp_source_l00017}{17}} of file \mbox{\hyperlink{powerup_8results_8hpp_source}{powerup.\+results.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classpowup__results_ae4f1bef5f6315e7d3e2757279c22d23e}\index{powup\_results@{powup\_results}!powupresult\_action@{powupresult\_action}}
+\index{powupresult\_action@{powupresult\_action}!powup\_results@{powup\_results}}
+\doxysubsubsection{\texorpdfstring{powupresult\_action}{powupresult\_action}}
+{\footnotesize\ttfamily \label{classpowup__results_ae4f1bef5f6315e7d3e2757279c22d23e} 
+using \mbox{\hyperlink{classpowup__results_ae4f1bef5f6315e7d3e2757279c22d23e}{powup\+\_\+results\+::powupresult\+\_\+action}} = action\+\_\+wrapper$<$"{}powupresult"{}\+\_\+n, \&\mbox{\hyperlink{classpowup__results_a92bf8a4505d35524f2708a7984d5df59}{powup\+\_\+results\+::powupresult}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{powerup_8results_8hpp_source_l00032}{32}} of file \mbox{\hyperlink{powerup_8results_8hpp_source}{powerup.\+results.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classpowup__results_a92bf8a4505d35524f2708a7984d5df59}\index{powup\_results@{powup\_results}!powupresult@{powupresult}}
+\index{powupresult@{powupresult}!powup\_results@{powup\_results}}
+\doxysubsubsection{\texorpdfstring{powupresult()}{powupresult()}}
+{\footnotesize\ttfamily \label{classpowup__results_a92bf8a4505d35524f2708a7984d5df59} 
+void powup\+\_\+results\+::powupresult (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&}]{fee}{, }\item[{const \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}}]{powup\+\_\+net}{, }\item[{const \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}}]{powup\+\_\+cpu}{}\end{DoxyParamCaption})}
+
+powupresult action.
+
+
+\begin{DoxyParams}{Parameters}
+{\em fee} & -\/ powerup fee amount \\
+\hline
+{\em powup\+\_\+net} & -\/ amount of powup NET tokens \\
+\hline
+{\em powup\+\_\+cpu} & -\/ amount of powup CPU tokens \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{powerup_8results_8cpp_source_l00003}{3}} of file \mbox{\hyperlink{powerup_8results_8cpp_source}{powerup.\+results.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00003\ \{\ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/svetlasyrimis/\+Desktop/wire-\/network/\+WN-\/org/wire-\/system-\/contracts/contracts/sysio.\+system/include/sysio.\+system/\mbox{\hyperlink{powerup_8results_8hpp}{powerup.\+results.\+hpp}}\item 
+/\+Users/svetlasyrimis/\+Desktop/wire-\/network/\+WN-\/org/wire-\/system-\/contracts/contracts/sysio.\+system/src/\mbox{\hyperlink{powerup_8results_8cpp}{powerup.\+results.\+cpp}}\end{DoxyCompactItemize}

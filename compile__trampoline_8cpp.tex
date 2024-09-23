@@ -1,0 +1,37 @@
+\doxysection{libraries/chain/webassembly/runtimes/sys-\/vm-\/oc/compile\+\_\+trampoline.cpp File Reference}
+\hypertarget{compile__trampoline_8cpp}{}\label{compile__trampoline_8cpp}\index{libraries/chain/webassembly/runtimes/sys-\/vm-\/oc/compile\_trampoline.cpp@{libraries/chain/webassembly/runtimes/sys-\/vm-\/oc/compile\_trampoline.cpp}}
+{\ttfamily \#include $<$sysio/chain/webassembly/sys-\/vm-\/oc/ipc\+\_\+helpers.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/webassembly/sys-\/vm-\/oc/ipc\+\_\+protocol.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/webassembly/sys-\/vm-\/oc/memory.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/webassembly/sys-\/vm-\/oc/intrinsic.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/wasm\+\_\+sysio\+\_\+injection.\+hpp$>$}\newline
+{\ttfamily \#include $<$sys/prctl.\+h$>$}\newline
+{\ttfamily \#include $<$signal.\+h$>$}\newline
+{\ttfamily \#include $<$sys/resource.\+h$>$}\newline
+{\ttfamily \#include "{}IR/\+Module.\+h"{}}\newline
+{\ttfamily \#include "{}IR/\+Validate.\+h"{}}\newline
+{\ttfamily \#include "{}WASM/\+WASM.\+h"{}}\newline
+{\ttfamily \#include "{}LLVMJIT.\+h"{}}\newline
+Include dependency graph for compile\+\_\+trampoline.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{compile__trampoline_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain}{sysio\+::chain}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc}{sysio\+::chain\+::eosvmoc}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a356ff87ec1b70511eecbf910c40be3da}{sysio\+::chain\+::eosvmoc\+::run\+\_\+compile}} (\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1wrapped__fd}{wrapped\+\_\+fd}} \&\&response\+\_\+sock, \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1wrapped__fd}{wrapped\+\_\+fd}} \&\&wasm\+\_\+code) noexcept
+\item 
+void \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a2e87b8655afafc1e4d272347fa5afabd}{sysio\+::chain\+::eosvmoc\+::run\+\_\+compile\+\_\+trampoline}} (int fd)
+\end{DoxyCompactItemize}

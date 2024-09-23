@@ -1,0 +1,71 @@
+\doxysection{libraries/fc/libraries/ff/depends/xbyak/test/test\+\_\+mmx.cpp File Reference}
+\hypertarget{test__mmx_8cpp}{}\label{test__mmx_8cpp}\index{libraries/fc/libraries/ff/depends/xbyak/test/test\_mmx.cpp@{libraries/fc/libraries/ff/depends/xbyak/test/test\_mmx.cpp}}
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include "{}../../include.\+mie/mie\+\_\+thread.\+h"{}}\newline
+{\ttfamily \#include "{}xbyak/xbyak.\+h"{}}\newline
+Include dependency graph for test\+\_\+mmx.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__mmx_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{class_write_m_m_x}{Write\+MMX}}
+\item 
+class \mbox{\hyperlink{class_read_m_m_x}{Read\+MMX}}
+\item 
+class \mbox{\hyperlink{class_test}{Test}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{test__mmx_8cpp_a0ddf1224851353fc92bfbff6f499fa97}{main}} (int argc, char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}\mbox{[}$\,$\mbox{]})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{test__mmx_8cpp_a0ddf1224851353fc92bfbff6f499fa97}\index{test\_mmx.cpp@{test\_mmx.cpp}!main@{main}}
+\index{main@{main}!test\_mmx.cpp@{test\_mmx.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{test__mmx_8cpp_a0ddf1224851353fc92bfbff6f499fa97} 
+int main (\begin{DoxyParamCaption}\item[{int}]{argc}{, }\item[{char \texorpdfstring{$\ast$}{*}}]{argv}{\mbox{[}$\,$\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__mmx_8cpp_source_l00058}{58}} of file \mbox{\hyperlink{test__mmx_8cpp_source}{test\+\_\+mmx.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00059\ \{}
+\DoxyCodeLine{00060\ \textcolor{preprocessor}{\#ifdef\ XBYAK32}}
+\DoxyCodeLine{00061\ \ \ \ \ puts(\textcolor{stringliteral}{"{}32bit"{}});}
+\DoxyCodeLine{00062\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00063\ \ \ \ \ puts(\textcolor{stringliteral}{"{}64bit"{}});}
+\DoxyCodeLine{00064\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00065\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ n\ =\ atoi(argc\ ==\ 1\ ?\ \textcolor{stringliteral}{"{}1223"{}}\ :\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[1]);}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_test}{Test}}\ test0(n),\ \mbox{\hyperlink{archivertest_8cpp_a1440a7779ac56f47a3f355ce4a8c7da0}{test1}}(n\ +\ 1);}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ test0.beginThread();}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{archivertest_8cpp_a1440a7779ac56f47a3f355ce4a8c7da0}{test1}}.beginThread();}
+\DoxyCodeLine{00070\ }
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ test0.joinThread();}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{archivertest_8cpp_a1440a7779ac56f47a3f355ce4a8c7da0}{test1}}.joinThread();}
+\DoxyCodeLine{00073\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (std::exception\&\ e)\ \{}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}ERR:\%s\(\backslash\)n"{}},\ e.what());}
+\DoxyCodeLine{00075\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}unknown\ error\(\backslash\)n"{}});}
+\DoxyCodeLine{00077\ \ \ \ \ \}}
+\DoxyCodeLine{00078\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=337pt]{test__mmx_8cpp_a0ddf1224851353fc92bfbff6f499fa97_cgraph}
+\end{center}
+\end{figure}

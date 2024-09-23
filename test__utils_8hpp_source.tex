@@ -1,0 +1,17 @@
+\doxysection{test\+\_\+utils.\+hpp}
+\hypertarget{test__utils_8hpp_source}{}\label{test__utils_8hpp_source}\index{libraries/fc/test/crypto/test\_utils.hpp@{libraries/fc/test/crypto/test\_utils.hpp}}
+\mbox{\hyperlink{test__utils_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{test__utils_8hpp_source_l00001}\mbox{\hyperlink{test__utils_8hpp_a47b91eb796fa8eeaabeec08ffd54038a}{00001}}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{test__utils_8hpp_a47b91eb796fa8eeaabeec08ffd54038a}{to\_uint32}}(\textcolor{keyword}{const}\ std::string\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})\ \{}
+\DoxyCodeLine{\Hypertarget{test__utils_8hpp_source_l00002}00002\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.size();}
+\DoxyCodeLine{\Hypertarget{test__utils_8hpp_source_l00003}00003\ \ \ \ \ \textcolor{keywordflow}{return}\ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})std::stoul(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.c\_str(),\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}},\ 16);}
+\DoxyCodeLine{\Hypertarget{test__utils_8hpp_source_l00004}00004\ \}}
+\DoxyCodeLine{\Hypertarget{test__utils_8hpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{test__utils_8hpp_source_l00006}\mbox{\hyperlink{test__utils_8hpp_af42811e238a2a23276bd4200e2b40dde}{00006}}\ bytes\ \mbox{\hyperlink{test__utils_8hpp_af42811e238a2a23276bd4200e2b40dde}{to\_bytes}}(\textcolor{keyword}{const}\ std::string\&\ \mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}})\ \{}
+\DoxyCodeLine{\Hypertarget{test__utils_8hpp_source_l00007}00007\ \ \ \ \ BOOST\_REQUIRE(!(\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}}.length()\ \%\ 2));}
+\DoxyCodeLine{\Hypertarget{test__utils_8hpp_source_l00008}00008\ \ \ \ \ bytes\ output(\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}}.length()/2);}
+\DoxyCodeLine{\Hypertarget{test__utils_8hpp_source_l00009}00009\ \ \ \ \ \mbox{\hyperlink{namespacefc_a6a0fb5b79914774be4ab66462362b292}{fc::from\_hex}}(\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}},\ output.data(),\ output.size());}
+\DoxyCodeLine{\Hypertarget{test__utils_8hpp_source_l00010}00010\ \ \ \ \ \textcolor{keywordflow}{return}\ output;}
+\DoxyCodeLine{\Hypertarget{test__utils_8hpp_source_l00011}00011\ \}}
+
+\end{DoxyCode}

@@ -1,0 +1,5 @@
+<map id="sysio::net_plugin_impl::authenticate_peer" name="sysio::net_plugin_impl::authenticate_peer">
+<area shape="rect" id="Node000001" title="Determine if a peer is allowed to connect." alt="" coords="185,5,335,46"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1connection.html#a6969d80878d60791744f4ace46f1b806" title=" " alt="" coords="5,5,137,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="169,28,137,28,137,23,169,23"/>
+</map>

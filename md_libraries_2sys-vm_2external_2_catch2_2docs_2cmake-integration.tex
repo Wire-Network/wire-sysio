@@ -1,0 +1,208 @@
+\chapter{cmake-\/integration}
+\hypertarget{md_libraries_2sys-vm_2external_2_catch2_2docs_2cmake-integration}{}\label{md_libraries_2sys-vm_2external_2_catch2_2docs_2cmake-integration}\index{cmake-\/integration@{cmake-\/integration}}
+\label{_top}%
+ \doxysection*{CMake integration}
+
+{\bfseries{Contents}}~\newline
+ CMake target~\newline
+ Automatic test registration~\newline
+ CMake project options~\newline
+ Installing Catch2 from git repository~\newline
+
+
+Because we use CMake to build Catch2, we also provide a couple of integration points for our users.
+
+1) Catch2 exports a (namespaced) CMake target 2) Catch2\textquotesingle{}s repository contains CMake scripts for automatic registration of {\ttfamily TEST\+\_\+\+CASE}s in CTest
+
+\doxysubsection*{CMake target}
+
+Catch2\textquotesingle{}s CMake build exports an interface target {\ttfamily Catch2\+::\+Catch2}. Linking against it will add the proper include path and all necessary capabilities to the resulting binary.
+
+This means that if Catch2 has been installed on the system, it should be enough to do\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{find\_package(Catch2\ REQUIRED)}
+\DoxyCodeLine{target\_link\_libraries(tests\ Catch2::Catch2)}
+
+\end{DoxyCode}
+
+
+This target is also provided when Catch2 is used as a subdirectory. Assuming that Catch2 has been cloned to {\ttfamily lib/\+Catch2}\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{add\_subdirectory(lib/Catch2)}
+\DoxyCodeLine{target\_link\_libraries(tests\ Catch2::Catch2)}
+
+\end{DoxyCode}
+
+
+\doxysubsection*{Automatic test registration}
+
+Catch2\textquotesingle{}s repository also contains two CMake scripts that help users with automatically registering their {\ttfamily TEST\+\_\+\+CASE}s with CTest. They can be found in the {\ttfamily contrib} folder, and are
+
+1) {\ttfamily Catch.\+cmake} (and its dependency {\ttfamily Catch\+Add\+Tests.\+cmake}) 2) {\ttfamily Parse\+And\+Add\+Catch\+Tests.\+cmake}
+
+If Catch2 has been installed in system, both of these can be used after doing {\ttfamily find\+\_\+package(\+Catch2 REQUIRED)}. Otherwise you need to add them to your CMake module path.
+
+\doxysubsubsection*{{\ttfamily Catch.\+cmake} and {\ttfamily Catch\+Add\+Tests.\+cmake}}
+
+{\ttfamily Catch.\+cmake} provides function {\ttfamily catch\+\_\+discover\+\_\+tests} to get tests from a target. This function works by running the resulting executable with {\ttfamily -\/-\/list-\/test-\/names-\/only} flag, and then parsing the output to find all existing tests.
+
+\doxysubsubsubsection*{Usage}
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{cmake\_minimum\_required(VERSION\ 3.5)}
+\DoxyCodeLine{}
+\DoxyCodeLine{project(baz\ LANGUAGES\ CXX\ VERSION\ 0.0.1)}
+\DoxyCodeLine{}
+\DoxyCodeLine{find\_package(Catch2\ REQUIRED)}
+\DoxyCodeLine{add\_executable(foo\ test.cpp)}
+\DoxyCodeLine{target\_link\_libraries(foo\ Catch2::Catch2)}
+\DoxyCodeLine{}
+\DoxyCodeLine{include(CTest)}
+\DoxyCodeLine{include(Catch)}
+\DoxyCodeLine{catch\_discover\_tests(foo)}
+
+\end{DoxyCode}
+
+
+\doxysubsubsubsection*{Customization}
+
+{\ttfamily catch\+\_\+discover\+\_\+tests} can be given several extra argumets\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{catch\_discover\_tests(target}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [TEST\_SPEC\ arg1...]}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [EXTRA\_ARGS\ arg1...]}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [WORKING\_DIRECTORY\ dir]}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [TEST\_PREFIX\ prefix]}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [TEST\_SUFFIX\ suffix]}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [PROPERTIES\ name1\ value1...]}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [TEST\_LIST\ var]}
+\DoxyCodeLine{)}
+
+\end{DoxyCode}
+
+
+
+\begin{DoxyItemize}
+\item {\ttfamily TEST\+\_\+\+SPEC arg1...}
+\end{DoxyItemize}
+
+Specifies test cases, wildcarded test cases, tags and tag expressions to pass to the \doxylink{namespace_catch}{Catch} executable alongside the {\ttfamily -\/-\/list-\/test-\/names-\/only} flag.
+
+
+\begin{DoxyItemize}
+\item {\ttfamily EXTRA\+\_\+\+ARGS arg1...}
+\end{DoxyItemize}
+
+Any extra arguments to pass on the command line to each test case.
+
+
+\begin{DoxyItemize}
+\item {\ttfamily WORKING\+\_\+\+DIRECTORY dir}
+\end{DoxyItemize}
+
+Specifies the directory in which to run the discovered test cases. If this option is not provided, the current binary directory is used.
+
+
+\begin{DoxyItemize}
+\item {\ttfamily TEST\+\_\+\+PREFIX prefix}
+\end{DoxyItemize}
+
+Specifies a {\itshape prefix} to be added to the name of each discovered test case. This can be useful when the same test executable is being used in multiple calls to {\ttfamily catch\+\_\+discover\+\_\+tests()}, with different {\ttfamily TEST\+\_\+\+SPEC} or {\ttfamily EXTRA\+\_\+\+ARGS}.
+
+
+\begin{DoxyItemize}
+\item {\ttfamily TEST\+\_\+\+SUFFIX suffix}
+\end{DoxyItemize}
+
+Same as {\ttfamily TEST\+\_\+\+PREFIX}, except it specific the {\itshape suffix} for the test names. Both {\ttfamily TEST\+\_\+\+PREFIX} and {\ttfamily TEST\+\_\+\+SUFFIX} can be specified at the same time.
+
+
+\begin{DoxyItemize}
+\item {\ttfamily PROPERTIES name1 value1...}
+\end{DoxyItemize}
+
+Specifies additional properties to be set on all tests discovered by this invocation of {\ttfamily catch\+\_\+discover\+\_\+tests}.
+
+
+\begin{DoxyItemize}
+\item {\ttfamily TEST\+\_\+\+LIST var}
+\end{DoxyItemize}
+
+Make the list of tests available in the variable {\ttfamily var}, rather than the default {\ttfamily \texorpdfstring{$<$}{<}target\texorpdfstring{$>$}{>}\+\_\+\+TESTS}. This can be useful when the same test executable is being used in multiple calls to {\ttfamily catch\+\_\+discover\+\_\+tests()}. Note that this variable is only available in CTest.
+
+\doxysubsubsection*{{\ttfamily Parse\+And\+Add\+Catch\+Tests.\+cmake}}
+
+{\ttfamily Parse\+And\+Add\+Catch\+Tests} works by parsing all implementation files associated with the provided target, and registering them via CTest\textquotesingle{}s {\ttfamily add\+\_\+test}. This approach has some limitations, such as the fact that commented-\/out tests will be registered anyway.
+
+\doxysubsubsubsection*{Usage}
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{cmake\_minimum\_required(VERSION\ 3.5)}
+\DoxyCodeLine{}
+\DoxyCodeLine{project(baz\ LANGUAGES\ CXX\ VERSION\ 0.0.1)}
+\DoxyCodeLine{}
+\DoxyCodeLine{find\_package(Catch2\ REQUIRED)}
+\DoxyCodeLine{add\_executable(foo\ test.cpp)}
+\DoxyCodeLine{target\_link\_libraries(foo\ Catch2::Catch2)}
+\DoxyCodeLine{}
+\DoxyCodeLine{include(CTest)}
+\DoxyCodeLine{include(ParseAndAddCatchTests)}
+\DoxyCodeLine{ParseAndAddCatchTests(foo)}
+
+\end{DoxyCode}
+
+
+\doxysubsubsubsection*{Customization}
+
+{\ttfamily Parse\+And\+Add\+Catch\+Tests} provides some customization points\+:
+\begin{DoxyItemize}
+\item {\ttfamily PARSE\+\_\+\+CATCH\+\_\+\+TESTS\+\_\+\+VERBOSE} -- When {\ttfamily ON}, the script prints debug messages. Defaults to {\ttfamily OFF}.
+\item {\ttfamily PARSE\+\_\+\+CATCH\+\_\+\+TESTS\+\_\+\+NO\+\_\+\+HIDDEN\+\_\+\+TESTS} -- When {\ttfamily ON}, hidden tests (tests tagged with any of {\ttfamily \mbox{[}!hide\mbox{]}}, {\ttfamily \mbox{[}.\mbox{]}} or {\ttfamily \mbox{[}.foo\mbox{]}}) will not be registered. Defaults to {\ttfamily OFF}.
+\item {\ttfamily PARSE\+\_\+\+CATCH\+\_\+\+TESTS\+\_\+\+ADD\+\_\+\+FIXTURE\+\_\+\+IN\+\_\+\+TEST\+\_\+\+NAME} -- When {\ttfamily ON}, adds fixture class name to the test name in CTest. Defaults to {\ttfamily ON}.
+\item {\ttfamily PARSE\+\_\+\+CATCH\+\_\+\+TESTS\+\_\+\+ADD\+\_\+\+TARGET\+\_\+\+IN\+\_\+\+TEST\+\_\+\+NAME} -- When {\ttfamily ON}, adds target name to the test name in CTest. Defaults to {\ttfamily ON}.
+\item {\ttfamily PARSE\+\_\+\+CATCH\+\_\+\+TESTS\+\_\+\+ADD\+\_\+\+TO\+\_\+\+CONFIGURE\+\_\+\+DEPENDS} -- When {\ttfamily ON}, adds test file to {\ttfamily CMAKE\+\_\+\+CONFIGURE\+\_\+\+DEPENDS}. This means that the CMake configuration step will be re-\/ran when the test files change, letting new tests be automatically discovered. Defaults to {\ttfamily OFF}.
+\end{DoxyItemize}
+
+Optionally, one can specify a launching command to run tests by setting the variable {\ttfamily Optional\+Catch\+Test\+Launcher} before calling {\ttfamily Parse\+And\+Add\+Catch\+Tests}. For instance to run some tests using {\ttfamily MPI} and other sequentially, one can write 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{set(OptionalCatchTestLauncher\ \$\{MPIEXEC\}\ \$\{MPIEXEC\_NUMPROC\_FLAG\}\ \$\{NUMPROC\})}
+\DoxyCodeLine{ParseAndAddCatchTests(mpi\_foo)}
+\DoxyCodeLine{unset(OptionalCatchTestLauncher)}
+\DoxyCodeLine{ParseAndAddCatchTests(bar)}
+
+\end{DoxyCode}
+
+
+\doxysubsection*{CMake project options}
+
+Catch2\textquotesingle{}s CMake project also provides some options for other projects that consume it. These are
+
+
+\begin{DoxyItemize}
+\item {\ttfamily CATCH\+\_\+\+BUILD\+\_\+\+TESTING} -- When {\ttfamily ON}, Catch2\textquotesingle{}s Self\+Test project will be built. Defaults to {\ttfamily ON}. Note that Catch2 also obeys {\ttfamily BUILD\+\_\+\+TESTING} CMake variable, so {\itshape both} of them need to be {\ttfamily ON} for the Self\+Test to be built, and either of them can be set to {\ttfamily OFF} to disable building Self\+Test.
+\item {\ttfamily CATCH\+\_\+\+BUILD\+\_\+\+EXAMPLES} -- When {\ttfamily ON}, Catch2\textquotesingle{}s usage examples will be built. Defaults to {\ttfamily OFF}.
+\item {\ttfamily CATCH\+\_\+\+INSTALL\+\_\+\+DOCS} -- When {\ttfamily ON}, Catch2\textquotesingle{}s documentation will be included in the installation. Defaults to {\ttfamily ON}.
+\item {\ttfamily CATCH\+\_\+\+INSTALL\+\_\+\+HELPERS} -- When {\ttfamily ON}, Catch2\textquotesingle{}s contrib folder will be included in the installation. Defaults to {\ttfamily ON}.
+\item {\ttfamily BUILD\+\_\+\+TESTING} -- When {\ttfamily ON} and the project is not used as a subproject, Catch2\textquotesingle{}s test binary will be built. Defaults to {\ttfamily ON}.
+\end{DoxyItemize}
+
+\doxysubsection*{Installing Catch2 from git repository}
+
+If you cannot install Catch2 from a package manager (e.\+g. Ubuntu 16.\+04 provides catch only in version 1.\+2.\+0) you might want to install it from the repository instead. Assuming you have enough rights, you can just install it to the default location, like so\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$\ git\ clone\ https://github.com/catchorg/Catch2.git}
+\DoxyCodeLine{\$\ cd\ Catch2}
+\DoxyCodeLine{\$\ cmake\ -\/Bbuild\ -\/H.\ -\/DBUILD\_TESTING=OFF}
+\DoxyCodeLine{\$\ sudo\ cmake\ -\/-\/build\ build/\ -\/-\/target\ install}
+
+\end{DoxyCode}
+
+
+If you do not have superuser rights, you will also need to specify \href{https://cmake.org/cmake/help/latest/variable/CMAKE_INSTALL_PREFIX.html}{\texttt{ CMAKE\+\_\+\+INSTALL\+\_\+\+PREFIX}} when configuring the build, and then modify your calls to \href{https://cmake.org/cmake/help/latest/command/find_package.html}{\texttt{ find\+\_\+package}} accordingly.
+
+\DoxyHorRuler{0}
+
+
+\href{Readme.md\#top}{\texttt{ Home}} 

@@ -1,0 +1,117 @@
+\doxysection{libraries/fc/libraries/ff/depends/xbyak/sample/jmp\+\_\+table.cpp File Reference}
+\hypertarget{jmp__table_8cpp}{}\label{jmp__table_8cpp}\index{libraries/fc/libraries/ff/depends/xbyak/sample/jmp\_table.cpp@{libraries/fc/libraries/ff/depends/xbyak/sample/jmp\_table.cpp}}
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$xbyak/xbyak.\+h$>$}\newline
+Include dependency graph for jmp\+\_\+table.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{jmp__table_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_code}{Code}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{jmp__table_8cpp_a3ede98665532cce0e33f614fac5150f9}{XBYAK\+\_\+\+NO\+\_\+\+OP\+\_\+\+NAMES}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{jmp__table_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+const int \mbox{\hyperlink{jmp__table_8cpp_ac1a569379ef0e5faa54a93417618bbc2}{expect\+Tbl}} \mbox{[}$\,$\mbox{]}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{jmp__table_8cpp_a3ede98665532cce0e33f614fac5150f9}\index{jmp\_table.cpp@{jmp\_table.cpp}!XBYAK\_NO\_OP\_NAMES@{XBYAK\_NO\_OP\_NAMES}}
+\index{XBYAK\_NO\_OP\_NAMES@{XBYAK\_NO\_OP\_NAMES}!jmp\_table.cpp@{jmp\_table.cpp}}
+\doxysubsubsection{\texorpdfstring{XBYAK\_NO\_OP\_NAMES}{XBYAK\_NO\_OP\_NAMES}}
+{\footnotesize\ttfamily \label{jmp__table_8cpp_a3ede98665532cce0e33f614fac5150f9} 
+\#define XBYAK\+\_\+\+NO\+\_\+\+OP\+\_\+\+NAMES}
+
+
+
+Definition at line \mbox{\hyperlink{jmp__table_8cpp_source_l00005}{5}} of file \mbox{\hyperlink{jmp__table_8cpp_source}{jmp\+\_\+table.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{jmp__table_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}\index{jmp\_table.cpp@{jmp\_table.cpp}!main@{main}}
+\index{main@{main}!jmp\_table.cpp@{jmp\_table.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{jmp__table_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4} 
+int main (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{jmp__table_8cpp_source_l00105}{105}} of file \mbox{\hyperlink{jmp__table_8cpp_source}{jmp\+\_\+table.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00107\ \{}
+\DoxyCodeLine{00108\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ mode\ =\ 0;\ mode\ <\ 3;\ mode++)\ \{}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}mode=\%d\(\backslash\)n"{}},\ mode);}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ grow\ =\ 0;\ grow\ <\ 2;\ grow++)\ \{}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}auto\ grow=\%s\(\backslash\)n"{}},\ grow\ ?\ \textcolor{stringliteral}{"{}on"{}}\ :\ \textcolor{stringliteral}{"{}off"{}});}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_code}{Code}}\ c(mode,\ grow\ ?\ 30\ :\ 4096,\ grow\ ?\ \mbox{\hyperlink{namespace_xbyak_ad5e0c45dcb6452fbb134519d796b0991}{Xbyak::AutoGrow}}\ :\ 0);}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \ \ \ \ int\ (*\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})(int)\ =\ c.getCode<int\ (*)(int)>();}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \ \ \ \ c.ready();}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ 3;\ i++)\ \{}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ =\ \mbox{\hyperlink{jmp__table_8cpp_ac1a569379ef0e5faa54a93417618bbc2}{expectTbl}}[i];}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ b\ =\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}(i);}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ !=\ b)\ \{}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}ERR\ i=\%d,\ a=\%d,\ b=\%d\(\backslash\)n"{}},\ i,\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ b);}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ exit(1);}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00124\ \ \ \ \ \}}
+\DoxyCodeLine{00125\ \ \ \ \ puts(\textcolor{stringliteral}{"{}ok"{}});}
+\DoxyCodeLine{00126\ \}\ \textcolor{keywordflow}{catch}\ (std::exception\&\ e)\ \{}
+\DoxyCodeLine{00127\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}ERR\ \%s\(\backslash\)n"{}},\ e.what());}
+\DoxyCodeLine{00128\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{jmp__table_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{jmp__table_8cpp_ac1a569379ef0e5faa54a93417618bbc2}\index{jmp\_table.cpp@{jmp\_table.cpp}!expectTbl@{expectTbl}}
+\index{expectTbl@{expectTbl}!jmp\_table.cpp@{jmp\_table.cpp}}
+\doxysubsubsection{\texorpdfstring{expectTbl}{expectTbl}}
+{\footnotesize\ttfamily \label{jmp__table_8cpp_ac1a569379ef0e5faa54a93417618bbc2} 
+const int expect\+Tbl\mbox{[}$\,$\mbox{]}}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=\ \{}
+\DoxyCodeLine{\ \ \ \ 5,\ 9,\ 12}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{jmp__table_8cpp_source_l00008}{8}} of file \mbox{\hyperlink{jmp__table_8cpp_source}{jmp\+\_\+table.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00008\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00009\ \ \ \ \ 5,\ 9,\ 12}
+\DoxyCodeLine{00010\ \};}
+
+\end{DoxyCode}

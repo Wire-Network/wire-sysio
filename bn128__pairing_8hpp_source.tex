@@ -1,0 +1,50 @@
+\doxysection{bn128\+\_\+pairing.\+hpp}
+\hypertarget{bn128__pairing_8hpp_source}{}\label{bn128__pairing_8hpp_source}\index{libraries/fc/libraries/ff/libff/algebra/curves/bn128/bn128\_pairing.hpp@{libraries/fc/libraries/ff/libff/algebra/curves/bn128/bn128\_pairing.hpp}}
+\mbox{\hyperlink{bn128__pairing_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{bn128__pairing_8hpp_source_l00001}00001\ }
+\DoxyCodeLine{\Hypertarget{bn128__pairing_8hpp_source_l00011}00011\ \textcolor{preprocessor}{\#ifndef\ BN128\_PAIRING\_HPP\_}}
+\DoxyCodeLine{\Hypertarget{bn128__pairing_8hpp_source_l00012}00012\ \textcolor{preprocessor}{\#define\ BN128\_PAIRING\_HPP\_}}
+\DoxyCodeLine{\Hypertarget{bn128__pairing_8hpp_source_l00013}00013\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{bn_8h}{depends/ate-\/pairing/include/bn.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{bn128__pairing_8hpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{bn128__pairing_8hpp_source_l00015}00015\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{bn128__g1_8hpp}{libff/algebra/curves/bn128/bn128\_g1.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{bn128__pairing_8hpp_source_l00016}00016\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{bn128__g2_8hpp}{libff/algebra/curves/bn128/bn128\_g2.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{bn128__pairing_8hpp_source_l00017}00017\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{bn128__gt_8hpp}{libff/algebra/curves/bn128/bn128\_gt.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{bn128__pairing_8hpp_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{bn128__pairing_8hpp_source_l00019}00019\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacelibff}{libff}}\ \{}
+\DoxyCodeLine{\Hypertarget{bn128__pairing_8hpp_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{bn128__pairing_8hpp_source_l00021}\mbox{\hyperlink{structlibff_1_1bn128__ate___g1__precomp}{00021}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structlibff_1_1bn128__ate___g1__precomp}{bn128\_ate\_G1\_precomp}}\ \{}
+\DoxyCodeLine{\Hypertarget{bn128__pairing_8hpp_source_l00022}\mbox{\hyperlink{structlibff_1_1bn128__ate___g1__precomp_a59312bc508942a0c1e9c4712d352f0bc}{00022}}\ \ \ \ \ \mbox{\hyperlink{classmie_1_1_fp}{bn::Fp}}\ \mbox{\hyperlink{structlibff_1_1bn128__ate___g1__precomp_a59312bc508942a0c1e9c4712d352f0bc}{P}}[3];}
+\DoxyCodeLine{\Hypertarget{bn128__pairing_8hpp_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{bn128__pairing_8hpp_source_l00024}00024\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{structlibff_1_1bn128__ate___g1__precomp_a275f3372656ce5f84aaeb47331768550}{operator==}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structlibff_1_1bn128__ate___g1__precomp}{bn128\_ate\_G1\_precomp}}\ \&other)\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{bn128__pairing_8hpp_source_l00025}00025\ \ \ \ \ \textcolor{keyword}{friend}\ std::ostream\&\ \mbox{\hyperlink{structlibff_1_1bn128__ate___g1__precomp_aa5a18b01d2b13cfe0e1d3cdbe5d9945a}{operator<<}}(std::ostream\ \&out,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structlibff_1_1bn128__ate___g1__precomp}{bn128\_ate\_G1\_precomp}}\ \&prec\_P);}
+\DoxyCodeLine{\Hypertarget{bn128__pairing_8hpp_source_l00026}00026\ \ \ \ \ \textcolor{keyword}{friend}\ std::istream\&\ \mbox{\hyperlink{structlibff_1_1bn128__ate___g1__precomp_a6bedfbfe5c8ed52c674c68964afd1af2}{operator>>}}(std::istream\ \&in,\ \mbox{\hyperlink{structlibff_1_1bn128__ate___g1__precomp}{bn128\_ate\_G1\_precomp}}\ \&prec\_P);}
+\DoxyCodeLine{\Hypertarget{bn128__pairing_8hpp_source_l00027}00027\ \};}
+\DoxyCodeLine{\Hypertarget{bn128__pairing_8hpp_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{bn128__pairing_8hpp_source_l00029}\mbox{\hyperlink{namespacelibff_a11567b32f2e7f7f1f95673368e0d80bf}{00029}}\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{structbn_1_1_fp6_t}{bn::Fp6}}\ \mbox{\hyperlink{namespacelibff_a11567b32f2e7f7f1f95673368e0d80bf}{bn128\_ate\_ell\_coeffs}};}
+\DoxyCodeLine{\Hypertarget{bn128__pairing_8hpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{bn128__pairing_8hpp_source_l00031}\mbox{\hyperlink{structlibff_1_1bn128__ate___g2__precomp}{00031}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structlibff_1_1bn128__ate___g2__precomp}{bn128\_ate\_G2\_precomp}}\ \{}
+\DoxyCodeLine{\Hypertarget{bn128__pairing_8hpp_source_l00032}\mbox{\hyperlink{structlibff_1_1bn128__ate___g2__precomp_adc3b15cfa7d23d1c3c2bc7ba748a41f3}{00032}}\ \ \ \ \ \mbox{\hyperlink{structbn_1_1_fp2_t}{bn::Fp2}}\ \mbox{\hyperlink{structlibff_1_1bn128__ate___g2__precomp_adc3b15cfa7d23d1c3c2bc7ba748a41f3}{Q}}[3];}
+\DoxyCodeLine{\Hypertarget{bn128__pairing_8hpp_source_l00033}\mbox{\hyperlink{structlibff_1_1bn128__ate___g2__precomp_a64cbf83cd0c635161e73ef49d27a34e9}{00033}}\ \ \ \ \ std::vector<bn128\_ate\_ell\_coeffs>\ \mbox{\hyperlink{structlibff_1_1bn128__ate___g2__precomp_a64cbf83cd0c635161e73ef49d27a34e9}{coeffs}};}
+\DoxyCodeLine{\Hypertarget{bn128__pairing_8hpp_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{bn128__pairing_8hpp_source_l00035}00035\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{structlibff_1_1bn128__ate___g2__precomp_ad5bed1742f421ab619d5ddbc827a696e}{operator==}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structlibff_1_1bn128__ate___g2__precomp}{bn128\_ate\_G2\_precomp}}\ \&other)\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{bn128__pairing_8hpp_source_l00036}00036\ \ \ \ \ \textcolor{keyword}{friend}\ std::ostream\&\ \mbox{\hyperlink{structlibff_1_1bn128__ate___g2__precomp_a93062e6e67b9000d4584524cc086de8c}{operator<<}}(std::ostream\ \&out,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structlibff_1_1bn128__ate___g2__precomp}{bn128\_ate\_G2\_precomp}}\ \&prec\_Q);}
+\DoxyCodeLine{\Hypertarget{bn128__pairing_8hpp_source_l00037}00037\ \ \ \ \ \textcolor{keyword}{friend}\ std::istream\&\ \mbox{\hyperlink{structlibff_1_1bn128__ate___g2__precomp_aceb9ccfa8f95cd86da4cf2722666f808}{operator>>}}(std::istream\ \&in,\ \mbox{\hyperlink{structlibff_1_1bn128__ate___g2__precomp}{bn128\_ate\_G2\_precomp}}\ \&prec\_Q);}
+\DoxyCodeLine{\Hypertarget{bn128__pairing_8hpp_source_l00038}00038\ \};}
+\DoxyCodeLine{\Hypertarget{bn128__pairing_8hpp_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{bn128__pairing_8hpp_source_l00040}00040\ \mbox{\hyperlink{structlibff_1_1bn128__ate___g1__precomp}{bn128\_ate\_G1\_precomp}}\ \mbox{\hyperlink{namespacelibff_afab71143fae177429731dac6f7642a74}{bn128\_ate\_precompute\_G1}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classlibff_1_1bn128___g1}{bn128\_G1}}\&\ \mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}});}
+\DoxyCodeLine{\Hypertarget{bn128__pairing_8hpp_source_l00041}00041\ \mbox{\hyperlink{structlibff_1_1bn128__ate___g2__precomp}{bn128\_ate\_G2\_precomp}}\ \mbox{\hyperlink{namespacelibff_a4822f3dd76b083bdba87ee80865b25ed}{bn128\_ate\_precompute\_G2}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classlibff_1_1bn128___g2}{bn128\_G2}}\&\ Q);}
+\DoxyCodeLine{\Hypertarget{bn128__pairing_8hpp_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{bn128__pairing_8hpp_source_l00043}00043\ \mbox{\hyperlink{classlibff_1_1bn128___g_t}{bn128\_Fq12}}\ \mbox{\hyperlink{namespacelibff_a4098fab909d49417e9051db55932f6cd}{bn128\_double\_ate\_miller\_loop}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structlibff_1_1bn128__ate___g1__precomp}{bn128\_ate\_G1\_precomp}}\ \&prec\_P1,}
+\DoxyCodeLine{\Hypertarget{bn128__pairing_8hpp_source_l00044}00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structlibff_1_1bn128__ate___g2__precomp}{bn128\_ate\_G2\_precomp}}\ \&prec\_Q1,}
+\DoxyCodeLine{\Hypertarget{bn128__pairing_8hpp_source_l00045}00045\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structlibff_1_1bn128__ate___g1__precomp}{bn128\_ate\_G1\_precomp}}\ \&prec\_P2,}
+\DoxyCodeLine{\Hypertarget{bn128__pairing_8hpp_source_l00046}00046\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structlibff_1_1bn128__ate___g2__precomp}{bn128\_ate\_G2\_precomp}}\ \&prec\_Q2);}
+\DoxyCodeLine{\Hypertarget{bn128__pairing_8hpp_source_l00047}00047\ \mbox{\hyperlink{classlibff_1_1bn128___g_t}{bn128\_Fq12}}\ \mbox{\hyperlink{namespacelibff_a4af9894412498937172d90343a9bbb90}{bn128\_ate\_miller\_loop}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structlibff_1_1bn128__ate___g1__precomp}{bn128\_ate\_G1\_precomp}}\ \&prec\_P,}
+\DoxyCodeLine{\Hypertarget{bn128__pairing_8hpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structlibff_1_1bn128__ate___g2__precomp}{bn128\_ate\_G2\_precomp}}\ \&prec\_Q);}
+\DoxyCodeLine{\Hypertarget{bn128__pairing_8hpp_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{bn128__pairing_8hpp_source_l00050}00050\ \mbox{\hyperlink{classlibff_1_1bn128___g_t}{bn128\_GT}}\ \mbox{\hyperlink{namespacelibff_a94cda500a6c4fadd7c821134984f01ee}{bn128\_final\_exponentiation}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classlibff_1_1bn128___g_t}{bn128\_Fq12}}\ \&elt);}
+\DoxyCodeLine{\Hypertarget{bn128__pairing_8hpp_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{bn128__pairing_8hpp_source_l00052}00052\ \}\ \textcolor{comment}{//\ libff}}
+\DoxyCodeLine{\Hypertarget{bn128__pairing_8hpp_source_l00053}00053\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ BN128\_PAIRING\_HPP\_}}
+
+\end{DoxyCode}

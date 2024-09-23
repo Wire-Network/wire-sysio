@@ -1,0 +1,59 @@
+\doxysection{libraries/fc/include/fc/time.hpp File Reference}
+\hypertarget{include_2fc_2time_8hpp}{}\label{include_2fc_2time_8hpp}\index{libraries/fc/include/fc/time.hpp@{libraries/fc/include/fc/time.hpp}}
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include $<$fc/string.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/reflect/reflect.\+hpp$>$}\newline
+Include dependency graph for time.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{include_2fc_2time_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{include_2fc_2time_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}}
+\item 
+class \mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}}
+\item 
+class \mbox{\hyperlink{classfc_1_1time__point__sec}{fc\+::time\+\_\+point\+\_\+sec}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacefc}{fc}}
+\begin{DoxyCompactList}\small\item\em namespace \doxylink{namespacesysio_1_1chain}{sysio\+::chain} \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef std\+::optional$<$ \mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} $>$ \mbox{\hyperlink{namespacefc_a0988d9682d4fa0c42f3da5ccc4722da7}{fc\+::otime\+\_\+point}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+constexpr \mbox{\hyperlink{classfc_1_1microseconds}{microseconds}} \mbox{\hyperlink{namespacefc_a9623b8cae3f48bbed6aa1fc2afe9b174}{fc\+::seconds}} (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\item 
+constexpr \mbox{\hyperlink{classfc_1_1microseconds}{microseconds}} \mbox{\hyperlink{namespacefc_a76ae235ec7e9b8862e70740058d7eb1b}{fc\+::milliseconds}} (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\item 
+constexpr \mbox{\hyperlink{classfc_1_1microseconds}{microseconds}} \mbox{\hyperlink{namespacefc_a9c3f2826ca2b6652fcef4da96f33503a}{fc\+::minutes}} (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} m)
+\item 
+constexpr \mbox{\hyperlink{classfc_1_1microseconds}{microseconds}} \mbox{\hyperlink{namespacefc_a6e85a2de1275728bcc4a3d01f14d9172}{fc\+::hours}} (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} h)
+\item 
+constexpr \mbox{\hyperlink{classfc_1_1microseconds}{microseconds}} \mbox{\hyperlink{namespacefc_adcb1bf49c2b6b33eacb5a84333b12a5c}{fc\+::days}} (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} d)
+\item 
+void \mbox{\hyperlink{namespacefc_a91859540574b996a87eca48e36990a47}{fc\+::to\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}} \&, \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&)
+\item 
+void \mbox{\hyperlink{namespacefc_adbd4dad54bd3fa870eb0ba0962f373ec}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&, \mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}} \&)
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacefc_ac76f6058bf7a33bb07ab1a147eeb24bf}{fc\+::get\+\_\+approximate\+\_\+relative\+\_\+time\+\_\+string}} (const \mbox{\hyperlink{classfc_1_1time__point__sec}{time\+\_\+point\+\_\+sec}} \&event\+\_\+time, const \mbox{\hyperlink{classfc_1_1time__point__sec}{time\+\_\+point\+\_\+sec}} \&relative\+\_\+to\+\_\+time=\mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{fc\+::time\+\_\+point\+::now}}(), const std\+::string \&ago="{} ago"{})
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacefc_af05f153d4d325d4186d87d2fab5ae3dd}{fc\+::get\+\_\+approximate\+\_\+relative\+\_\+time\+\_\+string}} (const \mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} \&event\+\_\+time, const \mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} \&relative\+\_\+to\+\_\+time=\mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{fc\+::time\+\_\+point\+::now}}(), const std\+::string \&ago="{} ago"{})
+\end{DoxyCompactItemize}

@@ -1,0 +1,699 @@
+\doxysection{hybi13.\+cpp}
+\hypertarget{hybi13_8cpp_source}{}\label{hybi13_8cpp_source}\index{libraries/fc/vendor/websocketpp/test/processors/hybi13.cpp@{libraries/fc/vendor/websocketpp/test/processors/hybi13.cpp}}
+\mbox{\hyperlink{hybi13_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2014,\ Peter\ Thorson.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00004}00004\ \textcolor{comment}{\ *\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00005}00005\ \textcolor{comment}{\ *\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are\ met:}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00006}00006\ \textcolor{comment}{\ *\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00007}00007\ \textcolor{comment}{\ *\ \ \ \ \ \ \ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00008}00008\ \textcolor{comment}{\ *\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00009}00009\ \textcolor{comment}{\ *\ \ \ \ \ \ \ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer\ in\ the}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00010}00010\ \textcolor{comment}{\ *\ \ \ \ \ \ \ documentation\ and/or\ other\ materials\ provided\ with\ the\ distribution.}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00011}00011\ \textcolor{comment}{\ *\ \ \ \ \ *\ Neither\ the\ name\ of\ the\ WebSocket++\ Project\ nor\ the}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00012}00012\ \textcolor{comment}{\ *\ \ \ \ \ \ \ names\ of\ its\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00013}00013\ \textcolor{comment}{\ *\ \ \ \ \ \ \ derived\ from\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00014}00014\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00015}00015\ \textcolor{comment}{\ *\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS\ "{}AS\ IS"{}}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00016}00016\ \textcolor{comment}{\ *\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ THE}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00017}00017\ \textcolor{comment}{\ *\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR\ A\ PARTICULAR\ PURPOSE}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00018}00018\ \textcolor{comment}{\ *\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ PETER\ THORSON\ BE\ LIABLE\ FOR\ ANY}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00019}00019\ \textcolor{comment}{\ *\ DIRECT,\ INDIRECT,\ INCIDENTAL,\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00020}00020\ \textcolor{comment}{\ *\ (INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00021}00021\ \textcolor{comment}{\ *\ LOSS\ OF\ USE,\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00022}00022\ \textcolor{comment}{\ *\ ON\ ANY\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00023}00023\ \textcolor{comment}{\ *\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE\ OF\ THIS}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00024}00024\ \textcolor{comment}{\ *\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00025}00025\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00026}00026\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00027}00027\ \textcolor{comment}{//\#define\ BOOST\_TEST\_DYN\_LINK}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00028}\mbox{\hyperlink{hybi13_8cpp_a6b2a3852db8bb19ab6909bac01859985}{00028}}\ \textcolor{preprocessor}{\#define\ BOOST\_TEST\_MODULE\ hybi\_13\_processor}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00029}00029\ \textcolor{preprocessor}{\#include\ <boost/test/unit\_test.hpp>}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00031}00031\ \textcolor{preprocessor}{\#include\ <iostream>}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00032}00032\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00034}00034\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{hybi13_8hpp}{websocketpp/processors/hybi13.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00036}00036\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{request_8hpp}{websocketpp/http/request.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00037}00037\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{response_8hpp}{websocketpp/http/response.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00038}00038\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{message_8hpp}{websocketpp/message\_buffer/message.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00039}00039\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{alloc_8hpp}{websocketpp/message\_buffer/alloc.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00040}00040\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{random_2none_8hpp}{websocketpp/random/none.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00042}00042\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{disabled_8hpp}{websocketpp/extensions/permessage\_deflate/disabled.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00043}00043\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{enabled_8hpp}{websocketpp/extensions/permessage\_deflate/enabled.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00045}00045\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structstub__config}{stub\_config}}\ \{}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00046}00046\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1request}{websocketpp::http::parser::request}}\ \mbox{\hyperlink{structstub__config_adf25cb289c00f17e0edde3ee14c7d513}{request\_type}};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00047}00047\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1response}{websocketpp::http::parser::response}}\ \mbox{\hyperlink{structstub__config_af5bf09e5641cb374d09ca1cc57a3db68}{response\_type}};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00049}00049\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message}{websocketpp::message\_buffer::message}}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00050}00050\ \ \ \ \ \ \ \ \ <\mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1alloc_1_1con__msg__manager}{websocketpp::message\_buffer::alloc::con\_msg\_manager}}>\ \mbox{\hyperlink{structstub__config_a608dd8f08c2967a1279f862646d5ccfe}{message\_type}};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00051}00051\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1alloc_1_1con__msg__manager}{websocketpp::message\_buffer::alloc::con\_msg\_manager<message\_type>}}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00052}00052\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstub__config_ac54fff1ce93b9e96d7c55f7a5f7070b6}{con\_msg\_manager\_type}};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00054}00054\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1random_1_1none_1_1int__generator}{websocketpp::random::none::int\_generator<uint32\_t>}}\ \mbox{\hyperlink{structstub__config_a8078a33b6ae688fb79664999e1373f74}{rng\_type}};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00056}\mbox{\hyperlink{structstub__config_1_1permessage__deflate__config}{00056}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structstub__config_1_1permessage__deflate__config}{permessage\_deflate\_config}}\ \{}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00057}00057\ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{structstub__config_adf25cb289c00f17e0edde3ee14c7d513}{stub\_config::request\_type}}\ \mbox{\hyperlink{structstub__config_1_1permessage__deflate__config_a042686c4994ab829d85e953045a0bdf4}{request\_type}};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00058}00058\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00060}00060\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1disabled}{websocketpp::extensions::permessage\_deflate::disabled}}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00061}00061\ \ \ \ \ \ \ \ \ <\mbox{\hyperlink{structstub__config_1_1permessage__deflate__config}{permessage\_deflate\_config}}>\ \mbox{\hyperlink{structstub__config_a14d3f42557ed02cac6157c9b7dcf3e28}{permessage\_deflate\_type}};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00062}00062\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00063}00063\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{structstub__config_af3bff8827bb7bc7b89bff020d6a1fa67}{max\_message\_size}}\ =\ 16000000;}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00064}00064\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{structstub__config_a10cfb6ee6ff233ac4581d3201a324684}{enable\_extensions}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00065}00065\ \};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00067}\mbox{\hyperlink{structstub__config__ext}{00067}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structstub__config__ext}{stub\_config\_ext}}\ \{}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00068}\mbox{\hyperlink{structstub__config__ext_a38c1307e1e06452457d1e9f866636bea}{00068}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1request}{websocketpp::http::parser::request}}\ \mbox{\hyperlink{structstub__config__ext_a38c1307e1e06452457d1e9f866636bea}{request\_type}};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00069}\mbox{\hyperlink{structstub__config__ext_a992461dc37b378721d8d7061aa9bd432}{00069}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1response}{websocketpp::http::parser::response}}\ \mbox{\hyperlink{structstub__config__ext_a992461dc37b378721d8d7061aa9bd432}{response\_type}};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00071}00071\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message}{websocketpp::message\_buffer::message}}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00072}\mbox{\hyperlink{structstub__config__ext_a2108527b0a311564826690b37184e8a4}{00072}}\ \ \ \ \ \ \ \ \ <\mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1alloc_1_1con__msg__manager}{websocketpp::message\_buffer::alloc::con\_msg\_manager}}>\ \mbox{\hyperlink{structstub__config__ext_a2108527b0a311564826690b37184e8a4}{message\_type}};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00073}00073\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1alloc_1_1con__msg__manager}{websocketpp::message\_buffer::alloc::con\_msg\_manager<message\_type>}}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00074}\mbox{\hyperlink{structstub__config__ext_afc55e0a43552aa3b7baba53dc0da7ad7}{00074}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstub__config__ext_afc55e0a43552aa3b7baba53dc0da7ad7}{con\_msg\_manager\_type}};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00075}00075\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00076}\mbox{\hyperlink{structstub__config__ext_a7d524f8074c5295f5a5a742761a61661}{00076}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1random_1_1none_1_1int__generator}{websocketpp::random::none::int\_generator<uint32\_t>}}\ \mbox{\hyperlink{structstub__config__ext_a7d524f8074c5295f5a5a742761a61661}{rng\_type}};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00077}00077\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00078}\mbox{\hyperlink{structstub__config__ext_1_1permessage__deflate__config}{00078}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structstub__config__ext_1_1permessage__deflate__config}{permessage\_deflate\_config}}\ \{}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00079}\mbox{\hyperlink{structstub__config__ext_1_1permessage__deflate__config_a099dc5d446229e847b9f50d052501761}{00079}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1request}{stub\_config\_ext::request\_type}}\ \mbox{\hyperlink{structstub__config__ext_1_1permessage__deflate__config_a099dc5d446229e847b9f50d052501761}{request\_type}};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00080}00080\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00081}00081\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00082}00082\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled}{websocketpp::extensions::permessage\_deflate::enabled}}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00083}\mbox{\hyperlink{structstub__config__ext_a39937c8f5951fd4509417129152de9b4}{00083}}\ \ \ \ \ \ \ \ \ <\mbox{\hyperlink{structstub__config__ext_1_1permessage__deflate__config}{permessage\_deflate\_config}}>\ \mbox{\hyperlink{structstub__config__ext_a39937c8f5951fd4509417129152de9b4}{permessage\_deflate\_type}};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00084}00084\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00085}\mbox{\hyperlink{structstub__config__ext_abd69405667bf978b87f3345c442b87ff}{00085}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{structstub__config__ext_abd69405667bf978b87f3345c442b87ff}{max\_message\_size}}\ =\ 16000000;}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00086}\mbox{\hyperlink{structstub__config__ext_ac0289e7c8826c2e74dcd33bda97dbf87}{00086}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{structstub__config__ext_ac0289e7c8826c2e74dcd33bda97dbf87}{enable\_extensions}}\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00087}00087\ \};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00088}00088\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00089}\mbox{\hyperlink{hybi13_8cpp_a13c41174dd3938337edbfb4ce0ba0644}{00089}}\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{structstub__config_ac54fff1ce93b9e96d7c55f7a5f7070b6}{stub\_config::con\_msg\_manager\_type}}\ \mbox{\hyperlink{hybi13_8cpp_a13c41174dd3938337edbfb4ce0ba0644}{con\_msg\_manager\_type}};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00090}00090\ \textcolor{keyword}{typedef}\ stub\_config::message\_type::ptr\ \mbox{\hyperlink{debug__client_8cpp_a08398c4d31a4dc3e42d1b9a9ef64c6ad}{message\_ptr}};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00091}00091\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00092}00092\ \textcolor{comment}{//\ Set\ up\ a\ structure\ that\ constructs\ new\ copies\ of\ all\ of\ the\ support\ structure}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00093}00093\ \textcolor{comment}{//\ for\ using\ connection\ processors}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00094}00094\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structprocessor__setup}{processor\_setup}}\ \{}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00095}\mbox{\hyperlink{structprocessor__setup_a760f623a2b8349aa21b8dd565b29e593}{00095}}\ \ \ \ \ \mbox{\hyperlink{structprocessor__setup_a760f623a2b8349aa21b8dd565b29e593}{processor\_setup}}(\textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classwebsocketpp_1_1server}{server}})}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00096}00096\ \ \ \ \ \ \ :\ \mbox{\hyperlink{structprocessor__setup_a7e5874fd9215c912a4b45a5595d393b6}{msg\_manager}}(new\ \mbox{\hyperlink{hybi13_8cpp_a13c41174dd3938337edbfb4ce0ba0644}{con\_msg\_manager\_type}}())}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00097}00097\ \ \ \ \ \ \ ,\ \mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}(false,\mbox{\hyperlink{classwebsocketpp_1_1server}{server}},\mbox{\hyperlink{structprocessor__setup_a7e5874fd9215c912a4b45a5595d393b6}{msg\_manager}},\mbox{\hyperlink{structprocessor__setup_a7bbb72ae0cad9525e149c1c3b3f7d61f}{rng}})\ \{\}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00098}00098\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00099}00099\ \ \ \ \ websocketpp::lib::error\_code\ \mbox{\hyperlink{structprocessor__setup_a4317b669be75123ab3301f66890e8ccc}{ec}};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00100}\mbox{\hyperlink{structprocessor__setup_a9243eed7f1b4feff6e614372bc95a97d}{00100}}\ \ \ \ \ con\_msg\_manager\_type::ptr\ \mbox{\hyperlink{structprocessor__setup_a9243eed7f1b4feff6e614372bc95a97d}{msg\_manager}};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00101}\mbox{\hyperlink{structprocessor__setup_a7bbb72ae0cad9525e149c1c3b3f7d61f}{00101}}\ \ \ \ \ \mbox{\hyperlink{structstub__config_a8078a33b6ae688fb79664999e1373f74}{stub\_config::rng\_type}}\ \mbox{\hyperlink{structprocessor__setup_a7bbb72ae0cad9525e149c1c3b3f7d61f}{rng}};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00102}00102\ \ \ \ \ \mbox{\hyperlink{structstub__config_adf25cb289c00f17e0edde3ee14c7d513}{stub\_config::request\_type}}\ \mbox{\hyperlink{structprocessor__setup_a980e15fe985e1b98b603d7cdfe7c59ae}{req}};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00103}00103\ \ \ \ \ \mbox{\hyperlink{structstub__config_af5bf09e5641cb374d09ca1cc57a3db68}{stub\_config::response\_type}}\ \mbox{\hyperlink{structprocessor__setup_a4f0a5fc919ad24998c07b4e9ea14497e}{res}};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00104}\mbox{\hyperlink{structprocessor__setup_a99c2a7222df023e004a08981332c19e8}{00104}}\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi13}{websocketpp::processor::hybi13<stub\_config>}}\ \mbox{\hyperlink{structprocessor__setup_a99c2a7222df023e004a08981332c19e8}{p}};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00105}00105\ \};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00106}00106\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00107}\mbox{\hyperlink{structprocessor__setup__ext}{00107}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structprocessor__setup__ext}{processor\_setup\_ext}}\ \{}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00108}\mbox{\hyperlink{structprocessor__setup__ext_a7be679fcc1767117e9040bce609e59ab}{00108}}\ \ \ \ \ \mbox{\hyperlink{structprocessor__setup__ext_a7be679fcc1767117e9040bce609e59ab}{processor\_setup\_ext}}(\textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classwebsocketpp_1_1server}{server}})}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00109}00109\ \ \ \ \ \ \ :\ \mbox{\hyperlink{structprocessor__setup__ext_a28f7642ffd000c87b1f6e1636fa89858}{msg\_manager}}(new\ \mbox{\hyperlink{hybi13_8cpp_a13c41174dd3938337edbfb4ce0ba0644}{con\_msg\_manager\_type}}())}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00110}00110\ \ \ \ \ \ \ ,\ \mbox{\hyperlink{structprocessor__setup__ext_a04ff04a58e537a96fc110d36928f828b}{p}}(false,\mbox{\hyperlink{classwebsocketpp_1_1server}{server}},\mbox{\hyperlink{structprocessor__setup__ext_a28f7642ffd000c87b1f6e1636fa89858}{msg\_manager}},\mbox{\hyperlink{structprocessor__setup__ext_a320e92e2721ed24ee02f04c103b78428}{rng}})\ \{\}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00111}00111\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00112}\mbox{\hyperlink{structprocessor__setup__ext_a500a49844ae879bb8189a58e89005cfa}{00112}}\ \ \ \ \ websocketpp::lib::error\_code\ \mbox{\hyperlink{structprocessor__setup__ext_a500a49844ae879bb8189a58e89005cfa}{ec}};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00113}\mbox{\hyperlink{structprocessor__setup__ext_a28f7642ffd000c87b1f6e1636fa89858}{00113}}\ \ \ \ \ con\_msg\_manager\_type::ptr\ \mbox{\hyperlink{structprocessor__setup__ext_a28f7642ffd000c87b1f6e1636fa89858}{msg\_manager}};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00114}\mbox{\hyperlink{structprocessor__setup__ext_a320e92e2721ed24ee02f04c103b78428}{00114}}\ \ \ \ \ \mbox{\hyperlink{structstub__config_a8078a33b6ae688fb79664999e1373f74}{stub\_config::rng\_type}}\ \mbox{\hyperlink{structprocessor__setup__ext_a320e92e2721ed24ee02f04c103b78428}{rng}};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00115}\mbox{\hyperlink{structprocessor__setup__ext_a3407743ef41e1a27cf5da82d467777d0}{00115}}\ \ \ \ \ \mbox{\hyperlink{structstub__config_adf25cb289c00f17e0edde3ee14c7d513}{stub\_config::request\_type}}\ \mbox{\hyperlink{structprocessor__setup__ext_a3407743ef41e1a27cf5da82d467777d0}{req}};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00116}\mbox{\hyperlink{structprocessor__setup__ext_a92adbb5666a2e60851507757f1f36443}{00116}}\ \ \ \ \ \mbox{\hyperlink{structstub__config_af5bf09e5641cb374d09ca1cc57a3db68}{stub\_config::response\_type}}\ \mbox{\hyperlink{structprocessor__setup__ext_a92adbb5666a2e60851507757f1f36443}{res}};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00117}\mbox{\hyperlink{structprocessor__setup__ext_a04ff04a58e537a96fc110d36928f828b}{00117}}\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi13}{websocketpp::processor::hybi13<stub\_config\_ext>}}\ \mbox{\hyperlink{structprocessor__setup__ext_a04ff04a58e537a96fc110d36928f828b}{p}};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00118}00118\ \};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00119}00119\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00120}\mbox{\hyperlink{hybi13_8cpp_aa574a21bd8b369edb379ed3e0a61bb46}{00120}}\ \mbox{\hyperlink{hybi13_8cpp_aa574a21bd8b369edb379ed3e0a61bb46}{BOOST\_AUTO\_TEST\_CASE}}(\ exact\_match\ )\ \{}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00121}00121\ \ \ \ \ \mbox{\hyperlink{structprocessor__setup}{processor\_setup}}\ env(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00122}00122\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00123}00123\ \ \ \ \ std::string\ handshake\ =\ \textcolor{stringliteral}{"{}GET\ /\ HTTP/1.1\(\backslash\)r\(\backslash\)nHost:\ www.example.com\(\backslash\)r\(\backslash\)nConnection:\ upgrade\(\backslash\)r\(\backslash\)nUpgrade:\ websocket\(\backslash\)r\(\backslash\)nSec-\/WebSocket-\/Version:\ 13\(\backslash\)r\(\backslash\)nSec-\/WebSocket-\/Key:\ dGhlIHNhbXBsZSBub25jZQ==\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00124}00124\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00125}00125\ \ \ \ \ env.\mbox{\hyperlink{structprocessor__setup_a980e15fe985e1b98b603d7cdfe7c59ae}{req}}.consume(handshake.c\_str(),handshake.size());}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00126}00126\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00127}00127\ \ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespacewebsocketpp_1_1processor_a9ff3159b48cf4be2e7cb79c81b155d53}{websocketpp::processor::is\_websocket\_handshake}}(env.\mbox{\hyperlink{structprocessor__setup_a980e15fe985e1b98b603d7cdfe7c59ae}{req}}));}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00128}00128\ \ \ \ \ BOOST\_CHECK\_EQUAL(\mbox{\hyperlink{namespacewebsocketpp_1_1processor_a1a0e5e7b10b24ff5ab836dc543826934}{websocketpp::processor::get\_websocket\_version}}(env.\mbox{\hyperlink{structprocessor__setup_a980e15fe985e1b98b603d7cdfe7c59ae}{req}}),\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a9e3f451bd48b1072a377108eba0cf0f5}{get\_version}}());}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00129}00129\ \ \ \ \ BOOST\_CHECK(!env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a9458e35fabf2b39bd9e09523ad60c22c}{validate\_handshake}}(env.\mbox{\hyperlink{structprocessor__setup_a980e15fe985e1b98b603d7cdfe7c59ae}{req}}));}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00130}00130\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00131}00131\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_aae370ea5ac83a8ece7712cb39fc23f5b}{websocketpp::uri\_ptr}}\ u;}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00132}00132\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00133}00133\ \ \ \ \ BOOST\_CHECK\_NO\_THROW(\ u\ =\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_aa490b9d9905915023b5f2e42aac59127}{get\_uri}}(env.\mbox{\hyperlink{structprocessor__setup_a980e15fe985e1b98b603d7cdfe7c59ae}{req}})\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00134}00134\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00135}00135\ \ \ \ \ BOOST\_CHECK\_EQUAL(u-\/>get\_secure(),\ \textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00136}00136\ \ \ \ \ BOOST\_CHECK\_EQUAL(u-\/>get\_host(),\ \textcolor{stringliteral}{"{}www.example.com"{}});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00137}00137\ \ \ \ \ BOOST\_CHECK\_EQUAL(u-\/>get\_resource(),\ \textcolor{stringliteral}{"{}/"{}});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00138}00138\ \ \ \ \ BOOST\_CHECK\_EQUAL(u-\/>get\_port(),\ websocketpp::uri\_default\_port);}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00139}00139\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00140}00140\ \ \ \ \ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a29c4300aa053e7028ee5a46601319afd}{process\_handshake}}(env.\mbox{\hyperlink{structprocessor__setup_a980e15fe985e1b98b603d7cdfe7c59ae}{req}},\textcolor{stringliteral}{"{}"{}},env.\mbox{\hyperlink{structprocessor__setup_a4f0a5fc919ad24998c07b4e9ea14497e}{res}});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00141}00141\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00142}00142\ \ \ \ \ BOOST\_CHECK\_EQUAL(env.\mbox{\hyperlink{structprocessor__setup_a4f0a5fc919ad24998c07b4e9ea14497e}{res}}.get\_header(\textcolor{stringliteral}{"{}Connection"{}}),\ \textcolor{stringliteral}{"{}upgrade"{}});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00143}00143\ \ \ \ \ BOOST\_CHECK\_EQUAL(env.\mbox{\hyperlink{structprocessor__setup_a4f0a5fc919ad24998c07b4e9ea14497e}{res}}.get\_header(\textcolor{stringliteral}{"{}Upgrade"{}}),\ \textcolor{stringliteral}{"{}websocket"{}});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00144}00144\ \ \ \ \ BOOST\_CHECK\_EQUAL(env.\mbox{\hyperlink{structprocessor__setup_a4f0a5fc919ad24998c07b4e9ea14497e}{res}}.get\_header(\textcolor{stringliteral}{"{}Sec-\/WebSocket-\/Accept"{}}),\ \textcolor{stringliteral}{"{}s3pPLMBiTxaQ9kYGzzhZRbK+xOo="{}});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00145}00145\ \}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00146}00146\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00147}\mbox{\hyperlink{hybi13_8cpp_a53fa7013c0af5d6b8940a4376f25c68f}{00147}}\ \mbox{\hyperlink{hybi13_8cpp_aa574a21bd8b369edb379ed3e0a61bb46}{BOOST\_AUTO\_TEST\_CASE}}(\ non\_get\_method\ )\ \{}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00148}00148\ \ \ \ \ \mbox{\hyperlink{structprocessor__setup}{processor\_setup}}\ env(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00149}00149\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00150}00150\ \ \ \ \ std::string\ handshake\ =\ \textcolor{stringliteral}{"{}POST\ /\ HTTP/1.1\(\backslash\)r\(\backslash\)nHost:\ www.example.com\(\backslash\)r\(\backslash\)nConnection:\ upgrade\(\backslash\)r\(\backslash\)nUpgrade:\ websocket\(\backslash\)r\(\backslash\)nSec-\/WebSocket-\/Version:\ 13\(\backslash\)r\(\backslash\)nSec-\/WebSocket-\/Key:\ foo\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00151}00151\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00152}00152\ \ \ \ \ env.\mbox{\hyperlink{structprocessor__setup_a980e15fe985e1b98b603d7cdfe7c59ae}{req}}.consume(handshake.c\_str(),handshake.size());}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00153}00153\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00154}00154\ \ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespacewebsocketpp_1_1processor_a9ff3159b48cf4be2e7cb79c81b155d53}{websocketpp::processor::is\_websocket\_handshake}}(env.\mbox{\hyperlink{structprocessor__setup_a980e15fe985e1b98b603d7cdfe7c59ae}{req}}));}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00155}00155\ \ \ \ \ BOOST\_CHECK\_EQUAL(\mbox{\hyperlink{namespacewebsocketpp_1_1processor_a1a0e5e7b10b24ff5ab836dc543826934}{websocketpp::processor::get\_websocket\_version}}(env.\mbox{\hyperlink{structprocessor__setup_a980e15fe985e1b98b603d7cdfe7c59ae}{req}}),\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a9e3f451bd48b1072a377108eba0cf0f5}{get\_version}}());}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00156}00156\ \ \ \ \ BOOST\_CHECK(\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a9458e35fabf2b39bd9e09523ad60c22c}{validate\_handshake}}(env.\mbox{\hyperlink{structprocessor__setup_a980e15fe985e1b98b603d7cdfe7c59ae}{req}})\ ==\ \mbox{\hyperlink{namespacewebsocketpp_1_1processor_1_1error_ae6510ada6a25dcd7af258b6e374e3ca5a2490b8f8de563854741a3475c2eaee40}{websocketpp::processor::error::invalid\_http\_method}}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00157}00157\ \}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00158}00158\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00159}\mbox{\hyperlink{hybi13_8cpp_a2e752fe3c8bae5df4a39fe47147bf160}{00159}}\ \mbox{\hyperlink{hybi13_8cpp_aa574a21bd8b369edb379ed3e0a61bb46}{BOOST\_AUTO\_TEST\_CASE}}(\ old\_http\_version\ )\ \{}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00160}00160\ \ \ \ \ \mbox{\hyperlink{structprocessor__setup}{processor\_setup}}\ env(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00161}00161\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00162}00162\ \ \ \ \ std::string\ handshake\ =\ \textcolor{stringliteral}{"{}GET\ /\ HTTP/1.0\(\backslash\)r\(\backslash\)nHost:\ www.example.com\(\backslash\)r\(\backslash\)nConnection:\ upgrade\(\backslash\)r\(\backslash\)nUpgrade:\ websocket\(\backslash\)r\(\backslash\)nSec-\/WebSocket-\/Version:\ 13\(\backslash\)r\(\backslash\)nSec-\/WebSocket-\/Key:\ foo\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00163}00163\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00164}00164\ \ \ \ \ env.\mbox{\hyperlink{structprocessor__setup_a980e15fe985e1b98b603d7cdfe7c59ae}{req}}.consume(handshake.c\_str(),handshake.size());}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00165}00165\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00166}00166\ \ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespacewebsocketpp_1_1processor_a9ff3159b48cf4be2e7cb79c81b155d53}{websocketpp::processor::is\_websocket\_handshake}}(env.\mbox{\hyperlink{structprocessor__setup_a980e15fe985e1b98b603d7cdfe7c59ae}{req}}));}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00167}00167\ \ \ \ \ BOOST\_CHECK\_EQUAL(\mbox{\hyperlink{namespacewebsocketpp_1_1processor_a1a0e5e7b10b24ff5ab836dc543826934}{websocketpp::processor::get\_websocket\_version}}(env.\mbox{\hyperlink{structprocessor__setup_a980e15fe985e1b98b603d7cdfe7c59ae}{req}}),\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a9e3f451bd48b1072a377108eba0cf0f5}{get\_version}}());}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00168}00168\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a9458e35fabf2b39bd9e09523ad60c22c}{validate\_handshake}}(env.\mbox{\hyperlink{structprocessor__setup_a980e15fe985e1b98b603d7cdfe7c59ae}{req}}),\ \mbox{\hyperlink{namespacewebsocketpp_1_1processor_1_1error_ae6510ada6a25dcd7af258b6e374e3ca5ac1a30a2007cfa754da78a486e2a22103}{websocketpp::processor::error::invalid\_http\_version}}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00169}00169\ \}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00170}00170\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00171}\mbox{\hyperlink{hybi13_8cpp_a6120ca4893d23496721f4053cfe93393}{00171}}\ \mbox{\hyperlink{hybi13_8cpp_aa574a21bd8b369edb379ed3e0a61bb46}{BOOST\_AUTO\_TEST\_CASE}}(\ missing\_handshake\_key1\ )\ \{}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00172}00172\ \ \ \ \ \mbox{\hyperlink{structprocessor__setup}{processor\_setup}}\ env(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00173}00173\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00174}00174\ \ \ \ \ std::string\ handshake\ =\ \textcolor{stringliteral}{"{}GET\ /\ HTTP/1.1\(\backslash\)r\(\backslash\)nHost:\ www.example.com\(\backslash\)r\(\backslash\)nConnection:\ upgrade\(\backslash\)r\(\backslash\)nUpgrade:\ websocket\(\backslash\)r\(\backslash\)nSec-\/WebSocket-\/Version:\ 13\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00175}00175\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00176}00176\ \ \ \ \ env.\mbox{\hyperlink{structprocessor__setup_a980e15fe985e1b98b603d7cdfe7c59ae}{req}}.consume(handshake.c\_str(),handshake.size());}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00177}00177\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00178}00178\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1processor_a9ff3159b48cf4be2e7cb79c81b155d53}{websocketpp::processor::is\_websocket\_handshake}}(env.\mbox{\hyperlink{structprocessor__setup_a980e15fe985e1b98b603d7cdfe7c59ae}{req}})\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00179}00179\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacewebsocketpp_1_1processor_a1a0e5e7b10b24ff5ab836dc543826934}{websocketpp::processor::get\_websocket\_version}}(env.\mbox{\hyperlink{structprocessor__setup_a980e15fe985e1b98b603d7cdfe7c59ae}{req}}),\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a9e3f451bd48b1072a377108eba0cf0f5}{get\_version}}()\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00180}00180\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a9458e35fabf2b39bd9e09523ad60c22c}{validate\_handshake}}(env.\mbox{\hyperlink{structprocessor__setup_a980e15fe985e1b98b603d7cdfe7c59ae}{req}}),\ \mbox{\hyperlink{namespacewebsocketpp_1_1processor_1_1error_ae6510ada6a25dcd7af258b6e374e3ca5a06199459b5805bf545a7a8b265933d2d}{websocketpp::processor::error::missing\_required\_header}}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00181}00181\ \}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00182}00182\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00183}\mbox{\hyperlink{hybi13_8cpp_a0b1c24a03b0c2ee04587f83e786e0cfd}{00183}}\ \mbox{\hyperlink{hybi13_8cpp_aa574a21bd8b369edb379ed3e0a61bb46}{BOOST\_AUTO\_TEST\_CASE}}(\ missing\_handshake\_key2\ )\ \{}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00184}00184\ \ \ \ \ \mbox{\hyperlink{structprocessor__setup}{processor\_setup}}\ env(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00185}00185\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00186}00186\ \ \ \ \ std::string\ handshake\ =\ \textcolor{stringliteral}{"{}GET\ /\ HTTP/1.1\(\backslash\)r\(\backslash\)nHost:\ www.example.com\(\backslash\)r\(\backslash\)nConnection:\ upgrade\(\backslash\)r\(\backslash\)nUpgrade:\ websocket\(\backslash\)r\(\backslash\)nSec-\/WebSocket-\/Version:\ 13\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00187}00187\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00188}00188\ \ \ \ \ env.\mbox{\hyperlink{structprocessor__setup_a980e15fe985e1b98b603d7cdfe7c59ae}{req}}.consume(handshake.c\_str(),handshake.size());}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00189}00189\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00190}00190\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1processor_a9ff3159b48cf4be2e7cb79c81b155d53}{websocketpp::processor::is\_websocket\_handshake}}(env.\mbox{\hyperlink{structprocessor__setup_a980e15fe985e1b98b603d7cdfe7c59ae}{req}})\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00191}00191\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacewebsocketpp_1_1processor_a1a0e5e7b10b24ff5ab836dc543826934}{websocketpp::processor::get\_websocket\_version}}(env.\mbox{\hyperlink{structprocessor__setup_a980e15fe985e1b98b603d7cdfe7c59ae}{req}}),\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a9e3f451bd48b1072a377108eba0cf0f5}{get\_version}}()\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00192}00192\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a9458e35fabf2b39bd9e09523ad60c22c}{validate\_handshake}}(env.\mbox{\hyperlink{structprocessor__setup_a980e15fe985e1b98b603d7cdfe7c59ae}{req}}),\ \mbox{\hyperlink{namespacewebsocketpp_1_1processor_1_1error_ae6510ada6a25dcd7af258b6e374e3ca5a06199459b5805bf545a7a8b265933d2d}{websocketpp::processor::error::missing\_required\_header}}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00193}00193\ \}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00194}00194\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00195}\mbox{\hyperlink{hybi13_8cpp_a28ab49690cd74a3b00567ad9b87ef437}{00195}}\ \mbox{\hyperlink{hybi13_8cpp_aa574a21bd8b369edb379ed3e0a61bb46}{BOOST\_AUTO\_TEST\_CASE}}(\ bad\_host\ )\ \{}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00196}00196\ \ \ \ \ \mbox{\hyperlink{structprocessor__setup}{processor\_setup}}\ env(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00197}00197\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00198}00198\ \ \ \ \ std::string\ handshake\ =\ \textcolor{stringliteral}{"{}GET\ /\ HTTP/1.1\(\backslash\)r\(\backslash\)nHost:\ www.example.com:70000\(\backslash\)r\(\backslash\)nConnection:\ upgrade\(\backslash\)r\(\backslash\)nUpgrade:\ websocket\(\backslash\)r\(\backslash\)nSec-\/WebSocket-\/Version:\ 13\(\backslash\)r\(\backslash\)nSec-\/WebSocket-\/Key:\ foo\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00199}00199\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00200}00200\ \ \ \ \ env.\mbox{\hyperlink{structprocessor__setup_a980e15fe985e1b98b603d7cdfe7c59ae}{req}}.consume(handshake.c\_str(),handshake.size());}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00201}00201\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00202}00202\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1processor_a9ff3159b48cf4be2e7cb79c81b155d53}{websocketpp::processor::is\_websocket\_handshake}}(env.\mbox{\hyperlink{structprocessor__setup_a980e15fe985e1b98b603d7cdfe7c59ae}{req}})\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00203}00203\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacewebsocketpp_1_1processor_a1a0e5e7b10b24ff5ab836dc543826934}{websocketpp::processor::get\_websocket\_version}}(env.\mbox{\hyperlink{structprocessor__setup_a980e15fe985e1b98b603d7cdfe7c59ae}{req}}),\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a9e3f451bd48b1072a377108eba0cf0f5}{get\_version}}()\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00204}00204\ \ \ \ \ BOOST\_CHECK(\ !env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a9458e35fabf2b39bd9e09523ad60c22c}{validate\_handshake}}(env.\mbox{\hyperlink{structprocessor__setup_a980e15fe985e1b98b603d7cdfe7c59ae}{req}})\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00205}00205\ \ \ \ \ BOOST\_CHECK(\ !env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_aa490b9d9905915023b5f2e42aac59127}{get\_uri}}(env.\mbox{\hyperlink{structprocessor__setup_a980e15fe985e1b98b603d7cdfe7c59ae}{req}})-\/>get\_valid()\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00206}00206\ \}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00207}00207\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00208}00208\ \textcolor{comment}{//\ FRAME\ TESTS\ TO\ DO}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00209}00209\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00210}00210\ \textcolor{comment}{//\ unmasked,\ 0\ length,\ binary}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00211}00211\ \textcolor{comment}{//\ 0x82\ 0x00}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00212}00212\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00213}00213\ \textcolor{comment}{//\ masked,\ 0\ length,\ binary}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00214}00214\ \textcolor{comment}{//\ 0x82\ 0x80}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00215}00215\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00216}00216\ \textcolor{comment}{//\ unmasked,\ 0\ length,\ text}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00217}00217\ \textcolor{comment}{//\ 0x81\ 0x00}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00218}00218\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00219}00219\ \textcolor{comment}{//\ masked,\ 0\ length,\ text}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00220}00220\ \textcolor{comment}{//\ 0x81\ 0x80}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00221}00221\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00222}\mbox{\hyperlink{hybi13_8cpp_a6f75cf479536c0bd69a1a2287516d686}{00222}}\ \mbox{\hyperlink{hybi13_8cpp_aa574a21bd8b369edb379ed3e0a61bb46}{BOOST\_AUTO\_TEST\_CASE}}(\ frame\_empty\_binary\_unmasked\ )\ \{}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00223}00223\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ frame[2]\ =\ \{0x82,\ 0x00\};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00224}00224\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00225}00225\ \ \ \ \ \textcolor{comment}{//\ all\ in\ one\ chunk}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00226}00226\ \ \ \ \ \mbox{\hyperlink{structprocessor__setup}{processor\_setup}}\ env1(\textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00227}00227\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00228}00228\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ ret1\ =\ env1.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a8065338a7a9c760a92ce24d736a3dff2}{consume}}(frame,2,env1.\mbox{\hyperlink{structprocessor__setup_a4317b669be75123ab3301f66890e8ccc}{ec}});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00229}00229\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00230}00230\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ ret1,\ 2\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00231}00231\ \ \ \ \ BOOST\_CHECK(\ !env1.\mbox{\hyperlink{structprocessor__setup_a4317b669be75123ab3301f66890e8ccc}{ec}}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00232}00232\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env1.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a8a0ebdb322dad95ea3c7aee8e5c56b9a}{ready}}(),\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00233}00233\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00234}00234\ \ \ \ \ \textcolor{comment}{//\ two\ separate\ chunks}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00235}00235\ \ \ \ \ \mbox{\hyperlink{structprocessor__setup}{processor\_setup}}\ env2(\textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00236}00236\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00237}00237\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env2.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a8065338a7a9c760a92ce24d736a3dff2}{consume}}(frame,1,env2.\mbox{\hyperlink{structprocessor__setup_a4317b669be75123ab3301f66890e8ccc}{ec}}),\ 1\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00238}00238\ \ \ \ \ BOOST\_CHECK(\ !env2.\mbox{\hyperlink{structprocessor__setup_a4317b669be75123ab3301f66890e8ccc}{ec}}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00239}00239\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env2.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a8a0ebdb322dad95ea3c7aee8e5c56b9a}{ready}}(),\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00240}00240\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00241}00241\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env2.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a8065338a7a9c760a92ce24d736a3dff2}{consume}}(frame+1,1,env2.\mbox{\hyperlink{structprocessor__setup_a4317b669be75123ab3301f66890e8ccc}{ec}}),\ 1\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00242}00242\ \ \ \ \ BOOST\_CHECK(\ !env2.\mbox{\hyperlink{structprocessor__setup_a4317b669be75123ab3301f66890e8ccc}{ec}}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00243}00243\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env2.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a8a0ebdb322dad95ea3c7aee8e5c56b9a}{ready}}(),\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00244}00244\ \}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00245}00245\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00246}\mbox{\hyperlink{hybi13_8cpp_a860efb27551433186fc10d94e75c2d5a}{00246}}\ \mbox{\hyperlink{hybi13_8cpp_aa574a21bd8b369edb379ed3e0a61bb46}{BOOST\_AUTO\_TEST\_CASE}}(\ frame\_small\_binary\_unmasked\ )\ \{}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00247}00247\ \ \ \ \ \mbox{\hyperlink{structprocessor__setup}{processor\_setup}}\ env(\textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00248}00248\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00249}00249\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ frame[4]\ =\ \{0x82,\ 0x02,\ 0x2A,\ 0x2A\};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00250}00250\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00251}00251\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_af5f3b4bec38c586e31c0574b6c3f56b8}{get\_message}}(),\ \mbox{\hyperlink{debug__client_8cpp_a08398c4d31a4dc3e42d1b9a9ef64c6ad}{message\_ptr}}()\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00252}00252\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a8065338a7a9c760a92ce24d736a3dff2}{consume}}(frame,4,env.\mbox{\hyperlink{structprocessor__setup_a4317b669be75123ab3301f66890e8ccc}{ec}}),\ 4\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00253}00253\ \ \ \ \ BOOST\_CHECK(\ !env.\mbox{\hyperlink{structprocessor__setup_a4317b669be75123ab3301f66890e8ccc}{ec}}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00254}00254\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a8a0ebdb322dad95ea3c7aee8e5c56b9a}{ready}}(),\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00255}00255\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00256}00256\ \ \ \ \ \mbox{\hyperlink{debug__client_8cpp_a08398c4d31a4dc3e42d1b9a9ef64c6ad}{message\_ptr}}\ \mbox{\hyperlink{namespacefoo}{foo}}\ =\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_af5f3b4bec38c586e31c0574b6c3f56b8}{get\_message}}();}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00257}00257\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00258}00258\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_af5f3b4bec38c586e31c0574b6c3f56b8}{get\_message}}(),\ \mbox{\hyperlink{debug__client_8cpp_a08398c4d31a4dc3e42d1b9a9ef64c6ad}{message\_ptr}}()\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00259}00259\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacefoo}{foo}}-\/>get\_payload(),\ \textcolor{stringliteral}{"{}**"{}}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00260}00260\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00261}00261\ \}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00262}00262\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00263}\mbox{\hyperlink{hybi13_8cpp_a5e257b35cd71cfa41dc16b922ecf2cf2}{00263}}\ \mbox{\hyperlink{hybi13_8cpp_aa574a21bd8b369edb379ed3e0a61bb46}{BOOST\_AUTO\_TEST\_CASE}}(\ frame\_extended\_binary\_unmasked\ )\ \{}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00264}00264\ \ \ \ \ \mbox{\hyperlink{structprocessor__setup}{processor\_setup}}\ env(\textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00265}00265\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00266}00266\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ frame[130]\ =\ \{0x82,\ 0x7E,\ 0x00,\ 0x7E\};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00267}00267\ \ \ \ \ frame[0]\ =\ 0x82;}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00268}00268\ \ \ \ \ frame[1]\ =\ 0x7E;}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00269}00269\ \ \ \ \ frame[2]\ =\ 0x00;}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00270}00270\ \ \ \ \ frame[3]\ =\ 0x7E;}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00271}00271\ \ \ \ \ std::fill\_n(frame+4,126,0x2A);}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00272}00272\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00273}00273\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_af5f3b4bec38c586e31c0574b6c3f56b8}{get\_message}}(),\ \mbox{\hyperlink{debug__client_8cpp_a08398c4d31a4dc3e42d1b9a9ef64c6ad}{message\_ptr}}()\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00274}00274\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a8065338a7a9c760a92ce24d736a3dff2}{consume}}(frame,130,env.\mbox{\hyperlink{structprocessor__setup_a4317b669be75123ab3301f66890e8ccc}{ec}}),\ 130\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00275}00275\ \ \ \ \ BOOST\_CHECK(\ !env.\mbox{\hyperlink{structprocessor__setup_a4317b669be75123ab3301f66890e8ccc}{ec}}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00276}00276\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a8a0ebdb322dad95ea3c7aee8e5c56b9a}{ready}}(),\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00277}00277\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00278}00278\ \ \ \ \ \mbox{\hyperlink{debug__client_8cpp_a08398c4d31a4dc3e42d1b9a9ef64c6ad}{message\_ptr}}\ \mbox{\hyperlink{namespacefoo}{foo}}\ =\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_af5f3b4bec38c586e31c0574b6c3f56b8}{get\_message}}();}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00279}00279\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00280}00280\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_af5f3b4bec38c586e31c0574b6c3f56b8}{get\_message}}(),\ \mbox{\hyperlink{debug__client_8cpp_a08398c4d31a4dc3e42d1b9a9ef64c6ad}{message\_ptr}}()\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00281}00281\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacefoo}{foo}}-\/>get\_payload().size(),\ 126\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00282}00282\ \}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00283}00283\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00284}\mbox{\hyperlink{hybi13_8cpp_a221896aacbeefffb43c267b86d1304d0}{00284}}\ \mbox{\hyperlink{hybi13_8cpp_aa574a21bd8b369edb379ed3e0a61bb46}{BOOST\_AUTO\_TEST\_CASE}}(\ frame\_jumbo\_binary\_unmasked\ )\ \{}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00285}00285\ \ \ \ \ \mbox{\hyperlink{structprocessor__setup}{processor\_setup}}\ env(\textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00286}00286\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00287}00287\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ frame[130]\ =\ \{0x82,\ 0x7E,\ 0x00,\ 0x7E\};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00288}00288\ \ \ \ \ std::fill\_n(frame+4,126,0x2A);}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00289}00289\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00290}00290\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_af5f3b4bec38c586e31c0574b6c3f56b8}{get\_message}}(),\ \mbox{\hyperlink{debug__client_8cpp_a08398c4d31a4dc3e42d1b9a9ef64c6ad}{message\_ptr}}()\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00291}00291\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a8065338a7a9c760a92ce24d736a3dff2}{consume}}(frame,130,env.\mbox{\hyperlink{structprocessor__setup_a4317b669be75123ab3301f66890e8ccc}{ec}}),\ 130\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00292}00292\ \ \ \ \ BOOST\_CHECK(\ !env.\mbox{\hyperlink{structprocessor__setup_a4317b669be75123ab3301f66890e8ccc}{ec}}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00293}00293\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a8a0ebdb322dad95ea3c7aee8e5c56b9a}{ready}}(),\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00294}00294\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00295}00295\ \ \ \ \ \mbox{\hyperlink{debug__client_8cpp_a08398c4d31a4dc3e42d1b9a9ef64c6ad}{message\_ptr}}\ \mbox{\hyperlink{namespacefoo}{foo}}\ =\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_af5f3b4bec38c586e31c0574b6c3f56b8}{get\_message}}();}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00296}00296\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00297}00297\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_af5f3b4bec38c586e31c0574b6c3f56b8}{get\_message}}(),\ \mbox{\hyperlink{debug__client_8cpp_a08398c4d31a4dc3e42d1b9a9ef64c6ad}{message\_ptr}}()\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00298}00298\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacefoo}{foo}}-\/>get\_payload().size(),\ 126\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00299}00299\ \}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00300}00300\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00301}\mbox{\hyperlink{hybi13_8cpp_aaf22086af2985d51e7145f7e2550d3bc}{00301}}\ \mbox{\hyperlink{hybi13_8cpp_aa574a21bd8b369edb379ed3e0a61bb46}{BOOST\_AUTO\_TEST\_CASE}}(\ control\_frame\_too\_large\ )\ \{}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00302}00302\ \ \ \ \ \mbox{\hyperlink{structprocessor__setup}{processor\_setup}}\ env(\textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00303}00303\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00304}00304\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ frame[130]\ =\ \{0x88,\ 0x7E,\ 0x00,\ 0x7E\};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00305}00305\ \ \ \ \ std::fill\_n(frame+4,126,0x2A);}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00306}00306\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00307}00307\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_af5f3b4bec38c586e31c0574b6c3f56b8}{get\_message}}(),\ \mbox{\hyperlink{debug__client_8cpp_a08398c4d31a4dc3e42d1b9a9ef64c6ad}{message\_ptr}}()\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00308}00308\ \ \ \ \ BOOST\_CHECK\_GT(\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a8065338a7a9c760a92ce24d736a3dff2}{consume}}(frame,130,env.\mbox{\hyperlink{structprocessor__setup_a4317b669be75123ab3301f66890e8ccc}{ec}}),\ 0\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00309}00309\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a4317b669be75123ab3301f66890e8ccc}{ec}},\ \mbox{\hyperlink{namespacewebsocketpp_1_1processor_1_1error_ae6510ada6a25dcd7af258b6e374e3ca5a10635788a8dffa63bbdfd89b2263be71}{websocketpp::processor::error::control\_too\_big}}\ \ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00310}00310\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a8a0ebdb322dad95ea3c7aee8e5c56b9a}{ready}}(),\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00311}00311\ \}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00312}00312\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00313}\mbox{\hyperlink{hybi13_8cpp_a384ee45473a807f2266c43a2ef165b9c}{00313}}\ \mbox{\hyperlink{hybi13_8cpp_aa574a21bd8b369edb379ed3e0a61bb46}{BOOST\_AUTO\_TEST\_CASE}}(\ rsv\_bits\_used\ )\ \{}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00314}00314\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ frame[3][2]\ =\ \{\{0x90,\ 0x00\},}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00315}00315\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{0xA0,\ 0x00\},}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00316}00316\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{0xC0,\ 0x00\}\};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00317}00317\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00318}00318\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ 3;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00319}00319\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structprocessor__setup}{processor\_setup}}\ env(\textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00320}00320\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00321}00321\ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_af5f3b4bec38c586e31c0574b6c3f56b8}{get\_message}}(),\ \mbox{\hyperlink{debug__client_8cpp_a08398c4d31a4dc3e42d1b9a9ef64c6ad}{message\_ptr}}()\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00322}00322\ \ \ \ \ \ \ \ \ BOOST\_CHECK\_GT(\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a8065338a7a9c760a92ce24d736a3dff2}{consume}}(frame[i],2,env.\mbox{\hyperlink{structprocessor__setup_a4317b669be75123ab3301f66890e8ccc}{ec}}),\ 0\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00323}00323\ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a4317b669be75123ab3301f66890e8ccc}{ec}},\ \mbox{\hyperlink{namespacewebsocketpp_1_1processor_1_1error_ae6510ada6a25dcd7af258b6e374e3ca5a2858ee3d29c64d8a8c7a7d9bcfd165a1}{websocketpp::processor::error::invalid\_rsv\_bit}}\ \ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00324}00324\ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a8a0ebdb322dad95ea3c7aee8e5c56b9a}{ready}}(),\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00325}00325\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00326}00326\ \}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00327}00327\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00328}00328\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00329}\mbox{\hyperlink{hybi13_8cpp_a31a9d568e92330aa57198fa5eee0d7e2}{00329}}\ \mbox{\hyperlink{hybi13_8cpp_aa574a21bd8b369edb379ed3e0a61bb46}{BOOST\_AUTO\_TEST\_CASE}}(\ reserved\_opcode\_used\ )\ \{}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00330}00330\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ frame[10][2]\ =\ \{\{0x83,\ 0x00\},}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00331}00331\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{0x84,\ 0x00\},}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00332}00332\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{0x85,\ 0x00\},}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00333}00333\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{0x86,\ 0x00\},}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00334}00334\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{0x87,\ 0x00\},}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00335}00335\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{0x8B,\ 0x00\},}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00336}00336\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{0x8C,\ 0x00\},}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00337}00337\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{0x8D,\ 0x00\},}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00338}00338\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{0x8E,\ 0x00\},}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00339}00339\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{0x8F,\ 0x00\}\};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00340}00340\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00341}00341\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ 10;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00342}00342\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structprocessor__setup}{processor\_setup}}\ env(\textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00343}00343\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00344}00344\ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_af5f3b4bec38c586e31c0574b6c3f56b8}{get\_message}}(),\ \mbox{\hyperlink{debug__client_8cpp_a08398c4d31a4dc3e42d1b9a9ef64c6ad}{message\_ptr}}()\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00345}00345\ \ \ \ \ \ \ \ \ BOOST\_CHECK\_GT(\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a8065338a7a9c760a92ce24d736a3dff2}{consume}}(frame[i],2,env.\mbox{\hyperlink{structprocessor__setup_a4317b669be75123ab3301f66890e8ccc}{ec}}),\ 0\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00346}00346\ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a4317b669be75123ab3301f66890e8ccc}{ec}},\ \mbox{\hyperlink{namespacewebsocketpp_1_1processor_1_1error_ae6510ada6a25dcd7af258b6e374e3ca5a68515957c61c729f4cce0e60ec90ddbc}{websocketpp::processor::error::invalid\_opcode}}\ \ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00347}00347\ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a8a0ebdb322dad95ea3c7aee8e5c56b9a}{ready}}(),\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00348}00348\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00349}00349\ \}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00350}00350\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00351}\mbox{\hyperlink{hybi13_8cpp_a4bd9cadd955a49f8d9a6056fe5575733}{00351}}\ \mbox{\hyperlink{hybi13_8cpp_aa574a21bd8b369edb379ed3e0a61bb46}{BOOST\_AUTO\_TEST\_CASE}}(\ fragmented\_control\_message\ )\ \{}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00352}00352\ \ \ \ \ \mbox{\hyperlink{structprocessor__setup}{processor\_setup}}\ env(\textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00353}00353\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00354}00354\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ frame[2]\ =\ \{0x08,\ 0x00\};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00355}00355\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00356}00356\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_af5f3b4bec38c586e31c0574b6c3f56b8}{get\_message}}(),\ \mbox{\hyperlink{debug__client_8cpp_a08398c4d31a4dc3e42d1b9a9ef64c6ad}{message\_ptr}}()\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00357}00357\ \ \ \ \ BOOST\_CHECK\_GT(\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a8065338a7a9c760a92ce24d736a3dff2}{consume}}(frame,2,env.\mbox{\hyperlink{structprocessor__setup_a4317b669be75123ab3301f66890e8ccc}{ec}}),\ 0\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00358}00358\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a4317b669be75123ab3301f66890e8ccc}{ec}},\ \mbox{\hyperlink{namespacewebsocketpp_1_1processor_1_1error_ae6510ada6a25dcd7af258b6e374e3ca5ade117cb717f8722d226a2f7d4ad4d633}{websocketpp::processor::error::fragmented\_control}}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00359}00359\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a8a0ebdb322dad95ea3c7aee8e5c56b9a}{ready}}(),\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00360}00360\ \}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00361}00361\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00362}\mbox{\hyperlink{hybi13_8cpp_a077364265adab9f60e0867c52422ada4}{00362}}\ \mbox{\hyperlink{hybi13_8cpp_aa574a21bd8b369edb379ed3e0a61bb46}{BOOST\_AUTO\_TEST\_CASE}}(\ fragmented\_binary\_message\ )\ \{}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00363}00363\ \ \ \ \ \mbox{\hyperlink{structprocessor__setup}{processor\_setup}}\ env0(\textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00364}00364\ \ \ \ \ \mbox{\hyperlink{structprocessor__setup}{processor\_setup}}\ env1(\textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00365}00365\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00366}00366\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ frame0[6]\ =\ \{0x02,\ 0x01,\ 0x2A,\ 0x80,\ 0x01,\ 0x2A\};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00367}00367\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ frame1[8]\ =\ \{0x02,\ 0x01,\ 0x2A,\ 0x89,\ 0x00,\ 0x80,\ 0x01,\ 0x2A\};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00368}00368\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00369}00369\ \ \ \ \ \textcolor{comment}{//\ read\ fragmented\ message\ in\ one\ chunk}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00370}00370\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env0.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_af5f3b4bec38c586e31c0574b6c3f56b8}{get\_message}}(),\ \mbox{\hyperlink{debug__client_8cpp_a08398c4d31a4dc3e42d1b9a9ef64c6ad}{message\_ptr}}()\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00371}00371\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env0.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a8065338a7a9c760a92ce24d736a3dff2}{consume}}(frame0,6,env0.\mbox{\hyperlink{structprocessor__setup_a4317b669be75123ab3301f66890e8ccc}{ec}}),\ 6\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00372}00372\ \ \ \ \ BOOST\_CHECK(\ !env0.\mbox{\hyperlink{structprocessor__setup_a4317b669be75123ab3301f66890e8ccc}{ec}}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00373}00373\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env0.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a8a0ebdb322dad95ea3c7aee8e5c56b9a}{ready}}(),\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00374}00374\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env0.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_af5f3b4bec38c586e31c0574b6c3f56b8}{get\_message}}()-\/>get\_payload(),\ \textcolor{stringliteral}{"{}**"{}}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00375}00375\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00376}00376\ \ \ \ \ \textcolor{comment}{//\ read\ fragmented\ message\ in\ two\ chunks}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00377}00377\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env0.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_af5f3b4bec38c586e31c0574b6c3f56b8}{get\_message}}(),\ \mbox{\hyperlink{debug__client_8cpp_a08398c4d31a4dc3e42d1b9a9ef64c6ad}{message\_ptr}}()\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00378}00378\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env0.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a8065338a7a9c760a92ce24d736a3dff2}{consume}}(frame0,3,env0.\mbox{\hyperlink{structprocessor__setup_a4317b669be75123ab3301f66890e8ccc}{ec}}),\ 3\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00379}00379\ \ \ \ \ BOOST\_CHECK(\ !env0.\mbox{\hyperlink{structprocessor__setup_a4317b669be75123ab3301f66890e8ccc}{ec}}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00380}00380\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env0.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a8a0ebdb322dad95ea3c7aee8e5c56b9a}{ready}}(),\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00381}00381\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env0.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a8065338a7a9c760a92ce24d736a3dff2}{consume}}(frame0+3,3,env0.\mbox{\hyperlink{structprocessor__setup_a4317b669be75123ab3301f66890e8ccc}{ec}}),\ 3\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00382}00382\ \ \ \ \ BOOST\_CHECK(\ !env0.\mbox{\hyperlink{structprocessor__setup_a4317b669be75123ab3301f66890e8ccc}{ec}}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00383}00383\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env0.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a8a0ebdb322dad95ea3c7aee8e5c56b9a}{ready}}(),\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00384}00384\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env0.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_af5f3b4bec38c586e31c0574b6c3f56b8}{get\_message}}()-\/>get\_payload(),\ \textcolor{stringliteral}{"{}**"{}}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00385}00385\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00386}00386\ \ \ \ \ \textcolor{comment}{//\ read\ fragmented\ message\ with\ control\ message\ in\ between}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00387}00387\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env0.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_af5f3b4bec38c586e31c0574b6c3f56b8}{get\_message}}(),\ \mbox{\hyperlink{debug__client_8cpp_a08398c4d31a4dc3e42d1b9a9ef64c6ad}{message\_ptr}}()\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00388}00388\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env0.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a8065338a7a9c760a92ce24d736a3dff2}{consume}}(frame1,8,env0.\mbox{\hyperlink{structprocessor__setup_a4317b669be75123ab3301f66890e8ccc}{ec}}),\ 5\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00389}00389\ \ \ \ \ BOOST\_CHECK(\ !env0.\mbox{\hyperlink{structprocessor__setup_a4317b669be75123ab3301f66890e8ccc}{ec}}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00390}00390\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env0.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a8a0ebdb322dad95ea3c7aee8e5c56b9a}{ready}}(),\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00391}00391\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env0.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_af5f3b4bec38c586e31c0574b6c3f56b8}{get\_message}}()-\/>get\_opcode(),\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea384ec7a09356db47fdf1646f954aa208}{websocketpp::frame::opcode::PING}});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00392}00392\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env0.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a8065338a7a9c760a92ce24d736a3dff2}{consume}}(frame1+5,3,env0.\mbox{\hyperlink{structprocessor__setup_a4317b669be75123ab3301f66890e8ccc}{ec}}),\ 3\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00393}00393\ \ \ \ \ BOOST\_CHECK(\ !env0.\mbox{\hyperlink{structprocessor__setup_a4317b669be75123ab3301f66890e8ccc}{ec}}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00394}00394\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env0.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a8a0ebdb322dad95ea3c7aee8e5c56b9a}{ready}}(),\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00395}00395\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env0.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_af5f3b4bec38c586e31c0574b6c3f56b8}{get\_message}}()-\/>get\_payload(),\ \textcolor{stringliteral}{"{}**"{}}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00396}00396\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00397}00397\ \ \ \ \ \textcolor{comment}{//\ read\ lone\ continuation\ frame}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00398}00398\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env0.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_af5f3b4bec38c586e31c0574b6c3f56b8}{get\_message}}(),\ \mbox{\hyperlink{debug__client_8cpp_a08398c4d31a4dc3e42d1b9a9ef64c6ad}{message\_ptr}}()\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00399}00399\ \ \ \ \ BOOST\_CHECK\_GT(\ env0.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a8065338a7a9c760a92ce24d736a3dff2}{consume}}(frame0+3,3,env0.\mbox{\hyperlink{structprocessor__setup_a4317b669be75123ab3301f66890e8ccc}{ec}}),\ 0);}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00400}00400\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env0.\mbox{\hyperlink{structprocessor__setup_a4317b669be75123ab3301f66890e8ccc}{ec}},\ \mbox{\hyperlink{namespacewebsocketpp_1_1processor_1_1error_ae6510ada6a25dcd7af258b6e374e3ca5ad848839b79789b2d50e8d3cac7839658}{websocketpp::processor::error::invalid\_continuation}}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00401}00401\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00402}00402\ \ \ \ \ \textcolor{comment}{//\ read\ two\ start\ frames\ in\ a\ row}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00403}00403\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env1.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_af5f3b4bec38c586e31c0574b6c3f56b8}{get\_message}}(),\ \mbox{\hyperlink{debug__client_8cpp_a08398c4d31a4dc3e42d1b9a9ef64c6ad}{message\_ptr}}()\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00404}00404\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env1.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a8065338a7a9c760a92ce24d736a3dff2}{consume}}(frame0,3,env1.\mbox{\hyperlink{structprocessor__setup_a4317b669be75123ab3301f66890e8ccc}{ec}}),\ 3);}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00405}00405\ \ \ \ \ BOOST\_CHECK(\ !env1.\mbox{\hyperlink{structprocessor__setup_a4317b669be75123ab3301f66890e8ccc}{ec}}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00406}00406\ \ \ \ \ BOOST\_CHECK\_GT(\ env1.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a8065338a7a9c760a92ce24d736a3dff2}{consume}}(frame0,3,env1.\mbox{\hyperlink{structprocessor__setup_a4317b669be75123ab3301f66890e8ccc}{ec}}),\ 0);}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00407}00407\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env1.\mbox{\hyperlink{structprocessor__setup_a4317b669be75123ab3301f66890e8ccc}{ec}},\ \mbox{\hyperlink{namespacewebsocketpp_1_1processor_1_1error_ae6510ada6a25dcd7af258b6e374e3ca5ad848839b79789b2d50e8d3cac7839658}{websocketpp::processor::error::invalid\_continuation}}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00408}00408\ \}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00409}00409\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00410}\mbox{\hyperlink{hybi13_8cpp_aa30431a442a5c72d8e0de601cc033a37}{00410}}\ \mbox{\hyperlink{hybi13_8cpp_aa574a21bd8b369edb379ed3e0a61bb46}{BOOST\_AUTO\_TEST\_CASE}}(\ unmasked\_client\_frame\ )\ \{}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00411}00411\ \ \ \ \ \mbox{\hyperlink{structprocessor__setup}{processor\_setup}}\ env(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00412}00412\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00413}00413\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ frame[2]\ =\ \{0x82,\ 0x00\};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00414}00414\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00415}00415\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_af5f3b4bec38c586e31c0574b6c3f56b8}{get\_message}}(),\ \mbox{\hyperlink{debug__client_8cpp_a08398c4d31a4dc3e42d1b9a9ef64c6ad}{message\_ptr}}()\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00416}00416\ \ \ \ \ BOOST\_CHECK\_GT(\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a8065338a7a9c760a92ce24d736a3dff2}{consume}}(frame,2,env.\mbox{\hyperlink{structprocessor__setup_a4317b669be75123ab3301f66890e8ccc}{ec}}),\ 0\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00417}00417\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a4317b669be75123ab3301f66890e8ccc}{ec}},\ \mbox{\hyperlink{namespacewebsocketpp_1_1processor_1_1error_ae6510ada6a25dcd7af258b6e374e3ca5a3846b5f6faad1b747b0ed8fd17ba2001}{websocketpp::processor::error::masking\_required}}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00418}00418\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a8a0ebdb322dad95ea3c7aee8e5c56b9a}{ready}}(),\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00419}00419\ \}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00420}00420\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00421}\mbox{\hyperlink{hybi13_8cpp_ab3384e2ab804d8733c8546fea5e9b14a}{00421}}\ \mbox{\hyperlink{hybi13_8cpp_aa574a21bd8b369edb379ed3e0a61bb46}{BOOST\_AUTO\_TEST\_CASE}}(\ masked\_server\_frame\ )\ \{}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00422}00422\ \ \ \ \ \mbox{\hyperlink{structprocessor__setup}{processor\_setup}}\ env(\textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00423}00423\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00424}00424\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ frame[8]\ =\ \{0x82,\ 0x82,\ 0xFF,\ 0xFF,\ 0xFF,\ 0xFF,\ 0xD5,\ 0xD5\};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00425}00425\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00426}00426\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_af5f3b4bec38c586e31c0574b6c3f56b8}{get\_message}}(),\ \mbox{\hyperlink{debug__client_8cpp_a08398c4d31a4dc3e42d1b9a9ef64c6ad}{message\_ptr}}()\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00427}00427\ \ \ \ \ BOOST\_CHECK\_GT(\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a8065338a7a9c760a92ce24d736a3dff2}{consume}}(frame,8,env.\mbox{\hyperlink{structprocessor__setup_a4317b669be75123ab3301f66890e8ccc}{ec}}),\ 0\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00428}00428\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a4317b669be75123ab3301f66890e8ccc}{ec}},\ \mbox{\hyperlink{namespacewebsocketpp_1_1processor_1_1error_ae6510ada6a25dcd7af258b6e374e3ca5a5bdeb11b8137ed6865c188f563afc335}{websocketpp::processor::error::masking\_forbidden}}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00429}00429\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a8a0ebdb322dad95ea3c7aee8e5c56b9a}{ready}}(),\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00430}00430\ \}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00431}00431\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00432}\mbox{\hyperlink{hybi13_8cpp_a016cd17ca5f4e28f9b47f12f6edcf834}{00432}}\ \mbox{\hyperlink{hybi13_8cpp_aa574a21bd8b369edb379ed3e0a61bb46}{BOOST\_AUTO\_TEST\_CASE}}(\ frame\_small\_binary\_masked\ )\ \{}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00433}00433\ \ \ \ \ \mbox{\hyperlink{structprocessor__setup}{processor\_setup}}\ env(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00434}00434\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00435}00435\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ frame[8]\ =\ \{0x82,\ 0x82,\ 0xFF,\ 0xFF,\ 0xFF,\ 0xFF,\ 0xD5,\ 0xD5\};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00436}00436\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00437}00437\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_af5f3b4bec38c586e31c0574b6c3f56b8}{get\_message}}(),\ \mbox{\hyperlink{debug__client_8cpp_a08398c4d31a4dc3e42d1b9a9ef64c6ad}{message\_ptr}}()\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00438}00438\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a8065338a7a9c760a92ce24d736a3dff2}{consume}}(frame,8,env.\mbox{\hyperlink{structprocessor__setup_a4317b669be75123ab3301f66890e8ccc}{ec}}),\ 8\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00439}00439\ \ \ \ \ BOOST\_CHECK(\ !env.\mbox{\hyperlink{structprocessor__setup_a4317b669be75123ab3301f66890e8ccc}{ec}}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00440}00440\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a8a0ebdb322dad95ea3c7aee8e5c56b9a}{ready}}(),\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00441}00441\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_af5f3b4bec38c586e31c0574b6c3f56b8}{get\_message}}()-\/>get\_payload(),\ \textcolor{stringliteral}{"{}**"{}}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00442}00442\ \}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00443}00443\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00444}\mbox{\hyperlink{hybi13_8cpp_ade472e80cc874ab76924ed5159c84260}{00444}}\ \mbox{\hyperlink{hybi13_8cpp_aa574a21bd8b369edb379ed3e0a61bb46}{BOOST\_AUTO\_TEST\_CASE}}(\ masked\_fragmented\_binary\_message\ )\ \{}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00445}00445\ \ \ \ \ \mbox{\hyperlink{structprocessor__setup}{processor\_setup}}\ env(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00446}00446\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00447}00447\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ frame0[14]\ =\ \{0x02,\ 0x81,\ 0xAB,\ 0x23,\ 0x98,\ 0x45,\ 0x81,}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00448}00448\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x80,\ 0x81,\ 0xB8,\ 0x34,\ 0x12,\ 0xFF,\ 0x92\};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00449}00449\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00450}00450\ \ \ \ \ \textcolor{comment}{//\ read\ fragmented\ message\ in\ one\ chunk}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00451}00451\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_af5f3b4bec38c586e31c0574b6c3f56b8}{get\_message}}(),\ \mbox{\hyperlink{debug__client_8cpp_a08398c4d31a4dc3e42d1b9a9ef64c6ad}{message\_ptr}}()\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00452}00452\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a8065338a7a9c760a92ce24d736a3dff2}{consume}}(frame0,14,env.\mbox{\hyperlink{structprocessor__setup_a4317b669be75123ab3301f66890e8ccc}{ec}}),\ 14\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00453}00453\ \ \ \ \ BOOST\_CHECK(\ !env.\mbox{\hyperlink{structprocessor__setup_a4317b669be75123ab3301f66890e8ccc}{ec}}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00454}00454\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a8a0ebdb322dad95ea3c7aee8e5c56b9a}{ready}}(),\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00455}00455\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_af5f3b4bec38c586e31c0574b6c3f56b8}{get\_message}}()-\/>get\_payload(),\ \textcolor{stringliteral}{"{}**"{}}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00456}00456\ \}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00457}00457\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00458}\mbox{\hyperlink{hybi13_8cpp_ae8fa75d088192976938f98253c21555f}{00458}}\ \mbox{\hyperlink{hybi13_8cpp_aa574a21bd8b369edb379ed3e0a61bb46}{BOOST\_AUTO\_TEST\_CASE}}(\ prepare\_data\_frame\ )\ \{}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00459}00459\ \ \ \ \ \mbox{\hyperlink{structprocessor__setup}{processor\_setup}}\ env(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00460}00460\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00461}00461\ \ \ \ \ \mbox{\hyperlink{debug__client_8cpp_a08398c4d31a4dc3e42d1b9a9ef64c6ad}{message\_ptr}}\ in\ =\ env.\mbox{\hyperlink{structprocessor__setup_a7e5874fd9215c912a4b45a5595d393b6}{msg\_manager}}-\/>get\_message();}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00462}00462\ \ \ \ \ \mbox{\hyperlink{debug__client_8cpp_a08398c4d31a4dc3e42d1b9a9ef64c6ad}{message\_ptr}}\ out\ =\ env.\mbox{\hyperlink{structprocessor__setup_a7e5874fd9215c912a4b45a5595d393b6}{msg\_manager}}-\/>get\_message();}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00463}00463\ \ \ \ \ \mbox{\hyperlink{debug__client_8cpp_a08398c4d31a4dc3e42d1b9a9ef64c6ad}{message\_ptr}}\ invalid;}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00464}00464\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00465}00465\ \ \ \ \ \textcolor{comment}{//\ empty\ pointers\ arguements\ should\ return\ sane\ error}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00466}00466\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a919aaed345cab679875be1d95c7302ec}{prepare\_data\_frame}}(invalid,invalid),\ \mbox{\hyperlink{namespacewebsocketpp_1_1processor_1_1error_ae6510ada6a25dcd7af258b6e374e3ca5ad78ff630d081b41ce9027d4f361df5da}{websocketpp::processor::error::invalid\_arguments}}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00467}00467\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00468}00468\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a919aaed345cab679875be1d95c7302ec}{prepare\_data\_frame}}(in,invalid),\ \mbox{\hyperlink{namespacewebsocketpp_1_1processor_1_1error_ae6510ada6a25dcd7af258b6e374e3ca5ad78ff630d081b41ce9027d4f361df5da}{websocketpp::processor::error::invalid\_arguments}}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00469}00469\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00470}00470\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a919aaed345cab679875be1d95c7302ec}{prepare\_data\_frame}}(invalid,out),\ \mbox{\hyperlink{namespacewebsocketpp_1_1processor_1_1error_ae6510ada6a25dcd7af258b6e374e3ca5ad78ff630d081b41ce9027d4f361df5da}{websocketpp::processor::error::invalid\_arguments}}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00471}00471\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00472}00472\ \ \ \ \ \textcolor{comment}{//\ test\ valid\ opcodes}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00473}00473\ \ \ \ \ \textcolor{comment}{//\ control\ opcodes\ should\ return\ an\ error,\ data\ ones\ shouldn't}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00474}00474\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ 0xF;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00475}00475\ \ \ \ \ \ \ \ \ in-\/>set\_opcode(\mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e}{websocketpp::frame::opcode::value}}(i));}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00476}00476\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00477}00477\ \ \ \ \ \ \ \ \ env.\mbox{\hyperlink{structprocessor__setup_a4317b669be75123ab3301f66890e8ccc}{ec}}\ =\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a919aaed345cab679875be1d95c7302ec}{prepare\_data\_frame}}(in,out);}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00478}00478\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00479}00479\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_aa5e7f94a35f8fb59a925fa01636f08ad}{websocketpp::frame::opcode::is\_control}}(in-\/>get\_opcode()))\ \{}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00480}00480\ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a4317b669be75123ab3301f66890e8ccc}{ec}},\ \mbox{\hyperlink{namespacewebsocketpp_1_1processor_1_1error_ae6510ada6a25dcd7af258b6e374e3ca5a68515957c61c729f4cce0e60ec90ddbc}{websocketpp::processor::error::invalid\_opcode}}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00481}00481\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00482}00482\ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_CHECK\_NE(\ env.\mbox{\hyperlink{structprocessor__setup_a4317b669be75123ab3301f66890e8ccc}{ec}},\ \mbox{\hyperlink{namespacewebsocketpp_1_1processor_1_1error_ae6510ada6a25dcd7af258b6e374e3ca5a68515957c61c729f4cce0e60ec90ddbc}{websocketpp::processor::error::invalid\_opcode}}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00483}00483\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00484}00484\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00485}00485\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00486}00486\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00487}00487\ \ \ \ \ \textcolor{comment}{//in.set\_payload("{}foo"{});}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00488}00488\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00489}00489\ \ \ \ \ \textcolor{comment}{//e\ =\ prepare\_data\_frame(in,out);}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00490}00490\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00491}00491\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00492}00492\ \}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00493}00493\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00494}\mbox{\hyperlink{hybi13_8cpp_a92891967af01f8fd15bb4b601637ecf4}{00494}}\ \mbox{\hyperlink{hybi13_8cpp_aa574a21bd8b369edb379ed3e0a61bb46}{BOOST\_AUTO\_TEST\_CASE}}(\ single\_frame\_message\_too\_large\ )\ \{}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00495}00495\ \ \ \ \ \mbox{\hyperlink{structprocessor__setup}{processor\_setup}}\ env(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00496}00496\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00497}00497\ \ \ \ \ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1processor_ad412d33b168539dfbfa1d7e89908c5d1}{set\_max\_message\_size}}(3);}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00498}00498\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00499}00499\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ frame0[10]\ =\ \{0x82,\ 0x84,\ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x01,\ 0x01,\ 0x01,\ 0x01\};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00500}00500\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00501}00501\ \ \ \ \ \textcolor{comment}{//\ read\ message\ that\ is\ one\ byte\ too\ large}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00502}00502\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a8065338a7a9c760a92ce24d736a3dff2}{consume}}(frame0,10,env.\mbox{\hyperlink{structprocessor__setup_a4317b669be75123ab3301f66890e8ccc}{ec}}),\ 6\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00503}00503\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a4317b669be75123ab3301f66890e8ccc}{ec}},\ \mbox{\hyperlink{namespacewebsocketpp_1_1processor_1_1error_ae6510ada6a25dcd7af258b6e374e3ca5ad151bfb0d6cd320ae85831715a15f1e2}{websocketpp::processor::error::message\_too\_big}}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00504}00504\ \}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00505}00505\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00506}\mbox{\hyperlink{hybi13_8cpp_a3387136d486c0cbccb6142d5dca1072b}{00506}}\ \mbox{\hyperlink{hybi13_8cpp_aa574a21bd8b369edb379ed3e0a61bb46}{BOOST\_AUTO\_TEST\_CASE}}(\ multiple\_frame\_message\_too\_large\ )\ \{}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00507}00507\ \ \ \ \ \mbox{\hyperlink{structprocessor__setup}{processor\_setup}}\ env(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00508}00508\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00509}00509\ \ \ \ \ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1processor_ad412d33b168539dfbfa1d7e89908c5d1}{set\_max\_message\_size}}(4);}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00510}00510\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00511}00511\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ frame0[8]\ =\ \{0x02,\ 0x82,\ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x01,\ 0x01\};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00512}00512\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ frame1[9]\ =\ \{0x80,\ 0x83,\ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x01,\ 0x01,\ 0x01\};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00513}00513\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00514}00514\ \ \ \ \ \textcolor{comment}{//\ read\ first\ message\ frame\ with\ size\ under\ the\ limit}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00515}00515\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a8065338a7a9c760a92ce24d736a3dff2}{consume}}(frame0,8,env.\mbox{\hyperlink{structprocessor__setup_a4317b669be75123ab3301f66890e8ccc}{ec}}),\ 8\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00516}00516\ \ \ \ \ BOOST\_CHECK(\ !env.\mbox{\hyperlink{structprocessor__setup_a4317b669be75123ab3301f66890e8ccc}{ec}}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00517}00517\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00518}00518\ \ \ \ \ \textcolor{comment}{//\ read\ second\ message\ frame\ that\ puts\ the\ size\ over\ the\ limit}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00519}00519\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a8065338a7a9c760a92ce24d736a3dff2}{consume}}(frame1,9,env.\mbox{\hyperlink{structprocessor__setup_a4317b669be75123ab3301f66890e8ccc}{ec}}),\ 6\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00520}00520\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a4317b669be75123ab3301f66890e8ccc}{ec}},\ \mbox{\hyperlink{namespacewebsocketpp_1_1processor_1_1error_ae6510ada6a25dcd7af258b6e374e3ca5ad151bfb0d6cd320ae85831715a15f1e2}{websocketpp::processor::error::message\_too\_big}}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00521}00521\ \}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00522}00522\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00523}00523\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00524}00524\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00525}\mbox{\hyperlink{hybi13_8cpp_ae71b3d5940e72a22996ab38556e61b74}{00525}}\ \mbox{\hyperlink{hybi13_8cpp_aa574a21bd8b369edb379ed3e0a61bb46}{BOOST\_AUTO\_TEST\_CASE}}(\ client\_handshake\_request\ )\ \{}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00526}00526\ \ \ \ \ \mbox{\hyperlink{structprocessor__setup}{processor\_setup}}\ env(\textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00527}00527\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00528}00528\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_aae370ea5ac83a8ece7712cb39fc23f5b}{websocketpp::uri\_ptr}}\ u(\textcolor{keyword}{new}\ \mbox{\hyperlink{classwebsocketpp_1_1uri}{websocketpp::uri}}(\textcolor{stringliteral}{"{}ws://localhost/"{}}));}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00529}00529\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00530}00530\ \ \ \ \ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a5f88e94fc52da9be8ba718889b5c093f}{client\_handshake\_request}}(env.\mbox{\hyperlink{structprocessor__setup_a980e15fe985e1b98b603d7cdfe7c59ae}{req}},u,\ std::vector<std::string>());}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00531}00531\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00532}00532\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a980e15fe985e1b98b603d7cdfe7c59ae}{req}}.get\_method(),\ \textcolor{stringliteral}{"{}GET"{}}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00533}00533\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a980e15fe985e1b98b603d7cdfe7c59ae}{req}}.get\_version(),\ \textcolor{stringliteral}{"{}HTTP/1.1"{}});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00534}00534\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a980e15fe985e1b98b603d7cdfe7c59ae}{req}}.get\_uri(),\ \textcolor{stringliteral}{"{}/"{}});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00535}00535\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00536}00536\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a980e15fe985e1b98b603d7cdfe7c59ae}{req}}.get\_header(\textcolor{stringliteral}{"{}Host"{}}),\ \textcolor{stringliteral}{"{}localhost"{}});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00537}00537\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a980e15fe985e1b98b603d7cdfe7c59ae}{req}}.get\_header(\textcolor{stringliteral}{"{}Sec-\/WebSocket-\/Version"{}}),\ \textcolor{stringliteral}{"{}13"{}});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00538}00538\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a980e15fe985e1b98b603d7cdfe7c59ae}{req}}.get\_header(\textcolor{stringliteral}{"{}Connection"{}}),\ \textcolor{stringliteral}{"{}Upgrade"{}});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00539}00539\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a980e15fe985e1b98b603d7cdfe7c59ae}{req}}.get\_header(\textcolor{stringliteral}{"{}Upgrade"{}}),\ \textcolor{stringliteral}{"{}websocket"{}});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00540}00540\ \}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00541}00541\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00542}00542\ \textcolor{comment}{//\ TODO:}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00543}00543\ \textcolor{comment}{//\ test\ cases}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00544}00544\ \textcolor{comment}{//\ -\/\ adding\ headers}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00545}00545\ \textcolor{comment}{//\ -\/\ adding\ Upgrade\ header}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00546}00546\ \textcolor{comment}{//\ -\/\ adding\ Connection\ header}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00547}00547\ \textcolor{comment}{//\ -\/\ adding\ Sec-\/WebSocket-\/Version,\ Sec-\/WebSocket-\/Key,\ or\ Host\ header}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00548}00548\ \textcolor{comment}{//\ -\/\ other\ Sec*\ headers?}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00549}00549\ \textcolor{comment}{//\ -\/\ User\ Agent\ header?}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00550}00550\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00551}00551\ \textcolor{comment}{//\ Origin\ support}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00552}00552\ \textcolor{comment}{//\ Subprotocol\ requests}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00553}00553\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00554}00554\ \textcolor{comment}{//websocketpp::uri\_ptr\ u(new\ websocketpp::uri("{}ws://localhost/"{}));}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00555}00555\ \ \ \ \ \textcolor{comment}{//env.p.client\_handshake\_request(env.req,u);}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00556}00556\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00557}\mbox{\hyperlink{hybi13_8cpp_acc5f6ba7659c10b9ac9ff459921e032a}{00557}}\ \mbox{\hyperlink{hybi13_8cpp_aa574a21bd8b369edb379ed3e0a61bb46}{BOOST\_AUTO\_TEST\_CASE}}(\ client\_handshake\_response\_404\ )\ \{}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00558}00558\ \ \ \ \ \mbox{\hyperlink{structprocessor__setup}{processor\_setup}}\ env(\textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00559}00559\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00560}00560\ \ \ \ \ std::string\ res\ =\ \textcolor{stringliteral}{"{}HTTP/1.1\ 404\ Not\ Found\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00561}00561\ \ \ \ \ env.\mbox{\hyperlink{structprocessor__setup_a4f0a5fc919ad24998c07b4e9ea14497e}{res}}.consume(res.data(),res.size());}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00562}00562\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00563}00563\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a8c7e9edc5eec497d908095ab7a848f2e}{validate\_server\_handshake\_response}}(env.\mbox{\hyperlink{structprocessor__setup_a980e15fe985e1b98b603d7cdfe7c59ae}{req}},env.\mbox{\hyperlink{structprocessor__setup_a4f0a5fc919ad24998c07b4e9ea14497e}{res}}),\ \mbox{\hyperlink{namespacewebsocketpp_1_1processor_1_1error_ae6510ada6a25dcd7af258b6e374e3ca5a97235028937f2e70216b725b8c265a64}{websocketpp::processor::error::invalid\_http\_status}}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00564}00564\ \}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00565}00565\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00566}\mbox{\hyperlink{hybi13_8cpp_ad30b1dedaaf5ea3e45daa2e0f71a0c30}{00566}}\ \mbox{\hyperlink{hybi13_8cpp_aa574a21bd8b369edb379ed3e0a61bb46}{BOOST\_AUTO\_TEST\_CASE}}(\ client\_handshake\_response\_no\_upgrade\ )\ \{}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00567}00567\ \ \ \ \ \mbox{\hyperlink{structprocessor__setup}{processor\_setup}}\ env(\textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00568}00568\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00569}00569\ \ \ \ \ std::string\ res\ =\ \textcolor{stringliteral}{"{}HTTP/1.1\ 101\ Switching\ Protocols\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00570}00570\ \ \ \ \ env.\mbox{\hyperlink{structprocessor__setup_a4f0a5fc919ad24998c07b4e9ea14497e}{res}}.consume(res.data(),res.size());}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00571}00571\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00572}00572\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a8c7e9edc5eec497d908095ab7a848f2e}{validate\_server\_handshake\_response}}(env.\mbox{\hyperlink{structprocessor__setup_a980e15fe985e1b98b603d7cdfe7c59ae}{req}},env.\mbox{\hyperlink{structprocessor__setup_a4f0a5fc919ad24998c07b4e9ea14497e}{res}}),\ \mbox{\hyperlink{namespacewebsocketpp_1_1processor_1_1error_ae6510ada6a25dcd7af258b6e374e3ca5a06199459b5805bf545a7a8b265933d2d}{websocketpp::processor::error::missing\_required\_header}}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00573}00573\ \}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00574}00574\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00575}\mbox{\hyperlink{hybi13_8cpp_a2152b3bfaab7e9b4c0a0c7bbd41d1e38}{00575}}\ \mbox{\hyperlink{hybi13_8cpp_aa574a21bd8b369edb379ed3e0a61bb46}{BOOST\_AUTO\_TEST\_CASE}}(\ client\_handshake\_response\_no\_connection\ )\ \{}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00576}00576\ \ \ \ \ \mbox{\hyperlink{structprocessor__setup}{processor\_setup}}\ env(\textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00577}00577\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00578}00578\ \ \ \ \ std::string\ res\ =\ \textcolor{stringliteral}{"{}HTTP/1.1\ 101\ Switching\ Protocols\(\backslash\)r\(\backslash\)nUpgrade:\ foo,\ wEbsOckEt\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00579}00579\ \ \ \ \ env.\mbox{\hyperlink{structprocessor__setup_a4f0a5fc919ad24998c07b4e9ea14497e}{res}}.consume(res.data(),res.size());}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00580}00580\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00581}00581\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a8c7e9edc5eec497d908095ab7a848f2e}{validate\_server\_handshake\_response}}(env.\mbox{\hyperlink{structprocessor__setup_a980e15fe985e1b98b603d7cdfe7c59ae}{req}},env.\mbox{\hyperlink{structprocessor__setup_a4f0a5fc919ad24998c07b4e9ea14497e}{res}}),\ \mbox{\hyperlink{namespacewebsocketpp_1_1processor_1_1error_ae6510ada6a25dcd7af258b6e374e3ca5a06199459b5805bf545a7a8b265933d2d}{websocketpp::processor::error::missing\_required\_header}}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00582}00582\ \}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00583}00583\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00584}\mbox{\hyperlink{hybi13_8cpp_ae8e3663a31c85ad34b9df23916a74c40}{00584}}\ \mbox{\hyperlink{hybi13_8cpp_aa574a21bd8b369edb379ed3e0a61bb46}{BOOST\_AUTO\_TEST\_CASE}}(\ client\_handshake\_response\_no\_accept\ )\ \{}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00585}00585\ \ \ \ \ \mbox{\hyperlink{structprocessor__setup}{processor\_setup}}\ env(\textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00586}00586\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00587}00587\ \ \ \ \ std::string\ res\ =\ \textcolor{stringliteral}{"{}HTTP/1.1\ 101\ Switching\ Protocols\(\backslash\)r\(\backslash\)nUpgrade:\ foo,\ wEbsOckEt\(\backslash\)r\(\backslash\)nConnection:\ bar,\ UpGrAdE\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00588}00588\ \ \ \ \ env.\mbox{\hyperlink{structprocessor__setup_a4f0a5fc919ad24998c07b4e9ea14497e}{res}}.consume(res.data(),res.size());}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00589}00589\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00590}00590\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a8c7e9edc5eec497d908095ab7a848f2e}{validate\_server\_handshake\_response}}(env.\mbox{\hyperlink{structprocessor__setup_a980e15fe985e1b98b603d7cdfe7c59ae}{req}},env.\mbox{\hyperlink{structprocessor__setup_a4f0a5fc919ad24998c07b4e9ea14497e}{res}}),\ \mbox{\hyperlink{namespacewebsocketpp_1_1processor_1_1error_ae6510ada6a25dcd7af258b6e374e3ca5a06199459b5805bf545a7a8b265933d2d}{websocketpp::processor::error::missing\_required\_header}}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00591}00591\ \}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00592}00592\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00593}\mbox{\hyperlink{hybi13_8cpp_a179dbaba417ad6d154b7a488d6cc5fba}{00593}}\ \mbox{\hyperlink{hybi13_8cpp_aa574a21bd8b369edb379ed3e0a61bb46}{BOOST\_AUTO\_TEST\_CASE}}(\ client\_handshake\_response\ )\ \{}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00594}00594\ \ \ \ \ \mbox{\hyperlink{structprocessor__setup}{processor\_setup}}\ env(\textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00595}00595\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00596}00596\ \ \ \ \ env.\mbox{\hyperlink{structprocessor__setup_a980e15fe985e1b98b603d7cdfe7c59ae}{req}}.append\_header(\textcolor{stringliteral}{"{}Sec-\/WebSocket-\/Key"{}},\ \textcolor{stringliteral}{"{}dGhlIHNhbXBsZSBub25jZQ=="{}});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00597}00597\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00598}00598\ \ \ \ \ std::string\ res\ =\ \textcolor{stringliteral}{"{}HTTP/1.1\ 101\ Switching\ Protocols\(\backslash\)r\(\backslash\)nUpgrade:\ foo,\ wEbsOckEt\(\backslash\)r\(\backslash\)nConnection:\ bar,\ UpGrAdE\(\backslash\)r\(\backslash\)nSec-\/WebSocket-\/Accept:\ s3pPLMBiTxaQ9kYGzzhZRbK+xOo=\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00599}00599\ \ \ \ \ env.\mbox{\hyperlink{structprocessor__setup_a4f0a5fc919ad24998c07b4e9ea14497e}{res}}.consume(res.data(),res.size());}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00600}00600\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00601}00601\ \ \ \ \ BOOST\_CHECK(\ !env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_a8c7e9edc5eec497d908095ab7a848f2e}{validate\_server\_handshake\_response}}(env.\mbox{\hyperlink{structprocessor__setup_a980e15fe985e1b98b603d7cdfe7c59ae}{req}},env.\mbox{\hyperlink{structprocessor__setup_a4f0a5fc919ad24998c07b4e9ea14497e}{res}})\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00602}00602\ \}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00603}00603\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00604}\mbox{\hyperlink{hybi13_8cpp_ab39de0660bd4dedec1c500fe90edf439}{00604}}\ \mbox{\hyperlink{hybi13_8cpp_aa574a21bd8b369edb379ed3e0a61bb46}{BOOST\_AUTO\_TEST\_CASE}}(\ extensions\_disabled\ )\ \{}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00605}00605\ \ \ \ \ \mbox{\hyperlink{structprocessor__setup}{processor\_setup}}\ env(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00606}00606\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00607}00607\ \ \ \ \ env.\mbox{\hyperlink{structprocessor__setup_a980e15fe985e1b98b603d7cdfe7c59ae}{req}}.replace\_header(\textcolor{stringliteral}{"{}Sec-\/WebSocket-\/Extensions"{}},\textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00608}00608\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00609}00609\ \ \ \ \ std::pair<websocketpp::lib::error\_code,std::string>\ neg\_results;}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00610}00610\ \ \ \ \ neg\_results\ =\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1processor_aad69873505ba59f4ddf53e864f32bb80}{negotiate\_extensions}}(env.\mbox{\hyperlink{structprocessor__setup_a980e15fe985e1b98b603d7cdfe7c59ae}{req}});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00611}00611\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00612}00612\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ neg\_results.first,\ \mbox{\hyperlink{namespacewebsocketpp_1_1processor_1_1error_ae6510ada6a25dcd7af258b6e374e3ca5a529dc9b46308d321bd52d8ced4e566e1}{websocketpp::processor::error::extensions\_disabled}}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00613}00613\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ neg\_results.second,\ \textcolor{stringliteral}{"{}"{}}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00614}00614\ \}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00615}00615\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00616}\mbox{\hyperlink{hybi13_8cpp_af2a6ac7de0cbf2ab3f42fad11589bb88}{00616}}\ \mbox{\hyperlink{hybi13_8cpp_aa574a21bd8b369edb379ed3e0a61bb46}{BOOST\_AUTO\_TEST\_CASE}}(\ extension\_negotiation\_blank\ )\ \{}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00617}00617\ \ \ \ \ \mbox{\hyperlink{structprocessor__setup__ext}{processor\_setup\_ext}}\ env(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00618}00618\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00619}00619\ \ \ \ \ env.\mbox{\hyperlink{structprocessor__setup__ext_a3407743ef41e1a27cf5da82d467777d0}{req}}.replace\_header(\textcolor{stringliteral}{"{}Sec-\/WebSocket-\/Extensions"{}},\textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00620}00620\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00621}00621\ \ \ \ \ std::pair<websocketpp::lib::error\_code,std::string>\ neg\_results;}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00622}00622\ \ \ \ \ neg\_results\ =\ env.\mbox{\hyperlink{structprocessor__setup__ext_a04ff04a58e537a96fc110d36928f828b}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi13_aee995e6a4a29a800ce3b031885814ed1}{negotiate\_extensions}}(env.\mbox{\hyperlink{structprocessor__setup__ext_a3407743ef41e1a27cf5da82d467777d0}{req}});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00623}00623\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00624}00624\ \ \ \ \ BOOST\_CHECK(\ !neg\_results.first\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00625}00625\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ neg\_results.second,\ \textcolor{stringliteral}{"{}"{}}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00626}00626\ \}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00627}00627\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00628}\mbox{\hyperlink{hybi13_8cpp_af031866649c220df69ea97f6d3c2569e}{00628}}\ \mbox{\hyperlink{hybi13_8cpp_aa574a21bd8b369edb379ed3e0a61bb46}{BOOST\_AUTO\_TEST\_CASE}}(\ extension\_negotiation\_unknown\ )\ \{}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00629}00629\ \ \ \ \ \mbox{\hyperlink{structprocessor__setup__ext}{processor\_setup\_ext}}\ env(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00630}00630\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00631}00631\ \ \ \ \ env.\mbox{\hyperlink{structprocessor__setup__ext_a3407743ef41e1a27cf5da82d467777d0}{req}}.replace\_header(\textcolor{stringliteral}{"{}Sec-\/WebSocket-\/Extensions"{}},\textcolor{stringliteral}{"{}foo"{}});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00632}00632\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00633}00633\ \ \ \ \ std::pair<websocketpp::lib::error\_code,std::string>\ neg\_results;}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00634}00634\ \ \ \ \ neg\_results\ =\ env.\mbox{\hyperlink{structprocessor__setup__ext_a04ff04a58e537a96fc110d36928f828b}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi13_aee995e6a4a29a800ce3b031885814ed1}{negotiate\_extensions}}(env.\mbox{\hyperlink{structprocessor__setup__ext_a3407743ef41e1a27cf5da82d467777d0}{req}});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00635}00635\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00636}00636\ \ \ \ \ BOOST\_CHECK(\ !neg\_results.first\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00637}00637\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ neg\_results.second,\ \textcolor{stringliteral}{"{}"{}}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00638}00638\ \}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00639}00639\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00640}\mbox{\hyperlink{hybi13_8cpp_a3b48fcf441b161c0f1652936cfefc2ab}{00640}}\ \mbox{\hyperlink{hybi13_8cpp_aa574a21bd8b369edb379ed3e0a61bb46}{BOOST\_AUTO\_TEST\_CASE}}(\ extract\_subprotocols\_empty\ )\ \{}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00641}00641\ \ \ \ \ \mbox{\hyperlink{structprocessor__setup}{processor\_setup}}\ env(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00642}00642\ \ \ \ \ std::vector<std::string>\ \mbox{\hyperlink{xbyak__mnemonic_8h_a6c0b7a19420e945dd6d8010a082bc397}{subps}};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00643}00643\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00644}00644\ \ \ \ \ BOOST\_CHECK(\ !env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_ab7b5ff7d3a174454404fe97314ed4717}{extract\_subprotocols}}(env.\mbox{\hyperlink{structprocessor__setup_a980e15fe985e1b98b603d7cdfe7c59ae}{req}},\mbox{\hyperlink{xbyak__mnemonic_8h_a6c0b7a19420e945dd6d8010a082bc397}{subps}})\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00645}00645\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{xbyak__mnemonic_8h_a6c0b7a19420e945dd6d8010a082bc397}{subps}}.size(),\ 0\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00646}00646\ \}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00647}00647\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00648}\mbox{\hyperlink{hybi13_8cpp_ac5fb5cd780c134dae40dd025879238ac}{00648}}\ \mbox{\hyperlink{hybi13_8cpp_aa574a21bd8b369edb379ed3e0a61bb46}{BOOST\_AUTO\_TEST\_CASE}}(\ extract\_subprotocols\_one\ )\ \{}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00649}00649\ \ \ \ \ \mbox{\hyperlink{structprocessor__setup}{processor\_setup}}\ env(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00650}00650\ \ \ \ \ std::vector<std::string>\ \mbox{\hyperlink{xbyak__mnemonic_8h_a6c0b7a19420e945dd6d8010a082bc397}{subps}};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00651}00651\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00652}00652\ \ \ \ \ env.\mbox{\hyperlink{structprocessor__setup_a980e15fe985e1b98b603d7cdfe7c59ae}{req}}.replace\_header(\textcolor{stringliteral}{"{}Sec-\/WebSocket-\/Protocol"{}},\textcolor{stringliteral}{"{}foo"{}});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00653}00653\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00654}00654\ \ \ \ \ BOOST\_CHECK(\ !env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_ab7b5ff7d3a174454404fe97314ed4717}{extract\_subprotocols}}(env.\mbox{\hyperlink{structprocessor__setup_a980e15fe985e1b98b603d7cdfe7c59ae}{req}},\mbox{\hyperlink{xbyak__mnemonic_8h_a6c0b7a19420e945dd6d8010a082bc397}{subps}})\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00655}00655\ \ \ \ \ BOOST\_REQUIRE\_EQUAL(\ \mbox{\hyperlink{xbyak__mnemonic_8h_a6c0b7a19420e945dd6d8010a082bc397}{subps}}.size(),\ 1\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00656}00656\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{xbyak__mnemonic_8h_a6c0b7a19420e945dd6d8010a082bc397}{subps}}[0],\ \textcolor{stringliteral}{"{}foo"{}}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00657}00657\ \}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00658}00658\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00659}\mbox{\hyperlink{hybi13_8cpp_aadca76141c5781ac204fc974bd93d97a}{00659}}\ \mbox{\hyperlink{hybi13_8cpp_aa574a21bd8b369edb379ed3e0a61bb46}{BOOST\_AUTO\_TEST\_CASE}}(\ extract\_subprotocols\_multiple\ )\ \{}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00660}00660\ \ \ \ \ \mbox{\hyperlink{structprocessor__setup}{processor\_setup}}\ env(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00661}00661\ \ \ \ \ std::vector<std::string>\ \mbox{\hyperlink{xbyak__mnemonic_8h_a6c0b7a19420e945dd6d8010a082bc397}{subps}};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00662}00662\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00663}00663\ \ \ \ \ env.\mbox{\hyperlink{structprocessor__setup_a980e15fe985e1b98b603d7cdfe7c59ae}{req}}.replace\_header(\textcolor{stringliteral}{"{}Sec-\/WebSocket-\/Protocol"{}},\textcolor{stringliteral}{"{}foo,bar"{}});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00664}00664\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00665}00665\ \ \ \ \ BOOST\_CHECK(\ !env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_ab7b5ff7d3a174454404fe97314ed4717}{extract\_subprotocols}}(env.\mbox{\hyperlink{structprocessor__setup_a980e15fe985e1b98b603d7cdfe7c59ae}{req}},\mbox{\hyperlink{xbyak__mnemonic_8h_a6c0b7a19420e945dd6d8010a082bc397}{subps}})\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00666}00666\ \ \ \ \ BOOST\_REQUIRE\_EQUAL(\ \mbox{\hyperlink{xbyak__mnemonic_8h_a6c0b7a19420e945dd6d8010a082bc397}{subps}}.size(),\ 2\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00667}00667\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{xbyak__mnemonic_8h_a6c0b7a19420e945dd6d8010a082bc397}{subps}}[0],\ \textcolor{stringliteral}{"{}foo"{}}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00668}00668\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{xbyak__mnemonic_8h_a6c0b7a19420e945dd6d8010a082bc397}{subps}}[1],\ \textcolor{stringliteral}{"{}bar"{}}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00669}00669\ \}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00670}00670\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00671}\mbox{\hyperlink{hybi13_8cpp_aa81ce66bd74d7c83e4c6bc32514cb3a8}{00671}}\ \mbox{\hyperlink{hybi13_8cpp_aa574a21bd8b369edb379ed3e0a61bb46}{BOOST\_AUTO\_TEST\_CASE}}(\ extract\_subprotocols\_invalid)\ \{}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00672}00672\ \ \ \ \ \mbox{\hyperlink{structprocessor__setup}{processor\_setup}}\ env(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00673}00673\ \ \ \ \ std::vector<std::string>\ \mbox{\hyperlink{xbyak__mnemonic_8h_a6c0b7a19420e945dd6d8010a082bc397}{subps}};}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00674}00674\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00675}00675\ \ \ \ \ env.\mbox{\hyperlink{structprocessor__setup_a980e15fe985e1b98b603d7cdfe7c59ae}{req}}.replace\_header(\textcolor{stringliteral}{"{}Sec-\/WebSocket-\/Protocol"{}},\textcolor{stringliteral}{"{}foo,bar,,,,"{}});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00676}00676\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00677}00677\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.\mbox{\hyperlink{structprocessor__setup_a59097e2a73856213db06663c439f45dd}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi00_ab7b5ff7d3a174454404fe97314ed4717}{extract\_subprotocols}}(env.\mbox{\hyperlink{structprocessor__setup_a980e15fe985e1b98b603d7cdfe7c59ae}{req}},\mbox{\hyperlink{xbyak__mnemonic_8h_a6c0b7a19420e945dd6d8010a082bc397}{subps}}),\ \mbox{\hyperlink{namespacewebsocketpp_1_1processor_1_1error_afc5fc4548656f87cfee89994c95bec9c}{websocketpp::processor::error::make\_error\_code}}(\mbox{\hyperlink{namespacewebsocketpp_1_1processor_1_1error_ae6510ada6a25dcd7af258b6e374e3ca5a826cd67f60ca8687720833cea17777ac}{websocketpp::processor::error::subprotocol\_parse\_error}})\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00678}00678\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{xbyak__mnemonic_8h_a6c0b7a19420e945dd6d8010a082bc397}{subps}}.size(),\ 0\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00679}00679\ \}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00680}00680\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00681}\mbox{\hyperlink{hybi13_8cpp_a8572ea5938c89238763c7978435f0fed}{00681}}\ \mbox{\hyperlink{hybi13_8cpp_aa574a21bd8b369edb379ed3e0a61bb46}{BOOST\_AUTO\_TEST\_CASE}}(\ extension\_negotiation\_permessage\_deflate\ )\ \{}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00682}00682\ \ \ \ \ \mbox{\hyperlink{structprocessor__setup__ext}{processor\_setup\_ext}}\ env(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00683}00683\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00684}00684\ \ \ \ \ env.\mbox{\hyperlink{structprocessor__setup__ext_a3407743ef41e1a27cf5da82d467777d0}{req}}.replace\_header(\textcolor{stringliteral}{"{}Sec-\/WebSocket-\/Extensions"{}},}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00685}00685\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}permessage-\/deflate;\ client\_max\_window\_bits"{}});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00686}00686\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00687}00687\ \ \ \ \ std::pair<websocketpp::lib::error\_code,std::string>\ neg\_results;}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00688}00688\ \ \ \ \ neg\_results\ =\ env.\mbox{\hyperlink{structprocessor__setup__ext_a04ff04a58e537a96fc110d36928f828b}{p}}.\mbox{\hyperlink{classwebsocketpp_1_1processor_1_1hybi13_aee995e6a4a29a800ce3b031885814ed1}{negotiate\_extensions}}(env.\mbox{\hyperlink{structprocessor__setup__ext_a3407743ef41e1a27cf5da82d467777d0}{req}});}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00689}00689\ }
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00690}00690\ \ \ \ \ BOOST\_CHECK(\ !neg\_results.first\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00691}00691\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ neg\_results.second,\ \textcolor{stringliteral}{"{}permessage-\/deflate"{}}\ );}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00692}00692\ \}}
+\DoxyCodeLine{\Hypertarget{hybi13_8cpp_source_l00693}00693\ }
+
+\end{DoxyCode}

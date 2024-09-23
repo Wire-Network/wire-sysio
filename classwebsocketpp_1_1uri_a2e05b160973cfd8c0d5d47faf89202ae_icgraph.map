@@ -1,0 +1,29 @@
+<map id="websocketpp::uri::get_resource" name="websocketpp::uri::get_resource">
+<area shape="rect" id="Node000001" title=" " alt="" coords="250,294,396,334"/>
+<area shape="rect" id="Node000002" href="$uri_8cpp.html#a050575ae7c33bd10e774fe69e262dc3e" title=" " alt="" coords="5,5,202,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="313,279,301,226,280,163,247,98,225,69,200,44,184,34,186,29,203,40,229,66,251,96,285,161,307,225,319,278"/>
+<area shape="rect" id="Node000003" href="$uri_8cpp.html#a57d9a5647cf69633e89e0e9848cef3d2" title=" " alt="" coords="5,55,202,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="310,280,295,236,272,186,241,136,222,113,200,94,182,83,185,79,203,89,226,109,245,132,277,183,300,234,315,278"/>
+<area shape="rect" id="Node000004" href="$uri_8cpp.html#ad867eca315ddeebf19671c63d1691309" title=" " alt="" coords="5,104,202,130"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="304,281,287,247,264,210,235,174,200,143,180,133,183,128,203,139,239,170,268,207,292,245,309,278"/>
+<area shape="rect" id="Node000005" href="$uri_8cpp.html#a634bacb042ea27aac8c7204c413d60ba" title=" " alt="" coords="5,153,202,179"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="296,283,255,236,229,212,200,192,177,182,179,177,203,188,232,208,259,232,300,280"/>
+<area shape="rect" id="Node000006" href="$uri_8cpp.html#a3e093ec6be3918bd900a711932661eaf" title=" " alt="" coords="5,203,202,228"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="280,287,242,263,201,242,170,231,172,226,203,237,245,259,283,282"/>
+<area shape="rect" id="Node000007" href="$uri_8cpp.html#ae6f0af9b485f82ae85dec81c6f5045bb" title=" " alt="" coords="5,252,202,278"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="234,297,163,281,165,276,235,292"/>
+<area shape="rect" id="Node000008" href="$uri_8cpp.html#a0ee4b8b30ab23a07c28c6870ad38821a" title=" " alt="" coords="5,301,202,327"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="234,317,202,317,202,312,234,312"/>
+<area shape="rect" id="Node000009" href="$uri_8cpp.html#a341b6a05215a707809a5b9c28e898701" title=" " alt="" coords="5,351,202,376"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="235,337,165,353,163,347,234,331"/>
+<area shape="rect" id="Node000010" href="$uri_8cpp.html#ab02e71071a8d66f64d9dc428e09e1c0f" title=" " alt="" coords="5,400,202,426"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="283,346,245,370,203,391,172,402,170,397,201,386,242,365,280,341"/>
+<area shape="rect" id="Node000011" href="$uri_8cpp.html#a8c8449deec7677543baca38aae400b98" title=" " alt="" coords="5,449,202,475"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="300,349,259,396,232,420,203,440,179,451,177,446,200,436,229,416,255,393,296,345"/>
+<area shape="rect" id="Node000012" href="$uri_8cpp.html#ad9f0a2b5cbfc1b75ba81d23b72f02e99" title=" " alt="" coords="5,499,202,524"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="309,350,292,384,268,421,239,458,203,490,183,500,180,496,200,485,235,455,264,418,287,381,304,348"/>
+<area shape="rect" id="Node000013" href="$uri_8cpp.html#a3329c478b3b2dd39d6c6b77dde098251" title=" " alt="" coords="5,548,202,574"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="315,351,300,394,277,445,245,496,226,519,203,539,185,550,182,545,200,535,222,515,241,493,272,443,295,392,310,349"/>
+<area shape="rect" id="Node000014" href="$classwebsocketpp_1_1processor_1_1hybi13.html#a587360571f5bb11b7d0c39b69566bf38" title="Fill in a set of request headers for a client connection request." alt="" coords="15,598,192,654"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="317,350,304,402,282,465,249,530,228,561,204,588,189,600,185,596,200,584,224,558,244,528,277,463,299,401,312,349"/>
+</map>

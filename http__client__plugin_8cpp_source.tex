@@ -1,0 +1,79 @@
+\doxysection{http\+\_\+client\+\_\+plugin.\+cpp}
+\hypertarget{http__client__plugin_8cpp_source}{}\label{http__client__plugin_8cpp_source}\index{plugins/http\_client\_plugin/http\_client\_plugin.cpp@{plugins/http\_client\_plugin/http\_client\_plugin.cpp}}
+\mbox{\hyperlink{http__client__plugin_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{http__client__plugin_8hpp}{sysio/http\_client\_plugin/http\_client\_plugin.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp}{sysio/chain/exceptions.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <boost/algorithm/string/predicate.hpp>}}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <fstream>}}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00006}00006\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00008}\mbox{\hyperlink{classsysio_1_1http__client__plugin_a224e4bc3cf4e11f3be6c1c4e1dde2c07}{00008}}\ \mbox{\hyperlink{classsysio_1_1http__client__plugin_a224e4bc3cf4e11f3be6c1c4e1dde2c07}{http\_client\_plugin::http\_client\_plugin}}():my(new\ \mbox{\hyperlink{classfc_1_1http__client}{http\_client}}())\{\}}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00009}\mbox{\hyperlink{classsysio_1_1http__client__plugin_a243118476e56deb7b23141e8b5577a04}{00009}}\ \mbox{\hyperlink{classsysio_1_1http__client__plugin_a243118476e56deb7b23141e8b5577a04}{http\_client\_plugin::\string~http\_client\_plugin}}()\{\}}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00011}\mbox{\hyperlink{classsysio_1_1http__client__plugin_abb0ae20718a87fef0af9411e77fbd3d1}{00011}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1http__client__plugin_abb0ae20718a87fef0af9411e77fbd3d1}{http\_client\_plugin::set\_program\_options}}(options\_description\&,\ options\_description\&\ cfg)\ \{}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00012}00012\ \ \ \ cfg.add\_options()}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00013}00013\ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}https-\/client-\/root-\/cert"{}},\ boost::program\_options::value<vector<string>>()-\/>composing()-\/>multitoken(),}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00014}00014\ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}PEM\ encoded\ trusted\ root\ certificate\ (or\ path\ to\ file\ containing\ one)\ used\ to\ validate\ any\ TLS\ connections\ made.\ \ (may\ specify\ multiple\ times)\(\backslash\)n"{}})}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00015}00015\ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}https-\/client-\/validate-\/peers"{}},\ boost::program\_options::value<bool>()-\/>default\_value(\textcolor{keyword}{true}),}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00016}00016\ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}true:\ validate\ that\ the\ peer\ certificates\ are\ valid\ and\ trusted,\ false:\ ignore\ cert\ errors"{}})}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00017}00017\ \ \ \ \ \ \ ;}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00019}00019\ \}}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00021}\mbox{\hyperlink{classsysio_1_1http__client__plugin_ac623443157e7df3ac8e1eba0cc63e87b}{00021}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1http__client__plugin_ac623443157e7df3ac8e1eba0cc63e87b}{http\_client\_plugin::plugin\_initialize}}(\textcolor{keyword}{const}\ variables\_map\&\ options)\ \{}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00022}00022\ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00023}00023\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ options.count(\ \textcolor{stringliteral}{"{}https-\/client-\/root-\/cert"{}}\ ))\ \{}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00024}00024\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::vector<std::string>\ root\_pems\ =\ options[\textcolor{stringliteral}{"{}https-\/client-\/root-\/cert"{}}].as<std::vector<std::string>>();}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00025}00025\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ root\_pem\ :\ root\_pems\ )\ \{}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00026}00026\ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ pem\_str\ =\ root\_pem;}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00027}00027\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !boost::algorithm::starts\_with(\ pem\_str,\ \textcolor{stringliteral}{"{}-\/-\/-\/-\/-\/BEGIN\ CERTIFICATE-\/-\/-\/-\/-\/\(\backslash\)n"{}}\ ))\ \{}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00028}00028\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00029}00029\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ infile\ =\ std::ifstream(\ pem\_str\ );}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00030}00030\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::stringstream\ sstr;}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00031}00031\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sstr\ <<\ infile.rdbuf();}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00032}00032\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ pem\_str\ =\ sstr.str();}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00033}00033\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ boost::algorithm::starts\_with(\ pem\_str,\ \textcolor{stringliteral}{"{}-\/-\/-\/-\/-\/BEGIN\ CERTIFICATE-\/-\/-\/-\/-\/\(\backslash\)n"{}}\ ),}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00034}00034\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ chain::invalid\_http\_client\_root\_cert,}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00035}00035\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}File\ does\ not\ appear\ to\ be\ a\ PEM\ encoded\ certificate"{}}\ );}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00036}00036\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\ \textcolor{keyword}{const}\ std::bad\_alloc\&\ )\ \{}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00037}00037\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw};}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00038}00038\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\ \textcolor{keyword}{const}\ boost::interprocess::bad\_alloc\&\ )\ \{}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00039}00039\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw};}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00040}00040\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1exception}{fc::exception}}\&\ e\ )\ \{}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00041}00041\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}}(\ \textcolor{stringliteral}{"{}Failed\ to\ read\ PEM\ \$\{f\}\ :\ \$\{e\}"{}},\ (\textcolor{stringliteral}{"{}f"{}},\ root\_pem)(\ \textcolor{stringliteral}{"{}e"{}},\ e.\mbox{\hyperlink{classfc_1_1exception_a7611ea8fbe25dde56649b685c2298a37}{to\_detail\_string}}()));}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00042}00042\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\ \textcolor{keyword}{const}\ std::exception\&\ e\ )\ \{}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00043}00043\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}}(\ \textcolor{stringliteral}{"{}Failed\ to\ read\ PEM\ \$\{f\}\ :\ \$\{e\}"{}},\ (\textcolor{stringliteral}{"{}f"{}},\ root\_pem)(\ \textcolor{stringliteral}{"{}e"{}},\ \mbox{\hyperlink{classfc_1_1std__exception__wrapper_ae5ad64f84b1d373f5b92031566284c7c}{fc::std\_exception\_wrapper::from\_current\_exception}}(e).to\_detail\_string()));}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00044}00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00045}00045\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00047}00047\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ my-\/>add\_cert(\ pem\_str\ );}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\ \textcolor{keyword}{const}\ std::bad\_alloc\&\ )\ \{}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00050}00050\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw};}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00051}00051\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\ \textcolor{keyword}{const}\ boost::interprocess::bad\_alloc\&\ )\ \{}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw};}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1exception}{fc::exception}}\&\ e\ )\ \{}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}}(\ \textcolor{stringliteral}{"{}Failed\ to\ read\ PEM\ :\ \$\{e\}\ \(\backslash\)n\$\{pem\}\(\backslash\)n"{}},\ (\textcolor{stringliteral}{"{}pem"{}},\ pem\_str)(\ \textcolor{stringliteral}{"{}e"{}},\ e.\mbox{\hyperlink{classfc_1_1exception_a7611ea8fbe25dde56649b685c2298a37}{to\_detail\_string}}()));}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\ \textcolor{keyword}{const}\ std::exception\&\ e\ )\ \{}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}}(\ \textcolor{stringliteral}{"{}Failed\ to\ read\ PEM\ :\ \$\{e\}\ \(\backslash\)n\$\{pem\}\(\backslash\)n"{}},\ (\textcolor{stringliteral}{"{}pem"{}},\ pem\_str)(\ \textcolor{stringliteral}{"{}e"{}},\ \mbox{\hyperlink{classfc_1_1std__exception__wrapper_ae5ad64f84b1d373f5b92031566284c7c}{fc::std\_exception\_wrapper::from\_current\_exception}}(e).to\_detail\_string()));}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00059}00059\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00061}00061\ \ \ \ \ \ \ my-\/>set\_verify\_peers(\ options.at(\ \textcolor{stringliteral}{"{}https-\/client-\/validate-\/peers"{}}\ ).as<\textcolor{keywordtype}{bool}>());}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00062}00062\ \ \ \ \}\ \mbox{\hyperlink{exception_8hpp_ae70bfa24f5a3bc0917382b3c17fc033c}{FC\_LOG\_AND\_RETHROW}}()}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00063}00063\ \}}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00065}\mbox{\hyperlink{classsysio_1_1http__client__plugin_afa82b5252e9d149678b234978874d60e}{00065}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1http__client__plugin_afa82b5252e9d149678b234978874d60e}{http\_client\_plugin::plugin\_startup}}()\ \{}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00067}00067\ \}}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00069}\mbox{\hyperlink{classsysio_1_1http__client__plugin_ad6fa432359cd79a1bb4795cfcd78c0ec}{00069}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1http__client__plugin_ad6fa432359cd79a1bb4795cfcd78c0ec}{http\_client\_plugin::plugin\_shutdown}}()\ \{}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00071}00071\ \}}
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{http__client__plugin_8cpp_source_l00073}00073\ \}}
+
+\end{DoxyCode}

@@ -1,0 +1,24 @@
+<map id="GenericDocument::Parse" name="GenericDocument::Parse">
+<area shape="rect" id="Node000001" title="Parse JSON text from a read&#45;only string (with Encoding conversion)" alt="" coords="5,80,174,106"/>
+<area shape="rect" id="Node000002" href="$class_generic_document.html#a7bc1827a7ab04de4789fe46237f0e921" title="Parse JSON text from an input stream (with Encoding conversion)" alt="" coords="222,80,432,106"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="174,99,206,99,206,104,174,104"/>
+<area shape="poly" id="edge11_Node000002_Node000001" title=" " alt="" coords="221,87,189,87,189,81,221,81"/>
+<area shape="rect" id="Node000003" href="$classinternal_1_1_stack.html#aa6f933acc7ecd92a2b567db5fa8cd43a" title=" " alt="" coords="482,5,667,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="365,77,479,40,503,33,505,38,481,45,367,82"/>
+<area shape="rect" id="Node000004" href="$classinternal_1_1_stack.html#ac484468a2791bd3e9ba609bd1600ab48" title=" " alt="" coords="494,55,654,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="432,79,478,75,479,80,433,85"/>
+<area shape="rect" id="Node000005" href="$classinternal_1_1_stack.html#a657ae4d477b25d4e0045aee0efd809c3" title=" " alt="" coords="480,104,668,130"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="433,100,465,104,464,109,432,106"/>
+<area shape="rect" id="Node000006" href="$class_generic_value.html#ad7502bbfcd0c14f7ece07243d56e2b90" title="Assignment with move semantics." alt="" coords="494,153,655,179"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="368,104,481,140,505,146,503,151,479,145,366,109"/>
+<area shape="rect" id="Node000007" href="$class_generic_value.html#abb8ea2dfbe74ff4ee7dac6be31317f81" title="Assignment without calling destructor." alt="" coords="725,128,899,154"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="655,155,709,149,710,154,655,160"/>
+<area shape="rect" id="Node000008" href="$class_generic_value.html#a213ba89ef5ef961a5e655bd8c78ac9f4" title="Destructor." alt="" coords="716,177,908,203"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="655,172,701,176,700,182,655,177"/>
+<area shape="rect" id="Node000009" href="$class_generic_value.html#a40f567bae6fabbb07822ebac5fe00bfc" title=" " alt="" coords="966,104,1148,145"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="867,174,907,164,966,147,968,152,908,169,868,179"/>
+<area shape="rect" id="Node000010" href="$class_generic_value.html#a8c39af1a639eae1b59db66e2cbb537c9" title=" " alt="" coords="966,170,1148,210"/>
+<area shape="poly" id="edge9_Node000008_Node000010" title=" " alt="" coords="908,188,950,188,950,193,908,193"/>
+<area shape="rect" id="Node000011" href="$class_generic_value.html#af182f2ccbcd962d2a28f92407622e9a9" title=" " alt="" coords="956,235,1158,260"/>
+<area shape="poly" id="edge10_Node000008_Node000011" title=" " alt="" coords="871,201,985,228,983,233,869,206"/>
+</map>

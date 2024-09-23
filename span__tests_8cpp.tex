@@ -1,0 +1,201 @@
+\doxysection{libraries/sys-\/vm/tests/span\+\_\+tests.cpp File Reference}
+\hypertarget{span__tests_8cpp}{}\label{span__tests_8cpp}\index{libraries/sys-\/vm/tests/span\_tests.cpp@{libraries/sys-\/vm/tests/span\_tests.cpp}}
+{\ttfamily \#include $<$sysio/vm/span.\+hpp$>$}\newline
+{\ttfamily \#include $<$catch2/catch.\+hpp$>$}\newline
+Include dependency graph for span\+\_\+tests.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{span__tests_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1vm}{sysio\+::vm}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{span__tests_8cpp_ad9c6d19b23812326832488d5c545a962}{TEST\+\_\+\+CASE}} ("{}span static\+\_\+extent tests"{}, "{}\mbox{[}span\+\_\+static\+\_\+extent\mbox{]}"{})
+\item 
+\mbox{\hyperlink{span__tests_8cpp_a3dbe5655ea3d526b88e25a594961fd74}{TEST\+\_\+\+CASE}} ("{}default constructor"{}, "{}\mbox{[}span\+\_\+dynamic\+\_\+extent\mbox{]}"{})
+\item 
+\mbox{\hyperlink{span__tests_8cpp_a2bd53441ac2c3c685c35c9c8d15fbf24}{TEST\+\_\+\+CASE}} ("{}array constructor"{}, "{}\mbox{[}span\mbox{]}"{})
+\item 
+\mbox{\hyperlink{span__tests_8cpp_aa04cb39703680cd3d35d33904b13672d}{TEST\+\_\+\+CASE}} ("{}std\+::array constructor"{}, "{}\mbox{[}span\mbox{]}"{})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t Extent$>$ }\\bool \mbox{\hyperlink{namespacesysio_1_1vm_a64eacc35e4a61c57790ed641e9ddc410}{sysio\+::vm\+::operator==}} (const \mbox{\hyperlink{classsysio_1_1vm_1_1span}{span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$ \&lhs, const \mbox{\hyperlink{classsysio_1_1vm_1_1span}{span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$ \&rhs)
+\item 
+\mbox{\hyperlink{span__tests_8cpp_a0d5c59020877c2102a61832efa26cb8a}{TEST\+\_\+\+CASE}} ("{}span dynamic\+\_\+extent tests"{}, "{}\mbox{[}span\+\_\+dynamic\+\_\+extent\mbox{]}"{})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{span__tests_8cpp_a2bd53441ac2c3c685c35c9c8d15fbf24}\index{span\_tests.cpp@{span\_tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!span\_tests.cpp@{span\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/5]}}
+{\footnotesize\ttfamily \label{span__tests_8cpp_a2bd53441ac2c3c685c35c9c8d15fbf24} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}array constructor"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}span\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{span__tests_8cpp_source_l00031}{31}} of file \mbox{\hyperlink{span__tests_8cpp_source}{span\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00032\ \ \ \ \textcolor{keyword}{static\_assert}(std::is\_constructible\_v<span<int>,\ int(\&)[1]>);}
+\DoxyCodeLine{00033\ \ \ \ \textcolor{keyword}{static\_assert}(std::is\_constructible\_v<span<const\ int>,\ int(\&)[1]>);}
+\DoxyCodeLine{00034\ \ \ \ \textcolor{keyword}{static\_assert}(std::is\_constructible\_v<span<const\ int>,\ \textcolor{keyword}{const}\ int(\&)[1]>);}
+\DoxyCodeLine{00035\ \ \ \ \textcolor{keyword}{static\_assert}(std::is\_constructible\_v<span<int,\ 1>,\ int(\&)[1]>);}
+\DoxyCodeLine{00036\ \ \ \ \textcolor{keyword}{static\_assert}(std::is\_constructible\_v<span<const\ int,\ 1>,\ int(\&)[1]>);}
+\DoxyCodeLine{00037\ \ \ \ \textcolor{keyword}{static\_assert}(std::is\_constructible\_v<span<const\ int,\ 1>,\ \textcolor{keyword}{const}\ int(\&)[1]>);}
+\DoxyCodeLine{00038\ \ \ \ \textcolor{keyword}{static\_assert}(!std::is\_constructible\_v<span<int>,\ long(\&)[1]>);}
+\DoxyCodeLine{00039\ \ \ \ \textcolor{keyword}{static\_assert}(!std::is\_constructible\_v<span<int,\ 1>,\ int(\&)[2]>);}
+\DoxyCodeLine{00040\ \ \ \ \textcolor{keyword}{static\_assert}(!std::is\_constructible\_v<span<int>,\ \textcolor{keyword}{const}\ int(\&)[1]>);}
+\DoxyCodeLine{00041\ \ \ \ \textcolor{keyword}{static\_assert}(!std::is\_constructible\_v<span<int,\ 1>,\ \textcolor{keyword}{const}\ int(\&)[1]>);}
+\DoxyCodeLine{00042\ \ \ \ \textcolor{keywordtype}{int}\ a1[1];}
+\DoxyCodeLine{00043\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1span}{span<int>}}\ s1(a1);}
+\DoxyCodeLine{00044\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(s1.data()\ ==\ a1);}
+\DoxyCodeLine{00045\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(s1.size()\ ==\ 1);}
+\DoxyCodeLine{00046\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=301pt]{span__tests_8cpp_a2bd53441ac2c3c685c35c9c8d15fbf24_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{span__tests_8cpp_a3dbe5655ea3d526b88e25a594961fd74}\index{span\_tests.cpp@{span\_tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!span\_tests.cpp@{span\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/5]}}
+{\footnotesize\ttfamily \label{span__tests_8cpp_a3dbe5655ea3d526b88e25a594961fd74} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}default constructor"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}span\+\_\+dynamic\+\_\+extent\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{span__tests_8cpp_source_l00022}{22}} of file \mbox{\hyperlink{span__tests_8cpp_source}{span\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00023\ \ \ \ \textcolor{comment}{//static\_assert(std::is\_constructible\_v<span<int,\ 0>>);}}
+\DoxyCodeLine{00024\ \ \ \ \textcolor{keyword}{static\_assert}(!std::is\_constructible\_v<span<int,\ 1>>);}
+\DoxyCodeLine{00025\ \ \ \ \textcolor{keyword}{static\_assert}(std::is\_constructible\_v<span<int>>);}
+\DoxyCodeLine{00026\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1span}{span<int>}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{00027\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.size()\ ==\ 0);}
+\DoxyCodeLine{00028\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.data()\ ==\ \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{00029\ \}}
+
+\end{DoxyCode}
+\Hypertarget{span__tests_8cpp_a0d5c59020877c2102a61832efa26cb8a}\index{span\_tests.cpp@{span\_tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!span\_tests.cpp@{span\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [3/5]}}
+{\footnotesize\ttfamily \label{span__tests_8cpp_a0d5c59020877c2102a61832efa26cb8a} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}span dynamic\+\_\+extent tests"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}span\+\_\+dynamic\+\_\+extent\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{span__tests_8cpp_source_l00072}{72}} of file \mbox{\hyperlink{span__tests_8cpp_source}{span\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00073\ \ \ \ \textcolor{comment}{//\ currently\ we\ only\ support\ a\ static\ extent\ of\ 1}}
+\DoxyCodeLine{00074\ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}[10]\ =\ \{1\};}
+\DoxyCodeLine{00075\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1span}{span<int>}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ 10);}
+\DoxyCodeLine{00076\ }
+\DoxyCodeLine{00077\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.data()\ ==\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{00078\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.front()\ ==\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}[0]);}
+\DoxyCodeLine{00079\ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.front()\ +=\ 3;}
+\DoxyCodeLine{00080\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.front()\ ==\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}[0]);}
+\DoxyCodeLine{00081\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(4\ ==\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}[0]);}
+\DoxyCodeLine{00082\ }
+\DoxyCodeLine{00083\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1span}{span<int>}}\ test\_a(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ 3);}
+\DoxyCodeLine{00084\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1span}{span<int>}}\ test\_b(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ +\ 7,\ 3);}
+\DoxyCodeLine{00085\ }
+\DoxyCodeLine{00086\ \ \ \ \textcolor{keywordflow}{for}\ (\ \textcolor{keyword}{auto}\&\ elem\ :\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ )\ \{}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{elem}}\ =\ 7;}
+\DoxyCodeLine{00088\ \ \ \ \}}
+\DoxyCodeLine{00089\ }
+\DoxyCodeLine{00090\ \ \ \ \textcolor{keywordflow}{for}\ (\ \textcolor{keywordtype}{int}\ i=0;\ i\ <\ 10;\ i++\ )\ \{}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}[i]\ ==\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}[i]);}
+\DoxyCodeLine{00092\ \ \ \ \}}
+\DoxyCodeLine{00093\ }
+\DoxyCodeLine{00094\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.first(3)\ ==\ \mbox{\hyperlink{classsysio_1_1vm_1_1span}{span<int>}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ 3));}
+\DoxyCodeLine{00095\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.last(3)\ \ ==\ \mbox{\hyperlink{classsysio_1_1vm_1_1span}{span<int>}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}+7,\ 3));}
+\DoxyCodeLine{00096\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.subspan(3,\ 3)\ ==\ \mbox{\hyperlink{classsysio_1_1vm_1_1span}{span<int>}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}+3,\ 3));}
+\DoxyCodeLine{00097\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.subspan(3,\ sysio::vm::dynamic\_extent)\ ==\ \mbox{\hyperlink{classsysio_1_1vm_1_1span}{span<int>}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}+3,\ 7));}
+\DoxyCodeLine{00098\ \}}
+
+\end{DoxyCode}
+\Hypertarget{span__tests_8cpp_ad9c6d19b23812326832488d5c545a962}\index{span\_tests.cpp@{span\_tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!span\_tests.cpp@{span\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [4/5]}}
+{\footnotesize\ttfamily \label{span__tests_8cpp_ad9c6d19b23812326832488d5c545a962} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}span static\+\_\+extent tests"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}span\+\_\+static\+\_\+extent\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{span__tests_8cpp_source_l00007}{7}} of file \mbox{\hyperlink{span__tests_8cpp_source}{span\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00007\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00008\ \ \ \ \textcolor{comment}{//\ currently\ we\ only\ support\ a\ static\ extent\ of\ 1}}
+\DoxyCodeLine{00009\ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ =\ 0;}
+\DoxyCodeLine{00010\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1span}{span<int,\ 1>}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}(\&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ 1);}
+\DoxyCodeLine{00011\ }
+\DoxyCodeLine{00012\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.data()\ ==\ std::addressof(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}));}
+\DoxyCodeLine{00013\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.front()\ ==\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{00014\ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.front()\ +=\ 3;}
+\DoxyCodeLine{00015\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.front()\ ==\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{00016\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(3\ ==\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \ \ \ \textcolor{keywordtype}{int}*\ lta\ =\ \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}};}
+\DoxyCodeLine{00019\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{classsysio_1_1vm_1_1span}{span<int>}}(\&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ lta-\/1),\ sysio::vm::span\_exception);}
+\DoxyCodeLine{00020\ \}}
+
+\end{DoxyCode}
+\Hypertarget{span__tests_8cpp_aa04cb39703680cd3d35d33904b13672d}\index{span\_tests.cpp@{span\_tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!span\_tests.cpp@{span\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [5/5]}}
+{\footnotesize\ttfamily \label{span__tests_8cpp_aa04cb39703680cd3d35d33904b13672d} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}std\+::array constructor"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}span\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{span__tests_8cpp_source_l00048}{48}} of file \mbox{\hyperlink{span__tests_8cpp_source}{span\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00049\ \ \ \ \textcolor{keyword}{static\_assert}(std::is\_constructible\_v<span<int>,\ std::array<int,\ 1>\&>);}
+\DoxyCodeLine{00050\ \ \ \ \textcolor{keyword}{static\_assert}(std::is\_constructible\_v<span<const\ int>,\ std::array<int,\ 1>\&>);}
+\DoxyCodeLine{00051\ \ \ \ \textcolor{keyword}{static\_assert}(std::is\_constructible\_v<span<const\ int>,\ \textcolor{keyword}{const}\ std::array<int,\ 1>\&>);}
+\DoxyCodeLine{00052\ \ \ \ \textcolor{keyword}{static\_assert}(std::is\_constructible\_v<span<int,\ 1>,\ std::array<int,\ 1>\&>);}
+\DoxyCodeLine{00053\ \ \ \ \textcolor{keyword}{static\_assert}(std::is\_constructible\_v<span<const\ int,\ 1>,\ std::array<int,\ 1>\&>);}
+\DoxyCodeLine{00054\ \ \ \ \textcolor{keyword}{static\_assert}(std::is\_constructible\_v<span<const\ int,\ 1>,\ \textcolor{keyword}{const}\ std::array<int,\ 1>\&>);}
+\DoxyCodeLine{00055\ \ \ \ \textcolor{keyword}{static\_assert}(!std::is\_constructible\_v<span<int>,\ std::array<long,\ 1>\&>);}
+\DoxyCodeLine{00056\ \ \ \ \textcolor{keyword}{static\_assert}(!std::is\_constructible\_v<span<int,\ 1>,\ std::array<int,\ 2>\&>);}
+\DoxyCodeLine{00057\ \ \ \ \textcolor{keyword}{static\_assert}(!std::is\_constructible\_v<span<int>,\ \textcolor{keyword}{const}\ std::array<int,\ 1>\&>);}
+\DoxyCodeLine{00058\ \ \ \ \textcolor{keyword}{static\_assert}(!std::is\_constructible\_v<span<int,\ 1>,\ \textcolor{keyword}{const}\ std::array<int,\ 1>\&>);}
+\DoxyCodeLine{00059\ \ \ \ std::array<int,\ 1>\ a1;}
+\DoxyCodeLine{00060\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1span}{span<int>}}\ s1(a1);}
+\DoxyCodeLine{00061\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(s1.data()\ ==\ a1.data());}
+\DoxyCodeLine{00062\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(s1.size()\ ==\ 1);}
+\DoxyCodeLine{00063\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=301pt]{span__tests_8cpp_aa04cb39703680cd3d35d33904b13672d_cgraph}
+\end{center}
+\end{figure}

@@ -1,0 +1,11 @@
+<map id="sysiosystem::voter_info" name="sysiosystem::voter_info">
+<area shape="rect" id="Node000001" title=" " alt="" coords="111,184,271,210"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1name.html" title="Immutable except for fc::from_variant." alt="" coords="5,80,137,106"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="97,114,148,158,177,181,174,186,145,162,94,118"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="161,80,221,106"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="194,122,194,184,188,184,188,122"/>
+<area shape="rect" id="Node000004" href="$structsysio_1_1chain_1_1asset.html" title=" " alt="" coords="275,80,406,106"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="337,122,327,143,313,162,292,176,269,186,267,181,289,171,309,158,323,140,332,120"/>
+<area shape="rect" id="Node000005" href="$structfc_1_1reflect__init.html" title=" " alt="" coords="290,5,390,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="343,46,343,80,338,80,338,46"/>
+</map>

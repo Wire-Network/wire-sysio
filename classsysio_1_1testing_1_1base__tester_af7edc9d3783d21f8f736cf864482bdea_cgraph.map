@@ -1,0 +1,45 @@
+<map id="sysio::testing::base_tester::open" name="sysio::testing::base_tester::open">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,263,141,304"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1genesis__state.html#ad6e72f371108e814704865a7f1b4d708" title=" " alt="" coords="193,79,363,120"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="95,261,241,128,244,132,99,265"/>
+<area shape="rect" id="Node000006" href="$classsysio_1_1chain_1_1block__log.html#ad17bd0904611f780b5d49ad14b363208" title=" " alt="" coords="204,234,352,274"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="141,271,188,264,189,270,141,276"/>
+<area shape="rect" id="Node000009" href="$namespacefc.html#a6855142912d4cfb89281ba0c7f4938a2" title=" " alt="" coords="668,249,788,275"/>
+<area shape="poly" id="edge24_Node000001_Node000009" title=" " alt="" coords="141,285,342,292,465,290,589,284,653,275,653,280,590,289,466,296,342,297,141,290"/>
+<area shape="rect" id="Node000011" href="$classsysio_1_1chain_1_1controller.html#a1fba60b779aae78110279aeda9aae351" title=" " alt="" coords="189,430,367,470"/>
+<area shape="poly" id="edge12_Node000001_Node000011" title=" " alt="" coords="101,302,242,418,238,422,98,306"/>
+<area shape="rect" id="Node000003" href="$namespacefc_1_1raw.html#a3a18d8161aa5b4f4f02b6fcfdff5e5d1" title=" " alt="" coords="454,29,551,55"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="359,76,438,56,439,61,360,81"/>
+<area shape="rect" id="Node000004" href="$classfc_1_1sha256_1_1encoder.html#a4d8b8181e912194cf98a56164671adf8" title=" " alt="" coords="434,79,570,120"/>
+<area shape="poly" id="edge4_Node000002_Node000004" title=" " alt="" coords="364,97,418,97,418,102,364,102"/>
+<area shape="poly" id="edge3_Node000003_Node000003" title=" " alt="" coords="465,31,458,21,462,11,477,5,502,3,530,5,544,12,541,17,528,10,502,8,478,10,466,15,463,20,469,27"/>
+<area shape="rect" id="Node000005" href="$classfc_1_1sha256.html#ab897537f6c524085b28049be51ed370d" title=" " alt="" coords="670,87,786,112"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="570,97,655,97,655,102,570,102"/>
+<area shape="rect" id="Node000007" href="$classsysio_1_1chain_1_1detail_1_1block__log__impl.html#a9e4742cc31b5b751d1f6fae18cb42455" title=" " alt="" coords="420,144,584,199"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="334,231,410,203,412,208,336,236"/>
+<area shape="rect" id="Node000010" href="$namespacefc_1_1raw.html#a0b442d98ceb22dd5a6ae84745e43ffab" title=" " alt="" coords="446,248,558,274"/>
+<area shape="poly" id="edge10_Node000006_Node000010" title=" " alt="" coords="352,254,431,256,431,261,352,259"/>
+<area shape="rect" id="Node000008" href="$namespacefc.html#ab123bfeadf918cc293ecad88bca7c499" title=" " alt="" coords="674,159,782,184"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="584,169,658,169,658,174,584,174"/>
+<area shape="poly" id="edge9_Node000007_Node000009" title=" " alt="" coords="575,197,681,241,679,246,572,202"/>
+<area shape="poly" id="edge11_Node000010_Node000010" title=" " alt="" coords="465,249,458,239,462,230,477,223,502,221,530,224,544,231,541,236,528,229,502,227,478,229,466,233,463,239,469,246"/>
+<area shape="rect" id="Node000012" href="$classchainbase_1_1database.html#a43a85f8b7d728b69dbf7a9d69c9ebc1c" title=" " alt="" coords="432,348,573,389"/>
+<area shape="poly" id="edge13_Node000011_Node000012" title=" " alt="" coords="335,427,429,392,430,397,337,432"/>
+<area shape="rect" id="Node000014" href="$classsysio_1_1chain_1_1controller.html#a0c79d00dae8c0d90efc18f4d091b2391" title=" " alt="" coords="415,413,589,439"/>
+<area shape="poly" id="edge15_Node000011_Node000014" title=" " alt="" coords="367,438,399,435,400,440,368,443"/>
+<area shape="rect" id="Node000015" href="$classchainbase_1_1database.html#afcfe00f81a526c1376d4f51197dd3a9a" title=" " alt="" coords="418,463,586,488"/>
+<area shape="poly" id="edge16_Node000011_Node000015" title=" " alt="" coords="368,458,403,462,403,467,367,463"/>
+<area shape="rect" id="Node000018" href="$classchainbase_1_1database.html#a224fc0c346a93fd027bfa2515f54bf98" title=" " alt="" coords="432,512,573,553"/>
+<area shape="poly" id="edge21_Node000011_Node000018" title=" " alt="" coords="336,469,431,504,429,509,334,474"/>
+<area shape="rect" id="Node000019" href="$structsysio_1_1chain_1_1controller__impl.html#addaaa85d266d34e5f247ec9214354139" title=" " alt="" coords="640,570,816,610"/>
+<area shape="poly" id="edge22_Node000011_Node000019" title=" " alt="" coords="298,469,348,518,380,543,416,562,468,579,521,589,575,594,625,595,625,600,575,599,521,594,466,584,414,567,377,548,344,522,294,473"/>
+<area shape="rect" id="Node000013" href="$classchainbase_1_1pinnable__mapped__file.html#a29dccb9bf52ef5c409fc1316fc99325a" title=" " alt="" coords="637,341,819,397"/>
+<area shape="poly" id="edge14_Node000012_Node000013" title=" " alt="" coords="573,366,622,366,622,372,573,372"/>
+<area shape="rect" id="Node000016" href="$classchainbase_1_1database.html#aa5a2ca0da0092693ac49b36b7ec6817a" title=" " alt="" coords="657,455,799,496"/>
+<area shape="poly" id="edge17_Node000015_Node000016" title=" " alt="" coords="586,482,642,482,642,487,586,487"/>
+<area shape="poly" id="edge18_Node000016_Node000015" title=" " alt="" coords="657,470,601,469,601,464,657,464"/>
+<area shape="rect" id="Node000017" href="$classchainbase_1_1database.html#a4d5297635dcf70be481d9b600da9bc13" title=" " alt="" coords="867,512,1008,553"/>
+<area shape="poly" id="edge19_Node000016_Node000017" title=" " alt="" coords="800,492,852,507,851,512,799,497"/>
+<area shape="poly" id="edge20_Node000017_Node000015" title=" " alt="" coords="866,533,758,525,637,510,566,495,567,490,638,505,758,520,866,527"/>
+<area shape="poly" id="edge23_Node000019_Node000017" title=" " alt="" coords="804,567,851,554,852,559,805,572"/>
+</map>

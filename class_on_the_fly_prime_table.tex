@@ -1,0 +1,118 @@
+\doxysection{On\+The\+Fly\+Prime\+Table Class Reference}
+\hypertarget{class_on_the_fly_prime_table}{}\label{class_on_the_fly_prime_table}\index{OnTheFlyPrimeTable@{OnTheFlyPrimeTable}}
+
+
+{\ttfamily \#include $<$prime\+\_\+tables.\+h$>$}
+
+
+
+Inheritance diagram for On\+The\+Fly\+Prime\+Table\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=188pt]{class_on_the_fly_prime_table__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for On\+The\+Fly\+Prime\+Table\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=188pt]{class_on_the_fly_prime_table__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual bool \mbox{\hyperlink{class_on_the_fly_prime_table_a1d49b78f79e018441289e79d75680067}{Is\+Prime}} (int n) const
+\item 
+virtual int \mbox{\hyperlink{class_on_the_fly_prime_table_a5a4644fedd95d33136723f33b9302bfc}{Get\+Next\+Prime}} (int \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}) const
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{class_prime_table}{Prime\+Table}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{class_prime_table_af2cdea4896fd86a42b4dfd5e5027d640}{\texorpdfstring{$\sim$}{\string~}\+Prime\+Table}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{prime__tables_8h_source_l00056}{56}} of file \mbox{\hyperlink{prime__tables_8h_source}{prime\+\_\+tables.\+h}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_on_the_fly_prime_table_a5a4644fedd95d33136723f33b9302bfc}\index{OnTheFlyPrimeTable@{OnTheFlyPrimeTable}!GetNextPrime@{GetNextPrime}}
+\index{GetNextPrime@{GetNextPrime}!OnTheFlyPrimeTable@{OnTheFlyPrimeTable}}
+\doxysubsubsection{\texorpdfstring{GetNextPrime()}{GetNextPrime()}}
+{\footnotesize\ttfamily \label{class_on_the_fly_prime_table_a5a4644fedd95d33136723f33b9302bfc} 
+virtual int On\+The\+Fly\+Prime\+Table\+::\+Get\+Next\+Prime (\begin{DoxyParamCaption}\item[{int}]{p}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{class_prime_table_ae537c939f56617d8937d57bbbae3ab30}{Prime\+Table}}.
+
+
+
+Definition at line \mbox{\hyperlink{prime__tables_8h_source_l00069}{69}} of file \mbox{\hyperlink{prime__tables_8h_source}{prime\+\_\+tables.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00070\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ n\ =\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ +\ 1;\ n\ >\ 0;\ n++)\ \{}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_on_the_fly_prime_table_a1d49b78f79e018441289e79d75680067}{IsPrime}}(n))\ \textcolor{keywordflow}{return}\ n;}
+\DoxyCodeLine{00072\ \ \ \ \ \}}
+\DoxyCodeLine{00073\ }
+\DoxyCodeLine{00074\ \ \ \ \ \textcolor{keywordflow}{return}\ -\/1;}
+\DoxyCodeLine{00075\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=331pt]{class_on_the_fly_prime_table_a5a4644fedd95d33136723f33b9302bfc_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_on_the_fly_prime_table_a1d49b78f79e018441289e79d75680067}\index{OnTheFlyPrimeTable@{OnTheFlyPrimeTable}!IsPrime@{IsPrime}}
+\index{IsPrime@{IsPrime}!OnTheFlyPrimeTable@{OnTheFlyPrimeTable}}
+\doxysubsubsection{\texorpdfstring{IsPrime()}{IsPrime()}}
+{\footnotesize\ttfamily \label{class_on_the_fly_prime_table_a1d49b78f79e018441289e79d75680067} 
+virtual bool On\+The\+Fly\+Prime\+Table\+::\+Is\+Prime (\begin{DoxyParamCaption}\item[{int}]{n}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{class_prime_table_a2ab9243364ded0c51541f641b2df362a}{Prime\+Table}}.
+
+
+
+Definition at line \mbox{\hyperlink{prime__tables_8h_source_l00058}{58}} of file \mbox{\hyperlink{prime__tables_8h_source}{prime\+\_\+tables.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00059\ \ \ \ \ \textcolor{keywordflow}{if}\ (n\ <=\ 1)\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00060\ }
+\DoxyCodeLine{00061\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 2;\ i*i\ <=\ n;\ i++)\ \{}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \textcolor{comment}{//\ n\ is\ divisible\ by\ an\ integer\ other\ than\ 1\ and\ itself.}}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((n\ \%\ i)\ ==\ 0)\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00064\ \ \ \ \ \}}
+\DoxyCodeLine{00065\ }
+\DoxyCodeLine{00066\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00067\ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=331pt]{class_on_the_fly_prime_table_a1d49b78f79e018441289e79d75680067_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/samples/\mbox{\hyperlink{prime__tables_8h}{prime\+\_\+tables.\+h}}\end{DoxyCompactItemize}

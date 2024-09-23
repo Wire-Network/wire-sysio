@@ -1,0 +1,93 @@
+\doxysection{aes.\+h}
+\hypertarget{aes_8h_source}{}\label{aes_8h_source}\index{libraries/yubihsm/aes\_cmac/aes.h@{libraries/yubihsm/aes\_cmac/aes.h}}
+\mbox{\hyperlink{aes_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ 2015-\/2018\ Yubico\ AB}}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00004}00004\ \textcolor{comment}{\ *\ Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00005}00005\ \textcolor{comment}{\ *\ you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00006}00006\ \textcolor{comment}{\ *\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00008}00008\ \textcolor{comment}{\ *\ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00009}00009\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00010}00010\ \textcolor{comment}{\ *\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00011}00011\ \textcolor{comment}{\ *\ distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00012}00012\ \textcolor{comment}{\ *\ WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00013}00013\ \textcolor{comment}{\ *\ See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00014}00014\ \textcolor{comment}{\ *\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00015}00015\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00017}00017\ \textcolor{comment}{/*\ aes.h}}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00018}00018\ \textcolor{comment}{**}}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00019}00019\ \textcolor{comment}{**\ Defines\ the\ AES\ crypto\ module\ for\ CMAC}}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00020}00020\ \textcolor{comment}{*/}}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00022}00022\ \textcolor{preprocessor}{\#ifndef\ \_AESCMAC\_AES\_H\_}}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00023}00023\ \textcolor{preprocessor}{\#define\ \_AESCMAC\_AES\_H\_}}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00025}00025\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{stdint_8h}{stdint.h}}>}}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00027}00027\ \textcolor{preprocessor}{\#ifdef\ \_WIN32\_BCRYPT}}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00028}00028\ \textcolor{preprocessor}{\#include\ <windows.h>}}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00029}00029\ \textcolor{preprocessor}{\#include\ <bcrypt.h>}}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00030}00030\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00031}00031\ \textcolor{preprocessor}{\#include\ <openssl/aes.h>}}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00032}00032\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00034}00034\ \textcolor{preprocessor}{\#ifndef\ AES\_BLOCK\_SIZE\ }\textcolor{comment}{//\ Defined\ in\ openssl/aes.h}}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00035}\mbox{\hyperlink{aes_8h_af19ab913a847ad1e91c5291215116de1}{00035}}\ \textcolor{preprocessor}{\#define\ AES\_BLOCK\_SIZE\ 16}}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00036}00036\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00038}00038\ \textcolor{preprocessor}{\#ifdef\ \_\_cplusplus}}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00039}00039\ \textcolor{keyword}{extern}\ \textcolor{stringliteral}{"{}C"{}}\ \{}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00040}00040\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00042}\mbox{\hyperlink{structaes__context}{00042}}\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00043}00043\ \textcolor{preprocessor}{\#ifdef\ \_WIN32\_BCRYPT}}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00044}00044\ \ \ BCRYPT\_ALG\_HANDLE\ hAlgCBC;}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00045}00045\ \ \ BCRYPT\_ALG\_HANDLE\ hAlgECB;}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00046}00046\ \ \ BCRYPT\_KEY\_HANDLE\ hKeyCBC;}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00047}00047\ \ \ BCRYPT\_KEY\_HANDLE\ hKeyECB;}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00048}00048\ \ \ PBYTE\ pbKeyCBCObj;}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00049}00049\ \ \ PBYTE\ pbKeyECBObj;}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00050}00050\ \ \ \textcolor{keywordtype}{size\_t}\ cbKeyObj;}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00051}00051\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00052}\mbox{\hyperlink{structaes__context_a65be0b7f58c31b98e61e222ccbda1bec}{00052}}\ \ \ AES\_KEY\ \mbox{\hyperlink{structaes__context_a65be0b7f58c31b98e61e222ccbda1bec}{key}};}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00053}\mbox{\hyperlink{structaes__context_aa9720d8aff877974aea48e7f30081497}{00053}}\ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ \mbox{\hyperlink{structaes__context_aa9720d8aff877974aea48e7f30081497}{key\_len}};}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00054}00054\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00055}00055\ \}\ \mbox{\hyperlink{structaes__context}{aes\_context}};}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00057}00057\ \textcolor{preprocessor}{\#ifndef\ \_\_WIN32}}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00058}\mbox{\hyperlink{aes_8h_a3f74f478154eb204fc614b5e9fcde0d1}{00058}}\ \textcolor{preprocessor}{\#define\ YH\_INTERNAL\ \_\_attribute\_\_((visibility("{}hidden"{})))}}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00059}00059\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00060}00060\ \textcolor{preprocessor}{\#define\ YH\_INTERNAL}}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00061}00061\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00062}00062\ }
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00063}00063\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \mbox{\hyperlink{aes_8h_a3f74f478154eb204fc614b5e9fcde0d1}{YH\_INTERNAL}}\ \mbox{\hyperlink{aes_8h_a192f5b027034f15be8e5f660edbbc4a2}{aes\_set\_encrypt\_key}}(\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *key,\ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a8b142e2a51f6b9b8760f9132119673b6}{key\_len}},}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00064}00064\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structaes__context}{aes\_context}}\ *ctx);}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00065}00065\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \mbox{\hyperlink{aes_8h_a3f74f478154eb204fc614b5e9fcde0d1}{YH\_INTERNAL}}\ \mbox{\hyperlink{aes_8h_a34a7c10876bc5d5570216dc0f27f464b}{aes\_set\_decrypt\_key}}(\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *key,\ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a8b142e2a51f6b9b8760f9132119673b6}{key\_len}},}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00066}00066\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structaes__context}{aes\_context}}\ *ctx);}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00067}00067\ }
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00068}00068\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \mbox{\hyperlink{aes_8h_a3f74f478154eb204fc614b5e9fcde0d1}{YH\_INTERNAL}}\ \mbox{\hyperlink{aes_8h_a896d5fb8c7b2e361d7435195bf87b27e}{aes\_encrypt}}(\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *in,\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *out,}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structaes__context}{aes\_context}}\ *ctx);}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00070}00070\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \mbox{\hyperlink{aes_8h_a3f74f478154eb204fc614b5e9fcde0d1}{YH\_INTERNAL}}\ \mbox{\hyperlink{aes_8h_ad32efa4d3f7b5e966270857f0a92a6b3}{aes\_decrypt}}(\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *in,\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *out,}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00071}00071\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structaes__context}{aes\_context}}\ *ctx);}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00073}00073\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \mbox{\hyperlink{aes_8h_a3f74f478154eb204fc614b5e9fcde0d1}{YH\_INTERNAL}}\ \mbox{\hyperlink{aes_8h_a520eb8095b50d1fb16efb914d00d3200}{aes\_cbc\_encrypt}}(\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *in,\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *out,\ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00074}00074\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *iv,\ \mbox{\hyperlink{structaes__context}{aes\_context}}\ *ctx);}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00075}00075\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \mbox{\hyperlink{aes_8h_a3f74f478154eb204fc614b5e9fcde0d1}{YH\_INTERNAL}}\ \mbox{\hyperlink{aes_8h_a41059ad21be9dab00346b693540ce9cb}{aes\_cbc\_decrypt}}(\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *in,\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *out,\ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *iv,\ \mbox{\hyperlink{structaes__context}{aes\_context}}\ *ctx);}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00077}00077\ }
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00078}00078\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{aes_8h_a3f74f478154eb204fc614b5e9fcde0d1}{YH\_INTERNAL}}\ \mbox{\hyperlink{aes_8h_a3d0abd389b67c0cd50adb2fba040bd1b}{aes\_add\_padding}}(\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *in,\ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}});}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00079}00079\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{aes_8h_a3f74f478154eb204fc614b5e9fcde0d1}{YH\_INTERNAL}}\ \mbox{\hyperlink{aes_8h_a1c057fac86939e57491b2f993b006643}{aes\_remove\_padding}}(\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *in,\ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}});}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00080}00080\ }
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00081}00081\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{aes_8h_a3f74f478154eb204fc614b5e9fcde0d1}{YH\_INTERNAL}}\ \mbox{\hyperlink{aes_8h_aac58f46d264dd75e26adb8b9dab1341e}{aes\_destroy}}(\mbox{\hyperlink{structaes__context}{aes\_context}}\ *ctx);}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00083}00083\ \textcolor{preprocessor}{\#ifdef\ \_\_cplusplus}}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00084}00084\ \}}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00085}00085\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00086}00086\ }
+\DoxyCodeLine{\Hypertarget{aes_8h_source_l00087}00087\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{/*\ \_AESCMAC\_AES\_H\_\ */}\textcolor{preprocessor}{}}
+
+\end{DoxyCode}

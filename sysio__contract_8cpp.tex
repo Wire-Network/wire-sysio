@@ -1,0 +1,57 @@
+\doxysection{libraries/chain/sysio\+\_\+contract.cpp File Reference}
+\hypertarget{sysio__contract_8cpp}{}\label{sysio__contract_8cpp}\index{libraries/chain/sysio\_contract.cpp@{libraries/chain/sysio\_contract.cpp}}
+{\ttfamily \#include $<$sysio/chain/sysio\+\_\+contract.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/contract\+\_\+table\+\_\+objects.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/controller.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/transaction\+\_\+context.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/apply\+\_\+context.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/transaction.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/exceptions.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/deep\+\_\+mind.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/account\+\_\+object.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/code\+\_\+object.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/permission\+\_\+object.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/permission\+\_\+link\+\_\+object.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/global\+\_\+property\+\_\+object.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/contract\+\_\+types.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/wasm\+\_\+interface.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/abi\+\_\+serializer.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/authorization\+\_\+manager.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/resource\+\_\+limits.\+hpp$>$}\newline
+Include dependency graph for sysio\+\_\+contract.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sysio__contract_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain}{sysio\+::chain}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_a896515137d9a7844105786ee3a6b1d47}{uint128\+\_\+t}} \mbox{\hyperlink{namespacesysio_1_1chain_aae2c9fe44a33a7568fb2b6a709112b9f}{sysio\+::chain\+::transaction\+\_\+id\+\_\+to\+\_\+sender\+\_\+id}} (const \mbox{\hyperlink{namespacesysio_1_1chain_aa85a3b49b3b219d1e3840567579e7e63}{transaction\+\_\+id\+\_\+type}} \&tid)
+\item 
+void \mbox{\hyperlink{namespacesysio_1_1chain_a93ca7c3e741b9e1bc359493f5eb06641}{sysio\+::chain\+::validate\+\_\+authority\+\_\+precondition}} (const \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context}{apply\+\_\+context}} \&\mbox{\hyperlink{structcontext}{context}}, const \mbox{\hyperlink{structsysio_1_1chain_1_1authority}{authority}} \&auth)
+\item 
+void \mbox{\hyperlink{group__native__action__handlers_gaf831ab656e697ba23f2f2a1b73647caf}{sysio\+::chain\+::apply\+\_\+sysio\+\_\+newaccount}} (\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context}{apply\+\_\+context}} \&)
+\item 
+void \mbox{\hyperlink{group__native__action__handlers_ga88394625fa30b19cd99bb0e89cda07dd}{sysio\+::chain\+::apply\+\_\+sysio\+\_\+setcode}} (\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context}{apply\+\_\+context}} \&)
+\item 
+void \mbox{\hyperlink{group__native__action__handlers_gad2aa3b784ec1f87e603f660e185b37ea}{sysio\+::chain\+::apply\+\_\+sysio\+\_\+setabi}} (\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context}{apply\+\_\+context}} \&)
+\item 
+void \mbox{\hyperlink{group__native__action__handlers_gacf5d6409205a5734a97033904741fc29}{sysio\+::chain\+::apply\+\_\+sysio\+\_\+updateauth}} (\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context}{apply\+\_\+context}} \&)
+\item 
+void \mbox{\hyperlink{group__native__action__handlers_ga7066cfd0bf35c67b300950c7282c4634}{sysio\+::chain\+::apply\+\_\+sysio\+\_\+deleteauth}} (\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context}{apply\+\_\+context}} \&)
+\item 
+void \mbox{\hyperlink{group__native__action__handlers_gaf5f965a8dcf8cf77b2cd04415d7bfa7f}{sysio\+::chain\+::apply\+\_\+sysio\+\_\+linkauth}} (\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context}{apply\+\_\+context}} \&)
+\item 
+void \mbox{\hyperlink{group__native__action__handlers_ga4563467ee8a6f7e9005314cd26560c34}{sysio\+::chain\+::apply\+\_\+sysio\+\_\+unlinkauth}} (\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context}{apply\+\_\+context}} \&)
+\item 
+void \mbox{\hyperlink{group__native__action__handlers_ga648d013d055bc0aa995f58f8fe0cb9f2}{sysio\+::chain\+::apply\+\_\+sysio\+\_\+canceldelay}} (\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context}{apply\+\_\+context}} \&)
+\end{DoxyCompactItemize}

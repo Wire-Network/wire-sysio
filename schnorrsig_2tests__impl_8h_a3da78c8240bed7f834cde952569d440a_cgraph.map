@@ -1,0 +1,17 @@
+<map id="test_schnorrsig_bip_vectors_check_signing" name="test_schnorrsig_bip_vectors_check_signing">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,104,167,145"/>
+<area shape="rect" id="Node000002" href="$extrakeys_2main__impl_8h.html#a0b67a64a755a308e1777e6c2bde4f57b" title=" " alt="" coords="226,5,402,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="112,102,158,70,214,40,229,34,231,39,216,45,161,74,115,106"/>
+<area shape="rect" id="Node000004" href="$extrakeys_2main__impl_8h.html#a5ef5543ae89fd59edea43c13cad73cfb" title=" " alt="" coords="215,55,414,80"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="166,102,244,82,246,87,168,107"/>
+<area shape="rect" id="Node000005" href="$schnorrsig_2main__impl_8h.html#a5bc69eb5f207ec82d3331594b2b9151e" title=" " alt="" coords="239,104,390,145"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="167,122,223,122,223,128,167,128"/>
+<area shape="rect" id="Node000006" href="$schnorrsig_2main__impl_8h.html#ab4b9ea2608b3c6e0dadad4c42a48d85f" title=" " alt="" coords="239,170,390,210"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="160,143,227,162,225,168,159,148"/>
+<area shape="rect" id="Node000007" href="$extrakeys_2main__impl_8h.html#ad13aa30c6a14103321a6467918965b16" title=" " alt="" coords="229,235,400,276"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="111,144,158,182,216,220,229,226,227,231,213,224,155,186,108,148"/>
+<area shape="rect" id="Node000003" href="$yubihsm__pkcs11_8c.html#adc4bd59a60361844aa0e852efa210105" title=" " alt="" coords="462,55,530,80"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="374,29,415,40,448,49,446,55,413,45,373,34"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="414,65,447,65,447,70,414,70"/>
+<area shape="poly" id="edge8_Node000007_Node000003" title=" " alt="" coords="394,232,412,220,439,191,459,158,485,94,490,96,464,160,443,194,416,224,397,237"/>
+</map>

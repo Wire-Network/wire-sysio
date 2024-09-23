@@ -1,0 +1,27 @@
+<map id="CLI::detail::check_path" name="CLI::detail::check_path">
+<area shape="rect" id="Node000001" title="get the type of the path from a file name" alt="" coords="795,193,951,219"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_app.html#a7a15e5743d4a8eccac57955ed5a6a3b6" title="Read and process a configuration file (main app only)" alt="" coords="565,22,699,62"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="852,182,807,129,778,101,745,78,698,58,700,53,748,73,781,97,811,126,856,179"/>
+<area shape="rect" id="Node000008" href="$class_c_l_i_1_1detail_1_1_existing_directory_validator.html#a75f836841c9a0b7f2eaccb32f25d59f4" title=" " alt="" coords="517,87,747,128"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="835,187,746,143,711,131,713,126,748,138,837,183"/>
+<area shape="rect" id="Node000009" href="$class_c_l_i_1_1detail_1_1_existing_file_validator.html#a93a39cd927968e7868fc2c145f2793e3" title=" " alt="" coords="533,152,731,193"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="779,196,731,189,732,184,780,191"/>
+<area shape="rect" id="Node000010" href="$class_c_l_i_1_1detail_1_1_existing_path_validator.html#ae0e2b8aca632fce3e902fcf99e2b8ad4" title=" " alt="" coords="530,218,734,258"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="779,221,734,227,734,222,779,216"/>
+<area shape="rect" id="Node000011" href="$class_c_l_i_1_1detail_1_1_nonexistent_path_validator.html#a1708ec7b5892f369b64be668870df677" title=" " alt="" coords="530,282,734,338"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="835,229,748,273,719,284,717,279,746,268,833,225"/>
+<area shape="rect" id="Node000012" href="$namespace_c_l_i_1_1detail.html#a86c8be4c04334eea7717547ed6816533" title=" " alt="" coords="575,362,689,402"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="858,234,813,294,783,325,748,352,720,366,690,376,689,371,718,361,745,348,779,321,809,290,854,231"/>
+<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_app.html#a0fec24c804daf5b458bb5762e4e75a73" title="Process callbacks and such." alt="" coords="335,29,469,55"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="549,45,470,45,470,40,549,40"/>
+<area shape="rect" id="Node000004" href="$class_c_l_i_1_1_app.html#a26a92886a7d7f10a9afbd39b6535f42b" title="Internal parse function." alt="" coords="167,5,287,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="319,33,287,29,288,24,320,28"/>
+<area shape="rect" id="Node000005" href="$class_c_l_i_1_1_app.html#a241ba75a6c98b36349ae2f71a9137291" title="Internal parse function." alt="" coords="167,55,287,80"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="320,57,288,61,287,56,319,51"/>
+<area shape="rect" id="Node000006" href="$class_c_l_i_1_1_app.html#a8ffb155a1153ee23d442c5bfed21225c" title="The real work is done here. Expects a reversed vector." alt="" coords="5,29,119,55"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="151,58,119,54,119,48,151,53"/>
+<area shape="rect" id="Node000007" href="$class_c_l_i_1_1_app.html#a878c1067ade7145aa11478d64f5173ed" title=" " alt="" coords="5,79,119,104"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="151,81,119,86,119,81,151,76"/>
+<area shape="rect" id="Node000013" href="$class_c_l_i_1_1_app.html#a187f08c5326d89319802162e33faff4e" title=" " alt="" coords="346,369,459,395"/>
+<area shape="poly" id="edge12_Node000012_Node000013" title=" " alt="" coords="559,385,459,385,459,380,559,380"/>
+</map>

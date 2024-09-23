@@ -1,0 +1,253 @@
+\doxysection{sysio\+::vm\+::binary\+\_\+parser\texorpdfstring{$<$}{<} Writer, Options, Debug\+Info \texorpdfstring{$>$}{>}\+::local\+\_\+types\+\_\+t Struct Reference}
+\hypertarget{structsysio_1_1vm_1_1binary__parser_1_1local__types__t}{}\label{structsysio_1_1vm_1_1binary__parser_1_1local__types__t}\index{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::local\_types\_t@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::local\_types\_t}}
+
+
+{\ttfamily \#include $<$parser.\+hpp$>$}
+
+
+
+Collaboration diagram for sysio\+::vm\+::binary\+\_\+parser\texorpdfstring{$<$}{<} Writer, Options, Debug\+Info \texorpdfstring{$>$}{>}\+::local\+\_\+types\+\_\+t\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1vm_1_1binary__parser_1_1local__types__t__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1local__types__t_a3fc214a6f34520181db7eb4fdaba9ae8}{local\+\_\+types\+\_\+t}} (const \mbox{\hyperlink{structsysio_1_1vm_1_1func__type}{func\+\_\+type}} \&ft, const \mbox{\hyperlink{namespacesysio_1_1vm_a4e7c9f9a80391b4f980c64238a1feaaf}{guarded\+\_\+vector}}$<$ \mbox{\hyperlink{structsysio_1_1vm_1_1local__entry}{local\+\_\+entry}} $>$ \&locals\+\_\+arg)
+\item 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1local__types__t_ac2215c6b99bb733576e195b3e0f1e26f}{operator\mbox{[}$\,$\mbox{]}}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} local\+\_\+idx) const
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1local__types__t_acdc39aefc8ca9f070bc3f86fc4646c52}{locals\+\_\+count}} () const
+\item 
+\mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1local__types__t_a3fc214a6f34520181db7eb4fdaba9ae8}{local\+\_\+types\+\_\+t}} (const \mbox{\hyperlink{structsysio_1_1vm_1_1func__type}{func\+\_\+type}} \&ft, const \mbox{\hyperlink{namespacesysio_1_1vm_a4e7c9f9a80391b4f980c64238a1feaaf}{guarded\+\_\+vector}}$<$ \mbox{\hyperlink{structsysio_1_1vm_1_1local__entry}{local\+\_\+entry}} $>$ \&locals\+\_\+arg)
+\item 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1local__types__t_ac2215c6b99bb733576e195b3e0f1e26f}{operator\mbox{[}$\,$\mbox{]}}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} local\+\_\+idx) const
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1local__types__t_acdc39aefc8ca9f070bc3f86fc4646c52}{locals\+\_\+count}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+const \mbox{\hyperlink{structsysio_1_1vm_1_1func__type}{func\+\_\+type}} \& \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1local__types__t_a5b690263a0e607399788921fe9ec90dc}{\+\_\+ft}}
+\item 
+const \mbox{\hyperlink{namespacesysio_1_1vm_a4e7c9f9a80391b4f980c64238a1feaaf}{guarded\+\_\+vector}}$<$ \mbox{\hyperlink{structsysio_1_1vm_1_1local__entry}{local\+\_\+entry}} $>$ \& \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1local__types__t_a26b439dba14a817b8525588f198518b1}{\+\_\+locals}}
+\item 
+std\+::vector$<$ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} $>$ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1local__types__t_a51a40bf33a68620a4f88dc20eca2661c}{\+\_\+boundaries}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{class_writer}{Writer}}, typename Options = default\+\_\+options, typename Debug\+Info = null\+\_\+debug\+\_\+info$>$\newline
+struct sysio\+::vm\+::binary\+\_\+parser$<$ Writer, Options, Debug\+Info $>$\+::local\+\_\+types\+\_\+t}
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2parser_8hpp_source_l00705}{705}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structsysio_1_1vm_1_1binary__parser_1_1local__types__t_a3fc214a6f34520181db7eb4fdaba9ae8}\index{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::local\_types\_t@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::local\_types\_t}!local\_types\_t@{local\_types\_t}}
+\index{local\_types\_t@{local\_types\_t}!sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::local\_types\_t@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::local\_types\_t}}
+\doxysubsubsection{\texorpdfstring{local\_types\_t()}{local\_types\_t()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1binary__parser_1_1local__types__t_a3fc214a6f34520181db7eb4fdaba9ae8} 
+template$<$typename \mbox{\hyperlink{class_writer}{Writer}} , typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1binary__parser}{sysio\+::vm\+::binary\+\_\+parser}}$<$ \mbox{\hyperlink{class_writer}{Writer}}, Options, Debug\+Info $>$\+::local\+\_\+types\+\_\+t\+::local\+\_\+types\+\_\+t (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1vm_1_1func__type}{func\+\_\+type}} \&}]{ft}{, }\item[{const \mbox{\hyperlink{namespacesysio_1_1vm_a4e7c9f9a80391b4f980c64238a1feaaf}{guarded\+\_\+vector}}$<$ \mbox{\hyperlink{structsysio_1_1vm_1_1local__entry}{local\+\_\+entry}} $>$ \&}]{locals\+\_\+arg}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_source_l00706}{706}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00706\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :}
+\DoxyCodeLine{00707\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1local__types__t_a5b690263a0e607399788921fe9ec90dc}{\_ft}}(ft),\ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1local__types__t_a26b439dba14a817b8525588f198518b1}{\_locals}}(locals\_arg)\ \{}
+\DoxyCodeLine{00708\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ =\ ft.\mbox{\hyperlink{structsysio_1_1vm_1_1func__type_a4280492c32f4103cc575ce3b3808bea6}{param\_types}}.size();}
+\DoxyCodeLine{00709\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1local__types__t_a51a40bf33a68620a4f88dc20eca2661c}{\_boundaries}}.push\_back(\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}});}
+\DoxyCodeLine{00710\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ i\ =\ 0;\ i\ <\ locals\_arg.size();\ ++i)\ \{}
+\DoxyCodeLine{00711\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ This\ test\ cannot\ overflow.}}
+\DoxyCodeLine{00712\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}\ (\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ <=\ 0xFFFFFFFFu\ -\/\ locals\_arg[i].\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}},\ wasm\_parse\_exception,\ \textcolor{stringliteral}{"{}too\ many\ locals"{}});}
+\DoxyCodeLine{00713\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ +=\ locals\_arg[i].count;}
+\DoxyCodeLine{00714\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1local__types__t_a51a40bf33a68620a4f88dc20eca2661c}{\_boundaries}}.push\_back(\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}});}
+\DoxyCodeLine{00715\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00716\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1vm_1_1binary__parser_1_1local__types__t_a3fc214a6f34520181db7eb4fdaba9ae8_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1vm_1_1binary__parser_1_1local__types__t_a3fc214a6f34520181db7eb4fdaba9ae8}\index{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::local\_types\_t@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::local\_types\_t}!local\_types\_t@{local\_types\_t}}
+\index{local\_types\_t@{local\_types\_t}!sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::local\_types\_t@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::local\_types\_t}}
+\doxysubsubsection{\texorpdfstring{local\_types\_t()}{local\_types\_t()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1binary__parser_1_1local__types__t_a3fc214a6f34520181db7eb4fdaba9ae8} 
+template$<$typename \mbox{\hyperlink{class_writer}{Writer}} , typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1binary__parser}{sysio\+::vm\+::binary\+\_\+parser}}$<$ \mbox{\hyperlink{class_writer}{Writer}}, Options, Debug\+Info $>$\+::local\+\_\+types\+\_\+t\+::local\+\_\+types\+\_\+t (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1vm_1_1func__type}{func\+\_\+type}} \&}]{ft}{, }\item[{const \mbox{\hyperlink{namespacesysio_1_1vm_a4e7c9f9a80391b4f980c64238a1feaaf}{guarded\+\_\+vector}}$<$ \mbox{\hyperlink{structsysio_1_1vm_1_1local__entry}{local\+\_\+entry}} $>$ \&}]{locals\+\_\+arg}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2parser_8hpp_source_l00706}{706}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00706\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :}
+\DoxyCodeLine{00707\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1local__types__t_a5b690263a0e607399788921fe9ec90dc}{\_ft}}(ft),\ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1local__types__t_a26b439dba14a817b8525588f198518b1}{\_locals}}(locals\_arg)\ \{}
+\DoxyCodeLine{00708\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ =\ ft.\mbox{\hyperlink{structsysio_1_1vm_1_1func__type_a4280492c32f4103cc575ce3b3808bea6}{param\_types}}.size();}
+\DoxyCodeLine{00709\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1local__types__t_a51a40bf33a68620a4f88dc20eca2661c}{\_boundaries}}.push\_back(\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}});}
+\DoxyCodeLine{00710\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ i\ =\ 0;\ i\ <\ locals\_arg.size();\ ++i)\ \{}
+\DoxyCodeLine{00711\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ This\ test\ cannot\ overflow.}}
+\DoxyCodeLine{00712\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}\ (\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ <=\ 0xFFFFFFFFu\ -\/\ locals\_arg[i].\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}},\ wasm\_parse\_exception,\ \textcolor{stringliteral}{"{}too\ many\ locals"{}});}
+\DoxyCodeLine{00713\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ +=\ locals\_arg[i].count;}
+\DoxyCodeLine{00714\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1local__types__t_a51a40bf33a68620a4f88dc20eca2661c}{\_boundaries}}.push\_back(\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}});}
+\DoxyCodeLine{00715\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00716\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1vm_1_1binary__parser_1_1local__types__t_a3fc214a6f34520181db7eb4fdaba9ae8_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1vm_1_1binary__parser_1_1local__types__t_acdc39aefc8ca9f070bc3f86fc4646c52}\index{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::local\_types\_t@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::local\_types\_t}!locals\_count@{locals\_count}}
+\index{locals\_count@{locals\_count}!sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::local\_types\_t@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::local\_types\_t}}
+\doxysubsubsection{\texorpdfstring{locals\_count()}{locals\_count()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1binary__parser_1_1local__types__t_acdc39aefc8ca9f070bc3f86fc4646c52} 
+template$<$typename \mbox{\hyperlink{class_writer}{Writer}} , typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{classsysio_1_1vm_1_1binary__parser}{sysio\+::vm\+::binary\+\_\+parser}}$<$ \mbox{\hyperlink{class_writer}{Writer}}, Options, Debug\+Info $>$\+::local\+\_\+types\+\_\+t\+::locals\+\_\+count (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_source_l00725}{725}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00725\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00726\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ total\ =\ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1local__types__t_a51a40bf33a68620a4f88dc20eca2661c}{\_boundaries}}.back();}
+\DoxyCodeLine{00727\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ total\ -\/\ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1local__types__t_a5b690263a0e607399788921fe9ec90dc}{\_ft}}.\mbox{\hyperlink{structsysio_1_1vm_1_1func__type_a4280492c32f4103cc575ce3b3808bea6}{param\_types}}.size();}
+\DoxyCodeLine{00728\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1vm_1_1binary__parser_1_1local__types__t_acdc39aefc8ca9f070bc3f86fc4646c52_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1vm_1_1binary__parser_1_1local__types__t_acdc39aefc8ca9f070bc3f86fc4646c52}\index{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::local\_types\_t@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::local\_types\_t}!locals\_count@{locals\_count}}
+\index{locals\_count@{locals\_count}!sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::local\_types\_t@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::local\_types\_t}}
+\doxysubsubsection{\texorpdfstring{locals\_count()}{locals\_count()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1binary__parser_1_1local__types__t_acdc39aefc8ca9f070bc3f86fc4646c52} 
+template$<$typename \mbox{\hyperlink{class_writer}{Writer}} , typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{classsysio_1_1vm_1_1binary__parser}{sysio\+::vm\+::binary\+\_\+parser}}$<$ \mbox{\hyperlink{class_writer}{Writer}}, Options, Debug\+Info $>$\+::local\+\_\+types\+\_\+t\+::locals\+\_\+count (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2parser_8hpp_source_l00725}{725}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00725\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00726\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ total\ =\ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1local__types__t_a51a40bf33a68620a4f88dc20eca2661c}{\_boundaries}}.back();}
+\DoxyCodeLine{00727\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ total\ -\/\ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1local__types__t_a5b690263a0e607399788921fe9ec90dc}{\_ft}}.\mbox{\hyperlink{structsysio_1_1vm_1_1func__type_a4280492c32f4103cc575ce3b3808bea6}{param\_types}}.size();}
+\DoxyCodeLine{00728\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1vm_1_1binary__parser_1_1local__types__t_ac2215c6b99bb733576e195b3e0f1e26f}\index{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::local\_types\_t@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::local\_types\_t}!operator\mbox{[}\mbox{]}@{operator[]}}
+\index{operator\mbox{[}\mbox{]}@{operator[]}!sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::local\_types\_t@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::local\_types\_t}}
+\doxysubsubsection{\texorpdfstring{operator[]()}{operator[]()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1binary__parser_1_1local__types__t_ac2215c6b99bb733576e195b3e0f1e26f} 
+template$<$typename \mbox{\hyperlink{class_writer}{Writer}} , typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{classsysio_1_1vm_1_1binary__parser}{sysio\+::vm\+::binary\+\_\+parser}}$<$ \mbox{\hyperlink{class_writer}{Writer}}, Options, Debug\+Info $>$\+::local\+\_\+types\+\_\+t\+::operator\mbox{[}$\,$\mbox{]} (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{local\+\_\+idx}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_source_l00717}{717}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00717\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00718\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(local\_idx\ <\ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1local__types__t_a51a40bf33a68620a4f88dc20eca2661c}{\_boundaries}}.back(),\ wasm\_parse\_exception,\ \textcolor{stringliteral}{"{}undefined\ local"{}});}
+\DoxyCodeLine{00719\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ pos\ =\ std::upper\_bound(\mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1local__types__t_a51a40bf33a68620a4f88dc20eca2661c}{\_boundaries}}.begin(),\ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1local__types__t_a51a40bf33a68620a4f88dc20eca2661c}{\_boundaries}}.end(),\ local\_idx);}
+\DoxyCodeLine{00720\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (pos\ ==\ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1local__types__t_a51a40bf33a68620a4f88dc20eca2661c}{\_boundaries}}.begin())}
+\DoxyCodeLine{00721\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1local__types__t_a5b690263a0e607399788921fe9ec90dc}{\_ft}}.\mbox{\hyperlink{structsysio_1_1vm_1_1func__type_a4280492c32f4103cc575ce3b3808bea6}{param\_types}}[local\_idx];}
+\DoxyCodeLine{00722\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00723\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1local__types__t_a26b439dba14a817b8525588f198518b1}{\_locals}}[pos\ -\/\ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1local__types__t_a51a40bf33a68620a4f88dc20eca2661c}{\_boundaries}}.begin()\ -\/\ 1].type;}
+\DoxyCodeLine{00724\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1vm_1_1binary__parser_1_1local__types__t_ac2215c6b99bb733576e195b3e0f1e26f}\index{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::local\_types\_t@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::local\_types\_t}!operator\mbox{[}\mbox{]}@{operator[]}}
+\index{operator\mbox{[}\mbox{]}@{operator[]}!sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::local\_types\_t@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::local\_types\_t}}
+\doxysubsubsection{\texorpdfstring{operator[]()}{operator[]()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1binary__parser_1_1local__types__t_ac2215c6b99bb733576e195b3e0f1e26f} 
+template$<$typename \mbox{\hyperlink{class_writer}{Writer}} , typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{classsysio_1_1vm_1_1binary__parser}{sysio\+::vm\+::binary\+\_\+parser}}$<$ \mbox{\hyperlink{class_writer}{Writer}}, Options, Debug\+Info $>$\+::local\+\_\+types\+\_\+t\+::operator\mbox{[}$\,$\mbox{]} (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{local\+\_\+idx}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2parser_8hpp_source_l00717}{717}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00717\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00718\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(local\_idx\ <\ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1local__types__t_a51a40bf33a68620a4f88dc20eca2661c}{\_boundaries}}.back(),\ wasm\_parse\_exception,\ \textcolor{stringliteral}{"{}undefined\ local"{}});}
+\DoxyCodeLine{00719\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ pos\ =\ std::upper\_bound(\mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1local__types__t_a51a40bf33a68620a4f88dc20eca2661c}{\_boundaries}}.begin(),\ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1local__types__t_a51a40bf33a68620a4f88dc20eca2661c}{\_boundaries}}.end(),\ local\_idx);}
+\DoxyCodeLine{00720\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (pos\ ==\ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1local__types__t_a51a40bf33a68620a4f88dc20eca2661c}{\_boundaries}}.begin())}
+\DoxyCodeLine{00721\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1local__types__t_a5b690263a0e607399788921fe9ec90dc}{\_ft}}.\mbox{\hyperlink{structsysio_1_1vm_1_1func__type_a4280492c32f4103cc575ce3b3808bea6}{param\_types}}[local\_idx];}
+\DoxyCodeLine{00722\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00723\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1local__types__t_a26b439dba14a817b8525588f198518b1}{\_locals}}[pos\ -\/\ \mbox{\hyperlink{structsysio_1_1vm_1_1binary__parser_1_1local__types__t_a51a40bf33a68620a4f88dc20eca2661c}{\_boundaries}}.begin()\ -\/\ 1].type;}
+\DoxyCodeLine{00724\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1vm_1_1binary__parser_1_1local__types__t_a51a40bf33a68620a4f88dc20eca2661c}\index{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::local\_types\_t@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::local\_types\_t}!\_boundaries@{\_boundaries}}
+\index{\_boundaries@{\_boundaries}!sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::local\_types\_t@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::local\_types\_t}}
+\doxysubsubsection{\texorpdfstring{\_boundaries}{\_boundaries}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1binary__parser_1_1local__types__t_a51a40bf33a68620a4f88dc20eca2661c} 
+template$<$typename \mbox{\hyperlink{class_writer}{Writer}} , typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+std\+::vector$<$ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} $>$ \mbox{\hyperlink{classsysio_1_1vm_1_1binary__parser}{sysio\+::vm\+::binary\+\_\+parser}}$<$ \mbox{\hyperlink{class_writer}{Writer}}, Options, Debug\+Info $>$\+::local\+\_\+types\+\_\+t\+::\+\_\+boundaries}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_source_l00731}{731}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_source}{parser.\+hpp}}.
+
+\Hypertarget{structsysio_1_1vm_1_1binary__parser_1_1local__types__t_a5b690263a0e607399788921fe9ec90dc}\index{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::local\_types\_t@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::local\_types\_t}!\_ft@{\_ft}}
+\index{\_ft@{\_ft}!sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::local\_types\_t@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::local\_types\_t}}
+\doxysubsubsection{\texorpdfstring{\_ft}{\_ft}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1binary__parser_1_1local__types__t_a5b690263a0e607399788921fe9ec90dc} 
+template$<$typename \mbox{\hyperlink{class_writer}{Writer}} , typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+const \mbox{\hyperlink{structsysio_1_1vm_1_1func__type}{func\+\_\+type}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1binary__parser}{sysio\+::vm\+::binary\+\_\+parser}}$<$ \mbox{\hyperlink{class_writer}{Writer}}, Options, Debug\+Info $>$\+::local\+\_\+types\+\_\+t\+::\+\_\+ft}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_source_l00729}{729}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_source}{parser.\+hpp}}.
+
+\Hypertarget{structsysio_1_1vm_1_1binary__parser_1_1local__types__t_a26b439dba14a817b8525588f198518b1}\index{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::local\_types\_t@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::local\_types\_t}!\_locals@{\_locals}}
+\index{\_locals@{\_locals}!sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::local\_types\_t@{sysio::vm::binary\_parser$<$ Writer, Options, DebugInfo $>$::local\_types\_t}}
+\doxysubsubsection{\texorpdfstring{\_locals}{\_locals}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1binary__parser_1_1local__types__t_a26b439dba14a817b8525588f198518b1} 
+template$<$typename \mbox{\hyperlink{class_writer}{Writer}} , typename Options  = default\+\_\+options, typename Debug\+Info  = null\+\_\+debug\+\_\+info$>$ \\
+const \mbox{\hyperlink{namespacesysio_1_1vm_a4e7c9f9a80391b4f980c64238a1feaaf}{guarded\+\_\+vector}}$<$ \mbox{\hyperlink{structsysio_1_1vm_1_1local__entry}{local\+\_\+entry}} $>$ \& \mbox{\hyperlink{classsysio_1_1vm_1_1binary__parser}{sysio\+::vm\+::binary\+\_\+parser}}$<$ \mbox{\hyperlink{class_writer}{Writer}}, Options, Debug\+Info $>$\+::local\+\_\+types\+\_\+t\+::\+\_\+locals}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_source_l00730}{730}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_source}{parser.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/include/sysio/sysio/vm/\mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp}{parser.\+hpp}}\item 
+libraries/sys-\/vm/include/sysio/vm/\mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2parser_8hpp}{parser.\+hpp}}\end{DoxyCompactItemize}

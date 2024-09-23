@@ -1,0 +1,36 @@
+\doxysection{trace.\+hpp}
+\hypertarget{libraries_2fc_2include_2fc_2log_2trace_8hpp_source}{}\label{libraries_2fc_2include_2fc_2log_2trace_8hpp_source}\index{libraries/fc/include/fc/log/trace.hpp@{libraries/fc/include/fc/log/trace.hpp}}
+\mbox{\hyperlink{libraries_2fc_2include_2fc_2log_2trace_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{libraries_2fc_2include_2fc_2log_2trace_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{libraries_2fc_2include_2fc_2log_2trace_8hpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{libraries_2fc_2include_2fc_2log_2trace_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{zipkin_8hpp}{fc/log/zipkin.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{libraries_2fc_2include_2fc_2log_2trace_8hpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <optional>}}
+\DoxyCodeLine{\Hypertarget{libraries_2fc_2include_2fc_2log_2trace_8hpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{libraries_2fc_2include_2fc_2log_2trace_8hpp_source_l00008}\mbox{\hyperlink{libraries_2fc_2include_2fc_2log_2trace_8hpp_a32afcad0577c1a29676cdc74e68d9a2e}{00008}}\ \textcolor{preprocessor}{\#define\ fc\_create\_trace(\ TRACE\_STR\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{libraries_2fc_2include_2fc_2log_2trace_8hpp_source_l00009}00009\ \textcolor{preprocessor}{\ \ \ \ \ \ ::fc::zipkin\_config::is\_enabled()\ ?\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{libraries_2fc_2include_2fc_2log_2trace_8hpp_source_l00010}00010\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ ::fc::optional\_trace\{\ ::std::optional<::fc::zipkin\_trace>(\ ::std::in\_place,\ (TRACE\_STR)\ )\ \}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{libraries_2fc_2include_2fc_2log_2trace_8hpp_source_l00011}00011\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ :\ ::fc::optional\_trace\{\};}}
+\DoxyCodeLine{\Hypertarget{libraries_2fc_2include_2fc_2log_2trace_8hpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{libraries_2fc_2include_2fc_2log_2trace_8hpp_source_l00016}\mbox{\hyperlink{libraries_2fc_2include_2fc_2log_2trace_8hpp_ac3bb6a97a411d329e9240e85bb7b0f78}{00016}}\ \textcolor{preprocessor}{\#define\ fc\_create\_trace\_with\_id(\ TRACE\_STR,\ TRACE\_ID\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{libraries_2fc_2include_2fc_2log_2trace_8hpp_source_l00017}00017\ \textcolor{preprocessor}{\ \ \ \ \ \ ::fc::zipkin\_config::is\_enabled()\ ?\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{libraries_2fc_2include_2fc_2log_2trace_8hpp_source_l00018}00018\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ ::fc::optional\_trace\{\ ::std::optional<::fc::zipkin\_trace>(\ ::std::in\_place,\ ::fc::zipkin\_span::to\_id(TRACE\_ID),\ (TRACE\_STR)\ )\ \}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{libraries_2fc_2include_2fc_2log_2trace_8hpp_source_l00019}00019\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ :\ ::fc::optional\_trace\{\};}}
+\DoxyCodeLine{\Hypertarget{libraries_2fc_2include_2fc_2log_2trace_8hpp_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{libraries_2fc_2include_2fc_2log_2trace_8hpp_source_l00024}\mbox{\hyperlink{libraries_2fc_2include_2fc_2log_2trace_8hpp_a371c2bad3426919efd755601d24b2303}{00024}}\ \textcolor{preprocessor}{\#define\ fc\_create\_span(\ TRACE\_VARNAME,\ SPAN\_STR\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{libraries_2fc_2include_2fc_2log_2trace_8hpp_source_l00025}00025\ \textcolor{preprocessor}{\ \ \ \ \ \ (\ (TRACE\_VARNAME)\ \&\&\ ::fc::zipkin\_config::is\_enabled()\ )\ ?\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{libraries_2fc_2include_2fc_2log_2trace_8hpp_source_l00026}00026\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ (TRACE\_VARNAME).opt-\/>create\_span(\ (SPAN\_STR)\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{libraries_2fc_2include_2fc_2log_2trace_8hpp_source_l00027}00027\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ :\ ::std::optional<::fc::zipkin\_span>\{\};}}
+\DoxyCodeLine{\Hypertarget{libraries_2fc_2include_2fc_2log_2trace_8hpp_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{libraries_2fc_2include_2fc_2log_2trace_8hpp_source_l00032}\mbox{\hyperlink{libraries_2fc_2include_2fc_2log_2trace_8hpp_a249737661bc2aba65a939c4ad0f7fc7a}{00032}}\ \textcolor{preprocessor}{\#define\ fc\_create\_span\_from\_token(\ TRACE\_TOKEN,\ SPAN\_STR\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{libraries_2fc_2include_2fc_2log_2trace_8hpp_source_l00033}00033\ \textcolor{preprocessor}{\ \ \ \ \ \ (\ (TRACE\_TOKEN)\ \&\&\ ::fc::zipkin\_config::is\_enabled()\ )\ ?\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{libraries_2fc_2include_2fc_2log_2trace_8hpp_source_l00034}00034\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ ::fc::zipkin\_trace::create\_span\_from\_token(\ (TRACE\_TOKEN),\ (SPAN\_STR)\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{libraries_2fc_2include_2fc_2log_2trace_8hpp_source_l00035}00035\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ :\ ::std::optional<::fc::zipkin\_span>\{\};}}
+\DoxyCodeLine{\Hypertarget{libraries_2fc_2include_2fc_2log_2trace_8hpp_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{libraries_2fc_2include_2fc_2log_2trace_8hpp_source_l00040}\mbox{\hyperlink{libraries_2fc_2include_2fc_2log_2trace_8hpp_a44ade4b276af8ddc16c951941ea51238}{00040}}\ \textcolor{preprocessor}{\#define\ fc\_add\_tag(\ SPAN\_VARNAME,\ TAG\_KEY\_STR,\ TAG\_VALUE\_STR)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{libraries_2fc_2include_2fc_2log_2trace_8hpp_source_l00041}00041\ \textcolor{preprocessor}{\ \ FC\_MULTILINE\_MACRO\_BEGIN\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{libraries_2fc_2include_2fc_2log_2trace_8hpp_source_l00042}00042\ \textcolor{preprocessor}{\ \ \ \ \ \ if(\ (SPAN\_VARNAME)\ \&\&\ ::fc::zipkin\_config::is\_enabled()\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{libraries_2fc_2include_2fc_2log_2trace_8hpp_source_l00043}00043\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ (SPAN\_VARNAME)-\/>add\_tag(\ (TAG\_KEY\_STR),\ (TAG\_VALUE\_STR)\ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{libraries_2fc_2include_2fc_2log_2trace_8hpp_source_l00044}00044\ \textcolor{preprocessor}{\ \ FC\_MULTILINE\_MACRO\_END}}
+
+\end{DoxyCode}

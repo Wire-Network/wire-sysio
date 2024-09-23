@@ -1,0 +1,76 @@
+\doxysection{sys-\/vm.hpp}
+\hypertarget{sys-vm_8hpp_source}{}\label{sys-vm_8hpp_source}\index{libraries/chain/include/sysio/chain/webassembly/sys-\/vm.hpp@{libraries/chain/include/sysio/chain/webassembly/sys-\/vm.hpp}}
+\mbox{\hyperlink{sys-vm_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2webassembly_2common_8hpp}{sysio/chain/webassembly/common.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{runtime__interface_8hpp}{sysio/chain/webassembly/runtime\_interface.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp}{sysio/chain/exceptions.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{apply__context_8hpp}{sysio/chain/apply\_context.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{wasm__config_8hpp}{sysio/chain/wasm\_config.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{whitelisted__intrinsics_8hpp}{sysio/chain/whitelisted\_intrinsics.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ <softfloat\_types.h>}}
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00011}00011\ \textcolor{comment}{//sys-\/vm\ includes}}
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00012}00012\ \textcolor{preprocessor}{\#include\ <sysio/vm/backend.hpp>}}
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00013}00013\ \textcolor{preprocessor}{\#include\ <sysio/vm/profile.hpp>}}
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00015}\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_1_1eos__vm__runtime}{00015}}\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{\ \textcolor{keyword}{namespace\ }chain\ \{\ \textcolor{keyword}{namespace\ }webassembly\ \{\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1eos__vm__runtime}{eos\_vm\_runtime}}\ \{}
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00017}00017\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1apply__options}{apply\_options}};}
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00019}00019\ \}\}}
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00021}00021\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ Impl>}
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00022}\mbox{\hyperlink{namespacesysio_1_1chain_a48442460d3a1314dec60433ab2f5ab15}{00022}}\ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{eos\_vm\_backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio::vm::backend<eos\_vm\_host\_functions\_t,\ Impl,\ webassembly::eos\_vm\_runtime::apply\_options,\ vm::profile\_instr\_map>}};}
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00024}00024\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ Options>}
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00025}\mbox{\hyperlink{namespacesysio_1_1chain_a09c1c5a11e3c4c94710b30af5f141e9e}{00025}}\ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{eos\_vm\_null\_backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{sysio::vm::backend<eos\_vm\_host\_functions\_t,\ sysio::vm::null\_backend,\ Options>}};}
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00027}00027\ \textcolor{keyword}{namespace\ }webassembly\ \{\ \textcolor{keyword}{namespace\ }eos\_vm\_runtime\ \{}
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00029}00029\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacefc}{fc}};}
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00030}00030\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacesysio_1_1vm}{sysio::vm}};}
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00032}00032\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_a78d9d364a9ab60de8d18b4660f592d5f}{validate}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1vector}{bytes}}\&\ code,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_ab67e634f02d35e09950917271779b2ff}{whitelisted\_intrinsics\_type}}\&\ intrinsics\ );}
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00034}00034\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_a78d9d364a9ab60de8d18b4660f592d5f}{validate}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1vector}{bytes}}\&\ code,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__config}{wasm\_config}}\&\ cfg,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_ab67e634f02d35e09950917271779b2ff}{whitelisted\_intrinsics\_type}}\&\ intrinsics\ );}
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00036}00036\ \textcolor{keyword}{struct\ }apply\_options;}
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00038}\mbox{\hyperlink{structsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1profile__config}{00038}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1profile__config}{profile\_config}}\ \{}
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00039}\mbox{\hyperlink{structsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1profile__config_a082df86c4ec9014ccb29d93ad2caae97}{00039}}\ \ \ \ boost::container::flat\_set<name>\ \mbox{\hyperlink{structsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1profile__config_a082df86c4ec9014ccb29d93ad2caae97}{accounts\_to\_profile}};}
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00040}00040\ \};}
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00042}00042\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ Backend>}
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00043}\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1eos__vm__runtime}{00043}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1eos__vm__runtime}{eos\_vm\_runtime}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classsysio_1_1chain_1_1wasm__runtime__interface}{sysio::chain::wasm\_runtime\_interface}}\ \{}
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00044}00044\ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00045}00045\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1eos__vm__runtime_a33702ec74f0cbbb20eb59458318d441a}{eos\_vm\_runtime}}();}
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00046}00046\ \ \ \ \ \ \ std::unique\_ptr<wasm\_instantiated\_module\_interface>\ \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1eos__vm__runtime_abd9f9c14ce5a8ffc2dc66457bd3f2d39}{instantiate\_module}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ code\_bytes,\ \textcolor{keywordtype}{size\_t}\ code\_size,\ std::vector<uint8\_t>,}
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00047}00047\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha256}{digest\_type}}\&\ code\_hash,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\&\ \mbox{\hyperlink{classsysio_1_1chain_1_1wasm__interface_a9053d9e65167e5f241f1f3f27b175f9c}{vm\_type}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\&\ vm\_version)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00049}00049\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1eos__vm__runtime_afdcfba1cdfc2fced68f0ecd2b9355546}{immediately\_exit\_currently\_running\_module}}()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00051}00051\ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00052}00052\ \ \ \ \ \ \ \textcolor{comment}{//\ todo:\ managing\ this\ will\ get\ more\ complicated\ with\ sync\ calls;}}
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00053}00053\ \ \ \ \ \ \ \textcolor{comment}{//\ \ \ \ \ \ \ immediately\_exit\_currently\_running\_module()\ should\ probably}}
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00054}00054\ \ \ \ \ \ \ \textcolor{comment}{//\ \ \ \ \ \ \ move\ from\ wasm\_runtime\_interface\ to\ wasm\_instantiated\_module\_interface.}}
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00055}00055\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{eos\_vm\_backend\_t<Backend>}}*\ \_bkend\ =\ \textcolor{keyword}{nullptr};\ \ \textcolor{comment}{//\ non\ owning\ pointer\ to\ allow\ for\ immediate\ exit}}
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00057}00057\ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ Impl>}
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00058}\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1eos__vm__runtime_aeffa1f8c7b8a4109a3711d0d5777ce58}{00058}}\ \ \ \ \textcolor{keyword}{friend}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1eos__vm__instantiated__module}{eos\_vm\_instantiated\_module}};}
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00059}00059\ \};}
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00061}\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1eos__vm__profile__runtime}{00061}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1eos__vm__profile__runtime}{eos\_vm\_profile\_runtime}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classsysio_1_1chain_1_1wasm__runtime__interface}{sysio::chain::wasm\_runtime\_interface}}\ \{}
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00062}00062\ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00063}\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1eos__vm__profile__runtime_ad5bdc8ba9cb215ff3c8c7ae000ce3d4e}{00063}}\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1eos__vm__profile__runtime_ad5bdc8ba9cb215ff3c8c7ae000ce3d4e}{eos\_vm\_profile\_runtime}}();}
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00064}\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1eos__vm__profile__runtime_af853b4e270fb9c3149372f382bdd1965}{00064}}\ \ \ \ \ \ \ std::unique\_ptr<wasm\_instantiated\_module\_interface>\ \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1eos__vm__profile__runtime_af853b4e270fb9c3149372f382bdd1965}{instantiate\_module}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ code\_bytes,\ \textcolor{keywordtype}{size\_t}\ code\_size,\ std::vector<uint8\_t>,}
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00065}00065\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha256}{digest\_type}}\&\ code\_hash,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\&\ \mbox{\hyperlink{classsysio_1_1chain_1_1wasm__interface_a9053d9e65167e5f241f1f3f27b175f9c}{vm\_type}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\&\ vm\_version)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00067}\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1eos__vm__profile__runtime_a9f720e2a8f2a9331939425ff2dc3e12a}{00067}}\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1eos__vm__profile__runtime_a9f720e2a8f2a9331939425ff2dc3e12a}{immediately\_exit\_currently\_running\_module}}()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00068}00068\ \};}
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00069}00069\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_8hpp_source_l00070}00070\ \}\}\}\}\textcolor{comment}{//\ sysio::chain::webassembly::eos\_vm\_runtime}}
+
+\end{DoxyCode}

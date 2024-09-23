@@ -1,0 +1,42 @@
+\doxysection{libraries/sys-\/vm/external/softfloat/source/s\+\_\+short\+Shift\+Right128.c File Reference}
+\hypertarget{sys-vm_2external_2softfloat_2source_2s__short_shift_right128_8c}{}\label{sys-vm_2external_2softfloat_2source_2s__short_shift_right128_8c}\index{libraries/sys-\/vm/external/softfloat/source/s\_shortShiftRight128.c@{libraries/sys-\/vm/external/softfloat/source/s\_shortShiftRight128.c}}
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include "{}platform.\+h"{}}\newline
+{\ttfamily \#include "{}primitive\+Types.\+h"{}}\newline
+Include dependency graph for s\+\_\+short\+Shift\+Right128.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=343pt]{sys-vm_2external_2softfloat_2source_2s__short_shift_right128_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+struct uint128 \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2s__short_shift_right128_8c_a6d10352377c3f775ca2b74ba3639ad81}{softfloat\+\_\+short\+Shift\+Right128}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} a64, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} a0, \mbox{\hyperlink{stdint_8h_ad0fca8b15c218d2c687f8c373a71d228}{uint\+\_\+fast8\+\_\+t}} dist)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{sys-vm_2external_2softfloat_2source_2s__short_shift_right128_8c_a6d10352377c3f775ca2b74ba3639ad81}\index{s\_shortShiftRight128.c@{s\_shortShiftRight128.c}!softfloat\_shortShiftRight128@{softfloat\_shortShiftRight128}}
+\index{softfloat\_shortShiftRight128@{softfloat\_shortShiftRight128}!s\_shortShiftRight128.c@{s\_shortShiftRight128.c}}
+\doxysubsubsection{\texorpdfstring{softfloat\_shortShiftRight128()}{softfloat\_shortShiftRight128()}}
+{\footnotesize\ttfamily \label{sys-vm_2external_2softfloat_2source_2s__short_shift_right128_8c_a6d10352377c3f775ca2b74ba3639ad81} 
+struct uint128 softfloat\+\_\+short\+Shift\+Right128 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{a64}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{a0}{, }\item[{\mbox{\hyperlink{stdint_8h_ad0fca8b15c218d2c687f8c373a71d228}{uint\+\_\+fast8\+\_\+t}}}]{dist}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2s__short_shift_right128_8c_source_l00044}{44}} of file \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2s__short_shift_right128_8c_source}{s\+\_\+short\+Shift\+Right128.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00045\ \{}
+\DoxyCodeLine{00046\ \ \ \ \ \textcolor{keyword}{struct\ }uint128\ z;}
+\DoxyCodeLine{00047\ }
+\DoxyCodeLine{00048\ \ \ \ \ z.v64\ =\ a64>>dist;}
+\DoxyCodeLine{00049\ \ \ \ \ z.v0\ =\ a64<<(-\/dist\ \&\ 63)\ |\ a0>>dist;}
+\DoxyCodeLine{00050\ \ \ \ \ \textcolor{keywordflow}{return}\ z;}
+\DoxyCodeLine{00051\ }
+\DoxyCodeLine{00052\ \}}
+
+\end{DoxyCode}

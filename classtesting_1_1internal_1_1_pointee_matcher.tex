@@ -1,0 +1,69 @@
+\doxysection{testing\+::internal\+::Pointee\+Matcher\texorpdfstring{$<$}{<} Inner\+Matcher \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classtesting_1_1internal_1_1_pointee_matcher}{}\label{classtesting_1_1internal_1_1_pointee_matcher}\index{testing::internal::PointeeMatcher$<$ InnerMatcher $>$@{testing::internal::PointeeMatcher$<$ InnerMatcher $>$}}
+
+
+{\ttfamily \#include $<$gmock-\/matchers.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_pointee_matcher_ad9f7d9dbd115c50811ce82ba27f1ba56}{Pointee\+Matcher}} (const Inner\+Matcher \&matcher)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{fwd_8h_a0e5c49dba7ec654cdda5735347c00397}{Pointer}} $>$ }\\\mbox{\hyperlink{classtesting_1_1internal_1_1_pointee_matcher_adec012cd8d3fa166ee89236545a57772}{operator Matcher$<$ Pointer $>$}} () const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Inner\+Matcher$>$\newline
+class testing\+::internal\+::\+Pointee\+Matcher$<$ Inner\+Matcher $>$}
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l02315}{2315}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_pointee_matcher_ad9f7d9dbd115c50811ce82ba27f1ba56}\index{testing::internal::PointeeMatcher$<$ InnerMatcher $>$@{testing::internal::PointeeMatcher$<$ InnerMatcher $>$}!PointeeMatcher@{PointeeMatcher}}
+\index{PointeeMatcher@{PointeeMatcher}!testing::internal::PointeeMatcher$<$ InnerMatcher $>$@{testing::internal::PointeeMatcher$<$ InnerMatcher $>$}}
+\doxysubsubsection{\texorpdfstring{PointeeMatcher()}{PointeeMatcher()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_pointee_matcher_ad9f7d9dbd115c50811ce82ba27f1ba56} 
+template$<$typename Inner\+Matcher $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_pointee_matcher}{testing\+::internal\+::\+Pointee\+Matcher}}$<$ Inner\+Matcher $>$\+::\+Pointee\+Matcher (\begin{DoxyParamCaption}\item[{const Inner\+Matcher \&}]{matcher}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l02317}{2317}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02317\ :\ matcher\_(matcher)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_pointee_matcher_adec012cd8d3fa166ee89236545a57772}\index{testing::internal::PointeeMatcher$<$ InnerMatcher $>$@{testing::internal::PointeeMatcher$<$ InnerMatcher $>$}!operator Matcher$<$ Pointer $>$@{operator Matcher$<$ Pointer $>$}}
+\index{operator Matcher$<$ Pointer $>$@{operator Matcher$<$ Pointer $>$}!testing::internal::PointeeMatcher$<$ InnerMatcher $>$@{testing::internal::PointeeMatcher$<$ InnerMatcher $>$}}
+\doxysubsubsection{\texorpdfstring{operator Matcher$<$ Pointer $>$()}{operator Matcher< Pointer >()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_pointee_matcher_adec012cd8d3fa166ee89236545a57772} 
+template$<$typename Inner\+Matcher $>$ \\
+template$<$typename \mbox{\hyperlink{fwd_8h_a0e5c49dba7ec654cdda5735347c00397}{Pointer}} $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_pointee_matcher}{testing\+::internal\+::\+Pointee\+Matcher}}$<$ Inner\+Matcher $>$\+::operator \mbox{\hyperlink{classtesting_1_1_matcher}{Matcher}}$<$ \mbox{\hyperlink{fwd_8h_a0e5c49dba7ec654cdda5735347c00397}{Pointer}} $>$ (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l02328}{2328}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02328\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02329\ \ \ \ \ \textcolor{keywordflow}{return}\ Matcher<Pointer>(}
+\DoxyCodeLine{02330\ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ Impl<\mbox{\hyperlink{gtest-port_8h_a9f91fcd24cae0b48fdaeb19102dac525}{GTEST\_REFERENCE\_TO\_CONST\_}}(\mbox{\hyperlink{class_generic_pointer}{Pointer}})>(matcher\_));}
+\DoxyCodeLine{02331\ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/include/gmock/\mbox{\hyperlink{gmock-matchers_8h}{gmock-\/matchers.\+h}}\end{DoxyCompactItemize}

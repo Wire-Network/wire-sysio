@@ -1,0 +1,64 @@
+\doxysection{libraries/chain/include/sysio/chain/incremental\+\_\+merkle.hpp File Reference}
+\hypertarget{incremental__merkle_8hpp}{}\label{incremental__merkle_8hpp}\index{libraries/chain/include/sysio/chain/incremental\_merkle.hpp@{libraries/chain/include/sysio/chain/incremental\_merkle.hpp}}
+{\ttfamily \#include $<$sysio/chain/types.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/merkle.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/io/raw.\+hpp$>$}\newline
+Include dependency graph for incremental\+\_\+merkle.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{incremental__merkle_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{incremental__merkle_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl}{sysio\+::chain\+::incremental\+\_\+merkle\+\_\+impl$<$ Digest\+Type, Container, Args $>$}}
+\begin{DoxyCompactList}\small\item\em detail \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain}{sysio\+::chain}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain_1_1detail}{sysio\+::chain\+::detail}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl}{incremental\+\_\+merkle\+\_\+impl}}$<$ \mbox{\hyperlink{namespacesysio_1_1chain_a357fd9478475457e5bb386a3143079b6}{digest\+\_\+type}} $>$ \mbox{\hyperlink{namespacesysio_1_1chain_a59349972af67217139919b7dd5df6202}{sysio\+::chain\+::incremental\+\_\+merkle}}
+\item 
+typedef \mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl}{incremental\+\_\+merkle\+\_\+impl}}$<$ \mbox{\hyperlink{namespacesysio_1_1chain_a357fd9478475457e5bb386a3143079b6}{digest\+\_\+type}}, \mbox{\hyperlink{namespacesysio_1_1chain_a915de5728df4a4ce45da87438053ee90}{shared\+\_\+vector}} $>$ \mbox{\hyperlink{namespacesysio_1_1chain_a152b8adb1dec299d65cddd6fb8071be3}{sysio\+::chain\+::shared\+\_\+incremental\+\_\+merkle}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+constexpr \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{namespacesysio_1_1chain_1_1detail_aadb14742ae5e74e7a95b645635e81182}{sysio\+::chain\+::detail\+::next\+\_\+power\+\_\+of\+\_\+2}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+constexpr int \mbox{\hyperlink{namespacesysio_1_1chain_1_1detail_aa2a5b13da34aba1dad3652772bcc7abd}{sysio\+::chain\+::detail\+::clz\+\_\+power\+\_\+2}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+constexpr int \mbox{\hyperlink{namespacesysio_1_1chain_1_1detail_a4792d9890e3eac4dcda1701a5205b6a0}{sysio\+::chain\+::detail\+::calcluate\+\_\+max\+\_\+depth}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} node\+\_\+count)
+\item 
+{\footnotesize template$<$typename ContainerA , typename ContainerB $>$ }\\void \mbox{\hyperlink{namespacesysio_1_1chain_1_1detail_ae701f28aaa83d39549003f9df7b5dd7a}{sysio\+::chain\+::detail\+::move\+\_\+nodes}} (ContainerA \&to, const ContainerB \&from)
+\item 
+{\footnotesize template$<$typename Container $>$ }\\void \mbox{\hyperlink{namespacesysio_1_1chain_1_1detail_a877b80d6ef213d2933bd06295bb086aa}{sysio\+::chain\+::detail\+::move\+\_\+nodes}} (Container \&to, Container \&\&from)
+\item 
+\mbox{\hyperlink{incremental__merkle_8hpp_ac7b9658f746214135c40c89915840c7f}{FC\+\_\+\+REFLECT}} (\mbox{\hyperlink{namespacesysio_1_1chain_a59349972af67217139919b7dd5df6202}{sysio\+::chain\+::incremental\+\_\+merkle}},(\+\_\+active\+\_\+nodes)(\+\_\+node\+\_\+count))
+\begin{DoxyCompactList}\small\item\em \doxylink{namespacesysio_1_1chain}{sysio\+::chain} \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{incremental__merkle_8hpp_ac7b9658f746214135c40c89915840c7f}\index{incremental\_merkle.hpp@{incremental\_merkle.hpp}!FC\_REFLECT@{FC\_REFLECT}}
+\index{FC\_REFLECT@{FC\_REFLECT}!incremental\_merkle.hpp@{incremental\_merkle.hpp}}
+\doxysubsubsection{\texorpdfstring{FC\_REFLECT()}{FC\_REFLECT()}}
+{\footnotesize\ttfamily \label{incremental__merkle_8hpp_ac7b9658f746214135c40c89915840c7f} 
+FC\+\_\+\+REFLECT (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacesysio_1_1chain_a59349972af67217139919b7dd5df6202}{sysio\+::chain\+::incremental\+\_\+merkle}}}]{}{, }\item[{(\+\_\+active\+\_\+nodes)(\+\_\+node\+\_\+count)}]{}{}\end{DoxyParamCaption})}
+

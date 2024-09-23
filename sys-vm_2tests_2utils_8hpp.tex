@@ -1,0 +1,148 @@
+\doxysection{libraries/sys-\/vm/tests/utils.hpp File Reference}
+\hypertarget{sys-vm_2tests_2utils_8hpp}{}\label{sys-vm_2tests_2utils_8hpp}\index{libraries/sys-\/vm/tests/utils.hpp@{libraries/sys-\/vm/tests/utils.hpp}}
+{\ttfamily \#include $<$algorithm$>$}\newline
+{\ttfamily \#include $<$cmath$>$}\newline
+{\ttfamily \#include $<$cstdlib$>$}\newline
+{\ttfamily \#include $<$cstring$>$}\newline
+{\ttfamily \#include $<$fstream$>$}\newline
+{\ttfamily \#include $<$iterator$>$}\newline
+{\ttfamily \#include $<$string$>$}\newline
+{\ttfamily \#include $<$vector$>$}\newline
+{\ttfamily \#include $<$sysio/vm/allocator.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/vm/stack\+\_\+elem.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/vm/utils.\+hpp$>$}\newline
+Include dependency graph for utils.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sys-vm_2tests_2utils_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sys-vm_2tests_2utils_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structtype__converter32}{type\+\_\+converter32}}
+\item 
+struct \mbox{\hyperlink{structtype__converter64}{type\+\_\+converter64}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_a3e5f265967cb6d730cad8ca15e807ac2}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  tags)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{union_u}{U}} $>$ }\\\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_a5e92cc8f53d748fa129bb1525cea7806}{bit\+\_\+cast}} (const \mbox{\hyperlink{union_u}{U}} \&u)
+\item 
+bool \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_a1d16c5ddf845abd894adeaafd2cb9c25}{check\+\_\+nan}} (const std\+::optional$<$ \mbox{\hyperlink{classsysio_1_1vm_1_1operand__stack__elem}{sysio\+::vm\+::operand\+\_\+stack\+\_\+elem}} $>$ \&v)
+\item 
+\mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator}{sysio\+::vm\+::wasm\+\_\+allocator}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_a4c503c4f3ca9f4afce322078d5a33f3e}{get\+\_\+wasm\+\_\+allocator}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{sys-vm_2tests_2utils_8hpp_a3e5f265967cb6d730cad8ca15e807ac2}\index{utils.hpp@{utils.hpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!utils.hpp@{utils.hpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE}{BACKEND\_TEST\_CASE}}
+{\footnotesize\ttfamily \label{sys-vm_2tests_2utils_8hpp_a3e5f265967cb6d730cad8ca15e807ac2} 
+\#define BACKEND\+\_\+\+TEST\+\_\+\+CASE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{tags}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \mbox{\hyperlink{include_2catch_8hpp_a9a88d21bfca0d58782cc5f0811801303}{TEMPLATE\_TEST\_CASE}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ tags,\ \mbox{\hyperlink{structsysio_1_1vm_1_1interpreter}{sysio::vm::interpreter}})}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_source_l00059}{59}} of file \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_source}{utils.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00059\ \textcolor{preprocessor}{\#define\ BACKEND\_TEST\_CASE(name,\ tags)\ \(\backslash\)}}
+\DoxyCodeLine{00060\ \textcolor{preprocessor}{\ \ TEMPLATE\_TEST\_CASE(name,\ tags,\ sysio::vm::interpreter)}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{sys-vm_2tests_2utils_8hpp_a5e92cc8f53d748fa129bb1525cea7806}\index{utils.hpp@{utils.hpp}!bit\_cast@{bit\_cast}}
+\index{bit\_cast@{bit\_cast}!utils.hpp@{utils.hpp}}
+\doxysubsubsection{\texorpdfstring{bit\_cast()}{bit\_cast()}}
+{\footnotesize\ttfamily \label{sys-vm_2tests_2utils_8hpp_a5e92cc8f53d748fa129bb1525cea7806} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{union_u}{U}} $>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} bit\+\_\+cast (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{union_u}{U}} \&}]{u}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_source_l00035}{35}} of file \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_source}{utils.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00036\ \ \ \ \textcolor{keyword}{static\_assert}(\textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}})\ ==\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{union_u}{U}}),\ \textcolor{stringliteral}{"{}bitcast\ requires\ identical\ sizes."{}});}
+\DoxyCodeLine{00037\ \ \ \ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ result;}
+\DoxyCodeLine{00038\ \ \ \ std::memcpy(\&result,\ \&u,\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}));}
+\DoxyCodeLine{00039\ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00040\ \}}
+
+\end{DoxyCode}
+\Hypertarget{sys-vm_2tests_2utils_8hpp_a1d16c5ddf845abd894adeaafd2cb9c25}\index{utils.hpp@{utils.hpp}!check\_nan@{check\_nan}}
+\index{check\_nan@{check\_nan}!utils.hpp@{utils.hpp}}
+\doxysubsubsection{\texorpdfstring{check\_nan()}{check\_nan()}}
+{\footnotesize\ttfamily \label{sys-vm_2tests_2utils_8hpp_a1d16c5ddf845abd894adeaafd2cb9c25} 
+bool check\+\_\+nan (\begin{DoxyParamCaption}\item[{const std\+::optional$<$ \mbox{\hyperlink{classsysio_1_1vm_1_1operand__stack__elem}{sysio\+::vm\+::operand\+\_\+stack\+\_\+elem}} $>$ \&}]{v}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_source_l00043}{43}} of file \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_source}{utils.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00044\ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacesysio_1_1vm_a1419a3e0b38f21f92401fe8acde2ef0e}{visit}}(\mbox{\hyperlink{structsysio_1_1vm_1_1overloaded}{sysio::vm::overloaded}}\{[](sysio::vm::i32\_const\_t)\{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};\ \},}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [](sysio::vm::i64\_const\_t)\{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};\ \},}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [](sysio::vm::f32\_const\_t\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})\ \{\ \textcolor{keywordflow}{return}\ std::isnan(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}.data.f);\ \},}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [](sysio::vm::f64\_const\_t\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})\ \{\ \textcolor{keywordflow}{return}\ std::isnan(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}.data.f);\ \}\},\ *\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}});}
+\DoxyCodeLine{00048\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{sys-vm_2tests_2utils_8hpp_a1d16c5ddf845abd894adeaafd2cb9c25_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{sys-vm_2tests_2utils_8hpp_a4c503c4f3ca9f4afce322078d5a33f3e}\index{utils.hpp@{utils.hpp}!get\_wasm\_allocator@{get\_wasm\_allocator}}
+\index{get\_wasm\_allocator@{get\_wasm\_allocator}!utils.hpp@{utils.hpp}}
+\doxysubsubsection{\texorpdfstring{get\_wasm\_allocator()}{get\_wasm\_allocator()}}
+{\footnotesize\ttfamily \label{sys-vm_2tests_2utils_8hpp_a4c503c4f3ca9f4afce322078d5a33f3e} 
+\mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator}{sysio\+::vm\+::wasm\+\_\+allocator}} \texorpdfstring{$\ast$}{*} get\+\_\+wasm\+\_\+allocator (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_source_l00050}{50}} of file \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_source}{utils.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00051\ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator}{sysio::vm::wasm\_allocator}}\ alloc;}
+\DoxyCodeLine{00052\ \ \ \ \textcolor{keywordflow}{return}\ \&alloc;}
+\DoxyCodeLine{00053\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=348pt]{sys-vm_2tests_2utils_8hpp_a4c503c4f3ca9f4afce322078d5a33f3e_icgraph}
+\end{center}
+\end{figure}

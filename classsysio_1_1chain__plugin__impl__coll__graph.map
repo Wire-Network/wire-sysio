@@ -1,0 +1,19 @@
+<map id="sysio::chain_plugin_impl" name="sysio::chain_plugin_impl">
+<area shape="rect" id="Node000001" title=" " alt="" coords="823,276,986,302"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="470,11,603,52"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="619,18,663,18,711,23,758,36,801,59,827,82,848,110,865,141,879,173,896,232,904,275,899,276,891,233,874,174,861,143,844,113,823,86,797,63,756,41,710,28,663,23,619,24"/>
+<area shape="rect" id="Node000003" href="$classfc_1_1microseconds.html" title=" " alt="" coords="476,80,597,106"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="613,91,720,99,767,107,800,120,822,136,840,155,870,199,890,242,902,275,897,276,885,244,865,202,836,159,818,140,798,124,766,113,719,104,612,97"/>
+<area shape="rect" id="Node000004" href="$classappbase_1_1channel.html" title=" " alt="" coords="453,268,620,309"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="636,286,823,286,823,291,636,291"/>
+<area shape="rect" id="Node000005" href="$classappbase_1_1method.html" title=" " alt="" coords="445,351,628,392"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="643,373,720,368,798,352,848,327,886,300,889,304,850,332,800,357,721,373,644,379"/>
+<area shape="rect" id="Node000006" href="$classappbase_1_1impl_1_1method__caller.html" title=" " alt="" coords="232,342,385,398"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="400,368,444,368,444,374,400,373"/>
+<area shape="rect" id="Node000007" href="$classsysio_1_1producer__plugin.html" title=" " alt="" coords="461,420,612,446"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="627,432,713,421,756,410,798,393,829,373,856,347,893,300,897,304,859,351,832,377,800,398,758,415,714,427,628,437"/>
+<area shape="rect" id="Node000008" href="$classappbase_1_1plugin.html" title=" " alt="" coords="221,422,395,462"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="410,435,460,433,460,439,411,441"/>
+<area shape="rect" id="Node000009" href="$classappbase_1_1abstract__plugin.html" title=" " alt="" coords="5,429,172,455"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="187,439,220,439,220,445,187,445"/>
+</map>

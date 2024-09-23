@@ -1,0 +1,65 @@
+\doxysection{sysio\+::chain\+::kv\+\_\+database\+\_\+config Struct Reference}
+\hypertarget{structsysio_1_1chain_1_1kv__database__config}{}\label{structsysio_1_1chain_1_1kv__database__config}\index{sysio::chain::kv\_database\_config@{sysio::chain::kv\_database\_config}}
+
+
+limits for a kv database.  
+
+
+
+
+{\ttfamily \#include $<$kv\+\_\+config.\+hpp$>$}
+
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::uint32\+\_\+t \mbox{\hyperlink{structsysio_1_1chain_1_1kv__database__config_a8501ae8ee2b0d235b250133bca3e3d2f}{max\+\_\+key\+\_\+size}} = 0
+\begin{DoxyCompactList}\small\item\em the maximum size in bytes of a key \end{DoxyCompactList}\item 
+std\+::uint32\+\_\+t \mbox{\hyperlink{structsysio_1_1chain_1_1kv__database__config_a13c830c9b0249f9127918fdcf626dd95}{max\+\_\+value\+\_\+size}} = 0
+\begin{DoxyCompactList}\small\item\em the maximum size in bytes of a value \end{DoxyCompactList}\item 
+std\+::uint32\+\_\+t \mbox{\hyperlink{structsysio_1_1chain_1_1kv__database__config_aa10bf18baff6ccd94808a719088d2010}{max\+\_\+iterators}} = 0
+\begin{DoxyCompactList}\small\item\em the maximum number of iterators that a contract can have simultaneously. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Each database (ram or disk, currently) has its own limits for these parameters. The key and value limits apply when adding or modifying elements. They may be reduced below existing database entries. 
+
+Definition at line \mbox{\hyperlink{kv__config_8hpp_source_l00015}{15}} of file \mbox{\hyperlink{kv__config_8hpp_source}{kv\+\_\+config.\+hpp}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1chain_1_1kv__database__config_aa10bf18baff6ccd94808a719088d2010}\index{sysio::chain::kv\_database\_config@{sysio::chain::kv\_database\_config}!max\_iterators@{max\_iterators}}
+\index{max\_iterators@{max\_iterators}!sysio::chain::kv\_database\_config@{sysio::chain::kv\_database\_config}}
+\doxysubsubsection{\texorpdfstring{max\_iterators}{max\_iterators}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1kv__database__config_aa10bf18baff6ccd94808a719088d2010} 
+std\+::uint32\+\_\+t sysio\+::chain\+::kv\+\_\+database\+\_\+config\+::max\+\_\+iterators = 0}
+
+
+
+Definition at line \mbox{\hyperlink{kv__config_8hpp_source_l00018}{18}} of file \mbox{\hyperlink{kv__config_8hpp_source}{kv\+\_\+config.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1kv__database__config_a8501ae8ee2b0d235b250133bca3e3d2f}\index{sysio::chain::kv\_database\_config@{sysio::chain::kv\_database\_config}!max\_key\_size@{max\_key\_size}}
+\index{max\_key\_size@{max\_key\_size}!sysio::chain::kv\_database\_config@{sysio::chain::kv\_database\_config}}
+\doxysubsubsection{\texorpdfstring{max\_key\_size}{max\_key\_size}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1kv__database__config_a8501ae8ee2b0d235b250133bca3e3d2f} 
+std\+::uint32\+\_\+t sysio\+::chain\+::kv\+\_\+database\+\_\+config\+::max\+\_\+key\+\_\+size = 0}
+
+
+
+Definition at line \mbox{\hyperlink{kv__config_8hpp_source_l00016}{16}} of file \mbox{\hyperlink{kv__config_8hpp_source}{kv\+\_\+config.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1kv__database__config_a13c830c9b0249f9127918fdcf626dd95}\index{sysio::chain::kv\_database\_config@{sysio::chain::kv\_database\_config}!max\_value\_size@{max\_value\_size}}
+\index{max\_value\_size@{max\_value\_size}!sysio::chain::kv\_database\_config@{sysio::chain::kv\_database\_config}}
+\doxysubsubsection{\texorpdfstring{max\_value\_size}{max\_value\_size}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1kv__database__config_a13c830c9b0249f9127918fdcf626dd95} 
+std\+::uint32\+\_\+t sysio\+::chain\+::kv\+\_\+database\+\_\+config\+::max\+\_\+value\+\_\+size = 0}
+
+
+
+Definition at line \mbox{\hyperlink{kv__config_8hpp_source_l00017}{17}} of file \mbox{\hyperlink{kv__config_8hpp_source}{kv\+\_\+config.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{kv__config_8hpp}{kv\+\_\+config.\+hpp}}\end{DoxyCompactItemize}

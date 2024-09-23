@@ -1,0 +1,32 @@
+<map id="sysio::wallet::detail::yubihsm_wallet_impl::prime_keepalive_timer" name="sysio::wallet::detail::yubihsm_wallet_impl::prime_keepalive_timer">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,114,165,170"/>
+<area shape="poly" id="edge17_Node000001_Node000001" title=" " alt="" coords="42,114,43,104,50,95,65,90,85,88,108,90,122,97,120,102,107,95,85,93,66,95,53,100,47,106,47,114"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl.html#a5920ace754a2d851bdb11322372b849c" title=" " alt="" coords="213,71,395,112"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="164,121,198,113,199,119,166,126"/>
+<area shape="rect" id="Node000007" href="$yubihsm_8c.html#a4c26f003b72e800e9c934bca922a404a" title=" " alt="" coords="640,157,789,183"/>
+<area shape="poly" id="edge18_Node000001_Node000007" title=" " alt="" coords="165,143,625,164,625,169,165,148"/>
+<area shape="rect" id="Node000003" href="$yubihsm_8c.html#a1a35f8ae5a739848408633a514e41b2d" title=" " alt="" coords="646,5,783,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="357,68,442,42,539,27,630,19,631,24,540,32,444,47,358,73"/>
+<area shape="rect" id="Node000005" href="$yubihsm_8c.html#ab12d5a42d2219741bd3630b99ed1c7d2" title=" " alt="" coords="465,57,570,83"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="395,80,450,74,450,80,396,85"/>
+<area shape="rect" id="Node000006" href="$yubihsm_8c.html#a61ab8dbab67b1cceb49cd306f8c3f4b1" title=" " alt="" coords="443,107,592,132"/>
+<area shape="poly" id="edge6_Node000002_Node000006" title=" " alt="" coords="396,101,428,105,427,110,395,106"/>
+<area shape="rect" id="Node000004" href="$lib_2error_8c.html#a238eedb1e27dbff2a0ab9a3932eb3f8b" title=" " alt="" coords="1060,107,1143,132"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="784,14,889,21,947,31,1003,48,1043,69,1077,94,1074,99,1041,74,1001,53,946,36,888,26,783,19"/>
+<area shape="poly" id="edge5_Node000005_Node000004" title=" " alt="" coords="571,69,761,77,881,86,1002,98,1045,105,1044,110,1002,103,881,91,761,82,571,74"/>
+<area shape="poly" id="edge16_Node000006_Node000004" title=" " alt="" coords="593,117,1044,117,1044,122,593,122"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="571,130,648,150,646,155,570,136"/>
+<area shape="rect" id="Node000008" href="$yubihsm_8c.html#a77870209747d5ccd90f9da3aae2bdfa8" title=" " alt="" coords="837,157,1002,183"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="789,168,821,168,821,173,789,173"/>
+<area shape="rect" id="Node000011" href="$yubihsm_8c.html#a0e96ea59c5f32def80843fec5a3c2142" title=" " alt="" coords="854,207,984,232"/>
+<area shape="poly" id="edge12_Node000007_Node000011" title=" " alt="" coords="772,181,849,200,847,205,770,186"/>
+<area shape="poly" id="edge11_Node000008_Node000004" title=" " alt="" coords="968,154,1044,133,1046,138,969,159"/>
+<area shape="rect" id="Node000009" href="$yubihsm__pkcs11_8c.html#ae785d5badbf1f08b491af31f32a135a1" title=" " alt="" coords="1066,205,1137,231"/>
+<area shape="poly" id="edge9_Node000008_Node000009" title=" " alt="" coords="972,181,1052,202,1050,208,971,186"/>
+<area shape="rect" id="Node000010" href="$yubihsm__pkcs11_8c.html#adc4bd59a60361844aa0e852efa210105" title=" " alt="" coords="1068,156,1136,182"/>
+<area shape="poly" id="edge10_Node000008_Node000010" title=" " alt="" coords="1003,167,1052,167,1052,172,1003,172"/>
+<area shape="poly" id="edge15_Node000011_Node000004" title=" " alt="" coords="979,204,1001,193,1015,181,1024,169,1034,155,1048,141,1053,138,1056,142,1052,146,1038,159,1029,172,1019,185,1003,198,981,208"/>
+<area shape="poly" id="edge13_Node000011_Node000009" title=" " alt="" coords="985,216,1051,216,1051,221,985,222"/>
+<area shape="rect" id="Node000012" href="$rand_8c.html#a2d3d1e86f4093fbe0a1b2a7eede4cd75" title=" " alt="" coords="1050,255,1153,280"/>
+<area shape="poly" id="edge14_Node000011_Node000012" title=" " alt="" coords="972,230,1037,248,1035,253,971,236"/>
+</map>

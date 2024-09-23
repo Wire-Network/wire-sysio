@@ -1,0 +1,155 @@
+\doxysection{sysio\+::vm\+::detail\+::dispatcher\texorpdfstring{$<$}{<} true, Ret \texorpdfstring{$>$}{>} Struct Template Reference}
+\hypertarget{structsysio_1_1vm_1_1detail_1_1dispatcher_3_01true_00_01_ret_01_4}{}\label{structsysio_1_1vm_1_1detail_1_1dispatcher_3_01true_00_01_ret_01_4}\index{sysio::vm::detail::dispatcher$<$ true, Ret $>$@{sysio::vm::detail::dispatcher$<$ true, Ret $>$}}
+
+
+{\ttfamily \#include $<$variant.\+hpp$>$}
+
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$std\+::size\+\_\+t I, typename Vis , typename Var $>$ }\\static constexpr Ret \mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1dispatcher_3_01true_00_01_ret_01_4_a9ec8ff07c8dd32571aa96824b4bdfe45}{\+\_\+case}} (Vis \&\&vis, Var \&\&var)
+\item 
+{\footnotesize template$<$std\+::size\+\_\+t I, typename Vis , typename Var $>$ }\\static constexpr Ret \mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1dispatcher_3_01true_00_01_ret_01_4_a02605ebf34e35ce393fbb3be3af57d90}{\+\_\+switch}} (Vis \&\&vis, Var \&\&var)
+\item 
+{\footnotesize template$<$std\+::size\+\_\+t I, typename Vis , typename Var $>$ }\\static constexpr Ret \mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1dispatcher_3_01true_00_01_ret_01_4_a9ec8ff07c8dd32571aa96824b4bdfe45}{\+\_\+case}} (Vis \&\&vis, Var \&\&var)
+\item 
+{\footnotesize template$<$std\+::size\+\_\+t I, typename Vis , typename Var $>$ }\\static constexpr Ret \mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1dispatcher_3_01true_00_01_ret_01_4_a02605ebf34e35ce393fbb3be3af57d90}{\+\_\+switch}} (Vis \&\&vis, Var \&\&var)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Ret$>$\newline
+struct sysio\+::vm\+::detail\+::dispatcher$<$ true, Ret $>$}
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2variant_8hpp_source_l00059}{59}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2variant_8hpp_source}{variant.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1vm_1_1detail_1_1dispatcher_3_01true_00_01_ret_01_4_a9ec8ff07c8dd32571aa96824b4bdfe45}\index{sysio::vm::detail::dispatcher$<$ true, Ret $>$@{sysio::vm::detail::dispatcher$<$ true, Ret $>$}!\_case@{\_case}}
+\index{\_case@{\_case}!sysio::vm::detail::dispatcher$<$ true, Ret $>$@{sysio::vm::detail::dispatcher$<$ true, Ret $>$}}
+\doxysubsubsection{\texorpdfstring{\_case()}{\_case()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1detail_1_1dispatcher_3_01true_00_01_ret_01_4_a9ec8ff07c8dd32571aa96824b4bdfe45} 
+template$<$typename Ret $>$ \\
+template$<$std\+::size\+\_\+t I, typename Vis , typename Var $>$ \\
+static constexpr Ret \mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1dispatcher}{sysio\+::vm\+::detail\+::dispatcher}}$<$ true, Ret $>$\+::\+\_\+case (\begin{DoxyParamCaption}\item[{Vis \&\&}]{vis}{, }\item[{Var \&\&}]{var}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_source_l00061}{61}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_source}{variant.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::invoke(std::forward<Vis>(vis),\ std::forward<Var>(var).\textcolor{keyword}{template}\ get<I>());}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1vm_1_1detail_1_1dispatcher_3_01true_00_01_ret_01_4_a9ec8ff07c8dd32571aa96824b4bdfe45}\index{sysio::vm::detail::dispatcher$<$ true, Ret $>$@{sysio::vm::detail::dispatcher$<$ true, Ret $>$}!\_case@{\_case}}
+\index{\_case@{\_case}!sysio::vm::detail::dispatcher$<$ true, Ret $>$@{sysio::vm::detail::dispatcher$<$ true, Ret $>$}}
+\doxysubsubsection{\texorpdfstring{\_case()}{\_case()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1detail_1_1dispatcher_3_01true_00_01_ret_01_4_a9ec8ff07c8dd32571aa96824b4bdfe45} 
+template$<$typename Ret $>$ \\
+template$<$std\+::size\+\_\+t I, typename Vis , typename Var $>$ \\
+static constexpr Ret \mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1dispatcher}{sysio\+::vm\+::detail\+::dispatcher}}$<$ true, Ret $>$\+::\+\_\+case (\begin{DoxyParamCaption}\item[{Vis \&\&}]{vis}{, }\item[{Var \&\&}]{var}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2variant_8hpp_source_l00061}{61}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2variant_8hpp_source}{variant.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::invoke(std::forward<Vis>(vis),\ std::forward<Var>(var).\textcolor{keyword}{template}\ get<I>());}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1vm_1_1detail_1_1dispatcher_3_01true_00_01_ret_01_4_a02605ebf34e35ce393fbb3be3af57d90}\index{sysio::vm::detail::dispatcher$<$ true, Ret $>$@{sysio::vm::detail::dispatcher$<$ true, Ret $>$}!\_switch@{\_switch}}
+\index{\_switch@{\_switch}!sysio::vm::detail::dispatcher$<$ true, Ret $>$@{sysio::vm::detail::dispatcher$<$ true, Ret $>$}}
+\doxysubsubsection{\texorpdfstring{\_switch()}{\_switch()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1detail_1_1dispatcher_3_01true_00_01_ret_01_4_a02605ebf34e35ce393fbb3be3af57d90} 
+template$<$typename Ret $>$ \\
+template$<$std\+::size\+\_\+t I, typename Vis , typename Var $>$ \\
+static constexpr Ret \mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1dispatcher}{sysio\+::vm\+::detail\+::dispatcher}}$<$ true, Ret $>$\+::\+\_\+switch (\begin{DoxyParamCaption}\item[{Vis \&\&}]{vis}{, }\item[{Var \&\&}]{var}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_source_l00066}{66}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp_source}{variant.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{constexpr}\ std::size\_t\ sz\ =\ std::decay\_t<Var>::variant\_size();}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (var.index())\ \{}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ I\ +\ 0:\ \{}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ dispatcher<I\ +\ 0\ <\ sz,\ Ret>::template\ \mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1dispatcher_3_01true_00_01_ret_01_4_a9ec8ff07c8dd32571aa96824b4bdfe45}{\_case<I\ +\ 0>}}(std::forward<Vis>(vis),}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::forward<Var>(var));}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ I\ +\ 1:\ \{}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ dispatcher<I\ +\ 1\ <\ sz,\ Ret>::template\ \mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1dispatcher_3_01true_00_01_ret_01_4_a9ec8ff07c8dd32571aa96824b4bdfe45}{\_case<I\ +\ 1>}}(std::forward<Vis>(vis),}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::forward<Var>(var));}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ I\ +\ 2:\ \{}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ dispatcher<I\ +\ 2\ <\ sz,\ Ret>::template\ \mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1dispatcher_3_01true_00_01_ret_01_4_a9ec8ff07c8dd32571aa96824b4bdfe45}{\_case<I\ +\ 2>}}(std::forward<Vis>(vis),}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::forward<Var>(var));}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ I\ +\ 3:\ \{}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ dispatcher<I\ +\ 3\ <\ sz,\ Ret>::template\ \mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1dispatcher_3_01true_00_01_ret_01_4_a9ec8ff07c8dd32571aa96824b4bdfe45}{\_case<I\ +\ 3>}}(std::forward<Vis>(vis),}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::forward<Var>(var));}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:\ \{}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ dispatcher<I\ +\ 4\ <\ sz,\ Ret>::template\ \mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1dispatcher_3_01true_00_01_ret_01_4_a02605ebf34e35ce393fbb3be3af57d90}{\_switch<I\ +\ 4>}}(std::forward<Vis>(vis),}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::forward<Var>(var));}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1vm_1_1detail_1_1dispatcher_3_01true_00_01_ret_01_4_a02605ebf34e35ce393fbb3be3af57d90}\index{sysio::vm::detail::dispatcher$<$ true, Ret $>$@{sysio::vm::detail::dispatcher$<$ true, Ret $>$}!\_switch@{\_switch}}
+\index{\_switch@{\_switch}!sysio::vm::detail::dispatcher$<$ true, Ret $>$@{sysio::vm::detail::dispatcher$<$ true, Ret $>$}}
+\doxysubsubsection{\texorpdfstring{\_switch()}{\_switch()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1detail_1_1dispatcher_3_01true_00_01_ret_01_4_a02605ebf34e35ce393fbb3be3af57d90} 
+template$<$typename Ret $>$ \\
+template$<$std\+::size\+\_\+t I, typename Vis , typename Var $>$ \\
+static constexpr Ret \mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1dispatcher}{sysio\+::vm\+::detail\+::dispatcher}}$<$ true, Ret $>$\+::\+\_\+switch (\begin{DoxyParamCaption}\item[{Vis \&\&}]{vis}{, }\item[{Var \&\&}]{var}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2variant_8hpp_source_l00066}{66}} of file \mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2variant_8hpp_source}{variant.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{constexpr}\ std::size\_t\ sz\ =\ std::decay\_t<Var>::variant\_size();}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (var.index())\ \{}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ I\ +\ 0:\ \{}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ dispatcher<I\ +\ 0\ <\ sz,\ Ret>::template\ \mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1dispatcher_3_01true_00_01_ret_01_4_a9ec8ff07c8dd32571aa96824b4bdfe45}{\_case<I\ +\ 0>}}(std::forward<Vis>(vis),}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::forward<Var>(var));}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ I\ +\ 1:\ \{}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ dispatcher<I\ +\ 1\ <\ sz,\ Ret>::template\ \mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1dispatcher_3_01true_00_01_ret_01_4_a9ec8ff07c8dd32571aa96824b4bdfe45}{\_case<I\ +\ 1>}}(std::forward<Vis>(vis),}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::forward<Var>(var));}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ I\ +\ 2:\ \{}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ dispatcher<I\ +\ 2\ <\ sz,\ Ret>::template\ \mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1dispatcher_3_01true_00_01_ret_01_4_a9ec8ff07c8dd32571aa96824b4bdfe45}{\_case<I\ +\ 2>}}(std::forward<Vis>(vis),}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::forward<Var>(var));}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ I\ +\ 3:\ \{}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ dispatcher<I\ +\ 3\ <\ sz,\ Ret>::template\ \mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1dispatcher_3_01true_00_01_ret_01_4_a9ec8ff07c8dd32571aa96824b4bdfe45}{\_case<I\ +\ 3>}}(std::forward<Vis>(vis),}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::forward<Var>(var));}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:\ \{}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ dispatcher<I\ +\ 4\ <\ sz,\ Ret>::template\ \mbox{\hyperlink{structsysio_1_1vm_1_1detail_1_1dispatcher_3_01true_00_01_ret_01_4_a02605ebf34e35ce393fbb3be3af57d90}{\_switch<I\ +\ 4>}}(std::forward<Vis>(vis),}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::forward<Var>(var));}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/include/sysio/sysio/vm/\mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2variant_8hpp}{variant.\+hpp}}\item 
+libraries/sys-\/vm/include/sysio/vm/\mbox{\hyperlink{sys-vm_2include_2sysio_2vm_2variant_8hpp}{variant.\+hpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,11 @@
+<map id="websocketpp::frame::get_rsv3" name="websocketpp::frame::get_rsv3">
+<area shape="rect" id="Node000001" title="check whether the frame&#39;s RSV3 bit is set" alt="" coords="461,47,600,88"/>
+<area shape="rect" id="Node000002" href="$frame_8cpp.html#a028b5ea71d8ed44151c5a3df274446e1" title=" " alt="" coords="217,5,413,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="445,51,374,34,375,29,447,46"/>
+<area shape="rect" id="Node000003" href="$frame_8cpp.html#a3cd85981c179494497755165261dde64" title=" " alt="" coords="217,55,413,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="446,70,413,70,413,65,446,65"/>
+<area shape="rect" id="Node000004" href="$classwebsocketpp_1_1processor_1_1hybi13.html#a0c549a5e2766288fb625c03e507cc9ad" title="Validate an incoming basic header." alt="" coords="225,105,404,161"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="447,95,406,108,404,103,446,90"/>
+<area shape="rect" id="Node000005" href="$classwebsocketpp_1_1processor_1_1hybi13.html#a5c5e3234a0067c7f14fe0ceb4e647659" title="Process new websocket connection bytes." alt="" coords="5,112,169,153"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="209,136,169,136,169,130,209,130"/>
+</map>

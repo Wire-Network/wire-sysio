@@ -1,0 +1,105 @@
+\doxysection{allocator\+\_\+tests.\+cpp}
+\hypertarget{allocator__tests_8cpp_source}{}\label{allocator__tests_8cpp_source}\index{libraries/sys-\/vm/tests/allocator\_tests.cpp@{libraries/sys-\/vm/tests/allocator\_tests.cpp}}
+\mbox{\hyperlink{allocator__tests_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <sysio/vm/allocator.hpp>}}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{single__include_2catch2_2catch_8hpp}{catch2/catch.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00005}00005\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}};}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00006}00006\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacesysio_1_1vm}{sysio::vm}};}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00008}00008\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00009}\mbox{\hyperlink{allocator__tests_8cpp_ad000166816dcdbe1584c13f67d61efce}{00009}}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{allocator__tests_8cpp_ad000166816dcdbe1584c13f67d61efce}{check\_alignment}}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ ptr)\ \{}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00010}00010\ \ \ \ \textcolor{keywordtype}{void}\ *\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ ptr;}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00011}00011\ \ \ \ std::size\_t\ sz\ =\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}});}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00012}00012\ \ \ \ \textcolor{keywordflow}{return}\ std::align(\textcolor{keyword}{alignof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}),\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}),\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\ sz)\ !=\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00013}00013\ \}}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00015}\mbox{\hyperlink{allocator__tests_8cpp_af448fd7e15b27276c4d415a15b210b88}{00015}}\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\textcolor{stringliteral}{"{}Testing\ growable\_allocator\ alignment"{}},\ \textcolor{stringliteral}{"{}[growable\_allocator]"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00016}00016\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator}{growable\_allocator}}\ alloc(1024);}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00017}00017\ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *\ cptr\ =\ alloc.\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a5fc8b2ef9ef1ef157d18ec40cf9310ee}{alloc}}<\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}>(1);}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00018}00018\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{allocator__tests_8cpp_ad000166816dcdbe1584c13f67d61efce}{check\_alignment}}(cptr));}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00019}00019\ \ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ *\ sptr\ =\ alloc.\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a5fc8b2ef9ef1ef157d18ec40cf9310ee}{alloc}}<\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}>(1);}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00020}00020\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{allocator__tests_8cpp_ad000166816dcdbe1584c13f67d61efce}{check\_alignment}}(sptr));}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00021}00021\ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ *\ iptr\ =\ alloc.\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a5fc8b2ef9ef1ef157d18ec40cf9310ee}{alloc}}<\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}>(1);}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00022}00022\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{allocator__tests_8cpp_ad000166816dcdbe1584c13f67d61efce}{check\_alignment}}(iptr));}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00023}00023\ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ *\ lptr\ =\ alloc.\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a5fc8b2ef9ef1ef157d18ec40cf9310ee}{alloc}}<\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}>(1);}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00024}00024\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{allocator__tests_8cpp_ad000166816dcdbe1584c13f67d61efce}{check\_alignment}}(lptr));}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00025}00025\ \ \ \ *cptr\ =\ 0x11u;}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00026}00026\ \ \ \ *sptr\ =\ 0x2233u;}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00027}00027\ \ \ \ *iptr\ =\ 0x44556677u;}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00028}00028\ \ \ \ *lptr\ =\ 0x8899102030405060u;}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00029}00029\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(*cptr\ ==\ 0x11u);}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00030}00030\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(*sptr\ ==\ 0x2233u);}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00031}00031\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(*iptr\ ==\ 0x44556677u);}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00032}00032\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(*lptr\ ==\ 0x8899102030405060u);}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00033}00033\ \}}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00035}\mbox{\hyperlink{allocator__tests_8cpp_adeaf8b7961e5e3e337d8590933a7546e}{00035}}\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\textcolor{stringliteral}{"{}Testing\ maximum\ single\ allocation"{}},\ \textcolor{stringliteral}{"{}[growable\_allocator]"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00036}00036\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator}{growable\_allocator}}\ alloc(0);}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00037}00037\ \ \ \ \textcolor{keywordtype}{char}\ *\ ptr\ =\ alloc.\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a5fc8b2ef9ef1ef157d18ec40cf9310ee}{alloc}}<\textcolor{keywordtype}{char}>(0x40000000);}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00038}00038\ \ \ \ ptr[0]\ =\ \textcolor{charliteral}{'a'};}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00039}00039\ \ \ \ ptr[0x3FFFFFFF]\ =\ \textcolor{charliteral}{'z'};}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00040}00040\ \ \ \ alloc.\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a5fc8b2ef9ef1ef157d18ec40cf9310ee}{alloc}}<\textcolor{keywordtype}{char}>(0);}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00041}00041\ \}}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00044}\mbox{\hyperlink{allocator__tests_8cpp_ae868e8147872aefb475be47d02411b9d}{00044}}\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\textcolor{stringliteral}{"{}Testing\ maximum\ multiple\ allocation"{}},\ \textcolor{stringliteral}{"{}[growable\_allocator]"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00045}00045\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator}{growable\_allocator}}\ alloc(1024);}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00046}00046\ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ 4;\ ++i)\ \{}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00047}00047\ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ *\ ptr\ =\ alloc.\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a5fc8b2ef9ef1ef157d18ec40cf9310ee}{alloc}}<\textcolor{keywordtype}{char}>(0x10000000);}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00048}00048\ \ \ \ \ \ \ ptr[0]\ =\ \textcolor{charliteral}{'a'};}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00049}00049\ \ \ \ \ \ \ ptr[0x0FFFFFFF]\ =\ \textcolor{charliteral}{'z'};}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00050}00050\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00051}00051\ \ \ \ alloc.\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a5fc8b2ef9ef1ef157d18ec40cf9310ee}{alloc}}<\textcolor{keywordtype}{char}>(0);}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00052}00052\ \}}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00054}\mbox{\hyperlink{allocator__tests_8cpp_a10bdc93f0e96fc3d9cf7bf11e8b85b74}{00054}}\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\textcolor{stringliteral}{"{}Testing\ too\ large\ single\ allocation"{}},\ \textcolor{stringliteral}{"{}[growable\_allocator]"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00055}00055\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator}{growable\_allocator}}\ alloc(1024);}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00056}00056\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(alloc.\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a5fc8b2ef9ef1ef157d18ec40cf9310ee}{alloc}}<\textcolor{keywordtype}{char}>(0x40000001),\ wasm\_bad\_alloc);}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00057}00057\ \}}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00059}\mbox{\hyperlink{allocator__tests_8cpp_a4aba5371945059b443cf2fdac97d129d}{00059}}\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\textcolor{stringliteral}{"{}Testing\ too\ large\ multiple\ allocation"{}},\ \textcolor{stringliteral}{"{}[growable\_allocator]"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00060}00060\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator}{growable\_allocator}}\ alloc(1024);}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00061}00061\ \ \ \ alloc.\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a5fc8b2ef9ef1ef157d18ec40cf9310ee}{alloc}}<\textcolor{keywordtype}{char}>(0x10000000);}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00062}00062\ \ \ \ alloc.\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a5fc8b2ef9ef1ef157d18ec40cf9310ee}{alloc}}<\textcolor{keywordtype}{char}>(0x10000000);}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00063}00063\ \ \ \ alloc.\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a5fc8b2ef9ef1ef157d18ec40cf9310ee}{alloc}}<\textcolor{keywordtype}{char}>(0x10000000);}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00064}00064\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(alloc.\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a5fc8b2ef9ef1ef157d18ec40cf9310ee}{alloc}}<\textcolor{keywordtype}{char}>(0x10000001),\ wasm\_bad\_alloc);}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00065}00065\ \}}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00067}\mbox{\hyperlink{allocator__tests_8cpp_a1debbace00cf0facf9c28e278737becf}{00067}}\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\textcolor{stringliteral}{"{}Testing\ maximum\ initial\ size"{}},\ \textcolor{stringliteral}{"{}[growable\_allocator]"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00068}00068\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator}{growable\_allocator}}\ alloc(0x40000000);}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00069}00069\ \ \ \ \textcolor{keywordtype}{char}\ *\ ptr\ =\ alloc.\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a5fc8b2ef9ef1ef157d18ec40cf9310ee}{alloc}}<\textcolor{keywordtype}{char}>(0x40000000);}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00070}00070\ \ \ \ ptr[0]\ =\ \textcolor{charliteral}{'a'};}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00071}00071\ \ \ \ ptr[0x3FFFFFFF]\ =\ \textcolor{charliteral}{'z'};}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00072}00072\ \}}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00073}00073\ }
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00074}\mbox{\hyperlink{allocator__tests_8cpp_af3c20b901f81ccd120b3992d59cd80d1}{00074}}\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\textcolor{stringliteral}{"{}Testing\ too\ large\ initial\ size"{}},\ \textcolor{stringliteral}{"{}[growable\_allocator]"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00075}00075\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator}{growable\_allocator}}\{0x40000001\},\ wasm\_bad\_alloc);}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00076}00076\ \ \ \ \textcolor{comment}{//\ Check\ that\ integer\ overflow\ in\ rounding\ functions\ won't\ cause\ issues}}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00077}00077\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator}{growable\_allocator}}\{0x8000000000000000ull\},\ wasm\_bad\_alloc);}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00078}00078\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator}{growable\_allocator}}\{0xFFFFFFFFFFFE0001ull\},\ wasm\_bad\_alloc);}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00079}00079\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator}{growable\_allocator}}\{0xFFFFFFFFFFFFFFFFull\},\ wasm\_bad\_alloc);}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00080}00080\ \}}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00081}00081\ }
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00082}\mbox{\hyperlink{allocator__tests_8cpp_a0295eeb94d43e5fefb0e7d72c7c5d418}{00082}}\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\textcolor{stringliteral}{"{}Testing\ maximum\ aligned\ allocation"{}},\ \textcolor{stringliteral}{"{}[growable\_allocator]"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00083}00083\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator}{growable\_allocator}}\ alloc(1024);}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00084}00084\ \ \ \ \textcolor{keyword}{struct\ }\textcolor{keyword}{alignas}(8)\ aligned\_t\ \{\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}[8];\ \};}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00085}00085\ \ \ \ alloc.\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a5fc8b2ef9ef1ef157d18ec40cf9310ee}{alloc}}<\textcolor{keywordtype}{char}>(0x3FFFFFF4);}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00086}00086\ \ \ \ aligned\_t\ *\ ptr\ =\ alloc.\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a5fc8b2ef9ef1ef157d18ec40cf9310ee}{alloc}}<aligned\_t>(1);}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00087}00087\ \ \ \ ptr-\/>a[0]\ =\ \textcolor{charliteral}{'a'};}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00088}00088\ \ \ \ ptr-\/>a[7]\ =\ \textcolor{charliteral}{'z'};}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00089}00089\ \ \ \ alloc.\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a5fc8b2ef9ef1ef157d18ec40cf9310ee}{alloc}}<aligned\_t>(0);}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00090}00090\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(alloc.\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a5fc8b2ef9ef1ef157d18ec40cf9310ee}{alloc}}<\textcolor{keywordtype}{char}>(1),\ wasm\_bad\_alloc);}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00091}00091\ \}}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00092}00092\ }
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00093}\mbox{\hyperlink{allocator__tests_8cpp_a88e72dd2da5ca8c94f8cf0dc9bf5e233}{00093}}\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\textcolor{stringliteral}{"{}Testing\ reclaim"{}},\ \textcolor{stringliteral}{"{}[growable\_allocator]"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00094}00094\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator}{growable\_allocator}}\ alloc(1024);}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00095}00095\ \ \ \ \textcolor{keywordtype}{int}\ *\ ptr1\ =\ alloc.\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a5fc8b2ef9ef1ef157d18ec40cf9310ee}{alloc}}<\textcolor{keywordtype}{int}>(10);}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00096}00096\ \ \ \ alloc.\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_ad9ed557611289b11da2b169bb45484cd}{reclaim}}(ptr1\ +\ 2,\ 8);}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00097}00097\ \ \ \ \textcolor{keywordtype}{int}\ *\ ptr2\ =\ alloc.\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a5fc8b2ef9ef1ef157d18ec40cf9310ee}{alloc}}<\textcolor{keywordtype}{int}>(10);}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00098}00098\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(ptr2\ ==\ ptr1\ +\ 2);}
+\DoxyCodeLine{\Hypertarget{allocator__tests_8cpp_source_l00099}00099\ \}}
+
+\end{DoxyCode}

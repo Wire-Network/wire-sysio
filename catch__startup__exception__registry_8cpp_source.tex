@@ -1,0 +1,32 @@
+\doxysection{catch\+\_\+startup\+\_\+exception\+\_\+registry.\+cpp}
+\hypertarget{catch__startup__exception__registry_8cpp_source}{}\label{catch__startup__exception__registry_8cpp_source}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_startup\_exception\_registry.cpp@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_startup\_exception\_registry.cpp}}
+\mbox{\hyperlink{catch__startup__exception__registry_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{catch__startup__exception__registry_8cpp_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{catch__startup__exception__registry_8cpp_source_l00002}00002\ \textcolor{comment}{\ *\ \ Created\ by\ Martin\ on\ 04/06/2017.}}
+\DoxyCodeLine{\Hypertarget{catch__startup__exception__registry_8cpp_source_l00003}00003\ \textcolor{comment}{\ *\ \ Copyright\ 2017\ Two\ Blue\ Cubes\ Ltd.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{catch__startup__exception__registry_8cpp_source_l00004}00004\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{catch__startup__exception__registry_8cpp_source_l00005}00005\ \textcolor{comment}{\ *\ \ Distributed\ under\ the\ Boost\ Software\ License,\ Version\ 1.0.\ (See\ accompanying}}
+\DoxyCodeLine{\Hypertarget{catch__startup__exception__registry_8cpp_source_l00006}00006\ \textcolor{comment}{\ *\ \ file\ LICENSE\_1\_0.txt\ or\ copy\ at\ http://www.boost.org/LICENSE\_1\_0.txt)}}
+\DoxyCodeLine{\Hypertarget{catch__startup__exception__registry_8cpp_source_l00007}00007\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{catch__startup__exception__registry_8cpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{catch__startup__exception__registry_8cpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__startup__exception__registry_8h}{catch\_startup\_exception\_registry.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__startup__exception__registry_8cpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__compiler__capabilities_8h}{catch\_compiler\_capabilities.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__startup__exception__registry_8cpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{catch__startup__exception__registry_8cpp_source_l00012}00012\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__startup__exception__registry_8cpp_source_l00013}\mbox{\hyperlink{class_catch_1_1_startup_exception_registry_afafe7382002cd04e42a07068480683e7}{00013}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_startup_exception_registry_afafe7382002cd04e42a07068480683e7}{StartupExceptionRegistry::add}}(\ std::exception\_ptr\ \textcolor{keyword}{const}\&\ exception\ )\ \textcolor{keyword}{noexcept}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__startup__exception__registry_8cpp_source_l00014}00014\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{catch__compiler__capabilities_8h_ab76c2d22e571ab1a828f5c60d2f485a6}{CATCH\_TRY}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__startup__exception__registry_8cpp_source_l00015}00015\ \ \ \ \ \ \ \ \ \ \ \ \ m\_exceptions.push\_back(exception);}
+\DoxyCodeLine{\Hypertarget{catch__startup__exception__registry_8cpp_source_l00016}00016\ \ \ \ \ \ \ \ \ \}\ \mbox{\hyperlink{catch__compiler__capabilities_8h_afa0ae14e70806dca4f8bf06d06645fa9}{CATCH\_CATCH\_ALL}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__startup__exception__registry_8cpp_source_l00017}00017\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ we\ run\ out\ of\ memory\ during\ start-\/up\ there's\ really\ not\ a\ lot\ more\ we\ can\ do\ about\ it}}
+\DoxyCodeLine{\Hypertarget{catch__startup__exception__registry_8cpp_source_l00018}00018\ \ \ \ \ \ \ \ \ \ \ \ \ std::terminate();}
+\DoxyCodeLine{\Hypertarget{catch__startup__exception__registry_8cpp_source_l00019}00019\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__startup__exception__registry_8cpp_source_l00020}00020\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__startup__exception__registry_8cpp_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{catch__startup__exception__registry_8cpp_source_l00022}\mbox{\hyperlink{class_catch_1_1_startup_exception_registry_a5d4829d60703104982205616e930b3e6}{00022}}\ \ \ \ \ std::vector<std::exception\_ptr>\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{class_catch_1_1_startup_exception_registry_a5d4829d60703104982205616e930b3e6}{StartupExceptionRegistry::getExceptions}}()\ const\ noexcept\ \{}
+\DoxyCodeLine{\Hypertarget{catch__startup__exception__registry_8cpp_source_l00023}00023\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_exceptions;}
+\DoxyCodeLine{\Hypertarget{catch__startup__exception__registry_8cpp_source_l00024}00024\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__startup__exception__registry_8cpp_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{catch__startup__exception__registry_8cpp_source_l00026}00026\ \}\ \textcolor{comment}{//\ end\ namespace\ Catch}}
+
+\end{DoxyCode}

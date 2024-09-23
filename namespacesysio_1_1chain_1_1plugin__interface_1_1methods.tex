@@ -1,0 +1,68 @@
+\doxysection{sysio\+::chain\+::plugin\+\_\+interface\+::methods Namespace Reference}
+\hypertarget{namespacesysio_1_1chain_1_1plugin__interface_1_1methods}{}\label{namespacesysio_1_1chain_1_1plugin__interface_1_1methods}\index{sysio::chain::plugin\_interface::methods@{sysio::chain::plugin\_interface::methods}}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1plugin__interface_1_1methods_a1dc915fee440a66569fa5d9705eaa779}{get\+\_\+block\+\_\+by\+\_\+number}} = \mbox{\hyperlink{structappbase_1_1method__decl}{method\+\_\+decl}}$<$chain\+\_\+plugin\+\_\+interface, \mbox{\hyperlink{namespacesysio_1_1chain_aa10ee348c57604b615bc8570f6685102}{signed\+\_\+block\+\_\+ptr}}(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} block\+\_\+num)$>$
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1plugin__interface_1_1methods_ac76686a7ff5a8f959b5a0eb404d49290}{get\+\_\+block\+\_\+by\+\_\+id}} = \mbox{\hyperlink{structappbase_1_1method__decl}{method\+\_\+decl}}$<$chain\+\_\+plugin\+\_\+interface, \mbox{\hyperlink{namespacesysio_1_1chain_aa10ee348c57604b615bc8570f6685102}{signed\+\_\+block\+\_\+ptr}}(const \mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{block\+\_\+id\+\_\+type}}\& block\+\_\+id)$>$
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1plugin__interface_1_1methods_aec45b7f4f9bb35e9860ec982cd79960e}{get\+\_\+head\+\_\+block\+\_\+id}} = \mbox{\hyperlink{structappbase_1_1method__decl}{method\+\_\+decl}}$<$chain\+\_\+plugin\+\_\+interface, \mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{block\+\_\+id\+\_\+type}} ()$>$
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1plugin__interface_1_1methods_adbbafc44d94293f7ad1e8738184ac794}{get\+\_\+lib\+\_\+block\+\_\+id}} = \mbox{\hyperlink{structappbase_1_1method__decl}{method\+\_\+decl}}$<$chain\+\_\+plugin\+\_\+interface, \mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{block\+\_\+id\+\_\+type}} ()$>$
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1plugin__interface_1_1methods_a5103be0de226bafc7aa3b176f7a95efc}{get\+\_\+last\+\_\+irreversible\+\_\+block\+\_\+number}} = \mbox{\hyperlink{structappbase_1_1method__decl}{method\+\_\+decl}}$<$chain\+\_\+plugin\+\_\+interface, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} ()$>$
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{namespacesysio_1_1chain_1_1plugin__interface_1_1methods_ac76686a7ff5a8f959b5a0eb404d49290}\index{sysio::chain::plugin\_interface::methods@{sysio::chain::plugin\_interface::methods}!get\_block\_by\_id@{get\_block\_by\_id}}
+\index{get\_block\_by\_id@{get\_block\_by\_id}!sysio::chain::plugin\_interface::methods@{sysio::chain::plugin\_interface::methods}}
+\doxysubsubsection{\texorpdfstring{get\_block\_by\_id}{get\_block\_by\_id}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1plugin__interface_1_1methods_ac76686a7ff5a8f959b5a0eb404d49290} 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1plugin__interface_1_1methods_ac76686a7ff5a8f959b5a0eb404d49290}{sysio\+::chain\+::plugin\+\_\+interface\+::methods\+::get\+\_\+block\+\_\+by\+\_\+id}} = \mbox{\hyperlink{structappbase_1_1method__decl}{method\+\_\+decl}}$<$chain\+\_\+plugin\+\_\+interface, \mbox{\hyperlink{namespacesysio_1_1chain_aa10ee348c57604b615bc8570f6685102}{signed\+\_\+block\+\_\+ptr}}(const \mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{block\+\_\+id\+\_\+type}}\& block\+\_\+id)$>$}
+
+
+
+Definition at line \mbox{\hyperlink{plugin__interface_8hpp_source_l00032}{32}} of file \mbox{\hyperlink{plugin__interface_8hpp_source}{plugin\+\_\+interface.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1chain_1_1plugin__interface_1_1methods_a1dc915fee440a66569fa5d9705eaa779}\index{sysio::chain::plugin\_interface::methods@{sysio::chain::plugin\_interface::methods}!get\_block\_by\_number@{get\_block\_by\_number}}
+\index{get\_block\_by\_number@{get\_block\_by\_number}!sysio::chain::plugin\_interface::methods@{sysio::chain::plugin\_interface::methods}}
+\doxysubsubsection{\texorpdfstring{get\_block\_by\_number}{get\_block\_by\_number}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1plugin__interface_1_1methods_a1dc915fee440a66569fa5d9705eaa779} 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1plugin__interface_1_1methods_a1dc915fee440a66569fa5d9705eaa779}{sysio\+::chain\+::plugin\+\_\+interface\+::methods\+::get\+\_\+block\+\_\+by\+\_\+number}} = \mbox{\hyperlink{structappbase_1_1method__decl}{method\+\_\+decl}}$<$chain\+\_\+plugin\+\_\+interface, \mbox{\hyperlink{namespacesysio_1_1chain_aa10ee348c57604b615bc8570f6685102}{signed\+\_\+block\+\_\+ptr}}(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} block\+\_\+num)$>$}
+
+
+
+Definition at line \mbox{\hyperlink{plugin__interface_8hpp_source_l00031}{31}} of file \mbox{\hyperlink{plugin__interface_8hpp_source}{plugin\+\_\+interface.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1chain_1_1plugin__interface_1_1methods_aec45b7f4f9bb35e9860ec982cd79960e}\index{sysio::chain::plugin\_interface::methods@{sysio::chain::plugin\_interface::methods}!get\_head\_block\_id@{get\_head\_block\_id}}
+\index{get\_head\_block\_id@{get\_head\_block\_id}!sysio::chain::plugin\_interface::methods@{sysio::chain::plugin\_interface::methods}}
+\doxysubsubsection{\texorpdfstring{get\_head\_block\_id}{get\_head\_block\_id}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1plugin__interface_1_1methods_aec45b7f4f9bb35e9860ec982cd79960e} 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1plugin__interface_1_1methods_aec45b7f4f9bb35e9860ec982cd79960e}{sysio\+::chain\+::plugin\+\_\+interface\+::methods\+::get\+\_\+head\+\_\+block\+\_\+id}} = \mbox{\hyperlink{structappbase_1_1method__decl}{method\+\_\+decl}}$<$chain\+\_\+plugin\+\_\+interface, \mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{block\+\_\+id\+\_\+type}} ()$>$}
+
+
+
+Definition at line \mbox{\hyperlink{plugin__interface_8hpp_source_l00033}{33}} of file \mbox{\hyperlink{plugin__interface_8hpp_source}{plugin\+\_\+interface.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1chain_1_1plugin__interface_1_1methods_a5103be0de226bafc7aa3b176f7a95efc}\index{sysio::chain::plugin\_interface::methods@{sysio::chain::plugin\_interface::methods}!get\_last\_irreversible\_block\_number@{get\_last\_irreversible\_block\_number}}
+\index{get\_last\_irreversible\_block\_number@{get\_last\_irreversible\_block\_number}!sysio::chain::plugin\_interface::methods@{sysio::chain::plugin\_interface::methods}}
+\doxysubsubsection{\texorpdfstring{get\_last\_irreversible\_block\_number}{get\_last\_irreversible\_block\_number}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1plugin__interface_1_1methods_a5103be0de226bafc7aa3b176f7a95efc} 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1plugin__interface_1_1methods_a5103be0de226bafc7aa3b176f7a95efc}{sysio\+::chain\+::plugin\+\_\+interface\+::methods\+::get\+\_\+last\+\_\+irreversible\+\_\+block\+\_\+number}} = \mbox{\hyperlink{structappbase_1_1method__decl}{method\+\_\+decl}}$<$chain\+\_\+plugin\+\_\+interface, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} ()$>$}
+
+
+
+Definition at line \mbox{\hyperlink{plugin__interface_8hpp_source_l00036}{36}} of file \mbox{\hyperlink{plugin__interface_8hpp_source}{plugin\+\_\+interface.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1chain_1_1plugin__interface_1_1methods_adbbafc44d94293f7ad1e8738184ac794}\index{sysio::chain::plugin\_interface::methods@{sysio::chain::plugin\_interface::methods}!get\_lib\_block\_id@{get\_lib\_block\_id}}
+\index{get\_lib\_block\_id@{get\_lib\_block\_id}!sysio::chain::plugin\_interface::methods@{sysio::chain::plugin\_interface::methods}}
+\doxysubsubsection{\texorpdfstring{get\_lib\_block\_id}{get\_lib\_block\_id}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1plugin__interface_1_1methods_adbbafc44d94293f7ad1e8738184ac794} 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1plugin__interface_1_1methods_adbbafc44d94293f7ad1e8738184ac794}{sysio\+::chain\+::plugin\+\_\+interface\+::methods\+::get\+\_\+lib\+\_\+block\+\_\+id}} = \mbox{\hyperlink{structappbase_1_1method__decl}{method\+\_\+decl}}$<$chain\+\_\+plugin\+\_\+interface, \mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{block\+\_\+id\+\_\+type}} ()$>$}
+
+
+
+Definition at line \mbox{\hyperlink{plugin__interface_8hpp_source_l00034}{34}} of file \mbox{\hyperlink{plugin__interface_8hpp_source}{plugin\+\_\+interface.\+hpp}}.
+

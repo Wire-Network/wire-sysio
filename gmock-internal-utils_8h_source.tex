@@ -1,0 +1,580 @@
+\doxysection{gmock-\/internal-\/utils.h}
+\hypertarget{gmock-internal-utils_8h_source}{}\label{gmock-internal-utils_8h_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googlemock/include/gmock/internal/gmock-\/internal-\/utils.h@{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googlemock/include/gmock/internal/gmock-\/internal-\/utils.h}}
+\mbox{\hyperlink{gmock-internal-utils_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00001}00001\ \textcolor{comment}{//\ Copyright\ 2007,\ Google\ Inc.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00002}00002\ \textcolor{comment}{//\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00003}00003\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00004}00004\ \textcolor{comment}{//\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00005}00005\ \textcolor{comment}{//\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00006}00006\ \textcolor{comment}{//\ met:}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00007}00007\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00008}00008\ \textcolor{comment}{//\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00009}00009\ \textcolor{comment}{//\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00010}00010\ \textcolor{comment}{//\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00011}00011\ \textcolor{comment}{//\ copyright\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00012}00012\ \textcolor{comment}{//\ in\ the\ documentation\ and/or\ other\ materials\ provided\ with\ the}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00013}00013\ \textcolor{comment}{//\ distribution.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00014}00014\ \textcolor{comment}{//\ \ \ \ \ *\ Neither\ the\ name\ of\ Google\ Inc.\ nor\ the\ names\ of\ its}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00015}00015\ \textcolor{comment}{//\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products\ derived\ from}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00016}00016\ \textcolor{comment}{//\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00017}00017\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00018}00018\ \textcolor{comment}{//\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00019}00019\ \textcolor{comment}{//\ "{}AS\ IS"{}\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00020}00020\ \textcolor{comment}{//\ LIMITED\ TO,\ THE\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00021}00021\ \textcolor{comment}{//\ A\ PARTICULAR\ PURPOSE\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ THE\ COPYRIGHT}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00022}00022\ \textcolor{comment}{//\ OWNER\ OR\ CONTRIBUTORS\ BE\ LIABLE\ FOR\ ANY\ DIRECT,\ INDIRECT,\ INCIDENTAL,}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00023}00023\ \textcolor{comment}{//\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES\ (INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00024}00024\ \textcolor{comment}{//\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;\ LOSS\ OF\ USE,}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00025}00025\ \textcolor{comment}{//\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND\ ON\ ANY}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00026}00026\ \textcolor{comment}{//\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00027}00027\ \textcolor{comment}{//\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00028}00028\ \textcolor{comment}{//\ OF\ THIS\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00029}00029\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00030}00030\ \textcolor{comment}{//\ Author:\ wan@google.com\ (Zhanyong\ Wan)}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00032}00032\ \textcolor{comment}{//\ Google\ Mock\ -\/\ a\ framework\ for\ writing\ C++\ mock\ classes.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00033}00033\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00034}00034\ \textcolor{comment}{//\ This\ file\ defines\ some\ utilities\ useful\ for\ implementing\ Google}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00035}00035\ \textcolor{comment}{//\ Mock.\ \ They\ are\ subject\ to\ change\ without\ notice,\ so\ please\ DO\ NOT}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00036}00036\ \textcolor{comment}{//\ USE\ THEM\ IN\ USER\ CODE.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00038}00038\ \textcolor{preprocessor}{\#ifndef\ GMOCK\_INCLUDE\_GMOCK\_INTERNAL\_GMOCK\_INTERNAL\_UTILS\_H\_}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00039}00039\ \textcolor{preprocessor}{\#define\ GMOCK\_INCLUDE\_GMOCK\_INTERNAL\_GMOCK\_INTERNAL\_UTILS\_H\_}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00041}00041\ \textcolor{preprocessor}{\#include\ <stdio.h>}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00042}00042\ \textcolor{preprocessor}{\#include\ <ostream>}\ \ \textcolor{comment}{//\ NOLINT}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00043}00043\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00044}00044\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{gmock-generated-internal-utils_8h}{gmock/internal/gmock-\/generated-\/internal-\/utils.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00045}00045\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{gmock-port_8h}{gmock/internal/gmock-\/port.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00046}00046\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{gtest_8h}{gtest/gtest.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00048}00048\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetesting}{testing}}\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00049}00049\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceinternal}{internal}}\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00051}00051\ \textcolor{comment}{//\ Silence\ MSVC\ C4100\ (unreferenced\ formal\ parameter)\ and}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00052}00052\ \textcolor{comment}{//\ C4805('==':\ unsafe\ mix\ of\ type\ 'const\ int'\ and\ type\ 'const\ bool')}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00053}00053\ \textcolor{preprocessor}{\#ifdef\ \_MSC\_VER}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00054}00054\ \textcolor{preprocessor}{\#\ pragma\ warning(push)}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00055}00055\ \textcolor{preprocessor}{\#\ pragma\ warning(disable:4100)}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00056}00056\ \textcolor{preprocessor}{\#\ pragma\ warning(disable:4805)}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00057}00057\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00059}00059\ \textcolor{comment}{//\ Joins\ a\ vector\ of\ strings\ as\ if\ they\ are\ fields\ of\ a\ tuple;\ returns}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00060}00060\ \textcolor{comment}{//\ the\ joined\ string.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00061}00061\ \mbox{\hyperlink{gtest-port_8h_aa73be6f0ba4a7456180a94904ce17790}{GTEST\_API\_}}\ std::string\ \mbox{\hyperlink{namespacetesting_1_1internal_a4ffe5309bf49f08145ed010a6d244e41}{JoinAsTuple}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{namespacetesting_1_1internal_a50003bb76ec2934be1062be11efba8bf}{Strings}}\&\ fields);}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00062}00062\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00063}00063\ \textcolor{comment}{//\ Converts\ an\ identifier\ name\ to\ a\ space-\/separated\ list\ of\ lower-\/case}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00064}00064\ \textcolor{comment}{//\ words.\ \ Each\ maximum\ substring\ of\ the\ form\ [A-\/Za-\/z][a-\/z]*|\(\backslash\)d+\ is}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00065}00065\ \textcolor{comment}{//\ treated\ as\ one\ word.\ \ For\ example,\ both\ "{}FooBar123"{}\ and}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00066}00066\ \textcolor{comment}{//\ "{}foo\_bar\_123"{}\ are\ converted\ to\ "{}foo\ bar\ 123"{}.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00067}00067\ \mbox{\hyperlink{gtest-port_8h_aa73be6f0ba4a7456180a94904ce17790}{GTEST\_API\_}}\ std::string\ \mbox{\hyperlink{namespacetesting_1_1internal_a0b375abcf3081393e6c420194a541b29}{ConvertIdentifierNameToWords}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ id\_name);}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00069}00069\ \textcolor{comment}{//\ PointeeOf<Pointer>::type\ is\ the\ type\ of\ a\ value\ pointed\ to\ by\ a}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00070}00070\ \textcolor{comment}{//\ Pointer,\ which\ can\ be\ either\ a\ smart\ pointer\ or\ a\ raw\ pointer.\ \ The}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00071}00071\ \textcolor{comment}{//\ following\ default\ implementation\ is\ for\ the\ case\ where\ Pointer\ is\ a}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00072}00072\ \textcolor{comment}{//\ smart\ pointer.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00073}00073\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ Po\textcolor{keywordtype}{int}er>}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00074}\mbox{\hyperlink{structtesting_1_1internal_1_1_pointee_of}{00074}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structtesting_1_1internal_1_1_pointee_of}{PointeeOf}}\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00075}00075\ \ \ \textcolor{comment}{//\ Smart\ pointer\ classes\ define\ type\ element\_type\ as\ the\ type\ of}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00076}00076\ \ \ \textcolor{comment}{//\ their\ pointees.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00077}\mbox{\hyperlink{structtesting_1_1internal_1_1_pointee_of_a36648f82e5ddaf460dc6591ab3b9d111}{00077}}\ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{typename}\ Pointer::element\_type\ \mbox{\hyperlink{structtesting_1_1internal_1_1_pointee_of_a36648f82e5ddaf460dc6591ab3b9d111}{type}};}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00078}00078\ \};}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00079}00079\ \textcolor{comment}{//\ This\ specialization\ is\ for\ the\ raw\ pointer\ case.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00080}00080\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00081}\mbox{\hyperlink{structtesting_1_1internal_1_1_pointee_of_3_01_t_01_5_01_4_ab3a7d0208d57cf9a751ab7ab0428ba57}{00081}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structtesting_1_1internal_1_1_pointee_of}{PointeeOf}}<\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*>\ \{\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \mbox{\hyperlink{structtesting_1_1internal_1_1_pointee_of_3_01_t_01_5_01_4_ab3a7d0208d57cf9a751ab7ab0428ba57}{type}};\ \};\ \ \textcolor{comment}{//\ NOLINT}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00083}00083\ \textcolor{comment}{//\ GetRawPointer(p)\ returns\ the\ raw\ pointer\ underlying\ p\ when\ p\ is\ a}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00084}00084\ \textcolor{comment}{//\ smart\ pointer,\ or\ returns\ p\ itself\ when\ p\ is\ already\ a\ raw\ pointer.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00085}00085\ \textcolor{comment}{//\ The\ following\ default\ implementation\ is\ for\ the\ smart\ pointer\ case.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00086}00086\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ Po\textcolor{keywordtype}{int}er>}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00087}\mbox{\hyperlink{namespacetesting_1_1internal_ad5e7c706ea3ebdffa1429cf3677062bd}{00087}}\ \textcolor{keyword}{inline}\ \textcolor{keyword}{const}\ \textcolor{keyword}{typename}\ Pointer::element\_type*\ \mbox{\hyperlink{namespacetesting_1_1internal_ad5e7c706ea3ebdffa1429cf3677062bd}{GetRawPointer}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{class_generic_pointer}{Pointer}}\&\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00088}00088\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.get();}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00089}00089\ \}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00090}00090\ \textcolor{comment}{//\ This\ overloaded\ version\ is\ for\ the\ raw\ pointer\ case.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00091}00091\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ Element>}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00092}\mbox{\hyperlink{namespacetesting_1_1internal_ae9f6499f55e30ff23f9ed914fb8ad597}{00092}}\ \textcolor{keyword}{inline}\ Element*\ \mbox{\hyperlink{namespacetesting_1_1internal_ad5e7c706ea3ebdffa1429cf3677062bd}{GetRawPointer}}(Element*\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}};\ \}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00093}00093\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00094}00094\ \textcolor{comment}{//\ This\ comparator\ allows\ linked\_ptr\ to\ be\ stored\ in\ sets.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00095}00095\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00096}\mbox{\hyperlink{structtesting_1_1internal_1_1_linked_ptr_less_than}{00096}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structtesting_1_1internal_1_1_linked_ptr_less_than}{LinkedPtrLessThan}}\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00097}\mbox{\hyperlink{structtesting_1_1internal_1_1_linked_ptr_less_than_a0614293c43e51b280a870ab117355164}{00097}}\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{structtesting_1_1internal_1_1_linked_ptr_less_than_a0614293c43e51b280a870ab117355164}{operator()}}(const\ ::testing::internal::linked\_ptr<T>\&\ lhs,}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00098}00098\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ const\ ::testing::internal::linked\_ptr<T>\&\ rhs)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00099}00099\ \ \ \ \ \textcolor{keywordflow}{return}\ lhs.get()\ <\ rhs.get();}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00100}00100\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00101}00101\ \};}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00102}00102\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00103}00103\ \textcolor{comment}{//\ Symbian\ compilation\ can\ be\ done\ with\ wchar\_t\ being\ either\ a\ native}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00104}00104\ \textcolor{comment}{//\ type\ or\ a\ typedef.\ \ Using\ Google\ Mock\ with\ OpenC\ without\ wchar\_t}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00105}00105\ \textcolor{comment}{//\ should\ require\ the\ definition\ of\ \_STLP\_NO\_WCHAR\_T.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00106}00106\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00107}00107\ \textcolor{comment}{//\ MSVC\ treats\ wchar\_t\ as\ a\ native\ type\ usually,\ but\ treats\ it\ as\ the}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00108}00108\ \textcolor{comment}{//\ same\ as\ unsigned\ short\ when\ the\ compiler\ option\ /Zc:wchar\_t-\/\ is}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00109}00109\ \textcolor{comment}{//\ specified.\ \ It\ defines\ \_NATIVE\_WCHAR\_T\_DEFINED\ symbol\ when\ wchar\_t}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00110}00110\ \textcolor{comment}{//\ is\ a\ native\ type.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00111}00111\ \textcolor{preprocessor}{\#if\ (GTEST\_OS\_SYMBIAN\ \&\&\ defined(\_STLP\_NO\_WCHAR\_T))\ ||\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00112}00112\ \textcolor{preprocessor}{\ \ \ \ (defined(\_MSC\_VER)\ \&\&\ !defined(\_NATIVE\_WCHAR\_T\_DEFINED))}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00113}00113\ \textcolor{comment}{//\ wchar\_t\ is\ a\ typedef.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00114}00114\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00115}\mbox{\hyperlink{gmock-internal-utils_8h_a0725bd2b3326d282677e5197e53cc5e9}{00115}}\ \textcolor{preprocessor}{\#\ define\ GMOCK\_WCHAR\_T\_IS\_NATIVE\_\ 1}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00116}00116\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00117}00117\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00118}00118\ \textcolor{comment}{//\ signed\ wchar\_t\ and\ unsigned\ wchar\_t\ are\ NOT\ in\ the\ C++\ standard.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00119}00119\ \textcolor{comment}{//\ Using\ them\ is\ a\ bad\ practice\ and\ not\ portable.\ \ So\ DON'T\ use\ them.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00120}00120\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00121}00121\ \textcolor{comment}{//\ Still,\ Google\ Mock\ is\ designed\ to\ work\ even\ if\ the\ user\ uses\ signed}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00122}00122\ \textcolor{comment}{//\ wchar\_t\ or\ unsigned\ wchar\_t\ (obviously,\ assuming\ the\ compiler}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00123}00123\ \textcolor{comment}{//\ supports\ them).}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00124}00124\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00125}00125\ \textcolor{comment}{//\ To\ gcc,}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00126}00126\ \textcolor{comment}{//\ \ \ wchar\_t\ ==\ signed\ wchar\_t\ !=\ unsigned\ wchar\_t\ ==\ unsigned\ int}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00127}00127\ \textcolor{preprocessor}{\#ifdef\ \_\_GNUC\_\_}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00128}00128\ \textcolor{preprocessor}{\#if\ !defined(\_\_WCHAR\_UNSIGNED\_\_)}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00129}00129\ \textcolor{comment}{//\ signed/unsigned\ wchar\_t\ are\ valid\ types.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00130}00130\ \textcolor{preprocessor}{\#\ define\ GMOCK\_HAS\_SIGNED\_WCHAR\_T\_\ 1}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00131}00131\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00132}00132\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00133}00133\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00134}00134\ \textcolor{comment}{//\ In\ what\ follows,\ we\ use\ the\ term\ "{}kind"{}\ to\ indicate\ whether\ a\ type}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00135}00135\ \textcolor{comment}{//\ is\ bool,\ an\ integer\ type\ (excluding\ bool),\ a\ floating-\/point\ type,}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00136}00136\ \textcolor{comment}{//\ or\ none\ of\ them.\ \ This\ categorization\ is\ useful\ for\ determining}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00137}00137\ \textcolor{comment}{//\ when\ a\ matcher\ argument\ type\ can\ be\ safely\ converted\ to\ another}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00138}00138\ \textcolor{comment}{//\ type\ in\ the\ implementation\ of\ SafeMatcherCast.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00139}\mbox{\hyperlink{namespacetesting_1_1internal_aa8747bda20137c9aa7f846dee830e686}{00139}}\ \textcolor{keyword}{enum}\ \mbox{\hyperlink{namespacetesting_1_1internal_aa8747bda20137c9aa7f846dee830e686}{TypeKind}}\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00140}\mbox{\hyperlink{namespacetesting_1_1internal_aa8747bda20137c9aa7f846dee830e686a3af2191917fb1796599139b3615302fe}{00140}}\ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_aa8747bda20137c9aa7f846dee830e686a3af2191917fb1796599139b3615302fe}{kBool}},\ \mbox{\hyperlink{namespacetesting_1_1internal_aa8747bda20137c9aa7f846dee830e686a8a52f0fd73e05da35c45d80653633cab}{kInteger}},\ \mbox{\hyperlink{namespacetesting_1_1internal_aa8747bda20137c9aa7f846dee830e686acdce59b8c136926ace18aa9c2995878d}{kFloatingPoint}},\ \mbox{\hyperlink{namespacetesting_1_1internal_aa8747bda20137c9aa7f846dee830e686ad47f29150ab7a9ec8ce2491f44537347}{kOther}}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00141}\mbox{\hyperlink{namespacetesting_1_1internal_aa8747bda20137c9aa7f846dee830e686ad47f29150ab7a9ec8ce2491f44537347}{00141}}\ \};}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00142}00142\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00143}00143\ \textcolor{comment}{//\ KindOf<T>::value\ is\ the\ kind\ of\ type\ T.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00144}\mbox{\hyperlink{structtesting_1_1internal_1_1_kind_of}{00144}}\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structtesting_1_1internal_1_1_kind_of}{KindOf}}\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00145}\mbox{\hyperlink{structtesting_1_1internal_1_1_kind_of_ad60d33f3e2501aeca70a0fa206ba3830a30d28b30579739dfb2d410825ac3aaa8}{00145}}\ \ \ \textcolor{keyword}{enum}\ \{\ \mbox{\hyperlink{structtesting_1_1internal_1_1_kind_of_ad60d33f3e2501aeca70a0fa206ba3830a30d28b30579739dfb2d410825ac3aaa8}{value}}\ =\ \mbox{\hyperlink{namespacetesting_1_1internal_aa8747bda20137c9aa7f846dee830e686ad47f29150ab7a9ec8ce2491f44537347}{kOther}}\ \};\ \ \textcolor{comment}{//\ The\ default\ kind.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00146}00146\ \};}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00147}00147\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00148}00148\ \textcolor{comment}{//\ This\ macro\ declares\ that\ the\ kind\ of\ 'type'\ is\ 'kind'.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00149}\mbox{\hyperlink{gmock-internal-utils_8h_a7d8a1871d7a30543a4e1882a8b2bbcd8}{00149}}\ \textcolor{preprocessor}{\#define\ GMOCK\_DECLARE\_KIND\_(type,\ kind)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00150}00150\ \textcolor{preprocessor}{\ \ template\ <>\ struct\ KindOf<type>\ \{\ enum\ \{\ value\ =\ kind\ \};\ \}}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00151}00151\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00152}\mbox{\hyperlink{namespacetesting_1_1internal_a20f5584732e44a368e7acf295b639319}{00152}}\ \mbox{\hyperlink{gmock-internal-utils_8h_a7d8a1871d7a30543a4e1882a8b2bbcd8}{GMOCK\_DECLARE\_KIND\_}}(\textcolor{keywordtype}{bool},\ \mbox{\hyperlink{namespacetesting_1_1internal_aa8747bda20137c9aa7f846dee830e686a3af2191917fb1796599139b3615302fe}{kBool}});}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00153}00153\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00154}00154\ \textcolor{comment}{//\ All\ standard\ integer\ types.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00155}\mbox{\hyperlink{namespacetesting_1_1internal_ac8f3722ca21d8b14f86e5c949e843508}{00155}}\ \mbox{\hyperlink{gmock-internal-utils_8h_a7d8a1871d7a30543a4e1882a8b2bbcd8}{GMOCK\_DECLARE\_KIND\_}}(\textcolor{keywordtype}{char},\ \mbox{\hyperlink{namespacetesting_1_1internal_aa8747bda20137c9aa7f846dee830e686a8a52f0fd73e05da35c45d80653633cab}{kInteger}});}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00156}\mbox{\hyperlink{namespacetesting_1_1internal_ae5b8e77d245fd0838ab22e439e92e9af}{00156}}\ \mbox{\hyperlink{gmock-internal-utils_8h_a7d8a1871d7a30543a4e1882a8b2bbcd8}{GMOCK\_DECLARE\_KIND\_}}(\textcolor{keywordtype}{signed}\ \textcolor{keywordtype}{char},\ \mbox{\hyperlink{namespacetesting_1_1internal_aa8747bda20137c9aa7f846dee830e686a8a52f0fd73e05da35c45d80653633cab}{kInteger}});}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00157}\mbox{\hyperlink{namespacetesting_1_1internal_ab13e89be2f0f22b1da9e22cd53bce5ce}{00157}}\ \mbox{\hyperlink{gmock-internal-utils_8h_a7d8a1871d7a30543a4e1882a8b2bbcd8}{GMOCK\_DECLARE\_KIND\_}}(\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char},\ \mbox{\hyperlink{namespacetesting_1_1internal_aa8747bda20137c9aa7f846dee830e686a8a52f0fd73e05da35c45d80653633cab}{kInteger}});}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00158}\mbox{\hyperlink{namespacetesting_1_1internal_af191a2be9cff1d5900426ef5aa59851e}{00158}}\ \mbox{\hyperlink{gmock-internal-utils_8h_a7d8a1871d7a30543a4e1882a8b2bbcd8}{GMOCK\_DECLARE\_KIND\_}}(\textcolor{keywordtype}{short},\ \mbox{\hyperlink{namespacetesting_1_1internal_aa8747bda20137c9aa7f846dee830e686a8a52f0fd73e05da35c45d80653633cab}{kInteger}});\ \ \textcolor{comment}{//\ NOLINT}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00159}\mbox{\hyperlink{namespacetesting_1_1internal_a6138ee5ce9f509d39e874e4eedb89ae1}{00159}}\ \mbox{\hyperlink{gmock-internal-utils_8h_a7d8a1871d7a30543a4e1882a8b2bbcd8}{GMOCK\_DECLARE\_KIND\_}}(\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{short},\ \mbox{\hyperlink{namespacetesting_1_1internal_aa8747bda20137c9aa7f846dee830e686a8a52f0fd73e05da35c45d80653633cab}{kInteger}});\ \ \textcolor{comment}{//\ NOLINT}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00160}\mbox{\hyperlink{namespacetesting_1_1internal_a59fb8e3bb6f1fec656ed8bdab0048f9f}{00160}}\ \mbox{\hyperlink{gmock-internal-utils_8h_a7d8a1871d7a30543a4e1882a8b2bbcd8}{GMOCK\_DECLARE\_KIND\_}}(\textcolor{keywordtype}{int},\ \mbox{\hyperlink{namespacetesting_1_1internal_aa8747bda20137c9aa7f846dee830e686a8a52f0fd73e05da35c45d80653633cab}{kInteger}});}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00161}\mbox{\hyperlink{namespacetesting_1_1internal_abdce95ddf8b975d2a17e76a4c5a6c37f}{00161}}\ \mbox{\hyperlink{gmock-internal-utils_8h_a7d8a1871d7a30543a4e1882a8b2bbcd8}{GMOCK\_DECLARE\_KIND\_}}(\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int},\ \mbox{\hyperlink{namespacetesting_1_1internal_aa8747bda20137c9aa7f846dee830e686a8a52f0fd73e05da35c45d80653633cab}{kInteger}});}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00162}\mbox{\hyperlink{namespacetesting_1_1internal_a40597f856b3d94dc82e9fbbf9b027819}{00162}}\ \mbox{\hyperlink{gmock-internal-utils_8h_a7d8a1871d7a30543a4e1882a8b2bbcd8}{GMOCK\_DECLARE\_KIND\_}}(\textcolor{keywordtype}{long},\ \mbox{\hyperlink{namespacetesting_1_1internal_aa8747bda20137c9aa7f846dee830e686a8a52f0fd73e05da35c45d80653633cab}{kInteger}});\ \ \textcolor{comment}{//\ NOLINT}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00163}\mbox{\hyperlink{namespacetesting_1_1internal_a8224329431c90b3d943cc43ac92e6e42}{00163}}\ \mbox{\hyperlink{gmock-internal-utils_8h_a7d8a1871d7a30543a4e1882a8b2bbcd8}{GMOCK\_DECLARE\_KIND\_}}(\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long},\ \mbox{\hyperlink{namespacetesting_1_1internal_aa8747bda20137c9aa7f846dee830e686a8a52f0fd73e05da35c45d80653633cab}{kInteger}});\ \ \textcolor{comment}{//\ NOLINT}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00164}00164\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00165}00165\ \textcolor{preprocessor}{\#if\ GMOCK\_WCHAR\_T\_IS\_NATIVE\_}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00166}\mbox{\hyperlink{namespacetesting_1_1internal_af00aa2679c10ed170064e5ec5dd80e29}{00166}}\ \mbox{\hyperlink{gmock-internal-utils_8h_a7d8a1871d7a30543a4e1882a8b2bbcd8}{GMOCK\_DECLARE\_KIND\_}}(\textcolor{keywordtype}{wchar\_t},\ \mbox{\hyperlink{namespacetesting_1_1internal_aa8747bda20137c9aa7f846dee830e686a8a52f0fd73e05da35c45d80653633cab}{kInteger}});}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00167}00167\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00168}00168\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00169}00169\ \textcolor{comment}{//\ Non-\/standard\ integer\ types.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00170}\mbox{\hyperlink{namespacetesting_1_1internal_ae1d4cd9aef9a240d257364691ed3679e}{00170}}\ \mbox{\hyperlink{gmock-internal-utils_8h_a7d8a1871d7a30543a4e1882a8b2bbcd8}{GMOCK\_DECLARE\_KIND\_}}(\mbox{\hyperlink{namespacetesting_1_1internal_a271c563fec38b804ddab0677f51f70a8}{Int64}},\ \mbox{\hyperlink{namespacetesting_1_1internal_aa8747bda20137c9aa7f846dee830e686a8a52f0fd73e05da35c45d80653633cab}{kInteger}});}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00171}\mbox{\hyperlink{namespacetesting_1_1internal_ae09394c3d07a5d99308fc3bbc9edc877}{00171}}\ \mbox{\hyperlink{gmock-internal-utils_8h_a7d8a1871d7a30543a4e1882a8b2bbcd8}{GMOCK\_DECLARE\_KIND\_}}(\mbox{\hyperlink{namespacetesting_1_1internal_aa6a1ac454e6d7e550fa4925c62c35caa}{UInt64}},\ \mbox{\hyperlink{namespacetesting_1_1internal_aa8747bda20137c9aa7f846dee830e686a8a52f0fd73e05da35c45d80653633cab}{kInteger}});}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00172}00172\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00173}00173\ \textcolor{comment}{//\ All\ standard\ floating-\/point\ types.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00174}\mbox{\hyperlink{namespacetesting_1_1internal_ad4ebf1b53b79ac38fbd18ccf4d63ceca}{00174}}\ \mbox{\hyperlink{gmock-internal-utils_8h_a7d8a1871d7a30543a4e1882a8b2bbcd8}{GMOCK\_DECLARE\_KIND\_}}(\textcolor{keywordtype}{float},\ \mbox{\hyperlink{namespacetesting_1_1internal_aa8747bda20137c9aa7f846dee830e686acdce59b8c136926ace18aa9c2995878d}{kFloatingPoint}});}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00175}\mbox{\hyperlink{namespacetesting_1_1internal_a45748f4c08b868cb4939081769cdc7b1}{00175}}\ \mbox{\hyperlink{gmock-internal-utils_8h_a7d8a1871d7a30543a4e1882a8b2bbcd8}{GMOCK\_DECLARE\_KIND\_}}(\textcolor{keywordtype}{double},\ \mbox{\hyperlink{namespacetesting_1_1internal_aa8747bda20137c9aa7f846dee830e686acdce59b8c136926ace18aa9c2995878d}{kFloatingPoint}});}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00176}\mbox{\hyperlink{namespacetesting_1_1internal_af46fdd94d8aea0da729b554de443315f}{00176}}\ \mbox{\hyperlink{gmock-internal-utils_8h_a7d8a1871d7a30543a4e1882a8b2bbcd8}{GMOCK\_DECLARE\_KIND\_}}(\textcolor{keywordtype}{long}\ \textcolor{keywordtype}{double},\ \mbox{\hyperlink{namespacetesting_1_1internal_aa8747bda20137c9aa7f846dee830e686acdce59b8c136926ace18aa9c2995878d}{kFloatingPoint}});}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00177}00177\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00178}00178\ \textcolor{preprocessor}{\#undef\ GMOCK\_DECLARE\_KIND\_}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00179}00179\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00180}00180\ \textcolor{comment}{//\ Evaluates\ to\ the\ kind\ of\ 'type'.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00181}\mbox{\hyperlink{gmock-internal-utils_8h_a72b01bdd08b78e927270885ca880ead4}{00181}}\ \textcolor{preprocessor}{\#define\ GMOCK\_KIND\_OF\_(type)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00182}00182\ \textcolor{preprocessor}{\ \ static\_cast<\ ::testing::internal::TypeKind>(\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00183}00183\ \textcolor{preprocessor}{\ \ \ \ \ \ ::testing::internal::KindOf<type>::value)}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00184}00184\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00185}00185\ \textcolor{comment}{//\ Evaluates\ to\ true\ iff\ integer\ type\ T\ is\ signed.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00186}\mbox{\hyperlink{gmock-internal-utils_8h_a8ee49a1af821b48fd83849c050d0d5a2}{00186}}\ \textcolor{preprocessor}{\#define\ GMOCK\_IS\_SIGNED\_(T)\ (static\_cast<T>(-\/1)\ <\ 0)}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00187}00187\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00188}00188\ \textcolor{comment}{//\ LosslessArithmeticConvertibleImpl<kFromKind,\ From,\ kToKind,\ To>::value}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00189}00189\ \textcolor{comment}{//\ is\ true\ iff\ arithmetic\ type\ From\ can\ be\ losslessly\ converted\ to}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00190}00190\ \textcolor{comment}{//\ arithmetic\ type\ To.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00191}00191\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00192}00192\ \textcolor{comment}{//\ It's\ the\ user's\ responsibility\ to\ ensure\ that\ both\ From\ and\ To\ are}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00193}00193\ \textcolor{comment}{//\ raw\ (i.e.\ has\ no\ CV\ modifier,\ is\ not\ a\ pointer,\ and\ is\ not\ a}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00194}00194\ \textcolor{comment}{//\ reference)\ built-\/in\ arithmetic\ types,\ kFromKind\ is\ the\ kind\ of}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00195}00195\ \textcolor{comment}{//\ From,\ and\ kToKind\ is\ the\ kind\ of\ To;\ the\ value\ is}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00196}00196\ \textcolor{comment}{//\ implementation-\/defined\ when\ the\ above\ pre-\/condition\ is\ violated.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00197}00197\ \textcolor{keyword}{template}\ <TypeKind\ kFromKind,\ \textcolor{keyword}{typename}\ From,\ TypeKind\ kToKind,\ \textcolor{keyword}{typename}\ To>}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00198}\mbox{\hyperlink{structtesting_1_1internal_1_1_lossless_arithmetic_convertible_impl}{00198}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structtesting_1_1internal_1_1_lossless_arithmetic_convertible_impl}{LosslessArithmeticConvertibleImpl}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{structtesting_1_1internal_1_1bool__constant}{false\_type}}\ \{\};}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00199}00199\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00200}00200\ \textcolor{comment}{//\ Converting\ bool\ to\ bool\ is\ lossless.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00201}00201\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00202}\mbox{\hyperlink{structtesting_1_1internal_1_1_lossless_arithmetic_convertible_impl_3_01k_bool_00_01bool_00_01k_bool_00_01bool_01_4}{00202}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structtesting_1_1internal_1_1_lossless_arithmetic_convertible_impl}{LosslessArithmeticConvertibleImpl}}<\mbox{\hyperlink{namespacetesting_1_1internal_aa8747bda20137c9aa7f846dee830e686a3af2191917fb1796599139b3615302fe}{kBool}},\ bool,\ \mbox{\hyperlink{namespacetesting_1_1internal_aa8747bda20137c9aa7f846dee830e686a3af2191917fb1796599139b3615302fe}{kBool}},\ bool>}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00203}00203\ \ \ \ \ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{structtesting_1_1internal_1_1bool__constant}{true\_type}}\ \{\};\ \ \textcolor{comment}{//\ NOLINT}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00204}00204\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00205}00205\ \textcolor{comment}{//\ Converting\ bool\ to\ any\ integer\ type\ is\ lossless.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00206}00206\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ To>}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00207}\mbox{\hyperlink{structtesting_1_1internal_1_1_lossless_arithmetic_convertible_impl_3_01k_bool_00_01bool_00_01k_integer_00_01_to_01_4}{00207}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structtesting_1_1internal_1_1_lossless_arithmetic_convertible_impl}{LosslessArithmeticConvertibleImpl}}<\mbox{\hyperlink{namespacetesting_1_1internal_aa8747bda20137c9aa7f846dee830e686a3af2191917fb1796599139b3615302fe}{kBool}},\ bool,\ \mbox{\hyperlink{namespacetesting_1_1internal_aa8747bda20137c9aa7f846dee830e686a8a52f0fd73e05da35c45d80653633cab}{kInteger}},\ \mbox{\hyperlink{classtesting_1_1internal_1_1_to}{To}}>}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00208}00208\ \ \ \ \ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{structtesting_1_1internal_1_1bool__constant}{true\_type}}\ \{\};\ \ \textcolor{comment}{//\ NOLINT}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00209}00209\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00210}00210\ \textcolor{comment}{//\ Converting\ bool\ to\ any\ floating-\/point\ type\ is\ lossless.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00211}00211\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ To>}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00212}\mbox{\hyperlink{structtesting_1_1internal_1_1_lossless_arithmetic_convertible_impl_3_01k_bool_00_01bool_00_01k_floating_point_00_01_to_01_4}{00212}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structtesting_1_1internal_1_1_lossless_arithmetic_convertible_impl}{LosslessArithmeticConvertibleImpl}}<\mbox{\hyperlink{namespacetesting_1_1internal_aa8747bda20137c9aa7f846dee830e686a3af2191917fb1796599139b3615302fe}{kBool}},\ bool,\ \mbox{\hyperlink{namespacetesting_1_1internal_aa8747bda20137c9aa7f846dee830e686acdce59b8c136926ace18aa9c2995878d}{kFloatingPoint}},\ \mbox{\hyperlink{classtesting_1_1internal_1_1_to}{To}}>}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00213}00213\ \ \ \ \ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{structtesting_1_1internal_1_1bool__constant}{true\_type}}\ \{\};\ \ \textcolor{comment}{//\ NOLINT}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00214}00214\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00215}00215\ \textcolor{comment}{//\ Converting\ an\ integer\ to\ bool\ is\ lossy.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00216}00216\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ From>}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00217}\mbox{\hyperlink{structtesting_1_1internal_1_1_lossless_arithmetic_convertible_impl_3_01k_integer_00_01_from_00_01k_bool_00_01bool_01_4}{00217}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structtesting_1_1internal_1_1_lossless_arithmetic_convertible_impl}{LosslessArithmeticConvertibleImpl}}<\mbox{\hyperlink{namespacetesting_1_1internal_aa8747bda20137c9aa7f846dee830e686a8a52f0fd73e05da35c45d80653633cab}{kInteger}},\ From,\ \mbox{\hyperlink{namespacetesting_1_1internal_aa8747bda20137c9aa7f846dee830e686a3af2191917fb1796599139b3615302fe}{kBool}},\ bool>}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00218}00218\ \ \ \ \ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{structtesting_1_1internal_1_1bool__constant}{false\_type}}\ \{\};\ \ \textcolor{comment}{//\ NOLINT}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00219}00219\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00220}00220\ \textcolor{comment}{//\ Converting\ an\ integer\ to\ another\ non-\/bool\ integer\ is\ lossless\ iff}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00221}00221\ \textcolor{comment}{//\ the\ target\ type's\ range\ encloses\ the\ source\ type's\ range.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00222}00222\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ From,\ \textcolor{keyword}{typename}\ To>}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00223}\mbox{\hyperlink{structtesting_1_1internal_1_1_lossless_arithmetic_convertible_impl_3_01k_integer_00_01_from_00_01k_integer_00_01_to_01_4}{00223}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structtesting_1_1internal_1_1_lossless_arithmetic_convertible_impl}{LosslessArithmeticConvertibleImpl}}<\mbox{\hyperlink{namespacetesting_1_1internal_aa8747bda20137c9aa7f846dee830e686a8a52f0fd73e05da35c45d80653633cab}{kInteger}},\ From,\ \mbox{\hyperlink{namespacetesting_1_1internal_aa8747bda20137c9aa7f846dee830e686a8a52f0fd73e05da35c45d80653633cab}{kInteger}},\ \mbox{\hyperlink{classtesting_1_1internal_1_1_to}{To}}>}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00224}00224\ \ \ \ \ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{structtesting_1_1internal_1_1bool__constant}{bool\_constant}}<}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00225}00225\ \ \ \ \ \ \ \textcolor{comment}{//\ When\ converting\ from\ a\ smaller\ size\ to\ a\ larger\ size,\ we\ are}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00226}00226\ \ \ \ \ \ \ \textcolor{comment}{//\ fine\ as\ long\ as\ we\ are\ not\ converting\ from\ signed\ to\ unsigned.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00227}00227\ \ \ \ \ \ \ ((sizeof(From)\ <\ sizeof(To))\ \&\&}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00228}00228\ \ \ \ \ \ \ \ (!GMOCK\_IS\_SIGNED\_(From)\ ||\ GMOCK\_IS\_SIGNED\_(To)))\ ||}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00229}00229\ \ \ \ \ \ \ \textcolor{comment}{//\ When\ converting\ between\ the\ same\ size,\ the\ signedness\ must\ match.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00230}00230\ \ \ \ \ \ \ ((sizeof(From)\ ==\ sizeof(To))\ \&\&}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00231}00231\ \ \ \ \ \ \ \ (GMOCK\_IS\_SIGNED\_(From)\ ==\ GMOCK\_IS\_SIGNED\_(To)))>\ \{\};\ \ \textcolor{comment}{//\ NOLINT}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00232}00232\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00233}00233\ \#undef\ GMOCK\_IS\_SIGNED\_}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00234}00234\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00235}00235\ \textcolor{comment}{//\ Converting\ an\ integer\ to\ a\ floating-\/point\ type\ may\ be\ lossy,\ since}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00236}00236\ \textcolor{comment}{//\ the\ format\ of\ a\ floating-\/point\ number\ is\ implementation-\/defined.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00237}00237\ template\ <typename\ From,\ typename\ To>}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00238}\mbox{\hyperlink{structtesting_1_1internal_1_1_lossless_arithmetic_convertible_impl_3_01k_integer_00_01_from_00_01k_floating_point_00_01_to_01_4}{00238}}\ struct\ LosslessArithmeticConvertibleImpl<kInteger,\ From,\ kFloatingPoint,\ To>}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00239}00239\ \ \ \ \ :\ public\ false\_type\ \{\};\ \ \textcolor{comment}{//\ NOLINT}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00240}00240\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00241}00241\ \textcolor{comment}{//\ Converting\ a\ floating-\/point\ to\ bool\ is\ lossy.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00242}00242\ template\ <typename\ From>}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00243}\mbox{\hyperlink{structtesting_1_1internal_1_1_lossless_arithmetic_convertible_impl_3_01k_floating_point_00_01_from_00_01k_bool_00_01bool_01_4}{00243}}\ struct\ LosslessArithmeticConvertibleImpl<kFloatingPoint,\ From,\ kBool,\ bool>}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00244}00244\ \ \ \ \ :\ public\ false\_type\ \{\};\ \ \textcolor{comment}{//\ NOLINT}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00245}00245\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00246}00246\ \textcolor{comment}{//\ Converting\ a\ floating-\/point\ to\ an\ integer\ is\ lossy.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00247}00247\ template\ <typename\ From,\ typename\ To>}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00248}\mbox{\hyperlink{structtesting_1_1internal_1_1_lossless_arithmetic_convertible_impl_3_01k_floating_point_00_01_from_00_01k_integer_00_01_to_01_4}{00248}}\ struct\ LosslessArithmeticConvertibleImpl<kFloatingPoint,\ From,\ kInteger,\ To>}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00249}00249\ \ \ \ \ :\ public\ false\_type\ \{\};\ \ \textcolor{comment}{//\ NOLINT}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00250}00250\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00251}00251\ \textcolor{comment}{//\ Converting\ a\ floating-\/point\ to\ another\ floating-\/point\ is\ lossless}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00252}00252\ \textcolor{comment}{//\ iff\ the\ target\ type\ is\ at\ least\ as\ big\ as\ the\ source\ type.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00253}00253\ template\ <typename\ From,\ typename\ To>}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00254}00254\ struct\ LosslessArithmeticConvertibleImpl<}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00255}00255\ \ \ kFloatingPoint,\ From,\ kFloatingPoint,\ To>}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00256}00256\ \ \ \ \ :\ public\ bool\_constant<sizeof(From)\ <=\ sizeof(To)>\ \{\};\ \ \textcolor{comment}{//\ NOLINT}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00257}00257\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00258}00258\ \textcolor{comment}{//\ LosslessArithmeticConvertible<From,\ To>::value\ is\ true\ iff\ arithmetic}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00259}00259\ \textcolor{comment}{//\ type\ From\ can\ be\ losslessly\ converted\ to\ arithmetic\ type\ To.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00260}00260\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00261}00261\ \textcolor{comment}{//\ It's\ the\ user's\ responsibility\ to\ ensure\ that\ both\ From\ and\ To\ are}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00262}00262\ \textcolor{comment}{//\ raw\ (i.e.\ has\ no\ CV\ modifier,\ is\ not\ a\ pointer,\ and\ is\ not\ a}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00263}00263\ \textcolor{comment}{//\ reference)\ built-\/in\ arithmetic\ types;\ the\ value\ is}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00264}00264\ \textcolor{comment}{//\ implementation-\/defined\ when\ the\ above\ pre-\/condition\ is\ violated.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00265}00265\ template\ <typename\ From,\ typename\ To>}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00266}00266\ struct\ LosslessArithmeticConvertible}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00267}00267\ \ \ \ \ :\ public\ LosslessArithmeticConvertibleImpl<}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00268}00268\ \ \ GMOCK\_KIND\_OF\_(From),\ From,\ GMOCK\_KIND\_OF\_(To),\ To>\ \{\};\ \ \textcolor{comment}{//\ NOLINT}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00269}00269\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00270}00270\ \textcolor{comment}{//\ This\ interface\ knows\ how\ to\ report\ a\ Google\ Mock\ failure\ (either}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00271}00271\ \textcolor{comment}{//\ non-\/fatal\ or\ fatal).}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00272}00272\ class\ FailureReporterInterface\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00273}00273\ \ public:}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00274}00274\ \ \ \textcolor{comment}{//\ The\ type\ of\ a\ failure\ (either\ non-\/fatal\ or\ fatal).}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00275}00275\ \ \ enum\ FailureType\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00276}00276\ \ \ \ \ kNonfatal,\ kFatal}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00277}00277\ \ \ \};}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00278}00278\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00279}00279\ \ \ virtual\ \string~FailureReporterInterface()\ \{\}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00280}00280\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00281}00281\ \ \ \textcolor{comment}{//\ Reports\ a\ failure\ that\ occurred\ at\ the\ given\ source\ file\ location.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00282}00282\ \ \ virtual\ void\ ReportFailure(FailureType\ type,\ const\ char*\ file,\ int\ line,}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00283}00283\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ const\ std::string\&\ message)\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00284}00284\ \};}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00285}00285\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00286}00286\ \textcolor{comment}{//\ Returns\ the\ failure\ reporter\ used\ by\ Google\ Mock.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00287}00287\ GTEST\_API\_\ FailureReporterInterface*\ GetFailureReporter();}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00288}00288\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00289}00289\ \textcolor{comment}{//\ Asserts\ that\ condition\ is\ true;\ aborts\ the\ process\ with\ the\ given}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00290}00290\ \textcolor{comment}{//\ message\ if\ condition\ is\ false.\ \ We\ cannot\ use\ LOG(FATAL)\ or\ CHECK()}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00291}00291\ \textcolor{comment}{//\ as\ Google\ Mock\ might\ be\ used\ to\ mock\ the\ log\ sink\ itself.\ \ We}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00292}00292\ \textcolor{comment}{//\ inline\ this\ function\ to\ prevent\ it\ from\ showing\ up\ in\ the\ stack}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00293}00293\ \textcolor{comment}{//\ trace.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00294}00294\ inline\ void\ Assert(bool\ condition,\ const\ char*\ file,\ int\ line,}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00295}00295\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ const\ std::string\&\ msg)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00296}00296\ \ \ if\ (!condition)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00297}00297\ \ \ \ \ GetFailureReporter()-\/>ReportFailure(FailureReporterInterface::kFatal,}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00298}00298\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ file,\ line,\ msg);}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00299}00299\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00300}00300\ \}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00301}\mbox{\hyperlink{namespacetesting_1_1internal_a7a259643b7f2d23ce2b757728df42c99}{00301}}\ inline\ void\ Assert(bool\ condition,\ const\ char*\ file,\ int\ line)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00302}00302\ \ \ Assert(condition,\ file,\ line,\ "{}Assertion\ failed."{});}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00303}00303\ \}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00304}00304\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00305}00305\ \textcolor{comment}{//\ Verifies\ that\ condition\ is\ true;\ generates\ a\ non-\/fatal\ failure\ if}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00306}00306\ \textcolor{comment}{//\ condition\ is\ false.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00307}\mbox{\hyperlink{namespacetesting_1_1internal_ad93379317e10862a77b9fb90aa96e083}{00307}}\ inline\ void\ Expect(bool\ condition,\ const\ char*\ file,\ int\ line,}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00308}00308\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ const\ std::string\&\ msg)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00309}00309\ \ \ if\ (!condition)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00310}00310\ \ \ \ \ GetFailureReporter()-\/>ReportFailure(FailureReporterInterface::kNonfatal,}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00311}00311\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ file,\ line,\ msg);}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00312}00312\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00313}00313\ \}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00314}\mbox{\hyperlink{namespacetesting_1_1internal_a0dfe8a755bd02aa5ea162764b61a9d97}{00314}}\ inline\ void\ \mbox{\hyperlink{namespacetesting_1_1internal_ad93379317e10862a77b9fb90aa96e083}{Expect}}(bool\ condition,\ const\ char*\ file,\ int\ line)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00315}00315\ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_ad93379317e10862a77b9fb90aa96e083}{Expect}}(condition,\ file,\ line,\ \textcolor{stringliteral}{"{}Expectation\ failed."{}});}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00316}00316\ \}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00317}00317\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00318}00318\ \textcolor{comment}{//\ Severity\ level\ of\ a\ log.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00319}\mbox{\hyperlink{namespacetesting_1_1internal_a203d1a8a2147a53d12bbdae40d443914}{00319}}\ \textcolor{keyword}{enum}\ \mbox{\hyperlink{namespacetesting_1_1internal_a203d1a8a2147a53d12bbdae40d443914}{LogSeverity}}\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00320}\mbox{\hyperlink{namespacetesting_1_1internal_a203d1a8a2147a53d12bbdae40d443914a396aacfaee2849eaab7c1de9773d624d}{00320}}\ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a203d1a8a2147a53d12bbdae40d443914a396aacfaee2849eaab7c1de9773d624d}{kInfo}}\ =\ 0,}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00321}00321\ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a203d1a8a2147a53d12bbdae40d443914a5beeeab1b0a3caabd0afb43356c1a271}{kWarning}}\ =\ 1}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00322}\mbox{\hyperlink{namespacetesting_1_1internal_a203d1a8a2147a53d12bbdae40d443914a5beeeab1b0a3caabd0afb43356c1a271}{00322}}\ \};}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00323}00323\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00324}00324\ \textcolor{comment}{//\ Valid\ values\ for\ the\ -\/-\/gmock\_verbose\ flag.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00325}00325\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00326}00326\ \textcolor{comment}{//\ All\ logs\ (informational\ and\ warnings)\ are\ printed.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00327}\mbox{\hyperlink{namespacetesting_1_1internal_a96274a788ffc75a6dffdfa8aa1f34fb9}{00327}}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ kInfoVerbosity[]\ =\ \textcolor{stringliteral}{"{}info"{}};}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00328}00328\ \textcolor{comment}{//\ Only\ warnings\ are\ printed.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00329}\mbox{\hyperlink{namespacetesting_1_1internal_ad9386ccda6b6deac2f7b84784d3088c0}{00329}}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ kWarningVerbosity[]\ =\ \textcolor{stringliteral}{"{}warning"{}};}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00330}00330\ \textcolor{comment}{//\ No\ logs\ are\ printed.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00331}\mbox{\hyperlink{namespacetesting_1_1internal_a3d730761274e7b80dd66e5014171fcb5}{00331}}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ kErrorVerbosity[]\ =\ \textcolor{stringliteral}{"{}error"{}};}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00332}00332\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00333}00333\ \textcolor{comment}{//\ Returns\ true\ iff\ a\ log\ with\ the\ given\ severity\ is\ visible\ according}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00334}00334\ \textcolor{comment}{//\ to\ the\ -\/-\/gmock\_verbose\ flag.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00335}00335\ \mbox{\hyperlink{gtest-port_8h_aa73be6f0ba4a7456180a94904ce17790}{GTEST\_API\_}}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacetesting_1_1internal_a69ffdba5ee36743e88d8f89b79e566ff}{LogIsVisible}}(\mbox{\hyperlink{namespacetesting_1_1internal_a203d1a8a2147a53d12bbdae40d443914}{LogSeverity}}\ severity);}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00336}00336\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00337}00337\ \textcolor{comment}{//\ Prints\ the\ given\ message\ to\ stdout\ iff\ 'severity'\ >=\ the\ level}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00338}00338\ \textcolor{comment}{//\ specified\ by\ the\ -\/-\/gmock\_verbose\ flag.\ \ If\ stack\_frames\_to\_skip\ >=}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00339}00339\ \textcolor{comment}{//\ 0,\ also\ prints\ the\ stack\ trace\ excluding\ the\ top}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00340}00340\ \textcolor{comment}{//\ stack\_frames\_to\_skip\ frames.\ \ In\ opt\ mode,\ any\ positive}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00341}00341\ \textcolor{comment}{//\ stack\_frames\_to\_skip\ is\ treated\ as\ 0,\ since\ we\ don't\ know\ which}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00342}00342\ \textcolor{comment}{//\ function\ calls\ will\ be\ inlined\ by\ the\ compiler\ and\ need\ to\ be}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00343}00343\ \textcolor{comment}{//\ conservative.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00344}00344\ \mbox{\hyperlink{gtest-port_8h_aa73be6f0ba4a7456180a94904ce17790}{GTEST\_API\_}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespace_log}{Log}}(\mbox{\hyperlink{namespacetesting_1_1internal_a203d1a8a2147a53d12bbdae40d443914}{LogSeverity}}\ severity,\ \textcolor{keyword}{const}\ std::string\&\ message,}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00345}00345\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ stack\_frames\_to\_skip);}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00346}00346\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00347}00347\ \textcolor{comment}{//\ A\ marker\ class\ that\ is\ used\ to\ resolve\ parameterless\ expectations\ to\ the}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00348}00348\ \textcolor{comment}{//\ correct\ overload.\ This\ must\ not\ be\ instantiable,\ to\ prevent\ client\ code\ from}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00349}00349\ \textcolor{comment}{//\ accidentally\ resolving\ to\ the\ overload;\ for\ example:}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00350}00350\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00351}00351\ \textcolor{comment}{//\ \ \ \ ON\_CALL(mock,\ Method(\{\},\ nullptr))…}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00352}00352\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00353}\mbox{\hyperlink{classtesting_1_1internal_1_1_without_matchers}{00353}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classtesting_1_1internal_1_1_without_matchers}{WithoutMatchers}}\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00354}00354\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00355}00355\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_without_matchers}{WithoutMatchers}}()\ \{\}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00356}00356\ \ \ \textcolor{keyword}{friend}\ \mbox{\hyperlink{gtest-port_8h_aa73be6f0ba4a7456180a94904ce17790}{GTEST\_API\_}}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_without_matchers}{WithoutMatchers}}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_without_matchers_aec6c0de08b3c9096e2365c023664a848}{GetWithoutMatchers}}();}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00357}00357\ \};}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00358}00358\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00359}00359\ \textcolor{comment}{//\ Internal\ use\ only:\ access\ the\ singleton\ instance\ of\ WithoutMatchers.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00360}00360\ \mbox{\hyperlink{gtest-port_8h_aa73be6f0ba4a7456180a94904ce17790}{GTEST\_API\_}}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_without_matchers}{WithoutMatchers}}\ \mbox{\hyperlink{namespacetesting_1_1internal_ad4e02ea077a717f95a10a03c10272f1c}{GetWithoutMatchers}}();}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00361}00361\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00362}00362\ \textcolor{comment}{//\ TODO(wan@google.com):\ group\ all\ type\ utilities\ together.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00363}00363\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00364}00364\ \textcolor{comment}{//\ Type\ traits.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00365}00365\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00366}00366\ \textcolor{comment}{//\ is\_reference<T>::value\ is\ non-\/zero\ iff\ T\ is\ a\ reference\ type.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00367}\mbox{\hyperlink{structtesting_1_1internal_1_1is__reference}{00367}}\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structtesting_1_1internal_1_1is__reference}{is\_reference}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{structtesting_1_1internal_1_1bool__constant}{false\_type}}\ \{\};}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00368}\mbox{\hyperlink{structtesting_1_1internal_1_1is__reference_3_01_t_01_6_01_4}{00368}}\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structtesting_1_1internal_1_1is__reference}{is\_reference}}<\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&>\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{structtesting_1_1internal_1_1bool__constant}{true\_type}}\ \{\};}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00369}00369\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00370}00370\ \textcolor{comment}{//\ type\_equals<T1,\ T2>::value\ is\ non-\/zero\ iff\ T1\ and\ T2\ are\ the\ same\ type.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00371}\mbox{\hyperlink{structtesting_1_1internal_1_1type__equals}{00371}}\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T1,\ \textcolor{keyword}{typename}\ T2>\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structtesting_1_1internal_1_1type__equals}{type\_equals}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{structtesting_1_1internal_1_1bool__constant}{false\_type}}\ \{\};}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00372}\mbox{\hyperlink{structtesting_1_1internal_1_1type__equals_3_01_t_00_01_t_01_4}{00372}}\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structtesting_1_1internal_1_1type__equals}{type\_equals}}<\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}},\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}>\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{structtesting_1_1internal_1_1bool__constant}{true\_type}}\ \{\};}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00373}00373\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00374}00374\ \textcolor{comment}{//\ remove\_reference<T>::type\ removes\ the\ reference\ from\ type\ T,\ if\ any.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00375}\mbox{\hyperlink{structtesting_1_1internal_1_1remove__reference_a166d8d92ea338e0c5976811ebdec6c79}{00375}}\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structtesting_1_1internal_1_1remove__reference}{remove\_reference}}\ \{\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \mbox{\hyperlink{structtesting_1_1internal_1_1remove__reference_a166d8d92ea338e0c5976811ebdec6c79}{type}};\ \};\ \ \textcolor{comment}{//\ NOLINT}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00376}\mbox{\hyperlink{structtesting_1_1internal_1_1remove__reference_3_01_t_01_6_01_4_a8e07b2d21420f9469dc4a2cbff1d53ed}{00376}}\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structtesting_1_1internal_1_1remove__reference}{remove\_reference}}<\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&>\ \{\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \mbox{\hyperlink{structtesting_1_1internal_1_1remove__reference_3_01_t_01_6_01_4_a8e07b2d21420f9469dc4a2cbff1d53ed}{type}};\ \};\ \textcolor{comment}{//\ NOLINT}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00377}00377\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00378}00378\ \textcolor{comment}{//\ DecayArray<T>::type\ turns\ an\ array\ type\ U[N]\ to\ const\ U*\ and\ preserves}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00379}00379\ \textcolor{comment}{//\ other\ types.\ \ Useful\ for\ saving\ a\ copy\ of\ a\ function\ argument.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00380}\mbox{\hyperlink{structtesting_1_1internal_1_1_decay_array_a98eb7e4477d7bfbdea80ac381867a8e0}{00380}}\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structtesting_1_1internal_1_1_decay_array}{DecayArray}}\ \{\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \mbox{\hyperlink{structtesting_1_1internal_1_1_decay_array_a98eb7e4477d7bfbdea80ac381867a8e0}{type}};\ \};\ \ \textcolor{comment}{//\ NOLINT}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00381}\mbox{\hyperlink{structtesting_1_1internal_1_1_decay_array_3_01_t_0f_n_0e_4}{00381}}\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T,\ \textcolor{keywordtype}{size\_t}\ N>\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structtesting_1_1internal_1_1_decay_array}{DecayArray}}<\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}[\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}]>\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00382}\mbox{\hyperlink{structtesting_1_1internal_1_1_decay_array_3_01_t_0f_n_0e_4_a808421fc92973cc474d4df3032dfaf1b}{00382}}\ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ \mbox{\hyperlink{structtesting_1_1internal_1_1_decay_array_3_01_t_0f_n_0e_4_a808421fc92973cc474d4df3032dfaf1b}{type}};}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00383}00383\ \};}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00384}00384\ \textcolor{comment}{//\ Sometimes\ people\ use\ arrays\ whose\ size\ is\ not\ available\ at\ the\ use\ site}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00385}00385\ \textcolor{comment}{//\ (e.g.\ extern\ const\ char\ kNamePrefix[]).\ \ This\ specialization\ covers\ that}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00386}00386\ \textcolor{comment}{//\ case.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00387}\mbox{\hyperlink{structtesting_1_1internal_1_1_decay_array_3_01_t_0f_0e_4}{00387}}\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structtesting_1_1internal_1_1_decay_array}{DecayArray}}<\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}[]>\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00388}\mbox{\hyperlink{structtesting_1_1internal_1_1_decay_array_3_01_t_0f_0e_4_a02d437cfc18c2e79a5938a3f064ca5a0}{00388}}\ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ \mbox{\hyperlink{structtesting_1_1internal_1_1_decay_array_3_01_t_0f_0e_4_a02d437cfc18c2e79a5938a3f064ca5a0}{type}};}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00389}00389\ \};}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00390}00390\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00391}00391\ \textcolor{comment}{//\ Disable\ MSVC\ warnings\ for\ infinite\ recursion,\ since\ in\ this\ case\ the}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00392}00392\ \textcolor{comment}{//\ the\ recursion\ is\ unreachable.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00393}00393\ \textcolor{preprocessor}{\#ifdef\ \_MSC\_VER}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00394}00394\ \textcolor{preprocessor}{\#\ pragma\ warning(push)}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00395}00395\ \textcolor{preprocessor}{\#\ pragma\ warning(disable:4717)}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00396}00396\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00397}00397\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00398}00398\ \textcolor{comment}{//\ Invalid<T>()\ is\ usable\ as\ an\ expression\ of\ type\ T,\ but\ will\ terminate}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00399}00399\ \textcolor{comment}{//\ the\ program\ with\ an\ assertion\ failure\ if\ actually\ run.\ \ This\ is\ useful}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00400}00400\ \textcolor{comment}{//\ when\ a\ value\ of\ type\ T\ is\ needed\ for\ compilation,\ but\ the\ statement}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00401}00401\ \textcolor{comment}{//\ will\ not\ really\ be\ executed\ (or\ we\ don't\ care\ if\ the\ statement}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00402}00402\ \textcolor{comment}{//\ crashes).}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00403}00403\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00404}\mbox{\hyperlink{namespacetesting_1_1internal_a3316c24e8a79f5def3e85d763ae50854}{00404}}\ \textcolor{keyword}{inline}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \mbox{\hyperlink{namespacetesting_1_1internal_a3316c24e8a79f5def3e85d763ae50854}{Invalid}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00405}00405\ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a7a259643b7f2d23ce2b757728df42c99}{Assert}}(\textcolor{keyword}{false},\ \textcolor{stringliteral}{"{}"{}},\ -\/1,\ \textcolor{stringliteral}{"{}Internal\ error:\ attempt\ to\ return\ invalid\ value"{}});}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00406}00406\ \ \ \textcolor{comment}{//\ This\ statement\ is\ unreachable,\ and\ would\ never\ terminate\ even\ if\ it}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00407}00407\ \ \ \textcolor{comment}{//\ could\ be\ reached.\ It\ is\ provided\ only\ to\ placate\ compiler\ warnings}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00408}00408\ \ \ \textcolor{comment}{//\ about\ missing\ return\ statements.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00409}00409\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetesting_1_1internal_a3316c24e8a79f5def3e85d763ae50854}{Invalid<T>}}();}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00410}00410\ \}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00411}00411\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00412}00412\ \textcolor{preprocessor}{\#ifdef\ \_MSC\_VER}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00413}00413\ \textcolor{preprocessor}{\#\ pragma\ warning(pop)}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00414}00414\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00415}00415\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00416}00416\ \textcolor{comment}{//\ Given\ a\ raw\ type\ (i.e.\ having\ no\ top-\/level\ reference\ or\ const}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00417}00417\ \textcolor{comment}{//\ modifier)\ RawContainer\ that's\ either\ an\ STL-\/style\ container\ or\ a}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00418}00418\ \textcolor{comment}{//\ native\ array,\ class\ StlContainerView<RawContainer>\ has\ the}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00419}00419\ \textcolor{comment}{//\ following\ members:}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00420}00420\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00421}00421\ \textcolor{comment}{//\ \ \ -\/\ type\ is\ a\ type\ that\ provides\ an\ STL-\/style\ container\ view\ to}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00422}00422\ \textcolor{comment}{//\ \ \ \ \ (i.e.\ implements\ the\ STL\ container\ concept\ for)\ RawContainer;}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00423}00423\ \textcolor{comment}{//\ \ \ -\/\ const\_reference\ is\ a\ type\ that\ provides\ a\ reference\ to\ a\ const}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00424}00424\ \textcolor{comment}{//\ \ \ \ \ RawContainer;}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00425}00425\ \textcolor{comment}{//\ \ \ -\/\ ConstReference(raw\_container)\ returns\ a\ const\ reference\ to\ an\ STL-\/style}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00426}00426\ \textcolor{comment}{//\ \ \ \ \ container\ view\ to\ raw\_container,\ which\ is\ a\ RawContainer.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00427}00427\ \textcolor{comment}{//\ \ \ -\/\ Copy(raw\_container)\ returns\ an\ STL-\/style\ container\ view\ of\ a}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00428}00428\ \textcolor{comment}{//\ \ \ \ \ copy\ of\ raw\_container,\ which\ is\ a\ RawContainer.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00429}00429\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00430}00430\ \textcolor{comment}{//\ This\ generic\ version\ is\ used\ when\ RawContainer\ itself\ is\ already\ an}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00431}00431\ \textcolor{comment}{//\ STL-\/style\ container.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00432}00432\ \textcolor{keyword}{template}\ <\textcolor{keyword}{class}\ RawContainer>}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00433}\mbox{\hyperlink{classtesting_1_1internal_1_1_stl_container_view}{00433}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classtesting_1_1internal_1_1_stl_container_view}{StlContainerView}}\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00434}00434\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00435}\mbox{\hyperlink{classtesting_1_1internal_1_1_stl_container_view_a8b797669a0d88851ba60c1e736ed9ba2}{00435}}\ \ \ \textcolor{keyword}{typedef}\ RawContainer\ \mbox{\hyperlink{classtesting_1_1internal_1_1_stl_container_view_a8b797669a0d88851ba60c1e736ed9ba2}{type}};}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00436}\mbox{\hyperlink{classtesting_1_1internal_1_1_stl_container_view_a6d09823f4962be6fa2b76c179ea5c166}{00436}}\ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_stl_container_view_a8b797669a0d88851ba60c1e736ed9ba2}{type}}\&\ \mbox{\hyperlink{classtesting_1_1internal_1_1_stl_container_view_a6d09823f4962be6fa2b76c179ea5c166}{const\_reference}};}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00437}00437\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00438}\mbox{\hyperlink{classtesting_1_1internal_1_1_stl_container_view_a36eccf53329730f6e55c12002128bf25}{00438}}\ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_stl_container_view_a6d09823f4962be6fa2b76c179ea5c166}{const\_reference}}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_stl_container_view_a36eccf53329730f6e55c12002128bf25}{ConstReference}}(\textcolor{keyword}{const}\ RawContainer\&\ container)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00439}00439\ \ \ \ \ \textcolor{comment}{//\ Ensures\ that\ RawContainer\ is\ not\ a\ const\ type.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00440}00440\ \ \ \ \ \mbox{\hyperlink{namespacetesting_a661e70fc6afeb5c085eed3716aa45059}{testing::StaticAssertTypeEq}}<RawContainer,}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00441}00441\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest-internal_8h_a2ffec8c60510eb130af387f5ce9a756a}{GTEST\_REMOVE\_CONST\_}}(RawContainer)>();}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00442}00442\ \ \ \ \ \textcolor{keywordflow}{return}\ container;}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00443}00443\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00444}\mbox{\hyperlink{classtesting_1_1internal_1_1_stl_container_view_a441123838221f1284873f66ed968f279}{00444}}\ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_stl_container_view_a8b797669a0d88851ba60c1e736ed9ba2}{type}}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_stl_container_view_a441123838221f1284873f66ed968f279}{Copy}}(\textcolor{keyword}{const}\ RawContainer\&\ container)\ \{\ \textcolor{keywordflow}{return}\ container;\ \}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00445}00445\ \};}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00446}00446\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00447}00447\ \textcolor{comment}{//\ This\ specialization\ is\ used\ when\ RawContainer\ is\ a\ native\ array\ type.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00448}00448\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ Element,\ \textcolor{keywordtype}{size\_t}\ N>}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00449}\mbox{\hyperlink{classtesting_1_1internal_1_1_stl_container_view_3_01_element_0f_n_0e_4}{00449}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classtesting_1_1internal_1_1_stl_container_view}{StlContainerView}}<Element[\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}]>\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00450}00450\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00451}\mbox{\hyperlink{classtesting_1_1internal_1_1_stl_container_view_3_01_element_0f_n_0e_4_af8c1aa62de6f8a5d3126c7b3badfefdb}{00451}}\ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_stl_container_view_3_01_element_0f_n_0e_4_af8c1aa62de6f8a5d3126c7b3badfefdb}{GTEST\_REMOVE\_CONST\_}}(Element)\ RawElement;}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00452}\mbox{\hyperlink{classtesting_1_1internal_1_1_stl_container_view_3_01_element_0f_n_0e_4_afb87adbce737bba97bb98e2778409483}{00452}}\ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_native_array}{internal::NativeArray<RawElement>}}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_stl_container_view_3_01_element_0f_n_0e_4_afb87adbce737bba97bb98e2778409483}{type}};}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00453}00453\ \ \ \textcolor{comment}{//\ NativeArray<T>\ can\ represent\ a\ native\ array\ either\ by\ value\ or\ by}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00454}00454\ \ \ \textcolor{comment}{//\ reference\ (selected\ by\ a\ constructor\ argument),\ so\ 'const\ type'}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00455}00455\ \ \ \textcolor{comment}{//\ can\ be\ used\ to\ reference\ a\ const\ native\ array.\ \ We\ cannot}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00456}00456\ \ \ \textcolor{comment}{//\ 'typedef\ const\ type\&\ const\_reference'\ here,\ as\ that\ would\ mean}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00457}00457\ \ \ \textcolor{comment}{//\ ConstReference()\ has\ to\ return\ a\ reference\ to\ a\ local\ variable.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00458}\mbox{\hyperlink{classtesting_1_1internal_1_1_stl_container_view_3_01_element_0f_n_0e_4_a7234b655d8d3cae29cccdb48ac1cebce}{00458}}\ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_native_array}{type}}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_stl_container_view_3_01_element_0f_n_0e_4_a7234b655d8d3cae29cccdb48ac1cebce}{const\_reference}};}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00459}00459\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00460}\mbox{\hyperlink{classtesting_1_1internal_1_1_stl_container_view_3_01_element_0f_n_0e_4_aa1b15d7f43d38751ae19f6dbdcb6aba3}{00460}}\ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_native_array}{const\_reference}}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_stl_container_view_3_01_element_0f_n_0e_4_aa1b15d7f43d38751ae19f6dbdcb6aba3}{ConstReference}}(\textcolor{keyword}{const}\ Element\ (\&array)[\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}])\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00461}00461\ \ \ \ \ \textcolor{comment}{//\ Ensures\ that\ Element\ is\ not\ a\ const\ type.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00462}00462\ \ \ \ \ \mbox{\hyperlink{namespacetesting_a661e70fc6afeb5c085eed3716aa45059}{testing::StaticAssertTypeEq<Element,\ RawElement>}}();}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00463}00463\ \textcolor{preprocessor}{\#if\ GTEST\_OS\_SYMBIAN}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00464}00464\ \ \ \ \ \textcolor{comment}{//\ The\ Nokia\ Symbian\ compiler\ confuses\ itself\ in\ template\ instantiation}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00465}00465\ \ \ \ \ \textcolor{comment}{//\ for\ this\ call\ without\ the\ cast\ to\ Element*:}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00466}00466\ \ \ \ \ \textcolor{comment}{//\ function\ call\ '[testing::internal::NativeArray<char\ *>].NativeArray(}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00467}00467\ \ \ \ \ \textcolor{comment}{//\ \ \ \ \ \{lval\}\ const\ char\ *[4],\ long,\ testing::internal::RelationToSource)'}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00468}00468\ \ \ \ \ \textcolor{comment}{//\ \ \ \ \ does\ not\ match}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00469}00469\ \ \ \ \ \textcolor{comment}{//\ 'testing::internal::NativeArray<char\ *>::NativeArray(}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00470}00470\ \ \ \ \ \textcolor{comment}{//\ \ \ \ \ char\ *const\ *,\ unsigned\ int,\ testing::internal::RelationToSource)'}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00471}00471\ \ \ \ \ \textcolor{comment}{//\ (instantiating:\ 'testing::internal::ContainsMatcherImpl}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00472}00472\ \ \ \ \ \textcolor{comment}{//\ \ \ \ \ <const\ char\ *\ (\&)[4]>::Matches(const\ char\ *\ (\&)[4])\ const')}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00473}00473\ \ \ \ \ \textcolor{comment}{//\ (instantiating:\ 'testing::internal::StlContainerView<char\ *[4]>::}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00474}00474\ \ \ \ \ \textcolor{comment}{//\ \ \ \ \ ConstReference(const\ char\ *\ (\&)[4])')}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00475}00475\ \ \ \ \ \textcolor{comment}{//\ (and\ though\ the\ N\ parameter\ type\ is\ mismatched\ in\ the\ above\ explicit}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00476}00476\ \ \ \ \ \textcolor{comment}{//\ conversion\ of\ it\ doesn't\ help\ -\/\ only\ the\ conversion\ of\ the\ array).}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00477}00477\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_stl_container_view_a8b797669a0d88851ba60c1e736ed9ba2}{type}}(\textcolor{keyword}{const\_cast<}Element*\textcolor{keyword}{>}(\&array[0]),\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}},}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00478}00478\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structtesting_1_1internal_1_1_relation_to_source_reference}{RelationToSourceReference}}());}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00479}00479\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00480}00480\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_stl_container_view_a8b797669a0d88851ba60c1e736ed9ba2}{type}}(array,\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}},\ \mbox{\hyperlink{structtesting_1_1internal_1_1_relation_to_source_reference}{RelationToSourceReference}}());}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00481}00481\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_OS\_SYMBIAN}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00482}00482\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00483}\mbox{\hyperlink{classtesting_1_1internal_1_1_stl_container_view_3_01_element_0f_n_0e_4_af2cf79fbd7f829229a47b52f863c68f8}{00483}}\ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_native_array}{type}}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_stl_container_view_3_01_element_0f_n_0e_4_af2cf79fbd7f829229a47b52f863c68f8}{Copy}}(\textcolor{keyword}{const}\ Element\ (\&array)[\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}])\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00484}00484\ \textcolor{preprocessor}{\#if\ GTEST\_OS\_SYMBIAN}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00485}00485\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_stl_container_view_a8b797669a0d88851ba60c1e736ed9ba2}{type}}(\textcolor{keyword}{const\_cast<}Element*\textcolor{keyword}{>}(\&array[0]),\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}},\ \mbox{\hyperlink{structtesting_1_1internal_1_1_relation_to_source_copy}{RelationToSourceCopy}}());}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00486}00486\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00487}00487\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_stl_container_view_a8b797669a0d88851ba60c1e736ed9ba2}{type}}(array,\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}},\ \mbox{\hyperlink{structtesting_1_1internal_1_1_relation_to_source_copy}{RelationToSourceCopy}}());}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00488}00488\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_OS\_SYMBIAN}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00489}00489\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00490}00490\ \};}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00491}00491\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00492}00492\ \textcolor{comment}{//\ This\ specialization\ is\ used\ when\ RawContainer\ is\ a\ native\ array}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00493}00493\ \textcolor{comment}{//\ represented\ as\ a\ (pointer,\ size)\ tuple.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00494}00494\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ ElementPo\textcolor{keywordtype}{int}er,\ \textcolor{keyword}{typename}\ Size>}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00495}\mbox{\hyperlink{classtesting_1_1internal_1_1_stl_container_view_3_01_1_1testing_1_1tuple_3_01_element_pointer_00_01_size_01_4_01_4}{00495}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classtesting_1_1internal_1_1_stl_container_view}{StlContainerView}}<\ ::testing::tuple<ElementPointer,\ Size>\ >\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00496}00496\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00497}\mbox{\hyperlink{classtesting_1_1internal_1_1_stl_container_view_3_01_1_1testing_1_1tuple_3_01_element_pointer_00_01_size_01_4_01_4_a2b1dd06842cb431ef647b85707ce52ff}{00497}}\ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_stl_container_view_3_01_1_1testing_1_1tuple_3_01_element_pointer_00_01_size_01_4_01_4_a2b1dd06842cb431ef647b85707ce52ff}{GTEST\_REMOVE\_CONST\_}}(}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00498}00498\ \ \ \ \ \ \ \textcolor{keyword}{typename}\ \mbox{\hyperlink{structtesting_1_1internal_1_1_pointee_of_a36648f82e5ddaf460dc6591ab3b9d111}{internal::PointeeOf<ElementPointer>::type}})\ RawElement;}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00499}\mbox{\hyperlink{classtesting_1_1internal_1_1_stl_container_view_3_01_1_1testing_1_1tuple_3_01_element_pointer_00_01_size_01_4_01_4_a64804aab60e4bcdfddf765ba82ddf8a9}{00499}}\ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_native_array}{internal::NativeArray<RawElement>}}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_stl_container_view_3_01_1_1testing_1_1tuple_3_01_element_pointer_00_01_size_01_4_01_4_a64804aab60e4bcdfddf765ba82ddf8a9}{type}};}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00500}\mbox{\hyperlink{classtesting_1_1internal_1_1_stl_container_view_3_01_1_1testing_1_1tuple_3_01_element_pointer_00_01_size_01_4_01_4_adf82018000909531d90a87d4c8a34488}{00500}}\ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_native_array}{type}}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_stl_container_view_3_01_1_1testing_1_1tuple_3_01_element_pointer_00_01_size_01_4_01_4_adf82018000909531d90a87d4c8a34488}{const\_reference}};}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00501}00501\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00502}\mbox{\hyperlink{classtesting_1_1internal_1_1_stl_container_view_3_01_1_1testing_1_1tuple_3_01_element_pointer_00_01_size_01_4_01_4_aba9be6fade312dd735ac47a3cb8cc355}{00502}}\ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_native_array}{const\_reference}}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_stl_container_view_3_01_1_1testing_1_1tuple_3_01_element_pointer_00_01_size_01_4_01_4_aba9be6fade312dd735ac47a3cb8cc355}{ConstReference}}(}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00503}00503\ \ \ \ \ \ \ const\ ::testing::tuple<ElementPointer,\ Size>\&\ array)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00504}00504\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_stl_container_view_a8b797669a0d88851ba60c1e736ed9ba2}{type}}(get<0>(array),\ get<1>(array),\ \mbox{\hyperlink{structtesting_1_1internal_1_1_relation_to_source_reference}{RelationToSourceReference}}());}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00505}00505\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00506}\mbox{\hyperlink{classtesting_1_1internal_1_1_stl_container_view_3_01_1_1testing_1_1tuple_3_01_element_pointer_00_01_size_01_4_01_4_a3d42db21a2f88d407a4b5acbb7fe252c}{00506}}\ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_native_array}{type}}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_stl_container_view_3_01_1_1testing_1_1tuple_3_01_element_pointer_00_01_size_01_4_01_4_a3d42db21a2f88d407a4b5acbb7fe252c}{Copy}}(const\ ::testing::tuple<ElementPointer,\ Size>\&\ array)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00507}00507\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_stl_container_view_a8b797669a0d88851ba60c1e736ed9ba2}{type}}(get<0>(array),\ get<1>(array),\ \mbox{\hyperlink{structtesting_1_1internal_1_1_relation_to_source_copy}{RelationToSourceCopy}}());}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00508}00508\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00509}00509\ \};}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00510}00510\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00511}00511\ \textcolor{comment}{//\ The\ following\ specialization\ prevents\ the\ user\ from\ instantiating}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00512}00512\ \textcolor{comment}{//\ StlContainer\ with\ a\ reference\ type.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00513}00513\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>\ \textcolor{keyword}{class\ }StlContainerView<\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&>;}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00514}00514\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00515}00515\ \textcolor{comment}{//\ A\ type\ transform\ to\ remove\ constness\ from\ the\ first\ part\ of\ a\ pair.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00516}00516\ \textcolor{comment}{//\ Pairs\ like\ that\ are\ used\ as\ the\ value\_type\ of\ associative\ containers,}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00517}00517\ \textcolor{comment}{//\ and\ this\ transform\ produces\ a\ similar\ but\ assignable\ pair.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00518}00518\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00519}\mbox{\hyperlink{structtesting_1_1internal_1_1_remove_const_from_key}{00519}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structtesting_1_1internal_1_1_remove_const_from_key}{RemoveConstFromKey}}\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00520}\mbox{\hyperlink{structtesting_1_1internal_1_1_remove_const_from_key_a9e2212235e4db5d989c368200a31fd4d}{00520}}\ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \mbox{\hyperlink{structtesting_1_1internal_1_1_remove_const_from_key_a9e2212235e4db5d989c368200a31fd4d}{type}};}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00521}00521\ \};}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00522}00522\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00523}00523\ \textcolor{comment}{//\ Partially\ specialized\ to\ remove\ constness\ from\ std::pair<const\ K,\ V>.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00524}00524\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ K,\ \textcolor{keyword}{typename}\ V>}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00525}\mbox{\hyperlink{structtesting_1_1internal_1_1_remove_const_from_key_3_01std_1_1pair_3_01const_01_k_00_01_v_01_4_01_4}{00525}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structtesting_1_1internal_1_1_remove_const_from_key}{RemoveConstFromKey}}<\mbox{\hyperlink{namespacestd}{std}}::pair<const\ K,\ V>\ >\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00526}\mbox{\hyperlink{structtesting_1_1internal_1_1_remove_const_from_key_3_01std_1_1pair_3_01const_01_k_00_01_v_01_4_01_4_a8229e70b4a92d9272c46ef8d81eab0c7}{00526}}\ \ \ \textcolor{keyword}{typedef}\ std::pair<K,\ V>\ \mbox{\hyperlink{structtesting_1_1internal_1_1_remove_const_from_key_3_01std_1_1pair_3_01const_01_k_00_01_v_01_4_01_4_a8229e70b4a92d9272c46ef8d81eab0c7}{type}};}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00527}00527\ \};}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00528}00528\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00529}00529\ \textcolor{comment}{//\ Mapping\ from\ booleans\ to\ types.\ Similar\ to\ boost::bool\_<kValue>\ and}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00530}00530\ \textcolor{comment}{//\ std::integral\_constant<bool,\ kValue>.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00531}00531\ \textcolor{keyword}{template}\ <\textcolor{keywordtype}{bool}\ kValue>}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00532}\mbox{\hyperlink{structtesting_1_1internal_1_1_boolean_constant}{00532}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structtesting_1_1internal_1_1_boolean_constant}{BooleanConstant}}\ \{\};}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00533}00533\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00534}00534\ \textcolor{comment}{//\ Emit\ an\ assertion\ failure\ due\ to\ incorrect\ DoDefault()\ usage.\ Out-\/of-\/lined\ to}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00535}00535\ \textcolor{comment}{//\ reduce\ code\ size.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00536}00536\ \mbox{\hyperlink{gtest-port_8h_aa73be6f0ba4a7456180a94904ce17790}{GTEST\_API\_}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetesting_1_1internal_aa67e1e9d28122eedffbb7b6636824f2d}{IllegalDoDefault}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ file,\ \textcolor{keywordtype}{int}\ line);}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00537}00537\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00538}00538\ \textcolor{preprocessor}{\#if\ GTEST\_LANG\_CXX11}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00539}00539\ \textcolor{comment}{//\ Helper\ types\ for\ Apply()\ below.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00540}00540\ \textcolor{keyword}{template}\ <\textcolor{keywordtype}{size\_t}...\ Is>\ \textcolor{keyword}{struct\ }int\_pack\ \{\ \textcolor{keyword}{typedef}\ int\_pack\ \mbox{\hyperlink{yubihsm_8h_a1d127017fb298b889f4ba24752d08b8e}{type}};\ \};}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00541}00541\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00542}00542\ \textcolor{keyword}{template}\ <\textcolor{keyword}{class}\ Pack,\ \textcolor{keywordtype}{size\_t}\ I>\ \textcolor{keyword}{struct\ }append;}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00543}00543\ \textcolor{keyword}{template}\ <\textcolor{keywordtype}{size\_t}...\ Is,\ \textcolor{keywordtype}{size\_t}\ I>}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00544}00544\ \textcolor{keyword}{struct\ }append<int\_pack<Is...>,\ I>\ :\ int\_pack<Is...,\ I>\ \{\};}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00545}00545\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00546}00546\ \textcolor{keyword}{template}\ <\textcolor{keywordtype}{size\_t}\ C>}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00547}00547\ \textcolor{keyword}{struct\ }make\_int\_pack\ :\ append<typename\ make\_int\_pack<C\ -\/\ 1>::type,\ C\ -\/\ 1>\ \{\};}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00548}00548\ \textcolor{keyword}{template}\ <>\ \textcolor{keyword}{struct\ }make\_int\_pack<0>\ :\ int\_pack<>\ \{\};}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00549}00549\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00550}00550\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ F,\ \textcolor{keyword}{typename}\ Tuple,\ \textcolor{keywordtype}{size\_t}...\ Idx>}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00551}00551\ \textcolor{keyword}{auto}\ ApplyImpl(F\&\&\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}},\ Tuple\&\&\ args,\ int\_pack<Idx...>)\ -\/>\ \textcolor{keyword}{decltype}(}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00552}00552\ \ \ \ \ std::forward<F>(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})(std::get<Idx>(std::forward<Tuple>(args))...))\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00553}00553\ \ \ \textcolor{keywordflow}{return}\ std::forward<F>(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})(std::get<Idx>(std::forward<Tuple>(args))...);}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00554}00554\ \}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00555}00555\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00556}00556\ \textcolor{comment}{//\ Apply\ the\ function\ to\ a\ tuple\ of\ arguments.}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00557}00557\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ F,\ \textcolor{keyword}{typename}\ Tuple>}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00558}00558\ \textcolor{keyword}{auto}\ Apply(F\&\&\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}},\ Tuple\&\&\ args)}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00559}00559\ \ \ \ \ -\/>\ \textcolor{keyword}{decltype}(ApplyImpl(std::forward<F>(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}),\ std::forward<Tuple>(args),}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00560}00560\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ make\_int\_pack<std::tuple\_size<Tuple>::value>()))\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00561}00561\ \ \ \textcolor{keywordflow}{return}\ ApplyImpl(std::forward<F>(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}),\ std::forward<Tuple>(args),}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00562}00562\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ make\_int\_pack<std::tuple\_size<Tuple>::value>());}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00563}00563\ \}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00564}00564\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00565}00565\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00566}00566\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00567}00567\ \textcolor{preprocessor}{\#ifdef\ \_MSC\_VER}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00568}00568\ \textcolor{preprocessor}{\#\ pragma\ warning(pop)}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00569}00569\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00570}00570\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00571}00571\ \}\ \ \textcolor{comment}{//\ namespace\ internal}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00572}00572\ \}\ \ \textcolor{comment}{//\ namespace\ testing}}
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00573}00573\ }
+\DoxyCodeLine{\Hypertarget{gmock-internal-utils_8h_source_l00574}00574\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GMOCK\_INCLUDE\_GMOCK\_INTERNAL\_GMOCK\_INTERNAL\_UTILS\_H\_}}
+
+\end{DoxyCode}

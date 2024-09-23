@@ -1,0 +1,4 @@
+var sys_vm_2external_2softfloat_2source_28086_2ext_f80_m__is_signaling_na_n_8c =
+[
+    [ "extF80M_isSignalingNaN", "sys-vm_2external_2softfloat_2source_28086_2ext_f80_m__is_signaling_na_n_8c.html#ace8e5230b332cd22bdf612d80da1a3de", null ]
+];

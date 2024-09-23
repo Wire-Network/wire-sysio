@@ -1,0 +1,72 @@
+\doxysection{gs\+\_\+seg\+\_\+helpers.\+c}
+\hypertarget{gs__seg__helpers_8c_source}{}\label{gs__seg__helpers_8c_source}\index{libraries/chain/webassembly/runtimes/sys-\/vm-\/oc/gs\_seg\_helpers.c@{libraries/chain/webassembly/runtimes/sys-\/vm-\/oc/gs\_seg\_helpers.c}}
+\mbox{\hyperlink{gs__seg__helpers_8c}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{gs__seg__helpers_8h}{sysio/chain/webassembly/sys-\/vm-\/oc/gs\_seg\_helpers.h}}>}}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <asm/prctl.h>}}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <sys/prctl.h>}}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <sys/mman.h>}}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00007}\mbox{\hyperlink{gs__seg__helpers_8c_ac1ca206f7fd4a694348df869fd793c9c}{00007}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{gs__seg__helpers_8c_ac1ca206f7fd4a694348df869fd793c9c}{arch\_prctl}}(\textcolor{keywordtype}{int}\ code,\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}*\ addr);}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00009}\mbox{\hyperlink{gs__seg__helpers_8c_af033ad50e2409e6c9c8e2bf0c113446a}{00009}}\ \textcolor{preprocessor}{\#define\ SYSVMOC\_MEMORY\_PTR\_cb\_ptr\ GS\_PTR\ struct\ eos\_vm\_oc\_control\_block*\ const\ cb\_ptr\ =\ ((GS\_PTR\ struct\ eos\_vm\_oc\_control\_block*\ const)(EOS\_VM\_OC\_CONTROL\_BLOCK\_OFFSET));}}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00011}\mbox{\hyperlink{gs__seg__helpers_8h_ae68a4f81029eccfca26fd55002e5caa9}{00011}}\ \mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}}\ \mbox{\hyperlink{gs__seg__helpers_8c_ae68a4f81029eccfca26fd55002e5caa9}{eos\_vm\_oc\_grow\_memory}}(\mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}}\ grow,\ \mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}}\ max)\ \{}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00012}00012\ \ \ \ \mbox{\hyperlink{gs__seg__helpers_8c_af033ad50e2409e6c9c8e2bf0c113446a}{SYSVMOC\_MEMORY\_PTR\_cb\_ptr}};}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00013}00013\ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ previous\_page\_count\ =\ cb\_ptr-\/>current\_linear\_memory\_pages;}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00014}00014\ \ \ \ \mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}}\ grow\_amount\ =\ grow;}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00015}00015\ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ max\_pages\ =\ max;}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00016}00016\ \ \ \ \textcolor{keywordflow}{if}(max\_pages\ >\ cb\_ptr-\/>max\_linear\_memory\_pages)}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00017}00017\ \ \ \ \ \ \ max\_pages\ =\ cb\_ptr-\/>max\_linear\_memory\_pages;}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00018}00018\ \ \ \ \textcolor{keywordflow}{if}(grow\ ==\ 0)}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00019}00019\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (\mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}})cb\_ptr-\/>current\_linear\_memory\_pages;}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00020}00020\ \ \ \ \textcolor{keywordflow}{if}(previous\_page\_count\ +\ grow\_amount\ >\ max\_pages)}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00021}00021\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (\mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}})-\/1;}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00023}00023\ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ max\_segments\ =\ cb\_ptr-\/>execution\_thread\_memory\_length\ /\ \mbox{\hyperlink{gs__seg__helpers_8h_aebe81eb85a49691a28997eaa4d6dce8f}{EOS\_VM\_OC\_MEMORY\_STRIDE}}\ -\/\ 1;}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00024}00024\ \ \ \ \textcolor{keywordtype}{int}\ was\_extended\ =\ previous\_page\_count\ >\ max\_segments;}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00025}00025\ \ \ \ \textcolor{keywordtype}{int}\ will\_be\_extended\ =\ previous\_page\_count\ +\ grow\_amount\ >\ max\_segments;}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00026}00026\ \ \ \ \textcolor{keywordtype}{char}*\ extended\_memory\_start\ =\ cb\_ptr-\/>full\_linear\_memory\_start\ +\ max\_segments\ *\ 64*1024;}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00027}00027\ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ gs\_diff;}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00028}00028\ \ \ \ \textcolor{keywordflow}{if}(will\_be\_extended\ \&\&\ grow\_amount\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00029}00029\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ skip\ =\ was\_extended\ ?\ previous\_page\_count\ -\/\ max\_segments\ :\ 0;}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00030}00030\ \ \ \ \ \ \ gs\_diff\ =\ was\_extended\ ?\ 0\ :\ max\_segments\ -\/\ previous\_page\_count;}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00031}00031\ \ \ \ \ \ \ mprotect(extended\_memory\_start\ +\ skip\ *\ 64*1024,\ (grow\_amount\ -\/\ gs\_diff)\ *\ 64*1024,\ PROT\_READ\ |\ PROT\_WRITE);}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00032}00032\ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (was\_extended\ \&\&\ grow\_amount\ <\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00033}00033\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ skip\ =\ will\_be\_extended\ ?\ previous\_page\_count\ +\ grow\_amount\ -\/\ max\_segments\ :\ 0;}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00034}00034\ \ \ \ \ \ \ gs\_diff\ =\ will\_be\_extended\ ?\ 0\ :\ previous\_page\_count\ +\ grow\_amount\ -\/\ max\_segments;}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00035}00035\ \ \ \ \ \ \ mprotect(extended\_memory\_start\ +\ skip\ *\ 64*1024,\ (-\/grow\_amount\ +\ gs\_diff)\ *\ 64*1024,\ PROT\_NONE);}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00036}00036\ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00037}00037\ \ \ \ \ \ \ gs\_diff\ =\ grow\_amount;}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00038}00038\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00040}00040\ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ current\_gs;}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00041}00041\ \ \ \ \mbox{\hyperlink{gs__seg__helpers_8c_ac1ca206f7fd4a694348df869fd793c9c}{arch\_prctl}}(ARCH\_GET\_GS,\ \&current\_gs);}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00042}00042\ \ \ \ current\_gs\ +=\ gs\_diff\ *\ \mbox{\hyperlink{gs__seg__helpers_8h_aebe81eb85a49691a28997eaa4d6dce8f}{EOS\_VM\_OC\_MEMORY\_STRIDE}};}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00043}00043\ \ \ \ \mbox{\hyperlink{gs__seg__helpers_8c_ac1ca206f7fd4a694348df869fd793c9c}{arch\_prctl}}(ARCH\_SET\_GS,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}*)current\_gs);}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00044}00044\ \ \ \ cb\_ptr-\/>current\_linear\_memory\_pages\ +=\ grow\_amount;}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00045}00045\ \ \ \ cb\_ptr-\/>first\_invalid\_memory\_address\ +=\ grow\_amount*64*1024;}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00047}00047\ \ \ \ \textcolor{keywordflow}{if}(grow\_amount\ >\ 0)}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00048}00048\ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(cb\_ptr-\/>full\_linear\_memory\_start\ +\ previous\_page\_count*64u*1024u,\ 0,\ grow\_amount*64u*1024u);}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00050}00050\ \ \ \ \textcolor{keywordflow}{return}\ (\mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}})previous\_page\_count;}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00051}00051\ \}}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00052}00052\ }
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00053}\mbox{\hyperlink{gs__seg__helpers_8h_a5b567c03bc74b2639ba506dc3700930d}{00053}}\ sigjmp\_buf*\ \mbox{\hyperlink{gs__seg__helpers_8c_a5b567c03bc74b2639ba506dc3700930d}{eos\_vm\_oc\_get\_jmp\_buf}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00054}00054\ \ \ \ \mbox{\hyperlink{gs__seg__helpers_8c_af033ad50e2409e6c9c8e2bf0c113446a}{SYSVMOC\_MEMORY\_PTR\_cb\_ptr}};}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00055}00055\ \ \ \ \textcolor{keywordflow}{return}\ cb\_ptr-\/>jmp;}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00056}00056\ \}}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00058}\mbox{\hyperlink{gs__seg__helpers_8h_a78b2433e9a5fa3e8e6d3312b251a0152}{00058}}\ \textcolor{keywordtype}{void}*\ \mbox{\hyperlink{gs__seg__helpers_8c_a78b2433e9a5fa3e8e6d3312b251a0152}{eos\_vm\_oc\_get\_exception\_ptr}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00059}00059\ \ \ \ \mbox{\hyperlink{gs__seg__helpers_8c_af033ad50e2409e6c9c8e2bf0c113446a}{SYSVMOC\_MEMORY\_PTR\_cb\_ptr}};}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00060}00060\ \ \ \ \textcolor{keywordflow}{return}\ cb\_ptr-\/>eptr;}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00061}00061\ \}}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00062}00062\ }
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00063}\mbox{\hyperlink{gs__seg__helpers_8h_afbc04a665423590aed4936410345e7f8}{00063}}\ \textcolor{keywordtype}{void}*\ \mbox{\hyperlink{gs__seg__helpers_8c_afbc04a665423590aed4936410345e7f8}{eos\_vm\_oc\_get\_bounce\_buffer\_list}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00064}00064\ \ \ \ \mbox{\hyperlink{gs__seg__helpers_8c_af033ad50e2409e6c9c8e2bf0c113446a}{SYSVMOC\_MEMORY\_PTR\_cb\_ptr}};}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00065}00065\ \ \ \ \textcolor{keywordflow}{return}\ cb\_ptr-\/>bounce\_buffers;}
+\DoxyCodeLine{\Hypertarget{gs__seg__helpers_8c_source_l00066}00066\ \}}
+
+\end{DoxyCode}

@@ -1,0 +1,678 @@
+\doxysection{sysio\+::chain\+::eosvmoc\+::LLVMJIT Namespace Reference}
+\hypertarget{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t}{}\label{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t}\index{sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_emit_function_context}{Emit\+Function\+Context}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_emit_module_context}{Emit\+Module\+Context}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_j_i_t_module}{JITModule}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager}{Unit\+Memory\+Manager}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unreachable_op_visitor}{Unreachable\+Op\+Visitor}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_ad225d9ff7b3c8d52e2e7128b937ca42e}{get\+Table\+Symbol\+Name}} ()
+\item 
+bool \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a6a845a4c43fc6bf05d5f301aef56ff77}{get\+Function\+Index\+From\+External\+Name}} (const char \texorpdfstring{$\ast$}{*}external\+Name, \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} \&out\+Function\+Def\+Index)
+\item 
+llvm\+::\+Value \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_af795eedea4eeeb05c14888495c44958d}{Create\+In\+Bounds\+GEPWAR}} (llvm\+::\+IRBuilder$<$$>$ \&ir\+Builder, llvm\+::\+Value \texorpdfstring{$\ast$}{*}Ptr, llvm\+::\+Value \texorpdfstring{$\ast$}{*}v1, llvm\+::\+Value \texorpdfstring{$\ast$}{*}v2=nullptr)
+\item 
+llvm\+::\+Type \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a9d72c71de74b687a86250a32946a7288}{as\+LLVMType}} (\mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{Value\+Type}} type)
+\item 
+llvm\+::\+Type \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a8e055d3c9465a2a1bf60ee5e03e7026a}{as\+LLVMType}} (\mbox{\hyperlink{namespace_i_r_ac56fb5355b338ad4a167c48ec539b90b}{Result\+Type}} type)
+\item 
+llvm\+::\+Function\+Type \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a3d16b9414b79f5141b40237a570d8ae4}{as\+LLVMType}} (const \mbox{\hyperlink{struct_i_r_1_1_function_type}{Function\+Type}} \texorpdfstring{$\ast$}{*}function\+Type)
+\item 
+llvm\+::\+Constant\+Int \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a3516e0069b55fd689270d7d866543bd4}{emit\+Literal}} (\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+llvm\+::\+Constant\+Int \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a4df86bb4684a9eb6c786c39ec576b490}{emit\+Literal}} (\mbox{\hyperlink{_basic_types_8h_a2f1a62071dd7dc3f6ef85c1b7612dc35}{I32}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+llvm\+::\+Constant\+Int \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_ac3111b8fad7fca0a556ff28ea9380c24}{emit\+Literal}} (\mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+llvm\+::\+Constant\+Int \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_ada409f18b1f66574aa1e2024c97a4ef3}{emit\+Literal}} (\mbox{\hyperlink{_basic_types_8h_a416b74ff5b1dc365af5713a3f48fb8b9}{I64}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+llvm\+::\+Constant \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a3500b23a4cd214df7625dd6c6da4acb2}{emit\+Literal}} (\mbox{\hyperlink{_basic_types_8h_a841d3674577a1e86afdc2f4845f46c4b}{F32}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+llvm\+::\+Constant \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a488113f7fdea1c5cfadc96760e9e3861}{emit\+Literal}} (\mbox{\hyperlink{_basic_types_8h_adc9896ee12db3bb116fc63b3464c72c7}{F64}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+llvm\+::\+Constant \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_af66446a9bc4909d857cde13ec075b61b}{emit\+Literal}} (bool \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+llvm\+::\+Constant \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a0ae0854b815533d14d628d2d5192656f}{emit\+Literal\+Pointer}} (const void \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}}, llvm\+::\+Type \texorpdfstring{$\ast$}{*}type)
+\item 
+llvm\+::\+Module \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a988f69eb1e3c3722b9b899034d86d146}{emit\+Module}} (const \mbox{\hyperlink{struct_i_r_1_1_module}{Module}} \&module)
+\item 
+void \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_ad380b9c76f5f65db2c744a9c46815c3b}{print\+Module}} (const llvm\+::\+Module \texorpdfstring{$\ast$}{*}llvm\+Module, const char \texorpdfstring{$\ast$}{*}filename)
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1instantiated__code}{instantiated\+\_\+code}} \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a5bd12a2d92a270ecd02902006bc53f59}{instantiate\+Module}} (const \mbox{\hyperlink{struct_i_r_1_1_module}{IR\+::\+Module}} \&module)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+llvm\+::\+LLVMContext \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a810104386ace5517d32da5601399238e}{context}}
+\item 
+llvm\+::\+Type \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a90fbf10072748df57aab1e6965dcb8b9}{llvm\+Result\+Types}} \mbox{[}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}) Result\+Type\+::num\mbox{]}
+\item 
+llvm\+::\+Type \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a61a8da55e599cd9365ff6487168a353c}{llvm\+I8\+Type}}
+\item 
+llvm\+::\+Type \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a529f20ea894c2ddc96505dacdab63780}{llvm\+I16\+Type}}
+\item 
+llvm\+::\+Type \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a32ff63778fba31b0d80fc8dbaac5dde2}{llvm\+I32\+Type}}
+\item 
+llvm\+::\+Type \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a79cec67ff4611f28c9ae3ab71add43a9}{llvm\+I64\+Type}}
+\item 
+llvm\+::\+Type \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_abc25b2e91dcd2c77156736f553fe39be}{llvm\+F32\+Type}}
+\item 
+llvm\+::\+Type \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a71de18ed122b1f59c36a3b0a9b8c26b0}{llvm\+F64\+Type}}
+\item 
+llvm\+::\+Type \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a139269b8e6cecac4e7195a810b27b5b9}{llvm\+Void\+Type}}
+\item 
+llvm\+::\+Type \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_ad6d4c1013f4d88832c3d090e96cef612}{llvm\+Bool\+Type}}
+\item 
+llvm\+::\+Type \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_af08c6a6042f0b71abc3f71556d864b1a}{llvm\+I8\+Ptr\+Type}}
+\item 
+llvm\+::\+Constant \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_adcc1122ae23ba2a66125f0972bc52310}{typed\+Zero\+Constants}} \mbox{[}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}) Value\+Type\+::num\mbox{]}
+\item 
+llvm\+::\+Target\+Machine \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a60cb0d30b54b5e84e4fd23a6b2764dfa}{target\+Machine}} = nullptr
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a3d16b9414b79f5141b40237a570d8ae4}\index{sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}!asLLVMType@{asLLVMType}}
+\index{asLLVMType@{asLLVMType}!sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}}
+\doxysubsubsection{\texorpdfstring{asLLVMType()}{asLLVMType()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a3d16b9414b79f5141b40237a570d8ae4} 
+llvm\+::\+Function\+Type \texorpdfstring{$\ast$}{*} sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::as\+LLVMType (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct_i_r_1_1_function_type}{Function\+Type}} \texorpdfstring{$\ast$}{*}}]{function\+Type}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source_l00103}{103}} of file \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source}{LLVMEmit\+IR.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00104\ \ \ \ \ \{}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ llvmArgTypes\ =\ (llvm::Type**)alloca(\textcolor{keyword}{sizeof}(llvm::Type*)\ *\ functionType-\/>\mbox{\hyperlink{struct_i_r_1_1_function_type_a92e17c58f6cd40ee5392dba1bdc2e822}{parameters}}.size());}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ argIndex\ =\ 0;argIndex\ <\ functionType-\/>\mbox{\hyperlink{struct_i_r_1_1_function_type_a92e17c58f6cd40ee5392dba1bdc2e822}{parameters}}.size();++argIndex)}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \ \ \ \ llvmArgTypes[argIndex]\ =\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a9d72c71de74b687a86250a32946a7288}{asLLVMType}}(functionType-\/>\mbox{\hyperlink{struct_i_r_1_1_function_type_a92e17c58f6cd40ee5392dba1bdc2e822}{parameters}}[argIndex]);}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ llvmResultType\ =\ asLLVMType(functionType-\/>\mbox{\hyperlink{struct_i_r_1_1_function_type_a6f6a20ea31fb2218bcdba1bc4d6a1103}{ret}});}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ llvm::FunctionType::get(llvmResultType,llvm::ArrayRef<llvm::Type*>(llvmArgTypes,functionType-\/>\mbox{\hyperlink{struct_i_r_1_1_function_type_a92e17c58f6cd40ee5392dba1bdc2e822}{parameters}}.size()),\textcolor{keyword}{false});}
+\DoxyCodeLine{00112\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a3d16b9414b79f5141b40237a570d8ae4_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a8e055d3c9465a2a1bf60ee5e03e7026a}\index{sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}!asLLVMType@{asLLVMType}}
+\index{asLLVMType@{asLLVMType}!sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}}
+\doxysubsubsection{\texorpdfstring{asLLVMType()}{asLLVMType()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a8e055d3c9465a2a1bf60ee5e03e7026a} 
+llvm\+::\+Type \texorpdfstring{$\ast$}{*} sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::as\+LLVMType (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespace_i_r_ac56fb5355b338ad4a167c48ec539b90b}{Result\+Type}}}]{type}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source_l00100}{100}} of file \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source}{LLVMEmit\+IR.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00100\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a90fbf10072748df57aab1e6965dcb8b9}{llvmResultTypes}}[(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}})type];\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a9d72c71de74b687a86250a32946a7288}\index{sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}!asLLVMType@{asLLVMType}}
+\index{asLLVMType@{asLLVMType}!sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}}
+\doxysubsubsection{\texorpdfstring{asLLVMType()}{asLLVMType()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a9d72c71de74b687a86250a32946a7288} 
+llvm\+::\+Type \texorpdfstring{$\ast$}{*} sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::as\+LLVMType (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{Value\+Type}}}]{type}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source_l00099}{99}} of file \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source}{LLVMEmit\+IR.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00099\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a90fbf10072748df57aab1e6965dcb8b9}{llvmResultTypes}}[(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}})\mbox{\hyperlink{namespace_i_r_ab45d3b43adbcd5e840ea00566a9d2622}{asResultType}}(type)];\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=330pt]{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a9d72c71de74b687a86250a32946a7288_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a9d72c71de74b687a86250a32946a7288_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_af795eedea4eeeb05c14888495c44958d}\index{sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}!CreateInBoundsGEPWAR@{CreateInBoundsGEPWAR}}
+\index{CreateInBoundsGEPWAR@{CreateInBoundsGEPWAR}!sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}}
+\doxysubsubsection{\texorpdfstring{CreateInBoundsGEPWAR()}{CreateInBoundsGEPWAR()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_af795eedea4eeeb05c14888495c44958d} 
+llvm\+::\+Value \texorpdfstring{$\ast$}{*} sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::\+Create\+In\+Bounds\+GEPWAR (\begin{DoxyParamCaption}\item[{llvm\+::\+IRBuilder$<$$>$ \&}]{ir\+Builder}{, }\item[{llvm\+::\+Value \texorpdfstring{$\ast$}{*}}]{Ptr}{, }\item[{llvm\+::\+Value \texorpdfstring{$\ast$}{*}}]{v1}{, }\item[{llvm\+::\+Value \texorpdfstring{$\ast$}{*}}]{v2}{ = {\ttfamily nullptr}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{llvm_w_a_rshim_8cpp_source_l00005}{5}} of file \mbox{\hyperlink{llvm_w_a_rshim_8cpp_source}{llvm\+WARshim.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00005\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00006\ \ \ \ \textcolor{keywordflow}{if}(!v2)}
+\DoxyCodeLine{00007\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ irBuilder.CreateInBoundsGEP(Ptr,\ v1);}
+\DoxyCodeLine{00008\ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00009\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ irBuilder.CreateInBoundsGEP(Ptr,\ \{v1,\ v2\});}
+\DoxyCodeLine{00010\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_af795eedea4eeeb05c14888495c44958d_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_af66446a9bc4909d857cde13ec075b61b}\index{sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}!emitLiteral@{emitLiteral}}
+\index{emitLiteral@{emitLiteral}!sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}}
+\doxysubsubsection{\texorpdfstring{emitLiteral()}{emitLiteral()}\hspace{0.1cm}{\footnotesize\ttfamily [1/7]}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_af66446a9bc4909d857cde13ec075b61b} 
+llvm\+::\+Constant \texorpdfstring{$\ast$}{*} sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::emit\+Literal (\begin{DoxyParamCaption}\item[{bool}]{value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source_l00121}{121}} of file \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source}{LLVMEmit\+IR.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00121\ \{\ \textcolor{keywordflow}{return}\ llvm::ConstantInt::get(llvmBoolType,llvm::APInt(1,\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ ?\ 1\ :\ 0,\textcolor{keyword}{false}));\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a3500b23a4cd214df7625dd6c6da4acb2}\index{sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}!emitLiteral@{emitLiteral}}
+\index{emitLiteral@{emitLiteral}!sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}}
+\doxysubsubsection{\texorpdfstring{emitLiteral()}{emitLiteral()}\hspace{0.1cm}{\footnotesize\ttfamily [2/7]}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a3500b23a4cd214df7625dd6c6da4acb2} 
+llvm\+::\+Constant \texorpdfstring{$\ast$}{*} sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::emit\+Literal (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{_basic_types_8h_a841d3674577a1e86afdc2f4845f46c4b}{F32}}}]{value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source_l00119}{119}} of file \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source}{LLVMEmit\+IR.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00119\ \{\ \textcolor{keywordflow}{return}\ llvm::ConstantFP::get(\mbox{\hyperlink{structcontext}{context}},llvm::APFloat(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}));\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a488113f7fdea1c5cfadc96760e9e3861}\index{sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}!emitLiteral@{emitLiteral}}
+\index{emitLiteral@{emitLiteral}!sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}}
+\doxysubsubsection{\texorpdfstring{emitLiteral()}{emitLiteral()}\hspace{0.1cm}{\footnotesize\ttfamily [3/7]}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a488113f7fdea1c5cfadc96760e9e3861} 
+llvm\+::\+Constant \texorpdfstring{$\ast$}{*} sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::emit\+Literal (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{_basic_types_8h_adc9896ee12db3bb116fc63b3464c72c7}{F64}}}]{value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source_l00120}{120}} of file \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source}{LLVMEmit\+IR.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00120\ \{\ \textcolor{keywordflow}{return}\ llvm::ConstantFP::get(\mbox{\hyperlink{structcontext}{context}},llvm::APFloat(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}));\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a4df86bb4684a9eb6c786c39ec576b490}\index{sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}!emitLiteral@{emitLiteral}}
+\index{emitLiteral@{emitLiteral}!sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}}
+\doxysubsubsection{\texorpdfstring{emitLiteral()}{emitLiteral()}\hspace{0.1cm}{\footnotesize\ttfamily [4/7]}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a4df86bb4684a9eb6c786c39ec576b490} 
+llvm\+::\+Constant\+Int \texorpdfstring{$\ast$}{*} sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::emit\+Literal (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{_basic_types_8h_a2f1a62071dd7dc3f6ef85c1b7612dc35}{I32}}}]{value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source_l00116}{116}} of file \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source}{LLVMEmit\+IR.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00116\ \{\ \textcolor{keywordflow}{return}\ (llvm::ConstantInt*)llvm::ConstantInt::get(llvmI32Type,llvm::APInt(32,(\mbox{\hyperlink{_basic_types_8h_a416b74ff5b1dc365af5713a3f48fb8b9}{I64}})\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\textcolor{keyword}{false}));\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_ada409f18b1f66574aa1e2024c97a4ef3}\index{sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}!emitLiteral@{emitLiteral}}
+\index{emitLiteral@{emitLiteral}!sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}}
+\doxysubsubsection{\texorpdfstring{emitLiteral()}{emitLiteral()}\hspace{0.1cm}{\footnotesize\ttfamily [5/7]}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_ada409f18b1f66574aa1e2024c97a4ef3} 
+llvm\+::\+Constant\+Int \texorpdfstring{$\ast$}{*} sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::emit\+Literal (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{_basic_types_8h_a416b74ff5b1dc365af5713a3f48fb8b9}{I64}}}]{value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source_l00118}{118}} of file \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source}{LLVMEmit\+IR.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00118\ \{\ \textcolor{keywordflow}{return}\ (llvm::ConstantInt*)llvm::ConstantInt::get(llvmI64Type,llvm::APInt(64,\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\textcolor{keyword}{false}));\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a3516e0069b55fd689270d7d866543bd4}\index{sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}!emitLiteral@{emitLiteral}}
+\index{emitLiteral@{emitLiteral}!sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}}
+\doxysubsubsection{\texorpdfstring{emitLiteral()}{emitLiteral()}\hspace{0.1cm}{\footnotesize\ttfamily [6/7]}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a3516e0069b55fd689270d7d866543bd4} 
+llvm\+::\+Constant\+Int \texorpdfstring{$\ast$}{*} sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::emit\+Literal (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}}]{value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source_l00115}{115}} of file \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source}{LLVMEmit\+IR.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00115\ \{\ \textcolor{keywordflow}{return}\ (llvm::ConstantInt*)llvm::ConstantInt::get(llvmI32Type,llvm::APInt(32,(\mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}})\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\textcolor{keyword}{false}));\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a3516e0069b55fd689270d7d866543bd4_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_ac3111b8fad7fca0a556ff28ea9380c24}\index{sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}!emitLiteral@{emitLiteral}}
+\index{emitLiteral@{emitLiteral}!sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}}
+\doxysubsubsection{\texorpdfstring{emitLiteral()}{emitLiteral()}\hspace{0.1cm}{\footnotesize\ttfamily [7/7]}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_ac3111b8fad7fca0a556ff28ea9380c24} 
+llvm\+::\+Constant\+Int \texorpdfstring{$\ast$}{*} sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::emit\+Literal (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}}}]{value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source_l00117}{117}} of file \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source}{LLVMEmit\+IR.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00117\ \{\ \textcolor{keywordflow}{return}\ (llvm::ConstantInt*)llvm::ConstantInt::get(llvmI64Type,llvm::APInt(64,\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\textcolor{keyword}{false}));\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a0ae0854b815533d14d628d2d5192656f}\index{sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}!emitLiteralPointer@{emitLiteralPointer}}
+\index{emitLiteralPointer@{emitLiteralPointer}!sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}}
+\doxysubsubsection{\texorpdfstring{emitLiteralPointer()}{emitLiteralPointer()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a0ae0854b815533d14d628d2d5192656f} 
+llvm\+::\+Constant \texorpdfstring{$\ast$}{*} sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::emit\+Literal\+Pointer (\begin{DoxyParamCaption}\item[{const void \texorpdfstring{$\ast$}{*}}]{pointer}{, }\item[{llvm\+::\+Type \texorpdfstring{$\ast$}{*}}]{type}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source_l00122}{122}} of file \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source}{LLVMEmit\+IR.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00123\ \ \ \ \ \{}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ pointerInt\ =\ llvm::APInt(\textcolor{keyword}{sizeof}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}})\ ==\ 8\ ?\ 64\ :\ 32,\textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\textcolor{keyword}{>}(\mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}}));}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ llvm::Constant::getIntegerValue(type,pointerInt);}
+\DoxyCodeLine{00126\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a0ae0854b815533d14d628d2d5192656f_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a988f69eb1e3c3722b9b899034d86d146}\index{sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}!emitModule@{emitModule}}
+\index{emitModule@{emitModule}!sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}}
+\doxysubsubsection{\texorpdfstring{emitModule()}{emitModule()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a988f69eb1e3c3722b9b899034d86d146} 
+llvm\+::\+Module \texorpdfstring{$\ast$}{*} sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::emit\+Module (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct_i_r_1_1_module}{Module}} \&}]{module}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source_l01326}{1326}} of file \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source}{LLVMEmit\+IR.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01327\ \ \ \ \ \{}
+\DoxyCodeLine{01328\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{bool}\ inited;}
+\DoxyCodeLine{01329\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!inited)\ \{}
+\DoxyCodeLine{01330\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a61a8da55e599cd9365ff6487168a353c}{llvmI8Type}}\ =\ llvm::Type::getInt8Ty(\mbox{\hyperlink{structcontext}{context}});}
+\DoxyCodeLine{01331\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a529f20ea894c2ddc96505dacdab63780}{llvmI16Type}}\ =\ llvm::Type::getInt16Ty(\mbox{\hyperlink{structcontext}{context}});}
+\DoxyCodeLine{01332\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a32ff63778fba31b0d80fc8dbaac5dde2}{llvmI32Type}}\ =\ llvm::Type::getInt32Ty(\mbox{\hyperlink{structcontext}{context}});}
+\DoxyCodeLine{01333\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a79cec67ff4611f28c9ae3ab71add43a9}{llvmI64Type}}\ =\ llvm::Type::getInt64Ty(\mbox{\hyperlink{structcontext}{context}});}
+\DoxyCodeLine{01334\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_abc25b2e91dcd2c77156736f553fe39be}{llvmF32Type}}\ =\ llvm::Type::getFloatTy(\mbox{\hyperlink{structcontext}{context}});}
+\DoxyCodeLine{01335\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a71de18ed122b1f59c36a3b0a9b8c26b0}{llvmF64Type}}\ =\ llvm::Type::getDoubleTy(\mbox{\hyperlink{structcontext}{context}});}
+\DoxyCodeLine{01336\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a139269b8e6cecac4e7195a810b27b5b9}{llvmVoidType}}\ =\ llvm::Type::getVoidTy(\mbox{\hyperlink{structcontext}{context}});}
+\DoxyCodeLine{01337\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_ad6d4c1013f4d88832c3d090e96cef612}{llvmBoolType}}\ =\ llvm::Type::getInt1Ty(\mbox{\hyperlink{structcontext}{context}});}
+\DoxyCodeLine{01338\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_af08c6a6042f0b71abc3f71556d864b1a}{llvmI8PtrType}}\ =\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a61a8da55e599cd9365ff6487168a353c}{llvmI8Type}}-\/>getPointerTo();}
+\DoxyCodeLine{01339\ }
+\DoxyCodeLine{01340\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a90fbf10072748df57aab1e6965dcb8b9}{llvmResultTypes}}[(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}})ResultType::none]\ =\ llvm::Type::getVoidTy(\mbox{\hyperlink{structcontext}{context}});}
+\DoxyCodeLine{01341\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a90fbf10072748df57aab1e6965dcb8b9}{llvmResultTypes}}[(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}})ResultType::i32]\ =\ llvmI32Type;}
+\DoxyCodeLine{01342\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a90fbf10072748df57aab1e6965dcb8b9}{llvmResultTypes}}[(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}})ResultType::i64]\ =\ llvmI64Type;}
+\DoxyCodeLine{01343\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a90fbf10072748df57aab1e6965dcb8b9}{llvmResultTypes}}[(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}})ResultType::f32]\ =\ llvmF32Type;}
+\DoxyCodeLine{01344\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a90fbf10072748df57aab1e6965dcb8b9}{llvmResultTypes}}[(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}})ResultType::f64]\ =\ llvmF64Type;}
+\DoxyCodeLine{01345\ }
+\DoxyCodeLine{01346\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Create\ zero\ constants\ of\ each\ type.}}
+\DoxyCodeLine{01347\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_adcc1122ae23ba2a66125f0972bc52310}{typedZeroConstants}}[(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}})ValueType::any]\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{01348\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_adcc1122ae23ba2a66125f0972bc52310}{typedZeroConstants}}[(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}})ValueType::i32]\ =\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a3516e0069b55fd689270d7d866543bd4}{emitLiteral}}((\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}})0);}
+\DoxyCodeLine{01349\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_adcc1122ae23ba2a66125f0972bc52310}{typedZeroConstants}}[(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}})ValueType::i64]\ =\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a3516e0069b55fd689270d7d866543bd4}{emitLiteral}}((\mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}})0);}
+\DoxyCodeLine{01350\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_adcc1122ae23ba2a66125f0972bc52310}{typedZeroConstants}}[(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}})ValueType::f32]\ =\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a3516e0069b55fd689270d7d866543bd4}{emitLiteral}}((\mbox{\hyperlink{_basic_types_8h_a841d3674577a1e86afdc2f4845f46c4b}{F32}})0.0f);}
+\DoxyCodeLine{01351\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_adcc1122ae23ba2a66125f0972bc52310}{typedZeroConstants}}[(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}})ValueType::f64]\ =\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a3516e0069b55fd689270d7d866543bd4}{emitLiteral}}((\mbox{\hyperlink{_basic_types_8h_adc9896ee12db3bb116fc63b3464c72c7}{F64}})0.0);}
+\DoxyCodeLine{01352\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01353\ }
+\DoxyCodeLine{01354\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ EmitModuleContext(\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}).emit();}
+\DoxyCodeLine{01355\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a988f69eb1e3c3722b9b899034d86d146_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a988f69eb1e3c3722b9b899034d86d146_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a6a845a4c43fc6bf05d5f301aef56ff77}\index{sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}!getFunctionIndexFromExternalName@{getFunctionIndexFromExternalName}}
+\index{getFunctionIndexFromExternalName@{getFunctionIndexFromExternalName}!sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}}
+\doxysubsubsection{\texorpdfstring{getFunctionIndexFromExternalName()}{getFunctionIndexFromExternalName()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a6a845a4c43fc6bf05d5f301aef56ff77} 
+bool sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::get\+Function\+Index\+From\+External\+Name (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{external\+Name}{, }\item[{\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} \&}]{out\+Function\+Def\+Index}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source_l00066}{66}} of file \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source}{LLVMEmit\+IR.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00067\ \ \ \ \ \{}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ wasmFuncPrefix[]\ =\ \textcolor{stringliteral}{"{}wasmFunc"{}};}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ numPrefixChars\ =\ \textcolor{keyword}{sizeof}(wasmFuncPrefix)\ -\/\ 1;}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!strncmp(externalName,wasmFuncPrefix,numPrefixChars))}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}*\ numberEnd\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}}\ functionDefIndex64\ =\ std::strtoull(externalName\ +\ numPrefixChars,\&numberEnd,10);}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(functionDefIndex64\ >\ \mbox{\hyperlink{stdint_8h_ab2355300ea19395357e62d780f4dd073}{UINTPTR\_MAX}})\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};\ \}}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \ \ \ outFunctionDefIndex\ =\ \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}(functionDefIndex64);}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};\ \}}
+\DoxyCodeLine{00079\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a6a845a4c43fc6bf05d5f301aef56ff77_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_ad225d9ff7b3c8d52e2e7128b937ca42e}\index{sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}!getTableSymbolName@{getTableSymbolName}}
+\index{getTableSymbolName@{getTableSymbolName}!sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}}
+\doxysubsubsection{\texorpdfstring{getTableSymbolName()}{getTableSymbolName()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_ad225d9ff7b3c8d52e2e7128b937ca42e} 
+const char \texorpdfstring{$\ast$}{*} sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::get\+Table\+Symbol\+Name (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source_l00062}{62}} of file \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source}{LLVMEmit\+IR.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}wasmTable"{}};}
+\DoxyCodeLine{00064\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_ad225d9ff7b3c8d52e2e7128b937ca42e_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a5bd12a2d92a270ecd02902006bc53f59}\index{sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}!instantiateModule@{instantiateModule}}
+\index{instantiateModule@{instantiateModule}!sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}}
+\doxysubsubsection{\texorpdfstring{instantiateModule()}{instantiateModule()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a5bd12a2d92a270ecd02902006bc53f59} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1instantiated__code}{instantiated\+\_\+code}} sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::instantiate\+Module (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct_i_r_1_1_module}{IR\+::\+Module}} \&}]{module}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_j_i_t_8cpp_source_l00278}{278}} of file \mbox{\hyperlink{_l_l_v_m_j_i_t_8cpp_source}{LLVMJIT.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00279\ \ \ \ \ \{}
+\DoxyCodeLine{00280\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{bool}\ inited;}
+\DoxyCodeLine{00281\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!inited)\ \{}
+\DoxyCodeLine{00282\ \ \ \ \ \ \ \ \ \ \ \ \ inited\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00283\ \ \ \ \ \ \ \ \ \ \ \ \ llvm::InitializeNativeTarget();}
+\DoxyCodeLine{00284\ \ \ \ \ \ \ \ \ \ \ \ \ llvm::InitializeNativeTargetAsmPrinter();}
+\DoxyCodeLine{00285\ \ \ \ \ \ \ \ \ \ \ \ \ llvm::InitializeNativeTargetAsmParser();}
+\DoxyCodeLine{00286\ \ \ \ \ \ \ \ \ \ \ \ \ llvm::InitializeNativeTargetDisassembler();}
+\DoxyCodeLine{00287\ \ \ \ \ \ \ \ \ \ \ \ \ llvm::sys::DynamicLibrary::LoadLibraryPermanently(\textcolor{keyword}{nullptr});}
+\DoxyCodeLine{00288\ }
+\DoxyCodeLine{00289\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ targetTriple\ =\ llvm::sys::getProcessTriple();}
+\DoxyCodeLine{00290\ }
+\DoxyCodeLine{00291\ \ \ \ \ \ \ \ \ \ \ \ \ llvm::TargetOptions\ to;}
+\DoxyCodeLine{00292\ \ \ \ \ \ \ \ \ \ \ \ \ to.EmitStackSizeSection\ =\ 1;}
+\DoxyCodeLine{00293\ }
+\DoxyCodeLine{00294\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a60cb0d30b54b5e84e4fd23a6b2764dfa}{targetMachine}}\ =\ llvm::EngineBuilder().setRelocationModel(llvm::Reloc::PIC\_).setCodeModel(llvm::CodeModel::Small).setTargetOptions(to).selectTarget(}
+\DoxyCodeLine{00295\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ llvm::Triple(targetTriple),\textcolor{stringliteral}{"{}"{}},\textcolor{stringliteral}{"{}"{}},llvm::SmallVector<std::string,0>()}
+\DoxyCodeLine{00296\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00297\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00298\ }
+\DoxyCodeLine{00299\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Emit\ LLVM\ IR\ for\ the\ module.}}
+\DoxyCodeLine{00300\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ llvmModule\ =\ emitModule(module);}
+\DoxyCodeLine{00301\ }
+\DoxyCodeLine{00302\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Construct\ the\ JIT\ compilation\ pipeline\ for\ this\ module.}}
+\DoxyCodeLine{00303\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ jitModule\ =\ \textcolor{keyword}{new}\ JITModule();}
+\DoxyCodeLine{00304\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Compile\ the\ module.}}
+\DoxyCodeLine{00305\ \ \ \ \ \ \ \ \ jitModule-\/>compile(llvmModule);}
+\DoxyCodeLine{00306\ }
+\DoxyCodeLine{00307\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ num\_functions\_stack\_size\_found\ =\ 0;}
+\DoxyCodeLine{00308\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ stacksizes\ :\ jitModule-\/>unitmemorymanager-\/>stack\_sizes)\ \{}
+\DoxyCodeLine{00309\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1datastream}{fc::datastream<const\ char*>}}\ ds(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(stacksizes.data()),\ stacksizes.size());}
+\DoxyCodeLine{00310\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(ds.remaining())\ \{}
+\DoxyCodeLine{00311\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ funcaddr;}
+\DoxyCodeLine{00312\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1unsigned__int}{fc::unsigned\_int}}\ stack\_size;}
+\DoxyCodeLine{00313\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a0b442d98ceb22dd5a6ae84745e43ffab}{fc::raw::unpack}}(ds,\ funcaddr);}
+\DoxyCodeLine{00314\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a0b442d98ceb22dd5a6ae84745e43ffab}{fc::raw::unpack}}(ds,\ stack\_size);}
+\DoxyCodeLine{00315\ }
+\DoxyCodeLine{00316\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++num\_functions\_stack\_size\_found;}
+\DoxyCodeLine{00317\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(stack\_size\ >\ 16u*1024u)}
+\DoxyCodeLine{00318\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_exit(1);}
+\DoxyCodeLine{00319\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00320\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00321\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(num\_functions\_stack\_size\_found\ !=\ module.functions.defs.size())}
+\DoxyCodeLine{00322\ \ \ \ \ \ \ \ \ \ \ \ \ \_exit(1);}
+\DoxyCodeLine{00323\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(jitModule-\/>final\_pic\_code.size()\ >=\ 16u*1024u*1024u)}
+\DoxyCodeLine{00324\ \ \ \ \ \ \ \ \ \ \ \ \ \_exit(1);}
+\DoxyCodeLine{00325\ }
+\DoxyCodeLine{00326\ \ \ \ \ \ \ \ \ instantiated\_code\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00327\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.code\ =\ jitModule-\/>final\_pic\_code;}
+\DoxyCodeLine{00328\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.function\_offsets\ =\ jitModule-\/>function\_to\_offsets;}
+\DoxyCodeLine{00329\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.table\_offset\ =\ jitModule-\/>table\_offset;}
+\DoxyCodeLine{00330\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00331\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a5bd12a2d92a270ecd02902006bc53f59_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a5bd12a2d92a270ecd02902006bc53f59_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_ad380b9c76f5f65db2c744a9c46815c3b}\index{sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}!printModule@{printModule}}
+\index{printModule@{printModule}!sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}}
+\doxysubsubsection{\texorpdfstring{printModule()}{printModule()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_ad380b9c76f5f65db2c744a9c46815c3b} 
+void sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::print\+Module (\begin{DoxyParamCaption}\item[{const llvm\+::\+Module \texorpdfstring{$\ast$}{*}}]{llvm\+Module}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{filename}{}\end{DoxyParamCaption})}
+
+\doxylink{namespace_log_a83926634a3916d0927abca4aca58a60a}{Log\+::printf}(\doxylink{namespace_log_a1f055cc08a2ed074aa74f9d99c8a0901aad42f6697b035b7580e4fef93be20b4d}{Log\+::\+Category\+::debug},"{}\+Dumped LLVM module to\+: \%s\textbackslash{}n"{},augmented\+Filename.\+c\+\_\+str());
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_j_i_t_8cpp_source_l00231}{231}} of file \mbox{\hyperlink{_l_l_v_m_j_i_t_8cpp_source}{LLVMJIT.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00232\ \ \ \ \ \{}
+\DoxyCodeLine{00233\ \ \ \ \ \ \ \ \ std::error\_code\ errorCode;}
+\DoxyCodeLine{00234\ \ \ \ \ \ \ \ \ std::string\ augmentedFilename\ =\ std::string(filename)\ +\ std::to\_string(printedModuleId++)\ +\ \textcolor{stringliteral}{"{}.ll"{}};}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \ \ llvm::raw\_fd\_ostream\ dumpFileStream(augmentedFilename,errorCode,llvm::sys::fs::OpenFlags::F\_Text);}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ llvmModule-\/>print(dumpFileStream,\textcolor{keyword}{nullptr});}
+\DoxyCodeLine{00238\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=346pt]{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_ad380b9c76f5f65db2c744a9c46815c3b_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a810104386ace5517d32da5601399238e}\index{sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}!context@{context}}
+\index{context@{context}!sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}}
+\doxysubsubsection{\texorpdfstring{context}{context}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a810104386ace5517d32da5601399238e} 
+llvm\+::\+LLVMContext sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::context}
+
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source_l00083}{83}} of file \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source}{LLVMEmit\+IR.\+cpp}}.
+
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_ad6d4c1013f4d88832c3d090e96cef612}\index{sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}!llvmBoolType@{llvmBoolType}}
+\index{llvmBoolType@{llvmBoolType}!sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}}
+\doxysubsubsection{\texorpdfstring{llvmBoolType}{llvmBoolType}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_ad6d4c1013f4d88832c3d090e96cef612} 
+llvm\+::\+Type\texorpdfstring{$\ast$}{*} sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::llvm\+Bool\+Type}
+
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source_l00093}{93}} of file \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source}{LLVMEmit\+IR.\+cpp}}.
+
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_abc25b2e91dcd2c77156736f553fe39be}\index{sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}!llvmF32Type@{llvmF32Type}}
+\index{llvmF32Type@{llvmF32Type}!sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}}
+\doxysubsubsection{\texorpdfstring{llvmF32Type}{llvmF32Type}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_abc25b2e91dcd2c77156736f553fe39be} 
+llvm\+::\+Type\texorpdfstring{$\ast$}{*} sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::llvm\+F32\+Type}
+
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source_l00090}{90}} of file \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source}{LLVMEmit\+IR.\+cpp}}.
+
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a71de18ed122b1f59c36a3b0a9b8c26b0}\index{sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}!llvmF64Type@{llvmF64Type}}
+\index{llvmF64Type@{llvmF64Type}!sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}}
+\doxysubsubsection{\texorpdfstring{llvmF64Type}{llvmF64Type}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a71de18ed122b1f59c36a3b0a9b8c26b0} 
+llvm\+::\+Type\texorpdfstring{$\ast$}{*} sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::llvm\+F64\+Type}
+
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source_l00091}{91}} of file \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source}{LLVMEmit\+IR.\+cpp}}.
+
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a529f20ea894c2ddc96505dacdab63780}\index{sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}!llvmI16Type@{llvmI16Type}}
+\index{llvmI16Type@{llvmI16Type}!sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}}
+\doxysubsubsection{\texorpdfstring{llvmI16Type}{llvmI16Type}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a529f20ea894c2ddc96505dacdab63780} 
+llvm\+::\+Type\texorpdfstring{$\ast$}{*} sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::llvm\+I16\+Type}
+
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source_l00087}{87}} of file \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source}{LLVMEmit\+IR.\+cpp}}.
+
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a32ff63778fba31b0d80fc8dbaac5dde2}\index{sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}!llvmI32Type@{llvmI32Type}}
+\index{llvmI32Type@{llvmI32Type}!sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}}
+\doxysubsubsection{\texorpdfstring{llvmI32Type}{llvmI32Type}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a32ff63778fba31b0d80fc8dbaac5dde2} 
+llvm\+::\+Type\texorpdfstring{$\ast$}{*} sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::llvm\+I32\+Type}
+
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source_l00088}{88}} of file \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source}{LLVMEmit\+IR.\+cpp}}.
+
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a79cec67ff4611f28c9ae3ab71add43a9}\index{sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}!llvmI64Type@{llvmI64Type}}
+\index{llvmI64Type@{llvmI64Type}!sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}}
+\doxysubsubsection{\texorpdfstring{llvmI64Type}{llvmI64Type}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a79cec67ff4611f28c9ae3ab71add43a9} 
+llvm\+::\+Type\texorpdfstring{$\ast$}{*} sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::llvm\+I64\+Type}
+
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source_l00089}{89}} of file \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source}{LLVMEmit\+IR.\+cpp}}.
+
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_af08c6a6042f0b71abc3f71556d864b1a}\index{sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}!llvmI8PtrType@{llvmI8PtrType}}
+\index{llvmI8PtrType@{llvmI8PtrType}!sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}}
+\doxysubsubsection{\texorpdfstring{llvmI8PtrType}{llvmI8PtrType}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_af08c6a6042f0b71abc3f71556d864b1a} 
+llvm\+::\+Type\texorpdfstring{$\ast$}{*} sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::llvm\+I8\+Ptr\+Type}
+
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source_l00094}{94}} of file \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source}{LLVMEmit\+IR.\+cpp}}.
+
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a61a8da55e599cd9365ff6487168a353c}\index{sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}!llvmI8Type@{llvmI8Type}}
+\index{llvmI8Type@{llvmI8Type}!sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}}
+\doxysubsubsection{\texorpdfstring{llvmI8Type}{llvmI8Type}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a61a8da55e599cd9365ff6487168a353c} 
+llvm\+::\+Type\texorpdfstring{$\ast$}{*} sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::llvm\+I8\+Type}
+
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source_l00086}{86}} of file \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source}{LLVMEmit\+IR.\+cpp}}.
+
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a90fbf10072748df57aab1e6965dcb8b9}\index{sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}!llvmResultTypes@{llvmResultTypes}}
+\index{llvmResultTypes@{llvmResultTypes}!sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}}
+\doxysubsubsection{\texorpdfstring{llvmResultTypes}{llvmResultTypes}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a90fbf10072748df57aab1e6965dcb8b9} 
+llvm\+::\+Type\texorpdfstring{$\ast$}{*} sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::llvm\+Result\+Types\mbox{[}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}) Result\+Type\+::num\mbox{]}}
+
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source_l00084}{84}} of file \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source}{LLVMEmit\+IR.\+cpp}}.
+
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a139269b8e6cecac4e7195a810b27b5b9}\index{sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}!llvmVoidType@{llvmVoidType}}
+\index{llvmVoidType@{llvmVoidType}!sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}}
+\doxysubsubsection{\texorpdfstring{llvmVoidType}{llvmVoidType}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a139269b8e6cecac4e7195a810b27b5b9} 
+llvm\+::\+Type\texorpdfstring{$\ast$}{*} sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::llvm\+Void\+Type}
+
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source_l00092}{92}} of file \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source}{LLVMEmit\+IR.\+cpp}}.
+
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a60cb0d30b54b5e84e4fd23a6b2764dfa}\index{sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}!targetMachine@{targetMachine}}
+\index{targetMachine@{targetMachine}!sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}}
+\doxysubsubsection{\texorpdfstring{targetMachine}{targetMachine}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a60cb0d30b54b5e84e4fd23a6b2764dfa} 
+llvm\+::\+Target\+Machine\texorpdfstring{$\ast$}{*} sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::target\+Machine = nullptr}
+
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_j_i_t_8cpp_source_l00107}{107}} of file \mbox{\hyperlink{_l_l_v_m_j_i_t_8cpp_source}{LLVMJIT.\+cpp}}.
+
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_adcc1122ae23ba2a66125f0972bc52310}\index{sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}!typedZeroConstants@{typedZeroConstants}}
+\index{typedZeroConstants@{typedZeroConstants}!sysio::chain::eosvmoc::LLVMJIT@{sysio::chain::eosvmoc::LLVMJIT}}
+\doxysubsubsection{\texorpdfstring{typedZeroConstants}{typedZeroConstants}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_adcc1122ae23ba2a66125f0972bc52310} 
+llvm\+::\+Constant\texorpdfstring{$\ast$}{*} sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::typed\+Zero\+Constants\mbox{[}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}) Value\+Type\+::num\mbox{]}}
+
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source_l00096}{96}} of file \mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_source}{LLVMEmit\+IR.\+cpp}}.
+

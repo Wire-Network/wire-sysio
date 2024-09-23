@@ -1,0 +1,68 @@
+\doxysection{fc\+::to\+\_\+variant\+\_\+visitor\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classfc_1_1to__variant__visitor}{}\label{classfc_1_1to__variant__visitor}\index{fc::to\_variant\_visitor$<$ T $>$@{fc::to\_variant\_visitor$<$ T $>$}}
+
+
+{\ttfamily \#include $<$variant.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1to__variant__visitor_a83fec1d53afbc6c8ff1f2ceb0799a510}{to\+\_\+variant\+\_\+visitor}} (\mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\+\_\+variant\+\_\+object}} \&mvo, const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&v)
+\item 
+{\footnotesize template$<$typename Member , \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} Class , Member Class\+::\texorpdfstring{$\ast$}{*} member$>$ }\\void \mbox{\hyperlink{classfc_1_1to__variant__visitor_a059d120f54abf982bb2deb6845100df3}{operator()}} (const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}) const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$\newline
+class fc\+::to\+\_\+variant\+\_\+visitor$<$ T $>$}
+
+
+Definition at line \mbox{\hyperlink{fc_2include_2fc_2reflect_2variant_8hpp_source_l00014}{14}} of file \mbox{\hyperlink{fc_2include_2fc_2reflect_2variant_8hpp_source}{variant.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1to__variant__visitor_a83fec1d53afbc6c8ff1f2ceb0799a510}\index{fc::to\_variant\_visitor$<$ T $>$@{fc::to\_variant\_visitor$<$ T $>$}!to\_variant\_visitor@{to\_variant\_visitor}}
+\index{to\_variant\_visitor@{to\_variant\_visitor}!fc::to\_variant\_visitor$<$ T $>$@{fc::to\_variant\_visitor$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{to\_variant\_visitor()}{to\_variant\_visitor()}}
+{\footnotesize\ttfamily \label{classfc_1_1to__variant__visitor_a83fec1d53afbc6c8ff1f2ceb0799a510} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{classfc_1_1to__variant__visitor}{fc\+::to\+\_\+variant\+\_\+visitor}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::to\+\_\+variant\+\_\+visitor (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\+\_\+variant\+\_\+object}} \&}]{mvo}{, }\item[{const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{v}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{fc_2include_2fc_2reflect_2variant_8hpp_source_l00017}{17}} of file \mbox{\hyperlink{fc_2include_2fc_2reflect_2variant_8hpp_source}{variant.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ \ :vo(mvo),val(v)\{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1to__variant__visitor_a059d120f54abf982bb2deb6845100df3}\index{fc::to\_variant\_visitor$<$ T $>$@{fc::to\_variant\_visitor$<$ T $>$}!operator()@{operator()}}
+\index{operator()@{operator()}!fc::to\_variant\_visitor$<$ T $>$@{fc::to\_variant\_visitor$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}}
+{\footnotesize\ttfamily \label{classfc_1_1to__variant__visitor_a059d120f54abf982bb2deb6845100df3} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+template$<$typename Member , \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} Class , Member Class\+::\texorpdfstring{$\ast$}{*} member$>$ \\
+void \mbox{\hyperlink{classfc_1_1to__variant__visitor}{fc\+::to\+\_\+variant\+\_\+visitor}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::operator() (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{name}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{fc_2include_2fc_2reflect_2variant_8hpp_source_l00021}{21}} of file \mbox{\hyperlink{fc_2include_2fc_2reflect_2variant_8hpp_source}{variant.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \ \ \ \ this-\/>add(vo,\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},(val.*member));}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/reflect/\mbox{\hyperlink{fc_2include_2fc_2reflect_2variant_8hpp}{variant.\+hpp}}\end{DoxyCompactItemize}

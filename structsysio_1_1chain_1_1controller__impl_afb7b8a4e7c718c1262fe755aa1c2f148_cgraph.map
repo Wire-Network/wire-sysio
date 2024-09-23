@@ -1,0 +1,13 @@
+<map id="sysio::chain::controller_impl::add_contract_tables_to_snapshot" name="sysio::chain::controller_impl::add_contract_tables_to_snapshot">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,23,183,79"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1chain_1_1index__utils.html#a20f6cbb7f55f78ff4d35a4bf7e928a86" title=" " alt="" coords="231,31,361,71"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="183,48,215,48,215,54,183,54"/>
+<area shape="rect" id="Node000003" href="$classchainbase_1_1database.html#a4d5297635dcf70be481d9b600da9bc13" title=" " alt="" coords="409,31,550,71"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="362,48,394,48,394,54,362,54"/>
+<area shape="rect" id="Node000004" href="$classchainbase_1_1database.html#afcfe00f81a526c1376d4f51197dd3a9a" title=" " alt="" coords="598,13,766,38"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="550,39,582,35,583,41,551,45"/>
+<area shape="rect" id="Node000005" href="$classchainbase_1_1database.html#aa5a2ca0da0092693ac49b36b7ec6817a" title=" " alt="" coords="814,5,955,46"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="766,32,798,32,798,37,766,37"/>
+<area shape="poly" id="edge6_Node000005_Node000003" title=" " alt="" coords="814,46,766,54,662,59,566,58,566,53,662,54,765,48,813,41"/>
+<area shape="poly" id="edge5_Node000005_Node000004" title=" " alt="" coords="813,20,781,19,781,14,813,14"/>
+</map>

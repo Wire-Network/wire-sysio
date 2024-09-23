@@ -1,0 +1,624 @@
+\doxysection{libraries/sys-\/vm/external/\+Catch2/include/internal/catch\+\_\+test\+\_\+registry.h File Reference}
+\hypertarget{catch__test__registry_8h}{}\label{catch__test__registry_8h}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_test\_registry.h@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_test\_registry.h}}
+{\ttfamily \#include "{}catch\+\_\+common.\+h"{}}\newline
+{\ttfamily \#include "{}catch\+\_\+interfaces\+\_\+testcase.\+h"{}}\newline
+{\ttfamily \#include "{}catch\+\_\+compiler\+\_\+capabilities.\+h"{}}\newline
+{\ttfamily \#include "{}catch\+\_\+stringref.\+h"{}}\newline
+{\ttfamily \#include "{}catch\+\_\+type\+\_\+traits.\+hpp"{}}\newline
+{\ttfamily \#include "{}catch\+\_\+preprocessor.\+hpp"{}}\newline
+{\ttfamily \#include "{}catch\+\_\+meta.\+hpp"{}}\newline
+Include dependency graph for catch\+\_\+test\+\_\+registry.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{catch__test__registry_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{catch__test__registry_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{class_catch_1_1_test_invoker_as_method}{Catch\+::\+Test\+Invoker\+As\+Method$<$ C $>$}}
+\item 
+struct \mbox{\hyperlink{struct_catch_1_1_name_and_tags}{Catch\+::\+Name\+And\+Tags}}
+\item 
+struct \mbox{\hyperlink{struct_catch_1_1_auto_reg}{Catch\+::\+Auto\+Reg}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespace_catch}{Catch}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{catch__test__registry_8h_a33905c95a4d545efcf34abfbf790ad9c}{INTERNAL\+\_\+\+CATCH\+\_\+\+TESTCASE2}}(Test\+Name, ...)
+\item 
+\#define \mbox{\hyperlink{catch__test__registry_8h_a83f221452b6494c1eb0ae9bab79faa3c}{INTERNAL\+\_\+\+CATCH\+\_\+\+TESTCASE}}(...)
+\item 
+\#define \mbox{\hyperlink{catch__test__registry_8h_af5bedfdbfc32cddf5287a77cf860f242}{INTERNAL\+\_\+\+CATCH\+\_\+\+METHOD\+\_\+\+AS\+\_\+\+TEST\+\_\+\+CASE}}(Qualified\+Method, ...)
+\item 
+\#define \mbox{\hyperlink{catch__test__registry_8h_a60e66c178de977271dd864ade805a250}{INTERNAL\+\_\+\+CATCH\+\_\+\+TEST\+\_\+\+CASE\+\_\+\+METHOD2}}(Test\+Name,  \mbox{\hyperlink{class_class_name}{Class\+Name}}, ...)
+\item 
+\#define \mbox{\hyperlink{catch__test__registry_8h_a4755a44f041605a731180e1e19e72bee}{INTERNAL\+\_\+\+CATCH\+\_\+\+TEST\+\_\+\+CASE\+\_\+\+METHOD}}(\mbox{\hyperlink{class_class_name}{Class\+Name}}, ...)
+\item 
+\#define \mbox{\hyperlink{catch__test__registry_8h_ad7fc9293cc800a6f2fde7a0a211533c8}{INTERNAL\+\_\+\+CATCH\+\_\+\+REGISTER\+\_\+\+TESTCASE}}(Function, ...)
+\item 
+\#define \mbox{\hyperlink{catch__test__registry_8h_a298519a7baf87d977393c41ff0776aaa}{INTERNAL\+\_\+\+CATCH\+\_\+\+TEMPLATE\+\_\+\+TEST\+\_\+\+CASE\+\_\+2}}(Test\+Name,  Test\+Func,  Name,  Tags, ...)
+\item 
+\#define \mbox{\hyperlink{catch__test__registry_8h_a5c2223eab176c5703fea64a77a74360c}{CATCH\+\_\+\+INTERNAL\+\_\+\+CHECK\+\_\+\+UNIQUE\+\_\+\+TYPES}}(...)
+\item 
+\#define \mbox{\hyperlink{catch__test__registry_8h_a8190f00b563c3efb52f8057be41db45f}{INTERNAL\+\_\+\+CATCH\+\_\+\+TEMPLATE\+\_\+\+TEST\+\_\+\+CASE}}(Name,  Tags, ...)
+\item 
+\#define \mbox{\hyperlink{catch__test__registry_8h_a9763834a73153202db93cf73ceff3043}{INTERNAL\+\_\+\+CATCH\+\_\+\+TEMPLATE\+\_\+\+REGISTRY\+\_\+\+INITIATE}}(Test\+Name,  Name, ...)
+\item 
+\#define \mbox{\hyperlink{catch__test__registry_8h_aaaad83aeb851522feb6b1c4efeb6cc3a}{INTERNAL\+\_\+\+CATCH\+\_\+\+TEMPLATE\+\_\+\+PRODUCT\+\_\+\+TEST\+\_\+\+CASE2}}(Test\+Name,  Test\+Func\+Name,  Name,  Tags,  Tmpl\+Types,  Types\+List)
+\item 
+\#define \mbox{\hyperlink{catch__test__registry_8h_acd8f967bc841a9ab05774e8863cf9506}{INTERNAL\+\_\+\+CATCH\+\_\+\+TEMPLATE\+\_\+\+PRODUCT\+\_\+\+TEST\+\_\+\+CASE}}(Name,  Tags, ...)
+\item 
+\#define \mbox{\hyperlink{catch__test__registry_8h_ab99b7b858b7ec7a812698ecdece50913}{INTERNAL\+\_\+\+CATCH\+\_\+\+TEMPLATE\+\_\+\+TEST\+\_\+\+CASE\+\_\+\+METHOD\+\_\+2}}(Test\+Name\+Class,  Test\+Name,  \mbox{\hyperlink{class_class_name}{Class\+Name}},  Name,  Tags, ...)
+\item 
+\#define \mbox{\hyperlink{catch__test__registry_8h_a582f90e5f7c36e9e69fff5f4c891ac29}{INTERNAL\+\_\+\+CATCH\+\_\+\+TEMPLATE\+\_\+\+TEST\+\_\+\+CASE\+\_\+\+METHOD}}(\mbox{\hyperlink{class_class_name}{Class\+Name}},  Name,  Tags, ...)
+\item 
+\#define \mbox{\hyperlink{catch__test__registry_8h_a29d15c5fc309eeba616c7e9dca7fe02f}{INTERNAL\+\_\+\+CATCH\+\_\+\+TEMPLATE\+\_\+\+PRODUCT\+\_\+\+TEST\+\_\+\+CASE\+\_\+\+METHOD\+\_\+2}}(Test\+Name\+Class,  Test\+Name,  \mbox{\hyperlink{class_class_name}{Class\+Name}},  Name,  Tags,  Tmpl\+Types,  Types\+List)
+\item 
+\#define \mbox{\hyperlink{catch__test__registry_8h_a1a4839fc44923f817dec5694f0bd1f33}{INTERNAL\+\_\+\+CATCH\+\_\+\+TEMPLATE\+\_\+\+PRODUCT\+\_\+\+TEST\+\_\+\+CASE\+\_\+\+METHOD}}(\mbox{\hyperlink{class_class_name}{Class\+Name}},  Name,  Tags, ...)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+auto \mbox{\hyperlink{namespace_catch_ab3d8ccbc900fe50322c39ecbba52f536}{Catch\+::make\+Test\+Invoker}} (void(\texorpdfstring{$\ast$}{*}test\+As\+Function)()) noexcept -\/$>$ \mbox{\hyperlink{struct_catch_1_1_i_test_invoker}{ITest\+Invoker}} \texorpdfstring{$\ast$}{*}
+\item 
+{\footnotesize template$<$typename C $>$ }\\auto \mbox{\hyperlink{namespace_catch_a82a954c4d70afa716115820dc7dc8d24}{Catch\+::make\+Test\+Invoker}} (void(C\+::\texorpdfstring{$\ast$}{*}test\+As\+Method)()) noexcept -\/$>$ \mbox{\hyperlink{struct_catch_1_1_i_test_invoker}{ITest\+Invoker}} \texorpdfstring{$\ast$}{*}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{catch__test__registry_8h_a5c2223eab176c5703fea64a77a74360c}\index{catch\_test\_registry.h@{catch\_test\_registry.h}!CATCH\_INTERNAL\_CHECK\_UNIQUE\_TYPES@{CATCH\_INTERNAL\_CHECK\_UNIQUE\_TYPES}}
+\index{CATCH\_INTERNAL\_CHECK\_UNIQUE\_TYPES@{CATCH\_INTERNAL\_CHECK\_UNIQUE\_TYPES}!catch\_test\_registry.h@{catch\_test\_registry.h}}
+\doxysubsubsection{\texorpdfstring{CATCH\_INTERNAL\_CHECK\_UNIQUE\_TYPES}{CATCH\_INTERNAL\_CHECK\_UNIQUE\_TYPES}}
+{\footnotesize\ttfamily \label{catch__test__registry_8h_a5c2223eab176c5703fea64a77a74360c} 
+\#define CATCH\+\_\+\+INTERNAL\+\_\+\+CHECK\+\_\+\+UNIQUE\+\_\+\+TYPES(\begin{DoxyParamCaption}\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{static\_assert}(\mbox{\hyperlink{struct_catch_1_1is__unique}{Catch::is\_unique<\_\_VA\_ARGS\_\_>::value}},\textcolor{stringliteral}{"{}Duplicate\ type\ detected\ in\ declaration\ of\ template\ test\ case"{}});}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__test__registry_8h_source_l00137}{137}} of file \mbox{\hyperlink{catch__test__registry_8h_source}{catch\+\_\+test\+\_\+registry.\+h}}.
+
+\Hypertarget{catch__test__registry_8h_af5bedfdbfc32cddf5287a77cf860f242}\index{catch\_test\_registry.h@{catch\_test\_registry.h}!INTERNAL\_CATCH\_METHOD\_AS\_TEST\_CASE@{INTERNAL\_CATCH\_METHOD\_AS\_TEST\_CASE}}
+\index{INTERNAL\_CATCH\_METHOD\_AS\_TEST\_CASE@{INTERNAL\_CATCH\_METHOD\_AS\_TEST\_CASE}!catch\_test\_registry.h@{catch\_test\_registry.h}}
+\doxysubsubsection{\texorpdfstring{INTERNAL\_CATCH\_METHOD\_AS\_TEST\_CASE}{INTERNAL\_CATCH\_METHOD\_AS\_TEST\_CASE}}
+{\footnotesize\ttfamily \label{catch__test__registry_8h_af5bedfdbfc32cddf5287a77cf860f242} 
+\#define INTERNAL\+\_\+\+CATCH\+\_\+\+METHOD\+\_\+\+AS\+\_\+\+TEST\+\_\+\+CASE(\begin{DoxyParamCaption}\item[{}]{Qualified\+Method}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ CATCH\_INTERNAL\_SUPPRESS\_GLOBALS\_WARNINGS\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ namespace\{\ \mbox{\hyperlink{struct_catch_1_1_auto_reg}{Catch::AutoReg}}\ \mbox{\hyperlink{catch__common_8h_afe320ceec108fc8c160f9ac3938f1bc8}{INTERNAL\_CATCH\_UNIQUE\_NAME}}(\ autoRegistrar\ )(\ \mbox{\hyperlink{namespace_catch_ab3d8ccbc900fe50322c39ecbba52f536}{Catch::makeTestInvoker}}(\ \&QualifiedMethod\ ),\ \mbox{\hyperlink{catch__common_8h_abc0b2405454c51748a31e0393d9ad5d1}{CATCH\_INTERNAL\_LINEINFO}},\ \textcolor{stringliteral}{"{}\&"{}}\ \#QualifiedMethod,\ \mbox{\hyperlink{struct_catch_1_1_name_and_tags}{Catch::NameAndTags}}\{\ \_\_VA\_ARGS\_\_\ \}\ );\ \}\ \textcolor{comment}{/*\ NOLINT\ */}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{catch__compiler__capabilities_8h_a957c9af2b374bd675e191cf3fd114f3f}{CATCH\_INTERNAL\_UNSUPPRESS\_GLOBALS\_WARNINGS}}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__test__registry_8h_source_l00088}{88}} of file \mbox{\hyperlink{catch__test__registry_8h_source}{catch\+\_\+test\+\_\+registry.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00088\ \textcolor{preprocessor}{\ \ \ \ \#define\ INTERNAL\_CATCH\_METHOD\_AS\_TEST\_CASE(\ QualifiedMethod,\ ...\ )\ \(\backslash\)}}
+\DoxyCodeLine{00089\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ CATCH\_INTERNAL\_SUPPRESS\_GLOBALS\_WARNINGS\ \(\backslash\)}}
+\DoxyCodeLine{00090\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ namespace\{\ Catch::AutoReg\ INTERNAL\_CATCH\_UNIQUE\_NAME(\ autoRegistrar\ )(\ Catch::makeTestInvoker(\ \&QualifiedMethod\ ),\ CATCH\_INTERNAL\_LINEINFO,\ "{}\&"{}\ \#QualifiedMethod,\ Catch::NameAndTags\{\ \_\_VA\_ARGS\_\_\ \}\ );\ \}\ }\textcolor{comment}{/*\ NOLINT\ */}\textcolor{preprocessor}{\ \(\backslash\)}}
+\DoxyCodeLine{00091\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ CATCH\_INTERNAL\_UNSUPPRESS\_GLOBALS\_WARNINGS}}
+
+\end{DoxyCode}
+\Hypertarget{catch__test__registry_8h_ad7fc9293cc800a6f2fde7a0a211533c8}\index{catch\_test\_registry.h@{catch\_test\_registry.h}!INTERNAL\_CATCH\_REGISTER\_TESTCASE@{INTERNAL\_CATCH\_REGISTER\_TESTCASE}}
+\index{INTERNAL\_CATCH\_REGISTER\_TESTCASE@{INTERNAL\_CATCH\_REGISTER\_TESTCASE}!catch\_test\_registry.h@{catch\_test\_registry.h}}
+\doxysubsubsection{\texorpdfstring{INTERNAL\_CATCH\_REGISTER\_TESTCASE}{INTERNAL\_CATCH\_REGISTER\_TESTCASE}}
+{\footnotesize\ttfamily \label{catch__test__registry_8h_ad7fc9293cc800a6f2fde7a0a211533c8} 
+\#define INTERNAL\+\_\+\+CATCH\+\_\+\+REGISTER\+\_\+\+TESTCASE(\begin{DoxyParamCaption}\item[{}]{Function}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ CATCH\_INTERNAL\_SUPPRESS\_GLOBALS\_WARNINGS\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ Catch::AutoReg\ \mbox{\hyperlink{catch__common_8h_afe320ceec108fc8c160f9ac3938f1bc8}{INTERNAL\_CATCH\_UNIQUE\_NAME}}(\ autoRegistrar\ )(\ \mbox{\hyperlink{namespace_catch_ab3d8ccbc900fe50322c39ecbba52f536}{Catch::makeTestInvoker}}(\ Function\ ),\ \mbox{\hyperlink{catch__common_8h_abc0b2405454c51748a31e0393d9ad5d1}{CATCH\_INTERNAL\_LINEINFO}},\ \mbox{\hyperlink{class_catch_1_1_string_ref}{Catch::StringRef}}(),\ \mbox{\hyperlink{struct_catch_1_1_name_and_tags}{Catch::NameAndTags}}\{\ \_\_VA\_ARGS\_\_\ \}\ );\ \textcolor{comment}{/*\ NOLINT\ */}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{catch__compiler__capabilities_8h_a957c9af2b374bd675e191cf3fd114f3f}{CATCH\_INTERNAL\_UNSUPPRESS\_GLOBALS\_WARNINGS}}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__test__registry_8h_source_l00108}{108}} of file \mbox{\hyperlink{catch__test__registry_8h_source}{catch\+\_\+test\+\_\+registry.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00108\ \textcolor{preprocessor}{\ \ \ \ \#define\ INTERNAL\_CATCH\_REGISTER\_TESTCASE(\ Function,\ ...\ )\ \(\backslash\)}}
+\DoxyCodeLine{00109\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ CATCH\_INTERNAL\_SUPPRESS\_GLOBALS\_WARNINGS\ \(\backslash\)}}
+\DoxyCodeLine{00110\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ Catch::AutoReg\ INTERNAL\_CATCH\_UNIQUE\_NAME(\ autoRegistrar\ )(\ Catch::makeTestInvoker(\ Function\ ),\ CATCH\_INTERNAL\_LINEINFO,\ Catch::StringRef(),\ Catch::NameAndTags\{\ \_\_VA\_ARGS\_\_\ \}\ );\ }\textcolor{comment}{/*\ NOLINT\ */}\textcolor{preprocessor}{\ \(\backslash\)}}
+\DoxyCodeLine{00111\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ CATCH\_INTERNAL\_UNSUPPRESS\_GLOBALS\_WARNINGS}}
+
+\end{DoxyCode}
+\Hypertarget{catch__test__registry_8h_acd8f967bc841a9ab05774e8863cf9506}\index{catch\_test\_registry.h@{catch\_test\_registry.h}!INTERNAL\_CATCH\_TEMPLATE\_PRODUCT\_TEST\_CASE@{INTERNAL\_CATCH\_TEMPLATE\_PRODUCT\_TEST\_CASE}}
+\index{INTERNAL\_CATCH\_TEMPLATE\_PRODUCT\_TEST\_CASE@{INTERNAL\_CATCH\_TEMPLATE\_PRODUCT\_TEST\_CASE}!catch\_test\_registry.h@{catch\_test\_registry.h}}
+\doxysubsubsection{\texorpdfstring{INTERNAL\_CATCH\_TEMPLATE\_PRODUCT\_TEST\_CASE}{INTERNAL\_CATCH\_TEMPLATE\_PRODUCT\_TEST\_CASE}}
+{\footnotesize\ttfamily \label{catch__test__registry_8h_acd8f967bc841a9ab05774e8863cf9506} 
+\#define INTERNAL\+\_\+\+CATCH\+\_\+\+TEMPLATE\+\_\+\+PRODUCT\+\_\+\+TEST\+\_\+\+CASE(\begin{DoxyParamCaption}\item[{}]{Name}{, }\item[{}]{Tags}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{catch__test__registry_8h_aaaad83aeb851522feb6b1c4efeb6cc3a}{INTERNAL\_CATCH\_TEMPLATE\_PRODUCT\_TEST\_CASE2}}(\mbox{\hyperlink{catch__common_8h_afe320ceec108fc8c160f9ac3938f1bc8}{INTERNAL\_CATCH\_UNIQUE\_NAME}}(\ \_\_\_\_C\_A\_T\_C\_H\_\_\_\_T\_E\_M\_P\_L\_A\_T\_E\_\_\_\_T\_E\_S\_T\_\_\_\_\ ),\ \mbox{\hyperlink{catch__common_8h_afe320ceec108fc8c160f9ac3938f1bc8}{INTERNAL\_CATCH\_UNIQUE\_NAME}}(\ \_\_\_\_C\_A\_T\_C\_H\_\_\_\_T\_E\_M\_P\_L\_A\_T\_E\_\_\_\_T\_E\_S\_T\_\_\_\_F\_U\_N\_C\_\_\_\_\ ),Name,Tags,\_\_VA\_ARGS\_\_)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__test__registry_8h_source_l00182}{182}} of file \mbox{\hyperlink{catch__test__registry_8h_source}{catch\+\_\+test\+\_\+registry.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00182\ \textcolor{preprocessor}{\ \ \ \ \#define\ INTERNAL\_CATCH\_TEMPLATE\_PRODUCT\_TEST\_CASE(Name,\ Tags,\ ...)\(\backslash\)}}
+\DoxyCodeLine{00183\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ INTERNAL\_CATCH\_TEMPLATE\_PRODUCT\_TEST\_CASE2(INTERNAL\_CATCH\_UNIQUE\_NAME(\ \_\_\_\_C\_A\_T\_C\_H\_\_\_\_T\_E\_M\_P\_L\_A\_T\_E\_\_\_\_T\_E\_S\_T\_\_\_\_\ ),\ INTERNAL\_CATCH\_UNIQUE\_NAME(\ \_\_\_\_C\_A\_T\_C\_H\_\_\_\_T\_E\_M\_P\_L\_A\_T\_E\_\_\_\_T\_E\_S\_T\_\_\_\_F\_U\_N\_C\_\_\_\_\ ),Name,Tags,\_\_VA\_ARGS\_\_)}}
+
+\end{DoxyCode}
+\Hypertarget{catch__test__registry_8h_aaaad83aeb851522feb6b1c4efeb6cc3a}\index{catch\_test\_registry.h@{catch\_test\_registry.h}!INTERNAL\_CATCH\_TEMPLATE\_PRODUCT\_TEST\_CASE2@{INTERNAL\_CATCH\_TEMPLATE\_PRODUCT\_TEST\_CASE2}}
+\index{INTERNAL\_CATCH\_TEMPLATE\_PRODUCT\_TEST\_CASE2@{INTERNAL\_CATCH\_TEMPLATE\_PRODUCT\_TEST\_CASE2}!catch\_test\_registry.h@{catch\_test\_registry.h}}
+\doxysubsubsection{\texorpdfstring{INTERNAL\_CATCH\_TEMPLATE\_PRODUCT\_TEST\_CASE2}{INTERNAL\_CATCH\_TEMPLATE\_PRODUCT\_TEST\_CASE2}}
+{\footnotesize\ttfamily \label{catch__test__registry_8h_aaaad83aeb851522feb6b1c4efeb6cc3a} 
+\#define INTERNAL\+\_\+\+CATCH\+\_\+\+TEMPLATE\+\_\+\+PRODUCT\+\_\+\+TEST\+\_\+\+CASE2(\begin{DoxyParamCaption}\item[{}]{Test\+Name}{, }\item[{}]{Test\+Func\+Name}{, }\item[{}]{Name}{, }\item[{}]{Tags}{, }\item[{}]{Tmpl\+Types}{, }\item[{}]{Types\+List}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ CATCH\_INTERNAL\_SUPPRESS\_GLOBALS\_WARNINGS\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ template<typename\ TestType>\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ TestFuncName();\ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keyword}{namespace\ }\{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}...\ Types>\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{struct\ }TestName\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ TestName()\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ CATCH\_INTERNAL\_CHECK\_UNIQUE\_TYPES(Types...)\ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ index\ =\ 0;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ }expander\ =\ \textcolor{keywordtype}{int}[];\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{char}\ \textcolor{keyword}{const}*\ tmpl\_types[]\ =\ \{\mbox{\hyperlink{catch__preprocessor_8hpp_a060f5fa141c247b4d07dfe9bf3c54079}{CATCH\_REC\_LIST}}(\mbox{\hyperlink{catch__preprocessor_8hpp_aa66562537dd49bc33e53f9aa01acedaf}{INTERNAL\_CATCH\_STRINGIZE\_WITHOUT\_PARENS}},\ \mbox{\hyperlink{catch__preprocessor_8hpp_adf5ede19321b27ce635d01688551e782}{INTERNAL\_CATCH\_REMOVE\_PARENS}}(TmplTypes))\};\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{char}\ \textcolor{keyword}{const}*\ types\_list[]\ =\ \{\mbox{\hyperlink{catch__preprocessor_8hpp_a060f5fa141c247b4d07dfe9bf3c54079}{CATCH\_REC\_LIST}}(\mbox{\hyperlink{catch__preprocessor_8hpp_aa66562537dd49bc33e53f9aa01acedaf}{INTERNAL\_CATCH\_STRINGIZE\_WITHOUT\_PARENS}},\ \mbox{\hyperlink{catch__preprocessor_8hpp_adf5ede19321b27ce635d01688551e782}{INTERNAL\_CATCH\_REMOVE\_PARENS}}(TypesList))\};\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{constexpr}\ \textcolor{keyword}{auto}\ num\_types\ =\ \textcolor{keyword}{sizeof}(types\_list)\ /\ \textcolor{keyword}{sizeof}(types\_list[0]);\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (void)expander\{(\mbox{\hyperlink{struct_catch_1_1_auto_reg}{Catch::AutoReg}}(\ \mbox{\hyperlink{namespace_catch_ab3d8ccbc900fe50322c39ecbba52f536}{Catch::makeTestInvoker}}(\ \&TestFuncName<Types>\ ),\ \mbox{\hyperlink{catch__common_8h_abc0b2405454c51748a31e0393d9ad5d1}{CATCH\_INTERNAL\_LINEINFO}},\ \mbox{\hyperlink{class_catch_1_1_string_ref}{Catch::StringRef}}(),\ \mbox{\hyperlink{struct_catch_1_1_name_and_tags}{Catch::NameAndTags}}\{\ Name\ \textcolor{stringliteral}{"{}\ -\/\ "{}}\ +\ std::string(tmpl\_types[index\ /\ num\_types])\ +\ \textcolor{stringliteral}{"{}<"{}}\ +\ std::string(types\_list[index\ \%\ num\_types])\ +\ \textcolor{stringliteral}{"{}>"{}},\ Tags\ \}\ ),\ index++,\ 0)...\ \};\textcolor{comment}{/*\ NOLINT\ */}\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{catch__common_8h_afe320ceec108fc8c160f9ac3938f1bc8}{INTERNAL\_CATCH\_UNIQUE\_NAME}}(\ globalRegistrar\ )\ =\ []()\{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ }TestInit\ =\ \mbox{\hyperlink{struct_catch_1_1combine}{Catch::combine}}<\mbox{\hyperlink{catch__preprocessor_8hpp_adf5ede19321b27ce635d01688551e782}{INTERNAL\_CATCH\_REMOVE\_PARENS}}(TmplTypes)>\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ::with\_types<\mbox{\hyperlink{catch__preprocessor_8hpp_aa48345a3d206462d571f98297654ca47}{INTERNAL\_CATCH\_MAKE\_TYPE\_LISTS\_FROM\_TYPES}}(TypesList)>::into<TestName>::type;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ TestInit();\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}();\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ CATCH\_INTERNAL\_UNSUPPRESS\_GLOBALS\_WARNINGS\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ template<typename\ TestType>\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ TestFuncName()}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__test__registry_8h_source_l00154}{154}} of file \mbox{\hyperlink{catch__test__registry_8h_source}{catch\+\_\+test\+\_\+registry.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00154\ \textcolor{preprocessor}{\ \ \ \ \#define\ INTERNAL\_CATCH\_TEMPLATE\_PRODUCT\_TEST\_CASE2(TestName,\ TestFuncName,\ Name,\ Tags,\ TmplTypes,\ TypesList)\ \(\backslash\)}}
+\DoxyCodeLine{00155\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ CATCH\_INTERNAL\_SUPPRESS\_GLOBALS\_WARNINGS\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00156\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ template<typename\ TestType>\ static\ void\ TestFuncName();\ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00157\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ namespace\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00158\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ template<typename...\ Types>\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00159\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ struct\ TestName\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00160\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ TestName()\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00161\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ CATCH\_INTERNAL\_CHECK\_UNIQUE\_TYPES(Types...)\ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00162\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int\ index\ =\ 0;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00163\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ using\ expander\ =\ int[];\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00164\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ constexpr\ char\ const*\ tmpl\_types[]\ =\ \{CATCH\_REC\_LIST(INTERNAL\_CATCH\_STRINGIZE\_WITHOUT\_PARENS,\ INTERNAL\_CATCH\_REMOVE\_PARENS(TmplTypes))\};\(\backslash\)}}
+\DoxyCodeLine{00165\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ constexpr\ char\ const*\ types\_list[]\ =\ \{CATCH\_REC\_LIST(INTERNAL\_CATCH\_STRINGIZE\_WITHOUT\_PARENS,\ INTERNAL\_CATCH\_REMOVE\_PARENS(TypesList))\};\(\backslash\)}}
+\DoxyCodeLine{00166\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ constexpr\ auto\ num\_types\ =\ sizeof(types\_list)\ /\ sizeof(types\_list[0]);\(\backslash\)}}
+\DoxyCodeLine{00167\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (void)expander\{(Catch::AutoReg(\ Catch::makeTestInvoker(\ \&TestFuncName<Types>\ ),\ CATCH\_INTERNAL\_LINEINFO,\ Catch::StringRef(),\ Catch::NameAndTags\{\ Name\ "{}\ -\/\ "{}\ +\ std::string(tmpl\_types[index\ /\ num\_types])\ +\ "{}<"{}\ +\ std::string(types\_list[index\ \%\ num\_types])\ +\ "{}>"{},\ Tags\ \}\ ),\ index++,\ 0)...\ \};}\textcolor{comment}{/*\ NOLINT\ */}\textcolor{preprocessor}{\(\backslash\)}}
+\DoxyCodeLine{00168\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00169\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00170\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ static\ int\ INTERNAL\_CATCH\_UNIQUE\_NAME(\ globalRegistrar\ )\ =\ []()\{\ \(\backslash\)}}
+\DoxyCodeLine{00171\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ using\ TestInit\ =\ Catch::combine<INTERNAL\_CATCH\_REMOVE\_PARENS(TmplTypes)>\ \(\backslash\)}}
+\DoxyCodeLine{00172\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ::with\_types<INTERNAL\_CATCH\_MAKE\_TYPE\_LISTS\_FROM\_TYPES(TypesList)>::into<TestName>::type;\ \(\backslash\)}}
+\DoxyCodeLine{00173\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ TestInit();\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00174\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ return\ 0;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00175\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \}();\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00176\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00177\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ CATCH\_INTERNAL\_UNSUPPRESS\_GLOBALS\_WARNINGS\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00178\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ template<typename\ TestType>\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00179\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ static\ void\ TestFuncName()}}
+
+\end{DoxyCode}
+\Hypertarget{catch__test__registry_8h_a1a4839fc44923f817dec5694f0bd1f33}\index{catch\_test\_registry.h@{catch\_test\_registry.h}!INTERNAL\_CATCH\_TEMPLATE\_PRODUCT\_TEST\_CASE\_METHOD@{INTERNAL\_CATCH\_TEMPLATE\_PRODUCT\_TEST\_CASE\_METHOD}}
+\index{INTERNAL\_CATCH\_TEMPLATE\_PRODUCT\_TEST\_CASE\_METHOD@{INTERNAL\_CATCH\_TEMPLATE\_PRODUCT\_TEST\_CASE\_METHOD}!catch\_test\_registry.h@{catch\_test\_registry.h}}
+\doxysubsubsection{\texorpdfstring{INTERNAL\_CATCH\_TEMPLATE\_PRODUCT\_TEST\_CASE\_METHOD}{INTERNAL\_CATCH\_TEMPLATE\_PRODUCT\_TEST\_CASE\_METHOD}}
+{\footnotesize\ttfamily \label{catch__test__registry_8h_a1a4839fc44923f817dec5694f0bd1f33} 
+\#define INTERNAL\+\_\+\+CATCH\+\_\+\+TEMPLATE\+\_\+\+PRODUCT\+\_\+\+TEST\+\_\+\+CASE\+\_\+\+METHOD(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{class_class_name}{Class\+Name}}}{, }\item[{}]{Name}{, }\item[{}]{Tags}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{catch__test__registry_8h_a29d15c5fc309eeba616c7e9dca7fe02f}{INTERNAL\_CATCH\_TEMPLATE\_PRODUCT\_TEST\_CASE\_METHOD\_2}}(\ \mbox{\hyperlink{catch__common_8h_afe320ceec108fc8c160f9ac3938f1bc8}{INTERNAL\_CATCH\_UNIQUE\_NAME}}(\ \_\_\_\_C\_A\_T\_C\_H\_\_\_\_T\_E\_M\_P\_L\_A\_T\_E\_\_\_\_T\_E\_S\_T\_\_\_\_\ ),\ \mbox{\hyperlink{catch__common_8h_afe320ceec108fc8c160f9ac3938f1bc8}{INTERNAL\_CATCH\_UNIQUE\_NAME}}(\ \_\_\_\_C\_A\_T\_C\_H\_\_\_\_T\_E\_M\_P\_L\_A\_T\_E\_\_\_\_T\_E\_S\_T\_\_\_\_F\_U\_N\_C\_\_\_\_\ ),\ \mbox{\hyperlink{class_class_name}{ClassName}},\ Name,\ Tags,\ \_\_VA\_ARGS\_\_\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__test__registry_8h_source_l00250}{250}} of file \mbox{\hyperlink{catch__test__registry_8h_source}{catch\+\_\+test\+\_\+registry.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00250\ \textcolor{preprocessor}{\ \ \ \ \#define\ INTERNAL\_CATCH\_TEMPLATE\_PRODUCT\_TEST\_CASE\_METHOD(\ ClassName,\ Name,\ Tags,\ ...\ )\(\backslash\)}}
+\DoxyCodeLine{00251\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ INTERNAL\_CATCH\_TEMPLATE\_PRODUCT\_TEST\_CASE\_METHOD\_2(\ INTERNAL\_CATCH\_UNIQUE\_NAME(\ \_\_\_\_C\_A\_T\_C\_H\_\_\_\_T\_E\_M\_P\_L\_A\_T\_E\_\_\_\_T\_E\_S\_T\_\_\_\_\ ),\ INTERNAL\_CATCH\_UNIQUE\_NAME(\ \_\_\_\_C\_A\_T\_C\_H\_\_\_\_T\_E\_M\_P\_L\_A\_T\_E\_\_\_\_T\_E\_S\_T\_\_\_\_F\_U\_N\_C\_\_\_\_\ ),\ ClassName,\ Name,\ Tags,\ \_\_VA\_ARGS\_\_\ )}}
+
+\end{DoxyCode}
+\Hypertarget{catch__test__registry_8h_a29d15c5fc309eeba616c7e9dca7fe02f}\index{catch\_test\_registry.h@{catch\_test\_registry.h}!INTERNAL\_CATCH\_TEMPLATE\_PRODUCT\_TEST\_CASE\_METHOD\_2@{INTERNAL\_CATCH\_TEMPLATE\_PRODUCT\_TEST\_CASE\_METHOD\_2}}
+\index{INTERNAL\_CATCH\_TEMPLATE\_PRODUCT\_TEST\_CASE\_METHOD\_2@{INTERNAL\_CATCH\_TEMPLATE\_PRODUCT\_TEST\_CASE\_METHOD\_2}!catch\_test\_registry.h@{catch\_test\_registry.h}}
+\doxysubsubsection{\texorpdfstring{INTERNAL\_CATCH\_TEMPLATE\_PRODUCT\_TEST\_CASE\_METHOD\_2}{INTERNAL\_CATCH\_TEMPLATE\_PRODUCT\_TEST\_CASE\_METHOD\_2}}
+{\footnotesize\ttfamily \label{catch__test__registry_8h_a29d15c5fc309eeba616c7e9dca7fe02f} 
+\#define INTERNAL\+\_\+\+CATCH\+\_\+\+TEMPLATE\+\_\+\+PRODUCT\+\_\+\+TEST\+\_\+\+CASE\+\_\+\+METHOD\+\_\+2(\begin{DoxyParamCaption}\item[{}]{Test\+Name\+Class}{, }\item[{}]{Test\+Name}{, }\item[{}]{\mbox{\hyperlink{class_class_name}{Class\+Name}}}{, }\item[{}]{Name}{, }\item[{}]{Tags}{, }\item[{}]{Tmpl\+Types}{, }\item[{}]{Types\+List}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ CATCH\_INTERNAL\_SUPPRESS\_GLOBALS\_WARNINGS\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ template<typename\ TestType>\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{struct\ }TestName\ :\ \mbox{\hyperlink{catch__preprocessor_8hpp_adf5ede19321b27ce635d01688551e782}{INTERNAL\_CATCH\_REMOVE\_PARENS}}(ClassName\ <TestType>)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ test();\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \};\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keyword}{namespace\ }\{\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}...Types>\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{struct\ }TestNameClass\{\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ TestNameClass()\{\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ CATCH\_INTERNAL\_CHECK\_UNIQUE\_TYPES(Types...)\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ index\ =\ 0;\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ }expander\ =\ \textcolor{keywordtype}{int}[];\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{char}\ \textcolor{keyword}{const}*\ tmpl\_types[]\ =\ \{\mbox{\hyperlink{catch__preprocessor_8hpp_a060f5fa141c247b4d07dfe9bf3c54079}{CATCH\_REC\_LIST}}(\mbox{\hyperlink{catch__preprocessor_8hpp_aa66562537dd49bc33e53f9aa01acedaf}{INTERNAL\_CATCH\_STRINGIZE\_WITHOUT\_PARENS}},\ \mbox{\hyperlink{catch__preprocessor_8hpp_adf5ede19321b27ce635d01688551e782}{INTERNAL\_CATCH\_REMOVE\_PARENS}}(TmplTypes))\};\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{char}\ \textcolor{keyword}{const}*\ types\_list[]\ =\ \{\mbox{\hyperlink{catch__preprocessor_8hpp_a060f5fa141c247b4d07dfe9bf3c54079}{CATCH\_REC\_LIST}}(\mbox{\hyperlink{catch__preprocessor_8hpp_aa66562537dd49bc33e53f9aa01acedaf}{INTERNAL\_CATCH\_STRINGIZE\_WITHOUT\_PARENS}},\ \mbox{\hyperlink{catch__preprocessor_8hpp_adf5ede19321b27ce635d01688551e782}{INTERNAL\_CATCH\_REMOVE\_PARENS}}(TypesList))\};\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{constexpr}\ \textcolor{keyword}{auto}\ num\_types\ =\ \textcolor{keyword}{sizeof}(types\_list)\ /\ \textcolor{keyword}{sizeof}(types\_list[0]);\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (void)expander\{(\mbox{\hyperlink{struct_catch_1_1_auto_reg}{Catch::AutoReg}}(\ \mbox{\hyperlink{namespace_catch_ab3d8ccbc900fe50322c39ecbba52f536}{Catch::makeTestInvoker}}(\ \&TestName<Types>::test\ ),\ \mbox{\hyperlink{catch__common_8h_abc0b2405454c51748a31e0393d9ad5d1}{CATCH\_INTERNAL\_LINEINFO}},\ \#\mbox{\hyperlink{class_class_name}{ClassName}},\ \mbox{\hyperlink{struct_catch_1_1_name_and_tags}{Catch::NameAndTags}}\{\ Name\ \textcolor{stringliteral}{"{}\ -\/\ "{}}\ +\ std::string(tmpl\_types[index\ /\ num\_types])\ +\ \textcolor{stringliteral}{"{}<"{}}\ +\ std::string(types\_list[index\ \%\ num\_types])\ +\ \textcolor{stringliteral}{"{}>"{}},\ Tags\ \}\ ),\ index++,\ 0)...\ \};\textcolor{comment}{/*\ NOLINT\ */}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \};\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{catch__common_8h_afe320ceec108fc8c160f9ac3938f1bc8}{INTERNAL\_CATCH\_UNIQUE\_NAME}}(\ globalRegistrar\ )\ =\ []()\{\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ }TestInit\ =\ \mbox{\hyperlink{struct_catch_1_1combine}{Catch::combine}}<\mbox{\hyperlink{catch__preprocessor_8hpp_adf5ede19321b27ce635d01688551e782}{INTERNAL\_CATCH\_REMOVE\_PARENS}}(TmplTypes)>\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ::with\_types<\mbox{\hyperlink{catch__preprocessor_8hpp_aa48345a3d206462d571f98297654ca47}{INTERNAL\_CATCH\_MAKE\_TYPE\_LISTS\_FROM\_TYPES}}(TypesList)>::into<TestNameClass>::type;\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ TestInit();\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}();\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ CATCH\_INTERNAL\_UNSUPPRESS\_GLOBALS\_WARNINGS\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ template<typename\ TestType>\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ TestName<TestType>::test()}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__test__registry_8h_source_l00219}{219}} of file \mbox{\hyperlink{catch__test__registry_8h_source}{catch\+\_\+test\+\_\+registry.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00219\ \textcolor{preprocessor}{\ \ \ \ \#define\ INTERNAL\_CATCH\_TEMPLATE\_PRODUCT\_TEST\_CASE\_METHOD\_2(TestNameClass,\ TestName,\ ClassName,\ Name,\ Tags,\ TmplTypes,\ TypesList)\(\backslash\)}}
+\DoxyCodeLine{00220\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ CATCH\_INTERNAL\_SUPPRESS\_GLOBALS\_WARNINGS\ \(\backslash\)}}
+\DoxyCodeLine{00221\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ template<typename\ TestType>\ \(\backslash\)}}
+\DoxyCodeLine{00222\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ struct\ TestName\ :\ INTERNAL\_CATCH\_REMOVE\_PARENS(ClassName\ <TestType>)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00223\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ void\ test();\(\backslash\)}}
+\DoxyCodeLine{00224\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \};\(\backslash\)}}
+\DoxyCodeLine{00225\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ namespace\ \{\(\backslash\)}}
+\DoxyCodeLine{00226\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ template<typename...Types>\(\backslash\)}}
+\DoxyCodeLine{00227\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ struct\ TestNameClass\{\(\backslash\)}}
+\DoxyCodeLine{00228\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ TestNameClass()\{\(\backslash\)}}
+\DoxyCodeLine{00229\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ CATCH\_INTERNAL\_CHECK\_UNIQUE\_TYPES(Types...)\(\backslash\)}}
+\DoxyCodeLine{00230\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int\ index\ =\ 0;\(\backslash\)}}
+\DoxyCodeLine{00231\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ using\ expander\ =\ int[];\(\backslash\)}}
+\DoxyCodeLine{00232\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ constexpr\ char\ const*\ tmpl\_types[]\ =\ \{CATCH\_REC\_LIST(INTERNAL\_CATCH\_STRINGIZE\_WITHOUT\_PARENS,\ INTERNAL\_CATCH\_REMOVE\_PARENS(TmplTypes))\};\(\backslash\)}}
+\DoxyCodeLine{00233\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ constexpr\ char\ const*\ types\_list[]\ =\ \{CATCH\_REC\_LIST(INTERNAL\_CATCH\_STRINGIZE\_WITHOUT\_PARENS,\ INTERNAL\_CATCH\_REMOVE\_PARENS(TypesList))\};\(\backslash\)}}
+\DoxyCodeLine{00234\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ constexpr\ auto\ num\_types\ =\ sizeof(types\_list)\ /\ sizeof(types\_list[0]);\(\backslash\)}}
+\DoxyCodeLine{00235\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (void)expander\{(Catch::AutoReg(\ Catch::makeTestInvoker(\ \&TestName<Types>::test\ ),\ CATCH\_INTERNAL\_LINEINFO,\ \#ClassName,\ Catch::NameAndTags\{\ Name\ "{}\ -\/\ "{}\ +\ std::string(tmpl\_types[index\ /\ num\_types])\ +\ "{}<"{}\ +\ std::string(types\_list[index\ \%\ num\_types])\ +\ "{}>"{},\ Tags\ \}\ ),\ index++,\ 0)...\ \};}\textcolor{comment}{/*\ NOLINT\ */}\textcolor{preprocessor}{\ \(\backslash\)}}
+\DoxyCodeLine{00236\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\(\backslash\)}}
+\DoxyCodeLine{00237\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \};\(\backslash\)}}
+\DoxyCodeLine{00238\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ static\ int\ INTERNAL\_CATCH\_UNIQUE\_NAME(\ globalRegistrar\ )\ =\ []()\{\(\backslash\)}}
+\DoxyCodeLine{00239\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ using\ TestInit\ =\ Catch::combine<INTERNAL\_CATCH\_REMOVE\_PARENS(TmplTypes)>\(\backslash\)}}
+\DoxyCodeLine{00240\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ::with\_types<INTERNAL\_CATCH\_MAKE\_TYPE\_LISTS\_FROM\_TYPES(TypesList)>::into<TestNameClass>::type;\(\backslash\)}}
+\DoxyCodeLine{00241\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ TestInit();\(\backslash\)}}
+\DoxyCodeLine{00242\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ return\ 0;\(\backslash\)}}
+\DoxyCodeLine{00243\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \}();\ \(\backslash\)}}
+\DoxyCodeLine{00244\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \}\(\backslash\)}}
+\DoxyCodeLine{00245\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ CATCH\_INTERNAL\_UNSUPPRESS\_GLOBALS\_WARNINGS\ \(\backslash\)}}
+\DoxyCodeLine{00246\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ template<typename\ TestType>\ \(\backslash\)}}
+\DoxyCodeLine{00247\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ void\ TestName<TestType>::test()}}
+
+\end{DoxyCode}
+\Hypertarget{catch__test__registry_8h_a9763834a73153202db93cf73ceff3043}\index{catch\_test\_registry.h@{catch\_test\_registry.h}!INTERNAL\_CATCH\_TEMPLATE\_REGISTRY\_INITIATE@{INTERNAL\_CATCH\_TEMPLATE\_REGISTRY\_INITIATE}}
+\index{INTERNAL\_CATCH\_TEMPLATE\_REGISTRY\_INITIATE@{INTERNAL\_CATCH\_TEMPLATE\_REGISTRY\_INITIATE}!catch\_test\_registry.h@{catch\_test\_registry.h}}
+\doxysubsubsection{\texorpdfstring{INTERNAL\_CATCH\_TEMPLATE\_REGISTRY\_INITIATE}{INTERNAL\_CATCH\_TEMPLATE\_REGISTRY\_INITIATE}}
+{\footnotesize\ttfamily \label{catch__test__registry_8h_a9763834a73153202db93cf73ceff3043} 
+\#define INTERNAL\+\_\+\+CATCH\+\_\+\+TEMPLATE\+\_\+\+REGISTRY\+\_\+\+INITIATE(\begin{DoxyParamCaption}\item[{}]{Test\+Name}{, }\item[{}]{Name}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{catch__common_8h_afe320ceec108fc8c160f9ac3938f1bc8}{INTERNAL\_CATCH\_UNIQUE\_NAME}}(\ globalRegistrar\ )\ =\ []()\{\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ TestName<CATCH\_REC\_LIST(INTERNAL\_CATCH\_REMOVE\_PARENS,\ \_\_VA\_ARGS\_\_)>(\mbox{\hyperlink{catch__preprocessor_8hpp_a8e404d42a6d0402698c1d4d16e831d28}{CATCH\_REC\_LIST\_UD}}(\mbox{\hyperlink{catch__preprocessor_8hpp_a8943b350c92f4732c53db42264f463ab}{INTERNAL\_CATCH\_TEMPLATE\_UNIQUE\_NAME}},Name,\ \_\_VA\_ARGS\_\_));\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}();}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__test__registry_8h_source_l00148}{148}} of file \mbox{\hyperlink{catch__test__registry_8h_source}{catch\+\_\+test\+\_\+registry.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00148\ \textcolor{preprocessor}{\ \ \ \ \#define\ INTERNAL\_CATCH\_TEMPLATE\_REGISTRY\_INITIATE(TestName,\ Name,\ ...)\(\backslash\)}}
+\DoxyCodeLine{00149\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ static\ int\ INTERNAL\_CATCH\_UNIQUE\_NAME(\ globalRegistrar\ )\ =\ []()\{\(\backslash\)}}
+\DoxyCodeLine{00150\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ TestName<CATCH\_REC\_LIST(INTERNAL\_CATCH\_REMOVE\_PARENS,\ \_\_VA\_ARGS\_\_)>(CATCH\_REC\_LIST\_UD(INTERNAL\_CATCH\_TEMPLATE\_UNIQUE\_NAME,Name,\ \_\_VA\_ARGS\_\_));\(\backslash\)}}
+\DoxyCodeLine{00151\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ return\ 0;\(\backslash\)}}
+\DoxyCodeLine{00152\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \}();}}
+
+\end{DoxyCode}
+\Hypertarget{catch__test__registry_8h_a8190f00b563c3efb52f8057be41db45f}\index{catch\_test\_registry.h@{catch\_test\_registry.h}!INTERNAL\_CATCH\_TEMPLATE\_TEST\_CASE@{INTERNAL\_CATCH\_TEMPLATE\_TEST\_CASE}}
+\index{INTERNAL\_CATCH\_TEMPLATE\_TEST\_CASE@{INTERNAL\_CATCH\_TEMPLATE\_TEST\_CASE}!catch\_test\_registry.h@{catch\_test\_registry.h}}
+\doxysubsubsection{\texorpdfstring{INTERNAL\_CATCH\_TEMPLATE\_TEST\_CASE}{INTERNAL\_CATCH\_TEMPLATE\_TEST\_CASE}}
+{\footnotesize\ttfamily \label{catch__test__registry_8h_a8190f00b563c3efb52f8057be41db45f} 
+\#define INTERNAL\+\_\+\+CATCH\+\_\+\+TEMPLATE\+\_\+\+TEST\+\_\+\+CASE(\begin{DoxyParamCaption}\item[{}]{Name}{, }\item[{}]{Tags}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{catch__test__registry_8h_a298519a7baf87d977393c41ff0776aaa}{INTERNAL\_CATCH\_TEMPLATE\_TEST\_CASE\_2}}(\ \mbox{\hyperlink{catch__common_8h_afe320ceec108fc8c160f9ac3938f1bc8}{INTERNAL\_CATCH\_UNIQUE\_NAME}}(\ \_\_\_\_C\_A\_T\_C\_H\_\_\_\_T\_E\_M\_P\_L\_A\_T\_E\_\_\_\_T\_E\_S\_T\_\_\_\_\ ),\ \mbox{\hyperlink{catch__common_8h_afe320ceec108fc8c160f9ac3938f1bc8}{INTERNAL\_CATCH\_UNIQUE\_NAME}}(\ \_\_\_\_C\_A\_T\_C\_H\_\_\_\_T\_E\_M\_P\_L\_A\_T\_E\_\_\_\_T\_E\_S\_T\_\_\_\_F\_U\_N\_C\_\_\_\_\ ),\ Name,\ Tags,\ \_\_VA\_ARGS\_\_\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__test__registry_8h_source_l00141}{141}} of file \mbox{\hyperlink{catch__test__registry_8h_source}{catch\+\_\+test\+\_\+registry.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00141\ \textcolor{preprocessor}{\ \ \ \ \#define\ INTERNAL\_CATCH\_TEMPLATE\_TEST\_CASE(Name,\ Tags,\ ...)\ \(\backslash\)}}
+\DoxyCodeLine{00142\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ INTERNAL\_CATCH\_TEMPLATE\_TEST\_CASE\_2(\ INTERNAL\_CATCH\_UNIQUE\_NAME(\ \_\_\_\_C\_A\_T\_C\_H\_\_\_\_T\_E\_M\_P\_L\_A\_T\_E\_\_\_\_T\_E\_S\_T\_\_\_\_\ ),\ INTERNAL\_CATCH\_UNIQUE\_NAME(\ \_\_\_\_C\_A\_T\_C\_H\_\_\_\_T\_E\_M\_P\_L\_A\_T\_E\_\_\_\_T\_E\_S\_T\_\_\_\_F\_U\_N\_C\_\_\_\_\ ),\ Name,\ Tags,\ \_\_VA\_ARGS\_\_\ )}}
+
+\end{DoxyCode}
+\Hypertarget{catch__test__registry_8h_a298519a7baf87d977393c41ff0776aaa}\index{catch\_test\_registry.h@{catch\_test\_registry.h}!INTERNAL\_CATCH\_TEMPLATE\_TEST\_CASE\_2@{INTERNAL\_CATCH\_TEMPLATE\_TEST\_CASE\_2}}
+\index{INTERNAL\_CATCH\_TEMPLATE\_TEST\_CASE\_2@{INTERNAL\_CATCH\_TEMPLATE\_TEST\_CASE\_2}!catch\_test\_registry.h@{catch\_test\_registry.h}}
+\doxysubsubsection{\texorpdfstring{INTERNAL\_CATCH\_TEMPLATE\_TEST\_CASE\_2}{INTERNAL\_CATCH\_TEMPLATE\_TEST\_CASE\_2}}
+{\footnotesize\ttfamily \label{catch__test__registry_8h_a298519a7baf87d977393c41ff0776aaa} 
+\#define INTERNAL\+\_\+\+CATCH\+\_\+\+TEMPLATE\+\_\+\+TEST\+\_\+\+CASE\+\_\+2(\begin{DoxyParamCaption}\item[{}]{Test\+Name}{, }\item[{}]{Test\+Func}{, }\item[{}]{Name}{, }\item[{}]{Tags}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ CATCH\_INTERNAL\_SUPPRESS\_GLOBALS\_WARNINGS\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ template<typename\ TestType>\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ TestFunc();\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keyword}{namespace\ }\{\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}...Types>\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{struct\ }TestName\{\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ template<typename...Ts>\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ TestName(Ts...names)\{\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ CATCH\_INTERNAL\_CHECK\_UNIQUE\_TYPES(\mbox{\hyperlink{catch__preprocessor_8hpp_a060f5fa141c247b4d07dfe9bf3c54079}{CATCH\_REC\_LIST}}(\mbox{\hyperlink{catch__preprocessor_8hpp_adf5ede19321b27ce635d01688551e782}{INTERNAL\_CATCH\_REMOVE\_PARENS}},\ \_\_VA\_ARGS\_\_))\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ }expander\ =\ \textcolor{keywordtype}{int}[];\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (void)expander\{(\mbox{\hyperlink{struct_catch_1_1_auto_reg}{Catch::AutoReg}}(\ \mbox{\hyperlink{namespace_catch_ab3d8ccbc900fe50322c39ecbba52f536}{Catch::makeTestInvoker}}(\ \&TestFunc<Types>\ ),\ \mbox{\hyperlink{catch__common_8h_abc0b2405454c51748a31e0393d9ad5d1}{CATCH\_INTERNAL\_LINEINFO}},\ \mbox{\hyperlink{class_catch_1_1_string_ref}{Catch::StringRef}}(),\ \mbox{\hyperlink{struct_catch_1_1_name_and_tags}{Catch::NameAndTags}}\{\ names,\ Tags\ \}\ ),\ 0)...\ \};\textcolor{comment}{/*\ NOLINT\ */}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \};\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ INTERNAL\_CATCH\_TEMPLATE\_REGISTRY\_INITIATE(TestName,\ Name,\ \_\_VA\_ARGS\_\_)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ CATCH\_INTERNAL\_UNSUPPRESS\_GLOBALS\_WARNINGS\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ template<typename\ TestType>\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ TestFunc()}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__test__registry_8h_source_l00114}{114}} of file \mbox{\hyperlink{catch__test__registry_8h_source}{catch\+\_\+test\+\_\+registry.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00114\ \textcolor{preprocessor}{\ \ \ \ \#define\ INTERNAL\_CATCH\_TEMPLATE\_TEST\_CASE\_2(TestName,\ TestFunc,\ Name,\ Tags,\ ...\ )\(\backslash\)}}
+\DoxyCodeLine{00115\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ CATCH\_INTERNAL\_SUPPRESS\_GLOBALS\_WARNINGS\ \(\backslash\)}}
+\DoxyCodeLine{00116\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ template<typename\ TestType>\ \(\backslash\)}}
+\DoxyCodeLine{00117\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ static\ void\ TestFunc();\(\backslash\)}}
+\DoxyCodeLine{00118\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ namespace\ \{\(\backslash\)}}
+\DoxyCodeLine{00119\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ template<typename...Types>\ \(\backslash\)}}
+\DoxyCodeLine{00120\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ struct\ TestName\{\(\backslash\)}}
+\DoxyCodeLine{00121\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ template<typename...Ts>\ \(\backslash\)}}
+\DoxyCodeLine{00122\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ TestName(Ts...names)\{\(\backslash\)}}
+\DoxyCodeLine{00123\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ CATCH\_INTERNAL\_CHECK\_UNIQUE\_TYPES(CATCH\_REC\_LIST(INTERNAL\_CATCH\_REMOVE\_PARENS,\ \_\_VA\_ARGS\_\_))\ \(\backslash\)}}
+\DoxyCodeLine{00124\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ using\ expander\ =\ int[];\(\backslash\)}}
+\DoxyCodeLine{00125\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (void)expander\{(Catch::AutoReg(\ Catch::makeTestInvoker(\ \&TestFunc<Types>\ ),\ CATCH\_INTERNAL\_LINEINFO,\ Catch::StringRef(),\ Catch::NameAndTags\{\ names,\ Tags\ \}\ ),\ 0)...\ \};}\textcolor{comment}{/*\ NOLINT\ */}\textcolor{preprocessor}{\ \(\backslash\)}}
+\DoxyCodeLine{00126\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\(\backslash\)}}
+\DoxyCodeLine{00127\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \};\(\backslash\)}}
+\DoxyCodeLine{00128\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ INTERNAL\_CATCH\_TEMPLATE\_REGISTRY\_INITIATE(TestName,\ Name,\ \_\_VA\_ARGS\_\_)\ \(\backslash\)}}
+\DoxyCodeLine{00129\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \}\(\backslash\)}}
+\DoxyCodeLine{00130\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ CATCH\_INTERNAL\_UNSUPPRESS\_GLOBALS\_WARNINGS\ \(\backslash\)}}
+\DoxyCodeLine{00131\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ template<typename\ TestType>\ \(\backslash\)}}
+\DoxyCodeLine{00132\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ static\ void\ TestFunc()}}
+
+\end{DoxyCode}
+\Hypertarget{catch__test__registry_8h_a582f90e5f7c36e9e69fff5f4c891ac29}\index{catch\_test\_registry.h@{catch\_test\_registry.h}!INTERNAL\_CATCH\_TEMPLATE\_TEST\_CASE\_METHOD@{INTERNAL\_CATCH\_TEMPLATE\_TEST\_CASE\_METHOD}}
+\index{INTERNAL\_CATCH\_TEMPLATE\_TEST\_CASE\_METHOD@{INTERNAL\_CATCH\_TEMPLATE\_TEST\_CASE\_METHOD}!catch\_test\_registry.h@{catch\_test\_registry.h}}
+\doxysubsubsection{\texorpdfstring{INTERNAL\_CATCH\_TEMPLATE\_TEST\_CASE\_METHOD}{INTERNAL\_CATCH\_TEMPLATE\_TEST\_CASE\_METHOD}}
+{\footnotesize\ttfamily \label{catch__test__registry_8h_a582f90e5f7c36e9e69fff5f4c891ac29} 
+\#define INTERNAL\+\_\+\+CATCH\+\_\+\+TEMPLATE\+\_\+\+TEST\+\_\+\+CASE\+\_\+\+METHOD(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{class_class_name}{Class\+Name}}}{, }\item[{}]{Name}{, }\item[{}]{Tags}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{catch__test__registry_8h_ab99b7b858b7ec7a812698ecdece50913}{INTERNAL\_CATCH\_TEMPLATE\_TEST\_CASE\_METHOD\_2}}(\ \mbox{\hyperlink{catch__common_8h_afe320ceec108fc8c160f9ac3938f1bc8}{INTERNAL\_CATCH\_UNIQUE\_NAME}}(\ \_\_\_\_C\_A\_T\_C\_H\_\_\_\_T\_E\_M\_P\_L\_A\_T\_E\_\_\_\_T\_E\_S\_T\_\_\_\_C\_L\_A\_S\_S\_\_\_\_\ ),\ \mbox{\hyperlink{catch__common_8h_afe320ceec108fc8c160f9ac3938f1bc8}{INTERNAL\_CATCH\_UNIQUE\_NAME}}(\ \_\_\_\_C\_A\_T\_C\_H\_\_\_\_T\_E\_M\_P\_L\_A\_T\_E\_\_\_\_T\_E\_S\_T\_\_\_\_\ )\ ,\ \mbox{\hyperlink{class_class_name}{ClassName}},\ Name,\ Tags,\ \_\_VA\_ARGS\_\_\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__test__registry_8h_source_l00212}{212}} of file \mbox{\hyperlink{catch__test__registry_8h_source}{catch\+\_\+test\+\_\+registry.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00212\ \textcolor{preprocessor}{\ \ \ \ \#define\ INTERNAL\_CATCH\_TEMPLATE\_TEST\_CASE\_METHOD(\ ClassName,\ Name,\ Tags,...\ )\ \(\backslash\)}}
+\DoxyCodeLine{00213\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ INTERNAL\_CATCH\_TEMPLATE\_TEST\_CASE\_METHOD\_2(\ INTERNAL\_CATCH\_UNIQUE\_NAME(\ \_\_\_\_C\_A\_T\_C\_H\_\_\_\_T\_E\_M\_P\_L\_A\_T\_E\_\_\_\_T\_E\_S\_T\_\_\_\_C\_L\_A\_S\_S\_\_\_\_\ ),\ INTERNAL\_CATCH\_UNIQUE\_NAME(\ \_\_\_\_C\_A\_T\_C\_H\_\_\_\_T\_E\_M\_P\_L\_A\_T\_E\_\_\_\_T\_E\_S\_T\_\_\_\_\ )\ ,\ ClassName,\ Name,\ Tags,\ \_\_VA\_ARGS\_\_\ )}}
+
+\end{DoxyCode}
+\Hypertarget{catch__test__registry_8h_ab99b7b858b7ec7a812698ecdece50913}\index{catch\_test\_registry.h@{catch\_test\_registry.h}!INTERNAL\_CATCH\_TEMPLATE\_TEST\_CASE\_METHOD\_2@{INTERNAL\_CATCH\_TEMPLATE\_TEST\_CASE\_METHOD\_2}}
+\index{INTERNAL\_CATCH\_TEMPLATE\_TEST\_CASE\_METHOD\_2@{INTERNAL\_CATCH\_TEMPLATE\_TEST\_CASE\_METHOD\_2}!catch\_test\_registry.h@{catch\_test\_registry.h}}
+\doxysubsubsection{\texorpdfstring{INTERNAL\_CATCH\_TEMPLATE\_TEST\_CASE\_METHOD\_2}{INTERNAL\_CATCH\_TEMPLATE\_TEST\_CASE\_METHOD\_2}}
+{\footnotesize\ttfamily \label{catch__test__registry_8h_ab99b7b858b7ec7a812698ecdece50913} 
+\#define INTERNAL\+\_\+\+CATCH\+\_\+\+TEMPLATE\+\_\+\+TEST\+\_\+\+CASE\+\_\+\+METHOD\+\_\+2(\begin{DoxyParamCaption}\item[{}]{Test\+Name\+Class}{, }\item[{}]{Test\+Name}{, }\item[{}]{\mbox{\hyperlink{class_class_name}{Class\+Name}}}{, }\item[{}]{Name}{, }\item[{}]{Tags}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ CATCH\_INTERNAL\_SUPPRESS\_GLOBALS\_WARNINGS\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ namespace\{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ TestType>\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{struct\ }TestName\ :\ \mbox{\hyperlink{catch__preprocessor_8hpp_adf5ede19321b27ce635d01688551e782}{INTERNAL\_CATCH\_REMOVE\_PARENS}}(ClassName\ <TestType>)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ test();\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \};\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}...Types>\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{struct\ }TestNameClass\{\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ template<typename...Ts>\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ TestNameClass(Ts...names)\{\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ CATCH\_INTERNAL\_CHECK\_UNIQUE\_TYPES(\mbox{\hyperlink{catch__preprocessor_8hpp_a060f5fa141c247b4d07dfe9bf3c54079}{CATCH\_REC\_LIST}}(\mbox{\hyperlink{catch__preprocessor_8hpp_adf5ede19321b27ce635d01688551e782}{INTERNAL\_CATCH\_REMOVE\_PARENS}},\ \_\_VA\_ARGS\_\_))\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ }expander\ =\ \textcolor{keywordtype}{int}[];\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (void)expander\{(\mbox{\hyperlink{struct_catch_1_1_auto_reg}{Catch::AutoReg}}(\ \mbox{\hyperlink{namespace_catch_ab3d8ccbc900fe50322c39ecbba52f536}{Catch::makeTestInvoker}}(\ \&TestName<Types>::test\ ),\ \mbox{\hyperlink{catch__common_8h_abc0b2405454c51748a31e0393d9ad5d1}{CATCH\_INTERNAL\_LINEINFO}},\ \#\mbox{\hyperlink{class_class_name}{ClassName}},\ \mbox{\hyperlink{struct_catch_1_1_name_and_tags}{Catch::NameAndTags}}\{\ names,\ Tags\ \}\ ),\ 0)...\ \};\textcolor{comment}{/*\ NOLINT\ */}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \};\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ INTERNAL\_CATCH\_TEMPLATE\_REGISTRY\_INITIATE(TestNameClass,\ Name,\ \_\_VA\_ARGS\_\_)\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ CATCH\_INTERNAL\_UNSUPPRESS\_GLOBALS\_WARNINGS\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ template<typename\ TestType>\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ TestName<TestType>::test()}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__test__registry_8h_source_l00189}{189}} of file \mbox{\hyperlink{catch__test__registry_8h_source}{catch\+\_\+test\+\_\+registry.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00189\ \textcolor{preprocessor}{\ \ \ \ \#define\ INTERNAL\_CATCH\_TEMPLATE\_TEST\_CASE\_METHOD\_2(\ TestNameClass,\ TestName,\ ClassName,\ Name,\ Tags,\ ...\ )\ \(\backslash\)}}
+\DoxyCodeLine{00190\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ CATCH\_INTERNAL\_SUPPRESS\_GLOBALS\_WARNINGS\ \(\backslash\)}}
+\DoxyCodeLine{00191\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ namespace\{\ \(\backslash\)}}
+\DoxyCodeLine{00192\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ template<typename\ TestType>\ \(\backslash\)}}
+\DoxyCodeLine{00193\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ struct\ TestName\ :\ INTERNAL\_CATCH\_REMOVE\_PARENS(ClassName\ <TestType>)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00194\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ void\ test();\(\backslash\)}}
+\DoxyCodeLine{00195\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \};\(\backslash\)}}
+\DoxyCodeLine{00196\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ template<typename...Types>\ \(\backslash\)}}
+\DoxyCodeLine{00197\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ struct\ TestNameClass\{\(\backslash\)}}
+\DoxyCodeLine{00198\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ template<typename...Ts>\ \(\backslash\)}}
+\DoxyCodeLine{00199\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ TestNameClass(Ts...names)\{\(\backslash\)}}
+\DoxyCodeLine{00200\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ CATCH\_INTERNAL\_CHECK\_UNIQUE\_TYPES(CATCH\_REC\_LIST(INTERNAL\_CATCH\_REMOVE\_PARENS,\ \_\_VA\_ARGS\_\_))\ \(\backslash\)}}
+\DoxyCodeLine{00201\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ using\ expander\ =\ int[];\(\backslash\)}}
+\DoxyCodeLine{00202\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (void)expander\{(Catch::AutoReg(\ Catch::makeTestInvoker(\ \&TestName<Types>::test\ ),\ CATCH\_INTERNAL\_LINEINFO,\ \#ClassName,\ Catch::NameAndTags\{\ names,\ Tags\ \}\ ),\ 0)...\ \};}\textcolor{comment}{/*\ NOLINT\ */}\textcolor{preprocessor}{\ \(\backslash\)}}
+\DoxyCodeLine{00203\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\(\backslash\)}}
+\DoxyCodeLine{00204\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \};\(\backslash\)}}
+\DoxyCodeLine{00205\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ INTERNAL\_CATCH\_TEMPLATE\_REGISTRY\_INITIATE(TestNameClass,\ Name,\ \_\_VA\_ARGS\_\_)\(\backslash\)}}
+\DoxyCodeLine{00206\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \}\(\backslash\)}}
+\DoxyCodeLine{00207\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ CATCH\_INTERNAL\_UNSUPPRESS\_GLOBALS\_WARNINGS\(\backslash\)}}
+\DoxyCodeLine{00208\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ template<typename\ TestType>\ \(\backslash\)}}
+\DoxyCodeLine{00209\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ void\ TestName<TestType>::test()}}
+
+\end{DoxyCode}
+\Hypertarget{catch__test__registry_8h_a4755a44f041605a731180e1e19e72bee}\index{catch\_test\_registry.h@{catch\_test\_registry.h}!INTERNAL\_CATCH\_TEST\_CASE\_METHOD@{INTERNAL\_CATCH\_TEST\_CASE\_METHOD}}
+\index{INTERNAL\_CATCH\_TEST\_CASE\_METHOD@{INTERNAL\_CATCH\_TEST\_CASE\_METHOD}!catch\_test\_registry.h@{catch\_test\_registry.h}}
+\doxysubsubsection{\texorpdfstring{INTERNAL\_CATCH\_TEST\_CASE\_METHOD}{INTERNAL\_CATCH\_TEST\_CASE\_METHOD}}
+{\footnotesize\ttfamily \label{catch__test__registry_8h_a4755a44f041605a731180e1e19e72bee} 
+\#define INTERNAL\+\_\+\+CATCH\+\_\+\+TEST\+\_\+\+CASE\+\_\+\+METHOD(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{class_class_name}{Class\+Name}}}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{catch__test__registry_8h_a60e66c178de977271dd864ade805a250}{INTERNAL\_CATCH\_TEST\_CASE\_METHOD2}}(\ \mbox{\hyperlink{catch__common_8h_afe320ceec108fc8c160f9ac3938f1bc8}{INTERNAL\_CATCH\_UNIQUE\_NAME}}(\ \_\_\_\_C\_A\_T\_C\_H\_\_\_\_T\_E\_S\_T\_\_\_\_\ ),\ \mbox{\hyperlink{class_class_name}{ClassName}},\ \_\_VA\_ARGS\_\_\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__test__registry_8h_source_l00104}{104}} of file \mbox{\hyperlink{catch__test__registry_8h_source}{catch\+\_\+test\+\_\+registry.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00104\ \textcolor{preprocessor}{\ \ \ \ \#define\ INTERNAL\_CATCH\_TEST\_CASE\_METHOD(\ ClassName,\ ...\ )\ \(\backslash\)}}
+\DoxyCodeLine{00105\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ INTERNAL\_CATCH\_TEST\_CASE\_METHOD2(\ INTERNAL\_CATCH\_UNIQUE\_NAME(\ \_\_\_\_C\_A\_T\_C\_H\_\_\_\_T\_E\_S\_T\_\_\_\_\ ),\ ClassName,\ \_\_VA\_ARGS\_\_\ )}}
+
+\end{DoxyCode}
+\Hypertarget{catch__test__registry_8h_a60e66c178de977271dd864ade805a250}\index{catch\_test\_registry.h@{catch\_test\_registry.h}!INTERNAL\_CATCH\_TEST\_CASE\_METHOD2@{INTERNAL\_CATCH\_TEST\_CASE\_METHOD2}}
+\index{INTERNAL\_CATCH\_TEST\_CASE\_METHOD2@{INTERNAL\_CATCH\_TEST\_CASE\_METHOD2}!catch\_test\_registry.h@{catch\_test\_registry.h}}
+\doxysubsubsection{\texorpdfstring{INTERNAL\_CATCH\_TEST\_CASE\_METHOD2}{INTERNAL\_CATCH\_TEST\_CASE\_METHOD2}}
+{\footnotesize\ttfamily \label{catch__test__registry_8h_a60e66c178de977271dd864ade805a250} 
+\#define INTERNAL\+\_\+\+CATCH\+\_\+\+TEST\+\_\+\+CASE\+\_\+\+METHOD2(\begin{DoxyParamCaption}\item[{}]{Test\+Name}{, }\item[{}]{\mbox{\hyperlink{class_class_name}{Class\+Name}}}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ CATCH\_INTERNAL\_SUPPRESS\_GLOBALS\_WARNINGS\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ namespace\{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{struct\ }TestName\ :\ \mbox{\hyperlink{catch__preprocessor_8hpp_adf5ede19321b27ce635d01688551e782}{INTERNAL\_CATCH\_REMOVE\_PARENS}}(ClassName)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ test();\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \};\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_auto_reg}{Catch::AutoReg}}\ \mbox{\hyperlink{catch__common_8h_afe320ceec108fc8c160f9ac3938f1bc8}{INTERNAL\_CATCH\_UNIQUE\_NAME}}(\ autoRegistrar\ )\ (\ \mbox{\hyperlink{namespace_catch_ab3d8ccbc900fe50322c39ecbba52f536}{Catch::makeTestInvoker}}(\ \&TestName::test\ ),\ \mbox{\hyperlink{catch__common_8h_abc0b2405454c51748a31e0393d9ad5d1}{CATCH\_INTERNAL\_LINEINFO}},\ \#\mbox{\hyperlink{class_class_name}{ClassName}},\ \mbox{\hyperlink{struct_catch_1_1_name_and_tags}{Catch::NameAndTags}}\{\ \_\_VA\_ARGS\_\_\ \}\ );\ \textcolor{comment}{/*\ NOLINT\ */}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ CATCH\_INTERNAL\_UNSUPPRESS\_GLOBALS\_WARNINGS\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ void\ TestName::test()}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__test__registry_8h_source_l00094}{94}} of file \mbox{\hyperlink{catch__test__registry_8h_source}{catch\+\_\+test\+\_\+registry.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00094\ \textcolor{preprocessor}{\ \ \ \ \#define\ INTERNAL\_CATCH\_TEST\_CASE\_METHOD2(\ TestName,\ ClassName,\ ...\ )\(\backslash\)}}
+\DoxyCodeLine{00095\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ CATCH\_INTERNAL\_SUPPRESS\_GLOBALS\_WARNINGS\ \(\backslash\)}}
+\DoxyCodeLine{00096\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ namespace\{\ \(\backslash\)}}
+\DoxyCodeLine{00097\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ struct\ TestName\ :\ INTERNAL\_CATCH\_REMOVE\_PARENS(ClassName)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00098\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ void\ test();\ \(\backslash\)}}
+\DoxyCodeLine{00099\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \};\ \(\backslash\)}}
+\DoxyCodeLine{00100\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ Catch::AutoReg\ INTERNAL\_CATCH\_UNIQUE\_NAME(\ autoRegistrar\ )\ (\ Catch::makeTestInvoker(\ \&TestName::test\ ),\ CATCH\_INTERNAL\_LINEINFO,\ \#ClassName,\ Catch::NameAndTags\{\ \_\_VA\_ARGS\_\_\ \}\ );\ }\textcolor{comment}{/*\ NOLINT\ */}\textcolor{preprocessor}{\ \(\backslash\)}}
+\DoxyCodeLine{00101\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00102\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ CATCH\_INTERNAL\_UNSUPPRESS\_GLOBALS\_WARNINGS\ \(\backslash\)}}
+\DoxyCodeLine{00103\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ void\ TestName::test()}}
+
+\end{DoxyCode}
+\Hypertarget{catch__test__registry_8h_a83f221452b6494c1eb0ae9bab79faa3c}\index{catch\_test\_registry.h@{catch\_test\_registry.h}!INTERNAL\_CATCH\_TESTCASE@{INTERNAL\_CATCH\_TESTCASE}}
+\index{INTERNAL\_CATCH\_TESTCASE@{INTERNAL\_CATCH\_TESTCASE}!catch\_test\_registry.h@{catch\_test\_registry.h}}
+\doxysubsubsection{\texorpdfstring{INTERNAL\_CATCH\_TESTCASE}{INTERNAL\_CATCH\_TESTCASE}}
+{\footnotesize\ttfamily \label{catch__test__registry_8h_a83f221452b6494c1eb0ae9bab79faa3c} 
+\#define INTERNAL\+\_\+\+CATCH\+\_\+\+TESTCASE(\begin{DoxyParamCaption}\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{catch__test__registry_8h_a33905c95a4d545efcf34abfbf790ad9c}{INTERNAL\_CATCH\_TESTCASE2}}(\ \mbox{\hyperlink{catch__common_8h_afe320ceec108fc8c160f9ac3938f1bc8}{INTERNAL\_CATCH\_UNIQUE\_NAME}}(\ \_\_\_\_C\_A\_T\_C\_H\_\_\_\_T\_E\_S\_T\_\_\_\_\ ),\ \_\_VA\_ARGS\_\_\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__test__registry_8h_source_l00084}{84}} of file \mbox{\hyperlink{catch__test__registry_8h_source}{catch\+\_\+test\+\_\+registry.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00084\ \textcolor{preprocessor}{\ \ \ \ \#define\ INTERNAL\_CATCH\_TESTCASE(\ ...\ )\ \(\backslash\)}}
+\DoxyCodeLine{00085\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ INTERNAL\_CATCH\_TESTCASE2(\ INTERNAL\_CATCH\_UNIQUE\_NAME(\ \_\_\_\_C\_A\_T\_C\_H\_\_\_\_T\_E\_S\_T\_\_\_\_\ ),\ \_\_VA\_ARGS\_\_\ )}}
+
+\end{DoxyCode}
+\Hypertarget{catch__test__registry_8h_a33905c95a4d545efcf34abfbf790ad9c}\index{catch\_test\_registry.h@{catch\_test\_registry.h}!INTERNAL\_CATCH\_TESTCASE2@{INTERNAL\_CATCH\_TESTCASE2}}
+\index{INTERNAL\_CATCH\_TESTCASE2@{INTERNAL\_CATCH\_TESTCASE2}!catch\_test\_registry.h@{catch\_test\_registry.h}}
+\doxysubsubsection{\texorpdfstring{INTERNAL\_CATCH\_TESTCASE2}{INTERNAL\_CATCH\_TESTCASE2}}
+{\footnotesize\ttfamily \label{catch__test__registry_8h_a33905c95a4d545efcf34abfbf790ad9c} 
+\#define INTERNAL\+\_\+\+CATCH\+\_\+\+TESTCASE2(\begin{DoxyParamCaption}\item[{}]{Test\+Name}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ TestName();\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ CATCH\_INTERNAL\_SUPPRESS\_GLOBALS\_WARNINGS\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ namespace\{\ \mbox{\hyperlink{struct_catch_1_1_auto_reg}{Catch::AutoReg}}\ \mbox{\hyperlink{catch__common_8h_afe320ceec108fc8c160f9ac3938f1bc8}{INTERNAL\_CATCH\_UNIQUE\_NAME}}(\ autoRegistrar\ )(\ \mbox{\hyperlink{namespace_catch_ab3d8ccbc900fe50322c39ecbba52f536}{Catch::makeTestInvoker}}(\ \&TestName\ ),\ \mbox{\hyperlink{catch__common_8h_abc0b2405454c51748a31e0393d9ad5d1}{CATCH\_INTERNAL\_LINEINFO}},\ \mbox{\hyperlink{class_catch_1_1_string_ref}{Catch::StringRef}}(),\ \mbox{\hyperlink{struct_catch_1_1_name_and_tags}{Catch::NameAndTags}}\{\ \_\_VA\_ARGS\_\_\ \}\ );\ \}\ \textcolor{comment}{/*\ NOLINT\ */}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ CATCH\_INTERNAL\_UNSUPPRESS\_GLOBALS\_WARNINGS\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ static\ \textcolor{keywordtype}{void}\ TestName()}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__test__registry_8h_source_l00078}{78}} of file \mbox{\hyperlink{catch__test__registry_8h_source}{catch\+\_\+test\+\_\+registry.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00078\ \textcolor{preprocessor}{\ \ \ \ \#define\ INTERNAL\_CATCH\_TESTCASE2(\ TestName,\ ...\ )\ \(\backslash\)}}
+\DoxyCodeLine{00079\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ static\ void\ TestName();\ \(\backslash\)}}
+\DoxyCodeLine{00080\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ CATCH\_INTERNAL\_SUPPRESS\_GLOBALS\_WARNINGS\ \(\backslash\)}}
+\DoxyCodeLine{00081\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ namespace\{\ Catch::AutoReg\ INTERNAL\_CATCH\_UNIQUE\_NAME(\ autoRegistrar\ )(\ Catch::makeTestInvoker(\ \&TestName\ ),\ CATCH\_INTERNAL\_LINEINFO,\ Catch::StringRef(),\ Catch::NameAndTags\{\ \_\_VA\_ARGS\_\_\ \}\ );\ \}\ }\textcolor{comment}{/*\ NOLINT\ */}\textcolor{preprocessor}{\ \(\backslash\)}}
+\DoxyCodeLine{00082\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ CATCH\_INTERNAL\_UNSUPPRESS\_GLOBALS\_WARNINGS\ \(\backslash\)}}
+\DoxyCodeLine{00083\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ static\ void\ TestName()}}
+
+\end{DoxyCode}

@@ -1,0 +1,10 @@
+<map id="sysio::chain::builtin_protocol_feature::digest" name="sysio::chain::builtin_protocol_feature::digest">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,51,170,92"/>
+<area shape="rect" id="Node000002" href="$namespacefc_1_1raw.html#a3a18d8161aa5b4f4f02b6fcfdff5e5d1" title=" " alt="" coords="237,29,334,55"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="170,57,221,49,222,54,171,62"/>
+<area shape="rect" id="Node000003" href="$classfc_1_1sha256_1_1encoder.html#a4d8b8181e912194cf98a56164671adf8" title=" " alt="" coords="218,79,354,120"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="170,80,203,85,202,90,170,86"/>
+<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="256,30,251,21,254,11,266,5,286,3,307,5,318,12,315,16,305,10,286,8,268,10,258,15,256,20,261,28"/>
+<area shape="rect" id="Node000004" href="$classfc_1_1sha256.html#ab897537f6c524085b28049be51ed370d" title=" " alt="" coords="402,87,517,112"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="354,97,386,97,386,102,354,102"/>
+</map>

@@ -1,0 +1,44 @@
+\doxysection{libraries/fc/include/fc/crypto/blake2.hpp File Reference}
+\hypertarget{blake2_8hpp}{}\label{blake2_8hpp}\index{libraries/fc/include/fc/crypto/blake2.hpp@{libraries/fc/include/fc/crypto/blake2.hpp}}
+{\ttfamily \#include $<$functional$>$}\newline
+{\ttfamily \#include $<$cstdint$>$}\newline
+{\ttfamily \#include $<$variant$>$}\newline
+{\ttfamily \#include $<$vector$>$}\newline
+{\ttfamily \#include $<$fc/utility.\+hpp$>$}\newline
+Include dependency graph for blake2.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{blake2_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{blake2_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structfc_1_1blake2b__state}{fc\+::blake2b\+\_\+state}}
+\item 
+class \mbox{\hyperlink{classfc_1_1blake2b__wrapper}{fc\+::blake2b\+\_\+wrapper}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacefc}{fc}}
+\begin{DoxyCompactList}\small\item\em namespace \doxylink{namespacesysio_1_1chain}{sysio\+::chain} \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum class \mbox{\hyperlink{namespacefc_acb26c721d16c6f6031600adee7d0b609}{fc\+::blake2b\+\_\+error}} \+: int32\+\_\+t \{ \mbox{\hyperlink{namespacefc_acb26c721d16c6f6031600adee7d0b609a432c768a921a9550970c31c8d332d59a}{fc\+::input\+\_\+len\+\_\+error}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+std\+::variant$<$ \mbox{\hyperlink{namespacefc_acb26c721d16c6f6031600adee7d0b609}{blake2b\+\_\+error}}, \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}} $>$ \mbox{\hyperlink{namespacefc_a3bcfede4e3ebdbd08006e020492dc7ce}{fc\+::blake2b}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \+\_\+rounds, const \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}} \&\+\_\+h, const \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}} \&\+\_\+m, const \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}} \&\+\_\+t0\+\_\+offset, const \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}} \&\+\_\+t1\+\_\+offset, bool \+\_\+f, const \mbox{\hyperlink{namespacefc_a978f9e97f64eb2ce6cbe892d3cc93397}{yield\+\_\+function\+\_\+t}} \&yield)
+\end{DoxyCompactItemize}

@@ -1,0 +1,60 @@
+\doxysection{libraries/fc/include/fc/network/ip.hpp File Reference}
+\hypertarget{ip_8hpp}{}\label{ip_8hpp}\index{libraries/fc/include/fc/network/ip.hpp@{libraries/fc/include/fc/network/ip.hpp}}
+{\ttfamily \#include $<$fc/string.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/crypto/sha1.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/io/raw\+\_\+fwd.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/crypto/city.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/reflect/reflect.\+hpp$>$}\newline
+Include dependency graph for ip.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{ip_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{ip_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classfc_1_1ip_1_1address}{fc\+::ip\+::address}}
+\item 
+class \mbox{\hyperlink{classfc_1_1ip_1_1endpoint}{fc\+::ip\+::endpoint}}
+\item 
+struct \mbox{\hyperlink{structstd_1_1hash_3_01fc_1_1ip_1_1endpoint_01_4}{std\+::hash$<$ fc\+::ip\+::endpoint $>$}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacefc}{fc}}
+\begin{DoxyCompactList}\small\item\em namespace \doxylink{namespacesysio_1_1chain}{sysio\+::chain} \end{DoxyCompactList}\item 
+namespace \mbox{\hyperlink{namespacefc_1_1ip}{fc\+::ip}}
+\item 
+namespace \mbox{\hyperlink{namespacefc_1_1raw}{fc\+::raw}}
+\item 
+namespace \mbox{\hyperlink{namespacestd}{std}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{namespacefc_a89592346d5b5cc41d0b6859f4b5ae8a3}{fc\+::to\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1ip_1_1endpoint}{ip\+::endpoint}} \&var, \mbox{\hyperlink{classfc_1_1variant}{variant}} \&vo)
+\item 
+void \mbox{\hyperlink{namespacefc_ad22dd021d6ffe639b96d6b6728635853}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{variant}} \&var, \mbox{\hyperlink{classfc_1_1ip_1_1endpoint}{ip\+::endpoint}} \&vo)
+\item 
+void \mbox{\hyperlink{namespacefc_a684c6aa122ee9aaf804e6b4945dd61b1}{fc\+::to\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1ip_1_1address}{ip\+::address}} \&var, \mbox{\hyperlink{classfc_1_1variant}{variant}} \&vo)
+\item 
+void \mbox{\hyperlink{namespacefc_a175d05886e7e58b4fd32f6673e81cb68}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{variant}} \&var, \mbox{\hyperlink{classfc_1_1ip_1_1address}{ip\+::address}} \&vo)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_a7808eeea9b9e3a004c5dbd2b985b5ce1}{fc\+::raw\+::pack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, const \mbox{\hyperlink{classfc_1_1ip_1_1address}{ip\+::address}} \&v)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_a625b1f92949b048bf6c57808a9767b3d}{fc\+::raw\+::unpack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, \mbox{\hyperlink{classfc_1_1ip_1_1address}{ip\+::address}} \&v)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_a0fdb9c6ae378596a96db14f8c4408dee}{fc\+::raw\+::pack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, const \mbox{\hyperlink{classfc_1_1ip_1_1endpoint}{ip\+::endpoint}} \&v)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespacefc_1_1raw_a463c3e6576b91e9bb634d9fac69b72ef}{fc\+::raw\+::unpack}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, \mbox{\hyperlink{classfc_1_1ip_1_1endpoint}{ip\+::endpoint}} \&v)
+\end{DoxyCompactItemize}

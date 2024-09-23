@@ -1,0 +1,156 @@
+\doxysection{libraries/sys-\/vm/tests/signals\+\_\+tests.cpp File Reference}
+\hypertarget{signals__tests_8cpp}{}\label{signals__tests_8cpp}\index{libraries/sys-\/vm/tests/signals\_tests.cpp@{libraries/sys-\/vm/tests/signals\_tests.cpp}}
+{\ttfamily \#include $<$sysio/vm/signals.\+hpp$>$}\newline
+{\ttfamily \#include $<$chrono$>$}\newline
+{\ttfamily \#include $<$csignal$>$}\newline
+{\ttfamily \#include $<$thread$>$}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$catch2/catch.\+hpp$>$}\newline
+Include dependency graph for signals\+\_\+tests.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{signals__tests_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structtest__exception}{test\+\_\+exception}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{signals__tests_8cpp_afb124f92e80a9c351bea946baefd52be}{TEST\+\_\+\+CASE}} ("{}Testing signals"{}, "{}\mbox{[}invoke\+\_\+with\+\_\+signal\+\_\+handler\mbox{]}"{})
+\item 
+\mbox{\hyperlink{signals__tests_8cpp_a3ec6449b1dadd607bc2bd1c15c4a43da}{TEST\+\_\+\+CASE}} ("{}Testing throw"{}, "{}\mbox{[}signal\+\_\+handler\+\_\+throw\mbox{]}"{})
+\item 
+\mbox{\hyperlink{signals__tests_8cpp_a585da1887fec017be608b0d11da3d12a}{TEST\+\_\+\+CASE}} ("{}Test signal handler forwarding"{}, "{}\mbox{[}signal\+\_\+handler\+\_\+forward\mbox{]}"{})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{signals__tests_8cpp_a585da1887fec017be608b0d11da3d12a}\index{signals\_tests.cpp@{signals\_tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!signals\_tests.cpp@{signals\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{signals__tests_8cpp_a585da1887fec017be608b0d11da3d12a} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Test signal handler forwarding"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}signal\+\_\+handler\+\_\+forward\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{signals__tests_8cpp_source_l00041}{41}} of file \mbox{\hyperlink{signals__tests_8cpp_source}{signals\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00042\ \ \ \ \textcolor{comment}{//\ reset\ backup\ signal\ handlers}}
+\DoxyCodeLine{00043\ \ \ \ \textcolor{keyword}{auto}\ guard\ =\ \mbox{\hyperlink{structsysio_1_1vm_1_1scope__guard}{sysio::vm::scope\_guard}}\{[]\{}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ std::signal(SIGSEGV,\ SIG\_DFL);}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ std::signal(SIGBUS,\ SIG\_DFL);}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ std::signal(SIGFPE,\ SIG\_DFL);}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1vm_a3b729c87be5c09baca1dec359fad785b}{sysio::vm::setup\_signal\_handler\_impl}}();\ \textcolor{comment}{//\ This\ is\ normally\ only\ called\ once}}
+\DoxyCodeLine{00048\ \ \ \ \}\};}
+\DoxyCodeLine{00049\ \ \ \ \{}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ std::signal(SIGSEGV,\ \&handle\_signal);}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ std::signal(SIGBUS,\ \&handle\_signal);}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ std::signal(SIGFPE,\ \&handle\_signal);}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1vm_a3b729c87be5c09baca1dec359fad785b}{sysio::vm::setup\_signal\_handler\_impl}}();}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ sig\_handled\ =\ 0;}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ std::raise(SIGSEGV);}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(sig\_handled\ ==\ 42\ +\ SIGSEGV);}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ sig\_handled\ =\ 0;}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ std::raise(SIGBUS);}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(sig\_handled\ ==\ 42\ +\ SIGBUS);}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ sig\_handled\ =\ 0;}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ std::raise(SIGFPE);}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(sig\_handled\ ==\ 42\ +\ SIGFPE);}
+\DoxyCodeLine{00063\ \ \ \ \}}
+\DoxyCodeLine{00064\ \ \ \ \{}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \textcolor{keyword}{struct\ }sigaction\ sa;}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ sa.sa\_sigaction\ =\ \&handle\_signal\_sigaction;}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ sigemptyset(\&sa.sa\_mask);}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ sa.sa\_flags\ =\ SA\_NODEFER\ |\ SA\_SIGINFO;}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ sigaction(SIGSEGV,\ \&sa,\ \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ sigaction(SIGBUS,\ \&sa,\ \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ sigaction(SIGFPE,\ \&sa,\ \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1vm_a3b729c87be5c09baca1dec359fad785b}{sysio::vm::setup\_signal\_handler\_impl}}();}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ sig\_handled\ =\ 0;}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ std::raise(SIGSEGV);}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(sig\_handled\ ==\ 142\ +\ SIGSEGV);}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ sig\_handled\ =\ 0;}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ std::raise(SIGBUS);}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(sig\_handled\ ==\ 142\ +\ SIGBUS);}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ sig\_handled\ =\ 0;}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ std::raise(SIGFPE);}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(sig\_handled\ ==\ 142\ +\ SIGFPE);}
+\DoxyCodeLine{00082\ \ \ \ \}}
+\DoxyCodeLine{00083\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{signals__tests_8cpp_a585da1887fec017be608b0d11da3d12a_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{signals__tests_8cpp_afb124f92e80a9c351bea946baefd52be}\index{signals\_tests.cpp@{signals\_tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!signals\_tests.cpp@{signals\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{signals__tests_8cpp_afb124f92e80a9c351bea946baefd52be} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Testing signals"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}invoke\+\_\+with\+\_\+signal\+\_\+handler\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{signals__tests_8cpp_source_l00011}{11}} of file \mbox{\hyperlink{signals__tests_8cpp_source}{signals\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00011\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00012\ \ \ \ \textcolor{keywordtype}{bool}\ okay\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00013\ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00014\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1vm_a071298ad9404d4cd62434edde161b767}{sysio::vm::invoke\_with\_signal\_handler}}([]()\ \{}
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \ \ \ std::raise(SIGSEGV);}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \},\ [](\textcolor{keywordtype}{int}\ sig)\ \{}
+\DoxyCodeLine{00017\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ test\_exception\{\};}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00019\ \ \ \ \}\ \textcolor{keywordflow}{catch}(test\_exception\&)\ \{}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ okay\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00021\ \ \ \ \}}
+\DoxyCodeLine{00022\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(okay);}
+\DoxyCodeLine{00023\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{signals__tests_8cpp_afb124f92e80a9c351bea946baefd52be_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{signals__tests_8cpp_a3ec6449b1dadd607bc2bd1c15c4a43da}\index{signals\_tests.cpp@{signals\_tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!signals\_tests.cpp@{signals\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{signals__tests_8cpp_a3ec6449b1dadd607bc2bd1c15c4a43da} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Testing throw"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}signal\+\_\+handler\+\_\+throw\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{signals__tests_8cpp_source_l00025}{25}} of file \mbox{\hyperlink{signals__tests_8cpp_source}{signals\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00026\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{namespacesysio_1_1vm_a071298ad9404d4cd62434edde161b767}{sysio::vm::invoke\_with\_signal\_handler}}([]()\{}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1vm_a96dfdf06dbb657c55b510cd09ee321e6}{sysio::vm::throw\_<sysio::vm::wasm\_exit\_exception>}}(\ \textcolor{stringliteral}{"{}Exiting"{}}\ );}
+\DoxyCodeLine{00028\ \ \ \ \},\ [](int)\{\}),\ sysio::vm::wasm\_exit\_exception);}
+\DoxyCodeLine{00029\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{signals__tests_8cpp_a3ec6449b1dadd607bc2bd1c15c4a43da_cgraph}
+\end{center}
+\end{figure}

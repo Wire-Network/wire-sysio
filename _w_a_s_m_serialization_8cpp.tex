@@ -1,0 +1,237 @@
+\doxysection{libraries/wasm-\/jit/\+Source/\+WASM/\+WASMSerialization.cpp File Reference}
+\hypertarget{_w_a_s_m_serialization_8cpp}{}\label{_w_a_s_m_serialization_8cpp}\index{libraries/wasm-\/jit/Source/WASM/WASMSerialization.cpp@{libraries/wasm-\/jit/Source/WASM/WASMSerialization.cpp}}
+{\ttfamily \#include "{}../../../chain/include/sysio/chain/wasm\+\_\+sysio\+\_\+constraints.\+hpp"{}}\newline
+{\ttfamily \#include "{}Inline/\+Basic\+Types.\+h"{}}\newline
+{\ttfamily \#include "{}Inline/\+Serialization.\+h"{}}\newline
+{\ttfamily \#include "{}Inline/\+UTF8.\+h"{}}\newline
+{\ttfamily \#include "{}WASM.\+h"{}}\newline
+{\ttfamily \#include "{}IR/\+Module.\+h"{}}\newline
+{\ttfamily \#include "{}IR/\+Operators.\+h"{}}\newline
+{\ttfamily \#include "{}IR/\+Types.\+h"{}}\newline
+{\ttfamily \#include "{}IR/\+Validate.\+h"{}}\newline
+Include dependency graph for WASMSerialization.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{_w_a_s_m_serialization_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_w_a_s_m_1_1_local_set}{WASM\+::\+Local\+Set}}
+\item 
+struct \mbox{\hyperlink{struct_w_a_s_m_1_1_operator_serializer_stream}{WASM\+::\+Operator\+Serializer\+Stream}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespace_i_r}{IR}}
+\item 
+namespace \mbox{\hyperlink{namespace_w_a_s_m}{WASM}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{_w_a_s_m_serialization_8cpp_a0d04d0b7b632d732f24972574f4bde51}{VISIT\+\_\+\+OPCODE}}(\mbox{\hyperlink{localize_8hpp_a6554a5ea005e85d0f84f2f34c11de938}{\+\_\+}},  \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  name\+String,  Imm, ...)
+\item 
+\#define \mbox{\hyperlink{_w_a_s_m_serialization_8cpp_a0d04d0b7b632d732f24972574f4bde51}{VISIT\+\_\+\+OPCODE}}(\mbox{\hyperlink{localize_8hpp_a6554a5ea005e85d0f84f2f34c11de938}{\+\_\+}},  \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  name\+String,  Imm, ...)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \{ \mbox{\hyperlink{namespace_w_a_s_m_a1dd643d884eb689b962a1968c20c0aedab482d153abcb7b00a1d511f6e4215fef}{WASM\+::magic\+Number}} =0x6d736100
+, \mbox{\hyperlink{namespace_w_a_s_m_a1dd643d884eb689b962a1968c20c0aeda3ef5b77745b11c45a15157020d475495}{WASM\+::current\+Version}} =1
+ \}
+\item 
+enum class \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103}{WASM\+::\+Section\+Type}} \+: U8 \{ \newline
+\mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103aad921d60486366258809553a3db49a4a}{WASM\+::unknown}} = 0
+, \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103aee11cbb19052e40b07aac0ca060c23ee}{WASM\+::user}} = 0
+, \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a599dcce2998a6b40b1e38e8c6006cb0a}{WASM\+::type}} = 1
+, \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a93473a7344419b15c4219cc2b6c64c6f}{WASM\+::import}} = 2
+, \newline
+\mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a5af5f8933f9e926d7ee5d34fbbccffc2}{WASM\+::function\+Declarations}} = 3
+, \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103aaab9e1de16f38176f86d7a92ba337a8d}{WASM\+::table}} = 4
+, \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103acd69b4957f06cd818d7bf3d61980e291}{WASM\+::memory}} = 5
+, \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a9c70933aff6b2a6d08c687a6cbb6b765}{WASM\+::global}} = 6
+, \newline
+\mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a0583300c259450db57fd2307fc84a673}{WASM\+::export\+\_\+}} = 7
+, \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103aea2b2676c28c0db26d39331a336c6b92}{WASM\+::start}} = 8
+, \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a3babe96d0bef4b896401917f1f6035fe}{WASM\+::elem}} = 9
+, \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a453fc2aabafc53f7c3db407e1d522d6f}{WASM\+::function\+Definitions}} = 10
+, \newline
+\mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a8d777f385d3dfec8815d20f7496026dc}{WASM\+::data}} = 11
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespace_i_r_afac891781684998f67dfba2c45bfed39}{IR\+::serialize}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{Value\+Type}} \&type)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespace_i_r_afb187751bb8f41737d23ccdbb779ee9a}{IR\+::serialize}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, \mbox{\hyperlink{struct_i_r_1_1_size_constraints}{Size\+Constraints}} \&size\+Constraints, bool has\+Max)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespace_i_r_ac94f05a65a2c5f05e640992ee319e2aa}{IR\+::serialize}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, \mbox{\hyperlink{namespace_i_r_a938516f231745a922740359bd3bdbc25}{Table\+Element\+Type}} \&element\+Type)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespace_i_r_a3d81722d03f5f55570d3a180f1842583}{IR\+::serialize}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, \mbox{\hyperlink{struct_i_r_1_1_table_type}{Table\+Type}} \&table\+Type)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespace_i_r_aa13c6eb2464940110234ccc6ded3144e}{IR\+::serialize}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, \mbox{\hyperlink{struct_i_r_1_1_memory_type}{Memory\+Type}} \&memory\+Type)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespace_i_r_af0497266cf38a27c97c57f646f76f2b5}{IR\+::serialize}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, \mbox{\hyperlink{struct_i_r_1_1_global_type}{Global\+Type}} \&global\+Type)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespace_i_r_a7ad5b4e51120e17aeed2a561cf98c7c1}{IR\+::serialize}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908}{Object\+Kind}} \&kind)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespace_i_r_a03bbf63216de460be26d5988ad96ffa4}{IR\+::serialize}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, \mbox{\hyperlink{struct_i_r_1_1_export}{Export}} \&e)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespace_i_r_aa15e268e37d71631e4a713c900edfc66}{IR\+::serialize}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, \mbox{\hyperlink{struct_i_r_1_1_initializer_expression}{Initializer\+Expression}} \&initializer)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespace_i_r_a6f9dd3b8cb2ee80fc40918ff42ea6b66}{IR\+::serialize}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, \mbox{\hyperlink{struct_i_r_1_1_table_def}{Table\+Def}} \&table\+Def)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespace_i_r_a748cb9a1be03a438717374a704093513}{IR\+::serialize}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, \mbox{\hyperlink{struct_i_r_1_1_memory_def}{Memory\+Def}} \&memory\+Def)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespace_i_r_ad5eb743aa80e51f2e41c28357de2f06f}{IR\+::serialize}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, \mbox{\hyperlink{struct_i_r_1_1_global_def}{Global\+Def}} \&global\+Def)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespace_i_r_a3a4e335d4f98997fc5ff425462ddd03e}{IR\+::serialize}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, \mbox{\hyperlink{struct_i_r_1_1_data_segment}{Data\+Segment}} \&data\+Segment)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespace_i_r_a05a2c3b109719e1078b317be9a0c0d72}{IR\+::serialize}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, \mbox{\hyperlink{struct_i_r_1_1_table_segment}{Table\+Segment}} \&table\+Segment)
+\item 
+\mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_a724fb9f82013c782db5c3c12ea36aac8}{FORCEINLINE}} void \mbox{\hyperlink{namespace_w_a_s_m_a742f948b1d94c2a4cbe0acd734850457}{WASM\+::serialize}} (\mbox{\hyperlink{struct_serialization_1_1_input_stream}{Input\+Stream}} \&stream, \mbox{\hyperlink{namespace_i_r_a59653fd60bb296de971e5f945c66933a}{Opcode}} \&opcode)
+\item 
+\mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_a724fb9f82013c782db5c3c12ea36aac8}{FORCEINLINE}} void \mbox{\hyperlink{namespace_w_a_s_m_afdf95d35a7a9f688f860f6ea59452f38}{WASM\+::serialize}} (\mbox{\hyperlink{struct_serialization_1_1_output_stream}{Output\+Stream}} \&stream, \mbox{\hyperlink{namespace_i_r_a59653fd60bb296de971e5f945c66933a}{Opcode}} opcode)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespace_w_a_s_m_a6e3e783f62d106df748bc0b812614b9a}{WASM\+::serialize}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, \mbox{\hyperlink{struct_i_r_1_1_no_imm}{No\+Imm}} \&, const \mbox{\hyperlink{struct_i_r_1_1_function_def}{Function\+Def}} \&)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespace_w_a_s_m_af5c4b6126029bdff4c6f7d35348d3eda}{WASM\+::serialize}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, \mbox{\hyperlink{struct_i_r_1_1_control_structure_imm}{Control\+Structure\+Imm}} \&imm, const \mbox{\hyperlink{struct_i_r_1_1_function_def}{Function\+Def}} \&)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespace_w_a_s_m_a73e0e01aeca8f546e5564452f9c0616c}{WASM\+::serialize}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, \mbox{\hyperlink{struct_i_r_1_1_branch_imm}{Branch\+Imm}} \&imm, const \mbox{\hyperlink{struct_i_r_1_1_function_def}{Function\+Def}} \&)
+\item 
+void \mbox{\hyperlink{namespace_w_a_s_m_a073b4ff44a63c4dc1ae0842407ef7a0a}{WASM\+::serialize}} (\mbox{\hyperlink{struct_serialization_1_1_input_stream}{Input\+Stream}} \&stream, \mbox{\hyperlink{struct_i_r_1_1_branch_table_imm}{Branch\+Table\+Imm}} \&imm, \mbox{\hyperlink{struct_i_r_1_1_function_def}{Function\+Def}} \&function\+Def)
+\item 
+void \mbox{\hyperlink{namespace_w_a_s_m_a1b6b9e47a9ace8d428dbd5f75968221f}{WASM\+::serialize}} (\mbox{\hyperlink{struct_serialization_1_1_output_stream}{Output\+Stream}} \&stream, \mbox{\hyperlink{struct_i_r_1_1_branch_table_imm}{Branch\+Table\+Imm}} \&imm, \mbox{\hyperlink{struct_i_r_1_1_function_def}{Function\+Def}} \&function\+Def)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespace_w_a_s_m_ad9775e26e237d66682cef962d12b0c97}{WASM\+::serialize}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, \mbox{\hyperlink{struct_i_r_1_1_literal_imm}{Literal\+Imm}}$<$ \mbox{\hyperlink{_basic_types_8h_a2f1a62071dd7dc3f6ef85c1b7612dc35}{I32}} $>$ \&imm, const \mbox{\hyperlink{struct_i_r_1_1_function_def}{Function\+Def}} \&)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespace_w_a_s_m_a4448ed7f411d9cf05afe03e30a10cf97}{WASM\+::serialize}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, \mbox{\hyperlink{struct_i_r_1_1_literal_imm}{Literal\+Imm}}$<$ \mbox{\hyperlink{_basic_types_8h_a416b74ff5b1dc365af5713a3f48fb8b9}{I64}} $>$ \&imm, const \mbox{\hyperlink{struct_i_r_1_1_function_def}{Function\+Def}} \&)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , bool is\+Global$>$ }\\void \mbox{\hyperlink{namespace_w_a_s_m_aa5f65bede1572740405c4c5d2cbd1afa}{WASM\+::serialize}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, \mbox{\hyperlink{struct_i_r_1_1_get_or_set_variable_imm}{Get\+Or\+Set\+Variable\+Imm}}$<$ is\+Global $>$ \&imm, const \mbox{\hyperlink{struct_i_r_1_1_function_def}{Function\+Def}} \&)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespace_w_a_s_m_a049b8c97b8f78c7bcb074846e9bc25d6}{WASM\+::serialize}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, \mbox{\hyperlink{struct_i_r_1_1_call_imm}{Call\+Imm}} \&imm, const \mbox{\hyperlink{struct_i_r_1_1_function_def}{Function\+Def}} \&)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespace_w_a_s_m_aecd913aa480dfa7e6c488d4ddd8adda7}{WASM\+::serialize}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, \mbox{\hyperlink{struct_i_r_1_1_call_indirect_imm}{Call\+Indirect\+Imm}} \&imm, const \mbox{\hyperlink{struct_i_r_1_1_function_def}{Function\+Def}} \&)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} natural\+Alignment\+Log2$>$ }\\void \mbox{\hyperlink{namespace_w_a_s_m_a2993626de412b4253b02d5ca72d836eb}{WASM\+::serialize}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, \mbox{\hyperlink{struct_i_r_1_1_load_or_store_imm}{Load\+Or\+Store\+Imm}}$<$ natural\+Alignment\+Log2 $>$ \&imm, const \mbox{\hyperlink{struct_i_r_1_1_function_def}{Function\+Def}} \&)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespace_w_a_s_m_ac84201a4365ce1236b6a1142358c678f}{WASM\+::serialize}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, \mbox{\hyperlink{struct_i_r_1_1_memory_imm}{Memory\+Imm}} \&imm, const \mbox{\hyperlink{struct_i_r_1_1_function_def}{Function\+Def}} \&)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} $>$ }\\void \mbox{\hyperlink{namespace_w_a_s_m_aae246e3e3365ac6296aa39047ac755d0}{WASM\+::serialize}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, \mbox{\hyperlink{struct_i_r_1_1_literal_imm}{Literal\+Imm}}$<$ \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} $>$ \&imm, const \mbox{\hyperlink{struct_i_r_1_1_function_def}{Function\+Def}} \&)
+\item 
+{\footnotesize template$<$typename Serialize\+Section $>$ }\\void \mbox{\hyperlink{namespace_w_a_s_m_aabc6a5be38bb15441f53d566f8ecbbeb}{WASM\+::serialize\+Section}} (\mbox{\hyperlink{struct_serialization_1_1_output_stream}{Output\+Stream}} \&stream, \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103}{Section\+Type}} \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103a599dcce2998a6b40b1e38e8c6006cb0a}{type}}, Serialize\+Section serialize\+Section\+Body)
+\item 
+{\footnotesize template$<$typename Serialize\+Section $>$ }\\void \mbox{\hyperlink{namespace_w_a_s_m_a8ceede50aa3c17d3df5969770845fda9}{WASM\+::serialize\+Section}} (\mbox{\hyperlink{struct_serialization_1_1_input_stream}{Input\+Stream}} \&stream, \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103}{Section\+Type}} expected\+Type, Serialize\+Section serialize\+Section\+Body)
+\item 
+void \mbox{\hyperlink{namespace_w_a_s_m_af513a9281bd3b9f9c0bce371ff167bdc}{WASM\+::serialize}} (\mbox{\hyperlink{struct_serialization_1_1_output_stream}{Output\+Stream}} \&stream, \mbox{\hyperlink{struct_i_r_1_1_user_section}{User\+Section}} \&user\+Section)
+\item 
+void \mbox{\hyperlink{namespace_w_a_s_m_ab6cc6958fd5008e16bd683ddc1965534}{WASM\+::serialize}} (\mbox{\hyperlink{struct_serialization_1_1_input_stream}{Input\+Stream}} \&stream, \mbox{\hyperlink{struct_i_r_1_1_user_section}{User\+Section}} \&user\+Section)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespace_w_a_s_m_a7c8ae54f291571f1857a49fa9a3d9cff}{WASM\+::serialize}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, \mbox{\hyperlink{struct_w_a_s_m_1_1_local_set}{Local\+Set}} \&local\+Set)
+\item 
+void \mbox{\hyperlink{namespace_w_a_s_m_a62089062afa72073b56defb5a08e4e77}{WASM\+::serialize\+Function\+Body}} (\mbox{\hyperlink{struct_serialization_1_1_output_stream}{Output\+Stream}} \&section\+Stream, \mbox{\hyperlink{struct_i_r_1_1_module}{Module}} \&\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}, \mbox{\hyperlink{struct_i_r_1_1_function_def}{Function\+Def}} \&function\+Def)
+\item 
+void \mbox{\hyperlink{namespace_w_a_s_m_ae071fd38b6019bc796306c226b54c2f2}{WASM\+::serialize\+Function\+Body}} (\mbox{\hyperlink{struct_serialization_1_1_input_stream}{Input\+Stream}} \&section\+Stream, \mbox{\hyperlink{struct_i_r_1_1_module}{Module}} \&\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}, \mbox{\hyperlink{struct_i_r_1_1_function_def}{Function\+Def}} \&function\+Def)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespace_w_a_s_m_a19223e3218c107143a01bd7d592881f7}{WASM\+::serialize\+Type\+Section}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&module\+Stream, \mbox{\hyperlink{struct_i_r_1_1_module}{Module}} \&\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespace_w_a_s_m_aaa4bd7164d7c2fb5ddf640b2512c6b0a}{WASM\+::serialize\+Import\+Section}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&module\+Stream, \mbox{\hyperlink{struct_i_r_1_1_module}{Module}} \&\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespace_w_a_s_m_afe03ecc4e50340ccea6532a639d3be00}{WASM\+::serialize\+Function\+Section}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&module\+Stream, \mbox{\hyperlink{struct_i_r_1_1_module}{Module}} \&\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespace_w_a_s_m_ac12290c76c5ce4237c95bb4f160f6095}{WASM\+::serialize\+Table\+Section}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&module\+Stream, \mbox{\hyperlink{struct_i_r_1_1_module}{Module}} \&\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespace_w_a_s_m_a761ce5f46418df56f21838eebd355768}{WASM\+::serialize\+Memory\+Section}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&module\+Stream, \mbox{\hyperlink{struct_i_r_1_1_module}{Module}} \&\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespace_w_a_s_m_a161054d9e108a3b08c1f32ff86d502e7}{WASM\+::serialize\+Global\+Section}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&module\+Stream, \mbox{\hyperlink{struct_i_r_1_1_module}{Module}} \&\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespace_w_a_s_m_a555cee388b6a7bac029fe6e33b5681b9}{WASM\+::serialize\+Export\+Section}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&module\+Stream, \mbox{\hyperlink{struct_i_r_1_1_module}{Module}} \&\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespace_w_a_s_m_a364aaa3c6db06df2d762bbdd0f96034a}{WASM\+::serialize\+Start\+Section}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&module\+Stream, \mbox{\hyperlink{struct_i_r_1_1_module}{Module}} \&\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespace_w_a_s_m_a26a4605a2170e608c42a0a95d62b6b05}{WASM\+::serialize\+Element\+Section}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&module\+Stream, \mbox{\hyperlink{struct_i_r_1_1_module}{Module}} \&\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespace_w_a_s_m_a9cec8472a02df3e7d8badd9fbe927899}{WASM\+::serialize\+Code\+Section}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&module\+Stream, \mbox{\hyperlink{struct_i_r_1_1_module}{Module}} \&\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespace_w_a_s_m_ae661da00b54008a553e8b357a85ba9f4}{WASM\+::serialize\+Data\+Section}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&module\+Stream, \mbox{\hyperlink{struct_i_r_1_1_module}{Module}} \&\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}})
+\item 
+void \mbox{\hyperlink{namespace_w_a_s_m_a33bbb5a7b429d0050a0a8b7615f9291b}{WASM\+::serialize\+Module}} (\mbox{\hyperlink{struct_serialization_1_1_output_stream}{Output\+Stream}} \&module\+Stream, \mbox{\hyperlink{struct_i_r_1_1_module}{Module}} \&\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}})
+\item 
+void \mbox{\hyperlink{namespace_w_a_s_m_a4b9dd447416e75d8a61736f81f250e7a}{WASM\+::serialize\+Module}} (\mbox{\hyperlink{struct_serialization_1_1_input_stream}{Input\+Stream}} \&module\+Stream, \mbox{\hyperlink{struct_i_r_1_1_module}{Module}} \&\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}})
+\item 
+\mbox{\hyperlink{_w_a_s_m_8h_afc9ce6deeb157b0638e2e03495aa1831}{WEBASSEMBLY\+\_\+\+API}} void \mbox{\hyperlink{namespace_w_a_s_m_a68fb78f7c4e19b54892500f5111620dd}{WASM\+::serialize}} (\mbox{\hyperlink{struct_serialization_1_1_input_stream}{Serialization\+::\+Input\+Stream}} \&stream, \mbox{\hyperlink{struct_i_r_1_1_module}{IR\+::\+Module}} \&\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}})
+\item 
+\mbox{\hyperlink{_w_a_s_m_8h_afc9ce6deeb157b0638e2e03495aa1831}{WEBASSEMBLY\+\_\+\+API}} void \mbox{\hyperlink{namespace_w_a_s_m_ac6b513c420b9f3e7b1da89381a0a6bf4}{WASM\+::serialize}} (\mbox{\hyperlink{struct_serialization_1_1_output_stream}{Serialization\+::\+Output\+Stream}} \&stream, const \mbox{\hyperlink{struct_i_r_1_1_module}{IR\+::\+Module}} \&\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{_w_a_s_m_serialization_8cpp_a0d04d0b7b632d732f24972574f4bde51}\index{WASMSerialization.cpp@{WASMSerialization.cpp}!VISIT\_OPCODE@{VISIT\_OPCODE}}
+\index{VISIT\_OPCODE@{VISIT\_OPCODE}!WASMSerialization.cpp@{WASMSerialization.cpp}}
+\doxysubsubsection{\texorpdfstring{VISIT\_OPCODE}{VISIT\_OPCODE}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{_w_a_s_m_serialization_8cpp_a0d04d0b7b632d732f24972574f4bde51} 
+\#define VISIT\+\_\+\+OPCODE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{localize_8hpp_a6554a5ea005e85d0f84f2f34c11de938}{\+\_\+}}}{, }\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{name\+String}{, }\item[{}]{Imm}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(Imm\ imm)\ \textcolor{keyword}{const}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Opcode\ opcode\ =\ Opcode::name;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ serialize(byteStream,opcode);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ serialize(byteStream,imm,functionDef);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{_w_a_s_m_serialization_8cpp_source_l00427}{427}} of file \mbox{\hyperlink{_w_a_s_m_serialization_8cpp_source}{WASMSerialization.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00427\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#define\ VISIT\_OPCODE(\_,name,nameString,Imm,...)\ \(\backslash\)}}
+\DoxyCodeLine{00428\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ void\ name(Imm\ imm)\ const\ \(\backslash\)}}
+\DoxyCodeLine{00429\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \{\ \(\backslash\)}}
+\DoxyCodeLine{00430\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Opcode\ opcode\ =\ Opcode::name;\ \(\backslash\)}}
+\DoxyCodeLine{00431\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ serialize(byteStream,opcode);\ \(\backslash\)}}
+\DoxyCodeLine{00432\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ serialize(byteStream,imm,functionDef);\ \(\backslash\)}}
+\DoxyCodeLine{00433\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \}}}
+
+\end{DoxyCode}
+\Hypertarget{_w_a_s_m_serialization_8cpp_a0d04d0b7b632d732f24972574f4bde51}\index{WASMSerialization.cpp@{WASMSerialization.cpp}!VISIT\_OPCODE@{VISIT\_OPCODE}}
+\index{VISIT\_OPCODE@{VISIT\_OPCODE}!WASMSerialization.cpp@{WASMSerialization.cpp}}
+\doxysubsubsection{\texorpdfstring{VISIT\_OPCODE}{VISIT\_OPCODE}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{_w_a_s_m_serialization_8cpp_a0d04d0b7b632d732f24972574f4bde51} 
+\#define VISIT\+\_\+\+OPCODE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{localize_8hpp_a6554a5ea005e85d0f84f2f34c11de938}{\+\_\+}}}{, }\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{name\+String}{, }\item[{}]{Imm}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ Opcode::name:\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Imm\ imm;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ serialize(bodyStream,imm,functionDef);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ codeValidationStream.name(imm);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ irEncoderStream.name(imm);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{_w_a_s_m_serialization_8cpp_source_l00427}{427}} of file \mbox{\hyperlink{_w_a_s_m_serialization_8cpp_source}{WASMSerialization.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00427\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#define\ VISIT\_OPCODE(\_,name,nameString,Imm,...)\ \(\backslash\)}}
+\DoxyCodeLine{00428\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ void\ name(Imm\ imm)\ const\ \(\backslash\)}}
+\DoxyCodeLine{00429\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \{\ \(\backslash\)}}
+\DoxyCodeLine{00430\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Opcode\ opcode\ =\ Opcode::name;\ \(\backslash\)}}
+\DoxyCodeLine{00431\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ serialize(byteStream,opcode);\ \(\backslash\)}}
+\DoxyCodeLine{00432\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ serialize(byteStream,imm,functionDef);\ \(\backslash\)}}
+\DoxyCodeLine{00433\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \}}}
+
+\end{DoxyCode}

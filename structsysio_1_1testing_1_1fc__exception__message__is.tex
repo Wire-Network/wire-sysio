@@ -1,0 +1,103 @@
+\doxysection{sysio\+::testing\+::fc\+\_\+exception\+\_\+message\+\_\+is Struct Reference}
+\hypertarget{structsysio_1_1testing_1_1fc__exception__message__is}{}\label{structsysio_1_1testing_1_1fc__exception__message__is}\index{sysio::testing::fc\_exception\_message\_is@{sysio::testing::fc\_exception\_message\_is}}
+
+
+{\ttfamily \#include $<$tester.\+hpp$>$}
+
+
+
+Collaboration diagram for sysio\+::testing\+::fc\+\_\+exception\+\_\+message\+\_\+is\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=201pt]{structsysio_1_1testing_1_1fc__exception__message__is__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1testing_1_1fc__exception__message__is_af7e27ad00da99078dcfbe7dc65312c9e}{fc\+\_\+exception\+\_\+message\+\_\+is}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&msg)
+\item 
+bool \mbox{\hyperlink{structsysio_1_1testing_1_1fc__exception__message__is_aaf8d523f1b374e3daa01c8c43c689f0e}{operator()}} (const \mbox{\hyperlink{classfc_1_1exception}{fc\+::exception}} \&ex)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structsysio_1_1testing_1_1fc__exception__message__is_ae4632a645bf9145e32103d7902b85dc0}{expected}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Utility predicate to check whether an \doxylink{classfc_1_1exception}{fc\+::exception} message is equivalent to a given string 
+
+Definition at line \mbox{\hyperlink{tester_8hpp_source_l00655}{655}} of file \mbox{\hyperlink{tester_8hpp_source}{tester.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structsysio_1_1testing_1_1fc__exception__message__is_af7e27ad00da99078dcfbe7dc65312c9e}\index{sysio::testing::fc\_exception\_message\_is@{sysio::testing::fc\_exception\_message\_is}!fc\_exception\_message\_is@{fc\_exception\_message\_is}}
+\index{fc\_exception\_message\_is@{fc\_exception\_message\_is}!sysio::testing::fc\_exception\_message\_is@{sysio::testing::fc\_exception\_message\_is}}
+\doxysubsubsection{\texorpdfstring{fc\_exception\_message\_is()}{fc\_exception\_message\_is()}}
+{\footnotesize\ttfamily \label{structsysio_1_1testing_1_1fc__exception__message__is_af7e27ad00da99078dcfbe7dc65312c9e} 
+sysio\+::testing\+::fc\+\_\+exception\+\_\+message\+\_\+is\+::fc\+\_\+exception\+\_\+message\+\_\+is (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&}]{msg}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{tester_8hpp_source_l00656}{656}} of file \mbox{\hyperlink{tester_8hpp_source}{tester.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00657\ \ \ \ \ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{structsysio_1_1testing_1_1fc__exception__message__is_ae4632a645bf9145e32103d7902b85dc0}{expected}}(\ msg\ )\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1testing_1_1fc__exception__message__is_aaf8d523f1b374e3daa01c8c43c689f0e}\index{sysio::testing::fc\_exception\_message\_is@{sysio::testing::fc\_exception\_message\_is}!operator()@{operator()}}
+\index{operator()@{operator()}!sysio::testing::fc\_exception\_message\_is@{sysio::testing::fc\_exception\_message\_is}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}}
+{\footnotesize\ttfamily \label{structsysio_1_1testing_1_1fc__exception__message__is_aaf8d523f1b374e3daa01c8c43c689f0e} 
+bool sysio\+::testing\+::fc\+\_\+exception\+\_\+message\+\_\+is\+::operator() (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1exception}{fc\+::exception}} \&}]{ex}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{tester_8cpp_source_l01200}{1200}} of file \mbox{\hyperlink{tester_8cpp_source}{tester.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01200\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01201\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ message\ =\ ex.\mbox{\hyperlink{classfc_1_1exception_a70b72c1e4fe0d17485a8b7a0a6f397de}{get\_log}}().at(\ 0\ ).get\_message();}
+\DoxyCodeLine{01202\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ match\ =\ (message\ ==\ \mbox{\hyperlink{structsysio_1_1testing_1_1fc__exception__message__is_ae4632a645bf9145e32103d7902b85dc0}{expected}});}
+\DoxyCodeLine{01203\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !match\ )\ \{}
+\DoxyCodeLine{01204\ \ \ \ \ \ \ \ \ \ BOOST\_TEST\_MESSAGE(\ \textcolor{stringliteral}{"{}LOG:\ expected:\ "{}}\ <<\ \mbox{\hyperlink{structsysio_1_1testing_1_1fc__exception__message__is_ae4632a645bf9145e32103d7902b85dc0}{expected}}\ <<\ \textcolor{stringliteral}{"{},\ actual:\ "{}}\ <<\ message\ );}
+\DoxyCodeLine{01205\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01206\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ match;}
+\DoxyCodeLine{01207\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=347pt]{structsysio_1_1testing_1_1fc__exception__message__is_aaf8d523f1b374e3daa01c8c43c689f0e_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1testing_1_1fc__exception__message__is_ae4632a645bf9145e32103d7902b85dc0}\index{sysio::testing::fc\_exception\_message\_is@{sysio::testing::fc\_exception\_message\_is}!expected@{expected}}
+\index{expected@{expected}!sysio::testing::fc\_exception\_message\_is@{sysio::testing::fc\_exception\_message\_is}}
+\doxysubsubsection{\texorpdfstring{expected}{expected}}
+{\footnotesize\ttfamily \label{structsysio_1_1testing_1_1fc__exception__message__is_ae4632a645bf9145e32103d7902b85dc0} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::testing\+::fc\+\_\+exception\+\_\+message\+\_\+is\+::expected}
+
+
+
+Definition at line \mbox{\hyperlink{tester_8hpp_source_l00661}{661}} of file \mbox{\hyperlink{tester_8hpp_source}{tester.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/testing/include/sysio/testing/\mbox{\hyperlink{tester_8hpp}{tester.\+hpp}}\item 
+libraries/testing/\mbox{\hyperlink{tester_8cpp}{tester.\+cpp}}\end{DoxyCompactItemize}

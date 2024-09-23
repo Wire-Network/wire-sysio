@@ -1,0 +1,162 @@
+\doxysection{CLI\+::Config Class Reference}
+\hypertarget{class_c_l_i_1_1_config}{}\label{class_c_l_i_1_1_config}\index{CLI::Config@{CLI::Config}}
+
+
+This class provides a converter for configuration files.  
+
+
+
+
+{\ttfamily \#include $<$CLI11.\+hpp$>$}
+
+
+
+Inheritance diagram for CLI\+::Config\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=173pt]{class_c_l_i_1_1_config__inherit__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual std\+::string \mbox{\hyperlink{class_c_l_i_1_1_config_a516815ecb20f72816caeab5049d0873d}{to\+\_\+config}} (const \mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \texorpdfstring{$\ast$}{*}, bool, bool, std\+::string) const =0
+\begin{DoxyCompactList}\small\item\em Convert an app into a configuration. \end{DoxyCompactList}\item 
+virtual std\+::vector$<$ \mbox{\hyperlink{struct_c_l_i_1_1_config_item}{Config\+Item}} $>$ \mbox{\hyperlink{class_c_l_i_1_1_config_af08741b7aa795644af5491faf04a0b2e}{from\+\_\+config}} (std\+::istream \&) const =0
+\begin{DoxyCompactList}\small\item\em Convert a configuration into an app. \end{DoxyCompactList}\item 
+virtual std\+::string \mbox{\hyperlink{class_c_l_i_1_1_config_affac2102274c1a09c0e08b2c9410b57f}{to\+\_\+flag}} (const \mbox{\hyperlink{struct_c_l_i_1_1_config_item}{Config\+Item}} \&item) const
+\begin{DoxyCompactList}\small\item\em Get a flag value. \end{DoxyCompactList}\item 
+std\+::vector$<$ \mbox{\hyperlink{struct_c_l_i_1_1_config_item}{Config\+Item}} $>$ \mbox{\hyperlink{class_c_l_i_1_1_config_a2581bc51c6f5bba2f07d0d696c1170c4}{from\+\_\+file}} (const std\+::string \&\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})
+\begin{DoxyCompactList}\small\item\em Parse a config file, throw an error (\doxylink{class_c_l_i_1_1_parse_error}{Parse\+Error}\+:Config\+Parse\+Error or \doxylink{class_c_l_i_1_1_file_error}{File\+Error}) on failure. \end{DoxyCompactList}\item 
+virtual \mbox{\hyperlink{class_c_l_i_1_1_config_adf504285455f78fb1595d2ddad1cb626}{\texorpdfstring{$\sim$}{\string~}\+Config}} ()=default
+\begin{DoxyCompactList}\small\item\em Virtual destructor. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::vector$<$ \mbox{\hyperlink{struct_c_l_i_1_1_config_item}{Config\+Item}} $>$ \mbox{\hyperlink{class_c_l_i_1_1_config_a44be58c62906c58a118d8a3bf0f2a312}{items}} \{\}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l01982}{1982}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_c_l_i_1_1_config_adf504285455f78fb1595d2ddad1cb626}\index{CLI::Config@{CLI::Config}!````~Config@{\texorpdfstring{$\sim$}{\string~}Config}}
+\index{````~Config@{\texorpdfstring{$\sim$}{\string~}Config}!CLI::Config@{CLI::Config}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}Config()}{\string~Config()}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_config_adf504285455f78fb1595d2ddad1cb626} 
+virtual CLI\+::\+Config\+::\texorpdfstring{$\sim$}{\string~}\+Config (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}, {\ttfamily [default]}}
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_c_l_i_1_1_config_af08741b7aa795644af5491faf04a0b2e}\index{CLI::Config@{CLI::Config}!from\_config@{from\_config}}
+\index{from\_config@{from\_config}!CLI::Config@{CLI::Config}}
+\doxysubsubsection{\texorpdfstring{from\_config()}{from\_config()}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_config_af08741b7aa795644af5491faf04a0b2e} 
+virtual std\+::vector$<$ \mbox{\hyperlink{struct_c_l_i_1_1_config_item}{Config\+Item}} $>$ CLI\+::\+Config\+::from\+\_\+config (\begin{DoxyParamCaption}\item[{std\+::istream \&}]{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{class_c_l_i_1_1_config_base_a1395eecde5af65b73e3670529df0e17b}{CLI\+::\+Config\+Base}}.
+
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=349pt]{class_c_l_i_1_1_config_af08741b7aa795644af5491faf04a0b2e_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_c_l_i_1_1_config_a2581bc51c6f5bba2f07d0d696c1170c4}\index{CLI::Config@{CLI::Config}!from\_file@{from\_file}}
+\index{from\_file@{from\_file}!CLI::Config@{CLI::Config}}
+\doxysubsubsection{\texorpdfstring{from\_file()}{from\_file()}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_config_a2581bc51c6f5bba2f07d0d696c1170c4} 
+std\+::vector$<$ \mbox{\hyperlink{struct_c_l_i_1_1_config_item}{Config\+Item}} $>$ CLI\+::\+Config\+::from\+\_\+file (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{name}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l02002}{2002}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02002\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02003\ \ \ \ \ \ \ \ \ std::ifstream\ input\{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\};}
+\DoxyCodeLine{02004\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!input.good())}
+\DoxyCodeLine{02005\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ FileError::Missing(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}});}
+\DoxyCodeLine{02006\ }
+\DoxyCodeLine{02007\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_c_l_i_1_1_config_af08741b7aa795644af5491faf04a0b2e}{from\_config}}(input);}
+\DoxyCodeLine{02008\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=349pt]{class_c_l_i_1_1_config_a2581bc51c6f5bba2f07d0d696c1170c4_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_c_l_i_1_1_config_a516815ecb20f72816caeab5049d0873d}\index{CLI::Config@{CLI::Config}!to\_config@{to\_config}}
+\index{to\_config@{to\_config}!CLI::Config@{CLI::Config}}
+\doxysubsubsection{\texorpdfstring{to\_config()}{to\_config()}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_config_a516815ecb20f72816caeab5049d0873d} 
+virtual std\+::string CLI\+::\+Config\+::to\+\_\+config (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \texorpdfstring{$\ast$}{*}}]{}{, }\item[{bool}]{}{, }\item[{bool}]{}{, }\item[{std\+::string}]{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{class_c_l_i_1_1_config_base_a5832f6f03212648fa08a8ff83bc9bc08}{CLI\+::\+Config\+Base}}.
+
+\Hypertarget{class_c_l_i_1_1_config_affac2102274c1a09c0e08b2c9410b57f}\index{CLI::Config@{CLI::Config}!to\_flag@{to\_flag}}
+\index{to\_flag@{to\_flag}!CLI::Config@{CLI::Config}}
+\doxysubsubsection{\texorpdfstring{to\_flag()}{to\_flag()}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_config_affac2102274c1a09c0e08b2c9410b57f} 
+virtual std\+::string CLI\+::\+Config\+::to\+\_\+flag (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct_c_l_i_1_1_config_item}{Config\+Item}} \&}]{item}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l01994}{1994}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01994\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01995\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(item.inputs.size()\ ==\ 1)\ \{}
+\DoxyCodeLine{01996\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ item.inputs.at(0);}
+\DoxyCodeLine{01997\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01998\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ ConversionError::TooManyInputsFlag(item.fullname());}
+\DoxyCodeLine{01999\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_c_l_i_1_1_config_affac2102274c1a09c0e08b2c9410b57f_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{class_c_l_i_1_1_config_a44be58c62906c58a118d8a3bf0f2a312}\index{CLI::Config@{CLI::Config}!items@{items}}
+\index{items@{items}!CLI::Config@{CLI::Config}}
+\doxysubsubsection{\texorpdfstring{items}{items}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_config_a44be58c62906c58a118d8a3bf0f2a312} 
+std\+::vector$<$\mbox{\hyperlink{struct_c_l_i_1_1_config_item}{Config\+Item}}$>$ CLI\+::\+Config\+::items \{\}\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l01984}{1984}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01984\ \{\};}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+programs/clio/\mbox{\hyperlink{_c_l_i11_8hpp}{CLI11.\+hpp}}\end{DoxyCompactItemize}

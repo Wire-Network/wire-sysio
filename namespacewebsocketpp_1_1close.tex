@@ -1,0 +1,136 @@
+\doxysection{websocketpp\+::close Namespace Reference}
+\hypertarget{namespacewebsocketpp_1_1close}{}\label{namespacewebsocketpp_1_1close}\index{websocketpp::close@{websocketpp::close}}
+
+
+\doxylink{struct_a}{A} package of types and methods for manipulating Web\+Socket close codes.  
+
+
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacewebsocketpp_1_1close_1_1status}{status}}
+\begin{DoxyCompactList}\small\item\em \doxylink{struct_a}{A} package of types and methods for manipulating Web\+Socket close status\textquotesingle{}. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+union \mbox{\hyperlink{unionwebsocketpp_1_1close_1_1code__converter}{code\+\_\+converter}}
+\begin{DoxyCompactList}\small\item\em Type used to convert close statuses between integer and wire representations. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacewebsocketpp_1_1close_1_1status_a8614a5c4733d708e2d2a32191c5bef84}{status\+::value}} \mbox{\hyperlink{namespacewebsocketpp_1_1close_aa47dacf7d2e13705d1f68d9ab5b9dad0}{extract\+\_\+code}} (std\+::string const \&payload, lib\+::error\+\_\+code \&ec)
+\begin{DoxyCompactList}\small\item\em Extract a close code value from a close payload. \end{DoxyCompactList}\item 
+std\+::string \mbox{\hyperlink{namespacewebsocketpp_1_1close_a537f66833c7b6e745b3cf5dc0252c0ca}{extract\+\_\+reason}} (std\+::string const \&payload, lib\+::error\+\_\+code \&ec)
+\begin{DoxyCompactList}\small\item\em Extract the reason string from a close payload. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacewebsocketpp_1_1close_aa47dacf7d2e13705d1f68d9ab5b9dad0}\index{websocketpp::close@{websocketpp::close}!extract\_code@{extract\_code}}
+\index{extract\_code@{extract\_code}!websocketpp::close@{websocketpp::close}}
+\doxysubsubsection{\texorpdfstring{extract\_code()}{extract\_code()}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1close_aa47dacf7d2e13705d1f68d9ab5b9dad0} 
+\mbox{\hyperlink{namespacewebsocketpp_1_1close_1_1status_a8614a5c4733d708e2d2a32191c5bef84}{status\+::value}} websocketpp\+::close\+::extract\+\_\+code (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{payload}{, }\item[{lib\+::error\+\_\+code \&}]{ec}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+If there is no close value (ie string is empty) status\+::no\+\_\+status is returned. If a code couldn\textquotesingle{}t be extracted (usually do to a short or otherwise mangled payload) status\+::protocol\+\_\+error is returned and the ec value is flagged as an error. Note that this case is different than the case where protocol error is received over the wire.
+
+If the value is in an invalid or reserved range ec is set accordingly.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em payload} & Close frame payload value received over the wire. \\
+\hline
+\mbox{\texttt{ out}}  & {\em ec} & Set to indicate what error occurred, if any. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The extracted value 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{close_8hpp_source_l00283}{283}} of file \mbox{\hyperlink{close_8hpp_source}{close.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00285\ \{}
+\DoxyCodeLine{00286\ \ \ \ \ ec\ =\ lib::error\_code();}
+\DoxyCodeLine{00287\ }
+\DoxyCodeLine{00288\ \ \ \ \ \textcolor{keywordflow}{if}\ (payload.size()\ ==\ 0)\ \{}
+\DoxyCodeLine{00289\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ status::no\_status;}
+\DoxyCodeLine{00290\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (payload.size()\ ==\ 1)\ \{}
+\DoxyCodeLine{00291\ \ \ \ \ \ \ \ \ ec\ =\ make\_error\_code(error::bad\_close\_code);}
+\DoxyCodeLine{00292\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ status::protocol\_error;}
+\DoxyCodeLine{00293\ \ \ \ \ \}}
+\DoxyCodeLine{00294\ }
+\DoxyCodeLine{00295\ \ \ \ \ code\_converter\ val;}
+\DoxyCodeLine{00296\ }
+\DoxyCodeLine{00297\ \ \ \ \ val.c[0]\ =\ payload[0];}
+\DoxyCodeLine{00298\ \ \ \ \ val.c[1]\ =\ payload[1];}
+\DoxyCodeLine{00299\ }
+\DoxyCodeLine{00300\ \ \ \ \ status::value\ code(ntohs(val.i));}
+\DoxyCodeLine{00301\ }
+\DoxyCodeLine{00302\ \ \ \ \ \textcolor{keywordflow}{if}\ (status::invalid(code))\ \{}
+\DoxyCodeLine{00303\ \ \ \ \ \ \ \ \ ec\ =\ make\_error\_code(error::invalid\_close\_code);}
+\DoxyCodeLine{00304\ \ \ \ \ \}}
+\DoxyCodeLine{00305\ }
+\DoxyCodeLine{00306\ \ \ \ \ \textcolor{keywordflow}{if}\ (status::reserved(code))\ \{}
+\DoxyCodeLine{00307\ \ \ \ \ \ \ \ \ ec\ =\ make\_error\_code(error::reserved\_close\_code);}
+\DoxyCodeLine{00308\ \ \ \ \ \}}
+\DoxyCodeLine{00309\ }
+\DoxyCodeLine{00310\ \ \ \ \ \textcolor{keywordflow}{return}\ code;}
+\DoxyCodeLine{00311\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=322pt]{namespacewebsocketpp_1_1close_aa47dacf7d2e13705d1f68d9ab5b9dad0_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacewebsocketpp_1_1close_a537f66833c7b6e745b3cf5dc0252c0ca}\index{websocketpp::close@{websocketpp::close}!extract\_reason@{extract\_reason}}
+\index{extract\_reason@{extract\_reason}!websocketpp::close@{websocketpp::close}}
+\doxysubsubsection{\texorpdfstring{extract\_reason()}{extract\_reason()}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1close_a537f66833c7b6e745b3cf5dc0252c0ca} 
+std\+::string websocketpp\+::close\+::extract\+\_\+reason (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{payload}{, }\item[{lib\+::error\+\_\+code \&}]{ec}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+The string should be a valid \doxylink{struct_u_t_f8}{UTF8} message. \doxylink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da942738932384d65a5156ca03863587e1}{error\+::invalid\+\_\+utf8} will be set if the function extracts a reason that is not valid \doxylink{struct_u_t_f8}{UTF8}.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em payload} & The payload string to extract a reason from. \\
+\hline
+\mbox{\texttt{ out}}  & {\em ec} & Set to indicate what error occurred, if any. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The reason string. 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{close_8hpp_source_l00322}{322}} of file \mbox{\hyperlink{close_8hpp_source}{close.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00324\ \{}
+\DoxyCodeLine{00325\ \ \ \ \ std::string\ reason;}
+\DoxyCodeLine{00326\ \ \ \ \ ec\ =\ lib::error\_code();}
+\DoxyCodeLine{00327\ }
+\DoxyCodeLine{00328\ \ \ \ \ \textcolor{keywordflow}{if}\ (payload.size()\ >\ 2)\ \{}
+\DoxyCodeLine{00329\ \ \ \ \ \ \ \ \ reason.append(payload.begin()+2,payload.end());}
+\DoxyCodeLine{00330\ \ \ \ \ \}}
+\DoxyCodeLine{00331\ }
+\DoxyCodeLine{00332\ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{namespacewebsocketpp_1_1utf8__validator_ad088137c6f18e6844e20496d8782c835}{websocketpp::utf8\_validator::validate}}(reason))\ \{}
+\DoxyCodeLine{00333\ \ \ \ \ \ \ \ \ ec\ =\ make\_error\_code(error::invalid\_utf8);}
+\DoxyCodeLine{00334\ \ \ \ \ \}}
+\DoxyCodeLine{00335\ }
+\DoxyCodeLine{00336\ \ \ \ \ \textcolor{keywordflow}{return}\ reason;}
+\DoxyCodeLine{00337\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacewebsocketpp_1_1close_a537f66833c7b6e745b3cf5dc0252c0ca_cgraph}
+\end{center}
+\end{figure}

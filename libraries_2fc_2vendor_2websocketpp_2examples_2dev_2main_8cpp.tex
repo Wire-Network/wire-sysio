@@ -1,0 +1,198 @@
+\doxysection{libraries/fc/vendor/websocketpp/examples/dev/main.cpp File Reference}
+\hypertarget{libraries_2fc_2vendor_2websocketpp_2examples_2dev_2main_8cpp}{}\label{libraries_2fc_2vendor_2websocketpp_2examples_2dev_2main_8cpp}\index{libraries/fc/vendor/websocketpp/examples/dev/main.cpp@{libraries/fc/vendor/websocketpp/examples/dev/main.cpp}}
+{\ttfamily \#include $<$random$>$}\newline
+{\ttfamily \#include $<$boost/timer/timer.\+hpp$>$}\newline
+{\ttfamily \#include $<$websocketpp/config/core.\+hpp$>$}\newline
+{\ttfamily \#include $<$websocketpp/server.\+hpp$>$}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$sstream$>$}\newline
+Include dependency graph for main.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{libraries_2fc_2vendor_2websocketpp_2examples_2dev_2main_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1server}{websocketpp\+::server}}$<$ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1core}{websocketpp\+::config\+::core}} $>$ \mbox{\hyperlink{libraries_2fc_2vendor_2websocketpp_2examples_2dev_2main_8cpp_a49fb43a0abcf860429edd72caab81b74}{server}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{libraries_2fc_2vendor_2websocketpp_2examples_2dev_2main_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{libraries_2fc_2vendor_2websocketpp_2examples_2dev_2main_8cpp_a49fb43a0abcf860429edd72caab81b74}\index{main.cpp@{main.cpp}!server@{server}}
+\index{server@{server}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{server}{server}}
+{\footnotesize\ttfamily \label{libraries_2fc_2vendor_2websocketpp_2examples_2dev_2main_8cpp_a49fb43a0abcf860429edd72caab81b74} 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1server}{websocketpp\+::server}}$<$\mbox{\hyperlink{structwebsocketpp_1_1config_1_1core}{websocketpp\+::config\+::core}}$>$ \mbox{\hyperlink{docs_2simple__broadcast__server_8cpp_afc38239e3eef2a4200e324bff14d91d1}{server}}}
+
+
+
+Definition at line \mbox{\hyperlink{libraries_2fc_2vendor_2websocketpp_2examples_2dev_2main_8cpp_source_l00024}{24}} of file \mbox{\hyperlink{libraries_2fc_2vendor_2websocketpp_2examples_2dev_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{libraries_2fc_2vendor_2websocketpp_2examples_2dev_2main_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}\index{main.cpp@{main.cpp}!main@{main}}
+\index{main@{main}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{libraries_2fc_2vendor_2websocketpp_2examples_2dev_2main_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4} 
+int main (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{libraries_2fc_2vendor_2websocketpp_2examples_2dev_2main_8cpp_source_l00065}{65}} of file \mbox{\hyperlink{libraries_2fc_2vendor_2websocketpp_2examples_2dev_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00066\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1message}{websocketpp::message\_buffer::message<websocketpp::message\_buffer::alloc::con\_msg\_manager>}}}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ message\_type;}
+\DoxyCodeLine{00068\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1message__buffer_1_1alloc_1_1con__msg__manager}{websocketpp::message\_buffer::alloc::con\_msg\_manager<message\_type>}}}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ con\_msg\_man\_type;}
+\DoxyCodeLine{00070\ }
+\DoxyCodeLine{00071\ \ \ \ \ con\_msg\_man\_type::ptr\ manager\ =\ websocketpp::lib::make\_shared<con\_msg\_man\_type>();}
+\DoxyCodeLine{00072\ }
+\DoxyCodeLine{00073\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{namespacefoo}{foo}}\ =\ 1024;}
+\DoxyCodeLine{00074\ }
+\DoxyCodeLine{00075\ \ \ \ \ message\_type::ptr\ input\ =\ manager-\/>get\_message(\mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea35faaee264826923566fc05bdfd76b72}{websocketpp::frame::opcode::TEXT}},\mbox{\hyperlink{namespacefoo}{foo}});}
+\DoxyCodeLine{00076\ \ \ \ \ message\_type::ptr\ output\ =\ manager-\/>get\_message(\mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea35faaee264826923566fc05bdfd76b72}{websocketpp::frame::opcode::TEXT}},\mbox{\hyperlink{namespacefoo}{foo}});}
+\DoxyCodeLine{00077\ \ \ \ \ \mbox{\hyperlink{unionwebsocketpp_1_1frame_1_1uint32__converter}{websocketpp::frame::masking\_key\_type}}\ \mbox{\hyperlink{yubico__otp_8c_a9246c20bb98ad2b4c60313c053c70f08}{key}};}
+\DoxyCodeLine{00078\ }
+\DoxyCodeLine{00079\ \ \ \ \ std::random\_device\ dev;}
+\DoxyCodeLine{00080\ }
+\DoxyCodeLine{00081\ }
+\DoxyCodeLine{00082\ }
+\DoxyCodeLine{00083\ \ \ \ \ key.\mbox{\hyperlink{unionwebsocketpp_1_1frame_1_1uint32__converter_a2bceb785be148d7c9b9ce11240595440}{i}}\ =\ 0x12345678;}
+\DoxyCodeLine{00084\ }
+\DoxyCodeLine{00085\ \ \ \ \ \textcolor{keywordtype}{double}\ m\ =\ 18094238402394.0824923;}
+\DoxyCodeLine{00086\ }
+\DoxyCodeLine{00087\ \ \ \ \ \textcolor{comment}{/*std::cout\ <<\ "{}Some\ Math"{}\ <<\ std::endl;}}
+\DoxyCodeLine{00088\ \textcolor{comment}{\ \ \ \ \{}}
+\DoxyCodeLine{00089\ \textcolor{comment}{\ \ \ \ \ \ \ \ boost::timer::auto\_cpu\_timer\ t;}}
+\DoxyCodeLine{00090\ \textcolor{comment}{}}
+\DoxyCodeLine{00091\ \textcolor{comment}{\ \ \ \ \ \ \ \ for\ (int\ i\ =\ 0;\ i\ <\ foo;\ i++)\ \{}}
+\DoxyCodeLine{00092\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ m\ /=\ 1.001;}}
+\DoxyCodeLine{00093\ \textcolor{comment}{\ \ \ \ \ \ \ \ \}}}
+\DoxyCodeLine{00094\ \textcolor{comment}{}}
+\DoxyCodeLine{00095\ \textcolor{comment}{\ \ \ \ \}*/}}
+\DoxyCodeLine{00096\ }
+\DoxyCodeLine{00097\ \ \ \ \ std::cout\ <<\ m\ <<\ std::endl;}
+\DoxyCodeLine{00098\ }
+\DoxyCodeLine{00099\ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}Random\ Gen"{}}\ <<\ std::endl;}
+\DoxyCodeLine{00100\ \ \ \ \ \{}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ boost::timer::auto\_cpu\_timer\ t;}
+\DoxyCodeLine{00102\ }
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ input-\/>get\_raw\_payload().replace(0,\mbox{\hyperlink{namespacefoo}{foo}},\mbox{\hyperlink{namespacefoo}{foo}},\textcolor{charliteral}{'\(\backslash\)0'});}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ output-\/>get\_raw\_payload().replace(0,\mbox{\hyperlink{namespacefoo}{foo}},\mbox{\hyperlink{namespacefoo}{foo}},\textcolor{charliteral}{'\(\backslash\)0'});}
+\DoxyCodeLine{00105\ \ \ \ \ \}}
+\DoxyCodeLine{00106\ }
+\DoxyCodeLine{00107\ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}Out\ of\ place\ accelerated"{}}\ <<\ std::endl;}
+\DoxyCodeLine{00108\ \ \ \ \ \{}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ boost::timer::auto\_cpu\_timer\ t;}
+\DoxyCodeLine{00110\ }
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_acb2ccda66981a8a12a3b97fb4b179aa3}{websocketpp::frame::word\_mask\_exact}}(\textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}*\textcolor{keyword}{>}(\textcolor{keyword}{const\_cast<}\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(input-\/>get\_raw\_payload().data())),\ \textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}*\textcolor{keyword}{>}(\textcolor{keyword}{const\_cast<}\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(output-\/>get\_raw\_payload().data())),\ \mbox{\hyperlink{namespacefoo}{foo}},\ key);}
+\DoxyCodeLine{00112\ \ \ \ \ \}}
+\DoxyCodeLine{00113\ }
+\DoxyCodeLine{00114\ \ \ \ \ std::cout\ <<\ \mbox{\hyperlink{namespacewebsocketpp_1_1utility_a26e5a26395d95d2f6bf3a9edb8d06dd2}{websocketpp::utility::to\_hex}}(input-\/>get\_payload().c\_str(),20)\ <<\ std::endl;}
+\DoxyCodeLine{00115\ \ \ \ \ std::cout\ <<\ \mbox{\hyperlink{namespacewebsocketpp_1_1utility_a26e5a26395d95d2f6bf3a9edb8d06dd2}{websocketpp::utility::to\_hex}}(output-\/>get\_payload().c\_str(),20)\ <<\ std::endl;}
+\DoxyCodeLine{00116\ }
+\DoxyCodeLine{00117\ \ \ \ \ input-\/>get\_raw\_payload().replace(0,\mbox{\hyperlink{namespacefoo}{foo}},\mbox{\hyperlink{namespacefoo}{foo}},\textcolor{charliteral}{'\(\backslash\)0'});}
+\DoxyCodeLine{00118\ \ \ \ \ output-\/>get\_raw\_payload().replace(0,\mbox{\hyperlink{namespacefoo}{foo}},\mbox{\hyperlink{namespacefoo}{foo}},\textcolor{charliteral}{'\(\backslash\)0'});}
+\DoxyCodeLine{00119\ }
+\DoxyCodeLine{00120\ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}In\ place\ accelerated"{}}\ <<\ std::endl;}
+\DoxyCodeLine{00121\ \ \ \ \ \{}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ boost::timer::auto\_cpu\_timer\ t;}
+\DoxyCodeLine{00123\ }
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_acb2ccda66981a8a12a3b97fb4b179aa3}{websocketpp::frame::word\_mask\_exact}}(\textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}*\textcolor{keyword}{>}(\textcolor{keyword}{const\_cast<}\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(input-\/>get\_raw\_payload().data())),\ \textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}*\textcolor{keyword}{>}(\textcolor{keyword}{const\_cast<}\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(input-\/>get\_raw\_payload().data())),\ \mbox{\hyperlink{namespacefoo}{foo}},\ key);}
+\DoxyCodeLine{00125\ \ \ \ \ \}}
+\DoxyCodeLine{00126\ }
+\DoxyCodeLine{00127\ \ \ \ \ std::cout\ <<\ \mbox{\hyperlink{namespacewebsocketpp_1_1utility_a26e5a26395d95d2f6bf3a9edb8d06dd2}{websocketpp::utility::to\_hex}}(input-\/>get\_payload().c\_str(),20)\ <<\ std::endl;}
+\DoxyCodeLine{00128\ \ \ \ \ std::cout\ <<\ \mbox{\hyperlink{namespacewebsocketpp_1_1utility_a26e5a26395d95d2f6bf3a9edb8d06dd2}{websocketpp::utility::to\_hex}}(output-\/>get\_payload().c\_str(),20)\ <<\ std::endl;}
+\DoxyCodeLine{00129\ }
+\DoxyCodeLine{00130\ \ \ \ \ input-\/>get\_raw\_payload().replace(0,\mbox{\hyperlink{namespacefoo}{foo}},\mbox{\hyperlink{namespacefoo}{foo}},\textcolor{charliteral}{'\(\backslash\)0'});}
+\DoxyCodeLine{00131\ \ \ \ \ output-\/>get\_raw\_payload().replace(0,\mbox{\hyperlink{namespacefoo}{foo}},\mbox{\hyperlink{namespacefoo}{foo}},\textcolor{charliteral}{'\(\backslash\)0'});}
+\DoxyCodeLine{00132\ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}Out\ of\ place\ byte\ by\ byte"{}}\ <<\ std::endl;}
+\DoxyCodeLine{00133\ \ \ \ \ \{}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ boost::timer::auto\_cpu\_timer\ t;}
+\DoxyCodeLine{00135\ }
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a417650d76aa2433163942d6a13334a6a}{websocketpp::frame::byte\_mask}}(input-\/>get\_raw\_payload().begin(),\ input-\/>get\_raw\_payload().end(),\ output-\/>get\_raw\_payload().begin(),\ key);}
+\DoxyCodeLine{00137\ \ \ \ \ \}}
+\DoxyCodeLine{00138\ }
+\DoxyCodeLine{00139\ \ \ \ \ std::cout\ <<\ \mbox{\hyperlink{namespacewebsocketpp_1_1utility_a26e5a26395d95d2f6bf3a9edb8d06dd2}{websocketpp::utility::to\_hex}}(input-\/>get\_payload().c\_str(),20)\ <<\ std::endl;}
+\DoxyCodeLine{00140\ \ \ \ \ std::cout\ <<\ \mbox{\hyperlink{namespacewebsocketpp_1_1utility_a26e5a26395d95d2f6bf3a9edb8d06dd2}{websocketpp::utility::to\_hex}}(output-\/>get\_payload().c\_str(),20)\ <<\ std::endl;}
+\DoxyCodeLine{00141\ }
+\DoxyCodeLine{00142\ \ \ \ \ input-\/>get\_raw\_payload().replace(0,\mbox{\hyperlink{namespacefoo}{foo}},\mbox{\hyperlink{namespacefoo}{foo}},\textcolor{charliteral}{'\(\backslash\)0'});}
+\DoxyCodeLine{00143\ \ \ \ \ output-\/>get\_raw\_payload().replace(0,\mbox{\hyperlink{namespacefoo}{foo}},\mbox{\hyperlink{namespacefoo}{foo}},\textcolor{charliteral}{'\(\backslash\)0'});}
+\DoxyCodeLine{00144\ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}In\ place\ byte\ by\ byte"{}}\ <<\ std::endl;}
+\DoxyCodeLine{00145\ \ \ \ \ \{}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ boost::timer::auto\_cpu\_timer\ t;}
+\DoxyCodeLine{00147\ }
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_a417650d76aa2433163942d6a13334a6a}{websocketpp::frame::byte\_mask}}(input-\/>get\_raw\_payload().begin(),\ input-\/>get\_raw\_payload().end(),\ input-\/>get\_raw\_payload().begin(),\ key);}
+\DoxyCodeLine{00149\ \ \ \ \ \}}
+\DoxyCodeLine{00150\ }
+\DoxyCodeLine{00151\ \ \ \ \ std::cout\ <<\ \mbox{\hyperlink{namespacewebsocketpp_1_1utility_a26e5a26395d95d2f6bf3a9edb8d06dd2}{websocketpp::utility::to\_hex}}(input-\/>get\_payload().c\_str(),20)\ <<\ std::endl;}
+\DoxyCodeLine{00152\ \ \ \ \ std::cout\ <<\ \mbox{\hyperlink{namespacewebsocketpp_1_1utility_a26e5a26395d95d2f6bf3a9edb8d06dd2}{websocketpp::utility::to\_hex}}(output-\/>get\_payload().c\_str(),20)\ <<\ std::endl;}
+\DoxyCodeLine{00153\ }
+\DoxyCodeLine{00154\ \ \ \ \ input-\/>get\_raw\_payload().replace(0,\mbox{\hyperlink{namespacefoo}{foo}},\mbox{\hyperlink{namespacefoo}{foo}},\textcolor{charliteral}{'a'});}
+\DoxyCodeLine{00155\ \ \ \ \ output-\/>get\_raw\_payload().replace(0,\mbox{\hyperlink{namespacefoo}{foo}},\mbox{\hyperlink{namespacefoo}{foo}},\textcolor{charliteral}{'b'});}
+\DoxyCodeLine{00156\ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}Copy"{}}\ <<\ std::endl;}
+\DoxyCodeLine{00157\ \ \ \ \ \{}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ boost::timer::auto\_cpu\_timer\ t;}
+\DoxyCodeLine{00159\ }
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ std::copy(input-\/>get\_raw\_payload().begin(),\ input-\/>get\_raw\_payload().end(),\ output-\/>get\_raw\_payload().begin());}
+\DoxyCodeLine{00161\ \ \ \ \ \}}
+\DoxyCodeLine{00162\ }
+\DoxyCodeLine{00163\ \ \ \ \ std::cout\ <<\ \mbox{\hyperlink{namespacewebsocketpp_1_1utility_a26e5a26395d95d2f6bf3a9edb8d06dd2}{websocketpp::utility::to\_hex}}(input-\/>get\_payload().c\_str(),20)\ <<\ std::endl;}
+\DoxyCodeLine{00164\ \ \ \ \ std::cout\ <<\ \mbox{\hyperlink{namespacewebsocketpp_1_1utility_a26e5a26395d95d2f6bf3a9edb8d06dd2}{websocketpp::utility::to\_hex}}(output-\/>get\_payload().c\_str(),20)\ <<\ std::endl;}
+\DoxyCodeLine{00165\ }
+\DoxyCodeLine{00166\ \ \ \ \ \textcolor{comment}{/*server::handler::ptr\ h(new\ handler());}}
+\DoxyCodeLine{00167\ \textcolor{comment}{}}
+\DoxyCodeLine{00168\ \textcolor{comment}{\ \ \ \ server\ test\_server(h);}}
+\DoxyCodeLine{00169\ \textcolor{comment}{\ \ \ \ server::connection\_ptr\ con;}}
+\DoxyCodeLine{00170\ \textcolor{comment}{}}
+\DoxyCodeLine{00171\ \textcolor{comment}{\ \ \ \ std::stringstream\ output;}}
+\DoxyCodeLine{00172\ \textcolor{comment}{}}
+\DoxyCodeLine{00173\ \textcolor{comment}{\ \ \ \ test\_server.register\_ostream(\&output);}}
+\DoxyCodeLine{00174\ \textcolor{comment}{}}
+\DoxyCodeLine{00175\ \textcolor{comment}{\ \ \ \ con\ =\ test\_server.get\_connection();}}
+\DoxyCodeLine{00176\ \textcolor{comment}{}}
+\DoxyCodeLine{00177\ \textcolor{comment}{\ \ \ \ con-\/>start();}}
+\DoxyCodeLine{00178\ \textcolor{comment}{}}
+\DoxyCodeLine{00179\ \textcolor{comment}{\ \ \ \ //foo.handle\_accept(con,true);}}
+\DoxyCodeLine{00180\ \textcolor{comment}{}}
+\DoxyCodeLine{00181\ \textcolor{comment}{\ \ \ \ std::stringstream\ input;}}
+\DoxyCodeLine{00182\ \textcolor{comment}{\ \ \ \ input\ <<\ "{}GET\ /\ HTTP/1.1\(\backslash\)r\(\backslash\)nHost:\ www.example.com\(\backslash\)r\(\backslash\)nConnection:\ upgrade\(\backslash\)r\(\backslash\)nUpgrade:\ websocket\(\backslash\)r\(\backslash\)nSec-\/WebSocket-\/Version:\ 13\(\backslash\)r\(\backslash\)nSec-\/WebSocket-\/Key:\ dGhlIHNhbXBsZSBub25jZQ==\(\backslash\)r\(\backslash\)nOrigin:\ http://www.example.com\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)n"{};}}
+\DoxyCodeLine{00183\ \textcolor{comment}{\ \ \ \ //input\ <<\ "{}GET\ /\ HTTP/1.1\(\backslash\)r\(\backslash\)nHost:\ www.example.com\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)n"{};}}
+\DoxyCodeLine{00184\ \textcolor{comment}{\ \ \ \ input\ >>\ *con;}}
+\DoxyCodeLine{00185\ \textcolor{comment}{}}
+\DoxyCodeLine{00186\ \textcolor{comment}{\ \ \ \ std::stringstream\ input2;}}
+\DoxyCodeLine{00187\ \textcolor{comment}{\ \ \ \ input2\ <<\ "{}messageabc2"{};}}
+\DoxyCodeLine{00188\ \textcolor{comment}{\ \ \ \ input2\ >>\ *con;}}
+\DoxyCodeLine{00189\ \textcolor{comment}{}}
+\DoxyCodeLine{00190\ \textcolor{comment}{\ \ \ \ std::stringstream\ input3;}}
+\DoxyCodeLine{00191\ \textcolor{comment}{\ \ \ \ input3\ <<\ "{}messageabc3"{};}}
+\DoxyCodeLine{00192\ \textcolor{comment}{\ \ \ \ input3\ >>\ *con;}}
+\DoxyCodeLine{00193\ \textcolor{comment}{}}
+\DoxyCodeLine{00194\ \textcolor{comment}{\ \ \ \ std::stringstream\ input4;}}
+\DoxyCodeLine{00195\ \textcolor{comment}{\ \ \ \ input4\ <<\ "{}close"{};}}
+\DoxyCodeLine{00196\ \textcolor{comment}{\ \ \ \ input4\ >>\ *con;}}
+\DoxyCodeLine{00197\ \textcolor{comment}{}}
+\DoxyCodeLine{00198\ \textcolor{comment}{\ \ \ \ std::cout\ <<\ "{}connection\ output:"{}\ <<\ std::endl;}}
+\DoxyCodeLine{00199\ \textcolor{comment}{\ \ \ \ std::cout\ <<\ output.str()\ <<\ std::endl;*/}}
+\DoxyCodeLine{00200\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{libraries_2fc_2vendor_2websocketpp_2examples_2dev_2main_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4_cgraph}
+\end{center}
+\end{figure}

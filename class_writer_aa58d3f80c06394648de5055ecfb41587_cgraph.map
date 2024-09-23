@@ -1,0 +1,13 @@
+<map id="Writer::WriteInt64" name="Writer::WriteInt64">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,55,128,80"/>
+<area shape="rect" id="Node000002" href="$namespaceinternal.html#a527358458754f514c249c55c27b35526" title=" " alt="" coords="176,5,282,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="111,51,169,33,170,39,112,57"/>
+<area shape="rect" id="Node000005" href="$stream_8h.html#aa817b00a466bb84d96c5de1616436c95" title="Reserve n characters for writing to a stream." alt="" coords="184,55,274,80"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="128,65,169,65,169,70,128,70"/>
+<area shape="rect" id="Node000006" href="$stream_8h.html#ad57ba7f2912c5509924b69dec7db4396" title="Write character to a stream, presuming buffer is reserved." alt="" coords="187,104,270,130"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="112,78,173,97,171,102,111,84"/>
+<area shape="rect" id="Node000003" href="$namespaceinternal.html#a489150922c0320e4290b455bf3c6e36c" title=" " alt="" coords="330,5,440,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="283,16,314,16,314,21,283,21"/>
+<area shape="rect" id="Node000004" href="$namespaceinternal.html#a76ad2b55668f695effde1971d53a5ce1" title=" " alt="" coords="488,5,633,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="441,16,473,16,473,21,441,21"/>
+</map>

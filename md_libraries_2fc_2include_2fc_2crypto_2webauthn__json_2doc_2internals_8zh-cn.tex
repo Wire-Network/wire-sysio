@@ -1,0 +1,463 @@
+\chapter{内部架构}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn}{}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn}\index{内部架构@{内部架构}}
+本部分记录了一些设计和实现细节。\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_Architecture}{}\doxysection{\texorpdfstring{Architecture}{Architecture}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_Architecture}
+\doxysubsection*{SAX 和 DOM}
+
+下面的 UML 图显示了 SAX 和 DOM 的基本关系。
+
+
+
+关系的核心是 {\ttfamily Handler} 概念。在 SAX 一边，{\ttfamily Reader} 从流解析 JSON 并将事件发送到 {\ttfamily Handler}。{\ttfamily \doxylink{class_writer}{Writer}} 实现了 {\ttfamily Handler} 概念，用于处理相同的事件。在 DOM 一边，{\ttfamily Document} 实现了 {\ttfamily Handler} 概念，用于通过这些时间来构建 DOM。{\ttfamily Value} 支持了 {\ttfamily Value\+::\+Accept(Handler\&)} 函数，它可以将 DOM 转换为事件进行发送。
+
+在这个设计，\+SAX 是不依赖于 DOM 的。甚至 {\ttfamily Reader} 和 {\ttfamily \doxylink{class_writer}{Writer}} 之间也没有依赖。这提供了连接事件发送器和处理器的灵活性。除此之外，{\ttfamily Value} 也是不依赖于 SAX 的。所以，除了将 DOM 序列化为 JSON 之外，用户也可以将其序列化为 XML，或者做任何其他事情。
+
+\doxysubsection*{工具类}
+
+SAX 和 DOM API 都依赖于3个额外的概念：{\ttfamily Allocator}、{\ttfamily Encoding} 和 {\ttfamily Stream}。它们的继承层次结构如下图所示。
+
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_Value}{}\doxysection{\texorpdfstring{Value}{Value}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_Value}
+{\ttfamily Value} （实际上被定义为 {\ttfamily \doxylink{class_generic_value}{Generic\+Value}\texorpdfstring{$<$}{<}\doxylink{struct_u_t_f8}{UTF8}\texorpdfstring{$<$}{<}\texorpdfstring{$>$}{>}\texorpdfstring{$>$}{>}}）是 DOM API 的核心。本部分描述了它的设计。\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_DataLayout}{}\doxysubsection{\texorpdfstring{Data Layout}{Data Layout}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_DataLayout}
+{\ttfamily Value} 是\href{http://en.wikipedia.org/wiki/Variant_type}{\texttt{ 可变类型}}。在 Rapid\+JSON 的上下文中，一个 {\ttfamily Value} 的实例可以包含6种 JSON 数据类型之一。通过使用 {\ttfamily union} ，这是可能实现的。每一个 {\ttfamily Value} 包含两个成员：{\ttfamily union \doxylink{struct_data}{Data} data\+\_\+} 和 {\ttfamily unsigned flags\+\_\+}。{\ttfamily flags\+\_\+} 表明了 JSON 类型，以及附加的信息。
+
+下表显示了所有类型的数据布局。32位/64位列表明了字段所占用的字节数。
+
+\tabulinesep=1mm
+\begin{longtabu}spread 0pt [c]{*{4}{|X[-1]}|}
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Null   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 32位   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 64位    }\\\cline{1-4}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Null   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 32位   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 64位    }\\\cline{1-4}
+\endhead
+（未使用）   &&\PBS\centering 4   &\PBS\centering 8    \\\cline{1-4}
+（未使用）   &&\PBS\centering 4   &\PBS\centering 4    \\\cline{1-4}
+（未使用）   &&\PBS\centering 4   &\PBS\centering 4    \\\cline{1-4}
+{\ttfamily unsigned flags\+\_\+}   &{\ttfamily k\+Null\+Type k\+Null\+Flag}   &\PBS\centering 4   &\PBS\centering 4   \\\cline{1-4}
+\end{longtabu}
+
+
+\tabulinesep=1mm
+\begin{longtabu}spread 0pt [c]{*{4}{|X[-1]}|}
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ \doxylink{struct_bool}{Bool}   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 32位   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 64位    }\\\cline{1-4}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ \doxylink{struct_bool}{Bool}   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 32位   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 64位    }\\\cline{1-4}
+\endhead
+（未使用）   &&\PBS\centering 4   &\PBS\centering 8    \\\cline{1-4}
+（未使用）   &&\PBS\centering 4   &\PBS\centering 4    \\\cline{1-4}
+（未使用）   &&\PBS\centering 4   &\PBS\centering 4    \\\cline{1-4}
+{\ttfamily unsigned flags\+\_\+}   &{\ttfamily k\+Bool\+Type} (either {\ttfamily k\+True\+Flag} or {\ttfamily k\+False\+Flag})   &\PBS\centering 4   &\PBS\centering 4   \\\cline{1-4}
+\end{longtabu}
+
+
+\tabulinesep=1mm
+\begin{longtabu}spread 0pt [c]{*{4}{|X[-1]}|}
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ String   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 32位   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 64位    }\\\cline{1-4}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ String   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 32位   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 64位    }\\\cline{1-4}
+\endhead
+{\ttfamily Ch\texorpdfstring{$\ast$}{*} str}   &指向字符串的指针（可能拥有所有权）   &\PBS\centering 4   &\PBS\centering 8    \\\cline{1-4}
+{\ttfamily Size\+Type length}   &字符串长度   &\PBS\centering 4   &\PBS\centering 4    \\\cline{1-4}
+（未使用）   &&\PBS\centering 4   &\PBS\centering 4    \\\cline{1-4}
+{\ttfamily unsigned flags\+\_\+}   &{\ttfamily k\+String\+Type k\+String\+Flag ...}   &\PBS\centering 4   &\PBS\centering 4   \\\cline{1-4}
+\end{longtabu}
+
+
+\tabulinesep=1mm
+\begin{longtabu}spread 0pt [c]{*{4}{|X[-1]}|}
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Object   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 32位   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 64位    }\\\cline{1-4}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Object   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 32位   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 64位    }\\\cline{1-4}
+\endhead
+{\ttfamily Member\texorpdfstring{$\ast$}{*} members}   &指向成员数组的指针（拥有所有权）   &\PBS\centering 4   &\PBS\centering 8    \\\cline{1-4}
+{\ttfamily Size\+Type size}   &成员数量   &\PBS\centering 4   &\PBS\centering 4    \\\cline{1-4}
+{\ttfamily Size\+Type capacity}   &成员容量   &\PBS\centering 4   &\PBS\centering 4    \\\cline{1-4}
+{\ttfamily unsigned flags\+\_\+}   &{\ttfamily k\+Object\+Type k\+Object\+Flag}   &\PBS\centering 4   &\PBS\centering 4   \\\cline{1-4}
+\end{longtabu}
+
+
+\tabulinesep=1mm
+\begin{longtabu}spread 0pt [c]{*{4}{|X[-1]}|}
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Array   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 32位   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 64位    }\\\cline{1-4}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Array   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 32位   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 64位    }\\\cline{1-4}
+\endhead
+{\ttfamily Value\texorpdfstring{$\ast$}{*} values}   &指向值数组的指针（拥有所有权）   &\PBS\centering 4   &\PBS\centering 8    \\\cline{1-4}
+{\ttfamily Size\+Type size}   &值数量   &\PBS\centering 4   &\PBS\centering 4    \\\cline{1-4}
+{\ttfamily Size\+Type capacity}   &值容量   &\PBS\centering 4   &\PBS\centering 4    \\\cline{1-4}
+{\ttfamily unsigned flags\+\_\+}   &{\ttfamily k\+Array\+Type k\+Array\+Flag}   &\PBS\centering 4   &\PBS\centering 4   \\\cline{1-4}
+\end{longtabu}
+
+
+\tabulinesep=1mm
+\begin{longtabu}spread 0pt [c]{*{4}{|X[-1]}|}
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Number (Int)   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 32位   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 64位    }\\\cline{1-4}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Number (Int)   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 32位   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 64位    }\\\cline{1-4}
+\endhead
+{\ttfamily int i}   &32位有符号整数   &\PBS\centering 4   &\PBS\centering 4    \\\cline{1-4}
+（零填充）   &0   &\PBS\centering 4   &\PBS\centering 4    \\\cline{1-4}
+（未使用）   &&\PBS\centering 4   &\PBS\centering 8    \\\cline{1-4}
+{\ttfamily unsigned flags\+\_\+}   &{\ttfamily k\+Number\+Type k\+Number\+Flag k\+Int\+Flag k\+Int64\+Flag ...}   &\PBS\centering 4   &\PBS\centering 4   \\\cline{1-4}
+\end{longtabu}
+
+
+\tabulinesep=1mm
+\begin{longtabu}spread 0pt [c]{*{4}{|X[-1]}|}
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Number (UInt)   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 32位   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 64位    }\\\cline{1-4}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Number (UInt)   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 32位   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 64位    }\\\cline{1-4}
+\endhead
+{\ttfamily unsigned u}   &32位无符号整数   &\PBS\centering 4   &\PBS\centering 4    \\\cline{1-4}
+（零填充）   &0   &\PBS\centering 4   &\PBS\centering 4    \\\cline{1-4}
+（未使用）   &&\PBS\centering 4   &\PBS\centering 8    \\\cline{1-4}
+{\ttfamily unsigned flags\+\_\+}   &{\ttfamily k\+Number\+Type k\+Number\+Flag k\+UInt\+Flag k\+UInt64\+Flag ...}   &\PBS\centering 4   &\PBS\centering 4   \\\cline{1-4}
+\end{longtabu}
+
+
+\tabulinesep=1mm
+\begin{longtabu}spread 0pt [c]{*{4}{|X[-1]}|}
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Number (Int64)   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 32位   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 64位    }\\\cline{1-4}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Number (Int64)   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 32位   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 64位    }\\\cline{1-4}
+\endhead
+{\ttfamily int64\+\_\+t i64}   &64位有符号整数   &\PBS\centering 8   &\PBS\centering 8    \\\cline{1-4}
+（未使用）   &&\PBS\centering 4   &\PBS\centering 8    \\\cline{1-4}
+{\ttfamily unsigned flags\+\_\+}   &{\ttfamily k\+Number\+Type k\+Number\+Flag k\+Int64\+Flag ...}   &\PBS\centering 4   &\PBS\centering 4   \\\cline{1-4}
+\end{longtabu}
+
+
+\tabulinesep=1mm
+\begin{longtabu}spread 0pt [c]{*{4}{|X[-1]}|}
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Number (Uint64)   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 32位   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 64位    }\\\cline{1-4}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Number (Uint64)   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 32位   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 64位    }\\\cline{1-4}
+\endhead
+{\ttfamily uint64\+\_\+t i64}   &64位无符号整数   &\PBS\centering 8   &\PBS\centering 8    \\\cline{1-4}
+（未使用）   &&\PBS\centering 4   &\PBS\centering 8    \\\cline{1-4}
+{\ttfamily unsigned flags\+\_\+}   &{\ttfamily k\+Number\+Type k\+Number\+Flag k\+Int64\+Flag ...}   &\PBS\centering 4   &\PBS\centering 4   \\\cline{1-4}
+\end{longtabu}
+
+
+\tabulinesep=1mm
+\begin{longtabu}spread 0pt [c]{*{4}{|X[-1]}|}
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Number (Double)   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 32位   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 64位    }\\\cline{1-4}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Number (Double)   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 32位   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 64位    }\\\cline{1-4}
+\endhead
+{\ttfamily uint64\+\_\+t i64}   &双精度浮点数   &\PBS\centering 8   &\PBS\centering 8    \\\cline{1-4}
+（未使用）   &&\PBS\centering 4   &\PBS\centering 8    \\\cline{1-4}
+{\ttfamily unsigned flags\+\_\+}   &{\ttfamily k\+Number\+Type k\+Number\+Flag k\+Double\+Flag}   &\PBS\centering 4   &\PBS\centering 4   \\\cline{1-4}
+\end{longtabu}
+
+
+这里有一些需要注意的地方：
+\begin{DoxyItemize}
+\item 为了减少在64位架构上的内存消耗，{\ttfamily Size\+Type} 被定义为 {\ttfamily unsigned} 而不是 {\ttfamily size\+\_\+t}。
+\item 32位整数的零填充可能被放在实际类型的前面或后面，这依赖于字节序。这使得它可以将32位整数不经过任何转换就可以解释为64位整数。
+\item {\ttfamily Int} 永远是 {\ttfamily Int64}，反之不然。
+\end{DoxyItemize}\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_Flags}{}\doxysubsection{\texorpdfstring{Flags}{Flags}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_Flags}
+32位的 {\ttfamily flags\+\_\+} 包含了 JSON 类型和其他信息。如前文中的表所述，每一种 JSON 类型包含了冗余的 {\ttfamily k\+XXXType} 和 {\ttfamily k\+XXXFlag}。这个设计是为了优化测试位标志（{\ttfamily Is\+Number()}）和获取每一种类型的序列号（{\ttfamily Get\+Type()}）。
+
+字符串有两个可选的标志。{\ttfamily k\+Copy\+Flag} 表明这个字符串拥有字符串拷贝的所有权。而 {\ttfamily k\+Inline\+Str\+Flag} 意味着使用了\doxysectlink{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_ShortString}{短字符串优化}{2}。
+
+数字更加复杂一些。对于普通的整数值，它可以包含 {\ttfamily k\+Int\+Flag}、{\ttfamily k\+Uint\+Flag}、 {\ttfamily k\+Int64\+Flag} 和/或 {\ttfamily k\+Uint64\+Flag}，这由整数的范围决定。带有小数或者超过64位所能表达的范围的整数的数字会被存储为带有 {\ttfamily k\+Double\+Flag} 的 {\ttfamily double}。\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_ShortString}{}\doxysubsection{\texorpdfstring{Short-\/\+String Optimization}{Short-\/\+String Optimization}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_ShortString}
+\href{https://github.com/Kosta-Github}{\texttt{ Kosta}} 提供了很棒的短字符串优化。这个优化的xxx如下所述。除去 {\ttfamily flags\+\_\+} ，{\ttfamily Value} 有12或16字节（对于32位或64位）来存储实际的数据。这为在其内部直接存储短字符串而不是存储字符串的指针创造了可能。对于1字节的字符类型（例如 {\ttfamily char}），它可以在 {\ttfamily Value} 类型内部存储至多11或15个字符的字符串。
+
+\tabulinesep=1mm
+\begin{longtabu}spread 0pt [c]{*{4}{|X[-1]}|}
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Short\+String (Ch=char)   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 32位   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 64位    }\\\cline{1-4}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Short\+String (Ch=char)   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 32位   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 64位    }\\\cline{1-4}
+\endhead
+{\ttfamily Ch str\mbox{[}Max\+Chars\mbox{]}}   &字符串缓冲区   &\PBS\centering 11   &\PBS\centering 15    \\\cline{1-4}
+{\ttfamily Ch inv\+Length}   &Max\+Chars -\/ Length   &\PBS\centering 1   &\PBS\centering 1    \\\cline{1-4}
+{\ttfamily unsigned flags\+\_\+}   &{\ttfamily k\+String\+Type k\+String\+Flag ...}   &\PBS\centering 4   &\PBS\centering 4   \\\cline{1-4}
+\end{longtabu}
+
+
+这里使用了一项特殊的技术。它存储了 (Max\+Chars -\/ length) 而不直接存储字符串的长度。这使得存储11个字符并且带有后缀 {\ttfamily \textbackslash{}0} 成为可能。
+
+这个优化可以减少字符串拷贝内存占用。它也改善了缓存一致性，并进一步提高了运行时性能。\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_InternalAllocator}{}\doxysection{\texorpdfstring{Allocator}{Allocator}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_InternalAllocator}
+{\ttfamily Allocator} 是 Rapid\+JSON 中的概念： 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{concept\ }\mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}\ \{}
+\DoxyCodeLine{\ \ \ \ static\ \mbox{\hyperlink{namespaceupload_a985aa9a71de3eb507344df65700c696d}{const}}\ bool\ kNeedFree;\ \ \ \ }
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ 申请内存块。}}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ \(\backslash\)param\ size\ 内存块的大小，以字节记。}}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ \(\backslash\)returns\ 指向内存块的指针。}}
+\DoxyCodeLine{\ \ \ \ void*\ Malloc(size\_t\ size);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ 调整内存块的大小。}}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ \(\backslash\)param\ originalPtr\ 当前内存块的指针。空指针是被允许的。}}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ \(\backslash\)param\ originalSize\ 当前大小，以字节记。（设计问题：因为有些分配器可能不会记录它，显示的传递它可以节约内存。）}}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ \(\backslash\)param\ newSize\ 新大小，以字节记。}}
+\DoxyCodeLine{\ \ \ \ void*\ Realloc(void*\ originalPtr,\ size\_t\ originalSize,\ size\_t\ newSize);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ 释放内存块。}}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ \(\backslash\)param\ ptr\ 指向内存块的指针。空指针是被允许的。}}
+\DoxyCodeLine{\ \ \ \ static\ void\ Free(void\ *ptr);}
+\DoxyCodeLine{\};}
+
+\end{DoxyCode}
+
+
+需要注意的是 {\ttfamily Malloc()} 和 {\ttfamily Realloc()} 是成员函数而 {\ttfamily Free()} 是静态成员函数。\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_MemoryPoolAllocator}{}\doxysubsection{\texorpdfstring{Memory\+Pool\+Allocator}{Memory\+Pool\+Allocator}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_MemoryPoolAllocator}
+{\ttfamily \doxylink{class_memory_pool_allocator}{Memory\+Pool\+Allocator}} 是 DOM 的默认内存分配器。它只申请内存而不释放内存。这对于构建 DOM 树非常合适。
+
+在它的内部，它从基础的内存分配器申请内存块（默认为 {\ttfamily \doxylink{class_crt_allocator}{Crt\+Allocator}}）并将这些内存块存储为单向链表。当用户请求申请内存，它会遵循下列步骤来申请内存：
+
+
+\begin{DoxyEnumerate}
+\item 如果可用，使用用户提供的缓冲区。（见 \doxylink{dom_8md}{User Buffer section in DOM}）
+\item 如果用户提供的缓冲区已满，使用当前内存块。
+\item 如果当前内存块已满，申请新的内存块。
+\end{DoxyEnumerate}\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_ParsingOptimization}{}\doxysection{\texorpdfstring{Parsing Optimization}{Parsing Optimization}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_ParsingOptimization}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_SkipwhitespaceWithSIMD}{}\doxysubsection{\texorpdfstring{Skip Whitespaces with SIMD}{Skip Whitespaces with SIMD}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_SkipwhitespaceWithSIMD}
+当从流中解析 JSON 时，解析器需要跳过4种空格字符：
+
+
+\begin{DoxyEnumerate}
+\item 空格 ({\ttfamily U+0020})
+\item 制表符 ({\ttfamily U+000B})
+\item 换行 ({\ttfamily U+000A})
+\item 回车 ({\ttfamily U+000D})
+\end{DoxyEnumerate}
+
+这是一份简单的实现： 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordtype}{void}\ \mbox{\hyperlink{reader_8h_a60338858b2582eca23f3e509a2d82e0e}{SkipWhitespace}}(InputStream\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})\ \{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{while}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.Peek()\ ==\ \textcolor{charliteral}{'\ '}\ ||\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.Peek()\ ==\ \textcolor{charliteral}{'\(\backslash\)n'}\ ||\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.Peek()\ ==\ \textcolor{charliteral}{'\(\backslash\)r'}\ ||\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.Peek()\ ==\ \textcolor{charliteral}{'\(\backslash\)t'})}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.Take();}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+但是，这需要对每个字符进行4次比较以及一些分支。这被发现是一个热点。
+
+为了加速这一处理，\+Rapid\+JSON 使用 SIMD 来在一次迭代中比较16个字符和4个空格。目前 Rapid\+JSON 支持 SSE2 ， SSE4.\+2 和 ARM Neon 指令。同时它也只会对 UTF-\/8 内存流启用，包括字符串流或 {\itshape 原位} 解析。
+
+你可以通过在包含 {\ttfamily \doxylink{rapidjson_8h}{rapidjson.\+h}} 之前定义 {\ttfamily RAPIDJSON\+\_\+\+SSE2} ， {\ttfamily RAPIDJSON\+\_\+\+SSE42} 或 {\ttfamily RAPIDJSON\+\_\+\+NEON} 来启用这个优化。一些编译器可以检测这个设置，如 {\ttfamily \doxylink{perftest_8h}{perftest.\+h}}：
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{comment}{//\ \_\_SSE2\_\_\ 和\ \_\_SSE4\_2\_\_\ 可被\ gcc、clang\ 和\ Intel\ 编译器识别：}}
+\DoxyCodeLine{\textcolor{comment}{//\ 如果支持的话，我们在\ gmake\ 中使用了\ -\/march=native\ 来启用\ -\/msse2\ 和\ -\/msse4.2}}
+\DoxyCodeLine{\textcolor{comment}{//\ 同样的，\ \_\_ARM\_NEON\ 被用于识别Neon}}
+\DoxyCodeLine{\textcolor{preprocessor}{\#if\ defined(\_\_SSE4\_2\_\_)}}
+\DoxyCodeLine{\textcolor{preprocessor}{\#\ \ define\ RAPIDJSON\_SSE42}}
+\DoxyCodeLine{\textcolor{preprocessor}{\#elif\ defined(\_\_SSE2\_\_)}}
+\DoxyCodeLine{\textcolor{preprocessor}{\#\ \ define\ RAPIDJSON\_SSE2}}
+\DoxyCodeLine{\textcolor{preprocessor}{\#elif\ defined(\_\_ARM\_NEON)}}
+\DoxyCodeLine{\textcolor{preprocessor}{\#\ \ define\ RAPIDJSON\_NEON}}
+\DoxyCodeLine{\textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}
+
+
+需要注意的是，这是编译期的设置。在不支持这些指令的机器上运行可执行文件会使它崩溃。
+
+\doxysubsubsection*{页面对齐问题}
+
+在 Rapid\+JSON 的早期版本中，被报告了\href{https://code.google.com/archive/p/rapidjson/issues/104}{\texttt{ 一个问题}}：{\ttfamily Skip\+Whitespace\+\_\+\+SIMD()} 会罕见地导致崩溃（约五十万分之一的几率）。在调查之后，怀疑是 {\ttfamily \+\_\+mm\+\_\+loadu\+\_\+si128()} 访问了 `'\textbackslash{}0\textquotesingle{}\`{} 之后的内存，并越过被保护的页面边界。
+
+在 \href{http://www.intel.com/content/www/us/en/architecture-and-technology/64-ia-32-architectures-optimization-manual.html}{\texttt{ Intel® 64 and IA-\/32 Architectures Optimization Reference Manual}} 中，章节 10.\+2.\+1：
+
+\begin{quote}
+为了支持需要费对齐的128位 SIMD 内存访问的算法，调用者的内存缓冲区申请应当考虑添加一些填充空间，这样被调用的函数可以安全地将地址指针用于未对齐的128位 SIMD 内存操作。 在结合非对齐的 SIMD 内存操作中，最小的对齐大小应该等于 SIMD 寄存器的大小。 \end{quote}
+对于 Rapid\+JSON 来说，这显然是不可行的，因为 Rapid\+JSON 不应当强迫用户进行内存对齐。
+
+为了修复这个问题，当前的代码会先按字节处理直到下一个对齐的地址。在这之后，使用对齐读取来进行 SIMD 处理。见 \href{https://github.com/Tencent/rapidjson/issues/85}{\texttt{ \#85}}。\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_LocalStreamCopy}{}\doxysubsection{\texorpdfstring{Local Stream Copy}{Local Stream Copy}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_LocalStreamCopy}
+在优化的过程中，我们发现一些编译器不能将访问流的一些成员数据放入局部变量或者寄存器中。测试结果显示，对于一些流类型，创建流的拷贝并将其用于内层循环中可以改善性能。例如，实际（非 SIMD）的 {\ttfamily \doxylink{reader_8h_a60338858b2582eca23f3e509a2d82e0e}{Skip\+Whitespace()}} 被实现为：
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{template}<\textcolor{keyword}{typename}\ InputStream>}
+\DoxyCodeLine{\textcolor{keywordtype}{void}\ \mbox{\hyperlink{reader_8h_a60338858b2582eca23f3e509a2d82e0e}{SkipWhitespace}}(InputStream\&\ is)\ \{}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{classinternal_1_1_stream_local_copy}{internal::StreamLocalCopy<InputStream>}}\ \mbox{\hyperlink{namespacefc_a79771837fffd80fcc4bc658ee2fc4b2b}{copy}}(is);}
+\DoxyCodeLine{\ \ \ \ InputStream\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}(\mbox{\hyperlink{namespacefc_a79771837fffd80fcc4bc658ee2fc4b2b}{copy}}.s);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{while}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.Peek()\ ==\ \textcolor{charliteral}{'\ '}\ ||\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.Peek()\ ==\ \textcolor{charliteral}{'\(\backslash\)n'}\ ||\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.Peek()\ ==\ \textcolor{charliteral}{'\(\backslash\)r'}\ ||\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.Peek()\ ==\ \textcolor{charliteral}{'\(\backslash\)t'})}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.Take();}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+基于流的特征，{\ttfamily Stream\+Local\+Copy} 会创建（或不创建）流对象的拷贝，在局部使用它并将流的状态拷贝回原来的流。\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_ParsingDouble}{}\doxysubsection{\texorpdfstring{Parsing to Double}{Parsing to Double}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_ParsingDouble}
+将字符串解析为 {\ttfamily double} 并不简单。标准库函数 {\ttfamily \doxylink{_parse_numbers_8cpp_a20d704fe51ff7001184f5bec5e2f7f8d}{strtod()}} 可以胜任这项工作，但它比较缓慢。默认情况下，解析器使用默认的精度设置。这最多有 3\href{http://en.wikipedia.org/wiki/Unit_in_the_last_place}{\texttt{ ULP}} 的误差，并实现在 {\ttfamily \doxylink{namespaceinternal_a9e5fac4695310f09892fe52b1d24ab19}{internal\+::\+Strtod\+Normal\+Precision()}} 中。
+
+当使用 {\ttfamily k\+Parse\+Full\+Precision\+Flag} 时，编译器会改为调用 {\ttfamily \doxylink{namespaceinternal_a899ff5a0c5f9b203d720bb6f5631ed10}{internal\+::\+Strtod\+Full\+Precision()}} ，这个函数会自动调用三个版本的转换。
+\begin{DoxyEnumerate}
+\item \href{http://www.exploringbinary.com/fast-path-decimal-to-floating-point-conversion/}{\texttt{ Fast-\/\+Path}}。
+\item \href{https://github.com/floitsch/double-conversion}{\texttt{ double-\/conversion}} 中的自定义 DIY-\/\+FP 实现。
+\item （\+Clinger, William D.\+ \+How to read floating point numbers accurately. Vol. 25. No. 6. ACM, 1990） 中的大整数算法。
+\end{DoxyEnumerate}
+
+如果第一个转换方法失败，则尝试使用第二种方法，以此类推。\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_GenerationOptimization}{}\doxysection{\texorpdfstring{Generation Optimization}{Generation Optimization}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_GenerationOptimization}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_itoa}{}\doxysubsection{\texorpdfstring{Integer-\/to-\/\+String conversion}{Integer-\/to-\/\+String conversion}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_itoa}
+整数到字符串转换的朴素算法需要对每一个十进制位进行一次处罚。我们实现了若干版本并在 \href{https://github.com/miloyip/itoa-benchmark}{\texttt{ itoa-\/benchmark}} 中对它们进行了评估。
+
+虽然 SSE2 版本是最快的，但它和第二快的 {\ttfamily branchlut} 差距不大。而且 {\ttfamily branchlut} 是纯\+C++实现，所以我们在 Rapid\+JSON 中使用了 {\ttfamily branchlut}。\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_dtoa}{}\doxysubsection{\texorpdfstring{Double-\/to-\/\+String conversion}{Double-\/to-\/\+String conversion}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_dtoa}
+原来 Rapid\+JSON 使用 {\ttfamily snprintf(..., ..., "{}\%g"{})} 来进行双精度浮点数到字符串的转换。这是不准确的，因为默认的精度是6。随后我们发现它很缓慢，而且有其它的替代品。
+
+Google 的 V8 \href{https://github.com/floitsch/double-conversion}{\texttt{ double-\/conversion}} 实现了更新的、快速的被称为 Grisu3 的算法（\+Loitsch, Florian. "{}\+Printing floating-\/point numbers quickly and accurately with integers."{} \+ACM Sigplan Notices 45.6 (2010)\+: 233-\/243.）。
+
+然而，这个实现不是仅头文件的，所以我们实现了一个仅头文件的 Grisu2 版本。这个算法保证了结果永远精确。而且在大多数情况下，它会生成最短的（可选）字符串表示。
+
+这个仅头文件的转换函数在 \href{https://github.com/miloyip/dtoa-benchmark}{\texttt{ dtoa-\/benchmark}} 中进行评估。\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_Parser}{}\doxysection{\texorpdfstring{Parser}{Parser}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_Parser}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_IterativeParser}{}\doxysubsection{\texorpdfstring{Iterative Parser}{Iterative Parser}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_IterativeParser}
+迭代解析器是一个以非递归方式实现的递归下降的 LL(1) 解析器。\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_IterativeParserGrammar}{}\doxysubsubsection{\texorpdfstring{Grammar}{Grammar}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_IterativeParserGrammar}
+解析器使用的语法是基于严格 JSON 语法的： 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{S\ -\/>\ array\ |\ object}
+\DoxyCodeLine{array\ -\/>\ [\ values\ ]}
+\DoxyCodeLine{object\ -\/>\ \{\ members\ \}}
+\DoxyCodeLine{values\ -\/>\ non-\/empty-\/values\ |\ ε}
+\DoxyCodeLine{non-\/empty-\/values\ -\/>\ value\ addition-\/values}
+\DoxyCodeLine{addition-\/values\ -\/>\ ε\ |\ ,\ non-\/empty-\/values}
+\DoxyCodeLine{members\ -\/>\ non-\/empty-\/members\ |\ ε}
+\DoxyCodeLine{non-\/empty-\/members\ -\/>\ member\ addition-\/members}
+\DoxyCodeLine{addition-\/members\ -\/>\ ε\ |\ ,\ non-\/empty-\/members}
+\DoxyCodeLine{member\ -\/>\ STRING\ :\ value}
+\DoxyCodeLine{value\ -\/>\ STRING\ |\ NUMBER\ |\ NULL\ |\ BOOLEAN\ |\ object\ |\ array}
+
+\end{DoxyCode}
+
+
+注意到左因子被加入了非终结符的 {\ttfamily values} 和 {\ttfamily members} 来保证语法是 LL(1) 的。\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_IterativeParserParsingTable}{}\doxysubsubsection{\texorpdfstring{Parsing Table}{Parsing Table}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_IterativeParserParsingTable}
+基于这份语法，我们可以构造 FIRST 和 FOLLOW 集合。
+
+非终结符的 FIRST 集合如下所示：
+
+\tabulinesep=1mm
+\begin{longtabu}spread 0pt [c]{*{2}{|X[-1]}|}
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ NON-\/\+TERMINAL   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ FIRST    }\\\cline{1-2}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ NON-\/\+TERMINAL   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ FIRST    }\\\cline{1-2}
+\endhead
+\PBS\centering array   &\PBS\centering \mbox{[}    \\\cline{1-2}
+\PBS\centering object   &\PBS\centering \{    \\\cline{1-2}
+\PBS\centering values   &\PBS\centering ε STRING NUMBER NULL BOOLEAN \{ \mbox{[}    \\\cline{1-2}
+\PBS\centering addition-\/values   &\PBS\centering ε COMMA    \\\cline{1-2}
+\PBS\centering members   &\PBS\centering ε STRING    \\\cline{1-2}
+\PBS\centering addition-\/members   &\PBS\centering ε COMMA    \\\cline{1-2}
+\PBS\centering member   &\PBS\centering STRING    \\\cline{1-2}
+\PBS\centering value   &\PBS\centering STRING NUMBER NULL BOOLEAN \{ \mbox{[}    \\\cline{1-2}
+\PBS\centering \doxylink{struct_s}{S}   &\PBS\centering \mbox{[} \{    \\\cline{1-2}
+\PBS\centering non-\/empty-\/members   &\PBS\centering STRING    \\\cline{1-2}
+\PBS\centering non-\/empty-\/values   &\PBS\centering STRING NUMBER NULL BOOLEAN \{ \mbox{[}   \\\cline{1-2}
+\end{longtabu}
+
+
+FOLLOW 集合如下所示：
+
+\tabulinesep=1mm
+\begin{longtabu}spread 0pt [c]{*{2}{|X[-1]}|}
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ NON-\/\+TERMINAL   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ FOLLOW    }\\\cline{1-2}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ NON-\/\+TERMINAL   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ FOLLOW    }\\\cline{1-2}
+\endhead
+\PBS\centering \doxylink{struct_s}{S}   &\PBS\centering \$    \\\cline{1-2}
+\PBS\centering array   &\PBS\centering , \$ \} \mbox{]}    \\\cline{1-2}
+\PBS\centering object   &\PBS\centering , \$ \} \mbox{]}    \\\cline{1-2}
+\PBS\centering values   &\PBS\centering \mbox{]}    \\\cline{1-2}
+\PBS\centering non-\/empty-\/values   &\PBS\centering \mbox{]}    \\\cline{1-2}
+\PBS\centering addition-\/values   &\PBS\centering \mbox{]}    \\\cline{1-2}
+\PBS\centering members   &\PBS\centering \}    \\\cline{1-2}
+\PBS\centering non-\/empty-\/members   &\PBS\centering \}    \\\cline{1-2}
+\PBS\centering addition-\/members   &\PBS\centering \}    \\\cline{1-2}
+\PBS\centering member   &\PBS\centering , \}    \\\cline{1-2}
+\PBS\centering value   &\PBS\centering , \} \mbox{]}   \\\cline{1-2}
+\end{longtabu}
+
+
+最终可以从 FIRST 和 FOLLOW 集合生成解析表：
+
+\tabulinesep=1mm
+\begin{longtabu}spread 0pt [c]{*{11}{|X[-1]}|}
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ NON-\/\+TERMINAL   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ \mbox{[}   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ \{   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ ,   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ \+:   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ \mbox{]}   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ \}   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ STRING   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ NUMBER   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ NULL   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ BOOLEAN    }\\\cline{1-11}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ NON-\/\+TERMINAL   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ \mbox{[}   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ \{   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ ,   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ \+:   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ \mbox{]}   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ \}   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ STRING   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ NUMBER   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ NULL   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ BOOLEAN    }\\\cline{1-11}
+\endhead
+\PBS\centering \doxylink{struct_s}{S}   &\PBS\centering array   &\PBS\centering object   &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering \\\cline{1-11}
+\PBS\centering array   &\PBS\centering \mbox{[} values \mbox{]}   &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering \\\cline{1-11}
+\PBS\centering object   &\PBS\centering &\PBS\centering \{ members \}   &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering \\\cline{1-11}
+\PBS\centering values   &\PBS\centering non-\/empty-\/values   &\PBS\centering non-\/empty-\/values   &\PBS\centering &\PBS\centering &\PBS\centering ε   &\PBS\centering &\PBS\centering non-\/empty-\/values   &\PBS\centering non-\/empty-\/values   &\PBS\centering non-\/empty-\/values   &\PBS\centering non-\/empty-\/values    \\\cline{1-11}
+\PBS\centering non-\/empty-\/values   &\PBS\centering value addition-\/values   &\PBS\centering value addition-\/values   &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering value addition-\/values   &\PBS\centering value addition-\/values   &\PBS\centering value addition-\/values   &\PBS\centering value addition-\/values    \\\cline{1-11}
+\PBS\centering addition-\/values   &\PBS\centering &\PBS\centering &\PBS\centering , non-\/empty-\/values   &\PBS\centering &\PBS\centering ε   &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering \\\cline{1-11}
+\PBS\centering members   &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering ε   &\PBS\centering non-\/empty-\/members   &\PBS\centering &\PBS\centering &\PBS\centering \\\cline{1-11}
+\PBS\centering non-\/empty-\/members   &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering member addition-\/members   &\PBS\centering &\PBS\centering &\PBS\centering \\\cline{1-11}
+\PBS\centering addition-\/members   &\PBS\centering &\PBS\centering &\PBS\centering , non-\/empty-\/members   &\PBS\centering &\PBS\centering &\PBS\centering ε   &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering \\\cline{1-11}
+\PBS\centering member   &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering STRING \+: value   &\PBS\centering &\PBS\centering &\PBS\centering \\\cline{1-11}
+\PBS\centering value   &\PBS\centering array   &\PBS\centering object   &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering STRING   &\PBS\centering NUMBER   &\PBS\centering NULL   &\PBS\centering BOOLEAN   \\\cline{1-11}
+\end{longtabu}
+
+
+对于上面的语法分析，这里有一个很棒的\href{http://hackingoff.com/compilers/predict-first-follow-set}{\texttt{ 工具}}。\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_IterativeParserImplementation}{}\doxysubsubsection{\texorpdfstring{Implementation}{Implementation}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_IterativeParserImplementation}
+基于这份解析表，一个直接的（常规的）将规则反向入栈的实现可以正常工作。
+
+在 Rapid\+JSON 中，对直接的实现进行了一些修改：
+
+首先，在 Rapid\+JSON 中，这份解析表被编码为状态机。 规则由头部和主体组成。 状态转换由规则构造。 除此之外，额外的状态被添加到与 {\ttfamily array} 和 {\ttfamily object} 有关的规则。 通过这种方式，生成数组值或对象成员可以只用一次状态转移便可完成， 而不需要在直接的实现中的多次出栈/入栈操作。 这也使得估计栈的大小更加容易。
+
+状态图如如下所示：
+
+
+
+第二，迭代解析器也在内部栈保存了数组的值个数和对象成员的数量，这也与传统的实现不同。 

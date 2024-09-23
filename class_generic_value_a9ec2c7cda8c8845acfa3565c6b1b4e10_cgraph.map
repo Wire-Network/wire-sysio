@@ -1,0 +1,9 @@
+<map id="GenericValue::GenericValue" name="GenericValue::GenericValue">
+<area shape="rect" id="Node000001" title="Constructor for copy&#45;string (i.e. do make a copy of string)" alt="" coords="5,31,189,56"/>
+<area shape="rect" id="Node000002" href="$class_generic_value.html#a1451603922dcdf34976f125dc60f70ee" title="Initialize this value as constant string, without calling destructor." alt="" coords="237,5,424,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="189,31,221,27,221,33,189,36"/>
+<area shape="rect" id="Node000004" href="$document_8h.html#aa6b9fd9f6aa49405a574c362ba9af6b5" title="Mark a character pointer as constant string." alt="" coords="292,55,368,80"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="189,50,277,59,277,65,189,56"/>
+<area shape="rect" id="Node000003" href="$class_generic_value.html#ab3e8833927fb1454585e8692200dbb93" title=" " alt="" coords="472,5,673,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="424,16,456,16,456,21,424,21"/>
+</map>

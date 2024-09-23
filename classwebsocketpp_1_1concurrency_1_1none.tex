@@ -1,0 +1,53 @@
+\doxysection{websocketpp\+::concurrency\+::none Class Reference}
+\hypertarget{classwebsocketpp_1_1concurrency_1_1none}{}\label{classwebsocketpp_1_1concurrency_1_1none}\index{websocketpp::concurrency::none@{websocketpp::concurrency::none}}
+
+
+Stub concurrency policy that implements the interface using no-\/ops.  
+
+
+
+
+{\ttfamily \#include $<$none.\+hpp$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1concurrency_1_1none__impl_1_1fake__mutex}{none\+\_\+impl\+::fake\+\_\+mutex}} \mbox{\hyperlink{classwebsocketpp_1_1concurrency_1_1none_a1768441855790bab4b7751a26821fcb3}{mutex\+\_\+type}}
+\begin{DoxyCompactList}\small\item\em The type of a mutex primitive. \end{DoxyCompactList}\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1concurrency_1_1none__impl_1_1fake__lock__guard}{none\+\_\+impl\+::fake\+\_\+lock\+\_\+guard}} \mbox{\hyperlink{classwebsocketpp_1_1concurrency_1_1none_a88fb8e4883c82e6bfa3638118ddff2aa}{scoped\+\_\+lock\+\_\+type}}
+\begin{DoxyCompactList}\small\item\em The type of a scoped/\+RAII lock primitive. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+This policy documents the concurrency policy interface using no-\/ops. It can be used as a reference or base for building a new concurrency policy. It can also be used as is to disable all locking for endpoints used in purely single threaded programs. 
+
+Definition at line \mbox{\hyperlink{concurrency_2none_8hpp_source_l00060}{60}} of file \mbox{\hyperlink{concurrency_2none_8hpp_source}{none.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classwebsocketpp_1_1concurrency_1_1none_a1768441855790bab4b7751a26821fcb3}\index{websocketpp::concurrency::none@{websocketpp::concurrency::none}!mutex\_type@{mutex\_type}}
+\index{mutex\_type@{mutex\_type}!websocketpp::concurrency::none@{websocketpp::concurrency::none}}
+\doxysubsubsection{\texorpdfstring{mutex\_type}{mutex\_type}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1concurrency_1_1none_a1768441855790bab4b7751a26821fcb3} 
+\mbox{\hyperlink{classwebsocketpp_1_1concurrency_1_1none__impl_1_1fake__mutex}{none\+\_\+impl\+::fake\+\_\+mutex}} \mbox{\hyperlink{classwebsocketpp_1_1concurrency_1_1none_a1768441855790bab4b7751a26821fcb3}{websocketpp\+::concurrency\+::none\+::mutex\+\_\+type}}}
+
+std\+::mutex is an example. 
+
+Definition at line \mbox{\hyperlink{concurrency_2none_8hpp_source_l00066}{66}} of file \mbox{\hyperlink{concurrency_2none_8hpp_source}{none.\+hpp}}.
+
+\Hypertarget{classwebsocketpp_1_1concurrency_1_1none_a88fb8e4883c82e6bfa3638118ddff2aa}\index{websocketpp::concurrency::none@{websocketpp::concurrency::none}!scoped\_lock\_type@{scoped\_lock\_type}}
+\index{scoped\_lock\_type@{scoped\_lock\_type}!websocketpp::concurrency::none@{websocketpp::concurrency::none}}
+\doxysubsubsection{\texorpdfstring{scoped\_lock\_type}{scoped\_lock\_type}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1concurrency_1_1none_a88fb8e4883c82e6bfa3638118ddff2aa} 
+\mbox{\hyperlink{classwebsocketpp_1_1concurrency_1_1none__impl_1_1fake__lock__guard}{none\+\_\+impl\+::fake\+\_\+lock\+\_\+guard}} \mbox{\hyperlink{classwebsocketpp_1_1concurrency_1_1none_a88fb8e4883c82e6bfa3638118ddff2aa}{websocketpp\+::concurrency\+::none\+::scoped\+\_\+lock\+\_\+type}}}
+
+The scoped lock constructor should take a mutex\+\_\+type as a parameter, acquire that lock, and release it in its destructor. std\+::lock\+\_\+guard is an example. 
+
+Definition at line \mbox{\hyperlink{concurrency_2none_8hpp_source_l00074}{74}} of file \mbox{\hyperlink{concurrency_2none_8hpp_source}{none.\+hpp}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/vendor/websocketpp/websocketpp/concurrency/\mbox{\hyperlink{concurrency_2none_8hpp}{none.\+hpp}}\end{DoxyCompactItemize}

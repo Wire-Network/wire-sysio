@@ -1,0 +1,344 @@
+\doxysection{trx\+\_\+retry\+\_\+db.\+cpp}
+\hypertarget{trx__retry__db_8cpp_source}{}\label{trx__retry__db_8cpp_source}\index{plugins/chain\_plugin/trx\_retry\_db.cpp@{plugins/chain\_plugin/trx\_retry\_db.cpp}}
+\mbox{\hyperlink{trx__retry__db_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{trx__retry__db_8hpp}{sysio/chain\_plugin/trx\_retry\_db.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{chain_2include_2sysio_2chain_2types_8hpp}{sysio/chain/types.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{contract__types_8hpp}{sysio/chain/contract\_types.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{controller_8hpp}{sysio/chain/controller.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{application_8hpp}{appbase/application.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{plugin__interface_8hpp}{sysio/chain/plugin\_interface.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{tracked__storage_8hpp}{fc/container/tracked\_storage.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00012}00012\ \textcolor{preprocessor}{\#include\ <boost/multi\_index\_container.hpp>}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00013}00013\ \textcolor{preprocessor}{\#include\ <boost/multi\_index/ordered\_index.hpp>}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00014}00014\ \textcolor{preprocessor}{\#include\ <boost/multi\_index/hashed\_index.hpp>}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00015}00015\ \textcolor{preprocessor}{\#include\ <boost/multi\_index/composite\_key.hpp>}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00016}00016\ \textcolor{preprocessor}{\#include\ <boost/multi\_index/member.hpp>}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00019}00019\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}};}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00020}00020\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacesysio_1_1chain}{sysio::chain}};}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00021}00021\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacesysio_1_1chain_1_1literals}{sysio::chain::literals}};}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00022}00022\ \textcolor{keyword}{using\ namespace\ }boost::multi\_index;}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00024}00024\ \textcolor{keyword}{namespace\ }\{}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00026}00026\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ lib\_totem\ =\ std::numeric\_limits<uint16\_t>::max();}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00028}00028\ \textcolor{keyword}{struct\ }tracked\_transaction\ \{}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00029}00029\ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_a7041c0316bd294d0866609ab3e0cc7a7}{packed\_transaction\_ptr}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ptrx;}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00030}00030\ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ num\_blocks\ =\ 0;\ \textcolor{comment}{//\ lib\ is\ lib\_totem}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00031}00031\ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ block\_num\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00032}00032\ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ trx\_trace\_v;}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00033}00033\ \ \ \ \mbox{\hyperlink{classfc_1_1time__point}{fc::time\_point}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ last\_try;}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00034}00034\ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain__apis_a7c0a9b3be43e3ab139d31d0d3bb98f5b}{chain\_apis::next\_function<std::unique\_ptr<fc::variant>}}>\ \ \ \mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}};}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00036}00036\ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha256}{transaction\_id\_type}}\&\ \mbox{\hyperlink{code__cache_8cpp_aa0efefe21f4700d78692edc823e763be}{id}}()\textcolor{keyword}{const\ }\{\ \textcolor{keywordflow}{return}\ ptrx-\/>id();\ \}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00037}00037\ \ \ \ \mbox{\hyperlink{classfc_1_1time__point__sec}{fc::time\_point\_sec}}\ expiry()\textcolor{keyword}{const\ }\{\ \textcolor{keywordflow}{return}\ ptrx-\/>expiration();\ \}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00039}00039\ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ ready\_block\_num()\textcolor{keyword}{const\ }\{}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00040}00040\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ block\_num\ ==\ 0\ )\ \textcolor{keywordflow}{return}\ std::numeric\_limits<uint32\_t>::max()\ -\/\ 1;\ \textcolor{comment}{//\ group\ not\ seen\ in\ middle}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00041}00041\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ num\_blocks\ ==\ lib\_totem\ )\ \textcolor{keywordflow}{return}\ std::numeric\_limits<uint32\_t>::max();\ \ \ \textcolor{comment}{//\ lib\ at\ the\ end}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00042}00042\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ block\_num\ +\ num\_blocks;}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00043}00043\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00045}00045\ \ \ \ \mbox{\hyperlink{classfc_1_1time__point}{fc::time\_point}}\ last\_try\_time()\textcolor{keyword}{const\ }\{}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00046}00046\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ block\_num\ !=\ 0\ )\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1time__point_aeccf1b70aa34b132c5269313b8a50573}{fc::time\_point::maximum}}();}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00047}00047\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ last\_try;}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00048}00048\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00050}00050\ \ \ \ \textcolor{keywordtype}{bool}\ is\_ready()\textcolor{keyword}{const\ }\{}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00051}00051\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ block\_num\ !=\ 0;}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00052}00052\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00054}00054\ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{namespacefc_1_1tracked_a7a874ea77f5afa2de8f3d5fb6d19a241}{memory\_size}}()\textcolor{keyword}{const\ }\{\ \textcolor{keywordflow}{return}\ ptrx-\/>get\_estimated\_size()\ +\ trx\_trace\_v.\mbox{\hyperlink{classfc_1_1variant_ab5f4bb5f1f3ab7bc8fee99135445df52}{estimated\_size}}()\ +\ \textcolor{keyword}{sizeof}(*this);\ \}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00056}00056\ \ \ \ tracked\_transaction(\textcolor{keyword}{const}\ tracked\_transaction\&)\ =\ \textcolor{keyword}{delete};}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00057}00057\ \ \ \ tracked\_transaction()\ =\ \textcolor{keyword}{delete};}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00058}00058\ \ \ \ tracked\_transaction\&\ operator=(\textcolor{keyword}{const}\ tracked\_transaction\&)\ =\ \textcolor{keyword}{delete};}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00059}00059\ \ \ \ tracked\_transaction(tracked\_transaction\&\&)\ =\ \textcolor{keywordflow}{default};}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00060}00060\ \};}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00062}00062\ \textcolor{keyword}{struct\ }by\_trx\_id;}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00063}00063\ \textcolor{keyword}{struct\ }by\_expiry;}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00064}00064\ \textcolor{keyword}{struct\ }by\_ready\_block\_num;}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00065}00065\ \textcolor{keyword}{struct\ }by\_block\_num;}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00066}00066\ \textcolor{keyword}{struct\ }by\_last\_try;}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00067}00067\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00068}00068\ \textcolor{keyword}{using\ }tracked\_transaction\_index\_t\ =\ multi\_index\_container<tracked\_transaction,}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00069}00069\ \ \ \ \ \ \ indexed\_by<}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \ \ \ hashed\_unique<tag<by\_trx\_id>,}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00071}00071\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ const\_mem\_fun<tracked\_transaction,\ const\ transaction\_id\_type\&,\ \&tracked\_transaction::id>,\ std::hash<transaction\_id\_type>}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \ \ \ >,}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00073}00073\ \ \ \ \ \ \ \ \ \ \ \ \ ordered\_non\_unique<tag<by\_expiry>,}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00074}00074\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ const\_mem\_fun<tracked\_transaction,\ fc::time\_point\_sec,\ \&tracked\_transaction::expiry>}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00075}00075\ \ \ \ \ \ \ \ \ \ \ \ \ >,}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \ \ \ ordered\_non\_unique<tag<by\_ready\_block\_num>,}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ const\_mem\_fun<tracked\_transaction,\ uint32\_t,\ \&tracked\_transaction::ready\_block\_num>}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00078}00078\ \ \ \ \ \ \ \ \ \ \ \ \ >,}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \ \ \ ordered\_non\_unique<tag<by\_block\_num>,}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00080}00080\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ member<tracked\_transaction,\ uint32\_t,\ \&tracked\_transaction::block\_num>}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00081}00081\ \ \ \ \ \ \ \ \ \ \ \ \ >,}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00082}00082\ \ \ \ \ \ \ \ \ \ \ \ \ ordered\_non\_unique<tag<by\_last\_try>,}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00083}00083\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ const\_mem\_fun<tracked\_transaction,\ fc::time\_point,\ \&tracked\_transaction::last\_try\_time>}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00084}00084\ \ \ \ \ \ \ \ \ \ \ \ \ >}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00085}00085\ \ \ \ \ \ \ >}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00086}00086\ >;}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00087}00087\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00088}00088\ \}\ \textcolor{comment}{//\ anonymous\ namespace}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00089}00089\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00090}00090\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio_1_1chain__apis}{sysio::chain\_apis}}\ \{}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00091}00091\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00092}\mbox{\hyperlink{structsysio_1_1chain__apis_1_1trx__retry__db__impl}{00092}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structsysio_1_1chain__apis_1_1trx__retry__db__impl}{trx\_retry\_db\_impl}}\ \{}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00093}\mbox{\hyperlink{structsysio_1_1chain__apis_1_1trx__retry__db__impl_af7d7ff0aaeb0aa01a7f6cfb312f7479f}{00093}}\ \ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1trx__retry__db__impl_af7d7ff0aaeb0aa01a7f6cfb312f7479f}{trx\_retry\_db\_impl}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1chain_1_1controller}{chain::controller}}\&\ \mbox{\hyperlink{classsysio_1_1chain_1_1controller}{controller}},\ \textcolor{keywordtype}{size\_t}\ max\_mem\_usage\_size,}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00094}00094\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1microseconds}{fc::microseconds}}\ retry\_interval,\ \mbox{\hyperlink{classfc_1_1microseconds}{fc::microseconds}}\ max\_expiration\_time,}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00095}00095\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1microseconds}{fc::microseconds}}\ \mbox{\hyperlink{programs_2clio_2main_8cpp_a074511b7997537efa9b642dcddcced71}{abi\_serializer\_max\_time}})}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00096}00096\ \ \ \ :\ \_controller(\mbox{\hyperlink{classsysio_1_1chain_1_1controller}{controller}})}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00097}00097\ \ \ \ ,\ \_transaction\_ack\_channel(\mbox{\hyperlink{namespaceappbase}{appbase}}::\mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().get\_channel<chain::plugin\_interface::compat::channels::transaction\_ack>())}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00098}00098\ \ \ \ ,\ \_abi\_serializer\_max\_time(\mbox{\hyperlink{programs_2clio_2main_8cpp_a074511b7997537efa9b642dcddcced71}{abi\_serializer\_max\_time}})}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00099}00099\ \ \ \ ,\ \_max\_mem\_usage\_size(max\_mem\_usage\_size)}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00100}00100\ \ \ \ ,\ \_retry\_interval(retry\_interval)}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00101}00101\ \ \ \ ,\ \_max\_expiration\_time(max\_expiration\_time)}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00102}00102\ \ \ \ \{\}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00103}00103\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00104}\mbox{\hyperlink{structsysio_1_1chain__apis_1_1trx__retry__db__impl_a55737444ce4d85c4dd484dfc5060d0f9}{00104}}\ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1microseconds}{fc::microseconds}}\&\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1trx__retry__db__impl_a55737444ce4d85c4dd484dfc5060d0f9}{get\_max\_expiration}}()\textcolor{keyword}{const\ }\{}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00105}00105\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \_max\_expiration\_time;}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00106}00106\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00107}00107\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00108}\mbox{\hyperlink{structsysio_1_1chain__apis_1_1trx__retry__db__impl_aa5c399d19146af11a74731749b4b6304}{00108}}\ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1trx__retry__db__impl_aa5c399d19146af11a74731749b4b6304}{size}}()\textcolor{keyword}{const\ }\{}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00109}00109\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \_tracked\_trxs.\mbox{\hyperlink{classfc_1_1tracked__storage_ab578f3765c80c8cee1d758d440c99e90}{index}}().size();}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00110}00110\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00111}00111\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00112}\mbox{\hyperlink{structsysio_1_1chain__apis_1_1trx__retry__db__impl_a6dd90ac668940381e2e43d68901b697b}{00112}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1trx__retry__db__impl_a6dd90ac668940381e2e43d68901b697b}{track\_transaction}}(\ \mbox{\hyperlink{namespacesysio_1_1chain_a7041c0316bd294d0866609ab3e0cc7a7}{packed\_transaction\_ptr}}\ ptrx,\ std::optional<uint16\_t>\ num\_blocks,\ \mbox{\hyperlink{namespacesysio_1_1chain__apis_a7c0a9b3be43e3ab139d31d0d3bb98f5b}{next\_function}}<std::unique\_ptr<fc::variant>>\ next\ )\ \{}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00113}00113\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ \_tracked\_trxs.\mbox{\hyperlink{classfc_1_1tracked__storage_a5bd678ec2e09568df574c8ecaa184962}{memory\_size}}()\ <\ \_max\_mem\_usage\_size,\ tx\_resource\_exhaustion,}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00114}00114\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Transaction\ exceeded\ \ transaction-\/retry-\/max-\/storage-\/size-\/gb\ limit:\ \$\{m\}\ bytes"{}},\ (\textcolor{stringliteral}{"{}m"{}},\ \_tracked\_trxs.\mbox{\hyperlink{classfc_1_1tracked__storage_a5bd678ec2e09568df574c8ecaa184962}{memory\_size}}())\ );}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00115}00115\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ i\ =\ \_tracked\_trxs.\mbox{\hyperlink{classfc_1_1tracked__storage_ab578f3765c80c8cee1d758d440c99e90}{index}}().get<by\_trx\_id>().find(\ ptrx-\/>id()\ );}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00116}00116\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ i\ ==\ \_tracked\_trxs.\mbox{\hyperlink{classfc_1_1tracked__storage_ab578f3765c80c8cee1d758d440c99e90}{index}}().end()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00117}00117\ \ \ \ \ \ \ \ \ \ \_tracked\_trxs.\mbox{\hyperlink{classfc_1_1tracked__storage_a6d24a6bf4512b48a846d88a1bf44b5b8}{insert}}(\ \{std::move(ptrx),}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00118}00118\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ !num\_blocks.has\_value()\ ?\ lib\_totem\ :\ *num\_blocks,}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00119}00119\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0,}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00120}00120\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\},}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00121}00121\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{fc::time\_point::now}}(),}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00122}00122\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::move(next)\}\ );}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00123}00123\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00124}00124\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ already\ tracking\ transaction}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00125}00125\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00126}00126\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00127}00127\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00128}\mbox{\hyperlink{structsysio_1_1chain__apis_1_1trx__retry__db__impl_a3a80c92f409e90cf684cb94e0d35338e}{00128}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1trx__retry__db__impl_a3a80c92f409e90cf684cb94e0d35338e}{on\_applied\_transaction}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_a4ee2867a6bec961c7a78b203cfd76be9}{chain::transaction\_trace\_ptr}}\&\ trace,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_a7041c0316bd294d0866609ab3e0cc7a7}{chain::packed\_transaction\_ptr}}\&\ ptrx\ )\ \{}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00129}00129\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !trace-\/>receipt\ )\ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00130}00130\ \ \ \ \ \ \ \textcolor{comment}{//\ include\ only\ executed\ incoming\ transactions.}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00131}00131\ \ \ \ \ \ \ \textcolor{comment}{//\ soft\_fail\ not\ included\ as\ only\ interested\ in\ incoming}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00132}00132\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(trace-\/>receipt-\/>status\ !=\ \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__receipt__header_a2bb00bac16048e6f624c2ded867ebf55a7a6de58f1f84063a5f85bbfb59b43608}{chain::transaction\_receipt\_header::executed}})\ \{}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00133}00133\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00134}00134\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00135}00135\ \ \ \ \ \ \ \textcolor{comment}{//\ only\ incoming}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00136}00136\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ trace-\/>scheduled\ )\ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00137}00137\ \ \ \ \ \ \ \textcolor{comment}{//\ Only\ want\ transactions\ in\ a\ block,\ if\ no\ producer\ id\ then\ not\ in\ a\ block}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00138}00138\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !trace-\/>producer\_block\_id\ )\ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00139}00139\ \ \ \ \ \ \ \textcolor{comment}{//\ Don't\ care\ about\ implicit}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00140}00140\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{namespacesysio_1_1chain_a9a9946a27c3832394b9b2b3911e0733c}{chain::is\_onblock}}(\ *trace\ )\ )\ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00141}00141\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00142}00142\ \ \ \ \ \ \ \textcolor{comment}{//\ Is\ this\ a\ transaction\ we\ are\ tracking}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00143}00143\ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ idx\ =\ \_tracked\_trxs.\mbox{\hyperlink{classfc_1_1tracked__storage_ab578f3765c80c8cee1d758d440c99e90}{index}}().get<by\_trx\_id>();}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00144}00144\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ idx.find(trace-\/>id);}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00145}00145\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr\ !=\ idx.end()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00146}00146\ \ \ \ \ \ \ \ \ \ \_tracked\_trxs.\mbox{\hyperlink{classfc_1_1tracked__storage_a857cf0f6d4ca31111b633b9d4c923ffe}{modify}}(\ itr,\ [\&trace,\ \&control=\_controller,\ \&abi\_max\_time=\_abi\_serializer\_max\_time](\ tracked\_transaction\&\ tt\ )\ \{}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00147}00147\ \ \ \ \ \ \ \ \ \ \ \ \ tt.block\_num\ =\ trace-\/>block\_num;}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00148}00148\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00149}00149\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ send\_transaction\ trace\ output\ format.}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00150}00150\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Convert\ to\ variant\ with\ abi\ here\ and\ now\ because\ abi\ could\ change\ in\ very\ next\ transaction.}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00151}00151\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Alternatively,\ we\ could\ store\ off\ all\ the\ abis\ needed\ and\ do\ the\ conversion\ later,\ but\ as\ this\ is\ designed}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00152}00152\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ to\ run\ on\ an\ API\ node,\ probably\ the\ best\ trade\ off\ to\ perform\ the\ abi\ serialization\ during\ block\ processing.}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00153}00153\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ tt.trx\_trace\_v\ =\ control.to\_variant\_with\_abi(\ *trace,\ \mbox{\hyperlink{structsysio_1_1chain_1_1abi__serializer_a2dc34bf706557f0c83d61b3791299c98}{abi\_serializer::create\_yield\_function}}(\ abi\_max\_time\ )\ );}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00154}00154\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}(\ chain::abi\_exception\&\ )\ \{}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00155}00155\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ tt.trx\_trace\_v\ =\ *trace;}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00156}00156\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00157}00157\ \ \ \ \ \ \ \ \ \ \}\ );}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00158}00158\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00159}00159\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00160}00160\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00161}\mbox{\hyperlink{structsysio_1_1chain__apis_1_1trx__retry__db__impl_a54008a84f46f45ddf7f8a57aba9e7c8f}{00161}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1trx__retry__db__impl_a54008a84f46f45ddf7f8a57aba9e7c8f}{on\_block\_start}}(\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ block\_num\ )\ \{}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00162}00162\ \ \ \ \ \ \ \textcolor{comment}{//\ on\ forks\ rollback\ any\ accepted\ block\ transactions}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00163}00163\ \ \ \ \ \ \ rollback\_to(\ block\_num\ );}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00164}00164\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00165}00165\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00166}\mbox{\hyperlink{structsysio_1_1chain__apis_1_1trx__retry__db__impl_a2540514c64a504f962802abecc314565}{00166}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1trx__retry__db__impl_a2540514c64a504f962802abecc314565}{on\_accepted\_block}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{chain::block\_state\_ptr}}\&\ bsp\ )\ \{}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00167}00167\ \ \ \ \ \ \ \textcolor{comment}{//\ good\ time\ to\ perform\ processing}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00168}00168\ \ \ \ \ \ \ ack\_ready\_trxs\_by\_block\_num(\ bsp-\/>block\_num\ );}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00169}00169\ \ \ \ \ \ \ retry\_trxs();}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00170}00170\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00171}00171\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00172}\mbox{\hyperlink{structsysio_1_1chain__apis_1_1trx__retry__db__impl_a198588874aabe1ad26f4f2c1f65ec843}{00172}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1trx__retry__db__impl_a198588874aabe1ad26f4f2c1f65ec843}{on\_irreversible\_block}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{chain::block\_state\_ptr}}\&\ bsp\ )\ \{}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00173}00173\ \ \ \ \ \ \ ack\_ready\_trxs\_by\_lib(\ bsp-\/>block\_num\ );}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00174}00174\ \ \ \ \ \ \ clear\_expired(\ bsp-\/>block-\/>timestamp\ );}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00175}00175\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00176}00176\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00177}00177\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00178}00178\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00179}00179\ \ \ \ \textcolor{keywordtype}{void}\ rollback\_to(\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ block\_num\ )\ \{}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00180}00180\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ idx\ =\ \_tracked\_trxs.\mbox{\hyperlink{classfc_1_1tracked__storage_ab578f3765c80c8cee1d758d440c99e90}{index}}().get<by\_block\_num>();}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00181}00181\ \ \ \ \ \ \ \textcolor{comment}{//\ determine\ what\ to\ rollback}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00182}00182\ \ \ \ \ \ \ deque<\textcolor{keyword}{decltype}(\_tracked\_trxs.\mbox{\hyperlink{classfc_1_1tracked__storage_ab578f3765c80c8cee1d758d440c99e90}{index}}().project<0>(idx.begin()))>\ to\_process;}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00183}00183\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\ i\ =\ idx.rbegin();\ i\ !=\ idx.rend();\ ++i\ )\ \{}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00184}00184\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ called\ on\ block\_start,\ so\ any\ block\_num\ greater\ or\ equal\ have\ been\ rolled\ back}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00185}00185\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ i-\/>block\_num\ <\ block\_num\ )\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00186}00186\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00187}00187\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ ii\ =\ i.base();\ \textcolor{comment}{//\ switch\ to\ forward\ iterator,\ then\ -\/-\/\ to\ get\ back\ to\ item}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00188}00188\ \ \ \ \ \ \ \ \ \ to\_process.emplace\_back(\ \_tracked\_trxs.\mbox{\hyperlink{classfc_1_1tracked__storage_ab578f3765c80c8cee1d758d440c99e90}{index}}().project<0>(\ -\/-\/ii\ )\ );}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00189}00189\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00190}00190\ \ \ \ \ \ \ \textcolor{comment}{//\ perform\ rollback}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00191}00191\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ now\ =\ \mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{fc::time\_point::now}}();}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00192}00192\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\&\ i\ :\ to\_process\ )\ \{}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00193}00193\ \ \ \ \ \ \ \ \ \ \_tracked\_trxs.\mbox{\hyperlink{classfc_1_1tracked__storage_a857cf0f6d4ca31111b633b9d4c923ffe}{modify}}(\ i,\ [\&](\ tracked\_transaction\&\ tt\ )\ \{}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00194}00194\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ if\ forked\ out,\ then\ need\ to\ retry,\ which\ will\ happen\ according\ to\ last\_try.}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00195}00195\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ if\ last\_try\ would\ cause\ it\ to\ immediately\ resend,\ then\ push\ it\ out\ 10\ seconds\ to\ allow\ time\ for}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00196}00196\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ fork-\/switch\ to\ complete.}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00197}00197\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ tt.last\_try\ +\ \_retry\_interval\ <=\ now\ )\ \{}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00198}00198\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ tt.last\_try\ +=\ \mbox{\hyperlink{namespacefc_a9623b8cae3f48bbed6aa1fc2afe9b174}{fc::seconds}}(\ 10\ );}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00199}00199\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00200}00200\ \ \ \ \ \ \ \ \ \ \ \ \ tt.block\_num\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00201}00201\ \ \ \ \ \ \ \ \ \ \ \ \ tt.trx\_trace\_v.\mbox{\hyperlink{classfc_1_1variant_a201c1ea686618f06d5839e541da3d641}{clear}}();}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00202}00202\ \ \ \ \ \ \ \ \ \ \}\ );}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00203}00203\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00204}00204\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00205}00205\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00206}00206\ \ \ \ \textcolor{keywordtype}{void}\ retry\_trxs()\ \{}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00207}00207\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ =\ \_tracked\_trxs.\mbox{\hyperlink{classfc_1_1tracked__storage_ab578f3765c80c8cee1d758d440c99e90}{index}}().get<by\_last\_try>();}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00208}00208\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ now\ =\ \mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{fc::time\_point::now}}();}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00209}00209\ \ \ \ \ \ \ \textcolor{comment}{//\ determine\ what\ to\ retry}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00210}00210\ \ \ \ \ \ \ deque<\textcolor{keyword}{decltype}(\_tracked\_trxs.\mbox{\hyperlink{classfc_1_1tracked__storage_ab578f3765c80c8cee1d758d440c99e90}{index}}().project<0>(\mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.begin()))>\ to\_process;}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00211}00211\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\ i\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.begin();\ i\ !=\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.end();\ ++i\ )\ \{}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00212}00212\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ i-\/>is\_ready()\ )\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00213}00213\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00214}00214\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ i-\/>last\_try\ +\ \_retry\_interval\ <=\ now\ )\ \{}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00215}00215\ \ \ \ \ \ \ \ \ \ \ \ \ to\_process.emplace\_back(\ \_tracked\_trxs.\mbox{\hyperlink{classfc_1_1tracked__storage_ab578f3765c80c8cee1d758d440c99e90}{index}}().project<0>(\ i\ )\ );}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00216}00216\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00217}00217\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00218}00218\ \ \ \ \ \ \ \textcolor{comment}{//\ retry}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00219}00219\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\&\ i:\ to\_process\ )\ \{}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00220}00220\ \ \ \ \ \ \ \ \ \ \_transaction\_ack\_channel.\mbox{\hyperlink{classappbase_1_1channel_ab30c2df14ba63cb006d8c52b48d19e3b}{publish}}(}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00221}00221\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structappbase_1_1priority_ae0c72abae2c2ba770667fcf90e40d654}{appbase::priority::low}},\ std::pair<fc::exception\_ptr,\ packed\_transaction\_ptr>(\ \textcolor{keyword}{nullptr},\ i-\/>ptrx\ )\ );}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00222}00222\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a3da1571bad6ca6c94df9a3660b2115ee}{dlog}}(\ \textcolor{stringliteral}{"{}retry\ send\ trx\ \$\{id\}"{}},\ (\textcolor{stringliteral}{"{}id"{}},\ i-\/>ptrx-\/>id())\ );}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00223}00223\ \ \ \ \ \ \ \ \ \ \_tracked\_trxs.\mbox{\hyperlink{classfc_1_1tracked__storage_a857cf0f6d4ca31111b633b9d4c923ffe}{modify}}(\ i,\ [\&](\ tracked\_transaction\&\ tt\ )\ \{}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00224}00224\ \ \ \ \ \ \ \ \ \ \ \ \ tt.last\_try\ =\ now;}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00225}00225\ \ \ \ \ \ \ \ \ \ \}\ );}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00226}00226\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00227}00227\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00228}00228\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00229}00229\ \ \ \ \textcolor{keywordtype}{void}\ ack\_ready\_trxs\_by\_block\_num(\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ block\_num\ )\ \{}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00230}00230\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ =\ \_tracked\_trxs.\mbox{\hyperlink{classfc_1_1tracked__storage_ab578f3765c80c8cee1d758d440c99e90}{index}}().get<by\_ready\_block\_num>();}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00231}00231\ \ \ \ \ \ \ \textcolor{comment}{//\ if\ we\ have\ reached\ requested\ block\ height\ then\ ack\ to\ user}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00232}00232\ \ \ \ \ \ \ deque<\textcolor{keyword}{decltype}(\_tracked\_trxs.\mbox{\hyperlink{classfc_1_1tracked__storage_ab578f3765c80c8cee1d758d440c99e90}{index}}().project<0>(\mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.begin()))>\ to\_process;}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00233}00233\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ end\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.upper\_bound(block\_num);}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00234}00234\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\ i\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.begin();\ i\ !=\ end;\ ++i\ )\ \{}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00235}00235\ \ \ \ \ \ \ \ \ \ to\_process.emplace\_back(\ \_tracked\_trxs.\mbox{\hyperlink{classfc_1_1tracked__storage_ab578f3765c80c8cee1d758d440c99e90}{index}}().project<0>(\ i\ )\ );}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00236}00236\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00237}00237\ \ \ \ \ \ \ \textcolor{comment}{//\ ack}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00238}00238\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\&\ i:\ to\_process\ )\ \{}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00239}00239\ \ \ \ \ \ \ \ \ \ \_tracked\_trxs.\mbox{\hyperlink{classfc_1_1tracked__storage_a857cf0f6d4ca31111b633b9d4c923ffe}{modify}}(\ i,\ [\&](\ tracked\_transaction\&\ tt\ )\ \{}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00240}00240\ \ \ \ \ \ \ \ \ \ \ \ \ tt.next(\ std::make\_unique<fc::variant>(\ std::move(\ tt.trx\_trace\_v\ )\ )\ );}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00241}00241\ \ \ \ \ \ \ \ \ \ \ \ \ tt.trx\_trace\_v.\mbox{\hyperlink{classfc_1_1variant_a201c1ea686618f06d5839e541da3d641}{clear}}();}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00242}00242\ \ \ \ \ \ \ \ \ \ \}\ );}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00243}00243\ \ \ \ \ \ \ \ \ \ \_tracked\_trxs.\mbox{\hyperlink{classfc_1_1tracked__storage_a51396073d7aa4bd1a431e318f5557924}{erase}}(\ i\ );}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00244}00244\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00245}00245\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00246}00246\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00247}00247\ \ \ \ \textcolor{keywordtype}{void}\ ack\_ready\_trxs\_by\_lib(\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ lib\_block\_num\ )\ \{}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00248}00248\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ =\ \_tracked\_trxs.\mbox{\hyperlink{classfc_1_1tracked__storage_ab578f3765c80c8cee1d758d440c99e90}{index}}().get<by\_block\_num>();}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00249}00249\ \ \ \ \ \ \ \textcolor{comment}{//\ determine\ what\ to\ ack}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00250}00250\ \ \ \ \ \ \ deque<\textcolor{keyword}{decltype}(\_tracked\_trxs.\mbox{\hyperlink{classfc_1_1tracked__storage_ab578f3765c80c8cee1d758d440c99e90}{index}}().project<0>(\mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.begin()))>\ to\_process;}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00251}00251\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ end\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.upper\_bound(lib\_block\_num);\ \textcolor{comment}{//\ process\ until\ lib\_block\_num}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00252}00252\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\ i\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.lower\_bound(1);\ i\ !=\ end;\ ++i\ )\ \{\ \textcolor{comment}{//\ skip\ over\ not\ ready,\ block\_num\ ==\ 0}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00253}00253\ \ \ \ \ \ \ \ \ \ to\_process.emplace\_back(\ \_tracked\_trxs.\mbox{\hyperlink{classfc_1_1tracked__storage_ab578f3765c80c8cee1d758d440c99e90}{index}}().project<0>(\ i\ )\ );}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00254}00254\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00255}00255\ \ \ \ \ \ \ \textcolor{comment}{//\ ack}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00256}00256\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\&\ i:\ to\_process\ )\ \{}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00257}00257\ \ \ \ \ \ \ \ \ \ \_tracked\_trxs.\mbox{\hyperlink{classfc_1_1tracked__storage_a857cf0f6d4ca31111b633b9d4c923ffe}{modify}}(\ i,\ [\&](\ tracked\_transaction\&\ tt\ )\ \{}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00258}00258\ \ \ \ \ \ \ \ \ \ \ \ \ tt.next(\ std::make\_unique<fc::variant>(\ std::move(\ tt.trx\_trace\_v\ )\ )\ );}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00259}00259\ \ \ \ \ \ \ \ \ \ \ \ \ tt.trx\_trace\_v.\mbox{\hyperlink{classfc_1_1variant_a201c1ea686618f06d5839e541da3d641}{clear}}();}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00260}00260\ \ \ \ \ \ \ \ \ \ \}\ );}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00261}00261\ \ \ \ \ \ \ \ \ \ \_tracked\_trxs.\mbox{\hyperlink{classfc_1_1tracked__storage_a51396073d7aa4bd1a431e318f5557924}{erase}}(\ i\ );}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00262}00262\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00263}00263\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00264}00264\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00265}00265\ \ \ \ \textcolor{keywordtype}{void}\ clear\_expired(\textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{block\_timestamp\_type}}\&\ \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{block\_timestamp}})\ \{}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00266}00266\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1time__point}{fc::time\_point}}\ block\_time\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{block\_timestamp}};}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00267}00267\ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ =\ \_tracked\_trxs.\mbox{\hyperlink{classfc_1_1tracked__storage_ab578f3765c80c8cee1d758d440c99e90}{index}}().get<by\_expiry>();}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00268}00268\ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\ !\mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.empty()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00269}00269\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.begin();}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00270}00270\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr-\/>expiry()\ >\ block\_time\ )\ \{}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00271}00271\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00272}00272\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00273}00273\ \ \ \ \ \ \ \ \ \ itr-\/>next(\ std::static\_pointer\_cast<fc::exception>(}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00274}00274\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::make\_shared<expired\_tx\_exception>(}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00275}00275\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{log__message_8hpp_a4a4df4bb5cffbe07aadf7d29fd44c75e}{FC\_LOG\_MESSAGE}}(\ error,\ \textcolor{stringliteral}{"{}expired\ retry\ transaction\ \$\{id\},\ expiration\ \$\{e\},\ block\ time\ \$\{bt\}"{}},}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00276}00276\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}id"{}},\ itr-\/>id())(\textcolor{stringliteral}{"{}e"{}},\ itr-\/>ptrx-\/>expiration())}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00277}00277\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}bt"{}},\ \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{block\_timestamp}})\ )\ )\ )\ );}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00278}00278\ \ \ \ \ \ \ \ \ \ \_tracked\_trxs.\mbox{\hyperlink{classfc_1_1tracked__storage_a51396073d7aa4bd1a431e318f5557924}{erase}}(\ \_tracked\_trxs.\mbox{\hyperlink{classfc_1_1tracked__storage_ab578f3765c80c8cee1d758d440c99e90}{index}}().project<0>(\ itr\ )\ );}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00279}00279\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00280}00280\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00281}00281\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00282}00282\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00283}00283\ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1chain_1_1controller}{chain::controller}}\&\ \_controller;\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00284}00284\ \ \ \ \mbox{\hyperlink{classappbase_1_1channel}{chain::plugin\_interface::compat::channels::transaction\_ack::channel\_type}}\&\ \_transaction\_ack\_channel;}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00285}00285\ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1microseconds}{fc::microseconds}}\ \_abi\_serializer\_max\_time;\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00286}00286\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ \_max\_mem\_usage\_size;\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00287}00287\ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1microseconds}{fc::microseconds}}\ \_retry\_interval;\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00288}00288\ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1microseconds}{fc::microseconds}}\ \_max\_expiration\_time;\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00289}00289\ \ \ \ \mbox{\hyperlink{classfc_1_1tracked__storage}{fc::tracked\_storage<tracked\_transaction\_index\_t>}}\ \_tracked\_trxs;}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00290}00290\ \};}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00291}00291\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00292}\mbox{\hyperlink{classsysio_1_1chain__apis_1_1trx__retry__db_a2cad85030655b7382ab4041a1a19706a}{00292}}\ \mbox{\hyperlink{classsysio_1_1chain__apis_1_1trx__retry__db_a2cad85030655b7382ab4041a1a19706a}{trx\_retry\_db::trx\_retry\_db}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1chain_1_1controller}{chain::controller}}\&\ \mbox{\hyperlink{classsysio_1_1chain_1_1controller}{controller}},\ \textcolor{keywordtype}{size\_t}\ max\_mem\_usage\_size,}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00293}00293\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1microseconds}{fc::microseconds}}\ retry\_interval,\ \mbox{\hyperlink{classfc_1_1microseconds}{fc::microseconds}}\ max\_expiration\_time,}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00294}00294\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1microseconds}{fc::microseconds}}\ \mbox{\hyperlink{programs_2clio_2main_8cpp_a074511b7997537efa9b642dcddcced71}{abi\_serializer\_max\_time}}\ )}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00295}00295\ :\_impl(\mbox{\hyperlink{namespacestd}{std}}::make\_unique<\mbox{\hyperlink{structsysio_1_1chain__apis_1_1trx__retry__db__impl}{trx\_retry\_db\_impl}}>(\mbox{\hyperlink{classsysio_1_1chain_1_1controller}{controller}},\ max\_mem\_usage\_size,\ retry\_interval,\ max\_expiration\_time,\ \mbox{\hyperlink{programs_2clio_2main_8cpp_a074511b7997537efa9b642dcddcced71}{abi\_serializer\_max\_time}}))}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00296}00296\ \{}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00297}00297\ \}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00298}00298\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00299}00299\ \mbox{\hyperlink{classsysio_1_1chain__apis_1_1trx__retry__db_a007266e0ec37f01641654aa7950ea916}{trx\_retry\_db::\string~trx\_retry\_db}}()\ =\ \textcolor{keywordflow}{default};}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00300}00300\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00301}\mbox{\hyperlink{classsysio_1_1chain__apis_1_1trx__retry__db_a963c0f454e3d7bf60e6afe32274c0f53}{00301}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain__apis_1_1trx__retry__db_a963c0f454e3d7bf60e6afe32274c0f53}{trx\_retry\_db::track\_transaction}}(\ \mbox{\hyperlink{namespacesysio_1_1chain_a7041c0316bd294d0866609ab3e0cc7a7}{chain::packed\_transaction\_ptr}}\ ptrx,\ std::optional<uint16\_t>\ num\_blocks,\ \mbox{\hyperlink{namespacesysio_1_1chain__apis_a7c0a9b3be43e3ab139d31d0d3bb98f5b}{next\_function}}<std::unique\_ptr<fc::variant>>\ next\ )\ \{}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00302}00302\ \ \ \ \_impl-\/>track\_transaction(\ std::move(\ ptrx\ ),\ num\_blocks,\ next\ );}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00303}00303\ \}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00304}00304\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00305}\mbox{\hyperlink{classsysio_1_1chain__apis_1_1trx__retry__db_a660b3e800a99fdd86094eab55469dc8b}{00305}}\ \mbox{\hyperlink{classfc_1_1time__point__sec}{fc::time\_point\_sec}}\ \mbox{\hyperlink{classsysio_1_1chain__apis_1_1trx__retry__db_a660b3e800a99fdd86094eab55469dc8b}{trx\_retry\_db::get\_max\_expiration\_time}}()\textcolor{keyword}{const\ }\{}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00306}00306\ \ \ \ \textcolor{comment}{//\ conversion\ from\ time\_point\ to\ time\_point\_sec\ rounds\ down,\ round\ up\ to\ nearest\ second\ to\ avoid\ appearing\ expired}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00307}00307\ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{fc::time\_point::now}}()\ +\ \_impl-\/>get\_max\_expiration()\ +\ \mbox{\hyperlink{classfc_1_1microseconds}{fc::microseconds}}(999'999);}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00308}00308\ \}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00309}00309\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00310}\mbox{\hyperlink{classsysio_1_1chain__apis_1_1trx__retry__db_af46a9168d0df4be1252ba36df2a27ef2}{00310}}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classsysio_1_1chain__apis_1_1trx__retry__db_af46a9168d0df4be1252ba36df2a27ef2}{trx\_retry\_db::size}}()\textcolor{keyword}{const\ }\{}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00311}00311\ \ \ \ \textcolor{keywordflow}{return}\ \_impl-\/>size();}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00312}00312\ \}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00313}00313\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00314}\mbox{\hyperlink{classsysio_1_1chain__apis_1_1trx__retry__db_a0e2be9e478ae0ec15310265367781ed6}{00314}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain__apis_1_1trx__retry__db_a0e2be9e478ae0ec15310265367781ed6}{trx\_retry\_db::on\_applied\_transaction}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_a4ee2867a6bec961c7a78b203cfd76be9}{chain::transaction\_trace\_ptr}}\&\ trace,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_a7041c0316bd294d0866609ab3e0cc7a7}{chain::packed\_transaction\_ptr}}\&\ ptrx\ )\ \{}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00315}00315\ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00316}00316\ \ \ \ \ \ \ \_impl-\/>on\_applied\_transaction(trace,\ ptrx);}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00317}00317\ \ \ \ \}\ \mbox{\hyperlink{exception_8hpp_aed56aa2593b6f6fc6a839b7cb5c6e8e3}{FC\_LOG\_AND\_DROP}}((\textcolor{stringliteral}{"{}trx\ retry\ on\_applied\_transaction\ ERROR"{}}));}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00318}00318\ \}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00319}00319\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00320}\mbox{\hyperlink{classsysio_1_1chain__apis_1_1trx__retry__db_ac3d9bd5ac2085676e9f3ecf67d3ab8fc}{00320}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain__apis_1_1trx__retry__db_ac3d9bd5ac2085676e9f3ecf67d3ab8fc}{trx\_retry\_db::on\_block\_start}}(\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ block\_num\ )\ \{}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00321}00321\ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00322}00322\ \ \ \ \ \ \ \_impl-\/>on\_block\_start(block\_num);}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00323}00323\ \ \ \ \}\ \mbox{\hyperlink{exception_8hpp_aed56aa2593b6f6fc6a839b7cb5c6e8e3}{FC\_LOG\_AND\_DROP}}((\textcolor{stringliteral}{"{}trx\ retry\ block\_start\ ERROR"{}}));}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00324}00324\ \}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00325}00325\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00326}\mbox{\hyperlink{classsysio_1_1chain__apis_1_1trx__retry__db_aa7baf34c40190b65c61c87ae42c9f72e}{00326}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain__apis_1_1trx__retry__db_aa7baf34c40190b65c61c87ae42c9f72e}{trx\_retry\_db::on\_accepted\_block}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{chain::block\_state\_ptr}}\&\ block\ )\ \{}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00327}00327\ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00328}00328\ \ \ \ \ \ \ \_impl-\/>on\_accepted\_block(block);}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00329}00329\ \ \ \ \}\ \mbox{\hyperlink{exception_8hpp_aed56aa2593b6f6fc6a839b7cb5c6e8e3}{FC\_LOG\_AND\_DROP}}((\textcolor{stringliteral}{"{}trx\ retry\ accepted\_block\ ERROR"{}}));}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00330}00330\ \}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00331}00331\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00332}\mbox{\hyperlink{classsysio_1_1chain__apis_1_1trx__retry__db_a84150dab60a7a856372d038e43338c65}{00332}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain__apis_1_1trx__retry__db_a84150dab60a7a856372d038e43338c65}{trx\_retry\_db::on\_irreversible\_block}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{chain::block\_state\_ptr}}\&\ block\ )\ \{}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00333}00333\ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00334}00334\ \ \ \ \ \ \ \_impl-\/>on\_irreversible\_block(block);}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00335}00335\ \ \ \ \}\ \mbox{\hyperlink{exception_8hpp_aed56aa2593b6f6fc6a839b7cb5c6e8e3}{FC\_LOG\_AND\_DROP}}((\textcolor{stringliteral}{"{}trx\ retry\ irreversible\_block\ ERROR"{}}));}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00336}00336\ \}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00337}00337\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8cpp_source_l00338}00338\ \}\ \textcolor{comment}{//\ namespace\ sysio::chain\_apis}}
+
+\end{DoxyCode}

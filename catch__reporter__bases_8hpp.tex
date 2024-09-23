@@ -1,0 +1,56 @@
+\doxysection{libraries/sys-\/vm/external/\+Catch2/include/reporters/catch\+\_\+reporter\+\_\+bases.hpp File Reference}
+\hypertarget{catch__reporter__bases_8hpp}{}\label{catch__reporter__bases_8hpp}\index{libraries/sys-\/vm/external/Catch2/include/reporters/catch\_reporter\_bases.hpp@{libraries/sys-\/vm/external/Catch2/include/reporters/catch\_reporter\_bases.hpp}}
+{\ttfamily \#include "{}../internal/catch\+\_\+enforce.\+h"{}}\newline
+{\ttfamily \#include "{}../internal/catch\+\_\+interfaces\+\_\+reporter.\+h"{}}\newline
+{\ttfamily \#include $<$algorithm$>$}\newline
+{\ttfamily \#include $<$cstring$>$}\newline
+{\ttfamily \#include $<$cfloat$>$}\newline
+{\ttfamily \#include $<$cstdio$>$}\newline
+{\ttfamily \#include $<$cassert$>$}\newline
+{\ttfamily \#include $<$memory$>$}\newline
+{\ttfamily \#include $<$ostream$>$}\newline
+Include dependency graph for catch\+\_\+reporter\+\_\+bases.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{catch__reporter__bases_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{catch__reporter__bases_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base}{Catch\+::\+Streaming\+Reporter\+Base$<$ Derived\+T $>$}}
+\item 
+struct \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base}{Catch\+::\+Cumulative\+Reporter\+Base$<$ Derived\+T $>$}}
+\item 
+struct \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_1_1_node}{Catch\+::\+Cumulative\+Reporter\+Base$<$ Derived\+T $>$\+::\+Node$<$ T, Child\+Node\+T $>$}}
+\item 
+struct \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_1_1_section_node}{Catch\+::\+Cumulative\+Reporter\+Base$<$ Derived\+T $>$\+::\+Section\+Node}}
+\item 
+struct \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_1_1_by_section_info}{Catch\+::\+Cumulative\+Reporter\+Base$<$ Derived\+T $>$\+::\+By\+Section\+Info}}
+\item 
+struct \mbox{\hyperlink{struct_catch_1_1_test_event_listener_base}{Catch\+::\+Test\+Event\+Listener\+Base}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespace_catch}{Catch}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{namespace_catch_a35544f701cf589064c1541c8cd723929}{Catch\+::prepare\+Expanded\+Expression}} (\mbox{\hyperlink{class_catch_1_1_assertion_result}{Assertion\+Result}} \&result)
+\item 
+std\+::string \mbox{\hyperlink{namespace_catch_af65507889895c5c4b04fb831eeab2972}{Catch\+::get\+Formatted\+Duration}} (double duration)
+\item 
+std\+::string \mbox{\hyperlink{namespace_catch_a517007deae24c241b3402b4433160a9b}{Catch\+::serialize\+Filters}} (std\+::vector$<$ std\+::string $>$ const \&container)
+\item 
+{\footnotesize template$<$char C$>$ }\\char const \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_catch_a15ae9a6c9d9d1a1987a08adac734134e}{Catch\+::get\+Line\+Of\+Chars}} ()
+\end{DoxyCompactItemize}

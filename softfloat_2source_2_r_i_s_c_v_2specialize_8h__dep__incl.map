@@ -1,0 +1,25 @@
+<map id="libraries/softfloat/source/RISCV/specialize.h" name="libraries/softfloat/source/RISCV/specialize.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="1217,5,1400,46"/>
+<area shape="rect" id="Node000002" href="$softfloat_2source_2_r_i_s_c_v_2s__common_na_n_to_ext_f80_m_8c.html" title=" " alt="" coords="5,94,225,150"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1201,31,1018,36,778,47,509,66,238,97,226,99,225,93,237,91,509,61,778,42,1018,31,1201,26"/>
+<area shape="rect" id="Node000003" href="$softfloat_2source_2_r_i_s_c_v_2s__common_na_n_to_ext_f80_u_i_8c.html" title=" " alt="" coords="249,94,469,150"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="1201,34,878,54,680,72,482,97,470,99,469,93,481,91,680,67,878,48,1201,29"/>
+<area shape="rect" id="Node000004" href="$softfloat_2source_2_r_i_s_c_v_2s__common_na_n_to_f128_m_8c.html" title=" " alt="" coords="493,94,713,150"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="1201,39,982,62,726,97,714,99,713,94,725,91,981,56,1201,33"/>
+<area shape="rect" id="Node000005" href="$softfloat_2source_2_r_i_s_c_v_2s__common_na_n_to_f128_u_i_8c.html" title=" " alt="" coords="737,94,957,150"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="1202,50,969,97,957,99,956,94,968,91,1201,45"/>
+<area shape="rect" id="Node000006" href="$softfloat_2source_2_r_i_s_c_v_2s__propagate_na_n_ext_f80_m_8c.html" title=" " alt="" coords="980,94,1183,150"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="1248,55,1148,96,1146,91,1246,50"/>
+<area shape="rect" id="Node000007" href="$softfloat_2source_2_r_i_s_c_v_2s__propagate_na_n_ext_f80_u_i_8c.html" title=" " alt="" coords="1207,94,1410,150"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="1311,61,1311,93,1306,93,1306,61"/>
+<area shape="rect" id="Node000008" href="$softfloat_2source_2_r_i_s_c_v_2s__propagate_na_n_f128_m_8c.html" title=" " alt="" coords="1434,94,1636,150"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="1371,50,1471,91,1468,96,1369,55"/>
+<area shape="rect" id="Node000009" href="$softfloat_2source_2_r_i_s_c_v_2s__propagate_na_n_f128_u_i_8c.html" title=" " alt="" coords="1660,94,1863,150"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="1416,44,1649,91,1661,94,1660,99,1648,97,1415,50"/>
+<area shape="rect" id="Node000010" href="$softfloat_2source_2_r_i_s_c_v_2s__propagate_na_n_f16_u_i_8c.html" title=" " alt="" coords="1887,94,2090,150"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="1416,33,1629,56,1875,91,1887,93,1886,99,1875,97,1628,61,1415,39"/>
+<area shape="rect" id="Node000011" href="$softfloat_2source_2_r_i_s_c_v_2s__propagate_na_n_f32_u_i_8c.html" title=" " alt="" coords="2114,94,2316,150"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="1416,28,1725,48,1914,66,2102,91,2114,93,2113,99,2101,97,1913,72,1725,53,1416,34"/>
+<area shape="rect" id="Node000012" href="$softfloat_2source_2_r_i_s_c_v_2s__propagate_na_n_f64_u_i_8c.html" title=" " alt="" coords="2340,94,2543,150"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="1416,26,1591,30,1818,41,2073,61,2329,91,2340,93,2339,99,2328,97,2072,66,1818,47,1591,36,1416,31"/>
+</map>

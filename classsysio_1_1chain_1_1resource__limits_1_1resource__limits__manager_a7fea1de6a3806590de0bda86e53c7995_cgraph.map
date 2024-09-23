@@ -1,0 +1,16 @@
+<map id="sysio::chain::resource_limits::resource_limits_manager::add_pending_ram_usage" name="sysio::chain::resource_limits::resource_limits_manager::add_pending_ram_usage">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,236,61"/>
+<area shape="rect" id="Node000002" href="$classchainbase_1_1database.html#afcfe00f81a526c1376d4f51197dd3a9a" title=" " alt="" coords="662,20,830,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="236,27,284,27,614,27,647,27,647,33,614,32,284,32,236,33"/>
+<area shape="rect" id="Node000005" href="$classchainbase_1_1database.html#a9ebc006075e8fc2e84357a0e068b58d4" title=" " alt="" coords="284,41,425,82"/>
+<area shape="poly" id="edge6_Node000001_Node000005" title=" " alt="" coords="236,44,269,48,268,54,236,50"/>
+<area shape="rect" id="Node000003" href="$classchainbase_1_1database.html#aa5a2ca0da0092693ac49b36b7ec6817a" title=" " alt="" coords="878,13,1019,54"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="830,39,862,39,862,45,830,45"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="877,27,845,27,845,22,877,22"/>
+<area shape="rect" id="Node000004" href="$classchainbase_1_1database.html#a4d5297635dcf70be481d9b600da9bc13" title=" " alt="" coords="1067,42,1208,83"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="1020,41,1052,47,1052,52,1019,47"/>
+<area shape="poly" id="edge5_Node000004_Node000002" title=" " alt="" coords="1067,67,1019,68,948,71,877,68,805,53,806,48,878,63,948,66,1019,63,1067,62"/>
+<area shape="rect" id="Node000006" href="$classchainbase_1_1database.html#afaea057692a8bbbf3f506b64c60308b6" title=" " alt="" coords="473,41,614,82"/>
+<area shape="poly" id="edge7_Node000005_Node000006" title=" " alt="" coords="425,58,458,58,458,64,425,64"/>
+<area shape="poly" id="edge8_Node000006_Node000002" title=" " alt="" coords="614,49,646,44,647,50,615,54"/>
+</map>

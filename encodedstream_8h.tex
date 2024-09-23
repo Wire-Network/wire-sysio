@@ -1,0 +1,54 @@
+\doxysection{libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/encodedstream.h File Reference}
+\hypertarget{encodedstream_8h}{}\label{encodedstream_8h}\index{libraries/fc/include/fc/crypto/webauthn\_json/include/rapidjson/encodedstream.h@{libraries/fc/include/fc/crypto/webauthn\_json/include/rapidjson/encodedstream.h}}
+{\ttfamily \#include "{}stream.\+h"{}}\newline
+{\ttfamily \#include "{}memorystream.\+h"{}}\newline
+Include dependency graph for encodedstream.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=254pt]{encodedstream_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{encodedstream_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{class_encoded_input_stream}{Encoded\+Input\+Stream$<$ Encoding, Input\+Byte\+Stream $>$}}
+\begin{DoxyCompactList}\small\item\em Input byte stream wrapper with a statically bound encoding. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_encoded_input_stream_3_01_u_t_f8_3_4_00_01_memory_stream_01_4}{Encoded\+Input\+Stream$<$ UTF8$<$$>$, Memory\+Stream $>$}}
+\begin{DoxyCompactList}\small\item\em Specialized for \doxylink{struct_u_t_f8}{UTF8} \doxylink{struct_memory_stream}{Memory\+Stream}. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_encoded_output_stream}{Encoded\+Output\+Stream$<$ Encoding, Output\+Byte\+Stream $>$}}
+\begin{DoxyCompactList}\small\item\em Output byte stream wrapper with statically bound encoding. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_auto_u_t_f_input_stream}{Auto\+UTFInput\+Stream$<$ Char\+Type, Input\+Byte\+Stream $>$}}
+\begin{DoxyCompactList}\small\item\em Input stream wrapper with dynamically bound encoding and automatic encoding detection. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_auto_u_t_f_output_stream}{Auto\+UTFOutput\+Stream$<$ Char\+Type, Output\+Byte\+Stream $>$}}
+\begin{DoxyCompactList}\small\item\em Output stream wrapper with dynamically bound encoding and automatic encoding detection. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{encodedstream_8h_a6530c8834a049a0ff230b56072df6c24}{RAPIDJSON\+\_\+\+ENCODINGS\+\_\+\+FUNC}}(x)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{encodedstream_8h_a6530c8834a049a0ff230b56072df6c24}\index{encodedstream.h@{encodedstream.h}!RAPIDJSON\_ENCODINGS\_FUNC@{RAPIDJSON\_ENCODINGS\_FUNC}}
+\index{RAPIDJSON\_ENCODINGS\_FUNC@{RAPIDJSON\_ENCODINGS\_FUNC}!encodedstream.h@{encodedstream.h}}
+\doxysubsubsection{\texorpdfstring{RAPIDJSON\_ENCODINGS\_FUNC}{RAPIDJSON\_ENCODINGS\_FUNC}}
+{\footnotesize\ttfamily \label{encodedstream_8h_a6530c8834a049a0ff230b56072df6c24} 
+\#define RAPIDJSON\+\_\+\+ENCODINGS\+\_\+\+FUNC(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{struct_u_t_f8}{UTF8<Ch>::x}},\ \mbox{\hyperlink{struct_u_t_f16_l_e}{UTF16LE<Ch>::x}},\ \mbox{\hyperlink{struct_u_t_f16_b_e}{UTF16BE<Ch>::x}},\ \mbox{\hyperlink{struct_u_t_f32_l_e}{UTF32LE<Ch>::x}},\ \mbox{\hyperlink{struct_u_t_f32_b_e}{UTF32BE<Ch>::x}}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{encodedstream_8h_source_l00127}{127}} of file \mbox{\hyperlink{encodedstream_8h_source}{encodedstream.\+h}}.
+

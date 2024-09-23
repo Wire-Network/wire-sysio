@@ -1,0 +1,169 @@
+\doxysection{Runtime\+::Table\+Instance Struct Reference}
+\hypertarget{struct_runtime_1_1_table_instance}{}\label{struct_runtime_1_1_table_instance}\index{Runtime::TableInstance@{Runtime::TableInstance}}
+
+
+{\ttfamily \#include $<$Runtime\+Private.\+h$>$}
+
+
+
+Inheritance diagram for Runtime\+::Table\+Instance\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=205pt]{struct_runtime_1_1_table_instance__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Runtime\+::Table\+Instance\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_runtime_1_1_table_instance__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_runtime_1_1_table_instance_1_1_function_element}{Function\+Element}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_runtime_1_1_table_instance_ad194e9e6205152a9e93f42c09e157f37}{Table\+Instance}} (const \mbox{\hyperlink{struct_i_r_1_1_table_type}{Table\+Type}} \&in\+Type)
+\item 
+\mbox{\hyperlink{struct_runtime_1_1_table_instance_aa207b7e4432ab8d4a148f8a41891214a}{\texorpdfstring{$\sim$}{\string~}\+Table\+Instance}} () override
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{struct_runtime_1_1_g_c_object}{Runtime\+::\+GCObject}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_runtime_1_1_g_c_object_ad61fa15a80d09b18aa1e8f80b1338467}{GCObject}} (\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908}{Object\+Kind}} in\+Kind)
+\item 
+\mbox{\hyperlink{struct_runtime_1_1_g_c_object_a87fe6580879c9e158d151219dfe6999e}{\texorpdfstring{$\sim$}{\string~}\+GCObject}} () override
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{struct_runtime_1_1_object_instance}{Runtime\+::\+Object\+Instance}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_runtime_1_1_object_instance_af7231f91092e2c8d8f65491f648504b5}{Object\+Instance}} (\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908}{IR\+::\+Object\+Kind}} in\+Kind)
+\item 
+virtual \mbox{\hyperlink{struct_runtime_1_1_object_instance_a67bf2d4a743aff39354b04a65108f383}{\texorpdfstring{$\sim$}{\string~}\+Object\+Instance}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_i_r_1_1_table_type}{Table\+Type}} \mbox{\hyperlink{struct_runtime_1_1_table_instance_a8c2b83504d64ab8b6d6712f218dcbbaf}{type}}
+\item 
+\mbox{\hyperlink{struct_runtime_1_1_table_instance_1_1_function_element}{Function\+Element}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{struct_runtime_1_1_table_instance_a0cc294ff380a59a1a412271baae6654f}{base\+Address}}
+\item 
+\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} \mbox{\hyperlink{struct_runtime_1_1_table_instance_a3839bbbde61652dde5aebc572e7c9df3}{end\+Offset}}
+\item 
+\mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{struct_runtime_1_1_table_instance_a7f1e2f643f47d8643fb808a6867c22b1}{reserved\+Base\+Address}}
+\item 
+\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} \mbox{\hyperlink{struct_runtime_1_1_table_instance_abbeb67176f883b3dad77bc0d7f68ca40}{reserved\+Num\+Platform\+Pages}}
+\item 
+std\+::vector$<$ \mbox{\hyperlink{struct_runtime_1_1_object_instance}{Object\+Instance}} \texorpdfstring{$\ast$}{*} $>$ \mbox{\hyperlink{struct_runtime_1_1_table_instance_ab08261931c02a14bad7616c3712139d8}{elements}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes inherited from \mbox{\hyperlink{struct_runtime_1_1_object_instance}{Runtime\+::\+Object\+Instance}}}
+\begin{DoxyCompactItemize}
+\item 
+const \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908}{IR\+::\+Object\+Kind}} \mbox{\hyperlink{struct_runtime_1_1_object_instance_a0d77f442a8f7418381f356c31795d8db}{kind}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{_runtime_private_8h_source_l00056}{56}} of file \mbox{\hyperlink{_runtime_private_8h_source}{Runtime\+Private.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{struct_runtime_1_1_table_instance_ad194e9e6205152a9e93f42c09e157f37}\index{Runtime::TableInstance@{Runtime::TableInstance}!TableInstance@{TableInstance}}
+\index{TableInstance@{TableInstance}!Runtime::TableInstance@{Runtime::TableInstance}}
+\doxysubsubsection{\texorpdfstring{TableInstance()}{TableInstance()}}
+{\footnotesize\ttfamily \label{struct_runtime_1_1_table_instance_ad194e9e6205152a9e93f42c09e157f37} 
+Runtime\+::\+Table\+Instance\+::\+Table\+Instance (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct_i_r_1_1_table_type}{Table\+Type}} \&}]{in\+Type}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_runtime_private_8h_source_l00075}{75}} of file \mbox{\hyperlink{_runtime_private_8h_source}{Runtime\+Private.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00075\ :\ \mbox{\hyperlink{struct_runtime_1_1_g_c_object_ad61fa15a80d09b18aa1e8f80b1338467}{GCObject}}(ObjectKind::table),\ \mbox{\hyperlink{struct_runtime_1_1_table_instance_a8c2b83504d64ab8b6d6712f218dcbbaf}{type}}(inType),\ \mbox{\hyperlink{struct_runtime_1_1_table_instance_a0cc294ff380a59a1a412271baae6654f}{baseAddress}}(\textcolor{keyword}{nullptr}),\ \mbox{\hyperlink{struct_runtime_1_1_table_instance_a3839bbbde61652dde5aebc572e7c9df3}{endOffset}}(0),\ \mbox{\hyperlink{struct_runtime_1_1_table_instance_a7f1e2f643f47d8643fb808a6867c22b1}{reservedBaseAddress}}(\textcolor{keyword}{nullptr}),\ \mbox{\hyperlink{struct_runtime_1_1_table_instance_abbeb67176f883b3dad77bc0d7f68ca40}{reservedNumPlatformPages}}(0)\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{struct_runtime_1_1_table_instance_aa207b7e4432ab8d4a148f8a41891214a}\index{Runtime::TableInstance@{Runtime::TableInstance}!````~TableInstance@{\texorpdfstring{$\sim$}{\string~}TableInstance}}
+\index{````~TableInstance@{\texorpdfstring{$\sim$}{\string~}TableInstance}!Runtime::TableInstance@{Runtime::TableInstance}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}TableInstance()}{\string~TableInstance()}}
+{\footnotesize\ttfamily \label{struct_runtime_1_1_table_instance_aa207b7e4432ab8d4a148f8a41891214a} 
+Runtime\+::\+Table\+Instance\+::\texorpdfstring{$\sim$}{\string~}\+Table\+Instance (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_runtime_1_1_table_instance_a0cc294ff380a59a1a412271baae6654f}\index{Runtime::TableInstance@{Runtime::TableInstance}!baseAddress@{baseAddress}}
+\index{baseAddress@{baseAddress}!Runtime::TableInstance@{Runtime::TableInstance}}
+\doxysubsubsection{\texorpdfstring{baseAddress}{baseAddress}}
+{\footnotesize\ttfamily \label{struct_runtime_1_1_table_instance_a0cc294ff380a59a1a412271baae6654f} 
+\mbox{\hyperlink{struct_runtime_1_1_table_instance_1_1_function_element}{Function\+Element}}\texorpdfstring{$\ast$}{*} Runtime\+::\+Table\+Instance\+::base\+Address}
+
+
+
+Definition at line \mbox{\hyperlink{_runtime_private_8h_source_l00066}{66}} of file \mbox{\hyperlink{_runtime_private_8h_source}{Runtime\+Private.\+h}}.
+
+\Hypertarget{struct_runtime_1_1_table_instance_ab08261931c02a14bad7616c3712139d8}\index{Runtime::TableInstance@{Runtime::TableInstance}!elements@{elements}}
+\index{elements@{elements}!Runtime::TableInstance@{Runtime::TableInstance}}
+\doxysubsubsection{\texorpdfstring{elements}{elements}}
+{\footnotesize\ttfamily \label{struct_runtime_1_1_table_instance_ab08261931c02a14bad7616c3712139d8} 
+std\+::vector$<$\mbox{\hyperlink{struct_runtime_1_1_object_instance}{Object\+Instance}}\texorpdfstring{$\ast$}{*}$>$ Runtime\+::\+Table\+Instance\+::elements}
+
+
+
+Definition at line \mbox{\hyperlink{_runtime_private_8h_source_l00073}{73}} of file \mbox{\hyperlink{_runtime_private_8h_source}{Runtime\+Private.\+h}}.
+
+\Hypertarget{struct_runtime_1_1_table_instance_a3839bbbde61652dde5aebc572e7c9df3}\index{Runtime::TableInstance@{Runtime::TableInstance}!endOffset@{endOffset}}
+\index{endOffset@{endOffset}!Runtime::TableInstance@{Runtime::TableInstance}}
+\doxysubsubsection{\texorpdfstring{endOffset}{endOffset}}
+{\footnotesize\ttfamily \label{struct_runtime_1_1_table_instance_a3839bbbde61652dde5aebc572e7c9df3} 
+\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} Runtime\+::\+Table\+Instance\+::end\+Offset}
+
+
+
+Definition at line \mbox{\hyperlink{_runtime_private_8h_source_l00067}{67}} of file \mbox{\hyperlink{_runtime_private_8h_source}{Runtime\+Private.\+h}}.
+
+\Hypertarget{struct_runtime_1_1_table_instance_a7f1e2f643f47d8643fb808a6867c22b1}\index{Runtime::TableInstance@{Runtime::TableInstance}!reservedBaseAddress@{reservedBaseAddress}}
+\index{reservedBaseAddress@{reservedBaseAddress}!Runtime::TableInstance@{Runtime::TableInstance}}
+\doxysubsubsection{\texorpdfstring{reservedBaseAddress}{reservedBaseAddress}}
+{\footnotesize\ttfamily \label{struct_runtime_1_1_table_instance_a7f1e2f643f47d8643fb808a6867c22b1} 
+\mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}\texorpdfstring{$\ast$}{*} Runtime\+::\+Table\+Instance\+::reserved\+Base\+Address}
+
+
+
+Definition at line \mbox{\hyperlink{_runtime_private_8h_source_l00069}{69}} of file \mbox{\hyperlink{_runtime_private_8h_source}{Runtime\+Private.\+h}}.
+
+\Hypertarget{struct_runtime_1_1_table_instance_abbeb67176f883b3dad77bc0d7f68ca40}\index{Runtime::TableInstance@{Runtime::TableInstance}!reservedNumPlatformPages@{reservedNumPlatformPages}}
+\index{reservedNumPlatformPages@{reservedNumPlatformPages}!Runtime::TableInstance@{Runtime::TableInstance}}
+\doxysubsubsection{\texorpdfstring{reservedNumPlatformPages}{reservedNumPlatformPages}}
+{\footnotesize\ttfamily \label{struct_runtime_1_1_table_instance_abbeb67176f883b3dad77bc0d7f68ca40} 
+\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} Runtime\+::\+Table\+Instance\+::reserved\+Num\+Platform\+Pages}
+
+
+
+Definition at line \mbox{\hyperlink{_runtime_private_8h_source_l00070}{70}} of file \mbox{\hyperlink{_runtime_private_8h_source}{Runtime\+Private.\+h}}.
+
+\Hypertarget{struct_runtime_1_1_table_instance_a8c2b83504d64ab8b6d6712f218dcbbaf}\index{Runtime::TableInstance@{Runtime::TableInstance}!type@{type}}
+\index{type@{type}!Runtime::TableInstance@{Runtime::TableInstance}}
+\doxysubsubsection{\texorpdfstring{type}{type}}
+{\footnotesize\ttfamily \label{struct_runtime_1_1_table_instance_a8c2b83504d64ab8b6d6712f218dcbbaf} 
+\mbox{\hyperlink{struct_i_r_1_1_table_type}{Table\+Type}} Runtime\+::\+Table\+Instance\+::type}
+
+
+
+Definition at line \mbox{\hyperlink{_runtime_private_8h_source_l00064}{64}} of file \mbox{\hyperlink{_runtime_private_8h_source}{Runtime\+Private.\+h}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/wasm-\/jit/\+Source/\+Runtime/\mbox{\hyperlink{_runtime_private_8h}{Runtime\+Private.\+h}}\end{DoxyCompactItemize}

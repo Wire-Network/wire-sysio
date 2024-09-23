@@ -1,0 +1,846 @@
+\doxysection{sysio\+::chain\+::authorization\+\_\+manager Class Reference}
+\hypertarget{classsysio_1_1chain_1_1authorization__manager}{}\label{classsysio_1_1chain_1_1authorization__manager}\index{sysio::chain::authorization\_manager@{sysio::chain::authorization\_manager}}
+
+
+{\ttfamily \#include $<$authorization\+\_\+manager.\+hpp$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{classsysio_1_1chain_1_1authorization__manager_add79267df1f466480b18703845327a78}{permission\+\_\+id\+\_\+type}} = \mbox{\hyperlink{structchainbase_1_1object_a7c6a0efb95ee67d538a976cfa5be9df9}{permission\+\_\+object\+::id\+\_\+type}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classsysio_1_1chain_1_1authorization__manager_a00571cdbafaf86b7de83655d89229280}{authorization\+\_\+manager}} (\mbox{\hyperlink{classsysio_1_1chain_1_1controller}{controller}} \&c, \mbox{\hyperlink{classchainbase_1_1database}{chainbase\+::database}} \&d)
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1authorization__manager_a112c1fae696fe6f53103076e9afa5a16}{add\+\_\+indices}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1authorization__manager_a27cfd5f70c12c10a9939e7bf6b3a52e4}{initialize\+\_\+database}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1authorization__manager_a24e23281d4ccfdddcc761c83e14a4080}{add\+\_\+to\+\_\+snapshot}} (const \mbox{\hyperlink{namespacesysio_1_1chain_a80afaa06d96e661a0f93e0ba4b09c8dc}{snapshot\+\_\+writer\+\_\+ptr}} \&snapshot) const
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1authorization__manager_a7a4d84d47bcd9069ab0c8d8f9f9ac5f3}{read\+\_\+from\+\_\+snapshot}} (const \mbox{\hyperlink{namespacesysio_1_1chain_aaa27dacddc54cea475602788c8e7a02c}{snapshot\+\_\+reader\+\_\+ptr}} \&snapshot)
+\item 
+const \mbox{\hyperlink{classsysio_1_1chain_1_1permission__object}{permission\+\_\+object}} \& \mbox{\hyperlink{classsysio_1_1chain_1_1authorization__manager_aac57733c5aa05c1c78a023a80b2f447f}{create\+\_\+permission}} (\mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} account, \mbox{\hyperlink{namespacesysio_1_1chain_aacc541763fed17ee490b6ac42b7bb77a}{permission\+\_\+name}} \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}, \mbox{\hyperlink{classsysio_1_1chain_1_1authorization__manager_add79267df1f466480b18703845327a78}{permission\+\_\+id\+\_\+type}} parent, const \mbox{\hyperlink{structsysio_1_1chain_1_1authority}{authority}} \&auth, \mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} initial\+\_\+creation\+\_\+time=\mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}}())
+\item 
+const \mbox{\hyperlink{classsysio_1_1chain_1_1permission__object}{permission\+\_\+object}} \& \mbox{\hyperlink{classsysio_1_1chain_1_1authorization__manager_a258e0daa2cd72440bfe34a2aa92c9104}{create\+\_\+permission}} (\mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} account, \mbox{\hyperlink{namespacesysio_1_1chain_aacc541763fed17ee490b6ac42b7bb77a}{permission\+\_\+name}} \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}, \mbox{\hyperlink{classsysio_1_1chain_1_1authorization__manager_add79267df1f466480b18703845327a78}{permission\+\_\+id\+\_\+type}} parent, \mbox{\hyperlink{structsysio_1_1chain_1_1authority}{authority}} \&\&auth, \mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} initial\+\_\+creation\+\_\+time=\mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}}())
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1authorization__manager_abf01ddda4cd475bf2530ad1d28c72dfb}{modify\+\_\+permission}} (const \mbox{\hyperlink{classsysio_1_1chain_1_1permission__object}{permission\+\_\+object}} \&permission, const \mbox{\hyperlink{structsysio_1_1chain_1_1authority}{authority}} \&auth)
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1authorization__manager_a9c889c94c63b7c53a5b4919738d6166b}{remove\+\_\+permission}} (const \mbox{\hyperlink{classsysio_1_1chain_1_1permission__object}{permission\+\_\+object}} \&permission)
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1authorization__manager_a6755c0b39298b2933eb4e74649a36442}{update\+\_\+permission\+\_\+usage}} (const \mbox{\hyperlink{classsysio_1_1chain_1_1permission__object}{permission\+\_\+object}} \&permission)
+\item 
+\mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}} \mbox{\hyperlink{classsysio_1_1chain_1_1authorization__manager_a0909c7f81928fd8ffc4269861d12ad3f}{get\+\_\+permission\+\_\+last\+\_\+used}} (const \mbox{\hyperlink{classsysio_1_1chain_1_1permission__object}{permission\+\_\+object}} \&permission) const
+\item 
+const \mbox{\hyperlink{classsysio_1_1chain_1_1permission__object}{permission\+\_\+object}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classsysio_1_1chain_1_1authorization__manager_ab0acfec50b75044030d082d1aa3fbf5c}{find\+\_\+permission}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1permission__level}{permission\+\_\+level}} \&level) const
+\item 
+const \mbox{\hyperlink{classsysio_1_1chain_1_1permission__object}{permission\+\_\+object}} \& \mbox{\hyperlink{classsysio_1_1chain_1_1authorization__manager_a96924f6aca32a602e24d991d12278a69}{get\+\_\+permission}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1permission__level}{permission\+\_\+level}} \&level) const
+\item 
+std\+::optional$<$ \mbox{\hyperlink{namespacesysio_1_1chain_aacc541763fed17ee490b6ac42b7bb77a}{permission\+\_\+name}} $>$ \mbox{\hyperlink{classsysio_1_1chain_1_1authorization__manager_a6193726fcf21c9b75f460696a67b6839}{lookup\+\_\+minimum\+\_\+permission}} (\mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} authorizer\+\_\+account, \mbox{\hyperlink{namespacesysio_1_1chain_a58379f7b40727cd3645e0f5a9b24e653}{scope\+\_\+name}} code\+\_\+account, \mbox{\hyperlink{namespacesysio_1_1chain_a7a1685bcc352cda9e45f055932069428}{action\+\_\+name}} type) const
+\begin{DoxyCompactList}\small\item\em Find the lowest authority level required for authorizer\+\_\+account to authorize a message of the specified type. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1authorization__manager_a8566f4407e33eb1e4029455e4feae2f1}{check\+\_\+authorization}} (const \mbox{\hyperlink{classfc_1_1vector}{vector}}$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1action}{action}} $>$ \&actions, const flat\+\_\+set$<$ \mbox{\hyperlink{namespacesysio_1_1chain_a0628a11f388cd2e43b1ccc1260a1042f}{public\+\_\+key\+\_\+type}} $>$ \&provided\+\_\+keys, const flat\+\_\+set$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1permission__level}{permission\+\_\+level}} $>$ \&provided\+\_\+permissions=flat\+\_\+set$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1permission__level}{permission\+\_\+level}} $>$(), \mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}} provided\+\_\+delay=\mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}}(0), const std\+::function$<$ void()$>$ \&checktime=std\+::function$<$ void()$>$(), bool allow\+\_\+unused\+\_\+keys=false, bool check\+\_\+but\+\_\+dont\+\_\+fail=false, const flat\+\_\+set$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1permission__level}{permission\+\_\+level}} $>$ \&satisfied\+\_\+authorizations=flat\+\_\+set$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1permission__level}{permission\+\_\+level}} $>$()) const
+\begin{DoxyCompactList}\small\item\em Check authorizations of a vector of actions with provided keys, permission levels, and delay. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1authorization__manager_a9f6cf6c813f4a578fddc10cf24aa396a}{check\+\_\+authorization}} (\mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} account, \mbox{\hyperlink{namespacesysio_1_1chain_aacc541763fed17ee490b6ac42b7bb77a}{permission\+\_\+name}} permission, const flat\+\_\+set$<$ \mbox{\hyperlink{namespacesysio_1_1chain_a0628a11f388cd2e43b1ccc1260a1042f}{public\+\_\+key\+\_\+type}} $>$ \&provided\+\_\+keys, const flat\+\_\+set$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1permission__level}{permission\+\_\+level}} $>$ \&provided\+\_\+permissions=flat\+\_\+set$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1permission__level}{permission\+\_\+level}} $>$(), \mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}} provided\+\_\+delay=\mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}}(0), const std\+::function$<$ void()$>$ \&checktime=std\+::function$<$ void()$>$(), bool allow\+\_\+unused\+\_\+keys=false) const
+\begin{DoxyCompactList}\small\item\em Check authorizations of a permission with provided keys, permission levels, and delay. \end{DoxyCompactList}\item 
+flat\+\_\+set$<$ \mbox{\hyperlink{namespacesysio_1_1chain_a0628a11f388cd2e43b1ccc1260a1042f}{public\+\_\+key\+\_\+type}} $>$ \mbox{\hyperlink{classsysio_1_1chain_1_1authorization__manager_ac1e69cb344bd39871d1c92993a491e95}{get\+\_\+required\+\_\+keys}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1transaction}{transaction}} \&trx, const flat\+\_\+set$<$ \mbox{\hyperlink{namespacesysio_1_1chain_a0628a11f388cd2e43b1ccc1260a1042f}{public\+\_\+key\+\_\+type}} $>$ \&candidate\+\_\+keys, \mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}} provided\+\_\+delay=\mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}}(0)) const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static std\+::function$<$ void()$>$ \mbox{\hyperlink{classsysio_1_1chain_1_1authorization__manager_a1e4aa0f280bcaa3057bc2970063f74b8}{\+\_\+noop\+\_\+checktime}} \{\&\mbox{\hyperlink{namespacesysio_1_1chain_a057ec53a1f8d23b2fb89de6c19b41c32}{noop\+\_\+checktime}}\}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{authorization__manager_8hpp_source_l00019}{19}} of file \mbox{\hyperlink{authorization__manager_8hpp_source}{authorization\+\_\+manager.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classsysio_1_1chain_1_1authorization__manager_add79267df1f466480b18703845327a78}\index{sysio::chain::authorization\_manager@{sysio::chain::authorization\_manager}!permission\_id\_type@{permission\_id\_type}}
+\index{permission\_id\_type@{permission\_id\_type}!sysio::chain::authorization\_manager@{sysio::chain::authorization\_manager}}
+\doxysubsubsection{\texorpdfstring{permission\_id\_type}{permission\_id\_type}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1authorization__manager_add79267df1f466480b18703845327a78} 
+using \mbox{\hyperlink{classsysio_1_1chain_1_1authorization__manager_add79267df1f466480b18703845327a78}{sysio\+::chain\+::authorization\+\_\+manager\+::permission\+\_\+id\+\_\+type}} = \mbox{\hyperlink{structchainbase_1_1object_a7c6a0efb95ee67d538a976cfa5be9df9}{permission\+\_\+object\+::id\+\_\+type}}}
+
+
+
+Definition at line \mbox{\hyperlink{authorization__manager_8hpp_source_l00021}{21}} of file \mbox{\hyperlink{authorization__manager_8hpp_source}{authorization\+\_\+manager.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classsysio_1_1chain_1_1authorization__manager_a00571cdbafaf86b7de83655d89229280}\index{sysio::chain::authorization\_manager@{sysio::chain::authorization\_manager}!authorization\_manager@{authorization\_manager}}
+\index{authorization\_manager@{authorization\_manager}!sysio::chain::authorization\_manager@{sysio::chain::authorization\_manager}}
+\doxysubsubsection{\texorpdfstring{authorization\_manager()}{authorization\_manager()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1authorization__manager_a00571cdbafaf86b7de83655d89229280} 
+sysio\+::chain\+::authorization\+\_\+manager\+::authorization\+\_\+manager (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classsysio_1_1chain_1_1controller}{controller}} \&}]{c}{, }\item[{\mbox{\hyperlink{classchainbase_1_1database}{chainbase\+::database}} \&}]{d}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{authorization__manager_8cpp_source_l00024}{24}} of file \mbox{\hyperlink{authorization__manager_8cpp_source}{authorization\+\_\+manager.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00025\ \ \ \ :\_control(c),\_db(d)\{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1chain_1_1authorization__manager_a112c1fae696fe6f53103076e9afa5a16}\index{sysio::chain::authorization\_manager@{sysio::chain::authorization\_manager}!add\_indices@{add\_indices}}
+\index{add\_indices@{add\_indices}!sysio::chain::authorization\_manager@{sysio::chain::authorization\_manager}}
+\doxysubsubsection{\texorpdfstring{add\_indices()}{add\_indices()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1authorization__manager_a112c1fae696fe6f53103076e9afa5a16} 
+void sysio\+::chain\+::authorization\+\_\+manager\+::add\+\_\+indices (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{authorization__manager_8cpp_source_l00027}{27}} of file \mbox{\hyperlink{authorization__manager_8cpp_source}{authorization\+\_\+manager.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ authorization\_index\_set::add\_indices(\_db);}
+\DoxyCodeLine{00029\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1authorization__manager_a112c1fae696fe6f53103076e9afa5a16_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1authorization__manager_a24e23281d4ccfdddcc761c83e14a4080}\index{sysio::chain::authorization\_manager@{sysio::chain::authorization\_manager}!add\_to\_snapshot@{add\_to\_snapshot}}
+\index{add\_to\_snapshot@{add\_to\_snapshot}!sysio::chain::authorization\_manager@{sysio::chain::authorization\_manager}}
+\doxysubsubsection{\texorpdfstring{add\_to\_snapshot()}{add\_to\_snapshot()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1authorization__manager_a24e23281d4ccfdddcc761c83e14a4080} 
+void sysio\+::chain\+::authorization\+\_\+manager\+::add\+\_\+to\+\_\+snapshot (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_a80afaa06d96e661a0f93e0ba4b09c8dc}{snapshot\+\_\+writer\+\_\+ptr}} \&}]{snapshot}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{authorization__manager_8cpp_source_l00096}{96}} of file \mbox{\hyperlink{authorization__manager_8cpp_source}{authorization\+\_\+manager.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ authorization\_index\_set::walk\_indices([\textcolor{keyword}{this},\ \&snapshot](\ \textcolor{keyword}{auto}\ utils\ )\{}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ }section\_t\ =\ \textcolor{keyword}{typename}\ \textcolor{keyword}{decltype}(utils)::index\_t::value\_type;}
+\DoxyCodeLine{00099\ }
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ skip\ the\ permission\_usage\_index\ as\ its\ inlined\ with\ permission\_index}}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (std::is\_same<section\_t,\ permission\_usage\_object>::value)\ \{}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00104\ }
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ snapshot-\/>write\_section<section\_t>([\textcolor{keyword}{this}](\ \textcolor{keyword}{auto}\&\ section\ )\{}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{decltype}(utils)::walk(\_db,\ [\textcolor{keyword}{this},\ \&section](\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ \&row\ )\ \{}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ section.add\_row(row,\ \_db);}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00111\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1authorization__manager_a24e23281d4ccfdddcc761c83e14a4080_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1authorization__manager_a9f6cf6c813f4a578fddc10cf24aa396a}\index{sysio::chain::authorization\_manager@{sysio::chain::authorization\_manager}!check\_authorization@{check\_authorization}}
+\index{check\_authorization@{check\_authorization}!sysio::chain::authorization\_manager@{sysio::chain::authorization\_manager}}
+\doxysubsubsection{\texorpdfstring{check\_authorization()}{check\_authorization()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1authorization__manager_a9f6cf6c813f4a578fddc10cf24aa396a} 
+void sysio\+::chain\+::authorization\+\_\+manager\+::check\+\_\+authorization (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}}}]{account}{, }\item[{\mbox{\hyperlink{namespacesysio_1_1chain_aacc541763fed17ee490b6ac42b7bb77a}{permission\+\_\+name}}}]{permission}{, }\item[{const flat\+\_\+set$<$ \mbox{\hyperlink{namespacesysio_1_1chain_a0628a11f388cd2e43b1ccc1260a1042f}{public\+\_\+key\+\_\+type}} $>$ \&}]{provided\+\_\+keys}{, }\item[{const flat\+\_\+set$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1permission__level}{permission\+\_\+level}} $>$ \&}]{provided\+\_\+permissions}{ = {\ttfamily flat\+\_\+set$<$\mbox{\hyperlink{structsysio_1_1chain_1_1permission__level}{permission\+\_\+level}}$>$()}, }\item[{\mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}}}]{provided\+\_\+delay}{ = {\ttfamily \mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}}(0)}, }\item[{const std\+::function$<$ void()$>$ \&}]{checktime}{ = {\ttfamily std\+:\+:function$<$void()$>$()}, }\item[{bool}]{allow\+\_\+unused\+\_\+keys}{ = {\ttfamily false}}\end{DoxyParamCaption}) const}
+
+
+\begin{DoxyParams}{Parameters}
+{\em account} & -\/ the account owner of the permission \\
+\hline
+{\em permission} & -\/ the permission name to check for authorization \\
+\hline
+{\em provided\+\_\+keys} & -\/ a set of public keys \\
+\hline
+{\em provided\+\_\+permissions} & -\/ the set of permissions which can be considered satisfied (empty permission name acts as wildcard) \\
+\hline
+{\em provided\+\_\+delay} & -\/ the delay considered to be satisfied for the authorization check \\
+\hline
+{\em checktime} & -\/ the function that can be called to track CPU usage and time during the process of checking authorization \\
+\hline
+{\em allow\+\_\+unused\+\_\+keys} & -\/ true if method does not require all keys to be used \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{authorization__manager_8cpp_source_l00575}{575}} of file \mbox{\hyperlink{authorization__manager_8cpp_source}{authorization\+\_\+manager.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00583\ \ \ \ \{}
+\DoxyCodeLine{00584\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ checktime\ =\ (\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{bool}\textcolor{keyword}{>}(\_checktime)\ ?\ \_checktime\ :\ \mbox{\hyperlink{classsysio_1_1chain_1_1authorization__manager_a1e4aa0f280bcaa3057bc2970063f74b8}{\_noop\_checktime}}\ );}
+\DoxyCodeLine{00585\ }
+\DoxyCodeLine{00586\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ delay\_max\_limit\ =\ \mbox{\hyperlink{namespacefc_a9623b8cae3f48bbed6aa1fc2afe9b174}{fc::seconds}}(\ \_control.\mbox{\hyperlink{classsysio_1_1chain_1_1controller_a0bb11e832a05b6437c79bf81758b1b7d}{get\_global\_properties}}().\mbox{\hyperlink{classsysio_1_1chain_1_1global__property__object_a7f149fcf87034217c899838eb4430496}{configuration}}.\mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_ad98015ab0842f0258be2df72e7ace5e3}{max\_transaction\_delay}}\ );}
+\DoxyCodeLine{00587\ }
+\DoxyCodeLine{00588\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ checker\ =\ \mbox{\hyperlink{namespacesysio_1_1chain_a9935b13f160accddca2509476a2cad8b}{make\_auth\_checker}}(\ [\&](\textcolor{keyword}{const}\ permission\_level\&\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})\{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1chain_1_1authorization__manager_a96924f6aca32a602e24d991d12278a69}{get\_permission}}(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}).auth;\ \},}
+\DoxyCodeLine{00589\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_control.\mbox{\hyperlink{classsysio_1_1chain_1_1controller_a0bb11e832a05b6437c79bf81758b1b7d}{get\_global\_properties}}().configuration.max\_authority\_depth,}
+\DoxyCodeLine{00590\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ provided\_keys,}
+\DoxyCodeLine{00591\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ provided\_permissions,}
+\DoxyCodeLine{00592\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\ provided\_delay\ >=\ delay\_max\_limit\ )\ ?\ \mbox{\hyperlink{classfc_1_1microseconds_afc3eb0bfd792c7b1cda062e559e30c2e}{fc::microseconds::maximum}}()\ :\ provided\_delay,}
+\DoxyCodeLine{00593\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ checktime}
+\DoxyCodeLine{00594\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00595\ }
+\DoxyCodeLine{00596\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ checker.satisfied(\{account,\ permission\}),\ unsatisfied\_authorization,}
+\DoxyCodeLine{00597\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}permission\ '\$\{auth\}'\ was\ not\ satisfied\ under\ a\ provided\ delay\ of\ \$\{provided\_delay\}\ ms,\ "{}}}
+\DoxyCodeLine{00598\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}provided\ permissions\ \$\{provided\_permissions\},\ provided\ keys\ \$\{provided\_keys\},\ "{}}}
+\DoxyCodeLine{00599\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}and\ a\ delay\ max\ limit\ of\ \$\{delay\_max\_limit\_ms\}\ ms"{}},}
+\DoxyCodeLine{00600\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}auth"{}},\ permission\_level\{account,\ permission\})}
+\DoxyCodeLine{00601\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}provided\_delay"{}},\ provided\_delay.\mbox{\hyperlink{classfc_1_1microseconds_a20fba59ec7e1f50c6b8f2c9443cc9b92}{count}}()/1000)}
+\DoxyCodeLine{00602\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}provided\_permissions"{}},\ provided\_permissions)}
+\DoxyCodeLine{00603\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}provided\_keys"{}},\ provided\_keys)}
+\DoxyCodeLine{00604\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}delay\_max\_limit\_ms"{}},\ delay\_max\_limit.count()/1000)}
+\DoxyCodeLine{00605\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00606\ }
+\DoxyCodeLine{00607\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !allow\_unused\_keys\ )\ \{}
+\DoxyCodeLine{00608\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ checker.all\_keys\_used(),\ tx\_irrelevant\_sig,}
+\DoxyCodeLine{00609\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}irrelevant\ keys\ provided:\ \$\{keys\}"{}},}
+\DoxyCodeLine{00610\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}keys"{}},\ checker.unused\_keys())\ );}
+\DoxyCodeLine{00611\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00612\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1authorization__manager_a9f6cf6c813f4a578fddc10cf24aa396a_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1authorization__manager_a8566f4407e33eb1e4029455e4feae2f1}\index{sysio::chain::authorization\_manager@{sysio::chain::authorization\_manager}!check\_authorization@{check\_authorization}}
+\index{check\_authorization@{check\_authorization}!sysio::chain::authorization\_manager@{sysio::chain::authorization\_manager}}
+\doxysubsubsection{\texorpdfstring{check\_authorization()}{check\_authorization()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1authorization__manager_a8566f4407e33eb1e4029455e4feae2f1} 
+void sysio\+::chain\+::authorization\+\_\+manager\+::check\+\_\+authorization (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1vector}{vector}}$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1action}{action}} $>$ \&}]{actions}{, }\item[{const flat\+\_\+set$<$ \mbox{\hyperlink{namespacesysio_1_1chain_a0628a11f388cd2e43b1ccc1260a1042f}{public\+\_\+key\+\_\+type}} $>$ \&}]{provided\+\_\+keys}{, }\item[{const flat\+\_\+set$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1permission__level}{permission\+\_\+level}} $>$ \&}]{provided\+\_\+permissions}{ = {\ttfamily flat\+\_\+set$<$\mbox{\hyperlink{structsysio_1_1chain_1_1permission__level}{permission\+\_\+level}}$>$()}, }\item[{\mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}}}]{provided\+\_\+delay}{ = {\ttfamily \mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}}(0)}, }\item[{const std\+::function$<$ void()$>$ \&}]{checktime}{ = {\ttfamily std\+:\+:function$<$void()$>$()}, }\item[{bool}]{allow\+\_\+unused\+\_\+keys}{ = {\ttfamily false}, }\item[{bool}]{check\+\_\+but\+\_\+dont\+\_\+fail}{ = {\ttfamily false}, }\item[{const flat\+\_\+set$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1permission__level}{permission\+\_\+level}} $>$ \&}]{satisfied\+\_\+authorizations}{ = {\ttfamily flat\+\_\+set$<$\mbox{\hyperlink{structsysio_1_1chain_1_1permission__level}{permission\+\_\+level}}$>$()}}\end{DoxyParamCaption}) const}
+
+
+\begin{DoxyParams}{Parameters}
+{\em actions} & -\/ the actions to check authorization across \\
+\hline
+{\em provided\+\_\+keys} & -\/ the set of public keys which have authorized the transaction \\
+\hline
+{\em provided\+\_\+permissions} & -\/ the set of permissions which have authorized the transaction (empty permission name acts as wildcard) \\
+\hline
+{\em provided\+\_\+delay} & -\/ the delay satisfied by the transaction \\
+\hline
+{\em checktime} & -\/ the function that can be called to track CPU usage and time during the process of checking authorization \\
+\hline
+{\em allow\+\_\+unused\+\_\+keys} & -\/ true if method should not assert on unused keys \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{authorization__manager_8cpp_source_l00471}{471}} of file \mbox{\hyperlink{authorization__manager_8cpp_source}{authorization\+\_\+manager.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00480\ \ \ \ \{}
+\DoxyCodeLine{00481\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ checktime\ =\ (\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{bool}\textcolor{keyword}{>}(\_checktime)\ ?\ \_checktime\ :\ \mbox{\hyperlink{classsysio_1_1chain_1_1authorization__manager_a1e4aa0f280bcaa3057bc2970063f74b8}{\_noop\_checktime}}\ );}
+\DoxyCodeLine{00482\ }
+\DoxyCodeLine{00483\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ delay\_max\_limit\ =\ \mbox{\hyperlink{namespacefc_a9623b8cae3f48bbed6aa1fc2afe9b174}{fc::seconds}}(\ \_control.\mbox{\hyperlink{classsysio_1_1chain_1_1controller_a0bb11e832a05b6437c79bf81758b1b7d}{get\_global\_properties}}().\mbox{\hyperlink{classsysio_1_1chain_1_1global__property__object_a7f149fcf87034217c899838eb4430496}{configuration}}.\mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v0_ad98015ab0842f0258be2df72e7ace5e3}{max\_transaction\_delay}}\ );}
+\DoxyCodeLine{00484\ }
+\DoxyCodeLine{00485\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ effective\_provided\_delay\ =\ \ (provided\_delay\ >=\ delay\_max\_limit)\ ?\ \mbox{\hyperlink{classfc_1_1microseconds_afc3eb0bfd792c7b1cda062e559e30c2e}{fc::microseconds::maximum}}()\ :\ provided\_delay;}
+\DoxyCodeLine{00486\ }
+\DoxyCodeLine{00487\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ checker\ =\ \mbox{\hyperlink{namespacesysio_1_1chain_a9935b13f160accddca2509476a2cad8b}{make\_auth\_checker}}(\ [\&](\textcolor{keyword}{const}\ permission\_level\&\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})\{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1chain_1_1authorization__manager_a96924f6aca32a602e24d991d12278a69}{get\_permission}}(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}).auth;\ \},}
+\DoxyCodeLine{00488\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_control.\mbox{\hyperlink{classsysio_1_1chain_1_1controller_a0bb11e832a05b6437c79bf81758b1b7d}{get\_global\_properties}}().configuration.max\_authority\_depth,}
+\DoxyCodeLine{00489\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ provided\_keys,}
+\DoxyCodeLine{00490\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ provided\_permissions,}
+\DoxyCodeLine{00491\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ effective\_provided\_delay,}
+\DoxyCodeLine{00492\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ checktime}
+\DoxyCodeLine{00493\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00494\ }
+\DoxyCodeLine{00495\ \ \ \ \ \ \ map<permission\_level,\ fc::microseconds>\ permissions\_to\_satisfy;}
+\DoxyCodeLine{00496\ }
+\DoxyCodeLine{00497\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ act\ :\ actions\ )\ \{}
+\DoxyCodeLine{00498\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ special\_case\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00499\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1microseconds}{fc::microseconds}}\ delay\ =\ effective\_provided\_delay;}
+\DoxyCodeLine{00500\ }
+\DoxyCodeLine{00501\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ act.account\ ==\ config::system\_account\_name\ )\ \{}
+\DoxyCodeLine{00502\ \ \ \ \ \ \ \ \ \ \ \ \ special\_case\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00503\ }
+\DoxyCodeLine{00504\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ act.name\ ==\ \mbox{\hyperlink{structsysio_1_1chain_1_1updateauth_afc31c0680242885924f64fc347780814}{updateauth::get\_name}}()\ )\ \{}
+\DoxyCodeLine{00505\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ check\_updateauth\_authorization(\ act.data\_as<updateauth>(),\ act.authorization\ );}
+\DoxyCodeLine{00506\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(\ act.name\ ==\ \mbox{\hyperlink{structsysio_1_1chain_1_1deleteauth_add712cbf63b55d0e2db2b874dca6576d}{deleteauth::get\_name}}()\ )\ \{}
+\DoxyCodeLine{00507\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ check\_deleteauth\_authorization(\ act.data\_as<deleteauth>(),\ act.authorization\ );}
+\DoxyCodeLine{00508\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(\ act.name\ ==\ \mbox{\hyperlink{structsysio_1_1chain_1_1linkauth_a41eafdd131f5b3c8a8b7688449986f2b}{linkauth::get\_name}}()\ )\ \{}
+\DoxyCodeLine{00509\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ check\_linkauth\_authorization(\ act.data\_as<linkauth>(),\ act.authorization\ );}
+\DoxyCodeLine{00510\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(\ act.name\ ==\ \mbox{\hyperlink{structsysio_1_1chain_1_1unlinkauth_a438dbc3c8575ab1f129c0fdd5c074327}{unlinkauth::get\_name}}()\ )\ \{}
+\DoxyCodeLine{00511\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ check\_unlinkauth\_authorization(\ act.data\_as<unlinkauth>(),\ act.authorization\ );}
+\DoxyCodeLine{00512\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(\ act.name\ ==\ \ \mbox{\hyperlink{structsysio_1_1chain_1_1canceldelay_a23c3d201f9917509b74001716daf254f}{canceldelay::get\_name}}()\ )\ \{}
+\DoxyCodeLine{00513\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ delay\ =\ std::max(\ delay,\ check\_canceldelay\_authorization(act.data\_as<canceldelay>(),\ act.authorization)\ );}
+\DoxyCodeLine{00514\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00515\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ special\_case\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00516\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00517\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00518\ }
+\DoxyCodeLine{00519\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ declared\_auth\ :\ act.authorization\ )\ \{}
+\DoxyCodeLine{00520\ }
+\DoxyCodeLine{00521\ \ \ \ \ \ \ \ \ \ \ \ \ checktime();}
+\DoxyCodeLine{00522\ }
+\DoxyCodeLine{00523\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !special\_case\ )\ \{}
+\DoxyCodeLine{00524\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ min\_permission\_name\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1authorization__manager_a6193726fcf21c9b75f460696a67b6839}{lookup\_minimum\_permission}}(declared\_auth.actor,\ act.account,\ act.name);}
+\DoxyCodeLine{00525\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ min\_permission\_name\ )\ \{\ \textcolor{comment}{//\ since\ special\ cases\ were\ already\ handled,\ it\ should\ only\ be\ false\ if\ the\ permission\ is\ sysio.any}}
+\DoxyCodeLine{00526\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ min\_permission\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1authorization__manager_a96924f6aca32a602e24d991d12278a69}{get\_permission}}(\{declared\_auth.actor,\ *min\_permission\_name\});}
+\DoxyCodeLine{00527\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ \mbox{\hyperlink{classsysio_1_1chain_1_1authorization__manager_a96924f6aca32a602e24d991d12278a69}{get\_permission}}(declared\_auth).satisfies(\ min\_permission,}
+\DoxyCodeLine{00528\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_db.\mbox{\hyperlink{classchainbase_1_1database_a4d5297635dcf70be481d9b600da9bc13}{get\_index}}<\mbox{\hyperlink{namespacesysio_1_1chain_a4e24a1668746342d40487d1019880986}{permission\_index}}>().indices()\ ),}
+\DoxyCodeLine{00529\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ irrelevant\_auth\_exception,}
+\DoxyCodeLine{00530\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}action\ declares\ irrelevant\ authority\ '\$\{auth\}';\ minimum\ authority\ is\ \$\{min\}"{}},}
+\DoxyCodeLine{00531\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}auth"{}},\ declared\_auth)(\textcolor{stringliteral}{"{}min"{}},\ permission\_level\{min\_permission.owner,\ min\_permission.name\})\ );}
+\DoxyCodeLine{00532\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00533\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00534\ }
+\DoxyCodeLine{00535\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ satisfied\_authorizations.find(\ declared\_auth\ )\ ==\ satisfied\_authorizations.end()\ )\ \{}
+\DoxyCodeLine{00536\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ res\ =\ permissions\_to\_satisfy.emplace(\ declared\_auth,\ delay\ );}
+\DoxyCodeLine{00537\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !res.second\ \&\&\ res.first-\/>second\ >\ delay)\ \{\ \textcolor{comment}{//\ if\ the\ declared\_auth\ was\ already\ in\ the\ map\ and\ with\ a\ higher\ delay}}
+\DoxyCodeLine{00538\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ res.first-\/>second\ =\ \mbox{\hyperlink{integration_8cpp_a6e9635897de7740b7389a391f613626b}{delay}};}
+\DoxyCodeLine{00539\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00540\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00541\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00542\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00543\ }
+\DoxyCodeLine{00544\ \ \ \ \ \ \ \textcolor{comment}{//\ Now\ verify\ that\ all\ the\ declared\ authorizations\ are\ satisfied:}}
+\DoxyCodeLine{00545\ }
+\DoxyCodeLine{00546\ \ \ \ \ \ \ \textcolor{comment}{//\ Although\ this\ can\ be\ made\ parallel\ (especially\ for\ input\ transactions)\ with\ the\ optimistic\ assumption\ that\ the}}
+\DoxyCodeLine{00547\ \ \ \ \ \ \ \textcolor{comment}{//\ CPU\ limit\ is\ not\ reached,\ because\ of\ the\ CPU\ limit\ the\ protocol\ must\ officially\ specify\ a\ sequential\ algorithm}}
+\DoxyCodeLine{00548\ \ \ \ \ \ \ \textcolor{comment}{//\ for\ checking\ the\ set\ of\ declared\ authorizations.}}
+\DoxyCodeLine{00549\ \ \ \ \ \ \ \textcolor{comment}{//\ The\ permission\_levels\ are\ traversed\ in\ ascending\ order,\ which\ is:}}
+\DoxyCodeLine{00550\ \ \ \ \ \ \ \textcolor{comment}{//\ ascending\ order\ of\ the\ actor\ name\ with\ ties\ broken\ by\ ascending\ order\ of\ the\ permission\ name.}}
+\DoxyCodeLine{00551\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ :\ permissions\_to\_satisfy\ )\ \{}
+\DoxyCodeLine{00552\ \ \ \ \ \ \ \ \ \ checktime();\ \textcolor{comment}{//\ TODO:\ this\ should\ eventually\ move\ into\ authority\_checker\ instead}}
+\DoxyCodeLine{00553\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ checker.satisfied(\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.first,\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.second\ )\ ||\ check\_but\_dont\_fail,\ unsatisfied\_authorization,}
+\DoxyCodeLine{00554\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}transaction\ declares\ authority\ '\$\{auth\}',\ "{}}}
+\DoxyCodeLine{00555\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}but\ does\ not\ have\ signatures\ for\ it\ under\ a\ provided\ delay\ of\ \$\{provided\_delay\}\ ms,\ "{}}}
+\DoxyCodeLine{00556\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}provided\ permissions\ \$\{provided\_permissions\},\ provided\ keys\ \$\{provided\_keys\},\ "{}}}
+\DoxyCodeLine{00557\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}and\ a\ delay\ max\ limit\ of\ \$\{delay\_max\_limit\_ms\}\ ms"{}},}
+\DoxyCodeLine{00558\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}auth"{}},\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.first)}
+\DoxyCodeLine{00559\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}provided\_delay"{}},\ provided\_delay.\mbox{\hyperlink{classfc_1_1microseconds_a20fba59ec7e1f50c6b8f2c9443cc9b92}{count}}()/1000)}
+\DoxyCodeLine{00560\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}provided\_permissions"{}},\ provided\_permissions)}
+\DoxyCodeLine{00561\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}provided\_keys"{}},\ provided\_keys)}
+\DoxyCodeLine{00562\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}delay\_max\_limit\_ms"{}},\ delay\_max\_limit.count()/1000)}
+\DoxyCodeLine{00563\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00564\ }
+\DoxyCodeLine{00565\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00566\ }
+\DoxyCodeLine{00567\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !allow\_unused\_keys\ \ ||\ check\_but\_dont\_fail)\ \{}
+\DoxyCodeLine{00568\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ checker.all\_keys\_used(),\ tx\_irrelevant\_sig,}
+\DoxyCodeLine{00569\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}transaction\ bears\ irrelevant\ signatures\ from\ these\ keys:\ \$\{keys\}"{}},}
+\DoxyCodeLine{00570\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}keys"{}},\ checker.unused\_keys())\ );}
+\DoxyCodeLine{00571\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00572\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1authorization__manager_a8566f4407e33eb1e4029455e4feae2f1_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1authorization__manager_a8566f4407e33eb1e4029455e4feae2f1_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1authorization__manager_a258e0daa2cd72440bfe34a2aa92c9104}\index{sysio::chain::authorization\_manager@{sysio::chain::authorization\_manager}!create\_permission@{create\_permission}}
+\index{create\_permission@{create\_permission}!sysio::chain::authorization\_manager@{sysio::chain::authorization\_manager}}
+\doxysubsubsection{\texorpdfstring{create\_permission()}{create\_permission()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1authorization__manager_a258e0daa2cd72440bfe34a2aa92c9104} 
+const \mbox{\hyperlink{classsysio_1_1chain_1_1permission__object}{permission\+\_\+object}} \& sysio\+::chain\+::authorization\+\_\+manager\+::create\+\_\+permission (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}}}]{account}{, }\item[{\mbox{\hyperlink{namespacesysio_1_1chain_aacc541763fed17ee490b6ac42b7bb77a}{permission\+\_\+name}}}]{name}{, }\item[{\mbox{\hyperlink{classsysio_1_1chain_1_1authorization__manager_add79267df1f466480b18703845327a78}{permission\+\_\+id\+\_\+type}}}]{parent}{, }\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1authority}{authority}} \&\&}]{auth}{, }\item[{\mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}}}]{initial\+\_\+creation\+\_\+time}{ = {\ttfamily \mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}}()}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{authorization__manager_8cpp_source_l00168}{168}} of file \mbox{\hyperlink{authorization__manager_8cpp_source}{authorization\+\_\+manager.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00174\ \ \ \ \{}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ key\_weight\&\ k:\ auth.keys)}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(k.key.which()\ <\ \_db.\mbox{\hyperlink{classchainbase_1_1database_afcfe00f81a526c1376d4f51197dd3a9a}{get}}<protocol\_state\_object>().num\_supported\_key\_types,\ unactivated\_key\_type,}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Unactivated\ key\ type\ used\ when\ creating\ permission"{}});}
+\DoxyCodeLine{00178\ }
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ creation\_time\ =\ initial\_creation\_time;}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ creation\_time\ ==\ \mbox{\hyperlink{namespacesystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_a28ca3704afa6ea443dd4a095daaedb3a}{time\_point}}()\ )\ \{}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ \ creation\_time\ =\ \_control.\mbox{\hyperlink{classsysio_1_1chain_1_1controller_abb1d81f96986df3bce46bd37caaf6a69}{pending\_block\_time}}();}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00183\ }
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ perm\_usage\ =\ \_db.\mbox{\hyperlink{classchainbase_1_1database_adc8f336b33d7013d1b0400399b16c5a7}{create}}<permission\_usage\_object>([\&](\textcolor{keyword}{auto}\&\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})\ \{}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.last\_used\ =\ creation\_time;}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00187\ }
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ perm\ =\ \_db.\mbox{\hyperlink{classchainbase_1_1database_adc8f336b33d7013d1b0400399b16c5a7}{create}}<permission\_object>([\&](\textcolor{keyword}{auto}\&\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})\ \{}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.usage\_id\ \ \ \ \ =\ perm\_usage.id;}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.parent\ \ \ \ \ \ \ =\ parent;}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.owner\ \ \ \ \ \ \ \ =\ account;}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.name\ \ \ \ \ \ \ \ \ =\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}};}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.last\_updated\ =\ creation\_time;}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.auth\ \ \ \ \ \ \ \ \ =\ std::move(auth);}
+\DoxyCodeLine{00195\ }
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{auto}\ dm\_logger\ =\ \_control.\mbox{\hyperlink{classsysio_1_1chain_1_1controller_a4f6404b355a3a4bf7fb60c92e85443d1}{get\_deep\_mind\_logger}}())\ \{}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \ \ \ \ dm\_logger-\/>on\_create\_permission(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}});}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ perm;}
+\DoxyCodeLine{00201\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1authorization__manager_a258e0daa2cd72440bfe34a2aa92c9104_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1authorization__manager_aac57733c5aa05c1c78a023a80b2f447f}\index{sysio::chain::authorization\_manager@{sysio::chain::authorization\_manager}!create\_permission@{create\_permission}}
+\index{create\_permission@{create\_permission}!sysio::chain::authorization\_manager@{sysio::chain::authorization\_manager}}
+\doxysubsubsection{\texorpdfstring{create\_permission()}{create\_permission()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1authorization__manager_aac57733c5aa05c1c78a023a80b2f447f} 
+const \mbox{\hyperlink{classsysio_1_1chain_1_1permission__object}{permission\+\_\+object}} \& sysio\+::chain\+::authorization\+\_\+manager\+::create\+\_\+permission (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}}}]{account}{, }\item[{\mbox{\hyperlink{namespacesysio_1_1chain_aacc541763fed17ee490b6ac42b7bb77a}{permission\+\_\+name}}}]{name}{, }\item[{\mbox{\hyperlink{classsysio_1_1chain_1_1authorization__manager_add79267df1f466480b18703845327a78}{permission\+\_\+id\+\_\+type}}}]{parent}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1authority}{authority}} \&}]{auth}{, }\item[{\mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}}}]{initial\+\_\+creation\+\_\+time}{ = {\ttfamily \mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}}()}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{authorization__manager_8cpp_source_l00133}{133}} of file \mbox{\hyperlink{authorization__manager_8cpp_source}{authorization\+\_\+manager.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00139\ \ \ \ \{}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ key\_weight\&\ k:\ auth.keys)}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(k.key.which()\ <\ \_db.\mbox{\hyperlink{classchainbase_1_1database_afcfe00f81a526c1376d4f51197dd3a9a}{get}}<protocol\_state\_object>().num\_supported\_key\_types,\ unactivated\_key\_type,}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Unactivated\ key\ type\ used\ when\ creating\ permission"{}});}
+\DoxyCodeLine{00143\ }
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ creation\_time\ =\ initial\_creation\_time;}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ creation\_time\ ==\ \mbox{\hyperlink{namespacesystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_a28ca3704afa6ea443dd4a095daaedb3a}{time\_point}}()\ )\ \{}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \ creation\_time\ =\ \_control.\mbox{\hyperlink{classsysio_1_1chain_1_1controller_abb1d81f96986df3bce46bd37caaf6a69}{pending\_block\_time}}();}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00148\ }
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ perm\_usage\ =\ \_db.\mbox{\hyperlink{classchainbase_1_1database_adc8f336b33d7013d1b0400399b16c5a7}{create}}<permission\_usage\_object>([\&](\textcolor{keyword}{auto}\&\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})\ \{}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.last\_used\ =\ creation\_time;}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00152\ }
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ perm\ =\ \_db.\mbox{\hyperlink{classchainbase_1_1database_adc8f336b33d7013d1b0400399b16c5a7}{create}}<permission\_object>([\&](\textcolor{keyword}{auto}\&\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})\ \{}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.usage\_id\ \ \ \ \ =\ perm\_usage.id;}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.parent\ \ \ \ \ \ \ =\ parent;}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.owner\ \ \ \ \ \ \ \ =\ account;}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.name\ \ \ \ \ \ \ \ \ =\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}};}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.last\_updated\ =\ creation\_time;}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.auth\ \ \ \ \ \ \ \ \ =\ auth;}
+\DoxyCodeLine{00160\ }
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{auto}\ dm\_logger\ =\ \_control.\mbox{\hyperlink{classsysio_1_1chain_1_1controller_a4f6404b355a3a4bf7fb60c92e85443d1}{get\_deep\_mind\_logger}}())\ \{}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \ \ \ \ \ \ dm\_logger-\/>on\_create\_permission(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}});}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ perm;}
+\DoxyCodeLine{00166\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1authorization__manager_aac57733c5aa05c1c78a023a80b2f447f_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1authorization__manager_aac57733c5aa05c1c78a023a80b2f447f_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1authorization__manager_ab0acfec50b75044030d082d1aa3fbf5c}\index{sysio::chain::authorization\_manager@{sysio::chain::authorization\_manager}!find\_permission@{find\_permission}}
+\index{find\_permission@{find\_permission}!sysio::chain::authorization\_manager@{sysio::chain::authorization\_manager}}
+\doxysubsubsection{\texorpdfstring{find\_permission()}{find\_permission()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1authorization__manager_ab0acfec50b75044030d082d1aa3fbf5c} 
+const \mbox{\hyperlink{classsysio_1_1chain_1_1permission__object}{permission\+\_\+object}} \texorpdfstring{$\ast$}{*} sysio\+::chain\+::authorization\+\_\+manager\+::find\+\_\+permission (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1permission__level}{permission\+\_\+level}} \&}]{level}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{authorization__manager_8cpp_source_l00251}{251}} of file \mbox{\hyperlink{authorization__manager_8cpp_source}{authorization\+\_\+manager.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00252\ \ \ \ \{\ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00253\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ !\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}}.actor.empty()\ \&\&\ !\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}}.permission.empty(),\ invalid\_permission,\ \textcolor{stringliteral}{"{}Invalid\ permission"{}}\ );}
+\DoxyCodeLine{00254\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \_db.\mbox{\hyperlink{classchainbase_1_1database_aa5a2ca0da0092693ac49b36b7ec6817a}{find}}<permission\_object,\ by\_owner>(\ boost::make\_tuple(\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}}.actor,\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}}.permission)\ );}
+\DoxyCodeLine{00255\ \ \ \ \}\ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a43bd817895cb757183fcecafc6ae7dc1}{SYS\_RETHROW\_EXCEPTIONS}}(\ chain::permission\_query\_exception,\ \textcolor{stringliteral}{"{}Failed\ to\ retrieve\ permission:\ \$\{level\}"{}},\ (\textcolor{stringliteral}{"{}level"{}},\ level)\ )\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1authorization__manager_ab0acfec50b75044030d082d1aa3fbf5c_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1authorization__manager_ab0acfec50b75044030d082d1aa3fbf5c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1authorization__manager_a96924f6aca32a602e24d991d12278a69}\index{sysio::chain::authorization\_manager@{sysio::chain::authorization\_manager}!get\_permission@{get\_permission}}
+\index{get\_permission@{get\_permission}!sysio::chain::authorization\_manager@{sysio::chain::authorization\_manager}}
+\doxysubsubsection{\texorpdfstring{get\_permission()}{get\_permission()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1authorization__manager_a96924f6aca32a602e24d991d12278a69} 
+const \mbox{\hyperlink{classsysio_1_1chain_1_1permission__object}{permission\+\_\+object}} \& sysio\+::chain\+::authorization\+\_\+manager\+::get\+\_\+permission (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1permission__level}{permission\+\_\+level}} \&}]{level}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{authorization__manager_8cpp_source_l00257}{257}} of file \mbox{\hyperlink{authorization__manager_8cpp_source}{authorization\+\_\+manager.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00258\ \ \ \ \{\ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00259\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ !\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}}.actor.empty()\ \&\&\ !\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}}.permission.empty(),\ invalid\_permission,\ \textcolor{stringliteral}{"{}Invalid\ permission"{}}\ );}
+\DoxyCodeLine{00260\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \_db.\mbox{\hyperlink{classchainbase_1_1database_afcfe00f81a526c1376d4f51197dd3a9a}{get}}<permission\_object,\ by\_owner>(\ boost::make\_tuple(\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}}.actor,\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}}.permission)\ );}
+\DoxyCodeLine{00261\ \ \ \ \}\ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a43bd817895cb757183fcecafc6ae7dc1}{SYS\_RETHROW\_EXCEPTIONS}}(\ chain::permission\_query\_exception,\ \textcolor{stringliteral}{"{}Failed\ to\ retrieve\ permission:\ \$\{level\}"{}},\ (\textcolor{stringliteral}{"{}level"{}},\ level)\ )\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1authorization__manager_a96924f6aca32a602e24d991d12278a69_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1authorization__manager_a96924f6aca32a602e24d991d12278a69_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1authorization__manager_a0909c7f81928fd8ffc4269861d12ad3f}\index{sysio::chain::authorization\_manager@{sysio::chain::authorization\_manager}!get\_permission\_last\_used@{get\_permission\_last\_used}}
+\index{get\_permission\_last\_used@{get\_permission\_last\_used}!sysio::chain::authorization\_manager@{sysio::chain::authorization\_manager}}
+\doxysubsubsection{\texorpdfstring{get\_permission\_last\_used()}{get\_permission\_last\_used()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1authorization__manager_a0909c7f81928fd8ffc4269861d12ad3f} 
+\mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}} sysio\+::chain\+::authorization\+\_\+manager\+::get\+\_\+permission\+\_\+last\+\_\+used (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classsysio_1_1chain_1_1permission__object}{permission\+\_\+object}} \&}]{permission}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{authorization__manager_8cpp_source_l00247}{247}} of file \mbox{\hyperlink{authorization__manager_8cpp_source}{authorization\+\_\+manager.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00247\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00248\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \_db.\mbox{\hyperlink{classchainbase_1_1database_afcfe00f81a526c1376d4f51197dd3a9a}{get}}<permission\_usage\_object,\ by\_id>(\ permission.usage\_id\ ).last\_used;}
+\DoxyCodeLine{00249\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1authorization__manager_a0909c7f81928fd8ffc4269861d12ad3f_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1authorization__manager_ac1e69cb344bd39871d1c92993a491e95}\index{sysio::chain::authorization\_manager@{sysio::chain::authorization\_manager}!get\_required\_keys@{get\_required\_keys}}
+\index{get\_required\_keys@{get\_required\_keys}!sysio::chain::authorization\_manager@{sysio::chain::authorization\_manager}}
+\doxysubsubsection{\texorpdfstring{get\_required\_keys()}{get\_required\_keys()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1authorization__manager_ac1e69cb344bd39871d1c92993a491e95} 
+flat\+\_\+set$<$ \mbox{\hyperlink{namespacesysio_1_1chain_a0628a11f388cd2e43b1ccc1260a1042f}{public\+\_\+key\+\_\+type}} $>$ sysio\+::chain\+::authorization\+\_\+manager\+::get\+\_\+required\+\_\+keys (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1transaction}{transaction}} \&}]{trx}{, }\item[{const flat\+\_\+set$<$ \mbox{\hyperlink{namespacesysio_1_1chain_a0628a11f388cd2e43b1ccc1260a1042f}{public\+\_\+key\+\_\+type}} $>$ \&}]{candidate\+\_\+keys}{, }\item[{\mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}}}]{provided\+\_\+delay}{ = {\ttfamily \mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}}(0)}}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{authorization__manager_8cpp_source_l00614}{614}} of file \mbox{\hyperlink{authorization__manager_8cpp_source}{authorization\+\_\+manager.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00618\ \ \ \ \{}
+\DoxyCodeLine{00619\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ checker\ =\ \mbox{\hyperlink{namespacesysio_1_1chain_a9935b13f160accddca2509476a2cad8b}{make\_auth\_checker}}(\ [\&](\textcolor{keyword}{const}\ permission\_level\&\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})\{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1chain_1_1authorization__manager_a96924f6aca32a602e24d991d12278a69}{get\_permission}}(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}).auth;\ \},}
+\DoxyCodeLine{00620\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_control.\mbox{\hyperlink{classsysio_1_1chain_1_1controller_a0bb11e832a05b6437c79bf81758b1b7d}{get\_global\_properties}}().configuration.max\_authority\_depth,}
+\DoxyCodeLine{00621\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ candidate\_keys,}
+\DoxyCodeLine{00622\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\},}
+\DoxyCodeLine{00623\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ provided\_delay,}
+\DoxyCodeLine{00624\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1authorization__manager_a1e4aa0f280bcaa3057bc2970063f74b8}{\_noop\_checktime}}}
+\DoxyCodeLine{00625\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00626\ }
+\DoxyCodeLine{00627\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ act\ :\ trx.actions\ )\ \{}
+\DoxyCodeLine{00628\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ declared\_auth\ :\ act.authorization)\ \{}
+\DoxyCodeLine{00629\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ checker.satisfied(declared\_auth),\ unsatisfied\_authorization,}
+\DoxyCodeLine{00630\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}transaction\ declares\ authority\ '\$\{auth\}',\ but\ does\ not\ have\ signatures\ for\ it."{}},}
+\DoxyCodeLine{00631\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}auth"{}},\ declared\_auth)\ );}
+\DoxyCodeLine{00632\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00633\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00634\ }
+\DoxyCodeLine{00635\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ checker.used\_keys();}
+\DoxyCodeLine{00636\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1authorization__manager_ac1e69cb344bd39871d1c92993a491e95_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1authorization__manager_a27cfd5f70c12c10a9939e7bf6b3a52e4}\index{sysio::chain::authorization\_manager@{sysio::chain::authorization\_manager}!initialize\_database@{initialize\_database}}
+\index{initialize\_database@{initialize\_database}!sysio::chain::authorization\_manager@{sysio::chain::authorization\_manager}}
+\doxysubsubsection{\texorpdfstring{initialize\_database()}{initialize\_database()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1authorization__manager_a27cfd5f70c12c10a9939e7bf6b3a52e4} 
+void sysio\+::chain\+::authorization\+\_\+manager\+::initialize\+\_\+database (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+reserve perm 0 (used else where)
+
+Definition at line \mbox{\hyperlink{authorization__manager_8cpp_source_l00031}{31}} of file \mbox{\hyperlink{authorization__manager_8cpp_source}{authorization\+\_\+manager.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \_db.\mbox{\hyperlink{classchainbase_1_1database_adc8f336b33d7013d1b0400399b16c5a7}{create}}<permission\_object>([](\textcolor{keyword}{auto}\&)\{\});\ }
+\DoxyCodeLine{00033\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1authorization__manager_a27cfd5f70c12c10a9939e7bf6b3a52e4_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1authorization__manager_a27cfd5f70c12c10a9939e7bf6b3a52e4_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1authorization__manager_a6193726fcf21c9b75f460696a67b6839}\index{sysio::chain::authorization\_manager@{sysio::chain::authorization\_manager}!lookup\_minimum\_permission@{lookup\_minimum\_permission}}
+\index{lookup\_minimum\_permission@{lookup\_minimum\_permission}!sysio::chain::authorization\_manager@{sysio::chain::authorization\_manager}}
+\doxysubsubsection{\texorpdfstring{lookup\_minimum\_permission()}{lookup\_minimum\_permission()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1authorization__manager_a6193726fcf21c9b75f460696a67b6839} 
+std\+::optional$<$ \mbox{\hyperlink{namespacesysio_1_1chain_aacc541763fed17ee490b6ac42b7bb77a}{permission\+\_\+name}} $>$ sysio\+::chain\+::authorization\+\_\+manager\+::lookup\+\_\+minimum\+\_\+permission (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}}}]{authorizer\+\_\+account}{, }\item[{\mbox{\hyperlink{namespacesysio_1_1chain_a58379f7b40727cd3645e0f5a9b24e653}{scope\+\_\+name}}}]{code\+\_\+account}{, }\item[{\mbox{\hyperlink{namespacesysio_1_1chain_a7a1685bcc352cda9e45f055932069428}{action\+\_\+name}}}]{type}{}\end{DoxyParamCaption}) const}
+
+
+\begin{DoxyParams}{Parameters}
+{\em authorizer\+\_\+account} & The account authorizing the message \\
+\hline
+{\em code\+\_\+account} & The account which publishes the contract that handles the message \\
+\hline
+{\em type} & The type of message \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{authorization__manager_8cpp_source_l00286}{286}} of file \mbox{\hyperlink{authorization__manager_8cpp_source}{authorization\+\_\+manager.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00290\ \ \ \ \{}
+\DoxyCodeLine{00291\ \ \ \ \ \ \ \textcolor{comment}{//\ Special\ case\ native\ actions\ cannot\ be\ linked\ to\ a\ minimum\ permission,\ so\ there\ is\ no\ need\ to\ check.}}
+\DoxyCodeLine{00292\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ scope\ ==\ config::system\_account\_name\ )\ \{}
+\DoxyCodeLine{00293\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ act\_name\ !=\ \mbox{\hyperlink{structsysio_1_1chain_1_1updateauth_afc31c0680242885924f64fc347780814}{updateauth::get\_name}}()\ \&\&}
+\DoxyCodeLine{00294\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ act\_name\ !=\ \mbox{\hyperlink{structsysio_1_1chain_1_1deleteauth_add712cbf63b55d0e2db2b874dca6576d}{deleteauth::get\_name}}()\ \&\&}
+\DoxyCodeLine{00295\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ act\_name\ !=\ \mbox{\hyperlink{structsysio_1_1chain_1_1linkauth_a41eafdd131f5b3c8a8b7688449986f2b}{linkauth::get\_name}}()\ \&\&}
+\DoxyCodeLine{00296\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ act\_name\ !=\ \mbox{\hyperlink{structsysio_1_1chain_1_1unlinkauth_a438dbc3c8575ab1f129c0fdd5c074327}{unlinkauth::get\_name}}()\ \&\&}
+\DoxyCodeLine{00297\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ act\_name\ !=\ \mbox{\hyperlink{structsysio_1_1chain_1_1canceldelay_a23c3d201f9917509b74001716daf254f}{canceldelay::get\_name}}(),}
+\DoxyCodeLine{00298\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ unlinkable\_min\_permission\_action,}
+\DoxyCodeLine{00299\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}cannot\ call\ lookup\_minimum\_permission\ on\ native\ actions\ that\ are\ not\ allowed\ to\ be\ linked\ to\ minimum\ permissions"{}}\ );}
+\DoxyCodeLine{00300\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00301\ }
+\DoxyCodeLine{00302\ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00303\ \ \ \ \ \ \ \ \ \ std::optional<permission\_name>\ linked\_permission\ =\ lookup\_linked\_permission(authorizer\_account,\ scope,\ act\_name);}
+\DoxyCodeLine{00304\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !linked\_permission\ )}
+\DoxyCodeLine{00305\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ config::active\_name;}
+\DoxyCodeLine{00306\ }
+\DoxyCodeLine{00307\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ *linked\_permission\ ==\ config::sysio\_any\_name\ )}
+\DoxyCodeLine{00308\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::optional<permission\_name>();}
+\DoxyCodeLine{00309\ }
+\DoxyCodeLine{00310\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ linked\_permission;}
+\DoxyCodeLine{00311\ \ \ \ \ \ \ \}\ \mbox{\hyperlink{exception_8hpp_a094902280cad82ad6529ebbd12a697eb}{FC\_CAPTURE\_AND\_RETHROW}}((authorizer\_account)(scope)(act\_name))}
+\DoxyCodeLine{00312\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1authorization__manager_a6193726fcf21c9b75f460696a67b6839_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1authorization__manager_a6193726fcf21c9b75f460696a67b6839_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1authorization__manager_abf01ddda4cd475bf2530ad1d28c72dfb}\index{sysio::chain::authorization\_manager@{sysio::chain::authorization\_manager}!modify\_permission@{modify\_permission}}
+\index{modify\_permission@{modify\_permission}!sysio::chain::authorization\_manager@{sysio::chain::authorization\_manager}}
+\doxysubsubsection{\texorpdfstring{modify\_permission()}{modify\_permission()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1authorization__manager_abf01ddda4cd475bf2530ad1d28c72dfb} 
+void sysio\+::chain\+::authorization\+\_\+manager\+::modify\+\_\+permission (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classsysio_1_1chain_1_1permission__object}{permission\+\_\+object}} \&}]{permission}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1authority}{authority}} \&}]{auth}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{authorization__manager_8cpp_source_l00203}{203}} of file \mbox{\hyperlink{authorization__manager_8cpp_source}{authorization\+\_\+manager.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ key\_weight\&\ k:\ auth.keys)}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(k.key.which()\ <\ \_db.\mbox{\hyperlink{classchainbase_1_1database_afcfe00f81a526c1376d4f51197dd3a9a}{get}}<protocol\_state\_object>().num\_supported\_key\_types,\ unactivated\_key\_type,}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Unactivated\ key\ type\ used\ when\ modifying\ permission"{}});}
+\DoxyCodeLine{00207\ }
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \_db.\mbox{\hyperlink{classchainbase_1_1database_a9ebc006075e8fc2e84357a0e068b58d4}{modify}}(\ permission,\ [\&](permission\_object\&\ po)\ \{}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ dm\_logger\ =\ \_control.\mbox{\hyperlink{classsysio_1_1chain_1_1controller_a4f6404b355a3a4bf7fb60c92e85443d1}{get\_deep\_mind\_logger}}();}
+\DoxyCodeLine{00210\ }
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \ \ \ std::optional<permission\_object>\ old\_permission;}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (dm\_logger)\ \{}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \ \ \ \ \ \ old\_permission\ =\ po;}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00215\ }
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ \ po.auth\ =\ auth;}
+\DoxyCodeLine{00217\ \ \ \ \ \ \ \ \ \ po.last\_updated\ =\ \_control.\mbox{\hyperlink{classsysio_1_1chain_1_1controller_abb1d81f96986df3bce46bd37caaf6a69}{pending\_block\_time}}();}
+\DoxyCodeLine{00218\ }
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{auto}\ dm\_logger\ =\ \_control.\mbox{\hyperlink{classsysio_1_1chain_1_1controller_a4f6404b355a3a4bf7fb60c92e85443d1}{get\_deep\_mind\_logger}}())\ \{}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \ \ \ \ \ \ dm\_logger-\/>on\_modify\_permission(*old\_permission,\ po);}
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00223\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1authorization__manager_abf01ddda4cd475bf2530ad1d28c72dfb_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1authorization__manager_a7a4d84d47bcd9069ab0c8d8f9f9ac5f3}\index{sysio::chain::authorization\_manager@{sysio::chain::authorization\_manager}!read\_from\_snapshot@{read\_from\_snapshot}}
+\index{read\_from\_snapshot@{read\_from\_snapshot}!sysio::chain::authorization\_manager@{sysio::chain::authorization\_manager}}
+\doxysubsubsection{\texorpdfstring{read\_from\_snapshot()}{read\_from\_snapshot()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1authorization__manager_a7a4d84d47bcd9069ab0c8d8f9f9ac5f3} 
+void sysio\+::chain\+::authorization\+\_\+manager\+::read\+\_\+from\+\_\+snapshot (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_aaa27dacddc54cea475602788c8e7a02c}{snapshot\+\_\+reader\+\_\+ptr}} \&}]{snapshot}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{authorization__manager_8cpp_source_l00113}{113}} of file \mbox{\hyperlink{authorization__manager_8cpp_source}{authorization\+\_\+manager.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ authorization\_index\_set::walk\_indices([\textcolor{keyword}{this},\ \&snapshot](\ \textcolor{keyword}{auto}\ utils\ )\{}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ }section\_t\ =\ \textcolor{keyword}{typename}\ \textcolor{keyword}{decltype}(utils)::index\_t::value\_type;}
+\DoxyCodeLine{00116\ }
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ skip\ the\ permission\_usage\_index\ as\ its\ inlined\ with\ permission\_index}}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (std::is\_same<section\_t,\ permission\_usage\_object>::value)\ \{}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00121\ }
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \ snapshot-\/>read\_section<section\_t>([\textcolor{keyword}{this}](\ \textcolor{keyword}{auto}\&\ section\ )\ \{}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ more\ =\ !section.empty();}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(more)\ \{}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{decltype}(utils)::create(\_db,\ [\textcolor{keyword}{this},\ \&section,\ \&more](\ \textcolor{keyword}{auto}\ \&row\ )\ \{}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ more\ =\ section.read\_row(row,\ \_db);}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00131\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1authorization__manager_a7a4d84d47bcd9069ab0c8d8f9f9ac5f3_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1authorization__manager_a9c889c94c63b7c53a5b4919738d6166b}\index{sysio::chain::authorization\_manager@{sysio::chain::authorization\_manager}!remove\_permission@{remove\_permission}}
+\index{remove\_permission@{remove\_permission}!sysio::chain::authorization\_manager@{sysio::chain::authorization\_manager}}
+\doxysubsubsection{\texorpdfstring{remove\_permission()}{remove\_permission()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1authorization__manager_a9c889c94c63b7c53a5b4919738d6166b} 
+void sysio\+::chain\+::authorization\+\_\+manager\+::remove\+\_\+permission (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classsysio_1_1chain_1_1permission__object}{permission\+\_\+object}} \&}]{permission}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{authorization__manager_8cpp_source_l00225}{225}} of file \mbox{\hyperlink{authorization__manager_8cpp_source}{authorization\+\_\+manager.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00226\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ index\ =\ \_db.template\ \mbox{\hyperlink{namespacefc_ae009b19d1fecf5979996e9f326cd98c3}{get\_index<permission\_index,\ by\_parent>}}();}
+\DoxyCodeLine{00227\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ range\ =\ index.equal\_range(permission.id);}
+\DoxyCodeLine{00228\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ range.first\ ==\ range.second,\ \mbox{\hyperlink{namespacesysio_1_1chain_a764b50974b9b72a0e233e72176913d6b}{action\_validate\_exception}},}
+\DoxyCodeLine{00229\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Cannot\ remove\ a\ permission\ which\ has\ children.\ Remove\ the\ children\ first."{}});}
+\DoxyCodeLine{00230\ }
+\DoxyCodeLine{00231\ \ \ \ \ \ \ \_db.\mbox{\hyperlink{classchainbase_1_1database_afaea057692a8bbbf3f506b64c60308b6}{get\_mutable\_index}}<\mbox{\hyperlink{namespacesysio_1_1chain_ad2f4ad05ff8f6e64102bf097f596589e}{permission\_usage\_index}}>().remove\_object(\ permission.usage\_id.\_id\ );}
+\DoxyCodeLine{00232\ }
+\DoxyCodeLine{00233\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{auto}\ dm\_logger\ =\ \_control.\mbox{\hyperlink{classsysio_1_1chain_1_1controller_a4f6404b355a3a4bf7fb60c92e85443d1}{get\_deep\_mind\_logger}}())\ \{}
+\DoxyCodeLine{00234\ \ \ \ \ \ \ \ \ \ dm\_logger-\/>on\_remove\_permission(permission);}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00236\ }
+\DoxyCodeLine{00237\ \ \ \ \ \ \ \_db.\mbox{\hyperlink{classchainbase_1_1database_ac6bb29708e4fdfb6899028e3c351fe0b}{remove}}(\ permission\ );}
+\DoxyCodeLine{00238\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1authorization__manager_a9c889c94c63b7c53a5b4919738d6166b_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1authorization__manager_a6755c0b39298b2933eb4e74649a36442}\index{sysio::chain::authorization\_manager@{sysio::chain::authorization\_manager}!update\_permission\_usage@{update\_permission\_usage}}
+\index{update\_permission\_usage@{update\_permission\_usage}!sysio::chain::authorization\_manager@{sysio::chain::authorization\_manager}}
+\doxysubsubsection{\texorpdfstring{update\_permission\_usage()}{update\_permission\_usage()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1authorization__manager_a6755c0b39298b2933eb4e74649a36442} 
+void sysio\+::chain\+::authorization\+\_\+manager\+::update\+\_\+permission\+\_\+usage (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classsysio_1_1chain_1_1permission__object}{permission\+\_\+object}} \&}]{permission}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{authorization__manager_8cpp_source_l00240}{240}} of file \mbox{\hyperlink{authorization__manager_8cpp_source}{authorization\+\_\+manager.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00241\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ puo\ =\ \_db.\mbox{\hyperlink{classchainbase_1_1database_afcfe00f81a526c1376d4f51197dd3a9a}{get}}<permission\_usage\_object,\ by\_id>(\ permission.usage\_id\ );}
+\DoxyCodeLine{00242\ \ \ \ \ \ \ \_db.\mbox{\hyperlink{classchainbase_1_1database_a9ebc006075e8fc2e84357a0e068b58d4}{modify}}(\ puo,\ [\&](permission\_usage\_object\&\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})\ \{}
+\DoxyCodeLine{00243\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.last\_used\ =\ \_control.\mbox{\hyperlink{classsysio_1_1chain_1_1controller_abb1d81f96986df3bce46bd37caaf6a69}{pending\_block\_time}}();}
+\DoxyCodeLine{00244\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00245\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1authorization__manager_a6755c0b39298b2933eb4e74649a36442_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classsysio_1_1chain_1_1authorization__manager_a1e4aa0f280bcaa3057bc2970063f74b8}\index{sysio::chain::authorization\_manager@{sysio::chain::authorization\_manager}!\_noop\_checktime@{\_noop\_checktime}}
+\index{\_noop\_checktime@{\_noop\_checktime}!sysio::chain::authorization\_manager@{sysio::chain::authorization\_manager}}
+\doxysubsubsection{\texorpdfstring{\_noop\_checktime}{\_noop\_checktime}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1authorization__manager_a1e4aa0f280bcaa3057bc2970063f74b8} 
+std\+::function$<$ void()$>$ sysio\+::chain\+::authorization\+\_\+manager\+::\+\_\+noop\+\_\+checktime \{\&\mbox{\hyperlink{namespacesysio_1_1chain_a057ec53a1f8d23b2fb89de6c19b41c32}{noop\+\_\+checktime}}\}\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{authorization__manager_8hpp_source_l00116}{116}} of file \mbox{\hyperlink{authorization__manager_8hpp_source}{authorization\+\_\+manager.\+hpp}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{authorization__manager_8hpp}{authorization\+\_\+manager.\+hpp}}\item 
+libraries/chain/\mbox{\hyperlink{authorization__manager_8cpp}{authorization\+\_\+manager.\+cpp}}\end{DoxyCompactItemize}

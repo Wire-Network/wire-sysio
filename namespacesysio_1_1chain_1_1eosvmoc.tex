@@ -1,0 +1,1403 @@
+\doxysection{sysio\+::chain\+::eosvmoc Namespace Reference}
+\hypertarget{namespacesysio_1_1chain_1_1eosvmoc}{}\label{namespacesysio_1_1chain_1_1eosvmoc}\index{sysio::chain::eosvmoc@{sysio::chain::eosvmoc}}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1detail}{detail}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t}{LLVMJIT}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__async}{code\+\_\+cache\+\_\+async}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base}{code\+\_\+cache\+\_\+base}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1code__cache__header}{code\+\_\+cache\+\_\+header}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__sync}{code\+\_\+cache\+\_\+sync}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1code__compilation__result__message}{code\+\_\+compilation\+\_\+result\+\_\+message}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1code__descriptor}{code\+\_\+descriptor}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1code__offset}{code\+\_\+offset}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1code__tuple}{code\+\_\+tuple}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1compilation__result__toofull}{compilation\+\_\+result\+\_\+toofull}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1compilation__result__unknownfailure}{compilation\+\_\+result\+\_\+unknownfailure}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor}{compile\+\_\+monitor}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor__session}{compile\+\_\+monitor\+\_\+session}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor__trampoline}{compile\+\_\+monitor\+\_\+trampoline}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1compile__wasm__message}{compile\+\_\+wasm\+\_\+message}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1config}{config}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1evict__wasms__message}{evict\+\_\+wasms\+\_\+message}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack}{execution\+\_\+stack}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1executor}{executor}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1executor__signal__init}{executor\+\_\+signal\+\_\+init}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1initalize__response__message}{initalize\+\_\+response\+\_\+message}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1initialize__message}{initialize\+\_\+message}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1instantiated__code}{instantiated\+\_\+code}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1intrinsic}{intrinsic}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1intrinsic__entry}{intrinsic\+\_\+entry}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1intrinsic__ordinal}{intrinsic\+\_\+ordinal}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1memory}{memory}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1no__offset}{no\+\_\+offset}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1wasm__compilation__result__message}{wasm\+\_\+compilation\+\_\+result\+\_\+message}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1wrapped__fd}{wrapped\+\_\+fd}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a113f05ff7d17d44ce4cee37bcb2caad7}{allocator\+\_\+t}} = bip\+::rbtree\+\_\+best\+\_\+fit$<$bip\+::null\+\_\+mutex\+\_\+family, bip\+::offset\+\_\+ptr$<$void$>$, alignof(std\+::max\+\_\+align\+\_\+t)$>$
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_af63b1d984c58d1e5445a96eae8eccb59}{intrinsic\+\_\+map\+\_\+t}} = std\+::map$<$std\+::string, \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1intrinsic__entry}{intrinsic\+\_\+entry}}$>$
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a35e02cff51d68c67aa87d68a5e383cd7}{wasm\+\_\+compilation\+\_\+result}}
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_adb6f030d3e2f8a95ff6926de0b9fab1e}{eosvmoc\+\_\+message}}
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a7cfa050a8e417822975ca260ac344c98}{control\+\_\+block}} = \mbox{\hyperlink{structeos__vm__oc__control__block}{eos\+\_\+vm\+\_\+oc\+\_\+control\+\_\+block}}
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a3f05d22e0b6e9719359408875c7ff0e3}{eosvmoc\+\_\+optional\+\_\+offset\+\_\+or\+\_\+import\+\_\+t}} = std\+::variant$<$\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1no__offset}{no\+\_\+offset}}, \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1code__offset}{code\+\_\+offset}}, \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1intrinsic__ordinal}{intrinsic\+\_\+ordinal}}$>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a1ddba067ecc18a3960be5ff756bc73f9}{eosvmoc\+\_\+exitcode}} \+: int \{ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a1ddba067ecc18a3960be5ff756bc73f9a36f75913eb0917485ea9b89a8c495078}{SYSVMOC\+\_\+\+EXIT\+\_\+\+CLEAN\+\_\+\+EXIT}} = 1
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a1ddba067ecc18a3960be5ff756bc73f9ae19ad8f2c051431379110a731c1c6e9d}{SYSVMOC\+\_\+\+EXIT\+\_\+\+CHECKTIME\+\_\+\+FAIL}}
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a1ddba067ecc18a3960be5ff756bc73f9a555f34533254a2280542ca9d53a83ca1}{SYSVMOC\+\_\+\+EXIT\+\_\+\+SEGV}}
+, \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a1ddba067ecc18a3960be5ff756bc73f9aebd8c9bd1767539a42045512514f92dd}{SYSVMOC\+\_\+\+EXIT\+\_\+\+EXCEPTION}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1wrapped__fd}{wrapped\+\_\+fd}} \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_af77847bae59b1a2878f14d00e46d6bab}{get\+\_\+connection\+\_\+to\+\_\+compile\+\_\+monitor}} (int cache\+\_\+fd)
+\item 
+void \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a2e87b8655afafc1e4d272347fa5afabd}{run\+\_\+compile\+\_\+trampoline}} (int fd)
+\item 
+const \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_af63b1d984c58d1e5445a96eae8eccb59}{intrinsic\+\_\+map\+\_\+t}} \& \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_abe43c1d3ddfb344db0cd7dd5ab25f48c}{get\+\_\+intrinsic\+\_\+map}} ()
+\item 
+constexpr auto \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_ad649cd6b28056e1ed27e70d4a42e8530}{get\+\_\+intrinsic\+\_\+table}} ()
+\item 
+constexpr std\+::size\+\_\+t \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a45477b2def754b987f33a693e9b9102b}{find\+\_\+intrinsic\+\_\+index}} (std\+::string\+\_\+view hf)
+\item 
+constexpr std\+::size\+\_\+t \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_af6cfcdcf0b52adb8f98540df0b6bf82a}{intrinsic\+\_\+table\+\_\+size}} ()
+\item 
+std\+::tuple$<$ bool, \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_adb6f030d3e2f8a95ff6926de0b9fab1e}{eosvmoc\+\_\+message}}, std\+::vector$<$ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1wrapped__fd}{wrapped\+\_\+fd}} $>$ $>$ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_aa65c4d6c02a0823262c6627a86cc74bc}{read\+\_\+message\+\_\+with\+\_\+fds}} (boost\+::asio\+::local\+::datagram\+\_\+protocol\+::socket \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\item 
+std\+::tuple$<$ bool, \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_adb6f030d3e2f8a95ff6926de0b9fab1e}{eosvmoc\+\_\+message}}, std\+::vector$<$ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1wrapped__fd}{wrapped\+\_\+fd}} $>$ $>$ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a2017f9b70e0519a2a1221c7626329a8e}{read\+\_\+message\+\_\+with\+\_\+fds}} (int fd)
+\item 
+bool \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a8715d32fd2e6a4a668578ca0d946b58b}{write\+\_\+message\+\_\+with\+\_\+fds}} (boost\+::asio\+::local\+::datagram\+\_\+protocol\+::socket \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, const \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_adb6f030d3e2f8a95ff6926de0b9fab1e}{eosvmoc\+\_\+message}} \&message, const std\+::vector$<$ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1wrapped__fd}{wrapped\+\_\+fd}} $>$ \&fds=std\+::vector$<$ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1wrapped__fd}{wrapped\+\_\+fd}} $>$())
+\item 
+bool \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a7895d52861a9caea86b6743f18256180}{write\+\_\+message\+\_\+with\+\_\+fds}} (int fd\+\_\+to\+\_\+send\+\_\+to, const \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_adb6f030d3e2f8a95ff6926de0b9fab1e}{eosvmoc\+\_\+message}} \&message, const std\+::vector$<$ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1wrapped__fd}{wrapped\+\_\+fd}} $>$ \&fds=std\+::vector$<$ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1wrapped__fd}{wrapped\+\_\+fd}} $>$())
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1wrapped__fd}{wrapped\+\_\+fd}} \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_afe4909c18643f64d0c67a83885aefd90}{memfd\+\_\+for\+\_\+bytearray}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\mbox{\hyperlink{namespacesysio_1_1chain_ac6f5a1f1e061f000983f5d5f3ac25dfa}{bytes}})
+\item 
+std\+::vector$<$ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} $>$ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a86ba861037da0aa52199df744c8270e5}{vector\+\_\+for\+\_\+memfd}} (const \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1wrapped__fd}{wrapped\+\_\+fd}} \&memfd)
+\item 
+void \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a01d6b5863fb04efe338371a7adabc227}{eosvmoc\+\_\+switch\+\_\+stack}} (void \texorpdfstring{$\ast$}{*}stack, void(\texorpdfstring{$\ast$}{*}fn)(void \texorpdfstring{$\ast$}{*}), void \texorpdfstring{$\ast$}{*}data)
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1code__cache__header}{sysio\+::chain\+::eosvmoc\+::code\+\_\+cache\+\_\+header}} \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_ad834e3c39ceead0c5229b0e45e079b06}{\+\_\+\+\_\+attribute\+\_\+\+\_\+}} ((packed))
+\item 
+void \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a12ffc07ce81ac9d9d6aea564a6574a6d}{launch\+\_\+compile\+\_\+monitor}} (int nodeop\+\_\+fd)
+\item 
+int \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a12998b2943468d1840d43f2421044f1a}{\+\_\+\+\_\+real\+\_\+main}} (int, char \texorpdfstring{$\ast$}{*}\mbox{[}$\,$\mbox{]})
+\item 
+int \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_ac2f5a046ee7ce7ae1a7075101417bf8b}{\+\_\+\+\_\+wrap\+\_\+main}} (int argc, char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}\mbox{[}$\,$\mbox{]})
+\item 
+void \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a356ff87ec1b70511eecbf910c40be3da}{run\+\_\+compile}} (\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1wrapped__fd}{wrapped\+\_\+fd}} \&\&response\+\_\+sock, \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1wrapped__fd}{wrapped\+\_\+fd}} \&\&wasm\+\_\+code) noexcept
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a0a1f3c1b82134ed94ba01229ebdf1178}{DEFINE\+\_\+\+SYSVMOC\+\_\+\+TRAP\+\_\+\+INTRINSIC}} (eosvmoc\+\_\+internal, depth\+\_\+assert)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a88dbcfca63335363ca96b0b89d56b9f8}{DEFINE\+\_\+\+SYSVMOC\+\_\+\+TRAP\+\_\+\+INTRINSIC}} (eosvmoc\+\_\+internal, div0\+\_\+or\+\_\+overflow)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_ab0288f033f97917697ce6d552e5c16ce}{DEFINE\+\_\+\+SYSVMOC\+\_\+\+TRAP\+\_\+\+INTRINSIC}} (eosvmoc\+\_\+internal, indirect\+\_\+call\+\_\+mismatch)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_aae282311819cfc31daeea799b1c4f4fd}{DEFINE\+\_\+\+SYSVMOC\+\_\+\+TRAP\+\_\+\+INTRINSIC}} (eosvmoc\+\_\+internal, indirect\+\_\+call\+\_\+oob)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_ad3bdd157cf4b56315ac302d73cb9abed}{DEFINE\+\_\+\+SYSVMOC\+\_\+\+TRAP\+\_\+\+INTRINSIC}} (eosvmoc\+\_\+internal, unreachable)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_a113f05ff7d17d44ce4cee37bcb2caad7}\index{sysio::chain::eosvmoc@{sysio::chain::eosvmoc}!allocator\_t@{allocator\_t}}
+\index{allocator\_t@{allocator\_t}!sysio::chain::eosvmoc@{sysio::chain::eosvmoc}}
+\doxysubsubsection{\texorpdfstring{allocator\_t}{allocator\_t}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_a113f05ff7d17d44ce4cee37bcb2caad7} 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a113f05ff7d17d44ce4cee37bcb2caad7}{sysio\+::chain\+::eosvmoc\+::allocator\+\_\+t}} = bip\+::rbtree\+\_\+best\+\_\+fit$<$bip\+::null\+\_\+mutex\+\_\+family, bip\+::offset\+\_\+ptr$<$void$>$, alignof(std\+::max\+\_\+align\+\_\+t)$>$}
+
+
+
+Definition at line \mbox{\hyperlink{code__cache_8hpp_source_l00035}{35}} of file \mbox{\hyperlink{code__cache_8hpp_source}{code\+\_\+cache.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_a7cfa050a8e417822975ca260ac344c98}\index{sysio::chain::eosvmoc@{sysio::chain::eosvmoc}!control\_block@{control\_block}}
+\index{control\_block@{control\_block}!sysio::chain::eosvmoc@{sysio::chain::eosvmoc}}
+\doxysubsubsection{\texorpdfstring{control\_block}{control\_block}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_a7cfa050a8e417822975ca260ac344c98} 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a7cfa050a8e417822975ca260ac344c98}{sysio\+::chain\+::eosvmoc\+::control\+\_\+block}} = \mbox{\hyperlink{structeos__vm__oc__control__block}{eos\+\_\+vm\+\_\+oc\+\_\+control\+\_\+block}}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm-oc_2sys-vm-oc_8hpp_source_l00021}{21}} of file \mbox{\hyperlink{sys-vm-oc_2sys-vm-oc_8hpp_source}{sys-\/vm-\/oc.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_adb6f030d3e2f8a95ff6926de0b9fab1e}\index{sysio::chain::eosvmoc@{sysio::chain::eosvmoc}!eosvmoc\_message@{eosvmoc\_message}}
+\index{eosvmoc\_message@{eosvmoc\_message}!sysio::chain::eosvmoc@{sysio::chain::eosvmoc}}
+\doxysubsubsection{\texorpdfstring{eosvmoc\_message}{eosvmoc\_message}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_adb6f030d3e2f8a95ff6926de0b9fab1e} 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_adb6f030d3e2f8a95ff6926de0b9fab1e}{sysio\+::chain\+::eosvmoc\+::eosvmoc\+\_\+message}}}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ std::variant<initialize\_message,}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ initalize\_response\_message,}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ compile\_wasm\_message,}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ evict\_wasms\_message,}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ code\_compilation\_result\_message,}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ wasm\_compilation\_result\_message>}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{ipc__protocol_8hpp_source_l00054}{54}} of file \mbox{\hyperlink{ipc__protocol_8hpp_source}{ipc\+\_\+protocol.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_a3f05d22e0b6e9719359408875c7ff0e3}\index{sysio::chain::eosvmoc@{sysio::chain::eosvmoc}!eosvmoc\_optional\_offset\_or\_import\_t@{eosvmoc\_optional\_offset\_or\_import\_t}}
+\index{eosvmoc\_optional\_offset\_or\_import\_t@{eosvmoc\_optional\_offset\_or\_import\_t}!sysio::chain::eosvmoc@{sysio::chain::eosvmoc}}
+\doxysubsubsection{\texorpdfstring{eosvmoc\_optional\_offset\_or\_import\_t}{eosvmoc\_optional\_offset\_or\_import\_t}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_a3f05d22e0b6e9719359408875c7ff0e3} 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a3f05d22e0b6e9719359408875c7ff0e3}{sysio\+::chain\+::eosvmoc\+::eosvmoc\+\_\+optional\+\_\+offset\+\_\+or\+\_\+import\+\_\+t}} = std\+::variant$<$\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1no__offset}{no\+\_\+offset}}, \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1code__offset}{code\+\_\+offset}}, \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1intrinsic__ordinal}{intrinsic\+\_\+ordinal}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm-oc_2sys-vm-oc_8hpp_source_l00031}{31}} of file \mbox{\hyperlink{sys-vm-oc_2sys-vm-oc_8hpp_source}{sys-\/vm-\/oc.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_af63b1d984c58d1e5445a96eae8eccb59}\index{sysio::chain::eosvmoc@{sysio::chain::eosvmoc}!intrinsic\_map\_t@{intrinsic\_map\_t}}
+\index{intrinsic\_map\_t@{intrinsic\_map\_t}!sysio::chain::eosvmoc@{sysio::chain::eosvmoc}}
+\doxysubsubsection{\texorpdfstring{intrinsic\_map\_t}{intrinsic\_map\_t}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_af63b1d984c58d1e5445a96eae8eccb59} 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_af63b1d984c58d1e5445a96eae8eccb59}{sysio\+::chain\+::eosvmoc\+::intrinsic\+\_\+map\+\_\+t}} = std\+::map$<$std\+::string, \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1intrinsic__entry}{intrinsic\+\_\+entry}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{intrinsic_8hpp_source_l00024}{24}} of file \mbox{\hyperlink{intrinsic_8hpp_source}{intrinsic.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_a35e02cff51d68c67aa87d68a5e383cd7}\index{sysio::chain::eosvmoc@{sysio::chain::eosvmoc}!wasm\_compilation\_result@{wasm\_compilation\_result}}
+\index{wasm\_compilation\_result@{wasm\_compilation\_result}!sysio::chain::eosvmoc@{sysio::chain::eosvmoc}}
+\doxysubsubsection{\texorpdfstring{wasm\_compilation\_result}{wasm\_compilation\_result}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_a35e02cff51d68c67aa87d68a5e383cd7} 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a35e02cff51d68c67aa87d68a5e383cd7}{sysio\+::chain\+::eosvmoc\+::wasm\+\_\+compilation\+\_\+result}}}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ std::variant<code\_descriptor,\ \ }
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ compilation\_result\_unknownfailure,}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ compilation\_result\_toofull>}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{ipc__protocol_8hpp_source_l00044}{44}} of file \mbox{\hyperlink{ipc__protocol_8hpp_source}{ipc\+\_\+protocol.\+hpp}}.
+
+
+
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_a1ddba067ecc18a3960be5ff756bc73f9}\index{sysio::chain::eosvmoc@{sysio::chain::eosvmoc}!eosvmoc\_exitcode@{eosvmoc\_exitcode}}
+\index{eosvmoc\_exitcode@{eosvmoc\_exitcode}!sysio::chain::eosvmoc@{sysio::chain::eosvmoc}}
+\doxysubsubsection{\texorpdfstring{eosvmoc\_exitcode}{eosvmoc\_exitcode}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_a1ddba067ecc18a3960be5ff756bc73f9} 
+enum \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a1ddba067ecc18a3960be5ff756bc73f9}{sysio\+::chain\+::eosvmoc\+::eosvmoc\+\_\+exitcode}} \+: int}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{SYSVMOC\_EXIT\_CLEAN\_EXIT@{SYSVMOC\_EXIT\_CLEAN\_EXIT}!sysio::chain::eosvmoc@{sysio::chain::eosvmoc}}\index{sysio::chain::eosvmoc@{sysio::chain::eosvmoc}!SYSVMOC\_EXIT\_CLEAN\_EXIT@{SYSVMOC\_EXIT\_CLEAN\_EXIT}}}\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_a1ddba067ecc18a3960be5ff756bc73f9a36f75913eb0917485ea9b89a8c495078}\label{namespacesysio_1_1chain_1_1eosvmoc_a1ddba067ecc18a3960be5ff756bc73f9} 
+SYSVMOC\+\_\+\+EXIT\+\_\+\+CLEAN\+\_\+\+EXIT&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{SYSVMOC\_EXIT\_CHECKTIME\_FAIL@{SYSVMOC\_EXIT\_CHECKTIME\_FAIL}!sysio::chain::eosvmoc@{sysio::chain::eosvmoc}}\index{sysio::chain::eosvmoc@{sysio::chain::eosvmoc}!SYSVMOC\_EXIT\_CHECKTIME\_FAIL@{SYSVMOC\_EXIT\_CHECKTIME\_FAIL}}}\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_a1ddba067ecc18a3960be5ff756bc73f9ae19ad8f2c051431379110a731c1c6e9d}\label{namespacesysio_1_1chain_1_1eosvmoc_a1ddba067ecc18a3960be5ff756bc73f9} 
+SYSVMOC\+\_\+\+EXIT\+\_\+\+CHECKTIME\+\_\+\+FAIL&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{SYSVMOC\_EXIT\_SEGV@{SYSVMOC\_EXIT\_SEGV}!sysio::chain::eosvmoc@{sysio::chain::eosvmoc}}\index{sysio::chain::eosvmoc@{sysio::chain::eosvmoc}!SYSVMOC\_EXIT\_SEGV@{SYSVMOC\_EXIT\_SEGV}}}\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_a1ddba067ecc18a3960be5ff756bc73f9a555f34533254a2280542ca9d53a83ca1}\label{namespacesysio_1_1chain_1_1eosvmoc_a1ddba067ecc18a3960be5ff756bc73f9} 
+SYSVMOC\+\_\+\+EXIT\+\_\+\+SEGV&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{SYSVMOC\_EXIT\_EXCEPTION@{SYSVMOC\_EXIT\_EXCEPTION}!sysio::chain::eosvmoc@{sysio::chain::eosvmoc}}\index{sysio::chain::eosvmoc@{sysio::chain::eosvmoc}!SYSVMOC\_EXIT\_EXCEPTION@{SYSVMOC\_EXIT\_EXCEPTION}}}\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_a1ddba067ecc18a3960be5ff756bc73f9aebd8c9bd1767539a42045512514f92dd}\label{namespacesysio_1_1chain_1_1eosvmoc_a1ddba067ecc18a3960be5ff756bc73f9} 
+SYSVMOC\+\_\+\+EXIT\+\_\+\+EXCEPTION&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{sys-vm-oc_2sys-vm-oc_8hpp_source_l00046}{46}} of file \mbox{\hyperlink{sys-vm-oc_2sys-vm-oc_8hpp_source}{sys-\/vm-\/oc.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \textcolor{keywordtype}{int}\ \{}
+\DoxyCodeLine{00047\ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a1ddba067ecc18a3960be5ff756bc73f9a36f75913eb0917485ea9b89a8c495078}{SYSVMOC\_EXIT\_CLEAN\_EXIT}}\ =\ 1,}
+\DoxyCodeLine{00048\ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a1ddba067ecc18a3960be5ff756bc73f9ae19ad8f2c051431379110a731c1c6e9d}{SYSVMOC\_EXIT\_CHECKTIME\_FAIL}},}
+\DoxyCodeLine{00049\ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a1ddba067ecc18a3960be5ff756bc73f9a555f34533254a2280542ca9d53a83ca1}{SYSVMOC\_EXIT\_SEGV}},}
+\DoxyCodeLine{00050\ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a1ddba067ecc18a3960be5ff756bc73f9aebd8c9bd1767539a42045512514f92dd}{SYSVMOC\_EXIT\_EXCEPTION}}}
+\DoxyCodeLine{00051\ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_ad834e3c39ceead0c5229b0e45e079b06}\index{sysio::chain::eosvmoc@{sysio::chain::eosvmoc}!\_\_attribute\_\_@{\_\_attribute\_\_}}
+\index{\_\_attribute\_\_@{\_\_attribute\_\_}!sysio::chain::eosvmoc@{sysio::chain::eosvmoc}}
+\doxysubsubsection{\texorpdfstring{\_\_attribute\_\_()}{\_\_attribute\_\_()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_ad834e3c39ceead0c5229b0e45e079b06} 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1code__cache__header}{sysio\+::chain\+::eosvmoc\+::code\+\_\+cache\+\_\+header}} sysio\+::chain\+::eosvmoc\+::\+\_\+\+\_\+attribute\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{(packed)}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_a12998b2943468d1840d43f2421044f1a}\index{sysio::chain::eosvmoc@{sysio::chain::eosvmoc}!\_\_real\_main@{\_\_real\_main}}
+\index{\_\_real\_main@{\_\_real\_main}!sysio::chain::eosvmoc@{sysio::chain::eosvmoc}}
+\doxysubsubsection{\texorpdfstring{\_\_real\_main()}{\_\_real\_main()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_a12998b2943468d1840d43f2421044f1a} 
+int sysio\+::chain\+::eosvmoc\+::\+\_\+\+\_\+real\+\_\+main (\begin{DoxyParamCaption}\item[{int}]{}{, }\item[{char \texorpdfstring{$\ast$}{*}}]{}{\mbox{[}$\,$\mbox{]}}\end{DoxyParamCaption})}
+
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_ac2f5a046ee7ce7ae1a7075101417bf8b}\index{sysio::chain::eosvmoc@{sysio::chain::eosvmoc}!\_\_wrap\_main@{\_\_wrap\_main}}
+\index{\_\_wrap\_main@{\_\_wrap\_main}!sysio::chain::eosvmoc@{sysio::chain::eosvmoc}}
+\doxysubsubsection{\texorpdfstring{\_\_wrap\_main()}{\_\_wrap\_main()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_ac2f5a046ee7ce7ae1a7075101417bf8b} 
+int sysio\+::chain\+::eosvmoc\+::\+\_\+\+\_\+wrap\+\_\+main (\begin{DoxyParamCaption}\item[{int}]{argc}{, }\item[{char \texorpdfstring{$\ast$}{*}}]{argv}{\mbox{[}$\,$\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{compile__monitor_8cpp_source_l00299}{299}} of file \mbox{\hyperlink{compile__monitor_8cpp_source}{compile\+\_\+monitor.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00299\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00300\ }
+\DoxyCodeLine{00301\ }
+\DoxyCodeLine{00302\ \ \ \ the\_compile\_monitor\_trampoline.\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor__trampoline_a63b95ad40fc14a208d56c3a687ef9b92}{start}}();}
+\DoxyCodeLine{00303\ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{default__real__main_8cpp_aa491c752bfa32df13a8fe2f2ca2b983c}{\_\_real\_main}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}});}
+\DoxyCodeLine{00304\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1chain_1_1eosvmoc_ac2f5a046ee7ce7ae1a7075101417bf8b_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=194pt]{namespacesysio_1_1chain_1_1eosvmoc_ac2f5a046ee7ce7ae1a7075101417bf8b_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_a0a1f3c1b82134ed94ba01229ebdf1178}\index{sysio::chain::eosvmoc@{sysio::chain::eosvmoc}!DEFINE\_SYSVMOC\_TRAP\_INTRINSIC@{DEFINE\_SYSVMOC\_TRAP\_INTRINSIC}}
+\index{DEFINE\_SYSVMOC\_TRAP\_INTRINSIC@{DEFINE\_SYSVMOC\_TRAP\_INTRINSIC}!sysio::chain::eosvmoc@{sysio::chain::eosvmoc}}
+\doxysubsubsection{\texorpdfstring{DEFINE\_SYSVMOC\_TRAP\_INTRINSIC()}{DEFINE\_SYSVMOC\_TRAP\_INTRINSIC()}\hspace{0.1cm}{\footnotesize\ttfamily [1/5]}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_a0a1f3c1b82134ed94ba01229ebdf1178} 
+sysio\+::chain\+::eosvmoc\+::\+DEFINE\+\_\+\+SYSVMOC\+\_\+\+TRAP\+\_\+\+INTRINSIC (\begin{DoxyParamCaption}\item[{eosvmoc\+\_\+internal}]{}{, }\item[{depth\+\_\+assert}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{executor_8cpp_source_l00102}{102}} of file \mbox{\hyperlink{executor_8cpp_source}{executor.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00103\ \ \ \ throw\_internal\_exception(\textcolor{stringliteral}{"{}Exceeded\ call\ depth\ maximum"{}});}
+\DoxyCodeLine{00104\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_a88dbcfca63335363ca96b0b89d56b9f8}\index{sysio::chain::eosvmoc@{sysio::chain::eosvmoc}!DEFINE\_SYSVMOC\_TRAP\_INTRINSIC@{DEFINE\_SYSVMOC\_TRAP\_INTRINSIC}}
+\index{DEFINE\_SYSVMOC\_TRAP\_INTRINSIC@{DEFINE\_SYSVMOC\_TRAP\_INTRINSIC}!sysio::chain::eosvmoc@{sysio::chain::eosvmoc}}
+\doxysubsubsection{\texorpdfstring{DEFINE\_SYSVMOC\_TRAP\_INTRINSIC()}{DEFINE\_SYSVMOC\_TRAP\_INTRINSIC()}\hspace{0.1cm}{\footnotesize\ttfamily [2/5]}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_a88dbcfca63335363ca96b0b89d56b9f8} 
+sysio\+::chain\+::eosvmoc\+::\+DEFINE\+\_\+\+SYSVMOC\+\_\+\+TRAP\+\_\+\+INTRINSIC (\begin{DoxyParamCaption}\item[{eosvmoc\+\_\+internal}]{}{, }\item[{div0\+\_\+or\+\_\+overflow}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{executor_8cpp_source_l00106}{106}} of file \mbox{\hyperlink{executor_8cpp_source}{executor.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00107\ \ \ \ throw\_internal\_exception(\textcolor{stringliteral}{"{}Division\ by\ 0\ or\ integer\ overflow\ trapped"{}});}
+\DoxyCodeLine{00108\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_ab0288f033f97917697ce6d552e5c16ce}\index{sysio::chain::eosvmoc@{sysio::chain::eosvmoc}!DEFINE\_SYSVMOC\_TRAP\_INTRINSIC@{DEFINE\_SYSVMOC\_TRAP\_INTRINSIC}}
+\index{DEFINE\_SYSVMOC\_TRAP\_INTRINSIC@{DEFINE\_SYSVMOC\_TRAP\_INTRINSIC}!sysio::chain::eosvmoc@{sysio::chain::eosvmoc}}
+\doxysubsubsection{\texorpdfstring{DEFINE\_SYSVMOC\_TRAP\_INTRINSIC()}{DEFINE\_SYSVMOC\_TRAP\_INTRINSIC()}\hspace{0.1cm}{\footnotesize\ttfamily [3/5]}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_ab0288f033f97917697ce6d552e5c16ce} 
+sysio\+::chain\+::eosvmoc\+::\+DEFINE\+\_\+\+SYSVMOC\+\_\+\+TRAP\+\_\+\+INTRINSIC (\begin{DoxyParamCaption}\item[{eosvmoc\+\_\+internal}]{}{, }\item[{indirect\+\_\+call\+\_\+mismatch}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{executor_8cpp_source_l00110}{110}} of file \mbox{\hyperlink{executor_8cpp_source}{executor.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00111\ \ \ \ throw\_internal\_exception(\textcolor{stringliteral}{"{}Indirect\ call\ function\ type\ mismatch"{}});}
+\DoxyCodeLine{00112\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_aae282311819cfc31daeea799b1c4f4fd}\index{sysio::chain::eosvmoc@{sysio::chain::eosvmoc}!DEFINE\_SYSVMOC\_TRAP\_INTRINSIC@{DEFINE\_SYSVMOC\_TRAP\_INTRINSIC}}
+\index{DEFINE\_SYSVMOC\_TRAP\_INTRINSIC@{DEFINE\_SYSVMOC\_TRAP\_INTRINSIC}!sysio::chain::eosvmoc@{sysio::chain::eosvmoc}}
+\doxysubsubsection{\texorpdfstring{DEFINE\_SYSVMOC\_TRAP\_INTRINSIC()}{DEFINE\_SYSVMOC\_TRAP\_INTRINSIC()}\hspace{0.1cm}{\footnotesize\ttfamily [4/5]}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_aae282311819cfc31daeea799b1c4f4fd} 
+sysio\+::chain\+::eosvmoc\+::\+DEFINE\+\_\+\+SYSVMOC\+\_\+\+TRAP\+\_\+\+INTRINSIC (\begin{DoxyParamCaption}\item[{eosvmoc\+\_\+internal}]{}{, }\item[{indirect\+\_\+call\+\_\+oob}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{executor_8cpp_source_l00114}{114}} of file \mbox{\hyperlink{executor_8cpp_source}{executor.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00115\ \ \ \ throw\_internal\_exception(\textcolor{stringliteral}{"{}Indirect\ call\ index\ out\ of\ bounds"{}});}
+\DoxyCodeLine{00116\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_ad3bdd157cf4b56315ac302d73cb9abed}\index{sysio::chain::eosvmoc@{sysio::chain::eosvmoc}!DEFINE\_SYSVMOC\_TRAP\_INTRINSIC@{DEFINE\_SYSVMOC\_TRAP\_INTRINSIC}}
+\index{DEFINE\_SYSVMOC\_TRAP\_INTRINSIC@{DEFINE\_SYSVMOC\_TRAP\_INTRINSIC}!sysio::chain::eosvmoc@{sysio::chain::eosvmoc}}
+\doxysubsubsection{\texorpdfstring{DEFINE\_SYSVMOC\_TRAP\_INTRINSIC()}{DEFINE\_SYSVMOC\_TRAP\_INTRINSIC()}\hspace{0.1cm}{\footnotesize\ttfamily [5/5]}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_ad3bdd157cf4b56315ac302d73cb9abed} 
+sysio\+::chain\+::eosvmoc\+::\+DEFINE\+\_\+\+SYSVMOC\+\_\+\+TRAP\+\_\+\+INTRINSIC (\begin{DoxyParamCaption}\item[{eosvmoc\+\_\+internal}]{}{, }\item[{unreachable}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{executor_8cpp_source_l00118}{118}} of file \mbox{\hyperlink{executor_8cpp_source}{executor.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00119\ \ \ \ throw\_internal\_exception(\textcolor{stringliteral}{"{}Unreachable\ reached"{}});}
+\DoxyCodeLine{00120\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_a01d6b5863fb04efe338371a7adabc227}\index{sysio::chain::eosvmoc@{sysio::chain::eosvmoc}!eosvmoc\_switch\_stack@{eosvmoc\_switch\_stack}}
+\index{eosvmoc\_switch\_stack@{eosvmoc\_switch\_stack}!sysio::chain::eosvmoc@{sysio::chain::eosvmoc}}
+\doxysubsubsection{\texorpdfstring{eosvmoc\_switch\_stack()}{eosvmoc\_switch\_stack()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_a01d6b5863fb04efe338371a7adabc227} 
+void sysio\+::chain\+::eosvmoc\+::eosvmoc\+\_\+switch\+\_\+stack (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{stack}{, }\item[{void(\texorpdfstring{$\ast$}{*}}]{fn~}{)(void \texorpdfstring{$\ast$}{*}), }\item[{void \texorpdfstring{$\ast$}{*}}]{data}{}\end{DoxyParamCaption})}
+
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1chain_1_1eosvmoc_a01d6b5863fb04efe338371a7adabc227_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_a45477b2def754b987f33a693e9b9102b}\index{sysio::chain::eosvmoc@{sysio::chain::eosvmoc}!find\_intrinsic\_index@{find\_intrinsic\_index}}
+\index{find\_intrinsic\_index@{find\_intrinsic\_index}!sysio::chain::eosvmoc@{sysio::chain::eosvmoc}}
+\doxysubsubsection{\texorpdfstring{find\_intrinsic\_index()}{find\_intrinsic\_index()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_a45477b2def754b987f33a693e9b9102b} 
+std\+::size\+\_\+t sysio\+::chain\+::eosvmoc\+::find\+\_\+intrinsic\+\_\+index (\begin{DoxyParamCaption}\item[{std\+::string\+\_\+view}]{hf}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{intrinsic__mapping_8hpp_source_l00273}{273}} of file \mbox{\hyperlink{intrinsic__mapping_8hpp_source}{intrinsic\+\_\+mapping.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00273\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00274\ \ \ \ \textcolor{keyword}{constexpr}\ \textcolor{keyword}{auto}\ hosts\ =\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_ad649cd6b28056e1ed27e70d4a42e8530}{get\_intrinsic\_table}}();}
+\DoxyCodeLine{00275\ \ \ \ \textcolor{keywordflow}{for}\ (\ \ std::size\_t\ i\ =\ 0;\ i\ <\ hosts.size();\ ++i\ )}
+\DoxyCodeLine{00276\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ hosts[i]\ ==\ hf\ )}
+\DoxyCodeLine{00277\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ i;}
+\DoxyCodeLine{00278\ \ \ \ \textcolor{keywordflow}{return}\ std::numeric\_limits<std::size\_t>::max();}
+\DoxyCodeLine{00279\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1chain_1_1eosvmoc_a45477b2def754b987f33a693e9b9102b_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1chain_1_1eosvmoc_a45477b2def754b987f33a693e9b9102b_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_af77847bae59b1a2878f14d00e46d6bab}\index{sysio::chain::eosvmoc@{sysio::chain::eosvmoc}!get\_connection\_to\_compile\_monitor@{get\_connection\_to\_compile\_monitor}}
+\index{get\_connection\_to\_compile\_monitor@{get\_connection\_to\_compile\_monitor}!sysio::chain::eosvmoc@{sysio::chain::eosvmoc}}
+\doxysubsubsection{\texorpdfstring{get\_connection\_to\_compile\_monitor()}{get\_connection\_to\_compile\_monitor()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_af77847bae59b1a2878f14d00e46d6bab} 
+\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1wrapped__fd}{wrapped\+\_\+fd}} sysio\+::chain\+::eosvmoc\+::get\+\_\+connection\+\_\+to\+\_\+compile\+\_\+monitor (\begin{DoxyParamCaption}\item[{int}]{cache\+\_\+fd}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{compile__monitor_8cpp_source_l00306}{306}} of file \mbox{\hyperlink{compile__monitor_8cpp_source}{compile\+\_\+monitor.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00306\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00307\ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(the\_compile\_monitor\_trampoline.\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor__trampoline_a4b4636c16b0c1ec81239d8d4205d2392}{compile\_manager\_pid}}\ >=\ 0,\ \textcolor{stringliteral}{"{}SYS\ VM\ oop\ connection\ doesn't\ look\ active"{}});}
+\DoxyCodeLine{00308\ }
+\DoxyCodeLine{00309\ \ \ \ \textcolor{keywordtype}{int}\ socks[2];\ \textcolor{comment}{//0:\ our\ socket\ to\ compile\_manager\_session,\ 1:\ socket\ we'll\ give\ to\ compile\_maanger\_session}}
+\DoxyCodeLine{00310\ \ \ \ socketpair(AF\_UNIX,\ SOCK\_SEQPACKET\ |\ SOCK\_CLOEXEC,\ 0,\ socks);}
+\DoxyCodeLine{00311\ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1wrapped__fd}{wrapped\_fd}}\ socket\_to\_monitor\_session(socks[0]);}
+\DoxyCodeLine{00312\ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1wrapped__fd}{wrapped\_fd}}\ socket\_to\_hand\_to\_monitor\_session(socks[1]);}
+\DoxyCodeLine{00313\ }
+\DoxyCodeLine{00314\ \ \ \ \textcolor{comment}{//we\ don't\ own\ cache\_fd,\ so\ try\ to\ be\ extra\ careful\ not\ to\ accidentally\ close\ it:\ don't\ stick\ it\ in\ a\ wrapped\_fd}}
+\DoxyCodeLine{00315\ \ \ \ \textcolor{comment}{//\ to\ hand\ off\ to\ write\_message\_with\_fds\ even\ temporarily.\ make\ a\ copy\ of\ it.}}
+\DoxyCodeLine{00316\ \ \ \ \textcolor{keywordtype}{int}\ dup\_of\_cache\_fd\ =\ dup(cache\_fd);}
+\DoxyCodeLine{00317\ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(dup\_of\_cache\_fd\ !=\ -\/1,\ \textcolor{stringliteral}{"{}failed\ to\ dup\ cache\_fd"{}});}
+\DoxyCodeLine{00318\ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1wrapped__fd}{wrapped\_fd}}\ dup\_cache\_fd(dup\_of\_cache\_fd);}
+\DoxyCodeLine{00319\ }
+\DoxyCodeLine{00320\ \ \ \ std::vector<wrapped\_fd>\ fds\_to\_pass;\ }
+\DoxyCodeLine{00321\ \ \ \ fds\_to\_pass.emplace\_back(std::move(socket\_to\_hand\_to\_monitor\_session));}
+\DoxyCodeLine{00322\ \ \ \ fds\_to\_pass.emplace\_back(std::move(dup\_cache\_fd));}
+\DoxyCodeLine{00323\ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a8715d32fd2e6a4a668578ca0d946b58b}{write\_message\_with\_fds}}(the\_compile\_monitor\_trampoline.\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor__trampoline_aa147232d9f0344f71c41d1fe3069bd51}{compile\_manager\_fd}},\ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1initialize__message}{initialize\_message}}(),\ fds\_to\_pass);}
+\DoxyCodeLine{00324\ }
+\DoxyCodeLine{00325\ \ \ \ \textcolor{keyword}{auto}\ [success,\ message,\ fds]\ =\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_aa65c4d6c02a0823262c6627a86cc74bc}{read\_message\_with\_fds}}(the\_compile\_monitor\_trampoline.\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor__trampoline_aa147232d9f0344f71c41d1fe3069bd51}{compile\_manager\_fd}});}
+\DoxyCodeLine{00326\ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(success,\ misc\_exception,\ \textcolor{stringliteral}{"{}failed\ to\ read\ response\ from\ monitor\ process"{}});}
+\DoxyCodeLine{00327\ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(std::holds\_alternative<initalize\_response\_message>(message),\ misc\_exception,\ \textcolor{stringliteral}{"{}unexpected\ response\ from\ monitor\ process"{}});}
+\DoxyCodeLine{00328\ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(!std::get<initalize\_response\_message>(message).\mbox{\hyperlink{structsysio_1_1chain_1_1error__message}{error\_message}},\ misc\_exception,\ \textcolor{stringliteral}{"{}Error\ message\ from\ monitor\ process:\ \$\{e\}"{}},\ (\textcolor{stringliteral}{"{}e"{}},\ *std::get<initalize\_response\_message>(message).\mbox{\hyperlink{structsysio_1_1chain_1_1error__message}{error\_message}}));}
+\DoxyCodeLine{00329\ \ \ \ \textcolor{keywordflow}{return}\ socket\_to\_monitor\_session;}
+\DoxyCodeLine{00330\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1chain_1_1eosvmoc_af77847bae59b1a2878f14d00e46d6bab_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1chain_1_1eosvmoc_af77847bae59b1a2878f14d00e46d6bab_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_abe43c1d3ddfb344db0cd7dd5ab25f48c}\index{sysio::chain::eosvmoc@{sysio::chain::eosvmoc}!get\_intrinsic\_map@{get\_intrinsic\_map}}
+\index{get\_intrinsic\_map@{get\_intrinsic\_map}!sysio::chain::eosvmoc@{sysio::chain::eosvmoc}}
+\doxysubsubsection{\texorpdfstring{get\_intrinsic\_map()}{get\_intrinsic\_map()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_abe43c1d3ddfb344db0cd7dd5ab25f48c} 
+const \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_af63b1d984c58d1e5445a96eae8eccb59}{intrinsic\+\_\+map\+\_\+t}} \& sysio\+::chain\+::eosvmoc\+::get\+\_\+intrinsic\+\_\+map (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{intrinsic_8cpp_source_l00010}{10}} of file \mbox{\hyperlink{intrinsic_8cpp_source}{intrinsic.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00010\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00011\ \ \ \ \textcolor{keywordflow}{return}\ the\_intrinsic\_map();}
+\DoxyCodeLine{00012\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1chain_1_1eosvmoc_abe43c1d3ddfb344db0cd7dd5ab25f48c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_ad649cd6b28056e1ed27e70d4a42e8530}\index{sysio::chain::eosvmoc@{sysio::chain::eosvmoc}!get\_intrinsic\_table@{get\_intrinsic\_table}}
+\index{get\_intrinsic\_table@{get\_intrinsic\_table}!sysio::chain::eosvmoc@{sysio::chain::eosvmoc}}
+\doxysubsubsection{\texorpdfstring{get\_intrinsic\_table()}{get\_intrinsic\_table()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_ad649cd6b28056e1ed27e70d4a42e8530} 
+auto sysio\+::chain\+::eosvmoc\+::get\+\_\+intrinsic\+\_\+table (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{intrinsic__mapping_8hpp_source_l00017}{17}} of file \mbox{\hyperlink{intrinsic__mapping_8hpp_source}{intrinsic\+\_\+mapping.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00017\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00018\ \ \ \ \textcolor{keywordflow}{return}\ detail::generate\_table(}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}eosvmoc\_internal.unreachable"{}},}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}eosvmoc\_internal.grow\_memory"{}},}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}eosvmoc\_internal.div0\_or\_overflow"{}},}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}eosvmoc\_internal.indirect\_call\_mismatch"{}},}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}eosvmoc\_internal.indirect\_call\_oob"{}},}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}eosvmoc\_internal.depth\_assert"{}},}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.call\_depth\_assert"{}},\ \ \textcolor{comment}{//now\ unused;\ left\ for\ purposes\ of\ not\ upsetting\ existing\ code\ mappings}}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.checktime"{}},\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//now\ unused;\ left\ for\ purposes\ of\ not\ upsetting\ existing\ code\ mappings}}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_ashlti3"{}},}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_ashrti3"{}},}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_lshlti3"{}},}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_lshrti3"{}},}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_divti3"{}},}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_udivti3"{}},}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_modti3"{}},}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_umodti3"{}},}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_multi3"{}},}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_addtf3"{}},}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_subtf3"{}},}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_multf3"{}},}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_divtf3"{}},}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_eqtf2"{}},}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_netf2"{}},}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_getf2"{}},}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_gttf2"{}},}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_lttf2"{}},}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_letf2"{}},}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_cmptf2"{}},}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_unordtf2"{}},}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_negtf2"{}},}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_floatsitf"{}},}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_floatunsitf"{}},}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_floatditf"{}},}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_floatunditf"{}},}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_floattidf"{}},}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_floatuntidf"{}},}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_floatsidf"{}},}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_extendsftf2"{}},}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_extenddftf2"{}},}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_fixtfti"{}},}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_fixtfdi"{}},}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_fixtfsi"{}},}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_fixunstfti"{}},}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_fixunstfdi"{}},}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_fixunstfsi"{}},}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_fixsfti"{}},}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_fixdfti"{}},}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_fixunssfti"{}},}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_fixunsdfti"{}},}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_trunctfdf2"{}},}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_trunctfsf2"{}},}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.is\_feature\_active"{}},}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.activate\_feature"{}},}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.get\_resource\_limits"{}},}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.set\_resource\_limits"{}},}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.set\_proposed\_producers"{}},}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.set\_proposed\_producers\_ex"{}},}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.get\_blockchain\_parameters\_packed"{}},}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.set\_blockchain\_parameters\_packed"{}},}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.is\_privileged"{}},}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.set\_privileged"{}},}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.preactivate\_feature"{}},}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.get\_active\_producers"{}},}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_store\_i64"{}},}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_update\_i64"{}},}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_remove\_i64"{}},}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_get\_i64"{}},}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_next\_i64"{}},}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_previous\_i64"{}},}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_find\_i64"{}},}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_lowerbound\_i64"{}},}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_upperbound\_i64"{}},}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_end\_i64"{}},}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx64\_store"{}},}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx64\_remove"{}},}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx64\_update"{}},}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx64\_find\_primary"{}},}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx64\_find\_secondary"{}},}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx64\_lowerbound"{}},}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx64\_upperbound"{}},}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx64\_end"{}},}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx64\_next"{}},}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx64\_previous"{}},}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx128\_store"{}},}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx128\_remove"{}},}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx128\_update"{}},}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx128\_find\_primary"{}},}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx128\_find\_secondary"{}},}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx128\_lowerbound"{}},}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx128\_upperbound"{}},}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx128\_end"{}},}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx128\_next"{}},}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx128\_previous"{}},}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx\_double\_store"{}},}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx\_double\_remove"{}},}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx\_double\_update"{}},}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx\_double\_find\_primary"{}},}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx\_double\_find\_secondary"{}},}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx\_double\_lowerbound"{}},}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx\_double\_upperbound"{}},}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx\_double\_end"{}},}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx\_double\_next"{}},}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx\_double\_previous"{}},}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx\_long\_double\_store"{}},}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx\_long\_double\_remove"{}},}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx\_long\_double\_update"{}},}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx\_long\_double\_find\_primary"{}},}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx\_long\_double\_find\_secondary"{}},}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx\_long\_double\_lowerbound"{}},}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx\_long\_double\_upperbound"{}},}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx\_long\_double\_end"{}},}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx\_long\_double\_next"{}},}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx\_long\_double\_previous"{}},}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx256\_store"{}},}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx256\_remove"{}},}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx256\_update"{}},}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx256\_find\_primary"{}},}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx256\_find\_secondary"{}},}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx256\_lowerbound"{}},}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx256\_upperbound"{}},}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx256\_end"{}},}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx256\_next"{}},}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx256\_previous"{}},}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.assert\_recover\_key"{}},}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.recover\_key"{}},}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.assert\_sha256"{}},}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.assert\_sha1"{}},}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.assert\_sha512"{}},}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.assert\_ripemd160"{}},}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.sha1"{}},}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.sha256"{}},}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.sha512"{}},}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.ripemd160"{}},}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.check\_transaction\_authorization"{}},}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.check\_permission\_authorization"{}},}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.get\_permission\_last\_used"{}},}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.get\_account\_creation\_time"{}},}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.current\_time"{}},}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.publication\_time"{}},}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.is\_feature\_activated"{}},}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.get\_sender"{}},}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.abort"{}},}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.sysio\_assert"{}},}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.sysio\_assert\_message"{}},}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.sysio\_assert\_code"{}},}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.sysio\_exit"{}},}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.read\_action\_data"{}},}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.action\_data\_size"{}},}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.current\_receiver"{}},}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.require\_recipient"{}},}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.require\_auth"{}},}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.require\_auth2"{}},}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.has\_auth"{}},}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.is\_account"{}},}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.prints"{}},}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.prints\_l"{}},}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.printi"{}},}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.printui"{}},}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.printi128"{}},}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.printui128"{}},}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.printsf"{}},}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.printdf"{}},}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.printqf"{}},}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.printn"{}},}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.printhex"{}},}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.read\_transaction"{}},}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.transaction\_size"{}},}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.expiration"{}},}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.tapos\_block\_prefix"{}},}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.tapos\_block\_num"{}},}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.get\_action"{}},}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.send\_inline"{}},}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.send\_context\_free\_inline"{}},}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.send\_deferred"{}},}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.cancel\_deferred"{}},}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.get\_context\_free\_data"{}},}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.memcpy"{}},}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.memmove"{}},}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.memcmp"{}},}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.memset"{}},}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f32\_add"{}},}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f32\_sub"{}},}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f32\_mul"{}},}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f32\_div"{}},}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f32\_min"{}},}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f32\_max"{}},}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f32\_copysign"{}},}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f32\_abs"{}},}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f32\_neg"{}},}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f32\_sqrt"{}},}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f32\_ceil"{}},}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f32\_floor"{}},}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f32\_trunc"{}},}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f32\_nearest"{}},}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f32\_eq"{}},}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f32\_ne"{}},}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f32\_lt"{}},}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f32\_le"{}},}
+\DoxyCodeLine{00217\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f32\_gt"{}},}
+\DoxyCodeLine{00218\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f32\_ge"{}},}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f64\_add"{}},}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f64\_sub"{}},}
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f64\_mul"{}},}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f64\_div"{}},}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f64\_min"{}},}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f64\_max"{}},}
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f64\_copysign"{}},}
+\DoxyCodeLine{00226\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f64\_abs"{}},}
+\DoxyCodeLine{00227\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f64\_neg"{}},}
+\DoxyCodeLine{00228\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f64\_sqrt"{}},}
+\DoxyCodeLine{00229\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f64\_ceil"{}},}
+\DoxyCodeLine{00230\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f64\_floor"{}},}
+\DoxyCodeLine{00231\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f64\_trunc"{}},}
+\DoxyCodeLine{00232\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f64\_nearest"{}},}
+\DoxyCodeLine{00233\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f64\_eq"{}},}
+\DoxyCodeLine{00234\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f64\_ne"{}},}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f64\_lt"{}},}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f64\_le"{}},}
+\DoxyCodeLine{00237\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f64\_gt"{}},}
+\DoxyCodeLine{00238\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f64\_ge"{}},}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f32\_promote"{}},}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f64\_demote"{}},}
+\DoxyCodeLine{00241\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f32\_trunc\_i32s"{}},}
+\DoxyCodeLine{00242\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f64\_trunc\_i32s"{}},}
+\DoxyCodeLine{00243\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f32\_trunc\_i32u"{}},}
+\DoxyCodeLine{00244\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f64\_trunc\_i32u"{}},}
+\DoxyCodeLine{00245\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f32\_trunc\_i64s"{}},}
+\DoxyCodeLine{00246\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f64\_trunc\_i64s"{}},}
+\DoxyCodeLine{00247\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f32\_trunc\_i64u"{}},}
+\DoxyCodeLine{00248\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f64\_trunc\_i64u"{}},}
+\DoxyCodeLine{00249\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_i32\_to\_f32"{}},}
+\DoxyCodeLine{00250\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_i64\_to\_f32"{}},}
+\DoxyCodeLine{00251\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_ui32\_to\_f32"{}},}
+\DoxyCodeLine{00252\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_ui64\_to\_f32"{}},}
+\DoxyCodeLine{00253\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_i32\_to\_f64"{}},}
+\DoxyCodeLine{00254\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_i64\_to\_f64"{}},}
+\DoxyCodeLine{00255\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_ui32\_to\_f64"{}},}
+\DoxyCodeLine{00256\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_ui64\_to\_f64"{}},}
+\DoxyCodeLine{00257\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.set\_action\_return\_value"{}},}
+\DoxyCodeLine{00258\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.get\_wasm\_parameters\_packed"{}},}
+\DoxyCodeLine{00259\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.set\_wasm\_parameters\_packed"{}},}
+\DoxyCodeLine{00260\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.get\_parameters\_packed"{}},}
+\DoxyCodeLine{00261\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.set\_parameters\_packed"{}},}
+\DoxyCodeLine{00262\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.get\_code\_hash"{}},}
+\DoxyCodeLine{00263\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.alt\_bn128\_add"{}},}
+\DoxyCodeLine{00264\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.alt\_bn128\_mul"{}},}
+\DoxyCodeLine{00265\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.alt\_bn128\_pair"{}},}
+\DoxyCodeLine{00266\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.mod\_exp"{}},}
+\DoxyCodeLine{00267\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.sha3"{}},}
+\DoxyCodeLine{00268\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.blake2\_f"{}},}
+\DoxyCodeLine{00269\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.k1\_recover"{}},}
+\DoxyCodeLine{00270\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.get\_block\_num"{}}}
+\DoxyCodeLine{00271\ \ \ \ );}
+\DoxyCodeLine{00272\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=345pt]{namespacesysio_1_1chain_1_1eosvmoc_ad649cd6b28056e1ed27e70d4a42e8530_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1chain_1_1eosvmoc_ad649cd6b28056e1ed27e70d4a42e8530_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_af6cfcdcf0b52adb8f98540df0b6bf82a}\index{sysio::chain::eosvmoc@{sysio::chain::eosvmoc}!intrinsic\_table\_size@{intrinsic\_table\_size}}
+\index{intrinsic\_table\_size@{intrinsic\_table\_size}!sysio::chain::eosvmoc@{sysio::chain::eosvmoc}}
+\doxysubsubsection{\texorpdfstring{intrinsic\_table\_size()}{intrinsic\_table\_size()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_af6cfcdcf0b52adb8f98540df0b6bf82a} 
+std\+::size\+\_\+t sysio\+::chain\+::eosvmoc\+::intrinsic\+\_\+table\+\_\+size (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{intrinsic__mapping_8hpp_source_l00281}{281}} of file \mbox{\hyperlink{intrinsic__mapping_8hpp_source}{intrinsic\+\_\+mapping.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00281\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00282\ \ \ \ \ \textcolor{keywordflow}{return}\ std::tuple\_size<\textcolor{keyword}{decltype}(\mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_ad649cd6b28056e1ed27e70d4a42e8530}{get\_intrinsic\_table}}())>\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{::value}};}
+\DoxyCodeLine{00283\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1chain_1_1eosvmoc_af6cfcdcf0b52adb8f98540df0b6bf82a_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_a12ffc07ce81ac9d9d6aea564a6574a6d}\index{sysio::chain::eosvmoc@{sysio::chain::eosvmoc}!launch\_compile\_monitor@{launch\_compile\_monitor}}
+\index{launch\_compile\_monitor@{launch\_compile\_monitor}!sysio::chain::eosvmoc@{sysio::chain::eosvmoc}}
+\doxysubsubsection{\texorpdfstring{launch\_compile\_monitor()}{launch\_compile\_monitor()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_a12ffc07ce81ac9d9d6aea564a6574a6d} 
+void sysio\+::chain\+::eosvmoc\+::launch\+\_\+compile\+\_\+monitor (\begin{DoxyParamCaption}\item[{int}]{nodeop\+\_\+fd}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{compile__monitor_8cpp_source_l00235}{235}} of file \mbox{\hyperlink{compile__monitor_8cpp_source}{compile\+\_\+monitor.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00236\ \ \ \ prctl(PR\_SET\_NAME,\ \textcolor{stringliteral}{"{}oc-\/monitor"{}});}
+\DoxyCodeLine{00237\ \ \ \ prctl(PR\_SET\_PDEATHSIG,\ SIGKILL);}
+\DoxyCodeLine{00238\ }
+\DoxyCodeLine{00239\ \ \ \ \textcolor{comment}{//first\ off,\ let's\ disable\ shutdown\ signals\ to\ us;\ we\ want\ all\ shutdown\ indicators\ to\ come\ from}}
+\DoxyCodeLine{00240\ \ \ \ \textcolor{comment}{//\ nodeop\ shutting\ us\ down}}
+\DoxyCodeLine{00241\ \ \ \ sigset\_t\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a893468abdce45d586a5b659094a25e6c}{set}};}
+\DoxyCodeLine{00242\ \ \ \ sigemptyset(\&set);}
+\DoxyCodeLine{00243\ \ \ \ sigaddset(\&set,\ SIGHUP);}
+\DoxyCodeLine{00244\ \ \ \ sigaddset(\&set,\ SIGTERM);}
+\DoxyCodeLine{00245\ \ \ \ sigaddset(\&set,\ SIGPIPE);}
+\DoxyCodeLine{00246\ \ \ \ sigaddset(\&set,\ SIGINT);}
+\DoxyCodeLine{00247\ \ \ \ sigaddset(\&set,\ SIGQUIT);}
+\DoxyCodeLine{00248\ \ \ \ sigprocmask(SIG\_BLOCK,\ \&set,\ \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{00249\ }
+\DoxyCodeLine{00250\ \ \ \ \textcolor{keyword}{struct\ }sigaction\ sa;}
+\DoxyCodeLine{00251\ \ \ \ sa.sa\_handler\ =\ \ SIG\_DFL;}
+\DoxyCodeLine{00252\ \ \ \ sa.sa\_flags\ =\ SA\_NOCLDWAIT;}
+\DoxyCodeLine{00253\ \ \ \ sigaction(SIGCHLD,\ \&sa,\ \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{00254\ }
+\DoxyCodeLine{00255\ \ \ \ \textcolor{keywordtype}{int}\ socks[2];\ \textcolor{comment}{//0:\ local\ trampoline\ socket,\ 1:\ the\ one\ we\ give\ to\ trampoline}}
+\DoxyCodeLine{00256\ \ \ \ socketpair(AF\_UNIX,\ SOCK\_SEQPACKET\ |\ SOCK\_CLOEXEC,\ 0,\ socks);}
+\DoxyCodeLine{00257\ \ \ \ pid\_t\ child\ =\ fork();}
+\DoxyCodeLine{00258\ \ \ \ \textcolor{keywordflow}{if}(child\ ==\ 0)\ \{}
+\DoxyCodeLine{00259\ \ \ \ \ \ \ \mbox{\hyperlink{integration_8cpp_af5b66d867a040d002fb57d645cae3fb4}{close}}(socks[0]);}
+\DoxyCodeLine{00260\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a2e87b8655afafc1e4d272347fa5afabd}{run\_compile\_trampoline}}(socks[1]);}
+\DoxyCodeLine{00261\ \ \ \ \}}
+\DoxyCodeLine{00262\ \ \ \ \mbox{\hyperlink{integration_8cpp_af5b66d867a040d002fb57d645cae3fb4}{close}}(socks[1]);}
+\DoxyCodeLine{00263\ }
+\DoxyCodeLine{00264\ \ \ \ \{}
+\DoxyCodeLine{00265\ \ \ \ \ \ \ boost::asio::io\_context\ ctx;}
+\DoxyCodeLine{00266\ \ \ \ \ \ \ boost::asio::local::datagram\_protocol::socket\ nodeop\_socket(ctx);}
+\DoxyCodeLine{00267\ \ \ \ \ \ \ nodeop\_socket.assign(boost::asio::local::datagram\_protocol(),\ nodeop\_fd);}
+\DoxyCodeLine{00268\ \ \ \ \ \ \ wrapped\_fd\ trampoline\_socket(socks[0]);}
+\DoxyCodeLine{00269\ \ \ \ \ \ \ compile\_monitor\ \mbox{\hyperlink{xbyak__mnemonic_8h_a0e89037e727d646088e956504e02ef8b}{monitor}}(ctx,\ std::move(nodeop\_socket),\ std::move(trampoline\_socket));}
+\DoxyCodeLine{00270\ \ \ \ \ \ \ ctx.run();}
+\DoxyCodeLine{00271\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{xbyak__mnemonic_8h_a0e89037e727d646088e956504e02ef8b}{monitor}}.\_compile\_sessions.size())}
+\DoxyCodeLine{00272\ \ \ \ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}ERROR:\ SYS\ VM\ OC\ compiler\ monitor\ exiting\ with\ active\ sessions"{}}\ <<\ std::endl;}
+\DoxyCodeLine{00273\ \ \ \ \}}
+\DoxyCodeLine{00274\ \ \ \ }
+\DoxyCodeLine{00275\ \ \ \ \_exit(0);}
+\DoxyCodeLine{00276\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1chain_1_1eosvmoc_a12ffc07ce81ac9d9d6aea564a6574a6d_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1chain_1_1eosvmoc_a12ffc07ce81ac9d9d6aea564a6574a6d_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_afe4909c18643f64d0c67a83885aefd90}\index{sysio::chain::eosvmoc@{sysio::chain::eosvmoc}!memfd\_for\_bytearray@{memfd\_for\_bytearray}}
+\index{memfd\_for\_bytearray@{memfd\_for\_bytearray}!sysio::chain::eosvmoc@{sysio::chain::eosvmoc}}
+\doxysubsubsection{\texorpdfstring{memfd\_for\_bytearray()}{memfd\_for\_bytearray()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_afe4909c18643f64d0c67a83885aefd90} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1wrapped__fd}{wrapped\+\_\+fd}} sysio\+::chain\+::eosvmoc\+::memfd\+\_\+for\+\_\+bytearray (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{bytes}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{ipc__helpers_8hpp_source_l00056}{56}} of file \mbox{\hyperlink{ipc__helpers_8hpp_source}{ipc\+\_\+helpers.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00057\ \ \ \ \textcolor{keywordtype}{int}\ fd\ =\ syscall(SYS\_memfd\_create,\ \textcolor{stringliteral}{"{}eosvmoc\_code"{}},\ MFD\_CLOEXEC);}
+\DoxyCodeLine{00058\ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(fd\ >=\ 0,\ \textcolor{stringliteral}{"{}Failed\ to\ create\ memfd"{}});}
+\DoxyCodeLine{00059\ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(ftruncate(fd,\ \mbox{\hyperlink{classfc_1_1vector}{bytes}}.size())\ ==\ 0,\ \textcolor{stringliteral}{"{}failed\ to\ grow\ memfd"{}});}
+\DoxyCodeLine{00060\ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{classfc_1_1vector}{bytes}}.size())\ \{}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}*\ b\ =\ (\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}*)mmap(\textcolor{keyword}{nullptr},\ \mbox{\hyperlink{classfc_1_1vector}{bytes}}.size(),\ PROT\_READ|PROT\_WRITE,\ MAP\_SHARED,\ fd,\ 0);}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(b\ !=\ MAP\_FAILED,\ \textcolor{stringliteral}{"{}failed\ to\ mmap\ memfd"{}});}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(b,\ \mbox{\hyperlink{classfc_1_1vector}{bytes}}.data(),\ \mbox{\hyperlink{classfc_1_1vector}{bytes}}.size());}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ munmap(b,\ \mbox{\hyperlink{classfc_1_1vector}{bytes}}.size());}
+\DoxyCodeLine{00065\ \ \ \ \}}
+\DoxyCodeLine{00066\ \ \ \ \textcolor{keywordflow}{return}\ wrapped\_fd(fd);}
+\DoxyCodeLine{00067\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=284pt]{namespacesysio_1_1chain_1_1eosvmoc_afe4909c18643f64d0c67a83885aefd90_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1chain_1_1eosvmoc_afe4909c18643f64d0c67a83885aefd90_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_aa65c4d6c02a0823262c6627a86cc74bc}\index{sysio::chain::eosvmoc@{sysio::chain::eosvmoc}!read\_message\_with\_fds@{read\_message\_with\_fds}}
+\index{read\_message\_with\_fds@{read\_message\_with\_fds}!sysio::chain::eosvmoc@{sysio::chain::eosvmoc}}
+\doxysubsubsection{\texorpdfstring{read\_message\_with\_fds()}{read\_message\_with\_fds()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_aa65c4d6c02a0823262c6627a86cc74bc} 
+std\+::tuple$<$ bool, \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_adb6f030d3e2f8a95ff6926de0b9fab1e}{eosvmoc\+\_\+message}}, std\+::vector$<$ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1wrapped__fd}{wrapped\+\_\+fd}} $>$ $>$ sysio\+::chain\+::eosvmoc\+::read\+\_\+message\+\_\+with\+\_\+fds (\begin{DoxyParamCaption}\item[{boost\+::asio\+::local\+::datagram\+\_\+protocol\+::socket \&}]{s}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{ipc__helpers_8cpp_source_l00009}{9}} of file \mbox{\hyperlink{ipc__helpers_8cpp_source}{ipc\+\_\+helpers.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00009\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00010\ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_aa65c4d6c02a0823262c6627a86cc74bc}{read\_message\_with\_fds}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.native\_handle());}
+\DoxyCodeLine{00011\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=208pt]{namespacesysio_1_1chain_1_1eosvmoc_aa65c4d6c02a0823262c6627a86cc74bc_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1chain_1_1eosvmoc_aa65c4d6c02a0823262c6627a86cc74bc_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_a2017f9b70e0519a2a1221c7626329a8e}\index{sysio::chain::eosvmoc@{sysio::chain::eosvmoc}!read\_message\_with\_fds@{read\_message\_with\_fds}}
+\index{read\_message\_with\_fds@{read\_message\_with\_fds}!sysio::chain::eosvmoc@{sysio::chain::eosvmoc}}
+\doxysubsubsection{\texorpdfstring{read\_message\_with\_fds()}{read\_message\_with\_fds()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_a2017f9b70e0519a2a1221c7626329a8e} 
+std\+::tuple$<$ bool, \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_adb6f030d3e2f8a95ff6926de0b9fab1e}{eosvmoc\+\_\+message}}, std\+::vector$<$ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1wrapped__fd}{wrapped\+\_\+fd}} $>$ $>$ sysio\+::chain\+::eosvmoc\+::read\+\_\+message\+\_\+with\+\_\+fds (\begin{DoxyParamCaption}\item[{int}]{fd}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{ipc__helpers_8cpp_source_l00013}{13}} of file \mbox{\hyperlink{ipc__helpers_8cpp_source}{ipc\+\_\+helpers.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00013\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00014\ \ \ \ \textcolor{keywordtype}{char}\ buff[max\_message\_size];}
+\DoxyCodeLine{00015\ }
+\DoxyCodeLine{00016\ \ \ \ \textcolor{keyword}{struct\ }msghdr\ msg\ =\ \{\};}
+\DoxyCodeLine{00017\ \ \ \ \textcolor{keyword}{struct\ }cmsghdr*\ cmsg;}
+\DoxyCodeLine{00018\ }
+\DoxyCodeLine{00019\ \ \ \ eosvmoc\_message\ message;}
+\DoxyCodeLine{00020\ \ \ \ std::vector<wrapped\_fd>\ fds;}
+\DoxyCodeLine{00021\ }
+\DoxyCodeLine{00022\ \ \ \ \textcolor{keyword}{struct\ }iovec\ io\ =\ \{}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ .iov\_base\ =\ buff,}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ .iov\_len\ =\ \textcolor{keyword}{sizeof}(buff)}
+\DoxyCodeLine{00025\ \ \ \ \};}
+\DoxyCodeLine{00026\ \ \ \ \textcolor{keyword}{union\ }\{}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}[CMSG\_SPACE(max\_num\_fds\ *\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{int}))];}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \textcolor{keyword}{struct\ }cmsghdr\ align;}
+\DoxyCodeLine{00029\ \ \ \ \}\ u;}
+\DoxyCodeLine{00030\ }
+\DoxyCodeLine{00031\ \ \ \ msg.msg\_iov\ =\ \&io;}
+\DoxyCodeLine{00032\ \ \ \ msg.msg\_iovlen\ =\ 1;}
+\DoxyCodeLine{00033\ \ \ \ msg.msg\_control\ =\ u.buf;}
+\DoxyCodeLine{00034\ \ \ \ msg.msg\_controllen\ =\ \textcolor{keyword}{sizeof}(u.buf);}
+\DoxyCodeLine{00035\ }
+\DoxyCodeLine{00036\ \ \ \ \textcolor{keywordtype}{int}\ red;}
+\DoxyCodeLine{00037\ \ \ \ \textcolor{keywordflow}{do}\ \{}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ red\ =\ recvmsg(fd,\ \&msg,\ 0);}
+\DoxyCodeLine{00039\ \ \ \ \}\ \textcolor{keywordflow}{while}(red\ ==\ -\/1\ \&\&\ errno\ ==\ EINTR);}
+\DoxyCodeLine{00040\ \ \ \ \textcolor{keywordflow}{if}(red\ <\ 1\ ||\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\textcolor{keyword}{>}(red)\ >=\ \textcolor{keyword}{sizeof}(buff))}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{\textcolor{keyword}{false},\ message,\ std::move(fds)\};}
+\DoxyCodeLine{00042\ \ \ \ }
+\DoxyCodeLine{00043\ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1datastream}{fc::datastream<char*>}}\ \mbox{\hyperlink{namespace_xbyak_1_1util_a4b2aef26182d21706896022467868f7c}{ds}}(buff,\ red);}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a0b442d98ceb22dd5a6ae84745e43ffab}{fc::raw::unpack}}(ds,\ message);}
+\DoxyCodeLine{00046\ \ \ \ \}}
+\DoxyCodeLine{00047\ \ \ \ \textcolor{keywordflow}{catch}(...)\ \{}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{\textcolor{keyword}{false},\ message,\ std::move(fds)\};}
+\DoxyCodeLine{00049\ \ \ \ \}}
+\DoxyCodeLine{00050\ }
+\DoxyCodeLine{00051\ \ \ \ \textcolor{keywordflow}{if}(msg.msg\_controllen)\ \{}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ cmsg\ =\ CMSG\_FIRSTHDR(\&msg);}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ num\_of\_fds\ =\ (cmsg-\/>cmsg\_len\ -\/\ CMSG\_LEN(0))/\textcolor{keyword}{sizeof}(\textcolor{keywordtype}{int});}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(num\_of\_fds\ >\ max\_num\_fds)}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{\textcolor{keyword}{false},\ message,\ std::move(fds)\};}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \textcolor{keywordtype}{int}*\ fd\_ptr\ =\ (\textcolor{keywordtype}{int}*)CMSG\_DATA(cmsg);}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keywordtype}{unsigned}\ i\ =\ 0;\ i\ <\ num\_of\_fds;\ ++i)}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ fds.push\_back(*fd\_ptr++);}
+\DoxyCodeLine{00059\ \ \ \ \}}
+\DoxyCodeLine{00060\ }
+\DoxyCodeLine{00061\ \ \ \ \textcolor{keywordflow}{return}\ \{\textcolor{keyword}{true},\ message,\ std::move(fds)\};}
+\DoxyCodeLine{00062\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=327pt]{namespacesysio_1_1chain_1_1eosvmoc_a2017f9b70e0519a2a1221c7626329a8e_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_a356ff87ec1b70511eecbf910c40be3da}\index{sysio::chain::eosvmoc@{sysio::chain::eosvmoc}!run\_compile@{run\_compile}}
+\index{run\_compile@{run\_compile}!sysio::chain::eosvmoc@{sysio::chain::eosvmoc}}
+\doxysubsubsection{\texorpdfstring{run\_compile()}{run\_compile()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_a356ff87ec1b70511eecbf910c40be3da} 
+void sysio\+::chain\+::eosvmoc\+::run\+\_\+compile (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1wrapped__fd}{wrapped\+\_\+fd}} \&\&}]{response\+\_\+sock}{, }\item[{\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1wrapped__fd}{wrapped\+\_\+fd}} \&\&}]{wasm\+\_\+code}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{compile__trampoline_8cpp_source_l00020}{20}} of file \mbox{\hyperlink{compile__trampoline_8cpp_source}{compile\+\_\+trampoline.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ \ \textcolor{comment}{//noexcept;\ we'll\ just\ blow\ up\ if\ anything\ tries\ to\ cross\ this\ boundry}}
+\DoxyCodeLine{00021\ \ \ \ std::vector<uint8\_t>\ wasm\ =\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a86ba861037da0aa52199df744c8270e5}{vector\_for\_memfd}}(wasm\_code);}
+\DoxyCodeLine{00022\ }
+\DoxyCodeLine{00023\ \ \ \ \textcolor{comment}{//ideally\ we\ catch\ exceptions\ and\ sent\ them\ upstream\ as\ strings\ for\ easier\ reporting}}
+\DoxyCodeLine{00024\ }
+\DoxyCodeLine{00025\ \ \ \ \mbox{\hyperlink{struct_i_r_1_1_module}{Module}}\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}};}
+\DoxyCodeLine{00026\ \ \ \ \mbox{\hyperlink{struct_serialization_1_1_memory_input_stream}{Serialization::MemoryInputStream}}\ stream(wasm.data(),\ wasm.size());}
+\DoxyCodeLine{00027\ \ \ \ \mbox{\hyperlink{struct_w_a_s_m_1_1scoped__skip__checks}{WASM::scoped\_skip\_checks}}\ no\_check;}
+\DoxyCodeLine{00028\ \ \ \ \mbox{\hyperlink{namespace_serialization_a2a05c5aff4847073ca0fb887d20ac485}{WASM::serialize}}(stream,\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}});}
+\DoxyCodeLine{00029\ \ \ \ \textcolor{keyword}{module}.userSections.clear();}
+\DoxyCodeLine{00030\ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1wasm__injections_1_1wasm__binary__injection}{wasm\_injections::wasm\_binary\_injection}}\ injector(\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}});}
+\DoxyCodeLine{00031\ \ \ \ injector.inject();}
+\DoxyCodeLine{00032\ }
+\DoxyCodeLine{00033\ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1instantiated__code}{instantiated\_code}}\ code\ =\ \mbox{\hyperlink{namespace_runtime_ab69935c3ec51168c91c2d864c7aa1334}{LLVMJIT::instantiateModule}}(\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}});}
+\DoxyCodeLine{00034\ }
+\DoxyCodeLine{00035\ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1code__compilation__result__message}{code\_compilation\_result\_message}}\ result\_message;}
+\DoxyCodeLine{00036\ }
+\DoxyCodeLine{00037\ \ \ \ \textcolor{keyword}{const}\ std::map<unsigned,\ uintptr\_t>\&\ function\_to\_offsets\ =\ code.function\_offsets;}
+\DoxyCodeLine{00038\ }
+\DoxyCodeLine{00039\ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.startFunctionIndex\ ==\ \mbox{\hyperlink{stdint_8h_ab2355300ea19395357e62d780f4dd073}{UINTPTR\_MAX}})}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ result\_message.\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1code__compilation__result__message_a9552625a0bbf37cb1aa27bf534c36e21}{start}}\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1no__offset}{no\_offset}}\{\};}
+\DoxyCodeLine{00041\ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.startFunctionIndex\ <\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.functions.imports.size())\ \{}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}\ =\ \textcolor{keyword}{module}.functions.imports[module.startFunctionIndex];}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \textcolor{keyword}{const}\ intrinsic\_entry\&\ ie\ =\ get\_intrinsic\_map().at(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}.moduleName\ +\ \textcolor{stringliteral}{"{}."{}}\ +\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}.exportName);}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ result\_message.\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1code__compilation__result__message_a9552625a0bbf37cb1aa27bf534c36e21}{start}}\ =\ intrinsic\_ordinal\{ie.ordinal\};}
+\DoxyCodeLine{00045\ \ \ \ \}}
+\DoxyCodeLine{00046\ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ result\_message.\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1code__compilation__result__message_a9552625a0bbf37cb1aa27bf534c36e21}{start}}\ =\ code\_offset\{function\_to\_offsets.at(\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.startFunctionIndex-\/\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.functions.imports.size())\};}
+\DoxyCodeLine{00048\ }
+\DoxyCodeLine{00049\ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_i_r_1_1_export}{Export}}\&\ exprt\ :\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.exports)\ \{}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(exprt.\mbox{\hyperlink{struct_i_r_1_1_export_acf1a148f2b0a0f855b772f014137c359}{name}}\ ==\ \textcolor{stringliteral}{"{}apply"{}})}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ result\_message.\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1code__compilation__result__message_ad0d75c276269dc20426a2c02fd659ba8}{apply\_offset}}\ =\ function\_to\_offsets.at(exprt.\mbox{\hyperlink{struct_i_r_1_1_export_ae452b6cb1b65bd904f3b2b9949f246ea}{index}}-\/\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.functions.imports.size());}
+\DoxyCodeLine{00052\ \ \ \ \}}
+\DoxyCodeLine{00053\ }
+\DoxyCodeLine{00054\ \ \ \ result\_message.\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1code__compilation__result__message_a5c8f71a2abdfb8ea9df36cec547ab302}{starting\_memory\_pages}}\ =\ -\/1;}
+\DoxyCodeLine{00055\ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.memories.size())}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ result\_message.\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1code__compilation__result__message_a5c8f71a2abdfb8ea9df36cec547ab302}{starting\_memory\_pages}}\ =\ \textcolor{keyword}{module}.memories.defs.at(0).type.size.min;}
+\DoxyCodeLine{00057\ }
+\DoxyCodeLine{00058\ \ \ \ std::vector<uint8\_t>\ prologue(\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.globals.defs.size()\ *\ 8);\ \textcolor{comment}{//\ Large\ enough\ to\ handle\ all\ mutable\ globals}}
+\DoxyCodeLine{00059\ \ \ \ std::vector<uint8\_t>::iterator\ prologue\_it\ =\ prologue.end();}
+\DoxyCodeLine{00060\ }
+\DoxyCodeLine{00061\ \ \ \ \textcolor{comment}{//set\ up\ mutable\ globals}}
+\DoxyCodeLine{00062\ \ \ \ \textcolor{keyword}{union\ }global\_union\ \{}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6add1d26230d15c93e8fbdba07b0299a44}{i64}};}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}}\ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6af89edb52b075b8bd95989bd3d0a04c0a}{i32}};}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6a512dc597be7ae761876315165dc8bd2e}{f32}};}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6a714b98e0a797e8f119f257a4ab802f86}{f64}};}
+\DoxyCodeLine{00067\ \ \ \ \};}
+\DoxyCodeLine{00068\ }
+\DoxyCodeLine{00069\ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_i_r_1_1_global_def}{GlobalDef}}\&\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a9c70933aff6b2a6d08c687a6cbb6b765}{global}}\ :\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.globals.defs)\ \{}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a9c70933aff6b2a6d08c687a6cbb6b765}{global}}.type.isMutable)}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ prologue\_it\ -\/=\ 8;}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ global\_union*\ \textcolor{keyword}{const}\ u\ =\ (global\_union*\ \textcolor{keyword}{const})\&*prologue\_it;}
+\DoxyCodeLine{00074\ }
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a9c70933aff6b2a6d08c687a6cbb6b765}{global}}.initializer.type)\ \{}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ InitializerExpression::Type::i32\_const:\ u-\/>i32\ =\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a9c70933aff6b2a6d08c687a6cbb6b765}{global}}.initializer.i32;\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ InitializerExpression::Type::i64\_const:\ u-\/>i64\ =\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a9c70933aff6b2a6d08c687a6cbb6b765}{global}}.initializer.i64;\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ InitializerExpression::Type::f32\_const:\ u-\/>f32\ =\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a9c70933aff6b2a6d08c687a6cbb6b765}{global}}.initializer.f32;\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ InitializerExpression::Type::f64\_const:\ u-\/>f64\ =\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a9c70933aff6b2a6d08c687a6cbb6b765}{global}}.initializer.f64;\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:\ \textcolor{keywordflow}{break};\ \textcolor{comment}{//impossible}}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00082\ \ \ \ \}}
+\DoxyCodeLine{00083\ }
+\DoxyCodeLine{00084\ \ \ \ \textcolor{keyword}{struct\ }table\_entry\ \{}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a31b85deecb45924320becd11d3ee16ce}{uintptr\_t}}\ \mbox{\hyperlink{yubihsm_8h_a1d127017fb298b889f4ba24752d08b8e}{type}};}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2}{func}};\ \ \ \ \textcolor{comment}{//>=\ 0\ means\ offset\ to\ code\ in\ wasm;\ <\ 0\ means\ intrinsic\ call\ at\ offset\ address}}
+\DoxyCodeLine{00087\ \ \ \ \};}
+\DoxyCodeLine{00088\ }
+\DoxyCodeLine{00089\ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_i_r_1_1_table_segment}{TableSegment}}\&\ table\_segment\ :\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.tableSegments)\ \{}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \textcolor{keyword}{struct\ }table\_entry*\ table\_index\_0\ =\ (\textcolor{keyword}{struct\ }table\_entry*)(code.code.data()\ +\ code.table\_offset);}
+\DoxyCodeLine{00091\ }
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\textcolor{keyword}{>}(table\_segment.\mbox{\hyperlink{struct_i_r_1_1_table_segment_aa3665479e20f35435cf111f04a5f7a28}{baseOffset}}.\mbox{\hyperlink{struct_i_r_1_1_initializer_expression_ae39054471f85529a9a641962618bab7e}{i32}})\ >\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.tables.defs[0].type.size.min)}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00094\ }
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\textcolor{keyword}{>}(table\_segment.\mbox{\hyperlink{struct_i_r_1_1_table_segment_aa3665479e20f35435cf111f04a5f7a28}{baseOffset}}.\mbox{\hyperlink{struct_i_r_1_1_initializer_expression_ae39054471f85529a9a641962618bab7e}{i32}})\ >\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.tables.defs[0].type.size.min)}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00097\ }
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ i\ =\ 0;\ i\ <\ table\_segment.\mbox{\hyperlink{struct_i_r_1_1_table_segment_a7ef544bc423b39282171f3af24ea8ff4}{indices}}.size();\ ++i)\ \{}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ function\_index\ =\ table\_segment.\mbox{\hyperlink{struct_i_r_1_1_table_segment_a7ef544bc423b39282171f3af24ea8ff4}{indices}}[i];}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ effective\_table\_index\ =\ table\_segment.\mbox{\hyperlink{struct_i_r_1_1_table_segment_aa3665479e20f35435cf111f04a5f7a28}{baseOffset}}.\mbox{\hyperlink{struct_i_r_1_1_initializer_expression_ae39054471f85529a9a641962618bab7e}{i32}}\ +\ i;}
+\DoxyCodeLine{00101\ }
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(effective\_table\_index\ >=\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.tables.defs[0].type.size.min)}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00104\ }
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(function\_index\ <\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.functions.imports.size())\ \{}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}\ =\ \textcolor{keyword}{module}.functions.imports[function\_index];}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ intrinsic\_entry\&\ ie\ =\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_abe43c1d3ddfb344db0cd7dd5ab25f48c}{get\_intrinsic\_map}}().at(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}.moduleName\ +\ \textcolor{stringliteral}{"{}."{}}\ +\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}.exportName);}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \ \ \ \ table\_index\_0[effective\_table\_index].func\ =\ ie.ordinal*-\/8;}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \ \ \ \ table\_index\_0[effective\_table\_index].type\ =\ (\mbox{\hyperlink{stdint_8h_a31b85deecb45924320becd11d3ee16ce}{uintptr\_t}})\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.types[\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.functions.imports[function\_index].type.index];}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \ \ \ \ table\_index\_0[effective\_table\_index].func\ =\ function\_to\_offsets.at(function\_index\ -\/\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.functions.imports.size());}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \ \ \ \ table\_index\_0[effective\_table\_index].type\ =\ (\mbox{\hyperlink{stdint_8h_a31b85deecb45924320becd11d3ee16ce}{uintptr\_t}})\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.types[\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.functions.defs[function\_index\ -\/\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.functions.imports.size()].type.index];}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00116\ \ \ \ \}}
+\DoxyCodeLine{00117\ }
+\DoxyCodeLine{00118\ \ \ \ \textcolor{comment}{//this\ is\ somewhat\ copy\ pasta\ from\ wasm\_interface\_private,\ with\ the\ asserts\ removed}}
+\DoxyCodeLine{00119\ \ \ \ std::vector<uint8\_t>\ initial\_mem;}
+\DoxyCodeLine{00120\ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_i_r_1_1_data_segment}{DataSegment}}\&\ data\_segment\ :\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.dataSegments)\ \{}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}\ base\_offset\ =\ data\_segment.\mbox{\hyperlink{struct_i_r_1_1_data_segment_a4426062ee993d970dfa7b9e33dd7da6b}{baseOffset}}.\mbox{\hyperlink{struct_i_r_1_1_initializer_expression_ae39054471f85529a9a641962618bab7e}{i32}};}
+\DoxyCodeLine{00122\ }
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(base\_offset\ +\ data\_segment.\mbox{\hyperlink{struct_i_r_1_1_data_segment_a32f58a06f3c2dfff7094c92f63ed1d23}{data}}.size()\ >\ initial\_mem.size())}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \ initial\_mem.resize(base\_offset\ +\ data\_segment.\mbox{\hyperlink{struct_i_r_1_1_data_segment_a32f58a06f3c2dfff7094c92f63ed1d23}{data}}.size(),\ 0x00);}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(initial\_mem.data()\ +\ base\_offset,\ data\_segment.\mbox{\hyperlink{struct_i_r_1_1_data_segment_a32f58a06f3c2dfff7094c92f63ed1d23}{data}}.data(),\ data\_segment.\mbox{\hyperlink{struct_i_r_1_1_data_segment_a32f58a06f3c2dfff7094c92f63ed1d23}{data}}.size());}
+\DoxyCodeLine{00126\ \ \ \ \}}
+\DoxyCodeLine{00127\ }
+\DoxyCodeLine{00128\ \ \ \ result\_message.\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1code__compilation__result__message_a9b8a4bb1abee7f132aa48e2ddc0f6c9f}{initdata\_prologue\_size}}\ =\ prologue.end()\ -\/\ prologue\_it;}
+\DoxyCodeLine{00129\ \ \ \ std::vector<uint8\_t>\ initdata\_prep;}
+\DoxyCodeLine{00130\ \ \ \ std::move(prologue\_it,\ prologue.end(),\ std::back\_inserter(initdata\_prep));}
+\DoxyCodeLine{00131\ \ \ \ std::move(initial\_mem.begin(),\ initial\_mem.end(),\ std::back\_inserter(initdata\_prep));}
+\DoxyCodeLine{00132\ }
+\DoxyCodeLine{00133\ \ \ \ std::vector<wrapped\_fd>\ fds\_to\_send;}
+\DoxyCodeLine{00134\ \ \ \ fds\_to\_send.emplace\_back(\mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_afe4909c18643f64d0c67a83885aefd90}{memfd\_for\_bytearray}}(code.code));}
+\DoxyCodeLine{00135\ \ \ \ fds\_to\_send.emplace\_back(\mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_afe4909c18643f64d0c67a83885aefd90}{memfd\_for\_bytearray}}(initdata\_prep));}
+\DoxyCodeLine{00136\ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a8715d32fd2e6a4a668578ca0d946b58b}{write\_message\_with\_fds}}(response\_sock,\ result\_message,\ fds\_to\_send);}
+\DoxyCodeLine{00137\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1chain_1_1eosvmoc_a356ff87ec1b70511eecbf910c40be3da_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1chain_1_1eosvmoc_a356ff87ec1b70511eecbf910c40be3da_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_a2e87b8655afafc1e4d272347fa5afabd}\index{sysio::chain::eosvmoc@{sysio::chain::eosvmoc}!run\_compile\_trampoline@{run\_compile\_trampoline}}
+\index{run\_compile\_trampoline@{run\_compile\_trampoline}!sysio::chain::eosvmoc@{sysio::chain::eosvmoc}}
+\doxysubsubsection{\texorpdfstring{run\_compile\_trampoline()}{run\_compile\_trampoline()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_a2e87b8655afafc1e4d272347fa5afabd} 
+void sysio\+::chain\+::eosvmoc\+::run\+\_\+compile\+\_\+trampoline (\begin{DoxyParamCaption}\item[{int}]{fd}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{compile__trampoline_8cpp_source_l00139}{139}} of file \mbox{\hyperlink{compile__trampoline_8cpp_source}{compile\+\_\+trampoline.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00140\ \ \ \ prctl(PR\_SET\_NAME,\ \textcolor{stringliteral}{"{}oc-\/trampoline"{}});}
+\DoxyCodeLine{00141\ \ \ \ prctl(PR\_SET\_PDEATHSIG,\ SIGKILL);}
+\DoxyCodeLine{00142\ }
+\DoxyCodeLine{00143\ \ \ \ \textcolor{comment}{//squelching\ this\ for\ now,\ but\ it\ means\ we\ won't\ have\ ability\ to\ get\ compile\ metrics}}
+\DoxyCodeLine{00144\ \ \ \ \textcolor{keyword}{struct\ }sigaction\ act;}
+\DoxyCodeLine{00145\ \ \ \ sigset\_t\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a893468abdce45d586a5b659094a25e6c}{set}};}
+\DoxyCodeLine{00146\ \ \ \ sigemptyset(\&set);}
+\DoxyCodeLine{00147\ \ \ \ act.sa\_handler\ =\ SIG\_IGN;}
+\DoxyCodeLine{00148\ \ \ \ act.sa\_mask\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a893468abdce45d586a5b659094a25e6c}{set}};}
+\DoxyCodeLine{00149\ \ \ \ act.sa\_flags\ =\ SA\_NOCLDWAIT;}
+\DoxyCodeLine{00150\ \ \ \ act.sa\_sigaction\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00151\ \ \ \ sigaction(SIGCHLD,\ \&act,\ \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{00152\ }
+\DoxyCodeLine{00153\ \ \ \ \textcolor{keywordflow}{while}(\textcolor{keyword}{true})\ \{}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ [success,\ message,\ fds]\ =\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_aa65c4d6c02a0823262c6627a86cc74bc}{read\_message\_with\_fds}}(fd);}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!success)}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ }
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!std::holds\_alternative<compile\_wasm\_message>(message)\ ||\ fds.size()\ !=\ 2)\ \{}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}SYS\ VM\ OC\ compile\ trampoline\ got\ unexpected\ message;\ ignoring"{}}\ <<\ std::endl;}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00162\ }
+\DoxyCodeLine{00163\ \ \ \ \ \ \ pid\_t\ pid\ =\ fork();}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(pid\ ==\ 0)\ \{}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \ prctl(PR\_SET\_NAME,\ \textcolor{stringliteral}{"{}oc-\/compile"{}});}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \ prctl(PR\_SET\_PDEATHSIG,\ SIGKILL);}
+\DoxyCodeLine{00167\ }
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{struct\ }rlimit\ cpu\_limits\ =\ \{20u,\ 20u\};}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \ setrlimit(RLIMIT\_CPU,\ \&cpu\_limits);}
+\DoxyCodeLine{00170\ }
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{struct\ }rlimit\ vm\_limits\ =\ \{512u*1024u*1024u,\ 512u*1024u*1024u\};}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \ setrlimit(RLIMIT\_AS,\ \&vm\_limits);}
+\DoxyCodeLine{00173\ }
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{struct\ }rlimit\ core\_limits\ =\ \{0u,\ 0u\};}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \ setrlimit(RLIMIT\_CORE,\ \&core\_limits);}
+\DoxyCodeLine{00176\ }
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a356ff87ec1b70511eecbf910c40be3da}{run\_compile}}(std::move(fds[0]),\ std::move(fds[1]));}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \ \_exit(0);}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(pid\ ==\ -\/1)}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}SYS\ VM\ OC\ compile\ trampoline\ failed\ to\ spawn\ compile\ task"{}}\ <<\ std::endl;}
+\DoxyCodeLine{00182\ \ \ \ \}}
+\DoxyCodeLine{00183\ }
+\DoxyCodeLine{00184\ \ \ \ \_exit(0);}
+\DoxyCodeLine{00185\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1chain_1_1eosvmoc_a2e87b8655afafc1e4d272347fa5afabd_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1chain_1_1eosvmoc_a2e87b8655afafc1e4d272347fa5afabd_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_a86ba861037da0aa52199df744c8270e5}\index{sysio::chain::eosvmoc@{sysio::chain::eosvmoc}!vector\_for\_memfd@{vector\_for\_memfd}}
+\index{vector\_for\_memfd@{vector\_for\_memfd}!sysio::chain::eosvmoc@{sysio::chain::eosvmoc}}
+\doxysubsubsection{\texorpdfstring{vector\_for\_memfd()}{vector\_for\_memfd()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_a86ba861037da0aa52199df744c8270e5} 
+std\+::vector$<$ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} $>$ sysio\+::chain\+::eosvmoc\+::vector\+\_\+for\+\_\+memfd (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1wrapped__fd}{wrapped\+\_\+fd}} \&}]{memfd}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{ipc__helpers_8cpp_source_l00121}{121}} of file \mbox{\hyperlink{ipc__helpers_8cpp_source}{ipc\+\_\+helpers.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00122\ \ \ \ \textcolor{keyword}{struct\ }stat\ st;}
+\DoxyCodeLine{00123\ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(fstat(memfd,\ \&st)\ ==\ 0,\ \textcolor{stringliteral}{"{}failed\ to\ get\ memfd\ size"{}});}
+\DoxyCodeLine{00124\ }
+\DoxyCodeLine{00125\ \ \ \ \textcolor{keywordflow}{if}(st.st\_size\ ==\ 0)}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::vector<uint8\_t>();}
+\DoxyCodeLine{00127\ }
+\DoxyCodeLine{00128\ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}*\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ (\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}*)mmap(\textcolor{keyword}{nullptr},\ st.st\_size,\ PROT\_READ|PROT\_WRITE,\ MAP\_SHARED,\ memfd,\ 0);}
+\DoxyCodeLine{00129\ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ !=\ MAP\_FAILED,\ \textcolor{stringliteral}{"{}failed\ to\ map\ memfd"{}});}
+\DoxyCodeLine{00130\ \ \ \ std::vector<uint8\_t>\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}+st.st\_size);}
+\DoxyCodeLine{00131\ \ \ \ munmap(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\ st.st\_size);}
+\DoxyCodeLine{00132\ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00133\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1chain_1_1eosvmoc_a86ba861037da0aa52199df744c8270e5_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_a8715d32fd2e6a4a668578ca0d946b58b}\index{sysio::chain::eosvmoc@{sysio::chain::eosvmoc}!write\_message\_with\_fds@{write\_message\_with\_fds}}
+\index{write\_message\_with\_fds@{write\_message\_with\_fds}!sysio::chain::eosvmoc@{sysio::chain::eosvmoc}}
+\doxysubsubsection{\texorpdfstring{write\_message\_with\_fds()}{write\_message\_with\_fds()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_a8715d32fd2e6a4a668578ca0d946b58b} 
+bool sysio\+::chain\+::eosvmoc\+::write\+\_\+message\+\_\+with\+\_\+fds (\begin{DoxyParamCaption}\item[{boost\+::asio\+::local\+::datagram\+\_\+protocol\+::socket \&}]{s}{, }\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_adb6f030d3e2f8a95ff6926de0b9fab1e}{eosvmoc\+\_\+message}} \&}]{message}{, }\item[{const std\+::vector$<$ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1wrapped__fd}{wrapped\+\_\+fd}} $>$ \&}]{fds}{ = {\ttfamily std\+:\+:vector$<$\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1wrapped__fd}{wrapped\+\_\+fd}}$>$()}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{ipc__helpers_8cpp_source_l00064}{64}} of file \mbox{\hyperlink{ipc__helpers_8cpp_source}{ipc\+\_\+helpers.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00065\ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a8715d32fd2e6a4a668578ca0d946b58b}{write\_message\_with\_fds}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.native\_handle(),\ message,\ fds);}
+\DoxyCodeLine{00066\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=210pt]{namespacesysio_1_1chain_1_1eosvmoc_a8715d32fd2e6a4a668578ca0d946b58b_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1chain_1_1eosvmoc_a8715d32fd2e6a4a668578ca0d946b58b_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacesysio_1_1chain_1_1eosvmoc_a7895d52861a9caea86b6743f18256180}\index{sysio::chain::eosvmoc@{sysio::chain::eosvmoc}!write\_message\_with\_fds@{write\_message\_with\_fds}}
+\index{write\_message\_with\_fds@{write\_message\_with\_fds}!sysio::chain::eosvmoc@{sysio::chain::eosvmoc}}
+\doxysubsubsection{\texorpdfstring{write\_message\_with\_fds()}{write\_message\_with\_fds()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1eosvmoc_a7895d52861a9caea86b6743f18256180} 
+bool sysio\+::chain\+::eosvmoc\+::write\+\_\+message\+\_\+with\+\_\+fds (\begin{DoxyParamCaption}\item[{int}]{fd\+\_\+to\+\_\+send\+\_\+to}{, }\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_adb6f030d3e2f8a95ff6926de0b9fab1e}{eosvmoc\+\_\+message}} \&}]{message}{, }\item[{const std\+::vector$<$ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1wrapped__fd}{wrapped\+\_\+fd}} $>$ \&}]{fds}{ = {\ttfamily std\+:\+:vector$<$\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1wrapped__fd}{wrapped\+\_\+fd}}$>$()}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{ipc__helpers_8cpp_source_l00068}{68}} of file \mbox{\hyperlink{ipc__helpers_8cpp_source}{ipc\+\_\+helpers.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00069\ \ \ \ \textcolor{keyword}{struct\ }msghdr\ msg\ =\ \{\};}
+\DoxyCodeLine{00070\ \ \ \ \textcolor{keyword}{struct\ }cmsghdr*\ cmsg;}
+\DoxyCodeLine{00071\ }
+\DoxyCodeLine{00072\ \ \ \ \textcolor{keywordtype}{size\_t}\ sz\ =\ \mbox{\hyperlink{namespacefc_1_1raw_a64937a5adc8041247f7007882224e225}{fc::raw::pack\_size}}(message);}
+\DoxyCodeLine{00073\ \ \ \ \textcolor{keywordflow}{if}(sz\ >\ max\_message\_size)}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00075\ \ \ \ \textcolor{keywordtype}{char}\ buff[max\_message\_size];}
+\DoxyCodeLine{00076\ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1datastream}{fc::datastream<char*>}}\ ds(buff,\ max\_message\_size);}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(ds,\ message);}
+\DoxyCodeLine{00079\ \ \ \ \}}
+\DoxyCodeLine{00080\ \ \ \ \textcolor{keywordflow}{catch}(...)\ \{}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00082\ \ \ \ \}}
+\DoxyCodeLine{00083\ }
+\DoxyCodeLine{00084\ \ \ \ \textcolor{keywordflow}{if}(fds.size()\ >\ max\_num\_fds)}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00086\ }
+\DoxyCodeLine{00087\ \ \ \ \textcolor{keyword}{struct\ }iovec\ io\ =\ \{}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ .iov\_base\ =\ buff,}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ .iov\_len\ =\ sz}
+\DoxyCodeLine{00090\ \ \ \ \};}
+\DoxyCodeLine{00091\ \ \ \ \textcolor{keyword}{union\ }\{}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}[CMSG\_SPACE(max\_num\_fds\ *\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{int}))];}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \textcolor{keyword}{struct\ }cmsghdr\ align;}
+\DoxyCodeLine{00094\ \ \ \ \}\ u;}
+\DoxyCodeLine{00095\ }
+\DoxyCodeLine{00096\ \ \ \ msg.msg\_iov\ =\ \&io;}
+\DoxyCodeLine{00097\ \ \ \ msg.msg\_iovlen\ =\ 1;}
+\DoxyCodeLine{00098\ \ \ \ \textcolor{keywordflow}{if}(fds.size())\ \{}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ msg.msg\_control\ =\ u.buf;}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ msg.msg\_controllen\ =\ \textcolor{keyword}{sizeof}(u.buf);}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ cmsg\ =\ CMSG\_FIRSTHDR(\&msg);}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ cmsg-\/>cmsg\_level\ =\ SOL\_SOCKET;}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ cmsg-\/>cmsg\_type\ =\ SCM\_RIGHTS;}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ cmsg-\/>cmsg\_len\ =\ CMSG\_LEN(\textcolor{keyword}{sizeof}(\textcolor{keywordtype}{int})\ *\ fds.size());}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ CMSG\_DATA(cmsg);}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ wrapped\_fd\&\ fd\ :\ fds)\ \{}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ thisfd\ =\ fd;}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\ \&thisfd,\ \textcolor{keyword}{sizeof}(thisfd));}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ +=\ \textcolor{keyword}{sizeof}(thisfd);}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00111\ \ \ \ \}}
+\DoxyCodeLine{00112\ }
+\DoxyCodeLine{00113\ \ \ \ \textcolor{keywordtype}{int}\ wrote;}
+\DoxyCodeLine{00114\ \ \ \ \textcolor{keywordflow}{do}\ \{}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ wrote\ =\ sendmsg(fd\_to\_send\_to,\ \&msg,\ 0);}
+\DoxyCodeLine{00116\ \ \ \ \}\ \textcolor{keywordflow}{while}(wrote\ ==\ -\/1\ \&\&\ errno\ ==\ EINTR);}
+\DoxyCodeLine{00117\ }
+\DoxyCodeLine{00118\ \ \ \ \textcolor{keywordflow}{return}\ wrote\ >=\ 0;}
+\DoxyCodeLine{00119\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1chain_1_1eosvmoc_a7895d52861a9caea86b6743f18256180_cgraph}
+\end{center}
+\end{figure}

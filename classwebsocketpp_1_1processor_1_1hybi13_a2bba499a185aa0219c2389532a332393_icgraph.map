@@ -1,0 +1,13 @@
+<map id="websocketpp::processor::hybi13::negotiate_extensions_helper" name="websocketpp::processor::hybi13::negotiate_extensions_helper">
+<area shape="rect" id="Node000001" title="Extension negotiation helper function." alt="" coords="496,73,694,129"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1processor_1_1hybi13.html#aee995e6a4a29a800ce3b031885814ed1" title="Initializes extensions based on the Sec&#45;WebSocket&#45;Extensions header." alt="" coords="250,47,448,88"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="480,88,448,84,449,78,481,83"/>
+<area shape="rect" id="Node000006" href="$classwebsocketpp_1_1processor_1_1hybi13.html#a5b01c6303142aa151cf9bf1fe9ccb6e3" title="Initializes extensions based on the Sec&#45;WebSocket&#45;Extensions header." alt="" coords="250,112,448,153"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="481,118,449,123,448,117,480,113"/>
+<area shape="rect" id="Node000003" href="$hybi13_8cpp.html#af2a6ac7de0cbf2ab3f42fad11589bb88" title=" " alt="" coords="5,5,202,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="234,47,170,34,172,29,235,42"/>
+<area shape="rect" id="Node000004" href="$hybi13_8cpp.html#a8572ea5938c89238763c7978435f0fed" title=" " alt="" coords="5,55,202,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="234,70,202,70,202,65,234,65"/>
+<area shape="rect" id="Node000005" href="$hybi13_8cpp.html#af031866649c220df69ea97f6d3c2569e" title=" " alt="" coords="5,104,202,130"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="235,93,172,106,170,101,234,88"/>
+</map>

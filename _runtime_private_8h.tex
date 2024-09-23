@@ -1,0 +1,84 @@
+\doxysection{libraries/wasm-\/jit/\+Source/\+Runtime/\+Runtime\+Private.h File Reference}
+\hypertarget{_runtime_private_8h}{}\label{_runtime_private_8h}\index{libraries/wasm-\/jit/Source/Runtime/RuntimePrivate.h@{libraries/wasm-\/jit/Source/Runtime/RuntimePrivate.h}}
+{\ttfamily \#include "{}Inline/\+Basic\+Types.\+h"{}}\newline
+{\ttfamily \#include "{}Platform/\+Platform.\+h"{}}\newline
+{\ttfamily \#include "{}Runtime.\+h"{}}\newline
+{\ttfamily \#include $<$functional$>$}\newline
+{\ttfamily \#include $<$map$>$}\newline
+{\ttfamily \#include $<$atomic$>$}\newline
+Include dependency graph for Runtime\+Private.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{_runtime_private_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{_runtime_private_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_l_l_v_m_j_i_t_1_1_j_i_t_module_base}{LLVMJIT\+::\+JITModule\+Base}}
+\item 
+struct \mbox{\hyperlink{struct_runtime_1_1_g_c_object}{Runtime\+::\+GCObject}}
+\item 
+struct \mbox{\hyperlink{struct_runtime_1_1_function_instance}{Runtime\+::\+Function\+Instance}}
+\item 
+struct \mbox{\hyperlink{struct_runtime_1_1_table_instance}{Runtime\+::\+Table\+Instance}}
+\item 
+struct \mbox{\hyperlink{struct_runtime_1_1_table_instance_1_1_function_element}{Runtime\+::\+Table\+Instance\+::\+Function\+Element}}
+\item 
+struct \mbox{\hyperlink{struct_runtime_1_1_memory_instance}{Runtime\+::\+Memory\+Instance}}
+\item 
+struct \mbox{\hyperlink{struct_runtime_1_1_global_instance}{Runtime\+::\+Global\+Instance}}
+\item 
+struct \mbox{\hyperlink{struct_runtime_1_1_module_instance}{Runtime\+::\+Module\+Instance}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespace_l_l_v_m_j_i_t}{LLVMJIT}}
+\item 
+namespace \mbox{\hyperlink{namespace_runtime}{Runtime}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{_runtime_private_8h_a2b316b7f96c18d1bb0e26d20fbd2f5cb}{HAS\+\_\+64\+BIT\+\_\+\+ADDRESS\+\_\+\+SPACE}}~(\mbox{\hyperlink{yubihsm__pkcs11_8c_af82555d15fc1c126f72a5c0566b5389a}{sizeof}}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}) == 8 \&\& !PRETEND\+\_\+32\+BIT\+\_\+\+ADDRESS\+\_\+\+SPACE)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef void(\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_l_l_v_m_j_i_t_ad8c76a743d9d4cee461c5f851700e7fd}{LLVMJIT\+::\+Invoke\+Function\+Pointer}}) (void \texorpdfstring{$\ast$}{*}, \mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}} \texorpdfstring{$\ast$}{*})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{namespace_l_l_v_m_j_i_t_a3065e9fa21cd0faa48c0a904d50f89ed}{LLVMJIT\+::init}} ()
+\item 
+void \mbox{\hyperlink{namespace_l_l_v_m_j_i_t_a4197e99684919c0291a877bf36c1e8d6}{LLVMJIT\+::instantiate\+Module}} (const \mbox{\hyperlink{struct_i_r_1_1_module}{IR\+::\+Module}} \&\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}, \mbox{\hyperlink{struct_runtime_1_1_module_instance}{Runtime\+::\+Module\+Instance}} \texorpdfstring{$\ast$}{*}module\+Instance)
+\item 
+bool \mbox{\hyperlink{namespace_l_l_v_m_j_i_t_a549f39e52ea0b92267a0387aaac7fdf2}{LLVMJIT\+::describe\+Instruction\+Pointer}} (\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} ip, std\+::string \&out\+Description)
+\item 
+\mbox{\hyperlink{namespace_l_l_v_m_j_i_t_ad8c76a743d9d4cee461c5f851700e7fd}{Invoke\+Function\+Pointer}} \mbox{\hyperlink{namespace_l_l_v_m_j_i_t_ab88751ef3ad11d6e2ca5cb97da25e953}{LLVMJIT\+::get\+Invoke\+Thunk}} (const \mbox{\hyperlink{struct_i_r_1_1_function_type}{IR\+::\+Function\+Type}} \texorpdfstring{$\ast$}{*}function\+Type)
+\item 
+void \mbox{\hyperlink{namespace_runtime_a2bd980dfb0cea2a1ede06b262793ef75}{Runtime\+::get\+Thread\+GCRoots}} (std\+::vector$<$ \mbox{\hyperlink{struct_runtime_1_1_object_instance}{Object\+Instance}} \texorpdfstring{$\ast$}{*} $>$ \&out\+GCRoots)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{_runtime_private_8h_a2b316b7f96c18d1bb0e26d20fbd2f5cb}\index{RuntimePrivate.h@{RuntimePrivate.h}!HAS\_64BIT\_ADDRESS\_SPACE@{HAS\_64BIT\_ADDRESS\_SPACE}}
+\index{HAS\_64BIT\_ADDRESS\_SPACE@{HAS\_64BIT\_ADDRESS\_SPACE}!RuntimePrivate.h@{RuntimePrivate.h}}
+\doxysubsubsection{\texorpdfstring{HAS\_64BIT\_ADDRESS\_SPACE}{HAS\_64BIT\_ADDRESS\_SPACE}}
+{\footnotesize\ttfamily \label{_runtime_private_8h_a2b316b7f96c18d1bb0e26d20fbd2f5cb} 
+\#define HAS\+\_\+64\+BIT\+\_\+\+ADDRESS\+\_\+\+SPACE~(\mbox{\hyperlink{yubihsm__pkcs11_8c_af82555d15fc1c126f72a5c0566b5389a}{sizeof}}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}) == 8 \&\& !PRETEND\+\_\+32\+BIT\+\_\+\+ADDRESS\+\_\+\+SPACE)}
+
+
+
+Definition at line \mbox{\hyperlink{_runtime_private_8h_source_l00011}{11}} of file \mbox{\hyperlink{_runtime_private_8h_source}{Runtime\+Private.\+h}}.
+

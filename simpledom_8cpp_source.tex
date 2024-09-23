@@ -1,0 +1,35 @@
+\doxysection{simpledom.\+cpp}
+\hypertarget{simpledom_8cpp_source}{}\label{simpledom_8cpp_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/example/simpledom/simpledom.cpp@{libraries/fc/include/fc/crypto/webauthn\_json/example/simpledom/simpledom.cpp}}
+\mbox{\hyperlink{simpledom_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{simpledom_8cpp_source_l00001}00001\ \textcolor{comment}{//\ JSON\ simple\ example}}
+\DoxyCodeLine{\Hypertarget{simpledom_8cpp_source_l00002}00002\ \textcolor{comment}{//\ This\ example\ does\ not\ handle\ errors.}}
+\DoxyCodeLine{\Hypertarget{simpledom_8cpp_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{simpledom_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{document_8h}{rapidjson/document.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{simpledom_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{writer_8h}{rapidjson/writer.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{simpledom_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{stringbuffer_8h}{rapidjson/stringbuffer.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{simpledom_8cpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <iostream>}}
+\DoxyCodeLine{\Hypertarget{simpledom_8cpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{simpledom_8cpp_source_l00009}00009\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacerapidjson}{rapidjson}};}
+\DoxyCodeLine{\Hypertarget{simpledom_8cpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{simpledom_8cpp_source_l00011}\mbox{\hyperlink{simpledom_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{00011}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{simpledom_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}()\ \{}
+\DoxyCodeLine{\Hypertarget{simpledom_8cpp_source_l00012}00012\ \ \ \ \ \textcolor{comment}{//\ 1.\ Parse\ a\ JSON\ string\ into\ DOM.}}
+\DoxyCodeLine{\Hypertarget{simpledom_8cpp_source_l00013}00013\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ json\ =\ \textcolor{stringliteral}{"{}\{\(\backslash\)"{}project\(\backslash\)"{}:\(\backslash\)"{}rapidjson\(\backslash\)"{},\(\backslash\)"{}stars\(\backslash\)"{}:10\}"{}};}
+\DoxyCodeLine{\Hypertarget{simpledom_8cpp_source_l00014}00014\ \ \ \ \ \mbox{\hyperlink{class_generic_document}{Document}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}};}
+\DoxyCodeLine{\Hypertarget{simpledom_8cpp_source_l00015}00015\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.Parse(json);}
+\DoxyCodeLine{\Hypertarget{simpledom_8cpp_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{simpledom_8cpp_source_l00017}00017\ \ \ \ \ \textcolor{comment}{//\ 2.\ Modify\ it\ by\ DOM.}}
+\DoxyCodeLine{\Hypertarget{simpledom_8cpp_source_l00018}00018\ \ \ \ \ \mbox{\hyperlink{class_generic_value}{Value}}\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}[\textcolor{stringliteral}{"{}stars"{}}];}
+\DoxyCodeLine{\Hypertarget{simpledom_8cpp_source_l00019}00019\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.SetInt(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.GetInt()\ +\ 1);}
+\DoxyCodeLine{\Hypertarget{simpledom_8cpp_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{simpledom_8cpp_source_l00021}00021\ \ \ \ \ \textcolor{comment}{//\ 3.\ Stringify\ the\ DOM}}
+\DoxyCodeLine{\Hypertarget{simpledom_8cpp_source_l00022}00022\ \ \ \ \ \mbox{\hyperlink{class_generic_string_buffer}{StringBuffer}}\ buffer;}
+\DoxyCodeLine{\Hypertarget{simpledom_8cpp_source_l00023}00023\ \ \ \ \ \mbox{\hyperlink{class_writer}{Writer<StringBuffer>}}\ writer(buffer);}
+\DoxyCodeLine{\Hypertarget{simpledom_8cpp_source_l00024}00024\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.Accept(writer);}
+\DoxyCodeLine{\Hypertarget{simpledom_8cpp_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{simpledom_8cpp_source_l00026}00026\ \ \ \ \ \textcolor{comment}{//\ Output\ \{"{}project"{}:"{}rapidjson"{},"{}stars"{}:11\}}}
+\DoxyCodeLine{\Hypertarget{simpledom_8cpp_source_l00027}00027\ \ \ \ \ std::cout\ <<\ buffer.\mbox{\hyperlink{class_generic_string_buffer_a42079865bab1deb930c6cff7d491c719}{GetString}}()\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{simpledom_8cpp_source_l00028}00028\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{simpledom_8cpp_source_l00029}00029\ \}}
+
+\end{DoxyCode}

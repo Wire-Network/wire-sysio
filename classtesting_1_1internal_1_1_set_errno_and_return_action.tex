@@ -1,0 +1,70 @@
+\doxysection{testing\+::internal\+::Set\+Errno\+And\+Return\+Action\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classtesting_1_1internal_1_1_set_errno_and_return_action}{}\label{classtesting_1_1internal_1_1_set_errno_and_return_action}\index{testing::internal::SetErrnoAndReturnAction$<$ T $>$@{testing::internal::SetErrnoAndReturnAction$<$ T $>$}}
+
+
+{\ttfamily \#include $<$gmock-\/actions.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_set_errno_and_return_action_abfe5a194a9b8f2b303c635ad99b3a257}{Set\+Errno\+And\+Return\+Action}} (int errno\+\_\+value, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} result)
+\item 
+{\footnotesize template$<$typename Result , typename Argument\+Tuple $>$ }\\Result \mbox{\hyperlink{classtesting_1_1internal_1_1_set_errno_and_return_action_a44025d0d124cab72878bf6bdb12c3693}{Perform}} (const Argument\+Tuple \&) const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$\newline
+class testing\+::internal\+::\+Set\+Errno\+And\+Return\+Action$<$ T $>$}
+
+
+Definition at line \mbox{\hyperlink{gmock-actions_8h_source_l00808}{808}} of file \mbox{\hyperlink{gmock-actions_8h_source}{gmock-\/actions.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_set_errno_and_return_action_abfe5a194a9b8f2b303c635ad99b3a257}\index{testing::internal::SetErrnoAndReturnAction$<$ T $>$@{testing::internal::SetErrnoAndReturnAction$<$ T $>$}!SetErrnoAndReturnAction@{SetErrnoAndReturnAction}}
+\index{SetErrnoAndReturnAction@{SetErrnoAndReturnAction}!testing::internal::SetErrnoAndReturnAction$<$ T $>$@{testing::internal::SetErrnoAndReturnAction$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{SetErrnoAndReturnAction()}{SetErrnoAndReturnAction()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_set_errno_and_return_action_abfe5a194a9b8f2b303c635ad99b3a257} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_set_errno_and_return_action}{testing\+::internal\+::\+Set\+Errno\+And\+Return\+Action}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::\+Set\+Errno\+And\+Return\+Action (\begin{DoxyParamCaption}\item[{int}]{errno\+\_\+value}{, }\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}}]{result}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-actions_8h_source_l00810}{810}} of file \mbox{\hyperlink{gmock-actions_8h_source}{gmock-\/actions.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00811\ \ \ \ \ \ \ :\ errno\_(errno\_value),}
+\DoxyCodeLine{00812\ \ \ \ \ \ \ \ \ result\_(result)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_set_errno_and_return_action_a44025d0d124cab72878bf6bdb12c3693}\index{testing::internal::SetErrnoAndReturnAction$<$ T $>$@{testing::internal::SetErrnoAndReturnAction$<$ T $>$}!Perform@{Perform}}
+\index{Perform@{Perform}!testing::internal::SetErrnoAndReturnAction$<$ T $>$@{testing::internal::SetErrnoAndReturnAction$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{Perform()}{Perform()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_set_errno_and_return_action_a44025d0d124cab72878bf6bdb12c3693} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+template$<$typename Result , typename Argument\+Tuple $>$ \\
+Result \mbox{\hyperlink{classtesting_1_1internal_1_1_set_errno_and_return_action}{testing\+::internal\+::\+Set\+Errno\+And\+Return\+Action}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::\+Perform (\begin{DoxyParamCaption}\item[{const Argument\+Tuple \&}]{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-actions_8h_source_l00814}{814}} of file \mbox{\hyperlink{gmock-actions_8h_source}{gmock-\/actions.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00814\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00815\ \ \ \ \ errno\ =\ errno\_;}
+\DoxyCodeLine{00816\ \ \ \ \ \textcolor{keywordflow}{return}\ result\_;}
+\DoxyCodeLine{00817\ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/include/gmock/\mbox{\hyperlink{gmock-actions_8h}{gmock-\/actions.\+h}}\end{DoxyCompactItemize}

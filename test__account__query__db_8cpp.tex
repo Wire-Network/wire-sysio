@@ -1,0 +1,429 @@
+\doxysection{plugins/chain\+\_\+plugin/test/test\+\_\+account\+\_\+query\+\_\+db.cpp File Reference}
+\hypertarget{test__account__query__db_8cpp}{}\label{test__account__query__db_8cpp}\index{plugins/chain\_plugin/test/test\_account\_query\_db.cpp@{plugins/chain\_plugin/test/test\_account\_query\_db.cpp}}
+{\ttfamily \#include $<$sysio/chain/permission\+\_\+object.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/test/included/unit\+\_\+test.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/testing/tester.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/types.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/block\+\_\+state.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain\+\_\+plugin/account\+\_\+query\+\_\+db.\+hpp$>$}\newline
+Include dependency graph for test\+\_\+account\+\_\+query\+\_\+db.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__account__query__db_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{test__account__query__db_8cpp_a6b2a3852db8bb19ab6909bac01859985}{BOOST\+\_\+\+TEST\+\_\+\+MODULE}}~\mbox{\hyperlink{classsysio_1_1chain__apis_1_1account__query__db}{account\+\_\+query\+\_\+db}}
+\item 
+\#define \mbox{\hyperlink{test__account__query__db_8cpp_aada0b9e3aa318087f731b01e9ae59f0d}{TESTER}}~\mbox{\hyperlink{classsysio_1_1testing_1_1validating__tester}{validating\+\_\+tester}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}} = \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params}{account\+\_\+query\+\_\+db\+::get\+\_\+accounts\+\_\+by\+\_\+authorizers\+\_\+params}}
+\item 
+using \mbox{\hyperlink{test__account__query__db_8cpp_a33f2983ff61d9343e424c440190d8610}{results}} = \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__result}{account\+\_\+query\+\_\+db\+::get\+\_\+accounts\+\_\+by\+\_\+authorizers\+\_\+result}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{test__account__query__db_8cpp_a20f35196f5a2323f5770855d7a90ffdb}{find\+\_\+account\+\_\+name}} (\mbox{\hyperlink{test__account__query__db_8cpp_a33f2983ff61d9343e424c440190d8610}{results}} rst, \mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}})
+\item 
+bool \mbox{\hyperlink{test__account__query__db_8cpp_a273a74cd0d03052f00c2417e32906a6f}{find\+\_\+account\+\_\+auth}} (\mbox{\hyperlink{test__account__query__db_8cpp_a33f2983ff61d9343e424c440190d8610}{results}} rst, \mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}, \mbox{\hyperlink{namespacesysio_1_1chain_aacc541763fed17ee490b6ac42b7bb77a}{permission\+\_\+name}} perm)
+\item 
+\mbox{\hyperlink{test__account__query__db_8cpp_aa3a2a5c56f46050729434925d9328c94}{BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE}} (newaccount\+\_\+test, \mbox{\hyperlink{test__account__query__db_8cpp_aada0b9e3aa318087f731b01e9ae59f0d}{TESTER}})
+\item 
+\mbox{\hyperlink{test__account__query__db_8cpp_a808f34b9e26b802143c17751d1150d31}{BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE}} (updateauth\+\_\+test, \mbox{\hyperlink{test__account__query__db_8cpp_aada0b9e3aa318087f731b01e9ae59f0d}{TESTER}})
+\item 
+\mbox{\hyperlink{test__account__query__db_8cpp_a7ffaecdb62bd10d3bad5c6c4ac8fe8c7}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (future\+\_\+fork\+\_\+test)
+\item 
+\mbox{\hyperlink{test__account__query__db_8cpp_a10d06a785bc9a3eea4d80f8e3a4920e0}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (fork\+\_\+test)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{test__account__query__db_8cpp_a6b2a3852db8bb19ab6909bac01859985}\index{test\_account\_query\_db.cpp@{test\_account\_query\_db.cpp}!BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}}
+\index{BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}!test\_account\_query\_db.cpp@{test\_account\_query\_db.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_TEST\_MODULE}{BOOST\_TEST\_MODULE}}
+{\footnotesize\ttfamily \label{test__account__query__db_8cpp_a6b2a3852db8bb19ab6909bac01859985} 
+\#define BOOST\+\_\+\+TEST\+\_\+\+MODULE~\mbox{\hyperlink{classsysio_1_1chain__apis_1_1account__query__db}{account\+\_\+query\+\_\+db}}}
+
+
+
+Definition at line \mbox{\hyperlink{test__account__query__db_8cpp_source_l00001}{1}} of file \mbox{\hyperlink{test__account__query__db_8cpp_source}{test\+\_\+account\+\_\+query\+\_\+db.\+cpp}}.
+
+\Hypertarget{test__account__query__db_8cpp_aada0b9e3aa318087f731b01e9ae59f0d}\index{test\_account\_query\_db.cpp@{test\_account\_query\_db.cpp}!TESTER@{TESTER}}
+\index{TESTER@{TESTER}!test\_account\_query\_db.cpp@{test\_account\_query\_db.cpp}}
+\doxysubsubsection{\texorpdfstring{TESTER}{TESTER}}
+{\footnotesize\ttfamily \label{test__account__query__db_8cpp_aada0b9e3aa318087f731b01e9ae59f0d} 
+\#define TESTER~\mbox{\hyperlink{classsysio_1_1testing_1_1validating__tester}{validating\+\_\+tester}}}
+
+
+
+Definition at line \mbox{\hyperlink{test__account__query__db_8cpp_source_l00012}{12}} of file \mbox{\hyperlink{test__account__query__db_8cpp_source}{test\+\_\+account\+\_\+query\+\_\+db.\+cpp}}.
+
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}\index{test\_account\_query\_db.cpp@{test\_account\_query\_db.cpp}!params@{params}}
+\index{params@{params}!test\_account\_query\_db.cpp@{test\_account\_query\_db.cpp}}
+\doxysubsubsection{\texorpdfstring{params}{params}}
+{\footnotesize\ttfamily \label{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73} 
+using \mbox{\hyperlink{namespacefc_a3a1a89eb370c7c0b0c7cf9bfa0bb0c71}{params}} = \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params}{account\+\_\+query\+\_\+db\+::get\+\_\+accounts\+\_\+by\+\_\+authorizers\+\_\+params}}}
+
+
+
+Definition at line \mbox{\hyperlink{test__account__query__db_8cpp_source_l00020}{20}} of file \mbox{\hyperlink{test__account__query__db_8cpp_source}{test\+\_\+account\+\_\+query\+\_\+db.\+cpp}}.
+
+\Hypertarget{test__account__query__db_8cpp_a33f2983ff61d9343e424c440190d8610}\index{test\_account\_query\_db.cpp@{test\_account\_query\_db.cpp}!results@{results}}
+\index{results@{results}!test\_account\_query\_db.cpp@{test\_account\_query\_db.cpp}}
+\doxysubsubsection{\texorpdfstring{results}{results}}
+{\footnotesize\ttfamily \label{test__account__query__db_8cpp_a33f2983ff61d9343e424c440190d8610} 
+using \mbox{\hyperlink{test__account__query__db_8cpp_a33f2983ff61d9343e424c440190d8610}{results}} = \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__result}{account\+\_\+query\+\_\+db\+::get\+\_\+accounts\+\_\+by\+\_\+authorizers\+\_\+result}}}
+
+
+
+Definition at line \mbox{\hyperlink{test__account__query__db_8cpp_source_l00021}{21}} of file \mbox{\hyperlink{test__account__query__db_8cpp_source}{test\+\_\+account\+\_\+query\+\_\+db.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{test__account__query__db_8cpp_a10d06a785bc9a3eea4d80f8e3a4920e0}\index{test\_account\_query\_db.cpp@{test\_account\_query\_db.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!test\_account\_query\_db.cpp@{test\_account\_query\_db.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{test__account__query__db_8cpp_a10d06a785bc9a3eea4d80f8e3a4920e0} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{fork\+\_\+test}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__account__query__db_8cpp_source_l00147}{147}} of file \mbox{\hyperlink{test__account__query__db_8cpp_source}{test\+\_\+account\+\_\+query\+\_\+db.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1testing_1_1tester}{tester}}\ node\_a(setup\_policy::none);}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1testing_1_1tester}{tester}}\ node\_b(setup\_policy::none);}
+\DoxyCodeLine{00150\ }
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \textcolor{comment}{//\ instantiate\ an\ account\_query\_db}}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ aq\_db\ =\ \mbox{\hyperlink{classsysio_1_1chain__apis_1_1account__query__db}{account\_query\_db}}(*node\_a.control);}
+\DoxyCodeLine{00153\ }
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \textcolor{comment}{//link\ aq\_db\ to\ the\ \`{}accepted\_block`\ signal\ on\ the\ controller}}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ c\ =\ node\_a.control-\/>accepted\_block.connect([\&](\textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\_state\_ptr}}\&\ blk)\ \{}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \ aq\_db.commit\_block(\ blk);}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00158\ }
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \textcolor{comment}{//\ create\ 10\ blocks\ synced}}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ 10;\ i++)\ \{}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \ node\_b.push\_block(node\_a.produce\_block());}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00163\ }
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \textcolor{comment}{//\ produce\ a\ block\ on\ node\ A\ with\ a\ new\ account\ and\ permission}}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ tester\_account\ =\ \textcolor{stringliteral}{"{}tester"{}}\_n;}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ tester\_account2\ =\ \textcolor{stringliteral}{"{}tester2"{}}\_n;}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\ role\ =\ \textcolor{stringliteral}{"{}first"{}};}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ node\_a.create\_account(tester\_account);}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ node\_a.create\_account(tester\_account2);}
+\DoxyCodeLine{00170\ }
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ trace\_ptr\ =\ node\_a.push\_action(config::system\_account\_name,\ \mbox{\hyperlink{structsysio_1_1chain_1_1updateauth_afc31c0680242885924f64fc347780814}{updateauth::get\_name}}(),\ tester\_account,\ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}()}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}account"{}},\ tester\_account)}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}permission"{}},\ \textcolor{stringliteral}{"{}role"{}}\_n)}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}parent"{}},\ \textcolor{stringliteral}{"{}active"{}})}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}auth"{}},\ \ \mbox{\hyperlink{structsysio_1_1chain_1_1authority}{authority}}(node\_a.get\_public\_key(tester\_account,\ role),\ 5)),\ 1}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ );}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ aq\_db.cache\_transaction\_trace(trace\_ptr);}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ trace\_ptr2\ =\ node\_a.push\_action(config::system\_account\_name,\ \mbox{\hyperlink{structsysio_1_1chain_1_1updateauth_afc31c0680242885924f64fc347780814}{updateauth::get\_name}}(),\ tester\_account2,\ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}()}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}account"{}},\ tester\_account2)}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}permission"{}},\ \textcolor{stringliteral}{"{}role"{}}\_n)}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}parent"{}},\ \textcolor{stringliteral}{"{}active"{}})}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}auth"{}},\ \ \mbox{\hyperlink{structsysio_1_1chain_1_1authority}{authority}}(node\_a.get\_public\_key(tester\_account2,\ role),\ 5)),\ 2}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ );}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ aq\_db.cache\_transaction\_trace(trace\_ptr2);}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ node\_a.produce\_block();}
+\DoxyCodeLine{00186\ }
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params}{params}}\ pars;}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ pars.\mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params_a1b6ac4031438d3bc900894f085c94142}{keys}}.emplace\_back(node\_a.get\_public\_key(tester\_account,\ role));}
+\DoxyCodeLine{00189\ }
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ pre\_results\ =\ aq\_db.get\_accounts\_by\_authorizers(pars);}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ BOOST\_TEST\_REQUIRE(\mbox{\hyperlink{test__account__query__db_8cpp_a273a74cd0d03052f00c2417e32906a6f}{find\_account\_auth}}(pre\_results,\ tester\_account,\ \textcolor{stringliteral}{"{}role"{}}\_n)\ ==\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00192\ }
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \textcolor{comment}{//\ have\ node\ B\ take\ over\ from\ head-\/1\ and\ also\ update\ permissions}}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ node\_b.create\_account(tester\_account);}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ node\_b.create\_account(tester\_account2);}
+\DoxyCodeLine{00196\ }
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ trace\_ptr3\ =\ node\_b.push\_action(config::system\_account\_name,\ \mbox{\hyperlink{structsysio_1_1chain_1_1updateauth_afc31c0680242885924f64fc347780814}{updateauth::get\_name}}(),\ tester\_account,\ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}()}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}account"{}},\ tester\_account)}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}permission"{}},\ \textcolor{stringliteral}{"{}role"{}}\_n)}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}parent"{}},\ \textcolor{stringliteral}{"{}active"{}})}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}auth"{}},\ \ \mbox{\hyperlink{structsysio_1_1chain_1_1authority}{authority}}(node\_b.get\_public\_key(tester\_account,\ role),\ 6)),\ 1}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ );}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ aq\_db.cache\_transaction\_trace(trace\_ptr3);}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ trace\_ptr4\ =\ node\_b.push\_action(config::system\_account\_name,\ \mbox{\hyperlink{structsysio_1_1chain_1_1updateauth_afc31c0680242885924f64fc347780814}{updateauth::get\_name}}(),\ tester\_account2,\ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}()}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}account"{}},\ tester\_account2)}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}permission"{}},\ \textcolor{stringliteral}{"{}role"{}}\_n)}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}parent"{}},\ \textcolor{stringliteral}{"{}active"{}})}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}auth"{}},\ \ \mbox{\hyperlink{structsysio_1_1chain_1_1authority}{authority}}(node\_b.get\_public\_key(tester\_account2,\ role),\ 6)),\ 2}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ );}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ aq\_db.cache\_transaction\_trace(trace\_ptr4);}
+\DoxyCodeLine{00211\ }
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \textcolor{comment}{//\ push\ b's\ onto\ a}}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ node\_a.push\_block(node\_b.produce\_block());}
+\DoxyCodeLine{00214\ }
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ trace\_ptr5\ =\ node\_b.push\_action(config::system\_account\_name,\ \mbox{\hyperlink{structsysio_1_1chain_1_1updateauth_afc31c0680242885924f64fc347780814}{updateauth::get\_name}}(),\ tester\_account,\ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}()}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}account"{}},\ tester\_account)}
+\DoxyCodeLine{00217\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}permission"{}},\ \textcolor{stringliteral}{"{}role"{}}\_n)}
+\DoxyCodeLine{00218\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}parent"{}},\ \textcolor{stringliteral}{"{}active"{}})}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}auth"{}},\ \ \mbox{\hyperlink{structsysio_1_1chain_1_1authority}{authority}}(node\_b.get\_public\_key(tester\_account,\ role),\ 5)),\ 3}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ );}
+\DoxyCodeLine{00221\ \ \ \ \ \ \ aq\_db.cache\_transaction\_trace(trace\_ptr5);}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ trace\_ptr6\ =\ node\_b.push\_action(config::system\_account\_name,\ \mbox{\hyperlink{structsysio_1_1chain_1_1updateauth_afc31c0680242885924f64fc347780814}{updateauth::get\_name}}(),\ tester\_account2,\ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}()}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}account"{}},\ tester\_account2)}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}permission"{}},\ \textcolor{stringliteral}{"{}role"{}}\_n)}
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}parent"{}},\ \textcolor{stringliteral}{"{}active"{}})}
+\DoxyCodeLine{00226\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}auth"{}},\ \ \mbox{\hyperlink{structsysio_1_1chain_1_1authority}{authority}}(node\_b.get\_public\_key(tester\_account2,\ role),\ 5)),\ 4}
+\DoxyCodeLine{00227\ \ \ \ \ \ \ );}
+\DoxyCodeLine{00228\ \ \ \ \ \ \ aq\_db.cache\_transaction\_trace(trace\_ptr6);}
+\DoxyCodeLine{00229\ }
+\DoxyCodeLine{00230\ \ \ \ \ \ \ node\_a.push\_block(node\_b.produce\_block());}
+\DoxyCodeLine{00231\ }
+\DoxyCodeLine{00232\ \ \ \ \ \ \ \textcolor{comment}{//\ ensure\ the\ account\ was\ forked\ away}}
+\DoxyCodeLine{00233\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ post\_results\ =\ aq\_db.get\_accounts\_by\_authorizers(pars);}
+\DoxyCodeLine{00234\ }
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \textcolor{comment}{//\ verify\ correct\ account\ is\ in\ results}}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ BOOST\_TEST\_REQUIRE(post\_results.accounts.size()\ ==\ 1);}
+\DoxyCodeLine{00237\ }
+\DoxyCodeLine{00238\ \ \ \ \}\ \mbox{\hyperlink{exception_8hpp_ae70bfa24f5a3bc0917382b3c17fc033c}{FC\_LOG\_AND\_RETHROW}}()\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__account__query__db_8cpp_a10d06a785bc9a3eea4d80f8e3a4920e0_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__account__query__db_8cpp_a7ffaecdb62bd10d3bad5c6c4ac8fe8c7}\index{test\_account\_query\_db.cpp@{test\_account\_query\_db.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!test\_account\_query\_db.cpp@{test\_account\_query\_db.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{test__account__query__db_8cpp_a7ffaecdb62bd10d3bad5c6c4ac8fe8c7} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{future\+\_\+fork\+\_\+test}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__account__query__db_8cpp_source_l00100}{100}} of file \mbox{\hyperlink{test__account__query__db_8cpp_source}{test\+\_\+account\+\_\+query\+\_\+db.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00101\ \ \ \ \mbox{\hyperlink{classsysio_1_1testing_1_1tester}{tester}}\ node\_a(setup\_policy::none);}
+\DoxyCodeLine{00102\ \ \ \ \mbox{\hyperlink{classsysio_1_1testing_1_1tester}{tester}}\ node\_b(setup\_policy::none);}
+\DoxyCodeLine{00103\ }
+\DoxyCodeLine{00104\ \ \ \ \textcolor{comment}{//\ instantiate\ an\ account\_query\_db}}
+\DoxyCodeLine{00105\ \ \ \ \textcolor{keyword}{auto}\ aq\_db\ =\ \mbox{\hyperlink{classsysio_1_1chain__apis_1_1account__query__db}{account\_query\_db}}(*node\_a.control);}
+\DoxyCodeLine{00106\ }
+\DoxyCodeLine{00107\ \ \ \ \textcolor{comment}{//link\ aq\_db\ to\ the\ \`{}accepted\_block`\ signal\ on\ the\ controller}}
+\DoxyCodeLine{00108\ \ \ \ \textcolor{keyword}{auto}\ c\ =\ node\_a.control-\/>accepted\_block.connect([\&](\textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\_state\_ptr}}\&\ blk)\ \{}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ aq\_db.commit\_block(\ blk);}
+\DoxyCodeLine{00110\ \ \ \ \});}
+\DoxyCodeLine{00111\ }
+\DoxyCodeLine{00112\ \ \ \ \textcolor{comment}{//\ create\ 10\ blocks\ synced}}
+\DoxyCodeLine{00113\ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ 10;\ i++)\ \{}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ node\_b.push\_block(node\_a.produce\_block());}
+\DoxyCodeLine{00115\ \ \ \ \}}
+\DoxyCodeLine{00116\ }
+\DoxyCodeLine{00117\ \ \ \ \textcolor{comment}{//\ produce\ a\ block\ on\ node\ A\ with\ a\ new\ account\ and\ permission}}
+\DoxyCodeLine{00118\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ tester\_account\ =\ \textcolor{stringliteral}{"{}tester"{}}\_n;}
+\DoxyCodeLine{00119\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\ role\ =\ \textcolor{stringliteral}{"{}first"{}};}
+\DoxyCodeLine{00120\ \ \ \ node\_a.create\_account(tester\_account);}
+\DoxyCodeLine{00121\ }
+\DoxyCodeLine{00122\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ trace\_ptr\ =\ node\_a.push\_action(config::system\_account\_name,\ \mbox{\hyperlink{structsysio_1_1chain_1_1updateauth_afc31c0680242885924f64fc347780814}{updateauth::get\_name}}(),\ tester\_account,\ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}()}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}account"{}},\ tester\_account)}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}permission"{}},\ \textcolor{stringliteral}{"{}role"{}}\_n)}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}parent"{}},\ \textcolor{stringliteral}{"{}active"{}})}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}auth"{}},\ \ \mbox{\hyperlink{structsysio_1_1chain_1_1authority}{authority}}(node\_a.get\_public\_key(tester\_account,\ role),\ 5))}
+\DoxyCodeLine{00127\ \ \ \ );}
+\DoxyCodeLine{00128\ \ \ \ aq\_db.cache\_transaction\_trace(trace\_ptr);}
+\DoxyCodeLine{00129\ \ \ \ node\_a.produce\_block();}
+\DoxyCodeLine{00130\ }
+\DoxyCodeLine{00131\ \ \ \ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params}{params}}\ pars;}
+\DoxyCodeLine{00132\ \ \ \ pars.\mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params_a1b6ac4031438d3bc900894f085c94142}{keys}}.emplace\_back(node\_a.get\_public\_key(tester\_account,\ role));}
+\DoxyCodeLine{00133\ }
+\DoxyCodeLine{00134\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ pre\_results\ =\ aq\_db.get\_accounts\_by\_authorizers(pars);}
+\DoxyCodeLine{00135\ \ \ \ BOOST\_TEST\_REQUIRE(\mbox{\hyperlink{test__account__query__db_8cpp_a273a74cd0d03052f00c2417e32906a6f}{find\_account\_auth}}(pre\_results,\ tester\_account,\ \textcolor{stringliteral}{"{}role"{}}\_n)\ ==\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00136\ }
+\DoxyCodeLine{00137\ \ \ \ \textcolor{comment}{//\ have\ node\ B\ take\ over\ from\ head-\/1\ and\ produce\ "{}future"{}\ blocks\ to\ overtake}}
+\DoxyCodeLine{00138\ \ \ \ node\_a.push\_block(node\_b.produce\_block(\mbox{\hyperlink{namespacefc_a76ae235ec7e9b8862e70740058d7eb1b}{fc::milliseconds}}(config::block\_interval\_ms\ *\ 100)));}
+\DoxyCodeLine{00139\ \ \ \ node\_a.push\_block(node\_b.produce\_block());}
+\DoxyCodeLine{00140\ }
+\DoxyCodeLine{00141\ \ \ \ \textcolor{comment}{//\ ensure\ the\ account\ was\ forked\ away}}
+\DoxyCodeLine{00142\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ post\_results\ =\ aq\_db.get\_accounts\_by\_authorizers(pars);}
+\DoxyCodeLine{00143\ \ \ \ BOOST\_TEST\_REQUIRE(post\_results.accounts.size()\ ==\ 0);}
+\DoxyCodeLine{00144\ }
+\DoxyCodeLine{00145\ \}\ \mbox{\hyperlink{exception_8hpp_ae70bfa24f5a3bc0917382b3c17fc033c}{FC\_LOG\_AND\_RETHROW}}()\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__account__query__db_8cpp_a7ffaecdb62bd10d3bad5c6c4ac8fe8c7_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__account__query__db_8cpp_aa3a2a5c56f46050729434925d9328c94}\index{test\_account\_query\_db.cpp@{test\_account\_query\_db.cpp}!BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}}
+\index{BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}!test\_account\_query\_db.cpp@{test\_account\_query\_db.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_FIXTURE\_TEST\_CASE()}{BOOST\_FIXTURE\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{test__account__query__db_8cpp_aa3a2a5c56f46050729434925d9328c94} 
+BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{newaccount\+\_\+test}]{}{, }\item[{\mbox{\hyperlink{test__account__query__db_8cpp_aada0b9e3aa318087f731b01e9ae59f0d}{TESTER}}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__account__query__db_8cpp_source_l00041}{41}} of file \mbox{\hyperlink{test__account__query__db_8cpp_source}{test\+\_\+account\+\_\+query\+\_\+db.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00042\ }
+\DoxyCodeLine{00043\ \ \ \ \textcolor{comment}{//\ instantiate\ an\ account\_query\_db}}
+\DoxyCodeLine{00044\ \ \ \ \textcolor{keyword}{auto}\ aq\_db\ =\ \mbox{\hyperlink{classsysio_1_1chain__apis_1_1account__query__db}{account\_query\_db}}(*control);}
+\DoxyCodeLine{00045\ }
+\DoxyCodeLine{00046\ \ \ \ \ \textcolor{comment}{//link\ aq\_db\ to\ the\ \`{}accepted\_block`\ signal\ on\ the\ controller}}
+\DoxyCodeLine{00047\ \ \ \ \textcolor{keyword}{auto}\ c2\ =\ control-\/>accepted\_block.connect([\&](\textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\_state\_ptr}}\&\ blk)\ \{}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ aq\_db.commit\_block(\ blk);}
+\DoxyCodeLine{00049\ \ \ \ \});}
+\DoxyCodeLine{00050\ }
+\DoxyCodeLine{00051\ \ \ \ produce\_blocks(10);}
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{account\_name}}\ tester\_account\ =\ \textcolor{stringliteral}{"{}tester"{}}\_n;}
+\DoxyCodeLine{00054\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ trace\_ptr\ =\ \ create\_account(tester\_account);}
+\DoxyCodeLine{00055\ \ \ \ aq\_db.cache\_transaction\_trace(trace\_ptr);}
+\DoxyCodeLine{00056\ \ \ \ produce\_block();}
+\DoxyCodeLine{00057\ }
+\DoxyCodeLine{00058\ \ \ \ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params}{params}}\ pars;}
+\DoxyCodeLine{00059\ \ \ \ pars.\mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params_a1b6ac4031438d3bc900894f085c94142}{keys}}.emplace\_back(\mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a9d8a6aa4b690e8cdddca915054a148a8}{get\_public\_key}}(tester\_account,\ \textcolor{stringliteral}{"{}owner"{}}));}
+\DoxyCodeLine{00060\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__result}{results}}\ =\ aq\_db.get\_accounts\_by\_authorizers(pars);}
+\DoxyCodeLine{00061\ }
+\DoxyCodeLine{00062\ \ \ \ BOOST\_TEST\_REQUIRE(\mbox{\hyperlink{test__account__query__db_8cpp_a20f35196f5a2323f5770855d7a90ffdb}{find\_account\_name}}(\mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__result}{results}},\ tester\_account)\ ==\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00063\ }
+\DoxyCodeLine{00064\ \}\ \mbox{\hyperlink{exception_8hpp_ae70bfa24f5a3bc0917382b3c17fc033c}{FC\_LOG\_AND\_RETHROW}}()\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__account__query__db_8cpp_aa3a2a5c56f46050729434925d9328c94_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__account__query__db_8cpp_a808f34b9e26b802143c17751d1150d31}\index{test\_account\_query\_db.cpp@{test\_account\_query\_db.cpp}!BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}}
+\index{BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}!test\_account\_query\_db.cpp@{test\_account\_query\_db.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_FIXTURE\_TEST\_CASE()}{BOOST\_FIXTURE\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{test__account__query__db_8cpp_a808f34b9e26b802143c17751d1150d31} 
+BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{updateauth\+\_\+test}]{}{, }\item[{\mbox{\hyperlink{test__account__query__db_8cpp_aada0b9e3aa318087f731b01e9ae59f0d}{TESTER}}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__account__query__db_8cpp_source_l00066}{66}} of file \mbox{\hyperlink{test__account__query__db_8cpp_source}{test\+\_\+account\+\_\+query\+\_\+db.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00067\ }
+\DoxyCodeLine{00068\ \ \ \ \ \textcolor{comment}{//\ instantiate\ an\ account\_query\_db}}
+\DoxyCodeLine{00069\ \ \ \ \ \textcolor{keyword}{auto}\ aq\_db\ =\ \mbox{\hyperlink{classsysio_1_1chain__apis_1_1account__query__db}{account\_query\_db}}(*control);}
+\DoxyCodeLine{00070\ }
+\DoxyCodeLine{00071\ \ \ \ \ \textcolor{comment}{//link\ aq\_db\ to\ the\ \`{}accepted\_block`\ signal\ on\ the\ controller}}
+\DoxyCodeLine{00072\ \ \ \ \ \textcolor{keyword}{auto}\ c\ =\ control-\/>accepted\_block.connect([\&](\textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\_state\_ptr}}\&\ blk)\ \{}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ aq\_db.commit\_block(\ blk);}
+\DoxyCodeLine{00074\ \ \ \ \ \});}
+\DoxyCodeLine{00075\ }
+\DoxyCodeLine{00076\ \ \ \ \ produce\_blocks(10);}
+\DoxyCodeLine{00077\ }
+\DoxyCodeLine{00078\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ tester\_account\ =\ \textcolor{stringliteral}{"{}tester"{}}\_n;}
+\DoxyCodeLine{00079\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\ role\ =\ \textcolor{stringliteral}{"{}first"{}};}
+\DoxyCodeLine{00080\ \ \ \ produce\_block();}
+\DoxyCodeLine{00081\ \ \ \ create\_account(tester\_account);}
+\DoxyCodeLine{00082\ }
+\DoxyCodeLine{00083\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ trace\_ptr\ =\ push\_action(config::system\_account\_name,\ \mbox{\hyperlink{structsysio_1_1chain_1_1updateauth_afc31c0680242885924f64fc347780814}{updateauth::get\_name}}(),\ tester\_account,\ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}()}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}account"{}},\ tester\_account)}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}permission"{}},\ \textcolor{stringliteral}{"{}role"{}}\_n)}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}parent"{}},\ \textcolor{stringliteral}{"{}active"{}})}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}auth"{}},\ \ \mbox{\hyperlink{structsysio_1_1chain_1_1authority}{authority}}(\mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a9d8a6aa4b690e8cdddca915054a148a8}{get\_public\_key}}(tester\_account,\ role),\ 5))}
+\DoxyCodeLine{00088\ \ \ \ );}
+\DoxyCodeLine{00089\ \ \ \ aq\_db.cache\_transaction\_trace(trace\_ptr);}
+\DoxyCodeLine{00090\ \ \ \ produce\_block();}
+\DoxyCodeLine{00091\ }
+\DoxyCodeLine{00092\ \ \ \ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params}{params}}\ pars;}
+\DoxyCodeLine{00093\ \ \ \ pars.\mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params_a1b6ac4031438d3bc900894f085c94142}{keys}}.emplace\_back(\mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a9d8a6aa4b690e8cdddca915054a148a8}{get\_public\_key}}(tester\_account,\ role));}
+\DoxyCodeLine{00094\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__result}{results}}\ =\ aq\_db.get\_accounts\_by\_authorizers(pars);}
+\DoxyCodeLine{00095\ }
+\DoxyCodeLine{00096\ \ \ \ BOOST\_TEST\_REQUIRE(\mbox{\hyperlink{test__account__query__db_8cpp_a273a74cd0d03052f00c2417e32906a6f}{find\_account\_auth}}(\mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__result}{results}},\ tester\_account,\ \textcolor{stringliteral}{"{}role"{}}\_n)\ ==\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00097\ }
+\DoxyCodeLine{00098\ \}\ \mbox{\hyperlink{exception_8hpp_ae70bfa24f5a3bc0917382b3c17fc033c}{FC\_LOG\_AND\_RETHROW}}()\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__account__query__db_8cpp_a808f34b9e26b802143c17751d1150d31_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__account__query__db_8cpp_a273a74cd0d03052f00c2417e32906a6f}\index{test\_account\_query\_db.cpp@{test\_account\_query\_db.cpp}!find\_account\_auth@{find\_account\_auth}}
+\index{find\_account\_auth@{find\_account\_auth}!test\_account\_query\_db.cpp@{test\_account\_query\_db.cpp}}
+\doxysubsubsection{\texorpdfstring{find\_account\_auth()}{find\_account\_auth()}}
+{\footnotesize\ttfamily \label{test__account__query__db_8cpp_a273a74cd0d03052f00c2417e32906a6f} 
+bool find\+\_\+account\+\_\+auth (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{test__account__query__db_8cpp_a33f2983ff61d9343e424c440190d8610}{results}}}]{rst}{, }\item[{\mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}}}]{name}{, }\item[{\mbox{\hyperlink{namespacesysio_1_1chain_aacc541763fed17ee490b6ac42b7bb77a}{permission\+\_\+name}}}]{perm}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__account__query__db_8cpp_source_l00031}{31}} of file \mbox{\hyperlink{test__account__query__db_8cpp_source}{test\+\_\+account\+\_\+query\+\_\+db.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00032\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ acc\ :\ rst.\mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__result_a987652cb712f4f8ca9e2d29f6716c243}{accounts}})\{}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (acc.account\_name\ ==\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\ \&\&\ acc.permission\_name\ ==\ perm)}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00035\ \ \ \ \ \}}
+\DoxyCodeLine{00036\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00037\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__account__query__db_8cpp_a273a74cd0d03052f00c2417e32906a6f_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__account__query__db_8cpp_a20f35196f5a2323f5770855d7a90ffdb}\index{test\_account\_query\_db.cpp@{test\_account\_query\_db.cpp}!find\_account\_name@{find\_account\_name}}
+\index{find\_account\_name@{find\_account\_name}!test\_account\_query\_db.cpp@{test\_account\_query\_db.cpp}}
+\doxysubsubsection{\texorpdfstring{find\_account\_name()}{find\_account\_name()}}
+{\footnotesize\ttfamily \label{test__account__query__db_8cpp_a20f35196f5a2323f5770855d7a90ffdb} 
+bool find\+\_\+account\+\_\+name (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{test__account__query__db_8cpp_a33f2983ff61d9343e424c440190d8610}{results}}}]{rst}{, }\item[{\mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}}}]{name}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__account__query__db_8cpp_source_l00023}{23}} of file \mbox{\hyperlink{test__account__query__db_8cpp_source}{test\+\_\+account\+\_\+query\+\_\+db.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00024\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ acc\ :\ rst.\mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__result_a987652cb712f4f8ca9e2d29f6716c243}{accounts}})\{}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (acc.account\_name\ ==\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}})\{}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00028\ \ \ \ \ \}}
+\DoxyCodeLine{00029\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00030\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__account__query__db_8cpp_a20f35196f5a2323f5770855d7a90ffdb_icgraph}
+\end{center}
+\end{figure}

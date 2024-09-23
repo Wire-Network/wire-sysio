@@ -1,0 +1,11 @@
+<map id="yh_com_disconnect" name="yh_com_disconnect">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,56,143,82"/>
+<area shape="rect" id="Node000002" href="$yubihsm_8c.html#a1a35f8ae5a739848408633a514e41b2d" title=" " alt="" coords="191,5,328,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="123,53,195,33,196,38,125,58"/>
+<area shape="rect" id="Node000003" href="$lib_2error_8c.html#a238eedb1e27dbff2a0ab9a3932eb3f8b" title=" " alt="" coords="376,56,459,82"/>
+<area shape="poly" id="edge5_Node000001_Node000003" title=" " alt="" coords="143,66,360,66,360,72,143,72"/>
+<area shape="rect" id="Node000004" href="$yubihsm_8c.html#ab12d5a42d2219741bd3630b99ed1c7d2" title=" " alt="" coords="207,107,312,132"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="125,80,196,100,195,105,123,85"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="303,29,362,48,360,53,301,34"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="301,104,360,84,362,89,303,109"/>
+</map>

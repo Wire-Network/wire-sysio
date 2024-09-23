@@ -1,0 +1,5 @@
+<map id="on_message" name="on_message">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,13,101,38"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1endpoint.html#a5341f59de7ef1a565a2fd93daba212d5" title="Create a message and add it to the outgoing send queue (exception free)" alt="" coords="149,5,304,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="101,23,133,23,133,28,101,28"/>
+</map>

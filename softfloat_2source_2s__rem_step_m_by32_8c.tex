@@ -1,0 +1,66 @@
+\doxysection{libraries/softfloat/source/s\+\_\+rem\+Step\+MBy32.c File Reference}
+\hypertarget{softfloat_2source_2s__rem_step_m_by32_8c}{}\label{softfloat_2source_2s__rem_step_m_by32_8c}\index{libraries/softfloat/source/s\_remStepMBy32.c@{libraries/softfloat/source/s\_remStepMBy32.c}}
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include "{}platform.\+h"{}}\newline
+{\ttfamily \#include "{}primitive\+Types.\+h"{}}\newline
+Include dependency graph for s\+\_\+rem\+Step\+MBy32.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=343pt]{softfloat_2source_2s__rem_step_m_by32_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{softfloat_2source_2s__rem_step_m_by32_8c_a2a49cf05a5a733c32a7bce421bc53ea0}{softfloat\+\_\+rem\+Step\+MBy32}} (\mbox{\hyperlink{stdint_8h_ad0fca8b15c218d2c687f8c373a71d228}{uint\+\_\+fast8\+\_\+t}} size\+\_\+words, const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*}rem\+Ptr, \mbox{\hyperlink{stdint_8h_ad0fca8b15c218d2c687f8c373a71d228}{uint\+\_\+fast8\+\_\+t}} dist, const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*}b\+Ptr, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} q, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*}z\+Ptr)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{softfloat_2source_2s__rem_step_m_by32_8c_a2a49cf05a5a733c32a7bce421bc53ea0}\index{s\_remStepMBy32.c@{s\_remStepMBy32.c}!softfloat\_remStepMBy32@{softfloat\_remStepMBy32}}
+\index{softfloat\_remStepMBy32@{softfloat\_remStepMBy32}!s\_remStepMBy32.c@{s\_remStepMBy32.c}}
+\doxysubsubsection{\texorpdfstring{softfloat\_remStepMBy32()}{softfloat\_remStepMBy32()}}
+{\footnotesize\ttfamily \label{softfloat_2source_2s__rem_step_m_by32_8c_a2a49cf05a5a733c32a7bce421bc53ea0} 
+void softfloat\+\_\+rem\+Step\+MBy32 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_ad0fca8b15c218d2c687f8c373a71d228}{uint\+\_\+fast8\+\_\+t}}}]{size\+\_\+words}{, }\item[{const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{rem\+Ptr}{, }\item[{\mbox{\hyperlink{stdint_8h_ad0fca8b15c218d2c687f8c373a71d228}{uint\+\_\+fast8\+\_\+t}}}]{dist}{, }\item[{const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{b\+Ptr}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{q}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{z\+Ptr}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2s__rem_step_m_by32_8c_source_l00044}{44}} of file \mbox{\hyperlink{softfloat_2source_2s__rem_step_m_by32_8c_source}{s\+\_\+rem\+Step\+MBy32.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00052\ \{}
+\DoxyCodeLine{00053\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ index,\ lastIndex;}
+\DoxyCodeLine{00054\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ dwordProd;}
+\DoxyCodeLine{00055\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ wordRem,\ wordShiftedRem,\ wordProd;}
+\DoxyCodeLine{00056\ \ \ \ \ \mbox{\hyperlink{stdint_8h_ad0fca8b15c218d2c687f8c373a71d228}{uint\_fast8\_t}}\ uNegDist,\ borrow;}
+\DoxyCodeLine{00057\ }
+\DoxyCodeLine{00058\ \ \ \ \ index\ =\ \mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a28a8ad1b8455a20d428c59cf01e36a66}{indexWordLo}}(\ size\_words\ );}
+\DoxyCodeLine{00059\ \ \ \ \ lastIndex\ =\ \mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_aa3af452dd34ad7a607f4ad31c234fda7}{indexWordHi}}(\ size\_words\ );}
+\DoxyCodeLine{00060\ \ \ \ \ dwordProd\ =\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})\ bPtr[index]\ *\ q;}
+\DoxyCodeLine{00061\ \ \ \ \ wordRem\ =\ remPtr[index];}
+\DoxyCodeLine{00062\ \ \ \ \ wordShiftedRem\ =\ wordRem<<dist;}
+\DoxyCodeLine{00063\ \ \ \ \ wordProd\ =\ dwordProd;}
+\DoxyCodeLine{00064\ \ \ \ \ zPtr[index]\ =\ wordShiftedRem\ -\/\ wordProd;}
+\DoxyCodeLine{00065\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ index\ !=\ lastIndex\ )\ \{}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ uNegDist\ =\ -\/dist;}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ borrow\ =\ (wordShiftedRem\ <\ wordProd);}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (;;)\ \{}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ wordShiftedRem\ =\ wordRem>>(uNegDist\ \&\ 31);}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \ \ \ index\ +=\ \mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a22ffd10aefa829eef57da03cff970e45}{wordIncr}};}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \ \ \ dwordProd\ =\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})\ bPtr[index]\ *\ q\ +\ (dwordProd>>32);}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ \ \ \ wordRem\ =\ remPtr[index];}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \ \ \ wordShiftedRem\ |=\ wordRem<<dist;}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \ \ \ wordProd\ =\ dwordProd;}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \ \ \ zPtr[index]\ =\ wordShiftedRem\ -\/\ wordProd\ -\/\ borrow;}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ index\ ==\ lastIndex\ )\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ \ \ \ borrow\ =}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ borrow\ ?\ (wordShiftedRem\ <=\ wordProd)}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ (wordShiftedRem\ <\ wordProd);}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00081\ \ \ \ \ \}}
+\DoxyCodeLine{00082\ }
+\DoxyCodeLine{00083\ \}}
+
+\end{DoxyCode}

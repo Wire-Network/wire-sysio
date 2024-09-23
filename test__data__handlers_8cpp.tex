@@ -1,0 +1,439 @@
+\doxysection{plugins/trace\+\_\+api\+\_\+plugin/test/test\+\_\+data\+\_\+handlers.cpp File Reference}
+\hypertarget{test__data__handlers_8cpp}{}\label{test__data__handlers_8cpp}\index{plugins/trace\_api\_plugin/test/test\_data\_handlers.cpp@{plugins/trace\_api\_plugin/test/test\_data\_handlers.cpp}}
+{\ttfamily \#include $<$boost/test/included/unit\+\_\+test.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/trace\+\_\+api/abi\+\_\+data\+\_\+handler.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/trace\+\_\+api/test\+\_\+common.\+hpp$>$}\newline
+Include dependency graph for test\+\_\+data\+\_\+handlers.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__data__handlers_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{test__data__handlers_8cpp_a6b2a3852db8bb19ab6909bac01859985}{BOOST\+\_\+\+TEST\+\_\+\+MODULE}}~trace\+\_\+data\+\_\+handlers
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{test__data__handlers_8cpp_ae215bc7436d5f76b4aaee6c090738624}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (empty\+\_\+data)
+\item 
+\mbox{\hyperlink{test__data__handlers_8cpp_a06ee24d054e78572189c580d817583b8}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (empty\+\_\+data\+\_\+v1)
+\item 
+\mbox{\hyperlink{test__data__handlers_8cpp_ab40b60bc2739d05fb2a92213ead9dd54}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (no\+\_\+abi)
+\item 
+\mbox{\hyperlink{test__data__handlers_8cpp_ab71df31f5142b5e1055952fc983e3297}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (no\+\_\+abi\+\_\+v1)
+\item 
+\mbox{\hyperlink{test__data__handlers_8cpp_abd47ff12e6f2289c9b8ddf4c1c790b8e}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (basic\+\_\+abi)
+\item 
+\mbox{\hyperlink{test__data__handlers_8cpp_a00ebbeb7a71f2a352599ab3333a383a7}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (basic\+\_\+abi\+\_\+v1)
+\item 
+\mbox{\hyperlink{test__data__handlers_8cpp_ac2c9f0bed87f4ecf8962e4512062c89f}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (basic\+\_\+abi\+\_\+wrong\+\_\+type)
+\item 
+\mbox{\hyperlink{test__data__handlers_8cpp_a6eeb192e4f8d76f4997f44466b61c594}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (basic\+\_\+abi\+\_\+wrong\+\_\+type\+\_\+v1)
+\item 
+\mbox{\hyperlink{test__data__handlers_8cpp_a6622a9063405241e2759f0664d401200}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (basic\+\_\+abi\+\_\+insufficient\+\_\+data)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{test__data__handlers_8cpp_a6b2a3852db8bb19ab6909bac01859985}\index{test\_data\_handlers.cpp@{test\_data\_handlers.cpp}!BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}}
+\index{BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}!test\_data\_handlers.cpp@{test\_data\_handlers.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_TEST\_MODULE}{BOOST\_TEST\_MODULE}}
+{\footnotesize\ttfamily \label{test__data__handlers_8cpp_a6b2a3852db8bb19ab6909bac01859985} 
+\#define BOOST\+\_\+\+TEST\+\_\+\+MODULE~trace\+\_\+data\+\_\+handlers}
+
+
+
+Definition at line \mbox{\hyperlink{test__data__handlers_8cpp_source_l00001}{1}} of file \mbox{\hyperlink{test__data__handlers_8cpp_source}{test\+\_\+data\+\_\+handlers.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{test__data__handlers_8cpp_abd47ff12e6f2289c9b8ddf4c1c790b8e}\index{test\_data\_handlers.cpp@{test\_data\_handlers.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!test\_data\_handlers.cpp@{test\_data\_handlers.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/9]}}
+{\footnotesize\ttfamily \label{test__data__handlers_8cpp_abd47ff12e6f2289c9b8ddf4c1c790b8e} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{basic\+\_\+abi}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__data__handlers_8cpp_source_l00071}{71}} of file \mbox{\hyperlink{test__data__handlers_8cpp_source}{test\+\_\+data\+\_\+handlers.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00072\ \ \ \ \{}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structsysio_1_1chain_1_1action}{action}}\ =\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1action__trace__v0}{action\_trace\_v0}}\ \{}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \ \ \ 0,\ \textcolor{stringliteral}{"{}alice"{}}\_n,\ \textcolor{stringliteral}{"{}alice"{}}\_n,\ \textcolor{stringliteral}{"{}foo"{}}\_n,\ \{\},\ \{0x00,\ 0x01,\ 0x02,\ 0x03\}}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00076\ }
+\DoxyCodeLine{00077\ \ \ \ \ \ \ std::variant<action\_trace\_v0,\ action\_trace\_v1>\ action\_trace\_t\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1action}{action}};}
+\DoxyCodeLine{00078\ }
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ abi\ =\ chain::abi\_def\ (\ \{\},}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \ \ \ \{\ \textcolor{stringliteral}{"{}foo"{}},\ \textcolor{stringliteral}{"{}"{}},\ \{\ \{\textcolor{stringliteral}{"{}a"{}},\ \textcolor{stringliteral}{"{}varuint32"{}}\},\ \{\textcolor{stringliteral}{"{}b"{}},\ \textcolor{stringliteral}{"{}varuint32"{}}\},\ \{\textcolor{stringliteral}{"{}c"{}},\ \textcolor{stringliteral}{"{}varuint32"{}}\},\ \{\textcolor{stringliteral}{"{}d"{}},\ \textcolor{stringliteral}{"{}varuint32"{}}\}\ \}\ \}}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \ \ \ \{\ \textcolor{stringliteral}{"{}foo"{}}\_n,\ \textcolor{stringliteral}{"{}foo"{}},\ \textcolor{stringliteral}{"{}"{}}\}}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \ \{\},\ \{\},\ \{\}}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ );}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ abi.version\ =\ \textcolor{stringliteral}{"{}sysio::abi/1."{}};}
+\DoxyCodeLine{00089\ }
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1trace__api_1_1abi__data__handler}{abi\_data\_handler}}\ handler(\mbox{\hyperlink{classfc_1_1optional__delegate}{exception\_handler}}\{\});}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ handler.\mbox{\hyperlink{classsysio_1_1trace__api_1_1abi__data__handler_a45fdfd7e086c2f51e3d1da63c4c5ef36}{add\_abi}}(\textcolor{stringliteral}{"{}alice"{}}\_n,\ abi);}
+\DoxyCodeLine{00092\ }
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}\ expected\ =\ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}()}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}a"{}},\ 0)}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}b"{}},\ 1)}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}c"{}},\ 2)}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}d"{}},\ 3);}
+\DoxyCodeLine{00098\ }
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ actual\ =\ handler.serialize\_to\_variant(action\_trace\_t,\ []()\{\});}
+\DoxyCodeLine{00100\ }
+\DoxyCodeLine{00101\ \ \ \ \ \ \ BOOST\_TEST(\mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a4684ce5b6bc8f5dd33e6a850719bfd4e}{to\_kv}}(expected)\ ==\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a4684ce5b6bc8f5dd33e6a850719bfd4e}{to\_kv}}(std::get<0>(actual)),\ boost::test\_tools::per\_element());}
+\DoxyCodeLine{00102\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__data__handlers_8cpp_abd47ff12e6f2289c9b8ddf4c1c790b8e_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__data__handlers_8cpp_a6622a9063405241e2759f0664d401200}\index{test\_data\_handlers.cpp@{test\_data\_handlers.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!test\_data\_handlers.cpp@{test\_data\_handlers.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/9]}}
+{\footnotesize\ttfamily \label{test__data__handlers_8cpp_a6622a9063405241e2759f0664d401200} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{basic\+\_\+abi\+\_\+insufficient\+\_\+data}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__data__handlers_8cpp_source_l00196}{196}} of file \mbox{\hyperlink{test__data__handlers_8cpp_source}{test\+\_\+data\+\_\+handlers.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00197\ \ \ \ \{}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structsysio_1_1chain_1_1action}{action}}\ =\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1action__trace__v0}{action\_trace\_v0}}\ \{}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ \ \ \ \ 0,\ \textcolor{stringliteral}{"{}alice"{}}\_n,\ \textcolor{stringliteral}{"{}alice"{}}\_n,\ \textcolor{stringliteral}{"{}foo"{}}\_n,\ \{\},\ \{0x00,\ 0x01,\ 0x02\}}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00201\ }
+\DoxyCodeLine{00202\ \ \ \ \ \ \ std::variant<action\_trace\_v0,\ action\_trace\_v1>\ action\_trace\_t\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1action}{action}};}
+\DoxyCodeLine{00203\ }
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ abi\ =\ chain::abi\_def\ (\ \{\},}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ \ \ \ \ \{\ \textcolor{stringliteral}{"{}foo"{}},\ \textcolor{stringliteral}{"{}"{}},\ \{\ \{\textcolor{stringliteral}{"{}a"{}},\ \textcolor{stringliteral}{"{}varuint32"{}}\},\ \{\textcolor{stringliteral}{"{}b"{}},\ \textcolor{stringliteral}{"{}varuint32"{}}\},\ \{\textcolor{stringliteral}{"{}c"{}},\ \textcolor{stringliteral}{"{}varuint32"{}}\},\ \{\textcolor{stringliteral}{"{}d"{}},\ \textcolor{stringliteral}{"{}varuint32"{}}\}\ \}\ \}}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \ \ \ \ \ \ \{\ \textcolor{stringliteral}{"{}foo"{}}\_n,\ \textcolor{stringliteral}{"{}foo"{}},\ \textcolor{stringliteral}{"{}"{}}\}}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \ \ \ \{\},\ \{\},\ \{\}}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ );}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ abi.version\ =\ \textcolor{stringliteral}{"{}sysio::abi/1."{}};}
+\DoxyCodeLine{00214\ }
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ log\_called\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1trace__api_1_1abi__data__handler}{abi\_data\_handler}}\ handler([\&log\_called](\textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1trace__api_a13234b2d8223402a236dd90c01bedcfb}{exception\_with\_context}}\&\ )\{log\_called\ =\ \textcolor{keyword}{true};\});}
+\DoxyCodeLine{00217\ \ \ \ \ \ \ handler.\mbox{\hyperlink{classsysio_1_1trace__api_1_1abi__data__handler_a45fdfd7e086c2f51e3d1da63c4c5ef36}{add\_abi}}(\textcolor{stringliteral}{"{}alice"{}}\_n,\ abi);}
+\DoxyCodeLine{00218\ }
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ expected\ =\ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}();}
+\DoxyCodeLine{00220\ }
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ actual\ =\ handler.serialize\_to\_variant(action\_trace\_t,\ []()\{\});}
+\DoxyCodeLine{00222\ }
+\DoxyCodeLine{00223\ \ \ \ \ \ \ BOOST\_TEST(\mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a4684ce5b6bc8f5dd33e6a850719bfd4e}{to\_kv}}(expected)\ ==\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a4684ce5b6bc8f5dd33e6a850719bfd4e}{to\_kv}}(std::get<0>(actual)),\ boost::test\_tools::per\_element());}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ BOOST\_TEST(log\_called);}
+\DoxyCodeLine{00225\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__data__handlers_8cpp_a6622a9063405241e2759f0664d401200_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__data__handlers_8cpp_a00ebbeb7a71f2a352599ab3333a383a7}\index{test\_data\_handlers.cpp@{test\_data\_handlers.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!test\_data\_handlers.cpp@{test\_data\_handlers.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [3/9]}}
+{\footnotesize\ttfamily \label{test__data__handlers_8cpp_a00ebbeb7a71f2a352599ab3333a383a7} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{basic\+\_\+abi\+\_\+v1}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__data__handlers_8cpp_source_l00104}{104}} of file \mbox{\hyperlink{test__data__handlers_8cpp_source}{test\+\_\+data\+\_\+handlers.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00105\ \ \ \ \{}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structsysio_1_1chain_1_1action}{action}}\ =\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1action__trace__v1}{action\_trace\_v1}}\ \{}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \ \{\ 0,\ \textcolor{stringliteral}{"{}alice"{}}\_n,\ \textcolor{stringliteral}{"{}alice"{}}\_n,\ \textcolor{stringliteral}{"{}foo"{}}\_n,\ \{\},\ \{0x00,\ 0x01,\ 0x02,\ 0x03\}\},}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \ \{0x04,\ 0x05,\ 0x06,\ 0x07\}}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00110\ }
+\DoxyCodeLine{00111\ \ \ \ \ \ \ std::variant<action\_trace\_v0,\ action\_trace\_v1>\ action\_trace\_t\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1action}{action}};}
+\DoxyCodeLine{00112\ }
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ abi\ =\ chain::abi\_def\ (\ \{\},}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \ \ \ \{\ \textcolor{stringliteral}{"{}foo"{}},\ \textcolor{stringliteral}{"{}"{}},\ \{\ \{\textcolor{stringliteral}{"{}a"{}},\ \textcolor{stringliteral}{"{}varuint32"{}}\},\ \{\textcolor{stringliteral}{"{}b"{}},\ \textcolor{stringliteral}{"{}varuint32"{}}\},\ \{\textcolor{stringliteral}{"{}c"{}},\ \textcolor{stringliteral}{"{}varuint32"{}}\},\ \{\textcolor{stringliteral}{"{}d"{}},\ \textcolor{stringliteral}{"{}varuint32"{}}\}\ \}\ \}}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ \{\ \textcolor{stringliteral}{"{}foo"{}}\_n,\ \textcolor{stringliteral}{"{}foo"{}},\ \textcolor{stringliteral}{"{}"{}}\}}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ \{\},\ \{\},\ \{\}}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ );}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ abi.version\ =\ \textcolor{stringliteral}{"{}sysio::abi/1."{}};}
+\DoxyCodeLine{00123\ }
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1trace__api_1_1abi__data__handler}{abi\_data\_handler}}\ handler(\mbox{\hyperlink{classfc_1_1optional__delegate}{exception\_handler}}\{\});}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ handler.\mbox{\hyperlink{classsysio_1_1trace__api_1_1abi__data__handler_a45fdfd7e086c2f51e3d1da63c4c5ef36}{add\_abi}}(\textcolor{stringliteral}{"{}alice"{}}\_n,\ abi);}
+\DoxyCodeLine{00126\ }
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}\ expected\ =\ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}()}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}a"{}},\ 0)}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}b"{}},\ 1)}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}c"{}},\ 2)}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}d"{}},\ 3);}
+\DoxyCodeLine{00132\ }
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ actual\ =\ handler.serialize\_to\_variant(action\_trace\_t,\ []()\{\});}
+\DoxyCodeLine{00134\ }
+\DoxyCodeLine{00135\ \ \ \ \ \ \ BOOST\_TEST(\mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a4684ce5b6bc8f5dd33e6a850719bfd4e}{to\_kv}}(expected)\ ==\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a4684ce5b6bc8f5dd33e6a850719bfd4e}{to\_kv}}(std::get<0>(actual)),\ boost::test\_tools::per\_element());}
+\DoxyCodeLine{00136\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__data__handlers_8cpp_a00ebbeb7a71f2a352599ab3333a383a7_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__data__handlers_8cpp_ac2c9f0bed87f4ecf8962e4512062c89f}\index{test\_data\_handlers.cpp@{test\_data\_handlers.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!test\_data\_handlers.cpp@{test\_data\_handlers.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [4/9]}}
+{\footnotesize\ttfamily \label{test__data__handlers_8cpp_ac2c9f0bed87f4ecf8962e4512062c89f} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{basic\+\_\+abi\+\_\+wrong\+\_\+type}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__data__handlers_8cpp_source_l00138}{138}} of file \mbox{\hyperlink{test__data__handlers_8cpp_source}{test\+\_\+data\+\_\+handlers.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00139\ \ \ \ \{}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structsysio_1_1chain_1_1action}{action}}\ =\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1action__trace__v0}{action\_trace\_v0}}\ \{}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \ \ \ \ 0,\ \textcolor{stringliteral}{"{}alice"{}}\_n,\ \textcolor{stringliteral}{"{}alice"{}}\_n,\ \textcolor{stringliteral}{"{}foo"{}}\_n,\ \{\},\ \{0x00,\ 0x01,\ 0x02,\ 0x03\}}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00143\ }
+\DoxyCodeLine{00144\ \ \ \ \ \ \ std::variant<action\_trace\_v0,\ action\_trace\_v1>\ action\_trace\_t\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1action}{action}};}
+\DoxyCodeLine{00145\ }
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ abi\ =\ chain::abi\_def\ (\ \{\},}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \ \ \ \ \{\ \textcolor{stringliteral}{"{}foo"{}},\ \textcolor{stringliteral}{"{}"{}},\ \{\ \{\textcolor{stringliteral}{"{}a"{}},\ \textcolor{stringliteral}{"{}varuint32"{}}\},\ \{\textcolor{stringliteral}{"{}b"{}},\ \textcolor{stringliteral}{"{}varuint32"{}}\},\ \{\textcolor{stringliteral}{"{}c"{}},\ \textcolor{stringliteral}{"{}varuint32"{}}\},\ \{\textcolor{stringliteral}{"{}d"{}},\ \textcolor{stringliteral}{"{}varuint32"{}}\}\ \}\ \}}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ \ \ \ \ \{\ \textcolor{stringliteral}{"{}bar"{}}\_n,\ \textcolor{stringliteral}{"{}foo"{}},\ \textcolor{stringliteral}{"{}"{}}\}}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \ \{\},\ \{\},\ \{\}}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ );}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ abi.version\ =\ \textcolor{stringliteral}{"{}sysio::abi/1."{}};}
+\DoxyCodeLine{00156\ }
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1trace__api_1_1abi__data__handler}{abi\_data\_handler}}\ handler(\mbox{\hyperlink{classfc_1_1optional__delegate}{exception\_handler}}\{\});}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ handler.\mbox{\hyperlink{classsysio_1_1trace__api_1_1abi__data__handler_a45fdfd7e086c2f51e3d1da63c4c5ef36}{add\_abi}}(\textcolor{stringliteral}{"{}alice"{}}\_n,\ abi);}
+\DoxyCodeLine{00159\ }
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ expected\ =\ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}();}
+\DoxyCodeLine{00161\ }
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ actual\ =\ handler.serialize\_to\_variant(action\_trace\_t,\ []()\{\});}
+\DoxyCodeLine{00163\ }
+\DoxyCodeLine{00164\ \ \ \ \ \ \ BOOST\_TEST(\mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a4684ce5b6bc8f5dd33e6a850719bfd4e}{to\_kv}}(expected)\ ==\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a4684ce5b6bc8f5dd33e6a850719bfd4e}{to\_kv}}(std::get<0>(actual)),\ boost::test\_tools::per\_element());}
+\DoxyCodeLine{00165\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__data__handlers_8cpp_ac2c9f0bed87f4ecf8962e4512062c89f_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__data__handlers_8cpp_a6eeb192e4f8d76f4997f44466b61c594}\index{test\_data\_handlers.cpp@{test\_data\_handlers.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!test\_data\_handlers.cpp@{test\_data\_handlers.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [5/9]}}
+{\footnotesize\ttfamily \label{test__data__handlers_8cpp_a6eeb192e4f8d76f4997f44466b61c594} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{basic\+\_\+abi\+\_\+wrong\+\_\+type\+\_\+v1}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__data__handlers_8cpp_source_l00167}{167}} of file \mbox{\hyperlink{test__data__handlers_8cpp_source}{test\+\_\+data\+\_\+handlers.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00168\ \ \ \ \{}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structsysio_1_1chain_1_1action}{action}}\ =\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1action__trace__v1}{action\_trace\_v1}}\ \{}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \ \{\ 0,\ \textcolor{stringliteral}{"{}alice"{}}\_n,\ \textcolor{stringliteral}{"{}alice"{}}\_n,\ \textcolor{stringliteral}{"{}foo"{}}\_n,\ \{\},\ \{0x00,\ 0x01,\ 0x02,\ 0x03\}\},}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \ \{0x04,\ 0x05,\ 0x06,\ 0x07\}}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ std::variant<action\_trace\_v0,\ action\_trace\_v1>\ action\_trace\_t\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1action}{action}};}
+\DoxyCodeLine{00174\ }
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ abi\ =\ chain::abi\_def\ (\ \{\},}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \ \ \ \ \{\ \textcolor{stringliteral}{"{}foo"{}},\ \textcolor{stringliteral}{"{}"{}},\ \{\ \{\textcolor{stringliteral}{"{}a"{}},\ \textcolor{stringliteral}{"{}varuint32"{}}\},\ \{\textcolor{stringliteral}{"{}b"{}},\ \textcolor{stringliteral}{"{}varuint32"{}}\},\ \{\textcolor{stringliteral}{"{}c"{}},\ \textcolor{stringliteral}{"{}varuint32"{}}\},\ \{\textcolor{stringliteral}{"{}d"{}},\ \textcolor{stringliteral}{"{}varuint32"{}}\}\ \}\ \}}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \ \ \ \ \{\ \textcolor{stringliteral}{"{}bar"{}}\_n,\ \textcolor{stringliteral}{"{}foo"{}},\ \textcolor{stringliteral}{"{}"{}}\}}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \ \{\},\ \{\},\ \{\}}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ );}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ abi.version\ =\ \textcolor{stringliteral}{"{}sysio::abi/1."{}};}
+\DoxyCodeLine{00185\ }
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1trace__api_1_1abi__data__handler}{abi\_data\_handler}}\ handler(\mbox{\hyperlink{classfc_1_1optional__delegate}{exception\_handler}}\{\});}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ handler.\mbox{\hyperlink{classsysio_1_1trace__api_1_1abi__data__handler_a45fdfd7e086c2f51e3d1da63c4c5ef36}{add\_abi}}(\textcolor{stringliteral}{"{}alice"{}}\_n,\ abi);}
+\DoxyCodeLine{00188\ }
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ expected\ =\ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}();}
+\DoxyCodeLine{00190\ }
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ actual\ =\ handler.serialize\_to\_variant(action\_trace\_t,\ []()\{\});}
+\DoxyCodeLine{00192\ }
+\DoxyCodeLine{00193\ \ \ \ \ \ \ BOOST\_TEST(\mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a4684ce5b6bc8f5dd33e6a850719bfd4e}{to\_kv}}(expected)\ ==\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a4684ce5b6bc8f5dd33e6a850719bfd4e}{to\_kv}}(std::get<0>(actual)),\ boost::test\_tools::per\_element());}
+\DoxyCodeLine{00194\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__data__handlers_8cpp_a6eeb192e4f8d76f4997f44466b61c594_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__data__handlers_8cpp_ae215bc7436d5f76b4aaee6c090738624}\index{test\_data\_handlers.cpp@{test\_data\_handlers.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!test\_data\_handlers.cpp@{test\_data\_handlers.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [6/9]}}
+{\footnotesize\ttfamily \label{test__data__handlers_8cpp_ae215bc7436d5f76b4aaee6c090738624} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{empty\+\_\+data}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__data__handlers_8cpp_source_l00013}{13}} of file \mbox{\hyperlink{test__data__handlers_8cpp_source}{test\+\_\+data\+\_\+handlers.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00014\ \ \ \ \{}
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structsysio_1_1chain_1_1action}{action}}\ =\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1action__trace__v0}{action\_trace\_v0}}\ \{}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \ \ \ 0,\ \textcolor{stringliteral}{"{}alice"{}}\_n,\ \textcolor{stringliteral}{"{}alice"{}}\_n,\ \textcolor{stringliteral}{"{}foo"{}}\_n,\ \{\},\ \{\}}
+\DoxyCodeLine{00017\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ std::variant<action\_trace\_v0,\ action\_trace\_v1>\ action\_trace\_t\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1action}{action}};}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1trace__api_1_1abi__data__handler}{abi\_data\_handler}}\ handler(\mbox{\hyperlink{classfc_1_1optional__delegate}{exception\_handler}}\{\});}
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ expected\ =\ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}();}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ actual\ =\ handler.serialize\_to\_variant(action\_trace\_t,\ []()\{\});}
+\DoxyCodeLine{00023\ }
+\DoxyCodeLine{00024\ \ \ \ \ \ \ BOOST\_TEST(\mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a4684ce5b6bc8f5dd33e6a850719bfd4e}{to\_kv}}(expected)\ ==\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a4684ce5b6bc8f5dd33e6a850719bfd4e}{to\_kv}}(std::get<0>(actual)),\ boost::test\_tools::per\_element());}
+\DoxyCodeLine{00025\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__data__handlers_8cpp_ae215bc7436d5f76b4aaee6c090738624_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__data__handlers_8cpp_a06ee24d054e78572189c580d817583b8}\index{test\_data\_handlers.cpp@{test\_data\_handlers.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!test\_data\_handlers.cpp@{test\_data\_handlers.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [7/9]}}
+{\footnotesize\ttfamily \label{test__data__handlers_8cpp_a06ee24d054e78572189c580d817583b8} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{empty\+\_\+data\+\_\+v1}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__data__handlers_8cpp_source_l00027}{27}} of file \mbox{\hyperlink{test__data__handlers_8cpp_source}{test\+\_\+data\+\_\+handlers.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00028\ \ \ \ \{}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structsysio_1_1chain_1_1action}{action}}\ =\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1action__trace__v1}{action\_trace\_v1}}\ \{}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ \{0,\ \textcolor{stringliteral}{"{}alice"{}}\_n,\ \textcolor{stringliteral}{"{}alice"{}}\_n,\ \textcolor{stringliteral}{"{}foo"{}}\_n,\ \{\},\ \{\}\},}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \{\}}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ std::variant<action\_trace\_v0,\ action\_trace\_v1>\ action\_trace\_t\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1action}{action}};}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1trace__api_1_1abi__data__handler}{abi\_data\_handler}}\ handler(\mbox{\hyperlink{classfc_1_1optional__delegate}{exception\_handler}}\{\});}
+\DoxyCodeLine{00035\ }
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ expected\ =\ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}();}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ actual\ =\ handler.serialize\_to\_variant(action\_trace\_t,\ []()\{\});}
+\DoxyCodeLine{00038\ }
+\DoxyCodeLine{00039\ \ \ \ \ \ \ BOOST\_TEST(\mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a4684ce5b6bc8f5dd33e6a850719bfd4e}{to\_kv}}(expected)\ ==\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a4684ce5b6bc8f5dd33e6a850719bfd4e}{to\_kv}}(std::get<0>(actual)),\ boost::test\_tools::per\_element());}
+\DoxyCodeLine{00040\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__data__handlers_8cpp_a06ee24d054e78572189c580d817583b8_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__data__handlers_8cpp_ab40b60bc2739d05fb2a92213ead9dd54}\index{test\_data\_handlers.cpp@{test\_data\_handlers.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!test\_data\_handlers.cpp@{test\_data\_handlers.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [8/9]}}
+{\footnotesize\ttfamily \label{test__data__handlers_8cpp_ab40b60bc2739d05fb2a92213ead9dd54} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{no\+\_\+abi}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__data__handlers_8cpp_source_l00042}{42}} of file \mbox{\hyperlink{test__data__handlers_8cpp_source}{test\+\_\+data\+\_\+handlers.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00043\ \ \ \ \{}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structsysio_1_1chain_1_1action}{action}}\ =\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1action__trace__v0}{action\_trace\_v0}}\ \{}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ 0,\ \textcolor{stringliteral}{"{}alice"{}}\_n,\ \textcolor{stringliteral}{"{}alice"{}}\_n,\ \textcolor{stringliteral}{"{}foo"{}}\_n,\ \{\},\ \{0x00,\ 0x01,\ 0x02,\ 0x03\}}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ std::variant<action\_trace\_v0,\ action\_trace\_v1>\ action\_trace\_t\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1action}{action}};}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1trace__api_1_1abi__data__handler}{abi\_data\_handler}}\ handler(\mbox{\hyperlink{classfc_1_1optional__delegate}{exception\_handler}}\{\});}
+\DoxyCodeLine{00049\ }
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ expected\ =\ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}();}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ actual\ =\ handler.serialize\_to\_variant(action\_trace\_t,\ []()\{\});}
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ \ \ \ \ \ \ BOOST\_TEST(\mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a4684ce5b6bc8f5dd33e6a850719bfd4e}{to\_kv}}(expected)\ ==\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a4684ce5b6bc8f5dd33e6a850719bfd4e}{to\_kv}}(std::get<0>(actual)),\ boost::test\_tools::per\_element());}
+\DoxyCodeLine{00054\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__data__handlers_8cpp_ab40b60bc2739d05fb2a92213ead9dd54_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__data__handlers_8cpp_ab71df31f5142b5e1055952fc983e3297}\index{test\_data\_handlers.cpp@{test\_data\_handlers.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!test\_data\_handlers.cpp@{test\_data\_handlers.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [9/9]}}
+{\footnotesize\ttfamily \label{test__data__handlers_8cpp_ab71df31f5142b5e1055952fc983e3297} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{no\+\_\+abi\+\_\+v1}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__data__handlers_8cpp_source_l00056}{56}} of file \mbox{\hyperlink{test__data__handlers_8cpp_source}{test\+\_\+data\+\_\+handlers.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00057\ \ \ \ \{}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structsysio_1_1chain_1_1action}{action}}\ =\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1action__trace__v1}{action\_trace\_v1}}\ \{}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ \{\ 0,\ \textcolor{stringliteral}{"{}alice"{}}\_n,\ \textcolor{stringliteral}{"{}alice"{}}\_n,\ \textcolor{stringliteral}{"{}foo"{}}\_n,\ \{\},\ \{0x00,\ 0x01,\ 0x02,\ 0x03\}\},}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \ \{0x04,\ 0x05,\ 0x06,\ 0x07\}}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ std::variant<action\_trace\_v0,\ action\_trace\_v1>\ action\_trace\_t\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1action}{action}};}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1trace__api_1_1abi__data__handler}{abi\_data\_handler}}\ handler(\mbox{\hyperlink{classfc_1_1optional__delegate}{exception\_handler}}\{\});}
+\DoxyCodeLine{00064\ }
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ expected\ =\ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}();}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ actual\ =\ handler.serialize\_to\_variant(action\_trace\_t,\ []()\{\});}
+\DoxyCodeLine{00067\ }
+\DoxyCodeLine{00068\ \ \ \ \ \ \ BOOST\_TEST(\mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a4684ce5b6bc8f5dd33e6a850719bfd4e}{to\_kv}}(expected)\ ==\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a4684ce5b6bc8f5dd33e6a850719bfd4e}{to\_kv}}(std::get<0>(actual)),\ boost::test\_tools::per\_element());}
+\DoxyCodeLine{00069\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__data__handlers_8cpp_ab71df31f5142b5e1055952fc983e3297_cgraph}
+\end{center}
+\end{figure}

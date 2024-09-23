@@ -1,0 +1,46 @@
+\doxysection{sys-\/vm-\/oc.h}
+\hypertarget{sys-vm-oc_8h_source}{}\label{sys-vm-oc_8h_source}\index{libraries/chain/include/sysio/chain/webassembly/sys-\/vm-\/oc/sys-\/vm-\/oc.h@{libraries/chain/include/sysio/chain/webassembly/sys-\/vm-\/oc/sys-\/vm-\/oc.h}}
+\mbox{\hyperlink{sys-vm-oc_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{sys-vm-oc_8h_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{sys-vm-oc_8h_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{sys-vm-oc_8h_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <setjmp.h>}}
+\DoxyCodeLine{\Hypertarget{sys-vm-oc_8h_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{stdint_8h}{stdint.h}}>}}
+\DoxyCodeLine{\Hypertarget{sys-vm-oc_8h_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <stdlib.h>}}
+\DoxyCodeLine{\Hypertarget{sys-vm-oc_8h_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{sys-vm-oc_8h_source_l00007}00007\ \textcolor{preprocessor}{\#ifdef\ \_\_cplusplus}}
+\DoxyCodeLine{\Hypertarget{sys-vm-oc_8h_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{\Hypertarget{sys-vm-oc_8h_source_l00009}00009\ \textcolor{preprocessor}{\#include\ <list>}}
+\DoxyCodeLine{\Hypertarget{sys-vm-oc_8h_source_l00010}00010\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{\ \textcolor{keyword}{namespace\ }chain\ \{\textcolor{keyword}{class\ }apply\_context;\}\}}
+\DoxyCodeLine{\Hypertarget{sys-vm-oc_8h_source_l00011}00011\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{sys-vm-oc_8h_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{sys-vm-oc_8h_source_l00013}\mbox{\hyperlink{structeos__vm__oc__control__block}{00013}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structeos__vm__oc__control__block}{eos\_vm\_oc\_control\_block}}\ \{}
+\DoxyCodeLine{\Hypertarget{sys-vm-oc_8h_source_l00014}\mbox{\hyperlink{structeos__vm__oc__control__block_acd9fce98948c290e0b88017d6f15a0ab}{00014}}\ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{structeos__vm__oc__control__block_acd9fce98948c290e0b88017d6f15a0ab}{magic}};}
+\DoxyCodeLine{\Hypertarget{sys-vm-oc_8h_source_l00015}\mbox{\hyperlink{structeos__vm__oc__control__block_aceb205c5f0c57e2d12b8d16a3bae0b4e}{00015}}\ \ \ \ \mbox{\hyperlink{stdint_8h_a31b85deecb45924320becd11d3ee16ce}{uintptr\_t}}\ \mbox{\hyperlink{structeos__vm__oc__control__block_aceb205c5f0c57e2d12b8d16a3bae0b4e}{execution\_thread\_code\_start}};}
+\DoxyCodeLine{\Hypertarget{sys-vm-oc_8h_source_l00016}\mbox{\hyperlink{structeos__vm__oc__control__block_a807efe7a81e83608facea7e7c1f70425}{00016}}\ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{structeos__vm__oc__control__block_a807efe7a81e83608facea7e7c1f70425}{execution\_thread\_code\_length}};}
+\DoxyCodeLine{\Hypertarget{sys-vm-oc_8h_source_l00017}\mbox{\hyperlink{structeos__vm__oc__control__block_ad269fcf99370e38a0424a64f547d5ad4}{00017}}\ \ \ \ \mbox{\hyperlink{stdint_8h_a31b85deecb45924320becd11d3ee16ce}{uintptr\_t}}\ \mbox{\hyperlink{structeos__vm__oc__control__block_ad269fcf99370e38a0424a64f547d5ad4}{execution\_thread\_memory\_start}};}
+\DoxyCodeLine{\Hypertarget{sys-vm-oc_8h_source_l00018}\mbox{\hyperlink{structeos__vm__oc__control__block_abf60f0e62f0df858df50e6410b0285be}{00018}}\ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{structeos__vm__oc__control__block_abf60f0e62f0df858df50e6410b0285be}{execution\_thread\_memory\_length}};}
+\DoxyCodeLine{\Hypertarget{sys-vm-oc_8h_source_l00019}00019\ \textcolor{preprocessor}{\#ifdef\ \_\_cplusplus}}
+\DoxyCodeLine{\Hypertarget{sys-vm-oc_8h_source_l00020}00020\ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context}{sysio::chain::apply\_context}}*\ \mbox{\hyperlink{structeos__vm__oc__control__block_a7842fb9d406e3a5b74eb3f9c6af0d35a}{ctx}};}
+\DoxyCodeLine{\Hypertarget{sys-vm-oc_8h_source_l00021}00021\ \ \ \ std::exception\_ptr*\ \mbox{\hyperlink{structeos__vm__oc__control__block_afc005114a2729c0df9a7a1dc4cbf1f5c}{eptr}};}
+\DoxyCodeLine{\Hypertarget{sys-vm-oc_8h_source_l00022}00022\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{sys-vm-oc_8h_source_l00023}\mbox{\hyperlink{structeos__vm__oc__control__block_a7842fb9d406e3a5b74eb3f9c6af0d35a}{00023}}\ \ \ \ \textcolor{keywordtype}{void}*\ \mbox{\hyperlink{structeos__vm__oc__control__block_a7842fb9d406e3a5b74eb3f9c6af0d35a}{ctx}};}
+\DoxyCodeLine{\Hypertarget{sys-vm-oc_8h_source_l00024}\mbox{\hyperlink{structeos__vm__oc__control__block_afc005114a2729c0df9a7a1dc4cbf1f5c}{00024}}\ \ \ \ \textcolor{keywordtype}{void}*\ \mbox{\hyperlink{structeos__vm__oc__control__block_afc005114a2729c0df9a7a1dc4cbf1f5c}{eptr}};}
+\DoxyCodeLine{\Hypertarget{sys-vm-oc_8h_source_l00025}00025\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{sys-vm-oc_8h_source_l00026}\mbox{\hyperlink{structeos__vm__oc__control__block_a618ee96b691c413d9f542250b325520d}{00026}}\ \ \ \ \textcolor{keywordtype}{unsigned}\ \mbox{\hyperlink{structeos__vm__oc__control__block_a618ee96b691c413d9f542250b325520d}{current\_call\_depth\_remaining}};}
+\DoxyCodeLine{\Hypertarget{sys-vm-oc_8h_source_l00027}\mbox{\hyperlink{structeos__vm__oc__control__block_a40bd84ac6942ae762c98eb91248c899a}{00027}}\ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ \mbox{\hyperlink{structeos__vm__oc__control__block_a40bd84ac6942ae762c98eb91248c899a}{current\_linear\_memory\_pages}};\ \textcolor{comment}{//-\/1\ if\ no\ memory}}
+\DoxyCodeLine{\Hypertarget{sys-vm-oc_8h_source_l00028}\mbox{\hyperlink{structeos__vm__oc__control__block_a7cbeda320b0bf5b5a0059bb558972cd0}{00028}}\ \ \ \ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{structeos__vm__oc__control__block_a7cbeda320b0bf5b5a0059bb558972cd0}{full\_linear\_memory\_start}};}
+\DoxyCodeLine{\Hypertarget{sys-vm-oc_8h_source_l00029}\mbox{\hyperlink{structeos__vm__oc__control__block_a8c143aa108831a3446d9eb19c08d4b36}{00029}}\ \ \ \ sigjmp\_buf*\ \mbox{\hyperlink{structeos__vm__oc__control__block_a8c143aa108831a3446d9eb19c08d4b36}{jmp}};}
+\DoxyCodeLine{\Hypertarget{sys-vm-oc_8h_source_l00030}00030\ \textcolor{preprocessor}{\#ifdef\ \_\_cplusplus}}
+\DoxyCodeLine{\Hypertarget{sys-vm-oc_8h_source_l00031}00031\ \ \ \ std::list<std::vector<std::byte>>*\ \mbox{\hyperlink{structeos__vm__oc__control__block_a183dcf71224bb96d4036312f95db3b17}{bounce\_buffers}};}
+\DoxyCodeLine{\Hypertarget{sys-vm-oc_8h_source_l00032}00032\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{sys-vm-oc_8h_source_l00033}\mbox{\hyperlink{structeos__vm__oc__control__block_a183dcf71224bb96d4036312f95db3b17}{00033}}\ \ \ \ \textcolor{keywordtype}{void}*\ \mbox{\hyperlink{structeos__vm__oc__control__block_a183dcf71224bb96d4036312f95db3b17}{bounce\_buffers}};}
+\DoxyCodeLine{\Hypertarget{sys-vm-oc_8h_source_l00034}00034\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{sys-vm-oc_8h_source_l00035}\mbox{\hyperlink{structeos__vm__oc__control__block_a5ba6ecbf592414baf809608893f9d51a}{00035}}\ \ \ \ \mbox{\hyperlink{stdint_8h_a31b85deecb45924320becd11d3ee16ce}{uintptr\_t}}\ \mbox{\hyperlink{structeos__vm__oc__control__block_a5ba6ecbf592414baf809608893f9d51a}{running\_code\_base}};}
+\DoxyCodeLine{\Hypertarget{sys-vm-oc_8h_source_l00036}\mbox{\hyperlink{structeos__vm__oc__control__block_ad39e16d297f7fcc00d3eb7e52fb618fd}{00036}}\ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ \ \mbox{\hyperlink{structeos__vm__oc__control__block_ad39e16d297f7fcc00d3eb7e52fb618fd}{first\_invalid\_memory\_address}};}
+\DoxyCodeLine{\Hypertarget{sys-vm-oc_8h_source_l00037}\mbox{\hyperlink{structeos__vm__oc__control__block_a808fd1d5e6fc08cbd814fccd8a64d880}{00037}}\ \ \ \ \textcolor{keywordtype}{unsigned}\ \mbox{\hyperlink{structeos__vm__oc__control__block_a808fd1d5e6fc08cbd814fccd8a64d880}{is\_running}};}
+\DoxyCodeLine{\Hypertarget{sys-vm-oc_8h_source_l00038}\mbox{\hyperlink{structeos__vm__oc__control__block_ab0499bf23f3ff55eb4fa63ac3d1fca69}{00038}}\ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ \mbox{\hyperlink{structeos__vm__oc__control__block_ab0499bf23f3ff55eb4fa63ac3d1fca69}{max\_linear\_memory\_pages}};}
+\DoxyCodeLine{\Hypertarget{sys-vm-oc_8h_source_l00039}\mbox{\hyperlink{structeos__vm__oc__control__block_aae2918302958796e0778703cfeb228d0}{00039}}\ \ \ \ \textcolor{keywordtype}{void}*\ \mbox{\hyperlink{structeos__vm__oc__control__block_aae2918302958796e0778703cfeb228d0}{globals}};}
+\DoxyCodeLine{\Hypertarget{sys-vm-oc_8h_source_l00040}00040\ \};}
+
+\end{DoxyCode}

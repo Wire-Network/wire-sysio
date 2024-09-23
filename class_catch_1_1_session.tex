@@ -1,0 +1,450 @@
+\doxysection{Catch\+::Session Class Reference}
+\hypertarget{class_catch_1_1_session}{}\label{class_catch_1_1_session}\index{Catch::Session@{Catch::Session}}
+
+
+{\ttfamily \#include $<$catch\+\_\+session.\+h$>$}
+
+
+
+Inheritance diagram for Catch\+::Session\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=188pt]{class_catch_1_1_session__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Catch\+::Session\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=188pt]{class_catch_1_1_session__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_catch_1_1_session_a4564992e2b028770e38a1dcc6fff8b34}{Session}} ()
+\item 
+\mbox{\hyperlink{class_catch_1_1_session_a4870e67e56335ed29a53a1d98d768fbc}{\texorpdfstring{$\sim$}{\string~}\+Session}} () override
+\item 
+void \mbox{\hyperlink{class_catch_1_1_session_a4286263c17b16c3ea9d0632bd4f8eaee}{show\+Help}} () const
+\item 
+void \mbox{\hyperlink{class_catch_1_1_session_ac28e293014007bbd9f6383c2d5daa1e4}{lib\+Identify}} ()
+\item 
+int \mbox{\hyperlink{class_catch_1_1_session_af890db02c69e36356ac9f8be4084c464}{apply\+Command\+Line}} (int argc, char const \texorpdfstring{$\ast$}{*}const \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}})
+\item 
+void \mbox{\hyperlink{class_catch_1_1_session_a122417ed44bfa29a229941b1e12b91a3}{use\+Config\+Data}} (\mbox{\hyperlink{struct_catch_1_1_config_data}{Config\+Data}} const \&\mbox{\hyperlink{class_catch_1_1_session_aadb20e3b2955209aaab3126c0c3da7a6}{config\+Data}})
+\item 
+{\footnotesize template$<$typename CharT $>$ }\\int \mbox{\hyperlink{class_catch_1_1_session_a8c82b89613ebd99f1ba1a3f7b634e571}{run}} (int argc, CharT const \texorpdfstring{$\ast$}{*}const \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}\mbox{[}$\,$\mbox{]})
+\item 
+int \mbox{\hyperlink{class_catch_1_1_session_a0232a6c37ad5b5064a2462eedf13a9be}{run}} ()
+\item 
+\mbox{\hyperlink{struct_catch_1_1clara_1_1detail_1_1_parser}{clara\+::\+Parser}} const \& \mbox{\hyperlink{class_catch_1_1_session_a0a6457ac45988a75429a6fa22f95f6da}{cli}} () const
+\item 
+void \mbox{\hyperlink{class_catch_1_1_session_a26521fca0f20400e9fe49a20c9b68b80}{cli}} (\mbox{\hyperlink{struct_catch_1_1clara_1_1detail_1_1_parser}{clara\+::\+Parser}} const \&new\+Parser)
+\item 
+\mbox{\hyperlink{struct_catch_1_1_config_data}{Config\+Data}} \& \mbox{\hyperlink{class_catch_1_1_session_aadb20e3b2955209aaab3126c0c3da7a6}{config\+Data}} ()
+\item 
+\mbox{\hyperlink{class_catch_1_1_config}{Config}} \& \mbox{\hyperlink{class_catch_1_1_session_afac375cd0ef4715b09924575d88fdc13}{config}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{catch__session_8h_source_l00019}{19}} of file \mbox{\hyperlink{catch__session_8h_source}{catch\+\_\+session.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_catch_1_1_session_a4564992e2b028770e38a1dcc6fff8b34}\index{Catch::Session@{Catch::Session}!Session@{Session}}
+\index{Session@{Session}!Catch::Session@{Catch::Session}}
+\doxysubsubsection{\texorpdfstring{Session()}{Session()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_session_a4564992e2b028770e38a1dcc6fff8b34} 
+Catch\+::\+Session\+::\+Session (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__session_8cpp_source_l00126}{126}} of file \mbox{\hyperlink{catch__session_8cpp_source}{catch\+\_\+session.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{bool}\ alreadyInstantiated\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ alreadyInstantiated\ )\ \{}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{catch__compiler__capabilities_8h_ab76c2d22e571ab1a828f5c60d2f485a6}{CATCH\_TRY}}\ \{\ \mbox{\hyperlink{catch__enforce_8h_a05b6c8a530fa2e5b397add8966522777}{CATCH\_INTERNAL\_ERROR}}(\ \textcolor{stringliteral}{"{}Only\ one\ instance\ of\ Catch::Session\ can\ ever\ be\ used"{}}\ );\ \}}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{catch__compiler__capabilities_8h_afa0ae14e70806dca4f8bf06d06645fa9}{CATCH\_CATCH\_ALL}}\ \{\ \mbox{\hyperlink{namespace_catch_a585459763f2c7610e57de2dd22dd1ad8}{getMutableRegistryHub}}().\mbox{\hyperlink{struct_catch_1_1_i_mutable_registry_hub_a72a7d5386851ac3200f8da794a009c86}{registerStartupException}}();\ \}}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00132\ }
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ There\ cannot\ be\ exceptions\ at\ startup\ in\ no-\/exception\ mode.}}
+\DoxyCodeLine{00134\ \textcolor{preprocessor}{\#if\ !defined(CATCH\_CONFIG\_DISABLE\_EXCEPTIONS)}}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ exceptions\ =\ \mbox{\hyperlink{namespace_catch_a5d328566cb8da87b48f1fac3f319ac7a}{getRegistryHub}}().\mbox{\hyperlink{struct_catch_1_1_i_registry_hub_a6a1810bb78ba99c3be091958bcc12f29}{getStartupExceptionRegistry}}().\mbox{\hyperlink{class_catch_1_1_startup_exception_registry_a5d4829d60703104982205616e930b3e6}{getExceptions}}();}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ !exceptions.empty()\ )\ \{}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ \ \ \ m\_startupExceptions\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \ \ \ \ Colour\ colourGuard(\ \mbox{\hyperlink{struct_catch_1_1_colour_a987a596fd001bd80db06b3ba7d53231ea333f999cd07742b982440fd6f44af75e}{Colour::Red}}\ );}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_catch_a54c1ce08041448d684ae8edc14162cd2}{Catch::cerr}}()\ <<\ \textcolor{stringliteral}{"{}Errors\ occurred\ during\ startup!"{}}\ <<\ \textcolor{charliteral}{'\(\backslash\)n'};}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ iterate\ over\ all\ exceptions\ and\ notify\ user}}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ ex\_ptr\ :\ exceptions\ )\ \{}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::rethrow\_exception(ex\_ptr);}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\ std::exception\ \textcolor{keyword}{const}\&\ ex\ )\ \{}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_catch_a54c1ce08041448d684ae8edc14162cd2}{Catch::cerr}}()\ <<\ Column(\ ex.what()\ ).indent(2)\ <<\ \textcolor{charliteral}{'\(\backslash\)n'};}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00149\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00150\ }
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ alreadyInstantiated\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ m\_cli\ =\ \mbox{\hyperlink{namespace_catch_add4f86f38bf30c7b49daacfac665aaff}{makeCommandLineParser}}(\ m\_configData\ );}
+\DoxyCodeLine{00153\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_session_a4564992e2b028770e38a1dcc6fff8b34_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_session_a4870e67e56335ed29a53a1d98d768fbc}\index{Catch::Session@{Catch::Session}!````~Session@{\texorpdfstring{$\sim$}{\string~}Session}}
+\index{````~Session@{\texorpdfstring{$\sim$}{\string~}Session}!Catch::Session@{Catch::Session}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}Session()}{\string~Session()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_session_a4870e67e56335ed29a53a1d98d768fbc} 
+Catch\+::\+Session\+::\texorpdfstring{$\sim$}{\string~}\+Session (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__session_8cpp_source_l00154}{154}} of file \mbox{\hyperlink{catch__session_8cpp_source}{catch\+\_\+session.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_catch_a0f78e9afdebc6d4512d18e76fbf54b8c}{Catch::cleanUp}}();}
+\DoxyCodeLine{00156\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_session_a4870e67e56335ed29a53a1d98d768fbc_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_catch_1_1_session_af890db02c69e36356ac9f8be4084c464}\index{Catch::Session@{Catch::Session}!applyCommandLine@{applyCommandLine}}
+\index{applyCommandLine@{applyCommandLine}!Catch::Session@{Catch::Session}}
+\doxysubsubsection{\texorpdfstring{applyCommandLine()}{applyCommandLine()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_session_af890db02c69e36356ac9f8be4084c464} 
+int Catch\+::\+Session\+::apply\+Command\+Line (\begin{DoxyParamCaption}\item[{int}]{argc}{, }\item[{char const \texorpdfstring{$\ast$}{*}const \texorpdfstring{$\ast$}{*}}]{argv}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__session_8cpp_source_l00172}{172}} of file \mbox{\hyperlink{catch__session_8cpp_source}{catch\+\_\+session.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ m\_startupExceptions\ )}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{00175\ }
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ result\ =\ m\_cli.\mbox{\hyperlink{struct_catch_1_1clara_1_1detail_1_1_parser_ac5acd3e8bbd2445ac48b1d12b67a78f1}{parse}}(\ \mbox{\hyperlink{classclara_1_1detail_1_1_args}{clara::Args}}(\ argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}\ )\ );}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !result\ )\ \{}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_session_afac375cd0ef4715b09924575d88fdc13}{config}}();}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_catch_a710841d4732b86c06f816bd4822bd425}{getCurrentMutableContext}}().\mbox{\hyperlink{struct_catch_1_1_i_mutable_context_aa81ba080fce084e9482f20338bc88531}{setConfig}}(m\_config);}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_catch_a54c1ce08041448d684ae8edc14162cd2}{Catch::cerr}}()}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ Colour(\ \mbox{\hyperlink{struct_catch_1_1_colour_a987a596fd001bd80db06b3ba7d53231ea333f999cd07742b982440fd6f44af75e}{Colour::Red}}\ )}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\(\backslash\)nError(s)\ in\ input:\(\backslash\)n"{}}}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ Column(\ result.errorMessage()\ ).indent(\ 2\ )}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n\(\backslash\)n"{}};}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_catch_a54c1ce08041448d684ae8edc14162cd2}{Catch::cerr}}()\ <<\ \textcolor{stringliteral}{"{}Run\ with\ -\/?\ for\ usage\(\backslash\)n"{}}\ <<\ std::endl;}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ MaxExitCode;}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00188\ }
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ m\_configData.\mbox{\hyperlink{struct_catch_1_1_config_data_a12535241547dfc57e6864c4fc2cd4dd9}{showHelp}}\ )}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_session_a4286263c17b16c3ea9d0632bd4f8eaee}{showHelp}}();}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ m\_configData.\mbox{\hyperlink{struct_catch_1_1_config_data_a2cda9be1ee8b85e51c2e242330c99949}{libIdentify}}\ )}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_session_ac28e293014007bbd9f6383c2d5daa1e4}{libIdentify}}();}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \ \ m\_config.reset();}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00195\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_session_af890db02c69e36356ac9f8be4084c464_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_session_af890db02c69e36356ac9f8be4084c464_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_session_a0a6457ac45988a75429a6fa22f95f6da}\index{Catch::Session@{Catch::Session}!cli@{cli}}
+\index{cli@{cli}!Catch::Session@{Catch::Session}}
+\doxysubsubsection{\texorpdfstring{cli()}{cli()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_session_a0a6457ac45988a75429a6fa22f95f6da} 
+\mbox{\hyperlink{struct_catch_1_1clara_1_1detail_1_1_parser}{clara\+::\+Parser}} const  \& Catch\+::\+Session\+::cli (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{catch__session_8cpp_source_l00239}{239}} of file \mbox{\hyperlink{catch__session_8cpp_source}{catch\+\_\+session.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_cli;}
+\DoxyCodeLine{00241\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_session_a26521fca0f20400e9fe49a20c9b68b80}\index{Catch::Session@{Catch::Session}!cli@{cli}}
+\index{cli@{cli}!Catch::Session@{Catch::Session}}
+\doxysubsubsection{\texorpdfstring{cli()}{cli()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_session_a26521fca0f20400e9fe49a20c9b68b80} 
+void Catch\+::\+Session\+::cli (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1clara_1_1detail_1_1_parser}{clara\+::\+Parser}} const \&}]{new\+Parser}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__session_8cpp_source_l00242}{242}} of file \mbox{\hyperlink{catch__session_8cpp_source}{catch\+\_\+session.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00242\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00243\ \ \ \ \ \ \ \ \ m\_cli\ =\ newParser;}
+\DoxyCodeLine{00244\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_session_afac375cd0ef4715b09924575d88fdc13}\index{Catch::Session@{Catch::Session}!config@{config}}
+\index{config@{config}!Catch::Session@{Catch::Session}}
+\doxysubsubsection{\texorpdfstring{config()}{config()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_session_afac375cd0ef4715b09924575d88fdc13} 
+\mbox{\hyperlink{class_catch_1_1_config}{Config}} \& Catch\+::\+Session\+::config (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__session_8cpp_source_l00248}{248}} of file \mbox{\hyperlink{catch__session_8cpp_source}{catch\+\_\+session.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00248\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00249\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !m\_config\ )}
+\DoxyCodeLine{00250\ \ \ \ \ \ \ \ \ \ \ \ \ m\_config\ =\ std::make\_shared<Config>(\ m\_configData\ );}
+\DoxyCodeLine{00251\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *m\_config;}
+\DoxyCodeLine{00252\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_session_afac375cd0ef4715b09924575d88fdc13_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_session_aadb20e3b2955209aaab3126c0c3da7a6}\index{Catch::Session@{Catch::Session}!configData@{configData}}
+\index{configData@{configData}!Catch::Session@{Catch::Session}}
+\doxysubsubsection{\texorpdfstring{configData()}{configData()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_session_aadb20e3b2955209aaab3126c0c3da7a6} 
+\mbox{\hyperlink{struct_catch_1_1_config_data}{Config\+Data}} \& Catch\+::\+Session\+::config\+Data (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__session_8cpp_source_l00245}{245}} of file \mbox{\hyperlink{catch__session_8cpp_source}{catch\+\_\+session.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00245\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00246\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_configData;}
+\DoxyCodeLine{00247\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_session_aadb20e3b2955209aaab3126c0c3da7a6_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_session_ac28e293014007bbd9f6383c2d5daa1e4}\index{Catch::Session@{Catch::Session}!libIdentify@{libIdentify}}
+\index{libIdentify@{libIdentify}!Catch::Session@{Catch::Session}}
+\doxysubsubsection{\texorpdfstring{libIdentify()}{libIdentify()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_session_ac28e293014007bbd9f6383c2d5daa1e4} 
+void Catch\+::\+Session\+::lib\+Identify (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__session_8cpp_source_l00164}{164}} of file \mbox{\hyperlink{catch__session_8cpp_source}{catch\+\_\+session.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_catch_a0179d453617ba2296f2baa99a49e7264}{Catch::cout}}()}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ std::left\ <<\ std::setw(16)\ <<\ \textcolor{stringliteral}{"{}description:\ "{}}\ <<\ \textcolor{stringliteral}{"{}A\ Catch\ test\ executable\(\backslash\)n"{}}}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ std::left\ <<\ std::setw(16)\ <<\ \textcolor{stringliteral}{"{}category:\ "{}}\ <<\ \textcolor{stringliteral}{"{}testframework\(\backslash\)n"{}}}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ std::left\ <<\ std::setw(16)\ <<\ \textcolor{stringliteral}{"{}framework:\ "{}}\ <<\ \textcolor{stringliteral}{"{}Catch\ Test\(\backslash\)n"{}}}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ std::left\ <<\ std::setw(16)\ <<\ \textcolor{stringliteral}{"{}version:\ "{}}\ <<\ \mbox{\hyperlink{namespace_catch_a35e54475ed669ef7f7ac00b858e91b2a}{libraryVersion}}()\ <<\ std::endl;}
+\DoxyCodeLine{00170\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_session_ac28e293014007bbd9f6383c2d5daa1e4_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_session_ac28e293014007bbd9f6383c2d5daa1e4_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_session_a0232a6c37ad5b5064a2462eedf13a9be}\index{Catch::Session@{Catch::Session}!run@{run}}
+\index{run@{run}!Catch::Session@{Catch::Session}}
+\doxysubsubsection{\texorpdfstring{run()}{run()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_session_a0232a6c37ad5b5064a2462eedf13a9be} 
+int Catch\+::\+Session\+::run (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__session_8cpp_source_l00226}{226}} of file \mbox{\hyperlink{catch__session_8cpp_source}{catch\+\_\+session.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00226\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00227\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ (\ m\_configData.\mbox{\hyperlink{struct_catch_1_1_config_data_a923861968eaad4d3c2ac82e514c7cc81}{waitForKeypress}}\ \&\ \mbox{\hyperlink{struct_catch_1_1_wait_for_keypress_a2e8c4369d0a605d64e3e83b5af3399baa0a77a81962c38c4f32792d7af4cd6493}{WaitForKeypress::BeforeStart}}\ )\ !=\ 0\ )\ \{}
+\DoxyCodeLine{00228\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_catch_a0179d453617ba2296f2baa99a49e7264}{Catch::cout}}()\ <<\ \textcolor{stringliteral}{"{}...waiting\ for\ enter/\ return\ before\ starting"{}}\ <<\ std::endl;}
+\DoxyCodeLine{00229\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{void}\textcolor{keyword}{>}(std::getchar());}
+\DoxyCodeLine{00230\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00231\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ exitCode\ =\ runInternal();}
+\DoxyCodeLine{00232\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ (\ m\_configData.\mbox{\hyperlink{struct_catch_1_1_config_data_a923861968eaad4d3c2ac82e514c7cc81}{waitForKeypress}}\ \&\ \mbox{\hyperlink{struct_catch_1_1_wait_for_keypress_a2e8c4369d0a605d64e3e83b5af3399baacbbeaab666e49112d304173e4461d350}{WaitForKeypress::BeforeExit}}\ )\ !=\ 0\ )\ \{}
+\DoxyCodeLine{00233\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_catch_a0179d453617ba2296f2baa99a49e7264}{Catch::cout}}()\ <<\ \textcolor{stringliteral}{"{}...waiting\ for\ enter/\ return\ before\ exiting,\ with\ code:\ "{}}\ <<\ exitCode\ <<\ std::endl;}
+\DoxyCodeLine{00234\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{void}\textcolor{keyword}{>}(std::getchar());}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ exitCode;}
+\DoxyCodeLine{00237\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=286pt]{class_catch_1_1_session_a0232a6c37ad5b5064a2462eedf13a9be_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_session_a0232a6c37ad5b5064a2462eedf13a9be_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_session_a8c82b89613ebd99f1ba1a3f7b634e571}\index{Catch::Session@{Catch::Session}!run@{run}}
+\index{run@{run}!Catch::Session@{Catch::Session}}
+\doxysubsubsection{\texorpdfstring{run()}{run()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_session_a8c82b89613ebd99f1ba1a3f7b634e571} 
+template$<$typename CharT $>$ \\
+int Catch\+::\+Session\+::run (\begin{DoxyParamCaption}\item[{int}]{argc}{, }\item[{CharT const \texorpdfstring{$\ast$}{*}const}]{argv}{\mbox{[}$\,$\mbox{]}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__session_8h_source_l00036}{36}} of file \mbox{\hyperlink{catch__session_8h_source}{catch\+\_\+session.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (m\_startupExceptions)}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ returnCode\ =\ \mbox{\hyperlink{class_catch_1_1_session_af890db02c69e36356ac9f8be4084c464}{applyCommandLine}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}});}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (returnCode\ ==\ 0)}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ returnCode\ =\ \mbox{\hyperlink{class_catch_1_1_session_a0232a6c37ad5b5064a2462eedf13a9be}{run}}();}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ returnCode;}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_session_a8c82b89613ebd99f1ba1a3f7b634e571_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=256pt]{class_catch_1_1_session_a8c82b89613ebd99f1ba1a3f7b634e571_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_session_a4286263c17b16c3ea9d0632bd4f8eaee}\index{Catch::Session@{Catch::Session}!showHelp@{showHelp}}
+\index{showHelp@{showHelp}!Catch::Session@{Catch::Session}}
+\doxysubsubsection{\texorpdfstring{showHelp()}{showHelp()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_session_a4286263c17b16c3ea9d0632bd4f8eaee} 
+void Catch\+::\+Session\+::show\+Help (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{catch__session_8cpp_source_l00158}{158}} of file \mbox{\hyperlink{catch__session_8cpp_source}{catch\+\_\+session.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_catch_a0179d453617ba2296f2baa99a49e7264}{Catch::cout}}()}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\(\backslash\)nCatch\ v"{}}\ <<\ \mbox{\hyperlink{namespace_catch_a35e54475ed669ef7f7ac00b858e91b2a}{libraryVersion}}()\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ m\_cli\ <<\ std::endl}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}For\ more\ detailed\ usage\ please\ see\ the\ project\ docs\(\backslash\)n"{}}\ <<\ std::endl;}
+\DoxyCodeLine{00163\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_session_a4286263c17b16c3ea9d0632bd4f8eaee_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_session_a4286263c17b16c3ea9d0632bd4f8eaee_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_session_a122417ed44bfa29a229941b1e12b91a3}\index{Catch::Session@{Catch::Session}!useConfigData@{useConfigData}}
+\index{useConfigData@{useConfigData}!Catch::Session@{Catch::Session}}
+\doxysubsubsection{\texorpdfstring{useConfigData()}{useConfigData()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_session_a122417ed44bfa29a229941b1e12b91a3} 
+void Catch\+::\+Session\+::use\+Config\+Data (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_config_data}{Config\+Data}} const \&}]{config\+Data}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__session_8cpp_source_l00221}{221}} of file \mbox{\hyperlink{catch__session_8cpp_source}{catch\+\_\+session.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \ \ m\_configData\ =\ \mbox{\hyperlink{class_catch_1_1_session_aadb20e3b2955209aaab3126c0c3da7a6}{configData}};}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \ \ m\_config.reset();}
+\DoxyCodeLine{00224\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_session_a122417ed44bfa29a229941b1e12b91a3_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__session_8h}{catch\+\_\+session.\+h}}\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__session_8cpp}{catch\+\_\+session.\+cpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,326 @@
+\doxysection{gtest-\/tuple\+\_\+test.cc}
+\hypertarget{gtest-tuple__test_8cc_source}{}\label{gtest-tuple__test_8cc_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/test/gtest-\/tuple\_test.cc@{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/test/gtest-\/tuple\_test.cc}}
+\mbox{\hyperlink{gtest-tuple__test_8cc}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00001}00001\ \textcolor{comment}{//\ Copyright\ 2007,\ Google\ Inc.}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00002}00002\ \textcolor{comment}{//\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00003}00003\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00004}00004\ \textcolor{comment}{//\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00005}00005\ \textcolor{comment}{//\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00006}00006\ \textcolor{comment}{//\ met:}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00007}00007\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00008}00008\ \textcolor{comment}{//\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00009}00009\ \textcolor{comment}{//\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00010}00010\ \textcolor{comment}{//\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00011}00011\ \textcolor{comment}{//\ copyright\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00012}00012\ \textcolor{comment}{//\ in\ the\ documentation\ and/or\ other\ materials\ provided\ with\ the}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00013}00013\ \textcolor{comment}{//\ distribution.}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00014}00014\ \textcolor{comment}{//\ \ \ \ \ *\ Neither\ the\ name\ of\ Google\ Inc.\ nor\ the\ names\ of\ its}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00015}00015\ \textcolor{comment}{//\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products\ derived\ from}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00016}00016\ \textcolor{comment}{//\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00017}00017\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00018}00018\ \textcolor{comment}{//\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00019}00019\ \textcolor{comment}{//\ "{}AS\ IS"{}\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00020}00020\ \textcolor{comment}{//\ LIMITED\ TO,\ THE\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00021}00021\ \textcolor{comment}{//\ A\ PARTICULAR\ PURPOSE\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ THE\ COPYRIGHT}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00022}00022\ \textcolor{comment}{//\ OWNER\ OR\ CONTRIBUTORS\ BE\ LIABLE\ FOR\ ANY\ DIRECT,\ INDIRECT,\ INCIDENTAL,}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00023}00023\ \textcolor{comment}{//\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES\ (INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00024}00024\ \textcolor{comment}{//\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;\ LOSS\ OF\ USE,}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00025}00025\ \textcolor{comment}{//\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND\ ON\ ANY}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00026}00026\ \textcolor{comment}{//\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00027}00027\ \textcolor{comment}{//\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00028}00028\ \textcolor{comment}{//\ OF\ THIS\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00029}00029\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00030}00030\ \textcolor{comment}{//\ Author:\ wan@google.com\ (Zhanyong\ Wan)}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00032}00032\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{gtest-tuple_8h}{gtest/internal/gtest-\/tuple.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00033}00033\ \textcolor{preprocessor}{\#include\ <utility>}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00034}00034\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{gtest_8h}{gtest/gtest.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00036}00036\ \textcolor{keyword}{namespace\ }\{}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00038}00038\ using\ ::std::tr1::get;}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00039}00039\ using\ ::std::tr1::make\_tuple;}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00040}00040\ using\ ::std::tr1::tuple;}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00041}00041\ using\ ::std::tr1::tuple\_element;}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00042}00042\ using\ ::std::tr1::tuple\_size;}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00043}00043\ using\ ::testing::StaticAssertTypeEq;}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00045}00045\ \textcolor{comment}{//\ Tests\ that\ tuple\_element<K,\ tuple<T0,\ T1,\ ...,\ TN>\ >::type\ returns\ TK.}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00046}00046\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(tuple\_element\_Test,\ ReturnsElementType)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00047}00047\ \ \ StaticAssertTypeEq<int,\ tuple\_element<0,\ tuple<int,\ char>\ >::type>();}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00048}00048\ \ \ StaticAssertTypeEq<int\&,\ tuple\_element<1,\ tuple<double,\ int\&>\ >::type>();}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00049}00049\ \ \ StaticAssertTypeEq<bool,\ tuple\_element<2,\ tuple<double,\ int,\ bool>\ >::type>();}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00050}00050\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00052}00052\ \textcolor{comment}{//\ Tests\ that\ tuple\_size<T>::value\ gives\ the\ number\ of\ fields\ in\ tuple}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00053}00053\ \textcolor{comment}{//\ type\ T.}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00054}00054\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(tuple\_size\_Test,\ ReturnsNumberOfFields)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00055}00055\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0,\ +tuple\_size<tuple<>\ >\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{::value}});}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00056}00056\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(1,\ +tuple\_size<tuple<void*>\ >\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{::value}});}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00057}00057\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(1,\ +tuple\_size<tuple<char>\ >\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{::value}});}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00058}00058\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(1,\ +(tuple\_size<tuple<tuple<int,\ double>\ >\ >\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{::value}}));}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00059}00059\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(2,\ +(tuple\_size<tuple<int\&,\ const\ char>\ >\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{::value}}));}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00060}00060\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(3,\ +(tuple\_size<tuple<char*,\ void,\ const\ bool\&>\ >\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{::value}}));}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00061}00061\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00062}00062\ }
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00063}00063\ \textcolor{comment}{//\ Tests\ comparing\ a\ tuple\ with\ itself.}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00064}00064\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(ComparisonTest,\ ComparesWithSelf)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00065}00065\ \ \ \textcolor{keyword}{const}\ tuple<int,\ char,\ bool>\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}(5,\ \textcolor{charliteral}{'a'},\ \textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00067}00067\ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ ==\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00068}00068\ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ !=\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00069}00069\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00071}00071\ \textcolor{comment}{//\ Tests\ comparing\ two\ tuples\ with\ the\ same\ value.}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00072}00072\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(ComparisonTest,\ ComparesEqualTuples)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00073}00073\ \ \ \textcolor{keyword}{const}\ tuple<int,\ bool>\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}(5,\ \textcolor{keyword}{true}),\ b(5,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00074}00074\ }
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00075}00075\ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ ==\ b);}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00076}00076\ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ !=\ b);}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00077}00077\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00079}00079\ \textcolor{comment}{//\ Tests\ comparing\ two\ different\ tuples\ that\ have\ no\ reference\ fields.}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00080}00080\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(ComparisonTest,\ ComparesUnequalTuplesWithoutReferenceFields)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00081}00081\ \ \ \textcolor{keyword}{typedef}\ tuple<const\ int,\ char>\ FooTuple;}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00083}00083\ \ \ \textcolor{keyword}{const}\ FooTuple\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}(0,\ \textcolor{charliteral}{'x'});}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00084}00084\ \ \ \textcolor{keyword}{const}\ FooTuple\ b(1,\ \textcolor{charliteral}{'a'});}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00085}00085\ }
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00086}00086\ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ !=\ b);}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00087}00087\ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ ==\ b);}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00088}00088\ }
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00089}00089\ \ \ \textcolor{keyword}{const}\ FooTuple\ c(1,\ \textcolor{charliteral}{'b'});}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00090}00090\ }
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00091}00091\ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(b\ !=\ c);}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00092}00092\ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(b\ ==\ c);}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00093}00093\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00094}00094\ }
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00095}00095\ \textcolor{comment}{//\ Tests\ comparing\ two\ different\ tuples\ that\ have\ reference\ fields.}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00096}00096\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(ComparisonTest,\ ComparesUnequalTuplesWithReferenceFields)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00097}00097\ \ \ \textcolor{keyword}{typedef}\ tuple<int\&,\ const\ char\&>\ FooTuple;}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00098}00098\ }
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00099}00099\ \ \ \textcolor{keywordtype}{int}\ i\ =\ 5;}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00100}00100\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{namespace_xbyak_1_1util_a36c093c7b6cc66981a18fcbfebc2a225}{ch}}\ =\ \textcolor{charliteral}{'a'};}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00101}00101\ \ \ \textcolor{keyword}{const}\ FooTuple\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}(i,\ ch);}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00102}00102\ }
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00103}00103\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ =\ 6;}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00104}00104\ \ \ \textcolor{keyword}{const}\ FooTuple\ b(\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}},\ ch);}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00105}00105\ }
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00106}00106\ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ !=\ b);}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00107}00107\ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ ==\ b);}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00108}00108\ }
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00109}00109\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ =\ 5;}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00110}00110\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ ch2\ =\ \textcolor{charliteral}{'b'};}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00111}00111\ \ \ \textcolor{keyword}{const}\ FooTuple\ c(\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}},\ ch2);}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00112}00112\ }
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00113}00113\ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(b\ !=\ c);}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00114}00114\ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(b\ ==\ c);}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00115}00115\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00116}00116\ }
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00117}00117\ \textcolor{comment}{//\ Tests\ that\ a\ tuple\ field\ with\ a\ reference\ type\ is\ an\ alias\ of\ the}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00118}00118\ \textcolor{comment}{//\ variable\ it's\ supposed\ to\ reference.}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00119}00119\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(ReferenceFieldTest,\ IsAliasOfReferencedVariable)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00120}00120\ \ \ \textcolor{keywordtype}{int}\ n\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00121}00121\ \ \ tuple<bool,\ int\&>\ t(\textcolor{keyword}{true},\ n);}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00122}00122\ }
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00123}00123\ \ \ n\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00124}00124\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(n,\ get<1>(t))}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00125}00125\ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}Changing\ a\ underlying\ variable\ should\ update\ the\ reference\ field."{}};}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00126}00126\ }
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00127}00127\ \ \ \textcolor{comment}{//\ Makes\ sure\ that\ the\ implementation\ doesn't\ do\ anything\ funny\ with}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00128}00128\ \ \ \textcolor{comment}{//\ the\ \&\ operator\ for\ the\ return\ type\ of\ get<>().}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00129}00129\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\&n,\ \&(get<1>(t)))}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00130}00130\ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}The\ address\ of\ a\ reference\ field\ should\ equal\ the\ address\ of\ "{}}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00131}00131\ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}the\ underlying\ variable."{}};}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00132}00132\ }
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00133}00133\ \ \ get<1>(t)\ =\ 2;}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00134}00134\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(2,\ n)}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00135}00135\ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}Changing\ a\ reference\ field\ should\ update\ the\ underlying\ variable."{}};}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00136}00136\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00137}00137\ }
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00138}00138\ \textcolor{comment}{//\ Tests\ that\ tuple's\ default\ constructor\ default\ initializes\ each\ field.}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00139}00139\ \textcolor{comment}{//\ This\ test\ needs\ to\ compile\ without\ generating\ warnings.}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00140}00140\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(TupleConstructorTest,\ DefaultConstructorDefaultInitializesEachField)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00141}00141\ \ \ \textcolor{comment}{//\ The\ TR1\ report\ requires\ that\ tuple's\ default\ constructor\ default}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00142}00142\ \ \ \textcolor{comment}{//\ initializes\ each\ field,\ even\ if\ it's\ a\ primitive\ type.\ \ If\ the}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00143}00143\ \ \ \textcolor{comment}{//\ implementation\ forgets\ to\ do\ this,\ this\ test\ will\ catch\ it\ by}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00144}00144\ \ \ \textcolor{comment}{//\ generating\ warnings\ about\ using\ uninitialized\ variables\ (assuming}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00145}00145\ \ \ \textcolor{comment}{//\ a\ decent\ compiler).}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00146}00146\ }
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00147}00147\ \ \ tuple<>\ empty;}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00148}00148\ }
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00149}00149\ \ \ tuple<int>\ a1,\ b1;}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00150}00150\ \ \ b1\ =\ a1;}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00151}00151\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0,\ get<0>(b1));}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00152}00152\ }
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00153}00153\ \ \ tuple<int,\ double>\ a2,\ b2;}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00154}00154\ \ \ b2\ =\ a2;}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00155}00155\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0,\ get<0>(b2));}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00156}00156\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0.0,\ get<1>(b2));}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00157}00157\ }
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00158}00158\ \ \ tuple<double,\ char,\ bool*>\ a3,\ b3;}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00159}00159\ \ \ b3\ =\ a3;}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00160}00160\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0.0,\ get<0>(b3));}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00161}00161\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\textcolor{charliteral}{'\(\backslash\)0'},\ get<1>(b3));}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00162}00162\ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(get<2>(b3)\ ==\ NULL);}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00163}00163\ }
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00164}00164\ \ \ tuple<int,\ int,\ int,\ int,\ int,\ int,\ int,\ int,\ int,\ int>\ a10,\ b10;}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00165}00165\ \ \ b10\ =\ a10;}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00166}00166\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0,\ get<0>(b10));}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00167}00167\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0,\ get<1>(b10));}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00168}00168\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0,\ get<2>(b10));}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00169}00169\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0,\ get<3>(b10));}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00170}00170\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0,\ get<4>(b10));}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00171}00171\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0,\ get<5>(b10));}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00172}00172\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0,\ get<6>(b10));}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00173}00173\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0,\ get<7>(b10));}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00174}00174\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0,\ get<8>(b10));}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00175}00175\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0,\ get<9>(b10));}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00176}00176\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00177}00177\ }
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00178}00178\ \textcolor{comment}{//\ Tests\ constructing\ a\ tuple\ from\ its\ fields.}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00179}00179\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(TupleConstructorTest,\ ConstructsFromFields)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00180}00180\ \ \ \textcolor{keywordtype}{int}\ n\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00181}00181\ \ \ \textcolor{comment}{//\ Reference\ field.}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00182}00182\ \ \ tuple<int\&>\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}(n);}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00183}00183\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\&n,\ \&(get<0>(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})));}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00184}00184\ }
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00185}00185\ \ \ \textcolor{comment}{//\ Non-\/reference\ fields.}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00186}00186\ \ \ tuple<int,\ char>\ b(5,\ \textcolor{charliteral}{'a'});}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00187}00187\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(5,\ get<0>(b));}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00188}00188\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\textcolor{charliteral}{'a'},\ get<1>(b));}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00189}00189\ }
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00190}00190\ \ \ \textcolor{comment}{//\ Const\ reference\ field.}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00191}00191\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ m\ =\ 2;}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00192}00192\ \ \ tuple<bool,\ const\ int\&>\ c(\textcolor{keyword}{true},\ m);}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00193}00193\ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(get<0>(c));}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00194}00194\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\&m,\ \&(get<1>(c)));}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00195}00195\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00196}00196\ }
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00197}00197\ \textcolor{comment}{//\ Tests\ tuple's\ copy\ constructor.}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00198}00198\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(TupleConstructorTest,\ CopyConstructor)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00199}00199\ \ \ tuple<double,\ bool>\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}(0.0,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00200}00200\ \ \ tuple<double,\ bool>\ b(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00201}00201\ }
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00202}00202\ \ \ \mbox{\hyperlink{gtest_8h_ab4852f9430cf656690256ea7fe6323b8}{EXPECT\_DOUBLE\_EQ}}(0.0,\ get<0>(b));}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00203}00203\ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(get<1>(b));}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00204}00204\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00205}00205\ }
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00206}00206\ \textcolor{comment}{//\ Tests\ constructing\ a\ tuple\ from\ another\ tuple\ that\ has\ a\ compatible}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00207}00207\ \textcolor{comment}{//\ but\ different\ type.}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00208}00208\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(TupleConstructorTest,\ ConstructsFromDifferentTupleType)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00209}00209\ \ \ tuple<int,\ int,\ char>\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}(0,\ 1,\ \textcolor{charliteral}{'a'});}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00210}00210\ \ \ tuple<double,\ long,\ int>\ b(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00211}00211\ }
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00212}00212\ \ \ \mbox{\hyperlink{gtest_8h_ab4852f9430cf656690256ea7fe6323b8}{EXPECT\_DOUBLE\_EQ}}(0.0,\ get<0>(b));}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00213}00213\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(1,\ get<1>(b));}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00214}00214\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\textcolor{charliteral}{'a'},\ get<2>(b));}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00215}00215\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00216}00216\ }
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00217}00217\ \textcolor{comment}{//\ Tests\ constructing\ a\ 2-\/tuple\ from\ an\ std::pair.}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00218}00218\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(TupleConstructorTest,\ ConstructsFromPair)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00219}00219\ \ \ ::std::pair<int,\ char>\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}(1,\ \textcolor{charliteral}{'a'});}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00220}00220\ \ \ tuple<int,\ char>\ b(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00221}00221\ \ \ tuple<int,\ const\ char\&>\ c(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00222}00222\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00223}00223\ }
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00224}00224\ \textcolor{comment}{//\ Tests\ assigning\ a\ tuple\ to\ another\ tuple\ with\ the\ same\ type.}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00225}00225\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(TupleAssignmentTest,\ AssignsToSameTupleType)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00226}00226\ \ \ \textcolor{keyword}{const}\ tuple<int,\ long>\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}(5,\ 7L);}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00227}00227\ \ \ tuple<int,\ long>\ b;}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00228}00228\ \ \ b\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}};}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00229}00229\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(5,\ get<0>(b));}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00230}00230\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(7L,\ get<1>(b));}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00231}00231\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00232}00232\ }
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00233}00233\ \textcolor{comment}{//\ Tests\ assigning\ a\ tuple\ to\ another\ tuple\ with\ a\ different\ but}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00234}00234\ \textcolor{comment}{//\ compatible\ type.}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00235}00235\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(TupleAssignmentTest,\ AssignsToDifferentTupleType)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00236}00236\ \ \ \textcolor{keyword}{const}\ tuple<int,\ long,\ bool>\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}(1,\ 7L,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00237}00237\ \ \ tuple<long,\ int,\ bool>\ b;}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00238}00238\ \ \ b\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}};}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00239}00239\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(1L,\ get<0>(b));}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00240}00240\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(7,\ get<1>(b));}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00241}00241\ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(get<2>(b));}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00242}00242\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00243}00243\ }
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00244}00244\ \textcolor{comment}{//\ Tests\ assigning\ an\ std::pair\ to\ a\ 2-\/tuple.}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00245}00245\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(TupleAssignmentTest,\ AssignsFromPair)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00246}00246\ \ \ const\ ::std::pair<int,\ bool>\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}(5,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00247}00247\ \ \ tuple<int,\ bool>\ b;}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00248}00248\ \ \ b\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}};}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00249}00249\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(5,\ get<0>(b));}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00250}00250\ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(get<1>(b));}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00251}00251\ }
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00252}00252\ \ \ tuple<long,\ bool>\ c;}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00253}00253\ \ \ c\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}};}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00254}00254\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(5L,\ get<0>(c));}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00255}00255\ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(get<1>(c));}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00256}00256\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00257}00257\ }
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00258}00258\ \textcolor{comment}{//\ A\ fixture\ for\ testing\ big\ tuples.}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00259}00259\ \textcolor{keyword}{class\ }BigTupleTest\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1_test}{testing::Test}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00260}00260\ \ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00261}00261\ \ \ \textcolor{keyword}{typedef}\ tuple<int,\ int,\ int,\ int,\ int,\ int,\ int,\ int,\ int,\ int>\ BigTuple;}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00262}00262\ }
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00263}00263\ \ \ BigTupleTest()\ :}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00264}00264\ \ \ \ \ \ \ a\_(1,\ 0,\ 0,\ 0,\ 0,\ 0,\ 0,\ 0,\ 0,\ 2),}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00265}00265\ \ \ \ \ \ \ b\_(1,\ 0,\ 0,\ 0,\ 0,\ 0,\ 0,\ 0,\ 0,\ 3)\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00266}00266\ }
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00267}00267\ \ \ BigTuple\ a\_,\ b\_;}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00268}00268\ \};}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00269}00269\ }
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00270}00270\ \textcolor{comment}{//\ Tests\ constructing\ big\ tuples.}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00271}00271\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(BigTupleTest,\ Construction)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00272}00272\ \ \ BigTuple\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}};}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00273}00273\ \ \ BigTuple\ b(b\_);}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00274}00274\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00275}00275\ }
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00276}00276\ \textcolor{comment}{//\ Tests\ that\ get<N>(t)\ returns\ the\ N-\/th\ (0-\/based)\ field\ of\ tuple\ t.}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00277}00277\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(BigTupleTest,\ get)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00278}00278\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(1,\ get<0>(a\_));}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00279}00279\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(2,\ get<9>(a\_));}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00280}00280\ }
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00281}00281\ \ \ \textcolor{comment}{//\ Tests\ that\ get()\ works\ on\ a\ const\ tuple\ too.}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00282}00282\ \ \ \textcolor{keyword}{const}\ BigTuple\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}(a\_);}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00283}00283\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(1,\ get<0>(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}));}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00284}00284\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(2,\ get<9>(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}));}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00285}00285\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00286}00286\ }
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00287}00287\ \textcolor{comment}{//\ Tests\ comparing\ big\ tuples.}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00288}00288\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(BigTupleTest,\ Comparisons)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00289}00289\ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(a\_\ ==\ a\_);}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00290}00290\ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(a\_\ !=\ a\_);}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00291}00291\ }
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00292}00292\ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(a\_\ !=\ b\_);}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00293}00293\ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(a\_\ ==\ b\_);}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00294}00294\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00295}00295\ }
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00296}00296\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(MakeTupleTest,\ WorksForScalarTypes)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00297}00297\ \ \ tuple<bool,\ int>\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}};}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00298}00298\ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ =\ make\_tuple(\textcolor{keyword}{true},\ 5);}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00299}00299\ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(get<0>(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}));}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00300}00300\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(5,\ get<1>(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}));}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00301}00301\ }
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00302}00302\ \ \ tuple<char,\ int,\ long>\ b;}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00303}00303\ \ \ b\ =\ make\_tuple(\textcolor{charliteral}{'a'},\ \textcolor{charliteral}{'b'},\ 5);}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00304}00304\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\textcolor{charliteral}{'a'},\ get<0>(b));}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00305}00305\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\textcolor{charliteral}{'b'},\ get<1>(b));}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00306}00306\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(5,\ get<2>(b));}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00307}00307\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00308}00308\ }
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00309}00309\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(MakeTupleTest,\ WorksForPointers)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00310}00310\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}[]\ =\ \{\ 1,\ 2,\ 3,\ 4\ \};}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00311}00311\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}\ =\ \textcolor{stringliteral}{"{}hi"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00312}00312\ \ \ \textcolor{keywordtype}{int}*\ \textcolor{keyword}{const}\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}};}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00313}00313\ }
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00314}00314\ \ \ tuple<const\ char*,\ int*>\ t;}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00315}00315\ \ \ t\ =\ make\_tuple(str,\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}});}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00316}00316\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(str,\ get<0>(t));}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00317}00317\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\ get<1>(t));}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00318}00318\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00319}00319\ }
+\DoxyCodeLine{\Hypertarget{gtest-tuple__test_8cc_source_l00320}00320\ \}\ \ \textcolor{comment}{//\ namespace}}
+
+\end{DoxyCode}

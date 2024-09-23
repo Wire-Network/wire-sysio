@@ -1,0 +1,95 @@
+\doxysection{iostream\+\_\+server.\+cpp}
+\hypertarget{iostream__server_8cpp_source}{}\label{iostream__server_8cpp_source}\index{libraries/fc/vendor/websocketpp/examples/iostream\_server/iostream\_server.cpp@{libraries/fc/vendor/websocketpp/examples/iostream\_server/iostream\_server.cpp}}
+\mbox{\hyperlink{iostream__server_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{core_8hpp}{websocketpp/config/core.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{server_8hpp}{websocketpp/server.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <iostream>}}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <fstream>}}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00008}\mbox{\hyperlink{iostream__server_8cpp_a49fb43a0abcf860429edd72caab81b74}{00008}}\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1server}{websocketpp::server<websocketpp::config::core>}}\ \mbox{\hyperlink{iostream__server_8cpp_a49fb43a0abcf860429edd72caab81b74}{server}};}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00010}00010\ \textcolor{keyword}{using\ }websocketpp::lib::placeholders::\_1;}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00011}00011\ \textcolor{keyword}{using\ }websocketpp::lib::placeholders::\_2;}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00012}00012\ \textcolor{keyword}{using\ }websocketpp::lib::bind;}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00014}00014\ \textcolor{comment}{//\ pull\ out\ the\ type\ of\ messages\ sent\ by\ our\ config}}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00015}00015\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a8097edab4feb0c36a69601c3786f0062}{server::message\_ptr}}\ \mbox{\hyperlink{debug__client_8cpp_a08398c4d31a4dc3e42d1b9a9ef64c6ad}{message\_ptr}};}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00017}00017\ \textcolor{comment}{//\ Define\ a\ callback\ to\ handle\ incoming\ messages}}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00018}\mbox{\hyperlink{iostream__server_8cpp_a9a10d63d7c00e9917ce373bf47bda4b6}{00018}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{iostream__server_8cpp_a9a10d63d7c00e9917ce373bf47bda4b6}{on\_message}}(\mbox{\hyperlink{classwebsocketpp_1_1server}{server}}*\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ \mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{websocketpp::connection\_hdl}}\ hdl,\ \mbox{\hyperlink{debug__client_8cpp_a08398c4d31a4dc3e42d1b9a9ef64c6ad}{message\_ptr}}\ msg)\ \{}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00019}00019\ \ \ \ \ \textcolor{keywordflow}{if}\ (msg-\/>get\_opcode()\ ==\ \mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea6b65f28626b19b2eef447744c564e727}{websocketpp::frame::opcode::text}})\ \{}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00020}00020\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}-\/>get\_alog().write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_aaf67c94a68502c49308489ff01d8d0a8}{websocketpp::log::alevel::app}},}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00021}00021\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Text\ Message\ Received:\ "{}}+msg-\/>get\_payload());}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00022}00022\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00023}00023\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}-\/>get\_alog().write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_aaf67c94a68502c49308489ff01d8d0a8}{websocketpp::log::alevel::app}},}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00024}00024\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Binary\ Message\ Received:\ "{}}+\mbox{\hyperlink{namespacewebsocketpp_1_1utility_a26e5a26395d95d2f6bf3a9edb8d06dd2}{websocketpp::utility::to\_hex}}(msg-\/>get\_payload()));}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00025}00025\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00027}00027\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00028}00028\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}-\/>send(hdl,\ msg-\/>get\_payload(),\ msg-\/>get\_opcode());}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00029}00029\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\textcolor{keyword}{const}\ websocketpp::lib::error\_code\&\ e)\ \{}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00030}00030\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}-\/>get\_alog().write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_aaf67c94a68502c49308489ff01d8d0a8}{websocketpp::log::alevel::app}},}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00031}00031\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Echo\ Failed:\ "{}}+e.message());}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00032}00032\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00033}00033\ \}}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00035}\mbox{\hyperlink{iostream__server_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{00035}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{iostream__server_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}()\ \{}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00036}00036\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1server}{server}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00037}00037\ \ \ \ \ std::ofstream\ log;}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00039}00039\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00040}00040\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ set\ up\ access\ channels\ to\ only\ log\ interesting\ things}}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00041}00041\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.clear\_access\_channels(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a853aa0b8976e53f3181af3bc398d493e}{websocketpp::log::alevel::all}});}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00042}00042\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.set\_access\_channels(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_aac3e16b6df297567ba2533233d477d57}{websocketpp::log::alevel::connect}});}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00043}00043\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.set\_access\_channels(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_af19681d3edb28e0407688eeda8f0005c}{websocketpp::log::alevel::disconnect}});}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00044}00044\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.set\_access\_channels(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_aaf67c94a68502c49308489ff01d8d0a8}{websocketpp::log::alevel::app}});}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00046}00046\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Log\ to\ a\ file\ rather\ than\ stdout,\ as\ we\ are\ using\ stdout\ for\ real}}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00047}00047\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ output}}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00048}00048\ \ \ \ \ \ \ \ \ log.open(\textcolor{stringliteral}{"{}output.log"{}});}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.get\_alog().set\_ostream(\&log);}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00050}00050\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.get\_elog().set\_ostream(\&log);}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00052}00052\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ print\ all\ output\ to\ stdout}}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.register\_ostream(\&std::cout);}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00054}00054\ }
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00055}00055\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Register\ our\ message\ handler}}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00056}00056\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.set\_message\_handler(bind(\&\mbox{\hyperlink{iostream__server_8cpp_a9a10d63d7c00e9917ce373bf47bda4b6}{on\_message}},\&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},::\_1,::\_2));}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00058}00058\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1server_abb895563dddafdc1426997d245cbd7cb}{server::connection\_ptr}}\ con\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.get\_connection();}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00060}00060\ \ \ \ \ \ \ \ \ con-\/>start();}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00062}00062\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ C++\ iostream's\ don't\ support\ the\ idea\ of\ asynchronous\ i/o.\ As\ such}}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00063}00063\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ there\ are\ two\ input\ strategies\ demonstrated\ here.\ Buffered\ I/O\ will}}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00064}00064\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ read\ from\ stdin\ in\ chunks\ until\ EOF.\ This\ works\ very\ well\ for}}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00065}00065\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ replaying\ canned\ connections\ as\ would\ be\ done\ in\ automated\ testing.}}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00066}00066\ \ \ \ \ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00067}00067\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ the\ server\ is\ being\ used\ live\ however,\ assuming\ input\ is\ being}}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00068}00068\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ piped\ from\ elsewhere\ in\ realtime,\ this\ strategy\ will\ result\ in\ small}}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00069}00069\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ messages\ being\ buffered\ forever.\ The\ non-\/buffered\ strategy\ below}}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00070}00070\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ reads\ characters\ from\ stdin\ one\ at\ a\ time.\ This\ is\ inefficient\ and}}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00071}00071\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ for\ more\ serious\ uses\ should\ be\ replaced\ with\ a\ platform\ specific}}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00072}00072\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ asyncronous\ i/o\ technique\ like\ select,\ poll,\ IOCP,\ etc}}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00073}00073\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ buffered\_io\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00074}00074\ }
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00075}00075\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (buffered\_io)\ \{}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \ \ \ std::cin\ >>\ *con;}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ con-\/>eof();}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00078}00078\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}};}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00080}00080\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(std::cin.get(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}))\ \{}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00081}00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ con-\/>read\_some(\&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},1);}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00082}00082\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00083}00083\ \ \ \ \ \ \ \ \ \ \ \ \ con-\/>eof();}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00084}00084\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00085}00085\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\mbox{\hyperlink{classwebsocketpp_1_1exception}{websocketpp::exception}}\ \textcolor{keyword}{const}\ \&\ e)\ \{}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00086}00086\ \ \ \ \ \ \ \ \ std::cout\ <<\ e.\mbox{\hyperlink{classwebsocketpp_1_1exception_a62dabd977bc59faaca6dc268744a6089}{what}}()\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00087}00087\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00088}00088\ \ \ \ \ log.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_aa6b81c003dba27c6b30d62d5e79593a6}{close}}();}
+\DoxyCodeLine{\Hypertarget{iostream__server_8cpp_source_l00089}00089\ \}}
+
+\end{DoxyCode}

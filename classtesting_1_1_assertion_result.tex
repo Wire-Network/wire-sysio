@@ -1,0 +1,217 @@
+\doxysection{testing\+::Assertion\+Result Class Reference}
+\hypertarget{classtesting_1_1_assertion_result}{}\label{classtesting_1_1_assertion_result}\index{testing::AssertionResult@{testing::AssertionResult}}
+
+
+{\ttfamily \#include $<$gtest.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1_assertion_result_a27788116f03f90aec4daf592fd809ead}{Assertion\+Result}} (const \mbox{\hyperlink{classtesting_1_1_assertion_result}{Assertion\+Result}} \&other)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{classtesting_1_1_assertion_result_a9b8d1d6d0a979d0769ed4ff97d06c4e3}{Assertion\+Result}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&success, typename \mbox{\hyperlink{structtesting_1_1internal_1_1_enable_if}{internal\+::\+Enable\+If}}$<$ !\mbox{\hyperlink{classtesting_1_1internal_1_1_implicitly_convertible}{internal\+::\+Implicitly\+Convertible}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classtesting_1_1_assertion_result}{Assertion\+Result}} $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}} $>$\+::type \texorpdfstring{$\ast$}{*}=NULL)
+\item 
+\mbox{\hyperlink{classtesting_1_1_assertion_result}{Assertion\+Result}} \& \mbox{\hyperlink{classtesting_1_1_assertion_result_af9b993aa3b1f273963a0fb7884a53655}{operator=}} (\mbox{\hyperlink{classtesting_1_1_assertion_result}{Assertion\+Result}} other)
+\item 
+\mbox{\hyperlink{classtesting_1_1_assertion_result_ab3f34b1623c82762ef4a8f52b535159c}{operator bool}} () const
+\item 
+\mbox{\hyperlink{classtesting_1_1_assertion_result}{Assertion\+Result}} \mbox{\hyperlink{classtesting_1_1_assertion_result_a5b0784686a756660ac8dfe528d89386b}{operator!}} () const
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classtesting_1_1_assertion_result_a642e9b448f000eced1ae8bdabd667cdb}{message}} () const
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classtesting_1_1_assertion_result_ae80e8e4452f6fb4d90def8f376447ae9}{failure\+\_\+message}} () const
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{classtesting_1_1_assertion_result}{Assertion\+Result}} \& \mbox{\hyperlink{classtesting_1_1_assertion_result_ab54da17bbe6a4713ff3d75df8658dbc5}{operator$<$$<$}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+\mbox{\hyperlink{classtesting_1_1_assertion_result}{Assertion\+Result}} \& \mbox{\hyperlink{classtesting_1_1_assertion_result_afa408467f4ff6ac1209f843d5c4a741e}{operator$<$$<$}} (\+::std\+::ostream \&(\texorpdfstring{$\ast$}{*}basic\+\_\+manipulator)(\+::std\+::ostream \&stream))
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{gtest_8h_source_l00269}{269}} of file \mbox{\hyperlink{gtest_8h_source}{gtest.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1_assertion_result_a27788116f03f90aec4daf592fd809ead}\index{testing::AssertionResult@{testing::AssertionResult}!AssertionResult@{AssertionResult}}
+\index{AssertionResult@{AssertionResult}!testing::AssertionResult@{testing::AssertionResult}}
+\doxysubsubsection{\texorpdfstring{AssertionResult()}{AssertionResult()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classtesting_1_1_assertion_result_a27788116f03f90aec4daf592fd809ead} 
+testing\+::\+Assertion\+Result\+::\+Assertion\+Result (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classtesting_1_1_assertion_result}{Assertion\+Result}} \&}]{other}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8cc_source_l01001}{1001}} of file \mbox{\hyperlink{gtest_8cc_source}{gtest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01002\ \ \ \ \ :\ success\_(\mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.success\_),}
+\DoxyCodeLine{01003\ \ \ \ \ \ \ message\_(\mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.message\_.get()\ !=\ NULL\ ?}
+\DoxyCodeLine{01004\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ new\ ::std::string(*\mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.message\_)\ :}
+\DoxyCodeLine{01005\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}\ ::std::string*\textcolor{keyword}{>}(NULL))\ \{}
+\DoxyCodeLine{01006\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1_assertion_result_a9b8d1d6d0a979d0769ed4ff97d06c4e3}\index{testing::AssertionResult@{testing::AssertionResult}!AssertionResult@{AssertionResult}}
+\index{AssertionResult@{AssertionResult}!testing::AssertionResult@{testing::AssertionResult}}
+\doxysubsubsection{\texorpdfstring{AssertionResult()}{AssertionResult()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classtesting_1_1_assertion_result_a9b8d1d6d0a979d0769ed4ff97d06c4e3} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+testing\+::\+Assertion\+Result\+::\+Assertion\+Result (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{success}{, }\item[{typename \mbox{\hyperlink{structtesting_1_1internal_1_1_enable_if}{internal\+::\+Enable\+If}}$<$ !\mbox{\hyperlink{classtesting_1_1internal_1_1_implicitly_convertible}{internal\+::\+Implicitly\+Convertible}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classtesting_1_1_assertion_result}{Assertion\+Result}} $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}} $>$\+::type \texorpdfstring{$\ast$}{*}}]{}{ = {\ttfamily NULL}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8h_source_l00287}{287}} of file \mbox{\hyperlink{gtest_8h_source}{gtest.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00292\ \ \ \ \ \ \ :\ success\_(success)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1_assertion_result_ae80e8e4452f6fb4d90def8f376447ae9}\index{testing::AssertionResult@{testing::AssertionResult}!failure\_message@{failure\_message}}
+\index{failure\_message@{failure\_message}!testing::AssertionResult@{testing::AssertionResult}}
+\doxysubsubsection{\texorpdfstring{failure\_message()}{failure\_message()}}
+{\footnotesize\ttfamily \label{classtesting_1_1_assertion_result_ae80e8e4452f6fb4d90def8f376447ae9} 
+const char \texorpdfstring{$\ast$}{*} testing\+::\+Assertion\+Result\+::failure\+\_\+message (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8h_source_l00319}{319}} of file \mbox{\hyperlink{gtest_8h_source}{gtest.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00319\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtesting_1_1_assertion_result_a642e9b448f000eced1ae8bdabd667cdb}{message}}();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1_assertion_result_a642e9b448f000eced1ae8bdabd667cdb}\index{testing::AssertionResult@{testing::AssertionResult}!message@{message}}
+\index{message@{message}!testing::AssertionResult@{testing::AssertionResult}}
+\doxysubsubsection{\texorpdfstring{message()}{message()}}
+{\footnotesize\ttfamily \label{classtesting_1_1_assertion_result_a642e9b448f000eced1ae8bdabd667cdb} 
+const char \texorpdfstring{$\ast$}{*} testing\+::\+Assertion\+Result\+::message (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8h_source_l00314}{314}} of file \mbox{\hyperlink{gtest_8h_source}{gtest.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00314\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00315\ \ \ \ \ \textcolor{keywordflow}{return}\ message\_.\mbox{\hyperlink{classtesting_1_1internal_1_1scoped__ptr_a5a78280b6a59ff4b63aae444efc61e3f}{get}}()\ !=\ NULL\ ?\ \ message\_-\/>c\_str()\ :\ \textcolor{stringliteral}{"{}"{}};}
+\DoxyCodeLine{00316\ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1_assertion_result_a642e9b448f000eced1ae8bdabd667cdb_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1_assertion_result_ab3f34b1623c82762ef4a8f52b535159c}\index{testing::AssertionResult@{testing::AssertionResult}!operator bool@{operator bool}}
+\index{operator bool@{operator bool}!testing::AssertionResult@{testing::AssertionResult}}
+\doxysubsubsection{\texorpdfstring{operator bool()}{operator bool()}}
+{\footnotesize\ttfamily \label{classtesting_1_1_assertion_result_ab3f34b1623c82762ef4a8f52b535159c} 
+testing\+::\+Assertion\+Result\+::operator bool (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8h_source_l00305}{305}} of file \mbox{\hyperlink{gtest_8h_source}{gtest.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00305\ \{\ \textcolor{keywordflow}{return}\ success\_;\ \}\ \ \textcolor{comment}{//\ NOLINT}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1_assertion_result_a5b0784686a756660ac8dfe528d89386b}\index{testing::AssertionResult@{testing::AssertionResult}!operator"!@{operator"!}}
+\index{operator"!@{operator"!}!testing::AssertionResult@{testing::AssertionResult}}
+\doxysubsubsection{\texorpdfstring{operator"!()}{operator!()}}
+{\footnotesize\ttfamily \label{classtesting_1_1_assertion_result_a5b0784686a756660ac8dfe528d89386b} 
+\mbox{\hyperlink{classtesting_1_1_assertion_result}{Assertion\+Result}} testing\+::\+Assertion\+Result\+::operator! (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8cc_source_l01016}{1016}} of file \mbox{\hyperlink{gtest_8cc_source}{gtest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01016\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01017\ \ \ \mbox{\hyperlink{classtesting_1_1_assertion_result_a27788116f03f90aec4daf592fd809ead}{AssertionResult}}\ negation(!success\_);}
+\DoxyCodeLine{01018\ \ \ \textcolor{keywordflow}{if}\ (message\_.\mbox{\hyperlink{classtesting_1_1internal_1_1scoped__ptr_a5a78280b6a59ff4b63aae444efc61e3f}{get}}()\ !=\ NULL)}
+\DoxyCodeLine{01019\ \ \ \ \ negation\ <<\ *message\_;}
+\DoxyCodeLine{01020\ \ \ \textcolor{keywordflow}{return}\ negation;}
+\DoxyCodeLine{01021\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=326pt]{classtesting_1_1_assertion_result_a5b0784686a756660ac8dfe528d89386b_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1_assertion_result_afa408467f4ff6ac1209f843d5c4a741e}\index{testing::AssertionResult@{testing::AssertionResult}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!testing::AssertionResult@{testing::AssertionResult}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classtesting_1_1_assertion_result_afa408467f4ff6ac1209f843d5c4a741e} 
+\mbox{\hyperlink{classtesting_1_1_assertion_result}{Assertion\+Result}} \& testing\+::\+Assertion\+Result\+::operator$<$$<$ (\begin{DoxyParamCaption}\item[{\+::std\+::ostream \&(\texorpdfstring{$\ast$}{*}}]{basic\+\_\+manipulator~}{)(\+::std\+::ostream \&stream)}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8h_source_l00329}{329}} of file \mbox{\hyperlink{gtest_8h_source}{gtest.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00330\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00331\ \ \ \ \ AppendMessage(Message()\ <<\ basic\_manipulator);}
+\DoxyCodeLine{00332\ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00333\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1_assertion_result_ab54da17bbe6a4713ff3d75df8658dbc5}\index{testing::AssertionResult@{testing::AssertionResult}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!testing::AssertionResult@{testing::AssertionResult}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classtesting_1_1_assertion_result_ab54da17bbe6a4713ff3d75df8658dbc5} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{classtesting_1_1_assertion_result}{Assertion\+Result}} \& testing\+::\+Assertion\+Result\+::operator$<$$<$ (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8h_source_l00322}{322}} of file \mbox{\hyperlink{gtest_8h_source}{gtest.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00322\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00323\ \ \ \ \ AppendMessage(Message()\ <<\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}});}
+\DoxyCodeLine{00324\ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00325\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1_assertion_result_af9b993aa3b1f273963a0fb7884a53655}\index{testing::AssertionResult@{testing::AssertionResult}!operator=@{operator=}}
+\index{operator=@{operator=}!testing::AssertionResult@{testing::AssertionResult}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}}
+{\footnotesize\ttfamily \label{classtesting_1_1_assertion_result_af9b993aa3b1f273963a0fb7884a53655} 
+\mbox{\hyperlink{classtesting_1_1_assertion_result}{Assertion\+Result}} \& testing\+::\+Assertion\+Result\+::operator= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classtesting_1_1_assertion_result}{Assertion\+Result}}}]{other}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8h_source_l00299}{299}} of file \mbox{\hyperlink{gtest_8h_source}{gtest.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00299\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00300\ \ \ \ \ swap(other);}
+\DoxyCodeLine{00301\ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00302\ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/include/gtest/\mbox{\hyperlink{gtest_8h}{gtest.\+h}}\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/src/\mbox{\hyperlink{gtest_8cc}{gtest.\+cc}}\end{DoxyCompactItemize}

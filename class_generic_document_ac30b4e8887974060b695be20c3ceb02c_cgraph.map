@@ -1,0 +1,17 @@
+<map id="GenericDocument::Populate" name="GenericDocument::Populate">
+<area shape="rect" id="Node000001" title="Populate this document by a generator which produces SAX events." alt="" coords="5,31,191,56"/>
+<area shape="rect" id="Node000002" href="$classinternal_1_1_stack.html#ac484468a2791bd3e9ba609bd1600ab48" title=" " alt="" coords="239,5,400,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="190,30,223,26,224,32,191,36"/>
+<area shape="rect" id="Node000003" href="$class_generic_value.html#ad7502bbfcd0c14f7ece07243d56e2b90" title="Assignment with move semantics." alt="" coords="239,55,400,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="191,51,223,54,223,60,191,56"/>
+<area shape="rect" id="Node000004" href="$class_generic_value.html#abb8ea2dfbe74ff4ee7dac6be31317f81" title="Assignment without calling destructor." alt="" coords="457,29,630,55"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="400,56,441,51,442,56,400,61"/>
+<area shape="rect" id="Node000005" href="$class_generic_value.html#a213ba89ef5ef961a5e655bd8c78ac9f4" title="Destructor." alt="" coords="448,79,639,104"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="400,73,433,77,432,82,400,79"/>
+<area shape="rect" id="Node000006" href="$class_generic_value.html#a40f567bae6fabbb07822ebac5fe00bfc" title=" " alt="" coords="697,6,880,46"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="598,75,639,65,698,49,700,54,640,70,600,81"/>
+<area shape="rect" id="Node000007" href="$class_generic_value.html#a8c39af1a639eae1b59db66e2cbb537c9" title=" " alt="" coords="698,71,879,112"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="640,89,682,89,682,94,640,94"/>
+<area shape="rect" id="Node000008" href="$class_generic_value.html#af182f2ccbcd962d2a28f92407622e9a9" title=" " alt="" coords="687,136,890,162"/>
+<area shape="poly" id="edge7_Node000005_Node000008" title=" " alt="" coords="602,102,716,129,715,135,601,108"/>
+</map>

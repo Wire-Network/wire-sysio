@@ -1,0 +1,116 @@
+\doxysection{libraries/fc/include/fc/crypto/webauthn\+\_\+json/example/archiver/archiver.cpp File Reference}
+\hypertarget{archiver_8cpp}{}\label{archiver_8cpp}\index{libraries/fc/include/fc/crypto/webauthn\_json/example/archiver/archiver.cpp@{libraries/fc/include/fc/crypto/webauthn\_json/example/archiver/archiver.cpp}}
+{\ttfamily \#include "{}archiver.\+h"{}}\newline
+{\ttfamily \#include $<$cassert$>$}\newline
+{\ttfamily \#include $<$stack$>$}\newline
+{\ttfamily \#include "{}rapidjson/document.\+h"{}}\newline
+{\ttfamily \#include "{}rapidjson/prettywriter.\+h"{}}\newline
+{\ttfamily \#include "{}rapidjson/stringbuffer.\+h"{}}\newline
+Include dependency graph for archiver.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{archiver_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_json_reader_stack_item}{Json\+Reader\+Stack\+Item}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{archiver_8cpp_a149b55eb821bfd8722c37788381acd09}{DOCUMENT}}~reinterpret\+\_\+cast$<$\mbox{\hyperlink{document_8h_ac6ea5b168e3fe8c7fa532450fc9391f7}{Document}}\texorpdfstring{$\ast$}{*}$>$(m\+Document)
+\item 
+\#define \mbox{\hyperlink{archiver_8cpp_a2cc8f2d83039de1aef6590f9782921ee}{STACK}}~(reinterpret\+\_\+cast$<$\mbox{\hyperlink{archiver_8cpp_ae895071c91568125917165b3aa4a9708}{Json\+Reader\+Stack}}\texorpdfstring{$\ast$}{*}$>$(m\+Stack))
+\item 
+\#define \mbox{\hyperlink{archiver_8cpp_afc0eef637f1016e8786e45e106a4881e}{TOP}}~(\mbox{\hyperlink{archiver_8cpp_a2cc8f2d83039de1aef6590f9782921ee}{STACK}}-\/$>$top())
+\item 
+\#define \mbox{\hyperlink{archiver_8cpp_a1f957b762e025dae67967a36c86dcfc1}{CURRENT}}~(\texorpdfstring{$\ast$}{*}\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{TOP.\+value}})
+\item 
+\#define \mbox{\hyperlink{archiver_8cpp_a092368cb0c35415b27ffe320e390e82b}{WRITER}}~reinterpret\+\_\+cast$<$\mbox{\hyperlink{class_pretty_writer}{Pretty\+Writer}}$<$\mbox{\hyperlink{fwd_8h_ab956b6537825abf8aac4112e81cfad7e}{String\+Buffer}}$>$\texorpdfstring{$\ast$}{*}$>$(m\+Writer)
+\item 
+\#define \mbox{\hyperlink{archiver_8cpp_aa57974323bef0262551029d83546b8e9}{STREAM}}~reinterpret\+\_\+cast$<$\mbox{\hyperlink{fwd_8h_ab956b6537825abf8aac4112e81cfad7e}{String\+Buffer}}\texorpdfstring{$\ast$}{*}$>$(m\+Stream)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef std\+::stack$<$ \mbox{\hyperlink{struct_json_reader_stack_item}{Json\+Reader\+Stack\+Item}} $>$ \mbox{\hyperlink{archiver_8cpp_ae895071c91568125917165b3aa4a9708}{Json\+Reader\+Stack}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{archiver_8cpp_a1f957b762e025dae67967a36c86dcfc1}\index{archiver.cpp@{archiver.cpp}!CURRENT@{CURRENT}}
+\index{CURRENT@{CURRENT}!archiver.cpp@{archiver.cpp}}
+\doxysubsubsection{\texorpdfstring{CURRENT}{CURRENT}}
+{\footnotesize\ttfamily \label{archiver_8cpp_a1f957b762e025dae67967a36c86dcfc1} 
+\#define CURRENT~(\texorpdfstring{$\ast$}{*}\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{TOP.\+value}})}
+
+
+
+Definition at line \mbox{\hyperlink{archiver_8cpp_source_l00029}{29}} of file \mbox{\hyperlink{archiver_8cpp_source}{archiver.\+cpp}}.
+
+\Hypertarget{archiver_8cpp_a149b55eb821bfd8722c37788381acd09}\index{archiver.cpp@{archiver.cpp}!DOCUMENT@{DOCUMENT}}
+\index{DOCUMENT@{DOCUMENT}!archiver.cpp@{archiver.cpp}}
+\doxysubsubsection{\texorpdfstring{DOCUMENT}{DOCUMENT}}
+{\footnotesize\ttfamily \label{archiver_8cpp_a149b55eb821bfd8722c37788381acd09} 
+\#define DOCUMENT~reinterpret\+\_\+cast$<$\mbox{\hyperlink{document_8h_ac6ea5b168e3fe8c7fa532450fc9391f7}{Document}}\texorpdfstring{$\ast$}{*}$>$(m\+Document)}
+
+
+
+Definition at line \mbox{\hyperlink{archiver_8cpp_source_l00026}{26}} of file \mbox{\hyperlink{archiver_8cpp_source}{archiver.\+cpp}}.
+
+\Hypertarget{archiver_8cpp_a2cc8f2d83039de1aef6590f9782921ee}\index{archiver.cpp@{archiver.cpp}!STACK@{STACK}}
+\index{STACK@{STACK}!archiver.cpp@{archiver.cpp}}
+\doxysubsubsection{\texorpdfstring{STACK}{STACK}}
+{\footnotesize\ttfamily \label{archiver_8cpp_a2cc8f2d83039de1aef6590f9782921ee} 
+\#define STACK~(reinterpret\+\_\+cast$<$\mbox{\hyperlink{archiver_8cpp_ae895071c91568125917165b3aa4a9708}{Json\+Reader\+Stack}}\texorpdfstring{$\ast$}{*}$>$(m\+Stack))}
+
+
+
+Definition at line \mbox{\hyperlink{archiver_8cpp_source_l00027}{27}} of file \mbox{\hyperlink{archiver_8cpp_source}{archiver.\+cpp}}.
+
+\Hypertarget{archiver_8cpp_aa57974323bef0262551029d83546b8e9}\index{archiver.cpp@{archiver.cpp}!STREAM@{STREAM}}
+\index{STREAM@{STREAM}!archiver.cpp@{archiver.cpp}}
+\doxysubsubsection{\texorpdfstring{STREAM}{STREAM}}
+{\footnotesize\ttfamily \label{archiver_8cpp_aa57974323bef0262551029d83546b8e9} 
+\#define STREAM~reinterpret\+\_\+cast$<$\mbox{\hyperlink{fwd_8h_ab956b6537825abf8aac4112e81cfad7e}{String\+Buffer}}\texorpdfstring{$\ast$}{*}$>$(m\+Stream)}
+
+
+
+Definition at line \mbox{\hyperlink{archiver_8cpp_source_l00214}{214}} of file \mbox{\hyperlink{archiver_8cpp_source}{archiver.\+cpp}}.
+
+\Hypertarget{archiver_8cpp_afc0eef637f1016e8786e45e106a4881e}\index{archiver.cpp@{archiver.cpp}!TOP@{TOP}}
+\index{TOP@{TOP}!archiver.cpp@{archiver.cpp}}
+\doxysubsubsection{\texorpdfstring{TOP}{TOP}}
+{\footnotesize\ttfamily \label{archiver_8cpp_afc0eef637f1016e8786e45e106a4881e} 
+\#define TOP~(\mbox{\hyperlink{archiver_8cpp_a2cc8f2d83039de1aef6590f9782921ee}{STACK}}-\/$>$top())}
+
+
+
+Definition at line \mbox{\hyperlink{archiver_8cpp_source_l00028}{28}} of file \mbox{\hyperlink{archiver_8cpp_source}{archiver.\+cpp}}.
+
+\Hypertarget{archiver_8cpp_a092368cb0c35415b27ffe320e390e82b}\index{archiver.cpp@{archiver.cpp}!WRITER@{WRITER}}
+\index{WRITER@{WRITER}!archiver.cpp@{archiver.cpp}}
+\doxysubsubsection{\texorpdfstring{WRITER}{WRITER}}
+{\footnotesize\ttfamily \label{archiver_8cpp_a092368cb0c35415b27ffe320e390e82b} 
+\#define WRITER~reinterpret\+\_\+cast$<$\mbox{\hyperlink{class_pretty_writer}{Pretty\+Writer}}$<$\mbox{\hyperlink{fwd_8h_ab956b6537825abf8aac4112e81cfad7e}{String\+Buffer}}$>$\texorpdfstring{$\ast$}{*}$>$(m\+Writer)}
+
+
+
+Definition at line \mbox{\hyperlink{archiver_8cpp_source_l00213}{213}} of file \mbox{\hyperlink{archiver_8cpp_source}{archiver.\+cpp}}.
+
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{archiver_8cpp_ae895071c91568125917165b3aa4a9708}\index{archiver.cpp@{archiver.cpp}!JsonReaderStack@{JsonReaderStack}}
+\index{JsonReaderStack@{JsonReaderStack}!archiver.cpp@{archiver.cpp}}
+\doxysubsubsection{\texorpdfstring{JsonReaderStack}{JsonReaderStack}}
+{\footnotesize\ttfamily \label{archiver_8cpp_ae895071c91568125917165b3aa4a9708} 
+typedef std\+::stack$<$\mbox{\hyperlink{struct_json_reader_stack_item}{Json\+Reader\+Stack\+Item}}$>$ \mbox{\hyperlink{archiver_8cpp_ae895071c91568125917165b3aa4a9708}{Json\+Reader\+Stack}}}
+
+
+
+Definition at line \mbox{\hyperlink{archiver_8cpp_source_l00024}{24}} of file \mbox{\hyperlink{archiver_8cpp_source}{archiver.\+cpp}}.
+

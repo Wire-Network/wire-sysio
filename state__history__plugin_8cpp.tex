@@ -1,0 +1,55 @@
+\doxysection{plugins/state\+\_\+history\+\_\+plugin/state\+\_\+history\+\_\+plugin.cpp File Reference}
+\hypertarget{state__history__plugin_8cpp}{}\label{state__history__plugin_8cpp}\index{plugins/state\_history\_plugin/state\_history\_plugin.cpp@{plugins/state\_history\_plugin/state\_history\_plugin.cpp}}
+{\ttfamily \#include $<$sysio/chain/config.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/state\+\_\+history/compression.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/state\+\_\+history/create\+\_\+deltas.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/resource\+\_\+monitor\+\_\+plugin/resource\+\_\+monitor\+\_\+plugin.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/state\+\_\+history/log.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/state\+\_\+history/serialization.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/state\+\_\+history/trace\+\_\+converter.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/state\+\_\+history\+\_\+plugin/state\+\_\+history\+\_\+plugin.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/asio/bind\+\_\+executor.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/asio/ip/host\+\_\+name.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/asio/ip/tcp.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/asio/strand.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/beast/core.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/beast/websocket.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/signals2/connection.\+hpp$>$}\newline
+Include dependency graph for state\+\_\+history\+\_\+plugin.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{state__history__plugin_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1state__history__plugin__impl}{sysio\+::state\+\_\+history\+\_\+plugin\+\_\+impl}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_1_1session}{sysio\+::state\+\_\+history\+\_\+plugin\+\_\+impl\+::session}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename F $>$ }\\auto \mbox{\hyperlink{namespacesysio_a39cc68aac0c6e19efdcf077c000b87a7}{sysio\+::catch\+\_\+and\+\_\+log}} (F \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+const char \texorpdfstring{$\ast$}{*}const \mbox{\hyperlink{state__history__plugin_8cpp_ae4097a3d4530483dcbecd2ffc0264aaa}{state\+\_\+history\+\_\+plugin\+\_\+abi}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{state__history__plugin_8cpp_ae4097a3d4530483dcbecd2ffc0264aaa}\index{state\_history\_plugin.cpp@{state\_history\_plugin.cpp}!state\_history\_plugin\_abi@{state\_history\_plugin\_abi}}
+\index{state\_history\_plugin\_abi@{state\_history\_plugin\_abi}!state\_history\_plugin.cpp@{state\_history\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{state\_history\_plugin\_abi}{state\_history\_plugin\_abi}}
+{\footnotesize\ttfamily \label{state__history__plugin_8cpp_ae4097a3d4530483dcbecd2ffc0264aaa} 
+const char\texorpdfstring{$\ast$}{*} const state\+\_\+history\+\_\+plugin\+\_\+abi\hspace{0.3cm}{\ttfamily [extern]}}
+

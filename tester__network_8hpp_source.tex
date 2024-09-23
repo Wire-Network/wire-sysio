@@ -1,0 +1,30 @@
+\doxysection{tester\+\_\+network.\+hpp}
+\hypertarget{tester__network_8hpp_source}{}\label{tester__network_8hpp_source}\index{libraries/testing/include/sysio/testing/tester\_network.hpp@{libraries/testing/include/sysio/testing/tester\_network.hpp}}
+\mbox{\hyperlink{tester__network_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{tester__network_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{tester__network_8hpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{tester__network_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{tester_8hpp}{tester.hpp}}"{}}}
+\DoxyCodeLine{\Hypertarget{tester__network_8hpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <boost/signals2/signal.hpp>}}
+\DoxyCodeLine{\Hypertarget{tester__network_8hpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <boost/signals2/shared\_connection\_block.hpp>}}
+\DoxyCodeLine{\Hypertarget{tester__network_8hpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{tester__network_8hpp_source_l00007}00007\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetesting}{testing}}\ \{}
+\DoxyCodeLine{\Hypertarget{tester__network_8hpp_source_l00008}00008\ \ \ \ \textcolor{keyword}{using\ namespace\ }boost::signals2;}
+\DoxyCodeLine{\Hypertarget{tester__network_8hpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{tester__network_8hpp_source_l00019}\mbox{\hyperlink{classsysio_1_1testing_1_1tester__network}{00019}}\ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1testing_1_1tester__network}{tester\_network}}\ \{}
+\DoxyCodeLine{\Hypertarget{tester__network_8hpp_source_l00020}00020\ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{tester__network_8hpp_source_l00025}00025\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1testing_1_1tester__network_a9c9b830e5114d4f23d69db171b80dea6}{connect\_blockchain}}(\mbox{\hyperlink{classsysio_1_1testing_1_1base__tester}{base\_tester}}\ \&new\_blockchain);}
+\DoxyCodeLine{\Hypertarget{tester__network_8hpp_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{tester__network_8hpp_source_l00031}00031\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1testing_1_1tester__network_a185eee1d04eaeec842264b6a785bf3a2}{disconnect\_blockchain}}(\mbox{\hyperlink{classsysio_1_1testing_1_1base__tester}{base\_tester}}\ \&leaving\_blockchain);}
+\DoxyCodeLine{\Hypertarget{tester__network_8hpp_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{tester__network_8hpp_source_l00036}00036\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1testing_1_1tester__network_a427768b3251b21855ab9a11adca108eb}{disconnect\_all}}();}
+\DoxyCodeLine{\Hypertarget{tester__network_8hpp_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{tester__network_8hpp_source_l00042}00042\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1testing_1_1tester__network_a387aeb702021c55f8278b47947d508a2}{propagate\_block}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1signed__block}{signed\_block}}\ \&block,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1testing_1_1base__tester}{base\_tester}}\ \&skip\_db);}
+\DoxyCodeLine{\Hypertarget{tester__network_8hpp_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{tester__network_8hpp_source_l00044}00044\ \ \ \ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{\Hypertarget{tester__network_8hpp_source_l00045}\mbox{\hyperlink{classsysio_1_1testing_1_1tester__network_a1845041cf846962d2b6d989a54dccfcd}{00045}}\ \ \ \ \ \ \ std::map<base\_tester\ *,\ scoped\_connection>\ \mbox{\hyperlink{classsysio_1_1testing_1_1tester__network_a1845041cf846962d2b6d989a54dccfcd}{blockchains}};}
+\DoxyCodeLine{\Hypertarget{tester__network_8hpp_source_l00046}00046\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{tester__network_8hpp_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{tester__network_8hpp_source_l00048}00048\ \}\ \}\ }
+
+\end{DoxyCode}

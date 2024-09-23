@@ -1,0 +1,177 @@
+\doxysection{libraries/fc/libraries/ff/depends/ate-\/pairing/include/zm.h File Reference}
+\hypertarget{zm_8h}{}\label{zm_8h}\index{libraries/fc/libraries/ff/depends/ate-\/pairing/include/zm.h@{libraries/fc/libraries/ff/depends/ate-\/pairing/include/zm.h}}
+{\ttfamily \#include $<$vector$>$}\newline
+{\ttfamily \#include $<$string$>$}\newline
+{\ttfamily \#include $<$cassert$>$}\newline
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$sstream$>$}\newline
+{\ttfamily \#include $<$iomanip$>$}\newline
+{\ttfamily \#include $<$stdexcept$>$}\newline
+{\ttfamily \#include $<$algorithm$>$}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+Include dependency graph for zm.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{zm_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{zm_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structmie_1_1local_1_1_empty}{mie\+::local\+::\+Empty$<$ T $>$}}
+\item 
+struct \mbox{\hyperlink{structmie_1_1local_1_1comparable}{mie\+::local\+::comparable$<$ T, E $>$}}
+\item 
+struct \mbox{\hyperlink{structmie_1_1local_1_1addsubmul}{mie\+::local\+::addsubmul$<$ T, E $>$}}
+\item 
+struct \mbox{\hyperlink{structmie_1_1local_1_1dividable}{mie\+::local\+::dividable$<$ T, E $>$}}
+\item 
+struct \mbox{\hyperlink{structmie_1_1local_1_1has_negative}{mie\+::local\+::has\+Negative$<$ T, E $>$}}
+\item 
+struct \mbox{\hyperlink{structmie_1_1local_1_1shiftable}{mie\+::local\+::shiftable$<$ T, E $>$}}
+\item 
+struct \mbox{\hyperlink{structmie_1_1local_1_1inversible}{mie\+::local\+::inversible$<$ T, E $>$}}
+\item 
+struct \mbox{\hyperlink{structmie_1_1local_1_1_primitive_function}{mie\+::local\+::\+Primitive\+Function}}
+\item 
+class \mbox{\hyperlink{classmie_1_1local_1_1_variable_buffer}{mie\+::local\+::\+Variable\+Buffer$<$ T, size\+\_\+t $>$}}
+\item 
+class \mbox{\hyperlink{classmie_1_1local_1_1_fixed_buffer}{mie\+::local\+::\+Fixed\+Buffer$<$ T, Bit\+Len $>$}}
+\item 
+struct \mbox{\hyperlink{structmie_1_1_vuint_t}{mie\+::\+Vuint\+T$<$ Buffer $>$}}
+\item 
+class \mbox{\hyperlink{classmie_1_1_vsint_t}{mie\+::\+Vsint\+T$<$ V $>$}}
+\item 
+class \mbox{\hyperlink{classmie_1_1_zm_z}{mie\+::\+Zm\+Z$<$ V, Tag $>$}}
+\item 
+struct \mbox{\hyperlink{structmie_1_1util_1_1_int_tag}{mie\+::util\+::\+Int\+Tag$<$ T $>$}}
+\item 
+struct \mbox{\hyperlink{structmie_1_1util_1_1_int_tag_3_01int_01_4}{mie\+::util\+::\+Int\+Tag$<$ int $>$}}
+\item 
+struct \mbox{\hyperlink{structmie_1_1util_1_1_int_tag_3_01size__t_01_4}{mie\+::util\+::\+Int\+Tag$<$ size\+\_\+t $>$}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacemie}{mie}}
+\item 
+namespace \mbox{\hyperlink{namespacemie_1_1local}{mie\+::local}}
+\item 
+namespace \mbox{\hyperlink{namespacemie_1_1util}{mie\+::util}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{zm_8h_abb4b130c76b6f36dceb9e58196953ddc}{MIE\+\_\+\+ZM\+\_\+\+VUINT\+\_\+\+BIT\+\_\+\+LEN}}~(64 \texorpdfstring{$\ast$}{*} 9)
+\item 
+\#define \mbox{\hyperlink{zm_8h_aaeb2ee9d1df1745661aaa18294aeadd6}{MIE\+\_\+\+USE\+\_\+\+X64\+ASM}}
+\item 
+\#define \mbox{\hyperlink{zm_8h_a5cef5f7b5efee59e24361929a7257baf}{MIE\+\_\+\+ALIGN}}(x)
+\item 
+\#define \mbox{\hyperlink{zm_8h_af05b4159bde6d4782da7bf7d42626e92}{MIE\+\_\+\+FORCE\+\_\+\+INLINE}}~\+\_\+\+\_\+attribute\+\_\+\+\_\+((always\+\_\+inline))
+\item 
+\#define \mbox{\hyperlink{zm_8h_a6e5804d6578e4a58c5fae7ecd7a13d75}{MIE\+\_\+\+ALLOCA\+\_\+}}(x)
+\item 
+\#define \mbox{\hyperlink{zm_8h_a7297b3c5c055559f7ee0b1002a2fdecf}{MIE\+\_\+\+USE\+\_\+\+UNIT32}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{namespacemie_a56ce7f54476ac398f450a858f9b741c4}{mie\+::\+Unit}}
+\item 
+typedef \mbox{\hyperlink{structmie_1_1_vuint_t}{VuintT}}$<$ local\+::\+Fixed\+Buffer$<$ \mbox{\hyperlink{namespacemie_a56ce7f54476ac398f450a858f9b741c4}{mie\+::\+Unit}}, \mbox{\hyperlink{zm_8h_abb4b130c76b6f36dceb9e58196953ddc}{MIE\+\_\+\+ZM\+\_\+\+VUINT\+\_\+\+BIT\+\_\+\+LEN}} $>$ $>$ \mbox{\hyperlink{namespacemie_ac62ddfee233ba71d08dc91a1924d4b74}{mie\+::\+Vuint}}
+\item 
+typedef \mbox{\hyperlink{classmie_1_1_vsint_t}{VsintT}}$<$ \mbox{\hyperlink{namespacemie_ac62ddfee233ba71d08dc91a1924d4b74}{Vuint}} $>$ \mbox{\hyperlink{namespacemie_a6e72ebec59e5d4dc84950bd3e36f7d1d}{mie\+::\+Vsint}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+std\+::istream \& \mbox{\hyperlink{namespacemie_1_1local_a847047e2eed379879763d334f64e2811}{mie\+::local\+::get\+Digits}} (std\+::istream \&is, std\+::string \&str, bool allow\+Negative=false)
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{struct_s}{S}} $>$ }\\\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{namespacemie_a595f193249b72c666b84e42439a60817}{mie\+::power}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&x, const \mbox{\hyperlink{struct_s}{S}} \&y)
+\item 
+void \mbox{\hyperlink{namespacemie_a1fbbd3566a6d17b92b0780b4f8aaa89f}{mie\+::zm\+Init}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{zm_8h_a5cef5f7b5efee59e24361929a7257baf}\index{zm.h@{zm.h}!MIE\_ALIGN@{MIE\_ALIGN}}
+\index{MIE\_ALIGN@{MIE\_ALIGN}!zm.h@{zm.h}}
+\doxysubsubsection{\texorpdfstring{MIE\_ALIGN}{MIE\_ALIGN}}
+{\footnotesize\ttfamily \label{zm_8h_a5cef5f7b5efee59e24361929a7257baf} 
+\#define MIE\+\_\+\+ALIGN(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\_\_attribute\_\_((aligned(16)))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{zm_8h_source_l00050}{50}} of file \mbox{\hyperlink{zm_8h_source}{zm.\+h}}.
+
+\Hypertarget{zm_8h_a6e5804d6578e4a58c5fae7ecd7a13d75}\index{zm.h@{zm.h}!MIE\_ALLOCA\_@{MIE\_ALLOCA\_}}
+\index{MIE\_ALLOCA\_@{MIE\_ALLOCA\_}!zm.h@{zm.h}}
+\doxysubsubsection{\texorpdfstring{MIE\_ALLOCA\_}{MIE\_ALLOCA\_}}
+{\footnotesize\ttfamily \label{zm_8h_a6e5804d6578e4a58c5fae7ecd7a13d75} 
+\#define MIE\+\_\+\+ALLOCA\+\_\+(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\_\_builtin\_alloca(x)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{zm_8h_source_l00056}{56}} of file \mbox{\hyperlink{zm_8h_source}{zm.\+h}}.
+
+\Hypertarget{zm_8h_af05b4159bde6d4782da7bf7d42626e92}\index{zm.h@{zm.h}!MIE\_FORCE\_INLINE@{MIE\_FORCE\_INLINE}}
+\index{MIE\_FORCE\_INLINE@{MIE\_FORCE\_INLINE}!zm.h@{zm.h}}
+\doxysubsubsection{\texorpdfstring{MIE\_FORCE\_INLINE}{MIE\_FORCE\_INLINE}}
+{\footnotesize\ttfamily \label{zm_8h_af05b4159bde6d4782da7bf7d42626e92} 
+\#define MIE\+\_\+\+FORCE\+\_\+\+INLINE~\+\_\+\+\_\+attribute\+\_\+\+\_\+((always\+\_\+inline))}
+
+
+
+Definition at line \mbox{\hyperlink{zm_8h_source_l00053}{53}} of file \mbox{\hyperlink{zm_8h_source}{zm.\+h}}.
+
+\Hypertarget{zm_8h_a7297b3c5c055559f7ee0b1002a2fdecf}\index{zm.h@{zm.h}!MIE\_USE\_UNIT32@{MIE\_USE\_UNIT32}}
+\index{MIE\_USE\_UNIT32@{MIE\_USE\_UNIT32}!zm.h@{zm.h}}
+\doxysubsubsection{\texorpdfstring{MIE\_USE\_UNIT32}{MIE\_USE\_UNIT32}}
+{\footnotesize\ttfamily \label{zm_8h_a7297b3c5c055559f7ee0b1002a2fdecf} 
+\#define MIE\+\_\+\+USE\+\_\+\+UNIT32}
+
+
+
+Definition at line \mbox{\hyperlink{zm_8h_source_l00067}{67}} of file \mbox{\hyperlink{zm_8h_source}{zm.\+h}}.
+
+\Hypertarget{zm_8h_aaeb2ee9d1df1745661aaa18294aeadd6}\index{zm.h@{zm.h}!MIE\_USE\_X64ASM@{MIE\_USE\_X64ASM}}
+\index{MIE\_USE\_X64ASM@{MIE\_USE\_X64ASM}!zm.h@{zm.h}}
+\doxysubsubsection{\texorpdfstring{MIE\_USE\_X64ASM}{MIE\_USE\_X64ASM}}
+{\footnotesize\ttfamily \label{zm_8h_aaeb2ee9d1df1745661aaa18294aeadd6} 
+\#define MIE\+\_\+\+USE\+\_\+\+X64\+ASM}
+
+
+
+Definition at line \mbox{\hyperlink{zm_8h_source_l00023}{23}} of file \mbox{\hyperlink{zm_8h_source}{zm.\+h}}.
+
+\Hypertarget{zm_8h_abb4b130c76b6f36dceb9e58196953ddc}\index{zm.h@{zm.h}!MIE\_ZM\_VUINT\_BIT\_LEN@{MIE\_ZM\_VUINT\_BIT\_LEN}}
+\index{MIE\_ZM\_VUINT\_BIT\_LEN@{MIE\_ZM\_VUINT\_BIT\_LEN}!zm.h@{zm.h}}
+\doxysubsubsection{\texorpdfstring{MIE\_ZM\_VUINT\_BIT\_LEN}{MIE\_ZM\_VUINT\_BIT\_LEN}}
+{\footnotesize\ttfamily \label{zm_8h_abb4b130c76b6f36dceb9e58196953ddc} 
+\#define MIE\+\_\+\+ZM\+\_\+\+VUINT\+\_\+\+BIT\+\_\+\+LEN~(64 \texorpdfstring{$\ast$}{*} 9)}
+
+Zm = Z/mZ field class (not optimzied) m \+: integer 
+
+Definition at line \mbox{\hyperlink{zm_8h_source_l00020}{20}} of file \mbox{\hyperlink{zm_8h_source}{zm.\+h}}.
+

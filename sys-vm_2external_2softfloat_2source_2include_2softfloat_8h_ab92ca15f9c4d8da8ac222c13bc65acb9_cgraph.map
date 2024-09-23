@@ -1,0 +1,11 @@
+<map id="extF80M_roundToInt" name="extF80M_roundToInt">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,146,56"/>
+<area shape="rect" id="Node000002" href="$sys-vm_2external_2softfloat_2source_2s__norm_ext_f80_sig_m_8c.html#ab73bb43a318bc3d5545a502f56021396" title=" " alt="" coords="212,5,388,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="145,33,196,27,197,32,146,38"/>
+<area shape="rect" id="Node000003" href="$softfloat_2source_28086-_s_s_e_2s__propagate_na_n_ext_f80_m_8c.html#a6d1fff7785c3407c872c7c2147223b5a" title=" " alt="" coords="194,55,406,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="146,48,179,52,178,57,145,54"/>
+<area shape="rect" id="Node000004" href="$softfloat_2source_28086-_s_s_e_2ext_f80_m__is_signaling_na_n_8c.html#ace8e5230b332cd22bdf612d80da1a3de" title=" " alt="" coords="454,29,623,55"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="406,54,438,50,439,55,407,59"/>
+<area shape="rect" id="Node000005" href="$softfloat_2source_28086-_s_s_e_2softfloat__raise_flags_8c.html#ac16bbf09eca0fe8ff91301d82c5a667f" title=" " alt="" coords="471,79,606,104"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="407,76,456,81,455,86,406,81"/>
+</map>

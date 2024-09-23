@@ -1,0 +1,146 @@
+\doxysection{test\+\_\+bilinearity.\+cpp}
+\hypertarget{test__bilinearity_8cpp_source}{}\label{test__bilinearity_8cpp_source}\index{libraries/fc/libraries/ff/libff/algebra/curves/tests/test\_bilinearity.cpp@{libraries/fc/libraries/ff/libff/algebra/curves/tests/test\_bilinearity.cpp}}
+\mbox{\hyperlink{test__bilinearity_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00001}00001\ }
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{edwards__pp_8hpp}{libff/algebra/curves/edwards/edwards\_pp.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{profiling_8hpp}{libff/common/profiling.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00009}00009\ \textcolor{preprocessor}{\#ifdef\ CURVE\_BN128}}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{bn128__pp_8hpp}{libff/algebra/curves/bn128/bn128\_pp.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00011}00011\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00012}00012\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{alt__bn128__pp_8hpp}{libff/algebra/curves/alt\_bn128/alt\_bn128\_pp.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00013}00013\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{mnt4__pp_8hpp}{libff/algebra/curves/mnt/mnt4/mnt4\_pp.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00014}00014\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{mnt6__pp_8hpp}{libff/algebra/curves/mnt/mnt6/mnt6\_pp.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00016}00016\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacelibff}{libff}};}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00018}00018\ \textcolor{preprocessor}{\#ifndef\ NDEBUG}}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00019}00019\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ ppT>}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00020}\mbox{\hyperlink{test__bilinearity_8cpp_abe14cbae407c46a5edea60215b49ff93}{00020}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{test__bilinearity_8cpp_abe14cbae407c46a5edea60215b49ff93}{pairing\_test}}()}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00021}00021\ \{}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00022}00022\ \ \ \ \ \mbox{\hyperlink{namespacelibff_ab20bea69cbab18a4560648792f14c6b9}{GT<ppT>}}\ GT\_one\ =\ \mbox{\hyperlink{namespacelibff_ab20bea69cbab18a4560648792f14c6b9}{GT<ppT>::one}}();}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00024}00024\ \ \ \ \ printf(\textcolor{stringliteral}{"{}Running\ bilinearity\ tests:\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00025}00025\ \ \ \ \ \mbox{\hyperlink{namespacelibff_a2076489a787bb029bf7fefef35b0f536}{G1<ppT>}}\ \mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}}\ =\ (\mbox{\hyperlink{namespacelibff_a4d9ee1177daeded24b60e6425e5370d3}{Fr<ppT>::random\_element}}())\ *\ \mbox{\hyperlink{namespacelibff_a2076489a787bb029bf7fefef35b0f536}{G1<ppT>::one}}();}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00026}00026\ \ \ \ \ \textcolor{comment}{//G1<ppT>\ P\ =\ Fr<ppT>("{}2"{})\ *\ G1<ppT>::one();}}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00027}00027\ \ \ \ \ \mbox{\hyperlink{struct_g2}{G2<ppT>}}\ Q\ =\ (\mbox{\hyperlink{namespacelibff_a4d9ee1177daeded24b60e6425e5370d3}{Fr<ppT>::random\_element}}())\ *\ \mbox{\hyperlink{struct_g2}{G2<ppT>::one}}();}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00028}00028\ \ \ \ \ \textcolor{comment}{//G2<ppT>\ Q\ =\ Fr<ppT>("{}3"{})\ *\ G2<ppT>::one();}}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00030}00030\ \ \ \ \ printf(\textcolor{stringliteral}{"{}P:\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00031}00031\ \ \ \ \ \mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}}.print();}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00032}00032\ \ \ \ \ \mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}}.print\_coordinates();}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00033}00033\ \ \ \ \ printf(\textcolor{stringliteral}{"{}Q:\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00034}00034\ \ \ \ \ Q.print();}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00035}00035\ \ \ \ \ Q.print\_coordinates();}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00036}00036\ \ \ \ \ printf(\textcolor{stringliteral}{"{}\(\backslash\)n\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00038}00038\ \ \ \ \ \mbox{\hyperlink{namespacelibff_a4d9ee1177daeded24b60e6425e5370d3}{Fr<ppT>}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ =\ \mbox{\hyperlink{namespacelibff_a4d9ee1177daeded24b60e6425e5370d3}{Fr<ppT>::random\_element}}();}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00039}00039\ \ \ \ \ \textcolor{comment}{//Fr<ppT>\ s\ =\ Fr<ppT>("{}2"{});}}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00040}00040\ \ \ \ \ \mbox{\hyperlink{namespacelibff_a2076489a787bb029bf7fefef35b0f536}{G1<ppT>}}\ sP\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ *\ \mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}};}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00041}00041\ \ \ \ \ \mbox{\hyperlink{struct_g2}{G2<ppT>}}\ sQ\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ *\ Q;}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00043}00043\ \ \ \ \ printf(\textcolor{stringliteral}{"{}Pairing\ bilinearity\ tests\ (three\ must\ match):\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00044}00044\ \ \ \ \ \mbox{\hyperlink{namespacelibff_ab20bea69cbab18a4560648792f14c6b9}{GT<ppT>}}\ ans1\ =\ ppT::reduced\_pairing(sP,\ Q);}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00045}00045\ \ \ \ \ \mbox{\hyperlink{namespacelibff_ab20bea69cbab18a4560648792f14c6b9}{GT<ppT>}}\ ans2\ =\ ppT::reduced\_pairing(\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}},\ sQ);}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00046}00046\ \ \ \ \ \mbox{\hyperlink{namespacelibff_ab20bea69cbab18a4560648792f14c6b9}{GT<ppT>}}\ ans3\ =\ ppT::reduced\_pairing(\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}},\ Q)\string^\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00047}00047\ \ \ \ \ ans1.print();}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00048}00048\ \ \ \ \ ans2.print();}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00049}00049\ \ \ \ \ ans3.print();}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00050}00050\ \ \ \ \ assert(ans1\ ==\ ans2);}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00051}00051\ \ \ \ \ assert(ans2\ ==\ ans3);}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00052}00052\ }
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00053}00053\ \ \ \ \ assert(ans1\ !=\ GT\_one);}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00054}00054\ \ \ \ \ assert((ans1\string^\mbox{\hyperlink{namespacelibff_a4d9ee1177daeded24b60e6425e5370d3}{Fr<ppT>::field\_char}}())\ ==\ GT\_one);}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00055}00055\ \ \ \ \ printf(\textcolor{stringliteral}{"{}\(\backslash\)n\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00056}00056\ \}}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00058}00058\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ ppT>}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00059}\mbox{\hyperlink{test__bilinearity_8cpp_abfac86c179e08b9a1b9652b8b50c3c34}{00059}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{test__bilinearity_8cpp_abfac86c179e08b9a1b9652b8b50c3c34}{double\_miller\_loop\_test}}()}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00060}00060\ \{}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00061}00061\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacelibff_a2076489a787bb029bf7fefef35b0f536}{G1<ppT>}}\ P1\ =\ (\mbox{\hyperlink{namespacelibff_a4d9ee1177daeded24b60e6425e5370d3}{Fr<ppT>::random\_element}}())\ *\ \mbox{\hyperlink{namespacelibff_a2076489a787bb029bf7fefef35b0f536}{G1<ppT>::one}}();}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00062}00062\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacelibff_a2076489a787bb029bf7fefef35b0f536}{G1<ppT>}}\ P2\ =\ (\mbox{\hyperlink{namespacelibff_a4d9ee1177daeded24b60e6425e5370d3}{Fr<ppT>::random\_element}}())\ *\ \mbox{\hyperlink{namespacelibff_a2076489a787bb029bf7fefef35b0f536}{G1<ppT>::one}}();}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00063}00063\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_g2}{G2<ppT>}}\ Q1\ =\ (\mbox{\hyperlink{namespacelibff_a4d9ee1177daeded24b60e6425e5370d3}{Fr<ppT>::random\_element}}())\ *\ \mbox{\hyperlink{struct_g2}{G2<ppT>::one}}();}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00064}00064\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_g2}{G2<ppT>}}\ Q2\ =\ (\mbox{\hyperlink{namespacelibff_a4d9ee1177daeded24b60e6425e5370d3}{Fr<ppT>::random\_element}}())\ *\ \mbox{\hyperlink{struct_g2}{G2<ppT>::one}}();}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00066}00066\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacelibff_a1f916db4f6e4e95cd54d1810b18fb236}{G1\_precomp<ppT>}}\ prec\_P1\ =\ ppT::precompute\_G1(P1);}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00067}00067\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacelibff_a1f916db4f6e4e95cd54d1810b18fb236}{G1\_precomp<ppT>}}\ prec\_P2\ =\ ppT::precompute\_G1(P2);}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00068}00068\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacelibff_ad967d2fbe0566124c5b1ed3006f99a3a}{G2\_precomp<ppT>}}\ prec\_Q1\ =\ ppT::precompute\_G2(Q1);}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00069}00069\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacelibff_ad967d2fbe0566124c5b1ed3006f99a3a}{G2\_precomp<ppT>}}\ prec\_Q2\ =\ ppT::precompute\_G2(Q2);}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00071}00071\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacelibff_a1cbc314a52017a7089a0e845293e3d9f}{Fqk<ppT>}}\ ans\_1\ =\ ppT::miller\_loop(prec\_P1,\ prec\_Q1);}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00072}00072\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacelibff_a1cbc314a52017a7089a0e845293e3d9f}{Fqk<ppT>}}\ ans\_2\ =\ ppT::miller\_loop(prec\_P2,\ prec\_Q2);}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00073}00073\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacelibff_a1cbc314a52017a7089a0e845293e3d9f}{Fqk<ppT>}}\ ans\_12\ =\ ppT::double\_miller\_loop(prec\_P1,\ prec\_Q1,\ prec\_P2,\ prec\_Q2);}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00074}00074\ \ \ \ \ assert(ans\_1\ *\ ans\_2\ ==\ ans\_12);}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00075}00075\ \}}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00076}00076\ }
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00077}00077\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ ppT>}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00078}\mbox{\hyperlink{test__bilinearity_8cpp_a44f3ce008f3ca77df10ddfeb829059a3}{00078}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{test__bilinearity_8cpp_a44f3ce008f3ca77df10ddfeb829059a3}{affine\_pairing\_test}}()}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00079}00079\ \{}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00080}00080\ \ \ \ \ \mbox{\hyperlink{namespacelibff_ab20bea69cbab18a4560648792f14c6b9}{GT<ppT>}}\ GT\_one\ =\ \mbox{\hyperlink{namespacelibff_ab20bea69cbab18a4560648792f14c6b9}{GT<ppT>::one}}();}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00081}00081\ }
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00082}00082\ \ \ \ \ printf(\textcolor{stringliteral}{"{}Running\ bilinearity\ tests:\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00083}00083\ \ \ \ \ \mbox{\hyperlink{namespacelibff_a2076489a787bb029bf7fefef35b0f536}{G1<ppT>}}\ \mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}}\ =\ (\mbox{\hyperlink{namespacelibff_a4d9ee1177daeded24b60e6425e5370d3}{Fr<ppT>::random\_element}}())\ *\ \mbox{\hyperlink{namespacelibff_a2076489a787bb029bf7fefef35b0f536}{G1<ppT>::one}}();}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00084}00084\ \ \ \ \ \mbox{\hyperlink{struct_g2}{G2<ppT>}}\ Q\ =\ (\mbox{\hyperlink{namespacelibff_a4d9ee1177daeded24b60e6425e5370d3}{Fr<ppT>::random\_element}}())\ *\ \mbox{\hyperlink{struct_g2}{G2<ppT>::one}}();}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00085}00085\ }
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00086}00086\ \ \ \ \ printf(\textcolor{stringliteral}{"{}P:\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00087}00087\ \ \ \ \ \mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}}.print();}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00088}00088\ \ \ \ \ printf(\textcolor{stringliteral}{"{}Q:\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00089}00089\ \ \ \ \ Q.print();}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00090}00090\ \ \ \ \ printf(\textcolor{stringliteral}{"{}\(\backslash\)n\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00091}00091\ }
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00092}00092\ \ \ \ \ \mbox{\hyperlink{namespacelibff_a4d9ee1177daeded24b60e6425e5370d3}{Fr<ppT>}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ =\ \mbox{\hyperlink{namespacelibff_a4d9ee1177daeded24b60e6425e5370d3}{Fr<ppT>::random\_element}}();}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00093}00093\ \ \ \ \ \mbox{\hyperlink{namespacelibff_a2076489a787bb029bf7fefef35b0f536}{G1<ppT>}}\ sP\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ *\ \mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}};}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00094}00094\ \ \ \ \ \mbox{\hyperlink{struct_g2}{G2<ppT>}}\ sQ\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ *\ Q;}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00095}00095\ }
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00096}00096\ \ \ \ \ printf(\textcolor{stringliteral}{"{}Pairing\ bilinearity\ tests\ (three\ must\ match):\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00097}00097\ \ \ \ \ \mbox{\hyperlink{namespacelibff_ab20bea69cbab18a4560648792f14c6b9}{GT<ppT>}}\ ans1\ =\ ppT::affine\_reduced\_pairing(sP,\ Q);}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00098}00098\ \ \ \ \ \mbox{\hyperlink{namespacelibff_ab20bea69cbab18a4560648792f14c6b9}{GT<ppT>}}\ ans2\ =\ ppT::affine\_reduced\_pairing(\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}},\ sQ);}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00099}00099\ \ \ \ \ \mbox{\hyperlink{namespacelibff_ab20bea69cbab18a4560648792f14c6b9}{GT<ppT>}}\ ans3\ =\ ppT::affine\_reduced\_pairing(\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}},\ Q)\string^\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00100}00100\ \ \ \ \ ans1.print();}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00101}00101\ \ \ \ \ ans2.print();}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00102}00102\ \ \ \ \ ans3.print();}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00103}00103\ \ \ \ \ assert(ans1\ ==\ ans2);}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00104}00104\ \ \ \ \ assert(ans2\ ==\ ans3);}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00105}00105\ }
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00106}00106\ \ \ \ \ assert(ans1\ !=\ GT\_one);}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00107}00107\ \ \ \ \ assert((ans1\string^\mbox{\hyperlink{namespacelibff_a4d9ee1177daeded24b60e6425e5370d3}{Fr<ppT>::field\_char}}())\ ==\ GT\_one);}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00108}00108\ \ \ \ \ printf(\textcolor{stringliteral}{"{}\(\backslash\)n\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00109}00109\ \}}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00110}00110\ }
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00111}\mbox{\hyperlink{test__bilinearity_8cpp_a840291bc02cba5474a4cb46a9b9566fe}{00111}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{test__bilinearity_8cpp_a840291bc02cba5474a4cb46a9b9566fe}{main}}(\textcolor{keywordtype}{void})}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00112}00112\ \{}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00113}00113\ \ \ \ \ \mbox{\hyperlink{namespacelibff_a4bcbacbbf8d028be4c4b2a863d21f4c6}{start\_profiling}}();}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00114}00114\ \ \ \ \ \mbox{\hyperlink{classlibff_1_1edwards__pp_a32abdda668a29bbc32de1ac0fbe977e1}{edwards\_pp::init\_public\_params}}();}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00115}00115\ \ \ \ \ \mbox{\hyperlink{test__bilinearity_8cpp_abe14cbae407c46a5edea60215b49ff93}{pairing\_test<edwards\_pp>}}();}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00116}00116\ \ \ \ \ \mbox{\hyperlink{test__bilinearity_8cpp_abfac86c179e08b9a1b9652b8b50c3c34}{double\_miller\_loop\_test<edwards\_pp>}}();}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00117}00117\ }
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00118}00118\ \ \ \ \ \mbox{\hyperlink{classlibff_1_1mnt6__pp_ac101aa5559dbece66f5730200d8e34ee}{mnt6\_pp::init\_public\_params}}();}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00119}00119\ \ \ \ \ \mbox{\hyperlink{test__bilinearity_8cpp_abe14cbae407c46a5edea60215b49ff93}{pairing\_test<mnt6\_pp>}}();}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00120}00120\ \ \ \ \ \mbox{\hyperlink{test__bilinearity_8cpp_abfac86c179e08b9a1b9652b8b50c3c34}{double\_miller\_loop\_test<mnt6\_pp>}}();}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00121}00121\ \ \ \ \ \mbox{\hyperlink{test__bilinearity_8cpp_a44f3ce008f3ca77df10ddfeb829059a3}{affine\_pairing\_test<mnt6\_pp>}}();}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00122}00122\ }
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00123}00123\ \ \ \ \ \mbox{\hyperlink{classlibff_1_1mnt4__pp_ac29b037b6aaf60603967653177f57f47}{mnt4\_pp::init\_public\_params}}();}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00124}00124\ \ \ \ \ \mbox{\hyperlink{test__bilinearity_8cpp_abe14cbae407c46a5edea60215b49ff93}{pairing\_test<mnt4\_pp>}}();}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00125}00125\ \ \ \ \ \mbox{\hyperlink{test__bilinearity_8cpp_abfac86c179e08b9a1b9652b8b50c3c34}{double\_miller\_loop\_test<mnt4\_pp>}}();}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00126}00126\ \ \ \ \ \mbox{\hyperlink{test__bilinearity_8cpp_a44f3ce008f3ca77df10ddfeb829059a3}{affine\_pairing\_test<mnt4\_pp>}}();}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00127}00127\ }
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00128}00128\ \ \ \ \ \mbox{\hyperlink{classlibff_1_1alt__bn128__pp_a64615d83a91bbc15fab3030a2203f4f4}{alt\_bn128\_pp::init\_public\_params}}();}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00129}00129\ \ \ \ \ \mbox{\hyperlink{test__bilinearity_8cpp_abe14cbae407c46a5edea60215b49ff93}{pairing\_test<alt\_bn128\_pp>}}();}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00130}00130\ \ \ \ \ \mbox{\hyperlink{test__bilinearity_8cpp_abfac86c179e08b9a1b9652b8b50c3c34}{double\_miller\_loop\_test<alt\_bn128\_pp>}}();}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00131}00131\ }
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00132}00132\ \textcolor{preprocessor}{\#ifdef\ CURVE\_BN128\ \ \ \ \ \ \ }\textcolor{comment}{//\ BN128\ has\ fancy\ dependencies\ so\ it\ may\ be\ disabled}}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00133}00133\ \ \ \ \ \mbox{\hyperlink{classlibff_1_1bn128__pp_ae44372429d5c8f7d85e87d6ddeb10a19}{bn128\_pp::init\_public\_params}}();}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00134}00134\ \ \ \ \ \mbox{\hyperlink{test__bilinearity_8cpp_abe14cbae407c46a5edea60215b49ff93}{pairing\_test<bn128\_pp>}}();}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00135}00135\ \ \ \ \ \mbox{\hyperlink{test__bilinearity_8cpp_abfac86c179e08b9a1b9652b8b50c3c34}{double\_miller\_loop\_test<bn128\_pp>}}();}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00136}00136\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00137}00137\ \}}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00138}00138\ }
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00139}00139\ \textcolor{preprocessor}{\#else\ }\textcolor{comment}{//\ NDEBUG}}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00140}00140\ }
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00141}00141\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{test__bilinearity_8cpp_a840291bc02cba5474a4cb46a9b9566fe}{main}}()}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00142}00142\ \{}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00143}00143\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}All\ tests\ here\ depend\ on\ assert()\ which\ is\ disabled\ by\ -\/DNDEBUG.\ Please\ recompile\ and\ run\ again.\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00144}00144\ \}}
+\DoxyCodeLine{\Hypertarget{test__bilinearity_8cpp_source_l00145}00145\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ NDEBUG}}
+
+\end{DoxyCode}

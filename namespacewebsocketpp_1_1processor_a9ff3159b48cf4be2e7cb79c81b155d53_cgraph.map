@@ -1,0 +1,5 @@
+<map id="websocketpp::processor::is_websocket_handshake" name="websocketpp::processor::is_websocket_handshake">
+<area shape="rect" id="Node000001" title="Determine whether or not a generic HTTP request is a WebSocket handshake." alt="" coords="5,5,185,46"/>
+<area shape="rect" id="Node000002" href="$namespacewebsocketpp_1_1utility.html#a484f1287b93cf58cc6514e46eed41568" title="Find substring (case insensitive)" alt="" coords="233,5,370,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="185,23,217,23,217,28,185,28"/>
+</map>

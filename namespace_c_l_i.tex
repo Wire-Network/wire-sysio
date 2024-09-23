@@ -1,0 +1,1142 @@
+\doxysection{CLI Namespace Reference}
+\hypertarget{namespace_c_l_i}{}\label{namespace_c_l_i}\index{CLI@{CLI}}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespace_c_l_i_1_1detail}{detail}}
+\item 
+namespace \mbox{\hyperlink{namespace_c_l_i_1_1enums}{enums}}
+\item 
+namespace \mbox{\hyperlink{namespace_c_l_i_1_1_failure_message}{Failure\+Message}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_app}{App}}
+\begin{DoxyCompactList}\small\item\em Creates a command line program, with very few defaults. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_argument_mismatch}{Argument\+Mismatch}}
+\begin{DoxyCompactList}\small\item\em Thrown when the wrong number of arguments has been received. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_as_number_with_unit}{As\+Number\+With\+Unit}}
+\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_as_size_value}{As\+Size\+Value}}
+\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_bad_name_string}{Bad\+Name\+String}}
+\begin{DoxyCompactList}\small\item\em Thrown on construction of a bad name. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_bound}{Bound}}
+\begin{DoxyCompactList}\small\item\em Produce a bounded range (factory). Min and max are inclusive. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_call_for_all_help}{Call\+For\+All\+Help}}
+\begin{DoxyCompactList}\small\item\em Usually something like --help-\/all on command line. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_call_for_help}{Call\+For\+Help}}
+\begin{DoxyCompactList}\small\item\em -\/h or --help on command line \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_checked_transformer}{Checked\+Transformer}}
+\begin{DoxyCompactList}\small\item\em translate named items to other or a value set \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_config}{Config}}
+\begin{DoxyCompactList}\small\item\em This class provides a converter for configuration files. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_config_base}{Config\+Base}}
+\begin{DoxyCompactList}\small\item\em This converter works with INI/\+TOML files; to write proper TOML files use \doxylink{class_c_l_i_1_1_config_t_o_m_l}{Config\+TOML}. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_config_error}{Config\+Error}}
+\begin{DoxyCompactList}\small\item\em Thrown when extra values are found in an INI file. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_c_l_i_1_1_config_item}{Config\+Item}}
+\begin{DoxyCompactList}\small\item\em Holds values to load into Options. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_config_t_o_m_l}{Config\+TOML}}
+\begin{DoxyCompactList}\small\item\em \doxylink{class_c_l_i_1_1_config_t_o_m_l}{Config\+TOML} generates a TOML compliant output. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_construction_error}{Construction\+Error}}
+\begin{DoxyCompactList}\small\item\em Construction errors (not in parsing) \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_conversion_error}{Conversion\+Error}}
+\begin{DoxyCompactList}\small\item\em Thrown when conversion call back fails, such as when an int fails to coerce to a string. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_custom_validator}{Custom\+Validator}}
+\begin{DoxyCompactList}\small\item\em Class wrapping some of the accessors of \doxylink{class_c_l_i_1_1_validator}{Validator}. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_error}{Error}}
+\begin{DoxyCompactList}\small\item\em All errors derive from this one. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_excludes_error}{Excludes\+Error}}
+\begin{DoxyCompactList}\small\item\em Thrown when an excludes option is present. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_extras_error}{Extras\+Error}}
+\begin{DoxyCompactList}\small\item\em Thrown when too many positionals or options are found. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_file_error}{File\+Error}}
+\begin{DoxyCompactList}\small\item\em Thrown when parsing an INI file and it is missing. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_formatter}{Formatter}}
+\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_formatter_base}{Formatter\+Base}}
+\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_formatter_lambda}{Formatter\+Lambda}}
+\begin{DoxyCompactList}\small\item\em This is a specialty override for lambda functions. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_horrible_error}{Horrible\+Error}}
+\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_incorrect_construction}{Incorrect\+Construction}}
+\begin{DoxyCompactList}\small\item\em Thrown when an option is set to conflicting values (non-\/vector and multi args, for example) \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_invalid_error}{Invalid\+Error}}
+\begin{DoxyCompactList}\small\item\em Thrown when validation fails before parsing. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_c_l_i_1_1is__bool}{is\+\_\+bool}}
+\begin{DoxyCompactList}\small\item\em Check to see if something is bool (fail check by default) \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_c_l_i_1_1is__bool_3_01bool_01_4}{is\+\_\+bool$<$ bool $>$}}
+\begin{DoxyCompactList}\small\item\em Check to see if something is bool (true if actually a bool) \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_c_l_i_1_1is__copyable__ptr}{is\+\_\+copyable\+\_\+ptr}}
+\begin{DoxyCompactList}\small\item\em Check to see if something is copyable pointer. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_c_l_i_1_1is__shared__ptr}{is\+\_\+shared\+\_\+ptr}}
+\begin{DoxyCompactList}\small\item\em Check to see if something is a shared pointer. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_c_l_i_1_1is__shared__ptr_3_01const_01std_1_1shared__ptr_3_01_t_01_4_01_4}{is\+\_\+shared\+\_\+ptr$<$ const std\+::shared\+\_\+ptr$<$ T $>$ $>$}}
+\begin{DoxyCompactList}\small\item\em Check to see if something is a shared pointer (True if really a shared pointer) \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_c_l_i_1_1is__shared__ptr_3_01std_1_1shared__ptr_3_01_t_01_4_01_4}{is\+\_\+shared\+\_\+ptr$<$ std\+::shared\+\_\+ptr$<$ T $>$ $>$}}
+\begin{DoxyCompactList}\small\item\em Check to see if something is a shared pointer (True if really a shared pointer) \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_c_l_i_1_1is__vector}{is\+\_\+vector}}
+\begin{DoxyCompactList}\small\item\em Check to see if something is a vector (fail check by default) \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_c_l_i_1_1is__vector_3_01const_01std_1_1vector_3_01_t_00_01_a_01_4_01_4}{is\+\_\+vector$<$ const std\+::vector$<$ T, A $>$ $>$}}
+\begin{DoxyCompactList}\small\item\em Check to see if something is a vector (true if actually a const vector) \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_c_l_i_1_1is__vector_3_01std_1_1vector_3_01_t_00_01_a_01_4_01_4}{is\+\_\+vector$<$ std\+::vector$<$ T, A $>$ $>$}}
+\begin{DoxyCompactList}\small\item\em Check to see if something is a vector (true if actually a vector) \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_is_member}{Is\+Member}}
+\begin{DoxyCompactList}\small\item\em Verify items are in a set. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_c_l_i_1_1_is_member_type}{Is\+Member\+Type}}
+\begin{DoxyCompactList}\small\item\em This can be specialized to override the type deduction for \doxylink{class_c_l_i_1_1_is_member}{Is\+Member}. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_c_l_i_1_1_is_member_type_3_01const_01char_01_5_01_4}{Is\+Member\+Type$<$ const char \texorpdfstring{$\ast$}{*} $>$}}
+\begin{DoxyCompactList}\small\item\em The main custom type needed here is const char \texorpdfstring{$\ast$}{*} should be a string. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_c_l_i_1_1make__void}{make\+\_\+void}}
+\begin{DoxyCompactList}\small\item\em \doxylink{struct_a}{A} copy of std\+::void\+\_\+t from C++17 (helper for C++11 and C++14) \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_option}{Option}}
+\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_option__group}{Option\+\_\+group}}
+\begin{DoxyCompactList}\small\item\em Extension of \doxylink{class_c_l_i_1_1_app}{App} to better manage groups of options. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_option_already_added}{Option\+Already\+Added}}
+\begin{DoxyCompactList}\small\item\em Thrown when an option already exists. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_option_base}{Option\+Base}}
+\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_option_defaults}{Option\+Defaults}}
+\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_option_not_found}{Option\+Not\+Found}}
+\begin{DoxyCompactList}\small\item\em Thrown when counting a non-\/existent option. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_parse_error}{Parse\+Error}}
+\begin{DoxyCompactList}\small\item\em Anything that can error in Parse. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_range}{Range}}
+\begin{DoxyCompactList}\small\item\em Produce a range (factory). Min and max are inclusive. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_required_error}{Required\+Error}}
+\begin{DoxyCompactList}\small\item\em Thrown when a required option is missing. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_requires_error}{Requires\+Error}}
+\begin{DoxyCompactList}\small\item\em Thrown when a requires option is missing. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_runtime_error}{Runtime\+Error}}
+\begin{DoxyCompactList}\small\item\em Does not output a diagnostic in CLI11\+\_\+\+PARSE, but allows to return from \doxylink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main()} with a specific error code. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_success}{Success}}
+\begin{DoxyCompactList}\small\item\em This is a successful completion on parsing, supposed to exit. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_transformer}{Transformer}}
+\begin{DoxyCompactList}\small\item\em Translate named items to other or a value set. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_validation_error}{Validation\+Error}}
+\begin{DoxyCompactList}\small\item\em Thrown when validation of results fails. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_validator}{Validator}}
+\begin{DoxyCompactList}\small\item\em Some validators that are provided. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$bool B, \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}  = void$>$ }\\using \mbox{\hyperlink{namespace_c_l_i_a4858f02cc3a0eeda7af44dd3e957b506}{enable\+\_\+if\+\_\+t}} = typename std\+::enable\+\_\+if$<$B, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$\+::type
+\item 
+{\footnotesize template$<$typename... Ts$>$ }\\using \mbox{\hyperlink{namespace_c_l_i_a202e774b5850d92a2b5650ad79b5d418}{void\+\_\+t}} = typename \mbox{\hyperlink{struct_c_l_i_1_1make__void}{make\+\_\+void}}$<$Ts...$>$\+::type
+\begin{DoxyCompactList}\small\item\em \doxylink{struct_a}{A} copy of std\+::void\+\_\+t from C++17 -\/ same reasoning as enable\+\_\+if\+\_\+t, it does not hurt to redefine. \end{DoxyCompactList}\item 
+{\footnotesize template$<$bool B, \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} F $>$ }\\using \mbox{\hyperlink{namespace_c_l_i_ac092ca4f58943edb3d71c563b3e7c953}{conditional\+\_\+t}} = typename std\+::conditional$<$B, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, F$>$\+::type
+\begin{DoxyCompactList}\small\item\em \doxylink{struct_a}{A} copy of std\+::conditional\+\_\+t from C++14 -\/ same reasoning as enable\+\_\+if\+\_\+t, it does not hurt to redefine. \end{DoxyCompactList}\item 
+using \mbox{\hyperlink{namespace_c_l_i_a15ab3d231d9eabe775a3cca1616acb84}{Config\+INI}} = \mbox{\hyperlink{class_c_l_i_1_1_config_base}{Config\+Base}}
+\begin{DoxyCompactList}\small\item\em the default \doxylink{class_c_l_i_1_1_config}{Config} is the INI file format \end{DoxyCompactList}\item 
+using \mbox{\hyperlink{namespace_c_l_i_af6f17295305147505ec3636151d35bbb}{results\+\_\+t}} = std\+::vector$<$std\+::string$>$
+\item 
+using \mbox{\hyperlink{namespace_c_l_i_aee5516e2fe4d7b0298d5491d73ccefe5}{callback\+\_\+t}} = std\+::function$<$bool(const \mbox{\hyperlink{namespace_c_l_i_af6f17295305147505ec3636151d35bbb}{results\+\_\+t}} \&)$>$
+\begin{DoxyCompactList}\small\item\em callback function definition \end{DoxyCompactList}\item 
+using \mbox{\hyperlink{namespace_c_l_i_afca10810a722704f401fe6c5bf57d52a}{Option\+\_\+p}} = std\+::unique\+\_\+ptr$<$\mbox{\hyperlink{class_c_l_i_1_1_option}{Option}}$>$
+\item 
+using \mbox{\hyperlink{namespace_c_l_i_a03ebc4aee21ceb9f5f33b6636e9af481}{App\+\_\+p}} = std\+::shared\+\_\+ptr$<$\mbox{\hyperlink{class_c_l_i_1_1_app}{App}}$>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum class \mbox{\hyperlink{namespace_c_l_i_a1d8108a219533f0b0361640a017f037e}{Exit\+Codes}} \{ \newline
+\mbox{\hyperlink{namespace_c_l_i_a1d8108a219533f0b0361640a017f037ea505a83f220c02df2f85c3810cd9ceb38}{Success}} = 0
+, \mbox{\hyperlink{namespace_c_l_i_a1d8108a219533f0b0361640a017f037ea903d95792f297008a1fd3fab8df69f79}{Incorrect\+Construction}} = 100
+, \mbox{\hyperlink{namespace_c_l_i_a1d8108a219533f0b0361640a017f037eab319e260db27232cb74e2a23124b7a2c}{Bad\+Name\+String}}
+, \mbox{\hyperlink{namespace_c_l_i_a1d8108a219533f0b0361640a017f037eade33f5f54db87abfb2926228f0867038}{Option\+Already\+Added}}
+, \newline
+\mbox{\hyperlink{namespace_c_l_i_a1d8108a219533f0b0361640a017f037ea06344c468073b2b66824779ffa5105cc}{File\+Error}}
+, \mbox{\hyperlink{namespace_c_l_i_a1d8108a219533f0b0361640a017f037ea33f8a28d3c790e00d94cc848895dfb51}{Conversion\+Error}}
+, \mbox{\hyperlink{namespace_c_l_i_a1d8108a219533f0b0361640a017f037ea8180c46099f957f51b2bc31f7f0f5c42}{Validation\+Error}}
+, \mbox{\hyperlink{namespace_c_l_i_a1d8108a219533f0b0361640a017f037ea9f418597ecc2a82cc220ea24b53505d3}{Required\+Error}}
+, \newline
+\mbox{\hyperlink{namespace_c_l_i_a1d8108a219533f0b0361640a017f037ea5a33e2f2a0eda1a6a9d8534c79459794}{Requires\+Error}}
+, \mbox{\hyperlink{namespace_c_l_i_a1d8108a219533f0b0361640a017f037ea180b6078f0a0618bbdbaeda656841923}{Excludes\+Error}}
+, \mbox{\hyperlink{namespace_c_l_i_a1d8108a219533f0b0361640a017f037ea12e25f67fcb619ec309d229ae4b9d75e}{Extras\+Error}}
+, \mbox{\hyperlink{namespace_c_l_i_a1d8108a219533f0b0361640a017f037ea1053efdc7a34708782767df3ed95cded}{Config\+Error}}
+, \newline
+\mbox{\hyperlink{namespace_c_l_i_a1d8108a219533f0b0361640a017f037eaf65e8093ec3083c0c4909e321df2ece7}{Invalid\+Error}}
+, \mbox{\hyperlink{namespace_c_l_i_a1d8108a219533f0b0361640a017f037eaaadcc078255a085fcac00639a9519392}{Horrible\+Error}}
+, \mbox{\hyperlink{namespace_c_l_i_a1d8108a219533f0b0361640a017f037eaa40b471f8a3c0ca91e719ea8101aa46d}{Option\+Not\+Found}}
+, \mbox{\hyperlink{namespace_c_l_i_a1d8108a219533f0b0361640a017f037ea347fac6a5a40acb21af1b8e7e81aab0e}{Argument\+Mismatch}}
+, \newline
+\mbox{\hyperlink{namespace_c_l_i_a1d8108a219533f0b0361640a017f037ea45b3e4c35409fb597ea598dc4b984b8c}{Base\+Class}} = 127
+ \}
+\item 
+enum class \mbox{\hyperlink{namespace_c_l_i_a97e7d97131e3889f32b721570eca119c}{App\+Format\+Mode}} \{ \mbox{\hyperlink{namespace_c_l_i_a97e7d97131e3889f32b721570eca119ca960b44c579bc2f6818d2daaf9e4c16f0}{Normal}}
+, \mbox{\hyperlink{namespace_c_l_i_a97e7d97131e3889f32b721570eca119cab1c94ca2fbc3e78fc30069c8d0f01680}{All}}
+, \mbox{\hyperlink{namespace_c_l_i_a97e7d97131e3889f32b721570eca119cae80155eceb940c89e2de63ad05868db2}{Sub}}
+ \}
+\item 
+enum class \mbox{\hyperlink{namespace_c_l_i_a991a3264d3459575fc7e83eb54d73d2b}{Multi\+Option\+Policy}} \+: char \{ \newline
+\mbox{\hyperlink{namespace_c_l_i_a991a3264d3459575fc7e83eb54d73d2ba8ce61dd2505effd96f937fa743b6491f}{Throw}}
+, \mbox{\hyperlink{namespace_c_l_i_a991a3264d3459575fc7e83eb54d73d2ba91a7975e6be6ac082721192c7eb98891}{Take\+Last}}
+, \mbox{\hyperlink{namespace_c_l_i_a991a3264d3459575fc7e83eb54d73d2ba59a97fc8d11b2b3f89acfe1c3ac891df}{Take\+First}}
+, \mbox{\hyperlink{namespace_c_l_i_a991a3264d3459575fc7e83eb54d73d2baa286d9991c6a547ae25a5f5216164b8f}{Join}}
+, \newline
+\mbox{\hyperlink{namespace_c_l_i_a991a3264d3459575fc7e83eb54d73d2ba571fa4972dd227b4097ab6a774ca1263}{Take\+All}}
+ \}
+\begin{DoxyCompactList}\small\item\em Enumeration of the multi\+Option Policy selection. \end{DoxyCompactList}\item 
+enum class \mbox{\hyperlink{namespace_c_l_i_a474d5665894fe9a318ddbdb9ebf194d4}{config\+\_\+extras\+\_\+mode}} \+: char \{ \mbox{\hyperlink{namespace_c_l_i_a474d5665894fe9a318ddbdb9ebf194d4acb5e100e5a9a3e7f6d1fd97512215282}{error}} = 0
+, \mbox{\hyperlink{namespace_c_l_i_a474d5665894fe9a318ddbdb9ebf194d4a567bc1d268f135496de3d5b946b691f3}{ignore}}
+, \mbox{\hyperlink{namespace_c_l_i_a474d5665894fe9a318ddbdb9ebf194d4ad7ba9bbfda42b9657f14ee37ef76150b}{capture}}
+ \}
+\begin{DoxyCompactList}\small\item\em enumeration of modes of how to deal with extras in config files \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+std\+::string \mbox{\hyperlink{namespace_c_l_i_af96013656b9682279a1c0d7d06ad9efe}{fix\+\_\+newlines}} (const std\+::string \&leader, std\+::string input)
+\item 
+std\+::size\+\_\+t \mbox{\hyperlink{namespace_c_l_i_a39254b3e259b6857df2f6dc88a1e9f30}{escape\+\_\+detect}} (std\+::string \&str, std\+::size\+\_\+t offset)
+\item 
+std\+::string \& \mbox{\hyperlink{namespace_c_l_i_a2fa3653dcd92f3fac95e7bc6bc2f2aa6}{add\+\_\+quotes\+\_\+if\+\_\+needed}} (std\+::string \&str)
+\begin{DoxyCompactList}\small\item\em Add quotes if the string contains spaces. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{namespace_c_l_i_a495f418aefacfdfbe91642a18f60d77c}{Trigger\+On}} (\mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \texorpdfstring{$\ast$}{*}trigger\+\_\+app, \mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \texorpdfstring{$\ast$}{*}app\+\_\+to\+\_\+enable)
+\begin{DoxyCompactList}\small\item\em Helper function to enable one option group/subcommand when another is used. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{namespace_c_l_i_a5feaad2da28dd1b1adac0ebd8382af7d}{Trigger\+On}} (\mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \texorpdfstring{$\ast$}{*}trigger\+\_\+app, std\+::vector$<$ \mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \texorpdfstring{$\ast$}{*} $>$ apps\+\_\+to\+\_\+enable)
+\begin{DoxyCompactList}\small\item\em Helper function to enable one option group/subcommand when another is used. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{namespace_c_l_i_ae611995dabf1e7d4a2480f1952ef6ba7}{Trigger\+Off}} (\mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \texorpdfstring{$\ast$}{*}trigger\+\_\+app, \mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \texorpdfstring{$\ast$}{*}app\+\_\+to\+\_\+enable)
+\begin{DoxyCompactList}\small\item\em Helper function to disable one option group/subcommand when another is used. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{namespace_c_l_i_aeb752166e5a0486440b5902f7878ed72}{Trigger\+Off}} (\mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \texorpdfstring{$\ast$}{*}trigger\+\_\+app, std\+::vector$<$ \mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \texorpdfstring{$\ast$}{*} $>$ apps\+\_\+to\+\_\+enable)
+\begin{DoxyCompactList}\small\item\em Helper function to disable one option group/subcommand when another is used. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{namespace_c_l_i_a6cb6f8bfff8c49385fb24f6f23a23c21}{deprecate\+\_\+option}} (\mbox{\hyperlink{class_c_l_i_1_1_option}{Option}} \texorpdfstring{$\ast$}{*}opt, const std\+::string \&replacement="{}"{})
+\begin{DoxyCompactList}\small\item\em Helper function to mark an option as deprecated. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{namespace_c_l_i_ad6d89b5d1aba2ebdca5f94534d658cab}{deprecate\+\_\+option}} (\mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \texorpdfstring{$\ast$}{*}app, const std\+::string \&option\+\_\+name, const std\+::string \&replacement="{}"{})
+\begin{DoxyCompactList}\small\item\em Helper function to mark an option as deprecated. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{namespace_c_l_i_a5e83d92a6ec271c2439141feaede1136}{deprecate\+\_\+option}} (\mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \&app, const std\+::string \&option\+\_\+name, const std\+::string \&replacement="{}"{})
+\begin{DoxyCompactList}\small\item\em Helper function to mark an option as deprecated. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{namespace_c_l_i_a36cfe4a6a80bf143735c0b80960bc252}{retire\+\_\+option}} (\mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \texorpdfstring{$\ast$}{*}app, \mbox{\hyperlink{class_c_l_i_1_1_option}{Option}} \texorpdfstring{$\ast$}{*}opt)
+\begin{DoxyCompactList}\small\item\em Helper function to mark an option as retired. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{namespace_c_l_i_a52390f850f663cf38a27e134c1a39b61}{retire\+\_\+option}} (\mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \&app, \mbox{\hyperlink{class_c_l_i_1_1_option}{Option}} \texorpdfstring{$\ast$}{*}opt)
+\begin{DoxyCompactList}\small\item\em Helper function to mark an option as retired. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{namespace_c_l_i_ad9ac23b01e2ef840ec123f5a115302ab}{retire\+\_\+option}} (\mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \texorpdfstring{$\ast$}{*}app, const std\+::string \&option\+\_\+name)
+\begin{DoxyCompactList}\small\item\em Helper function to mark an option as retired. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{namespace_c_l_i_a77cd1a3639a91dea33a7d144ea476df6}{retire\+\_\+option}} (\mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \&app, const std\+::string \&option\+\_\+name)
+\begin{DoxyCompactList}\small\item\em Helper function to mark an option as retired. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\using \mbox{\hyperlink{namespace_c_l_i_afac11216d7de35041e5d82a35be30481}{Transform\+Pairs}} = std\+::vector$<$std\+::pair$<$std\+::string, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$$>$
+\begin{DoxyCompactList}\small\item\em definition of the default transformation object \end{DoxyCompactList}\item 
+const \mbox{\hyperlink{class_c_l_i_1_1detail_1_1_existing_file_validator}{detail\+::\+Existing\+File\+Validator}} \mbox{\hyperlink{namespace_c_l_i_ab60cbe0bb76c7b2e00d63f48a573e322}{Existing\+File}}
+\begin{DoxyCompactList}\small\item\em Check for existing file (returns error message if check fails) \end{DoxyCompactList}\item 
+const \mbox{\hyperlink{class_c_l_i_1_1detail_1_1_existing_directory_validator}{detail\+::\+Existing\+Directory\+Validator}} \mbox{\hyperlink{namespace_c_l_i_a297aa1a5877b3f744ee8857960e0e025}{Existing\+Directory}}
+\begin{DoxyCompactList}\small\item\em Check for an existing directory (returns error message if check fails) \end{DoxyCompactList}\item 
+const \mbox{\hyperlink{class_c_l_i_1_1detail_1_1_existing_path_validator}{detail\+::\+Existing\+Path\+Validator}} \mbox{\hyperlink{namespace_c_l_i_ab0065d2e9866c49896ce3c682e8c7062}{Existing\+Path}}
+\begin{DoxyCompactList}\small\item\em Check for an existing path. \end{DoxyCompactList}\item 
+const \mbox{\hyperlink{class_c_l_i_1_1detail_1_1_nonexistent_path_validator}{detail\+::\+Nonexistent\+Path\+Validator}} \mbox{\hyperlink{namespace_c_l_i_a790f9bb552cf96ab9ca2d6c9749adba1}{Nonexistent\+Path}}
+\begin{DoxyCompactList}\small\item\em Check for an non-\/existing path. \end{DoxyCompactList}\item 
+const \mbox{\hyperlink{class_c_l_i_1_1detail_1_1_i_p_v4_validator}{detail\+::\+IPV4\+Validator}} \mbox{\hyperlink{namespace_c_l_i_a9cfed0354c4d5dd79f145fcbdcb4c155}{Valid\+IPV4}}
+\begin{DoxyCompactList}\small\item\em Check for an IP4 address. \end{DoxyCompactList}\item 
+const \mbox{\hyperlink{class_c_l_i_1_1detail_1_1_positive_number}{detail\+::\+Positive\+Number}} \mbox{\hyperlink{namespace_c_l_i_aef2ee22a4ae84639a9c1f31c9ef00514}{Positive\+Number}}
+\begin{DoxyCompactList}\small\item\em Check for a positive number. \end{DoxyCompactList}\item 
+const \mbox{\hyperlink{class_c_l_i_1_1detail_1_1_non_negative_number}{detail\+::\+Non\+Negative\+Number}} \mbox{\hyperlink{namespace_c_l_i_a64dd90027e481b48b0096721fc6829ec}{Non\+Negative\+Number}}
+\begin{DoxyCompactList}\small\item\em Check for a non-\/negative number. \end{DoxyCompactList}\item 
+const \mbox{\hyperlink{class_c_l_i_1_1detail_1_1_number}{detail\+::\+Number}} \mbox{\hyperlink{namespace_c_l_i_a713b5a1bbb98173dbc74edd4f295a582}{Number}}
+\begin{DoxyCompactList}\small\item\em Check for a number. \end{DoxyCompactList}\item 
+std\+::string \mbox{\hyperlink{namespace_c_l_i_a0c52326d2681814c22aa1a93ce43375e}{ignore\+\_\+case}} (std\+::string item)
+\begin{DoxyCompactList}\small\item\em Helper function to allow ignore\+\_\+case to be passed to \doxylink{class_c_l_i_1_1_is_member}{Is\+Member} or Transform. \end{DoxyCompactList}\item 
+std\+::string \mbox{\hyperlink{namespace_c_l_i_a111b6f05d21b9b84e7ba933ade79884c}{ignore\+\_\+underscore}} (std\+::string item)
+\begin{DoxyCompactList}\small\item\em Helper function to allow ignore\+\_\+underscore to be passed to \doxylink{class_c_l_i_1_1_is_member}{Is\+Member} or Transform. \end{DoxyCompactList}\item 
+std\+::string \mbox{\hyperlink{namespace_c_l_i_ac9f5612a3fa6d56e08bff5c307af10f1}{ignore\+\_\+space}} (std\+::string item)
+\begin{DoxyCompactList}\small\item\em Helper function to allow checks to ignore spaces to be passed to \doxylink{class_c_l_i_1_1_is_member}{Is\+Member} or Transform. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{namespace_c_l_i_a03ebc4aee21ceb9f5f33b6636e9af481}\index{CLI@{CLI}!App\_p@{App\_p}}
+\index{App\_p@{App\_p}!CLI@{CLI}}
+\doxysubsubsection{\texorpdfstring{App\_p}{App\_p}}
+{\footnotesize\ttfamily \label{namespace_c_l_i_a03ebc4aee21ceb9f5f33b6636e9af481} 
+using \mbox{\hyperlink{namespace_c_l_i_a03ebc4aee21ceb9f5f33b6636e9af481}{CLI\+::\+App\+\_\+p}} = std\+::shared\+\_\+ptr$<$\mbox{\hyperlink{class_c_l_i_1_1_app}{App}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l04607}{4607}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+\Hypertarget{namespace_c_l_i_aee5516e2fe4d7b0298d5491d73ccefe5}\index{CLI@{CLI}!callback\_t@{callback\_t}}
+\index{callback\_t@{callback\_t}!CLI@{CLI}}
+\doxysubsubsection{\texorpdfstring{callback\_t}{callback\_t}}
+{\footnotesize\ttfamily \label{namespace_c_l_i_aee5516e2fe4d7b0298d5491d73ccefe5} 
+using \mbox{\hyperlink{namespace_c_l_i_aee5516e2fe4d7b0298d5491d73ccefe5}{CLI\+::callback\+\_\+t}} = std\+::function$<$bool(const \mbox{\hyperlink{namespace_c_l_i_af6f17295305147505ec3636151d35bbb}{results\+\_\+t}} \&)$>$}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l03329}{3329}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+\Hypertarget{namespace_c_l_i_ac092ca4f58943edb3d71c563b3e7c953}\index{CLI@{CLI}!conditional\_t@{conditional\_t}}
+\index{conditional\_t@{conditional\_t}!CLI@{CLI}}
+\doxysubsubsection{\texorpdfstring{conditional\_t}{conditional\_t}}
+{\footnotesize\ttfamily \label{namespace_c_l_i_ac092ca4f58943edb3d71c563b3e7c953} 
+template$<$bool B, \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} F $>$ \\
+using \mbox{\hyperlink{namespace_c_l_i_ac092ca4f58943edb3d71c563b3e7c953}{CLI\+::conditional\+\_\+t}} = typename std\+::conditional$<$B, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, F$>$\+::type}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l00873}{873}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+\Hypertarget{namespace_c_l_i_a15ab3d231d9eabe775a3cca1616acb84}\index{CLI@{CLI}!ConfigINI@{ConfigINI}}
+\index{ConfigINI@{ConfigINI}!CLI@{CLI}}
+\doxysubsubsection{\texorpdfstring{ConfigINI}{ConfigINI}}
+{\footnotesize\ttfamily \label{namespace_c_l_i_a15ab3d231d9eabe775a3cca1616acb84} 
+using \mbox{\hyperlink{namespace_c_l_i_a15ab3d231d9eabe775a3cca1616acb84}{CLI\+::\+Config\+INI}} = \mbox{\hyperlink{class_c_l_i_1_1_config_base}{Config\+Base}}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l02057}{2057}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+\Hypertarget{namespace_c_l_i_a4858f02cc3a0eeda7af44dd3e957b506}\index{CLI@{CLI}!enable\_if\_t@{enable\_if\_t}}
+\index{enable\_if\_t@{enable\_if\_t}!CLI@{CLI}}
+\doxysubsubsection{\texorpdfstring{enable\_if\_t}{enable\_if\_t}}
+{\footnotesize\ttfamily \label{namespace_c_l_i_a4858f02cc3a0eeda7af44dd3e957b506} 
+template$<$bool B, \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}  = void$>$ \\
+using \mbox{\hyperlink{namespace_c_l_i_a4858f02cc3a0eeda7af44dd3e957b506}{CLI\+::enable\+\_\+if\+\_\+t}} = typename std\+::enable\+\_\+if$<$B, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$\+::type}
+
+\doxylink{struct_a}{A} copy of enable\+\_\+if\+\_\+t from C++14, compatible with C++11.
+
+We could check to see if C++14 is being used, but it does not hurt to redefine this (even Google does this\+: \href{https://github.com/google/skia/blob/master/include/private/SkTLogic.h}{\texttt{ https\+://github.\+com/google/skia/blob/master/include/private/\+Sk\+TLogic.\+h}}) It is not in the std namespace anyway, so no harm done. 
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l00864}{864}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+\Hypertarget{namespace_c_l_i_afca10810a722704f401fe6c5bf57d52a}\index{CLI@{CLI}!Option\_p@{Option\_p}}
+\index{Option\_p@{Option\_p}!CLI@{CLI}}
+\doxysubsubsection{\texorpdfstring{Option\_p}{Option\_p}}
+{\footnotesize\ttfamily \label{namespace_c_l_i_afca10810a722704f401fe6c5bf57d52a} 
+using \mbox{\hyperlink{namespace_c_l_i_afca10810a722704f401fe6c5bf57d52a}{CLI\+::\+Option\+\_\+p}} = std\+::unique\+\_\+ptr$<$\mbox{\hyperlink{class_c_l_i_1_1_option}{Option}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l03334}{3334}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+\Hypertarget{namespace_c_l_i_af6f17295305147505ec3636151d35bbb}\index{CLI@{CLI}!results\_t@{results\_t}}
+\index{results\_t@{results\_t}!CLI@{CLI}}
+\doxysubsubsection{\texorpdfstring{results\_t}{results\_t}}
+{\footnotesize\ttfamily \label{namespace_c_l_i_af6f17295305147505ec3636151d35bbb} 
+using \mbox{\hyperlink{namespace_c_l_i_af6f17295305147505ec3636151d35bbb}{CLI\+::results\+\_\+t}} = std\+::vector$<$std\+::string$>$}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l03327}{3327}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+\Hypertarget{namespace_c_l_i_afac11216d7de35041e5d82a35be30481}\index{CLI@{CLI}!TransformPairs@{TransformPairs}}
+\index{TransformPairs@{TransformPairs}!CLI@{CLI}}
+\doxysubsubsection{\texorpdfstring{TransformPairs}{TransformPairs}}
+{\footnotesize\ttfamily \label{namespace_c_l_i_afac11216d7de35041e5d82a35be30481} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+using \mbox{\hyperlink{namespace_c_l_i_afac11216d7de35041e5d82a35be30481}{CLI\+::\+Transform\+Pairs}} = std\+::vector$<$std\+::pair$<$std\+::string, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l02780}{2780}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+\Hypertarget{namespace_c_l_i_a202e774b5850d92a2b5650ad79b5d418}\index{CLI@{CLI}!void\_t@{void\_t}}
+\index{void\_t@{void\_t}!CLI@{CLI}}
+\doxysubsubsection{\texorpdfstring{void\_t}{void\_t}}
+{\footnotesize\ttfamily \label{namespace_c_l_i_a202e774b5850d92a2b5650ad79b5d418} 
+template$<$typename... Ts$>$ \\
+using \mbox{\hyperlink{namespace_c_l_i_a202e774b5850d92a2b5650ad79b5d418}{CLI\+::void\+\_\+t}} = typename \mbox{\hyperlink{struct_c_l_i_1_1make__void}{make\+\_\+void}}$<$Ts...$>$\+::type}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l00870}{870}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{namespace_c_l_i_a97e7d97131e3889f32b721570eca119c}\index{CLI@{CLI}!AppFormatMode@{AppFormatMode}}
+\index{AppFormatMode@{AppFormatMode}!CLI@{CLI}}
+\doxysubsubsection{\texorpdfstring{AppFormatMode}{AppFormatMode}}
+{\footnotesize\ttfamily \label{namespace_c_l_i_a97e7d97131e3889f32b721570eca119c} 
+enum \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{namespace_c_l_i_a97e7d97131e3889f32b721570eca119c}{CLI\+::\+App\+Format\+Mode}}\hspace{0.3cm}{\ttfamily [strong]}}
+
+This enum signifies the type of help requested
+
+This is passed in by \doxylink{class_c_l_i_1_1_app}{App}; all user classes must accept this as the second argument. \begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Normal@{Normal}!CLI@{CLI}}\index{CLI@{CLI}!Normal@{Normal}}}\Hypertarget{namespace_c_l_i_a97e7d97131e3889f32b721570eca119ca960b44c579bc2f6818d2daaf9e4c16f0}\label{namespace_c_l_i_a97e7d97131e3889f32b721570eca119c} 
+Normal&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{All@{All}!CLI@{CLI}}\index{CLI@{CLI}!All@{All}}}\Hypertarget{namespace_c_l_i_a97e7d97131e3889f32b721570eca119cab1c94ca2fbc3e78fc30069c8d0f01680}\label{namespace_c_l_i_a97e7d97131e3889f32b721570eca119c} 
+All&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Sub@{Sub}!CLI@{CLI}}\index{CLI@{CLI}!Sub@{Sub}}}\Hypertarget{namespace_c_l_i_a97e7d97131e3889f32b721570eca119cae80155eceb940c89e2de63ad05868db2}\label{namespace_c_l_i_a97e7d97131e3889f32b721570eca119c} 
+Sub&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l03167}{3167}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03167\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{03168\ \ \ \ \ Normal,\ \textcolor{comment}{//<\ The\ normal,\ detailed\ help}}
+\DoxyCodeLine{03169\ \ \ \ \ \mbox{\hyperlink{namespace_c_l_i_a97e7d97131e3889f32b721570eca119cab1c94ca2fbc3e78fc30069c8d0f01680}{All}},\ \ \ \ \textcolor{comment}{//<\ A\ fully\ expanded\ help}}
+\DoxyCodeLine{03170\ \ \ \ \ \mbox{\hyperlink{namespace_c_l_i_a97e7d97131e3889f32b721570eca119cae80155eceb940c89e2de63ad05868db2}{Sub}},\ \ \ \ \textcolor{comment}{//<\ Used\ when\ printed\ as\ part\ of\ expanded\ subcommand}}
+\DoxyCodeLine{03171\ \};}
+
+\end{DoxyCode}
+\Hypertarget{namespace_c_l_i_a474d5665894fe9a318ddbdb9ebf194d4}\index{CLI@{CLI}!config\_extras\_mode@{config\_extras\_mode}}
+\index{config\_extras\_mode@{config\_extras\_mode}!CLI@{CLI}}
+\doxysubsubsection{\texorpdfstring{config\_extras\_mode}{config\_extras\_mode}}
+{\footnotesize\ttfamily \label{namespace_c_l_i_a474d5665894fe9a318ddbdb9ebf194d4} 
+enum \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{namespace_c_l_i_a474d5665894fe9a318ddbdb9ebf194d4}{CLI\+::config\+\_\+extras\+\_\+mode}} \+: char\hspace{0.3cm}{\ttfamily [strong]}}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{error@{error}!CLI@{CLI}}\index{CLI@{CLI}!error@{error}}}\Hypertarget{namespace_c_l_i_a474d5665894fe9a318ddbdb9ebf194d4acb5e100e5a9a3e7f6d1fd97512215282}\label{namespace_c_l_i_a474d5665894fe9a318ddbdb9ebf194d4} 
+error&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ignore@{ignore}!CLI@{CLI}}\index{CLI@{CLI}!ignore@{ignore}}}\Hypertarget{namespace_c_l_i_a474d5665894fe9a318ddbdb9ebf194d4a567bc1d268f135496de3d5b946b691f3}\label{namespace_c_l_i_a474d5665894fe9a318ddbdb9ebf194d4} 
+ignore&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{capture@{capture}!CLI@{CLI}}\index{CLI@{CLI}!capture@{capture}}}\Hypertarget{namespace_c_l_i_a474d5665894fe9a318ddbdb9ebf194d4ad7ba9bbfda42b9657f14ee37ef76150b}\label{namespace_c_l_i_a474d5665894fe9a318ddbdb9ebf194d4} 
+capture&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l04603}{4603}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{04603\ :\ \textcolor{keywordtype}{char}\ \{\ error\ =\ 0,\ ignore,\ \mbox{\hyperlink{namespace_c_l_i_a474d5665894fe9a318ddbdb9ebf194d4ad7ba9bbfda42b9657f14ee37ef76150b}{capture}}\ \};}
+
+\end{DoxyCode}
+\Hypertarget{namespace_c_l_i_a1d8108a219533f0b0361640a017f037e}\index{CLI@{CLI}!ExitCodes@{ExitCodes}}
+\index{ExitCodes@{ExitCodes}!CLI@{CLI}}
+\doxysubsubsection{\texorpdfstring{ExitCodes}{ExitCodes}}
+{\footnotesize\ttfamily \label{namespace_c_l_i_a1d8108a219533f0b0361640a017f037e} 
+enum \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{namespace_c_l_i_a1d8108a219533f0b0361640a017f037e}{CLI\+::\+Exit\+Codes}}\hspace{0.3cm}{\ttfamily [strong]}}
+
+These codes are part of every error in \doxylink{namespace_c_l_i}{CLI}. They can be obtained from e using e.\+exit\+\_\+code or as a quick shortcut, int values from e.\+get\+\_\+error\+\_\+code(). \begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Success@{Success}!CLI@{CLI}}\index{CLI@{CLI}!Success@{Success}}}\Hypertarget{namespace_c_l_i_a1d8108a219533f0b0361640a017f037ea505a83f220c02df2f85c3810cd9ceb38}\label{namespace_c_l_i_a1d8108a219533f0b0361640a017f037e} 
+Success&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{IncorrectConstruction@{IncorrectConstruction}!CLI@{CLI}}\index{CLI@{CLI}!IncorrectConstruction@{IncorrectConstruction}}}\Hypertarget{namespace_c_l_i_a1d8108a219533f0b0361640a017f037ea903d95792f297008a1fd3fab8df69f79}\label{namespace_c_l_i_a1d8108a219533f0b0361640a017f037e} 
+Incorrect\+Construction&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{BadNameString@{BadNameString}!CLI@{CLI}}\index{CLI@{CLI}!BadNameString@{BadNameString}}}\Hypertarget{namespace_c_l_i_a1d8108a219533f0b0361640a017f037eab319e260db27232cb74e2a23124b7a2c}\label{namespace_c_l_i_a1d8108a219533f0b0361640a017f037e} 
+Bad\+Name\+String&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{OptionAlreadyAdded@{OptionAlreadyAdded}!CLI@{CLI}}\index{CLI@{CLI}!OptionAlreadyAdded@{OptionAlreadyAdded}}}\Hypertarget{namespace_c_l_i_a1d8108a219533f0b0361640a017f037eade33f5f54db87abfb2926228f0867038}\label{namespace_c_l_i_a1d8108a219533f0b0361640a017f037e} 
+Option\+Already\+Added&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{FileError@{FileError}!CLI@{CLI}}\index{CLI@{CLI}!FileError@{FileError}}}\Hypertarget{namespace_c_l_i_a1d8108a219533f0b0361640a017f037ea06344c468073b2b66824779ffa5105cc}\label{namespace_c_l_i_a1d8108a219533f0b0361640a017f037e} 
+File\+Error&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ConversionError@{ConversionError}!CLI@{CLI}}\index{CLI@{CLI}!ConversionError@{ConversionError}}}\Hypertarget{namespace_c_l_i_a1d8108a219533f0b0361640a017f037ea33f8a28d3c790e00d94cc848895dfb51}\label{namespace_c_l_i_a1d8108a219533f0b0361640a017f037e} 
+Conversion\+Error&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ValidationError@{ValidationError}!CLI@{CLI}}\index{CLI@{CLI}!ValidationError@{ValidationError}}}\Hypertarget{namespace_c_l_i_a1d8108a219533f0b0361640a017f037ea8180c46099f957f51b2bc31f7f0f5c42}\label{namespace_c_l_i_a1d8108a219533f0b0361640a017f037e} 
+Validation\+Error&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{RequiredError@{RequiredError}!CLI@{CLI}}\index{CLI@{CLI}!RequiredError@{RequiredError}}}\Hypertarget{namespace_c_l_i_a1d8108a219533f0b0361640a017f037ea9f418597ecc2a82cc220ea24b53505d3}\label{namespace_c_l_i_a1d8108a219533f0b0361640a017f037e} 
+Required\+Error&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{RequiresError@{RequiresError}!CLI@{CLI}}\index{CLI@{CLI}!RequiresError@{RequiresError}}}\Hypertarget{namespace_c_l_i_a1d8108a219533f0b0361640a017f037ea5a33e2f2a0eda1a6a9d8534c79459794}\label{namespace_c_l_i_a1d8108a219533f0b0361640a017f037e} 
+Requires\+Error&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ExcludesError@{ExcludesError}!CLI@{CLI}}\index{CLI@{CLI}!ExcludesError@{ExcludesError}}}\Hypertarget{namespace_c_l_i_a1d8108a219533f0b0361640a017f037ea180b6078f0a0618bbdbaeda656841923}\label{namespace_c_l_i_a1d8108a219533f0b0361640a017f037e} 
+Excludes\+Error&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ExtrasError@{ExtrasError}!CLI@{CLI}}\index{CLI@{CLI}!ExtrasError@{ExtrasError}}}\Hypertarget{namespace_c_l_i_a1d8108a219533f0b0361640a017f037ea12e25f67fcb619ec309d229ae4b9d75e}\label{namespace_c_l_i_a1d8108a219533f0b0361640a017f037e} 
+Extras\+Error&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ConfigError@{ConfigError}!CLI@{CLI}}\index{CLI@{CLI}!ConfigError@{ConfigError}}}\Hypertarget{namespace_c_l_i_a1d8108a219533f0b0361640a017f037ea1053efdc7a34708782767df3ed95cded}\label{namespace_c_l_i_a1d8108a219533f0b0361640a017f037e} 
+Config\+Error&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{InvalidError@{InvalidError}!CLI@{CLI}}\index{CLI@{CLI}!InvalidError@{InvalidError}}}\Hypertarget{namespace_c_l_i_a1d8108a219533f0b0361640a017f037eaf65e8093ec3083c0c4909e321df2ece7}\label{namespace_c_l_i_a1d8108a219533f0b0361640a017f037e} 
+Invalid\+Error&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{HorribleError@{HorribleError}!CLI@{CLI}}\index{CLI@{CLI}!HorribleError@{HorribleError}}}\Hypertarget{namespace_c_l_i_a1d8108a219533f0b0361640a017f037eaaadcc078255a085fcac00639a9519392}\label{namespace_c_l_i_a1d8108a219533f0b0361640a017f037e} 
+Horrible\+Error&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{OptionNotFound@{OptionNotFound}!CLI@{CLI}}\index{CLI@{CLI}!OptionNotFound@{OptionNotFound}}}\Hypertarget{namespace_c_l_i_a1d8108a219533f0b0361640a017f037eaa40b471f8a3c0ca91e719ea8101aa46d}\label{namespace_c_l_i_a1d8108a219533f0b0361640a017f037e} 
+Option\+Not\+Found&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ArgumentMismatch@{ArgumentMismatch}!CLI@{CLI}}\index{CLI@{CLI}!ArgumentMismatch@{ArgumentMismatch}}}\Hypertarget{namespace_c_l_i_a1d8108a219533f0b0361640a017f037ea347fac6a5a40acb21af1b8e7e81aab0e}\label{namespace_c_l_i_a1d8108a219533f0b0361640a017f037e} 
+Argument\+Mismatch&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{BaseClass@{BaseClass}!CLI@{CLI}}\index{CLI@{CLI}!BaseClass@{BaseClass}}}\Hypertarget{namespace_c_l_i_a1d8108a219533f0b0361640a017f037ea45b3e4c35409fb597ea598dc4b984b8c}\label{namespace_c_l_i_a1d8108a219533f0b0361640a017f037e} 
+Base\+Class&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l00539}{539}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00539\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00540\ \ \ \ \ \mbox{\hyperlink{class_c_l_i_1_1_success}{Success}}\ =\ 0,}
+\DoxyCodeLine{00541\ \ \ \ \ \mbox{\hyperlink{class_c_l_i_1_1_incorrect_construction}{IncorrectConstruction}}\ =\ 100,}
+\DoxyCodeLine{00542\ \ \ \ \ \mbox{\hyperlink{class_c_l_i_1_1_bad_name_string}{BadNameString}},}
+\DoxyCodeLine{00543\ \ \ \ \ \mbox{\hyperlink{class_c_l_i_1_1_option_already_added}{OptionAlreadyAdded}},}
+\DoxyCodeLine{00544\ \ \ \ \ \mbox{\hyperlink{class_c_l_i_1_1_file_error}{FileError}},}
+\DoxyCodeLine{00545\ \ \ \ \ \mbox{\hyperlink{class_c_l_i_1_1_conversion_error}{ConversionError}},}
+\DoxyCodeLine{00546\ \ \ \ \ \mbox{\hyperlink{class_c_l_i_1_1_validation_error}{ValidationError}},}
+\DoxyCodeLine{00547\ \ \ \ \ \mbox{\hyperlink{class_c_l_i_1_1_required_error}{RequiredError}},}
+\DoxyCodeLine{00548\ \ \ \ \ \mbox{\hyperlink{class_c_l_i_1_1_requires_error}{RequiresError}},}
+\DoxyCodeLine{00549\ \ \ \ \ \mbox{\hyperlink{class_c_l_i_1_1_excludes_error}{ExcludesError}},}
+\DoxyCodeLine{00550\ \ \ \ \ \mbox{\hyperlink{class_c_l_i_1_1_extras_error}{ExtrasError}},}
+\DoxyCodeLine{00551\ \ \ \ \ \mbox{\hyperlink{class_c_l_i_1_1_config_error}{ConfigError}},}
+\DoxyCodeLine{00552\ \ \ \ \ \mbox{\hyperlink{class_c_l_i_1_1_invalid_error}{InvalidError}},}
+\DoxyCodeLine{00553\ \ \ \ \ \mbox{\hyperlink{class_c_l_i_1_1_horrible_error}{HorribleError}},}
+\DoxyCodeLine{00554\ \ \ \ \ \mbox{\hyperlink{class_c_l_i_1_1_option_not_found}{OptionNotFound}},}
+\DoxyCodeLine{00555\ \ \ \ \ \mbox{\hyperlink{class_c_l_i_1_1_argument_mismatch}{ArgumentMismatch}},}
+\DoxyCodeLine{00556\ \ \ \ \ \mbox{\hyperlink{namespace_c_l_i_a1d8108a219533f0b0361640a017f037ea45b3e4c35409fb597ea598dc4b984b8c}{BaseClass}}\ =\ 127}
+\DoxyCodeLine{00557\ \};}
+
+\end{DoxyCode}
+\Hypertarget{namespace_c_l_i_a991a3264d3459575fc7e83eb54d73d2b}\index{CLI@{CLI}!MultiOptionPolicy@{MultiOptionPolicy}}
+\index{MultiOptionPolicy@{MultiOptionPolicy}!CLI@{CLI}}
+\doxysubsubsection{\texorpdfstring{MultiOptionPolicy}{MultiOptionPolicy}}
+{\footnotesize\ttfamily \label{namespace_c_l_i_a991a3264d3459575fc7e83eb54d73d2b} 
+enum \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{namespace_c_l_i_a991a3264d3459575fc7e83eb54d73d2b}{CLI\+::\+Multi\+Option\+Policy}} \+: char\hspace{0.3cm}{\ttfamily [strong]}}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Throw@{Throw}!CLI@{CLI}}\index{CLI@{CLI}!Throw@{Throw}}}\Hypertarget{namespace_c_l_i_a991a3264d3459575fc7e83eb54d73d2ba8ce61dd2505effd96f937fa743b6491f}\label{namespace_c_l_i_a991a3264d3459575fc7e83eb54d73d2b} 
+Throw&Throw an error if any extra arguments were given. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{TakeLast@{TakeLast}!CLI@{CLI}}\index{CLI@{CLI}!TakeLast@{TakeLast}}}\Hypertarget{namespace_c_l_i_a991a3264d3459575fc7e83eb54d73d2ba91a7975e6be6ac082721192c7eb98891}\label{namespace_c_l_i_a991a3264d3459575fc7e83eb54d73d2b} 
+Take\+Last&take only the last Expected number of arguments \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{TakeFirst@{TakeFirst}!CLI@{CLI}}\index{CLI@{CLI}!TakeFirst@{TakeFirst}}}\Hypertarget{namespace_c_l_i_a991a3264d3459575fc7e83eb54d73d2ba59a97fc8d11b2b3f89acfe1c3ac891df}\label{namespace_c_l_i_a991a3264d3459575fc7e83eb54d73d2b} 
+Take\+First&take only the first Expected number of arguments \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Join@{Join}!CLI@{CLI}}\index{CLI@{CLI}!Join@{Join}}}\Hypertarget{namespace_c_l_i_a991a3264d3459575fc7e83eb54d73d2baa286d9991c6a547ae25a5f5216164b8f}\label{namespace_c_l_i_a991a3264d3459575fc7e83eb54d73d2b} 
+Join&merge all the arguments together into a single string via the delimiter character default(\textquotesingle{}~\newline
+\textquotesingle{}) \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{TakeAll@{TakeAll}!CLI@{CLI}}\index{CLI@{CLI}!TakeAll@{TakeAll}}}\Hypertarget{namespace_c_l_i_a991a3264d3459575fc7e83eb54d73d2ba571fa4972dd227b4097ab6a774ca1263}\label{namespace_c_l_i_a991a3264d3459575fc7e83eb54d73d2b} 
+Take\+All&just get all the passed argument regardless \\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l03336}{3336}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03336\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \textcolor{keywordtype}{char}\ \{}
+\DoxyCodeLine{03337\ \ \ \ \ \mbox{\hyperlink{namespace_c_l_i_a991a3264d3459575fc7e83eb54d73d2ba8ce61dd2505effd96f937fa743b6491f}{Throw}},\ \ \ \ \ }
+\DoxyCodeLine{03338\ \ \ \ \ \mbox{\hyperlink{namespace_c_l_i_a991a3264d3459575fc7e83eb54d73d2ba91a7975e6be6ac082721192c7eb98891}{TakeLast}},\ \ }
+\DoxyCodeLine{03339\ \ \ \ \ \mbox{\hyperlink{namespace_c_l_i_a991a3264d3459575fc7e83eb54d73d2ba59a97fc8d11b2b3f89acfe1c3ac891df}{TakeFirst}},\ }
+\DoxyCodeLine{03340\ \ \ \ \ \mbox{\hyperlink{namespace_c_l_i_a991a3264d3459575fc7e83eb54d73d2baa286d9991c6a547ae25a5f5216164b8f}{Join}},\ \ \ \ \ \ }
+\DoxyCodeLine{03341\ \ \ \ \ \mbox{\hyperlink{namespace_c_l_i_a991a3264d3459575fc7e83eb54d73d2ba571fa4972dd227b4097ab6a774ca1263}{TakeAll}}\ \ \ \ }
+\DoxyCodeLine{03342\ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespace_c_l_i_a2fa3653dcd92f3fac95e7bc6bc2f2aa6}\index{CLI@{CLI}!add\_quotes\_if\_needed@{add\_quotes\_if\_needed}}
+\index{add\_quotes\_if\_needed@{add\_quotes\_if\_needed}!CLI@{CLI}}
+\doxysubsubsection{\texorpdfstring{add\_quotes\_if\_needed()}{add\_quotes\_if\_needed()}}
+{\footnotesize\ttfamily \label{namespace_c_l_i_a2fa3653dcd92f3fac95e7bc6bc2f2aa6} 
+std\+::string \& CLI\+::add\+\_\+quotes\+\_\+if\+\_\+needed (\begin{DoxyParamCaption}\item[{std\+::string \&}]{str}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l00502}{502}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00502\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00503\ \ \ \ \ \textcolor{keywordflow}{if}((str.front()\ !=\ \textcolor{charliteral}{'"{}'}\ \&\&\ str.front()\ !=\ \textcolor{charliteral}{'\(\backslash\)''})\ ||\ str.front()\ !=\ str.back())\ \{}
+\DoxyCodeLine{00504\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ quote\ =\ str.find(\textcolor{charliteral}{'"{}'})\ <\ str.find(\textcolor{charliteral}{'\(\backslash\)''})\ ?\ \textcolor{charliteral}{'\(\backslash\)''}\ :\ \textcolor{charliteral}{'"{}'};}
+\DoxyCodeLine{00505\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(str.find(\textcolor{charliteral}{'\ '})\ !=\ std::string::npos)\ \{}
+\DoxyCodeLine{00506\ \ \ \ \ \ \ \ \ \ \ \ \ str.insert(0,\ 1,\ quote);}
+\DoxyCodeLine{00507\ \ \ \ \ \ \ \ \ \ \ \ \ str.append(1,\ quote);}
+\DoxyCodeLine{00508\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00509\ \ \ \ \ \}}
+\DoxyCodeLine{00510\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}};}
+\DoxyCodeLine{00511\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespace_c_l_i_a5e83d92a6ec271c2439141feaede1136}\index{CLI@{CLI}!deprecate\_option@{deprecate\_option}}
+\index{deprecate\_option@{deprecate\_option}!CLI@{CLI}}
+\doxysubsubsection{\texorpdfstring{deprecate\_option()}{deprecate\_option()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{namespace_c_l_i_a5e83d92a6ec271c2439141feaede1136} 
+void CLI\+::deprecate\+\_\+option (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \&}]{app}{, }\item[{const std\+::string \&}]{option\+\_\+name}{, }\item[{const std\+::string \&}]{replacement}{ = {\ttfamily "{}"{}}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l07514}{7514}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{07514\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{07515\ \ \ \ \ \textcolor{keyword}{auto}\ opt\ =\ app.get\_option(option\_name);}
+\DoxyCodeLine{07516\ \ \ \ \ \mbox{\hyperlink{namespace_c_l_i_a6cb6f8bfff8c49385fb24f6f23a23c21}{deprecate\_option}}(opt,\ replacement);}
+\DoxyCodeLine{07517\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_c_l_i_a5e83d92a6ec271c2439141feaede1136_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_c_l_i_ad6d89b5d1aba2ebdca5f94534d658cab}\index{CLI@{CLI}!deprecate\_option@{deprecate\_option}}
+\index{deprecate\_option@{deprecate\_option}!CLI@{CLI}}
+\doxysubsubsection{\texorpdfstring{deprecate\_option()}{deprecate\_option()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{namespace_c_l_i_ad6d89b5d1aba2ebdca5f94534d658cab} 
+void CLI\+::deprecate\+\_\+option (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \texorpdfstring{$\ast$}{*}}]{app}{, }\item[{const std\+::string \&}]{option\+\_\+name}{, }\item[{const std\+::string \&}]{replacement}{ = {\ttfamily "{}"{}}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l07508}{7508}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{07508\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{07509\ \ \ \ \ \textcolor{keyword}{auto}\ opt\ =\ app-\/>get\_option(option\_name);}
+\DoxyCodeLine{07510\ \ \ \ \ \mbox{\hyperlink{namespace_c_l_i_a6cb6f8bfff8c49385fb24f6f23a23c21}{deprecate\_option}}(opt,\ replacement);}
+\DoxyCodeLine{07511\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_c_l_i_ad6d89b5d1aba2ebdca5f94534d658cab_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_c_l_i_a6cb6f8bfff8c49385fb24f6f23a23c21}\index{CLI@{CLI}!deprecate\_option@{deprecate\_option}}
+\index{deprecate\_option@{deprecate\_option}!CLI@{CLI}}
+\doxysubsubsection{\texorpdfstring{deprecate\_option()}{deprecate\_option()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{namespace_c_l_i_a6cb6f8bfff8c49385fb24f6f23a23c21} 
+void CLI\+::deprecate\+\_\+option (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_c_l_i_1_1_option}{Option}} \texorpdfstring{$\ast$}{*}}]{opt}{, }\item[{const std\+::string \&}]{replacement}{ = {\ttfamily "{}"{}}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l07493}{7493}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{07493\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{07494\ \ \ \ \ \mbox{\hyperlink{class_c_l_i_1_1_validator}{Validator}}\ deprecate\_warning\{[opt,\ replacement](std::string\ \&)\ \{}
+\DoxyCodeLine{07495\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ opt-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_ab84751fbf9037efaed5b64fed17fe57f}{get\_name}}()\ <<\ \textcolor{stringliteral}{"{}\ is\ deprecated\ please\ use\ '"{}}\ <<\ replacement}
+\DoxyCodeLine{07496\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}'\ instead\(\backslash\)n"{}};}
+\DoxyCodeLine{07497\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::string();}
+\DoxyCodeLine{07498\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{07499\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}DEPRECATED"{}}\};}
+\DoxyCodeLine{07500\ \ \ \ \ deprecate\_warning.\mbox{\hyperlink{class_c_l_i_1_1_validator_ae24fb3eedf62301b733b3a20d2b93757}{application\_index}}(0);}
+\DoxyCodeLine{07501\ \ \ \ \ opt-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_ae94ff5bfc6549f9c86aff629be829353}{check}}(deprecate\_warning);}
+\DoxyCodeLine{07502\ \ \ \ \ \textcolor{keywordflow}{if}(!replacement.empty())\ \{}
+\DoxyCodeLine{07503\ \ \ \ \ \ \ \ \ opt-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_adb517865b2f89c023e9544085cb332e4}{description}}(opt-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_a6298f2354e3e02d262f1f6815621639a}{get\_description}}()\ +\ \textcolor{stringliteral}{"{}\ DEPRECATED:\ please\ use\ '"{}}\ +\ replacement\ +\ \textcolor{stringliteral}{"{}'\ instead"{}});}
+\DoxyCodeLine{07504\ \ \ \ \ \}}
+\DoxyCodeLine{07505\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_c_l_i_a6cb6f8bfff8c49385fb24f6f23a23c21_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=340pt]{namespace_c_l_i_a6cb6f8bfff8c49385fb24f6f23a23c21_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_c_l_i_a39254b3e259b6857df2f6dc88a1e9f30}\index{CLI@{CLI}!escape\_detect@{escape\_detect}}
+\index{escape\_detect@{escape\_detect}!CLI@{CLI}}
+\doxysubsubsection{\texorpdfstring{escape\_detect()}{escape\_detect()}}
+{\footnotesize\ttfamily \label{namespace_c_l_i_a39254b3e259b6857df2f6dc88a1e9f30} 
+std\+::size\+\_\+t CLI\+::escape\+\_\+detect (\begin{DoxyParamCaption}\item[{std\+::string \&}]{str}{, }\item[{std\+::size\+\_\+t}]{offset}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+This function detects an equal or colon followed by an escaped quote after an argument then modifies the string to replace the equality with a space. This is needed to allow the split up function to work properly and is intended to be used with the find\+\_\+and\+\_\+modify function the return value is the offset+1 which is required by the find\+\_\+and\+\_\+modify function. 
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l00489}{489}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00489\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00490\ \ \ \ \ \textcolor{keyword}{auto}\ next\ =\ str[offset\ +\ 1];}
+\DoxyCodeLine{00491\ \ \ \ \ \textcolor{keywordflow}{if}((next\ ==\ \textcolor{charliteral}{'\(\backslash\)"{}'})\ ||\ (next\ ==\ \textcolor{charliteral}{'\(\backslash\)''})\ ||\ (next\ ==\ \textcolor{charliteral}{'`'}))\ \{}
+\DoxyCodeLine{00492\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ astart\ =\ str.find\_last\_of(\textcolor{stringliteral}{"{}-\//\ \(\backslash\)"{}\(\backslash\)'\`{}"{}},\ offset\ -\/\ 1);}
+\DoxyCodeLine{00493\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(astart\ !=\ std::string::npos)\ \{}
+\DoxyCodeLine{00494\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(str[astart]\ ==\ ((str[offset]\ ==\ \textcolor{charliteral}{'='})\ ?\ \textcolor{charliteral}{'-\/'}\ :\ \textcolor{charliteral}{'/'}))}
+\DoxyCodeLine{00495\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ str[offset]\ =\ \textcolor{charliteral}{'\ '};\ \textcolor{comment}{//\ interpret\ this\ as\ a\ space\ so\ the\ split\_up\ works\ properly}}
+\DoxyCodeLine{00496\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00497\ \ \ \ \ \}}
+\DoxyCodeLine{00498\ \ \ \ \ \textcolor{keywordflow}{return}\ offset\ +\ 1;}
+\DoxyCodeLine{00499\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespace_c_l_i_af96013656b9682279a1c0d7d06ad9efe}\index{CLI@{CLI}!fix\_newlines@{fix\_newlines}}
+\index{fix\_newlines@{fix\_newlines}!CLI@{CLI}}
+\doxysubsubsection{\texorpdfstring{fix\_newlines()}{fix\_newlines()}}
+{\footnotesize\ttfamily \label{namespace_c_l_i_af96013656b9682279a1c0d7d06ad9efe} 
+std\+::string CLI\+::fix\+\_\+newlines (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{leader}{, }\item[{std\+::string}]{input}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Add a leader to the beginning of all new lines (nothing is added at the start of the first line). {\ttfamily "{}; "{}} would be for ini files
+
+Can\textquotesingle{}t use Regex, or this would be a subs. 
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l00473}{473}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00473\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00474\ \ \ \ \ std::string::size\_type\ n\ =\ 0;}
+\DoxyCodeLine{00475\ \ \ \ \ \textcolor{keywordflow}{while}(n\ !=\ std::string::npos\ \&\&\ n\ <\ input.size())\ \{}
+\DoxyCodeLine{00476\ \ \ \ \ \ \ \ \ n\ =\ input.find(\textcolor{charliteral}{'\(\backslash\)n'},\ n);}
+\DoxyCodeLine{00477\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(n\ !=\ std::string::npos)\ \{}
+\DoxyCodeLine{00478\ \ \ \ \ \ \ \ \ \ \ \ \ input\ =\ input.substr(0,\ n\ +\ 1)\ +\ leader\ +\ input.substr(n\ +\ 1);}
+\DoxyCodeLine{00479\ \ \ \ \ \ \ \ \ \ \ \ \ n\ +=\ leader.size();}
+\DoxyCodeLine{00480\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00481\ \ \ \ \ \}}
+\DoxyCodeLine{00482\ \ \ \ \ \textcolor{keywordflow}{return}\ input;}
+\DoxyCodeLine{00483\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespace_c_l_i_a0c52326d2681814c22aa1a93ce43375e}\index{CLI@{CLI}!ignore\_case@{ignore\_case}}
+\index{ignore\_case@{ignore\_case}!CLI@{CLI}}
+\doxysubsubsection{\texorpdfstring{ignore\_case()}{ignore\_case()}}
+{\footnotesize\ttfamily \label{namespace_c_l_i_a0c52326d2681814c22aa1a93ce43375e} 
+std\+::string CLI\+::ignore\+\_\+case (\begin{DoxyParamCaption}\item[{std\+::string}]{item}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l02918}{2918}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02918\ \{\ \textcolor{keywordflow}{return}\ detail::to\_lower(item);\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=310pt]{namespace_c_l_i_a0c52326d2681814c22aa1a93ce43375e_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_c_l_i_a0c52326d2681814c22aa1a93ce43375e_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_c_l_i_ac9f5612a3fa6d56e08bff5c307af10f1}\index{CLI@{CLI}!ignore\_space@{ignore\_space}}
+\index{ignore\_space@{ignore\_space}!CLI@{CLI}}
+\doxysubsubsection{\texorpdfstring{ignore\_space()}{ignore\_space()}}
+{\footnotesize\ttfamily \label{namespace_c_l_i_ac9f5612a3fa6d56e08bff5c307af10f1} 
+std\+::string CLI\+::ignore\+\_\+space (\begin{DoxyParamCaption}\item[{std\+::string}]{item}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l02924}{2924}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02924\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02925\ \ \ \ \ item.erase(std::remove(std::begin(item),\ std::end(item),\ \textcolor{charliteral}{'\ '}),\ std::end(item));}
+\DoxyCodeLine{02926\ \ \ \ \ item.erase(std::remove(std::begin(item),\ std::end(item),\ \textcolor{charliteral}{'\(\backslash\)t'}),\ std::end(item));}
+\DoxyCodeLine{02927\ \ \ \ \ \textcolor{keywordflow}{return}\ item;}
+\DoxyCodeLine{02928\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespace_c_l_i_a111b6f05d21b9b84e7ba933ade79884c}\index{CLI@{CLI}!ignore\_underscore@{ignore\_underscore}}
+\index{ignore\_underscore@{ignore\_underscore}!CLI@{CLI}}
+\doxysubsubsection{\texorpdfstring{ignore\_underscore()}{ignore\_underscore()}}
+{\footnotesize\ttfamily \label{namespace_c_l_i_a111b6f05d21b9b84e7ba933ade79884c} 
+std\+::string CLI\+::ignore\+\_\+underscore (\begin{DoxyParamCaption}\item[{std\+::string}]{item}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l02921}{2921}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02921\ \{\ \textcolor{keywordflow}{return}\ detail::remove\_underscore(item);\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=333pt]{namespace_c_l_i_a111b6f05d21b9b84e7ba933ade79884c_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_c_l_i_a111b6f05d21b9b84e7ba933ade79884c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_c_l_i_a77cd1a3639a91dea33a7d144ea476df6}\index{CLI@{CLI}!retire\_option@{retire\_option}}
+\index{retire\_option@{retire\_option}!CLI@{CLI}}
+\doxysubsubsection{\texorpdfstring{retire\_option()}{retire\_option()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{namespace_c_l_i_a77cd1a3639a91dea33a7d144ea476df6} 
+void CLI\+::retire\+\_\+option (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \&}]{app}{, }\item[{const std\+::string \&}]{option\+\_\+name}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l07569}{7569}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{07569\ \{\ \mbox{\hyperlink{namespace_c_l_i_a36cfe4a6a80bf143735c0b80960bc252}{retire\_option}}(\&app,\ option\_name);\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_c_l_i_a77cd1a3639a91dea33a7d144ea476df6_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_c_l_i_a52390f850f663cf38a27e134c1a39b61}\index{CLI@{CLI}!retire\_option@{retire\_option}}
+\index{retire\_option@{retire\_option}!CLI@{CLI}}
+\doxysubsubsection{\texorpdfstring{retire\_option()}{retire\_option()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{namespace_c_l_i_a52390f850f663cf38a27e134c1a39b61} 
+void CLI\+::retire\+\_\+option (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \&}]{app}{, }\item[{\mbox{\hyperlink{class_c_l_i_1_1_option}{Option}} \texorpdfstring{$\ast$}{*}}]{opt}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l07545}{7545}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{07545\ \{\ \mbox{\hyperlink{namespace_c_l_i_a36cfe4a6a80bf143735c0b80960bc252}{retire\_option}}(\&app,\ opt);\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_c_l_i_a52390f850f663cf38a27e134c1a39b61_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_c_l_i_ad9ac23b01e2ef840ec123f5a115302ab}\index{CLI@{CLI}!retire\_option@{retire\_option}}
+\index{retire\_option@{retire\_option}!CLI@{CLI}}
+\doxysubsubsection{\texorpdfstring{retire\_option()}{retire\_option()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{namespace_c_l_i_ad9ac23b01e2ef840ec123f5a115302ab} 
+void CLI\+::retire\+\_\+option (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \texorpdfstring{$\ast$}{*}}]{app}{, }\item[{const std\+::string \&}]{option\+\_\+name}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l07548}{7548}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{07548\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{07549\ }
+\DoxyCodeLine{07550\ \ \ \ \ \textcolor{keyword}{auto}\ opt\ =\ app-\/>get\_option\_no\_throw(option\_name);}
+\DoxyCodeLine{07551\ \ \ \ \ \textcolor{keywordflow}{if}(opt\ !=\ \textcolor{keyword}{nullptr})\ \{}
+\DoxyCodeLine{07552\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_c_l_i_a36cfe4a6a80bf143735c0b80960bc252}{retire\_option}}(app,\ opt);}
+\DoxyCodeLine{07553\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{07554\ \ \ \ \ \}}
+\DoxyCodeLine{07555\ \ \ \ \ \textcolor{keyword}{auto}\ opt2\ =\ app-\/>add\_option(option\_name,\ \textcolor{stringliteral}{"{}option\ has\ been\ retired\ and\ has\ no\ effect"{}})}
+\DoxyCodeLine{07556\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>type\_name(\textcolor{stringliteral}{"{}RETIRED"{}})}
+\DoxyCodeLine{07557\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>expected(0,\ 1)}
+\DoxyCodeLine{07558\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>default\_str(\textcolor{stringliteral}{"{}RETIRED"{}});}
+\DoxyCodeLine{07559\ \ \ \ \ Validator\ retired\_warning\{[opt2](std::string\ \&)\ \{}
+\DoxyCodeLine{07560\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}WARNING\ "{}}\ <<\ opt2-\/>get\_name()\ <<\ \textcolor{stringliteral}{"{}\ is\ retired\ and\ has\ no\ effect\(\backslash\)n"{}};}
+\DoxyCodeLine{07561\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::string();}
+\DoxyCodeLine{07562\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{07563\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}"{}}\};}
+\DoxyCodeLine{07564\ \ \ \ \ retired\_warning.application\_index(0);}
+\DoxyCodeLine{07565\ \ \ \ \ opt2-\/>check(retired\_warning);}
+\DoxyCodeLine{07566\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_c_l_i_ad9ac23b01e2ef840ec123f5a115302ab_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_c_l_i_a36cfe4a6a80bf143735c0b80960bc252}\index{CLI@{CLI}!retire\_option@{retire\_option}}
+\index{retire\_option@{retire\_option}!CLI@{CLI}}
+\doxysubsubsection{\texorpdfstring{retire\_option()}{retire\_option()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{namespace_c_l_i_a36cfe4a6a80bf143735c0b80960bc252} 
+void CLI\+::retire\+\_\+option (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \texorpdfstring{$\ast$}{*}}]{app}{, }\item[{\mbox{\hyperlink{class_c_l_i_1_1_option}{Option}} \texorpdfstring{$\ast$}{*}}]{opt}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l07520}{7520}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{07520\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{07521\ \ \ \ \ \mbox{\hyperlink{class_c_l_i_1_1_app}{App}}\ temp;}
+\DoxyCodeLine{07522\ \ \ \ \ \textcolor{keyword}{auto}\ option\_copy\ =\ temp.\mbox{\hyperlink{class_c_l_i_1_1_app_a8c812d42c7720ecb5cd0aec41b5aa941}{add\_option}}(opt-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_ab84751fbf9037efaed5b64fed17fe57f}{get\_name}}(\textcolor{keyword}{false},\ \textcolor{keyword}{true}))}
+\DoxyCodeLine{07523\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>\mbox{\hyperlink{class_c_l_i_1_1_option_a8914e4810b213c5e23359d61a70c5ac1}{type\_size}}(opt-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_a38a511ab2001c283c06fb31a7ea12501}{get\_type\_size\_min}}(),\ opt-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_a0c7e5712134a2227301fb50bcc9488c8}{get\_type\_size\_max}}())}
+\DoxyCodeLine{07524\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>\mbox{\hyperlink{class_c_l_i_1_1_option_a66d22991355232198a3da4b395847eba}{expected}}(opt-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_a19c64a02c22d968e834c2aaf13f98f62}{get\_expected\_min}}(),\ opt-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_a21133f27201fa12203567cf0ee40c9c5}{get\_expected\_max}}())}
+\DoxyCodeLine{07525\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>\mbox{\hyperlink{class_c_l_i_1_1_option_a83302957a61e4bd7e5f21c552b39edb5}{allow\_extra\_args}}(opt-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_a784f66cb9371753ddeb8df59c85cb490}{get\_allow\_extra\_args}}());}
+\DoxyCodeLine{07526\ }
+\DoxyCodeLine{07527\ \ \ \ \ app-\/>remove\_option(opt);}
+\DoxyCodeLine{07528\ \ \ \ \ \textcolor{keyword}{auto}\ opt2\ =\ app-\/>add\_option(option\_copy-\/>get\_name(\textcolor{keyword}{false},\ \textcolor{keyword}{true}),\ \textcolor{stringliteral}{"{}option\ has\ been\ retired\ and\ has\ no\ effect"{}})}
+\DoxyCodeLine{07529\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>type\_name(\textcolor{stringliteral}{"{}RETIRED"{}})}
+\DoxyCodeLine{07530\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>default\_str(\textcolor{stringliteral}{"{}RETIRED"{}})}
+\DoxyCodeLine{07531\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>type\_size(option\_copy-\/>get\_type\_size\_min(),\ option\_copy-\/>get\_type\_size\_max())}
+\DoxyCodeLine{07532\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>expected(option\_copy-\/>get\_expected\_min(),\ option\_copy-\/>get\_expected\_max())}
+\DoxyCodeLine{07533\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>allow\_extra\_args(option\_copy-\/>get\_allow\_extra\_args());}
+\DoxyCodeLine{07534\ }
+\DoxyCodeLine{07535\ \ \ \ \ \mbox{\hyperlink{class_c_l_i_1_1_validator}{Validator}}\ retired\_warning\{[opt2](std::string\ \&)\ \{}
+\DoxyCodeLine{07536\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}WARNING\ "{}}\ <<\ opt2-\/>get\_name()\ <<\ \textcolor{stringliteral}{"{}\ is\ retired\ and\ has\ no\ effect\(\backslash\)n"{}};}
+\DoxyCodeLine{07537\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::string();}
+\DoxyCodeLine{07538\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{07539\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}"{}}\};}
+\DoxyCodeLine{07540\ \ \ \ \ retired\_warning.\mbox{\hyperlink{class_c_l_i_1_1_validator_ae24fb3eedf62301b733b3a20d2b93757}{application\_index}}(0);}
+\DoxyCodeLine{07541\ \ \ \ \ opt2-\/>check(retired\_warning);}
+\DoxyCodeLine{07542\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_c_l_i_a36cfe4a6a80bf143735c0b80960bc252_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=298pt]{namespace_c_l_i_a36cfe4a6a80bf143735c0b80960bc252_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_c_l_i_ae611995dabf1e7d4a2480f1952ef6ba7}\index{CLI@{CLI}!TriggerOff@{TriggerOff}}
+\index{TriggerOff@{TriggerOff}!CLI@{CLI}}
+\doxysubsubsection{\texorpdfstring{TriggerOff()}{TriggerOff()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{namespace_c_l_i_ae611995dabf1e7d4a2480f1952ef6ba7} 
+void CLI\+::\+Trigger\+Off (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \texorpdfstring{$\ast$}{*}}]{trigger\+\_\+app}{, }\item[{\mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \texorpdfstring{$\ast$}{*}}]{app\+\_\+to\+\_\+enable}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l07472}{7472}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{07472\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{07473\ \ \ \ \ app\_to\_enable-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_a1d4af11ac48929ee486482ea7b2cfe4f}{disabled\_by\_default}}(\textcolor{keyword}{false});}
+\DoxyCodeLine{07474\ \ \ \ \ app\_to\_enable-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_a7d58a9da106a0fb723eda4bd56017523}{enabled\_by\_default}}();}
+\DoxyCodeLine{07475\ \ \ \ \ trigger\_app-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_a94045b9a983dd80d8fa1b477422c7849}{preparse\_callback}}([app\_to\_enable](std::size\_t)\ \{\ app\_to\_enable-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_af5104a0ae06292a8cef25e428ce533c8}{disabled}}();\ \});}
+\DoxyCodeLine{07476\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=308pt]{namespace_c_l_i_ae611995dabf1e7d4a2480f1952ef6ba7_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_c_l_i_aeb752166e5a0486440b5902f7878ed72}\index{CLI@{CLI}!TriggerOff@{TriggerOff}}
+\index{TriggerOff@{TriggerOff}!CLI@{CLI}}
+\doxysubsubsection{\texorpdfstring{TriggerOff()}{TriggerOff()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{namespace_c_l_i_aeb752166e5a0486440b5902f7878ed72} 
+void CLI\+::\+Trigger\+Off (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \texorpdfstring{$\ast$}{*}}]{trigger\+\_\+app}{, }\item[{std\+::vector$<$ \mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \texorpdfstring{$\ast$}{*} $>$}]{apps\+\_\+to\+\_\+enable}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l07479}{7479}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{07479\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{07480\ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\ \&app\ :\ apps\_to\_enable)\ \{}
+\DoxyCodeLine{07481\ \ \ \ \ \ \ \ \ app-\/>disabled\_by\_default(\textcolor{keyword}{false});}
+\DoxyCodeLine{07482\ \ \ \ \ \ \ \ \ app-\/>enabled\_by\_default();}
+\DoxyCodeLine{07483\ \ \ \ \ \}}
+\DoxyCodeLine{07484\ }
+\DoxyCodeLine{07485\ \ \ \ \ trigger\_app-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_a94045b9a983dd80d8fa1b477422c7849}{preparse\_callback}}([apps\_to\_enable](std::size\_t)\ \{}
+\DoxyCodeLine{07486\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\ \&app\ :\ apps\_to\_enable)\ \{}
+\DoxyCodeLine{07487\ \ \ \ \ \ \ \ \ \ \ \ \ app-\/>disabled();}
+\DoxyCodeLine{07488\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{07489\ \ \ \ \ \});}
+\DoxyCodeLine{07490\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=296pt]{namespace_c_l_i_aeb752166e5a0486440b5902f7878ed72_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_c_l_i_a495f418aefacfdfbe91642a18f60d77c}\index{CLI@{CLI}!TriggerOn@{TriggerOn}}
+\index{TriggerOn@{TriggerOn}!CLI@{CLI}}
+\doxysubsubsection{\texorpdfstring{TriggerOn()}{TriggerOn()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{namespace_c_l_i_a495f418aefacfdfbe91642a18f60d77c} 
+void CLI\+::\+Trigger\+On (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \texorpdfstring{$\ast$}{*}}]{trigger\+\_\+app}{, }\item[{\mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \texorpdfstring{$\ast$}{*}}]{app\+\_\+to\+\_\+enable}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l07451}{7451}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{07451\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{07452\ \ \ \ \ app\_to\_enable-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_a7d58a9da106a0fb723eda4bd56017523}{enabled\_by\_default}}(\textcolor{keyword}{false});}
+\DoxyCodeLine{07453\ \ \ \ \ app\_to\_enable-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_a1d4af11ac48929ee486482ea7b2cfe4f}{disabled\_by\_default}}();}
+\DoxyCodeLine{07454\ \ \ \ \ trigger\_app-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_a94045b9a983dd80d8fa1b477422c7849}{preparse\_callback}}([app\_to\_enable](std::size\_t)\ \{\ app\_to\_enable-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_af5104a0ae06292a8cef25e428ce533c8}{disabled}}(\textcolor{keyword}{false});\ \});}
+\DoxyCodeLine{07455\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=307pt]{namespace_c_l_i_a495f418aefacfdfbe91642a18f60d77c_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_c_l_i_a5feaad2da28dd1b1adac0ebd8382af7d}\index{CLI@{CLI}!TriggerOn@{TriggerOn}}
+\index{TriggerOn@{TriggerOn}!CLI@{CLI}}
+\doxysubsubsection{\texorpdfstring{TriggerOn()}{TriggerOn()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{namespace_c_l_i_a5feaad2da28dd1b1adac0ebd8382af7d} 
+void CLI\+::\+Trigger\+On (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \texorpdfstring{$\ast$}{*}}]{trigger\+\_\+app}{, }\item[{std\+::vector$<$ \mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \texorpdfstring{$\ast$}{*} $>$}]{apps\+\_\+to\+\_\+enable}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l07458}{7458}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{07458\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{07459\ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\ \&app\ :\ apps\_to\_enable)\ \{}
+\DoxyCodeLine{07460\ \ \ \ \ \ \ \ \ app-\/>enabled\_by\_default(\textcolor{keyword}{false});}
+\DoxyCodeLine{07461\ \ \ \ \ \ \ \ \ app-\/>disabled\_by\_default();}
+\DoxyCodeLine{07462\ \ \ \ \ \}}
+\DoxyCodeLine{07463\ }
+\DoxyCodeLine{07464\ \ \ \ \ trigger\_app-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_a94045b9a983dd80d8fa1b477422c7849}{preparse\_callback}}([apps\_to\_enable](std::size\_t)\ \{}
+\DoxyCodeLine{07465\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\ \&app\ :\ apps\_to\_enable)\ \{}
+\DoxyCodeLine{07466\ \ \ \ \ \ \ \ \ \ \ \ \ app-\/>disabled(\textcolor{keyword}{false});}
+\DoxyCodeLine{07467\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{07468\ \ \ \ \ \});}
+\DoxyCodeLine{07469\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=295pt]{namespace_c_l_i_a5feaad2da28dd1b1adac0ebd8382af7d_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{namespace_c_l_i_a297aa1a5877b3f744ee8857960e0e025}\index{CLI@{CLI}!ExistingDirectory@{ExistingDirectory}}
+\index{ExistingDirectory@{ExistingDirectory}!CLI@{CLI}}
+\doxysubsubsection{\texorpdfstring{ExistingDirectory}{ExistingDirectory}}
+{\footnotesize\ttfamily \label{namespace_c_l_i_a297aa1a5877b3f744ee8857960e0e025} 
+const \mbox{\hyperlink{class_c_l_i_1_1detail_1_1_existing_directory_validator}{detail\+::\+Existing\+Directory\+Validator}} CLI\+::\+Existing\+Directory}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l02492}{2492}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+\Hypertarget{namespace_c_l_i_ab60cbe0bb76c7b2e00d63f48a573e322}\index{CLI@{CLI}!ExistingFile@{ExistingFile}}
+\index{ExistingFile@{ExistingFile}!CLI@{CLI}}
+\doxysubsubsection{\texorpdfstring{ExistingFile}{ExistingFile}}
+{\footnotesize\ttfamily \label{namespace_c_l_i_ab60cbe0bb76c7b2e00d63f48a573e322} 
+const \mbox{\hyperlink{class_c_l_i_1_1detail_1_1_existing_file_validator}{detail\+::\+Existing\+File\+Validator}} CLI\+::\+Existing\+File}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l02489}{2489}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+\Hypertarget{namespace_c_l_i_ab0065d2e9866c49896ce3c682e8c7062}\index{CLI@{CLI}!ExistingPath@{ExistingPath}}
+\index{ExistingPath@{ExistingPath}!CLI@{CLI}}
+\doxysubsubsection{\texorpdfstring{ExistingPath}{ExistingPath}}
+{\footnotesize\ttfamily \label{namespace_c_l_i_ab0065d2e9866c49896ce3c682e8c7062} 
+const \mbox{\hyperlink{class_c_l_i_1_1detail_1_1_existing_path_validator}{detail\+::\+Existing\+Path\+Validator}} CLI\+::\+Existing\+Path}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l02495}{2495}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+\Hypertarget{namespace_c_l_i_a790f9bb552cf96ab9ca2d6c9749adba1}\index{CLI@{CLI}!NonexistentPath@{NonexistentPath}}
+\index{NonexistentPath@{NonexistentPath}!CLI@{CLI}}
+\doxysubsubsection{\texorpdfstring{NonexistentPath}{NonexistentPath}}
+{\footnotesize\ttfamily \label{namespace_c_l_i_a790f9bb552cf96ab9ca2d6c9749adba1} 
+const \mbox{\hyperlink{class_c_l_i_1_1detail_1_1_nonexistent_path_validator}{detail\+::\+Nonexistent\+Path\+Validator}} CLI\+::\+Nonexistent\+Path}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l02498}{2498}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+\Hypertarget{namespace_c_l_i_a64dd90027e481b48b0096721fc6829ec}\index{CLI@{CLI}!NonNegativeNumber@{NonNegativeNumber}}
+\index{NonNegativeNumber@{NonNegativeNumber}!CLI@{CLI}}
+\doxysubsubsection{\texorpdfstring{NonNegativeNumber}{NonNegativeNumber}}
+{\footnotesize\ttfamily \label{namespace_c_l_i_a64dd90027e481b48b0096721fc6829ec} 
+const \mbox{\hyperlink{class_c_l_i_1_1detail_1_1_non_negative_number}{detail\+::\+Non\+Negative\+Number}} CLI\+::\+Non\+Negative\+Number}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l02507}{2507}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+\Hypertarget{namespace_c_l_i_a713b5a1bbb98173dbc74edd4f295a582}\index{CLI@{CLI}!Number@{Number}}
+\index{Number@{Number}!CLI@{CLI}}
+\doxysubsubsection{\texorpdfstring{Number}{Number}}
+{\footnotesize\ttfamily \label{namespace_c_l_i_a713b5a1bbb98173dbc74edd4f295a582} 
+const \mbox{\hyperlink{class_c_l_i_1_1detail_1_1_number}{detail\+::\+Number}} CLI\+::\+Number}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l02510}{2510}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+\Hypertarget{namespace_c_l_i_aef2ee22a4ae84639a9c1f31c9ef00514}\index{CLI@{CLI}!PositiveNumber@{PositiveNumber}}
+\index{PositiveNumber@{PositiveNumber}!CLI@{CLI}}
+\doxysubsubsection{\texorpdfstring{PositiveNumber}{PositiveNumber}}
+{\footnotesize\ttfamily \label{namespace_c_l_i_aef2ee22a4ae84639a9c1f31c9ef00514} 
+const \mbox{\hyperlink{class_c_l_i_1_1detail_1_1_positive_number}{detail\+::\+Positive\+Number}} CLI\+::\+Positive\+Number}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l02504}{2504}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+\Hypertarget{namespace_c_l_i_a9cfed0354c4d5dd79f145fcbdcb4c155}\index{CLI@{CLI}!ValidIPV4@{ValidIPV4}}
+\index{ValidIPV4@{ValidIPV4}!CLI@{CLI}}
+\doxysubsubsection{\texorpdfstring{ValidIPV4}{ValidIPV4}}
+{\footnotesize\ttfamily \label{namespace_c_l_i_a9cfed0354c4d5dd79f145fcbdcb4c155} 
+const \mbox{\hyperlink{class_c_l_i_1_1detail_1_1_i_p_v4_validator}{detail\+::\+IPV4\+Validator}} CLI\+::\+Valid\+IPV4}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l02501}{2501}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+

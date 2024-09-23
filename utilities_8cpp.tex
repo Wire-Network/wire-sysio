@@ -1,0 +1,182 @@
+\doxysection{libraries/fc/vendor/websocketpp/test/utility/utilities.cpp File Reference}
+\hypertarget{utilities_8cpp}{}\label{utilities_8cpp}\index{libraries/fc/vendor/websocketpp/test/utility/utilities.cpp@{libraries/fc/vendor/websocketpp/test/utility/utilities.cpp}}
+{\ttfamily \#include $<$boost/test/unit\+\_\+test.\+hpp$>$}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$string$>$}\newline
+{\ttfamily \#include $<$websocketpp/utilities.\+hpp$>$}\newline
+Include dependency graph for utilities.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{utilities_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{utilities_8cpp_a6b2a3852db8bb19ab6909bac01859985}{BOOST\+\_\+\+TEST\+\_\+\+MODULE}}~utility
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{utilities_8cpp_aaa39055d46a4bd5c31303c580307c84b}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (substr\+\_\+found)
+\item 
+\mbox{\hyperlink{utilities_8cpp_af816eeb64a5f5af33aa4a3ab35e0be92}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (substr\+\_\+found\+\_\+ci)
+\item 
+\mbox{\hyperlink{utilities_8cpp_aace80b7d6ca6a7975ad5c175dc98e628}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (substr\+\_\+not\+\_\+found)
+\item 
+\mbox{\hyperlink{utilities_8cpp_ae0ac5806761abf670e1bcd0a80599d0c}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (to\+\_\+lower)
+\item 
+\mbox{\hyperlink{utilities_8cpp_aafff4a5be545396f0e532a6b4a8cf168}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (string\+\_\+replace\+\_\+all)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{utilities_8cpp_a6b2a3852db8bb19ab6909bac01859985}\index{utilities.cpp@{utilities.cpp}!BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}}
+\index{BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}!utilities.cpp@{utilities.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_TEST\_MODULE}{BOOST\_TEST\_MODULE}}
+{\footnotesize\ttfamily \label{utilities_8cpp_a6b2a3852db8bb19ab6909bac01859985} 
+\#define BOOST\+\_\+\+TEST\+\_\+\+MODULE~utility}
+
+
+
+Definition at line \mbox{\hyperlink{utilities_8cpp_source_l00028}{28}} of file \mbox{\hyperlink{utilities_8cpp_source}{utilities.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{utilities_8cpp_aafff4a5be545396f0e532a6b4a8cf168}\index{utilities.cpp@{utilities.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!utilities.cpp@{utilities.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/5]}}
+{\footnotesize\ttfamily \label{utilities_8cpp_aafff4a5be545396f0e532a6b4a8cf168} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{string\+\_\+replace\+\_\+all}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{utilities_8cpp_source_l00065}{65}} of file \mbox{\hyperlink{utilities_8cpp_source}{utilities.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00066\ \ \ \ \ std::string\ \mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}}\ =\ \textcolor{stringliteral}{"{}foo\ \(\backslash\)"{}bar\(\backslash\)"{}\ baz"{}};}
+\DoxyCodeLine{00067\ \ \ \ \ std::string\ \mbox{\hyperlink{namespaceupload_a770d9c7b49b1fede80de6078d5e49af7}{dest}}\ =\ \textcolor{stringliteral}{"{}foo\ \(\backslash\)\(\backslash\)\(\backslash\)"{}bar\(\backslash\)\(\backslash\)\(\backslash\)"{}\ baz"{}};}
+\DoxyCodeLine{00068\ }
+\DoxyCodeLine{00069\ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacewebsocketpp_1_1utility_a5d36afd6d8da4b22b5d634e035bfb450}{websocketpp::utility::string\_replace\_all}};}
+\DoxyCodeLine{00070\ \ \ \ \ BOOST\_CHECK\_EQUAL(\mbox{\hyperlink{namespacewebsocketpp_1_1utility_a5d36afd6d8da4b22b5d634e035bfb450}{string\_replace\_all}}(\mbox{\hyperlink{pointer_8h_adb82dfe18535e9a30aa97d275f82bd55}{source}},\textcolor{stringliteral}{"{}\(\backslash\)"{}"{}},\textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)\(\backslash\)"{}"{}}),dest);}
+\DoxyCodeLine{00071\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{utilities_8cpp_aafff4a5be545396f0e532a6b4a8cf168_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{utilities_8cpp_aaa39055d46a4bd5c31303c580307c84b}\index{utilities.cpp@{utilities.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!utilities.cpp@{utilities.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/5]}}
+{\footnotesize\ttfamily \label{utilities_8cpp_aaa39055d46a4bd5c31303c580307c84b} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{substr\+\_\+found}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{utilities_8cpp_source_l00038}{38}} of file \mbox{\hyperlink{utilities_8cpp_source}{utilities.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00039\ \ \ \ \ std::string\ haystack\ =\ \textcolor{stringliteral}{"{}abc123"{}};}
+\DoxyCodeLine{00040\ \ \ \ \ std::string\ needle\ =\ \textcolor{stringliteral}{"{}abc"{}};}
+\DoxyCodeLine{00041\ }
+\DoxyCodeLine{00042\ \ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespacewebsocketpp_1_1utility_a484f1287b93cf58cc6514e46eed41568}{websocketpp::utility::ci\_find\_substr}}(haystack,needle)\ ==haystack.begin());}
+\DoxyCodeLine{00043\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{utilities_8cpp_aaa39055d46a4bd5c31303c580307c84b_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{utilities_8cpp_af816eeb64a5f5af33aa4a3ab35e0be92}\index{utilities.cpp@{utilities.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!utilities.cpp@{utilities.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [3/5]}}
+{\footnotesize\ttfamily \label{utilities_8cpp_af816eeb64a5f5af33aa4a3ab35e0be92} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{substr\+\_\+found\+\_\+ci}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{utilities_8cpp_source_l00045}{45}} of file \mbox{\hyperlink{utilities_8cpp_source}{utilities.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00046\ \ \ \ \ std::string\ haystack\ =\ \textcolor{stringliteral}{"{}abc123"{}};}
+\DoxyCodeLine{00047\ \ \ \ \ std::string\ needle\ =\ \textcolor{stringliteral}{"{}aBc"{}};}
+\DoxyCodeLine{00048\ }
+\DoxyCodeLine{00049\ \ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespacewebsocketpp_1_1utility_a484f1287b93cf58cc6514e46eed41568}{websocketpp::utility::ci\_find\_substr}}(haystack,needle)\ ==haystack.begin());}
+\DoxyCodeLine{00050\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{utilities_8cpp_af816eeb64a5f5af33aa4a3ab35e0be92_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{utilities_8cpp_aace80b7d6ca6a7975ad5c175dc98e628}\index{utilities.cpp@{utilities.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!utilities.cpp@{utilities.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [4/5]}}
+{\footnotesize\ttfamily \label{utilities_8cpp_aace80b7d6ca6a7975ad5c175dc98e628} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{substr\+\_\+not\+\_\+found}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{utilities_8cpp_source_l00052}{52}} of file \mbox{\hyperlink{utilities_8cpp_source}{utilities.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00053\ \ \ \ \ std::string\ haystack\ =\ \textcolor{stringliteral}{"{}abd123"{}};}
+\DoxyCodeLine{00054\ \ \ \ \ std::string\ needle\ =\ \textcolor{stringliteral}{"{}abcd"{}};}
+\DoxyCodeLine{00055\ }
+\DoxyCodeLine{00056\ \ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespacewebsocketpp_1_1utility_a484f1287b93cf58cc6514e46eed41568}{websocketpp::utility::ci\_find\_substr}}(haystack,needle)\ ==\ haystack.end());}
+\DoxyCodeLine{00057\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{utilities_8cpp_aace80b7d6ca6a7975ad5c175dc98e628_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{utilities_8cpp_ae0ac5806761abf670e1bcd0a80599d0c}\index{utilities.cpp@{utilities.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!utilities.cpp@{utilities.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [5/5]}}
+{\footnotesize\ttfamily \label{utilities_8cpp_ae0ac5806761abf670e1bcd0a80599d0c} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{to\+\_\+lower}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{utilities_8cpp_source_l00059}{59}} of file \mbox{\hyperlink{utilities_8cpp_source}{utilities.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00060\ \ \ \ \ std::string\ in\ =\ \textcolor{stringliteral}{"{}AbCd"{}};}
+\DoxyCodeLine{00061\ }
+\DoxyCodeLine{00062\ \ \ \ \ BOOST\_CHECK\_EQUAL(\mbox{\hyperlink{namespacewebsocketpp_1_1utility_aa96a743a4f0392aac39742c3e5dfd1cc}{websocketpp::utility::to\_lower}}(in),\ \textcolor{stringliteral}{"{}abcd"{}});}
+\DoxyCodeLine{00063\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{utilities_8cpp_ae0ac5806761abf670e1bcd0a80599d0c_cgraph}
+\end{center}
+\end{figure}

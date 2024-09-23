@@ -1,0 +1,17 @@
+<map id="libff::alt_bn128_G2::to_affine_coordinates" name="libff::alt_bn128_G2::to_affine_coordinates">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,127,159,168"/>
+<area shape="rect" id="Node000002" href="$classlibff_1_1_fp2__model.html#a7675b3ac055769d005423724cb0c1e43" title=" " alt="" coords="214,5,378,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="101,125,146,82,175,60,205,41,220,34,222,39,208,46,178,65,149,86,105,128"/>
+<area shape="rect" id="Node000003" href="$classlibff_1_1alt__bn128___g2.html#a72b51605d8f56288e0b1a894e4c1ab6c" title=" " alt="" coords="231,55,362,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="144,124,218,99,220,104,145,129"/>
+<area shape="rect" id="Node000006" href="$classlibff_1_1_fp2__model.html#a788488a8008a009dbeb0275dfd896457" title=" " alt="" coords="207,120,386,175"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="159,145,191,145,191,150,159,150"/>
+<area shape="rect" id="Node000007" href="$classlibff_1_1_fp2__model.html#aaccdb66043e8f15334350d7a7ed4fcd5" title=" " alt="" coords="212,200,380,226"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="147,166,207,185,233,193,232,198,206,190,146,171"/>
+<area shape="rect" id="Node000008" href="$classlibff_1_1_fp2__model.html#a05452a6b5b1d8c2a4dd6d32cb01c9cc0" title=" " alt="" coords="207,250,386,306"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="110,166,155,200,208,236,216,240,214,245,205,240,151,205,107,170"/>
+<area shape="rect" id="Node000004" href="$classlibff_1_1_fp2__model.html#a0a31f5770e3ce400fff50b54f5048f92" title=" " alt="" coords="434,63,598,88"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="362,73,418,73,418,78,362,78"/>
+<area shape="rect" id="Node000005" href="$classlibff_1_1_fp__model.html#a121b2621e9557b86faa6806774f42837" title=" " alt="" coords="646,63,804,88"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="599,73,631,73,631,78,599,78"/>
+</map>

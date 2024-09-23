@@ -1,0 +1,109 @@
+\doxysection{Intrinsics\+::Function Struct Reference}
+\hypertarget{struct_intrinsics_1_1_function}{}\label{struct_intrinsics_1_1_function}\index{Intrinsics::Function@{Intrinsics::Function}}
+
+
+{\ttfamily \#include $<$Intrinsics.\+h$>$}
+
+
+
+Collaboration diagram for Intrinsics\+::Function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_intrinsics_1_1_function__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{_runtime_8h_aae02bf1df7927dd0f69c6412fce40fc4}{RUNTIME\+\_\+\+API}} \mbox{\hyperlink{struct_intrinsics_1_1_function_add6250b1384c61c30811f3e8e8eac39a}{Function}} (const char \texorpdfstring{$\ast$}{*}in\+Name, const \mbox{\hyperlink{struct_i_r_1_1_function_type}{IR\+::\+Function\+Type}} \texorpdfstring{$\ast$}{*}type, void \texorpdfstring{$\ast$}{*}native\+Function)
+\item 
+\mbox{\hyperlink{_runtime_8h_aae02bf1df7927dd0f69c6412fce40fc4}{RUNTIME\+\_\+\+API}} \mbox{\hyperlink{struct_intrinsics_1_1_function_a69b0213732030a11eb3ab8c0b128e5c0}{\texorpdfstring{$\sim$}{\string~}\+Function}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_runtime_1_1_function_instance}{Runtime\+::\+Function\+Instance}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{struct_intrinsics_1_1_function_ae282783b6f14ad1b1c0301b6e0e957a8}{function}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{_intrinsics_8h_source_l00010}{10}} of file \mbox{\hyperlink{_intrinsics_8h_source}{Intrinsics.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{struct_intrinsics_1_1_function_add6250b1384c61c30811f3e8e8eac39a}\index{Intrinsics::Function@{Intrinsics::Function}!Function@{Function}}
+\index{Function@{Function}!Intrinsics::Function@{Intrinsics::Function}}
+\doxysubsubsection{\texorpdfstring{Function()}{Function()}}
+{\footnotesize\ttfamily \label{struct_intrinsics_1_1_function_add6250b1384c61c30811f3e8e8eac39a} 
+Intrinsics\+::\+Function\+::\+Function (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{in\+Name}{, }\item[{const \mbox{\hyperlink{struct_i_r_1_1_function_type}{IR\+::\+Function\+Type}} \texorpdfstring{$\ast$}{*}}]{type}{, }\item[{void \texorpdfstring{$\ast$}{*}}]{native\+Function}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_intrinsics_8cpp_source_l00033}{33}} of file \mbox{\hyperlink{_intrinsics_8cpp_source}{Intrinsics.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00034\ \ \ \ \ :\ \ \ name(inName)}
+\DoxyCodeLine{00035\ \ \ \ \ \{}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ function\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{struct_runtime_1_1_function_instance}{Runtime::FunctionInstance}}(\textcolor{keyword}{nullptr},type,nativeFunction);}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_intrinsics_1_1_singleton_ae66967b702a73c8530197352c8e8edcf}{Singleton::get}}().\mbox{\hyperlink{struct_intrinsics_1_1_singleton_a39ea76e76006654966f34fba12e7c5ab}{functionMap}}[\mbox{\hyperlink{namespace_intrinsics_a4f9641bbac5d77ac77dda48612aa3bb1}{getDecoratedName}}(inName,type)]\ =\ \textcolor{keyword}{this};}
+\DoxyCodeLine{00038\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_intrinsics_1_1_function_add6250b1384c61c30811f3e8e8eac39a_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_intrinsics_1_1_function_a69b0213732030a11eb3ab8c0b128e5c0}\index{Intrinsics::Function@{Intrinsics::Function}!````~Function@{\texorpdfstring{$\sim$}{\string~}Function}}
+\index{````~Function@{\texorpdfstring{$\sim$}{\string~}Function}!Intrinsics::Function@{Intrinsics::Function}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}Function()}{\string~Function()}}
+{\footnotesize\ttfamily \label{struct_intrinsics_1_1_function_a69b0213732030a11eb3ab8c0b128e5c0} 
+Intrinsics\+::\+Function\+::\texorpdfstring{$\sim$}{\string~}\+Function (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_intrinsics_8cpp_source_l00040}{40}} of file \mbox{\hyperlink{_intrinsics_8cpp_source}{Intrinsics.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00041\ \ \ \ \ \{}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_intrinsics_1_1_singleton_ae66967b702a73c8530197352c8e8edcf}{Singleton::get}}().\mbox{\hyperlink{struct_intrinsics_1_1_singleton_a39ea76e76006654966f34fba12e7c5ab}{functionMap}}.erase(\mbox{\hyperlink{struct_intrinsics_1_1_singleton_ae66967b702a73c8530197352c8e8edcf}{Singleton::get}}().functionMap.find(\mbox{\hyperlink{namespace_intrinsics_a4f9641bbac5d77ac77dda48612aa3bb1}{getDecoratedName}}(name,function-\/>type)));}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \textcolor{keyword}{delete}\ \mbox{\hyperlink{struct_intrinsics_1_1_function_ae282783b6f14ad1b1c0301b6e0e957a8}{function}};}
+\DoxyCodeLine{00046\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_intrinsics_1_1_function_a69b0213732030a11eb3ab8c0b128e5c0_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_intrinsics_1_1_function_ae282783b6f14ad1b1c0301b6e0e957a8}\index{Intrinsics::Function@{Intrinsics::Function}!function@{function}}
+\index{function@{function}!Intrinsics::Function@{Intrinsics::Function}}
+\doxysubsubsection{\texorpdfstring{function}{function}}
+{\footnotesize\ttfamily \label{struct_intrinsics_1_1_function_ae282783b6f14ad1b1c0301b6e0e957a8} 
+\mbox{\hyperlink{struct_runtime_1_1_function_instance}{Runtime\+::\+Function\+Instance}}\texorpdfstring{$\ast$}{*} Intrinsics\+::\+Function\+::function}
+
+
+
+Definition at line \mbox{\hyperlink{_intrinsics_8h_source_l00012}{12}} of file \mbox{\hyperlink{_intrinsics_8h_source}{Intrinsics.\+h}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/wasm-\/jit/\+Include/\+Runtime/\mbox{\hyperlink{_intrinsics_8h}{Intrinsics.\+h}}\item 
+libraries/wasm-\/jit/\+Source/\+Runtime/\mbox{\hyperlink{_intrinsics_8cpp}{Intrinsics.\+cpp}}\end{DoxyCompactItemize}

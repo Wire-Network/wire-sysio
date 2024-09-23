@@ -1,0 +1,140 @@
+\doxysection{rentcpu\+\_\+subcommand Struct Reference}
+\hypertarget{structrentcpu__subcommand}{}\label{structrentcpu__subcommand}\index{rentcpu\_subcommand@{rentcpu\_subcommand}}
+
+
+Collaboration diagram for rentcpu\+\_\+subcommand\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=192pt]{structrentcpu__subcommand__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structrentcpu__subcommand_aa645fa30d0f7f61a5025a7c3cc6f12a2}{rentcpu\+\_\+subcommand}} (\mbox{\hyperlink{class_c_l_i_1_1_app}{CLI\+::\+App}} \texorpdfstring{$\ast$}{*}action\+Root)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structrentcpu__subcommand_a94346564d200908661deb31b036bc96e}{from\+\_\+str}}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structrentcpu__subcommand_a27c9a313382db0818843611006fb8439}{receiver\+\_\+str}}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structrentcpu__subcommand_a80e87b04e8dbacb44039dbb98df041a9}{loan\+\_\+payment\+\_\+str}}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structrentcpu__subcommand_a18422d0bba62dbaa18691696ff13845b}{loan\+\_\+fund\+\_\+str}}
+\item 
+const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \mbox{\hyperlink{structrentcpu__subcommand_a329bd2d0d022616a2f5d8321e7542f9c}{act\+\_\+name}} \{ "{}rentcpu"{}\+\_\+n \}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01959}{1959}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structrentcpu__subcommand_aa645fa30d0f7f61a5025a7c3cc6f12a2}\index{rentcpu\_subcommand@{rentcpu\_subcommand}!rentcpu\_subcommand@{rentcpu\_subcommand}}
+\index{rentcpu\_subcommand@{rentcpu\_subcommand}!rentcpu\_subcommand@{rentcpu\_subcommand}}
+\doxysubsubsection{\texorpdfstring{rentcpu\_subcommand()}{rentcpu\_subcommand()}}
+{\footnotesize\ttfamily \label{structrentcpu__subcommand_aa645fa30d0f7f61a5025a7c3cc6f12a2} 
+rentcpu\+\_\+subcommand\+::rentcpu\+\_\+subcommand (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_c_l_i_1_1_app}{CLI\+::\+App}} \texorpdfstring{$\ast$}{*}}]{action\+Root}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01966}{1966}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01966\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01967\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ rentcpu\ =\ actionRoot-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_a8b461d2233ec4121259011b5ed24b336}{add\_subcommand}}(\textcolor{stringliteral}{"{}rentcpu"{}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}Rent\ CPU\ bandwidth\ for\ 30\ days"{}}));}
+\DoxyCodeLine{01968\ \ \ \ \ \ \ rentcpu-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_a8c812d42c7720ecb5cd0aec41b5aa941}{add\_option}}(\textcolor{stringliteral}{"{}from"{}},\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structrentcpu__subcommand_a94346564d200908661deb31b036bc96e}{from\_str}},\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}Account\ paying\ rent\ fees"{}}))-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a}{required}}();}
+\DoxyCodeLine{01969\ \ \ \ \ \ \ rentcpu-\/>add\_option(\textcolor{stringliteral}{"{}receiver"{}},\ \ \ \ \ \mbox{\hyperlink{structrentcpu__subcommand_a27c9a313382db0818843611006fb8439}{receiver\_str}},\ \ \ \ \ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}Account\ to\ whom\ rented\ CPU\ bandwidth\ is\ staked"{}}))-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a}{required}}();}
+\DoxyCodeLine{01970\ \ \ \ \ \ \ rentcpu-\/>add\_option(\textcolor{stringliteral}{"{}loan\_payment"{}},\ \mbox{\hyperlink{structrentcpu__subcommand_a80e87b04e8dbacb44039dbb98df041a9}{loan\_payment\_str}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}Loan\ fee\ to\ be\ paid,\ used\ to\ calculate\ amount\ of\ rented\ bandwidth"{}}))-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a}{required}}();}
+\DoxyCodeLine{01971\ \ \ \ \ \ \ rentcpu-\/>add\_option(\textcolor{stringliteral}{"{}loan\_fund"{}},\ \ \ \ \mbox{\hyperlink{structrentcpu__subcommand_a18422d0bba62dbaa18691696ff13845b}{loan\_fund\_str}},\ \ \ \ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}Loan\ fund\ to\ be\ used\ in\ automatic\ renewal,\ can\ be\ 0\ tokens"{}}))-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a}{required}}();}
+\DoxyCodeLine{01972\ \ \ \ \ \ \ \mbox{\hyperlink{programs_2clio_2main_8cpp_aa5d53f41b83b5323c73622fbbb15e9cd}{add\_standard\_transaction\_options}}(rentcpu,\ \textcolor{stringliteral}{"{}from@active"{}});}
+\DoxyCodeLine{01973\ \ \ \ \ \ \ rentcpu-\/>callback([\textcolor{keyword}{this}]\ \{}
+\DoxyCodeLine{01974\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}\ act\_payload\ =\ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}()}
+\DoxyCodeLine{01975\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}from"{}},\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structrentcpu__subcommand_a94346564d200908661deb31b036bc96e}{from\_str}})}
+\DoxyCodeLine{01976\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}receiver"{}},\ \ \ \ \ \mbox{\hyperlink{structrentcpu__subcommand_a27c9a313382db0818843611006fb8439}{receiver\_str}})}
+\DoxyCodeLine{01977\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}loan\_payment"{}},\ \mbox{\hyperlink{structrentcpu__subcommand_a80e87b04e8dbacb44039dbb98df041a9}{loan\_payment\_str}})}
+\DoxyCodeLine{01978\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}loan\_fund"{}},\ \ \ \ \mbox{\hyperlink{structrentcpu__subcommand_a18422d0bba62dbaa18691696ff13845b}{loan\_fund\_str}});}
+\DoxyCodeLine{01979\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ accountPermissions\ =\ \mbox{\hyperlink{programs_2clio_2main_8cpp_a2b91ca5dbe7cc4ab287d0e44c3037552}{get\_account\_permissions}}(\mbox{\hyperlink{programs_2clio_2main_8cpp_ad552924cb151dcd5b60c73856d1ff706}{tx\_permission}},\ \{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(\mbox{\hyperlink{structrentcpu__subcommand_a94346564d200908661deb31b036bc96e}{from\_str}}),\ config::active\_name\});}
+\DoxyCodeLine{01980\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{programs_2clio_2main_8cpp_aaf784434864a29e4835be7465173d1ab}{send\_actions}}(\{\mbox{\hyperlink{programs_2clio_2main_8cpp_a067e20df5f65333b0c3cf5840bc37dea}{create\_action}}(accountPermissions,\ config::system\_account\_name,\ \mbox{\hyperlink{structrentcpu__subcommand_a329bd2d0d022616a2f5d8321e7542f9c}{act\_name}},\ act\_payload)\});}
+\DoxyCodeLine{01981\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{01982\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structrentcpu__subcommand_aa645fa30d0f7f61a5025a7c3cc6f12a2_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structrentcpu__subcommand_a329bd2d0d022616a2f5d8321e7542f9c}\index{rentcpu\_subcommand@{rentcpu\_subcommand}!act\_name@{act\_name}}
+\index{act\_name@{act\_name}!rentcpu\_subcommand@{rentcpu\_subcommand}}
+\doxysubsubsection{\texorpdfstring{act\_name}{act\_name}}
+{\footnotesize\ttfamily \label{structrentcpu__subcommand_a329bd2d0d022616a2f5d8321e7542f9c} 
+const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} rentcpu\+\_\+subcommand\+::act\+\_\+name \{ "{}rentcpu"{}\+\_\+n \}}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01964}{1964}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01964\ \{\ \textcolor{stringliteral}{"{}rentcpu"{}}\_n\ \};}
+
+\end{DoxyCode}
+\Hypertarget{structrentcpu__subcommand_a94346564d200908661deb31b036bc96e}\index{rentcpu\_subcommand@{rentcpu\_subcommand}!from\_str@{from\_str}}
+\index{from\_str@{from\_str}!rentcpu\_subcommand@{rentcpu\_subcommand}}
+\doxysubsubsection{\texorpdfstring{from\_str}{from\_str}}
+{\footnotesize\ttfamily \label{structrentcpu__subcommand_a94346564d200908661deb31b036bc96e} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} rentcpu\+\_\+subcommand\+::from\+\_\+str}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01960}{1960}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{structrentcpu__subcommand_a18422d0bba62dbaa18691696ff13845b}\index{rentcpu\_subcommand@{rentcpu\_subcommand}!loan\_fund\_str@{loan\_fund\_str}}
+\index{loan\_fund\_str@{loan\_fund\_str}!rentcpu\_subcommand@{rentcpu\_subcommand}}
+\doxysubsubsection{\texorpdfstring{loan\_fund\_str}{loan\_fund\_str}}
+{\footnotesize\ttfamily \label{structrentcpu__subcommand_a18422d0bba62dbaa18691696ff13845b} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} rentcpu\+\_\+subcommand\+::loan\+\_\+fund\+\_\+str}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01963}{1963}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{structrentcpu__subcommand_a80e87b04e8dbacb44039dbb98df041a9}\index{rentcpu\_subcommand@{rentcpu\_subcommand}!loan\_payment\_str@{loan\_payment\_str}}
+\index{loan\_payment\_str@{loan\_payment\_str}!rentcpu\_subcommand@{rentcpu\_subcommand}}
+\doxysubsubsection{\texorpdfstring{loan\_payment\_str}{loan\_payment\_str}}
+{\footnotesize\ttfamily \label{structrentcpu__subcommand_a80e87b04e8dbacb44039dbb98df041a9} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} rentcpu\+\_\+subcommand\+::loan\+\_\+payment\+\_\+str}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01962}{1962}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{structrentcpu__subcommand_a27c9a313382db0818843611006fb8439}\index{rentcpu\_subcommand@{rentcpu\_subcommand}!receiver\_str@{receiver\_str}}
+\index{receiver\_str@{receiver\_str}!rentcpu\_subcommand@{rentcpu\_subcommand}}
+\doxysubsubsection{\texorpdfstring{receiver\_str}{receiver\_str}}
+{\footnotesize\ttfamily \label{structrentcpu__subcommand_a27c9a313382db0818843611006fb8439} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} rentcpu\+\_\+subcommand\+::receiver\+\_\+str}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01961}{1961}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+programs/clio/\mbox{\hyperlink{programs_2clio_2main_8cpp}{main.\+cpp}}\end{DoxyCompactItemize}

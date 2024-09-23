@@ -1,0 +1,331 @@
+\doxysection{sysio\+::chain\+::producer\+\_\+authority Struct Reference}
+\hypertarget{structsysio_1_1chain_1_1producer__authority}{}\label{structsysio_1_1chain_1_1producer__authority}\index{sysio::chain::producer\_authority@{sysio::chain::producer\_authority}}
+
+
+{\ttfamily \#include $<$producer\+\_\+schedule.\+hpp$>$}
+
+
+
+Collaboration diagram for sysio\+::chain\+::producer\+\_\+authority\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=206pt]{structsysio_1_1chain_1_1producer__authority__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename Op $>$ }\\void \mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority_aaea3ca82f1d89dc0a4c65f9f4057675c}{for\+\_\+each\+\_\+key}} (Op \&\&\mbox{\hyperlink{unionop}{op}}) const
+\item 
+std\+::pair$<$ bool, size\+\_\+t $>$ \mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority_aec8c3a6e1e7c09990917840855cd9abf}{keys\+\_\+satisfy\+\_\+and\+\_\+relevant}} (const std\+::set$<$ \mbox{\hyperlink{namespacesysio_1_1chain_a0628a11f388cd2e43b1ccc1260a1042f}{public\+\_\+key\+\_\+type}} $>$ \&presented\+\_\+keys) const
+\item 
+auto \mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority_a4ec10e3097033fb568cb7b2b64960800}{to\+\_\+shared}} (\mbox{\hyperlink{namespacechainbase_add7d4cf66ab3f2808fe613e6b0343b89}{chainbase\+::allocator}}$<$ char $>$ alloc) const
+\item 
+\mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority_ad3b20bf5d86566c173e867ce2a531e36}{get\+\_\+abi\+\_\+variant}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename Op $>$ }\\static void \mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority_ae72370fc6180ebd6b5a04d61cd436f6a}{for\+\_\+each\+\_\+key}} (const \mbox{\hyperlink{namespacesysio_1_1chain_a5d68aec4c925d17b62f0a9b543fabfc5}{block\+\_\+signing\+\_\+authority}} \&\mbox{\hyperlink{structsysio_1_1chain_1_1authority}{authority}}, Op \&\&\mbox{\hyperlink{unionop}{op}})
+\item 
+static std\+::pair$<$ bool, size\+\_\+t $>$ \mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority_a9c43c1464530c217fa8d7c320e2a1e82}{keys\+\_\+satisfy\+\_\+and\+\_\+relevant}} (const std\+::set$<$ \mbox{\hyperlink{namespacesysio_1_1chain_a0628a11f388cd2e43b1ccc1260a1042f}{public\+\_\+key\+\_\+type}} $>$ \&keys, const \mbox{\hyperlink{namespacesysio_1_1chain_a5d68aec4c925d17b62f0a9b543fabfc5}{block\+\_\+signing\+\_\+authority}} \&\mbox{\hyperlink{structsysio_1_1chain_1_1authority}{authority}})
+\item 
+static auto \mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority_a1861665169e509d0bcf56bbf6064a1f9}{from\+\_\+shared}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1shared__producer__authority}{shared\+\_\+producer\+\_\+authority}} \&src)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority_a8910e67801c1f21448f5cc6e358b99c5}{producer\+\_\+name}}
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_a5d68aec4c925d17b62f0a9b543fabfc5}{block\+\_\+signing\+\_\+authority}} \mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority_a2eb7b3851731ca960fc23c2a646cd828}{authority}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority_a40e5352087afc6f264e9c48522b0acff}{operator==}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority}{producer\+\_\+authority}} \&lhs, const \mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority}{producer\+\_\+authority}} \&rhs)
+\item 
+bool \mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority_a8675b17fdc3f11b90b34992f95942385}{operator!=}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority}{producer\+\_\+authority}} \&lhs, const \mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority}{producer\+\_\+authority}} \&rhs)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{producer__schedule_8hpp_source_l00163}{163}} of file \mbox{\hyperlink{producer__schedule_8hpp_source}{producer\+\_\+schedule.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1chain_1_1producer__authority_ae72370fc6180ebd6b5a04d61cd436f6a}\index{sysio::chain::producer\_authority@{sysio::chain::producer\_authority}!for\_each\_key@{for\_each\_key}}
+\index{for\_each\_key@{for\_each\_key}!sysio::chain::producer\_authority@{sysio::chain::producer\_authority}}
+\doxysubsubsection{\texorpdfstring{for\_each\_key()}{for\_each\_key()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1producer__authority_ae72370fc6180ebd6b5a04d61cd436f6a} 
+template$<$typename Op $>$ \\
+static void sysio\+::chain\+::producer\+\_\+authority\+::for\+\_\+each\+\_\+key (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_a5d68aec4c925d17b62f0a9b543fabfc5}{block\+\_\+signing\+\_\+authority}} \&}]{authority}{, }\item[{Op \&\&}]{op}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{producer__schedule_8hpp_source_l00168}{168}} of file \mbox{\hyperlink{producer__schedule_8hpp_source}{producer\+\_\+schedule.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \ std::visit([\&\mbox{\hyperlink{unionop}{op}}](\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})\{}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.for\_each\_key(std::forward<Op>(\mbox{\hyperlink{unionop}{op}}));}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \ \},\ \mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority_a2eb7b3851731ca960fc23c2a646cd828}{authority}});}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1producer__authority_ae72370fc6180ebd6b5a04d61cd436f6a_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1producer__authority_aaea3ca82f1d89dc0a4c65f9f4057675c}\index{sysio::chain::producer\_authority@{sysio::chain::producer\_authority}!for\_each\_key@{for\_each\_key}}
+\index{for\_each\_key@{for\_each\_key}!sysio::chain::producer\_authority@{sysio::chain::producer\_authority}}
+\doxysubsubsection{\texorpdfstring{for\_each\_key()}{for\_each\_key()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1producer__authority_aaea3ca82f1d89dc0a4c65f9f4057675c} 
+template$<$typename Op $>$ \\
+void sysio\+::chain\+::producer\+\_\+authority\+::for\+\_\+each\+\_\+key (\begin{DoxyParamCaption}\item[{Op \&\&}]{op}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{producer__schedule_8hpp_source_l00175}{175}} of file \mbox{\hyperlink{producer__schedule_8hpp_source}{producer\+\_\+schedule.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority_ae72370fc6180ebd6b5a04d61cd436f6a}{for\_each\_key}}(\mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority_a2eb7b3851731ca960fc23c2a646cd828}{authority}},\ std::forward<Op>(\mbox{\hyperlink{unionop}{op}}));}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1producer__authority_aaea3ca82f1d89dc0a4c65f9f4057675c_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1producer__authority_a1861665169e509d0bcf56bbf6064a1f9}\index{sysio::chain::producer\_authority@{sysio::chain::producer\_authority}!from\_shared@{from\_shared}}
+\index{from\_shared@{from\_shared}!sysio::chain::producer\_authority@{sysio::chain::producer\_authority}}
+\doxysubsubsection{\texorpdfstring{from\_shared()}{from\_shared()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1producer__authority_a1861665169e509d0bcf56bbf6064a1f9} 
+static auto sysio\+::chain\+::producer\+\_\+authority\+::from\+\_\+shared (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1shared__producer__authority}{shared\+\_\+producer\+\_\+authority}} \&}]{src}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{producer__schedule_8hpp_source_l00197}{197}} of file \mbox{\hyperlink{producer__schedule_8hpp_source}{producer\+\_\+schedule.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \ producer\_authority\ result;}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ \ result.producer\_name\ =\ src.producer\_name;}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \ result.authority\ =\ std::visit(\mbox{\hyperlink{namespacesysio_1_1chain_ae5470abf94d0fdeff7866fda992ba844}{overloaded}}\ \{}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \ \ \ \ \ \ [](\textcolor{keyword}{const}\ shared\_block\_signing\_authority\_v0\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})\ \{}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1chain_1_1block__signing__authority__v0_a939082a81292f2aed3e844140b59461c}{block\_signing\_authority\_v0::from\_shared}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ \ \},\ src.authority);}
+\DoxyCodeLine{00205\ }
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=345pt]{structsysio_1_1chain_1_1producer__authority_a1861665169e509d0bcf56bbf6064a1f9_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1producer__authority_a1861665169e509d0bcf56bbf6064a1f9_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1producer__authority_ad3b20bf5d86566c173e867ce2a531e36}\index{sysio::chain::producer\_authority@{sysio::chain::producer\_authority}!get\_abi\_variant@{get\_abi\_variant}}
+\index{get\_abi\_variant@{get\_abi\_variant}!sysio::chain::producer\_authority@{sysio::chain::producer\_authority}}
+\doxysubsubsection{\texorpdfstring{get\_abi\_variant()}{get\_abi\_variant()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1producer__authority_ad3b20bf5d86566c173e867ce2a531e36} 
+\mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} sysio\+::chain\+::producer\+\_\+authority\+::get\+\_\+abi\+\_\+variant (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+ABI\textquotesingle{}s for contracts expect variants to be serialized as a 2 entry array of \mbox{[}type-\/name, value\mbox{]}.
+
+This is incompatible with standard FC rules for static\+\_\+variants which produce
+
+\mbox{[}ordinal, value\mbox{]}
+
+this method produces an appropriate variant for contracts where the authority field is correctly formatted 
+
+Definition at line \mbox{\hyperlink{producer__schedule_8cpp_source_l00005}{5}} of file \mbox{\hyperlink{producer__schedule_8cpp_source}{producer\+\_\+schedule.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00005\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00006\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ authority\_variant\ =\ std::visit([](\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})\{}
+\DoxyCodeLine{00007\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}};}
+\DoxyCodeLine{00008\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_adea61f2343de94d0fbcb920a32332ad9}{fc::to\_variant}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}});}
+\DoxyCodeLine{00009\ }
+\DoxyCodeLine{00010\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}\ type\ =\ std::string(std::decay\_t<\textcolor{keyword}{decltype}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})>::abi\_type\_name());}
+\DoxyCodeLine{00011\ }
+\DoxyCodeLine{00012\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{fc::variants}}\ \{}
+\DoxyCodeLine{00013\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::move(type),}
+\DoxyCodeLine{00014\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::move(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})}
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \},\ \mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority_a2eb7b3851731ca960fc23c2a646cd828}{authority}});}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}()}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}producer\_name"{}},\ \mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority_a8910e67801c1f21448f5cc6e358b99c5}{producer\_name}})}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}authority"{}},\ std::move(authority\_variant));}
+\DoxyCodeLine{00021\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1producer__authority_ad3b20bf5d86566c173e867ce2a531e36_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1producer__authority_a9c43c1464530c217fa8d7c320e2a1e82}\index{sysio::chain::producer\_authority@{sysio::chain::producer\_authority}!keys\_satisfy\_and\_relevant@{keys\_satisfy\_and\_relevant}}
+\index{keys\_satisfy\_and\_relevant@{keys\_satisfy\_and\_relevant}!sysio::chain::producer\_authority@{sysio::chain::producer\_authority}}
+\doxysubsubsection{\texorpdfstring{keys\_satisfy\_and\_relevant()}{keys\_satisfy\_and\_relevant()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1producer__authority_a9c43c1464530c217fa8d7c320e2a1e82} 
+static std\+::pair$<$ bool, size\+\_\+t $>$ sysio\+::chain\+::producer\+\_\+authority\+::keys\+\_\+satisfy\+\_\+and\+\_\+relevant (\begin{DoxyParamCaption}\item[{const std\+::set$<$ \mbox{\hyperlink{namespacesysio_1_1chain_a0628a11f388cd2e43b1ccc1260a1042f}{public\+\_\+key\+\_\+type}} $>$ \&}]{keys}{, }\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_a5d68aec4c925d17b62f0a9b543fabfc5}{block\+\_\+signing\+\_\+authority}} \&}]{authority}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{producer__schedule_8hpp_source_l00179}{179}} of file \mbox{\hyperlink{producer__schedule_8hpp_source}{producer\+\_\+schedule.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::visit([\&keys](\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})\{}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.keys\_satisfy\_and\_relevant(keys);}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \ \},\ \mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority_a2eb7b3851731ca960fc23c2a646cd828}{authority}});}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1producer__authority_a9c43c1464530c217fa8d7c320e2a1e82_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1producer__authority_aec8c3a6e1e7c09990917840855cd9abf}\index{sysio::chain::producer\_authority@{sysio::chain::producer\_authority}!keys\_satisfy\_and\_relevant@{keys\_satisfy\_and\_relevant}}
+\index{keys\_satisfy\_and\_relevant@{keys\_satisfy\_and\_relevant}!sysio::chain::producer\_authority@{sysio::chain::producer\_authority}}
+\doxysubsubsection{\texorpdfstring{keys\_satisfy\_and\_relevant()}{keys\_satisfy\_and\_relevant()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1producer__authority_aec8c3a6e1e7c09990917840855cd9abf} 
+std\+::pair$<$ bool, size\+\_\+t $>$ sysio\+::chain\+::producer\+\_\+authority\+::keys\+\_\+satisfy\+\_\+and\+\_\+relevant (\begin{DoxyParamCaption}\item[{const std\+::set$<$ \mbox{\hyperlink{namespacesysio_1_1chain_a0628a11f388cd2e43b1ccc1260a1042f}{public\+\_\+key\+\_\+type}} $>$ \&}]{presented\+\_\+keys}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{producer__schedule_8hpp_source_l00185}{185}} of file \mbox{\hyperlink{producer__schedule_8hpp_source}{producer\+\_\+schedule.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority_a9c43c1464530c217fa8d7c320e2a1e82}{keys\_satisfy\_and\_relevant}}(presented\_keys,\ \mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority_a2eb7b3851731ca960fc23c2a646cd828}{authority}});}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1producer__authority_aec8c3a6e1e7c09990917840855cd9abf_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1producer__authority_a4ec10e3097033fb568cb7b2b64960800}\index{sysio::chain::producer\_authority@{sysio::chain::producer\_authority}!to\_shared@{to\_shared}}
+\index{to\_shared@{to\_shared}!sysio::chain::producer\_authority@{sysio::chain::producer\_authority}}
+\doxysubsubsection{\texorpdfstring{to\_shared()}{to\_shared()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1producer__authority_a4ec10e3097033fb568cb7b2b64960800} 
+auto sysio\+::chain\+::producer\+\_\+authority\+::to\+\_\+shared (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacechainbase_add7d4cf66ab3f2808fe613e6b0343b89}{chainbase\+::allocator}}$<$ char $>$}]{alloc}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{producer__schedule_8hpp_source_l00189}{189}} of file \mbox{\hyperlink{producer__schedule_8hpp_source}{producer\+\_\+schedule.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ shared\_auth\ =\ std::visit([\&alloc](\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})\ \{}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.to\_shared(alloc);}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ \ \},\ \mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority_a2eb7b3851731ca960fc23c2a646cd828}{authority}});}
+\DoxyCodeLine{00193\ }
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ shared\_producer\_authority(\mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority_a8910e67801c1f21448f5cc6e358b99c5}{producer\_name}},\ std::move(shared\_auth));}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{structsysio_1_1chain_1_1producer__authority_a8675b17fdc3f11b90b34992f95942385}\index{sysio::chain::producer\_authority@{sysio::chain::producer\_authority}!operator"!=@{operator"!=}}
+\index{operator"!=@{operator"!=}!sysio::chain::producer\_authority@{sysio::chain::producer\_authority}}
+\doxysubsubsection{\texorpdfstring{operator"!=}{operator!=}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1producer__authority_a8675b17fdc3f11b90b34992f95942385} 
+bool \mbox{\hyperlink{namespacefc_a40c368ac88294ae47b064cad937fdbf6}{operator!}}= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority}{producer\+\_\+authority}} \&}]{lhs}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority}{producer\+\_\+authority}} \&}]{rhs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{producer__schedule_8hpp_source_l00226}{226}} of file \mbox{\hyperlink{producer__schedule_8hpp_source}{producer\+\_\+schedule.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00226\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00227\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ tie(\ lhs.producer\_name,\ lhs.authority\ )\ !=\ tie(\ rhs.producer\_name,\ rhs.authority\ );}
+\DoxyCodeLine{00228\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1producer__authority_a40e5352087afc6f264e9c48522b0acff}\index{sysio::chain::producer\_authority@{sysio::chain::producer\_authority}!operator==@{operator==}}
+\index{operator==@{operator==}!sysio::chain::producer\_authority@{sysio::chain::producer\_authority}}
+\doxysubsubsection{\texorpdfstring{operator==}{operator==}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1producer__authority_a40e5352087afc6f264e9c48522b0acff} 
+bool operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority}{producer\+\_\+authority}} \&}]{lhs}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority}{producer\+\_\+authority}} \&}]{rhs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{producer__schedule_8hpp_source_l00223}{223}} of file \mbox{\hyperlink{producer__schedule_8hpp_source}{producer\+\_\+schedule.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ tie(\ lhs.producer\_name,\ lhs.authority\ )\ ==\ tie(\ rhs.producer\_name,\ rhs.authority\ );}
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1chain_1_1producer__authority_a2eb7b3851731ca960fc23c2a646cd828}\index{sysio::chain::producer\_authority@{sysio::chain::producer\_authority}!authority@{authority}}
+\index{authority@{authority}!sysio::chain::producer\_authority@{sysio::chain::producer\_authority}}
+\doxysubsubsection{\texorpdfstring{authority}{authority}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1producer__authority_a2eb7b3851731ca960fc23c2a646cd828} 
+\mbox{\hyperlink{namespacesysio_1_1chain_a5d68aec4c925d17b62f0a9b543fabfc5}{block\+\_\+signing\+\_\+authority}} sysio\+::chain\+::producer\+\_\+authority\+::authority}
+
+
+
+Definition at line \mbox{\hyperlink{producer__schedule_8hpp_source_l00165}{165}} of file \mbox{\hyperlink{producer__schedule_8hpp_source}{producer\+\_\+schedule.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1producer__authority_a8910e67801c1f21448f5cc6e358b99c5}\index{sysio::chain::producer\_authority@{sysio::chain::producer\_authority}!producer\_name@{producer\_name}}
+\index{producer\_name@{producer\_name}!sysio::chain::producer\_authority@{sysio::chain::producer\_authority}}
+\doxysubsubsection{\texorpdfstring{producer\_name}{producer\_name}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1producer__authority_a8910e67801c1f21448f5cc6e358b99c5} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} sysio\+::chain\+::producer\+\_\+authority\+::producer\+\_\+name}
+
+
+
+Definition at line \mbox{\hyperlink{producer__schedule_8hpp_source_l00164}{164}} of file \mbox{\hyperlink{producer__schedule_8hpp_source}{producer\+\_\+schedule.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{producer__schedule_8hpp}{producer\+\_\+schedule.\+hpp}}\item 
+libraries/chain/\mbox{\hyperlink{producer__schedule_8cpp}{producer\+\_\+schedule.\+cpp}}\end{DoxyCompactItemize}

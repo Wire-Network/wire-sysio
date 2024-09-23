@@ -1,0 +1,27 @@
+<map id="libraries/sys&#45;vm/external/Catch2/include/internal/catch_interfaces_exception.cpp" name="libraries/sys&#45;vm/external/Catch2/include/internal/catch_interfaces_exception.cpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="460,5,669,61"/>
+<area shape="rect" id="Node000002" href="$catch__interfaces__exception_8h.html" title=" " alt="" coords="482,109,646,150"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="567,62,567,94,562,94,562,62"/>
+<area shape="rect" id="Node000003" href="$catch__interfaces__registry__hub_8h.html" title=" " alt="" coords="311,198,478,238"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="527,153,448,193,445,188,525,148"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="390,360,443,386"/>
+<area shape="poly" id="edge12_Node000002_Node000008" title=" " alt="" coords="564,151,546,226,529,271,504,314,481,336,456,354,453,350,478,332,499,310,524,269,541,224,559,149"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="564,205,642,231"/>
+<area shape="poly" id="edge11_Node000002_Node000011" title=" " alt="" coords="575,149,594,190,589,192,571,151"/>
+<area shape="rect" id="Node000012" title=" " alt="" coords="666,205,724,231"/>
+<area shape="poly" id="edge13_Node000002_Node000012" title=" " alt="" coords="595,148,665,194,662,198,592,152"/>
+<area shape="rect" id="Node000004" href="$catch__common_8h.html" title=" " alt="" coords="224,286,345,312"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="369,241,315,279,312,275,366,237"/>
+<area shape="poly" id="edge9_Node000003_Node000008" title=" " alt="" coords="400,238,415,344,410,345,395,239"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="421,286,489,312"/>
+<area shape="poly" id="edge10_Node000003_Node000010" title=" " alt="" coords="412,237,439,272,434,275,408,240"/>
+<area shape="rect" id="Node000005" href="$catch__compiler__capabilities_8h.html" title=" " alt="" coords="5,360,198,386"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="254,315,148,356,146,352,252,310"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="221,360,280,386"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="281,313,265,347,261,345,276,311"/>
+<area shape="poly" id="edge7_Node000004_Node000008" title=" " alt="" coords="308,310,382,350,379,355,305,315"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="305,360,365,386"/>
+<area shape="poly" id="edge8_Node000004_Node000009" title=" " alt="" coords="295,311,320,346,315,349,290,314"/>
+<area shape="rect" id="Node000006" href="$catch__platform_8h.html" title=" " alt="" coords="42,434,161,459"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="104,386,104,418,99,418,99,386"/>
+</map>

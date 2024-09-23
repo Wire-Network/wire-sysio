@@ -1,0 +1,71 @@
+\doxysection{libraries/sys-\/vm/tools/interp.cpp File Reference}
+\hypertarget{interp_8cpp}{}\label{interp_8cpp}\index{libraries/sys-\/vm/tools/interp.cpp@{libraries/sys-\/vm/tools/interp.cpp}}
+{\ttfamily \#include $<$sysio/vm/backend.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/vm/error\+\_\+codes.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/vm/watchdog.\+hpp$>$}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+Include dependency graph for interp.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{interp_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{interp_8cpp_a3c04138a5bfe5d72780bb7e82a18e627}{main}} (int argc, char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{interp_8cpp_a3c04138a5bfe5d72780bb7e82a18e627}\index{interp.cpp@{interp.cpp}!main@{main}}
+\index{main@{main}!interp.cpp@{interp.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{interp_8cpp_a3c04138a5bfe5d72780bb7e82a18e627} 
+int main (\begin{DoxyParamCaption}\item[{int}]{argc}{, }\item[{char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{argv}{}\end{DoxyParamCaption})}
+
+Simple implementation of an interpreter using sys-\/vm. 
+
+Definition at line \mbox{\hyperlink{interp_8cpp_source_l00013}{13}} of file \mbox{\hyperlink{interp_8cpp_source}{interp.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00013\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00014\ \ \ \ \textcolor{comment}{//\ Thread\ specific\ \`{}allocator`\ used\ for\ wasm\ linear\ memory.}}
+\DoxyCodeLine{00015\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator}{wasm\_allocator}}\ \mbox{\hyperlink{allow__code__after__function__end__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}};}
+\DoxyCodeLine{00016\ }
+\DoxyCodeLine{00017\ \ \ \ \textcolor{keywordflow}{if}\ (argc\ <\ 2)\ \{}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}Error,\ no\ wasm\ file\ provided\(\backslash\)n"{}};}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ -\/1;}
+\DoxyCodeLine{00020\ \ \ \ \}}
+\DoxyCodeLine{00021\ }
+\DoxyCodeLine{00022\ \ \ \ std::string\ \mbox{\hyperlink{namespaceembed_clara_a1e1bd594f85f58f5dca6c41c0ac720fb}{filename}}\ =\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[1];}
+\DoxyCodeLine{00023\ }
+\DoxyCodeLine{00024\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1watchdog}{watchdog}}\ \mbox{\hyperlink{hello__driver_8cpp_aa199bff2581e446e3865732d06d873f0}{wd}}\{std::chrono::seconds(3)\};}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \textcolor{comment}{//\ Read\ the\ wasm\ into\ memory.}}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ code\ =\ \mbox{\hyperlink{namespacesysio_1_1vm_a962c97bda1b30dbf62f4f9a50abe6f99}{read\_wasm}}(\ filename\ );}
+\DoxyCodeLine{00029\ }
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \textcolor{comment}{//\ Instaniate\ a\ new\ backend\ using\ the\ wasm\ provided.}}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ interpreter,\ default\_options>}}\ \mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}(\ code,\ \&\mbox{\hyperlink{allow__code__after__function__end__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}\ );}
+\DoxyCodeLine{00032\ }
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \textcolor{comment}{//\ Execute\ any\ exported\ functions\ provided\ by\ the\ wasm.}}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_a6a3fbbc16a719762e15001d75ed3a6d0}{execute\_all}}(\mbox{\hyperlink{hello__driver_8cpp_aa199bff2581e446e3865732d06d873f0}{wd}});}
+\DoxyCodeLine{00035\ }
+\DoxyCodeLine{00036\ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1vm_1_1exception}{sysio::vm::exception}}\&\ ex\ )\ \{}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}sys-\/vm\ interpreter\ error\(\backslash\)n"{}};}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ std::cerr\ <<\ ex.\mbox{\hyperlink{structsysio_1_1vm_1_1exception_ae888671119bac3f7c635b6bc8244dc33}{what}}()\ <<\ \textcolor{stringliteral}{"{}\ :\ "{}}\ <<\ ex.\mbox{\hyperlink{structsysio_1_1vm_1_1exception_af86f633419d7c667dc588b16f13f1972}{detail}}()\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{00039\ \ \ \ \}}
+\DoxyCodeLine{00040\ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00041\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{interp_8cpp_a3c04138a5bfe5d72780bb7e82a18e627_cgraph}
+\end{center}
+\end{figure}

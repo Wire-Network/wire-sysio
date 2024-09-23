@@ -1,0 +1,991 @@
+\doxysection{connection.\+hpp}
+\hypertarget{transport_2asio_2connection_8hpp_source}{}\label{transport_2asio_2connection_8hpp_source}\index{libraries/fc/vendor/websocketpp/websocketpp/transport/asio/connection.hpp@{libraries/fc/vendor/websocketpp/websocketpp/transport/asio/connection.hpp}}
+\mbox{\hyperlink{transport_2asio_2connection_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2015,\ Peter\ Thorson.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00004}00004\ \textcolor{comment}{\ *\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00005}00005\ \textcolor{comment}{\ *\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are\ met:}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00006}00006\ \textcolor{comment}{\ *\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00007}00007\ \textcolor{comment}{\ *\ \ \ \ \ \ \ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00008}00008\ \textcolor{comment}{\ *\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00009}00009\ \textcolor{comment}{\ *\ \ \ \ \ \ \ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer\ in\ the}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00010}00010\ \textcolor{comment}{\ *\ \ \ \ \ \ \ documentation\ and/or\ other\ materials\ provided\ with\ the\ distribution.}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00011}00011\ \textcolor{comment}{\ *\ \ \ \ \ *\ Neither\ the\ name\ of\ the\ WebSocket++\ Project\ nor\ the}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00012}00012\ \textcolor{comment}{\ *\ \ \ \ \ \ \ names\ of\ its\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00013}00013\ \textcolor{comment}{\ *\ \ \ \ \ \ \ derived\ from\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00014}00014\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00015}00015\ \textcolor{comment}{\ *\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS\ "{}AS\ IS"{}}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00016}00016\ \textcolor{comment}{\ *\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ THE}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00017}00017\ \textcolor{comment}{\ *\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR\ A\ PARTICULAR\ PURPOSE}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00018}00018\ \textcolor{comment}{\ *\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ PETER\ THORSON\ BE\ LIABLE\ FOR\ ANY}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00019}00019\ \textcolor{comment}{\ *\ DIRECT,\ INDIRECT,\ INCIDENTAL,\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00020}00020\ \textcolor{comment}{\ *\ (INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00021}00021\ \textcolor{comment}{\ *\ LOSS\ OF\ USE,\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00022}00022\ \textcolor{comment}{\ *\ ON\ ANY\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00023}00023\ \textcolor{comment}{\ *\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE\ OF\ THIS}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00024}00024\ \textcolor{comment}{\ *\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00025}00025\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00026}00026\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00028}00028\ \textcolor{preprocessor}{\#ifndef\ WEBSOCKETPP\_TRANSPORT\_ASIO\_CON\_HPP}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00029}00029\ \textcolor{preprocessor}{\#define\ WEBSOCKETPP\_TRANSPORT\_ASIO\_CON\_HPP}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00031}00031\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{transport_2asio_2base_8hpp}{websocketpp/transport/asio/base.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00033}00033\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{transport_2base_2connection_8hpp}{websocketpp/transport/base/connection.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00035}00035\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{levels_8hpp}{websocketpp/logger/levels.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00036}00036\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2http_2constants_8hpp}{websocketpp/http/constants.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00038}00038\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{vendor_2websocketpp_2websocketpp_2base64_2base64_8hpp}{websocketpp/base64/base64.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00039}00039\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{error_8hpp}{websocketpp/error.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00040}00040\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{uri_8hpp}{websocketpp/uri.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00042}00042\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{common_2asio_8hpp}{websocketpp/common/asio.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00043}00043\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{chrono_8hpp}{websocketpp/common/chrono.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00044}00044\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{cpp11_8hpp}{websocketpp/common/cpp11.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00045}00045\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp}{websocketpp/common/memory.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00046}00046\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{functional_8hpp}{websocketpp/common/functional.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00047}00047\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{connection__hdl_8hpp}{websocketpp/common/connection\_hdl.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00049}00049\ \textcolor{preprocessor}{\#include\ <istream>}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00050}00050\ \textcolor{preprocessor}{\#include\ <sstream>}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00051}00051\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00052}00052\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00054}00054\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacewebsocketpp}{websocketpp}}\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00055}00055\ \textcolor{keyword}{namespace\ }transport\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00056}00056\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacewebsocketpp_1_1lib_1_1asio}{asio}}\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00058}\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1asio_ad12345b8638872037c87db068467233d}{00058}}\ \textcolor{keyword}{typedef}\ lib::function<void(\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\_hdl}})>\ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1asio_ad12345b8638872037c87db068467233d}{tcp\_init\_handler}};}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00066}00066\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ config>}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00067}\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection}{00067}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection}{connection}}\ :\ \textcolor{keyword}{public}\ config::socket\_type::socket\_con\_type\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00068}00068\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00070}\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_aa5cad008b3f8d495d26c1a49296d94dd}{00070}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection}{connection<config>}}\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_aa5cad008b3f8d495d26c1a49296d94dd}{type}};}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00072}\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a3e79097648295dd7d2849c5615a7c42e}{00072}}\ \ \ \ \ \textcolor{keyword}{typedef}\ lib::shared\_ptr<type>\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a3e79097648295dd7d2849c5615a7c42e}{ptr}};}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00073}00073\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00075}\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a66d22f74327624da6f62c25b3c74349b}{00075}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{typename}\ config::socket\_type::socket\_con\_type\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a66d22f74327624da6f62c25b3c74349b}{socket\_con\_type}};}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00077}\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_aebe31d6c36d40a8547072ee8ad6777ad}{00077}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{typename}\ socket\_con\_type::ptr\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_aebe31d6c36d40a8547072ee8ad6777ad}{socket\_con\_ptr}};}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00079}\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a7d86173232da92ca09d5dd483ff5be65}{00079}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{typename}\ config::alog\_type\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a7d86173232da92ca09d5dd483ff5be65}{alog\_type}};}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00081}\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_adeafff07988dfd298f83323fbc89d0de}{00081}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{typename}\ config::elog\_type\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_adeafff07988dfd298f83323fbc89d0de}{elog\_type}};}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00083}\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_aa56061051276800f874e25e31307c9bf}{00083}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{typename}\ config::request\_type\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_aa56061051276800f874e25e31307c9bf}{request\_type}};}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00084}\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_aa79f8a58dd87aaaa932c8aa8bb8409de}{00084}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{typename}\ request\_type::ptr\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_aa79f8a58dd87aaaa932c8aa8bb8409de}{request\_ptr}};}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00085}\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_ad678e688912f42ec0da0806b8ed97b11}{00085}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{typename}\ config::response\_type\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_ad678e688912f42ec0da0806b8ed97b11}{response\_type}};}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00086}\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_aac7eec74d5702a1aefd7698ca92c8e9d}{00086}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{typename}\ response\_type::ptr\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_aac7eec74d5702a1aefd7698ca92c8e9d}{response\_ptr}};}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00087}00087\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00089}\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_aaeeac719b46cae4abf53bc6303b00e82}{00089}}\ \ \ \ \ \textcolor{keyword}{typedef}\ lib::asio::io\_service\ *\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_aaeeac719b46cae4abf53bc6303b00e82}{io\_service\_ptr}};}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00091}\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a75088d08cd553a440c6521d777339443}{00091}}\ \ \ \ \ \textcolor{keyword}{typedef}\ lib::shared\_ptr<lib::asio::io\_service::strand>\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a75088d08cd553a440c6521d777339443}{strand\_ptr}};}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00093}\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_ad7f0fad4f6837f8f4e97cf905b3a231f}{00093}}\ \ \ \ \ \textcolor{keyword}{typedef}\ lib::shared\_ptr<lib::asio::steady\_timer>\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a85df849fb3f9bfd5289a549f08864ccd}{timer\_ptr}};}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00094}00094\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00095}00095\ \ \ \ \ \textcolor{comment}{//\ connection\ is\ friends\ with\ its\ associated\ endpoint\ to\ allow\ the\ endpoint}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00096}00096\ \ \ \ \ \textcolor{comment}{//\ to\ call\ private/protected\ utility\ methods\ that\ we\ don't\ want\ to\ expose}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00097}00097\ \ \ \ \ \textcolor{comment}{//\ to\ the\ public\ api.}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00098}00098\ \ \ \ \ \textcolor{keyword}{friend}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1endpoint}{endpoint}}<\mbox{\hyperlink{classconfig}{config}}>;}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00099}\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_af5e9a5a2c74896a17159b530f46f04a8}{00099}}\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>\ \textcolor{keyword}{friend}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1local__endpoint}{local\_endpoint}};}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00100}00100\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00101}00101\ \ \ \ \ \textcolor{comment}{//\ generate\ and\ manage\ our\ own\ io\_service}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00102}\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_aff25718cc376e7d473d4e46c12e22551}{00102}}\ \ \ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_aff25718cc376e7d473d4e46c12e22551}{connection}}(\textcolor{keywordtype}{bool}\ is\_server,\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a7d86173232da92ca09d5dd483ff5be65}{alog\_type}}\ \&\ alog,\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_adeafff07988dfd298f83323fbc89d0de}{elog\_type}}\ \&\ \mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}})}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00103}00103\ \ \ \ \ \ \ :\ m\_is\_server(is\_server)}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00104}00104\ \ \ \ \ \ \ ,\ m\_alog(alog)}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00105}00105\ \ \ \ \ \ \ ,\ m\_elog(\mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}})}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00106}00106\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00107}00107\ \ \ \ \ \ \ \ \ m\_alog.write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}{log::alevel::devel}},\textcolor{stringliteral}{"{}asio\ con\ transport\ constructor"{}});}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00108}00108\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00109}00109\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00111}\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_ac190efbc8cfd2654bc07b5b9382c36cc}{00111}}\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a3e79097648295dd7d2849c5615a7c42e}{ptr}}\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_ac190efbc8cfd2654bc07b5b9382c36cc}{get\_shared}}()\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00112}00112\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ lib::static\_pointer\_cast<type>(socket\_con\_type::get\_shared());}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00113}00113\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00114}00114\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00115}\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_aaca175de7022aa0840bad7429c8988fd}{00115}}\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_aaca175de7022aa0840bad7429c8988fd}{is\_secure}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00116}00116\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ socket\_con\_type::is\_secure();}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00117}00117\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00118}00118\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00120}00120\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00131}\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_abe1def82c2be645adfc9f769aafb1a0d}{00131}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_abe1def82c2be645adfc9f769aafb1a0d}{set\_uri}}(\mbox{\hyperlink{namespacewebsocketpp_aae370ea5ac83a8ece7712cb39fc23f5b}{uri\_ptr}}\ u)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00132}00132\ \ \ \ \ \ \ \ \ socket\_con\_type::set\_uri(u);}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00133}00133\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00134}00134\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00136}00136\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00145}\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_ac71341129ff5389fa84cd9ef13c8c05e}{00145}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_ac71341129ff5389fa84cd9ef13c8c05e}{set\_tcp\_pre\_init\_handler}}(\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1asio_ad12345b8638872037c87db068467233d}{tcp\_init\_handler}}\ h)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00146}00146\ \ \ \ \ \ \ \ \ m\_tcp\_pre\_init\_handler\ =\ h;}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00147}00147\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00148}00148\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00150}00150\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00159}\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_abb0254e3207691c45c9ca7061352a90a}{00159}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_abb0254e3207691c45c9ca7061352a90a}{set\_tcp\_init\_handler}}(\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1asio_ad12345b8638872037c87db068467233d}{tcp\_init\_handler}}\ h)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00160}00160\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_ac71341129ff5389fa84cd9ef13c8c05e}{set\_tcp\_pre\_init\_handler}}(h);}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00161}00161\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00162}00162\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00164}00164\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00174}\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a069b63faee90061ed4fa4e66d221ac18}{00174}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a069b63faee90061ed4fa4e66d221ac18}{set\_tcp\_post\_init\_handler}}(\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1asio_ad12345b8638872037c87db068467233d}{tcp\_init\_handler}}\ h)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00175}00175\ \ \ \ \ \ \ \ \ m\_tcp\_post\_init\_handler\ =\ h;}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00176}00176\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00177}00177\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00179}00179\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00190}\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a9638063c7c8c90c74d97008dacd81095}{00190}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a9638063c7c8c90c74d97008dacd81095}{set\_proxy}}(std::string\ \textcolor{keyword}{const}\ \&\ \mbox{\hyperlink{classwebsocketpp_1_1uri}{uri}},\ lib::error\_code\ \&\ ec)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00191}00191\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ TODO:\ return\ errors\ for\ illegal\ URIs\ here?}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00192}00192\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ TODO:\ should\ https\ urls\ be\ illegal\ for\ the\ moment?}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00193}00193\ \ \ \ \ \ \ \ \ m\_proxy\ =\ \mbox{\hyperlink{classwebsocketpp_1_1uri}{uri}};}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00194}00194\ \ \ \ \ \ \ \ \ m\_proxy\_data\ =\ lib::make\_shared<proxy\_data>();}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00195}00195\ \ \ \ \ \ \ \ \ ec\ =\ lib::error\_code();}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00196}00196\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00197}00197\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00199}\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a8bd4c1b8ffbe04230249567e3217acfb}{00199}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a8bd4c1b8ffbe04230249567e3217acfb}{set\_proxy}}(std::string\ \textcolor{keyword}{const}\ \&\ \mbox{\hyperlink{classwebsocketpp_1_1uri}{uri}})\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00200}00200\ \ \ \ \ \ \ \ \ lib::error\_code\ ec;}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00201}00201\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a9638063c7c8c90c74d97008dacd81095}{set\_proxy}}(\mbox{\hyperlink{classwebsocketpp_1_1uri}{uri}},ec);}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00202}00202\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ec)\ \{\ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{classwebsocketpp_1_1exception}{exception}}(ec);\ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00203}00203\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00204}00204\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00206}00206\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00218}\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a99ee9d4f4043a2e3b2225cb1f03a56d1}{00218}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a99ee9d4f4043a2e3b2225cb1f03a56d1}{set\_proxy\_basic\_auth}}(std::string\ \textcolor{keyword}{const}\ \&\ username,\ std::string\ \textcolor{keyword}{const}\ \&}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00219}00219\ \ \ \ \ \ \ \ \ password,\ lib::error\_code\ \&\ ec)}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00220}00220\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00221}00221\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!m\_proxy\_data)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00222}00222\ \ \ \ \ \ \ \ \ \ \ \ \ ec\ =\ make\_error\_code(\mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da7566c083efb2833cbe99e6f4bda75882}{websocketpp::error::invalid\_state}});}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00223}00223\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00224}00224\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00225}00225\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00226}00226\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ TODO:\ username\ can't\ contain\ ':'}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00227}00227\ \ \ \ \ \ \ \ \ std::string\ val\ =\ \textcolor{stringliteral}{"{}Basic\ "{}}+\mbox{\hyperlink{namespacewebsocketpp_aff36d40583424a2c879df02219133af8}{base64\_encode}}(username\ +\ \textcolor{stringliteral}{"{}:"{}}\ +\ password);}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00228}00228\ \ \ \ \ \ \ \ \ m\_proxy\_data-\/>req.replace\_header(\textcolor{stringliteral}{"{}Proxy-\/Authorization"{}},val);}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00229}00229\ \ \ \ \ \ \ \ \ ec\ =\ lib::error\_code();}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00230}00230\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00231}00231\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00233}\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a0a42cbcc12974d71c0ea91d12da6b72e}{00233}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a0a42cbcc12974d71c0ea91d12da6b72e}{set\_proxy\_basic\_auth}}(std::string\ \textcolor{keyword}{const}\ \&\ username,\ std::string\ \textcolor{keyword}{const}\ \&}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00234}00234\ \ \ \ \ \ \ \ \ password)}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00235}00235\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00236}00236\ \ \ \ \ \ \ \ \ lib::error\_code\ ec;}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00237}00237\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a99ee9d4f4043a2e3b2225cb1f03a56d1}{set\_proxy\_basic\_auth}}(username,password,ec);}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00238}00238\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ec)\ \{\ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{classwebsocketpp_1_1exception}{exception}}(ec);\ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00239}00239\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00240}00240\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00242}00242\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00251}\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a1617e51dd915164bd80d0a24b19e7763}{00251}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a1617e51dd915164bd80d0a24b19e7763}{set\_proxy\_timeout}}(\textcolor{keywordtype}{long}\ duration,\ lib::error\_code\ \&\ ec)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00252}00252\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!m\_proxy\_data)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00253}00253\ \ \ \ \ \ \ \ \ \ \ \ \ ec\ =\ make\_error\_code(\mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da7566c083efb2833cbe99e6f4bda75882}{websocketpp::error::invalid\_state}});}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00254}00254\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00255}00255\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00256}00256\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00257}00257\ \ \ \ \ \ \ \ \ m\_proxy\_data-\/>timeout\_proxy\ =\ duration;}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00258}00258\ \ \ \ \ \ \ \ \ ec\ =\ lib::error\_code();}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00259}00259\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00260}00260\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00262}\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a01368cd677c09dfb7e47261180ebba82}{00262}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a01368cd677c09dfb7e47261180ebba82}{set\_proxy\_timeout}}(\textcolor{keywordtype}{long}\ duration)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00263}00263\ \ \ \ \ \ \ \ \ lib::error\_code\ ec;}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00264}00264\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a1617e51dd915164bd80d0a24b19e7763}{set\_proxy\_timeout}}(duration,ec);}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00265}00265\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ec)\ \{\ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{classwebsocketpp_1_1exception}{exception}}(ec);\ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00266}00266\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00267}00267\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00268}\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_adffcaead38af5ed4cab7e40d5a78bafd}{00268}}\ \ \ \ \ std::string\ \textcolor{keyword}{const}\ \&\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_adffcaead38af5ed4cab7e40d5a78bafd}{get\_proxy}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00269}00269\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_proxy;}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00270}00270\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00271}00271\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00273}00273\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00282}\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_ac16d6ae60ee14176130dc92d12a30b61}{00282}}\ \ \ \ \ std::string\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_ac16d6ae60ee14176130dc92d12a30b61}{get\_remote\_endpoint}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00283}00283\ \ \ \ \ \ \ \ \ lib::error\_code\ ec;}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00284}00284\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00285}00285\ \ \ \ \ \ \ \ \ std::string\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ socket\_con\_type::get\_remote\_endpoint(ec);}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00286}00286\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00287}00287\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ec)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00288}00288\ \ \ \ \ \ \ \ \ \ \ \ \ m\_elog.write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1elevel_a3ab47987a682f0de7b1d0df8c9c3b9d2}{log::elevel::info}},\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}});}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00289}00289\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Unknown"{}};}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00290}00290\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00291}00291\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00292}00292\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00293}00293\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00294}00294\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00296}\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_af9931e0ac551bc307ca7d16061484998}{00296}}\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\_hdl}}\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_af9931e0ac551bc307ca7d16061484998}{get\_handle}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00297}00297\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_connection\_hdl;}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00298}00298\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00299}00299\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00301}00301\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00314}\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_ab9db04550ee6b3dd2643cd7d23cda3f1}{00314}}\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a85df849fb3f9bfd5289a549f08864ccd}{timer\_ptr}}\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_ab9db04550ee6b3dd2643cd7d23cda3f1}{set\_timer}}(\textcolor{keywordtype}{long}\ duration,\ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_a946cc56ff41139f3002149c15fd87bc9}{timer\_handler}}\ callback)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00315}00315\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a85df849fb3f9bfd5289a549f08864ccd}{timer\_ptr}}\ new\_timer\ =\ lib::make\_shared<lib::asio::steady\_timer>(}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00316}00316\ \ \ \ \ \ \ \ \ \ \ \ \ *m\_io\_service,}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00317}00317\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1lib_1_1asio_a38ce6cba13c37a134a65f3623d00090e}{lib::asio::milliseconds}}(duration)}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00318}00318\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00319}00319\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00320}00320\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (config::enable\_multithreading)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00321}00321\ \ \ \ \ \ \ \ \ \ \ \ \ new\_timer-\/>async\_wait(m\_strand-\/>wrap(lib::bind(}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00322}00322\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a61ec4db64a17fcd38d2ca1c819dd2d9b}{type::handle\_timer}},\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_ac190efbc8cfd2654bc07b5b9382c36cc}{get\_shared}}(),}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00323}00323\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ new\_timer,}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00324}00324\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ callback,}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00325}00325\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lib::placeholders::\_1}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00326}00326\ \ \ \ \ \ \ \ \ \ \ \ \ )));}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00327}00327\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00328}00328\ \ \ \ \ \ \ \ \ \ \ \ \ new\_timer-\/>async\_wait(lib::bind(}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00329}00329\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a61ec4db64a17fcd38d2ca1c819dd2d9b}{type::handle\_timer}},\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_ac190efbc8cfd2654bc07b5b9382c36cc}{get\_shared}}(),}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00330}00330\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ new\_timer,}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00331}00331\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ callback,}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00332}00332\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lib::placeholders::\_1}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00333}00333\ \ \ \ \ \ \ \ \ \ \ \ \ ));}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00334}00334\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00335}00335\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00336}00336\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ new\_timer;}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00337}00337\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00338}00338\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00340}00340\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00350}\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a61ec4db64a17fcd38d2ca1c819dd2d9b}{00350}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a61ec4db64a17fcd38d2ca1c819dd2d9b}{handle\_timer}}(\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a85df849fb3f9bfd5289a549f08864ccd}{timer\_ptr}},\ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_a946cc56ff41139f3002149c15fd87bc9}{timer\_handler}}\ callback,}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00351}00351\ \ \ \ \ \ \ \ \ lib::asio::error\_code\ \textcolor{keyword}{const}\ \&\ ec)}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00352}00352\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00353}00353\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ec)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00354}00354\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ec\ ==\ lib::asio::error::operation\_aborted)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00355}00355\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ callback(make\_error\_code(\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0a887436887a8732e48f7c67bd85bb6f64}{transport::error::operation\_aborted}}));}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00356}00356\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00357}00357\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ log\_err(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1elevel_a3ab47987a682f0de7b1d0df8c9c3b9d2}{log::elevel::info}},\textcolor{stringliteral}{"{}asio\ handle\_timer"{}},ec);}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00358}00358\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ callback(ec);}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00359}00359\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00360}00360\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00361}00361\ \ \ \ \ \ \ \ \ \ \ \ \ callback(lib::error\_code());}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00362}00362\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00363}00363\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00364}00364\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00366}\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a1d636545ad5cc7d78ddcff414fd55d0a}{00366}}\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a75088d08cd553a440c6521d777339443}{strand\_ptr}}\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a1d636545ad5cc7d78ddcff414fd55d0a}{get\_strand}}()\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00367}00367\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_strand;}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00368}00368\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00369}00369\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00371}00371\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00389}\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a8394f160cb79d081ff5d10d355bacf1a}{00389}}\ \ \ \ \ lib::asio::error\_code\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a8394f160cb79d081ff5d10d355bacf1a}{get\_transport\_ec}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00390}00390\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_tec;}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00391}00391\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00392}00392\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00394}00394\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00410}00410\ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00411}\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_ae09d85b808498f06bcc8d938c9107e8e}{00411}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_ae09d85b808498f06bcc8d938c9107e8e}{init}}(\mbox{\hyperlink{namespacewebsocketpp_1_1transport_aeae75e675c1a334b3b33ab7120b480a5}{init\_handler}}\ callback)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00412}00412\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (m\_alog.static\_test(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}{log::alevel::devel}}))\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00413}00413\ \ \ \ \ \ \ \ \ \ \ \ \ m\_alog.write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}{log::alevel::devel}},\textcolor{stringliteral}{"{}asio\ connection\ init"{}});}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00414}00414\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00415}00415\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00416}00416\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ TODO:\ pre-\/init\ timeout.\ Right\ now\ no\ implemented\ socket\ policies}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00417}00417\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ actually\ have\ an\ asyncronous\ pre-\/init}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00418}00418\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00419}00419\ \ \ \ \ \ \ \ \ socket\_con\_type::pre\_init(}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00420}00420\ \ \ \ \ \ \ \ \ \ \ \ \ lib::bind(}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00421}00421\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a27730f6446dd626f40b17ad1b26e5b77}{type::handle\_pre\_init}},}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00422}00422\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_ac190efbc8cfd2654bc07b5b9382c36cc}{get\_shared}}(),}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00423}00423\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ callback,}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00424}00424\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lib::placeholders::\_1}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00425}00425\ \ \ \ \ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00426}00426\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00427}00427\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00428}00428\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00430}00430\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00437}\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a2397c24d0ab9b344d70328788de721d4}{00437}}\ \ \ \ \ lib::error\_code\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a2397c24d0ab9b344d70328788de721d4}{proxy\_init}}(std::string\ \textcolor{keyword}{const}\ \&\ authority)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00438}00438\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!m\_proxy\_data)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00439}00439\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a3344622df8c36e8ae03c59164e7b5e89}{websocketpp::error::make\_error\_code}}(}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00440}00440\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da7566c083efb2833cbe99e6f4bda75882}{websocketpp::error::invalid\_state}});}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00441}00441\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00442}00442\ \ \ \ \ \ \ \ \ m\_proxy\_data-\/>req.set\_version(\textcolor{stringliteral}{"{}HTTP/1.1"{}});}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00443}00443\ \ \ \ \ \ \ \ \ m\_proxy\_data-\/>req.set\_method(\textcolor{stringliteral}{"{}CONNECT"{}});}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00444}00444\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00445}00445\ \ \ \ \ \ \ \ \ m\_proxy\_data-\/>req.set\_uri(authority);}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00446}00446\ \ \ \ \ \ \ \ \ m\_proxy\_data-\/>req.replace\_header(\textcolor{stringliteral}{"{}Host"{}},authority);}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00447}00447\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00448}00448\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ lib::error\_code();}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00449}00449\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00450}00450\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00452}00452\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00461}\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a6432e2cbcb4e7781a6910dd7c9aa05e6}{00461}}\ \ \ \ \ lib::error\_code\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a6432e2cbcb4e7781a6910dd7c9aa05e6}{init\_asio}}\ (\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_aaeeac719b46cae4abf53bc6303b00e82}{io\_service\_ptr}}\ io\_service)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00462}00462\ \ \ \ \ \ \ \ \ m\_io\_service\ =\ io\_service;}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00463}00463\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00464}00464\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (config::enable\_multithreading)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00465}00465\ \ \ \ \ \ \ \ \ \ \ \ \ m\_strand\ =\ lib::make\_shared<lib::asio::io\_service::strand>(*io\_service);}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00466}00466\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00467}00467\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00468}00468\ \ \ \ \ \ \ \ \ lib::error\_code\ ec\ =\ socket\_con\_type::init\_asio(io\_service,\ m\_strand,}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00469}00469\ \ \ \ \ \ \ \ \ \ \ \ \ m\_is\_server);}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00470}00470\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00471}00471\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ec;}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00472}00472\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00473}00473\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00474}\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a27730f6446dd626f40b17ad1b26e5b77}{00474}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a27730f6446dd626f40b17ad1b26e5b77}{handle\_pre\_init}}(\mbox{\hyperlink{namespacewebsocketpp_1_1transport_aeae75e675c1a334b3b33ab7120b480a5}{init\_handler}}\ callback,\ lib::error\_code\ \textcolor{keyword}{const}\ \&\ ec)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00475}00475\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (m\_alog.static\_test(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}{log::alevel::devel}}))\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00476}00476\ \ \ \ \ \ \ \ \ \ \ \ \ m\_alog.write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}{log::alevel::devel}},\textcolor{stringliteral}{"{}asio\ connection\ handle\ pre\_init"{}});}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00477}00477\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00478}00478\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00479}00479\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (m\_tcp\_pre\_init\_handler)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00480}00480\ \ \ \ \ \ \ \ \ \ \ \ \ m\_tcp\_pre\_init\_handler(m\_connection\_hdl);}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00481}00481\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00482}00482\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00483}00483\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ec)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00484}00484\ \ \ \ \ \ \ \ \ \ \ \ \ callback(ec);}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00485}00485\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00486}00486\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00487}00487\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ we\ have\ a\ proxy\ set\ issue\ a\ proxy\ connect,\ otherwise\ skip\ to}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00488}00488\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ post\_init}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00489}00489\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!m\_proxy.empty())\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00490}00490\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a55e3fac0ec05389d6765a6496922f099}{proxy\_write}}(callback);}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00491}00491\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00492}00492\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_ad640e3f3123494ba1e58ad9842c46169}{post\_init}}(callback);}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00493}00493\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00494}00494\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00495}00495\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00496}\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_ad640e3f3123494ba1e58ad9842c46169}{00496}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_ad640e3f3123494ba1e58ad9842c46169}{post\_init}}(\mbox{\hyperlink{namespacewebsocketpp_1_1transport_aeae75e675c1a334b3b33ab7120b480a5}{init\_handler}}\ callback)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00497}00497\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (m\_alog.static\_test(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}{log::alevel::devel}}))\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00498}00498\ \ \ \ \ \ \ \ \ \ \ \ \ m\_alog.write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}{log::alevel::devel}},\textcolor{stringliteral}{"{}asio\ connection\ post\_init"{}});}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00499}00499\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00500}00500\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00501}00501\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a85df849fb3f9bfd5289a549f08864ccd}{timer\_ptr}}\ post\_timer;}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00502}00502\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00503}00503\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (config::timeout\_socket\_post\_init\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00504}00504\ \ \ \ \ \ \ \ \ \ \ \ \ post\_timer\ =\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_ab9db04550ee6b3dd2643cd7d23cda3f1}{set\_timer}}(}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00505}00505\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ config::timeout\_socket\_post\_init,}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00506}00506\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lib::bind(}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00507}00507\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a8c21e2814d440c6fe49a4514f6cf5ff1}{type::handle\_post\_init\_timeout}},}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00508}00508\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_ac190efbc8cfd2654bc07b5b9382c36cc}{get\_shared}}(),}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00509}00509\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ post\_timer,}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00510}00510\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ callback,}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00511}00511\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lib::placeholders::\_1}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00512}00512\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00513}00513\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00514}00514\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00515}00515\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00516}00516\ \ \ \ \ \ \ \ \ socket\_con\_type::post\_init(}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00517}00517\ \ \ \ \ \ \ \ \ \ \ \ \ lib::bind(}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00518}00518\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a6782049b9d8b324d85da34dd9e426950}{type::handle\_post\_init}},}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00519}00519\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_ac190efbc8cfd2654bc07b5b9382c36cc}{get\_shared}}(),}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00520}00520\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ post\_timer,}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00521}00521\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ callback,}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00522}00522\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lib::placeholders::\_1}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00523}00523\ \ \ \ \ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00524}00524\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00525}00525\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00526}00526\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00528}00528\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00536}\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a8c21e2814d440c6fe49a4514f6cf5ff1}{00536}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a8c21e2814d440c6fe49a4514f6cf5ff1}{handle\_post\_init\_timeout}}(\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a85df849fb3f9bfd5289a549f08864ccd}{timer\_ptr}},\ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_aeae75e675c1a334b3b33ab7120b480a5}{init\_handler}}\ callback,}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00537}00537\ \ \ \ \ \ \ \ \ lib::error\_code\ \textcolor{keyword}{const}\ \&\ ec)}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00538}00538\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00539}00539\ \ \ \ \ \ \ \ \ lib::error\_code\ ret\_ec;}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00540}00540\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00541}00541\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ec)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00542}00542\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ec\ ==\ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0a887436887a8732e48f7c67bd85bb6f64}{transport::error::operation\_aborted}})\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00543}00543\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_alog.write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}{log::alevel::devel}},}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00544}00544\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}asio\ post\ init\ timer\ cancelled"{}});}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00545}00545\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00546}00546\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00547}00547\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00548}00548\ \ \ \ \ \ \ \ \ \ \ \ \ log\_err(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1elevel_a0b1dbc650c6f2711522c096496423726}{log::elevel::devel}},\textcolor{stringliteral}{"{}asio\ handle\_post\_init\_timeout"{}},ec);}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00549}00549\ \ \ \ \ \ \ \ \ \ \ \ \ ret\_ec\ =\ ec;}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00550}00550\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00551}00551\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (socket\_con\_type::get\_ec())\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00552}00552\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ret\_ec\ =\ socket\_con\_type::get\_ec();}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00553}00553\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00554}00554\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ret\_ec\ =\ make\_error\_code(\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0a0e2f0627b4105746429d747f6137b37e}{transport::error::timeout}});}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00555}00555\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00556}00556\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00557}00557\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00558}00558\ \ \ \ \ \ \ \ \ m\_alog.write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}{log::alevel::devel}},\ \textcolor{stringliteral}{"{}Asio\ transport\ post-\/init\ timed\ out"{}});}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00559}00559\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_ac4b63fadf2083ab4656ab7f1a47d3b5d}{cancel\_socket\_checked}}();}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00560}00560\ \ \ \ \ \ \ \ \ callback(ret\_ec);}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00561}00561\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00562}00562\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00564}00564\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00572}\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a6782049b9d8b324d85da34dd9e426950}{00572}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a6782049b9d8b324d85da34dd9e426950}{handle\_post\_init}}(\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a85df849fb3f9bfd5289a549f08864ccd}{timer\_ptr}}\ post\_timer,\ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_aeae75e675c1a334b3b33ab7120b480a5}{init\_handler}}\ callback,}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00573}00573\ \ \ \ \ \ \ \ \ lib::error\_code\ \textcolor{keyword}{const}\ \&\ ec)}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00574}00574\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00575}00575\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ec\ ==\ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0a887436887a8732e48f7c67bd85bb6f64}{transport::error::operation\_aborted}}\ ||}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00576}00576\ \ \ \ \ \ \ \ \ \ \ \ \ (post\_timer\ \&\&\ \mbox{\hyperlink{namespacewebsocketpp_1_1lib_1_1asio_a1096d9d4bcff306bf568ba95842142b5}{lib::asio::is\_neg}}(post\_timer-\/>expires\_from\_now())))}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00577}00577\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00578}00578\ \ \ \ \ \ \ \ \ \ \ \ \ m\_alog.write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}{log::alevel::devel}},\textcolor{stringliteral}{"{}post\_init\ cancelled"{}});}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00579}00579\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00580}00580\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00581}00581\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00582}00582\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (post\_timer)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00583}00583\ \ \ \ \ \ \ \ \ \ \ \ \ post\_timer-\/>cancel();}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00584}00584\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00585}00585\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00586}00586\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (m\_alog.static\_test(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}{log::alevel::devel}}))\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00587}00587\ \ \ \ \ \ \ \ \ \ \ \ \ m\_alog.write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}{log::alevel::devel}},\textcolor{stringliteral}{"{}asio\ connection\ handle\_post\_init"{}});}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00588}00588\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00589}00589\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00590}00590\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (m\_tcp\_post\_init\_handler)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00591}00591\ \ \ \ \ \ \ \ \ \ \ \ \ m\_tcp\_post\_init\_handler(m\_connection\_hdl);}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00592}00592\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00593}00593\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00594}00594\ \ \ \ \ \ \ \ \ callback(ec);}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00595}00595\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00596}00596\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00597}\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a55e3fac0ec05389d6765a6496922f099}{00597}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a55e3fac0ec05389d6765a6496922f099}{proxy\_write}}(\mbox{\hyperlink{namespacewebsocketpp_1_1transport_aeae75e675c1a334b3b33ab7120b480a5}{init\_handler}}\ callback)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00598}00598\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (m\_alog.static\_test(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}{log::alevel::devel}}))\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00599}00599\ \ \ \ \ \ \ \ \ \ \ \ \ m\_alog.write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}{log::alevel::devel}},\textcolor{stringliteral}{"{}asio\ connection\ proxy\_write"{}});}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00600}00600\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00601}00601\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00602}00602\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!m\_proxy\_data)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00603}00603\ \ \ \ \ \ \ \ \ \ \ \ \ m\_elog.write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1elevel_a2b862d4f143d9b77619ddbacd1763674}{log::elevel::library}},}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00604}00604\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}assertion\ failed:\ !m\_proxy\_data\ in\ asio::connection::proxy\_write"{}});}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00605}00605\ \ \ \ \ \ \ \ \ \ \ \ \ callback(make\_error\_code(\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1asio_1_1error_aeb44b27fc0ffac2a8991bf629cbfd045a883593fb292745d5e7dc0edb402fd23a}{error::general}}));}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00606}00606\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00607}00607\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00608}00608\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00609}00609\ \ \ \ \ \ \ \ \ m\_proxy\_data-\/>write\_buf\ =\ m\_proxy\_data-\/>req.raw();}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00610}00610\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00611}00611\ \ \ \ \ \ \ \ \ m\_bufs.push\_back(lib::asio::buffer(m\_proxy\_data-\/>write\_buf.data(),}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00612}00612\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_proxy\_data-\/>write\_buf.size()));}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00613}00613\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00614}00614\ \ \ \ \ \ \ \ \ m\_alog.write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}{log::alevel::devel}},m\_proxy\_data-\/>write\_buf);}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00615}00615\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00616}00616\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Set\ a\ timer\ so\ we\ don't\ wait\ forever\ for\ the\ proxy\ to\ respond}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00617}00617\ \ \ \ \ \ \ \ \ m\_proxy\_data-\/>timer\ =\ this-\/>\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_ab9db04550ee6b3dd2643cd7d23cda3f1}{set\_timer}}(}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00618}00618\ \ \ \ \ \ \ \ \ \ \ \ \ m\_proxy\_data-\/>timeout\_proxy,}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00619}00619\ \ \ \ \ \ \ \ \ \ \ \ \ lib::bind(}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00620}00620\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a5bf6d19bdada66f4880182f632fe88e0}{type::handle\_proxy\_timeout}},}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00621}00621\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_ac190efbc8cfd2654bc07b5b9382c36cc}{get\_shared}}(),}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00622}00622\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ callback,}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00623}00623\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lib::placeholders::\_1}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00624}00624\ \ \ \ \ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00625}00625\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00626}00626\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00627}00627\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Send\ proxy\ request}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00628}00628\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (config::enable\_multithreading)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00629}00629\ \ \ \ \ \ \ \ \ \ \ \ \ lib::asio::async\_write(}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00630}00630\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ socket\_con\_type::get\_next\_layer(),}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00631}00631\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_bufs,}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00632}00632\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_strand-\/>wrap(lib::bind(}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00633}00633\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a5684daf9e8ee3e0447694d4376832917}{type::handle\_proxy\_write}},\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_ac190efbc8cfd2654bc07b5b9382c36cc}{get\_shared}}(),}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00634}00634\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ callback,}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00635}00635\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lib::placeholders::\_1}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00636}00636\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ))}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00637}00637\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00638}00638\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00639}00639\ \ \ \ \ \ \ \ \ \ \ \ \ lib::asio::async\_write(}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00640}00640\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ socket\_con\_type::get\_next\_layer(),}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00641}00641\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_bufs,}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00642}00642\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lib::bind(}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00643}00643\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a5684daf9e8ee3e0447694d4376832917}{type::handle\_proxy\_write}},\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_ac190efbc8cfd2654bc07b5b9382c36cc}{get\_shared}}(),}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00644}00644\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ callback,}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00645}00645\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lib::placeholders::\_1}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00646}00646\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00647}00647\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00648}00648\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00649}00649\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00650}00650\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00651}\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a5bf6d19bdada66f4880182f632fe88e0}{00651}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a5bf6d19bdada66f4880182f632fe88e0}{handle\_proxy\_timeout}}(\mbox{\hyperlink{namespacewebsocketpp_1_1transport_aeae75e675c1a334b3b33ab7120b480a5}{init\_handler}}\ callback,\ lib::error\_code\ \textcolor{keyword}{const}\ \&\ ec)}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00652}00652\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00653}00653\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ec\ ==\ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0a887436887a8732e48f7c67bd85bb6f64}{transport::error::operation\_aborted}})\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00654}00654\ \ \ \ \ \ \ \ \ \ \ \ \ m\_alog.write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}{log::alevel::devel}},}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00655}00655\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}asio\ handle\_proxy\_write\ timer\ cancelled"{}});}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00656}00656\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00657}00657\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (ec)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00658}00658\ \ \ \ \ \ \ \ \ \ \ \ \ log\_err(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1elevel_a0b1dbc650c6f2711522c096496423726}{log::elevel::devel}},\textcolor{stringliteral}{"{}asio\ handle\_proxy\_write"{}},ec);}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00659}00659\ \ \ \ \ \ \ \ \ \ \ \ \ callback(ec);}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00660}00660\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00661}00661\ \ \ \ \ \ \ \ \ \ \ \ \ m\_alog.write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}{log::alevel::devel}},}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00662}00662\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}asio\ handle\_proxy\_write\ timer\ expired"{}});}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00663}00663\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_ac4b63fadf2083ab4656ab7f1a47d3b5d}{cancel\_socket\_checked}}();}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00664}00664\ \ \ \ \ \ \ \ \ \ \ \ \ callback(make\_error\_code(\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0a0e2f0627b4105746429d747f6137b37e}{transport::error::timeout}}));}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00665}00665\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00666}00666\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00667}00667\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00668}\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a5684daf9e8ee3e0447694d4376832917}{00668}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a5684daf9e8ee3e0447694d4376832917}{handle\_proxy\_write}}(\mbox{\hyperlink{namespacewebsocketpp_1_1transport_aeae75e675c1a334b3b33ab7120b480a5}{init\_handler}}\ callback,}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00669}00669\ \ \ \ \ \ \ \ \ lib::asio::error\_code\ \textcolor{keyword}{const}\ \&\ ec)}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00670}00670\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00671}00671\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (m\_alog.static\_test(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}{log::alevel::devel}}))\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00672}00672\ \ \ \ \ \ \ \ \ \ \ \ \ m\_alog.write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}{log::alevel::devel}},}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00673}00673\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}asio\ connection\ handle\_proxy\_write"{}});}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00674}00674\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00675}00675\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00676}00676\ \ \ \ \ \ \ \ \ m\_bufs.clear();}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00677}00677\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00678}00678\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Timer\ expired\ or\ the\ operation\ was\ aborted\ for\ some\ reason.}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00679}00679\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Whatever\ aborted\ it\ will\ be\ issuing\ the\ callback\ so\ we\ are\ safe\ to}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00680}00680\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ return}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00681}00681\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ec\ ==\ lib::asio::error::operation\_aborted\ ||}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00682}00682\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1lib_1_1asio_a1096d9d4bcff306bf568ba95842142b5}{lib::asio::is\_neg}}(m\_proxy\_data-\/>timer-\/>expires\_from\_now()))}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00683}00683\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00684}00684\ \ \ \ \ \ \ \ \ \ \ \ \ m\_elog.write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1elevel_a0b1dbc650c6f2711522c096496423726}{log::elevel::devel}},\textcolor{stringliteral}{"{}write\ operation\ aborted"{}});}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00685}00685\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00686}00686\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00687}00687\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00688}00688\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ec)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00689}00689\ \ \ \ \ \ \ \ \ \ \ \ \ log\_err(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1elevel_a3ab47987a682f0de7b1d0df8c9c3b9d2}{log::elevel::info}},\textcolor{stringliteral}{"{}asio\ handle\_proxy\_write"{}},ec);}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00690}00690\ \ \ \ \ \ \ \ \ \ \ \ \ m\_proxy\_data-\/>timer-\/>cancel();}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00691}00691\ \ \ \ \ \ \ \ \ \ \ \ \ callback(ec);}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00692}00692\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00693}00693\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00694}00694\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00695}00695\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a37efcf4f20e4291bb62174cdd4093730}{proxy\_read}}(callback);}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00696}00696\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00697}00697\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00698}\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a37efcf4f20e4291bb62174cdd4093730}{00698}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a37efcf4f20e4291bb62174cdd4093730}{proxy\_read}}(\mbox{\hyperlink{namespacewebsocketpp_1_1transport_aeae75e675c1a334b3b33ab7120b480a5}{init\_handler}}\ callback)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00699}00699\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (m\_alog.static\_test(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}{log::alevel::devel}}))\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00700}00700\ \ \ \ \ \ \ \ \ \ \ \ \ m\_alog.write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}{log::alevel::devel}},\textcolor{stringliteral}{"{}asio\ connection\ proxy\_read"{}});}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00701}00701\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00702}00702\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00703}00703\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!m\_proxy\_data)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00704}00704\ \ \ \ \ \ \ \ \ \ \ \ \ m\_elog.write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1elevel_a2b862d4f143d9b77619ddbacd1763674}{log::elevel::library}},}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00705}00705\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}assertion\ failed:\ !m\_proxy\_data\ in\ asio::connection::proxy\_read"{}});}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00706}00706\ \ \ \ \ \ \ \ \ \ \ \ \ m\_proxy\_data-\/>timer-\/>cancel();}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00707}00707\ \ \ \ \ \ \ \ \ \ \ \ \ callback(make\_error\_code(\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1asio_1_1error_aeb44b27fc0ffac2a8991bf629cbfd045a883593fb292745d5e7dc0edb402fd23a}{error::general}}));}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00708}00708\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00709}00709\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00710}00710\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00711}00711\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (config::enable\_multithreading)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00712}00712\ \ \ \ \ \ \ \ \ \ \ \ \ lib::asio::async\_read\_until(}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00713}00713\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ socket\_con\_type::get\_next\_layer(),}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00714}00714\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_proxy\_data-\/>read\_buf,}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00715}00715\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)n"{}},}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00716}00716\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_strand-\/>wrap(lib::bind(}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00717}00717\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_abb5b33cf14e1f84aa5997e1fe8bffa0e}{type::handle\_proxy\_read}},\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_ac190efbc8cfd2654bc07b5b9382c36cc}{get\_shared}}(),}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00718}00718\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ callback,}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00719}00719\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lib::placeholders::\_1,\ lib::placeholders::\_2}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00720}00720\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ))}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00721}00721\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00722}00722\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00723}00723\ \ \ \ \ \ \ \ \ \ \ \ \ lib::asio::async\_read\_until(}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00724}00724\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ socket\_con\_type::get\_next\_layer(),}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00725}00725\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_proxy\_data-\/>read\_buf,}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00726}00726\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)n"{}},}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00727}00727\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lib::bind(}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00728}00728\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_abb5b33cf14e1f84aa5997e1fe8bffa0e}{type::handle\_proxy\_read}},\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_ac190efbc8cfd2654bc07b5b9382c36cc}{get\_shared}}(),}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00729}00729\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ callback,}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00730}00730\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lib::placeholders::\_1,\ lib::placeholders::\_2}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00731}00731\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00732}00732\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00733}00733\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00734}00734\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00735}00735\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00737}00737\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00742}\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_abb5b33cf14e1f84aa5997e1fe8bffa0e}{00742}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_abb5b33cf14e1f84aa5997e1fe8bffa0e}{handle\_proxy\_read}}(\mbox{\hyperlink{namespacewebsocketpp_1_1transport_aeae75e675c1a334b3b33ab7120b480a5}{init\_handler}}\ callback,}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00743}00743\ \ \ \ \ \ \ \ \ lib::asio::error\_code\ \textcolor{keyword}{const}\ \&\ ec,\ \textcolor{keywordtype}{size\_t})}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00744}00744\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00745}00745\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (m\_alog.static\_test(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}{log::alevel::devel}}))\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00746}00746\ \ \ \ \ \ \ \ \ \ \ \ \ m\_alog.write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}{log::alevel::devel}},}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00747}00747\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}asio\ connection\ handle\_proxy\_read"{}});}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00748}00748\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00749}00749\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00750}00750\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Timer\ expired\ or\ the\ operation\ was\ aborted\ for\ some\ reason.}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00751}00751\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Whatever\ aborted\ it\ will\ be\ issuing\ the\ callback\ so\ we\ are\ safe\ to}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00752}00752\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ return}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00753}00753\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ec\ ==\ lib::asio::error::operation\_aborted\ ||}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00754}00754\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1lib_1_1asio_a1096d9d4bcff306bf568ba95842142b5}{lib::asio::is\_neg}}(m\_proxy\_data-\/>timer-\/>expires\_from\_now()))}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00755}00755\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00756}00756\ \ \ \ \ \ \ \ \ \ \ \ \ m\_elog.write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1elevel_a0b1dbc650c6f2711522c096496423726}{log::elevel::devel}},\textcolor{stringliteral}{"{}read\ operation\ aborted"{}});}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00757}00757\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00758}00758\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00759}00759\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00760}00760\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ At\ this\ point\ there\ is\ no\ need\ to\ wait\ for\ the\ timer\ anymore}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00761}00761\ \ \ \ \ \ \ \ \ m\_proxy\_data-\/>timer-\/>cancel();}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00762}00762\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00763}00763\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ec)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00764}00764\ \ \ \ \ \ \ \ \ \ \ \ \ m\_elog.write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1elevel_a3ab47987a682f0de7b1d0df8c9c3b9d2}{log::elevel::info}},}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00765}00765\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}asio\ handle\_proxy\_read\ error:\ "{}}+ec.message());}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00766}00766\ \ \ \ \ \ \ \ \ \ \ \ \ callback(ec);}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00767}00767\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00768}00768\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!m\_proxy\_data)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00769}00769\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_elog.write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1elevel_a2b862d4f143d9b77619ddbacd1763674}{log::elevel::library}},}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00770}00770\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}assertion\ failed:\ !m\_proxy\_data\ in\ asio::connection::handle\_proxy\_read"{}});}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00771}00771\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ callback(make\_error\_code(\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1asio_1_1error_aeb44b27fc0ffac2a8991bf629cbfd045a883593fb292745d5e7dc0edb402fd23a}{error::general}}));}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00772}00772\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00773}00773\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00774}00774\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00775}00775\ \ \ \ \ \ \ \ \ \ \ \ \ std::istream\ input(\&m\_proxy\_data-\/>read\_buf);}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00776}00776\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00777}00777\ \ \ \ \ \ \ \ \ \ \ \ \ m\_proxy\_data-\/>res.consume(input);}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00778}00778\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00779}00779\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!m\_proxy\_data-\/>res.headers\_ready())\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00780}00780\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ we\ read\ until\ the\ headers\ were\ done\ in\ theory\ but\ apparently}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00781}00781\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ they\ aren't.\ Internal\ endpoint\ error.}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00782}00782\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ callback(make\_error\_code(\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1asio_1_1error_aeb44b27fc0ffac2a8991bf629cbfd045a883593fb292745d5e7dc0edb402fd23a}{error::general}}));}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00783}00783\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00784}00784\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00785}00785\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00786}00786\ \ \ \ \ \ \ \ \ \ \ \ \ m\_alog.write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}{log::alevel::devel}},m\_proxy\_data-\/>res.raw());}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00787}00787\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00788}00788\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (m\_proxy\_data-\/>res.get\_status\_code()\ !=\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1status__code_ae0d61c309e053ee5673517b54e2886c6a289caa931313b2f373b33032e3661733}{http::status\_code::ok}})\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00789}00789\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ got\ an\ error\ response\ back}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00790}00790\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ TODO:\ expose\ this\ error\ in\ a\ programmatically\ accessible\ way?}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00791}00791\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ if\ so,\ see\ below\ for\ an\ option\ on\ how\ to\ do\ this.}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00792}00792\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::stringstream\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00793}00793\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ <<\ \textcolor{stringliteral}{"{}Proxy\ connection\ error:\ "{}}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00794}00794\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ m\_proxy\_data-\/>res.get\_status\_code()}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00795}00795\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\ ("{}}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00796}00796\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ m\_proxy\_data-\/>res.get\_status\_msg()}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00797}00797\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{})"{}};}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00798}00798\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_elog.write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1elevel_a3ab47987a682f0de7b1d0df8c9c3b9d2}{log::elevel::info}},\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.str());}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00799}00799\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ callback(make\_error\_code(\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1asio_1_1error_aeb44b27fc0ffac2a8991bf629cbfd045a70868b579b442f39074623c5072f86a0}{error::proxy\_failed}}));}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00800}00800\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00801}00801\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00802}00802\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00803}00803\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ we\ have\ successfully\ established\ a\ connection\ to\ the\ proxy,\ now}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00804}00804\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ we\ can\ continue\ and\ the\ proxy\ will\ transparently\ forward\ the}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00805}00805\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ WebSocket\ connection.}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00806}00806\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00807}00807\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ TODO:\ decide\ if\ we\ want\ an\ on\_proxy\ callback\ that\ would\ allow}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00808}00808\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ access\ to\ the\ proxy\ response.}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00809}00809\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00810}00810\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ free\ the\ proxy\ buffers\ and\ req/res\ objects\ as\ they\ aren't\ needed}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00811}00811\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ anymore}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00812}00812\ \ \ \ \ \ \ \ \ \ \ \ \ m\_proxy\_data.reset();}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00813}00813\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00814}00814\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Continue\ with\ post\ proxy\ initialization}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00815}00815\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_ad640e3f3123494ba1e58ad9842c46169}{post\_init}}(callback);}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00816}00816\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00817}00817\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00818}00818\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00820}\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a1ed9a4a93e753c4b84118760195f484c}{00820}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a1ed9a4a93e753c4b84118760195f484c}{async\_read\_at\_least}}(\textcolor{keywordtype}{size\_t}\ num\_bytes,\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00821}00821\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_a3a9b2ed54dfcc6ebe7d7e6b4c02f53fb}{read\_handler}}\ handler)}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00822}00822\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00823}00823\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (m\_alog.static\_test(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}{log::alevel::devel}}))\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00824}00824\ \ \ \ \ \ \ \ \ \ \ \ \ std::stringstream\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00825}00825\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ <<\ \textcolor{stringliteral}{"{}asio\ async\_read\_at\_least:\ "{}}\ <<\ num\_bytes;}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00826}00826\ \ \ \ \ \ \ \ \ \ \ \ \ m\_alog.write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}{log::alevel::devel}},\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.str());}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00827}00827\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00828}00828\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00829}00829\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ TODO:\ safety\ vs\ speed\ ?}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00830}00830\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ maybe\ move\ into\ an\ if\ devel\ block}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00831}00831\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*if\ (num\_bytes\ >\ len)\ \{}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00832}00832\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ m\_elog.write(log::elevel::devel,}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00833}00833\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "{}asio\ async\_read\_at\_least\ error::invalid\_num\_bytes"{});}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00834}00834\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ handler(make\_error\_code(transport::error::invalid\_num\_bytes),}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00835}00835\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ size\_t(0));}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00836}00836\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ return;}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00837}00837\ \textcolor{comment}{\ \ \ \ \ \ \ \ \}*/}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00838}00838\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00839}00839\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (config::enable\_multithreading)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00840}00840\ \ \ \ \ \ \ \ \ \ \ \ \ lib::asio::async\_read(}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00841}00841\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ socket\_con\_type::get\_socket(),}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00842}00842\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lib::asio::buffer(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}),}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00843}00843\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lib::asio::transfer\_at\_least(num\_bytes),}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00844}00844\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_strand-\/>wrap(\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1asio_ae1d60a52c0f07b90a75d36a3dcaac589}{make\_custom\_alloc\_handler}}(}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00845}00845\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_read\_handler\_allocator,}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00846}00846\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lib::bind(}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00847}00847\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a0f3c75498e3ff2246b6842fc8cb4711b}{type::handle\_async\_read}},\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_ac190efbc8cfd2654bc07b5b9382c36cc}{get\_shared}}(),}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00848}00848\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ handler,}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00849}00849\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lib::placeholders::\_1,\ lib::placeholders::\_2}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00850}00850\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00851}00851\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ))}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00852}00852\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00853}00853\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00854}00854\ \ \ \ \ \ \ \ \ \ \ \ \ lib::asio::async\_read(}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00855}00855\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ socket\_con\_type::get\_socket(),}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00856}00856\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lib::asio::buffer(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}),}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00857}00857\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lib::asio::transfer\_at\_least(num\_bytes),}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00858}00858\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1asio_ae1d60a52c0f07b90a75d36a3dcaac589}{make\_custom\_alloc\_handler}}(}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00859}00859\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_read\_handler\_allocator,}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00860}00860\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lib::bind(}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00861}00861\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a0f3c75498e3ff2246b6842fc8cb4711b}{type::handle\_async\_read}},\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_ac190efbc8cfd2654bc07b5b9382c36cc}{get\_shared}}(),}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00862}00862\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ handler,}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00863}00863\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lib::placeholders::\_1,\ lib::placeholders::\_2}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00864}00864\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00865}00865\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00866}00866\ \ \ \ \ \ \ \ \ \ \ \ \ );\ \ \ \ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00867}00867\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00868}00868\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00869}00869\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00870}00870\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00871}\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a0f3c75498e3ff2246b6842fc8cb4711b}{00871}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a0f3c75498e3ff2246b6842fc8cb4711b}{handle\_async\_read}}(\mbox{\hyperlink{namespacewebsocketpp_1_1transport_a3a9b2ed54dfcc6ebe7d7e6b4c02f53fb}{read\_handler}}\ handler,\ lib::asio::error\_code\ \textcolor{keyword}{const}\ \&\ ec,}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00872}00872\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ bytes\_transferred)}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00873}00873\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00874}00874\ \ \ \ \ \ \ \ \ m\_alog.write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}{log::alevel::devel}},\ \textcolor{stringliteral}{"{}asio\ con\ handle\_async\_read"{}});}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00875}00875\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00876}00876\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ translate\ asio\ error\ codes\ into\ more\ lib::error\_codes}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00877}00877\ \ \ \ \ \ \ \ \ lib::error\_code\ tec;}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00878}00878\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ec\ ==\ lib::asio::error::eof)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00879}00879\ \ \ \ \ \ \ \ \ \ \ \ \ tec\ =\ make\_error\_code(\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0a73dd0d0f22cd67b7bcc031cd6bdef743}{transport::error::eof}});}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00880}00880\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (ec)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00881}00881\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ We\ don't\ know\ much\ more\ about\ the\ error\ at\ this\ point.\ As\ our}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00882}00882\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ socket/security\ policy\ if\ it\ knows\ more:}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00883}00883\ \ \ \ \ \ \ \ \ \ \ \ \ tec\ =\ socket\_con\_type::translate\_ec(ec);}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00884}00884\ \ \ \ \ \ \ \ \ \ \ \ \ m\_tec\ =\ ec;}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00885}00885\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00886}00886\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (tec\ ==\ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0a8e68893bc224f55aae654318734dcd40}{transport::error::tls\_error}}\ ||}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00887}00887\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ tec\ ==\ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0a6a7cb8ef776c9eabe2324a529e991732}{transport::error::pass\_through}})}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00888}00888\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00889}00889\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ These\ are\ aggregate/catch\ all\ errors.\ Log\ some\ human\ readable}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00890}00890\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ information\ to\ the\ info\ channel\ to\ give\ library\ users\ some}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00891}00891\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ more\ details\ about\ why\ the\ upstream\ method\ may\ have\ failed.}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00892}00892\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ log\_err(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1elevel_a3ab47987a682f0de7b1d0df8c9c3b9d2}{log::elevel::info}},\textcolor{stringliteral}{"{}asio\ async\_read\_at\_least"{}},ec);}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00893}00893\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00894}00894\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00895}00895\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (handler)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00896}00896\ \ \ \ \ \ \ \ \ \ \ \ \ handler(tec,bytes\_transferred);}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00897}00897\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00898}00898\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ This\ can\ happen\ in\ cases\ where\ the\ connection\ is\ terminated\ while}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00899}00899\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ the\ transport\ is\ waiting\ on\ a\ read.}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00900}00900\ \ \ \ \ \ \ \ \ \ \ \ \ m\_alog.write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}{log::alevel::devel}},}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00901}00901\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}handle\_async\_read\ called\ with\ null\ read\ handler"{}});}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00902}00902\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00903}00903\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00904}00904\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00906}\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a9c17ab9142868c2dd2ff74c478173bb3}{00906}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a9c17ab9142868c2dd2ff74c478173bb3}{async\_write}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_addf5d728159e7aa2bce2a0df947b1560}{write\_handler}}\ handler)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00907}00907\ \ \ \ \ \ \ \ \ m\_bufs.push\_back(lib::asio::buffer(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}));}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00908}00908\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00909}00909\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (config::enable\_multithreading)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00910}00910\ \ \ \ \ \ \ \ \ \ \ \ \ lib::asio::async\_write(}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00911}00911\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ socket\_con\_type::get\_socket(),}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00912}00912\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_bufs,}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00913}00913\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_strand-\/>wrap(\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1asio_ae1d60a52c0f07b90a75d36a3dcaac589}{make\_custom\_alloc\_handler}}(}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00914}00914\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_write\_handler\_allocator,}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00915}00915\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lib::bind(}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00916}00916\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a5f0bb67448323c4653f564397dcb0fe8}{type::handle\_async\_write}},\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_ac190efbc8cfd2654bc07b5b9382c36cc}{get\_shared}}(),}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00917}00917\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ handler,}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00918}00918\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lib::placeholders::\_1,\ lib::placeholders::\_2}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00919}00919\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00920}00920\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ))}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00921}00921\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00922}00922\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00923}00923\ \ \ \ \ \ \ \ \ \ \ \ \ lib::asio::async\_write(}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00924}00924\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ socket\_con\_type::get\_socket(),}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00925}00925\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_bufs,}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00926}00926\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1asio_ae1d60a52c0f07b90a75d36a3dcaac589}{make\_custom\_alloc\_handler}}(}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00927}00927\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_write\_handler\_allocator,}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00928}00928\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lib::bind(}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00929}00929\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a5f0bb67448323c4653f564397dcb0fe8}{type::handle\_async\_write}},\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_ac190efbc8cfd2654bc07b5b9382c36cc}{get\_shared}}(),}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00930}00930\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ handler,}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00931}00931\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lib::placeholders::\_1,\ lib::placeholders::\_2}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00932}00932\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00933}00933\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00934}00934\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00935}00935\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00936}00936\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00937}00937\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00939}\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a9f62627d2a0fd05278a0fb1d8761911b}{00939}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a9f62627d2a0fd05278a0fb1d8761911b}{async\_write}}(std::vector<buffer>\ \textcolor{keyword}{const}\ \&\ bufs,\ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_addf5d728159e7aa2bce2a0df947b1560}{write\_handler}}\ handler)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00940}00940\ \ \ \ \ \ \ \ \ std::vector<buffer>::const\_iterator\ it;}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00941}00941\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00942}00942\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (it\ =\ bufs.begin();\ it\ !=\ bufs.end();\ ++it)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00943}00943\ \ \ \ \ \ \ \ \ \ \ \ \ m\_bufs.push\_back(lib::asio::buffer((*it).buf,(*it).len));}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00944}00944\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00945}00945\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00946}00946\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (config::enable\_multithreading)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00947}00947\ \ \ \ \ \ \ \ \ \ \ \ \ lib::asio::async\_write(}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00948}00948\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ socket\_con\_type::get\_socket(),}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00949}00949\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_bufs,}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00950}00950\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_strand-\/>wrap(\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1asio_ae1d60a52c0f07b90a75d36a3dcaac589}{make\_custom\_alloc\_handler}}(}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00951}00951\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_write\_handler\_allocator,}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00952}00952\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lib::bind(}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00953}00953\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a5f0bb67448323c4653f564397dcb0fe8}{type::handle\_async\_write}},\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_ac190efbc8cfd2654bc07b5b9382c36cc}{get\_shared}}(),}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00954}00954\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ handler,}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00955}00955\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lib::placeholders::\_1,\ lib::placeholders::\_2}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00956}00956\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00957}00957\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ))}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00958}00958\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00959}00959\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00960}00960\ \ \ \ \ \ \ \ \ \ \ \ \ lib::asio::async\_write(}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00961}00961\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ socket\_con\_type::get\_socket(),}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00962}00962\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_bufs,}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00963}00963\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1asio_ae1d60a52c0f07b90a75d36a3dcaac589}{make\_custom\_alloc\_handler}}(}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00964}00964\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_write\_handler\_allocator,}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00965}00965\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lib::bind(}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00966}00966\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a5f0bb67448323c4653f564397dcb0fe8}{type::handle\_async\_write}},\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_ac190efbc8cfd2654bc07b5b9382c36cc}{get\_shared}}(),}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00967}00967\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ handler,}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00968}00968\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lib::placeholders::\_1,\ lib::placeholders::\_2}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00969}00969\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00970}00970\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00971}00971\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00972}00972\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00973}00973\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00974}00974\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00976}00976\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00980}\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a5f0bb67448323c4653f564397dcb0fe8}{00980}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a5f0bb67448323c4653f564397dcb0fe8}{handle\_async\_write}}(\mbox{\hyperlink{namespacewebsocketpp_1_1transport_addf5d728159e7aa2bce2a0df947b1560}{write\_handler}}\ handler,\ lib::asio::error\_code\ \textcolor{keyword}{const}\ \&\ ec,\ \textcolor{keywordtype}{size\_t})\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00981}00981\ \ \ \ \ \ \ \ \ m\_bufs.clear();}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00982}00982\ \ \ \ \ \ \ \ \ lib::error\_code\ tec;}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00983}00983\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ec)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00984}00984\ \ \ \ \ \ \ \ \ \ \ \ \ log\_err(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1elevel_a3ab47987a682f0de7b1d0df8c9c3b9d2}{log::elevel::info}},\textcolor{stringliteral}{"{}asio\ async\_write"{}},ec);}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00985}00985\ \ \ \ \ \ \ \ \ \ \ \ \ tec\ =\ ec;}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00986}00986\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00987}00987\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (handler)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00988}00988\ \ \ \ \ \ \ \ \ \ \ \ \ handler(tec);}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00989}00989\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00990}00990\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ This\ can\ happen\ in\ cases\ where\ the\ connection\ is\ terminated\ while}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00991}00991\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ the\ transport\ is\ waiting\ on\ a\ read.}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00992}00992\ \ \ \ \ \ \ \ \ \ \ \ \ m\_alog.write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}{log::alevel::devel}},}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00993}00993\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}handle\_async\_write\ called\ with\ null\ write\ handler"{}});}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00994}00994\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00995}00995\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00996}00996\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l00998}00998\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01004}\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_ac6dae6a18678187b7da35f5b064c9ddd}{01004}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_ac6dae6a18678187b7da35f5b064c9ddd}{set\_handle}}(\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\_hdl}}\ hdl)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01005}01005\ \ \ \ \ \ \ \ \ m\_connection\_hdl\ =\ hdl;}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01006}01006\ \ \ \ \ \ \ \ \ socket\_con\_type::set\_handle(hdl);}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01007}01007\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01008}01008\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01010}01010\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01013}\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a2fc9b41450047e40a3b5476c0e3bf853}{01013}}\ \ \ \ \ lib::error\_code\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a2fc9b41450047e40a3b5476c0e3bf853}{interrupt}}(\mbox{\hyperlink{namespacewebsocketpp_1_1transport_a8090563b066d7e8e31f7165be18dee51}{interrupt\_handler}}\ handler)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01014}01014\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (config::enable\_multithreading)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01015}01015\ \ \ \ \ \ \ \ \ \ \ \ \ m\_io\_service-\/>post(m\_strand-\/>wrap(handler));}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01016}01016\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01017}01017\ \ \ \ \ \ \ \ \ \ \ \ \ m\_io\_service-\/>post(handler);}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01018}01018\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01019}01019\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ lib::error\_code();}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01020}01020\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01021}01021\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01022}\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a660c671234223eb60517d26bbbc0268a}{01022}}\ \ \ \ \ lib::error\_code\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a660c671234223eb60517d26bbbc0268a}{dispatch}}(\mbox{\hyperlink{namespacewebsocketpp_1_1transport_a6658447b2e10f4c712dd792aad0e0c78}{dispatch\_handler}}\ handler)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01023}01023\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (config::enable\_multithreading)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01024}01024\ \ \ \ \ \ \ \ \ \ \ \ \ m\_io\_service-\/>post(m\_strand-\/>wrap(handler));}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01025}01025\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01026}01026\ \ \ \ \ \ \ \ \ \ \ \ \ m\_io\_service-\/>post(handler);}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01027}01027\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01028}01028\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ lib::error\_code();}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01029}01029\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01030}01030\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01031}01031\ \ \ \ \ \textcolor{comment}{/*void\ handle\_interrupt(interrupt\_handler\ handler)\ \{}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01032}01032\ \textcolor{comment}{\ \ \ \ \ \ \ \ handler();}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01033}01033\ \textcolor{comment}{\ \ \ \ \}*/}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01034}01034\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01036}\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a7a3767d922bb2cc97f71dd2fb2f0e903}{01036}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a7a3767d922bb2cc97f71dd2fb2f0e903}{async\_shutdown}}(\mbox{\hyperlink{namespacewebsocketpp_1_1transport_af39aff6fc4cb76f7df0d5322b734d156}{shutdown\_handler}}\ callback)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01037}01037\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (m\_alog.static\_test(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}{log::alevel::devel}}))\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01038}01038\ \ \ \ \ \ \ \ \ \ \ \ \ m\_alog.write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}{log::alevel::devel}},\textcolor{stringliteral}{"{}asio\ connection\ async\_shutdown"{}});}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01039}01039\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01040}01040\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01041}01041\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a85df849fb3f9bfd5289a549f08864ccd}{timer\_ptr}}\ shutdown\_timer;}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01042}01042\ \ \ \ \ \ \ \ \ shutdown\_timer\ =\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_ab9db04550ee6b3dd2643cd7d23cda3f1}{set\_timer}}(}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01043}01043\ \ \ \ \ \ \ \ \ \ \ \ \ config::timeout\_socket\_shutdown,}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01044}01044\ \ \ \ \ \ \ \ \ \ \ \ \ lib::bind(}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01045}01045\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a9386ad48e8b2137987205bc4e831edfb}{type::handle\_async\_shutdown\_timeout}},}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01046}01046\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_ac190efbc8cfd2654bc07b5b9382c36cc}{get\_shared}}(),}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01047}01047\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ shutdown\_timer,}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01048}01048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ callback,}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01049}01049\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lib::placeholders::\_1}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01050}01050\ \ \ \ \ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01051}01051\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01052}01052\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01053}01053\ \ \ \ \ \ \ \ \ socket\_con\_type::async\_shutdown(}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01054}01054\ \ \ \ \ \ \ \ \ \ \ \ \ lib::bind(}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01055}01055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_ad7a28616792a3bae4dfc215ebfc640c6}{type::handle\_async\_shutdown}},}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01056}01056\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_ac190efbc8cfd2654bc07b5b9382c36cc}{get\_shared}}(),}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01057}01057\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ shutdown\_timer,}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01058}01058\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ callback,}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01059}01059\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lib::placeholders::\_1}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01060}01060\ \ \ \ \ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01061}01061\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01062}01062\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01063}01063\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01065}01065\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01070}\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a9386ad48e8b2137987205bc4e831edfb}{01070}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a9386ad48e8b2137987205bc4e831edfb}{handle\_async\_shutdown\_timeout}}(\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a85df849fb3f9bfd5289a549f08864ccd}{timer\_ptr}},\ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_aeae75e675c1a334b3b33ab7120b480a5}{init\_handler}}\ callback,\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01071}01071\ \ \ \ \ \ \ \ \ lib::error\_code\ \textcolor{keyword}{const}\ \&\ ec)}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01072}01072\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01073}01073\ \ \ \ \ \ \ \ \ lib::error\_code\ ret\_ec;}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01074}01074\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01075}01075\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ec)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01076}01076\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ec\ ==\ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0a887436887a8732e48f7c67bd85bb6f64}{transport::error::operation\_aborted}})\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01077}01077\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_alog.write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}{log::alevel::devel}},}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01078}01078\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}asio\ socket\ shutdown\ timer\ cancelled"{}});}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01079}01079\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01080}01080\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01081}01081\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01082}01082\ \ \ \ \ \ \ \ \ \ \ \ \ log\_err(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1elevel_a0b1dbc650c6f2711522c096496423726}{log::elevel::devel}},\textcolor{stringliteral}{"{}asio\ handle\_async\_shutdown\_timeout"{}},ec);}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01083}01083\ \ \ \ \ \ \ \ \ \ \ \ \ ret\_ec\ =\ ec;}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01084}01084\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01085}01085\ \ \ \ \ \ \ \ \ \ \ \ \ ret\_ec\ =\ make\_error\_code(\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0a0e2f0627b4105746429d747f6137b37e}{transport::error::timeout}});}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01086}01086\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01087}01087\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01088}01088\ \ \ \ \ \ \ \ \ m\_alog.write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}{log::alevel::devel}},}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01089}01089\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Asio\ transport\ socket\ shutdown\ timed\ out"{}});}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01090}01090\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_ac4b63fadf2083ab4656ab7f1a47d3b5d}{cancel\_socket\_checked}}();}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01091}01091\ \ \ \ \ \ \ \ \ callback(ret\_ec);}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01092}01092\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01093}01093\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01094}\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_ad7a28616792a3bae4dfc215ebfc640c6}{01094}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_ad7a28616792a3bae4dfc215ebfc640c6}{handle\_async\_shutdown}}(\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a85df849fb3f9bfd5289a549f08864ccd}{timer\_ptr}}\ shutdown\_timer,\ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_af39aff6fc4cb76f7df0d5322b734d156}{shutdown\_handler}}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01095}01095\ \ \ \ \ \ \ \ \ callback,\ lib::asio::error\_code\ \textcolor{keyword}{const}\ \&\ ec)}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01096}01096\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01097}01097\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ec\ ==\ lib::asio::error::operation\_aborted\ ||}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01098}01098\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1lib_1_1asio_a1096d9d4bcff306bf568ba95842142b5}{lib::asio::is\_neg}}(shutdown\_timer-\/>expires\_from\_now()))}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01099}01099\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01100}01100\ \ \ \ \ \ \ \ \ \ \ \ \ m\_alog.write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}{log::alevel::devel}},\textcolor{stringliteral}{"{}async\_shutdown\ cancelled"{}});}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01101}01101\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01102}01102\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01103}01103\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01104}01104\ \ \ \ \ \ \ \ \ shutdown\_timer-\/>cancel();}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01105}01105\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01106}01106\ \ \ \ \ \ \ \ \ lib::error\_code\ tec;}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01107}01107\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ec)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01108}01108\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ec\ ==\ lib::asio::error::not\_connected)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01109}01109\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ The\ socket\ was\ already\ closed\ when\ we\ tried\ to\ close\ it.\ This}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01110}01110\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ happens\ periodically\ (usually\ if\ a\ read\ or\ write\ fails}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01111}01111\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ earlier\ and\ if\ it\ is\ a\ real\ error\ will\ be\ caught\ at\ another}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01112}01112\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ level\ of\ the\ stack.}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01113}01113\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01114}01114\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ We\ don't\ know\ anything\ more\ about\ this\ error,\ give\ our}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01115}01115\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ socket/security\ policy\ a\ crack\ at\ it.}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01116}01116\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ tec\ =\ socket\_con\_type::translate\_ec(ec);}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01117}01117\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_tec\ =\ ec;}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01118}01118\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01119}01119\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (tec\ ==\ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0af716728e7a91dafb4439a15e7c638112}{transport::error::tls\_short\_read}})\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01120}01120\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ TLS\ short\ read\ at\ this\ point\ is\ somewhat\ expected\ if\ both}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01121}01121\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ sides\ try\ and\ end\ the\ connection\ at\ the\ same\ time\ or\ if}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01122}01122\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ SSLv2\ is\ being\ used.\ In\ general\ there\ is\ nothing\ that\ can}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01123}01123\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ be\ done\ here\ other\ than\ a\ low\ level\ development\ log.}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01124}01124\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01125}01125\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ all\ other\ errors\ are\ effectively\ pass\ through\ errors\ of}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01126}01126\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ some\ sort\ so\ print\ some\ detail\ on\ the\ info\ channel\ for}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01127}01127\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ library\ users\ to\ look\ up\ if\ needed.}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01128}01128\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ log\_err(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1elevel_a3ab47987a682f0de7b1d0df8c9c3b9d2}{log::elevel::info}},\textcolor{stringliteral}{"{}asio\ async\_shutdown"{}},ec);}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01129}01129\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01130}01130\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01131}01131\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01132}01132\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (m\_alog.static\_test(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}{log::alevel::devel}}))\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01133}01133\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_alog.write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}{log::alevel::devel}},}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01134}01134\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}asio\ con\ handle\_async\_shutdown"{}});}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01135}01135\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01136}01136\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01137}01137\ \ \ \ \ \ \ \ \ callback(tec);}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01138}01138\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01139}01139\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01141}\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_ac4b63fadf2083ab4656ab7f1a47d3b5d}{01141}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_ac4b63fadf2083ab4656ab7f1a47d3b5d}{cancel\_socket\_checked}}()\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01142}01142\ \ \ \ \ \ \ \ \ lib::asio::error\_code\ cec\ =\ socket\_con\_type::cancel\_socket();}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01143}01143\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (cec)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01144}01144\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (cec\ ==\ lib::asio::error::operation\_not\_supported)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01145}01145\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ cancel\ not\ supported\ on\ this\ OS,\ ignore\ and\ log\ at\ dev\ level}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01146}01146\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_alog.write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}{log::alevel::devel}},\ \textcolor{stringliteral}{"{}socket\ cancel\ not\ supported"{}});}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01147}01147\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01148}01148\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ log\_err(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1elevel_aef51fd791400121297f38f4381edaebe}{log::elevel::warn}},\ \textcolor{stringliteral}{"{}socket\ cancel\ failed"{}},\ cec);}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01149}01149\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01150}01150\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01151}01151\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01152}01152\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01153}01153\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01155}01155\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ error\_type>}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01156}01156\ \ \ \ \ \textcolor{keywordtype}{void}\ log\_err(\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{log::level}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}},\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\ msg,\ \textcolor{keyword}{const}\ error\_type\ \&\ ec)\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01157}01157\ \ \ \ \ \ \ \ \ std::stringstream\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01158}01158\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ <<\ msg\ <<\ \textcolor{stringliteral}{"{}\ error:\ "{}}\ <<\ ec\ <<\ \textcolor{stringliteral}{"{}\ ("{}}\ <<\ ec.message()\ <<\ \textcolor{stringliteral}{"{})"{}};}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01159}01159\ \ \ \ \ \ \ \ \ m\_elog.write(\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}},\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.str());}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01160}01160\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01161}01161\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01162}01162\ \ \ \ \ \textcolor{comment}{//\ static\ settings}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01163}01163\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ m\_is\_server;}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01164}01164\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a7d86173232da92ca09d5dd483ff5be65}{alog\_type}}\&\ m\_alog;}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01165}01165\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_adeafff07988dfd298f83323fbc89d0de}{elog\_type}}\&\ m\_elog;}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01166}01166\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01167}01167\ \ \ \ \ \textcolor{keyword}{struct\ }proxy\_data\ \{}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01168}01168\ \ \ \ \ \ \ \ \ proxy\_data()\ :\ timeout\_proxy(\mbox{\hyperlink{classconfig}{config}}::timeout\_proxy)\ \{\}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01169}01169\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01170}01170\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_aa56061051276800f874e25e31307c9bf}{request\_type}}\ req;}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01171}01171\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_ad678e688912f42ec0da0806b8ed97b11}{response\_type}}\ res;}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01172}01172\ \ \ \ \ \ \ \ \ std::string\ write\_buf;}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01173}01173\ \ \ \ \ \ \ \ \ lib::asio::streambuf\ read\_buf;}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01174}01174\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{long}\ timeout\_proxy;}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01175}01175\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a85df849fb3f9bfd5289a549f08864ccd}{timer\_ptr}}\ timer;}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01176}01176\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01177}01177\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01178}01178\ \ \ \ \ std::string\ m\_proxy;}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01179}01179\ \ \ \ \ lib::shared\_ptr<proxy\_data>\ m\_proxy\_data;}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01180}01180\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01181}01181\ \ \ \ \ \textcolor{comment}{//\ transport\ resources}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01182}01182\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_aaeeac719b46cae4abf53bc6303b00e82}{io\_service\_ptr}}\ \ m\_io\_service;}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01183}01183\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_a75088d08cd553a440c6521d777339443}{strand\_ptr}}\ \ \ \ \ \ m\_strand;}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01184}01184\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\_hdl}}\ \ m\_connection\_hdl;}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01185}01185\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01186}01186\ \ \ \ \ std::vector<lib::asio::const\_buffer>\ m\_bufs;}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01187}01187\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01189}01189\ \ \ \ \ lib::asio::error\_code\ m\_tec;}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01190}01190\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01191}01191\ \ \ \ \ \textcolor{comment}{//\ Handlers}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01192}01192\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1asio_ad12345b8638872037c87db068467233d}{tcp\_init\_handler}}\ \ \ \ m\_tcp\_pre\_init\_handler;}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01193}01193\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1asio_ad12345b8638872037c87db068467233d}{tcp\_init\_handler}}\ \ \ \ m\_tcp\_post\_init\_handler;}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01194}01194\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01195}01195\ \ \ \ \ handler\_allocator\ \ \ m\_read\_handler\_allocator;}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01196}01196\ \ \ \ \ handler\_allocator\ \ \ m\_write\_handler\_allocator;}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01197}01197\ \};}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01198}01198\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01199}01199\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01200}01200\ \}\ \textcolor{comment}{//\ namespace\ asio}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01201}01201\ \}\ \textcolor{comment}{//\ namespace\ transport}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01202}01202\ \}\ \textcolor{comment}{//\ namespace\ websocketpp}}
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01203}01203\ }
+\DoxyCodeLine{\Hypertarget{transport_2asio_2connection_8hpp_source_l01204}01204\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ WEBSOCKETPP\_TRANSPORT\_ASIO\_CON\_HPP}}
+
+\end{DoxyCode}

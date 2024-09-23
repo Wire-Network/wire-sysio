@@ -1,0 +1,183 @@
+\doxysection{libraries/fc/src/crypto/city.cpp File Reference}
+\hypertarget{city_8cpp}{}\label{city_8cpp}\index{libraries/fc/src/crypto/city.cpp@{libraries/fc/src/crypto/city.cpp}}
+{\ttfamily \#include $<$algorithm$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include $<$fc/crypto/city.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/uint128.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/array.\+hpp$>$}\newline
+{\ttfamily \#include $<$byteswap.\+h$>$}\newline
+Include dependency graph for city.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{city_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacefc}{fc}}
+\begin{DoxyCompactList}\small\item\em namespace \doxylink{namespacesysio_1_1chain}{sysio\+::chain} \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{city_8cpp_aeaffbeef893240bf17d51c8ccde3c686}{uint32\+\_\+in\+\_\+expected\+\_\+order}}(x)
+\item 
+\#define \mbox{\hyperlink{city_8cpp_aebeacf3a6a1c4e278fa1b74f18c08d4a}{uint64\+\_\+in\+\_\+expected\+\_\+order}}(x)
+\item 
+\#define \mbox{\hyperlink{city_8cpp_affde14445f49f65ff4f5b592e44ee71a}{LIKELY}}(x)
+\item 
+\#define \mbox{\hyperlink{city_8cpp_a6b854d47c10d6bfe9674b07cc48660dc}{PERMUTE3}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},  b,  c)
+\item 
+\#define \mbox{\hyperlink{city_8cpp_a2b7129d8fd966cc7d442029d78690508}{CHUNK}}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{city_8cpp_a47f86ad708829bc6642facb4809f498a}{\+\_\+mm\+\_\+crc32\+\_\+u64}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} b)
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{namespacefc_a84a44059b35881e55bc326c1e0aaf2d7}{fc\+::\+Uint128\+Low64}} (const \mbox{\hyperlink{classfc_1_1uint128}{uint128}} \&x)
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{namespacefc_a74555130e68faf5849d916babc2a7c00}{fc\+::\+Uint128\+High64}} (const \mbox{\hyperlink{classfc_1_1uint128}{uint128}} \&x)
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{namespacefc_af582dd90106af58e139cff580b1fccd4}{fc\+::\+Hash128to64}} (const \mbox{\hyperlink{classfc_1_1uint128}{uint128}} \&x)
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{namespacefc_a61954d69e71a9a610cdb843823459d35}{fc\+::city\+\_\+hash32}} (const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}, size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{namespacefc_a8bc1967c65aedd6545bf78fe6ffde635}{fc\+::city\+\_\+hash64}} (const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}, size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{namespacefc_a6fb9528abfb48c9a560628178b82c5d3}{fc\+::\+City\+Hash64\+With\+Seeds}} (const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} seed0, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} seed1)
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{namespacefc_a9348344b9161cd90a125089fd3ecbc94}{fc\+::\+City\+Hash64\+With\+Seed}} (const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} seed)
+\item 
+\mbox{\hyperlink{classfc_1_1uint128}{uint128}} \mbox{\hyperlink{namespacefc_a844e19367a59ec674e83d631cdf4e170}{fc\+::\+City\+Hash128\+With\+Seed}} (const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}, \mbox{\hyperlink{classfc_1_1uint128}{uint128}} seed)
+\item 
+\mbox{\hyperlink{classfc_1_1uint128}{uint128}} \mbox{\hyperlink{namespacefc_a63d1fe0e861957cf4daf4a0d2b744475}{fc\+::city\+\_\+hash128}} (const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})
+\item 
+void \mbox{\hyperlink{namespacefc_a9200b7569059e39ccd3bb854a6184c28}{fc\+::\+City\+Hash\+Crc256}} (const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \texorpdfstring{$\ast$}{*}result)
+\item 
+\mbox{\hyperlink{classfc_1_1array}{array}}$<$ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}, 4 $>$ \mbox{\hyperlink{namespacefc_ae738c65ef1d8bb7c121d6671f90383ff}{fc\+::city\+\_\+hash\+\_\+crc\+\_\+256}} (const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})
+\item 
+\mbox{\hyperlink{classfc_1_1uint128}{uint128}} \mbox{\hyperlink{namespacefc_ab65f763d83f1d03e910979f873c262e2}{fc\+::\+City\+Hash\+Crc128\+With\+Seed}} (const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}, \mbox{\hyperlink{classfc_1_1uint128}{uint128}} seed)
+\item 
+\mbox{\hyperlink{classfc_1_1uint128}{uint128}} \mbox{\hyperlink{namespacefc_a9d66adb69f407e1d80839d2d0a72a94d}{fc\+::city\+\_\+hash\+\_\+crc\+\_\+128}} (const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{city_8cpp_a2b7129d8fd966cc7d442029d78690508}\index{city.cpp@{city.cpp}!CHUNK@{CHUNK}}
+\index{CHUNK@{CHUNK}!city.cpp@{city.cpp}}
+\doxysubsubsection{\texorpdfstring{CHUNK}{CHUNK}}
+{\footnotesize\ttfamily \label{city_8cpp_a2b7129d8fd966cc7d442029d78690508} 
+\#define CHUNK(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{city_8cpp_a6b854d47c10d6bfe9674b07cc48660dc}{PERMUTE3}}(x,\ z,\ y);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ b\ +=\ Fetch64(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ c\ +=\ Fetch64(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ +\ 8);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ +=\ Fetch64(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ +\ 16);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ e\ +=\ Fetch64(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ +\ 24);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}\ +=\ Fetch64(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ +\ 32);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ +=\ b;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ h\ +=\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ b\ +=\ c;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}\ +=\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ g\ +=\ e;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ e\ +=\ z;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ g\ +=\ x;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ z\ =\ \mbox{\hyperlink{city_8cpp_a47f86ad708829bc6642facb4809f498a}{\_mm\_crc32\_u64}}(z,\ b\ +\ g);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ y\ =\ \mbox{\hyperlink{city_8cpp_a47f86ad708829bc6642facb4809f498a}{\_mm\_crc32\_u64}}(y,\ e\ +\ h);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ x\ =\ \mbox{\hyperlink{city_8cpp_a47f86ad708829bc6642facb4809f498a}{\_mm\_crc32\_u64}}(x,\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}\ +\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ e\ =\ Rotate(e,\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}});\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ c\ +=\ e;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ +=\ 40}
+
+\end{DoxyCode}
+\Hypertarget{city_8cpp_affde14445f49f65ff4f5b592e44ee71a}\index{city.cpp@{city.cpp}!LIKELY@{LIKELY}}
+\index{LIKELY@{LIKELY}!city.cpp@{city.cpp}}
+\doxysubsubsection{\texorpdfstring{LIKELY}{LIKELY}}
+{\footnotesize\ttfamily \label{city_8cpp_affde14445f49f65ff4f5b592e44ee71a} 
+\#define LIKELY(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(x)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{city_8cpp_source_l00136}{136}} of file \mbox{\hyperlink{city_8cpp_source}{city.\+cpp}}.
+
+\Hypertarget{city_8cpp_a6b854d47c10d6bfe9674b07cc48660dc}\index{city.cpp@{city.cpp}!PERMUTE3@{PERMUTE3}}
+\index{PERMUTE3@{PERMUTE3}!city.cpp@{city.cpp}}
+\doxysubsubsection{\texorpdfstring{PERMUTE3}{PERMUTE3}}
+{\footnotesize\ttfamily \label{city_8cpp_a6b854d47c10d6bfe9674b07cc48660dc} 
+\#define PERMUTE3(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}}{, }\item[{}]{b}{, }\item[{}]{c}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordflow}{do}\ \{\ \mbox{\hyperlink{namespacestd_abb7e41c7063536ff6eeee4bb5f66de6c}{std::swap}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ b);\ \mbox{\hyperlink{namespacestd_abb7e41c7063536ff6eeee4bb5f66de6c}{std::swap}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ c);\ \}\ \textcolor{keywordflow}{while}\ (0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{city_8cpp_source_l00174}{174}} of file \mbox{\hyperlink{city_8cpp_source}{city.\+cpp}}.
+
+\Hypertarget{city_8cpp_aeaffbeef893240bf17d51c8ccde3c686}\index{city.cpp@{city.cpp}!uint32\_in\_expected\_order@{uint32\_in\_expected\_order}}
+\index{uint32\_in\_expected\_order@{uint32\_in\_expected\_order}!city.cpp@{city.cpp}}
+\doxysubsubsection{\texorpdfstring{uint32\_in\_expected\_order}{uint32\_in\_expected\_order}}
+{\footnotesize\ttfamily \label{city_8cpp_aeaffbeef893240bf17d51c8ccde3c686} 
+\#define uint32\+\_\+in\+\_\+expected\+\_\+order(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(x)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{city_8cpp_source_l00128}{128}} of file \mbox{\hyperlink{city_8cpp_source}{city.\+cpp}}.
+
+\Hypertarget{city_8cpp_aebeacf3a6a1c4e278fa1b74f18c08d4a}\index{city.cpp@{city.cpp}!uint64\_in\_expected\_order@{uint64\_in\_expected\_order}}
+\index{uint64\_in\_expected\_order@{uint64\_in\_expected\_order}!city.cpp@{city.cpp}}
+\doxysubsubsection{\texorpdfstring{uint64\_in\_expected\_order}{uint64\_in\_expected\_order}}
+{\footnotesize\ttfamily \label{city_8cpp_aebeacf3a6a1c4e278fa1b74f18c08d4a} 
+\#define uint64\+\_\+in\+\_\+expected\+\_\+order(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(x)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{city_8cpp_source_l00129}{129}} of file \mbox{\hyperlink{city_8cpp_source}{city.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{city_8cpp_a47f86ad708829bc6642facb4809f498a}\index{city.cpp@{city.cpp}!\_mm\_crc32\_u64@{\_mm\_crc32\_u64}}
+\index{\_mm\_crc32\_u64@{\_mm\_crc32\_u64}!city.cpp@{city.cpp}}
+\doxysubsubsection{\texorpdfstring{\_mm\_crc32\_u64()}{\_mm\_crc32\_u64()}}
+{\footnotesize\ttfamily \label{city_8cpp_a47f86ad708829bc6642facb4809f498a} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \+\_\+mm\+\_\+crc32\+\_\+u64 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{a}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{b}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{crc_8cpp_source_l00607}{607}} of file \mbox{\hyperlink{crc_8cpp_source}{crc.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00608\ \{}
+\DoxyCodeLine{00609\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{crc_8cpp_abc893dff4177edc98813f62de3513bae}{crc32cSlicingBy8}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)\&b,\ \textcolor{keyword}{sizeof}(b));\ }
+\DoxyCodeLine{00610\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=296pt]{city_8cpp_a47f86ad708829bc6642facb4809f498a_cgraph}
+\end{center}
+\end{figure}

@@ -1,0 +1,249 @@
+\doxysection{ck\+\_\+token\+\_\+info Struct Reference}
+\hypertarget{structck__token__info}{}\label{structck__token__info}\index{ck\_token\_info@{ck\_token\_info}}
+
+
+{\ttfamily \#include $<$pkcs11.\+h$>$}
+
+
+
+Collaboration diagram for ck\+\_\+token\+\_\+info\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=303pt]{structck__token__info__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+unsigned char \mbox{\hyperlink{structck__token__info_ac403fdd4a556e7b453889856d3fe8af6}{label}} \mbox{[}32\mbox{]}
+\item 
+unsigned char \mbox{\hyperlink{structck__token__info_a2c6c137b6052d336d3419e26ec15445e}{manufacturer\+\_\+id}} \mbox{[}32\mbox{]}
+\item 
+unsigned char \mbox{\hyperlink{structck__token__info_a1d9a930d1f3a68f572c8b0471dc67991}{model}} \mbox{[}16\mbox{]}
+\item 
+unsigned char \mbox{\hyperlink{structck__token__info_a2ad5832fe061ff59939acdab81e59e51}{serial\+\_\+number}} \mbox{[}16\mbox{]}
+\item 
+\mbox{\hyperlink{pkcs11_8h_a8b2d1ca485775ea7249cf84753071cf7}{ck\+\_\+flags\+\_\+t}} \mbox{\hyperlink{structck__token__info_a3bc6ba44890597975e49ab65c7ac4acc}{flags}}
+\item 
+unsigned long \mbox{\hyperlink{structck__token__info_a1a7abf0c9b84364b3bb12efaf3ffd70d}{max\+\_\+session\+\_\+count}}
+\item 
+unsigned long \mbox{\hyperlink{structck__token__info_acfde56e051ce0043d34e0ea092254594}{session\+\_\+count}}
+\item 
+unsigned long \mbox{\hyperlink{structck__token__info_a17c6dd2b023b485a227bf16d2ea2d058}{max\+\_\+rw\+\_\+session\+\_\+count}}
+\item 
+unsigned long \mbox{\hyperlink{structck__token__info_aa226f88abebbe9235625c6c524ab7382}{rw\+\_\+session\+\_\+count}}
+\item 
+unsigned long \mbox{\hyperlink{structck__token__info_af3bf974753bc7ea6267ee043874c6c18}{max\+\_\+pin\+\_\+len}}
+\item 
+unsigned long \mbox{\hyperlink{structck__token__info_af49f4814ba43ea9b9562c59f00c3a4c1}{min\+\_\+pin\+\_\+len}}
+\item 
+unsigned long \mbox{\hyperlink{structck__token__info_a09f1174fce8f60d5fab1e33e90508180}{total\+\_\+public\+\_\+memory}}
+\item 
+unsigned long \mbox{\hyperlink{structck__token__info_a0a15be72ccce29d11b3a1e91e141ea68}{free\+\_\+public\+\_\+memory}}
+\item 
+unsigned long \mbox{\hyperlink{structck__token__info_a85a14795ee14b699a3ba3b8ec1eb96f2}{total\+\_\+private\+\_\+memory}}
+\item 
+unsigned long \mbox{\hyperlink{structck__token__info_a6e8c4a21429ddc839436c167ed0de2b6}{free\+\_\+private\+\_\+memory}}
+\item 
+struct \mbox{\hyperlink{structck__version}{ck\+\_\+version}} \mbox{\hyperlink{structck__token__info_afc67e4c279a4103d9079f45d4276b3e8}{hardware\+\_\+version}}
+\item 
+struct \mbox{\hyperlink{structck__version}{ck\+\_\+version}} \mbox{\hyperlink{structck__token__info_a89471f0dad191fccd392dc0b811bf3a3}{firmware\+\_\+version}}
+\item 
+unsigned char \mbox{\hyperlink{structck__token__info_a0a23c128823ca2e334968032a1edb680}{utc\+\_\+time}} \mbox{[}16\mbox{]}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{pkcs11_8h_source_l00225}{225}} of file \mbox{\hyperlink{pkcs11_8h_source}{pkcs11.\+h}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structck__token__info_a89471f0dad191fccd392dc0b811bf3a3}\index{ck\_token\_info@{ck\_token\_info}!firmware\_version@{firmware\_version}}
+\index{firmware\_version@{firmware\_version}!ck\_token\_info@{ck\_token\_info}}
+\doxysubsubsection{\texorpdfstring{firmware\_version}{firmware\_version}}
+{\footnotesize\ttfamily \label{structck__token__info_a89471f0dad191fccd392dc0b811bf3a3} 
+struct \mbox{\hyperlink{structck__version}{ck\+\_\+version}} ck\+\_\+token\+\_\+info\+::firmware\+\_\+version}
+
+
+
+Definition at line \mbox{\hyperlink{pkcs11_8h_source_l00242}{242}} of file \mbox{\hyperlink{pkcs11_8h_source}{pkcs11.\+h}}.
+
+\Hypertarget{structck__token__info_a3bc6ba44890597975e49ab65c7ac4acc}\index{ck\_token\_info@{ck\_token\_info}!flags@{flags}}
+\index{flags@{flags}!ck\_token\_info@{ck\_token\_info}}
+\doxysubsubsection{\texorpdfstring{flags}{flags}}
+{\footnotesize\ttfamily \label{structck__token__info_a3bc6ba44890597975e49ab65c7ac4acc} 
+\mbox{\hyperlink{pkcs11_8h_a8b2d1ca485775ea7249cf84753071cf7}{ck\+\_\+flags\+\_\+t}} ck\+\_\+token\+\_\+info\+::flags}
+
+
+
+Definition at line \mbox{\hyperlink{pkcs11_8h_source_l00230}{230}} of file \mbox{\hyperlink{pkcs11_8h_source}{pkcs11.\+h}}.
+
+\Hypertarget{structck__token__info_a6e8c4a21429ddc839436c167ed0de2b6}\index{ck\_token\_info@{ck\_token\_info}!free\_private\_memory@{free\_private\_memory}}
+\index{free\_private\_memory@{free\_private\_memory}!ck\_token\_info@{ck\_token\_info}}
+\doxysubsubsection{\texorpdfstring{free\_private\_memory}{free\_private\_memory}}
+{\footnotesize\ttfamily \label{structck__token__info_a6e8c4a21429ddc839436c167ed0de2b6} 
+unsigned long ck\+\_\+token\+\_\+info\+::free\+\_\+private\+\_\+memory}
+
+
+
+Definition at line \mbox{\hyperlink{pkcs11_8h_source_l00240}{240}} of file \mbox{\hyperlink{pkcs11_8h_source}{pkcs11.\+h}}.
+
+\Hypertarget{structck__token__info_a0a15be72ccce29d11b3a1e91e141ea68}\index{ck\_token\_info@{ck\_token\_info}!free\_public\_memory@{free\_public\_memory}}
+\index{free\_public\_memory@{free\_public\_memory}!ck\_token\_info@{ck\_token\_info}}
+\doxysubsubsection{\texorpdfstring{free\_public\_memory}{free\_public\_memory}}
+{\footnotesize\ttfamily \label{structck__token__info_a0a15be72ccce29d11b3a1e91e141ea68} 
+unsigned long ck\+\_\+token\+\_\+info\+::free\+\_\+public\+\_\+memory}
+
+
+
+Definition at line \mbox{\hyperlink{pkcs11_8h_source_l00238}{238}} of file \mbox{\hyperlink{pkcs11_8h_source}{pkcs11.\+h}}.
+
+\Hypertarget{structck__token__info_afc67e4c279a4103d9079f45d4276b3e8}\index{ck\_token\_info@{ck\_token\_info}!hardware\_version@{hardware\_version}}
+\index{hardware\_version@{hardware\_version}!ck\_token\_info@{ck\_token\_info}}
+\doxysubsubsection{\texorpdfstring{hardware\_version}{hardware\_version}}
+{\footnotesize\ttfamily \label{structck__token__info_afc67e4c279a4103d9079f45d4276b3e8} 
+struct \mbox{\hyperlink{structck__version}{ck\+\_\+version}} ck\+\_\+token\+\_\+info\+::hardware\+\_\+version}
+
+
+
+Definition at line \mbox{\hyperlink{pkcs11_8h_source_l00241}{241}} of file \mbox{\hyperlink{pkcs11_8h_source}{pkcs11.\+h}}.
+
+\Hypertarget{structck__token__info_ac403fdd4a556e7b453889856d3fe8af6}\index{ck\_token\_info@{ck\_token\_info}!label@{label}}
+\index{label@{label}!ck\_token\_info@{ck\_token\_info}}
+\doxysubsubsection{\texorpdfstring{label}{label}}
+{\footnotesize\ttfamily \label{structck__token__info_ac403fdd4a556e7b453889856d3fe8af6} 
+unsigned char ck\+\_\+token\+\_\+info\+::label\mbox{[}32\mbox{]}}
+
+
+
+Definition at line \mbox{\hyperlink{pkcs11_8h_source_l00226}{226}} of file \mbox{\hyperlink{pkcs11_8h_source}{pkcs11.\+h}}.
+
+\Hypertarget{structck__token__info_a2c6c137b6052d336d3419e26ec15445e}\index{ck\_token\_info@{ck\_token\_info}!manufacturer\_id@{manufacturer\_id}}
+\index{manufacturer\_id@{manufacturer\_id}!ck\_token\_info@{ck\_token\_info}}
+\doxysubsubsection{\texorpdfstring{manufacturer\_id}{manufacturer\_id}}
+{\footnotesize\ttfamily \label{structck__token__info_a2c6c137b6052d336d3419e26ec15445e} 
+unsigned char ck\+\_\+token\+\_\+info\+::manufacturer\+\_\+id\mbox{[}32\mbox{]}}
+
+
+
+Definition at line \mbox{\hyperlink{pkcs11_8h_source_l00227}{227}} of file \mbox{\hyperlink{pkcs11_8h_source}{pkcs11.\+h}}.
+
+\Hypertarget{structck__token__info_af3bf974753bc7ea6267ee043874c6c18}\index{ck\_token\_info@{ck\_token\_info}!max\_pin\_len@{max\_pin\_len}}
+\index{max\_pin\_len@{max\_pin\_len}!ck\_token\_info@{ck\_token\_info}}
+\doxysubsubsection{\texorpdfstring{max\_pin\_len}{max\_pin\_len}}
+{\footnotesize\ttfamily \label{structck__token__info_af3bf974753bc7ea6267ee043874c6c18} 
+unsigned long ck\+\_\+token\+\_\+info\+::max\+\_\+pin\+\_\+len}
+
+
+
+Definition at line \mbox{\hyperlink{pkcs11_8h_source_l00235}{235}} of file \mbox{\hyperlink{pkcs11_8h_source}{pkcs11.\+h}}.
+
+\Hypertarget{structck__token__info_a17c6dd2b023b485a227bf16d2ea2d058}\index{ck\_token\_info@{ck\_token\_info}!max\_rw\_session\_count@{max\_rw\_session\_count}}
+\index{max\_rw\_session\_count@{max\_rw\_session\_count}!ck\_token\_info@{ck\_token\_info}}
+\doxysubsubsection{\texorpdfstring{max\_rw\_session\_count}{max\_rw\_session\_count}}
+{\footnotesize\ttfamily \label{structck__token__info_a17c6dd2b023b485a227bf16d2ea2d058} 
+unsigned long ck\+\_\+token\+\_\+info\+::max\+\_\+rw\+\_\+session\+\_\+count}
+
+
+
+Definition at line \mbox{\hyperlink{pkcs11_8h_source_l00233}{233}} of file \mbox{\hyperlink{pkcs11_8h_source}{pkcs11.\+h}}.
+
+\Hypertarget{structck__token__info_a1a7abf0c9b84364b3bb12efaf3ffd70d}\index{ck\_token\_info@{ck\_token\_info}!max\_session\_count@{max\_session\_count}}
+\index{max\_session\_count@{max\_session\_count}!ck\_token\_info@{ck\_token\_info}}
+\doxysubsubsection{\texorpdfstring{max\_session\_count}{max\_session\_count}}
+{\footnotesize\ttfamily \label{structck__token__info_a1a7abf0c9b84364b3bb12efaf3ffd70d} 
+unsigned long ck\+\_\+token\+\_\+info\+::max\+\_\+session\+\_\+count}
+
+
+
+Definition at line \mbox{\hyperlink{pkcs11_8h_source_l00231}{231}} of file \mbox{\hyperlink{pkcs11_8h_source}{pkcs11.\+h}}.
+
+\Hypertarget{structck__token__info_af49f4814ba43ea9b9562c59f00c3a4c1}\index{ck\_token\_info@{ck\_token\_info}!min\_pin\_len@{min\_pin\_len}}
+\index{min\_pin\_len@{min\_pin\_len}!ck\_token\_info@{ck\_token\_info}}
+\doxysubsubsection{\texorpdfstring{min\_pin\_len}{min\_pin\_len}}
+{\footnotesize\ttfamily \label{structck__token__info_af49f4814ba43ea9b9562c59f00c3a4c1} 
+unsigned long ck\+\_\+token\+\_\+info\+::min\+\_\+pin\+\_\+len}
+
+
+
+Definition at line \mbox{\hyperlink{pkcs11_8h_source_l00236}{236}} of file \mbox{\hyperlink{pkcs11_8h_source}{pkcs11.\+h}}.
+
+\Hypertarget{structck__token__info_a1d9a930d1f3a68f572c8b0471dc67991}\index{ck\_token\_info@{ck\_token\_info}!model@{model}}
+\index{model@{model}!ck\_token\_info@{ck\_token\_info}}
+\doxysubsubsection{\texorpdfstring{model}{model}}
+{\footnotesize\ttfamily \label{structck__token__info_a1d9a930d1f3a68f572c8b0471dc67991} 
+unsigned char ck\+\_\+token\+\_\+info\+::model\mbox{[}16\mbox{]}}
+
+
+
+Definition at line \mbox{\hyperlink{pkcs11_8h_source_l00228}{228}} of file \mbox{\hyperlink{pkcs11_8h_source}{pkcs11.\+h}}.
+
+\Hypertarget{structck__token__info_aa226f88abebbe9235625c6c524ab7382}\index{ck\_token\_info@{ck\_token\_info}!rw\_session\_count@{rw\_session\_count}}
+\index{rw\_session\_count@{rw\_session\_count}!ck\_token\_info@{ck\_token\_info}}
+\doxysubsubsection{\texorpdfstring{rw\_session\_count}{rw\_session\_count}}
+{\footnotesize\ttfamily \label{structck__token__info_aa226f88abebbe9235625c6c524ab7382} 
+unsigned long ck\+\_\+token\+\_\+info\+::rw\+\_\+session\+\_\+count}
+
+
+
+Definition at line \mbox{\hyperlink{pkcs11_8h_source_l00234}{234}} of file \mbox{\hyperlink{pkcs11_8h_source}{pkcs11.\+h}}.
+
+\Hypertarget{structck__token__info_a2ad5832fe061ff59939acdab81e59e51}\index{ck\_token\_info@{ck\_token\_info}!serial\_number@{serial\_number}}
+\index{serial\_number@{serial\_number}!ck\_token\_info@{ck\_token\_info}}
+\doxysubsubsection{\texorpdfstring{serial\_number}{serial\_number}}
+{\footnotesize\ttfamily \label{structck__token__info_a2ad5832fe061ff59939acdab81e59e51} 
+unsigned char ck\+\_\+token\+\_\+info\+::serial\+\_\+number\mbox{[}16\mbox{]}}
+
+
+
+Definition at line \mbox{\hyperlink{pkcs11_8h_source_l00229}{229}} of file \mbox{\hyperlink{pkcs11_8h_source}{pkcs11.\+h}}.
+
+\Hypertarget{structck__token__info_acfde56e051ce0043d34e0ea092254594}\index{ck\_token\_info@{ck\_token\_info}!session\_count@{session\_count}}
+\index{session\_count@{session\_count}!ck\_token\_info@{ck\_token\_info}}
+\doxysubsubsection{\texorpdfstring{session\_count}{session\_count}}
+{\footnotesize\ttfamily \label{structck__token__info_acfde56e051ce0043d34e0ea092254594} 
+unsigned long ck\+\_\+token\+\_\+info\+::session\+\_\+count}
+
+
+
+Definition at line \mbox{\hyperlink{pkcs11_8h_source_l00232}{232}} of file \mbox{\hyperlink{pkcs11_8h_source}{pkcs11.\+h}}.
+
+\Hypertarget{structck__token__info_a85a14795ee14b699a3ba3b8ec1eb96f2}\index{ck\_token\_info@{ck\_token\_info}!total\_private\_memory@{total\_private\_memory}}
+\index{total\_private\_memory@{total\_private\_memory}!ck\_token\_info@{ck\_token\_info}}
+\doxysubsubsection{\texorpdfstring{total\_private\_memory}{total\_private\_memory}}
+{\footnotesize\ttfamily \label{structck__token__info_a85a14795ee14b699a3ba3b8ec1eb96f2} 
+unsigned long ck\+\_\+token\+\_\+info\+::total\+\_\+private\+\_\+memory}
+
+
+
+Definition at line \mbox{\hyperlink{pkcs11_8h_source_l00239}{239}} of file \mbox{\hyperlink{pkcs11_8h_source}{pkcs11.\+h}}.
+
+\Hypertarget{structck__token__info_a09f1174fce8f60d5fab1e33e90508180}\index{ck\_token\_info@{ck\_token\_info}!total\_public\_memory@{total\_public\_memory}}
+\index{total\_public\_memory@{total\_public\_memory}!ck\_token\_info@{ck\_token\_info}}
+\doxysubsubsection{\texorpdfstring{total\_public\_memory}{total\_public\_memory}}
+{\footnotesize\ttfamily \label{structck__token__info_a09f1174fce8f60d5fab1e33e90508180} 
+unsigned long ck\+\_\+token\+\_\+info\+::total\+\_\+public\+\_\+memory}
+
+
+
+Definition at line \mbox{\hyperlink{pkcs11_8h_source_l00237}{237}} of file \mbox{\hyperlink{pkcs11_8h_source}{pkcs11.\+h}}.
+
+\Hypertarget{structck__token__info_a0a23c128823ca2e334968032a1edb680}\index{ck\_token\_info@{ck\_token\_info}!utc\_time@{utc\_time}}
+\index{utc\_time@{utc\_time}!ck\_token\_info@{ck\_token\_info}}
+\doxysubsubsection{\texorpdfstring{utc\_time}{utc\_time}}
+{\footnotesize\ttfamily \label{structck__token__info_a0a23c128823ca2e334968032a1edb680} 
+unsigned char ck\+\_\+token\+\_\+info\+::utc\+\_\+time\mbox{[}16\mbox{]}}
+
+
+
+Definition at line \mbox{\hyperlink{pkcs11_8h_source_l00243}{243}} of file \mbox{\hyperlink{pkcs11_8h_source}{pkcs11.\+h}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/yubihsm/pkcs11/\mbox{\hyperlink{pkcs11_8h}{pkcs11.\+h}}\end{DoxyCompactItemize}

@@ -1,0 +1,42 @@
+\doxysection{yubihsm\+\_\+usb.\+h}
+\hypertarget{yubihsm__usb_8h_source}{}\label{yubihsm__usb_8h_source}\index{libraries/yubihsm/lib/yubihsm\_usb.h@{libraries/yubihsm/lib/yubihsm\_usb.h}}
+\mbox{\hyperlink{yubihsm__usb_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{yubihsm__usb_8h_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{yubihsm__usb_8h_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ 2015-\/2018\ Yubico\ AB}}
+\DoxyCodeLine{\Hypertarget{yubihsm__usb_8h_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{yubihsm__usb_8h_source_l00004}00004\ \textcolor{comment}{\ *\ Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{\Hypertarget{yubihsm__usb_8h_source_l00005}00005\ \textcolor{comment}{\ *\ you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{yubihsm__usb_8h_source_l00006}00006\ \textcolor{comment}{\ *\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{\Hypertarget{yubihsm__usb_8h_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{yubihsm__usb_8h_source_l00008}00008\ \textcolor{comment}{\ *\ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{\Hypertarget{yubihsm__usb_8h_source_l00009}00009\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{yubihsm__usb_8h_source_l00010}00010\ \textcolor{comment}{\ *\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{\Hypertarget{yubihsm__usb_8h_source_l00011}00011\ \textcolor{comment}{\ *\ distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{\Hypertarget{yubihsm__usb_8h_source_l00012}00012\ \textcolor{comment}{\ *\ WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{\Hypertarget{yubihsm__usb_8h_source_l00013}00013\ \textcolor{comment}{\ *\ See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{\Hypertarget{yubihsm__usb_8h_source_l00014}00014\ \textcolor{comment}{\ *\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{yubihsm__usb_8h_source_l00015}00015\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{yubihsm__usb_8h_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__usb_8h_source_l00017}00017\ \textcolor{preprocessor}{\#ifndef\ YUBIHSM\_USB\_H}}
+\DoxyCodeLine{\Hypertarget{yubihsm__usb_8h_source_l00018}00018\ \textcolor{preprocessor}{\#define\ YUBIHSM\_USB\_H}}
+\DoxyCodeLine{\Hypertarget{yubihsm__usb_8h_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__usb_8h_source_l00020}00020\ \textcolor{preprocessor}{\#ifndef\ \_\_WIN32}}
+\DoxyCodeLine{\Hypertarget{yubihsm__usb_8h_source_l00021}\mbox{\hyperlink{yubihsm__usb_8h_aa1c48ca7b894657e01905d3074b38b8c}{00021}}\ \textcolor{preprocessor}{\#define\ YH\_INTERNAL\ \_\_attribute\_\_((visibility("{}hidden"{})))}}
+\DoxyCodeLine{\Hypertarget{yubihsm__usb_8h_source_l00022}00022\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{yubihsm__usb_8h_source_l00023}00023\ \textcolor{preprocessor}{\#define\ YH\_INTERNAL}}
+\DoxyCodeLine{\Hypertarget{yubihsm__usb_8h_source_l00024}00024\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{yubihsm__usb_8h_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__usb_8h_source_l00026}00026\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{yubihsm__usb_8h_aa1c48ca7b894657e01905d3074b38b8c}{YH\_INTERNAL}}\ \mbox{\hyperlink{yubihsm__usb_8h_a0d32af1cd8286d079ed55a3e19cb99b0}{usb\_close}}(\mbox{\hyperlink{structstate}{yh\_backend}}\ *\mbox{\hyperlink{structstate}{state}});}
+\DoxyCodeLine{\Hypertarget{yubihsm__usb_8h_source_l00027}00027\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{yubihsm__usb_8h_aa1c48ca7b894657e01905d3074b38b8c}{YH\_INTERNAL}}\ \mbox{\hyperlink{yubihsm__usb_8h_a92721e82fdd546fa36c9d8ed17966673}{usb\_destroy}}(\mbox{\hyperlink{structstate}{yh\_backend}}\ **\mbox{\hyperlink{structstate}{state}});}
+\DoxyCodeLine{\Hypertarget{yubihsm__usb_8h_source_l00028}00028\ \mbox{\hyperlink{structstate}{yh\_backend}}\ \mbox{\hyperlink{yubihsm__usb_8h_aa1c48ca7b894657e01905d3074b38b8c}{YH\_INTERNAL}}\ *\mbox{\hyperlink{yubihsm__usb_8h_a196708330baac37822e5c41078d3604f}{backend\_create}}(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{\Hypertarget{yubihsm__usb_8h_source_l00029}00029\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{yubihsm__usb_8h_aa1c48ca7b894657e01905d3074b38b8c}{YH\_INTERNAL}}\ \mbox{\hyperlink{yubihsm__usb_8h_a3e531be586ea5ef07c983d2b5a02d4ba}{usb\_open\_device}}(\mbox{\hyperlink{structstate}{yh\_backend}}\ *backend);}
+\DoxyCodeLine{\Hypertarget{yubihsm__usb_8h_source_l00030}00030\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__usb_8h_aa1c48ca7b894657e01905d3074b38b8c}{YH\_INTERNAL}}\ \mbox{\hyperlink{yubihsm__usb_8h_a54c84e4f1afea494cf510ae43d610a82}{usb\_write}}(\mbox{\hyperlink{structstate}{yh\_backend}}\ *\mbox{\hyperlink{structstate}{state}},\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},}
+\DoxyCodeLine{\Hypertarget{yubihsm__usb_8h_source_l00031}00031\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{long}\ \textcolor{keywordtype}{unsigned}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}});}
+\DoxyCodeLine{\Hypertarget{yubihsm__usb_8h_source_l00032}00032\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__usb_8h_aa1c48ca7b894657e01905d3074b38b8c}{YH\_INTERNAL}}\ \mbox{\hyperlink{yubihsm__usb_8h_a1afd311980b8a12cdde82bc85dc9b963}{usb\_read}}(\mbox{\hyperlink{structstate}{yh\_backend}}\ *\mbox{\hyperlink{structstate}{state}},\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},}
+\DoxyCodeLine{\Hypertarget{yubihsm__usb_8h_source_l00033}00033\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{long}\ \textcolor{keywordtype}{unsigned}\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}});}
+\DoxyCodeLine{\Hypertarget{yubihsm__usb_8h_source_l00034}00034\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{yubihsm__usb_8h_aa1c48ca7b894657e01905d3074b38b8c}{YH\_INTERNAL}}\ \mbox{\hyperlink{yubihsm__usb_8h_a39ffacda9c62206f1f384cb906965d93}{usb\_set\_serial}}(\mbox{\hyperlink{structstate}{yh\_backend}}\ *\mbox{\hyperlink{structstate}{state}},\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a1149ca4bd0659030412db8e77bebdf88}{serial}});}
+\DoxyCodeLine{\Hypertarget{yubihsm__usb_8h_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{yubihsm__usb_8h_source_l00036}00036\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

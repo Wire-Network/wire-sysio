@@ -1,0 +1,10 @@
+<map id="sysio::chain::webassembly::interface::set_parameters_packed" name="sysio::chain::webassembly::interface::set_parameters_packed">
+<area shape="rect" id="Node000001" title="Set the blockchain parameters in a flexible manner." alt="" coords="5,47,232,88"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1vm_1_1span.html#a65d9e2641d763c860ae175a9a936a309" title=" " alt="" coords="280,5,427,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="218,44,273,32,275,37,219,49"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1vm_1_1span.html#a584ee0404e01edf225142e86d23d6d7d" title=" " alt="" coords="280,55,426,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="232,65,265,65,265,70,232,70"/>
+<area shape="rect" id="Node000004" href="$namespacefc_1_1raw.html#a0b442d98ceb22dd5a6ae84745e43ffab" title=" " alt="" coords="298,128,409,154"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="187,86,296,120,294,125,185,91"/>
+<area shape="poly" id="edge4_Node000004_Node000004" title=" " alt="" coords="315,129,307,119,311,110,327,103,353,101,382,104,397,111,394,116,381,109,353,107,328,109,315,113,312,119,319,126"/>
+</map>

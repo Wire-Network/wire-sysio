@@ -1,0 +1,11 @@
+<map id="testing::internal::ShouldUseColor" name="testing::internal::ShouldUseColor">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,85,124,126"/>
+<area shape="rect" id="Node000002" href="$classtesting_1_1internal_1_1_string.html#a116ca435d63306927ba19f90a3596787" title=" " alt="" coords="172,5,373,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="123,82,175,64,177,69,125,87"/>
+<area shape="rect" id="Node000004" href="$classtesting_1_1internal_1_1_string.html#a8bea7b33e7effbd299a0b4a5522ea96e" title=" " alt="" coords="199,85,346,126"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="124,102,183,102,183,108,124,108"/>
+<area shape="rect" id="Node000005" href="$namespacetesting_1_1internal_1_1posix.html#aa78973d3f7aa4efd24742b0537c8cd50" title=" " alt="" coords="213,150,332,191"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="125,121,199,145,197,150,123,126"/>
+<area shape="rect" id="Node000003" href="$namespacetesting_1_1internal_1_1posix.html#a1ef2385a7f8e4c706054da35967e76bd" title=" " alt="" coords="421,13,557,54"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="373,30,406,30,406,36,373,36"/>
+</map>

@@ -1,0 +1,12 @@
+<map id="websocketpp::frame::get_fin" name="websocketpp::frame::get_fin">
+<area shape="rect" id="Node000001" title="Check whether the frame&#39;s FIN bit is set." alt="" coords="461,72,600,113"/>
+<area shape="rect" id="Node000002" href="$frame_8cpp.html#a028b5ea71d8ed44151c5a3df274446e1" title=" " alt="" coords="217,5,413,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="472,68,412,45,376,34,378,29,414,40,474,63"/>
+<area shape="rect" id="Node000003" href="$frame_8cpp.html#a3cd85981c179494497755165261dde64" title=" " alt="" coords="217,55,413,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="445,86,413,82,414,76,446,80"/>
+<area shape="rect" id="Node000004" href="$classwebsocketpp_1_1processor_1_1hybi13.html#a5c5e3234a0067c7f14fe0ceb4e647659" title="Process new websocket connection bytes." alt="" coords="5,131,169,172"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="446,107,169,143,169,138,445,101"/>
+<area shape="rect" id="Node000005" href="$classwebsocketpp_1_1processor_1_1hybi13.html#a0c549a5e2766288fb625c03e507cc9ad" title="Validate an incoming basic header." alt="" coords="225,156,404,211"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="467,122,384,158,382,153,465,117"/>
+<area shape="poly" id="edge5_Node000005_Node000004" title=" " alt="" coords="209,171,169,166,169,160,210,166"/>
+</map>

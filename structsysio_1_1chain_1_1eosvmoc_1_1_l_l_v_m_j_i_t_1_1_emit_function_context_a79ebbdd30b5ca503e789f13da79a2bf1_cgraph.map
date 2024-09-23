@@ -1,0 +1,23 @@
+<map id="sysio::chain::eosvmoc::LLVMJIT::EmitFunctionContext::trapDivideByZero" name="sysio::chain::eosvmoc::LLVMJIT::EmitFunctionContext::trapDivideByZero">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,139,216,195"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_emit_function_context.html#afb959026e9f0bb673e618c6daaeeb252" title=" " alt="" coords="264,106,474,162"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="216,151,248,147,248,152,217,156"/>
+<area shape="rect" id="Node000009" href="$struct_i_r_1_1_function_type.html#a97cbdf384d97c3a5203a1310c9af0822" title=" " alt="" coords="295,186,442,212"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="217,177,280,185,280,191,216,183"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_emit_function_context.html#a6cc7ba306b7a1a30217455c60e56264e" title=" " alt="" coords="522,106,732,162"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="475,131,506,131,506,136,475,136"/>
+<area shape="rect" id="Node000004" href="$namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t.html#a9d72c71de74b687a86250a32946a7288" title=" " alt="" coords="804,5,967,46"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="679,103,779,55,796,49,798,54,781,60,681,108"/>
+<area shape="rect" id="Node000006" href="$structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_emit_function_context.html#a8800b02b3be374856f4370d5ec7911e4" title=" " alt="" coords="780,70,991,126"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="732,116,764,112,765,117,733,122"/>
+<area shape="rect" id="Node000007" href="$namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t.html#a0ae0854b815533d14d628d2d5192656f" title=" " alt="" coords="791,149,980,190"/>
+<area shape="poly" id="edge6_Node000003_Node000007" title=" " alt="" coords="733,146,776,152,776,157,732,151"/>
+<area shape="rect" id="Node000008" href="$namespacesysio_1_1chain_1_1eosvmoc.html#abe43c1d3ddfb344db0cd7dd5ab25f48c" title=" " alt="" coords="809,215,962,255"/>
+<area shape="poly" id="edge7_Node000003_Node000008" title=" " alt="" coords="707,160,734,171,758,186,782,199,799,206,797,211,779,204,755,190,731,176,705,164"/>
+<area shape="rect" id="Node000005" href="$namespace_i_r.html#ab45d3b43adbcd5e840ea00566a9d2622" title=" " alt="" coords="1039,13,1162,38"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="967,23,1024,23,1024,28,967,28"/>
+<area shape="rect" id="Node000010" href="$namespace_i_r.html#a434479ddde7e14159d718ff19489492d" title=" " alt="" coords="532,186,723,212"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="443,196,516,196,516,202,443,202"/>
+<area shape="rect" id="Node000011" href="$struct_i_r_1_1_function_type_map.html#a162948d8f2279cf7b70e1ead7878ed7b" title=" " alt="" coords="541,236,713,261"/>
+<area shape="poly" id="edge10_Node000009_Node000011" title=" " alt="" coords="441,210,542,229,541,235,440,215"/>
+</map>

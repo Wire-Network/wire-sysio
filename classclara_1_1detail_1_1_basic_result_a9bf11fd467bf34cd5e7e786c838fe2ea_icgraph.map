@@ -1,0 +1,15 @@
+<map id="clara::detail::BasicResult::type" name="clara::detail::BasicResult::type">
+<area shape="rect" id="Node000001" title=" " alt="" coords="470,128,637,169"/>
+<area shape="rect" id="Node000002" href="$classcpp_1_1ast_1_1_parameter.html#aebd069a2a057dc791df21c56e22912bb" title=" " alt="" coords="264,5,396,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="513,121,469,90,421,61,393,49,396,44,423,57,472,86,516,116"/>
+<area shape="rect" id="Node000003" href="$classclara_1_1detail_1_1_basic_result.html#a325c85c605354d12c844351a88aa6b34" title=" " alt="" coords="246,71,414,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="456,126,411,115,413,109,458,121"/>
+<area shape="rect" id="Node000004" href="$classcpp_1_1ast_1_1_parameter.html#a6514b2e10c1818003d6df7e4e8385eb8" title=" " alt="" coords="238,136,422,161"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="454,151,422,151,422,146,454,146"/>
+<area shape="rect" id="Node000005" href="$classcpp_1_1ast_1_1_variable_declaration.html#a72eae8975219cb7ba0e989ceb2be7ac0" title=" " alt="" coords="238,185,422,226"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="458,176,413,187,411,182,456,170"/>
+<area shape="rect" id="Node000006" href="$classcpp_1_1ast_1_1_variable_declaration.html#ad8821ceb26b91d7c3604486a424c3f8f" title=" " alt="" coords="238,251,422,291"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="516,180,472,211,423,240,396,252,393,248,421,235,469,206,513,176"/>
+<area shape="rect" id="Node000007" href="$classcpp_1_1ast_1_1_variable_declaration.html#aeafe1b55bcf3005d00951f0accb18def" title=" " alt="" coords="5,251,190,291"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="222,274,190,274,190,268,222,268"/>
+</map>

@@ -1,0 +1,12 @@
+<map id="CLI::App::_compare_subcommand_names" name="CLI::App::_compare_subcommand_names">
+<area shape="rect" id="Node000001" title="Helper function to run through all possible comparisons of subcommand names to check there is no over..." alt="" coords="5,59,158,99"/>
+<area shape="poly" id="edge1_Node000001_Node000001" title=" " alt="" coords="43,59,41,49,48,40,61,34,82,32,103,34,117,41,114,45,102,40,81,37,62,39,51,44,46,50,48,57"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_app.html#a3ba6eb33f3ee9cd1a126385fa44f2c16" title="Check the name, case insensitive and underscore insensitive if set." alt="" coords="206,41,361,66"/>
+<area shape="poly" id="edge2_Node000001_Node000002" title=" " alt="" coords="158,67,190,63,191,68,158,72"/>
+<area shape="rect" id="Node000005" href="$class_c_l_i_1_1_app.html#adeac41bd40859dfbff9817244c09c989" title="Get the name of the current app." alt="" coords="214,90,352,116"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="158,85,199,90,198,96,158,91"/>
+<area shape="rect" id="Node000003" href="$namespace_c_l_i_1_1detail.html#a5359a7a0e33366a12e15523b100f591a" title="remove underscores from a string" alt="" coords="412,5,544,46"/>
+<area shape="poly" id="edge3_Node000002_Node000003" title=" " alt="" coords="361,40,396,35,397,40,362,45"/>
+<area shape="rect" id="Node000004" href="$namespace_c_l_i_1_1detail.html#ae83709ec148057ec53df4383645727e9" title="Return a lower case version of a string." alt="" coords="409,70,547,96"/>
+<area shape="poly" id="edge4_Node000002_Node000004" title=" " alt="" coords="362,63,394,68,393,73,361,68"/>
+</map>

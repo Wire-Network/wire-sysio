@@ -1,0 +1,164 @@
+\doxysection{sysio\+::trace\+\_\+api\+::abi\+\_\+data\+\_\+handler Class Reference}
+\hypertarget{classsysio_1_1trace__api_1_1abi__data__handler}{}\label{classsysio_1_1trace__api_1_1abi__data__handler}\index{sysio::trace\_api::abi\_data\_handler@{sysio::trace\_api::abi\_data\_handler}}
+
+
+{\ttfamily \#include $<$abi\+\_\+data\+\_\+handler.\+hpp$>$}
+
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classsysio_1_1trace__api_1_1abi__data__handler_1_1shared__provider}{shared\+\_\+provider}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classsysio_1_1trace__api_1_1abi__data__handler_a3d44ab86339f97c8483c8beb5f8b46fc}{abi\+\_\+data\+\_\+handler}} (\mbox{\hyperlink{namespacesysio_1_1trace__api_abe71d6f34a01119df1abb45e75c65a0f}{exception\+\_\+handler}} except\+\_\+handler)
+\item 
+void \mbox{\hyperlink{classsysio_1_1trace__api_1_1abi__data__handler_a45fdfd7e086c2f51e3d1da63c4c5ef36}{add\+\_\+abi}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{chain\+::name}} \&\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}, const \mbox{\hyperlink{structsysio_1_1chain_1_1abi__def}{chain\+::abi\+\_\+def}} \&abi)
+\item 
+std\+::tuple$<$ \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}}, std\+::optional$<$ \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} $>$ $>$ \mbox{\hyperlink{classsysio_1_1trace__api_1_1abi__data__handler_a71b5e1285cd06e8e0aef49f35b5f31c2}{serialize\+\_\+to\+\_\+variant}} (const std\+::variant$<$ \mbox{\hyperlink{structsysio_1_1trace__api_1_1action__trace__v0}{action\+\_\+trace\+\_\+v0}}, \mbox{\hyperlink{structsysio_1_1trace__api_1_1action__trace__v1}{action\+\_\+trace\+\_\+v1}} $>$ \&\mbox{\hyperlink{structsysio_1_1chain_1_1action}{action}}, const \mbox{\hyperlink{namespacesysio_1_1trace__api_a24d1d2b642518b3d627011e7ef39ae9a}{yield\+\_\+function}} \&yield)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\doxylink{struct_data}{Data} Handler that uses \doxylink{structsysio_1_1chain_1_1abi__serializer}{sysio\+::chain\+::abi\+\_\+serializer} to decode data with a known set of ABI\textquotesingle{}s Can be used directly as a Data\+\_\+handler\+\_\+provider OR shared between request\+\_\+handlers using the \+::shared\+\_\+provider abstraction. 
+
+Definition at line \mbox{\hyperlink{abi__data__handler_8hpp_source_l00019}{19}} of file \mbox{\hyperlink{abi__data__handler_8hpp_source}{abi\+\_\+data\+\_\+handler.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classsysio_1_1trace__api_1_1abi__data__handler_a3d44ab86339f97c8483c8beb5f8b46fc}\index{sysio::trace\_api::abi\_data\_handler@{sysio::trace\_api::abi\_data\_handler}!abi\_data\_handler@{abi\_data\_handler}}
+\index{abi\_data\_handler@{abi\_data\_handler}!sysio::trace\_api::abi\_data\_handler@{sysio::trace\_api::abi\_data\_handler}}
+\doxysubsubsection{\texorpdfstring{abi\_data\_handler()}{abi\_data\_handler()}}
+{\footnotesize\ttfamily \label{classsysio_1_1trace__api_1_1abi__data__handler_a3d44ab86339f97c8483c8beb5f8b46fc} 
+sysio\+::trace\+\_\+api\+::abi\+\_\+data\+\_\+handler\+::abi\+\_\+data\+\_\+handler (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacesysio_1_1trace__api_abe71d6f34a01119df1abb45e75c65a0f}{exception\+\_\+handler}}}]{except\+\_\+handler}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{abi__data__handler_8hpp_source_l00021}{21}} of file \mbox{\hyperlink{abi__data__handler_8hpp_source}{abi\+\_\+data\+\_\+handler.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ :except\_handler(\ std::move(\ except\_handler\ )\ )}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1trace__api_1_1abi__data__handler_a45fdfd7e086c2f51e3d1da63c4c5ef36}\index{sysio::trace\_api::abi\_data\_handler@{sysio::trace\_api::abi\_data\_handler}!add\_abi@{add\_abi}}
+\index{add\_abi@{add\_abi}!sysio::trace\_api::abi\_data\_handler@{sysio::trace\_api::abi\_data\_handler}}
+\doxysubsubsection{\texorpdfstring{add\_abi()}{add\_abi()}}
+{\footnotesize\ttfamily \label{classsysio_1_1trace__api_1_1abi__data__handler_a45fdfd7e086c2f51e3d1da63c4c5ef36} 
+void sysio\+::trace\+\_\+api\+::abi\+\_\+data\+\_\+handler\+::add\+\_\+abi (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{chain\+::name}} \&}]{name}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1abi__def}{chain\+::abi\+\_\+def}} \&}]{abi}{}\end{DoxyParamCaption})}
+
+Add an ABI definition to this data handler 
+\begin{DoxyParams}{Parameters}
+{\em name} & -\/ the name of the account/contract that this ABI belongs to \\
+\hline
+{\em abi} & -\/ the ABI definition of that ABI \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{abi__data__handler_8cpp_source_l00006}{6}} of file \mbox{\hyperlink{abi__data__handler_8cpp_source}{abi\+\_\+data\+\_\+handler.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00006\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00007\ \ \ \ \ \ \ \textcolor{comment}{//\ currently\ abis\ are\ operator\ provided\ so\ no\ need\ to\ protect\ against\ abuse}}
+\DoxyCodeLine{00008\ \ \ \ \ \ \ abi\_serializer\_by\_account.emplace(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},}
+\DoxyCodeLine{00009\ \ \ \ \ \ \ \ \ \ \ \ \ std::make\_shared<chain::abi\_serializer>(abi,\ \mbox{\hyperlink{structsysio_1_1chain_1_1abi__serializer_a2dc34bf706557f0c83d61b3791299c98}{chain::abi\_serializer::create\_yield\_function}}(\mbox{\hyperlink{classfc_1_1microseconds_afc3eb0bfd792c7b1cda062e559e30c2e}{fc::microseconds::maximum}}())));}
+\DoxyCodeLine{00010\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1trace__api_1_1abi__data__handler_a45fdfd7e086c2f51e3d1da63c4c5ef36_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1trace__api_1_1abi__data__handler_a45fdfd7e086c2f51e3d1da63c4c5ef36_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1trace__api_1_1abi__data__handler_a71b5e1285cd06e8e0aef49f35b5f31c2}\index{sysio::trace\_api::abi\_data\_handler@{sysio::trace\_api::abi\_data\_handler}!serialize\_to\_variant@{serialize\_to\_variant}}
+\index{serialize\_to\_variant@{serialize\_to\_variant}!sysio::trace\_api::abi\_data\_handler@{sysio::trace\_api::abi\_data\_handler}}
+\doxysubsubsection{\texorpdfstring{serialize\_to\_variant()}{serialize\_to\_variant()}}
+{\footnotesize\ttfamily \label{classsysio_1_1trace__api_1_1abi__data__handler_a71b5e1285cd06e8e0aef49f35b5f31c2} 
+std\+::tuple$<$ \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}}, std\+::optional$<$ \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} $>$ $>$ sysio\+::trace\+\_\+api\+::abi\+\_\+data\+\_\+handler\+::serialize\+\_\+to\+\_\+variant (\begin{DoxyParamCaption}\item[{const std\+::variant$<$ \mbox{\hyperlink{structsysio_1_1trace__api_1_1action__trace__v0}{action\+\_\+trace\+\_\+v0}}, \mbox{\hyperlink{structsysio_1_1trace__api_1_1action__trace__v1}{action\+\_\+trace\+\_\+v1}} $>$ \&}]{action}{, }\item[{const \mbox{\hyperlink{namespacesysio_1_1trace__api_a24d1d2b642518b3d627011e7ef39ae9a}{yield\+\_\+function}} \&}]{yield}{}\end{DoxyParamCaption})}
+
+Given an action trace, produce a tuple representing the {\ttfamily data} and {\ttfamily return\+\_\+value} fields in the trace
+
+
+\begin{DoxyParams}{Parameters}
+{\em action} & -\/ trace of the action including metadata necessary for finding the ABI \\
+\hline
+{\em yield} & -\/ a yield function to allow cooperation during long running tasks \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+tuple where the first element is a variant representing the {\ttfamily data} field of the action interpreted by known ABIs OR an empty variant, and the second element represents the {\ttfamily return\+\_\+value} field of the trace. 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{abi__data__handler_8cpp_source_l00012}{12}} of file \mbox{\hyperlink{abi__data__handler_8cpp_source}{abi\+\_\+data\+\_\+handler.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00012\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00013\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ account\ =\ std::visit([](\textcolor{keyword}{auto}\ \&\&\mbox{\hyperlink{structaction}{action}})\ -\/>\ \textcolor{keyword}{auto}\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structaction}{action}}.account;\ \},\ \mbox{\hyperlink{structaction}{action}});}
+\DoxyCodeLine{00014\ }
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (abi\_serializer\_by\_account.count(account)\ >\ 0)\ \{}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ \&serializer\_p\ =\ abi\_serializer\_by\_account.at(account);}
+\DoxyCodeLine{00017\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacesysio_1_1chain_a7a1685bcc352cda9e45f055932069428}{action\_name}}\ =\ std::visit([](\textcolor{keyword}{auto}\ \&\&\mbox{\hyperlink{structaction}{action}})\ -\/>\ \textcolor{keyword}{auto}\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structaction}{action}}.\mbox{\hyperlink{structaction_a0be087fbf9a58c69c490951f1b8ea505}{action}};\ \},\ \mbox{\hyperlink{structaction}{action}});}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacesysio_1_1chain_a007674e7dd512662e202e2a3268da2c4}{type\_name}}\ =\ serializer\_p-\/>get\_action\_type(\mbox{\hyperlink{namespacesysio_1_1chain_a7a1685bcc352cda9e45f055932069428}{action\_name}});}
+\DoxyCodeLine{00019\ }
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{namespacesysio_1_1chain_a007674e7dd512662e202e2a3268da2c4}{type\_name}}.empty())\ \{}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ abi\_serializer\ expects\ a\ yield\ function\ that\ takes\ a\ recursion\ depth}}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ abi\_yield\ =\ [\mbox{\hyperlink{namespaceboost_1_1fibers_1_1asio_a65142b77539b20ba6d2abb35a0d4f5d2}{yield}}](\textcolor{keywordtype}{size\_t}\ recursion\_depth)\ \{}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceboost_1_1fibers_1_1asio_a65142b77539b20ba6d2abb35a0d4f5d2}{yield}}();}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ recursion\_depth\ <\ \mbox{\hyperlink{structsysio_1_1chain_1_1abi__serializer_a1d6521ad70c99a7d68c0e59b595ce6f5}{chain::abi\_serializer::max\_recursion\_depth}},\ chain::abi\_recursion\_depth\_exception,}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}exceeded\ max\_recursion\_depth\ \$\{r\}\ "{}},\ (\textcolor{stringliteral}{"{}r"{}},\ \mbox{\hyperlink{structsysio_1_1chain_1_1abi__serializer_a1d6521ad70c99a7d68c0e59b595ce6f5}{chain::abi\_serializer::max\_recursion\_depth}})\ );}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::visit([\&](\textcolor{keyword}{auto}\ \&\&\mbox{\hyperlink{structaction}{action}})\ -\/>\ std::tuple<\mbox{\hyperlink{classfc_1_1variant}{fc::variant}},\ std::optional<fc::variant>>\ \{}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ =\ std::decay\_t<\textcolor{keyword}{decltype}(\mbox{\hyperlink{structaction}{action}})>;}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::optional<fc::variant>\ ret\_data;}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}}\ =\ serializer\_p-\/>binary\_to\_variant(\mbox{\hyperlink{namespacesysio_1_1chain_a007674e7dd512662e202e2a3268da2c4}{type\_name}},\ \mbox{\hyperlink{structaction}{action}}.data,\ abi\_yield);}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keyword}{constexpr}\ (std::is\_same\_v<T,\ action\_trace\_v1>)\ \{}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{structaction}{action}}.return\_value.size()\ >\ 0)\ \{}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ret\_data\ =\ serializer\_p-\/>binary\_to\_variant(\mbox{\hyperlink{namespacesysio_1_1chain_a007674e7dd512662e202e2a3268da2c4}{type\_name}},\ \mbox{\hyperlink{structaction}{action}}.return\_value,\ abi\_yield);}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{\mbox{\hyperlink{namespacefc_a3a1a89eb370c7c0b0c7cf9bfa0bb0c71}{params}},\ ret\_data\};}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \},\ \mbox{\hyperlink{structaction}{action}});}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ except\_handler(\mbox{\hyperlink{plugins_2trace__api__plugin_2include_2sysio_2trace__api_2common_8hpp_acf999535bf43beecf0513ac65ae0c813}{MAKE\_EXCEPTION\_WITH\_CONTEXT}}(std::current\_exception()));}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00044\ }
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{\};}
+\DoxyCodeLine{00046\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=336pt]{classsysio_1_1trace__api_1_1abi__data__handler_a71b5e1285cd06e8e0aef49f35b5f31c2_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+plugins/trace\+\_\+api\+\_\+plugin/include/sysio/trace\+\_\+api/\mbox{\hyperlink{abi__data__handler_8hpp}{abi\+\_\+data\+\_\+handler.\+hpp}}\item 
+plugins/trace\+\_\+api\+\_\+plugin/\mbox{\hyperlink{abi__data__handler_8cpp}{abi\+\_\+data\+\_\+handler.\+cpp}}\end{DoxyCompactItemize}

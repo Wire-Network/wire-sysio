@@ -1,0 +1,513 @@
+\doxysection{sysio\+::vm\+::execution\+\_\+interface Struct Reference}
+\hypertarget{structsysio_1_1vm_1_1execution__interface}{}\label{structsysio_1_1vm_1_1execution__interface}\index{sysio::vm::execution\_interface@{sysio::vm::execution\_interface}}
+
+
+{\ttfamily \#include $<$execution\+\_\+interface.\+hpp$>$}
+
+
+
+Collaboration diagram for sysio\+::vm\+::execution\+\_\+interface\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=212pt]{structsysio_1_1vm_1_1execution__interface__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1vm_1_1execution__interface_a6f30f7ec6697931179c396b8152d9b31}{execution\+\_\+interface}} (char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{structsysio_1_1vm_1_1execution__interface_aee156e49ed42e090ea0950672b22906e}{memory}}, \mbox{\hyperlink{namespacesysio_1_1vm_a80b2c5cc5651a70a1f86e6390546fbd6}{operand\+\_\+stack}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{structsysio_1_1vm_1_1execution__interface_ab9a372ed9206cf89b9b1dc2383a72157}{os}})
+\item 
+void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structsysio_1_1vm_1_1execution__interface_a15cc2cd83df3c0e6572c58f325d4c482}{get\+\_\+memory}} () const
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1execution__interface_a209bec8b3138d230fe2aae2385bc567c}{trim\+\_\+operands}} (std\+::size\+\_\+t amt)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{structsysio_1_1vm_1_1execution__interface_a2b8ae377145c591c5d199c4d91e71c64}{push\+\_\+operand}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\&\mbox{\hyperlink{unionop}{op}})
+\item 
+auto \mbox{\hyperlink{structsysio_1_1vm_1_1execution__interface_a25821ae413bb8e693deac653c82ddd95}{pop\+\_\+operand}} ()
+\item 
+const auto \& \mbox{\hyperlink{structsysio_1_1vm_1_1execution__interface_ac5ab9433c402a92f88dbcb9e1bf02108}{operand\+\_\+from\+\_\+back}} (std\+::size\+\_\+t index) const
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structsysio_1_1vm_1_1execution__interface_aa226d8c9bc28da78dca896d499136780}{validate\+\_\+pointer}} (\mbox{\hyperlink{namespacesysio_1_1vm_a82e706727e849ccc38e1c8e7888c1609}{wasm\+\_\+ptr\+\_\+t}} ptr, \mbox{\hyperlink{namespacesysio_1_1vm_ab7d81f47e123ef4970d3e643196660ea}{wasm\+\_\+size\+\_\+t}} \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}) const
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{structsysio_1_1vm_1_1execution__interface_ab27e50adf88011911f5aab31cdaa90c4}{validate\+\_\+pointer}} (const void \texorpdfstring{$\ast$}{*}ptr, \mbox{\hyperlink{namespacesysio_1_1vm_ab7d81f47e123ef4970d3e643196660ea}{wasm\+\_\+size\+\_\+t}} \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}) const
+\item 
+void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structsysio_1_1vm_1_1execution__interface_a5cbc04a72bafb4d0cfb32453991258af}{validate\+\_\+null\+\_\+terminated\+\_\+pointer}} (\mbox{\hyperlink{namespacesysio_1_1vm_a82e706727e849ccc38e1c8e7888c1609}{wasm\+\_\+ptr\+\_\+t}} ptr) const
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1execution__interface_ae232261f5e82de248bfd4b92523c1948}{validate\+\_\+null\+\_\+terminated\+\_\+pointer}} (const void \texorpdfstring{$\ast$}{*}ptr) const
+\item 
+\mbox{\hyperlink{structsysio_1_1vm_1_1execution__interface_a6f30f7ec6697931179c396b8152d9b31}{execution\+\_\+interface}} (char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{structsysio_1_1vm_1_1execution__interface_aee156e49ed42e090ea0950672b22906e}{memory}}, \mbox{\hyperlink{namespacesysio_1_1vm_a80b2c5cc5651a70a1f86e6390546fbd6}{operand\+\_\+stack}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{structsysio_1_1vm_1_1execution__interface_ab9a372ed9206cf89b9b1dc2383a72157}{os}})
+\item 
+void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structsysio_1_1vm_1_1execution__interface_a15cc2cd83df3c0e6572c58f325d4c482}{get\+\_\+memory}} () const
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1execution__interface_a209bec8b3138d230fe2aae2385bc567c}{trim\+\_\+operands}} (std\+::size\+\_\+t amt)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{structsysio_1_1vm_1_1execution__interface_a2b8ae377145c591c5d199c4d91e71c64}{push\+\_\+operand}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\&\mbox{\hyperlink{unionop}{op}})
+\item 
+auto \mbox{\hyperlink{structsysio_1_1vm_1_1execution__interface_a25821ae413bb8e693deac653c82ddd95}{pop\+\_\+operand}} ()
+\item 
+const auto \& \mbox{\hyperlink{structsysio_1_1vm_1_1execution__interface_ac5ab9433c402a92f88dbcb9e1bf02108}{operand\+\_\+from\+\_\+back}} (std\+::size\+\_\+t index) const
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structsysio_1_1vm_1_1execution__interface_aa226d8c9bc28da78dca896d499136780}{validate\+\_\+pointer}} (\mbox{\hyperlink{namespacesysio_1_1vm_a82e706727e849ccc38e1c8e7888c1609}{wasm\+\_\+ptr\+\_\+t}} ptr, \mbox{\hyperlink{namespacesysio_1_1vm_ab7d81f47e123ef4970d3e643196660ea}{wasm\+\_\+size\+\_\+t}} \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}) const
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{structsysio_1_1vm_1_1execution__interface_ab27e50adf88011911f5aab31cdaa90c4}{validate\+\_\+pointer}} (const void \texorpdfstring{$\ast$}{*}ptr, \mbox{\hyperlink{namespacesysio_1_1vm_ab7d81f47e123ef4970d3e643196660ea}{wasm\+\_\+size\+\_\+t}} \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}) const
+\item 
+void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structsysio_1_1vm_1_1execution__interface_a5cbc04a72bafb4d0cfb32453991258af}{validate\+\_\+null\+\_\+terminated\+\_\+pointer}} (\mbox{\hyperlink{namespacesysio_1_1vm_a82e706727e849ccc38e1c8e7888c1609}{wasm\+\_\+ptr\+\_\+t}} ptr) const
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1execution__interface_ae232261f5e82de248bfd4b92523c1948}{validate\+\_\+null\+\_\+terminated\+\_\+pointer}} (const void \texorpdfstring{$\ast$}{*}ptr) const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structsysio_1_1vm_1_1execution__interface_aee156e49ed42e090ea0950672b22906e}{memory}}
+\item 
+\mbox{\hyperlink{namespacesysio_1_1vm_a80b2c5cc5651a70a1f86e6390546fbd6}{operand\+\_\+stack}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structsysio_1_1vm_1_1execution__interface_ab9a372ed9206cf89b9b1dc2383a72157}{os}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{vm_2execution__interface_8hpp_source_l00013}{13}} of file \mbox{\hyperlink{vm_2execution__interface_8hpp_source}{execution\+\_\+interface.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structsysio_1_1vm_1_1execution__interface_a6f30f7ec6697931179c396b8152d9b31}\index{sysio::vm::execution\_interface@{sysio::vm::execution\_interface}!execution\_interface@{execution\_interface}}
+\index{execution\_interface@{execution\_interface}!sysio::vm::execution\_interface@{sysio::vm::execution\_interface}}
+\doxysubsubsection{\texorpdfstring{execution\_interface()}{execution\_interface()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1execution__interface_a6f30f7ec6697931179c396b8152d9b31} 
+sysio\+::vm\+::execution\+\_\+interface\+::execution\+\_\+interface (\begin{DoxyParamCaption}\item[{char \texorpdfstring{$\ast$}{*}}]{memory}{, }\item[{\mbox{\hyperlink{namespacesysio_1_1vm_a80b2c5cc5651a70a1f86e6390546fbd6}{operand\+\_\+stack}} \texorpdfstring{$\ast$}{*}}]{os}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2execution__interface_8hpp_source_l00014}{14}} of file \mbox{\hyperlink{sysio_2vm_2execution__interface_8hpp_source}{execution\+\_\+interface.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00014\ :\ \mbox{\hyperlink{structsysio_1_1vm_1_1execution__interface_aee156e49ed42e090ea0950672b22906e}{memory}}(\mbox{\hyperlink{structsysio_1_1vm_1_1execution__interface_aee156e49ed42e090ea0950672b22906e}{memory}}),\ \mbox{\hyperlink{structsysio_1_1vm_1_1execution__interface_ab9a372ed9206cf89b9b1dc2383a72157}{os}}(os)\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1vm_1_1execution__interface_a6f30f7ec6697931179c396b8152d9b31}\index{sysio::vm::execution\_interface@{sysio::vm::execution\_interface}!execution\_interface@{execution\_interface}}
+\index{execution\_interface@{execution\_interface}!sysio::vm::execution\_interface@{sysio::vm::execution\_interface}}
+\doxysubsubsection{\texorpdfstring{execution\_interface()}{execution\_interface()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1execution__interface_a6f30f7ec6697931179c396b8152d9b31} 
+sysio\+::vm\+::execution\+\_\+interface\+::execution\+\_\+interface (\begin{DoxyParamCaption}\item[{char \texorpdfstring{$\ast$}{*}}]{memory}{, }\item[{\mbox{\hyperlink{namespacesysio_1_1vm_a80b2c5cc5651a70a1f86e6390546fbd6}{operand\+\_\+stack}} \texorpdfstring{$\ast$}{*}}]{os}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2execution__interface_8hpp_source_l00014}{14}} of file \mbox{\hyperlink{vm_2execution__interface_8hpp_source}{execution\+\_\+interface.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00014\ :\ \mbox{\hyperlink{structsysio_1_1vm_1_1execution__interface_aee156e49ed42e090ea0950672b22906e}{memory}}(\mbox{\hyperlink{structsysio_1_1vm_1_1execution__interface_aee156e49ed42e090ea0950672b22906e}{memory}}),\ \mbox{\hyperlink{structsysio_1_1vm_1_1execution__interface_ab9a372ed9206cf89b9b1dc2383a72157}{os}}(os)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1vm_1_1execution__interface_a15cc2cd83df3c0e6572c58f325d4c482}\index{sysio::vm::execution\_interface@{sysio::vm::execution\_interface}!get\_memory@{get\_memory}}
+\index{get\_memory@{get\_memory}!sysio::vm::execution\_interface@{sysio::vm::execution\_interface}}
+\doxysubsubsection{\texorpdfstring{get\_memory()}{get\_memory()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1execution__interface_a15cc2cd83df3c0e6572c58f325d4c482} 
+void \texorpdfstring{$\ast$}{*} sysio\+::vm\+::execution\+\_\+interface\+::get\+\_\+memory (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2execution__interface_8hpp_source_l00015}{15}} of file \mbox{\hyperlink{sysio_2vm_2execution__interface_8hpp_source}{execution\+\_\+interface.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00015\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1vm_1_1execution__interface_aee156e49ed42e090ea0950672b22906e}{memory}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1vm_1_1execution__interface_a15cc2cd83df3c0e6572c58f325d4c482}\index{sysio::vm::execution\_interface@{sysio::vm::execution\_interface}!get\_memory@{get\_memory}}
+\index{get\_memory@{get\_memory}!sysio::vm::execution\_interface@{sysio::vm::execution\_interface}}
+\doxysubsubsection{\texorpdfstring{get\_memory()}{get\_memory()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1execution__interface_a15cc2cd83df3c0e6572c58f325d4c482} 
+void \texorpdfstring{$\ast$}{*} sysio\+::vm\+::execution\+\_\+interface\+::get\+\_\+memory (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2execution__interface_8hpp_source_l00015}{15}} of file \mbox{\hyperlink{vm_2execution__interface_8hpp_source}{execution\+\_\+interface.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00015\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1vm_1_1execution__interface_aee156e49ed42e090ea0950672b22906e}{memory}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1vm_1_1execution__interface_ac5ab9433c402a92f88dbcb9e1bf02108}\index{sysio::vm::execution\_interface@{sysio::vm::execution\_interface}!operand\_from\_back@{operand\_from\_back}}
+\index{operand\_from\_back@{operand\_from\_back}!sysio::vm::execution\_interface@{sysio::vm::execution\_interface}}
+\doxysubsubsection{\texorpdfstring{operand\_from\_back()}{operand\_from\_back()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1execution__interface_ac5ab9433c402a92f88dbcb9e1bf02108} 
+const auto \& sysio\+::vm\+::execution\+\_\+interface\+::operand\+\_\+from\+\_\+back (\begin{DoxyParamCaption}\item[{std\+::size\+\_\+t}]{index}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2execution__interface_8hpp_source_l00021}{21}} of file \mbox{\hyperlink{sysio_2vm_2execution__interface_8hpp_source}{execution\+\_\+interface.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00021\ \{\ \textcolor{keywordflow}{return}\ os-\/>get\_back(index);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1vm_1_1execution__interface_ac5ab9433c402a92f88dbcb9e1bf02108}\index{sysio::vm::execution\_interface@{sysio::vm::execution\_interface}!operand\_from\_back@{operand\_from\_back}}
+\index{operand\_from\_back@{operand\_from\_back}!sysio::vm::execution\_interface@{sysio::vm::execution\_interface}}
+\doxysubsubsection{\texorpdfstring{operand\_from\_back()}{operand\_from\_back()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1execution__interface_ac5ab9433c402a92f88dbcb9e1bf02108} 
+const auto \& sysio\+::vm\+::execution\+\_\+interface\+::operand\+\_\+from\+\_\+back (\begin{DoxyParamCaption}\item[{std\+::size\+\_\+t}]{index}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2execution__interface_8hpp_source_l00021}{21}} of file \mbox{\hyperlink{vm_2execution__interface_8hpp_source}{execution\+\_\+interface.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00021\ \{\ \textcolor{keywordflow}{return}\ os-\/>get\_back(index);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1vm_1_1execution__interface_a25821ae413bb8e693deac653c82ddd95}\index{sysio::vm::execution\_interface@{sysio::vm::execution\_interface}!pop\_operand@{pop\_operand}}
+\index{pop\_operand@{pop\_operand}!sysio::vm::execution\_interface@{sysio::vm::execution\_interface}}
+\doxysubsubsection{\texorpdfstring{pop\_operand()}{pop\_operand()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1execution__interface_a25821ae413bb8e693deac653c82ddd95} 
+auto sysio\+::vm\+::execution\+\_\+interface\+::pop\+\_\+operand (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2execution__interface_8hpp_source_l00020}{20}} of file \mbox{\hyperlink{sysio_2vm_2execution__interface_8hpp_source}{execution\+\_\+interface.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00020\ \{\ \textcolor{keywordflow}{return}\ os-\/>pop();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1vm_1_1execution__interface_a25821ae413bb8e693deac653c82ddd95}\index{sysio::vm::execution\_interface@{sysio::vm::execution\_interface}!pop\_operand@{pop\_operand}}
+\index{pop\_operand@{pop\_operand}!sysio::vm::execution\_interface@{sysio::vm::execution\_interface}}
+\doxysubsubsection{\texorpdfstring{pop\_operand()}{pop\_operand()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1execution__interface_a25821ae413bb8e693deac653c82ddd95} 
+auto sysio\+::vm\+::execution\+\_\+interface\+::pop\+\_\+operand (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2execution__interface_8hpp_source_l00020}{20}} of file \mbox{\hyperlink{vm_2execution__interface_8hpp_source}{execution\+\_\+interface.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00020\ \{\ \textcolor{keywordflow}{return}\ os-\/>pop();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1vm_1_1execution__interface_a2b8ae377145c591c5d199c4d91e71c64}\index{sysio::vm::execution\_interface@{sysio::vm::execution\_interface}!push\_operand@{push\_operand}}
+\index{push\_operand@{push\_operand}!sysio::vm::execution\_interface@{sysio::vm::execution\_interface}}
+\doxysubsubsection{\texorpdfstring{push\_operand()}{push\_operand()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1execution__interface_a2b8ae377145c591c5d199c4d91e71c64} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+void sysio\+::vm\+::execution\+\_\+interface\+::push\+\_\+operand (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\&}]{op}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2execution__interface_8hpp_source_l00019}{19}} of file \mbox{\hyperlink{sysio_2vm_2execution__interface_8hpp_source}{execution\+\_\+interface.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00019\ \{\ os-\/>push(std::forward<T>(\mbox{\hyperlink{unionop}{op}}));\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1vm_1_1execution__interface_a2b8ae377145c591c5d199c4d91e71c64}\index{sysio::vm::execution\_interface@{sysio::vm::execution\_interface}!push\_operand@{push\_operand}}
+\index{push\_operand@{push\_operand}!sysio::vm::execution\_interface@{sysio::vm::execution\_interface}}
+\doxysubsubsection{\texorpdfstring{push\_operand()}{push\_operand()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1execution__interface_a2b8ae377145c591c5d199c4d91e71c64} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+void sysio\+::vm\+::execution\+\_\+interface\+::push\+\_\+operand (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\&}]{op}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2execution__interface_8hpp_source_l00019}{19}} of file \mbox{\hyperlink{vm_2execution__interface_8hpp_source}{execution\+\_\+interface.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00019\ \{\ os-\/>push(std::forward<T>(\mbox{\hyperlink{unionop}{op}}));\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1vm_1_1execution__interface_a209bec8b3138d230fe2aae2385bc567c}\index{sysio::vm::execution\_interface@{sysio::vm::execution\_interface}!trim\_operands@{trim\_operands}}
+\index{trim\_operands@{trim\_operands}!sysio::vm::execution\_interface@{sysio::vm::execution\_interface}}
+\doxysubsubsection{\texorpdfstring{trim\_operands()}{trim\_operands()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1execution__interface_a209bec8b3138d230fe2aae2385bc567c} 
+void sysio\+::vm\+::execution\+\_\+interface\+::trim\+\_\+operands (\begin{DoxyParamCaption}\item[{std\+::size\+\_\+t}]{amt}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2execution__interface_8hpp_source_l00016}{16}} of file \mbox{\hyperlink{sysio_2vm_2execution__interface_8hpp_source}{execution\+\_\+interface.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00016\ \{\ os-\/>trim(amt);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1vm_1_1execution__interface_a209bec8b3138d230fe2aae2385bc567c}\index{sysio::vm::execution\_interface@{sysio::vm::execution\_interface}!trim\_operands@{trim\_operands}}
+\index{trim\_operands@{trim\_operands}!sysio::vm::execution\_interface@{sysio::vm::execution\_interface}}
+\doxysubsubsection{\texorpdfstring{trim\_operands()}{trim\_operands()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1execution__interface_a209bec8b3138d230fe2aae2385bc567c} 
+void sysio\+::vm\+::execution\+\_\+interface\+::trim\+\_\+operands (\begin{DoxyParamCaption}\item[{std\+::size\+\_\+t}]{amt}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2execution__interface_8hpp_source_l00016}{16}} of file \mbox{\hyperlink{vm_2execution__interface_8hpp_source}{execution\+\_\+interface.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00016\ \{\ os-\/>trim(amt);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1vm_1_1execution__interface_ae232261f5e82de248bfd4b92523c1948}\index{sysio::vm::execution\_interface@{sysio::vm::execution\_interface}!validate\_null\_terminated\_pointer@{validate\_null\_terminated\_pointer}}
+\index{validate\_null\_terminated\_pointer@{validate\_null\_terminated\_pointer}!sysio::vm::execution\_interface@{sysio::vm::execution\_interface}}
+\doxysubsubsection{\texorpdfstring{validate\_null\_terminated\_pointer()}{validate\_null\_terminated\_pointer()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1execution__interface_ae232261f5e82de248bfd4b92523c1948} 
+void sysio\+::vm\+::execution\+\_\+interface\+::validate\+\_\+null\+\_\+terminated\+\_\+pointer (\begin{DoxyParamCaption}\item[{const void \texorpdfstring{$\ast$}{*}}]{ptr}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2execution__interface_8hpp_source_l00043}{43}} of file \mbox{\hyperlink{sysio_2vm_2execution__interface_8hpp_source}{execution\+\_\+interface.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{volatile}\ \textcolor{keyword}{auto}\ check\_addr\ =\ std::strlen(\textcolor{keyword}{static\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(ptr));}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1vm_a54ec5a188f3bccc28c33687d74736bdf}{ignore\_unused\_variable\_warning}}(check\_addr);}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1vm_1_1execution__interface_ae232261f5e82de248bfd4b92523c1948_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1vm_1_1execution__interface_ae232261f5e82de248bfd4b92523c1948}\index{sysio::vm::execution\_interface@{sysio::vm::execution\_interface}!validate\_null\_terminated\_pointer@{validate\_null\_terminated\_pointer}}
+\index{validate\_null\_terminated\_pointer@{validate\_null\_terminated\_pointer}!sysio::vm::execution\_interface@{sysio::vm::execution\_interface}}
+\doxysubsubsection{\texorpdfstring{validate\_null\_terminated\_pointer()}{validate\_null\_terminated\_pointer()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1execution__interface_ae232261f5e82de248bfd4b92523c1948} 
+void sysio\+::vm\+::execution\+\_\+interface\+::validate\+\_\+null\+\_\+terminated\+\_\+pointer (\begin{DoxyParamCaption}\item[{const void \texorpdfstring{$\ast$}{*}}]{ptr}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2execution__interface_8hpp_source_l00043}{43}} of file \mbox{\hyperlink{vm_2execution__interface_8hpp_source}{execution\+\_\+interface.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{volatile}\ \textcolor{keyword}{auto}\ check\_addr\ =\ std::strlen(\textcolor{keyword}{static\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(ptr));}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1vm_a54ec5a188f3bccc28c33687d74736bdf}{ignore\_unused\_variable\_warning}}(check\_addr);}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1vm_1_1execution__interface_ae232261f5e82de248bfd4b92523c1948_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1vm_1_1execution__interface_a5cbc04a72bafb4d0cfb32453991258af}\index{sysio::vm::execution\_interface@{sysio::vm::execution\_interface}!validate\_null\_terminated\_pointer@{validate\_null\_terminated\_pointer}}
+\index{validate\_null\_terminated\_pointer@{validate\_null\_terminated\_pointer}!sysio::vm::execution\_interface@{sysio::vm::execution\_interface}}
+\doxysubsubsection{\texorpdfstring{validate\_null\_terminated\_pointer()}{validate\_null\_terminated\_pointer()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1execution__interface_a5cbc04a72bafb4d0cfb32453991258af} 
+void \texorpdfstring{$\ast$}{*} sysio\+::vm\+::execution\+\_\+interface\+::validate\+\_\+null\+\_\+terminated\+\_\+pointer (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacesysio_1_1vm_a82e706727e849ccc38e1c8e7888c1609}{wasm\+\_\+ptr\+\_\+t}}}]{ptr}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2execution__interface_8hpp_source_l00037}{37}} of file \mbox{\hyperlink{sysio_2vm_2execution__interface_8hpp_source}{execution\+\_\+interface.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ result\ =\ \mbox{\hyperlink{structsysio_1_1vm_1_1execution__interface_aee156e49ed42e090ea0950672b22906e}{memory}}\ +\ ptr;}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1execution__interface_a5cbc04a72bafb4d0cfb32453991258af}{validate\_null\_terminated\_pointer}}(result);}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=202pt]{structsysio_1_1vm_1_1execution__interface_a5cbc04a72bafb4d0cfb32453991258af_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=202pt]{structsysio_1_1vm_1_1execution__interface_a5cbc04a72bafb4d0cfb32453991258af_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1vm_1_1execution__interface_a5cbc04a72bafb4d0cfb32453991258af}\index{sysio::vm::execution\_interface@{sysio::vm::execution\_interface}!validate\_null\_terminated\_pointer@{validate\_null\_terminated\_pointer}}
+\index{validate\_null\_terminated\_pointer@{validate\_null\_terminated\_pointer}!sysio::vm::execution\_interface@{sysio::vm::execution\_interface}}
+\doxysubsubsection{\texorpdfstring{validate\_null\_terminated\_pointer()}{validate\_null\_terminated\_pointer()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1execution__interface_a5cbc04a72bafb4d0cfb32453991258af} 
+void \texorpdfstring{$\ast$}{*} sysio\+::vm\+::execution\+\_\+interface\+::validate\+\_\+null\+\_\+terminated\+\_\+pointer (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacesysio_1_1vm_a82e706727e849ccc38e1c8e7888c1609}{wasm\+\_\+ptr\+\_\+t}}}]{ptr}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2execution__interface_8hpp_source_l00037}{37}} of file \mbox{\hyperlink{vm_2execution__interface_8hpp_source}{execution\+\_\+interface.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ result\ =\ \mbox{\hyperlink{structsysio_1_1vm_1_1execution__interface_aee156e49ed42e090ea0950672b22906e}{memory}}\ +\ ptr;}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1execution__interface_a5cbc04a72bafb4d0cfb32453991258af}{validate\_null\_terminated\_pointer}}(result);}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=202pt]{structsysio_1_1vm_1_1execution__interface_a5cbc04a72bafb4d0cfb32453991258af_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1vm_1_1execution__interface_ab27e50adf88011911f5aab31cdaa90c4}\index{sysio::vm::execution\_interface@{sysio::vm::execution\_interface}!validate\_pointer@{validate\_pointer}}
+\index{validate\_pointer@{validate\_pointer}!sysio::vm::execution\_interface@{sysio::vm::execution\_interface}}
+\doxysubsubsection{\texorpdfstring{validate\_pointer()}{validate\_pointer()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1execution__interface_ab27e50adf88011911f5aab31cdaa90c4} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+void sysio\+::vm\+::execution\+\_\+interface\+::validate\+\_\+pointer (\begin{DoxyParamCaption}\item[{const void \texorpdfstring{$\ast$}{*}}]{ptr}{, }\item[{\mbox{\hyperlink{namespacesysio_1_1vm_ab7d81f47e123ef4970d3e643196660ea}{wasm\+\_\+size\+\_\+t}}}]{len}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2execution__interface_8hpp_source_l00031}{31}} of file \mbox{\hyperlink{sysio_2vm_2execution__interface_8hpp_source}{execution\+\_\+interface.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ <=\ std::numeric\_limits<wasm\_size\_t>::max()\ /\ (\mbox{\hyperlink{namespacesysio_1_1vm_ab7d81f47e123ef4970d3e643196660ea}{wasm\_size\_t}})\textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}),\ wasm\_interpreter\_exception,\ \textcolor{stringliteral}{"{}length\ will\ overflow"{}}\ );}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{volatile}\ \textcolor{keyword}{auto}\ check\_addr\ =\ *(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(ptr)\ +\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ *\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}))\ -\/\ 1);}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1vm_a54ec5a188f3bccc28c33687d74736bdf}{ignore\_unused\_variable\_warning}}(check\_addr);}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1vm_1_1execution__interface_ab27e50adf88011911f5aab31cdaa90c4_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1vm_1_1execution__interface_ab27e50adf88011911f5aab31cdaa90c4}\index{sysio::vm::execution\_interface@{sysio::vm::execution\_interface}!validate\_pointer@{validate\_pointer}}
+\index{validate\_pointer@{validate\_pointer}!sysio::vm::execution\_interface@{sysio::vm::execution\_interface}}
+\doxysubsubsection{\texorpdfstring{validate\_pointer()}{validate\_pointer()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1execution__interface_ab27e50adf88011911f5aab31cdaa90c4} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+void sysio\+::vm\+::execution\+\_\+interface\+::validate\+\_\+pointer (\begin{DoxyParamCaption}\item[{const void \texorpdfstring{$\ast$}{*}}]{ptr}{, }\item[{\mbox{\hyperlink{namespacesysio_1_1vm_ab7d81f47e123ef4970d3e643196660ea}{wasm\+\_\+size\+\_\+t}}}]{len}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2execution__interface_8hpp_source_l00031}{31}} of file \mbox{\hyperlink{vm_2execution__interface_8hpp_source}{execution\+\_\+interface.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ <=\ std::numeric\_limits<wasm\_size\_t>::max()\ /\ (\mbox{\hyperlink{namespacesysio_1_1vm_ab7d81f47e123ef4970d3e643196660ea}{wasm\_size\_t}})\textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}),\ wasm\_interpreter\_exception,\ \textcolor{stringliteral}{"{}length\ will\ overflow"{}}\ );}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{volatile}\ \textcolor{keyword}{auto}\ check\_addr\ =\ *(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(ptr)\ +\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ *\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}))\ -\/\ 1);}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1vm_a54ec5a188f3bccc28c33687d74736bdf}{ignore\_unused\_variable\_warning}}(check\_addr);}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1vm_1_1execution__interface_ab27e50adf88011911f5aab31cdaa90c4_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1vm_1_1execution__interface_aa226d8c9bc28da78dca896d499136780}\index{sysio::vm::execution\_interface@{sysio::vm::execution\_interface}!validate\_pointer@{validate\_pointer}}
+\index{validate\_pointer@{validate\_pointer}!sysio::vm::execution\_interface@{sysio::vm::execution\_interface}}
+\doxysubsubsection{\texorpdfstring{validate\_pointer()}{validate\_pointer()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1execution__interface_aa226d8c9bc28da78dca896d499136780} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+void \texorpdfstring{$\ast$}{*} sysio\+::vm\+::execution\+\_\+interface\+::validate\+\_\+pointer (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacesysio_1_1vm_a82e706727e849ccc38e1c8e7888c1609}{wasm\+\_\+ptr\+\_\+t}}}]{ptr}{, }\item[{\mbox{\hyperlink{namespacesysio_1_1vm_ab7d81f47e123ef4970d3e643196660ea}{wasm\+\_\+size\+\_\+t}}}]{len}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2execution__interface_8hpp_source_l00024}{24}} of file \mbox{\hyperlink{sysio_2vm_2execution__interface_8hpp_source}{execution\+\_\+interface.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ result\ =\ \mbox{\hyperlink{structsysio_1_1vm_1_1execution__interface_aee156e49ed42e090ea0950672b22906e}{memory}}\ +\ ptr;}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1execution__interface_aa226d8c9bc28da78dca896d499136780}{validate\_pointer<T>}}(result,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}});}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=187pt]{structsysio_1_1vm_1_1execution__interface_aa226d8c9bc28da78dca896d499136780_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=187pt]{structsysio_1_1vm_1_1execution__interface_aa226d8c9bc28da78dca896d499136780_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1vm_1_1execution__interface_aa226d8c9bc28da78dca896d499136780}\index{sysio::vm::execution\_interface@{sysio::vm::execution\_interface}!validate\_pointer@{validate\_pointer}}
+\index{validate\_pointer@{validate\_pointer}!sysio::vm::execution\_interface@{sysio::vm::execution\_interface}}
+\doxysubsubsection{\texorpdfstring{validate\_pointer()}{validate\_pointer()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1execution__interface_aa226d8c9bc28da78dca896d499136780} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+void \texorpdfstring{$\ast$}{*} sysio\+::vm\+::execution\+\_\+interface\+::validate\+\_\+pointer (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacesysio_1_1vm_a82e706727e849ccc38e1c8e7888c1609}{wasm\+\_\+ptr\+\_\+t}}}]{ptr}{, }\item[{\mbox{\hyperlink{namespacesysio_1_1vm_ab7d81f47e123ef4970d3e643196660ea}{wasm\+\_\+size\+\_\+t}}}]{len}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2execution__interface_8hpp_source_l00024}{24}} of file \mbox{\hyperlink{vm_2execution__interface_8hpp_source}{execution\+\_\+interface.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ result\ =\ \mbox{\hyperlink{structsysio_1_1vm_1_1execution__interface_aee156e49ed42e090ea0950672b22906e}{memory}}\ +\ ptr;}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1execution__interface_aa226d8c9bc28da78dca896d499136780}{validate\_pointer<T>}}(result,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}});}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=187pt]{structsysio_1_1vm_1_1execution__interface_aa226d8c9bc28da78dca896d499136780_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1vm_1_1execution__interface_aee156e49ed42e090ea0950672b22906e}\index{sysio::vm::execution\_interface@{sysio::vm::execution\_interface}!memory@{memory}}
+\index{memory@{memory}!sysio::vm::execution\_interface@{sysio::vm::execution\_interface}}
+\doxysubsubsection{\texorpdfstring{memory}{memory}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1execution__interface_aee156e49ed42e090ea0950672b22906e} 
+char \texorpdfstring{$\ast$}{*} sysio\+::vm\+::execution\+\_\+interface\+::memory}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2execution__interface_8hpp_source_l00047}{47}} of file \mbox{\hyperlink{sysio_2vm_2execution__interface_8hpp_source}{execution\+\_\+interface.\+hpp}}.
+
+\Hypertarget{structsysio_1_1vm_1_1execution__interface_ab9a372ed9206cf89b9b1dc2383a72157}\index{sysio::vm::execution\_interface@{sysio::vm::execution\_interface}!os@{os}}
+\index{os@{os}!sysio::vm::execution\_interface@{sysio::vm::execution\_interface}}
+\doxysubsubsection{\texorpdfstring{os}{os}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1execution__interface_ab9a372ed9206cf89b9b1dc2383a72157} 
+\mbox{\hyperlink{namespacesysio_1_1vm_a80b2c5cc5651a70a1f86e6390546fbd6}{operand\+\_\+stack}} \texorpdfstring{$\ast$}{*} sysio\+::vm\+::execution\+\_\+interface\+::os}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2execution__interface_8hpp_source_l00048}{48}} of file \mbox{\hyperlink{sysio_2vm_2execution__interface_8hpp_source}{execution\+\_\+interface.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/include/sysio/sysio/vm/\mbox{\hyperlink{sysio_2vm_2execution__interface_8hpp}{execution\+\_\+interface.\+hpp}}\item 
+libraries/sys-\/vm/include/sysio/vm/\mbox{\hyperlink{vm_2execution__interface_8hpp}{execution\+\_\+interface.\+hpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,114 @@
+\doxysection{Catch\+::Test\+Spec\+Parser Class Reference}
+\hypertarget{class_catch_1_1_test_spec_parser}{}\label{class_catch_1_1_test_spec_parser}\index{Catch::TestSpecParser@{Catch::TestSpecParser}}
+
+
+{\ttfamily \#include $<$catch\+\_\+test\+\_\+spec\+\_\+parser.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_catch_1_1_test_spec_parser_abcf08413406eb1b9bc6983f4f88d7a49}{Test\+Spec\+Parser}} (\mbox{\hyperlink{struct_catch_1_1_i_tag_alias_registry}{ITag\+Alias\+Registry}} const \&tag\+Aliases)
+\item 
+\mbox{\hyperlink{class_catch_1_1_test_spec_parser}{Test\+Spec\+Parser}} \& \mbox{\hyperlink{class_catch_1_1_test_spec_parser_ae64a39ddb12beec3f884ff2905682213}{parse}} (std\+::string const \&arg)
+\item 
+\mbox{\hyperlink{class_catch_1_1_test_spec}{Test\+Spec}} \mbox{\hyperlink{class_catch_1_1_test_spec_parser_add7c2909cf42d02e83d504956dc3e8bc}{test\+Spec}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{catch__test__spec__parser_8h_source_l00022}{22}} of file \mbox{\hyperlink{catch__test__spec__parser_8h_source}{catch\+\_\+test\+\_\+spec\+\_\+parser.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_catch_1_1_test_spec_parser_abcf08413406eb1b9bc6983f4f88d7a49}\index{Catch::TestSpecParser@{Catch::TestSpecParser}!TestSpecParser@{TestSpecParser}}
+\index{TestSpecParser@{TestSpecParser}!Catch::TestSpecParser@{Catch::TestSpecParser}}
+\doxysubsubsection{\texorpdfstring{TestSpecParser()}{TestSpecParser()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_test_spec_parser_abcf08413406eb1b9bc6983f4f88d7a49} 
+Catch\+::\+Test\+Spec\+Parser\+::\+Test\+Spec\+Parser (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_i_tag_alias_registry}{ITag\+Alias\+Registry}} const \&}]{tag\+Aliases}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__test__spec__parser_8cpp_source_l00012}{12}} of file \mbox{\hyperlink{catch__test__spec__parser_8cpp_source}{catch\+\_\+test\+\_\+spec\+\_\+parser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00012\ :\ m\_tagAliases(\ \&tagAliases\ )\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_catch_1_1_test_spec_parser_ae64a39ddb12beec3f884ff2905682213}\index{Catch::TestSpecParser@{Catch::TestSpecParser}!parse@{parse}}
+\index{parse@{parse}!Catch::TestSpecParser@{Catch::TestSpecParser}}
+\doxysubsubsection{\texorpdfstring{parse()}{parse()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_test_spec_parser_ae64a39ddb12beec3f884ff2905682213} 
+\mbox{\hyperlink{class_catch_1_1_test_spec_parser}{Test\+Spec\+Parser}} \& Catch\+::\+Test\+Spec\+Parser\+::parse (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{arg}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__test__spec__parser_8cpp_source_l00014}{14}} of file \mbox{\hyperlink{catch__test__spec__parser_8cpp_source}{catch\+\_\+test\+\_\+spec\+\_\+parser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00014\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \ \ m\_mode\ =\ None;}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \ \ m\_exclusion\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00017\ \ \ \ \ \ \ \ \ m\_start\ =\ std::string::npos;}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ m\_arg\ =\ m\_tagAliases-\/>\mbox{\hyperlink{struct_catch_1_1_i_tag_alias_registry_ae729a7532faf7466db1a157ce0395170}{expandAliases}}(\ arg\ );}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ m\_escapeChars.clear();}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ m\_pos\ =\ 0;\ m\_pos\ <\ m\_arg.size();\ ++m\_pos\ )}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \ \ \ \ visitChar(\ m\_arg[m\_pos]\ );}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ m\_mode\ ==\ Name\ )}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \ \ \ \ addPattern<TestSpec::NamePattern>();}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00025\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_test_spec_parser_ae64a39ddb12beec3f884ff2905682213_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_test_spec_parser_ae64a39ddb12beec3f884ff2905682213_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_test_spec_parser_add7c2909cf42d02e83d504956dc3e8bc}\index{Catch::TestSpecParser@{Catch::TestSpecParser}!testSpec@{testSpec}}
+\index{testSpec@{testSpec}!Catch::TestSpecParser@{Catch::TestSpecParser}}
+\doxysubsubsection{\texorpdfstring{testSpec()}{testSpec()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_test_spec_parser_add7c2909cf42d02e83d504956dc3e8bc} 
+\mbox{\hyperlink{class_catch_1_1_test_spec}{Test\+Spec}} Catch\+::\+Test\+Spec\+Parser\+::test\+Spec (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__test__spec__parser_8cpp_source_l00026}{26}} of file \mbox{\hyperlink{catch__test__spec__parser_8cpp_source}{catch\+\_\+test\+\_\+spec\+\_\+parser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ addFilter();}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_testSpec;}
+\DoxyCodeLine{00029\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_test_spec_parser_add7c2909cf42d02e83d504956dc3e8bc_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__test__spec__parser_8h}{catch\+\_\+test\+\_\+spec\+\_\+parser.\+h}}\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__test__spec__parser_8cpp}{catch\+\_\+test\+\_\+spec\+\_\+parser.\+cpp}}\end{DoxyCompactItemize}

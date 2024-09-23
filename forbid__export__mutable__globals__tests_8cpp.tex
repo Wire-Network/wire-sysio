@@ -1,0 +1,156 @@
+\doxysection{libraries/sys-\/vm/tests/forbid\+\_\+export\+\_\+mutable\+\_\+globals\+\_\+tests.cpp File Reference}
+\hypertarget{forbid__export__mutable__globals__tests_8cpp}{}\label{forbid__export__mutable__globals__tests_8cpp}\index{libraries/sys-\/vm/tests/forbid\_export\_mutable\_globals\_tests.cpp@{libraries/sys-\/vm/tests/forbid\_export\_mutable\_globals\_tests.cpp}}
+{\ttfamily \#include $<$sysio/vm/backend.\+hpp$>$}\newline
+{\ttfamily \#include "{}utils.\+hpp"{}}\newline
+{\ttfamily \#include $<$catch2/catch.\+hpp$>$}\newline
+Include dependency graph for forbid\+\_\+export\+\_\+mutable\+\_\+globals\+\_\+tests.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{forbid__export__mutable__globals__tests_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{forbid__export__mutable__globals__tests_8cpp_a752fa21e25916a74ac8d40ee4cdaf235}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Test forbid\+\_\+export\+\_\+mutable\+\_\+globals default"{}, "{}\mbox{[}forbid\+\_\+export\+\_\+mutable\+\_\+globals\+\_\+test\mbox{]}"{})
+\item 
+\mbox{\hyperlink{forbid__export__mutable__globals__tests_8cpp_a4d3751a4cd1402f642b301e45114fc27}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Test forbid\+\_\+export\+\_\+mutable\+\_\+globals empty"{}, "{}\mbox{[}forbid\+\_\+export\+\_\+mutable\+\_\+globals\+\_\+test\mbox{]}"{})
+\item 
+\mbox{\hyperlink{forbid__export__mutable__globals__tests_8cpp_a091685b7d6d395d859c645c3e297f03d}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Test forbid\+\_\+export\+\_\+mutable\+\_\+globals static pass"{}, "{}\mbox{[}forbid\+\_\+export\+\_\+mutable\+\_\+globals\+\_\+test\mbox{]}"{})
+\item 
+\mbox{\hyperlink{forbid__export__mutable__globals__tests_8cpp_afa66c394e2c72f01e1ce9043a53fcaef}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Test forbid\+\_\+export\+\_\+mutable\+\_\+globals static fail"{}, "{}\mbox{[}forbid\+\_\+export\+\_\+mutable\+\_\+globals\+\_\+test\mbox{]}"{})
+\item 
+\mbox{\hyperlink{forbid__export__mutable__globals__tests_8cpp_a52686e402337690850b67af739dcc043}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Test forbid\+\_\+export\+\_\+mutable\+\_\+globals dynamic pass"{}, "{}\mbox{[}forbid\+\_\+export\+\_\+mutable\+\_\+globals\+\_\+test\mbox{]}"{})
+\item 
+\mbox{\hyperlink{forbid__export__mutable__globals__tests_8cpp_a7a33bb3a144befe3acca75b6f3b74642}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Test forbid\+\_\+export\+\_\+mutable\+\_\+globals dynamic fail"{}, "{}\mbox{[}forbid\+\_\+export\+\_\+mutable\+\_\+globals\+\_\+test\mbox{]}"{})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+wasm\+\_\+allocator \mbox{\hyperlink{forbid__export__mutable__globals__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{forbid__export__mutable__globals__tests_8cpp_a752fa21e25916a74ac8d40ee4cdaf235}\index{forbid\_export\_mutable\_globals\_tests.cpp@{forbid\_export\_mutable\_globals\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!forbid\_export\_mutable\_globals\_tests.cpp@{forbid\_export\_mutable\_globals\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/6]}}
+{\footnotesize\ttfamily \label{forbid__export__mutable__globals__tests_8cpp_a752fa21e25916a74ac8d40ee4cdaf235} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Test forbid\+\_\+export\+\_\+mutable\+\_\+globals default"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}forbid\+\_\+export\+\_\+mutable\+\_\+globals\+\_\+test\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{forbid__export__mutable__globals__tests_8cpp_source_l00035}{35}} of file \mbox{\hyperlink{forbid__export__mutable__globals__tests_8cpp_source}{forbid\+\_\+export\+\_\+mutable\+\_\+globals\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00036\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType>}};}
+\DoxyCodeLine{00037\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend}}(mut\_global\_wasm,\ \&\mbox{\hyperlink{forbid__export__mutable__globals__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00038\ \}}
+
+\end{DoxyCode}
+\Hypertarget{forbid__export__mutable__globals__tests_8cpp_a7a33bb3a144befe3acca75b6f3b74642}\index{forbid\_export\_mutable\_globals\_tests.cpp@{forbid\_export\_mutable\_globals\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!forbid\_export\_mutable\_globals\_tests.cpp@{forbid\_export\_mutable\_globals\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/6]}}
+{\footnotesize\ttfamily \label{forbid__export__mutable__globals__tests_8cpp_a7a33bb3a144befe3acca75b6f3b74642} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Test forbid\+\_\+export\+\_\+mutable\+\_\+globals dynamic fail"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}forbid\+\_\+export\+\_\+mutable\+\_\+globals\+\_\+test\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{forbid__export__mutable__globals__tests_8cpp_source_l00060}{60}} of file \mbox{\hyperlink{forbid__export__mutable__globals__tests_8cpp_source}{forbid\+\_\+export\+\_\+mutable\+\_\+globals\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00061\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ dynamic\_options>}};}
+\DoxyCodeLine{00062\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(mut\_global\_wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\{\textcolor{keyword}{true}\}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{00063\ \}}
+
+\end{DoxyCode}
+\Hypertarget{forbid__export__mutable__globals__tests_8cpp_a52686e402337690850b67af739dcc043}\index{forbid\_export\_mutable\_globals\_tests.cpp@{forbid\_export\_mutable\_globals\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!forbid\_export\_mutable\_globals\_tests.cpp@{forbid\_export\_mutable\_globals\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [3/6]}}
+{\footnotesize\ttfamily \label{forbid__export__mutable__globals__tests_8cpp_a52686e402337690850b67af739dcc043} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Test forbid\+\_\+export\+\_\+mutable\+\_\+globals dynamic pass"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}forbid\+\_\+export\+\_\+mutable\+\_\+globals\+\_\+test\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{forbid__export__mutable__globals__tests_8cpp_source_l00055}{55}} of file \mbox{\hyperlink{forbid__export__mutable__globals__tests_8cpp_source}{forbid\+\_\+export\+\_\+mutable\+\_\+globals\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00056\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ dynamic\_options>}};}
+\DoxyCodeLine{00057\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend}}(mut\_global\_wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\{\textcolor{keyword}{false}\});}
+\DoxyCodeLine{00058\ \}}
+
+\end{DoxyCode}
+\Hypertarget{forbid__export__mutable__globals__tests_8cpp_a4d3751a4cd1402f642b301e45114fc27}\index{forbid\_export\_mutable\_globals\_tests.cpp@{forbid\_export\_mutable\_globals\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!forbid\_export\_mutable\_globals\_tests.cpp@{forbid\_export\_mutable\_globals\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [4/6]}}
+{\footnotesize\ttfamily \label{forbid__export__mutable__globals__tests_8cpp_a4d3751a4cd1402f642b301e45114fc27} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Test forbid\+\_\+export\+\_\+mutable\+\_\+globals empty"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}forbid\+\_\+export\+\_\+mutable\+\_\+globals\+\_\+test\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{forbid__export__mutable__globals__tests_8cpp_source_l00040}{40}} of file \mbox{\hyperlink{forbid__export__mutable__globals__tests_8cpp_source}{forbid\+\_\+export\+\_\+mutable\+\_\+globals\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00041\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ empty\_options>}};}
+\DoxyCodeLine{00042\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend}}(mut\_global\_wasm,\ \&\mbox{\hyperlink{forbid__export__mutable__globals__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00043\ \}}
+
+\end{DoxyCode}
+\Hypertarget{forbid__export__mutable__globals__tests_8cpp_afa66c394e2c72f01e1ce9043a53fcaef}\index{forbid\_export\_mutable\_globals\_tests.cpp@{forbid\_export\_mutable\_globals\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!forbid\_export\_mutable\_globals\_tests.cpp@{forbid\_export\_mutable\_globals\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [5/6]}}
+{\footnotesize\ttfamily \label{forbid__export__mutable__globals__tests_8cpp_afa66c394e2c72f01e1ce9043a53fcaef} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Test forbid\+\_\+export\+\_\+mutable\+\_\+globals static fail"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}forbid\+\_\+export\+\_\+mutable\+\_\+globals\+\_\+test\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{forbid__export__mutable__globals__tests_8cpp_source_l00050}{50}} of file \mbox{\hyperlink{forbid__export__mutable__globals__tests_8cpp_source}{forbid\+\_\+export\+\_\+mutable\+\_\+globals\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00051\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ static\_options\_true>}};}
+\DoxyCodeLine{00052\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(mut\_global\_wasm,\ \&\mbox{\hyperlink{forbid__export__mutable__globals__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{00053\ \}}
+
+\end{DoxyCode}
+\Hypertarget{forbid__export__mutable__globals__tests_8cpp_a091685b7d6d395d859c645c3e297f03d}\index{forbid\_export\_mutable\_globals\_tests.cpp@{forbid\_export\_mutable\_globals\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!forbid\_export\_mutable\_globals\_tests.cpp@{forbid\_export\_mutable\_globals\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [6/6]}}
+{\footnotesize\ttfamily \label{forbid__export__mutable__globals__tests_8cpp_a091685b7d6d395d859c645c3e297f03d} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Test forbid\+\_\+export\+\_\+mutable\+\_\+globals static pass"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}forbid\+\_\+export\+\_\+mutable\+\_\+globals\+\_\+test\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{forbid__export__mutable__globals__tests_8cpp_source_l00045}{45}} of file \mbox{\hyperlink{forbid__export__mutable__globals__tests_8cpp_source}{forbid\+\_\+export\+\_\+mutable\+\_\+globals\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00046\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ static\_options\_false>}};}
+\DoxyCodeLine{00047\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend}}(mut\_global\_wasm,\ \&\mbox{\hyperlink{forbid__export__mutable__globals__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00048\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{forbid__export__mutable__globals__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}\index{forbid\_export\_mutable\_globals\_tests.cpp@{forbid\_export\_mutable\_globals\_tests.cpp}!wa@{wa}}
+\index{wa@{wa}!forbid\_export\_mutable\_globals\_tests.cpp@{forbid\_export\_mutable\_globals\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{wa}{wa}}
+{\footnotesize\ttfamily \label{forbid__export__mutable__globals__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89} 
+wasm\+\_\+allocator wa\hspace{0.3cm}{\ttfamily [extern]}}
+
+
+
+Definition at line \mbox{\hyperlink{libraries_2sys-vm_2tests_2main_8cpp_source_l00010}{10}} of file \mbox{\hyperlink{libraries_2sys-vm_2tests_2main_8cpp_source}{main.\+cpp}}.
+

@@ -1,0 +1,64 @@
+\doxysection{libraries/fc/libraries/ff/libff/algebra/fields/field\+\_\+utils.hpp File Reference}
+\hypertarget{field__utils_8hpp}{}\label{field__utils_8hpp}\index{libraries/fc/libraries/ff/libff/algebra/fields/field\_utils.hpp@{libraries/fc/libraries/ff/libff/algebra/fields/field\_utils.hpp}}
+{\ttfamily \#include $<$cstdint$>$}\newline
+{\ttfamily \#include $<$libff/algebra/fields/bigint.\+hpp$>$}\newline
+{\ttfamily \#include $<$libff/common/double.\+hpp$>$}\newline
+{\ttfamily \#include $<$libff/common/utils.\+hpp$>$}\newline
+{\ttfamily \#include $<$libff/algebra/fields/field\+\_\+utils.\+tcc$>$}\newline
+Include dependency graph for field\+\_\+utils.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{field__utils_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{field__utils_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacelibff}{libff}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename FieldT $>$ }\\std\+::enable\+\_\+if$<$ std\+::is\+\_\+same$<$ FieldT, \mbox{\hyperlink{classlibff_1_1_double}{Double}} $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}}, FieldT $>$\+::type \mbox{\hyperlink{namespacelibff_a2c53eb025ffa58c0514fbe3dc8ae040a}{libff\+::get\+\_\+root\+\_\+of\+\_\+unity}} (const size\+\_\+t n)
+\item 
+{\footnotesize template$<$typename FieldT $>$ }\\std\+::enable\+\_\+if$<$!std\+::is\+\_\+same$<$ FieldT, \mbox{\hyperlink{classlibff_1_1_double}{Double}} $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}}, FieldT $>$\+::type \mbox{\hyperlink{namespacelibff_abcfe7edb8ba772241506c1959fa88005}{libff\+::get\+\_\+root\+\_\+of\+\_\+unity}} (const size\+\_\+t n)
+\item 
+{\footnotesize template$<$typename FieldT $>$ }\\std\+::vector$<$ FieldT $>$ \mbox{\hyperlink{namespacelibff_aea611fb6c0a08f52e34d620721b58683}{libff\+::pack\+\_\+int\+\_\+vector\+\_\+into\+\_\+field\+\_\+element\+\_\+vector}} (const std\+::vector$<$ size\+\_\+t $>$ \&v, const size\+\_\+t w)
+\item 
+{\footnotesize template$<$typename FieldT $>$ }\\std\+::vector$<$ FieldT $>$ \mbox{\hyperlink{namespacelibff_a2d286900968b3cd9323250df2af9252b}{libff\+::pack\+\_\+bit\+\_\+vector\+\_\+into\+\_\+field\+\_\+element\+\_\+vector}} (const \mbox{\hyperlink{namespacelibff_a696ce545f08b1dfc65e1cf261eed148c}{bit\+\_\+vector}} \&v, const size\+\_\+t chunk\+\_\+bits)
+\item 
+{\footnotesize template$<$typename FieldT $>$ }\\std\+::vector$<$ FieldT $>$ \mbox{\hyperlink{namespacelibff_a640372de1454d1fb7d755c12ed9cabc5}{libff\+::pack\+\_\+bit\+\_\+vector\+\_\+into\+\_\+field\+\_\+element\+\_\+vector}} (const \mbox{\hyperlink{namespacelibff_a696ce545f08b1dfc65e1cf261eed148c}{bit\+\_\+vector}} \&v)
+\item 
+{\footnotesize template$<$typename FieldT $>$ }\\std\+::vector$<$ FieldT $>$ \mbox{\hyperlink{namespacelibff_a2246693049c4448ec62479f78b074588}{libff\+::convert\+\_\+bit\+\_\+vector\+\_\+to\+\_\+field\+\_\+element\+\_\+vector}} (const \mbox{\hyperlink{namespacelibff_a696ce545f08b1dfc65e1cf261eed148c}{bit\+\_\+vector}} \&v)
+\item 
+{\footnotesize template$<$typename FieldT $>$ }\\\mbox{\hyperlink{namespacelibff_a696ce545f08b1dfc65e1cf261eed148c}{bit\+\_\+vector}} \mbox{\hyperlink{namespacelibff_a1df1ddef48d6d2b60ff979b580e8ac4d}{libff\+::convert\+\_\+field\+\_\+element\+\_\+vector\+\_\+to\+\_\+bit\+\_\+vector}} (const std\+::vector$<$ FieldT $>$ \&v)
+\item 
+{\footnotesize template$<$typename FieldT $>$ }\\\mbox{\hyperlink{namespacelibff_a696ce545f08b1dfc65e1cf261eed148c}{bit\+\_\+vector}} \mbox{\hyperlink{namespacelibff_aee3e1ba840b2d44acf587628bb0333df}{libff\+::convert\+\_\+field\+\_\+element\+\_\+to\+\_\+bit\+\_\+vector}} (const FieldT \&el)
+\item 
+{\footnotesize template$<$typename FieldT $>$ }\\\mbox{\hyperlink{namespacelibff_a696ce545f08b1dfc65e1cf261eed148c}{bit\+\_\+vector}} \mbox{\hyperlink{namespacelibff_ac9b363ea4d0b48eb3490a55d3452d9f7}{libff\+::convert\+\_\+field\+\_\+element\+\_\+to\+\_\+bit\+\_\+vector}} (const FieldT \&el, const size\+\_\+t bitcount)
+\item 
+{\footnotesize template$<$typename FieldT $>$ }\\FieldT \mbox{\hyperlink{namespacelibff_a7f68589e724a7fb9c96175bdaf06f007}{libff\+::convert\+\_\+bit\+\_\+vector\+\_\+to\+\_\+field\+\_\+element}} (const \mbox{\hyperlink{namespacelibff_a696ce545f08b1dfc65e1cf261eed148c}{bit\+\_\+vector}} \&v)
+\item 
+{\footnotesize template$<$typename FieldT $>$ }\\void \mbox{\hyperlink{namespacelibff_aecf9947f6cf142476f71f413e69eec59}{libff\+::batch\+\_\+invert}} (std\+::vector$<$ FieldT $>$ \&vec)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\begin{DoxyAuthor}{Author}
+This file is part of libff, developed by SCIPR Lab and contributors (see AUTHORS). 
+\end{DoxyAuthor}
+\begin{DoxyCopyright}{Copyright}
+MIT license (see LICENSE file) 
+\end{DoxyCopyright}
+
+
+Definition in file \mbox{\hyperlink{field__utils_8hpp_source}{field\+\_\+utils.\+hpp}}.
+

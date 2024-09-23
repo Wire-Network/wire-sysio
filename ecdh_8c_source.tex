@@ -1,0 +1,133 @@
+\doxysection{ecdh.\+c}
+\hypertarget{ecdh_8c_source}{}\label{ecdh_8c_source}\index{libraries/fc/secp256k1/secp256k1/examples/ecdh.c@{libraries/fc/secp256k1/secp256k1/examples/ecdh.c}}
+\mbox{\hyperlink{ecdh_8c}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00001}00001\ \textcolor{comment}{/*************************************************************************}}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00002}00002\ \textcolor{comment}{\ *\ Written\ in\ 2020-\/2022\ by\ Elichai\ Turkel\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00003}00003\ \textcolor{comment}{\ *\ To\ the\ extent\ possible\ under\ law,\ the\ author(s)\ have\ dedicated\ all\ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00004}00004\ \textcolor{comment}{\ *\ copyright\ and\ related\ and\ neighboring\ rights\ to\ the\ software\ in\ this\ \ *}}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00005}00005\ \textcolor{comment}{\ *\ file\ to\ the\ public\ domain\ worldwide.\ This\ software\ is\ distributed\ \ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00006}00006\ \textcolor{comment}{\ *\ without\ any\ warranty.\ For\ the\ CC0\ Public\ Domain\ Dedication,\ see\ \ \ \ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00007}00007\ \textcolor{comment}{\ *\ EXAMPLES\_COPYING\ or\ https://creativecommons.org/publicdomain/zero/1.0\ *}}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00008}00008\ \textcolor{comment}{\ *************************************************************************/}}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <stdio.h>}}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00011}00011\ \textcolor{preprocessor}{\#include\ <assert.h>}}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00012}00012\ \textcolor{preprocessor}{\#include\ <string.h>}}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00014}00014\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{secp256k1_8h}{secp256k1.h}}>}}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00015}00015\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{secp256k1__ecdh_8h}{secp256k1\_ecdh.h}}>}}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00017}00017\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{random_8h}{random.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00020}\mbox{\hyperlink{ecdh_8c_a840291bc02cba5474a4cb46a9b9566fe}{00020}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{ecdh_8c_a840291bc02cba5474a4cb46a9b9566fe}{main}}(\textcolor{keywordtype}{void})\ \{}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00021}00021\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ seckey1[32];}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00022}00022\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ seckey2[32];}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00023}00023\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ compressed\_pubkey1[33];}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00024}00024\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ compressed\_pubkey2[33];}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00025}00025\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ shared\_secret1[32];}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00026}00026\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ shared\_secret2[32];}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00027}00027\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ randomize[32];}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00028}00028\ \ \ \ \ \textcolor{keywordtype}{int}\ return\_val;}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00029}00029\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}};}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00030}00030\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__pubkey}{secp256k1\_pubkey}}\ pubkey1;}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00031}00031\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__pubkey}{secp256k1\_pubkey}}\ pubkey2;}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00033}00033\ \ \ \ \ \textcolor{comment}{/*\ The\ specification\ in\ secp256k1.h\ states\ that\ \`{}secp256k1\_ec\_pubkey\_create`}}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00034}00034\ \textcolor{comment}{\ \ \ \ \ *\ needs\ a\ context\ object\ initialized\ for\ signing,\ which\ is\ why\ we\ create}}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00035}00035\ \textcolor{comment}{\ \ \ \ \ *\ a\ context\ with\ the\ SECP256K1\_CONTEXT\_SIGN\ flag.}}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00036}00036\ \textcolor{comment}{\ \ \ \ \ *\ (The\ docs\ for\ \`{}secp256k1\_ecdh`\ don't\ require\ any\ special\ context,\ just}}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00037}00037\ \textcolor{comment}{\ \ \ \ \ *\ some\ initialized\ context)\ */}}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00038}00038\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__context__struct}{secp256k1\_context}}*\ ctx\ =\ \mbox{\hyperlink{secp256k1_8h_a3aaa9fcc3ab67bc8f841779a049069c5}{secp256k1\_context\_create}}(\mbox{\hyperlink{secp256k1_8h_a0d34fe6baa73d3145f2e376e43de0b15}{SECP256K1\_CONTEXT\_SIGN}});}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00039}00039\ \ \ \ \ \textcolor{keywordflow}{if}\ (!fill\_random(randomize,\ \textcolor{keyword}{sizeof}(randomize)))\ \{}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00040}00040\ \ \ \ \ \ \ \ \ printf(\textcolor{stringliteral}{"{}Failed\ to\ generate\ randomness\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00041}00041\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00042}00042\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00043}00043\ \ \ \ \ \textcolor{comment}{/*\ Randomizing\ the\ context\ is\ recommended\ to\ protect\ against\ side-\/channel}}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00044}00044\ \textcolor{comment}{\ \ \ \ \ *\ leakage\ See\ \`{}secp256k1\_context\_randomize`\ in\ secp256k1.h\ for\ more}}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00045}00045\ \textcolor{comment}{\ \ \ \ \ *\ information\ about\ it.\ This\ should\ never\ fail.\ */}}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00046}00046\ \ \ \ \ return\_val\ =\ \mbox{\hyperlink{secp256k1_8h_a1b81d70feb6ed24dc902cbbd5ba569e7}{secp256k1\_context\_randomize}}(ctx,\ randomize);}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00047}00047\ \ \ \ \ assert(return\_val);}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00049}00049\ \textcolor{comment}{\ \ \ \ /***\ Key\ Generation\ ***/}}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00051}00051\ \ \ \ \ \textcolor{comment}{/*\ If\ the\ secret\ key\ is\ zero\ or\ out\ of\ range\ (bigger\ than\ secp256k1's}}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00052}00052\ \textcolor{comment}{\ \ \ \ \ *\ order),\ we\ try\ to\ sample\ a\ new\ key.\ Note\ that\ the\ probability\ of\ this}}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00053}00053\ \textcolor{comment}{\ \ \ \ \ *\ happening\ is\ negligible.\ */}}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00054}00054\ \ \ \ \ \textcolor{keywordflow}{while}\ (1)\ \{}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00055}00055\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!fill\_random(seckey1,\ \textcolor{keyword}{sizeof}(seckey1))\ ||\ !fill\_random(seckey2,\ \textcolor{keyword}{sizeof}(seckey2)))\ \{}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \ \ \ printf(\textcolor{stringliteral}{"{}Failed\ to\ generate\ randomness\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00058}00058\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00059}00059\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{secp256k1_8h_a366f922fc0c787351e82ff8e3a95f652}{secp256k1\_ec\_seckey\_verify}}(ctx,\ seckey1)\ \&\&\ \mbox{\hyperlink{secp256k1_8h_a366f922fc0c787351e82ff8e3a95f652}{secp256k1\_ec\_seckey\_verify}}(ctx,\ seckey2))\ \{}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00061}00061\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00062}00062\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00064}00064\ \ \ \ \ \textcolor{comment}{/*\ Public\ key\ creation\ using\ a\ valid\ context\ with\ a\ verified\ secret\ key\ should\ never\ fail\ */}}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00065}00065\ \ \ \ \ return\_val\ =\ \mbox{\hyperlink{secp256k1_8h_a7438071aa8a6dc4697abe4f4659f2161}{secp256k1\_ec\_pubkey\_create}}(ctx,\ \&pubkey1,\ seckey1);}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00066}00066\ \ \ \ \ assert(return\_val);}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00067}00067\ \ \ \ \ return\_val\ =\ \mbox{\hyperlink{secp256k1_8h_a7438071aa8a6dc4697abe4f4659f2161}{secp256k1\_ec\_pubkey\_create}}(ctx,\ \&pubkey2,\ seckey2);}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00068}00068\ \ \ \ \ assert(return\_val);}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00069}00069\ }
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00070}00070\ \ \ \ \ \textcolor{comment}{/*\ Serialize\ pubkey1\ in\ a\ compressed\ form\ (33\ bytes),\ should\ always\ return\ 1\ */}}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00071}00071\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ =\ \textcolor{keyword}{sizeof}(compressed\_pubkey1);}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00072}00072\ \ \ \ \ return\_val\ =\ \mbox{\hyperlink{secp256k1_8h_a34977bf00322e510e881160c421836d7}{secp256k1\_ec\_pubkey\_serialize}}(ctx,\ compressed\_pubkey1,\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ \&pubkey1,\ \mbox{\hyperlink{secp256k1_8h_a7b8f642c65e8b5c81fa4421b7c42ab57}{SECP256K1\_EC\_COMPRESSED}});}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00073}00073\ \ \ \ \ assert(return\_val);}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00074}00074\ \ \ \ \ \textcolor{comment}{/*\ Should\ be\ the\ same\ size\ as\ the\ size\ of\ the\ output,\ because\ we\ passed\ a\ 33\ byte\ array.\ */}}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00075}00075\ \ \ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ ==\ \textcolor{keyword}{sizeof}(compressed\_pubkey1));}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00076}00076\ }
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00077}00077\ \ \ \ \ \textcolor{comment}{/*\ Serialize\ pubkey2\ in\ a\ compressed\ form\ (33\ bytes)\ */}}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00078}00078\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ =\ \textcolor{keyword}{sizeof}(compressed\_pubkey2);}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00079}00079\ \ \ \ \ return\_val\ =\ \mbox{\hyperlink{secp256k1_8h_a34977bf00322e510e881160c421836d7}{secp256k1\_ec\_pubkey\_serialize}}(ctx,\ compressed\_pubkey2,\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ \&pubkey2,\ \mbox{\hyperlink{secp256k1_8h_a7b8f642c65e8b5c81fa4421b7c42ab57}{SECP256K1\_EC\_COMPRESSED}});}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00080}00080\ \ \ \ \ assert(return\_val);}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00081}00081\ \ \ \ \ \textcolor{comment}{/*\ Should\ be\ the\ same\ size\ as\ the\ size\ of\ the\ output,\ because\ we\ passed\ a\ 33\ byte\ array.\ */}}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00082}00082\ \ \ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ ==\ \textcolor{keyword}{sizeof}(compressed\_pubkey2));}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00083}00083\ }
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00084}00084\ \textcolor{comment}{\ \ \ \ /***\ Creating\ the\ shared\ secret\ ***/}}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00085}00085\ }
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00086}00086\ \ \ \ \ \textcolor{comment}{/*\ Perform\ ECDH\ with\ seckey1\ and\ pubkey2.\ Should\ never\ fail\ with\ a\ verified}}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00087}00087\ \textcolor{comment}{\ \ \ \ \ *\ seckey\ and\ valid\ pubkey\ */}}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00088}00088\ \ \ \ \ return\_val\ =\ \mbox{\hyperlink{secp256k1__ecdh_8h_a4386914d0dce8b04f056ce3fae9a37a8}{secp256k1\_ecdh}}(ctx,\ shared\_secret1,\ \&pubkey2,\ seckey1,\ NULL,\ NULL);}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00089}00089\ \ \ \ \ assert(return\_val);}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00090}00090\ }
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00091}00091\ \ \ \ \ \textcolor{comment}{/*\ Perform\ ECDH\ with\ seckey2\ and\ pubkey1.\ Should\ never\ fail\ with\ a\ verified}}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00092}00092\ \textcolor{comment}{\ \ \ \ \ *\ seckey\ and\ valid\ pubkey\ */}}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00093}00093\ \ \ \ \ return\_val\ =\ \mbox{\hyperlink{secp256k1__ecdh_8h_a4386914d0dce8b04f056ce3fae9a37a8}{secp256k1\_ecdh}}(ctx,\ shared\_secret2,\ \&pubkey1,\ seckey2,\ NULL,\ NULL);}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00094}00094\ \ \ \ \ assert(return\_val);}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00095}00095\ }
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00096}00096\ \ \ \ \ \textcolor{comment}{/*\ Both\ parties\ should\ end\ up\ with\ the\ same\ shared\ secret\ */}}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00097}00097\ \ \ \ \ return\_val\ =\ memcmp(shared\_secret1,\ shared\_secret2,\ \textcolor{keyword}{sizeof}(shared\_secret1));}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00098}00098\ \ \ \ \ assert(return\_val\ ==\ 0);}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00099}00099\ }
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00100}00100\ \ \ \ \ printf(\textcolor{stringliteral}{"{}Secret\ Key1:\ "{}});}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00101}00101\ \ \ \ \ print\_hex(seckey1,\ \textcolor{keyword}{sizeof}(seckey1));}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00102}00102\ \ \ \ \ printf(\textcolor{stringliteral}{"{}Compressed\ Pubkey1:\ "{}});}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00103}00103\ \ \ \ \ print\_hex(compressed\_pubkey1,\ \textcolor{keyword}{sizeof}(compressed\_pubkey1));}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00104}00104\ \ \ \ \ printf(\textcolor{stringliteral}{"{}\(\backslash\)nSecret\ Key2:\ "{}});}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00105}00105\ \ \ \ \ print\_hex(seckey2,\ \textcolor{keyword}{sizeof}(seckey2));}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00106}00106\ \ \ \ \ printf(\textcolor{stringliteral}{"{}Compressed\ Pubkey2:\ "{}});}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00107}00107\ \ \ \ \ print\_hex(compressed\_pubkey2,\ \textcolor{keyword}{sizeof}(compressed\_pubkey2));}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00108}00108\ \ \ \ \ printf(\textcolor{stringliteral}{"{}\(\backslash\)nShared\ Secret:\ "{}});}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00109}00109\ \ \ \ \ print\_hex(shared\_secret1,\ \textcolor{keyword}{sizeof}(shared\_secret1));}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00110}00110\ }
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00111}00111\ \ \ \ \ \textcolor{comment}{/*\ This\ will\ clear\ everything\ from\ the\ context\ and\ free\ the\ memory\ */}}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00112}00112\ \ \ \ \ \mbox{\hyperlink{secp256k1_8h_a026db914e3723531825ecf25a0cbd699}{secp256k1\_context\_destroy}}(ctx);}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00113}00113\ }
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00114}00114\ \ \ \ \ \textcolor{comment}{/*\ It's\ best\ practice\ to\ try\ to\ clear\ secrets\ from\ memory\ after\ using\ them.}}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00115}00115\ \textcolor{comment}{\ \ \ \ \ *\ This\ is\ done\ because\ some\ bugs\ can\ allow\ an\ attacker\ to\ leak\ memory,\ for}}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00116}00116\ \textcolor{comment}{\ \ \ \ \ *\ example\ through\ "{}out\ of\ bounds"{}\ array\ access\ (see\ Heartbleed),\ Or\ the\ OS}}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00117}00117\ \textcolor{comment}{\ \ \ \ \ *\ swapping\ them\ to\ disk.\ Hence,\ we\ overwrite\ the\ secret\ key\ buffer\ with\ zeros.}}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00118}00118\ \textcolor{comment}{\ \ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00119}00119\ \textcolor{comment}{\ \ \ \ \ *\ TODO:\ Prevent\ these\ writes\ from\ being\ optimized\ out,\ as\ any\ good\ compiler}}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00120}00120\ \textcolor{comment}{\ \ \ \ \ *\ will\ remove\ any\ writes\ that\ aren't\ used.\ */}}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00121}00121\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(seckey1,\ 0,\ \textcolor{keyword}{sizeof}(seckey1));}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00122}00122\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(seckey2,\ 0,\ \textcolor{keyword}{sizeof}(seckey2));}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00123}00123\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(shared\_secret1,\ 0,\ \textcolor{keyword}{sizeof}(shared\_secret1));}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00124}00124\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(shared\_secret2,\ 0,\ \textcolor{keyword}{sizeof}(shared\_secret2));}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00125}00125\ }
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00126}00126\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{ecdh_8c_source_l00127}00127\ \}}
+
+\end{DoxyCode}

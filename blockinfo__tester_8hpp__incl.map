@@ -1,0 +1,23 @@
+<map id="/Users/svetlasyrimis/Desktop/wire&#45;network/WN&#45;org/wire&#45;system&#45;contracts/contracts/test_contracts/blockinfo_tester/include/blockinfo_tester/blockinfo_tester.hpp" name="/Users/svetlasyrimis/Desktop/wire&#45;network/WN&#45;org/wire&#45;system&#45;contracts/contracts/test_contracts/blockinfo_tester/include/blockinfo_tester/blockinfo_tester.hpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="305,5,527,106"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,243,112,268"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="305,86,226,115,186,134,149,156,108,193,77,232,72,228,104,190,146,152,184,129,224,110,303,81"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="159,162,272,187"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="332,109,251,156,248,151,329,104"/>
+<area shape="rect" id="Node000004" href="$block__info_8hpp.html" title=" " alt="" coords="297,154,431,195"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="396,108,381,140,376,138,391,105"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="521,243,588,268"/>
+<area shape="poly" id="edge10_Node000001_Node000008" title=" " alt="" coords="441,105,466,149,495,193,531,231,527,234,491,196,461,152,437,108"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="506,162,566,187"/>
+<area shape="poly" id="edge9_Node000001_Node000009" title=" " alt="" coords="469,105,515,149,511,153,465,108"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="590,162,650,187"/>
+<area shape="poly" id="edge11_Node000001_Node000010" title=" " alt="" coords="504,104,587,151,584,156,502,109"/>
+<area shape="poly" id="edge6_Node000004_Node000002" title=" " alt="" coords="297,196,121,241,119,236,295,191"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="136,243,283,268"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="326,198,248,238,245,233,324,193"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="307,243,420,268"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="366,195,366,227,361,227,361,195"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="444,243,497,268"/>
+<area shape="poly" id="edge7_Node000004_Node000007" title=" " alt="" coords="392,193,444,231,441,235,389,197"/>
+<area shape="poly" id="edge8_Node000004_Node000008" title=" " alt="" coords="412,193,512,234,510,239,410,198"/>
+</map>

@@ -1,0 +1,245 @@
+\doxysection{libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/reader.h File Reference}
+\hypertarget{reader_8h}{}\label{reader_8h}\index{libraries/fc/include/fc/crypto/webauthn\_json/include/rapidjson/reader.h@{libraries/fc/include/fc/crypto/webauthn\_json/include/rapidjson/reader.h}}
+{\ttfamily \#include "{}allocators.\+h"{}}\newline
+{\ttfamily \#include "{}stream.\+h"{}}\newline
+{\ttfamily \#include "{}encodedstream.\+h"{}}\newline
+{\ttfamily \#include "{}internal/meta.\+h"{}}\newline
+{\ttfamily \#include "{}internal/stack.\+h"{}}\newline
+{\ttfamily \#include "{}internal/strtod.\+h"{}}\newline
+{\ttfamily \#include $<$limits$>$}\newline
+{\ttfamily \#include "{}error/error.\+h"{}}\newline
+Include dependency graph for reader.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{reader_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{reader_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_base_reader_handler}{Base\+Reader\+Handler$<$ Encoding, Derived $>$}}
+\begin{DoxyCompactList}\small\item\em Default implementation of Handler. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{classinternal_1_1_stream_local_copy_3_01_stream_00_011_01_4}{internal\+::\+Stream\+Local\+Copy$<$ Stream, 1 $>$}}
+\begin{DoxyCompactList}\small\item\em Do copy optimization. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{classinternal_1_1_stream_local_copy_3_01_stream_00_010_01_4}{internal\+::\+Stream\+Local\+Copy$<$ Stream, 0 $>$}}
+\begin{DoxyCompactList}\small\item\em Keep reference. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_generic_reader}{Generic\+Reader$<$ Source\+Encoding, Target\+Encoding, Stack\+Allocator $>$}}
+\begin{DoxyCompactList}\small\item\em SAX-\/style JSON parser. Use \doxysectlink{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2sax_8zh-cn_Reader}{Reader}{1} for \doxylink{struct_u_t_f8}{UTF8} encoding and default allocator. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespaceinternal}{internal}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_ga7f8c4265b2edda78568ae3338aaf1461}{RAPIDJSON\+\_\+\+PARSE\+\_\+\+ERROR\+\_\+\+NORETURN}}(parse\+Error\+Code,  offset)
+\begin{DoxyCompactList}\small\item\em Macro to indicate a parse error. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_gae3689840fa6e89a241313f33b602f865}{RAPIDJSON\+\_\+\+PARSE\+\_\+\+ERROR}}(parse\+Error\+Code,  offset)
+\begin{DoxyCompactList}\small\item\em (Internal) macro to indicate and handle a parse error. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{reader_8h_a77005e892e6601599beaf421b0395c31}{RAPIDJSON\+\_\+\+PARSE\+\_\+\+DEFAULT\+\_\+\+FLAGS}}~\mbox{\hyperlink{reader_8h_ab7be7dabe6ffcba60fad441505583450a1af603dc5f65bb815316589e782bc71a}{k\+Parse\+No\+Flags}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{class_generic_reader}{Generic\+Reader}}$<$ \mbox{\hyperlink{struct_u_t_f8}{UTF8}}$<$$>$, \mbox{\hyperlink{struct_u_t_f8}{UTF8}}$<$$>$ $>$ \mbox{\hyperlink{reader_8h_a84f3b66a66647f4ac4267078359188ba}{Reader}}
+\begin{DoxyCompactList}\small\item\em Reader with \doxylink{struct_u_t_f8}{UTF8} encoding and default allocator. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{reader_8h_ab7be7dabe6ffcba60fad441505583450}{Parse\+Flag}} \{ \newline
+\mbox{\hyperlink{reader_8h_ab7be7dabe6ffcba60fad441505583450a1af603dc5f65bb815316589e782bc71a}{k\+Parse\+No\+Flags}} = 0
+, \mbox{\hyperlink{reader_8h_ab7be7dabe6ffcba60fad441505583450a13188bd483b4df0b6582bebe2aeb5b01}{k\+Parse\+Insitu\+Flag}} = 1
+, \mbox{\hyperlink{reader_8h_ab7be7dabe6ffcba60fad441505583450a9b3baa16346575d2dc072b23a88e1928}{k\+Parse\+Validate\+Encoding\+Flag}} = 2
+, \mbox{\hyperlink{reader_8h_ab7be7dabe6ffcba60fad441505583450aadb14f5a3b6b33e28055e913a2eae5e9}{k\+Parse\+Iterative\+Flag}} = 4
+, \newline
+\mbox{\hyperlink{reader_8h_ab7be7dabe6ffcba60fad441505583450af77d115d3bbed0a448b6b335f3b93b36}{k\+Parse\+Stop\+When\+Done\+Flag}} = 8
+, \mbox{\hyperlink{reader_8h_ab7be7dabe6ffcba60fad441505583450a057fbeacafb16bb7d24c9998262cae46}{k\+Parse\+Full\+Precision\+Flag}} = 16
+, \mbox{\hyperlink{reader_8h_ab7be7dabe6ffcba60fad441505583450a245d1b6af730f47f0e7bd27078f5e8c1}{k\+Parse\+Comments\+Flag}} = 32
+, \mbox{\hyperlink{reader_8h_ab7be7dabe6ffcba60fad441505583450aa951ab03a51b32b60164436bc280cf01}{k\+Parse\+Numbers\+As\+Strings\+Flag}} = 64
+, \newline
+\mbox{\hyperlink{reader_8h_ab7be7dabe6ffcba60fad441505583450a953d6381de950e25c8c97ad54f52370a}{k\+Parse\+Trailing\+Commas\+Flag}} = 128
+, \mbox{\hyperlink{reader_8h_ab7be7dabe6ffcba60fad441505583450a9849d65c1d3edd796bd75897c6a37eb6}{k\+Parse\+Nan\+And\+Inf\+Flag}} = 256
+, \mbox{\hyperlink{reader_8h_ab7be7dabe6ffcba60fad441505583450a9104b0946d648e9467cb7a967401ec80}{k\+Parse\+Default\+Flags}} = RAPIDJSON\+\_\+\+PARSE\+\_\+\+DEFAULT\+\_\+\+FLAGS
+ \}
+\begin{DoxyCompactList}\small\item\em Combination of parse\+Flags. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename Input\+Stream $>$ }\\void \mbox{\hyperlink{reader_8h_a60338858b2582eca23f3e509a2d82e0e}{Skip\+Whitespace}} (Input\+Stream \&is)
+\begin{DoxyCompactList}\small\item\em Skip the JSON white spaces in a stream. \end{DoxyCompactList}\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{reader_8h_aeddf0374b22926be76140ec6708dc203}{Skip\+Whitespace}} (const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}, const char \texorpdfstring{$\ast$}{*}end)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{reader_8h_a77005e892e6601599beaf421b0395c31}\index{reader.h@{reader.h}!RAPIDJSON\_PARSE\_DEFAULT\_FLAGS@{RAPIDJSON\_PARSE\_DEFAULT\_FLAGS}}
+\index{RAPIDJSON\_PARSE\_DEFAULT\_FLAGS@{RAPIDJSON\_PARSE\_DEFAULT\_FLAGS}!reader.h@{reader.h}}
+\doxysubsubsection{\texorpdfstring{RAPIDJSON\_PARSE\_DEFAULT\_FLAGS}{RAPIDJSON\_PARSE\_DEFAULT\_FLAGS}}
+{\footnotesize\ttfamily \label{reader_8h_a77005e892e6601599beaf421b0395c31} 
+\#define RAPIDJSON\+\_\+\+PARSE\+\_\+\+DEFAULT\+\_\+\+FLAGS~\mbox{\hyperlink{reader_8h_ab7be7dabe6ffcba60fad441505583450a1af603dc5f65bb815316589e782bc71a}{k\+Parse\+No\+Flags}}}
+
+
+
+Definition at line \mbox{\hyperlink{reader_8h_source_l00139}{139}} of file \mbox{\hyperlink{reader_8h_source}{reader.\+h}}.
+
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{reader_8h_a84f3b66a66647f4ac4267078359188ba}\index{reader.h@{reader.h}!Reader@{Reader}}
+\index{Reader@{Reader}!reader.h@{reader.h}}
+\doxysubsubsection{\texorpdfstring{Reader}{Reader}}
+{\footnotesize\ttfamily \label{reader_8h_a84f3b66a66647f4ac4267078359188ba} 
+typedef \mbox{\hyperlink{class_generic_reader}{Generic\+Reader}}$<$\mbox{\hyperlink{struct_u_t_f8}{UTF8}}$<$$>$, \mbox{\hyperlink{struct_u_t_f8}{UTF8}}$<$$>$ $>$ \mbox{\hyperlink{fwd_8h_ab7f1c1207749ff25c0d7f0cc88e62788}{Reader}}}
+
+
+
+Definition at line \mbox{\hyperlink{reader_8h_source_l02217}{2217}} of file \mbox{\hyperlink{reader_8h_source}{reader.\+h}}.
+
+
+
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{reader_8h_ab7be7dabe6ffcba60fad441505583450}\index{reader.h@{reader.h}!ParseFlag@{ParseFlag}}
+\index{ParseFlag@{ParseFlag}!reader.h@{reader.h}}
+\doxysubsubsection{\texorpdfstring{ParseFlag}{ParseFlag}}
+{\footnotesize\ttfamily \label{reader_8h_ab7be7dabe6ffcba60fad441505583450} 
+enum \mbox{\hyperlink{reader_8h_ab7be7dabe6ffcba60fad441505583450}{Parse\+Flag}}}
+
+\begin{DoxySeeAlso}{See also}
+\doxylink{class_generic_reader_a0c450620d14ff1824e58bb7bd9b42099}{Reader\+::\+Parse}, \doxylink{class_generic_document_a901db1678f99a1b550003eed75bc380a}{Document\+::\+Parse}, \doxylink{class_generic_document_a13f68b1896a24eea4cdbc03a3916225f}{Document\+::\+Parse\+Insitu}, \doxylink{class_generic_document_a7bc1827a7ab04de4789fe46237f0e921}{Document\+::\+Parse\+Stream} 
+\end{DoxySeeAlso}
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kParseNoFlags@{kParseNoFlags}!reader.h@{reader.h}}\index{reader.h@{reader.h}!kParseNoFlags@{kParseNoFlags}}}\Hypertarget{reader_8h_ab7be7dabe6ffcba60fad441505583450a1af603dc5f65bb815316589e782bc71a}\label{reader_8h_ab7be7dabe6ffcba60fad441505583450} 
+k\+Parse\+No\+Flags&No flags are set. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kParseInsituFlag@{kParseInsituFlag}!reader.h@{reader.h}}\index{reader.h@{reader.h}!kParseInsituFlag@{kParseInsituFlag}}}\Hypertarget{reader_8h_ab7be7dabe6ffcba60fad441505583450a13188bd483b4df0b6582bebe2aeb5b01}\label{reader_8h_ab7be7dabe6ffcba60fad441505583450} 
+k\+Parse\+Insitu\+Flag&In-\/situ(destructive) parsing. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kParseValidateEncodingFlag@{kParseValidateEncodingFlag}!reader.h@{reader.h}}\index{reader.h@{reader.h}!kParseValidateEncodingFlag@{kParseValidateEncodingFlag}}}\Hypertarget{reader_8h_ab7be7dabe6ffcba60fad441505583450a9b3baa16346575d2dc072b23a88e1928}\label{reader_8h_ab7be7dabe6ffcba60fad441505583450} 
+k\+Parse\+Validate\+Encoding\+Flag&Validate encoding of JSON strings. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kParseIterativeFlag@{kParseIterativeFlag}!reader.h@{reader.h}}\index{reader.h@{reader.h}!kParseIterativeFlag@{kParseIterativeFlag}}}\Hypertarget{reader_8h_ab7be7dabe6ffcba60fad441505583450aadb14f5a3b6b33e28055e913a2eae5e9}\label{reader_8h_ab7be7dabe6ffcba60fad441505583450} 
+k\+Parse\+Iterative\+Flag&Iterative(constant complexity in terms of function call stack size) parsing. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kParseStopWhenDoneFlag@{kParseStopWhenDoneFlag}!reader.h@{reader.h}}\index{reader.h@{reader.h}!kParseStopWhenDoneFlag@{kParseStopWhenDoneFlag}}}\Hypertarget{reader_8h_ab7be7dabe6ffcba60fad441505583450af77d115d3bbed0a448b6b335f3b93b36}\label{reader_8h_ab7be7dabe6ffcba60fad441505583450} 
+k\+Parse\+Stop\+When\+Done\+Flag&After parsing a complete JSON root from stream, stop further processing the rest of stream. When this flag is used, parser will not generate k\+Parse\+Error\+Document\+Root\+Not\+Singular error. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kParseFullPrecisionFlag@{kParseFullPrecisionFlag}!reader.h@{reader.h}}\index{reader.h@{reader.h}!kParseFullPrecisionFlag@{kParseFullPrecisionFlag}}}\Hypertarget{reader_8h_ab7be7dabe6ffcba60fad441505583450a057fbeacafb16bb7d24c9998262cae46}\label{reader_8h_ab7be7dabe6ffcba60fad441505583450} 
+k\+Parse\+Full\+Precision\+Flag&Parse number in full precision (but slower). \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kParseCommentsFlag@{kParseCommentsFlag}!reader.h@{reader.h}}\index{reader.h@{reader.h}!kParseCommentsFlag@{kParseCommentsFlag}}}\Hypertarget{reader_8h_ab7be7dabe6ffcba60fad441505583450a245d1b6af730f47f0e7bd27078f5e8c1}\label{reader_8h_ab7be7dabe6ffcba60fad441505583450} 
+k\+Parse\+Comments\+Flag&Allow one-\/line (//) and multi-\/line (/\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}/) comments. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kParseNumbersAsStringsFlag@{kParseNumbersAsStringsFlag}!reader.h@{reader.h}}\index{reader.h@{reader.h}!kParseNumbersAsStringsFlag@{kParseNumbersAsStringsFlag}}}\Hypertarget{reader_8h_ab7be7dabe6ffcba60fad441505583450aa951ab03a51b32b60164436bc280cf01}\label{reader_8h_ab7be7dabe6ffcba60fad441505583450} 
+k\+Parse\+Numbers\+As\+Strings\+Flag&Parse all numbers (ints/doubles) as strings. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kParseTrailingCommasFlag@{kParseTrailingCommasFlag}!reader.h@{reader.h}}\index{reader.h@{reader.h}!kParseTrailingCommasFlag@{kParseTrailingCommasFlag}}}\Hypertarget{reader_8h_ab7be7dabe6ffcba60fad441505583450a953d6381de950e25c8c97ad54f52370a}\label{reader_8h_ab7be7dabe6ffcba60fad441505583450} 
+k\+Parse\+Trailing\+Commas\+Flag&Allow trailing commas at the end of objects and arrays. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kParseNanAndInfFlag@{kParseNanAndInfFlag}!reader.h@{reader.h}}\index{reader.h@{reader.h}!kParseNanAndInfFlag@{kParseNanAndInfFlag}}}\Hypertarget{reader_8h_ab7be7dabe6ffcba60fad441505583450a9849d65c1d3edd796bd75897c6a37eb6}\label{reader_8h_ab7be7dabe6ffcba60fad441505583450} 
+k\+Parse\+Nan\+And\+Inf\+Flag&Allow parsing NaN, Inf, Infinity, -\/Inf and -\/Infinity as doubles. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kParseDefaultFlags@{kParseDefaultFlags}!reader.h@{reader.h}}\index{reader.h@{reader.h}!kParseDefaultFlags@{kParseDefaultFlags}}}\Hypertarget{reader_8h_ab7be7dabe6ffcba60fad441505583450a9104b0946d648e9467cb7a967401ec80}\label{reader_8h_ab7be7dabe6ffcba60fad441505583450} 
+k\+Parse\+Default\+Flags&Default parse flags. Can be customized by defining RAPIDJSON\+\_\+\+PARSE\+\_\+\+DEFAULT\+\_\+\+FLAGS. \\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{reader_8h_source_l00145}{145}} of file \mbox{\hyperlink{reader_8h_source}{reader.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00146\ \ \ \ \ \mbox{\hyperlink{reader_8h_ab7be7dabe6ffcba60fad441505583450a1af603dc5f65bb815316589e782bc71a}{kParseNoFlags}}\ =\ 0,\ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00147\ \ \ \ \ \mbox{\hyperlink{reader_8h_ab7be7dabe6ffcba60fad441505583450a13188bd483b4df0b6582bebe2aeb5b01}{kParseInsituFlag}}\ =\ 1,\ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00148\ \ \ \ \ \mbox{\hyperlink{reader_8h_ab7be7dabe6ffcba60fad441505583450a9b3baa16346575d2dc072b23a88e1928}{kParseValidateEncodingFlag}}\ =\ 2,\ }
+\DoxyCodeLine{00149\ \ \ \ \ \mbox{\hyperlink{reader_8h_ab7be7dabe6ffcba60fad441505583450aadb14f5a3b6b33e28055e913a2eae5e9}{kParseIterativeFlag}}\ =\ 4,\ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00150\ \ \ \ \ \mbox{\hyperlink{reader_8h_ab7be7dabe6ffcba60fad441505583450af77d115d3bbed0a448b6b335f3b93b36}{kParseStopWhenDoneFlag}}\ =\ 8,\ \ \ \ \ }
+\DoxyCodeLine{00151\ \ \ \ \ \mbox{\hyperlink{reader_8h_ab7be7dabe6ffcba60fad441505583450a057fbeacafb16bb7d24c9998262cae46}{kParseFullPrecisionFlag}}\ =\ 16,\ \ \ }
+\DoxyCodeLine{00152\ \ \ \ \ \mbox{\hyperlink{reader_8h_ab7be7dabe6ffcba60fad441505583450a245d1b6af730f47f0e7bd27078f5e8c1}{kParseCommentsFlag}}\ =\ 32,\ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00153\ \ \ \ \ \mbox{\hyperlink{reader_8h_ab7be7dabe6ffcba60fad441505583450aa951ab03a51b32b60164436bc280cf01}{kParseNumbersAsStringsFlag}}\ =\ 64,\ \ \ \ }
+\DoxyCodeLine{00154\ \ \ \ \ \mbox{\hyperlink{reader_8h_ab7be7dabe6ffcba60fad441505583450a953d6381de950e25c8c97ad54f52370a}{kParseTrailingCommasFlag}}\ =\ 128,\ }
+\DoxyCodeLine{00155\ \ \ \ \ \mbox{\hyperlink{reader_8h_ab7be7dabe6ffcba60fad441505583450a9849d65c1d3edd796bd75897c6a37eb6}{kParseNanAndInfFlag}}\ =\ 256,\ \ \ \ \ \ }
+\DoxyCodeLine{00156\ \ \ \ \ \mbox{\hyperlink{reader_8h_ab7be7dabe6ffcba60fad441505583450a9104b0946d648e9467cb7a967401ec80}{kParseDefaultFlags}}\ =\ \mbox{\hyperlink{reader_8h_a77005e892e6601599beaf421b0395c31}{RAPIDJSON\_PARSE\_DEFAULT\_FLAGS}}\ \ }
+\DoxyCodeLine{00157\ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{reader_8h_aeddf0374b22926be76140ec6708dc203}\index{reader.h@{reader.h}!SkipWhitespace@{SkipWhitespace}}
+\index{SkipWhitespace@{SkipWhitespace}!reader.h@{reader.h}}
+\doxysubsubsection{\texorpdfstring{SkipWhitespace()}{SkipWhitespace()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{reader_8h_aeddf0374b22926be76140ec6708dc203} 
+const char \texorpdfstring{$\ast$}{*} Skip\+Whitespace (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{p}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{end}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{reader_8h_source_l00273}{273}} of file \mbox{\hyperlink{reader_8h_source}{reader.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00273\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00274\ \ \ \ \ \textcolor{keywordflow}{while}\ (\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ !=\ end\ \&\&\ (*\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ ==\ \textcolor{charliteral}{'\ '}\ ||\ *\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ ==\ \textcolor{charliteral}{'\(\backslash\)n'}\ ||\ *\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ ==\ \textcolor{charliteral}{'\(\backslash\)r'}\ ||\ *\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ ==\ \textcolor{charliteral}{'\(\backslash\)t'}))}
+\DoxyCodeLine{00275\ \ \ \ \ \ \ \ \ ++\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}};}
+\DoxyCodeLine{00276\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}};}
+\DoxyCodeLine{00277\ \}}
+
+\end{DoxyCode}
+\Hypertarget{reader_8h_a60338858b2582eca23f3e509a2d82e0e}\index{reader.h@{reader.h}!SkipWhitespace@{SkipWhitespace}}
+\index{SkipWhitespace@{SkipWhitespace}!reader.h@{reader.h}}
+\doxysubsubsection{\texorpdfstring{SkipWhitespace()}{SkipWhitespace()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{reader_8h_a60338858b2582eca23f3e509a2d82e0e} 
+template$<$typename Input\+Stream $>$ \\
+void Skip\+Whitespace (\begin{DoxyParamCaption}\item[{Input\+Stream \&}]{is}{}\end{DoxyParamCaption})}
+
+
+\begin{DoxyParams}{Parameters}
+{\em is} & \doxylink{struct_a}{A} input stream for skipping white spaces. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyNote}{Note}
+This function has SSE2/\+SSE4.\+2 specialization. 
+\end{DoxyNote}
+
+
+Definition at line \mbox{\hyperlink{reader_8h_source_l00264}{264}} of file \mbox{\hyperlink{reader_8h_source}{reader.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00264\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00265\ \ \ \ \ \mbox{\hyperlink{classinternal_1_1_stream_local_copy}{internal::StreamLocalCopy<InputStream>}}\ \mbox{\hyperlink{namespacefc_a79771837fffd80fcc4bc658ee2fc4b2b}{copy}}(is);}
+\DoxyCodeLine{00266\ \ \ \ \ InputStream\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}(\mbox{\hyperlink{namespacefc_a79771837fffd80fcc4bc658ee2fc4b2b}{copy}}.s);}
+\DoxyCodeLine{00267\ }
+\DoxyCodeLine{00268\ \ \ \ \ \textcolor{keyword}{typename}\ InputStream::Ch\ c;}
+\DoxyCodeLine{00269\ \ \ \ \ \textcolor{keywordflow}{while}\ ((c\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.Peek())\ ==\ \textcolor{charliteral}{'\ '}\ ||\ c\ ==\ \textcolor{charliteral}{'\(\backslash\)n'}\ ||\ c\ ==\ \textcolor{charliteral}{'\(\backslash\)r'}\ ||\ c\ ==\ \textcolor{charliteral}{'\(\backslash\)t'})}
+\DoxyCodeLine{00270\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.Take();}
+\DoxyCodeLine{00271\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{reader_8h_a60338858b2582eca23f3e509a2d82e0e_icgraph}
+\end{center}
+\end{figure}

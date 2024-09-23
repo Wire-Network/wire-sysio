@@ -1,0 +1,7 @@
+<map id="sysio::testing::mock::webauthn_private_key::regenerate" name="sysio::testing::mock::webauthn_private_key::regenerate">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,34,165,90"/>
+<area shape="rect" id="Node000002" href="$classfc_1_1crypto_1_1r1_1_1private__key.html#abed020ddf6cc239edccce96dbbdb4238" title=" " alt="" coords="221,5,364,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="164,45,205,38,206,43,165,50"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1testing_1_1mock_1_1webauthn__private__key.html#a910d73126307fa9f6100aedb3e13c454" title=" " alt="" coords="213,70,372,126"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="165,73,198,79,197,84,164,78"/>
+</map>

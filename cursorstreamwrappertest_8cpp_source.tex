@@ -1,0 +1,121 @@
+\doxysection{cursorstreamwrappertest.\+cpp}
+\hypertarget{cursorstreamwrappertest_8cpp_source}{}\label{cursorstreamwrappertest_8cpp_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/test/unittest/cursorstreamwrappertest.cpp@{libraries/fc/include/fc/crypto/webauthn\_json/test/unittest/cursorstreamwrappertest.cpp}}
+\mbox{\hyperlink{cursorstreamwrappertest_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00001}00001\ \textcolor{comment}{//\ Tencent\ is\ pleased\ to\ support\ the\ open\ source\ community\ by\ making\ RapidJSON\ available.}}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00002}00002\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00003}00003\ \textcolor{comment}{//\ Copyright\ (C)\ 2015\ THL\ A29\ Limited,\ a\ Tencent\ company,\ and\ Milo\ Yip.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00004}00004\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00005}00005\ \textcolor{comment}{//\ Licensed\ under\ the\ MIT\ License\ (the\ "{}License"{});\ you\ may\ not\ use\ this\ file\ except}}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00006}00006\ \textcolor{comment}{//\ in\ compliance\ with\ the\ License.\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00007}00007\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00008}00008\ \textcolor{comment}{//\ http://opensource.org/licenses/MIT}}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00009}00009\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00010}00010\ \textcolor{comment}{//\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software\ distributed}}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00011}00011\ \textcolor{comment}{//\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,\ WITHOUT\ WARRANTIES\ OR}}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00012}00012\ \textcolor{comment}{//\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.\ See\ the\ License\ for\ the}}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00013}00013\ \textcolor{comment}{//\ specific\ language\ governing\ permissions\ and\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00015}00015\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{unittest_8h}{unittest.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00016}00016\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{document_8h}{rapidjson/document.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00017}00017\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{cursorstreamwrapper_8h}{rapidjson/cursorstreamwrapper.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00019}00019\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacerapidjson}{rapidjson}};}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00021}00021\ \textcolor{comment}{//\ static\ const\ char\ json[]\ =\ "{}\{\(\backslash\)"{}string\(\backslash\)"{}\(\backslash\)n\(\backslash\)n:\(\backslash\)"{}my\ string\(\backslash\)"{},\(\backslash\)"{}array\(\backslash\)"{}\(\backslash\)n:[\(\backslash\)"{}1\(\backslash\)"{},\ \(\backslash\)"{}2\(\backslash\)"{},\ \(\backslash\)"{}3\(\backslash\)"{}]\}"{};}}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00023}\mbox{\hyperlink{cursorstreamwrappertest_8cpp_a275da0d1f29dba3630a7ba31e01101e2}{00023}}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{cursorstreamwrappertest_8cpp_a275da0d1f29dba3630a7ba31e01101e2}{testJson}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *json,\ \textcolor{keywordtype}{size\_t}\ \&line,\ \textcolor{keywordtype}{size\_t}\ \&col)\ \{}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00024}00024\ \ \ \ \ \mbox{\hyperlink{struct_generic_string_stream}{StringStream}}\ ss(json);}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00025}00025\ \ \ \ \ \mbox{\hyperlink{class_cursor_stream_wrapper}{CursorStreamWrapper<StringStream>}}\ csw(ss);}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00026}00026\ \ \ \ \ \mbox{\hyperlink{class_generic_document}{Document}}\ document;}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00027}00027\ \ \ \ \ document.\mbox{\hyperlink{class_generic_document_a7bc1827a7ab04de4789fe46237f0e921}{ParseStream}}(csw);}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00028}00028\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ document.\mbox{\hyperlink{class_generic_document_a510a0588db4eb372f5d81bc3646578fb}{HasParseError}}();}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00029}00029\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}})\ \{}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00030}00030\ \ \ \ \ \ \ \ \ col\ =\ csw.\mbox{\hyperlink{class_cursor_stream_wrapper_afdd243889599c9c9edfacea82674a8f4}{GetColumn}}();}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00031}00031\ \ \ \ \ \ \ \ \ line\ =\ csw.\mbox{\hyperlink{class_cursor_stream_wrapper_ad5cc5b06be7fb5afb7c3d4a82b5ef8ce}{GetLine}}();}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00032}00032\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00033}00033\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00034}00034\ \}}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00036}\mbox{\hyperlink{cursorstreamwrappertest_8cpp_ac4fb8d3acd98f897e36fa6bc9d54583d}{00036}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(\mbox{\hyperlink{class_cursor_stream_wrapper}{CursorStreamWrapper}},\ MissingFirstBracket)\ \{}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00037}00037\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ json[]\ =\ \textcolor{stringliteral}{"{}\(\backslash\)"{}string\(\backslash\)"{}\(\backslash\)n\(\backslash\)n:\(\backslash\)"{}my\ string\(\backslash\)"{},\(\backslash\)"{}array\(\backslash\)"{}\(\backslash\)n:[\(\backslash\)"{}1\(\backslash\)"{},\ \(\backslash\)"{}2\(\backslash\)"{},\ \(\backslash\)"{}3\(\backslash\)"{}]\}"{}};}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00038}00038\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ col,\ line;}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00039}00039\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{cursorstreamwrappertest_8cpp_a275da0d1f29dba3630a7ba31e01101e2}{testJson}}(json,\ line,\ col);}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00040}00040\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}});}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00041}00041\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(line,\ 3u);}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00042}00042\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(col,\ 0u);}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00043}00043\ \}}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00045}\mbox{\hyperlink{cursorstreamwrappertest_8cpp_ae8b36851bf3b3305e4292794cdd52ddc}{00045}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(\mbox{\hyperlink{class_cursor_stream_wrapper}{CursorStreamWrapper}},\ MissingQuotes)\ \{}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00046}00046\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ json[]\ =\ \textcolor{stringliteral}{"{}\{\(\backslash\)"{}string\(\backslash\)n\(\backslash\)n:\(\backslash\)"{}my\ string\(\backslash\)"{},\(\backslash\)"{}array\(\backslash\)"{}\(\backslash\)n:[\(\backslash\)"{}1\(\backslash\)"{},\ \(\backslash\)"{}2\(\backslash\)"{},\ \(\backslash\)"{}3\(\backslash\)"{}]\}"{}};}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00047}00047\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ col,\ line;}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00048}00048\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{cursorstreamwrappertest_8cpp_a275da0d1f29dba3630a7ba31e01101e2}{testJson}}(json,\ line,\ col);}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00049}00049\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}});}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00050}00050\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(line,\ 1u);}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00051}00051\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(col,\ 8u);}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00052}00052\ \}}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00054}\mbox{\hyperlink{cursorstreamwrappertest_8cpp_ad4f41f82ee5faf1e197735d085678b10}{00054}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(\mbox{\hyperlink{class_cursor_stream_wrapper}{CursorStreamWrapper}},\ MissingColon)\ \{}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00055}00055\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ json[]\ =\ \textcolor{stringliteral}{"{}\{\(\backslash\)"{}string\(\backslash\)"{}\(\backslash\)n\(\backslash\)n\(\backslash\)"{}my\ string\(\backslash\)"{},\(\backslash\)"{}array\(\backslash\)"{}\(\backslash\)n:[\(\backslash\)"{}1\(\backslash\)"{},\ \(\backslash\)"{}2\(\backslash\)"{},\ \(\backslash\)"{}3\(\backslash\)"{}]\}"{}};}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00056}00056\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ col,\ line;}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00057}00057\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{cursorstreamwrappertest_8cpp_a275da0d1f29dba3630a7ba31e01101e2}{testJson}}(json,\ line,\ col);}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00058}00058\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}});}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00059}00059\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(line,\ 3u);}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00060}00060\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(col,\ 0u);}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00061}00061\ \}}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00062}00062\ }
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00063}\mbox{\hyperlink{cursorstreamwrappertest_8cpp_a128a1978f9d76e5b8f33a73fb193cd69}{00063}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(\mbox{\hyperlink{class_cursor_stream_wrapper}{CursorStreamWrapper}},\ MissingSecondQuotes)\ \{}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00064}00064\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ json[]\ =\ \textcolor{stringliteral}{"{}\{\(\backslash\)"{}string\(\backslash\)"{}\(\backslash\)n\(\backslash\)n:my\ string\(\backslash\)"{},\(\backslash\)"{}array\(\backslash\)"{}\(\backslash\)n:[\(\backslash\)"{}1\(\backslash\)"{},\ \(\backslash\)"{}2\(\backslash\)"{},\ \(\backslash\)"{}3\(\backslash\)"{}]\}"{}};}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00065}00065\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ col,\ line;}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00066}00066\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{cursorstreamwrappertest_8cpp_a275da0d1f29dba3630a7ba31e01101e2}{testJson}}(json,\ line,\ col);}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00067}00067\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}});}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00068}00068\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(line,\ 3u);}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00069}00069\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(col,\ 1u);}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00070}00070\ \}}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00072}\mbox{\hyperlink{cursorstreamwrappertest_8cpp_a540fcbc4d8110c5cf1e394bef973864e}{00072}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(\mbox{\hyperlink{class_cursor_stream_wrapper}{CursorStreamWrapper}},\ MissingComma)\ \{}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00073}00073\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ json[]\ =\ \textcolor{stringliteral}{"{}\{\(\backslash\)"{}string\(\backslash\)"{}\(\backslash\)n\(\backslash\)n:\(\backslash\)"{}my\ string\(\backslash\)"{}\(\backslash\)"{}array\(\backslash\)"{}\(\backslash\)n:[\(\backslash\)"{}1\(\backslash\)"{},\ \(\backslash\)"{}2\(\backslash\)"{},\ \(\backslash\)"{}3\(\backslash\)"{}]\}"{}};}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00074}00074\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ col,\ line;}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00075}00075\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{cursorstreamwrappertest_8cpp_a275da0d1f29dba3630a7ba31e01101e2}{testJson}}(json,\ line,\ col);}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00076}00076\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}});}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00077}00077\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(line,\ 3u);}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00078}00078\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(col,\ 12u);}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00079}00079\ \}}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00080}00080\ }
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00081}\mbox{\hyperlink{cursorstreamwrappertest_8cpp_ad7be74dba4df64b632deef663f49ee1d}{00081}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(\mbox{\hyperlink{class_cursor_stream_wrapper}{CursorStreamWrapper}},\ MissingArrayBracket)\ \{}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00082}00082\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ json[]\ =\ \textcolor{stringliteral}{"{}\{\(\backslash\)"{}string\(\backslash\)"{}\(\backslash\)n\(\backslash\)n:\(\backslash\)"{}my\ string\(\backslash\)"{},\(\backslash\)"{}array\(\backslash\)"{}\(\backslash\)n:\(\backslash\)"{}1\(\backslash\)"{},\ \(\backslash\)"{}2\(\backslash\)"{},\ \(\backslash\)"{}3\(\backslash\)"{}]\}"{}};}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00083}00083\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ col,\ line;}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00084}00084\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{cursorstreamwrappertest_8cpp_a275da0d1f29dba3630a7ba31e01101e2}{testJson}}(json,\ line,\ col);}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00085}00085\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}});}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00086}00086\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(line,\ 4u);}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00087}00087\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(col,\ 9u);}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00088}00088\ \}}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00089}00089\ }
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00090}\mbox{\hyperlink{cursorstreamwrappertest_8cpp_aa928a9ee549a92b19b936232e5b80529}{00090}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(\mbox{\hyperlink{class_cursor_stream_wrapper}{CursorStreamWrapper}},\ MissingArrayComma)\ \{}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00091}00091\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ json[]\ =\ \textcolor{stringliteral}{"{}\{\(\backslash\)"{}string\(\backslash\)"{}\(\backslash\)n\(\backslash\)n:\(\backslash\)"{}my\ string\(\backslash\)"{},\(\backslash\)"{}array\(\backslash\)"{}\(\backslash\)n:[\(\backslash\)"{}1\(\backslash\)"{}\ \(\backslash\)"{}2\(\backslash\)"{},\ \(\backslash\)"{}3\(\backslash\)"{}]\}"{}};}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00092}00092\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ col,\ line;}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00093}00093\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{cursorstreamwrappertest_8cpp_a275da0d1f29dba3630a7ba31e01101e2}{testJson}}(json,\ line,\ col);}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00094}00094\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}});}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00095}00095\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(line,\ 4u);}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00096}00096\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(col,\ 6u);}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00097}00097\ \}}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00098}00098\ }
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00099}\mbox{\hyperlink{cursorstreamwrappertest_8cpp_ac4cf5478a8fa67307f2b5d2213aca3a8}{00099}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(\mbox{\hyperlink{class_cursor_stream_wrapper}{CursorStreamWrapper}},\ MissingLastArrayBracket)\ \{}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00100}00100\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ json8[]\ =\ \textcolor{stringliteral}{"{}\{\(\backslash\)"{}string\(\backslash\)"{}\(\backslash\)n\(\backslash\)n:\(\backslash\)"{}my\ string\(\backslash\)"{},\(\backslash\)"{}array\(\backslash\)"{}\(\backslash\)n:[\(\backslash\)"{}1\(\backslash\)"{},\ \(\backslash\)"{}2\(\backslash\)"{},\ \(\backslash\)"{}3\(\backslash\)"{}\}"{}};}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00101}00101\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ col,\ line;}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00102}00102\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{cursorstreamwrappertest_8cpp_a275da0d1f29dba3630a7ba31e01101e2}{testJson}}(json8,\ line,\ col);}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00103}00103\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}});}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00104}00104\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(line,\ 4u);}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00105}00105\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(col,\ 15u);}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00106}00106\ \}}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00107}00107\ }
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00108}\mbox{\hyperlink{cursorstreamwrappertest_8cpp_a6bd684af3886ac0848edf1a8bdfc5c66}{00108}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(\mbox{\hyperlink{class_cursor_stream_wrapper}{CursorStreamWrapper}},\ MissingLastBracket)\ \{}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00109}00109\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ json9[]\ =\ \textcolor{stringliteral}{"{}\{\(\backslash\)"{}string\(\backslash\)"{}\(\backslash\)n\(\backslash\)n:\(\backslash\)"{}my\ string\(\backslash\)"{},\(\backslash\)"{}array\(\backslash\)"{}\(\backslash\)n:[\(\backslash\)"{}1\(\backslash\)"{},\ \(\backslash\)"{}2\(\backslash\)"{},\ \(\backslash\)"{}3\(\backslash\)"{}]"{}};}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00110}00110\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ col,\ line;}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00111}00111\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{cursorstreamwrappertest_8cpp_a275da0d1f29dba3630a7ba31e01101e2}{testJson}}(json9,\ line,\ col);}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00112}00112\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}});}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00113}00113\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(line,\ 4u);}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00114}00114\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(col,\ 16u);}
+\DoxyCodeLine{\Hypertarget{cursorstreamwrappertest_8cpp_source_l00115}00115\ \}}
+
+\end{DoxyCode}

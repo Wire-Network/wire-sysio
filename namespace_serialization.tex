@@ -1,0 +1,839 @@
+\doxysection{Serialization Namespace Reference}
+\hypertarget{namespace_serialization}{}\label{namespace_serialization}\index{Serialization@{Serialization}}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_serialization_1_1_array_output_stream}{Array\+Output\+Stream}}
+\item 
+struct \mbox{\hyperlink{struct_serialization_1_1_fatal_serialization_exception}{Fatal\+Serialization\+Exception}}
+\item 
+struct \mbox{\hyperlink{struct_serialization_1_1_input_stream}{Input\+Stream}}
+\item 
+struct \mbox{\hyperlink{struct_serialization_1_1_memory_input_stream}{Memory\+Input\+Stream}}
+\item 
+struct \mbox{\hyperlink{struct_serialization_1_1_output_stream}{Output\+Stream}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_a724fb9f82013c782db5c3c12ea36aac8}{FORCEINLINE}} void \mbox{\hyperlink{namespace_serialization_aee190f414695b837a7b75cd86adc516f}{serialize\+Bytes}} (\mbox{\hyperlink{struct_serialization_1_1_output_stream}{Output\+Stream}} \&stream, const \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} \texorpdfstring{$\ast$}{*}bytes, \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} num\+Bytes)
+\item 
+\mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_a724fb9f82013c782db5c3c12ea36aac8}{FORCEINLINE}} void \mbox{\hyperlink{namespace_serialization_ab3502c43ba150270c3c65b4e7c87080e}{serialize\+Bytes}} (\mbox{\hyperlink{struct_serialization_1_1_input_stream}{Input\+Stream}} \&stream, \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} \texorpdfstring{$\ast$}{*}bytes, \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} num\+Bytes)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} $>$ }\\\mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_a724fb9f82013c782db5c3c12ea36aac8}{FORCEINLINE}} void \mbox{\hyperlink{namespace_serialization_acbd5d61d25bec4a37a4ecc33f7734155}{serialize\+Native\+Value}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespace_serialization_a2a05c5aff4847073ca0fb887d20ac485}{serialize}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} \&i)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespace_serialization_aa8a7b1baac3660bd63f2418dbbd61efe}{serialize}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}} \&i)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespace_serialization_a4ac446f43ac33663fbfb891e78049e0f}{serialize}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, \mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}} \&i)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespace_serialization_a4354d6cf14b1ce6de06039ef97269365}{serialize}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, \mbox{\hyperlink{_basic_types_8h_a33c92dd47950aa8c1d6df7e1c163e5a6}{I8}} \&i)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespace_serialization_afb8810a09bbf513478059c7abafbf891}{serialize}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, \mbox{\hyperlink{_basic_types_8h_a2f1a62071dd7dc3f6ef85c1b7612dc35}{I32}} \&i)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespace_serialization_ad66c33ddcb4f0294cbbf939530f192ee}{serialize}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, \mbox{\hyperlink{_basic_types_8h_a416b74ff5b1dc365af5713a3f48fb8b9}{I64}} \&i)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespace_serialization_a10e426850f78156cd8c3bcf355f85e08}{serialize}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, \mbox{\hyperlink{_basic_types_8h_a841d3674577a1e86afdc2f4845f46c4b}{F32}} \&\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespace_serialization_a855a29de6a26c8f99d47c22f11804a5f}{serialize}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, \mbox{\hyperlink{_basic_types_8h_adc9896ee12db3bb116fc63b3464c72c7}{F64}} \&\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} , \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} max\+Bits$>$ }\\\mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_a724fb9f82013c782db5c3c12ea36aac8}{FORCEINLINE}} void \mbox{\hyperlink{namespace_serialization_a7542db4eecbd9af4bc8398241da2614d}{serialize\+Var\+Int}} (\mbox{\hyperlink{struct_serialization_1_1_output_stream}{Output\+Stream}} \&stream, \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} \&in\+Value, \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} min\+Value, \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} max\+Value)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} , \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} max\+Bits$>$ }\\\mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_a724fb9f82013c782db5c3c12ea36aac8}{FORCEINLINE}} void \mbox{\hyperlink{namespace_serialization_a3999d7df48f01a86a1c743401da00fc6}{serialize\+Var\+Int}} (\mbox{\hyperlink{struct_serialization_1_1_input_stream}{Input\+Stream}} \&stream, \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}, \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} min\+Value, \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} max\+Value)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} $>$ }\\void \mbox{\hyperlink{namespace_serialization_a46462b1f33100cfe651e13e844827dec}{serialize\+Var\+UInt1}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} $>$ }\\void \mbox{\hyperlink{namespace_serialization_af14a3f6c258b4253ad4d75a57827d41e}{serialize\+Var\+UInt7}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} $>$ }\\void \mbox{\hyperlink{namespace_serialization_a1ea6ecb2f4de00340f936648398f4f66}{serialize\+Var\+UInt32}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} $>$ }\\void \mbox{\hyperlink{namespace_serialization_a4ac33cb15215c7dbaae4eb516786aba4}{serialize\+Var\+UInt64}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} $>$ }\\void \mbox{\hyperlink{namespace_serialization_aa3a610a68eadc6fc16175ae3b4e3a829}{serialize\+Var\+Int7}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} $>$ }\\void \mbox{\hyperlink{namespace_serialization_ad134d54737dffbb61803344f6ffbd778}{serialize\+Var\+Int32}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} $>$ }\\void \mbox{\hyperlink{namespace_serialization_aa9ecd5c87d12b25bb872a2f822d0b729}{serialize\+Var\+Int64}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+{\footnotesize template$<$typename Constant $>$ }\\void \mbox{\hyperlink{namespace_serialization_a1b9abe1b3bbe0732eb1f8d900be0f3aa}{serialize\+Constant}} (\mbox{\hyperlink{struct_serialization_1_1_input_stream}{Input\+Stream}} \&stream, const char \texorpdfstring{$\ast$}{*}constant\+Mismatch\+Message, Constant constant)
+\item 
+{\footnotesize template$<$typename Constant $>$ }\\void \mbox{\hyperlink{namespace_serialization_aa8b915b1069c6ce250def8c15606cbbf}{serialize\+Constant}} (\mbox{\hyperlink{struct_serialization_1_1_output_stream}{Output\+Stream}} \&stream, const char \texorpdfstring{$\ast$}{*}constant\+Mismatch\+Message, Constant constant)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ }\\void \mbox{\hyperlink{namespace_serialization_a9af40bc27e193e72b3946d97f4f40cb2}{serialize}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, std\+::string \&string)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename Element , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} , typename Serialize\+Element $>$ }\\void \mbox{\hyperlink{namespace_serialization_a4eb4f7ddb9c392ea5af0205ef8e4e987}{serialize\+Array}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, std\+::vector$<$ Element, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \&vector, Serialize\+Element serialize\+Element)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename Element , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ }\\void \mbox{\hyperlink{namespace_serialization_a28ab1a84c8ac0af04f22000d514e17b5}{serialize}} (\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&stream, std\+::vector$<$ Element, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \&vector)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespace_serialization_a10e426850f78156cd8c3bcf355f85e08}\index{Serialization@{Serialization}!serialize@{serialize}}
+\index{serialize@{serialize}!Serialization@{Serialization}}
+\doxysubsubsection{\texorpdfstring{serialize()}{serialize()}\hspace{0.1cm}{\footnotesize\ttfamily [1/10]}}
+{\footnotesize\ttfamily \label{namespace_serialization_a10e426850f78156cd8c3bcf355f85e08} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ \\
+void Serialization\+::serialize (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&}]{stream}{, }\item[{\mbox{\hyperlink{_basic_types_8h_a841d3674577a1e86afdc2f4845f46c4b}{F32}} \&}]{f}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_serialization_8h_source_l00153}{153}} of file \mbox{\hyperlink{_serialization_8h_source}{Serialization.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00153\ \{\ \mbox{\hyperlink{namespace_serialization_acbd5d61d25bec4a37a4ecc33f7734155}{serializeNativeValue}}(stream,\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}});\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_serialization_a10e426850f78156cd8c3bcf355f85e08_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_serialization_a855a29de6a26c8f99d47c22f11804a5f}\index{Serialization@{Serialization}!serialize@{serialize}}
+\index{serialize@{serialize}!Serialization@{Serialization}}
+\doxysubsubsection{\texorpdfstring{serialize()}{serialize()}\hspace{0.1cm}{\footnotesize\ttfamily [2/10]}}
+{\footnotesize\ttfamily \label{namespace_serialization_a855a29de6a26c8f99d47c22f11804a5f} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ \\
+void Serialization\+::serialize (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&}]{stream}{, }\item[{\mbox{\hyperlink{_basic_types_8h_adc9896ee12db3bb116fc63b3464c72c7}{F64}} \&}]{f}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_serialization_8h_source_l00154}{154}} of file \mbox{\hyperlink{_serialization_8h_source}{Serialization.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00154\ \{\ \mbox{\hyperlink{namespace_serialization_acbd5d61d25bec4a37a4ecc33f7734155}{serializeNativeValue}}(stream,\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}});\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_serialization_a855a29de6a26c8f99d47c22f11804a5f_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_serialization_afb8810a09bbf513478059c7abafbf891}\index{Serialization@{Serialization}!serialize@{serialize}}
+\index{serialize@{serialize}!Serialization@{Serialization}}
+\doxysubsubsection{\texorpdfstring{serialize()}{serialize()}\hspace{0.1cm}{\footnotesize\ttfamily [3/10]}}
+{\footnotesize\ttfamily \label{namespace_serialization_afb8810a09bbf513478059c7abafbf891} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ \\
+void Serialization\+::serialize (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&}]{stream}{, }\item[{\mbox{\hyperlink{_basic_types_8h_a2f1a62071dd7dc3f6ef85c1b7612dc35}{I32}} \&}]{i}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_serialization_8h_source_l00151}{151}} of file \mbox{\hyperlink{_serialization_8h_source}{Serialization.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00151\ \{\ \mbox{\hyperlink{namespace_serialization_acbd5d61d25bec4a37a4ecc33f7734155}{serializeNativeValue}}(stream,i);\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_serialization_afb8810a09bbf513478059c7abafbf891_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_serialization_ad66c33ddcb4f0294cbbf939530f192ee}\index{Serialization@{Serialization}!serialize@{serialize}}
+\index{serialize@{serialize}!Serialization@{Serialization}}
+\doxysubsubsection{\texorpdfstring{serialize()}{serialize()}\hspace{0.1cm}{\footnotesize\ttfamily [4/10]}}
+{\footnotesize\ttfamily \label{namespace_serialization_ad66c33ddcb4f0294cbbf939530f192ee} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ \\
+void Serialization\+::serialize (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&}]{stream}{, }\item[{\mbox{\hyperlink{_basic_types_8h_a416b74ff5b1dc365af5713a3f48fb8b9}{I64}} \&}]{i}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_serialization_8h_source_l00152}{152}} of file \mbox{\hyperlink{_serialization_8h_source}{Serialization.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00152\ \{\ \mbox{\hyperlink{namespace_serialization_acbd5d61d25bec4a37a4ecc33f7734155}{serializeNativeValue}}(stream,i);\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_serialization_ad66c33ddcb4f0294cbbf939530f192ee_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_serialization_a4354d6cf14b1ce6de06039ef97269365}\index{Serialization@{Serialization}!serialize@{serialize}}
+\index{serialize@{serialize}!Serialization@{Serialization}}
+\doxysubsubsection{\texorpdfstring{serialize()}{serialize()}\hspace{0.1cm}{\footnotesize\ttfamily [5/10]}}
+{\footnotesize\ttfamily \label{namespace_serialization_a4354d6cf14b1ce6de06039ef97269365} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ \\
+void Serialization\+::serialize (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&}]{stream}{, }\item[{\mbox{\hyperlink{_basic_types_8h_a33c92dd47950aa8c1d6df7e1c163e5a6}{I8}} \&}]{i}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_serialization_8h_source_l00150}{150}} of file \mbox{\hyperlink{_serialization_8h_source}{Serialization.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00150\ \{\ \mbox{\hyperlink{namespace_serialization_acbd5d61d25bec4a37a4ecc33f7734155}{serializeNativeValue}}(stream,i);\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_serialization_a4354d6cf14b1ce6de06039ef97269365_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_serialization_a9af40bc27e193e72b3946d97f4f40cb2}\index{Serialization@{Serialization}!serialize@{serialize}}
+\index{serialize@{serialize}!Serialization@{Serialization}}
+\doxysubsubsection{\texorpdfstring{serialize()}{serialize()}\hspace{0.1cm}{\footnotesize\ttfamily [6/10]}}
+{\footnotesize\ttfamily \label{namespace_serialization_a9af40bc27e193e72b3946d97f4f40cb2} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ \\
+void Serialization\+::serialize (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&}]{stream}{, }\item[{std\+::string \&}]{string}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_serialization_8h_source_l00264}{264}} of file \mbox{\hyperlink{_serialization_8h_source}{Serialization.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00265\ \ \ \ \ \{}
+\DoxyCodeLine{00266\ \ \ \ \ \ \ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{size\_t}\ max\_size\ =\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__constraints_acd9b29a2807d996ee0e61249e1f5fde3}{sysio::chain::wasm\_constraints::maximum\_func\_local\_bytes}};}
+\DoxyCodeLine{00267\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ size\ =\ \textcolor{keywordtype}{string}.size();}
+\DoxyCodeLine{00268\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_serialization_a1ea6ecb2f4de00340f936648398f4f66}{serializeVarUInt32}}(stream,size);}
+\DoxyCodeLine{00269\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(Stream::isInput)}
+\DoxyCodeLine{00270\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00271\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Advance\ the\ stream\ before\ resizing\ the\ string:}}
+\DoxyCodeLine{00272\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ try\ to\ get\ a\ serialization\ exception\ before\ making\ a\ huge\ allocation\ for\ malformed\ input.}}
+\DoxyCodeLine{00273\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}*\ inputBytes\ =\ stream.advance(size);}
+\DoxyCodeLine{00274\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (size\ >=\ max\_size\ \&\&\ \mbox{\hyperlink{namespace_w_a_s_m_a5c8e6887571b126ae374d7cb5c38eac4}{WASM::check\_limits}})}
+\DoxyCodeLine{00275\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{struct_serialization_1_1_fatal_serialization_exception}{FatalSerializationException}}(std::string(\textcolor{stringliteral}{"{}Trying\ to\ deserialize\ string\ of\ size\ :\ "{}}\ +\ std::to\_string((\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})size)\ +\ \textcolor{stringliteral}{"{},\ which\ is\ over\ by\ "{}}+std::to\_string(size\ -\/\ max\_size\ )+\textcolor{stringliteral}{"{}\ bytes"{}}));}
+\DoxyCodeLine{00276\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}.resize(size);}
+\DoxyCodeLine{00277\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(\textcolor{keyword}{const\_cast<}\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(\textcolor{keywordtype}{string}.data()),inputBytes,size);}
+\DoxyCodeLine{00278\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}.shrink\_to\_fit();}
+\DoxyCodeLine{00279\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00280\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{\ serializeBytes(stream,(\mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}*)\textcolor{keywordtype}{string}.c\_str(),size);\ \}}
+\DoxyCodeLine{00281\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_serialization_a9af40bc27e193e72b3946d97f4f40cb2_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_serialization_a28ab1a84c8ac0af04f22000d514e17b5}\index{Serialization@{Serialization}!serialize@{serialize}}
+\index{serialize@{serialize}!Serialization@{Serialization}}
+\doxysubsubsection{\texorpdfstring{serialize()}{serialize()}\hspace{0.1cm}{\footnotesize\ttfamily [7/10]}}
+{\footnotesize\ttfamily \label{namespace_serialization_a28ab1a84c8ac0af04f22000d514e17b5} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename Element , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+void Serialization\+::serialize (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&}]{stream}{, }\item[{std\+::vector$<$ Element, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \&}]{vector}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_serialization_8h_source_l00310}{310}} of file \mbox{\hyperlink{_serialization_8h_source}{Serialization.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00311\ \ \ \ \ \{}
+\DoxyCodeLine{00312\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_serialization_a4eb4f7ddb9c392ea5af0205ef8e4e987}{serializeArray}}(stream,vector,[](\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}}\&\ stream,Element\&\ element)\{\mbox{\hyperlink{namespace_serialization_a2a05c5aff4847073ca0fb887d20ac485}{serialize}}(stream,element);\});}
+\DoxyCodeLine{00313\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_serialization_a28ab1a84c8ac0af04f22000d514e17b5_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_serialization_aa8a7b1baac3660bd63f2418dbbd61efe}\index{Serialization@{Serialization}!serialize@{serialize}}
+\index{serialize@{serialize}!Serialization@{Serialization}}
+\doxysubsubsection{\texorpdfstring{serialize()}{serialize()}\hspace{0.1cm}{\footnotesize\ttfamily [8/10]}}
+{\footnotesize\ttfamily \label{namespace_serialization_aa8a7b1baac3660bd63f2418dbbd61efe} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ \\
+void Serialization\+::serialize (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&}]{stream}{, }\item[{\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}} \&}]{i}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_serialization_8h_source_l00148}{148}} of file \mbox{\hyperlink{_serialization_8h_source}{Serialization.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00148\ \{\ \mbox{\hyperlink{namespace_serialization_acbd5d61d25bec4a37a4ecc33f7734155}{serializeNativeValue}}(stream,i);\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_serialization_aa8a7b1baac3660bd63f2418dbbd61efe_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_serialization_a4ac446f43ac33663fbfb891e78049e0f}\index{Serialization@{Serialization}!serialize@{serialize}}
+\index{serialize@{serialize}!Serialization@{Serialization}}
+\doxysubsubsection{\texorpdfstring{serialize()}{serialize()}\hspace{0.1cm}{\footnotesize\ttfamily [9/10]}}
+{\footnotesize\ttfamily \label{namespace_serialization_a4ac446f43ac33663fbfb891e78049e0f} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ \\
+void Serialization\+::serialize (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&}]{stream}{, }\item[{\mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}} \&}]{i}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_serialization_8h_source_l00149}{149}} of file \mbox{\hyperlink{_serialization_8h_source}{Serialization.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00149\ \{\ \mbox{\hyperlink{namespace_serialization_acbd5d61d25bec4a37a4ecc33f7734155}{serializeNativeValue}}(stream,i);\ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_serialization_a4ac446f43ac33663fbfb891e78049e0f_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_serialization_a2a05c5aff4847073ca0fb887d20ac485}\index{Serialization@{Serialization}!serialize@{serialize}}
+\index{serialize@{serialize}!Serialization@{Serialization}}
+\doxysubsubsection{\texorpdfstring{serialize()}{serialize()}\hspace{0.1cm}{\footnotesize\ttfamily [10/10]}}
+{\footnotesize\ttfamily \label{namespace_serialization_a2a05c5aff4847073ca0fb887d20ac485} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} $>$ \\
+void Serialization\+::serialize (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&}]{stream}{, }\item[{\mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} \&}]{i}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_serialization_8h_source_l00147}{147}} of file \mbox{\hyperlink{_serialization_8h_source}{Serialization.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00147\ \{\ \mbox{\hyperlink{namespace_serialization_acbd5d61d25bec4a37a4ecc33f7734155}{serializeNativeValue}}(stream,i);\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_serialization_a2a05c5aff4847073ca0fb887d20ac485_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_serialization_a2a05c5aff4847073ca0fb887d20ac485_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_serialization_a4eb4f7ddb9c392ea5af0205ef8e4e987}\index{Serialization@{Serialization}!serializeArray@{serializeArray}}
+\index{serializeArray@{serializeArray}!Serialization@{Serialization}}
+\doxysubsubsection{\texorpdfstring{serializeArray()}{serializeArray()}}
+{\footnotesize\ttfamily \label{namespace_serialization_a4eb4f7ddb9c392ea5af0205ef8e4e987} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename Element , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} , typename Serialize\+Element $>$ \\
+void Serialization\+::serialize\+Array (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&}]{stream}{, }\item[{std\+::vector$<$ Element, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \&}]{vector}{, }\item[{Serialize\+Element}]{serialize\+Element}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_serialization_8h_source_l00284}{284}} of file \mbox{\hyperlink{_serialization_8h_source}{Serialization.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00285\ \ \ \ \ \{}
+\DoxyCodeLine{00286\ \ \ \ \ \ \ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{size\_t}\ max\_size\ =\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__constraints_acd9b29a2807d996ee0e61249e1f5fde3}{sysio::chain::wasm\_constraints::maximum\_func\_local\_bytes}};}
+\DoxyCodeLine{00287\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ size\ =\ vector.size();}
+\DoxyCodeLine{00288\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_serialization_a1ea6ecb2f4de00340f936648398f4f66}{serializeVarUInt32}}(stream,size);}
+\DoxyCodeLine{00289\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(Stream::isInput)}
+\DoxyCodeLine{00290\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00291\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Grow\ the\ vector\ one\ element\ at\ a\ time:}}
+\DoxyCodeLine{00292\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ try\ to\ get\ a\ serialization\ exception\ before\ making\ a\ huge\ allocation\ for\ malformed\ input.}}
+\DoxyCodeLine{00293\ \ \ \ \ \ \ \ \ \ \ \ \ vector.clear();}
+\DoxyCodeLine{00294\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (size\ >=\ max\_size\ \&\&\ \mbox{\hyperlink{namespace_w_a_s_m_a5c8e6887571b126ae374d7cb5c38eac4}{WASM::check\_limits}})}
+\DoxyCodeLine{00295\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{struct_serialization_1_1_fatal_serialization_exception}{FatalSerializationException}}(std::string(\textcolor{stringliteral}{"{}Trying\ to\ deserialize\ array\ of\ size\ :\ "{}}\ +\ std::to\_string((\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})size)\ +\ \textcolor{stringliteral}{"{},\ which\ is\ over\ by\ "{}}+std::to\_string(size\ -\/\ max\_size\ )+\textcolor{stringliteral}{"{}\ bytes"{}}));}
+\DoxyCodeLine{00296\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ index\ =\ 0;index\ <\ size;++index)}
+\DoxyCodeLine{00297\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00298\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ vector.push\_back(Element());}
+\DoxyCodeLine{00299\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ serializeElement(stream,vector.back());}
+\DoxyCodeLine{00300\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00301\ \ \ \ \ \ \ \ \ \ vector.shrink\_to\_fit();}
+\DoxyCodeLine{00302\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00303\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00304\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00305\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ index\ =\ 0;index\ <\ vector.size();++index)\ \{\ serializeElement(stream,vector[index]);\ \}}
+\DoxyCodeLine{00306\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00307\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_serialization_a4eb4f7ddb9c392ea5af0205ef8e4e987_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_serialization_a4eb4f7ddb9c392ea5af0205ef8e4e987_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_serialization_ab3502c43ba150270c3c65b4e7c87080e}\index{Serialization@{Serialization}!serializeBytes@{serializeBytes}}
+\index{serializeBytes@{serializeBytes}!Serialization@{Serialization}}
+\doxysubsubsection{\texorpdfstring{serializeBytes()}{serializeBytes()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{namespace_serialization_ab3502c43ba150270c3c65b4e7c87080e} 
+\mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_a724fb9f82013c782db5c3c12ea36aac8}{FORCEINLINE}} void Serialization\+::serialize\+Bytes (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_serialization_1_1_input_stream}{Input\+Stream}} \&}]{stream}{, }\item[{\mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} \texorpdfstring{$\ast$}{*}}]{bytes}{, }\item[{\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}}]{num\+Bytes}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_serialization_8h_source_l00135}{135}} of file \mbox{\hyperlink{_serialization_8h_source}{Serialization.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00136\ \ \ \ \ \{\ }
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ numBytes\ <\ sysio::chain::wasm\_constraints::wasm\_page\_size\ ||\ !\mbox{\hyperlink{namespace_w_a_s_m_a5c8e6887571b126ae374d7cb5c38eac4}{WASM::check\_limits}})}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(bytes,stream.advance(numBytes),numBytes);\ }
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{struct_serialization_1_1_fatal_serialization_exception}{FatalSerializationException}}(std::string(\textcolor{stringliteral}{"{}Trying\ to\ deserialize\ bytes\ of\ size\ :\ "{}}\ +\ std::to\_string((\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})numBytes)));}
+\DoxyCodeLine{00141\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=281pt]{namespace_serialization_ab3502c43ba150270c3c65b4e7c87080e_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_serialization_aee190f414695b837a7b75cd86adc516f}\index{Serialization@{Serialization}!serializeBytes@{serializeBytes}}
+\index{serializeBytes@{serializeBytes}!Serialization@{Serialization}}
+\doxysubsubsection{\texorpdfstring{serializeBytes()}{serializeBytes()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{namespace_serialization_aee190f414695b837a7b75cd86adc516f} 
+\mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_a724fb9f82013c782db5c3c12ea36aac8}{FORCEINLINE}} void Serialization\+::serialize\+Bytes (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_serialization_1_1_output_stream}{Output\+Stream}} \&}]{stream}{, }\item[{const \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} \texorpdfstring{$\ast$}{*}}]{bytes}{, }\item[{\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}}]{num\+Bytes}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_serialization_8h_source_l00133}{133}} of file \mbox{\hyperlink{_serialization_8h_source}{Serialization.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00134\ \ \ \ \ \{\ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(stream.advance(numBytes),bytes,numBytes);\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=281pt]{namespace_serialization_aee190f414695b837a7b75cd86adc516f_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_serialization_aee190f414695b837a7b75cd86adc516f_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_serialization_a1b9abe1b3bbe0732eb1f8d900be0f3aa}\index{Serialization@{Serialization}!serializeConstant@{serializeConstant}}
+\index{serializeConstant@{serializeConstant}!Serialization@{Serialization}}
+\doxysubsubsection{\texorpdfstring{serializeConstant()}{serializeConstant()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{namespace_serialization_a1b9abe1b3bbe0732eb1f8d900be0f3aa} 
+template$<$typename Constant $>$ \\
+void Serialization\+::serialize\+Constant (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_serialization_1_1_input_stream}{Input\+Stream}} \&}]{stream}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{constant\+Mismatch\+Message}{, }\item[{Constant}]{constant}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_serialization_8h_source_l00247}{247}} of file \mbox{\hyperlink{_serialization_8h_source}{Serialization.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00248\ \ \ \ \ \{}
+\DoxyCodeLine{00249\ \ \ \ \ \ \ \ \ Constant\ savedConstant;}
+\DoxyCodeLine{00250\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_serialization_a2a05c5aff4847073ca0fb887d20ac485}{serialize}}(stream,savedConstant);}
+\DoxyCodeLine{00251\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(savedConstant\ !=\ constant)}
+\DoxyCodeLine{00252\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00253\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{struct_serialization_1_1_fatal_serialization_exception}{FatalSerializationException}}(std::string(constantMismatchMessage)\ +\ \textcolor{stringliteral}{"{}:\ loaded\ "{}}\ +\ std::to\_string(savedConstant)\ +\ \textcolor{stringliteral}{"{}\ but\ was\ expecting\ "{}}\ +\ std::to\_string(constant));}
+\DoxyCodeLine{00254\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00255\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_serialization_a1b9abe1b3bbe0732eb1f8d900be0f3aa_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_serialization_a1b9abe1b3bbe0732eb1f8d900be0f3aa_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_serialization_aa8b915b1069c6ce250def8c15606cbbf}\index{Serialization@{Serialization}!serializeConstant@{serializeConstant}}
+\index{serializeConstant@{serializeConstant}!Serialization@{Serialization}}
+\doxysubsubsection{\texorpdfstring{serializeConstant()}{serializeConstant()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{namespace_serialization_aa8b915b1069c6ce250def8c15606cbbf} 
+template$<$typename Constant $>$ \\
+void Serialization\+::serialize\+Constant (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_serialization_1_1_output_stream}{Output\+Stream}} \&}]{stream}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{constant\+Mismatch\+Message}{, }\item[{Constant}]{constant}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_serialization_8h_source_l00257}{257}} of file \mbox{\hyperlink{_serialization_8h_source}{Serialization.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00258\ \ \ \ \ \{}
+\DoxyCodeLine{00259\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_serialization_a2a05c5aff4847073ca0fb887d20ac485}{serialize}}(stream,constant);}
+\DoxyCodeLine{00260\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_serialization_aa8b915b1069c6ce250def8c15606cbbf_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_serialization_acbd5d61d25bec4a37a4ecc33f7734155}\index{Serialization@{Serialization}!serializeNativeValue@{serializeNativeValue}}
+\index{serializeNativeValue@{serializeNativeValue}!Serialization@{Serialization}}
+\doxysubsubsection{\texorpdfstring{serializeNativeValue()}{serializeNativeValue()}}
+{\footnotesize\ttfamily \label{namespace_serialization_acbd5d61d25bec4a37a4ecc33f7734155} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} $>$ \\
+\mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_a724fb9f82013c782db5c3c12ea36aac8}{FORCEINLINE}} void Serialization\+::serialize\+Native\+Value (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&}]{stream}{, }\item[{\mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} \&}]{value}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_serialization_8h_source_l00145}{145}} of file \mbox{\hyperlink{_serialization_8h_source}{Serialization.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00145\ \{\ \mbox{\hyperlink{namespace_serialization_aee190f414695b837a7b75cd86adc516f}{serializeBytes}}(stream,(\mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}*)\&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\textcolor{keyword}{sizeof}(\mbox{\hyperlink{class_generic_value}{Value}}));\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_serialization_acbd5d61d25bec4a37a4ecc33f7734155_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_serialization_acbd5d61d25bec4a37a4ecc33f7734155_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_serialization_a3999d7df48f01a86a1c743401da00fc6}\index{Serialization@{Serialization}!serializeVarInt@{serializeVarInt}}
+\index{serializeVarInt@{serializeVarInt}!Serialization@{Serialization}}
+\doxysubsubsection{\texorpdfstring{serializeVarInt()}{serializeVarInt()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{namespace_serialization_a3999d7df48f01a86a1c743401da00fc6} 
+template$<$typename \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} , \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} max\+Bits$>$ \\
+\mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_a724fb9f82013c782db5c3c12ea36aac8}{FORCEINLINE}} void Serialization\+::serialize\+Var\+Int (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_serialization_1_1_input_stream}{Input\+Stream}} \&}]{stream}{, }\item[{\mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} \&}]{value}{, }\item[{\mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}}}]{min\+Value}{, }\item[{\mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}}}]{max\+Value}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_serialization_8h_source_l00181}{181}} of file \mbox{\hyperlink{_serialization_8h_source}{Serialization.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00182\ \ \ \ \ \{}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ First,\ read\ the\ variable\ number\ of\ input\ bytes\ into\ a\ fixed\ size\ buffer.}}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ \textcolor{keyword}{enum}\ \{\ maxBytes\ =\ (maxBits\ +\ 6)\ /\ 7\ \};}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}\ bytes[maxBytes]\ =\ \{0\};}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ numBytes\ =\ 0;}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_a33c92dd47950aa8c1d6df7e1c163e5a6}{I8}}\ signExtendShift\ =\ (\mbox{\hyperlink{_basic_types_8h_a33c92dd47950aa8c1d6df7e1c163e5a6}{I8}})\textcolor{keyword}{sizeof}(\mbox{\hyperlink{class_generic_value}{Value}})\ *\ 8;}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(numBytes\ <\ maxBytes)}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}\ \textcolor{keywordtype}{byte}\ =\ *stream.advance(1);}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_ac6f5a1f1e061f000983f5d5f3ac25dfa}{bytes}}[numBytes]\ =\ \mbox{\hyperlink{namespace_xbyak_1_1util_aa32c2b65ee9fdc28f9ef245092e96352}{byte}};}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ \ \ \ \ ++numBytes;}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \ \ \ \ \ \ signExtendShift\ -\/=\ 7;}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!(\textcolor{keywordtype}{byte}\ \&\ 0x80))\ \{\ \textcolor{keywordflow}{break};\ \}}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00196\ }
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Ensure\ that\ the\ input\ does\ not\ encode\ more\ than\ maxBits\ of\ data.}}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \textcolor{keyword}{enum}\ \{\ numUsedBitsInLastByte\ =\ maxBits\ -\/\ (maxBytes-\/1)\ *\ 7\ \};}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ \textcolor{keyword}{enum}\ \{\ numUnusedBitsInLast\ =\ 8\ -\/\ numUsedBitsInLastByte\ \};}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \textcolor{keyword}{enum}\ \{\ lastBitUsedMask\ =\ \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}(1<<(numUsedBitsInLastByte-\/1))\ \};}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \ \ \textcolor{keyword}{enum}\ \{\ lastByteUsedMask\ =\ \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}(1<<numUsedBitsInLastByte)-\/\mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}(1)\ \};}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \ \ \textcolor{keyword}{enum}\ \{\ lastByteSignedMask\ =\ \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}(\string~\mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}(lastByteUsedMask)\ \&\ \string~\mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}(0x80))\ \};}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}\ lastByte\ =\ \mbox{\hyperlink{namespacesysio_1_1chain_ac6f5a1f1e061f000983f5d5f3ac25dfa}{bytes}}[maxBytes-\/1];}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!std::is\_signed<Value>::value)}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}((lastByte\ \&\ \string~lastByteUsedMask)\ !=\ 0)}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ FatalSerializationException(\textcolor{stringliteral}{"{}Invalid\ unsigned\ LEB\ encoding:\ unused\ bits\ in\ final\ byte\ must\ be\ 0"{}});}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_basic_types_8h_a33c92dd47950aa8c1d6df7e1c163e5a6}{I8}}\ \mbox{\hyperlink{fp128_8h_a24a207bac48041c7a290ab7b276a3b8b}{signBit}}\ =\ \mbox{\hyperlink{_basic_types_8h_a33c92dd47950aa8c1d6df7e1c163e5a6}{I8}}((lastByte\ \&\ lastBitUsedMask)\ <<\ numUnusedBitsInLast);}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_basic_types_8h_a33c92dd47950aa8c1d6df7e1c163e5a6}{I8}}\ signExtendedLastBit\ =\ \mbox{\hyperlink{fp128_8h_a24a207bac48041c7a290ab7b276a3b8b}{signBit}}\ >>\ numUnusedBitsInLast;}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}((lastByte\ \&\ \string~lastByteUsedMask)\ !=\ (signExtendedLastBit\ \&\ lastByteSignedMask))}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00217\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ FatalSerializationException(}
+\DoxyCodeLine{00218\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Invalid\ signed\ LEB\ encoding:\ unused\ bits\ in\ final\ byte\ must\ match\ the\ most-\/significant\ used\ bit"{}});}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00221\ }
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Decode\ the\ buffer's\ bytes\ into\ the\ output\ integer.}}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ =\ 0;}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ byteIndex\ =\ 0;byteIndex\ <\ maxBytes;++byteIndex)}
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \ \ \{\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ |=\ \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}}(bytes[byteIndex]\ \&\ \string~0x80)\ <<\ (byteIndex\ *\ 7);\ \}}
+\DoxyCodeLine{00226\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00227\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Sign\ extend\ the\ output\ integer\ to\ the\ full\ size\ of\ Value.}}
+\DoxyCodeLine{00228\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(std::is\_signed<Value>::value\ \&\&\ signExtendShift\ >\ 0)}
+\DoxyCodeLine{00229\ \ \ \ \ \ \ \ \ \{\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ =\ \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}}(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ <<\ signExtendShift)\ >>\ signExtendShift;\ \}}
+\DoxyCodeLine{00230\ }
+\DoxyCodeLine{00231\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Check\ that\ the\ output\ integer\ is\ in\ the\ expected\ range.}}
+\DoxyCodeLine{00232\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value\ <\ minValue\ ||\ value\ >}}\ maxValue)}
+\DoxyCodeLine{00233\ \ \ \ \ \ \ \ \ \{\ \textcolor{keywordflow}{throw}\ FatalSerializationException(std::string(\textcolor{stringliteral}{"{}out-\/of-\/range\ value:\ "{}})\ +\ std::to\_string(minValue)\ +\ \textcolor{stringliteral}{"{}<="{}}\ +\ std::to\_string(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})\ +\ \textcolor{stringliteral}{"{}<="{}}\ +\ std::to\_string(maxValue));\ \}}
+\DoxyCodeLine{00234\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespace_serialization_a7542db4eecbd9af4bc8398241da2614d}\index{Serialization@{Serialization}!serializeVarInt@{serializeVarInt}}
+\index{serializeVarInt@{serializeVarInt}!Serialization@{Serialization}}
+\doxysubsubsection{\texorpdfstring{serializeVarInt()}{serializeVarInt()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{namespace_serialization_a7542db4eecbd9af4bc8398241da2614d} 
+template$<$typename \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} , \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} max\+Bits$>$ \\
+\mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_a724fb9f82013c782db5c3c12ea36aac8}{FORCEINLINE}} void Serialization\+::serialize\+Var\+Int (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_serialization_1_1_output_stream}{Output\+Stream}} \&}]{stream}{, }\item[{\mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} \&}]{in\+Value}{, }\item[{\mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}}}]{min\+Value}{, }\item[{\mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}}}]{max\+Value}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_serialization_8h_source_l00158}{158}} of file \mbox{\hyperlink{_serialization_8h_source}{Serialization.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00159\ \ \ \ \ \{}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value}{Value}}\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ =\ inValue;}
+\DoxyCodeLine{00161\ }
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value\ <\ minValue\ ||\ value\ >}}\ maxValue)}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{struct_serialization_1_1_fatal_serialization_exception}{FatalSerializationException}}(std::string(\textcolor{stringliteral}{"{}out-\/of-\/range\ value:\ "{}})\ +\ std::to\_string(minValue)\ +\ \textcolor{stringliteral}{"{}<="{}}\ +\ std::to\_string(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})\ +\ \textcolor{stringliteral}{"{}<="{}}\ +\ std::to\_string(maxValue));}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00166\ }
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ more\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(more)}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}\ outputByte\ =\ (\mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}})(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\&127);}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ >>=\ 7;}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \ \ \ \ more\ =\ std::is\_signed<Value>::value}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ?\ (\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ !=\ 0\ \&\&\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ !=\ \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}}(-\/1))\ ||\ (\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ >=\ 0\ \&\&\ (outputByte\ \&\ 0x40))\ ||\ (\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ <\ 0\ \&\&\ !(outputByte\ \&\ 0x40))}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ (\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ !=\ 0);}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(more)\ \{\ outputByte\ |=\ 0x80;\ \}}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \ \ \ \ *stream.advance(1)\ =\ outputByte;}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00178\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_serialization_a7542db4eecbd9af4bc8398241da2614d_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_serialization_ad134d54737dffbb61803344f6ffbd778}\index{Serialization@{Serialization}!serializeVarInt32@{serializeVarInt32}}
+\index{serializeVarInt32@{serializeVarInt32}!Serialization@{Serialization}}
+\doxysubsubsection{\texorpdfstring{serializeVarInt32()}{serializeVarInt32()}}
+{\footnotesize\ttfamily \label{namespace_serialization_ad134d54737dffbb61803344f6ffbd778} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} $>$ \\
+void Serialization\+::serialize\+Var\+Int32 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&}]{stream}{, }\item[{\mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} \&}]{value}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_serialization_8h_source_l00242}{242}} of file \mbox{\hyperlink{_serialization_8h_source}{Serialization.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00242\ \{\ serializeVarInt<Value,32>(stream,\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\mbox{\hyperlink{stdint_8h_a688eb21a22db27c2b2bd5836943cdcbe}{INT32\_MIN}},\mbox{\hyperlink{stdint_8h_a181807730d4a375f848ba139813ce04f}{INT32\_MAX}});\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=339pt]{namespace_serialization_ad134d54737dffbb61803344f6ffbd778_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=316pt]{namespace_serialization_ad134d54737dffbb61803344f6ffbd778_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_serialization_aa9ecd5c87d12b25bb872a2f822d0b729}\index{Serialization@{Serialization}!serializeVarInt64@{serializeVarInt64}}
+\index{serializeVarInt64@{serializeVarInt64}!Serialization@{Serialization}}
+\doxysubsubsection{\texorpdfstring{serializeVarInt64()}{serializeVarInt64()}}
+{\footnotesize\ttfamily \label{namespace_serialization_aa9ecd5c87d12b25bb872a2f822d0b729} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} $>$ \\
+void Serialization\+::serialize\+Var\+Int64 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&}]{stream}{, }\item[{\mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} \&}]{value}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_serialization_8h_source_l00243}{243}} of file \mbox{\hyperlink{_serialization_8h_source}{Serialization.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00243\ \{\ serializeVarInt<Value,64>(stream,\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\mbox{\hyperlink{stdint_8h_ab21f12f372f67b8ff0aa3432336ede67}{INT64\_MIN}},\mbox{\hyperlink{stdint_8h_ad0d744f05898e32d01f73f8af3cd2071}{INT64\_MAX}});\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=339pt]{namespace_serialization_aa9ecd5c87d12b25bb872a2f822d0b729_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=316pt]{namespace_serialization_aa9ecd5c87d12b25bb872a2f822d0b729_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_serialization_aa3a610a68eadc6fc16175ae3b4e3a829}\index{Serialization@{Serialization}!serializeVarInt7@{serializeVarInt7}}
+\index{serializeVarInt7@{serializeVarInt7}!Serialization@{Serialization}}
+\doxysubsubsection{\texorpdfstring{serializeVarInt7()}{serializeVarInt7()}}
+{\footnotesize\ttfamily \label{namespace_serialization_aa3a610a68eadc6fc16175ae3b4e3a829} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} $>$ \\
+void Serialization\+::serialize\+Var\+Int7 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&}]{stream}{, }\item[{\mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} \&}]{value}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_serialization_8h_source_l00241}{241}} of file \mbox{\hyperlink{_serialization_8h_source}{Serialization.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00241\ \{\ serializeVarInt<Value,7>(stream,\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},-\/64,63);\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=339pt]{namespace_serialization_aa3a610a68eadc6fc16175ae3b4e3a829_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_serialization_aa3a610a68eadc6fc16175ae3b4e3a829_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_serialization_a46462b1f33100cfe651e13e844827dec}\index{Serialization@{Serialization}!serializeVarUInt1@{serializeVarUInt1}}
+\index{serializeVarUInt1@{serializeVarUInt1}!Serialization@{Serialization}}
+\doxysubsubsection{\texorpdfstring{serializeVarUInt1()}{serializeVarUInt1()}}
+{\footnotesize\ttfamily \label{namespace_serialization_a46462b1f33100cfe651e13e844827dec} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} $>$ \\
+void Serialization\+::serialize\+Var\+UInt1 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&}]{stream}{, }\item[{\mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} \&}]{value}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_serialization_8h_source_l00237}{237}} of file \mbox{\hyperlink{_serialization_8h_source}{Serialization.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00237\ \{\ serializeVarInt<Value,1>(stream,\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},0,1);\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=339pt]{namespace_serialization_a46462b1f33100cfe651e13e844827dec_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=296pt]{namespace_serialization_a46462b1f33100cfe651e13e844827dec_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_serialization_a1ea6ecb2f4de00340f936648398f4f66}\index{Serialization@{Serialization}!serializeVarUInt32@{serializeVarUInt32}}
+\index{serializeVarUInt32@{serializeVarUInt32}!Serialization@{Serialization}}
+\doxysubsubsection{\texorpdfstring{serializeVarUInt32()}{serializeVarUInt32()}}
+{\footnotesize\ttfamily \label{namespace_serialization_a1ea6ecb2f4de00340f936648398f4f66} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} $>$ \\
+void Serialization\+::serialize\+Var\+UInt32 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&}]{stream}{, }\item[{\mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} \&}]{value}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_serialization_8h_source_l00239}{239}} of file \mbox{\hyperlink{_serialization_8h_source}{Serialization.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00239\ \{\ serializeVarInt<Value,32>(stream,\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},0,\mbox{\hyperlink{stdint_8h_ab5eb23180f7cc12b7d6c04a8ec067fdd}{UINT32\_MAX}});\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=339pt]{namespace_serialization_a1ea6ecb2f4de00340f936648398f4f66_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_serialization_a1ea6ecb2f4de00340f936648398f4f66_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_serialization_a4ac33cb15215c7dbaae4eb516786aba4}\index{Serialization@{Serialization}!serializeVarUInt64@{serializeVarUInt64}}
+\index{serializeVarUInt64@{serializeVarUInt64}!Serialization@{Serialization}}
+\doxysubsubsection{\texorpdfstring{serializeVarUInt64()}{serializeVarUInt64()}}
+{\footnotesize\ttfamily \label{namespace_serialization_a4ac33cb15215c7dbaae4eb516786aba4} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} $>$ \\
+void Serialization\+::serialize\+Var\+UInt64 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&}]{stream}{, }\item[{\mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} \&}]{value}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_serialization_8h_source_l00240}{240}} of file \mbox{\hyperlink{_serialization_8h_source}{Serialization.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00240\ \{\ serializeVarInt<Value,64>(stream,\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},0,\mbox{\hyperlink{stdint_8h_a30654b4b67d97c42ca3f9b6052dda916}{UINT64\_MAX}});\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=339pt]{namespace_serialization_a4ac33cb15215c7dbaae4eb516786aba4_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_serialization_af14a3f6c258b4253ad4d75a57827d41e}\index{Serialization@{Serialization}!serializeVarUInt7@{serializeVarUInt7}}
+\index{serializeVarUInt7@{serializeVarUInt7}!Serialization@{Serialization}}
+\doxysubsubsection{\texorpdfstring{serializeVarUInt7()}{serializeVarUInt7()}}
+{\footnotesize\ttfamily \label{namespace_serialization_af14a3f6c258b4253ad4d75a57827d41e} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} , typename \mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} $>$ \\
+void Serialization\+::serialize\+Var\+UInt7 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classrapidjson_1_1_stream}{Stream}} \&}]{stream}{, }\item[{\mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}} \&}]{value}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_serialization_8h_source_l00238}{238}} of file \mbox{\hyperlink{_serialization_8h_source}{Serialization.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00238\ \{\ serializeVarInt<Value,7>(stream,\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},0,127);\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=339pt]{namespace_serialization_af14a3f6c258b4253ad4d75a57827d41e_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_serialization_af14a3f6c258b4253ad4d75a57827d41e_icgraph}
+\end{center}
+\end{figure}

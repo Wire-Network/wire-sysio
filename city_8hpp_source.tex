@@ -1,0 +1,82 @@
+\doxysection{city.\+hpp}
+\hypertarget{city_8hpp_source}{}\label{city_8hpp_source}\index{libraries/fc/include/fc/crypto/city.hpp@{libraries/fc/include/fc/crypto/city.hpp}}
+\mbox{\hyperlink{city_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00001}00001\ \textcolor{comment}{//\ Copyright\ (c)\ 2011\ Google,\ Inc.}}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00002}00002\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00003}00003\ \textcolor{comment}{//\ Permission\ is\ hereby\ granted,\ free\ of\ charge,\ to\ any\ person\ obtaining\ a\ copy}}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00004}00004\ \textcolor{comment}{//\ of\ this\ software\ and\ associated\ documentation\ files\ (the\ "{}Software"{}),\ to\ deal}}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00005}00005\ \textcolor{comment}{//\ in\ the\ Software\ without\ restriction,\ including\ without\ limitation\ the\ rights}}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00006}00006\ \textcolor{comment}{//\ to\ use,\ copy,\ modify,\ merge,\ publish,\ distribute,\ sublicense,\ and/or\ sell}}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00007}00007\ \textcolor{comment}{//\ copies\ of\ the\ Software,\ and\ to\ permit\ persons\ to\ whom\ the\ Software\ is}}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00008}00008\ \textcolor{comment}{//\ furnished\ to\ do\ so,\ subject\ to\ the\ following\ conditions:}}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00009}00009\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00010}00010\ \textcolor{comment}{//\ The\ above\ copyright\ notice\ and\ this\ permission\ notice\ shall\ be\ included\ in}}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00011}00011\ \textcolor{comment}{//\ all\ copies\ or\ substantial\ portions\ of\ the\ Software.}}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00012}00012\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00013}00013\ \textcolor{comment}{//\ THE\ SOFTWARE\ IS\ PROVIDED\ "{}AS\ IS"{},\ WITHOUT\ WARRANTY\ OF\ ANY\ KIND,\ EXPRESS\ OR}}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00014}00014\ \textcolor{comment}{//\ IMPLIED,\ INCLUDING\ BUT\ NOT\ LIMITED\ TO\ THE\ WARRANTIES\ OF\ MERCHANTABILITY,}}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00015}00015\ \textcolor{comment}{//\ FITNESS\ FOR\ A\ PARTICULAR\ PURPOSE\ AND\ NONINFRINGEMENT.\ IN\ NO\ EVENT\ SHALL\ THE}}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00016}00016\ \textcolor{comment}{//\ AUTHORS\ OR\ COPYRIGHT\ HOLDERS\ BE\ LIABLE\ FOR\ ANY\ CLAIM,\ DAMAGES\ OR\ OTHER}}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00017}00017\ \textcolor{comment}{//\ LIABILITY,\ WHETHER\ IN\ AN\ ACTION\ OF\ CONTRACT,\ TORT\ OR\ OTHERWISE,\ ARISING\ FROM,}}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00018}00018\ \textcolor{comment}{//\ OUT\ OF\ OR\ IN\ CONNECTION\ WITH\ THE\ SOFTWARE\ OR\ THE\ USE\ OR\ OTHER\ DEALINGS\ IN}}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00019}00019\ \textcolor{comment}{//\ THE\ SOFTWARE.}}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00020}00020\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00021}00021\ \textcolor{comment}{//\ CityHash,\ by\ Geoff\ Pike\ and\ Jyrki\ Alakuijala}}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00022}00022\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00023}00023\ \textcolor{comment}{//\ This\ file\ provides\ a\ few\ functions\ for\ hashing\ strings.\ On\ x86-\/64}}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00024}00024\ \textcolor{comment}{//\ hardware\ in\ 2011,\ CityHash64()\ is\ faster\ than\ other\ high-\/quality}}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00025}00025\ \textcolor{comment}{//\ hash\ functions,\ such\ as\ Murmur.\ \ This\ is\ largely\ due\ to\ higher}}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00026}00026\ \textcolor{comment}{//\ instruction-\/level\ parallelism.\ \ CityHash64()\ and\ CityHash128()\ also\ perform}}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00027}00027\ \textcolor{comment}{//\ well\ on\ hash-\/quality\ tests.}}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00028}00028\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00029}00029\ \textcolor{comment}{//\ CityHash128()\ is\ optimized\ for\ relatively\ long\ strings\ and\ returns}}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00030}00030\ \textcolor{comment}{//\ a\ 128-\/bit\ hash.\ \ For\ strings\ more\ than\ about\ 2000\ bytes\ it\ can\ be}}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00031}00031\ \textcolor{comment}{//\ faster\ than\ CityHash64().}}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00032}00032\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00033}00033\ \textcolor{comment}{//\ Functions\ in\ the\ CityHash\ family\ are\ not\ suitable\ for\ cryptography.}}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00034}00034\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00035}00035\ \textcolor{comment}{//\ WARNING:\ This\ code\ has\ not\ been\ tested\ on\ big-\/endian\ platforms!}}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00036}00036\ \textcolor{comment}{//\ It\ is\ known\ to\ work\ well\ on\ little-\/endian\ platforms\ that\ have\ a\ small\ penalty}}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00037}00037\ \textcolor{comment}{//\ for\ unaligned\ reads,\ such\ as\ current\ Intel\ and\ AMD\ moderate-\/to-\/high-\/end\ CPUs.}}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00038}00038\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00039}00039\ \textcolor{comment}{//\ By\ the\ way,\ for\ some\ hash\ functions,\ given\ strings\ a\ and\ b,\ the\ hash}}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00040}00040\ \textcolor{comment}{//\ of\ a+b\ is\ easily\ derived\ from\ the\ hashes\ of\ a\ and\ b.\ \ This\ property}}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00041}00041\ \textcolor{comment}{//\ doesn't\ hold\ for\ any\ hash\ functions\ in\ this\ file.}}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00042}00042\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00044}00044\ \textcolor{preprocessor}{\#include\ <stdlib.h>}\ \ \textcolor{comment}{//\ for\ size\_t.}}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00045}00045\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{stdint_8h}{stdint.h}}>}}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00046}00046\ \textcolor{preprocessor}{\#include\ <utility>}}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00048}00048\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}\ \{}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00050}00050\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T,\ \textcolor{keywordtype}{size\_t}\ N>}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00051}\mbox{\hyperlink{classfc_1_1array}{00051}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classfc_1_1array}{array}};}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00052}00052\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classfc_1_1uint128}{uint128}};}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00054}00054\ \textcolor{comment}{//\ Hash\ function\ for\ a\ byte\ array.}}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00055}00055\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{namespacefc_a8bc1967c65aedd6545bf78fe6ffde635}{city\_hash64}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}});}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00057}00057\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{namespacefc_a61954d69e71a9a610cdb843823459d35}{city\_hash32}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}});}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00059}00059\ \textcolor{preprocessor}{\#if\ SIZE\_MAX\ >\ UINT32\_MAX}}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00060}00060\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{namespacefc_a7b219440c7949d024ec8d150261ea9c4}{city\_hash\_size\_t}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_a8bc1967c65aedd6545bf78fe6ffde635}{city\_hash64}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}});\ \}}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00061}00061\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00062}\mbox{\hyperlink{namespacefc_a7b219440c7949d024ec8d150261ea9c4}{00062}}\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{namespacefc_a7b219440c7949d024ec8d150261ea9c4}{city\_hash\_size\_t}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_a61954d69e71a9a610cdb843823459d35}{city\_hash32}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}});\ \}}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00063}00063\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00065}00065\ \textcolor{comment}{//\ Hash\ function\ for\ a\ byte\ array.}}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00066}00066\ uint128\ \mbox{\hyperlink{namespacefc_a63d1fe0e861957cf4daf4a0d2b744475}{city\_hash128}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}});}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00067}00067\ }
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00068}00068\ \textcolor{comment}{//\ Hash\ function\ for\ a\ byte\ array.}}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00069}\mbox{\hyperlink{namespacefc_a3c14bbcaaa61ee3d55965861a17a8a9c}{00069}}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{namespacefc_a3c14bbcaaa61ee3d55965861a17a8a9c}{city\_hash\_crc\_64}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}});}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00071}00071\ \textcolor{comment}{//\ Hash\ function\ for\ a\ byte\ array.}}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00072}00072\ \mbox{\hyperlink{classfc_1_1uint128}{uint128}}\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a9d66adb69f407e1d80839d2d0a72a94d}{city\_hash\_crc\_128}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}});}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00073}00073\ \mbox{\hyperlink{classfc_1_1array}{array<uint64\_t,4>}}\ \mbox{\hyperlink{namespacefc_ae738c65ef1d8bb7c121d6671f90383ff}{city\_hash\_crc\_256}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}});}
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00074}00074\ }
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00075}00075\ }
+\DoxyCodeLine{\Hypertarget{city_8hpp_source_l00076}00076\ \}\ \textcolor{comment}{//\ namespace\ fc}}
+
+\end{DoxyCode}

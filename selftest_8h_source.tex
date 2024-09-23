@@ -1,0 +1,38 @@
+\doxysection{selftest.\+h}
+\hypertarget{selftest_8h_source}{}\label{selftest_8h_source}\index{libraries/fc/secp256k1/secp256k1/src/selftest.h@{libraries/fc/secp256k1/secp256k1/src/selftest.h}}
+\mbox{\hyperlink{selftest_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{selftest_8h_source_l00001}00001\ \textcolor{comment}{/***********************************************************************}}
+\DoxyCodeLine{\Hypertarget{selftest_8h_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2020\ Pieter\ Wuille\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{selftest_8h_source_l00003}00003\ \textcolor{comment}{\ *\ Distributed\ under\ the\ MIT\ software\ license,\ see\ the\ accompanying\ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{selftest_8h_source_l00004}00004\ \textcolor{comment}{\ *\ file\ COPYING\ or\ https://www.opensource.org/licenses/mit-\/license.php.*}}
+\DoxyCodeLine{\Hypertarget{selftest_8h_source_l00005}00005\ \textcolor{comment}{\ ***********************************************************************/}}
+\DoxyCodeLine{\Hypertarget{selftest_8h_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{selftest_8h_source_l00007}00007\ \textcolor{preprocessor}{\#ifndef\ SECP256K1\_SELFTEST\_H}}
+\DoxyCodeLine{\Hypertarget{selftest_8h_source_l00008}00008\ \textcolor{preprocessor}{\#define\ SECP256K1\_SELFTEST\_H}}
+\DoxyCodeLine{\Hypertarget{selftest_8h_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{selftest_8h_source_l00010}00010\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2hash_8h}{hash.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{selftest_8h_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{selftest_8h_source_l00012}00012\ \textcolor{preprocessor}{\#include\ <string.h>}}
+\DoxyCodeLine{\Hypertarget{selftest_8h_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{selftest_8h_source_l00014}00014\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ secp256k1\_selftest\_sha256(\textcolor{keywordtype}{void})\ \{}
+\DoxyCodeLine{\Hypertarget{selftest_8h_source_l00015}00015\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *input63\ =\ \textcolor{stringliteral}{"{}For\ this\ sample,\ this\ 63-\/byte\ string\ will\ be\ used\ as\ input\ data"{}};}
+\DoxyCodeLine{\Hypertarget{selftest_8h_source_l00016}00016\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ output32[32]\ =\ \{}
+\DoxyCodeLine{\Hypertarget{selftest_8h_source_l00017}00017\ \ \ \ \ \ \ \ \ 0xf0,\ 0x8a,\ 0x78,\ 0xcb,\ 0xba,\ 0xee,\ 0x08,\ 0x2b,\ 0x05,\ 0x2a,\ 0xe0,\ 0x70,\ 0x8f,\ 0x32,\ 0xfa,\ 0x1e,}
+\DoxyCodeLine{\Hypertarget{selftest_8h_source_l00018}00018\ \ \ \ \ \ \ \ \ 0x50,\ 0xc5,\ 0xc4,\ 0x21,\ 0xaa,\ 0x77,\ 0x2b,\ 0xa5,\ 0xdb,\ 0xb4,\ 0x06,\ 0xa2,\ 0xea,\ 0x6b,\ 0xe3,\ 0x42,}
+\DoxyCodeLine{\Hypertarget{selftest_8h_source_l00019}00019\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{selftest_8h_source_l00020}00020\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ out[32];}
+\DoxyCodeLine{\Hypertarget{selftest_8h_source_l00021}00021\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__sha256}{secp256k1\_sha256}}\ hasher;}
+\DoxyCodeLine{\Hypertarget{selftest_8h_source_l00022}00022\ \ \ \ \ secp256k1\_sha256\_initialize(\&hasher);}
+\DoxyCodeLine{\Hypertarget{selftest_8h_source_l00023}00023\ \ \ \ \ secp256k1\_sha256\_write(\&hasher,\ (\textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)input63,\ 63);}
+\DoxyCodeLine{\Hypertarget{selftest_8h_source_l00024}00024\ \ \ \ \ secp256k1\_sha256\_finalize(\&hasher,\ out);}
+\DoxyCodeLine{\Hypertarget{selftest_8h_source_l00025}00025\ \ \ \ \ \textcolor{keywordflow}{return}\ secp256k1\_memcmp\_var(out,\ output32,\ 32)\ ==\ 0;}
+\DoxyCodeLine{\Hypertarget{selftest_8h_source_l00026}00026\ \}}
+\DoxyCodeLine{\Hypertarget{selftest_8h_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{selftest_8h_source_l00028}00028\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ secp256k1\_selftest(\textcolor{keywordtype}{void})\ \{}
+\DoxyCodeLine{\Hypertarget{selftest_8h_source_l00029}00029\ \ \ \ \ \textcolor{keywordflow}{return}\ secp256k1\_selftest\_sha256();}
+\DoxyCodeLine{\Hypertarget{selftest_8h_source_l00030}00030\ \}}
+\DoxyCodeLine{\Hypertarget{selftest_8h_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{selftest_8h_source_l00032}00032\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{/*\ SECP256K1\_SELFTEST\_H\ */}\textcolor{preprocessor}{}}
+
+\end{DoxyCode}

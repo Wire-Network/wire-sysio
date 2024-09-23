@@ -1,0 +1,108 @@
+\doxysection{libraries/state\+\_\+history/include/sysio/state\+\_\+history/types.hpp File Reference}
+\hypertarget{state__history_2include_2sysio_2state__history_2types_8hpp}{}\label{state__history_2include_2sysio_2state__history_2types_8hpp}\index{libraries/state\_history/include/sysio/state\_history/types.hpp@{libraries/state\_history/include/sysio/state\_history/types.hpp}}
+{\ttfamily \#include $<$sysio/chain/trace.\+hpp$>$}\newline
+Include dependency graph for types.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{state__history_2include_2sysio_2state__history_2types_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{state__history_2include_2sysio_2state__history_2types_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1state__history_1_1big__vector__wrapper}{sysio\+::state\+\_\+history\+::big\+\_\+vector\+\_\+wrapper$<$ T $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1state__history_1_1partial__transaction}{sysio\+::state\+\_\+history\+::partial\+\_\+transaction}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1state__history_1_1augmented__transaction__trace}{sysio\+::state\+\_\+history\+::augmented\+\_\+transaction\+\_\+trace}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1state__history_1_1table__delta}{sysio\+::state\+\_\+history\+::table\+\_\+delta}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1state__history_1_1block__position}{sysio\+::state\+\_\+history\+::block\+\_\+position}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1state__history_1_1get__status__request__v0}{sysio\+::state\+\_\+history\+::get\+\_\+status\+\_\+request\+\_\+v0}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1state__history_1_1get__status__result__v0}{sysio\+::state\+\_\+history\+::get\+\_\+status\+\_\+result\+\_\+v0}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1state__history_1_1get__blocks__request__v0}{sysio\+::state\+\_\+history\+::get\+\_\+blocks\+\_\+request\+\_\+v0}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1state__history_1_1get__blocks__ack__request__v0}{sysio\+::state\+\_\+history\+::get\+\_\+blocks\+\_\+ack\+\_\+request\+\_\+v0}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1state__history_1_1get__blocks__result__v0}{sysio\+::state\+\_\+history\+::get\+\_\+blocks\+\_\+result\+\_\+v0}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1state__history}{sysio\+::state\+\_\+history}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1state__history_a0e788deef6248a86a8620bdbf4dea020}{sysio\+::state\+\_\+history\+::state\+\_\+request}} = std\+::variant$<$\mbox{\hyperlink{structsysio_1_1state__history_1_1get__status__request__v0}{get\+\_\+status\+\_\+request\+\_\+v0}}, \mbox{\hyperlink{structsysio_1_1state__history_1_1get__blocks__request__v0}{get\+\_\+blocks\+\_\+request\+\_\+v0}}, \mbox{\hyperlink{structsysio_1_1state__history_1_1get__blocks__ack__request__v0}{get\+\_\+blocks\+\_\+ack\+\_\+request\+\_\+v0}}$>$
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1state__history_a7c0ebdf566e085620947b3981fb324ec}{sysio\+::state\+\_\+history\+::state\+\_\+result}} = std\+::variant$<$\mbox{\hyperlink{structsysio_1_1state__history_1_1get__status__result__v0}{get\+\_\+status\+\_\+result\+\_\+v0}}, \mbox{\hyperlink{structsysio_1_1state__history_1_1get__blocks__result__v0}{get\+\_\+blocks\+\_\+result\+\_\+v0}}$>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{state__history_2include_2sysio_2state__history_2types_8hpp_a8c4240c6db10921e18164ff167f3c705}{FC\+\_\+\+REFLECT}} (\mbox{\hyperlink{structsysio_1_1state__history_1_1table__delta}{sysio\+::state\+\_\+history\+::table\+\_\+delta}},(struct\+\_\+version)(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})(rows))
+\item 
+\mbox{\hyperlink{state__history_2include_2sysio_2state__history_2types_8hpp_a9eed0d0edc899f75eb5dde085cc89efc}{FC\+\_\+\+REFLECT}} (\mbox{\hyperlink{structsysio_1_1state__history_1_1block__position}{sysio\+::state\+\_\+history\+::block\+\_\+position}},(block\+\_\+num)(block\+\_\+id))
+\item 
+\mbox{\hyperlink{state__history_2include_2sysio_2state__history_2types_8hpp_aa13de552fca1fbd29b6558889795e286}{FC\+\_\+\+REFLECT\+\_\+\+EMPTY}} (\mbox{\hyperlink{structsysio_1_1state__history_1_1get__status__request__v0}{sysio\+::state\+\_\+history\+::get\+\_\+status\+\_\+request\+\_\+v0}})
+\item 
+\mbox{\hyperlink{state__history_2include_2sysio_2state__history_2types_8hpp_a2d08d883535bff9c44b0a618c24a4b28}{FC\+\_\+\+REFLECT}} (\mbox{\hyperlink{structsysio_1_1state__history_1_1get__status__result__v0}{sysio\+::state\+\_\+history\+::get\+\_\+status\+\_\+result\+\_\+v0}},(head)(last\+\_\+irreversible)(trace\+\_\+begin\+\_\+block)(trace\+\_\+end\+\_\+block)(chain\+\_\+state\+\_\+begin\+\_\+block)(chain\+\_\+state\+\_\+end\+\_\+block)(chain\+\_\+id))
+\item 
+\mbox{\hyperlink{state__history_2include_2sysio_2state__history_2types_8hpp_aae8f15e51e9c348a176ae5411fe9e06d}{FC\+\_\+\+REFLECT}} (\mbox{\hyperlink{structsysio_1_1state__history_1_1get__blocks__request__v0}{sysio\+::state\+\_\+history\+::get\+\_\+blocks\+\_\+request\+\_\+v0}},(start\+\_\+block\+\_\+num)(end\+\_\+block\+\_\+num)(max\+\_\+messages\+\_\+in\+\_\+flight)(have\+\_\+positions)(irreversible\+\_\+only)(fetch\+\_\+block)(fetch\+\_\+traces)(fetch\+\_\+deltas))
+\item 
+\mbox{\hyperlink{state__history_2include_2sysio_2state__history_2types_8hpp_a43cc12957426c1a0b7ac4579c0999265}{FC\+\_\+\+REFLECT}} (\mbox{\hyperlink{structsysio_1_1state__history_1_1get__blocks__ack__request__v0}{sysio\+::state\+\_\+history\+::get\+\_\+blocks\+\_\+ack\+\_\+request\+\_\+v0}},(num\+\_\+messages))
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{state__history_2include_2sysio_2state__history_2types_8hpp_a9eed0d0edc899f75eb5dde085cc89efc}\index{types.hpp@{types.hpp}!FC\_REFLECT@{FC\_REFLECT}}
+\index{FC\_REFLECT@{FC\_REFLECT}!types.hpp@{types.hpp}}
+\doxysubsubsection{\texorpdfstring{FC\_REFLECT()}{FC\_REFLECT()}\hspace{0.1cm}{\footnotesize\ttfamily [1/5]}}
+{\footnotesize\ttfamily \label{state__history_2include_2sysio_2state__history_2types_8hpp_a9eed0d0edc899f75eb5dde085cc89efc} 
+FC\+\_\+\+REFLECT (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1state__history_1_1block__position}{sysio\+::state\+\_\+history\+::block\+\_\+position}}}]{}{, }\item[{(block\+\_\+num)(block\+\_\+id)}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{state__history_2include_2sysio_2state__history_2types_8hpp_a43cc12957426c1a0b7ac4579c0999265}\index{types.hpp@{types.hpp}!FC\_REFLECT@{FC\_REFLECT}}
+\index{FC\_REFLECT@{FC\_REFLECT}!types.hpp@{types.hpp}}
+\doxysubsubsection{\texorpdfstring{FC\_REFLECT()}{FC\_REFLECT()}\hspace{0.1cm}{\footnotesize\ttfamily [2/5]}}
+{\footnotesize\ttfamily \label{state__history_2include_2sysio_2state__history_2types_8hpp_a43cc12957426c1a0b7ac4579c0999265} 
+FC\+\_\+\+REFLECT (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1state__history_1_1get__blocks__ack__request__v0}{sysio\+::state\+\_\+history\+::get\+\_\+blocks\+\_\+ack\+\_\+request\+\_\+v0}}}]{}{, }\item[{(num\+\_\+messages)}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{state__history_2include_2sysio_2state__history_2types_8hpp_aae8f15e51e9c348a176ae5411fe9e06d}\index{types.hpp@{types.hpp}!FC\_REFLECT@{FC\_REFLECT}}
+\index{FC\_REFLECT@{FC\_REFLECT}!types.hpp@{types.hpp}}
+\doxysubsubsection{\texorpdfstring{FC\_REFLECT()}{FC\_REFLECT()}\hspace{0.1cm}{\footnotesize\ttfamily [3/5]}}
+{\footnotesize\ttfamily \label{state__history_2include_2sysio_2state__history_2types_8hpp_aae8f15e51e9c348a176ae5411fe9e06d} 
+FC\+\_\+\+REFLECT (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1state__history_1_1get__blocks__request__v0}{sysio\+::state\+\_\+history\+::get\+\_\+blocks\+\_\+request\+\_\+v0}}}]{}{, }\item[{(start\+\_\+block\+\_\+num)(end\+\_\+block\+\_\+num)(max\+\_\+messages\+\_\+in\+\_\+flight)(have\+\_\+positions)(irreversible\+\_\+only)(fetch\+\_\+block)(fetch\+\_\+traces)(fetch\+\_\+deltas)}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{state__history_2include_2sysio_2state__history_2types_8hpp_a2d08d883535bff9c44b0a618c24a4b28}\index{types.hpp@{types.hpp}!FC\_REFLECT@{FC\_REFLECT}}
+\index{FC\_REFLECT@{FC\_REFLECT}!types.hpp@{types.hpp}}
+\doxysubsubsection{\texorpdfstring{FC\_REFLECT()}{FC\_REFLECT()}\hspace{0.1cm}{\footnotesize\ttfamily [4/5]}}
+{\footnotesize\ttfamily \label{state__history_2include_2sysio_2state__history_2types_8hpp_a2d08d883535bff9c44b0a618c24a4b28} 
+FC\+\_\+\+REFLECT (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1state__history_1_1get__status__result__v0}{sysio\+::state\+\_\+history\+::get\+\_\+status\+\_\+result\+\_\+v0}}}]{}{, }\item[{(head)(last\+\_\+irreversible)(trace\+\_\+begin\+\_\+block)(trace\+\_\+end\+\_\+block)(chain\+\_\+state\+\_\+begin\+\_\+block)(chain\+\_\+state\+\_\+end\+\_\+block)(chain\+\_\+id)}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{state__history_2include_2sysio_2state__history_2types_8hpp_a8c4240c6db10921e18164ff167f3c705}\index{types.hpp@{types.hpp}!FC\_REFLECT@{FC\_REFLECT}}
+\index{FC\_REFLECT@{FC\_REFLECT}!types.hpp@{types.hpp}}
+\doxysubsubsection{\texorpdfstring{FC\_REFLECT()}{FC\_REFLECT()}\hspace{0.1cm}{\footnotesize\ttfamily [5/5]}}
+{\footnotesize\ttfamily \label{state__history_2include_2sysio_2state__history_2types_8hpp_a8c4240c6db10921e18164ff167f3c705} 
+FC\+\_\+\+REFLECT (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1state__history_1_1table__delta}{sysio\+::state\+\_\+history\+::table\+\_\+delta}}}]{}{, }\item[{(struct\+\_\+version)(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})(rows)}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{state__history_2include_2sysio_2state__history_2types_8hpp_aa13de552fca1fbd29b6558889795e286}\index{types.hpp@{types.hpp}!FC\_REFLECT\_EMPTY@{FC\_REFLECT\_EMPTY}}
+\index{FC\_REFLECT\_EMPTY@{FC\_REFLECT\_EMPTY}!types.hpp@{types.hpp}}
+\doxysubsubsection{\texorpdfstring{FC\_REFLECT\_EMPTY()}{FC\_REFLECT\_EMPTY()}}
+{\footnotesize\ttfamily \label{state__history_2include_2sysio_2state__history_2types_8hpp_aa13de552fca1fbd29b6558889795e286} 
+FC\+\_\+\+REFLECT\+\_\+\+EMPTY (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1state__history_1_1get__status__request__v0}{sysio\+::state\+\_\+history\+::get\+\_\+status\+\_\+request\+\_\+v0}}}]{}{}\end{DoxyParamCaption})}
+

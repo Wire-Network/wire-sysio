@@ -1,0 +1,8 @@
+<map id="TEST_F" name="TEST_F">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,37,76,62"/>
+<area shape="rect" id="Node000002" href="$class_generic_string_buffer.html#a8be5c8fadccacdcf40e20220f38e0afa" title=" " alt="" coords="124,37,287,62"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="76,47,108,47,108,52,76,52"/>
+<area shape="rect" id="Node000003" href="$class_generic_string_buffer.html#a80af78c43da93126a940a40d1889278a" title=" " alt="" coords="335,29,470,70"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="288,47,319,47,319,52,288,52"/>
+<area shape="poly" id="edge3_Node000003_Node000003" title=" " alt="" coords="365,29,363,19,369,10,383,5,403,3,424,5,437,11,435,16,423,10,403,8,384,10,373,15,368,20,370,28"/>
+</map>

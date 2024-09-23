@@ -1,0 +1,13 @@
+<map id="utility_server::utility_server" name="utility_server::utility_server">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,104,140,145"/>
+<area shape="rect" id="Node000002" href="$classutility__server.html#a34dbd3789ee5ef7c1918e4ff9d154a15" title=" " alt="" coords="200,5,332,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="106,101,186,57,199,50,201,55,189,61,109,106"/>
+<area shape="rect" id="Node000004" href="$classwebsocketpp_1_1endpoint.html#a5d7da609ebd2f797e5e67b6d050ebc59" title="Set Access logging channel." alt="" coords="188,71,344,111"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="140,110,172,104,173,110,140,115"/>
+<area shape="rect" id="Node000005" href="$classwebsocketpp_1_1endpoint.html#a8292bcdca9344b57af1b0964ff7fc778" title="Set Error logging channel." alt="" coords="188,136,344,177"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="140,133,173,138,172,144,140,138"/>
+<area shape="rect" id="Node000006" href="$classwebsocketpp_1_1endpoint.html#a34a3a8351bff65ba878975be471cab85" title=" " alt="" coords="188,201,344,242"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="110,143,189,186,201,192,199,197,186,191,107,148"/>
+<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1endpoint.html#a5341f59de7ef1a565a2fd93daba212d5" title="Create a message and add it to the outgoing send queue (exception free)" alt="" coords="392,5,547,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="332,23,376,23,376,28,332,28"/>
+</map>

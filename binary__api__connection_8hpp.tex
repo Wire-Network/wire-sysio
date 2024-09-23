@@ -1,0 +1,53 @@
+\doxysection{libraries/fc/include/fc/rpc/binary\+\_\+api\+\_\+connection.hpp File Reference}
+\hypertarget{binary__api__connection_8hpp}{}\label{binary__api__connection_8hpp}\index{libraries/fc/include/fc/rpc/binary\_api\_connection.hpp@{libraries/fc/include/fc/rpc/binary\_api\_connection.hpp}}
+{\ttfamily \#include $<$fc/variant.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/io/raw.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/api.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/any.\+hpp$>$}\newline
+{\ttfamily \#include $<$memory$>$}\newline
+{\ttfamily \#include $<$vector$>$}\newline
+{\ttfamily \#include $<$functional$>$}\newline
+{\ttfamily \#include $<$utility$>$}\newline
+{\ttfamily \#include $<$fc/signals.\+hpp$>$}\newline
+Include dependency graph for binary\+\_\+api\+\_\+connection.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{binary__api__connection_8hpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classfc_1_1detail_1_1callback__functor}{fc\+::detail\+::callback\+\_\+functor$<$ Signature $>$}}
+\item 
+class \mbox{\hyperlink{classfc_1_1detail_1_1any__api}{fc\+::detail\+::any\+\_\+api}}
+\item 
+class \mbox{\hyperlink{classfc_1_1generic__api}{fc\+::generic\+\_\+api}}
+\item 
+class \mbox{\hyperlink{classfc_1_1binary__api__connection}{fc\+::binary\+\_\+api\+\_\+connection}}
+\item 
+class \mbox{\hyperlink{classfc_1_1local__binary__api__connection}{fc\+::local\+\_\+binary\+\_\+api\+\_\+connection}}
+\item 
+class \mbox{\hyperlink{classfc_1_1detail_1_1callback__functor_3_01void_07_args_8_8_8_08_4}{fc\+::detail\+::callback\+\_\+functor$<$ void(\+Args...)$>$}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacefc}{fc}}
+\begin{DoxyCompactList}\small\item\em namespace \doxylink{namespacesysio_1_1chain}{sysio\+::chain} \end{DoxyCompactList}\item 
+namespace \mbox{\hyperlink{namespacefc_1_1detail}{fc\+::detail}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}} , typename Arg0 , typename ... Args$>$ }\\std\+::function$<$ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}(Args...)$>$ \mbox{\hyperlink{namespacefc_1_1detail_a98454bf24c338e40dca5b45c87a2f026}{fc\+::detail\+::bind\+\_\+first\+\_\+arg}} (const std\+::function$<$ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}(Arg0, Args...)$>$ \&\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}, Arg0 a0)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}} $>$ }\\\mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}} \mbox{\hyperlink{namespacefc_1_1detail_a7dc44189c20da67e53f546ab54eb88f3}{fc\+::detail\+::call\+\_\+generic}} (const std\+::function$<$ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}()$>$ \&\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}, variants\+::const\+\_\+iterator a0, variants\+::const\+\_\+iterator e)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}} , typename Arg0 , typename ... Args$>$ }\\\mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}} \mbox{\hyperlink{namespacefc_1_1detail_ab872ea0d1cfd2b3f8b6b8fcb685bc157}{fc\+::detail\+::call\+\_\+generic}} (const std\+::function$<$ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}(Arg0, Args...)$>$ \&\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}, variants\+::const\+\_\+iterator a0, variants\+::const\+\_\+iterator e)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}} , typename ... Args$>$ }\\std\+::function$<$ \mbox{\hyperlink{classfc_1_1variant}{variant}}(const \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{fc\+::variants}} \&)$>$ \mbox{\hyperlink{namespacefc_1_1detail_a10759577faf256c5da4dd80fb55125db}{fc\+::detail\+::to\+\_\+generic}} (const std\+::function$<$ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}(Args...)$>$ \&\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})
+\item 
+{\footnotesize template$<$typename ... Args$>$ }\\std\+::function$<$ \mbox{\hyperlink{classfc_1_1variant}{variant}}(const \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{fc\+::variants}} \&)$>$ \mbox{\hyperlink{namespacefc_1_1detail_ae162080f61330b93315b6fa09a8250dd}{fc\+::detail\+::to\+\_\+generic}} (const std\+::function$<$ void(Args...)$>$ \&\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})
+\end{DoxyCompactItemize}

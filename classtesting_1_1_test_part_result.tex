@@ -1,0 +1,256 @@
+\doxysection{testing\+::Test\+Part\+Result Class Reference}
+\hypertarget{classtesting_1_1_test_part_result}{}\label{classtesting_1_1_test_part_result}\index{testing::TestPartResult@{testing::TestPartResult}}
+
+
+{\ttfamily \#include $<$gtest-\/test-\/part.\+h$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{classtesting_1_1_test_part_result_a65ae656b33fdfdfffaf34858778a52d5}{Type}} \{ \mbox{\hyperlink{classtesting_1_1_test_part_result_a65ae656b33fdfdfffaf34858778a52d5a8fa3d06b2baad8bf7c1f17dea314983e}{k\+Success}}
+, \mbox{\hyperlink{classtesting_1_1_test_part_result_a65ae656b33fdfdfffaf34858778a52d5a00a755614f8ec3f78b2e951f8c91cd92}{k\+Non\+Fatal\+Failure}}
+, \mbox{\hyperlink{classtesting_1_1_test_part_result_a65ae656b33fdfdfffaf34858778a52d5ae1bf0b610b697a43fee97628cdab4ea1}{k\+Fatal\+Failure}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1_test_part_result_a6409eb519c1cd514aab2426c8f40737f}{Test\+Part\+Result}} (\mbox{\hyperlink{classtesting_1_1_test_part_result_a65ae656b33fdfdfffaf34858778a52d5}{Type}} a\+\_\+type, const char \texorpdfstring{$\ast$}{*}a\+\_\+file\+\_\+name, int a\+\_\+line\+\_\+number, const char \texorpdfstring{$\ast$}{*}a\+\_\+message)
+\item 
+\mbox{\hyperlink{classtesting_1_1_test_part_result_a65ae656b33fdfdfffaf34858778a52d5}{Type}} \mbox{\hyperlink{classtesting_1_1_test_part_result_aab92b225e8a472e78bd3889ca6df0d2a}{type}} () const
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classtesting_1_1_test_part_result_a5b44531e6847fa75882c43cf758345ff}{file\+\_\+name}} () const
+\item 
+int \mbox{\hyperlink{classtesting_1_1_test_part_result_ad4c5da5f13245ac18cf256d0d9f3eda9}{line\+\_\+number}} () const
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classtesting_1_1_test_part_result_a42fa8f2568e3317f146e969298f63158}{summary}} () const
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classtesting_1_1_test_part_result_a1c522b89938fd685797adcafa357b771}{message}} () const
+\item 
+bool \mbox{\hyperlink{classtesting_1_1_test_part_result_ac90edd5ea9cc4bb986a1eb2b5e1d53de}{passed}} () const
+\item 
+bool \mbox{\hyperlink{classtesting_1_1_test_part_result_aa04b377c3e7ed57d39e882df5561ac90}{failed}} () const
+\item 
+bool \mbox{\hyperlink{classtesting_1_1_test_part_result_a6197c7f6672acc1cfdf580eb1f2183ac}{nonfatally\+\_\+failed}} () const
+\item 
+bool \mbox{\hyperlink{classtesting_1_1_test_part_result_a77db157eff9531c3c00c2420502f9a89}{fatally\+\_\+failed}} () const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{gtest-test-part_8h_source_l00047}{47}} of file \mbox{\hyperlink{gtest-test-part_8h_source}{gtest-\/test-\/part.\+h}}.
+
+
+
+\doxysubsection{Member Enumeration Documentation}
+\Hypertarget{classtesting_1_1_test_part_result_a65ae656b33fdfdfffaf34858778a52d5}\index{testing::TestPartResult@{testing::TestPartResult}!Type@{Type}}
+\index{Type@{Type}!testing::TestPartResult@{testing::TestPartResult}}
+\doxysubsubsection{\texorpdfstring{Type}{Type}}
+{\footnotesize\ttfamily \label{classtesting_1_1_test_part_result_a65ae656b33fdfdfffaf34858778a52d5} 
+enum \mbox{\hyperlink{classtesting_1_1_test_part_result_a65ae656b33fdfdfffaf34858778a52d5}{testing\+::\+Test\+Part\+Result\+::\+Type}}}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kSuccess@{kSuccess}!testing::TestPartResult@{testing::TestPartResult}}\index{testing::TestPartResult@{testing::TestPartResult}!kSuccess@{kSuccess}}}\Hypertarget{classtesting_1_1_test_part_result_a65ae656b33fdfdfffaf34858778a52d5a8fa3d06b2baad8bf7c1f17dea314983e}\label{classtesting_1_1_test_part_result_a65ae656b33fdfdfffaf34858778a52d5} 
+k\+Success&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kNonFatalFailure@{kNonFatalFailure}!testing::TestPartResult@{testing::TestPartResult}}\index{testing::TestPartResult@{testing::TestPartResult}!kNonFatalFailure@{kNonFatalFailure}}}\Hypertarget{classtesting_1_1_test_part_result_a65ae656b33fdfdfffaf34858778a52d5a00a755614f8ec3f78b2e951f8c91cd92}\label{classtesting_1_1_test_part_result_a65ae656b33fdfdfffaf34858778a52d5} 
+k\+Non\+Fatal\+Failure&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kFatalFailure@{kFatalFailure}!testing::TestPartResult@{testing::TestPartResult}}\index{testing::TestPartResult@{testing::TestPartResult}!kFatalFailure@{kFatalFailure}}}\Hypertarget{classtesting_1_1_test_part_result_a65ae656b33fdfdfffaf34858778a52d5ae1bf0b610b697a43fee97628cdab4ea1}\label{classtesting_1_1_test_part_result_a65ae656b33fdfdfffaf34858778a52d5} 
+k\+Fatal\+Failure&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{gtest-test-part_8h_source_l00051}{51}} of file \mbox{\hyperlink{gtest-test-part_8h_source}{gtest-\/test-\/part.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00052\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1_test_part_result_a65ae656b33fdfdfffaf34858778a52d5a8fa3d06b2baad8bf7c1f17dea314983e}{kSuccess}},\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Succeeded.}}
+\DoxyCodeLine{00053\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1_test_part_result_a65ae656b33fdfdfffaf34858778a52d5a00a755614f8ec3f78b2e951f8c91cd92}{kNonFatalFailure}},\ \ \textcolor{comment}{//\ Failed\ but\ the\ test\ can\ continue.}}
+\DoxyCodeLine{00054\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1_test_part_result_a65ae656b33fdfdfffaf34858778a52d5ae1bf0b610b697a43fee97628cdab4ea1}{kFatalFailure}}\ \ \ \ \ \ \textcolor{comment}{//\ Failed\ and\ the\ test\ should\ be\ terminated.}}
+\DoxyCodeLine{00055\ \ \ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1_test_part_result_a6409eb519c1cd514aab2426c8f40737f}\index{testing::TestPartResult@{testing::TestPartResult}!TestPartResult@{TestPartResult}}
+\index{TestPartResult@{TestPartResult}!testing::TestPartResult@{testing::TestPartResult}}
+\doxysubsubsection{\texorpdfstring{TestPartResult()}{TestPartResult()}}
+{\footnotesize\ttfamily \label{classtesting_1_1_test_part_result_a6409eb519c1cd514aab2426c8f40737f} 
+testing\+::\+Test\+Part\+Result\+::\+Test\+Part\+Result (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classtesting_1_1_test_part_result_a65ae656b33fdfdfffaf34858778a52d5}{Type}}}]{a\+\_\+type}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{a\+\_\+file\+\_\+name}{, }\item[{int}]{a\+\_\+line\+\_\+number}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{a\+\_\+message}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-test-part_8h_source_l00060}{60}} of file \mbox{\hyperlink{gtest-test-part_8h_source}{gtest-\/test-\/part.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ :\ type\_(a\_type),}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ file\_name\_(a\_file\_name\ ==\ NULL\ ?\ \textcolor{stringliteral}{"{}"{}}\ :\ a\_file\_name),}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ line\_number\_(a\_line\_number),}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ summary\_(ExtractSummary(a\_message)),}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ message\_(a\_message)\ \{}
+\DoxyCodeLine{00069\ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1_test_part_result_aa04b377c3e7ed57d39e882df5561ac90}\index{testing::TestPartResult@{testing::TestPartResult}!failed@{failed}}
+\index{failed@{failed}!testing::TestPartResult@{testing::TestPartResult}}
+\doxysubsubsection{\texorpdfstring{failed()}{failed()}}
+{\footnotesize\ttfamily \label{classtesting_1_1_test_part_result_aa04b377c3e7ed57d39e882df5561ac90} 
+bool testing\+::\+Test\+Part\+Result\+::failed (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-test-part_8h_source_l00094}{94}} of file \mbox{\hyperlink{gtest-test-part_8h_source}{gtest-\/test-\/part.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00094\ \{\ \textcolor{keywordflow}{return}\ type\_\ !=\ \mbox{\hyperlink{classtesting_1_1_test_part_result_a65ae656b33fdfdfffaf34858778a52d5a8fa3d06b2baad8bf7c1f17dea314983e}{kSuccess}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1_test_part_result_a77db157eff9531c3c00c2420502f9a89}\index{testing::TestPartResult@{testing::TestPartResult}!fatally\_failed@{fatally\_failed}}
+\index{fatally\_failed@{fatally\_failed}!testing::TestPartResult@{testing::TestPartResult}}
+\doxysubsubsection{\texorpdfstring{fatally\_failed()}{fatally\_failed()}}
+{\footnotesize\ttfamily \label{classtesting_1_1_test_part_result_a77db157eff9531c3c00c2420502f9a89} 
+bool testing\+::\+Test\+Part\+Result\+::fatally\+\_\+failed (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-test-part_8h_source_l00100}{100}} of file \mbox{\hyperlink{gtest-test-part_8h_source}{gtest-\/test-\/part.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00100\ \{\ \textcolor{keywordflow}{return}\ type\_\ ==\ \mbox{\hyperlink{classtesting_1_1_test_part_result_a65ae656b33fdfdfffaf34858778a52d5ae1bf0b610b697a43fee97628cdab4ea1}{kFatalFailure}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1_test_part_result_a5b44531e6847fa75882c43cf758345ff}\index{testing::TestPartResult@{testing::TestPartResult}!file\_name@{file\_name}}
+\index{file\_name@{file\_name}!testing::TestPartResult@{testing::TestPartResult}}
+\doxysubsubsection{\texorpdfstring{file\_name()}{file\_name()}}
+{\footnotesize\ttfamily \label{classtesting_1_1_test_part_result_a5b44531e6847fa75882c43cf758345ff} 
+const char \texorpdfstring{$\ast$}{*} testing\+::\+Test\+Part\+Result\+::file\+\_\+name (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-test-part_8h_source_l00076}{76}} of file \mbox{\hyperlink{gtest-test-part_8h_source}{gtest-\/test-\/part.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00077\ \ \ \ \ \textcolor{keywordflow}{return}\ file\_name\_.empty()\ ?\ NULL\ :\ file\_name\_.c\_str();}
+\DoxyCodeLine{00078\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1_test_part_result_ad4c5da5f13245ac18cf256d0d9f3eda9}\index{testing::TestPartResult@{testing::TestPartResult}!line\_number@{line\_number}}
+\index{line\_number@{line\_number}!testing::TestPartResult@{testing::TestPartResult}}
+\doxysubsubsection{\texorpdfstring{line\_number()}{line\_number()}}
+{\footnotesize\ttfamily \label{classtesting_1_1_test_part_result_ad4c5da5f13245ac18cf256d0d9f3eda9} 
+int testing\+::\+Test\+Part\+Result\+::line\+\_\+number (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-test-part_8h_source_l00082}{82}} of file \mbox{\hyperlink{gtest-test-part_8h_source}{gtest-\/test-\/part.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00082\ \{\ \textcolor{keywordflow}{return}\ line\_number\_;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1_test_part_result_a1c522b89938fd685797adcafa357b771}\index{testing::TestPartResult@{testing::TestPartResult}!message@{message}}
+\index{message@{message}!testing::TestPartResult@{testing::TestPartResult}}
+\doxysubsubsection{\texorpdfstring{message()}{message()}}
+{\footnotesize\ttfamily \label{classtesting_1_1_test_part_result_a1c522b89938fd685797adcafa357b771} 
+const char \texorpdfstring{$\ast$}{*} testing\+::\+Test\+Part\+Result\+::message (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-test-part_8h_source_l00088}{88}} of file \mbox{\hyperlink{gtest-test-part_8h_source}{gtest-\/test-\/part.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00088\ \{\ \textcolor{keywordflow}{return}\ message\_.c\_str();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1_test_part_result_a6197c7f6672acc1cfdf580eb1f2183ac}\index{testing::TestPartResult@{testing::TestPartResult}!nonfatally\_failed@{nonfatally\_failed}}
+\index{nonfatally\_failed@{nonfatally\_failed}!testing::TestPartResult@{testing::TestPartResult}}
+\doxysubsubsection{\texorpdfstring{nonfatally\_failed()}{nonfatally\_failed()}}
+{\footnotesize\ttfamily \label{classtesting_1_1_test_part_result_a6197c7f6672acc1cfdf580eb1f2183ac} 
+bool testing\+::\+Test\+Part\+Result\+::nonfatally\+\_\+failed (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-test-part_8h_source_l00097}{97}} of file \mbox{\hyperlink{gtest-test-part_8h_source}{gtest-\/test-\/part.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00097\ \{\ \textcolor{keywordflow}{return}\ type\_\ ==\ \mbox{\hyperlink{classtesting_1_1_test_part_result_a65ae656b33fdfdfffaf34858778a52d5a00a755614f8ec3f78b2e951f8c91cd92}{kNonFatalFailure}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1_test_part_result_ac90edd5ea9cc4bb986a1eb2b5e1d53de}\index{testing::TestPartResult@{testing::TestPartResult}!passed@{passed}}
+\index{passed@{passed}!testing::TestPartResult@{testing::TestPartResult}}
+\doxysubsubsection{\texorpdfstring{passed()}{passed()}}
+{\footnotesize\ttfamily \label{classtesting_1_1_test_part_result_ac90edd5ea9cc4bb986a1eb2b5e1d53de} 
+bool testing\+::\+Test\+Part\+Result\+::passed (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-test-part_8h_source_l00091}{91}} of file \mbox{\hyperlink{gtest-test-part_8h_source}{gtest-\/test-\/part.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00091\ \{\ \textcolor{keywordflow}{return}\ type\_\ ==\ \mbox{\hyperlink{classtesting_1_1_test_part_result_a65ae656b33fdfdfffaf34858778a52d5a8fa3d06b2baad8bf7c1f17dea314983e}{kSuccess}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1_test_part_result_a42fa8f2568e3317f146e969298f63158}\index{testing::TestPartResult@{testing::TestPartResult}!summary@{summary}}
+\index{summary@{summary}!testing::TestPartResult@{testing::TestPartResult}}
+\doxysubsubsection{\texorpdfstring{summary()}{summary()}}
+{\footnotesize\ttfamily \label{classtesting_1_1_test_part_result_a42fa8f2568e3317f146e969298f63158} 
+const char \texorpdfstring{$\ast$}{*} testing\+::\+Test\+Part\+Result\+::summary (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-test-part_8h_source_l00085}{85}} of file \mbox{\hyperlink{gtest-test-part_8h_source}{gtest-\/test-\/part.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00085\ \{\ \textcolor{keywordflow}{return}\ summary\_.c\_str();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1_test_part_result_aab92b225e8a472e78bd3889ca6df0d2a}\index{testing::TestPartResult@{testing::TestPartResult}!type@{type}}
+\index{type@{type}!testing::TestPartResult@{testing::TestPartResult}}
+\doxysubsubsection{\texorpdfstring{type()}{type()}}
+{\footnotesize\ttfamily \label{classtesting_1_1_test_part_result_aab92b225e8a472e78bd3889ca6df0d2a} 
+\mbox{\hyperlink{classtesting_1_1_test_part_result_a65ae656b33fdfdfffaf34858778a52d5}{Type}} testing\+::\+Test\+Part\+Result\+::type (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-test-part_8h_source_l00072}{72}} of file \mbox{\hyperlink{gtest-test-part_8h_source}{gtest-\/test-\/part.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00072\ \{\ \textcolor{keywordflow}{return}\ type\_;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1_test_part_result_aab92b225e8a472e78bd3889ca6df0d2a_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/include/gtest/\mbox{\hyperlink{gtest-test-part_8h}{gtest-\/test-\/part.\+h}}\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/src/\mbox{\hyperlink{gtest-test-part_8cc}{gtest-\/test-\/part.\+cc}}\end{DoxyCompactItemize}

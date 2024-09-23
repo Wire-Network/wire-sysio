@@ -1,0 +1,6 @@
+<map id="sysio::chain::eosvmoc::read_message_with_fds" name="sysio::chain::eosvmoc::read_message_with_fds">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,22,176,62"/>
+<area shape="rect" id="Node000002" href="$namespacefc_1_1raw.html#a0b442d98ceb22dd5a6ae84745e43ffab" title=" " alt="" coords="224,29,335,55"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="176,40,208,40,208,45,176,45"/>
+<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="248,30,241,21,245,11,258,5,279,3,302,5,314,12,312,16,301,10,279,8,260,10,249,15,247,20,252,27"/>
+</map>

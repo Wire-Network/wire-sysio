@@ -1,0 +1,11 @@
+<map id="sysio::chain::producer_authority_schedule::to_shared" name="sysio::chain::producer_authority_schedule::to_shared">
+<area shape="rect" id="Node000001" title=" " alt="" coords="256,96,412,152"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1chain_1_1global__property__object.html#ab9e11f9c9fcc9f77204088b2e0deb187" title=" " alt="" coords="5,5,208,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="269,91,207,61,175,49,176,44,209,57,271,87"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1chain_1_1global__property__object.html#a3c4aff03aad8222b7beb9f626f349955" title=" " alt="" coords="5,71,208,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="240,113,208,109,209,103,240,108"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1chain_1_1global__property__object.html#ae4f01aec23162081b1145a2dc0f842ec" title=" " alt="" coords="5,136,208,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="240,140,209,145,208,139,240,135"/>
+<area shape="rect" id="Node000005" href="$classsysio_1_1chain_1_1controller.html#ab4cab73bf67a1686c6c595e08a63b632" title=" " alt="" coords="21,201,192,242"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="269,162,209,191,176,203,174,198,207,186,267,157"/>
+</map>

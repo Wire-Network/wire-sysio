@@ -1,0 +1,28 @@
+var datastream_8hpp =
+[
+    [ "fc::datastream< T, std::enable_if_t< std::is_same_v< T, char * >||std::is_same_v< T, const char * >||std::is_same_v< T, const unsigned char * > > >", "classfc_1_1datastream_3_01_t_00_01std_1_1enable__if__t_3_01std_1_1is__same__v_3_01_t_00_01char_04eadb0f8bdce27e5631f0871386070b4.html", "classfc_1_1datastream_3_01_t_00_01std_1_1enable__if__t_3_01std_1_1is__same__v_3_01_t_00_01char_04eadb0f8bdce27e5631f0871386070b4" ],
+    [ "fc::datastream< size_t, void >", "classfc_1_1datastream_3_01size__t_00_01void_01_4.html", "classfc_1_1datastream_3_01size__t_00_01void_01_4" ],
+    [ "fc::datastream< Streambuf, typename std::enable_if_t< std::is_base_of_v< std::streambuf, Streambuf > > >", "classfc_1_1datastream_3_01_streambuf_00_01typename_01std_1_1enable__if__t_3_01std_1_1is__base__o76614512708450c186f49e481e4fdabd.html", "classfc_1_1datastream_3_01_streambuf_00_01typename_01std_1_1enable__if__t_3_01std_1_1is__base__o76614512708450c186f49e481e4fdabd" ],
+    [ "fc::datastream< Container, typename std::enable_if_t<(std::is_same_v< std::vector< char >, Container >||std::is_same_v< std::deque< char >, Container >)> >", "classfc_1_1datastream_3_01_container_00_01typename_01std_1_1enable__if__t_3_07std_1_1is__same__vfd96e234dc1149e01c9f4c631faf0080.html", "classfc_1_1datastream_3_01_container_00_01typename_01std_1_1enable__if__t_3_07std_1_1is__same__vfd96e234dc1149e01c9f4c631faf0080" ],
+    [ "operator<<", "datastream_8hpp.html#a41c2c53a5b52eb48b47afa7d38261f73", null ],
+    [ "operator<<", "datastream_8hpp.html#a60dbd98bf029ab3113f5134171a2a404", null ],
+    [ "operator<<", "datastream_8hpp.html#a0c8885e70e438435a32fbf826f35fb6e", null ],
+    [ "operator<<", "datastream_8hpp.html#a28f93eed9274b053f3479b939bc0fb5c", null ],
+    [ "operator<<", "datastream_8hpp.html#a523f4b71775b04eb20ff29f77b384a7e", null ],
+    [ "operator<<", "datastream_8hpp.html#a4dc481c62007b58ec81b22c046b76140", null ],
+    [ "operator<<", "datastream_8hpp.html#ad59ee302f3b0de6fa68fa36dab5fb0d3", null ],
+    [ "operator<<", "datastream_8hpp.html#a9196a4a08f4845ef048112cb0c5ad38e", null ],
+    [ "operator<<", "datastream_8hpp.html#a048f536e5e210414568d5993f5100743", null ],
+    [ "operator<<", "datastream_8hpp.html#aecd968891b4a94518caccc0755ff6208", null ],
+    [ "operator>>", "datastream_8hpp.html#ab3ebdab797051b684fd5c6f2bf9e600e", null ],
+    [ "operator>>", "datastream_8hpp.html#a006850cfe64e6bbb4484b7cd47e6882b", null ],
+    [ "operator>>", "datastream_8hpp.html#a51137b43c25e20fc53ab46d0619e8c90", null ],
+    [ "operator>>", "datastream_8hpp.html#a3dc344225431623f1714cf82a682487a", null ],
+    [ "operator>>", "datastream_8hpp.html#a71b778ebfe0451a2dfa35a1fc9f6da50", null ],
+    [ "operator>>", "datastream_8hpp.html#a85d445a2f0f9e2e5dc6e52f09c4b498b", null ],
+    [ "operator>>", "datastream_8hpp.html#a44e08d884820dab558f8b935a697761a", null ],
+    [ "operator>>", "datastream_8hpp.html#a05c1a0d6c2fd94c7ab09573af69a1fff", null ],
+    [ "operator>>", "datastream_8hpp.html#a0719bd6e6e8ec1a10c4d56162bb3d76e", null ],
+    [ "operator>>", "datastream_8hpp.html#ac35bad4cbd53e5ee7a7d8a038f03334e", null ],
+    [ "throw_datastream_range_error", "datastream_8hpp.html#a20e12fc3683b005cd6430a4a3c066bc0", null ]
+];

@@ -1,0 +1,46 @@
+\doxysection{k1\+\_\+recover.\+cpp}
+\hypertarget{k1__recover_8cpp_source}{}\label{k1__recover_8cpp_source}\index{libraries/fc/src/crypto/k1\_recover.cpp@{libraries/fc/src/crypto/k1\_recover.cpp}}
+\mbox{\hyperlink{k1__recover_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{k1__recover_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{exception_8hpp}{fc/exception/exception.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{k1__recover_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{k1__recover_8hpp}{fc/crypto/k1\_recover.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{k1__recover_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{secp256k1_8h}{secp256k1.h}}>}}
+\DoxyCodeLine{\Hypertarget{k1__recover_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{secp256k1__recovery_8h}{secp256k1\_recovery.h}}>}}
+\DoxyCodeLine{\Hypertarget{k1__recover_8cpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{k1__recover_8cpp_source_l00006}00006\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}\ \{}
+\DoxyCodeLine{\Hypertarget{k1__recover_8cpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{k1__recover_8cpp_source_l00008}\mbox{\hyperlink{namespacefc_a1dc5b305a6c1be44fd9ddaa265de34f0}{00008}}\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__context__struct}{secp256k1\_context}}*\ \mbox{\hyperlink{namespacefc_a1dc5b305a6c1be44fd9ddaa265de34f0}{k1\_recover\_context}}()\ \{}
+\DoxyCodeLine{\Hypertarget{k1__recover_8cpp_source_l00009}00009\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{structsecp256k1__context__struct}{secp256k1\_context}}*\ ctx\ =\ \mbox{\hyperlink{secp256k1_8h_a3aaa9fcc3ab67bc8f841779a049069c5}{secp256k1\_context\_create}}(\mbox{\hyperlink{secp256k1_8h_add20a6c320e247ca7bd524cbc4259d64}{SECP256K1\_CONTEXT\_VERIFY}});}
+\DoxyCodeLine{\Hypertarget{k1__recover_8cpp_source_l00010}00010\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ctx;}
+\DoxyCodeLine{\Hypertarget{k1__recover_8cpp_source_l00011}00011\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{k1__recover_8cpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{k1__recover_8cpp_source_l00013}\mbox{\hyperlink{namespacefc_ad33908e48c447780b71e5e4ba567d523}{00013}}\ \ \ \ \ std::variant<k1\_recover\_error,\ bytes>\ \mbox{\hyperlink{namespacefc_ad33908e48c447780b71e5e4ba567d523}{k1\_recover}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}}\&\ \mbox{\hyperlink{namespacefc_a50190ee8a24af6929033b058b16158c4}{signature}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}}\&\ \mbox{\hyperlink{namespacefc_a150ca4cd9c0318ca45dc0dc7df5d58b9}{digest}})\ \{}
+\DoxyCodeLine{\Hypertarget{k1__recover_8cpp_source_l00014}00014\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__context__struct}{secp256k1\_context}}*\ \mbox{\hyperlink{structcontext}{context}}\{\mbox{\hyperlink{namespacefc_a1dc5b305a6c1be44fd9ddaa265de34f0}{k1\_recover\_context}}()\};}
+\DoxyCodeLine{\Hypertarget{k1__recover_8cpp_source_l00015}00015\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\mbox{\hyperlink{structcontext}{context}}\ !=\ \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{\Hypertarget{k1__recover_8cpp_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{k1__recover_8cpp_source_l00017}00017\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacefc_a50190ee8a24af6929033b058b16158c4}{signature}}.size()\ !=\ 65\ ||\ \mbox{\hyperlink{namespacefc_a150ca4cd9c0318ca45dc0dc7df5d58b9}{digest}}.size()\ !=\ 32)\ \{}
+\DoxyCodeLine{\Hypertarget{k1__recover_8cpp_source_l00018}00018\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_a97e49922a2f755b551da706c89c774f2afcf739c019873c68ec4e3dd5ee56ddc2}{k1\_recover\_error::input\_error}};}
+\DoxyCodeLine{\Hypertarget{k1__recover_8cpp_source_l00019}00019\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{k1__recover_8cpp_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{k1__recover_8cpp_source_l00021}00021\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ recid\ =\ \mbox{\hyperlink{namespacefc_a50190ee8a24af6929033b058b16158c4}{signature}}[0];}
+\DoxyCodeLine{\Hypertarget{k1__recover_8cpp_source_l00022}00022\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (recid<27\ ||\ recid>=35)\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_a97e49922a2f755b551da706c89c774f2a12c527ffd45868061a192960b352b5d9}{k1\_recover\_error::invalid\_signature}};}
+\DoxyCodeLine{\Hypertarget{k1__recover_8cpp_source_l00023}00023\ \ \ \ \ \ \ \ \ recid\ =\ (recid\ -\/\ 27)\ \&\ 3;}
+\DoxyCodeLine{\Hypertarget{k1__recover_8cpp_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{k1__recover_8cpp_source_l00025}00025\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsecp256k1__ecdsa__recoverable__signature}{secp256k1\_ecdsa\_recoverable\_signature}}\ sig;}
+\DoxyCodeLine{\Hypertarget{k1__recover_8cpp_source_l00026}00026\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{secp256k1__recovery_8h_a6699b45dc75be70f028ac7d8ffaba46e}{secp256k1\_ecdsa\_recoverable\_signature\_parse\_compact}}(\mbox{\hyperlink{structcontext}{context}},\ \&sig,\ (\textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)\&\mbox{\hyperlink{namespacefc_a50190ee8a24af6929033b058b16158c4}{signature}}[1],\ recid))\ \{}
+\DoxyCodeLine{\Hypertarget{k1__recover_8cpp_source_l00027}00027\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_a97e49922a2f755b551da706c89c774f2a12c527ffd45868061a192960b352b5d9}{k1\_recover\_error::invalid\_signature}};}
+\DoxyCodeLine{\Hypertarget{k1__recover_8cpp_source_l00028}00028\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{k1__recover_8cpp_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{k1__recover_8cpp_source_l00030}00030\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsecp256k1__pubkey}{secp256k1\_pubkey}}\ pub\_key;}
+\DoxyCodeLine{\Hypertarget{k1__recover_8cpp_source_l00031}00031\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{secp256k1__recovery_8h_af9f2082776bf8ebdb4c38161a211a02b}{secp256k1\_ecdsa\_recover}}(\mbox{\hyperlink{structcontext}{context}},\ \&pub\_key,\ \&sig,\ (\textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)\&\mbox{\hyperlink{namespacefc_a150ca4cd9c0318ca45dc0dc7df5d58b9}{digest}}[0]))\ \{}
+\DoxyCodeLine{\Hypertarget{k1__recover_8cpp_source_l00032}00032\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_a97e49922a2f755b551da706c89c774f2a7a4a85d2f97680e7be97e5e23f53595a}{k1\_recover\_error::recover\_error}};}
+\DoxyCodeLine{\Hypertarget{k1__recover_8cpp_source_l00033}00033\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{k1__recover_8cpp_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{k1__recover_8cpp_source_l00035}00035\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ kOutLen\{65\};}
+\DoxyCodeLine{\Hypertarget{k1__recover_8cpp_source_l00036}00036\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}}\ out(kOutLen,\ \textcolor{charliteral}{'\(\backslash\)0'});}
+\DoxyCodeLine{\Hypertarget{k1__recover_8cpp_source_l00037}00037\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{secp256k1_8h_a34977bf00322e510e881160c421836d7}{secp256k1\_ec\_pubkey\_serialize}}(\mbox{\hyperlink{structcontext}{context}},\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)\&out[0],\ \&kOutLen,\ \&pub\_key,\ \mbox{\hyperlink{secp256k1_8h_ab8e25dc58843e83926f95795f9e8a6e2}{SECP256K1\_EC\_UNCOMPRESSED}});}
+\DoxyCodeLine{\Hypertarget{k1__recover_8cpp_source_l00038}00038\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ out;}
+\DoxyCodeLine{\Hypertarget{k1__recover_8cpp_source_l00039}00039\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{k1__recover_8cpp_source_l00040}00040\ \}}
+
+\end{DoxyCode}

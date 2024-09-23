@@ -1,0 +1,79 @@
+\doxysection{Stateful\+Naming\+Functor Struct Reference}
+\hypertarget{struct_stateful_naming_functor}{}\label{struct_stateful_naming_functor}\index{StatefulNamingFunctor@{StatefulNamingFunctor}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_stateful_naming_functor_a5ad1bfb327a44d58aafa96e4e2490a36}{Stateful\+Naming\+Functor}} ()
+\item 
+std\+::string \mbox{\hyperlink{struct_stateful_naming_functor_a6a1d07c0b8314c1aee535f269ea536db}{operator()}} (const \mbox{\hyperlink{structtesting_1_1_test_param_info}{\+::testing\+::\+Test\+Param\+Info}}$<$ int $>$ \&info)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{struct_stateful_naming_functor_a95887cf031d3113ae2edcd7617af3b79}{sum}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{gtest-param-test__test_8cc_source_l00999}{999}} of file \mbox{\hyperlink{gtest-param-test__test_8cc_source}{gtest-\/param-\/test\+\_\+test.\+cc}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{struct_stateful_naming_functor_a5ad1bfb327a44d58aafa96e4e2490a36}\index{StatefulNamingFunctor@{StatefulNamingFunctor}!StatefulNamingFunctor@{StatefulNamingFunctor}}
+\index{StatefulNamingFunctor@{StatefulNamingFunctor}!StatefulNamingFunctor@{StatefulNamingFunctor}}
+\doxysubsubsection{\texorpdfstring{StatefulNamingFunctor()}{StatefulNamingFunctor()}}
+{\footnotesize\ttfamily \label{struct_stateful_naming_functor_a5ad1bfb327a44d58aafa96e4e2490a36} 
+Stateful\+Naming\+Functor\+::\+Stateful\+Naming\+Functor (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-param-test__test_8cc_source_l01000}{1000}} of file \mbox{\hyperlink{gtest-param-test__test_8cc_source}{gtest-\/param-\/test\+\_\+test.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01000\ :\ \mbox{\hyperlink{struct_stateful_naming_functor_a95887cf031d3113ae2edcd7617af3b79}{sum}}(0)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_stateful_naming_functor_a6a1d07c0b8314c1aee535f269ea536db}\index{StatefulNamingFunctor@{StatefulNamingFunctor}!operator()@{operator()}}
+\index{operator()@{operator()}!StatefulNamingFunctor@{StatefulNamingFunctor}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}}
+{\footnotesize\ttfamily \label{struct_stateful_naming_functor_a6a1d07c0b8314c1aee535f269ea536db} 
+std\+::string Stateful\+Naming\+Functor\+::operator() (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structtesting_1_1_test_param_info}{\+::testing\+::\+Test\+Param\+Info}}$<$ int $>$ \&}]{info}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-param-test__test_8cc_source_l01001}{1001}} of file \mbox{\hyperlink{gtest-param-test__test_8cc_source}{gtest-\/param-\/test\+\_\+test.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01001\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01002\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ =\ info.param\ +\ \mbox{\hyperlink{struct_stateful_naming_functor_a95887cf031d3113ae2edcd7617af3b79}{sum}};}
+\DoxyCodeLine{01003\ \ \ \ \ \mbox{\hyperlink{struct_stateful_naming_functor_a95887cf031d3113ae2edcd7617af3b79}{sum}}\ +=\ info.param;}
+\DoxyCodeLine{01004\ \ \ \ \ return\ ::testing::PrintToString(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}});}
+\DoxyCodeLine{01005\ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_stateful_naming_functor_a95887cf031d3113ae2edcd7617af3b79}\index{StatefulNamingFunctor@{StatefulNamingFunctor}!sum@{sum}}
+\index{sum@{sum}!StatefulNamingFunctor@{StatefulNamingFunctor}}
+\doxysubsubsection{\texorpdfstring{sum}{sum}}
+{\footnotesize\ttfamily \label{struct_stateful_naming_functor_a95887cf031d3113ae2edcd7617af3b79} 
+int Stateful\+Naming\+Functor\+::sum}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-param-test__test_8cc_source_l01006}{1006}} of file \mbox{\hyperlink{gtest-param-test__test_8cc_source}{gtest-\/param-\/test\+\_\+test.\+cc}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/test/\mbox{\hyperlink{gtest-param-test__test_8cc}{gtest-\/param-\/test\+\_\+test.\+cc}}\end{DoxyCompactItemize}

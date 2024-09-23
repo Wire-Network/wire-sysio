@@ -1,0 +1,136 @@
+\doxysection{real128.\+cpp}
+\hypertarget{real128_8cpp_source}{}\label{real128_8cpp_source}\index{libraries/fc/src/real128.cpp@{libraries/fc/src/real128.cpp}}
+\mbox{\hyperlink{real128_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{real128_8hpp}{fc/real128.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp}{fc/crypto/bigint.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{exception_8hpp}{fc/exception/exception.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <sstream>}}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{stdint_8h}{stdint.h}}>}}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00007}00007\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00008}00008\ \{}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00009}\mbox{\hyperlink{classfc_1_1real128_acf80e4cd529988227f25e2e9f58923c0}{00009}}\ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{classfc_1_1real128_acf80e4cd529988227f25e2e9f58923c0}{real128::to\_uint64}}()\textcolor{keyword}{const}}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00010}00010\ \textcolor{keyword}{\ \ \ }\{}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00011}00011\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (fixed/\ \mbox{\hyperlink{real128_8hpp_ac7d6999aca6d173e118c185e3c4513db}{FC\_REAL128\_PRECISION}}).to\_uint64();}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00012}00012\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00014}\mbox{\hyperlink{classfc_1_1real128_a097da5b9bf1cf07153422781be41a16d}{00014}}\ \ \ \ \mbox{\hyperlink{classfc_1_1real128_a097da5b9bf1cf07153422781be41a16d}{real128::real128}}(\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ integer\ )}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00015}00015\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00016}00016\ \ \ \ \ \ \ fixed\ =\ \mbox{\hyperlink{classfc_1_1uint128}{uint128}}(integer)\ *\ \mbox{\hyperlink{real128_8hpp_ac7d6999aca6d173e118c185e3c4513db}{FC\_REAL128\_PRECISION}};}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00017}00017\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00018}\mbox{\hyperlink{classfc_1_1real128_a3b64577b2d9b3faa2ca42c89fe06a6d6}{00018}}\ \ \ \ \mbox{\hyperlink{classfc_1_1real128}{real128}}\&\ \mbox{\hyperlink{classfc_1_1real128_a3b64577b2d9b3faa2ca42c89fe06a6d6}{real128::operator\ +=\ }}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1real128}{real128}}\&\ o\ )}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00019}00019\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00020}00020\ \ \ \ \ \ \ fixed\ +=\ o.fixed;}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00021}00021\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00022}00022\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00023}\mbox{\hyperlink{classfc_1_1real128_a62d973a4d6975e50aeee8d66af384bec}{00023}}\ \ \ \ \mbox{\hyperlink{classfc_1_1real128}{real128}}\&\ \mbox{\hyperlink{classfc_1_1real128_a62d973a4d6975e50aeee8d66af384bec}{real128::operator\ -\/=\ }}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1real128}{real128}}\&\ o\ )}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00024}00024\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00025}00025\ \ \ \ \ \ \ fixed\ -\/=\ o.fixed;}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00026}00026\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00027}00027\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00029}\mbox{\hyperlink{classfc_1_1real128_a6c68340169a8a565a94aaaf7765d0263}{00029}}\ \ \ \ \mbox{\hyperlink{classfc_1_1real128}{real128}}\&\ \mbox{\hyperlink{classfc_1_1real128_a6c68340169a8a565a94aaaf7765d0263}{real128::operator\ /=\ }}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1real128}{real128}}\&\ o\ )}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00030}00030\ \ \ \ \{\ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00031}00031\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ o.fixed\ >\ \mbox{\hyperlink{classfc_1_1uint128}{uint128}}(0),\ \textcolor{stringliteral}{"{}Divide\ by\ Zero"{}}\ );}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00033}00033\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bigint}{fc::bigint}}\ self(fixed);}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00034}00034\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bigint}{fc::bigint}}\ other(o.fixed);}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00035}00035\ \ \ \ \ \ \ self\ *=\ \mbox{\hyperlink{real128_8hpp_ac7d6999aca6d173e118c185e3c4513db}{FC\_REAL128\_PRECISION}};}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00036}00036\ \ \ \ \ \ \ self\ /=\ other;}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00037}00037\ \ \ \ \ \ \ fixed\ =\ self;}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00039}00039\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00040}00040\ \ \ \ \}\ \mbox{\hyperlink{exception_8hpp_a094902280cad82ad6529ebbd12a697eb}{FC\_CAPTURE\_AND\_RETHROW}}(\ (*\textcolor{keyword}{this})(o)\ )\ \}}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00042}\mbox{\hyperlink{classfc_1_1real128_a22168634d6c0642f5298cb503d2916af}{00042}}\ \ \ \ \mbox{\hyperlink{classfc_1_1real128}{real128}}\&\ \mbox{\hyperlink{classfc_1_1real128_a22168634d6c0642f5298cb503d2916af}{real128::operator\ *=\ }}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1real128}{real128}}\&\ o\ )}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00043}00043\ \ \ \ \{\ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00044}00044\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bigint}{fc::bigint}}\ self(fixed);}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00045}00045\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bigint}{fc::bigint}}\ other(o.fixed);}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00046}00046\ \ \ \ \ \ \ self\ *=\ other;}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00047}00047\ \ \ \ \ \ \ self\ /=\ \mbox{\hyperlink{real128_8hpp_ac7d6999aca6d173e118c185e3c4513db}{FC\_REAL128\_PRECISION}};}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00048}00048\ \ \ \ \ \ \ fixed\ =\ self;}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00049}00049\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00050}00050\ \ \ \ \}\ \mbox{\hyperlink{exception_8hpp_a094902280cad82ad6529ebbd12a697eb}{FC\_CAPTURE\_AND\_RETHROW}}(\ (*\textcolor{keyword}{this})(o)\ )\ \}}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00052}00052\ }
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00053}\mbox{\hyperlink{classfc_1_1real128_ae105bbfed47ef87953b1e72156c4b7d7}{00053}}\ \ \ \ \mbox{\hyperlink{classfc_1_1real128_a097da5b9bf1cf07153422781be41a16d}{real128::real128}}(\ \textcolor{keyword}{const}\ std::string\&\ ratio\_str\ )}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00054}00054\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00055}00055\ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ c\ =\ ratio\_str.c\_str();}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00056}00056\ \ \ \ \ \ \textcolor{keywordtype}{int}\ digit\ =\ *c\ -\/\ \textcolor{charliteral}{'0'};}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00057}00057\ \ \ \ \ \ \textcolor{keywordflow}{if}\ (digit\ >=\ 0\ \&\&\ digit\ <=\ 9)}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00058}00058\ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00059}00059\ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ int\_part\ =\ digit;}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00060}00060\ \ \ \ \ \ \ \ ++c;}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00061}00061\ \ \ \ \ \ \ \ digit\ =\ *c\ -\/\ \textcolor{charliteral}{'0'};}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00062}00062\ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (digit\ >=\ 0\ \&\&\ digit\ <=\ 9)}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00063}00063\ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00064}00064\ \ \ \ \ \ \ \ \ \ int\_part\ =\ int\_part\ *\ 10\ +\ digit;}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00065}00065\ \ \ \ \ \ \ \ \ \ ++c;}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00066}00066\ \ \ \ \ \ \ \ \ \ digit\ =\ *c\ -\/\ \textcolor{charliteral}{'0'};}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00067}00067\ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00068}00068\ \ \ \ \ \ \ \ *\textcolor{keyword}{this}\ =\ \mbox{\hyperlink{classfc_1_1real128_a097da5b9bf1cf07153422781be41a16d}{real128}}(int\_part);}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00069}00069\ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00070}00070\ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00071}00071\ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00072}00072\ \ \ \ \ \ \ \ \textcolor{comment}{//\ if\ the\ string\ doesn't\ look\ like\ "{}123.45"{}\ or\ "{}.45"{},\ this\ code\ isn't\ designed\ to\ parse\ it\ correctly}}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00073}00073\ \ \ \ \ \ \ \ \textcolor{comment}{//\ in\ particular,\ we\ don't\ try\ to\ handle\ leading\ whitespace\ or\ '+'/'-\/'\ indicators\ at\ the\ beginning}}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00074}00074\ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(*c\ ==\ \textcolor{charliteral}{'.'});}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00075}00075\ \ \ \ \ \ \ \ fixed\ =\ \mbox{\hyperlink{classfc_1_1uint128}{fc::uint128}}();}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00076}00076\ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00077}00077\ }
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00079}00079\ \ \ \ \ \ \textcolor{keywordflow}{if}\ (*c\ ==\ \textcolor{charliteral}{'.'})}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00080}00080\ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00081}00081\ \ \ \ \ \ \ \ c++;}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00082}00082\ \ \ \ \ \ \ \ digit\ =\ *c\ -\/\ \textcolor{charliteral}{'0'};}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00083}00083\ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (digit\ >=\ 0\ \&\&\ digit\ <=\ 9)}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00084}00084\ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00085}00085\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ frac\_part\ =\ digit;}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00086}00086\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ frac\_magnitude\ =\ 10;}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00087}00087\ \ \ \ \ \ \ \ \ \ ++c;}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00088}00088\ \ \ \ \ \ \ \ \ \ digit\ =\ *c\ -\/\ \textcolor{charliteral}{'0'};}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00089}00089\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (digit\ >=\ 0\ \&\&\ digit\ <=\ 9)}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00090}00090\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00091}00091\ \ \ \ \ \ \ \ \ \ \ \ frac\_part\ =\ frac\_part\ *\ 10\ +\ digit;}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00092}00092\ \ \ \ \ \ \ \ \ \ \ \ frac\_magnitude\ *=\ 10;}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00093}00093\ \ \ \ \ \ \ \ \ \ \ \ ++c;}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00094}00094\ \ \ \ \ \ \ \ \ \ \ \ digit\ =\ *c\ -\/\ \textcolor{charliteral}{'0'};}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00095}00095\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00096}00096\ \ \ \ \ \ \ \ \ \ *\textcolor{keyword}{this}\ +=\ \mbox{\hyperlink{classfc_1_1real128_a097da5b9bf1cf07153422781be41a16d}{real128}}(\ frac\_part\ )\ /\ \mbox{\hyperlink{classfc_1_1real128_a097da5b9bf1cf07153422781be41a16d}{real128}}(\ frac\_magnitude\ );}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00097}00097\ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00098}00098\ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00099}00099\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00100}\mbox{\hyperlink{classfc_1_1real128_a44f0f700768ba7c54874005c1a35647e}{00100}}\ \ \ \ real128::operator\ std::string()\textcolor{keyword}{const}}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00101}00101\ \textcolor{keyword}{\ \ \ }\{}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00102}00102\ \ \ \ \ \ \ std::stringstream\ ss;}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00103}00103\ \ \ \ \ \ \ ss\ <<\ std::string(fixed\ /\ \mbox{\hyperlink{real128_8hpp_ac7d6999aca6d173e118c185e3c4513db}{FC\_REAL128\_PRECISION}});}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00104}00104\ \ \ \ \ \ \ ss\ <<\ \textcolor{charliteral}{'.'};}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00105}00105\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ frac\ =\ (fixed\ \%\ \mbox{\hyperlink{real128_8hpp_ac7d6999aca6d173e118c185e3c4513db}{FC\_REAL128\_PRECISION}})\ +\ \mbox{\hyperlink{real128_8hpp_ac7d6999aca6d173e118c185e3c4513db}{FC\_REAL128\_PRECISION}};}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00106}00106\ \ \ \ \ \ \ ss\ <<\ std::string(\ frac\ ).substr(1);}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00107}00107\ }
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00108}00108\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ number\ =\ ss.str();}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00109}00109\ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\ \ number.back()\ ==\ \textcolor{charliteral}{'0'}\ )\ number.pop\_back();}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00110}00110\ }
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00111}00111\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ number;}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00112}00112\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00113}00113\ }
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00114}\mbox{\hyperlink{classfc_1_1real128_a89773971c76d0b6c18b734c20094e3c2}{00114}}\ \ \ \ \mbox{\hyperlink{classfc_1_1real128}{real128}}\ \mbox{\hyperlink{classfc_1_1real128_a89773971c76d0b6c18b734c20094e3c2}{real128::from\_fixed}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1uint128}{uint128}}\&\ fixed\ )}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00115}00115\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00116}00116\ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1real128}{real128}}\ result;}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00117}00117\ \ \ \ \ \ \ \ result.fixed\ =\ fixed;}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00118}00118\ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00119}00119\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00120}00120\ }
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00121}\mbox{\hyperlink{namespacefc_af8b901079ab6961265f159f45e8c8a50}{00121}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefc_adea61f2343de94d0fbcb920a32332ad9}{to\_variant}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1real128}{real128}}\&\ var,\ \ \mbox{\hyperlink{classfc_1_1variant}{variant}}\&\ vo\ )}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00122}00122\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00123}00123\ \ \ \ \ \ \ vo\ =\ std::string(var);}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00124}00124\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00125}\mbox{\hyperlink{namespacefc_a64c3f3dead69a5d90791f81445cb1e92}{00125}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefc_accef08adf4ee05c36ccc550d8101b08f}{from\_variant}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1variant}{variant}}\&\ var,\ \ \mbox{\hyperlink{classfc_1_1real128}{real128}}\&\ vo\ )}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00126}00126\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00127}00127\ \ \ \ \ \ vo\ =\ \mbox{\hyperlink{classfc_1_1real128}{real128}}(var.\mbox{\hyperlink{classfc_1_1variant_acbd70a93184e4277631f2a261acb707c}{as\_string}}());}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00128}00128\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00129}00129\ }
+\DoxyCodeLine{\Hypertarget{real128_8cpp_source_l00130}00130\ \}\ \textcolor{comment}{//\ namespace\ fc}}
+
+\end{DoxyCode}

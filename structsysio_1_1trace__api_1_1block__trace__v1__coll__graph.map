@@ -1,0 +1,12 @@
+<map id="sysio::trace_api::block_trace_v1" name="sysio::trace_api::block_trace_v1">
+<area shape="rect" id="Node000001" title=" " alt="" coords="503,30,656,70"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1trace__api_1_1block__trace__v0.html" title=" " alt="" coords="302,76,454,117"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="468,73,502,65,503,70,470,78"/>
+<area shape="rect" id="Node000003" href="$classfc_1_1sha256.html" title=" " alt="" coords="55,15,138,40"/>
+<area shape="poly" id="edge5_Node000001_Node000003" title=" " alt="" coords="153,27,278,31,503,43,503,48,278,37,153,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="150,43,212,61,302,81,300,86,211,67,149,48"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1chain_1_1block__timestamp.html" title=" " alt="" coords="5,76,188,147"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="203,110,277,108,301,106,301,111,278,113,203,116"/>
+<area shape="rect" id="Node000005" href="$structsysio_1_1chain_1_1name.html" title="Immutable except for fc::from_variant." alt="" coords="31,171,162,196"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="164,164,277,131,321,115,323,120,278,136,165,169"/>
+</map>

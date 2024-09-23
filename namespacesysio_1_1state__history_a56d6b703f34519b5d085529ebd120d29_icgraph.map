@@ -1,0 +1,10 @@
+<map id="sysio::state_history::zlib_compress_bytes" name="sysio::state_history::zlib_compress_bytes">
+<area shape="rect" id="Node000001" title=" " alt="" coords="519,39,671,79"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1state__history__plugin__impl.html#abada9ce88fb6a33aa4ac4c9d4726bf67" title=" " alt="" coords="267,5,471,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="503,48,471,43,472,38,504,43"/>
+<area shape="rect" id="Node000004" href="$structsysio_1_1state__history__plugin__impl.html#a2074796cb93f0dda90a98f2d5ef143ee" title=" " alt="" coords="282,71,456,111"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="504,75,456,81,455,76,503,69"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1state__history__plugin__impl.html#aaa0729b45ec2388fbc2b5feefde76292" title=" " alt="" coords="5,39,219,79"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="252,44,220,48,219,42,251,38"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="267,81,219,75,219,70,267,76"/>
+</map>

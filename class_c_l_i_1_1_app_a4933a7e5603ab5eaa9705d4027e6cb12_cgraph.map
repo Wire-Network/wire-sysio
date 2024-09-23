@@ -1,0 +1,9 @@
+<map id="CLI::App::count_all" name="CLI::App::count_all">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,55,139,80"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_option.html#a154543609c45d9c59c69991a08ca272b" title="Count the total number of times an option was passed." alt="" coords="192,5,320,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="122,51,190,33,192,38,124,57"/>
+<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_app.html#adeac41bd40859dfbff9817244c09c989" title="Get the name of the current app." alt="" coords="187,55,325,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="139,65,171,65,171,70,139,70"/>
+<area shape="rect" id="Node000004" href="$xbyak__mnemonic_8h.html#ad8856ea517c970ed0584a251c3fdc94f" title=" " alt="" coords="235,104,277,130"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="124,78,220,105,219,110,122,84"/>
+</map>

@@ -1,0 +1,12 @@
+<map id="secp256k1_ec_pubkey_combine" name="secp256k1_ec_pubkey_combine">
+<area shape="rect" id="Node000001" title=" " alt="" coords="499,22,654,62"/>
+<area shape="rect" id="Node000002" href="$tests_8c.html#a32498e86a99a258f68cd4b1176f47966" title=" " alt="" coords="103,5,283,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="484,39,283,26,284,21,484,34"/>
+<area shape="rect" id="Node000004" href="$tests_8c.html#af668387a475fa94107e316b2ddc003cf" title=" " alt="" coords="331,55,451,80"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="484,58,452,62,452,57,483,52"/>
+<area shape="rect" id="Node000003" href="$tests_8c.html#a3c04138a5bfe5d72780bb7e82a18e627" title=" " alt="" coords="5,31,55,56"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="92,37,56,42,55,37,91,31"/>
+<area shape="rect" id="Node000005" href="$tests_8c.html#a394075284eed27ac8d87935f73d4c673" title=" " alt="" coords="135,55,251,80"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="315,70,252,70,252,65,315,65"/>
+<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="119,59,55,50,55,44,120,54"/>
+</map>

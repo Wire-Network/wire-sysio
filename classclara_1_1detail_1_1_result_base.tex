@@ -1,0 +1,140 @@
+\doxysection{clara\+::detail\+::Result\+Base Class Reference}
+\hypertarget{classclara_1_1detail_1_1_result_base}{}\label{classclara_1_1detail_1_1_result_base}\index{clara::detail::ResultBase@{clara::detail::ResultBase}}
+
+
+{\ttfamily \#include $<$clara.\+hpp$>$}
+
+
+
+Inheritance diagram for clara\+::detail\+::Result\+Base\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classclara_1_1detail_1_1_result_base__inherit__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{classclara_1_1detail_1_1_result_base_aa12e1603c08124d8ca758eb3ff0525ba}{Type}} \{ \mbox{\hyperlink{classclara_1_1detail_1_1_result_base_aa12e1603c08124d8ca758eb3ff0525baa9808252239f2d5b1f989dc71fedc49b2}{Ok}}
+, \mbox{\hyperlink{classclara_1_1detail_1_1_result_base_aa12e1603c08124d8ca758eb3ff0525baa60cc102497325f938f770f25c588c8ee}{Logic\+Error}}
+, \mbox{\hyperlink{classclara_1_1detail_1_1_result_base_aa12e1603c08124d8ca758eb3ff0525baa3d95feafa8e4df6f160fb39d15cbd7aa}{Runtime\+Error}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classclara_1_1detail_1_1_result_base_aac4cb9b0a9bf851f2bde244a80748cf9}{Result\+Base}} (\mbox{\hyperlink{classclara_1_1detail_1_1_result_base_aa12e1603c08124d8ca758eb3ff0525ba}{Type}} type)
+\item 
+virtual \mbox{\hyperlink{classclara_1_1detail_1_1_result_base_a2b113bd711a7491b0e91bf98f8e63465}{\texorpdfstring{$\sim$}{\string~}\+Result\+Base}} ()=default
+\item 
+virtual void \mbox{\hyperlink{classclara_1_1detail_1_1_result_base_adf549420db016c783cc0bc72dd9a790e}{enforce\+Ok}} () const =0
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classclara_1_1detail_1_1_result_base_aa12e1603c08124d8ca758eb3ff0525ba}{Type}} \mbox{\hyperlink{classclara_1_1detail_1_1_result_base_acd405f9567e1dfcf135b468c597dd560}{m\+\_\+type}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{third__party_2clara_8hpp_source_l00520}{520}} of file \mbox{\hyperlink{third__party_2clara_8hpp_source}{clara.\+hpp}}.
+
+
+
+\doxysubsection{Member Enumeration Documentation}
+\Hypertarget{classclara_1_1detail_1_1_result_base_aa12e1603c08124d8ca758eb3ff0525ba}\index{clara::detail::ResultBase@{clara::detail::ResultBase}!Type@{Type}}
+\index{Type@{Type}!clara::detail::ResultBase@{clara::detail::ResultBase}}
+\doxysubsubsection{\texorpdfstring{Type}{Type}}
+{\footnotesize\ttfamily \label{classclara_1_1detail_1_1_result_base_aa12e1603c08124d8ca758eb3ff0525ba} 
+enum \mbox{\hyperlink{classclara_1_1detail_1_1_result_base_aa12e1603c08124d8ca758eb3ff0525ba}{clara\+::detail\+::\+Result\+Base\+::\+Type}}}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Ok@{Ok}!clara::detail::ResultBase@{clara::detail::ResultBase}}\index{clara::detail::ResultBase@{clara::detail::ResultBase}!Ok@{Ok}}}\Hypertarget{classclara_1_1detail_1_1_result_base_aa12e1603c08124d8ca758eb3ff0525baa9808252239f2d5b1f989dc71fedc49b2}\label{classclara_1_1detail_1_1_result_base_aa12e1603c08124d8ca758eb3ff0525ba} 
+Ok&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{LogicError@{LogicError}!clara::detail::ResultBase@{clara::detail::ResultBase}}\index{clara::detail::ResultBase@{clara::detail::ResultBase}!LogicError@{LogicError}}}\Hypertarget{classclara_1_1detail_1_1_result_base_aa12e1603c08124d8ca758eb3ff0525baa60cc102497325f938f770f25c588c8ee}\label{classclara_1_1detail_1_1_result_base_aa12e1603c08124d8ca758eb3ff0525ba} 
+Logic\+Error&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{RuntimeError@{RuntimeError}!clara::detail::ResultBase@{clara::detail::ResultBase}}\index{clara::detail::ResultBase@{clara::detail::ResultBase}!RuntimeError@{RuntimeError}}}\Hypertarget{classclara_1_1detail_1_1_result_base_aa12e1603c08124d8ca758eb3ff0525baa3d95feafa8e4df6f160fb39d15cbd7aa}\label{classclara_1_1detail_1_1_result_base_aa12e1603c08124d8ca758eb3ff0525ba} 
+Runtime\+Error&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{third__party_2clara_8hpp_source_l00522}{522}} of file \mbox{\hyperlink{third__party_2clara_8hpp_source}{clara.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00522\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00523\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classclara_1_1detail_1_1_result_base_aa12e1603c08124d8ca758eb3ff0525baa9808252239f2d5b1f989dc71fedc49b2}{Ok}},\ \mbox{\hyperlink{classclara_1_1detail_1_1_result_base_aa12e1603c08124d8ca758eb3ff0525baa60cc102497325f938f770f25c588c8ee}{LogicError}},\ \mbox{\hyperlink{classclara_1_1detail_1_1_result_base_aa12e1603c08124d8ca758eb3ff0525baa3d95feafa8e4df6f160fb39d15cbd7aa}{RuntimeError}}}
+\DoxyCodeLine{00524\ \ \ \ \ \ \ \ \ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classclara_1_1detail_1_1_result_base_aac4cb9b0a9bf851f2bde244a80748cf9}\index{clara::detail::ResultBase@{clara::detail::ResultBase}!ResultBase@{ResultBase}}
+\index{ResultBase@{ResultBase}!clara::detail::ResultBase@{clara::detail::ResultBase}}
+\doxysubsubsection{\texorpdfstring{ResultBase()}{ResultBase()}}
+{\footnotesize\ttfamily \label{classclara_1_1detail_1_1_result_base_aac4cb9b0a9bf851f2bde244a80748cf9} 
+clara\+::detail\+::\+Result\+Base\+::\+Result\+Base (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classclara_1_1detail_1_1_result_base_aa12e1603c08124d8ca758eb3ff0525ba}{Type}}}]{type}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{third__party_2clara_8hpp_source_l00527}{527}} of file \mbox{\hyperlink{third__party_2clara_8hpp_source}{clara.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00527\ :\ \mbox{\hyperlink{classclara_1_1detail_1_1_result_base_acd405f9567e1dfcf135b468c597dd560}{m\_type}}(\ type\ )\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classclara_1_1detail_1_1_result_base_a2b113bd711a7491b0e91bf98f8e63465}\index{clara::detail::ResultBase@{clara::detail::ResultBase}!````~ResultBase@{\texorpdfstring{$\sim$}{\string~}ResultBase}}
+\index{````~ResultBase@{\texorpdfstring{$\sim$}{\string~}ResultBase}!clara::detail::ResultBase@{clara::detail::ResultBase}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}ResultBase()}{\string~ResultBase()}}
+{\footnotesize\ttfamily \label{classclara_1_1detail_1_1_result_base_a2b113bd711a7491b0e91bf98f8e63465} 
+virtual clara\+::detail\+::\+Result\+Base\+::\texorpdfstring{$\sim$}{\string~}\+Result\+Base (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [virtual]}, {\ttfamily [default]}}
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classclara_1_1detail_1_1_result_base_adf549420db016c783cc0bc72dd9a790e}\index{clara::detail::ResultBase@{clara::detail::ResultBase}!enforceOk@{enforceOk}}
+\index{enforceOk@{enforceOk}!clara::detail::ResultBase@{clara::detail::ResultBase}}
+\doxysubsubsection{\texorpdfstring{enforceOk()}{enforceOk()}}
+{\footnotesize\ttfamily \label{classclara_1_1detail_1_1_result_base_adf549420db016c783cc0bc72dd9a790e} 
+virtual void clara\+::detail\+::\+Result\+Base\+::enforce\+Ok (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{classclara_1_1detail_1_1_basic_result_acc2672c2d6a6a14497efc33e04854f2f}{clara\+::detail\+::\+Basic\+Result$<$ T $>$}}.
+
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classclara_1_1detail_1_1_result_base_adf549420db016c783cc0bc72dd9a790e_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classclara_1_1detail_1_1_result_base_acd405f9567e1dfcf135b468c597dd560}\index{clara::detail::ResultBase@{clara::detail::ResultBase}!m\_type@{m\_type}}
+\index{m\_type@{m\_type}!clara::detail::ResultBase@{clara::detail::ResultBase}}
+\doxysubsubsection{\texorpdfstring{m\_type}{m\_type}}
+{\footnotesize\ttfamily \label{classclara_1_1detail_1_1_result_base_acd405f9567e1dfcf135b468c597dd560} 
+\mbox{\hyperlink{classclara_1_1detail_1_1_result_base_aa12e1603c08124d8ca758eb3ff0525ba}{Type}} clara\+::detail\+::\+Result\+Base\+::m\+\_\+type\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{third__party_2clara_8hpp_source_l00532}{532}} of file \mbox{\hyperlink{third__party_2clara_8hpp_source}{clara.\+hpp}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/third\+\_\+party/\mbox{\hyperlink{third__party_2clara_8hpp}{clara.\+hpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,14 @@
+<map id="Catch::prepareExpandedExpression" name="Catch::prepareExpandedExpression">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,48,236,73"/>
+<area shape="rect" id="Node000002" href="$class_catch_1_1_assertion_result.html#aaa46070791a6c07caaed86229b8d9d75" title=" " alt="" coords="284,40,454,81"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="236,58,268,58,268,63,236,63"/>
+<area shape="rect" id="Node000003" href="$class_catch_1_1_assertion_result.html#a26a777f3959353c729544cb2ace0d279" title=" " alt="" coords="516,5,673,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="454,45,500,37,501,43,455,50"/>
+<area shape="rect" id="Node000005" href="$struct_catch_1_1_assertion_result_data.html#a21c9d6ed92a8beaeeb229302ca8cffbb" title=" " alt="" coords="502,72,687,113"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="455,70,487,74,486,80,454,75"/>
+<area shape="rect" id="Node000004" href="$namespace_catch.html#a93ef4e3e307a2021ca0d41b32c0e54b0" title=" " alt="" coords="779,10,910,36"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="674,22,763,21,763,27,674,27"/>
+<area shape="rect" id="Node000006" href="$class_catch_1_1_reusable_string_stream.html#a0e9ecf260b2a5d35f4886ef0d51f6270" title=" " alt="" coords="735,84,954,109"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="688,91,720,92,720,97,688,96"/>
+<area shape="poly" id="edge6_Node000006_Node000006" title=" " alt="" coords="803,85,795,75,800,65,817,59,845,57,876,60,891,67,889,72,874,65,844,62,818,64,804,69,800,74,807,81"/>
+</map>

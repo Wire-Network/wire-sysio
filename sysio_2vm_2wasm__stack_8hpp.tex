@@ -1,0 +1,34 @@
+\doxysection{libraries/sys-\/vm/include/sysio/sysio/vm/wasm\+\_\+stack.hpp File Reference}
+\hypertarget{sysio_2vm_2wasm__stack_8hpp}{}\label{sysio_2vm_2wasm__stack_8hpp}\index{libraries/sys-\/vm/include/sysio/sysio/vm/wasm\_stack.hpp@{libraries/sys-\/vm/include/sysio/sysio/vm/wasm\_stack.hpp}}
+{\ttfamily \#include $<$sysio/vm/allocator.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/vm/constants.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/vm/exceptions.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/vm/stack\+\_\+elem.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/vm/types.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/vm/vector.\+hpp$>$}\newline
+Include dependency graph for wasm\+\_\+stack.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sysio_2vm_2wasm__stack_8hpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classsysio_1_1vm_1_1stack}{sysio\+::vm\+::stack$<$ Elem\+T, Elem\+Sz, Allocator $>$}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1vm}{sysio\+::vm}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1vm_a80b2c5cc5651a70a1f86e6390546fbd6}{sysio\+::vm\+::operand\+\_\+stack}} = \mbox{\hyperlink{classsysio_1_1vm_1_1stack}{stack}}$<$\mbox{\hyperlink{classsysio_1_1vm_1_1operand__stack__elem}{operand\+\_\+stack\+\_\+elem}}, constants\+::initial\+\_\+stack\+\_\+size$>$
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1vm_a5491df8eb4ad32b5173d3678e0341d67}{sysio\+::vm\+::call\+\_\+stack}} = \mbox{\hyperlink{classsysio_1_1vm_1_1stack}{stack}}$<$\mbox{\hyperlink{structsysio_1_1vm_1_1activation__frame}{activation\+\_\+frame}}, constants\+::max\+\_\+call\+\_\+depth + 1, \mbox{\hyperlink{classsysio_1_1vm_1_1bounded__allocator}{bounded\+\_\+allocator}}$>$
+\end{DoxyCompactItemize}

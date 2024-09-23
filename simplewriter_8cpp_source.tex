@@ -1,0 +1,42 @@
+\doxysection{simplewriter.\+cpp}
+\hypertarget{simplewriter_8cpp_source}{}\label{simplewriter_8cpp_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/example/simplewriter/simplewriter.cpp@{libraries/fc/include/fc/crypto/webauthn\_json/example/simplewriter/simplewriter.cpp}}
+\mbox{\hyperlink{simplewriter_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{simplewriter_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{writer_8h}{rapidjson/writer.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{simplewriter_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{stringbuffer_8h}{rapidjson/stringbuffer.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{simplewriter_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <iostream>}}
+\DoxyCodeLine{\Hypertarget{simplewriter_8cpp_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{simplewriter_8cpp_source_l00005}00005\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacerapidjson}{rapidjson}};}
+\DoxyCodeLine{\Hypertarget{simplewriter_8cpp_source_l00006}00006\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacestd}{std}};}
+\DoxyCodeLine{\Hypertarget{simplewriter_8cpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{simplewriter_8cpp_source_l00008}\mbox{\hyperlink{simplewriter_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{00008}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{simplewriter_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}()\ \{}
+\DoxyCodeLine{\Hypertarget{simplewriter_8cpp_source_l00009}00009\ \ \ \ \ \mbox{\hyperlink{class_generic_string_buffer}{StringBuffer}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{\Hypertarget{simplewriter_8cpp_source_l00010}00010\ \ \ \ \ \mbox{\hyperlink{class_writer}{Writer<StringBuffer>}}\ writer(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{\Hypertarget{simplewriter_8cpp_source_l00011}00011\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{simplewriter_8cpp_source_l00012}00012\ \ \ \ \ writer.\mbox{\hyperlink{class_writer_aec3200b2fc80ec87d1c37f775256b2e1}{StartObject}}();\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Between\ StartObject()/EndObject(),\ }}
+\DoxyCodeLine{\Hypertarget{simplewriter_8cpp_source_l00013}00013\ \ \ \ \ writer.\mbox{\hyperlink{class_writer_a19096d2ccb90761f63ab1240337bf90a}{Key}}(\textcolor{stringliteral}{"{}hello"{}});\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ output\ a\ key,}}
+\DoxyCodeLine{\Hypertarget{simplewriter_8cpp_source_l00014}00014\ \ \ \ \ writer.\mbox{\hyperlink{class_writer_a8b4dc44f471403a83c9959575796ceab}{String}}(\textcolor{stringliteral}{"{}world"{}});\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ follow\ by\ a\ value.}}
+\DoxyCodeLine{\Hypertarget{simplewriter_8cpp_source_l00015}00015\ \ \ \ \ writer.\mbox{\hyperlink{class_writer_a19096d2ccb90761f63ab1240337bf90a}{Key}}(\textcolor{stringliteral}{"{}t"{}});}
+\DoxyCodeLine{\Hypertarget{simplewriter_8cpp_source_l00016}00016\ \ \ \ \ writer.\mbox{\hyperlink{class_writer_ad7491f4dedb02e7456b240b23ef8c1ad}{Bool}}(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{simplewriter_8cpp_source_l00017}00017\ \ \ \ \ writer.\mbox{\hyperlink{class_writer_a19096d2ccb90761f63ab1240337bf90a}{Key}}(\textcolor{stringliteral}{"{}f"{}});}
+\DoxyCodeLine{\Hypertarget{simplewriter_8cpp_source_l00018}00018\ \ \ \ \ writer.\mbox{\hyperlink{class_writer_ad7491f4dedb02e7456b240b23ef8c1ad}{Bool}}(\textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{simplewriter_8cpp_source_l00019}00019\ \ \ \ \ writer.\mbox{\hyperlink{class_writer_a19096d2ccb90761f63ab1240337bf90a}{Key}}(\textcolor{stringliteral}{"{}n"{}});}
+\DoxyCodeLine{\Hypertarget{simplewriter_8cpp_source_l00020}00020\ \ \ \ \ writer.\mbox{\hyperlink{class_writer_af700ed03c8810d48a4aaa3c5baeaf26c}{Null}}();}
+\DoxyCodeLine{\Hypertarget{simplewriter_8cpp_source_l00021}00021\ \ \ \ \ writer.\mbox{\hyperlink{class_writer_a19096d2ccb90761f63ab1240337bf90a}{Key}}(\textcolor{stringliteral}{"{}i"{}});}
+\DoxyCodeLine{\Hypertarget{simplewriter_8cpp_source_l00022}00022\ \ \ \ \ writer.\mbox{\hyperlink{class_writer_a5fb0c3228f89f6f9bef15f3e6e6f1739}{Uint}}(123);}
+\DoxyCodeLine{\Hypertarget{simplewriter_8cpp_source_l00023}00023\ \ \ \ \ writer.\mbox{\hyperlink{class_writer_a19096d2ccb90761f63ab1240337bf90a}{Key}}(\textcolor{stringliteral}{"{}pi"{}});}
+\DoxyCodeLine{\Hypertarget{simplewriter_8cpp_source_l00024}00024\ \ \ \ \ writer.\mbox{\hyperlink{class_writer_a22a43e8a7193105deec6b808736f7a1a}{Double}}(3.1416);}
+\DoxyCodeLine{\Hypertarget{simplewriter_8cpp_source_l00025}00025\ \ \ \ \ writer.\mbox{\hyperlink{class_writer_a19096d2ccb90761f63ab1240337bf90a}{Key}}(\textcolor{stringliteral}{"{}a"{}});}
+\DoxyCodeLine{\Hypertarget{simplewriter_8cpp_source_l00026}00026\ \ \ \ \ writer.\mbox{\hyperlink{class_writer_a38715785194b42cd67ba5dd52bf7967e}{StartArray}}();\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Between\ StartArray()/EndArray(),}}
+\DoxyCodeLine{\Hypertarget{simplewriter_8cpp_source_l00027}00027\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{unsigned}\ i\ =\ 0;\ i\ <\ 4;\ i++)}
+\DoxyCodeLine{\Hypertarget{simplewriter_8cpp_source_l00028}00028\ \ \ \ \ \ \ \ \ writer.\mbox{\hyperlink{class_writer_a5fb0c3228f89f6f9bef15f3e6e6f1739}{Uint}}(i);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ all\ values\ are\ elements\ of\ the\ array.}}
+\DoxyCodeLine{\Hypertarget{simplewriter_8cpp_source_l00029}00029\ \ \ \ \ writer.\mbox{\hyperlink{class_writer_ac88d533095591a878500b63b351d4013}{EndArray}}();}
+\DoxyCodeLine{\Hypertarget{simplewriter_8cpp_source_l00030}00030\ \ \ \ \ writer.\mbox{\hyperlink{class_writer_a0771a565261564c27676b7300b11f2b5}{EndObject}}();}
+\DoxyCodeLine{\Hypertarget{simplewriter_8cpp_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{simplewriter_8cpp_source_l00032}00032\ \ \ \ \ \textcolor{comment}{//\ \{"{}hello"{}:"{}world"{},"{}t"{}:true,"{}f"{}:false,"{}n"{}:null,"{}i"{}:123,"{}pi"{}:3.1416,"{}a"{}:[0,1,2,3]\}}}
+\DoxyCodeLine{\Hypertarget{simplewriter_8cpp_source_l00033}00033\ \ \ \ \ cout\ <<\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.GetString()\ <<\ endl;}
+\DoxyCodeLine{\Hypertarget{simplewriter_8cpp_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{simplewriter_8cpp_source_l00035}00035\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{simplewriter_8cpp_source_l00036}00036\ \}}
+
+\end{DoxyCode}

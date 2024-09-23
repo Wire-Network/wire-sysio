@@ -1,0 +1,236 @@
+\doxysection{sysio\+::testing\+::mock\+::webauthn\+\_\+private\+\_\+key Struct Reference}
+\hypertarget{structsysio_1_1testing_1_1mock_1_1webauthn__private__key}{}\label{structsysio_1_1testing_1_1mock_1_1webauthn__private__key}\index{sysio::testing::mock::webauthn\_private\_key@{sysio::testing::mock::webauthn\_private\_key}}
+
+
+{\ttfamily \#include $<$tester.\+hpp$>$}
+
+
+
+Collaboration diagram for sysio\+::testing\+::mock\+::webauthn\+\_\+private\+\_\+key\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=293pt]{structsysio_1_1testing_1_1mock_1_1webauthn__private__key__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1testing_1_1mock_1_1webauthn__private__key_a910d73126307fa9f6100aedb3e13c454}{webauthn\+\_\+private\+\_\+key}} (\mbox{\hyperlink{classfc_1_1crypto_1_1r1_1_1private__key}{r1\+::private\+\_\+key}} \&\&\mbox{\hyperlink{structsysio_1_1testing_1_1mock_1_1webauthn__private__key_a05419bf91a27ad64e42237efe7999feb}{priv\+\_\+key}})
+\item 
+\mbox{\hyperlink{structsysio_1_1testing_1_1mock_1_1webauthn__private__key_a2d3106b1f675a77ff96050d56c0f5f84}{webauthn\+\_\+private\+\_\+key}} (\mbox{\hyperlink{structsysio_1_1testing_1_1mock_1_1webauthn__private__key}{webauthn\+\_\+private\+\_\+key}} \&\&)=default
+\item 
+\mbox{\hyperlink{structsysio_1_1testing_1_1mock_1_1webauthn__private__key_a60634b9f5b61999e7c96e666de9bf2ef}{webauthn\+\_\+private\+\_\+key}} (const \mbox{\hyperlink{structsysio_1_1testing_1_1mock_1_1webauthn__private__key}{webauthn\+\_\+private\+\_\+key}} \&)=default
+\item 
+\mbox{\hyperlink{classfc_1_1crypto_1_1public__key}{public\+\_\+key}} \mbox{\hyperlink{structsysio_1_1testing_1_1mock_1_1webauthn__private__key_aea8772215cc3512d70b352a50a990fdb}{get\+\_\+public\+\_\+key}} (\mbox{\hyperlink{classfc_1_1crypto_1_1webauthn_1_1public__key_a68ab318f7c3904d81be44f53319c7303}{webauthn\+::public\+\_\+key\+::user\+\_\+presence\+\_\+t}} presence=webauthn\+::public\+\_\+key\+::user\+\_\+presence\+\_\+t\+::\+USER\+\_\+\+PRESENCE\+\_\+\+NONE) const
+\item 
+\mbox{\hyperlink{classfc_1_1crypto_1_1signature}{signature}} \mbox{\hyperlink{structsysio_1_1testing_1_1mock_1_1webauthn__private__key_afa88c8e06b8a8fffaa82a201b5326380}{sign}} (const \mbox{\hyperlink{classfc_1_1sha256}{sha256}} \&\mbox{\hyperlink{namespacefc_a150ca4cd9c0318ca45dc0dc7df5d58b9}{digest}}, bool=true) const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static auto \mbox{\hyperlink{structsysio_1_1testing_1_1mock_1_1webauthn__private__key_a05b2982062ba5cb9ad92ed071b393381}{regenerate}} (const \mbox{\hyperlink{classfc_1_1sha256}{fc\+::sha256}} \&secret)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1crypto_1_1r1_1_1private__key}{r1\+::private\+\_\+key}} \mbox{\hyperlink{structsysio_1_1testing_1_1mock_1_1webauthn__private__key_a05419bf91a27ad64e42237efe7999feb}{priv\+\_\+key}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static const std\+::string \mbox{\hyperlink{structsysio_1_1testing_1_1mock_1_1webauthn__private__key_ab57122ea654ad96804db1c3a9fa4defe}{\+\_\+origin}} = "{}mock.\+webauthn.\+invalid"{}
+\item 
+static const \mbox{\hyperlink{classfc_1_1sha256}{fc\+::sha256}} \mbox{\hyperlink{structsysio_1_1testing_1_1mock_1_1webauthn__private__key_a4eb5bec1c8d0bb89a67a513c665a13e2}{\+\_\+origin\+\_\+hash}} = \mbox{\hyperlink{classfc_1_1sha256_a474784de7d6213b855abd7e952df5e36}{fc\+::sha256\+::hash}}(\mbox{\hyperlink{structsysio_1_1testing_1_1mock_1_1webauthn__private__key_ab57122ea654ad96804db1c3a9fa4defe}{mock\+::webauthn\+\_\+private\+\_\+key\+::\+\_\+origin}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{tester_8hpp_source_l00091}{91}} of file \mbox{\hyperlink{tester_8hpp_source}{tester.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structsysio_1_1testing_1_1mock_1_1webauthn__private__key_a910d73126307fa9f6100aedb3e13c454}\index{sysio::testing::mock::webauthn\_private\_key@{sysio::testing::mock::webauthn\_private\_key}!webauthn\_private\_key@{webauthn\_private\_key}}
+\index{webauthn\_private\_key@{webauthn\_private\_key}!sysio::testing::mock::webauthn\_private\_key@{sysio::testing::mock::webauthn\_private\_key}}
+\doxysubsubsection{\texorpdfstring{webauthn\_private\_key()}{webauthn\_private\_key()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{structsysio_1_1testing_1_1mock_1_1webauthn__private__key_a910d73126307fa9f6100aedb3e13c454} 
+sysio\+::testing\+::mock\+::webauthn\+\_\+private\+\_\+key\+::webauthn\+\_\+private\+\_\+key (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1crypto_1_1r1_1_1private__key}{r1\+::private\+\_\+key}} \&\&}]{priv\+\_\+key}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{tester_8hpp_source_l00092}{92}} of file \mbox{\hyperlink{tester_8hpp_source}{tester.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ :\mbox{\hyperlink{structsysio_1_1testing_1_1mock_1_1webauthn__private__key_a05419bf91a27ad64e42237efe7999feb}{priv\_key}}(std::move(\mbox{\hyperlink{structsysio_1_1testing_1_1mock_1_1webauthn__private__key_a05419bf91a27ad64e42237efe7999feb}{priv\_key}}))}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1testing_1_1mock_1_1webauthn__private__key_a910d73126307fa9f6100aedb3e13c454_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1testing_1_1mock_1_1webauthn__private__key_a2d3106b1f675a77ff96050d56c0f5f84}\index{sysio::testing::mock::webauthn\_private\_key@{sysio::testing::mock::webauthn\_private\_key}!webauthn\_private\_key@{webauthn\_private\_key}}
+\index{webauthn\_private\_key@{webauthn\_private\_key}!sysio::testing::mock::webauthn\_private\_key@{sysio::testing::mock::webauthn\_private\_key}}
+\doxysubsubsection{\texorpdfstring{webauthn\_private\_key()}{webauthn\_private\_key()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{structsysio_1_1testing_1_1mock_1_1webauthn__private__key_a2d3106b1f675a77ff96050d56c0f5f84} 
+sysio\+::testing\+::mock\+::webauthn\+\_\+private\+\_\+key\+::webauthn\+\_\+private\+\_\+key (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1testing_1_1mock_1_1webauthn__private__key}{webauthn\+\_\+private\+\_\+key}} \&\&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [default]}}
+
+\Hypertarget{structsysio_1_1testing_1_1mock_1_1webauthn__private__key_a60634b9f5b61999e7c96e666de9bf2ef}\index{sysio::testing::mock::webauthn\_private\_key@{sysio::testing::mock::webauthn\_private\_key}!webauthn\_private\_key@{webauthn\_private\_key}}
+\index{webauthn\_private\_key@{webauthn\_private\_key}!sysio::testing::mock::webauthn\_private\_key@{sysio::testing::mock::webauthn\_private\_key}}
+\doxysubsubsection{\texorpdfstring{webauthn\_private\_key()}{webauthn\_private\_key()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{structsysio_1_1testing_1_1mock_1_1webauthn__private__key_a60634b9f5b61999e7c96e666de9bf2ef} 
+sysio\+::testing\+::mock\+::webauthn\+\_\+private\+\_\+key\+::webauthn\+\_\+private\+\_\+key (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1testing_1_1mock_1_1webauthn__private__key}{webauthn\+\_\+private\+\_\+key}} \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [default]}}
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1testing_1_1mock_1_1webauthn__private__key_aea8772215cc3512d70b352a50a990fdb}\index{sysio::testing::mock::webauthn\_private\_key@{sysio::testing::mock::webauthn\_private\_key}!get\_public\_key@{get\_public\_key}}
+\index{get\_public\_key@{get\_public\_key}!sysio::testing::mock::webauthn\_private\_key@{sysio::testing::mock::webauthn\_private\_key}}
+\doxysubsubsection{\texorpdfstring{get\_public\_key()}{get\_public\_key()}}
+{\footnotesize\ttfamily \label{structsysio_1_1testing_1_1mock_1_1webauthn__private__key_aea8772215cc3512d70b352a50a990fdb} 
+\mbox{\hyperlink{classfc_1_1crypto_1_1public__key}{public\+\_\+key}} sysio\+::testing\+::mock\+::webauthn\+\_\+private\+\_\+key\+::get\+\_\+public\+\_\+key (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1crypto_1_1webauthn_1_1public__key_a68ab318f7c3904d81be44f53319c7303}{webauthn\+::public\+\_\+key\+::user\+\_\+presence\+\_\+t}}}]{presence}{ = {\ttfamily webauthn\+:\+:public\+\_\+key\+:\+:user\+\_\+presence\+\_\+t\+:\+:USER\+\_\+PRESENCE\+\_\+NONE}}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{tester_8hpp_source_l00104}{104}} of file \mbox{\hyperlink{tester_8hpp_source}{tester.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacesysio_1_1chain_a0628a11f388cd2e43b1ccc1260a1042f}{public\_key\_type}}(webauthn::public\_key(\mbox{\hyperlink{structsysio_1_1testing_1_1mock_1_1webauthn__private__key_a05419bf91a27ad64e42237efe7999feb}{priv\_key}}.\mbox{\hyperlink{classfc_1_1crypto_1_1r1_1_1private__key_a99a8502bdd1abc670c779247d606b671}{get\_public\_key}}().\mbox{\hyperlink{classfc_1_1crypto_1_1r1_1_1public__key_a4d2870dcdd92e224a376e0284e2bacc6}{serialize}}(),\ presence,\ \mbox{\hyperlink{structsysio_1_1testing_1_1mock_1_1webauthn__private__key_ab57122ea654ad96804db1c3a9fa4defe}{\_origin}}));}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=344pt]{structsysio_1_1testing_1_1mock_1_1webauthn__private__key_aea8772215cc3512d70b352a50a990fdb_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1testing_1_1mock_1_1webauthn__private__key_a05b2982062ba5cb9ad92ed071b393381}\index{sysio::testing::mock::webauthn\_private\_key@{sysio::testing::mock::webauthn\_private\_key}!regenerate@{regenerate}}
+\index{regenerate@{regenerate}!sysio::testing::mock::webauthn\_private\_key@{sysio::testing::mock::webauthn\_private\_key}}
+\doxysubsubsection{\texorpdfstring{regenerate()}{regenerate()}}
+{\footnotesize\ttfamily \label{structsysio_1_1testing_1_1mock_1_1webauthn__private__key_a05b2982062ba5cb9ad92ed071b393381} 
+static auto sysio\+::testing\+::mock\+::webauthn\+\_\+private\+\_\+key\+::regenerate (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1sha256}{fc\+::sha256}} \&}]{secret}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{tester_8hpp_source_l00100}{100}} of file \mbox{\hyperlink{tester_8hpp_source}{tester.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1testing_1_1mock_1_1webauthn__private__key_a910d73126307fa9f6100aedb3e13c454}{webauthn\_private\_key}}(\mbox{\hyperlink{classfc_1_1crypto_1_1r1_1_1private__key_abed020ddf6cc239edccce96dbbdb4238}{r1::private\_key::regenerate}}(secret));}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1testing_1_1mock_1_1webauthn__private__key_a05b2982062ba5cb9ad92ed071b393381_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1testing_1_1mock_1_1webauthn__private__key_a05b2982062ba5cb9ad92ed071b393381_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1testing_1_1mock_1_1webauthn__private__key_afa88c8e06b8a8fffaa82a201b5326380}\index{sysio::testing::mock::webauthn\_private\_key@{sysio::testing::mock::webauthn\_private\_key}!sign@{sign}}
+\index{sign@{sign}!sysio::testing::mock::webauthn\_private\_key@{sysio::testing::mock::webauthn\_private\_key}}
+\doxysubsubsection{\texorpdfstring{sign()}{sign()}}
+{\footnotesize\ttfamily \label{structsysio_1_1testing_1_1mock_1_1webauthn__private__key_afa88c8e06b8a8fffaa82a201b5326380} 
+\mbox{\hyperlink{classfc_1_1crypto_1_1signature}{signature}} sysio\+::testing\+::mock\+::webauthn\+\_\+private\+\_\+key\+::sign (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1sha256}{sha256}} \&}]{digest}{, }\item[{bool}]{}{ = {\ttfamily true}}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{tester_8hpp_source_l00108}{108}} of file \mbox{\hyperlink{tester_8hpp_source}{tester.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ json\ =\ std::string(\textcolor{stringliteral}{"{}\{\(\backslash\)"{}origin\(\backslash\)"{}:\(\backslash\)"{}https://"{}})\ +}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1testing_1_1mock_1_1webauthn__private__key_ab57122ea654ad96804db1c3a9fa4defe}{\_origin}}\ +}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)"{},\(\backslash\)"{}type\(\backslash\)"{}:\(\backslash\)"{}webauthn.get\(\backslash\)"{},\(\backslash\)"{}challenge\(\backslash\)"{}:\(\backslash\)"{}"{}}\ +}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a4d30681e99b9cacc0c9b3b8985a5daa4}{fc::base64url\_encode}}(\mbox{\hyperlink{namespacefc_a150ca4cd9c0318ca45dc0dc7df5d58b9}{digest}}.\mbox{\hyperlink{classfc_1_1sha256_ab897537f6c524085b28049be51ed370d}{data}}(),\ \mbox{\hyperlink{namespacefc_a150ca4cd9c0318ca45dc0dc7df5d58b9}{digest}}.\mbox{\hyperlink{classfc_1_1sha256_ac7722b7428b1db345f1b7fab7f4d5774}{data\_size}}())\ +}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)"{}\}"{}};}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \ \ \ \ std::vector<uint8\_t>\ auth\_data(37);}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(auth\_data.data(),\ \mbox{\hyperlink{structsysio_1_1testing_1_1mock_1_1webauthn__private__key_a4eb5bec1c8d0bb89a67a513c665a13e2}{\_origin\_hash}}.\mbox{\hyperlink{classfc_1_1sha256_ab897537f6c524085b28049be51ed370d}{data}}(),\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{structsysio_1_1testing_1_1mock_1_1webauthn__private__key_a4eb5bec1c8d0bb89a67a513c665a13e2}{\_origin\_hash}}));}
+\DoxyCodeLine{00116\ }
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ client\_data\_hash\ =\ \mbox{\hyperlink{classfc_1_1sha256_a474784de7d6213b855abd7e952df5e36}{fc::sha256::hash}}(json);}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1sha256_1_1encoder}{fc::sha256::encoder}}\ e;}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ \ \ \ e.\mbox{\hyperlink{classfc_1_1sha256_1_1encoder_a4a246dfb33e3eb78ba167446bee92e30}{write}}((\textcolor{keywordtype}{char}*)auth\_data.data(),\ auth\_data.size());}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ \ \ \ e.\mbox{\hyperlink{classfc_1_1sha256_1_1encoder_a4a246dfb33e3eb78ba167446bee92e30}{write}}(client\_data\_hash.data(),\ client\_data\_hash.data\_size());}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ sig\ =\ \mbox{\hyperlink{structsysio_1_1testing_1_1mock_1_1webauthn__private__key_a05419bf91a27ad64e42237efe7999feb}{priv\_key}}.\mbox{\hyperlink{classfc_1_1crypto_1_1r1_1_1private__key_a9f54b768f15f9685167c846e2cdcd61e}{sign\_compact}}(e.\mbox{\hyperlink{classfc_1_1sha256_1_1encoder_a4d8b8181e912194cf98a56164671adf8}{result}}());}
+\DoxyCodeLine{00122\ }
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ serialized\_sig[4096];}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \ \ \ \ datastream<char*>\ sig\_ds(serialized\_sig,\ \textcolor{keyword}{sizeof}(serialized\_sig));}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(sig\_ds,\ (\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}})\mbox{\hyperlink{namespacefc_ae009b19d1fecf5979996e9f326cd98c3}{get\_index<signature::storage\_type,\ webauthn::signature>}}());}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(sig\_ds,\ sig);}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(sig\_ds,\ auth\_data);}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(sig\_ds,\ json);}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \ \ \ sig\_ds.seekp(0);}
+\DoxyCodeLine{00130\ }
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a50190ee8a24af6929033b058b16158c4}{signature}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a0b442d98ceb22dd5a6ae84745e43ffab}{fc::raw::unpack}}(sig\_ds,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}});}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1testing_1_1mock_1_1webauthn__private__key_afa88c8e06b8a8fffaa82a201b5326380_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1testing_1_1mock_1_1webauthn__private__key_ab57122ea654ad96804db1c3a9fa4defe}\index{sysio::testing::mock::webauthn\_private\_key@{sysio::testing::mock::webauthn\_private\_key}!\_origin@{\_origin}}
+\index{\_origin@{\_origin}!sysio::testing::mock::webauthn\_private\_key@{sysio::testing::mock::webauthn\_private\_key}}
+\doxysubsubsection{\texorpdfstring{\_origin}{\_origin}}
+{\footnotesize\ttfamily \label{structsysio_1_1testing_1_1mock_1_1webauthn__private__key_ab57122ea654ad96804db1c3a9fa4defe} 
+const std\+::string sysio\+::testing\+::mock\+::webauthn\+\_\+private\+\_\+key\+::\+\_\+origin = "{}mock.\+webauthn.\+invalid"{}\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{tester_8hpp_source_l00137}{137}} of file \mbox{\hyperlink{tester_8hpp_source}{tester.\+hpp}}.
+
+\Hypertarget{structsysio_1_1testing_1_1mock_1_1webauthn__private__key_a4eb5bec1c8d0bb89a67a513c665a13e2}\index{sysio::testing::mock::webauthn\_private\_key@{sysio::testing::mock::webauthn\_private\_key}!\_origin\_hash@{\_origin\_hash}}
+\index{\_origin\_hash@{\_origin\_hash}!sysio::testing::mock::webauthn\_private\_key@{sysio::testing::mock::webauthn\_private\_key}}
+\doxysubsubsection{\texorpdfstring{\_origin\_hash}{\_origin\_hash}}
+{\footnotesize\ttfamily \label{structsysio_1_1testing_1_1mock_1_1webauthn__private__key_a4eb5bec1c8d0bb89a67a513c665a13e2} 
+const \mbox{\hyperlink{classfc_1_1sha256}{sha256}} sysio\+::testing\+::mock\+::webauthn\+\_\+private\+\_\+key\+::\+\_\+origin\+\_\+hash = \mbox{\hyperlink{classfc_1_1sha256_a474784de7d6213b855abd7e952df5e36}{fc\+::sha256\+::hash}}(\mbox{\hyperlink{structsysio_1_1testing_1_1mock_1_1webauthn__private__key_ab57122ea654ad96804db1c3a9fa4defe}{mock\+::webauthn\+\_\+private\+\_\+key\+::\+\_\+origin}})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{tester_8hpp_source_l00138}{138}} of file \mbox{\hyperlink{tester_8hpp_source}{tester.\+hpp}}.
+
+\Hypertarget{structsysio_1_1testing_1_1mock_1_1webauthn__private__key_a05419bf91a27ad64e42237efe7999feb}\index{sysio::testing::mock::webauthn\_private\_key@{sysio::testing::mock::webauthn\_private\_key}!priv\_key@{priv\_key}}
+\index{priv\_key@{priv\_key}!sysio::testing::mock::webauthn\_private\_key@{sysio::testing::mock::webauthn\_private\_key}}
+\doxysubsubsection{\texorpdfstring{priv\_key}{priv\_key}}
+{\footnotesize\ttfamily \label{structsysio_1_1testing_1_1mock_1_1webauthn__private__key_a05419bf91a27ad64e42237efe7999feb} 
+\mbox{\hyperlink{classfc_1_1crypto_1_1r1_1_1private__key}{r1\+::private\+\_\+key}} sysio\+::testing\+::mock\+::webauthn\+\_\+private\+\_\+key\+::priv\+\_\+key}
+
+
+
+Definition at line \mbox{\hyperlink{tester_8hpp_source_l00136}{136}} of file \mbox{\hyperlink{tester_8hpp_source}{tester.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/testing/include/sysio/testing/\mbox{\hyperlink{tester_8hpp}{tester.\+hpp}}\item 
+libraries/testing/\mbox{\hyperlink{tester_8cpp}{tester.\+cpp}}\end{DoxyCompactItemize}

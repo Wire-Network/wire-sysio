@@ -1,0 +1,1782 @@
+\doxysection{libraries/fc/vendor/websocketpp/test/http/parser.cpp File Reference}
+\hypertarget{parser_8cpp}{}\label{parser_8cpp}\index{libraries/fc/vendor/websocketpp/test/http/parser.cpp@{libraries/fc/vendor/websocketpp/test/http/parser.cpp}}
+{\ttfamily \#include $<$boost/test/unit\+\_\+test.\+hpp$>$}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$string$>$}\newline
+{\ttfamily \#include $<$websocketpp/http/request.\+hpp$>$}\newline
+{\ttfamily \#include $<$websocketpp/http/response.\+hpp$>$}\newline
+Include dependency graph for parser.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{parser_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{parser_8cpp_a6b2a3852db8bb19ab6909bac01859985}{BOOST\+\_\+\+TEST\+\_\+\+MODULE}}~http\+\_\+parser
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{parser_8cpp_a0ea7d5a58346812a68ef9e4a9044b653}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (is\+\_\+token\+\_\+char)
+\item 
+\mbox{\hyperlink{parser_8cpp_a077c95881f898ee0dae6222aebc4fd2d}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (extract\+\_\+token)
+\item 
+\mbox{\hyperlink{parser_8cpp_a10b6a74e26e7fddf378c09c9ccbdd40a}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (extract\+\_\+quoted\+\_\+string)
+\item 
+\mbox{\hyperlink{parser_8cpp_a18cc8397e3e7b19f7693599bcf3bbe30}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (extract\+\_\+all\+\_\+lws)
+\item 
+\mbox{\hyperlink{parser_8cpp_a643a09a7248f9cf7a1c63eba7e27a7fa}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (extract\+\_\+attributes\+\_\+blank)
+\item 
+\mbox{\hyperlink{parser_8cpp_aa3430b9bb5f9f4f2b5aed19d0877336d}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (extract\+\_\+attributes\+\_\+simple)
+\item 
+\mbox{\hyperlink{parser_8cpp_a64c6535ab9b7008bfe06cc6f9b32c677}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (extract\+\_\+parameters)
+\item 
+\mbox{\hyperlink{parser_8cpp_aaf32dbf85a444e1657a5ee29489fdc4b}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (strip\+\_\+lws)
+\item 
+\mbox{\hyperlink{parser_8cpp_a3d8555a7d1c87aab622f5eac9837dc97}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (case\+\_\+insensitive\+\_\+headers)
+\item 
+\mbox{\hyperlink{parser_8cpp_a98499ef7c621cb318564adf26c36c4bb}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (case\+\_\+insensitive\+\_\+headers\+\_\+overwrite)
+\item 
+\mbox{\hyperlink{parser_8cpp_ae3f59c58e8b1e695cbd830ca381cbcf4}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (blank\+\_\+consume)
+\item 
+\mbox{\hyperlink{parser_8cpp_a70a8b2ac1a6aaf3cd0f7c990b8426303}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (blank\+\_\+request)
+\item 
+\mbox{\hyperlink{parser_8cpp_af059f485b939418697da4ed5135d1d16}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (bad\+\_\+request\+\_\+no\+\_\+host)
+\item 
+\mbox{\hyperlink{parser_8cpp_a74bf5d6c6f88c6e866ce1f9b6c1a373f}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (basic\+\_\+request)
+\item 
+\mbox{\hyperlink{parser_8cpp_a9cd35c0011ed0b54b1fe8e42840478c2}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (basic\+\_\+request\+\_\+with\+\_\+body)
+\item 
+\mbox{\hyperlink{parser_8cpp_ac65be0dc6d746101384df36a59f91653}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (basic\+\_\+request\+\_\+with\+\_\+body\+\_\+split)
+\item 
+\mbox{\hyperlink{parser_8cpp_a57f138f17fa60c0051fae12c56e726e4}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (trailing\+\_\+body\+\_\+characters)
+\item 
+\mbox{\hyperlink{parser_8cpp_a07d35a19460eea8d94b581c30b380989}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (trailing\+\_\+body\+\_\+characters\+\_\+beyond\+\_\+max\+\_\+lenth)
+\item 
+\mbox{\hyperlink{parser_8cpp_ac81c001f6257b2f21edd6ce595514417}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (basic\+\_\+split1)
+\item 
+\mbox{\hyperlink{parser_8cpp_ae48ab7022bb31f05d663061d552d9f66}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (basic\+\_\+split2)
+\item 
+\mbox{\hyperlink{parser_8cpp_ae083a85b8c6333c550b631a7cc3a8319}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (max\+\_\+header\+\_\+len)
+\item 
+\mbox{\hyperlink{parser_8cpp_a1cd47da8a6e2ddb5783eacfbb721cb5c}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (max\+\_\+header\+\_\+len\+\_\+split)
+\item 
+\mbox{\hyperlink{parser_8cpp_a904679cc9508a839e99d2f08bc09665e}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (max\+\_\+body\+\_\+len)
+\item 
+\mbox{\hyperlink{parser_8cpp_af2a89183fd3266136fb70151cdf414b1}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (firefox\+\_\+full\+\_\+request)
+\item 
+\mbox{\hyperlink{parser_8cpp_a84b40fecfd5e70ee3f33d55cb5a163c9}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (bad\+\_\+method)
+\item 
+\mbox{\hyperlink{parser_8cpp_a94d439029a55372b150b0ad2ef9483e7}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (bad\+\_\+header\+\_\+name)
+\item 
+\mbox{\hyperlink{parser_8cpp_a2e752fe3c8bae5df4a39fe47147bf160}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (old\+\_\+http\+\_\+version)
+\item 
+\mbox{\hyperlink{parser_8cpp_ae2e219ec29a87e69287c36774dec5313}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (new\+\_\+http\+\_\+version1)
+\item 
+\mbox{\hyperlink{parser_8cpp_a4bd1574ba910e5724a33defe409345d1}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (new\+\_\+http\+\_\+version2)
+\item 
+\mbox{\hyperlink{parser_8cpp_ab0f6dec176d008e6ad8842d338724256}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (header\+\_\+whitespace1)
+\item 
+\mbox{\hyperlink{parser_8cpp_a431012962def47867128ae15dccd170c}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (header\+\_\+whitespace2)
+\item 
+\mbox{\hyperlink{parser_8cpp_a056641a0357b0d8af30bbcc6fb1da4ad}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (header\+\_\+aggregation)
+\item 
+\mbox{\hyperlink{parser_8cpp_a591aa40373acaaf34df930d060dca098}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (wikipedia\+\_\+example\+\_\+response)
+\item 
+\mbox{\hyperlink{parser_8cpp_a33552bc4536782c1cd79359daf62c542}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (wikipedia\+\_\+example\+\_\+response\+\_\+trailing)
+\item 
+\mbox{\hyperlink{parser_8cpp_a27ab78fb76e2f000375ebca27ca27af4}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (wikipedia\+\_\+example\+\_\+response\+\_\+trailing\+\_\+large)
+\item 
+\mbox{\hyperlink{parser_8cpp_a0ca45b062646981bf90da02a398f7c87}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (response\+\_\+with\+\_\+non\+\_\+standard\+\_\+lws)
+\item 
+\mbox{\hyperlink{parser_8cpp_a41b250bcb3ef462f8bfe7c11d9e04b2c}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (plain\+\_\+http\+\_\+response)
+\item 
+\mbox{\hyperlink{parser_8cpp_ac6c55136ca9d2ea0df76a277bafa9285}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (parse\+\_\+istream)
+\item 
+\mbox{\hyperlink{parser_8cpp_aa0aa41bb471829da9a74347abfdaba4d}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (write\+\_\+request\+\_\+basic)
+\item 
+\mbox{\hyperlink{parser_8cpp_a9cc109790290f7958c5265cc5a0f3ad0}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (write\+\_\+request\+\_\+with\+\_\+header)
+\item 
+\mbox{\hyperlink{parser_8cpp_a74b1a6f1b2f7f1dc440a844f5bf279be}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (write\+\_\+request\+\_\+with\+\_\+body)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{parser_8cpp_a6b2a3852db8bb19ab6909bac01859985}\index{parser.cpp@{parser.cpp}!BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}}
+\index{BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}!parser.cpp@{parser.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_TEST\_MODULE}{BOOST\_TEST\_MODULE}}
+{\footnotesize\ttfamily \label{parser_8cpp_a6b2a3852db8bb19ab6909bac01859985} 
+\#define BOOST\+\_\+\+TEST\+\_\+\+MODULE~http\+\_\+parser}
+
+
+
+Definition at line \mbox{\hyperlink{parser_8cpp_source_l00028}{28}} of file \mbox{\hyperlink{parser_8cpp_source}{parser.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{parser_8cpp_a94d439029a55372b150b0ad2ef9483e7}\index{parser.cpp@{parser.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!parser.cpp@{parser.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/41]}}
+{\footnotesize\ttfamily \label{parser_8cpp_a94d439029a55372b150b0ad2ef9483e7} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{bad\+\_\+header\+\_\+name}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{parser_8cpp_source_l00752}{752}} of file \mbox{\hyperlink{parser_8cpp_source}{parser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00752\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00753\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1request}{websocketpp::http::parser::request}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};}
+\DoxyCodeLine{00754\ }
+\DoxyCodeLine{00755\ \ \ \ \ std::string\ raw\ =\ \textcolor{stringliteral}{"{}GET\ /\ HTTP/1.1\(\backslash\)r\(\backslash\)nHo]st:\ www.example.com\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)n"{}};}
+\DoxyCodeLine{00756\ }
+\DoxyCodeLine{00757\ \ \ \ \ \textcolor{keywordtype}{bool}\ exception\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00758\ }
+\DoxyCodeLine{00759\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00760\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.consume(raw.c\_str(),raw.size());}
+\DoxyCodeLine{00761\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{}
+\DoxyCodeLine{00762\ \ \ \ \ \ \ \ \ exception\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00763\ \ \ \ \ \}}
+\DoxyCodeLine{00764\ }
+\DoxyCodeLine{00765\ \ \ \ \ BOOST\_CHECK(\ exception\ ==\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{00766\ \}}
+
+\end{DoxyCode}
+\Hypertarget{parser_8cpp_a84b40fecfd5e70ee3f33d55cb5a163c9}\index{parser.cpp@{parser.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!parser.cpp@{parser.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/41]}}
+{\footnotesize\ttfamily \label{parser_8cpp_a84b40fecfd5e70ee3f33d55cb5a163c9} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{bad\+\_\+method}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{parser_8cpp_source_l00736}{736}} of file \mbox{\hyperlink{parser_8cpp_source}{parser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00736\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00737\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1request}{websocketpp::http::parser::request}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};}
+\DoxyCodeLine{00738\ }
+\DoxyCodeLine{00739\ \ \ \ \ std::string\ raw\ =\ \textcolor{stringliteral}{"{}GE]T\ /\ HTTP/1.1\(\backslash\)r\(\backslash\)nHost:\ www.example.com\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)n"{}};}
+\DoxyCodeLine{00740\ }
+\DoxyCodeLine{00741\ \ \ \ \ \textcolor{keywordtype}{bool}\ exception\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00742\ }
+\DoxyCodeLine{00743\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00744\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.consume(raw.c\_str(),raw.size());}
+\DoxyCodeLine{00745\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{}
+\DoxyCodeLine{00746\ \ \ \ \ \ \ \ \ exception\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00747\ \ \ \ \ \}}
+\DoxyCodeLine{00748\ }
+\DoxyCodeLine{00749\ \ \ \ \ BOOST\_CHECK(\ exception\ ==\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{00750\ \}}
+
+\end{DoxyCode}
+\Hypertarget{parser_8cpp_af059f485b939418697da4ed5135d1d16}\index{parser.cpp@{parser.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!parser.cpp@{parser.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [3/41]}}
+{\footnotesize\ttfamily \label{parser_8cpp_af059f485b939418697da4ed5135d1d16} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{bad\+\_\+request\+\_\+no\+\_\+host}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{parser_8cpp_source_l00444}{444}} of file \mbox{\hyperlink{parser_8cpp_source}{parser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00444\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00445\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1request}{websocketpp::http::parser::request}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};}
+\DoxyCodeLine{00446\ }
+\DoxyCodeLine{00447\ \ \ \ \ std::string\ raw\ =\ \textcolor{stringliteral}{"{}GET\ /\ HTTP/1.1\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)n"{}};}
+\DoxyCodeLine{00448\ }
+\DoxyCodeLine{00449\ \ \ \ \ \textcolor{keywordtype}{bool}\ exception\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00450\ }
+\DoxyCodeLine{00451\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00452\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.consume(raw.c\_str(),raw.size());}
+\DoxyCodeLine{00453\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{}
+\DoxyCodeLine{00454\ \ \ \ \ \ \ \ \ exception\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00455\ \ \ \ \ \}}
+\DoxyCodeLine{00456\ }
+\DoxyCodeLine{00457\ \ \ \ \ BOOST\_CHECK(\ exception\ ==\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{00458\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.ready()\ ==\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{00459\ \}}
+
+\end{DoxyCode}
+\Hypertarget{parser_8cpp_a74bf5d6c6f88c6e866ce1f9b6c1a373f}\index{parser.cpp@{parser.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!parser.cpp@{parser.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [4/41]}}
+{\footnotesize\ttfamily \label{parser_8cpp_a74bf5d6c6f88c6e866ce1f9b6c1a373f} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{basic\+\_\+request}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{parser_8cpp_source_l00461}{461}} of file \mbox{\hyperlink{parser_8cpp_source}{parser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00461\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00462\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1request}{websocketpp::http::parser::request}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};}
+\DoxyCodeLine{00463\ }
+\DoxyCodeLine{00464\ \ \ \ \ std::string\ raw\ =\ \textcolor{stringliteral}{"{}GET\ /\ HTTP/1.1\(\backslash\)r\(\backslash\)nHost:\ www.example.com\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)n"{}};}
+\DoxyCodeLine{00465\ }
+\DoxyCodeLine{00466\ \ \ \ \ \textcolor{keywordtype}{bool}\ exception\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00467\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ pos\ =\ 0;}
+\DoxyCodeLine{00468\ }
+\DoxyCodeLine{00469\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00470\ \ \ \ \ \ \ \ \ pos\ =\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.consume(raw.c\_str(),raw.size());}
+\DoxyCodeLine{00471\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (std::exception\ \&e)\ \{}
+\DoxyCodeLine{00472\ \ \ \ \ \ \ \ \ exception\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00473\ \ \ \ \ \ \ \ \ std::cout\ <<\ e.what()\ <<\ std::endl;}
+\DoxyCodeLine{00474\ \ \ \ \ \}}
+\DoxyCodeLine{00475\ }
+\DoxyCodeLine{00476\ \ \ \ \ BOOST\_CHECK(\ exception\ ==\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{00477\ \ \ \ \ BOOST\_CHECK(\ pos\ ==\ 41\ );}
+\DoxyCodeLine{00478\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.ready()\ ==\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{00479\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_version()\ ==\ \textcolor{stringliteral}{"{}HTTP/1.1"{}}\ );}
+\DoxyCodeLine{00480\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_method()\ ==\ \textcolor{stringliteral}{"{}GET"{}}\ );}
+\DoxyCodeLine{00481\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_uri()\ ==\ \textcolor{stringliteral}{"{}/"{}}\ );}
+\DoxyCodeLine{00482\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}Host"{}})\ ==\ \textcolor{stringliteral}{"{}www.example.com"{}}\ );}
+\DoxyCodeLine{00483\ \}}
+
+\end{DoxyCode}
+\Hypertarget{parser_8cpp_a9cd35c0011ed0b54b1fe8e42840478c2}\index{parser.cpp@{parser.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!parser.cpp@{parser.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [5/41]}}
+{\footnotesize\ttfamily \label{parser_8cpp_a9cd35c0011ed0b54b1fe8e42840478c2} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{basic\+\_\+request\+\_\+with\+\_\+body}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{parser_8cpp_source_l00485}{485}} of file \mbox{\hyperlink{parser_8cpp_source}{parser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00485\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00486\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1request}{websocketpp::http::parser::request}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};}
+\DoxyCodeLine{00487\ }
+\DoxyCodeLine{00488\ \ \ \ \ std::string\ raw\ =\ \textcolor{stringliteral}{"{}GET\ /\ HTTP/1.1\(\backslash\)r\(\backslash\)nHost:\ www.example.com\(\backslash\)r\(\backslash\)nContent-\/Length:\ 5\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)nabcdef"{}};}
+\DoxyCodeLine{00489\ }
+\DoxyCodeLine{00490\ \ \ \ \ \textcolor{keywordtype}{bool}\ exception\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00491\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ pos\ =\ 0;}
+\DoxyCodeLine{00492\ }
+\DoxyCodeLine{00493\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00494\ \ \ \ \ \ \ \ \ pos\ =\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.consume(raw.c\_str(),raw.size());}
+\DoxyCodeLine{00495\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (std::exception\ \&e)\ \{}
+\DoxyCodeLine{00496\ \ \ \ \ \ \ \ \ exception\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00497\ \ \ \ \ \ \ \ \ std::cout\ <<\ e.what()\ <<\ std::endl;}
+\DoxyCodeLine{00498\ \ \ \ \ \}}
+\DoxyCodeLine{00499\ }
+\DoxyCodeLine{00500\ \ \ \ \ BOOST\_CHECK(\ exception\ ==\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{00501\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ pos,\ 65\ );}
+\DoxyCodeLine{00502\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.ready()\ ==\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{00503\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_version(),\ \textcolor{stringliteral}{"{}HTTP/1.1"{}}\ );}
+\DoxyCodeLine{00504\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_method(),\ \textcolor{stringliteral}{"{}GET"{}}\ );}
+\DoxyCodeLine{00505\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_uri(),\ \textcolor{stringliteral}{"{}/"{}}\ );}
+\DoxyCodeLine{00506\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}Host"{}}),\ \textcolor{stringliteral}{"{}www.example.com"{}}\ );}
+\DoxyCodeLine{00507\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}Content-\/Length"{}}),\ \textcolor{stringliteral}{"{}5"{}}\ );}
+\DoxyCodeLine{00508\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_body(),\ \textcolor{stringliteral}{"{}abcde"{}}\ );}
+\DoxyCodeLine{00509\ \}}
+
+\end{DoxyCode}
+\Hypertarget{parser_8cpp_ac65be0dc6d746101384df36a59f91653}\index{parser.cpp@{parser.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!parser.cpp@{parser.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [6/41]}}
+{\footnotesize\ttfamily \label{parser_8cpp_ac65be0dc6d746101384df36a59f91653} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{basic\+\_\+request\+\_\+with\+\_\+body\+\_\+split}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{parser_8cpp_source_l00511}{511}} of file \mbox{\hyperlink{parser_8cpp_source}{parser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00511\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00512\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1request}{websocketpp::http::parser::request}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};}
+\DoxyCodeLine{00513\ }
+\DoxyCodeLine{00514\ \ \ \ \ std::string\ raw\ =\ \textcolor{stringliteral}{"{}GET\ /\ HTTP/1.1\(\backslash\)r\(\backslash\)nHost:\ www.example.com\(\backslash\)r\(\backslash\)nContent-\/Length:\ 6\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)nabc"{}};}
+\DoxyCodeLine{00515\ \ \ \ \ std::string\ raw2\ =\ \textcolor{stringliteral}{"{}def"{}};}
+\DoxyCodeLine{00516\ }
+\DoxyCodeLine{00517\ \ \ \ \ \textcolor{keywordtype}{bool}\ exception\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00518\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ pos\ =\ 0;}
+\DoxyCodeLine{00519\ }
+\DoxyCodeLine{00520\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00521\ \ \ \ \ \ \ \ \ pos\ +=\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.consume(raw.c\_str(),raw.size());}
+\DoxyCodeLine{00522\ \ \ \ \ \ \ \ \ pos\ +=\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.consume(raw2.c\_str(),raw2.size());}
+\DoxyCodeLine{00523\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (std::exception\ \&e)\ \{}
+\DoxyCodeLine{00524\ \ \ \ \ \ \ \ \ exception\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00525\ \ \ \ \ \ \ \ \ std::cout\ <<\ e.what()\ <<\ std::endl;}
+\DoxyCodeLine{00526\ \ \ \ \ \}}
+\DoxyCodeLine{00527\ }
+\DoxyCodeLine{00528\ \ \ \ \ BOOST\_CHECK(\ exception\ ==\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{00529\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ pos,\ 66\ );}
+\DoxyCodeLine{00530\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.ready()\ ==\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{00531\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_version(),\ \textcolor{stringliteral}{"{}HTTP/1.1"{}}\ );}
+\DoxyCodeLine{00532\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_method(),\ \textcolor{stringliteral}{"{}GET"{}}\ );}
+\DoxyCodeLine{00533\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_uri(),\ \textcolor{stringliteral}{"{}/"{}}\ );}
+\DoxyCodeLine{00534\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}Host"{}}),\ \textcolor{stringliteral}{"{}www.example.com"{}}\ );}
+\DoxyCodeLine{00535\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}Content-\/Length"{}}),\ \textcolor{stringliteral}{"{}6"{}}\ );}
+\DoxyCodeLine{00536\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_body(),\ \textcolor{stringliteral}{"{}abcdef"{}}\ );}
+\DoxyCodeLine{00537\ \}}
+
+\end{DoxyCode}
+\Hypertarget{parser_8cpp_ac81c001f6257b2f21edd6ce595514417}\index{parser.cpp@{parser.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!parser.cpp@{parser.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [7/41]}}
+{\footnotesize\ttfamily \label{parser_8cpp_ac81c001f6257b2f21edd6ce595514417} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{basic\+\_\+split1}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{parser_8cpp_source_l00588}{588}} of file \mbox{\hyperlink{parser_8cpp_source}{parser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00588\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00589\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1request}{websocketpp::http::parser::request}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};}
+\DoxyCodeLine{00590\ }
+\DoxyCodeLine{00591\ \ \ \ \ std::string\ raw\ =\ \textcolor{stringliteral}{"{}GET\ /\ HTTP/1.1\(\backslash\)r\(\backslash\)n"{}};}
+\DoxyCodeLine{00592\ \ \ \ \ std::string\ raw2\ =\ \textcolor{stringliteral}{"{}Host:\ www.example.com\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)na"{}};}
+\DoxyCodeLine{00593\ }
+\DoxyCodeLine{00594\ \ \ \ \ \textcolor{keywordtype}{bool}\ exception\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00595\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ pos\ =\ 0;}
+\DoxyCodeLine{00596\ }
+\DoxyCodeLine{00597\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00598\ \ \ \ \ \ \ \ \ pos\ +=\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.consume(raw.c\_str(),raw.size());}
+\DoxyCodeLine{00599\ \ \ \ \ \ \ \ \ pos\ +=\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.consume(raw2.c\_str(),raw2.size());}
+\DoxyCodeLine{00600\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (std::exception\ \&e)\ \{}
+\DoxyCodeLine{00601\ \ \ \ \ \ \ \ \ exception\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00602\ \ \ \ \ \ \ \ \ std::cout\ <<\ e.what()\ <<\ std::endl;}
+\DoxyCodeLine{00603\ \ \ \ \ \}}
+\DoxyCodeLine{00604\ }
+\DoxyCodeLine{00605\ \ \ \ \ BOOST\_CHECK(\ exception\ ==\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{00606\ \ \ \ \ BOOST\_CHECK(\ pos\ ==\ 41\ );}
+\DoxyCodeLine{00607\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.ready()\ ==\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{00608\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_version()\ ==\ \textcolor{stringliteral}{"{}HTTP/1.1"{}}\ );}
+\DoxyCodeLine{00609\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_method()\ ==\ \textcolor{stringliteral}{"{}GET"{}}\ );}
+\DoxyCodeLine{00610\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_uri()\ ==\ \textcolor{stringliteral}{"{}/"{}}\ );}
+\DoxyCodeLine{00611\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}Host"{}})\ ==\ \textcolor{stringliteral}{"{}www.example.com"{}}\ );}
+\DoxyCodeLine{00612\ \}}
+
+\end{DoxyCode}
+\Hypertarget{parser_8cpp_ae48ab7022bb31f05d663061d552d9f66}\index{parser.cpp@{parser.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!parser.cpp@{parser.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [8/41]}}
+{\footnotesize\ttfamily \label{parser_8cpp_ae48ab7022bb31f05d663061d552d9f66} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{basic\+\_\+split2}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{parser_8cpp_source_l00614}{614}} of file \mbox{\hyperlink{parser_8cpp_source}{parser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00614\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00615\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1request}{websocketpp::http::parser::request}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};}
+\DoxyCodeLine{00616\ }
+\DoxyCodeLine{00617\ \ \ \ \ std::string\ raw\ =\ \textcolor{stringliteral}{"{}GET\ /\ HTTP/1.1\(\backslash\)r\(\backslash\)nHost:\ www.example.com\(\backslash\)r"{}};}
+\DoxyCodeLine{00618\ \ \ \ \ std::string\ raw2\ =\ \textcolor{stringliteral}{"{}\(\backslash\)n\(\backslash\)r\(\backslash\)na"{}};}
+\DoxyCodeLine{00619\ }
+\DoxyCodeLine{00620\ \ \ \ \ \textcolor{keywordtype}{bool}\ exception\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00621\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ pos\ =\ 0;}
+\DoxyCodeLine{00622\ }
+\DoxyCodeLine{00623\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00624\ \ \ \ \ \ \ \ \ pos\ +=\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.consume(raw.c\_str(),raw.size());}
+\DoxyCodeLine{00625\ \ \ \ \ \ \ \ \ pos\ +=\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.consume(raw2.c\_str(),raw2.size());}
+\DoxyCodeLine{00626\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (std::exception\ \&e)\ \{}
+\DoxyCodeLine{00627\ \ \ \ \ \ \ \ \ exception\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00628\ \ \ \ \ \ \ \ \ std::cout\ <<\ e.what()\ <<\ std::endl;}
+\DoxyCodeLine{00629\ \ \ \ \ \}}
+\DoxyCodeLine{00630\ }
+\DoxyCodeLine{00631\ \ \ \ \ BOOST\_CHECK(\ exception\ ==\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{00632\ \ \ \ \ BOOST\_CHECK(\ pos\ ==\ 41\ );}
+\DoxyCodeLine{00633\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.ready()\ ==\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{00634\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_version()\ ==\ \textcolor{stringliteral}{"{}HTTP/1.1"{}}\ );}
+\DoxyCodeLine{00635\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_method()\ ==\ \textcolor{stringliteral}{"{}GET"{}}\ );}
+\DoxyCodeLine{00636\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_uri()\ ==\ \textcolor{stringliteral}{"{}/"{}}\ );}
+\DoxyCodeLine{00637\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}Host"{}})\ ==\ \textcolor{stringliteral}{"{}www.example.com"{}}\ );}
+\DoxyCodeLine{00638\ \}}
+
+\end{DoxyCode}
+\Hypertarget{parser_8cpp_ae3f59c58e8b1e695cbd830ca381cbcf4}\index{parser.cpp@{parser.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!parser.cpp@{parser.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [9/41]}}
+{\footnotesize\ttfamily \label{parser_8cpp_ae3f59c58e8b1e695cbd830ca381cbcf4} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{blank\+\_\+consume}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{parser_8cpp_source_l00410}{410}} of file \mbox{\hyperlink{parser_8cpp_source}{parser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00410\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00411\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1request}{websocketpp::http::parser::request}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};}
+\DoxyCodeLine{00412\ }
+\DoxyCodeLine{00413\ \ \ \ \ std::string\ raw;}
+\DoxyCodeLine{00414\ }
+\DoxyCodeLine{00415\ \ \ \ \ \textcolor{keywordtype}{bool}\ exception\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00416\ }
+\DoxyCodeLine{00417\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00418\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.consume(raw.c\_str(),raw.size());}
+\DoxyCodeLine{00419\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{}
+\DoxyCodeLine{00420\ \ \ \ \ \ \ \ \ exception\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00421\ \ \ \ \ \}}
+\DoxyCodeLine{00422\ }
+\DoxyCodeLine{00423\ \ \ \ \ BOOST\_CHECK(\ exception\ ==\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{00424\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.ready()\ ==\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{00425\ \}}
+
+\end{DoxyCode}
+\Hypertarget{parser_8cpp_a70a8b2ac1a6aaf3cd0f7c990b8426303}\index{parser.cpp@{parser.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!parser.cpp@{parser.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [10/41]}}
+{\footnotesize\ttfamily \label{parser_8cpp_a70a8b2ac1a6aaf3cd0f7c990b8426303} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{blank\+\_\+request}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{parser_8cpp_source_l00427}{427}} of file \mbox{\hyperlink{parser_8cpp_source}{parser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00427\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00428\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1request}{websocketpp::http::parser::request}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};}
+\DoxyCodeLine{00429\ }
+\DoxyCodeLine{00430\ \ \ \ \ std::string\ raw\ =\ \textcolor{stringliteral}{"{}\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)n"{}};}
+\DoxyCodeLine{00431\ }
+\DoxyCodeLine{00432\ \ \ \ \ \textcolor{keywordtype}{bool}\ exception\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00433\ }
+\DoxyCodeLine{00434\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00435\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.consume(raw.c\_str(),raw.size());}
+\DoxyCodeLine{00436\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{}
+\DoxyCodeLine{00437\ \ \ \ \ \ \ \ \ exception\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00438\ \ \ \ \ \}}
+\DoxyCodeLine{00439\ }
+\DoxyCodeLine{00440\ \ \ \ \ BOOST\_CHECK(\ exception\ ==\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{00441\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.ready()\ ==\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{00442\ \}}
+
+\end{DoxyCode}
+\Hypertarget{parser_8cpp_a3d8555a7d1c87aab622f5eac9837dc97}\index{parser.cpp@{parser.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!parser.cpp@{parser.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [11/41]}}
+{\footnotesize\ttfamily \label{parser_8cpp_a3d8555a7d1c87aab622f5eac9837dc97} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{case\+\_\+insensitive\+\_\+headers}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{parser_8cpp_source_l00381}{381}} of file \mbox{\hyperlink{parser_8cpp_source}{parser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00381\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00382\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser}{websocketpp::http::parser::parser}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};}
+\DoxyCodeLine{00383\ }
+\DoxyCodeLine{00384\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.replace\_header(\textcolor{stringliteral}{"{}foo"{}},\textcolor{stringliteral}{"{}bar"{}});}
+\DoxyCodeLine{00385\ }
+\DoxyCodeLine{00386\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}foo"{}}),\ \textcolor{stringliteral}{"{}bar"{}}\ );}
+\DoxyCodeLine{00387\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}FOO"{}}),\ \textcolor{stringliteral}{"{}bar"{}}\ );}
+\DoxyCodeLine{00388\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}Foo"{}}),\ \textcolor{stringliteral}{"{}bar"{}}\ );}
+\DoxyCodeLine{00389\ \}}
+
+\end{DoxyCode}
+\Hypertarget{parser_8cpp_a98499ef7c621cb318564adf26c36c4bb}\index{parser.cpp@{parser.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!parser.cpp@{parser.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [12/41]}}
+{\footnotesize\ttfamily \label{parser_8cpp_a98499ef7c621cb318564adf26c36c4bb} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{case\+\_\+insensitive\+\_\+headers\+\_\+overwrite}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{parser_8cpp_source_l00391}{391}} of file \mbox{\hyperlink{parser_8cpp_source}{parser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00391\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00392\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1parser}{websocketpp::http::parser::parser}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};}
+\DoxyCodeLine{00393\ }
+\DoxyCodeLine{00394\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.replace\_header(\textcolor{stringliteral}{"{}foo"{}},\textcolor{stringliteral}{"{}bar"{}});}
+\DoxyCodeLine{00395\ }
+\DoxyCodeLine{00396\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}foo"{}}),\ \textcolor{stringliteral}{"{}bar"{}}\ );}
+\DoxyCodeLine{00397\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}Foo"{}}),\ \textcolor{stringliteral}{"{}bar"{}}\ );}
+\DoxyCodeLine{00398\ }
+\DoxyCodeLine{00399\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.replace\_header(\textcolor{stringliteral}{"{}Foo"{}},\textcolor{stringliteral}{"{}baz"{}});}
+\DoxyCodeLine{00400\ }
+\DoxyCodeLine{00401\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}foo"{}}),\ \textcolor{stringliteral}{"{}baz"{}}\ );}
+\DoxyCodeLine{00402\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}Foo"{}}),\ \textcolor{stringliteral}{"{}baz"{}}\ );}
+\DoxyCodeLine{00403\ }
+\DoxyCodeLine{00404\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.remove\_header(\textcolor{stringliteral}{"{}FoO"{}});}
+\DoxyCodeLine{00405\ }
+\DoxyCodeLine{00406\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}foo"{}}),\ \textcolor{stringliteral}{"{}"{}}\ );}
+\DoxyCodeLine{00407\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}Foo"{}}),\ \textcolor{stringliteral}{"{}"{}}\ );}
+\DoxyCodeLine{00408\ \}}
+
+\end{DoxyCode}
+\Hypertarget{parser_8cpp_a18cc8397e3e7b19f7693599bcf3bbe30}\index{parser.cpp@{parser.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!parser.cpp@{parser.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [13/41]}}
+{\footnotesize\ttfamily \label{parser_8cpp_a18cc8397e3e7b19f7693599bcf3bbe30} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{extract\+\_\+all\+\_\+lws}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{parser_8cpp_source_l00158}{158}} of file \mbox{\hyperlink{parser_8cpp_source}{parser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00159\ \ \ \ \ std::string\ \mbox{\hyperlink{dtoa_8c_a1fe17aa2ff1722c937379044a27da68a}{d1}}\ =\ \textcolor{stringliteral}{"{}\ foo\ \ \ \ \ bar"{}};}
+\DoxyCodeLine{00160\ \ \ \ \ \mbox{\hyperlink{dtoa_8c_a1fe17aa2ff1722c937379044a27da68a}{d1}}.append(1,\textcolor{keywordtype}{char}(9));}
+\DoxyCodeLine{00161\ \ \ \ \ \mbox{\hyperlink{dtoa_8c_a1fe17aa2ff1722c937379044a27da68a}{d1}}.append(\textcolor{stringliteral}{"{}baz\(\backslash\)r\(\backslash\)n\ d\(\backslash\)r\(\backslash\)n\ \ \(\backslash\)r\(\backslash\)n\ \ e\(\backslash\)r\(\backslash\)nf"{}});}
+\DoxyCodeLine{00162\ }
+\DoxyCodeLine{00163\ \ \ \ \ std::string::const\_iterator\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00164\ }
+\DoxyCodeLine{00165\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_a263c7c466bbed56948d5877b9c33c354}{websocketpp::http::parser::extract\_all\_lws}}(\mbox{\hyperlink{dtoa_8c_a1fe17aa2ff1722c937379044a27da68a}{d1}}.begin(),\mbox{\hyperlink{dtoa_8c_a1fe17aa2ff1722c937379044a27da68a}{d1}}.end());}
+\DoxyCodeLine{00166\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ ==\ \mbox{\hyperlink{dtoa_8c_a1fe17aa2ff1722c937379044a27da68a}{d1}}.begin()+1\ );}
+\DoxyCodeLine{00167\ }
+\DoxyCodeLine{00168\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_a263c7c466bbed56948d5877b9c33c354}{websocketpp::http::parser::extract\_all\_lws}}(\mbox{\hyperlink{dtoa_8c_a1fe17aa2ff1722c937379044a27da68a}{d1}}.begin()+1,\mbox{\hyperlink{dtoa_8c_a1fe17aa2ff1722c937379044a27da68a}{d1}}.end());}
+\DoxyCodeLine{00169\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ ==\ \mbox{\hyperlink{dtoa_8c_a1fe17aa2ff1722c937379044a27da68a}{d1}}.begin()+1\ );}
+\DoxyCodeLine{00170\ }
+\DoxyCodeLine{00171\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_a263c7c466bbed56948d5877b9c33c354}{websocketpp::http::parser::extract\_all\_lws}}(\mbox{\hyperlink{dtoa_8c_a1fe17aa2ff1722c937379044a27da68a}{d1}}.begin()+4,\mbox{\hyperlink{dtoa_8c_a1fe17aa2ff1722c937379044a27da68a}{d1}}.end());}
+\DoxyCodeLine{00172\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ ==\ \mbox{\hyperlink{dtoa_8c_a1fe17aa2ff1722c937379044a27da68a}{d1}}.begin()+9\ );}
+\DoxyCodeLine{00173\ }
+\DoxyCodeLine{00174\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_a263c7c466bbed56948d5877b9c33c354}{websocketpp::http::parser::extract\_all\_lws}}(\mbox{\hyperlink{dtoa_8c_a1fe17aa2ff1722c937379044a27da68a}{d1}}.begin()+12,\mbox{\hyperlink{dtoa_8c_a1fe17aa2ff1722c937379044a27da68a}{d1}}.end());}
+\DoxyCodeLine{00175\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ ==\ \mbox{\hyperlink{dtoa_8c_a1fe17aa2ff1722c937379044a27da68a}{d1}}.begin()+13\ );}
+\DoxyCodeLine{00176\ }
+\DoxyCodeLine{00177\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_a263c7c466bbed56948d5877b9c33c354}{websocketpp::http::parser::extract\_all\_lws}}(\mbox{\hyperlink{dtoa_8c_a1fe17aa2ff1722c937379044a27da68a}{d1}}.begin()+16,\mbox{\hyperlink{dtoa_8c_a1fe17aa2ff1722c937379044a27da68a}{d1}}.end());}
+\DoxyCodeLine{00178\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ ==\ \mbox{\hyperlink{dtoa_8c_a1fe17aa2ff1722c937379044a27da68a}{d1}}.begin()+19\ );}
+\DoxyCodeLine{00179\ }
+\DoxyCodeLine{00180\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_a263c7c466bbed56948d5877b9c33c354}{websocketpp::http::parser::extract\_all\_lws}}(\mbox{\hyperlink{dtoa_8c_a1fe17aa2ff1722c937379044a27da68a}{d1}}.begin()+20,\mbox{\hyperlink{dtoa_8c_a1fe17aa2ff1722c937379044a27da68a}{d1}}.end());}
+\DoxyCodeLine{00181\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ ==\ \mbox{\hyperlink{dtoa_8c_a1fe17aa2ff1722c937379044a27da68a}{d1}}.begin()+28\ );}
+\DoxyCodeLine{00182\ }
+\DoxyCodeLine{00183\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_a263c7c466bbed56948d5877b9c33c354}{websocketpp::http::parser::extract\_all\_lws}}(\mbox{\hyperlink{dtoa_8c_a1fe17aa2ff1722c937379044a27da68a}{d1}}.begin()+29,\mbox{\hyperlink{dtoa_8c_a1fe17aa2ff1722c937379044a27da68a}{d1}}.end());}
+\DoxyCodeLine{00184\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ ==\ \mbox{\hyperlink{dtoa_8c_a1fe17aa2ff1722c937379044a27da68a}{d1}}.begin()+29\ );}
+\DoxyCodeLine{00185\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{parser_8cpp_a18cc8397e3e7b19f7693599bcf3bbe30_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{parser_8cpp_a643a09a7248f9cf7a1c63eba7e27a7fa}\index{parser.cpp@{parser.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!parser.cpp@{parser.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [14/41]}}
+{\footnotesize\ttfamily \label{parser_8cpp_a643a09a7248f9cf7a1c63eba7e27a7fa} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{extract\+\_\+attributes\+\_\+blank}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{parser_8cpp_source_l00187}{187}} of file \mbox{\hyperlink{parser_8cpp_source}{parser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00188\ \ \ \ \ std::string\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{00189\ }
+\DoxyCodeLine{00190\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1http_a9744f4104772b987aa9e86c35ce1357b}{websocketpp::http::attribute\_list}}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}};}
+\DoxyCodeLine{00191\ \ \ \ \ std::string::const\_iterator\ it;}
+\DoxyCodeLine{00192\ }
+\DoxyCodeLine{00193\ \ \ \ \ it\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_ac13fb3aca2101c9e6d2ee14039f1a758}{websocketpp::http::parser::extract\_attributes}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.begin(),\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.end(),\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{00194\ \ \ \ \ BOOST\_CHECK(\ it\ ==\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.begin()\ );}
+\DoxyCodeLine{00195\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.size(),\ 0\ );}
+\DoxyCodeLine{00196\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{parser_8cpp_a643a09a7248f9cf7a1c63eba7e27a7fa_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{parser_8cpp_aa3430b9bb5f9f4f2b5aed19d0877336d}\index{parser.cpp@{parser.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!parser.cpp@{parser.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [15/41]}}
+{\footnotesize\ttfamily \label{parser_8cpp_aa3430b9bb5f9f4f2b5aed19d0877336d} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{extract\+\_\+attributes\+\_\+simple}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{parser_8cpp_source_l00198}{198}} of file \mbox{\hyperlink{parser_8cpp_source}{parser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00199\ \ \ \ \ std::string\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ =\ \textcolor{stringliteral}{"{}foo"{}};}
+\DoxyCodeLine{00200\ }
+\DoxyCodeLine{00201\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1http_a9744f4104772b987aa9e86c35ce1357b}{websocketpp::http::attribute\_list}}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}};}
+\DoxyCodeLine{00202\ \ \ \ \ std::string::const\_iterator\ it;}
+\DoxyCodeLine{00203\ }
+\DoxyCodeLine{00204\ \ \ \ \ it\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_ac13fb3aca2101c9e6d2ee14039f1a758}{websocketpp::http::parser::extract\_attributes}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.begin(),\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.end(),\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{00205\ \ \ \ \ BOOST\_CHECK(\ it\ ==\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.end()\ );}
+\DoxyCodeLine{00206\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.size(),\ 1\ );}
+\DoxyCodeLine{00207\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.find(\textcolor{stringliteral}{"{}foo"{}})\ !=\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.end()\ );}
+\DoxyCodeLine{00208\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.find(\textcolor{stringliteral}{"{}foo"{}})-\/>second,\ \textcolor{stringliteral}{"{}"{}}\ );}
+\DoxyCodeLine{00209\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{parser_8cpp_aa3430b9bb5f9f4f2b5aed19d0877336d_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{parser_8cpp_a64c6535ab9b7008bfe06cc6f9b32c677}\index{parser.cpp@{parser.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!parser.cpp@{parser.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [16/41]}}
+{\footnotesize\ttfamily \label{parser_8cpp_a64c6535ab9b7008bfe06cc6f9b32c677} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{extract\+\_\+parameters}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{parser_8cpp_source_l00211}{211}} of file \mbox{\hyperlink{parser_8cpp_source}{parser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00212\ \ \ \ \ std::string\ s1;}
+\DoxyCodeLine{00213\ \ \ \ \ std::string\ s2\ =\ \textcolor{stringliteral}{"{}foo"{}};}
+\DoxyCodeLine{00214\ \ \ \ \ std::string\ s3\ =\ \textcolor{stringliteral}{"{}\ foo\ \(\backslash\)r\(\backslash\)nAbc"{}};}
+\DoxyCodeLine{00215\ \ \ \ \ std::string\ s4\ =\ \textcolor{stringliteral}{"{}\ \ \(\backslash\)r\(\backslash\)n\ \ \ foo\ \ "{}};}
+\DoxyCodeLine{00216\ \ \ \ \ std::string\ s5\ =\ \textcolor{stringliteral}{"{}foo,bar"{}};}
+\DoxyCodeLine{00217\ \ \ \ \ std::string\ s6\ =\ \textcolor{stringliteral}{"{}foo;bar"{}};}
+\DoxyCodeLine{00218\ \ \ \ \ std::string\ s7\ =\ \textcolor{stringliteral}{"{}foo;baz,bar"{}};}
+\DoxyCodeLine{00219\ \ \ \ \ std::string\ s8\ =\ \textcolor{stringliteral}{"{}foo;bar;baz"{}};}
+\DoxyCodeLine{00220\ \ \ \ \ std::string\ s9\ =\ \textcolor{stringliteral}{"{}foo;bar=baz"{}};}
+\DoxyCodeLine{00221\ \ \ \ \ std::string\ s10\ =\ \textcolor{stringliteral}{"{}foo;bar=baz;boo"{}};}
+\DoxyCodeLine{00222\ \ \ \ \ std::string\ s11\ =\ \textcolor{stringliteral}{"{}foo;bar=baz;boo,bob"{}};}
+\DoxyCodeLine{00223\ \ \ \ \ std::string\ s12\ =\ \textcolor{stringliteral}{"{}foo;bar=\(\backslash\)"{}a\ b\ c\(\backslash\)"{}"{}};}
+\DoxyCodeLine{00224\ \ \ \ \ std::string\ s13\ =\ \textcolor{stringliteral}{"{}foo;bar=\(\backslash\)"{}a\ \(\backslash\)\(\backslash\)\(\backslash\)"{}b\(\backslash\)\(\backslash\)\(\backslash\)"{}\ c\(\backslash\)"{}"{}};}
+\DoxyCodeLine{00225\ }
+\DoxyCodeLine{00226\ }
+\DoxyCodeLine{00227\ \ \ \ \ std::string\ sx\ =\ \textcolor{stringliteral}{"{}foo;bar=\(\backslash\)"{}a\ \(\backslash\)\(\backslash\)\(\backslash\)"{}b\(\backslash\)\(\backslash\)\(\backslash\)"{}\ c\(\backslash\)"{}"{}};}
+\DoxyCodeLine{00228\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1http_a2c285bc959df5a63bf962bed842fccfb}{websocketpp::http::parameter\_list}}\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}};}
+\DoxyCodeLine{00229\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1http_a9744f4104772b987aa9e86c35ce1357b}{websocketpp::http::attribute\_list}}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}};}
+\DoxyCodeLine{00230\ \ \ \ \ std::string::const\_iterator\ it;}
+\DoxyCodeLine{00231\ }
+\DoxyCodeLine{00232\ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_adabfd491d364be43bee4c7cad63e7e08}{websocketpp::http::parser::extract\_parameters}};}
+\DoxyCodeLine{00233\ }
+\DoxyCodeLine{00234\ \ \ \ \ it\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_adabfd491d364be43bee4c7cad63e7e08}{extract\_parameters}}(s1.begin(),s1.end(),\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}});}
+\DoxyCodeLine{00235\ \ \ \ \ BOOST\_CHECK(\ it\ ==\ s1.begin()\ );}
+\DoxyCodeLine{00236\ }
+\DoxyCodeLine{00237\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.\mbox{\hyperlink{structmie_1_1_vuint_t_a37838a763e8b608a0aeba236ec1313a7}{clear}}();}
+\DoxyCodeLine{00238\ \ \ \ \ it\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_adabfd491d364be43bee4c7cad63e7e08}{extract\_parameters}}(s2.begin(),s2.end(),\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}});}
+\DoxyCodeLine{00239\ \ \ \ \ BOOST\_CHECK(\ it\ ==\ s2.end()\ );}
+\DoxyCodeLine{00240\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.\mbox{\hyperlink{structmie_1_1_vuint_t_a1be409ac9e110dc4b60234ce37cbf0c8}{size}}(),\ 1\ );}
+\DoxyCodeLine{00241\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}[0].first\ ==\ \textcolor{stringliteral}{"{}foo"{}}\ );}
+\DoxyCodeLine{00242\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}[0].second.\mbox{\hyperlink{structmie_1_1_vuint_t_a1be409ac9e110dc4b60234ce37cbf0c8}{size}}(),\ 0\ );}
+\DoxyCodeLine{00243\ }
+\DoxyCodeLine{00244\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.\mbox{\hyperlink{structmie_1_1_vuint_t_a37838a763e8b608a0aeba236ec1313a7}{clear}}();}
+\DoxyCodeLine{00245\ \ \ \ \ it\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_adabfd491d364be43bee4c7cad63e7e08}{extract\_parameters}}(s3.begin(),s3.end(),\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}});}
+\DoxyCodeLine{00246\ \ \ \ \ BOOST\_CHECK(\ it\ ==\ s3.begin()+5\ );}
+\DoxyCodeLine{00247\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.\mbox{\hyperlink{structmie_1_1_vuint_t_a1be409ac9e110dc4b60234ce37cbf0c8}{size}}(),\ 1\ );}
+\DoxyCodeLine{00248\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}[0].first\ ==\ \textcolor{stringliteral}{"{}foo"{}}\ );}
+\DoxyCodeLine{00249\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}[0].second.\mbox{\hyperlink{structmie_1_1_vuint_t_a1be409ac9e110dc4b60234ce37cbf0c8}{size}}(),\ 0\ );}
+\DoxyCodeLine{00250\ }
+\DoxyCodeLine{00251\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.\mbox{\hyperlink{structmie_1_1_vuint_t_a37838a763e8b608a0aeba236ec1313a7}{clear}}();}
+\DoxyCodeLine{00252\ \ \ \ \ it\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_adabfd491d364be43bee4c7cad63e7e08}{extract\_parameters}}(s4.begin(),s4.end(),\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}});}
+\DoxyCodeLine{00253\ \ \ \ \ BOOST\_CHECK(\ it\ ==\ s4.end()\ );}
+\DoxyCodeLine{00254\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.\mbox{\hyperlink{structmie_1_1_vuint_t_a1be409ac9e110dc4b60234ce37cbf0c8}{size}}(),\ 1\ );}
+\DoxyCodeLine{00255\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}[0].first\ ==\ \textcolor{stringliteral}{"{}foo"{}}\ );}
+\DoxyCodeLine{00256\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}[0].second.\mbox{\hyperlink{structmie_1_1_vuint_t_a1be409ac9e110dc4b60234ce37cbf0c8}{size}}(),\ 0\ );}
+\DoxyCodeLine{00257\ }
+\DoxyCodeLine{00258\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.\mbox{\hyperlink{structmie_1_1_vuint_t_a37838a763e8b608a0aeba236ec1313a7}{clear}}();}
+\DoxyCodeLine{00259\ \ \ \ \ it\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_adabfd491d364be43bee4c7cad63e7e08}{extract\_parameters}}(s5.begin(),s5.end(),\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}});}
+\DoxyCodeLine{00260\ \ \ \ \ BOOST\_CHECK(\ it\ ==\ s5.end()\ );}
+\DoxyCodeLine{00261\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.\mbox{\hyperlink{structmie_1_1_vuint_t_a1be409ac9e110dc4b60234ce37cbf0c8}{size}}(),\ 2\ );}
+\DoxyCodeLine{00262\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}[0].first\ ==\ \textcolor{stringliteral}{"{}foo"{}}\ );}
+\DoxyCodeLine{00263\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}[0].second.\mbox{\hyperlink{structmie_1_1_vuint_t_a1be409ac9e110dc4b60234ce37cbf0c8}{size}}(),\ 0\ );}
+\DoxyCodeLine{00264\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}[1].first\ ==\ \textcolor{stringliteral}{"{}bar"{}}\ );}
+\DoxyCodeLine{00265\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}[1].second.\mbox{\hyperlink{structmie_1_1_vuint_t_a1be409ac9e110dc4b60234ce37cbf0c8}{size}}(),\ 0\ );}
+\DoxyCodeLine{00266\ }
+\DoxyCodeLine{00267\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.\mbox{\hyperlink{structmie_1_1_vuint_t_a37838a763e8b608a0aeba236ec1313a7}{clear}}();}
+\DoxyCodeLine{00268\ \ \ \ \ it\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_adabfd491d364be43bee4c7cad63e7e08}{extract\_parameters}}(s6.begin(),s6.end(),\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}});}
+\DoxyCodeLine{00269\ \ \ \ \ BOOST\_CHECK(\ it\ ==\ s6.end()\ );}
+\DoxyCodeLine{00270\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.\mbox{\hyperlink{structmie_1_1_vuint_t_a1be409ac9e110dc4b60234ce37cbf0c8}{size}}(),\ 1\ );}
+\DoxyCodeLine{00271\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}[0].first\ ==\ \textcolor{stringliteral}{"{}foo"{}}\ );}
+\DoxyCodeLine{00272\ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ =\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}[0].second;}
+\DoxyCodeLine{00273\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.size(),\ 1\ );}
+\DoxyCodeLine{00274\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.find(\textcolor{stringliteral}{"{}bar"{}})\ !=\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.end()\ );}
+\DoxyCodeLine{00275\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.find(\textcolor{stringliteral}{"{}bar"{}})-\/>second,\ \textcolor{stringliteral}{"{}"{}}\ );}
+\DoxyCodeLine{00276\ }
+\DoxyCodeLine{00277\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.\mbox{\hyperlink{structmie_1_1_vuint_t_a37838a763e8b608a0aeba236ec1313a7}{clear}}();}
+\DoxyCodeLine{00278\ \ \ \ \ it\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_adabfd491d364be43bee4c7cad63e7e08}{extract\_parameters}}(s7.begin(),s7.end(),\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}});}
+\DoxyCodeLine{00279\ \ \ \ \ BOOST\_CHECK(\ it\ ==\ s7.end()\ );}
+\DoxyCodeLine{00280\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.\mbox{\hyperlink{structmie_1_1_vuint_t_a1be409ac9e110dc4b60234ce37cbf0c8}{size}}(),\ 2\ );}
+\DoxyCodeLine{00281\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}[0].first\ ==\ \textcolor{stringliteral}{"{}foo"{}}\ );}
+\DoxyCodeLine{00282\ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ =\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}[0].second;}
+\DoxyCodeLine{00283\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.size(),\ 1\ );}
+\DoxyCodeLine{00284\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.find(\textcolor{stringliteral}{"{}baz"{}})\ !=\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.end()\ );}
+\DoxyCodeLine{00285\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.find(\textcolor{stringliteral}{"{}baz"{}})-\/>second,\ \textcolor{stringliteral}{"{}"{}}\ );}
+\DoxyCodeLine{00286\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}[1].first\ ==\ \textcolor{stringliteral}{"{}bar"{}}\ );}
+\DoxyCodeLine{00287\ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ =\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}[1].second;}
+\DoxyCodeLine{00288\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.size(),\ 0\ );}
+\DoxyCodeLine{00289\ }
+\DoxyCodeLine{00290\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.\mbox{\hyperlink{structmie_1_1_vuint_t_a37838a763e8b608a0aeba236ec1313a7}{clear}}();}
+\DoxyCodeLine{00291\ \ \ \ \ it\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_adabfd491d364be43bee4c7cad63e7e08}{extract\_parameters}}(s8.begin(),s8.end(),\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}});}
+\DoxyCodeLine{00292\ \ \ \ \ BOOST\_CHECK(\ it\ ==\ s8.end()\ );}
+\DoxyCodeLine{00293\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.\mbox{\hyperlink{structmie_1_1_vuint_t_a1be409ac9e110dc4b60234ce37cbf0c8}{size}}(),\ 1\ );}
+\DoxyCodeLine{00294\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}[0].first\ ==\ \textcolor{stringliteral}{"{}foo"{}}\ );}
+\DoxyCodeLine{00295\ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ =\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}[0].second;}
+\DoxyCodeLine{00296\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.size(),\ 2\ );}
+\DoxyCodeLine{00297\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.find(\textcolor{stringliteral}{"{}bar"{}})\ !=\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.end()\ );}
+\DoxyCodeLine{00298\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.find(\textcolor{stringliteral}{"{}bar"{}})-\/>second,\ \textcolor{stringliteral}{"{}"{}}\ );}
+\DoxyCodeLine{00299\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.find(\textcolor{stringliteral}{"{}baz"{}})\ !=\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.end()\ );}
+\DoxyCodeLine{00300\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.find(\textcolor{stringliteral}{"{}baz"{}})-\/>second,\ \textcolor{stringliteral}{"{}"{}}\ );}
+\DoxyCodeLine{00301\ }
+\DoxyCodeLine{00302\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.\mbox{\hyperlink{structmie_1_1_vuint_t_a37838a763e8b608a0aeba236ec1313a7}{clear}}();}
+\DoxyCodeLine{00303\ \ \ \ \ it\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_adabfd491d364be43bee4c7cad63e7e08}{extract\_parameters}}(s9.begin(),s9.end(),\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}});}
+\DoxyCodeLine{00304\ \ \ \ \ BOOST\_CHECK(\ it\ ==\ s9.end()\ );}
+\DoxyCodeLine{00305\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.\mbox{\hyperlink{structmie_1_1_vuint_t_a1be409ac9e110dc4b60234ce37cbf0c8}{size}}(),\ 1\ );}
+\DoxyCodeLine{00306\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}[0].first\ ==\ \textcolor{stringliteral}{"{}foo"{}}\ );}
+\DoxyCodeLine{00307\ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ =\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}[0].second;}
+\DoxyCodeLine{00308\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.size(),\ 1\ );}
+\DoxyCodeLine{00309\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.find(\textcolor{stringliteral}{"{}bar"{}})\ !=\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.end()\ );}
+\DoxyCodeLine{00310\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.find(\textcolor{stringliteral}{"{}bar"{}})-\/>second,\ \textcolor{stringliteral}{"{}baz"{}}\ );}
+\DoxyCodeLine{00311\ }
+\DoxyCodeLine{00312\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.\mbox{\hyperlink{structmie_1_1_vuint_t_a37838a763e8b608a0aeba236ec1313a7}{clear}}();}
+\DoxyCodeLine{00313\ \ \ \ \ it\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_adabfd491d364be43bee4c7cad63e7e08}{extract\_parameters}}(s10.begin(),s10.end(),\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}});}
+\DoxyCodeLine{00314\ \ \ \ \ BOOST\_CHECK(\ it\ ==\ s10.end()\ );}
+\DoxyCodeLine{00315\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.\mbox{\hyperlink{structmie_1_1_vuint_t_a1be409ac9e110dc4b60234ce37cbf0c8}{size}}(),\ 1\ );}
+\DoxyCodeLine{00316\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}[0].first\ ==\ \textcolor{stringliteral}{"{}foo"{}}\ );}
+\DoxyCodeLine{00317\ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ =\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}[0].second;}
+\DoxyCodeLine{00318\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.size(),\ 2\ );}
+\DoxyCodeLine{00319\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.find(\textcolor{stringliteral}{"{}bar"{}})\ !=\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.end()\ );}
+\DoxyCodeLine{00320\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.find(\textcolor{stringliteral}{"{}bar"{}})-\/>second,\ \textcolor{stringliteral}{"{}baz"{}}\ );}
+\DoxyCodeLine{00321\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.find(\textcolor{stringliteral}{"{}boo"{}})\ !=\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.end()\ );}
+\DoxyCodeLine{00322\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.find(\textcolor{stringliteral}{"{}boo"{}})-\/>second,\ \textcolor{stringliteral}{"{}"{}}\ );}
+\DoxyCodeLine{00323\ }
+\DoxyCodeLine{00324\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.\mbox{\hyperlink{structmie_1_1_vuint_t_a37838a763e8b608a0aeba236ec1313a7}{clear}}();}
+\DoxyCodeLine{00325\ \ \ \ \ it\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_adabfd491d364be43bee4c7cad63e7e08}{extract\_parameters}}(s11.begin(),s11.end(),\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}});}
+\DoxyCodeLine{00326\ \ \ \ \ BOOST\_CHECK(\ it\ ==\ s11.end()\ );}
+\DoxyCodeLine{00327\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.\mbox{\hyperlink{structmie_1_1_vuint_t_a1be409ac9e110dc4b60234ce37cbf0c8}{size}}(),\ 2\ );}
+\DoxyCodeLine{00328\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}[0].first\ ==\ \textcolor{stringliteral}{"{}foo"{}}\ );}
+\DoxyCodeLine{00329\ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ =\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}[0].second;}
+\DoxyCodeLine{00330\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.size(),\ 2\ );}
+\DoxyCodeLine{00331\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.find(\textcolor{stringliteral}{"{}bar"{}})\ !=\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.end()\ );}
+\DoxyCodeLine{00332\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.find(\textcolor{stringliteral}{"{}bar"{}})-\/>second,\ \textcolor{stringliteral}{"{}baz"{}}\ );}
+\DoxyCodeLine{00333\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.find(\textcolor{stringliteral}{"{}boo"{}})\ !=\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.end()\ );}
+\DoxyCodeLine{00334\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.find(\textcolor{stringliteral}{"{}boo"{}})-\/>second,\ \textcolor{stringliteral}{"{}"{}}\ );}
+\DoxyCodeLine{00335\ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ =\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}[1].second;}
+\DoxyCodeLine{00336\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.size(),\ 0\ );}
+\DoxyCodeLine{00337\ }
+\DoxyCodeLine{00338\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.\mbox{\hyperlink{structmie_1_1_vuint_t_a37838a763e8b608a0aeba236ec1313a7}{clear}}();}
+\DoxyCodeLine{00339\ \ \ \ \ it\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_adabfd491d364be43bee4c7cad63e7e08}{extract\_parameters}}(s12.begin(),s12.end(),\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}});}
+\DoxyCodeLine{00340\ \ \ \ \ BOOST\_CHECK(\ it\ ==\ s12.end()\ );}
+\DoxyCodeLine{00341\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.\mbox{\hyperlink{structmie_1_1_vuint_t_a1be409ac9e110dc4b60234ce37cbf0c8}{size}}(),\ 1\ );}
+\DoxyCodeLine{00342\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}[0].first\ ==\ \textcolor{stringliteral}{"{}foo"{}}\ );}
+\DoxyCodeLine{00343\ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ =\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}[0].second;}
+\DoxyCodeLine{00344\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.size(),\ 1\ );}
+\DoxyCodeLine{00345\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.find(\textcolor{stringliteral}{"{}bar"{}})\ !=\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.end()\ );}
+\DoxyCodeLine{00346\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.find(\textcolor{stringliteral}{"{}bar"{}})-\/>second,\ \textcolor{stringliteral}{"{}a\ b\ c"{}}\ );}
+\DoxyCodeLine{00347\ }
+\DoxyCodeLine{00348\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.\mbox{\hyperlink{structmie_1_1_vuint_t_a37838a763e8b608a0aeba236ec1313a7}{clear}}();}
+\DoxyCodeLine{00349\ \ \ \ \ it\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_adabfd491d364be43bee4c7cad63e7e08}{extract\_parameters}}(s13.begin(),s13.end(),\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}});}
+\DoxyCodeLine{00350\ \ \ \ \ BOOST\_CHECK(\ it\ ==\ s13.end()\ );}
+\DoxyCodeLine{00351\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.\mbox{\hyperlink{structmie_1_1_vuint_t_a1be409ac9e110dc4b60234ce37cbf0c8}{size}}(),\ 1\ );}
+\DoxyCodeLine{00352\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}[0].first\ ==\ \textcolor{stringliteral}{"{}foo"{}}\ );}
+\DoxyCodeLine{00353\ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ =\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}[0].second;}
+\DoxyCodeLine{00354\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.size(),\ 1\ );}
+\DoxyCodeLine{00355\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.find(\textcolor{stringliteral}{"{}bar"{}})\ !=\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.end()\ );}
+\DoxyCodeLine{00356\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.find(\textcolor{stringliteral}{"{}bar"{}})-\/>second,\ \textcolor{stringliteral}{"{}a\ \(\backslash\)"{}b\(\backslash\)"{}\ c"{}}\ );}
+\DoxyCodeLine{00357\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{parser_8cpp_a64c6535ab9b7008bfe06cc6f9b32c677_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{parser_8cpp_a10b6a74e26e7fddf378c09c9ccbdd40a}\index{parser.cpp@{parser.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!parser.cpp@{parser.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [17/41]}}
+{\footnotesize\ttfamily \label{parser_8cpp_a10b6a74e26e7fddf378c09c9ccbdd40a} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{extract\+\_\+quoted\+\_\+string}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{parser_8cpp_source_l00126}{126}} of file \mbox{\hyperlink{parser_8cpp_source}{parser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00127\ \ \ \ \ std::string\ \mbox{\hyperlink{dtoa_8c_a1fe17aa2ff1722c937379044a27da68a}{d1}}\ =\ \textcolor{stringliteral}{"{}\(\backslash\)"{}foo\(\backslash\)"{}"{}};}
+\DoxyCodeLine{00128\ \ \ \ \ std::string\ d2\ =\ \textcolor{stringliteral}{"{}\(\backslash\)"{}foo\(\backslash\)\(\backslash\)\(\backslash\)"{}bar\(\backslash\)\(\backslash\)\(\backslash\)"{}baz\(\backslash\)"{}"{}};}
+\DoxyCodeLine{00129\ \ \ \ \ std::string\ d3\ =\ \textcolor{stringliteral}{"{}\(\backslash\)"{}foo\(\backslash\)"{}\ \ \ \ \ "{}};}
+\DoxyCodeLine{00130\ \ \ \ \ std::string\ d4;}
+\DoxyCodeLine{00131\ \ \ \ \ std::string\ d5\ =\ \textcolor{stringliteral}{"{}foo"{}};}
+\DoxyCodeLine{00132\ }
+\DoxyCodeLine{00133\ \ \ \ \ std::pair<std::string,std::string::const\_iterator>\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00134\ }
+\DoxyCodeLine{00135\ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_a2a35158d976b84679dda4fd4a4b237bc}{websocketpp::http::parser::extract\_quoted\_string}};}
+\DoxyCodeLine{00136\ }
+\DoxyCodeLine{00137\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_a2a35158d976b84679dda4fd4a4b237bc}{extract\_quoted\_string}}(\mbox{\hyperlink{dtoa_8c_a1fe17aa2ff1722c937379044a27da68a}{d1}}.begin(),\mbox{\hyperlink{dtoa_8c_a1fe17aa2ff1722c937379044a27da68a}{d1}}.end());}
+\DoxyCodeLine{00138\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.first\ ==\ \textcolor{stringliteral}{"{}foo"{}}\ );}
+\DoxyCodeLine{00139\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.second\ ==\ \mbox{\hyperlink{dtoa_8c_a1fe17aa2ff1722c937379044a27da68a}{d1}}.end()\ );}
+\DoxyCodeLine{00140\ }
+\DoxyCodeLine{00141\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_a2a35158d976b84679dda4fd4a4b237bc}{extract\_quoted\_string}}(d2.begin(),d2.end());}
+\DoxyCodeLine{00142\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.first\ ==\ \textcolor{stringliteral}{"{}foo\(\backslash\)"{}bar\(\backslash\)"{}baz"{}}\ );}
+\DoxyCodeLine{00143\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.second\ ==\ d2.end()\ );}
+\DoxyCodeLine{00144\ }
+\DoxyCodeLine{00145\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_a2a35158d976b84679dda4fd4a4b237bc}{extract\_quoted\_string}}(d3.begin(),d3.end());}
+\DoxyCodeLine{00146\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.first\ ==\ \textcolor{stringliteral}{"{}foo"{}}\ );}
+\DoxyCodeLine{00147\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.second\ ==\ d3.begin()+5\ );}
+\DoxyCodeLine{00148\ }
+\DoxyCodeLine{00149\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_a2a35158d976b84679dda4fd4a4b237bc}{extract\_quoted\_string}}(d4.begin(),d4.end());}
+\DoxyCodeLine{00150\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.first.empty()\ );}
+\DoxyCodeLine{00151\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.second\ ==\ d4.begin()\ );}
+\DoxyCodeLine{00152\ }
+\DoxyCodeLine{00153\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_a2a35158d976b84679dda4fd4a4b237bc}{extract\_quoted\_string}}(d5.begin(),d5.end());}
+\DoxyCodeLine{00154\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.first.empty()\ );}
+\DoxyCodeLine{00155\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.second\ ==\ d5.begin()\ );}
+\DoxyCodeLine{00156\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{parser_8cpp_a10b6a74e26e7fddf378c09c9ccbdd40a_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{parser_8cpp_a077c95881f898ee0dae6222aebc4fd2d}\index{parser.cpp@{parser.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!parser.cpp@{parser.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [18/41]}}
+{\footnotesize\ttfamily \label{parser_8cpp_a077c95881f898ee0dae6222aebc4fd2d} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{extract\+\_\+token}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{parser_8cpp_source_l00107}{107}} of file \mbox{\hyperlink{parser_8cpp_source}{parser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00108\ \ \ \ \ std::string\ \mbox{\hyperlink{dtoa_8c_a1fe17aa2ff1722c937379044a27da68a}{d1}}\ =\ \textcolor{stringliteral}{"{}foo"{}};}
+\DoxyCodeLine{00109\ \ \ \ \ std::string\ d2\ =\ \textcolor{stringliteral}{"{}\ foo\ "{}};}
+\DoxyCodeLine{00110\ }
+\DoxyCodeLine{00111\ \ \ \ \ std::pair<std::string,std::string::const\_iterator>\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00112\ }
+\DoxyCodeLine{00113\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_a6c56e2f70369551a1dcd9816f3d4d2eb}{websocketpp::http::parser::extract\_token}}(\mbox{\hyperlink{dtoa_8c_a1fe17aa2ff1722c937379044a27da68a}{d1}}.begin(),\mbox{\hyperlink{dtoa_8c_a1fe17aa2ff1722c937379044a27da68a}{d1}}.end());}
+\DoxyCodeLine{00114\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.first\ ==\ \textcolor{stringliteral}{"{}foo"{}}\ );}
+\DoxyCodeLine{00115\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.second\ ==\ \mbox{\hyperlink{dtoa_8c_a1fe17aa2ff1722c937379044a27da68a}{d1}}.begin()+3\ );}
+\DoxyCodeLine{00116\ }
+\DoxyCodeLine{00117\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_a6c56e2f70369551a1dcd9816f3d4d2eb}{websocketpp::http::parser::extract\_token}}(d2.begin(),d2.end());}
+\DoxyCodeLine{00118\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.first.empty()\ );}
+\DoxyCodeLine{00119\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.second\ ==\ d2.begin()+0\ );}
+\DoxyCodeLine{00120\ }
+\DoxyCodeLine{00121\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_a6c56e2f70369551a1dcd9816f3d4d2eb}{websocketpp::http::parser::extract\_token}}(d2.begin()+1,d2.end());}
+\DoxyCodeLine{00122\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.first\ ==\ \textcolor{stringliteral}{"{}foo"{}}\ );}
+\DoxyCodeLine{00123\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.second\ ==\ d2.begin()+4\ );}
+\DoxyCodeLine{00124\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{parser_8cpp_a077c95881f898ee0dae6222aebc4fd2d_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{parser_8cpp_af2a89183fd3266136fb70151cdf414b1}\index{parser.cpp@{parser.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!parser.cpp@{parser.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [19/41]}}
+{\footnotesize\ttfamily \label{parser_8cpp_af2a89183fd3266136fb70151cdf414b1} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{firefox\+\_\+full\+\_\+request}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{parser_8cpp_source_l00702}{702}} of file \mbox{\hyperlink{parser_8cpp_source}{parser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00702\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00703\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1request}{websocketpp::http::parser::request}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};}
+\DoxyCodeLine{00704\ }
+\DoxyCodeLine{00705\ \ \ \ \ std::string\ raw\ =\ \textcolor{stringliteral}{"{}GET\ /\ HTTP/1.1\(\backslash\)r\(\backslash\)nHost:\ localhost:5000\(\backslash\)r\(\backslash\)nUser-\/Agent:\ Mozilla/5.0\ (Macintosh;\ Intel\ Mac\ OS\ X\ 10.7;\ rv:10.0)\ Gecko/20100101\ Firefox/10.0\(\backslash\)r\(\backslash\)nAccept:\ text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\(\backslash\)r\(\backslash\)nAccept-\/Language:\ en-\/us,en;q=0.5\(\backslash\)r\(\backslash\)nAccept-\/Encoding:\ gzip,\ deflate\(\backslash\)r\(\backslash\)nConnection:\ keep-\/alive,\ Upgrade\(\backslash\)r\(\backslash\)nSec-\/WebSocket-\/Version:\ 8\(\backslash\)r\(\backslash\)nSec-\/WebSocket-\/Origin:\ http://zaphoyd.com\(\backslash\)r\(\backslash\)nSec-\/WebSocket-\/Key:\ pFik//FxwFk0riN4ZiPFjQ==\(\backslash\)r\(\backslash\)nPragma:\ no-\/cache\(\backslash\)r\(\backslash\)nCache-\/Control:\ no-\/cache\(\backslash\)r\(\backslash\)nUpgrade:\ websocket\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)n"{}};}
+\DoxyCodeLine{00706\ }
+\DoxyCodeLine{00707\ \ \ \ \ \textcolor{keywordtype}{bool}\ exception\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00708\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ pos\ =\ 0;}
+\DoxyCodeLine{00709\ }
+\DoxyCodeLine{00710\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00711\ \ \ \ \ \ \ \ \ pos\ +=\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.consume(raw.c\_str(),raw.size());}
+\DoxyCodeLine{00712\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{}
+\DoxyCodeLine{00713\ \ \ \ \ \ \ \ \ exception\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00714\ \ \ \ \ \}}
+\DoxyCodeLine{00715\ }
+\DoxyCodeLine{00716\ \ \ \ \ BOOST\_CHECK(\ exception\ ==\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{00717\ \ \ \ \ BOOST\_CHECK(\ pos\ ==\ 482\ );}
+\DoxyCodeLine{00718\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.ready()\ ==\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{00719\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_version()\ ==\ \textcolor{stringliteral}{"{}HTTP/1.1"{}}\ );}
+\DoxyCodeLine{00720\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_method()\ ==\ \textcolor{stringliteral}{"{}GET"{}}\ );}
+\DoxyCodeLine{00721\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_uri()\ ==\ \textcolor{stringliteral}{"{}/"{}}\ );}
+\DoxyCodeLine{00722\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}Host"{}})\ ==\ \textcolor{stringliteral}{"{}localhost:5000"{}}\ );}
+\DoxyCodeLine{00723\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}User-\/Agent"{}})\ ==\ \textcolor{stringliteral}{"{}Mozilla/5.0\ (Macintosh;\ Intel\ Mac\ OS\ X\ 10.7;\ rv:10.0)\ Gecko/20100101\ Firefox/10.0"{}}\ );}
+\DoxyCodeLine{00724\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}Accept"{}})\ ==\ \textcolor{stringliteral}{"{}text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"{}}\ );}
+\DoxyCodeLine{00725\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}Accept-\/Language"{}})\ ==\ \textcolor{stringliteral}{"{}en-\/us,en;q=0.5"{}}\ );}
+\DoxyCodeLine{00726\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}Accept-\/Encoding"{}})\ ==\ \textcolor{stringliteral}{"{}gzip,\ deflate"{}}\ );}
+\DoxyCodeLine{00727\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}Connection"{}})\ ==\ \textcolor{stringliteral}{"{}keep-\/alive,\ Upgrade"{}}\ );}
+\DoxyCodeLine{00728\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}Sec-\/WebSocket-\/Version"{}})\ ==\ \textcolor{stringliteral}{"{}8"{}}\ );}
+\DoxyCodeLine{00729\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}Sec-\/WebSocket-\/Origin"{}})\ ==\ \textcolor{stringliteral}{"{}http://zaphoyd.com"{}}\ );}
+\DoxyCodeLine{00730\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}Sec-\/WebSocket-\/Key"{}})\ ==\ \textcolor{stringliteral}{"{}pFik//FxwFk0riN4ZiPFjQ=="{}}\ );}
+\DoxyCodeLine{00731\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}Pragma"{}})\ ==\ \textcolor{stringliteral}{"{}no-\/cache"{}}\ );}
+\DoxyCodeLine{00732\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}Cache-\/Control"{}})\ ==\ \textcolor{stringliteral}{"{}no-\/cache"{}}\ );}
+\DoxyCodeLine{00733\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}Upgrade"{}})\ ==\ \textcolor{stringliteral}{"{}websocket"{}}\ );}
+\DoxyCodeLine{00734\ \}}
+
+\end{DoxyCode}
+\Hypertarget{parser_8cpp_a056641a0357b0d8af30bbcc6fb1da4ad}\index{parser.cpp@{parser.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!parser.cpp@{parser.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [20/41]}}
+{\footnotesize\ttfamily \label{parser_8cpp_a056641a0357b0d8af30bbcc6fb1da4ad} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{header\+\_\+aggregation}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{parser_8cpp_source_l00902}{902}} of file \mbox{\hyperlink{parser_8cpp_source}{parser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00902\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00903\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1request}{websocketpp::http::parser::request}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};}
+\DoxyCodeLine{00904\ }
+\DoxyCodeLine{00905\ \ \ \ \ std::string\ raw\ =\ \textcolor{stringliteral}{"{}GET\ /\ HTTP/1.1\(\backslash\)r\(\backslash\)nHost:\ www.example.com\(\backslash\)r\(\backslash\)nFoo:\ bar\(\backslash\)r\(\backslash\)nFoo:\ bat\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)n"{}};}
+\DoxyCodeLine{00906\ }
+\DoxyCodeLine{00907\ \ \ \ \ \textcolor{keywordtype}{bool}\ exception\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00908\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ pos\ =\ 0;}
+\DoxyCodeLine{00909\ }
+\DoxyCodeLine{00910\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00911\ \ \ \ \ \ \ \ \ pos\ =\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.consume(raw.c\_str(),raw.size());}
+\DoxyCodeLine{00912\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{}
+\DoxyCodeLine{00913\ \ \ \ \ \ \ \ \ exception\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00914\ \ \ \ \ \}}
+\DoxyCodeLine{00915\ }
+\DoxyCodeLine{00916\ \ \ \ \ BOOST\_CHECK(\ exception\ ==\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{00917\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ pos,\ 61\ );}
+\DoxyCodeLine{00918\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.ready()\ ==\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{00919\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_version(),\ \textcolor{stringliteral}{"{}HTTP/1.1"{}}\ );}
+\DoxyCodeLine{00920\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_method(),\ \textcolor{stringliteral}{"{}GET"{}}\ );}
+\DoxyCodeLine{00921\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_uri(),\ \textcolor{stringliteral}{"{}/"{}}\ );}
+\DoxyCodeLine{00922\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}Foo"{}}),\ \textcolor{stringliteral}{"{}bar,\ bat"{}}\ );}
+\DoxyCodeLine{00923\ \}}
+
+\end{DoxyCode}
+\Hypertarget{parser_8cpp_ab0f6dec176d008e6ad8842d338724256}\index{parser.cpp@{parser.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!parser.cpp@{parser.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [21/41]}}
+{\footnotesize\ttfamily \label{parser_8cpp_ab0f6dec176d008e6ad8842d338724256} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{header\+\_\+whitespace1}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{parser_8cpp_source_l00856}{856}} of file \mbox{\hyperlink{parser_8cpp_source}{parser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00856\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00857\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1request}{websocketpp::http::parser::request}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};}
+\DoxyCodeLine{00858\ }
+\DoxyCodeLine{00859\ \ \ \ \ std::string\ raw\ =\ \textcolor{stringliteral}{"{}GET\ /\ HTTP/1.1\(\backslash\)r\(\backslash\)nHost:\ \ www.example.com\ \(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)n"{}};}
+\DoxyCodeLine{00860\ }
+\DoxyCodeLine{00861\ \ \ \ \ \textcolor{keywordtype}{bool}\ exception\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00862\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ pos\ =\ 0;}
+\DoxyCodeLine{00863\ }
+\DoxyCodeLine{00864\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00865\ \ \ \ \ \ \ \ \ pos\ =\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.consume(raw.c\_str(),raw.size());}
+\DoxyCodeLine{00866\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{}
+\DoxyCodeLine{00867\ \ \ \ \ \ \ \ \ exception\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00868\ \ \ \ \ \}}
+\DoxyCodeLine{00869\ }
+\DoxyCodeLine{00870\ \ \ \ \ BOOST\_CHECK(\ exception\ ==\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{00871\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ pos,\ 43\ );}
+\DoxyCodeLine{00872\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.ready()\ ==\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{00873\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_version(),\ \textcolor{stringliteral}{"{}HTTP/1.1"{}}\ );}
+\DoxyCodeLine{00874\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_method(),\ \textcolor{stringliteral}{"{}GET"{}}\ );}
+\DoxyCodeLine{00875\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_uri(),\ \textcolor{stringliteral}{"{}/"{}}\ );}
+\DoxyCodeLine{00876\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}Host"{}}),\ \textcolor{stringliteral}{"{}www.example.com"{}}\ );}
+\DoxyCodeLine{00877\ \}}
+
+\end{DoxyCode}
+\Hypertarget{parser_8cpp_a431012962def47867128ae15dccd170c}\index{parser.cpp@{parser.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!parser.cpp@{parser.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [22/41]}}
+{\footnotesize\ttfamily \label{parser_8cpp_a431012962def47867128ae15dccd170c} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{header\+\_\+whitespace2}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{parser_8cpp_source_l00879}{879}} of file \mbox{\hyperlink{parser_8cpp_source}{parser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00879\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00880\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1request}{websocketpp::http::parser::request}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};}
+\DoxyCodeLine{00881\ }
+\DoxyCodeLine{00882\ \ \ \ \ std::string\ raw\ =\ \textcolor{stringliteral}{"{}GET\ /\ HTTP/1.1\(\backslash\)r\(\backslash\)nHost:www.example.com\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)n"{}};}
+\DoxyCodeLine{00883\ }
+\DoxyCodeLine{00884\ \ \ \ \ \textcolor{keywordtype}{bool}\ exception\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00885\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ pos\ =\ 0;}
+\DoxyCodeLine{00886\ }
+\DoxyCodeLine{00887\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00888\ \ \ \ \ \ \ \ \ pos\ =\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.consume(raw.c\_str(),raw.size());}
+\DoxyCodeLine{00889\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{}
+\DoxyCodeLine{00890\ \ \ \ \ \ \ \ \ exception\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00891\ \ \ \ \ \}}
+\DoxyCodeLine{00892\ }
+\DoxyCodeLine{00893\ \ \ \ \ BOOST\_CHECK(\ exception\ ==\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{00894\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ pos,\ 40\ );}
+\DoxyCodeLine{00895\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.ready()\ ==\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{00896\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_version(),\ \textcolor{stringliteral}{"{}HTTP/1.1"{}}\ );}
+\DoxyCodeLine{00897\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_method(),\ \textcolor{stringliteral}{"{}GET"{}}\ );}
+\DoxyCodeLine{00898\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_uri(),\ \textcolor{stringliteral}{"{}/"{}}\ );}
+\DoxyCodeLine{00899\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}Host"{}}),\ \textcolor{stringliteral}{"{}www.example.com"{}}\ );}
+\DoxyCodeLine{00900\ \}}
+
+\end{DoxyCode}
+\Hypertarget{parser_8cpp_a0ea7d5a58346812a68ef9e4a9044b653}\index{parser.cpp@{parser.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!parser.cpp@{parser.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [23/41]}}
+{\footnotesize\ttfamily \label{parser_8cpp_a0ea7d5a58346812a68ef9e4a9044b653} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{is\+\_\+token\+\_\+char}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{parser_8cpp_source_l00037}{37}} of file \mbox{\hyperlink{parser_8cpp_source}{parser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00038\ \ \ \ \ \textcolor{comment}{//\ Valid\ characters}}
+\DoxyCodeLine{00039\ }
+\DoxyCodeLine{00040\ \ \ \ \ \textcolor{comment}{//\ misc}}
+\DoxyCodeLine{00041\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_aa414db2fb0b24344fe795183e0a4dbd9}{websocketpp::http::is\_token\_char}}(\textcolor{charliteral}{'!'})\ );}
+\DoxyCodeLine{00042\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_aa414db2fb0b24344fe795183e0a4dbd9}{websocketpp::http::is\_token\_char}}(\textcolor{charliteral}{'\#'})\ );}
+\DoxyCodeLine{00043\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_aa414db2fb0b24344fe795183e0a4dbd9}{websocketpp::http::is\_token\_char}}(\textcolor{charliteral}{'\$'})\ );}
+\DoxyCodeLine{00044\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_aa414db2fb0b24344fe795183e0a4dbd9}{websocketpp::http::is\_token\_char}}(\textcolor{charliteral}{'\%'})\ );}
+\DoxyCodeLine{00045\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_aa414db2fb0b24344fe795183e0a4dbd9}{websocketpp::http::is\_token\_char}}(\textcolor{charliteral}{'\&'})\ );}
+\DoxyCodeLine{00046\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_aa414db2fb0b24344fe795183e0a4dbd9}{websocketpp::http::is\_token\_char}}(\textcolor{charliteral}{'\(\backslash\)''})\ );}
+\DoxyCodeLine{00047\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_aa414db2fb0b24344fe795183e0a4dbd9}{websocketpp::http::is\_token\_char}}(\textcolor{charliteral}{'*'})\ );}
+\DoxyCodeLine{00048\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_aa414db2fb0b24344fe795183e0a4dbd9}{websocketpp::http::is\_token\_char}}(\textcolor{charliteral}{'+'})\ );}
+\DoxyCodeLine{00049\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_aa414db2fb0b24344fe795183e0a4dbd9}{websocketpp::http::is\_token\_char}}(\textcolor{charliteral}{'-\/'})\ );}
+\DoxyCodeLine{00050\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_aa414db2fb0b24344fe795183e0a4dbd9}{websocketpp::http::is\_token\_char}}(\textcolor{charliteral}{'.'})\ );}
+\DoxyCodeLine{00051\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_aa414db2fb0b24344fe795183e0a4dbd9}{websocketpp::http::is\_token\_char}}(\textcolor{charliteral}{'\string^'})\ );}
+\DoxyCodeLine{00052\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_aa414db2fb0b24344fe795183e0a4dbd9}{websocketpp::http::is\_token\_char}}(\textcolor{charliteral}{'\_'})\ );}
+\DoxyCodeLine{00053\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_aa414db2fb0b24344fe795183e0a4dbd9}{websocketpp::http::is\_token\_char}}(\textcolor{charliteral}{'`'})\ );}
+\DoxyCodeLine{00054\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_aa414db2fb0b24344fe795183e0a4dbd9}{websocketpp::http::is\_token\_char}}(\textcolor{charliteral}{'\string~'})\ );}
+\DoxyCodeLine{00055\ }
+\DoxyCodeLine{00056\ \ \ \ \ \textcolor{comment}{//\ numbers}}
+\DoxyCodeLine{00057\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0x30;\ i\ <\ 0x3a;\ i++)\ \{}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_aa414db2fb0b24344fe795183e0a4dbd9}{websocketpp::http::is\_token\_char}}((\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char})(i))\ );}
+\DoxyCodeLine{00059\ \ \ \ \ \}}
+\DoxyCodeLine{00060\ }
+\DoxyCodeLine{00061\ \ \ \ \ \textcolor{comment}{//\ upper}}
+\DoxyCodeLine{00062\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0x41;\ i\ <\ 0x5b;\ i++)\ \{}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_aa414db2fb0b24344fe795183e0a4dbd9}{websocketpp::http::is\_token\_char}}((\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char})(i))\ );}
+\DoxyCodeLine{00064\ \ \ \ \ \}}
+\DoxyCodeLine{00065\ }
+\DoxyCodeLine{00066\ \ \ \ \ \textcolor{comment}{//\ lower}}
+\DoxyCodeLine{00067\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0x61;\ i\ <\ 0x7b;\ i++)\ \{}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_aa414db2fb0b24344fe795183e0a4dbd9}{websocketpp::http::is\_token\_char}}((\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char})(i))\ );}
+\DoxyCodeLine{00069\ \ \ \ \ \}}
+\DoxyCodeLine{00070\ }
+\DoxyCodeLine{00071\ \ \ \ \ \textcolor{comment}{//\ invalid\ characters}}
+\DoxyCodeLine{00072\ }
+\DoxyCodeLine{00073\ \ \ \ \ \textcolor{comment}{//\ lower\ unprintable}}
+\DoxyCodeLine{00074\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ 33;\ i++)\ \{}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ BOOST\_CHECK(\ !\mbox{\hyperlink{namespacewebsocketpp_1_1http_aa414db2fb0b24344fe795183e0a4dbd9}{websocketpp::http::is\_token\_char}}((\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char})(i))\ );}
+\DoxyCodeLine{00076\ \ \ \ \ \}}
+\DoxyCodeLine{00077\ }
+\DoxyCodeLine{00078\ \ \ \ \ \textcolor{comment}{//\ misc}}
+\DoxyCodeLine{00079\ \ \ \ \ BOOST\_CHECK(\ !\mbox{\hyperlink{namespacewebsocketpp_1_1http_aa414db2fb0b24344fe795183e0a4dbd9}{websocketpp::http::is\_token\_char}}(\textcolor{charliteral}{'('})\ );}
+\DoxyCodeLine{00080\ \ \ \ \ BOOST\_CHECK(\ !\mbox{\hyperlink{namespacewebsocketpp_1_1http_aa414db2fb0b24344fe795183e0a4dbd9}{websocketpp::http::is\_token\_char}}(\textcolor{charliteral}{')'})\ );}
+\DoxyCodeLine{00081\ \ \ \ \ BOOST\_CHECK(\ !\mbox{\hyperlink{namespacewebsocketpp_1_1http_aa414db2fb0b24344fe795183e0a4dbd9}{websocketpp::http::is\_token\_char}}(\textcolor{charliteral}{'<'})\ );}
+\DoxyCodeLine{00082\ \ \ \ \ BOOST\_CHECK(\ !\mbox{\hyperlink{namespacewebsocketpp_1_1http_aa414db2fb0b24344fe795183e0a4dbd9}{websocketpp::http::is\_token\_char}}(\textcolor{charliteral}{'>'})\ );}
+\DoxyCodeLine{00083\ \ \ \ \ BOOST\_CHECK(\ !\mbox{\hyperlink{namespacewebsocketpp_1_1http_aa414db2fb0b24344fe795183e0a4dbd9}{websocketpp::http::is\_token\_char}}(\textcolor{charliteral}{'@'})\ );}
+\DoxyCodeLine{00084\ \ \ \ \ BOOST\_CHECK(\ !\mbox{\hyperlink{namespacewebsocketpp_1_1http_aa414db2fb0b24344fe795183e0a4dbd9}{websocketpp::http::is\_token\_char}}(\textcolor{charliteral}{','})\ );}
+\DoxyCodeLine{00085\ \ \ \ \ BOOST\_CHECK(\ !\mbox{\hyperlink{namespacewebsocketpp_1_1http_aa414db2fb0b24344fe795183e0a4dbd9}{websocketpp::http::is\_token\_char}}(\textcolor{charliteral}{';'})\ );}
+\DoxyCodeLine{00086\ \ \ \ \ BOOST\_CHECK(\ !\mbox{\hyperlink{namespacewebsocketpp_1_1http_aa414db2fb0b24344fe795183e0a4dbd9}{websocketpp::http::is\_token\_char}}(\textcolor{charliteral}{':'})\ );}
+\DoxyCodeLine{00087\ \ \ \ \ BOOST\_CHECK(\ !\mbox{\hyperlink{namespacewebsocketpp_1_1http_aa414db2fb0b24344fe795183e0a4dbd9}{websocketpp::http::is\_token\_char}}(\textcolor{charliteral}{'\(\backslash\)\(\backslash\)'})\ );}
+\DoxyCodeLine{00088\ \ \ \ \ BOOST\_CHECK(\ !\mbox{\hyperlink{namespacewebsocketpp_1_1http_aa414db2fb0b24344fe795183e0a4dbd9}{websocketpp::http::is\_token\_char}}(\textcolor{charliteral}{'"{}'})\ );}
+\DoxyCodeLine{00089\ \ \ \ \ BOOST\_CHECK(\ !\mbox{\hyperlink{namespacewebsocketpp_1_1http_aa414db2fb0b24344fe795183e0a4dbd9}{websocketpp::http::is\_token\_char}}(\textcolor{charliteral}{'/'})\ );}
+\DoxyCodeLine{00090\ \ \ \ \ BOOST\_CHECK(\ !\mbox{\hyperlink{namespacewebsocketpp_1_1http_aa414db2fb0b24344fe795183e0a4dbd9}{websocketpp::http::is\_token\_char}}(\textcolor{charliteral}{'['})\ );}
+\DoxyCodeLine{00091\ \ \ \ \ BOOST\_CHECK(\ !\mbox{\hyperlink{namespacewebsocketpp_1_1http_aa414db2fb0b24344fe795183e0a4dbd9}{websocketpp::http::is\_token\_char}}(\textcolor{charliteral}{']'})\ );}
+\DoxyCodeLine{00092\ \ \ \ \ BOOST\_CHECK(\ !\mbox{\hyperlink{namespacewebsocketpp_1_1http_aa414db2fb0b24344fe795183e0a4dbd9}{websocketpp::http::is\_token\_char}}(\textcolor{charliteral}{'?'})\ );}
+\DoxyCodeLine{00093\ \ \ \ \ BOOST\_CHECK(\ !\mbox{\hyperlink{namespacewebsocketpp_1_1http_aa414db2fb0b24344fe795183e0a4dbd9}{websocketpp::http::is\_token\_char}}(\textcolor{charliteral}{'='})\ );}
+\DoxyCodeLine{00094\ \ \ \ \ BOOST\_CHECK(\ !\mbox{\hyperlink{namespacewebsocketpp_1_1http_aa414db2fb0b24344fe795183e0a4dbd9}{websocketpp::http::is\_token\_char}}(\textcolor{charliteral}{'\{'})\ );}
+\DoxyCodeLine{00095\ \ \ \ \ BOOST\_CHECK(\ !\mbox{\hyperlink{namespacewebsocketpp_1_1http_aa414db2fb0b24344fe795183e0a4dbd9}{websocketpp::http::is\_token\_char}}(\textcolor{charliteral}{'\}'})\ );}
+\DoxyCodeLine{00096\ }
+\DoxyCodeLine{00097\ \ \ \ \ \textcolor{comment}{//\ upper\ unprintable\ and\ out\ of\ ascii\ range}}
+\DoxyCodeLine{00098\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 127;\ i\ <\ 256;\ i++)\ \{}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ BOOST\_CHECK(\ !\mbox{\hyperlink{namespacewebsocketpp_1_1http_aa414db2fb0b24344fe795183e0a4dbd9}{websocketpp::http::is\_token\_char}}((\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char})(i))\ );}
+\DoxyCodeLine{00100\ \ \ \ \ \}}
+\DoxyCodeLine{00101\ }
+\DoxyCodeLine{00102\ \ \ \ \ \textcolor{comment}{//\ is\ not}}
+\DoxyCodeLine{00103\ \ \ \ \ BOOST\_CHECK(\ !\mbox{\hyperlink{namespacewebsocketpp_1_1http_a45a9b60b72b68de7b32fb75d89ad4c04}{websocketpp::http::is\_not\_token\_char}}(\textcolor{charliteral}{'!'})\ );}
+\DoxyCodeLine{00104\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_a45a9b60b72b68de7b32fb75d89ad4c04}{websocketpp::http::is\_not\_token\_char}}(\textcolor{charliteral}{'('})\ );}
+\DoxyCodeLine{00105\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{parser_8cpp_a0ea7d5a58346812a68ef9e4a9044b653_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{parser_8cpp_a904679cc9508a839e99d2f08bc09665e}\index{parser.cpp@{parser.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!parser.cpp@{parser.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [24/41]}}
+{\footnotesize\ttfamily \label{parser_8cpp_a904679cc9508a839e99d2f08bc09665e} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{max\+\_\+body\+\_\+len}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{parser_8cpp_source_l00681}{681}} of file \mbox{\hyperlink{parser_8cpp_source}{parser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00681\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00682\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1request}{websocketpp::http::parser::request}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};}
+\DoxyCodeLine{00683\ \ \ \ \ }
+\DoxyCodeLine{00684\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.set\_max\_body\_size(5);}
+\DoxyCodeLine{00685\ }
+\DoxyCodeLine{00686\ \ \ \ \ std::string\ raw\ =\ \textcolor{stringliteral}{"{}GET\ /\ HTTP/1.1\(\backslash\)r\(\backslash\)nHost:\ www.example.com\(\backslash\)r\(\backslash\)nContent-\/Length:\ 6\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)nabcdef"{}};}
+\DoxyCodeLine{00687\ }
+\DoxyCodeLine{00688\ \ \ \ \ \textcolor{keywordtype}{bool}\ exception\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00689\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ pos\ =\ 0;}
+\DoxyCodeLine{00690\ }
+\DoxyCodeLine{00691\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00692\ \ \ \ \ \ \ \ \ pos\ +=\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.consume(raw.c\_str(),raw.size());}
+\DoxyCodeLine{00693\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\mbox{\hyperlink{classwebsocketpp_1_1http_1_1exception}{websocketpp::http::exception}}\ \textcolor{keyword}{const}\ \&\ e)\ \{}
+\DoxyCodeLine{00694\ \ \ \ \ \ \ \ \ exception\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00695\ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(e.\mbox{\hyperlink{classwebsocketpp_1_1http_1_1exception_a169eaa70f405f073091194113fe75d0c}{m\_error\_code}},\mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1status__code_ae0d61c309e053ee5673517b54e2886c6a2be6cb895a653d5953623fbd2ede900a}{websocketpp::http::status\_code::request\_entity\_too\_large}});}
+\DoxyCodeLine{00696\ \ \ \ \ \}}
+\DoxyCodeLine{00697\ }
+\DoxyCodeLine{00698\ \ \ \ \ BOOST\_CHECK\_EQUAL(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_max\_body\_size(),5);}
+\DoxyCodeLine{00699\ \ \ \ \ BOOST\_CHECK(\ exception\ ==\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{00700\ \}}
+
+\end{DoxyCode}
+\Hypertarget{parser_8cpp_ae083a85b8c6333c550b631a7cc3a8319}\index{parser.cpp@{parser.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!parser.cpp@{parser.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [25/41]}}
+{\footnotesize\ttfamily \label{parser_8cpp_ae083a85b8c6333c550b631a7cc3a8319} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{max\+\_\+header\+\_\+len}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{parser_8cpp_source_l00640}{640}} of file \mbox{\hyperlink{parser_8cpp_source}{parser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00640\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00641\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1request}{websocketpp::http::parser::request}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};}
+\DoxyCodeLine{00642\ }
+\DoxyCodeLine{00643\ \ \ \ \ std::string\ raw(\mbox{\hyperlink{namespacewebsocketpp_1_1http_a514b8c48c36a9e42964f9ea35a82bc95}{websocketpp::http::max\_header\_size}}-\/1,\textcolor{charliteral}{'*'});}
+\DoxyCodeLine{00644\ \ \ \ \ raw\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)r\(\backslash\)n"{}};}
+\DoxyCodeLine{00645\ }
+\DoxyCodeLine{00646\ \ \ \ \ \textcolor{keywordtype}{bool}\ exception\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00647\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ pos\ =\ 0;}
+\DoxyCodeLine{00648\ }
+\DoxyCodeLine{00649\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00650\ \ \ \ \ \ \ \ \ pos\ +=\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.consume(raw.c\_str(),raw.size());}
+\DoxyCodeLine{00651\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1exception}{websocketpp::http::exception}}\&\ e)\ \{}
+\DoxyCodeLine{00652\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (e.\mbox{\hyperlink{classwebsocketpp_1_1http_1_1exception_a169eaa70f405f073091194113fe75d0c}{m\_error\_code}}\ ==\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1status__code_ae0d61c309e053ee5673517b54e2886c6a9f7d1a6d7434db2ba4397cd76e608560}{websocketpp::http::status\_code::request\_header\_fields\_too\_large}})\ \{}
+\DoxyCodeLine{00653\ \ \ \ \ \ \ \ \ \ \ \ \ exception\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00654\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00655\ \ \ \ \ \}}
+\DoxyCodeLine{00656\ }
+\DoxyCodeLine{00657\ \ \ \ \ BOOST\_CHECK(\ exception\ ==\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{00658\ \}}
+
+\end{DoxyCode}
+\Hypertarget{parser_8cpp_a1cd47da8a6e2ddb5783eacfbb721cb5c}\index{parser.cpp@{parser.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!parser.cpp@{parser.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [26/41]}}
+{\footnotesize\ttfamily \label{parser_8cpp_a1cd47da8a6e2ddb5783eacfbb721cb5c} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{max\+\_\+header\+\_\+len\+\_\+split}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{parser_8cpp_source_l00660}{660}} of file \mbox{\hyperlink{parser_8cpp_source}{parser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00660\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00661\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1request}{websocketpp::http::parser::request}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};}
+\DoxyCodeLine{00662\ }
+\DoxyCodeLine{00663\ \ \ \ \ std::string\ raw(\mbox{\hyperlink{namespacewebsocketpp_1_1http_a514b8c48c36a9e42964f9ea35a82bc95}{websocketpp::http::max\_header\_size}}-\/1,\textcolor{charliteral}{'*'});}
+\DoxyCodeLine{00664\ \ \ \ \ std::string\ raw2(2,\textcolor{charliteral}{'*'});}
+\DoxyCodeLine{00665\ }
+\DoxyCodeLine{00666\ \ \ \ \ \textcolor{keywordtype}{bool}\ exception\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00667\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ pos\ =\ 0;}
+\DoxyCodeLine{00668\ }
+\DoxyCodeLine{00669\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00670\ \ \ \ \ \ \ \ \ pos\ +=\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.consume(raw.c\_str(),raw.size());}
+\DoxyCodeLine{00671\ \ \ \ \ \ \ \ \ pos\ +=\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.consume(raw2.c\_str(),raw2.size());}
+\DoxyCodeLine{00672\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1exception}{websocketpp::http::exception}}\&\ e)\ \{}
+\DoxyCodeLine{00673\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (e.\mbox{\hyperlink{classwebsocketpp_1_1http_1_1exception_a169eaa70f405f073091194113fe75d0c}{m\_error\_code}}\ ==\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1status__code_ae0d61c309e053ee5673517b54e2886c6a9f7d1a6d7434db2ba4397cd76e608560}{websocketpp::http::status\_code::request\_header\_fields\_too\_large}})\ \{}
+\DoxyCodeLine{00674\ \ \ \ \ \ \ \ \ \ \ \ \ exception\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00675\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00676\ \ \ \ \ \}}
+\DoxyCodeLine{00677\ }
+\DoxyCodeLine{00678\ \ \ \ \ BOOST\_CHECK(\ exception\ ==\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{00679\ \}}
+
+\end{DoxyCode}
+\Hypertarget{parser_8cpp_ae2e219ec29a87e69287c36774dec5313}\index{parser.cpp@{parser.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!parser.cpp@{parser.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [27/41]}}
+{\footnotesize\ttfamily \label{parser_8cpp_ae2e219ec29a87e69287c36774dec5313} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{new\+\_\+http\+\_\+version1}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{parser_8cpp_source_l00791}{791}} of file \mbox{\hyperlink{parser_8cpp_source}{parser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00791\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00792\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1request}{websocketpp::http::parser::request}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};}
+\DoxyCodeLine{00793\ }
+\DoxyCodeLine{00794\ \ \ \ \ std::string\ raw\ =\ \textcolor{stringliteral}{"{}GET\ /\ HTTP/1.12\(\backslash\)r\(\backslash\)nHost:\ www.example.com\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)n"{}};}
+\DoxyCodeLine{00795\ }
+\DoxyCodeLine{00796\ \ \ \ \ \textcolor{keywordtype}{bool}\ exception\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00797\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ pos\ =\ 0;}
+\DoxyCodeLine{00798\ }
+\DoxyCodeLine{00799\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00800\ \ \ \ \ \ \ \ \ pos\ =\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.consume(raw.c\_str(),raw.size());}
+\DoxyCodeLine{00801\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{}
+\DoxyCodeLine{00802\ \ \ \ \ \ \ \ \ exception\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00803\ \ \ \ \ \}}
+\DoxyCodeLine{00804\ }
+\DoxyCodeLine{00805\ \ \ \ \ BOOST\_CHECK(\ exception\ ==\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{00806\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ pos,\ 42\ );}
+\DoxyCodeLine{00807\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.ready()\ ==\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{00808\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_version(),\ \textcolor{stringliteral}{"{}HTTP/1.12"{}}\ );}
+\DoxyCodeLine{00809\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_method(),\ \textcolor{stringliteral}{"{}GET"{}}\ );}
+\DoxyCodeLine{00810\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_uri(),\ \textcolor{stringliteral}{"{}/"{}}\ );}
+\DoxyCodeLine{00811\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}Host"{}}),\ \textcolor{stringliteral}{"{}www.example.com"{}}\ );}
+\DoxyCodeLine{00812\ \}}
+
+\end{DoxyCode}
+\Hypertarget{parser_8cpp_a4bd1574ba910e5724a33defe409345d1}\index{parser.cpp@{parser.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!parser.cpp@{parser.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [28/41]}}
+{\footnotesize\ttfamily \label{parser_8cpp_a4bd1574ba910e5724a33defe409345d1} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{new\+\_\+http\+\_\+version2}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{parser_8cpp_source_l00814}{814}} of file \mbox{\hyperlink{parser_8cpp_source}{parser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00814\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00815\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1request}{websocketpp::http::parser::request}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};}
+\DoxyCodeLine{00816\ }
+\DoxyCodeLine{00817\ \ \ \ \ std::string\ raw\ =\ \textcolor{stringliteral}{"{}GET\ /\ HTTP/12.12\(\backslash\)r\(\backslash\)nHost:\ www.example.com\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)n"{}};}
+\DoxyCodeLine{00818\ }
+\DoxyCodeLine{00819\ \ \ \ \ \textcolor{keywordtype}{bool}\ exception\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00820\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ pos\ =\ 0;}
+\DoxyCodeLine{00821\ }
+\DoxyCodeLine{00822\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00823\ \ \ \ \ \ \ \ \ pos\ =\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.consume(raw.c\_str(),raw.size());}
+\DoxyCodeLine{00824\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{}
+\DoxyCodeLine{00825\ \ \ \ \ \ \ \ \ exception\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00826\ \ \ \ \ \}}
+\DoxyCodeLine{00827\ }
+\DoxyCodeLine{00828\ \ \ \ \ BOOST\_CHECK(\ exception\ ==\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{00829\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ pos,\ 43\ );}
+\DoxyCodeLine{00830\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.ready()\ ==\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{00831\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_version(),\ \textcolor{stringliteral}{"{}HTTP/12.12"{}}\ );}
+\DoxyCodeLine{00832\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_method(),\ \textcolor{stringliteral}{"{}GET"{}}\ );}
+\DoxyCodeLine{00833\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_uri(),\ \textcolor{stringliteral}{"{}/"{}}\ );}
+\DoxyCodeLine{00834\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}Host"{}}),\ \textcolor{stringliteral}{"{}www.example.com"{}}\ );}
+\DoxyCodeLine{00835\ \}}
+
+\end{DoxyCode}
+\Hypertarget{parser_8cpp_a2e752fe3c8bae5df4a39fe47147bf160}\index{parser.cpp@{parser.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!parser.cpp@{parser.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [29/41]}}
+{\footnotesize\ttfamily \label{parser_8cpp_a2e752fe3c8bae5df4a39fe47147bf160} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{old\+\_\+http\+\_\+version}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{parser_8cpp_source_l00768}{768}} of file \mbox{\hyperlink{parser_8cpp_source}{parser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00768\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00769\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1request}{websocketpp::http::parser::request}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};}
+\DoxyCodeLine{00770\ }
+\DoxyCodeLine{00771\ \ \ \ \ std::string\ raw\ =\ \textcolor{stringliteral}{"{}GET\ /\ HTTP/1.0\(\backslash\)r\(\backslash\)nHost:\ www.example.com\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)n"{}};}
+\DoxyCodeLine{00772\ }
+\DoxyCodeLine{00773\ \ \ \ \ \textcolor{keywordtype}{bool}\ exception\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00774\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ pos\ =\ 0;}
+\DoxyCodeLine{00775\ }
+\DoxyCodeLine{00776\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00777\ \ \ \ \ \ \ \ \ pos\ =\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.consume(raw.c\_str(),raw.size());}
+\DoxyCodeLine{00778\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{}
+\DoxyCodeLine{00779\ \ \ \ \ \ \ \ \ exception\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00780\ \ \ \ \ \}}
+\DoxyCodeLine{00781\ }
+\DoxyCodeLine{00782\ \ \ \ \ BOOST\_CHECK(\ exception\ ==\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{00783\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ pos,\ 41\ );}
+\DoxyCodeLine{00784\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.ready()\ ==\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{00785\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_version(),\ \textcolor{stringliteral}{"{}HTTP/1.0"{}}\ );}
+\DoxyCodeLine{00786\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_method(),\ \textcolor{stringliteral}{"{}GET"{}}\ );}
+\DoxyCodeLine{00787\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_uri(),\ \textcolor{stringliteral}{"{}/"{}}\ );}
+\DoxyCodeLine{00788\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}Host"{}}),\ \textcolor{stringliteral}{"{}www.example.com"{}}\ );}
+\DoxyCodeLine{00789\ \}}
+
+\end{DoxyCode}
+\Hypertarget{parser_8cpp_ac6c55136ca9d2ea0df76a277bafa9285}\index{parser.cpp@{parser.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!parser.cpp@{parser.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [30/41]}}
+{\footnotesize\ttfamily \label{parser_8cpp_ac6c55136ca9d2ea0df76a277bafa9285} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{parse\+\_\+istream}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{parser_8cpp_source_l01068}{1068}} of file \mbox{\hyperlink{parser_8cpp_source}{parser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01068\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01069\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1response}{websocketpp::http::parser::response}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};}
+\DoxyCodeLine{01070\ }
+\DoxyCodeLine{01071\ \ \ \ \ std::stringstream\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{01072\ }
+\DoxyCodeLine{01073\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ <<\ \textcolor{stringliteral}{"{}HTTP/1.1\ 200\ OK\(\backslash\)r\(\backslash\)nDate:\ Thu,\ 10\ May\ 2012\ 11:59:25\ GMT\(\backslash\)r\(\backslash\)nServer:\ Apache/2.2.21\ (Unix)\ mod\_ssl/2.2.21\ OpenSSL/0.9.8r\ DAV/2\ PHP/5.3.8\ with\ Suhosin-\/Patch\(\backslash\)r\(\backslash\)nLast-\/Modified:\ Tue,\ 30\ Mar\ 2010\ 17:41:28\ GMT\(\backslash\)r\(\backslash\)nETag:\ \(\backslash\)"{}16799d-\/55-\/4830823a78200\(\backslash\)"{}\(\backslash\)r\(\backslash\)nAccept-\/Ranges:\ bytes\(\backslash\)r\(\backslash\)nContent-\/Length:\ 85\(\backslash\)r\(\backslash\)nVary:\ Accept-\/Encoding\(\backslash\)r\(\backslash\)nContent-\/Type:\ text/html\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)n<!doctype\ html>\(\backslash\)n<html>\(\backslash\)n<head>\(\backslash\)n<title>Thor</title>\(\backslash\)n</head>\(\backslash\)n<body>\ \(\backslash\)n<p>Thor</p>\(\backslash\)n</body>"{}};}
+\DoxyCodeLine{01074\ }
+\DoxyCodeLine{01075\ \ \ \ \ \textcolor{keywordtype}{bool}\ exception\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{01076\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ pos\ =\ 0;}
+\DoxyCodeLine{01077\ }
+\DoxyCodeLine{01078\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{01079\ \ \ \ \ \ \ \ \ pos\ +=\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.consume(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{01080\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (std::exception\ \&e)\ \{}
+\DoxyCodeLine{01081\ \ \ \ \ \ \ \ \ exception\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{01082\ \ \ \ \ \ \ \ \ std::cout\ <<\ e.what()\ <<\ std::endl;}
+\DoxyCodeLine{01083\ \ \ \ \ \}}
+\DoxyCodeLine{01084\ }
+\DoxyCodeLine{01085\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ exception,\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{01086\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ pos,\ 405\ );}
+\DoxyCodeLine{01087\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.headers\_ready(),\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{01088\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.ready(),\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{01089\ \}}
+
+\end{DoxyCode}
+\Hypertarget{parser_8cpp_a41b250bcb3ef462f8bfe7c11d9e04b2c}\index{parser.cpp@{parser.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!parser.cpp@{parser.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [31/41]}}
+{\footnotesize\ttfamily \label{parser_8cpp_a41b250bcb3ef462f8bfe7c11d9e04b2c} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{plain\+\_\+http\+\_\+response}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{parser_8cpp_source_l01035}{1035}} of file \mbox{\hyperlink{parser_8cpp_source}{parser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01035\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01036\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1response}{websocketpp::http::parser::response}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};}
+\DoxyCodeLine{01037\ }
+\DoxyCodeLine{01038\ \ \ \ \ std::string\ raw\ =\ \textcolor{stringliteral}{"{}HTTP/1.1\ 200\ OK\(\backslash\)r\(\backslash\)nDate:\ Thu,\ 10\ May\ 2012\ 11:59:25\ GMT\(\backslash\)r\(\backslash\)nServer:\ Apache/2.2.21\ (Unix)\ mod\_ssl/2.2.21\ OpenSSL/0.9.8r\ DAV/2\ PHP/5.3.8\ with\ Suhosin-\/Patch\(\backslash\)r\(\backslash\)nLast-\/Modified:\ Tue,\ 30\ Mar\ 2010\ 17:41:28\ GMT\(\backslash\)r\(\backslash\)nETag:\ \(\backslash\)"{}16799d-\/55-\/4830823a78200\(\backslash\)"{}\(\backslash\)r\(\backslash\)nAccept-\/Ranges:\ bytes\(\backslash\)r\(\backslash\)nContent-\/Length:\ 85\(\backslash\)r\(\backslash\)nVary:\ Accept-\/Encoding\(\backslash\)r\(\backslash\)nContent-\/Type:\ text/html\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)n<!doctype\ html>\(\backslash\)n<html>\(\backslash\)n<head>\(\backslash\)n<title>Thor</title>\(\backslash\)n</head>\(\backslash\)n<body>\ \(\backslash\)n<p>Thor</p>\(\backslash\)n</body>"{}};}
+\DoxyCodeLine{01039\ }
+\DoxyCodeLine{01040\ \ \ \ \ \textcolor{keywordtype}{bool}\ exception\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{01041\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ pos\ =\ 0;}
+\DoxyCodeLine{01042\ }
+\DoxyCodeLine{01043\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{01044\ \ \ \ \ \ \ \ \ pos\ +=\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.consume(raw.c\_str(),raw.size());}
+\DoxyCodeLine{01045\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (std::exception\ \&e)\ \{}
+\DoxyCodeLine{01046\ \ \ \ \ \ \ \ \ exception\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{01047\ \ \ \ \ \ \ \ \ std::cout\ <<\ e.what()\ <<\ std::endl;}
+\DoxyCodeLine{01048\ \ \ \ \ \}}
+\DoxyCodeLine{01049\ }
+\DoxyCodeLine{01050\ \ \ \ \ BOOST\_CHECK(\ exception\ ==\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{01051\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ pos,\ 405\ );}
+\DoxyCodeLine{01052\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.headers\_ready()\ ==\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{01053\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.ready()\ ==\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{01054\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_version(),\ \textcolor{stringliteral}{"{}HTTP/1.1"{}}\ );}
+\DoxyCodeLine{01055\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_status\_code(),\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1status__code_ae0d61c309e053ee5673517b54e2886c6a289caa931313b2f373b33032e3661733}{websocketpp::http::status\_code::ok}}\ );}
+\DoxyCodeLine{01056\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_status\_msg(),\ \textcolor{stringliteral}{"{}OK"{}}\ );}
+\DoxyCodeLine{01057\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}Date"{}}),\ \textcolor{stringliteral}{"{}Thu,\ 10\ May\ 2012\ 11:59:25\ GMT"{}}\ );}
+\DoxyCodeLine{01058\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}Server"{}}),\ \textcolor{stringliteral}{"{}Apache/2.2.21\ (Unix)\ mod\_ssl/2.2.21\ OpenSSL/0.9.8r\ DAV/2\ PHP/5.3.8\ with\ Suhosin-\/Patch"{}}\ );}
+\DoxyCodeLine{01059\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}Last-\/Modified"{}}),\ \textcolor{stringliteral}{"{}Tue,\ 30\ Mar\ 2010\ 17:41:28\ GMT"{}}\ );}
+\DoxyCodeLine{01060\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}ETag"{}}),\ \textcolor{stringliteral}{"{}\(\backslash\)"{}16799d-\/55-\/4830823a78200\(\backslash\)"{}"{}}\ );}
+\DoxyCodeLine{01061\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}Accept-\/Ranges"{}}),\ \textcolor{stringliteral}{"{}bytes"{}}\ );}
+\DoxyCodeLine{01062\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}Content-\/Length"{}}),\ \textcolor{stringliteral}{"{}85"{}}\ );}
+\DoxyCodeLine{01063\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}Vary"{}}),\ \textcolor{stringliteral}{"{}Accept-\/Encoding"{}}\ );}
+\DoxyCodeLine{01064\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}Content-\/Type"{}}),\ \textcolor{stringliteral}{"{}text/html"{}}\ );}
+\DoxyCodeLine{01065\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_body(),\ \textcolor{stringliteral}{"{}<!doctype\ html>\(\backslash\)n<html>\(\backslash\)n<head>\(\backslash\)n<title>Thor</title>\(\backslash\)n</head>\(\backslash\)n<body>\ \(\backslash\)n<p>Thor</p>\(\backslash\)n</body>"{}}\ );}
+\DoxyCodeLine{01066\ \}}
+
+\end{DoxyCode}
+\Hypertarget{parser_8cpp_a0ca45b062646981bf90da02a398f7c87}\index{parser.cpp@{parser.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!parser.cpp@{parser.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [32/41]}}
+{\footnotesize\ttfamily \label{parser_8cpp_a0ca45b062646981bf90da02a398f7c87} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{response\+\_\+with\+\_\+non\+\_\+standard\+\_\+lws}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{parser_8cpp_source_l01008}{1008}} of file \mbox{\hyperlink{parser_8cpp_source}{parser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01008\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01009\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1response}{websocketpp::http::parser::response}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};}
+\DoxyCodeLine{01010\ }
+\DoxyCodeLine{01011\ \ \ \ \ std::string\ raw\ =\ \textcolor{stringliteral}{"{}HTTP/1.1\ 101\ Switching\ Protocols\(\backslash\)r\(\backslash\)nUpgrade:\ websocket\(\backslash\)r\(\backslash\)nConnection:\ Upgrade\(\backslash\)r\(\backslash\)nSec-\/WebSocket-\/Accept:HSmrc0sMlYUkAGmm5OPpG2HaGWk=\(\backslash\)r\(\backslash\)nSec-\/WebSocket-\/Protocol:\ chat\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)n"{}};}
+\DoxyCodeLine{01012\ }
+\DoxyCodeLine{01013\ \ \ \ \ \textcolor{keywordtype}{bool}\ exception\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{01014\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ pos\ =\ 0;}
+\DoxyCodeLine{01015\ }
+\DoxyCodeLine{01016\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{01017\ \ \ \ \ \ \ \ \ pos\ +=\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.consume(raw.c\_str(),raw.size());}
+\DoxyCodeLine{01018\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (std::exception\ \&e)\ \{}
+\DoxyCodeLine{01019\ \ \ \ \ \ \ \ \ exception\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{01020\ \ \ \ \ \ \ \ \ std::cout\ <<\ e.what()\ <<\ std::endl;}
+\DoxyCodeLine{01021\ \ \ \ \ \}}
+\DoxyCodeLine{01022\ }
+\DoxyCodeLine{01023\ \ \ \ \ BOOST\_CHECK(\ exception\ ==\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{01024\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ pos,\ 158\ );}
+\DoxyCodeLine{01025\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.headers\_ready()\ );}
+\DoxyCodeLine{01026\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_version(),\ \textcolor{stringliteral}{"{}HTTP/1.1"{}}\ );}
+\DoxyCodeLine{01027\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_status\_code(),\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1status__code_ae0d61c309e053ee5673517b54e2886c6af8fdb6ffaa8898b9a69112d3dd8f0bfc}{websocketpp::http::status\_code::switching\_protocols}}\ );}
+\DoxyCodeLine{01028\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_status\_msg(),\ \textcolor{stringliteral}{"{}Switching\ Protocols"{}}\ );}
+\DoxyCodeLine{01029\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}Upgrade"{}}),\ \textcolor{stringliteral}{"{}websocket"{}}\ );}
+\DoxyCodeLine{01030\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}Connection"{}}),\ \textcolor{stringliteral}{"{}Upgrade"{}}\ );}
+\DoxyCodeLine{01031\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}Sec-\/WebSocket-\/Accept"{}}),\ \textcolor{stringliteral}{"{}HSmrc0sMlYUkAGmm5OPpG2HaGWk="{}}\ );}
+\DoxyCodeLine{01032\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}Sec-\/WebSocket-\/Protocol"{}}),\ \textcolor{stringliteral}{"{}chat"{}}\ );}
+\DoxyCodeLine{01033\ \}}
+
+\end{DoxyCode}
+\Hypertarget{parser_8cpp_aaf32dbf85a444e1657a5ee29489fdc4b}\index{parser.cpp@{parser.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!parser.cpp@{parser.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [33/41]}}
+{\footnotesize\ttfamily \label{parser_8cpp_aaf32dbf85a444e1657a5ee29489fdc4b} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{strip\+\_\+lws}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{parser_8cpp_source_l00359}{359}} of file \mbox{\hyperlink{parser_8cpp_source}{parser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00359\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00360\ \ \ \ \ std::string\ \mbox{\hyperlink{archivertest_8cpp_a1440a7779ac56f47a3f355ce4a8c7da0}{test1}}\ =\ \textcolor{stringliteral}{"{}foo"{}};}
+\DoxyCodeLine{00361\ \ \ \ \ std::string\ \mbox{\hyperlink{archivertest_8cpp_a0283886819c7c140a023582b7269e2d0}{test2}}\ =\ \textcolor{stringliteral}{"{}\ foo\ "{}};}
+\DoxyCodeLine{00362\ \ \ \ \ std::string\ \mbox{\hyperlink{archivertest_8cpp_a6d0455dd5c30adda100e95f0423c786e}{test3}}\ =\ \textcolor{stringliteral}{"{}foo\ "{}};}
+\DoxyCodeLine{00363\ \ \ \ \ std::string\ test4\ =\ \textcolor{stringliteral}{"{}\ foo"{}};}
+\DoxyCodeLine{00364\ \ \ \ \ std::string\ test5\ =\ \textcolor{stringliteral}{"{}\ \ \ \ foo\ \ \ \ \ "{}};}
+\DoxyCodeLine{00365\ \ \ \ \ std::string\ test6\ =\ \textcolor{stringliteral}{"{}\ \ \(\backslash\)r\(\backslash\)n\ \ foo\ \ \ \ \ "{}};}
+\DoxyCodeLine{00366\ \ \ \ \ std::string\ test7\ =\ \textcolor{stringliteral}{"{}\ \ \(\backslash\)t\ \ foo\ \ \ \ \ "{}};}
+\DoxyCodeLine{00367\ \ \ \ \ std::string\ test8\ =\ \textcolor{stringliteral}{"{}\ \ \(\backslash\)t\ \ \ \ \ \ \ "{}};}
+\DoxyCodeLine{00368\ \ \ \ \ std::string\ test9\ =\ \textcolor{stringliteral}{"{}\ \(\backslash\)n\(\backslash\)r"{}};}
+\DoxyCodeLine{00369\ }
+\DoxyCodeLine{00370\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_ae656f7130716b25fb2a34cee77a0444e}{websocketpp::http::parser::strip\_lws}}(\mbox{\hyperlink{archivertest_8cpp_a1440a7779ac56f47a3f355ce4a8c7da0}{test1}}),\ \textcolor{stringliteral}{"{}foo"{}}\ );}
+\DoxyCodeLine{00371\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_ae656f7130716b25fb2a34cee77a0444e}{websocketpp::http::parser::strip\_lws}}(\mbox{\hyperlink{archivertest_8cpp_a0283886819c7c140a023582b7269e2d0}{test2}}),\ \textcolor{stringliteral}{"{}foo"{}}\ );}
+\DoxyCodeLine{00372\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_ae656f7130716b25fb2a34cee77a0444e}{websocketpp::http::parser::strip\_lws}}(\mbox{\hyperlink{archivertest_8cpp_a6d0455dd5c30adda100e95f0423c786e}{test3}}),\ \textcolor{stringliteral}{"{}foo"{}}\ );}
+\DoxyCodeLine{00373\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_ae656f7130716b25fb2a34cee77a0444e}{websocketpp::http::parser::strip\_lws}}(test4),\ \textcolor{stringliteral}{"{}foo"{}}\ );}
+\DoxyCodeLine{00374\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_ae656f7130716b25fb2a34cee77a0444e}{websocketpp::http::parser::strip\_lws}}(test5),\ \textcolor{stringliteral}{"{}foo"{}}\ );}
+\DoxyCodeLine{00375\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_ae656f7130716b25fb2a34cee77a0444e}{websocketpp::http::parser::strip\_lws}}(test6),\ \textcolor{stringliteral}{"{}foo"{}}\ );}
+\DoxyCodeLine{00376\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_ae656f7130716b25fb2a34cee77a0444e}{websocketpp::http::parser::strip\_lws}}(test7),\ \textcolor{stringliteral}{"{}foo"{}}\ );}
+\DoxyCodeLine{00377\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_ae656f7130716b25fb2a34cee77a0444e}{websocketpp::http::parser::strip\_lws}}(test8),\ \textcolor{stringliteral}{"{}"{}}\ );}
+\DoxyCodeLine{00378\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_ae656f7130716b25fb2a34cee77a0444e}{websocketpp::http::parser::strip\_lws}}(test9),\ \textcolor{stringliteral}{"{}"{}}\ );}
+\DoxyCodeLine{00379\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{parser_8cpp_aaf32dbf85a444e1657a5ee29489fdc4b_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{parser_8cpp_a57f138f17fa60c0051fae12c56e726e4}\index{parser.cpp@{parser.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!parser.cpp@{parser.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [34/41]}}
+{\footnotesize\ttfamily \label{parser_8cpp_a57f138f17fa60c0051fae12c56e726e4} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{trailing\+\_\+body\+\_\+characters}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{parser_8cpp_source_l00541}{541}} of file \mbox{\hyperlink{parser_8cpp_source}{parser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00541\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00542\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1request}{websocketpp::http::parser::request}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};}
+\DoxyCodeLine{00543\ }
+\DoxyCodeLine{00544\ \ \ \ \ std::string\ raw\ =\ \textcolor{stringliteral}{"{}GET\ /\ HTTP/1.1\(\backslash\)r\(\backslash\)nHost:\ www.example.com\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)na"{}};}
+\DoxyCodeLine{00545\ }
+\DoxyCodeLine{00546\ \ \ \ \ \textcolor{keywordtype}{bool}\ exception\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00547\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ pos\ =\ 0;}
+\DoxyCodeLine{00548\ }
+\DoxyCodeLine{00549\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00550\ \ \ \ \ \ \ \ \ pos\ =\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.consume(raw.c\_str(),raw.size());}
+\DoxyCodeLine{00551\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{}
+\DoxyCodeLine{00552\ \ \ \ \ \ \ \ \ exception\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00553\ \ \ \ \ \}}
+\DoxyCodeLine{00554\ }
+\DoxyCodeLine{00555\ \ \ \ \ BOOST\_CHECK(\ exception\ ==\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{00556\ \ \ \ \ BOOST\_CHECK(\ pos\ ==\ 41\ );}
+\DoxyCodeLine{00557\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.ready()\ ==\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{00558\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_version()\ ==\ \textcolor{stringliteral}{"{}HTTP/1.1"{}}\ );}
+\DoxyCodeLine{00559\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_method()\ ==\ \textcolor{stringliteral}{"{}GET"{}}\ );}
+\DoxyCodeLine{00560\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_uri()\ ==\ \textcolor{stringliteral}{"{}/"{}}\ );}
+\DoxyCodeLine{00561\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}Host"{}})\ ==\ \textcolor{stringliteral}{"{}www.example.com"{}}\ );}
+\DoxyCodeLine{00562\ \}}
+
+\end{DoxyCode}
+\Hypertarget{parser_8cpp_a07d35a19460eea8d94b581c30b380989}\index{parser.cpp@{parser.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!parser.cpp@{parser.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [35/41]}}
+{\footnotesize\ttfamily \label{parser_8cpp_a07d35a19460eea8d94b581c30b380989} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{trailing\+\_\+body\+\_\+characters\+\_\+beyond\+\_\+max\+\_\+lenth}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{parser_8cpp_source_l00564}{564}} of file \mbox{\hyperlink{parser_8cpp_source}{parser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00564\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00565\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1request}{websocketpp::http::parser::request}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};}
+\DoxyCodeLine{00566\ }
+\DoxyCodeLine{00567\ \ \ \ \ std::string\ raw\ =\ \textcolor{stringliteral}{"{}GET\ /\ HTTP/1.1\(\backslash\)r\(\backslash\)nHost:\ www.example.com\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)n"{}};}
+\DoxyCodeLine{00568\ \ \ \ \ raw.append(\mbox{\hyperlink{namespacewebsocketpp_1_1http_a514b8c48c36a9e42964f9ea35a82bc95}{websocketpp::http::max\_header\_size}},\textcolor{charliteral}{'*'});}
+\DoxyCodeLine{00569\ }
+\DoxyCodeLine{00570\ \ \ \ \ \textcolor{keywordtype}{bool}\ exception\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00571\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ pos\ =\ 0;}
+\DoxyCodeLine{00572\ }
+\DoxyCodeLine{00573\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00574\ \ \ \ \ \ \ \ \ pos\ =\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.consume(raw.c\_str(),raw.size());}
+\DoxyCodeLine{00575\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{}
+\DoxyCodeLine{00576\ \ \ \ \ \ \ \ \ exception\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00577\ \ \ \ \ \}}
+\DoxyCodeLine{00578\ }
+\DoxyCodeLine{00579\ \ \ \ \ BOOST\_CHECK(\ exception\ ==\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{00580\ \ \ \ \ BOOST\_CHECK(\ pos\ ==\ 41\ );}
+\DoxyCodeLine{00581\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.ready()\ ==\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{00582\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_version()\ ==\ \textcolor{stringliteral}{"{}HTTP/1.1"{}}\ );}
+\DoxyCodeLine{00583\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_method()\ ==\ \textcolor{stringliteral}{"{}GET"{}}\ );}
+\DoxyCodeLine{00584\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_uri()\ ==\ \textcolor{stringliteral}{"{}/"{}}\ );}
+\DoxyCodeLine{00585\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}Host"{}})\ ==\ \textcolor{stringliteral}{"{}www.example.com"{}}\ );}
+\DoxyCodeLine{00586\ \}}
+
+\end{DoxyCode}
+\Hypertarget{parser_8cpp_a591aa40373acaaf34df930d060dca098}\index{parser.cpp@{parser.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!parser.cpp@{parser.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [36/41]}}
+{\footnotesize\ttfamily \label{parser_8cpp_a591aa40373acaaf34df930d060dca098} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{wikipedia\+\_\+example\+\_\+response}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{parser_8cpp_source_l00925}{925}} of file \mbox{\hyperlink{parser_8cpp_source}{parser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00925\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00926\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1response}{websocketpp::http::parser::response}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};}
+\DoxyCodeLine{00927\ }
+\DoxyCodeLine{00928\ \ \ \ \ std::string\ raw\ =\ \textcolor{stringliteral}{"{}HTTP/1.1\ 101\ Switching\ Protocols\(\backslash\)r\(\backslash\)nUpgrade:\ websocket\(\backslash\)r\(\backslash\)nConnection:\ Upgrade\(\backslash\)r\(\backslash\)nSec-\/WebSocket-\/Accept:\ HSmrc0sMlYUkAGmm5OPpG2HaGWk=\(\backslash\)r\(\backslash\)nSec-\/WebSocket-\/Protocol:\ chat\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)n"{}};}
+\DoxyCodeLine{00929\ }
+\DoxyCodeLine{00930\ \ \ \ \ \textcolor{keywordtype}{bool}\ exception\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00931\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ pos\ =\ 0;}
+\DoxyCodeLine{00932\ }
+\DoxyCodeLine{00933\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00934\ \ \ \ \ \ \ \ \ pos\ +=\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.consume(raw.c\_str(),raw.size());}
+\DoxyCodeLine{00935\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (std::exception\ \&e)\ \{}
+\DoxyCodeLine{00936\ \ \ \ \ \ \ \ \ exception\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00937\ \ \ \ \ \ \ \ \ std::cout\ <<\ e.what()\ <<\ std::endl;}
+\DoxyCodeLine{00938\ \ \ \ \ \}}
+\DoxyCodeLine{00939\ }
+\DoxyCodeLine{00940\ \ \ \ \ BOOST\_CHECK(\ exception\ ==\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{00941\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ pos,\ 159\ );}
+\DoxyCodeLine{00942\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.headers\_ready()\ ==\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{00943\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_version(),\ \textcolor{stringliteral}{"{}HTTP/1.1"{}}\ );}
+\DoxyCodeLine{00944\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_status\_code(),\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1status__code_ae0d61c309e053ee5673517b54e2886c6af8fdb6ffaa8898b9a69112d3dd8f0bfc}{websocketpp::http::status\_code::switching\_protocols}}\ );}
+\DoxyCodeLine{00945\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_status\_msg(),\ \textcolor{stringliteral}{"{}Switching\ Protocols"{}}\ );}
+\DoxyCodeLine{00946\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}Upgrade"{}}),\ \textcolor{stringliteral}{"{}websocket"{}}\ );}
+\DoxyCodeLine{00947\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}Connection"{}}),\ \textcolor{stringliteral}{"{}Upgrade"{}}\ );}
+\DoxyCodeLine{00948\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}Sec-\/WebSocket-\/Accept"{}}),\ \textcolor{stringliteral}{"{}HSmrc0sMlYUkAGmm5OPpG2HaGWk="{}}\ );}
+\DoxyCodeLine{00949\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}Sec-\/WebSocket-\/Protocol"{}}),\ \textcolor{stringliteral}{"{}chat"{}}\ );}
+\DoxyCodeLine{00950\ \}}
+
+\end{DoxyCode}
+\Hypertarget{parser_8cpp_a33552bc4536782c1cd79359daf62c542}\index{parser.cpp@{parser.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!parser.cpp@{parser.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [37/41]}}
+{\footnotesize\ttfamily \label{parser_8cpp_a33552bc4536782c1cd79359daf62c542} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{wikipedia\+\_\+example\+\_\+response\+\_\+trailing}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{parser_8cpp_source_l00952}{952}} of file \mbox{\hyperlink{parser_8cpp_source}{parser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00952\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00953\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1response}{websocketpp::http::parser::response}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};}
+\DoxyCodeLine{00954\ }
+\DoxyCodeLine{00955\ \ \ \ \ std::string\ raw\ =\ \textcolor{stringliteral}{"{}HTTP/1.1\ 101\ Switching\ Protocols\(\backslash\)r\(\backslash\)nUpgrade:\ websocket\(\backslash\)r\(\backslash\)nConnection:\ Upgrade\(\backslash\)r\(\backslash\)nSec-\/WebSocket-\/Accept:\ HSmrc0sMlYUkAGmm5OPpG2HaGWk=\(\backslash\)r\(\backslash\)nSec-\/WebSocket-\/Protocol:\ chat\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)n"{}};}
+\DoxyCodeLine{00956\ \ \ \ \ raw\ +=\ \textcolor{stringliteral}{"{}a"{}};}
+\DoxyCodeLine{00957\ }
+\DoxyCodeLine{00958\ \ \ \ \ \textcolor{keywordtype}{bool}\ exception\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00959\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ pos\ =\ 0;}
+\DoxyCodeLine{00960\ }
+\DoxyCodeLine{00961\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00962\ \ \ \ \ \ \ \ \ pos\ +=\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.consume(raw.c\_str(),raw.size());}
+\DoxyCodeLine{00963\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (std::exception\ \&e)\ \{}
+\DoxyCodeLine{00964\ \ \ \ \ \ \ \ \ exception\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00965\ \ \ \ \ \ \ \ \ std::cout\ <<\ e.what()\ <<\ std::endl;}
+\DoxyCodeLine{00966\ \ \ \ \ \}}
+\DoxyCodeLine{00967\ }
+\DoxyCodeLine{00968\ \ \ \ \ BOOST\_CHECK(\ exception\ ==\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{00969\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ pos,\ 159\ );}
+\DoxyCodeLine{00970\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.headers\_ready()\ ==\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{00971\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_version(),\ \textcolor{stringliteral}{"{}HTTP/1.1"{}}\ );}
+\DoxyCodeLine{00972\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_status\_code(),\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1status__code_ae0d61c309e053ee5673517b54e2886c6af8fdb6ffaa8898b9a69112d3dd8f0bfc}{websocketpp::http::status\_code::switching\_protocols}}\ );}
+\DoxyCodeLine{00973\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_status\_msg(),\ \textcolor{stringliteral}{"{}Switching\ Protocols"{}}\ );}
+\DoxyCodeLine{00974\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}Upgrade"{}}),\ \textcolor{stringliteral}{"{}websocket"{}}\ );}
+\DoxyCodeLine{00975\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}Connection"{}}),\ \textcolor{stringliteral}{"{}Upgrade"{}}\ );}
+\DoxyCodeLine{00976\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}Sec-\/WebSocket-\/Accept"{}}),\ \textcolor{stringliteral}{"{}HSmrc0sMlYUkAGmm5OPpG2HaGWk="{}}\ );}
+\DoxyCodeLine{00977\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}Sec-\/WebSocket-\/Protocol"{}}),\ \textcolor{stringliteral}{"{}chat"{}}\ );}
+\DoxyCodeLine{00978\ \}}
+
+\end{DoxyCode}
+\Hypertarget{parser_8cpp_a27ab78fb76e2f000375ebca27ca27af4}\index{parser.cpp@{parser.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!parser.cpp@{parser.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [38/41]}}
+{\footnotesize\ttfamily \label{parser_8cpp_a27ab78fb76e2f000375ebca27ca27af4} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{wikipedia\+\_\+example\+\_\+response\+\_\+trailing\+\_\+large}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{parser_8cpp_source_l00980}{980}} of file \mbox{\hyperlink{parser_8cpp_source}{parser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00980\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00981\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1response}{websocketpp::http::parser::response}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};}
+\DoxyCodeLine{00982\ }
+\DoxyCodeLine{00983\ \ \ \ \ std::string\ raw\ =\ \textcolor{stringliteral}{"{}HTTP/1.1\ 101\ Switching\ Protocols\(\backslash\)r\(\backslash\)nUpgrade:\ websocket\(\backslash\)r\(\backslash\)nConnection:\ Upgrade\(\backslash\)r\(\backslash\)nSec-\/WebSocket-\/Accept:\ HSmrc0sMlYUkAGmm5OPpG2HaGWk=\(\backslash\)r\(\backslash\)nSec-\/WebSocket-\/Protocol:\ chat\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)n"{}};}
+\DoxyCodeLine{00984\ \ \ \ \ raw.append(\mbox{\hyperlink{namespacewebsocketpp_1_1http_a514b8c48c36a9e42964f9ea35a82bc95}{websocketpp::http::max\_header\_size}},\textcolor{charliteral}{'*'});}
+\DoxyCodeLine{00985\ }
+\DoxyCodeLine{00986\ \ \ \ \ \textcolor{keywordtype}{bool}\ exception\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00987\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ pos\ =\ 0;}
+\DoxyCodeLine{00988\ }
+\DoxyCodeLine{00989\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00990\ \ \ \ \ \ \ \ \ pos\ +=\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.consume(raw.c\_str(),raw.size());}
+\DoxyCodeLine{00991\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (std::exception\ \&e)\ \{}
+\DoxyCodeLine{00992\ \ \ \ \ \ \ \ \ exception\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00993\ \ \ \ \ \ \ \ \ std::cout\ <<\ e.what()\ <<\ std::endl;}
+\DoxyCodeLine{00994\ \ \ \ \ \}}
+\DoxyCodeLine{00995\ }
+\DoxyCodeLine{00996\ \ \ \ \ BOOST\_CHECK(\ exception\ ==\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{00997\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ pos,\ 159\ );}
+\DoxyCodeLine{00998\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.headers\_ready()\ ==\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{00999\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_version(),\ \textcolor{stringliteral}{"{}HTTP/1.1"{}}\ );}
+\DoxyCodeLine{01000\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_status\_code(),\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1status__code_ae0d61c309e053ee5673517b54e2886c6af8fdb6ffaa8898b9a69112d3dd8f0bfc}{websocketpp::http::status\_code::switching\_protocols}}\ );}
+\DoxyCodeLine{01001\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_status\_msg(),\ \textcolor{stringliteral}{"{}Switching\ Protocols"{}}\ );}
+\DoxyCodeLine{01002\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}Upgrade"{}}),\ \textcolor{stringliteral}{"{}websocket"{}}\ );}
+\DoxyCodeLine{01003\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}Connection"{}}),\ \textcolor{stringliteral}{"{}Upgrade"{}}\ );}
+\DoxyCodeLine{01004\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}Sec-\/WebSocket-\/Accept"{}}),\ \textcolor{stringliteral}{"{}HSmrc0sMlYUkAGmm5OPpG2HaGWk="{}}\ );}
+\DoxyCodeLine{01005\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}Sec-\/WebSocket-\/Protocol"{}}),\ \textcolor{stringliteral}{"{}chat"{}}\ );}
+\DoxyCodeLine{01006\ \}}
+
+\end{DoxyCode}
+\Hypertarget{parser_8cpp_aa0aa41bb471829da9a74347abfdaba4d}\index{parser.cpp@{parser.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!parser.cpp@{parser.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [39/41]}}
+{\footnotesize\ttfamily \label{parser_8cpp_aa0aa41bb471829da9a74347abfdaba4d} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{write\+\_\+request\+\_\+basic}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{parser_8cpp_source_l01091}{1091}} of file \mbox{\hyperlink{parser_8cpp_source}{parser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01091\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01092\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1request}{websocketpp::http::parser::request}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};}
+\DoxyCodeLine{01093\ }
+\DoxyCodeLine{01094\ \ \ \ \ std::string\ raw\ =\ \textcolor{stringliteral}{"{}GET\ /\ HTTP/1.1\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)n"{}};}
+\DoxyCodeLine{01095\ }
+\DoxyCodeLine{01096\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.set\_version(\textcolor{stringliteral}{"{}HTTP/1.1"{}});}
+\DoxyCodeLine{01097\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.set\_method(\textcolor{stringliteral}{"{}GET"{}});}
+\DoxyCodeLine{01098\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.set\_uri(\textcolor{stringliteral}{"{}/"{}});}
+\DoxyCodeLine{01099\ }
+\DoxyCodeLine{01100\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.raw(),\ raw\ );}
+\DoxyCodeLine{01101\ \}}
+
+\end{DoxyCode}
+\Hypertarget{parser_8cpp_a74b1a6f1b2f7f1dc440a844f5bf279be}\index{parser.cpp@{parser.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!parser.cpp@{parser.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [40/41]}}
+{\footnotesize\ttfamily \label{parser_8cpp_a74b1a6f1b2f7f1dc440a844f5bf279be} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{write\+\_\+request\+\_\+with\+\_\+body}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{parser_8cpp_source_l01116}{1116}} of file \mbox{\hyperlink{parser_8cpp_source}{parser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01116\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01117\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1request}{websocketpp::http::parser::request}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};}
+\DoxyCodeLine{01118\ }
+\DoxyCodeLine{01119\ \ \ \ \ std::string\ raw\ =\ \textcolor{stringliteral}{"{}POST\ /\ HTTP/1.1\(\backslash\)r\(\backslash\)nContent-\/Length:\ 48\(\backslash\)r\(\backslash\)nContent-\/Type:\ application/x-\/www-\/form-\/urlencoded\(\backslash\)r\(\backslash\)nHost:\ http://example.com\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)nlicenseID=string\&content=string\&paramsXML=string"{}};}
+\DoxyCodeLine{01120\ }
+\DoxyCodeLine{01121\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.set\_version(\textcolor{stringliteral}{"{}HTTP/1.1"{}});}
+\DoxyCodeLine{01122\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.set\_method(\textcolor{stringliteral}{"{}POST"{}});}
+\DoxyCodeLine{01123\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.set\_uri(\textcolor{stringliteral}{"{}/"{}});}
+\DoxyCodeLine{01124\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.replace\_header(\textcolor{stringliteral}{"{}Host"{}},\textcolor{stringliteral}{"{}http://example.com"{}});}
+\DoxyCodeLine{01125\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.replace\_header(\textcolor{stringliteral}{"{}Content-\/Type"{}},\textcolor{stringliteral}{"{}application/x-\/www-\/form-\/urlencoded"{}});}
+\DoxyCodeLine{01126\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.set\_body(\textcolor{stringliteral}{"{}licenseID=string\&content=string\&paramsXML=string"{}});}
+\DoxyCodeLine{01127\ }
+\DoxyCodeLine{01128\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.raw(),\ raw\ );}
+\DoxyCodeLine{01129\ \}}
+
+\end{DoxyCode}
+\Hypertarget{parser_8cpp_a9cc109790290f7958c5265cc5a0f3ad0}\index{parser.cpp@{parser.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!parser.cpp@{parser.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [41/41]}}
+{\footnotesize\ttfamily \label{parser_8cpp_a9cc109790290f7958c5265cc5a0f3ad0} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{write\+\_\+request\+\_\+with\+\_\+header}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{parser_8cpp_source_l01103}{1103}} of file \mbox{\hyperlink{parser_8cpp_source}{parser.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01103\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01104\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1request}{websocketpp::http::parser::request}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};}
+\DoxyCodeLine{01105\ }
+\DoxyCodeLine{01106\ \ \ \ \ std::string\ raw\ =\ \textcolor{stringliteral}{"{}GET\ /\ HTTP/1.1\(\backslash\)r\(\backslash\)nHost:\ http://example.com\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)n"{}};}
+\DoxyCodeLine{01107\ }
+\DoxyCodeLine{01108\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.set\_version(\textcolor{stringliteral}{"{}HTTP/1.1"{}});}
+\DoxyCodeLine{01109\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.set\_method(\textcolor{stringliteral}{"{}GET"{}});}
+\DoxyCodeLine{01110\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.set\_uri(\textcolor{stringliteral}{"{}/"{}});}
+\DoxyCodeLine{01111\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.replace\_header(\textcolor{stringliteral}{"{}Host"{}},\textcolor{stringliteral}{"{}http://example.com"{}});}
+\DoxyCodeLine{01112\ }
+\DoxyCodeLine{01113\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.raw(),\ raw\ );}
+\DoxyCodeLine{01114\ \}}
+
+\end{DoxyCode}

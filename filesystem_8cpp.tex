@@ -1,0 +1,91 @@
+\doxysection{libraries/fc/src/filesystem.cpp File Reference}
+\hypertarget{filesystem_8cpp}{}\label{filesystem_8cpp}\index{libraries/fc/src/filesystem.cpp@{libraries/fc/src/filesystem.cpp}}
+{\ttfamily \#include $<$fc/filesystem.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/exception/exception.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/fwd\+\_\+impl.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/utility.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/utf8.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/variant.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/config.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/filesystem.\+hpp$>$}\newline
+{\ttfamily \#include $<$fstream$>$}\newline
+{\ttfamily \#include $<$sys/types.\+h$>$}\newline
+{\ttfamily \#include $<$sys/stat.\+h$>$}\newline
+{\ttfamily \#include $<$pwd.\+h$>$}\newline
+Include dependency graph for filesystem.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{filesystem_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacefc}{fc}}
+\begin{DoxyCompactList}\small\item\em namespace \doxylink{namespacesysio_1_1chain}{sysio\+::chain} \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{namespacefc_ab3f1824164e169cf6697c22db22e1065}{fc\+::to\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&, \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&)
+\item 
+void \mbox{\hyperlink{namespacefc_a77f02042bd60e2889251c4ffd5cda0be}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&, \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&)
+\item 
+bool \mbox{\hyperlink{namespacefc_a2450bb19b2a45352f86130699b835672}{fc\+::operator$<$}} (const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}, const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}})
+\item 
+bool \mbox{\hyperlink{namespacefc_ac659259ecdcc185b38a01acbd4749aad}{fc\+::operator==}} (const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}, const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}})
+\item 
+bool \mbox{\hyperlink{namespacefc_a6ac1600a45a010b76941dcfb6d6c7d79}{fc\+::operator!=}} (const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}, const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}})
+\item 
+\mbox{\hyperlink{classfc_1_1path}{path}} \mbox{\hyperlink{namespacefc_a624adb190a96ac38b54d4eed4f6e42e3}{fc\+::operator/}} (const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}, const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&o)
+\item 
+bool \mbox{\hyperlink{namespacefc_ae42d80da6bb25750019a5738fef8e016}{fc\+::operator==}} (const \mbox{\hyperlink{classfc_1_1directory__iterator}{directory\+\_\+iterator}} \&\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}, const \mbox{\hyperlink{classfc_1_1directory__iterator}{directory\+\_\+iterator}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}})
+\item 
+bool \mbox{\hyperlink{namespacefc_ad32f2fa0d0979a05754dc1759880c748}{fc\+::operator!=}} (const \mbox{\hyperlink{classfc_1_1directory__iterator}{directory\+\_\+iterator}} \&\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}, const \mbox{\hyperlink{classfc_1_1directory__iterator}{directory\+\_\+iterator}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}})
+\item 
+bool \mbox{\hyperlink{namespacefc_adeb2fec49ce8bb1a1f0ca6401b2d0257}{fc\+::operator==}} (const \mbox{\hyperlink{classfc_1_1recursive__directory__iterator}{recursive\+\_\+directory\+\_\+iterator}} \&\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}, const \mbox{\hyperlink{classfc_1_1recursive__directory__iterator}{recursive\+\_\+directory\+\_\+iterator}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}})
+\item 
+bool \mbox{\hyperlink{namespacefc_a3013e4b45b5a0430cb0a692b05ac8a51}{fc\+::operator!=}} (const \mbox{\hyperlink{classfc_1_1recursive__directory__iterator}{recursive\+\_\+directory\+\_\+iterator}} \&\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}, const \mbox{\hyperlink{classfc_1_1recursive__directory__iterator}{recursive\+\_\+directory\+\_\+iterator}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}})
+\item 
+bool \mbox{\hyperlink{namespacefc_a3fcf0d920aea28014aacae50a51d8485}{fc\+::exists}} (const \mbox{\hyperlink{classfc_1_1path}{path}} \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})
+\item 
+void \mbox{\hyperlink{namespacefc_a76b0787468a9f403087b71a894c07ce2}{fc\+::create\+\_\+directories}} (const \mbox{\hyperlink{classfc_1_1path}{path}} \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})
+\item 
+bool \mbox{\hyperlink{namespacefc_ab123bfeadf918cc293ecad88bca7c499}{fc\+::is\+\_\+directory}} (const \mbox{\hyperlink{classfc_1_1path}{path}} \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})
+\item 
+bool \mbox{\hyperlink{namespacefc_a6855142912d4cfb89281ba0c7f4938a2}{fc\+::is\+\_\+regular\+\_\+file}} (const \mbox{\hyperlink{classfc_1_1path}{path}} \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{namespacefc_aae3e907b120751591ca6919ac66c384b}{fc\+::file\+\_\+size}} (const \mbox{\hyperlink{classfc_1_1path}{path}} \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{namespacefc_ab533ebf0126ab57947f79946c342acec}{fc\+::directory\+\_\+size}} (const \mbox{\hyperlink{classfc_1_1path}{path}} \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})
+\item 
+void \mbox{\hyperlink{namespacefc_a50ad24e0099358d167967f9df2e368fc}{fc\+::remove\+\_\+all}} (const \mbox{\hyperlink{classfc_1_1path}{path}} \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})
+\item 
+void \mbox{\hyperlink{namespacefc_a79771837fffd80fcc4bc658ee2fc4b2b}{fc\+::copy}} (const \mbox{\hyperlink{classfc_1_1path}{path}} \&from, const \mbox{\hyperlink{classfc_1_1path}{path}} \&to)
+\item 
+void \mbox{\hyperlink{namespacefc_ab25ea24552f2c490047c335a102f12fc}{fc\+::resize\+\_\+file}} (const \mbox{\hyperlink{classfc_1_1path}{path}} \&file, size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\item 
+void \mbox{\hyperlink{namespacefc_ad02fa8571ca999725dfcaa871b672230}{fc\+::chmod}} (const \mbox{\hyperlink{classfc_1_1path}{path}} \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}, int perm)
+\item 
+void \mbox{\hyperlink{namespacefc_a067b275100894b82b6cf3aa85e804ea5}{fc\+::rename}} (const \mbox{\hyperlink{classfc_1_1path}{path}} \&from, const \mbox{\hyperlink{classfc_1_1path}{path}} \&to)
+\item 
+void \mbox{\hyperlink{namespacefc_a9bc83475f555620274c3b776ea38af2b}{fc\+::create\+\_\+hard\+\_\+link}} (const \mbox{\hyperlink{classfc_1_1path}{path}} \&from, const \mbox{\hyperlink{classfc_1_1path}{path}} \&to)
+\item 
+bool \mbox{\hyperlink{namespacefc_a0db76f35dc060918029b16de918b1e84}{fc\+::remove}} (const \mbox{\hyperlink{classfc_1_1path}{path}} \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})
+\item 
+\mbox{\hyperlink{classfc_1_1path}{path}} \mbox{\hyperlink{namespacefc_ac7ca5987762ad2fba3d278b956067171}{fc\+::canonical}} (const \mbox{\hyperlink{classfc_1_1path}{path}} \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})
+\item 
+\mbox{\hyperlink{classfc_1_1path}{path}} \mbox{\hyperlink{namespacefc_ab76ad94ec93db365293a67053393fbb4}{fc\+::absolute}} (const \mbox{\hyperlink{classfc_1_1path}{path}} \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})
+\item 
+\mbox{\hyperlink{classfc_1_1path}{path}} \mbox{\hyperlink{namespacefc_a887060cd05d29b1ed9dec83ec97ee8e5}{fc\+::unique\+\_\+path}} ()
+\item 
+\mbox{\hyperlink{classfc_1_1path}{path}} \mbox{\hyperlink{namespacefc_afe3ee0e7b733d87469a967ac456302dc}{fc\+::temp\+\_\+directory\+\_\+path}} ()
+\item 
+\mbox{\hyperlink{classfc_1_1path}{path}} \mbox{\hyperlink{namespacefc_a9fcdf886a023ef71441fd2f02ef3dc04}{fc\+::make\+\_\+relative}} (const \mbox{\hyperlink{classfc_1_1path}{path}} \&from, const \mbox{\hyperlink{classfc_1_1path}{path}} \&to)
+\item 
+const \mbox{\hyperlink{classfc_1_1path}{path}} \& \mbox{\hyperlink{namespacefc_a638386a755d79377ef4c5c779c731e43}{fc\+::home\+\_\+path}} ()
+\item 
+const \mbox{\hyperlink{classfc_1_1path}{path}} \& \mbox{\hyperlink{namespacefc_a3e2cb20721f4d3404ec07ff31694153e}{fc\+::app\+\_\+path}} ()
+\item 
+const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \& \mbox{\hyperlink{namespacefc_a6e83f7c8488e348511224442f4591d33}{fc\+::current\+\_\+path}} ()
+\end{DoxyCompactItemize}

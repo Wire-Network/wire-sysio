@@ -1,0 +1,9 @@
+<map id="sysio::chain::fork_database_impl::add_impl" name="sysio::chain::fork_database_impl::add_impl">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,77,178,118"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1protocol__feature__activation.html#a9b74efdc3ccf711443174ff0c9b535e3" title=" " alt="" coords="226,5,438,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="161,74,246,48,248,53,162,79"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1chain_1_1fork__database__impl.html#a65a4578964babf603443cdf3c0726908" title=" " alt="" coords="263,70,401,126"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="178,95,247,95,247,100,178,100"/>
+<area shape="rect" id="Node000004" href="$namespacesysio_1_1chain.html#aa56956ceeec88a964737228174aec6d6" title=" " alt="" coords="260,150,404,176"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="161,116,226,135,258,143,257,148,225,140,159,121"/>
+</map>

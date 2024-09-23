@@ -1,0 +1,13 @@
+<map id="websocketpp::connection::process_handshake_request" name="websocketpp::connection::process_handshake_request">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,71,201,111"/>
+<area shape="rect" id="Node000002" href="$namespacewebsocketpp_1_1processor.html#a5fa80687521dc24678e773fc3e71e0ce" title="Extract a URI ptr from the host header of the request." alt="" coords="257,5,420,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="178,68,247,48,248,53,179,73"/>
+<area shape="rect" id="Node000003" href="$namespacewebsocketpp_1_1processor.html#a9ff3159b48cf4be2e7cb79c81b155d53" title="Determine whether or not a generic HTTP request is a WebSocket handshake." alt="" coords="249,71,428,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="201,88,233,88,233,94,201,94"/>
+<area shape="rect" id="Node000005" href="$namespacewebsocketpp_1_1error.html#a3344622df8c36e8ae03c59164e7b5e89" title=" " alt="" coords="272,136,404,177"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="179,109,258,131,256,136,178,114"/>
+<area shape="rect" id="Node000004" href="$namespacewebsocketpp_1_1utility.html#a484f1287b93cf58cc6514e46eed41568" title="Find substring (case insensitive)" alt="" coords="476,71,613,111"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="428,88,460,88,460,94,428,94"/>
+<area shape="rect" id="Node000006" href="$namespacewebsocketpp_1_1error.html#ac1acac2bfb24bbd2b1791db80993b0c2" title=" " alt="" coords="478,136,611,177"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="405,154,463,154,463,159,405,159"/>
+</map>

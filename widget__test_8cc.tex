@@ -1,0 +1,78 @@
+\doxysection{libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/xcode/\+Samples/\+Framework\+Sample/widget\+\_\+test.cc File Reference}
+\hypertarget{widget__test_8cc}{}\label{widget__test_8cc}\index{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/xcode/Samples/FrameworkSample/widget\_test.cc@{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/xcode/Samples/FrameworkSample/widget\_test.cc}}
+{\ttfamily \#include $<$string$>$}\newline
+{\ttfamily \#include "{}gtest/gtest.\+h"{}}\newline
+{\ttfamily \#include $<$Widget/widget.\+h$>$}\newline
+Include dependency graph for widget\+\_\+test.\+cc\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{widget__test_8cc__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{widget__test_8cc_a291536a26f617362e0c4b58941eeaead}{TEST}} (Widget\+Initializer\+Test, Test\+Constructor)
+\item 
+\mbox{\hyperlink{widget__test_8cc_ab0b72ae0a336fd2a4470c6b5566cd8c0}{TEST}} (Widget\+Initializer\+Test, Test\+Conversion)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{widget__test_8cc_a291536a26f617362e0c4b58941eeaead}\index{widget\_test.cc@{widget\_test.cc}!TEST@{TEST}}
+\index{TEST@{TEST}!widget\_test.cc@{widget\_test.cc}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{widget__test_8cc_a291536a26f617362e0c4b58941eeaead} 
+TEST (\begin{DoxyParamCaption}\item[{Widget\+Initializer\+Test}]{}{, }\item[{Test\+Constructor}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{widget__test_8cc_source_l00045}{45}} of file \mbox{\hyperlink{widget__test_8cc_source}{widget\+\_\+test.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00046\ \ \ \mbox{\hyperlink{class_widget}{Widget}}\ widget(1.0f,\ \textcolor{stringliteral}{"{}name"{}});}
+\DoxyCodeLine{00047\ \ \ \mbox{\hyperlink{gtest_8h_a981e552322fb084042d02d6dfa9860ca}{EXPECT\_FLOAT\_EQ}}(1.0f,\ widget.GetFloatValue());}
+\DoxyCodeLine{00048\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(std::string(\textcolor{stringliteral}{"{}name"{}}),\ widget.GetStringValue());}
+\DoxyCodeLine{00049\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=276pt]{widget__test_8cc_a291536a26f617362e0c4b58941eeaead_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{widget__test_8cc_ab0b72ae0a336fd2a4470c6b5566cd8c0}\index{widget\_test.cc@{widget\_test.cc}!TEST@{TEST}}
+\index{TEST@{TEST}!widget\_test.cc@{widget\_test.cc}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{widget__test_8cc_ab0b72ae0a336fd2a4470c6b5566cd8c0} 
+TEST (\begin{DoxyParamCaption}\item[{Widget\+Initializer\+Test}]{}{, }\item[{Test\+Conversion}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{widget__test_8cc_source_l00053}{53}} of file \mbox{\hyperlink{widget__test_8cc_source}{widget\+\_\+test.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00054\ \ \ \mbox{\hyperlink{class_widget}{Widget}}\ widget(1.0f,\ \textcolor{stringliteral}{"{}name"{}});}
+\DoxyCodeLine{00055\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(1,\ widget.GetIntValue());}
+\DoxyCodeLine{00056\ }
+\DoxyCodeLine{00057\ \ \ \textcolor{keywordtype}{size\_t}\ max\_size\ =\ 128;}
+\DoxyCodeLine{00058\ \ \ \textcolor{keywordtype}{char}\ buffer[max\_size];}
+\DoxyCodeLine{00059\ \ \ widget.GetCharPtrValue(buffer,\ max\_size);}
+\DoxyCodeLine{00060\ \ \ \mbox{\hyperlink{gtest_8h_ad20f7b94ac5081e16f0005b94e95f0c6}{EXPECT\_STREQ}}(\textcolor{stringliteral}{"{}name"{}},\ buffer);}
+\DoxyCodeLine{00061\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=284pt]{widget__test_8cc_ab0b72ae0a336fd2a4470c6b5566cd8c0_cgraph}
+\end{center}
+\end{figure}

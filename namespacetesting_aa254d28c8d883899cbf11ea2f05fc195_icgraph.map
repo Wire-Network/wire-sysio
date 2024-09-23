@@ -1,0 +1,7 @@
+<map id="testing::MakeAction" name="testing::MakeAction">
+<area shape="rect" id="Node000001" title=" " alt="" coords="225,56,362,82"/>
+<area shape="rect" id="Node000002" href="$classtesting_1_1internal_1_1_with_args_action.html#ab6d8f89fd5a54f2914da2523b2ba6ee5" title=" " alt="" coords="7,5,175,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="209,57,175,51,176,45,210,52"/>
+<area shape="rect" id="Node000003" href="$namespacetesting_1_1gmock__generated__actions__test.html#a5380c41df40cb159d58d4c4c81aeac19" title=" " alt="" coords="5,85,177,126"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="210,87,178,92,177,87,209,81"/>
+</map>

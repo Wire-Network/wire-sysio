@@ -1,0 +1,123 @@
+\doxysection{code\+\_\+cache.\+hpp}
+\hypertarget{code__cache_8hpp_source}{}\label{code__cache_8hpp_source}\index{libraries/chain/include/sysio/chain/webassembly/sys-\/vm-\/oc/code\_cache.hpp@{libraries/chain/include/sysio/chain/webassembly/sys-\/vm-\/oc/code\_cache.hpp}}
+\mbox{\hyperlink{code__cache_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <boost/lockfree/spsc\_queue.hpp>}}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{sys-vm-oc_2sys-vm-oc_8hpp}{sysio/chain/webassembly/sys-\/vm-\/oc/sys-\/vm-\/oc.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{ipc__helpers_8hpp}{sysio/chain/webassembly/sys-\/vm-\/oc/ipc\_helpers.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <boost/multi\_index\_container.hpp>}}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <boost/multi\_index/hashed\_index.hpp>}}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ <boost/multi\_index/sequenced\_index.hpp>}}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <boost/multi\_index/composite\_key.hpp>}}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00011}00011\ \textcolor{preprocessor}{\#include\ <boost/multi\_index/key\_extractors.hpp>}}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00013}00013\ \textcolor{preprocessor}{\#include\ <boost/interprocess/mem\_algo/rbtree\_best\_fit.hpp>}}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00014}00014\ \textcolor{preprocessor}{\#include\ <boost/asio/local/datagram\_protocol.hpp>}}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00017}00017\ \textcolor{preprocessor}{\#include\ <thread>}}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00019}00019\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacestd}{std}}\ \{}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00020}\mbox{\hyperlink{structstd_1_1hash_3_01sysio_1_1chain_1_1eosvmoc_1_1code__tuple_01_4}{00020}}\ \ \ \ \ \textcolor{keyword}{template}<>\ \textcolor{keyword}{struct\ }hash<\mbox{\hyperlink{namespacesysio}{sysio}}::chain::eosvmoc::code\_tuple>\ \{}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00021}\mbox{\hyperlink{structstd_1_1hash_3_01sysio_1_1chain_1_1eosvmoc_1_1code__tuple_01_4_a90a22d279d0ac7607547911de892b142}{00021}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{structstd_1_1hash_3_01sysio_1_1chain_1_1eosvmoc_1_1code__tuple_01_4_a90a22d279d0ac7607547911de892b142}{operator()}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1code__tuple}{sysio::chain::eosvmoc::code\_tuple}}\&\ ct)\ \textcolor{keyword}{const}\ \textcolor{keyword}{noexcept}\ \{}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00022}00022\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ct.code\_id.\_hash[0];}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00023}00023\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00024}00024\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00025}00025\ \}}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00027}00027\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{\ \textcolor{keyword}{namespace\ }chain\ \{\ \textcolor{keyword}{namespace\ }eosvmoc\ \{}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00029}00029\ \textcolor{keyword}{using\ namespace\ }boost::multi\_index;}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00030}00030\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespaceboost_1_1asio}{boost::asio}};}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00032}00032\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceboost_1_1interprocess}{bip}}\ =\ \mbox{\hyperlink{namespaceboost_1_1interprocess}{boost::interprocess}};}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00033}00033\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceboost_1_1filesystem}{bfs}}\ =\ \mbox{\hyperlink{namespaceboost_1_1filesystem}{boost::filesystem}};}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00035}\mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a113f05ff7d17d44ce4cee37bcb2caad7}{00035}}\ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a113f05ff7d17d44ce4cee37bcb2caad7}{allocator\_t}}\ =\ bip::rbtree\_best\_fit<bip::null\_mutex\_family,\ bip::offset\_ptr<void>,\ \textcolor{keyword}{alignof}(std::max\_align\_t)>;}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00037}00037\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1config}{config}};}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00039}\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base}{00039}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base}{code\_cache\_base}}\ \{}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00040}00040\ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00041}00041\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_ab31065b1fab5b6d5910d1cae71bb15cf}{code\_cache\_base}}(\textcolor{keyword}{const}\ bfs::path\ data\_dir,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1config}{eosvmoc::config}}\&\ eosvmoc\_config,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classchainbase_1_1database}{chainbase::database}}\&\ db);}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00042}00042\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_ac04c389f3eef6d9860d507ce690a4781}{\string~code\_cache\_base}}();}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00044}\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_ad77b7e524be52fdfab8d5faef376b4db}{00044}}\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\&\ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_ad77b7e524be52fdfab8d5faef376b4db}{fd}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_aaee1ae29b4dc9f8f3cb0b86f32998dc4}{\_cache\_fd}};\ \}}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00046}00046\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_a898c78da95cb62a1fc2fbdb197f2836d}{free\_code}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha256}{digest\_type}}\&\ code\_id,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\&\ vm\_version);}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00048}00048\ \ \ \ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00049}00049\ \ \ \ \ \ \ \textcolor{keyword}{struct\ }by\_hash;}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00051}00051\ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ boost::multi\_index\_container<}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1code__descriptor}{code\_descriptor}},}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \ indexed\_by<}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \ \ \ sequenced<>,}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \ \ \ hashed\_unique<tag<by\_hash>,}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ composite\_key<\ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1code__descriptor}{code\_descriptor}},}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ member<code\_descriptor,\ digest\_type,\ \&code\_descriptor::code\_hash>,}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ member<code\_descriptor,\ uint8\_t,\ \ \ \ \ \&code\_descriptor::vm\_version>}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00059}00059\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ >}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \ \ \ >}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00061}00061\ \ \ \ \ \ \ \ \ \ >}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00062}\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_a30f70ce315e8da4166face9c8b4ea5e5}{00062}}\ \ \ \ \ \ \ >\ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_a30f70ce315e8da4166face9c8b4ea5e5}{code\_cache\_index}};}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00063}\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_adb969be895a25820aa4e599304dfa252}{00063}}\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_a30f70ce315e8da4166face9c8b4ea5e5}{code\_cache\_index}}\ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_adb969be895a25820aa4e599304dfa252}{\_cache\_index}};}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00065}\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_ad7e0e5b63b94e48e35baacc15644b0b7}{00065}}\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classchainbase_1_1database}{chainbase::database}}\&\ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_ad7e0e5b63b94e48e35baacc15644b0b7}{\_db}};}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00067}\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_abbf29e52e658f8089958c93ae87402ac}{00067}}\ \ \ \ \ \ \ bfs::path\ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_abbf29e52e658f8089958c93ae87402ac}{\_cache\_file\_path}};}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00068}\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_aaee1ae29b4dc9f8f3cb0b86f32998dc4}{00068}}\ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_aaee1ae29b4dc9f8f3cb0b86f32998dc4}{\_cache\_fd}};}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00069}00069\ }
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00070}\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_acccb3fc4fe49eb154ea915ee8b350f70}{00070}}\ \ \ \ \ \ \ io\_context\ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_acccb3fc4fe49eb154ea915ee8b350f70}{\_ctx}};}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00071}\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_a1ea07bb510f7b82ecfb324bca6225728}{00071}}\ \ \ \ \ \ \ local::datagram\_protocol::socket\ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_a1ea07bb510f7b82ecfb324bca6225728}{\_compile\_monitor\_write\_socket}}\{\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_acccb3fc4fe49eb154ea915ee8b350f70}{\_ctx}}\};}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00072}\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_a3422663ea869e784bf6b6e72cb43f96b}{00072}}\ \ \ \ \ \ \ local::datagram\_protocol::socket\ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_a3422663ea869e784bf6b6e72cb43f96b}{\_compile\_monitor\_read\_socket}}\{\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_acccb3fc4fe49eb154ea915ee8b350f70}{\_ctx}}\};}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00073}00073\ }
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00074}00074\ \ \ \ \ \ \ \textcolor{comment}{//these\ are\ really\ only\ useful\ to\ the\ async\ code\ cache,\ but\ keep\ them\ here\ so}}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00075}00075\ \ \ \ \ \ \ \textcolor{comment}{//free\_code\ can\ be\ shared}}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00076}\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_a44c50f4deb837180fa47026465c55d8a}{00076}}\ \ \ \ \ \ \ std::unordered\_set<code\_tuple>\ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_a44c50f4deb837180fa47026465c55d8a}{\_queued\_compiles}};}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00077}\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_a6f9d3065fa9328cb776d6c68b0c9ef1f}{00077}}\ \ \ \ \ \ \ std::unordered\_map<code\_tuple,\ bool>\ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_a6f9d3065fa9328cb776d6c68b0c9ef1f}{\_outstanding\_compiles\_and\_poison}};}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00079}\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_aa4b8115d88fae51bcaf70a15bd3db3bc}{00079}}\ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_aa4b8115d88fae51bcaf70a15bd3db3bc}{\_free\_bytes\_eviction\_threshold}};}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00080}00080\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_a249bdb27d2796f53a728b85a2889db44}{check\_eviction\_threshold}}(\textcolor{keywordtype}{size\_t}\ free\_bytes);}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00081}00081\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_a543e8301b86cc0682a715686279dc1c3}{run\_eviction\_round}}();}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00083}00083\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_a9933307339971ede770f460277491587}{set\_on\_disk\_region\_dirty}}(\textcolor{keywordtype}{bool});}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00084}00084\ }
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00085}00085\ \ \ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00086}00086\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_a06095b550460307a8e11b2b8a1083230}{serialize\_cache\_index}}(\mbox{\hyperlink{classfc_1_1datastream}{fc::datastream<T>}}\&\ ds);}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00087}00087\ \};}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00088}00088\ }
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00089}\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__async}{00089}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__async}{code\_cache\_async}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base}{code\_cache\_base}}\ \{}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00090}00090\ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00091}00091\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__async_ab5e9f17c574c6388b10a05dcedea7fde}{code\_cache\_async}}(\textcolor{keyword}{const}\ bfs::path\ data\_dir,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1config}{eosvmoc::config}}\&\ eosvmoc\_config,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classchainbase_1_1database}{chainbase::database}}\&\ db);}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00092}00092\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__async_ab8076b08d9220abbf0a2ec7f717d5925}{\string~code\_cache\_async}}();}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00093}00093\ }
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00094}00094\ \ \ \ \ \ \ \textcolor{comment}{//If\ code\ is\ in\ cache:\ returns\ pointer\ \&\ bumps\ to\ front\ of\ MRU\ list}}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00095}00095\ \ \ \ \ \ \ \textcolor{comment}{//If\ code\ is\ not\ in\ cache,\ and\ not\ blacklisted,\ and\ not\ currently\ compiling:\ return\ nullptr\ and\ kick\ off\ compile}}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00096}00096\ \ \ \ \ \ \ \textcolor{comment}{//otherwise:\ return\ nullptr}}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00097}00097\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1code__descriptor}{code\_descriptor}}*\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__async_ae6565ec4ecff75fbdbf99ab37604c2b0}{get\_descriptor\_for\_code}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha256}{digest\_type}}\&\ code\_id,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\&\ vm\_version);}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00098}00098\ }
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00099}00099\ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00100}00100\ \ \ \ \ \ \ std::thread\ \_monitor\_reply\_thread;}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00101}00101\ \ \ \ \ \ \ boost::lockfree::spsc\_queue<wasm\_compilation\_result\_message>\ \_result\_queue;}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00102}00102\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ wait\_on\_compile\_monitor\_message();}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00103}00103\ \ \ \ \ \ \ std::tuple<size\_t,\ size\_t>\ consume\_compile\_thread\_queue();}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00104}00104\ \ \ \ \ \ \ std::unordered\_set<code\_tuple>\ \_blacklist;}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00105}00105\ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \_threads;}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00106}00106\ \};}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00107}00107\ }
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00108}\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__sync}{00108}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__sync}{code\_cache\_sync}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base}{code\_cache\_base}}\ \{}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00109}00109\ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00110}00110\ \ \ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base_ab31065b1fab5b6d5910d1cae71bb15cf}{code\_cache\_base::code\_cache\_base}};}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00111}00111\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__sync_ad8925611879b3ff1c1975952543d17d3}{\string~code\_cache\_sync}}();}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00112}00112\ }
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00113}00113\ \ \ \ \ \ \ \textcolor{comment}{//Can\ still\ fail\ and\ return\ nullptr\ if,\ for\ example,\ there\ is\ an\ expected\ instantiation\ failure}}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00114}00114\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1code__descriptor}{code\_descriptor}}*\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__sync_ab6cb5ce5742de26979b108d2e5d908db}{get\_descriptor\_for\_code\_sync}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha256}{digest\_type}}\&\ code\_id,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\&\ vm\_version);}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00115}00115\ \};}
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00116}00116\ }
+\DoxyCodeLine{\Hypertarget{code__cache_8hpp_source_l00117}00117\ \}\}\}}
+
+\end{DoxyCode}

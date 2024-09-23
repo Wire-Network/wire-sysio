@@ -1,0 +1,146 @@
+\doxysection{local\+\_\+identity Struct Reference}
+\hypertarget{structlocal__identity}{}\label{structlocal__identity}\index{local\_identity@{local\_identity}}
+
+
+Collaboration diagram for local\+\_\+identity\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=306pt]{structlocal__identity__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{structlocal__identity_a2fd343eec2b3f79db81dc97ae6dddd5b}{initialize}} ()
+\item 
+bool \mbox{\hyperlink{structlocal__identity_af3f117131afdf1dac924d3861639c3b7}{contains}} (const string \&\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}) const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+vector$<$ \mbox{\hyperlink{classfc_1_1ip_1_1address}{fc\+::ip\+::address}} $>$ \mbox{\hyperlink{structlocal__identity_ab8a1b8fbbe33949a33c5c215c9f6f7bb}{addrs}}
+\item 
+vector$<$ string $>$ \mbox{\hyperlink{structlocal__identity_a48222ce432b59ec9244d956ef773f804}{names}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source_l00051}{51}} of file \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structlocal__identity_af3f117131afdf1dac924d3861639c3b7}\index{local\_identity@{local\_identity}!contains@{contains}}
+\index{contains@{contains}!local\_identity@{local\_identity}}
+\doxysubsubsection{\texorpdfstring{contains()}{contains()}}
+{\footnotesize\ttfamily \label{structlocal__identity_af3f117131afdf1dac924d3861639c3b7} 
+bool local\+\_\+identity\+::contains (\begin{DoxyParamCaption}\item[{const string \&}]{name}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source_l00094}{94}} of file \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00095\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1ip_1_1address}{fc::ip::address}}\ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68daee5b74d2be31ca48e104578d6c2b7425}{test}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}});}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ :\ \mbox{\hyperlink{structlocal__identity_ab8a1b8fbbe33949a33c5c215c9f6f7bb}{addrs}})\ \{}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ ==\ test)}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00101\ \ \ \ \ \}}
+\DoxyCodeLine{00102\ \ \ \ \ \textcolor{keywordflow}{catch}\ (...)\ \{}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \textcolor{comment}{//\ not\ an\ ip\ address}}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ n\ :\ \mbox{\hyperlink{structlocal__identity_a48222ce432b59ec9244d956ef773f804}{names}})\ \{}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (n\ ==\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00108\ \ \ \ \ \}}
+\DoxyCodeLine{00109\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00110\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structlocal__identity_a2fd343eec2b3f79db81dc97ae6dddd5b}\index{local\_identity@{local\_identity}!initialize@{initialize}}
+\index{initialize@{initialize}!local\_identity@{local\_identity}}
+\doxysubsubsection{\texorpdfstring{initialize()}{initialize()}}
+{\footnotesize\ttfamily \label{structlocal__identity_a2fd343eec2b3f79db81dc97ae6dddd5b} 
+void local\+\_\+identity\+::initialize (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source_l00055}{55}} of file \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00056\ \ \ \ \ \mbox{\hyperlink{structlocal__identity_a48222ce432b59ec9244d956ef773f804}{names}}.push\_back\ (\textcolor{stringliteral}{"{}localhost"{}});}
+\DoxyCodeLine{00057\ \ \ \ \ \mbox{\hyperlink{structlocal__identity_a48222ce432b59ec9244d956ef773f804}{names}}.push\_back\ (\textcolor{stringliteral}{"{}127.0.0.1"{}});}
+\DoxyCodeLine{00058\ }
+\DoxyCodeLine{00059\ \ \ \ \ boost::system::error\_code\ ec;}
+\DoxyCodeLine{00060\ \ \ \ \ \textcolor{keywordtype}{string}\ hn\ =\ host\_name\ (ec);}
+\DoxyCodeLine{00061\ \ \ \ \ \textcolor{keywordflow}{if}\ (ec.value()\ !=\ boost::system::errc::success)\ \{}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_catch_a54c1ce08041448d684ae8edc14162cd2}{cerr}}\ <<\ \textcolor{stringliteral}{"{}unable\ to\ retrieve\ host\ name:\ "{}}\ <<\ ec.message()\ <<\ endl;}
+\DoxyCodeLine{00063\ \ \ \ \ \}}
+\DoxyCodeLine{00064\ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \mbox{\hyperlink{structlocal__identity_a48222ce432b59ec9244d956ef773f804}{names}}.push\_back\ (hn);}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (hn.find\ (\textcolor{charliteral}{'.'})\ !=\ string::npos)\ \{}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structlocal__identity_a48222ce432b59ec9244d956ef773f804}{names}}.push\_back\ (hn.substr\ (0,hn.find(\textcolor{charliteral}{'.'})));}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00069\ \ \ \ \ \}}
+\DoxyCodeLine{00070\ }
+\DoxyCodeLine{00071\ \ \ \ \ ifaddrs\ *ifap\ =\ 0;}
+\DoxyCodeLine{00072\ \ \ \ \ \textcolor{keywordflow}{if}\ (::getifaddrs\ (\&ifap)\ ==\ 0)\ \{}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (ifaddrs\ *p\_if\ =\ ifap;\ p\_if\ !=\ 0;\ p\_if\ =\ p\_if-\/>ifa\_next)\ \{}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (p\_if-\/>ifa\_addr\ !=\ 0\ \&\&}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \ \ \ p\_if-\/>ifa\_addr-\/>sa\_family\ ==\ AF\_INET\ \&\&}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ (p\_if-\/>ifa\_flags\ \&\ IFF\_UP)\ ==\ IFF\_UP)\ \{}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ \ sockaddr\_in\ *ifaddr\ =\ \textcolor{keyword}{reinterpret\_cast<}sockaddr\_in\ *\textcolor{keyword}{>}(p\_if-\/>ifa\_addr);}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}}\ in\_addr\ =\ ntohl(ifaddr-\/>sin\_addr.s\_addr);}
+\DoxyCodeLine{00079\ }
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (in\_addr\ !=\ 0)\ \{}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1ip_1_1address}{fc::ip::address}}\ ifa(in\_addr);}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structlocal__identity_ab8a1b8fbbe33949a33c5c215c9f6f7bb}{addrs}}.push\_back\ (ifa);}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ ::freeifaddrs\ (ifap);}
+\DoxyCodeLine{00087\ \ \ \ \ \}}
+\DoxyCodeLine{00088\ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_catch_a54c1ce08041448d684ae8edc14162cd2}{cerr}}\ <<\ \textcolor{stringliteral}{"{}unable\ to\ query\ local\ ip\ interfaces"{}}\ <<\ endl;}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \mbox{\hyperlink{structlocal__identity_ab8a1b8fbbe33949a33c5c215c9f6f7bb}{addrs}}.push\_back\ (\mbox{\hyperlink{classfc_1_1ip_1_1address}{fc::ip::address}}(\textcolor{stringliteral}{"{}127.0.0.1"{}}));}
+\DoxyCodeLine{00091\ \ \ \ \ \}}
+\DoxyCodeLine{00092\ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structlocal__identity_ab8a1b8fbbe33949a33c5c215c9f6f7bb}\index{local\_identity@{local\_identity}!addrs@{addrs}}
+\index{addrs@{addrs}!local\_identity@{local\_identity}}
+\doxysubsubsection{\texorpdfstring{addrs}{addrs}}
+{\footnotesize\ttfamily \label{structlocal__identity_ab8a1b8fbbe33949a33c5c215c9f6f7bb} 
+vector$<$\mbox{\hyperlink{classfc_1_1ip_1_1address}{fc\+::ip\+::address}}$>$ local\+\_\+identity\+::addrs}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source_l00052}{52}} of file \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{structlocal__identity_a48222ce432b59ec9244d956ef773f804}\index{local\_identity@{local\_identity}!names@{names}}
+\index{names@{names}!local\_identity@{local\_identity}}
+\doxysubsubsection{\texorpdfstring{names}{names}}
+{\footnotesize\ttfamily \label{structlocal__identity_a48222ce432b59ec9244d956ef773f804} 
+vector$<$string$>$ local\+\_\+identity\+::names}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source_l00053}{53}} of file \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+programs/sysio-\/launcher/\mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp}{main.\+cpp}}\end{DoxyCompactItemize}

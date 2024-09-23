@@ -1,0 +1,226 @@
+\doxysection{libraries/fc/secp256k1/secp256k1/src/modules/schnorrsig/main\+\_\+impl.h File Reference}
+\hypertarget{schnorrsig_2main__impl_8h}{}\label{schnorrsig_2main__impl_8h}\index{libraries/fc/secp256k1/secp256k1/src/modules/schnorrsig/main\_impl.h@{libraries/fc/secp256k1/secp256k1/src/modules/schnorrsig/main\_impl.h}}
+{\ttfamily \#include "{}../../../include/secp256k1.\+h"{}}\newline
+{\ttfamily \#include "{}../../../include/secp256k1\+\_\+schnorrsig.\+h"{}}\newline
+{\ttfamily \#include "{}../../hash.\+h"{}}\newline
+Include dependency graph for main\+\_\+impl.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{schnorrsig_2main__impl_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=253pt]{schnorrsig_2main__impl_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{schnorrsig_2main__impl_8h_a5bc69eb5f207ec82d3331594b2b9151e}{secp256k1\+\_\+schnorrsig\+\_\+sign32}} (const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}ctx, unsigned char \texorpdfstring{$\ast$}{*}sig64, const unsigned char \texorpdfstring{$\ast$}{*}msg32, const \mbox{\hyperlink{structsecp256k1__keypair}{secp256k1\+\_\+keypair}} \texorpdfstring{$\ast$}{*}keypair, const unsigned char \texorpdfstring{$\ast$}{*}aux\+\_\+rand32)
+\item 
+int \mbox{\hyperlink{schnorrsig_2main__impl_8h_a221c526a09b8faa406e15824eb92cf1b}{secp256k1\+\_\+schnorrsig\+\_\+sign}} (const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}ctx, unsigned char \texorpdfstring{$\ast$}{*}sig64, const unsigned char \texorpdfstring{$\ast$}{*}msg32, const \mbox{\hyperlink{structsecp256k1__keypair}{secp256k1\+\_\+keypair}} \texorpdfstring{$\ast$}{*}keypair, const unsigned char \texorpdfstring{$\ast$}{*}aux\+\_\+rand32)
+\item 
+int \mbox{\hyperlink{schnorrsig_2main__impl_8h_a4b12030197ede3e4cef1e2118c40fd33}{secp256k1\+\_\+schnorrsig\+\_\+sign\+\_\+custom}} (const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}ctx, unsigned char \texorpdfstring{$\ast$}{*}sig64, const unsigned char \texorpdfstring{$\ast$}{*}msg, size\+\_\+t msglen, const \mbox{\hyperlink{structsecp256k1__keypair}{secp256k1\+\_\+keypair}} \texorpdfstring{$\ast$}{*}keypair, \mbox{\hyperlink{structsecp256k1__schnorrsig__extraparams}{secp256k1\+\_\+schnorrsig\+\_\+extraparams}} \texorpdfstring{$\ast$}{*}extraparams)
+\item 
+int \mbox{\hyperlink{schnorrsig_2main__impl_8h_ab4b9ea2608b3c6e0dadad4c42a48d85f}{secp256k1\+\_\+schnorrsig\+\_\+verify}} (const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}ctx, const unsigned char \texorpdfstring{$\ast$}{*}sig64, const unsigned char \texorpdfstring{$\ast$}{*}msg, size\+\_\+t msglen, const \mbox{\hyperlink{structsecp256k1__xonly__pubkey}{secp256k1\+\_\+xonly\+\_\+pubkey}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+const \mbox{\hyperlink{secp256k1__schnorrsig_8h_a134d980bb4432c6d70e3298979c8f5ec}{secp256k1\+\_\+nonce\+\_\+function\+\_\+hardened}} \mbox{\hyperlink{schnorrsig_2main__impl_8h_aa1fa704630945408ebce25083c7977e1}{secp256k1\+\_\+nonce\+\_\+function\+\_\+bip340}} = nonce\+\_\+function\+\_\+bip340
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{schnorrsig_2main__impl_8h_a221c526a09b8faa406e15824eb92cf1b}\index{main\_impl.h@{main\_impl.h}!secp256k1\_schnorrsig\_sign@{secp256k1\_schnorrsig\_sign}}
+\index{secp256k1\_schnorrsig\_sign@{secp256k1\_schnorrsig\_sign}!main\_impl.h@{main\_impl.h}}
+\doxysubsubsection{\texorpdfstring{secp256k1\_schnorrsig\_sign()}{secp256k1\_schnorrsig\_sign()}}
+{\footnotesize\ttfamily \label{schnorrsig_2main__impl_8h_a221c526a09b8faa406e15824eb92cf1b} 
+int secp256k1\+\_\+schnorrsig\+\_\+sign (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}}]{ctx}{, }\item[{unsigned char \texorpdfstring{$\ast$}{*}}]{sig64}{, }\item[{const unsigned char \texorpdfstring{$\ast$}{*}}]{msg32}{, }\item[{const \mbox{\hyperlink{structsecp256k1__keypair}{secp256k1\+\_\+keypair}} \texorpdfstring{$\ast$}{*}}]{keypair}{, }\item[{const unsigned char \texorpdfstring{$\ast$}{*}}]{aux\+\_\+rand32}{}\end{DoxyParamCaption})}
+
+Same as secp256k1\+\_\+schnorrsig\+\_\+sign32, but DEPRECATED. Will be removed in future versions. 
+
+Definition at line \mbox{\hyperlink{schnorrsig_2main__impl_8h_source_l00200}{200}} of file \mbox{\hyperlink{schnorrsig_2main__impl_8h_source}{main\+\_\+impl.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00201\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{schnorrsig_2main__impl_8h_a5bc69eb5f207ec82d3331594b2b9151e}{secp256k1\_schnorrsig\_sign32}}(ctx,\ sig64,\ msg32,\ keypair,\ aux\_rand32);}
+\DoxyCodeLine{00202\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{schnorrsig_2main__impl_8h_a221c526a09b8faa406e15824eb92cf1b_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{schnorrsig_2main__impl_8h_a221c526a09b8faa406e15824eb92cf1b_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{schnorrsig_2main__impl_8h_a5bc69eb5f207ec82d3331594b2b9151e}\index{main\_impl.h@{main\_impl.h}!secp256k1\_schnorrsig\_sign32@{secp256k1\_schnorrsig\_sign32}}
+\index{secp256k1\_schnorrsig\_sign32@{secp256k1\_schnorrsig\_sign32}!main\_impl.h@{main\_impl.h}}
+\doxysubsubsection{\texorpdfstring{secp256k1\_schnorrsig\_sign32()}{secp256k1\_schnorrsig\_sign32()}}
+{\footnotesize\ttfamily \label{schnorrsig_2main__impl_8h_a5bc69eb5f207ec82d3331594b2b9151e} 
+int secp256k1\+\_\+schnorrsig\+\_\+sign32 (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}}]{ctx}{, }\item[{unsigned char \texorpdfstring{$\ast$}{*}}]{sig64}{, }\item[{const unsigned char \texorpdfstring{$\ast$}{*}}]{msg32}{, }\item[{const \mbox{\hyperlink{structsecp256k1__keypair}{secp256k1\+\_\+keypair}} \texorpdfstring{$\ast$}{*}}]{keypair}{, }\item[{const unsigned char \texorpdfstring{$\ast$}{*}}]{aux\+\_\+rand32}{}\end{DoxyParamCaption})}
+
+Create a Schnorr signature.
+
+Does {\itshape not} strictly follow BIP-\/340 because it does not verify the resulting signature. Instead, you can manually use secp256k1\+\_\+schnorrsig\+\_\+verify and abort if it fails.
+
+This function only signs 32-\/byte messages. If you have messages of a different size (or the same size but without a context-\/specific tag prefix), it is recommended to create a 32-\/byte message hash with secp256k1\+\_\+tagged\+\_\+sha256 and then sign the hash. Tagged hashing allows providing an context-\/specific tag for domain separation. This prevents signatures from being valid in multiple contexts by accident.
+
+Returns 1 on success, 0 on failure. Args\+: ctx\+: pointer to a context object, initialized for signing. Out\+: sig64\+: pointer to a 64-\/byte array to store the serialized signature. In\+: msg32\+: the 32-\/byte message being signed. keypair\+: pointer to an initialized keypair. aux\+\_\+rand32\+: 32 bytes of fresh randomness. While recommended to provide this, it is only supplemental to security and can be NULL. \doxylink{struct_a}{A} NULL argument is treated the same as an all-\/zero one. See BIP-\/340 "{}\+Default Signing"{} for a full explanation of this argument and for guidance if randomness is expensive. 
+
+Definition at line \mbox{\hyperlink{schnorrsig_2main__impl_8h_source_l00195}{195}} of file \mbox{\hyperlink{schnorrsig_2main__impl_8h_source}{main\+\_\+impl.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00196\ \ \ \ \ \textcolor{comment}{/*\ We\ cast\ away\ const\ from\ the\ passed\ aux\_rand32\ argument\ since\ we\ know\ the\ default\ nonce\ function\ does\ not\ modify\ it.\ */}}
+\DoxyCodeLine{00197\ \ \ \ \ \textcolor{keywordflow}{return}\ secp256k1\_schnorrsig\_sign\_internal(ctx,\ sig64,\ msg32,\ 32,\ keypair,\ \mbox{\hyperlink{schnorrsig_2main__impl_8h_aa1fa704630945408ebce25083c7977e1}{secp256k1\_nonce\_function\_bip340}},\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)aux\_rand32);}
+\DoxyCodeLine{00198\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{schnorrsig_2main__impl_8h_a5bc69eb5f207ec82d3331594b2b9151e_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{schnorrsig_2main__impl_8h_a4b12030197ede3e4cef1e2118c40fd33}\index{main\_impl.h@{main\_impl.h}!secp256k1\_schnorrsig\_sign\_custom@{secp256k1\_schnorrsig\_sign\_custom}}
+\index{secp256k1\_schnorrsig\_sign\_custom@{secp256k1\_schnorrsig\_sign\_custom}!main\_impl.h@{main\_impl.h}}
+\doxysubsubsection{\texorpdfstring{secp256k1\_schnorrsig\_sign\_custom()}{secp256k1\_schnorrsig\_sign\_custom()}}
+{\footnotesize\ttfamily \label{schnorrsig_2main__impl_8h_a4b12030197ede3e4cef1e2118c40fd33} 
+int secp256k1\+\_\+schnorrsig\+\_\+sign\+\_\+custom (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}}]{ctx}{, }\item[{unsigned char \texorpdfstring{$\ast$}{*}}]{sig64}{, }\item[{const unsigned char \texorpdfstring{$\ast$}{*}}]{msg}{, }\item[{size\+\_\+t}]{msglen}{, }\item[{const \mbox{\hyperlink{structsecp256k1__keypair}{secp256k1\+\_\+keypair}} \texorpdfstring{$\ast$}{*}}]{keypair}{, }\item[{\mbox{\hyperlink{structsecp256k1__schnorrsig__extraparams}{secp256k1\+\_\+schnorrsig\+\_\+extraparams}} \texorpdfstring{$\ast$}{*}}]{extraparams}{}\end{DoxyParamCaption})}
+
+Create a Schnorr signature with a more flexible API.
+
+Same arguments as secp256k1\+\_\+schnorrsig\+\_\+sign except that it allows signing variable length messages and accepts a pointer to an extraparams object that allows customizing signing by passing additional arguments.
+
+Creates the same signatures as schnorrsig\+\_\+sign if msglen is 32 and the extraparams.\+ndata is the same as aux\+\_\+rand32.
+
+In\+: msg\+: the message being signed. Can only be NULL if msglen is 0. msglen\+: length of the message extraparams\+: pointer to a extraparams object (can be NULL) 
+
+Definition at line \mbox{\hyperlink{schnorrsig_2main__impl_8h_source_l00204}{204}} of file \mbox{\hyperlink{schnorrsig_2main__impl_8h_source}{main\+\_\+impl.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00205\ \ \ \ \ \mbox{\hyperlink{secp256k1__schnorrsig_8h_a134d980bb4432c6d70e3298979c8f5ec}{secp256k1\_nonce\_function\_hardened}}\ noncefp\ =\ NULL;}
+\DoxyCodeLine{00206\ \ \ \ \ \textcolor{keywordtype}{void}\ *ndata\ =\ NULL;}
+\DoxyCodeLine{00207\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(ctx\ !=\ NULL);}
+\DoxyCodeLine{00208\ }
+\DoxyCodeLine{00209\ \ \ \ \ \textcolor{keywordflow}{if}\ (extraparams\ !=\ NULL)\ \{}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(secp256k1\_memcmp\_var(extraparams-\/>\mbox{\hyperlink{structsecp256k1__schnorrsig__extraparams_ad90ca666fb9cee5fb047d83bea870798}{magic}},}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ schnorrsig\_extraparams\_magic,}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{sizeof}(extraparams-\/>\mbox{\hyperlink{structsecp256k1__schnorrsig__extraparams_ad90ca666fb9cee5fb047d83bea870798}{magic}}))\ ==\ 0);}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \ \ noncefp\ =\ extraparams-\/>\mbox{\hyperlink{structsecp256k1__schnorrsig__extraparams_a2077f4d9419810e53d252d9d91de33e4}{noncefp}};}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ ndata\ =\ extraparams-\/>\mbox{\hyperlink{structsecp256k1__schnorrsig__extraparams_a2b41a75d3d43b71f1f8e04703c1a857d}{ndata}};}
+\DoxyCodeLine{00215\ \ \ \ \ \}}
+\DoxyCodeLine{00216\ \ \ \ \ \textcolor{keywordflow}{return}\ secp256k1\_schnorrsig\_sign\_internal(ctx,\ sig64,\ msg,\ msglen,\ keypair,\ noncefp,\ ndata);}
+\DoxyCodeLine{00217\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{schnorrsig_2main__impl_8h_a4b12030197ede3e4cef1e2118c40fd33_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{schnorrsig_2main__impl_8h_ab4b9ea2608b3c6e0dadad4c42a48d85f}\index{main\_impl.h@{main\_impl.h}!secp256k1\_schnorrsig\_verify@{secp256k1\_schnorrsig\_verify}}
+\index{secp256k1\_schnorrsig\_verify@{secp256k1\_schnorrsig\_verify}!main\_impl.h@{main\_impl.h}}
+\doxysubsubsection{\texorpdfstring{secp256k1\_schnorrsig\_verify()}{secp256k1\_schnorrsig\_verify()}}
+{\footnotesize\ttfamily \label{schnorrsig_2main__impl_8h_ab4b9ea2608b3c6e0dadad4c42a48d85f} 
+int secp256k1\+\_\+schnorrsig\+\_\+verify (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}}]{ctx}{, }\item[{const unsigned char \texorpdfstring{$\ast$}{*}}]{sig64}{, }\item[{const unsigned char \texorpdfstring{$\ast$}{*}}]{msg}{, }\item[{size\+\_\+t}]{msglen}{, }\item[{const \mbox{\hyperlink{structsecp256k1__xonly__pubkey}{secp256k1\+\_\+xonly\+\_\+pubkey}} \texorpdfstring{$\ast$}{*}}]{pubkey}{}\end{DoxyParamCaption})}
+
+Verify a Schnorr signature.
+
+Returns\+: 1\+: correct signature 0\+: incorrect signature Args\+: ctx\+: a secp256k1 context object, initialized for verification. In\+: sig64\+: pointer to the 64-\/byte signature to verify. msg\+: the message being verified. Can only be NULL if msglen is 0. msglen\+: length of the message pubkey\+: pointer to an x-\/only public key to verify with (cannot be NULL) 
+
+Definition at line \mbox{\hyperlink{schnorrsig_2main__impl_8h_source_l00219}{219}} of file \mbox{\hyperlink{schnorrsig_2main__impl_8h_source}{main\+\_\+impl.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00220\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{00221\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ e;}
+\DoxyCodeLine{00222\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__gej}{secp256k1\_gej}}\ rj;}
+\DoxyCodeLine{00223\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__ge}{secp256k1\_ge}}\ pk;}
+\DoxyCodeLine{00224\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__gej}{secp256k1\_gej}}\ pkj;}
+\DoxyCodeLine{00225\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__fe}{secp256k1\_fe}}\ rx;}
+\DoxyCodeLine{00226\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__ge}{secp256k1\_ge}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};}
+\DoxyCodeLine{00227\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}[32];}
+\DoxyCodeLine{00228\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a49aa97067a36875627e1380c3fb3833d}{overflow}};}
+\DoxyCodeLine{00229\ }
+\DoxyCodeLine{00230\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(ctx\ !=\ NULL);}
+\DoxyCodeLine{00231\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(sig64\ !=\ NULL);}
+\DoxyCodeLine{00232\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(msg\ !=\ NULL\ ||\ msglen\ ==\ 0);}
+\DoxyCodeLine{00233\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}}\ !=\ NULL);}
+\DoxyCodeLine{00234\ }
+\DoxyCodeLine{00235\ \ \ \ \ \textcolor{keywordflow}{if}\ (!secp256k1\_fe\_set\_b32(\&rx,\ \&sig64[0]))\ \{}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00237\ \ \ \ \ \}}
+\DoxyCodeLine{00238\ }
+\DoxyCodeLine{00239\ \ \ \ \ secp256k1\_scalar\_set\_b32(\&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ \&sig64[32],\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a49aa97067a36875627e1380c3fb3833d}{overflow}});}
+\DoxyCodeLine{00240\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a49aa97067a36875627e1380c3fb3833d}{overflow}})\ \{}
+\DoxyCodeLine{00241\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00242\ \ \ \ \ \}}
+\DoxyCodeLine{00243\ }
+\DoxyCodeLine{00244\ \ \ \ \ \textcolor{keywordflow}{if}\ (!secp256k1\_xonly\_pubkey\_load(ctx,\ \&pk,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}}))\ \{}
+\DoxyCodeLine{00245\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00246\ \ \ \ \ \}}
+\DoxyCodeLine{00247\ }
+\DoxyCodeLine{00248\ \ \ \ \ \textcolor{comment}{/*\ Compute\ e.\ */}}
+\DoxyCodeLine{00249\ \ \ \ \ secp256k1\_fe\_get\_b32(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ \&pk.\mbox{\hyperlink{structsecp256k1__ge_a3c04a97b606c82ea87e55d4a06f06b6e}{x}});}
+\DoxyCodeLine{00250\ \ \ \ \ secp256k1\_schnorrsig\_challenge(\&e,\ \&sig64[0],\ msg,\ msglen,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}});}
+\DoxyCodeLine{00251\ }
+\DoxyCodeLine{00252\ \ \ \ \ \textcolor{comment}{/*\ Compute\ rj\ =\ \ s*G\ +\ (-\/e)*pkj\ */}}
+\DoxyCodeLine{00253\ \ \ \ \ secp256k1\_scalar\_negate(\&e,\ \&e);}
+\DoxyCodeLine{00254\ \ \ \ \ secp256k1\_gej\_set\_ge(\&pkj,\ \&pk);}
+\DoxyCodeLine{00255\ \ \ \ \ secp256k1\_ecmult(\&rj,\ \&pkj,\ \&e,\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{00256\ }
+\DoxyCodeLine{00257\ \ \ \ \ secp256k1\_ge\_set\_gej\_var(\&\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \&rj);}
+\DoxyCodeLine{00258\ \ \ \ \ \textcolor{keywordflow}{if}\ (secp256k1\_ge\_is\_infinity(\&\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}))\ \{}
+\DoxyCodeLine{00259\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00260\ \ \ \ \ \}}
+\DoxyCodeLine{00261\ }
+\DoxyCodeLine{00262\ \ \ \ \ secp256k1\_fe\_normalize\_var(\&\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.y);}
+\DoxyCodeLine{00263\ \ \ \ \ \textcolor{keywordflow}{return}\ !secp256k1\_fe\_is\_odd(\&\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.y)\ \&\&}
+\DoxyCodeLine{00264\ \ \ \ \ \ \ \ \ \ \ \ secp256k1\_fe\_equal\_var(\&rx,\ \&\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.x);}
+\DoxyCodeLine{00265\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{schnorrsig_2main__impl_8h_ab4b9ea2608b3c6e0dadad4c42a48d85f_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{schnorrsig_2main__impl_8h_aa1fa704630945408ebce25083c7977e1}\index{main\_impl.h@{main\_impl.h}!secp256k1\_nonce\_function\_bip340@{secp256k1\_nonce\_function\_bip340}}
+\index{secp256k1\_nonce\_function\_bip340@{secp256k1\_nonce\_function\_bip340}!main\_impl.h@{main\_impl.h}}
+\doxysubsubsection{\texorpdfstring{secp256k1\_nonce\_function\_bip340}{secp256k1\_nonce\_function\_bip340}}
+{\footnotesize\ttfamily \label{schnorrsig_2main__impl_8h_aa1fa704630945408ebce25083c7977e1} 
+const \mbox{\hyperlink{secp256k1__schnorrsig_8h_a134d980bb4432c6d70e3298979c8f5ec}{secp256k1\+\_\+nonce\+\_\+function\+\_\+hardened}} secp256k1\+\_\+nonce\+\_\+function\+\_\+bip340 = nonce\+\_\+function\+\_\+bip340}
+
+An implementation of the nonce generation function as defined in Bitcoin Improvement Proposal 340 "{}\+Schnorr Signatures for secp256k1"{} (\href{https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki}{\texttt{ https\+://github.\+com/bitcoin/bips/blob/master/bip-\/0340.\+mediawiki}}).
+
+If a data pointer is passed, it is assumed to be a pointer to 32 bytes of auxiliary random data as defined in BIP-\/340. If the data pointer is NULL, the nonce derivation procedure follows BIP-\/340 by setting the auxiliary random data to zero. The algo argument must be non-\/\+NULL, otherwise the function will fail and return 0. The hash will be tagged with algo. Therefore, to create BIP-\/340 compliant signatures, algo must be set to "{}\+BIP0340/nonce"{} and algolen to 13. 
+
+Definition at line \mbox{\hyperlink{schnorrsig_2main__impl_8h_source_l00099}{99}} of file \mbox{\hyperlink{schnorrsig_2main__impl_8h_source}{main\+\_\+impl.\+h}}.
+

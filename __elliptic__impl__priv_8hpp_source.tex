@@ -1,0 +1,31 @@
+\doxysection{\+\_\+elliptic\+\_\+impl\+\_\+priv.\+hpp}
+\hypertarget{__elliptic__impl__priv_8hpp_source}{}\label{__elliptic__impl__priv_8hpp_source}\index{libraries/fc/src/crypto/\_elliptic\_impl\_priv.hpp@{libraries/fc/src/crypto/\_elliptic\_impl\_priv.hpp}}
+\mbox{\hyperlink{__elliptic__impl__priv_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{__elliptic__impl__priv_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{__elliptic__impl__priv_8hpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{elliptic_8hpp}{fc/crypto/elliptic.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{__elliptic__impl__priv_8hpp_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{__elliptic__impl__priv_8hpp_source_l00004}00004\ \textcolor{comment}{/*\ private\_key\_impl\ based\ on\ libsecp256k1}}
+\DoxyCodeLine{\Hypertarget{__elliptic__impl__priv_8hpp_source_l00005}00005\ \textcolor{comment}{\ *\ used\ by\ mixed\ +\ secp256k1}}
+\DoxyCodeLine{\Hypertarget{__elliptic__impl__priv_8hpp_source_l00006}00006\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{__elliptic__impl__priv_8hpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{__elliptic__impl__priv_8hpp_source_l00008}00008\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}\ \{\ \textcolor{keyword}{namespace\ }ecc\ \{\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacedetail}{detail}}\ \{}
+\DoxyCodeLine{\Hypertarget{__elliptic__impl__priv_8hpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{__elliptic__impl__priv_8hpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{__elliptic__impl__priv_8hpp_source_l00011}00011\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__context__struct}{secp256k1\_context}}*\ \mbox{\hyperlink{namespacefc_1_1ecc_1_1detail_a977de2554ed3ebc5f128e486d161517d}{\_get\_context}}();}
+\DoxyCodeLine{\Hypertarget{__elliptic__impl__priv_8hpp_source_l00012}00012\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefc_1_1ecc_1_1detail_a71a18cd0920a238991d70c5dd2868570}{\_init\_lib}}();}
+\DoxyCodeLine{\Hypertarget{__elliptic__impl__priv_8hpp_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{__elliptic__impl__priv_8hpp_source_l00014}00014\ \textcolor{keyword}{class\ }private\_key\_impl}
+\DoxyCodeLine{\Hypertarget{__elliptic__impl__priv_8hpp_source_l00015}00015\ \{}
+\DoxyCodeLine{\Hypertarget{__elliptic__impl__priv_8hpp_source_l00016}00016\ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{__elliptic__impl__priv_8hpp_source_l00017}00017\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1ecc_1_1detail_1_1private__key__impl_a45c0c167f628701059d9e8bbf86b4d72}{private\_key\_impl}}()\ BOOST\_NOEXCEPT;}
+\DoxyCodeLine{\Hypertarget{__elliptic__impl__priv_8hpp_source_l00018}00018\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1ecc_1_1detail_1_1private__key__impl_a45c0c167f628701059d9e8bbf86b4d72}{private\_key\_impl}}(\ const\ \mbox{\hyperlink{classfc_1_1ecc_1_1detail_1_1private__key__impl_a45c0c167f628701059d9e8bbf86b4d72}{private\_key\_impl}}\&\ cpy\ )\ BOOST\_NOEXCEPT;}
+\DoxyCodeLine{\Hypertarget{__elliptic__impl__priv_8hpp_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{__elliptic__impl__priv_8hpp_source_l00020}00020\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1ecc_1_1detail_1_1private__key__impl_a45c0c167f628701059d9e8bbf86b4d72}{private\_key\_impl}}\&\ operator=(\ const\ \mbox{\hyperlink{classfc_1_1ecc_1_1detail_1_1private__key__impl_a45c0c167f628701059d9e8bbf86b4d72}{private\_key\_impl}}\&\ pk\ )\ BOOST\_NOEXCEPT;}
+\DoxyCodeLine{\Hypertarget{__elliptic__impl__priv_8hpp_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{__elliptic__impl__priv_8hpp_source_l00022}\mbox{\hyperlink{classfc_1_1ecc_1_1detail_1_1private__key__impl_aa66af36dbc6c4ac5b6fe144adcf36703}{00022}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1sha256}{private\_key\_secret}}\ \mbox{\hyperlink{classfc_1_1ecc_1_1detail_1_1private__key__impl_aa66af36dbc6c4ac5b6fe144adcf36703}{\_key}};}
+\DoxyCodeLine{\Hypertarget{__elliptic__impl__priv_8hpp_source_l00023}00023\ \};}
+\DoxyCodeLine{\Hypertarget{__elliptic__impl__priv_8hpp_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{__elliptic__impl__priv_8hpp_source_l00025}00025\ \}\}\}}
+
+\end{DoxyCode}

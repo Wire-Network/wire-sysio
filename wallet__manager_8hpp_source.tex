@@ -1,0 +1,87 @@
+\doxysection{wallet\+\_\+manager.\+hpp}
+\hypertarget{wallet__manager_8hpp_source}{}\label{wallet__manager_8hpp_source}\index{plugins/wallet\_plugin/include/sysio/wallet\_plugin/wallet\_manager.hpp@{plugins/wallet\_plugin/include/sysio/wallet\_plugin/wallet\_manager.hpp}}
+\mbox{\hyperlink{wallet__manager_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{transaction_8hpp}{sysio/chain/transaction.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{wallet__api_8hpp}{sysio/wallet\_plugin/wallet\_api.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <boost/asio/deadline\_timer.hpp>}}
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <boost/filesystem/path.hpp>}}
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <boost/interprocess/sync/file\_lock.hpp>}}
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <chrono>}}
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00009}00009\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}\ \{\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classfc_1_1variant}{variant}};\ \}}
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00011}00011\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{}
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00012}00012\ \textcolor{keyword}{namespace\ }wallet\ \{}
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00018}\mbox{\hyperlink{classsysio_1_1wallet_1_1wallet__manager}{00018}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1wallet_1_1wallet__manager}{wallet\_manager}}\ \{}
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00019}00019\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00020}00020\ \ \ \ \mbox{\hyperlink{classsysio_1_1wallet_1_1wallet__manager_a21033bf369566df07a2305d23bdd26d2}{wallet\_manager}}();}
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00021}\mbox{\hyperlink{classsysio_1_1wallet_1_1wallet__manager_a4da134f518c4d1c9f440fbfda6bde907}{00021}}\ \ \ \ \mbox{\hyperlink{classsysio_1_1wallet_1_1wallet__manager_a4da134f518c4d1c9f440fbfda6bde907}{wallet\_manager}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1wallet_1_1wallet__manager}{wallet\_manager}}\&)\ =\ \textcolor{keyword}{delete};}
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00022}\mbox{\hyperlink{classsysio_1_1wallet_1_1wallet__manager_a75b660b3a994d3a6052a00851798085f}{00022}}\ \ \ \ \mbox{\hyperlink{classsysio_1_1wallet_1_1wallet__manager_a75b660b3a994d3a6052a00851798085f}{wallet\_manager}}(\mbox{\hyperlink{classsysio_1_1wallet_1_1wallet__manager}{wallet\_manager}}\&\&)\ =\ \textcolor{keyword}{delete};}
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00023}\mbox{\hyperlink{classsysio_1_1wallet_1_1wallet__manager_ace255539e23f9b452790404bd8f82dfd}{00023}}\ \ \ \ \mbox{\hyperlink{classsysio_1_1wallet_1_1wallet__manager}{wallet\_manager}}\&\ \mbox{\hyperlink{classsysio_1_1wallet_1_1wallet__manager_ace255539e23f9b452790404bd8f82dfd}{operator=}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1wallet_1_1wallet__manager}{wallet\_manager}}\&)\ =\ \textcolor{keyword}{delete};}
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00024}\mbox{\hyperlink{classsysio_1_1wallet_1_1wallet__manager_ab51693ac8b433e803108a8c84ac580a7}{00024}}\ \ \ \ \mbox{\hyperlink{classsysio_1_1wallet_1_1wallet__manager}{wallet\_manager}}\&\ \mbox{\hyperlink{classsysio_1_1wallet_1_1wallet__manager_ab51693ac8b433e803108a8c84ac580a7}{operator=}}(\mbox{\hyperlink{classsysio_1_1wallet_1_1wallet__manager}{wallet\_manager}}\&\&)\ =\ \textcolor{keyword}{delete};}
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00025}00025\ \ \ \ \mbox{\hyperlink{classsysio_1_1wallet_1_1wallet__manager_a91f87ee286b1ad524277ad1b9a89d362}{\string~wallet\_manager}}();}
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00029}\mbox{\hyperlink{classsysio_1_1wallet_1_1wallet__manager_ac330332e56fe16ba2d2b855acc551a44}{00029}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1wallet_1_1wallet__manager_ac330332e56fe16ba2d2b855acc551a44}{set\_dir}}(\textcolor{keyword}{const}\ boost::filesystem::path\&\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})\ \{}
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00030}00030\ \ \ \ \ \ \ dir\ =\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}};}
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00031}00031\ \ \ \ \ \ \ initialize\_lock();}
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00032}00032\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00037}00037\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1wallet_1_1wallet__manager_a31ff8d23227bdca61ae4d53d228e7988}{set\_timeout}}(\textcolor{keyword}{const}\ std::chrono::seconds\&\ t);}
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00041}\mbox{\hyperlink{classsysio_1_1wallet_1_1wallet__manager_aa0b19fba064d2db5a813e6e934638a3a}{00041}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1wallet_1_1wallet__manager_aa0b19fba064d2db5a813e6e934638a3a}{set\_timeout}}(\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ secs)\ \{\ \mbox{\hyperlink{classsysio_1_1wallet_1_1wallet__manager_aa0b19fba064d2db5a813e6e934638a3a}{set\_timeout}}(std::chrono::seconds(secs));\ \}}
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00042}00042\ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00050}00050\ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1signed__transaction}{chain::signed\_transaction}}\ \mbox{\hyperlink{classsysio_1_1wallet_1_1wallet__manager_a5603a17a529a1e55788a1cb42d73af89}{sign\_transaction}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1signed__transaction}{chain::signed\_transaction}}\&\ txn,\ \textcolor{keyword}{const}\ flat\_set<public\_key\_type>\&\ keys,}
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00051}00051\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__id__type}{chain::chain\_id\_type}}\&\ \textcolor{keywordtype}{id});}
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00052}00052\ }
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00059}00059\ \ \ \ \mbox{\hyperlink{classfc_1_1crypto_1_1signature}{chain::signature\_type}}\ \mbox{\hyperlink{classsysio_1_1wallet_1_1wallet__manager_abdd2a00c00061934ba7899e41f6b5a09}{sign\_digest}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha256}{chain::digest\_type}}\&\ \mbox{\hyperlink{namespacefc_a150ca4cd9c0318ca45dc0dc7df5d58b9}{digest}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1crypto_1_1public__key}{public\_key\_type}}\&\ key);}
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00068}00068\ \ \ \ std::string\ \mbox{\hyperlink{classsysio_1_1wallet_1_1wallet__manager_a9c1673ae072e569c07ab5af68fc3ae34}{create}}(\textcolor{keyword}{const}\ std::string\&\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}});}
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00069}00069\ }
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00074}00074\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1wallet_1_1wallet__manager_aa2afccf9173458e34f4ce2aba878efb4}{open}}(\textcolor{keyword}{const}\ std::string\&\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}});}
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00075}00075\ }
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00077}00077\ \ \ \ std::vector<std::string>\ \mbox{\hyperlink{classsysio_1_1wallet_1_1wallet__manager_afad689d414b3d3e08a90e6e631111838}{list\_wallets}}();}
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00080}00080\ \ \ \ map<public\_key\_type,private\_key\_type>\ \mbox{\hyperlink{classsysio_1_1wallet_1_1wallet__manager_a319251983b7f931e0a5b3dbc78cceac9}{list\_keys}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\&\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}},\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\&\ pw);}
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00081}00081\ }
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00083}00083\ \ \ \ flat\_set<public\_key\_type>\ \mbox{\hyperlink{classsysio_1_1wallet_1_1wallet__manager_a761fbbaa05ca80aa08d9de80a1d2f224}{get\_public\_keys}}();}
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00084}00084\ }
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00086}00086\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1wallet_1_1wallet__manager_a386ae05dc788545f920226be4c4e8f24}{lock\_all}}();}
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00087}00087\ }
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00092}00092\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{xbyak__mnemonic_8h_aa81aed607133209dade63a226818224d}{lock}}(\textcolor{keyword}{const}\ std::string\&\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}});}
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00093}00093\ }
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00099}00099\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1wallet_1_1wallet__manager_a108a129e4176fb7a1b782344e9cecc8f}{unlock}}(\textcolor{keyword}{const}\ std::string\&\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}},\ \textcolor{keyword}{const}\ std::string\&\ password);}
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00100}00100\ }
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00107}00107\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1wallet_1_1wallet__manager_a7af27f75346e69c7037dc648129e878b}{import\_key}}(\textcolor{keyword}{const}\ std::string\&\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}},\ \textcolor{keyword}{const}\ std::string\&\ wif\_key);}
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00108}00108\ }
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00115}00115\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1wallet_1_1wallet__manager_ab6aafecc1ed2761dc39d963d45321acf}{remove\_key}}(\textcolor{keyword}{const}\ std::string\&\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}},\ \textcolor{keyword}{const}\ std::string\&\ password,\ \textcolor{keyword}{const}\ std::string\&\ key);}
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00116}00116\ }
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00123}00123\ \ \ \ \textcolor{keywordtype}{string}\ \mbox{\hyperlink{classsysio_1_1wallet_1_1wallet__manager_abcbda806e839ef15affb1f090d44cac3}{create\_key}}(\textcolor{keyword}{const}\ std::string\&\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}},\ \textcolor{keyword}{const}\ std::string\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_afa4592d59d085cf06cad9000120eba84}{key\_type}});}
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00124}00124\ }
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00126}00126\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1wallet_1_1wallet__manager_a313c62b87f7dc75063341bdbed750eef}{own\_and\_use\_wallet}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\&\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}},\ std::unique\_ptr<wallet\_api>\&\&\ wallet);}
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00127}00127\ }
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00128}00128\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00131}00131\ \ \ \ \textcolor{keywordtype}{void}\ check\_timeout();}
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00132}00132\ }
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00133}00133\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00134}00134\ \ \ \ \textcolor{keyword}{using\ }timepoint\_t\ =\ std::chrono::time\_point<std::chrono::system\_clock>;}
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00135}00135\ \ \ \ std::map<std::string,\ std::unique\_ptr<wallet\_api>>\ wallets;}
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00136}00136\ \ \ \ std::chrono::seconds\ timeout\ =\ std::chrono::seconds::max();\ }
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00137}00137\ \ \ \ \textcolor{keyword}{mutable}\ timepoint\_t\ timeout\_time\ =\ timepoint\_t::max();\ }
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00138}00138\ \ \ \ boost::filesystem::path\ dir\ =\ \textcolor{stringliteral}{"{}."{}};}
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00139}00139\ \ \ \ boost::filesystem::path\ lock\_path\ =\ dir\ /\ \textcolor{stringliteral}{"{}wallet.lock"{}};}
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00140}00140\ \ \ \ std::unique\_ptr<boost::interprocess::file\_lock>\ wallet\_dir\_lock;}
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00141}00141\ }
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00142}00142\ \ \ \ \textcolor{keywordtype}{void}\ start\_lock\_watch(std::shared\_ptr<boost::asio::deadline\_timer>\ t);}
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00143}00143\ \ \ \ \textcolor{keywordtype}{void}\ initialize\_lock();}
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00144}00144\ \};}
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00145}00145\ }
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00146}00146\ \}\ \textcolor{comment}{//\ namespace\ wallet}}
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00147}00147\ \}\ \textcolor{comment}{//\ namespace\ sysio}}
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00148}00148\ }
+\DoxyCodeLine{\Hypertarget{wallet__manager_8hpp_source_l00149}00149\ }
+
+\end{DoxyCode}

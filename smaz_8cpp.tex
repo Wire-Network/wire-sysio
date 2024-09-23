@@ -1,0 +1,34 @@
+\doxysection{libraries/fc/src/compress/smaz.cpp File Reference}
+\hypertarget{smaz_8cpp}{}\label{smaz_8cpp}\index{libraries/fc/src/compress/smaz.cpp@{libraries/fc/src/compress/smaz.cpp}}
+{\ttfamily \#include $<$string$>$}\newline
+{\ttfamily \#include $<$sstream$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include $<$fc/exception/exception.\+hpp$>$}\newline
+Include dependency graph for smaz.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{smaz_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacefc}{fc}}
+\begin{DoxyCompactList}\small\item\em namespace \doxylink{namespacesysio_1_1chain}{sysio\+::chain} \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacefc_a0640ee6b17d8d5fca0013f9c753d7f6d}{fc\+::const\+\_\+char\+\_\+ptr}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{namespacefc_ad0d1e863d8c267f0b9d9781fbbc652b9}{fc\+::smaz\+\_\+compress}} (const char \texorpdfstring{$\ast$}{*}in, int inlen, char \texorpdfstring{$\ast$}{*}out, int outlen)
+\item 
+void \mbox{\hyperlink{namespacefc_a320d3d44d794b4247c4089d86280dd45}{fc\+::smaz\+\_\+decompress}} (const char \texorpdfstring{$\ast$}{*}in, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} inlen, std\+::stringstream \&ss)
+\item 
+std\+::string \mbox{\hyperlink{namespacefc_a207783e19dff234bb16f308f95feb974}{fc\+::smaz\+\_\+compress}} (const std\+::string \&in)
+\item 
+std\+::string \mbox{\hyperlink{namespacefc_aafe89447c710df2a341af679383d99d4}{fc\+::smaz\+\_\+decompress}} (const std\+::string \&compressed)
+\end{DoxyCompactItemize}

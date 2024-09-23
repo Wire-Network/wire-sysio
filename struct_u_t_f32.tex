@@ -1,0 +1,220 @@
+\doxysection{UTF32\texorpdfstring{$<$}{<} Char\+Type \texorpdfstring{$>$}{>} Struct Template Reference}
+\hypertarget{struct_u_t_f32}{}\label{struct_u_t_f32}\index{UTF32$<$ CharType $>$@{UTF32$<$ CharType $>$}}
+
+
+UTF-\/32 encoding.  
+
+
+
+
+{\ttfamily \#include $<$encodings.\+h$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \{ \mbox{\hyperlink{struct_u_t_f32_a4baddc2142816c358b41f5b08ce29778ae44852fd9d88deed3a956b89108412a5}{support\+Unicode}} = 1
+ \}
+\item 
+typedef Char\+Type \mbox{\hyperlink{struct_u_t_f32_aa215989d027f01f256174c5f91332997}{Ch}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_u_t_f32_aae11b766f799d311679d59e9f7077f83}{RAPIDJSON\+\_\+\+STATIC\+\_\+\+ASSERT}} (\mbox{\hyperlink{yubihsm__pkcs11_8c_af82555d15fc1c126f72a5c0566b5389a}{sizeof}}(\mbox{\hyperlink{struct_u_t_f32_aa215989d027f01f256174c5f91332997}{Ch}}) $>$=4)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename Output\+Stream $>$ }\\static void \mbox{\hyperlink{struct_u_t_f32_a511d1b09672ce535085895a28d8c2f13}{Encode}} (Output\+Stream \&os, unsigned codepoint)
+\item 
+{\footnotesize template$<$typename Output\+Stream $>$ }\\static void \mbox{\hyperlink{struct_u_t_f32_ae50dd8dff92c36ee184c6d4eccb1961e}{Encode\+Unsafe}} (Output\+Stream \&os, unsigned codepoint)
+\item 
+{\footnotesize template$<$typename Input\+Stream $>$ }\\static bool \mbox{\hyperlink{struct_u_t_f32_a6e7258a5e982e101345dffdc355e9b53}{Decode}} (Input\+Stream \&is, unsigned \texorpdfstring{$\ast$}{*}codepoint)
+\item 
+{\footnotesize template$<$typename Input\+Stream , typename Output\+Stream $>$ }\\static bool \mbox{\hyperlink{struct_u_t_f32_a71336fb0546b3079e01bbd51d2fa2e45}{Validate}} (Input\+Stream \&is, Output\+Stream \&os)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Char\+Type = unsigned$>$\newline
+struct UTF32$<$ Char\+Type $>$}
+\href{http://en.wikipedia.org/wiki/UTF-32}{\texttt{ http\+://en.\+wikipedia.\+org/wiki/\+UTF-\/32}} 
+\begin{DoxyTemplParams}{Template Parameters}
+{\em Char\+Type} & Type for storing 32-\/bit UTF-\/32 data. Default is unsigned. C++11 may use char32\+\_\+t instead. \\
+\hline
+\end{DoxyTemplParams}
+\begin{DoxyNote}{Note}
+implements Encoding concept
+
+For in-\/memory access, no need to concern endianness. The code units and code points are represented by CPU\textquotesingle{}s endianness. For streaming, use \doxylink{struct_u_t_f32_l_e}{UTF32\+LE} and \doxylink{struct_u_t_f32_b_e}{UTF32\+BE}, which handle endianness. 
+\end{DoxyNote}
+
+
+Definition at line \mbox{\hyperlink{encodings_8h_source_l00418}{418}} of file \mbox{\hyperlink{encodings_8h_source}{encodings.\+h}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{struct_u_t_f32_aa215989d027f01f256174c5f91332997}\index{UTF32$<$ CharType $>$@{UTF32$<$ CharType $>$}!Ch@{Ch}}
+\index{Ch@{Ch}!UTF32$<$ CharType $>$@{UTF32$<$ CharType $>$}}
+\doxysubsubsection{\texorpdfstring{Ch}{Ch}}
+{\footnotesize\ttfamily \label{struct_u_t_f32_aa215989d027f01f256174c5f91332997} 
+template$<$typename Char\+Type  = unsigned$>$ \\
+Char\+Type \mbox{\hyperlink{struct_u_t_f32}{UTF32}}$<$ Char\+Type $>$\+::\+Ch}
+
+
+
+Definition at line \mbox{\hyperlink{encodings_8h_source_l00419}{419}} of file \mbox{\hyperlink{encodings_8h_source}{encodings.\+h}}.
+
+
+
+\doxysubsection{Member Enumeration Documentation}
+\Hypertarget{struct_u_t_f32_a4baddc2142816c358b41f5b08ce29778}\doxysubsubsection{\texorpdfstring{anonymous enum}{anonymous enum}}
+{\footnotesize\ttfamily \label{struct_u_t_f32_a4baddc2142816c358b41f5b08ce29778} 
+template$<$typename Char\+Type  = unsigned$>$ \\
+anonymous enum}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{supportUnicode@{supportUnicode}!UTF32$<$ CharType $>$@{UTF32$<$ CharType $>$}}\index{UTF32$<$ CharType $>$@{UTF32$<$ CharType $>$}!supportUnicode@{supportUnicode}}}\Hypertarget{struct_u_t_f32_a4baddc2142816c358b41f5b08ce29778ae44852fd9d88deed3a956b89108412a5}\label{struct_u_t_f32_a4baddc2142816c358b41f5b08ce29778} 
+support\+Unicode&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{encodings_8h_source_l00422}{422}} of file \mbox{\hyperlink{encodings_8h_source}{encodings.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00422\ \{\ \mbox{\hyperlink{struct_u_t_f32_a4baddc2142816c358b41f5b08ce29778ae44852fd9d88deed3a956b89108412a5}{supportUnicode}}\ =\ 1\ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_u_t_f32_a6e7258a5e982e101345dffdc355e9b53}\index{UTF32$<$ CharType $>$@{UTF32$<$ CharType $>$}!Decode@{Decode}}
+\index{Decode@{Decode}!UTF32$<$ CharType $>$@{UTF32$<$ CharType $>$}}
+\doxysubsubsection{\texorpdfstring{Decode()}{Decode()}}
+{\footnotesize\ttfamily \label{struct_u_t_f32_a6e7258a5e982e101345dffdc355e9b53} 
+template$<$typename Char\+Type  = unsigned$>$ \\
+template$<$typename Input\+Stream $>$ \\
+static bool \mbox{\hyperlink{struct_u_t_f32}{UTF32}}$<$ Char\+Type $>$\+::\+Decode (\begin{DoxyParamCaption}\item[{Input\+Stream \&}]{is}{, }\item[{unsigned \texorpdfstring{$\ast$}{*}}]{codepoint}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{encodings_8h_source_l00439}{439}} of file \mbox{\hyperlink{encodings_8h_source}{encodings.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00439\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00440\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_af95188da1d8eb6d4b148fe9ce71cd7c4}{RAPIDJSON\_STATIC\_ASSERT}}(\textcolor{keyword}{sizeof}(\textcolor{keyword}{typename}\ InputStream::Ch)\ >=\ 4);}
+\DoxyCodeLine{00441\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_u_t_f32_aa215989d027f01f256174c5f91332997}{Ch}}\ c\ =\ is.Take();}
+\DoxyCodeLine{00442\ \ \ \ \ \ \ \ \ *codepoint\ =\ c;}
+\DoxyCodeLine{00443\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ c\ <=\ 0x10FFFF;}
+\DoxyCodeLine{00444\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=243pt]{struct_u_t_f32_a6e7258a5e982e101345dffdc355e9b53_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_u_t_f32_a511d1b09672ce535085895a28d8c2f13}\index{UTF32$<$ CharType $>$@{UTF32$<$ CharType $>$}!Encode@{Encode}}
+\index{Encode@{Encode}!UTF32$<$ CharType $>$@{UTF32$<$ CharType $>$}}
+\doxysubsubsection{\texorpdfstring{Encode()}{Encode()}}
+{\footnotesize\ttfamily \label{struct_u_t_f32_a511d1b09672ce535085895a28d8c2f13} 
+template$<$typename Char\+Type  = unsigned$>$ \\
+template$<$typename Output\+Stream $>$ \\
+static void \mbox{\hyperlink{struct_u_t_f32}{UTF32}}$<$ Char\+Type $>$\+::\+Encode (\begin{DoxyParamCaption}\item[{Output\+Stream \&}]{os}{, }\item[{unsigned}]{codepoint}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{encodings_8h_source_l00425}{425}} of file \mbox{\hyperlink{encodings_8h_source}{encodings.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00425\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00426\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_af95188da1d8eb6d4b148fe9ce71cd7c4}{RAPIDJSON\_STATIC\_ASSERT}}(\textcolor{keyword}{sizeof}(\textcolor{keyword}{typename}\ OutputStream::Ch)\ >=\ 4);}
+\DoxyCodeLine{00427\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(codepoint\ <=\ 0x10FFFF);}
+\DoxyCodeLine{00428\ \ \ \ \ \ \ \ \ os.Put(codepoint);}
+\DoxyCodeLine{00429\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=243pt]{struct_u_t_f32_a511d1b09672ce535085895a28d8c2f13_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_u_t_f32_ae50dd8dff92c36ee184c6d4eccb1961e}\index{UTF32$<$ CharType $>$@{UTF32$<$ CharType $>$}!EncodeUnsafe@{EncodeUnsafe}}
+\index{EncodeUnsafe@{EncodeUnsafe}!UTF32$<$ CharType $>$@{UTF32$<$ CharType $>$}}
+\doxysubsubsection{\texorpdfstring{EncodeUnsafe()}{EncodeUnsafe()}}
+{\footnotesize\ttfamily \label{struct_u_t_f32_ae50dd8dff92c36ee184c6d4eccb1961e} 
+template$<$typename Char\+Type  = unsigned$>$ \\
+template$<$typename Output\+Stream $>$ \\
+static void \mbox{\hyperlink{struct_u_t_f32}{UTF32}}$<$ Char\+Type $>$\+::\+Encode\+Unsafe (\begin{DoxyParamCaption}\item[{Output\+Stream \&}]{os}{, }\item[{unsigned}]{codepoint}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{encodings_8h_source_l00432}{432}} of file \mbox{\hyperlink{encodings_8h_source}{encodings.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00432\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00433\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_af95188da1d8eb6d4b148fe9ce71cd7c4}{RAPIDJSON\_STATIC\_ASSERT}}(\textcolor{keyword}{sizeof}(\textcolor{keyword}{typename}\ OutputStream::Ch)\ >=\ 4);}
+\DoxyCodeLine{00434\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(codepoint\ <=\ 0x10FFFF);}
+\DoxyCodeLine{00435\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{encodings_8h_ad57ba7f2912c5509924b69dec7db4396}{PutUnsafe}}(os,\ codepoint);}
+\DoxyCodeLine{00436\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=295pt]{struct_u_t_f32_ae50dd8dff92c36ee184c6d4eccb1961e_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_u_t_f32_aae11b766f799d311679d59e9f7077f83}\index{UTF32$<$ CharType $>$@{UTF32$<$ CharType $>$}!RAPIDJSON\_STATIC\_ASSERT@{RAPIDJSON\_STATIC\_ASSERT}}
+\index{RAPIDJSON\_STATIC\_ASSERT@{RAPIDJSON\_STATIC\_ASSERT}!UTF32$<$ CharType $>$@{UTF32$<$ CharType $>$}}
+\doxysubsubsection{\texorpdfstring{RAPIDJSON\_STATIC\_ASSERT()}{RAPIDJSON\_STATIC\_ASSERT()}}
+{\footnotesize\ttfamily \label{struct_u_t_f32_aae11b766f799d311679d59e9f7077f83} 
+template$<$typename Char\+Type  = unsigned$>$ \\
+\mbox{\hyperlink{struct_u_t_f32}{UTF32}}$<$ Char\+Type $>$\+::\+RAPIDJSON\+\_\+\+STATIC\+\_\+\+ASSERT (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{yubihsm__pkcs11_8c_af82555d15fc1c126f72a5c0566b5389a}{sizeof}}(\mbox{\hyperlink{struct_u_t_f32_aa215989d027f01f256174c5f91332997}{Ch}}) $>$=}]{4}{}\end{DoxyParamCaption})}
+
+\Hypertarget{struct_u_t_f32_a71336fb0546b3079e01bbd51d2fa2e45}\index{UTF32$<$ CharType $>$@{UTF32$<$ CharType $>$}!Validate@{Validate}}
+\index{Validate@{Validate}!UTF32$<$ CharType $>$@{UTF32$<$ CharType $>$}}
+\doxysubsubsection{\texorpdfstring{Validate()}{Validate()}}
+{\footnotesize\ttfamily \label{struct_u_t_f32_a71336fb0546b3079e01bbd51d2fa2e45} 
+template$<$typename Char\+Type  = unsigned$>$ \\
+template$<$typename Input\+Stream , typename Output\+Stream $>$ \\
+static bool \mbox{\hyperlink{struct_u_t_f32}{UTF32}}$<$ Char\+Type $>$\+::\+Validate (\begin{DoxyParamCaption}\item[{Input\+Stream \&}]{is}{, }\item[{Output\+Stream \&}]{os}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{encodings_8h_source_l00447}{447}} of file \mbox{\hyperlink{encodings_8h_source}{encodings.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00447\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00448\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_af95188da1d8eb6d4b148fe9ce71cd7c4}{RAPIDJSON\_STATIC\_ASSERT}}(\textcolor{keyword}{sizeof}(\textcolor{keyword}{typename}\ InputStream::Ch)\ >=\ 4);}
+\DoxyCodeLine{00449\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_u_t_f32_aa215989d027f01f256174c5f91332997}{Ch}}\ c;}
+\DoxyCodeLine{00450\ \ \ \ \ \ \ \ \ os.Put(c\ =\ is.Take());}
+\DoxyCodeLine{00451\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ c\ <=\ 0x10FFFF;}
+\DoxyCodeLine{00452\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=244pt]{struct_u_t_f32_a71336fb0546b3079e01bbd51d2fa2e45_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/\mbox{\hyperlink{encodings_8h}{encodings.\+h}}\end{DoxyCompactItemize}

@@ -1,0 +1,151 @@
+\doxysection{internal\+::ISchema\+State\+Factory\texorpdfstring{$<$}{<} Schema\+Type \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classinternal_1_1_i_schema_state_factory}{}\label{classinternal_1_1_i_schema_state_factory}\index{internal::ISchemaStateFactory$<$ SchemaType $>$@{internal::ISchemaStateFactory$<$ SchemaType $>$}}
+
+
+{\ttfamily \#include $<$schema.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{classinternal_1_1_i_schema_state_factory_ae769eac75f9561fc8d0da7fadad2f6b4}{\texorpdfstring{$\sim$}{\string~}\+ISchema\+State\+Factory}} ()
+\item 
+virtual \mbox{\hyperlink{classinternal_1_1_i_schema_validator}{ISchema\+Validator}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classinternal_1_1_i_schema_state_factory_a701ea8bed7af3f8e2f92d8009afca0c1}{Create\+Schema\+Validator}} (const Schema\+Type \&)=0
+\item 
+virtual void \mbox{\hyperlink{classinternal_1_1_i_schema_state_factory_a112cbf154077050bc30ffe670032442c}{Destroy\+Schema\+Validator}} (\mbox{\hyperlink{classinternal_1_1_i_schema_validator}{ISchema\+Validator}} \texorpdfstring{$\ast$}{*}validator)=0
+\item 
+virtual void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classinternal_1_1_i_schema_state_factory_ab26076418c94535cec2af570e8b0a436}{Create\+Hasher}} ()=0
+\item 
+virtual \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{classinternal_1_1_i_schema_state_factory_addfcf00963cc777edf642b204f07c8d6}{Get\+Hash\+Code}} (void \texorpdfstring{$\ast$}{*}hasher)=0
+\item 
+virtual void \mbox{\hyperlink{classinternal_1_1_i_schema_state_factory_a70b8d88180d2e6993105b17f19101635}{Destrory\+Hasher}} (void \texorpdfstring{$\ast$}{*}hasher)=0
+\item 
+virtual void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classinternal_1_1_i_schema_state_factory_abf29f19ba86e08f62b84b74a879b8922}{Malloc\+State}} (size\+\_\+t size)=0
+\item 
+virtual void \mbox{\hyperlink{classinternal_1_1_i_schema_state_factory_a27bd2138940cac3c330dd8399c49b22b}{Free\+State}} (void \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})=0
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Schema\+Type$>$\newline
+class internal\+::\+ISchema\+State\+Factory$<$ Schema\+Type $>$}
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l00147}{147}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classinternal_1_1_i_schema_state_factory_ae769eac75f9561fc8d0da7fadad2f6b4}\index{internal::ISchemaStateFactory$<$ SchemaType $>$@{internal::ISchemaStateFactory$<$ SchemaType $>$}!````~ISchemaStateFactory@{\texorpdfstring{$\sim$}{\string~}ISchemaStateFactory}}
+\index{````~ISchemaStateFactory@{\texorpdfstring{$\sim$}{\string~}ISchemaStateFactory}!internal::ISchemaStateFactory$<$ SchemaType $>$@{internal::ISchemaStateFactory$<$ SchemaType $>$}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}ISchemaStateFactory()}{\string~ISchemaStateFactory()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_i_schema_state_factory_ae769eac75f9561fc8d0da7fadad2f6b4} 
+template$<$typename Schema\+Type $>$ \\
+virtual \mbox{\hyperlink{classinternal_1_1_i_schema_state_factory}{internal\+::\+ISchema\+State\+Factory}}$<$ Schema\+Type $>$\+::\texorpdfstring{$\sim$}{\string~}\mbox{\hyperlink{classinternal_1_1_i_schema_state_factory}{ISchema\+State\+Factory}} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l00149}{149}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00149\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classinternal_1_1_i_schema_state_factory_ab26076418c94535cec2af570e8b0a436}\index{internal::ISchemaStateFactory$<$ SchemaType $>$@{internal::ISchemaStateFactory$<$ SchemaType $>$}!CreateHasher@{CreateHasher}}
+\index{CreateHasher@{CreateHasher}!internal::ISchemaStateFactory$<$ SchemaType $>$@{internal::ISchemaStateFactory$<$ SchemaType $>$}}
+\doxysubsubsection{\texorpdfstring{CreateHasher()}{CreateHasher()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_i_schema_state_factory_ab26076418c94535cec2af570e8b0a436} 
+template$<$typename Schema\+Type $>$ \\
+virtual void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classinternal_1_1_i_schema_state_factory}{internal\+::\+ISchema\+State\+Factory}}$<$ Schema\+Type $>$\+::\+Create\+Hasher (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{class_generic_schema_validator_a48ecc252813e60a0efdb4eb44b193bd5}{Generic\+Schema\+Validator$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$}}.
+
+\Hypertarget{classinternal_1_1_i_schema_state_factory_a701ea8bed7af3f8e2f92d8009afca0c1}\index{internal::ISchemaStateFactory$<$ SchemaType $>$@{internal::ISchemaStateFactory$<$ SchemaType $>$}!CreateSchemaValidator@{CreateSchemaValidator}}
+\index{CreateSchemaValidator@{CreateSchemaValidator}!internal::ISchemaStateFactory$<$ SchemaType $>$@{internal::ISchemaStateFactory$<$ SchemaType $>$}}
+\doxysubsubsection{\texorpdfstring{CreateSchemaValidator()}{CreateSchemaValidator()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_i_schema_state_factory_a701ea8bed7af3f8e2f92d8009afca0c1} 
+template$<$typename Schema\+Type $>$ \\
+virtual \mbox{\hyperlink{classinternal_1_1_i_schema_validator}{ISchema\+Validator}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classinternal_1_1_i_schema_state_factory}{internal\+::\+ISchema\+State\+Factory}}$<$ Schema\+Type $>$\+::\+Create\+Schema\+Validator (\begin{DoxyParamCaption}\item[{const Schema\+Type \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+\Hypertarget{classinternal_1_1_i_schema_state_factory_a70b8d88180d2e6993105b17f19101635}\index{internal::ISchemaStateFactory$<$ SchemaType $>$@{internal::ISchemaStateFactory$<$ SchemaType $>$}!DestroryHasher@{DestroryHasher}}
+\index{DestroryHasher@{DestroryHasher}!internal::ISchemaStateFactory$<$ SchemaType $>$@{internal::ISchemaStateFactory$<$ SchemaType $>$}}
+\doxysubsubsection{\texorpdfstring{DestroryHasher()}{DestroryHasher()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_i_schema_state_factory_a70b8d88180d2e6993105b17f19101635} 
+template$<$typename Schema\+Type $>$ \\
+virtual void \mbox{\hyperlink{classinternal_1_1_i_schema_state_factory}{internal\+::\+ISchema\+State\+Factory}}$<$ Schema\+Type $>$\+::\+Destrory\+Hasher (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{hasher}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{class_generic_schema_validator_a007eef58be575dc562543d069ddd2710}{Generic\+Schema\+Validator$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$}}.
+
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classinternal_1_1_i_schema_state_factory_a70b8d88180d2e6993105b17f19101635_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classinternal_1_1_i_schema_state_factory_a112cbf154077050bc30ffe670032442c}\index{internal::ISchemaStateFactory$<$ SchemaType $>$@{internal::ISchemaStateFactory$<$ SchemaType $>$}!DestroySchemaValidator@{DestroySchemaValidator}}
+\index{DestroySchemaValidator@{DestroySchemaValidator}!internal::ISchemaStateFactory$<$ SchemaType $>$@{internal::ISchemaStateFactory$<$ SchemaType $>$}}
+\doxysubsubsection{\texorpdfstring{DestroySchemaValidator()}{DestroySchemaValidator()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_i_schema_state_factory_a112cbf154077050bc30ffe670032442c} 
+template$<$typename Schema\+Type $>$ \\
+virtual void \mbox{\hyperlink{classinternal_1_1_i_schema_state_factory}{internal\+::\+ISchema\+State\+Factory}}$<$ Schema\+Type $>$\+::\+Destroy\+Schema\+Validator (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classinternal_1_1_i_schema_validator}{ISchema\+Validator}} \texorpdfstring{$\ast$}{*}}]{validator}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classinternal_1_1_i_schema_state_factory_a112cbf154077050bc30ffe670032442c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classinternal_1_1_i_schema_state_factory_a27bd2138940cac3c330dd8399c49b22b}\index{internal::ISchemaStateFactory$<$ SchemaType $>$@{internal::ISchemaStateFactory$<$ SchemaType $>$}!FreeState@{FreeState}}
+\index{FreeState@{FreeState}!internal::ISchemaStateFactory$<$ SchemaType $>$@{internal::ISchemaStateFactory$<$ SchemaType $>$}}
+\doxysubsubsection{\texorpdfstring{FreeState()}{FreeState()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_i_schema_state_factory_a27bd2138940cac3c330dd8399c49b22b} 
+template$<$typename Schema\+Type $>$ \\
+virtual void \mbox{\hyperlink{classinternal_1_1_i_schema_state_factory}{internal\+::\+ISchema\+State\+Factory}}$<$ Schema\+Type $>$\+::\+Free\+State (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{p}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{class_generic_schema_validator_a4e250737a411af2969a9e585a7da4187}{Generic\+Schema\+Validator$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$}}.
+
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classinternal_1_1_i_schema_state_factory_a27bd2138940cac3c330dd8399c49b22b_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classinternal_1_1_i_schema_state_factory_addfcf00963cc777edf642b204f07c8d6}\index{internal::ISchemaStateFactory$<$ SchemaType $>$@{internal::ISchemaStateFactory$<$ SchemaType $>$}!GetHashCode@{GetHashCode}}
+\index{GetHashCode@{GetHashCode}!internal::ISchemaStateFactory$<$ SchemaType $>$@{internal::ISchemaStateFactory$<$ SchemaType $>$}}
+\doxysubsubsection{\texorpdfstring{GetHashCode()}{GetHashCode()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_i_schema_state_factory_addfcf00963cc777edf642b204f07c8d6} 
+template$<$typename Schema\+Type $>$ \\
+virtual \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{classinternal_1_1_i_schema_state_factory}{internal\+::\+ISchema\+State\+Factory}}$<$ Schema\+Type $>$\+::\+Get\+Hash\+Code (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{hasher}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{class_generic_schema_validator_ac01c45982a1f512e1ca06fe5544b0c0f}{Generic\+Schema\+Validator$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$}}.
+
+\Hypertarget{classinternal_1_1_i_schema_state_factory_abf29f19ba86e08f62b84b74a879b8922}\index{internal::ISchemaStateFactory$<$ SchemaType $>$@{internal::ISchemaStateFactory$<$ SchemaType $>$}!MallocState@{MallocState}}
+\index{MallocState@{MallocState}!internal::ISchemaStateFactory$<$ SchemaType $>$@{internal::ISchemaStateFactory$<$ SchemaType $>$}}
+\doxysubsubsection{\texorpdfstring{MallocState()}{MallocState()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_i_schema_state_factory_abf29f19ba86e08f62b84b74a879b8922} 
+template$<$typename Schema\+Type $>$ \\
+virtual void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classinternal_1_1_i_schema_state_factory}{internal\+::\+ISchema\+State\+Factory}}$<$ Schema\+Type $>$\+::\+Malloc\+State (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{size}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{class_generic_schema_validator_a9f983043d6bd1a12d9e2dac756dabbae}{Generic\+Schema\+Validator$<$ Schema\+Document\+Type, Output\+Handler, State\+Allocator $>$}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/\mbox{\hyperlink{schema_8h}{schema.\+h}}\end{DoxyCompactItemize}

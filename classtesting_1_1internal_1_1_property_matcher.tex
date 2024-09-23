@@ -1,0 +1,158 @@
+\doxysection{testing\+::internal\+::Property\+Matcher\texorpdfstring{$<$}{<} Class, Property\+Type, Property \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classtesting_1_1internal_1_1_property_matcher}{}\label{classtesting_1_1internal_1_1_property_matcher}\index{testing::internal::PropertyMatcher$<$ Class, PropertyType, Property $>$@{testing::internal::PropertyMatcher$<$ Class, PropertyType, Property $>$}}
+
+
+{\ttfamily \#include $<$gmock-\/matchers.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{classtesting_1_1internal_1_1_property_matcher_ac16ed4d702fd74fe4ba193786dcb00d1}{GTEST\+\_\+\+REFERENCE\+\_\+\+TO\+\_\+\+CONST\+\_\+}} (Property\+Type) Ref\+To\+Const\+Property
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_property_matcher_ae1a0055af429e56426c009971238f135}{Property\+Matcher}} (\mbox{\hyperlink{namespacetesting_a48ab638d9b31f27ef01a1701ffa4e5cb}{Property}} property, const \mbox{\hyperlink{classtesting_1_1_matcher}{Matcher}}$<$ Ref\+To\+Const\+Property $>$ \&matcher)
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_property_matcher_a234aa9bcbfee8520b2225dd784fdcbb6}{Property\+Matcher}} (const std\+::string \&property\+\_\+name, \mbox{\hyperlink{namespacetesting_a48ab638d9b31f27ef01a1701ffa4e5cb}{Property}} property, const \mbox{\hyperlink{classtesting_1_1_matcher}{Matcher}}$<$ Ref\+To\+Const\+Property $>$ \&matcher)
+\item 
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_property_matcher_adb3edb13cfb37aeb676a3dff7dda91d9}{Describe\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}os) const
+\item 
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_property_matcher_a9a61385c05e8a87eeb6c37043bc5de39}{Describe\+Negation\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}os) const
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\bool \mbox{\hyperlink{classtesting_1_1internal_1_1_property_matcher_aad14e52735fdabbacd2901eb27393a52}{Match\+And\+Explain}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}, \mbox{\hyperlink{classtesting_1_1_match_result_listener}{Match\+Result\+Listener}} \texorpdfstring{$\ast$}{*}listener) const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Class, typename Property\+Type, typename \mbox{\hyperlink{namespacetesting_a48ab638d9b31f27ef01a1701ffa4e5cb}{Property}}$>$\newline
+class testing\+::internal\+::\+Property\+Matcher$<$ Class, Property\+Type, Property $>$}
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l02520}{2520}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_property_matcher_ae1a0055af429e56426c009971238f135}\index{testing::internal::PropertyMatcher$<$ Class, PropertyType, Property $>$@{testing::internal::PropertyMatcher$<$ Class, PropertyType, Property $>$}!PropertyMatcher@{PropertyMatcher}}
+\index{PropertyMatcher@{PropertyMatcher}!testing::internal::PropertyMatcher$<$ Class, PropertyType, Property $>$@{testing::internal::PropertyMatcher$<$ Class, PropertyType, Property $>$}}
+\doxysubsubsection{\texorpdfstring{PropertyMatcher()}{PropertyMatcher()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_property_matcher_ae1a0055af429e56426c009971238f135} 
+template$<$typename Class , typename Property\+Type , typename \mbox{\hyperlink{namespacetesting_a48ab638d9b31f27ef01a1701ffa4e5cb}{Property}} $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_property_matcher}{testing\+::internal\+::\+Property\+Matcher}}$<$ Class, Property\+Type, \mbox{\hyperlink{namespacetesting_a48ab638d9b31f27ef01a1701ffa4e5cb}{Property}} $>$\+::\+Property\+Matcher (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacetesting_a48ab638d9b31f27ef01a1701ffa4e5cb}{Property}}}]{property}{, }\item[{const \mbox{\hyperlink{classtesting_1_1_matcher}{Matcher}}$<$ Ref\+To\+Const\+Property $>$ \&}]{matcher}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l02528}{2528}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02529\ \ \ \ \ \ \ :\ property\_(property),}
+\DoxyCodeLine{02530\ \ \ \ \ \ \ \ \ matcher\_(matcher),}
+\DoxyCodeLine{02531\ \ \ \ \ \ \ \ \ whose\_property\_(\textcolor{stringliteral}{"{}whose\ given\ property\ "{}})\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1internal_1_1_property_matcher_a234aa9bcbfee8520b2225dd784fdcbb6}\index{testing::internal::PropertyMatcher$<$ Class, PropertyType, Property $>$@{testing::internal::PropertyMatcher$<$ Class, PropertyType, Property $>$}!PropertyMatcher@{PropertyMatcher}}
+\index{PropertyMatcher@{PropertyMatcher}!testing::internal::PropertyMatcher$<$ Class, PropertyType, Property $>$@{testing::internal::PropertyMatcher$<$ Class, PropertyType, Property $>$}}
+\doxysubsubsection{\texorpdfstring{PropertyMatcher()}{PropertyMatcher()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_property_matcher_a234aa9bcbfee8520b2225dd784fdcbb6} 
+template$<$typename Class , typename Property\+Type , typename \mbox{\hyperlink{namespacetesting_a48ab638d9b31f27ef01a1701ffa4e5cb}{Property}} $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_property_matcher}{testing\+::internal\+::\+Property\+Matcher}}$<$ Class, Property\+Type, \mbox{\hyperlink{namespacetesting_a48ab638d9b31f27ef01a1701ffa4e5cb}{Property}} $>$\+::\+Property\+Matcher (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{property\+\_\+name}{, }\item[{\mbox{\hyperlink{namespacetesting_a48ab638d9b31f27ef01a1701ffa4e5cb}{Property}}}]{property}{, }\item[{const \mbox{\hyperlink{classtesting_1_1_matcher}{Matcher}}$<$ Ref\+To\+Const\+Property $>$ \&}]{matcher}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l02533}{2533}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02535\ \ \ \ \ \ \ :\ property\_(property),}
+\DoxyCodeLine{02536\ \ \ \ \ \ \ \ \ matcher\_(matcher),}
+\DoxyCodeLine{02537\ \ \ \ \ \ \ \ \ whose\_property\_(\textcolor{stringliteral}{"{}whose\ property\ \`{}"{}}\ +\ property\_name\ +\ \textcolor{stringliteral}{"{}\`{}\ "{}})\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_property_matcher_a9a61385c05e8a87eeb6c37043bc5de39}\index{testing::internal::PropertyMatcher$<$ Class, PropertyType, Property $>$@{testing::internal::PropertyMatcher$<$ Class, PropertyType, Property $>$}!DescribeNegationTo@{DescribeNegationTo}}
+\index{DescribeNegationTo@{DescribeNegationTo}!testing::internal::PropertyMatcher$<$ Class, PropertyType, Property $>$@{testing::internal::PropertyMatcher$<$ Class, PropertyType, Property $>$}}
+\doxysubsubsection{\texorpdfstring{DescribeNegationTo()}{DescribeNegationTo()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_property_matcher_a9a61385c05e8a87eeb6c37043bc5de39} 
+template$<$typename Class , typename Property\+Type , typename \mbox{\hyperlink{namespacetesting_a48ab638d9b31f27ef01a1701ffa4e5cb}{Property}} $>$ \\
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_property_matcher}{testing\+::internal\+::\+Property\+Matcher}}$<$ Class, Property\+Type, \mbox{\hyperlink{namespacetesting_a48ab638d9b31f27ef01a1701ffa4e5cb}{Property}} $>$\+::\+Describe\+Negation\+To (\begin{DoxyParamCaption}\item[{\+::std\+::ostream \texorpdfstring{$\ast$}{*}}]{os}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l02544}{2544}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02544\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02545\ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}is\ an\ object\ "{}}\ <<\ whose\_property\_;}
+\DoxyCodeLine{02546\ \ \ \ \ matcher\_.\mbox{\hyperlink{classtesting_1_1internal_1_1_matcher_base_ac1089d49b6b8a381900618985cd69b7f}{DescribeNegationTo}}(os);}
+\DoxyCodeLine{02547\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_property_matcher_a9a61385c05e8a87eeb6c37043bc5de39_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_property_matcher_adb3edb13cfb37aeb676a3dff7dda91d9}\index{testing::internal::PropertyMatcher$<$ Class, PropertyType, Property $>$@{testing::internal::PropertyMatcher$<$ Class, PropertyType, Property $>$}!DescribeTo@{DescribeTo}}
+\index{DescribeTo@{DescribeTo}!testing::internal::PropertyMatcher$<$ Class, PropertyType, Property $>$@{testing::internal::PropertyMatcher$<$ Class, PropertyType, Property $>$}}
+\doxysubsubsection{\texorpdfstring{DescribeTo()}{DescribeTo()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_property_matcher_adb3edb13cfb37aeb676a3dff7dda91d9} 
+template$<$typename Class , typename Property\+Type , typename \mbox{\hyperlink{namespacetesting_a48ab638d9b31f27ef01a1701ffa4e5cb}{Property}} $>$ \\
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_property_matcher}{testing\+::internal\+::\+Property\+Matcher}}$<$ Class, Property\+Type, \mbox{\hyperlink{namespacetesting_a48ab638d9b31f27ef01a1701ffa4e5cb}{Property}} $>$\+::\+Describe\+To (\begin{DoxyParamCaption}\item[{\+::std\+::ostream \texorpdfstring{$\ast$}{*}}]{os}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l02539}{2539}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02539\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02540\ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}is\ an\ object\ "{}}\ <<\ whose\_property\_;}
+\DoxyCodeLine{02541\ \ \ \ \ matcher\_.\mbox{\hyperlink{classtesting_1_1internal_1_1_matcher_base_a7e0c883c7745e0d646463077ef1c1267}{DescribeTo}}(os);}
+\DoxyCodeLine{02542\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_property_matcher_adb3edb13cfb37aeb676a3dff7dda91d9_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_property_matcher_ac16ed4d702fd74fe4ba193786dcb00d1}\index{testing::internal::PropertyMatcher$<$ Class, PropertyType, Property $>$@{testing::internal::PropertyMatcher$<$ Class, PropertyType, Property $>$}!GTEST\_REFERENCE\_TO\_CONST\_@{GTEST\_REFERENCE\_TO\_CONST\_}}
+\index{GTEST\_REFERENCE\_TO\_CONST\_@{GTEST\_REFERENCE\_TO\_CONST\_}!testing::internal::PropertyMatcher$<$ Class, PropertyType, Property $>$@{testing::internal::PropertyMatcher$<$ Class, PropertyType, Property $>$}}
+\doxysubsubsection{\texorpdfstring{GTEST\_REFERENCE\_TO\_CONST\_()}{GTEST\_REFERENCE\_TO\_CONST\_()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_property_matcher_ac16ed4d702fd74fe4ba193786dcb00d1} 
+template$<$typename Class , typename Property\+Type , typename \mbox{\hyperlink{namespacetesting_a48ab638d9b31f27ef01a1701ffa4e5cb}{Property}} $>$ \\
+typedef \mbox{\hyperlink{classtesting_1_1internal_1_1_property_matcher}{testing\+::internal\+::\+Property\+Matcher}}$<$ Class, Property\+Type, \mbox{\hyperlink{namespacetesting_a48ab638d9b31f27ef01a1701ffa4e5cb}{Property}} $>$\+::\+GTEST\+\_\+\+REFERENCE\+\_\+\+TO\+\_\+\+CONST\+\_\+ (\begin{DoxyParamCaption}\item[{Property\+Type}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{classtesting_1_1internal_1_1_property_matcher_aad14e52735fdabbacd2901eb27393a52}\index{testing::internal::PropertyMatcher$<$ Class, PropertyType, Property $>$@{testing::internal::PropertyMatcher$<$ Class, PropertyType, Property $>$}!MatchAndExplain@{MatchAndExplain}}
+\index{MatchAndExplain@{MatchAndExplain}!testing::internal::PropertyMatcher$<$ Class, PropertyType, Property $>$@{testing::internal::PropertyMatcher$<$ Class, PropertyType, Property $>$}}
+\doxysubsubsection{\texorpdfstring{MatchAndExplain()}{MatchAndExplain()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_property_matcher_aad14e52735fdabbacd2901eb27393a52} 
+template$<$typename Class , typename Property\+Type , typename \mbox{\hyperlink{namespacetesting_a48ab638d9b31f27ef01a1701ffa4e5cb}{Property}} $>$ \\
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+bool \mbox{\hyperlink{classtesting_1_1internal_1_1_property_matcher}{testing\+::internal\+::\+Property\+Matcher}}$<$ Class, Property\+Type, \mbox{\hyperlink{namespacetesting_a48ab638d9b31f27ef01a1701ffa4e5cb}{Property}} $>$\+::\+Match\+And\+Explain (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{value}{, }\item[{\mbox{\hyperlink{classtesting_1_1_match_result_listener}{Match\+Result\+Listener}} \texorpdfstring{$\ast$}{*}}]{listener}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l02550}{2550}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02550\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02551\ \ \ \ \ \textcolor{keywordflow}{return}\ MatchAndExplainImpl(}
+\DoxyCodeLine{02552\ \ \ \ \ \ \ \ \ typename\ ::testing::internal::}
+\DoxyCodeLine{02553\ \ \ \ \ \ \ \ \ \ \ \ \ is\_pointer<\mbox{\hyperlink{gtest-internal_8h_a2ffec8c60510eb130af387f5ce9a756a}{GTEST\_REMOVE\_CONST\_}}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}})>::type(),}
+\DoxyCodeLine{02554\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\ listener);}
+\DoxyCodeLine{02555\ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/include/gmock/\mbox{\hyperlink{gmock-matchers_8h}{gmock-\/matchers.\+h}}\end{DoxyCompactItemize}

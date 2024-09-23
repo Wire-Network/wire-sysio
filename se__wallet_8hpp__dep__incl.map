@@ -1,0 +1,7 @@
+<map id="plugins/wallet_plugin/include/sysio/wallet_plugin/se_wallet.hpp" name="plugins/wallet_plugin/include/sysio/wallet_plugin/se_wallet.hpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="86,5,232,61"/>
+<area shape="rect" id="Node000002" href="$se__wallet_8cpp.html" title=" " alt="" coords="5,109,147,150"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="127,75,95,110,91,107,123,71"/>
+<area shape="rect" id="Node000003" href="$wallet__manager_8cpp.html" title=" " alt="" coords="171,109,312,150"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="195,71,226,107,222,110,191,75"/>
+</map>

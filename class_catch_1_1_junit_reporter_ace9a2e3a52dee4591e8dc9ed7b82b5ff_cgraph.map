@@ -1,0 +1,19 @@
+<map id="Catch::JunitReporter::writeAssertions" name="Catch::JunitReporter::writeAssertions">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,112,148,153"/>
+<area shape="rect" id="Node000002" href="$class_catch_1_1_junit_reporter.html#a5f357b138781615261724e3271600aaa" title=" " alt="" coords="196,112,338,153"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="148,130,180,130,180,135,148,135"/>
+<area shape="rect" id="Node000003" href="$class_catch_1_1_xml_writer.html#a48f1a53e3255938813ff91f9fec9b690" title=" " alt="" coords="410,5,581,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="294,109,336,82,385,55,399,49,401,54,387,60,339,86,297,114"/>
+<area shape="rect" id="Node000006" href="$class_catch_1_1_reusable_string_stream.html#a0e9ecf260b2a5d35f4886ef0d51f6270" title=" " alt="" coords="386,94,604,120"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="338,122,370,118,371,123,339,127"/>
+<area shape="rect" id="Node000007" href="$class_catch_1_1_xml_writer.html#ad433310b59d30e0fedc7130dc11c563b" title=" " alt="" coords="392,144,598,169"/>
+<area shape="poly" id="edge7_Node000002_Node000007" title=" " alt="" coords="339,137,376,141,376,146,338,142"/>
+<area shape="rect" id="Node000008" href="$class_catch_1_1_xml_writer.html#a4c49775bdf7b5bd870b34ab22af62a9c" title=" " alt="" coords="663,129,845,154"/>
+<area shape="poly" id="edge8_Node000002_Node000008" title=" " alt="" coords="308,151,346,167,387,179,447,189,495,191,604,179,653,170,699,157,701,162,654,175,605,184,495,196,446,194,385,184,344,172,306,156"/>
+<area shape="rect" id="Node000004" href="$class_catch_1_1_xml_writer.html#a6114b9d8038cd4f159ccd016f12d4992" title=" " alt="" coords="652,46,856,72"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="582,34,637,41,637,47,581,39"/>
+<area shape="rect" id="Node000005" href="$class_catch_1_1_xml_writer.html#aba98703d9852416e237de82aed4a9c4f" title=" " alt="" coords="904,97,1072,138"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="809,70,890,90,888,96,808,75"/>
+<area shape="poly" id="edge6_Node000006_Node000006" title=" " alt="" coords="457,95,450,86,454,76,470,70,495,68,523,70,537,77,535,82,522,75,495,73,471,75,458,80,455,85,461,92"/>
+<area shape="poly" id="edge9_Node000008_Node000005" title=" " alt="" coords="845,130,888,125,888,131,846,135"/>
+</map>

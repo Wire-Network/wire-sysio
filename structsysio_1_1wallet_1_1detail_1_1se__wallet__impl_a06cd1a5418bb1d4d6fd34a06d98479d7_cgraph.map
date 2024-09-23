@@ -1,0 +1,7 @@
+<map id="sysio::wallet::detail::se_wallet_impl::get_public_key_data" name="sysio::wallet::detail::se_wallet_impl::get_public_key_data">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,24,147,79"/>
+<area shape="rect" id="Node000002" href="$yubihsm__pkcs11_8c.html#ae785d5badbf1f08b491af31f32a135a1" title=" " alt="" coords="237,5,308,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="147,37,221,24,222,29,148,42"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1wallet_1_1detail_1_1se__wallet__impl.html#a617c3932501399454678530512b48f57" title=" " alt="" coords="195,56,350,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="148,60,180,66,179,71,147,66"/>
+</map>

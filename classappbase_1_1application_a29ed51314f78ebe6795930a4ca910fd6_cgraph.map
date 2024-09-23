@@ -1,0 +1,31 @@
+<map id="appbase::application::initialize" name="appbase::application::initialize">
+<area shape="rect" id="Node000001" title="Looks for the –plugin commandline / config option and calls initialize on those plugins." alt="" coords="5,110,146,151"/>
+<area shape="rect" id="Node000002" href="$classappbase_1_1application.html#add09ef243c90b8f86636c9ee592db739" title=" " alt="" coords="597,144,738,184"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="109,108,189,65,242,43,301,23,363,9,427,3,490,8,521,16,551,27,583,47,610,73,650,129,646,132,606,77,579,51,548,32,519,21,489,13,427,8,364,14,302,28,244,48,191,70,111,112"/>
+<area shape="rect" id="Node000003" href="$classappbase_1_1application.html#adebe1a60f6663b205a196385d4bc6231" title=" " alt="" coords="194,237,334,278"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="109,149,221,226,218,230,106,154"/>
+<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="632,144,630,134,636,125,648,119,668,117,688,119,700,126,698,130,687,125,667,122,650,124,639,129,635,135,637,143"/>
+<area shape="rect" id="Node000004" href="$classappbase_1_1application.html#a9b2c99749c7209e218a3dbbe51cfdeac" title="Get config directory." alt="" coords="396,41,536,82"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="273,235,314,166,344,127,380,93,387,88,390,92,384,97,348,131,318,169,277,238"/>
+<area shape="rect" id="Node000005" href="$classappbase_1_1application.html#a5dfd3cfb1124c57963fa17b3f4aabbe1" title="Get data directory." alt="" coords="396,106,536,147"/>
+<area shape="poly" id="edge5_Node000003_Node000005" title=" " alt="" coords="284,235,327,196,381,158,391,152,394,156,383,162,330,201,288,239"/>
+<area shape="rect" id="Node000006" href="$classappbase_1_1application.html#a5ef9c293a86a7dd786641ce25a671208" title="Get full config.ini path." alt="" coords="394,172,538,212"/>
+<area shape="poly" id="edge6_Node000003_Node000006" title=" " alt="" coords="328,234,385,215,387,220,330,239"/>
+<area shape="rect" id="Node000007" href="$classappbase_1_1application.html#ab53fa2d323d053e4e57adc832a9969bb" title="Get full version string; same as version_string() unless set differently." alt="" coords="396,237,536,278"/>
+<area shape="poly" id="edge7_Node000003_Node000007" title=" " alt="" coords="334,255,380,255,380,260,334,260"/>
+<area shape="rect" id="Node000008" href="$classappbase_1_1application.html#a9e37a08603d6b3b3cc06d662fc4100eb" title=" " alt="" coords="396,302,536,343"/>
+<area shape="poly" id="edge8_Node000003_Node000008" title=" " alt="" coords="330,276,387,294,385,300,328,281"/>
+<area shape="rect" id="Node000009" href="$classappbase_1_1plugin.html#a857288c2424b57a898c0579d25dacbb0" title=" " alt="" coords="396,368,535,408"/>
+<area shape="poly" id="edge10_Node000003_Node000009" title=" " alt="" coords="288,276,330,314,383,352,394,358,391,363,381,357,327,318,284,280"/>
+<area shape="rect" id="Node000010" href="$classappbase_1_1plugin.html#ac28755a82831d41e5d0ef0ce56b10fa9" title=" " alt="" coords="382,433,549,458"/>
+<area shape="poly" id="edge11_Node000003_Node000010" title=" " alt="" coords="277,277,317,346,347,385,384,418,392,423,389,428,380,422,343,389,313,349,272,280"/>
+<area shape="rect" id="Node000014" href="$classappbase_1_1application.html#a780543c4d0330fe88b912a3fa914f953" title="Get version string; generated from git describe if available." alt="" coords="396,482,536,523"/>
+<area shape="poly" id="edge15_Node000003_Node000014" title=" " alt="" coords="274,277,288,317,311,368,342,422,384,469,387,472,384,476,380,473,338,425,306,371,283,319,269,279"/>
+<area shape="poly" id="edge9_Node000008_Node000002" title=" " alt="" coords="526,299,548,287,600,242,640,195,644,198,604,246,551,292,529,304"/>
+<area shape="rect" id="Node000011" href="$namespaceappbase.html#a99374dc23934f008a09f2f79be9eae40" title=" " alt="" coords="618,405,717,430"/>
+<area shape="poly" id="edge12_Node000010_Node000011" title=" " alt="" coords="549,431,602,424,603,429,550,436"/>
+<area shape="rect" id="Node000013" href="$classappbase_1_1application.html#a110137cd2c59d1d998750eeb28443b5d" title=" " alt="" coords="597,454,738,495"/>
+<area shape="poly" id="edge14_Node000010_Node000013" title=" " alt="" coords="550,455,583,460,582,465,549,460"/>
+<area shape="rect" id="Node000012" href="$classappbase_1_1application.html#ac874b2659b400fe254f1ae4260d06ecf" title=" " alt="" coords="786,397,926,438"/>
+<area shape="poly" id="edge13_Node000011_Node000012" title=" " alt="" coords="718,415,770,415,770,420,718,420"/>
+</map>

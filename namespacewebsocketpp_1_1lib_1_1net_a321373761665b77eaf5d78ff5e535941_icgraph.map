@@ -1,0 +1,31 @@
+<map id="websocketpp::lib::net::is_little_endian" name="websocketpp::lib::net::is_little_endian">
+<area shape="rect" id="Node000001" title=" " alt="" coords="873,136,1018,177"/>
+<area shape="rect" id="Node000002" href="$namespacewebsocketpp_1_1frame.html#a76bf120d54d47d760eb8bd803572b004" title="circularly shifts the supplied prepared masking key by offset bytes" alt="" coords="664,136,825,177"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="857,160,825,160,825,154,857,154"/>
+<area shape="rect" id="Node000003" href="$frame_8cpp.html#aa018ad4e0b15224ad277a57b67268b3f" title=" " alt="" coords="225,5,421,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="709,128,666,95,615,66,567,49,517,37,421,24,422,19,518,32,569,44,617,61,669,90,713,124"/>
+<area shape="rect" id="Node000004" href="$frame_8cpp.html#a46f3dc49b5bdbd03033c782f1863fcc8" title=" " alt="" coords="225,55,421,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="695,131,657,112,616,97,567,85,516,78,421,70,422,65,517,72,568,80,617,92,659,107,698,126"/>
+<area shape="rect" id="Node000005" href="$frame_8cpp.html#ab305f4dce85b1e40c5b358aca8dc14d3" title=" " alt="" coords="225,235,421,260"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="650,180,387,237,386,231,649,175"/>
+<area shape="rect" id="Node000006" href="$frame_8cpp.html#a28df57354b9f4ded6a15d93c4b49e582" title=" " alt="" coords="225,284,421,310"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="692,187,617,221,525,252,430,275,386,286,385,281,428,270,523,246,615,216,690,182"/>
+<area shape="rect" id="Node000007" href="$namespacewebsocketpp_1_1frame.html#a3e0ba89b475df758d84dab352a76c3b3" title="Circular byte aligned mask/unmask." alt="" coords="477,106,616,146"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="648,145,616,140,617,134,649,139"/>
+<area shape="rect" id="Node000011" href="$namespacewebsocketpp_1_1frame.html#aa3458068f08acb26e350e39375265085" title="Circular word aligned mask/unmask." alt="" coords="477,276,616,317"/>
+<area shape="poly" id="edge12_Node000002_Node000011" title=" " alt="" coords="709,190,618,259,587,278,584,274,615,255,705,185"/>
+<area shape="poly" id="edge7_Node000007_Node000003" title=" " alt="" coords="510,98,472,70,428,45,399,34,401,29,430,40,475,65,513,94"/>
+<area shape="poly" id="edge8_Node000007_Node000004" title=" " alt="" coords="461,104,428,95,381,83,382,78,430,90,463,99"/>
+<area shape="rect" id="Node000008" href="$namespacewebsocketpp_1_1frame.html#a5e0b4f532f0d309a605e232cfdb03960" title="Circular byte aligned mask/unmask (in place)" alt="" coords="253,104,392,145"/>
+<area shape="poly" id="edge9_Node000007_Node000008" title=" " alt="" coords="461,128,393,128,393,123,461,123"/>
+<area shape="rect" id="Node000009" href="$classwebsocketpp_1_1processor_1_1hybi13.html#aa7eece3f48840535f41b625061fa7867" title="Reads bytes from buf into message payload." alt="" coords="217,170,429,210"/>
+<area shape="poly" id="edge10_Node000007_Node000009" title=" " alt="" coords="463,153,397,172,396,167,461,148"/>
+<area shape="rect" id="Node000010" href="$classwebsocketpp_1_1processor_1_1hybi13.html#a5c5e3234a0067c7f14fe0ceb4e647659" title="Process new websocket connection bytes." alt="" coords="5,170,169,210"/>
+<area shape="poly" id="edge11_Node000009_Node000010" title=" " alt="" coords="201,193,169,193,169,188,201,188"/>
+<area shape="poly" id="edge13_Node000011_Node000005" title=" " alt="" coords="461,281,384,264,385,258,462,276"/>
+<area shape="poly" id="edge15_Node000011_Node000006" title=" " alt="" coords="461,300,421,300,421,294,461,294"/>
+<area shape="rect" id="Node000012" href="$frame_8cpp.html#a40dc3819858ee15daf92b3190b7e079a" title=" " alt="" coords="225,333,421,359"/>
+<area shape="poly" id="edge14_Node000011_Node000012" title=" " alt="" coords="462,318,385,335,384,330,461,313"/>
+<area shape="rect" id="Node000013" href="$namespacewebsocketpp_1_1frame.html#af1365b296d14ee7dea6e17d0af368821" title="Circular word aligned mask/unmask (in place)" alt="" coords="253,383,392,424"/>
+<area shape="poly" id="edge16_Node000011_Node000013" title=" " alt="" coords="507,328,471,352,430,374,394,388,392,383,428,369,468,347,504,324"/>
+</map>

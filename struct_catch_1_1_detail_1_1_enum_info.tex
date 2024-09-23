@@ -1,0 +1,107 @@
+\doxysection{Catch\+::Detail\+::Enum\+Info Struct Reference}
+\hypertarget{struct_catch_1_1_detail_1_1_enum_info}{}\label{struct_catch_1_1_detail_1_1_enum_info}\index{Catch::Detail::EnumInfo@{Catch::Detail::EnumInfo}}
+
+
+{\ttfamily \#include $<$catch\+\_\+interfaces\+\_\+enum\+\_\+values\+\_\+registry.\+h$>$}
+
+
+
+Collaboration diagram for Catch\+::Detail\+::Enum\+Info\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=202pt]{struct_catch_1_1_detail_1_1_enum_info__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_catch_1_1_detail_1_1_enum_info_ab6608593c00614a688045fe8d911258d}{\texorpdfstring{$\sim$}{\string~}\+Enum\+Info}} ()
+\item 
+\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} \mbox{\hyperlink{struct_catch_1_1_detail_1_1_enum_info_a2fdfacc411d7afb1cb690366e5e49cb3}{lookup}} (int \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}) const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} \mbox{\hyperlink{struct_catch_1_1_detail_1_1_enum_info_a16ecfd3a7e11439433aabbdf6ecb676c}{m\+\_\+name}}
+\item 
+std\+::vector$<$ std\+::pair$<$ int, std\+::string $>$ $>$ \mbox{\hyperlink{struct_catch_1_1_detail_1_1_enum_info_a1093082858366071bae0eba1fb3c3388}{m\+\_\+values}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{catch__interfaces__enum__values__registry_8h_source_l00018}{18}} of file \mbox{\hyperlink{catch__interfaces__enum__values__registry_8h_source}{catch\+\_\+interfaces\+\_\+enum\+\_\+values\+\_\+registry.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{struct_catch_1_1_detail_1_1_enum_info_ab6608593c00614a688045fe8d911258d}\index{Catch::Detail::EnumInfo@{Catch::Detail::EnumInfo}!````~EnumInfo@{\texorpdfstring{$\sim$}{\string~}EnumInfo}}
+\index{````~EnumInfo@{\texorpdfstring{$\sim$}{\string~}EnumInfo}!Catch::Detail::EnumInfo@{Catch::Detail::EnumInfo}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}EnumInfo()}{\string~EnumInfo()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_detail_1_1_enum_info_ab6608593c00614a688045fe8d911258d} 
+Catch\+::\+Detail\+::\+Enum\+Info\+::\texorpdfstring{$\sim$}{\string~}\+Enum\+Info (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__enum__values__registry_8cpp_source_l00032}{32}} of file \mbox{\hyperlink{catch__enum__values__registry_8cpp_source}{catch\+\_\+enum\+\_\+values\+\_\+registry.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00032\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_catch_1_1_detail_1_1_enum_info_a2fdfacc411d7afb1cb690366e5e49cb3}\index{Catch::Detail::EnumInfo@{Catch::Detail::EnumInfo}!lookup@{lookup}}
+\index{lookup@{lookup}!Catch::Detail::EnumInfo@{Catch::Detail::EnumInfo}}
+\doxysubsubsection{\texorpdfstring{lookup()}{lookup()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_detail_1_1_enum_info_a2fdfacc411d7afb1cb690366e5e49cb3} 
+\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} Catch\+::\+Detail\+::\+Enum\+Info\+::lookup (\begin{DoxyParamCaption}\item[{int}]{value}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{catch__enum__values__registry_8cpp_source_l00034}{34}} of file \mbox{\hyperlink{catch__enum__values__registry_8cpp_source}{catch\+\_\+enum\+\_\+values\+\_\+registry.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\ \textcolor{keyword}{const}\&\ valueToName\ :\ \mbox{\hyperlink{struct_catch_1_1_detail_1_1_enum_info_a1093082858366071bae0eba1fb3c3388}{m\_values}}\ )\ \{}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ valueToName.first\ ==\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ )}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ valueToName.second;}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}\{**\ unexpected\ enum\ value\ **\}"{}};}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_catch_1_1_detail_1_1_enum_info_a16ecfd3a7e11439433aabbdf6ecb676c}\index{Catch::Detail::EnumInfo@{Catch::Detail::EnumInfo}!m\_name@{m\_name}}
+\index{m\_name@{m\_name}!Catch::Detail::EnumInfo@{Catch::Detail::EnumInfo}}
+\doxysubsubsection{\texorpdfstring{m\_name}{m\_name}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_detail_1_1_enum_info_a16ecfd3a7e11439433aabbdf6ecb676c} 
+\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} Catch\+::\+Detail\+::\+Enum\+Info\+::m\+\_\+name}
+
+
+
+Definition at line \mbox{\hyperlink{catch__interfaces__enum__values__registry_8h_source_l00019}{19}} of file \mbox{\hyperlink{catch__interfaces__enum__values__registry_8h_source}{catch\+\_\+interfaces\+\_\+enum\+\_\+values\+\_\+registry.\+h}}.
+
+\Hypertarget{struct_catch_1_1_detail_1_1_enum_info_a1093082858366071bae0eba1fb3c3388}\index{Catch::Detail::EnumInfo@{Catch::Detail::EnumInfo}!m\_values@{m\_values}}
+\index{m\_values@{m\_values}!Catch::Detail::EnumInfo@{Catch::Detail::EnumInfo}}
+\doxysubsubsection{\texorpdfstring{m\_values}{m\_values}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_detail_1_1_enum_info_a1093082858366071bae0eba1fb3c3388} 
+std\+::vector$<$std\+::pair$<$int, std\+::string$>$ $>$ Catch\+::\+Detail\+::\+Enum\+Info\+::m\+\_\+values}
+
+
+
+Definition at line \mbox{\hyperlink{catch__interfaces__enum__values__registry_8h_source_l00020}{20}} of file \mbox{\hyperlink{catch__interfaces__enum__values__registry_8h_source}{catch\+\_\+interfaces\+\_\+enum\+\_\+values\+\_\+registry.\+h}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__interfaces__enum__values__registry_8h}{catch\+\_\+interfaces\+\_\+enum\+\_\+values\+\_\+registry.\+h}}\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__enum__values__registry_8cpp}{catch\+\_\+enum\+\_\+values\+\_\+registry.\+cpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,158 @@
+\doxysection{libraries/fc/include/fc/crypto/webauthn\+\_\+json/test/unittest/ostreamwrappertest.cpp File Reference}
+\hypertarget{ostreamwrappertest_8cpp}{}\label{ostreamwrappertest_8cpp}\index{libraries/fc/include/fc/crypto/webauthn\_json/test/unittest/ostreamwrappertest.cpp@{libraries/fc/include/fc/crypto/webauthn\_json/test/unittest/ostreamwrappertest.cpp}}
+{\ttfamily \#include "{}unittest.\+h"{}}\newline
+{\ttfamily \#include "{}rapidjson/ostreamwrapper.\+h"{}}\newline
+{\ttfamily \#include "{}rapidjson/encodedstream.\+h"{}}\newline
+{\ttfamily \#include "{}rapidjson/document.\+h"{}}\newline
+{\ttfamily \#include $<$sstream$>$}\newline
+{\ttfamily \#include $<$fstream$>$}\newline
+Include dependency graph for ostreamwrappertest.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{ostreamwrappertest_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{ostreamwrappertest_8cpp_aebb89d881f588a9a902f348de94ed6cd}{TEST}} (\mbox{\hyperlink{class_o_stream_wrapper}{OStream\+Wrapper}}, ostringstream)
+\item 
+\mbox{\hyperlink{ostreamwrappertest_8cpp_aadf939ee7c96aa3a629d1bb7686ba823}{TEST}} (\mbox{\hyperlink{class_o_stream_wrapper}{OStream\+Wrapper}}, stringstream)
+\item 
+\mbox{\hyperlink{ostreamwrappertest_8cpp_a220dfe938e8cf505067fb2f426f8c425}{TEST}} (\mbox{\hyperlink{class_o_stream_wrapper}{OStream\+Wrapper}}, wostringstream)
+\item 
+\mbox{\hyperlink{ostreamwrappertest_8cpp_a21ebd54589e4f28bac98322c7ee4f8fe}{TEST}} (\mbox{\hyperlink{class_o_stream_wrapper}{OStream\+Wrapper}}, wstringstream)
+\item 
+\mbox{\hyperlink{ostreamwrappertest_8cpp_ad34c7e1109dc3bb0e7307e762b09b818}{TEST}} (\mbox{\hyperlink{class_o_stream_wrapper}{OStream\+Wrapper}}, cout)
+\item 
+\mbox{\hyperlink{ostreamwrappertest_8cpp_a6c6684f857411534af3e4859b2f519ce}{TEST}} (\mbox{\hyperlink{class_o_stream_wrapper}{OStream\+Wrapper}}, ofstream)
+\item 
+\mbox{\hyperlink{ostreamwrappertest_8cpp_af2c8de40081d03e8df9fca1a7f52e15f}{TEST}} (\mbox{\hyperlink{class_o_stream_wrapper}{OStream\+Wrapper}}, fstream)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{ostreamwrappertest_8cpp_ad34c7e1109dc3bb0e7307e762b09b818}\index{ostreamwrappertest.cpp@{ostreamwrappertest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!ostreamwrappertest.cpp@{ostreamwrappertest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [1/7]}}
+{\footnotesize\ttfamily \label{ostreamwrappertest_8cpp_ad34c7e1109dc3bb0e7307e762b09b818} 
+TEST (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_o_stream_wrapper}{OStream\+Wrapper}}}]{}{, }\item[{cout}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{ostreamwrappertest_8cpp_source_l00056}{56}} of file \mbox{\hyperlink{ostreamwrappertest_8cpp_source}{ostreamwrappertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00057\ \ \ \ \ \mbox{\hyperlink{class_o_stream_wrapper}{OStreamWrapper}}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}(cout);}
+\DoxyCodeLine{00058\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ =\ \textcolor{stringliteral}{"{}Hello\ World!\(\backslash\)n"{}};}
+\DoxyCodeLine{00059\ \ \ \ \ \textcolor{keywordflow}{while}\ (*\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ os.Put(*\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}++);}
+\DoxyCodeLine{00061\ \ \ \ \ os.Flush();}
+\DoxyCodeLine{00062\ \}}
+
+\end{DoxyCode}
+\Hypertarget{ostreamwrappertest_8cpp_af2c8de40081d03e8df9fca1a7f52e15f}\index{ostreamwrappertest.cpp@{ostreamwrappertest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!ostreamwrappertest.cpp@{ostreamwrappertest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [2/7]}}
+{\footnotesize\ttfamily \label{ostreamwrappertest_8cpp_af2c8de40081d03e8df9fca1a7f52e15f} 
+TEST (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_o_stream_wrapper}{OStream\+Wrapper}}}]{}{, }\item[{fstream}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{ostreamwrappertest_8cpp_source_l00090}{90}} of file \mbox{\hyperlink{ostreamwrappertest_8cpp_source}{ostreamwrappertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00091\ \ \ \ \ TestFileStream<fstream>();}
+\DoxyCodeLine{00092\ \}}
+
+\end{DoxyCode}
+\Hypertarget{ostreamwrappertest_8cpp_a6c6684f857411534af3e4859b2f519ce}\index{ostreamwrappertest.cpp@{ostreamwrappertest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!ostreamwrappertest.cpp@{ostreamwrappertest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [3/7]}}
+{\footnotesize\ttfamily \label{ostreamwrappertest_8cpp_a6c6684f857411534af3e4859b2f519ce} 
+TEST (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_o_stream_wrapper}{OStream\+Wrapper}}}]{}{, }\item[{ofstream}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{ostreamwrappertest_8cpp_source_l00086}{86}} of file \mbox{\hyperlink{ostreamwrappertest_8cpp_source}{ostreamwrappertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00087\ \ \ \ \ TestFileStream<ofstream>();}
+\DoxyCodeLine{00088\ \}}
+
+\end{DoxyCode}
+\Hypertarget{ostreamwrappertest_8cpp_aebb89d881f588a9a902f348de94ed6cd}\index{ostreamwrappertest.cpp@{ostreamwrappertest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!ostreamwrappertest.cpp@{ostreamwrappertest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [4/7]}}
+{\footnotesize\ttfamily \label{ostreamwrappertest_8cpp_aebb89d881f588a9a902f348de94ed6cd} 
+TEST (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_o_stream_wrapper}{OStream\+Wrapper}}}]{}{, }\item[{ostringstream}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{ostreamwrappertest_8cpp_source_l00040}{40}} of file \mbox{\hyperlink{ostreamwrappertest_8cpp_source}{ostreamwrappertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00041\ \ \ \ \ TestStringStream<ostringstream>();}
+\DoxyCodeLine{00042\ \}}
+
+\end{DoxyCode}
+\Hypertarget{ostreamwrappertest_8cpp_aadf939ee7c96aa3a629d1bb7686ba823}\index{ostreamwrappertest.cpp@{ostreamwrappertest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!ostreamwrappertest.cpp@{ostreamwrappertest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [5/7]}}
+{\footnotesize\ttfamily \label{ostreamwrappertest_8cpp_aadf939ee7c96aa3a629d1bb7686ba823} 
+TEST (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_o_stream_wrapper}{OStream\+Wrapper}}}]{}{, }\item[{stringstream}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{ostreamwrappertest_8cpp_source_l00044}{44}} of file \mbox{\hyperlink{ostreamwrappertest_8cpp_source}{ostreamwrappertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00045\ \ \ \ \ TestStringStream<stringstream>();}
+\DoxyCodeLine{00046\ \}}
+
+\end{DoxyCode}
+\Hypertarget{ostreamwrappertest_8cpp_a220dfe938e8cf505067fb2f426f8c425}\index{ostreamwrappertest.cpp@{ostreamwrappertest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!ostreamwrappertest.cpp@{ostreamwrappertest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [6/7]}}
+{\footnotesize\ttfamily \label{ostreamwrappertest_8cpp_a220dfe938e8cf505067fb2f426f8c425} 
+TEST (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_o_stream_wrapper}{OStream\+Wrapper}}}]{}{, }\item[{wostringstream}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{ostreamwrappertest_8cpp_source_l00048}{48}} of file \mbox{\hyperlink{ostreamwrappertest_8cpp_source}{ostreamwrappertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00049\ \ \ \ \ TestStringStream<wostringstream>();}
+\DoxyCodeLine{00050\ \}}
+
+\end{DoxyCode}
+\Hypertarget{ostreamwrappertest_8cpp_a21ebd54589e4f28bac98322c7ee4f8fe}\index{ostreamwrappertest.cpp@{ostreamwrappertest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!ostreamwrappertest.cpp@{ostreamwrappertest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [7/7]}}
+{\footnotesize\ttfamily \label{ostreamwrappertest_8cpp_a21ebd54589e4f28bac98322c7ee4f8fe} 
+TEST (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_o_stream_wrapper}{OStream\+Wrapper}}}]{}{, }\item[{wstringstream}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{ostreamwrappertest_8cpp_source_l00052}{52}} of file \mbox{\hyperlink{ostreamwrappertest_8cpp_source}{ostreamwrappertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00053\ \ \ \ \ TestStringStream<wstringstream>();}
+\DoxyCodeLine{00054\ \}}
+
+\end{DoxyCode}

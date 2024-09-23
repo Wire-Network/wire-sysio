@@ -1,0 +1,42 @@
+\doxysection{Catch\+::Generators\+::pf Namespace Reference}
+\hypertarget{namespace_catch_1_1_generators_1_1pf}{}\label{namespace_catch_1_1_generators_1_1pf}\index{Catch::Generators::pf@{Catch::Generators::pf}}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename... Args$>$ }\\std\+::unique\+\_\+ptr$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \mbox{\hyperlink{namespace_catch_1_1_generators_1_1pf_a015e8fcef2972da878a07023e40d46d8}{make\+\_\+unique}} (Args \&\&... args)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespace_catch_1_1_generators_1_1pf_a015e8fcef2972da878a07023e40d46d8}\index{Catch::Generators::pf@{Catch::Generators::pf}!make\_unique@{make\_unique}}
+\index{make\_unique@{make\_unique}!Catch::Generators::pf@{Catch::Generators::pf}}
+\doxysubsubsection{\texorpdfstring{make\_unique()}{make\_unique()}}
+{\footnotesize\ttfamily \label{namespace_catch_1_1_generators_1_1pf_a015e8fcef2972da878a07023e40d46d8} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename... Args$>$ \\
+std\+::unique\+\_\+ptr$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ Catch\+::\+Generators\+::pf\+::make\+\_\+unique (\begin{DoxyParamCaption}\item[{Args \&\&...}]{args}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__generators_8hpp_source_l00039}{39}} of file \mbox{\hyperlink{catch__generators_8hpp_source}{catch\+\_\+generators.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::unique\_ptr<T>(\textcolor{keyword}{new}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}(std::forward<Args>(args)...));}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=182pt]{namespace_catch_1_1_generators_1_1pf_a015e8fcef2972da878a07023e40d46d8_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=339pt]{namespace_catch_1_1_generators_1_1pf_a015e8fcef2972da878a07023e40d46d8_icgraph}
+\end{center}
+\end{figure}

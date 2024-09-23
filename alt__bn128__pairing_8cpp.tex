@@ -1,0 +1,84 @@
+\doxysection{libraries/fc/libraries/ff/libff/algebra/curves/alt\+\_\+bn128/alt\+\_\+bn128\+\_\+pairing.cpp File Reference}
+\hypertarget{alt__bn128__pairing_8cpp}{}\label{alt__bn128__pairing_8cpp}\index{libraries/fc/libraries/ff/libff/algebra/curves/alt\_bn128/alt\_bn128\_pairing.cpp@{libraries/fc/libraries/ff/libff/algebra/curves/alt\_bn128/alt\_bn128\_pairing.cpp}}
+{\ttfamily \#include $<$cassert$>$}\newline
+{\ttfamily \#include $<$libff/algebra/curves/alt\+\_\+bn128/alt\+\_\+bn128\+\_\+g1.\+hpp$>$}\newline
+{\ttfamily \#include $<$libff/algebra/curves/alt\+\_\+bn128/alt\+\_\+bn128\+\_\+g2.\+hpp$>$}\newline
+{\ttfamily \#include $<$libff/algebra/curves/alt\+\_\+bn128/alt\+\_\+bn128\+\_\+init.\+hpp$>$}\newline
+{\ttfamily \#include $<$libff/algebra/curves/alt\+\_\+bn128/alt\+\_\+bn128\+\_\+pairing.\+hpp$>$}\newline
+{\ttfamily \#include $<$libff/common/profiling.\+hpp$>$}\newline
+Include dependency graph for alt\+\_\+bn128\+\_\+pairing.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{alt__bn128__pairing_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacelibff}{libff}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+std\+::ostream \& \mbox{\hyperlink{namespacelibff_af2c5f3d9045dbe718759cbf2ee1496a9}{libff\+::operator$<$$<$}} (std\+::ostream \&out, const \mbox{\hyperlink{structlibff_1_1alt__bn128__ate___g1__precomp}{alt\+\_\+bn128\+\_\+ate\+\_\+\+G1\+\_\+precomp}} \&prec\+\_\+P)
+\item 
+std\+::istream \& \mbox{\hyperlink{namespacelibff_a2de336a5da327468a0f97f636a7bf9b5}{libff\+::operator$>$$>$}} (std\+::istream \&in, \mbox{\hyperlink{structlibff_1_1alt__bn128__ate___g1__precomp}{alt\+\_\+bn128\+\_\+ate\+\_\+\+G1\+\_\+precomp}} \&prec\+\_\+P)
+\item 
+std\+::ostream \& \mbox{\hyperlink{namespacelibff_a2c92a134ceefe37443329832e343b81f}{libff\+::operator$<$$<$}} (std\+::ostream \&out, const \mbox{\hyperlink{structlibff_1_1alt__bn128__ate__ell__coeffs}{alt\+\_\+bn128\+\_\+ate\+\_\+ell\+\_\+coeffs}} \&c)
+\item 
+std\+::istream \& \mbox{\hyperlink{namespacelibff_ae18b2caf97c22f95dc530a64f5d88236}{libff\+::operator$>$$>$}} (std\+::istream \&in, \mbox{\hyperlink{structlibff_1_1alt__bn128__ate__ell__coeffs}{alt\+\_\+bn128\+\_\+ate\+\_\+ell\+\_\+coeffs}} \&c)
+\item 
+std\+::ostream \& \mbox{\hyperlink{namespacelibff_a8ad85edf5931224e2bf1f399f808398b}{libff\+::operator$<$$<$}} (std\+::ostream \&out, const \mbox{\hyperlink{structlibff_1_1alt__bn128__ate___g2__precomp}{alt\+\_\+bn128\+\_\+ate\+\_\+\+G2\+\_\+precomp}} \&prec\+\_\+Q)
+\item 
+std\+::istream \& \mbox{\hyperlink{namespacelibff_a392028c8a44cab50f7284e8588950fbf}{libff\+::operator$>$$>$}} (std\+::istream \&in, \mbox{\hyperlink{structlibff_1_1alt__bn128__ate___g2__precomp}{alt\+\_\+bn128\+\_\+ate\+\_\+\+G2\+\_\+precomp}} \&prec\+\_\+Q)
+\item 
+\mbox{\hyperlink{namespacelibff_a944d3a5afc087dd2778eb547e74a891d}{alt\+\_\+bn128\+\_\+\+Fq12}} \mbox{\hyperlink{namespacelibff_aa358d87f7982afbc39001a979daaee29}{libff\+::alt\+\_\+bn128\+\_\+final\+\_\+exponentiation\+\_\+first\+\_\+chunk}} (const \mbox{\hyperlink{namespacelibff_a944d3a5afc087dd2778eb547e74a891d}{alt\+\_\+bn128\+\_\+\+Fq12}} \&elt)
+\item 
+\mbox{\hyperlink{namespacelibff_a944d3a5afc087dd2778eb547e74a891d}{alt\+\_\+bn128\+\_\+\+Fq12}} \mbox{\hyperlink{namespacelibff_a90f309dff0e97a726bc4c637b9ad2947}{libff\+::alt\+\_\+bn128\+\_\+exp\+\_\+by\+\_\+neg\+\_\+z}} (const \mbox{\hyperlink{namespacelibff_a944d3a5afc087dd2778eb547e74a891d}{alt\+\_\+bn128\+\_\+\+Fq12}} \&elt)
+\item 
+\mbox{\hyperlink{namespacelibff_a944d3a5afc087dd2778eb547e74a891d}{alt\+\_\+bn128\+\_\+\+Fq12}} \mbox{\hyperlink{namespacelibff_a27b23f04483187d1f2a38d35b710ce86}{libff\+::alt\+\_\+bn128\+\_\+final\+\_\+exponentiation\+\_\+last\+\_\+chunk}} (const \mbox{\hyperlink{namespacelibff_a944d3a5afc087dd2778eb547e74a891d}{alt\+\_\+bn128\+\_\+\+Fq12}} \&elt)
+\item 
+\mbox{\hyperlink{namespacelibff_afac7b28c9861352c78a65f6fbdffa32c}{alt\+\_\+bn128\+\_\+\+GT}} \mbox{\hyperlink{namespacelibff_add51b65ee720635bce0b03b339703425}{libff\+::alt\+\_\+bn128\+\_\+final\+\_\+exponentiation}} (const \mbox{\hyperlink{namespacelibff_a944d3a5afc087dd2778eb547e74a891d}{alt\+\_\+bn128\+\_\+\+Fq12}} \&elt)
+\item 
+void \mbox{\hyperlink{namespacelibff_a7970ee7294f3d4cbf302e269fdc0c215}{libff\+::doubling\+\_\+step\+\_\+for\+\_\+flipped\+\_\+miller\+\_\+loop}} (const \mbox{\hyperlink{namespacelibff_a4a54804b59c74fb7022bf34d8b7f482d}{alt\+\_\+bn128\+\_\+\+Fq}} two\+\_\+inv, \mbox{\hyperlink{classlibff_1_1alt__bn128___g2}{alt\+\_\+bn128\+\_\+\+G2}} \&current, \mbox{\hyperlink{structlibff_1_1alt__bn128__ate__ell__coeffs}{alt\+\_\+bn128\+\_\+ate\+\_\+ell\+\_\+coeffs}} \&c)
+\item 
+void \mbox{\hyperlink{namespacelibff_af90b6a00b53d890afc332a92a49f552a}{libff\+::mixed\+\_\+addition\+\_\+step\+\_\+for\+\_\+flipped\+\_\+miller\+\_\+loop}} (const \mbox{\hyperlink{classlibff_1_1alt__bn128___g2}{alt\+\_\+bn128\+\_\+\+G2}} base, \mbox{\hyperlink{classlibff_1_1alt__bn128___g2}{alt\+\_\+bn128\+\_\+\+G2}} \&current, \mbox{\hyperlink{structlibff_1_1alt__bn128__ate__ell__coeffs}{alt\+\_\+bn128\+\_\+ate\+\_\+ell\+\_\+coeffs}} \&c)
+\item 
+\mbox{\hyperlink{structlibff_1_1alt__bn128__ate___g1__precomp}{alt\+\_\+bn128\+\_\+ate\+\_\+\+G1\+\_\+precomp}} \mbox{\hyperlink{namespacelibff_ab3e5dcf5471f27a30dae932e1b269f9e}{libff\+::alt\+\_\+bn128\+\_\+ate\+\_\+precompute\+\_\+\+G1}} (const \mbox{\hyperlink{classlibff_1_1alt__bn128___g1}{alt\+\_\+bn128\+\_\+\+G1}} \&\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}})
+\item 
+\mbox{\hyperlink{structlibff_1_1alt__bn128__ate___g2__precomp}{alt\+\_\+bn128\+\_\+ate\+\_\+\+G2\+\_\+precomp}} \mbox{\hyperlink{namespacelibff_a58f4ade33befb87fbf475e48adfac9c0}{libff\+::alt\+\_\+bn128\+\_\+ate\+\_\+precompute\+\_\+\+G2}} (const \mbox{\hyperlink{classlibff_1_1alt__bn128___g2}{alt\+\_\+bn128\+\_\+\+G2}} \&Q)
+\item 
+\mbox{\hyperlink{namespacelibff_a944d3a5afc087dd2778eb547e74a891d}{alt\+\_\+bn128\+\_\+\+Fq12}} \mbox{\hyperlink{namespacelibff_abb8757555631894637c117f6cd62fdd4}{libff\+::alt\+\_\+bn128\+\_\+ate\+\_\+miller\+\_\+loop}} (const \mbox{\hyperlink{structlibff_1_1alt__bn128__ate___g1__precomp}{alt\+\_\+bn128\+\_\+ate\+\_\+\+G1\+\_\+precomp}} \&prec\+\_\+P, const \mbox{\hyperlink{structlibff_1_1alt__bn128__ate___g2__precomp}{alt\+\_\+bn128\+\_\+ate\+\_\+\+G2\+\_\+precomp}} \&prec\+\_\+Q)
+\item 
+\mbox{\hyperlink{namespacelibff_a944d3a5afc087dd2778eb547e74a891d}{alt\+\_\+bn128\+\_\+\+Fq12}} \mbox{\hyperlink{namespacelibff_afd32cda5e8c3cda9a970bd9acb97b802}{libff\+::alt\+\_\+bn128\+\_\+ate\+\_\+double\+\_\+miller\+\_\+loop}} (const \mbox{\hyperlink{structlibff_1_1alt__bn128__ate___g1__precomp}{alt\+\_\+bn128\+\_\+ate\+\_\+\+G1\+\_\+precomp}} \&prec\+\_\+\+P1, const \mbox{\hyperlink{structlibff_1_1alt__bn128__ate___g2__precomp}{alt\+\_\+bn128\+\_\+ate\+\_\+\+G2\+\_\+precomp}} \&prec\+\_\+\+Q1, const \mbox{\hyperlink{structlibff_1_1alt__bn128__ate___g1__precomp}{alt\+\_\+bn128\+\_\+ate\+\_\+\+G1\+\_\+precomp}} \&prec\+\_\+\+P2, const \mbox{\hyperlink{structlibff_1_1alt__bn128__ate___g2__precomp}{alt\+\_\+bn128\+\_\+ate\+\_\+\+G2\+\_\+precomp}} \&prec\+\_\+\+Q2)
+\item 
+\mbox{\hyperlink{namespacelibff_a944d3a5afc087dd2778eb547e74a891d}{alt\+\_\+bn128\+\_\+\+Fq12}} \mbox{\hyperlink{namespacelibff_ae1600c88d69ff1c22e5b607955bbee95}{libff\+::alt\+\_\+bn128\+\_\+ate\+\_\+pairing}} (const \mbox{\hyperlink{classlibff_1_1alt__bn128___g1}{alt\+\_\+bn128\+\_\+\+G1}} \&\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}}, const \mbox{\hyperlink{classlibff_1_1alt__bn128___g2}{alt\+\_\+bn128\+\_\+\+G2}} \&Q)
+\item 
+\mbox{\hyperlink{namespacelibff_afac7b28c9861352c78a65f6fbdffa32c}{alt\+\_\+bn128\+\_\+\+GT}} \mbox{\hyperlink{namespacelibff_a52e70e9ff5407db6df5ee855dd889a02}{libff\+::alt\+\_\+bn128\+\_\+ate\+\_\+reduced\+\_\+pairing}} (const \mbox{\hyperlink{classlibff_1_1alt__bn128___g1}{alt\+\_\+bn128\+\_\+\+G1}} \&\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}}, const \mbox{\hyperlink{classlibff_1_1alt__bn128___g2}{alt\+\_\+bn128\+\_\+\+G2}} \&Q)
+\item 
+\mbox{\hyperlink{namespacelibff_a5bec23f8c44ca03585c4a9cbb3ee70a5}{alt\+\_\+bn128\+\_\+\+G1\+\_\+precomp}} \mbox{\hyperlink{namespacelibff_a91e96b81cf41394720aa8f8b29de53ba}{libff\+::alt\+\_\+bn128\+\_\+precompute\+\_\+\+G1}} (const \mbox{\hyperlink{classlibff_1_1alt__bn128___g1}{alt\+\_\+bn128\+\_\+\+G1}} \&\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}})
+\item 
+\mbox{\hyperlink{namespacelibff_aacd9e3d2d6843c8a7e6aa90a3950536f}{alt\+\_\+bn128\+\_\+\+G2\+\_\+precomp}} \mbox{\hyperlink{namespacelibff_a732504a1d544ec92340318077e535288}{libff\+::alt\+\_\+bn128\+\_\+precompute\+\_\+\+G2}} (const \mbox{\hyperlink{classlibff_1_1alt__bn128___g2}{alt\+\_\+bn128\+\_\+\+G2}} \&Q)
+\item 
+\mbox{\hyperlink{namespacelibff_a944d3a5afc087dd2778eb547e74a891d}{alt\+\_\+bn128\+\_\+\+Fq12}} \mbox{\hyperlink{namespacelibff_a57e7bc7a0733b011baf0e0690cd8e179}{libff\+::alt\+\_\+bn128\+\_\+miller\+\_\+loop}} (const \mbox{\hyperlink{namespacelibff_a5bec23f8c44ca03585c4a9cbb3ee70a5}{alt\+\_\+bn128\+\_\+\+G1\+\_\+precomp}} \&prec\+\_\+P, const \mbox{\hyperlink{namespacelibff_aacd9e3d2d6843c8a7e6aa90a3950536f}{alt\+\_\+bn128\+\_\+\+G2\+\_\+precomp}} \&prec\+\_\+Q)
+\item 
+\mbox{\hyperlink{namespacelibff_a944d3a5afc087dd2778eb547e74a891d}{alt\+\_\+bn128\+\_\+\+Fq12}} \mbox{\hyperlink{namespacelibff_aa74dc01d97f7911c58165e962c932ed5}{libff\+::alt\+\_\+bn128\+\_\+double\+\_\+miller\+\_\+loop}} (const \mbox{\hyperlink{namespacelibff_a5bec23f8c44ca03585c4a9cbb3ee70a5}{alt\+\_\+bn128\+\_\+\+G1\+\_\+precomp}} \&prec\+\_\+\+P1, const \mbox{\hyperlink{namespacelibff_aacd9e3d2d6843c8a7e6aa90a3950536f}{alt\+\_\+bn128\+\_\+\+G2\+\_\+precomp}} \&prec\+\_\+\+Q1, const \mbox{\hyperlink{namespacelibff_a5bec23f8c44ca03585c4a9cbb3ee70a5}{alt\+\_\+bn128\+\_\+\+G1\+\_\+precomp}} \&prec\+\_\+\+P2, const \mbox{\hyperlink{namespacelibff_aacd9e3d2d6843c8a7e6aa90a3950536f}{alt\+\_\+bn128\+\_\+\+G2\+\_\+precomp}} \&prec\+\_\+\+Q2)
+\item 
+\mbox{\hyperlink{namespacelibff_a944d3a5afc087dd2778eb547e74a891d}{alt\+\_\+bn128\+\_\+\+Fq12}} \mbox{\hyperlink{namespacelibff_a03eb0822828ec4a2889e9ddc469a49c1}{libff\+::alt\+\_\+bn128\+\_\+pairing}} (const \mbox{\hyperlink{classlibff_1_1alt__bn128___g1}{alt\+\_\+bn128\+\_\+\+G1}} \&\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}}, const \mbox{\hyperlink{classlibff_1_1alt__bn128___g2}{alt\+\_\+bn128\+\_\+\+G2}} \&Q)
+\item 
+\mbox{\hyperlink{namespacelibff_afac7b28c9861352c78a65f6fbdffa32c}{alt\+\_\+bn128\+\_\+\+GT}} \mbox{\hyperlink{namespacelibff_a39a2b42cbf3d7d40f35250b0af14aba8}{libff\+::alt\+\_\+bn128\+\_\+reduced\+\_\+pairing}} (const \mbox{\hyperlink{classlibff_1_1alt__bn128___g1}{alt\+\_\+bn128\+\_\+\+G1}} \&\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}}, const \mbox{\hyperlink{classlibff_1_1alt__bn128___g2}{alt\+\_\+bn128\+\_\+\+G2}} \&Q)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\begin{DoxyAuthor}{Author}
+This file is part of libff, developed by SCIPR Lab and contributors (see AUTHORS). 
+\end{DoxyAuthor}
+\begin{DoxyCopyright}{Copyright}
+MIT license (see LICENSE file) 
+\end{DoxyCopyright}
+
+
+Definition in file \mbox{\hyperlink{alt__bn128__pairing_8cpp_source}{alt\+\_\+bn128\+\_\+pairing.\+cpp}}.
+

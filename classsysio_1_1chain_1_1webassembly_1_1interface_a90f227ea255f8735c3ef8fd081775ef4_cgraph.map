@@ -1,0 +1,13 @@
+<map id="sysio::chain::webassembly::interface::get_wasm_parameters_packed" name="sysio::chain::webassembly::interface::get_wasm_parameters_packed">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,74,274,114"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1vm_1_1span.html#a65d9e2641d763c860ae175a9a936a309" title=" " alt="" coords="322,5,469,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="210,71,334,33,335,39,211,76"/>
+<area shape="rect" id="Node000003" href="$namespacefc_1_1raw.html#a3a18d8161aa5b4f4f02b6fcfdff5e5d1" title=" " alt="" coords="517,81,614,107"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="274,92,501,92,501,97,274,97"/>
+<area shape="rect" id="Node000004" href="$namespacefc_1_1raw.html#a64937a5adc8041247f7007882224e225" title=" " alt="" coords="331,107,460,132"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="274,105,316,109,315,114,274,110"/>
+<area shape="rect" id="Node000005" href="$classsysio_1_1vm_1_1span.html#a584ee0404e01edf225142e86d23d6d7d" title=" " alt="" coords="322,156,468,182"/>
+<area shape="poly" id="edge6_Node000001_Node000005" title=" " alt="" coords="213,113,335,149,333,154,211,118"/>
+<area shape="poly" id="edge3_Node000003_Node000003" title=" " alt="" coords="537,82,531,73,535,63,546,57,566,55,586,57,597,64,595,68,585,62,566,60,548,62,539,67,536,72,541,80"/>
+<area shape="poly" id="edge5_Node000004_Node000003" title=" " alt="" coords="460,107,501,101,502,106,460,113"/>
+</map>

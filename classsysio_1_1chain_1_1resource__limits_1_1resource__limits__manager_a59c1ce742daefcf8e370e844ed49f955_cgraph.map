@@ -1,0 +1,11 @@
+<map id="sysio::chain::resource_limits::resource_limits_manager::get_block_cpu_limit" name="sysio::chain::resource_limits::resource_limits_manager::get_block_cpu_limit">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,207,61"/>
+<area shape="rect" id="Node000002" href="$classchainbase_1_1database.html#afcfe00f81a526c1376d4f51197dd3a9a" title=" " alt="" coords="255,20,422,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="207,30,239,30,239,36,207,36"/>
+<area shape="rect" id="Node000003" href="$classchainbase_1_1database.html#aa5a2ca0da0092693ac49b36b7ec6817a" title=" " alt="" coords="470,13,611,54"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="423,39,454,39,454,45,423,45"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="470,27,438,27,438,22,470,22"/>
+<area shape="rect" id="Node000004" href="$classchainbase_1_1database.html#a4d5297635dcf70be481d9b600da9bc13" title=" " alt="" coords="659,42,801,83"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="612,41,645,47,644,52,611,47"/>
+<area shape="poly" id="edge5_Node000004_Node000002" title=" " alt="" coords="659,67,611,68,540,71,470,68,398,53,399,48,470,63,540,66,611,63,659,62"/>
+</map>

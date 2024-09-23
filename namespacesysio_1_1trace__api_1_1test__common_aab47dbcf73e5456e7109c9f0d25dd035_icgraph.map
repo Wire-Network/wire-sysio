@@ -1,0 +1,7 @@
+<map id="sysio::trace_api::test_common::make_transfer_data" name="sysio::trace_api::test_common::make_transfer_data">
+<area shape="rect" id="Node000001" title=" " alt="" coords="271,23,472,64"/>
+<area shape="rect" id="Node000002" href="$test__extraction_8cpp.html#a9e693fc131434163ab9b8e714c31a328" title=" " alt="" coords="5,5,223,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="255,35,223,32,223,26,255,29"/>
+<area shape="rect" id="Node000003" href="$test__extraction_8cpp.html#abb35f24810053ae3e26ee8924bf2d064" title=" " alt="" coords="5,55,223,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="255,57,223,60,223,55,255,52"/>
+</map>

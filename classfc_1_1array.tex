@@ -1,0 +1,240 @@
+\doxysection{fc\+::array\texorpdfstring{$<$}{<} T, N \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classfc_1_1array}{}\label{classfc_1_1array}\index{fc::array$<$ T, N $>$@{fc::array$<$ T, N $>$}}
+
+
+{\ttfamily \#include $<$array.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classfc_1_1array_a9b50e41f4f6565fd816c4f6d7efcb6dc}{operator\mbox{[}$\,$\mbox{]}}} (size\+\_\+t pos)
+\item 
+const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classfc_1_1array_a5d8c3707ee54786a4506b5f32f761fa7}{operator\mbox{[}$\,$\mbox{]}}} (size\+\_\+t pos) const
+\item 
+const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classfc_1_1array_a1735af1b0ae9cae989c1372b426d6b29}{begin}} () const
+\item 
+const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classfc_1_1array_ab8a8e1a3e90d1bc519181ab464edfe29}{end}} () const
+\item 
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classfc_1_1array_a12ab76c92aa23760026610cec8e37670}{begin}} ()
+\item 
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classfc_1_1array_aabec0e8bc6991abe05741c3e5ddfed54}{end}} ()
+\item 
+size\+\_\+t \mbox{\hyperlink{classfc_1_1array_a0a4696737886d8a01c8eb75e2d234dc0}{size}} () const
+\end{DoxyCompactItemize}
+\textbf{ }\par
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classfc_1_1array_abbf66011fa09b8f1d5bd775bc57f6a22}{at}} (size\+\_\+t pos)
+\item 
+const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classfc_1_1array_a26a3a7928fcb225445b179273e1786c3}{at}} (size\+\_\+t pos) const
+\end{DoxyCompactItemize}
+
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{classfc_1_1array_ad01e4627be17148ee922c37944c48626}{data}} \mbox{[}\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\mbox{]}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, size\+\_\+t N$>$\newline
+class fc\+::array$<$ T, N $>$}
+Provides a fixed size array that is easier for templates to specialize against or overload than T\mbox{[}N\mbox{]}. 
+
+Definition at line \mbox{\hyperlink{city_8hpp_source_l00051}{51}} of file \mbox{\hyperlink{city_8hpp_source}{city.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1array_abbf66011fa09b8f1d5bd775bc57f6a22}\index{fc::array$<$ T, N $>$@{fc::array$<$ T, N $>$}!at@{at}}
+\index{at@{at}!fc::array$<$ T, N $>$@{fc::array$<$ T, N $>$}}
+\doxysubsubsection{\texorpdfstring{at()}{at()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1array_abbf66011fa09b8f1d5bd775bc57f6a22} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , size\+\_\+t N$>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classfc_1_1array}{fc\+::array}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}} $>$\+::at (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{pos}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Checked indexing (when in debug build) that also simplifies dereferencing when you have an array$<$\+T,\+N$>$\texorpdfstring{$\ast$}{*}. 
+
+Definition at line \mbox{\hyperlink{array_8hpp_source_l00021}{21}} of file \mbox{\hyperlink{array_8hpp_source}{array.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00021\ \{\ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ pos\ <\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}},\ \textcolor{stringliteral}{"{}array\ out-\/of-\/bounds"{}}\ );\ \textcolor{keywordflow}{return}\ data[pos];\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1array_a26a3a7928fcb225445b179273e1786c3}\index{fc::array$<$ T, N $>$@{fc::array$<$ T, N $>$}!at@{at}}
+\index{at@{at}!fc::array$<$ T, N $>$@{fc::array$<$ T, N $>$}}
+\doxysubsubsection{\texorpdfstring{at()}{at()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1array_a26a3a7928fcb225445b179273e1786c3} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , size\+\_\+t N$>$ \\
+const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classfc_1_1array}{fc\+::array}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}} $>$\+::at (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{pos}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{array_8hpp_source_l00022}{22}} of file \mbox{\hyperlink{array_8hpp_source}{array.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00022\ \{\ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ pos\ <\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}},\ \textcolor{stringliteral}{"{}array\ out-\/of-\/bounds"{}}\ );\ \textcolor{keywordflow}{return}\ data[pos];\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1array_a12ab76c92aa23760026610cec8e37670}\index{fc::array$<$ T, N $>$@{fc::array$<$ T, N $>$}!begin@{begin}}
+\index{begin@{begin}!fc::array$<$ T, N $>$@{fc::array$<$ T, N $>$}}
+\doxysubsubsection{\texorpdfstring{begin()}{begin()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1array_a12ab76c92aa23760026610cec8e37670} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , size\+\_\+t N$>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classfc_1_1array}{fc\+::array}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}} $>$\+::begin (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{array_8hpp_source_l00032}{32}} of file \mbox{\hyperlink{array_8hpp_source}{array.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00032\ \{\ \ \textcolor{keywordflow}{return}\ \&data[0];\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1array_a1735af1b0ae9cae989c1372b426d6b29}\index{fc::array$<$ T, N $>$@{fc::array$<$ T, N $>$}!begin@{begin}}
+\index{begin@{begin}!fc::array$<$ T, N $>$@{fc::array$<$ T, N $>$}}
+\doxysubsubsection{\texorpdfstring{begin()}{begin()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1array_a1735af1b0ae9cae989c1372b426d6b29} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , size\+\_\+t N$>$ \\
+const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classfc_1_1array}{fc\+::array}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}} $>$\+::begin (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{array_8hpp_source_l00029}{29}} of file \mbox{\hyperlink{array_8hpp_source}{array.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00029\ \{\ \ \textcolor{keywordflow}{return}\ \&data[0];\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1array_a1735af1b0ae9cae989c1372b426d6b29_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1array_aabec0e8bc6991abe05741c3e5ddfed54}\index{fc::array$<$ T, N $>$@{fc::array$<$ T, N $>$}!end@{end}}
+\index{end@{end}!fc::array$<$ T, N $>$@{fc::array$<$ T, N $>$}}
+\doxysubsubsection{\texorpdfstring{end()}{end()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1array_aabec0e8bc6991abe05741c3e5ddfed54} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , size\+\_\+t N$>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classfc_1_1array}{fc\+::array}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}} $>$\+::end (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{array_8hpp_source_l00033}{33}} of file \mbox{\hyperlink{array_8hpp_source}{array.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00033\ \{\ \ \textcolor{keywordflow}{return}\ \&data[\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}];\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1array_aabec0e8bc6991abe05741c3e5ddfed54_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1array_ab8a8e1a3e90d1bc519181ab464edfe29}\index{fc::array$<$ T, N $>$@{fc::array$<$ T, N $>$}!end@{end}}
+\index{end@{end}!fc::array$<$ T, N $>$@{fc::array$<$ T, N $>$}}
+\doxysubsubsection{\texorpdfstring{end()}{end()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1array_ab8a8e1a3e90d1bc519181ab464edfe29} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , size\+\_\+t N$>$ \\
+const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classfc_1_1array}{fc\+::array}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}} $>$\+::end (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{array_8hpp_source_l00030}{30}} of file \mbox{\hyperlink{array_8hpp_source}{array.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00030\ \{\ \ \textcolor{keywordflow}{return}\ \&data[\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}];\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1array_ab8a8e1a3e90d1bc519181ab464edfe29_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1array_a9b50e41f4f6565fd816c4f6d7efcb6dc}\index{fc::array$<$ T, N $>$@{fc::array$<$ T, N $>$}!operator\mbox{[}\mbox{]}@{operator[]}}
+\index{operator\mbox{[}\mbox{]}@{operator[]}!fc::array$<$ T, N $>$@{fc::array$<$ T, N $>$}}
+\doxysubsubsection{\texorpdfstring{operator[]()}{operator[]()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1array_a9b50e41f4f6565fd816c4f6d7efcb6dc} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , size\+\_\+t N$>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classfc_1_1array}{fc\+::array}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}} $>$\+::operator\mbox{[}$\,$\mbox{]} (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{pos}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{array_8hpp_source_l00025}{25}} of file \mbox{\hyperlink{array_8hpp_source}{array.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00025\ \{\ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ pos\ <\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}},\ \textcolor{stringliteral}{"{}array\ out-\/of-\/bounds"{}}\ );\ \textcolor{keywordflow}{return}\ data[pos];\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1array_a5d8c3707ee54786a4506b5f32f761fa7}\index{fc::array$<$ T, N $>$@{fc::array$<$ T, N $>$}!operator\mbox{[}\mbox{]}@{operator[]}}
+\index{operator\mbox{[}\mbox{]}@{operator[]}!fc::array$<$ T, N $>$@{fc::array$<$ T, N $>$}}
+\doxysubsubsection{\texorpdfstring{operator[]()}{operator[]()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1array_a5d8c3707ee54786a4506b5f32f761fa7} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , size\+\_\+t N$>$ \\
+const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classfc_1_1array}{fc\+::array}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}} $>$\+::operator\mbox{[}$\,$\mbox{]} (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{pos}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{array_8hpp_source_l00026}{26}} of file \mbox{\hyperlink{array_8hpp_source}{array.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00026\ \{\ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ pos\ <\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}},\ \textcolor{stringliteral}{"{}array\ out-\/of-\/bounds"{}}\ );\ \textcolor{keywordflow}{return}\ data[pos];\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1array_a0a4696737886d8a01c8eb75e2d234dc0}\index{fc::array$<$ T, N $>$@{fc::array$<$ T, N $>$}!size@{size}}
+\index{size@{size}!fc::array$<$ T, N $>$@{fc::array$<$ T, N $>$}}
+\doxysubsubsection{\texorpdfstring{size()}{size()}}
+{\footnotesize\ttfamily \label{classfc_1_1array_a0a4696737886d8a01c8eb75e2d234dc0} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , size\+\_\+t N$>$ \\
+size\+\_\+t \mbox{\hyperlink{classfc_1_1array}{fc\+::array}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}} $>$\+::size (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{array_8hpp_source_l00035}{35}} of file \mbox{\hyperlink{array_8hpp_source}{array.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00035\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}};\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1array_a0a4696737886d8a01c8eb75e2d234dc0_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classfc_1_1array_ad01e4627be17148ee922c37944c48626}\index{fc::array$<$ T, N $>$@{fc::array$<$ T, N $>$}!data@{data}}
+\index{data@{data}!fc::array$<$ T, N $>$@{fc::array$<$ T, N $>$}}
+\doxysubsubsection{\texorpdfstring{data}{data}}
+{\footnotesize\ttfamily \label{classfc_1_1array_ad01e4627be17148ee922c37944c48626} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , size\+\_\+t N$>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{classfc_1_1array}{fc\+::array}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}} $>$\+::data\mbox{[}\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\mbox{]}}
+
+
+
+Definition at line \mbox{\hyperlink{array_8hpp_source_l00037}{37}} of file \mbox{\hyperlink{array_8hpp_source}{array.\+hpp}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/\mbox{\hyperlink{array_8hpp}{array.\+hpp}}\item 
+libraries/fc/include/fc/crypto/\mbox{\hyperlink{city_8hpp}{city.\+hpp}}\end{DoxyCompactItemize}

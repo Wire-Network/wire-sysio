@@ -1,0 +1,11 @@
+<map id="sysio::chain::apply_context::get_code_hash" name="sysio::chain::apply_context::get_code_hash">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,173,46"/>
+<area shape="rect" id="Node000002" href="$classchainbase_1_1database.html#aa5a2ca0da0092693ac49b36b7ec6817a" title=" " alt="" coords="221,5,362,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="173,23,205,23,205,28,173,28"/>
+<area shape="rect" id="Node000003" href="$classchainbase_1_1database.html#afcfe00f81a526c1376d4f51197dd3a9a" title=" " alt="" coords="599,13,767,38"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="363,30,584,31,583,36,363,35"/>
+<area shape="rect" id="Node000004" href="$classchainbase_1_1database.html#a4d5297635dcf70be481d9b600da9bc13" title=" " alt="" coords="410,75,551,115"/>
+<area shape="poly" id="edge4_Node000002_Node000004" title=" " alt="" coords="350,44,410,66,408,71,348,49"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="599,21,378,21,378,15,599,15"/>
+<area shape="poly" id="edge5_Node000004_Node000003" title=" " alt="" coords="542,71,627,42,629,47,543,77"/>
+</map>

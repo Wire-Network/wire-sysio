@@ -1,0 +1,39 @@
+\doxysection{fc\+::detail\+::is\+\_\+operation\+\_\+shorter Struct Reference}
+\hypertarget{structfc_1_1detail_1_1is__operation__shorter}{}\label{structfc_1_1detail_1_1is__operation__shorter}\index{fc::detail::is\_operation\_shorter@{fc::detail::is\_operation\_shorter}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{structfc_1_1detail_1_1is__operation__shorter_a627302d610ca6e526f14f56462b27aa0}{operator()}} (const \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation}{rate\+\_\+limited\+\_\+operation}} \texorpdfstring{$\ast$}{*}lhs, const \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation}{rate\+\_\+limited\+\_\+operation}} \texorpdfstring{$\ast$}{*}rhs)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00125}{125}} of file \mbox{\hyperlink{rate__limiting_8cpp_source}{rate\+\_\+limiting.\+cpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structfc_1_1detail_1_1is__operation__shorter_a627302d610ca6e526f14f56462b27aa0}\index{fc::detail::is\_operation\_shorter@{fc::detail::is\_operation\_shorter}!operator()@{operator()}}
+\index{operator()@{operator()}!fc::detail::is\_operation\_shorter@{fc::detail::is\_operation\_shorter}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}}
+{\footnotesize\ttfamily \label{structfc_1_1detail_1_1is__operation__shorter_a627302d610ca6e526f14f56462b27aa0} 
+bool fc\+::detail\+::is\+\_\+operation\+\_\+shorter\+::operator() (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation}{rate\+\_\+limited\+\_\+operation}} \texorpdfstring{$\ast$}{*}}]{lhs}{, }\item[{const \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation}{rate\+\_\+limited\+\_\+operation}} \texorpdfstring{$\ast$}{*}}]{rhs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00128}{128}} of file \mbox{\hyperlink{rate__limiting_8cpp_source}{rate\+\_\+limiting.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ lhs-\/>length\ >\ rhs-\/>length;}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/src/network/\mbox{\hyperlink{rate__limiting_8cpp}{rate\+\_\+limiting.\+cpp}}\end{DoxyCompactItemize}

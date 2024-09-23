@@ -1,0 +1,177 @@
+\doxysection{gtest\+\_\+throw\+\_\+on\+\_\+failure\+\_\+test.\+py}
+\hypertarget{gtest__throw__on__failure__test_8py_source}{}\label{gtest__throw__on__failure__test_8py_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/test/gtest\_throw\_on\_failure\_test.py@{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/test/gtest\_throw\_on\_failure\_test.py}}
+\mbox{\hyperlink{gtest__throw__on__failure__test_8py}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00001}\mbox{\hyperlink{namespacegtest__throw__on__failure__test}{00001}}\ \textcolor{comment}{\#!/usr/bin/env\ python}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00002}00002\ \textcolor{comment}{\#}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00003}00003\ \textcolor{comment}{\#\ Copyright\ 2009,\ Google\ Inc.}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00004}00004\ \textcolor{comment}{\#\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00005}00005\ \textcolor{comment}{\#}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00006}00006\ \textcolor{comment}{\#\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00007}00007\ \textcolor{comment}{\#\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00008}00008\ \textcolor{comment}{\#\ met:}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00009}00009\ \textcolor{comment}{\#}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00010}00010\ \textcolor{comment}{\#\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00011}00011\ \textcolor{comment}{\#\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00012}00012\ \textcolor{comment}{\#\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00013}00013\ \textcolor{comment}{\#\ copyright\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00014}00014\ \textcolor{comment}{\#\ in\ the\ documentation\ and/or\ other\ materials\ provided\ with\ the}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00015}00015\ \textcolor{comment}{\#\ distribution.}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00016}00016\ \textcolor{comment}{\#\ \ \ \ \ *\ Neither\ the\ name\ of\ Google\ Inc.\ nor\ the\ names\ of\ its}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00017}00017\ \textcolor{comment}{\#\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products\ derived\ from}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00018}00018\ \textcolor{comment}{\#\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00019}00019\ \textcolor{comment}{\#}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00020}00020\ \textcolor{comment}{\#\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00021}00021\ \textcolor{comment}{\#\ "{}AS\ IS"{}\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00022}00022\ \textcolor{comment}{\#\ LIMITED\ TO,\ THE\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00023}00023\ \textcolor{comment}{\#\ A\ PARTICULAR\ PURPOSE\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ THE\ COPYRIGHT}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00024}00024\ \textcolor{comment}{\#\ OWNER\ OR\ CONTRIBUTORS\ BE\ LIABLE\ FOR\ ANY\ DIRECT,\ INDIRECT,\ INCIDENTAL,}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00025}00025\ \textcolor{comment}{\#\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES\ (INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00026}00026\ \textcolor{comment}{\#\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;\ LOSS\ OF\ USE,}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00027}00027\ \textcolor{comment}{\#\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND\ ON\ ANY}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00028}00028\ \textcolor{comment}{\#\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00029}00029\ \textcolor{comment}{\#\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00030}00030\ \textcolor{comment}{\#\ OF\ THIS\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00032}00032\ \textcolor{stringliteral}{"{}"{}"{}Tests\ Google\ Test's\ throw-\/on-\/failure\ mode\ with\ exceptions\ disabled.}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00033}00033\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00034}00034\ \textcolor{stringliteral}{This\ script\ invokes\ gtest\_throw\_on\_failure\_test\_\ (a\ program\ written\ with}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00035}00035\ \textcolor{stringliteral}{Google\ Test)\ with\ different\ environments\ and\ command\ line\ flags.}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00036}00036\ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00038}00038\ \_\_author\_\_\ =\ \textcolor{stringliteral}{'wan@google.com\ (Zhanyong\ Wan)'}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00040}00040\ \textcolor{keyword}{import}\ os}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00041}00041\ \textcolor{keyword}{import}\ gtest\_test\_utils}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00044}00044\ \textcolor{comment}{\#\ Constants.}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00046}00046\ \textcolor{comment}{\#\ The\ command\ line\ flag\ for\ enabling/disabling\ the\ throw-\/on-\/failure\ mode.}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00047}\mbox{\hyperlink{namespacegtest__throw__on__failure__test_a173045fadfd97ccee3191aebbf10dc91}{00047}}\ THROW\_ON\_FAILURE\ =\ \textcolor{stringliteral}{'gtest\_throw\_on\_failure'}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00049}00049\ \textcolor{comment}{\#\ Path\ to\ the\ gtest\_throw\_on\_failure\_test\_\ program,\ compiled\ with}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00050}00050\ \textcolor{comment}{\#\ exceptions\ disabled.}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00051}\mbox{\hyperlink{namespacegtest__throw__on__failure__test_ac38dda23e362ecc76943073d173294f1}{00051}}\ EXE\_PATH\ =\ \mbox{\hyperlink{namespacegtest__test__utils_a239f43ff0e44144cb5a1e14f3453c273}{gtest\_test\_utils.GetTestExecutablePath}}(}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00052}00052\ \ \ \ \ \textcolor{stringliteral}{'gtest\_throw\_on\_failure\_test\_'})}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00054}00054\ }
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00055}00055\ \textcolor{comment}{\#\ Utilities.}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00058}\mbox{\hyperlink{namespacegtest__throw__on__failure__test_a171689016f544388d0c6ab640966cc1f}{00058}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacegtest__throw__on__failure__test_a171689016f544388d0c6ab640966cc1f}{SetEnvVar}}(env\_var,\ value):}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00059}00059\ \ \ \textcolor{stringliteral}{"{}"{}"{}Sets\ an\ environment\ variable\ to\ a\ given\ value;\ unsets\ it\ when\ the}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00060}00060\ \textcolor{stringliteral}{\ \ given\ value\ is\ None.}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00061}00061\ \textcolor{stringliteral}{\ \ "{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00062}00062\ }
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00063}00063\ \ \ env\_var\ =\ env\_var.upper()}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00064}00064\ \ \ \textcolor{keywordflow}{if}\ value\ \textcolor{keywordflow}{is}\ \textcolor{keywordflow}{not}\ \textcolor{keywordtype}{None}:}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00065}00065\ \ \ \ \ os.environ[env\_var]\ =\ value}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00066}00066\ \ \ \textcolor{keywordflow}{elif}\ env\_var\ \textcolor{keywordflow}{in}\ os.environ:}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00067}00067\ \ \ \ \ del\ os.environ[env\_var]}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00069}00069\ }
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00070}\mbox{\hyperlink{namespacegtest__throw__on__failure__test_a2cee7e69e065f147418e9ef1d4913a1b}{00070}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacegtest__throw__on__failure__test_a2cee7e69e065f147418e9ef1d4913a1b}{Run}}(command):}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00071}00071\ \ \ \textcolor{stringliteral}{"{}"{}"{}Runs\ a\ command;\ returns\ True/False\ if\ its\ exit\ code\ is/isn't\ 0."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00073}00073\ \ \ \textcolor{keywordflow}{print}\ \textcolor{stringliteral}{'Running\ "{}\%s"{}.\ .\ .'}\ \%\ \textcolor{stringliteral}{'\ '}.join(command)}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00074}00074\ \ \ p\ =\ \mbox{\hyperlink{classgtest__test__utils_1_1_subprocess}{gtest\_test\_utils.Subprocess}}(command)}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00075}00075\ \ \ \textcolor{keywordflow}{return}\ p.exited\ \textcolor{keywordflow}{and}\ p.exit\_code\ ==\ 0}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00076}00076\ }
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00077}00077\ }
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00078}00078\ \textcolor{comment}{\#\ The\ tests.\ \ TODO(wan@google.com):\ refactor\ the\ class\ to\ share\ common}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00079}00079\ \textcolor{comment}{\#\ logic\ with\ code\ in\ gtest\_break\_on\_failure\_unittest.py.}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00080}\mbox{\hyperlink{classgtest__throw__on__failure__test_1_1_throw_on_failure_test}{00080}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classgtest__throw__on__failure__test_1_1_throw_on_failure_test}{ThrowOnFailureTest}}(\mbox{\hyperlink{namespacegtest__test__utils_acb97a85206c09d233db6c7f2362e5428}{gtest\_test\_utils.TestCase}}):}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00081}00081\ \ \ \textcolor{stringliteral}{"{}"{}"{}Tests\ the\ throw-\/on-\/failure\ mode."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00083}\mbox{\hyperlink{classgtest__throw__on__failure__test_1_1_throw_on_failure_test_a40e35f07698883194d35fb0ab00b80cc}{00083}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classgtest__throw__on__failure__test_1_1_throw_on_failure_test_a40e35f07698883194d35fb0ab00b80cc}{RunAndVerify}}(self,\ env\_var\_value,\ flag\_value,\ should\_fail):}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00084}00084\ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Runs\ gtest\_throw\_on\_failure\_test\_\ and\ verifies\ that\ it\ does}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00085}00085\ \textcolor{stringliteral}{\ \ \ \ (or\ does\ not)\ exit\ with\ a\ non-\/zero\ code.}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00086}00086\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00087}00087\ \textcolor{stringliteral}{\ \ \ \ Args:}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00088}00088\ \textcolor{stringliteral}{\ \ \ \ \ \ env\_var\_value:\ \ \ \ value\ of\ the\ GTEST\_BREAK\_ON\_FAILURE\ environment}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00089}00089\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ variable;\ None\ if\ the\ variable\ should\ be\ unset.}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00090}00090\ \textcolor{stringliteral}{\ \ \ \ \ \ flag\_value:\ \ \ \ \ \ \ value\ of\ the\ -\/-\/gtest\_break\_on\_failure\ flag;}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00091}00091\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ None\ if\ the\ flag\ should\ not\ be\ present.}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00092}00092\ \textcolor{stringliteral}{\ \ \ \ \ \ should\_fail:\ \ \ \ \ \ True\ iff\ the\ program\ is\ expected\ to\ fail.}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00093}00093\ \textcolor{stringliteral}{\ \ \ \ "{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00094}00094\ }
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00095}00095\ \ \ \ \ \mbox{\hyperlink{namespacegtest__throw__on__failure__test_a171689016f544388d0c6ab640966cc1f}{SetEnvVar}}(THROW\_ON\_FAILURE,\ env\_var\_value)}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00096}00096\ }
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00097}00097\ \ \ \ \ \textcolor{keywordflow}{if}\ env\_var\_value\ \textcolor{keywordflow}{is}\ \textcolor{keywordtype}{None}:}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00098}00098\ \ \ \ \ \ \ env\_var\_value\_msg\ =\ \textcolor{stringliteral}{'\ is\ not\ set'}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00099}00099\ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00100}00100\ \ \ \ \ \ \ env\_var\_value\_msg\ =\ \textcolor{stringliteral}{'='}\ +\ env\_var\_value}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00101}00101\ }
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00102}00102\ \ \ \ \ \textcolor{keywordflow}{if}\ flag\_value\ \textcolor{keywordflow}{is}\ \textcolor{keywordtype}{None}:}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00103}00103\ \ \ \ \ \ \ flag\ =\ \textcolor{stringliteral}{''}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00104}00104\ \ \ \ \ \textcolor{keywordflow}{elif}\ flag\_value\ ==\ \textcolor{stringliteral}{'0'}:}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00105}00105\ \ \ \ \ \ \ flag\ =\ \textcolor{stringliteral}{'-\/-\/\%s=0'}\ \%\ THROW\_ON\_FAILURE}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00106}00106\ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00107}00107\ \ \ \ \ \ \ flag\ =\ \textcolor{stringliteral}{'-\/-\/\%s'}\ \%\ THROW\_ON\_FAILURE}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00108}00108\ }
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00109}00109\ \ \ \ \ command\ =\ [EXE\_PATH]}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00110}00110\ \ \ \ \ \textcolor{keywordflow}{if}\ flag:}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00111}00111\ \ \ \ \ \ \ command.append(flag)}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00112}00112\ }
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00113}00113\ \ \ \ \ \textcolor{keywordflow}{if}\ should\_fail:}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00114}00114\ \ \ \ \ \ \ should\_or\_not\ =\ \textcolor{stringliteral}{'should'}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00115}00115\ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00116}00116\ \ \ \ \ \ \ should\_or\_not\ =\ \textcolor{stringliteral}{'should\ not'}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00117}00117\ }
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00118}00118\ \ \ \ \ failed\ =\ \textcolor{keywordflow}{not}\ \mbox{\hyperlink{namespacegtest__throw__on__failure__test_a2cee7e69e065f147418e9ef1d4913a1b}{Run}}(command)}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00119}00119\ }
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00120}00120\ \ \ \ \ \mbox{\hyperlink{namespacegtest__throw__on__failure__test_a171689016f544388d0c6ab640966cc1f}{SetEnvVar}}(THROW\_ON\_FAILURE,\ \textcolor{keywordtype}{None})}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00121}00121\ }
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00122}00122\ \ \ \ \ msg\ =\ (\textcolor{stringliteral}{'when\ \%s\%s,\ an\ assertion\ failure\ in\ "{}\%s"{}\ \%s\ cause\ a\ non-\/zero\ '}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00123}00123\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'exit\ code.'}\ \%}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00124}00124\ \ \ \ \ \ \ \ \ \ \ \ (THROW\_ON\_FAILURE,\ env\_var\_value\_msg,\ \textcolor{stringliteral}{'\ '}.join(command),}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00125}00125\ \ \ \ \ \ \ \ \ \ \ \ \ should\_or\_not))}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00126}00126\ \ \ \ \ self.assert\_(failed\ ==\ should\_fail,\ msg)}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00127}00127\ }
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00128}\mbox{\hyperlink{classgtest__throw__on__failure__test_1_1_throw_on_failure_test_a5d0c4b7c44c98e07646bcf9ff1050409}{00128}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classgtest__throw__on__failure__test_1_1_throw_on_failure_test_a5d0c4b7c44c98e07646bcf9ff1050409}{testDefaultBehavior}}(self):}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00129}00129\ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Tests\ the\ behavior\ of\ the\ default\ mode."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00130}00130\ }
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00131}00131\ \ \ \ \ self.\mbox{\hyperlink{classgtest__throw__on__failure__test_1_1_throw_on_failure_test_a40e35f07698883194d35fb0ab00b80cc}{RunAndVerify}}(env\_var\_value=\textcolor{keywordtype}{None},\ flag\_value=\textcolor{keywordtype}{None},\ should\_fail=\textcolor{keyword}{False})}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00132}00132\ }
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00133}\mbox{\hyperlink{classgtest__throw__on__failure__test_1_1_throw_on_failure_test_a516ee6ea4b86ddcb5db287aae80c7eef}{00133}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classgtest__throw__on__failure__test_1_1_throw_on_failure_test_a516ee6ea4b86ddcb5db287aae80c7eef}{testThrowOnFailureEnvVar}}(self):}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00134}00134\ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Tests\ using\ the\ GTEST\_THROW\_ON\_FAILURE\ environment\ variable."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00135}00135\ }
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00136}00136\ \ \ \ \ self.\mbox{\hyperlink{classgtest__throw__on__failure__test_1_1_throw_on_failure_test_a40e35f07698883194d35fb0ab00b80cc}{RunAndVerify}}(env\_var\_value=\textcolor{stringliteral}{'0'},}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00137}00137\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ flag\_value=\textcolor{keywordtype}{None},}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00138}00138\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ should\_fail=\textcolor{keyword}{False})}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00139}00139\ \ \ \ \ self.\mbox{\hyperlink{classgtest__throw__on__failure__test_1_1_throw_on_failure_test_a40e35f07698883194d35fb0ab00b80cc}{RunAndVerify}}(env\_var\_value=\textcolor{stringliteral}{'1'},}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00140}00140\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ flag\_value=\textcolor{keywordtype}{None},}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00141}00141\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ should\_fail=\textcolor{keyword}{True})}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00142}00142\ }
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00143}\mbox{\hyperlink{classgtest__throw__on__failure__test_1_1_throw_on_failure_test_a2e2c172dcd9d7109ce7b0d43cc724ae5}{00143}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classgtest__throw__on__failure__test_1_1_throw_on_failure_test_a2e2c172dcd9d7109ce7b0d43cc724ae5}{testThrowOnFailureFlag}}(self):}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00144}00144\ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Tests\ using\ the\ -\/-\/gtest\_throw\_on\_failure\ flag."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00145}00145\ }
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00146}00146\ \ \ \ \ self.\mbox{\hyperlink{classgtest__throw__on__failure__test_1_1_throw_on_failure_test_a40e35f07698883194d35fb0ab00b80cc}{RunAndVerify}}(env\_var\_value=\textcolor{keywordtype}{None},}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00147}00147\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ flag\_value=\textcolor{stringliteral}{'0'},}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00148}00148\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ should\_fail=\textcolor{keyword}{False})}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00149}00149\ \ \ \ \ self.\mbox{\hyperlink{classgtest__throw__on__failure__test_1_1_throw_on_failure_test_a40e35f07698883194d35fb0ab00b80cc}{RunAndVerify}}(env\_var\_value=\textcolor{keywordtype}{None},}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00150}00150\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ flag\_value=\textcolor{stringliteral}{'1'},}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00151}00151\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ should\_fail=\textcolor{keyword}{True})}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00152}00152\ }
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00153}\mbox{\hyperlink{classgtest__throw__on__failure__test_1_1_throw_on_failure_test_a2a9ab8ecb729728a8cd3505357fbfebd}{00153}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classgtest__throw__on__failure__test_1_1_throw_on_failure_test_a2a9ab8ecb729728a8cd3505357fbfebd}{testThrowOnFailureFlagOverridesEnvVar}}(self):}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00154}00154\ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Tests\ that\ -\/-\/gtest\_throw\_on\_failure\ overrides\ GTEST\_THROW\_ON\_FAILURE."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00155}00155\ }
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00156}00156\ \ \ \ \ self.\mbox{\hyperlink{classgtest__throw__on__failure__test_1_1_throw_on_failure_test_a40e35f07698883194d35fb0ab00b80cc}{RunAndVerify}}(env\_var\_value=\textcolor{stringliteral}{'0'},}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00157}00157\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ flag\_value=\textcolor{stringliteral}{'0'},}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00158}00158\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ should\_fail=\textcolor{keyword}{False})}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00159}00159\ \ \ \ \ self.\mbox{\hyperlink{classgtest__throw__on__failure__test_1_1_throw_on_failure_test_a40e35f07698883194d35fb0ab00b80cc}{RunAndVerify}}(env\_var\_value=\textcolor{stringliteral}{'0'},}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00160}00160\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ flag\_value=\textcolor{stringliteral}{'1'},}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00161}00161\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ should\_fail=\textcolor{keyword}{True})}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00162}00162\ \ \ \ \ self.\mbox{\hyperlink{classgtest__throw__on__failure__test_1_1_throw_on_failure_test_a40e35f07698883194d35fb0ab00b80cc}{RunAndVerify}}(env\_var\_value=\textcolor{stringliteral}{'1'},}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00163}00163\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ flag\_value=\textcolor{stringliteral}{'0'},}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00164}00164\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ should\_fail=\textcolor{keyword}{False})}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00165}00165\ \ \ \ \ self.\mbox{\hyperlink{classgtest__throw__on__failure__test_1_1_throw_on_failure_test_a40e35f07698883194d35fb0ab00b80cc}{RunAndVerify}}(env\_var\_value=\textcolor{stringliteral}{'1'},}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00166}00166\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ flag\_value=\textcolor{stringliteral}{'1'},}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00167}00167\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ should\_fail=\textcolor{keyword}{True})}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00168}00168\ }
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00169}00169\ }
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00170}00170\ \textcolor{keywordflow}{if}\ \_\_name\_\_\ ==\ \textcolor{stringliteral}{'\_\_main\_\_'}:}
+\DoxyCodeLine{\Hypertarget{gtest__throw__on__failure__test_8py_source_l00171}00171\ \ \ \mbox{\hyperlink{namespacegtest__test__utils_affb42cd189bf8fb9618e5b7178fd34fd}{gtest\_test\_utils.Main}}()}
+
+\end{DoxyCode}

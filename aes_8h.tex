@@ -1,0 +1,416 @@
+\doxysection{libraries/yubihsm/aes\+\_\+cmac/aes.h File Reference}
+\hypertarget{aes_8h}{}\label{aes_8h}\index{libraries/yubihsm/aes\_cmac/aes.h@{libraries/yubihsm/aes\_cmac/aes.h}}
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include $<$openssl/aes.\+h$>$}\newline
+Include dependency graph for aes.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=256pt]{aes_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{aes_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structaes__context}{aes\+\_\+context}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{aes_8h_af19ab913a847ad1e91c5291215116de1}{AES\+\_\+\+BLOCK\+\_\+\+SIZE}}~16
+\item 
+\#define \mbox{\hyperlink{aes_8h_a3f74f478154eb204fc614b5e9fcde0d1}{YH\+\_\+\+INTERNAL}}~\+\_\+\+\_\+attribute\+\_\+\+\_\+((visibility("{}hidden"{})))
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{aes_8h_a3f74f478154eb204fc614b5e9fcde0d1}{YH\+\_\+\+INTERNAL}} \mbox{\hyperlink{aes_8h_a192f5b027034f15be8e5f660edbbc4a2}{aes\+\_\+set\+\_\+encrypt\+\_\+key}} (\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}key, \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{yubihsm__pkcs11_8c_a8b142e2a51f6b9b8760f9132119673b6}{key\+\_\+len}}, \mbox{\hyperlink{structaes__context}{aes\+\_\+context}} \texorpdfstring{$\ast$}{*}ctx)
+\item 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{aes_8h_a3f74f478154eb204fc614b5e9fcde0d1}{YH\+\_\+\+INTERNAL}} \mbox{\hyperlink{aes_8h_a34a7c10876bc5d5570216dc0f27f464b}{aes\+\_\+set\+\_\+decrypt\+\_\+key}} (\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}key, \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{yubihsm__pkcs11_8c_a8b142e2a51f6b9b8760f9132119673b6}{key\+\_\+len}}, \mbox{\hyperlink{structaes__context}{aes\+\_\+context}} \texorpdfstring{$\ast$}{*}ctx)
+\item 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{aes_8h_a3f74f478154eb204fc614b5e9fcde0d1}{YH\+\_\+\+INTERNAL}} \mbox{\hyperlink{aes_8h_a896d5fb8c7b2e361d7435195bf87b27e}{aes\+\_\+encrypt}} (\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}in, \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}out, const \mbox{\hyperlink{structaes__context}{aes\+\_\+context}} \texorpdfstring{$\ast$}{*}ctx)
+\item 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{aes_8h_a3f74f478154eb204fc614b5e9fcde0d1}{YH\+\_\+\+INTERNAL}} \mbox{\hyperlink{aes_8h_ad32efa4d3f7b5e966270857f0a92a6b3}{aes\+\_\+decrypt}} (\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}in, \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}out, const \mbox{\hyperlink{structaes__context}{aes\+\_\+context}} \texorpdfstring{$\ast$}{*}ctx)
+\item 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{aes_8h_a3f74f478154eb204fc614b5e9fcde0d1}{YH\+\_\+\+INTERNAL}} \mbox{\hyperlink{aes_8h_a520eb8095b50d1fb16efb914d00d3200}{aes\+\_\+cbc\+\_\+encrypt}} (\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}in, \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}out, \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}, \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}iv, \mbox{\hyperlink{structaes__context}{aes\+\_\+context}} \texorpdfstring{$\ast$}{*}ctx)
+\item 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{aes_8h_a3f74f478154eb204fc614b5e9fcde0d1}{YH\+\_\+\+INTERNAL}} \mbox{\hyperlink{aes_8h_a41059ad21be9dab00346b693540ce9cb}{aes\+\_\+cbc\+\_\+decrypt}} (\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}in, \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}out, \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}, \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}iv, \mbox{\hyperlink{structaes__context}{aes\+\_\+context}} \texorpdfstring{$\ast$}{*}ctx)
+\item 
+void \mbox{\hyperlink{aes_8h_a3f74f478154eb204fc614b5e9fcde0d1}{YH\+\_\+\+INTERNAL}} \mbox{\hyperlink{aes_8h_a3d0abd389b67c0cd50adb2fba040bd1b}{aes\+\_\+add\+\_\+padding}} (\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}in, \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})
+\item 
+void \mbox{\hyperlink{aes_8h_a3f74f478154eb204fc614b5e9fcde0d1}{YH\+\_\+\+INTERNAL}} \mbox{\hyperlink{aes_8h_a1c057fac86939e57491b2f993b006643}{aes\+\_\+remove\+\_\+padding}} (\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}in, \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})
+\item 
+void \mbox{\hyperlink{aes_8h_a3f74f478154eb204fc614b5e9fcde0d1}{YH\+\_\+\+INTERNAL}} \mbox{\hyperlink{aes_8h_aac58f46d264dd75e26adb8b9dab1341e}{aes\+\_\+destroy}} (\mbox{\hyperlink{structaes__context}{aes\+\_\+context}} \texorpdfstring{$\ast$}{*}ctx)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{aes_8h_af19ab913a847ad1e91c5291215116de1}\index{aes.h@{aes.h}!AES\_BLOCK\_SIZE@{AES\_BLOCK\_SIZE}}
+\index{AES\_BLOCK\_SIZE@{AES\_BLOCK\_SIZE}!aes.h@{aes.h}}
+\doxysubsubsection{\texorpdfstring{AES\_BLOCK\_SIZE}{AES\_BLOCK\_SIZE}}
+{\footnotesize\ttfamily \label{aes_8h_af19ab913a847ad1e91c5291215116de1} 
+\#define AES\+\_\+\+BLOCK\+\_\+\+SIZE~16}
+
+
+
+Definition at line \mbox{\hyperlink{aes_8h_source_l00035}{35}} of file \mbox{\hyperlink{aes_8h_source}{aes.\+h}}.
+
+\Hypertarget{aes_8h_a3f74f478154eb204fc614b5e9fcde0d1}\index{aes.h@{aes.h}!YH\_INTERNAL@{YH\_INTERNAL}}
+\index{YH\_INTERNAL@{YH\_INTERNAL}!aes.h@{aes.h}}
+\doxysubsubsection{\texorpdfstring{YH\_INTERNAL}{YH\_INTERNAL}}
+{\footnotesize\ttfamily \label{aes_8h_a3f74f478154eb204fc614b5e9fcde0d1} 
+FILE \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{debug__lib_8h_a76ba6bc136c2b38b71a9e3c56282cd3a}{\+\_\+yh\+\_\+output}} YH\+\_\+\+INTERNAL~\+\_\+\+\_\+attribute\+\_\+\+\_\+((visibility("{}hidden"{})))}
+
+
+
+Definition at line \mbox{\hyperlink{aes_8h_source_l00058}{58}} of file \mbox{\hyperlink{aes_8h_source}{aes.\+h}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{aes_8h_a3d0abd389b67c0cd50adb2fba040bd1b}\index{aes.h@{aes.h}!aes\_add\_padding@{aes\_add\_padding}}
+\index{aes\_add\_padding@{aes\_add\_padding}!aes.h@{aes.h}}
+\doxysubsubsection{\texorpdfstring{aes\_add\_padding()}{aes\_add\_padding()}}
+{\footnotesize\ttfamily \label{aes_8h_a3d0abd389b67c0cd50adb2fba040bd1b} 
+void \mbox{\hyperlink{aes_8h_a3f74f478154eb204fc614b5e9fcde0d1}{YH\+\_\+\+INTERNAL}} aes\+\_\+add\+\_\+padding (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{in}{, }\item[{\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{len}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{aes_8c_source_l00313}{313}} of file \mbox{\hyperlink{aes_8c_source}{aes.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00313\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00314\ }
+\DoxyCodeLine{00315\ \ \ in[(*len)++]\ =\ 0x80;}
+\DoxyCodeLine{00316\ \ \ \textcolor{keywordflow}{while}\ ((*\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})\ \%\ \mbox{\hyperlink{aes_8h_af19ab913a847ad1e91c5291215116de1}{AES\_BLOCK\_SIZE}}\ !=\ 0)\ \{}
+\DoxyCodeLine{00317\ \ \ \ \ in[(*len)++]\ =\ 0x00;}
+\DoxyCodeLine{00318\ \ \ \}}
+\DoxyCodeLine{00319\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=245pt]{aes_8h_a3d0abd389b67c0cd50adb2fba040bd1b_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{aes_8h_a41059ad21be9dab00346b693540ce9cb}\index{aes.h@{aes.h}!aes\_cbc\_decrypt@{aes\_cbc\_decrypt}}
+\index{aes\_cbc\_decrypt@{aes\_cbc\_decrypt}!aes.h@{aes.h}}
+\doxysubsubsection{\texorpdfstring{aes\_cbc\_decrypt()}{aes\_cbc\_decrypt()}}
+{\footnotesize\ttfamily \label{aes_8h_a41059ad21be9dab00346b693540ce9cb} 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{aes_8h_a3f74f478154eb204fc614b5e9fcde0d1}{YH\+\_\+\+INTERNAL}} aes\+\_\+cbc\+\_\+decrypt (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{in}{, }\item[{\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{out}{, }\item[{\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}}}]{len}{, }\item[{\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{iv}{, }\item[{\mbox{\hyperlink{structaes__context}{aes\+\_\+context}} \texorpdfstring{$\ast$}{*}}]{ctx}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{aes_8c_source_l00292}{292}} of file \mbox{\hyperlink{aes_8c_source}{aes.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00293\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00294\ \textcolor{preprocessor}{\#ifdef\ \_WIN32\_BCRYPT}}
+\DoxyCodeLine{00295\ \ \ NTSTATUS\ status\ =\ STATUS\_SUCCESS;}
+\DoxyCodeLine{00296\ \ \ ULONG\ cbResult\ =\ 0;}
+\DoxyCodeLine{00297\ }
+\DoxyCodeLine{00298\ \ \ \textcolor{keywordflow}{if}\ (!BCRYPT\_SUCCESS(status\ =\ BCryptDecrypt(ctx-\/>hKeyCBC,\ in,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ NULL,\ iv,}
+\DoxyCodeLine{00299\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{aes_8h_af19ab913a847ad1e91c5291215116de1}{AES\_BLOCK\_SIZE}},\ out,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},}
+\DoxyCodeLine{00300\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&cbResult,\ 0)))\ \{}
+\DoxyCodeLine{00301\ \ \ \ \ \textcolor{keywordflow}{return}\ -\/1;}
+\DoxyCodeLine{00302\ \ \ \}}
+\DoxyCodeLine{00303\ }
+\DoxyCodeLine{00304\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00305\ }
+\DoxyCodeLine{00306\ \ \ AES\_cbc\_encrypt(in,\ out,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ \&ctx-\/>\mbox{\hyperlink{structaes__context_a65be0b7f58c31b98e61e222ccbda1bec}{key}},\ iv,\ AES\_DECRYPT);}
+\DoxyCodeLine{00307\ }
+\DoxyCodeLine{00308\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00309\ }
+\DoxyCodeLine{00310\ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00311\ \}}
+
+\end{DoxyCode}
+\Hypertarget{aes_8h_a520eb8095b50d1fb16efb914d00d3200}\index{aes.h@{aes.h}!aes\_cbc\_encrypt@{aes\_cbc\_encrypt}}
+\index{aes\_cbc\_encrypt@{aes\_cbc\_encrypt}!aes.h@{aes.h}}
+\doxysubsubsection{\texorpdfstring{aes\_cbc\_encrypt()}{aes\_cbc\_encrypt()}}
+{\footnotesize\ttfamily \label{aes_8h_a520eb8095b50d1fb16efb914d00d3200} 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{aes_8h_a3f74f478154eb204fc614b5e9fcde0d1}{YH\+\_\+\+INTERNAL}} aes\+\_\+cbc\+\_\+encrypt (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{in}{, }\item[{\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{out}{, }\item[{\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}}}]{len}{, }\item[{\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{iv}{, }\item[{\mbox{\hyperlink{structaes__context}{aes\+\_\+context}} \texorpdfstring{$\ast$}{*}}]{ctx}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{aes_8c_source_l00271}{271}} of file \mbox{\hyperlink{aes_8c_source}{aes.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00272\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00273\ \textcolor{preprocessor}{\#ifdef\ \_WIN32\_BCRYPT}}
+\DoxyCodeLine{00274\ \ \ NTSTATUS\ status\ =\ STATUS\_SUCCESS;}
+\DoxyCodeLine{00275\ \ \ ULONG\ cbResult\ =\ 0;}
+\DoxyCodeLine{00276\ }
+\DoxyCodeLine{00277\ \ \ \textcolor{keywordflow}{if}\ (!BCRYPT\_SUCCESS(status\ =\ BCryptEncrypt(ctx-\/>hKeyCBC,\ in,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ NULL,\ iv,}
+\DoxyCodeLine{00278\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{aes_8h_af19ab913a847ad1e91c5291215116de1}{AES\_BLOCK\_SIZE}},\ out,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},}
+\DoxyCodeLine{00279\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&cbResult,\ 0)))\ \{}
+\DoxyCodeLine{00280\ \ \ \ \ \textcolor{keywordflow}{return}\ -\/1;}
+\DoxyCodeLine{00281\ \ \ \}}
+\DoxyCodeLine{00282\ }
+\DoxyCodeLine{00283\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00284\ }
+\DoxyCodeLine{00285\ \ \ AES\_cbc\_encrypt(in,\ out,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ \&ctx-\/>\mbox{\hyperlink{structaes__context_a65be0b7f58c31b98e61e222ccbda1bec}{key}},\ iv,\ AES\_ENCRYPT);}
+\DoxyCodeLine{00286\ }
+\DoxyCodeLine{00287\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00288\ }
+\DoxyCodeLine{00289\ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00290\ \}}
+
+\end{DoxyCode}
+\Hypertarget{aes_8h_ad32efa4d3f7b5e966270857f0a92a6b3}\index{aes.h@{aes.h}!aes\_decrypt@{aes\_decrypt}}
+\index{aes\_decrypt@{aes\_decrypt}!aes.h@{aes.h}}
+\doxysubsubsection{\texorpdfstring{aes\_decrypt()}{aes\_decrypt()}}
+{\footnotesize\ttfamily \label{aes_8h_ad32efa4d3f7b5e966270857f0a92a6b3} 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{aes_8h_a3f74f478154eb204fc614b5e9fcde0d1}{YH\+\_\+\+INTERNAL}} aes\+\_\+decrypt (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{in}{, }\item[{\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{out}{, }\item[{const \mbox{\hyperlink{structaes__context}{aes\+\_\+context}} \texorpdfstring{$\ast$}{*}}]{ctx}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{aes_8c_source_l00249}{249}} of file \mbox{\hyperlink{aes_8c_source}{aes.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00249\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00250\ \textcolor{preprocessor}{\#ifdef\ \_WIN32\_BCRYPT}}
+\DoxyCodeLine{00251\ \ \ NTSTATUS\ status\ =\ STATUS\_SUCCESS;}
+\DoxyCodeLine{00252\ \ \ ULONG\ cbResult\ =\ 0;}
+\DoxyCodeLine{00253\ }
+\DoxyCodeLine{00254\ \ \ \textcolor{keywordflow}{if}\ (!BCRYPT\_SUCCESS(status\ =\ BCryptDecrypt(ctx-\/>hKeyECB,\ in,\ \mbox{\hyperlink{aes_8h_af19ab913a847ad1e91c5291215116de1}{AES\_BLOCK\_SIZE}},}
+\DoxyCodeLine{00255\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ NULL,\ NULL,\ 0,\ out,\ \mbox{\hyperlink{aes_8h_af19ab913a847ad1e91c5291215116de1}{AES\_BLOCK\_SIZE}},}
+\DoxyCodeLine{00256\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&cbResult,\ 0)))\ \{}
+\DoxyCodeLine{00257\ \ \ \ \ \textcolor{keywordflow}{return}\ -\/1;}
+\DoxyCodeLine{00258\ \ \ \}}
+\DoxyCodeLine{00259\ }
+\DoxyCodeLine{00260\ \ \ assert(cbResult\ ==\ \mbox{\hyperlink{aes_8h_af19ab913a847ad1e91c5291215116de1}{AES\_BLOCK\_SIZE}});}
+\DoxyCodeLine{00261\ }
+\DoxyCodeLine{00262\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00263\ }
+\DoxyCodeLine{00264\ \ \ AES\_ecb\_encrypt(in,\ out,\ \&ctx-\/>\mbox{\hyperlink{structaes__context_a65be0b7f58c31b98e61e222ccbda1bec}{key}},\ AES\_DECRYPT);}
+\DoxyCodeLine{00265\ }
+\DoxyCodeLine{00266\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00267\ }
+\DoxyCodeLine{00268\ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00269\ \}}
+
+\end{DoxyCode}
+\Hypertarget{aes_8h_aac58f46d264dd75e26adb8b9dab1341e}\index{aes.h@{aes.h}!aes\_destroy@{aes\_destroy}}
+\index{aes\_destroy@{aes\_destroy}!aes.h@{aes.h}}
+\doxysubsubsection{\texorpdfstring{aes\_destroy()}{aes\_destroy()}}
+{\footnotesize\ttfamily \label{aes_8h_aac58f46d264dd75e26adb8b9dab1341e} 
+void \mbox{\hyperlink{aes_8h_a3f74f478154eb204fc614b5e9fcde0d1}{YH\+\_\+\+INTERNAL}} aes\+\_\+destroy (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structaes__context}{aes\+\_\+context}} \texorpdfstring{$\ast$}{*}}]{ctx}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{aes_8c_source_l00330}{330}} of file \mbox{\hyperlink{aes_8c_source}{aes.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00330\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00331\ \ \ \textcolor{keywordflow}{if}\ (!ctx)\ \{}
+\DoxyCodeLine{00332\ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00333\ \ \ \}}
+\DoxyCodeLine{00334\ }
+\DoxyCodeLine{00335\ \textcolor{preprocessor}{\#ifdef\ \_WIN32\_BCRYPT}}
+\DoxyCodeLine{00336\ }
+\DoxyCodeLine{00337\ \ \ \textcolor{keywordflow}{if}\ (ctx-\/>hKeyCBC)\ \{}
+\DoxyCodeLine{00338\ \ \ \ \ BCryptDestroyKey(ctx-\/>hKeyCBC);}
+\DoxyCodeLine{00339\ \ \ \}}
+\DoxyCodeLine{00340\ \ \ \textcolor{keywordflow}{if}\ (ctx-\/>pbKeyCBCObj)\ \{}
+\DoxyCodeLine{00341\ \ \ \ \ free(ctx-\/>pbKeyCBCObj);}
+\DoxyCodeLine{00342\ \ \ \}}
+\DoxyCodeLine{00343\ \ \ \textcolor{keywordflow}{if}\ (ctx-\/>hKeyECB)\ \{}
+\DoxyCodeLine{00344\ \ \ \ \ BCryptDestroyKey(ctx-\/>hKeyECB);}
+\DoxyCodeLine{00345\ \ \ \}}
+\DoxyCodeLine{00346\ \ \ \textcolor{keywordflow}{if}\ (ctx-\/>pbKeyECBObj)\ \{}
+\DoxyCodeLine{00347\ \ \ \ \ free(ctx-\/>pbKeyECBObj);}
+\DoxyCodeLine{00348\ \ \ \}}
+\DoxyCodeLine{00349\ \ \ \textcolor{keywordflow}{if}\ (ctx-\/>hAlgCBC)\ \{}
+\DoxyCodeLine{00350\ \ \ \ \ BCryptCloseAlgorithmProvider(ctx-\/>hAlgCBC,\ 0);}
+\DoxyCodeLine{00351\ \ \ \}}
+\DoxyCodeLine{00352\ \ \ \textcolor{keywordflow}{if}\ (ctx-\/>hAlgECB)\ \{}
+\DoxyCodeLine{00353\ \ \ \ \ BCryptCloseAlgorithmProvider(ctx-\/>hAlgECB,\ 0);}
+\DoxyCodeLine{00354\ \ \ \}}
+\DoxyCodeLine{00355\ }
+\DoxyCodeLine{00356\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00357\ }
+\DoxyCodeLine{00358\ \ \ \mbox{\hyperlink{insecure__memzero_8h_a0794f9275fd1036ecba6ff0a901a320b}{insecure\_memzero}}(ctx,\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{structaes__context}{aes\_context}}));}
+\DoxyCodeLine{00359\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=284pt]{aes_8h_aac58f46d264dd75e26adb8b9dab1341e_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{aes_8h_a896d5fb8c7b2e361d7435195bf87b27e}\index{aes.h@{aes.h}!aes\_encrypt@{aes\_encrypt}}
+\index{aes\_encrypt@{aes\_encrypt}!aes.h@{aes.h}}
+\doxysubsubsection{\texorpdfstring{aes\_encrypt()}{aes\_encrypt()}}
+{\footnotesize\ttfamily \label{aes_8h_a896d5fb8c7b2e361d7435195bf87b27e} 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{aes_8h_a3f74f478154eb204fc614b5e9fcde0d1}{YH\+\_\+\+INTERNAL}} aes\+\_\+encrypt (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{in}{, }\item[{\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{out}{, }\item[{const \mbox{\hyperlink{structaes__context}{aes\+\_\+context}} \texorpdfstring{$\ast$}{*}}]{ctx}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{aes_8c_source_l00229}{229}} of file \mbox{\hyperlink{aes_8c_source}{aes.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00229\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00230\ \textcolor{preprocessor}{\#ifdef\ \_WIN32\_BCRYPT}}
+\DoxyCodeLine{00231\ \ \ NTSTATUS\ status\ =\ STATUS\_SUCCESS;}
+\DoxyCodeLine{00232\ \ \ ULONG\ cbResult\ =\ 0;}
+\DoxyCodeLine{00233\ }
+\DoxyCodeLine{00234\ \ \ \textcolor{keywordflow}{if}\ (!BCRYPT\_SUCCESS(status\ =\ BCryptEncrypt(ctx-\/>hKeyECB,\ in,\ \mbox{\hyperlink{aes_8h_af19ab913a847ad1e91c5291215116de1}{AES\_BLOCK\_SIZE}},}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ NULL,\ NULL,\ 0,\ out,\ \mbox{\hyperlink{aes_8h_af19ab913a847ad1e91c5291215116de1}{AES\_BLOCK\_SIZE}},}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&cbResult,\ 0)))\ \{}
+\DoxyCodeLine{00237\ \ \ \ \ \textcolor{keywordflow}{return}\ -\/2;}
+\DoxyCodeLine{00238\ \ \ \}}
+\DoxyCodeLine{00239\ }
+\DoxyCodeLine{00240\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00241\ }
+\DoxyCodeLine{00242\ \ \ AES\_ecb\_encrypt(in,\ out,\ \&ctx-\/>\mbox{\hyperlink{structaes__context_a65be0b7f58c31b98e61e222ccbda1bec}{key}},\ AES\_ENCRYPT);}
+\DoxyCodeLine{00243\ }
+\DoxyCodeLine{00244\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00245\ }
+\DoxyCodeLine{00246\ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00247\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{aes_8h_a896d5fb8c7b2e361d7435195bf87b27e_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{aes_8h_a1c057fac86939e57491b2f993b006643}\index{aes.h@{aes.h}!aes\_remove\_padding@{aes\_remove\_padding}}
+\index{aes\_remove\_padding@{aes\_remove\_padding}!aes.h@{aes.h}}
+\doxysubsubsection{\texorpdfstring{aes\_remove\_padding()}{aes\_remove\_padding()}}
+{\footnotesize\ttfamily \label{aes_8h_a1c057fac86939e57491b2f993b006643} 
+void \mbox{\hyperlink{aes_8h_a3f74f478154eb204fc614b5e9fcde0d1}{YH\+\_\+\+INTERNAL}} aes\+\_\+remove\+\_\+padding (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{in}{, }\item[{\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{len}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{aes_8c_source_l00321}{321}} of file \mbox{\hyperlink{aes_8c_source}{aes.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00321\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00322\ }
+\DoxyCodeLine{00323\ \ \ \textcolor{keywordflow}{while}\ (in[(*\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})\ -\/\ 1]\ ==\ 0)\ \{}
+\DoxyCodeLine{00324\ \ \ \ \ (*len)-\/-\/;}
+\DoxyCodeLine{00325\ \ \ \}}
+\DoxyCodeLine{00326\ }
+\DoxyCodeLine{00327\ \ \ (*len)-\/-\/;}
+\DoxyCodeLine{00328\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=261pt]{aes_8h_a1c057fac86939e57491b2f993b006643_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{aes_8h_a34a7c10876bc5d5570216dc0f27f464b}\index{aes.h@{aes.h}!aes\_set\_decrypt\_key@{aes\_set\_decrypt\_key}}
+\index{aes\_set\_decrypt\_key@{aes\_set\_decrypt\_key}!aes.h@{aes.h}}
+\doxysubsubsection{\texorpdfstring{aes\_set\_decrypt\_key()}{aes\_set\_decrypt\_key()}}
+{\footnotesize\ttfamily \label{aes_8h_a34a7c10876bc5d5570216dc0f27f464b} 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{aes_8h_a3f74f478154eb204fc614b5e9fcde0d1}{YH\+\_\+\+INTERNAL}} aes\+\_\+set\+\_\+decrypt\+\_\+key (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{key}{, }\item[{\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}}}]{key\+\_\+len}{, }\item[{\mbox{\hyperlink{structaes__context}{aes\+\_\+context}} \texorpdfstring{$\ast$}{*}}]{ctx}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{aes_8c_source_l00201}{201}} of file \mbox{\hyperlink{aes_8c_source}{aes.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00202\ \textcolor{preprocessor}{\#ifdef\ \_WIN32\_BCRYPT}}
+\DoxyCodeLine{00203\ \ \ NTSTATUS\ status\ =\ STATUS\_SUCCESS;}
+\DoxyCodeLine{00204\ }
+\DoxyCodeLine{00205\ \ \ \textcolor{keywordflow}{if}\ (!BCRYPT\_SUCCESS(status\ =\ init\_ctx(ctx)))\ \{}
+\DoxyCodeLine{00206\ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{00207\ \ \ \}}
+\DoxyCodeLine{00208\ }
+\DoxyCodeLine{00209\ \ \ \textcolor{keywordflow}{if}\ (!BCRYPT\_SUCCESS(status\ =\ import\_key(ctx-\/>hAlgCBC,\ \&(ctx-\/>hKeyCBC),}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&(ctx-\/>pbKeyCBCObj),\ ctx-\/>cbKeyObj,}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ key,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a8b142e2a51f6b9b8760f9132119673b6}{key\_len}})))\ \{}
+\DoxyCodeLine{00212\ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{00213\ \ \ \}}
+\DoxyCodeLine{00214\ }
+\DoxyCodeLine{00215\ \ \ \textcolor{keywordflow}{if}\ (!BCRYPT\_SUCCESS(status\ =\ import\_key(ctx-\/>hAlgECB,\ \&(ctx-\/>hKeyECB),}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&(ctx-\/>pbKeyECBObj),\ ctx-\/>cbKeyObj,}
+\DoxyCodeLine{00217\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ key,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a8b142e2a51f6b9b8760f9132119673b6}{key\_len}})))\ \{}
+\DoxyCodeLine{00218\ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{00219\ \ \ \}}
+\DoxyCodeLine{00220\ }
+\DoxyCodeLine{00221\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00222\ \ \ AES\_set\_decrypt\_key(key,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a8b142e2a51f6b9b8760f9132119673b6}{key\_len}}\ *\ 8,\ \&ctx-\/>\mbox{\hyperlink{structaes__context_a65be0b7f58c31b98e61e222ccbda1bec}{key}});}
+\DoxyCodeLine{00223\ \ \ ctx-\/>\mbox{\hyperlink{structaes__context_aa9720d8aff877974aea48e7f30081497}{key\_len}}\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a8b142e2a51f6b9b8760f9132119673b6}{key\_len}};}
+\DoxyCodeLine{00224\ }
+\DoxyCodeLine{00225\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00226\ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00227\ \}}
+
+\end{DoxyCode}
+\Hypertarget{aes_8h_a192f5b027034f15be8e5f660edbbc4a2}\index{aes.h@{aes.h}!aes\_set\_encrypt\_key@{aes\_set\_encrypt\_key}}
+\index{aes\_set\_encrypt\_key@{aes\_set\_encrypt\_key}!aes.h@{aes.h}}
+\doxysubsubsection{\texorpdfstring{aes\_set\_encrypt\_key()}{aes\_set\_encrypt\_key()}}
+{\footnotesize\ttfamily \label{aes_8h_a192f5b027034f15be8e5f660edbbc4a2} 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{aes_8h_a3f74f478154eb204fc614b5e9fcde0d1}{YH\+\_\+\+INTERNAL}} aes\+\_\+set\+\_\+encrypt\+\_\+key (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{key}{, }\item[{\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}}}]{key\+\_\+len}{, }\item[{\mbox{\hyperlink{structaes__context}{aes\+\_\+context}} \texorpdfstring{$\ast$}{*}}]{ctx}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{aes_8c_source_l00172}{172}} of file \mbox{\hyperlink{aes_8c_source}{aes.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00173\ \textcolor{preprocessor}{\#ifdef\ \_WIN32\_BCRYPT}}
+\DoxyCodeLine{00174\ \ \ NTSTATUS\ status\ =\ STATUS\_SUCCESS;}
+\DoxyCodeLine{00175\ }
+\DoxyCodeLine{00176\ \ \ \textcolor{keywordflow}{if}\ (!BCRYPT\_SUCCESS(status\ =\ init\_ctx(ctx)))\ \{}
+\DoxyCodeLine{00177\ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{00178\ \ \ \}}
+\DoxyCodeLine{00179\ }
+\DoxyCodeLine{00180\ \ \ \textcolor{keywordflow}{if}\ (!BCRYPT\_SUCCESS(status\ =\ import\_key(ctx-\/>hAlgCBC,\ \&(ctx-\/>hKeyCBC),}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&(ctx-\/>pbKeyCBCObj),\ ctx-\/>cbKeyObj,}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ key,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a8b142e2a51f6b9b8760f9132119673b6}{key\_len}})))\ \{}
+\DoxyCodeLine{00183\ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{00184\ \ \ \}}
+\DoxyCodeLine{00185\ }
+\DoxyCodeLine{00186\ \ \ \textcolor{keywordflow}{if}\ (!BCRYPT\_SUCCESS(status\ =\ import\_key(ctx-\/>hAlgECB,\ \&(ctx-\/>hKeyECB),}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&(ctx-\/>pbKeyECBObj),\ ctx-\/>cbKeyObj,}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ key,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a8b142e2a51f6b9b8760f9132119673b6}{key\_len}})))\ \{}
+\DoxyCodeLine{00189\ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{00190\ \ \ \}}
+\DoxyCodeLine{00191\ }
+\DoxyCodeLine{00192\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00193\ \ \ AES\_set\_encrypt\_key(key,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a8b142e2a51f6b9b8760f9132119673b6}{key\_len}}\ *\ 8,\ \&ctx-\/>\mbox{\hyperlink{structaes__context_a65be0b7f58c31b98e61e222ccbda1bec}{key}});}
+\DoxyCodeLine{00194\ \ \ ctx-\/>\mbox{\hyperlink{structaes__context_aa9720d8aff877974aea48e7f30081497}{key\_len}}\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a8b142e2a51f6b9b8760f9132119673b6}{key\_len}};}
+\DoxyCodeLine{00195\ }
+\DoxyCodeLine{00196\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00197\ }
+\DoxyCodeLine{00198\ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00199\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{aes_8h_a192f5b027034f15be8e5f660edbbc4a2_icgraph}
+\end{center}
+\end{figure}

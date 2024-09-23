@@ -1,0 +1,233 @@
+\doxysection{libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/test/gtest-\/listener\+\_\+test.cc File Reference}
+\hypertarget{gtest-listener__test_8cc}{}\label{gtest-listener__test_8cc}\index{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/test/gtest-\/listener\_test.cc@{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/test/gtest-\/listener\_test.cc}}
+{\ttfamily \#include "{}gtest/gtest.\+h"{}}\newline
+{\ttfamily \#include $<$vector$>$}\newline
+Include dependency graph for gtest-\/listener\+\_\+test.cc\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{gtest-listener__test_8cc__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classtesting_1_1internal_1_1_event_recording_listener}{testing\+::internal\+::\+Event\+Recording\+Listener}}
+\item 
+class \mbox{\hyperlink{classtesting_1_1internal_1_1_environment_invocation_catcher}{testing\+::internal\+::\+Environment\+Invocation\+Catcher}}
+\item 
+class \mbox{\hyperlink{classtesting_1_1internal_1_1_listener_test}{testing\+::internal\+::\+Listener\+Test}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacetesting}{testing}}
+\item 
+namespace \mbox{\hyperlink{namespacetesting_1_1internal}{testing\+::internal}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacetesting_1_1internal_a7e113e9c70d45d89fe1703e58ff083b9}{testing\+::internal\+::\+TEST\+\_\+F}} (\mbox{\hyperlink{classtesting_1_1internal_1_1_listener_test}{Listener\+Test}}, Does\+Foo)
+\item 
+\mbox{\hyperlink{namespacetesting_1_1internal_a02cef32090020d164460dd3d9f8e2852}{testing\+::internal\+::\+TEST\+\_\+F}} (\mbox{\hyperlink{classtesting_1_1internal_1_1_listener_test}{Listener\+Test}}, Does\+Bar)
+\item 
+void \mbox{\hyperlink{gtest-listener__test_8cc_ab9d583cd17d35925ad3d12f864d57fe9}{Verify\+Results}} (const std\+::vector$<$ std\+::string $>$ \&data, const char \texorpdfstring{$\ast$}{*}const \texorpdfstring{$\ast$}{*}expected\+\_\+data, size\+\_\+t expected\+\_\+data\+\_\+size)
+\item 
+int \mbox{\hyperlink{gtest-listener__test_8cc_a3c04138a5bfe5d72780bb7e82a18e627}{main}} (int argc, char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+std\+::vector$<$ std\+::string $>$ \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{gtest-listener__test_8cc_a32a264046f3603db11e6fcdaea5fb094}{g\+\_\+events}} = NULL
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{gtest-listener__test_8cc_a3c04138a5bfe5d72780bb7e82a18e627}\index{gtest-\/listener\_test.cc@{gtest-\/listener\_test.cc}!main@{main}}
+\index{main@{main}!gtest-\/listener\_test.cc@{gtest-\/listener\_test.cc}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{gtest-listener__test_8cc_a3c04138a5bfe5d72780bb7e82a18e627} 
+int main (\begin{DoxyParamCaption}\item[{int}]{argc}{, }\item[{char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{argv}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-listener__test_8cc_source_l00201}{201}} of file \mbox{\hyperlink{gtest-listener__test_8cc_source}{gtest-\/listener\+\_\+test.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00202\ \ \ std::vector<std::string>\ events;}
+\DoxyCodeLine{00203\ \ \ \mbox{\hyperlink{gtest-listener__test_8cc_a32a264046f3603db11e6fcdaea5fb094}{g\_events}}\ =\ \&events;}
+\DoxyCodeLine{00204\ \ \ \mbox{\hyperlink{namespacetesting_afd726ae08c9bd16dc52f78c822d9946b}{InitGoogleTest}}(\&argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}});}
+\DoxyCodeLine{00205\ }
+\DoxyCodeLine{00206\ \ \ UnitTest::GetInstance()-\/>listeners().Append(}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ \textcolor{keyword}{new}\ EventRecordingListener(\textcolor{stringliteral}{"{}1st"{}}));}
+\DoxyCodeLine{00208\ \ \ UnitTest::GetInstance()-\/>listeners().Append(}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \textcolor{keyword}{new}\ EventRecordingListener(\textcolor{stringliteral}{"{}2nd"{}}));}
+\DoxyCodeLine{00210\ }
+\DoxyCodeLine{00211\ \ \ \mbox{\hyperlink{namespacetesting_a224caeebdb6586b728d204367fea1087}{AddGlobalTestEnvironment}}(\textcolor{keyword}{new}\ EnvironmentInvocationCatcher);}
+\DoxyCodeLine{00212\ }
+\DoxyCodeLine{00213\ \ \ \mbox{\hyperlink{gtest-port_8h_ab54343f0a36dc4cb0ce8a478dd7847b8}{GTEST\_CHECK\_}}(events.size()\ ==\ 0)}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}AddGlobalTestEnvironment\ should\ not\ generate\ any\ events\ itself."{}};}
+\DoxyCodeLine{00215\ }
+\DoxyCodeLine{00216\ \ \ ::testing::GTEST\_FLAG(repeat)\ =\ 2;}
+\DoxyCodeLine{00217\ \ \ \textcolor{keywordtype}{int}\ ret\_val\ =\ \mbox{\hyperlink{gtest_8h_a853a3792807489591d3d4a2f2ff9359f}{RUN\_ALL\_TESTS}}();}
+\DoxyCodeLine{00218\ }
+\DoxyCodeLine{00219\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \textcolor{keyword}{const}\ expected\_events[]\ =\ \{}
+\DoxyCodeLine{00220\ \ \ \ \ \textcolor{stringliteral}{"{}1st.OnTestProgramStart"{}},}
+\DoxyCodeLine{00221\ \ \ \ \ \textcolor{stringliteral}{"{}2nd.OnTestProgramStart"{}},}
+\DoxyCodeLine{00222\ \ \ \ \ \textcolor{stringliteral}{"{}1st.OnTestIterationStart(0)"{}},}
+\DoxyCodeLine{00223\ \ \ \ \ \textcolor{stringliteral}{"{}2nd.OnTestIterationStart(0)"{}},}
+\DoxyCodeLine{00224\ \ \ \ \ \textcolor{stringliteral}{"{}1st.OnEnvironmentsSetUpStart"{}},}
+\DoxyCodeLine{00225\ \ \ \ \ \textcolor{stringliteral}{"{}2nd.OnEnvironmentsSetUpStart"{}},}
+\DoxyCodeLine{00226\ \ \ \ \ \textcolor{stringliteral}{"{}Environment::SetUp"{}},}
+\DoxyCodeLine{00227\ \ \ \ \ \textcolor{stringliteral}{"{}2nd.OnEnvironmentsSetUpEnd"{}},}
+\DoxyCodeLine{00228\ \ \ \ \ \textcolor{stringliteral}{"{}1st.OnEnvironmentsSetUpEnd"{}},}
+\DoxyCodeLine{00229\ \ \ \ \ \textcolor{stringliteral}{"{}1st.OnTestCaseStart"{}},}
+\DoxyCodeLine{00230\ \ \ \ \ \textcolor{stringliteral}{"{}2nd.OnTestCaseStart"{}},}
+\DoxyCodeLine{00231\ \ \ \ \ \textcolor{stringliteral}{"{}ListenerTest::SetUpTestCase"{}},}
+\DoxyCodeLine{00232\ \ \ \ \ \textcolor{stringliteral}{"{}1st.OnTestStart"{}},}
+\DoxyCodeLine{00233\ \ \ \ \ \textcolor{stringliteral}{"{}2nd.OnTestStart"{}},}
+\DoxyCodeLine{00234\ \ \ \ \ \textcolor{stringliteral}{"{}ListenerTest::SetUp"{}},}
+\DoxyCodeLine{00235\ \ \ \ \ \textcolor{stringliteral}{"{}ListenerTest::*\ Test\ Body"{}},}
+\DoxyCodeLine{00236\ \ \ \ \ \textcolor{stringliteral}{"{}1st.OnTestPartResult"{}},}
+\DoxyCodeLine{00237\ \ \ \ \ \textcolor{stringliteral}{"{}2nd.OnTestPartResult"{}},}
+\DoxyCodeLine{00238\ \ \ \ \ \textcolor{stringliteral}{"{}ListenerTest::TearDown"{}},}
+\DoxyCodeLine{00239\ \ \ \ \ \textcolor{stringliteral}{"{}2nd.OnTestEnd"{}},}
+\DoxyCodeLine{00240\ \ \ \ \ \textcolor{stringliteral}{"{}1st.OnTestEnd"{}},}
+\DoxyCodeLine{00241\ \ \ \ \ \textcolor{stringliteral}{"{}1st.OnTestStart"{}},}
+\DoxyCodeLine{00242\ \ \ \ \ \textcolor{stringliteral}{"{}2nd.OnTestStart"{}},}
+\DoxyCodeLine{00243\ \ \ \ \ \textcolor{stringliteral}{"{}ListenerTest::SetUp"{}},}
+\DoxyCodeLine{00244\ \ \ \ \ \textcolor{stringliteral}{"{}ListenerTest::*\ Test\ Body"{}},}
+\DoxyCodeLine{00245\ \ \ \ \ \textcolor{stringliteral}{"{}1st.OnTestPartResult"{}},}
+\DoxyCodeLine{00246\ \ \ \ \ \textcolor{stringliteral}{"{}2nd.OnTestPartResult"{}},}
+\DoxyCodeLine{00247\ \ \ \ \ \textcolor{stringliteral}{"{}ListenerTest::TearDown"{}},}
+\DoxyCodeLine{00248\ \ \ \ \ \textcolor{stringliteral}{"{}2nd.OnTestEnd"{}},}
+\DoxyCodeLine{00249\ \ \ \ \ \textcolor{stringliteral}{"{}1st.OnTestEnd"{}},}
+\DoxyCodeLine{00250\ \ \ \ \ \textcolor{stringliteral}{"{}ListenerTest::TearDownTestCase"{}},}
+\DoxyCodeLine{00251\ \ \ \ \ \textcolor{stringliteral}{"{}2nd.OnTestCaseEnd"{}},}
+\DoxyCodeLine{00252\ \ \ \ \ \textcolor{stringliteral}{"{}1st.OnTestCaseEnd"{}},}
+\DoxyCodeLine{00253\ \ \ \ \ \textcolor{stringliteral}{"{}1st.OnEnvironmentsTearDownStart"{}},}
+\DoxyCodeLine{00254\ \ \ \ \ \textcolor{stringliteral}{"{}2nd.OnEnvironmentsTearDownStart"{}},}
+\DoxyCodeLine{00255\ \ \ \ \ \textcolor{stringliteral}{"{}Environment::TearDown"{}},}
+\DoxyCodeLine{00256\ \ \ \ \ \textcolor{stringliteral}{"{}2nd.OnEnvironmentsTearDownEnd"{}},}
+\DoxyCodeLine{00257\ \ \ \ \ \textcolor{stringliteral}{"{}1st.OnEnvironmentsTearDownEnd"{}},}
+\DoxyCodeLine{00258\ \ \ \ \ \textcolor{stringliteral}{"{}2nd.OnTestIterationEnd(0)"{}},}
+\DoxyCodeLine{00259\ \ \ \ \ \textcolor{stringliteral}{"{}1st.OnTestIterationEnd(0)"{}},}
+\DoxyCodeLine{00260\ \ \ \ \ \textcolor{stringliteral}{"{}1st.OnTestIterationStart(1)"{}},}
+\DoxyCodeLine{00261\ \ \ \ \ \textcolor{stringliteral}{"{}2nd.OnTestIterationStart(1)"{}},}
+\DoxyCodeLine{00262\ \ \ \ \ \textcolor{stringliteral}{"{}1st.OnEnvironmentsSetUpStart"{}},}
+\DoxyCodeLine{00263\ \ \ \ \ \textcolor{stringliteral}{"{}2nd.OnEnvironmentsSetUpStart"{}},}
+\DoxyCodeLine{00264\ \ \ \ \ \textcolor{stringliteral}{"{}Environment::SetUp"{}},}
+\DoxyCodeLine{00265\ \ \ \ \ \textcolor{stringliteral}{"{}2nd.OnEnvironmentsSetUpEnd"{}},}
+\DoxyCodeLine{00266\ \ \ \ \ \textcolor{stringliteral}{"{}1st.OnEnvironmentsSetUpEnd"{}},}
+\DoxyCodeLine{00267\ \ \ \ \ \textcolor{stringliteral}{"{}1st.OnTestCaseStart"{}},}
+\DoxyCodeLine{00268\ \ \ \ \ \textcolor{stringliteral}{"{}2nd.OnTestCaseStart"{}},}
+\DoxyCodeLine{00269\ \ \ \ \ \textcolor{stringliteral}{"{}ListenerTest::SetUpTestCase"{}},}
+\DoxyCodeLine{00270\ \ \ \ \ \textcolor{stringliteral}{"{}1st.OnTestStart"{}},}
+\DoxyCodeLine{00271\ \ \ \ \ \textcolor{stringliteral}{"{}2nd.OnTestStart"{}},}
+\DoxyCodeLine{00272\ \ \ \ \ \textcolor{stringliteral}{"{}ListenerTest::SetUp"{}},}
+\DoxyCodeLine{00273\ \ \ \ \ \textcolor{stringliteral}{"{}ListenerTest::*\ Test\ Body"{}},}
+\DoxyCodeLine{00274\ \ \ \ \ \textcolor{stringliteral}{"{}1st.OnTestPartResult"{}},}
+\DoxyCodeLine{00275\ \ \ \ \ \textcolor{stringliteral}{"{}2nd.OnTestPartResult"{}},}
+\DoxyCodeLine{00276\ \ \ \ \ \textcolor{stringliteral}{"{}ListenerTest::TearDown"{}},}
+\DoxyCodeLine{00277\ \ \ \ \ \textcolor{stringliteral}{"{}2nd.OnTestEnd"{}},}
+\DoxyCodeLine{00278\ \ \ \ \ \textcolor{stringliteral}{"{}1st.OnTestEnd"{}},}
+\DoxyCodeLine{00279\ \ \ \ \ \textcolor{stringliteral}{"{}1st.OnTestStart"{}},}
+\DoxyCodeLine{00280\ \ \ \ \ \textcolor{stringliteral}{"{}2nd.OnTestStart"{}},}
+\DoxyCodeLine{00281\ \ \ \ \ \textcolor{stringliteral}{"{}ListenerTest::SetUp"{}},}
+\DoxyCodeLine{00282\ \ \ \ \ \textcolor{stringliteral}{"{}ListenerTest::*\ Test\ Body"{}},}
+\DoxyCodeLine{00283\ \ \ \ \ \textcolor{stringliteral}{"{}1st.OnTestPartResult"{}},}
+\DoxyCodeLine{00284\ \ \ \ \ \textcolor{stringliteral}{"{}2nd.OnTestPartResult"{}},}
+\DoxyCodeLine{00285\ \ \ \ \ \textcolor{stringliteral}{"{}ListenerTest::TearDown"{}},}
+\DoxyCodeLine{00286\ \ \ \ \ \textcolor{stringliteral}{"{}2nd.OnTestEnd"{}},}
+\DoxyCodeLine{00287\ \ \ \ \ \textcolor{stringliteral}{"{}1st.OnTestEnd"{}},}
+\DoxyCodeLine{00288\ \ \ \ \ \textcolor{stringliteral}{"{}ListenerTest::TearDownTestCase"{}},}
+\DoxyCodeLine{00289\ \ \ \ \ \textcolor{stringliteral}{"{}2nd.OnTestCaseEnd"{}},}
+\DoxyCodeLine{00290\ \ \ \ \ \textcolor{stringliteral}{"{}1st.OnTestCaseEnd"{}},}
+\DoxyCodeLine{00291\ \ \ \ \ \textcolor{stringliteral}{"{}1st.OnEnvironmentsTearDownStart"{}},}
+\DoxyCodeLine{00292\ \ \ \ \ \textcolor{stringliteral}{"{}2nd.OnEnvironmentsTearDownStart"{}},}
+\DoxyCodeLine{00293\ \ \ \ \ \textcolor{stringliteral}{"{}Environment::TearDown"{}},}
+\DoxyCodeLine{00294\ \ \ \ \ \textcolor{stringliteral}{"{}2nd.OnEnvironmentsTearDownEnd"{}},}
+\DoxyCodeLine{00295\ \ \ \ \ \textcolor{stringliteral}{"{}1st.OnEnvironmentsTearDownEnd"{}},}
+\DoxyCodeLine{00296\ \ \ \ \ \textcolor{stringliteral}{"{}2nd.OnTestIterationEnd(1)"{}},}
+\DoxyCodeLine{00297\ \ \ \ \ \textcolor{stringliteral}{"{}1st.OnTestIterationEnd(1)"{}},}
+\DoxyCodeLine{00298\ \ \ \ \ \textcolor{stringliteral}{"{}2nd.OnTestProgramEnd"{}},}
+\DoxyCodeLine{00299\ \ \ \ \ \textcolor{stringliteral}{"{}1st.OnTestProgramEnd"{}}}
+\DoxyCodeLine{00300\ \ \ \};}
+\DoxyCodeLine{00301\ \ \ \mbox{\hyperlink{gtest-listener__test_8cc_ab9d583cd17d35925ad3d12f864d57fe9}{VerifyResults}}(events,}
+\DoxyCodeLine{00302\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ expected\_events,}
+\DoxyCodeLine{00303\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{sizeof}(expected\_events)/\textcolor{keyword}{sizeof}(expected\_events[0]));}
+\DoxyCodeLine{00304\ }
+\DoxyCodeLine{00305\ \ \ \textcolor{comment}{//\ We\ need\ to\ check\ manually\ for\ ad\ hoc\ test\ failures\ that\ happen\ after}}
+\DoxyCodeLine{00306\ \ \ \textcolor{comment}{//\ RUN\_ALL\_TESTS\ finishes.}}
+\DoxyCodeLine{00307\ \ \ \textcolor{keywordflow}{if}\ (UnitTest::GetInstance()-\/>Failed())}
+\DoxyCodeLine{00308\ \ \ \ \ ret\_val\ =\ 1;}
+\DoxyCodeLine{00309\ }
+\DoxyCodeLine{00310\ \ \ \textcolor{keywordflow}{return}\ ret\_val;}
+\DoxyCodeLine{00311\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=252pt]{gtest-listener__test_8cc_a3c04138a5bfe5d72780bb7e82a18e627_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{gtest-listener__test_8cc_ab9d583cd17d35925ad3d12f864d57fe9}\index{gtest-\/listener\_test.cc@{gtest-\/listener\_test.cc}!VerifyResults@{VerifyResults}}
+\index{VerifyResults@{VerifyResults}!gtest-\/listener\_test.cc@{gtest-\/listener\_test.cc}}
+\doxysubsubsection{\texorpdfstring{VerifyResults()}{VerifyResults()}}
+{\footnotesize\ttfamily \label{gtest-listener__test_8cc_ab9d583cd17d35925ad3d12f864d57fe9} 
+void Verify\+Results (\begin{DoxyParamCaption}\item[{const std\+::vector$<$ std\+::string $>$ \&}]{data}{, }\item[{const char \texorpdfstring{$\ast$}{*}const \texorpdfstring{$\ast$}{*}}]{expected\+\_\+data}{, }\item[{size\+\_\+t}]{expected\+\_\+data\+\_\+size}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-listener__test_8cc_source_l00177}{177}} of file \mbox{\hyperlink{gtest-listener__test_8cc_source}{gtest-\/listener\+\_\+test.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00180\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ actual\_size\ =\ data.size();}
+\DoxyCodeLine{00181\ \ \ \textcolor{comment}{//\ If\ the\ following\ assertion\ fails,\ a\ new\ entry\ will\ be\ appended\ to}}
+\DoxyCodeLine{00182\ \ \ \textcolor{comment}{//\ data.\ \ Hence\ we\ save\ data.size()\ first.}}
+\DoxyCodeLine{00183\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(expected\_data\_size,\ actual\_size);}
+\DoxyCodeLine{00184\ }
+\DoxyCodeLine{00185\ \ \ \textcolor{comment}{//\ Compares\ the\ common\ prefix.}}
+\DoxyCodeLine{00186\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ shorter\_size\ =\ expected\_data\_size\ <=\ actual\_size\ ?}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ expected\_data\_size\ :\ actual\_size;}
+\DoxyCodeLine{00188\ \ \ \textcolor{keywordtype}{size\_t}\ i\ =\ 0;}
+\DoxyCodeLine{00189\ \ \ \textcolor{keywordflow}{for}\ (;\ i\ <\ shorter\_size;\ ++i)\ \{}
+\DoxyCodeLine{00190\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a74f4189ea570bab9a65d47104659ef9c}{ASSERT\_STREQ}}(expected\_data[i],\ data[i].c\_str())}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}at\ position\ "{}}\ <<\ i;}
+\DoxyCodeLine{00192\ \ \ \}}
+\DoxyCodeLine{00193\ }
+\DoxyCodeLine{00194\ \ \ \textcolor{comment}{//\ Prints\ extra\ elements\ in\ the\ actual\ data.}}
+\DoxyCodeLine{00195\ \ \ \textcolor{keywordflow}{for}\ (;\ i\ <\ actual\_size;\ ++i)\ \{}
+\DoxyCodeLine{00196\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\ \ Actual\ event\ \#\%lu:\ \%s\(\backslash\)n"{}},}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\textcolor{keyword}{>}(i),\ data[i].c\_str());}
+\DoxyCodeLine{00198\ \ \ \}}
+\DoxyCodeLine{00199\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=228pt]{gtest-listener__test_8cc_ab9d583cd17d35925ad3d12f864d57fe9_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{gtest-listener__test_8cc_a32a264046f3603db11e6fcdaea5fb094}\index{gtest-\/listener\_test.cc@{gtest-\/listener\_test.cc}!g\_events@{g\_events}}
+\index{g\_events@{g\_events}!gtest-\/listener\_test.cc@{gtest-\/listener\_test.cc}}
+\doxysubsubsection{\texorpdfstring{g\_events}{g\_events}}
+{\footnotesize\ttfamily \label{gtest-listener__test_8cc_a32a264046f3603db11e6fcdaea5fb094} 
+std\+::vector$<$std\+::string$>$\texorpdfstring{$\ast$}{*} g\+\_\+events = NULL}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-listener__test_8cc_source_l00050}{50}} of file \mbox{\hyperlink{gtest-listener__test_8cc_source}{gtest-\/listener\+\_\+test.\+cc}}.
+

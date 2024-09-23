@@ -1,0 +1,296 @@
+\doxysection{websocketpp\+::md5 Namespace Reference}
+\hypertarget{namespacewebsocketpp_1_1md5}{}\label{namespacewebsocketpp_1_1md5}\index{websocketpp::md5@{websocketpp::md5}}
+
+
+Provides MD5 hashing functionality.  
+
+
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structwebsocketpp_1_1md5_1_1md5__state__s}{md5\+\_\+state\+\_\+s}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef unsigned char \mbox{\hyperlink{namespacewebsocketpp_1_1md5_a0c434041715d244182207c3413e36e71}{md5\+\_\+byte\+\_\+t}}
+\item 
+typedef unsigned int \mbox{\hyperlink{namespacewebsocketpp_1_1md5_a0ece422ac11bb1332dcf342ced42ac96}{md5\+\_\+word\+\_\+t}}
+\item 
+typedef struct \mbox{\hyperlink{structwebsocketpp_1_1md5_1_1md5__state__s}{websocketpp\+::md5\+::md5\+\_\+state\+\_\+s}} \mbox{\hyperlink{namespacewebsocketpp_1_1md5_acf01aa8d102c0a4d24c2a798cc7490c2}{md5\+\_\+state\+\_\+t}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{namespacewebsocketpp_1_1md5_a73499ae9912f813cdbb98d27b6487112}{md5\+\_\+init}} (\mbox{\hyperlink{namespacewebsocketpp_1_1md5_acf01aa8d102c0a4d24c2a798cc7490c2}{md5\+\_\+state\+\_\+t}} \texorpdfstring{$\ast$}{*}pms)
+\item 
+void \mbox{\hyperlink{namespacewebsocketpp_1_1md5_afd827a71255e45a8293b9df13342ceb3}{md5\+\_\+append}} (\mbox{\hyperlink{namespacewebsocketpp_1_1md5_acf01aa8d102c0a4d24c2a798cc7490c2}{md5\+\_\+state\+\_\+t}} \texorpdfstring{$\ast$}{*}pms, \mbox{\hyperlink{namespacewebsocketpp_1_1md5_a0c434041715d244182207c3413e36e71}{md5\+\_\+byte\+\_\+t}} const \texorpdfstring{$\ast$}{*}data, size\+\_\+t nbytes)
+\item 
+void \mbox{\hyperlink{namespacewebsocketpp_1_1md5_a29e7adb892ae2de7d2c4853bc7ace034}{md5\+\_\+finish}} (\mbox{\hyperlink{namespacewebsocketpp_1_1md5_acf01aa8d102c0a4d24c2a798cc7490c2}{md5\+\_\+state\+\_\+t}} \texorpdfstring{$\ast$}{*}pms, \mbox{\hyperlink{namespacewebsocketpp_1_1md5_a0c434041715d244182207c3413e36e71}{md5\+\_\+byte\+\_\+t}} digest\mbox{[}16\mbox{]})
+\item 
+std\+::string \mbox{\hyperlink{namespacewebsocketpp_1_1md5_ab445cdc2367665afb8fd4e983a354e0f}{md5\+\_\+hash\+\_\+string}} (std\+::string const \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\item 
+std\+::string \mbox{\hyperlink{namespacewebsocketpp_1_1md5_a9fbd05134b509739ff15175fe7104443}{md5\+\_\+hash\+\_\+hex}} (std\+::string const \&input)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+const char \mbox{\hyperlink{namespacewebsocketpp_1_1md5_a6c9cff96cd43c87cb0fc47f7d641dac8}{hexval}} \mbox{[}16\mbox{]} = \{\textquotesingle{}0\textquotesingle{}, \textquotesingle{}1\textquotesingle{}, \textquotesingle{}2\textquotesingle{}, \textquotesingle{}3\textquotesingle{}, \textquotesingle{}4\textquotesingle{}, \textquotesingle{}5\textquotesingle{}, \textquotesingle{}6\textquotesingle{}, \textquotesingle{}7\textquotesingle{}, \textquotesingle{}8\textquotesingle{}, \textquotesingle{}9\textquotesingle{}, \textquotesingle{}\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\textquotesingle{}, \textquotesingle{}b\textquotesingle{}, \textquotesingle{}c\textquotesingle{}, \textquotesingle{}d\textquotesingle{}, \textquotesingle{}e\textquotesingle{}, \textquotesingle{}\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}\textquotesingle{}\}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{namespacewebsocketpp_1_1md5_a0c434041715d244182207c3413e36e71}\index{websocketpp::md5@{websocketpp::md5}!md5\_byte\_t@{md5\_byte\_t}}
+\index{md5\_byte\_t@{md5\_byte\_t}!websocketpp::md5@{websocketpp::md5}}
+\doxysubsubsection{\texorpdfstring{md5\_byte\_t}{md5\_byte\_t}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1md5_a0c434041715d244182207c3413e36e71} 
+typedef unsigned char \mbox{\hyperlink{namespacewebsocketpp_1_1md5_a0c434041715d244182207c3413e36e71}{websocketpp\+::md5\+::md5\+\_\+byte\+\_\+t}}}
+
+
+
+Definition at line \mbox{\hyperlink{md5_8hpp_source_l00078}{78}} of file \mbox{\hyperlink{md5_8hpp_source}{md5.\+hpp}}.
+
+\Hypertarget{namespacewebsocketpp_1_1md5_acf01aa8d102c0a4d24c2a798cc7490c2}\index{websocketpp::md5@{websocketpp::md5}!md5\_state\_t@{md5\_state\_t}}
+\index{md5\_state\_t@{md5\_state\_t}!websocketpp::md5@{websocketpp::md5}}
+\doxysubsubsection{\texorpdfstring{md5\_state\_t}{md5\_state\_t}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1md5_acf01aa8d102c0a4d24c2a798cc7490c2} 
+typedef struct \mbox{\hyperlink{structwebsocketpp_1_1md5_1_1md5__state__s}{websocketpp\+::md5\+::md5\+\_\+state\+\_\+s}} \mbox{\hyperlink{namespacewebsocketpp_1_1md5_acf01aa8d102c0a4d24c2a798cc7490c2}{websocketpp\+::md5\+::md5\+\_\+state\+\_\+t}}}
+
+\Hypertarget{namespacewebsocketpp_1_1md5_a0ece422ac11bb1332dcf342ced42ac96}\index{websocketpp::md5@{websocketpp::md5}!md5\_word\_t@{md5\_word\_t}}
+\index{md5\_word\_t@{md5\_word\_t}!websocketpp::md5@{websocketpp::md5}}
+\doxysubsubsection{\texorpdfstring{md5\_word\_t}{md5\_word\_t}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1md5_a0ece422ac11bb1332dcf342ced42ac96} 
+typedef unsigned int \mbox{\hyperlink{namespacewebsocketpp_1_1md5_a0ece422ac11bb1332dcf342ced42ac96}{websocketpp\+::md5\+::md5\+\_\+word\+\_\+t}}}
+
+
+
+Definition at line \mbox{\hyperlink{md5_8hpp_source_l00079}{79}} of file \mbox{\hyperlink{md5_8hpp_source}{md5.\+hpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacewebsocketpp_1_1md5_afd827a71255e45a8293b9df13342ceb3}\index{websocketpp::md5@{websocketpp::md5}!md5\_append@{md5\_append}}
+\index{md5\_append@{md5\_append}!websocketpp::md5@{websocketpp::md5}}
+\doxysubsubsection{\texorpdfstring{md5\_append()}{md5\_append()}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1md5_afd827a71255e45a8293b9df13342ceb3} 
+void websocketpp\+::md5\+::md5\+\_\+append (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1md5_acf01aa8d102c0a4d24c2a798cc7490c2}{md5\+\_\+state\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{pms}{, }\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1md5_a0c434041715d244182207c3413e36e71}{md5\+\_\+byte\+\_\+t}} const \texorpdfstring{$\ast$}{*}}]{data}{, }\item[{size\+\_\+t}]{nbytes}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{md5_8hpp_source_l00357}{357}} of file \mbox{\hyperlink{md5_8hpp_source}{md5.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00357\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00358\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1md5_a0c434041715d244182207c3413e36e71}{md5\_byte\_t}}\ \textcolor{keyword}{const}\ *\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ data;}
+\DoxyCodeLine{00359\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ left\ =\ nbytes;}
+\DoxyCodeLine{00360\ \ \ \ \ \textcolor{keywordtype}{int}\ offset\ =\ (pms-\/>\mbox{\hyperlink{structwebsocketpp_1_1md5_1_1md5__state__s_a749f80b1f08f2e740e63a05a8821cf5c}{count}}[0]\ >>\ 3)\ \&\ 63;}
+\DoxyCodeLine{00361\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1md5_a0ece422ac11bb1332dcf342ced42ac96}{md5\_word\_t}}\ nbits\ =\ (\mbox{\hyperlink{namespacewebsocketpp_1_1md5_a0ece422ac11bb1332dcf342ced42ac96}{md5\_word\_t}})(nbytes\ <<\ 3);}
+\DoxyCodeLine{00362\ }
+\DoxyCodeLine{00363\ \ \ \ \ \textcolor{keywordflow}{if}\ (nbytes\ <=\ 0)}
+\DoxyCodeLine{00364\ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00365\ }
+\DoxyCodeLine{00366\ \ \ \ \ \textcolor{comment}{/*\ Update\ the\ message\ length.\ */}}
+\DoxyCodeLine{00367\ \ \ \ \ pms-\/>\mbox{\hyperlink{structwebsocketpp_1_1md5_1_1md5__state__s_a749f80b1f08f2e740e63a05a8821cf5c}{count}}[1]\ +=\ nbytes\ >>\ 29;}
+\DoxyCodeLine{00368\ \ \ \ \ pms-\/>\mbox{\hyperlink{structwebsocketpp_1_1md5_1_1md5__state__s_a749f80b1f08f2e740e63a05a8821cf5c}{count}}[0]\ +=\ nbits;}
+\DoxyCodeLine{00369\ \ \ \ \ \textcolor{keywordflow}{if}\ (pms-\/>\mbox{\hyperlink{structwebsocketpp_1_1md5_1_1md5__state__s_a749f80b1f08f2e740e63a05a8821cf5c}{count}}[0]\ <\ nbits)}
+\DoxyCodeLine{00370\ \ \ \ \ pms-\/>\mbox{\hyperlink{structwebsocketpp_1_1md5_1_1md5__state__s_a749f80b1f08f2e740e63a05a8821cf5c}{count}}[1]++;}
+\DoxyCodeLine{00371\ }
+\DoxyCodeLine{00372\ \ \ \ \ \textcolor{comment}{/*\ Process\ an\ initial\ partial\ block.\ */}}
+\DoxyCodeLine{00373\ \ \ \ \ \textcolor{keywordflow}{if}\ (offset)\ \{}
+\DoxyCodeLine{00374\ \ \ \ \ \textcolor{keywordtype}{int}\ copy\ =\ (offset\ +\ nbytes\ >\ 64\ ?\ 64\ -\/\ offset\ :\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(nbytes));}
+\DoxyCodeLine{00375\ }
+\DoxyCodeLine{00376\ \ \ \ \ std::memcpy(pms-\/>\mbox{\hyperlink{structwebsocketpp_1_1md5_1_1md5__state__s_a4d3bae1432efcd8e294b910ee01ef39a}{buf}}\ +\ offset,\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\ copy);}
+\DoxyCodeLine{00377\ \ \ \ \ \textcolor{keywordflow}{if}\ (offset\ +\ copy\ <\ 64)}
+\DoxyCodeLine{00378\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00379\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ +=\ copy;}
+\DoxyCodeLine{00380\ \ \ \ \ left\ -\/=\ copy;}
+\DoxyCodeLine{00381\ \ \ \ \ md5\_process(pms,\ pms-\/>\mbox{\hyperlink{structwebsocketpp_1_1md5_1_1md5__state__s_a4d3bae1432efcd8e294b910ee01ef39a}{buf}});}
+\DoxyCodeLine{00382\ \ \ \ \ \}}
+\DoxyCodeLine{00383\ }
+\DoxyCodeLine{00384\ \ \ \ \ \textcolor{comment}{/*\ Process\ full\ blocks.\ */}}
+\DoxyCodeLine{00385\ \ \ \ \ \textcolor{keywordflow}{for}\ (;\ left\ >=\ 64;\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ +=\ 64,\ left\ -\/=\ 64)}
+\DoxyCodeLine{00386\ \ \ \ \ md5\_process(pms,\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}});}
+\DoxyCodeLine{00387\ }
+\DoxyCodeLine{00388\ \ \ \ \ \textcolor{comment}{/*\ Process\ a\ final\ partial\ block.\ */}}
+\DoxyCodeLine{00389\ \ \ \ \ \textcolor{keywordflow}{if}\ (left)}
+\DoxyCodeLine{00390\ \ \ \ \ std::memcpy(pms-\/>\mbox{\hyperlink{structwebsocketpp_1_1md5_1_1md5__state__s_a4d3bae1432efcd8e294b910ee01ef39a}{buf}},\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\ left);}
+\DoxyCodeLine{00391\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacewebsocketpp_1_1md5_afd827a71255e45a8293b9df13342ceb3_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacewebsocketpp_1_1md5_a29e7adb892ae2de7d2c4853bc7ace034}\index{websocketpp::md5@{websocketpp::md5}!md5\_finish@{md5\_finish}}
+\index{md5\_finish@{md5\_finish}!websocketpp::md5@{websocketpp::md5}}
+\doxysubsubsection{\texorpdfstring{md5\_finish()}{md5\_finish()}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1md5_a29e7adb892ae2de7d2c4853bc7ace034} 
+void websocketpp\+::md5\+::md5\+\_\+finish (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1md5_acf01aa8d102c0a4d24c2a798cc7490c2}{md5\+\_\+state\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{pms}{, }\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1md5_a0c434041715d244182207c3413e36e71}{md5\+\_\+byte\+\_\+t}}}]{digest}{\mbox{[}16\mbox{]}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{md5_8hpp_source_l00393}{393}} of file \mbox{\hyperlink{md5_8hpp_source}{md5.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00393\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00394\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{namespacewebsocketpp_1_1md5_a0c434041715d244182207c3413e36e71}{md5\_byte\_t}}\ \textcolor{keyword}{const}\ pad[64]\ =\ \{}
+\DoxyCodeLine{00395\ \ \ \ \ 0x80,\ 0,\ 0,\ 0,\ 0,\ 0,\ 0,\ 0,\ 0,\ 0,\ 0,\ 0,\ 0,\ 0,\ 0,\ 0,}
+\DoxyCodeLine{00396\ \ \ \ \ 0,\ 0,\ 0,\ 0,\ 0,\ 0,\ 0,\ 0,\ 0,\ 0,\ 0,\ 0,\ 0,\ 0,\ 0,\ 0,}
+\DoxyCodeLine{00397\ \ \ \ \ 0,\ 0,\ 0,\ 0,\ 0,\ 0,\ 0,\ 0,\ 0,\ 0,\ 0,\ 0,\ 0,\ 0,\ 0,\ 0,}
+\DoxyCodeLine{00398\ \ \ \ \ 0,\ 0,\ 0,\ 0,\ 0,\ 0,\ 0,\ 0,\ 0,\ 0,\ 0,\ 0,\ 0,\ 0,\ 0,\ 0}
+\DoxyCodeLine{00399\ \ \ \ \ \};}
+\DoxyCodeLine{00400\ \ \ \ \ md5\_byte\_t\ data[8];}
+\DoxyCodeLine{00401\ \ \ \ \ \textcolor{keywordtype}{int}\ i;}
+\DoxyCodeLine{00402\ }
+\DoxyCodeLine{00403\ \ \ \ \ \textcolor{comment}{/*\ Save\ the\ length\ before\ padding.\ */}}
+\DoxyCodeLine{00404\ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ 8;\ ++i)}
+\DoxyCodeLine{00405\ \ \ \ \ data[i]\ =\ (md5\_byte\_t)(pms-\/>\mbox{\hyperlink{structwebsocketpp_1_1md5_1_1md5__state__s_a749f80b1f08f2e740e63a05a8821cf5c}{count}}[i\ >>\ 2]\ >>\ ((i\ \&\ 3)\ <<\ 3));}
+\DoxyCodeLine{00406\ \ \ \ \ \textcolor{comment}{/*\ Pad\ to\ 56\ bytes\ mod\ 64.\ */}}
+\DoxyCodeLine{00407\ \ \ \ \ md5\_append(pms,\ pad,\ ((55\ -\/\ (pms-\/>\mbox{\hyperlink{structwebsocketpp_1_1md5_1_1md5__state__s_a749f80b1f08f2e740e63a05a8821cf5c}{count}}[0]\ >>\ 3))\ \&\ 63)\ +\ 1);}
+\DoxyCodeLine{00408\ \ \ \ \ \textcolor{comment}{/*\ Append\ the\ length.\ */}}
+\DoxyCodeLine{00409\ \ \ \ \ md5\_append(pms,\ data,\ 8);}
+\DoxyCodeLine{00410\ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ 16;\ ++i)}
+\DoxyCodeLine{00411\ \ \ \ \ digest[i]\ =\ (md5\_byte\_t)(pms-\/>\mbox{\hyperlink{structwebsocketpp_1_1md5_1_1md5__state__s_a4579438de233e09db1f5994a341a3371}{abcd}}[i\ >>\ 2]\ >>\ ((i\ \&\ 3)\ <<\ 3));}
+\DoxyCodeLine{00412\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacewebsocketpp_1_1md5_a29e7adb892ae2de7d2c4853bc7ace034_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacewebsocketpp_1_1md5_a29e7adb892ae2de7d2c4853bc7ace034_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacewebsocketpp_1_1md5_a9fbd05134b509739ff15175fe7104443}\index{websocketpp::md5@{websocketpp::md5}!md5\_hash\_hex@{md5\_hash\_hex}}
+\index{md5\_hash\_hex@{md5\_hash\_hex}!websocketpp::md5@{websocketpp::md5}}
+\doxysubsubsection{\texorpdfstring{md5\_hash\_hex()}{md5\_hash\_hex()}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1md5_a9fbd05134b509739ff15175fe7104443} 
+std\+::string websocketpp\+::md5\+::md5\+\_\+hash\+\_\+hex (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{input}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{md5_8hpp_source_l00433}{433}} of file \mbox{\hyperlink{md5_8hpp_source}{md5.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00433\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00434\ \ \ \ \ std::string\ hash\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1md5_ab445cdc2367665afb8fd4e983a354e0f}{md5\_hash\_string}}(input);}
+\DoxyCodeLine{00435\ \ \ \ \ std::string\ hex;}
+\DoxyCodeLine{00436\ }
+\DoxyCodeLine{00437\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ hash.size();\ i++)\ \{}
+\DoxyCodeLine{00438\ \ \ \ \ \ \ \ \ hex.push\_back(hexval[((hash[i]\ >>\ 4)\ \&\ 0xF)]);}
+\DoxyCodeLine{00439\ \ \ \ \ \ \ \ \ hex.push\_back(hexval[(hash[i])\ \&\ 0x0F]);}
+\DoxyCodeLine{00440\ \ \ \ \ \}}
+\DoxyCodeLine{00441\ }
+\DoxyCodeLine{00442\ \ \ \ \ \textcolor{keywordflow}{return}\ hex;}
+\DoxyCodeLine{00443\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacewebsocketpp_1_1md5_a9fbd05134b509739ff15175fe7104443_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacewebsocketpp_1_1md5_ab445cdc2367665afb8fd4e983a354e0f}\index{websocketpp::md5@{websocketpp::md5}!md5\_hash\_string@{md5\_hash\_string}}
+\index{md5\_hash\_string@{md5\_hash\_string}!websocketpp::md5@{websocketpp::md5}}
+\doxysubsubsection{\texorpdfstring{md5\_hash\_string()}{md5\_hash\_string()}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1md5_ab445cdc2367665afb8fd4e983a354e0f} 
+std\+::string websocketpp\+::md5\+::md5\+\_\+hash\+\_\+string (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{s}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{md5_8hpp_source_l00415}{415}} of file \mbox{\hyperlink{md5_8hpp_source}{md5.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00415\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00416\ \ \ \ \ \textcolor{keywordtype}{char}\ digest[16];}
+\DoxyCodeLine{00417\ }
+\DoxyCodeLine{00418\ \ \ \ \ \mbox{\hyperlink{structwebsocketpp_1_1md5_1_1md5__state__s}{md5\_state\_t}}\ \mbox{\hyperlink{structstate}{state}};}
+\DoxyCodeLine{00419\ }
+\DoxyCodeLine{00420\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1md5_a73499ae9912f813cdbb98d27b6487112}{md5\_init}}(\&\mbox{\hyperlink{structstate}{state}});}
+\DoxyCodeLine{00421\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1md5_afd827a71255e45a8293b9df13342ceb3}{md5\_append}}(\&\mbox{\hyperlink{structstate}{state}},\ (\mbox{\hyperlink{namespacewebsocketpp_1_1md5_a0c434041715d244182207c3413e36e71}{md5\_byte\_t}}\ \textcolor{keyword}{const}\ *)\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.c\_str(),\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.size());}
+\DoxyCodeLine{00422\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1md5_a29e7adb892ae2de7d2c4853bc7ace034}{md5\_finish}}(\&\mbox{\hyperlink{structstate}{state}},\ (\mbox{\hyperlink{namespacewebsocketpp_1_1md5_a0c434041715d244182207c3413e36e71}{md5\_byte\_t}}\ *)digest);}
+\DoxyCodeLine{00423\ }
+\DoxyCodeLine{00424\ \ \ \ \ std::string\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00425\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.resize(16);}
+\DoxyCodeLine{00426\ \ \ \ \ std::copy(digest,digest+16,\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.begin());}
+\DoxyCodeLine{00427\ }
+\DoxyCodeLine{00428\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00429\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacewebsocketpp_1_1md5_ab445cdc2367665afb8fd4e983a354e0f_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacewebsocketpp_1_1md5_ab445cdc2367665afb8fd4e983a354e0f_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacewebsocketpp_1_1md5_a73499ae9912f813cdbb98d27b6487112}\index{websocketpp::md5@{websocketpp::md5}!md5\_init@{md5\_init}}
+\index{md5\_init@{md5\_init}!websocketpp::md5@{websocketpp::md5}}
+\doxysubsubsection{\texorpdfstring{md5\_init()}{md5\_init()}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1md5_a73499ae9912f813cdbb98d27b6487112} 
+void websocketpp\+::md5\+::md5\+\_\+init (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1md5_acf01aa8d102c0a4d24c2a798cc7490c2}{md5\+\_\+state\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{pms}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{md5_8hpp_source_l00349}{349}} of file \mbox{\hyperlink{md5_8hpp_source}{md5.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00349\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00350\ \ \ \ \ pms-\/>\mbox{\hyperlink{structwebsocketpp_1_1md5_1_1md5__state__s_a749f80b1f08f2e740e63a05a8821cf5c}{count}}[0]\ =\ pms-\/>\mbox{\hyperlink{structwebsocketpp_1_1md5_1_1md5__state__s_a749f80b1f08f2e740e63a05a8821cf5c}{count}}[1]\ =\ 0;}
+\DoxyCodeLine{00351\ \ \ \ \ pms-\/>\mbox{\hyperlink{structwebsocketpp_1_1md5_1_1md5__state__s_a4579438de233e09db1f5994a341a3371}{abcd}}[0]\ =\ 0x67452301;}
+\DoxyCodeLine{00352\ \ \ \ \ pms-\/>\mbox{\hyperlink{structwebsocketpp_1_1md5_1_1md5__state__s_a4579438de233e09db1f5994a341a3371}{abcd}}[1]\ =\ \textcolor{comment}{/*0xefcdab89*/}\ \mbox{\hyperlink{md5_8hpp_a445a6b964fc6777300a63ba77305cc7d}{ZSW\_MD5\_T\_MASK}}\ \string^\ 0x10325476;}
+\DoxyCodeLine{00353\ \ \ \ \ pms-\/>\mbox{\hyperlink{structwebsocketpp_1_1md5_1_1md5__state__s_a4579438de233e09db1f5994a341a3371}{abcd}}[2]\ =\ \textcolor{comment}{/*0x98badcfe*/}\ \mbox{\hyperlink{md5_8hpp_a445a6b964fc6777300a63ba77305cc7d}{ZSW\_MD5\_T\_MASK}}\ \string^\ 0x67452301;}
+\DoxyCodeLine{00354\ \ \ \ \ pms-\/>\mbox{\hyperlink{structwebsocketpp_1_1md5_1_1md5__state__s_a4579438de233e09db1f5994a341a3371}{abcd}}[3]\ =\ 0x10325476;}
+\DoxyCodeLine{00355\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacewebsocketpp_1_1md5_a73499ae9912f813cdbb98d27b6487112_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{namespacewebsocketpp_1_1md5_a6c9cff96cd43c87cb0fc47f7d641dac8}\index{websocketpp::md5@{websocketpp::md5}!hexval@{hexval}}
+\index{hexval@{hexval}!websocketpp::md5@{websocketpp::md5}}
+\doxysubsubsection{\texorpdfstring{hexval}{hexval}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1md5_a6c9cff96cd43c87cb0fc47f7d641dac8} 
+const char websocketpp\+::md5\+::hexval\mbox{[}16\mbox{]} = \{\textquotesingle{}0\textquotesingle{}, \textquotesingle{}1\textquotesingle{}, \textquotesingle{}2\textquotesingle{}, \textquotesingle{}3\textquotesingle{}, \textquotesingle{}4\textquotesingle{}, \textquotesingle{}5\textquotesingle{}, \textquotesingle{}6\textquotesingle{}, \textquotesingle{}7\textquotesingle{}, \textquotesingle{}8\textquotesingle{}, \textquotesingle{}9\textquotesingle{}, \textquotesingle{}\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\textquotesingle{}, \textquotesingle{}b\textquotesingle{}, \textquotesingle{}c\textquotesingle{}, \textquotesingle{}d\textquotesingle{}, \textquotesingle{}e\textquotesingle{}, \textquotesingle{}\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}\textquotesingle{}\}}
+
+
+
+Definition at line \mbox{\hyperlink{md5_8hpp_source_l00431}{431}} of file \mbox{\hyperlink{md5_8hpp_source}{md5.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00431\ \{\textcolor{charliteral}{'0'},\ \textcolor{charliteral}{'1'},\ \textcolor{charliteral}{'2'},\ \textcolor{charliteral}{'3'},\ \textcolor{charliteral}{'4'},\ \textcolor{charliteral}{'5'},\ \textcolor{charliteral}{'6'},\ \textcolor{charliteral}{'7'},\ \textcolor{charliteral}{'8'},\ \textcolor{charliteral}{'9'},\ \textcolor{charliteral}{'a'},\ \textcolor{charliteral}{'b'},\ \textcolor{charliteral}{'c'},\ \textcolor{charliteral}{'d'},\ \textcolor{charliteral}{'e'},\ \textcolor{charliteral}{'f'}\};}
+
+\end{DoxyCode}

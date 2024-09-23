@@ -1,0 +1,107 @@
+\doxysection{openssl-\/compat.c}
+\hypertarget{openssl-compat_8c_source}{}\label{openssl-compat_8c_source}\index{libraries/yubihsm/common/openssl-\/compat.c@{libraries/yubihsm/common/openssl-\/compat.c}}
+\mbox{\hyperlink{openssl-compat_8c}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ 1995-\/2016\ The\ OpenSSL\ Project\ Authors.\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00004}00004\ \textcolor{comment}{\ *\ Licensed\ under\ the\ OpenSSL\ license\ (the\ "{}License"{}).\ \ You\ may\ not\ use}}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00005}00005\ \textcolor{comment}{\ *\ this\ file\ except\ in\ compliance\ with\ the\ License.\ \ You\ can\ obtain\ a\ copy}}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00006}00006\ \textcolor{comment}{\ *\ in\ the\ file\ LICENSE\ in\ the\ source\ distribution\ or\ at}}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00007}00007\ \textcolor{comment}{\ *\ https://www.openssl.org/source/license.html}}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00008}00008\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00010}00010\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{openssl-compat_8h}{openssl-\/compat.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00011}00011\ \textcolor{preprocessor}{\#if\ OPENSSL\_VERSION\_NUMBER\ <\ 0x10100000L}}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00013}\mbox{\hyperlink{openssl-compat_8c_ada007b0a8f3f9089fed98a22cb2b1554}{00013}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{openssl-compat_8c_ada007b0a8f3f9089fed98a22cb2b1554}{RSA\_set0\_key}}(RSA\ *\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_a62125ea4e1d748a4a9c1aed9766f451a}{BIGNUM}}\ *n,\ \mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_a62125ea4e1d748a4a9c1aed9766f451a}{BIGNUM}}\ *e,\ \mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_a62125ea4e1d748a4a9c1aed9766f451a}{BIGNUM}}\ *d)\ \{}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00014}00014\ \ \ \textcolor{comment}{/*\ If\ the\ fields\ n\ and\ e\ in\ r\ are\ NULL,\ the\ corresponding\ input}}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00015}00015\ \textcolor{comment}{\ \ \ *\ parameters\ MUST\ be\ non-\/NULL\ for\ n\ and\ e.\ \ d\ may\ be}}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00016}00016\ \textcolor{comment}{\ \ \ *\ left\ NULL\ (in\ case\ only\ the\ public\ key\ is\ used).}}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00017}00017\ \textcolor{comment}{\ \ \ */}}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00018}00018\ \ \ \textcolor{keywordflow}{if}\ ((\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>n\ ==\ NULL\ \&\&\ n\ ==\ NULL)\ ||\ (\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>e\ ==\ NULL\ \&\&\ e\ ==\ NULL))}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00019}00019\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00021}00021\ \ \ \textcolor{keywordflow}{if}\ (n\ !=\ NULL)\ \{}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00022}00022\ \ \ \ \ BN\_free(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>n);}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00023}00023\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>n\ =\ n;}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00024}00024\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00025}00025\ \ \ \textcolor{keywordflow}{if}\ (e\ !=\ NULL)\ \{}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00026}00026\ \ \ \ \ BN\_free(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>e);}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00027}00027\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>e\ =\ e;}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00028}00028\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00029}00029\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ !=\ NULL)\ \{}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00030}00030\ \ \ \ \ BN\_free(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d);}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00031}00031\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}};}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00032}00032\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00034}00034\ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00035}00035\ \}}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00037}\mbox{\hyperlink{openssl-compat_8c_a96e6deebb87bafb81f7bde3df63e59f3}{00037}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{openssl-compat_8c_a96e6deebb87bafb81f7bde3df63e59f3}{RSA\_get0\_key}}(\textcolor{keyword}{const}\ RSA\ *\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_a62125ea4e1d748a4a9c1aed9766f451a}{BIGNUM}}\ **n,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_a62125ea4e1d748a4a9c1aed9766f451a}{BIGNUM}}\ **e,}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00038}00038\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_a62125ea4e1d748a4a9c1aed9766f451a}{BIGNUM}}\ **d)\ \{}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00039}00039\ \ \ \textcolor{keywordflow}{if}\ (n\ !=\ NULL)}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00040}00040\ \ \ \ \ *n\ =\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>n;}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00041}00041\ \ \ \textcolor{keywordflow}{if}\ (e\ !=\ NULL)}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00042}00042\ \ \ \ \ *e\ =\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>e;}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00043}00043\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ !=\ NULL)}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00044}00044\ \ \ \ \ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ =\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>d;}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00045}00045\ \}}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00047}\mbox{\hyperlink{openssl-compat_8c_ad0eaa8f2e87045d4abd7b3fc94ab4694}{00047}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{openssl-compat_8c_ad0eaa8f2e87045d4abd7b3fc94ab4694}{RSA\_get0\_factors}}(\textcolor{keyword}{const}\ RSA\ *\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_a62125ea4e1d748a4a9c1aed9766f451a}{BIGNUM}}\ **\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_a62125ea4e1d748a4a9c1aed9766f451a}{BIGNUM}}\ **q)\ \{}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00048}00048\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ !=\ NULL)}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00049}00049\ \ \ \ \ *\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>p;}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00050}00050\ \ \ \textcolor{keywordflow}{if}\ (q\ !=\ NULL)}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00051}00051\ \ \ \ \ *q\ =\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>q;}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00052}00052\ \}}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00054}\mbox{\hyperlink{openssl-compat_8c_a4f4b9ece6db658890011cfcf730d18f1}{00054}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{openssl-compat_8c_a4f4b9ece6db658890011cfcf730d18f1}{RSA\_get0\_crt\_params}}(\textcolor{keyword}{const}\ RSA\ *\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_a62125ea4e1d748a4a9c1aed9766f451a}{BIGNUM}}\ **dmp1,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_a62125ea4e1d748a4a9c1aed9766f451a}{BIGNUM}}\ **dmq1,}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_a62125ea4e1d748a4a9c1aed9766f451a}{BIGNUM}}\ **iqmp)\ \{}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00056}00056\ \ \ \textcolor{keywordflow}{if}\ (dmp1\ !=\ NULL)}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00057}00057\ \ \ \ \ *dmp1\ =\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>dmp1;}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00058}00058\ \ \ \textcolor{keywordflow}{if}\ (dmq1\ !=\ NULL)}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00059}00059\ \ \ \ \ *dmq1\ =\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>dmq1;}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00060}00060\ \ \ \textcolor{keywordflow}{if}\ (iqmp\ !=\ NULL)}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00061}00061\ \ \ \ \ *iqmp\ =\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/>iqmp;}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00062}00062\ \}}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00064}\mbox{\hyperlink{openssl-compat_8c_ae2f28de42b8345422b7ac3b28f330b9b}{00064}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{openssl-compat_8c_ae2f28de42b8345422b7ac3b28f330b9b}{ECDSA\_SIG\_set0}}(ECDSA\_SIG\ *sig,\ \mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_a62125ea4e1d748a4a9c1aed9766f451a}{BIGNUM}}\ *\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_a62125ea4e1d748a4a9c1aed9766f451a}{BIGNUM}}\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})\ \{}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00065}00065\ \ \ \textcolor{keywordflow}{if}\ ((sig-\/>r\ ==\ NULL\ \&\&\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ ==\ NULL)\ ||\ (sig-\/>s\ ==\ NULL\ \&\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ ==\ NULL))\ \{}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00066}00066\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00067}00067\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00069}00069\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ !=\ NULL)\ \{}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00070}00070\ \ \ \ \ BN\_free(sig-\/>r);}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00071}00071\ \ \ \ \ sig-\/>r\ =\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00072}00072\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00073}00073\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ !=\ NULL)\ \{}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00074}00074\ \ \ \ \ BN\_free(sig-\/>s);}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00075}00075\ \ \ \ \ sig-\/>s\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00076}00076\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00077}00077\ }
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00078}00078\ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00079}00079\ \}}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00080}\mbox{\hyperlink{openssl-compat_8c_aa0ad424eeb5c9c34c12d77cd3dc9dbf1}{00080}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{openssl-compat_8c_aa0ad424eeb5c9c34c12d77cd3dc9dbf1}{ECDSA\_SIG\_get0}}(\textcolor{keyword}{const}\ ECDSA\_SIG\ *sig,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_a62125ea4e1d748a4a9c1aed9766f451a}{BIGNUM}}\ **pr,}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00081}00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_a62125ea4e1d748a4a9c1aed9766f451a}{BIGNUM}}\ **ps)\ \{}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00082}00082\ \ \ \textcolor{keywordflow}{if}\ (pr\ !=\ NULL)\ \{}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00083}00083\ \ \ \ \ *pr\ =\ sig-\/>r;}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00084}00084\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00085}00085\ \ \ \textcolor{keywordflow}{if}\ (ps\ !=\ NULL)\ \{}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00086}00086\ \ \ \ \ *ps\ =\ sig-\/>s;}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00087}00087\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00088}00088\ \}}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00089}00089\ }
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00090}\mbox{\hyperlink{openssl-compat_8c_a93acf209ee3e7156a5533958e7e50bb0}{00090}}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{openssl-compat_8c_a93acf209ee3e7156a5533958e7e50bb0}{STACK\_OF}}(X509\_EXTENSION)\ *\ X509\_get0\_extensions(\textcolor{keyword}{const}\ X509\ *x)\ \{}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00091}00091\ \ \ \textcolor{keywordflow}{return}\ x-\/>cert\_info-\/>extensions;}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00092}00092\ \}}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00093}00093\ }
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00094}\mbox{\hyperlink{openssl-compat_8c_a6bdaf92149340326578e982fc4b81f6a}{00094}}\ ASN1\_OBJECT\ *\mbox{\hyperlink{openssl-compat_8c_a6bdaf92149340326578e982fc4b81f6a}{X509\_EXTENSION\_get\_object}}(X509\_EXTENSION\ *ex)\ \{}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00095}00095\ \ \ \textcolor{keywordflow}{return}\ ex-\/>object;}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00096}00096\ \}}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00097}\mbox{\hyperlink{openssl-compat_8c_a4dbc44b3ea7e769ad8704b1aec815eee}{00097}}\ ASN1\_OCTET\_STRING\ *\mbox{\hyperlink{openssl-compat_8c_a4dbc44b3ea7e769ad8704b1aec815eee}{X509\_EXTENSION\_get\_data}}(X509\_EXTENSION\ *ex)\ \{}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00098}00098\ \ \ \textcolor{keywordflow}{return}\ ex-\/>value;}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00099}00099\ \}}
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00100}00100\ }
+\DoxyCodeLine{\Hypertarget{openssl-compat_8c_source_l00101}00101\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{/*\ OPENSSL\_VERSION\_NUMBER\ */}\textcolor{preprocessor}{}}
+
+\end{DoxyCode}

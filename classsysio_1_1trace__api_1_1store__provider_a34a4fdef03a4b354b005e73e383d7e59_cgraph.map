@@ -1,0 +1,32 @@
+<map id="sysio::trace_api::store_provider::append_lib" name="sysio::trace_api::store_provider::append_lib">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,147,156,187"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1trace__api_1_1slice__directory.html#a24faf23a87e249099bea549dbda165b2" title=" " alt="" coords="204,40,372,96"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="124,144,213,101,215,106,126,148"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1trace__api_1_1slice__directory.html#a47a30741cf28932df1556209da63b227" title=" " alt="" coords="648,113,812,154"/>
+<area shape="poly" id="edge18_Node000001_Node000004" title=" " alt="" coords="156,161,633,136,633,141,156,166"/>
+<area shape="rect" id="Node000005" href="$classsysio_1_1trace__api_1_1slice__directory.html#aaa86b5afdb3d46491da2af321f6b54bd" title=" " alt="" coords="204,192,372,248"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="157,184,189,192,188,197,156,189"/>
+<area shape="rect" id="Node000011" href="$classsysio_1_1trace__api_1_1slice__directory.html#aca2e44229ad8159ea40397ec974fca22" title=" " alt="" coords="214,289,362,330"/>
+<area shape="poly" id="edge16_Node000001_Node000011" title=" " alt="" coords="109,186,205,258,238,279,235,283,202,263,106,190"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1trace__api_1_1slice__directory.html#aa8fdc6fcd3d18c76b517d65b6ea56bef" title=" " alt="" coords="420,5,600,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="372,50,405,43,406,48,373,55"/>
+<area shape="poly" id="edge4_Node000002_Node000004" title=" " alt="" coords="373,78,633,117,632,122,372,83"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="563,44,602,62,680,103,678,108,599,67,561,49"/>
+<area shape="poly" id="edge15_Node000005_Node000004" title=" " alt="" coords="372,201,633,150,634,155,373,207"/>
+<area shape="rect" id="Node000006" href="$classsysio_1_1trace__api_1_1slice__directory.html#afd4f092c1fd16893e6d0a8cc06a40ea4" title=" " alt="" coords="420,221,600,262"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="372,226,405,229,404,234,372,231"/>
+<area shape="rect" id="Node000009" href="$classfc_1_1cfile.html#a9e01adaeee108420312ed271133a2d7d" title=" " alt="" coords="460,286,560,312"/>
+<area shape="poly" id="edge10_Node000005_Node000009" title=" " alt="" coords="356,246,421,271,446,279,445,284,419,276,354,251"/>
+<area shape="poly" id="edge9_Node000006_Node000004" title=" " alt="" coords="561,218,599,201,678,160,680,164,602,205,563,223"/>
+<area shape="rect" id="Node000007" href="$classfc_1_1cfile.html#a29badc2b6c1f589d0c79b20ce31cacf0" title=" " alt="" coords="666,229,794,254"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="600,239,650,239,650,244,600,244"/>
+<area shape="rect" id="Node000008" href="$classfc_1_1path.html#ab1eae2062df4ea01435348ec52fb3784" title=" " alt="" coords="860,280,1014,305"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="786,253,867,273,866,278,785,258"/>
+<area shape="poly" id="edge14_Node000009_Node000008" title=" " alt="" coords="561,296,844,291,844,296,561,301"/>
+<area shape="rect" id="Node000010" href="$classfc_1_1cfile.html#a3b11f29f74860527a8bba66e4ae0317d" title=" " alt="" coords="678,354,782,380"/>
+<area shape="poly" id="edge11_Node000009_Node000010" title=" " alt="" coords="561,309,601,320,679,346,677,351,600,326,560,314"/>
+<area shape="poly" id="edge13_Node000010_Node000008" title=" " alt="" coords="767,351,883,309,885,314,769,356"/>
+<area shape="poly" id="edge12_Node000010_Node000010" title=" " alt="" coords="695,355,689,346,693,336,707,330,730,328,755,330,768,337,766,342,754,335,730,333,708,335,697,340,694,345,700,352"/>
+<area shape="rect" id="Node000012" href="$xbyak__mnemonic_8h.html#aa81aed607133209dade63a226818224d" title=" " alt="" coords="488,336,533,361"/>
+<area shape="poly" id="edge17_Node000011_Node000012" title=" " alt="" coords="363,320,473,339,472,344,362,325"/>
+</map>

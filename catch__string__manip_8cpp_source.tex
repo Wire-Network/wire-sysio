@@ -1,0 +1,103 @@
+\doxysection{catch\+\_\+string\+\_\+manip.\+cpp}
+\hypertarget{catch__string__manip_8cpp_source}{}\label{catch__string__manip_8cpp_source}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_string\_manip.cpp@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_string\_manip.cpp}}
+\mbox{\hyperlink{catch__string__manip_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00002}00002\ \textcolor{comment}{\ *\ \ Created\ by\ Martin\ on\ 25/07/2017.}}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00004}00004\ \textcolor{comment}{\ *\ \ Distributed\ under\ the\ Boost\ Software\ License,\ Version\ 1.0.\ (See\ accompanying}}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00005}00005\ \textcolor{comment}{\ *\ \ file\ LICENSE\_1\_0.txt\ or\ copy\ at\ http://www.boost.org/LICENSE\_1\_0.txt)}}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00006}00006\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__string__manip_8h}{catch\_string\_manip.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__stringref_8h}{catch\_stringref.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00011}00011\ \textcolor{preprocessor}{\#include\ <algorithm>}}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00012}00012\ \textcolor{preprocessor}{\#include\ <ostream>}}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00013}00013\ \textcolor{preprocessor}{\#include\ <cstring>}}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00014}00014\ \textcolor{preprocessor}{\#include\ <cctype>}}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00015}00015\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00017}00017\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00019}00019\ \ \ \ \ \textcolor{keyword}{namespace\ }\{}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00020}00020\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ toLowerCh(\textcolor{keywordtype}{char}\ c)\ \{}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00021}00021\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{char}\textcolor{keyword}{>}(\ std::tolower(\ c\ )\ );}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00022}00022\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00023}00023\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00025}\mbox{\hyperlink{namespace_catch_a695f62327be0676e046291eeaae15110}{00025}}\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespace_catch_a695f62327be0676e046291eeaae15110}{startsWith}}(\ std::string\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ std::string\ \textcolor{keyword}{const}\&\ prefix\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00026}00026\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.size()\ >=\ prefix.size()\ \&\&\ std::equal(prefix.begin(),\ prefix.end(),\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.begin());}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00027}00027\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00028}\mbox{\hyperlink{namespace_catch_acad23751846ac23d0f379e34f5adebb1}{00028}}\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespace_catch_a695f62327be0676e046291eeaae15110}{startsWith}}(\ std::string\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ \textcolor{keywordtype}{char}\ prefix\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00029}00029\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.empty()\ \&\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}[0]\ ==\ prefix;}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00030}00030\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00031}\mbox{\hyperlink{namespace_catch_ada025504f627feaf9ac68ca391515dff}{00031}}\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespace_catch_ada025504f627feaf9ac68ca391515dff}{endsWith}}(\ std::string\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ std::string\ \textcolor{keyword}{const}\&\ suffix\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00032}00032\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.size()\ >=\ suffix.size()\ \&\&\ std::equal(suffix.rbegin(),\ suffix.rend(),\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.rbegin());}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00033}00033\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00034}\mbox{\hyperlink{namespace_catch_afd801a3e33fd7a8b91ded0d02747a93f}{00034}}\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespace_catch_ada025504f627feaf9ac68ca391515dff}{endsWith}}(\ std::string\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ \textcolor{keywordtype}{char}\ suffix\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00035}00035\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.empty()\ \&\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}[\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.size()-\/1]\ ==\ suffix;}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00036}00036\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00037}\mbox{\hyperlink{namespace_catch_aa52974b0e426e7e2fbd725a900e9c36e}{00037}}\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespace_catch_aa52974b0e426e7e2fbd725a900e9c36e}{contains}}(\ std::string\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ std::string\ \textcolor{keyword}{const}\&\ infix\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00038}00038\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.find(\ infix\ )\ !=\ std::string::npos;}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00039}00039\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00040}\mbox{\hyperlink{namespace_catch_a0760dbe87d090a55a35414db57d272c4}{00040}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespace_catch_a0760dbe87d090a55a35414db57d272c4}{toLowerInPlace}}(\ std::string\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00041}00041\ \ \ \ \ \ \ \ \ std::transform(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.begin(),\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.end(),\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.begin(),\ toLowerCh\ );}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00042}00042\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00043}\mbox{\hyperlink{namespace_catch_ac036a17412d318598ffda8e1fe7a1177}{00043}}\ \ \ \ \ std::string\ \mbox{\hyperlink{namespace_catch_ac036a17412d318598ffda8e1fe7a1177}{toLower}}(\ std::string\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00044}00044\ \ \ \ \ \ \ \ \ std::string\ lc\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00045}00045\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_catch_a0760dbe87d090a55a35414db57d272c4}{toLowerInPlace}}(\ lc\ );}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00046}00046\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ lc;}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00047}00047\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00048}\mbox{\hyperlink{namespace_catch_a084108b47f37d8bfd5db51c50c7451b3}{00048}}\ \ \ \ \ std::string\ \mbox{\hyperlink{namespace_catch_a084108b47f37d8bfd5db51c50c7451b3}{trim}}(\ std::string\ \textcolor{keyword}{const}\&\ str\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{char}\ \textcolor{keyword}{const}*\ whitespaceChars\ =\ \textcolor{stringliteral}{"{}\(\backslash\)n\(\backslash\)r\(\backslash\)t\ "{}};}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00050}00050\ \ \ \ \ \ \ \ \ std::string::size\_type\ start\ =\ str.find\_first\_not\_of(\ whitespaceChars\ );}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00051}00051\ \ \ \ \ \ \ \ \ std::string::size\_type\ end\ =\ str.find\_last\_not\_of(\ whitespaceChars\ );}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00052}00052\ }
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ start\ !=\ std::string::npos\ ?\ str.substr(\ start,\ 1+end-\/start\ )\ :\ std::string();}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00054}00054\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00056}\mbox{\hyperlink{namespace_catch_afe4e6770da547e43e9e4eeaa05f946ea}{00056}}\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespace_catch_afe4e6770da547e43e9e4eeaa05f946ea}{replaceInPlace}}(\ std::string\&\ str,\ std::string\ \textcolor{keyword}{const}\&\ replaceThis,\ std::string\ \textcolor{keyword}{const}\&\ withThis\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00057}00057\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ replaced\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00058}00058\ \ \ \ \ \ \ \ \ std::size\_t\ i\ =\ str.find(\ replaceThis\ );}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00059}00059\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\ i\ !=\ std::string::npos\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \ \ \ replaced\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00061}00061\ \ \ \ \ \ \ \ \ \ \ \ \ str\ =\ str.substr(\ 0,\ i\ )\ +\ withThis\ +\ str.substr(\ i+replaceThis.size()\ );}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00062}00062\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ i\ <\ str.size()-\/withThis.size()\ )}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i\ =\ str.find(\ replaceThis,\ i+withThis.size()\ );}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00064}00064\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00065}00065\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i\ =\ std::string::npos;}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00066}00066\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00067}00067\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ replaced;}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00068}00068\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00069}00069\ }
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00070}\mbox{\hyperlink{namespace_catch_a678e3c779388970bb3ec5802245f93d7}{00070}}\ \ \ \ \ std::vector<StringRef>\ \mbox{\hyperlink{namespace_catch_a678e3c779388970bb3ec5802245f93d7}{splitStringRef}}(\ \mbox{\hyperlink{class_catch_1_1_string_ref}{StringRef}}\ str,\ \textcolor{keywordtype}{char}\ delimiter\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00071}00071\ \ \ \ \ \ \ \ \ std::vector<StringRef>\ subStrings;}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00072}00072\ \ \ \ \ \ \ \ \ std::size\_t\ start\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00073}00073\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(std::size\_t\ pos\ =\ 0;\ pos\ <\ str.size();\ ++pos\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00074}00074\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ str[pos]\ ==\ delimiter\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00075}00075\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ pos\ -\/\ start\ >\ 1\ )}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ subStrings.push\_back(\ str.substr(\ start,\ pos-\/start\ )\ );}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ start\ =\ pos+1;}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00078}00078\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00079}00079\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00080}00080\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ start\ <\ str.size()\ )}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00081}00081\ \ \ \ \ \ \ \ \ \ \ \ \ subStrings.push\_back(\ str.substr(\ start,\ str.size()-\/start\ )\ );}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00082}00082\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ subStrings;}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00083}00083\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00084}00084\ }
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00085}\mbox{\hyperlink{struct_catch_1_1pluralise_a5c55e22de2416cfe416edf715c6b9234}{00085}}\ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1pluralise_a5c55e22de2416cfe416edf715c6b9234}{pluralise::pluralise}}(\ std::size\_t\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}},\ std::string\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a22f45a3cb4f074e609f58ebaeef0ecf9}{label}}\ )}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00086}00086\ \ \ \ \ :\ \ \ m\_count(\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ ),}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00087}00087\ \ \ \ \ \ \ \ \ m\_label(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a22f45a3cb4f074e609f58ebaeef0ecf9}{label}}\ )}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00088}00088\ \ \ \ \ \{\}}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00089}00089\ }
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00090}\mbox{\hyperlink{struct_catch_1_1pluralise_abe20c2451f99d57be5cc5157949b09ad}{00090}}\ \ \ \ \ std::ostream\&\ \mbox{\hyperlink{namespace_catch_abf821d46e662c8d93d80a98d79a10314}{operator\ <<\ }}(\ std::ostream\&\ os,\ \mbox{\hyperlink{struct_catch_1_1pluralise}{pluralise}}\ \textcolor{keyword}{const}\&\ pluraliser\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00091}00091\ \ \ \ \ \ \ \ \ os\ <<\ pluraliser.\mbox{\hyperlink{struct_catch_1_1pluralise_a4dce2fa13ec6f00fac09b2418265441e}{m\_count}}\ <<\ \textcolor{charliteral}{'\ '}\ <<\ pluraliser.\mbox{\hyperlink{struct_catch_1_1pluralise_a8849cbdd3f11ebe7747597c8644e8793}{m\_label}};}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00092}00092\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ pluraliser.\mbox{\hyperlink{struct_catch_1_1pluralise_a4dce2fa13ec6f00fac09b2418265441e}{m\_count}}\ !=\ 1\ )}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00093}00093\ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{charliteral}{'s'};}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00094}00094\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}};}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00095}00095\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00096}00096\ }
+\DoxyCodeLine{\Hypertarget{catch__string__manip_8cpp_source_l00097}00097\ \}}
+
+\end{DoxyCode}

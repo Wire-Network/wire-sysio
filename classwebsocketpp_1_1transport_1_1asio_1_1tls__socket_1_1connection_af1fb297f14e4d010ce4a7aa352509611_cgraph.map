@@ -1,0 +1,5 @@
+<map id="websocketpp::transport::asio::tls_socket::connection::cancel_socket" name="websocketpp::transport::asio::tls_socket::connection::cancel_socket">
+<area shape="rect" id="Node000001" title="Cancel all async operations on this socket." alt="" coords="5,5,198,61"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1transport_1_1asio_1_1tls__socket_1_1connection.html#a67a89affb55931ec7f757373d4846dcc" title="Retrieve a pointer to the underlying socket." alt="" coords="246,5,438,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="198,30,230,30,230,36,198,36"/>
+</map>

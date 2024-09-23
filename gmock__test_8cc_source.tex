@@ -1,0 +1,268 @@
+\doxysection{gmock\+\_\+test.\+cc}
+\hypertarget{gmock__test_8cc_source}{}\label{gmock__test_8cc_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googlemock/test/gmock\_test.cc@{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googlemock/test/gmock\_test.cc}}
+\mbox{\hyperlink{gmock__test_8cc}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00001}00001\ \textcolor{comment}{//\ Copyright\ 2008,\ Google\ Inc.}}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00002}00002\ \textcolor{comment}{//\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00003}00003\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00004}00004\ \textcolor{comment}{//\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00005}00005\ \textcolor{comment}{//\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are}}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00006}00006\ \textcolor{comment}{//\ met:}}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00007}00007\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00008}00008\ \textcolor{comment}{//\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00009}00009\ \textcolor{comment}{//\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00010}00010\ \textcolor{comment}{//\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above}}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00011}00011\ \textcolor{comment}{//\ copyright\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer}}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00012}00012\ \textcolor{comment}{//\ in\ the\ documentation\ and/or\ other\ materials\ provided\ with\ the}}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00013}00013\ \textcolor{comment}{//\ distribution.}}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00014}00014\ \textcolor{comment}{//\ \ \ \ \ *\ Neither\ the\ name\ of\ Google\ Inc.\ nor\ the\ names\ of\ its}}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00015}00015\ \textcolor{comment}{//\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products\ derived\ from}}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00016}00016\ \textcolor{comment}{//\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00017}00017\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00018}00018\ \textcolor{comment}{//\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS}}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00019}00019\ \textcolor{comment}{//\ "{}AS\ IS"{}\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00020}00020\ \textcolor{comment}{//\ LIMITED\ TO,\ THE\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR}}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00021}00021\ \textcolor{comment}{//\ A\ PARTICULAR\ PURPOSE\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ THE\ COPYRIGHT}}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00022}00022\ \textcolor{comment}{//\ OWNER\ OR\ CONTRIBUTORS\ BE\ LIABLE\ FOR\ ANY\ DIRECT,\ INDIRECT,\ INCIDENTAL,}}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00023}00023\ \textcolor{comment}{//\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES\ (INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00024}00024\ \textcolor{comment}{//\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;\ LOSS\ OF\ USE,}}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00025}00025\ \textcolor{comment}{//\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND\ ON\ ANY}}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00026}00026\ \textcolor{comment}{//\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00027}00027\ \textcolor{comment}{//\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE}}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00028}00028\ \textcolor{comment}{//\ OF\ THIS\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00029}00029\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00030}00030\ \textcolor{comment}{//\ Author:\ wan@google.com\ (Zhanyong\ Wan)}}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00032}00032\ \textcolor{comment}{//\ Google\ Mock\ -\/\ a\ framework\ for\ writing\ C++\ mock\ classes.}}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00033}00033\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00034}00034\ \textcolor{comment}{//\ This\ file\ tests\ code\ in\ gmock.cc.}}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00036}00036\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{gmock_8h}{gmock/gmock.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00038}00038\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00039}00039\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{gtest_8h}{gtest/gtest.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00040}00040\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{internal_2custom_2gtest_8h}{gtest/internal/custom/gtest.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00042}00042\ \textcolor{preprocessor}{\#if\ !defined(GTEST\_CUSTOM\_INIT\_GOOGLE\_TEST\_FUNCTION\_)}}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00044}00044\ \textcolor{keyword}{using\ }testing::GMOCK\_FLAG(default\_mock\_behavior);}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00045}00045\ \textcolor{keyword}{using\ }testing::GMOCK\_FLAG(\mbox{\hyperlink{programs_2clio_2main_8cpp_ab3f078684998b83967d507d0f453f454}{verbose}});}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00046}00046\ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacetesting_a32b1c6db9ba5133ccabfa67616b3c041}{testing::InitGoogleMock}};}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00048}00048\ \textcolor{comment}{//\ Verifies\ that\ calling\ InitGoogleMock()\ on\ argv\ results\ in\ new\_argv,}}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00049}00049\ \textcolor{comment}{//\ and\ the\ gmock\_verbose\ flag's\ value\ is\ set\ to\ expected\_gmock\_verbose.}}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00050}00050\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ Char,\ \textcolor{keywordtype}{int}\ M,\ \textcolor{keywordtype}{int}\ N>}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00051}\mbox{\hyperlink{gmock__test_8cc_ac9c8ae8722c330d47f75dee43fb8ab78}{00051}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{gmock__test_8cc_ac9c8ae8722c330d47f75dee43fb8ab78}{TestInitGoogleMock}}(\textcolor{keyword}{const}\ Char*\ (\&\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}})[M],\ \textcolor{keyword}{const}\ Char*\ (\&new\_argv)[\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}],}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ const\ ::std::string\&\ expected\_gmock\_verbose)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00053}00053\ \ \ const\ ::std::string\ old\_verbose\ =\ \mbox{\hyperlink{gmock-port_8h_ad7119adfef06be5e7b1551633f5a1436}{GMOCK\_FLAG}}(verbose);}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00054}00054\ }
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00055}00055\ \ \ \textcolor{keywordtype}{int}\ argc\ =\ M\ -\/\ 1;}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00056}00056\ \ \ InitGoogleMock(\&argc,\ \textcolor{keyword}{const\_cast<}Char**\textcolor{keyword}{>}(\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}));}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00057}00057\ \ \ \mbox{\hyperlink{gtest_8h_a1a6db8b1338ee7040329322b77779086}{ASSERT\_EQ}}(\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\ -\/\ 1,\ argc)\ <<\ \textcolor{stringliteral}{"{}The\ new\ argv\ has\ wrong\ number\ of\ elements."{}};}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00059}00059\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}};\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00060}00060\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ad20f7b94ac5081e16f0005b94e95f0c6}{EXPECT\_STREQ}}(new\_argv[i],\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[i]);}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00061}00061\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00062}00062\ }
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00063}00063\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(expected\_gmock\_verbose,\ \mbox{\hyperlink{gmock-port_8h_ad7119adfef06be5e7b1551633f5a1436}{GMOCK\_FLAG}}(verbose).c\_str());}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00064}00064\ \ \ \mbox{\hyperlink{gmock-port_8h_ad7119adfef06be5e7b1551633f5a1436}{GMOCK\_FLAG}}(verbose)\ =\ old\_verbose;\ \ \textcolor{comment}{//\ Restores\ the\ gmock\_verbose\ flag.}}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00065}00065\ \}}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00067}\mbox{\hyperlink{gmock__test_8cc_a7c86c6c98b72e903135c1b01370a13f3}{00067}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(InitGoogleMockTest,\ ParsesInvalidCommandLine)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00068}00068\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[]\ =\ \{}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00069}00069\ \ \ \ \ NULL}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00070}00070\ \ \ \};}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00072}00072\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ new\_argv[]\ =\ \{}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00073}00073\ \ \ \ \ NULL}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00074}00074\ \ \ \};}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00075}00075\ }
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00076}00076\ \ \ \mbox{\hyperlink{gmock__test_8cc_ac9c8ae8722c330d47f75dee43fb8ab78}{TestInitGoogleMock}}(\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ new\_argv,\ \mbox{\hyperlink{gmock-port_8h_ad7119adfef06be5e7b1551633f5a1436}{GMOCK\_FLAG}}(verbose));}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00077}00077\ \}}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00079}\mbox{\hyperlink{gmock__test_8cc_a29b51be89eb52fa64713438ecf4ab924}{00079}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(InitGoogleMockTest,\ ParsesEmptyCommandLine)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00080}00080\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[]\ =\ \{}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00081}00081\ \ \ \ \ \textcolor{stringliteral}{"{}foo.exe"{}},}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00082}00082\ \ \ \ \ NULL}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00083}00083\ \ \ \};}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00084}00084\ }
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00085}00085\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ new\_argv[]\ =\ \{}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00086}00086\ \ \ \ \ \textcolor{stringliteral}{"{}foo.exe"{}},}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00087}00087\ \ \ \ \ NULL}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00088}00088\ \ \ \};}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00089}00089\ }
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00090}00090\ \ \ \mbox{\hyperlink{gmock__test_8cc_ac9c8ae8722c330d47f75dee43fb8ab78}{TestInitGoogleMock}}(\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ new\_argv,\ \mbox{\hyperlink{gmock-port_8h_ad7119adfef06be5e7b1551633f5a1436}{GMOCK\_FLAG}}(verbose));}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00091}00091\ \}}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00092}00092\ }
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00093}\mbox{\hyperlink{gmock__test_8cc_ae24e1f90eac538406a16306612d7c380}{00093}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(InitGoogleMockTest,\ ParsesSingleFlag)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00094}00094\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[]\ =\ \{}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00095}00095\ \ \ \ \ \textcolor{stringliteral}{"{}foo.exe"{}},}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00096}00096\ \ \ \ \ \textcolor{stringliteral}{"{}-\/-\/gmock\_verbose=info"{}},}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00097}00097\ \ \ \ \ NULL}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00098}00098\ \ \ \};}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00099}00099\ }
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00100}00100\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ new\_argv[]\ =\ \{}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00101}00101\ \ \ \ \ \textcolor{stringliteral}{"{}foo.exe"{}},}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00102}00102\ \ \ \ \ NULL}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00103}00103\ \ \ \};}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00104}00104\ }
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00105}00105\ \ \ \mbox{\hyperlink{gmock__test_8cc_ac9c8ae8722c330d47f75dee43fb8ab78}{TestInitGoogleMock}}(\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ new\_argv,\ \textcolor{stringliteral}{"{}info"{}});}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00106}00106\ \}}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00107}00107\ }
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00108}\mbox{\hyperlink{gmock__test_8cc_af2ebcdde7f19ba9d002c20673e41fb97}{00108}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(InitGoogleMockTest,\ ParsesMultipleFlags)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00109}00109\ \ \ \textcolor{keywordtype}{int}\ old\_default\_behavior\ =\ \mbox{\hyperlink{gmock-port_8h_ad7119adfef06be5e7b1551633f5a1436}{GMOCK\_FLAG}}(default\_mock\_behavior);}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00110}00110\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{wchar\_t}*\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[]\ =\ \{}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00111}00111\ \ \ \ \ L\textcolor{stringliteral}{"{}foo.exe"{}},}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00112}00112\ \ \ \ \ L\textcolor{stringliteral}{"{}-\/-\/gmock\_verbose=info"{}},}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00113}00113\ \ \ \ \ L\textcolor{stringliteral}{"{}-\/-\/gmock\_default\_mock\_behavior=2"{}},}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00114}00114\ \ \ \ \ NULL}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00115}00115\ \ \ \};}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00116}00116\ }
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00117}00117\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{wchar\_t}*\ new\_argv[]\ =\ \{}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00118}00118\ \ \ \ \ L\textcolor{stringliteral}{"{}foo.exe"{}},}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00119}00119\ \ \ \ \ NULL}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00120}00120\ \ \ \};}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00121}00121\ }
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00122}00122\ \ \ \mbox{\hyperlink{gmock__test_8cc_ac9c8ae8722c330d47f75dee43fb8ab78}{TestInitGoogleMock}}(\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ new\_argv,\ \textcolor{stringliteral}{"{}info"{}});}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00123}00123\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(2,\ \mbox{\hyperlink{gmock-port_8h_ad7119adfef06be5e7b1551633f5a1436}{GMOCK\_FLAG}}(default\_mock\_behavior));}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00124}00124\ \ \ \mbox{\hyperlink{gtest_8h_a6ae7443947f25abc58bfcfcfc56b0d75}{EXPECT\_NE}}(2,\ old\_default\_behavior);}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00125}00125\ \ \ \mbox{\hyperlink{gmock-port_8h_ad7119adfef06be5e7b1551633f5a1436}{GMOCK\_FLAG}}(default\_mock\_behavior)\ =\ old\_default\_behavior;}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00126}00126\ \}}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00127}00127\ }
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00128}\mbox{\hyperlink{gmock__test_8cc_ada1ddcc67dc056492a76fa398429038f}{00128}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(InitGoogleMockTest,\ ParsesUnrecognizedFlag)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00129}00129\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[]\ =\ \{}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00130}00130\ \ \ \ \ \textcolor{stringliteral}{"{}foo.exe"{}},}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00131}00131\ \ \ \ \ \textcolor{stringliteral}{"{}-\/-\/non\_gmock\_flag=blah"{}},}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00132}00132\ \ \ \ \ NULL}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00133}00133\ \ \ \};}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00134}00134\ }
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00135}00135\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ new\_argv[]\ =\ \{}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00136}00136\ \ \ \ \ \textcolor{stringliteral}{"{}foo.exe"{}},}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00137}00137\ \ \ \ \ \textcolor{stringliteral}{"{}-\/-\/non\_gmock\_flag=blah"{}},}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00138}00138\ \ \ \ \ NULL}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00139}00139\ \ \ \};}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00140}00140\ }
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00141}00141\ \ \ \mbox{\hyperlink{gmock__test_8cc_ac9c8ae8722c330d47f75dee43fb8ab78}{TestInitGoogleMock}}(\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ new\_argv,\ \mbox{\hyperlink{gmock-port_8h_ad7119adfef06be5e7b1551633f5a1436}{GMOCK\_FLAG}}(verbose));}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00142}00142\ \}}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00143}00143\ }
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00144}\mbox{\hyperlink{gmock__test_8cc_aea344ddf9b83f7912dde4f8e7adbd4e2}{00144}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(InitGoogleMockTest,\ ParsesGoogleMockFlagAndUnrecognizedFlag)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00145}00145\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[]\ =\ \{}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00146}00146\ \ \ \ \ \textcolor{stringliteral}{"{}foo.exe"{}},}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00147}00147\ \ \ \ \ \textcolor{stringliteral}{"{}-\/-\/non\_gmock\_flag=blah"{}},}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00148}00148\ \ \ \ \ \textcolor{stringliteral}{"{}-\/-\/gmock\_verbose=error"{}},}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00149}00149\ \ \ \ \ NULL}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00150}00150\ \ \ \};}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00151}00151\ }
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00152}00152\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ new\_argv[]\ =\ \{}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00153}00153\ \ \ \ \ \textcolor{stringliteral}{"{}foo.exe"{}},}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00154}00154\ \ \ \ \ \textcolor{stringliteral}{"{}-\/-\/non\_gmock\_flag=blah"{}},}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00155}00155\ \ \ \ \ NULL}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00156}00156\ \ \ \};}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00157}00157\ }
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00158}00158\ \ \ \mbox{\hyperlink{gmock__test_8cc_ac9c8ae8722c330d47f75dee43fb8ab78}{TestInitGoogleMock}}(\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ new\_argv,\ \textcolor{stringliteral}{"{}error"{}});}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00159}00159\ \}}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00160}00160\ }
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00161}\mbox{\hyperlink{gmock__test_8cc_ad66fde04be818693ebdcdcfc9943d57f}{00161}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(WideInitGoogleMockTest,\ ParsesInvalidCommandLine)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00162}00162\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{wchar\_t}*\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[]\ =\ \{}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00163}00163\ \ \ \ \ NULL}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00164}00164\ \ \ \};}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00165}00165\ }
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00166}00166\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{wchar\_t}*\ new\_argv[]\ =\ \{}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00167}00167\ \ \ \ \ NULL}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00168}00168\ \ \ \};}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00169}00169\ }
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00170}00170\ \ \ \mbox{\hyperlink{gmock__test_8cc_ac9c8ae8722c330d47f75dee43fb8ab78}{TestInitGoogleMock}}(\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ new\_argv,\ \mbox{\hyperlink{gmock-port_8h_ad7119adfef06be5e7b1551633f5a1436}{GMOCK\_FLAG}}(verbose));}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00171}00171\ \}}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00172}00172\ }
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00173}\mbox{\hyperlink{gmock__test_8cc_ad08ca27203202ca15cdf8eaaa7003ba7}{00173}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(WideInitGoogleMockTest,\ ParsesEmptyCommandLine)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00174}00174\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{wchar\_t}*\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[]\ =\ \{}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00175}00175\ \ \ \ \ L\textcolor{stringliteral}{"{}foo.exe"{}},}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00176}00176\ \ \ \ \ NULL}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00177}00177\ \ \ \};}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00178}00178\ }
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00179}00179\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{wchar\_t}*\ new\_argv[]\ =\ \{}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00180}00180\ \ \ \ \ L\textcolor{stringliteral}{"{}foo.exe"{}},}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00181}00181\ \ \ \ \ NULL}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00182}00182\ \ \ \};}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00183}00183\ }
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00184}00184\ \ \ \mbox{\hyperlink{gmock__test_8cc_ac9c8ae8722c330d47f75dee43fb8ab78}{TestInitGoogleMock}}(\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ new\_argv,\ \mbox{\hyperlink{gmock-port_8h_ad7119adfef06be5e7b1551633f5a1436}{GMOCK\_FLAG}}(verbose));}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00185}00185\ \}}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00186}00186\ }
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00187}\mbox{\hyperlink{gmock__test_8cc_ab4288bcdb1b8464596f24c7384c72eb4}{00187}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(WideInitGoogleMockTest,\ ParsesSingleFlag)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00188}00188\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{wchar\_t}*\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[]\ =\ \{}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00189}00189\ \ \ \ \ L\textcolor{stringliteral}{"{}foo.exe"{}},}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00190}00190\ \ \ \ \ L\textcolor{stringliteral}{"{}-\/-\/gmock\_verbose=info"{}},}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00191}00191\ \ \ \ \ NULL}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00192}00192\ \ \ \};}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00193}00193\ }
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00194}00194\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{wchar\_t}*\ new\_argv[]\ =\ \{}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00195}00195\ \ \ \ \ L\textcolor{stringliteral}{"{}foo.exe"{}},}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00196}00196\ \ \ \ \ NULL}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00197}00197\ \ \ \};}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00198}00198\ }
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00199}00199\ \ \ \mbox{\hyperlink{gmock__test_8cc_ac9c8ae8722c330d47f75dee43fb8ab78}{TestInitGoogleMock}}(\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ new\_argv,\ \textcolor{stringliteral}{"{}info"{}});}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00200}00200\ \}}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00201}00201\ }
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00202}\mbox{\hyperlink{gmock__test_8cc_a00a9cde83573de9c598297cb89020e69}{00202}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(WideInitGoogleMockTest,\ ParsesMultipleFlags)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00203}00203\ \ \ \textcolor{keywordtype}{int}\ old\_default\_behavior\ =\ \mbox{\hyperlink{gmock-port_8h_ad7119adfef06be5e7b1551633f5a1436}{GMOCK\_FLAG}}(default\_mock\_behavior);}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00204}00204\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{wchar\_t}*\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[]\ =\ \{}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00205}00205\ \ \ \ \ L\textcolor{stringliteral}{"{}foo.exe"{}},}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00206}00206\ \ \ \ \ L\textcolor{stringliteral}{"{}-\/-\/gmock\_verbose=info"{}},}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00207}00207\ \ \ \ \ L\textcolor{stringliteral}{"{}-\/-\/gmock\_default\_mock\_behavior=2"{}},}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00208}00208\ \ \ \ \ NULL}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00209}00209\ \ \ \};}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00210}00210\ }
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00211}00211\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{wchar\_t}*\ new\_argv[]\ =\ \{}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00212}00212\ \ \ \ \ L\textcolor{stringliteral}{"{}foo.exe"{}},}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00213}00213\ \ \ \ \ NULL}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00214}00214\ \ \ \};}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00215}00215\ }
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00216}00216\ \ \ \mbox{\hyperlink{gmock__test_8cc_ac9c8ae8722c330d47f75dee43fb8ab78}{TestInitGoogleMock}}(\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ new\_argv,\ \textcolor{stringliteral}{"{}info"{}});}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00217}00217\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(2,\ \mbox{\hyperlink{gmock-port_8h_ad7119adfef06be5e7b1551633f5a1436}{GMOCK\_FLAG}}(default\_mock\_behavior));}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00218}00218\ \ \ \mbox{\hyperlink{gtest_8h_a6ae7443947f25abc58bfcfcfc56b0d75}{EXPECT\_NE}}(2,\ old\_default\_behavior);}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00219}00219\ \ \ \mbox{\hyperlink{gmock-port_8h_ad7119adfef06be5e7b1551633f5a1436}{GMOCK\_FLAG}}(default\_mock\_behavior)\ =\ old\_default\_behavior;}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00220}00220\ \}}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00221}00221\ }
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00222}\mbox{\hyperlink{gmock__test_8cc_a29f97c351b2c31a05b34d7c63bb06392}{00222}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(WideInitGoogleMockTest,\ ParsesUnrecognizedFlag)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00223}00223\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{wchar\_t}*\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[]\ =\ \{}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00224}00224\ \ \ \ \ L\textcolor{stringliteral}{"{}foo.exe"{}},}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00225}00225\ \ \ \ \ L\textcolor{stringliteral}{"{}-\/-\/non\_gmock\_flag=blah"{}},}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00226}00226\ \ \ \ \ NULL}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00227}00227\ \ \ \};}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00228}00228\ }
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00229}00229\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{wchar\_t}*\ new\_argv[]\ =\ \{}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00230}00230\ \ \ \ \ L\textcolor{stringliteral}{"{}foo.exe"{}},}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00231}00231\ \ \ \ \ L\textcolor{stringliteral}{"{}-\/-\/non\_gmock\_flag=blah"{}},}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00232}00232\ \ \ \ \ NULL}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00233}00233\ \ \ \};}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00234}00234\ }
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00235}00235\ \ \ \mbox{\hyperlink{gmock__test_8cc_ac9c8ae8722c330d47f75dee43fb8ab78}{TestInitGoogleMock}}(\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ new\_argv,\ \mbox{\hyperlink{gmock-port_8h_ad7119adfef06be5e7b1551633f5a1436}{GMOCK\_FLAG}}(verbose));}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00236}00236\ \}}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00237}00237\ }
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00238}\mbox{\hyperlink{gmock__test_8cc_a6d85c181697be8603091b049564cf5c6}{00238}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(WideInitGoogleMockTest,\ ParsesGoogleMockFlagAndUnrecognizedFlag)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00239}00239\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{wchar\_t}*\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[]\ =\ \{}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00240}00240\ \ \ \ \ L\textcolor{stringliteral}{"{}foo.exe"{}},}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00241}00241\ \ \ \ \ L\textcolor{stringliteral}{"{}-\/-\/non\_gmock\_flag=blah"{}},}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00242}00242\ \ \ \ \ L\textcolor{stringliteral}{"{}-\/-\/gmock\_verbose=error"{}},}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00243}00243\ \ \ \ \ NULL}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00244}00244\ \ \ \};}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00245}00245\ }
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00246}00246\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{wchar\_t}*\ new\_argv[]\ =\ \{}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00247}00247\ \ \ \ \ L\textcolor{stringliteral}{"{}foo.exe"{}},}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00248}00248\ \ \ \ \ L\textcolor{stringliteral}{"{}-\/-\/non\_gmock\_flag=blah"{}},}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00249}00249\ \ \ \ \ NULL}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00250}00250\ \ \ \};}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00251}00251\ }
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00252}00252\ \ \ \mbox{\hyperlink{gmock__test_8cc_ac9c8ae8722c330d47f75dee43fb8ab78}{TestInitGoogleMock}}(\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ new\_argv,\ \textcolor{stringliteral}{"{}error"{}});}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00253}00253\ \}}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00254}00254\ }
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00255}00255\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ !defined(GTEST\_CUSTOM\_INIT\_GOOGLE\_TEST\_FUNCTION\_)}}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00256}00256\ }
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00257}00257\ \textcolor{comment}{//\ Makes\ sure\ Google\ Mock\ flags\ can\ be\ accessed\ in\ code.}}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00258}\mbox{\hyperlink{gmock__test_8cc_a737c00dcd21d5b1ef3d9299cab7a51d3}{00258}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(FlagTest,\ IsAccessibleInCode)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00259}00259\ \ \ \textcolor{keywordtype}{bool}\ dummy\ =\ testing::GMOCK\_FLAG(catch\_leaked\_mocks)\ \&\&}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00260}00260\ \ \ \ \ \ \ testing::GMOCK\_FLAG(verbose)\ ==\ \textcolor{stringliteral}{"{}"{}};}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00261}00261\ \ \ (void)dummy;\ \ \textcolor{comment}{//\ Avoids\ the\ "{}unused\ local\ variable"{}\ warning.}}
+\DoxyCodeLine{\Hypertarget{gmock__test_8cc_source_l00262}00262\ \}}
+
+\end{DoxyCode}

@@ -1,0 +1,11 @@
+<map id="sysio::chain::generated_transaction" name="sysio::chain::generated_transaction">
+<area shape="rect" id="Node000001" title=" " alt="" coords="168,124,325,165"/>
+<area shape="rect" id="Node000002" href="$classfc_1_1sha256.html" title=" " alt="" coords="5,5,88,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="74,39,113,68,157,98,202,121,200,126,154,102,109,72,71,43"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1chain_1_1name.html" title="Immutable except for fc::from_variant." alt="" coords="112,5,243,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="193,43,238,122,233,125,189,46"/>
+<area shape="rect" id="Node000004" href="$classfc_1_1time__point.html" title=" " alt="" coords="267,5,367,31"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="305,46,260,125,255,122,301,43"/>
+<area shape="rect" id="Node000005" href="$classfc_1_1vector.html" title=" " alt="" coords="392,5,517,31"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="436,45,406,74,369,102,318,126,316,121,366,98,403,70,433,41"/>
+</map>

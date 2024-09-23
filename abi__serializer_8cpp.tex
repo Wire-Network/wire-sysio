@@ -1,0 +1,50 @@
+\doxysection{libraries/chain/abi\+\_\+serializer.cpp File Reference}
+\hypertarget{abi__serializer_8cpp}{}\label{abi__serializer_8cpp}\index{libraries/chain/abi\_serializer.cpp@{libraries/chain/abi\_serializer.cpp}}
+{\ttfamily \#include $<$sysio/chain/abi\+\_\+serializer.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/asset.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/exceptions.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/io/raw.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/algorithm/string/predicate.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/io/varint.\+hpp$>$}\newline
+Include dependency graph for abi\+\_\+serializer.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{abi__serializer_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor}{sysio\+::chain\+::impl\+::generate\+\_\+path\+\_\+string\+\_\+visitor}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1path__item__type__visitor}{sysio\+::chain\+::impl\+::path\+\_\+item\+\_\+type\+\_\+visitor}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain}{sysio\+::chain}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain_1_1impl}{sysio\+::chain\+::impl}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \mbox{\hyperlink{namespacesysio_1_1chain_a3ecb976e999cca9527cc285655784283}{sysio\+::chain\+::variant\+\_\+from\+\_\+stream}} (\mbox{\hyperlink{classfc_1_1datastream}{fc\+::datastream}}$<$ const char \texorpdfstring{$\ast$}{*} $>$ \&stream)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \mbox{\hyperlink{namespacesysio_1_1chain_ad6ac471a90eefcb17b2783872715c7ff}{sysio\+::chain\+::variant\+\_\+from\+\_\+stream}} (\mbox{\hyperlink{classfc_1_1datastream}{fc\+::datastream}}$<$ const char \texorpdfstring{$\ast$}{*} $>$ \&stream, const \mbox{\hyperlink{structsysio_1_1chain_1_1abi__serializer_ac81c8efe132df6ebffcfa61fb2a6959e}{abi\+\_\+serializer\+::yield\+\_\+function\+\_\+t}} \&yield)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\auto \mbox{\hyperlink{namespacesysio_1_1chain_ae38ee83f72344acbe3cbd39d2f8b3b13}{sysio\+::chain\+::pack\+\_\+function}} ()
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\auto \mbox{\hyperlink{namespacesysio_1_1chain_a40db245206b3fd97f92f02b6b391d47b}{sysio\+::chain\+::pack\+\_\+unpack}} ()
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\auto \mbox{\hyperlink{namespacesysio_1_1chain_ab5f59cb8d8c9a23b837a26462509aeb3}{sysio\+::chain\+::pack\+\_\+unpack\+\_\+deadline}} ()
+\item 
+constexpr size\+\_\+t \mbox{\hyperlink{namespacesysio_1_1chain_1_1impl_a808811094deb4a3461bcc19cc611ebb4}{sysio\+::chain\+::impl\+::const\+\_\+strlen}} (const char \texorpdfstring{$\ast$}{*}str)
+\item 
+void \mbox{\hyperlink{namespacesysio_1_1chain_1_1impl_a0ff60b42e045adb210fcfb9e00f7a3af}{sysio\+::chain\+::impl\+::output\+\_\+name}} (std\+::ostream \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, const string\+\_\+view \&str, bool shorten, size\+\_\+t max\+\_\+length=64)
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1chain_1_1impl_a895fb1ce3fc84c602deed5d3192c1368}{sysio\+::chain\+::impl\+::limit\+\_\+size}} (const std\+::string\+\_\+view \&str)
+\begin{DoxyCompactList}\small\item\em limits the string size to default max\+\_\+length of output\+\_\+name \end{DoxyCompactList}\end{DoxyCompactItemize}

@@ -1,0 +1,161 @@
+\doxysection{sysio\+::testing\+::tester\+\_\+network Class Reference}
+\hypertarget{classsysio_1_1testing_1_1tester__network}{}\label{classsysio_1_1testing_1_1tester__network}\index{sysio::testing::tester\_network@{sysio::testing::tester\_network}}
+
+
+The \doxylink{classsysio_1_1testing_1_1tester__network}{tester\+\_\+network} class provides a simplistic virtual P2P network connecting testing\+\_\+blockchains together.  
+
+
+
+
+{\ttfamily \#include $<$tester\+\_\+network.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{classsysio_1_1testing_1_1tester__network_a9c9b830e5114d4f23d69db171b80dea6}{connect\+\_\+blockchain}} (\mbox{\hyperlink{classsysio_1_1testing_1_1base__tester}{base\+\_\+tester}} \&new\+\_\+blockchain)
+\begin{DoxyCompactList}\small\item\em Add a new blockchain to the network. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classsysio_1_1testing_1_1tester__network_a185eee1d04eaeec842264b6a785bf3a2}{disconnect\+\_\+blockchain}} (\mbox{\hyperlink{classsysio_1_1testing_1_1base__tester}{base\+\_\+tester}} \&leaving\+\_\+blockchain)
+\begin{DoxyCompactList}\small\item\em Remove a blockchain from the network. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classsysio_1_1testing_1_1tester__network_a427768b3251b21855ab9a11adca108eb}{disconnect\+\_\+all}} ()
+\begin{DoxyCompactList}\small\item\em Disconnect all blockchains from the network. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classsysio_1_1testing_1_1tester__network_a387aeb702021c55f8278b47947d508a2}{propagate\+\_\+block}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1signed__block}{signed\+\_\+block}} \&block, const \mbox{\hyperlink{classsysio_1_1testing_1_1base__tester}{base\+\_\+tester}} \&skip\+\_\+db)
+\begin{DoxyCompactList}\small\item\em Send a block to all blockchains in this network. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::map$<$ \mbox{\hyperlink{classsysio_1_1testing_1_1base__tester}{base\+\_\+tester}} \texorpdfstring{$\ast$}{*}, scoped\+\_\+connection $>$ \mbox{\hyperlink{classsysio_1_1testing_1_1tester__network_a1845041cf846962d2b6d989a54dccfcd}{blockchains}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\doxylink{struct_a}{A} tester may be connected to zero or more tester\+\_\+networks at any given time. When a new tester joins the network, it will be synced with all other blockchains already in the network (blocks known only to the new chain will be pushed to the prior network members and vice versa, ignoring blocks not on the main fork). After this, whenever any blockchain in the network gets a new block, that block will be pushed to all other blockchains in the network as well. 
+
+Definition at line \mbox{\hyperlink{tester__network_8hpp_source_l00019}{19}} of file \mbox{\hyperlink{tester__network_8hpp_source}{tester\+\_\+network.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1testing_1_1tester__network_a9c9b830e5114d4f23d69db171b80dea6}\index{sysio::testing::tester\_network@{sysio::testing::tester\_network}!connect\_blockchain@{connect\_blockchain}}
+\index{connect\_blockchain@{connect\_blockchain}!sysio::testing::tester\_network@{sysio::testing::tester\_network}}
+\doxysubsubsection{\texorpdfstring{connect\_blockchain()}{connect\_blockchain()}}
+{\footnotesize\ttfamily \label{classsysio_1_1testing_1_1tester__network_a9c9b830e5114d4f23d69db171b80dea6} 
+void sysio\+::testing\+::tester\+\_\+network\+::connect\+\_\+blockchain (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classsysio_1_1testing_1_1base__tester}{base\+\_\+tester}} \&}]{new\+\_\+blockchain}{}\end{DoxyParamCaption})}
+
+
+\begin{DoxyParams}{Parameters}
+{\em new\+\_\+blockchain} & The blockchain to add \\
+\hline
+\end{DoxyParams}
+TODO restore this
+
+Definition at line \mbox{\hyperlink{tester__network_8cpp_source_l00005}{5}} of file \mbox{\hyperlink{tester__network_8cpp_source}{tester\+\_\+network.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00005\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00006\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classsysio_1_1testing_1_1tester__network_a1845041cf846962d2b6d989a54dccfcd}{blockchains}}.count(\&new\_blockchain))}
+\DoxyCodeLine{00007\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00008\ }
+\DoxyCodeLine{00009\ \ \ \ \ \ \ \textcolor{comment}{//\ If\ the\ network\ isn't\ empty,\ sync\ the\ new\ blockchain\ with\ one\ of\ the\ old\ ones.\ The\ old\ ones\ are\ already\ in\ sync\ with}}
+\DoxyCodeLine{00010\ \ \ \ \ \ \ \textcolor{comment}{//\ each\ other,\ so\ just\ grab\ one\ arbitrarily.\ The\ old\ blockchains\ are\ connected\ to\ the\ propagation\ signals,\ so\ when\ one}}
+\DoxyCodeLine{00011\ \ \ \ \ \ \ \textcolor{comment}{//\ of\ them\ gets\ synced,\ it\ will\ propagate\ blocks\ to\ the\ others\ as\ well.}}
+\DoxyCodeLine{00012\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{classsysio_1_1testing_1_1tester__network_a1845041cf846962d2b6d989a54dccfcd}{blockchains}}.empty())\ \{}
+\DoxyCodeLine{00013\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1testing_1_1tester__network_a1845041cf846962d2b6d989a54dccfcd}{blockchains}}.begin()-\/>first-\/>sync\_with(new\_blockchain);}
+\DoxyCodeLine{00014\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00015\ }
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \textcolor{comment}{//\ The\ new\ blockchain\ is\ now\ in\ sync\ with\ any\ old\ ones;\ go\ ahead\ and\ connect\ the\ propagation\ signal.}}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00019\ \ \ \ \ \ \ }
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \textcolor{comment}{/*}}
+\DoxyCodeLine{00021\ \textcolor{comment}{\ \ \ \ \ \ blockchains[\&new\_blockchain]\ =\ new\_blockchain.control-\/>applied\_block.connect(}}
+\DoxyCodeLine{00022\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ [this,\ \&new\_blockchain](const\ chain::block\_trace\&\ bt)\ \{}}
+\DoxyCodeLine{00023\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ propagate\_block(bt.block,\ new\_blockchain);}}
+\DoxyCodeLine{00024\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \});}}
+\DoxyCodeLine{00025\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ */}}
+\DoxyCodeLine{00026\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1testing_1_1tester__network_a427768b3251b21855ab9a11adca108eb}\index{sysio::testing::tester\_network@{sysio::testing::tester\_network}!disconnect\_all@{disconnect\_all}}
+\index{disconnect\_all@{disconnect\_all}!sysio::testing::tester\_network@{sysio::testing::tester\_network}}
+\doxysubsubsection{\texorpdfstring{disconnect\_all()}{disconnect\_all()}}
+{\footnotesize\ttfamily \label{classsysio_1_1testing_1_1tester__network_a427768b3251b21855ab9a11adca108eb} 
+void sysio\+::testing\+::tester\+\_\+network\+::disconnect\+\_\+all (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{tester__network_8cpp_source_l00032}{32}} of file \mbox{\hyperlink{tester__network_8cpp_source}{tester\+\_\+network.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1testing_1_1tester__network_a1845041cf846962d2b6d989a54dccfcd}{blockchains}}.clear();}
+\DoxyCodeLine{00034\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1testing_1_1tester__network_a185eee1d04eaeec842264b6a785bf3a2}\index{sysio::testing::tester\_network@{sysio::testing::tester\_network}!disconnect\_blockchain@{disconnect\_blockchain}}
+\index{disconnect\_blockchain@{disconnect\_blockchain}!sysio::testing::tester\_network@{sysio::testing::tester\_network}}
+\doxysubsubsection{\texorpdfstring{disconnect\_blockchain()}{disconnect\_blockchain()}}
+{\footnotesize\ttfamily \label{classsysio_1_1testing_1_1tester__network_a185eee1d04eaeec842264b6a785bf3a2} 
+void sysio\+::testing\+::tester\+\_\+network\+::disconnect\+\_\+blockchain (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classsysio_1_1testing_1_1base__tester}{base\+\_\+tester}} \&}]{leaving\+\_\+blockchain}{}\end{DoxyParamCaption})}
+
+
+\begin{DoxyParams}{Parameters}
+{\em leaving\+\_\+blockchain} & The blockchain to remove \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{tester__network_8cpp_source_l00028}{28}} of file \mbox{\hyperlink{tester__network_8cpp_source}{tester\+\_\+network.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1testing_1_1tester__network_a1845041cf846962d2b6d989a54dccfcd}{blockchains}}.erase(\&leaving\_blockchain);}
+\DoxyCodeLine{00030\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1testing_1_1tester__network_a387aeb702021c55f8278b47947d508a2}\index{sysio::testing::tester\_network@{sysio::testing::tester\_network}!propagate\_block@{propagate\_block}}
+\index{propagate\_block@{propagate\_block}!sysio::testing::tester\_network@{sysio::testing::tester\_network}}
+\doxysubsubsection{\texorpdfstring{propagate\_block()}{propagate\_block()}}
+{\footnotesize\ttfamily \label{classsysio_1_1testing_1_1tester__network_a387aeb702021c55f8278b47947d508a2} 
+void sysio\+::testing\+::tester\+\_\+network\+::propagate\+\_\+block (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1signed__block}{signed\+\_\+block}} \&}]{block}{, }\item[{const \mbox{\hyperlink{classsysio_1_1testing_1_1base__tester}{base\+\_\+tester}} \&}]{skip\+\_\+db}{}\end{DoxyParamCaption})}
+
+
+\begin{DoxyParams}{Parameters}
+{\em block} & The block to send \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{tester__network_8cpp_source_l00036}{36}} of file \mbox{\hyperlink{tester__network_8cpp_source}{tester\+\_\+network.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00037\ \ \ \ \ \textcolor{comment}{//\ \ for\ (const\ auto\ \&pair\ :\ blockchains)\ \{}}
+\DoxyCodeLine{00038\ \ \ \ \ \textcolor{comment}{//\ \ \ \ \ if\ (pair.first\ ==\ \&skip\_blockchain)\ continue;}}
+\DoxyCodeLine{00039\ \ \ \ \ \textcolor{comment}{//\ \ \ \ \ boost::signals2::shared\_connection\_block\ blocker(pair.second);}}
+\DoxyCodeLine{00040\ \ \ \ \ \textcolor{comment}{//\ \ \ \ \ pair.first-\/>control-\/>push\_block(block,\ sysio::chain::validation\_steps::created\_block);}}
+\DoxyCodeLine{00041\ \ \ \ \ \textcolor{comment}{//\ \ \}}}
+\DoxyCodeLine{00042\ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classsysio_1_1testing_1_1tester__network_a1845041cf846962d2b6d989a54dccfcd}\index{sysio::testing::tester\_network@{sysio::testing::tester\_network}!blockchains@{blockchains}}
+\index{blockchains@{blockchains}!sysio::testing::tester\_network@{sysio::testing::tester\_network}}
+\doxysubsubsection{\texorpdfstring{blockchains}{blockchains}}
+{\footnotesize\ttfamily \label{classsysio_1_1testing_1_1tester__network_a1845041cf846962d2b6d989a54dccfcd} 
+std\+::map$<$\mbox{\hyperlink{classsysio_1_1testing_1_1base__tester}{base\+\_\+tester}} \texorpdfstring{$\ast$}{*}, scoped\+\_\+connection$>$ sysio\+::testing\+::tester\+\_\+network\+::blockchains\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{tester__network_8hpp_source_l00045}{45}} of file \mbox{\hyperlink{tester__network_8hpp_source}{tester\+\_\+network.\+hpp}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/testing/include/sysio/testing/\mbox{\hyperlink{tester__network_8hpp}{tester\+\_\+network.\+hpp}}\item 
+libraries/testing/\mbox{\hyperlink{tester__network_8cpp}{tester\+\_\+network.\+cpp}}\end{DoxyCompactItemize}

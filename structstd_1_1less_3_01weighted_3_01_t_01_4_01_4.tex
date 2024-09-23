@@ -1,0 +1,42 @@
+\doxysection{std\+::less\texorpdfstring{$<$}{<} weighted\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>} \texorpdfstring{$>$}{>} Struct Template Reference}
+\hypertarget{structstd_1_1less_3_01weighted_3_01_t_01_4_01_4}{}\label{structstd_1_1less_3_01weighted_3_01_t_01_4_01_4}\index{std::less$<$ weighted$<$ T $>$ $>$@{std::less$<$ weighted$<$ T $>$ $>$}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{structstd_1_1less_3_01weighted_3_01_t_01_4_01_4_a1a6a1e94171e4c0cd4fcfd49deec7382}{operator()}} (const weighted$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&lhs, const weighted$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&rhs) const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$\newline
+struct std\+::less$<$ weighted$<$ T $>$ $>$}
+support for using {\ttfamily weighted\texorpdfstring{$<$}{<}T\texorpdfstring{$>$}{>}} in ordered containers 
+
+Definition at line \mbox{\hyperlink{account__query__db_8cpp_source_l00119}{119}} of file \mbox{\hyperlink{account__query__db_8cpp_source}{account\+\_\+query\+\_\+db.\+cpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structstd_1_1less_3_01weighted_3_01_t_01_4_01_4_a1a6a1e94171e4c0cd4fcfd49deec7382}\index{std::less$<$ weighted$<$ T $>$ $>$@{std::less$<$ weighted$<$ T $>$ $>$}!operator()@{operator()}}
+\index{operator()@{operator()}!std::less$<$ weighted$<$ T $>$ $>$@{std::less$<$ weighted$<$ T $>$ $>$}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}}
+{\footnotesize\ttfamily \label{structstd_1_1less_3_01weighted_3_01_t_01_4_01_4_a1a6a1e94171e4c0cd4fcfd49deec7382} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+bool std\+::less$<$ weighted$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ $>$\+::operator() (\begin{DoxyParamCaption}\item[{const weighted$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&}]{lhs}{, }\item[{const weighted$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&}]{rhs}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{account__query__db_8cpp_source_l00120}{120}} of file \mbox{\hyperlink{account__query__db_8cpp_source}{account\+\_\+query\+\_\+db.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::tie(lhs.value,\ lhs.weight)\ <\ std::tie(rhs.value,\ rhs.weight);}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+plugins/chain\+\_\+plugin/\mbox{\hyperlink{account__query__db_8cpp}{account\+\_\+query\+\_\+db.\+cpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,15 @@
+<map id="fc::detail::ntp_impl::fc_time_point_to_ntp_timestamp" name="fc::detail::ntp_impl::fc_time_point_to_ntp_timestamp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="719,26,869,82"/>
+<area shape="rect" id="Node000002" href="$classfc_1_1detail_1_1ntp__impl.html#aabb55b1b1ca4de17db3d2b7f3f3ab56a" title=" " alt="" coords="542,33,671,74"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="703,56,671,56,671,51,703,51"/>
+<area shape="rect" id="Node000003" href="$classfc_1_1detail_1_1ntp__impl.html#a5b3a58d9010e8ca23ee3e287595b8967" title=" " alt="" coords="182,5,310,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="529,31,494,24,398,18,311,22,310,17,398,13,495,19,530,26"/>
+<area shape="rect" id="Node000005" href="$classfc_1_1detail_1_1ntp__impl.html#ab2beecf0f92d0bad2bdd8047f45ab599" title=" " alt="" coords="358,33,494,74"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="527,56,495,56,495,51,527,51"/>
+<area shape="rect" id="Node000006" href="$classfc_1_1detail_1_1ntp__impl.html#a3ee1de6f11e03bf63ac439e5bddec0b7" title=" " alt="" coords="362,123,490,163"/>
+<area shape="poly" id="edge6_Node000002_Node000006" title=" " alt="" coords="551,84,470,125,468,120,549,79"/>
+<area shape="rect" id="Node000004" href="$classfc_1_1detail_1_1ntp__impl.html#a70d5cd30257c17171bc81e7dba288664" title=" " alt="" coords="5,5,134,46"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="166,28,134,28,134,23,166,23"/>
+<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="342,43,310,38,311,33,343,38"/>
+<area shape="poly" id="edge7_Node000006_Node000006" title=" " alt="" coords="455,109,444,104,426,101,409,103,399,108,395,114,397,122,392,123,390,113,396,104,408,98,426,96,446,98,458,105"/>
+</map>

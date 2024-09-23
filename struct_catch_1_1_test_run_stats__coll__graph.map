@@ -1,0 +1,13 @@
+<map id="Catch::TestRunStats" name="Catch::TestRunStats">
+<area shape="rect" id="Node000001" title=" " alt="" coords="72,316,216,342"/>
+<area shape="rect" id="Node000002" href="$struct_catch_1_1_test_run_info.html" title=" " alt="" coords="5,228,141,253"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="94,263,136,314,132,318,90,267"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="46,124,100,150"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="76,165,76,227,70,227,70,165"/>
+<area shape="rect" id="Node000004" href="$struct_catch_1_1_totals.html" title=" " alt="" coords="165,228,264,253"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="197,267,155,318,151,314,193,263"/>
+<area shape="rect" id="Node000005" href="$struct_catch_1_1_counts.html" title=" " alt="" coords="161,124,268,150"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="217,165,217,227,212,227,212,165"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="186,5,242,31"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="217,47,217,123,212,123,212,47"/>
+</map>

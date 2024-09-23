@@ -1,0 +1,83 @@
+\doxysection{libraries/sys-\/vm/external/\+Catch2/projects/\+Extra\+Tests/\+X03-\/\+Disabled\+Exceptions-\/\+Default\+Handler.cpp File Reference}
+\hypertarget{_x03-_disabled_exceptions-_default_handler_8cpp}{}\label{_x03-_disabled_exceptions-_default_handler_8cpp}\index{libraries/sys-\/vm/external/Catch2/projects/ExtraTests/X03-\/DisabledExceptions-\/DefaultHandler.cpp@{libraries/sys-\/vm/external/Catch2/projects/ExtraTests/X03-\/DisabledExceptions-\/DefaultHandler.cpp}}
+{\ttfamily \#include $<$catch2/catch.\+hpp$>$}\newline
+Include dependency graph for X03-\/\+Disabled\+Exceptions-\/\+Default\+Handler.cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{_x03-_disabled_exceptions-_default_handler_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{_x03-_disabled_exceptions-_default_handler_8cpp_a656eb5868e824d59f489f910db438420}{CATCH\+\_\+\+CONFIG\+\_\+\+MAIN}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{_x03-_disabled_exceptions-_default_handler_8cpp_aa07a28d6c769eba97cd7de6231431d3d}{TEST\+\_\+\+CASE}} ("{}Tests that run"{})
+\item 
+\mbox{\hyperlink{_x03-_disabled_exceptions-_default_handler_8cpp_a6bee8da195893a3daf97a491f19c73c0}{TEST\+\_\+\+CASE}} ("{}Tests that abort"{})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{_x03-_disabled_exceptions-_default_handler_8cpp_a656eb5868e824d59f489f910db438420}\index{X03-\/DisabledExceptions-\/DefaultHandler.cpp@{X03-\/DisabledExceptions-\/DefaultHandler.cpp}!CATCH\_CONFIG\_MAIN@{CATCH\_CONFIG\_MAIN}}
+\index{CATCH\_CONFIG\_MAIN@{CATCH\_CONFIG\_MAIN}!X03-\/DisabledExceptions-\/DefaultHandler.cpp@{X03-\/DisabledExceptions-\/DefaultHandler.cpp}}
+\doxysubsubsection{\texorpdfstring{CATCH\_CONFIG\_MAIN}{CATCH\_CONFIG\_MAIN}}
+{\footnotesize\ttfamily \label{_x03-_disabled_exceptions-_default_handler_8cpp_a656eb5868e824d59f489f910db438420} 
+\#define CATCH\+\_\+\+CONFIG\+\_\+\+MAIN}
+
+
+
+Definition at line \mbox{\hyperlink{_x03-_disabled_exceptions-_default_handler_8cpp_source_l00001}{1}} of file \mbox{\hyperlink{_x03-_disabled_exceptions-_default_handler_8cpp_source}{X03-\/\+Disabled\+Exceptions-\/\+Default\+Handler.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{_x03-_disabled_exceptions-_default_handler_8cpp_a6bee8da195893a3daf97a491f19c73c0}\index{X03-\/DisabledExceptions-\/DefaultHandler.cpp@{X03-\/DisabledExceptions-\/DefaultHandler.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!X03-\/DisabledExceptions-\/DefaultHandler.cpp@{X03-\/DisabledExceptions-\/DefaultHandler.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{_x03-_disabled_exceptions-_default_handler_8cpp_a6bee8da195893a3daf97a491f19c73c0} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Tests that abort"{}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_x03-_disabled_exceptions-_default_handler_8cpp_source_l00014}{14}} of file \mbox{\hyperlink{_x03-_disabled_exceptions-_default_handler_8cpp_source}{X03-\/\+Disabled\+Exceptions-\/\+Default\+Handler.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00014\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00015\ \ \ \ \ \textcolor{comment}{//\ Avoid\ abort\ and\ other\ exceptional\ exits\ -\/-\/\ there\ is\ no\ way}}
+\DoxyCodeLine{00016\ \ \ \ \ \textcolor{comment}{//\ to\ tell\ CMake\ that\ abort\ is\ the\ desired\ outcome\ of\ a\ test.}}
+\DoxyCodeLine{00017\ \ \ \ \ std::set\_terminate([]()\{exit(1);\});}
+\DoxyCodeLine{00018\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(1\ ==\ 1);}
+\DoxyCodeLine{00019\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(1\ !=\ 2);}
+\DoxyCodeLine{00020\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(1\ ==\ 3);}
+\DoxyCodeLine{00021\ \ \ \ \ \textcolor{comment}{//\ We\ should\ not\ get\ here,\ because\ the\ test\ above\ aborts}}
+\DoxyCodeLine{00022\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(1\ !=\ 4);}
+\DoxyCodeLine{00023\ \}}
+
+\end{DoxyCode}
+\Hypertarget{_x03-_disabled_exceptions-_default_handler_8cpp_aa07a28d6c769eba97cd7de6231431d3d}\index{X03-\/DisabledExceptions-\/DefaultHandler.cpp@{X03-\/DisabledExceptions-\/DefaultHandler.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!X03-\/DisabledExceptions-\/DefaultHandler.cpp@{X03-\/DisabledExceptions-\/DefaultHandler.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{_x03-_disabled_exceptions-_default_handler_8cpp_aa07a28d6c769eba97cd7de6231431d3d} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Tests that run"{}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_x03-_disabled_exceptions-_default_handler_8cpp_source_l00004}{4}} of file \mbox{\hyperlink{_x03-_disabled_exceptions-_default_handler_8cpp_source}{X03-\/\+Disabled\+Exceptions-\/\+Default\+Handler.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00004\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00005\ \ \ \ \ \textcolor{comment}{//\ All\ of\ these\ should\ be\ run\ and\ be\ reported}}
+\DoxyCodeLine{00006\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(1\ ==\ 2);}
+\DoxyCodeLine{00007\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(1\ ==\ 1);}
+\DoxyCodeLine{00008\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(1\ !=\ 3);}
+\DoxyCodeLine{00009\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(1\ ==\ 4);}
+\DoxyCodeLine{00010\ \}}
+
+\end{DoxyCode}

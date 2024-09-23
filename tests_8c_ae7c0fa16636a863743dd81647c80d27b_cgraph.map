@@ -1,0 +1,20 @@
+<map id="run_tagged_sha256_tests" name="run_tagged_sha256_tests">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,120,176,145"/>
+<area shape="rect" id="Node000002" href="$yubihsm__pkcs11_8c.html#ae785d5badbf1f08b491af31f32a135a1" title=" " alt="" coords="280,21,352,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="110,117,160,86,223,55,264,42,266,47,225,60,163,91,113,121"/>
+<area shape="rect" id="Node000003" href="$secp256k1_8c.html#a861ce6fc7ee5e9fc346a5fee7093adb1" title=" " alt="" coords="227,70,404,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="152,116,238,97,240,102,153,121"/>
+<area shape="rect" id="Node000006" href="$secp256k1_8c.html#ac80c186f8ff22d87441240267a2c8100" title=" " alt="" coords="224,120,408,145"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="176,130,208,130,208,135,176,135"/>
+<area shape="rect" id="Node000008" href="$secp256k1_8c.html#a947ba36e0fe0bced91d4c9a7ef3b1f09" title=" " alt="" coords="236,169,396,210"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="145,143,221,163,220,168,143,148"/>
+<area shape="rect" id="Node000009" href="$secp256k1_8c.html#a364d53929192054916b1207a22e701ec" title=" " alt="" coords="226,234,406,260"/>
+<area shape="poly" id="edge9_Node000001_Node000009" title=" " alt="" coords="109,144,159,181,225,219,242,226,240,231,222,224,156,185,106,148"/>
+<area shape="rect" id="Node000004" href="$secp256k1_8c.html#af4866e9619f06679358fe6338ed42cd0" title=" " alt="" coords="456,5,667,46"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="374,67,456,48,457,53,375,72"/>
+<area shape="rect" id="Node000005" href="$secp256k1_8c.html#a9f5faeec85b85bdaccd7ddda899dbfa2" title=" " alt="" coords="715,42,958,68"/>
+<area shape="poly" id="edge5_Node000003_Node000005" title=" " alt="" coords="405,76,699,60,700,65,405,81"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="668,34,700,38,700,43,668,40"/>
+<area shape="rect" id="Node000007" href="$secp256k1_8c.html#a62b32b6a46f53b6aef01d3888496a79f" title=" " alt="" coords="456,120,667,161"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="408,133,440,134,440,139,408,138"/>
+</map>

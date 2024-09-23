@@ -1,0 +1,278 @@
+\doxysection{libraries/wasm-\/jit/\+Source/\+IR/\+Validate.cpp File Reference}
+\hypertarget{_validate_8cpp}{}\label{_validate_8cpp}\index{libraries/wasm-\/jit/Source/IR/Validate.cpp@{libraries/wasm-\/jit/Source/IR/Validate.cpp}}
+{\ttfamily \#include "{}IR/\+Module.\+h"{}}\newline
+{\ttfamily \#include "{}IR/\+Operators.\+h"{}}\newline
+{\ttfamily \#include "{}IR/\+Operator\+Printer.\+h"{}}\newline
+{\ttfamily \#include "{}IR/\+Validate.\+h"{}}\newline
+{\ttfamily \#include "{}Logging/\+Logging.\+h"{}}\newline
+{\ttfamily \#include "{}Inline/\+Timing.\+h"{}}\newline
+{\ttfamily \#include $<$set$>$}\newline
+Include dependency graph for Validate.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{_validate_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_i_r_1_1_function_validation_context}{IR\+::\+Function\+Validation\+Context}}
+\item 
+struct \mbox{\hyperlink{struct_i_r_1_1_code_validation_stream_impl}{IR\+::\+Code\+Validation\+Stream\+Impl}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespace_i_r}{IR}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{_validate_8cpp_a042e13d7e40b6a804e22e1089a8074ec}{ENABLE\+\_\+\+LOGGING}}~0
+\item 
+\#define \mbox{\hyperlink{_validate_8cpp_a17a5193fad64ed76a99511b0bc1057e8}{VALIDATE\+\_\+\+UNLESS}}(reason,  comparison)
+\item 
+\#define \mbox{\hyperlink{_validate_8cpp_af10283475485df0d3b511707d7e6a4d7}{VALIDATE\+\_\+\+INDEX}}(index,  array\+Size)
+\item 
+\#define \mbox{\hyperlink{_validate_8cpp_aec12c50abeddde83317edb3d75c2d437}{LOAD}}(result\+Type\+Id)
+\item 
+\#define \mbox{\hyperlink{_validate_8cpp_a57b67fc5129dd91860d3a41ab67b60f3}{STORE}}(value\+Type\+Id)
+\item 
+\#define \mbox{\hyperlink{_validate_8cpp_a18eb1b75c82c533f80b24f7a55b66107}{NULLARY}}(result\+Type\+Id)
+\item 
+\#define \mbox{\hyperlink{_validate_8cpp_aaaf4ef40e88fd195e8b6bdb9b572b83d}{BINARY}}(operand\+Type\+Id,  result\+Type\+Id)
+\item 
+\#define \mbox{\hyperlink{_validate_8cpp_a420c6dfe43b03bfc02391cac17d9f1f1}{UNARY}}(operand\+Type\+Id,  result\+Type\+Id)
+\item 
+\#define \mbox{\hyperlink{_validate_8cpp_ac0c08c48cd3d4766501beca3a09cfb15}{VALIDATE\+\_\+\+OP}}(opcode,  \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  name\+String,  Imm,  validate\+Operands)
+\item 
+\#define \mbox{\hyperlink{_validate_8cpp_a0d04d0b7b632d732f24972574f4bde51}{VISIT\+\_\+\+OPCODE}}(\mbox{\hyperlink{localize_8hpp_a6554a5ea005e85d0f84f2f34c11de938}{\+\_\+}},  \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  name\+String,  Imm, ...)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{namespace_i_r_a8da3a77ff43cbfb1df55dd3adcb7fe7c}{IR\+::validate}} (\mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{Value\+Type}} value\+Type)
+\item 
+void \mbox{\hyperlink{namespace_i_r_af44302d021871ae2dfe63cc6e6500cc6}{IR\+::validate}} (\mbox{\hyperlink{namespace_i_r_ac56fb5355b338ad4a167c48ec539b90b}{Result\+Type}} return\+Type)
+\item 
+void \mbox{\hyperlink{namespace_i_r_ac6127e0f21382baafe1db445afdd4688}{IR\+::validate}} (\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908}{Object\+Kind}} kind)
+\item 
+void \mbox{\hyperlink{namespace_i_r_a2b28479fa1c40c43174e6d7528a17b3e}{IR\+::validate}} (\mbox{\hyperlink{struct_i_r_1_1_size_constraints}{Size\+Constraints}} size, \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} max\+Max)
+\item 
+void \mbox{\hyperlink{namespace_i_r_ae07a98f1785486783fcaed60bd637617}{IR\+::validate}} (\mbox{\hyperlink{namespace_i_r_a938516f231745a922740359bd3bdbc25}{Table\+Element\+Type}} type)
+\item 
+void \mbox{\hyperlink{namespace_i_r_a3a9ed9aa86392d71a7278c8ef552ca07}{IR\+::validate}} (\mbox{\hyperlink{struct_i_r_1_1_table_type}{Table\+Type}} type)
+\item 
+void \mbox{\hyperlink{namespace_i_r_a3d573ccce4065b0861cf9a77d65ea722}{IR\+::validate}} (\mbox{\hyperlink{struct_i_r_1_1_memory_type}{Memory\+Type}} type)
+\item 
+void \mbox{\hyperlink{namespace_i_r_a6fadc0dcadf0e2230296c5590de59ca9}{IR\+::validate}} (\mbox{\hyperlink{struct_i_r_1_1_global_type}{Global\+Type}} type)
+\item 
+void \mbox{\hyperlink{namespace_i_r_afb9145a4bfa58fedc2175b7a6cd09e11}{IR\+::validate\+Import\+Kind}} (\mbox{\hyperlink{struct_i_r_1_1_object_type}{Object\+Type}} import\+Type, \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908}{Object\+Kind}} expected\+Kind)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}} $>$ }\\void \mbox{\hyperlink{namespace_i_r_a676f46ec5bb239610dc364cacc50d779}{IR\+::validate\+Type}} (\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}} expected\+Type, \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}} actual\+Type, const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{structcontext}{context}})
+\item 
+void \mbox{\hyperlink{namespace_i_r_a828976099fcb4837979d20b3584d76c0}{IR\+::validate\+Operand\+Type}} (\mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{Value\+Type}} expected\+Type, \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{Value\+Type}} actual\+Type, const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{structcontext}{context}})
+\item 
+\mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{Value\+Type}} \mbox{\hyperlink{namespace_i_r_af69533e52a1b28c7325201f2365f6868}{IR\+::validate\+Global\+Index}} (const \mbox{\hyperlink{struct_i_r_1_1_module}{Module}} \&\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}, \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} global\+Index, bool must\+Be\+Mutable, bool must\+Be\+Immutable, bool must\+Be\+Import, const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{structcontext}{context}})
+\item 
+const \mbox{\hyperlink{struct_i_r_1_1_function_type}{Function\+Type}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_i_r_a7e5e03353622f6b7af0a5df82325bc47}{IR\+::validate\+Function\+Index}} (const \mbox{\hyperlink{struct_i_r_1_1_module}{Module}} \&\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}, \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} function\+Index)
+\item 
+void \mbox{\hyperlink{namespace_i_r_adb28ed6d351d5f23fccfa9a3a7165db4}{IR\+::validate\+Initializer}} (const \mbox{\hyperlink{struct_i_r_1_1_module}{Module}} \&\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}, const \mbox{\hyperlink{struct_i_r_1_1_initializer_expression}{Initializer\+Expression}} \&expression, \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{Value\+Type}} expected\+Type, const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{structcontext}{context}})
+\item 
+\mbox{\hyperlink{_i_r_8h_a0ee024894bb6f700da724f2f1a120abb}{IR\+\_\+\+API}} void \mbox{\hyperlink{namespace_i_r_a623d4533e80c60c6d4a5217635b7602f}{IR\+::validate\+Definitions}} (const \mbox{\hyperlink{struct_i_r_1_1_module}{IR\+::\+Module}} \&\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{_validate_8cpp_aaaf4ef40e88fd195e8b6bdb9b572b83d}\index{Validate.cpp@{Validate.cpp}!BINARY@{BINARY}}
+\index{BINARY@{BINARY}!Validate.cpp@{Validate.cpp}}
+\doxysubsubsection{\texorpdfstring{BINARY}{BINARY}}
+{\footnotesize\ttfamily \label{_validate_8cpp_aaaf4ef40e88fd195e8b6bdb9b572b83d} 
+\#define BINARY(\begin{DoxyParamCaption}\item[{}]{operand\+Type\+Id}{, }\item[{}]{result\+Type\+Id}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ popAndValidateOperands(operatorName,ValueType::operandTypeId,ValueType::operandTypeId);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ pushOperand(ResultType::resultTypeId)}
+
+\end{DoxyCode}
+\Hypertarget{_validate_8cpp_a042e13d7e40b6a804e22e1089a8074ec}\index{Validate.cpp@{Validate.cpp}!ENABLE\_LOGGING@{ENABLE\_LOGGING}}
+\index{ENABLE\_LOGGING@{ENABLE\_LOGGING}!Validate.cpp@{Validate.cpp}}
+\doxysubsubsection{\texorpdfstring{ENABLE\_LOGGING}{ENABLE\_LOGGING}}
+{\footnotesize\ttfamily \label{_validate_8cpp_a042e13d7e40b6a804e22e1089a8074ec} 
+\#define ENABLE\+\_\+\+LOGGING~0}
+
+
+
+Definition at line \mbox{\hyperlink{_validate_8cpp_source_l00010}{10}} of file \mbox{\hyperlink{_validate_8cpp_source}{Validate.\+cpp}}.
+
+\Hypertarget{_validate_8cpp_aec12c50abeddde83317edb3d75c2d437}\index{Validate.cpp@{Validate.cpp}!LOAD@{LOAD}}
+\index{LOAD@{LOAD}!Validate.cpp@{Validate.cpp}}
+\doxysubsubsection{\texorpdfstring{LOAD}{LOAD}}
+{\footnotesize\ttfamily \label{_validate_8cpp_aec12c50abeddde83317edb3d75c2d437} 
+\#define LOAD(\begin{DoxyParamCaption}\item[{}]{result\+Type\+Id}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ popAndValidateOperand(operatorName,ValueType::i32);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ pushOperand(ResultType::resultTypeId);}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{_validate_8cpp_source_l00372}{372}} of file \mbox{\hyperlink{_validate_8cpp_source}{Validate.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00372\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#define\ LOAD(resultTypeId)\ \(\backslash\)}}
+\DoxyCodeLine{00373\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ popAndValidateOperand(operatorName,ValueType::i32);\ \(\backslash\)}}
+\DoxyCodeLine{00374\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ pushOperand(ResultType::resultTypeId);}}
+
+\end{DoxyCode}
+\Hypertarget{_validate_8cpp_a18eb1b75c82c533f80b24f7a55b66107}\index{Validate.cpp@{Validate.cpp}!NULLARY@{NULLARY}}
+\index{NULLARY@{NULLARY}!Validate.cpp@{Validate.cpp}}
+\doxysubsubsection{\texorpdfstring{NULLARY}{NULLARY}}
+{\footnotesize\ttfamily \label{_validate_8cpp_a18eb1b75c82c533f80b24f7a55b66107} 
+\#define NULLARY(\begin{DoxyParamCaption}\item[{}]{result\+Type\+Id}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ pushOperand(ResultType::resultTypeId);}
+
+\end{DoxyCode}
+\Hypertarget{_validate_8cpp_a57b67fc5129dd91860d3a41ab67b60f3}\index{Validate.cpp@{Validate.cpp}!STORE@{STORE}}
+\index{STORE@{STORE}!Validate.cpp@{Validate.cpp}}
+\doxysubsubsection{\texorpdfstring{STORE}{STORE}}
+{\footnotesize\ttfamily \label{_validate_8cpp_a57b67fc5129dd91860d3a41ab67b60f3} 
+\#define STORE(\begin{DoxyParamCaption}\item[{}]{value\+Type\+Id}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ popAndValidateOperands(operatorName,ValueType::i32,ValueType::valueTypeId);}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{_validate_8cpp_source_l00375}{375}} of file \mbox{\hyperlink{_validate_8cpp_source}{Validate.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00375\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#define\ STORE(valueTypeId)\ \(\backslash\)}}
+\DoxyCodeLine{00376\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ popAndValidateOperands(operatorName,ValueType::i32,ValueType::valueTypeId);}}
+
+\end{DoxyCode}
+\Hypertarget{_validate_8cpp_a420c6dfe43b03bfc02391cac17d9f1f1}\index{Validate.cpp@{Validate.cpp}!UNARY@{UNARY}}
+\index{UNARY@{UNARY}!Validate.cpp@{Validate.cpp}}
+\doxysubsubsection{\texorpdfstring{UNARY}{UNARY}}
+{\footnotesize\ttfamily \label{_validate_8cpp_a420c6dfe43b03bfc02391cac17d9f1f1} 
+\#define UNARY(\begin{DoxyParamCaption}\item[{}]{operand\+Type\+Id}{, }\item[{}]{result\+Type\+Id}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ popAndValidateOperand(operatorName,ValueType::operandTypeId);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ pushOperand(ResultType::resultTypeId)}
+
+\end{DoxyCode}
+\Hypertarget{_validate_8cpp_af10283475485df0d3b511707d7e6a4d7}\index{Validate.cpp@{Validate.cpp}!VALIDATE\_INDEX@{VALIDATE\_INDEX}}
+\index{VALIDATE\_INDEX@{VALIDATE\_INDEX}!Validate.cpp@{Validate.cpp}}
+\doxysubsubsection{\texorpdfstring{VALIDATE\_INDEX}{VALIDATE\_INDEX}}
+{\footnotesize\ttfamily \label{_validate_8cpp_af10283475485df0d3b511707d7e6a4d7} 
+\#define VALIDATE\+\_\+\+INDEX(\begin{DoxyParamCaption}\item[{}]{index}{, }\item[{}]{array\+Size}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{_validate_8cpp_a17a5193fad64ed76a99511b0bc1057e8}{VALIDATE\_UNLESS}}(\textcolor{stringliteral}{"{}invalid\ index:\ "{}},index>=arraySize)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{_validate_8cpp_source_l00020}{20}} of file \mbox{\hyperlink{_validate_8cpp_source}{Validate.\+cpp}}.
+
+\Hypertarget{_validate_8cpp_ac0c08c48cd3d4766501beca3a09cfb15}\index{Validate.cpp@{Validate.cpp}!VALIDATE\_OP@{VALIDATE\_OP}}
+\index{VALIDATE\_OP@{VALIDATE\_OP}!Validate.cpp@{Validate.cpp}}
+\doxysubsubsection{\texorpdfstring{VALIDATE\_OP}{VALIDATE\_OP}}
+{\footnotesize\ttfamily \label{_validate_8cpp_ac0c08c48cd3d4766501beca3a09cfb15} 
+\#define VALIDATE\+\_\+\+OP(\begin{DoxyParamCaption}\item[{}]{opcode}{, }\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{name\+String}{, }\item[{}]{Imm}{, }\item[{}]{validate\+Operands}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(Imm\ imm)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ operatorName\ =\ nameString;\ \mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_af754e908a4e63c2527b91fe55260059b}{SUPPRESS\_UNUSED}}(operatorName);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ validateImm(imm);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ validateOperands;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{_validate_8cpp_source_l00401}{401}} of file \mbox{\hyperlink{_validate_8cpp_source}{Validate.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00401\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#define\ WAIT(valueTypeId)\ \(\backslash\)}}
+\DoxyCodeLine{00402\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ popAndValidateOperands(operatorName,ValueType::i32,ValueType::valueTypeId,ValueType::f64);\ \(\backslash\)}}
+\DoxyCodeLine{00403\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ pushOperand(ValueType::i32);}}
+\DoxyCodeLine{00404\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#define\ ATOMICRMW(valueTypeId)\ \(\backslash\)}}
+\DoxyCodeLine{00405\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ popAndValidateOperands(operatorName,ValueType::i32,ValueType::valueTypeId);\ \(\backslash\)}}
+\DoxyCodeLine{00406\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ pushOperand(ValueType::valueTypeId);}}
+\DoxyCodeLine{00407\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#endif}}
+
+\end{DoxyCode}
+\Hypertarget{_validate_8cpp_a17a5193fad64ed76a99511b0bc1057e8}\index{Validate.cpp@{Validate.cpp}!VALIDATE\_UNLESS@{VALIDATE\_UNLESS}}
+\index{VALIDATE\_UNLESS@{VALIDATE\_UNLESS}!Validate.cpp@{Validate.cpp}}
+\doxysubsubsection{\texorpdfstring{VALIDATE\_UNLESS}{VALIDATE\_UNLESS}}
+{\footnotesize\ttfamily \label{_validate_8cpp_a17a5193fad64ed76a99511b0bc1057e8} 
+\#define VALIDATE\+\_\+\+UNLESS(\begin{DoxyParamCaption}\item[{}]{reason}{, }\item[{}]{comparison}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(comparison)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ ValidationException(reason\ \#comparison);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{_validate_8cpp_source_l00014}{14}} of file \mbox{\hyperlink{_validate_8cpp_source}{Validate.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00014\ \textcolor{preprocessor}{\ \ \ \ \#define\ VALIDATE\_UNLESS(reason,comparison)\ \(\backslash\)}}
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ if(comparison)\ \(\backslash\)}}
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \{\ \(\backslash\)}}
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ throw\ ValidationException(reason\ \#comparison);\ \(\backslash\)}}
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \}}}
+
+\end{DoxyCode}
+\Hypertarget{_validate_8cpp_a0d04d0b7b632d732f24972574f4bde51}\index{Validate.cpp@{Validate.cpp}!VISIT\_OPCODE@{VISIT\_OPCODE}}
+\index{VISIT\_OPCODE@{VISIT\_OPCODE}!Validate.cpp@{Validate.cpp}}
+\doxysubsubsection{\texorpdfstring{VISIT\_OPCODE}{VISIT\_OPCODE}}
+{\footnotesize\ttfamily \label{_validate_8cpp_a0d04d0b7b632d732f24972574f4bde51} 
+\#define VISIT\+\_\+\+OPCODE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{localize_8hpp_a6554a5ea005e85d0f84f2f34c11de938}{\+\_\+}}}{, }\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{name\+String}{, }\item[{}]{Imm}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ CodeValidationStream::name(Imm\ imm)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ if(\mbox{\hyperlink{_validate_8cpp_a042e13d7e40b6a804e22e1089a8074ec}{ENABLE\_LOGGING}})\ \{\ impl-\/>functionContext.logOperator(impl-\/>operatorPrinter.name(imm));\ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ impl-\/>functionContext.name(imm);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{_validate_8cpp_source_l00672}{672}} of file \mbox{\hyperlink{_validate_8cpp_source}{Validate.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00672\ \ \ \ \ \ \ \ \ impl\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00673\ \ \ \ \ \}}
+\DoxyCodeLine{00674\ }
+\DoxyCodeLine{00675\ \ \ \ \ \textcolor{keywordtype}{void}\ CodeValidationStream::finish()}
+\DoxyCodeLine{00676\ \ \ \ \ \{}
+\DoxyCodeLine{00677\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(impl-\/>functionContext.getControlStackSize())\ \{\ \textcolor{keywordflow}{throw}\ ValidationException(\textcolor{stringliteral}{"{}end\ of\ code\ reached\ before\ end\ of\ function"{}});\ \}}
+
+\end{DoxyCode}

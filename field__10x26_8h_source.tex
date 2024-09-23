@@ -1,0 +1,56 @@
+\doxysection{field\+\_\+10x26.\+h}
+\hypertarget{field__10x26_8h_source}{}\label{field__10x26_8h_source}\index{libraries/fc/secp256k1/secp256k1/src/field\_10x26.h@{libraries/fc/secp256k1/secp256k1/src/field\_10x26.h}}
+\mbox{\hyperlink{field__10x26_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{field__10x26_8h_source_l00001}00001\ \textcolor{comment}{/***********************************************************************}}
+\DoxyCodeLine{\Hypertarget{field__10x26_8h_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2013,\ 2014\ Pieter\ Wuille\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{field__10x26_8h_source_l00003}00003\ \textcolor{comment}{\ *\ Distributed\ under\ the\ MIT\ software\ license,\ see\ the\ accompanying\ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{field__10x26_8h_source_l00004}00004\ \textcolor{comment}{\ *\ file\ COPYING\ or\ https://www.opensource.org/licenses/mit-\/license.php.*}}
+\DoxyCodeLine{\Hypertarget{field__10x26_8h_source_l00005}00005\ \textcolor{comment}{\ ***********************************************************************/}}
+\DoxyCodeLine{\Hypertarget{field__10x26_8h_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{field__10x26_8h_source_l00007}00007\ \textcolor{preprocessor}{\#ifndef\ SECP256K1\_FIELD\_REPR\_H}}
+\DoxyCodeLine{\Hypertarget{field__10x26_8h_source_l00008}00008\ \textcolor{preprocessor}{\#define\ SECP256K1\_FIELD\_REPR\_H}}
+\DoxyCodeLine{\Hypertarget{field__10x26_8h_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{field__10x26_8h_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{stdint_8h}{stdint.h}}>}}
+\DoxyCodeLine{\Hypertarget{field__10x26_8h_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{field__10x26_8h_source_l00012}\mbox{\hyperlink{structsecp256k1__fe}{00012}}\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{\Hypertarget{field__10x26_8h_source_l00013}00013\ \ \ \ \ \textcolor{comment}{/*\ X\ =\ sum(i=0..9,\ n[i]*2\string^(i*26))\ mod\ p}}
+\DoxyCodeLine{\Hypertarget{field__10x26_8h_source_l00014}00014\ \textcolor{comment}{\ \ \ \ \ *\ where\ p\ =\ 2\string^256\ -\/\ 0x1000003D1}}
+\DoxyCodeLine{\Hypertarget{field__10x26_8h_source_l00015}00015\ \textcolor{comment}{\ \ \ \ \ */}}
+\DoxyCodeLine{\Hypertarget{field__10x26_8h_source_l00016}\mbox{\hyperlink{structsecp256k1__fe_a4e7c00a989d1da635e7ffd33105d62df}{00016}}\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ n[10];}
+\DoxyCodeLine{\Hypertarget{field__10x26_8h_source_l00017}00017\ \textcolor{preprocessor}{\#ifdef\ VERIFY}}
+\DoxyCodeLine{\Hypertarget{field__10x26_8h_source_l00018}00018\ \ \ \ \ \textcolor{keywordtype}{int}\ magnitude;}
+\DoxyCodeLine{\Hypertarget{field__10x26_8h_source_l00019}00019\ \ \ \ \ \textcolor{keywordtype}{int}\ normalized;}
+\DoxyCodeLine{\Hypertarget{field__10x26_8h_source_l00020}00020\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{field__10x26_8h_source_l00021}00021\ \}\ \mbox{\hyperlink{structsecp256k1__fe}{secp256k1\_fe}};}
+\DoxyCodeLine{\Hypertarget{field__10x26_8h_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{field__10x26_8h_source_l00023}00023\ \textcolor{comment}{/*\ Unpacks\ a\ constant\ into\ a\ overlapping\ multi-\/limbed\ FE\ element.\ */}}
+\DoxyCodeLine{\Hypertarget{field__10x26_8h_source_l00024}\mbox{\hyperlink{field__10x26_8h_ada11f3eca644a2310ab658a0146dbd5d}{00024}}\ \textcolor{preprocessor}{\#define\ SECP256K1\_FE\_CONST\_INNER(d7,\ d6,\ d5,\ d4,\ d3,\ d2,\ d1,\ d0)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{field__10x26_8h_source_l00025}00025\ \textcolor{preprocessor}{\ \ \ \ (d0)\ \&\ 0x3FFFFFFUL,\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{field__10x26_8h_source_l00026}00026\ \textcolor{preprocessor}{\ \ \ \ (((uint32\_t)d0)\ >>\ 26)\ |\ (((uint32\_t)(d1)\ \&\ 0xFFFFFUL)\ <<\ 6),\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{field__10x26_8h_source_l00027}00027\ \textcolor{preprocessor}{\ \ \ \ (((uint32\_t)d1)\ >>\ 20)\ |\ (((uint32\_t)(d2)\ \&\ 0x3FFFUL)\ <<\ 12),\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{field__10x26_8h_source_l00028}00028\ \textcolor{preprocessor}{\ \ \ \ (((uint32\_t)d2)\ >>\ 14)\ |\ (((uint32\_t)(d3)\ \&\ 0xFFUL)\ <<\ 18),\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{field__10x26_8h_source_l00029}00029\ \textcolor{preprocessor}{\ \ \ \ (((uint32\_t)d3)\ >>\ 8)\ |\ (((uint32\_t)(d4)\ \&\ 0x3UL)\ <<\ 24),\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{field__10x26_8h_source_l00030}00030\ \textcolor{preprocessor}{\ \ \ \ (((uint32\_t)d4)\ >>\ 2)\ \&\ 0x3FFFFFFUL,\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{field__10x26_8h_source_l00031}00031\ \textcolor{preprocessor}{\ \ \ \ (((uint32\_t)d4)\ >>\ 28)\ |\ (((uint32\_t)(d5)\ \&\ 0x3FFFFFUL)\ <<\ 4),\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{field__10x26_8h_source_l00032}00032\ \textcolor{preprocessor}{\ \ \ \ (((uint32\_t)d5)\ >>\ 22)\ |\ (((uint32\_t)(d6)\ \&\ 0xFFFFUL)\ <<\ 10),\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{field__10x26_8h_source_l00033}00033\ \textcolor{preprocessor}{\ \ \ \ (((uint32\_t)d6)\ >>\ 16)\ |\ (((uint32\_t)(d7)\ \&\ 0x3FFUL)\ <<\ 16),\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{field__10x26_8h_source_l00034}00034\ \textcolor{preprocessor}{\ \ \ \ (((uint32\_t)d7)\ >>\ 10)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{field__10x26_8h_source_l00035}00035\ \textcolor{preprocessor}{\}}}
+\DoxyCodeLine{\Hypertarget{field__10x26_8h_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{field__10x26_8h_source_l00037}00037\ \textcolor{preprocessor}{\#ifdef\ VERIFY}}
+\DoxyCodeLine{\Hypertarget{field__10x26_8h_source_l00038}00038\ \textcolor{preprocessor}{\#define\ SECP256K1\_FE\_CONST(d7,\ d6,\ d5,\ d4,\ d3,\ d2,\ d1,\ d0)\ \{SECP256K1\_FE\_CONST\_INNER((d7),\ (d6),\ (d5),\ (d4),\ (d3),\ (d2),\ (d1),\ (d0)),\ 1,\ 1\}}}
+\DoxyCodeLine{\Hypertarget{field__10x26_8h_source_l00039}00039\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{field__10x26_8h_source_l00040}\mbox{\hyperlink{field__10x26_8h_a8c00ba3d97ea0d9b0d461463e890de15}{00040}}\ \textcolor{preprocessor}{\#define\ SECP256K1\_FE\_CONST(d7,\ d6,\ d5,\ d4,\ d3,\ d2,\ d1,\ d0)\ \{SECP256K1\_FE\_CONST\_INNER((d7),\ (d6),\ (d5),\ (d4),\ (d3),\ (d2),\ (d1),\ (d0))\}}}
+\DoxyCodeLine{\Hypertarget{field__10x26_8h_source_l00041}00041\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{field__10x26_8h_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{field__10x26_8h_source_l00043}\mbox{\hyperlink{structsecp256k1__fe__storage}{00043}}\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{\Hypertarget{field__10x26_8h_source_l00044}\mbox{\hyperlink{structsecp256k1__fe__storage_a63f0548b6674a57ab1d2c6271008c037}{00044}}\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ n[8];}
+\DoxyCodeLine{\Hypertarget{field__10x26_8h_source_l00045}00045\ \}\ \mbox{\hyperlink{structsecp256k1__fe__storage}{secp256k1\_fe\_storage}};}
+\DoxyCodeLine{\Hypertarget{field__10x26_8h_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{field__10x26_8h_source_l00047}\mbox{\hyperlink{field__10x26_8h_ae6927483c41044bd04e5f8efb42f53ba}{00047}}\ \textcolor{preprocessor}{\#define\ SECP256K1\_FE\_STORAGE\_CONST(d7,\ d6,\ d5,\ d4,\ d3,\ d2,\ d1,\ d0)\ \{\{\ (d0),\ (d1),\ (d2),\ (d3),\ (d4),\ (d5),\ (d6),\ (d7)\ \}\}}}
+\DoxyCodeLine{\Hypertarget{field__10x26_8h_source_l00048}\mbox{\hyperlink{field__10x26_8h_a07b67ff641d5db9df0691b14cdc29584}{00048}}\ \textcolor{preprocessor}{\#define\ SECP256K1\_FE\_STORAGE\_CONST\_GET(d)\ d.n[7],\ d.n[6],\ d.n[5],\ d.n[4],d.n[3],\ d.n[2],\ d.n[1],\ d.n[0]}}
+\DoxyCodeLine{\Hypertarget{field__10x26_8h_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{field__10x26_8h_source_l00050}00050\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{/*\ SECP256K1\_FIELD\_REPR\_H\ */}\textcolor{preprocessor}{}}
+
+\end{DoxyCode}

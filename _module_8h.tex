@@ -1,0 +1,76 @@
+\doxysection{libraries/wasm-\/jit/\+Include/\+IR/\+Module.h File Reference}
+\hypertarget{_module_8h}{}\label{_module_8h}\index{libraries/wasm-\/jit/Include/IR/Module.h@{libraries/wasm-\/jit/Include/IR/Module.h}}
+{\ttfamily \#include "{}Inline/\+Basic\+Types.\+h"{}}\newline
+{\ttfamily \#include "{}IR.\+h"{}}\newline
+{\ttfamily \#include "{}Types.\+h"{}}\newline
+{\ttfamily \#include $<$vector$>$}\newline
+Include dependency graph for Module.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{_module_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{_module_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_i_r_1_1_initializer_expression}{IR\+::\+Initializer\+Expression}}
+\item 
+struct \mbox{\hyperlink{struct_i_r_1_1_function_def}{IR\+::\+Function\+Def}}
+\item 
+struct \mbox{\hyperlink{struct_i_r_1_1_table_def}{IR\+::\+Table\+Def}}
+\item 
+struct \mbox{\hyperlink{struct_i_r_1_1_memory_def}{IR\+::\+Memory\+Def}}
+\item 
+struct \mbox{\hyperlink{struct_i_r_1_1_global_def}{IR\+::\+Global\+Def}}
+\item 
+struct \mbox{\hyperlink{struct_i_r_1_1_import}{IR\+::\+Import$<$ Type $>$}}
+\item 
+struct \mbox{\hyperlink{struct_i_r_1_1_export}{IR\+::\+Export}}
+\item 
+struct \mbox{\hyperlink{struct_i_r_1_1_data_segment}{IR\+::\+Data\+Segment}}
+\item 
+struct \mbox{\hyperlink{struct_i_r_1_1_table_segment}{IR\+::\+Table\+Segment}}
+\item 
+struct \mbox{\hyperlink{struct_i_r_1_1_user_section}{IR\+::\+User\+Section}}
+\item 
+struct \mbox{\hyperlink{struct_i_r_1_1_index_space}{IR\+::\+Index\+Space$<$ Definition, Type $>$}}
+\item 
+struct \mbox{\hyperlink{struct_i_r_1_1_module}{IR\+::\+Module}}
+\item 
+struct \mbox{\hyperlink{struct_i_r_1_1_disassembly_names}{IR\+::\+Disassembly\+Names}}
+\item 
+struct \mbox{\hyperlink{struct_i_r_1_1_disassembly_names_1_1_function}{IR\+::\+Disassembly\+Names\+::\+Function}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespace_i_r}{IR}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{struct_i_r_1_1_import}{Import}}$<$ \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} $>$ \mbox{\hyperlink{namespace_i_r_a05a2052e37effc6898e640f6a656c1f8}{IR\+::\+Function\+Import}}
+\item 
+typedef \mbox{\hyperlink{struct_i_r_1_1_import}{Import}}$<$ \mbox{\hyperlink{struct_i_r_1_1_table_type}{Table\+Type}} $>$ \mbox{\hyperlink{namespace_i_r_a6e39cb144af6ef3199d8d03d089f56dd}{IR\+::\+Table\+Import}}
+\item 
+typedef \mbox{\hyperlink{struct_i_r_1_1_import}{Import}}$<$ \mbox{\hyperlink{struct_i_r_1_1_memory_type}{Memory\+Type}} $>$ \mbox{\hyperlink{namespace_i_r_acf8466b8a3edc306ee3542a4cb41e309}{IR\+::\+Memory\+Import}}
+\item 
+typedef \mbox{\hyperlink{struct_i_r_1_1_import}{Import}}$<$ \mbox{\hyperlink{struct_i_r_1_1_global_type}{Global\+Type}} $>$ \mbox{\hyperlink{namespace_i_r_a4ae47451bb9301f301a77cb23e06cd41}{IR\+::\+Global\+Import}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{namespace_i_r_a40d3c46d577c46a69b0d8da4d2ecd681}{IR\+::find\+User\+Section}} (const \mbox{\hyperlink{struct_i_r_1_1_module}{Module}} \&\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}, const char \texorpdfstring{$\ast$}{*}user\+Section\+Name, \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} \&out\+User\+Section\+Index)
+\item 
+\mbox{\hyperlink{_i_r_8h_a0ee024894bb6f700da724f2f1a120abb}{IR\+\_\+\+API}} void \mbox{\hyperlink{namespace_i_r_ae36055728f4542ad9b363e04021674ba}{IR\+::get\+Disassembly\+Names}} (const \mbox{\hyperlink{struct_i_r_1_1_module}{Module}} \&\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}, \mbox{\hyperlink{struct_i_r_1_1_disassembly_names}{Disassembly\+Names}} \&out\+Names)
+\item 
+\mbox{\hyperlink{_i_r_8h_a0ee024894bb6f700da724f2f1a120abb}{IR\+\_\+\+API}} void \mbox{\hyperlink{namespace_i_r_ac643afa4254e978e5e09895166b8bdb8}{IR\+::set\+Disassembly\+Names}} (\mbox{\hyperlink{struct_i_r_1_1_module}{Module}} \&\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}, const \mbox{\hyperlink{struct_i_r_1_1_disassembly_names}{Disassembly\+Names}} \&names)
+\end{DoxyCompactItemize}

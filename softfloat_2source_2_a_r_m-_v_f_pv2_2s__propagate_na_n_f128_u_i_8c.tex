@@ -1,0 +1,67 @@
+\doxysection{libraries/softfloat/source/\+ARM-\/\+VFPv2/s\+\_\+propagate\+Na\+NF128\+UI.c File Reference}
+\hypertarget{softfloat_2source_2_a_r_m-_v_f_pv2_2s__propagate_na_n_f128_u_i_8c}{}\label{softfloat_2source_2_a_r_m-_v_f_pv2_2s__propagate_na_n_f128_u_i_8c}\index{libraries/softfloat/source/ARM-\/VFPv2/s\_propagateNaNF128UI.c@{libraries/softfloat/source/ARM-\/VFPv2/s\_propagateNaNF128UI.c}}
+{\ttfamily \#include $<$stdbool.\+h$>$}\newline
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include "{}platform.\+h"{}}\newline
+{\ttfamily \#include "{}internals.\+h"{}}\newline
+{\ttfamily \#include "{}specialize.\+h"{}}\newline
+{\ttfamily \#include "{}softfloat.\+h"{}}\newline
+Include dependency graph for s\+\_\+propagate\+Na\+NF128\+UI.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{softfloat_2source_2_a_r_m-_v_f_pv2_2s__propagate_na_n_f128_u_i_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+struct uint128 \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2_2s__propagate_na_n_f128_u_i_8c_a6bc082e0aa5040a81d9baf5162c5b6ca}{softfloat\+\_\+propagate\+Na\+NF128\+UI}} (\mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\+\_\+fast64\+\_\+t}} ui\+A64, \mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\+\_\+fast64\+\_\+t}} ui\+A0, \mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\+\_\+fast64\+\_\+t}} ui\+B64, \mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\+\_\+fast64\+\_\+t}} ui\+B0)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{softfloat_2source_2_a_r_m-_v_f_pv2_2s__propagate_na_n_f128_u_i_8c_a6bc082e0aa5040a81d9baf5162c5b6ca}\index{s\_propagateNaNF128UI.c@{s\_propagateNaNF128UI.c}!softfloat\_propagateNaNF128UI@{softfloat\_propagateNaNF128UI}}
+\index{softfloat\_propagateNaNF128UI@{softfloat\_propagateNaNF128UI}!s\_propagateNaNF128UI.c@{s\_propagateNaNF128UI.c}}
+\doxysubsubsection{\texorpdfstring{softfloat\_propagateNaNF128UI()}{softfloat\_propagateNaNF128UI()}}
+{\footnotesize\ttfamily \label{softfloat_2source_2_a_r_m-_v_f_pv2_2s__propagate_na_n_f128_u_i_8c_a6bc082e0aa5040a81d9baf5162c5b6ca} 
+struct uint128 softfloat\+\_\+propagate\+Na\+NF128\+UI (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\+\_\+fast64\+\_\+t}}}]{ui\+A64}{, }\item[{\mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\+\_\+fast64\+\_\+t}}}]{ui\+A0}{, }\item[{\mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\+\_\+fast64\+\_\+t}}}]{ui\+B64}{, }\item[{\mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\+\_\+fast64\+\_\+t}}}]{ui\+B0}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2_2s__propagate_na_n_f128_u_i_8c_source_l00054}{54}} of file \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2_2s__propagate_na_n_f128_u_i_8c_source}{s\+\_\+propagate\+Na\+NF128\+UI.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00060\ \{}
+\DoxyCodeLine{00061\ \ \ \ \ \textcolor{keywordtype}{bool}\ isSigNaNA;}
+\DoxyCodeLine{00062\ \ \ \ \ \textcolor{keyword}{struct\ }uint128\ uiZ;}
+\DoxyCodeLine{00063\ }
+\DoxyCodeLine{00064\ \ \ \ \ isSigNaNA\ =\ softfloat\_isSigNaNF128UI(\ uiA64,\ uiA0\ );}
+\DoxyCodeLine{00065\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ isSigNaNA\ ||\ softfloat\_isSigNaNF128UI(\ uiB64,\ uiB0\ )\ )\ \{}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2softfloat__raise_flags_8c_ac16bbf09eca0fe8ff91301d82c5a667f}{softfloat\_raiseFlags}}(\ \mbox{\hyperlink{softfloat_2source_2include_2softfloat_8h_a56a0f36da7f9eaaf54bd05cc2bf49173a191f069090c3d33752fb728272d9a4a9}{softfloat\_flag\_invalid}}\ );}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ isSigNaNA\ )\ \textcolor{keywordflow}{goto}\ returnNonsigA;}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ returnNonsigB;}
+\DoxyCodeLine{00069\ \ \ \ \ \}}
+\DoxyCodeLine{00070\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ isNaNF128UI(\ uiA64,\ uiA0\ )\ )\ \{}
+\DoxyCodeLine{00071\ \ returnNonsigA:}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ uiZ.v64\ =\ uiA64;}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ uiZ.v0\ \ =\ uiA0;}
+\DoxyCodeLine{00074\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00075\ \ returnNonsigB:}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ uiZ.v64\ =\ uiB64;}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ uiZ.v0\ \ =\ uiB0;}
+\DoxyCodeLine{00078\ \ \ \ \ \}}
+\DoxyCodeLine{00079\ \ \ \ \ uiZ.v64\ |=\ \mbox{\hyperlink{stdint_8h_a8da5373e041921aa34c2b6172ac3babc}{UINT64\_C}}(\ 0x0000800000000000\ );}
+\DoxyCodeLine{00080\ \ \ \ \ \textcolor{keywordflow}{return}\ uiZ;}
+\DoxyCodeLine{00081\ }
+\DoxyCodeLine{00082\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{softfloat_2source_2_a_r_m-_v_f_pv2_2s__propagate_na_n_f128_u_i_8c_a6bc082e0aa5040a81d9baf5162c5b6ca_cgraph}
+\end{center}
+\end{figure}

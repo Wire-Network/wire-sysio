@@ -1,0 +1,168 @@
+\doxysection{libraries/sys-\/vm/tests/allow\+\_\+zero\+\_\+blocktype\+\_\+tests.cpp File Reference}
+\hypertarget{allow__zero__blocktype__tests_8cpp}{}\label{allow__zero__blocktype__tests_8cpp}\index{libraries/sys-\/vm/tests/allow\_zero\_blocktype\_tests.cpp@{libraries/sys-\/vm/tests/allow\_zero\_blocktype\_tests.cpp}}
+{\ttfamily \#include $<$sysio/vm/backend.\+hpp$>$}\newline
+{\ttfamily \#include "{}utils.\+hpp"{}}\newline
+{\ttfamily \#include $<$catch2/catch.\+hpp$>$}\newline
+Include dependency graph for allow\+\_\+zero\+\_\+blocktype\+\_\+tests.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{allow__zero__blocktype__tests_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{allow__zero__blocktype__tests_8cpp_aaee3b9c6b3d95dbda30c64334d7e7c04}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Test allow\+\_\+zero\+\_\+blocktype default"{}, "{}\mbox{[}allow\+\_\+zero\+\_\+blocktype\+\_\+test\mbox{]}"{})
+\item 
+\mbox{\hyperlink{allow__zero__blocktype__tests_8cpp_af161f4597347b848ed171249f4306a41}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Test allow\+\_\+zero\+\_\+blocktype empty"{}, "{}\mbox{[}allow\+\_\+zero\+\_\+blocktype\+\_\+test\mbox{]}"{})
+\item 
+\mbox{\hyperlink{allow__zero__blocktype__tests_8cpp_ada669040857e143cd73f2001d43c7d60}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Test allow\+\_\+zero\+\_\+blocktype static fail"{}, "{}\mbox{[}allow\+\_\+zero\+\_\+blocktype\+\_\+test\mbox{]}"{})
+\item 
+\mbox{\hyperlink{allow__zero__blocktype__tests_8cpp_a1b88bb045e81a03ab5a0cf74e8061029}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Test allow\+\_\+zero\+\_\+blocktype static pass"{}, "{}\mbox{[}allow\+\_\+zero\+\_\+blocktype\+\_\+test\mbox{]}"{})
+\item 
+\mbox{\hyperlink{allow__zero__blocktype__tests_8cpp_a4e1fb78ffe85d0fc67c6c81cbc40011c}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Test allow\+\_\+zero\+\_\+blocktype dynamic fail"{}, "{}\mbox{[}allow\+\_\+zero\+\_\+blocktype\+\_\+test\mbox{]}"{})
+\item 
+\mbox{\hyperlink{allow__zero__blocktype__tests_8cpp_a40829783668154466b4777ba15c6dbe2}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Test allow\+\_\+zero\+\_\+blocktype dynamic pass"{}, "{}\mbox{[}allow\+\_\+zero\+\_\+blocktype\+\_\+test\mbox{]}"{})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+wasm\+\_\+allocator \mbox{\hyperlink{allow__zero__blocktype__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{allow__zero__blocktype__tests_8cpp_aaee3b9c6b3d95dbda30c64334d7e7c04}\index{allow\_zero\_blocktype\_tests.cpp@{allow\_zero\_blocktype\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!allow\_zero\_blocktype\_tests.cpp@{allow\_zero\_blocktype\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/6]}}
+{\footnotesize\ttfamily \label{allow__zero__blocktype__tests_8cpp_aaee3b9c6b3d95dbda30c64334d7e7c04} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Test allow\+\_\+zero\+\_\+blocktype default"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}allow\+\_\+zero\+\_\+blocktype\+\_\+test\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{allow__zero__blocktype__tests_8cpp_source_l00058}{58}} of file \mbox{\hyperlink{allow__zero__blocktype__tests_8cpp_source}{allow\+\_\+zero\+\_\+blocktype\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00059\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType>}};}
+\DoxyCodeLine{00060\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(block\_wasm,\ \&\mbox{\hyperlink{allow__zero__blocktype__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{00061\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(loop\_wasm,\ \&\mbox{\hyperlink{allow__zero__blocktype__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{00062\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(if\_wasm,\ \&\mbox{\hyperlink{allow__zero__blocktype__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{00063\ \}}
+
+\end{DoxyCode}
+\Hypertarget{allow__zero__blocktype__tests_8cpp_a4e1fb78ffe85d0fc67c6c81cbc40011c}\index{allow\_zero\_blocktype\_tests.cpp@{allow\_zero\_blocktype\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!allow\_zero\_blocktype\_tests.cpp@{allow\_zero\_blocktype\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/6]}}
+{\footnotesize\ttfamily \label{allow__zero__blocktype__tests_8cpp_a4e1fb78ffe85d0fc67c6c81cbc40011c} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Test allow\+\_\+zero\+\_\+blocktype dynamic fail"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}allow\+\_\+zero\+\_\+blocktype\+\_\+test\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{allow__zero__blocktype__tests_8cpp_source_l00086}{86}} of file \mbox{\hyperlink{allow__zero__blocktype__tests_8cpp_source}{allow\+\_\+zero\+\_\+blocktype\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00087\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ dynamic\_options>}};}
+\DoxyCodeLine{00088\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(block\_wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\{\textcolor{keyword}{false}\}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{00089\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(loop\_wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\{\textcolor{keyword}{false}\}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{00090\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(if\_wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\{\textcolor{keyword}{false}\}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{00091\ \}}
+
+\end{DoxyCode}
+\Hypertarget{allow__zero__blocktype__tests_8cpp_a40829783668154466b4777ba15c6dbe2}\index{allow\_zero\_blocktype\_tests.cpp@{allow\_zero\_blocktype\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!allow\_zero\_blocktype\_tests.cpp@{allow\_zero\_blocktype\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [3/6]}}
+{\footnotesize\ttfamily \label{allow__zero__blocktype__tests_8cpp_a40829783668154466b4777ba15c6dbe2} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Test allow\+\_\+zero\+\_\+blocktype dynamic pass"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}allow\+\_\+zero\+\_\+blocktype\+\_\+test\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{allow__zero__blocktype__tests_8cpp_source_l00093}{93}} of file \mbox{\hyperlink{allow__zero__blocktype__tests_8cpp_source}{allow\+\_\+zero\+\_\+blocktype\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00094\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ dynamic\_options>}};}
+\DoxyCodeLine{00095\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_block(block\_wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\{\textcolor{keyword}{true}\});}
+\DoxyCodeLine{00096\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_loop(loop\_wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\{\textcolor{keyword}{true}\});}
+\DoxyCodeLine{00097\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_if(if\_wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\{\textcolor{keyword}{true}\});}
+\DoxyCodeLine{00098\ \}}
+
+\end{DoxyCode}
+\Hypertarget{allow__zero__blocktype__tests_8cpp_af161f4597347b848ed171249f4306a41}\index{allow\_zero\_blocktype\_tests.cpp@{allow\_zero\_blocktype\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!allow\_zero\_blocktype\_tests.cpp@{allow\_zero\_blocktype\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [4/6]}}
+{\footnotesize\ttfamily \label{allow__zero__blocktype__tests_8cpp_af161f4597347b848ed171249f4306a41} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Test allow\+\_\+zero\+\_\+blocktype empty"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}allow\+\_\+zero\+\_\+blocktype\+\_\+test\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{allow__zero__blocktype__tests_8cpp_source_l00065}{65}} of file \mbox{\hyperlink{allow__zero__blocktype__tests_8cpp_source}{allow\+\_\+zero\+\_\+blocktype\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00066\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ empty\_options>}};}
+\DoxyCodeLine{00067\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(block\_wasm,\ \&\mbox{\hyperlink{allow__zero__blocktype__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{00068\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(loop\_wasm,\ \&\mbox{\hyperlink{allow__zero__blocktype__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{00069\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(if\_wasm,\ \&\mbox{\hyperlink{allow__zero__blocktype__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{00070\ \}}
+
+\end{DoxyCode}
+\Hypertarget{allow__zero__blocktype__tests_8cpp_ada669040857e143cd73f2001d43c7d60}\index{allow\_zero\_blocktype\_tests.cpp@{allow\_zero\_blocktype\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!allow\_zero\_blocktype\_tests.cpp@{allow\_zero\_blocktype\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [5/6]}}
+{\footnotesize\ttfamily \label{allow__zero__blocktype__tests_8cpp_ada669040857e143cd73f2001d43c7d60} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Test allow\+\_\+zero\+\_\+blocktype static fail"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}allow\+\_\+zero\+\_\+blocktype\+\_\+test\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{allow__zero__blocktype__tests_8cpp_source_l00072}{72}} of file \mbox{\hyperlink{allow__zero__blocktype__tests_8cpp_source}{allow\+\_\+zero\+\_\+blocktype\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00073\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ static\_options\_false>}};}
+\DoxyCodeLine{00074\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(block\_wasm,\ \&\mbox{\hyperlink{allow__zero__blocktype__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{00075\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(loop\_wasm,\ \&\mbox{\hyperlink{allow__zero__blocktype__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{00076\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(if\_wasm,\ \&\mbox{\hyperlink{allow__zero__blocktype__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{00077\ \}}
+
+\end{DoxyCode}
+\Hypertarget{allow__zero__blocktype__tests_8cpp_a1b88bb045e81a03ab5a0cf74e8061029}\index{allow\_zero\_blocktype\_tests.cpp@{allow\_zero\_blocktype\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!allow\_zero\_blocktype\_tests.cpp@{allow\_zero\_blocktype\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [6/6]}}
+{\footnotesize\ttfamily \label{allow__zero__blocktype__tests_8cpp_a1b88bb045e81a03ab5a0cf74e8061029} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Test allow\+\_\+zero\+\_\+blocktype static pass"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}allow\+\_\+zero\+\_\+blocktype\+\_\+test\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{allow__zero__blocktype__tests_8cpp_source_l00079}{79}} of file \mbox{\hyperlink{allow__zero__blocktype__tests_8cpp_source}{allow\+\_\+zero\+\_\+blocktype\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00080\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ static\_options\_true>}};}
+\DoxyCodeLine{00081\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_block(block\_wasm,\ \&\mbox{\hyperlink{allow__zero__blocktype__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00082\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_loop(loop\_wasm,\ \&\mbox{\hyperlink{allow__zero__blocktype__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00083\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend\_if(if\_wasm,\ \&\mbox{\hyperlink{allow__zero__blocktype__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00084\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{allow__zero__blocktype__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}\index{allow\_zero\_blocktype\_tests.cpp@{allow\_zero\_blocktype\_tests.cpp}!wa@{wa}}
+\index{wa@{wa}!allow\_zero\_blocktype\_tests.cpp@{allow\_zero\_blocktype\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{wa}{wa}}
+{\footnotesize\ttfamily \label{allow__zero__blocktype__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89} 
+wasm\+\_\+allocator wa\hspace{0.3cm}{\ttfamily [extern]}}
+
+
+
+Definition at line \mbox{\hyperlink{libraries_2sys-vm_2tests_2main_8cpp_source_l00010}{10}} of file \mbox{\hyperlink{libraries_2sys-vm_2tests_2main_8cpp_source}{main.\+cpp}}.
+

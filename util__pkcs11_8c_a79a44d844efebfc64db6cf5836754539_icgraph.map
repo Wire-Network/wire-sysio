@@ -1,0 +1,16 @@
+<map id="get_slot" name="get_slot">
+<area shape="rect" id="Node000001" title=" " alt="" coords="450,55,517,80"/>
+<area shape="rect" id="Node000002" href="$yubihsm__pkcs11_8c.html#a48d97eeb2196fb96be0f0ba4c82d5063" title=" " alt="" coords="228,5,402,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="434,55,401,45,365,34,366,29,403,40,436,50"/>
+<area shape="rect" id="Node000003" href="$util__pkcs11_8c.html#a85ea84ffb047281f34a733572f67b254" title=" " alt="" coords="261,55,369,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="435,70,369,70,369,65,435,65"/>
+<area shape="rect" id="Node000005" href="$util__pkcs11_8c.html#a45da02427ecf4427e4c4c181bdd9891b" title=" " alt="" coords="269,104,360,130"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="436,85,403,95,362,107,360,102,401,90,434,80"/>
+<area shape="rect" id="Node000004" href="$yubihsm__pkcs11_8c.html#ae42be1463b17c635f1d1db61afc0db16" title=" " alt="" coords="5,55,180,80"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="245,70,180,70,180,65,245,65"/>
+<area shape="poly" id="edge5_Node000005_Node000004" title=" " alt="" coords="253,106,153,84,154,78,254,101"/>
+<area shape="rect" id="Node000006" href="$yubihsm__pkcs11_8c.html#a43267eb905aa786de5a5bbf4bd08d775" title=" " alt="" coords="5,104,180,130"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="253,120,180,120,180,114,253,114"/>
+<area shape="rect" id="Node000007" href="$yubihsm__pkcs11_8c.html#a011b512f4b9e6e43e3ab56b5534f3fde" title=" " alt="" coords="5,153,180,179"/>
+<area shape="poly" id="edge7_Node000005_Node000007" title=" " alt="" coords="254,133,154,155,153,150,253,128"/>
+</map>

@@ -1,0 +1,15 @@
+<map id="libff::Fp12_2over3over2_model::inverse" name="libff::Fp12_2over3over2_model::inverse">
+<area shape="rect" id="Node000001" title=" " alt="" coords="997,39,1154,79"/>
+<area shape="rect" id="Node000002" href="$namespacelibff.html#aa358d87f7982afbc39001a979daaee29" title=" " alt="" coords="766,39,949,79"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="981,62,950,62,950,56,981,56"/>
+<area shape="rect" id="Node000003" href="$namespacelibff.html#add51b65ee720635bce0b03b339703425" title=" " alt="" coords="580,39,718,79"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="750,62,718,62,718,56,750,56"/>
+<area shape="rect" id="Node000004" href="$namespacelibff.html#a52e70e9ff5407db6df5ee855dd889a02" title=" " alt="" coords="394,5,526,46"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="564,47,526,40,527,35,565,42"/>
+<area shape="rect" id="Node000007" href="$classlibff_1_1alt__bn128__pp.html#a8c6c2062f0983cfec30582cf772d0394" title=" " alt="" coords="388,71,532,111"/>
+<area shape="poly" id="edge6_Node000003_Node000007" title=" " alt="" coords="565,76,533,81,532,76,564,71"/>
+<area shape="rect" id="Node000005" href="$namespacelibff.html#a39a2b42cbf3d7d40f35250b0af14aba8" title=" " alt="" coords="181,5,340,46"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="379,28,340,28,340,23,379,23"/>
+<area shape="rect" id="Node000006" href="$classlibff_1_1alt__bn128__pp.html#a684441c16067dd63f2947d6928f2b460" title=" " alt="" coords="5,5,133,46"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="165,28,133,28,133,23,165,23"/>
+</map>

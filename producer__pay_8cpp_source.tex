@@ -1,0 +1,197 @@
+\doxysection{producer\+\_\+pay.\+cpp}
+\hypertarget{producer__pay_8cpp_source}{}\label{producer__pay_8cpp_source}\index{/Users/svetlasyrimis/Desktop/wire-\/network/WN-\/org/wire-\/system-\/contracts/contracts/sysio.system/src/producer\_pay.cpp@{/Users/svetlasyrimis/Desktop/wire-\/network/WN-\/org/wire-\/system-\/contracts/contracts/sysio.system/src/producer\_pay.cpp}}
+\mbox{\hyperlink{producer__pay_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{sysio_8system_8hpp}{sysio.system/sysio.system.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{sysio_8token_8hpp}{sysio.token/sysio.token.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00004}00004\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysiosystem}{sysiosystem}}\ \{}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00006}00006\ \ \ \ \textcolor{keyword}{using\ }sysio::current\_time\_point;}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00007}00007\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classfc_1_1microseconds}{sysio::microseconds}};}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00008}00008\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1token}{sysio::token}};}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00010}\mbox{\hyperlink{classsysiosystem_1_1system__contract_a9d200cbff6eb8a4f30fc20b9f11d4dc0}{00010}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_a9d200cbff6eb8a4f30fc20b9f11d4dc0}{system\_contract::onblock}}(\ ignore<block\_header>\ )\ \{}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00011}00011\ \ \ \ \ \ \ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}};}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00013}00013\ \ \ \ \ \ \ require\_auth(get\_self());}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00015}00015\ \ \ \ \ \ \ \textcolor{comment}{//\ Deserialize\ needed\ fields\ from\ block\ header.}}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00016}00016\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{block\_timestamp}}\ timestamp;}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00017}00017\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\ \ \ \ \ \ \ \ \ \ \ \ producer;}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00018}00018\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ \ \ \ \ \ \ \ confirmed;}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00019}00019\ \ \ \ \ \ \ checksum256\ \ \ \ \ previous\_block\_id;}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00021}00021\ \ \ \ \ \ \ \_ds\ >>\ timestamp\ >>\ producer\ >>\ confirmed\ >>\ previous\_block\_id;}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00022}00022\ \ \ \ \ \ \ (void)confirmed;\ \textcolor{comment}{//\ Only\ to\ suppress\ warning\ since\ confirmed\ is\ not\ used.}}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00024}00024\ \ \ \ \ \ \ \textcolor{comment}{//\ Add\ latest\ block\ information\ to\ blockinfo\ table.}}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00025}00025\ \ \ \ \ \ \ add\_to\_blockinfo\_table(previous\_block\_id,\ timestamp);}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00027}00027\ \ \ \ \ \ \ \textcolor{comment}{//\ \_gstate2.last\_block\_num\ is\ not\ used\ anywhere\ in\ the\ system\ contract\ code\ anymore.}}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00028}00028\ \ \ \ \ \ \ \textcolor{comment}{//\ Although\ this\ field\ is\ deprecated,\ we\ will\ continue\ updating\ it\ for\ now\ until\ the\ last\_block\_num\ field}}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00029}00029\ \ \ \ \ \ \ \textcolor{comment}{//\ is\ eventually\ completely\ removed,\ at\ which\ point\ this\ line\ can\ be\ removed.}}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00030}00030\ \ \ \ \ \ \ \_gstate2.\mbox{\hyperlink{structsysiosystem_1_1sysio__global__state2_a3f2c8a7424a2c0d27346dbfe929b5f15}{last\_block\_num}}\ =\ timestamp;}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00033}00033\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \_gstate.\mbox{\hyperlink{structsysiosystem_1_1sysio__global__state_a9103ca2911e1be3a551b03f6f8d19895}{thresh\_activated\_stake\_time}}\ ==\ \mbox{\hyperlink{classfc_1_1time__point}{time\_point}}()\ )}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00034}00034\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00036}00036\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \_gstate.\mbox{\hyperlink{structsysiosystem_1_1sysio__global__state_acf59d7c9d51e5b13a28cba74e04fda40}{last\_pervote\_bucket\_fill}}\ ==\ \mbox{\hyperlink{classfc_1_1time__point}{time\_point}}()\ )\ \ }
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00037}00037\ \ \ \ \ \ \ \ \ \ \_gstate.\mbox{\hyperlink{structsysiosystem_1_1sysio__global__state_acf59d7c9d51e5b13a28cba74e04fda40}{last\_pervote\_bucket\_fill}}\ =\ current\_time\_point();}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00044}00044\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ prod\ =\ \_producers.find(\ producer.value\ );}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00045}00045\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ prod\ !=\ \_producers.end()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00046}00046\ \ \ \ \ \ \ \ \ \ \_gstate.\mbox{\hyperlink{structsysiosystem_1_1sysio__global__state_a960a9ef2c91a04d7fdceb84e64ae8ec4}{total\_unpaid\_blocks}}++;}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00047}00047\ \ \ \ \ \ \ \ \ \ \_producers.modify(\ prod,\ same\_payer,\ [\&](\textcolor{keyword}{auto}\&\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.unpaid\_blocks++;}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00050}00050\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00053}00053\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ timestamp.\mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp_a1bdb67323980085a2d4002d877b6c232}{slot}}\ -\/\ \_gstate.\mbox{\hyperlink{structsysiosystem_1_1sysio__global__state_aaa745851c2221bd24eae5fc4e383869b}{last\_producer\_schedule\_update}}.\mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp_a1bdb67323980085a2d4002d877b6c232}{slot}}\ >\ 120\ )\ \{}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00054}00054\ \ \ \ \ \ \ \ \ \ update\_elected\_producers(\ timestamp\ );}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ (timestamp.\mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp_a1bdb67323980085a2d4002d877b6c232}{slot}}\ -\/\ \_gstate.\mbox{\hyperlink{structsysiosystem_1_1sysio__global__state_ac51fbd74c97dbfd5d15eca7e22e99897}{last\_name\_close}}.\mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp_a1bdb67323980085a2d4002d877b6c232}{slot}})\ >\ blocks\_per\_day\ )\ \{}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysiosystem_a3e1fecc8ab83c8e8f634cbdc1073e484}{name\_bid\_table}}\ bids(get\_self(),\ get\_self().\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}});}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ idx\ =\ bids.get\_index<\textcolor{stringliteral}{"{}highbid"{}}\_n>();}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00059}00059\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ highest\ =\ idx.lower\_bound(\ std::numeric\_limits<uint64\_t>::max()/2\ );}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ highest\ !=\ idx.end()\ \&\&}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00061}00061\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ highest-\/>high\_bid\ >\ 0\ \&\&}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00062}00062\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (current\_time\_point()\ -\/\ highest-\/>last\_bid\_time)\ >\ \mbox{\hyperlink{classfc_1_1microseconds}{microseconds}}(useconds\_per\_day)\ \&\&}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_gstate.\mbox{\hyperlink{structsysiosystem_1_1sysio__global__state_a9103ca2911e1be3a551b03f6f8d19895}{thresh\_activated\_stake\_time}}\ >\ \mbox{\hyperlink{classfc_1_1time__point}{time\_point}}()\ \&\&}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00064}00064\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (current\_time\_point()\ -\/\ \_gstate.\mbox{\hyperlink{structsysiosystem_1_1sysio__global__state_a9103ca2911e1be3a551b03f6f8d19895}{thresh\_activated\_stake\_time}})\ >\ \mbox{\hyperlink{classfc_1_1microseconds}{microseconds}}(14\ *\ useconds\_per\_day)}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00065}00065\ \ \ \ \ \ \ \ \ \ \ \ \ )\ \{}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00066}00066\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_gstate.\mbox{\hyperlink{structsysiosystem_1_1sysio__global__state_ac51fbd74c97dbfd5d15eca7e22e99897}{last\_name\_close}}\ =\ timestamp;}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00067}00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ channel\_namebid\_to\_rex(\ highest-\/>high\_bid\ );}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ idx.modify(\ highest,\ same\_payer,\ [\&](\ \textcolor{keyword}{auto}\&\ b\ )\{}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ b.high\_bid\ =\ -\/b.high\_bid;}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00071}00071\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00073}00073\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00074}00074\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00075}00075\ }
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00076}\mbox{\hyperlink{classsysiosystem_1_1system__contract_ab9da8658bb03830ff0706195fa14fcb0}{00076}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_ab9da8658bb03830ff0706195fa14fcb0}{system\_contract::claimrewards}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\&\ owner\ )\ \{}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00077}00077\ \ \ \ \ \ \ require\_auth(\ owner\ );}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00079}00079\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ prod\ =\ \_producers.get(\ owner.value\ );}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00080}00080\ \ \ \ \ \ \ check(\ prod.active(),\ \textcolor{stringliteral}{"{}producer\ does\ not\ have\ an\ active\ key"{}}\ );}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00081}00081\ }
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00082}00082\ \ \ \ \ \ \ check(\ \_gstate.\mbox{\hyperlink{structsysiosystem_1_1sysio__global__state_a9103ca2911e1be3a551b03f6f8d19895}{thresh\_activated\_stake\_time}}\ !=\ \mbox{\hyperlink{classfc_1_1time__point}{time\_point}}(),}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00083}00083\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}cannot\ claim\ rewards\ until\ the\ chain\ is\ activated\ (at\ least\ 15\%\ of\ all\ tokens\ participate\ in\ voting)"{}}\ );}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00084}00084\ }
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00085}00085\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ ct\ =\ current\_time\_point();}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00086}00086\ }
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00087}00087\ \ \ \ \ \ \ check(\ ct\ -\/\ prod.last\_claim\_time\ >\ \mbox{\hyperlink{classfc_1_1microseconds}{microseconds}}(useconds\_per\_day),\ \textcolor{stringliteral}{"{}already\ claimed\ rewards\ within\ past\ day"{}}\ );}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00088}00088\ }
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00089}00089\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\ token\_supply\ \ \ =\ \mbox{\hyperlink{classsysio_1_1token_a39b1dd52a6510808e8692ca6d6d0f636}{token::get\_supply}}(\mbox{\hyperlink{classsysiosystem_1_1system__contract_a52f7532857765f2a19f0b55e9b8c29ea}{token\_account}},\ core\_symbol().code()\ );}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00090}00090\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ usecs\_since\_last\_fill\ =\ (ct\ -\/\ \_gstate.\mbox{\hyperlink{structsysiosystem_1_1sysio__global__state_acf59d7c9d51e5b13a28cba74e04fda40}{last\_pervote\_bucket\_fill}}).\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}();}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00091}00091\ }
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00092}00092\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ usecs\_since\_last\_fill\ >\ 0\ \&\&\ \_gstate.\mbox{\hyperlink{structsysiosystem_1_1sysio__global__state_acf59d7c9d51e5b13a28cba74e04fda40}{last\_pervote\_bucket\_fill}}\ >\ \mbox{\hyperlink{classfc_1_1time__point}{time\_point}}()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00093}00093\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ additional\_inflation\ =\ (\_gstate4.\mbox{\hyperlink{structsysiosystem_1_1sysio__global__state4_a0662dc9d458ba2eed394aa58dd014515}{continuous\_rate}}\ *\ double(token\_supply.amount)\ *\ double(usecs\_since\_last\_fill))\ /\ \textcolor{keywordtype}{double}(useconds\_per\_year);}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00094}00094\ \ \ \ \ \ \ \ \ \ check(\ additional\_inflation\ <=\ \textcolor{keywordtype}{double}(std::numeric\_limits<int64\_t>::max()\ -\/\ ((1ll\ <<\ 10)\ -\/\ 1)),}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00095}00095\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}overflow\ in\ calculating\ new\ tokens\ to\ be\ issued;\ inflation\ rate\ is\ too\ high"{}}\ );}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00096}00096\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ new\_tokens\ =\ (additional\_inflation\ <\ 0.0)\ ?\ 0\ :\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\textcolor{keyword}{>}(additional\_inflation);}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00097}00097\ }
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00098}00098\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ to\_producers\ \ \ \ \ =\ (new\_tokens\ *\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a376f631fcb770bd4b2e8349a33e52f8a}{uint128\_t}}(pay\_factor\_precision))\ /\ \_gstate4.\mbox{\hyperlink{structsysiosystem_1_1sysio__global__state4_aaa2cf6bb6deaa4f9be6ca96a83aca9a7}{inflation\_pay\_factor}};}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00099}00099\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ to\_savings\ \ \ \ \ \ \ =\ new\_tokens\ -\/\ to\_producers;}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00100}00100\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ to\_per\_block\_pay\ =\ (to\_producers\ *\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a376f631fcb770bd4b2e8349a33e52f8a}{uint128\_t}}(pay\_factor\_precision))\ /\ \_gstate4.\mbox{\hyperlink{structsysiosystem_1_1sysio__global__state4_afdb9e4d5b950453a9f704182972bfcf4}{votepay\_factor}};}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00101}00101\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ to\_per\_vote\_pay\ \ =\ to\_producers\ -\/\ to\_per\_block\_pay;}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00102}00102\ }
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00103}00103\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ new\_tokens\ >\ 0\ )\ \{}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00104}00104\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00105}00105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1token_a03e64f227cb14be0979e35e6cac78617}{token::issue\_action}}\ issue\_act\{\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_a52f7532857765f2a19f0b55e9b8c29ea}{token\_account}},\ \{\ \{get\_self(),\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_a73d78c07b50de02a172c31966637041e}{active\_permission}}\}\ \}\ \};}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00106}00106\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ issue\_act.send(\ get\_self(),\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}(new\_tokens,\ core\_symbol()),\ \textcolor{stringliteral}{"{}issue\ tokens\ for\ producer\ pay\ and\ savings"{}}\ );}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00107}00107\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00108}00108\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00109}00109\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1token_a104313ae127b80733cf26925f5246379}{token::transfer\_action}}\ transfer\_act\{\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_a52f7532857765f2a19f0b55e9b8c29ea}{token\_account}},\ \{\ \{get\_self(),\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_a73d78c07b50de02a172c31966637041e}{active\_permission}}\}\ \}\ \};}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00110}00110\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ to\_savings\ >\ 0\ )\ \{}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00111}00111\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ transfer\_act.send(\ get\_self(),\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_ab4a3a7252b8b3cecdbb84837e16a48c3}{saving\_account}},\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}(to\_savings,\ core\_symbol()),\ \textcolor{stringliteral}{"{}unallocated\ inflation"{}}\ );}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00112}00112\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00113}00113\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ to\_per\_block\_pay\ >\ 0\ )\ \{}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00114}00114\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ transfer\_act.send(\ get\_self(),\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_ad3f22aacd713dacc3aaddfd94de397bd}{bpay\_account}},\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}(to\_per\_block\_pay,\ core\_symbol()),\ \textcolor{stringliteral}{"{}fund\ per-\/block\ bucket"{}}\ );}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00115}00115\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00116}00116\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ to\_per\_vote\_pay\ >\ 0\ )\ \{}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00117}00117\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ transfer\_act.send(\ get\_self(),\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_a93f8e5fa2c67ee7672f7ebbfa3084067}{vpay\_account}},\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}(to\_per\_vote\_pay,\ core\_symbol()),\ \textcolor{stringliteral}{"{}fund\ per-\/vote\ bucket"{}}\ );}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00118}00118\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00119}00119\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00120}00120\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00121}00121\ }
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00122}00122\ \ \ \ \ \ \ \ \ \ \_gstate.\mbox{\hyperlink{structsysiosystem_1_1sysio__global__state_a15dc798972c47b28b02413ffec40676c}{pervote\_bucket}}\ \ \ \ \ \ \ \ \ \ +=\ to\_per\_vote\_pay;}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00123}00123\ \ \ \ \ \ \ \ \ \ \_gstate.\mbox{\hyperlink{structsysiosystem_1_1sysio__global__state_a5c443152fb46132d2271101f103fb2dd}{perblock\_bucket}}\ \ \ \ \ \ \ \ \ +=\ to\_per\_block\_pay;}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00124}00124\ \ \ \ \ \ \ \ \ \ \_gstate.\mbox{\hyperlink{structsysiosystem_1_1sysio__global__state_acf59d7c9d51e5b13a28cba74e04fda40}{last\_pervote\_bucket\_fill}}\ =\ ct;}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00125}00125\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00126}00126\ }
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00127}00127\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ prod2\ =\ \_producers2.find(\ owner.value\ );}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00128}00128\ }
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00131}00131\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ last\_claim\_plus\_3days\ =\ prod.last\_claim\_time\ +\ \mbox{\hyperlink{classfc_1_1microseconds}{microseconds}}(3\ *\ useconds\_per\_day);}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00132}00132\ }
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00133}00133\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ crossed\_threshold\ \ \ \ \ \ \ =\ (last\_claim\_plus\_3days\ <=\ ct);}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00134}00134\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ updated\_after\_threshold\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00135}00135\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ prod2\ !=\ \_producers2.end()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00136}00136\ \ \ \ \ \ \ \ \ \ updated\_after\_threshold\ =\ (last\_claim\_plus\_3days\ <=\ prod2-\/>last\_votepay\_share\_update);}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00137}00137\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00138}00138\ \ \ \ \ \ \ \ \ \ prod2\ =\ \_producers2.emplace(\ owner,\ [\&](\ \mbox{\hyperlink{structsysiosystem_1_1producer__info2}{producer\_info2}}\&\ info\ \ )\ \{}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00139}00139\ \ \ \ \ \ \ \ \ \ \ \ \ info.owner\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ owner;}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00140}00140\ \ \ \ \ \ \ \ \ \ \ \ \ info.last\_votepay\_share\_update\ =\ ct;}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00141}00141\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00142}00142\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00143}00143\ }
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00144}00144\ \ \ \ \ \ \ \textcolor{comment}{//\ Note:\ updated\_after\_threshold\ implies\ cross\_threshold\ (except\ if\ claiming\ rewards\ when\ the\ producers2\ table\ row\ did\ not\ exist).}}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00145}00145\ \ \ \ \ \ \ \textcolor{comment}{//\ The\ exception\ leads\ to\ updated\_after\_threshold\ to\ be\ treated\ as\ true\ regardless\ of\ whether\ the\ threshold\ was\ crossed.}}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00146}00146\ \ \ \ \ \ \ \textcolor{comment}{//\ This\ is\ okay\ because\ in\ this\ case\ the\ producer\ will\ not\ get\ paid\ anything\ either\ way.}}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00147}00147\ \ \ \ \ \ \ \textcolor{comment}{//\ In\ fact\ it\ is\ desired\ behavior\ because\ the\ producers\ votes\ need\ to\ be\ counted\ in\ the\ global\ total\_producer\_votepay\_share\ for\ the\ first\ time.}}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00148}00148\ }
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00149}00149\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ producer\_per\_block\_pay\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00150}00150\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \_gstate.\mbox{\hyperlink{structsysiosystem_1_1sysio__global__state_a960a9ef2c91a04d7fdceb84e64ae8ec4}{total\_unpaid\_blocks}}\ >\ 0\ )\ \{}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00151}00151\ \ \ \ \ \ \ \ \ \ producer\_per\_block\_pay\ =\ (\_gstate.\mbox{\hyperlink{structsysiosystem_1_1sysio__global__state_a5c443152fb46132d2271101f103fb2dd}{perblock\_bucket}}\ *\ prod.unpaid\_blocks)\ /\ \_gstate.\mbox{\hyperlink{structsysiosystem_1_1sysio__global__state_a960a9ef2c91a04d7fdceb84e64ae8ec4}{total\_unpaid\_blocks}};}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00152}00152\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00153}00153\ }
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00154}00154\ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ new\_votepay\_share\ =\ update\_producer\_votepay\_share(\ prod2,}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00155}00155\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ct,}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00156}00156\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ updated\_after\_threshold\ ?\ 0.0\ :\ prod.total\_votes,}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00157}00157\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{true}\ \textcolor{comment}{//\ reset\ votepay\_share\ to\ zero\ after\ updating}}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00158}00158\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00159}00159\ }
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00160}00160\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ producer\_per\_vote\_pay\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00161}00161\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \_gstate2.\mbox{\hyperlink{structsysiosystem_1_1sysio__global__state2_a3aa483a119f0245c64696aa9a395848f}{revision}}\ >\ 0\ )\ \{}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00162}00162\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ total\_votepay\_share\ =\ update\_total\_votepay\_share(\ ct\ );}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00163}00163\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ total\_votepay\_share\ >\ 0\ \&\&\ !crossed\_threshold\ )\ \{}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00164}00164\ \ \ \ \ \ \ \ \ \ \ \ \ producer\_per\_vote\_pay\ =\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}((new\_votepay\_share\ *\ \_gstate.\mbox{\hyperlink{structsysiosystem_1_1sysio__global__state_a15dc798972c47b28b02413ffec40676c}{pervote\_bucket}})\ /\ total\_votepay\_share);}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00165}00165\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ producer\_per\_vote\_pay\ >\ \_gstate.\mbox{\hyperlink{structsysiosystem_1_1sysio__global__state_a15dc798972c47b28b02413ffec40676c}{pervote\_bucket}}\ )}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00166}00166\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ producer\_per\_vote\_pay\ =\ \_gstate.\mbox{\hyperlink{structsysiosystem_1_1sysio__global__state_a15dc798972c47b28b02413ffec40676c}{pervote\_bucket}};}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00167}00167\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00168}00168\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00169}00169\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \_gstate.\mbox{\hyperlink{structsysiosystem_1_1sysio__global__state_acb169bdf3bca4e6cabb0f5b8da2adc19}{total\_producer\_vote\_weight}}\ >\ 0\ )\ \{}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00170}00170\ \ \ \ \ \ \ \ \ \ \ \ \ producer\_per\_vote\_pay\ =\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}((\_gstate.\mbox{\hyperlink{structsysiosystem_1_1sysio__global__state_a15dc798972c47b28b02413ffec40676c}{pervote\_bucket}}\ *\ prod.total\_votes)\ /\ \_gstate.\mbox{\hyperlink{structsysiosystem_1_1sysio__global__state_acb169bdf3bca4e6cabb0f5b8da2adc19}{total\_producer\_vote\_weight}});}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00171}00171\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00172}00172\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00173}00173\ }
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00174}00174\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ producer\_per\_vote\_pay\ <\ min\_pervote\_daily\_pay\ )\ \{}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00175}00175\ \ \ \ \ \ \ \ \ \ producer\_per\_vote\_pay\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00176}00176\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00177}00177\ }
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00178}00178\ \ \ \ \ \ \ \_gstate.\mbox{\hyperlink{structsysiosystem_1_1sysio__global__state_a15dc798972c47b28b02413ffec40676c}{pervote\_bucket}}\ \ \ \ \ \ -\/=\ producer\_per\_vote\_pay;}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00179}00179\ \ \ \ \ \ \ \_gstate.\mbox{\hyperlink{structsysiosystem_1_1sysio__global__state_a5c443152fb46132d2271101f103fb2dd}{perblock\_bucket}}\ \ \ \ \ -\/=\ producer\_per\_block\_pay;}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00180}00180\ \ \ \ \ \ \ \_gstate.\mbox{\hyperlink{structsysiosystem_1_1sysio__global__state_a960a9ef2c91a04d7fdceb84e64ae8ec4}{total\_unpaid\_blocks}}\ -\/=\ prod.unpaid\_blocks;}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00181}00181\ }
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00182}00182\ \ \ \ \ \ \ update\_total\_votepay\_share(\ ct,\ -\/new\_votepay\_share,\ (updated\_after\_threshold\ ?\ prod.total\_votes\ :\ 0.0)\ );}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00183}00183\ }
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00184}00184\ \ \ \ \ \ \ \_producers.modify(\ prod,\ same\_payer,\ [\&](\textcolor{keyword}{auto}\&\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})\ \{}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00185}00185\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.last\_claim\_time\ =\ ct;}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00186}00186\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.unpaid\_blocks\ \ \ =\ 0;}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00187}00187\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00188}00188\ }
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00189}00189\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ producer\_per\_block\_pay\ >\ 0\ )\ \{}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00190}00190\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1token_a104313ae127b80733cf26925f5246379}{token::transfer\_action}}\ transfer\_act\{\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_a52f7532857765f2a19f0b55e9b8c29ea}{token\_account}},\ \{\ \{\mbox{\hyperlink{classsysiosystem_1_1system__contract_ad3f22aacd713dacc3aaddfd94de397bd}{bpay\_account}},\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_a73d78c07b50de02a172c31966637041e}{active\_permission}}\},\ \{owner,\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_a73d78c07b50de02a172c31966637041e}{active\_permission}}\}\ \}\ \};}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00191}00191\ \ \ \ \ \ \ \ \ \ transfer\_act.send(\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_ad3f22aacd713dacc3aaddfd94de397bd}{bpay\_account}},\ owner,\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}(producer\_per\_block\_pay,\ core\_symbol()),\ \textcolor{stringliteral}{"{}producer\ block\ pay"{}}\ );}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00192}00192\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00193}00193\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ producer\_per\_vote\_pay\ >\ 0\ )\ \{}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00194}00194\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1token_a104313ae127b80733cf26925f5246379}{token::transfer\_action}}\ transfer\_act\{\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_a52f7532857765f2a19f0b55e9b8c29ea}{token\_account}},\ \{\ \{\mbox{\hyperlink{classsysiosystem_1_1system__contract_a93f8e5fa2c67ee7672f7ebbfa3084067}{vpay\_account}},\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_a73d78c07b50de02a172c31966637041e}{active\_permission}}\},\ \{owner,\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_a73d78c07b50de02a172c31966637041e}{active\_permission}}\}\ \}\ \};}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00195}00195\ \ \ \ \ \ \ \ \ \ transfer\_act.send(\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_a93f8e5fa2c67ee7672f7ebbfa3084067}{vpay\_account}},\ owner,\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}(producer\_per\_vote\_pay,\ core\_symbol()),\ \textcolor{stringliteral}{"{}producer\ vote\ pay"{}}\ );}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00196}00196\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00197}00197\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00198}00198\ }
+\DoxyCodeLine{\Hypertarget{producer__pay_8cpp_source_l00199}00199\ \}\ \textcolor{comment}{//namespace\ sysiosystem}}
+
+\end{DoxyCode}

@@ -1,0 +1,7 @@
+<map id="sysio::pending_snapshot" name="sysio::pending_snapshot">
+<area shape="rect" id="Node000001" title=" " alt="" coords="9,109,174,135"/>
+<area shape="rect" id="Node000002" href="$classfc_1_1sha256.html" title=" " alt="" coords="5,5,88,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="50,46,53,65,59,84,79,107,74,110,55,86,48,66,45,47"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="112,5,165,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="130,46,112,86,100,110,95,108,107,84,125,44"/>
+</map>

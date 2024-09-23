@@ -1,0 +1,70 @@
+\doxysection{libraries/softfloat/source/s\+\_\+shift\+Right\+Jam128\+Extra.c File Reference}
+\hypertarget{softfloat_2source_2s__shift_right_jam128_extra_8c}{}\label{softfloat_2source_2s__shift_right_jam128_extra_8c}\index{libraries/softfloat/source/s\_shiftRightJam128Extra.c@{libraries/softfloat/source/s\_shiftRightJam128Extra.c}}
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include "{}platform.\+h"{}}\newline
+{\ttfamily \#include "{}primitive\+Types.\+h"{}}\newline
+Include dependency graph for s\+\_\+shift\+Right\+Jam128\+Extra.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=343pt]{softfloat_2source_2s__shift_right_jam128_extra_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+struct uint128\+\_\+extra \mbox{\hyperlink{softfloat_2source_2s__shift_right_jam128_extra_8c_a9d776a20a27b1fe07ed8c12022e3a209}{softfloat\+\_\+shift\+Right\+Jam128\+Extra}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} a64, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} a0, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} extra, \mbox{\hyperlink{stdint_8h_a8f075c759c74e109e8184306c663809d}{uint\+\_\+fast32\+\_\+t}} dist)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{softfloat_2source_2s__shift_right_jam128_extra_8c_a9d776a20a27b1fe07ed8c12022e3a209}\index{s\_shiftRightJam128Extra.c@{s\_shiftRightJam128Extra.c}!softfloat\_shiftRightJam128Extra@{softfloat\_shiftRightJam128Extra}}
+\index{softfloat\_shiftRightJam128Extra@{softfloat\_shiftRightJam128Extra}!s\_shiftRightJam128Extra.c@{s\_shiftRightJam128Extra.c}}
+\doxysubsubsection{\texorpdfstring{softfloat\_shiftRightJam128Extra()}{softfloat\_shiftRightJam128Extra()}}
+{\footnotesize\ttfamily \label{softfloat_2source_2s__shift_right_jam128_extra_8c_a9d776a20a27b1fe07ed8c12022e3a209} 
+struct uint128\+\_\+extra softfloat\+\_\+shift\+Right\+Jam128\+Extra (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{a64}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{a0}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{extra}{, }\item[{\mbox{\hyperlink{stdint_8h_a8f075c759c74e109e8184306c663809d}{uint\+\_\+fast32\+\_\+t}}}]{dist}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2s__shift_right_jam128_extra_8c_source_l00044}{44}} of file \mbox{\hyperlink{softfloat_2source_2s__shift_right_jam128_extra_8c_source}{s\+\_\+shift\+Right\+Jam128\+Extra.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00046\ \{}
+\DoxyCodeLine{00047\ \ \ \ \ \mbox{\hyperlink{stdint_8h_ad0fca8b15c218d2c687f8c373a71d228}{uint\_fast8\_t}}\ u8NegDist;}
+\DoxyCodeLine{00048\ \ \ \ \ \textcolor{keyword}{struct\ }uint128\_extra\ z;}
+\DoxyCodeLine{00049\ }
+\DoxyCodeLine{00050\ \ \ \ \ u8NegDist\ =\ -\/dist;}
+\DoxyCodeLine{00051\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ dist\ <\ 64\ )\ \{}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ z.v.v64\ =\ a64>>dist;}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ z.v.v0\ =\ a64<<(u8NegDist\ \&\ 63)\ |\ a0>>dist;}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ z.extra\ =\ a0<<(u8NegDist\ \&\ 63);}
+\DoxyCodeLine{00055\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ z.v.v64\ =\ 0;}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ dist\ ==\ 64\ )\ \{}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \ \ \ z.v.v0\ =\ a64;}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ \ \ \ z.extra\ =\ a0;}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \ \ \ \ extra\ |=\ a0;}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ dist\ <\ 128\ )\ \{}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ z.v.v0\ =\ a64>>(dist\ \&\ 63);}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ z.extra\ =\ a64<<(u8NegDist\ \&\ 63);}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ z.v.v0\ =\ 0;}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ z.extra\ =\ (dist\ ==\ 128)\ ?\ a64\ :\ (a64\ !=\ 0);}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00070\ \ \ \ \ \}}
+\DoxyCodeLine{00071\ \ \ \ \ z.extra\ |=\ (extra\ !=\ 0);}
+\DoxyCodeLine{00072\ \ \ \ \ \textcolor{keywordflow}{return}\ z;}
+\DoxyCodeLine{00073\ }
+\DoxyCodeLine{00074\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{softfloat_2source_2s__shift_right_jam128_extra_8c_a9d776a20a27b1fe07ed8c12022e3a209_icgraph}
+\end{center}
+\end{figure}

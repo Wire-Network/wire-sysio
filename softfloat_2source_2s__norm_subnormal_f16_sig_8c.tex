@@ -1,0 +1,44 @@
+\doxysection{libraries/softfloat/source/s\+\_\+norm\+Subnormal\+F16\+Sig.c File Reference}
+\hypertarget{softfloat_2source_2s__norm_subnormal_f16_sig_8c}{}\label{softfloat_2source_2s__norm_subnormal_f16_sig_8c}\index{libraries/softfloat/source/s\_normSubnormalF16Sig.c@{libraries/softfloat/source/s\_normSubnormalF16Sig.c}}
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include "{}platform.\+h"{}}\newline
+{\ttfamily \#include "{}internals.\+h"{}}\newline
+Include dependency graph for s\+\_\+norm\+Subnormal\+F16\+Sig.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=317pt]{softfloat_2source_2s__norm_subnormal_f16_sig_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structexp8__sig16}{exp8\+\_\+sig16}} \mbox{\hyperlink{softfloat_2source_2s__norm_subnormal_f16_sig_8c_a26b4ee075a563add11162dbc7cff7c7b}{softfloat\+\_\+norm\+Subnormal\+F16\+Sig}} (\mbox{\hyperlink{stdint_8h_a6ed085329b153773ff76afa0702cf897}{uint\+\_\+fast16\+\_\+t}} sig)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{softfloat_2source_2s__norm_subnormal_f16_sig_8c_a26b4ee075a563add11162dbc7cff7c7b}\index{s\_normSubnormalF16Sig.c@{s\_normSubnormalF16Sig.c}!softfloat\_normSubnormalF16Sig@{softfloat\_normSubnormalF16Sig}}
+\index{softfloat\_normSubnormalF16Sig@{softfloat\_normSubnormalF16Sig}!s\_normSubnormalF16Sig.c@{s\_normSubnormalF16Sig.c}}
+\doxysubsubsection{\texorpdfstring{softfloat\_normSubnormalF16Sig()}{softfloat\_normSubnormalF16Sig()}}
+{\footnotesize\ttfamily \label{softfloat_2source_2s__norm_subnormal_f16_sig_8c_a26b4ee075a563add11162dbc7cff7c7b} 
+struct \mbox{\hyperlink{structexp8__sig16}{exp8\+\_\+sig16}} softfloat\+\_\+norm\+Subnormal\+F16\+Sig (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a6ed085329b153773ff76afa0702cf897}{uint\+\_\+fast16\+\_\+t}}}]{sig}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2s__norm_subnormal_f16_sig_8c_source_l00041}{41}} of file \mbox{\hyperlink{softfloat_2source_2s__norm_subnormal_f16_sig_8c_source}{s\+\_\+norm\+Subnormal\+F16\+Sig.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00042\ \{}
+\DoxyCodeLine{00043\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a880ed9ceb8621521452c81d03bd08cfb}{int\_fast8\_t}}\ shiftDist;}
+\DoxyCodeLine{00044\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structexp8__sig16}{exp8\_sig16}}\ z;}
+\DoxyCodeLine{00045\ }
+\DoxyCodeLine{00046\ \ \ \ \ shiftDist\ =\ \mbox{\hyperlink{softfloat_2source_2s__count_leading_zeros16_8c_a945c3dfcb3e1a5a92be75fd284b165f4}{softfloat\_countLeadingZeros16}}(\ \mbox{\hyperlink{structexp8__sig16_ae3b5c2043a54096a10111aad9e8352e1}{sig}}\ )\ -\/\ 5;}
+\DoxyCodeLine{00047\ \ \ \ \ z.\mbox{\hyperlink{structexp8__sig16_abd72e2de3e109e3a944b47edd4b7b74d}{exp}}\ =\ 1\ -\/\ shiftDist;}
+\DoxyCodeLine{00048\ \ \ \ \ z.sig\ =\ \mbox{\hyperlink{structexp8__sig16_ae3b5c2043a54096a10111aad9e8352e1}{sig}}<<shiftDist;}
+\DoxyCodeLine{00049\ \ \ \ \ \textcolor{keywordflow}{return}\ z;}
+\DoxyCodeLine{00050\ }
+\DoxyCodeLine{00051\ \}}
+
+\end{DoxyCode}

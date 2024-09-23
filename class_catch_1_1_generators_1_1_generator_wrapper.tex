@@ -1,0 +1,164 @@
+\doxysection{Catch\+::Generators\+::Generator\+Wrapper\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{class_catch_1_1_generators_1_1_generator_wrapper}{}\label{class_catch_1_1_generators_1_1_generator_wrapper}\index{Catch::Generators::GeneratorWrapper$<$ T $>$@{Catch::Generators::GeneratorWrapper$<$ T $>$}}
+
+
+{\ttfamily \#include $<$catch\+\_\+generators.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_catch_1_1_generators_1_1_generator_wrapper_ad65b09392d8b3a7472a8b5375048748d}{Generator\+Wrapper}} (std\+::unique\+\_\+ptr$<$ \mbox{\hyperlink{struct_catch_1_1_generators_1_1_i_generator}{IGenerator}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ $>$ generator)
+\item 
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const \& \mbox{\hyperlink{class_catch_1_1_generators_1_1_generator_wrapper_a4a461a591d0bd5360a2745cb2b5011cc}{get}} () const
+\item 
+bool \mbox{\hyperlink{class_catch_1_1_generators_1_1_generator_wrapper_acbfdca94811ae02461bd2cf5f60b666e}{next}} ()
+\item 
+\mbox{\hyperlink{class_catch_1_1_generators_1_1_generator_wrapper_ad65b09392d8b3a7472a8b5375048748d}{Generator\+Wrapper}} (std\+::unique\+\_\+ptr$<$ \mbox{\hyperlink{struct_catch_1_1_generators_1_1_i_generator}{IGenerator}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ $>$ generator)
+\item 
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const \& \mbox{\hyperlink{class_catch_1_1_generators_1_1_generator_wrapper_a4a461a591d0bd5360a2745cb2b5011cc}{get}} () const
+\item 
+bool \mbox{\hyperlink{class_catch_1_1_generators_1_1_generator_wrapper_acbfdca94811ae02461bd2cf5f60b666e}{next}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$\newline
+class Catch\+::\+Generators\+::\+Generator\+Wrapper$<$ T $>$}
+
+
+Definition at line \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source_l03572}{3572}} of file \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source}{catch.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_catch_1_1_generators_1_1_generator_wrapper_ad65b09392d8b3a7472a8b5375048748d}\index{Catch::Generators::GeneratorWrapper$<$ T $>$@{Catch::Generators::GeneratorWrapper$<$ T $>$}!GeneratorWrapper@{GeneratorWrapper}}
+\index{GeneratorWrapper@{GeneratorWrapper}!Catch::Generators::GeneratorWrapper$<$ T $>$@{Catch::Generators::GeneratorWrapper$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{GeneratorWrapper()}{GeneratorWrapper()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_generators_1_1_generator_wrapper_ad65b09392d8b3a7472a8b5375048748d} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{class_catch_1_1_generators_1_1_generator_wrapper}{Catch\+::\+Generators\+::\+Generator\+Wrapper}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::\+Generator\+Wrapper (\begin{DoxyParamCaption}\item[{std\+::unique\+\_\+ptr$<$ \mbox{\hyperlink{struct_catch_1_1_generators_1_1_i_generator}{IGenerator}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ $>$}]{generator}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__generators_8hpp_source_l00091}{91}} of file \mbox{\hyperlink{catch__generators_8hpp_source}{catch\+\_\+generators.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ \ \ \ m\_generator(std::move(generator))}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_generators_1_1_generator_wrapper_ad65b09392d8b3a7472a8b5375048748d}\index{Catch::Generators::GeneratorWrapper$<$ T $>$@{Catch::Generators::GeneratorWrapper$<$ T $>$}!GeneratorWrapper@{GeneratorWrapper}}
+\index{GeneratorWrapper@{GeneratorWrapper}!Catch::Generators::GeneratorWrapper$<$ T $>$@{Catch::Generators::GeneratorWrapper$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{GeneratorWrapper()}{GeneratorWrapper()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_generators_1_1_generator_wrapper_ad65b09392d8b3a7472a8b5375048748d} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{class_catch_1_1_generators_1_1_generator_wrapper}{Catch\+::\+Generators\+::\+Generator\+Wrapper}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::\+Generator\+Wrapper (\begin{DoxyParamCaption}\item[{std\+::unique\+\_\+ptr$<$ \mbox{\hyperlink{struct_catch_1_1_generators_1_1_i_generator}{IGenerator}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ $>$}]{generator}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source_l03575}{3575}} of file \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source}{catch.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03575\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :}
+\DoxyCodeLine{03576\ \ \ \ \ \ \ \ \ \ \ \ \ m\_generator(std::move(generator))}
+\DoxyCodeLine{03577\ \ \ \ \ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_catch_1_1_generators_1_1_generator_wrapper_a4a461a591d0bd5360a2745cb2b5011cc}\index{Catch::Generators::GeneratorWrapper$<$ T $>$@{Catch::Generators::GeneratorWrapper$<$ T $>$}!get@{get}}
+\index{get@{get}!Catch::Generators::GeneratorWrapper$<$ T $>$@{Catch::Generators::GeneratorWrapper$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{get()}{get()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_generators_1_1_generator_wrapper_a4a461a591d0bd5360a2745cb2b5011cc} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const  \& \mbox{\hyperlink{class_catch_1_1_generators_1_1_generator_wrapper}{Catch\+::\+Generators\+::\+Generator\+Wrapper}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::get (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__generators_8hpp_source_l00094}{94}} of file \mbox{\hyperlink{catch__generators_8hpp_source}{catch\+\_\+generators.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_generator-\/>get();}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_generators_1_1_generator_wrapper_a4a461a591d0bd5360a2745cb2b5011cc_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_generators_1_1_generator_wrapper_a4a461a591d0bd5360a2745cb2b5011cc}\index{Catch::Generators::GeneratorWrapper$<$ T $>$@{Catch::Generators::GeneratorWrapper$<$ T $>$}!get@{get}}
+\index{get@{get}!Catch::Generators::GeneratorWrapper$<$ T $>$@{Catch::Generators::GeneratorWrapper$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{get()}{get()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_generators_1_1_generator_wrapper_a4a461a591d0bd5360a2745cb2b5011cc} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const  \& \mbox{\hyperlink{class_catch_1_1_generators_1_1_generator_wrapper}{Catch\+::\+Generators\+::\+Generator\+Wrapper}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::get (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source_l03578}{3578}} of file \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source}{catch.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03578\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{03579\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_generator-\/>get();}
+\DoxyCodeLine{03580\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_generators_1_1_generator_wrapper_acbfdca94811ae02461bd2cf5f60b666e}\index{Catch::Generators::GeneratorWrapper$<$ T $>$@{Catch::Generators::GeneratorWrapper$<$ T $>$}!next@{next}}
+\index{next@{next}!Catch::Generators::GeneratorWrapper$<$ T $>$@{Catch::Generators::GeneratorWrapper$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{next()}{next()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_generators_1_1_generator_wrapper_acbfdca94811ae02461bd2cf5f60b666e} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+bool \mbox{\hyperlink{class_catch_1_1_generators_1_1_generator_wrapper}{Catch\+::\+Generators\+::\+Generator\+Wrapper}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::next (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__generators_8hpp_source_l00097}{97}} of file \mbox{\hyperlink{catch__generators_8hpp_source}{catch\+\_\+generators.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_generator-\/>next();}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_generators_1_1_generator_wrapper_acbfdca94811ae02461bd2cf5f60b666e_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_generators_1_1_generator_wrapper_acbfdca94811ae02461bd2cf5f60b666e}\index{Catch::Generators::GeneratorWrapper$<$ T $>$@{Catch::Generators::GeneratorWrapper$<$ T $>$}!next@{next}}
+\index{next@{next}!Catch::Generators::GeneratorWrapper$<$ T $>$@{Catch::Generators::GeneratorWrapper$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{next()}{next()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_generators_1_1_generator_wrapper_acbfdca94811ae02461bd2cf5f60b666e} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+bool \mbox{\hyperlink{class_catch_1_1_generators_1_1_generator_wrapper}{Catch\+::\+Generators\+::\+Generator\+Wrapper}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::next (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source_l03581}{3581}} of file \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source}{catch.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03581\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{03582\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_generator-\/>next();}
+\DoxyCodeLine{03583\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__generators_8hpp}{catch\+\_\+generators.\+hpp}}\item 
+libraries/sys-\/vm/external/\+Catch2/single\+\_\+include/catch2/\mbox{\hyperlink{single__include_2catch2_2catch_8hpp}{catch.\+hpp}}\end{DoxyCompactItemize}

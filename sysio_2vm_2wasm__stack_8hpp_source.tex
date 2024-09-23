@@ -1,0 +1,82 @@
+\doxysection{wasm\+\_\+stack.\+hpp}
+\hypertarget{sysio_2vm_2wasm__stack_8hpp_source}{}\label{sysio_2vm_2wasm__stack_8hpp_source}\index{libraries/sys-\/vm/include/sysio/sysio/vm/wasm\_stack.hpp@{libraries/sys-\/vm/include/sysio/sysio/vm/wasm\_stack.hpp}}
+\mbox{\hyperlink{sysio_2vm_2wasm__stack_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00003}00003\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00004}00004\ \textcolor{comment}{\ *\ definitions\ from\ https://github.com/WebAssembly/design/blob/master/BinaryEncoding.md}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00005}00005\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <sysio/vm/allocator.hpp>}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <sysio/vm/constants.hpp>}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ <sysio/vm/exceptions.hpp>}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <sysio/vm/stack\_elem.hpp>}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00011}00011\ \textcolor{preprocessor}{\#include\ <sysio/vm/types.hpp>}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00012}00012\ \textcolor{preprocessor}{\#include\ <sysio/vm/vector.hpp>}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00014}00014\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{\ \textcolor{keyword}{namespace\ }vm\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00015}00015\ \ \ \ \textcolor{keyword}{using\ }std::nullptr\_t;}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00017}00017\ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ ElemT,\ \textcolor{keywordtype}{size\_t}\ ElemSz,\ \textcolor{keyword}{typename}\ Allocator\ =\ \textcolor{keywordtype}{nullptr}\_t\ >}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00018}00018\ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{namespacesysio_1_1vm_abc94c8e9af7289dc068a502c63ad98d4afac2a47adace059aff113283a03f6760}{stack}}\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00019}00019\ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00020}00020\ \ \ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ Alloc=Allocator,\ \textcolor{keyword}{typename}\ =\ std::enable\_if\_t<std::is\_same\_v<Alloc,\ std::\textcolor{keywordtype}{nullptr}\_t>,\ \textcolor{keywordtype}{int}>>}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00021}\mbox{\hyperlink{classsysio_1_1vm_1_1stack_adeb53b4513bfc04a652492148f1b1792}{00021}}\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1stack_adeb53b4513bfc04a652492148f1b1792}{stack}}()}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00022}00022\ \ \ \ \ \ \ \ \ \ :\ \_store(ElemSz)\ \{\}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00024}00024\ \ \ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ Alloc=Allocator,\ \textcolor{keyword}{typename}\ =\ std::enable\_if\_t<!std::is\_same\_v<Alloc,\ \textcolor{keywordtype}{nullptr}\_t>,\ \textcolor{keywordtype}{int}>>}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00025}\mbox{\hyperlink{classsysio_1_1vm_1_1stack_a5cceaecd58d33b15e1095a8c1fea723c}{00025}}\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1stack_a5cceaecd58d33b15e1095a8c1fea723c}{stack}}(Alloc\&\&\ alloc)}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00026}00026\ \ \ \ \ \ \ \ \ \ :\ \_store(alloc,\ ElemSz)\ \{\}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00028}00028\ \ \ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ Alloc=Allocator,\ \textcolor{keyword}{typename}\ =\ std::enable\_if\_t<!std::is\_same\_v<Alloc,\ \textcolor{keywordtype}{nullptr}\_t>,\ \textcolor{keywordtype}{int}>>}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00029}\mbox{\hyperlink{classsysio_1_1vm_1_1stack_a57412b35f62a6138038785948fe4e39a}{00029}}\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1stack_a57412b35f62a6138038785948fe4e39a}{stack}}(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ n,\ Alloc\&\&\ alloc)}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00030}00030\ \ \ \ \ \ \ \ \ \ :\ \_store(alloc,\ n)\ \{\}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00032}\mbox{\hyperlink{classsysio_1_1vm_1_1stack_a6622e50cf34d892c701d2085faa53f8e}{00032}}\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1vm_1_1stack_a6622e50cf34d892c701d2085faa53f8e}{push}}(ElemT\&\&\ e)\ \{\ }
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00033}00033\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keyword}{constexpr}\ (std::is\_same\_v<Allocator,\ nullptr\_t>)\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00034}00034\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\_index\ >=\ \_store.size())}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00035}00035\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_store.resize(\_store.size()*2);}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00036}00036\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00037}00037\ \ \ \ \ \ \ \ \ \ \_store[\_index++]\ =\ std::forward<ElemT>(e);}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00038}00038\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00040}\mbox{\hyperlink{classsysio_1_1vm_1_1stack_ae9a715af8918e2e59bf5256632c6b7b1}{00040}}\ \ \ \ \ \ \ ElemT\ \mbox{\hyperlink{classsysio_1_1vm_1_1stack_ae9a715af8918e2e59bf5256632c6b7b1}{pop}}()\ \{\ \textcolor{keywordflow}{return}\ \_store[-\/-\/\_index];\ \}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00042}\mbox{\hyperlink{classsysio_1_1vm_1_1stack_a210b5e6a0e8192d8f648a95355a1c993}{00042}}\ \ \ \ \ \ \ ElemT\&\ \mbox{\hyperlink{classsysio_1_1vm_1_1stack_a210b5e6a0e8192d8f648a95355a1c993}{get}}(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ index)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00043}00043\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(index\ <=\ \_index,\ wasm\_interpreter\_exception,\ \textcolor{stringliteral}{"{}invalid\ stack\ index"{}});}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00044}00044\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (ElemT\&)\_store[index];}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00045}00045\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00046}\mbox{\hyperlink{classsysio_1_1vm_1_1stack_a0393f31c92bd595ec39b2b6afa4fa3a4}{00046}}\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1vm_1_1stack_a0393f31c92bd595ec39b2b6afa4fa3a4}{set}}(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ index,\ \textcolor{keyword}{const}\ ElemT\&\ el)\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00047}00047\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(index\ <=\ \_index,\ wasm\_interpreter\_exception,\ \textcolor{stringliteral}{"{}invalid\ stack\ index"{}});}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \_store[index]\ =\ el;}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00049}00049\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00050}\mbox{\hyperlink{classsysio_1_1vm_1_1stack_a515d7dcc22ab5464d01db42c26123870}{00050}}\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \ \mbox{\hyperlink{classsysio_1_1vm_1_1stack_a515d7dcc22ab5464d01db42c26123870}{eat}}(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ index)\ \{\ \_index\ =\ index;\ \}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00051}00051\ \ \ \ \ \ \ \textcolor{comment}{//\ compact\ the\ last\ element\ to\ the\ element\ pointed\ to\ by\ index}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00052}\mbox{\hyperlink{classsysio_1_1vm_1_1stack_a30d9575d6cd028b9e177872c7505f1b8}{00052}}\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1vm_1_1stack_a30d9575d6cd028b9e177872c7505f1b8}{compact}}(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ index)\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \_store[index]\ =\ \_store[\_index-\/1];}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \_index\ =\ index+1;}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00055}00055\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00056}\mbox{\hyperlink{classsysio_1_1vm_1_1stack_a5651fcb15702086e2f71b26dee163762}{00056}}\ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1stack_a5651fcb15702086e2f71b26dee163762}{current\_index}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \_index;\ \}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00057}\mbox{\hyperlink{classsysio_1_1vm_1_1stack_a48b925105ad1a8d21cc097a2aede7b10}{00057}}\ \ \ \ \ \ \ ElemT\&\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1stack_a48b925105ad1a8d21cc097a2aede7b10}{peek}}()\ \{\ \textcolor{keywordflow}{return}\ \_store[\_index\ -\/\ 1];\ \}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00058}\mbox{\hyperlink{classsysio_1_1vm_1_1stack_a13aee6203ea75049d009cf2f5a7d521e}{00058}}\ \ \ \ \ \ \ \textcolor{keyword}{const}\ ElemT\&\ \mbox{\hyperlink{classsysio_1_1vm_1_1stack_a13aee6203ea75049d009cf2f5a7d521e}{peek}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \_store[\_index\ -\/\ 1];\ \}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00059}\mbox{\hyperlink{classsysio_1_1vm_1_1stack_a7fc7f1abbd43b2dd6d2d1e829171b7dc}{00059}}\ \ \ \ \ \ \ ElemT\&\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1stack_a7fc7f1abbd43b2dd6d2d1e829171b7dc}{peek}}(\textcolor{keywordtype}{size\_t}\ i)\ \{\ \textcolor{keywordflow}{return}\ \_store[\_index\ -\/\ 1\ -\/\ i];\ \}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00060}\mbox{\hyperlink{classsysio_1_1vm_1_1stack_a062d42c4ce4359ef87c6a53267796d4d}{00060}}\ \ \ \ \ \ \ ElemT\&\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1stack_a062d42c4ce4359ef87c6a53267796d4d}{get\_back}}(\textcolor{keywordtype}{size\_t}\ i)\ \{\ \textcolor{keywordflow}{return}\ \_store[\_index\ -\/\ 1\ -\/\ i];\ \}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00061}\mbox{\hyperlink{classsysio_1_1vm_1_1stack_a19946087d603ee67057b2c45b8c3f3b0}{00061}}\ \ \ \ \ \ \ \textcolor{keyword}{const}\ ElemT\&\ \mbox{\hyperlink{classsysio_1_1vm_1_1stack_a19946087d603ee67057b2c45b8c3f3b0}{get\_back}}(\textcolor{keywordtype}{size\_t}\ i)\textcolor{keyword}{const\ }\{\ \textcolor{keywordflow}{return}\ \_store[\_index\ -\/\ 1\ -\/\ i];\ \}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00062}\mbox{\hyperlink{classsysio_1_1vm_1_1stack_adc4a93eafdcbf2f3526d11bdbe0cc126}{00062}}\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1stack_adc4a93eafdcbf2f3526d11bdbe0cc126}{trim}}(\textcolor{keywordtype}{size\_t}\ amt)\ \{\ \_index\ -\/=\ amt;\ \}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00063}\mbox{\hyperlink{classsysio_1_1vm_1_1stack_acee386572ddf55df79ab4f7e35eecc96}{00063}}\ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1stack_acee386572ddf55df79ab4f7e35eecc96}{size}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \_index;\ \}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00064}\mbox{\hyperlink{classsysio_1_1vm_1_1stack_a37e6c72d62683bc2b77713010a51a56f}{00064}}\ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1stack_a37e6c72d62683bc2b77713010a51a56f}{capacity}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \_store.size();\ \}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00066}00066\ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00067}00067\ \ \ \ \ \ \ \textcolor{keyword}{using\ }base\_data\_store\_t\ =\ std::conditional\_t<std::is\_same\_v<Allocator,\ std::nullptr\_t>,\ \mbox{\hyperlink{namespacesysio_1_1vm_ab7f3476af3409887ab60e8b853a5f271}{unmanaged\_vector<ElemT>}},\ \mbox{\hyperlink{classsysio_1_1vm_1_1managed__vector}{managed\_vector<ElemT,\ Allocator>}}>;}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00069}00069\ \ \ \ \ \ \ base\_data\_store\_t\ \_store;}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00070}00070\ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \ \ \ \ \ \ \ \ \ \ \ \_index\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00071}00071\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00073}\mbox{\hyperlink{namespacesysio_1_1vm_a80b2c5cc5651a70a1f86e6390546fbd6}{00073}}\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1stack}{operand\_stack}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1stack}{stack<operand\_stack\_elem,\ constants::initial\_stack\_size>}};}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00074}\mbox{\hyperlink{namespacesysio_1_1vm_a5491df8eb4ad32b5173d3678e0341d67}{00074}}\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1stack}{call\_stack}}\ \ \ \ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1stack}{stack<activation\_frame,\ \ \ constants::max\_call\_depth\ +\ 1,\ bounded\_allocator>}};}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00075}00075\ }
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2wasm__stack_8hpp_source_l00076}00076\ \}\}\ \textcolor{comment}{//\ namespace\ sysio::vm}}
+
+\end{DoxyCode}

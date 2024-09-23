@@ -1,0 +1,107 @@
+\doxysection{libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/writer.h File Reference}
+\hypertarget{writer_8h}{}\label{writer_8h}\index{libraries/fc/include/fc/crypto/webauthn\_json/include/rapidjson/writer.h@{libraries/fc/include/fc/crypto/webauthn\_json/include/rapidjson/writer.h}}
+{\ttfamily \#include "{}stream.\+h"{}}\newline
+{\ttfamily \#include "{}internal/meta.\+h"{}}\newline
+{\ttfamily \#include "{}internal/stack.\+h"{}}\newline
+{\ttfamily \#include "{}internal/strfunc.\+h"{}}\newline
+{\ttfamily \#include "{}internal/dtoa.\+h"{}}\newline
+{\ttfamily \#include "{}internal/itoa.\+h"{}}\newline
+{\ttfamily \#include "{}stringbuffer.\+h"{}}\newline
+{\ttfamily \#include $<$new$>$}\newline
+Include dependency graph for writer.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{writer_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{writer_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{class_writer}{Writer$<$ Output\+Stream, Source\+Encoding, Target\+Encoding, Stack\+Allocator, write\+Flags $>$}}
+\begin{DoxyCompactList}\small\item\em JSON writer. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_writer_1_1_level}{Writer$<$ Output\+Stream, Source\+Encoding, Target\+Encoding, Stack\+Allocator, write\+Flags $>$\+::\+Level}}
+\begin{DoxyCompactList}\small\item\em Information for each nested level. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{writer_8h_a1975595e2f1dc20a2d4859f340ac88c6}{RAPIDJSON\+\_\+\+WRITE\+\_\+\+DEFAULT\+\_\+\+FLAGS}}~\mbox{\hyperlink{writer_8h_ab05d31260e712ed01daa80077f21e0a5a840478bb69a2b99ad9a47920ba176997}{k\+Write\+No\+Flags}}
+\item 
+\#define \mbox{\hyperlink{writer_8h_ae2c492a0a464591893d4255ea26d5e3a}{Z16}}~0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{writer_8h_ab05d31260e712ed01daa80077f21e0a5}{Write\+Flag}} \{ \mbox{\hyperlink{writer_8h_ab05d31260e712ed01daa80077f21e0a5a840478bb69a2b99ad9a47920ba176997}{k\+Write\+No\+Flags}} = 0
+, \mbox{\hyperlink{writer_8h_ab05d31260e712ed01daa80077f21e0a5a4a41050fd3b8f133b51ced9905f839c4}{k\+Write\+Validate\+Encoding\+Flag}} = 1
+, \mbox{\hyperlink{writer_8h_ab05d31260e712ed01daa80077f21e0a5a1ff67a91b689ae093ce241e0301c0816}{k\+Write\+Nan\+And\+Inf\+Flag}} = 2
+, \mbox{\hyperlink{writer_8h_ab05d31260e712ed01daa80077f21e0a5a63d8536bdc203be5310a1c58643f30b8}{k\+Write\+Default\+Flags}} = RAPIDJSON\+\_\+\+WRITE\+\_\+\+DEFAULT\+\_\+\+FLAGS
+ \}
+\begin{DoxyCompactList}\small\item\em Combination of write\+Flags. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{writer_8h_a1975595e2f1dc20a2d4859f340ac88c6}\index{writer.h@{writer.h}!RAPIDJSON\_WRITE\_DEFAULT\_FLAGS@{RAPIDJSON\_WRITE\_DEFAULT\_FLAGS}}
+\index{RAPIDJSON\_WRITE\_DEFAULT\_FLAGS@{RAPIDJSON\_WRITE\_DEFAULT\_FLAGS}!writer.h@{writer.h}}
+\doxysubsubsection{\texorpdfstring{RAPIDJSON\_WRITE\_DEFAULT\_FLAGS}{RAPIDJSON\_WRITE\_DEFAULT\_FLAGS}}
+{\footnotesize\ttfamily \label{writer_8h_a1975595e2f1dc20a2d4859f340ac88c6} 
+\#define RAPIDJSON\+\_\+\+WRITE\+\_\+\+DEFAULT\+\_\+\+FLAGS~\mbox{\hyperlink{writer_8h_ab05d31260e712ed01daa80077f21e0a5a840478bb69a2b99ad9a47920ba176997}{k\+Write\+No\+Flags}}}
+
+
+
+Definition at line \mbox{\hyperlink{writer_8h_source_l00061}{61}} of file \mbox{\hyperlink{writer_8h_source}{writer.\+h}}.
+
+\Hypertarget{writer_8h_ae2c492a0a464591893d4255ea26d5e3a}\index{writer.h@{writer.h}!Z16@{Z16}}
+\index{Z16@{Z16}!writer.h@{writer.h}}
+\doxysubsubsection{\texorpdfstring{Z16}{Z16}}
+{\footnotesize\ttfamily \label{writer_8h_ae2c492a0a464591893d4255ea26d5e3a} 
+\#define Z16~0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
+
+
+
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{writer_8h_ab05d31260e712ed01daa80077f21e0a5}\index{writer.h@{writer.h}!WriteFlag@{WriteFlag}}
+\index{WriteFlag@{WriteFlag}!writer.h@{writer.h}}
+\doxysubsubsection{\texorpdfstring{WriteFlag}{WriteFlag}}
+{\footnotesize\ttfamily \label{writer_8h_ab05d31260e712ed01daa80077f21e0a5} 
+enum \mbox{\hyperlink{writer_8h_ab05d31260e712ed01daa80077f21e0a5}{Write\+Flag}}}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kWriteNoFlags@{kWriteNoFlags}!writer.h@{writer.h}}\index{writer.h@{writer.h}!kWriteNoFlags@{kWriteNoFlags}}}\Hypertarget{writer_8h_ab05d31260e712ed01daa80077f21e0a5a840478bb69a2b99ad9a47920ba176997}\label{writer_8h_ab05d31260e712ed01daa80077f21e0a5} 
+k\+Write\+No\+Flags&No flags are set. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kWriteValidateEncodingFlag@{kWriteValidateEncodingFlag}!writer.h@{writer.h}}\index{writer.h@{writer.h}!kWriteValidateEncodingFlag@{kWriteValidateEncodingFlag}}}\Hypertarget{writer_8h_ab05d31260e712ed01daa80077f21e0a5a4a41050fd3b8f133b51ced9905f839c4}\label{writer_8h_ab05d31260e712ed01daa80077f21e0a5} 
+k\+Write\+Validate\+Encoding\+Flag&Validate encoding of JSON strings. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kWriteNanAndInfFlag@{kWriteNanAndInfFlag}!writer.h@{writer.h}}\index{writer.h@{writer.h}!kWriteNanAndInfFlag@{kWriteNanAndInfFlag}}}\Hypertarget{writer_8h_ab05d31260e712ed01daa80077f21e0a5a1ff67a91b689ae093ce241e0301c0816}\label{writer_8h_ab05d31260e712ed01daa80077f21e0a5} 
+k\+Write\+Nan\+And\+Inf\+Flag&Allow writing of Infinity, -\/Infinity and NaN. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kWriteDefaultFlags@{kWriteDefaultFlags}!writer.h@{writer.h}}\index{writer.h@{writer.h}!kWriteDefaultFlags@{kWriteDefaultFlags}}}\Hypertarget{writer_8h_ab05d31260e712ed01daa80077f21e0a5a63d8536bdc203be5310a1c58643f30b8}\label{writer_8h_ab05d31260e712ed01daa80077f21e0a5} 
+k\+Write\+Default\+Flags&Default write flags. Can be customized by defining RAPIDJSON\+\_\+\+WRITE\+\_\+\+DEFAULT\+\_\+\+FLAGS. \\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{writer_8h_source_l00065}{65}} of file \mbox{\hyperlink{writer_8h_source}{writer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00066\ \ \ \ \ \mbox{\hyperlink{writer_8h_ab05d31260e712ed01daa80077f21e0a5a840478bb69a2b99ad9a47920ba176997}{kWriteNoFlags}}\ =\ 0,\ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00067\ \ \ \ \ \mbox{\hyperlink{writer_8h_ab05d31260e712ed01daa80077f21e0a5a4a41050fd3b8f133b51ced9905f839c4}{kWriteValidateEncodingFlag}}\ =\ 1,\ }
+\DoxyCodeLine{00068\ \ \ \ \ \mbox{\hyperlink{writer_8h_ab05d31260e712ed01daa80077f21e0a5a1ff67a91b689ae093ce241e0301c0816}{kWriteNanAndInfFlag}}\ =\ 2,\ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00069\ \ \ \ \ \mbox{\hyperlink{writer_8h_ab05d31260e712ed01daa80077f21e0a5a63d8536bdc203be5310a1c58643f30b8}{kWriteDefaultFlags}}\ =\ \mbox{\hyperlink{writer_8h_a1975595e2f1dc20a2d4859f340ac88c6}{RAPIDJSON\_WRITE\_DEFAULT\_FLAGS}}\ \ }
+\DoxyCodeLine{00070\ \};}
+
+\end{DoxyCode}

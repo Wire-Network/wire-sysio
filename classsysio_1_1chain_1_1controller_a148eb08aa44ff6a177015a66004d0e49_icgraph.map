@@ -1,0 +1,9 @@
+<map id="sysio::chain::controller::get_dynamic_global_properties" name="sysio::chain::controller::get_dynamic_global_properties">
+<area shape="rect" id="Node000001" title=" " alt="" coords="560,13,769,54"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1chain_1_1apply__context.html#a2ef781fcd0596791a3edb004b4f5c8c5" title=" " alt="" coords="367,5,512,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="545,36,513,36,513,30,545,30"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1chain_1_1apply__context.html#a3d55f08ae8c014eb7cca9d36b43e8220" title="Execution methods:" alt="" coords="184,13,319,54"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="351,36,319,36,319,30,351,30"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1chain_1_1apply__context.html#aac87c3bc66a6e05318bfd25c3373fee5" title=" " alt="" coords="5,13,136,54"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="168,36,136,36,136,30,168,30"/>
+</map>

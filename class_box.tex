@@ -1,0 +1,185 @@
+\doxysection{Box Class Reference}
+\hypertarget{class_box}{}\label{class_box}\index{Box@{Box}}
+
+
+Inheritance diagram for Box\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=124pt]{class_box__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Box\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=125pt]{class_box__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_box_aca78d7db44972bfa78d46b7bbc8796f6}{Box}} ()
+\item 
+\mbox{\hyperlink{class_box_a7a97bd48df3d1566397d85dd3909726d}{Box}} (double x, double y, double \mbox{\hyperlink{catch__reporter__console_8cpp_a2474a5474cbff19523a51eb1de01cda4}{width}}, double height)
+\item 
+\mbox{\hyperlink{class_box_a6a5e09398e85d602a046b429062fb9c2}{\texorpdfstring{$\sim$}{\string~}\+Box}} ()
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_box_adaceada7d5d145b0f23a9826cff7b6a8}{Get\+Type}} () const
+\item 
+void \mbox{\hyperlink{class_box_a86242bc341ab7392b64def3a3d08c300}{Print}} (std\+::ostream \&os) const
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{class_shape}{Shape}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{class_shape_ac3b9fc48965274893f25b18aa14ba665}{\texorpdfstring{$\sim$}{\string~}\+Shape}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{class_archiver}{Archiver}} $>$ }\\\mbox{\hyperlink{class_archiver}{Archiver}} \& \mbox{\hyperlink{class_box_aee7a0ca62f7a4898a0fd17926586396a}{operator\&}} (\mbox{\hyperlink{class_archiver}{Archiver}} \&ar, \mbox{\hyperlink{class_box}{Box}} \&b)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Protected Member Functions inherited from \mbox{\hyperlink{class_shape}{Shape}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_shape_aaa8d87171e65e0d8ba3c5459978992a7}{Shape}} ()
+\item 
+\mbox{\hyperlink{class_shape_afea00449915131bc1f07fbb5acc5ac25}{Shape}} (double x, double y)
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Attributes inherited from \mbox{\hyperlink{class_shape}{Shape}}}
+\begin{DoxyCompactItemize}
+\item 
+double \mbox{\hyperlink{class_shape_a0974311a6a8584d89c0b0ef54bf39025}{x\+\_\+}}
+\item 
+double \mbox{\hyperlink{class_shape_a262c653c278f26cf0bd1029279a03923}{y\+\_\+}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{archivertest_8cpp_source_l00175}{175}} of file \mbox{\hyperlink{archivertest_8cpp_source}{archivertest.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_box_aca78d7db44972bfa78d46b7bbc8796f6}\index{Box@{Box}!Box@{Box}}
+\index{Box@{Box}!Box@{Box}}
+\doxysubsubsection{\texorpdfstring{Box()}{Box()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_box_aca78d7db44972bfa78d46b7bbc8796f6} 
+Box\+::\+Box (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{archivertest_8cpp_source_l00177}{177}} of file \mbox{\hyperlink{archivertest_8cpp_source}{archivertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00177\ :\ width\_(),\ height\_()\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{class_box_a7a97bd48df3d1566397d85dd3909726d}\index{Box@{Box}!Box@{Box}}
+\index{Box@{Box}!Box@{Box}}
+\doxysubsubsection{\texorpdfstring{Box()}{Box()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_box_a7a97bd48df3d1566397d85dd3909726d} 
+Box\+::\+Box (\begin{DoxyParamCaption}\item[{double}]{x}{, }\item[{double}]{y}{, }\item[{double}]{width}{, }\item[{double}]{height}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{archivertest_8cpp_source_l00178}{178}} of file \mbox{\hyperlink{archivertest_8cpp_source}{archivertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00178\ :\ \mbox{\hyperlink{class_shape_aaa8d87171e65e0d8ba3c5459978992a7}{Shape}}(x,\ y),\ width\_(\mbox{\hyperlink{catch__reporter__console_8cpp_a2474a5474cbff19523a51eb1de01cda4}{width}}),\ height\_(height)\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{class_box_a6a5e09398e85d602a046b429062fb9c2}\index{Box@{Box}!````~Box@{\texorpdfstring{$\sim$}{\string~}Box}}
+\index{````~Box@{\texorpdfstring{$\sim$}{\string~}Box}!Box@{Box}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}Box()}{\string~Box()}}
+{\footnotesize\ttfamily \label{class_box_a6a5e09398e85d602a046b429062fb9c2} 
+Box\+::\texorpdfstring{$\sim$}{\string~}\+Box (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{archivertest_8cpp_source_l00179}{179}} of file \mbox{\hyperlink{archivertest_8cpp_source}{archivertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00179\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_box_adaceada7d5d145b0f23a9826cff7b6a8}\index{Box@{Box}!GetType@{GetType}}
+\index{GetType@{GetType}!Box@{Box}}
+\doxysubsubsection{\texorpdfstring{GetType()}{GetType()}}
+{\footnotesize\ttfamily \label{class_box_adaceada7d5d145b0f23a9826cff7b6a8} 
+const char \texorpdfstring{$\ast$}{*} Box\+::\+Get\+Type (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{class_shape_a8b6867bd77e0c1e3bd323aceb0d97382}{Shape}}.
+
+
+
+Definition at line \mbox{\hyperlink{archivertest_8cpp_source_l00181}{181}} of file \mbox{\hyperlink{archivertest_8cpp_source}{archivertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00181\ \{\ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Box"{}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_box_a86242bc341ab7392b64def3a3d08c300}\index{Box@{Box}!Print@{Print}}
+\index{Print@{Print}!Box@{Box}}
+\doxysubsubsection{\texorpdfstring{Print()}{Print()}}
+{\footnotesize\ttfamily \label{class_box_a86242bc341ab7392b64def3a3d08c300} 
+void Box\+::\+Print (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{os}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{class_shape_a7dab84dc6f915f8b919954aab44fcd91}{Shape}}.
+
+
+
+Definition at line \mbox{\hyperlink{archivertest_8cpp_source_l00183}{183}} of file \mbox{\hyperlink{archivertest_8cpp_source}{archivertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}Box\ ("{}}\ <<\ \mbox{\hyperlink{class_shape_a0974311a6a8584d89c0b0ef54bf39025}{x\_}}\ <<\ \textcolor{stringliteral}{"{},\ "{}}\ <<\ \mbox{\hyperlink{class_shape_a262c653c278f26cf0bd1029279a03923}{y\_}}\ <<\ \textcolor{stringliteral}{"{})"{}}\ <<\ \textcolor{stringliteral}{"{}\ width\ =\ "{}}\ <<\ width\_\ <<\ \textcolor{stringliteral}{"{}\ height\ =\ "{}}\ <<\ height\_;}
+\DoxyCodeLine{00185\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{class_box_aee7a0ca62f7a4898a0fd17926586396a}\index{Box@{Box}!operator\&@{operator\&}}
+\index{operator\&@{operator\&}!Box@{Box}}
+\doxysubsubsection{\texorpdfstring{operator\&}{operator\&}}
+{\footnotesize\ttfamily \label{class_box_aee7a0ca62f7a4898a0fd17926586396a} 
+template$<$typename \mbox{\hyperlink{class_archiver}{Archiver}} $>$ \\
+\mbox{\hyperlink{class_archiver}{Archiver}} \& operator\& (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_archiver}{Archiver}} \&}]{ar}{, }\item[{\mbox{\hyperlink{class_box}{Box}} \&}]{b}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{archivertest_8cpp_source_l00195}{195}} of file \mbox{\hyperlink{archivertest_8cpp_source}{archivertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00196\ \ \ \ \ ar\ \&\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{class_shape}{Shape}}\&\textcolor{keyword}{>}(b);}
+\DoxyCodeLine{00197\ \ \ \ \ ar.Member(\textcolor{stringliteral}{"{}width"{}})\ \&\ b.width\_;}
+\DoxyCodeLine{00198\ \ \ \ \ ar.Member(\textcolor{stringliteral}{"{}height"{}})\ \&\ b.height\_;}
+\DoxyCodeLine{00199\ \ \ \ \ \textcolor{keywordflow}{return}\ ar;}
+\DoxyCodeLine{00200\ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/example/archiver/\mbox{\hyperlink{archivertest_8cpp}{archivertest.\+cpp}}\end{DoxyCompactItemize}

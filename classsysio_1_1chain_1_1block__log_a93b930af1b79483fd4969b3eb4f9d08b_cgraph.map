@@ -1,0 +1,9 @@
+<map id="sysio::chain::block_log::read_block_by_id" name="sysio::chain::block_log::read_block_by_id">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,39,160,79"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1block__header.html#a39d57e33ef8d3f6ba59b4c458f0ae375" title=" " alt="" coords="217,5,368,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="159,44,201,37,202,43,160,49"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1chain_1_1block__log.html#a99c59d29b262144ad99eacc827f76107" title=" " alt="" coords="208,71,377,111"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="160,68,192,73,191,78,159,73"/>
+<area shape="rect" id="Node000003" href="$namespacefc.html#afb668c55fd6ee73e1fcd67e77d8f6009" title=" " alt="" coords="425,13,581,38"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="368,23,410,23,410,28,368,28"/>
+</map>

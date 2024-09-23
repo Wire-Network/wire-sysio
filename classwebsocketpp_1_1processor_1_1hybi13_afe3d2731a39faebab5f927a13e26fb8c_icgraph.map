@@ -1,0 +1,7 @@
+<map id="websocketpp::processor::hybi13::process_handshake_key" name="websocketpp::processor::hybi13::process_handshake_key">
+<area shape="rect" id="Node000001" title="Convert a client handshake key into a server response key in place." alt="" coords="245,41,464,82"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1processor_1_1hybi13.html#aa527ee3ece912ef818a207fce5261383" title="Calculate the appropriate response for this websocket request." alt="" coords="5,5,197,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="229,47,197,42,198,37,229,41"/>
+<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1processor_1_1hybi13.html#a8b3cea2f1526b4982e0836c5705584a8" title="Validate the server&#39;s response to an outgoing handshake request." alt="" coords="19,70,183,126"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="230,82,184,89,183,83,229,77"/>
+</map>

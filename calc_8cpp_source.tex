@@ -1,0 +1,235 @@
+\doxysection{calc.\+cpp}
+\hypertarget{calc_8cpp_source}{}\label{calc_8cpp_source}\index{libraries/fc/libraries/ff/depends/xbyak/sample/calc.cpp@{libraries/fc/libraries/ff/depends/xbyak/sample/calc.cpp}}
+\mbox{\hyperlink{calc_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00002}00002\ \textcolor{comment}{\ \ \ \ @author\ herumi}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00003}00003\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00004}00004\ \textcolor{comment}{\ \ \ \ tiny\ calculator}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00005}00005\ \textcolor{comment}{\ \ \ \ This\ program\ generates\ a\ function\ to\ calc\ the\ value\ of}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00006}00006\ \textcolor{comment}{\ \ \ \ polynomial\ given\ by\ user\ in\ run-\/time.}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00007}00007\ \textcolor{comment}{\ \ \ \ use\ boost::spirit::classic}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00008}00008\ \textcolor{comment}{\ \ \ \ see\ calc2.cpp\ for\ new\ version\ of\ boost::spirit}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00009}00009\ \textcolor{comment}{*/}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <stdio.h>}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00011}00011\ \textcolor{preprocessor}{\#include\ <sstream>}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00012}00012\ \textcolor{preprocessor}{\#include\ <map>}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00013}\mbox{\hyperlink{calc_8cpp_a3ede98665532cce0e33f614fac5150f9}{00013}}\ \textcolor{preprocessor}{\#define\ XBYAK\_NO\_OP\_NAMES}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00014}00014\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{xbyak_8h}{xbyak/xbyak.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00015}00015\ \textcolor{preprocessor}{\#ifdef\ \_MSC\_VER}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00016}00016\ \textcolor{preprocessor}{\ \ \ \ \#pragma\ warning(disable\ :\ 4127)\ }\textcolor{comment}{//\ for\ boost(constant\ condition)}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00017}00017\ \textcolor{preprocessor}{\ \ \ \ \#pragma\ warning(disable\ :\ 4512)\ }\textcolor{comment}{//\ for\ boost}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00018}00018\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00019}00019\ \textcolor{preprocessor}{\#include\ <boost/spirit/include/classic\_file\_iterator.hpp>}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00020}00020\ \textcolor{preprocessor}{\#include\ <boost/spirit/include/classic\_core.hpp>}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00021}00021\ \textcolor{preprocessor}{\#include\ <boost/bind.hpp>}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00023}\mbox{\hyperlink{calc_8cpp_a2c3e4bb40f36b262a5214e2da2bca9c5}{00023}}\ \textcolor{keyword}{enum}\ \mbox{\hyperlink{calc_8cpp_a2c3e4bb40f36b262a5214e2da2bca9c5}{Error}}\ \{}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00024}00024\ \ \ \ \ \mbox{\hyperlink{calc_8cpp_a2c3e4bb40f36b262a5214e2da2bca9c5abdd8fbc6e5223908efcefdcb5da14f09}{UNDEFINED\_VARIABLE}}\ =\ 1}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00025}\mbox{\hyperlink{calc_8cpp_a2c3e4bb40f36b262a5214e2da2bca9c5abdd8fbc6e5223908efcefdcb5da14f09}{00025}}\ \};}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00027}00027\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00028}00028\ \textcolor{comment}{\ \ \ \ JIT\ assemble\ of\ given\ polynomial\ for\ VC\ or\ gcc}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00029}00029\ \textcolor{comment}{*/}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00030}\mbox{\hyperlink{class_func_gen}{00030}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_func_gen}{FuncGen}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{class_xbyak_1_1_code_generator}{Xbyak::CodeGenerator}}\ \{}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00031}00031\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00032}\mbox{\hyperlink{class_func_gen_abb4a2a76f2daa13ec948935c22290599}{00032}}\ \ \ \ \ \textcolor{keyword}{typedef}\ std::map<std::string,\ int>\ \mbox{\hyperlink{class_func_gen_abb4a2a76f2daa13ec948935c22290599}{Map}};}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00033}00033\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00034}00034\ \ \ \ \ \textcolor{keyword}{enum}\ \{}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00035}00035\ \ \ \ \ \ \ \ \ MAX\_CONST\_NUM\ =\ 32}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00036}00036\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00037}00037\ \ \ \ \ \textcolor{keywordtype}{double}\ constTbl\_[MAX\_CONST\_NUM];}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00038}00038\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ constTblPos\_;}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00039}00039\ \ \ \ \ \textcolor{keywordtype}{int}\ regIdx\_;}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00040}00040\ \ \ \ \ \mbox{\hyperlink{class_func_gen_abb4a2a76f2daa13ec948935c22290599}{Map}}\ varMap\_;\ \textcolor{comment}{//\ map\ var\ name\ to\ index}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00041}00041\ \textcolor{preprocessor}{\#ifdef\ XBYAK32}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00042}00042\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_xbyak_1_1_reg32}{Xbyak::Reg32}}\&\ valTbl\_;}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00043}00043\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_xbyak_1_1_reg32}{Xbyak::Reg32}}\&\ tbl\_;}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00044}00044\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00045}00045\ \ \ \ \ \textcolor{keyword}{const}\ Xbyak::Reg64\&\ valTbl\_;}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00046}00046\ \ \ \ \ \textcolor{keyword}{const}\ Xbyak::Reg64\&\ tbl\_;}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00047}00047\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00048}00048\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00049}00049\ \ \ \ \ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00050}00050\ \textcolor{comment}{\ \ \ \ \ \ \ \ @param\ y\ [out]\ the\ value\ of\ f(var)}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00051}00051\ \textcolor{comment}{\ \ \ \ \ \ \ \ @param\ var\ [in]\ table\ of\ input\ variables}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00052}00052\ \textcolor{comment}{\ \ \ \ \ \ \ \ func(double\ *y,\ const\ double\ var[]);}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00053}00053\ \textcolor{comment}{\ \ \ \ \ \ \ \ @note\ func\ does\ not\ return\ double\ to\ avoid\ difference\ of\ compiler}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00054}00054\ \textcolor{comment}{\ \ \ \ */}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00055}\mbox{\hyperlink{class_func_gen_a80406df77950dc630930e839f06ffb85}{00055}}\ \ \ \ \ \mbox{\hyperlink{class_func_gen_a80406df77950dc630930e839f06ffb85}{FuncGen}}(\textcolor{keyword}{const}\ std::vector<std::string>\&\ varTbl)}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00056}00056\ \ \ \ \ \ \ \ \ :\ constTblPos\_(0)}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00057}00057\ \ \ \ \ \ \ \ \ ,\ regIdx\_(-\/1)}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00058}00058\ \#ifdef\ \mbox{\hyperlink{xbyak_8h_a60fc2f7fc52f5c6239712b95537626ee}{XBYAK32}}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00059}00059\ \ \ \ \ \ \ \ \ ,\ valTbl\_(\mbox{\hyperlink{class_xbyak_1_1_code_generator_a682bca64626bf98c33660e1e245392d1}{eax}})}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00060}00060\ \ \ \ \ \ \ \ \ ,\ tbl\_(\mbox{\hyperlink{class_xbyak_1_1_code_generator_ab442b30a131a655e6a8b3d47a80935a6}{edx}})}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00061}00061\ \#elif\ defined(XBYAK64\_WIN)}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00062}00062\ \ \ \ \ \ \ \ \ ,\ valTbl\_(rcx)}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00063}00063\ \ \ \ \ \ \ \ \ ,\ tbl\_(rdx)}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00064}00064\ \#\mbox{\hyperlink{yubihsm__pkcs11_8c_a0544c3fe466e421738dae463968b70ba}{else}}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00065}00065\ \ \ \ \ \ \ \ \ ,\ valTbl\_(rdi)}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00066}00066\ \ \ \ \ \ \ \ \ ,\ tbl\_(rsi)}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00067}00067\ \#endif}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00068}00068\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00069}00069\ \textcolor{preprocessor}{\#ifdef\ XBYAK32}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00070}00070\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_code_generator_ac01f285f4da251eb2fa144d5c49c9e3e}{mov}}(valTbl\_,\ \mbox{\hyperlink{class_xbyak_1_1_code_generator_afed7c06309f882ffc109dd9136eb3ee1}{ptr}}[\mbox{\hyperlink{class_xbyak_1_1_code_generator_a677a65f34079fe5e53c397f0fb00e018}{esp}}+8]);\ \textcolor{comment}{//\ eax\ ==\ varTbl}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00071}00071\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_code_generator_ac01f285f4da251eb2fa144d5c49c9e3e}{mov}}(tbl\_,\ (\textcolor{keywordtype}{size\_t})constTbl\_);}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00072}00072\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00073}00073\ \textcolor{preprocessor}{\#ifdef\ XBYAK64\_WIN}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00074}00074\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_code_generator_aa3870f0e567a68f846038b39140aeb63}{movaps}}(\mbox{\hyperlink{class_xbyak_1_1_code_generator_afed7c06309f882ffc109dd9136eb3ee1}{ptr}}\ [rsp\ +\ 8],\ \mbox{\hyperlink{class_xbyak_1_1_code_generator_a28cf65ce0b761d3df9404165a73ea51f}{xm6}});\ \textcolor{comment}{//\ save\ xm6,\ xm7}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00075}00075\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_code_generator_aa3870f0e567a68f846038b39140aeb63}{movaps}}(\mbox{\hyperlink{class_xbyak_1_1_code_generator_afed7c06309f882ffc109dd9136eb3ee1}{ptr}}\ [rsp\ +\ 8\ +\ 16],\ \mbox{\hyperlink{class_xbyak_1_1_code_generator_a6071404116a7ccf215fb86d195f2e04e}{xm7}});}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00076}00076\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00077}00077\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_code_generator_ac01f285f4da251eb2fa144d5c49c9e3e}{mov}}(tbl\_,\ (\textcolor{keywordtype}{size\_t})constTbl\_);}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00078}00078\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00079}00079\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0,\ n\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(varTbl.size());\ i\ <\ n;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00080}00080\ \ \ \ \ \ \ \ \ \ \ \ \ varMap\_[varTbl[i]]\ =\ i;}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00081}00081\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00082}00082\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00083}00083\ \ \ \ \ \textcolor{comment}{//\ use\ edx}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00084}\mbox{\hyperlink{class_func_gen_a7b43b8b04a687e8e4e75cc2962a2a562}{00084}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_func_gen_a7b43b8b04a687e8e4e75cc2962a2a562}{genPush}}(\textcolor{keywordtype}{double}\ n)}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00085}00085\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00086}00086\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (constTblPos\_\ >=\ MAX\_CONST\_NUM)\ \textcolor{keywordflow}{throw};}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00087}00087\ \ \ \ \ \ \ \ \ constTbl\_[constTblPos\_]\ =\ n;}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00088}00088\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (regIdx\_\ ==\ 7)\ \textcolor{keywordflow}{throw};}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00089}00089\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_code_generator_a8aef9e05d40d183ef2df9f2e0bfc2acf}{movsd}}(\mbox{\hyperlink{struct_xbyak_1_1_xmm}{Xbyak::Xmm}}(++regIdx\_),\ \mbox{\hyperlink{class_xbyak_1_1_code_generator_afed7c06309f882ffc109dd9136eb3ee1}{ptr}}[tbl\_\ +\ (\textcolor{keywordtype}{int})(constTblPos\_\ *\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{double}))]);}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00090}00090\ \ \ \ \ \ \ \ \ constTblPos\_++;}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00091}00091\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00092}00092\ \ \ \ \ \textcolor{comment}{//\ use\ eax}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00093}\mbox{\hyperlink{class_func_gen_ad3975a9ef3b9ca19733a13ab25a2e050}{00093}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_func_gen_ad3975a9ef3b9ca19733a13ab25a2e050}{genVal}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *begin,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *end)}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00094}00094\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00095}00095\ \ \ \ \ \ \ \ \ std::string\ var(begin,\ end);}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00096}00096\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (varMap\_.find(var)\ ==\ varMap\_.end())\ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{calc_8cpp_a2c3e4bb40f36b262a5214e2da2bca9c5abdd8fbc6e5223908efcefdcb5da14f09}{UNDEFINED\_VARIABLE}};}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00097}00097\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (regIdx\_\ ==\ 7)\ \textcolor{keywordflow}{throw};}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00098}00098\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_code_generator_a8aef9e05d40d183ef2df9f2e0bfc2acf}{movsd}}(\mbox{\hyperlink{struct_xbyak_1_1_xmm}{Xbyak::Xmm}}(++regIdx\_),\ \mbox{\hyperlink{class_xbyak_1_1_code_generator_afed7c06309f882ffc109dd9136eb3ee1}{ptr}}[valTbl\_\ +\ varMap\_[var]\ *\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{double})]);}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00099}00099\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00100}\mbox{\hyperlink{class_func_gen_a991cb45b149db007d78c36510be8a1e2}{00100}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_func_gen_a991cb45b149db007d78c36510be8a1e2}{genAdd}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*)}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00101}00101\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00102}00102\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_code_generator_a943f53286e8abe884967a5fc769e5223}{addsd}}(\mbox{\hyperlink{struct_xbyak_1_1_xmm}{Xbyak::Xmm}}(regIdx\_\ -\/\ 1),\ \mbox{\hyperlink{struct_xbyak_1_1_xmm}{Xbyak::Xmm}}(regIdx\_));\ regIdx\_-\/-\/;}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00103}00103\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00104}\mbox{\hyperlink{class_func_gen_ab89436d6f5201778e2d2897bc119e9e0}{00104}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_func_gen_ab89436d6f5201778e2d2897bc119e9e0}{genSub}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*)}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00105}00105\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00106}00106\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_code_generator_a2d56624872d5c6184a55342f24ecd8c6}{subsd}}(\mbox{\hyperlink{struct_xbyak_1_1_xmm}{Xbyak::Xmm}}(regIdx\_\ -\/\ 1),\ \mbox{\hyperlink{struct_xbyak_1_1_xmm}{Xbyak::Xmm}}(regIdx\_));\ regIdx\_-\/-\/;}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00107}00107\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00108}\mbox{\hyperlink{class_func_gen_a91ebff06a6f14e8c4268b71c582ac0f0}{00108}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_func_gen_a91ebff06a6f14e8c4268b71c582ac0f0}{genMul}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*)}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00109}00109\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00110}00110\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_code_generator_ad2dccd5647fb372d0602badccf096af6}{mulsd}}(\mbox{\hyperlink{struct_xbyak_1_1_xmm}{Xbyak::Xmm}}(regIdx\_\ -\/\ 1),\ \mbox{\hyperlink{struct_xbyak_1_1_xmm}{Xbyak::Xmm}}(regIdx\_));\ regIdx\_-\/-\/;}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00111}00111\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00112}\mbox{\hyperlink{class_func_gen_a6a031f1b5df2c1a4e3f58228a114719b}{00112}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_func_gen_a6a031f1b5df2c1a4e3f58228a114719b}{genDiv}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*)}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00113}00113\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00114}00114\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_code_generator_af7d825cd6aba34c2d4bd00edbdf0137f}{divsd}}(\mbox{\hyperlink{struct_xbyak_1_1_xmm}{Xbyak::Xmm}}(regIdx\_\ -\/\ 1),\ \mbox{\hyperlink{struct_xbyak_1_1_xmm}{Xbyak::Xmm}}(regIdx\_));\ regIdx\_-\/-\/;}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00115}00115\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00116}\mbox{\hyperlink{class_func_gen_ac619433621b1da3a6a90ebd1b8b496ec}{00116}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_func_gen_ac619433621b1da3a6a90ebd1b8b496ec}{complete}}()}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00117}00117\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00118}00118\ \textcolor{preprocessor}{\#ifdef\ XBYAK32}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00119}00119\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_code_generator_ac01f285f4da251eb2fa144d5c49c9e3e}{mov}}(\mbox{\hyperlink{class_xbyak_1_1_code_generator_a682bca64626bf98c33660e1e245392d1}{eax}},\ \mbox{\hyperlink{class_xbyak_1_1_code_generator_afed7c06309f882ffc109dd9136eb3ee1}{ptr}}\ [\mbox{\hyperlink{class_xbyak_1_1_code_generator_a677a65f34079fe5e53c397f0fb00e018}{esp}}\ +\ 4]);\ \textcolor{comment}{//\ eax\ =\ valTbl}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00120}00120\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_code_generator_a8aef9e05d40d183ef2df9f2e0bfc2acf}{movsd}}(\mbox{\hyperlink{class_xbyak_1_1_code_generator_afed7c06309f882ffc109dd9136eb3ee1}{ptr}}\ [\mbox{\hyperlink{class_xbyak_1_1_code_generator_a682bca64626bf98c33660e1e245392d1}{eax}}],\ \mbox{\hyperlink{class_xbyak_1_1_code_generator_a6a617ce7ab12f4094ba559860134e13a}{xm0}});}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00121}00121\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00122}00122\ \textcolor{preprocessor}{\#ifdef\ XBYAK64\_WIN}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00123}00123\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_code_generator_aa3870f0e567a68f846038b39140aeb63}{movaps}}(\mbox{\hyperlink{class_xbyak_1_1_code_generator_a28cf65ce0b761d3df9404165a73ea51f}{xm6}},\ \mbox{\hyperlink{class_xbyak_1_1_code_generator_afed7c06309f882ffc109dd9136eb3ee1}{ptr}}\ [rsp\ +\ 8]);}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00124}00124\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_code_generator_aa3870f0e567a68f846038b39140aeb63}{movaps}}(\mbox{\hyperlink{class_xbyak_1_1_code_generator_a6071404116a7ccf215fb86d195f2e04e}{xm7}},\ \mbox{\hyperlink{class_xbyak_1_1_code_generator_afed7c06309f882ffc109dd9136eb3ee1}{ptr}}\ [rsp\ +\ 8\ +\ 16]);}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00125}00125\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00126}00126\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00127}00127\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}();}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00128}00128\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00129}00129\ \};}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00130}00130\ }
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00131}\mbox{\hyperlink{struct_grammar}{00131}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_grammar}{Grammar}}\ :\ \textcolor{keyword}{public}\ boost::spirit::classic::grammar<Grammar>\ \{}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00132}\mbox{\hyperlink{struct_grammar_a1fad232d6239b46cb9cd8b9e4041097f}{00132}}\ \ \ \ \ \mbox{\hyperlink{class_func_gen}{FuncGen}}\&\ \mbox{\hyperlink{struct_grammar_a1fad232d6239b46cb9cd8b9e4041097f}{f\_}};}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00133}\mbox{\hyperlink{struct_grammar_a7cab2b5ae2be6eadaa55d21d3d63dd49}{00133}}\ \ \ \ \ \mbox{\hyperlink{struct_grammar_a7cab2b5ae2be6eadaa55d21d3d63dd49}{Grammar}}(\mbox{\hyperlink{class_func_gen}{FuncGen}}\&\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})\ :\ \mbox{\hyperlink{struct_grammar_a1fad232d6239b46cb9cd8b9e4041097f}{f\_}}(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})\ \{\ \}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00134}00134\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ ScannerT>}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00135}\mbox{\hyperlink{struct_grammar_1_1definition}{00135}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_grammar_1_1definition}{definition}}\ \{}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00136}\mbox{\hyperlink{struct_grammar_1_1definition_a8177a2c5ebf6a4931f362cafa805cea4}{00136}}\ \ \ \ \ \ \ \ \ boost::spirit::classic::rule<ScannerT>\ \mbox{\hyperlink{struct_grammar_1_1definition_a8177a2c5ebf6a4931f362cafa805cea4}{poly0}},\ \mbox{\hyperlink{struct_grammar_1_1definition_a81db946f633882e4b87597f8e158e5c0}{poly1}},\ \mbox{\hyperlink{struct_grammar_1_1definition_adce4680c056a0422988fb5dbe30b7b51}{poly2}},\ \mbox{\hyperlink{struct_grammar_1_1definition_a9a9a89950e23601717956e5513ecd587}{var}};}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00137}00137\ }
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00138}\mbox{\hyperlink{struct_grammar_1_1definition_a8cec5c1bd053c0de70c42d0e01225bea}{00138}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_grammar_1_1definition_a8cec5c1bd053c0de70c42d0e01225bea}{definition}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_grammar}{Grammar}}\&\ self)}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00139}00139\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00140}00140\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespaceboost}{boost}};}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00141}00141\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ namespace\ }boost::spirit::classic;}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00142}00142\ }
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00143}00143\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_grammar_1_1definition_a8177a2c5ebf6a4931f362cafa805cea4}{poly0}}\ =\ \mbox{\hyperlink{struct_grammar_1_1definition_a81db946f633882e4b87597f8e158e5c0}{poly1}}\ >>\ *((\textcolor{charliteral}{'+'}\ >>\ \mbox{\hyperlink{struct_grammar_1_1definition_a81db946f633882e4b87597f8e158e5c0}{poly1}})[bind(\&\mbox{\hyperlink{class_func_gen_a991cb45b149db007d78c36510be8a1e2}{FuncGen::genAdd}},\ ref(self.f\_),\ \_1,\ \_2)]}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00144}00144\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ (\textcolor{charliteral}{'-\/'}\ >>\ \mbox{\hyperlink{struct_grammar_1_1definition_a81db946f633882e4b87597f8e158e5c0}{poly1}})[bind(\&\mbox{\hyperlink{class_func_gen_ab89436d6f5201778e2d2897bc119e9e0}{FuncGen::genSub}},\ ref(self.f\_),\ \_1,\ \_2)]);}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00145}00145\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_grammar_1_1definition_a81db946f633882e4b87597f8e158e5c0}{poly1}}\ =\ \mbox{\hyperlink{struct_grammar_1_1definition_adce4680c056a0422988fb5dbe30b7b51}{poly2}}\ >>\ *((\textcolor{charliteral}{'*'}\ >>\ \mbox{\hyperlink{struct_grammar_1_1definition_adce4680c056a0422988fb5dbe30b7b51}{poly2}})[bind(\&\mbox{\hyperlink{class_func_gen_a91ebff06a6f14e8c4268b71c582ac0f0}{FuncGen::genMul}},\ ref(self.f\_),\ \_1,\ \_2)]}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00146}00146\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ (\textcolor{charliteral}{'/'}\ >>\ \mbox{\hyperlink{struct_grammar_1_1definition_adce4680c056a0422988fb5dbe30b7b51}{poly2}})[bind(\&\mbox{\hyperlink{class_func_gen_a6a031f1b5df2c1a4e3f58228a114719b}{FuncGen::genDiv}},\ ref(self.f\_),\ \_1,\ \_2)]);}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00147}00147\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_grammar_1_1definition_a9a9a89950e23601717956e5513ecd587}{var}}\ =\ (+alpha\_p)[bind(\&\mbox{\hyperlink{class_func_gen_ad3975a9ef3b9ca19733a13ab25a2e050}{FuncGen::genVal}},\ ref(self.f\_),\ \_1,\ \_2)];}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00148}00148\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_grammar_1_1definition_adce4680c056a0422988fb5dbe30b7b51}{poly2}}\ =\ real\_p[bind(\&\mbox{\hyperlink{class_func_gen_a7b43b8b04a687e8e4e75cc2962a2a562}{FuncGen::genPush}},\ ref(self.f\_),\ \_1)]}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00149}00149\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ \mbox{\hyperlink{struct_grammar_1_1definition_a9a9a89950e23601717956e5513ecd587}{var}}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00150}00150\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ \textcolor{charliteral}{'('}\ >>\ \mbox{\hyperlink{struct_grammar_1_1definition_a8177a2c5ebf6a4931f362cafa805cea4}{poly0}}\ >>\ \textcolor{charliteral}{')'};}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00151}00151\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00152}\mbox{\hyperlink{struct_grammar_1_1definition_a95f99cb64798b113574c61e00c30e88c}{00152}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ boost::spirit::classic::rule<ScannerT>\&\ \mbox{\hyperlink{struct_grammar_1_1definition_a95f99cb64798b113574c61e00c30e88c}{start}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_grammar_1_1definition_a8177a2c5ebf6a4931f362cafa805cea4}{poly0}};\ \}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00153}00153\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00154}00154\ \};}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00155}00155\ }
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00156}\mbox{\hyperlink{calc_8cpp_a41df23bb2f4940011b732bc4bb33be96}{00156}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{gen__code_8cpp_a760567729cc565fd13d414937a558a89}{put}}(\textcolor{keyword}{const}\ std::vector<double>\&\ x)}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00157}00157\ \{}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00158}00158\ \ \ \ \ printf(\textcolor{stringliteral}{"{}\%f"{}},\ x[0]);}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00159}00159\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 1,\ n\ =\ x.size();\ i\ <\ n;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00160}00160\ \ \ \ \ \ \ \ \ printf(\textcolor{stringliteral}{"{},\ \%f"{}},\ x[i]);}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00161}00161\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00162}00162\ \}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00163}00163\ }
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00164}\mbox{\hyperlink{calc_8cpp_a0ddf1224851353fc92bfbff6f499fa97}{00164}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}(\textcolor{keywordtype}{int}\ argc,\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[])}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00165}00165\ \{}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00166}00166\ \ \ \ \ \textcolor{keywordflow}{if}\ (argc\ <=\ 2)\ \{}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00167}00167\ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}calc\ \(\backslash\)"{}var1\ var2\ ...\(\backslash\)"{}\ \(\backslash\)"{}function\ of\ var\(\backslash\)"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00168}00168\ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}eg.\ calc\ x\ \(\backslash\)"{}x*x\(\backslash\)"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00169}00169\ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}eg.\ calc\ \(\backslash\)"{}x\ y\ z\(\backslash\)"{}\ \ \(\backslash\)"{}x*x\ +\ y\ -\/\ z\(\backslash\)"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00170}00170\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00171}00171\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00172}00172\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *poly\ =\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[2];}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00173}00173\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00174}00174\ \ \ \ \ \ \ \ \ std::vector<std::string>\ varTbl;}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00175}00175\ }
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00176}00176\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ get\ varTbl\ from\ argv[1]}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00177}00177\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00178}00178\ \ \ \ \ \ \ \ \ \ \ \ \ std::istringstream\ is(\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[1]);}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00179}00179\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ i\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00180}00180\ \ \ \ \ \ \ \ \ \ \ \ \ printf(\textcolor{stringliteral}{"{}varTbl\ =\ \{\ "{}});}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00181}00181\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (is)\ \{}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00182}00182\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ var;}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00183}00183\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ is\ >>\ var;}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00184}00184\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (var.empty())\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00185}00185\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ printf(\textcolor{stringliteral}{"{}\%s:\%d,\ "{}},\ var.c\_str(),\ i);}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00186}00186\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ varTbl.push\_back(var);}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00187}00187\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i++;}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00188}00188\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00189}00189\ \ \ \ \ \ \ \ \ \ \ \ \ printf(\textcolor{stringliteral}{"{}\}\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00190}00190\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00191}00191\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_func_gen}{FuncGen}}\ funcGen(varTbl);}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00192}00192\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_grammar}{Grammar}}\ calc(funcGen);}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00193}00193\ \ \ \ \ \ \ \ \ boost::spirit::classic::parse\_info<>\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ =\ parse(poly,\ calc,\ boost::spirit::classic::space\_p);}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00194}00194\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.full)\ \{}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00195}00195\ \ \ \ \ \ \ \ \ \ \ \ \ printf(\textcolor{stringliteral}{"{}err\ poly=\%s\(\backslash\)n"{}},\ poly);}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00196}00196\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00197}00197\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00198}00198\ \ \ \ \ \ \ \ \ funcGen.\mbox{\hyperlink{class_func_gen_ac619433621b1da3a6a90ebd1b8b496ec}{complete}}();}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00199}00199\ \ \ \ \ \ \ \ \ std::vector<double>\ valTbl;}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00200}00200\ \ \ \ \ \ \ \ \ valTbl.resize(varTbl.size());}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00201}00201\ \textcolor{preprocessor}{\#ifdef\ XBYAK32}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00202}00202\ \ \ \ \ \ \ \ \ puts(\textcolor{stringliteral}{"{}32bit\ mode"{}});}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00203}00203\ \ \ \ \ \ \ \ \ void\ (*func)(\textcolor{keywordtype}{double}\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}},\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{double}\ *valTbl)\ =\ funcGen.\mbox{\hyperlink{class_xbyak_1_1_code_array_a9ad8a38842d1e0de9045338e460f58ce}{getCode}}<void\ (*)(\textcolor{keywordtype}{double}\ *,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{double}*)>();}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00204}00204\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00205}00205\ \ \ \ \ \ \ \ \ puts(\textcolor{stringliteral}{"{}64bit\ mode"{}});}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00206}00206\ \ \ \ \ \ \ \ \ double\ (*func)(\textcolor{keyword}{const}\ \textcolor{keywordtype}{double}\ *valTbl)\ =\ funcGen.\mbox{\hyperlink{class_xbyak_1_1_code_array_a9ad8a38842d1e0de9045338e460f58ce}{getCode}}<double\ (*)(\textcolor{keyword}{const}\ \textcolor{keywordtype}{double}*)>();}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00207}00207\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00208}00208\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ 10;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00209}00209\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ =\ 0,\ n\ =\ valTbl.size();\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ <\ n;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}++)\ \{}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00210}00210\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ valTbl[\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}]\ =\ rand()\ \%\ 7;}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00211}00211\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00212}00212\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ y;}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00213}00213\ \textcolor{preprocessor}{\#ifdef\ XBYAK32}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00214}00214\ \ \ \ \ \ \ \ \ \ \ \ \ func(\&y,\ \&valTbl[0]);}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00215}00215\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00216}00216\ \ \ \ \ \ \ \ \ \ \ \ \ y\ =\ func(\&valTbl[0]);}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00217}00217\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00218}00218\ \ \ \ \ \ \ \ \ \ \ \ \ printf(\textcolor{stringliteral}{"{}f("{}});\ \mbox{\hyperlink{gen__code_8cpp_a760567729cc565fd13d414937a558a89}{put}}(valTbl);\ printf(\textcolor{stringliteral}{"{})=\%f\(\backslash\)n"{}},\ y);}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00219}00219\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00220}00220\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (std::exception\&\ e)\ \{}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00221}00221\ \ \ \ \ \ \ \ \ printf(\textcolor{stringliteral}{"{}ERR:\%s\(\backslash\)n"{}},\ e.what());}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00222}00222\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\mbox{\hyperlink{calc_8cpp_a2c3e4bb40f36b262a5214e2da2bca9c5}{Error}}\ err)\ \{}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00223}00223\ \ \ \ \ \ \ \ \ printf(\textcolor{stringliteral}{"{}ERR:\%d\(\backslash\)n"{}},\ err);}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00224}00224\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00225}00225\ \ \ \ \ \ \ \ \ printf(\textcolor{stringliteral}{"{}unknown\ error\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00226}00226\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00227}00227\ }
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00228}00228\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{calc_8cpp_source_l00229}00229\ \}}
+
+\end{DoxyCode}

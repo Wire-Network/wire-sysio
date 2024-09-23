@@ -1,0 +1,8 @@
+<map id="sysio::chain::controller_impl::failure_is_subjective" name="sysio::chain::controller_impl::failure_is_subjective">
+<area shape="rect" id="Node000001" title=" " alt="" coords="488,5,666,46"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1controller__impl.html#a43b89d301b09c599969412d7db819bd3" title=" " alt="" coords="5,5,231,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="472,22,440,20,279,20,231,22,231,17,279,15,440,15,472,16"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1chain_1_1controller__impl.html#ab9468e19953b5bb9ace497c98ee4ecc1" title=" " alt="" coords="279,30,440,86"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="473,44,441,48,440,43,472,38"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="263,48,231,43,232,38,264,42"/>
+</map>

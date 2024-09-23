@@ -1,0 +1,134 @@
+\doxysection{IR\+::Function\+Type Struct Reference}
+\hypertarget{struct_i_r_1_1_function_type}{}\label{struct_i_r_1_1_function_type}\index{IR::FunctionType@{IR::FunctionType}}
+
+
+{\ttfamily \#include $<$Types.\+h$>$}
+
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static \mbox{\hyperlink{_i_r_8h_a0ee024894bb6f700da724f2f1a120abb}{IR\+\_\+\+API}} const \mbox{\hyperlink{struct_i_r_1_1_function_type}{Function\+Type}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{struct_i_r_1_1_function_type_a97cbdf384d97c3a5203a1310c9af0822}{get}} (\mbox{\hyperlink{namespace_i_r_ac56fb5355b338ad4a167c48ec539b90b}{Result\+Type}} \mbox{\hyperlink{struct_i_r_1_1_function_type_a6f6a20ea31fb2218bcdba1bc4d6a1103}{ret}}, const std\+::initializer\+\_\+list$<$ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{Value\+Type}} $>$ \&\mbox{\hyperlink{struct_i_r_1_1_function_type_a92e17c58f6cd40ee5392dba1bdc2e822}{parameters}})
+\item 
+static \mbox{\hyperlink{_i_r_8h_a0ee024894bb6f700da724f2f1a120abb}{IR\+\_\+\+API}} const \mbox{\hyperlink{struct_i_r_1_1_function_type}{Function\+Type}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{struct_i_r_1_1_function_type_a2d2f734852bb2dc1fb9377bc02c20fc3}{get}} (\mbox{\hyperlink{namespace_i_r_ac56fb5355b338ad4a167c48ec539b90b}{Result\+Type}} \mbox{\hyperlink{struct_i_r_1_1_function_type_a6f6a20ea31fb2218bcdba1bc4d6a1103}{ret}}, const std\+::vector$<$ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{Value\+Type}} $>$ \&\mbox{\hyperlink{struct_i_r_1_1_function_type_a92e17c58f6cd40ee5392dba1bdc2e822}{parameters}})
+\item 
+static \mbox{\hyperlink{_i_r_8h_a0ee024894bb6f700da724f2f1a120abb}{IR\+\_\+\+API}} const \mbox{\hyperlink{struct_i_r_1_1_function_type}{Function\+Type}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{struct_i_r_1_1_function_type_ae19aab83e704222b2dcc8e0b0af80f3c}{get}} (\mbox{\hyperlink{namespace_i_r_ac56fb5355b338ad4a167c48ec539b90b}{Result\+Type}} \mbox{\hyperlink{struct_i_r_1_1_function_type_a6f6a20ea31fb2218bcdba1bc4d6a1103}{ret}}=\mbox{\hyperlink{namespace_i_r_ac56fb5355b338ad4a167c48ec539b90ba334c4a4c42fdb79d7ebc3e73b517e6f8}{Result\+Type\+::none}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespace_i_r_ac56fb5355b338ad4a167c48ec539b90b}{Result\+Type}} \mbox{\hyperlink{struct_i_r_1_1_function_type_a6f6a20ea31fb2218bcdba1bc4d6a1103}{ret}}
+\item 
+std\+::vector$<$ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{Value\+Type}} $>$ \mbox{\hyperlink{struct_i_r_1_1_function_type_a92e17c58f6cd40ee5392dba1bdc2e822}{parameters}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{_types_8h_source_l00193}{193}} of file \mbox{\hyperlink{_types_8h_source}{Types.\+h}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_i_r_1_1_function_type_a97cbdf384d97c3a5203a1310c9af0822}\index{IR::FunctionType@{IR::FunctionType}!get@{get}}
+\index{get@{get}!IR::FunctionType@{IR::FunctionType}}
+\doxysubsubsection{\texorpdfstring{get()}{get()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_function_type_a97cbdf384d97c3a5203a1310c9af0822} 
+const \mbox{\hyperlink{struct_i_r_1_1_function_type}{Function\+Type}} \texorpdfstring{$\ast$}{*} IR\+::\+Function\+Type\+::get (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespace_i_r_ac56fb5355b338ad4a167c48ec539b90b}{Result\+Type}}}]{ret}{, }\item[{const std\+::initializer\+\_\+list$<$ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{Value\+Type}} $>$ \&}]{parameters}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{_types_8cpp_source_l00038}{38}} of file \mbox{\hyperlink{_types_8cpp_source}{Types.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00039\ \ \ \ \ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_i_r_a434479ddde7e14159d718ff19489492d}{findExistingOrCreateNew}}(\mbox{\hyperlink{struct_i_r_1_1_function_type_map_a162948d8f2279cf7b70e1ead7878ed7b}{FunctionTypeMap::get}}(),FunctionTypeMap::Key\ \{\mbox{\hyperlink{struct_i_r_1_1_function_type_a6f6a20ea31fb2218bcdba1bc4d6a1103}{ret}},\mbox{\hyperlink{struct_i_r_1_1_function_type_a92e17c58f6cd40ee5392dba1bdc2e822}{parameters}}\},[=]\{\textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ FunctionType(\mbox{\hyperlink{struct_i_r_1_1_function_type_a6f6a20ea31fb2218bcdba1bc4d6a1103}{ret}},\mbox{\hyperlink{struct_i_r_1_1_function_type_a92e17c58f6cd40ee5392dba1bdc2e822}{parameters}});\});\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_i_r_1_1_function_type_a97cbdf384d97c3a5203a1310c9af0822_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_i_r_1_1_function_type_a97cbdf384d97c3a5203a1310c9af0822_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_i_r_1_1_function_type_a2d2f734852bb2dc1fb9377bc02c20fc3}\index{IR::FunctionType@{IR::FunctionType}!get@{get}}
+\index{get@{get}!IR::FunctionType@{IR::FunctionType}}
+\doxysubsubsection{\texorpdfstring{get()}{get()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_function_type_a2d2f734852bb2dc1fb9377bc02c20fc3} 
+const \mbox{\hyperlink{struct_i_r_1_1_function_type}{Function\+Type}} \texorpdfstring{$\ast$}{*} IR\+::\+Function\+Type\+::get (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespace_i_r_ac56fb5355b338ad4a167c48ec539b90b}{Result\+Type}}}]{ret}{, }\item[{const std\+::vector$<$ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{Value\+Type}} $>$ \&}]{parameters}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{_types_8cpp_source_l00040}{40}} of file \mbox{\hyperlink{_types_8cpp_source}{Types.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00041\ \ \ \ \ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_i_r_a434479ddde7e14159d718ff19489492d}{findExistingOrCreateNew}}(\mbox{\hyperlink{struct_i_r_1_1_function_type_map_a162948d8f2279cf7b70e1ead7878ed7b}{FunctionTypeMap::get}}(),FunctionTypeMap::Key\ \{\mbox{\hyperlink{struct_i_r_1_1_function_type_a6f6a20ea31fb2218bcdba1bc4d6a1103}{ret}},\mbox{\hyperlink{struct_i_r_1_1_function_type_a92e17c58f6cd40ee5392dba1bdc2e822}{parameters}}\},[=]\{\textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ FunctionType(\mbox{\hyperlink{struct_i_r_1_1_function_type_a6f6a20ea31fb2218bcdba1bc4d6a1103}{ret}},\mbox{\hyperlink{struct_i_r_1_1_function_type_a92e17c58f6cd40ee5392dba1bdc2e822}{parameters}});\});\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_i_r_1_1_function_type_a2d2f734852bb2dc1fb9377bc02c20fc3_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_i_r_1_1_function_type_ae19aab83e704222b2dcc8e0b0af80f3c}\index{IR::FunctionType@{IR::FunctionType}!get@{get}}
+\index{get@{get}!IR::FunctionType@{IR::FunctionType}}
+\doxysubsubsection{\texorpdfstring{get()}{get()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_function_type_ae19aab83e704222b2dcc8e0b0af80f3c} 
+const \mbox{\hyperlink{struct_i_r_1_1_function_type}{Function\+Type}} \texorpdfstring{$\ast$}{*} IR\+::\+Function\+Type\+::get (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespace_i_r_ac56fb5355b338ad4a167c48ec539b90b}{Result\+Type}}}]{ret}{ = {\ttfamily \mbox{\hyperlink{namespace_i_r_ac56fb5355b338ad4a167c48ec539b90ba334c4a4c42fdb79d7ebc3e73b517e6f8}{Result\+Type\+::none}}}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{_types_8cpp_source_l00042}{42}} of file \mbox{\hyperlink{_types_8cpp_source}{Types.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00043\ \ \ \ \ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_i_r_a434479ddde7e14159d718ff19489492d}{findExistingOrCreateNew}}(\mbox{\hyperlink{struct_i_r_1_1_function_type_map_a162948d8f2279cf7b70e1ead7878ed7b}{FunctionTypeMap::get}}(),FunctionTypeMap::Key\ \{\mbox{\hyperlink{struct_i_r_1_1_function_type_a6f6a20ea31fb2218bcdba1bc4d6a1103}{ret}},\{\}\},[=]\{\textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ FunctionType(\mbox{\hyperlink{struct_i_r_1_1_function_type_a6f6a20ea31fb2218bcdba1bc4d6a1103}{ret}},\{\});\});\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_i_r_1_1_function_type_ae19aab83e704222b2dcc8e0b0af80f3c_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_i_r_1_1_function_type_a92e17c58f6cd40ee5392dba1bdc2e822}\index{IR::FunctionType@{IR::FunctionType}!parameters@{parameters}}
+\index{parameters@{parameters}!IR::FunctionType@{IR::FunctionType}}
+\doxysubsubsection{\texorpdfstring{parameters}{parameters}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_function_type_a92e17c58f6cd40ee5392dba1bdc2e822} 
+std\+::vector$<$\mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{Value\+Type}}$>$ IR\+::\+Function\+Type\+::parameters}
+
+
+
+Definition at line \mbox{\hyperlink{_types_8h_source_l00196}{196}} of file \mbox{\hyperlink{_types_8h_source}{Types.\+h}}.
+
+\Hypertarget{struct_i_r_1_1_function_type_a6f6a20ea31fb2218bcdba1bc4d6a1103}\index{IR::FunctionType@{IR::FunctionType}!ret@{ret}}
+\index{ret@{ret}!IR::FunctionType@{IR::FunctionType}}
+\doxysubsubsection{\texorpdfstring{ret}{ret}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_function_type_a6f6a20ea31fb2218bcdba1bc4d6a1103} 
+\mbox{\hyperlink{namespace_i_r_ac56fb5355b338ad4a167c48ec539b90b}{Result\+Type}} IR\+::\+Function\+Type\+::ret}
+
+
+
+Definition at line \mbox{\hyperlink{_types_8h_source_l00195}{195}} of file \mbox{\hyperlink{_types_8h_source}{Types.\+h}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/wasm-\/jit/\+Include/\+IR/\mbox{\hyperlink{_types_8h}{Types.\+h}}\item 
+libraries/wasm-\/jit/\+Source/\+IR/\mbox{\hyperlink{_types_8cpp}{Types.\+cpp}}\end{DoxyCompactItemize}

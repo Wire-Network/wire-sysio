@@ -1,0 +1,14 @@
+<map id="libraries/yubihsm/pkcs11/pkcs11y.h" name="libraries/yubihsm/pkcs11/pkcs11y.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="65,5,231,46"/>
+<area shape="rect" id="Node000002" href="$util__pkcs11_8c.html" title=" " alt="" coords="5,271,171,312"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="134,61,110,117,91,183,87,230,89,271,83,271,81,230,85,182,105,116,129,59"/>
+<area shape="rect" id="Node000003" href="$util__pkcs11_8h.html" title=" " alt="" coords="100,183,265,223"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="157,60,181,182,176,183,152,61"/>
+<area shape="rect" id="Node000005" href="$yubihsm__pkcs11_8h.html" title=" " alt="" coords="185,94,351,135"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="189,53,242,91,239,96,186,57"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="152,236,111,273,108,269,148,232"/>
+<area shape="rect" id="Node000004" href="$yubihsm__pkcs11_8c.html" title=" " alt="" coords="207,271,372,312"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="220,231,267,269,264,273,217,235"/>
+<area shape="poly" id="edge6_Node000005_Node000003" title=" " alt="" coords="240,148,204,184,200,180,236,144"/>
+<area shape="poly" id="edge7_Node000005_Node000004" title=" " alt="" coords="276,149,280,182,290,271,285,271,275,183,270,150"/>
+</map>

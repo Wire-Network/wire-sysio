@@ -1,0 +1,17 @@
+<map id="sysio::trace_api::slice_directory::find_or_create_index_slice" name="sysio::trace_api::slice_directory::find_or_create_index_slice">
+<area shape="rect" id="Node000001" title=" " alt="" coords="469,130,637,186"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1trace__api_1_1store__provider.html#a34a4fdef03a4b354b005e73e383d7e59" title=" " alt="" coords="237,5,388,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="509,122,467,89,420,60,387,46,389,41,422,55,470,85,512,118"/>
+<area shape="rect" id="Node000003" href="$test__trace__file_8cpp.html#a66729e2b0f8ef9a605dab627b7e99dc1" title=" " alt="" coords="204,70,421,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="469,126,420,110,380,99,382,94,422,104,471,121"/>
+<area shape="rect" id="Node000004" href="$test__trace__file_8cpp.html#a87483942b91385d216d42689d0af1535" title=" " alt="" coords="204,120,421,145"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="453,150,421,146,422,141,454,145"/>
+<area shape="rect" id="Node000005" href="$test__trace__file_8cpp.html#ae06d4153674bd514a96d7a5e6f743f16" title=" " alt="" coords="204,169,421,194"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="454,170,422,173,421,168,453,165"/>
+<area shape="rect" id="Node000006" href="$test__trace__file_8cpp.html#a5e1b80e8551bf5d0081e1828243dc423" title=" " alt="" coords="204,218,421,244"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="469,194,422,210,381,220,380,215,420,204,467,189"/>
+<area shape="rect" id="Node000007" href="$classsysio_1_1trace__api_1_1slice__directory.html#ac7433eb9c741feab026859dc4807b174" title=" " alt="" coords="228,268,396,324"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="510,198,468,229,422,259,398,271,396,266,420,254,465,225,506,194"/>
+<area shape="rect" id="Node000008" href="$classsysio_1_1trace__api_1_1store__provider.html#a2bd4f8dab0dda219044a2032d94a1668" title=" " alt="" coords="5,276,156,317"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="213,299,156,299,156,294,213,294"/>
+</map>

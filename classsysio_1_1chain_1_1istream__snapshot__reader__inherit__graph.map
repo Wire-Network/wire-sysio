@@ -1,0 +1,7 @@
+<map id="sysio::chain::istream_snapshot_reader" name="sysio::chain::istream_snapshot_reader">
+<area shape="rect" id="Node000001" title=" " alt="" coords="16,94,158,135"/>
+<area shape="rect" id="Node000003" href="$structbuffered__snapshot__suite_1_1reader.html" title=" " alt="" coords="5,183,169,223"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="90,150,90,182,84,182,84,150"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1chain_1_1snapshot__reader.html" title=" " alt="" coords="11,5,163,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="90,62,90,94,84,94,84,62"/>
+</map>

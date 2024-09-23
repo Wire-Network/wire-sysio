@@ -1,0 +1,113 @@
+\doxysection{chainbase\+::chainbase\+\_\+error\+\_\+category Class Reference}
+\hypertarget{classchainbase_1_1chainbase__error__category}{}\label{classchainbase_1_1chainbase__error__category}\index{chainbase::chainbase\_error\_category@{chainbase::chainbase\_error\_category}}
+
+
+{\ttfamily \#include $<$pinnable\+\_\+mapped\+\_\+file.\+hpp$>$}
+
+
+
+Inheritance diagram for chainbase\+::chainbase\+\_\+error\+\_\+category\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=191pt]{classchainbase_1_1chainbase__error__category__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for chainbase\+::chainbase\+\_\+error\+\_\+category\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=191pt]{classchainbase_1_1chainbase__error__category__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classchainbase_1_1chainbase__error__category_ad6858349be570a439d3e90cf39b40042}{name}} () const noexcept override
+\item 
+std\+::string \mbox{\hyperlink{classchainbase_1_1chainbase__error__category_a1c89d2a1e1c8b74a1dbac52f4b07eae7}{message}} (int ev) const override
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{pinnable__mapped__file_8hpp_source_l00034}{34}} of file \mbox{\hyperlink{pinnable__mapped__file_8hpp_source}{pinnable\+\_\+mapped\+\_\+file.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classchainbase_1_1chainbase__error__category_a1c89d2a1e1c8b74a1dbac52f4b07eae7}\index{chainbase::chainbase\_error\_category@{chainbase::chainbase\_error\_category}!message@{message}}
+\index{message@{message}!chainbase::chainbase\_error\_category@{chainbase::chainbase\_error\_category}}
+\doxysubsubsection{\texorpdfstring{message()}{message()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1chainbase__error__category_a1c89d2a1e1c8b74a1dbac52f4b07eae7} 
+std\+::string chainbase\+::chainbase\+\_\+error\+\_\+category\+::message (\begin{DoxyParamCaption}\item[{int}]{ev}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line \mbox{\hyperlink{pinnable__mapped__file_8cpp_source_l00019}{19}} of file \mbox{\hyperlink{pinnable__mapped__file_8cpp_source}{pinnable\+\_\+mapped\+\_\+file.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00020\ \ \ \ \textcolor{keywordflow}{switch}(ev)\ \{}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3ac3fdc8e4e3df74b216721e3ae1fd4945}{db\_error\_code::ok}}:\ }
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Ok"{}};}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3a8251c5ee6c4498d42adb2b1a0aa286af}{db\_error\_code::dirty}}:}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Database\ dirty\ flag\ set"{}};}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3a5930c2c995a1d73d95f81298c603a1f6}{db\_error\_code::incompatible}}:}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Database\ incompatible;\ All\ environment\ parameters\ must\ match"{}};}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3a6bfa63b7b57c5c68e76f9f172d60146d}{db\_error\_code::incorrect\_db\_version}}:}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Database\ format\ not\ compatible\ with\ this\ version\ of\ chainbase"{}};}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3a38fedd2f0ecf76dcc0d1757f8d45ab41}{db\_error\_code::not\_found}}:}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Database\ file\ not\ found"{}};}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3a879ce3cfde213e7781b0af14bc8f5882}{db\_error\_code::bad\_size}}:}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Bad\ size"{}};}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3ad93329bc939212e26c7aa54ff55b9738}{db\_error\_code::unsupported\_win32\_mode}}:}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Heap\ and\ locked\ mode\ are\ not\ supported\ on\ win32"{}};}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3a337ee0b30f7db83f8837cbb7fb17e4c2}{db\_error\_code::bad\_header}}:}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Failed\ to\ read\ DB\ header"{}};}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3ad55e98bcfae349c5f8896278142b755c}{db\_error\_code::no\_access}}:}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Could\ not\ gain\ write\ access\ to\ the\ shared\ memory\ file"{}};}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3ac065ca1b36da471ff7499ebeed558fb6}{db\_error\_code::aborted}}:}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Database\ load\ aborted"{}};}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3a4672b7d7aeb6cc7e8c973ef5e0fbc698}{db\_error\_code::no\_mlock}}:}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Failed\ to\ mlock\ database"{}};}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Unrecognized\ error\ code"{}};}
+\DoxyCodeLine{00045\ \ \ \ \}}
+\DoxyCodeLine{00046\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classchainbase_1_1chainbase__error__category_ad6858349be570a439d3e90cf39b40042}\index{chainbase::chainbase\_error\_category@{chainbase::chainbase\_error\_category}!name@{name}}
+\index{name@{name}!chainbase::chainbase\_error\_category@{chainbase::chainbase\_error\_category}}
+\doxysubsubsection{\texorpdfstring{name()}{name()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1chainbase__error__category_ad6858349be570a439d3e90cf39b40042} 
+const char \texorpdfstring{$\ast$}{*} chainbase\+::chainbase\+\_\+error\+\_\+category\+::name (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{pinnable__mapped__file_8cpp_source_l00015}{15}} of file \mbox{\hyperlink{pinnable__mapped__file_8cpp_source}{pinnable\+\_\+mapped\+\_\+file.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00016\ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}chainbase"{}};}
+\DoxyCodeLine{00017\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classchainbase_1_1chainbase__error__category_ad6858349be570a439d3e90cf39b40042_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chainbase/include/chainbase/\mbox{\hyperlink{pinnable__mapped__file_8hpp}{pinnable\+\_\+mapped\+\_\+file.\+hpp}}\item 
+libraries/chainbase/src/\mbox{\hyperlink{pinnable__mapped__file_8cpp}{pinnable\+\_\+mapped\+\_\+file.\+cpp}}\end{DoxyCompactItemize}

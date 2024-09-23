@@ -1,0 +1,106 @@
+\doxysection{filewritestream.\+h}
+\hypertarget{filewritestream_8h_source}{}\label{filewritestream_8h_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/include/rapidjson/filewritestream.h@{libraries/fc/include/fc/crypto/webauthn\_json/include/rapidjson/filewritestream.h}}
+\mbox{\hyperlink{filewritestream_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00001}00001\ \textcolor{comment}{//\ Tencent\ is\ pleased\ to\ support\ the\ open\ source\ community\ by\ making\ RapidJSON\ available.}}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00002}00002\ \textcolor{comment}{//\ }}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00003}00003\ \textcolor{comment}{//\ Copyright\ (C)\ 2015\ THL\ A29\ Limited,\ a\ Tencent\ company,\ and\ Milo\ Yip.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00004}00004\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00005}00005\ \textcolor{comment}{//\ Licensed\ under\ the\ MIT\ License\ (the\ "{}License"{});\ you\ may\ not\ use\ this\ file\ except}}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00006}00006\ \textcolor{comment}{//\ in\ compliance\ with\ the\ License.\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00007}00007\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00008}00008\ \textcolor{comment}{//\ http://opensource.org/licenses/MIT}}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00009}00009\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00010}00010\ \textcolor{comment}{//\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software\ distributed\ }}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00011}00011\ \textcolor{comment}{//\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,\ WITHOUT\ WARRANTIES\ OR\ }}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00012}00012\ \textcolor{comment}{//\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.\ See\ the\ License\ for\ the\ }}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00013}00013\ \textcolor{comment}{//\ specific\ language\ governing\ permissions\ and\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00015}00015\ \textcolor{preprocessor}{\#ifndef\ RAPIDJSON\_FILEWRITESTREAM\_H\_}}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00016}00016\ \textcolor{preprocessor}{\#define\ RAPIDJSON\_FILEWRITESTREAM\_H\_}}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00018}00018\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{stream_8h}{stream.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00019}00019\ \textcolor{preprocessor}{\#include\ <cstdio>}}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00021}00021\ \textcolor{preprocessor}{\#ifdef\ \_\_clang\_\_}}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00022}00022\ RAPIDJSON\_DIAG\_PUSH}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00023}00023\ RAPIDJSON\_DIAG\_OFF(unreachable-\/code)}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00024}00024\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00026}00026\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gad3806c8251fdc7da9618b7e922674ffc}{RAPIDJSON\_NAMESPACE\_BEGIN}}}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00032}\mbox{\hyperlink{class_file_write_stream}{00032}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_file_write_stream}{FileWriteStream}}\ \{}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00033}00033\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00034}\mbox{\hyperlink{class_file_write_stream_a42a626fb22f69c5634e8ed62a92cd167}{00034}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{class_file_write_stream_a42a626fb22f69c5634e8ed62a92cd167}{Ch}};\ \ \ \ }
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00036}\mbox{\hyperlink{class_file_write_stream_a553ea3e7377a7f7cace2daa3cc90e1a1}{00036}}\ \ \ \ \ \mbox{\hyperlink{class_file_write_stream_a553ea3e7377a7f7cace2daa3cc90e1a1}{FileWriteStream}}(std::FILE*\ fp,\ \textcolor{keywordtype}{char}*\ buffer,\ \textcolor{keywordtype}{size\_t}\ bufferSize)\ :\ fp\_(fp),\ buffer\_(buffer),\ bufferEnd\_(buffer\ +\ bufferSize),\ current\_(buffer\_)\ \{\ }
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00037}00037\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(fp\_\ !=\ 0);}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00038}00038\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00040}\mbox{\hyperlink{class_file_write_stream_af6a6061d0accd939fa475b9b34427d85}{00040}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_file_write_stream_af6a6061d0accd939fa475b9b34427d85}{Put}}(\textcolor{keywordtype}{char}\ c)\ \{\ }
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00041}00041\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (current\_\ >=\ bufferEnd\_)}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00042}00042\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_file_write_stream_a939fbf183ba36464c5e0837df4329d37}{Flush}}();}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00044}00044\ \ \ \ \ \ \ \ \ *current\_++\ =\ c;}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00045}00045\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00047}\mbox{\hyperlink{class_file_write_stream_ad9ec108b24316a2c1c83c6ddc75d308a}{00047}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_file_write_stream_ad9ec108b24316a2c1c83c6ddc75d308a}{PutN}}(\textcolor{keywordtype}{char}\ c,\ \textcolor{keywordtype}{size\_t}\ n)\ \{}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00048}00048\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ avail\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(bufferEnd\_\ -\/\ current\_);}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00049}00049\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (n\ >\ avail)\ \{}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00050}00050\ \ \ \ \ \ \ \ \ \ \ \ \ std::memset(current\_,\ c,\ avail);}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00051}00051\ \ \ \ \ \ \ \ \ \ \ \ \ current\_\ +=\ avail;}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_file_write_stream_a939fbf183ba36464c5e0837df4329d37}{Flush}}();}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \ \ \ n\ -\/=\ avail;}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \ \ \ avail\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(bufferEnd\_\ -\/\ current\_);}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00055}00055\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00057}00057\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (n\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \ \ \ std::memset(current\_,\ c,\ n);}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00059}00059\ \ \ \ \ \ \ \ \ \ \ \ \ current\_\ +=\ n;}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00060}00060\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00061}00061\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00062}00062\ }
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00063}\mbox{\hyperlink{class_file_write_stream_a939fbf183ba36464c5e0837df4329d37}{00063}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_file_write_stream_a939fbf183ba36464c5e0837df4329d37}{Flush}}()\ \{}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00064}00064\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (current\_\ !=\ buffer\_)\ \{}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00065}00065\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ result\ =\ std::fwrite(buffer\_,\ 1,\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(current\_\ -\/\ buffer\_),\ fp\_);}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00066}00066\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (result\ <\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(current\_\ -\/\ buffer\_))\ \{}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00067}00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ failure\ deliberately\ ignored\ at\ this\ time}}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ added\ to\ avoid\ warn\_unused\_result\ build\ errors}}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \ \ \ current\_\ =\ buffer\_;}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00071}00071\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00072}00072\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00073}00073\ }
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00074}00074\ \ \ \ \ \textcolor{comment}{//\ Not\ implemented}}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00075}\mbox{\hyperlink{class_file_write_stream_ab556c7e26346ddff0e579a53c09c3a13}{00075}}\ \ \ \ \ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{class_file_write_stream_ab556c7e26346ddff0e579a53c09c3a13}{Peek}}()\textcolor{keyword}{\ const\ }\{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\textcolor{keyword}{false});\ \textcolor{keywordflow}{return}\ 0;\ \}}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00076}\mbox{\hyperlink{class_file_write_stream_ac927a0ae09a85eaba58a74ceb04b40ed}{00076}}\ \ \ \ \ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{class_file_write_stream_ac927a0ae09a85eaba58a74ceb04b40ed}{Take}}()\ \{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\textcolor{keyword}{false});\ \textcolor{keywordflow}{return}\ 0;\ \}}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00077}\mbox{\hyperlink{class_file_write_stream_a06272de32d6ac4d10c9bd5deb79a0234}{00077}}\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{class_file_write_stream_a06272de32d6ac4d10c9bd5deb79a0234}{Tell}}()\textcolor{keyword}{\ const\ }\{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\textcolor{keyword}{false});\ \textcolor{keywordflow}{return}\ 0;\ \}}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00078}\mbox{\hyperlink{class_file_write_stream_a3805559e228703c94d1165f0653e1f64}{00078}}\ \ \ \ \ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{class_file_write_stream_a3805559e228703c94d1165f0653e1f64}{PutBegin}}()\ \{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\textcolor{keyword}{false});\ \textcolor{keywordflow}{return}\ 0;\ \}}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00079}\mbox{\hyperlink{class_file_write_stream_a54b14047e4c998db0594290605f8f0dc}{00079}}\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{class_file_write_stream_a54b14047e4c998db0594290605f8f0dc}{PutEnd}}(\textcolor{keywordtype}{char}*)\ \{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\textcolor{keyword}{false});\ \textcolor{keywordflow}{return}\ 0;\ \}}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00080}00080\ }
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00081}00081\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00082}00082\ \ \ \ \ \textcolor{comment}{//\ Prohibit\ copy\ constructor\ \&\ assignment\ operator.}}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00083}00083\ \ \ \ \ \mbox{\hyperlink{class_file_write_stream_a553ea3e7377a7f7cace2daa3cc90e1a1}{FileWriteStream}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{class_file_write_stream}{FileWriteStream}}\&);}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00084}00084\ \ \ \ \ \mbox{\hyperlink{class_file_write_stream}{FileWriteStream}}\&\ operator=(\textcolor{keyword}{const}\ \mbox{\hyperlink{class_file_write_stream}{FileWriteStream}}\&);}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00085}00085\ }
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00086}00086\ \ \ \ \ std::FILE*\ fp\_;}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00087}00087\ \ \ \ \ \textcolor{keywordtype}{char}\ *buffer\_;}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00088}00088\ \ \ \ \ \textcolor{keywordtype}{char}\ *bufferEnd\_;}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00089}00089\ \ \ \ \ \textcolor{keywordtype}{char}\ *current\_;}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00090}00090\ \};}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00091}00091\ }
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00093}00093\ \textcolor{keyword}{template}<>}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00094}\mbox{\hyperlink{filewritestream_8h_a5c9b0f0e6249be2acf7f3505c295c132}{00094}}\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{filewritestream_8h_a5c9b0f0e6249be2acf7f3505c295c132}{PutN}}(\mbox{\hyperlink{class_file_write_stream}{FileWriteStream}}\&\ stream,\ \textcolor{keywordtype}{char}\ c,\ \textcolor{keywordtype}{size\_t}\ n)\ \{}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00095}00095\ \ \ \ \ stream.PutN(c,\ n);}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00096}00096\ \}}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00097}00097\ }
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00098}00098\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gaf18f052a98b9f5df5448d39484b743c1}{RAPIDJSON\_NAMESPACE\_END}}}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00099}00099\ }
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00100}00100\ \textcolor{preprocessor}{\#ifdef\ \_\_clang\_\_}}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00101}00101\ RAPIDJSON\_DIAG\_POP}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00102}00102\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00103}00103\ }
+\DoxyCodeLine{\Hypertarget{filewritestream_8h_source_l00104}00104\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ RAPIDJSON\_FILESTREAM\_H\_}}
+
+\end{DoxyCode}

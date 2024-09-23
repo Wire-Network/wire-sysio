@@ -1,0 +1,54 @@
+\doxysection{libraries/chain/include/sysio/chain/webassembly/sys-\/vm-\/oc/code\+\_\+cache.hpp File Reference}
+\hypertarget{code__cache_8hpp}{}\label{code__cache_8hpp}\index{libraries/chain/include/sysio/chain/webassembly/sys-\/vm-\/oc/code\_cache.hpp@{libraries/chain/include/sysio/chain/webassembly/sys-\/vm-\/oc/code\_cache.hpp}}
+{\ttfamily \#include $<$boost/lockfree/spsc\+\_\+queue.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/webassembly/sys-\/vm-\/oc/sys-\/vm-\/oc.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/webassembly/sys-\/vm-\/oc/ipc\+\_\+helpers.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/multi\+\_\+index\+\_\+container.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/multi\+\_\+index/hashed\+\_\+index.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/multi\+\_\+index/sequenced\+\_\+index.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/multi\+\_\+index/composite\+\_\+key.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/multi\+\_\+index/key\+\_\+extractors.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/interprocess/mem\+\_\+algo/rbtree\+\_\+best\+\_\+fit.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/asio/local/datagram\+\_\+protocol.\+hpp$>$}\newline
+{\ttfamily \#include $<$thread$>$}\newline
+Include dependency graph for code\+\_\+cache.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{code__cache_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{code__cache_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structstd_1_1hash_3_01sysio_1_1chain_1_1eosvmoc_1_1code__tuple_01_4}{std\+::hash$<$ sysio\+::chain\+::eosvmoc\+::code\+\_\+tuple $>$}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base}{sysio\+::chain\+::eosvmoc\+::code\+\_\+cache\+\_\+base}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__async}{sysio\+::chain\+::eosvmoc\+::code\+\_\+cache\+\_\+async}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__sync}{sysio\+::chain\+::eosvmoc\+::code\+\_\+cache\+\_\+sync}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacestd}{std}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain}{sysio\+::chain}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc}{sysio\+::chain\+::eosvmoc}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a113f05ff7d17d44ce4cee37bcb2caad7}{sysio\+::chain\+::eosvmoc\+::allocator\+\_\+t}} = bip\+::rbtree\+\_\+best\+\_\+fit$<$bip\+::null\+\_\+mutex\+\_\+family, bip\+::offset\+\_\+ptr$<$void$>$, alignof(std\+::max\+\_\+align\+\_\+t)$>$
+\end{DoxyCompactItemize}

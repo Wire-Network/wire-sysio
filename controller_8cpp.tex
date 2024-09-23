@@ -1,0 +1,135 @@
+\doxysection{libraries/chain/controller.cpp File Reference}
+\hypertarget{controller_8cpp}{}\label{controller_8cpp}\index{libraries/chain/controller.cpp@{libraries/chain/controller.cpp}}
+{\ttfamily \#include $<$sysio/chain/controller.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/transaction\+\_\+context.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/block\+\_\+log.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/fork\+\_\+database.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/exceptions.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/account\+\_\+object.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/code\+\_\+object.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/block\+\_\+summary\+\_\+object.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/sysio\+\_\+contract.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/global\+\_\+property\+\_\+object.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/protocol\+\_\+state\+\_\+object.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/contract\+\_\+table\+\_\+objects.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/generated\+\_\+transaction\+\_\+object.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/transaction\+\_\+object.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/genesis\+\_\+intrinsics.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/whitelisted\+\_\+intrinsics.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/database\+\_\+header\+\_\+object.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/protocol\+\_\+feature\+\_\+manager.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/authorization\+\_\+manager.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/resource\+\_\+limits.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/chain\+\_\+snapshot.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/thread\+\_\+utils.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/platform\+\_\+timer.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/deep\+\_\+mind.\+hpp$>$}\newline
+{\ttfamily \#include $<$chainbase/chainbase.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/vm/allocator.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/io/json.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/log/logger\+\_\+config.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/scoped\+\_\+exit.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/variant\+\_\+object.\+hpp$>$}\newline
+{\ttfamily \#include $<$new$>$}\newline
+Include dependency graph for controller.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{controller_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classsysio_1_1chain_1_1maybe__session}{sysio\+::chain\+::maybe\+\_\+session}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1building__block}{sysio\+::chain\+::building\+\_\+block}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1assembled__block}{sysio\+::chain\+::assembled\+\_\+block}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1completed__block}{sysio\+::chain\+::completed\+\_\+block}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1pending__state}{sysio\+::chain\+::pending\+\_\+state}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1controller__impl}{sysio\+::chain\+::controller\+\_\+impl}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1controller__impl_1_1reset__new__handler}{sysio\+::chain\+::controller\+\_\+impl\+::reset\+\_\+new\+\_\+handler}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain}{sysio\+::chain}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{controller_8cpp_a903c4d2c725a565b423b8c7978ba252c}{SET\+\_\+\+APP\+\_\+\+HANDLER}}(receiver,  contract,  \mbox{\hyperlink{structaction}{action}})
+\item 
+\#define \mbox{\hyperlink{controller_8cpp_aefcef1ac3f0ac4f01876837e1e9f66d7}{SYS\+\_\+\+REPORT}}(DESC,  \mbox{\hyperlink{struct_a}{A}},  B)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_a5af72ea2ff72b80b5f7c50c5a43722c5}{sysio\+::chain\+::controller\+\_\+index\+\_\+set}}
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_ac4f7cb93debf1865241d63e122d5e689}{sysio\+::chain\+::contract\+\_\+database\+\_\+index\+\_\+set}}
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_a4d2a657824ea3c4e231edee184c29b20}{sysio\+::chain\+::block\+\_\+stage\+\_\+type}} = std\+::variant$<$\mbox{\hyperlink{structsysio_1_1chain_1_1building__block}{building\+\_\+block}}, \mbox{\hyperlink{structsysio_1_1chain_1_1assembled__block}{assembled\+\_\+block}}, \mbox{\hyperlink{structsysio_1_1chain_1_1completed__block}{completed\+\_\+block}}$>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+template$<$$>$ void \mbox{\hyperlink{namespacesysio_1_1chain_ad489cfc4ad2a8e6c83ba6df824cdf86a}{sysio\+::chain\+::controller\+\_\+impl\+::on\+\_\+activation$<$ builtin\+\_\+protocol\+\_\+feature\+\_\+t\+::preactivate\+\_\+feature $>$}} ()
+\begin{DoxyCompactList}\small\item\em Protocol feature activation handlers\+: \end{DoxyCompactList}\item 
+template$<$$>$ void \mbox{\hyperlink{namespacesysio_1_1chain_abe48b8bdbfc90c716c2829e1b1179502}{sysio\+::chain\+::controller\+\_\+impl\+::on\+\_\+activation$<$ builtin\+\_\+protocol\+\_\+feature\+\_\+t\+::get\+\_\+sender $>$}} ()
+\item 
+template$<$$>$ void \mbox{\hyperlink{namespacesysio_1_1chain_a97599248411293cb485c399a25bd8988}{sysio\+::chain\+::controller\+\_\+impl\+::on\+\_\+activation$<$ builtin\+\_\+protocol\+\_\+feature\+\_\+t\+::replace\+\_\+deferred $>$}} ()
+\item 
+template$<$$>$ void \mbox{\hyperlink{namespacesysio_1_1chain_aac086788d0a960567236f63be7577125}{sysio\+::chain\+::controller\+\_\+impl\+::on\+\_\+activation$<$ builtin\+\_\+protocol\+\_\+feature\+\_\+t\+::webauthn\+\_\+key $>$}} ()
+\item 
+template$<$$>$ void \mbox{\hyperlink{namespacesysio_1_1chain_aaa84e3c493ad81712088b1185ad986b9}{sysio\+::chain\+::controller\+\_\+impl\+::on\+\_\+activation$<$ builtin\+\_\+protocol\+\_\+feature\+\_\+t\+::em\+\_\+key $>$}} ()
+\item 
+template$<$$>$ void \mbox{\hyperlink{namespacesysio_1_1chain_a4393e09bb7b222765c0ce7b4e6476904}{sysio\+::chain\+::controller\+\_\+impl\+::on\+\_\+activation$<$ builtin\+\_\+protocol\+\_\+feature\+\_\+t\+::wtmsig\+\_\+block\+\_\+signatures $>$}} ()
+\item 
+template$<$$>$ void \mbox{\hyperlink{namespacesysio_1_1chain_aa6bdd154dacf21ee6930994377762448}{sysio\+::chain\+::controller\+\_\+impl\+::on\+\_\+activation$<$ builtin\+\_\+protocol\+\_\+feature\+\_\+t\+::action\+\_\+return\+\_\+value $>$}} ()
+\item 
+template$<$$>$ void \mbox{\hyperlink{namespacesysio_1_1chain_aa0cebf01441e8d48e3f59d1e71952216}{sysio\+::chain\+::controller\+\_\+impl\+::on\+\_\+activation$<$ builtin\+\_\+protocol\+\_\+feature\+\_\+t\+::configurable\+\_\+wasm\+\_\+limits $>$}} ()
+\item 
+template$<$$>$ void \mbox{\hyperlink{namespacesysio_1_1chain_a5b554a28a2283bf08cf5a087ad9aa263}{sysio\+::chain\+::controller\+\_\+impl\+::on\+\_\+activation$<$ builtin\+\_\+protocol\+\_\+feature\+\_\+t\+::blockchain\+\_\+parameters $>$}} ()
+\item 
+template$<$$>$ void \mbox{\hyperlink{namespacesysio_1_1chain_a3035aa4ca3ab051f87561bee854ae8e3}{sysio\+::chain\+::controller\+\_\+impl\+::on\+\_\+activation$<$ builtin\+\_\+protocol\+\_\+feature\+\_\+t\+::get\+\_\+code\+\_\+hash $>$}} ()
+\item 
+template$<$$>$ void \mbox{\hyperlink{namespacesysio_1_1chain_a9506d121391f12b3301d4e52e4b73910}{sysio\+::chain\+::controller\+\_\+impl\+::on\+\_\+activation$<$ builtin\+\_\+protocol\+\_\+feature\+\_\+t\+::get\+\_\+block\+\_\+num $>$}} ()
+\item 
+template$<$$>$ void \mbox{\hyperlink{namespacesysio_1_1chain_a709635b6f069bd2cde699931d8182e87}{sysio\+::chain\+::controller\+\_\+impl\+::on\+\_\+activation$<$ builtin\+\_\+protocol\+\_\+feature\+\_\+t\+::crypto\+\_\+primitives $>$}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{controller_8cpp_a903c4d2c725a565b423b8c7978ba252c}\index{controller.cpp@{controller.cpp}!SET\_APP\_HANDLER@{SET\_APP\_HANDLER}}
+\index{SET\_APP\_HANDLER@{SET\_APP\_HANDLER}!controller.cpp@{controller.cpp}}
+\doxysubsubsection{\texorpdfstring{SET\_APP\_HANDLER}{SET\_APP\_HANDLER}}
+{\footnotesize\ttfamily \label{controller_8cpp_a903c4d2c725a565b423b8c7978ba252c} 
+\#define SET\+\_\+\+APP\+\_\+\+HANDLER(\begin{DoxyParamCaption}\item[{}]{receiver}{, }\item[{}]{contract}{, }\item[{}]{\mbox{\hyperlink{structaction}{action}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ set\_apply\_handler(\ account\_name(\#receiver),\ account\_name(\#contract),\ action\_name(\#\mbox{\hyperlink{structaction}{action}}),\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&BOOST\_PP\_CAT(apply\_,\ BOOST\_PP\_CAT(contract,\ BOOST\_PP\_CAT(\_,\mbox{\hyperlink{structaction}{action}})\ )\ )\ )}
+
+\end{DoxyCode}
+\Hypertarget{controller_8cpp_aefcef1ac3f0ac4f01876837e1e9f66d7}\index{controller.cpp@{controller.cpp}!SYS\_REPORT@{SYS\_REPORT}}
+\index{SYS\_REPORT@{SYS\_REPORT}!controller.cpp@{controller.cpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_REPORT}{SYS\_REPORT}}
+{\footnotesize\ttfamily \label{controller_8cpp_aefcef1ac3f0ac4f01876837e1e9f66d7} 
+\#define SYS\+\_\+\+REPORT(\begin{DoxyParamCaption}\item[{}]{DESC}{, }\item[{}]{\mbox{\hyperlink{struct_a}{A}}}{, }\item[{}]{B}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{namespace_a}{A}}\ !=\ \mbox{\hyperlink{namespace_b}{B}}\ )\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ elog(\textcolor{stringliteral}{"{}\$\{desc\}:\ \$\{bv\}\ !=\ \$\{abv\}"{}},\ (\textcolor{stringliteral}{"{}desc"{}},\ DESC)(\textcolor{stringliteral}{"{}bv"{}},\ \mbox{\hyperlink{namespace_a}{A}})(\textcolor{stringliteral}{"{}abv"{}},\ \mbox{\hyperlink{namespace_b}{B}}));\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \}}
+
+\end{DoxyCode}

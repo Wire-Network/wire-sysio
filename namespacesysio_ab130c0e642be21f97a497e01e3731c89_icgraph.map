@@ -1,0 +1,7 @@
+<map id="sysio::make_trimmed_string_view" name="sysio::make_trimmed_string_view">
+<area shape="rect" id="Node000001" title="Used to trim whitespace from body. Returned string_view valid only for lifetime of body." alt="" coords="407,5,553,46"/>
+<area shape="rect" id="Node000002" href="$namespacesysio.html#a8dcbd40369d7ed378c27a2cc45494865" title=" " alt="" coords="196,13,359,38"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="391,28,360,28,360,23,391,23"/>
+<area shape="rect" id="Node000003" href="$namespacesysio.html#ae109d11a69599661a434b345dcc2f62a" title=" " alt="" coords="5,13,148,38"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="180,28,148,28,148,23,180,23"/>
+</map>

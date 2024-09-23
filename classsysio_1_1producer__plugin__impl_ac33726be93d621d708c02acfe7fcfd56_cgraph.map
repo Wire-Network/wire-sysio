@@ -1,0 +1,9 @@
+<map id="sysio::producer_plugin_impl::abort_block" name="sysio::producer_plugin_impl::abort_block">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,77,157,118"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1subjective__billing.html#a23d4fafb3e774be584b5e23b3510bb0d" title=" " alt="" coords="207,5,366,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="140,74,211,49,213,54,142,79"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1chain_1_1unapplied__transaction__queue.html#a64a6bf20ec0b7476d2fe310840dc818d" title=" " alt="" coords="205,70,368,126"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="157,95,189,95,189,100,157,100"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1chain__plugin.html#a14a5e77b31ecf267c8062267d03440ae" title=" " alt="" coords="220,149,352,190"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="142,116,213,141,211,146,140,121"/>
+</map>

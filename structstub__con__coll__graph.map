@@ -1,0 +1,11 @@
+<map id="stub_con" name="stub_con">
+<area shape="rect" id="Node000001" title=" " alt="" coords="180,214,255,240"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1transport_1_1iostream_1_1connection.html" title=" " alt="" coords="53,95,153,121"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="127,130,208,212,204,215,124,134"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,5,201,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="106,61,106,95,100,95,100,61"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="176,95,259,121"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="220,137,220,213,215,213,215,137"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="283,95,339,121"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="294,135,229,215,225,212,290,132"/>
+</map>

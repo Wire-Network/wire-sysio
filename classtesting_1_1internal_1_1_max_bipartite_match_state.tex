@@ -1,0 +1,104 @@
+\doxysection{testing\+::internal\+::Max\+Bipartite\+Match\+State Class Reference}
+\hypertarget{classtesting_1_1internal_1_1_max_bipartite_match_state}{}\label{classtesting_1_1internal_1_1_max_bipartite_match_state}\index{testing::internal::MaxBipartiteMatchState@{testing::internal::MaxBipartiteMatchState}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_max_bipartite_match_state_a9d0166d5cc7afd1b741f6c312df72b54}{Max\+Bipartite\+Match\+State}} (const \mbox{\hyperlink{classtesting_1_1internal_1_1_match_matrix}{Match\+Matrix}} \&graph)
+\item 
+\mbox{\hyperlink{namespacetesting_1_1internal_a0038618710c01a71150887dc7cfb0a29}{Element\+Matcher\+Pairs}} \mbox{\hyperlink{classtesting_1_1internal_1_1_max_bipartite_match_state_af6efab664ee390925b24d023f1368192}{Compute}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8cc_source_l00233}{233}} of file \mbox{\hyperlink{gmock-matchers_8cc_source}{gmock-\/matchers.\+cc}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_max_bipartite_match_state_a9d0166d5cc7afd1b741f6c312df72b54}\index{testing::internal::MaxBipartiteMatchState@{testing::internal::MaxBipartiteMatchState}!MaxBipartiteMatchState@{MaxBipartiteMatchState}}
+\index{MaxBipartiteMatchState@{MaxBipartiteMatchState}!testing::internal::MaxBipartiteMatchState@{testing::internal::MaxBipartiteMatchState}}
+\doxysubsubsection{\texorpdfstring{MaxBipartiteMatchState()}{MaxBipartiteMatchState()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_max_bipartite_match_state_a9d0166d5cc7afd1b741f6c312df72b54} 
+testing\+::internal\+::\+Max\+Bipartite\+Match\+State\+::\+Max\+Bipartite\+Match\+State (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classtesting_1_1internal_1_1_match_matrix}{Match\+Matrix}} \&}]{graph}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8cc_source_l00235}{235}} of file \mbox{\hyperlink{gmock-matchers_8cc_source}{gmock-\/matchers.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ :\ graph\_(\&graph),}
+\DoxyCodeLine{00237\ \ \ \ \ \ \ \ \ left\_(graph\_-\/>\mbox{\hyperlink{classtesting_1_1internal_1_1_match_matrix_a337d9793c61d985dbc1be166e34eed61}{LhsSize}}(),\ kUnused),}
+\DoxyCodeLine{00238\ \ \ \ \ \ \ \ \ right\_(graph\_-\/>\mbox{\hyperlink{classtesting_1_1internal_1_1_match_matrix_aff068e9fed3a42466c5da8766ac43134}{RhsSize}}(),\ kUnused)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_max_bipartite_match_state_af6efab664ee390925b24d023f1368192}\index{testing::internal::MaxBipartiteMatchState@{testing::internal::MaxBipartiteMatchState}!Compute@{Compute}}
+\index{Compute@{Compute}!testing::internal::MaxBipartiteMatchState@{testing::internal::MaxBipartiteMatchState}}
+\doxysubsubsection{\texorpdfstring{Compute()}{Compute()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_max_bipartite_match_state_af6efab664ee390925b24d023f1368192} 
+\mbox{\hyperlink{namespacetesting_1_1internal_a0038618710c01a71150887dc7cfb0a29}{Element\+Matcher\+Pairs}} testing\+::internal\+::\+Max\+Bipartite\+Match\+State\+::\+Compute (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8cc_source_l00241}{241}} of file \mbox{\hyperlink{gmock-matchers_8cc_source}{gmock-\/matchers.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00241\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00242\ \ \ \ \ \textcolor{comment}{//\ 'seen'\ is\ used\ for\ path\ finding\ \{\ 0:\ unseen,\ 1:\ seen\ \}.}}
+\DoxyCodeLine{00243\ \ \ \ \ ::std::vector<char>\ seen;}
+\DoxyCodeLine{00244\ \ \ \ \ \textcolor{comment}{//\ Searches\ the\ residual\ flow\ graph\ for\ a\ path\ from\ each\ left\ node\ to}}
+\DoxyCodeLine{00245\ \ \ \ \ \textcolor{comment}{//\ the\ sink\ in\ the\ residual\ flow\ graph,\ and\ if\ one\ is\ found,\ add\ flow}}
+\DoxyCodeLine{00246\ \ \ \ \ \textcolor{comment}{//\ to\ the\ graph.\ It's\ okay\ to\ search\ through\ the\ left\ nodes\ once.\ The}}
+\DoxyCodeLine{00247\ \ \ \ \ \textcolor{comment}{//\ edge\ from\ the\ implicit\ source\ node\ to\ each\ previously-\/visited\ left}}
+\DoxyCodeLine{00248\ \ \ \ \ \textcolor{comment}{//\ node\ will\ have\ flow\ if\ that\ left\ node\ has\ any\ path\ to\ the\ sink}}
+\DoxyCodeLine{00249\ \ \ \ \ \textcolor{comment}{//\ whatsoever.\ Subsequent\ augmentations\ can\ only\ add\ flow\ to\ the}}
+\DoxyCodeLine{00250\ \ \ \ \ \textcolor{comment}{//\ network,\ and\ cannot\ take\ away\ that\ previous\ flow\ unit\ from\ the\ source.}}
+\DoxyCodeLine{00251\ \ \ \ \ \textcolor{comment}{//\ Since\ the\ source-\/to-\/left\ edge\ can\ only\ carry\ one\ flow\ unit\ (or,}}
+\DoxyCodeLine{00252\ \ \ \ \ \textcolor{comment}{//\ each\ element\ can\ be\ matched\ to\ only\ one\ matcher),\ there\ is\ no\ need}}
+\DoxyCodeLine{00253\ \ \ \ \ \textcolor{comment}{//\ to\ visit\ the\ left\ nodes\ more\ than\ once\ looking\ for\ augmented\ paths.}}
+\DoxyCodeLine{00254\ \ \ \ \ \textcolor{comment}{//\ The\ flow\ is\ known\ to\ be\ possible\ or\ impossible\ by\ looking\ at\ the}}
+\DoxyCodeLine{00255\ \ \ \ \ \textcolor{comment}{//\ node\ once.}}
+\DoxyCodeLine{00256\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ ilhs\ =\ 0;\ ilhs\ <\ graph\_-\/>\mbox{\hyperlink{classtesting_1_1internal_1_1_match_matrix_a337d9793c61d985dbc1be166e34eed61}{LhsSize}}();\ ++ilhs)\ \{}
+\DoxyCodeLine{00257\ \ \ \ \ \ \ \textcolor{comment}{//\ Reset\ the\ path-\/marking\ vector\ and\ try\ to\ find\ a\ path\ from}}
+\DoxyCodeLine{00258\ \ \ \ \ \ \ \textcolor{comment}{//\ source\ to\ sink\ starting\ at\ the\ left\_[ilhs]\ node.}}
+\DoxyCodeLine{00259\ \ \ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_ab54343f0a36dc4cb0ce8a478dd7847b8}{GTEST\_CHECK\_}}(left\_[ilhs]\ ==\ kUnused)}
+\DoxyCodeLine{00260\ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}ilhs:\ "{}}\ <<\ ilhs\ <<\ \textcolor{stringliteral}{"{},\ left\_[ilhs]:\ "{}}\ <<\ left\_[ilhs];}
+\DoxyCodeLine{00261\ \ \ \ \ \ \ \textcolor{comment}{//\ 'seen'\ initialized\ to\ 'graph\_-\/>RhsSize()'\ copies\ of\ 0.}}
+\DoxyCodeLine{00262\ \ \ \ \ \ \ seen.assign(graph\_-\/>\mbox{\hyperlink{classtesting_1_1internal_1_1_match_matrix_aff068e9fed3a42466c5da8766ac43134}{RhsSize}}(),\ 0);}
+\DoxyCodeLine{00263\ \ \ \ \ \ \ TryAugment(ilhs,\ \&seen);}
+\DoxyCodeLine{00264\ \ \ \ \ \}}
+\DoxyCodeLine{00265\ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a0038618710c01a71150887dc7cfb0a29}{ElementMatcherPairs}}\ result;}
+\DoxyCodeLine{00266\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ ilhs\ =\ 0;\ ilhs\ <\ left\_.size();\ ++ilhs)\ \{}
+\DoxyCodeLine{00267\ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ irhs\ =\ left\_[ilhs];}
+\DoxyCodeLine{00268\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (irhs\ ==\ kUnused)\ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{00269\ \ \ \ \ \ \ result.push\_back(\mbox{\hyperlink{namespacetesting_1_1internal_a109863545f08651178bf0f520aebd33b}{ElementMatcherPair}}(ilhs,\ irhs));}
+\DoxyCodeLine{00270\ \ \ \ \ \}}
+\DoxyCodeLine{00271\ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00272\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_max_bipartite_match_state_af6efab664ee390925b24d023f1368192_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_max_bipartite_match_state_af6efab664ee390925b24d023f1368192_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/src/\mbox{\hyperlink{gmock-matchers_8cc}{gmock-\/matchers.\+cc}}\end{DoxyCompactItemize}

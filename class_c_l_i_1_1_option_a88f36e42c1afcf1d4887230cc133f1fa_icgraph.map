@@ -1,0 +1,24 @@
+<map id="CLI::Option::get_type_size" name="CLI::Option::get_type_size">
+<area shape="rect" id="Node000001" title="The number of arguments the option expects." alt="" coords="1397,48,1574,74"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_formatter.html#a9f11b9ee12c8ccb8bf9670be1b47a3b1" title="This is the options part of the name, Default: combined into left column." alt="" coords="1202,41,1349,81"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1381,64,1349,64,1349,58,1381,58"/>
+<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_formatter.html#a1503e498cef1cab66a01d84bac59b5d8" title="This prints out an option help line, either positional or optional form." alt="" coords="1008,41,1154,81"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="1187,64,1154,64,1154,58,1187,58"/>
+<area shape="rect" id="Node000004" href="$class_c_l_i_1_1_formatter.html#aebbdf79e2615ea7d16fe8f30fb6551fc" title=" " alt="" coords="814,41,960,81"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="992,64,960,64,960,58,992,58"/>
+<area shape="rect" id="Node000005" href="$class_c_l_i_1_1_formatter.html#ad48dd6b9432babc0037d6726230221f0" title="This prints out all the groups of options." alt="" coords="619,7,766,48"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="798,48,765,43,766,38,798,43"/>
+<area shape="rect" id="Node000009" href="$class_c_l_i_1_1_formatter.html#aab5f07a6d3154ace0be4d9dbf85f795b" title="This prints out just the positionals &quot;group&quot;." alt="" coords="619,73,766,113"/>
+<area shape="poly" id="edge11_Node000004_Node000009" title=" " alt="" coords="798,78,766,84,765,78,798,73"/>
+<area shape="rect" id="Node000006" href="$class_c_l_i_1_1_formatter.html#ade54fd392e2c9f5364744dca82408e60" title="This prints out a subcommand in help&#45;all." alt="" coords="425,35,571,76"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="604,43,572,48,571,42,603,38"/>
+<area shape="rect" id="Node000007" href="$class_c_l_i_1_1_formatter.html#a838e0f47efa4fbd1b738eedb156887b9" title="This puts everything together." alt="" coords="5,72,183,98"/>
+<area shape="poly" id="edge10_Node000005_Node000007" title=" " alt="" coords="603,18,524,11,430,8,330,12,231,26,169,48,118,74,116,69,166,43,230,21,329,7,430,3,524,6,604,13"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="417,83,377,90,277,97,183,95,183,89,277,91,377,85,416,78"/>
+<area shape="rect" id="Node000008" href="$class_c_l_i_1_1_formatter.html#a9e6b7c4c6eee50b11fe1ca785002db04" title="This prints out all the subcommands." alt="" coords="231,35,377,76"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="409,67,377,67,377,62,409,62"/>
+<area shape="poly" id="edge8_Node000008_Node000006" title=" " alt="" coords="392,44,424,44,424,50,392,49"/>
+<area shape="poly" id="edge9_Node000008_Node000007" title=" " alt="" coords="215,71,183,75,183,70,214,65"/>
+<area shape="poly" id="edge12_Node000009_Node000006" title=" " alt="" coords="603,79,571,72,572,67,605,73"/>
+<area shape="poly" id="edge13_Node000009_Node000007" title=" " alt="" coords="604,100,431,106,231,102,183,99,184,93,231,97,431,100,604,95"/>
+</map>

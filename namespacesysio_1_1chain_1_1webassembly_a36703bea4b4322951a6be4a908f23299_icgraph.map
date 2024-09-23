@@ -1,0 +1,8 @@
+<map id="sysio::chain::webassembly::set_proposed_producers_common" name="sysio::chain::webassembly::set_proposed_producers_common">
+<area shape="rect" id="Node000001" title=" " alt="" coords="460,46,688,87"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1chain_1_1webassembly_1_1interface.html#aebd6787969bf07ac25f180a822b54a2b" title=" " alt="" coords="233,5,412,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="444,52,412,48,413,42,445,47"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1chain_1_1webassembly_1_1interface.html#a6a07f35005fe7f45c085b1969a671d85" title=" " alt="" coords="5,39,185,94"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="445,75,412,76,233,76,185,74,185,69,233,71,412,71,444,70"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="218,51,186,56,185,51,217,46"/>
+</map>

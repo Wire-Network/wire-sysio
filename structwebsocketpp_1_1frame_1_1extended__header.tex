@@ -1,0 +1,114 @@
+\doxysection{websocketpp\+::frame\+::extended\+\_\+header Struct Reference}
+\hypertarget{structwebsocketpp_1_1frame_1_1extended__header}{}\label{structwebsocketpp_1_1frame_1_1extended__header}\index{websocketpp::frame::extended\_header@{websocketpp::frame::extended\_header}}
+
+
+The variable size component of a Web\+Socket frame header.  
+
+
+
+
+{\ttfamily \#include $<$frame.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structwebsocketpp_1_1frame_1_1extended__header_a6015c1b4ce066acdaef80e83b716b09e}{extended\+\_\+header}} ()
+\item 
+\mbox{\hyperlink{structwebsocketpp_1_1frame_1_1extended__header_a0fdbc1aaf81b56d61cc962fd724d3ffa}{extended\+\_\+header}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} payload\+\_\+size)
+\item 
+\mbox{\hyperlink{structwebsocketpp_1_1frame_1_1extended__header_af94b7d3a232117abfbd2b876025ab451}{extended\+\_\+header}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} payload\+\_\+size, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} masking\+\_\+key)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{structwebsocketpp_1_1frame_1_1extended__header_a64507c32b568d0894b2bf3a2513debd1}{bytes}} \mbox{[}MAX\+\_\+\+EXTENDED\+\_\+\+HEADER\+\_\+\+LENGTH\mbox{]}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{frame_8hpp_source_l00235}{235}} of file \mbox{\hyperlink{frame_8hpp_source}{frame.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structwebsocketpp_1_1frame_1_1extended__header_a6015c1b4ce066acdaef80e83b716b09e}\index{websocketpp::frame::extended\_header@{websocketpp::frame::extended\_header}!extended\_header@{extended\_header}}
+\index{extended\_header@{extended\_header}!websocketpp::frame::extended\_header@{websocketpp::frame::extended\_header}}
+\doxysubsubsection{\texorpdfstring{extended\_header()}{extended\_header()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1frame_1_1extended__header_a6015c1b4ce066acdaef80e83b716b09e} 
+websocketpp\+::frame\+::extended\+\_\+header\+::extended\+\_\+header (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{frame_8hpp_source_l00236}{236}} of file \mbox{\hyperlink{frame_8hpp_source}{frame.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00237\ \ \ \ \ \ \ \ \ std::fill\_n(this-\/>\mbox{\hyperlink{structwebsocketpp_1_1frame_1_1extended__header_a64507c32b568d0894b2bf3a2513debd1}{bytes}},MAX\_EXTENDED\_HEADER\_LENGTH,0x00);}
+\DoxyCodeLine{00238\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structwebsocketpp_1_1frame_1_1extended__header_a0fdbc1aaf81b56d61cc962fd724d3ffa}\index{websocketpp::frame::extended\_header@{websocketpp::frame::extended\_header}!extended\_header@{extended\_header}}
+\index{extended\_header@{extended\_header}!websocketpp::frame::extended\_header@{websocketpp::frame::extended\_header}}
+\doxysubsubsection{\texorpdfstring{extended\_header()}{extended\_header()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1frame_1_1extended__header_a0fdbc1aaf81b56d61cc962fd724d3ffa} 
+websocketpp\+::frame\+::extended\+\_\+header\+::extended\+\_\+header (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{payload\+\_\+size}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{frame_8hpp_source_l00240}{240}} of file \mbox{\hyperlink{frame_8hpp_source}{frame.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00241\ \ \ \ \ \ \ \ \ std::fill\_n(this-\/>\mbox{\hyperlink{structwebsocketpp_1_1frame_1_1extended__header_a64507c32b568d0894b2bf3a2513debd1}{bytes}},MAX\_EXTENDED\_HEADER\_LENGTH,0x00);}
+\DoxyCodeLine{00242\ }
+\DoxyCodeLine{00243\ \ \ \ \ \ \ \ \ copy\_payload(payload\_size);}
+\DoxyCodeLine{00244\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structwebsocketpp_1_1frame_1_1extended__header_af94b7d3a232117abfbd2b876025ab451}\index{websocketpp::frame::extended\_header@{websocketpp::frame::extended\_header}!extended\_header@{extended\_header}}
+\index{extended\_header@{extended\_header}!websocketpp::frame::extended\_header@{websocketpp::frame::extended\_header}}
+\doxysubsubsection{\texorpdfstring{extended\_header()}{extended\_header()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1frame_1_1extended__header_af94b7d3a232117abfbd2b876025ab451} 
+websocketpp\+::frame\+::extended\+\_\+header\+::extended\+\_\+header (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{payload\+\_\+size}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{masking\+\_\+key}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{frame_8hpp_source_l00246}{246}} of file \mbox{\hyperlink{frame_8hpp_source}{frame.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00246\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00247\ \ \ \ \ \ \ \ \ std::fill\_n(this-\/>\mbox{\hyperlink{structwebsocketpp_1_1frame_1_1extended__header_a64507c32b568d0894b2bf3a2513debd1}{bytes}},MAX\_EXTENDED\_HEADER\_LENGTH,0x00);}
+\DoxyCodeLine{00248\ }
+\DoxyCodeLine{00249\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Copy\ payload\ size}}
+\DoxyCodeLine{00250\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ offset\ =\ copy\_payload(payload\_size);}
+\DoxyCodeLine{00251\ }
+\DoxyCodeLine{00252\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Copy\ Masking\ Key}}
+\DoxyCodeLine{00253\ \ \ \ \ \ \ \ \ uint32\_converter\ temp32;}
+\DoxyCodeLine{00254\ \ \ \ \ \ \ \ \ temp32.i\ =\ masking\_key;}
+\DoxyCodeLine{00255\ \ \ \ \ \ \ \ \ std::copy(temp32.c,temp32.c+4,\mbox{\hyperlink{structwebsocketpp_1_1frame_1_1extended__header_a64507c32b568d0894b2bf3a2513debd1}{bytes}}+offset);}
+\DoxyCodeLine{00256\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structwebsocketpp_1_1frame_1_1extended__header_a64507c32b568d0894b2bf3a2513debd1}\index{websocketpp::frame::extended\_header@{websocketpp::frame::extended\_header}!bytes@{bytes}}
+\index{bytes@{bytes}!websocketpp::frame::extended\_header@{websocketpp::frame::extended\_header}}
+\doxysubsubsection{\texorpdfstring{bytes}{bytes}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1frame_1_1extended__header_a64507c32b568d0894b2bf3a2513debd1} 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} websocketpp\+::frame\+::extended\+\_\+header\+::bytes\mbox{[}MAX\+\_\+\+EXTENDED\+\_\+\+HEADER\+\_\+\+LENGTH\mbox{]}}
+
+
+
+Definition at line \mbox{\hyperlink{frame_8hpp_source_l00258}{258}} of file \mbox{\hyperlink{frame_8hpp_source}{frame.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/vendor/websocketpp/websocketpp/\mbox{\hyperlink{frame_8hpp}{frame.\+hpp}}\end{DoxyCompactItemize}

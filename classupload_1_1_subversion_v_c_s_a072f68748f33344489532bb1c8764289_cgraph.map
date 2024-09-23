@@ -1,0 +1,10 @@
+<map id="upload.SubversionVCS.GenerateDiff" name="upload.SubversionVCS.GenerateDiff">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,29,240,55"/>
+<area shape="rect" id="Node000002" href="$namespaceupload.html#aded00b2430ea094be3da97c21c1ec61f" title=" " alt="" coords="502,5,616,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="240,33,486,19,486,25,240,38"/>
+<area shape="rect" id="Node000003" href="$namespaceupload.html#adc4aea7c4a79d29dfab04f650c274fdb" title=" " alt="" coords="288,55,404,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="240,53,272,57,272,62,240,58"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="401,51,451,40,486,32,487,37,453,45,403,57"/>
+<area shape="rect" id="Node000004" href="$namespaceupload.html#aaf7f85c895770c6aba543e1bf57533ae" title=" " alt="" coords="452,55,665,80"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="405,65,436,65,436,70,405,70"/>
+</map>

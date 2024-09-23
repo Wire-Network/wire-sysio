@@ -1,0 +1,9 @@
+<map id="test_ecmult_multi_batch_single" name="test_ecmult_multi_batch_single">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,23,169,64"/>
+<area shape="rect" id="Node000002" href="$tests_8c.html#a63a7c68b6b72356c59cfdaaab131c73b" title=" " alt="" coords="217,5,402,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="169,32,201,28,201,33,169,37"/>
+<area shape="rect" id="Node000004" href="$tests_8c.html#a01cf4b4fc9b4ab8cb3e04fd3dc2ff57f" title=" " alt="" coords="238,55,380,80"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="169,50,223,55,222,61,169,55"/>
+<area shape="rect" id="Node000003" href="$tests_8c.html#af038dec65d22bf5050a82de7b4ad4bca" title=" " alt="" coords="450,5,627,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="402,16,434,16,434,21,402,21"/>
+</map>

@@ -1,0 +1,44 @@
+\doxysection{libraries/softfloat/source/f128\+\_\+isnan.c File Reference}
+\hypertarget{softfloat_2source_2f128__isnan_8c}{}\label{softfloat_2source_2f128__isnan_8c}\index{libraries/softfloat/source/f128\_isnan.c@{libraries/softfloat/source/f128\_isnan.c}}
+{\ttfamily \#include "{}include/softfloat.\+h"{}}\newline
+{\ttfamily \#include "{}include/internals.\+h"{}}\newline
+Include dependency graph for f128\+\_\+isnan.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{softfloat_2source_2f128__isnan_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{softfloat_2source_2f128__isnan_8c_aa2b9f171a550f8fcd55bc6fc2639b3c0}{is\+Na\+NF128}} (const \mbox{\hyperlink{structfloat128__t}{float128\+\_\+t}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{softfloat_2source_2f128__isnan_8c_aa2b9f171a550f8fcd55bc6fc2639b3c0}\index{f128\_isnan.c@{f128\_isnan.c}!isNaNF128@{isNaNF128}}
+\index{isNaNF128@{isNaNF128}!f128\_isnan.c@{f128\_isnan.c}}
+\doxysubsubsection{\texorpdfstring{isNaNF128()}{isNaNF128()}}
+{\footnotesize\ttfamily \label{softfloat_2source_2f128__isnan_8c_aa2b9f171a550f8fcd55bc6fc2639b3c0} 
+bool is\+Na\+NF128 (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structfloat128__t}{float128\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{f}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2f128__isnan_8c_source_l00004}{4}} of file \mbox{\hyperlink{softfloat_2source_2f128__isnan_8c_source}{f128\+\_\+isnan.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00004\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00005\ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}*\ wptr\ =\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}*)\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}};}
+\DoxyCodeLine{00006\ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a20b9dda0624f400a1cffd66ac207e165}{softfloat\_isNaNF128M}}(\ wptr\ );}
+\DoxyCodeLine{00007\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=296pt]{softfloat_2source_2f128__isnan_8c_aa2b9f171a550f8fcd55bc6fc2639b3c0_cgraph}
+\end{center}
+\end{figure}

@@ -1,0 +1,649 @@
+\doxysection{sysio\+::chain\+::apply\+\_\+context\+::generic\+\_\+index\texorpdfstring{$<$}{<} Object\+Type, Secondary\+Key\+Proxy, Secondary\+Key\+Proxy\+Const \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classsysio_1_1chain_1_1apply__context_1_1generic__index}{}\label{classsysio_1_1chain_1_1apply__context_1_1generic__index}\index{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$@{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$}}
+
+
+{\ttfamily \#include $<$apply\+\_\+context.\+hpp$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef Object\+Type\+::secondary\+\_\+key\+\_\+type \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_a1c9871d3f98bee2fb18b463d3f0cab57}{secondary\+\_\+key\+\_\+type}}
+\item 
+typedef Secondary\+Key\+Proxy \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_acfa8f5772dddbaea038435d2136b8a5a}{secondary\+\_\+key\+\_\+proxy\+\_\+type}}
+\item 
+typedef Secondary\+Key\+Proxy\+Const \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_a8dd024499302ed645150802b342074e4}{secondary\+\_\+key\+\_\+proxy\+\_\+const\+\_\+type}}
+\item 
+using \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_a4326ffcaf34f23e4c0382832e6a93619}{secondary\+\_\+key\+\_\+helper\+\_\+t}} = secondary\+\_\+key\+\_\+helper$<$\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_a1c9871d3f98bee2fb18b463d3f0cab57}{secondary\+\_\+key\+\_\+type}}, \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_acfa8f5772dddbaea038435d2136b8a5a}{secondary\+\_\+key\+\_\+proxy\+\_\+type}}, \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_a8dd024499302ed645150802b342074e4}{secondary\+\_\+key\+\_\+proxy\+\_\+const\+\_\+type}}$>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_aa163d059e04eef60f674e912cab2dbde}{generic\+\_\+index}} (\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context}{apply\+\_\+context}} \&c)
+\item 
+int \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_ae7d0c1a61f88980193ccd274271c8c0c}{store}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} scope, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} table, const \mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} \&payer, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{code__cache_8cpp_aa0efefe21f4700d78692edc823e763be}{id}}, \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_a8dd024499302ed645150802b342074e4}{secondary\+\_\+key\+\_\+proxy\+\_\+const\+\_\+type}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_afde92a06e6e55e639af34a78497fdde0}{remove}} (int iterator)
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_a12898aaf953c5e776be5ec4e5aa553aa}{update}} (int iterator, \mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} payer, \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_a8dd024499302ed645150802b342074e4}{secondary\+\_\+key\+\_\+proxy\+\_\+const\+\_\+type}} secondary)
+\item 
+int \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_a72c9f02ac4c3097ead87a75a96fcf3bc}{find\+\_\+secondary}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} code, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} scope, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} table, \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_a8dd024499302ed645150802b342074e4}{secondary\+\_\+key\+\_\+proxy\+\_\+const\+\_\+type}} secondary, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \&primary)
+\item 
+int \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_a55bfe099c362c65dcfddf789ce7e0644}{lowerbound\+\_\+secondary}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} code, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} scope, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} table, \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_acfa8f5772dddbaea038435d2136b8a5a}{secondary\+\_\+key\+\_\+proxy\+\_\+type}} secondary, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \&primary)
+\item 
+int \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_a40c918a736dea9e083eeb8555bbbb38c}{upperbound\+\_\+secondary}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} code, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} scope, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} table, \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_acfa8f5772dddbaea038435d2136b8a5a}{secondary\+\_\+key\+\_\+proxy\+\_\+type}} secondary, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \&primary)
+\item 
+int \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_a4b2b3df3ef950b7103b785f66b66ff1f}{end\+\_\+secondary}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} code, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} scope, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} table)
+\item 
+int \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_aea51e4cd9cd94d318f62ce672f59de39}{next\+\_\+secondary}} (int iterator, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \&primary)
+\item 
+int \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_a9a2c075e4dc356ff50a7997f15b46a9c}{previous\+\_\+secondary}} (int iterator, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \&primary)
+\item 
+int \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_a66b28dae52a27292011575ca5ab3fa9c}{find\+\_\+primary}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} code, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} scope, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} table, \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_acfa8f5772dddbaea038435d2136b8a5a}{secondary\+\_\+key\+\_\+proxy\+\_\+type}} secondary, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} primary)
+\item 
+int \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_a462e5ee835141095a5f68eed9ff2f5e6}{lowerbound\+\_\+primary}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} code, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} scope, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} table, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} primary)
+\item 
+int \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_a6ff8f70b48656eaadfafea194a11602e}{upperbound\+\_\+primary}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} code, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} scope, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} table, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} primary)
+\item 
+int \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_acb2637427c124b3956ff70ff38aec97d}{next\+\_\+primary}} (int iterator, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \&primary)
+\item 
+int \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_a58586003c8097053f5c0801813a5cfdd}{previous\+\_\+primary}} (int iterator, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \&primary)
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_a05e187455e430f91ff29ac7ced8a6756}{get}} (int iterator, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \&primary, \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_acfa8f5772dddbaea038435d2136b8a5a}{secondary\+\_\+key\+\_\+proxy\+\_\+type}} secondary)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Object\+Type, typename Secondary\+Key\+Proxy = typename std\+::add\+\_\+lvalue\+\_\+reference$<$typename Object\+Type\+::secondary\+\_\+key\+\_\+type$>$\+::type, typename Secondary\+Key\+Proxy\+Const = typename std\+::add\+\_\+lvalue\+\_\+reference$<$                                                   typename std\+::add\+\_\+const$<$typename Object\+Type\+::secondary\+\_\+key\+\_\+type$>$\+::type$>$\+::type$>$\newline
+class sysio\+::chain\+::apply\+\_\+context\+::generic\+\_\+index$<$ Object\+Type, Secondary\+Key\+Proxy, Secondary\+Key\+Proxy\+Const $>$}
+
+
+Definition at line \mbox{\hyperlink{apply__context_8hpp_source_l00166}{166}} of file \mbox{\hyperlink{apply__context_8hpp_source}{apply\+\_\+context.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classsysio_1_1chain_1_1apply__context_1_1generic__index_a4326ffcaf34f23e4c0382832e6a93619}\index{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$@{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$}!secondary\_key\_helper\_t@{secondary\_key\_helper\_t}}
+\index{secondary\_key\_helper\_t@{secondary\_key\_helper\_t}!sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$@{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$}}
+\doxysubsubsection{\texorpdfstring{secondary\_key\_helper\_t}{secondary\_key\_helper\_t}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1apply__context_1_1generic__index_a4326ffcaf34f23e4c0382832e6a93619} 
+template$<$typename Object\+Type , typename Secondary\+Key\+Proxy  = typename std\+::add\+\_\+lvalue\+\_\+reference$<$typename Object\+Type\+::secondary\+\_\+key\+\_\+type$>$\+::type, typename Secondary\+Key\+Proxy\+Const  = typename std\+::add\+\_\+lvalue\+\_\+reference$<$                                                   typename std\+::add\+\_\+const$<$typename Object\+Type\+::secondary\+\_\+key\+\_\+type$>$\+::type$>$\+::type$>$ \\
+using \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index}{sysio\+::chain\+::apply\+\_\+context\+::generic\+\_\+index}}$<$ Object\+Type, Secondary\+Key\+Proxy, Secondary\+Key\+Proxy\+Const $>$\+::secondary\+\_\+key\+\_\+helper\+\_\+t = secondary\+\_\+key\+\_\+helper$<$\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_a1c9871d3f98bee2fb18b463d3f0cab57}{secondary\+\_\+key\+\_\+type}}, \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_acfa8f5772dddbaea038435d2136b8a5a}{secondary\+\_\+key\+\_\+proxy\+\_\+type}}, \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_a8dd024499302ed645150802b342074e4}{secondary\+\_\+key\+\_\+proxy\+\_\+const\+\_\+type}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{apply__context_8hpp_source_l00173}{173}} of file \mbox{\hyperlink{apply__context_8hpp_source}{apply\+\_\+context.\+hpp}}.
+
+\Hypertarget{classsysio_1_1chain_1_1apply__context_1_1generic__index_a8dd024499302ed645150802b342074e4}\index{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$@{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$}!secondary\_key\_proxy\_const\_type@{secondary\_key\_proxy\_const\_type}}
+\index{secondary\_key\_proxy\_const\_type@{secondary\_key\_proxy\_const\_type}!sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$@{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$}}
+\doxysubsubsection{\texorpdfstring{secondary\_key\_proxy\_const\_type}{secondary\_key\_proxy\_const\_type}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1apply__context_1_1generic__index_a8dd024499302ed645150802b342074e4} 
+template$<$typename Object\+Type , typename Secondary\+Key\+Proxy  = typename std\+::add\+\_\+lvalue\+\_\+reference$<$typename Object\+Type\+::secondary\+\_\+key\+\_\+type$>$\+::type, typename Secondary\+Key\+Proxy\+Const  = typename std\+::add\+\_\+lvalue\+\_\+reference$<$                                                   typename std\+::add\+\_\+const$<$typename Object\+Type\+::secondary\+\_\+key\+\_\+type$>$\+::type$>$\+::type$>$ \\
+Secondary\+Key\+Proxy\+Const \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index}{sysio\+::chain\+::apply\+\_\+context\+::generic\+\_\+index}}$<$ Object\+Type, Secondary\+Key\+Proxy, Secondary\+Key\+Proxy\+Const $>$\+::secondary\+\_\+key\+\_\+proxy\+\_\+const\+\_\+type}
+
+
+
+Definition at line \mbox{\hyperlink{apply__context_8hpp_source_l00171}{171}} of file \mbox{\hyperlink{apply__context_8hpp_source}{apply\+\_\+context.\+hpp}}.
+
+\Hypertarget{classsysio_1_1chain_1_1apply__context_1_1generic__index_acfa8f5772dddbaea038435d2136b8a5a}\index{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$@{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$}!secondary\_key\_proxy\_type@{secondary\_key\_proxy\_type}}
+\index{secondary\_key\_proxy\_type@{secondary\_key\_proxy\_type}!sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$@{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$}}
+\doxysubsubsection{\texorpdfstring{secondary\_key\_proxy\_type}{secondary\_key\_proxy\_type}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1apply__context_1_1generic__index_acfa8f5772dddbaea038435d2136b8a5a} 
+template$<$typename Object\+Type , typename Secondary\+Key\+Proxy  = typename std\+::add\+\_\+lvalue\+\_\+reference$<$typename Object\+Type\+::secondary\+\_\+key\+\_\+type$>$\+::type, typename Secondary\+Key\+Proxy\+Const  = typename std\+::add\+\_\+lvalue\+\_\+reference$<$                                                   typename std\+::add\+\_\+const$<$typename Object\+Type\+::secondary\+\_\+key\+\_\+type$>$\+::type$>$\+::type$>$ \\
+Secondary\+Key\+Proxy \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index}{sysio\+::chain\+::apply\+\_\+context\+::generic\+\_\+index}}$<$ Object\+Type, Secondary\+Key\+Proxy, Secondary\+Key\+Proxy\+Const $>$\+::secondary\+\_\+key\+\_\+proxy\+\_\+type}
+
+
+
+Definition at line \mbox{\hyperlink{apply__context_8hpp_source_l00170}{170}} of file \mbox{\hyperlink{apply__context_8hpp_source}{apply\+\_\+context.\+hpp}}.
+
+\Hypertarget{classsysio_1_1chain_1_1apply__context_1_1generic__index_a1c9871d3f98bee2fb18b463d3f0cab57}\index{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$@{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$}!secondary\_key\_type@{secondary\_key\_type}}
+\index{secondary\_key\_type@{secondary\_key\_type}!sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$@{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$}}
+\doxysubsubsection{\texorpdfstring{secondary\_key\_type}{secondary\_key\_type}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1apply__context_1_1generic__index_a1c9871d3f98bee2fb18b463d3f0cab57} 
+template$<$typename Object\+Type , typename Secondary\+Key\+Proxy  = typename std\+::add\+\_\+lvalue\+\_\+reference$<$typename Object\+Type\+::secondary\+\_\+key\+\_\+type$>$\+::type, typename Secondary\+Key\+Proxy\+Const  = typename std\+::add\+\_\+lvalue\+\_\+reference$<$                                                   typename std\+::add\+\_\+const$<$typename Object\+Type\+::secondary\+\_\+key\+\_\+type$>$\+::type$>$\+::type$>$ \\
+Object\+Type\+::secondary\+\_\+key\+\_\+type \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index}{sysio\+::chain\+::apply\+\_\+context\+::generic\+\_\+index}}$<$ Object\+Type, Secondary\+Key\+Proxy, Secondary\+Key\+Proxy\+Const $>$\+::secondary\+\_\+key\+\_\+type}
+
+
+
+Definition at line \mbox{\hyperlink{apply__context_8hpp_source_l00169}{169}} of file \mbox{\hyperlink{apply__context_8hpp_source}{apply\+\_\+context.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classsysio_1_1chain_1_1apply__context_1_1generic__index_aa163d059e04eef60f674e912cab2dbde}\index{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$@{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$}!generic\_index@{generic\_index}}
+\index{generic\_index@{generic\_index}!sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$@{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$}}
+\doxysubsubsection{\texorpdfstring{generic\_index()}{generic\_index()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1apply__context_1_1generic__index_aa163d059e04eef60f674e912cab2dbde} 
+template$<$typename Object\+Type , typename Secondary\+Key\+Proxy  = typename std\+::add\+\_\+lvalue\+\_\+reference$<$typename Object\+Type\+::secondary\+\_\+key\+\_\+type$>$\+::type, typename Secondary\+Key\+Proxy\+Const  = typename std\+::add\+\_\+lvalue\+\_\+reference$<$                                                   typename std\+::add\+\_\+const$<$typename Object\+Type\+::secondary\+\_\+key\+\_\+type$>$\+::type$>$\+::type$>$ \\
+\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index}{sysio\+::chain\+::apply\+\_\+context\+::generic\+\_\+index}}$<$ Object\+Type, Secondary\+Key\+Proxy, Secondary\+Key\+Proxy\+Const $>$\+::generic\+\_\+index (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context}{apply\+\_\+context}} \&}]{c}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{apply__context_8hpp_source_l00175}{175}} of file \mbox{\hyperlink{apply__context_8hpp_source}{apply\+\_\+context.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00175\ :\mbox{\hyperlink{structcontext}{context}}(c)\{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1chain_1_1apply__context_1_1generic__index_a4b2b3df3ef950b7103b785f66b66ff1f}\index{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$@{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$}!end\_secondary@{end\_secondary}}
+\index{end\_secondary@{end\_secondary}!sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$@{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$}}
+\doxysubsubsection{\texorpdfstring{end\_secondary()}{end\_secondary()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1apply__context_1_1generic__index_a4b2b3df3ef950b7103b785f66b66ff1f} 
+template$<$typename Object\+Type , typename Secondary\+Key\+Proxy  = typename std\+::add\+\_\+lvalue\+\_\+reference$<$typename Object\+Type\+::secondary\+\_\+key\+\_\+type$>$\+::type, typename Secondary\+Key\+Proxy\+Const  = typename std\+::add\+\_\+lvalue\+\_\+reference$<$                                                   typename std\+::add\+\_\+const$<$typename Object\+Type\+::secondary\+\_\+key\+\_\+type$>$\+::type$>$\+::type$>$ \\
+int \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index}{sysio\+::chain\+::apply\+\_\+context\+::generic\+\_\+index}}$<$ Object\+Type, Secondary\+Key\+Proxy, Secondary\+Key\+Proxy\+Const $>$\+::end\+\_\+secondary (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{code}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{scope}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{table}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{apply__context_8hpp_source_l00334}{334}} of file \mbox{\hyperlink{apply__context_8hpp_source}{apply\+\_\+context.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00334\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00335\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ tab\ =\ \mbox{\hyperlink{structcontext}{context}}.find\_table(\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(code),\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(scope),\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(table)\ );}
+\DoxyCodeLine{00336\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !tab\ )\ \textcolor{keywordflow}{return}\ -\/1;}
+\DoxyCodeLine{00337\ }
+\DoxyCodeLine{00338\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ itr\_cache.cache\_table(\ *tab\ );}
+\DoxyCodeLine{00339\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1apply__context_1_1generic__index_a66b28dae52a27292011575ca5ab3fa9c}\index{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$@{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$}!find\_primary@{find\_primary}}
+\index{find\_primary@{find\_primary}!sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$@{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$}}
+\doxysubsubsection{\texorpdfstring{find\_primary()}{find\_primary()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1apply__context_1_1generic__index_a66b28dae52a27292011575ca5ab3fa9c} 
+template$<$typename Object\+Type , typename Secondary\+Key\+Proxy  = typename std\+::add\+\_\+lvalue\+\_\+reference$<$typename Object\+Type\+::secondary\+\_\+key\+\_\+type$>$\+::type, typename Secondary\+Key\+Proxy\+Const  = typename std\+::add\+\_\+lvalue\+\_\+reference$<$                                                   typename std\+::add\+\_\+const$<$typename Object\+Type\+::secondary\+\_\+key\+\_\+type$>$\+::type$>$\+::type$>$ \\
+int \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index}{sysio\+::chain\+::apply\+\_\+context\+::generic\+\_\+index}}$<$ Object\+Type, Secondary\+Key\+Proxy, Secondary\+Key\+Proxy\+Const $>$\+::find\+\_\+primary (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{code}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{scope}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{table}{, }\item[{\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_acfa8f5772dddbaea038435d2136b8a5a}{secondary\+\_\+key\+\_\+proxy\+\_\+type}}}]{secondary}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{primary}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{apply__context_8hpp_source_l00388}{388}} of file \mbox{\hyperlink{apply__context_8hpp_source}{apply\+\_\+context.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00388\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00389\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ tab\ =\ \mbox{\hyperlink{structcontext}{context}}.find\_table(\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(code),\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(scope),\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(table)\ );}
+\DoxyCodeLine{00390\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !tab\ )\ \textcolor{keywordflow}{return}\ -\/1;}
+\DoxyCodeLine{00391\ }
+\DoxyCodeLine{00392\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ table\_end\_itr\ =\ itr\_cache.cache\_table(\ *tab\ );}
+\DoxyCodeLine{00393\ }
+\DoxyCodeLine{00394\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}*\ obj\ =\ \mbox{\hyperlink{structcontext}{context}}.db.find<ObjectType,\ by\_primary>(\ boost::make\_tuple(\ tab-\/>id,\ primary\ )\ );}
+\DoxyCodeLine{00395\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !obj\ )\ \textcolor{keywordflow}{return}\ table\_end\_itr;}
+\DoxyCodeLine{00396\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ secondary\_key\_helper\_t::get(secondary,\ obj-\/>secondary\_key);}
+\DoxyCodeLine{00397\ }
+\DoxyCodeLine{00398\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ itr\_cache.add(\ *obj\ );}
+\DoxyCodeLine{00399\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1apply__context_1_1generic__index_a72c9f02ac4c3097ead87a75a96fcf3bc}\index{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$@{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$}!find\_secondary@{find\_secondary}}
+\index{find\_secondary@{find\_secondary}!sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$@{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$}}
+\doxysubsubsection{\texorpdfstring{find\_secondary()}{find\_secondary()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1apply__context_1_1generic__index_a72c9f02ac4c3097ead87a75a96fcf3bc} 
+template$<$typename Object\+Type , typename Secondary\+Key\+Proxy  = typename std\+::add\+\_\+lvalue\+\_\+reference$<$typename Object\+Type\+::secondary\+\_\+key\+\_\+type$>$\+::type, typename Secondary\+Key\+Proxy\+Const  = typename std\+::add\+\_\+lvalue\+\_\+reference$<$                                                   typename std\+::add\+\_\+const$<$typename Object\+Type\+::secondary\+\_\+key\+\_\+type$>$\+::type$>$\+::type$>$ \\
+int \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index}{sysio\+::chain\+::apply\+\_\+context\+::generic\+\_\+index}}$<$ Object\+Type, Secondary\+Key\+Proxy, Secondary\+Key\+Proxy\+Const $>$\+::find\+\_\+secondary (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{code}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{scope}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{table}{, }\item[{\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_a8dd024499302ed645150802b342074e4}{secondary\+\_\+key\+\_\+proxy\+\_\+const\+\_\+type}}}]{secondary}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \&}]{primary}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{apply__context_8hpp_source_l00286}{286}} of file \mbox{\hyperlink{apply__context_8hpp_source}{apply\+\_\+context.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00286\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00287\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ tab\ =\ \mbox{\hyperlink{structcontext}{context}}.find\_table(\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(code),\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(scope),\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(table)\ );}
+\DoxyCodeLine{00288\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !tab\ )\ \textcolor{keywordflow}{return}\ -\/1;}
+\DoxyCodeLine{00289\ }
+\DoxyCodeLine{00290\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ table\_end\_itr\ =\ itr\_cache.cache\_table(\ *tab\ );}
+\DoxyCodeLine{00291\ }
+\DoxyCodeLine{00292\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}*\ obj\ =\ \mbox{\hyperlink{structcontext}{context}}.db.find<ObjectType,\ \mbox{\hyperlink{structby__secondary}{by\_secondary}}>(\ secondary\_key\_helper\_t::create\_tuple(\ *tab,\ secondary\ )\ );}
+\DoxyCodeLine{00293\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !obj\ )\ \textcolor{keywordflow}{return}\ table\_end\_itr;}
+\DoxyCodeLine{00294\ }
+\DoxyCodeLine{00295\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ primary\ =\ obj-\/>primary\_key;}
+\DoxyCodeLine{00296\ }
+\DoxyCodeLine{00297\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ itr\_cache.add(\ *obj\ );}
+\DoxyCodeLine{00298\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1apply__context_1_1generic__index_a05e187455e430f91ff29ac7ced8a6756}\index{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$@{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$}!get@{get}}
+\index{get@{get}!sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$@{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$}}
+\doxysubsubsection{\texorpdfstring{get()}{get()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1apply__context_1_1generic__index_a05e187455e430f91ff29ac7ced8a6756} 
+template$<$typename Object\+Type , typename Secondary\+Key\+Proxy  = typename std\+::add\+\_\+lvalue\+\_\+reference$<$typename Object\+Type\+::secondary\+\_\+key\+\_\+type$>$\+::type, typename Secondary\+Key\+Proxy\+Const  = typename std\+::add\+\_\+lvalue\+\_\+reference$<$                                                   typename std\+::add\+\_\+const$<$typename Object\+Type\+::secondary\+\_\+key\+\_\+type$>$\+::type$>$\+::type$>$ \\
+void \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index}{sysio\+::chain\+::apply\+\_\+context\+::generic\+\_\+index}}$<$ Object\+Type, Secondary\+Key\+Proxy, Secondary\+Key\+Proxy\+Const $>$\+::get (\begin{DoxyParamCaption}\item[{int}]{iterator}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \&}]{primary}{, }\item[{\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_acfa8f5772dddbaea038435d2136b8a5a}{secondary\+\_\+key\+\_\+proxy\+\_\+type}}}]{secondary}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{apply__context_8hpp_source_l00477}{477}} of file \mbox{\hyperlink{apply__context_8hpp_source}{apply\+\_\+context.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00477\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00478\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ obj\ =\ itr\_cache.get(\ iterator\ );}
+\DoxyCodeLine{00479\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ primary\ \ \ =\ obj.primary\_key;}
+\DoxyCodeLine{00480\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ secondary\_key\_helper\_t::get(secondary,\ obj.secondary\_key);}
+\DoxyCodeLine{00481\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1apply__context_1_1generic__index_a462e5ee835141095a5f68eed9ff2f5e6}\index{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$@{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$}!lowerbound\_primary@{lowerbound\_primary}}
+\index{lowerbound\_primary@{lowerbound\_primary}!sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$@{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$}}
+\doxysubsubsection{\texorpdfstring{lowerbound\_primary()}{lowerbound\_primary()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1apply__context_1_1generic__index_a462e5ee835141095a5f68eed9ff2f5e6} 
+template$<$typename Object\+Type , typename Secondary\+Key\+Proxy  = typename std\+::add\+\_\+lvalue\+\_\+reference$<$typename Object\+Type\+::secondary\+\_\+key\+\_\+type$>$\+::type, typename Secondary\+Key\+Proxy\+Const  = typename std\+::add\+\_\+lvalue\+\_\+reference$<$                                                   typename std\+::add\+\_\+const$<$typename Object\+Type\+::secondary\+\_\+key\+\_\+type$>$\+::type$>$\+::type$>$ \\
+int \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index}{sysio\+::chain\+::apply\+\_\+context\+::generic\+\_\+index}}$<$ Object\+Type, Secondary\+Key\+Proxy, Secondary\+Key\+Proxy\+Const $>$\+::lowerbound\+\_\+primary (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{code}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{scope}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{table}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{primary}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{apply__context_8hpp_source_l00401}{401}} of file \mbox{\hyperlink{apply__context_8hpp_source}{apply\+\_\+context.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00401\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00402\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ tab\ =\ \mbox{\hyperlink{structcontext}{context}}.find\_table(\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(code),\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(scope),\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(table)\ );}
+\DoxyCodeLine{00403\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!tab)\ \textcolor{keywordflow}{return}\ -\/1;}
+\DoxyCodeLine{00404\ }
+\DoxyCodeLine{00405\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ table\_end\_itr\ =\ itr\_cache.cache\_table(\ *tab\ );}
+\DoxyCodeLine{00406\ }
+\DoxyCodeLine{00407\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ =\ \mbox{\hyperlink{structcontext}{context}}.db.get\_index<\textcolor{keyword}{typename}\ \mbox{\hyperlink{structchainbase_1_1get__index__type}{chainbase::get\_index\_type<ObjectType>::type}},\ by\_primary>();}
+\DoxyCodeLine{00408\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.lower\_bound(boost::make\_tuple(tab-\/>id,\ primary));}
+\DoxyCodeLine{00409\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (itr\ ==\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.end())\ \textcolor{keywordflow}{return}\ table\_end\_itr;}
+\DoxyCodeLine{00410\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (itr-\/>t\_id\ !=\ tab-\/>id)\ \textcolor{keywordflow}{return}\ table\_end\_itr;}
+\DoxyCodeLine{00411\ }
+\DoxyCodeLine{00412\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ itr\_cache.add(*itr);}
+\DoxyCodeLine{00413\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1apply__context_1_1generic__index_a55bfe099c362c65dcfddf789ce7e0644}\index{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$@{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$}!lowerbound\_secondary@{lowerbound\_secondary}}
+\index{lowerbound\_secondary@{lowerbound\_secondary}!sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$@{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$}}
+\doxysubsubsection{\texorpdfstring{lowerbound\_secondary()}{lowerbound\_secondary()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1apply__context_1_1generic__index_a55bfe099c362c65dcfddf789ce7e0644} 
+template$<$typename Object\+Type , typename Secondary\+Key\+Proxy  = typename std\+::add\+\_\+lvalue\+\_\+reference$<$typename Object\+Type\+::secondary\+\_\+key\+\_\+type$>$\+::type, typename Secondary\+Key\+Proxy\+Const  = typename std\+::add\+\_\+lvalue\+\_\+reference$<$                                                   typename std\+::add\+\_\+const$<$typename Object\+Type\+::secondary\+\_\+key\+\_\+type$>$\+::type$>$\+::type$>$ \\
+int \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index}{sysio\+::chain\+::apply\+\_\+context\+::generic\+\_\+index}}$<$ Object\+Type, Secondary\+Key\+Proxy, Secondary\+Key\+Proxy\+Const $>$\+::lowerbound\+\_\+secondary (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{code}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{scope}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{table}{, }\item[{\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_acfa8f5772dddbaea038435d2136b8a5a}{secondary\+\_\+key\+\_\+proxy\+\_\+type}}}]{secondary}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \&}]{primary}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{apply__context_8hpp_source_l00300}{300}} of file \mbox{\hyperlink{apply__context_8hpp_source}{apply\+\_\+context.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00300\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00301\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ tab\ =\ \mbox{\hyperlink{structcontext}{context}}.find\_table(\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(code),\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(scope),\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(table)\ );}
+\DoxyCodeLine{00302\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !tab\ )\ \textcolor{keywordflow}{return}\ -\/1;}
+\DoxyCodeLine{00303\ }
+\DoxyCodeLine{00304\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ table\_end\_itr\ =\ itr\_cache.cache\_table(\ *tab\ );}
+\DoxyCodeLine{00305\ }
+\DoxyCodeLine{00306\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ =\ \mbox{\hyperlink{structcontext}{context}}.db.get\_index<\ \textcolor{keyword}{typename}\ \mbox{\hyperlink{structchainbase_1_1get__index__type}{chainbase::get\_index\_type<ObjectType>::type}},\ \mbox{\hyperlink{structby__secondary}{by\_secondary}}\ >();}
+\DoxyCodeLine{00307\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.lower\_bound(\ secondary\_key\_helper\_t::create\_tuple(\ *tab,\ secondary\ )\ );}
+\DoxyCodeLine{00308\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr\ ==\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.end()\ )\ \textcolor{keywordflow}{return}\ table\_end\_itr;}
+\DoxyCodeLine{00309\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr-\/>t\_id\ !=\ tab-\/>id\ )\ \textcolor{keywordflow}{return}\ table\_end\_itr;}
+\DoxyCodeLine{00310\ }
+\DoxyCodeLine{00311\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ primary\ =\ itr-\/>primary\_key;}
+\DoxyCodeLine{00312\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ secondary\_key\_helper\_t::get(secondary,\ itr-\/>secondary\_key);}
+\DoxyCodeLine{00313\ }
+\DoxyCodeLine{00314\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ itr\_cache.add(\ *itr\ );}
+\DoxyCodeLine{00315\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1apply__context_1_1generic__index_acb2637427c124b3956ff70ff38aec97d}\index{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$@{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$}!next\_primary@{next\_primary}}
+\index{next\_primary@{next\_primary}!sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$@{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$}}
+\doxysubsubsection{\texorpdfstring{next\_primary()}{next\_primary()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1apply__context_1_1generic__index_acb2637427c124b3956ff70ff38aec97d} 
+template$<$typename Object\+Type , typename Secondary\+Key\+Proxy  = typename std\+::add\+\_\+lvalue\+\_\+reference$<$typename Object\+Type\+::secondary\+\_\+key\+\_\+type$>$\+::type, typename Secondary\+Key\+Proxy\+Const  = typename std\+::add\+\_\+lvalue\+\_\+reference$<$                                                   typename std\+::add\+\_\+const$<$typename Object\+Type\+::secondary\+\_\+key\+\_\+type$>$\+::type$>$\+::type$>$ \\
+int \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index}{sysio\+::chain\+::apply\+\_\+context\+::generic\+\_\+index}}$<$ Object\+Type, Secondary\+Key\+Proxy, Secondary\+Key\+Proxy\+Const $>$\+::next\+\_\+primary (\begin{DoxyParamCaption}\item[{int}]{iterator}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \&}]{primary}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{apply__context_8hpp_source_l00430}{430}} of file \mbox{\hyperlink{apply__context_8hpp_source}{apply\+\_\+context.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00430\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00431\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ iterator\ <\ -\/1\ )\ \textcolor{keywordflow}{return}\ -\/1;\ \textcolor{comment}{//\ cannot\ increment\ past\ end\ iterator\ of\ table}}
+\DoxyCodeLine{00432\ }
+\DoxyCodeLine{00433\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ obj\ =\ itr\_cache.get(iterator);\ \textcolor{comment}{//\ Check\ for\ iterator\ !=\ -\/1\ happens\ in\ this\ call}}
+\DoxyCodeLine{00434\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ =\ \mbox{\hyperlink{structcontext}{context}}.db.get\_index<\textcolor{keyword}{typename}\ \mbox{\hyperlink{structchainbase_1_1get__index__type}{chainbase::get\_index\_type<ObjectType>::type}},\ by\_primary>();}
+\DoxyCodeLine{00435\ }
+\DoxyCodeLine{00436\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.iterator\_to(obj);}
+\DoxyCodeLine{00437\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++itr;}
+\DoxyCodeLine{00438\ }
+\DoxyCodeLine{00439\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr\ ==\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.end()\ ||\ itr-\/>t\_id\ !=\ obj.t\_id\ )\ \textcolor{keywordflow}{return}\ itr\_cache.get\_end\_iterator\_by\_table\_id(obj.t\_id);}
+\DoxyCodeLine{00440\ }
+\DoxyCodeLine{00441\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ primary\ =\ itr-\/>primary\_key;}
+\DoxyCodeLine{00442\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ itr\_cache.add(*itr);}
+\DoxyCodeLine{00443\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1apply__context_1_1generic__index_aea51e4cd9cd94d318f62ce672f59de39}\index{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$@{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$}!next\_secondary@{next\_secondary}}
+\index{next\_secondary@{next\_secondary}!sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$@{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$}}
+\doxysubsubsection{\texorpdfstring{next\_secondary()}{next\_secondary()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1apply__context_1_1generic__index_aea51e4cd9cd94d318f62ce672f59de39} 
+template$<$typename Object\+Type , typename Secondary\+Key\+Proxy  = typename std\+::add\+\_\+lvalue\+\_\+reference$<$typename Object\+Type\+::secondary\+\_\+key\+\_\+type$>$\+::type, typename Secondary\+Key\+Proxy\+Const  = typename std\+::add\+\_\+lvalue\+\_\+reference$<$                                                   typename std\+::add\+\_\+const$<$typename Object\+Type\+::secondary\+\_\+key\+\_\+type$>$\+::type$>$\+::type$>$ \\
+int \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index}{sysio\+::chain\+::apply\+\_\+context\+::generic\+\_\+index}}$<$ Object\+Type, Secondary\+Key\+Proxy, Secondary\+Key\+Proxy\+Const $>$\+::next\+\_\+secondary (\begin{DoxyParamCaption}\item[{int}]{iterator}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \&}]{primary}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{apply__context_8hpp_source_l00341}{341}} of file \mbox{\hyperlink{apply__context_8hpp_source}{apply\+\_\+context.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00341\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00342\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ iterator\ <\ -\/1\ )\ \textcolor{keywordflow}{return}\ -\/1;\ \textcolor{comment}{//\ cannot\ increment\ past\ end\ iterator\ of\ index}}
+\DoxyCodeLine{00343\ }
+\DoxyCodeLine{00344\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ obj\ =\ itr\_cache.get(iterator);\ \textcolor{comment}{//\ Check\ for\ iterator\ !=\ -\/1\ happens\ in\ this\ call}}
+\DoxyCodeLine{00345\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ =\ \mbox{\hyperlink{structcontext}{context}}.db.get\_index<\textcolor{keyword}{typename}\ \mbox{\hyperlink{structchainbase_1_1get__index__type}{chainbase::get\_index\_type<ObjectType>::type}},\ \mbox{\hyperlink{structby__secondary}{by\_secondary}}>();}
+\DoxyCodeLine{00346\ }
+\DoxyCodeLine{00347\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.iterator\_to(obj);}
+\DoxyCodeLine{00348\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++itr;}
+\DoxyCodeLine{00349\ }
+\DoxyCodeLine{00350\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr\ ==\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.end()\ ||\ itr-\/>t\_id\ !=\ obj.t\_id\ )\ \textcolor{keywordflow}{return}\ itr\_cache.get\_end\_iterator\_by\_table\_id(obj.t\_id);}
+\DoxyCodeLine{00351\ }
+\DoxyCodeLine{00352\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ primary\ =\ itr-\/>primary\_key;}
+\DoxyCodeLine{00353\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ itr\_cache.add(*itr);}
+\DoxyCodeLine{00354\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1apply__context_1_1generic__index_a58586003c8097053f5c0801813a5cfdd}\index{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$@{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$}!previous\_primary@{previous\_primary}}
+\index{previous\_primary@{previous\_primary}!sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$@{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$}}
+\doxysubsubsection{\texorpdfstring{previous\_primary()}{previous\_primary()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1apply__context_1_1generic__index_a58586003c8097053f5c0801813a5cfdd} 
+template$<$typename Object\+Type , typename Secondary\+Key\+Proxy  = typename std\+::add\+\_\+lvalue\+\_\+reference$<$typename Object\+Type\+::secondary\+\_\+key\+\_\+type$>$\+::type, typename Secondary\+Key\+Proxy\+Const  = typename std\+::add\+\_\+lvalue\+\_\+reference$<$                                                   typename std\+::add\+\_\+const$<$typename Object\+Type\+::secondary\+\_\+key\+\_\+type$>$\+::type$>$\+::type$>$ \\
+int \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index}{sysio\+::chain\+::apply\+\_\+context\+::generic\+\_\+index}}$<$ Object\+Type, Secondary\+Key\+Proxy, Secondary\+Key\+Proxy\+Const $>$\+::previous\+\_\+primary (\begin{DoxyParamCaption}\item[{int}]{iterator}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \&}]{primary}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{apply__context_8hpp_source_l00445}{445}} of file \mbox{\hyperlink{apply__context_8hpp_source}{apply\+\_\+context.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00445\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00446\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ =\ \mbox{\hyperlink{structcontext}{context}}.db.get\_index<\textcolor{keyword}{typename}\ \mbox{\hyperlink{structchainbase_1_1get__index__type}{chainbase::get\_index\_type<ObjectType>::type}},\ by\_primary>();}
+\DoxyCodeLine{00447\ }
+\DoxyCodeLine{00448\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ iterator\ <\ -\/1\ )\ \textcolor{comment}{//\ is\ end\ iterator}}
+\DoxyCodeLine{00449\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00450\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ tab\ =\ itr\_cache.find\_table\_by\_end\_iterator(iterator);}
+\DoxyCodeLine{00451\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ tab,\ invalid\_table\_iterator,\ \textcolor{stringliteral}{"{}not\ a\ valid\ end\ iterator"{}}\ );}
+\DoxyCodeLine{00452\ }
+\DoxyCodeLine{00453\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.upper\_bound(tab-\/>id);}
+\DoxyCodeLine{00454\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.begin()\ ==\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.end()\ ||\ itr\ ==\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.begin()\ )\ \textcolor{keywordflow}{return}\ -\/1;\ \textcolor{comment}{//\ Empty\ table}}
+\DoxyCodeLine{00455\ }
+\DoxyCodeLine{00456\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/-\/itr;}
+\DoxyCodeLine{00457\ }
+\DoxyCodeLine{00458\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr-\/>t\_id\ !=\ tab-\/>id\ )\ \textcolor{keywordflow}{return}\ -\/1;\ \textcolor{comment}{//\ Empty\ table}}
+\DoxyCodeLine{00459\ }
+\DoxyCodeLine{00460\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ primary\ =\ itr-\/>primary\_key;}
+\DoxyCodeLine{00461\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ itr\_cache.add(*itr);}
+\DoxyCodeLine{00462\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00463\ }
+\DoxyCodeLine{00464\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ obj\ =\ itr\_cache.get(iterator);\ \textcolor{comment}{//\ Check\ for\ iterator\ !=\ -\/1\ happens\ in\ this\ call}}
+\DoxyCodeLine{00465\ }
+\DoxyCodeLine{00466\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.iterator\_to(obj);}
+\DoxyCodeLine{00467\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr\ ==\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.begin()\ )\ \textcolor{keywordflow}{return}\ -\/1;\ \textcolor{comment}{//\ cannot\ decrement\ past\ beginning\ iterator\ of\ table}}
+\DoxyCodeLine{00468\ }
+\DoxyCodeLine{00469\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/-\/itr;}
+\DoxyCodeLine{00470\ }
+\DoxyCodeLine{00471\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr-\/>t\_id\ !=\ obj.t\_id\ )\ \textcolor{keywordflow}{return}\ -\/1;\ \textcolor{comment}{//\ cannot\ decrement\ past\ beginning\ iterator\ of\ index}}
+\DoxyCodeLine{00472\ }
+\DoxyCodeLine{00473\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ primary\ =\ itr-\/>primary\_key;}
+\DoxyCodeLine{00474\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ itr\_cache.add(*itr);}
+\DoxyCodeLine{00475\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1apply__context_1_1generic__index_a9a2c075e4dc356ff50a7997f15b46a9c}\index{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$@{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$}!previous\_secondary@{previous\_secondary}}
+\index{previous\_secondary@{previous\_secondary}!sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$@{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$}}
+\doxysubsubsection{\texorpdfstring{previous\_secondary()}{previous\_secondary()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1apply__context_1_1generic__index_a9a2c075e4dc356ff50a7997f15b46a9c} 
+template$<$typename Object\+Type , typename Secondary\+Key\+Proxy  = typename std\+::add\+\_\+lvalue\+\_\+reference$<$typename Object\+Type\+::secondary\+\_\+key\+\_\+type$>$\+::type, typename Secondary\+Key\+Proxy\+Const  = typename std\+::add\+\_\+lvalue\+\_\+reference$<$                                                   typename std\+::add\+\_\+const$<$typename Object\+Type\+::secondary\+\_\+key\+\_\+type$>$\+::type$>$\+::type$>$ \\
+int \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index}{sysio\+::chain\+::apply\+\_\+context\+::generic\+\_\+index}}$<$ Object\+Type, Secondary\+Key\+Proxy, Secondary\+Key\+Proxy\+Const $>$\+::previous\+\_\+secondary (\begin{DoxyParamCaption}\item[{int}]{iterator}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \&}]{primary}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{apply__context_8hpp_source_l00356}{356}} of file \mbox{\hyperlink{apply__context_8hpp_source}{apply\+\_\+context.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00356\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00357\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ =\ \mbox{\hyperlink{structcontext}{context}}.db.get\_index<\textcolor{keyword}{typename}\ \mbox{\hyperlink{structchainbase_1_1get__index__type}{chainbase::get\_index\_type<ObjectType>::type}},\ \mbox{\hyperlink{structby__secondary}{by\_secondary}}>();}
+\DoxyCodeLine{00358\ }
+\DoxyCodeLine{00359\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ iterator\ <\ -\/1\ )\ \textcolor{comment}{//\ is\ end\ iterator}}
+\DoxyCodeLine{00360\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00361\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ tab\ =\ itr\_cache.find\_table\_by\_end\_iterator(iterator);}
+\DoxyCodeLine{00362\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ tab,\ invalid\_table\_iterator,\ \textcolor{stringliteral}{"{}not\ a\ valid\ end\ iterator"{}}\ );}
+\DoxyCodeLine{00363\ }
+\DoxyCodeLine{00364\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.upper\_bound(tab-\/>id);}
+\DoxyCodeLine{00365\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.begin()\ ==\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.end()\ ||\ itr\ ==\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.begin()\ )\ \textcolor{keywordflow}{return}\ -\/1;\ \textcolor{comment}{//\ Empty\ index}}
+\DoxyCodeLine{00366\ }
+\DoxyCodeLine{00367\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/-\/itr;}
+\DoxyCodeLine{00368\ }
+\DoxyCodeLine{00369\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr-\/>t\_id\ !=\ tab-\/>id\ )\ \textcolor{keywordflow}{return}\ -\/1;\ \textcolor{comment}{//\ Empty\ index}}
+\DoxyCodeLine{00370\ }
+\DoxyCodeLine{00371\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ primary\ =\ itr-\/>primary\_key;}
+\DoxyCodeLine{00372\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ itr\_cache.add(*itr);}
+\DoxyCodeLine{00373\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00374\ }
+\DoxyCodeLine{00375\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ obj\ =\ itr\_cache.get(iterator);\ \textcolor{comment}{//\ Check\ for\ iterator\ !=\ -\/1\ happens\ in\ this\ call}}
+\DoxyCodeLine{00376\ }
+\DoxyCodeLine{00377\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.iterator\_to(obj);}
+\DoxyCodeLine{00378\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr\ ==\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.begin()\ )\ \textcolor{keywordflow}{return}\ -\/1;\ \textcolor{comment}{//\ cannot\ decrement\ past\ beginning\ iterator\ of\ index}}
+\DoxyCodeLine{00379\ }
+\DoxyCodeLine{00380\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/-\/itr;}
+\DoxyCodeLine{00381\ }
+\DoxyCodeLine{00382\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr-\/>t\_id\ !=\ obj.t\_id\ )\ \textcolor{keywordflow}{return}\ -\/1;\ \textcolor{comment}{//\ cannot\ decrement\ past\ beginning\ iterator\ of\ index}}
+\DoxyCodeLine{00383\ }
+\DoxyCodeLine{00384\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ primary\ =\ itr-\/>primary\_key;}
+\DoxyCodeLine{00385\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ itr\_cache.add(*itr);}
+\DoxyCodeLine{00386\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1apply__context_1_1generic__index_afde92a06e6e55e639af34a78497fdde0}\index{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$@{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$}!remove@{remove}}
+\index{remove@{remove}!sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$@{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$}}
+\doxysubsubsection{\texorpdfstring{remove()}{remove()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1apply__context_1_1generic__index_afde92a06e6e55e639af34a78497fdde0} 
+template$<$typename Object\+Type , typename Secondary\+Key\+Proxy  = typename std\+::add\+\_\+lvalue\+\_\+reference$<$typename Object\+Type\+::secondary\+\_\+key\+\_\+type$>$\+::type, typename Secondary\+Key\+Proxy\+Const  = typename std\+::add\+\_\+lvalue\+\_\+reference$<$                                                   typename std\+::add\+\_\+const$<$typename Object\+Type\+::secondary\+\_\+key\+\_\+type$>$\+::type$>$\+::type$>$ \\
+void \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index}{sysio\+::chain\+::apply\+\_\+context\+::generic\+\_\+index}}$<$ Object\+Type, Secondary\+Key\+Proxy, Secondary\+Key\+Proxy\+Const $>$\+::remove (\begin{DoxyParamCaption}\item[{int}]{iterator}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{apply__context_8hpp_source_l00213}{213}} of file \mbox{\hyperlink{apply__context_8hpp_source}{apply\+\_\+context.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ obj\ =\ itr\_cache.get(\ iterator\ );}
+\DoxyCodeLine{00215\ }
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ table\_obj\ =\ itr\_cache.get\_table(\ obj.t\_id\ );}
+\DoxyCodeLine{00217\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ table\_obj.code\ ==\ \mbox{\hyperlink{structcontext}{context}}.receiver,\ table\_access\_violation,\ \textcolor{stringliteral}{"{}db\ access\ violation"{}}\ );}
+\DoxyCodeLine{00218\ }
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{auto}\ dm\_logger\ =\ \mbox{\hyperlink{structcontext}{context}}.control.get\_deep\_mind\_logger())\ \{}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ event\_id\ =\ \mbox{\hyperlink{deep__mind_8hpp_aaaa2f1dbd522de03ccbaa73f01db5f50}{RAM\_EVENT\_ID}}(\textcolor{stringliteral}{"{}\$\{code\}:\$\{scope\}:\$\{table\}:\$\{index\_name\}"{}},}
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}code"{}},\ table\_obj.code)}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}scope"{}},\ table\_obj.scope)}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}table"{}},\ table\_obj.table)}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}index\_name"{}},\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(obj.primary\_key))}
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00226\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ dm\_logger-\/>on\_ram\_trace(std::move(event\_id),\ \textcolor{stringliteral}{"{}secondary\_index"{}},\ \textcolor{stringliteral}{"{}remove"{}},\ \textcolor{stringliteral}{"{}secondary\_index\_remove"{}});}
+\DoxyCodeLine{00227\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00228\ }
+\DoxyCodeLine{00229\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structcontext}{context}}.update\_db\_usage(\ obj.payer,\ -\/(\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a2772c77657b1f6fda680bbe8f7282d13}{config::billable\_size\_v<ObjectType>}}\ )\ );}
+\DoxyCodeLine{00230\ }
+\DoxyCodeLine{00231\ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ context.require\_write\_lock(\ table\_obj.scope\ );}}
+\DoxyCodeLine{00232\ }
+\DoxyCodeLine{00233\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structcontext}{context}}.db.modify(\ table\_obj,\ [\&](\ \textcolor{keyword}{auto}\&\ t\ )\ \{}
+\DoxyCodeLine{00234\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/-\/t.count;}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structcontext}{context}}.db.remove(\ obj\ );}
+\DoxyCodeLine{00237\ }
+\DoxyCodeLine{00238\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (table\_obj.count\ ==\ 0)\ \{}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structcontext}{context}}.remove\_table(table\_obj);}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00241\ }
+\DoxyCodeLine{00242\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ itr\_cache.remove(\ iterator\ );}
+\DoxyCodeLine{00243\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1apply__context_1_1generic__index_ae7d0c1a61f88980193ccd274271c8c0c}\index{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$@{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$}!store@{store}}
+\index{store@{store}!sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$@{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$}}
+\doxysubsubsection{\texorpdfstring{store()}{store()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1apply__context_1_1generic__index_ae7d0c1a61f88980193ccd274271c8c0c} 
+template$<$typename Object\+Type , typename Secondary\+Key\+Proxy  = typename std\+::add\+\_\+lvalue\+\_\+reference$<$typename Object\+Type\+::secondary\+\_\+key\+\_\+type$>$\+::type, typename Secondary\+Key\+Proxy\+Const  = typename std\+::add\+\_\+lvalue\+\_\+reference$<$                                                   typename std\+::add\+\_\+const$<$typename Object\+Type\+::secondary\+\_\+key\+\_\+type$>$\+::type$>$\+::type$>$ \\
+int \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index}{sysio\+::chain\+::apply\+\_\+context\+::generic\+\_\+index}}$<$ Object\+Type, Secondary\+Key\+Proxy, Secondary\+Key\+Proxy\+Const $>$\+::store (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{scope}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{table}{, }\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} \&}]{payer}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{id}{, }\item[{\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_a8dd024499302ed645150802b342074e4}{secondary\+\_\+key\+\_\+proxy\+\_\+const\+\_\+type}}}]{value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{apply__context_8hpp_source_l00177}{177}} of file \mbox{\hyperlink{apply__context_8hpp_source}{apply\+\_\+context.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ payer\ !=\ \mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\_name}}(),\ invalid\_table\_payer,\ \textcolor{stringliteral}{"{}must\ specify\ a\ valid\ account\ to\ pay\ for\ new\ record"{}}\ );}
+\DoxyCodeLine{00181\ }
+\DoxyCodeLine{00182\ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ context.require\_write\_lock(\ scope\ );}}
+\DoxyCodeLine{00183\ }
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ tab\ =\ \mbox{\hyperlink{structcontext}{context}}.find\_or\_create\_table(\ \mbox{\hyperlink{structcontext}{context}}.receiver,\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(scope),\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(table),\ payer\ );}
+\DoxyCodeLine{00185\ }
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ obj\ =\ \mbox{\hyperlink{structcontext}{context}}.db.create<ObjectType>(\ [\&](\ \textcolor{keyword}{auto}\&\ o\ )\{}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ o.t\_id\ \ \ \ \ \ \ \ \ \ =\ tab.id;}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ o.primary\_key\ \ \ =\ \mbox{\hyperlink{code__cache_8cpp_aa0efefe21f4700d78692edc823e763be}{id}};}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ secondary\_key\_helper\_t::set(o.secondary\_key,\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}});}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ o.payer\ \ \ \ \ \ \ \ \ =\ payer;}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00192\ }
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structcontext}{context}}.db.modify(\ tab,\ [\&](\ \textcolor{keyword}{auto}\&\ t\ )\ \{}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++t.count;}
+\DoxyCodeLine{00195\ }
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{auto}\ dm\_logger\ =\ \mbox{\hyperlink{structcontext}{context}}.control.get\_deep\_mind\_logger())\ \{}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ event\_id\ =\ \mbox{\hyperlink{deep__mind_8hpp_aaaa2f1dbd522de03ccbaa73f01db5f50}{RAM\_EVENT\_ID}}(\textcolor{stringliteral}{"{}\$\{code\}:\$\{scope\}:\$\{table\}:\$\{index\_name\}"{}},}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}code"{}},\ t.code)}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}scope"{}},\ t.scope)}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}table"{}},\ t.table)}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}index\_name"{}},\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(\textcolor{keywordtype}{id}))}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ dm\_logger-\/>on\_ram\_trace(std::move(event\_id),\ \textcolor{stringliteral}{"{}secondary\_index"{}},\ \textcolor{stringliteral}{"{}add"{}},\ \textcolor{stringliteral}{"{}secondary\_index\_add"{}});}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00206\ }
+\DoxyCodeLine{00207\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structcontext}{context}}.update\_db\_usage(\ payer,\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a2772c77657b1f6fda680bbe8f7282d13}{config::billable\_size\_v<ObjectType>}}\ );}
+\DoxyCodeLine{00208\ }
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ itr\_cache.cache\_table(\ tab\ );}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ itr\_cache.add(\ obj\ );}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1apply__context_1_1generic__index_a12898aaf953c5e776be5ec4e5aa553aa}\index{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$@{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$}!update@{update}}
+\index{update@{update}!sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$@{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$}}
+\doxysubsubsection{\texorpdfstring{update()}{update()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1apply__context_1_1generic__index_a12898aaf953c5e776be5ec4e5aa553aa} 
+template$<$typename Object\+Type , typename Secondary\+Key\+Proxy  = typename std\+::add\+\_\+lvalue\+\_\+reference$<$typename Object\+Type\+::secondary\+\_\+key\+\_\+type$>$\+::type, typename Secondary\+Key\+Proxy\+Const  = typename std\+::add\+\_\+lvalue\+\_\+reference$<$                                                   typename std\+::add\+\_\+const$<$typename Object\+Type\+::secondary\+\_\+key\+\_\+type$>$\+::type$>$\+::type$>$ \\
+void \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index}{sysio\+::chain\+::apply\+\_\+context\+::generic\+\_\+index}}$<$ Object\+Type, Secondary\+Key\+Proxy, Secondary\+Key\+Proxy\+Const $>$\+::update (\begin{DoxyParamCaption}\item[{int}]{iterator}{, }\item[{\mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}}}]{payer}{, }\item[{\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_a8dd024499302ed645150802b342074e4}{secondary\+\_\+key\+\_\+proxy\+\_\+const\+\_\+type}}}]{secondary}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{apply__context_8hpp_source_l00245}{245}} of file \mbox{\hyperlink{apply__context_8hpp_source}{apply\+\_\+context.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00245\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00246\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ obj\ =\ itr\_cache.get(\ iterator\ );}
+\DoxyCodeLine{00247\ }
+\DoxyCodeLine{00248\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ table\_obj\ =\ itr\_cache.get\_table(\ obj.t\_id\ );}
+\DoxyCodeLine{00249\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ table\_obj.code\ ==\ \mbox{\hyperlink{structcontext}{context}}.receiver,\ table\_access\_violation,\ \textcolor{stringliteral}{"{}db\ access\ violation"{}}\ );}
+\DoxyCodeLine{00250\ }
+\DoxyCodeLine{00251\ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ context.require\_write\_lock(\ table\_obj.scope\ );}}
+\DoxyCodeLine{00252\ }
+\DoxyCodeLine{00253\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ payer\ ==\ \mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\_name}}()\ )\ payer\ =\ obj.payer;}
+\DoxyCodeLine{00254\ }
+\DoxyCodeLine{00255\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ billing\_size\ =\ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a2772c77657b1f6fda680bbe8f7282d13}{config::billable\_size\_v<ObjectType>}};}
+\DoxyCodeLine{00256\ }
+\DoxyCodeLine{00257\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ event\_id;}
+\DoxyCodeLine{00258\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structcontext}{context}}.control.get\_deep\_mind\_logger()\ !=\ \textcolor{keyword}{nullptr})\ \{}
+\DoxyCodeLine{00259\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ event\_id\ =\ \mbox{\hyperlink{deep__mind_8hpp_aaaa2f1dbd522de03ccbaa73f01db5f50}{RAM\_EVENT\_ID}}(\textcolor{stringliteral}{"{}\$\{code\}:\$\{scope\}:\$\{table\}:\$\{index\_name\}"{}},}
+\DoxyCodeLine{00260\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}code"{}},\ table\_obj.code)}
+\DoxyCodeLine{00261\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}scope"{}},\ table\_obj.scope)}
+\DoxyCodeLine{00262\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}table"{}},\ table\_obj.table)}
+\DoxyCodeLine{00263\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}index\_name"{}},\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(obj.primary\_key))}
+\DoxyCodeLine{00264\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00265\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00266\ }
+\DoxyCodeLine{00267\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ obj.payer\ !=\ payer\ )\ \{}
+\DoxyCodeLine{00268\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{auto}\ dm\_logger\ =\ \mbox{\hyperlink{structcontext}{context}}.control.get\_deep\_mind\_logger())}
+\DoxyCodeLine{00269\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00270\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ dm\_logger-\/>on\_ram\_trace(std::string(event\_id),\ \textcolor{stringliteral}{"{}secondary\_index"{}},\ \textcolor{stringliteral}{"{}remove"{}},\ \textcolor{stringliteral}{"{}secondary\_index\_remove"{}});}
+\DoxyCodeLine{00271\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00272\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structcontext}{context}}.update\_db\_usage(\ obj.payer,\ -\/(billing\_size)\ );}
+\DoxyCodeLine{00273\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{auto}\ dm\_logger\ =\ \mbox{\hyperlink{structcontext}{context}}.control.get\_deep\_mind\_logger())}
+\DoxyCodeLine{00274\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00275\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ dm\_logger-\/>on\_ram\_trace(std::move(event\_id),\ \textcolor{stringliteral}{"{}secondary\_index"{}},\ \textcolor{stringliteral}{"{}add"{}},\ \textcolor{stringliteral}{"{}secondary\_index\_update\_add\_new\_payer"{}});}
+\DoxyCodeLine{00276\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00277\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structcontext}{context}}.update\_db\_usage(\ payer,\ +(billing\_size)\ );}
+\DoxyCodeLine{00278\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00279\ }
+\DoxyCodeLine{00280\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structcontext}{context}}.db.modify(\ obj,\ [\&](\ \textcolor{keyword}{auto}\&\ o\ )\ \{}
+\DoxyCodeLine{00281\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ secondary\_key\_helper\_t::set(o.secondary\_key,\ secondary);}
+\DoxyCodeLine{00282\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ o.payer\ =\ payer;}
+\DoxyCodeLine{00283\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00284\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1apply__context_1_1generic__index_a6ff8f70b48656eaadfafea194a11602e}\index{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$@{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$}!upperbound\_primary@{upperbound\_primary}}
+\index{upperbound\_primary@{upperbound\_primary}!sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$@{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$}}
+\doxysubsubsection{\texorpdfstring{upperbound\_primary()}{upperbound\_primary()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1apply__context_1_1generic__index_a6ff8f70b48656eaadfafea194a11602e} 
+template$<$typename Object\+Type , typename Secondary\+Key\+Proxy  = typename std\+::add\+\_\+lvalue\+\_\+reference$<$typename Object\+Type\+::secondary\+\_\+key\+\_\+type$>$\+::type, typename Secondary\+Key\+Proxy\+Const  = typename std\+::add\+\_\+lvalue\+\_\+reference$<$                                                   typename std\+::add\+\_\+const$<$typename Object\+Type\+::secondary\+\_\+key\+\_\+type$>$\+::type$>$\+::type$>$ \\
+int \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index}{sysio\+::chain\+::apply\+\_\+context\+::generic\+\_\+index}}$<$ Object\+Type, Secondary\+Key\+Proxy, Secondary\+Key\+Proxy\+Const $>$\+::upperbound\+\_\+primary (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{code}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{scope}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{table}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{primary}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{apply__context_8hpp_source_l00415}{415}} of file \mbox{\hyperlink{apply__context_8hpp_source}{apply\+\_\+context.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00415\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00416\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ tab\ =\ \mbox{\hyperlink{structcontext}{context}}.find\_table(\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(code),\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(scope),\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(table)\ );}
+\DoxyCodeLine{00417\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ !tab\ )\ \textcolor{keywordflow}{return}\ -\/1;}
+\DoxyCodeLine{00418\ }
+\DoxyCodeLine{00419\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ table\_end\_itr\ =\ itr\_cache.cache\_table(\ *tab\ );}
+\DoxyCodeLine{00420\ }
+\DoxyCodeLine{00421\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ =\ \mbox{\hyperlink{structcontext}{context}}.db.get\_index<\textcolor{keyword}{typename}\ \mbox{\hyperlink{structchainbase_1_1get__index__type}{chainbase::get\_index\_type<ObjectType>::type}},\ by\_primary>();}
+\DoxyCodeLine{00422\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.upper\_bound(boost::make\_tuple(tab-\/>id,\ primary));}
+\DoxyCodeLine{00423\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (itr\ ==\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.end())\ \textcolor{keywordflow}{return}\ table\_end\_itr;}
+\DoxyCodeLine{00424\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (itr-\/>t\_id\ !=\ tab-\/>id)\ \textcolor{keywordflow}{return}\ table\_end\_itr;}
+\DoxyCodeLine{00425\ }
+\DoxyCodeLine{00426\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ itr\_cache.cache\_table(*tab);}
+\DoxyCodeLine{00427\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ itr\_cache.add(*itr);}
+\DoxyCodeLine{00428\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1apply__context_1_1generic__index_a40c918a736dea9e083eeb8555bbbb38c}\index{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$@{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$}!upperbound\_secondary@{upperbound\_secondary}}
+\index{upperbound\_secondary@{upperbound\_secondary}!sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$@{sysio::chain::apply\_context::generic\_index$<$ ObjectType, SecondaryKeyProxy, SecondaryKeyProxyConst $>$}}
+\doxysubsubsection{\texorpdfstring{upperbound\_secondary()}{upperbound\_secondary()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1apply__context_1_1generic__index_a40c918a736dea9e083eeb8555bbbb38c} 
+template$<$typename Object\+Type , typename Secondary\+Key\+Proxy  = typename std\+::add\+\_\+lvalue\+\_\+reference$<$typename Object\+Type\+::secondary\+\_\+key\+\_\+type$>$\+::type, typename Secondary\+Key\+Proxy\+Const  = typename std\+::add\+\_\+lvalue\+\_\+reference$<$                                                   typename std\+::add\+\_\+const$<$typename Object\+Type\+::secondary\+\_\+key\+\_\+type$>$\+::type$>$\+::type$>$ \\
+int \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index}{sysio\+::chain\+::apply\+\_\+context\+::generic\+\_\+index}}$<$ Object\+Type, Secondary\+Key\+Proxy, Secondary\+Key\+Proxy\+Const $>$\+::upperbound\+\_\+secondary (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{code}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{scope}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{table}{, }\item[{\mbox{\hyperlink{classsysio_1_1chain_1_1apply__context_1_1generic__index_acfa8f5772dddbaea038435d2136b8a5a}{secondary\+\_\+key\+\_\+proxy\+\_\+type}}}]{secondary}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \&}]{primary}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{apply__context_8hpp_source_l00317}{317}} of file \mbox{\hyperlink{apply__context_8hpp_source}{apply\+\_\+context.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00317\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00318\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ tab\ =\ \mbox{\hyperlink{structcontext}{context}}.find\_table(\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(code),\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(scope),\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(table)\ );}
+\DoxyCodeLine{00319\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !tab\ )\ \textcolor{keywordflow}{return}\ -\/1;}
+\DoxyCodeLine{00320\ }
+\DoxyCodeLine{00321\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ table\_end\_itr\ =\ itr\_cache.cache\_table(\ *tab\ );}
+\DoxyCodeLine{00322\ }
+\DoxyCodeLine{00323\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ =\ \mbox{\hyperlink{structcontext}{context}}.db.get\_index<\ \textcolor{keyword}{typename}\ \mbox{\hyperlink{structchainbase_1_1get__index__type}{chainbase::get\_index\_type<ObjectType>::type}},\ \mbox{\hyperlink{structby__secondary}{by\_secondary}}\ >();}
+\DoxyCodeLine{00324\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.upper\_bound(\ secondary\_key\_helper\_t::create\_tuple(\ *tab,\ secondary\ )\ );}
+\DoxyCodeLine{00325\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr\ ==\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.end()\ )\ \textcolor{keywordflow}{return}\ table\_end\_itr;}
+\DoxyCodeLine{00326\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr-\/>t\_id\ !=\ tab-\/>id\ )\ \textcolor{keywordflow}{return}\ table\_end\_itr;}
+\DoxyCodeLine{00327\ }
+\DoxyCodeLine{00328\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ primary\ =\ itr-\/>primary\_key;}
+\DoxyCodeLine{00329\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ secondary\_key\_helper\_t::get(secondary,\ itr-\/>secondary\_key);}
+\DoxyCodeLine{00330\ }
+\DoxyCodeLine{00331\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ itr\_cache.add(\ *itr\ );}
+\DoxyCodeLine{00332\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{apply__context_8hpp}{apply\+\_\+context.\+hpp}}\end{DoxyCompactItemize}

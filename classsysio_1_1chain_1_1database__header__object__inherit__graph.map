@@ -1,0 +1,5 @@
+<map id="sysio::chain::database_header_object" name="sysio::chain::database_header_object">
+<area shape="rect" id="Node000001" title="tracks the version of the application data stored in the database" alt="" coords="12,124,165,165"/>
+<area shape="rect" id="Node000002" href="$structchainbase_1_1object.html" title=" " alt="" coords="5,5,172,76"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="91,91,91,124,86,124,86,91"/>
+</map>

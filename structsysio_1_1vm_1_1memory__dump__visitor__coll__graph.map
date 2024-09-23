@@ -1,0 +1,7 @@
+<map id="sysio::vm::memory_dump_visitor&lt; Stream &gt;" name="sysio::vm::memory_dump_visitor&lt; Stream &gt;">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,94,178,135"/>
+<area shape="rect" id="Node000002" href="$classrapidjson_1_1_stream.html" title="Concept for reading and writing characters." alt="" coords="18,5,82,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="56,46,63,69,77,92,73,95,58,71,51,47"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="106,5,162,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="125,46,103,95,98,92,120,44"/>
+</map>

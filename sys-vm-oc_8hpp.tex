@@ -1,0 +1,109 @@
+\doxysection{libraries/chain/include/sysio/chain/webassembly/sys-\/vm-\/oc.hpp File Reference}
+\hypertarget{sys-vm-oc_8hpp}{}\label{sys-vm-oc_8hpp}\index{libraries/chain/include/sysio/chain/webassembly/sys-\/vm-\/oc.hpp@{libraries/chain/include/sysio/chain/webassembly/sys-\/vm-\/oc.hpp}}
+{\ttfamily \#include $<$sysio/chain/webassembly/common.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/exceptions.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/webassembly/runtime\+\_\+interface.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/apply\+\_\+context.\+hpp$>$}\newline
+{\ttfamily \#include $<$softfloat.\+hpp$>$}\newline
+{\ttfamily \#include "{}IR/\+Types.\+h"{}}\newline
+{\ttfamily \#include $<$sysio/chain/webassembly/sys-\/vm-\/oc/sys-\/vm-\/oc.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/webassembly/sys-\/vm-\/oc/memory.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/webassembly/sys-\/vm-\/oc/executor.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/webassembly/sys-\/vm-\/oc/code\+\_\+cache.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/webassembly/sys-\/vm-\/oc/config.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/webassembly/sys-\/vm-\/oc/intrinsic.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/hana/string.\+hpp$>$}\newline
+Include dependency graph for sys-\/vm-\/oc.hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sys-vm-oc_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=219pt]{sys-vm-oc_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1eosvmoc_1_1eosvmoc__runtime}{sysio\+::chain\+::webassembly\+::eosvmoc\+::eosvmoc\+\_\+runtime}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1webassembly_1_1eosvmoc_1_1wasm__to__value__type_3_01_f32_01_4}{sysio\+::chain\+::webassembly\+::eosvmoc\+::wasm\+\_\+to\+\_\+value\+\_\+type$<$ F32 $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1webassembly_1_1eosvmoc_1_1wasm__to__value__type_3_01_f64_01_4}{sysio\+::chain\+::webassembly\+::eosvmoc\+::wasm\+\_\+to\+\_\+value\+\_\+type$<$ F64 $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1webassembly_1_1eosvmoc_1_1wasm__to__value__type_3_01_u32_01_4}{sysio\+::chain\+::webassembly\+::eosvmoc\+::wasm\+\_\+to\+\_\+value\+\_\+type$<$ U32 $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1webassembly_1_1eosvmoc_1_1wasm__to__value__type_3_01_u64_01_4}{sysio\+::chain\+::webassembly\+::eosvmoc\+::wasm\+\_\+to\+\_\+value\+\_\+type$<$ U64 $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1webassembly_1_1eosvmoc_1_1wasm__to__rvalue__type_3_01_f32_01_4}{sysio\+::chain\+::webassembly\+::eosvmoc\+::wasm\+\_\+to\+\_\+rvalue\+\_\+type$<$ F32 $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1webassembly_1_1eosvmoc_1_1wasm__to__rvalue__type_3_01_f64_01_4}{sysio\+::chain\+::webassembly\+::eosvmoc\+::wasm\+\_\+to\+\_\+rvalue\+\_\+type$<$ F64 $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1webassembly_1_1eosvmoc_1_1wasm__to__rvalue__type_3_01_u32_01_4}{sysio\+::chain\+::webassembly\+::eosvmoc\+::wasm\+\_\+to\+\_\+rvalue\+\_\+type$<$ U32 $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1webassembly_1_1eosvmoc_1_1wasm__to__rvalue__type_3_01_u64_01_4}{sysio\+::chain\+::webassembly\+::eosvmoc\+::wasm\+\_\+to\+\_\+rvalue\+\_\+type$<$ U64 $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1webassembly_1_1eosvmoc_1_1wasm__to__rvalue__type_3_01void_01_4}{sysio\+::chain\+::webassembly\+::eosvmoc\+::wasm\+\_\+to\+\_\+rvalue\+\_\+type$<$ void $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1webassembly_1_1eosvmoc_1_1wasm__function__type__provider_3_01_ret_07_args_8_8_8_08_4}{sysio\+::chain\+::webassembly\+::eosvmoc\+::wasm\+\_\+function\+\_\+type\+\_\+provider$<$ Ret(\+Args...)$>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1webassembly_1_1eosvmoc_1_1eos__vm__oc__execution__interface}{sysio\+::chain\+::webassembly\+::eosvmoc\+::eos\+\_\+vm\+\_\+oc\+\_\+execution\+\_\+interface}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1webassembly_1_1eosvmoc_1_1eos__vm__oc__type__converter}{sysio\+::chain\+::webassembly\+::eosvmoc\+::eos\+\_\+vm\+\_\+oc\+\_\+type\+\_\+converter}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1webassembly_1_1eosvmoc_1_1result__resolver}{sysio\+::chain\+::webassembly\+::eosvmoc\+::result\+\_\+resolver}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain}{sysio\+::chain}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly}{sysio\+::chain\+::webassembly}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_1_1eosvmoc}{sysio\+::chain\+::webassembly\+::eosvmoc}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_1_1eosvmoc_a05746249c324341be2376504575272f7}{sysio\+::chain\+::webassembly\+::eosvmoc\+::array\+\_\+ptr\+\_\+impl}} (size\+\_\+t ptr, size\+\_\+t length)
+\item 
+char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_1_1eosvmoc_a1dc44fc53ea710b8b11620421b8a3b40}{sysio\+::chain\+::webassembly\+::eosvmoc\+::null\+\_\+terminated\+\_\+ptr\+\_\+impl}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} ptr)
+\item 
+auto \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_1_1eosvmoc_a99a524ede89622eb18829e2c730a1ade}{sysio\+::chain\+::webassembly\+::eosvmoc\+::convert\+\_\+native\+\_\+to\+\_\+wasm}} (char \texorpdfstring{$\ast$}{*}ptr)
+\item 
+{\footnotesize template$<$typename Args , std\+::size\+\_\+t... Is$>$ }\\auto \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_1_1eosvmoc_a4eac6dba434ae4fbd77147eaefe0277d}{sysio\+::chain\+::webassembly\+::eosvmoc\+::get\+\_\+ct\+\_\+args}} (std\+::index\+\_\+sequence$<$ Is... $>$)
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_1_1eosvmoc_a173af606cebafad2119528b533f21ced}{sysio\+::chain\+::webassembly\+::eosvmoc\+::make\+\_\+native\+\_\+type}} (vm\+::i32\+\_\+const\+\_\+t x)
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_1_1eosvmoc_ad84430999ebaa41e9114169a6087af19}{sysio\+::chain\+::webassembly\+::eosvmoc\+::make\+\_\+native\+\_\+type}} (vm\+::i64\+\_\+const\+\_\+t x)
+\item 
+float \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_1_1eosvmoc_a4e407acfc844cb64a3e09a6ad25a2e85}{sysio\+::chain\+::webassembly\+::eosvmoc\+::make\+\_\+native\+\_\+type}} (vm\+::f32\+\_\+const\+\_\+t x)
+\item 
+double \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_1_1eosvmoc_abe810969c793b830fae20ccfb448080b}{sysio\+::chain\+::webassembly\+::eosvmoc\+::make\+\_\+native\+\_\+type}} (vm\+::f64\+\_\+const\+\_\+t x)
+\item 
+{\footnotesize template$<$typename TC , typename Args , std\+::size\+\_\+t... Is$>$ }\\auto \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_1_1eosvmoc_ae347ac30020feebc0cb0452d6ecf5164}{sysio\+::chain\+::webassembly\+::eosvmoc\+::get\+\_\+ct\+\_\+args\+\_\+one}} (std\+::index\+\_\+sequence$<$ Is... $>$)
+\item 
+{\footnotesize template$<$typename TC , typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\auto \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_1_1eosvmoc_a7a50104e9dfcb83cb52d823a079b4bee}{sysio\+::chain\+::webassembly\+::eosvmoc\+::get\+\_\+ct\+\_\+args\+\_\+i}} ()
+\item 
+{\footnotesize template$<$auto F, typename \mbox{\hyperlink{class_interface}{Interface}} , typename Preconditions , bool is\+\_\+injected, typename... A$>$ }\\auto \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_1_1eosvmoc_ac6593044ffde3f1589b705c6e21f342d}{sysio\+::chain\+::webassembly\+::eosvmoc\+::fn}} (A... \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})
+\item 
+{\footnotesize template$<$auto F, typename Preconditions , typename Args , bool is\+\_\+injected, std\+::size\+\_\+t... Is$>$ }\\constexpr auto \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_1_1eosvmoc_a83daa42506d4e17a27f0a60b36aa6f46}{sysio\+::chain\+::webassembly\+::eosvmoc\+::create\+\_\+function}} (std\+::index\+\_\+sequence$<$ Is... $>$)
+\item 
+{\footnotesize template$<$auto F, typename Preconditions , bool is\+\_\+injected$>$ }\\constexpr auto \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_1_1eosvmoc_a3dd1211a90dc7ff1746b5459a3e03b2c}{sysio\+::chain\+::webassembly\+::eosvmoc\+::create\+\_\+function}} ()
+\item 
+{\footnotesize template$<$auto F, bool injected, typename Preconditions , typename Name $>$ }\\void \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_1_1eosvmoc_a6efa174d4d38f5f348b1a3dc0c9d9c0b}{sysio\+::chain\+::webassembly\+::eosvmoc\+::register\+\_\+eosvm\+\_\+oc}} (Name n)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\constexpr auto \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_1_1eosvmoc_aa26c9786756f2b0acea7ac3ee6033fb7}{sysio\+::chain\+::webassembly\+::eosvmoc\+::wasm\+\_\+to\+\_\+value\+\_\+type\+\_\+v}} = \mbox{\hyperlink{structsysio_1_1chain_1_1webassembly_1_1eosvmoc_1_1wasm__to__value__type}{wasm\+\_\+to\+\_\+value\+\_\+type}}$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\constexpr auto \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_1_1eosvmoc_af9e610ca44b3d4ee3ab33e6d4b7bbdac}{sysio\+::chain\+::webassembly\+::eosvmoc\+::wasm\+\_\+to\+\_\+rvalue\+\_\+type\+\_\+v}} = \mbox{\hyperlink{structsysio_1_1chain_1_1webassembly_1_1eosvmoc_1_1wasm__to__rvalue__type}{wasm\+\_\+to\+\_\+rvalue\+\_\+type}}$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}}
+\end{DoxyCompactItemize}

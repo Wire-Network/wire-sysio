@@ -1,0 +1,9 @@
+<map id="sysio::chain_apis::read_only::get_code_results" name="sysio::chain_apis::read_only::get_code_results">
+<area shape="rect" id="Node000001" title=" " alt="" coords="122,109,260,165"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1name.html" title="Immutable except for fc::from_variant." alt="" coords="5,5,137,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="79,45,87,65,99,83,127,106,124,111,95,87,82,68,74,47"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="164,5,218,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="194,47,194,109,188,109,188,47"/>
+<area shape="rect" id="Node000004" href="$classfc_1_1sha256.html" title=" " alt="" coords="242,5,324,31"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="268,45,237,87,217,110,213,107,233,83,264,42"/>
+</map>

@@ -1,0 +1,16 @@
+<map id="websocketpp::processor::hybi00::process_handshake" name="websocketpp::processor::hybi00::process_handshake">
+<area shape="rect" id="Node000001" title="Calculate the appropriate response for this websocket request." alt="" coords="5,71,197,111"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1processor_1_1hybi00.html#aa490b9d9905915023b5f2e42aac59127" title="Extracts client uri from a handshake request." alt="" coords="245,5,408,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="173,68,239,48,240,53,174,73"/>
+<area shape="rect" id="Node000003" href="$namespacewebsocketpp_1_1md5.html#ab445cdc2367665afb8fd4e983a354e0f" title=" " alt="" coords="245,71,409,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="197,88,229,88,229,94,197,94"/>
+<area shape="rect" id="Node000007" href="$classwebsocketpp_1_1uri.html#ad684773687e2b92f2c0d0c9bcad48a17" title=" " alt="" coords="255,136,398,161"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="184,109,259,129,258,134,183,114"/>
+<area shape="rect" id="Node000004" href="$namespacewebsocketpp_1_1md5.html#afd827a71255e45a8293b9df13342ceb3" title=" " alt="" coords="693,43,858,83"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="399,67,457,56,571,50,678,52,678,58,571,55,457,62,400,73"/>
+<area shape="rect" id="Node000005" href="$namespacewebsocketpp_1_1md5.html#a29e7adb892ae2de7d2c4853bc7ace034" title=" " alt="" coords="469,71,633,111"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="409,88,453,88,453,94,409,94"/>
+<area shape="rect" id="Node000006" href="$namespacewebsocketpp_1_1md5.html#a73499ae9912f813cdbb98d27b6487112" title=" " alt="" coords="457,136,645,161"/>
+<area shape="poly" id="edge6_Node000003_Node000006" title=" " alt="" coords="409,109,484,128,482,134,408,114"/>
+<area shape="poly" id="edge5_Node000005_Node000004" title=" " alt="" coords="633,78,677,73,678,78,634,83"/>
+</map>

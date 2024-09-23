@@ -1,0 +1,18 @@
+<map id="Catch::AutoReg::AutoReg" name="Catch::AutoReg::AutoReg">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,104,180,130"/>
+<area shape="rect" id="Node000002" href="$namespace_catch.html#a9e1cbffd90354d851c4ba6dff1e09fd7" title=" " alt="" coords="242,5,415,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="112,101,163,70,227,40,245,33,247,38,229,45,166,75,115,106"/>
+<area shape="rect" id="Node000004" href="$namespace_catch.html#a585459763f2c7610e57de2dd22dd1ad8" title=" " alt="" coords="228,104,429,130"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="180,114,212,114,212,120,180,120"/>
+<area shape="rect" id="Node000006" href="$namespace_catch.html#a0d7fc9d074bde40c74ce4ffd27fe72b2" title=" " alt="" coords="252,55,404,80"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="157,101,248,81,249,87,158,106"/>
+<area shape="rect" id="Node000007" href="$struct_catch_1_1_i_mutable_registry_hub.html#a72a7d5386851ac3200f8da794a009c86" title=" " alt="" coords="235,154,422,194"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="149,128,228,147,226,152,148,133"/>
+<area shape="rect" id="Node000008" href="$struct_catch_1_1_i_mutable_registry_hub.html#a11b85c6744d88c9f83fe16ad4a8dd451" title=" " alt="" coords="235,219,422,260"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="112,128,163,165,229,204,244,211,242,216,226,209,160,169,109,132"/>
+<area shape="rect" id="Node000003" href="$namespace_catch.html#a695f62327be0676e046291eeaae15110" title=" " alt="" coords="510,31,634,56"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="416,25,495,33,494,38,415,30"/>
+<area shape="rect" id="Node000005" href="$class_catch_1_1_singleton.html#a8c18286fe40405813c5bab05e20ce4f0" title=" " alt="" coords="477,104,667,130"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="429,114,461,114,461,120,429,120"/>
+<area shape="poly" id="edge6_Node000006_Node000003" title=" " alt="" coords="404,57,494,48,495,54,405,63"/>
+</map>

@@ -1,0 +1,11 @@
+<map id="IR::GlobalDef" name="IR::GlobalDef">
+<area shape="rect" id="Node000001" title=" " alt="" coords="38,198,140,223"/>
+<area shape="rect" id="Node000002" href="$struct_i_r_1_1_global_type.html" title=" " alt="" coords="5,109,114,135"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="71,149,87,196,82,198,66,150"/>
+<area shape="rect" id="Node000003" href="$struct_i_r_1_1_initializer_expression.html" title=" " alt="" coords="138,109,298,135"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="189,146,109,199,106,195,186,141"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="120,13,180,38"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="170,49,212,107,207,110,165,52"/>
+<area shape="rect" id="Node000005" href="$struct_pointer_int_helper.html" title=" " alt="" coords="204,5,366,46"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="264,60,229,110,224,107,260,57"/>
+</map>

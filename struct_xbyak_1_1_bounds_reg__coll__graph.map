@@ -1,0 +1,7 @@
+<map id="Xbyak::BoundsReg" name="Xbyak::BoundsReg">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,153,140,178"/>
+<area shape="rect" id="Node000002" href="$class_xbyak_1_1_reg.html" title=" " alt="" coords="27,79,118,105"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="75,120,75,152,70,152,70,120"/>
+<area shape="rect" id="Node000003" href="$class_xbyak_1_1_operand.html" title=" " alt="" coords="15,5,130,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="75,46,75,79,70,79,70,46"/>
+</map>

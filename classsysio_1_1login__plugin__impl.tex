@@ -1,0 +1,96 @@
+\doxysection{sysio\+::login\+\_\+plugin\+\_\+impl Class Reference}
+\hypertarget{classsysio_1_1login__plugin__impl}{}\label{classsysio_1_1login__plugin__impl}\index{sysio::login\_plugin\_impl@{sysio::login\_plugin\_impl}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{classsysio_1_1login__plugin__impl_a95c0bed6fb919bea8160ce8cee35ef32}{expire\+\_\+requests}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacesysio_aca44e4e3828e19ae86b3c6eab210a94e}{login\+\_\+request\+\_\+container}} \mbox{\hyperlink{classsysio_1_1login__plugin__impl_a1e7b34fb3ee63cf4e33cec10e4b45455}{requests}} \{\}
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classsysio_1_1login__plugin__impl_ac323052bf6623c4cd151ca8855a077cc}{max\+\_\+login\+\_\+requests}} = 1000000
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classsysio_1_1login__plugin__impl_a69d6d93b57bb1735bad1d5a0b9d25a37}{max\+\_\+login\+\_\+timeout}} = 60
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{login__plugin_8cpp_source_l00031}{31}} of file \mbox{\hyperlink{login__plugin_8cpp_source}{login\+\_\+plugin.\+cpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1login__plugin__impl_a95c0bed6fb919bea8160ce8cee35ef32}\index{sysio::login\_plugin\_impl@{sysio::login\_plugin\_impl}!expire\_requests@{expire\_requests}}
+\index{expire\_requests@{expire\_requests}!sysio::login\_plugin\_impl@{sysio::login\_plugin\_impl}}
+\doxysubsubsection{\texorpdfstring{expire\_requests()}{expire\_requests()}}
+{\footnotesize\ttfamily \label{classsysio_1_1login__plugin__impl_a95c0bed6fb919bea8160ce8cee35ef32} 
+void sysio\+::login\+\_\+plugin\+\_\+impl\+::expire\+\_\+requests (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{login__plugin_8cpp_source_l00037}{37}} of file \mbox{\hyperlink{login__plugin_8cpp_source}{login\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ index\ =\ \mbox{\hyperlink{classsysio_1_1login__plugin__impl_a1e7b34fb3ee63cf4e33cec10e4b45455}{requests}}.get<login\_request\_time\_index>();}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ now\ =\ \mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{fc::time\_point::now}}();}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\ it\ =\ index.begin();\ it\ !=\ index.end()\ \&\&\ it-\/>expiration\_time\ <\ now;\ it\ =\ index.erase(it))}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{00042\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1login__plugin__impl_a95c0bed6fb919bea8160ce8cee35ef32_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classsysio_1_1login__plugin__impl_ac323052bf6623c4cd151ca8855a077cc}\index{sysio::login\_plugin\_impl@{sysio::login\_plugin\_impl}!max\_login\_requests@{max\_login\_requests}}
+\index{max\_login\_requests@{max\_login\_requests}!sysio::login\_plugin\_impl@{sysio::login\_plugin\_impl}}
+\doxysubsubsection{\texorpdfstring{max\_login\_requests}{max\_login\_requests}}
+{\footnotesize\ttfamily \label{classsysio_1_1login__plugin__impl_ac323052bf6623c4cd151ca8855a077cc} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::login\+\_\+plugin\+\_\+impl\+::max\+\_\+login\+\_\+requests = 1000000}
+
+
+
+Definition at line \mbox{\hyperlink{login__plugin_8cpp_source_l00034}{34}} of file \mbox{\hyperlink{login__plugin_8cpp_source}{login\+\_\+plugin.\+cpp}}.
+
+\Hypertarget{classsysio_1_1login__plugin__impl_a69d6d93b57bb1735bad1d5a0b9d25a37}\index{sysio::login\_plugin\_impl@{sysio::login\_plugin\_impl}!max\_login\_timeout@{max\_login\_timeout}}
+\index{max\_login\_timeout@{max\_login\_timeout}!sysio::login\_plugin\_impl@{sysio::login\_plugin\_impl}}
+\doxysubsubsection{\texorpdfstring{max\_login\_timeout}{max\_login\_timeout}}
+{\footnotesize\ttfamily \label{classsysio_1_1login__plugin__impl_a69d6d93b57bb1735bad1d5a0b9d25a37} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::login\+\_\+plugin\+\_\+impl\+::max\+\_\+login\+\_\+timeout = 60}
+
+
+
+Definition at line \mbox{\hyperlink{login__plugin_8cpp_source_l00035}{35}} of file \mbox{\hyperlink{login__plugin_8cpp_source}{login\+\_\+plugin.\+cpp}}.
+
+\Hypertarget{classsysio_1_1login__plugin__impl_a1e7b34fb3ee63cf4e33cec10e4b45455}\index{sysio::login\_plugin\_impl@{sysio::login\_plugin\_impl}!requests@{requests}}
+\index{requests@{requests}!sysio::login\_plugin\_impl@{sysio::login\_plugin\_impl}}
+\doxysubsubsection{\texorpdfstring{requests}{requests}}
+{\footnotesize\ttfamily \label{classsysio_1_1login__plugin__impl_a1e7b34fb3ee63cf4e33cec10e4b45455} 
+\mbox{\hyperlink{namespacesysio_aca44e4e3828e19ae86b3c6eab210a94e}{login\+\_\+request\+\_\+container}} sysio\+::login\+\_\+plugin\+\_\+impl\+::requests \{\}}
+
+
+
+Definition at line \mbox{\hyperlink{login__plugin_8cpp_source_l00033}{33}} of file \mbox{\hyperlink{login__plugin_8cpp_source}{login\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00033\ \{\};}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+plugins/login\+\_\+plugin/\mbox{\hyperlink{login__plugin_8cpp}{login\+\_\+plugin.\+cpp}}\end{DoxyCompactItemize}

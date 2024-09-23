@@ -1,0 +1,193 @@
+\doxysection{Platform Namespace Reference}
+\hypertarget{namespace_platform}{}\label{namespace_platform}\index{Platform@{Platform}}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}} \mbox{\hyperlink{namespace_platform_a881d22a3f51a7e519908f07f22b0d45b}{count\+Leading\+Zeroes}} (\mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}} \mbox{\hyperlink{namespace_platform_a9d8ab9694b20d773a5461807f52bcdd1}{count\+Leading\+Zeroes}} (\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+\mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}} \mbox{\hyperlink{namespace_platform_a39cf10b3b7c47517a25d8284d0f7813f}{count\+Trailing\+Zeroes}} (\mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}} \mbox{\hyperlink{namespace_platform_a739a36a7403c4d85a2f0228f9e913ba9}{count\+Trailing\+Zeroes}} (\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+\mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}} \mbox{\hyperlink{namespace_platform_aa618d555db82f8b59b0eeeac8d9a946a}{floor\+Log\+Two}} (\mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}} \mbox{\hyperlink{namespace_platform_a4f3d15d0115fe31b0bcdb65a24ed24ef}{floor\+Log\+Two}} (\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+\mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}} \mbox{\hyperlink{namespace_platform_aa87d100a441e9a04d55cb742410cdd48}{ceil\+Log\+Two}} (\mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}} \mbox{\hyperlink{namespace_platform_aae9e96348b025c85ff9dff116169a4e4}{ceil\+Log\+Two}} (\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespace_platform_aae9e96348b025c85ff9dff116169a4e4}\index{Platform@{Platform}!ceilLogTwo@{ceilLogTwo}}
+\index{ceilLogTwo@{ceilLogTwo}!Platform@{Platform}}
+\doxysubsubsection{\texorpdfstring{ceilLogTwo()}{ceilLogTwo()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{namespace_platform_aae9e96348b025c85ff9dff116169a4e4} 
+\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}} Platform\+::ceil\+Log\+Two (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}}]{value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_source_l00032}{32}} of file \mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_source}{Platform.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00032\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_platform_aa618d555db82f8b59b0eeeac8d9a946a}{floorLogTwo}}(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ *\ 2\ -\/\ 1);\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_platform_aae9e96348b025c85ff9dff116169a4e4_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_platform_aa87d100a441e9a04d55cb742410cdd48}\index{Platform@{Platform}!ceilLogTwo@{ceilLogTwo}}
+\index{ceilLogTwo@{ceilLogTwo}!Platform@{Platform}}
+\doxysubsubsection{\texorpdfstring{ceilLogTwo()}{ceilLogTwo()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{namespace_platform_aa87d100a441e9a04d55cb742410cdd48} 
+\mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}} Platform\+::ceil\+Log\+Two (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}}}]{value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_source_l00031}{31}} of file \mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_source}{Platform.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00031\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_platform_aa618d555db82f8b59b0eeeac8d9a946a}{floorLogTwo}}(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ *\ 2\ -\/\ 1);\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_platform_aa87d100a441e9a04d55cb742410cdd48_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_platform_a9d8ab9694b20d773a5461807f52bcdd1}\index{Platform@{Platform}!countLeadingZeroes@{countLeadingZeroes}}
+\index{countLeadingZeroes@{countLeadingZeroes}!Platform@{Platform}}
+\doxysubsubsection{\texorpdfstring{countLeadingZeroes()}{countLeadingZeroes()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{namespace_platform_a9d8ab9694b20d773a5461807f52bcdd1} 
+\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}} Platform\+::count\+Leading\+Zeroes (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}}]{value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_source_l00026}{26}} of file \mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_source}{Platform.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00026\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ ==\ 0\ ?\ 32\ :\ \_\_builtin\_clz(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}});\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespace_platform_a881d22a3f51a7e519908f07f22b0d45b}\index{Platform@{Platform}!countLeadingZeroes@{countLeadingZeroes}}
+\index{countLeadingZeroes@{countLeadingZeroes}!Platform@{Platform}}
+\doxysubsubsection{\texorpdfstring{countLeadingZeroes()}{countLeadingZeroes()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{namespace_platform_a881d22a3f51a7e519908f07f22b0d45b} 
+\mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}} Platform\+::count\+Leading\+Zeroes (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}}}]{value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_source_l00025}{25}} of file \mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_source}{Platform.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00025\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ ==\ 0\ ?\ 64\ :\ \_\_builtin\_clzll(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}});\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_platform_a881d22a3f51a7e519908f07f22b0d45b_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_platform_a739a36a7403c4d85a2f0228f9e913ba9}\index{Platform@{Platform}!countTrailingZeroes@{countTrailingZeroes}}
+\index{countTrailingZeroes@{countTrailingZeroes}!Platform@{Platform}}
+\doxysubsubsection{\texorpdfstring{countTrailingZeroes()}{countTrailingZeroes()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{namespace_platform_a739a36a7403c4d85a2f0228f9e913ba9} 
+\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}} Platform\+::count\+Trailing\+Zeroes (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}}]{value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_source_l00028}{28}} of file \mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_source}{Platform.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00028\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ ==\ 0\ ?\ 32\ :\ \_\_builtin\_ctz(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}});\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespace_platform_a39cf10b3b7c47517a25d8284d0f7813f}\index{Platform@{Platform}!countTrailingZeroes@{countTrailingZeroes}}
+\index{countTrailingZeroes@{countTrailingZeroes}!Platform@{Platform}}
+\doxysubsubsection{\texorpdfstring{countTrailingZeroes()}{countTrailingZeroes()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{namespace_platform_a39cf10b3b7c47517a25d8284d0f7813f} 
+\mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}} Platform\+::count\+Trailing\+Zeroes (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}}}]{value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_source_l00027}{27}} of file \mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_source}{Platform.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00027\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ ==\ 0\ ?\ 64\ :\ \_\_builtin\_ctzll(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}});\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_platform_a39cf10b3b7c47517a25d8284d0f7813f_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_platform_a4f3d15d0115fe31b0bcdb65a24ed24ef}\index{Platform@{Platform}!floorLogTwo@{floorLogTwo}}
+\index{floorLogTwo@{floorLogTwo}!Platform@{Platform}}
+\doxysubsubsection{\texorpdfstring{floorLogTwo()}{floorLogTwo()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{namespace_platform_a4f3d15d0115fe31b0bcdb65a24ed24ef} 
+\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}} Platform\+::floor\+Log\+Two (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}}]{value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_source_l00030}{30}} of file \mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_source}{Platform.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00030\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ <=\ 1\ ?\ 0\ :\ 31\ -\/\ \mbox{\hyperlink{namespace_platform_a881d22a3f51a7e519908f07f22b0d45b}{countLeadingZeroes}}(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}});\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_platform_a4f3d15d0115fe31b0bcdb65a24ed24ef_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_platform_aa618d555db82f8b59b0eeeac8d9a946a}\index{Platform@{Platform}!floorLogTwo@{floorLogTwo}}
+\index{floorLogTwo@{floorLogTwo}!Platform@{Platform}}
+\doxysubsubsection{\texorpdfstring{floorLogTwo()}{floorLogTwo()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{namespace_platform_aa618d555db82f8b59b0eeeac8d9a946a} 
+\mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}} Platform\+::floor\+Log\+Two (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}}}]{value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_source_l00029}{29}} of file \mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_source}{Platform.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00029\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ <=\ 1\ ?\ 0\ :\ 63\ -\/\ \mbox{\hyperlink{namespace_platform_a881d22a3f51a7e519908f07f22b0d45b}{countLeadingZeroes}}(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}});\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_platform_aa618d555db82f8b59b0eeeac8d9a946a_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=335pt]{namespace_platform_aa618d555db82f8b59b0eeeac8d9a946a_icgraph}
+\end{center}
+\end{figure}

@@ -1,0 +1,589 @@
+\doxysection{Catch\+::Streaming\+Reporter\+Base\texorpdfstring{$<$}{<} DerivedT \texorpdfstring{$>$}{>} Struct Template Reference}
+\hypertarget{struct_catch_1_1_streaming_reporter_base}{}\label{struct_catch_1_1_streaming_reporter_base}\index{Catch::StreamingReporterBase$<$ DerivedT $>$@{Catch::StreamingReporterBase$<$ DerivedT $>$}}
+
+
+{\ttfamily \#include $<$catch\+\_\+reporter\+\_\+bases.\+hpp$>$}
+
+
+
+Inheritance diagram for Catch\+::Streaming\+Reporter\+Base\texorpdfstring{$<$}{<} DerivedT \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=213pt]{struct_catch_1_1_streaming_reporter_base__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Catch\+::Streaming\+Reporter\+Base\texorpdfstring{$<$}{<} DerivedT \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_catch_1_1_streaming_reporter_base__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_aa92dc1c46e7ec51639bedac214dba74a}{Streaming\+Reporter\+Base}} (\mbox{\hyperlink{struct_catch_1_1_reporter_config}{Reporter\+Config}} const \&\+\_\+config)
+\item 
+\mbox{\hyperlink{struct_catch_1_1_reporter_preferences}{Reporter\+Preferences}} \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a83390b98f9a6ac5dab1165d6eb1a7f62}{get\+Preferences}} () const override
+\item 
+\mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ae70b64581a4fcaf024073b9619737826}{\texorpdfstring{$\sim$}{\string~}\+Streaming\+Reporter\+Base}} () override=default
+\item 
+void \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a3576d7fca326a345fd3aff03efa4fbc8}{no\+Matching\+Test\+Cases}} (std\+::string const \&) override
+\item 
+void \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a510b201b48fb7d0ebd11d0c8c65a43ba}{test\+Run\+Starting}} (\mbox{\hyperlink{struct_catch_1_1_test_run_info}{Test\+Run\+Info}} const \&\+\_\+test\+Run\+Info) override
+\item 
+void \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a6961a1cbf0d4bffed14cb04f80aaf318}{test\+Group\+Starting}} (\mbox{\hyperlink{struct_catch_1_1_group_info}{Group\+Info}} const \&\+\_\+group\+Info) override
+\item 
+void \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ad8a773ceb481c17f3cedee3bf65b9820}{test\+Case\+Starting}} (\mbox{\hyperlink{struct_catch_1_1_test_case_info}{Test\+Case\+Info}} const \&\+\_\+test\+Info) override
+\item 
+void \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a249cfe647a373a77d118e4c564422e49}{section\+Starting}} (\mbox{\hyperlink{struct_catch_1_1_section_info}{Section\+Info}} const \&\+\_\+section\+Info) override
+\item 
+void \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ab889c47d829ddb5a2b96b46e1e09d207}{section\+Ended}} (\mbox{\hyperlink{struct_catch_1_1_section_stats}{Section\+Stats}} const \&) override
+\item 
+void \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ae9e916b4aeb5e9080f3b77a10d69c5f6}{test\+Case\+Ended}} (\mbox{\hyperlink{struct_catch_1_1_test_case_stats}{Test\+Case\+Stats}} const \&) override
+\item 
+void \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_aebb3f5242058ff945527079b85964bbe}{test\+Group\+Ended}} (\mbox{\hyperlink{struct_catch_1_1_test_group_stats}{Test\+Group\+Stats}} const \&) override
+\item 
+void \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a8cfd2e27ce7746966cf145b818254fd1}{test\+Run\+Ended}} (\mbox{\hyperlink{struct_catch_1_1_test_run_stats}{Test\+Run\+Stats}} const \&) override
+\item 
+void \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ae9debeac49a31342ffa6844de5346cbf}{skip\+Test}} (\mbox{\hyperlink{struct_catch_1_1_test_case_info}{Test\+Case\+Info}} const \&) override
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter}{Catch\+::\+IStreaming\+Reporter}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_a7edcaeb7bb35258b4faa4b79a20320e1}{\texorpdfstring{$\sim$}{\string~}\+IStreaming\+Reporter}} ()=default
+\item 
+virtual void \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_ac0b61a3ef04ee287937751c043a7013a}{benchmark\+Starting}} (\mbox{\hyperlink{struct_catch_1_1_benchmark_info}{Benchmark\+Info}} const \&)
+\item 
+virtual void \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_ae1c3becff20f4a940c9f01d2c4114a17}{assertion\+Starting}} (\mbox{\hyperlink{struct_catch_1_1_assertion_info}{Assertion\+Info}} const \&assertion\+Info)=0
+\item 
+virtual bool \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_a5248ab87149e0f1abe2de96c387ff5e3}{assertion\+Ended}} (\mbox{\hyperlink{struct_catch_1_1_assertion_stats}{Assertion\+Stats}} const \&assertion\+Stats)=0
+\item 
+virtual void \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_aed607b9cde8193cc470c2749f106b4fa}{benchmark\+Ended}} (\mbox{\hyperlink{struct_catch_1_1_benchmark_stats}{Benchmark\+Stats}} const \&)
+\item 
+virtual void \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_ad5001d7247cc94e5fec26b0e702f134f}{fatal\+Error\+Encountered}} (\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})
+\item 
+virtual bool \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_a6ca0329f20ad8b8ec7b3d1958f1fa73f}{is\+Multi}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static std\+::set$<$ \mbox{\hyperlink{namespace_catch_af85c0d46dfe687d923a157362fd07737}{Verbosity}} $>$ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ac6bcd1df9a5cd22abc781c919bed010e}{get\+Supported\+Verbosities}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespace_catch_a961f6f5f07e265684c220a8ae014d7d6}{IConfig\+Ptr}} \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_aea2fd5c5f7cbfa78d96e15485a1b8ff7}{m\+\_\+config}}
+\item 
+std\+::ostream \& \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a8ad7526bce08333b7d9414cc157e1f6d}{stream}}
+\item 
+\mbox{\hyperlink{struct_catch_1_1_lazy_stat}{Lazy\+Stat}}$<$ \mbox{\hyperlink{struct_catch_1_1_test_run_info}{Test\+Run\+Info}} $>$ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ad6fcc15e73e91f3cd19a0c8324783bd7}{current\+Test\+Run\+Info}}
+\item 
+\mbox{\hyperlink{struct_catch_1_1_lazy_stat}{Lazy\+Stat}}$<$ \mbox{\hyperlink{struct_catch_1_1_group_info}{Group\+Info}} $>$ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a1b3f99eb83f649f90be2e3a2a296f76f}{current\+Group\+Info}}
+\item 
+\mbox{\hyperlink{struct_catch_1_1_lazy_stat}{Lazy\+Stat}}$<$ \mbox{\hyperlink{struct_catch_1_1_test_case_info}{Test\+Case\+Info}} $>$ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a974c80ec3ab579eeafe899d9f0a97405}{current\+Test\+Case\+Info}}
+\item 
+std\+::vector$<$ \mbox{\hyperlink{struct_catch_1_1_section_info}{Section\+Info}} $>$ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a5358f16b9cc5afa0633519bf2c3a642b}{m\+\_\+section\+Stack}}
+\item 
+\mbox{\hyperlink{struct_catch_1_1_reporter_preferences}{Reporter\+Preferences}} \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ab3c0202658a530cb0a384fef4fbd0baf}{m\+\_\+reporter\+Prefs}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename DerivedT$>$\newline
+struct Catch\+::\+Streaming\+Reporter\+Base$<$ Derived\+T $>$}
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__bases_8hpp_source_l00031}{31}} of file \mbox{\hyperlink{catch__reporter__bases_8hpp_source}{catch\+\_\+reporter\+\_\+bases.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{struct_catch_1_1_streaming_reporter_base_aa92dc1c46e7ec51639bedac214dba74a}\index{Catch::StreamingReporterBase$<$ DerivedT $>$@{Catch::StreamingReporterBase$<$ DerivedT $>$}!StreamingReporterBase@{StreamingReporterBase}}
+\index{StreamingReporterBase@{StreamingReporterBase}!Catch::StreamingReporterBase$<$ DerivedT $>$@{Catch::StreamingReporterBase$<$ DerivedT $>$}}
+\doxysubsubsection{\texorpdfstring{StreamingReporterBase()}{StreamingReporterBase()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_streaming_reporter_base_aa92dc1c46e7ec51639bedac214dba74a} 
+template$<$typename DerivedT $>$ \\
+\mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base}{Catch\+::\+Streaming\+Reporter\+Base}}$<$ DerivedT $>$\+::\+Streaming\+Reporter\+Base (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_reporter_config}{Reporter\+Config}} const \&}]{\+\_\+config}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__bases_8hpp_source_l00033}{33}} of file \mbox{\hyperlink{catch__reporter__bases_8hpp_source}{catch\+\_\+reporter\+\_\+bases.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ :\ \ \ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_aea2fd5c5f7cbfa78d96e15485a1b8ff7}{m\_config}}(\ \_config.fullConfig()\ ),}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a8ad7526bce08333b7d9414cc157e1f6d}{stream}}(\ \_config.stream()\ )}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ab3c0202658a530cb0a384fef4fbd0baf}{m\_reporterPrefs}}.\mbox{\hyperlink{struct_catch_1_1_reporter_preferences_a434511c4080edbbc12e0d1c31ea14769}{shouldRedirectStdOut}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !DerivedT::getSupportedVerbosities().\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}(\ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_aea2fd5c5f7cbfa78d96e15485a1b8ff7}{m\_config}}-\/>verbosity()\ )\ )}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{catch__enforce_8h_adc6e1c0661c7c34fbb6033de06ec4833}{CATCH\_ERROR}}(\ \textcolor{stringliteral}{"{}Verbosity\ level\ not\ supported\ by\ this\ reporter"{}}\ );}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_catch_1_1_streaming_reporter_base_ae70b64581a4fcaf024073b9619737826}\index{Catch::StreamingReporterBase$<$ DerivedT $>$@{Catch::StreamingReporterBase$<$ DerivedT $>$}!````~StreamingReporterBase@{\texorpdfstring{$\sim$}{\string~}StreamingReporterBase}}
+\index{````~StreamingReporterBase@{\texorpdfstring{$\sim$}{\string~}StreamingReporterBase}!Catch::StreamingReporterBase$<$ DerivedT $>$@{Catch::StreamingReporterBase$<$ DerivedT $>$}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}StreamingReporterBase()}{\string~StreamingReporterBase()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_streaming_reporter_base_ae70b64581a4fcaf024073b9619737826} 
+template$<$typename DerivedT $>$ \\
+\mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base}{Catch\+::\+Streaming\+Reporter\+Base}}$<$ DerivedT $>$\+::\texorpdfstring{$\sim$}{\string~}\mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base}{Streaming\+Reporter\+Base}} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [default]}}
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_catch_1_1_streaming_reporter_base_a83390b98f9a6ac5dab1165d6eb1a7f62}\index{Catch::StreamingReporterBase$<$ DerivedT $>$@{Catch::StreamingReporterBase$<$ DerivedT $>$}!getPreferences@{getPreferences}}
+\index{getPreferences@{getPreferences}!Catch::StreamingReporterBase$<$ DerivedT $>$@{Catch::StreamingReporterBase$<$ DerivedT $>$}}
+\doxysubsubsection{\texorpdfstring{getPreferences()}{getPreferences()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_streaming_reporter_base_a83390b98f9a6ac5dab1165d6eb1a7f62} 
+template$<$typename DerivedT $>$ \\
+\mbox{\hyperlink{struct_catch_1_1_reporter_preferences}{Reporter\+Preferences}} \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base}{Catch\+::\+Streaming\+Reporter\+Base}}$<$ DerivedT $>$\+::get\+Preferences (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_a122d9136175aefb16ccc5d3b61f23711}{Catch\+::\+IStreaming\+Reporter}}.
+
+
+
+Reimplemented in \mbox{\hyperlink{struct_catch_1_1_t_a_p_reporter_a52f056dc4cd354d5020a9ed3358877cb}{Catch\+::\+TAPReporter}}, and \mbox{\hyperlink{struct_catch_1_1_t_a_p_reporter_a52f056dc4cd354d5020a9ed3358877cb}{Catch\+::\+TAPReporter}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__bases_8hpp_source_l00042}{42}} of file \mbox{\hyperlink{catch__reporter__bases_8hpp_source}{catch\+\_\+reporter\+\_\+bases.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ab3c0202658a530cb0a384fef4fbd0baf}{m\_reporterPrefs}};}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_catch_1_1_streaming_reporter_base_ac6bcd1df9a5cd22abc781c919bed010e}\index{Catch::StreamingReporterBase$<$ DerivedT $>$@{Catch::StreamingReporterBase$<$ DerivedT $>$}!getSupportedVerbosities@{getSupportedVerbosities}}
+\index{getSupportedVerbosities@{getSupportedVerbosities}!Catch::StreamingReporterBase$<$ DerivedT $>$@{Catch::StreamingReporterBase$<$ DerivedT $>$}}
+\doxysubsubsection{\texorpdfstring{getSupportedVerbosities()}{getSupportedVerbosities()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_streaming_reporter_base_ac6bcd1df9a5cd22abc781c919bed010e} 
+template$<$typename DerivedT $>$ \\
+static std\+::set$<$ \mbox{\hyperlink{namespace_catch_af85c0d46dfe687d923a157362fd07737}{Verbosity}} $>$ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base}{Catch\+::\+Streaming\+Reporter\+Base}}$<$ DerivedT $>$\+::get\+Supported\+Verbosities (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__bases_8hpp_source_l00046}{46}} of file \mbox{\hyperlink{catch__reporter__bases_8hpp_source}{catch\+\_\+reporter\+\_\+bases.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{\ \mbox{\hyperlink{namespace_catch_af85c0d46dfe687d923a157362fd07737a960b44c579bc2f6818d2daaf9e4c16f0}{Verbosity::Normal}}\ \};}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_catch_1_1_streaming_reporter_base_a3576d7fca326a345fd3aff03efa4fbc8}\index{Catch::StreamingReporterBase$<$ DerivedT $>$@{Catch::StreamingReporterBase$<$ DerivedT $>$}!noMatchingTestCases@{noMatchingTestCases}}
+\index{noMatchingTestCases@{noMatchingTestCases}!Catch::StreamingReporterBase$<$ DerivedT $>$@{Catch::StreamingReporterBase$<$ DerivedT $>$}}
+\doxysubsubsection{\texorpdfstring{noMatchingTestCases()}{noMatchingTestCases()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_streaming_reporter_base_a3576d7fca326a345fd3aff03efa4fbc8} 
+template$<$typename DerivedT $>$ \\
+void \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base}{Catch\+::\+Streaming\+Reporter\+Base}}$<$ DerivedT $>$\+::no\+Matching\+Test\+Cases (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_aaa0ea1d8250b48fafc8d36f86e6d1d80}{Catch\+::\+IStreaming\+Reporter}}.
+
+
+
+Reimplemented in \mbox{\hyperlink{struct_catch_1_1_t_a_p_reporter_aa0ebdd59272d35036d6500972466d906}{Catch\+::\+TAPReporter}}, \mbox{\hyperlink{struct_catch_1_1_t_a_p_reporter_aa0ebdd59272d35036d6500972466d906}{Catch\+::\+TAPReporter}}, \mbox{\hyperlink{struct_catch_1_1_team_city_reporter_a0467f50b1349b71ac72b4302d146c988}{Catch\+::\+Team\+City\+Reporter}}, \mbox{\hyperlink{struct_catch_1_1_team_city_reporter_a0467f50b1349b71ac72b4302d146c988}{Catch\+::\+Team\+City\+Reporter}}, and \mbox{\hyperlink{class_catch_1_1_xml_reporter_a5e80921e60f776401d6e2e111e48398f}{Catch\+::\+Xml\+Reporter}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__bases_8hpp_source_l00052}{52}} of file \mbox{\hyperlink{catch__reporter__bases_8hpp_source}{catch\+\_\+reporter\+\_\+bases.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00052\ \{\}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_catch_1_1_streaming_reporter_base_a3576d7fca326a345fd3aff03efa4fbc8_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_catch_1_1_streaming_reporter_base_ab889c47d829ddb5a2b96b46e1e09d207}\index{Catch::StreamingReporterBase$<$ DerivedT $>$@{Catch::StreamingReporterBase$<$ DerivedT $>$}!sectionEnded@{sectionEnded}}
+\index{sectionEnded@{sectionEnded}!Catch::StreamingReporterBase$<$ DerivedT $>$@{Catch::StreamingReporterBase$<$ DerivedT $>$}}
+\doxysubsubsection{\texorpdfstring{sectionEnded()}{sectionEnded()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_streaming_reporter_base_ab889c47d829ddb5a2b96b46e1e09d207} 
+template$<$typename DerivedT $>$ \\
+void \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base}{Catch\+::\+Streaming\+Reporter\+Base}}$<$ DerivedT $>$\+::section\+Ended (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_section_stats}{Section\+Stats}} const \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_aba7a6ce1f315da47b8017b5ca6d1d008}{Catch\+::\+IStreaming\+Reporter}}.
+
+
+
+Reimplemented in \mbox{\hyperlink{class_catch_1_1_xml_reporter_a73c809f067d58a7a6748cb13643448e5}{Catch\+::\+Xml\+Reporter}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__bases_8hpp_source_l00069}{69}} of file \mbox{\hyperlink{catch__reporter__bases_8hpp_source}{catch\+\_\+reporter\+\_\+bases.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a5358f16b9cc5afa0633519bf2c3a642b}{m\_sectionStack}}.pop\_back();}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_catch_1_1_streaming_reporter_base_ab889c47d829ddb5a2b96b46e1e09d207_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_catch_1_1_streaming_reporter_base_a249cfe647a373a77d118e4c564422e49}\index{Catch::StreamingReporterBase$<$ DerivedT $>$@{Catch::StreamingReporterBase$<$ DerivedT $>$}!sectionStarting@{sectionStarting}}
+\index{sectionStarting@{sectionStarting}!Catch::StreamingReporterBase$<$ DerivedT $>$@{Catch::StreamingReporterBase$<$ DerivedT $>$}}
+\doxysubsubsection{\texorpdfstring{sectionStarting()}{sectionStarting()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_streaming_reporter_base_a249cfe647a373a77d118e4c564422e49} 
+template$<$typename DerivedT $>$ \\
+void \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base}{Catch\+::\+Streaming\+Reporter\+Base}}$<$ DerivedT $>$\+::section\+Starting (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_section_info}{Section\+Info}} const \&}]{\+\_\+section\+Info}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_aa6236178937a43c2d7665729fcb79521}{Catch\+::\+IStreaming\+Reporter}}.
+
+
+
+Reimplemented in \mbox{\hyperlink{struct_catch_1_1_team_city_reporter_a659dbf515acee57b7e957edf2b10e2d9}{Catch\+::\+Team\+City\+Reporter}}, \mbox{\hyperlink{struct_catch_1_1_team_city_reporter_a659dbf515acee57b7e957edf2b10e2d9}{Catch\+::\+Team\+City\+Reporter}}, and \mbox{\hyperlink{class_catch_1_1_xml_reporter_a06befa9cf2b661c5226317bff0f05c64}{Catch\+::\+Xml\+Reporter}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__bases_8hpp_source_l00065}{65}} of file \mbox{\hyperlink{catch__reporter__bases_8hpp_source}{catch\+\_\+reporter\+\_\+bases.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a5358f16b9cc5afa0633519bf2c3a642b}{m\_sectionStack}}.push\_back(\_sectionInfo);}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_catch_1_1_streaming_reporter_base_a249cfe647a373a77d118e4c564422e49_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_catch_1_1_streaming_reporter_base_ae9debeac49a31342ffa6844de5346cbf}\index{Catch::StreamingReporterBase$<$ DerivedT $>$@{Catch::StreamingReporterBase$<$ DerivedT $>$}!skipTest@{skipTest}}
+\index{skipTest@{skipTest}!Catch::StreamingReporterBase$<$ DerivedT $>$@{Catch::StreamingReporterBase$<$ DerivedT $>$}}
+\doxysubsubsection{\texorpdfstring{skipTest()}{skipTest()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_streaming_reporter_base_ae9debeac49a31342ffa6844de5346cbf} 
+template$<$typename DerivedT $>$ \\
+void \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base}{Catch\+::\+Streaming\+Reporter\+Base}}$<$ DerivedT $>$\+::skip\+Test (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_test_case_info}{Test\+Case\+Info}} const \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_a04ef7725043808bbbf258633043f06b2}{Catch\+::\+IStreaming\+Reporter}}.
+
+
+
+Reimplemented in \mbox{\hyperlink{struct_catch_1_1_team_city_reporter_a41a25116e22dee735f8fca7a29490e1b}{Catch\+::\+Team\+City\+Reporter}}, and \mbox{\hyperlink{struct_catch_1_1_team_city_reporter_a41a25116e22dee735f8fca7a29490e1b}{Catch\+::\+Team\+City\+Reporter}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__bases_8hpp_source_l00084}{84}} of file \mbox{\hyperlink{catch__reporter__bases_8hpp_source}{catch\+\_\+reporter\+\_\+bases.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Don't\ do\ anything\ with\ this\ by\ default.}}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ It\ can\ optionally\ be\ overridden\ in\ the\ derived\ class.}}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_catch_1_1_streaming_reporter_base_ae9e916b4aeb5e9080f3b77a10d69c5f6}\index{Catch::StreamingReporterBase$<$ DerivedT $>$@{Catch::StreamingReporterBase$<$ DerivedT $>$}!testCaseEnded@{testCaseEnded}}
+\index{testCaseEnded@{testCaseEnded}!Catch::StreamingReporterBase$<$ DerivedT $>$@{Catch::StreamingReporterBase$<$ DerivedT $>$}}
+\doxysubsubsection{\texorpdfstring{testCaseEnded()}{testCaseEnded()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_streaming_reporter_base_ae9e916b4aeb5e9080f3b77a10d69c5f6} 
+template$<$typename DerivedT $>$ \\
+void \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base}{Catch\+::\+Streaming\+Reporter\+Base}}$<$ DerivedT $>$\+::test\+Case\+Ended (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_test_case_stats}{Test\+Case\+Stats}} const \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_ae295b98b77bab527be53ea9d35dfe66f}{Catch\+::\+IStreaming\+Reporter}}.
+
+
+
+Reimplemented in \mbox{\hyperlink{struct_catch_1_1_team_city_reporter_ab2a5007071e489a4e4c8ee8e84585ef8}{Catch\+::\+Team\+City\+Reporter}}, \mbox{\hyperlink{struct_catch_1_1_team_city_reporter_ab2a5007071e489a4e4c8ee8e84585ef8}{Catch\+::\+Team\+City\+Reporter}}, and \mbox{\hyperlink{class_catch_1_1_xml_reporter_ab641ec7e115cb94efa02f85e9d91de0f}{Catch\+::\+Xml\+Reporter}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__bases_8hpp_source_l00072}{72}} of file \mbox{\hyperlink{catch__reporter__bases_8hpp_source}{catch\+\_\+reporter\+\_\+bases.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a974c80ec3ab579eeafe899d9f0a97405}{currentTestCaseInfo}}.reset();}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_catch_1_1_streaming_reporter_base_ae9e916b4aeb5e9080f3b77a10d69c5f6_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_catch_1_1_streaming_reporter_base_ad8a773ceb481c17f3cedee3bf65b9820}\index{Catch::StreamingReporterBase$<$ DerivedT $>$@{Catch::StreamingReporterBase$<$ DerivedT $>$}!testCaseStarting@{testCaseStarting}}
+\index{testCaseStarting@{testCaseStarting}!Catch::StreamingReporterBase$<$ DerivedT $>$@{Catch::StreamingReporterBase$<$ DerivedT $>$}}
+\doxysubsubsection{\texorpdfstring{testCaseStarting()}{testCaseStarting()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_streaming_reporter_base_ad8a773ceb481c17f3cedee3bf65b9820} 
+template$<$typename DerivedT $>$ \\
+void \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base}{Catch\+::\+Streaming\+Reporter\+Base}}$<$ DerivedT $>$\+::test\+Case\+Starting (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_test_case_info}{Test\+Case\+Info}} const \&}]{\+\_\+test\+Info}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_a8f7270dc83853494a1c3a912ddf95a11}{Catch\+::\+IStreaming\+Reporter}}.
+
+
+
+Reimplemented in \mbox{\hyperlink{struct_catch_1_1_team_city_reporter_a512e183512859522d4605fee3ad8e52b}{Catch\+::\+Team\+City\+Reporter}}, \mbox{\hyperlink{struct_catch_1_1_team_city_reporter_a512e183512859522d4605fee3ad8e52b}{Catch\+::\+Team\+City\+Reporter}}, and \mbox{\hyperlink{class_catch_1_1_xml_reporter_a1395b2efb62faaa947a42638a03be32c}{Catch\+::\+Xml\+Reporter}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__bases_8hpp_source_l00062}{62}} of file \mbox{\hyperlink{catch__reporter__bases_8hpp_source}{catch\+\_\+reporter\+\_\+bases.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a974c80ec3ab579eeafe899d9f0a97405}{currentTestCaseInfo}}\ =\ \_testInfo;}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_catch_1_1_streaming_reporter_base_ad8a773ceb481c17f3cedee3bf65b9820_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_catch_1_1_streaming_reporter_base_aebb3f5242058ff945527079b85964bbe}\index{Catch::StreamingReporterBase$<$ DerivedT $>$@{Catch::StreamingReporterBase$<$ DerivedT $>$}!testGroupEnded@{testGroupEnded}}
+\index{testGroupEnded@{testGroupEnded}!Catch::StreamingReporterBase$<$ DerivedT $>$@{Catch::StreamingReporterBase$<$ DerivedT $>$}}
+\doxysubsubsection{\texorpdfstring{testGroupEnded()}{testGroupEnded()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_streaming_reporter_base_aebb3f5242058ff945527079b85964bbe} 
+template$<$typename DerivedT $>$ \\
+void \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base}{Catch\+::\+Streaming\+Reporter\+Base}}$<$ DerivedT $>$\+::test\+Group\+Ended (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_test_group_stats}{Test\+Group\+Stats}} const \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_abf668bf347eda4ba94fa2b3483ca4dd3}{Catch\+::\+IStreaming\+Reporter}}.
+
+
+
+Reimplemented in \mbox{\hyperlink{struct_catch_1_1_team_city_reporter_a1f84a6b49e1b13a3fc5a14b1e351909d}{Catch\+::\+Team\+City\+Reporter}}, \mbox{\hyperlink{struct_catch_1_1_team_city_reporter_a1f84a6b49e1b13a3fc5a14b1e351909d}{Catch\+::\+Team\+City\+Reporter}}, and \mbox{\hyperlink{class_catch_1_1_xml_reporter_ab9ba05f0311cb976fb6f7e5bd2df477c}{Catch\+::\+Xml\+Reporter}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__bases_8hpp_source_l00075}{75}} of file \mbox{\hyperlink{catch__reporter__bases_8hpp_source}{catch\+\_\+reporter\+\_\+bases.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a1b3f99eb83f649f90be2e3a2a296f76f}{currentGroupInfo}}.reset();}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_catch_1_1_streaming_reporter_base_aebb3f5242058ff945527079b85964bbe_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_catch_1_1_streaming_reporter_base_a6961a1cbf0d4bffed14cb04f80aaf318}\index{Catch::StreamingReporterBase$<$ DerivedT $>$@{Catch::StreamingReporterBase$<$ DerivedT $>$}!testGroupStarting@{testGroupStarting}}
+\index{testGroupStarting@{testGroupStarting}!Catch::StreamingReporterBase$<$ DerivedT $>$@{Catch::StreamingReporterBase$<$ DerivedT $>$}}
+\doxysubsubsection{\texorpdfstring{testGroupStarting()}{testGroupStarting()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_streaming_reporter_base_a6961a1cbf0d4bffed14cb04f80aaf318} 
+template$<$typename DerivedT $>$ \\
+void \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base}{Catch\+::\+Streaming\+Reporter\+Base}}$<$ DerivedT $>$\+::test\+Group\+Starting (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_group_info}{Group\+Info}} const \&}]{\+\_\+group\+Info}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_aef40d16994fe8a7ab140c885d8c2d7d0}{Catch\+::\+IStreaming\+Reporter}}.
+
+
+
+Reimplemented in \mbox{\hyperlink{struct_catch_1_1_team_city_reporter_a6b9db7ad0ac2c39c8b222bffa8eace6c}{Catch\+::\+Team\+City\+Reporter}}, \mbox{\hyperlink{struct_catch_1_1_team_city_reporter_a6b9db7ad0ac2c39c8b222bffa8eace6c}{Catch\+::\+Team\+City\+Reporter}}, and \mbox{\hyperlink{class_catch_1_1_xml_reporter_a873beb2333056238c4fd476ef90412fb}{Catch\+::\+Xml\+Reporter}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__bases_8hpp_source_l00058}{58}} of file \mbox{\hyperlink{catch__reporter__bases_8hpp_source}{catch\+\_\+reporter\+\_\+bases.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a1b3f99eb83f649f90be2e3a2a296f76f}{currentGroupInfo}}\ =\ \_groupInfo;}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_catch_1_1_streaming_reporter_base_a6961a1cbf0d4bffed14cb04f80aaf318_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_catch_1_1_streaming_reporter_base_a8cfd2e27ce7746966cf145b818254fd1}\index{Catch::StreamingReporterBase$<$ DerivedT $>$@{Catch::StreamingReporterBase$<$ DerivedT $>$}!testRunEnded@{testRunEnded}}
+\index{testRunEnded@{testRunEnded}!Catch::StreamingReporterBase$<$ DerivedT $>$@{Catch::StreamingReporterBase$<$ DerivedT $>$}}
+\doxysubsubsection{\texorpdfstring{testRunEnded()}{testRunEnded()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_streaming_reporter_base_a8cfd2e27ce7746966cf145b818254fd1} 
+template$<$typename DerivedT $>$ \\
+void \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base}{Catch\+::\+Streaming\+Reporter\+Base}}$<$ DerivedT $>$\+::test\+Run\+Ended (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_test_run_stats}{Test\+Run\+Stats}} const \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_a1ac383df84242bc55578e32ebca13e88}{Catch\+::\+IStreaming\+Reporter}}.
+
+
+
+Reimplemented in \mbox{\hyperlink{struct_catch_1_1_t_a_p_reporter_a991c5fc83855f65e11e840044335198a}{Catch\+::\+TAPReporter}}, \mbox{\hyperlink{struct_catch_1_1_t_a_p_reporter_a991c5fc83855f65e11e840044335198a}{Catch\+::\+TAPReporter}}, and \mbox{\hyperlink{class_catch_1_1_xml_reporter_a2458c9f342a446f0b3a7480b53c93705}{Catch\+::\+Xml\+Reporter}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__bases_8hpp_source_l00078}{78}} of file \mbox{\hyperlink{catch__reporter__bases_8hpp_source}{catch\+\_\+reporter\+\_\+bases.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a974c80ec3ab579eeafe899d9f0a97405}{currentTestCaseInfo}}.reset();}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_a1b3f99eb83f649f90be2e3a2a296f76f}{currentGroupInfo}}.reset();}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ad6fcc15e73e91f3cd19a0c8324783bd7}{currentTestRunInfo}}.reset();}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_catch_1_1_streaming_reporter_base_a8cfd2e27ce7746966cf145b818254fd1_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_catch_1_1_streaming_reporter_base_a510b201b48fb7d0ebd11d0c8c65a43ba}\index{Catch::StreamingReporterBase$<$ DerivedT $>$@{Catch::StreamingReporterBase$<$ DerivedT $>$}!testRunStarting@{testRunStarting}}
+\index{testRunStarting@{testRunStarting}!Catch::StreamingReporterBase$<$ DerivedT $>$@{Catch::StreamingReporterBase$<$ DerivedT $>$}}
+\doxysubsubsection{\texorpdfstring{testRunStarting()}{testRunStarting()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_streaming_reporter_base_a510b201b48fb7d0ebd11d0c8c65a43ba} 
+template$<$typename DerivedT $>$ \\
+void \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base}{Catch\+::\+Streaming\+Reporter\+Base}}$<$ DerivedT $>$\+::test\+Run\+Starting (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_test_run_info}{Test\+Run\+Info}} const \&}]{\+\_\+test\+Run\+Info}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_a8c7b304d9563992a611dc7d68dc0c1ce}{Catch\+::\+IStreaming\+Reporter}}.
+
+
+
+Reimplemented in \mbox{\hyperlink{class_catch_1_1_xml_reporter_ab5de0b02d5a30612ae5449360d867672}{Catch\+::\+Xml\+Reporter}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__bases_8hpp_source_l00054}{54}} of file \mbox{\hyperlink{catch__reporter__bases_8hpp_source}{catch\+\_\+reporter\+\_\+bases.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_ad6fcc15e73e91f3cd19a0c8324783bd7}{currentTestRunInfo}}\ =\ \_testRunInfo;}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_catch_1_1_streaming_reporter_base_a510b201b48fb7d0ebd11d0c8c65a43ba_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_catch_1_1_streaming_reporter_base_a1b3f99eb83f649f90be2e3a2a296f76f}\index{Catch::StreamingReporterBase$<$ DerivedT $>$@{Catch::StreamingReporterBase$<$ DerivedT $>$}!currentGroupInfo@{currentGroupInfo}}
+\index{currentGroupInfo@{currentGroupInfo}!Catch::StreamingReporterBase$<$ DerivedT $>$@{Catch::StreamingReporterBase$<$ DerivedT $>$}}
+\doxysubsubsection{\texorpdfstring{currentGroupInfo}{currentGroupInfo}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_streaming_reporter_base_a1b3f99eb83f649f90be2e3a2a296f76f} 
+template$<$typename DerivedT $>$ \\
+\mbox{\hyperlink{struct_catch_1_1_lazy_stat}{Lazy\+Stat}}$<$\mbox{\hyperlink{struct_catch_1_1_group_info}{Group\+Info}}$>$ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base}{Catch\+::\+Streaming\+Reporter\+Base}}$<$ DerivedT $>$\+::current\+Group\+Info}
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__bases_8hpp_source_l00093}{93}} of file \mbox{\hyperlink{catch__reporter__bases_8hpp_source}{catch\+\_\+reporter\+\_\+bases.\+hpp}}.
+
+\Hypertarget{struct_catch_1_1_streaming_reporter_base_a974c80ec3ab579eeafe899d9f0a97405}\index{Catch::StreamingReporterBase$<$ DerivedT $>$@{Catch::StreamingReporterBase$<$ DerivedT $>$}!currentTestCaseInfo@{currentTestCaseInfo}}
+\index{currentTestCaseInfo@{currentTestCaseInfo}!Catch::StreamingReporterBase$<$ DerivedT $>$@{Catch::StreamingReporterBase$<$ DerivedT $>$}}
+\doxysubsubsection{\texorpdfstring{currentTestCaseInfo}{currentTestCaseInfo}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_streaming_reporter_base_a974c80ec3ab579eeafe899d9f0a97405} 
+template$<$typename DerivedT $>$ \\
+\mbox{\hyperlink{struct_catch_1_1_lazy_stat}{Lazy\+Stat}}$<$\mbox{\hyperlink{struct_catch_1_1_test_case_info}{Test\+Case\+Info}}$>$ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base}{Catch\+::\+Streaming\+Reporter\+Base}}$<$ DerivedT $>$\+::current\+Test\+Case\+Info}
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__bases_8hpp_source_l00094}{94}} of file \mbox{\hyperlink{catch__reporter__bases_8hpp_source}{catch\+\_\+reporter\+\_\+bases.\+hpp}}.
+
+\Hypertarget{struct_catch_1_1_streaming_reporter_base_ad6fcc15e73e91f3cd19a0c8324783bd7}\index{Catch::StreamingReporterBase$<$ DerivedT $>$@{Catch::StreamingReporterBase$<$ DerivedT $>$}!currentTestRunInfo@{currentTestRunInfo}}
+\index{currentTestRunInfo@{currentTestRunInfo}!Catch::StreamingReporterBase$<$ DerivedT $>$@{Catch::StreamingReporterBase$<$ DerivedT $>$}}
+\doxysubsubsection{\texorpdfstring{currentTestRunInfo}{currentTestRunInfo}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_streaming_reporter_base_ad6fcc15e73e91f3cd19a0c8324783bd7} 
+template$<$typename DerivedT $>$ \\
+\mbox{\hyperlink{struct_catch_1_1_lazy_stat}{Lazy\+Stat}}$<$\mbox{\hyperlink{struct_catch_1_1_test_run_info}{Test\+Run\+Info}}$>$ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base}{Catch\+::\+Streaming\+Reporter\+Base}}$<$ DerivedT $>$\+::current\+Test\+Run\+Info}
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__bases_8hpp_source_l00092}{92}} of file \mbox{\hyperlink{catch__reporter__bases_8hpp_source}{catch\+\_\+reporter\+\_\+bases.\+hpp}}.
+
+\Hypertarget{struct_catch_1_1_streaming_reporter_base_aea2fd5c5f7cbfa78d96e15485a1b8ff7}\index{Catch::StreamingReporterBase$<$ DerivedT $>$@{Catch::StreamingReporterBase$<$ DerivedT $>$}!m\_config@{m\_config}}
+\index{m\_config@{m\_config}!Catch::StreamingReporterBase$<$ DerivedT $>$@{Catch::StreamingReporterBase$<$ DerivedT $>$}}
+\doxysubsubsection{\texorpdfstring{m\_config}{m\_config}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_streaming_reporter_base_aea2fd5c5f7cbfa78d96e15485a1b8ff7} 
+template$<$typename DerivedT $>$ \\
+\mbox{\hyperlink{namespace_catch_a961f6f5f07e265684c220a8ae014d7d6}{IConfig\+Ptr}} \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base}{Catch\+::\+Streaming\+Reporter\+Base}}$<$ DerivedT $>$\+::m\+\_\+config}
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__bases_8hpp_source_l00089}{89}} of file \mbox{\hyperlink{catch__reporter__bases_8hpp_source}{catch\+\_\+reporter\+\_\+bases.\+hpp}}.
+
+\Hypertarget{struct_catch_1_1_streaming_reporter_base_ab3c0202658a530cb0a384fef4fbd0baf}\index{Catch::StreamingReporterBase$<$ DerivedT $>$@{Catch::StreamingReporterBase$<$ DerivedT $>$}!m\_reporterPrefs@{m\_reporterPrefs}}
+\index{m\_reporterPrefs@{m\_reporterPrefs}!Catch::StreamingReporterBase$<$ DerivedT $>$@{Catch::StreamingReporterBase$<$ DerivedT $>$}}
+\doxysubsubsection{\texorpdfstring{m\_reporterPrefs}{m\_reporterPrefs}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_streaming_reporter_base_ab3c0202658a530cb0a384fef4fbd0baf} 
+template$<$typename DerivedT $>$ \\
+\mbox{\hyperlink{struct_catch_1_1_reporter_preferences}{Reporter\+Preferences}} \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base}{Catch\+::\+Streaming\+Reporter\+Base}}$<$ DerivedT $>$\+::m\+\_\+reporter\+Prefs}
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__bases_8hpp_source_l00097}{97}} of file \mbox{\hyperlink{catch__reporter__bases_8hpp_source}{catch\+\_\+reporter\+\_\+bases.\+hpp}}.
+
+\Hypertarget{struct_catch_1_1_streaming_reporter_base_a5358f16b9cc5afa0633519bf2c3a642b}\index{Catch::StreamingReporterBase$<$ DerivedT $>$@{Catch::StreamingReporterBase$<$ DerivedT $>$}!m\_sectionStack@{m\_sectionStack}}
+\index{m\_sectionStack@{m\_sectionStack}!Catch::StreamingReporterBase$<$ DerivedT $>$@{Catch::StreamingReporterBase$<$ DerivedT $>$}}
+\doxysubsubsection{\texorpdfstring{m\_sectionStack}{m\_sectionStack}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_streaming_reporter_base_a5358f16b9cc5afa0633519bf2c3a642b} 
+template$<$typename DerivedT $>$ \\
+std\+::vector$<$\mbox{\hyperlink{struct_catch_1_1_section_info}{Section\+Info}}$>$ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base}{Catch\+::\+Streaming\+Reporter\+Base}}$<$ DerivedT $>$\+::m\+\_\+section\+Stack}
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__bases_8hpp_source_l00096}{96}} of file \mbox{\hyperlink{catch__reporter__bases_8hpp_source}{catch\+\_\+reporter\+\_\+bases.\+hpp}}.
+
+\Hypertarget{struct_catch_1_1_streaming_reporter_base_a8ad7526bce08333b7d9414cc157e1f6d}\index{Catch::StreamingReporterBase$<$ DerivedT $>$@{Catch::StreamingReporterBase$<$ DerivedT $>$}!stream@{stream}}
+\index{stream@{stream}!Catch::StreamingReporterBase$<$ DerivedT $>$@{Catch::StreamingReporterBase$<$ DerivedT $>$}}
+\doxysubsubsection{\texorpdfstring{stream}{stream}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_streaming_reporter_base_a8ad7526bce08333b7d9414cc157e1f6d} 
+template$<$typename DerivedT $>$ \\
+std\+::ostream\& \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base}{Catch\+::\+Streaming\+Reporter\+Base}}$<$ DerivedT $>$\+::stream}
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__bases_8hpp_source_l00090}{90}} of file \mbox{\hyperlink{catch__reporter__bases_8hpp_source}{catch\+\_\+reporter\+\_\+bases.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/include/reporters/\mbox{\hyperlink{catch__reporter__bases_8hpp}{catch\+\_\+reporter\+\_\+bases.\+hpp}}\end{DoxyCompactItemize}

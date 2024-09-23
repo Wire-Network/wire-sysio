@@ -1,0 +1,1401 @@
+\doxysection{libraries/fc/include/fc/crypto/webauthn\+\_\+json/test/unittest/regextest.cpp File Reference}
+\hypertarget{regextest_8cpp}{}\label{regextest_8cpp}\index{libraries/fc/include/fc/crypto/webauthn\_json/test/unittest/regextest.cpp@{libraries/fc/include/fc/crypto/webauthn\_json/test/unittest/regextest.cpp}}
+{\ttfamily \#include "{}unittest.\+h"{}}\newline
+{\ttfamily \#include "{}rapidjson/internal/regex.\+h"{}}\newline
+Include dependency graph for regextest.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{regextest_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{regextest_8cpp_a5434fc5857bd1456b47ab1f89ad35098}{EURO}}~"{}\textbackslash{}x\+E2\textbackslash{}x82\textbackslash{}x\+AC"{}
+\item 
+\#define \mbox{\hyperlink{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960}{TEST\+\_\+\+INVALID}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{regextest_8cpp_a6926fa190879f4c751bbf0aae4be823c}{TEST}} (Regex, Single)
+\item 
+\mbox{\hyperlink{regextest_8cpp_a9f5f104eb29b493ba0cf3d88e7ccf2f4}{TEST}} (Regex, Concatenation)
+\item 
+\mbox{\hyperlink{regextest_8cpp_ab2c1dab85277a95c0d8f63a0d7932280}{TEST}} (Regex, Alternation1)
+\item 
+\mbox{\hyperlink{regextest_8cpp_a8958e10f913d41a4f130d7a90bc36109}{TEST}} (Regex, Alternation2)
+\item 
+\mbox{\hyperlink{regextest_8cpp_a4935dc01746cdf09ddc5c40f855fdc34}{TEST}} (Regex, Parenthesis1)
+\item 
+\mbox{\hyperlink{regextest_8cpp_adad68bb47b6019c9789d548c2e16f4bb}{TEST}} (Regex, Parenthesis2)
+\item 
+\mbox{\hyperlink{regextest_8cpp_a51706383c0b0745bf5deaec6a356fa20}{TEST}} (Regex, Parenthesis3)
+\item 
+\mbox{\hyperlink{regextest_8cpp_ab3660284a866e1b38128832952301a1c}{TEST}} (Regex, Zero\+Or\+One1)
+\item 
+\mbox{\hyperlink{regextest_8cpp_a69d5aa19c98edd1c583084a57b52c423}{TEST}} (Regex, Zero\+Or\+One2)
+\item 
+\mbox{\hyperlink{regextest_8cpp_a86d5177b7bfa3ad21bdedee7858fb246}{TEST}} (Regex, Zero\+Or\+One3)
+\item 
+\mbox{\hyperlink{regextest_8cpp_a5bfb68eb7300039e328dfd5229a01d55}{TEST}} (Regex, Zero\+Or\+One4)
+\item 
+\mbox{\hyperlink{regextest_8cpp_a3686c9aa735631ce12ddeaeff182c1dd}{TEST}} (Regex, Zero\+Or\+One5)
+\item 
+\mbox{\hyperlink{regextest_8cpp_ae26efb0cf2a86adcc118d3cec67459a0}{TEST}} (Regex, Zero\+Or\+More1)
+\item 
+\mbox{\hyperlink{regextest_8cpp_a461556287c755c1523ae785f2cdfebd5}{TEST}} (Regex, Zero\+Or\+More2)
+\item 
+\mbox{\hyperlink{regextest_8cpp_aa9d44367baa9feaa13f56bd3db85f723}{TEST}} (Regex, Zero\+Or\+More3)
+\item 
+\mbox{\hyperlink{regextest_8cpp_ae64f25bb4a800aa8cb56e29506a92755}{TEST}} (Regex, Zero\+Or\+More4)
+\item 
+\mbox{\hyperlink{regextest_8cpp_acf303a61ed3dc3e78162e043bd722ab4}{TEST}} (Regex, One\+Or\+More1)
+\item 
+\mbox{\hyperlink{regextest_8cpp_ab5eaedc150f27cbff58b89409f81441f}{TEST}} (Regex, One\+Or\+More2)
+\item 
+\mbox{\hyperlink{regextest_8cpp_a56170b119ba1cb63cb6f56c17b895b90}{TEST}} (Regex, One\+Or\+More3)
+\item 
+\mbox{\hyperlink{regextest_8cpp_ad9856cc9219629528b1163c39a49b6ef}{TEST}} (Regex, One\+Or\+More4)
+\item 
+\mbox{\hyperlink{regextest_8cpp_a6dff68def4615f25c278610e2ba0b51a}{TEST}} (Regex, Quantifier\+Exact1)
+\item 
+\mbox{\hyperlink{regextest_8cpp_a201a2f3aa40f995245e1cf61f50173c0}{TEST}} (Regex, Quantifier\+Exact2)
+\item 
+\mbox{\hyperlink{regextest_8cpp_a3cfb69a95cf9faa9e107fac21570bfd2}{TEST}} (Regex, Quantifier\+Exact3)
+\item 
+\mbox{\hyperlink{regextest_8cpp_a7d0565b30cef53039b81555c20aa4788}{TEST}} (Regex, Quantifier\+Min1)
+\item 
+\mbox{\hyperlink{regextest_8cpp_aceeb4372d8f8bffa5afe5f5b181bbfec}{TEST}} (Regex, Quantifier\+Min2)
+\item 
+\mbox{\hyperlink{regextest_8cpp_a8fcf728559bdbb4c18cab8ae8dd01844}{TEST}} (Regex, Quantifier\+Min3)
+\item 
+\mbox{\hyperlink{regextest_8cpp_aa1d34ea422c754e17f1af018917ffab2}{TEST}} (Regex, Quantifier\+Min\+Max1)
+\item 
+\mbox{\hyperlink{regextest_8cpp_a1d0baf9ad759c6cbb8cae7dcff7df081}{TEST}} (Regex, Quantifier\+Min\+Max2)
+\item 
+\mbox{\hyperlink{regextest_8cpp_aa53c89d72e27ca7d5030e034ae88b3ff}{TEST}} (Regex, Quantifier\+Min\+Max3)
+\item 
+\mbox{\hyperlink{regextest_8cpp_afddf32b93ac293a87ebbf708f2c9d19a}{TEST}} (Regex, Quantifier\+Min\+Max4)
+\item 
+\mbox{\hyperlink{regextest_8cpp_a88fc24c0b52bc49b9b82e513397a0a23}{TEST}} (Regex, Quantifier\+Min\+Max5)
+\item 
+\mbox{\hyperlink{regextest_8cpp_a381af5b77c706a40e6bc9a8ef561213a}{TEST}} (Regex, Unicode)
+\item 
+\mbox{\hyperlink{regextest_8cpp_a26baa15b641c8c8200ebedd68f72b3bd}{TEST}} (Regex, Any\+Character)
+\item 
+\mbox{\hyperlink{regextest_8cpp_a5eee49c855b7e6aa70ea9afa54551da0}{TEST}} (Regex, Character\+Range1)
+\item 
+\mbox{\hyperlink{regextest_8cpp_a03bdf5b8c7c85f58f3d94cf3c88021d2}{TEST}} (Regex, Character\+Range2)
+\item 
+\mbox{\hyperlink{regextest_8cpp_ad8766e194579bc7b258e0351b59f0ac5}{TEST}} (Regex, Character\+Range3)
+\item 
+\mbox{\hyperlink{regextest_8cpp_a6fce7647b571b45ef18cbe1096a31b3f}{TEST}} (Regex, Character\+Range4)
+\item 
+\mbox{\hyperlink{regextest_8cpp_aced64e292ed888b561abe6152cf25dc7}{TEST}} (Regex, Character\+Range5)
+\item 
+\mbox{\hyperlink{regextest_8cpp_a7c4605405d9ad43a0da07e169cb69d2b}{TEST}} (Regex, Character\+Range6)
+\item 
+\mbox{\hyperlink{regextest_8cpp_a3ada903d344b111ae36967dbd30bcba3}{TEST}} (Regex, Character\+Range7)
+\item 
+\mbox{\hyperlink{regextest_8cpp_a4081650a6aa86d371eee0cdb1b457a28}{TEST}} (Regex, Character\+Range8)
+\item 
+\mbox{\hyperlink{regextest_8cpp_a64325e2a1d76fb7a8f92d7bccd1a8da2}{TEST}} (Regex, Search)
+\item 
+\mbox{\hyperlink{regextest_8cpp_a1eda53a0cbf84cccc01a36819bc6751e}{TEST}} (Regex, Search\+\_\+\+Begin\+Anchor)
+\item 
+\mbox{\hyperlink{regextest_8cpp_a887e8f018eb36b77ad013086f1449544}{TEST}} (Regex, Search\+\_\+\+End\+Anchor)
+\item 
+\mbox{\hyperlink{regextest_8cpp_a187f2920cd48f579f856c82442441ba0}{TEST}} (Regex, Search\+\_\+\+Both\+Anchor)
+\item 
+\mbox{\hyperlink{regextest_8cpp_a00d40453c1add72f9d4bd76397ccaf73}{TEST}} (Regex, Escape)
+\item 
+\mbox{\hyperlink{regextest_8cpp_a33959d5936db2191b7849ce2f395b4ff}{TEST}} (Regex, Invalid)
+\item 
+\mbox{\hyperlink{regextest_8cpp_accdc2f6fbc70061692589a4d7fdd0d07}{TEST}} (Regex, Issue538)
+\item 
+\mbox{\hyperlink{regextest_8cpp_a86b74f2568edad0f59ccf1746046f910}{TEST}} (Regex, Issue583)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{regextest_8cpp_a5434fc5857bd1456b47ab1f89ad35098}\index{regextest.cpp@{regextest.cpp}!EURO@{EURO}}
+\index{EURO@{EURO}!regextest.cpp@{regextest.cpp}}
+\doxysubsubsection{\texorpdfstring{EURO}{EURO}}
+{\footnotesize\ttfamily \label{regextest_8cpp_a5434fc5857bd1456b47ab1f89ad35098} 
+\#define EURO~"{}\textbackslash{}x\+E2\textbackslash{}x82\textbackslash{}x\+AC"{}}
+
+
+
+Definition at line \mbox{\hyperlink{regextest_8cpp_source_l00404}{404}} of file \mbox{\hyperlink{regextest_8cpp_source}{regextest.\+cpp}}.
+
+\Hypertarget{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960}\index{regextest.cpp@{regextest.cpp}!TEST\_INVALID@{TEST\_INVALID}}
+\index{TEST\_INVALID@{TEST\_INVALID}!regextest.cpp@{regextest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_INVALID}{TEST\_INVALID}}
+{\footnotesize\ttfamily \label{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960} 
+\#define TEST\+\_\+\+INVALID(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \{\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ Regex\ re(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ EXPECT\_FALSE(re.IsValid());\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{regextest_8cpp_ab2c1dab85277a95c0d8f63a0d7932280}\index{regextest.cpp@{regextest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!regextest.cpp@{regextest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [1/49]}}
+{\footnotesize\ttfamily \label{regextest_8cpp_ab2c1dab85277a95c0d8f63a0d7932280} 
+TEST (\begin{DoxyParamCaption}\item[{Regex}]{}{, }\item[{Alternation1}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{regextest_8cpp_source_l00041}{41}} of file \mbox{\hyperlink{regextest_8cpp_source}{regextest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00042\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_ae7fc20c6ee680ae3ba16ae16b4bd5e16}{Regex}}\ re(\textcolor{stringliteral}{"{}abab|abbb"{}});}
+\DoxyCodeLine{00043\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{00044\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a7101e324c2d06f1505ef7c7d4401392b}{RegexSearch}}\ rs(re);}
+\DoxyCodeLine{00045\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abab"{}}));}
+\DoxyCodeLine{00046\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abbb"{}}));}
+\DoxyCodeLine{00047\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}"{}}));}
+\DoxyCodeLine{00048\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}ab"{}}));}
+\DoxyCodeLine{00049\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}ababa"{}}));}
+\DoxyCodeLine{00050\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}abb"{}}));}
+\DoxyCodeLine{00051\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}abbbb"{}}));}
+\DoxyCodeLine{00052\ \}}
+
+\end{DoxyCode}
+\Hypertarget{regextest_8cpp_a8958e10f913d41a4f130d7a90bc36109}\index{regextest.cpp@{regextest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!regextest.cpp@{regextest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [2/49]}}
+{\footnotesize\ttfamily \label{regextest_8cpp_a8958e10f913d41a4f130d7a90bc36109} 
+TEST (\begin{DoxyParamCaption}\item[{Regex}]{}{, }\item[{Alternation2}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{regextest_8cpp_source_l00054}{54}} of file \mbox{\hyperlink{regextest_8cpp_source}{regextest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00055\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_ae7fc20c6ee680ae3ba16ae16b4bd5e16}{Regex}}\ re(\textcolor{stringliteral}{"{}a|b|c"{}});}
+\DoxyCodeLine{00056\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{00057\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a7101e324c2d06f1505ef7c7d4401392b}{RegexSearch}}\ rs(re);}
+\DoxyCodeLine{00058\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}a"{}}));}
+\DoxyCodeLine{00059\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}b"{}}));}
+\DoxyCodeLine{00060\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}c"{}}));}
+\DoxyCodeLine{00061\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}"{}}));}
+\DoxyCodeLine{00062\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}aa"{}}));}
+\DoxyCodeLine{00063\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}ab"{}}));}
+\DoxyCodeLine{00064\ \}}
+
+\end{DoxyCode}
+\Hypertarget{regextest_8cpp_a26baa15b641c8c8200ebedd68f72b3bd}\index{regextest.cpp@{regextest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!regextest.cpp@{regextest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [3/49]}}
+{\footnotesize\ttfamily \label{regextest_8cpp_a26baa15b641c8c8200ebedd68f72b3bd} 
+TEST (\begin{DoxyParamCaption}\item[{Regex}]{}{, }\item[{Any\+Character}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{regextest_8cpp_source_l00416}{416}} of file \mbox{\hyperlink{regextest_8cpp_source}{regextest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00416\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00417\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_ae7fc20c6ee680ae3ba16ae16b4bd5e16}{Regex}}\ re(\textcolor{stringliteral}{"{}."{}});}
+\DoxyCodeLine{00418\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{00419\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a7101e324c2d06f1505ef7c7d4401392b}{RegexSearch}}\ rs(re);}
+\DoxyCodeLine{00420\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}a"{}}));}
+\DoxyCodeLine{00421\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}b"{}}));}
+\DoxyCodeLine{00422\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\mbox{\hyperlink{regextest_8cpp_a5434fc5857bd1456b47ab1f89ad35098}{EURO}}));}
+\DoxyCodeLine{00423\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}"{}}));}
+\DoxyCodeLine{00424\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}aa"{}}));}
+\DoxyCodeLine{00425\ \}}
+
+\end{DoxyCode}
+\Hypertarget{regextest_8cpp_a5eee49c855b7e6aa70ea9afa54551da0}\index{regextest.cpp@{regextest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!regextest.cpp@{regextest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [4/49]}}
+{\footnotesize\ttfamily \label{regextest_8cpp_a5eee49c855b7e6aa70ea9afa54551da0} 
+TEST (\begin{DoxyParamCaption}\item[{Regex}]{}{, }\item[{Character\+Range1}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{regextest_8cpp_source_l00427}{427}} of file \mbox{\hyperlink{regextest_8cpp_source}{regextest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00427\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00428\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_ae7fc20c6ee680ae3ba16ae16b4bd5e16}{Regex}}\ re(\textcolor{stringliteral}{"{}[abc]"{}});}
+\DoxyCodeLine{00429\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{00430\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a7101e324c2d06f1505ef7c7d4401392b}{RegexSearch}}\ rs(re);}
+\DoxyCodeLine{00431\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}a"{}}));}
+\DoxyCodeLine{00432\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}b"{}}));}
+\DoxyCodeLine{00433\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}c"{}}));}
+\DoxyCodeLine{00434\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}"{}}));}
+\DoxyCodeLine{00435\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}\`{}"{}}));}
+\DoxyCodeLine{00436\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}d"{}}));}
+\DoxyCodeLine{00437\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}aa"{}}));}
+\DoxyCodeLine{00438\ \}}
+
+\end{DoxyCode}
+\Hypertarget{regextest_8cpp_a03bdf5b8c7c85f58f3d94cf3c88021d2}\index{regextest.cpp@{regextest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!regextest.cpp@{regextest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [5/49]}}
+{\footnotesize\ttfamily \label{regextest_8cpp_a03bdf5b8c7c85f58f3d94cf3c88021d2} 
+TEST (\begin{DoxyParamCaption}\item[{Regex}]{}{, }\item[{Character\+Range2}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{regextest_8cpp_source_l00440}{440}} of file \mbox{\hyperlink{regextest_8cpp_source}{regextest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00440\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00441\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_ae7fc20c6ee680ae3ba16ae16b4bd5e16}{Regex}}\ re(\textcolor{stringliteral}{"{}[\string^abc]"{}});}
+\DoxyCodeLine{00442\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{00443\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a7101e324c2d06f1505ef7c7d4401392b}{RegexSearch}}\ rs(re);}
+\DoxyCodeLine{00444\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}\`{}"{}}));}
+\DoxyCodeLine{00445\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}d"{}}));}
+\DoxyCodeLine{00446\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}a"{}}));}
+\DoxyCodeLine{00447\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}b"{}}));}
+\DoxyCodeLine{00448\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}c"{}}));}
+\DoxyCodeLine{00449\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}"{}}));}
+\DoxyCodeLine{00450\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}aa"{}}));}
+\DoxyCodeLine{00451\ \}}
+
+\end{DoxyCode}
+\Hypertarget{regextest_8cpp_ad8766e194579bc7b258e0351b59f0ac5}\index{regextest.cpp@{regextest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!regextest.cpp@{regextest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [6/49]}}
+{\footnotesize\ttfamily \label{regextest_8cpp_ad8766e194579bc7b258e0351b59f0ac5} 
+TEST (\begin{DoxyParamCaption}\item[{Regex}]{}{, }\item[{Character\+Range3}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{regextest_8cpp_source_l00453}{453}} of file \mbox{\hyperlink{regextest_8cpp_source}{regextest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00453\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00454\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_ae7fc20c6ee680ae3ba16ae16b4bd5e16}{Regex}}\ re(\textcolor{stringliteral}{"{}[a-\/c]"{}});}
+\DoxyCodeLine{00455\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{00456\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a7101e324c2d06f1505ef7c7d4401392b}{RegexSearch}}\ rs(re);}
+\DoxyCodeLine{00457\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}a"{}}));}
+\DoxyCodeLine{00458\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}b"{}}));}
+\DoxyCodeLine{00459\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}c"{}}));}
+\DoxyCodeLine{00460\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}"{}}));}
+\DoxyCodeLine{00461\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}\`{}"{}}));}
+\DoxyCodeLine{00462\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}d"{}}));}
+\DoxyCodeLine{00463\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}aa"{}}));}
+\DoxyCodeLine{00464\ \}}
+
+\end{DoxyCode}
+\Hypertarget{regextest_8cpp_a6fce7647b571b45ef18cbe1096a31b3f}\index{regextest.cpp@{regextest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!regextest.cpp@{regextest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [7/49]}}
+{\footnotesize\ttfamily \label{regextest_8cpp_a6fce7647b571b45ef18cbe1096a31b3f} 
+TEST (\begin{DoxyParamCaption}\item[{Regex}]{}{, }\item[{Character\+Range4}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{regextest_8cpp_source_l00466}{466}} of file \mbox{\hyperlink{regextest_8cpp_source}{regextest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00466\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00467\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_ae7fc20c6ee680ae3ba16ae16b4bd5e16}{Regex}}\ re(\textcolor{stringliteral}{"{}[\string^a-\/c]"{}});}
+\DoxyCodeLine{00468\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{00469\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a7101e324c2d06f1505ef7c7d4401392b}{RegexSearch}}\ rs(re);}
+\DoxyCodeLine{00470\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}\`{}"{}}));}
+\DoxyCodeLine{00471\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}d"{}}));}
+\DoxyCodeLine{00472\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}a"{}}));}
+\DoxyCodeLine{00473\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}b"{}}));}
+\DoxyCodeLine{00474\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}c"{}}));}
+\DoxyCodeLine{00475\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}"{}}));}
+\DoxyCodeLine{00476\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}aa"{}}));}
+\DoxyCodeLine{00477\ \}}
+
+\end{DoxyCode}
+\Hypertarget{regextest_8cpp_aced64e292ed888b561abe6152cf25dc7}\index{regextest.cpp@{regextest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!regextest.cpp@{regextest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [8/49]}}
+{\footnotesize\ttfamily \label{regextest_8cpp_aced64e292ed888b561abe6152cf25dc7} 
+TEST (\begin{DoxyParamCaption}\item[{Regex}]{}{, }\item[{Character\+Range5}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{regextest_8cpp_source_l00479}{479}} of file \mbox{\hyperlink{regextest_8cpp_source}{regextest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00479\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00480\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_ae7fc20c6ee680ae3ba16ae16b4bd5e16}{Regex}}\ re(\textcolor{stringliteral}{"{}[-\/]"{}});}
+\DoxyCodeLine{00481\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{00482\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a7101e324c2d06f1505ef7c7d4401392b}{RegexSearch}}\ rs(re);}
+\DoxyCodeLine{00483\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}-\/"{}}));}
+\DoxyCodeLine{00484\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}"{}}));}
+\DoxyCodeLine{00485\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}a"{}}));}
+\DoxyCodeLine{00486\ \}}
+
+\end{DoxyCode}
+\Hypertarget{regextest_8cpp_a7c4605405d9ad43a0da07e169cb69d2b}\index{regextest.cpp@{regextest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!regextest.cpp@{regextest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [9/49]}}
+{\footnotesize\ttfamily \label{regextest_8cpp_a7c4605405d9ad43a0da07e169cb69d2b} 
+TEST (\begin{DoxyParamCaption}\item[{Regex}]{}{, }\item[{Character\+Range6}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{regextest_8cpp_source_l00488}{488}} of file \mbox{\hyperlink{regextest_8cpp_source}{regextest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00488\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00489\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_ae7fc20c6ee680ae3ba16ae16b4bd5e16}{Regex}}\ re(\textcolor{stringliteral}{"{}[a-\/]"{}});}
+\DoxyCodeLine{00490\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{00491\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a7101e324c2d06f1505ef7c7d4401392b}{RegexSearch}}\ rs(re);}
+\DoxyCodeLine{00492\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}a"{}}));}
+\DoxyCodeLine{00493\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}-\/"{}}));}
+\DoxyCodeLine{00494\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}"{}}));}
+\DoxyCodeLine{00495\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}\`{}"{}}));}
+\DoxyCodeLine{00496\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}b"{}}));}
+\DoxyCodeLine{00497\ \}}
+
+\end{DoxyCode}
+\Hypertarget{regextest_8cpp_a3ada903d344b111ae36967dbd30bcba3}\index{regextest.cpp@{regextest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!regextest.cpp@{regextest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [10/49]}}
+{\footnotesize\ttfamily \label{regextest_8cpp_a3ada903d344b111ae36967dbd30bcba3} 
+TEST (\begin{DoxyParamCaption}\item[{Regex}]{}{, }\item[{Character\+Range7}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{regextest_8cpp_source_l00499}{499}} of file \mbox{\hyperlink{regextest_8cpp_source}{regextest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00499\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00500\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_ae7fc20c6ee680ae3ba16ae16b4bd5e16}{Regex}}\ re(\textcolor{stringliteral}{"{}[-\/a]"{}});}
+\DoxyCodeLine{00501\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{00502\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a7101e324c2d06f1505ef7c7d4401392b}{RegexSearch}}\ rs(re);}
+\DoxyCodeLine{00503\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}a"{}}));}
+\DoxyCodeLine{00504\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}-\/"{}}));}
+\DoxyCodeLine{00505\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}"{}}));}
+\DoxyCodeLine{00506\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}\`{}"{}}));}
+\DoxyCodeLine{00507\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}b"{}}));}
+\DoxyCodeLine{00508\ \}}
+
+\end{DoxyCode}
+\Hypertarget{regextest_8cpp_a4081650a6aa86d371eee0cdb1b457a28}\index{regextest.cpp@{regextest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!regextest.cpp@{regextest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [11/49]}}
+{\footnotesize\ttfamily \label{regextest_8cpp_a4081650a6aa86d371eee0cdb1b457a28} 
+TEST (\begin{DoxyParamCaption}\item[{Regex}]{}{, }\item[{Character\+Range8}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{regextest_8cpp_source_l00510}{510}} of file \mbox{\hyperlink{regextest_8cpp_source}{regextest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00510\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00511\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_ae7fc20c6ee680ae3ba16ae16b4bd5e16}{Regex}}\ re(\textcolor{stringliteral}{"{}[a-\/zA-\/Z0-\/9]*"{}});}
+\DoxyCodeLine{00512\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{00513\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a7101e324c2d06f1505ef7c7d4401392b}{RegexSearch}}\ rs(re);}
+\DoxyCodeLine{00514\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}Milo"{}}));}
+\DoxyCodeLine{00515\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}MT19937"{}}));}
+\DoxyCodeLine{00516\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}43"{}}));}
+\DoxyCodeLine{00517\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}a\_b"{}}));}
+\DoxyCodeLine{00518\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}!"{}}));}
+\DoxyCodeLine{00519\ \}}
+
+\end{DoxyCode}
+\Hypertarget{regextest_8cpp_a9f5f104eb29b493ba0cf3d88e7ccf2f4}\index{regextest.cpp@{regextest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!regextest.cpp@{regextest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [12/49]}}
+{\footnotesize\ttfamily \label{regextest_8cpp_a9f5f104eb29b493ba0cf3d88e7ccf2f4} 
+TEST (\begin{DoxyParamCaption}\item[{Regex}]{}{, }\item[{Concatenation}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{regextest_8cpp_source_l00029}{29}} of file \mbox{\hyperlink{regextest_8cpp_source}{regextest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00030\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_ae7fc20c6ee680ae3ba16ae16b4bd5e16}{Regex}}\ re(\textcolor{stringliteral}{"{}abc"{}});}
+\DoxyCodeLine{00031\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{00032\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a7101e324c2d06f1505ef7c7d4401392b}{RegexSearch}}\ rs(re);}
+\DoxyCodeLine{00033\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abc"{}}));}
+\DoxyCodeLine{00034\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}"{}}));}
+\DoxyCodeLine{00035\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}a"{}}));}
+\DoxyCodeLine{00036\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}b"{}}));}
+\DoxyCodeLine{00037\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}ab"{}}));}
+\DoxyCodeLine{00038\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}abcd"{}}));}
+\DoxyCodeLine{00039\ \}}
+
+\end{DoxyCode}
+\Hypertarget{regextest_8cpp_a00d40453c1add72f9d4bd76397ccaf73}\index{regextest.cpp@{regextest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!regextest.cpp@{regextest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [13/49]}}
+{\footnotesize\ttfamily \label{regextest_8cpp_a00d40453c1add72f9d4bd76397ccaf73} 
+TEST (\begin{DoxyParamCaption}\item[{Regex}]{}{, }\item[{Escape}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{regextest_8cpp_source_l00579}{579}} of file \mbox{\hyperlink{regextest_8cpp_source}{regextest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00579\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00580\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ =\ \textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)\string^\(\backslash\)\(\backslash\)\$\(\backslash\)\(\backslash\)|\(\backslash\)\(\backslash\)(\(\backslash\)\(\backslash\))\(\backslash\)\(\backslash\)?\(\backslash\)\(\backslash\)*\(\backslash\)\(\backslash\)+\(\backslash\)\(\backslash\).\(\backslash\)\(\backslash\)[\(\backslash\)\(\backslash\)]\(\backslash\)\(\backslash\)\{\(\backslash\)\(\backslash\)\}\(\backslash\)\(\backslash\)\(\backslash\)\(\backslash\)\(\backslash\)\(\backslash\)f\(\backslash\)\(\backslash\)n\(\backslash\)\(\backslash\)r\(\backslash\)\(\backslash\)t\(\backslash\)\(\backslash\)v[\(\backslash\)\(\backslash\)b][\(\backslash\)\(\backslash\)[][\(\backslash\)\(\backslash\)]]"{}};}
+\DoxyCodeLine{00581\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_ae7fc20c6ee680ae3ba16ae16b4bd5e16}{Regex}}\ re(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{00582\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{00583\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a7101e324c2d06f1505ef7c7d4401392b}{RegexSearch}}\ rs(re);}
+\DoxyCodeLine{00584\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}\string^\$|()?*+.[]\{\}\(\backslash\)\(\backslash\)\(\backslash\)x0C\(\backslash\)n\(\backslash\)r\(\backslash\)t\(\backslash\)x0B\(\backslash\)b[]"{}}));}
+\DoxyCodeLine{00585\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}));\ \textcolor{comment}{//\ Not\ escaping}}
+\DoxyCodeLine{00586\ \}}
+
+\end{DoxyCode}
+\Hypertarget{regextest_8cpp_a33959d5936db2191b7849ce2f395b4ff}\index{regextest.cpp@{regextest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!regextest.cpp@{regextest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [14/49]}}
+{\footnotesize\ttfamily \label{regextest_8cpp_a33959d5936db2191b7849ce2f395b4ff} 
+TEST (\begin{DoxyParamCaption}\item[{Regex}]{}{, }\item[{Invalid}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{regextest_8cpp_source_l00588}{588}} of file \mbox{\hyperlink{regextest_8cpp_source}{regextest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00588\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00589\ \textcolor{preprocessor}{\#define\ TEST\_INVALID(s)\ \(\backslash\)}}
+\DoxyCodeLine{00590\ \textcolor{preprocessor}{\ \ \ \ \{\(\backslash\)}}
+\DoxyCodeLine{00591\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ Regex\ re(s);\(\backslash\)}}
+\DoxyCodeLine{00592\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ EXPECT\_FALSE(re.IsValid());\(\backslash\)}}
+\DoxyCodeLine{00593\ \textcolor{preprocessor}{\ \ \ \ \}}}
+\DoxyCodeLine{00594\ }
+\DoxyCodeLine{00595\ \ \ \ \ \mbox{\hyperlink{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960}{TEST\_INVALID}}(\textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{00596\ \ \ \ \ \mbox{\hyperlink{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960}{TEST\_INVALID}}(\textcolor{stringliteral}{"{}a|"{}});}
+\DoxyCodeLine{00597\ \ \ \ \ \mbox{\hyperlink{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960}{TEST\_INVALID}}(\textcolor{stringliteral}{"{}()"{}});}
+\DoxyCodeLine{00598\ \ \ \ \ \mbox{\hyperlink{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960}{TEST\_INVALID}}(\textcolor{stringliteral}{"{}("{}});}
+\DoxyCodeLine{00599\ \ \ \ \ \mbox{\hyperlink{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960}{TEST\_INVALID}}(\textcolor{stringliteral}{"{})"{}});}
+\DoxyCodeLine{00600\ \ \ \ \ \mbox{\hyperlink{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960}{TEST\_INVALID}}(\textcolor{stringliteral}{"{}(a))"{}});}
+\DoxyCodeLine{00601\ \ \ \ \ \mbox{\hyperlink{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960}{TEST\_INVALID}}(\textcolor{stringliteral}{"{}(a|)"{}});}
+\DoxyCodeLine{00602\ \ \ \ \ \mbox{\hyperlink{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960}{TEST\_INVALID}}(\textcolor{stringliteral}{"{}(a||b)"{}});}
+\DoxyCodeLine{00603\ \ \ \ \ \mbox{\hyperlink{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960}{TEST\_INVALID}}(\textcolor{stringliteral}{"{}(|b)"{}});}
+\DoxyCodeLine{00604\ \ \ \ \ \mbox{\hyperlink{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960}{TEST\_INVALID}}(\textcolor{stringliteral}{"{}?"{}});}
+\DoxyCodeLine{00605\ \ \ \ \ \mbox{\hyperlink{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960}{TEST\_INVALID}}(\textcolor{stringliteral}{"{}*"{}});}
+\DoxyCodeLine{00606\ \ \ \ \ \mbox{\hyperlink{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960}{TEST\_INVALID}}(\textcolor{stringliteral}{"{}+"{}});}
+\DoxyCodeLine{00607\ \ \ \ \ \mbox{\hyperlink{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960}{TEST\_INVALID}}(\textcolor{stringliteral}{"{}\{"{}});}
+\DoxyCodeLine{00608\ \ \ \ \ \mbox{\hyperlink{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960}{TEST\_INVALID}}(\textcolor{stringliteral}{"{}\{\}"{}});}
+\DoxyCodeLine{00609\ \ \ \ \ \mbox{\hyperlink{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960}{TEST\_INVALID}}(\textcolor{stringliteral}{"{}a\{a\}"{}});}
+\DoxyCodeLine{00610\ \ \ \ \ \mbox{\hyperlink{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960}{TEST\_INVALID}}(\textcolor{stringliteral}{"{}a\{0\}"{}});}
+\DoxyCodeLine{00611\ \ \ \ \ \mbox{\hyperlink{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960}{TEST\_INVALID}}(\textcolor{stringliteral}{"{}a\{-\/1\}"{}});}
+\DoxyCodeLine{00612\ \ \ \ \ \mbox{\hyperlink{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960}{TEST\_INVALID}}(\textcolor{stringliteral}{"{}a\{\}"{}});}
+\DoxyCodeLine{00613\ \ \ \ \ \textcolor{comment}{//\ TEST\_INVALID("{}a\{0,\}"{});\ \ \ //\ Support\ now}}
+\DoxyCodeLine{00614\ \ \ \ \ \mbox{\hyperlink{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960}{TEST\_INVALID}}(\textcolor{stringliteral}{"{}a\{,0\}"{}});}
+\DoxyCodeLine{00615\ \ \ \ \ \mbox{\hyperlink{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960}{TEST\_INVALID}}(\textcolor{stringliteral}{"{}a\{1,0\}"{}});}
+\DoxyCodeLine{00616\ \ \ \ \ \mbox{\hyperlink{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960}{TEST\_INVALID}}(\textcolor{stringliteral}{"{}a\{-\/1,0\}"{}});}
+\DoxyCodeLine{00617\ \ \ \ \ \mbox{\hyperlink{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960}{TEST\_INVALID}}(\textcolor{stringliteral}{"{}a\{-\/1,1\}"{}});}
+\DoxyCodeLine{00618\ \ \ \ \ \mbox{\hyperlink{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960}{TEST\_INVALID}}(\textcolor{stringliteral}{"{}a\{4294967296\}"{}});\ \textcolor{comment}{//\ overflow\ of\ unsigned}}
+\DoxyCodeLine{00619\ \ \ \ \ \mbox{\hyperlink{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960}{TEST\_INVALID}}(\textcolor{stringliteral}{"{}a\{1a\}"{}});}
+\DoxyCodeLine{00620\ \ \ \ \ \mbox{\hyperlink{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960}{TEST\_INVALID}}(\textcolor{stringliteral}{"{}["{}});}
+\DoxyCodeLine{00621\ \ \ \ \ \mbox{\hyperlink{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960}{TEST\_INVALID}}(\textcolor{stringliteral}{"{}[]"{}});}
+\DoxyCodeLine{00622\ \ \ \ \ \mbox{\hyperlink{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960}{TEST\_INVALID}}(\textcolor{stringliteral}{"{}[\string^]"{}});}
+\DoxyCodeLine{00623\ \ \ \ \ \mbox{\hyperlink{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960}{TEST\_INVALID}}(\textcolor{stringliteral}{"{}[\(\backslash\)\(\backslash\)a]"{}});}
+\DoxyCodeLine{00624\ \ \ \ \ \mbox{\hyperlink{regextest_8cpp_ae270a8a2de2750e2425c7b17459c8960}{TEST\_INVALID}}(\textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)a"{}});}
+\DoxyCodeLine{00625\ }
+\DoxyCodeLine{00626\ \textcolor{preprocessor}{\#undef\ TEST\_INVALID}}
+\DoxyCodeLine{00627\ \}}
+
+\end{DoxyCode}
+\Hypertarget{regextest_8cpp_accdc2f6fbc70061692589a4d7fdd0d07}\index{regextest.cpp@{regextest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!regextest.cpp@{regextest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [15/49]}}
+{\footnotesize\ttfamily \label{regextest_8cpp_accdc2f6fbc70061692589a4d7fdd0d07} 
+TEST (\begin{DoxyParamCaption}\item[{Regex}]{}{, }\item[{Issue538}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{regextest_8cpp_source_l00629}{629}} of file \mbox{\hyperlink{regextest_8cpp_source}{regextest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00629\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00630\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_ae7fc20c6ee680ae3ba16ae16b4bd5e16}{Regex}}\ re(\textcolor{stringliteral}{"{}\string^[0-\/9]+(\(\backslash\)\(\backslash\)\(\backslash\)\(\backslash\).[0-\/9]+)\{0,2\}"{}});}
+\DoxyCodeLine{00631\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{00632\ \}}
+
+\end{DoxyCode}
+\Hypertarget{regextest_8cpp_a86b74f2568edad0f59ccf1746046f910}\index{regextest.cpp@{regextest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!regextest.cpp@{regextest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [16/49]}}
+{\footnotesize\ttfamily \label{regextest_8cpp_a86b74f2568edad0f59ccf1746046f910} 
+TEST (\begin{DoxyParamCaption}\item[{Regex}]{}{, }\item[{Issue583}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{regextest_8cpp_source_l00634}{634}} of file \mbox{\hyperlink{regextest_8cpp_source}{regextest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00634\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00635\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_ae7fc20c6ee680ae3ba16ae16b4bd5e16}{Regex}}\ re(\textcolor{stringliteral}{"{}[0-\/9]\{99999\}"{}});}
+\DoxyCodeLine{00636\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{00637\ \}}
+
+\end{DoxyCode}
+\Hypertarget{regextest_8cpp_acf303a61ed3dc3e78162e043bd722ab4}\index{regextest.cpp@{regextest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!regextest.cpp@{regextest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [17/49]}}
+{\footnotesize\ttfamily \label{regextest_8cpp_acf303a61ed3dc3e78162e043bd722ab4} 
+TEST (\begin{DoxyParamCaption}\item[{Regex}]{}{, }\item[{One\+Or\+More1}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{regextest_8cpp_source_l00207}{207}} of file \mbox{\hyperlink{regextest_8cpp_source}{regextest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00208\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_ae7fc20c6ee680ae3ba16ae16b4bd5e16}{Regex}}\ re(\textcolor{stringliteral}{"{}a+"{}});}
+\DoxyCodeLine{00209\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{00210\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a7101e324c2d06f1505ef7c7d4401392b}{RegexSearch}}\ rs(re);}
+\DoxyCodeLine{00211\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}a"{}}));}
+\DoxyCodeLine{00212\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}aa"{}}));}
+\DoxyCodeLine{00213\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}"{}}));}
+\DoxyCodeLine{00214\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}b"{}}));}
+\DoxyCodeLine{00215\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}ab"{}}));}
+\DoxyCodeLine{00216\ \}}
+
+\end{DoxyCode}
+\Hypertarget{regextest_8cpp_ab5eaedc150f27cbff58b89409f81441f}\index{regextest.cpp@{regextest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!regextest.cpp@{regextest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [18/49]}}
+{\footnotesize\ttfamily \label{regextest_8cpp_ab5eaedc150f27cbff58b89409f81441f} 
+TEST (\begin{DoxyParamCaption}\item[{Regex}]{}{, }\item[{One\+Or\+More2}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{regextest_8cpp_source_l00218}{218}} of file \mbox{\hyperlink{regextest_8cpp_source}{regextest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00218\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00219\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_ae7fc20c6ee680ae3ba16ae16b4bd5e16}{Regex}}\ re(\textcolor{stringliteral}{"{}a+b"{}});}
+\DoxyCodeLine{00220\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{00221\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a7101e324c2d06f1505ef7c7d4401392b}{RegexSearch}}\ rs(re);}
+\DoxyCodeLine{00222\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}ab"{}}));}
+\DoxyCodeLine{00223\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}aab"{}}));}
+\DoxyCodeLine{00224\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}"{}}));}
+\DoxyCodeLine{00225\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}b"{}}));}
+\DoxyCodeLine{00226\ \}}
+
+\end{DoxyCode}
+\Hypertarget{regextest_8cpp_a56170b119ba1cb63cb6f56c17b895b90}\index{regextest.cpp@{regextest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!regextest.cpp@{regextest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [19/49]}}
+{\footnotesize\ttfamily \label{regextest_8cpp_a56170b119ba1cb63cb6f56c17b895b90} 
+TEST (\begin{DoxyParamCaption}\item[{Regex}]{}{, }\item[{One\+Or\+More3}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{regextest_8cpp_source_l00228}{228}} of file \mbox{\hyperlink{regextest_8cpp_source}{regextest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00228\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00229\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_ae7fc20c6ee680ae3ba16ae16b4bd5e16}{Regex}}\ re(\textcolor{stringliteral}{"{}a+b+"{}});}
+\DoxyCodeLine{00230\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{00231\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a7101e324c2d06f1505ef7c7d4401392b}{RegexSearch}}\ rs(re);}
+\DoxyCodeLine{00232\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}ab"{}}));}
+\DoxyCodeLine{00233\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}aab"{}}));}
+\DoxyCodeLine{00234\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abb"{}}));}
+\DoxyCodeLine{00235\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}aabb"{}}));}
+\DoxyCodeLine{00236\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}"{}}));}
+\DoxyCodeLine{00237\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}b"{}}));}
+\DoxyCodeLine{00238\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}ba"{}}));}
+\DoxyCodeLine{00239\ \}}
+
+\end{DoxyCode}
+\Hypertarget{regextest_8cpp_ad9856cc9219629528b1163c39a49b6ef}\index{regextest.cpp@{regextest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!regextest.cpp@{regextest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [20/49]}}
+{\footnotesize\ttfamily \label{regextest_8cpp_ad9856cc9219629528b1163c39a49b6ef} 
+TEST (\begin{DoxyParamCaption}\item[{Regex}]{}{, }\item[{One\+Or\+More4}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{regextest_8cpp_source_l00241}{241}} of file \mbox{\hyperlink{regextest_8cpp_source}{regextest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00241\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00242\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_ae7fc20c6ee680ae3ba16ae16b4bd5e16}{Regex}}\ re(\textcolor{stringliteral}{"{}a(ab)+b"{}});}
+\DoxyCodeLine{00243\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{00244\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a7101e324c2d06f1505ef7c7d4401392b}{RegexSearch}}\ rs(re);}
+\DoxyCodeLine{00245\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}aabb"{}}));}
+\DoxyCodeLine{00246\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}aababb"{}}));}
+\DoxyCodeLine{00247\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}"{}}));}
+\DoxyCodeLine{00248\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}ab"{}}));}
+\DoxyCodeLine{00249\ \}}
+
+\end{DoxyCode}
+\Hypertarget{regextest_8cpp_a4935dc01746cdf09ddc5c40f855fdc34}\index{regextest.cpp@{regextest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!regextest.cpp@{regextest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [21/49]}}
+{\footnotesize\ttfamily \label{regextest_8cpp_a4935dc01746cdf09ddc5c40f855fdc34} 
+TEST (\begin{DoxyParamCaption}\item[{Regex}]{}{, }\item[{Parenthesis1}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{regextest_8cpp_source_l00066}{66}} of file \mbox{\hyperlink{regextest_8cpp_source}{regextest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00067\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_ae7fc20c6ee680ae3ba16ae16b4bd5e16}{Regex}}\ re(\textcolor{stringliteral}{"{}(ab)c"{}});}
+\DoxyCodeLine{00068\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{00069\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a7101e324c2d06f1505ef7c7d4401392b}{RegexSearch}}\ rs(re);}
+\DoxyCodeLine{00070\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abc"{}}));}
+\DoxyCodeLine{00071\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}"{}}));}
+\DoxyCodeLine{00072\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}a"{}}));}
+\DoxyCodeLine{00073\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}b"{}}));}
+\DoxyCodeLine{00074\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}ab"{}}));}
+\DoxyCodeLine{00075\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}abcd"{}}));}
+\DoxyCodeLine{00076\ \}}
+
+\end{DoxyCode}
+\Hypertarget{regextest_8cpp_adad68bb47b6019c9789d548c2e16f4bb}\index{regextest.cpp@{regextest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!regextest.cpp@{regextest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [22/49]}}
+{\footnotesize\ttfamily \label{regextest_8cpp_adad68bb47b6019c9789d548c2e16f4bb} 
+TEST (\begin{DoxyParamCaption}\item[{Regex}]{}{, }\item[{Parenthesis2}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{regextest_8cpp_source_l00078}{78}} of file \mbox{\hyperlink{regextest_8cpp_source}{regextest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00079\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_ae7fc20c6ee680ae3ba16ae16b4bd5e16}{Regex}}\ re(\textcolor{stringliteral}{"{}a(bc)"{}});}
+\DoxyCodeLine{00080\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{00081\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a7101e324c2d06f1505ef7c7d4401392b}{RegexSearch}}\ rs(re);}
+\DoxyCodeLine{00082\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abc"{}}));}
+\DoxyCodeLine{00083\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}"{}}));}
+\DoxyCodeLine{00084\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}a"{}}));}
+\DoxyCodeLine{00085\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}b"{}}));}
+\DoxyCodeLine{00086\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}ab"{}}));}
+\DoxyCodeLine{00087\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}abcd"{}}));}
+\DoxyCodeLine{00088\ \}}
+
+\end{DoxyCode}
+\Hypertarget{regextest_8cpp_a51706383c0b0745bf5deaec6a356fa20}\index{regextest.cpp@{regextest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!regextest.cpp@{regextest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [23/49]}}
+{\footnotesize\ttfamily \label{regextest_8cpp_a51706383c0b0745bf5deaec6a356fa20} 
+TEST (\begin{DoxyParamCaption}\item[{Regex}]{}{, }\item[{Parenthesis3}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{regextest_8cpp_source_l00090}{90}} of file \mbox{\hyperlink{regextest_8cpp_source}{regextest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00091\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_ae7fc20c6ee680ae3ba16ae16b4bd5e16}{Regex}}\ re(\textcolor{stringliteral}{"{}(a|b)(c|d)"{}});}
+\DoxyCodeLine{00092\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{00093\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a7101e324c2d06f1505ef7c7d4401392b}{RegexSearch}}\ rs(re);}
+\DoxyCodeLine{00094\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}ac"{}}));}
+\DoxyCodeLine{00095\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}ad"{}}));}
+\DoxyCodeLine{00096\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}bc"{}}));}
+\DoxyCodeLine{00097\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}bd"{}}));}
+\DoxyCodeLine{00098\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}"{}}));}
+\DoxyCodeLine{00099\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}ab"{}}));}
+\DoxyCodeLine{00100\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}cd"{}}));}
+\DoxyCodeLine{00101\ \}}
+
+\end{DoxyCode}
+\Hypertarget{regextest_8cpp_a6dff68def4615f25c278610e2ba0b51a}\index{regextest.cpp@{regextest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!regextest.cpp@{regextest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [24/49]}}
+{\footnotesize\ttfamily \label{regextest_8cpp_a6dff68def4615f25c278610e2ba0b51a} 
+TEST (\begin{DoxyParamCaption}\item[{Regex}]{}{, }\item[{Quantifier\+Exact1}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{regextest_8cpp_source_l00251}{251}} of file \mbox{\hyperlink{regextest_8cpp_source}{regextest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00251\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00252\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_ae7fc20c6ee680ae3ba16ae16b4bd5e16}{Regex}}\ re(\textcolor{stringliteral}{"{}ab\{3\}c"{}});}
+\DoxyCodeLine{00253\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{00254\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a7101e324c2d06f1505ef7c7d4401392b}{RegexSearch}}\ rs(re);}
+\DoxyCodeLine{00255\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abbbc"{}}));}
+\DoxyCodeLine{00256\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}ac"{}}));}
+\DoxyCodeLine{00257\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}abc"{}}));}
+\DoxyCodeLine{00258\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}abbc"{}}));}
+\DoxyCodeLine{00259\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}abbbbc"{}}));}
+\DoxyCodeLine{00260\ \}}
+
+\end{DoxyCode}
+\Hypertarget{regextest_8cpp_a201a2f3aa40f995245e1cf61f50173c0}\index{regextest.cpp@{regextest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!regextest.cpp@{regextest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [25/49]}}
+{\footnotesize\ttfamily \label{regextest_8cpp_a201a2f3aa40f995245e1cf61f50173c0} 
+TEST (\begin{DoxyParamCaption}\item[{Regex}]{}{, }\item[{Quantifier\+Exact2}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{regextest_8cpp_source_l00262}{262}} of file \mbox{\hyperlink{regextest_8cpp_source}{regextest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00262\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00263\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_ae7fc20c6ee680ae3ba16ae16b4bd5e16}{Regex}}\ re(\textcolor{stringliteral}{"{}a(bc)\{3\}d"{}});}
+\DoxyCodeLine{00264\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{00265\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a7101e324c2d06f1505ef7c7d4401392b}{RegexSearch}}\ rs(re);}
+\DoxyCodeLine{00266\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abcbcbcd"{}}));}
+\DoxyCodeLine{00267\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}ad"{}}));}
+\DoxyCodeLine{00268\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}abcd"{}}));}
+\DoxyCodeLine{00269\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}abcbcd"{}}));}
+\DoxyCodeLine{00270\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}abcbcbcbcd"{}}));}
+\DoxyCodeLine{00271\ \}}
+
+\end{DoxyCode}
+\Hypertarget{regextest_8cpp_a3cfb69a95cf9faa9e107fac21570bfd2}\index{regextest.cpp@{regextest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!regextest.cpp@{regextest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [26/49]}}
+{\footnotesize\ttfamily \label{regextest_8cpp_a3cfb69a95cf9faa9e107fac21570bfd2} 
+TEST (\begin{DoxyParamCaption}\item[{Regex}]{}{, }\item[{Quantifier\+Exact3}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{regextest_8cpp_source_l00273}{273}} of file \mbox{\hyperlink{regextest_8cpp_source}{regextest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00273\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00274\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_ae7fc20c6ee680ae3ba16ae16b4bd5e16}{Regex}}\ re(\textcolor{stringliteral}{"{}a(b|c)\{3\}d"{}});}
+\DoxyCodeLine{00275\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{00276\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a7101e324c2d06f1505ef7c7d4401392b}{RegexSearch}}\ rs(re);}
+\DoxyCodeLine{00277\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abbbd"{}}));}
+\DoxyCodeLine{00278\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}acccd"{}}));}
+\DoxyCodeLine{00279\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abcbd"{}}));}
+\DoxyCodeLine{00280\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}ad"{}}));}
+\DoxyCodeLine{00281\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}abbd"{}}));}
+\DoxyCodeLine{00282\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}accccd"{}}));}
+\DoxyCodeLine{00283\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}abbbbd"{}}));}
+\DoxyCodeLine{00284\ \}}
+
+\end{DoxyCode}
+\Hypertarget{regextest_8cpp_a7d0565b30cef53039b81555c20aa4788}\index{regextest.cpp@{regextest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!regextest.cpp@{regextest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [27/49]}}
+{\footnotesize\ttfamily \label{regextest_8cpp_a7d0565b30cef53039b81555c20aa4788} 
+TEST (\begin{DoxyParamCaption}\item[{Regex}]{}{, }\item[{Quantifier\+Min1}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{regextest_8cpp_source_l00286}{286}} of file \mbox{\hyperlink{regextest_8cpp_source}{regextest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00286\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00287\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_ae7fc20c6ee680ae3ba16ae16b4bd5e16}{Regex}}\ re(\textcolor{stringliteral}{"{}ab\{3,\}c"{}});}
+\DoxyCodeLine{00288\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{00289\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a7101e324c2d06f1505ef7c7d4401392b}{RegexSearch}}\ rs(re);}
+\DoxyCodeLine{00290\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abbbc"{}}));}
+\DoxyCodeLine{00291\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abbbbc"{}}));}
+\DoxyCodeLine{00292\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abbbbbc"{}}));}
+\DoxyCodeLine{00293\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}ac"{}}));}
+\DoxyCodeLine{00294\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}abc"{}}));}
+\DoxyCodeLine{00295\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}abbc"{}}));}
+\DoxyCodeLine{00296\ \}}
+
+\end{DoxyCode}
+\Hypertarget{regextest_8cpp_aceeb4372d8f8bffa5afe5f5b181bbfec}\index{regextest.cpp@{regextest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!regextest.cpp@{regextest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [28/49]}}
+{\footnotesize\ttfamily \label{regextest_8cpp_aceeb4372d8f8bffa5afe5f5b181bbfec} 
+TEST (\begin{DoxyParamCaption}\item[{Regex}]{}{, }\item[{Quantifier\+Min2}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{regextest_8cpp_source_l00298}{298}} of file \mbox{\hyperlink{regextest_8cpp_source}{regextest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00298\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00299\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_ae7fc20c6ee680ae3ba16ae16b4bd5e16}{Regex}}\ re(\textcolor{stringliteral}{"{}a(bc)\{3,\}d"{}});}
+\DoxyCodeLine{00300\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{00301\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a7101e324c2d06f1505ef7c7d4401392b}{RegexSearch}}\ rs(re);}
+\DoxyCodeLine{00302\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abcbcbcd"{}}));}
+\DoxyCodeLine{00303\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abcbcbcbcd"{}}));}
+\DoxyCodeLine{00304\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}ad"{}}));}
+\DoxyCodeLine{00305\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}abcd"{}}));}
+\DoxyCodeLine{00306\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}abcbcd"{}}));}
+\DoxyCodeLine{00307\ \}}
+
+\end{DoxyCode}
+\Hypertarget{regextest_8cpp_a8fcf728559bdbb4c18cab8ae8dd01844}\index{regextest.cpp@{regextest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!regextest.cpp@{regextest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [29/49]}}
+{\footnotesize\ttfamily \label{regextest_8cpp_a8fcf728559bdbb4c18cab8ae8dd01844} 
+TEST (\begin{DoxyParamCaption}\item[{Regex}]{}{, }\item[{Quantifier\+Min3}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{regextest_8cpp_source_l00309}{309}} of file \mbox{\hyperlink{regextest_8cpp_source}{regextest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00309\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00310\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_ae7fc20c6ee680ae3ba16ae16b4bd5e16}{Regex}}\ re(\textcolor{stringliteral}{"{}a(b|c)\{3,\}d"{}});}
+\DoxyCodeLine{00311\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{00312\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a7101e324c2d06f1505ef7c7d4401392b}{RegexSearch}}\ rs(re);}
+\DoxyCodeLine{00313\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abbbd"{}}));}
+\DoxyCodeLine{00314\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}acccd"{}}));}
+\DoxyCodeLine{00315\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abcbd"{}}));}
+\DoxyCodeLine{00316\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}accccd"{}}));}
+\DoxyCodeLine{00317\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abbbbd"{}}));}
+\DoxyCodeLine{00318\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}ad"{}}));}
+\DoxyCodeLine{00319\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}abbd"{}}));}
+\DoxyCodeLine{00320\ \}}
+
+\end{DoxyCode}
+\Hypertarget{regextest_8cpp_aa1d34ea422c754e17f1af018917ffab2}\index{regextest.cpp@{regextest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!regextest.cpp@{regextest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [30/49]}}
+{\footnotesize\ttfamily \label{regextest_8cpp_aa1d34ea422c754e17f1af018917ffab2} 
+TEST (\begin{DoxyParamCaption}\item[{Regex}]{}{, }\item[{Quantifier\+Min\+Max1}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{regextest_8cpp_source_l00322}{322}} of file \mbox{\hyperlink{regextest_8cpp_source}{regextest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00322\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00323\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_ae7fc20c6ee680ae3ba16ae16b4bd5e16}{Regex}}\ re(\textcolor{stringliteral}{"{}ab\{3,5\}c"{}});}
+\DoxyCodeLine{00324\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{00325\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a7101e324c2d06f1505ef7c7d4401392b}{RegexSearch}}\ rs(re);}
+\DoxyCodeLine{00326\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abbbc"{}}));}
+\DoxyCodeLine{00327\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abbbbc"{}}));}
+\DoxyCodeLine{00328\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abbbbbc"{}}));}
+\DoxyCodeLine{00329\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}ac"{}}));}
+\DoxyCodeLine{00330\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}abc"{}}));}
+\DoxyCodeLine{00331\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}abbc"{}}));}
+\DoxyCodeLine{00332\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}abbbbbbc"{}}));}
+\DoxyCodeLine{00333\ \}}
+
+\end{DoxyCode}
+\Hypertarget{regextest_8cpp_a1d0baf9ad759c6cbb8cae7dcff7df081}\index{regextest.cpp@{regextest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!regextest.cpp@{regextest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [31/49]}}
+{\footnotesize\ttfamily \label{regextest_8cpp_a1d0baf9ad759c6cbb8cae7dcff7df081} 
+TEST (\begin{DoxyParamCaption}\item[{Regex}]{}{, }\item[{Quantifier\+Min\+Max2}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{regextest_8cpp_source_l00335}{335}} of file \mbox{\hyperlink{regextest_8cpp_source}{regextest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00335\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00336\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_ae7fc20c6ee680ae3ba16ae16b4bd5e16}{Regex}}\ re(\textcolor{stringliteral}{"{}a(bc)\{3,5\}d"{}});}
+\DoxyCodeLine{00337\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{00338\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a7101e324c2d06f1505ef7c7d4401392b}{RegexSearch}}\ rs(re);}
+\DoxyCodeLine{00339\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abcbcbcd"{}}));}
+\DoxyCodeLine{00340\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abcbcbcbcd"{}}));}
+\DoxyCodeLine{00341\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abcbcbcbcbcd"{}}));}
+\DoxyCodeLine{00342\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}ad"{}}));}
+\DoxyCodeLine{00343\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}abcd"{}}));}
+\DoxyCodeLine{00344\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}abcbcd"{}}));}
+\DoxyCodeLine{00345\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}abcbcbcbcbcbcd"{}}));}
+\DoxyCodeLine{00346\ \}}
+
+\end{DoxyCode}
+\Hypertarget{regextest_8cpp_aa53c89d72e27ca7d5030e034ae88b3ff}\index{regextest.cpp@{regextest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!regextest.cpp@{regextest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [32/49]}}
+{\footnotesize\ttfamily \label{regextest_8cpp_aa53c89d72e27ca7d5030e034ae88b3ff} 
+TEST (\begin{DoxyParamCaption}\item[{Regex}]{}{, }\item[{Quantifier\+Min\+Max3}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{regextest_8cpp_source_l00348}{348}} of file \mbox{\hyperlink{regextest_8cpp_source}{regextest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00348\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00349\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_ae7fc20c6ee680ae3ba16ae16b4bd5e16}{Regex}}\ re(\textcolor{stringliteral}{"{}a(b|c)\{3,5\}d"{}});}
+\DoxyCodeLine{00350\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{00351\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a7101e324c2d06f1505ef7c7d4401392b}{RegexSearch}}\ rs(re);}
+\DoxyCodeLine{00352\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abbbd"{}}));}
+\DoxyCodeLine{00353\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}acccd"{}}));}
+\DoxyCodeLine{00354\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abcbd"{}}));}
+\DoxyCodeLine{00355\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}accccd"{}}));}
+\DoxyCodeLine{00356\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abbbbd"{}}));}
+\DoxyCodeLine{00357\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}acccccd"{}}));}
+\DoxyCodeLine{00358\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abbbbbd"{}}));}
+\DoxyCodeLine{00359\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}ad"{}}));}
+\DoxyCodeLine{00360\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}abbd"{}}));}
+\DoxyCodeLine{00361\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}accccccd"{}}));}
+\DoxyCodeLine{00362\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}abbbbbbd"{}}));}
+\DoxyCodeLine{00363\ \}}
+
+\end{DoxyCode}
+\Hypertarget{regextest_8cpp_afddf32b93ac293a87ebbf708f2c9d19a}\index{regextest.cpp@{regextest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!regextest.cpp@{regextest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [33/49]}}
+{\footnotesize\ttfamily \label{regextest_8cpp_afddf32b93ac293a87ebbf708f2c9d19a} 
+TEST (\begin{DoxyParamCaption}\item[{Regex}]{}{, }\item[{Quantifier\+Min\+Max4}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{regextest_8cpp_source_l00366}{366}} of file \mbox{\hyperlink{regextest_8cpp_source}{regextest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00366\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00367\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_ae7fc20c6ee680ae3ba16ae16b4bd5e16}{Regex}}\ re(\textcolor{stringliteral}{"{}a(b|c)\{0,3\}d"{}});}
+\DoxyCodeLine{00368\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{00369\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a7101e324c2d06f1505ef7c7d4401392b}{RegexSearch}}\ rs(re);}
+\DoxyCodeLine{00370\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}ad"{}}));}
+\DoxyCodeLine{00371\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abd"{}}));}
+\DoxyCodeLine{00372\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}acd"{}}));}
+\DoxyCodeLine{00373\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abbd"{}}));}
+\DoxyCodeLine{00374\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}accd"{}}));}
+\DoxyCodeLine{00375\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abcd"{}}));}
+\DoxyCodeLine{00376\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abbbd"{}}));}
+\DoxyCodeLine{00377\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}acccd"{}}));}
+\DoxyCodeLine{00378\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}abbbbd"{}}));}
+\DoxyCodeLine{00379\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}add"{}}));}
+\DoxyCodeLine{00380\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}accccd"{}}));}
+\DoxyCodeLine{00381\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}abcbcd"{}}));}
+\DoxyCodeLine{00382\ \}}
+
+\end{DoxyCode}
+\Hypertarget{regextest_8cpp_a88fc24c0b52bc49b9b82e513397a0a23}\index{regextest.cpp@{regextest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!regextest.cpp@{regextest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [34/49]}}
+{\footnotesize\ttfamily \label{regextest_8cpp_a88fc24c0b52bc49b9b82e513397a0a23} 
+TEST (\begin{DoxyParamCaption}\item[{Regex}]{}{, }\item[{Quantifier\+Min\+Max5}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{regextest_8cpp_source_l00385}{385}} of file \mbox{\hyperlink{regextest_8cpp_source}{regextest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00385\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00386\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_ae7fc20c6ee680ae3ba16ae16b4bd5e16}{Regex}}\ re(\textcolor{stringliteral}{"{}a(b|c)\{0,\}d"{}});}
+\DoxyCodeLine{00387\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{00388\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a7101e324c2d06f1505ef7c7d4401392b}{RegexSearch}}\ rs(re);}
+\DoxyCodeLine{00389\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}ad"{}}));}
+\DoxyCodeLine{00390\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abd"{}}));}
+\DoxyCodeLine{00391\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}acd"{}}));}
+\DoxyCodeLine{00392\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abbd"{}}));}
+\DoxyCodeLine{00393\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}accd"{}}));}
+\DoxyCodeLine{00394\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abcd"{}}));}
+\DoxyCodeLine{00395\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abbbd"{}}));}
+\DoxyCodeLine{00396\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}acccd"{}}));}
+\DoxyCodeLine{00397\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abbbbd"{}}));}
+\DoxyCodeLine{00398\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}accccd"{}}));}
+\DoxyCodeLine{00399\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}abcbcd"{}}));}
+\DoxyCodeLine{00400\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}add"{}}));}
+\DoxyCodeLine{00401\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}aad"{}}));}
+\DoxyCodeLine{00402\ \}}
+
+\end{DoxyCode}
+\Hypertarget{regextest_8cpp_a64325e2a1d76fb7a8f92d7bccd1a8da2}\index{regextest.cpp@{regextest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!regextest.cpp@{regextest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [35/49]}}
+{\footnotesize\ttfamily \label{regextest_8cpp_a64325e2a1d76fb7a8f92d7bccd1a8da2} 
+TEST (\begin{DoxyParamCaption}\item[{Regex}]{}{, }\item[{Search}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{regextest_8cpp_source_l00521}{521}} of file \mbox{\hyperlink{regextest_8cpp_source}{regextest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00521\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00522\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_ae7fc20c6ee680ae3ba16ae16b4bd5e16}{Regex}}\ re(\textcolor{stringliteral}{"{}abc"{}});}
+\DoxyCodeLine{00523\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{00524\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a7101e324c2d06f1505ef7c7d4401392b}{RegexSearch}}\ rs(re);}
+\DoxyCodeLine{00525\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Search(\textcolor{stringliteral}{"{}abc"{}}));}
+\DoxyCodeLine{00526\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Search(\textcolor{stringliteral}{"{}\_abc"{}}));}
+\DoxyCodeLine{00527\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Search(\textcolor{stringliteral}{"{}abc\_"{}}));}
+\DoxyCodeLine{00528\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Search(\textcolor{stringliteral}{"{}\_abc\_"{}}));}
+\DoxyCodeLine{00529\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Search(\textcolor{stringliteral}{"{}\_\_abc\_\_"{}}));}
+\DoxyCodeLine{00530\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Search(\textcolor{stringliteral}{"{}abcabc"{}}));}
+\DoxyCodeLine{00531\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Search(\textcolor{stringliteral}{"{}a"{}}));}
+\DoxyCodeLine{00532\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Search(\textcolor{stringliteral}{"{}ab"{}}));}
+\DoxyCodeLine{00533\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Search(\textcolor{stringliteral}{"{}bc"{}}));}
+\DoxyCodeLine{00534\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Search(\textcolor{stringliteral}{"{}cba"{}}));}
+\DoxyCodeLine{00535\ \}}
+
+\end{DoxyCode}
+\Hypertarget{regextest_8cpp_a1eda53a0cbf84cccc01a36819bc6751e}\index{regextest.cpp@{regextest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!regextest.cpp@{regextest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [36/49]}}
+{\footnotesize\ttfamily \label{regextest_8cpp_a1eda53a0cbf84cccc01a36819bc6751e} 
+TEST (\begin{DoxyParamCaption}\item[{Regex}]{}{, }\item[{Search\+\_\+\+Begin\+Anchor}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{regextest_8cpp_source_l00537}{537}} of file \mbox{\hyperlink{regextest_8cpp_source}{regextest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00537\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00538\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_ae7fc20c6ee680ae3ba16ae16b4bd5e16}{Regex}}\ re(\textcolor{stringliteral}{"{}\string^abc"{}});}
+\DoxyCodeLine{00539\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{00540\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a7101e324c2d06f1505ef7c7d4401392b}{RegexSearch}}\ rs(re);}
+\DoxyCodeLine{00541\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Search(\textcolor{stringliteral}{"{}abc"{}}));}
+\DoxyCodeLine{00542\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Search(\textcolor{stringliteral}{"{}abc\_"{}}));}
+\DoxyCodeLine{00543\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Search(\textcolor{stringliteral}{"{}abcabc"{}}));}
+\DoxyCodeLine{00544\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Search(\textcolor{stringliteral}{"{}\_abc"{}}));}
+\DoxyCodeLine{00545\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Search(\textcolor{stringliteral}{"{}\_abc\_"{}}));}
+\DoxyCodeLine{00546\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Search(\textcolor{stringliteral}{"{}a"{}}));}
+\DoxyCodeLine{00547\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Search(\textcolor{stringliteral}{"{}ab"{}}));}
+\DoxyCodeLine{00548\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Search(\textcolor{stringliteral}{"{}bc"{}}));}
+\DoxyCodeLine{00549\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Search(\textcolor{stringliteral}{"{}cba"{}}));}
+\DoxyCodeLine{00550\ \}}
+
+\end{DoxyCode}
+\Hypertarget{regextest_8cpp_a187f2920cd48f579f856c82442441ba0}\index{regextest.cpp@{regextest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!regextest.cpp@{regextest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [37/49]}}
+{\footnotesize\ttfamily \label{regextest_8cpp_a187f2920cd48f579f856c82442441ba0} 
+TEST (\begin{DoxyParamCaption}\item[{Regex}]{}{, }\item[{Search\+\_\+\+Both\+Anchor}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{regextest_8cpp_source_l00567}{567}} of file \mbox{\hyperlink{regextest_8cpp_source}{regextest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00567\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00568\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_ae7fc20c6ee680ae3ba16ae16b4bd5e16}{Regex}}\ re(\textcolor{stringliteral}{"{}\string^abc\$"{}});}
+\DoxyCodeLine{00569\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{00570\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a7101e324c2d06f1505ef7c7d4401392b}{RegexSearch}}\ rs(re);}
+\DoxyCodeLine{00571\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Search(\textcolor{stringliteral}{"{}abc"{}}));}
+\DoxyCodeLine{00572\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Search(\textcolor{stringliteral}{"{}"{}}));}
+\DoxyCodeLine{00573\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Search(\textcolor{stringliteral}{"{}a"{}}));}
+\DoxyCodeLine{00574\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Search(\textcolor{stringliteral}{"{}b"{}}));}
+\DoxyCodeLine{00575\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Search(\textcolor{stringliteral}{"{}ab"{}}));}
+\DoxyCodeLine{00576\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Search(\textcolor{stringliteral}{"{}abcd"{}}));}
+\DoxyCodeLine{00577\ \}}
+
+\end{DoxyCode}
+\Hypertarget{regextest_8cpp_a887e8f018eb36b77ad013086f1449544}\index{regextest.cpp@{regextest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!regextest.cpp@{regextest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [38/49]}}
+{\footnotesize\ttfamily \label{regextest_8cpp_a887e8f018eb36b77ad013086f1449544} 
+TEST (\begin{DoxyParamCaption}\item[{Regex}]{}{, }\item[{Search\+\_\+\+End\+Anchor}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{regextest_8cpp_source_l00552}{552}} of file \mbox{\hyperlink{regextest_8cpp_source}{regextest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00552\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00553\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_ae7fc20c6ee680ae3ba16ae16b4bd5e16}{Regex}}\ re(\textcolor{stringliteral}{"{}abc\$"{}});}
+\DoxyCodeLine{00554\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{00555\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a7101e324c2d06f1505ef7c7d4401392b}{RegexSearch}}\ rs(re);}
+\DoxyCodeLine{00556\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Search(\textcolor{stringliteral}{"{}abc"{}}));}
+\DoxyCodeLine{00557\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Search(\textcolor{stringliteral}{"{}\_abc"{}}));}
+\DoxyCodeLine{00558\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Search(\textcolor{stringliteral}{"{}abcabc"{}}));}
+\DoxyCodeLine{00559\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Search(\textcolor{stringliteral}{"{}abc\_"{}}));}
+\DoxyCodeLine{00560\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Search(\textcolor{stringliteral}{"{}\_abc\_"{}}));}
+\DoxyCodeLine{00561\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Search(\textcolor{stringliteral}{"{}a"{}}));}
+\DoxyCodeLine{00562\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Search(\textcolor{stringliteral}{"{}ab"{}}));}
+\DoxyCodeLine{00563\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Search(\textcolor{stringliteral}{"{}bc"{}}));}
+\DoxyCodeLine{00564\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Search(\textcolor{stringliteral}{"{}cba"{}}));}
+\DoxyCodeLine{00565\ \}}
+
+\end{DoxyCode}
+\Hypertarget{regextest_8cpp_a6926fa190879f4c751bbf0aae4be823c}\index{regextest.cpp@{regextest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!regextest.cpp@{regextest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [39/49]}}
+{\footnotesize\ttfamily \label{regextest_8cpp_a6926fa190879f4c751bbf0aae4be823c} 
+TEST (\begin{DoxyParamCaption}\item[{Regex}]{}{, }\item[{Single}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{regextest_8cpp_source_l00020}{20}} of file \mbox{\hyperlink{regextest_8cpp_source}{regextest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00021\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_ae7fc20c6ee680ae3ba16ae16b4bd5e16}{Regex}}\ re(\textcolor{stringliteral}{"{}a"{}});}
+\DoxyCodeLine{00022\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{00023\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a7101e324c2d06f1505ef7c7d4401392b}{RegexSearch}}\ rs(re);}
+\DoxyCodeLine{00024\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}a"{}}));}
+\DoxyCodeLine{00025\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}"{}}));}
+\DoxyCodeLine{00026\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}b"{}}));}
+\DoxyCodeLine{00027\ \}}
+
+\end{DoxyCode}
+\Hypertarget{regextest_8cpp_a381af5b77c706a40e6bc9a8ef561213a}\index{regextest.cpp@{regextest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!regextest.cpp@{regextest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [40/49]}}
+{\footnotesize\ttfamily \label{regextest_8cpp_a381af5b77c706a40e6bc9a8ef561213a} 
+TEST (\begin{DoxyParamCaption}\item[{Regex}]{}{, }\item[{Unicode}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{regextest_8cpp_source_l00406}{406}} of file \mbox{\hyperlink{regextest_8cpp_source}{regextest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00406\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00407\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_ae7fc20c6ee680ae3ba16ae16b4bd5e16}{Regex}}\ re(\textcolor{stringliteral}{"{}a"{}}\ \mbox{\hyperlink{regextest_8cpp_a5434fc5857bd1456b47ab1f89ad35098}{EURO}}\ \textcolor{stringliteral}{"{}+b"{}});\ }
+\DoxyCodeLine{00408\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{00409\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a7101e324c2d06f1505ef7c7d4401392b}{RegexSearch}}\ rs(re);}
+\DoxyCodeLine{00410\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}a"{}}\ \mbox{\hyperlink{regextest_8cpp_a5434fc5857bd1456b47ab1f89ad35098}{EURO}}\ \textcolor{stringliteral}{"{}b"{}}));}
+\DoxyCodeLine{00411\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}a"{}}\ \mbox{\hyperlink{regextest_8cpp_a5434fc5857bd1456b47ab1f89ad35098}{EURO}}\ \mbox{\hyperlink{regextest_8cpp_a5434fc5857bd1456b47ab1f89ad35098}{EURO}}\ \textcolor{stringliteral}{"{}b"{}}));}
+\DoxyCodeLine{00412\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}a?b"{}}));}
+\DoxyCodeLine{00413\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}a"{}}\ \mbox{\hyperlink{regextest_8cpp_a5434fc5857bd1456b47ab1f89ad35098}{EURO}}\ \textcolor{stringliteral}{"{}\(\backslash\)xAC"{}}\ \textcolor{stringliteral}{"{}b"{}}));\ \textcolor{comment}{//\ unaware\ of\ UTF-\/8\ will\ match}}
+\DoxyCodeLine{00414\ \}}
+
+\end{DoxyCode}
+\Hypertarget{regextest_8cpp_ae26efb0cf2a86adcc118d3cec67459a0}\index{regextest.cpp@{regextest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!regextest.cpp@{regextest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [41/49]}}
+{\footnotesize\ttfamily \label{regextest_8cpp_ae26efb0cf2a86adcc118d3cec67459a0} 
+TEST (\begin{DoxyParamCaption}\item[{Regex}]{}{, }\item[{Zero\+Or\+More1}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{regextest_8cpp_source_l00160}{160}} of file \mbox{\hyperlink{regextest_8cpp_source}{regextest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00161\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_ae7fc20c6ee680ae3ba16ae16b4bd5e16}{Regex}}\ re(\textcolor{stringliteral}{"{}a*"{}});}
+\DoxyCodeLine{00162\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{00163\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a7101e324c2d06f1505ef7c7d4401392b}{RegexSearch}}\ rs(re);}
+\DoxyCodeLine{00164\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}"{}}));}
+\DoxyCodeLine{00165\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}a"{}}));}
+\DoxyCodeLine{00166\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}aa"{}}));}
+\DoxyCodeLine{00167\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}b"{}}));}
+\DoxyCodeLine{00168\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}ab"{}}));}
+\DoxyCodeLine{00169\ \}}
+
+\end{DoxyCode}
+\Hypertarget{regextest_8cpp_a461556287c755c1523ae785f2cdfebd5}\index{regextest.cpp@{regextest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!regextest.cpp@{regextest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [42/49]}}
+{\footnotesize\ttfamily \label{regextest_8cpp_a461556287c755c1523ae785f2cdfebd5} 
+TEST (\begin{DoxyParamCaption}\item[{Regex}]{}{, }\item[{Zero\+Or\+More2}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{regextest_8cpp_source_l00171}{171}} of file \mbox{\hyperlink{regextest_8cpp_source}{regextest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00172\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_ae7fc20c6ee680ae3ba16ae16b4bd5e16}{Regex}}\ re(\textcolor{stringliteral}{"{}a*b"{}});}
+\DoxyCodeLine{00173\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{00174\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a7101e324c2d06f1505ef7c7d4401392b}{RegexSearch}}\ rs(re);}
+\DoxyCodeLine{00175\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}b"{}}));}
+\DoxyCodeLine{00176\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}ab"{}}));}
+\DoxyCodeLine{00177\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}aab"{}}));}
+\DoxyCodeLine{00178\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}"{}}));}
+\DoxyCodeLine{00179\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}bb"{}}));}
+\DoxyCodeLine{00180\ \}}
+
+\end{DoxyCode}
+\Hypertarget{regextest_8cpp_aa9d44367baa9feaa13f56bd3db85f723}\index{regextest.cpp@{regextest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!regextest.cpp@{regextest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [43/49]}}
+{\footnotesize\ttfamily \label{regextest_8cpp_aa9d44367baa9feaa13f56bd3db85f723} 
+TEST (\begin{DoxyParamCaption}\item[{Regex}]{}{, }\item[{Zero\+Or\+More3}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{regextest_8cpp_source_l00182}{182}} of file \mbox{\hyperlink{regextest_8cpp_source}{regextest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00183\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_ae7fc20c6ee680ae3ba16ae16b4bd5e16}{Regex}}\ re(\textcolor{stringliteral}{"{}a*b*"{}});}
+\DoxyCodeLine{00184\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{00185\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a7101e324c2d06f1505ef7c7d4401392b}{RegexSearch}}\ rs(re);}
+\DoxyCodeLine{00186\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}"{}}));}
+\DoxyCodeLine{00187\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}a"{}}));}
+\DoxyCodeLine{00188\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}aa"{}}));}
+\DoxyCodeLine{00189\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}b"{}}));}
+\DoxyCodeLine{00190\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}bb"{}}));}
+\DoxyCodeLine{00191\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}ab"{}}));}
+\DoxyCodeLine{00192\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}aabb"{}}));}
+\DoxyCodeLine{00193\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}ba"{}}));}
+\DoxyCodeLine{00194\ \}}
+
+\end{DoxyCode}
+\Hypertarget{regextest_8cpp_ae64f25bb4a800aa8cb56e29506a92755}\index{regextest.cpp@{regextest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!regextest.cpp@{regextest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [44/49]}}
+{\footnotesize\ttfamily \label{regextest_8cpp_ae64f25bb4a800aa8cb56e29506a92755} 
+TEST (\begin{DoxyParamCaption}\item[{Regex}]{}{, }\item[{Zero\+Or\+More4}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{regextest_8cpp_source_l00196}{196}} of file \mbox{\hyperlink{regextest_8cpp_source}{regextest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00197\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_ae7fc20c6ee680ae3ba16ae16b4bd5e16}{Regex}}\ re(\textcolor{stringliteral}{"{}a(ab)*b"{}});}
+\DoxyCodeLine{00198\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{00199\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a7101e324c2d06f1505ef7c7d4401392b}{RegexSearch}}\ rs(re);}
+\DoxyCodeLine{00200\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}ab"{}}));}
+\DoxyCodeLine{00201\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}aabb"{}}));}
+\DoxyCodeLine{00202\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}aababb"{}}));}
+\DoxyCodeLine{00203\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}"{}}));}
+\DoxyCodeLine{00204\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}aa"{}}));}
+\DoxyCodeLine{00205\ \}}
+
+\end{DoxyCode}
+\Hypertarget{regextest_8cpp_ab3660284a866e1b38128832952301a1c}\index{regextest.cpp@{regextest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!regextest.cpp@{regextest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [45/49]}}
+{\footnotesize\ttfamily \label{regextest_8cpp_ab3660284a866e1b38128832952301a1c} 
+TEST (\begin{DoxyParamCaption}\item[{Regex}]{}{, }\item[{Zero\+Or\+One1}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{regextest_8cpp_source_l00103}{103}} of file \mbox{\hyperlink{regextest_8cpp_source}{regextest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00104\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_ae7fc20c6ee680ae3ba16ae16b4bd5e16}{Regex}}\ re(\textcolor{stringliteral}{"{}a?"{}});}
+\DoxyCodeLine{00105\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{00106\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a7101e324c2d06f1505ef7c7d4401392b}{RegexSearch}}\ rs(re);}
+\DoxyCodeLine{00107\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}"{}}));}
+\DoxyCodeLine{00108\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}a"{}}));}
+\DoxyCodeLine{00109\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}aa"{}}));}
+\DoxyCodeLine{00110\ \}}
+
+\end{DoxyCode}
+\Hypertarget{regextest_8cpp_a69d5aa19c98edd1c583084a57b52c423}\index{regextest.cpp@{regextest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!regextest.cpp@{regextest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [46/49]}}
+{\footnotesize\ttfamily \label{regextest_8cpp_a69d5aa19c98edd1c583084a57b52c423} 
+TEST (\begin{DoxyParamCaption}\item[{Regex}]{}{, }\item[{Zero\+Or\+One2}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{regextest_8cpp_source_l00112}{112}} of file \mbox{\hyperlink{regextest_8cpp_source}{regextest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00113\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_ae7fc20c6ee680ae3ba16ae16b4bd5e16}{Regex}}\ re(\textcolor{stringliteral}{"{}a?b"{}});}
+\DoxyCodeLine{00114\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{00115\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a7101e324c2d06f1505ef7c7d4401392b}{RegexSearch}}\ rs(re);}
+\DoxyCodeLine{00116\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}b"{}}));}
+\DoxyCodeLine{00117\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}ab"{}}));}
+\DoxyCodeLine{00118\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}a"{}}));}
+\DoxyCodeLine{00119\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}aa"{}}));}
+\DoxyCodeLine{00120\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}bb"{}}));}
+\DoxyCodeLine{00121\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}ba"{}}));}
+\DoxyCodeLine{00122\ \}}
+
+\end{DoxyCode}
+\Hypertarget{regextest_8cpp_a86d5177b7bfa3ad21bdedee7858fb246}\index{regextest.cpp@{regextest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!regextest.cpp@{regextest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [47/49]}}
+{\footnotesize\ttfamily \label{regextest_8cpp_a86d5177b7bfa3ad21bdedee7858fb246} 
+TEST (\begin{DoxyParamCaption}\item[{Regex}]{}{, }\item[{Zero\+Or\+One3}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{regextest_8cpp_source_l00124}{124}} of file \mbox{\hyperlink{regextest_8cpp_source}{regextest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00125\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_ae7fc20c6ee680ae3ba16ae16b4bd5e16}{Regex}}\ re(\textcolor{stringliteral}{"{}ab?"{}});}
+\DoxyCodeLine{00126\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{00127\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a7101e324c2d06f1505ef7c7d4401392b}{RegexSearch}}\ rs(re);}
+\DoxyCodeLine{00128\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}a"{}}));}
+\DoxyCodeLine{00129\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}ab"{}}));}
+\DoxyCodeLine{00130\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}b"{}}));}
+\DoxyCodeLine{00131\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}aa"{}}));}
+\DoxyCodeLine{00132\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}bb"{}}));}
+\DoxyCodeLine{00133\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}ba"{}}));}
+\DoxyCodeLine{00134\ \}}
+
+\end{DoxyCode}
+\Hypertarget{regextest_8cpp_a5bfb68eb7300039e328dfd5229a01d55}\index{regextest.cpp@{regextest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!regextest.cpp@{regextest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [48/49]}}
+{\footnotesize\ttfamily \label{regextest_8cpp_a5bfb68eb7300039e328dfd5229a01d55} 
+TEST (\begin{DoxyParamCaption}\item[{Regex}]{}{, }\item[{Zero\+Or\+One4}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{regextest_8cpp_source_l00136}{136}} of file \mbox{\hyperlink{regextest_8cpp_source}{regextest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00137\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_ae7fc20c6ee680ae3ba16ae16b4bd5e16}{Regex}}\ re(\textcolor{stringliteral}{"{}a?b?"{}});}
+\DoxyCodeLine{00138\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{00139\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a7101e324c2d06f1505ef7c7d4401392b}{RegexSearch}}\ rs(re);}
+\DoxyCodeLine{00140\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}"{}}));}
+\DoxyCodeLine{00141\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}a"{}}));}
+\DoxyCodeLine{00142\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}b"{}}));}
+\DoxyCodeLine{00143\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}ab"{}}));}
+\DoxyCodeLine{00144\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}aa"{}}));}
+\DoxyCodeLine{00145\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}bb"{}}));}
+\DoxyCodeLine{00146\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}ba"{}}));}
+\DoxyCodeLine{00147\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}abc"{}}));}
+\DoxyCodeLine{00148\ \}}
+
+\end{DoxyCode}
+\Hypertarget{regextest_8cpp_a3686c9aa735631ce12ddeaeff182c1dd}\index{regextest.cpp@{regextest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!regextest.cpp@{regextest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [49/49]}}
+{\footnotesize\ttfamily \label{regextest_8cpp_a3686c9aa735631ce12ddeaeff182c1dd} 
+TEST (\begin{DoxyParamCaption}\item[{Regex}]{}{, }\item[{Zero\+Or\+One5}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{regextest_8cpp_source_l00150}{150}} of file \mbox{\hyperlink{regextest_8cpp_source}{regextest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00151\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_ae7fc20c6ee680ae3ba16ae16b4bd5e16}{Regex}}\ re(\textcolor{stringliteral}{"{}a(ab)?b"{}});}
+\DoxyCodeLine{00152\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(re.IsValid());}
+\DoxyCodeLine{00153\ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a7101e324c2d06f1505ef7c7d4401392b}{RegexSearch}}\ rs(re);}
+\DoxyCodeLine{00154\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}ab"{}}));}
+\DoxyCodeLine{00155\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(rs.Match(\textcolor{stringliteral}{"{}aabb"{}}));}
+\DoxyCodeLine{00156\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}aab"{}}));}
+\DoxyCodeLine{00157\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(rs.Match(\textcolor{stringliteral}{"{}abb"{}}));}
+\DoxyCodeLine{00158\ \}}
+
+\end{DoxyCode}

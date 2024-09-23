@@ -1,0 +1,162 @@
+\doxysection{sysiosystem\+::powerup\+\_\+order Struct Reference}
+\hypertarget{structsysiosystem_1_1powerup__order}{}\label{structsysiosystem_1_1powerup__order}\index{sysiosystem::powerup\_order@{sysiosystem::powerup\_order}}
+
+
+{\ttfamily \#include $<$sysio.\+system.\+hpp$>$}
+
+
+
+Collaboration diagram for sysiosystem\+::powerup\+\_\+order\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=292pt]{structsysiosystem_1_1powerup__order__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1powerup__order_aa810ce0ec032a92bcd945351664b1a66}{primary\+\_\+key}} () const
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1powerup__order_ae2f3aca585ef167fc2b3b37da5bb0617}{by\+\_\+owner}} () const
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1powerup__order_a0764dbb1a184d07ede0397f3dd9d728c}{by\+\_\+expires}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1powerup__order_af0500d0b23c04394948f78ca45fc7993}{version}} = 0
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1powerup__order_a3c97595b5c67406b6c8aabb6b38a9186}{id}}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \mbox{\hyperlink{structsysiosystem_1_1powerup__order_a8fdaba9342e5edfe6adf7d28d9f7e73b}{owner}}
+\item 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1powerup__order_ace0c2bec10285c323181fae1a95d1513}{net\+\_\+weight}}
+\item 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1powerup__order_a45c6bc78e1423ff07edbece098829265}{cpu\+\_\+weight}}
+\item 
+\mbox{\hyperlink{classfc_1_1time__point__sec}{time\+\_\+point\+\_\+sec}} \mbox{\hyperlink{structsysiosystem_1_1powerup__order_a65f80cb272b76c37002e595d3b8514d5}{expires}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00647}{647}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysiosystem_1_1powerup__order_a0764dbb1a184d07ede0397f3dd9d728c}\index{sysiosystem::powerup\_order@{sysiosystem::powerup\_order}!by\_expires@{by\_expires}}
+\index{by\_expires@{by\_expires}!sysiosystem::powerup\_order@{sysiosystem::powerup\_order}}
+\doxysubsubsection{\texorpdfstring{by\_expires()}{by\_expires()}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1powerup__order_a0764dbb1a184d07ede0397f3dd9d728c} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} sysiosystem\+::powerup\+\_\+order\+::by\+\_\+expires (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00657}{657}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00657\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysiosystem_1_1powerup__order_a65f80cb272b76c37002e595d3b8514d5}{expires}}.utc\_seconds;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysiosystem_1_1powerup__order_ae2f3aca585ef167fc2b3b37da5bb0617}\index{sysiosystem::powerup\_order@{sysiosystem::powerup\_order}!by\_owner@{by\_owner}}
+\index{by\_owner@{by\_owner}!sysiosystem::powerup\_order@{sysiosystem::powerup\_order}}
+\doxysubsubsection{\texorpdfstring{by\_owner()}{by\_owner()}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1powerup__order_ae2f3aca585ef167fc2b3b37da5bb0617} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} sysiosystem\+::powerup\+\_\+order\+::by\+\_\+owner (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00656}{656}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00656\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysiosystem_1_1powerup__order_a8fdaba9342e5edfe6adf7d28d9f7e73b}{owner}}.value;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysiosystem_1_1powerup__order_aa810ce0ec032a92bcd945351664b1a66}\index{sysiosystem::powerup\_order@{sysiosystem::powerup\_order}!primary\_key@{primary\_key}}
+\index{primary\_key@{primary\_key}!sysiosystem::powerup\_order@{sysiosystem::powerup\_order}}
+\doxysubsubsection{\texorpdfstring{primary\_key()}{primary\_key()}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1powerup__order_aa810ce0ec032a92bcd945351664b1a66} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} sysiosystem\+::powerup\+\_\+order\+::primary\+\_\+key (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00655}{655}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00655\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysiosystem_1_1powerup__order_a3c97595b5c67406b6c8aabb6b38a9186}{id}};\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysiosystem_1_1powerup__order_a45c6bc78e1423ff07edbece098829265}\index{sysiosystem::powerup\_order@{sysiosystem::powerup\_order}!cpu\_weight@{cpu\_weight}}
+\index{cpu\_weight@{cpu\_weight}!sysiosystem::powerup\_order@{sysiosystem::powerup\_order}}
+\doxysubsubsection{\texorpdfstring{cpu\_weight}{cpu\_weight}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1powerup__order_a45c6bc78e1423ff07edbece098829265} 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} sysiosystem\+::powerup\+\_\+order\+::cpu\+\_\+weight}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00652}{652}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1powerup__order_a65f80cb272b76c37002e595d3b8514d5}\index{sysiosystem::powerup\_order@{sysiosystem::powerup\_order}!expires@{expires}}
+\index{expires@{expires}!sysiosystem::powerup\_order@{sysiosystem::powerup\_order}}
+\doxysubsubsection{\texorpdfstring{expires}{expires}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1powerup__order_a65f80cb272b76c37002e595d3b8514d5} 
+\mbox{\hyperlink{classfc_1_1time__point__sec}{time\+\_\+point\+\_\+sec}} sysiosystem\+::powerup\+\_\+order\+::expires}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00653}{653}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1powerup__order_a3c97595b5c67406b6c8aabb6b38a9186}\index{sysiosystem::powerup\_order@{sysiosystem::powerup\_order}!id@{id}}
+\index{id@{id}!sysiosystem::powerup\_order@{sysiosystem::powerup\_order}}
+\doxysubsubsection{\texorpdfstring{id}{id}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1powerup__order_a3c97595b5c67406b6c8aabb6b38a9186} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} sysiosystem\+::powerup\+\_\+order\+::id}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00649}{649}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1powerup__order_ace0c2bec10285c323181fae1a95d1513}\index{sysiosystem::powerup\_order@{sysiosystem::powerup\_order}!net\_weight@{net\_weight}}
+\index{net\_weight@{net\_weight}!sysiosystem::powerup\_order@{sysiosystem::powerup\_order}}
+\doxysubsubsection{\texorpdfstring{net\_weight}{net\_weight}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1powerup__order_ace0c2bec10285c323181fae1a95d1513} 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} sysiosystem\+::powerup\+\_\+order\+::net\+\_\+weight}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00651}{651}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1powerup__order_a8fdaba9342e5edfe6adf7d28d9f7e73b}\index{sysiosystem::powerup\_order@{sysiosystem::powerup\_order}!owner@{owner}}
+\index{owner@{owner}!sysiosystem::powerup\_order@{sysiosystem::powerup\_order}}
+\doxysubsubsection{\texorpdfstring{owner}{owner}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1powerup__order_a8fdaba9342e5edfe6adf7d28d9f7e73b} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} sysiosystem\+::powerup\+\_\+order\+::owner}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00650}{650}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1powerup__order_af0500d0b23c04394948f78ca45fc7993}\index{sysiosystem::powerup\_order@{sysiosystem::powerup\_order}!version@{version}}
+\index{version@{version}!sysiosystem::powerup\_order@{sysiosystem::powerup\_order}}
+\doxysubsubsection{\texorpdfstring{version}{version}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1powerup__order_af0500d0b23c04394948f78ca45fc7993} 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} sysiosystem\+::powerup\+\_\+order\+::version = 0}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00648}{648}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/svetlasyrimis/\+Desktop/wire-\/network/\+WN-\/org/wire-\/system-\/contracts/contracts/sysio.\+system/include/sysio.\+system/\mbox{\hyperlink{sysio_8system_8hpp}{sysio.\+system.\+hpp}}\end{DoxyCompactItemize}

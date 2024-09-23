@@ -1,0 +1,1111 @@
+\doxysection{plugins/chain\+\_\+plugin/test/test\+\_\+trx\+\_\+finality\+\_\+status\+\_\+processing.cpp File Reference}
+\hypertarget{test__trx__finality__status__processing_8cpp}{}\label{test__trx__finality__status__processing_8cpp}\index{plugins/chain\_plugin/test/test\_trx\_finality\_status\_processing.cpp@{plugins/chain\_plugin/test/test\_trx\_finality\_status\_processing.cpp}}
+{\ttfamily \#include $<$boost/test/included/unit\+\_\+test.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain\+\_\+plugin/trx\+\_\+finality\+\_\+status\+\_\+processing.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/testing/tester.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/block\+\_\+header.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/genesis\+\_\+state.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/name.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/trace.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/date\+\_\+time/posix\+\_\+time/posix\+\_\+time.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/mock\+\_\+time.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/bitutil.\+hpp$>$}\newline
+{\ttfamily \#include $<$deque$>$}\newline
+{\ttfamily \#include $<$memory$>$}\newline
+Include dependency graph for test\+\_\+trx\+\_\+finality\+\_\+status\+\_\+processing.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__trx__finality__status__processing_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1test_1_1detail_1_1testit}{sysio\+::test\+::detail\+::testit}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1test}{sysio\+::test}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1test_1_1detail}{sysio\+::test\+::detail}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{test__trx__finality__status__processing_8cpp_a6b2a3852db8bb19ab6909bac01859985}{BOOST\+\_\+\+TEST\+\_\+\+MODULE}}~transaction\+\_\+finality\+\_\+status
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{test__trx__finality__status__processing_8cpp_a05fa078c0d69deb99ee8e8b33be63e9a}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (trx\+\_\+finality\+\_\+status\+\_\+logic)
+\item 
+\mbox{\hyperlink{test__trx__finality__status__processing_8cpp_ab653bc9bc525b8d8cd8292f4fcfb7638}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (trx\+\_\+finality\+\_\+status\+\_\+storage\+\_\+reduction)
+\item 
+\mbox{\hyperlink{test__trx__finality__status__processing_8cpp_a863bc6d6b13b7d8bb62e810d9d8b5c25}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (trx\+\_\+finality\+\_\+status\+\_\+lifespan)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{test__trx__finality__status__processing_8cpp_a6b2a3852db8bb19ab6909bac01859985}\index{test\_trx\_finality\_status\_processing.cpp@{test\_trx\_finality\_status\_processing.cpp}!BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}}
+\index{BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}!test\_trx\_finality\_status\_processing.cpp@{test\_trx\_finality\_status\_processing.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_TEST\_MODULE}{BOOST\_TEST\_MODULE}}
+{\footnotesize\ttfamily \label{test__trx__finality__status__processing_8cpp_a6b2a3852db8bb19ab6909bac01859985} 
+\#define BOOST\+\_\+\+TEST\+\_\+\+MODULE~transaction\+\_\+finality\+\_\+status}
+
+
+
+Definition at line \mbox{\hyperlink{test__trx__finality__status__processing_8cpp_source_l00001}{1}} of file \mbox{\hyperlink{test__trx__finality__status__processing_8cpp_source}{test\+\_\+trx\+\_\+finality\+\_\+status\+\_\+processing.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{test__trx__finality__status__processing_8cpp_a863bc6d6b13b7d8bb62e810d9d8b5c25}\index{test\_trx\_finality\_status\_processing.cpp@{test\_trx\_finality\_status\_processing.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!test\_trx\_finality\_status\_processing.cpp@{test\_trx\_finality\_status\_processing.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{test__trx__finality__status__processing_8cpp_a863bc6d6b13b7d8bb62e810d9d8b5c25} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{trx\+\_\+finality\+\_\+status\+\_\+lifespan}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__trx__finality__status__processing_8cpp_source_l01121}{1121}} of file \mbox{\hyperlink{test__trx__finality__status__processing_8cpp_source}{test\+\_\+trx\+\_\+finality\+\_\+status\+\_\+processing.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01121\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{01122\ \ \ \ set\_now(\textcolor{stringliteral}{"{}2022-\/04-\/04"{}},\ \textcolor{stringliteral}{"{}04:44:44.450"{}});}
+\DoxyCodeLine{01123\ \ \ \ \mbox{\hyperlink{classfc_1_1microseconds}{fc::microseconds}}\ max\_success\_duration\ =\ \mbox{\hyperlink{namespacefc_a9623b8cae3f48bbed6aa1fc2afe9b174}{fc::seconds}}(25);}
+\DoxyCodeLine{01124\ \ \ \ \mbox{\hyperlink{classfc_1_1microseconds}{fc::microseconds}}\ max\_failure\_duration\ =\ \mbox{\hyperlink{namespacefc_a9623b8cae3f48bbed6aa1fc2afe9b174}{fc::seconds}}(35);}
+\DoxyCodeLine{01125\ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ max\_storage\ =\ 10'000;}
+\DoxyCodeLine{01126\ \ \ \ \mbox{\hyperlink{classsysio_1_1chain__apis_1_1trx__finality__status__processing}{trx\_finality\_status\_processing}}\ status(max\_storage,\ max\_success\_duration,\ max\_failure\_duration);}
+\DoxyCodeLine{01127\ }
+\DoxyCodeLine{01128\ \ \ \ \textcolor{comment}{//\ auto\ verify\_trx\ =\ [\&status](trx\_deque\&\ trx\_pairs,\ const\ sysio::chain::block\_state\_ptr\&\ bs)\ \{}}
+\DoxyCodeLine{01129\ \ \ \ \textcolor{comment}{//\ \ \ \ const\ auto\ id\ =\ bs\ ?\ bs-\/>id\ :\ sysio::chain::transaction\_id\_type\{\};}}
+\DoxyCodeLine{01130\ \ \ \ \textcolor{comment}{//\ \ \ \ for\ (const\ auto\&\ trx\_pair\ :\ trx\_pairs)\ \{}}
+\DoxyCodeLine{01131\ \ \ \ \textcolor{comment}{//\ \ \ \ \ \ \ auto\ ts\ =\ status.get\_trx\_state(std::get<1>(trx\_pair)-\/>id());}}
+\DoxyCodeLine{01132\ \ \ \ \textcolor{comment}{//\ \ \ \ \ \ \ BOOST\_REQUIRE(ts);}}
+\DoxyCodeLine{01133\ \ \ \ \textcolor{comment}{//\ \ \ \ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ id);}}
+\DoxyCodeLine{01134\ \ \ \ \textcolor{comment}{//\ \ \ \ \}}}
+\DoxyCodeLine{01135\ \ \ \ \textcolor{comment}{//\ \};}}
+\DoxyCodeLine{01136\ }
+\DoxyCodeLine{01137\ }
+\DoxyCodeLine{01138\ \ \ \ block\_frame\ b\_01(status,\ \textcolor{stringliteral}{"{}04:44:00.500"{}},\ 1);}
+\DoxyCodeLine{01139\ \ \ \ b\_01.send\_spec\_block();}
+\DoxyCodeLine{01140\ \ \ \ b\_01.verify\_spec\_block();}
+\DoxyCodeLine{01141\ }
+\DoxyCodeLine{01142\ \ \ \ b\_01.send\_block();}
+\DoxyCodeLine{01143\ \ \ \ b\_01.verify\_block();}
+\DoxyCodeLine{01144\ }
+\DoxyCodeLine{01145\ }
+\DoxyCodeLine{01146\ \ \ \ block\_frame\ b\_02(status,\ \textcolor{stringliteral}{"{}04:44:05.500"{}});}
+\DoxyCodeLine{01147\ \ \ \ b\_02.send\_spec\_block();}
+\DoxyCodeLine{01148\ \ \ \ b\_02.verify\_spec\_block();}
+\DoxyCodeLine{01149\ }
+\DoxyCodeLine{01150\ \ \ \ b\_02.send\_block();}
+\DoxyCodeLine{01151\ \ \ \ b\_02.verify\_block();}
+\DoxyCodeLine{01152\ }
+\DoxyCodeLine{01153\ }
+\DoxyCodeLine{01154\ \ \ \ block\_frame\ b\_03(status,\ \textcolor{stringliteral}{"{}04:44:10.500"{}});}
+\DoxyCodeLine{01155\ \ \ \ b\_03.send\_spec\_block();}
+\DoxyCodeLine{01156\ \ \ \ b\_03.verify\_spec\_block();}
+\DoxyCodeLine{01157\ }
+\DoxyCodeLine{01158\ \ \ \ b\_03.send\_block();}
+\DoxyCodeLine{01159\ \ \ \ b\_03.verify\_block();}
+\DoxyCodeLine{01160\ }
+\DoxyCodeLine{01161\ }
+\DoxyCodeLine{01162\ \ \ \ block\_frame\ b\_04(status,\ \textcolor{stringliteral}{"{}04:44:15.500"{}});}
+\DoxyCodeLine{01163\ \ \ \ b\_04.send\_spec\_block();}
+\DoxyCodeLine{01164\ \ \ \ b\_04.verify\_spec\_block();}
+\DoxyCodeLine{01165\ }
+\DoxyCodeLine{01166\ \ \ \ b\_04.send\_block();}
+\DoxyCodeLine{01167\ \ \ \ b\_04.verify\_block();}
+\DoxyCodeLine{01168\ }
+\DoxyCodeLine{01169\ }
+\DoxyCodeLine{01170\ \ \ \ block\_frame\ b\_05(status,\ \textcolor{stringliteral}{"{}04:44:20.500"{}});}
+\DoxyCodeLine{01171\ \ \ \ b\_05.send\_spec\_block();}
+\DoxyCodeLine{01172\ \ \ \ b\_05.verify\_spec\_block();}
+\DoxyCodeLine{01173\ }
+\DoxyCodeLine{01174\ \ \ \ b\_05.send\_block();}
+\DoxyCodeLine{01175\ \ \ \ b\_05.verify\_block();}
+\DoxyCodeLine{01176\ }
+\DoxyCodeLine{01177\ \ \ \ \textcolor{comment}{//\ should\ be\ still\ available}}
+\DoxyCodeLine{01178\ \ \ \ b\_01.verify\_block();}
+\DoxyCodeLine{01179\ \ \ \ b\_01.verify\_spec\_block();\ \textcolor{comment}{//\ still\ available\ and\ will\ continue\ till\ failure\ time}}
+\DoxyCodeLine{01180\ }
+\DoxyCodeLine{01181\ }
+\DoxyCodeLine{01182\ \ \ \ block\_frame\ b\_06(status,\ \textcolor{stringliteral}{"{}04:44:25.500"{}});}
+\DoxyCodeLine{01183\ \ \ \ b\_06.send\_spec\_block();}
+\DoxyCodeLine{01184\ \ \ \ b\_06.verify\_spec\_block();}
+\DoxyCodeLine{01185\ }
+\DoxyCodeLine{01186\ \ \ \ b\_06.send\_block();}
+\DoxyCodeLine{01187\ \ \ \ b\_06.verify\_block();}
+\DoxyCodeLine{01188\ }
+\DoxyCodeLine{01189\ \ \ \ \textcolor{comment}{//\ block\ 1\ now\ removed}}
+\DoxyCodeLine{01190\ \ \ \ b\_01.verify\_block\_not\_there();}
+\DoxyCodeLine{01191\ \ \ \ b\_02.verify\_block();}
+\DoxyCodeLine{01192\ \ \ \ b\_01.verify\_spec\_block();}
+\DoxyCodeLine{01193\ }
+\DoxyCodeLine{01194\ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}\ =\ status.get\_chain\_state();}
+\DoxyCodeLine{01195\ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}.head\_id\ ==\ b\_06.bs-\/>id);}
+\DoxyCodeLine{01196\ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}.irr\_id\ ==\ \mbox{\hyperlink{classfc_1_1sha256}{sysio::chain::block\_id\_type}}\{\});}
+\DoxyCodeLine{01197\ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}.earliest\_tracked\_block\_id\ ==\ b\_02.bs-\/>id);}
+\DoxyCodeLine{01198\ }
+\DoxyCodeLine{01199\ }
+\DoxyCodeLine{01200\ \ \ \ block\_frame\ b\_07(status,\ \textcolor{stringliteral}{"{}04:44:30.500"{}});}
+\DoxyCodeLine{01201\ \ \ \ b\_07.send\_spec\_block();}
+\DoxyCodeLine{01202\ \ \ \ b\_07.verify\_spec\_block();}
+\DoxyCodeLine{01203\ }
+\DoxyCodeLine{01204\ \ \ \ b\_07.send\_block();}
+\DoxyCodeLine{01205\ \ \ \ b\_07.verify\_block();}
+\DoxyCodeLine{01206\ }
+\DoxyCodeLine{01207\ \ \ \ \textcolor{comment}{//\ block\ 2\ now\ removed}}
+\DoxyCodeLine{01208\ \ \ \ b\_02.verify\_block\_not\_there();}
+\DoxyCodeLine{01209\ \ \ \ b\_03.verify\_block();}
+\DoxyCodeLine{01210\ \ \ \ b\_01.verify\_spec\_block();}
+\DoxyCodeLine{01211\ \ \ \ b\_02.verify\_spec\_block();}
+\DoxyCodeLine{01212\ }
+\DoxyCodeLine{01213\ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}\ =\ status.get\_chain\_state();}
+\DoxyCodeLine{01214\ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}.head\_id\ ==\ b\_07.bs-\/>id);}
+\DoxyCodeLine{01215\ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}.irr\_id\ ==\ \mbox{\hyperlink{classfc_1_1sha256}{sysio::chain::block\_id\_type}}\{\});}
+\DoxyCodeLine{01216\ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}.earliest\_tracked\_block\_id\ ==\ b\_03.bs-\/>id);}
+\DoxyCodeLine{01217\ }
+\DoxyCodeLine{01218\ }
+\DoxyCodeLine{01219\ \ \ \ block\_frame\ b\_08(status,\ \textcolor{stringliteral}{"{}04:44:35.500"{}});}
+\DoxyCodeLine{01220\ \ \ \ b\_08.send\_spec\_block();}
+\DoxyCodeLine{01221\ \ \ \ b\_08.verify\_spec\_block();}
+\DoxyCodeLine{01222\ }
+\DoxyCodeLine{01223\ \ \ \ b\_08.send\_block();}
+\DoxyCodeLine{01224\ \ \ \ b\_08.verify\_block();}
+\DoxyCodeLine{01225\ }
+\DoxyCodeLine{01226\ \ \ \ \textcolor{comment}{//\ block\ 3\ now\ removed\ and\ speculative's\ from\ block\ 1\ time\ frame}}
+\DoxyCodeLine{01227\ \ \ \ b\_03.verify\_block\_not\_there();}
+\DoxyCodeLine{01228\ \ \ \ b\_04.verify\_block();}
+\DoxyCodeLine{01229\ \ \ \ b\_01.verify\_spec\_block\_not\_there();}
+\DoxyCodeLine{01230\ \ \ \ b\_02.verify\_spec\_block();}
+\DoxyCodeLine{01231\ \ \ \ b\_03.verify\_spec\_block();}
+\DoxyCodeLine{01232\ }
+\DoxyCodeLine{01233\ }
+\DoxyCodeLine{01234\ \ \ \ block\_frame\ b\_09(status,\ \textcolor{stringliteral}{"{}04:44:40.500"{}});}
+\DoxyCodeLine{01235\ \ \ \ b\_09.send\_spec\_block();}
+\DoxyCodeLine{01236\ \ \ \ b\_09.verify\_spec\_block();}
+\DoxyCodeLine{01237\ }
+\DoxyCodeLine{01238\ \ \ \ b\_09.send\_block();}
+\DoxyCodeLine{01239\ \ \ \ b\_09.verify\_block();}
+\DoxyCodeLine{01240\ }
+\DoxyCodeLine{01241\ \ \ \ \textcolor{comment}{//\ block\ 4\ now\ removed\ and\ speculative's\ from\ block\ 2\ time\ frame}}
+\DoxyCodeLine{01242\ \ \ \ b\_04.verify\_block\_not\_there();}
+\DoxyCodeLine{01243\ \ \ \ b\_05.verify\_block();}
+\DoxyCodeLine{01244\ \ \ \ b\_02.verify\_spec\_block\_not\_there();}
+\DoxyCodeLine{01245\ \ \ \ b\_03.verify\_spec\_block();}
+\DoxyCodeLine{01246\ \ \ \ b\_04.verify\_spec\_block();}
+\DoxyCodeLine{01247\ }
+\DoxyCodeLine{01248\ }
+\DoxyCodeLine{01249\ \ \ \ block\_frame\ b\_10(status,\ \textcolor{stringliteral}{"{}04:44:45.500"{}});}
+\DoxyCodeLine{01250\ \ \ \ b\_10.send\_spec\_block();}
+\DoxyCodeLine{01251\ \ \ \ b\_10.verify\_spec\_block();}
+\DoxyCodeLine{01252\ }
+\DoxyCodeLine{01253\ \ \ \ b\_10.send\_block();}
+\DoxyCodeLine{01254\ \ \ \ b\_10.verify\_block();}
+\DoxyCodeLine{01255\ }
+\DoxyCodeLine{01256\ \ \ \ \textcolor{comment}{//\ block\ 5\ now\ removed\ and\ speculative's\ from\ block\ 3\ time\ frame}}
+\DoxyCodeLine{01257\ \ \ \ b\_05.verify\_block\_not\_there();}
+\DoxyCodeLine{01258\ \ \ \ b\_06.verify\_block();}
+\DoxyCodeLine{01259\ \ \ \ b\_03.verify\_spec\_block\_not\_there();}
+\DoxyCodeLine{01260\ \ \ \ b\_04.verify\_spec\_block();}
+\DoxyCodeLine{01261\ \ \ \ b\_05.verify\_spec\_block();}
+\DoxyCodeLine{01262\ }
+\DoxyCodeLine{01263\ \}\ \mbox{\hyperlink{exception_8hpp_ae70bfa24f5a3bc0917382b3c17fc033c}{FC\_LOG\_AND\_RETHROW}}()\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__trx__finality__status__processing_8cpp_a863bc6d6b13b7d8bb62e810d9d8b5c25_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__trx__finality__status__processing_8cpp_a05fa078c0d69deb99ee8e8b33be63e9a}\index{test\_trx\_finality\_status\_processing.cpp@{test\_trx\_finality\_status\_processing.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!test\_trx\_finality\_status\_processing.cpp@{test\_trx\_finality\_status\_processing.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{test__trx__finality__status__processing_8cpp_a05fa078c0d69deb99ee8e8b33be63e9a} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{trx\+\_\+finality\+\_\+status\+\_\+logic}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__trx__finality__status__processing_8cpp_source_l00167}{167}} of file \mbox{\hyperlink{test__trx__finality__status__processing_8cpp_source}{test\+\_\+trx\+\_\+finality\+\_\+status\+\_\+processing.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00168\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ pre\_block\_20\_time\ =\ set\_now(\textcolor{stringliteral}{"{}2022-\/04-\/04"{}},\ \textcolor{stringliteral}{"{}04:44:44.450"{}});}
+\DoxyCodeLine{00169\ \ \ \ \mbox{\hyperlink{classfc_1_1microseconds}{fc::microseconds}}\ max\_success\_duration\ =\ \mbox{\hyperlink{namespacefc_a9623b8cae3f48bbed6aa1fc2afe9b174}{fc::seconds}}(25);}
+\DoxyCodeLine{00170\ \ \ \ \mbox{\hyperlink{classfc_1_1microseconds}{fc::microseconds}}\ max\_failure\_duration\ =\ \mbox{\hyperlink{namespacefc_a9623b8cae3f48bbed6aa1fc2afe9b174}{fc::seconds}}(45);}
+\DoxyCodeLine{00171\ \ \ \ \mbox{\hyperlink{classsysio_1_1chain__apis_1_1trx__finality__status__processing}{trx\_finality\_status\_processing}}\ status(10'000,\ max\_success\_duration,\ max\_failure\_duration);}
+\DoxyCodeLine{00172\ }
+\DoxyCodeLine{00173\ \ \ \ \textcolor{keyword}{using\ }trx\_deque\ =\ sysio::chain::deque<\ std::tuple<\ chain::transaction\_trace\_ptr,\ packed\_transaction\_ptr\ >\ >;}
+\DoxyCodeLine{00174\ }
+\DoxyCodeLine{00175\ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{namespacebn}{bn}}\ =\ 20;}
+\DoxyCodeLine{00176\ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{static__buf_8cpp_aa99823a0fc8313c9c32541ce768fb801}{add}}\ =\ [\&\mbox{\hyperlink{namespacebn}{bn}},\ \&status](trx\_deque\&\ trx\_pairs,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{sysio::chain::block\_state\_ptr}}\&\ bs\_ptr)\ \{}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ trx\ =\ make\_unique\_trx(\mbox{\hyperlink{namespacefc_a9623b8cae3f48bbed6aa1fc2afe9b174}{fc::seconds}}(2));}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ trace\ =\ make\_transaction\_trace(\ trx,\ \mbox{\hyperlink{namespacebn}{bn}},\ bs\_ptr);}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ trx\_pairs.push\_back(std::tuple(trace,\ trx));}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ status.signal\_applied\_transaction(trace,\ trx);}
+\DoxyCodeLine{00181\ \ \ \ \};}
+\DoxyCodeLine{00182\ }
+\DoxyCodeLine{00183\ \ \ \ trx\_deque\ trx\_pairs\_20;}
+\DoxyCodeLine{00184\ }
+\DoxyCodeLine{00185\ \ \ \ \textcolor{comment}{//\ Create\ speculative\ block\ to\ begin\ applying\ transactions\ locally}}
+\DoxyCodeLine{00186\ \ \ \ status.signal\_block\_start(\mbox{\hyperlink{namespacebn}{bn}});}
+\DoxyCodeLine{00187\ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{sysio::chain::block\_state\_ptr}}\ no\_bs;}
+\DoxyCodeLine{00188\ }
+\DoxyCodeLine{00189\ \ \ \ \mbox{\hyperlink{static__buf_8cpp_aa99823a0fc8313c9c32541ce768fb801}{add}}(trx\_pairs\_20,\ no\_bs);}
+\DoxyCodeLine{00190\ \ \ \ \mbox{\hyperlink{static__buf_8cpp_aa99823a0fc8313c9c32541ce768fb801}{add}}(trx\_pairs\_20,\ no\_bs);}
+\DoxyCodeLine{00191\ \ \ \ \mbox{\hyperlink{static__buf_8cpp_aa99823a0fc8313c9c32541ce768fb801}{add}}(trx\_pairs\_20,\ no\_bs);}
+\DoxyCodeLine{00192\ \ \ \ \mbox{\hyperlink{static__buf_8cpp_aa99823a0fc8313c9c32541ce768fb801}{add}}(trx\_pairs\_20,\ no\_bs);}
+\DoxyCodeLine{00193\ }
+\DoxyCodeLine{00194\ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}\ =\ status.get\_chain\_state();}
+\DoxyCodeLine{00195\ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}.head\_id\ ==\ \mbox{\hyperlink{classfc_1_1sha256}{sysio::chain::block\_id\_type}}\{\});}
+\DoxyCodeLine{00196\ \ \ \ BOOST\_TEST(!std::get<0>(trx\_pairs\_20[0])-\/>producer\_block\_id.has\_value());}
+\DoxyCodeLine{00197\ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}.head\_block\_timestamp\ ==\ \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{sysio::chain::block\_timestamp\_type}}\{\});}
+\DoxyCodeLine{00198\ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}.irr\_id\ ==\ \mbox{\hyperlink{classfc_1_1sha256}{sysio::chain::block\_id\_type}}\{\});}
+\DoxyCodeLine{00199\ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}.earliest\_tracked\_block\_id\ ==\ \mbox{\hyperlink{classfc_1_1sha256}{sysio::chain::block\_id\_type}}\{\});}
+\DoxyCodeLine{00200\ }
+\DoxyCodeLine{00201\ \ \ \ \textcolor{keyword}{using\ }op\_ts\ =\ std::optional<sysio::chain\_apis::trx\_finality\_status\_processing::trx\_state>;}
+\DoxyCodeLine{00202\ }
+\DoxyCodeLine{00203\ \ \ \ op\_ts\ ts\ =\ status.get\_trx\_state(std::get<1>(trx\_pairs\_20[0])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00204\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00205\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ \mbox{\hyperlink{classfc_1_1sha256}{sysio::chain::block\_id\_type}}\{\});}
+\DoxyCodeLine{00206\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{sysio::chain::block\_timestamp\_type}}\{\});}
+\DoxyCodeLine{00207\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ pre\_block\_20\_time);}
+\DoxyCodeLine{00208\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}LOCALLY\_APPLIED"{}});}
+\DoxyCodeLine{00209\ }
+\DoxyCodeLine{00210\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(trx\_pairs\_20[1])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00211\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00212\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ \mbox{\hyperlink{classfc_1_1sha256}{sysio::chain::block\_id\_type}}\{\});}
+\DoxyCodeLine{00213\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{sysio::chain::block\_timestamp\_type}}\{\});}
+\DoxyCodeLine{00214\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ pre\_block\_20\_time);}
+\DoxyCodeLine{00215\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}LOCALLY\_APPLIED"{}});}
+\DoxyCodeLine{00216\ }
+\DoxyCodeLine{00217\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(trx\_pairs\_20[2])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00218\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00219\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ \mbox{\hyperlink{classfc_1_1sha256}{sysio::chain::block\_id\_type}}\{\});}
+\DoxyCodeLine{00220\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{sysio::chain::block\_timestamp\_type}}\{\});}
+\DoxyCodeLine{00221\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ pre\_block\_20\_time);}
+\DoxyCodeLine{00222\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}LOCALLY\_APPLIED"{}});}
+\DoxyCodeLine{00223\ }
+\DoxyCodeLine{00224\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(trx\_pairs\_20[3])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00225\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00226\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ \mbox{\hyperlink{classfc_1_1sha256}{sysio::chain::block\_id\_type}}\{\});}
+\DoxyCodeLine{00227\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{sysio::chain::block\_timestamp\_type}}\{\});}
+\DoxyCodeLine{00228\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ pre\_block\_20\_time);}
+\DoxyCodeLine{00229\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}LOCALLY\_APPLIED"{}});}
+\DoxyCodeLine{00230\ }
+\DoxyCodeLine{00231\ \ \ \ \textcolor{comment}{//\ Simulate\ situation\ where\ the\ last\ 2\ trxs\ do\ not\ make\ it\ into\ the\ block.}}
+\DoxyCodeLine{00232\ \ \ \ trx\_deque\ hold\_pairs;}
+\DoxyCodeLine{00233\ \ \ \ std::vector<chain::packed\_transaction\_ptr>\ holds;}
+\DoxyCodeLine{00234\ \ \ \ hold\_pairs.push\_back(trx\_pairs\_20[2]);}
+\DoxyCodeLine{00235\ \ \ \ hold\_pairs.push\_back(trx\_pairs\_20[3]);}
+\DoxyCodeLine{00236\ \ \ \ trx\_pairs\_20.pop\_back();}
+\DoxyCodeLine{00237\ \ \ \ trx\_pairs\_20.pop\_back();}
+\DoxyCodeLine{00238\ }
+\DoxyCodeLine{00239\ \ \ \ \textcolor{comment}{//Make\ a\ real\ block\ start.\ \ Pull\ these\ before\ any\ updates\ to\ the\ trx/trace\ objects.}}
+\DoxyCodeLine{00240\ \ \ \ \textcolor{comment}{//\ send\ block\ 20}}
+\DoxyCodeLine{00241\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ bs\_20\ =\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a7ad028261e9ab9a38fd557c8f7628615}{make\_block\_state}}(\mbox{\hyperlink{namespacebn}{bn}});}
+\DoxyCodeLine{00242\ \ \ \ status.signal\_block\_start(\mbox{\hyperlink{namespacebn}{bn}});}
+\DoxyCodeLine{00243\ }
+\DoxyCodeLine{00244\ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ trx\_tuple\ :\ trx\_pairs\_20)\ \{}
+\DoxyCodeLine{00245\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ trace\ =\ std::get<0>(trx\_tuple);}
+\DoxyCodeLine{00246\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ txn\ =\ std::get<1>(trx\_tuple);}
+\DoxyCodeLine{00247\ }
+\DoxyCodeLine{00248\ \ \ \ \ \ \ trace-\/>producer\_block\_id\ =\ bs\_20-\/>id;}
+\DoxyCodeLine{00249\ \ \ \ \ \ \ trace-\/>block\_time\ =\ bs\_20-\/>block-\/>timestamp;}
+\DoxyCodeLine{00250\ }
+\DoxyCodeLine{00251\ \ \ \ \ \ \ status.signal\_applied\_transaction(trace,\ txn);}
+\DoxyCodeLine{00252\ \ \ \ \}}
+\DoxyCodeLine{00253\ }
+\DoxyCodeLine{00254\ \ \ \ \textcolor{comment}{//\ and\ 2\ new\ transactions}}
+\DoxyCodeLine{00255\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ block\_20\_time\ =\ set\_now(\textcolor{stringliteral}{"{}2022-\/04-\/04"{}},\ \textcolor{stringliteral}{"{}04:44:44.500"{}});}
+\DoxyCodeLine{00256\ \ \ \ \mbox{\hyperlink{static__buf_8cpp_aa99823a0fc8313c9c32541ce768fb801}{add}}(trx\_pairs\_20,\ bs\_20);}
+\DoxyCodeLine{00257\ \ \ \ \mbox{\hyperlink{static__buf_8cpp_aa99823a0fc8313c9c32541ce768fb801}{add}}(trx\_pairs\_20,\ bs\_20);}
+\DoxyCodeLine{00258\ \ \ \ status.signal\_accepted\_block(bs\_20);}
+\DoxyCodeLine{00259\ }
+\DoxyCodeLine{00260\ }
+\DoxyCodeLine{00261\ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}\ =\ status.get\_chain\_state();}
+\DoxyCodeLine{00262\ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}.head\_id\ ==\ bs\_20-\/>id);}
+\DoxyCodeLine{00263\ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}.head\_id\ ==\ *std::get<0>(trx\_pairs\_20[0])-\/>producer\_block\_id);}
+\DoxyCodeLine{00264\ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}.head\_id\ ==\ *std::get<0>(trx\_pairs\_20[1])-\/>producer\_block\_id);}
+\DoxyCodeLine{00265\ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}.head\_id\ ==\ *std::get<0>(trx\_pairs\_20[2])-\/>producer\_block\_id);}
+\DoxyCodeLine{00266\ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}.head\_id\ ==\ *std::get<0>(trx\_pairs\_20[3])-\/>producer\_block\_id);}
+\DoxyCodeLine{00267\ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}.head\_block\_timestamp\ ==\ bs\_20-\/>block-\/>timestamp);}
+\DoxyCodeLine{00268\ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}.irr\_id\ ==\ \mbox{\hyperlink{classfc_1_1sha256}{sysio::chain::block\_id\_type}}\{\});}
+\DoxyCodeLine{00269\ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}.earliest\_tracked\_block\_id\ ==\ bs\_20-\/>id);}
+\DoxyCodeLine{00270\ }
+\DoxyCodeLine{00271\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(trx\_pairs\_20[0])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00272\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00273\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ bs\_20-\/>id);}
+\DoxyCodeLine{00274\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ bs\_20-\/>block-\/>timestamp);}
+\DoxyCodeLine{00275\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ pre\_block\_20\_time);}
+\DoxyCodeLine{00276\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}IN\_BLOCK"{}});}
+\DoxyCodeLine{00277\ }
+\DoxyCodeLine{00278\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(trx\_pairs\_20[1])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00279\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00280\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ bs\_20-\/>id);}
+\DoxyCodeLine{00281\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ bs\_20-\/>block-\/>timestamp);}
+\DoxyCodeLine{00282\ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{classfc_1_1time__point__sec}{fc::time\_point\_sec}}(ts-\/>expiration)\ ==\ (std::get<1>(trx\_pairs\_20[1])-\/>expiration()));}
+\DoxyCodeLine{00283\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ pre\_block\_20\_time);}
+\DoxyCodeLine{00284\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}IN\_BLOCK"{}});}
+\DoxyCodeLine{00285\ }
+\DoxyCodeLine{00286\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(trx\_pairs\_20[2])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00287\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00288\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ bs\_20-\/>id);}
+\DoxyCodeLine{00289\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ bs\_20-\/>block-\/>timestamp);}
+\DoxyCodeLine{00290\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ block\_20\_time);}
+\DoxyCodeLine{00291\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}IN\_BLOCK"{}});}
+\DoxyCodeLine{00292\ }
+\DoxyCodeLine{00293\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(trx\_pairs\_20[3])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00294\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00295\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ bs\_20-\/>id);}
+\DoxyCodeLine{00296\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ bs\_20-\/>block-\/>timestamp);}
+\DoxyCodeLine{00297\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ block\_20\_time);}
+\DoxyCodeLine{00298\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}IN\_BLOCK"{}});}
+\DoxyCodeLine{00299\ }
+\DoxyCodeLine{00300\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(hold\_pairs[0])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00301\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00302\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ \mbox{\hyperlink{classfc_1_1sha256}{sysio::chain::block\_id\_type}}\{\});}
+\DoxyCodeLine{00303\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{sysio::chain::block\_timestamp\_type}}\{\});}
+\DoxyCodeLine{00304\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ pre\_block\_20\_time);}
+\DoxyCodeLine{00305\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}LOCALLY\_APPLIED"{}});}
+\DoxyCodeLine{00306\ }
+\DoxyCodeLine{00307\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(hold\_pairs[1])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00308\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00309\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ \mbox{\hyperlink{classfc_1_1sha256}{sysio::chain::block\_id\_type}}\{\});}
+\DoxyCodeLine{00310\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{sysio::chain::block\_timestamp\_type}}\{\});}
+\DoxyCodeLine{00311\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ pre\_block\_20\_time);}
+\DoxyCodeLine{00312\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}LOCALLY\_APPLIED"{}});}
+\DoxyCodeLine{00313\ }
+\DoxyCodeLine{00314\ }
+\DoxyCodeLine{00315\ }
+\DoxyCodeLine{00316\ \ \ \ \textcolor{comment}{//\ send\ block\ 21}}
+\DoxyCodeLine{00317\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ block\_21\_time\ =\ set\_now(\textcolor{stringliteral}{"{}2022-\/04-\/04"{}},\ \textcolor{stringliteral}{"{}04:44:45.000"{}});}
+\DoxyCodeLine{00318\ \ \ \ trx\_deque\ trx\_pairs\_21;}
+\DoxyCodeLine{00319\ \ \ \ \mbox{\hyperlink{namespacebn}{bn}}\ =\ 21;}
+\DoxyCodeLine{00320\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ bs\_21\ =\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a7ad028261e9ab9a38fd557c8f7628615}{make\_block\_state}}(\mbox{\hyperlink{namespacebn}{bn}});}
+\DoxyCodeLine{00321\ \ \ \ status.signal\_block\_start(\mbox{\hyperlink{namespacebn}{bn}});}
+\DoxyCodeLine{00322\ \ \ \ \mbox{\hyperlink{classfc_1_1logger_a4e12ef2e794551d593e497b4b90601ab}{fc::logger::get}}(\mbox{\hyperlink{logger_8hpp_a8c7a288fea519c7e895518f8dff4888f}{DEFAULT\_LOGGER}}).\mbox{\hyperlink{classfc_1_1logger_a4c22e498cec41efb806fda9733662650}{set\_log\_level}}(\mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4a30d2de77e71beb8d09d530cac04efa25}{fc::log\_level::debug}});}
+\DoxyCodeLine{00323\ }
+\DoxyCodeLine{00324\ \ \ \ \mbox{\hyperlink{static__buf_8cpp_aa99823a0fc8313c9c32541ce768fb801}{add}}(trx\_pairs\_21,\ bs\_21);}
+\DoxyCodeLine{00325\ \ \ \ status.signal\_accepted\_block(bs\_21);}
+\DoxyCodeLine{00326\ }
+\DoxyCodeLine{00327\ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}\ =\ status.get\_chain\_state();}
+\DoxyCodeLine{00328\ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}.head\_id\ ==\ bs\_21-\/>id);}
+\DoxyCodeLine{00329\ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}.head\_id\ ==\ *std::get<0>(trx\_pairs\_21[0])-\/>producer\_block\_id);}
+\DoxyCodeLine{00330\ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}.head\_block\_timestamp\ ==\ bs\_21-\/>block-\/>timestamp);}
+\DoxyCodeLine{00331\ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}.irr\_id\ ==\ \mbox{\hyperlink{classfc_1_1sha256}{sysio::chain::block\_id\_type}}\{\});}
+\DoxyCodeLine{00332\ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}.earliest\_tracked\_block\_id\ ==\ bs\_20-\/>id);}
+\DoxyCodeLine{00333\ }
+\DoxyCodeLine{00334\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(trx\_pairs\_20[0])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00335\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00336\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ bs\_20-\/>id);}
+\DoxyCodeLine{00337\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ bs\_20-\/>block-\/>timestamp);}
+\DoxyCodeLine{00338\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ pre\_block\_20\_time);}
+\DoxyCodeLine{00339\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}IN\_BLOCK"{}});}
+\DoxyCodeLine{00340\ }
+\DoxyCodeLine{00341\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(trx\_pairs\_20[1])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00342\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00343\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ bs\_20-\/>id);}
+\DoxyCodeLine{00344\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ bs\_20-\/>block-\/>timestamp);}
+\DoxyCodeLine{00345\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ pre\_block\_20\_time);}
+\DoxyCodeLine{00346\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}IN\_BLOCK"{}});}
+\DoxyCodeLine{00347\ }
+\DoxyCodeLine{00348\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(trx\_pairs\_20[2])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00349\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00350\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ bs\_20-\/>id);}
+\DoxyCodeLine{00351\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ bs\_20-\/>block-\/>timestamp);}
+\DoxyCodeLine{00352\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ block\_20\_time);}
+\DoxyCodeLine{00353\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}IN\_BLOCK"{}});}
+\DoxyCodeLine{00354\ }
+\DoxyCodeLine{00355\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(trx\_pairs\_20[3])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00356\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00357\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ bs\_20-\/>id);}
+\DoxyCodeLine{00358\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ bs\_20-\/>block-\/>timestamp);}
+\DoxyCodeLine{00359\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ block\_20\_time);}
+\DoxyCodeLine{00360\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}IN\_BLOCK"{}});}
+\DoxyCodeLine{00361\ }
+\DoxyCodeLine{00362\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(hold\_pairs[0])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00363\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00364\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ \mbox{\hyperlink{classfc_1_1sha256}{sysio::chain::block\_id\_type}}\{\});}
+\DoxyCodeLine{00365\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{sysio::chain::block\_timestamp\_type}}\{\});}
+\DoxyCodeLine{00366\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ pre\_block\_20\_time);}
+\DoxyCodeLine{00367\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}LOCALLY\_APPLIED"{}});}
+\DoxyCodeLine{00368\ }
+\DoxyCodeLine{00369\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(hold\_pairs[1])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00370\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00371\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ \mbox{\hyperlink{classfc_1_1sha256}{sysio::chain::block\_id\_type}}\{\});}
+\DoxyCodeLine{00372\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{sysio::chain::block\_timestamp\_type}}\{\});}
+\DoxyCodeLine{00373\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ pre\_block\_20\_time);}
+\DoxyCodeLine{00374\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}LOCALLY\_APPLIED"{}});}
+\DoxyCodeLine{00375\ }
+\DoxyCodeLine{00376\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(trx\_pairs\_21[0])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00377\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00378\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ bs\_21-\/>id);}
+\DoxyCodeLine{00379\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ bs\_21-\/>block-\/>timestamp);}
+\DoxyCodeLine{00380\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ block\_21\_time);}
+\DoxyCodeLine{00381\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}IN\_BLOCK"{}});}
+\DoxyCodeLine{00382\ }
+\DoxyCodeLine{00383\ }
+\DoxyCodeLine{00384\ }
+\DoxyCodeLine{00385\ \ \ \ \textcolor{comment}{//\ send\ block\ 22}}
+\DoxyCodeLine{00386\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ block\_22\_time\ =\ set\_now(\textcolor{stringliteral}{"{}2022-\/04-\/04"{}},\ \textcolor{stringliteral}{"{}04:44:45.500"{}});}
+\DoxyCodeLine{00387\ \ \ \ trx\_deque\ trx\_pairs\_22;}
+\DoxyCodeLine{00388\ \ \ \ \mbox{\hyperlink{namespacebn}{bn}}\ =\ 22;}
+\DoxyCodeLine{00389\ }
+\DoxyCodeLine{00390\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ bs\_22\ =\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a7ad028261e9ab9a38fd557c8f7628615}{make\_block\_state}}(\mbox{\hyperlink{namespacebn}{bn}});}
+\DoxyCodeLine{00391\ \ \ \ status.signal\_block\_start(\mbox{\hyperlink{namespacebn}{bn}});}
+\DoxyCodeLine{00392\ }
+\DoxyCodeLine{00393\ \ \ \ \mbox{\hyperlink{static__buf_8cpp_aa99823a0fc8313c9c32541ce768fb801}{add}}(trx\_pairs\_22,\ bs\_22);}
+\DoxyCodeLine{00394\ \ \ \ status.signal\_accepted\_block(bs\_22);}
+\DoxyCodeLine{00395\ }
+\DoxyCodeLine{00396\ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}\ =\ status.get\_chain\_state();}
+\DoxyCodeLine{00397\ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}.head\_id\ ==\ bs\_22-\/>id);}
+\DoxyCodeLine{00398\ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}.head\_id\ ==\ *std::get<0>(trx\_pairs\_22[0])-\/>producer\_block\_id);}
+\DoxyCodeLine{00399\ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}.head\_block\_timestamp\ ==\ bs\_22-\/>block-\/>timestamp);}
+\DoxyCodeLine{00400\ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}.irr\_id\ ==\ \mbox{\hyperlink{classfc_1_1sha256}{sysio::chain::block\_id\_type}}\{\});}
+\DoxyCodeLine{00401\ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}.earliest\_tracked\_block\_id\ ==\ bs\_20-\/>id);}
+\DoxyCodeLine{00402\ }
+\DoxyCodeLine{00403\ }
+\DoxyCodeLine{00404\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(trx\_pairs\_20[0])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00405\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00406\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ bs\_20-\/>id);}
+\DoxyCodeLine{00407\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ bs\_20-\/>block-\/>timestamp);}
+\DoxyCodeLine{00408\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ pre\_block\_20\_time);}
+\DoxyCodeLine{00409\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}IN\_BLOCK"{}});}
+\DoxyCodeLine{00410\ }
+\DoxyCodeLine{00411\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(trx\_pairs\_20[1])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00412\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00413\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ bs\_20-\/>id);}
+\DoxyCodeLine{00414\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ bs\_20-\/>block-\/>timestamp);}
+\DoxyCodeLine{00415\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ pre\_block\_20\_time);}
+\DoxyCodeLine{00416\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}IN\_BLOCK"{}});}
+\DoxyCodeLine{00417\ }
+\DoxyCodeLine{00418\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(trx\_pairs\_20[2])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00419\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00420\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ bs\_20-\/>id);}
+\DoxyCodeLine{00421\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ bs\_20-\/>block-\/>timestamp);}
+\DoxyCodeLine{00422\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ block\_20\_time);}
+\DoxyCodeLine{00423\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}IN\_BLOCK"{}});}
+\DoxyCodeLine{00424\ }
+\DoxyCodeLine{00425\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(trx\_pairs\_20[3])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00426\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00427\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ bs\_20-\/>id);}
+\DoxyCodeLine{00428\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ bs\_20-\/>block-\/>timestamp);}
+\DoxyCodeLine{00429\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ block\_20\_time);}
+\DoxyCodeLine{00430\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}IN\_BLOCK"{}});}
+\DoxyCodeLine{00431\ }
+\DoxyCodeLine{00432\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(hold\_pairs[0])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00433\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00434\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ \mbox{\hyperlink{classfc_1_1sha256}{sysio::chain::block\_id\_type}}\{\});}
+\DoxyCodeLine{00435\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{sysio::chain::block\_timestamp\_type}}\{\});}
+\DoxyCodeLine{00436\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ pre\_block\_20\_time);}
+\DoxyCodeLine{00437\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}LOCALLY\_APPLIED"{}});}
+\DoxyCodeLine{00438\ }
+\DoxyCodeLine{00439\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(hold\_pairs[1])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00440\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00441\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ \mbox{\hyperlink{classfc_1_1sha256}{sysio::chain::block\_id\_type}}\{\});}
+\DoxyCodeLine{00442\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{sysio::chain::block\_timestamp\_type}}\{\});}
+\DoxyCodeLine{00443\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ pre\_block\_20\_time);}
+\DoxyCodeLine{00444\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}LOCALLY\_APPLIED"{}});}
+\DoxyCodeLine{00445\ }
+\DoxyCodeLine{00446\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(trx\_pairs\_21[0])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00447\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00448\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ bs\_21-\/>id);}
+\DoxyCodeLine{00449\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ bs\_21-\/>block-\/>timestamp);}
+\DoxyCodeLine{00450\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ block\_21\_time);}
+\DoxyCodeLine{00451\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}IN\_BLOCK"{}});}
+\DoxyCodeLine{00452\ }
+\DoxyCodeLine{00453\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(trx\_pairs\_22[0])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00454\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00455\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ bs\_22-\/>id);}
+\DoxyCodeLine{00456\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ bs\_22-\/>block-\/>timestamp);}
+\DoxyCodeLine{00457\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ block\_22\_time);}
+\DoxyCodeLine{00458\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}IN\_BLOCK"{}});}
+\DoxyCodeLine{00459\ }
+\DoxyCodeLine{00460\ }
+\DoxyCodeLine{00461\ }
+\DoxyCodeLine{00462\ }
+\DoxyCodeLine{00463\ \ \ \ \textcolor{comment}{//\ send\ block\ 22}}
+\DoxyCodeLine{00464\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ block\_22\_alt\_time\ =\ set\_now(\textcolor{stringliteral}{"{}2022-\/04-\/04"{}},\ \textcolor{stringliteral}{"{}04:44:46.000"{}});}
+\DoxyCodeLine{00465\ \ \ \ trx\_deque\ trx\_pairs\_22\_alt;}
+\DoxyCodeLine{00466\ \ \ \ \mbox{\hyperlink{namespacebn}{bn}}\ =\ 22;}
+\DoxyCodeLine{00467\ }
+\DoxyCodeLine{00468\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ bs\_22\_alt\ =\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a7ad028261e9ab9a38fd557c8f7628615}{make\_block\_state}}(\mbox{\hyperlink{namespacebn}{bn}});}
+\DoxyCodeLine{00469\ \ \ \ status.signal\_block\_start(\mbox{\hyperlink{namespacebn}{bn}});}
+\DoxyCodeLine{00470\ }
+\DoxyCodeLine{00471\ \ \ \ \mbox{\hyperlink{static__buf_8cpp_aa99823a0fc8313c9c32541ce768fb801}{add}}(trx\_pairs\_22\_alt,\ bs\_22\_alt);}
+\DoxyCodeLine{00472\ \ \ \ status.signal\_accepted\_block(bs\_22\_alt);}
+\DoxyCodeLine{00473\ }
+\DoxyCodeLine{00474\ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}\ =\ status.get\_chain\_state();}
+\DoxyCodeLine{00475\ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}.head\_id\ ==\ bs\_22\_alt-\/>id);}
+\DoxyCodeLine{00476\ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}.head\_id\ ==\ *std::get<0>(trx\_pairs\_22\_alt[0])-\/>producer\_block\_id);}
+\DoxyCodeLine{00477\ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}.head\_block\_timestamp\ ==\ bs\_22\_alt-\/>block-\/>timestamp);}
+\DoxyCodeLine{00478\ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}.irr\_id\ ==\ \mbox{\hyperlink{classfc_1_1sha256}{sysio::chain::block\_id\_type}}\{\});}
+\DoxyCodeLine{00479\ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}.earliest\_tracked\_block\_id\ ==\ bs\_20-\/>id);}
+\DoxyCodeLine{00480\ }
+\DoxyCodeLine{00481\ }
+\DoxyCodeLine{00482\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(trx\_pairs\_20[0])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00483\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00484\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ bs\_20-\/>id);}
+\DoxyCodeLine{00485\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ bs\_20-\/>block-\/>timestamp);}
+\DoxyCodeLine{00486\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ pre\_block\_20\_time);}
+\DoxyCodeLine{00487\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}IN\_BLOCK"{}});}
+\DoxyCodeLine{00488\ }
+\DoxyCodeLine{00489\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(trx\_pairs\_20[1])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00490\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00491\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ bs\_20-\/>id);}
+\DoxyCodeLine{00492\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ bs\_20-\/>block-\/>timestamp);}
+\DoxyCodeLine{00493\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ pre\_block\_20\_time);}
+\DoxyCodeLine{00494\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}IN\_BLOCK"{}});}
+\DoxyCodeLine{00495\ }
+\DoxyCodeLine{00496\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(trx\_pairs\_20[2])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00497\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00498\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ bs\_20-\/>id);}
+\DoxyCodeLine{00499\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ bs\_20-\/>block-\/>timestamp);}
+\DoxyCodeLine{00500\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ block\_20\_time);}
+\DoxyCodeLine{00501\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}IN\_BLOCK"{}});}
+\DoxyCodeLine{00502\ }
+\DoxyCodeLine{00503\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(trx\_pairs\_20[3])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00504\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00505\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ bs\_20-\/>id);}
+\DoxyCodeLine{00506\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ bs\_20-\/>block-\/>timestamp);}
+\DoxyCodeLine{00507\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ block\_20\_time);}
+\DoxyCodeLine{00508\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}IN\_BLOCK"{}});}
+\DoxyCodeLine{00509\ }
+\DoxyCodeLine{00510\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(hold\_pairs[0])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00511\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00512\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ \mbox{\hyperlink{classfc_1_1sha256}{sysio::chain::block\_id\_type}}\{\});}
+\DoxyCodeLine{00513\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{sysio::chain::block\_timestamp\_type}}\{\});}
+\DoxyCodeLine{00514\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ pre\_block\_20\_time);}
+\DoxyCodeLine{00515\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}FAILED"{}});}
+\DoxyCodeLine{00516\ }
+\DoxyCodeLine{00517\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(hold\_pairs[1])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00518\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00519\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ \mbox{\hyperlink{classfc_1_1sha256}{sysio::chain::block\_id\_type}}\{\});}
+\DoxyCodeLine{00520\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{sysio::chain::block\_timestamp\_type}}\{\});}
+\DoxyCodeLine{00521\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ pre\_block\_20\_time);}
+\DoxyCodeLine{00522\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}FAILED"{}});}
+\DoxyCodeLine{00523\ }
+\DoxyCodeLine{00524\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(trx\_pairs\_21[0])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00525\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00526\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ bs\_21-\/>id);}
+\DoxyCodeLine{00527\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ bs\_21-\/>block-\/>timestamp);}
+\DoxyCodeLine{00528\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ block\_21\_time);}
+\DoxyCodeLine{00529\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}IN\_BLOCK"{}});}
+\DoxyCodeLine{00530\ }
+\DoxyCodeLine{00531\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(trx\_pairs\_22[0])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00532\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00533\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ bs\_22-\/>id);}
+\DoxyCodeLine{00534\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ bs\_22-\/>block-\/>timestamp);}
+\DoxyCodeLine{00535\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ block\_22\_time);}
+\DoxyCodeLine{00536\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}FORKED\_OUT"{}});}
+\DoxyCodeLine{00537\ }
+\DoxyCodeLine{00538\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(trx\_pairs\_22\_alt[0])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00539\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00540\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ bs\_22\_alt-\/>id);}
+\DoxyCodeLine{00541\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ bs\_22\_alt-\/>block-\/>timestamp);}
+\DoxyCodeLine{00542\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ block\_22\_alt\_time);}
+\DoxyCodeLine{00543\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}IN\_BLOCK"{}});}
+\DoxyCodeLine{00544\ }
+\DoxyCodeLine{00545\ }
+\DoxyCodeLine{00546\ }
+\DoxyCodeLine{00547\ \ \ \ \textcolor{comment}{//\ send\ block\ 19\ (forking\ out\ previous\ blocks.)}}
+\DoxyCodeLine{00548\ \ \ \ \textcolor{comment}{//\ Testing\ that\ code\ handles\ getting\ blocks\ before\ when\ it\ started}}
+\DoxyCodeLine{00549\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ block\_19\_time\ =\ set\_now(\textcolor{stringliteral}{"{}2022-\/04-\/04"{}},\ \textcolor{stringliteral}{"{}04:44:47.000"{}});}
+\DoxyCodeLine{00550\ \ \ \ trx\_deque\ trx\_pairs\_19;}
+\DoxyCodeLine{00551\ \ \ \ \mbox{\hyperlink{namespacebn}{bn}}\ =\ 19;}
+\DoxyCodeLine{00552\ }
+\DoxyCodeLine{00553\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ bs\_19\ =\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a7ad028261e9ab9a38fd557c8f7628615}{make\_block\_state}}(\mbox{\hyperlink{namespacebn}{bn}});}
+\DoxyCodeLine{00554\ \ \ \ status.signal\_block\_start(\mbox{\hyperlink{namespacebn}{bn}});}
+\DoxyCodeLine{00555\ }
+\DoxyCodeLine{00556\ \ \ \ \mbox{\hyperlink{static__buf_8cpp_aa99823a0fc8313c9c32541ce768fb801}{add}}(trx\_pairs\_19,\ bs\_19);}
+\DoxyCodeLine{00557\ \ \ \ status.signal\_accepted\_block(bs\_19);}
+\DoxyCodeLine{00558\ }
+\DoxyCodeLine{00559\ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}\ =\ status.get\_chain\_state();}
+\DoxyCodeLine{00560\ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}.head\_id\ ==\ bs\_19-\/>id);}
+\DoxyCodeLine{00561\ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}.head\_id\ ==\ *std::get<0>(trx\_pairs\_19[0])-\/>producer\_block\_id);}
+\DoxyCodeLine{00562\ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}.head\_block\_timestamp\ ==\ bs\_19-\/>block-\/>timestamp);}
+\DoxyCodeLine{00563\ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}.irr\_id\ ==\ \mbox{\hyperlink{classfc_1_1sha256}{sysio::chain::block\_id\_type}}\{\});}
+\DoxyCodeLine{00564\ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}.earliest\_tracked\_block\_id\ ==\ bs\_19-\/>id);}
+\DoxyCodeLine{00565\ }
+\DoxyCodeLine{00566\ }
+\DoxyCodeLine{00567\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(trx\_pairs\_20[0])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00568\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00569\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ bs\_20-\/>id);}
+\DoxyCodeLine{00570\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ bs\_20-\/>block-\/>timestamp);}
+\DoxyCodeLine{00571\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ pre\_block\_20\_time);}
+\DoxyCodeLine{00572\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}FAILED"{}});}
+\DoxyCodeLine{00573\ }
+\DoxyCodeLine{00574\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(trx\_pairs\_20[1])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00575\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00576\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ bs\_20-\/>id);}
+\DoxyCodeLine{00577\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ bs\_20-\/>block-\/>timestamp);}
+\DoxyCodeLine{00578\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ pre\_block\_20\_time);}
+\DoxyCodeLine{00579\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}FAILED"{}});}
+\DoxyCodeLine{00580\ }
+\DoxyCodeLine{00581\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(trx\_pairs\_20[2])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00582\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00583\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ bs\_20-\/>id);}
+\DoxyCodeLine{00584\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ bs\_20-\/>block-\/>timestamp);}
+\DoxyCodeLine{00585\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ block\_20\_time);}
+\DoxyCodeLine{00586\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}FAILED"{}});}
+\DoxyCodeLine{00587\ }
+\DoxyCodeLine{00588\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(trx\_pairs\_20[3])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00589\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00590\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ bs\_20-\/>id);}
+\DoxyCodeLine{00591\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ bs\_20-\/>block-\/>timestamp);}
+\DoxyCodeLine{00592\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ block\_20\_time);}
+\DoxyCodeLine{00593\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}FAILED"{}});}
+\DoxyCodeLine{00594\ }
+\DoxyCodeLine{00595\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(hold\_pairs[0])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00596\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00597\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ \mbox{\hyperlink{classfc_1_1sha256}{sysio::chain::block\_id\_type}}\{\});}
+\DoxyCodeLine{00598\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{sysio::chain::block\_timestamp\_type}}\{\});}
+\DoxyCodeLine{00599\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ pre\_block\_20\_time);}
+\DoxyCodeLine{00600\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}FAILED"{}});}
+\DoxyCodeLine{00601\ }
+\DoxyCodeLine{00602\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(hold\_pairs[1])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00603\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00604\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ \mbox{\hyperlink{classfc_1_1sha256}{sysio::chain::block\_id\_type}}\{\});}
+\DoxyCodeLine{00605\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{sysio::chain::block\_timestamp\_type}}\{\});}
+\DoxyCodeLine{00606\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ pre\_block\_20\_time);}
+\DoxyCodeLine{00607\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}FAILED"{}});}
+\DoxyCodeLine{00608\ }
+\DoxyCodeLine{00609\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(trx\_pairs\_21[0])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00610\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00611\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ bs\_21-\/>id);}
+\DoxyCodeLine{00612\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ bs\_21-\/>block-\/>timestamp);}
+\DoxyCodeLine{00613\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ block\_21\_time);}
+\DoxyCodeLine{00614\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}FAILED"{}});}
+\DoxyCodeLine{00615\ }
+\DoxyCodeLine{00616\ \ \ \ \mbox{\hyperlink{classfc_1_1logger_a4e12ef2e794551d593e497b4b90601ab}{fc::logger::get}}(\mbox{\hyperlink{logger_8hpp_a8c7a288fea519c7e895518f8dff4888f}{DEFAULT\_LOGGER}}).\mbox{\hyperlink{classfc_1_1logger_a4c22e498cec41efb806fda9733662650}{set\_log\_level}}(\mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4a30d2de77e71beb8d09d530cac04efa25}{fc::log\_level::debug}});}
+\DoxyCodeLine{00617\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(trx\_pairs\_22[0])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00618\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00619\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ bs\_22-\/>id);}
+\DoxyCodeLine{00620\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ bs\_22-\/>block-\/>timestamp);}
+\DoxyCodeLine{00621\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ block\_22\_time);}
+\DoxyCodeLine{00622\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}FAILED"{}});}
+\DoxyCodeLine{00623\ }
+\DoxyCodeLine{00624\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(trx\_pairs\_22\_alt[0])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00625\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00626\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ bs\_22\_alt-\/>id);}
+\DoxyCodeLine{00627\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ bs\_22\_alt-\/>block-\/>timestamp);}
+\DoxyCodeLine{00628\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ block\_22\_alt\_time);}
+\DoxyCodeLine{00629\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}FORKED\_OUT"{}});}
+\DoxyCodeLine{00630\ }
+\DoxyCodeLine{00631\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(trx\_pairs\_19[0])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00632\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00633\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ bs\_19-\/>id);}
+\DoxyCodeLine{00634\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ bs\_19-\/>block-\/>timestamp);}
+\DoxyCodeLine{00635\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ block\_19\_time);}
+\DoxyCodeLine{00636\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}IN\_BLOCK"{}});}
+\DoxyCodeLine{00637\ }
+\DoxyCodeLine{00638\ }
+\DoxyCodeLine{00639\ }
+\DoxyCodeLine{00640\ \ \ \ \textcolor{comment}{//\ send\ block\ 19\ alternate}}
+\DoxyCodeLine{00641\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ block\_19\_alt\_time\ =\ set\_now(\textcolor{stringliteral}{"{}2022-\/04-\/04"{}},\ \textcolor{stringliteral}{"{}04:44:44.000"{}});}
+\DoxyCodeLine{00642\ \ \ \ trx\_deque\ trx\_pairs\_19\_alt;}
+\DoxyCodeLine{00643\ \ \ \ \mbox{\hyperlink{namespacebn}{bn}}\ =\ 19;}
+\DoxyCodeLine{00644\ \ \ \ trx\_pairs\_19\_alt.push\_back(trx\_pairs\_19[0]);}
+\DoxyCodeLine{00645\ \ \ \ trx\_pairs\_19\_alt.push\_back(trx\_pairs\_20[0]);}
+\DoxyCodeLine{00646\ \ \ \ trx\_pairs\_19\_alt.push\_back(trx\_pairs\_20[1]);}
+\DoxyCodeLine{00647\ \ \ \ trx\_pairs\_19\_alt.push\_back(trx\_pairs\_20[2]);}
+\DoxyCodeLine{00648\ \ \ \ trx\_pairs\_19\_alt.push\_back(trx\_pairs\_20[3]);}
+\DoxyCodeLine{00649\ \ \ \ trx\_pairs\_19\_alt.push\_back(hold\_pairs[0]);}
+\DoxyCodeLine{00650\ }
+\DoxyCodeLine{00651\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ bs\_19\_alt\ =\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a7ad028261e9ab9a38fd557c8f7628615}{make\_block\_state}}(\mbox{\hyperlink{namespacebn}{bn}});}
+\DoxyCodeLine{00652\ \ \ \ \textcolor{comment}{//\ const\ auto\ bs\_19\_alt\ =\ make\_block\_state(make\_block\_id(bn),\ std::vector<chain::packed\_transaction\_ptr>\{\});}}
+\DoxyCodeLine{00653\ \ \ \ status.signal\_block\_start(\mbox{\hyperlink{namespacebn}{bn}});}
+\DoxyCodeLine{00654\ }
+\DoxyCodeLine{00655\ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ trx\_tuple\ :\ trx\_pairs\_19\_alt)\ \{}
+\DoxyCodeLine{00656\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ trace\ =\ std::get<0>(trx\_tuple);}
+\DoxyCodeLine{00657\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ txn\ =\ std::get<1>(trx\_tuple);}
+\DoxyCodeLine{00658\ }
+\DoxyCodeLine{00659\ \ \ \ \ \ \ trace-\/>producer\_block\_id\ =\ bs\_19\_alt-\/>id;}
+\DoxyCodeLine{00660\ \ \ \ \ \ \ trace-\/>block\_time\ =\ bs\_19\_alt-\/>block-\/>timestamp;}
+\DoxyCodeLine{00661\ }
+\DoxyCodeLine{00662\ \ \ \ \ \ \ status.signal\_applied\_transaction(trace,\ txn);}
+\DoxyCodeLine{00663\ \ \ \ \}}
+\DoxyCodeLine{00664\ }
+\DoxyCodeLine{00665\ \ \ \ status.signal\_accepted\_block(bs\_19\_alt);}
+\DoxyCodeLine{00666\ }
+\DoxyCodeLine{00667\ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}\ =\ status.get\_chain\_state();}
+\DoxyCodeLine{00668\ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}.head\_id\ ==\ bs\_19\_alt-\/>id);}
+\DoxyCodeLine{00669\ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}.head\_id\ ==\ *std::get<0>(trx\_pairs\_19[0])-\/>producer\_block\_id);}
+\DoxyCodeLine{00670\ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}.head\_block\_timestamp\ ==\ bs\_19\_alt-\/>block-\/>timestamp);}
+\DoxyCodeLine{00671\ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}.irr\_id\ ==\ \mbox{\hyperlink{classfc_1_1sha256}{sysio::chain::block\_id\_type}}\{\});}
+\DoxyCodeLine{00672\ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}.earliest\_tracked\_block\_id\ ==\ bs\_19\_alt-\/>id);}
+\DoxyCodeLine{00673\ }
+\DoxyCodeLine{00674\ }
+\DoxyCodeLine{00675\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(trx\_pairs\_20[0])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00676\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00677\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ bs\_19\_alt-\/>id);}
+\DoxyCodeLine{00678\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ bs\_19\_alt-\/>block-\/>timestamp);}
+\DoxyCodeLine{00679\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ pre\_block\_20\_time);}
+\DoxyCodeLine{00680\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}IN\_BLOCK"{}});}
+\DoxyCodeLine{00681\ }
+\DoxyCodeLine{00682\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(trx\_pairs\_20[1])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00683\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00684\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ bs\_19\_alt-\/>id);}
+\DoxyCodeLine{00685\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ bs\_19\_alt-\/>block-\/>timestamp);}
+\DoxyCodeLine{00686\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ pre\_block\_20\_time);}
+\DoxyCodeLine{00687\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}IN\_BLOCK"{}});}
+\DoxyCodeLine{00688\ }
+\DoxyCodeLine{00689\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(trx\_pairs\_20[2])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00690\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00691\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ bs\_19\_alt-\/>id);}
+\DoxyCodeLine{00692\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ bs\_19\_alt-\/>block-\/>timestamp);}
+\DoxyCodeLine{00693\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ block\_20\_time);}
+\DoxyCodeLine{00694\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}IN\_BLOCK"{}});}
+\DoxyCodeLine{00695\ }
+\DoxyCodeLine{00696\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(trx\_pairs\_20[3])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00697\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00698\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ bs\_19\_alt-\/>id);}
+\DoxyCodeLine{00699\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ bs\_19\_alt-\/>block-\/>timestamp);}
+\DoxyCodeLine{00700\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ block\_20\_time);}
+\DoxyCodeLine{00701\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}IN\_BLOCK"{}});}
+\DoxyCodeLine{00702\ }
+\DoxyCodeLine{00703\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(hold\_pairs[0])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00704\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00705\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ bs\_19\_alt-\/>id);}
+\DoxyCodeLine{00706\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ bs\_19\_alt-\/>block-\/>timestamp);}
+\DoxyCodeLine{00707\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ pre\_block\_20\_time);}
+\DoxyCodeLine{00708\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}IN\_BLOCK"{}});}
+\DoxyCodeLine{00709\ }
+\DoxyCodeLine{00710\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(hold\_pairs[1])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00711\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00712\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ \mbox{\hyperlink{classfc_1_1sha256}{sysio::chain::block\_id\_type}}\{\});}
+\DoxyCodeLine{00713\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{sysio::chain::block\_timestamp\_type}}\{\});}
+\DoxyCodeLine{00714\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ pre\_block\_20\_time);}
+\DoxyCodeLine{00715\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}LOCALLY\_APPLIED"{}});}
+\DoxyCodeLine{00716\ }
+\DoxyCodeLine{00717\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(trx\_pairs\_21[0])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00718\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00719\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ bs\_21-\/>id);}
+\DoxyCodeLine{00720\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ bs\_21-\/>block-\/>timestamp);}
+\DoxyCodeLine{00721\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ block\_21\_time);}
+\DoxyCodeLine{00722\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}FORKED\_OUT"{}});}
+\DoxyCodeLine{00723\ }
+\DoxyCodeLine{00724\ \ \ \ \mbox{\hyperlink{classfc_1_1logger_a4e12ef2e794551d593e497b4b90601ab}{fc::logger::get}}(\mbox{\hyperlink{logger_8hpp_a8c7a288fea519c7e895518f8dff4888f}{DEFAULT\_LOGGER}}).\mbox{\hyperlink{classfc_1_1logger_a4c22e498cec41efb806fda9733662650}{set\_log\_level}}(\mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4a30d2de77e71beb8d09d530cac04efa25}{fc::log\_level::debug}});}
+\DoxyCodeLine{00725\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(trx\_pairs\_22[0])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00726\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00727\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ bs\_22-\/>id);}
+\DoxyCodeLine{00728\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ bs\_22-\/>block-\/>timestamp);}
+\DoxyCodeLine{00729\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ block\_22\_time);}
+\DoxyCodeLine{00730\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}FORKED\_OUT"{}});}
+\DoxyCodeLine{00731\ }
+\DoxyCodeLine{00732\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(trx\_pairs\_22\_alt[0])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00733\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00734\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ bs\_22\_alt-\/>id);}
+\DoxyCodeLine{00735\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ bs\_22\_alt-\/>block-\/>timestamp);}
+\DoxyCodeLine{00736\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ block\_22\_alt\_time);}
+\DoxyCodeLine{00737\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}FORKED\_OUT"{}});}
+\DoxyCodeLine{00738\ }
+\DoxyCodeLine{00739\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(trx\_pairs\_19[0])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00740\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00741\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ bs\_19\_alt-\/>id);}
+\DoxyCodeLine{00742\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ bs\_19\_alt-\/>block-\/>timestamp);}
+\DoxyCodeLine{00743\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ block\_19\_time);}
+\DoxyCodeLine{00744\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}IN\_BLOCK"{}});}
+\DoxyCodeLine{00745\ }
+\DoxyCodeLine{00746\ }
+\DoxyCodeLine{00747\ \ \ \ \textcolor{comment}{//\ look\ for\ unknown\ transaction}}
+\DoxyCodeLine{00748\ \ \ \ \textcolor{keyword}{auto}\ trx\ =\ make\_unique\_trx(\mbox{\hyperlink{namespacefc_a9623b8cae3f48bbed6aa1fc2afe9b174}{fc::seconds}}(2));}
+\DoxyCodeLine{00749\ }
+\DoxyCodeLine{00750\ \ \ \ ts\ =\ status.get\_trx\_state(trx-\/>id());}
+\DoxyCodeLine{00751\ \ \ \ BOOST\_REQUIRE(!ts);}
+\DoxyCodeLine{00752\ }
+\DoxyCodeLine{00753\ \ \ \ \textcolor{comment}{//\ irreversible}}
+\DoxyCodeLine{00754\ \ \ \ status.signal\_irreversible\_block(bs\_19\_alt);}
+\DoxyCodeLine{00755\ }
+\DoxyCodeLine{00756\ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}\ =\ status.get\_chain\_state();}
+\DoxyCodeLine{00757\ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}.head\_id\ ==\ bs\_19\_alt-\/>id);}
+\DoxyCodeLine{00758\ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}.irr\_id\ ==\ bs\_19\_alt-\/>id);}
+\DoxyCodeLine{00759\ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}.irr\_block\_timestamp\ ==\ bs\_19\_alt-\/>block-\/>timestamp);}
+\DoxyCodeLine{00760\ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}.earliest\_tracked\_block\_id\ ==\ bs\_19\_alt-\/>id);}
+\DoxyCodeLine{00761\ }
+\DoxyCodeLine{00762\ }
+\DoxyCodeLine{00763\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(trx\_pairs\_20[0])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00764\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00765\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ bs\_19\_alt-\/>id);}
+\DoxyCodeLine{00766\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ bs\_19\_alt-\/>block-\/>timestamp);}
+\DoxyCodeLine{00767\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ pre\_block\_20\_time);}
+\DoxyCodeLine{00768\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}IRREVERSIBLE"{}});}
+\DoxyCodeLine{00769\ }
+\DoxyCodeLine{00770\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(trx\_pairs\_20[1])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00771\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00772\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ bs\_19\_alt-\/>id);}
+\DoxyCodeLine{00773\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ bs\_19\_alt-\/>block-\/>timestamp);}
+\DoxyCodeLine{00774\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ pre\_block\_20\_time);}
+\DoxyCodeLine{00775\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}IRREVERSIBLE"{}});}
+\DoxyCodeLine{00776\ }
+\DoxyCodeLine{00777\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(trx\_pairs\_20[2])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00778\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00779\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ bs\_19\_alt-\/>id);}
+\DoxyCodeLine{00780\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ bs\_19\_alt-\/>block-\/>timestamp);}
+\DoxyCodeLine{00781\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ block\_20\_time);}
+\DoxyCodeLine{00782\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}IRREVERSIBLE"{}});}
+\DoxyCodeLine{00783\ }
+\DoxyCodeLine{00784\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(trx\_pairs\_20[3])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00785\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00786\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ bs\_19\_alt-\/>id);}
+\DoxyCodeLine{00787\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ bs\_19\_alt-\/>block-\/>timestamp);}
+\DoxyCodeLine{00788\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ block\_20\_time);}
+\DoxyCodeLine{00789\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}IRREVERSIBLE"{}});}
+\DoxyCodeLine{00790\ }
+\DoxyCodeLine{00791\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(hold\_pairs[0])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00792\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00793\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ bs\_19\_alt-\/>id);}
+\DoxyCodeLine{00794\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ bs\_19\_alt-\/>block-\/>timestamp);}
+\DoxyCodeLine{00795\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ pre\_block\_20\_time);}
+\DoxyCodeLine{00796\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}IRREVERSIBLE"{}});}
+\DoxyCodeLine{00797\ }
+\DoxyCodeLine{00798\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(hold\_pairs[1])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00799\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00800\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ \mbox{\hyperlink{classfc_1_1sha256}{sysio::chain::block\_id\_type}}\{\});}
+\DoxyCodeLine{00801\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{sysio::chain::block\_timestamp\_type}}\{\});}
+\DoxyCodeLine{00802\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ pre\_block\_20\_time);}
+\DoxyCodeLine{00803\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}LOCALLY\_APPLIED"{}});}
+\DoxyCodeLine{00804\ }
+\DoxyCodeLine{00805\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(trx\_pairs\_21[0])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00806\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00807\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ bs\_21-\/>id);}
+\DoxyCodeLine{00808\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ bs\_21-\/>block-\/>timestamp);}
+\DoxyCodeLine{00809\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ block\_21\_time);}
+\DoxyCodeLine{00810\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}FORKED\_OUT"{}});}
+\DoxyCodeLine{00811\ }
+\DoxyCodeLine{00812\ \ \ \ \mbox{\hyperlink{classfc_1_1logger_a4e12ef2e794551d593e497b4b90601ab}{fc::logger::get}}(\mbox{\hyperlink{logger_8hpp_a8c7a288fea519c7e895518f8dff4888f}{DEFAULT\_LOGGER}}).\mbox{\hyperlink{classfc_1_1logger_a4c22e498cec41efb806fda9733662650}{set\_log\_level}}(\mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4a30d2de77e71beb8d09d530cac04efa25}{fc::log\_level::debug}});}
+\DoxyCodeLine{00813\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(trx\_pairs\_22[0])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00814\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00815\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ bs\_22-\/>id);}
+\DoxyCodeLine{00816\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ bs\_22-\/>block-\/>timestamp);}
+\DoxyCodeLine{00817\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ block\_22\_time);}
+\DoxyCodeLine{00818\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}FORKED\_OUT"{}});}
+\DoxyCodeLine{00819\ }
+\DoxyCodeLine{00820\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(trx\_pairs\_22\_alt[0])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00821\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00822\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ bs\_22\_alt-\/>id);}
+\DoxyCodeLine{00823\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ bs\_22\_alt-\/>block-\/>timestamp);}
+\DoxyCodeLine{00824\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ block\_22\_alt\_time);}
+\DoxyCodeLine{00825\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}FORKED\_OUT"{}});}
+\DoxyCodeLine{00826\ }
+\DoxyCodeLine{00827\ \ \ \ ts\ =\ status.get\_trx\_state(std::get<1>(trx\_pairs\_19[0])-\/>\textcolor{keywordtype}{id}());}
+\DoxyCodeLine{00828\ \ \ \ BOOST\_REQUIRE(ts);}
+\DoxyCodeLine{00829\ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ bs\_19\_alt-\/>id);}
+\DoxyCodeLine{00830\ \ \ \ BOOST\_CHECK(ts-\/>block\_timestamp\ ==\ bs\_19\_alt-\/>block-\/>timestamp);}
+\DoxyCodeLine{00831\ \ \ \ BOOST\_CHECK\_EQUAL(std::string(ts-\/>received),\ block\_19\_time);}
+\DoxyCodeLine{00832\ \ \ \ BOOST\_CHECK\_EQUAL(ts-\/>status,\ \textcolor{stringliteral}{"{}IRREVERSIBLE"{}});}
+\DoxyCodeLine{00833\ }
+\DoxyCodeLine{00834\ \}\ \mbox{\hyperlink{exception_8hpp_ae70bfa24f5a3bc0917382b3c17fc033c}{FC\_LOG\_AND\_RETHROW}}()\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__trx__finality__status__processing_8cpp_a05fa078c0d69deb99ee8e8b33be63e9a_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__trx__finality__status__processing_8cpp_ab653bc9bc525b8d8cd8292f4fcfb7638}\index{test\_trx\_finality\_status\_processing.cpp@{test\_trx\_finality\_status\_processing.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!test\_trx\_finality\_status\_processing.cpp@{test\_trx\_finality\_status\_processing.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{test__trx__finality__status__processing_8cpp_ab653bc9bc525b8d8cd8292f4fcfb7638} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{trx\+\_\+finality\+\_\+status\+\_\+storage\+\_\+reduction}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__trx__finality__status__processing_8cpp_source_l00947}{947}} of file \mbox{\hyperlink{test__trx__finality__status__processing_8cpp_source}{test\+\_\+trx\+\_\+finality\+\_\+status\+\_\+processing.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00947\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00948\ \ \ \ set\_now(\textcolor{stringliteral}{"{}2022-\/04-\/04"{}},\ \textcolor{stringliteral}{"{}04:44:44.450"{}});}
+\DoxyCodeLine{00949\ \ \ \ \mbox{\hyperlink{classfc_1_1microseconds}{fc::microseconds}}\ max\_success\_duration\ =\ \mbox{\hyperlink{namespacefc_a9623b8cae3f48bbed6aa1fc2afe9b174}{fc::seconds}}(25);}
+\DoxyCodeLine{00950\ \ \ \ \mbox{\hyperlink{classfc_1_1microseconds}{fc::microseconds}}\ max\_failure\_duration\ =\ \mbox{\hyperlink{namespacefc_a9623b8cae3f48bbed6aa1fc2afe9b174}{fc::seconds}}(45);}
+\DoxyCodeLine{00951\ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ max\_storage\ =\ 10'000;}
+\DoxyCodeLine{00952\ \ \ \ \mbox{\hyperlink{classsysio_1_1chain__apis_1_1trx__finality__status__processing}{trx\_finality\_status\_processing}}\ status(max\_storage,\ max\_success\_duration,\ max\_failure\_duration);}
+\DoxyCodeLine{00953\ }
+\DoxyCodeLine{00954\ \ \ \ \textcolor{comment}{//\ auto\ verify\_trx\ =\ [\&status](trx\_deque\&\ trx\_pairs,\ const\ sysio::chain::block\_state\_ptr\&\ bs)\ \{}}
+\DoxyCodeLine{00955\ \ \ \ \textcolor{comment}{//\ \ \ \ const\ auto\ id\ =\ bs\ ?\ bs-\/>id\ :\ sysio::chain::transaction\_id\_type\{\};}}
+\DoxyCodeLine{00956\ \ \ \ \textcolor{comment}{//\ \ \ \ for\ (const\ auto\&\ trx\_pair\ :\ trx\_pairs)\ \{}}
+\DoxyCodeLine{00957\ \ \ \ \textcolor{comment}{//\ \ \ \ \ \ \ auto\ ts\ =\ status.get\_trx\_state(std::get<1>(trx\_pair)-\/>id());}}
+\DoxyCodeLine{00958\ \ \ \ \textcolor{comment}{//\ \ \ \ \ \ \ BOOST\_REQUIRE(ts);}}
+\DoxyCodeLine{00959\ \ \ \ \textcolor{comment}{//\ \ \ \ \ \ \ BOOST\_CHECK(ts-\/>block\_id\ ==\ id);}}
+\DoxyCodeLine{00960\ \ \ \ \textcolor{comment}{//\ \ \ \ \}}}
+\DoxyCodeLine{00961\ \ \ \ \textcolor{comment}{//\ \};}}
+\DoxyCodeLine{00962\ }
+\DoxyCodeLine{00963\ \ \ \ block\_frame\ b\_01(status,\ \textcolor{stringliteral}{"{}04:44:00.500"{}},\ 1);}
+\DoxyCodeLine{00964\ \ \ \ b\_01.send\_spec\_block();}
+\DoxyCodeLine{00965\ \ \ \ b\_01.verify\_spec\_block();}
+\DoxyCodeLine{00966\ }
+\DoxyCodeLine{00967\ \ \ \ b\_01.send\_block();}
+\DoxyCodeLine{00968\ \ \ \ b\_01.verify\_block();}
+\DoxyCodeLine{00969\ }
+\DoxyCodeLine{00970\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ block\_and\_speculative\_size\ =\ status.get\_storage\_memory\_size();}
+\DoxyCodeLine{00971\ \ \ \ \textcolor{comment}{//\ test\ expects\ to\ not\ hit\ the\ storage\ limitation\ till\ the\ 12th\ block}}
+\DoxyCodeLine{00972\ \ \ \ BOOST\_REQUIRE(max\_storage\ /\ 11\ >\ block\_and\_speculative\_size);}
+\DoxyCodeLine{00973\ \ \ \ BOOST\_REQUIRE(max\_storage\ /\ 12\ <\ block\_and\_speculative\_size);}
+\DoxyCodeLine{00974\ }
+\DoxyCodeLine{00975\ }
+\DoxyCodeLine{00976\ \ \ \ block\_frame\ b\_02(status,\ \textcolor{stringliteral}{"{}04:44:01.500"{}});}
+\DoxyCodeLine{00977\ \ \ \ b\_02.send\_spec\_block();}
+\DoxyCodeLine{00978\ \ \ \ b\_02.verify\_spec\_block();}
+\DoxyCodeLine{00979\ }
+\DoxyCodeLine{00980\ \ \ \ b\_02.send\_block();}
+\DoxyCodeLine{00981\ \ \ \ b\_02.verify\_block();}
+\DoxyCodeLine{00982\ }
+\DoxyCodeLine{00983\ }
+\DoxyCodeLine{00984\ \ \ \ block\_frame\ b\_03(status,\ \textcolor{stringliteral}{"{}04:44:02.500"{}});}
+\DoxyCodeLine{00985\ \ \ \ b\_03.send\_spec\_block();}
+\DoxyCodeLine{00986\ \ \ \ b\_03.verify\_spec\_block();}
+\DoxyCodeLine{00987\ }
+\DoxyCodeLine{00988\ \ \ \ b\_03.send\_block();}
+\DoxyCodeLine{00989\ \ \ \ b\_03.verify\_block();}
+\DoxyCodeLine{00990\ }
+\DoxyCodeLine{00991\ }
+\DoxyCodeLine{00992\ \ \ \ block\_frame\ b\_04(status,\ \textcolor{stringliteral}{"{}04:44:03.500"{}});}
+\DoxyCodeLine{00993\ \ \ \ b\_04.send\_spec\_block();}
+\DoxyCodeLine{00994\ \ \ \ b\_04.verify\_spec\_block();}
+\DoxyCodeLine{00995\ }
+\DoxyCodeLine{00996\ \ \ \ b\_04.send\_block();}
+\DoxyCodeLine{00997\ \ \ \ b\_04.verify\_block();}
+\DoxyCodeLine{00998\ }
+\DoxyCodeLine{00999\ }
+\DoxyCodeLine{01000\ \ \ \ block\_frame\ b\_05(status,\ \textcolor{stringliteral}{"{}04:44:04.500"{}});}
+\DoxyCodeLine{01001\ \ \ \ b\_05.send\_spec\_block();}
+\DoxyCodeLine{01002\ \ \ \ b\_05.verify\_spec\_block();}
+\DoxyCodeLine{01003\ }
+\DoxyCodeLine{01004\ \ \ \ b\_05.send\_block();}
+\DoxyCodeLine{01005\ \ \ \ b\_05.verify\_block();}
+\DoxyCodeLine{01006\ }
+\DoxyCodeLine{01007\ }
+\DoxyCodeLine{01008\ \ \ \ block\_frame\ b\_06(status,\ \textcolor{stringliteral}{"{}04:44:05.500"{}});}
+\DoxyCodeLine{01009\ \ \ \ b\_06.send\_spec\_block();}
+\DoxyCodeLine{01010\ \ \ \ b\_06.verify\_spec\_block();}
+\DoxyCodeLine{01011\ }
+\DoxyCodeLine{01012\ \ \ \ b\_06.send\_block();}
+\DoxyCodeLine{01013\ \ \ \ b\_06.verify\_block();}
+\DoxyCodeLine{01014\ }
+\DoxyCodeLine{01015\ }
+\DoxyCodeLine{01016\ \ \ \ block\_frame\ b\_07(status,\ \textcolor{stringliteral}{"{}04:44:06.500"{}});}
+\DoxyCodeLine{01017\ \ \ \ b\_07.send\_spec\_block();}
+\DoxyCodeLine{01018\ \ \ \ b\_07.verify\_spec\_block();}
+\DoxyCodeLine{01019\ }
+\DoxyCodeLine{01020\ \ \ \ b\_07.send\_block();}
+\DoxyCodeLine{01021\ \ \ \ b\_07.verify\_block();}
+\DoxyCodeLine{01022\ }
+\DoxyCodeLine{01023\ }
+\DoxyCodeLine{01024\ \ \ \ block\_frame\ b\_08(status,\ \textcolor{stringliteral}{"{}04:44:07.500"{}});}
+\DoxyCodeLine{01025\ \ \ \ b\_08.send\_spec\_block();}
+\DoxyCodeLine{01026\ \ \ \ b\_08.verify\_spec\_block();}
+\DoxyCodeLine{01027\ }
+\DoxyCodeLine{01028\ \ \ \ b\_08.send\_block();}
+\DoxyCodeLine{01029\ \ \ \ b\_08.verify\_block();}
+\DoxyCodeLine{01030\ }
+\DoxyCodeLine{01031\ }
+\DoxyCodeLine{01032\ \ \ \ block\_frame\ b\_09(status,\ \textcolor{stringliteral}{"{}04:44:08.500"{}});}
+\DoxyCodeLine{01033\ \ \ \ b\_09.send\_spec\_block();}
+\DoxyCodeLine{01034\ \ \ \ b\_09.verify\_spec\_block();}
+\DoxyCodeLine{01035\ }
+\DoxyCodeLine{01036\ \ \ \ b\_09.send\_block();}
+\DoxyCodeLine{01037\ \ \ \ b\_09.verify\_block();}
+\DoxyCodeLine{01038\ }
+\DoxyCodeLine{01039\ }
+\DoxyCodeLine{01040\ \ \ \ block\_frame\ b\_10(status,\ \textcolor{stringliteral}{"{}04:44:09.500"{}});}
+\DoxyCodeLine{01041\ \ \ \ b\_10.send\_spec\_block();}
+\DoxyCodeLine{01042\ \ \ \ b\_10.verify\_spec\_block();}
+\DoxyCodeLine{01043\ }
+\DoxyCodeLine{01044\ \ \ \ b\_10.send\_block();}
+\DoxyCodeLine{01045\ \ \ \ b\_10.verify\_block();}
+\DoxyCodeLine{01046\ }
+\DoxyCodeLine{01047\ }
+\DoxyCodeLine{01048\ \ \ \ block\_frame\ b\_11(status,\ \textcolor{stringliteral}{"{}04:44:10.500"{}});}
+\DoxyCodeLine{01049\ \ \ \ b\_11.send\_spec\_block();}
+\DoxyCodeLine{01050\ \ \ \ b\_11.verify\_spec\_block();}
+\DoxyCodeLine{01051\ }
+\DoxyCodeLine{01052\ \ \ \ b\_11.send\_block();}
+\DoxyCodeLine{01053\ \ \ \ b\_11.verify\_block();}
+\DoxyCodeLine{01054\ }
+\DoxyCodeLine{01055\ }
+\DoxyCodeLine{01056\ }
+\DoxyCodeLine{01057\ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}\ =\ status.get\_chain\_state();}
+\DoxyCodeLine{01058\ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}.head\_id\ ==\ b\_11.bs-\/>id);}
+\DoxyCodeLine{01059\ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}.irr\_id\ ==\ \mbox{\hyperlink{classfc_1_1sha256}{sysio::chain::block\_id\_type}}\{\});}
+\DoxyCodeLine{01060\ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}.earliest\_tracked\_block\_id\ ==\ b\_01.bs-\/>id);}
+\DoxyCodeLine{01061\ }
+\DoxyCodeLine{01062\ \ \ \ \textcolor{comment}{//\ Test\ expects\ the\ next\ block\ range\ to\ exceed\ max\_storage.\ Need\ to\ adjust}}
+\DoxyCodeLine{01063\ \ \ \ \textcolor{comment}{//\ this\ test\ if\ this\ fails.}}
+\DoxyCodeLine{01064\ \ \ \ BOOST\_REQUIRE(status.get\_storage\_memory\_size()\ +\ block\_and\_speculative\_size\ >\ max\_storage);}
+\DoxyCodeLine{01065\ }
+\DoxyCodeLine{01066\ }
+\DoxyCodeLine{01067\ \ \ \ block\_frame\ b\_12(status,\ \textcolor{stringliteral}{"{}04:44:11.500"{}});}
+\DoxyCodeLine{01068\ \ \ \ b\_12.send\_spec\_block();}
+\DoxyCodeLine{01069\ \ \ \ b\_12.verify\_spec\_block();}
+\DoxyCodeLine{01070\ }
+\DoxyCodeLine{01071\ \ \ \ b\_12.send\_block();}
+\DoxyCodeLine{01072\ \ \ \ b\_12.verify\_block();}
+\DoxyCodeLine{01073\ }
+\DoxyCodeLine{01074\ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}\ =\ status.get\_chain\_state();}
+\DoxyCodeLine{01075\ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}.head\_id\ ==\ b\_12.bs-\/>id);}
+\DoxyCodeLine{01076\ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}.head\_block\_timestamp\ ==\ b\_12.bs-\/>block-\/>timestamp);}
+\DoxyCodeLine{01077\ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}.irr\_id\ ==\ \mbox{\hyperlink{classfc_1_1sha256}{sysio::chain::block\_id\_type}}\{\});}
+\DoxyCodeLine{01078\ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}.irr\_block\_timestamp\ ==\ \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{sysio::chain::block\_timestamp\_type}}\{\});}
+\DoxyCodeLine{01079\ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespace_xbyak_1_1util_afaa04901113ae6e241309a25ece6e2b9}{cs}}.earliest\_tracked\_block\_id\ ==\ b\_03.bs-\/>id);}
+\DoxyCodeLine{01080\ }
+\DoxyCodeLine{01081\ }
+\DoxyCodeLine{01082\ \ \ \ b\_01.verify\_spec\_block\_not\_there();}
+\DoxyCodeLine{01083\ \ \ \ b\_01.verify\_block\_not\_there();}
+\DoxyCodeLine{01084\ }
+\DoxyCodeLine{01085\ \ \ \ b\_02.verify\_spec\_block\_not\_there();}
+\DoxyCodeLine{01086\ \ \ \ b\_02.verify\_block\_not\_there();}
+\DoxyCodeLine{01087\ }
+\DoxyCodeLine{01088\ \ \ \ b\_03.verify\_spec\_block();}
+\DoxyCodeLine{01089\ \ \ \ b\_03.verify\_block();}
+\DoxyCodeLine{01090\ }
+\DoxyCodeLine{01091\ \ \ \ b\_04.verify\_spec\_block();}
+\DoxyCodeLine{01092\ \ \ \ b\_04.verify\_block();}
+\DoxyCodeLine{01093\ }
+\DoxyCodeLine{01094\ \ \ \ b\_05.verify\_spec\_block();}
+\DoxyCodeLine{01095\ \ \ \ b\_05.verify\_block();}
+\DoxyCodeLine{01096\ }
+\DoxyCodeLine{01097\ \ \ \ b\_06.verify\_spec\_block();}
+\DoxyCodeLine{01098\ \ \ \ b\_06.verify\_block();}
+\DoxyCodeLine{01099\ }
+\DoxyCodeLine{01100\ \ \ \ b\_07.verify\_spec\_block();}
+\DoxyCodeLine{01101\ \ \ \ b\_07.verify\_block();}
+\DoxyCodeLine{01102\ }
+\DoxyCodeLine{01103\ \ \ \ b\_08.verify\_spec\_block();}
+\DoxyCodeLine{01104\ \ \ \ b\_08.verify\_block();}
+\DoxyCodeLine{01105\ }
+\DoxyCodeLine{01106\ \ \ \ b\_09.verify\_spec\_block();}
+\DoxyCodeLine{01107\ \ \ \ b\_09.verify\_block();}
+\DoxyCodeLine{01108\ }
+\DoxyCodeLine{01109\ \ \ \ b\_10.verify\_spec\_block();}
+\DoxyCodeLine{01110\ \ \ \ b\_10.verify\_block();}
+\DoxyCodeLine{01111\ }
+\DoxyCodeLine{01112\ \ \ \ b\_11.verify\_spec\_block();}
+\DoxyCodeLine{01113\ \ \ \ b\_11.verify\_block();}
+\DoxyCodeLine{01114\ }
+\DoxyCodeLine{01115\ \ \ \ b\_12.verify\_spec\_block();}
+\DoxyCodeLine{01116\ \ \ \ b\_12.verify\_block();}
+\DoxyCodeLine{01117\ }
+\DoxyCodeLine{01118\ \}\ \mbox{\hyperlink{exception_8hpp_ae70bfa24f5a3bc0917382b3c17fc033c}{FC\_LOG\_AND\_RETHROW}}()\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__trx__finality__status__processing_8cpp_ab653bc9bc525b8d8cd8292f4fcfb7638_cgraph}
+\end{center}
+\end{figure}

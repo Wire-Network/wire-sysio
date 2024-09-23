@@ -1,0 +1,1283 @@
+\doxysection{gtest-\/port.cc}
+\hypertarget{gtest-port_8cc_source}{}\label{gtest-port_8cc_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/src/gtest-\/port.cc@{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/src/gtest-\/port.cc}}
+\mbox{\hyperlink{gtest-port_8cc}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00001}00001\ \textcolor{comment}{//\ Copyright\ 2008,\ Google\ Inc.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00002}00002\ \textcolor{comment}{//\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00003}00003\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00004}00004\ \textcolor{comment}{//\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00005}00005\ \textcolor{comment}{//\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00006}00006\ \textcolor{comment}{//\ met:}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00007}00007\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00008}00008\ \textcolor{comment}{//\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00009}00009\ \textcolor{comment}{//\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00010}00010\ \textcolor{comment}{//\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00011}00011\ \textcolor{comment}{//\ copyright\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00012}00012\ \textcolor{comment}{//\ in\ the\ documentation\ and/or\ other\ materials\ provided\ with\ the}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00013}00013\ \textcolor{comment}{//\ distribution.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00014}00014\ \textcolor{comment}{//\ \ \ \ \ *\ Neither\ the\ name\ of\ Google\ Inc.\ nor\ the\ names\ of\ its}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00015}00015\ \textcolor{comment}{//\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products\ derived\ from}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00016}00016\ \textcolor{comment}{//\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00017}00017\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00018}00018\ \textcolor{comment}{//\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00019}00019\ \textcolor{comment}{//\ "{}AS\ IS"{}\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00020}00020\ \textcolor{comment}{//\ LIMITED\ TO,\ THE\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00021}00021\ \textcolor{comment}{//\ A\ PARTICULAR\ PURPOSE\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ THE\ COPYRIGHT}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00022}00022\ \textcolor{comment}{//\ OWNER\ OR\ CONTRIBUTORS\ BE\ LIABLE\ FOR\ ANY\ DIRECT,\ INDIRECT,\ INCIDENTAL,}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00023}00023\ \textcolor{comment}{//\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES\ (INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00024}00024\ \textcolor{comment}{//\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;\ LOSS\ OF\ USE,}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00025}00025\ \textcolor{comment}{//\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND\ ON\ ANY}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00026}00026\ \textcolor{comment}{//\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00027}00027\ \textcolor{comment}{//\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00028}00028\ \textcolor{comment}{//\ OF\ THIS\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00029}00029\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00030}00030\ \textcolor{comment}{//\ Author:\ wan@google.com\ (Zhanyong\ Wan)}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00032}00032\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{gtest-port_8h}{gtest/internal/gtest-\/port.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00034}00034\ \textcolor{preprocessor}{\#include\ <limits.h>}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00035}00035\ \textcolor{preprocessor}{\#include\ <stdlib.h>}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00036}00036\ \textcolor{preprocessor}{\#include\ <stdio.h>}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00037}00037\ \textcolor{preprocessor}{\#include\ <string.h>}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00038}00038\ \textcolor{preprocessor}{\#include\ <fstream>}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00040}00040\ \textcolor{preprocessor}{\#if\ GTEST\_OS\_WINDOWS}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00041}00041\ \textcolor{preprocessor}{\#\ include\ <windows.h>}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00042}00042\ \textcolor{preprocessor}{\#\ include\ <io.h>}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00043}00043\ \textcolor{preprocessor}{\#\ include\ <sys/stat.h>}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00044}00044\ \textcolor{preprocessor}{\#\ include\ <map>}\ \ \textcolor{comment}{//\ Used\ in\ ThreadLocal.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00045}00045\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00046}00046\ \textcolor{preprocessor}{\#\ include\ <unistd.h>}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00047}00047\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_OS\_WINDOWS}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00049}00049\ \textcolor{preprocessor}{\#if\ GTEST\_OS\_MAC}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00050}00050\ \textcolor{preprocessor}{\#\ include\ <mach/mach\_init.h>}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00051}00051\ \textcolor{preprocessor}{\#\ include\ <mach/task.h>}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00052}00052\ \textcolor{preprocessor}{\#\ include\ <mach/vm\_map.h>}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00053}00053\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_OS\_MAC}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00054}00054\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00055}00055\ \textcolor{preprocessor}{\#if\ GTEST\_OS\_QNX}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00056}00056\ \textcolor{preprocessor}{\#\ include\ <devctl.h>}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00057}00057\ \textcolor{preprocessor}{\#\ include\ <fcntl.h>}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00058}00058\ \textcolor{preprocessor}{\#\ include\ <sys/procfs.h>}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00059}00059\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_OS\_QNX}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00061}00061\ \textcolor{preprocessor}{\#if\ GTEST\_OS\_AIX}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00062}00062\ \textcolor{preprocessor}{\#\ include\ <procinfo.h>}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00063}00063\ \textcolor{preprocessor}{\#\ include\ <sys/types.h>}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00064}00064\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_OS\_AIX}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00066}00066\ \textcolor{preprocessor}{\#if\ GTEST\_OS\_FUCHSIA}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00067}00067\ \textcolor{preprocessor}{\#\ include\ <zircon/process.h>}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00068}00068\ \textcolor{preprocessor}{\#\ include\ <zircon/syscalls.h>}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00069}00069\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_OS\_FUCHSIA}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00071}00071\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{gtest-spi_8h}{gtest/gtest-\/spi.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00072}00072\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{gtest-message_8h}{gtest/gtest-\/message.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00073}00073\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{gtest-internal_8h}{gtest/internal/gtest-\/internal.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00074}00074\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{gtest-string_8h}{gtest/internal/gtest-\/string.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00075}00075\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{gtest-internal-inl_8h}{src/gtest-\/internal-\/inl.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00076}00076\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00077}00077\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetesting}{testing}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00078}00078\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceinternal}{internal}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00080}00080\ \textcolor{preprocessor}{\#if\ defined(\_MSC\_VER)\ ||\ defined(\_\_BORLANDC\_\_)}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00081}00081\ \textcolor{comment}{//\ MSVC\ and\ C++Builder\ do\ not\ provide\ a\ definition\ of\ STDERR\_FILENO.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00082}00082\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetesting_1_1internal_a24f0a3d50cac54a9132f4828ec9b96d9}{kStdOutFileno}}\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00083}00083\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetesting_1_1internal_a747eccfdbdee3ff8af3bedc476a57c85}{kStdErrFileno}}\ =\ 2;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00084}00084\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00085}\mbox{\hyperlink{namespacetesting_1_1internal_a24f0a3d50cac54a9132f4828ec9b96d9}{00085}}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetesting_1_1internal_a24f0a3d50cac54a9132f4828ec9b96d9}{kStdOutFileno}}\ =\ STDOUT\_FILENO;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00086}\mbox{\hyperlink{namespacetesting_1_1internal_a747eccfdbdee3ff8af3bedc476a57c85}{00086}}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacetesting_1_1internal_a747eccfdbdee3ff8af3bedc476a57c85}{kStdErrFileno}}\ =\ STDERR\_FILENO;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00087}00087\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ \_MSC\_VER}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00088}00088\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00089}00089\ \textcolor{preprocessor}{\#if\ GTEST\_OS\_LINUX}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00090}00090\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00091}00091\ \textcolor{keyword}{namespace\ }\{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00092}00092\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00093}00093\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ ReadProcFileField(\textcolor{keyword}{const}\ std::string\&\ filename,\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{hello__driver_8cpp_a0b6f424d9a532680c6b2ca5c119c938b}{field}})\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00094}00094\ \ \ std::string\ dummy;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00095}00095\ \ \ std::ifstream\ file(filename.c\_str());}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00096}00096\ \ \ \textcolor{keywordflow}{while}\ (\mbox{\hyperlink{hello__driver_8cpp_a0b6f424d9a532680c6b2ca5c119c938b}{field}}-\/-\/\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00097}00097\ \ \ \ \ file\ >>\ dummy;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00098}00098\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00099}00099\ \ \ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ output\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00100}00100\ \ \ file\ >>\ output;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00101}00101\ \ \ \textcolor{keywordflow}{return}\ output;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00102}00102\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00103}00103\ \}\ \ \textcolor{comment}{//\ namespace}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00104}00104\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00105}00105\ \textcolor{comment}{//\ Returns\ the\ number\ of\ active\ threads,\ or\ 0\ when\ there\ is\ an\ error.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00106}00106\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{namespacetesting_1_1internal_a3b9b3649cd04558bf46c75de52a7ef34}{GetThreadCount}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00107}00107\ \ \ \textcolor{keyword}{const}\ std::string\ filename\ =}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00108}00108\ \ \ \ \ \ \ (\mbox{\hyperlink{classtesting_1_1_message}{Message}}()\ <<\ \textcolor{stringliteral}{"{}/proc/"{}}\ <<\ getpid()\ <<\ \textcolor{stringliteral}{"{}/stat"{}}).GetString();}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00109}00109\ \ \ \textcolor{keywordflow}{return}\ ReadProcFileField<int>(filename,\ 19);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00110}00110\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00111}00111\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00112}00112\ \textcolor{preprocessor}{\#elif\ GTEST\_OS\_MAC}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00113}00113\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00114}00114\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{namespacetesting_1_1internal_a3b9b3649cd04558bf46c75de52a7ef34}{GetThreadCount}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00115}00115\ \ \ \textcolor{keyword}{const}\ task\_t\ task\ =\ mach\_task\_self();}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00116}00116\ \ \ mach\_msg\_type\_number\_t\ thread\_count;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00117}00117\ \ \ thread\_act\_array\_t\ thread\_list;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00118}00118\ \ \ \textcolor{keyword}{const}\ kern\_return\_t\ status\ =\ task\_threads(task,\ \&thread\_list,\ \&thread\_count);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00119}00119\ \ \ \textcolor{keywordflow}{if}\ (status\ ==\ KERN\_SUCCESS)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00120}00120\ \ \ \ \ \textcolor{comment}{//\ task\_threads\ allocates\ resources\ in\ thread\_list\ and\ we\ need\ to\ free\ them}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00121}00121\ \ \ \ \ \textcolor{comment}{//\ to\ avoid\ leaks.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00122}00122\ \ \ \ \ vm\_deallocate(task,}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00123}00123\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{reinterpret\_cast<}vm\_address\_t\textcolor{keyword}{>}(thread\_list),}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00124}00124\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{sizeof}(thread\_t)\ *\ thread\_count);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00125}00125\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(thread\_count);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00126}00126\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00127}00127\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00128}00128\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00129}00129\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00130}00130\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00131}00131\ \textcolor{preprocessor}{\#elif\ GTEST\_OS\_QNX}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00132}00132\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00133}00133\ \textcolor{comment}{//\ Returns\ the\ number\ of\ threads\ running\ in\ the\ process,\ or\ 0\ to\ indicate\ that}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00134}00134\ \textcolor{comment}{//\ we\ cannot\ detect\ it.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00135}00135\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{namespacetesting_1_1internal_a3b9b3649cd04558bf46c75de52a7ef34}{GetThreadCount}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00136}00136\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ fd\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1session_1_1state_a12acca56cdb6c10f467dfb10fc763ca5a90d929cb6e119645ec2800451bfdc0a0}{open}}(\textcolor{stringliteral}{"{}/proc/self/as"{}},\ O\_RDONLY);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00137}00137\ \ \ \textcolor{keywordflow}{if}\ (fd\ <\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00138}00138\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00139}00139\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00140}00140\ \ \ procfs\_info\ process\_info;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00141}00141\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ status\ =}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00142}00142\ \ \ \ \ \ \ devctl(fd,\ DCMD\_PROC\_INFO,\ \&process\_info,\ \textcolor{keyword}{sizeof}(process\_info),\ NULL);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00143}00143\ \ \ \mbox{\hyperlink{integration_8cpp_af5b66d867a040d002fb57d645cae3fb4}{close}}(fd);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00144}00144\ \ \ \textcolor{keywordflow}{if}\ (status\ ==\ EOK)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00145}00145\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(process\_info.num\_threads);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00146}00146\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00147}00147\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00148}00148\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00149}00149\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00150}00150\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00151}00151\ \textcolor{preprocessor}{\#elif\ GTEST\_OS\_AIX}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00152}00152\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00153}00153\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{namespacetesting_1_1internal_a3b9b3649cd04558bf46c75de52a7ef34}{GetThreadCount}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00154}00154\ \ \ \textcolor{keyword}{struct\ }procentry64\ entry;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00155}00155\ \ \ pid\_t\ pid\ =\ getpid();}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00156}00156\ \ \ \textcolor{keywordtype}{int}\ status\ =\ getprocs64(\&entry,\ \textcolor{keyword}{sizeof}(entry),\ NULL,\ 0,\ \&pid,\ 1);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00157}00157\ \ \ \textcolor{keywordflow}{if}\ (status\ ==\ 1)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00158}00158\ \ \ \ \ \textcolor{keywordflow}{return}\ entry.pi\_thcount;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00159}00159\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00160}00160\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00161}00161\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00162}00162\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00163}00163\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00164}00164\ \textcolor{preprocessor}{\#elif\ GTEST\_OS\_FUCHSIA}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00165}00165\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00166}00166\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{namespacetesting_1_1internal_a3b9b3649cd04558bf46c75de52a7ef34}{GetThreadCount}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00167}00167\ \ \ \textcolor{keywordtype}{int}\ dummy\_buffer;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00168}00168\ \ \ \textcolor{keywordtype}{size\_t}\ avail;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00169}00169\ \ \ zx\_status\_t\ status\ =\ zx\_object\_get\_info(}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00170}00170\ \ \ \ \ \ \ zx\_process\_self(),}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00171}00171\ \ \ \ \ \ \ ZX\_INFO\_PROCESS\_THREADS,}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00172}00172\ \ \ \ \ \ \ \&dummy\_buffer,}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00173}00173\ \ \ \ \ \ \ 0,}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00174}00174\ \ \ \ \ \ \ \textcolor{keyword}{nullptr},}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00175}00175\ \ \ \ \ \ \ \&avail);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00176}00176\ \ \ \textcolor{keywordflow}{if}\ (status\ ==\ ZX\_OK)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00177}00177\ \ \ \ \ \textcolor{keywordflow}{return}\ avail;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00178}00178\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00179}00179\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00180}00180\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00181}00181\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00182}00182\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00183}00183\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00184}00184\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00185}\mbox{\hyperlink{namespacetesting_1_1internal_a3b9b3649cd04558bf46c75de52a7ef34}{00185}}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{namespacetesting_1_1internal_a3b9b3649cd04558bf46c75de52a7ef34}{GetThreadCount}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00186}00186\ \ \ \textcolor{comment}{//\ There's\ no\ portable\ way\ to\ detect\ the\ number\ of\ threads,\ so\ we\ just}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00187}00187\ \ \ \textcolor{comment}{//\ return\ 0\ to\ indicate\ that\ we\ cannot\ detect\ it.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00188}00188\ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00189}00189\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00190}00190\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00191}00191\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_OS\_LINUX}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00192}00192\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00193}00193\ \textcolor{preprocessor}{\#if\ GTEST\_IS\_THREADSAFE\ \&\&\ GTEST\_OS\_WINDOWS}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00194}00194\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00195}00195\ \textcolor{keywordtype}{void}\ SleepMilliseconds(\textcolor{keywordtype}{int}\ n)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00196}00196\ \ \ ::Sleep(n);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00197}00197\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00198}00198\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00199}00199\ AutoHandle::AutoHandle()}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00200}00200\ \ \ \ \ :\ handle\_(INVALID\_HANDLE\_VALUE)\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00201}00201\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00202}00202\ AutoHandle::AutoHandle(Handle\ handle)}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00203}00203\ \ \ \ \ :\ handle\_(handle)\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00204}00204\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00205}00205\ AutoHandle::\string~AutoHandle()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00206}00206\ \ \ \mbox{\hyperlink{struct_reset}{Reset}}();}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00207}00207\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00208}00208\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00209}00209\ AutoHandle::Handle\ AutoHandle::Get()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00210}00210\ \ \ \textcolor{keywordflow}{return}\ handle\_;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00211}00211\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00212}00212\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00213}00213\ \textcolor{keywordtype}{void}\ AutoHandle::Reset()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00214}00214\ \ \ \mbox{\hyperlink{struct_reset}{Reset}}(INVALID\_HANDLE\_VALUE);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00215}00215\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00216}00216\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00217}00217\ \textcolor{keywordtype}{void}\ AutoHandle::Reset(HANDLE\ handle)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00218}00218\ \ \ \textcolor{comment}{//\ Resetting\ with\ the\ same\ handle\ we\ already\ own\ is\ invalid.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00219}00219\ \ \ \textcolor{keywordflow}{if}\ (handle\_\ !=\ handle)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00220}00220\ \ \ \ \ \textcolor{keywordflow}{if}\ (IsCloseable())\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00221}00221\ \ \ \ \ \ \ ::CloseHandle(handle\_);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00222}00222\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00223}00223\ \ \ \ \ handle\_\ =\ handle;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00224}00224\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00225}00225\ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_ab54343f0a36dc4cb0ce8a478dd7847b8}{GTEST\_CHECK\_}}(!IsCloseable())}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00226}00226\ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}Resetting\ a\ valid\ handle\ to\ itself\ is\ likely\ a\ programmer\ error\ "{}}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00227}00227\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}and\ thus\ not\ allowed."{}};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00228}00228\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00229}00229\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00230}00230\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00231}00231\ \textcolor{keywordtype}{bool}\ AutoHandle::IsCloseable()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00232}00232\ \ \ \textcolor{comment}{//\ Different\ Windows\ APIs\ may\ use\ either\ of\ these\ values\ to\ represent\ an}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00233}00233\ \ \ \textcolor{comment}{//\ invalid\ handle.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00234}00234\ \ \ \textcolor{keywordflow}{return}\ handle\_\ !=\ NULL\ \&\&\ handle\_\ !=\ INVALID\_HANDLE\_VALUE;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00235}00235\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00236}00236\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00237}00237\ Notification::Notification()}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00238}00238\ \ \ \ \ :\ event\_(::CreateEvent(NULL,\ \ \ \textcolor{comment}{//\ Default\ security\ attributes.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00239}00239\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pkcs11_8h_aa8cecfc5c5c054d2875c03e77b7be15d}{TRUE}},\ \ \ \textcolor{comment}{//\ Do\ not\ reset\ automatically.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00240}00240\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pkcs11_8h_aa93f0eb578d23995850d61f7d61c55c1}{FALSE}},\ \ \textcolor{comment}{//\ Initially\ unset.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00241}00241\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ NULL))\ \{\ \ \textcolor{comment}{//\ Anonymous\ event.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00242}00242\ \ \ \mbox{\hyperlink{gtest-port_8h_ab54343f0a36dc4cb0ce8a478dd7847b8}{GTEST\_CHECK\_}}(event\_.Get()\ !=\ NULL);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00243}00243\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00244}00244\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00245}00245\ \textcolor{keywordtype}{void}\ Notification::Notify()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00246}00246\ \ \ \mbox{\hyperlink{gtest-port_8h_ab54343f0a36dc4cb0ce8a478dd7847b8}{GTEST\_CHECK\_}}(::SetEvent(event\_.Get())\ !=\ \mbox{\hyperlink{pkcs11_8h_aa93f0eb578d23995850d61f7d61c55c1}{FALSE}});}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00247}00247\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00248}00248\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00249}00249\ \textcolor{keywordtype}{void}\ Notification::WaitForNotification()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00250}00250\ \ \ \mbox{\hyperlink{gtest-port_8h_ab54343f0a36dc4cb0ce8a478dd7847b8}{GTEST\_CHECK\_}}(}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00251}00251\ \ \ \ \ \ \ ::WaitForSingleObject(event\_.Get(),\ INFINITE)\ ==\ WAIT\_OBJECT\_0);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00252}00252\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00253}00253\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00254}00254\ Mutex::Mutex()}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00255}00255\ \ \ \ \ :\ owner\_thread\_id\_(0),}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00256}00256\ \ \ \ \ \ \ type\_(kDynamic),}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00257}00257\ \ \ \ \ \ \ critical\_section\_init\_phase\_(0),}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00258}00258\ \ \ \ \ \ \ critical\_section\_(new\ CRITICAL\_SECTION)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00259}00259\ \ \ ::InitializeCriticalSection(critical\_section\_);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00260}00260\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00261}00261\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00262}00262\ Mutex::\string~Mutex()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00263}00263\ \ \ \textcolor{comment}{//\ Static\ mutexes\ are\ leaked\ intentionally.\ It\ is\ not\ thread-\/safe\ to\ try}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00264}00264\ \ \ \textcolor{comment}{//\ to\ clean\ them\ up.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00265}00265\ \ \ \textcolor{comment}{//\ TODO(yukawa):\ Switch\ to\ Slim\ Reader/Writer\ (SRW)\ Locks,\ which\ requires}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00266}00266\ \ \ \textcolor{comment}{//\ nothing\ to\ clean\ it\ up\ but\ is\ available\ only\ on\ Vista\ and\ later.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00267}00267\ \ \ \textcolor{comment}{//\ http://msdn.microsoft.com/en-\/us/library/windows/desktop/aa904937.aspx}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00268}00268\ \ \ \textcolor{keywordflow}{if}\ (type\_\ ==\ kDynamic)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00269}00269\ \ \ \ \ ::DeleteCriticalSection(critical\_section\_);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00270}00270\ \ \ \ \ \textcolor{keyword}{delete}\ critical\_section\_;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00271}00271\ \ \ \ \ critical\_section\_\ =\ NULL;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00272}00272\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00273}00273\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00274}00274\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00275}00275\ \textcolor{keywordtype}{void}\ Mutex::Lock()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00276}00276\ \ \ ThreadSafeLazyInit();}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00277}00277\ \ \ ::EnterCriticalSection(critical\_section\_);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00278}00278\ \ \ owner\_thread\_id\_\ =\ ::GetCurrentThreadId();}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00279}00279\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00280}00280\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00281}00281\ \textcolor{keywordtype}{void}\ Mutex::Unlock()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00282}00282\ \ \ ThreadSafeLazyInit();}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00283}00283\ \ \ \textcolor{comment}{//\ We\ don't\ protect\ writing\ to\ owner\_thread\_id\_\ here,\ as\ it's\ the}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00284}00284\ \ \ \textcolor{comment}{//\ caller's\ responsibility\ to\ ensure\ that\ the\ current\ thread\ holds\ the}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00285}00285\ \ \ \textcolor{comment}{//\ mutex\ when\ this\ is\ called.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00286}00286\ \ \ owner\_thread\_id\_\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00287}00287\ \ \ ::LeaveCriticalSection(critical\_section\_);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00288}00288\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00289}00289\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00290}00290\ \textcolor{comment}{//\ Does\ nothing\ if\ the\ current\ thread\ holds\ the\ mutex.\ Otherwise,\ crashes}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00291}00291\ \textcolor{comment}{//\ with\ high\ probability.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00292}00292\ \textcolor{keywordtype}{void}\ Mutex::AssertHeld()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00293}00293\ \ \ ThreadSafeLazyInit();}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00294}00294\ \ \ \mbox{\hyperlink{gtest-port_8h_ab54343f0a36dc4cb0ce8a478dd7847b8}{GTEST\_CHECK\_}}(owner\_thread\_id\_\ ==\ ::GetCurrentThreadId())}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00295}00295\ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}The\ current\ thread\ is\ not\ holding\ the\ mutex\ @"{}}\ <<\ \textcolor{keyword}{this};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00296}00296\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00297}00297\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00298}00298\ \textcolor{comment}{//\ Initializes\ owner\_thread\_id\_\ and\ critical\_section\_\ in\ static\ mutexes.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00299}00299\ \textcolor{keywordtype}{void}\ Mutex::ThreadSafeLazyInit()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00300}00300\ \ \ \textcolor{comment}{//\ Dynamic\ mutexes\ are\ initialized\ in\ the\ constructor.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00301}00301\ \ \ \textcolor{keywordflow}{if}\ (type\_\ ==\ kStatic)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00302}00302\ \ \ \ \ \textcolor{keywordflow}{switch}\ (}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00303}00303\ \ \ \ \ \ \ \ \ ::InterlockedCompareExchange(\&critical\_section\_init\_phase\_,\ 1L,\ 0L))\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00304}00304\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ 0:}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00305}00305\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ critical\_section\_init\_phase\_\ was\ 0\ before\ the\ exchange,\ we}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00306}00306\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ are\ the\ first\ to\ test\ it\ and\ need\ to\ perform\ the\ initialization.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00307}00307\ \ \ \ \ \ \ \ \ owner\_thread\_id\_\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00308}00308\ \ \ \ \ \ \ \ \ critical\_section\_\ =\ \textcolor{keyword}{new}\ CRITICAL\_SECTION;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00309}00309\ \ \ \ \ \ \ \ \ ::InitializeCriticalSection(critical\_section\_);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00310}00310\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Updates\ the\ critical\_section\_init\_phase\_\ to\ 2\ to\ signal}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00311}00311\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ initialization\ complete.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00312}00312\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_ab54343f0a36dc4cb0ce8a478dd7847b8}{GTEST\_CHECK\_}}(::InterlockedCompareExchange(}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00313}00313\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&critical\_section\_init\_phase\_,\ 2L,\ 1L)\ ==}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00314}00314\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 1L);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00315}00315\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00316}00316\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ 1:}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00317}00317\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Somebody\ else\ is\ already\ initializing\ the\ mutex;\ spin\ until\ they}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00318}00318\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ are\ done.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00319}00319\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (::InterlockedCompareExchange(\&critical\_section\_init\_phase\_,}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00320}00320\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 2L,}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00321}00321\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 2L)\ !=\ 2L)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00322}00322\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Possibly\ yields\ the\ rest\ of\ the\ thread's\ time\ slice\ to\ other}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00323}00323\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ threads.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00324}00324\ \ \ \ \ \ \ \ \ \ \ ::Sleep(0);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00325}00325\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00326}00326\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00327}00327\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00328}00328\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ 2:}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00329}00329\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};\ \ \textcolor{comment}{//\ The\ mutex\ is\ already\ initialized\ and\ ready\ for\ use.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00330}00330\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00331}00331\ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00332}00332\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_ab54343f0a36dc4cb0ce8a478dd7847b8}{GTEST\_CHECK\_}}(\textcolor{keyword}{false})}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00333}00333\ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}Unexpected\ value\ of\ critical\_section\_init\_phase\_\ "{}}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00334}00334\ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}while\ initializing\ a\ static\ mutex."{}};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00335}00335\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00336}00336\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00337}00337\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00338}00338\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00339}00339\ \textcolor{keyword}{namespace\ }\{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00340}00340\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00341}00341\ \textcolor{keyword}{class\ }ThreadWithParamSupport\ :\ \textcolor{keyword}{public}\ ThreadWithParamBase\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00342}00342\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00343}00343\ \ \ \textcolor{keyword}{static}\ HANDLE\ CreateThread(Runnable*\ runnable,}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00344}00344\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Notification*\ thread\_can\_start)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00345}00345\ \ \ \ \ ThreadMainParam*\ param\ =\ \textcolor{keyword}{new}\ ThreadMainParam(runnable,\ thread\_can\_start);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00346}00346\ \ \ \ \ DWORD\ thread\_id;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00347}00347\ \ \ \ \ \textcolor{comment}{//\ TODO(yukawa):\ Consider\ to\ use\ \_beginthreadex\ instead.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00348}00348\ \ \ \ \ HANDLE\ thread\_handle\ =\ ::CreateThread(}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00349}00349\ \ \ \ \ \ \ \ \ NULL,\ \ \ \ \textcolor{comment}{//\ Default\ security.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00350}00350\ \ \ \ \ \ \ \ \ 0,\ \ \ \ \ \ \ \textcolor{comment}{//\ Default\ stack\ size.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00351}00351\ \ \ \ \ \ \ \ \ \&ThreadWithParamSupport::ThreadMain,}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00352}00352\ \ \ \ \ \ \ \ \ param,\ \ \ \textcolor{comment}{//\ Parameter\ to\ ThreadMainStatic}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00353}00353\ \ \ \ \ \ \ \ \ 0x0,\ \ \ \ \ \textcolor{comment}{//\ Default\ creation\ flags.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00354}00354\ \ \ \ \ \ \ \ \ \&thread\_id);\ \ \textcolor{comment}{//\ Need\ a\ valid\ pointer\ for\ the\ call\ to\ work\ under\ Win98.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00355}00355\ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_ab54343f0a36dc4cb0ce8a478dd7847b8}{GTEST\_CHECK\_}}(thread\_handle\ !=\ NULL)\ <<\ \textcolor{stringliteral}{"{}CreateThread\ failed\ with\ error\ "{}}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00356}00356\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ ::GetLastError()\ <<\ \textcolor{stringliteral}{"{}."{}};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00357}00357\ \ \ \ \ \textcolor{keywordflow}{if}\ (thread\_handle\ ==\ NULL)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00358}00358\ \ \ \ \ \ \ \textcolor{keyword}{delete}\ param;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00359}00359\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00360}00360\ \ \ \ \ \textcolor{keywordflow}{return}\ thread\_handle;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00361}00361\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00362}00362\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00363}00363\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00364}00364\ \ \ \textcolor{keyword}{struct\ }ThreadMainParam\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00365}00365\ \ \ \ \ ThreadMainParam(Runnable*\ runnable,\ Notification*\ thread\_can\_start)}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00366}00366\ \ \ \ \ \ \ \ \ :\ runnable\_(runnable),}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00367}00367\ \ \ \ \ \ \ \ \ \ \ thread\_can\_start\_(thread\_can\_start)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00368}00368\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00369}00369\ \ \ \ \ scoped\_ptr<Runnable>\ runnable\_;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00370}00370\ \ \ \ \ \textcolor{comment}{//\ Does\ not\ own.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00371}00371\ \ \ \ \ Notification*\ thread\_can\_start\_;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00372}00372\ \ \ \};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00373}00373\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00374}00374\ \ \ \textcolor{keyword}{static}\ DWORD\ WINAPI\ ThreadMain(\textcolor{keywordtype}{void}*\ ptr)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00375}00375\ \ \ \ \ \textcolor{comment}{//\ Transfers\ ownership.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00376}00376\ \ \ \ \ scoped\_ptr<ThreadMainParam>\ param(\textcolor{keyword}{static\_cast<}ThreadMainParam*\textcolor{keyword}{>}(ptr));}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00377}00377\ \ \ \ \ \textcolor{keywordflow}{if}\ (param-\/>thread\_can\_start\_\ !=\ NULL)}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00378}00378\ \ \ \ \ \ \ param-\/>thread\_can\_start\_-\/>WaitForNotification();}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00379}00379\ \ \ \ \ param-\/>runnable\_-\/>Run();}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00380}00380\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00381}00381\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00382}00382\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00383}00383\ \ \ \textcolor{comment}{//\ Prohibit\ instantiation.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00384}00384\ \ \ ThreadWithParamSupport();}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00385}00385\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00386}00386\ \ \ \mbox{\hyperlink{gtest-port_8h_aed8c1888c32b588b0681e88b95031e29}{GTEST\_DISALLOW\_COPY\_AND\_ASSIGN\_}}(ThreadWithParamSupport);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00387}00387\ \};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00388}00388\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00389}00389\ \}\ \ \textcolor{comment}{//\ namespace}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00390}00390\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00391}00391\ ThreadWithParamBase::ThreadWithParamBase(Runnable\ *runnable,}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00392}00392\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Notification*\ thread\_can\_start)}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00393}00393\ \ \ \ \ \ \ :\ thread\_(ThreadWithParamSupport::CreateThread(runnable,}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00394}00394\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ thread\_can\_start))\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00395}00395\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00396}00396\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00397}00397\ ThreadWithParamBase::\string~ThreadWithParamBase()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00398}00398\ \ \ \mbox{\hyperlink{namespace_c_l_i_a991a3264d3459575fc7e83eb54d73d2baa286d9991c6a547ae25a5f5216164b8f}{Join}}();}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00399}00399\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00400}00400\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00401}00401\ \textcolor{keywordtype}{void}\ ThreadWithParamBase::Join()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00402}00402\ \ \ \mbox{\hyperlink{gtest-port_8h_ab54343f0a36dc4cb0ce8a478dd7847b8}{GTEST\_CHECK\_}}(::WaitForSingleObject(thread\_.Get(),\ INFINITE)\ ==\ WAIT\_OBJECT\_0)}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00403}00403\ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}Failed\ to\ join\ the\ thread\ with\ error\ "{}}\ <<\ ::GetLastError()\ <<\ \textcolor{stringliteral}{"{}."{}};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00404}00404\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00405}00405\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00406}00406\ \textcolor{comment}{//\ Maps\ a\ thread\ to\ a\ set\ of\ ThreadIdToThreadLocals\ that\ have\ values}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00407}00407\ \textcolor{comment}{//\ instantiated\ on\ that\ thread\ and\ notifies\ them\ when\ the\ thread\ exits.\ \ A}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00408}00408\ \textcolor{comment}{//\ ThreadLocal\ instance\ is\ expected\ to\ persist\ until\ all\ threads\ it\ has}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00409}00409\ \textcolor{comment}{//\ values\ on\ have\ terminated.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00410}00410\ \textcolor{keyword}{class\ }ThreadLocalRegistryImpl\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00411}00411\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00412}00412\ \ \ \textcolor{comment}{//\ Registers\ thread\_local\_instance\ as\ having\ value\ on\ the\ current\ thread.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00413}00413\ \ \ \textcolor{comment}{//\ Returns\ a\ value\ that\ can\ be\ used\ to\ identify\ the\ thread\ from\ other\ threads.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00414}00414\ \ \ \textcolor{keyword}{static}\ ThreadLocalValueHolderBase*\ GetValueOnCurrentThread(}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00415}00415\ \ \ \ \ \ \ \textcolor{keyword}{const}\ ThreadLocalBase*\ thread\_local\_instance)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00416}00416\ \ \ \ \ DWORD\ current\_thread\ =\ ::GetCurrentThreadId();}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00417}00417\ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a08b187c6cc4e28400aadf9a32fccc8de}{MutexLock}}\ \mbox{\hyperlink{xbyak__mnemonic_8h_aa81aed607133209dade63a226818224d}{lock}}(\&mutex\_);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00418}00418\ \ \ \ \ ThreadIdToThreadLocals*\ \textcolor{keyword}{const}\ thread\_to\_thread\_locals\ =}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00419}00419\ \ \ \ \ \ \ \ \ GetThreadLocalsMapLocked();}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00420}00420\ \ \ \ \ ThreadIdToThreadLocals::iterator\ thread\_local\_pos\ =}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00421}00421\ \ \ \ \ \ \ \ \ thread\_to\_thread\_locals-\/>find(current\_thread);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00422}00422\ \ \ \ \ \textcolor{keywordflow}{if}\ (thread\_local\_pos\ ==\ thread\_to\_thread\_locals-\/>end())\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00423}00423\ \ \ \ \ \ \ thread\_local\_pos\ =\ thread\_to\_thread\_locals-\/>insert(}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00424}00424\ \ \ \ \ \ \ \ \ \ \ std::make\_pair(current\_thread,\ ThreadLocalValues())).first;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00425}00425\ \ \ \ \ \ \ StartWatcherThreadFor(current\_thread);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00426}00426\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00427}00427\ \ \ \ \ ThreadLocalValues\&\ thread\_local\_values\ =\ thread\_local\_pos-\/>second;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00428}00428\ \ \ \ \ ThreadLocalValues::iterator\ value\_pos\ =}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00429}00429\ \ \ \ \ \ \ \ \ thread\_local\_values.find(thread\_local\_instance);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00430}00430\ \ \ \ \ \textcolor{keywordflow}{if}\ (value\_pos\ ==\ thread\_local\_values.end())\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00431}00431\ \ \ \ \ \ \ value\_pos\ =}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00432}00432\ \ \ \ \ \ \ \ \ \ \ thread\_local\_values}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00433}00433\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .insert(std::make\_pair(}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00434}00434\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ thread\_local\_instance,}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00435}00435\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ linked\_ptr<ThreadLocalValueHolderBase>(}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00436}00436\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ thread\_local\_instance-\/>NewValueForCurrentThread())))}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00437}00437\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .first;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00438}00438\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00439}00439\ \ \ \ \ \textcolor{keywordflow}{return}\ value\_pos-\/>second.get();}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00440}00440\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00441}00441\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00442}00442\ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ OnThreadLocalDestroyed(}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00443}00443\ \ \ \ \ \ \ \textcolor{keyword}{const}\ ThreadLocalBase*\ thread\_local\_instance)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00444}00444\ \ \ \ \ std::vector<linked\_ptr<ThreadLocalValueHolderBase>\ >\ value\_holders;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00445}00445\ \ \ \ \ \textcolor{comment}{//\ Clean\ up\ the\ ThreadLocalValues\ data\ structure\ while\ holding\ the\ lock,\ but}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00446}00446\ \ \ \ \ \textcolor{comment}{//\ defer\ the\ destruction\ of\ the\ ThreadLocalValueHolderBases.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00447}00447\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00448}00448\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a08b187c6cc4e28400aadf9a32fccc8de}{MutexLock}}\ \mbox{\hyperlink{xbyak__mnemonic_8h_aa81aed607133209dade63a226818224d}{lock}}(\&mutex\_);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00449}00449\ \ \ \ \ \ \ ThreadIdToThreadLocals*\ \textcolor{keyword}{const}\ thread\_to\_thread\_locals\ =}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00450}00450\ \ \ \ \ \ \ \ \ \ \ GetThreadLocalsMapLocked();}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00451}00451\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (ThreadIdToThreadLocals::iterator\ it\ =}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00452}00452\ \ \ \ \ \ \ \ \ \ \ thread\_to\_thread\_locals-\/>begin();}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00453}00453\ \ \ \ \ \ \ \ \ \ \ it\ !=\ thread\_to\_thread\_locals-\/>end();}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00454}00454\ \ \ \ \ \ \ \ \ \ \ ++it)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00455}00455\ \ \ \ \ \ \ \ \ ThreadLocalValues\&\ thread\_local\_values\ =\ it-\/>second;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00456}00456\ \ \ \ \ \ \ \ \ ThreadLocalValues::iterator\ value\_pos\ =}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00457}00457\ \ \ \ \ \ \ \ \ \ \ \ \ thread\_local\_values.find(thread\_local\_instance);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00458}00458\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (value\_pos\ !=\ thread\_local\_values.end())\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00459}00459\ \ \ \ \ \ \ \ \ \ \ value\_holders.push\_back(value\_pos-\/>second);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00460}00460\ \ \ \ \ \ \ \ \ \ \ thread\_local\_values.erase(value\_pos);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00461}00461\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ This\ 'if'\ can\ only\ be\ successful\ at\ most\ once,\ so\ theoretically\ we}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00462}00462\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ could\ break\ out\ of\ the\ loop\ here,\ but\ we\ don't\ bother\ doing\ so.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00463}00463\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00464}00464\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00465}00465\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00466}00466\ \ \ \ \ \textcolor{comment}{//\ Outside\ the\ lock,\ let\ the\ destructor\ for\ 'value\_holders'\ deallocate\ the}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00467}00467\ \ \ \ \ \textcolor{comment}{//\ ThreadLocalValueHolderBases.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00468}00468\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00469}00469\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00470}00470\ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ OnThreadExit(DWORD\ thread\_id)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00471}00471\ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_ab54343f0a36dc4cb0ce8a478dd7847b8}{GTEST\_CHECK\_}}(thread\_id\ !=\ 0)\ <<\ ::GetLastError();}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00472}00472\ \ \ \ \ std::vector<linked\_ptr<ThreadLocalValueHolderBase>\ >\ value\_holders;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00473}00473\ \ \ \ \ \textcolor{comment}{//\ Clean\ up\ the\ ThreadIdToThreadLocals\ data\ structure\ while\ holding\ the}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00474}00474\ \ \ \ \ \textcolor{comment}{//\ lock,\ but\ defer\ the\ destruction\ of\ the\ ThreadLocalValueHolderBases.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00475}00475\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00476}00476\ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a08b187c6cc4e28400aadf9a32fccc8de}{MutexLock}}\ \mbox{\hyperlink{xbyak__mnemonic_8h_aa81aed607133209dade63a226818224d}{lock}}(\&mutex\_);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00477}00477\ \ \ \ \ \ \ ThreadIdToThreadLocals*\ \textcolor{keyword}{const}\ thread\_to\_thread\_locals\ =}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00478}00478\ \ \ \ \ \ \ \ \ \ \ GetThreadLocalsMapLocked();}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00479}00479\ \ \ \ \ \ \ ThreadIdToThreadLocals::iterator\ thread\_local\_pos\ =}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00480}00480\ \ \ \ \ \ \ \ \ \ \ thread\_to\_thread\_locals-\/>find(thread\_id);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00481}00481\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (thread\_local\_pos\ !=\ thread\_to\_thread\_locals-\/>end())\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00482}00482\ \ \ \ \ \ \ \ \ ThreadLocalValues\&\ thread\_local\_values\ =\ thread\_local\_pos-\/>second;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00483}00483\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (ThreadLocalValues::iterator\ value\_pos\ =}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00484}00484\ \ \ \ \ \ \ \ \ \ \ \ \ thread\_local\_values.begin();}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00485}00485\ \ \ \ \ \ \ \ \ \ \ \ \ value\_pos\ !=\ thread\_local\_values.end();}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00486}00486\ \ \ \ \ \ \ \ \ \ \ \ \ ++value\_pos)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00487}00487\ \ \ \ \ \ \ \ \ \ \ value\_holders.push\_back(value\_pos-\/>second);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00488}00488\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00489}00489\ \ \ \ \ \ \ \ \ thread\_to\_thread\_locals-\/>erase(thread\_local\_pos);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00490}00490\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00491}00491\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00492}00492\ \ \ \ \ \textcolor{comment}{//\ Outside\ the\ lock,\ let\ the\ destructor\ for\ 'value\_holders'\ deallocate\ the}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00493}00493\ \ \ \ \ \textcolor{comment}{//\ ThreadLocalValueHolderBases.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00494}00494\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00495}00495\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00496}00496\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00497}00497\ \ \ \textcolor{comment}{//\ In\ a\ particular\ thread,\ maps\ a\ ThreadLocal\ object\ to\ its\ value.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00498}00498\ \ \ \textcolor{keyword}{typedef}\ std::map<\textcolor{keyword}{const}\ ThreadLocalBase*,}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00499}00499\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ linked\_ptr<ThreadLocalValueHolderBase>\ >\ ThreadLocalValues;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00500}00500\ \ \ \textcolor{comment}{//\ Stores\ all\ ThreadIdToThreadLocals\ having\ values\ in\ a\ thread,\ indexed\ by}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00501}00501\ \ \ \textcolor{comment}{//\ thread's\ ID.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00502}00502\ \ \ \textcolor{keyword}{typedef}\ std::map<DWORD,\ ThreadLocalValues>\ ThreadIdToThreadLocals;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00503}00503\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00504}00504\ \ \ \textcolor{comment}{//\ Holds\ the\ thread\ id\ and\ thread\ handle\ that\ we\ pass\ from}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00505}00505\ \ \ \textcolor{comment}{//\ StartWatcherThreadFor\ to\ WatcherThreadFunc.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00506}00506\ \ \ \textcolor{keyword}{typedef}\ std::pair<DWORD,\ HANDLE>\ ThreadIdAndHandle;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00507}00507\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00508}00508\ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ StartWatcherThreadFor(DWORD\ thread\_id)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00509}00509\ \ \ \ \ \textcolor{comment}{//\ The\ returned\ handle\ will\ be\ kept\ in\ thread\_map\ and\ closed\ by}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00510}00510\ \ \ \ \ \textcolor{comment}{//\ watcher\_thread\ in\ WatcherThreadFunc.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00511}00511\ \ \ \ \ HANDLE\ thread\ =\ ::OpenThread(SYNCHRONIZE\ |\ THREAD\_QUERY\_INFORMATION,}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00512}00512\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pkcs11_8h_aa93f0eb578d23995850d61f7d61c55c1}{FALSE}},}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00513}00513\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ thread\_id);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00514}00514\ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_ab54343f0a36dc4cb0ce8a478dd7847b8}{GTEST\_CHECK\_}}(thread\ !=\ NULL);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00515}00515\ \ \ \ \ \textcolor{comment}{//\ We\ need\ to\ pass\ a\ valid\ thread\ ID\ pointer\ into\ CreateThread\ for\ it}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00516}00516\ \ \ \ \ \textcolor{comment}{//\ to\ work\ correctly\ under\ Win98.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00517}00517\ \ \ \ \ DWORD\ watcher\_thread\_id;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00518}00518\ \ \ \ \ HANDLE\ watcher\_thread\ =\ ::CreateThread(}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00519}00519\ \ \ \ \ \ \ \ \ NULL,\ \ \ \textcolor{comment}{//\ Default\ security.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00520}00520\ \ \ \ \ \ \ \ \ 0,\ \ \ \ \ \ \textcolor{comment}{//\ Default\ stack\ size}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00521}00521\ \ \ \ \ \ \ \ \ \&ThreadLocalRegistryImpl::WatcherThreadFunc,}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00522}00522\ \ \ \ \ \ \ \ \ \textcolor{keyword}{reinterpret\_cast<}LPVOID\textcolor{keyword}{>}(\textcolor{keyword}{new}\ ThreadIdAndHandle(thread\_id,\ thread)),}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00523}00523\ \ \ \ \ \ \ \ \ CREATE\_SUSPENDED,}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00524}00524\ \ \ \ \ \ \ \ \ \&watcher\_thread\_id);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00525}00525\ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_ab54343f0a36dc4cb0ce8a478dd7847b8}{GTEST\_CHECK\_}}(watcher\_thread\ !=\ NULL);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00526}00526\ \ \ \ \ \textcolor{comment}{//\ Give\ the\ watcher\ thread\ the\ same\ priority\ as\ ours\ to\ avoid\ being}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00527}00527\ \ \ \ \ \textcolor{comment}{//\ blocked\ by\ it.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00528}00528\ \ \ \ \ ::SetThreadPriority(watcher\_thread,}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00529}00529\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ::GetThreadPriority(::GetCurrentThread()));}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00530}00530\ \ \ \ \ ::ResumeThread(watcher\_thread);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00531}00531\ \ \ \ \ ::CloseHandle(watcher\_thread);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00532}00532\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00533}00533\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00534}00534\ \ \ \textcolor{comment}{//\ Monitors\ exit\ from\ a\ given\ thread\ and\ notifies\ those}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00535}00535\ \ \ \textcolor{comment}{//\ ThreadIdToThreadLocals\ about\ thread\ termination.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00536}00536\ \ \ \textcolor{keyword}{static}\ DWORD\ WINAPI\ WatcherThreadFunc(LPVOID\ param)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00537}00537\ \ \ \ \ \textcolor{keyword}{const}\ ThreadIdAndHandle*\ tah\ =}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00538}00538\ \ \ \ \ \ \ \ \ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }ThreadIdAndHandle*\textcolor{keyword}{>}(param);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00539}00539\ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_ab54343f0a36dc4cb0ce8a478dd7847b8}{GTEST\_CHECK\_}}(}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00540}00540\ \ \ \ \ \ \ \ \ ::WaitForSingleObject(tah-\/>second,\ INFINITE)\ ==\ WAIT\_OBJECT\_0);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00541}00541\ \ \ \ \ OnThreadExit(tah-\/>first);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00542}00542\ \ \ \ \ ::CloseHandle(tah-\/>second);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00543}00543\ \ \ \ \ \textcolor{keyword}{delete}\ tah;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00544}00544\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00545}00545\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00546}00546\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00547}00547\ \ \ \textcolor{comment}{//\ Returns\ map\ of\ thread\ local\ instances.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00548}00548\ \ \ \textcolor{keyword}{static}\ ThreadIdToThreadLocals*\ GetThreadLocalsMapLocked()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00549}00549\ \ \ \ \ mutex\_.AssertHeld();}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00550}00550\ \ \ \ \ \textcolor{keyword}{static}\ ThreadIdToThreadLocals*\ map\ =\ \textcolor{keyword}{new}\ ThreadIdToThreadLocals;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00551}00551\ \ \ \ \ \textcolor{keywordflow}{return}\ map;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00552}00552\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00553}00553\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00554}00554\ \ \ \textcolor{comment}{//\ Protects\ access\ to\ GetThreadLocalsMapLocked()\ and\ its\ return\ value.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00555}00555\ \ \ \textcolor{keyword}{static}\ Mutex\ mutex\_;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00556}00556\ \ \ \textcolor{comment}{//\ Protects\ access\ to\ GetThreadMapLocked()\ and\ its\ return\ value.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00557}00557\ \ \ \textcolor{keyword}{static}\ Mutex\ thread\_map\_mutex\_;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00558}00558\ \};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00559}00559\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00560}00560\ Mutex\ ThreadLocalRegistryImpl::mutex\_(Mutex::kStaticMutex);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00561}00561\ Mutex\ ThreadLocalRegistryImpl::thread\_map\_mutex\_(Mutex::kStaticMutex);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00562}00562\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00563}00563\ ThreadLocalValueHolderBase*\ ThreadLocalRegistry::GetValueOnCurrentThread(}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00564}00564\ \ \ \ \ \ \ \textcolor{keyword}{const}\ ThreadLocalBase*\ thread\_local\_instance)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00565}00565\ \ \ \textcolor{keywordflow}{return}\ ThreadLocalRegistryImpl::GetValueOnCurrentThread(}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00566}00566\ \ \ \ \ \ \ thread\_local\_instance);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00567}00567\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00568}00568\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00569}00569\ \textcolor{keywordtype}{void}\ ThreadLocalRegistry::OnThreadLocalDestroyed(}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00570}00570\ \ \ \ \ \ \ \textcolor{keyword}{const}\ ThreadLocalBase*\ thread\_local\_instance)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00571}00571\ \ \ ThreadLocalRegistryImpl::OnThreadLocalDestroyed(thread\_local\_instance);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00572}00572\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00573}00573\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00574}00574\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_IS\_THREADSAFE\ \&\&\ GTEST\_OS\_WINDOWS}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00575}00575\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00576}00576\ \textcolor{preprocessor}{\#if\ GTEST\_USES\_POSIX\_RE}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00577}00577\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00578}00578\ \textcolor{comment}{//\ Implements\ RE.\ \ Currently\ only\ needed\ for\ death\ tests.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00579}00579\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00580}00580\ RE::\string~RE()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00581}00581\ \ \ \textcolor{keywordflow}{if}\ (is\_valid\_)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00582}00582\ \ \ \ \ \textcolor{comment}{//\ regfree'ing\ an\ invalid\ regex\ might\ crash\ because\ the\ content}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00583}00583\ \ \ \ \ \textcolor{comment}{//\ of\ the\ regex\ is\ undefined.\ Since\ the\ regex's\ are\ essentially}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00584}00584\ \ \ \ \ \textcolor{comment}{//\ the\ same,\ one\ cannot\ be\ valid\ (or\ invalid)\ without\ the\ other}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00585}00585\ \ \ \ \ \textcolor{comment}{//\ being\ so\ too.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00586}00586\ \ \ \ \ regfree(\&partial\_regex\_);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00587}00587\ \ \ \ \ regfree(\&full\_regex\_);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00588}00588\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00589}00589\ \ \ free(\textcolor{keyword}{const\_cast<}\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(pattern\_));}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00590}00590\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00591}00591\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00592}00592\ \textcolor{comment}{//\ Returns\ true\ iff\ regular\ expression\ re\ matches\ the\ entire\ str.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00593}00593\ \textcolor{keywordtype}{bool}\ RE::FullMatch(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ str,\ \textcolor{keyword}{const}\ RE\&\ re)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00594}00594\ \ \ \textcolor{keywordflow}{if}\ (!re.is\_valid\_)\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00595}00595\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00596}00596\ \ \ regmatch\_t\ match;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00597}00597\ \ \ \textcolor{keywordflow}{return}\ regexec(\&re.full\_regex\_,\ str,\ 1,\ \&match,\ 0)\ ==\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00598}00598\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00599}00599\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00600}00600\ \textcolor{comment}{//\ Returns\ true\ iff\ regular\ expression\ re\ matches\ a\ substring\ of\ str}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00601}00601\ \textcolor{comment}{//\ (including\ str\ itself).}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00602}00602\ \textcolor{keywordtype}{bool}\ RE::PartialMatch(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ str,\ \textcolor{keyword}{const}\ RE\&\ re)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00603}00603\ \ \ \textcolor{keywordflow}{if}\ (!re.is\_valid\_)\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00604}00604\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00605}00605\ \ \ regmatch\_t\ match;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00606}00606\ \ \ \textcolor{keywordflow}{return}\ regexec(\&re.partial\_regex\_,\ str,\ 1,\ \&match,\ 0)\ ==\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00607}00607\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00608}00608\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00609}00609\ \textcolor{comment}{//\ Initializes\ an\ RE\ from\ its\ string\ representation.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00610}00610\ \textcolor{keywordtype}{void}\ RE::Init(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ regex)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00611}00611\ \ \ pattern\_\ =\ \mbox{\hyperlink{namespacetesting_1_1internal_1_1posix_a5c0864ea9d81d27332b9133e35cbc43c}{posix::StrDup}}(regex);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00612}00612\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00613}00613\ \ \ \textcolor{comment}{//\ Reserves\ enough\ bytes\ to\ hold\ the\ regular\ expression\ used\ for\ a}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00614}00614\ \ \ \textcolor{comment}{//\ full\ match.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00615}00615\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ full\_regex\_len\ =\ strlen(regex)\ +\ 10;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00616}00616\ \ \ \textcolor{keywordtype}{char}*\ \textcolor{keyword}{const}\ full\_pattern\ =\ \textcolor{keyword}{new}\ \textcolor{keywordtype}{char}[full\_regex\_len];}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00617}00617\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00618}00618\ \ \ snprintf(full\_pattern,\ full\_regex\_len,\ \textcolor{stringliteral}{"{}\string^(\%s)\$"{}},\ regex);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00619}00619\ \ \ is\_valid\_\ =\ regcomp(\&full\_regex\_,\ full\_pattern,\ REG\_EXTENDED)\ ==\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00620}00620\ \ \ \textcolor{comment}{//\ We\ want\ to\ call\ regcomp(\&partial\_regex\_,\ ...)\ even\ if\ the}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00621}00621\ \ \ \textcolor{comment}{//\ previous\ expression\ returns\ false.\ \ Otherwise\ partial\_regex\_\ may}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00622}00622\ \ \ \textcolor{comment}{//\ not\ be\ properly\ initialized\ can\ may\ cause\ trouble\ when\ it's}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00623}00623\ \ \ \textcolor{comment}{//\ freed.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00624}00624\ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00625}00625\ \ \ \textcolor{comment}{//\ Some\ implementation\ of\ POSIX\ regex\ (e.g.\ on\ at\ least\ some}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00626}00626\ \ \ \textcolor{comment}{//\ versions\ of\ Cygwin)\ doesn't\ accept\ the\ empty\ string\ as\ a\ valid}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00627}00627\ \ \ \textcolor{comment}{//\ regex.\ \ We\ change\ it\ to\ an\ equivalent\ form\ "{}()"{}\ to\ be\ safe.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00628}00628\ \ \ \textcolor{keywordflow}{if}\ (is\_valid\_)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00629}00629\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \textcolor{keyword}{const}\ partial\_regex\ =\ (*regex\ ==\ \textcolor{charliteral}{'\(\backslash\)0'})\ ?\ \textcolor{stringliteral}{"{}()"{}}\ :\ regex;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00630}00630\ \ \ \ \ is\_valid\_\ =\ regcomp(\&partial\_regex\_,\ partial\_regex,\ REG\_EXTENDED)\ ==\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00631}00631\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00632}00632\ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(is\_valid\_)}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00633}00633\ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}Regular\ expression\ \(\backslash\)"{}"{}}\ <<\ regex}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00634}00634\ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\(\backslash\)"{}\ is\ not\ a\ valid\ POSIX\ Extended\ regular\ expression."{}};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00635}00635\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00636}00636\ \ \ \textcolor{keyword}{delete}[]\ full\_pattern;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00637}00637\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00638}00638\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00639}00639\ \textcolor{preprocessor}{\#elif\ GTEST\_USES\_SIMPLE\_RE}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00640}00640\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00641}00641\ \textcolor{comment}{//\ Returns\ true\ iff\ ch\ appears\ anywhere\ in\ str\ (excluding\ the}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00642}00642\ \textcolor{comment}{//\ terminating\ '\(\backslash\)0'\ character).}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00643}00643\ \textcolor{keywordtype}{bool}\ IsInSet(\textcolor{keywordtype}{char}\ ch,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ str)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00644}00644\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_xbyak_1_1util_a36c093c7b6cc66981a18fcbfebc2a225}{ch}}\ !=\ \textcolor{charliteral}{'\(\backslash\)0'}\ \&\&\ strchr(str,\ ch)\ !=\ NULL;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00645}00645\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00646}00646\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00647}00647\ \textcolor{comment}{//\ Returns\ true\ iff\ ch\ belongs\ to\ the\ given\ classification.\ \ Unlike}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00648}00648\ \textcolor{comment}{//\ similar\ functions\ in\ <ctype.h>,\ these\ aren't\ affected\ by\ the}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00649}00649\ \textcolor{comment}{//\ current\ locale.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00650}00650\ \textcolor{keywordtype}{bool}\ IsAsciiDigit(\textcolor{keywordtype}{char}\ ch)\ \{\ \textcolor{keywordflow}{return}\ \textcolor{charliteral}{'0'}\ <=\ \mbox{\hyperlink{namespace_xbyak_1_1util_a36c093c7b6cc66981a18fcbfebc2a225}{ch}}\ \&\&\ \mbox{\hyperlink{namespace_xbyak_1_1util_a36c093c7b6cc66981a18fcbfebc2a225}{ch}}\ <=\ \textcolor{charliteral}{'9'};\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00651}00651\ \textcolor{keywordtype}{bool}\ IsAsciiPunct(\textcolor{keywordtype}{char}\ ch)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00652}00652\ \ \ \textcolor{keywordflow}{return}\ IsInSet(ch,\ \textcolor{stringliteral}{"{}\string^-\/!\(\backslash\)"{}\#\$\%\&'()*+,./:;<=>?@[\(\backslash\)\(\backslash\)]\_`\{|\}\string~"{}});}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00653}00653\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00654}00654\ \textcolor{keywordtype}{bool}\ IsRepeat(\textcolor{keywordtype}{char}\ ch)\ \{\ \textcolor{keywordflow}{return}\ IsInSet(ch,\ \textcolor{stringliteral}{"{}?*+"{}});\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00655}00655\ \textcolor{keywordtype}{bool}\ IsAsciiWhiteSpace(\textcolor{keywordtype}{char}\ ch)\ \{\ \textcolor{keywordflow}{return}\ IsInSet(ch,\ \textcolor{stringliteral}{"{}\ \(\backslash\)f\(\backslash\)n\(\backslash\)r\(\backslash\)t\(\backslash\)v"{}});\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00656}00656\ \textcolor{keywordtype}{bool}\ IsAsciiWordChar(\textcolor{keywordtype}{char}\ ch)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00657}00657\ \ \ \textcolor{keywordflow}{return}\ (\textcolor{charliteral}{'a'}\ <=\ ch\ \&\&\ ch\ <=\ \textcolor{charliteral}{'z'})\ ||\ (\textcolor{charliteral}{'A'}\ <=\ \mbox{\hyperlink{namespace_xbyak_1_1util_a36c093c7b6cc66981a18fcbfebc2a225}{ch}}\ \&\&\ \mbox{\hyperlink{namespace_xbyak_1_1util_a36c093c7b6cc66981a18fcbfebc2a225}{ch}}\ <=\ \textcolor{charliteral}{'Z'})\ ||}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00658}00658\ \ \ \ \ \ \ (\textcolor{charliteral}{'0'}\ <=\ ch\ \&\&\ ch\ <=\ \textcolor{charliteral}{'9'})\ ||\ \mbox{\hyperlink{namespace_xbyak_1_1util_a36c093c7b6cc66981a18fcbfebc2a225}{ch}}\ ==\ \textcolor{charliteral}{'\_'};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00659}00659\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00660}00660\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00661}00661\ \textcolor{comment}{//\ Returns\ true\ iff\ "{}\(\backslash\)\(\backslash\)c"{}\ is\ a\ supported\ escape\ sequence.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00662}00662\ \textcolor{keywordtype}{bool}\ IsValidEscape(\textcolor{keywordtype}{char}\ c)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00663}00663\ \ \ \textcolor{keywordflow}{return}\ (IsAsciiPunct(c)\ ||\ IsInSet(c,\ \textcolor{stringliteral}{"{}dDfnrsStvwW"{}}));}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00664}00664\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00665}00665\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00666}00666\ \textcolor{comment}{//\ Returns\ true\ iff\ the\ given\ atom\ (specified\ by\ escaped\ and\ pattern)}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00667}00667\ \textcolor{comment}{//\ matches\ ch.\ \ The\ result\ is\ undefined\ if\ the\ atom\ is\ invalid.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00668}00668\ \textcolor{keywordtype}{bool}\ AtomMatchesChar(\textcolor{keywordtype}{bool}\ escaped,\ \textcolor{keywordtype}{char}\ pattern\_char,\ \textcolor{keywordtype}{char}\ ch)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00669}00669\ \ \ \textcolor{keywordflow}{if}\ (escaped)\ \{\ \ \textcolor{comment}{//\ "{}\(\backslash\)\(\backslash\)p"{}\ where\ p\ is\ pattern\_char.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00670}00670\ \ \ \ \ \textcolor{keywordflow}{switch}\ (pattern\_char)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00671}00671\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'d'}:\ \textcolor{keywordflow}{return}\ IsAsciiDigit(ch);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00672}00672\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'D'}:\ \textcolor{keywordflow}{return}\ !IsAsciiDigit(ch);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00673}00673\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'f'}:\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_xbyak_1_1util_a36c093c7b6cc66981a18fcbfebc2a225}{ch}}\ ==\ \textcolor{charliteral}{'\(\backslash\)f'};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00674}00674\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'n'}:\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_xbyak_1_1util_a36c093c7b6cc66981a18fcbfebc2a225}{ch}}\ ==\ \textcolor{charliteral}{'\(\backslash\)n'};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00675}00675\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'r'}:\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_xbyak_1_1util_a36c093c7b6cc66981a18fcbfebc2a225}{ch}}\ ==\ \textcolor{charliteral}{'\(\backslash\)r'};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00676}00676\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'s'}:\ \textcolor{keywordflow}{return}\ IsAsciiWhiteSpace(ch);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00677}00677\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'S'}:\ \textcolor{keywordflow}{return}\ !IsAsciiWhiteSpace(ch);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00678}00678\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'t'}:\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_xbyak_1_1util_a36c093c7b6cc66981a18fcbfebc2a225}{ch}}\ ==\ \textcolor{charliteral}{'\(\backslash\)t'};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00679}00679\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'v'}:\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_xbyak_1_1util_a36c093c7b6cc66981a18fcbfebc2a225}{ch}}\ ==\ \textcolor{charliteral}{'\(\backslash\)v'};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00680}00680\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'w'}:\ \textcolor{keywordflow}{return}\ IsAsciiWordChar(ch);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00681}00681\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'W'}:\ \textcolor{keywordflow}{return}\ !IsAsciiWordChar(ch);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00682}00682\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00683}00683\ \ \ \ \ \textcolor{keywordflow}{return}\ IsAsciiPunct(pattern\_char)\ \&\&\ pattern\_char\ ==\ \mbox{\hyperlink{namespace_xbyak_1_1util_a36c093c7b6cc66981a18fcbfebc2a225}{ch}};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00684}00684\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00685}00685\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00686}00686\ \ \ \textcolor{keywordflow}{return}\ (pattern\_char\ ==\ \textcolor{charliteral}{'.'}\ \&\&\ ch\ !=\ \textcolor{charliteral}{'\(\backslash\)n'})\ ||\ pattern\_char\ ==\ \mbox{\hyperlink{namespace_xbyak_1_1util_a36c093c7b6cc66981a18fcbfebc2a225}{ch}};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00687}00687\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00688}00688\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00689}00689\ \textcolor{comment}{//\ Helper\ function\ used\ by\ ValidateRegex()\ to\ format\ error\ messages.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00690}00690\ \textcolor{keyword}{static}\ std::string\ FormatRegexSyntaxError(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ regex,\ \textcolor{keywordtype}{int}\ index)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00691}00691\ \ \ \textcolor{keywordflow}{return}\ (Message()\ <<\ \textcolor{stringliteral}{"{}Syntax\ error\ at\ index\ "{}}\ <<\ index}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00692}00692\ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\ in\ simple\ regular\ expression\ \(\backslash\)"{}"{}}\ <<\ regex\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)"{}:\ "{}}).GetString();}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00693}00693\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00694}00694\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00695}00695\ \textcolor{comment}{//\ Generates\ non-\/fatal\ failures\ and\ returns\ false\ if\ regex\ is\ invalid;}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00696}00696\ \textcolor{comment}{//\ otherwise\ returns\ true.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00697}00697\ \textcolor{keywordtype}{bool}\ ValidateRegex(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ regex)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00698}00698\ \ \ \textcolor{keywordflow}{if}\ (regex\ ==\ NULL)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00699}00699\ \ \ \ \ \textcolor{comment}{//\ TODO(wan@google.com):\ fix\ the\ source\ file\ location\ in\ the}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00700}00700\ \ \ \ \ \textcolor{comment}{//\ assertion\ failures\ to\ match\ where\ the\ regex\ is\ used\ in\ user}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00701}00701\ \ \ \ \ \textcolor{comment}{//\ code.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00702}00702\ \ \ \ \ \mbox{\hyperlink{gtest_8h_adc16b5b0a740c39084ea5c9e960e3063}{ADD\_FAILURE}}()\ <<\ \textcolor{stringliteral}{"{}NULL\ is\ not\ a\ valid\ simple\ regular\ expression."{}};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00703}00703\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00704}00704\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00705}00705\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00706}00706\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespaceutf8_add2dbec3d058aa66500ec4f97cc8174b}{is\_valid}}\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00707}00707\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00708}00708\ \ \ \textcolor{comment}{//\ True\ iff\ ?,\ *,\ or\ +\ can\ follow\ the\ previous\ atom.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00709}00709\ \ \ \textcolor{keywordtype}{bool}\ prev\_repeatable\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00710}00710\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ regex[i];\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00711}00711\ \ \ \ \ \textcolor{keywordflow}{if}\ (regex[i]\ ==\ \textcolor{charliteral}{'\(\backslash\)\(\backslash\)'})\ \{\ \ \textcolor{comment}{//\ An\ escape\ sequence}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00712}00712\ \ \ \ \ \ \ i++;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00713}00713\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (regex[i]\ ==\ \textcolor{charliteral}{'\(\backslash\)0'})\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00714}00714\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_adc16b5b0a740c39084ea5c9e960e3063}{ADD\_FAILURE}}()\ <<\ FormatRegexSyntaxError(regex,\ i\ -\/\ 1)}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00715}00715\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}'\(\backslash\)\(\backslash\)'\ cannot\ appear\ at\ the\ end."{}};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00716}00716\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00717}00717\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00718}00718\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00719}00719\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!IsValidEscape(regex[i]))\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00720}00720\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_adc16b5b0a740c39084ea5c9e960e3063}{ADD\_FAILURE}}()\ <<\ FormatRegexSyntaxError(regex,\ i\ -\/\ 1)}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00721}00721\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}invalid\ escape\ sequence\ \(\backslash\)"{}\(\backslash\)\(\backslash\)"{}}\ <<\ regex[i]\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)"{}."{}};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00722}00722\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceutf8_add2dbec3d058aa66500ec4f97cc8174b}{is\_valid}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00723}00723\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00724}00724\ \ \ \ \ \ \ prev\_repeatable\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00725}00725\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{\ \ \textcolor{comment}{//\ Not\ an\ escape\ sequence.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00726}00726\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{namespace_xbyak_1_1util_a36c093c7b6cc66981a18fcbfebc2a225}{ch}}\ =\ regex[i];}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00727}00727\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00728}00728\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ch\ ==\ \textcolor{charliteral}{'\string^'}\ \&\&\ i\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00729}00729\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_adc16b5b0a740c39084ea5c9e960e3063}{ADD\_FAILURE}}()\ <<\ FormatRegexSyntaxError(regex,\ i)}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00730}00730\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}'\string^'\ can\ only\ appear\ at\ the\ beginning."{}};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00731}00731\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceutf8_add2dbec3d058aa66500ec4f97cc8174b}{is\_valid}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00732}00732\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (ch\ ==\ \textcolor{charliteral}{'\$'}\ \&\&\ regex[i\ +\ 1]\ !=\ \textcolor{charliteral}{'\(\backslash\)0'})\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00733}00733\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_adc16b5b0a740c39084ea5c9e960e3063}{ADD\_FAILURE}}()\ <<\ FormatRegexSyntaxError(regex,\ i)}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00734}00734\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}'\$'\ can\ only\ appear\ at\ the\ end."{}};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00735}00735\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceutf8_add2dbec3d058aa66500ec4f97cc8174b}{is\_valid}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00736}00736\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (IsInSet(ch,\ \textcolor{stringliteral}{"{}()[]\{\}|"{}}))\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00737}00737\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_adc16b5b0a740c39084ea5c9e960e3063}{ADD\_FAILURE}}()\ <<\ FormatRegexSyntaxError(regex,\ i)}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00738}00738\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}'"{}}\ <<\ \mbox{\hyperlink{namespace_xbyak_1_1util_a36c093c7b6cc66981a18fcbfebc2a225}{ch}}\ <<\ \textcolor{stringliteral}{"{}'\ is\ unsupported."{}};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00739}00739\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceutf8_add2dbec3d058aa66500ec4f97cc8174b}{is\_valid}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00740}00740\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (IsRepeat(ch)\ \&\&\ !prev\_repeatable)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00741}00741\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_adc16b5b0a740c39084ea5c9e960e3063}{ADD\_FAILURE}}()\ <<\ FormatRegexSyntaxError(regex,\ i)}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00742}00742\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}'"{}}\ <<\ \mbox{\hyperlink{namespace_xbyak_1_1util_a36c093c7b6cc66981a18fcbfebc2a225}{ch}}\ <<\ \textcolor{stringliteral}{"{}'\ can\ only\ follow\ a\ repeatable\ token."{}};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00743}00743\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceutf8_add2dbec3d058aa66500ec4f97cc8174b}{is\_valid}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00744}00744\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00745}00745\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00746}00746\ \ \ \ \ \ \ prev\_repeatable\ =\ !IsInSet(ch,\ \textcolor{stringliteral}{"{}\string^\$?*+"{}});}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00747}00747\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00748}00748\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00749}00749\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00750}00750\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespaceutf8_add2dbec3d058aa66500ec4f97cc8174b}{is\_valid}};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00751}00751\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00752}00752\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00753}00753\ \textcolor{comment}{//\ Matches\ a\ repeated\ regex\ atom\ followed\ by\ a\ valid\ simple\ regular}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00754}00754\ \textcolor{comment}{//\ expression.\ \ The\ regex\ atom\ is\ defined\ as\ c\ if\ escaped\ is\ false,}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00755}00755\ \textcolor{comment}{//\ or\ \(\backslash\)c\ otherwise.\ \ repeat\ is\ the\ repetition\ meta\ character\ (?,\ *,}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00756}00756\ \textcolor{comment}{//\ or\ +).\ \ The\ behavior\ is\ undefined\ if\ str\ contains\ too\ many}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00757}00757\ \textcolor{comment}{//\ characters\ to\ be\ indexable\ by\ size\_t,\ in\ which\ case\ the\ test\ will}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00758}00758\ \textcolor{comment}{//\ probably\ time\ out\ anyway.\ \ We\ are\ fine\ with\ this\ limitation\ as}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00759}00759\ \textcolor{comment}{//\ std::string\ has\ it\ too.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00760}00760\ \textcolor{keywordtype}{bool}\ MatchRepetitionAndRegexAtHead(}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00761}00761\ \ \ \ \ \textcolor{keywordtype}{bool}\ escaped,\ \textcolor{keywordtype}{char}\ c,\ \textcolor{keywordtype}{char}\ repeat,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ regex,}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00762}00762\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ str)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00763}00763\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ min\_count\ =\ (repeat\ ==\ \textcolor{charliteral}{'+'})\ ?\ 1\ :\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00764}00764\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ max\_count\ =\ (repeat\ ==\ \textcolor{charliteral}{'?'})\ ?\ 1\ :}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00765}00765\ \ \ \ \ \ \ static\_cast<size\_t>(-\/1)\ -\/\ 1;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00766}00766\ \ \ \textcolor{comment}{//\ We\ cannot\ call\ numeric\_limits::max()\ as\ it\ conflicts\ with\ the}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00767}00767\ \ \ \textcolor{comment}{//\ max()\ macro\ on\ Windows.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00768}00768\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00769}00769\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <=\ max\_count;\ ++i)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00770}00770\ \ \ \ \ \textcolor{comment}{//\ We\ know\ that\ the\ atom\ matches\ each\ of\ the\ first\ i\ characters\ in\ str.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00771}00771\ \ \ \ \ \textcolor{keywordflow}{if}\ (i\ >=\ min\_count\ \&\&\ MatchRegexAtHead(regex,\ str\ +\ i))\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00772}00772\ \ \ \ \ \ \ \textcolor{comment}{//\ We\ have\ enough\ matches\ at\ the\ head,\ and\ the\ tail\ matches\ too.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00773}00773\ \ \ \ \ \ \ \textcolor{comment}{//\ Since\ we\ only\ care\ about\ *whether*\ the\ pattern\ matches\ str}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00774}00774\ \ \ \ \ \ \ \textcolor{comment}{//\ (as\ opposed\ to\ *how*\ it\ matches),\ there\ is\ no\ need\ to\ find\ a}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00775}00775\ \ \ \ \ \ \ \textcolor{comment}{//\ greedy\ match.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00776}00776\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00777}00777\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00778}00778\ \ \ \ \ \textcolor{keywordflow}{if}\ (str[i]\ ==\ \textcolor{charliteral}{'\(\backslash\)0'}\ ||\ !AtomMatchesChar(escaped,\ c,\ str[i]))}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00779}00779\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00780}00780\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00781}00781\ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00782}00782\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00783}00783\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00784}00784\ \textcolor{comment}{//\ Returns\ true\ iff\ regex\ matches\ a\ prefix\ of\ str.\ \ regex\ must\ be\ a}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00785}00785\ \textcolor{comment}{//\ valid\ simple\ regular\ expression\ and\ not\ start\ with\ "{}\string^"{},\ or\ the}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00786}00786\ \textcolor{comment}{//\ result\ is\ undefined.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00787}00787\ \textcolor{keywordtype}{bool}\ MatchRegexAtHead(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ regex,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ str)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00788}00788\ \ \ \textcolor{keywordflow}{if}\ (*regex\ ==\ \textcolor{charliteral}{'\(\backslash\)0'})\ \ \textcolor{comment}{//\ An\ empty\ regex\ matches\ a\ prefix\ of\ anything.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00789}00789\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00790}00790\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00791}00791\ \ \ \textcolor{comment}{//\ "{}\$"{}\ only\ matches\ the\ end\ of\ a\ string.\ \ Note\ that\ regex\ being}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00792}00792\ \ \ \textcolor{comment}{//\ valid\ guarantees\ that\ there's\ nothing\ after\ "{}\$"{}\ in\ it.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00793}00793\ \ \ \textcolor{keywordflow}{if}\ (*regex\ ==\ \textcolor{charliteral}{'\$'})}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00794}00794\ \ \ \ \ \textcolor{keywordflow}{return}\ *\mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}\ ==\ \textcolor{charliteral}{'\(\backslash\)0'};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00795}00795\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00796}00796\ \ \ \textcolor{comment}{//\ Is\ the\ first\ thing\ in\ regex\ an\ escape\ sequence?}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00797}00797\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ escaped\ =\ *regex\ ==\ \textcolor{charliteral}{'\(\backslash\)\(\backslash\)'};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00798}00798\ \ \ \textcolor{keywordflow}{if}\ (escaped)}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00799}00799\ \ \ \ \ ++regex;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00800}00800\ \ \ \textcolor{keywordflow}{if}\ (IsRepeat(regex[1]))\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00801}00801\ \ \ \ \ \textcolor{comment}{//\ MatchRepetitionAndRegexAtHead()\ calls\ MatchRegexAtHead(),\ so}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00802}00802\ \ \ \ \ \textcolor{comment}{//\ here's\ an\ indirect\ recursion.\ \ It\ terminates\ as\ the\ regex\ gets}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00803}00803\ \ \ \ \ \textcolor{comment}{//\ shorter\ in\ each\ recursion.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00804}00804\ \ \ \ \ \textcolor{keywordflow}{return}\ MatchRepetitionAndRegexAtHead(}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00805}00805\ \ \ \ \ \ \ \ \ escaped,\ regex[0],\ regex[1],\ regex\ +\ 2,\ str);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00806}00806\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00807}00807\ \ \ \ \ \textcolor{comment}{//\ regex\ isn't\ empty,\ isn't\ "{}\$"{},\ and\ doesn't\ start\ with\ a}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00808}00808\ \ \ \ \ \textcolor{comment}{//\ repetition.\ \ We\ match\ the\ first\ atom\ of\ regex\ with\ the\ first}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00809}00809\ \ \ \ \ \textcolor{comment}{//\ character\ of\ str\ and\ recurse.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00810}00810\ \ \ \ \ \textcolor{keywordflow}{return}\ (*str\ !=\ \textcolor{charliteral}{'\(\backslash\)0'})\ \&\&\ AtomMatchesChar(escaped,\ *regex,\ *str)\ \&\&}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00811}00811\ \ \ \ \ \ \ \ \ MatchRegexAtHead(regex\ +\ 1,\ str\ +\ 1);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00812}00812\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00813}00813\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00814}00814\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00815}00815\ \textcolor{comment}{//\ Returns\ true\ iff\ regex\ matches\ any\ substring\ of\ str.\ \ regex\ must\ be}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00816}00816\ \textcolor{comment}{//\ a\ valid\ simple\ regular\ expression,\ or\ the\ result\ is\ undefined.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00817}00817\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00818}00818\ \textcolor{comment}{//\ The\ algorithm\ is\ recursive,\ but\ the\ recursion\ depth\ doesn't\ exceed}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00819}00819\ \textcolor{comment}{//\ the\ regex\ length,\ so\ we\ won't\ need\ to\ worry\ about\ running\ out\ of}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00820}00820\ \textcolor{comment}{//\ stack\ space\ normally.\ \ In\ rare\ cases\ the\ time\ complexity\ can\ be}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00821}00821\ \textcolor{comment}{//\ exponential\ with\ respect\ to\ the\ regex\ length\ +\ the\ string\ length,}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00822}00822\ \textcolor{comment}{//\ but\ usually\ it's\ must\ faster\ (often\ close\ to\ linear).}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00823}00823\ \textcolor{keywordtype}{bool}\ MatchRegexAnywhere(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ regex,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ str)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00824}00824\ \ \ \textcolor{keywordflow}{if}\ (regex\ ==\ NULL\ ||\ str\ ==\ NULL)}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00825}00825\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00826}00826\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00827}00827\ \ \ \textcolor{keywordflow}{if}\ (*regex\ ==\ \textcolor{charliteral}{'\string^'})}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00828}00828\ \ \ \ \ \textcolor{keywordflow}{return}\ MatchRegexAtHead(regex\ +\ 1,\ str);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00829}00829\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00830}00830\ \ \ \textcolor{comment}{//\ A\ successful\ match\ can\ be\ anywhere\ in\ str.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00831}00831\ \ \ \textcolor{keywordflow}{do}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00832}00832\ \ \ \ \ \textcolor{keywordflow}{if}\ (MatchRegexAtHead(regex,\ str))}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00833}00833\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00834}00834\ \ \ \}\ \textcolor{keywordflow}{while}\ (*str++\ !=\ \textcolor{charliteral}{'\(\backslash\)0'});}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00835}00835\ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00836}00836\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00837}00837\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00838}00838\ \textcolor{comment}{//\ Implements\ the\ RE\ class.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00839}00839\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00840}00840\ RE::\string~RE()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00841}00841\ \ \ free(\textcolor{keyword}{const\_cast<}\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(pattern\_));}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00842}00842\ \ \ free(\textcolor{keyword}{const\_cast<}\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(full\_pattern\_));}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00843}00843\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00844}00844\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00845}00845\ \textcolor{comment}{//\ Returns\ true\ iff\ regular\ expression\ re\ matches\ the\ entire\ str.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00846}00846\ \textcolor{keywordtype}{bool}\ RE::FullMatch(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ str,\ \textcolor{keyword}{const}\ RE\&\ re)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00847}00847\ \ \ \textcolor{keywordflow}{return}\ re.is\_valid\_\ \&\&\ MatchRegexAnywhere(re.full\_pattern\_,\ str);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00848}00848\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00849}00849\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00850}00850\ \textcolor{comment}{//\ Returns\ true\ iff\ regular\ expression\ re\ matches\ a\ substring\ of\ str}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00851}00851\ \textcolor{comment}{//\ (including\ str\ itself).}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00852}00852\ \textcolor{keywordtype}{bool}\ RE::PartialMatch(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ str,\ \textcolor{keyword}{const}\ RE\&\ re)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00853}00853\ \ \ \textcolor{keywordflow}{return}\ re.is\_valid\_\ \&\&\ MatchRegexAnywhere(re.pattern\_,\ str);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00854}00854\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00855}00855\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00856}00856\ \textcolor{comment}{//\ Initializes\ an\ RE\ from\ its\ string\ representation.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00857}00857\ \textcolor{keywordtype}{void}\ RE::Init(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ regex)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00858}00858\ \ \ pattern\_\ =\ full\_pattern\_\ =\ NULL;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00859}00859\ \ \ \textcolor{keywordflow}{if}\ (regex\ !=\ NULL)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00860}00860\ \ \ \ \ pattern\_\ =\ \mbox{\hyperlink{namespacetesting_1_1internal_1_1posix_a5c0864ea9d81d27332b9133e35cbc43c}{posix::StrDup}}(regex);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00861}00861\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00862}00862\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00863}00863\ \ \ is\_valid\_\ =\ ValidateRegex(regex);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00864}00864\ \ \ \textcolor{keywordflow}{if}\ (!is\_valid\_)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00865}00865\ \ \ \ \ \textcolor{comment}{//\ No\ need\ to\ calculate\ the\ full\ pattern\ when\ the\ regex\ is\ invalid.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00866}00866\ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00867}00867\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00868}00868\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00869}00869\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ =\ strlen(regex);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00870}00870\ \ \ \textcolor{comment}{//\ Reserves\ enough\ bytes\ to\ hold\ the\ regular\ expression\ used\ for\ a}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00871}00871\ \ \ \textcolor{comment}{//\ full\ match:\ we\ need\ space\ to\ prepend\ a\ '\string^',\ append\ a\ '\$',\ and}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00872}00872\ \ \ \textcolor{comment}{//\ terminate\ the\ string\ with\ '\(\backslash\)0'.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00873}00873\ \ \ \textcolor{keywordtype}{char}*\ buffer\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(malloc(\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ +\ 3));}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00874}00874\ \ \ full\_pattern\_\ =\ buffer;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00875}00875\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00876}00876\ \ \ \textcolor{keywordflow}{if}\ (*regex\ !=\ \textcolor{charliteral}{'\string^'})}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00877}00877\ \ \ \ \ *buffer++\ =\ \textcolor{charliteral}{'\string^'};\ \ \textcolor{comment}{//\ Makes\ sure\ full\_pattern\_\ starts\ with\ '\string^'.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00878}00878\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00879}00879\ \ \ \textcolor{comment}{//\ We\ don't\ use\ snprintf\ or\ strncpy,\ as\ they\ trigger\ a\ warning\ when}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00880}00880\ \ \ \textcolor{comment}{//\ compiled\ with\ VC++\ 8.0.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00881}00881\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(buffer,\ regex,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}});}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00882}00882\ \ \ buffer\ +=\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00883}00883\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00884}00884\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ ==\ 0\ ||\ regex[\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ -\/\ 1]\ !=\ \textcolor{charliteral}{'\$'})}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00885}00885\ \ \ \ \ *buffer++\ =\ \textcolor{charliteral}{'\$'};\ \ \textcolor{comment}{//\ Makes\ sure\ full\_pattern\_\ ends\ with\ '\$'.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00886}00886\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00887}00887\ \ \ *buffer\ =\ \textcolor{charliteral}{'\(\backslash\)0'};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00888}00888\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00889}00889\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00890}00890\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_USES\_POSIX\_RE}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00891}00891\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00892}\mbox{\hyperlink{namespacetesting_1_1internal_abae7a5775c901f2fd12b058b00d09840}{00892}}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{namespacetesting_1_1internal_abae7a5775c901f2fd12b058b00d09840}{kUnknownFile}}[]\ =\ \textcolor{stringliteral}{"{}unknown\ file"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00893}00893\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00894}00894\ \textcolor{comment}{//\ Formats\ a\ source\ file\ path\ and\ a\ line\ number\ as\ they\ would\ appear}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00895}00895\ \textcolor{comment}{//\ in\ an\ error\ message\ from\ the\ compiler\ used\ to\ compile\ this\ code.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00896}\mbox{\hyperlink{namespacetesting_1_1internal_a31b7c3abed4a7c395f42c61e993989f4}{00896}}\ GTEST\_API\_\ ::std::string\ FormatFileLocation(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ file,\ \textcolor{keywordtype}{int}\ line)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00897}00897\ \ \ \textcolor{keyword}{const}\ std::string\ file\_name(file\ ==\ NULL\ ?\ \mbox{\hyperlink{namespacetesting_1_1internal_abae7a5775c901f2fd12b058b00d09840}{kUnknownFile}}\ :\ file);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00898}00898\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00899}00899\ \ \ \textcolor{keywordflow}{if}\ (line\ <\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00900}00900\ \ \ \ \ \textcolor{keywordflow}{return}\ file\_name\ +\ \textcolor{stringliteral}{"{}:"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00901}00901\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00902}00902\ \textcolor{preprocessor}{\#ifdef\ \_MSC\_VER}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00903}00903\ \ \ \textcolor{keywordflow}{return}\ file\_name\ +\ \textcolor{stringliteral}{"{}("{}}\ +\ StreamableToString(line)\ +\ \textcolor{stringliteral}{"{}):"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00904}00904\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00905}00905\ \ \ \textcolor{keywordflow}{return}\ file\_name\ +\ \textcolor{stringliteral}{"{}:"{}}\ +\ StreamableToString(line)\ +\ \textcolor{stringliteral}{"{}:"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00906}00906\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ \_MSC\_VER}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00907}00907\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00908}00908\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00909}00909\ \textcolor{comment}{//\ Formats\ a\ file\ location\ for\ compiler-\/independent\ XML\ output.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00910}00910\ \textcolor{comment}{//\ Although\ this\ function\ is\ not\ platform\ dependent,\ we\ put\ it\ next\ to}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00911}00911\ \textcolor{comment}{//\ FormatFileLocation\ in\ order\ to\ contrast\ the\ two\ functions.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00912}00912\ \textcolor{comment}{//\ Note\ that\ FormatCompilerIndependentFileLocation()\ does\ NOT\ append\ colon}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00913}00913\ \textcolor{comment}{//\ to\ the\ file\ location\ it\ produces,\ unlike\ FormatFileLocation().}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00914}\mbox{\hyperlink{namespacetesting_1_1internal_a1ee4cde97868c53e442d3182496a9f3c}{00914}}\ GTEST\_API\_\ ::std::string\ \mbox{\hyperlink{namespacetesting_1_1internal_a1ee4cde97868c53e442d3182496a9f3c}{FormatCompilerIndependentFileLocation}}(}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00915}00915\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ file,\ \textcolor{keywordtype}{int}\ line)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00916}00916\ \ \ \textcolor{keyword}{const}\ std::string\ file\_name(file\ ==\ NULL\ ?\ \mbox{\hyperlink{namespacetesting_1_1internal_abae7a5775c901f2fd12b058b00d09840}{kUnknownFile}}\ :\ file);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00917}00917\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00918}00918\ \ \ \textcolor{keywordflow}{if}\ (line\ <\ 0)}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00919}00919\ \ \ \ \ \textcolor{keywordflow}{return}\ file\_name;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00920}00920\ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00921}00921\ \ \ \ \ \textcolor{keywordflow}{return}\ file\_name\ +\ \textcolor{stringliteral}{"{}:"{}}\ +\ StreamableToString(line);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00922}00922\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00923}00923\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00924}\mbox{\hyperlink{classtesting_1_1internal_1_1_g_test_log_a364691bf972983a59cfa2891062a64af}{00924}}\ GTestLog::GTestLog(\mbox{\hyperlink{namespacetesting_1_1internal_aa6255ef3b023c5b4e1a2198d887fb977}{GTestLogSeverity}}\ severity,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ file,\ \textcolor{keywordtype}{int}\ line)}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00925}00925\ \ \ \ \ :\ severity\_(severity)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00926}00926\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \textcolor{keyword}{const}\ marker\ =}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00927}00927\ \ \ \ \ \ \ severity\ ==\ \mbox{\hyperlink{namespacetesting_1_1internal_aa6255ef3b023c5b4e1a2198d887fb977aff315e0913fcda86fe4de882bf5e33e9}{GTEST\_INFO}}\ ?\ \ \ \ \textcolor{stringliteral}{"{}[\ \ INFO\ ]"{}}\ :}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00928}00928\ \ \ \ \ \ \ severity\ ==\ \mbox{\hyperlink{namespacetesting_1_1internal_aa6255ef3b023c5b4e1a2198d887fb977a7a051bc2794f15a4bf0eab40562a304c}{GTEST\_WARNING}}\ ?\ \textcolor{stringliteral}{"{}[WARNING]"{}}\ :}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00929}00929\ \ \ \ \ \ \ severity\ ==\ \mbox{\hyperlink{namespacetesting_1_1internal_aa6255ef3b023c5b4e1a2198d887fb977a651e9cd2a904e0c8210536271b875f75}{GTEST\_ERROR}}\ ?\ \ \ \textcolor{stringliteral}{"{}[\ ERROR\ ]"{}}\ :\ \textcolor{stringliteral}{"{}[\ FATAL\ ]"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00930}00930\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_g_test_log_a74935e7a0b424c4a6312fb73dafab6b5}{GetStream}}()\ <<\ ::std::endl\ <<\ marker\ <<\ \textcolor{stringliteral}{"{}\ "{}}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00931}00931\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \mbox{\hyperlink{namespacetesting_1_1internal_a31b7c3abed4a7c395f42c61e993989f4}{FormatFileLocation}}(file,\ line).c\_str()\ <<\ \textcolor{stringliteral}{"{}:\ "{}};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00932}00932\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00933}00933\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00934}00934\ \textcolor{comment}{//\ Flushes\ the\ buffers\ and,\ if\ severity\ is\ GTEST\_FATAL,\ aborts\ the\ program.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00935}\mbox{\hyperlink{classtesting_1_1internal_1_1_g_test_log_a978a099703bbaa0f380216e8d7ee03d3}{00935}}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_g_test_log_a978a099703bbaa0f380216e8d7ee03d3}{GTestLog::\string~GTestLog}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00936}00936\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_g_test_log_a74935e7a0b424c4a6312fb73dafab6b5}{GetStream}}()\ <<\ ::std::endl;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00937}00937\ \ \ \textcolor{keywordflow}{if}\ (severity\_\ ==\ \mbox{\hyperlink{namespacetesting_1_1internal_aa6255ef3b023c5b4e1a2198d887fb977a75063567740f6bf7da419b1b9197b12e}{GTEST\_FATAL}})\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00938}00938\ \ \ \ \ fflush(stderr);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00939}00939\ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_1_1posix_a69b8278c59359dd6a6f941b4643db9fb}{posix::Abort}}();}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00940}00940\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00941}00941\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00942}00942\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00943}00943\ \textcolor{comment}{//\ Disable\ Microsoft\ deprecation\ warnings\ for\ POSIX\ functions\ called\ from}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00944}00944\ \textcolor{comment}{//\ this\ class\ (creat,\ dup,\ dup2,\ and\ close)}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00945}00945\ \mbox{\hyperlink{gtest-port_8h_a86994cc68e844d8b82089c70408dfc61}{GTEST\_DISABLE\_MSC\_WARNINGS\_PUSH\_}}(4996)}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00946}00946\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00947}00947\ \textcolor{preprocessor}{\#if\ GTEST\_HAS\_STREAM\_REDIRECTION}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00948}00948\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00949}00949\ \textcolor{comment}{//\ Object\ that\ captures\ an\ output\ stream\ (stdout/stderr).}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00950}00950\ \textcolor{keyword}{class\ }CapturedStream\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00951}00951\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00952}00952\ \ \ \textcolor{comment}{//\ The\ ctor\ redirects\ the\ stream\ to\ a\ temporary\ file.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00953}00953\ \ \ \textcolor{keyword}{explicit}\ CapturedStream(\textcolor{keywordtype}{int}\ fd)\ :\ fd\_(fd),\ uncaptured\_fd\_(dup(fd))\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00954}00954\ \textcolor{preprocessor}{\#\ if\ GTEST\_OS\_WINDOWS}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00955}00955\ \ \ \ \ \textcolor{keywordtype}{char}\ temp\_dir\_path[MAX\_PATH\ +\ 1]\ =\ \{\ \textcolor{charliteral}{'\(\backslash\)0'}\ \};\ \ \textcolor{comment}{//\ NOLINT}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00956}00956\ \ \ \ \ \textcolor{keywordtype}{char}\ temp\_file\_path[MAX\_PATH\ +\ 1]\ =\ \{\ \textcolor{charliteral}{'\(\backslash\)0'}\ \};\ \ \textcolor{comment}{//\ NOLINT}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00957}00957\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00958}00958\ \ \ \ \ ::GetTempPathA(\textcolor{keyword}{sizeof}(temp\_dir\_path),\ temp\_dir\_path);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00959}00959\ \ \ \ \ \textcolor{keyword}{const}\ UINT\ success\ =\ ::GetTempFileNameA(temp\_dir\_path,}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00960}00960\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}gtest\_redir"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00961}00961\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0,\ \ \textcolor{comment}{//\ Generate\ unique\ file\ name.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00962}00962\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ temp\_file\_path);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00963}00963\ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_ab54343f0a36dc4cb0ce8a478dd7847b8}{GTEST\_CHECK\_}}(success\ !=\ 0)}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00964}00964\ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}Unable\ to\ create\ a\ temporary\ file\ in\ "{}}\ <<\ temp\_dir\_path;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00965}00965\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ captured\_fd\ =\ creat(temp\_file\_path,\ \_S\_IREAD\ |\ \_S\_IWRITE);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00966}00966\ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_ab54343f0a36dc4cb0ce8a478dd7847b8}{GTEST\_CHECK\_}}(captured\_fd\ !=\ -\/1)\ <<\ \textcolor{stringliteral}{"{}Unable\ to\ open\ temporary\ file\ "{}}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00967}00967\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ temp\_file\_path;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00968}00968\ \ \ \ \ filename\_\ =\ temp\_file\_path;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00969}00969\ \textcolor{preprocessor}{\#\ else}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00970}00970\ \ \ \ \ \textcolor{comment}{//\ There's\ no\ guarantee\ that\ a\ test\ has\ write\ access\ to\ the\ current}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00971}00971\ \ \ \ \ \textcolor{comment}{//\ directory,\ so\ we\ create\ the\ temporary\ file\ in\ the\ /tmp\ directory}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00972}00972\ \ \ \ \ \textcolor{comment}{//\ instead.\ We\ use\ /tmp\ on\ most\ systems,\ and\ /sdcard\ on\ Android.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00973}00973\ \ \ \ \ \textcolor{comment}{//\ That's\ because\ Android\ doesn't\ have\ /tmp.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00974}00974\ \textcolor{preprocessor}{\#\ \ if\ GTEST\_OS\_LINUX\_ANDROID}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00975}00975\ \ \ \ \ \textcolor{comment}{//\ Note:\ Android\ applications\ are\ expected\ to\ call\ the\ framework's}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00976}00976\ \ \ \ \ \textcolor{comment}{//\ Context.getExternalStorageDirectory()\ method\ through\ JNI\ to\ get}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00977}00977\ \ \ \ \ \textcolor{comment}{//\ the\ location\ of\ the\ world-\/writable\ SD\ Card\ directory.\ However,}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00978}00978\ \ \ \ \ \textcolor{comment}{//\ this\ requires\ a\ Context\ handle,\ which\ cannot\ be\ retrieved}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00979}00979\ \ \ \ \ \textcolor{comment}{//\ globally\ from\ native\ code.\ Doing\ so\ also\ precludes\ running\ the}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00980}00980\ \ \ \ \ \textcolor{comment}{//\ code\ as\ part\ of\ a\ regular\ standalone\ executable,\ which\ doesn't}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00981}00981\ \ \ \ \ \textcolor{comment}{//\ run\ in\ a\ Dalvik\ process\ (e.g.\ when\ running\ it\ through\ 'adb\ shell').}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00982}00982\ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00983}00983\ \ \ \ \ \textcolor{comment}{//\ The\ location\ /sdcard\ is\ directly\ accessible\ from\ native\ code}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00984}00984\ \ \ \ \ \textcolor{comment}{//\ and\ is\ the\ only\ location\ (unofficially)\ supported\ by\ the\ Android}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00985}00985\ \ \ \ \ \textcolor{comment}{//\ team.\ It's\ generally\ a\ symlink\ to\ the\ real\ SD\ Card\ mount\ point}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00986}00986\ \ \ \ \ \textcolor{comment}{//\ which\ can\ be\ /mnt/sdcard,\ /mnt/sdcard0,\ /system/media/sdcard,\ or}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00987}00987\ \ \ \ \ \textcolor{comment}{//\ other\ OEM-\/customized\ locations.\ Never\ rely\ on\ these,\ and\ always}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00988}00988\ \ \ \ \ \textcolor{comment}{//\ use\ /sdcard.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00989}00989\ \ \ \ \ \textcolor{keywordtype}{char}\ name\_template[]\ =\ \textcolor{stringliteral}{"{}/sdcard/gtest\_captured\_stream.XXXXXX"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00990}00990\ \textcolor{preprocessor}{\#\ \ else}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00991}00991\ \ \ \ \ \textcolor{keywordtype}{char}\ name\_template[]\ =\ \textcolor{stringliteral}{"{}/tmp/captured\_stream.XXXXXX"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00992}00992\ \textcolor{preprocessor}{\#\ \ endif\ \ }\textcolor{comment}{//\ GTEST\_OS\_LINUX\_ANDROID}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00993}00993\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ captured\_fd\ =\ mkstemp(name\_template);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00994}00994\ \ \ \ \ filename\_\ =\ name\_template;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00995}00995\ \textcolor{preprocessor}{\#\ endif\ \ }\textcolor{comment}{//\ GTEST\_OS\_WINDOWS}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00996}00996\ \ \ \ \ fflush(NULL);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00997}00997\ \ \ \ \ dup2(captured\_fd,\ fd\_);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00998}00998\ \ \ \ \ \mbox{\hyperlink{integration_8cpp_af5b66d867a040d002fb57d645cae3fb4}{close}}(captured\_fd);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l00999}00999\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01000}01000\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01001}01001\ \ \ \string~CapturedStream()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01002}01002\ \ \ \ \ \mbox{\hyperlink{namespacefc_a0db76f35dc060918029b16de918b1e84}{remove}}(filename\_.c\_str());}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01003}01003\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01004}01004\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01005}01005\ \ \ std::string\ GetCapturedString()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01006}01006\ \ \ \ \ \textcolor{keywordflow}{if}\ (uncaptured\_fd\_\ !=\ -\/1)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01007}01007\ \ \ \ \ \ \ \textcolor{comment}{//\ Restores\ the\ original\ stream.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01008}01008\ \ \ \ \ \ \ fflush(NULL);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01009}01009\ \ \ \ \ \ \ dup2(uncaptured\_fd\_,\ fd\_);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01010}01010\ \ \ \ \ \ \ \mbox{\hyperlink{integration_8cpp_af5b66d867a040d002fb57d645cae3fb4}{close}}(uncaptured\_fd\_);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01011}01011\ \ \ \ \ \ \ uncaptured\_fd\_\ =\ -\/1;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01012}01012\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01013}01013\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01014}01014\ \ \ \ \ FILE*\ \textcolor{keyword}{const}\ file\ =\ \mbox{\hyperlink{namespacetesting_1_1internal_1_1posix_affa05d06d3e3b1ce975935cb0eac4fa7}{posix::FOpen}}(filename\_.c\_str(),\ \textcolor{stringliteral}{"{}r"{}});}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01015}01015\ \ \ \ \ \textcolor{keyword}{const}\ std::string\ content\ =\ \mbox{\hyperlink{namespacetesting_1_1internal_a2cc0be60c54a8701423fe5297e1349ee}{ReadEntireFile}}(file);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01016}01016\ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_1_1posix_af4beeaaa8d62916d5e3b644a1ddfbd6b}{posix::FClose}}(file);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01017}01017\ \ \ \ \ \textcolor{keywordflow}{return}\ content;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01018}01018\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01019}01019\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01020}01020\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01021}01021\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ fd\_;\ \ \textcolor{comment}{//\ A\ stream\ to\ capture.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01022}01022\ \ \ \textcolor{keywordtype}{int}\ uncaptured\_fd\_;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01023}01023\ \ \ \textcolor{comment}{//\ Name\ of\ the\ temporary\ file\ holding\ the\ stderr\ output.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01024}01024\ \ \ ::std::string\ filename\_;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01025}01025\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01026}01026\ \ \ \mbox{\hyperlink{gtest-port_8h_aed8c1888c32b588b0681e88b95031e29}{GTEST\_DISALLOW\_COPY\_AND\_ASSIGN\_}}(CapturedStream);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01027}01027\ \};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01028}01028\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01029}01029\ \mbox{\hyperlink{gtest-port_8h_ab4c44546d6d9aced68993b87b608fc06}{GTEST\_DISABLE\_MSC\_WARNINGS\_POP\_}}()}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01030}01030\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01031}01031\ static\ CapturedStream*\ g\_captured\_stderr\ =\ NULL;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01032}01032\ static\ CapturedStream*\ g\_captured\_stdout\ =\ NULL;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01033}01033\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01034}01034\ \textcolor{comment}{//\ Starts\ capturing\ an\ output\ stream\ (stdout/stderr).}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01035}01035\ static\ \textcolor{keywordtype}{void}\ CaptureStream(\textcolor{keywordtype}{int}\ fd,\ const\ \textcolor{keywordtype}{char}*\ stream\_name,}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01036}01036\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ CapturedStream**\ stream)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01037}01037\ \ \ \textcolor{keywordflow}{if}\ (*stream\ !=\ NULL)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01038}01038\ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_a8ef4cb4c465db8c15464aecc6d9510ef}{GTEST\_LOG\_}}(FATAL)\ <<\ \textcolor{stringliteral}{"{}Only\ one\ "{}}\ <<\ stream\_name}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01039}01039\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\ capturer\ can\ exist\ at\ a\ time."{}};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01040}01040\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01041}01041\ \ \ *stream\ =\ \textcolor{keyword}{new}\ CapturedStream(fd);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01042}01042\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01043}01043\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01044}01044\ \textcolor{comment}{//\ Stops\ capturing\ the\ output\ stream\ and\ returns\ the\ captured\ string.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01045}01045\ \textcolor{keyword}{static}\ std::string\ GetCapturedStream(CapturedStream**\ captured\_stream)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01046}01046\ \ \ \textcolor{keyword}{const}\ std::string\ content\ =\ (*captured\_stream)-\/>GetCapturedString();}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01047}01047\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01048}01048\ \ \ \textcolor{keyword}{delete}\ *captured\_stream;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01049}01049\ \ \ *captured\_stream\ =\ NULL;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01050}01050\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01051}01051\ \ \ \textcolor{keywordflow}{return}\ content;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01052}01052\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01053}01053\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01054}01054\ \textcolor{comment}{//\ Starts\ capturing\ stdout.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01055}01055\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetesting_1_1internal_acba06d4f0343dec407738ba5544af990}{CaptureStdout}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01056}01056\ \ \ CaptureStream(\mbox{\hyperlink{namespacetesting_1_1internal_a24f0a3d50cac54a9132f4828ec9b96d9}{kStdOutFileno}},\ \textcolor{stringliteral}{"{}stdout"{}},\ \&g\_captured\_stdout);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01057}01057\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01058}01058\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01059}01059\ \textcolor{comment}{//\ Starts\ capturing\ stderr.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01060}01060\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetesting_1_1internal_a8ec00d458d0d442bd64af7b5f9c22dda}{CaptureStderr}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01061}01061\ \ \ CaptureStream(\mbox{\hyperlink{namespacetesting_1_1internal_a747eccfdbdee3ff8af3bedc476a57c85}{kStdErrFileno}},\ \textcolor{stringliteral}{"{}stderr"{}},\ \&g\_captured\_stderr);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01062}01062\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01063}01063\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01064}01064\ \textcolor{comment}{//\ Stops\ capturing\ stdout\ and\ returns\ the\ captured\ string.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01065}01065\ std::string\ \mbox{\hyperlink{namespacetesting_1_1internal_aed657219a9856a8d249a3230de0c54ce}{GetCapturedStdout}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01066}01066\ \ \ \textcolor{keywordflow}{return}\ GetCapturedStream(\&g\_captured\_stdout);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01067}01067\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01068}01068\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01069}01069\ \textcolor{comment}{//\ Stops\ capturing\ stderr\ and\ returns\ the\ captured\ string.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01070}01070\ std::string\ \mbox{\hyperlink{namespacetesting_1_1internal_a374156401da17704099d0c33fa53adfb}{GetCapturedStderr}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01071}01071\ \ \ \textcolor{keywordflow}{return}\ GetCapturedStream(\&g\_captured\_stderr);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01072}01072\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01073}01073\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01074}01074\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_HAS\_STREAM\_REDIRECTION}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01075}01075\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01076}01076\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01077}01077\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01078}01078\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01079}01079\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01080}\mbox{\hyperlink{namespacetesting_1_1internal_a06ca3f65f5e85c9ce7299b9e4cd52408}{01080}}\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{namespacetesting_1_1internal_a06ca3f65f5e85c9ce7299b9e4cd52408}{GetFileSize}}(FILE*\ file)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01081}01081\ \ \ fseek(file,\ 0,\ SEEK\_END);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01082}01082\ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(ftell(file));}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01083}01083\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01084}01084\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01085}\mbox{\hyperlink{namespacetesting_1_1internal_a2cc0be60c54a8701423fe5297e1349ee}{01085}}\ std::string\ \mbox{\hyperlink{namespacetesting_1_1internal_a2cc0be60c54a8701423fe5297e1349ee}{ReadEntireFile}}(FILE*\ file)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01086}01086\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ file\_size\ =\ \mbox{\hyperlink{namespacetesting_1_1internal_a06ca3f65f5e85c9ce7299b9e4cd52408}{GetFileSize}}(file);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01087}01087\ \ \ \textcolor{keywordtype}{char}*\ \textcolor{keyword}{const}\ buffer\ =\ \textcolor{keyword}{new}\ \textcolor{keywordtype}{char}[file\_size];}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01088}01088\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01089}01089\ \ \ \textcolor{keywordtype}{size\_t}\ bytes\_last\_read\ =\ 0;\ \ \textcolor{comment}{//\ \#\ of\ bytes\ read\ in\ the\ last\ fread()}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01090}01090\ \ \ \textcolor{keywordtype}{size\_t}\ bytes\_read\ =\ 0;\ \ \ \ \ \ \ \textcolor{comment}{//\ \#\ of\ bytes\ read\ so\ far}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01091}01091\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01092}01092\ \ \ fseek(file,\ 0,\ SEEK\_SET);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01093}01093\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01094}01094\ \ \ \textcolor{comment}{//\ Keeps\ reading\ the\ file\ until\ we\ cannot\ read\ further\ or\ the}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01095}01095\ \ \ \textcolor{comment}{//\ pre-\/determined\ file\ size\ is\ reached.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01096}01096\ \ \ \textcolor{keywordflow}{do}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01097}01097\ \ \ \ \ bytes\_last\_read\ =\ fread(buffer+bytes\_read,\ 1,\ file\_size-\/bytes\_read,\ file);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01098}01098\ \ \ \ \ bytes\_read\ +=\ bytes\_last\_read;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01099}01099\ \ \ \}\ \textcolor{keywordflow}{while}\ (bytes\_last\_read\ >\ 0\ \&\&\ bytes\_read\ <\ file\_size);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01100}01100\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01101}01101\ \ \ \textcolor{keyword}{const}\ std::string\ content(buffer,\ bytes\_read);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01102}01102\ \ \ \textcolor{keyword}{delete}[]\ buffer;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01103}01103\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01104}01104\ \ \ \textcolor{keywordflow}{return}\ content;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01105}01105\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01106}01106\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01107}01107\ \textcolor{preprocessor}{\#if\ GTEST\_HAS\_DEATH\_TEST}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01108}01108\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ std::vector<std::string>*\ g\_injected\_test\_argvs\ =\ NULL;\ \ \textcolor{comment}{//\ Owned.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01109}01109\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01110}01110\ std::vector<std::string>\ GetInjectableArgvs()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01111}01111\ \ \ \textcolor{keywordflow}{if}\ (g\_injected\_test\_argvs\ !=\ NULL)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01112}01112\ \ \ \ \ \textcolor{keywordflow}{return}\ *g\_injected\_test\_argvs;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01113}01113\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01114}01114\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetesting_1_1internal_a9608256c67f889006be44912e57e3d4f}{GetArgvs}}();}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01115}01115\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01116}01116\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01117}01117\ \textcolor{keywordtype}{void}\ SetInjectableArgvs(\textcolor{keyword}{const}\ std::vector<std::string>*\ new\_argvs)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01118}01118\ \ \ \textcolor{keywordflow}{if}\ (g\_injected\_test\_argvs\ !=\ new\_argvs)\ \textcolor{keyword}{delete}\ g\_injected\_test\_argvs;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01119}01119\ \ \ g\_injected\_test\_argvs\ =\ new\_argvs;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01120}01120\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01121}01121\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01122}01122\ \textcolor{keywordtype}{void}\ SetInjectableArgvs(\textcolor{keyword}{const}\ std::vector<std::string>\&\ new\_argvs)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01123}01123\ \ \ SetInjectableArgvs(}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01124}01124\ \ \ \ \ \ \ \textcolor{keyword}{new}\ std::vector<std::string>(new\_argvs.begin(),\ new\_argvs.end()));}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01125}01125\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01126}01126\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01127}01127\ \textcolor{preprocessor}{\#if\ GTEST\_HAS\_GLOBAL\_STRING}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01128}01128\ \textcolor{keywordtype}{void}\ SetInjectableArgvs(\textcolor{keyword}{const}\ std::vector<\ ::string>\&\ new\_argvs)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01129}01129\ \ \ SetInjectableArgvs(}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01130}01130\ \ \ \ \ \ \ \textcolor{keyword}{new}\ std::vector<std::string>(new\_argvs.begin(),\ new\_argvs.end()));}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01131}01131\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01132}01132\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_HAS\_GLOBAL\_STRING}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01133}01133\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01134}01134\ \textcolor{keywordtype}{void}\ ClearInjectableArgvs()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01135}01135\ \ \ \textcolor{keyword}{delete}\ g\_injected\_test\_argvs;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01136}01136\ \ \ g\_injected\_test\_argvs\ =\ NULL;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01137}01137\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01138}01138\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_HAS\_DEATH\_TEST}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01139}01139\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01140}01140\ \textcolor{preprocessor}{\#if\ GTEST\_OS\_WINDOWS\_MOBILE}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01141}01141\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetesting_1_1internal_1_1posix}{posix}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01142}01142\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetesting_1_1internal_1_1posix_a69b8278c59359dd6a6f941b4643db9fb}{Abort}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01143}01143\ \ \ DebugBreak();}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01144}01144\ \ \ TerminateProcess(GetCurrentProcess(),\ 1);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01145}01145\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01146}01146\ \}\ \ \textcolor{comment}{//\ namespace\ posix}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01147}01147\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_OS\_WINDOWS\_MOBILE}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01148}01148\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01149}01149\ \textcolor{comment}{//\ Returns\ the\ name\ of\ the\ environment\ variable\ corresponding\ to\ the}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01150}01150\ \textcolor{comment}{//\ given\ flag.\ \ For\ example,\ FlagToEnvVar("{}foo"{})\ will\ return}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01151}01151\ \textcolor{comment}{//\ "{}GTEST\_FOO"{}\ in\ the\ open-\/source\ version.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01152}01152\ \textcolor{keyword}{static}\ std::string\ FlagToEnvVar(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ flag)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01153}01153\ \ \ \textcolor{keyword}{const}\ std::string\ full\_flag\ =}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01154}01154\ \ \ \ \ \ \ (Message()\ <<\ \mbox{\hyperlink{gtest-port_8h_a088e84784c589ba9b1fc48602ad8eabf}{GTEST\_FLAG\_PREFIX\_}}\ <<\ flag).GetString();}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01155}01155\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01156}01156\ \ \ Message\ env\_var;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01157}01157\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ !=\ full\_flag.length();\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01158}01158\ \ \ \ \ env\_var\ <<\ \mbox{\hyperlink{namespacetesting_1_1internal_ac1b876a8133895bd553d4780ecaa1e3a}{ToUpper}}(full\_flag.c\_str()[i]);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01159}01159\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01160}01160\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01161}01161\ \ \ \textcolor{keywordflow}{return}\ env\_var.GetString();}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01162}01162\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01163}01163\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01164}01164\ \textcolor{comment}{//\ Parses\ 'str'\ for\ a\ 32-\/bit\ signed\ integer.\ \ If\ successful,\ writes}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01165}01165\ \textcolor{comment}{//\ the\ result\ to\ *value\ and\ returns\ true;\ otherwise\ leaves\ *value}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01166}01166\ \textcolor{comment}{//\ unchanged\ and\ returns\ false.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01167}\mbox{\hyperlink{namespacetesting_1_1internal_ac06fc81336a3d80755f4020d34321766}{01167}}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacetesting_1_1internal_ac06fc81336a3d80755f4020d34321766}{ParseInt32}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1_message}{Message}}\&\ src\_text,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ str,\ \mbox{\hyperlink{namespacetesting_1_1internal_a8ee38faaf875f133358abaf9bc056cec}{Int32}}*\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01168}01168\ \ \ \textcolor{comment}{//\ Parses\ the\ environment\ variable\ as\ a\ decimal\ integer.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01169}01169\ \ \ \textcolor{keywordtype}{char}*\ end\ =\ NULL;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01170}01170\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{long}\ long\_value\ =\ strtol(str,\ \&end,\ 10);\ \ \textcolor{comment}{//\ NOLINT}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01171}01171\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01172}01172\ \ \ \textcolor{comment}{//\ Has\ strtol()\ consumed\ all\ characters\ in\ the\ string?}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01173}01173\ \ \ \textcolor{keywordflow}{if}\ (*end\ !=\ \textcolor{charliteral}{'\(\backslash\)0'})\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01174}01174\ \ \ \ \ \textcolor{comment}{//\ No\ -\/\ an\ invalid\ character\ was\ encountered.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01175}01175\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1_message}{Message}}\ msg;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01176}01176\ \ \ \ \ msg\ <<\ \textcolor{stringliteral}{"{}WARNING:\ "{}}\ <<\ src\_text}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01177}01177\ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\ is\ expected\ to\ be\ a\ 32-\/bit\ integer,\ but\ actually"{}}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01178}01178\ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\ has\ value\ \(\backslash\)"{}"{}}\ <<\ str\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)"{}.\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01179}01179\ \ \ \ \ printf(\textcolor{stringliteral}{"{}\%s"{}},\ msg.\mbox{\hyperlink{classtesting_1_1_message_a2cdc4df62bdcc9df37651a1cf527704e}{GetString}}().c\_str());}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01180}01180\ \ \ \ \ fflush(stdout);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01181}01181\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01182}01182\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01183}01183\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01184}01184\ \ \ \textcolor{comment}{//\ Is\ the\ parsed\ value\ in\ the\ range\ of\ an\ Int32?}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01185}01185\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacetesting_1_1internal_a8ee38faaf875f133358abaf9bc056cec}{Int32}}\ result\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{namespacetesting_1_1internal_a8ee38faaf875f133358abaf9bc056cec}{Int32}}\textcolor{keyword}{>}(long\_value);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01186}01186\ \ \ \textcolor{keywordflow}{if}\ (long\_value\ ==\ LONG\_MAX\ ||\ long\_value\ ==\ LONG\_MIN\ ||}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01187}01187\ \ \ \ \ \ \ \textcolor{comment}{//\ The\ parsed\ value\ overflows\ as\ a\ long.\ \ (strtol()\ returns}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01188}01188\ \ \ \ \ \ \ \textcolor{comment}{//\ LONG\_MAX\ or\ LONG\_MIN\ when\ the\ input\ overflows.)}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01189}01189\ \ \ \ \ \ \ result\ !=\ long\_value}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01190}01190\ \ \ \ \ \ \ \textcolor{comment}{//\ The\ parsed\ value\ overflows\ as\ an\ Int32.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01191}01191\ \ \ \ \ \ \ )\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01192}01192\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1_message}{Message}}\ msg;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01193}01193\ \ \ \ \ msg\ <<\ \textcolor{stringliteral}{"{}WARNING:\ "{}}\ <<\ src\_text}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01194}01194\ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\ is\ expected\ to\ be\ a\ 32-\/bit\ integer,\ but\ actually"{}}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01195}01195\ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\ has\ value\ "{}}\ <<\ str\ <<\ \textcolor{stringliteral}{"{},\ which\ overflows.\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01196}01196\ \ \ \ \ printf(\textcolor{stringliteral}{"{}\%s"{}},\ msg.\mbox{\hyperlink{classtesting_1_1_message_a2cdc4df62bdcc9df37651a1cf527704e}{GetString}}().c\_str());}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01197}01197\ \ \ \ \ fflush(stdout);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01198}01198\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01199}01199\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01200}01200\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01201}01201\ \ \ *\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ =\ result;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01202}01202\ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01203}01203\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01204}01204\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01205}01205\ \textcolor{comment}{//\ Reads\ and\ returns\ the\ Boolean\ environment\ variable\ corresponding\ to}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01206}01206\ \textcolor{comment}{//\ the\ given\ flag;\ if\ it's\ not\ set,\ returns\ default\_value.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01207}01207\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01208}01208\ \textcolor{comment}{//\ The\ value\ is\ considered\ true\ iff\ it's\ not\ "{}0"{}.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01209}\mbox{\hyperlink{namespacetesting_1_1internal_a67132cdce23fb71b6c38ee34ef81eb4c}{01209}}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacetesting_1_1internal_a67132cdce23fb71b6c38ee34ef81eb4c}{BoolFromGTestEnv}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ flag,\ \textcolor{keywordtype}{bool}\ default\_value)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01210}01210\ \textcolor{preprocessor}{\#if\ defined(GTEST\_GET\_BOOL\_FROM\_ENV\_)}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01211}01211\ \ \ \textcolor{keywordflow}{return}\ GTEST\_GET\_BOOL\_FROM\_ENV\_(flag,\ default\_value);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01212}01212\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01213}01213\ \ \ \textcolor{keyword}{const}\ std::string\ env\_var\ =\ FlagToEnvVar(flag);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01214}01214\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \textcolor{keyword}{const}\ string\_value\ =\ \mbox{\hyperlink{namespacetesting_1_1internal_1_1posix_aa78973d3f7aa4efd24742b0537c8cd50}{posix::GetEnv}}(env\_var.c\_str());}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01215}01215\ \ \ \textcolor{keywordflow}{return}\ string\_value\ ==\ NULL\ ?}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01216}01216\ \ \ \ \ \ \ default\_value\ :\ strcmp(string\_value,\ \textcolor{stringliteral}{"{}0"{}})\ !=\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01217}01217\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ defined(GTEST\_GET\_BOOL\_FROM\_ENV\_)}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01218}01218\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01219}01219\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01220}01220\ \textcolor{comment}{//\ Reads\ and\ returns\ a\ 32-\/bit\ integer\ stored\ in\ the\ environment}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01221}01221\ \textcolor{comment}{//\ variable\ corresponding\ to\ the\ given\ flag;\ if\ it\ isn't\ set\ or}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01222}01222\ \textcolor{comment}{//\ doesn't\ represent\ a\ valid\ 32-\/bit\ integer,\ returns\ default\_value.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01223}\mbox{\hyperlink{namespacetesting_1_1internal_a0f7e728793f9e6cb0aa2b69eaa468bf3}{01223}}\ \mbox{\hyperlink{namespacetesting_1_1internal_a8ee38faaf875f133358abaf9bc056cec}{Int32}}\ \mbox{\hyperlink{namespacetesting_1_1internal_a0f7e728793f9e6cb0aa2b69eaa468bf3}{Int32FromGTestEnv}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ flag,\ \mbox{\hyperlink{namespacetesting_1_1internal_a8ee38faaf875f133358abaf9bc056cec}{Int32}}\ default\_value)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01224}01224\ \textcolor{preprocessor}{\#if\ defined(GTEST\_GET\_INT32\_FROM\_ENV\_)}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01225}01225\ \ \ \textcolor{keywordflow}{return}\ GTEST\_GET\_INT32\_FROM\_ENV\_(flag,\ default\_value);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01226}01226\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01227}01227\ \ \ \textcolor{keyword}{const}\ std::string\ env\_var\ =\ FlagToEnvVar(flag);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01228}01228\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \textcolor{keyword}{const}\ string\_value\ =\ \mbox{\hyperlink{namespacetesting_1_1internal_1_1posix_aa78973d3f7aa4efd24742b0537c8cd50}{posix::GetEnv}}(env\_var.c\_str());}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01229}01229\ \ \ \textcolor{keywordflow}{if}\ (string\_value\ ==\ NULL)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01230}01230\ \ \ \ \ \textcolor{comment}{//\ The\ environment\ variable\ is\ not\ set.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01231}01231\ \ \ \ \ \textcolor{keywordflow}{return}\ default\_value;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01232}01232\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01233}01233\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01234}01234\ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a8ee38faaf875f133358abaf9bc056cec}{Int32}}\ result\ =\ default\_value;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01235}01235\ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{namespacetesting_1_1internal_ac06fc81336a3d80755f4020d34321766}{ParseInt32}}(\mbox{\hyperlink{classtesting_1_1_message}{Message}}()\ <<\ \textcolor{stringliteral}{"{}Environment\ variable\ "{}}\ <<\ env\_var,}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01236}01236\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ string\_value,\ \&result))\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01237}01237\ \ \ \ \ printf(\textcolor{stringliteral}{"{}The\ default\ value\ \%s\ is\ used.\(\backslash\)n"{}},}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01238}01238\ \ \ \ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{classtesting_1_1_message}{Message}}()\ <<\ default\_value).GetString().c\_str());}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01239}01239\ \ \ \ \ fflush(stdout);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01240}01240\ \ \ \ \ \textcolor{keywordflow}{return}\ default\_value;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01241}01241\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01242}01242\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01243}01243\ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01244}01244\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ defined(GTEST\_GET\_INT32\_FROM\_ENV\_)}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01245}01245\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01246}01246\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01247}01247\ \textcolor{comment}{//\ As\ a\ special\ case\ for\ the\ 'output'\ flag,\ if\ GTEST\_OUTPUT\ is\ not}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01248}01248\ \textcolor{comment}{//\ set,\ we\ look\ for\ XML\_OUTPUT\_FILE,\ which\ is\ set\ by\ the\ Bazel\ build}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01249}01249\ \textcolor{comment}{//\ system.\ \ The\ value\ of\ XML\_OUTPUT\_FILE\ is\ a\ filename\ without\ the}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01250}01250\ \textcolor{comment}{//\ "{}xml:"{}\ prefix\ of\ GTEST\_OUTPUT.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01251}01251\ \textcolor{comment}{//\ Note\ that\ this\ is\ meant\ to\ be\ called\ at\ the\ call\ site\ so\ it\ does}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01252}01252\ \textcolor{comment}{//\ not\ check\ that\ the\ flag\ is\ 'output'}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01253}01253\ \textcolor{comment}{//\ In\ essence\ this\ checks\ an\ env\ variable\ called\ XML\_OUTPUT\_FILE}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01254}01254\ \textcolor{comment}{//\ and\ if\ it\ is\ set\ we\ prepend\ "{}xml:"{}\ to\ its\ value,\ if\ it\ not\ set\ we\ return\ "{}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01255}\mbox{\hyperlink{namespacetesting_1_1internal_a0c793c6d84760d900299916c077a1af4}{01255}}\ std::string\ \mbox{\hyperlink{namespacetesting_1_1internal_a0c793c6d84760d900299916c077a1af4}{OutputFlagAlsoCheckEnvVar}}()\{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01256}01256\ \ \ std::string\ default\_value\_for\_output\_flag\ =\ \textcolor{stringliteral}{"{}"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01257}01257\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ xml\_output\_file\_env\ =\ \mbox{\hyperlink{namespacetesting_1_1internal_1_1posix_aa78973d3f7aa4efd24742b0537c8cd50}{posix::GetEnv}}(\textcolor{stringliteral}{"{}XML\_OUTPUT\_FILE"{}});}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01258}01258\ \ \ \textcolor{keywordflow}{if}\ (NULL\ !=\ xml\_output\_file\_env)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01259}01259\ \ \ \ \ default\_value\_for\_output\_flag\ =\ std::string(\textcolor{stringliteral}{"{}xml:"{}})\ +\ xml\_output\_file\_env;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01260}01260\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01261}01261\ \ \ \textcolor{keywordflow}{return}\ default\_value\_for\_output\_flag;}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01262}01262\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01263}01263\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01264}01264\ \textcolor{comment}{//\ Reads\ and\ returns\ the\ string\ environment\ variable\ corresponding\ to}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01265}01265\ \textcolor{comment}{//\ the\ given\ flag;\ if\ it's\ not\ set,\ returns\ default\_value.}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01266}\mbox{\hyperlink{namespacetesting_1_1internal_a7ed785df46a339403b0f749d3a879201}{01266}}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{namespacetesting_1_1internal_a7ed785df46a339403b0f749d3a879201}{StringFromGTestEnv}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ flag,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ default\_value)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01267}01267\ \textcolor{preprocessor}{\#if\ defined(GTEST\_GET\_STRING\_FROM\_ENV\_)}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01268}01268\ \ \ \textcolor{keywordflow}{return}\ GTEST\_GET\_STRING\_FROM\_ENV\_(flag,\ default\_value);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01269}01269\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01270}01270\ \ \ \textcolor{keyword}{const}\ std::string\ env\_var\ =\ FlagToEnvVar(flag);}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01271}01271\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \textcolor{keyword}{const}\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ =\ \mbox{\hyperlink{namespacetesting_1_1internal_1_1posix_aa78973d3f7aa4efd24742b0537c8cd50}{posix::GetEnv}}(env\_var.c\_str());}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01272}01272\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ ==\ NULL\ ?\ default\_value\ :\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}};}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01273}01273\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ defined(GTEST\_GET\_STRING\_FROM\_ENV\_)}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01274}01274\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01275}01275\ }
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01276}01276\ \}\ \ \textcolor{comment}{//\ namespace\ internal}}
+\DoxyCodeLine{\Hypertarget{gtest-port_8cc_source_l01277}01277\ \}\ \ \textcolor{comment}{//\ namespace\ testing}}
+
+\end{DoxyCode}

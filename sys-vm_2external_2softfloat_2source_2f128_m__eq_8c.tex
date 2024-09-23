@@ -1,0 +1,86 @@
+\doxysection{libraries/sys-\/vm/external/softfloat/source/f128\+M\+\_\+eq.c File Reference}
+\hypertarget{sys-vm_2external_2softfloat_2source_2f128_m__eq_8c}{}\label{sys-vm_2external_2softfloat_2source_2f128_m__eq_8c}\index{libraries/sys-\/vm/external/softfloat/source/f128M\_eq.c@{libraries/sys-\/vm/external/softfloat/source/f128M\_eq.c}}
+{\ttfamily \#include $<$stdbool.\+h$>$}\newline
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include "{}platform.\+h"{}}\newline
+{\ttfamily \#include "{}internals.\+h"{}}\newline
+{\ttfamily \#include "{}specialize.\+h"{}}\newline
+{\ttfamily \#include "{}softfloat.\+h"{}}\newline
+Include dependency graph for f128\+M\+\_\+eq.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sys-vm_2external_2softfloat_2source_2f128_m__eq_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2f128_m__eq_8c_af78d1f12da217250d9b7a813768139f3}{f128\+M\+\_\+eq}} (const \mbox{\hyperlink{structfloat128__t}{float128\+\_\+t}} \texorpdfstring{$\ast$}{*}a\+Ptr, const \mbox{\hyperlink{structfloat128__t}{float128\+\_\+t}} \texorpdfstring{$\ast$}{*}b\+Ptr)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{sys-vm_2external_2softfloat_2source_2f128_m__eq_8c_af78d1f12da217250d9b7a813768139f3}\index{f128M\_eq.c@{f128M\_eq.c}!f128M\_eq@{f128M\_eq}}
+\index{f128M\_eq@{f128M\_eq}!f128M\_eq.c@{f128M\_eq.c}}
+\doxysubsubsection{\texorpdfstring{f128M\_eq()}{f128M\_eq()}}
+{\footnotesize\ttfamily \label{sys-vm_2external_2softfloat_2source_2f128_m__eq_8c_af78d1f12da217250d9b7a813768139f3} 
+bool f128\+M\+\_\+eq (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structfloat128__t}{float128\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{a\+Ptr}{, }\item[{const \mbox{\hyperlink{structfloat128__t}{float128\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{b\+Ptr}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2f128_m__eq_8c_source_l00055}{55}} of file \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2f128_m__eq_8c_source}{f128\+M\+\_\+eq.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00056\ \{}
+\DoxyCodeLine{00057\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ *aWPtr,\ *bWPtr;}
+\DoxyCodeLine{00058\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ wordA,\ wordB,\ uiA96,\ uiB96;}
+\DoxyCodeLine{00059\ \ \ \ \ \textcolor{keywordtype}{bool}\ possibleOppositeZeros;}
+\DoxyCodeLine{00060\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ mashWord;}
+\DoxyCodeLine{00061\ }
+\DoxyCodeLine{00062\ \ \ \ \ aWPtr\ =\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ *)\ aPtr;}
+\DoxyCodeLine{00063\ \ \ \ \ bWPtr\ =\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ *)\ bPtr;}
+\DoxyCodeLine{00064\ \ \ \ \ wordA\ =\ aWPtr[\mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a49446dd1193996f92b1e5bb62eaa4689}{indexWord}}(\ 4,\ 2\ )];}
+\DoxyCodeLine{00065\ \ \ \ \ wordB\ =\ bWPtr[\mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a49446dd1193996f92b1e5bb62eaa4689}{indexWord}}(\ 4,\ 2\ )];}
+\DoxyCodeLine{00066\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ wordA\ !=\ wordB\ )\ \textcolor{keywordflow}{goto}\ false\_checkSigNaNs;}
+\DoxyCodeLine{00067\ \ \ \ \ uiA96\ =\ aWPtr[\mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_aa3af452dd34ad7a607f4ad31c234fda7}{indexWordHi}}(\ 4\ )];}
+\DoxyCodeLine{00068\ \ \ \ \ uiB96\ =\ bWPtr[\mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_aa3af452dd34ad7a607f4ad31c234fda7}{indexWordHi}}(\ 4\ )];}
+\DoxyCodeLine{00069\ \ \ \ \ possibleOppositeZeros\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00070\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ uiA96\ !=\ uiB96\ )\ \{}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ possibleOppositeZeros\ =\ (((uiA96\ |\ uiB96)\ \&\ 0x7FFFFFFF)\ ==\ 0);}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ !\ possibleOppositeZeros\ )\ \textcolor{keywordflow}{goto}\ false\_checkSigNaNs;}
+\DoxyCodeLine{00073\ \ \ \ \ \}}
+\DoxyCodeLine{00074\ \ \ \ \ mashWord\ =\ wordA\ |\ wordB;}
+\DoxyCodeLine{00075\ \ \ \ \ wordA\ =\ aWPtr[\mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a49446dd1193996f92b1e5bb62eaa4689}{indexWord}}(\ 4,\ 1\ )];}
+\DoxyCodeLine{00076\ \ \ \ \ wordB\ =\ bWPtr[\mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a49446dd1193996f92b1e5bb62eaa4689}{indexWord}}(\ 4,\ 1\ )];}
+\DoxyCodeLine{00077\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ wordA\ !=\ wordB\ )\ \textcolor{keywordflow}{goto}\ false\_checkSigNaNs;}
+\DoxyCodeLine{00078\ \ \ \ \ mashWord\ |=\ wordA\ |\ wordB;}
+\DoxyCodeLine{00079\ \ \ \ \ wordA\ =\ aWPtr[\mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a49446dd1193996f92b1e5bb62eaa4689}{indexWord}}(\ 4,\ 0\ )];}
+\DoxyCodeLine{00080\ \ \ \ \ wordB\ =\ bWPtr[\mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a49446dd1193996f92b1e5bb62eaa4689}{indexWord}}(\ 4,\ 0\ )];}
+\DoxyCodeLine{00081\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ wordA\ !=\ wordB\ )\ \textcolor{keywordflow}{goto}\ false\_checkSigNaNs;}
+\DoxyCodeLine{00082\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ possibleOppositeZeros\ \&\&\ ((mashWord\ |\ wordA\ |\ wordB)\ !=\ 0)\ )\ \{}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ false\_checkSigNaNs;}
+\DoxyCodeLine{00084\ \ \ \ \ \}}
+\DoxyCodeLine{00085\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ !\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a20b9dda0624f400a1cffd66ac207e165}{softfloat\_isNaNF128M}}(\ aWPtr\ )\ \&\&\ !\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a20b9dda0624f400a1cffd66ac207e165}{softfloat\_isNaNF128M}}(\ bWPtr\ )\ )\ \{}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00087\ \ \ \ \ \}}
+\DoxyCodeLine{00088\ \ false\_checkSigNaNs:}
+\DoxyCodeLine{00089\ \ \ \ \ \textcolor{keywordflow}{if}\ (}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2f128_m__is_signaling_na_n_8c_a641033e2d5605286e9cdd3e0bf651cb9}{f128M\_isSignalingNaN}}(\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{structfloat128__t}{float128\_t}}\ *)\ aWPtr\ )}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ ||\ \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2f128_m__is_signaling_na_n_8c_a641033e2d5605286e9cdd3e0bf651cb9}{f128M\_isSignalingNaN}}(\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{structfloat128__t}{float128\_t}}\ *)\ bWPtr\ )}
+\DoxyCodeLine{00092\ \ \ \ \ )\ \{}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2softfloat__raise_flags_8c_ac16bbf09eca0fe8ff91301d82c5a667f}{softfloat\_raiseFlags}}(\ \mbox{\hyperlink{softfloat_2source_2include_2softfloat_8h_a56a0f36da7f9eaaf54bd05cc2bf49173a191f069090c3d33752fb728272d9a4a9}{softfloat\_flag\_invalid}}\ );}
+\DoxyCodeLine{00094\ \ \ \ \ \}}
+\DoxyCodeLine{00095\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00096\ }
+\DoxyCodeLine{00097\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=291pt]{sys-vm_2external_2softfloat_2source_2f128_m__eq_8c_af78d1f12da217250d9b7a813768139f3_cgraph}
+\end{center}
+\end{figure}

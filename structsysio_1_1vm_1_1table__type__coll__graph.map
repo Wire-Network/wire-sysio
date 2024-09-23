@@ -1,0 +1,10 @@
+<map id="sysio::vm::table_type" name="sysio::vm::table_type">
+<area shape="rect" id="Node000001" title=" " alt="" coords="57,199,204,225"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1vm_1_1resizable__limits.html" title=" " alt="" coords="5,95,144,136"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="96,148,126,197,121,200,92,151"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1vm_1_1managed__vector.html" title=" " alt="" coords="168,95,307,136"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="206,148,146,201,142,197,202,144"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1vm_1_1detail_1_1vector.html" title=" " alt="" coords="144,5,330,46"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="231,61,232,95,227,95,226,62"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="249,62,247,95,242,95,243,61"/>
+</map>

@@ -1,0 +1,8 @@
+<map id="sysio::testing::base_tester::get_currency_balance" name="sysio::testing::base_tester::get_currency_balance">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,39,150,95"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1chain_1_1symbol.html#ac5a46c10b3921f2eebe29ec7a53cb9c5" title=" " alt="" coords="198,5,339,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="149,49,181,42,183,47,151,54"/>
+<area shape="rect" id="Node000003" href="$namespacefc_1_1raw.html#a0b442d98ceb22dd5a6ae84745e43ffab" title=" " alt="" coords="213,94,324,120"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="151,80,198,90,197,95,149,85"/>
+<area shape="poly" id="edge3_Node000003_Node000003" title=" " alt="" coords="236,95,230,86,234,76,247,70,268,68,291,70,303,77,301,81,290,75,268,73,248,75,238,80,235,85,241,92"/>
+</map>

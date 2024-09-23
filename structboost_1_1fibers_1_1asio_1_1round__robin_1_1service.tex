@@ -1,0 +1,170 @@
+\doxysection{boost\+::fibers\+::asio\+::round\+\_\+robin\+::service Struct Reference}
+\hypertarget{structboost_1_1fibers_1_1asio_1_1round__robin_1_1service}{}\label{structboost_1_1fibers_1_1asio_1_1round__robin_1_1service}\index{boost::fibers::asio::round\_robin::service@{boost::fibers::asio::round\_robin::service}}
+
+
+{\ttfamily \#include $<$round\+\_\+robin.\+hpp$>$}
+
+
+
+Inheritance diagram for boost\+::fibers\+::asio\+::round\+\_\+robin\+::service\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=194pt]{structboost_1_1fibers_1_1asio_1_1round__robin_1_1service__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for boost\+::fibers\+::asio\+::round\+\_\+robin\+::service\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=194pt]{structboost_1_1fibers_1_1asio_1_1round__robin_1_1service__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structboost_1_1fibers_1_1asio_1_1round__robin_1_1service_a5a70b1f98352210c028ec6c7b0b4c551}{service}} (boost\+::asio\+::io\+\_\+service \&io\+\_\+svc)
+\item 
+virtual \mbox{\hyperlink{structboost_1_1fibers_1_1asio_1_1round__robin_1_1service_af928978e12c73a234d8db3a64196698a}{\texorpdfstring{$\sim$}{\string~}service}} ()
+\item 
+\mbox{\hyperlink{structboost_1_1fibers_1_1asio_1_1round__robin_1_1service_ab91aa937da14f49271578bbe5f29f2c3}{service}} (\mbox{\hyperlink{structboost_1_1fibers_1_1asio_1_1round__robin_1_1service}{service}} const \&)=delete
+\item 
+\mbox{\hyperlink{structboost_1_1fibers_1_1asio_1_1round__robin_1_1service}{service}} \& \mbox{\hyperlink{structboost_1_1fibers_1_1asio_1_1round__robin_1_1service_aad5d5e65b36f00866e6d164569fa81ff}{operator=}} (\mbox{\hyperlink{structboost_1_1fibers_1_1asio_1_1round__robin_1_1service}{service}} const \&)=delete
+\item 
+void \mbox{\hyperlink{structboost_1_1fibers_1_1asio_1_1round__robin_1_1service_a627fd1ef2f8de4047e825d7077751fa8}{shutdown\+\_\+service}} () override final
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::unique\+\_\+ptr$<$ boost\+::asio\+::io\+\_\+service\+::work $>$ \mbox{\hyperlink{structboost_1_1fibers_1_1asio_1_1round__robin_1_1service_ab3ee3b26155151605450e8b9020747c0}{work\+\_\+}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static boost\+::asio\+::io\+\_\+service\+::id \mbox{\hyperlink{structboost_1_1fibers_1_1asio_1_1round__robin_1_1service_a6f248abcf76ef404a9c804fbcaa4852c}{id}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{round__robin_8hpp_source_l00047}{47}} of file \mbox{\hyperlink{round__robin_8hpp_source}{round\+\_\+robin.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structboost_1_1fibers_1_1asio_1_1round__robin_1_1service_a5a70b1f98352210c028ec6c7b0b4c551}\index{boost::fibers::asio::round\_robin::service@{boost::fibers::asio::round\_robin::service}!service@{service}}
+\index{service@{service}!boost::fibers::asio::round\_robin::service@{boost::fibers::asio::round\_robin::service}}
+\doxysubsubsection{\texorpdfstring{service()}{service()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structboost_1_1fibers_1_1asio_1_1round__robin_1_1service_a5a70b1f98352210c028ec6c7b0b4c551} 
+boost\+::fibers\+::asio\+::round\+\_\+robin\+::service\+::service (\begin{DoxyParamCaption}\item[{boost\+::asio\+::io\+\_\+service \&}]{io\+\_\+svc}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{round__robin_8hpp_source_l00052}{52}} of file \mbox{\hyperlink{round__robin_8hpp_source}{round\+\_\+robin.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \ boost::asio::io\_service::service(\ io\_svc),}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structboost_1_1fibers_1_1asio_1_1round__robin_1_1service_ab3ee3b26155151605450e8b9020747c0}{work\_}}\{\ \textcolor{keyword}{new}\ boost::asio::io\_service::work(\ io\_svc)\ \}\ \{}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \ \ \ io\_svc.post([\&io\_svc]()\{}
+\DoxyCodeLine{00056\ \textcolor{comment}{//]}}
+\DoxyCodeLine{00057\ \textcolor{comment}{//[asio\_rr\_service\_lambda}}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (\ !\ io\_svc.stopped()\ )\ \{}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ boost::fibers::has\_ready\_fibers()\ )\ \{}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ run\ all\ pending\ handlers\ in\ round\_robin}}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (\ io\_svc.poll()\ );}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ run\ pending\ (ready)\ fibers}}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ this\_fiber::yield();}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ run\ one\ handler\ inside\ io\_service}}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ if\ no\ handler\ available,\ block\ this\ thread}}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ !\ io\_svc.run\_one()\ )\ \{}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00072\ \textcolor{comment}{//]}}
+\DoxyCodeLine{00073\ \textcolor{comment}{//[asio\_rr\_service\_bottom}}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structboost_1_1fibers_1_1asio_1_1round__robin_1_1service_af928978e12c73a234d8db3a64196698a}\index{boost::fibers::asio::round\_robin::service@{boost::fibers::asio::round\_robin::service}!````~service@{\texorpdfstring{$\sim$}{\string~}service}}
+\index{````~service@{\texorpdfstring{$\sim$}{\string~}service}!boost::fibers::asio::round\_robin::service@{boost::fibers::asio::round\_robin::service}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}service()}{\string~service()}}
+{\footnotesize\ttfamily \label{structboost_1_1fibers_1_1asio_1_1round__robin_1_1service_af928978e12c73a234d8db3a64196698a} 
+virtual boost\+::fibers\+::asio\+::round\+\_\+robin\+::service\+::\texorpdfstring{$\sim$}{\string~}service (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{round__robin_8hpp_source_l00077}{77}} of file \mbox{\hyperlink{round__robin_8hpp_source}{round\+\_\+robin.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00077\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{structboost_1_1fibers_1_1asio_1_1round__robin_1_1service_ab91aa937da14f49271578bbe5f29f2c3}\index{boost::fibers::asio::round\_robin::service@{boost::fibers::asio::round\_robin::service}!service@{service}}
+\index{service@{service}!boost::fibers::asio::round\_robin::service@{boost::fibers::asio::round\_robin::service}}
+\doxysubsubsection{\texorpdfstring{service()}{service()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structboost_1_1fibers_1_1asio_1_1round__robin_1_1service_ab91aa937da14f49271578bbe5f29f2c3} 
+boost\+::fibers\+::asio\+::round\+\_\+robin\+::service\+::service (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structboost_1_1fibers_1_1asio_1_1round__robin_1_1service}{service}} const \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [delete]}}
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structboost_1_1fibers_1_1asio_1_1round__robin_1_1service_aad5d5e65b36f00866e6d164569fa81ff}\index{boost::fibers::asio::round\_robin::service@{boost::fibers::asio::round\_robin::service}!operator=@{operator=}}
+\index{operator=@{operator=}!boost::fibers::asio::round\_robin::service@{boost::fibers::asio::round\_robin::service}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}}
+{\footnotesize\ttfamily \label{structboost_1_1fibers_1_1asio_1_1round__robin_1_1service_aad5d5e65b36f00866e6d164569fa81ff} 
+\mbox{\hyperlink{structboost_1_1fibers_1_1asio_1_1round__robin_1_1service}{service}} \& boost\+::fibers\+::asio\+::round\+\_\+robin\+::service\+::operator= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structboost_1_1fibers_1_1asio_1_1round__robin_1_1service}{service}} const \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [delete]}}
+
+\Hypertarget{structboost_1_1fibers_1_1asio_1_1round__robin_1_1service_a627fd1ef2f8de4047e825d7077751fa8}\index{boost::fibers::asio::round\_robin::service@{boost::fibers::asio::round\_robin::service}!shutdown\_service@{shutdown\_service}}
+\index{shutdown\_service@{shutdown\_service}!boost::fibers::asio::round\_robin::service@{boost::fibers::asio::round\_robin::service}}
+\doxysubsubsection{\texorpdfstring{shutdown\_service()}{shutdown\_service()}}
+{\footnotesize\ttfamily \label{structboost_1_1fibers_1_1asio_1_1round__robin_1_1service_a627fd1ef2f8de4047e825d7077751fa8} 
+void boost\+::fibers\+::asio\+::round\+\_\+robin\+::service\+::shutdown\+\_\+service (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [final]}, {\ttfamily [override]}}
+
+
+
+Definition at line \mbox{\hyperlink{round__robin_8hpp_source_l00082}{82}} of file \mbox{\hyperlink{round__robin_8hpp_source}{round\+\_\+robin.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structboost_1_1fibers_1_1asio_1_1round__robin_1_1service_ab3ee3b26155151605450e8b9020747c0}{work\_}}.reset();}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structboost_1_1fibers_1_1asio_1_1round__robin_1_1service_a6f248abcf76ef404a9c804fbcaa4852c}\index{boost::fibers::asio::round\_robin::service@{boost::fibers::asio::round\_robin::service}!id@{id}}
+\index{id@{id}!boost::fibers::asio::round\_robin::service@{boost::fibers::asio::round\_robin::service}}
+\doxysubsubsection{\texorpdfstring{id}{id}}
+{\footnotesize\ttfamily \label{structboost_1_1fibers_1_1asio_1_1round__robin_1_1service_a6f248abcf76ef404a9c804fbcaa4852c} 
+boost\+::asio\+::io\+\_\+service\+::id boost\+::fibers\+::asio\+::round\+\_\+robin\+::service\+::id\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{round__robin_8hpp_source_l00048}{48}} of file \mbox{\hyperlink{round__robin_8hpp_source}{round\+\_\+robin.\+hpp}}.
+
+\Hypertarget{structboost_1_1fibers_1_1asio_1_1round__robin_1_1service_ab3ee3b26155151605450e8b9020747c0}\index{boost::fibers::asio::round\_robin::service@{boost::fibers::asio::round\_robin::service}!work\_@{work\_}}
+\index{work\_@{work\_}!boost::fibers::asio::round\_robin::service@{boost::fibers::asio::round\_robin::service}}
+\doxysubsubsection{\texorpdfstring{work\_}{work\_}}
+{\footnotesize\ttfamily \label{structboost_1_1fibers_1_1asio_1_1round__robin_1_1service_ab3ee3b26155151605450e8b9020747c0} 
+std\+::unique\+\_\+ptr$<$ boost\+::asio\+::io\+\_\+service\+::work $>$ boost\+::fibers\+::asio\+::round\+\_\+robin\+::service\+::work\+\_\+}
+
+
+
+Definition at line \mbox{\hyperlink{round__robin_8hpp_source_l00050}{50}} of file \mbox{\hyperlink{round__robin_8hpp_source}{round\+\_\+robin.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/src/thread/asio/\mbox{\hyperlink{round__robin_8hpp}{round\+\_\+robin.\+hpp}}\end{DoxyCompactItemize}

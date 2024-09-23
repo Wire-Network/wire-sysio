@@ -1,0 +1,89 @@
+\doxysection{websocketpp\+::utility\+::my\+\_\+equal\texorpdfstring{$<$}{<} charT \texorpdfstring{$>$}{>} Struct Template Reference}
+\hypertarget{structwebsocketpp_1_1utility_1_1my__equal}{}\label{structwebsocketpp_1_1utility_1_1my__equal}\index{websocketpp::utility::my\_equal$<$ charT $>$@{websocketpp::utility::my\_equal$<$ charT $>$}}
+
+
+Helper functor for case insensitive find.  
+
+
+
+
+{\ttfamily \#include $<$utilities.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structwebsocketpp_1_1utility_1_1my__equal_a8f03de886784304ffd39ed5de677af1f}{my\+\_\+equal}} (std\+::locale const \&loc)
+\begin{DoxyCompactList}\small\item\em Construct the functor with the given locale. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{structwebsocketpp_1_1utility_1_1my__equal_a06b93db62003458703574e6421f9875f}{operator()}} (charT ch1, charT ch2)
+\begin{DoxyCompactList}\small\item\em Perform a case insensitive comparison. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename charT$>$\newline
+struct websocketpp\+::utility\+::my\+\_\+equal$<$ char\+T $>$}
+Based on code from \href{http://stackoverflow.com/questions/3152241/case-insensitive-stdstring-find}{\texttt{ http\+://stackoverflow.\+com/questions/3152241/case-\/insensitive-\/stdstring-\/find}}
+
+templated version of \doxylink{structwebsocketpp_1_1utility_1_1my__equal}{my\+\_\+equal} so it could work with both char and wchar\+\_\+t 
+
+Definition at line \mbox{\hyperlink{utilities_8hpp_source_l00049}{49}} of file \mbox{\hyperlink{utilities_8hpp_source}{utilities.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structwebsocketpp_1_1utility_1_1my__equal_a8f03de886784304ffd39ed5de677af1f}\index{websocketpp::utility::my\_equal$<$ charT $>$@{websocketpp::utility::my\_equal$<$ charT $>$}!my\_equal@{my\_equal}}
+\index{my\_equal@{my\_equal}!websocketpp::utility::my\_equal$<$ charT $>$@{websocketpp::utility::my\_equal$<$ charT $>$}}
+\doxysubsubsection{\texorpdfstring{my\_equal()}{my\_equal()}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1utility_1_1my__equal_a8f03de886784304ffd39ed5de677af1f} 
+template$<$typename charT $>$ \\
+\mbox{\hyperlink{structwebsocketpp_1_1utility_1_1my__equal}{websocketpp\+::utility\+::my\+\_\+equal}}$<$ charT $>$\+::my\+\_\+equal (\begin{DoxyParamCaption}\item[{std\+::locale const \&}]{loc}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em loc} & The locale to use for determining the case of values \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{utilities_8hpp_source_l00054}{54}} of file \mbox{\hyperlink{utilities_8hpp_source}{utilities.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00054\ :\ m\_loc(loc)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structwebsocketpp_1_1utility_1_1my__equal_a06b93db62003458703574e6421f9875f}\index{websocketpp::utility::my\_equal$<$ charT $>$@{websocketpp::utility::my\_equal$<$ charT $>$}!operator()@{operator()}}
+\index{operator()@{operator()}!websocketpp::utility::my\_equal$<$ charT $>$@{websocketpp::utility::my\_equal$<$ charT $>$}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1utility_1_1my__equal_a06b93db62003458703574e6421f9875f} 
+template$<$typename charT $>$ \\
+bool \mbox{\hyperlink{structwebsocketpp_1_1utility_1_1my__equal}{websocketpp\+::utility\+::my\+\_\+equal}}$<$ charT $>$\+::operator() (\begin{DoxyParamCaption}\item[{charT}]{ch1}{, }\item[{charT}]{ch2}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+\begin{DoxyParams}{Parameters}
+{\em ch1} & The first value to compare \\
+\hline
+{\em ch2} & The second value to compare \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Whether or not the two values are equal when both are converted to uppercase using the given locale. 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{utilities_8hpp_source_l00063}{63}} of file \mbox{\hyperlink{utilities_8hpp_source}{utilities.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::toupper(ch1,\ m\_loc)\ ==\ std::toupper(ch2,\ m\_loc);}
+\DoxyCodeLine{00065\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/vendor/websocketpp/websocketpp/\mbox{\hyperlink{utilities_8hpp}{utilities.\+hpp}}\end{DoxyCompactItemize}

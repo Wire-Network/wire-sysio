@@ -1,0 +1,379 @@
+\doxysection{fc\+::log\+\_\+context Class Reference}
+\hypertarget{classfc_1_1log__context}{}\label{classfc_1_1log__context}\index{fc::log\_context@{fc::log\_context}}
+
+
+provides information about where and when a log message was generated.  
+
+
+
+
+{\ttfamily \#include $<$log\+\_\+message.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1log__context_ae7ab830ecef7dbdb04c67d1075b8006f}{log\+\_\+context}} ()
+\item 
+\mbox{\hyperlink{classfc_1_1log__context_aedcb779fc5dac38fb7a2c78880eb61a4}{log\+\_\+context}} (\mbox{\hyperlink{classfc_1_1log__level}{log\+\_\+level}} ll, const char \texorpdfstring{$\ast$}{*}file, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} line, const char \texorpdfstring{$\ast$}{*}method)
+\item 
+\mbox{\hyperlink{classfc_1_1log__context_ab577cb07a9732e7d1b57ff2c6f47619c}{\texorpdfstring{$\sim$}{\string~}log\+\_\+context}} ()
+\item 
+\mbox{\hyperlink{classfc_1_1log__context_a4dd50551f679b724c87f9ea129b6afe3}{log\+\_\+context}} (const \mbox{\hyperlink{classfc_1_1variant}{variant}} \&v)
+\item 
+\mbox{\hyperlink{classfc_1_1variant}{variant}} \mbox{\hyperlink{classfc_1_1log__context_ac6a95f997d99c873434051960e91c19a}{to\+\_\+variant}} () const
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{classfc_1_1log__context_a52164ce433aa8c079e962ac816bb8098}{get\+\_\+file}} () const
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{classfc_1_1log__context_a9439a7a8b5550f0a6f73a322976ad0ad}{get\+\_\+line\+\_\+number}} () const
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{classfc_1_1log__context_a221af1499de04d0f15f956703c728785}{get\+\_\+method}} () const
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{classfc_1_1log__context_a269b101c3a42ef2f44c8f37bde10c5d5}{get\+\_\+thread\+\_\+name}} () const
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{classfc_1_1log__context_a4293894c527a3b4997ecc53f895b6619}{get\+\_\+task\+\_\+name}} () const
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{classfc_1_1log__context_ac420c44f6ab4a85326525b0da4e4eb87}{get\+\_\+host\+\_\+name}} () const
+\item 
+\mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} \mbox{\hyperlink{classfc_1_1log__context_a68e28fbb4d7f55e2156d67196b22e07d}{get\+\_\+timestamp}} () const
+\item 
+\mbox{\hyperlink{classfc_1_1log__level}{log\+\_\+level}} \mbox{\hyperlink{classfc_1_1log__context_a1033bff5ffa2ebdfa70ae0f9d63a7666}{get\+\_\+log\+\_\+level}} () const
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{classfc_1_1log__context_afc2319fe6b9cc7bdbcbab56bc17ac5b4}{get\+\_\+context}} () const
+\item 
+void \mbox{\hyperlink{classfc_1_1log__context_a03c5f68fae3fb1386f12a9e3aa9928c6}{append\+\_\+context}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} \&c)
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{classfc_1_1log__context_aa3d895810b5c5598bf327328d48d3a2c}{to\+\_\+string}} () const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\begin{DoxySeeAlso}{See also}
+\doxylink{log__message_8hpp_a123cc04b932788928fbe261f7c9bce5c}{FC\+\_\+\+LOG\+\_\+\+CONTEXT} 
+\end{DoxySeeAlso}
+
+
+Definition at line \mbox{\hyperlink{log__message_8hpp_source_l00055}{55}} of file \mbox{\hyperlink{log__message_8hpp_source}{log\+\_\+message.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1log__context_ae7ab830ecef7dbdb04c67d1075b8006f}\index{fc::log\_context@{fc::log\_context}!log\_context@{log\_context}}
+\index{log\_context@{log\_context}!fc::log\_context@{fc::log\_context}}
+\doxysubsubsection{\texorpdfstring{log\_context()}{log\_context()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{classfc_1_1log__context_ae7ab830ecef7dbdb04c67d1075b8006f} 
+fc\+::log\+\_\+context\+::log\+\_\+context (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{log__message_8cpp_source_l00042}{42}} of file \mbox{\hyperlink{log__message_8cpp_source}{log\+\_\+message.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00043\ \ \ \ :my(\ std::make\_shared<detail::log\_context\_impl>()\ )\{\}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1log__context_aedcb779fc5dac38fb7a2c78880eb61a4}\index{fc::log\_context@{fc::log\_context}!log\_context@{log\_context}}
+\index{log\_context@{log\_context}!fc::log\_context@{fc::log\_context}}
+\doxysubsubsection{\texorpdfstring{log\_context()}{log\_context()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{classfc_1_1log__context_aedcb779fc5dac38fb7a2c78880eb61a4} 
+fc\+::log\+\_\+context\+::log\+\_\+context (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1log__level}{log\+\_\+level}}}]{ll}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{file}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{line}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{method}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{log__message_8cpp_source_l00045}{45}} of file \mbox{\hyperlink{log__message_8cpp_source}{log\+\_\+message.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00047\ \ \ \ :my(\ std::make\_shared<detail::log\_context\_impl>()\ )}
+\DoxyCodeLine{00048\ \ \ \ \{}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ my-\/>level\ \ \ \ \ \ \ =\ ll;}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ my-\/>file\ \ \ \ \ \ \ \ =\ \mbox{\hyperlink{classfc_1_1path}{fc::path}}(file).\mbox{\hyperlink{classfc_1_1path_a1e6beb6e05c3f6d6f699c1c448c4b1d6}{filename}}().\mbox{\hyperlink{classfc_1_1path_ab1eae2062df4ea01435348ec52fb3784}{generic\_string}}();\ \textcolor{comment}{//\ TODO\ truncate\ filename}}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ my-\/>line\ \ \ \ \ \ \ \ =\ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}};}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ my-\/>method\ \ \ \ \ \ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1state_a12f378e0c6dbf373781e7988ee4a0853a808f25179e5ccace33050c0f65571dee}{method}};}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ my-\/>timestamp\ \ \ =\ \mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{time\_point::now}}();}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ my-\/>thread\_name\ =\ \mbox{\hyperlink{namespacefc_a6b490790e2e4297225ecaee475b64ccb}{fc::get\_thread\_name}}();}
+\DoxyCodeLine{00055\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1log__context_aedcb779fc5dac38fb7a2c78880eb61a4_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1log__context_ab577cb07a9732e7d1b57ff2c6f47619c}\index{fc::log\_context@{fc::log\_context}!````~log\_context@{\texorpdfstring{$\sim$}{\string~}log\_context}}
+\index{````~log\_context@{\texorpdfstring{$\sim$}{\string~}log\_context}!fc::log\_context@{fc::log\_context}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}log\_context()}{\string~log\_context()}}
+{\footnotesize\ttfamily \label{classfc_1_1log__context_ab577cb07a9732e7d1b57ff2c6f47619c} 
+fc\+::log\+\_\+context\+::\texorpdfstring{$\sim$}{\string~}log\+\_\+context (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{log__message_8cpp_source_l00087}{87}} of file \mbox{\hyperlink{log__message_8cpp_source}{log\+\_\+message.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00087\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1log__context_a4dd50551f679b724c87f9ea129b6afe3}\index{fc::log\_context@{fc::log\_context}!log\_context@{log\_context}}
+\index{log\_context@{log\_context}!fc::log\_context@{fc::log\_context}}
+\doxysubsubsection{\texorpdfstring{log\_context()}{log\_context()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{classfc_1_1log__context_a4dd50551f679b724c87f9ea129b6afe3} 
+fc\+::log\+\_\+context\+::log\+\_\+context (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1variant}{variant}} \&}]{v}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{log__message_8cpp_source_l00057}{57}} of file \mbox{\hyperlink{log__message_8cpp_source}{log\+\_\+message.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00058\ \ \ \ :my(\ std::make\_shared<detail::log\_context\_impl>()\ )}
+\DoxyCodeLine{00059\ \ \ \ \{}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ obj\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.get\_object();}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ my-\/>level\ \ \ \ \ \ \ \ =\ obj[\textcolor{stringliteral}{"{}level"{}}].as<log\_level>();}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ my-\/>file\ \ \ \ \ \ \ \ \ =\ obj[\textcolor{stringliteral}{"{}file"{}}].as\_string();}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ my-\/>line\ \ \ \ \ \ \ \ \ =\ obj[\textcolor{stringliteral}{"{}line"{}}].as\_uint64();}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ my-\/>method\ \ \ \ \ \ \ =\ obj[\textcolor{stringliteral}{"{}method"{}}].as\_string();}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ my-\/>hostname\ \ \ \ \ =\ obj[\textcolor{stringliteral}{"{}hostname"{}}].as\_string();}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ my-\/>thread\_name\ \ =\ obj[\textcolor{stringliteral}{"{}thread\_name"{}}].as\_string();}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (obj.contains(\textcolor{stringliteral}{"{}task\_name"{}}))}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ my-\/>task\_name\ \ \ \ =\ obj[\textcolor{stringliteral}{"{}task\_name"{}}].as\_string();}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ my-\/>timestamp\ \ \ \ =\ obj[\textcolor{stringliteral}{"{}timestamp"{}}].as<\mbox{\hyperlink{namespacesystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_a28ca3704afa6ea443dd4a095daaedb3a}{time\_point}}>();}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ obj.contains(\ \textcolor{stringliteral}{"{}context"{}}\ )\ )}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \ \ my-\/>context\ \ \ \ \ \ =\ obj[\textcolor{stringliteral}{"{}context"{}}].as<\textcolor{keywordtype}{string}>();}
+\DoxyCodeLine{00072\ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1log__context_a03c5f68fae3fb1386f12a9e3aa9928c6}\index{fc::log\_context@{fc::log\_context}!append\_context@{append\_context}}
+\index{append\_context@{append\_context}!fc::log\_context@{fc::log\_context}}
+\doxysubsubsection{\texorpdfstring{append\_context()}{append\_context()}}
+{\footnotesize\ttfamily \label{classfc_1_1log__context_a03c5f68fae3fb1386f12a9e3aa9928c6} 
+void fc\+::log\+\_\+context\+::append\+\_\+context (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} \&}]{c}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{log__message_8cpp_source_l00080}{80}} of file \mbox{\hyperlink{log__message_8cpp_source}{log\+\_\+message.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00081\ \ \ \ \{}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!my-\/>context.empty())}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \ my-\/>context\ +=\ \textcolor{stringliteral}{"{}\ -\/>\ "{}};}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ my-\/>context\ +=\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{00085\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1log__context_a03c5f68fae3fb1386f12a9e3aa9928c6_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1log__context_afc2319fe6b9cc7bdbcbab56bc17ac5b4}\index{fc::log\_context@{fc::log\_context}!get\_context@{get\_context}}
+\index{get\_context@{get\_context}!fc::log\_context@{fc::log\_context}}
+\doxysubsubsection{\texorpdfstring{get\_context()}{get\_context()}}
+{\footnotesize\ttfamily \label{classfc_1_1log__context_afc2319fe6b9cc7bdbcbab56bc17ac5b4} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} fc\+::log\+\_\+context\+::get\+\_\+context (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{log__message_8cpp_source_l00176}{176}} of file \mbox{\hyperlink{log__message_8cpp_source}{log\+\_\+message.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00176\ \{\ \textcolor{keywordflow}{return}\ my-\/>context;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1log__context_a52164ce433aa8c079e962ac816bb8098}\index{fc::log\_context@{fc::log\_context}!get\_file@{get\_file}}
+\index{get\_file@{get\_file}!fc::log\_context@{fc::log\_context}}
+\doxysubsubsection{\texorpdfstring{get\_file()}{get\_file()}}
+{\footnotesize\ttfamily \label{classfc_1_1log__context_a52164ce433aa8c079e962ac816bb8098} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} fc\+::log\+\_\+context\+::get\+\_\+file (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{log__message_8cpp_source_l00168}{168}} of file \mbox{\hyperlink{log__message_8cpp_source}{log\+\_\+message.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00168\ \{\ \textcolor{keywordflow}{return}\ my-\/>file;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1log__context_ac420c44f6ab4a85326525b0da4e4eb87}\index{fc::log\_context@{fc::log\_context}!get\_host\_name@{get\_host\_name}}
+\index{get\_host\_name@{get\_host\_name}!fc::log\_context@{fc::log\_context}}
+\doxysubsubsection{\texorpdfstring{get\_host\_name()}{get\_host\_name()}}
+{\footnotesize\ttfamily \label{classfc_1_1log__context_ac420c44f6ab4a85326525b0da4e4eb87} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} fc\+::log\+\_\+context\+::get\+\_\+host\+\_\+name (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{log__message_8cpp_source_l00173}{173}} of file \mbox{\hyperlink{log__message_8cpp_source}{log\+\_\+message.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00173\ \{\ \textcolor{keywordflow}{return}\ my-\/>hostname;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1log__context_a9439a7a8b5550f0a6f73a322976ad0ad}\index{fc::log\_context@{fc::log\_context}!get\_line\_number@{get\_line\_number}}
+\index{get\_line\_number@{get\_line\_number}!fc::log\_context@{fc::log\_context}}
+\doxysubsubsection{\texorpdfstring{get\_line\_number()}{get\_line\_number()}}
+{\footnotesize\ttfamily \label{classfc_1_1log__context_a9439a7a8b5550f0a6f73a322976ad0ad} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} fc\+::log\+\_\+context\+::get\+\_\+line\+\_\+number (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{log__message_8cpp_source_l00169}{169}} of file \mbox{\hyperlink{log__message_8cpp_source}{log\+\_\+message.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00169\ \{\ \textcolor{keywordflow}{return}\ my-\/>line;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1log__context_a1033bff5ffa2ebdfa70ae0f9d63a7666}\index{fc::log\_context@{fc::log\_context}!get\_log\_level@{get\_log\_level}}
+\index{get\_log\_level@{get\_log\_level}!fc::log\_context@{fc::log\_context}}
+\doxysubsubsection{\texorpdfstring{get\_log\_level()}{get\_log\_level()}}
+{\footnotesize\ttfamily \label{classfc_1_1log__context_a1033bff5ffa2ebdfa70ae0f9d63a7666} 
+\mbox{\hyperlink{classfc_1_1log__level}{log\+\_\+level}} fc\+::log\+\_\+context\+::get\+\_\+log\+\_\+level (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{log__message_8cpp_source_l00175}{175}} of file \mbox{\hyperlink{log__message_8cpp_source}{log\+\_\+message.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00175\ \{\ \textcolor{keywordflow}{return}\ my-\/>level;\ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=344pt]{classfc_1_1log__context_a1033bff5ffa2ebdfa70ae0f9d63a7666_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1log__context_a221af1499de04d0f15f956703c728785}\index{fc::log\_context@{fc::log\_context}!get\_method@{get\_method}}
+\index{get\_method@{get\_method}!fc::log\_context@{fc::log\_context}}
+\doxysubsubsection{\texorpdfstring{get\_method()}{get\_method()}}
+{\footnotesize\ttfamily \label{classfc_1_1log__context_a221af1499de04d0f15f956703c728785} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} fc\+::log\+\_\+context\+::get\+\_\+method (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{log__message_8cpp_source_l00170}{170}} of file \mbox{\hyperlink{log__message_8cpp_source}{log\+\_\+message.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00170\ \{\ \textcolor{keywordflow}{return}\ my-\/>method;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1log__context_a4293894c527a3b4997ecc53f895b6619}\index{fc::log\_context@{fc::log\_context}!get\_task\_name@{get\_task\_name}}
+\index{get\_task\_name@{get\_task\_name}!fc::log\_context@{fc::log\_context}}
+\doxysubsubsection{\texorpdfstring{get\_task\_name()}{get\_task\_name()}}
+{\footnotesize\ttfamily \label{classfc_1_1log__context_a4293894c527a3b4997ecc53f895b6619} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} fc\+::log\+\_\+context\+::get\+\_\+task\+\_\+name (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{log__message_8cpp_source_l00172}{172}} of file \mbox{\hyperlink{log__message_8cpp_source}{log\+\_\+message.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00172\ \{\ \textcolor{keywordflow}{return}\ my-\/>task\_name;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1log__context_a269b101c3a42ef2f44c8f37bde10c5d5}\index{fc::log\_context@{fc::log\_context}!get\_thread\_name@{get\_thread\_name}}
+\index{get\_thread\_name@{get\_thread\_name}!fc::log\_context@{fc::log\_context}}
+\doxysubsubsection{\texorpdfstring{get\_thread\_name()}{get\_thread\_name()}}
+{\footnotesize\ttfamily \label{classfc_1_1log__context_a269b101c3a42ef2f44c8f37bde10c5d5} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} fc\+::log\+\_\+context\+::get\+\_\+thread\+\_\+name (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{log__message_8cpp_source_l00171}{171}} of file \mbox{\hyperlink{log__message_8cpp_source}{log\+\_\+message.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00171\ \{\ \textcolor{keywordflow}{return}\ my-\/>thread\_name;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1log__context_a68e28fbb4d7f55e2156d67196b22e07d}\index{fc::log\_context@{fc::log\_context}!get\_timestamp@{get\_timestamp}}
+\index{get\_timestamp@{get\_timestamp}!fc::log\_context@{fc::log\_context}}
+\doxysubsubsection{\texorpdfstring{get\_timestamp()}{get\_timestamp()}}
+{\footnotesize\ttfamily \label{classfc_1_1log__context_a68e28fbb4d7f55e2156d67196b22e07d} 
+\mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} fc\+::log\+\_\+context\+::get\+\_\+timestamp (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{log__message_8cpp_source_l00174}{174}} of file \mbox{\hyperlink{log__message_8cpp_source}{log\+\_\+message.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00174\ \{\ \textcolor{keywordflow}{return}\ my-\/>timestamp;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1log__context_aa3d895810b5c5598bf327328d48d3a2c}\index{fc::log\_context@{fc::log\_context}!to\_string@{to\_string}}
+\index{to\_string@{to\_string}!fc::log\_context@{fc::log\_context}}
+\doxysubsubsection{\texorpdfstring{to\_string()}{to\_string()}}
+{\footnotesize\ttfamily \label{classfc_1_1log__context_aa3d895810b5c5598bf327328d48d3a2c} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} fc\+::log\+\_\+context\+::to\+\_\+string (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{log__message_8cpp_source_l00074}{74}} of file \mbox{\hyperlink{log__message_8cpp_source}{log\+\_\+message.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00075\ \ \ \ \{}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ my-\/>thread\_name\ +\ \textcolor{stringliteral}{"{}\ \ "{}}\ +\ my-\/>file\ +\ \textcolor{stringliteral}{"{}:"{}}\ +\ \mbox{\hyperlink{namespacefc_a4e07b3870aa72f8c38bdd5f78044dad1}{fc::to\_string}}(my-\/>line)\ +\ \textcolor{stringliteral}{"{}\ "{}}\ +\ my-\/>method;}
+\DoxyCodeLine{00077\ }
+\DoxyCodeLine{00078\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=279pt]{classfc_1_1log__context_aa3d895810b5c5598bf327328d48d3a2c_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1log__context_ac6a95f997d99c873434051960e91c19a}\index{fc::log\_context@{fc::log\_context}!to\_variant@{to\_variant}}
+\index{to\_variant@{to\_variant}!fc::log\_context@{fc::log\_context}}
+\doxysubsubsection{\texorpdfstring{to\_variant()}{to\_variant()}}
+{\footnotesize\ttfamily \label{classfc_1_1log__context_ac6a95f997d99c873434051960e91c19a} 
+\mbox{\hyperlink{classfc_1_1variant}{variant}} fc\+::log\+\_\+context\+::to\+\_\+variant (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{log__message_8cpp_source_l00179}{179}} of file \mbox{\hyperlink{log__message_8cpp_source}{log\+\_\+message.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00180\ \ \ \ \{}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ mutable\_variant\_object\ o;}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ o(\ \textcolor{stringliteral}{"{}level"{}},\ \ \ \ \ \ \ \ variant(my-\/>level)\ \ \ \ \ \ )}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\ \textcolor{stringliteral}{"{}file"{}},\ \ \ \ \ \ \ \ \ my-\/>file\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\ \textcolor{stringliteral}{"{}line"{}},\ \ \ \ \ \ \ \ \ my-\/>line\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\ \textcolor{stringliteral}{"{}method"{}},\ \ \ \ \ \ \ my-\/>method\ \ \ \ \ \ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\ \textcolor{stringliteral}{"{}hostname"{}},\ \ \ \ \ my-\/>hostname\ \ \ \ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\ \textcolor{stringliteral}{"{}thread\_name"{}},\ \ my-\/>thread\_name\ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\ \textcolor{stringliteral}{"{}timestamp"{}},\ \ \ \ variant(my-\/>timestamp)\ \ );}
+\DoxyCodeLine{00189\ }
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ my-\/>context.size()\ )\ }
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ \ o(\ \textcolor{stringliteral}{"{}context"{}},\ \ \ \ \ \ my-\/>context\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00192\ }
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ o;}
+\DoxyCodeLine{00194\ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/log/\mbox{\hyperlink{log__message_8hpp}{log\+\_\+message.\+hpp}}\item 
+libraries/fc/src/log/\mbox{\hyperlink{log__message_8cpp}{log\+\_\+message.\+cpp}}\end{DoxyCompactItemize}

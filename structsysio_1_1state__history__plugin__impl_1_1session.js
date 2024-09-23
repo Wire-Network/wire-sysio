@@ -1,0 +1,27 @@
+var structsysio_1_1state__history__plugin__impl_1_1session =
+[
+    [ "result_type", "structsysio_1_1state__history__plugin__impl_1_1session.html#adefb2e4dc7f9df0757692d574647b4c2", null ],
+    [ "session", "structsysio_1_1state__history__plugin__impl_1_1session.html#a3cd33110b680ab466ee00253864dd3bf", null ],
+    [ "callback", "structsysio_1_1state__history__plugin__impl_1_1session.html#aa305d7b95c5825b8b786aebd283d7eb4", null ],
+    [ "catch_and_close", "structsysio_1_1state__history__plugin__impl_1_1session.html#abc70d4152ee00348029c61a9bcc85a6f", null ],
+    [ "close", "structsysio_1_1state__history__plugin__impl_1_1session.html#a6261f9fdfff9e0784b09ee4039523a9e", null ],
+    [ "on_fail", "structsysio_1_1state__history__plugin__impl_1_1session.html#a39c66f17854fd671de6749d4c3346207", null ],
+    [ "operator()", "structsysio_1_1state__history__plugin__impl_1_1session.html#a57b7afe6688f1c54848a58349a45047c", null ],
+    [ "operator()", "structsysio_1_1state__history__plugin__impl_1_1session.html#a3f2b52fad830aec966bcf5a7bc84ae2a", null ],
+    [ "operator()", "structsysio_1_1state__history__plugin__impl_1_1session.html#a8a04f269bddae7be304148383eb5f841", null ],
+    [ "send", "structsysio_1_1state__history__plugin__impl_1_1session.html#a75102a1a12cdf641267a4ad44813503a", null ],
+    [ "send", "structsysio_1_1state__history__plugin__impl_1_1session.html#a43d48af2140f59121b87b1cb59a83368", null ],
+    [ "send", "structsysio_1_1state__history__plugin__impl_1_1session.html#ac14c4a6544d49506a065e86c0f3bf2b3", null ],
+    [ "send_update", "structsysio_1_1state__history__plugin__impl_1_1session.html#aa4fee32d71ab41e65315338411c3748c", null ],
+    [ "send_update", "structsysio_1_1state__history__plugin__impl_1_1session.html#a5e595a743feb07936a8ddba0131bc856", null ],
+    [ "send_update", "structsysio_1_1state__history__plugin__impl_1_1session.html#a7cd34f5d9ec817197d11d7e2e6b51292", null ],
+    [ "start", "structsysio_1_1state__history__plugin__impl_1_1session.html#a32b08f79712865d9f6f7fd9ede4fa857", null ],
+    [ "start_read", "structsysio_1_1state__history__plugin__impl_1_1session.html#a11af9b8b9ca48cfa4ba8c0bdfc94f3af", null ],
+    [ "current_request", "structsysio_1_1state__history__plugin__impl_1_1session.html#ac69354c3678235cceb5e957452bd2925", null ],
+    [ "need_to_send_update", "structsysio_1_1state__history__plugin__impl_1_1session.html#a5b58c569f9182397a38f5d2c8c84ebcf", null ],
+    [ "plugin", "structsysio_1_1state__history__plugin__impl_1_1session.html#a0b52bdba191da292fa565f1dff8428fd", null ],
+    [ "send_queue", "structsysio_1_1state__history__plugin__impl_1_1session.html#ad43d0e5fd9c0fb69e92fe7cf173082e8", null ],
+    [ "sending", "structsysio_1_1state__history__plugin__impl_1_1session.html#a063d7f178fc69d9090a8aa1b0eb61221", null ],
+    [ "sent_abi", "structsysio_1_1state__history__plugin__impl_1_1session.html#a373eff86875491f81d3f8116bc537db0", null ],
+    [ "socket_stream", "structsysio_1_1state__history__plugin__impl_1_1session.html#ac8c2ace1089e3f85745575b5202d41d1", null ]
+];

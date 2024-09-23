@@ -1,0 +1,15 @@
+<map id="sysio::chain::apply_context::update_db_usage" name="sysio::chain::apply_context::update_db_usage">
+<area shape="rect" id="Node000001" title="Database methods:" alt="" coords="5,107,187,147"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1chain_1_1apply__context.html#a18d1df4bf3df1229cbfd0bcdce63c06c" title=" " alt="" coords="249,5,420,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="135,104,234,57,252,49,254,54,236,61,137,109"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1chain_1_1controller.html#aa808acf858e93c567ff983ccbf8fb6d3" title=" " alt="" coords="258,71,410,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="187,111,242,102,243,107,188,116"/>
+<area shape="rect" id="Node000005" href="$classsysio_1_1chain_1_1controller.html#a4afbf4e4448a73468eb6947b68a0c348" title=" " alt="" coords="252,135,416,191"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="188,138,237,146,236,151,187,143"/>
+<area shape="rect" id="Node000007" href="$classsysio_1_1chain_1_1apply__context.html#a7dbd347239af8b3540db7830b6e2f11e" title="Authorization methods:" alt="" coords="235,215,434,255"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="132,146,180,173,236,201,250,206,248,211,234,205,178,178,130,150"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1chain_1_1controller.html#a33704b4936bb9bbd2ea6b0874ca521b4" title=" " alt="" coords="482,71,634,111"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="411,88,466,88,466,94,411,94"/>
+<area shape="rect" id="Node000006" href="$classsysio_1_1chain_1_1controller.html#a0fcc85a590581560765686050fe105a8" title=" " alt="" coords="482,143,634,183"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="417,160,467,160,467,166,417,166"/>
+</map>

@@ -1,0 +1,379 @@
+\doxysection{prettywritertest.\+cpp}
+\hypertarget{prettywritertest_8cpp_source}{}\label{prettywritertest_8cpp_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/test/unittest/prettywritertest.cpp@{libraries/fc/include/fc/crypto/webauthn\_json/test/unittest/prettywritertest.cpp}}
+\mbox{\hyperlink{prettywritertest_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00001}00001\ \textcolor{comment}{//\ Tencent\ is\ pleased\ to\ support\ the\ open\ source\ community\ by\ making\ RapidJSON\ available.}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00002}00002\ \textcolor{comment}{//\ }}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00003}00003\ \textcolor{comment}{//\ Copyright\ (C)\ 2015\ THL\ A29\ Limited,\ a\ Tencent\ company,\ and\ Milo\ Yip.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00004}00004\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00005}00005\ \textcolor{comment}{//\ Licensed\ under\ the\ MIT\ License\ (the\ "{}License"{});\ you\ may\ not\ use\ this\ file\ except}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00006}00006\ \textcolor{comment}{//\ in\ compliance\ with\ the\ License.\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00007}00007\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00008}00008\ \textcolor{comment}{//\ http://opensource.org/licenses/MIT}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00009}00009\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00010}00010\ \textcolor{comment}{//\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software\ distributed\ }}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00011}00011\ \textcolor{comment}{//\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,\ WITHOUT\ WARRANTIES\ OR\ }}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00012}00012\ \textcolor{comment}{//\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.\ See\ the\ License\ for\ the\ }}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00013}00013\ \textcolor{comment}{//\ specific\ language\ governing\ permissions\ and\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00015}00015\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{unittest_8h}{unittest.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00016}00016\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{reader_8h}{rapidjson/reader.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00017}00017\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{prettywriter_8h}{rapidjson/prettywriter.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00018}00018\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{stringbuffer_8h}{rapidjson/stringbuffer.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00019}00019\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{filewritestream_8h}{rapidjson/filewritestream.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00021}00021\ \textcolor{preprocessor}{\#ifdef\ \_\_clang\_\_}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00022}00022\ RAPIDJSON\_DIAG\_PUSH}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00023}00023\ RAPIDJSON\_DIAG\_OFF(c++98-\/compat)}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00024}00024\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00026}00026\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacerapidjson}{rapidjson}};}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00028}00028\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ kJson[]\ =\ \textcolor{stringliteral}{"{}\{\(\backslash\)"{}hello\(\backslash\)"{}:\(\backslash\)"{}world\(\backslash\)"{},\(\backslash\)"{}t\(\backslash\)"{}:true,\(\backslash\)"{}f\(\backslash\)"{}:false,\(\backslash\)"{}n\(\backslash\)"{}:null,\(\backslash\)"{}i\(\backslash\)"{}:123,\(\backslash\)"{}pi\(\backslash\)"{}:3.1416,\(\backslash\)"{}a\(\backslash\)"{}:[1,2,3,-\/1],\(\backslash\)"{}u64\(\backslash\)"{}:1234567890123456789,\(\backslash\)"{}i64\(\backslash\)"{}:-\/1234567890123456789\}"{}};}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00029}00029\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ kPrettyJson[]\ =}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00030}00030\ \textcolor{stringliteral}{"{}\{\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00031}00031\ \textcolor{stringliteral}{"{}\ \ \ \ \(\backslash\)"{}hello\(\backslash\)"{}:\ \(\backslash\)"{}world\(\backslash\)"{},\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00032}00032\ \textcolor{stringliteral}{"{}\ \ \ \ \(\backslash\)"{}t\(\backslash\)"{}:\ true,\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00033}00033\ \textcolor{stringliteral}{"{}\ \ \ \ \(\backslash\)"{}f\(\backslash\)"{}:\ false,\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00034}00034\ \textcolor{stringliteral}{"{}\ \ \ \ \(\backslash\)"{}n\(\backslash\)"{}:\ null,\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00035}00035\ \textcolor{stringliteral}{"{}\ \ \ \ \(\backslash\)"{}i\(\backslash\)"{}:\ 123,\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00036}00036\ \textcolor{stringliteral}{"{}\ \ \ \ \(\backslash\)"{}pi\(\backslash\)"{}:\ 3.1416,\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00037}00037\ \textcolor{stringliteral}{"{}\ \ \ \ \(\backslash\)"{}a\(\backslash\)"{}:\ [\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00038}00038\ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ \ 1,\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00039}00039\ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ \ 2,\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00040}00040\ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ \ 3,\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00041}00041\ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ \ -\/1\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00042}00042\ \textcolor{stringliteral}{"{}\ \ \ \ ],\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00043}00043\ \textcolor{stringliteral}{"{}\ \ \ \ \(\backslash\)"{}u64\(\backslash\)"{}:\ 1234567890123456789,\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00044}00044\ \textcolor{stringliteral}{"{}\ \ \ \ \(\backslash\)"{}i64\(\backslash\)"{}:\ -\/1234567890123456789\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00045}00045\ \textcolor{stringliteral}{"{}\}"{}};}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00047}00047\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ kPrettyJson\_FormatOptions\_SLA[]\ =}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00048}00048\ \textcolor{stringliteral}{"{}\{\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00049}00049\ \textcolor{stringliteral}{"{}\ \ \ \ \(\backslash\)"{}hello\(\backslash\)"{}:\ \(\backslash\)"{}world\(\backslash\)"{},\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00050}00050\ \textcolor{stringliteral}{"{}\ \ \ \ \(\backslash\)"{}t\(\backslash\)"{}:\ true,\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00051}00051\ \textcolor{stringliteral}{"{}\ \ \ \ \(\backslash\)"{}f\(\backslash\)"{}:\ false,\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00052}00052\ \textcolor{stringliteral}{"{}\ \ \ \ \(\backslash\)"{}n\(\backslash\)"{}:\ null,\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00053}00053\ \textcolor{stringliteral}{"{}\ \ \ \ \(\backslash\)"{}i\(\backslash\)"{}:\ 123,\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00054}00054\ \textcolor{stringliteral}{"{}\ \ \ \ \(\backslash\)"{}pi\(\backslash\)"{}:\ 3.1416,\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00055}00055\ \textcolor{stringliteral}{"{}\ \ \ \ \(\backslash\)"{}a\(\backslash\)"{}:\ [1,\ 2,\ 3,\ -\/1],\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00056}00056\ \textcolor{stringliteral}{"{}\ \ \ \ \(\backslash\)"{}u64\(\backslash\)"{}:\ 1234567890123456789,\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00057}00057\ \textcolor{stringliteral}{"{}\ \ \ \ \(\backslash\)"{}i64\(\backslash\)"{}:\ -\/1234567890123456789\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00058}00058\ \textcolor{stringliteral}{"{}\}"{}};}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00060}\mbox{\hyperlink{prettywritertest_8cpp_aeb0ccc6927503be3f73aa180e9828298}{00060}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(\mbox{\hyperlink{class_pretty_writer}{PrettyWriter}},\ Basic)\ \{}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00061}00061\ \ \ \ \ \mbox{\hyperlink{class_generic_string_buffer}{StringBuffer}}\ buffer;}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00062}00062\ \ \ \ \ \mbox{\hyperlink{class_pretty_writer}{PrettyWriter<StringBuffer>}}\ writer(buffer);}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00063}00063\ \ \ \ \ \mbox{\hyperlink{class_generic_reader}{Reader}}\ reader;}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00064}00064\ \ \ \ \ \mbox{\hyperlink{struct_generic_string_stream}{StringStream}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}(kJson);}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00065}00065\ \ \ \ \ reader.\mbox{\hyperlink{class_generic_reader_a0c450620d14ff1824e58bb7bd9b42099}{Parse}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ writer);}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00066}00066\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ad20f7b94ac5081e16f0005b94e95f0c6}{EXPECT\_STREQ}}(kPrettyJson,\ buffer.\mbox{\hyperlink{class_generic_string_buffer_a42079865bab1deb930c6cff7d491c719}{GetString}}());}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00067}00067\ \}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00069}\mbox{\hyperlink{prettywritertest_8cpp_aca7a8f5ce83342905379ead13c122276}{00069}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(\mbox{\hyperlink{class_pretty_writer}{PrettyWriter}},\ FormatOptions)\ \{}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00070}00070\ \ \ \ \ \mbox{\hyperlink{class_generic_string_buffer}{StringBuffer}}\ buffer;}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00071}00071\ \ \ \ \ \mbox{\hyperlink{class_pretty_writer}{PrettyWriter<StringBuffer>}}\ writer(buffer);}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00072}00072\ \ \ \ \ writer.\mbox{\hyperlink{class_pretty_writer_aade3381a128071f1da060f5f3075de10}{SetFormatOptions}}(\mbox{\hyperlink{prettywriter_8h_a150fd6ef2dbf4025c33ece85451982d5addf85c922d2d597ab1074a55b27c3fe2}{kFormatSingleLineArray}});}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00073}00073\ \ \ \ \ \mbox{\hyperlink{class_generic_reader}{Reader}}\ reader;}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00074}00074\ \ \ \ \ \mbox{\hyperlink{struct_generic_string_stream}{StringStream}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}(kJson);}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00075}00075\ \ \ \ \ reader.\mbox{\hyperlink{class_generic_reader_a0c450620d14ff1824e58bb7bd9b42099}{Parse}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ writer);}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00076}00076\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ad20f7b94ac5081e16f0005b94e95f0c6}{EXPECT\_STREQ}}(kPrettyJson\_FormatOptions\_SLA,\ buffer.\mbox{\hyperlink{class_generic_string_buffer_a42079865bab1deb930c6cff7d491c719}{GetString}}());}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00077}00077\ \}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00079}\mbox{\hyperlink{prettywritertest_8cpp_a9f6f484811f073565bc9d5d1912b2a16}{00079}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(\mbox{\hyperlink{class_pretty_writer}{PrettyWriter}},\ SetIndent)\ \{}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00080}00080\ \ \ \ \ \mbox{\hyperlink{class_generic_string_buffer}{StringBuffer}}\ buffer;}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00081}00081\ \ \ \ \ \mbox{\hyperlink{class_pretty_writer}{PrettyWriter<StringBuffer>}}\ writer(buffer);}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00082}00082\ \ \ \ \ writer.\mbox{\hyperlink{class_pretty_writer_abbdc83ce02cf4a811a7355aa3879b45a}{SetIndent}}(\textcolor{charliteral}{'\(\backslash\)t'},\ 1);}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00083}00083\ \ \ \ \ \mbox{\hyperlink{class_generic_reader}{Reader}}\ reader;}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00084}00084\ \ \ \ \ \mbox{\hyperlink{struct_generic_string_stream}{StringStream}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}(kJson);}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00085}00085\ \ \ \ \ reader.\mbox{\hyperlink{class_generic_reader_a0c450620d14ff1824e58bb7bd9b42099}{Parse}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ writer);}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00086}00086\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ad20f7b94ac5081e16f0005b94e95f0c6}{EXPECT\_STREQ}}(}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00087}00087\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\{\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00088}00088\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)t\(\backslash\)"{}hello\(\backslash\)"{}:\ \(\backslash\)"{}world\(\backslash\)"{},\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00089}00089\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)t\(\backslash\)"{}t\(\backslash\)"{}:\ true,\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00090}00090\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)t\(\backslash\)"{}f\(\backslash\)"{}:\ false,\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00091}00091\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)t\(\backslash\)"{}n\(\backslash\)"{}:\ null,\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00092}00092\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)t\(\backslash\)"{}i\(\backslash\)"{}:\ 123,\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00093}00093\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)t\(\backslash\)"{}pi\(\backslash\)"{}:\ 3.1416,\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00094}00094\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)t\(\backslash\)"{}a\(\backslash\)"{}:\ [\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00095}00095\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)t\(\backslash\)t1,\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00096}00096\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)t\(\backslash\)t2,\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00097}00097\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)t\(\backslash\)t3,\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00098}00098\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)t\(\backslash\)t-\/1\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00099}00099\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)t],\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00100}00100\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)t\(\backslash\)"{}u64\(\backslash\)"{}:\ 1234567890123456789,\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00101}00101\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)t\(\backslash\)"{}i64\(\backslash\)"{}:\ -\/1234567890123456789\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00102}00102\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\}"{}},}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00103}00103\ \ \ \ \ \ \ \ \ buffer.\mbox{\hyperlink{class_generic_string_buffer_a42079865bab1deb930c6cff7d491c719}{GetString}}());}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00104}00104\ \}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00105}00105\ }
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00106}\mbox{\hyperlink{prettywritertest_8cpp_a4ebbc2e0f8e35357c4ed285570b8f9f1}{00106}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(\mbox{\hyperlink{class_pretty_writer}{PrettyWriter}},\ String)\ \{}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00107}00107\ \ \ \ \ \mbox{\hyperlink{class_generic_string_buffer}{StringBuffer}}\ buffer;}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00108}00108\ \ \ \ \ \mbox{\hyperlink{class_pretty_writer}{PrettyWriter<StringBuffer>}}\ writer(buffer);}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00109}00109\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(writer.\mbox{\hyperlink{class_pretty_writer_aec7fdf4798a3af5e31c147633f4798ed}{StartArray}}());}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00110}00110\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(writer.\mbox{\hyperlink{class_pretty_writer_ae544ccfe35dd7e80ed694873062409f6}{String}}(\textcolor{stringliteral}{"{}Hello\(\backslash\)n"{}}));}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00111}00111\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(writer.\mbox{\hyperlink{class_pretty_writer_a1e9d97fc950d349f55abd864c787ff37}{EndArray}}());}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00112}00112\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ad20f7b94ac5081e16f0005b94e95f0c6}{EXPECT\_STREQ}}(\textcolor{stringliteral}{"{}[\(\backslash\)n\ \ \ \ \(\backslash\)"{}Hello\(\backslash\)\(\backslash\)n\(\backslash\)"{}\(\backslash\)n]"{}},\ buffer.\mbox{\hyperlink{class_generic_string_buffer_a42079865bab1deb930c6cff7d491c719}{GetString}}());}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00113}00113\ \}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00114}00114\ }
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00115}00115\ \textcolor{preprocessor}{\#if\ RAPIDJSON\_HAS\_STDSTRING}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00116}00116\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(\mbox{\hyperlink{class_pretty_writer}{PrettyWriter}},\ String\_STDSTRING)\ \{}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00117}00117\ \ \ \ \ \mbox{\hyperlink{class_generic_string_buffer}{StringBuffer}}\ buffer;}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00118}00118\ \ \ \ \ \mbox{\hyperlink{class_pretty_writer}{PrettyWriter<StringBuffer>}}\ writer(buffer);}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00119}00119\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(writer.StartArray());}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00120}00120\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(writer.String(std::string(\textcolor{stringliteral}{"{}Hello\(\backslash\)n"{}})));}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00121}00121\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(writer.EndArray());}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00122}00122\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ad20f7b94ac5081e16f0005b94e95f0c6}{EXPECT\_STREQ}}(\textcolor{stringliteral}{"{}[\(\backslash\)n\ \ \ \ \(\backslash\)"{}Hello\(\backslash\)\(\backslash\)n\(\backslash\)"{}\(\backslash\)n]"{}},\ buffer.\mbox{\hyperlink{class_generic_string_buffer_a42079865bab1deb930c6cff7d491c719}{GetString}}());}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00123}00123\ \}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00124}00124\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00125}00125\ }
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00126}00126\ \textcolor{preprocessor}{\#include\ <sstream>}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00127}00127\ }
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00128}\mbox{\hyperlink{class_o_stream_wrapper}{00128}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_o_stream_wrapper}{OStreamWrapper}}\ \{}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00129}00129\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00130}\mbox{\hyperlink{class_o_stream_wrapper_a24d357b08e2033c0b74b46377da895dd}{00130}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{class_o_stream_wrapper_a24d357b08e2033c0b74b46377da895dd}{Ch}};}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00131}00131\ }
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00132}\mbox{\hyperlink{class_o_stream_wrapper_adb6c4fb526c0f91eb24da2c6d3fce770}{00132}}\ \ \ \ \ \mbox{\hyperlink{class_o_stream_wrapper_adb6c4fb526c0f91eb24da2c6d3fce770}{OStreamWrapper}}(std::ostream\&\ os)\ :\ os\_(os)\ \{\}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00133}00133\ }
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00134}\mbox{\hyperlink{class_o_stream_wrapper_aad80276a3af7da88f1cdde77c6e01277}{00134}}\ \ \ \ \ \mbox{\hyperlink{class_o_stream_wrapper_a24d357b08e2033c0b74b46377da895dd}{Ch}}\ \mbox{\hyperlink{class_o_stream_wrapper_aad80276a3af7da88f1cdde77c6e01277}{Peek}}()\textcolor{keyword}{\ const\ }\{\ assert(\textcolor{keyword}{false});\ \textcolor{keywordflow}{return}\ \textcolor{charliteral}{'\(\backslash\)0'};\ \}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00135}\mbox{\hyperlink{class_o_stream_wrapper_aa7695be6ed74a50a29f7baee63800cf4}{00135}}\ \ \ \ \ \mbox{\hyperlink{class_o_stream_wrapper_a24d357b08e2033c0b74b46377da895dd}{Ch}}\ \mbox{\hyperlink{class_o_stream_wrapper_aa7695be6ed74a50a29f7baee63800cf4}{Take}}()\ \{\ assert(\textcolor{keyword}{false});\ \textcolor{keywordflow}{return}\ \textcolor{charliteral}{'\(\backslash\)0'};\ \}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00136}\mbox{\hyperlink{class_o_stream_wrapper_a308fd9f938c9f52ec1ac26f3a9b2f48e}{00136}}\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{class_o_stream_wrapper_a308fd9f938c9f52ec1ac26f3a9b2f48e}{Tell}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ 0;\ \}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00137}00137\ }
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00138}\mbox{\hyperlink{class_o_stream_wrapper_a23aa06a5e084fc07cc617082bd63d122}{00138}}\ \ \ \ \ \mbox{\hyperlink{class_o_stream_wrapper_a24d357b08e2033c0b74b46377da895dd}{Ch}}*\ \mbox{\hyperlink{class_o_stream_wrapper_a23aa06a5e084fc07cc617082bd63d122}{PutBegin}}()\ \{\ assert(\textcolor{keyword}{false});\ \textcolor{keywordflow}{return}\ 0;\ \}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00139}\mbox{\hyperlink{class_o_stream_wrapper_a68f0e728e2780b74de545ae752c5c637}{00139}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_o_stream_wrapper_a68f0e728e2780b74de545ae752c5c637}{Put}}(\mbox{\hyperlink{class_o_stream_wrapper_a24d357b08e2033c0b74b46377da895dd}{Ch}}\ c)\ \{\ os\_.put(c);\ \}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00140}\mbox{\hyperlink{class_o_stream_wrapper_ad053cc149354ad4503248886374e3c40}{00140}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_o_stream_wrapper_ad053cc149354ad4503248886374e3c40}{Flush}}()\ \{\ os\_.flush();\ \}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00141}\mbox{\hyperlink{class_o_stream_wrapper_afd040491313089c3de54e70200c9f3ed}{00141}}\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{class_o_stream_wrapper_afd040491313089c3de54e70200c9f3ed}{PutEnd}}(\mbox{\hyperlink{class_o_stream_wrapper_a24d357b08e2033c0b74b46377da895dd}{Ch}}*)\ \{\ assert(\textcolor{keyword}{false});\ \textcolor{keywordflow}{return}\ 0;\ \}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00142}00142\ }
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00143}00143\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00144}00144\ \ \ \ \ \mbox{\hyperlink{ostreamwrapper_8h_aa8f833ae8c21c308bc48717f056ac4b6}{OStreamWrapper}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{class_o_stream_wrapper}{OStreamWrapper}}\&);}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00145}00145\ \ \ \ \ \mbox{\hyperlink{class_o_stream_wrapper}{OStreamWrapper}}\&\ operator=(\textcolor{keyword}{const}\ \mbox{\hyperlink{class_o_stream_wrapper}{OStreamWrapper}}\&);}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00146}00146\ }
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00147}00147\ \ \ \ \ std::ostream\&\ os\_;}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00148}00148\ \};}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00149}00149\ }
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00150}00150\ \textcolor{comment}{//\ For\ covering\ PutN()\ generic\ version}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00151}\mbox{\hyperlink{prettywritertest_8cpp_a214ec81d3b2cab773ca02dee308920d5}{00151}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(\mbox{\hyperlink{class_pretty_writer}{PrettyWriter}},\ \mbox{\hyperlink{class_o_stream_wrapper}{OStreamWrapper}})\ \{}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00152}00152\ \ \ \ \ \mbox{\hyperlink{struct_generic_string_stream}{StringStream}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}(kJson);}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00153}00153\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00154}00154\ \ \ \ \ std::stringstream\ ss;}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00155}00155\ \ \ \ \ \mbox{\hyperlink{class_o_stream_wrapper}{OStreamWrapper}}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}(ss);}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00156}00156\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00157}00157\ \ \ \ \ \mbox{\hyperlink{class_pretty_writer}{PrettyWriter<OStreamWrapper>}}\ writer(os);}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00158}00158\ }
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00159}00159\ \ \ \ \ \mbox{\hyperlink{class_generic_reader}{Reader}}\ reader;}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00160}00160\ \ \ \ \ reader.\mbox{\hyperlink{class_generic_reader_a0c450620d14ff1824e58bb7bd9b42099}{Parse}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ writer);}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00161}00161\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00162}00162\ \ \ \ \ std::string\ actual\ =\ ss.str();}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00163}00163\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ad20f7b94ac5081e16f0005b94e95f0c6}{EXPECT\_STREQ}}(kPrettyJson,\ actual.c\_str());}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00164}00164\ \}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00165}00165\ }
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00166}00166\ \textcolor{comment}{//\ For\ covering\ FileWriteStream::PutN()}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00167}\mbox{\hyperlink{prettywritertest_8cpp_a85e6090680de34aa01654aed562dd226}{00167}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(\mbox{\hyperlink{class_pretty_writer}{PrettyWriter}},\ \mbox{\hyperlink{class_file_write_stream}{FileWriteStream}})\ \{}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00168}00168\ \ \ \ \ \textcolor{keywordtype}{char}\ filename[L\_tmpnam];}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00169}00169\ \ \ \ \ FILE*\ fp\ =\ \mbox{\hyperlink{unittest_8h_acb6251ae9b44050f1fcabf8d3c2e792b}{TempFile}}(filename);}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00170}00170\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(fp!=NULL);}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00171}00171\ \ \ \ \ \textcolor{keywordtype}{char}\ buffer[16];}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00172}00172\ \ \ \ \ \mbox{\hyperlink{class_file_write_stream}{FileWriteStream}}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}(fp,\ buffer,\ \textcolor{keyword}{sizeof}(buffer));}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00173}00173\ \ \ \ \ \mbox{\hyperlink{class_pretty_writer}{PrettyWriter<FileWriteStream>}}\ writer(os);}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00174}00174\ \ \ \ \ \mbox{\hyperlink{class_generic_reader}{Reader}}\ reader;}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00175}00175\ \ \ \ \ \mbox{\hyperlink{struct_generic_string_stream}{StringStream}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}(kJson);}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00176}00176\ \ \ \ \ reader.\mbox{\hyperlink{class_generic_reader_a0c450620d14ff1824e58bb7bd9b42099}{Parse}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ writer);}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00177}00177\ \ \ \ \ fclose(fp);}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00178}00178\ }
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00179}00179\ \ \ \ \ fp\ =\ fopen(filename,\ \textcolor{stringliteral}{"{}rb"{}});}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00180}00180\ \ \ \ \ fseek(fp,\ 0,\ SEEK\_END);}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00181}00181\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ size\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(ftell(fp));}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00182}00182\ \ \ \ \ fseek(fp,\ 0,\ SEEK\_SET);}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00183}00183\ \ \ \ \ \textcolor{keywordtype}{char}*\ json\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(malloc(size\ +\ 1));}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00184}00184\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ readLength\ =\ fread(json,\ 1,\ size,\ fp);}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00185}00185\ \ \ \ \ json[readLength]\ =\ \textcolor{charliteral}{'\(\backslash\)0'};}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00186}00186\ \ \ \ \ fclose(fp);}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00187}00187\ \ \ \ \ remove(filename);}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00188}00188\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ad20f7b94ac5081e16f0005b94e95f0c6}{EXPECT\_STREQ}}(kPrettyJson,\ json);}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00189}00189\ \ \ \ \ free(json);}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00190}00190\ \}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00191}00191\ }
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00192}\mbox{\hyperlink{prettywritertest_8cpp_a2f008ec971ec60b45f575b040bccb845}{00192}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(\mbox{\hyperlink{class_pretty_writer}{PrettyWriter}},\ RawValue)\ \{}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00193}00193\ \ \ \ \ \mbox{\hyperlink{class_generic_string_buffer}{StringBuffer}}\ buffer;}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00194}00194\ \ \ \ \ \mbox{\hyperlink{class_pretty_writer}{PrettyWriter<StringBuffer>}}\ writer(buffer);}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00195}00195\ \ \ \ \ writer.\mbox{\hyperlink{class_pretty_writer_a27bdda225dc152b8974e44c1df7525b7}{StartObject}}();}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00196}00196\ \ \ \ \ writer.\mbox{\hyperlink{class_pretty_writer_a20ecbe1d31a871e4da4a3899b40ad3cd}{Key}}(\textcolor{stringliteral}{"{}a"{}});}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00197}00197\ \ \ \ \ writer.\mbox{\hyperlink{class_pretty_writer_aa1815263e61cb7af3b6dfba480a0f481}{Int}}(1);}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00198}00198\ \ \ \ \ writer.\mbox{\hyperlink{class_pretty_writer_a20ecbe1d31a871e4da4a3899b40ad3cd}{Key}}(\textcolor{stringliteral}{"{}raw"{}});}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00199}00199\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ json[]\ =\ \textcolor{stringliteral}{"{}[\(\backslash\)"{}Hello\(\backslash\)\(\backslash\)nWorld\(\backslash\)"{},\ 123.456]"{}};}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00200}00200\ \ \ \ \ writer.\mbox{\hyperlink{class_pretty_writer_a440890a72408a150ef46edda6becdc94}{RawValue}}(json,\ strlen(json),\ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7af41527d6925efa3c5c3dadb23dfef7c8}{kArrayType}});}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00201}00201\ \ \ \ \ writer.\mbox{\hyperlink{class_pretty_writer_a6bfdfa4193193ef763cce5c592c4d20c}{EndObject}}();}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00202}00202\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(writer.\mbox{\hyperlink{class_writer_a07d74d36dd3191b06e0aab678c246157}{IsComplete}}());}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00203}00203\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ad20f7b94ac5081e16f0005b94e95f0c6}{EXPECT\_STREQ}}(}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00204}00204\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\{\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00205}00205\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ \ \ \ \(\backslash\)"{}a\(\backslash\)"{}:\ 1,\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00206}00206\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ \ \ \ \(\backslash\)"{}raw\(\backslash\)"{}:\ [\(\backslash\)"{}Hello\(\backslash\)\(\backslash\)nWorld\(\backslash\)"{},\ 123.456]\(\backslash\)n"{}}\ \textcolor{comment}{//\ no\ indentation\ within\ raw\ value}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00207}00207\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\}"{}},}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00208}00208\ \ \ \ \ \ \ \ \ buffer.\mbox{\hyperlink{class_generic_string_buffer_a42079865bab1deb930c6cff7d491c719}{GetString}}());}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00209}00209\ \}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00210}00210\ }
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00211}\mbox{\hyperlink{prettywritertest_8cpp_a09fd3ae0b4f8e7dccb5421dff71b9245}{00211}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(\mbox{\hyperlink{class_pretty_writer}{PrettyWriter}},\ InvalidEventSequence)\ \{}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00212}00212\ \ \ \ \ \textcolor{comment}{//\ \{]}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00213}00213\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00214}00214\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_string_buffer}{StringBuffer}}\ buffer;}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00215}00215\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_pretty_writer}{PrettyWriter<StringBuffer>}}\ writer(buffer);}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00216}00216\ \ \ \ \ \ \ \ \ writer.\mbox{\hyperlink{class_pretty_writer_a27bdda225dc152b8974e44c1df7525b7}{StartObject}}();}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00217}00217\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a789842b4475eed948e6fd18390d5a859}{EXPECT\_THROW}}(writer.\mbox{\hyperlink{class_pretty_writer_a1e9d97fc950d349f55abd864c787ff37}{EndArray}}(),\ \mbox{\hyperlink{class_assert_exception}{AssertException}});}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00218}00218\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(writer.\mbox{\hyperlink{class_writer_a07d74d36dd3191b06e0aab678c246157}{IsComplete}}());}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00219}00219\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00220}00220\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00221}00221\ \ \ \ \ \textcolor{comment}{//\ [\}}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00222}00222\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00223}00223\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_string_buffer}{StringBuffer}}\ buffer;}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00224}00224\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_pretty_writer}{PrettyWriter<StringBuffer>}}\ writer(buffer);}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00225}00225\ \ \ \ \ \ \ \ \ writer.\mbox{\hyperlink{class_pretty_writer_aec7fdf4798a3af5e31c147633f4798ed}{StartArray}}();}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00226}00226\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a789842b4475eed948e6fd18390d5a859}{EXPECT\_THROW}}(writer.\mbox{\hyperlink{class_pretty_writer_a6bfdfa4193193ef763cce5c592c4d20c}{EndObject}}(),\ \mbox{\hyperlink{class_assert_exception}{AssertException}});}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00227}00227\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(writer.\mbox{\hyperlink{class_writer_a07d74d36dd3191b06e0aab678c246157}{IsComplete}}());}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00228}00228\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00229}00229\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00230}00230\ \ \ \ \ \textcolor{comment}{//\ \{\ 1:}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00231}00231\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00232}00232\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_string_buffer}{StringBuffer}}\ buffer;}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00233}00233\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_pretty_writer}{PrettyWriter<StringBuffer>}}\ writer(buffer);}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00234}00234\ \ \ \ \ \ \ \ \ writer.\mbox{\hyperlink{class_pretty_writer_a27bdda225dc152b8974e44c1df7525b7}{StartObject}}();}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00235}00235\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a789842b4475eed948e6fd18390d5a859}{EXPECT\_THROW}}(writer.\mbox{\hyperlink{class_pretty_writer_aa1815263e61cb7af3b6dfba480a0f481}{Int}}(1),\ \mbox{\hyperlink{class_assert_exception}{AssertException}});}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00236}00236\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(writer.\mbox{\hyperlink{class_writer_a07d74d36dd3191b06e0aab678c246157}{IsComplete}}());}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00237}00237\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00238}00238\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00239}00239\ \ \ \ \ \textcolor{comment}{//\ \{\ 'a'\ \}}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00240}00240\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00241}00241\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_string_buffer}{StringBuffer}}\ buffer;}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00242}00242\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_pretty_writer}{PrettyWriter<StringBuffer>}}\ writer(buffer);}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00243}00243\ \ \ \ \ \ \ \ \ writer.\mbox{\hyperlink{class_pretty_writer_a27bdda225dc152b8974e44c1df7525b7}{StartObject}}();}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00244}00244\ \ \ \ \ \ \ \ \ writer.\mbox{\hyperlink{class_pretty_writer_a20ecbe1d31a871e4da4a3899b40ad3cd}{Key}}(\textcolor{stringliteral}{"{}a"{}});}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00245}00245\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a789842b4475eed948e6fd18390d5a859}{EXPECT\_THROW}}(writer.\mbox{\hyperlink{class_pretty_writer_a6bfdfa4193193ef763cce5c592c4d20c}{EndObject}}(),\ \mbox{\hyperlink{class_assert_exception}{AssertException}});}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00246}00246\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(writer.\mbox{\hyperlink{class_writer_a07d74d36dd3191b06e0aab678c246157}{IsComplete}}());}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00247}00247\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00248}00248\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00249}00249\ \ \ \ \ \textcolor{comment}{//\ \{\ 'a':'b','c'\ \}}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00250}00250\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00251}00251\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_string_buffer}{StringBuffer}}\ buffer;}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00252}00252\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_pretty_writer}{PrettyWriter<StringBuffer>}}\ writer(buffer);}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00253}00253\ \ \ \ \ \ \ \ \ writer.\mbox{\hyperlink{class_pretty_writer_a27bdda225dc152b8974e44c1df7525b7}{StartObject}}();}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00254}00254\ \ \ \ \ \ \ \ \ writer.\mbox{\hyperlink{class_pretty_writer_a20ecbe1d31a871e4da4a3899b40ad3cd}{Key}}(\textcolor{stringliteral}{"{}a"{}});}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00255}00255\ \ \ \ \ \ \ \ \ writer.\mbox{\hyperlink{class_pretty_writer_ae544ccfe35dd7e80ed694873062409f6}{String}}(\textcolor{stringliteral}{"{}b"{}});}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00256}00256\ \ \ \ \ \ \ \ \ writer.\mbox{\hyperlink{class_pretty_writer_a20ecbe1d31a871e4da4a3899b40ad3cd}{Key}}(\textcolor{stringliteral}{"{}c"{}});}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00257}00257\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a789842b4475eed948e6fd18390d5a859}{EXPECT\_THROW}}(writer.\mbox{\hyperlink{class_pretty_writer_a6bfdfa4193193ef763cce5c592c4d20c}{EndObject}}(),\ \mbox{\hyperlink{class_assert_exception}{AssertException}});}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00258}00258\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(writer.\mbox{\hyperlink{class_writer_a07d74d36dd3191b06e0aab678c246157}{IsComplete}}());}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00259}00259\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00260}00260\ \}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00261}00261\ }
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00262}\mbox{\hyperlink{prettywritertest_8cpp_a3108e29798ac992aa723da1c46ff8b57}{00262}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(\mbox{\hyperlink{class_pretty_writer}{PrettyWriter}},\ NaN)\ \{}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00263}00263\ \ \ \ \ \textcolor{keywordtype}{double}\ nan\ =\ std::numeric\_limits<double>::quiet\_NaN();}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00264}00264\ }
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00265}00265\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{classinternal_1_1_double}{internal::Double}}(nan).IsNan());}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00266}00266\ \ \ \ \ \mbox{\hyperlink{class_generic_string_buffer}{StringBuffer}}\ buffer;}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00267}00267\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00268}00268\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_pretty_writer}{PrettyWriter<StringBuffer>}}\ writer(buffer);}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00269}00269\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(writer.\mbox{\hyperlink{class_pretty_writer_ad9d592e86b985da666665926e87db415}{Double}}(nan));}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00270}00270\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00271}00271\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00272}00272\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_pretty_writer}{PrettyWriter<StringBuffer,\ UTF8<>}},\ \mbox{\hyperlink{struct_u_t_f8}{UTF8<>}},\ \mbox{\hyperlink{class_crt_allocator}{CrtAllocator}},\ \mbox{\hyperlink{writer_8h_ab05d31260e712ed01daa80077f21e0a5a1ff67a91b689ae093ce241e0301c0816}{kWriteNanAndInfFlag}}>\ writer(buffer);}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00273}00273\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(writer.\mbox{\hyperlink{class_pretty_writer_ad9d592e86b985da666665926e87db415}{Double}}(nan));}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00274}00274\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ad20f7b94ac5081e16f0005b94e95f0c6}{EXPECT\_STREQ}}(\textcolor{stringliteral}{"{}NaN"{}},\ buffer.\mbox{\hyperlink{class_generic_string_buffer_a42079865bab1deb930c6cff7d491c719}{GetString}}());}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00275}00275\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00276}00276\ \ \ \ \ \mbox{\hyperlink{class_generic_string_buffer}{GenericStringBuffer<UTF16<>}}\ >\ buffer2;}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00277}00277\ \ \ \ \ \mbox{\hyperlink{class_pretty_writer}{PrettyWriter<GenericStringBuffer<UTF16<>}}\ >\ >\ writer2(buffer2);}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00278}00278\ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(writer2.\mbox{\hyperlink{class_pretty_writer_ad9d592e86b985da666665926e87db415}{Double}}(nan));}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00279}00279\ \}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00280}00280\ }
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00281}\mbox{\hyperlink{prettywritertest_8cpp_afb66a00052107cf357df92dc211e87ad}{00281}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(\mbox{\hyperlink{class_pretty_writer}{PrettyWriter}},\ Inf)\ \{}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00282}00282\ \ \ \ \ \textcolor{keywordtype}{double}\ inf\ =\ std::numeric\_limits<double>::infinity();}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00283}00283\ }
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00284}00284\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{classinternal_1_1_double}{internal::Double}}(inf).IsInf());}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00285}00285\ \ \ \ \ \mbox{\hyperlink{class_generic_string_buffer}{StringBuffer}}\ buffer;}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00286}00286\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00287}00287\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_pretty_writer}{PrettyWriter<StringBuffer>}}\ writer(buffer);}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00288}00288\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(writer.\mbox{\hyperlink{class_pretty_writer_ad9d592e86b985da666665926e87db415}{Double}}(inf));}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00289}00289\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00290}00290\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00291}00291\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_pretty_writer}{PrettyWriter<StringBuffer>}}\ writer(buffer);}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00292}00292\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(writer.\mbox{\hyperlink{class_pretty_writer_ad9d592e86b985da666665926e87db415}{Double}}(-\/inf));}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00293}00293\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00294}00294\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00295}00295\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_pretty_writer}{PrettyWriter<StringBuffer,\ UTF8<>}},\ \mbox{\hyperlink{struct_u_t_f8}{UTF8<>}},\ \mbox{\hyperlink{class_crt_allocator}{CrtAllocator}},\ \mbox{\hyperlink{writer_8h_ab05d31260e712ed01daa80077f21e0a5a1ff67a91b689ae093ce241e0301c0816}{kWriteNanAndInfFlag}}>\ writer(buffer);}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00296}00296\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(writer.\mbox{\hyperlink{class_pretty_writer_ad9d592e86b985da666665926e87db415}{Double}}(inf));}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00297}00297\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00298}00298\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00299}00299\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_pretty_writer}{PrettyWriter<StringBuffer,\ UTF8<>}},\ \mbox{\hyperlink{struct_u_t_f8}{UTF8<>}},\ \mbox{\hyperlink{class_crt_allocator}{CrtAllocator}},\ \mbox{\hyperlink{writer_8h_ab05d31260e712ed01daa80077f21e0a5a1ff67a91b689ae093ce241e0301c0816}{kWriteNanAndInfFlag}}>\ writer(buffer);}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00300}00300\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(writer.\mbox{\hyperlink{class_pretty_writer_ad9d592e86b985da666665926e87db415}{Double}}(-\/inf));}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00301}00301\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00302}00302\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ad20f7b94ac5081e16f0005b94e95f0c6}{EXPECT\_STREQ}}(\textcolor{stringliteral}{"{}Infinity-\/Infinity"{}},\ buffer.\mbox{\hyperlink{class_generic_string_buffer_a42079865bab1deb930c6cff7d491c719}{GetString}}());}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00303}00303\ \}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00304}00304\ }
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00305}\mbox{\hyperlink{prettywritertest_8cpp_aa9f976ea86c5d8d3393d4e1fc733ae5e}{00305}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(\mbox{\hyperlink{class_pretty_writer}{PrettyWriter}},\ Issue\_889)\ \{}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00306}00306\ \ \ \ \ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}[100]\ =\ \textcolor{stringliteral}{"{}Hello"{}};}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00307}00307\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00308}00308\ \ \ \ \ \mbox{\hyperlink{class_generic_string_buffer}{StringBuffer}}\ buffer;}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00309}00309\ \ \ \ \ \mbox{\hyperlink{class_pretty_writer}{PrettyWriter<StringBuffer>}}\ writer(buffer);}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00310}00310\ \ \ \ \ writer.\mbox{\hyperlink{class_pretty_writer_aec7fdf4798a3af5e31c147633f4798ed}{StartArray}}();}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00311}00311\ \ \ \ \ writer.\mbox{\hyperlink{class_pretty_writer_ae544ccfe35dd7e80ed694873062409f6}{String}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}});}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00312}00312\ \ \ \ \ writer.\mbox{\hyperlink{class_pretty_writer_a1e9d97fc950d349f55abd864c787ff37}{EndArray}}();}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00313}00313\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00314}00314\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ad20f7b94ac5081e16f0005b94e95f0c6}{EXPECT\_STREQ}}(\textcolor{stringliteral}{"{}[\(\backslash\)n\ \ \ \ \(\backslash\)"{}Hello\(\backslash\)"{}\(\backslash\)n]"{}},\ buffer.\mbox{\hyperlink{class_generic_string_buffer_a42079865bab1deb930c6cff7d491c719}{GetString}}());}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00315}00315\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(writer.\mbox{\hyperlink{class_writer_a07d74d36dd3191b06e0aab678c246157}{IsComplete}}());\ \(\backslash\)}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00316}00316\ \}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00317}00317\ }
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00318}00318\ }
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00319}00319\ \textcolor{preprocessor}{\#if\ RAPIDJSON\_HAS\_CXX11\_RVALUE\_REFS}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00320}00320\ }
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00321}00321\ \textcolor{keyword}{static}\ \mbox{\hyperlink{class_pretty_writer}{PrettyWriter<StringBuffer>}}\ WriterGen(\mbox{\hyperlink{class_generic_string_buffer}{StringBuffer}}\ \&target)\ \{}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00322}00322\ \ \ \ \ \mbox{\hyperlink{class_pretty_writer}{PrettyWriter<StringBuffer>}}\ writer(target);}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00323}00323\ \ \ \ \ writer.StartObject();}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00324}00324\ \ \ \ \ writer.Key(\textcolor{stringliteral}{"{}a"{}});}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00325}00325\ \ \ \ \ writer.Int(1);}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00326}00326\ \ \ \ \ \textcolor{keywordflow}{return}\ writer;}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00327}00327\ \}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00328}00328\ }
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00329}00329\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(\mbox{\hyperlink{class_pretty_writer}{PrettyWriter}},\ MoveCtor)\ \{}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00330}00330\ \ \ \ \ \mbox{\hyperlink{class_generic_string_buffer}{StringBuffer}}\ buffer;}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00331}00331\ \ \ \ \ \mbox{\hyperlink{class_pretty_writer}{PrettyWriter<StringBuffer>}}\ writer(WriterGen(buffer));}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00332}00332\ \ \ \ \ writer.EndObject();}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00333}00333\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(writer.IsComplete());}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00334}00334\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ad20f7b94ac5081e16f0005b94e95f0c6}{EXPECT\_STREQ}}(}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00335}00335\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\{\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00336}00336\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ \ \ \ \(\backslash\)"{}a\(\backslash\)"{}:\ 1\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00337}00337\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\}"{}},}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00338}00338\ \ \ \ \ \ \ \ \ buffer.\mbox{\hyperlink{class_generic_string_buffer_a42079865bab1deb930c6cff7d491c719}{GetString}}());}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00339}00339\ \}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00340}00340\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00341}00341\ }
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00342}\mbox{\hyperlink{prettywritertest_8cpp_abe0376325cacaa63085d1252790e25d7}{00342}}\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(\mbox{\hyperlink{class_pretty_writer}{PrettyWriter}},\ Issue\_1336)\ \{}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00343}00343\ \textcolor{preprocessor}{\#define\ T(meth,\ val,\ expected)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00344}00344\ \textcolor{preprocessor}{\ \ \ \ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00345}00345\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ StringBuffer\ buffer;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00346}00346\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ PrettyWriter<StringBuffer>\ writer(buffer);\ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00347}00347\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ writer.meth(val);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00348}00348\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00349}00349\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ EXPECT\_STREQ(expected,\ buffer.GetString());\ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00350}00350\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ EXPECT\_TRUE(writer.IsComplete());\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00351}00351\ \textcolor{preprocessor}{\ \ \ \ \}}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00352}00352\ }
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00353}00353\ \ \ \ \ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}(\mbox{\hyperlink{struct_bool}{Bool}},\ \textcolor{keyword}{false},\ \textcolor{stringliteral}{"{}false"{}});}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00354}00354\ \ \ \ \ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}(\mbox{\hyperlink{struct_bool}{Bool}},\ \textcolor{keyword}{true},\ \textcolor{stringliteral}{"{}true"{}});}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00355}00355\ \ \ \ \ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}(Int,\ 0,\ \textcolor{stringliteral}{"{}0"{}});}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00356}00356\ \ \ \ \ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}(Uint,\ 0,\ \textcolor{stringliteral}{"{}0"{}});}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00357}00357\ \ \ \ \ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}(Int64,\ 0,\ \textcolor{stringliteral}{"{}0"{}});}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00358}00358\ \ \ \ \ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}(Uint64,\ 0,\ \textcolor{stringliteral}{"{}0"{}});}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00359}00359\ \ \ \ \ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}(Double,\ 0,\ \textcolor{stringliteral}{"{}0.0"{}});}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00360}00360\ \ \ \ \ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}(String,\ \textcolor{stringliteral}{"{}Hello"{}},\ \textcolor{stringliteral}{"{}\(\backslash\)"{}Hello\(\backslash\)"{}"{}});}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00361}00361\ \textcolor{preprocessor}{\#undef\ T}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00362}00362\ }
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00363}00363\ \ \ \ \ \mbox{\hyperlink{class_generic_string_buffer}{StringBuffer}}\ buffer;}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00364}00364\ \ \ \ \ \mbox{\hyperlink{class_pretty_writer}{PrettyWriter<StringBuffer>}}\ writer(buffer);}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00365}00365\ \ \ \ \ writer.\mbox{\hyperlink{class_pretty_writer_aa144f2d0f0c3c69248cdbe957349528c}{Null}}();}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00366}00366\ }
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00367}00367\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ad20f7b94ac5081e16f0005b94e95f0c6}{EXPECT\_STREQ}}(\textcolor{stringliteral}{"{}null"{}},\ buffer.\mbox{\hyperlink{class_generic_string_buffer_a42079865bab1deb930c6cff7d491c719}{GetString}}());}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00368}00368\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(writer.\mbox{\hyperlink{class_writer_a07d74d36dd3191b06e0aab678c246157}{IsComplete}}());}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00369}00369\ \}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00370}00370\ }
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00371}00371\ \textcolor{preprocessor}{\#ifdef\ \_\_clang\_\_}}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00372}00372\ RAPIDJSON\_DIAG\_POP}
+\DoxyCodeLine{\Hypertarget{prettywritertest_8cpp_source_l00373}00373\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

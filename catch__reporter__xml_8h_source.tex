@@ -1,0 +1,67 @@
+\doxysection{catch\+\_\+reporter\+\_\+xml.\+h}
+\hypertarget{catch__reporter__xml_8h_source}{}\label{catch__reporter__xml_8h_source}\index{libraries/sys-\/vm/external/Catch2/include/reporters/catch\_reporter\_xml.h@{libraries/sys-\/vm/external/Catch2/include/reporters/catch\_reporter\_xml.h}}
+\mbox{\hyperlink{catch__reporter__xml_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00002}00002\ \textcolor{comment}{\ *\ \ Created\ by\ Martin\ on\ 14/11/2017.}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00004}00004\ \textcolor{comment}{\ *\ \ Distributed\ under\ the\ Boost\ Software\ License,\ Version\ 1.0.\ (See\ accompanying}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00005}00005\ \textcolor{comment}{\ *\ \ file\ LICENSE\_1\_0.txt\ or\ copy\ at\ http://www.boost.org/LICENSE\_1\_0.txt)}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00006}00006\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00007}00007\ \textcolor{preprocessor}{\#ifndef\ TWOBLUECUBES\_CATCH\_REPORTER\_XML\_H\_INCLUDED}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00008}00008\ \textcolor{preprocessor}{\#define\ TWOBLUECUBES\_CATCH\_REPORTER\_XML\_H\_INCLUDED}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00010}00010\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__reporter__bases_8hpp}{catch\_reporter\_bases.hpp}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00012}00012\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__xmlwriter_8h}{../internal/catch\_xmlwriter.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00013}00013\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__timer_8h}{../internal/catch\_timer.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00016}00016\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00017}\mbox{\hyperlink{class_catch_1_1_xml_reporter}{00017}}\ \ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_catch_1_1_xml_reporter}{XmlReporter}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base}{StreamingReporterBase}}<XmlReporter>\ \{}
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00018}00018\ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00019}00019\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_xml_reporter_aa34d7e971361f72ce7622602011d6441}{XmlReporter}}(\mbox{\hyperlink{struct_catch_1_1_reporter_config}{ReporterConfig}}\ \textcolor{keyword}{const}\&\ \_config);}
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00021}\mbox{\hyperlink{class_catch_1_1_xml_reporter_a00aa87ce78b6f4ac8ed612446a5eeff3}{00021}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_xml_reporter_a00aa87ce78b6f4ac8ed612446a5eeff3}{\string~XmlReporter}}()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00023}00023\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ std::string\ \mbox{\hyperlink{class_catch_1_1_xml_reporter_ab998bc455a7b20f6a8b78ce291601807}{getDescription}}();}
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00025}00025\ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ std::string\ \mbox{\hyperlink{class_catch_1_1_xml_reporter_ad94c592b511097332f6e5ecf29ccb2ee}{getStylesheetRef}}()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00027}00027\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_xml_reporter_a190d2ae83de78e06273fa476d3729771}{writeSourceInfo}}(\mbox{\hyperlink{struct_catch_1_1_source_line_info}{SourceLineInfo}}\ \textcolor{keyword}{const}\&\ sourceInfo);}
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00029}00029\ \ \ \ \ \textcolor{keyword}{public}:\ \textcolor{comment}{//\ StreamingReporterBase}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00031}00031\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_xml_reporter_a5e80921e60f776401d6e2e111e48398f}{noMatchingTestCases}}(std::string\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00033}00033\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_xml_reporter_ab5de0b02d5a30612ae5449360d867672}{testRunStarting}}(\mbox{\hyperlink{struct_catch_1_1_test_run_info}{TestRunInfo}}\ \textcolor{keyword}{const}\&\ testInfo)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00035}00035\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_xml_reporter_a873beb2333056238c4fd476ef90412fb}{testGroupStarting}}(\mbox{\hyperlink{struct_catch_1_1_group_info}{GroupInfo}}\ \textcolor{keyword}{const}\&\ groupInfo)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00037}00037\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_xml_reporter_a1395b2efb62faaa947a42638a03be32c}{testCaseStarting}}(\mbox{\hyperlink{struct_catch_1_1_test_case_info}{TestCaseInfo}}\ \textcolor{keyword}{const}\&\ testInfo)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00039}00039\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_xml_reporter_a06befa9cf2b661c5226317bff0f05c64}{sectionStarting}}(\mbox{\hyperlink{struct_catch_1_1_section_info}{SectionInfo}}\ \textcolor{keyword}{const}\&\ sectionInfo)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00041}00041\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_xml_reporter_a4f2661042672c0930086700fcd348f04}{assertionStarting}}(\mbox{\hyperlink{struct_catch_1_1_assertion_info}{AssertionInfo}}\ \textcolor{keyword}{const}\&)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00043}00043\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_catch_1_1_xml_reporter_a133d3b5deb923998634d96ff8f234cde}{assertionEnded}}(\mbox{\hyperlink{struct_catch_1_1_assertion_stats}{AssertionStats}}\ \textcolor{keyword}{const}\&\ assertionStats)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00045}00045\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_xml_reporter_a73c809f067d58a7a6748cb13643448e5}{sectionEnded}}(\mbox{\hyperlink{struct_catch_1_1_section_stats}{SectionStats}}\ \textcolor{keyword}{const}\&\ sectionStats)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00047}00047\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_xml_reporter_ab641ec7e115cb94efa02f85e9d91de0f}{testCaseEnded}}(\mbox{\hyperlink{struct_catch_1_1_test_case_stats}{TestCaseStats}}\ \textcolor{keyword}{const}\&\ testCaseStats)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00049}00049\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_xml_reporter_ab9ba05f0311cb976fb6f7e5bd2df477c}{testGroupEnded}}(\mbox{\hyperlink{struct_catch_1_1_test_group_stats}{TestGroupStats}}\ \textcolor{keyword}{const}\&\ testGroupStats)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00051}00051\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_xml_reporter_a2458c9f342a446f0b3a7480b53c93705}{testRunEnded}}(\mbox{\hyperlink{struct_catch_1_1_test_run_stats}{TestRunStats}}\ \textcolor{keyword}{const}\&\ testRunStats)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00052}00052\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00053}00053\ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00054}00054\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_timer}{Timer}}\ m\_testCaseTimer;}
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00055}00055\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_xml_writer}{XmlWriter}}\ m\_xml;}
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00056}00056\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ m\_sectionDepth\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00057}00057\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00059}00059\ \}\ \textcolor{comment}{//\ end\ namespace\ Catch}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__xml_8h_source_l00061}00061\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ TWOBLUECUBES\_CATCH\_REPORTER\_XML\_H\_INCLUDED}}
+
+\end{DoxyCode}

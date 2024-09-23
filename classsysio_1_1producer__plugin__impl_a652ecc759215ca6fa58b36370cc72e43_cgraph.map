@@ -1,0 +1,17 @@
+<map id="sysio::producer_plugin_impl::calculate_producer_wake_up_time" name="sysio::producer_plugin_impl::calculate_producer_wake_up_time">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,162,175,218"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1producer__plugin__impl.html#a9368777de44180b2070838ff18f2fb36" title=" " alt="" coords="223,162,374,218"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="175,187,207,187,207,192,175,192"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1chain__plugin.html#a14a5e77b31ecf267c8062267d03440ae" title=" " alt="" coords="444,5,576,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="318,160,361,108,390,81,420,57,430,51,433,56,424,61,393,85,365,112,322,163"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1producer__plugin__impl.html#a9077b433ee5250472b5670b5b9802362" title=" " alt="" coords="434,71,585,111"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="348,159,421,122,436,115,438,120,423,127,351,164"/>
+<area shape="rect" id="Node000005" href="$classsysio_1_1chain_1_1controller.html#a3e445e8e2da032a322a1348091a1a702" title=" " alt="" coords="434,136,586,177"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="374,175,418,168,418,173,375,180"/>
+<area shape="rect" id="Node000006" href="$classsysio_1_1chain_1_1controller.html#a286751cd6498b500b70a0d3678672263" title=" " alt="" coords="434,201,586,242"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="375,198,418,205,418,210,374,204"/>
+<area shape="rect" id="Node000007" href="$programs_2sysio-launcher_2main_8cpp.html#af3e300c02a95a1230283a8ea2bb1ad70" title=" " alt="" coords="454,266,565,292"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="350,216,423,251,443,259,441,264,421,256,347,220"/>
+<area shape="rect" id="Node000008" href="$classsysio_1_1chain_1_1block__timestamp.html#aa1d88152d9cc082b5ad651c3aeadfb8f" title=" " alt="" coords="422,316,597,357"/>
+<area shape="poly" id="edge7_Node000002_Node000008" title=" " alt="" coords="326,216,369,260,423,302,431,306,428,311,421,307,365,264,322,220"/>
+</map>

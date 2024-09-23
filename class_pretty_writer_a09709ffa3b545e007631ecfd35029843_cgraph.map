@@ -1,0 +1,9 @@
+<map id="PrettyWriter::PrettyPrefix" name="PrettyWriter::PrettyPrefix">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,173,56"/>
+<area shape="rect" id="Node000002" href="$class_pretty_writer.html#a6f244ecc94fd5b134d424033b1574b7e" title=" " alt="" coords="221,31,385,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="173,41,205,41,205,46,173,46"/>
+<area shape="rect" id="Node000003" href="$classinternal_1_1_stack.html#ac484468a2791bd3e9ba609bd1600ab48" title=" " alt="" coords="433,5,593,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="385,31,417,27,418,32,386,36"/>
+<area shape="rect" id="Node000004" href="$filewritestream_8h.html#a5c9b0f0e6249be2acf7f3505c295c132" title="Implement specialized version of PutN() with memset() for better performance." alt="" coords="488,55,539,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="386,50,472,60,472,66,385,56"/>
+</map>

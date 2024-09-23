@@ -1,0 +1,68 @@
+\doxysection{testing\+::internal\+::Invoke\+Callback\+Without\+Args\+Action\texorpdfstring{$<$}{<} Callback\+Type \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classtesting_1_1internal_1_1_invoke_callback_without_args_action}{}\label{classtesting_1_1internal_1_1_invoke_callback_without_args_action}\index{testing::internal::InvokeCallbackWithoutArgsAction$<$ CallbackType $>$@{testing::internal::InvokeCallbackWithoutArgsAction$<$ CallbackType $>$}}
+
+
+{\ttfamily \#include $<$gmock-\/actions.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_invoke_callback_without_args_action_a333d0b92596759753cf78dc98ee7e270}{Invoke\+Callback\+Without\+Args\+Action}} (Callback\+Type \texorpdfstring{$\ast$}{*}callback)
+\item 
+{\footnotesize template$<$typename Result , typename Argument\+Tuple $>$ }\\Result \mbox{\hyperlink{classtesting_1_1internal_1_1_invoke_callback_without_args_action_ac43b186c6daa5f21c8377678c6a9d4ba}{Perform}} (const Argument\+Tuple \&) const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Callback\+Type$>$\newline
+class testing\+::internal\+::\+Invoke\+Callback\+Without\+Args\+Action$<$ Callback\+Type $>$}
+
+
+Definition at line \mbox{\hyperlink{gmock-actions_8h_source_l00919}{919}} of file \mbox{\hyperlink{gmock-actions_8h_source}{gmock-\/actions.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_invoke_callback_without_args_action_a333d0b92596759753cf78dc98ee7e270}\index{testing::internal::InvokeCallbackWithoutArgsAction$<$ CallbackType $>$@{testing::internal::InvokeCallbackWithoutArgsAction$<$ CallbackType $>$}!InvokeCallbackWithoutArgsAction@{InvokeCallbackWithoutArgsAction}}
+\index{InvokeCallbackWithoutArgsAction@{InvokeCallbackWithoutArgsAction}!testing::internal::InvokeCallbackWithoutArgsAction$<$ CallbackType $>$@{testing::internal::InvokeCallbackWithoutArgsAction$<$ CallbackType $>$}}
+\doxysubsubsection{\texorpdfstring{InvokeCallbackWithoutArgsAction()}{InvokeCallbackWithoutArgsAction()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_invoke_callback_without_args_action_a333d0b92596759753cf78dc98ee7e270} 
+template$<$typename Callback\+Type $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_invoke_callback_without_args_action}{testing\+::internal\+::\+Invoke\+Callback\+Without\+Args\+Action}}$<$ Callback\+Type $>$\+::\+Invoke\+Callback\+Without\+Args\+Action (\begin{DoxyParamCaption}\item[{Callback\+Type \texorpdfstring{$\ast$}{*}}]{callback}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-actions_8h_source_l00922}{922}} of file \mbox{\hyperlink{gmock-actions_8h_source}{gmock-\/actions.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00923\ \ \ \ \ \ \ :\ callback\_(callback)\ \{}
+\DoxyCodeLine{00924\ \ \ \ \ callback-\/>CheckIsRepeatable();\ \ \textcolor{comment}{//\ Makes\ sure\ the\ callback\ is\ permanent.}}
+\DoxyCodeLine{00925\ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_invoke_callback_without_args_action_ac43b186c6daa5f21c8377678c6a9d4ba}\index{testing::internal::InvokeCallbackWithoutArgsAction$<$ CallbackType $>$@{testing::internal::InvokeCallbackWithoutArgsAction$<$ CallbackType $>$}!Perform@{Perform}}
+\index{Perform@{Perform}!testing::internal::InvokeCallbackWithoutArgsAction$<$ CallbackType $>$@{testing::internal::InvokeCallbackWithoutArgsAction$<$ CallbackType $>$}}
+\doxysubsubsection{\texorpdfstring{Perform()}{Perform()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_invoke_callback_without_args_action_ac43b186c6daa5f21c8377678c6a9d4ba} 
+template$<$typename Callback\+Type $>$ \\
+template$<$typename Result , typename Argument\+Tuple $>$ \\
+Result \mbox{\hyperlink{classtesting_1_1internal_1_1_invoke_callback_without_args_action}{testing\+::internal\+::\+Invoke\+Callback\+Without\+Args\+Action}}$<$ Callback\+Type $>$\+::\+Perform (\begin{DoxyParamCaption}\item[{const Argument\+Tuple \&}]{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-actions_8h_source_l00931}{931}} of file \mbox{\hyperlink{gmock-actions_8h_source}{gmock-\/actions.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00931\ \{\ \textcolor{keywordflow}{return}\ callback\_-\/>Run();\ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/include/gmock/\mbox{\hyperlink{gmock-actions_8h}{gmock-\/actions.\+h}}\end{DoxyCompactItemize}

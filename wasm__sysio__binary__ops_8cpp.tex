@@ -1,0 +1,59 @@
+\doxysection{libraries/chain/wasm\+\_\+sysio\+\_\+binary\+\_\+ops.cpp File Reference}
+\hypertarget{wasm__sysio__binary__ops_8cpp}{}\label{wasm__sysio__binary__ops_8cpp}\index{libraries/chain/wasm\_sysio\_binary\_ops.cpp@{libraries/chain/wasm\_sysio\_binary\_ops.cpp}}
+{\ttfamily \#include $<$sysio/chain/wasm\+\_\+sysio\+\_\+binary\+\_\+ops.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/exception/exception.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/exceptions.\+hpp$>$}\newline
+{\ttfamily \#include "{}IR/\+Module.\+h"{}}\newline
+{\ttfamily \#include "{}IR/\+Operators.\+h"{}}\newline
+{\ttfamily \#include $<$vector$>$}\newline
+Include dependency graph for wasm\+\_\+sysio\+\_\+binary\+\_\+ops.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{wasm__sysio__binary__ops_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain}{sysio\+::chain}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops}{sysio\+::chain\+::wasm\+\_\+ops}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+std\+::string \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_a7b30df61cf482041b82ef222402356c6}{sysio\+::chain\+::wasm\+\_\+ops\+::to\+\_\+string}} (\mbox{\hyperlink{struct_i_r_1_1_no_imm}{No\+Imm}} imm)
+\item 
+std\+::string \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_a76645fe52b9ed49fdaee2583cb3a28b3}{sysio\+::chain\+::wasm\+\_\+ops\+::to\+\_\+string}} (\mbox{\hyperlink{struct_i_r_1_1_memory_imm}{Memory\+Imm}} imm)
+\item 
+std\+::string \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_a1c33a7575104646d5c65dcf77c9396b0}{sysio\+::chain\+::wasm\+\_\+ops\+::to\+\_\+string}} (\mbox{\hyperlink{struct_i_r_1_1_call_imm}{Call\+Imm}} imm)
+\item 
+std\+::string \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_abf6209ab1bbffc6951a52313f2b69f56}{sysio\+::chain\+::wasm\+\_\+ops\+::to\+\_\+string}} (\mbox{\hyperlink{struct_i_r_1_1_call_indirect_imm}{Call\+Indirect\+Imm}} imm)
+\item 
+std\+::string \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_a7f5043d86d9d203459eb0c8e4071e9d8}{sysio\+::chain\+::wasm\+\_\+ops\+::to\+\_\+string}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{hello__driver_8cpp_a0b6f424d9a532680c6b2ca5c119c938b}{field}})
+\item 
+std\+::string \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_a3655843e5c29f71e2672732f50505da4}{sysio\+::chain\+::wasm\+\_\+ops\+::to\+\_\+string}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{hello__driver_8cpp_a0b6f424d9a532680c6b2ca5c119c938b}{field}})
+\item 
+std\+::string \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_a673fe0122b0c814d5f0b67c7cad2a6a5}{sysio\+::chain\+::wasm\+\_\+ops\+::to\+\_\+string}} (\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1blocktype}{blocktype}} \mbox{\hyperlink{hello__driver_8cpp_a0b6f424d9a532680c6b2ca5c119c938b}{field}})
+\item 
+std\+::string \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_adb975509e5dd2e74b71684ee7a8d599f}{sysio\+::chain\+::wasm\+\_\+ops\+::to\+\_\+string}} (\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1memoryoptype}{memoryoptype}} \mbox{\hyperlink{hello__driver_8cpp_a0b6f424d9a532680c6b2ca5c119c938b}{field}})
+\item 
+std\+::string \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_a941fecf1c7caa6628f4d3518cffda917}{sysio\+::chain\+::wasm\+\_\+ops\+::to\+\_\+string}} (\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1memarg}{memarg}} \mbox{\hyperlink{hello__driver_8cpp_a0b6f424d9a532680c6b2ca5c119c938b}{field}})
+\item 
+std\+::string \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_a00edca1135edaafa6401ad137f7e5efe}{sysio\+::chain\+::wasm\+\_\+ops\+::to\+\_\+string}} (\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1branchtabletype}{branchtabletype}} \mbox{\hyperlink{hello__driver_8cpp_a0b6f424d9a532680c6b2ca5c119c938b}{field}})
+\item 
+std\+::vector$<$ \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} $>$ \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_a89b112bf2bc003d12b1d019e32976e68}{sysio\+::chain\+::wasm\+\_\+ops\+::pack}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{hello__driver_8cpp_a0b6f424d9a532680c6b2ca5c119c938b}{field}})
+\item 
+std\+::vector$<$ \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} $>$ \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_a9f786eefe1900d7589a7f380c655f5f2}{sysio\+::chain\+::wasm\+\_\+ops\+::pack}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{hello__driver_8cpp_a0b6f424d9a532680c6b2ca5c119c938b}{field}})
+\item 
+std\+::vector$<$ \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} $>$ \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_a61806e159219cc31de5e860f56df1d0a}{sysio\+::chain\+::wasm\+\_\+ops\+::pack}} (\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1blocktype}{blocktype}} \mbox{\hyperlink{hello__driver_8cpp_a0b6f424d9a532680c6b2ca5c119c938b}{field}})
+\item 
+std\+::vector$<$ \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} $>$ \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac71755f480172fadbfc64bd294da80bc}{sysio\+::chain\+::wasm\+\_\+ops\+::pack}} (\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1memoryoptype}{memoryoptype}} \mbox{\hyperlink{hello__driver_8cpp_a0b6f424d9a532680c6b2ca5c119c938b}{field}})
+\item 
+std\+::vector$<$ \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} $>$ \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ab61d0f4c04b467f38c7be97db73caa4e}{sysio\+::chain\+::wasm\+\_\+ops\+::pack}} (\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1memarg}{memarg}} \mbox{\hyperlink{hello__driver_8cpp_a0b6f424d9a532680c6b2ca5c119c938b}{field}})
+\item 
+std\+::vector$<$ \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} $>$ \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_a1af8c63171f1f21536457e003f8d6e2e}{sysio\+::chain\+::wasm\+\_\+ops\+::pack}} (\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1branchtabletype}{branchtabletype}} \mbox{\hyperlink{hello__driver_8cpp_a0b6f424d9a532680c6b2ca5c119c938b}{field}})
+\end{DoxyCompactItemize}

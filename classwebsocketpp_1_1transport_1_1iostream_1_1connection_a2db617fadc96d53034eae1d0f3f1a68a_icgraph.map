@@ -1,0 +1,5 @@
+<map id="websocketpp::transport::iostream::connection::async_shutdown" name="websocketpp::transport::iostream::connection::async_shutdown">
+<area shape="rect" id="Node000001" title="Perform cleanup on socket shutdown_handler." alt="" coords="192,5,349,61"/>
+<area shape="rect" id="Node000002" href="$structstub__con.html#a206b67c35da3da4fed8bfb2e2e783993" title=" " alt="" coords="5,20,144,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="176,36,144,36,144,30,176,30"/>
+</map>

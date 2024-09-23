@@ -1,0 +1,18 @@
+<map id="sysio::chain::builtin_protocol_feature" name="sysio::chain::builtin_protocol_feature">
+<area shape="rect" id="Node000001" title=" " alt="" coords="934,43,1068,84"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1chain_1_1protocol__feature__base.html" title=" " alt="" coords="736,91,882,132"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="896,87,934,78,935,83,897,92"/>
+<area shape="rect" id="Node000003" href="$structfc_1_1reflect__init.html" title=" " alt="" coords="398,59,498,84"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="515,76,736,101,736,106,514,81"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="422,5,475,31"/>
+<area shape="poly" id="edge8_Node000001_Node000004" title=" " alt="" coords="491,18,709,32,934,53,934,59,709,37,490,23"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="491,26,576,47,643,61,710,77,747,88,746,93,708,82,642,66,574,52,489,31"/>
+<area shape="rect" id="Node000005" href="$classfc_1_1sha256.html" title=" " alt="" coords="407,173,490,199"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="505,181,601,171,708,151,764,130,766,135,710,156,601,177,505,186"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="374,223,523,248"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="538,232,623,221,666,210,708,195,732,181,754,165,788,130,792,134,757,169,735,186,710,200,668,215,624,226,539,237"/>
+<area shape="rect" id="Node000007" href="$structsysio_1_1chain_1_1protocol__feature__subjective__restrictions.html" title=" " alt="" coords="346,108,551,149"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="566,130,709,125,736,122,736,127,709,130,566,135"/>
+<area shape="rect" id="Node000008" href="$classfc_1_1time__point.html" title=" " alt="" coords="5,116,106,142"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="121,126,345,126,345,132,121,132"/>
+</map>

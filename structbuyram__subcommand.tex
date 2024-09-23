@@ -1,0 +1,126 @@
+\doxysection{buyram\+\_\+subcommand Struct Reference}
+\hypertarget{structbuyram__subcommand}{}\label{structbuyram__subcommand}\index{buyram\_subcommand@{buyram\_subcommand}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structbuyram__subcommand_aefe28771c949401bedb6bc69b1596421}{buyram\+\_\+subcommand}} (\mbox{\hyperlink{class_c_l_i_1_1_app}{CLI\+::\+App}} \texorpdfstring{$\ast$}{*}action\+Root)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structbuyram__subcommand_ad644b8470c3a44d4f5222311bdbc86ec}{from\+\_\+str}}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structbuyram__subcommand_a88ee7a74253af8a3130f4149aa137316}{receiver\+\_\+str}}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structbuyram__subcommand_ab47dbd2e5805b957e5ea53e884a61b95}{amount}}
+\item 
+bool \mbox{\hyperlink{structbuyram__subcommand_a7a41c9da1053fadd77ac11fa2f3c8d6d}{kbytes}} = false
+\item 
+bool \mbox{\hyperlink{structbuyram__subcommand_a958c124ff7ad331fd5adfedc683039e9}{bytes}} = false
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01689}{1689}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structbuyram__subcommand_aefe28771c949401bedb6bc69b1596421}\index{buyram\_subcommand@{buyram\_subcommand}!buyram\_subcommand@{buyram\_subcommand}}
+\index{buyram\_subcommand@{buyram\_subcommand}!buyram\_subcommand@{buyram\_subcommand}}
+\doxysubsubsection{\texorpdfstring{buyram\_subcommand()}{buyram\_subcommand()}}
+{\footnotesize\ttfamily \label{structbuyram__subcommand_aefe28771c949401bedb6bc69b1596421} 
+buyram\+\_\+subcommand\+::buyram\+\_\+subcommand (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_c_l_i_1_1_app}{CLI\+::\+App}} \texorpdfstring{$\ast$}{*}}]{action\+Root}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01696}{1696}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01696\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01697\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ buyram\ =\ actionRoot-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_a8b461d2233ec4121259011b5ed24b336}{add\_subcommand}}(\textcolor{stringliteral}{"{}buyram"{}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}Buy\ RAM"{}}));}
+\DoxyCodeLine{01698\ \ \ \ \ \ \ buyram-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_a8c812d42c7720ecb5cd0aec41b5aa941}{add\_option}}(\textcolor{stringliteral}{"{}payer"{}},\ \mbox{\hyperlink{structbuyram__subcommand_ad644b8470c3a44d4f5222311bdbc86ec}{from\_str}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}The\ account\ paying\ for\ RAM"{}}))-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a}{required}}();}
+\DoxyCodeLine{01699\ \ \ \ \ \ \ buyram-\/>add\_option(\textcolor{stringliteral}{"{}receiver"{}},\ \mbox{\hyperlink{structbuyram__subcommand_a88ee7a74253af8a3130f4149aa137316}{receiver\_str}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}The\ account\ receiving\ bought\ RAM"{}}))-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a}{required}}();}
+\DoxyCodeLine{01700\ \ \ \ \ \ \ buyram-\/>add\_option(\textcolor{stringliteral}{"{}amount"{}},\ \mbox{\hyperlink{structbuyram__subcommand_ab47dbd2e5805b957e5ea53e884a61b95}{amount}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}The\ amount\ of\ tokens\ to\ pay\ for\ RAM,\ or\ number\ of\ bytes/kibibytes\ of\ RAM\ if\ -\/-\/bytes/-\/-\/kbytes\ is\ set"{}}))-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a}{required}}();}
+\DoxyCodeLine{01701\ \ \ \ \ \ \ buyram-\/>add\_flag(\textcolor{stringliteral}{"{}-\/-\/kbytes,-\/k"{}},\ \mbox{\hyperlink{structbuyram__subcommand_a7a41c9da1053fadd77ac11fa2f3c8d6d}{kbytes}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}The\ amount\ to\ buy\ in\ kibibytes\ (KiB)"{}}));}
+\DoxyCodeLine{01702\ \ \ \ \ \ \ buyram-\/>add\_flag(\textcolor{stringliteral}{"{}-\/-\/bytes,-\/b"{}},\ \mbox{\hyperlink{classfc_1_1vector}{bytes}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}The\ amount\ to\ buy\ in\ bytes"{}}));}
+\DoxyCodeLine{01703\ \ \ \ \ \ \ \mbox{\hyperlink{programs_2clio_2main_8cpp_aa5d53f41b83b5323c73622fbbb15e9cd}{add\_standard\_transaction\_options}}(buyram,\ \textcolor{stringliteral}{"{}payer@active"{}});}
+\DoxyCodeLine{01704\ \ \ \ \ \ \ buyram-\/>callback([\textcolor{keyword}{this}]\ \{}
+\DoxyCodeLine{01705\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{programs_2clio_2main_8cpp_a105d61ef6bafc8f471dd8f59e08945e1}{SYSC\_ASSERT}}(\ !\mbox{\hyperlink{structbuyram__subcommand_a7a41c9da1053fadd77ac11fa2f3c8d6d}{kbytes}}\ ||\ !\mbox{\hyperlink{classfc_1_1vector}{bytes}},\ \textcolor{stringliteral}{"{}ERROR:\ -\/-\/kbytes\ and\ -\/-\/bytes\ cannot\ be\ set\ at\ the\ same\ time"{}}\ );}
+\DoxyCodeLine{01706\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structbuyram__subcommand_a7a41c9da1053fadd77ac11fa2f3c8d6d}{kbytes}}\ ||\ \mbox{\hyperlink{classfc_1_1vector}{bytes}})\ \{}
+\DoxyCodeLine{01707\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{programs_2clio_2main_8cpp_aaf784434864a29e4835be7465173d1ab}{send\_actions}}(\ \{\ \mbox{\hyperlink{programs_2clio_2main_8cpp_afaa24f25f9a5686fd3686fb211af3c0e}{create\_buyrambytes}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(\mbox{\hyperlink{structbuyram__subcommand_ad644b8470c3a44d4f5222311bdbc86ec}{from\_str}}),\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(\mbox{\hyperlink{structbuyram__subcommand_a88ee7a74253af8a3130f4149aa137316}{receiver\_str}}),\ \mbox{\hyperlink{namespacefc_ab20c9acf886f89fabeb8a0d9ebc9abb8}{fc::to\_uint64}}(\mbox{\hyperlink{structbuyram__subcommand_ab47dbd2e5805b957e5ea53e884a61b95}{amount}})\ *\ ((\mbox{\hyperlink{structbuyram__subcommand_a7a41c9da1053fadd77ac11fa2f3c8d6d}{kbytes}})\ ?\ 1024ull\ :\ 1ull))\ \}\ );}
+\DoxyCodeLine{01708\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{01709\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{programs_2clio_2main_8cpp_aaf784434864a29e4835be7465173d1ab}{send\_actions}}(\ \{\ \mbox{\hyperlink{programs_2clio_2main_8cpp_a9205975d40636a093c81061558e5c297}{create\_buyram}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(\mbox{\hyperlink{structbuyram__subcommand_ad644b8470c3a44d4f5222311bdbc86ec}{from\_str}}),\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(\mbox{\hyperlink{structbuyram__subcommand_a88ee7a74253af8a3130f4149aa137316}{receiver\_str}}),\ \mbox{\hyperlink{programs_2clio_2main_8cpp_a1eaaa88d636c18502c1997d48cdbebb1}{to\_asset}}(\mbox{\hyperlink{structbuyram__subcommand_ab47dbd2e5805b957e5ea53e884a61b95}{amount}}))\ \}\ );}
+\DoxyCodeLine{01710\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01711\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{01712\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structbuyram__subcommand_aefe28771c949401bedb6bc69b1596421_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structbuyram__subcommand_ab47dbd2e5805b957e5ea53e884a61b95}\index{buyram\_subcommand@{buyram\_subcommand}!amount@{amount}}
+\index{amount@{amount}!buyram\_subcommand@{buyram\_subcommand}}
+\doxysubsubsection{\texorpdfstring{amount}{amount}}
+{\footnotesize\ttfamily \label{structbuyram__subcommand_ab47dbd2e5805b957e5ea53e884a61b95} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} buyram\+\_\+subcommand\+::amount}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01692}{1692}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{structbuyram__subcommand_a958c124ff7ad331fd5adfedc683039e9}\index{buyram\_subcommand@{buyram\_subcommand}!bytes@{bytes}}
+\index{bytes@{bytes}!buyram\_subcommand@{buyram\_subcommand}}
+\doxysubsubsection{\texorpdfstring{bytes}{bytes}}
+{\footnotesize\ttfamily \label{structbuyram__subcommand_a958c124ff7ad331fd5adfedc683039e9} 
+bool buyram\+\_\+subcommand\+::bytes = false}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01694}{1694}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{structbuyram__subcommand_ad644b8470c3a44d4f5222311bdbc86ec}\index{buyram\_subcommand@{buyram\_subcommand}!from\_str@{from\_str}}
+\index{from\_str@{from\_str}!buyram\_subcommand@{buyram\_subcommand}}
+\doxysubsubsection{\texorpdfstring{from\_str}{from\_str}}
+{\footnotesize\ttfamily \label{structbuyram__subcommand_ad644b8470c3a44d4f5222311bdbc86ec} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} buyram\+\_\+subcommand\+::from\+\_\+str}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01690}{1690}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{structbuyram__subcommand_a7a41c9da1053fadd77ac11fa2f3c8d6d}\index{buyram\_subcommand@{buyram\_subcommand}!kbytes@{kbytes}}
+\index{kbytes@{kbytes}!buyram\_subcommand@{buyram\_subcommand}}
+\doxysubsubsection{\texorpdfstring{kbytes}{kbytes}}
+{\footnotesize\ttfamily \label{structbuyram__subcommand_a7a41c9da1053fadd77ac11fa2f3c8d6d} 
+bool buyram\+\_\+subcommand\+::kbytes = false}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01693}{1693}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{structbuyram__subcommand_a88ee7a74253af8a3130f4149aa137316}\index{buyram\_subcommand@{buyram\_subcommand}!receiver\_str@{receiver\_str}}
+\index{receiver\_str@{receiver\_str}!buyram\_subcommand@{buyram\_subcommand}}
+\doxysubsubsection{\texorpdfstring{receiver\_str}{receiver\_str}}
+{\footnotesize\ttfamily \label{structbuyram__subcommand_a88ee7a74253af8a3130f4149aa137316} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} buyram\+\_\+subcommand\+::receiver\+\_\+str}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01691}{1691}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+programs/clio/\mbox{\hyperlink{programs_2clio_2main_8cpp}{main.\+cpp}}\end{DoxyCompactItemize}

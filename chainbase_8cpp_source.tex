@@ -1,0 +1,93 @@
+\doxysection{chainbase.\+cpp}
+\hypertarget{chainbase_8cpp_source}{}\label{chainbase_8cpp_source}\index{libraries/chainbase/src/chainbase.cpp@{libraries/chainbase/src/chainbase.cpp}}
+\mbox{\hyperlink{chainbase_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{chainbase_8hpp}{chainbase/chainbase.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <boost/array.hpp>}}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <iostream>}}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#ifndef\ \_WIN32}}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <sys/mman.h>}}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00008}00008\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00010}00010\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacechainbase}{chainbase}}\ \{}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00012}\mbox{\hyperlink{classchainbase_1_1database_a461fee5fe782650c4642bf1e5817e646}{00012}}\ \ \ \ \mbox{\hyperlink{classchainbase_1_1database_a461fee5fe782650c4642bf1e5817e646}{database::database}}(\textcolor{keyword}{const}\ bfs::path\&\ dir,\ \mbox{\hyperlink{classchainbase_1_1database_a3d0148ef1d3bf633f3d0bfab420250ee}{open\_flags}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae0ed371842ace71a7886a6134ecbcb62}{flags}},\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ shared\_file\_size,\ \textcolor{keywordtype}{bool}\ allow\_dirty,}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00013}00013\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a7fe6684b11f441d2e971fe65166d7d5f}{pinnable\_mapped\_file::map\_mode}}\ db\_map\_mode)\ :}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00014}00014\ \ \ \ \ \ \ \_db\_file(dir,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae0ed371842ace71a7886a6134ecbcb62}{flags}}\ \&\ \mbox{\hyperlink{classchainbase_1_1database}{database}}::read\_write,\ shared\_file\_size,\ allow\_dirty,\ db\_map\_mode),}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00015}00015\ \ \ \ \ \ \ \_read\_only(\mbox{\hyperlink{yubihsm__pkcs11_8c_ae0ed371842ace71a7886a6134ecbcb62}{flags}}\ ==\ \mbox{\hyperlink{classchainbase_1_1database}{database}}::read\_only)}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00016}00016\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00017}00017\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00019}\mbox{\hyperlink{classchainbase_1_1database_a31008de680565a626cd975c25d4351db}{00019}}\ \ \ \ \mbox{\hyperlink{classchainbase_1_1database_a31008de680565a626cd975c25d4351db}{database::\string~database}}()}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00020}00020\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00021}00021\ \ \ \ \ \ \ \_index\_list.clear();}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00022}00022\ \ \ \ \ \ \ \_index\_map.clear();}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00023}00023\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00025}\mbox{\hyperlink{classchainbase_1_1database_ad544b6a999bff16775ebd96dfb6b8e27}{00025}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classchainbase_1_1database_ad544b6a999bff16775ebd96dfb6b8e27}{database::set\_require\_locking}}(\ \textcolor{keywordtype}{bool}\ enable\_require\_locking\ )}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00026}00026\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00027}00027\ \textcolor{preprocessor}{\#ifdef\ CHAINBASE\_CHECK\_LOCKING}}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00028}00028\ \ \ \ \ \ \ \_enable\_require\_locking\ =\ enable\_require\_locking;}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00029}00029\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00030}00030\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00032}00032\ \textcolor{preprocessor}{\#ifdef\ CHAINBASE\_CHECK\_LOCKING}}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00033}00033\ \ \ \ \textcolor{keywordtype}{void}\ database::require\_lock\_fail(\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ method,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ lock\_type,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ tname\ )\textcolor{keyword}{const}}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00034}00034\ \textcolor{keyword}{\ \ \ }\{}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00035}00035\ \ \ \ \ \ \ std::string\ err\_msg\ =\ \textcolor{stringliteral}{"{}database::"{}}\ +\ std::string(\ method\ )\ +\ \textcolor{stringliteral}{"{}\ require\_"{}}\ +\ std::string(\ lock\_type\ )\ +\ \textcolor{stringliteral}{"{}\_lock()\ failed\ on\ type\ "{}}\ +\ std::string(\ tname\ );}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00036}00036\ \ \ \ \ \ \ std::cerr\ <<\ err\_msg\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00037}00037\ \ \ \ \ \ \ BOOST\_THROW\_EXCEPTION(\ std::runtime\_error(\ err\_msg\ )\ );}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00038}00038\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00039}00039\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00041}\mbox{\hyperlink{classchainbase_1_1database_a167bce30384de1f373ebe0c25d4d0de6}{00041}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classchainbase_1_1database_a167bce30384de1f373ebe0c25d4d0de6}{database::undo}}()}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00042}00042\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00043}00043\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\&\ item\ :\ \_index\_list\ )}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00044}00044\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00045}00045\ \ \ \ \ \ \ \ \ \ item-\/>undo();}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00046}00046\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00047}00047\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00049}\mbox{\hyperlink{classchainbase_1_1database_ace133a4e1820ea8663fb4eaa19145e57}{00049}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classchainbase_1_1database_ace133a4e1820ea8663fb4eaa19145e57}{database::squash}}()}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00050}00050\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00051}00051\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\&\ item\ :\ \_index\_list\ )}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00052}00052\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \ item-\/>squash();}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00054}00054\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00055}00055\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00057}\mbox{\hyperlink{classchainbase_1_1database_aca6d7bcd700644f077b89203b2e8b7ef}{00057}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classchainbase_1_1database_aca6d7bcd700644f077b89203b2e8b7ef}{database::commit}}(\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ revision\ )}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00058}00058\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00059}00059\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\&\ item\ :\ \_index\_list\ )}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00060}00060\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00061}00061\ \ \ \ \ \ \ \ \ \ item-\/>commit(\ \mbox{\hyperlink{classchainbase_1_1database_a224fc0c346a93fd027bfa2515f54bf98}{revision}}\ );}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00062}00062\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00063}00063\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00065}\mbox{\hyperlink{classchainbase_1_1database_a832c383b7d8573d399e6149d4c715bd6}{00065}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classchainbase_1_1database_a832c383b7d8573d399e6149d4c715bd6}{database::undo\_all}}()}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00066}00066\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00067}00067\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\&\ item\ :\ \_index\_list\ )}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00068}00068\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00069}00069\ \ \ \ \ \ \ \ \ \ item-\/>undo\_all();}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00070}00070\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00071}00071\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00073}\mbox{\hyperlink{classchainbase_1_1database_abb570c03bda1ee6ae1b428d41481b476}{00073}}\ \ \ \ \mbox{\hyperlink{structchainbase_1_1database_1_1session}{database::session}}\ \mbox{\hyperlink{classchainbase_1_1database_abb570c03bda1ee6ae1b428d41481b476}{database::start\_undo\_session}}(\ \textcolor{keywordtype}{bool}\ enabled\ )}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00074}00074\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00075}00075\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ enabled\ )\ \{}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00076}00076\ \ \ \ \ \ \ \ \ \ vector<\ std::unique\_ptr<abstract\_session>\ >\ \_sub\_sessions;}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \_sub\_sessions.reserve(\ \_index\_list.size()\ );}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00078}00078\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\&\ item\ :\ \_index\_list\ )\ \{}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \ \ \ \_sub\_sessions.push\_back(\ item-\/>start\_undo\_session(\ enabled\ )\ );}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00080}00080\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00081}00081\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}}(\ std::move(\ \_sub\_sessions\ )\ );}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00082}00082\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00083}00083\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}}();}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00084}00084\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00085}00085\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00086}00086\ }
+\DoxyCodeLine{\Hypertarget{chainbase_8cpp_source_l00087}00087\ \}\ \ \textcolor{comment}{//\ namespace\ chainbase}}
+
+\end{DoxyCode}

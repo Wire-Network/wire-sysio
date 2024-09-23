@@ -1,0 +1,61 @@
+\doxysection{time.\+hpp}
+\hypertarget{vendor_2websocketpp_2websocketpp_2common_2time_8hpp_source}{}\label{vendor_2websocketpp_2websocketpp_2common_2time_8hpp_source}\index{libraries/fc/vendor/websocketpp/websocketpp/common/time.hpp@{libraries/fc/vendor/websocketpp/websocketpp/common/time.hpp}}
+\mbox{\hyperlink{vendor_2websocketpp_2websocketpp_2common_2time_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2websocketpp_2common_2time_8hpp_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2websocketpp_2common_2time_8hpp_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2014,\ Peter\ Thorson.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2websocketpp_2common_2time_8hpp_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2websocketpp_2common_2time_8hpp_source_l00004}00004\ \textcolor{comment}{\ *\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2websocketpp_2common_2time_8hpp_source_l00005}00005\ \textcolor{comment}{\ *\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are\ met:}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2websocketpp_2common_2time_8hpp_source_l00006}00006\ \textcolor{comment}{\ *\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2websocketpp_2common_2time_8hpp_source_l00007}00007\ \textcolor{comment}{\ *\ \ \ \ \ \ \ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2websocketpp_2common_2time_8hpp_source_l00008}00008\ \textcolor{comment}{\ *\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2websocketpp_2common_2time_8hpp_source_l00009}00009\ \textcolor{comment}{\ *\ \ \ \ \ \ \ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer\ in\ the}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2websocketpp_2common_2time_8hpp_source_l00010}00010\ \textcolor{comment}{\ *\ \ \ \ \ \ \ documentation\ and/or\ other\ materials\ provided\ with\ the\ distribution.}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2websocketpp_2common_2time_8hpp_source_l00011}00011\ \textcolor{comment}{\ *\ \ \ \ \ *\ Neither\ the\ name\ of\ the\ WebSocket++\ Project\ nor\ the}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2websocketpp_2common_2time_8hpp_source_l00012}00012\ \textcolor{comment}{\ *\ \ \ \ \ \ \ names\ of\ its\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2websocketpp_2common_2time_8hpp_source_l00013}00013\ \textcolor{comment}{\ *\ \ \ \ \ \ \ derived\ from\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2websocketpp_2common_2time_8hpp_source_l00014}00014\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2websocketpp_2common_2time_8hpp_source_l00015}00015\ \textcolor{comment}{\ *\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS\ "{}AS\ IS"{}}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2websocketpp_2common_2time_8hpp_source_l00016}00016\ \textcolor{comment}{\ *\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ THE}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2websocketpp_2common_2time_8hpp_source_l00017}00017\ \textcolor{comment}{\ *\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR\ A\ PARTICULAR\ PURPOSE}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2websocketpp_2common_2time_8hpp_source_l00018}00018\ \textcolor{comment}{\ *\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ PETER\ THORSON\ BE\ LIABLE\ FOR\ ANY}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2websocketpp_2common_2time_8hpp_source_l00019}00019\ \textcolor{comment}{\ *\ DIRECT,\ INDIRECT,\ INCIDENTAL,\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2websocketpp_2common_2time_8hpp_source_l00020}00020\ \textcolor{comment}{\ *\ (INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2websocketpp_2common_2time_8hpp_source_l00021}00021\ \textcolor{comment}{\ *\ LOSS\ OF\ USE,\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2websocketpp_2common_2time_8hpp_source_l00022}00022\ \textcolor{comment}{\ *\ ON\ ANY\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2websocketpp_2common_2time_8hpp_source_l00023}00023\ \textcolor{comment}{\ *\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE\ OF\ THIS}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2websocketpp_2common_2time_8hpp_source_l00024}00024\ \textcolor{comment}{\ *\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2websocketpp_2common_2time_8hpp_source_l00025}00025\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2websocketpp_2common_2time_8hpp_source_l00026}00026\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2websocketpp_2common_2time_8hpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2websocketpp_2common_2time_8hpp_source_l00028}00028\ \textcolor{preprocessor}{\#ifndef\ WEBSOCKETPP\_COMMON\_TIME\_HPP}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2websocketpp_2common_2time_8hpp_source_l00029}00029\ \textcolor{preprocessor}{\#define\ WEBSOCKETPP\_COMMON\_TIME\_HPP}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2websocketpp_2common_2time_8hpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2websocketpp_2common_2time_8hpp_source_l00031}00031\ \textcolor{preprocessor}{\#include\ <ctime>}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2websocketpp_2common_2time_8hpp_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2websocketpp_2common_2time_8hpp_source_l00033}00033\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacewebsocketpp}{websocketpp}}\ \{}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2websocketpp_2common_2time_8hpp_source_l00034}00034\ \textcolor{keyword}{namespace\ }lib\ \{}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2websocketpp_2common_2time_8hpp_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2websocketpp_2common_2time_8hpp_source_l00036}00036\ \textcolor{comment}{//\ Code\ in\ this\ header\ was\ inspired\ by\ the\ following\ article\ and\ includes\ some}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2websocketpp_2common_2time_8hpp_source_l00037}00037\ \textcolor{comment}{//\ code\ from\ the\ related\ project\ g2log.\ The\ g2log\ code\ is\ public\ domain\ licensed}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2websocketpp_2common_2time_8hpp_source_l00038}00038\ \textcolor{comment}{//\ http://kjellkod.wordpress.com/2013/01/22/exploring-\/c11-\/part-\/2-\/localtime-\/and-\/time-\/again/}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2websocketpp_2common_2time_8hpp_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2websocketpp_2common_2time_8hpp_source_l00041}\mbox{\hyperlink{namespacewebsocketpp_1_1lib_a1b873cb6baa3d85b57573bee059b29f4}{00041}}\ \textcolor{keyword}{inline}\ std::tm\ \mbox{\hyperlink{namespacewebsocketpp_1_1lib_a1b873cb6baa3d85b57573bee059b29f4}{localtime}}(std::time\_t\ \textcolor{keyword}{const}\ \&\ time)\ \{}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2websocketpp_2common_2time_8hpp_source_l00042}00042\ \ \ \ \ std::tm\ tm\_snapshot;}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2websocketpp_2common_2time_8hpp_source_l00043}00043\ \textcolor{preprocessor}{\#if\ (defined(\_\_MINGW32\_\_)\ ||\ defined(\_\_MINGW64\_\_))}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2websocketpp_2common_2time_8hpp_source_l00044}00044\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(\&tm\_snapshot,\ \mbox{\hyperlink{namespacewebsocketpp_1_1lib_a1b873cb6baa3d85b57573bee059b29f4}{::localtime}}(\&time),\ \textcolor{keyword}{sizeof}(std::tm));}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2websocketpp_2common_2time_8hpp_source_l00045}00045\ \textcolor{preprocessor}{\#elif\ (defined(WIN32)\ ||\ defined(\_WIN32)\ ||\ defined(\_\_WIN32\_\_))}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2websocketpp_2common_2time_8hpp_source_l00046}00046\ \ \ \ \ localtime\_s(\&tm\_snapshot,\ \&time);\ }
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2websocketpp_2common_2time_8hpp_source_l00047}00047\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2websocketpp_2common_2time_8hpp_source_l00048}00048\ \ \ \ \ localtime\_r(\&time,\ \&tm\_snapshot);\ \textcolor{comment}{//\ POSIX\ \ }}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2websocketpp_2common_2time_8hpp_source_l00049}00049\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2websocketpp_2common_2time_8hpp_source_l00050}00050\ \ \ \ \ \textcolor{keywordflow}{return}\ tm\_snapshot;}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2websocketpp_2common_2time_8hpp_source_l00051}00051\ \}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2websocketpp_2common_2time_8hpp_source_l00052}00052\ }
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2websocketpp_2common_2time_8hpp_source_l00053}00053\ \}\ \textcolor{comment}{//\ lib}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2websocketpp_2common_2time_8hpp_source_l00054}00054\ \}\ \textcolor{comment}{//\ websocketpp}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2websocketpp_2common_2time_8hpp_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2websocketpp_2common_2time_8hpp_source_l00056}00056\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ WEBSOCKETPP\_COMMON\_TIME\_HPP}}
+
+\end{DoxyCode}

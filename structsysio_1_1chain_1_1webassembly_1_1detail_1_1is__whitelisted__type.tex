@@ -1,0 +1,45 @@
+\doxysection{sysio\+::chain\+::webassembly\+::detail\+::is\+\_\+whitelisted\+\_\+type\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>} Struct Template Reference}
+\hypertarget{structsysio_1_1chain_1_1webassembly_1_1detail_1_1is__whitelisted__type}{}\label{structsysio_1_1chain_1_1webassembly_1_1detail_1_1is__whitelisted__type}\index{sysio::chain::webassembly::detail::is\_whitelisted\_type$<$ T $>$@{sysio::chain::webassembly::detail::is\_whitelisted\_type$<$ T $>$}}
+
+
+{\ttfamily \#include $<$preconditions.\+hpp$>$}
+
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static constexpr bool \mbox{\hyperlink{structsysio_1_1chain_1_1webassembly_1_1detail_1_1is__whitelisted__type_aa035d4bc847232708bfe27aedce486de}{value}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$\newline
+struct sysio\+::chain\+::webassembly\+::detail\+::is\+\_\+whitelisted\+\_\+type$<$ T $>$}
+
+
+Definition at line \mbox{\hyperlink{preconditions_8hpp_source_l00043}{43}} of file \mbox{\hyperlink{preconditions_8hpp_source}{preconditions.\+hpp}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1chain_1_1webassembly_1_1detail_1_1is__whitelisted__type_aa035d4bc847232708bfe27aedce486de}\index{sysio::chain::webassembly::detail::is\_whitelisted\_type$<$ T $>$@{sysio::chain::webassembly::detail::is\_whitelisted\_type$<$ T $>$}!value@{value}}
+\index{value@{value}!sysio::chain::webassembly::detail::is\_whitelisted\_type$<$ T $>$@{sysio::chain::webassembly::detail::is\_whitelisted\_type$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{value}{value}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1webassembly_1_1detail_1_1is__whitelisted__type_aa035d4bc847232708bfe27aedce486de} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+bool \mbox{\hyperlink{structsysio_1_1chain_1_1webassembly_1_1detail_1_1is__whitelisted__type}{sysio\+::chain\+::webassembly\+::detail\+::is\+\_\+whitelisted\+\_\+type}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::value\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=\ (\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_1_1detail_abbc8f78657b994f62d142f7a81d0174b}{is\_wasm\_arithmetic\_type\_v<T>}}\ ||\ std::is\_same\_v<name,\ T>)\ \&\&}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ !(std::is\_pointer\_v<T>\ ||\ std::is\_reference\_v<T>)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{preconditions_8hpp_source_l00044}{44}} of file \mbox{\hyperlink{preconditions_8hpp_source}{preconditions.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/webassembly/\mbox{\hyperlink{preconditions_8hpp}{preconditions.\+hpp}}\end{DoxyCompactItemize}

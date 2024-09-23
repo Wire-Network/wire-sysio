@@ -1,0 +1,18 @@
+<map id="WAST::calcLocusFromOffset" name="WAST::calcLocusFromOffset">
+<area shape="rect" id="Node000001" title=" " alt="" coords="877,63,1067,88"/>
+<area shape="rect" id="Node000002" href="$namespace_w_a_s_t.html#a9b736e747098508f90bd9495fa4a9a11" title=" " alt="" coords="697,33,821,59"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="861,63,821,57,822,52,862,58"/>
+<area shape="rect" id="Node000006" href="$namespace_w_a_s_t.html#a6d93426db9bd262249b9ce93ddba7c87" title=" " alt="" coords="689,87,829,112"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="862,91,829,94,829,89,861,85"/>
+<area shape="rect" id="Node000003" href="$namespace_w_a_s_t.html#ad67ed47b4a120f234a3a4a2da076418f" title=" " alt="" coords="5,5,174,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="691,32,641,23,514,13,387,10,174,15,174,10,387,4,514,8,642,18,692,27"/>
+<area shape="rect" id="Node000004" href="$namespace_w_a_s_t.html#afdc0ca4bc5028ce0d0d1f0b50eadf451" title=" " alt="" coords="466,33,641,59"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="681,49,642,49,642,44,681,44"/>
+<area shape="rect" id="Node000005" href="$namespace_w_a_s_t.html#ab72b47fe2520b8a7840ff4ce5d07684d" title=" " alt="" coords="222,26,418,66"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="450,49,418,49,418,44,450,44"/>
+<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="206,35,174,31,174,26,206,30"/>
+<area shape="rect" id="Node000007" href="$namespacesysio_1_1chain.html#ae6ea4fd60bb72cc213f5311600ca63e8" title=" " alt="" coords="490,87,617,128"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="674,105,618,108,618,102,674,100"/>
+<area shape="rect" id="Node000008" href="$classsysio_1_1testing_1_1base__tester.html#a768d08e70915faf981cdfe6da50f24d1" title=" " alt="" coords="252,91,388,132"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="475,112,388,113,388,108,474,106"/>
+</map>

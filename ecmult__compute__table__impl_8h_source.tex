@@ -1,0 +1,55 @@
+\doxysection{ecmult\+\_\+compute\+\_\+table\+\_\+impl.\+h}
+\hypertarget{ecmult__compute__table__impl_8h_source}{}\label{ecmult__compute__table__impl_8h_source}\index{libraries/fc/secp256k1/secp256k1/src/ecmult\_compute\_table\_impl.h@{libraries/fc/secp256k1/secp256k1/src/ecmult\_compute\_table\_impl.h}}
+\mbox{\hyperlink{ecmult__compute__table__impl_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table__impl_8h_source_l00001}00001\ \textcolor{comment}{/*****************************************************************************************************}}
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table__impl_8h_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2013,\ 2014,\ 2017,\ 2021\ Pieter\ Wuille,\ Andrew\ Poelstra,\ Jonas\ Nick,\ Russell\ O'Connor\ *}}
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table__impl_8h_source_l00003}00003\ \textcolor{comment}{\ *\ Distributed\ under\ the\ MIT\ software\ license,\ see\ the\ accompanying\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table__impl_8h_source_l00004}00004\ \textcolor{comment}{\ *\ file\ COPYING\ or\ https://www.opensource.org/licenses/mit-\/license.php.\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table__impl_8h_source_l00005}00005\ \textcolor{comment}{\ *****************************************************************************************************/}}
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table__impl_8h_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table__impl_8h_source_l00007}00007\ \textcolor{preprocessor}{\#ifndef\ SECP256K1\_ECMULT\_COMPUTE\_TABLE\_IMPL\_H}}
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table__impl_8h_source_l00008}00008\ \textcolor{preprocessor}{\#define\ SECP256K1\_ECMULT\_COMPUTE\_TABLE\_IMPL\_H}}
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table__impl_8h_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table__impl_8h_source_l00010}00010\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ecmult__compute__table_8h}{ecmult\_compute\_table.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table__impl_8h_source_l00011}00011\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{group__impl_8h}{group\_impl.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table__impl_8h_source_l00012}00012\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{field__impl_8h}{field\_impl.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table__impl_8h_source_l00013}00013\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ecmult_8h}{ecmult.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table__impl_8h_source_l00014}00014\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h}{util.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table__impl_8h_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table__impl_8h_source_l00016}00016\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_ecmult\_compute\_table(\mbox{\hyperlink{structsecp256k1__ge__storage}{secp256k1\_ge\_storage}}*\ table,\ \textcolor{keywordtype}{int}\ window\_g,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__gej}{secp256k1\_gej}}*\ gen)\ \{}
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table__impl_8h_source_l00017}00017\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__gej}{secp256k1\_gej}}\ gj;}
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table__impl_8h_source_l00018}00018\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__ge}{secp256k1\_ge}}\ ge,\ dgen;}
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table__impl_8h_source_l00019}00019\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}};}
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table__impl_8h_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table__impl_8h_source_l00021}00021\ \ \ \ \ gj\ =\ *gen;}
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table__impl_8h_source_l00022}00022\ \ \ \ \ secp256k1\_ge\_set\_gej\_var(\&ge,\ \&gj);}
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table__impl_8h_source_l00023}00023\ \ \ \ \ secp256k1\_ge\_to\_storage(\&table[0],\ \&ge);}
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table__impl_8h_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table__impl_8h_source_l00025}00025\ \ \ \ \ secp256k1\_gej\_double\_var(\&gj,\ gen,\ NULL);}
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table__impl_8h_source_l00026}00026\ \ \ \ \ secp256k1\_ge\_set\_gej\_var(\&dgen,\ \&gj);}
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table__impl_8h_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table__impl_8h_source_l00028}00028\ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ =\ 1;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ <\ \mbox{\hyperlink{ecmult_8h_a97c6c6e5aa98f202eec77c4c931e02f1}{ECMULT\_TABLE\_SIZE}}(window\_g);\ ++\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}})\ \{}
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table__impl_8h_source_l00029}00029\ \ \ \ \ \ \ \ \ secp256k1\_gej\_set\_ge(\&gj,\ \&ge);}
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table__impl_8h_source_l00030}00030\ \ \ \ \ \ \ \ \ secp256k1\_gej\_add\_ge\_var(\&gj,\ \&gj,\ \&dgen,\ NULL);}
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table__impl_8h_source_l00031}00031\ \ \ \ \ \ \ \ \ secp256k1\_ge\_set\_gej\_var(\&ge,\ \&gj);}
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table__impl_8h_source_l00032}00032\ \ \ \ \ \ \ \ \ secp256k1\_ge\_to\_storage(\&table[\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}],\ \&ge);}
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table__impl_8h_source_l00033}00033\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table__impl_8h_source_l00034}00034\ \}}
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table__impl_8h_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table__impl_8h_source_l00036}00036\ \textcolor{comment}{/*\ Like\ secp256k1\_ecmult\_compute\_table,\ but\ one\ for\ both\ gen\ and\ gen*2\string^128.\ */}}
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table__impl_8h_source_l00037}00037\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_ecmult\_compute\_two\_tables(\mbox{\hyperlink{structsecp256k1__ge__storage}{secp256k1\_ge\_storage}}*\ table,\ \mbox{\hyperlink{structsecp256k1__ge__storage}{secp256k1\_ge\_storage}}*\ table\_128,\ \textcolor{keywordtype}{int}\ window\_g,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__ge}{secp256k1\_ge}}*\ gen)\ \{}
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table__impl_8h_source_l00038}00038\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__gej}{secp256k1\_gej}}\ gj;}
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table__impl_8h_source_l00039}00039\ \ \ \ \ \textcolor{keywordtype}{int}\ i;}
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table__impl_8h_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table__impl_8h_source_l00041}00041\ \ \ \ \ secp256k1\_gej\_set\_ge(\&gj,\ gen);}
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table__impl_8h_source_l00042}00042\ \ \ \ \ secp256k1\_ecmult\_compute\_table(table,\ window\_g,\ \&gj);}
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table__impl_8h_source_l00043}00043\ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ 128;\ ++i)\ \{}
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table__impl_8h_source_l00044}00044\ \ \ \ \ \ \ \ \ secp256k1\_gej\_double\_var(\&gj,\ \&gj,\ NULL);}
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table__impl_8h_source_l00045}00045\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table__impl_8h_source_l00046}00046\ \ \ \ \ secp256k1\_ecmult\_compute\_table(table\_128,\ window\_g,\ \&gj);}
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table__impl_8h_source_l00047}00047\ \}}
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table__impl_8h_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{ecmult__compute__table__impl_8h_source_l00049}00049\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{/*\ SECP256K1\_ECMULT\_COMPUTE\_TABLE\_IMPL\_H\ */}\textcolor{preprocessor}{}}
+
+\end{DoxyCode}

@@ -1,0 +1,494 @@
+\doxysection{internal\+::Schema\+Validation\+Context\texorpdfstring{$<$}{<} Schema\+Document\+Type \texorpdfstring{$>$}{>} Struct Template Reference}
+\hypertarget{structinternal_1_1_schema_validation_context}{}\label{structinternal_1_1_schema_validation_context}\index{internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}}
+
+
+{\ttfamily \#include $<$schema.\+h$>$}
+
+
+
+Collaboration diagram for internal\+::Schema\+Validation\+Context\texorpdfstring{$<$}{<} Schema\+Document\+Type \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structinternal_1_1_schema_validation_context__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{structinternal_1_1_schema_validation_context_a4fb1b8fe7ecb9d4608e6b0ac0716826c}{Pattern\+Validator\+Type}} \{ \mbox{\hyperlink{structinternal_1_1_schema_validation_context_a4fb1b8fe7ecb9d4608e6b0ac0716826ca54cca82af0ef391404c2a930187ce5e9}{k\+Pattern\+Validator\+Only}}
+, \mbox{\hyperlink{structinternal_1_1_schema_validation_context_a4fb1b8fe7ecb9d4608e6b0ac0716826ca2514cf806ce8e41993907d57d3732435}{k\+Pattern\+Validator\+With\+Property}}
+, \mbox{\hyperlink{structinternal_1_1_schema_validation_context_a4fb1b8fe7ecb9d4608e6b0ac0716826ca39a21b8fcd048ddaabe29bc11e08c8f8}{k\+Pattern\+Validator\+With\+Additional\+Property}}
+ \}
+\item 
+typedef \mbox{\hyperlink{classinternal_1_1_schema}{Schema}}$<$ Schema\+Document\+Type $>$ \mbox{\hyperlink{structinternal_1_1_schema_validation_context_ab18f864202ff87e1060afaa26a315f48}{Schema\+Type}}
+\item 
+typedef \mbox{\hyperlink{classinternal_1_1_i_schema_state_factory}{ISchema\+State\+Factory}}$<$ \mbox{\hyperlink{structinternal_1_1_schema_validation_context_ab18f864202ff87e1060afaa26a315f48}{Schema\+Type}} $>$ \mbox{\hyperlink{structinternal_1_1_schema_validation_context_aeb061edf370174dc73123fa98d9b5bd9}{Schema\+Validator\+Factory\+Type}}
+\item 
+typedef \mbox{\hyperlink{classinternal_1_1_i_validation_error_handler}{IValidation\+Error\+Handler}}$<$ \mbox{\hyperlink{structinternal_1_1_schema_validation_context_ab18f864202ff87e1060afaa26a315f48}{Schema\+Type}} $>$ \mbox{\hyperlink{structinternal_1_1_schema_validation_context_a1aab859110aa7da8adf1fd77a6ce77a7}{Error\+Handler\+Type}}
+\item 
+typedef \mbox{\hyperlink{classinternal_1_1_schema_a2a5fe5fcb1b3987afc624a286243ceeb}{Schema\+Type\+::\+Value\+Type}} \mbox{\hyperlink{structinternal_1_1_schema_validation_context_a8b4295c8f64b47c767ba8d1639fa3325}{Value\+Type}}
+\item 
+typedef Value\+Type\+::\+Ch \mbox{\hyperlink{structinternal_1_1_schema_validation_context_a0d5e219029a11ba86c4537792283ae70}{Ch}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structinternal_1_1_schema_validation_context_ad2cb3f3168faf268157f582102979102}{Schema\+Validation\+Context}} (\mbox{\hyperlink{structinternal_1_1_schema_validation_context_aeb061edf370174dc73123fa98d9b5bd9}{Schema\+Validator\+Factory\+Type}} \&\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}, \mbox{\hyperlink{structinternal_1_1_schema_validation_context_a1aab859110aa7da8adf1fd77a6ce77a7}{Error\+Handler\+Type}} \&eh, const \mbox{\hyperlink{structinternal_1_1_schema_validation_context_ab18f864202ff87e1060afaa26a315f48}{Schema\+Type}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\item 
+\mbox{\hyperlink{structinternal_1_1_schema_validation_context_abd287930e1134fe74e3e92580e51e97b}{\texorpdfstring{$\sim$}{\string~}\+Schema\+Validation\+Context}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structinternal_1_1_schema_validation_context_aeb061edf370174dc73123fa98d9b5bd9}{Schema\+Validator\+Factory\+Type}} \& \mbox{\hyperlink{structinternal_1_1_schema_validation_context_ae2661ad92602b4f12fbffadb3dab502e}{factory}}
+\item 
+\mbox{\hyperlink{structinternal_1_1_schema_validation_context_a1aab859110aa7da8adf1fd77a6ce77a7}{Error\+Handler\+Type}} \& \mbox{\hyperlink{structinternal_1_1_schema_validation_context_ad85d300184c10bf45b0852b6b26d118d}{error\+\_\+handler}}
+\item 
+const \mbox{\hyperlink{structinternal_1_1_schema_validation_context_ab18f864202ff87e1060afaa26a315f48}{Schema\+Type}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structinternal_1_1_schema_validation_context_af44336e8a612b77a0091cc57f8de1734}{schema}}
+\item 
+const \mbox{\hyperlink{structinternal_1_1_schema_validation_context_ab18f864202ff87e1060afaa26a315f48}{Schema\+Type}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structinternal_1_1_schema_validation_context_a34865d65fb3cbb01bc497d0efade0458}{value\+Schema}}
+\item 
+const \mbox{\hyperlink{structinternal_1_1_schema_validation_context_a0d5e219029a11ba86c4537792283ae70}{Ch}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structinternal_1_1_schema_validation_context_a9f6a91ee46c70e55f287b1e9b219df21}{invalid\+Keyword}}
+\item 
+void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structinternal_1_1_schema_validation_context_a4b419775e207cf72834f895dc30ac596}{hasher}}
+\item 
+void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structinternal_1_1_schema_validation_context_a5b6ec1a5fde2215de14a65fcbb06edde}{array\+Element\+Hash\+Codes}}
+\item 
+\mbox{\hyperlink{classinternal_1_1_i_schema_validator}{ISchema\+Validator}} \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structinternal_1_1_schema_validation_context_a1d215b80511f602ebece5c83b875cdd9}{validators}}
+\item 
+\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} \mbox{\hyperlink{structinternal_1_1_schema_validation_context_a10e5e97640846f3c23eaaba0506bb4f7}{validator\+Count}}
+\item 
+\mbox{\hyperlink{classinternal_1_1_i_schema_validator}{ISchema\+Validator}} \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structinternal_1_1_schema_validation_context_a758565f674e8fb2066ff0f89ee67a174}{pattern\+Properties\+Validators}}
+\item 
+\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} \mbox{\hyperlink{structinternal_1_1_schema_validation_context_a2b8a521d60d39472a1550b535028a353}{pattern\+Properties\+Validator\+Count}}
+\item 
+const \mbox{\hyperlink{structinternal_1_1_schema_validation_context_ab18f864202ff87e1060afaa26a315f48}{Schema\+Type}} \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structinternal_1_1_schema_validation_context_a12c48f172fbaae2e883f9eb2614d860e}{pattern\+Properties\+Schemas}}
+\item 
+\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} \mbox{\hyperlink{structinternal_1_1_schema_validation_context_a77d48b63f006479ab8c77f8192558441}{pattern\+Properties\+Schema\+Count}}
+\item 
+\mbox{\hyperlink{structinternal_1_1_schema_validation_context_a4fb1b8fe7ecb9d4608e6b0ac0716826c}{Pattern\+Validator\+Type}} \mbox{\hyperlink{structinternal_1_1_schema_validation_context_acc1ba6a63e678d0efff8a63d617c4d0d}{value\+Pattern\+Validator\+Type}}
+\item 
+\mbox{\hyperlink{structinternal_1_1_schema_validation_context_a4fb1b8fe7ecb9d4608e6b0ac0716826c}{Pattern\+Validator\+Type}} \mbox{\hyperlink{structinternal_1_1_schema_validation_context_add156192946b251ded2e11e24cfa9898}{object\+Pattern\+Validator\+Type}}
+\item 
+\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} \mbox{\hyperlink{structinternal_1_1_schema_validation_context_a213dd0b8a746b1548bb28b12a17c2c1e}{array\+Element\+Index}}
+\item 
+bool \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structinternal_1_1_schema_validation_context_a3e58787498af48ecceb97c47fb592d47}{property\+Exist}}
+\item 
+bool \mbox{\hyperlink{structinternal_1_1_schema_validation_context_af18fc4ef754e8a52732e152854f06341}{in\+Array}}
+\item 
+bool \mbox{\hyperlink{structinternal_1_1_schema_validation_context_a23e93ca88653ed878e3ddf290fc6bd9f}{value\+Uniqueness}}
+\item 
+bool \mbox{\hyperlink{structinternal_1_1_schema_validation_context_a0864c5e8155fe0064f17e8dcb31d93c7}{array\+Uniqueness}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Schema\+Document\+Type$>$\newline
+struct internal\+::\+Schema\+Validation\+Context$<$ Schema\+Document\+Type $>$}
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l00316}{316}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{structinternal_1_1_schema_validation_context_a0d5e219029a11ba86c4537792283ae70}\index{internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}!Ch@{Ch}}
+\index{Ch@{Ch}!internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}}
+\doxysubsubsection{\texorpdfstring{Ch}{Ch}}
+{\footnotesize\ttfamily \label{structinternal_1_1_schema_validation_context_a0d5e219029a11ba86c4537792283ae70} 
+template$<$typename Schema\+Document\+Type $>$ \\
+Value\+Type\+::\+Ch \mbox{\hyperlink{structinternal_1_1_schema_validation_context}{internal\+::\+Schema\+Validation\+Context}}$<$ Schema\+Document\+Type $>$\+::\+Ch}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l00321}{321}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+\Hypertarget{structinternal_1_1_schema_validation_context_a1aab859110aa7da8adf1fd77a6ce77a7}\index{internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}!ErrorHandlerType@{ErrorHandlerType}}
+\index{ErrorHandlerType@{ErrorHandlerType}!internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}}
+\doxysubsubsection{\texorpdfstring{ErrorHandlerType}{ErrorHandlerType}}
+{\footnotesize\ttfamily \label{structinternal_1_1_schema_validation_context_a1aab859110aa7da8adf1fd77a6ce77a7} 
+template$<$typename Schema\+Document\+Type $>$ \\
+\mbox{\hyperlink{classinternal_1_1_i_validation_error_handler}{IValidation\+Error\+Handler}}$<$\mbox{\hyperlink{structinternal_1_1_schema_validation_context_ab18f864202ff87e1060afaa26a315f48}{Schema\+Type}}$>$ \mbox{\hyperlink{structinternal_1_1_schema_validation_context}{internal\+::\+Schema\+Validation\+Context}}$<$ Schema\+Document\+Type $>$\+::\+Error\+Handler\+Type}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l00319}{319}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+\Hypertarget{structinternal_1_1_schema_validation_context_ab18f864202ff87e1060afaa26a315f48}\index{internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}!SchemaType@{SchemaType}}
+\index{SchemaType@{SchemaType}!internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}}
+\doxysubsubsection{\texorpdfstring{SchemaType}{SchemaType}}
+{\footnotesize\ttfamily \label{structinternal_1_1_schema_validation_context_ab18f864202ff87e1060afaa26a315f48} 
+template$<$typename Schema\+Document\+Type $>$ \\
+\mbox{\hyperlink{classinternal_1_1_schema}{Schema}}$<$Schema\+Document\+Type$>$ \mbox{\hyperlink{structinternal_1_1_schema_validation_context}{internal\+::\+Schema\+Validation\+Context}}$<$ Schema\+Document\+Type $>$\+::\+Schema\+Type}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l00317}{317}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+\Hypertarget{structinternal_1_1_schema_validation_context_aeb061edf370174dc73123fa98d9b5bd9}\index{internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}!SchemaValidatorFactoryType@{SchemaValidatorFactoryType}}
+\index{SchemaValidatorFactoryType@{SchemaValidatorFactoryType}!internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}}
+\doxysubsubsection{\texorpdfstring{SchemaValidatorFactoryType}{SchemaValidatorFactoryType}}
+{\footnotesize\ttfamily \label{structinternal_1_1_schema_validation_context_aeb061edf370174dc73123fa98d9b5bd9} 
+template$<$typename Schema\+Document\+Type $>$ \\
+\mbox{\hyperlink{classinternal_1_1_i_schema_state_factory}{ISchema\+State\+Factory}}$<$\mbox{\hyperlink{structinternal_1_1_schema_validation_context_ab18f864202ff87e1060afaa26a315f48}{Schema\+Type}}$>$ \mbox{\hyperlink{structinternal_1_1_schema_validation_context}{internal\+::\+Schema\+Validation\+Context}}$<$ Schema\+Document\+Type $>$\+::\+Schema\+Validator\+Factory\+Type}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l00318}{318}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+\Hypertarget{structinternal_1_1_schema_validation_context_a8b4295c8f64b47c767ba8d1639fa3325}\index{internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}!ValueType@{ValueType}}
+\index{ValueType@{ValueType}!internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}}
+\doxysubsubsection{\texorpdfstring{ValueType}{ValueType}}
+{\footnotesize\ttfamily \label{structinternal_1_1_schema_validation_context_a8b4295c8f64b47c767ba8d1639fa3325} 
+template$<$typename Schema\+Document\+Type $>$ \\
+\mbox{\hyperlink{classinternal_1_1_schema_a2a5fe5fcb1b3987afc624a286243ceeb}{Schema\+Type\+::\+Value\+Type}} \mbox{\hyperlink{structinternal_1_1_schema_validation_context}{internal\+::\+Schema\+Validation\+Context}}$<$ Schema\+Document\+Type $>$\+::\+Value\+Type}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l00320}{320}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+
+\doxysubsection{Member Enumeration Documentation}
+\Hypertarget{structinternal_1_1_schema_validation_context_a4fb1b8fe7ecb9d4608e6b0ac0716826c}\index{internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}!PatternValidatorType@{PatternValidatorType}}
+\index{PatternValidatorType@{PatternValidatorType}!internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}}
+\doxysubsubsection{\texorpdfstring{PatternValidatorType}{PatternValidatorType}}
+{\footnotesize\ttfamily \label{structinternal_1_1_schema_validation_context_a4fb1b8fe7ecb9d4608e6b0ac0716826c} 
+template$<$typename Schema\+Document\+Type $>$ \\
+enum \mbox{\hyperlink{structinternal_1_1_schema_validation_context_a4fb1b8fe7ecb9d4608e6b0ac0716826c}{internal\+::\+Schema\+Validation\+Context\+::\+Pattern\+Validator\+Type}}}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kPatternValidatorOnly@{kPatternValidatorOnly}!internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}}\index{internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}!kPatternValidatorOnly@{kPatternValidatorOnly}}}\Hypertarget{structinternal_1_1_schema_validation_context_a4fb1b8fe7ecb9d4608e6b0ac0716826ca54cca82af0ef391404c2a930187ce5e9}\label{structinternal_1_1_schema_validation_context_a4fb1b8fe7ecb9d4608e6b0ac0716826c} 
+k\+Pattern\+Validator\+Only&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kPatternValidatorWithProperty@{kPatternValidatorWithProperty}!internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}}\index{internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}!kPatternValidatorWithProperty@{kPatternValidatorWithProperty}}}\Hypertarget{structinternal_1_1_schema_validation_context_a4fb1b8fe7ecb9d4608e6b0ac0716826ca2514cf806ce8e41993907d57d3732435}\label{structinternal_1_1_schema_validation_context_a4fb1b8fe7ecb9d4608e6b0ac0716826c} 
+k\+Pattern\+Validator\+With\+Property&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kPatternValidatorWithAdditionalProperty@{kPatternValidatorWithAdditionalProperty}!internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}}\index{internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}!kPatternValidatorWithAdditionalProperty@{kPatternValidatorWithAdditionalProperty}}}\Hypertarget{structinternal_1_1_schema_validation_context_a4fb1b8fe7ecb9d4608e6b0ac0716826ca39a21b8fcd048ddaabe29bc11e08c8f8}\label{structinternal_1_1_schema_validation_context_a4fb1b8fe7ecb9d4608e6b0ac0716826c} 
+k\+Pattern\+Validator\+With\+Additional\+Property&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l00323}{323}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00323\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00324\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structinternal_1_1_schema_validation_context_a4fb1b8fe7ecb9d4608e6b0ac0716826ca54cca82af0ef391404c2a930187ce5e9}{kPatternValidatorOnly}},}
+\DoxyCodeLine{00325\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structinternal_1_1_schema_validation_context_a4fb1b8fe7ecb9d4608e6b0ac0716826ca2514cf806ce8e41993907d57d3732435}{kPatternValidatorWithProperty}},}
+\DoxyCodeLine{00326\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structinternal_1_1_schema_validation_context_a4fb1b8fe7ecb9d4608e6b0ac0716826ca39a21b8fcd048ddaabe29bc11e08c8f8}{kPatternValidatorWithAdditionalProperty}}}
+\DoxyCodeLine{00327\ \ \ \ \ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structinternal_1_1_schema_validation_context_ad2cb3f3168faf268157f582102979102}\index{internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}!SchemaValidationContext@{SchemaValidationContext}}
+\index{SchemaValidationContext@{SchemaValidationContext}!internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}}
+\doxysubsubsection{\texorpdfstring{SchemaValidationContext()}{SchemaValidationContext()}}
+{\footnotesize\ttfamily \label{structinternal_1_1_schema_validation_context_ad2cb3f3168faf268157f582102979102} 
+template$<$typename Schema\+Document\+Type $>$ \\
+\mbox{\hyperlink{structinternal_1_1_schema_validation_context}{internal\+::\+Schema\+Validation\+Context}}$<$ Schema\+Document\+Type $>$\+::\+Schema\+Validation\+Context (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structinternal_1_1_schema_validation_context_aeb061edf370174dc73123fa98d9b5bd9}{Schema\+Validator\+Factory\+Type}} \&}]{f}{, }\item[{\mbox{\hyperlink{structinternal_1_1_schema_validation_context_a1aab859110aa7da8adf1fd77a6ce77a7}{Error\+Handler\+Type}} \&}]{eh}{, }\item[{const \mbox{\hyperlink{structinternal_1_1_schema_validation_context_ab18f864202ff87e1060afaa26a315f48}{Schema\+Type}} \texorpdfstring{$\ast$}{*}}]{s}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l00329}{329}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00329\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :}
+\DoxyCodeLine{00330\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structinternal_1_1_schema_validation_context_ae2661ad92602b4f12fbffadb3dab502e}{factory}}(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}),}
+\DoxyCodeLine{00331\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structinternal_1_1_schema_validation_context_ad85d300184c10bf45b0852b6b26d118d}{error\_handler}}(eh),}
+\DoxyCodeLine{00332\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structinternal_1_1_schema_validation_context_af44336e8a612b77a0091cc57f8de1734}{schema}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}),}
+\DoxyCodeLine{00333\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structinternal_1_1_schema_validation_context_a34865d65fb3cbb01bc497d0efade0458}{valueSchema}}(),}
+\DoxyCodeLine{00334\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structinternal_1_1_schema_validation_context_a9f6a91ee46c70e55f287b1e9b219df21}{invalidKeyword}}(),}
+\DoxyCodeLine{00335\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structinternal_1_1_schema_validation_context_a4b419775e207cf72834f895dc30ac596}{hasher}}(),}
+\DoxyCodeLine{00336\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structinternal_1_1_schema_validation_context_a5b6ec1a5fde2215de14a65fcbb06edde}{arrayElementHashCodes}}(),}
+\DoxyCodeLine{00337\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structinternal_1_1_schema_validation_context_a1d215b80511f602ebece5c83b875cdd9}{validators}}(),}
+\DoxyCodeLine{00338\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structinternal_1_1_schema_validation_context_a10e5e97640846f3c23eaaba0506bb4f7}{validatorCount}}(),}
+\DoxyCodeLine{00339\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structinternal_1_1_schema_validation_context_a758565f674e8fb2066ff0f89ee67a174}{patternPropertiesValidators}}(),}
+\DoxyCodeLine{00340\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structinternal_1_1_schema_validation_context_a2b8a521d60d39472a1550b535028a353}{patternPropertiesValidatorCount}}(),}
+\DoxyCodeLine{00341\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structinternal_1_1_schema_validation_context_a12c48f172fbaae2e883f9eb2614d860e}{patternPropertiesSchemas}}(),}
+\DoxyCodeLine{00342\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structinternal_1_1_schema_validation_context_a77d48b63f006479ab8c77f8192558441}{patternPropertiesSchemaCount}}(),}
+\DoxyCodeLine{00343\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structinternal_1_1_schema_validation_context_acc1ba6a63e678d0efff8a63d617c4d0d}{valuePatternValidatorType}}(\mbox{\hyperlink{structinternal_1_1_schema_validation_context_a4fb1b8fe7ecb9d4608e6b0ac0716826ca54cca82af0ef391404c2a930187ce5e9}{kPatternValidatorOnly}}),}
+\DoxyCodeLine{00344\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structinternal_1_1_schema_validation_context_a3e58787498af48ecceb97c47fb592d47}{propertyExist}}(),}
+\DoxyCodeLine{00345\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structinternal_1_1_schema_validation_context_af18fc4ef754e8a52732e152854f06341}{inArray}}(\textcolor{keyword}{false}),}
+\DoxyCodeLine{00346\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structinternal_1_1_schema_validation_context_a23e93ca88653ed878e3ddf290fc6bd9f}{valueUniqueness}}(\textcolor{keyword}{false}),}
+\DoxyCodeLine{00347\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structinternal_1_1_schema_validation_context_a0864c5e8155fe0064f17e8dcb31d93c7}{arrayUniqueness}}(\textcolor{keyword}{false})}
+\DoxyCodeLine{00348\ \ \ \ \ \{}
+\DoxyCodeLine{00349\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structinternal_1_1_schema_validation_context_abd287930e1134fe74e3e92580e51e97b}\index{internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}!````~SchemaValidationContext@{\texorpdfstring{$\sim$}{\string~}SchemaValidationContext}}
+\index{````~SchemaValidationContext@{\texorpdfstring{$\sim$}{\string~}SchemaValidationContext}!internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}SchemaValidationContext()}{\string~SchemaValidationContext()}}
+{\footnotesize\ttfamily \label{structinternal_1_1_schema_validation_context_abd287930e1134fe74e3e92580e51e97b} 
+template$<$typename Schema\+Document\+Type $>$ \\
+\mbox{\hyperlink{structinternal_1_1_schema_validation_context}{internal\+::\+Schema\+Validation\+Context}}$<$ Schema\+Document\+Type $>$\+::\texorpdfstring{$\sim$}{\string~}\mbox{\hyperlink{structinternal_1_1_schema_validation_context}{Schema\+Validation\+Context}} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l00351}{351}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00351\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00352\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structinternal_1_1_schema_validation_context_a4b419775e207cf72834f895dc30ac596}{hasher}})}
+\DoxyCodeLine{00353\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structinternal_1_1_schema_validation_context_ae2661ad92602b4f12fbffadb3dab502e}{factory}}.\mbox{\hyperlink{classinternal_1_1_i_schema_state_factory_a70b8d88180d2e6993105b17f19101635}{DestroryHasher}}(\mbox{\hyperlink{structinternal_1_1_schema_validation_context_a4b419775e207cf72834f895dc30ac596}{hasher}});}
+\DoxyCodeLine{00354\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structinternal_1_1_schema_validation_context_a1d215b80511f602ebece5c83b875cdd9}{validators}})\ \{}
+\DoxyCodeLine{00355\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{structinternal_1_1_schema_validation_context_a10e5e97640846f3c23eaaba0506bb4f7}{validatorCount}};\ i++)}
+\DoxyCodeLine{00356\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structinternal_1_1_schema_validation_context_ae2661ad92602b4f12fbffadb3dab502e}{factory}}.\mbox{\hyperlink{classinternal_1_1_i_schema_state_factory_a112cbf154077050bc30ffe670032442c}{DestroySchemaValidator}}(\mbox{\hyperlink{structinternal_1_1_schema_validation_context_a1d215b80511f602ebece5c83b875cdd9}{validators}}[i]);}
+\DoxyCodeLine{00357\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structinternal_1_1_schema_validation_context_ae2661ad92602b4f12fbffadb3dab502e}{factory}}.\mbox{\hyperlink{classinternal_1_1_i_schema_state_factory_a27bd2138940cac3c330dd8399c49b22b}{FreeState}}(\mbox{\hyperlink{structinternal_1_1_schema_validation_context_a1d215b80511f602ebece5c83b875cdd9}{validators}});}
+\DoxyCodeLine{00358\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00359\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structinternal_1_1_schema_validation_context_a758565f674e8fb2066ff0f89ee67a174}{patternPropertiesValidators}})\ \{}
+\DoxyCodeLine{00360\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{structinternal_1_1_schema_validation_context_a2b8a521d60d39472a1550b535028a353}{patternPropertiesValidatorCount}};\ i++)}
+\DoxyCodeLine{00361\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structinternal_1_1_schema_validation_context_ae2661ad92602b4f12fbffadb3dab502e}{factory}}.\mbox{\hyperlink{classinternal_1_1_i_schema_state_factory_a112cbf154077050bc30ffe670032442c}{DestroySchemaValidator}}(\mbox{\hyperlink{structinternal_1_1_schema_validation_context_a758565f674e8fb2066ff0f89ee67a174}{patternPropertiesValidators}}[i]);}
+\DoxyCodeLine{00362\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structinternal_1_1_schema_validation_context_ae2661ad92602b4f12fbffadb3dab502e}{factory}}.\mbox{\hyperlink{classinternal_1_1_i_schema_state_factory_a27bd2138940cac3c330dd8399c49b22b}{FreeState}}(\mbox{\hyperlink{structinternal_1_1_schema_validation_context_a758565f674e8fb2066ff0f89ee67a174}{patternPropertiesValidators}});}
+\DoxyCodeLine{00363\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00364\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structinternal_1_1_schema_validation_context_a12c48f172fbaae2e883f9eb2614d860e}{patternPropertiesSchemas}})}
+\DoxyCodeLine{00365\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structinternal_1_1_schema_validation_context_ae2661ad92602b4f12fbffadb3dab502e}{factory}}.\mbox{\hyperlink{classinternal_1_1_i_schema_state_factory_a27bd2138940cac3c330dd8399c49b22b}{FreeState}}(\mbox{\hyperlink{structinternal_1_1_schema_validation_context_a12c48f172fbaae2e883f9eb2614d860e}{patternPropertiesSchemas}});}
+\DoxyCodeLine{00366\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structinternal_1_1_schema_validation_context_a3e58787498af48ecceb97c47fb592d47}{propertyExist}})}
+\DoxyCodeLine{00367\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structinternal_1_1_schema_validation_context_ae2661ad92602b4f12fbffadb3dab502e}{factory}}.\mbox{\hyperlink{classinternal_1_1_i_schema_state_factory_a27bd2138940cac3c330dd8399c49b22b}{FreeState}}(\mbox{\hyperlink{structinternal_1_1_schema_validation_context_a3e58787498af48ecceb97c47fb592d47}{propertyExist}});}
+\DoxyCodeLine{00368\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structinternal_1_1_schema_validation_context_abd287930e1134fe74e3e92580e51e97b_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structinternal_1_1_schema_validation_context_a5b6ec1a5fde2215de14a65fcbb06edde}\index{internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}!arrayElementHashCodes@{arrayElementHashCodes}}
+\index{arrayElementHashCodes@{arrayElementHashCodes}!internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}}
+\doxysubsubsection{\texorpdfstring{arrayElementHashCodes}{arrayElementHashCodes}}
+{\footnotesize\ttfamily \label{structinternal_1_1_schema_validation_context_a5b6ec1a5fde2215de14a65fcbb06edde} 
+template$<$typename Schema\+Document\+Type $>$ \\
+void\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structinternal_1_1_schema_validation_context}{internal\+::\+Schema\+Validation\+Context}}$<$ Schema\+Document\+Type $>$\+::array\+Element\+Hash\+Codes}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l00376}{376}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+\Hypertarget{structinternal_1_1_schema_validation_context_a213dd0b8a746b1548bb28b12a17c2c1e}\index{internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}!arrayElementIndex@{arrayElementIndex}}
+\index{arrayElementIndex@{arrayElementIndex}!internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}}
+\doxysubsubsection{\texorpdfstring{arrayElementIndex}{arrayElementIndex}}
+{\footnotesize\ttfamily \label{structinternal_1_1_schema_validation_context_a213dd0b8a746b1548bb28b12a17c2c1e} 
+template$<$typename Schema\+Document\+Type $>$ \\
+\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} \mbox{\hyperlink{structinternal_1_1_schema_validation_context}{internal\+::\+Schema\+Validation\+Context}}$<$ Schema\+Document\+Type $>$\+::array\+Element\+Index}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l00385}{385}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+\Hypertarget{structinternal_1_1_schema_validation_context_a0864c5e8155fe0064f17e8dcb31d93c7}\index{internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}!arrayUniqueness@{arrayUniqueness}}
+\index{arrayUniqueness@{arrayUniqueness}!internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}}
+\doxysubsubsection{\texorpdfstring{arrayUniqueness}{arrayUniqueness}}
+{\footnotesize\ttfamily \label{structinternal_1_1_schema_validation_context_a0864c5e8155fe0064f17e8dcb31d93c7} 
+template$<$typename Schema\+Document\+Type $>$ \\
+bool \mbox{\hyperlink{structinternal_1_1_schema_validation_context}{internal\+::\+Schema\+Validation\+Context}}$<$ Schema\+Document\+Type $>$\+::array\+Uniqueness}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l00389}{389}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+\Hypertarget{structinternal_1_1_schema_validation_context_ad85d300184c10bf45b0852b6b26d118d}\index{internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}!error\_handler@{error\_handler}}
+\index{error\_handler@{error\_handler}!internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}}
+\doxysubsubsection{\texorpdfstring{error\_handler}{error\_handler}}
+{\footnotesize\ttfamily \label{structinternal_1_1_schema_validation_context_ad85d300184c10bf45b0852b6b26d118d} 
+template$<$typename Schema\+Document\+Type $>$ \\
+\mbox{\hyperlink{structinternal_1_1_schema_validation_context_a1aab859110aa7da8adf1fd77a6ce77a7}{Error\+Handler\+Type}}\& \mbox{\hyperlink{structinternal_1_1_schema_validation_context}{internal\+::\+Schema\+Validation\+Context}}$<$ Schema\+Document\+Type $>$\+::error\+\_\+handler}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l00371}{371}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+\Hypertarget{structinternal_1_1_schema_validation_context_ae2661ad92602b4f12fbffadb3dab502e}\index{internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}!factory@{factory}}
+\index{factory@{factory}!internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}}
+\doxysubsubsection{\texorpdfstring{factory}{factory}}
+{\footnotesize\ttfamily \label{structinternal_1_1_schema_validation_context_ae2661ad92602b4f12fbffadb3dab502e} 
+template$<$typename Schema\+Document\+Type $>$ \\
+\mbox{\hyperlink{structinternal_1_1_schema_validation_context_aeb061edf370174dc73123fa98d9b5bd9}{Schema\+Validator\+Factory\+Type}}\& \mbox{\hyperlink{structinternal_1_1_schema_validation_context}{internal\+::\+Schema\+Validation\+Context}}$<$ Schema\+Document\+Type $>$\+::factory}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l00370}{370}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+\Hypertarget{structinternal_1_1_schema_validation_context_a4b419775e207cf72834f895dc30ac596}\index{internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}!hasher@{hasher}}
+\index{hasher@{hasher}!internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}}
+\doxysubsubsection{\texorpdfstring{hasher}{hasher}}
+{\footnotesize\ttfamily \label{structinternal_1_1_schema_validation_context_a4b419775e207cf72834f895dc30ac596} 
+template$<$typename Schema\+Document\+Type $>$ \\
+void\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structinternal_1_1_schema_validation_context}{internal\+::\+Schema\+Validation\+Context}}$<$ Schema\+Document\+Type $>$\+::hasher}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l00375}{375}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+\Hypertarget{structinternal_1_1_schema_validation_context_af18fc4ef754e8a52732e152854f06341}\index{internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}!inArray@{inArray}}
+\index{inArray@{inArray}!internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}}
+\doxysubsubsection{\texorpdfstring{inArray}{inArray}}
+{\footnotesize\ttfamily \label{structinternal_1_1_schema_validation_context_af18fc4ef754e8a52732e152854f06341} 
+template$<$typename Schema\+Document\+Type $>$ \\
+bool \mbox{\hyperlink{structinternal_1_1_schema_validation_context}{internal\+::\+Schema\+Validation\+Context}}$<$ Schema\+Document\+Type $>$\+::in\+Array}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l00387}{387}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+\Hypertarget{structinternal_1_1_schema_validation_context_a9f6a91ee46c70e55f287b1e9b219df21}\index{internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}!invalidKeyword@{invalidKeyword}}
+\index{invalidKeyword@{invalidKeyword}!internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}}
+\doxysubsubsection{\texorpdfstring{invalidKeyword}{invalidKeyword}}
+{\footnotesize\ttfamily \label{structinternal_1_1_schema_validation_context_a9f6a91ee46c70e55f287b1e9b219df21} 
+template$<$typename Schema\+Document\+Type $>$ \\
+const \mbox{\hyperlink{structinternal_1_1_schema_validation_context_a0d5e219029a11ba86c4537792283ae70}{Ch}}\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structinternal_1_1_schema_validation_context}{internal\+::\+Schema\+Validation\+Context}}$<$ Schema\+Document\+Type $>$\+::invalid\+Keyword}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l00374}{374}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+\Hypertarget{structinternal_1_1_schema_validation_context_add156192946b251ded2e11e24cfa9898}\index{internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}!objectPatternValidatorType@{objectPatternValidatorType}}
+\index{objectPatternValidatorType@{objectPatternValidatorType}!internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}}
+\doxysubsubsection{\texorpdfstring{objectPatternValidatorType}{objectPatternValidatorType}}
+{\footnotesize\ttfamily \label{structinternal_1_1_schema_validation_context_add156192946b251ded2e11e24cfa9898} 
+template$<$typename Schema\+Document\+Type $>$ \\
+\mbox{\hyperlink{structinternal_1_1_schema_validation_context_a4fb1b8fe7ecb9d4608e6b0ac0716826c}{Pattern\+Validator\+Type}} \mbox{\hyperlink{structinternal_1_1_schema_validation_context}{internal\+::\+Schema\+Validation\+Context}}$<$ Schema\+Document\+Type $>$\+::object\+Pattern\+Validator\+Type}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l00384}{384}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+\Hypertarget{structinternal_1_1_schema_validation_context_a77d48b63f006479ab8c77f8192558441}\index{internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}!patternPropertiesSchemaCount@{patternPropertiesSchemaCount}}
+\index{patternPropertiesSchemaCount@{patternPropertiesSchemaCount}!internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}}
+\doxysubsubsection{\texorpdfstring{patternPropertiesSchemaCount}{patternPropertiesSchemaCount}}
+{\footnotesize\ttfamily \label{structinternal_1_1_schema_validation_context_a77d48b63f006479ab8c77f8192558441} 
+template$<$typename Schema\+Document\+Type $>$ \\
+\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} \mbox{\hyperlink{structinternal_1_1_schema_validation_context}{internal\+::\+Schema\+Validation\+Context}}$<$ Schema\+Document\+Type $>$\+::pattern\+Properties\+Schema\+Count}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l00382}{382}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+\Hypertarget{structinternal_1_1_schema_validation_context_a12c48f172fbaae2e883f9eb2614d860e}\index{internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}!patternPropertiesSchemas@{patternPropertiesSchemas}}
+\index{patternPropertiesSchemas@{patternPropertiesSchemas}!internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}}
+\doxysubsubsection{\texorpdfstring{patternPropertiesSchemas}{patternPropertiesSchemas}}
+{\footnotesize\ttfamily \label{structinternal_1_1_schema_validation_context_a12c48f172fbaae2e883f9eb2614d860e} 
+template$<$typename Schema\+Document\+Type $>$ \\
+const \mbox{\hyperlink{structinternal_1_1_schema_validation_context_ab18f864202ff87e1060afaa26a315f48}{Schema\+Type}}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structinternal_1_1_schema_validation_context}{internal\+::\+Schema\+Validation\+Context}}$<$ Schema\+Document\+Type $>$\+::pattern\+Properties\+Schemas}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l00381}{381}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+\Hypertarget{structinternal_1_1_schema_validation_context_a2b8a521d60d39472a1550b535028a353}\index{internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}!patternPropertiesValidatorCount@{patternPropertiesValidatorCount}}
+\index{patternPropertiesValidatorCount@{patternPropertiesValidatorCount}!internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}}
+\doxysubsubsection{\texorpdfstring{patternPropertiesValidatorCount}{patternPropertiesValidatorCount}}
+{\footnotesize\ttfamily \label{structinternal_1_1_schema_validation_context_a2b8a521d60d39472a1550b535028a353} 
+template$<$typename Schema\+Document\+Type $>$ \\
+\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} \mbox{\hyperlink{structinternal_1_1_schema_validation_context}{internal\+::\+Schema\+Validation\+Context}}$<$ Schema\+Document\+Type $>$\+::pattern\+Properties\+Validator\+Count}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l00380}{380}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+\Hypertarget{structinternal_1_1_schema_validation_context_a758565f674e8fb2066ff0f89ee67a174}\index{internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}!patternPropertiesValidators@{patternPropertiesValidators}}
+\index{patternPropertiesValidators@{patternPropertiesValidators}!internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}}
+\doxysubsubsection{\texorpdfstring{patternPropertiesValidators}{patternPropertiesValidators}}
+{\footnotesize\ttfamily \label{structinternal_1_1_schema_validation_context_a758565f674e8fb2066ff0f89ee67a174} 
+template$<$typename Schema\+Document\+Type $>$ \\
+\mbox{\hyperlink{classinternal_1_1_i_schema_validator}{ISchema\+Validator}}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structinternal_1_1_schema_validation_context}{internal\+::\+Schema\+Validation\+Context}}$<$ Schema\+Document\+Type $>$\+::pattern\+Properties\+Validators}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l00379}{379}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+\Hypertarget{structinternal_1_1_schema_validation_context_a3e58787498af48ecceb97c47fb592d47}\index{internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}!propertyExist@{propertyExist}}
+\index{propertyExist@{propertyExist}!internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}}
+\doxysubsubsection{\texorpdfstring{propertyExist}{propertyExist}}
+{\footnotesize\ttfamily \label{structinternal_1_1_schema_validation_context_a3e58787498af48ecceb97c47fb592d47} 
+template$<$typename Schema\+Document\+Type $>$ \\
+bool\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structinternal_1_1_schema_validation_context}{internal\+::\+Schema\+Validation\+Context}}$<$ Schema\+Document\+Type $>$\+::property\+Exist}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l00386}{386}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+\Hypertarget{structinternal_1_1_schema_validation_context_af44336e8a612b77a0091cc57f8de1734}\index{internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}!schema@{schema}}
+\index{schema@{schema}!internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}}
+\doxysubsubsection{\texorpdfstring{schema}{schema}}
+{\footnotesize\ttfamily \label{structinternal_1_1_schema_validation_context_af44336e8a612b77a0091cc57f8de1734} 
+template$<$typename Schema\+Document\+Type $>$ \\
+const \mbox{\hyperlink{structinternal_1_1_schema_validation_context_ab18f864202ff87e1060afaa26a315f48}{Schema\+Type}}\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structinternal_1_1_schema_validation_context}{internal\+::\+Schema\+Validation\+Context}}$<$ Schema\+Document\+Type $>$\+::schema}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l00372}{372}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+\Hypertarget{structinternal_1_1_schema_validation_context_a10e5e97640846f3c23eaaba0506bb4f7}\index{internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}!validatorCount@{validatorCount}}
+\index{validatorCount@{validatorCount}!internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}}
+\doxysubsubsection{\texorpdfstring{validatorCount}{validatorCount}}
+{\footnotesize\ttfamily \label{structinternal_1_1_schema_validation_context_a10e5e97640846f3c23eaaba0506bb4f7} 
+template$<$typename Schema\+Document\+Type $>$ \\
+\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} \mbox{\hyperlink{structinternal_1_1_schema_validation_context}{internal\+::\+Schema\+Validation\+Context}}$<$ Schema\+Document\+Type $>$\+::validator\+Count}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l00378}{378}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+\Hypertarget{structinternal_1_1_schema_validation_context_a1d215b80511f602ebece5c83b875cdd9}\index{internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}!validators@{validators}}
+\index{validators@{validators}!internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}}
+\doxysubsubsection{\texorpdfstring{validators}{validators}}
+{\footnotesize\ttfamily \label{structinternal_1_1_schema_validation_context_a1d215b80511f602ebece5c83b875cdd9} 
+template$<$typename Schema\+Document\+Type $>$ \\
+\mbox{\hyperlink{classinternal_1_1_i_schema_validator}{ISchema\+Validator}}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structinternal_1_1_schema_validation_context}{internal\+::\+Schema\+Validation\+Context}}$<$ Schema\+Document\+Type $>$\+::validators}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l00377}{377}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+\Hypertarget{structinternal_1_1_schema_validation_context_acc1ba6a63e678d0efff8a63d617c4d0d}\index{internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}!valuePatternValidatorType@{valuePatternValidatorType}}
+\index{valuePatternValidatorType@{valuePatternValidatorType}!internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}}
+\doxysubsubsection{\texorpdfstring{valuePatternValidatorType}{valuePatternValidatorType}}
+{\footnotesize\ttfamily \label{structinternal_1_1_schema_validation_context_acc1ba6a63e678d0efff8a63d617c4d0d} 
+template$<$typename Schema\+Document\+Type $>$ \\
+\mbox{\hyperlink{structinternal_1_1_schema_validation_context_a4fb1b8fe7ecb9d4608e6b0ac0716826c}{Pattern\+Validator\+Type}} \mbox{\hyperlink{structinternal_1_1_schema_validation_context}{internal\+::\+Schema\+Validation\+Context}}$<$ Schema\+Document\+Type $>$\+::value\+Pattern\+Validator\+Type}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l00383}{383}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+\Hypertarget{structinternal_1_1_schema_validation_context_a34865d65fb3cbb01bc497d0efade0458}\index{internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}!valueSchema@{valueSchema}}
+\index{valueSchema@{valueSchema}!internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}}
+\doxysubsubsection{\texorpdfstring{valueSchema}{valueSchema}}
+{\footnotesize\ttfamily \label{structinternal_1_1_schema_validation_context_a34865d65fb3cbb01bc497d0efade0458} 
+template$<$typename Schema\+Document\+Type $>$ \\
+const \mbox{\hyperlink{structinternal_1_1_schema_validation_context_ab18f864202ff87e1060afaa26a315f48}{Schema\+Type}}\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structinternal_1_1_schema_validation_context}{internal\+::\+Schema\+Validation\+Context}}$<$ Schema\+Document\+Type $>$\+::value\+Schema}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l00373}{373}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+\Hypertarget{structinternal_1_1_schema_validation_context_a23e93ca88653ed878e3ddf290fc6bd9f}\index{internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}!valueUniqueness@{valueUniqueness}}
+\index{valueUniqueness@{valueUniqueness}!internal::SchemaValidationContext$<$ SchemaDocumentType $>$@{internal::SchemaValidationContext$<$ SchemaDocumentType $>$}}
+\doxysubsubsection{\texorpdfstring{valueUniqueness}{valueUniqueness}}
+{\footnotesize\ttfamily \label{structinternal_1_1_schema_validation_context_a23e93ca88653ed878e3ddf290fc6bd9f} 
+template$<$typename Schema\+Document\+Type $>$ \\
+bool \mbox{\hyperlink{structinternal_1_1_schema_validation_context}{internal\+::\+Schema\+Validation\+Context}}$<$ Schema\+Document\+Type $>$\+::value\+Uniqueness}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l00388}{388}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/\mbox{\hyperlink{schema_8h}{schema.\+h}}\end{DoxyCompactItemize}

@@ -1,0 +1,301 @@
+\doxysection{programs/sysio-\/blocklog/main.cpp File Reference}
+\hypertarget{programs_2sysio-blocklog_2main_8cpp}{}\label{programs_2sysio-blocklog_2main_8cpp}\index{programs/sysio-\/blocklog/main.cpp@{programs/sysio-\/blocklog/main.cpp}}
+{\ttfamily \#include $<$memory$>$}\newline
+{\ttfamily \#include $<$sysio/chain/abi\+\_\+serializer.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/block\+\_\+log.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/fork\+\_\+database.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/config.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/io/json.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/filesystem.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/variant.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/bitutil.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/exception/diagnostic\+\_\+information.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/program\+\_\+options.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/filesystem.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/filesystem/path.\+hpp$>$}\newline
+{\ttfamily \#include $<$chrono$>$}\newline
+Include dependency graph for main.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{programs_2sysio-blocklog_2main_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structblocklog}{blocklog}}
+\item 
+struct \mbox{\hyperlink{structreport__time}{report\+\_\+time}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{programs_2sysio-blocklog_2main_8cpp_ae71fa88ae01a3daa2aa3021ad8a4e22a}{FOPEN}}(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},  m)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{programs_2sysio-blocklog_2main_8cpp_a3cfbe737c1a84d19629ae9ffc5bc40a2}{trim\+\_\+blocklog\+\_\+end}} (bfs\+::path \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a3426d59b828f63d073d546fed967330e}{block\+\_\+dir}}, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} n)
+\item 
+bool \mbox{\hyperlink{programs_2sysio-blocklog_2main_8cpp_ace4e6c78c84c1c16b0486d5833afd9f2}{trim\+\_\+blocklog\+\_\+front}} (bfs\+::path \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a3426d59b828f63d073d546fed967330e}{block\+\_\+dir}}, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} n)
+\item 
+void \mbox{\hyperlink{programs_2sysio-blocklog_2main_8cpp_a37fad1474c0a90433ca0152870e1da72}{smoke\+\_\+test}} (bfs\+::path \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a3426d59b828f63d073d546fed967330e}{block\+\_\+dir}})
+\item 
+int \mbox{\hyperlink{programs_2sysio-blocklog_2main_8cpp_a3c04138a5bfe5d72780bb7e82a18e627}{main}} (int argc, char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{programs_2sysio-blocklog_2main_8cpp_ae71fa88ae01a3daa2aa3021ad8a4e22a}\index{main.cpp@{main.cpp}!FOPEN@{FOPEN}}
+\index{FOPEN@{FOPEN}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{FOPEN}{FOPEN}}
+{\footnotesize\ttfamily \label{programs_2sysio-blocklog_2main_8cpp_ae71fa88ae01a3daa2aa3021ad8a4e22a} 
+\#define FOPEN(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}}{, }\item[{}]{m}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{fopen(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\ m)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{programs_2sysio-blocklog_2main_8cpp_source_l00020}{20}} of file \mbox{\hyperlink{programs_2sysio-blocklog_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{programs_2sysio-blocklog_2main_8cpp_a3c04138a5bfe5d72780bb7e82a18e627}\index{main.cpp@{main.cpp}!main@{main}}
+\index{main@{main}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{programs_2sysio-blocklog_2main_8cpp_a3c04138a5bfe5d72780bb7e82a18e627} 
+int main (\begin{DoxyParamCaption}\item[{int}]{argc}{, }\item[{char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{argv}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2sysio-blocklog_2main_8cpp_source_l00292}{292}} of file \mbox{\hyperlink{programs_2sysio-blocklog_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00292\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00293\ \ \ \ std::ios::sync\_with\_stdio(\textcolor{keyword}{false});\ \textcolor{comment}{//\ for\ potential\ performance\ boost\ for\ large\ block\ log\ files}}
+\DoxyCodeLine{00294\ \ \ \ options\_description\ \mbox{\hyperlink{xbyak__mnemonic_8h_a4229a9b84f8b8673326f12bd41acd27c}{cli}}\ (\textcolor{stringliteral}{"{}sysio-\/blocklog\ command\ line\ options"{}});}
+\DoxyCodeLine{00295\ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00296\ \ \ \ \ \ \ \mbox{\hyperlink{structblocklog}{blocklog}}\ blog;}
+\DoxyCodeLine{00297\ \ \ \ \ \ \ blog.\mbox{\hyperlink{structblocklog_a28b743fa586fa3fdde6fe6d56c31bd10}{set\_program\_options}}(\mbox{\hyperlink{xbyak__mnemonic_8h_a4229a9b84f8b8673326f12bd41acd27c}{cli}});}
+\DoxyCodeLine{00298\ \ \ \ \ \ \ variables\_map\ vmap;}
+\DoxyCodeLine{00299\ \ \ \ \ \ \ bpo::store(bpo::parse\_command\_line(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \mbox{\hyperlink{xbyak__mnemonic_8h_a4229a9b84f8b8673326f12bd41acd27c}{cli}}),\ vmap);}
+\DoxyCodeLine{00300\ \ \ \ \ \ \ bpo::notify(vmap);}
+\DoxyCodeLine{00301\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (blog.\mbox{\hyperlink{structblocklog_a442dfd1ca9af856f45b361f476439094}{help}})\ \{}
+\DoxyCodeLine{00302\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{xbyak__mnemonic_8h_a4229a9b84f8b8673326f12bd41acd27c}{cli}}.print(std::cerr);}
+\DoxyCodeLine{00303\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00304\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00305\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (blog.\mbox{\hyperlink{structblocklog_a863df5b3d0843cc13da1783b395643f0}{smoke\_test}})\ \{}
+\DoxyCodeLine{00306\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{programs_2sysio-blocklog_2main_8cpp_a37fad1474c0a90433ca0152870e1da72}{smoke\_test}}(vmap.at(\textcolor{stringliteral}{"{}blocks-\/dir"{}}).as<bfs::path>());}
+\DoxyCodeLine{00307\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00308\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00309\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (blog.\mbox{\hyperlink{structblocklog_a8846ed72bffb6e6e9bcc3ee2b88fa4b9}{trim\_log}})\ \{}
+\DoxyCodeLine{00310\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (blog.\mbox{\hyperlink{structblocklog_af082dff0eddf0db2bf2c5918d7d5d6d8}{first\_block}}\ ==\ 0\ \&\&\ blog.\mbox{\hyperlink{structblocklog_a504bea1a7eecb02361022f3be70943e3}{last\_block}}\ ==\ std::numeric\_limits<uint32\_t>::max())\ \{}
+\DoxyCodeLine{00311\ \ \ \ \ \ \ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}trim-\/blocklog\ does\ nothing\ unless\ specify\ first\ and/or\ last\ block."{}};}
+\DoxyCodeLine{00312\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ -\/1;}
+\DoxyCodeLine{00313\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00314\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (blog.\mbox{\hyperlink{structblocklog_a504bea1a7eecb02361022f3be70943e3}{last\_block}}\ !=\ std::numeric\_limits<uint32\_t>::max())\ \{}
+\DoxyCodeLine{00315\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{programs_2sysio-blocklog_2main_8cpp_a3cfbe737c1a84d19629ae9ffc5bc40a2}{trim\_blocklog\_end}}(vmap.at(\textcolor{stringliteral}{"{}blocks-\/dir"{}}).as<bfs::path>(),\ blog.\mbox{\hyperlink{structblocklog_a504bea1a7eecb02361022f3be70943e3}{last\_block}})\ !=\ 0)}
+\DoxyCodeLine{00316\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ -\/1;}
+\DoxyCodeLine{00317\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00318\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (blog.\mbox{\hyperlink{structblocklog_af082dff0eddf0db2bf2c5918d7d5d6d8}{first\_block}}\ !=\ 0)\ \{}
+\DoxyCodeLine{00319\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{programs_2sysio-blocklog_2main_8cpp_ace4e6c78c84c1c16b0486d5833afd9f2}{trim\_blocklog\_front}}(vmap.at(\textcolor{stringliteral}{"{}blocks-\/dir"{}}).as<bfs::path>(),\ blog.\mbox{\hyperlink{structblocklog_af082dff0eddf0db2bf2c5918d7d5d6d8}{first\_block}}))}
+\DoxyCodeLine{00320\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ -\/1;}
+\DoxyCodeLine{00321\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00322\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00323\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00324\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (blog.\mbox{\hyperlink{structblocklog_abd54d312af971ed1ac047ccc6853b388}{vacuum}})\ \{}
+\DoxyCodeLine{00325\ \ \ \ \ \ \ \ \ \ blog.\mbox{\hyperlink{structblocklog_a9a8b4159b641c6ee906cbdc9f8a162d8}{initialize}}(vmap);}
+\DoxyCodeLine{00326\ \ \ \ \ \ \ \ \ \ blog.\mbox{\hyperlink{structblocklog_a08f56f870947694c27fb76f1fb73c887}{do\_vacuum}}();}
+\DoxyCodeLine{00327\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00328\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00329\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (blog.\mbox{\hyperlink{structblocklog_a47a28e90ebfa01f667ffb74c1423644f}{make\_index}})\ \{}
+\DoxyCodeLine{00330\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ bfs::path\ blocks\_dir\ =\ vmap.at(\textcolor{stringliteral}{"{}blocks-\/dir"{}}).as<bfs::path>();}
+\DoxyCodeLine{00331\ \ \ \ \ \ \ \ \ \ bfs::path\ out\_file\ =\ blocks\_dir\ /\ \textcolor{stringliteral}{"{}blocks.index"{}};}
+\DoxyCodeLine{00332\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ bfs::path\ block\_file\ =\ blocks\_dir\ /\ \textcolor{stringliteral}{"{}blocks.log"{}};}
+\DoxyCodeLine{00333\ }
+\DoxyCodeLine{00334\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (vmap.count(\textcolor{stringliteral}{"{}output-\/file"{}})\ >\ 0)}
+\DoxyCodeLine{00335\ \ \ \ \ \ \ \ \ \ \ \ \ \ out\_file\ =\ vmap.at(\textcolor{stringliteral}{"{}output-\/file"{}}).as<bfs::path>();}
+\DoxyCodeLine{00336\ }
+\DoxyCodeLine{00337\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structreport__time}{report\_time}}\ rt(\textcolor{stringliteral}{"{}making\ index"{}});}
+\DoxyCodeLine{00338\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{classfc_1_1log__level}{log\_level}}\ =\ \mbox{\hyperlink{classfc_1_1logger_a4e12ef2e794551d593e497b4b90601ab}{fc::logger::get}}(\mbox{\hyperlink{logger_8hpp_a8c7a288fea519c7e895518f8dff4888f}{DEFAULT\_LOGGER}}).\mbox{\hyperlink{classfc_1_1logger_ab4ee187ac7a43ba90d16c93da35e9954}{get\_log\_level}}();}
+\DoxyCodeLine{00339\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1logger_a4e12ef2e794551d593e497b4b90601ab}{fc::logger::get}}(\mbox{\hyperlink{logger_8hpp_a8c7a288fea519c7e895518f8dff4888f}{DEFAULT\_LOGGER}}).\mbox{\hyperlink{classfc_1_1logger_a4c22e498cec41efb806fda9733662650}{set\_log\_level}}(\mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4a30d2de77e71beb8d09d530cac04efa25}{fc::log\_level::debug}});}
+\DoxyCodeLine{00340\ \ \ \ \ \ \ \ \ \ block\_log::construct\_index(block\_file.generic\_string(),\ out\_file.generic\_string());}
+\DoxyCodeLine{00341\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1logger_a4e12ef2e794551d593e497b4b90601ab}{fc::logger::get}}(\mbox{\hyperlink{logger_8hpp_a8c7a288fea519c7e895518f8dff4888f}{DEFAULT\_LOGGER}}).\mbox{\hyperlink{classfc_1_1logger_a4c22e498cec41efb806fda9733662650}{set\_log\_level}}(\mbox{\hyperlink{classfc_1_1log__level}{log\_level}});}
+\DoxyCodeLine{00342\ \ \ \ \ \ \ \ \ \ rt.report();}
+\DoxyCodeLine{00343\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00344\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00345\ \ \ \ \ \ \ \textcolor{comment}{//else\ print\ blocks.log\ as\ JSON}}
+\DoxyCodeLine{00346\ \ \ \ \ \ \ blog.\mbox{\hyperlink{structblocklog_a9a8b4159b641c6ee906cbdc9f8a162d8}{initialize}}(vmap);}
+\DoxyCodeLine{00347\ \ \ \ \ \ \ blog.\mbox{\hyperlink{structblocklog_ab8fb32dc3425a85102c05fe4a1c1fd62}{read\_log}}();}
+\DoxyCodeLine{00348\ \ \ \ \}\ \textcolor{keywordflow}{catch}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1exception}{fc::exception}}\&\ e\ )\ \{}
+\DoxyCodeLine{00349\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}}(\ \textcolor{stringliteral}{"{}\$\{e\}"{}},\ (\textcolor{stringliteral}{"{}e"{}},\ e.\mbox{\hyperlink{classfc_1_1exception_a7611ea8fbe25dde56649b685c2298a37}{to\_detail\_string}}()));}
+\DoxyCodeLine{00350\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ -\/1;}
+\DoxyCodeLine{00351\ \ \ \ \}\ \textcolor{keywordflow}{catch}(\ \textcolor{keyword}{const}\ boost::exception\&\ e\ )\ \{}
+\DoxyCodeLine{00352\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}}(\textcolor{stringliteral}{"{}\$\{e\}"{}},\ (\textcolor{stringliteral}{"{}e"{}},boost::diagnostic\_information(e)));}
+\DoxyCodeLine{00353\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ -\/1;}
+\DoxyCodeLine{00354\ \ \ \ \}\ \textcolor{keywordflow}{catch}(\ \textcolor{keyword}{const}\ std::exception\&\ e\ )\ \{}
+\DoxyCodeLine{00355\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}}(\textcolor{stringliteral}{"{}\$\{e\}"{}},\ (\textcolor{stringliteral}{"{}e"{}},e.what()));}
+\DoxyCodeLine{00356\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ -\/1;}
+\DoxyCodeLine{00357\ \ \ \ \}\ \textcolor{keywordflow}{catch}(\ ...\ )\ \{}
+\DoxyCodeLine{00358\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}}(\textcolor{stringliteral}{"{}unknown\ exception"{}});}
+\DoxyCodeLine{00359\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ -\/1;}
+\DoxyCodeLine{00360\ \ \ \ \}}
+\DoxyCodeLine{00361\ }
+\DoxyCodeLine{00362\ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00363\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{programs_2sysio-blocklog_2main_8cpp_a3c04138a5bfe5d72780bb7e82a18e627_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{programs_2sysio-blocklog_2main_8cpp_a37fad1474c0a90433ca0152870e1da72}\index{main.cpp@{main.cpp}!smoke\_test@{smoke\_test}}
+\index{smoke\_test@{smoke\_test}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{smoke\_test()}{smoke\_test()}}
+{\footnotesize\ttfamily \label{programs_2sysio-blocklog_2main_8cpp_a37fad1474c0a90433ca0152870e1da72} 
+void smoke\+\_\+test (\begin{DoxyParamCaption}\item[{bfs\+::path}]{block\+\_\+dir}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2sysio-blocklog_2main_8cpp_source_l00262}{262}} of file \mbox{\hyperlink{programs_2sysio-blocklog_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00262\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00263\ \ \ \ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacestd}{std}};}
+\DoxyCodeLine{00264\ \ \ \ cout\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)nSmoke\ test\ of\ blocks.log\ and\ blocks.index\ in\ directory\ "{}}\ <<\ \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a3426d59b828f63d073d546fed967330e}{block\_dir}}\ <<\ \textcolor{charliteral}{'\(\backslash\)n'};}
+\DoxyCodeLine{00265\ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1trim__data}{trim\_data}}\ td(\mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a3426d59b828f63d073d546fed967330e}{block\_dir}});}
+\DoxyCodeLine{00266\ \ \ \ \textcolor{keyword}{auto}\ status\ =\ fseek(td.blk\_in,\ -\/\textcolor{keyword}{sizeof}(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}),\ SEEK\_END);\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//get\ last\_block\ from\ blocks.log,\ compare\ to\ from\ blocks.index}}
+\DoxyCodeLine{00267\ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ status\ ==\ 0,\ block\_log\_exception,\ \textcolor{stringliteral}{"{}cannot\ seek\ to\ \$\{file\}\ \$\{pos\}\ from\ beginning\ of\ file"{}},\ (\textcolor{stringliteral}{"{}file"{}},\ td.block\_file\_name.string())(\textcolor{stringliteral}{"{}pos"{}},\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}))\ );}
+\DoxyCodeLine{00268\ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ file\_pos;}
+\DoxyCodeLine{00269\ \ \ \ \textcolor{keyword}{auto}\ size\ =\ fread((\textcolor{keywordtype}{void}*)\&file\_pos,\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}),\ 1,\ td.blk\_in);}
+\DoxyCodeLine{00270\ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ size\ ==\ 1,\ block\_log\_exception,\ \textcolor{stringliteral}{"{}\$\{file\}\ read\ fails"{}},\ (\textcolor{stringliteral}{"{}file"{}},\ td.block\_file\_name.string())\ );}
+\DoxyCodeLine{00271\ \ \ \ status\ =\ fseek(td.blk\_in,\ file\_pos\ +\ \mbox{\hyperlink{structsysio_1_1chain_1_1trim__data_aeacad2aff58cf29973f137cd79819264}{trim\_data::blknum\_offset}},\ SEEK\_SET);}
+\DoxyCodeLine{00272\ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ status\ ==\ 0,\ block\_log\_exception,\ \textcolor{stringliteral}{"{}cannot\ seek\ to\ \$\{file\}\ \$\{pos\}\ from\ beginning\ of\ file"{}},\ (\textcolor{stringliteral}{"{}file"{}},\ td.block\_file\_name.string())(\textcolor{stringliteral}{"{}pos"{}},\ file\_pos\ +\ \mbox{\hyperlink{structsysio_1_1chain_1_1trim__data_aeacad2aff58cf29973f137cd79819264}{trim\_data::blknum\_offset}})\ );}
+\DoxyCodeLine{00273\ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ bnum;}
+\DoxyCodeLine{00274\ \ \ \ size\ =\ fread((\textcolor{keywordtype}{void}*)\&bnum,\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}),\ 1,\ td.blk\_in);}
+\DoxyCodeLine{00275\ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ size\ ==\ 1,\ block\_log\_exception,\ \textcolor{stringliteral}{"{}\$\{file\}\ read\ fails"{}},\ (\textcolor{stringliteral}{"{}file"{}},\ td.block\_file\_name.string())\ );}
+\DoxyCodeLine{00276\ \ \ \ bnum\ =\ \mbox{\hyperlink{namespacefc_afb668c55fd6ee73e1fcd67e77d8f6009}{endian\_reverse\_u32}}(bnum)\ +\ 1;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//convert\ from\ big\ endian\ to\ little\ endian\ and\ add\ 1}}
+\DoxyCodeLine{00277\ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ td.last\_block\ ==\ bnum,\ block\_log\_exception,\ \textcolor{stringliteral}{"{}blocks.log\ says\ last\ block\ is\ \$\{lb\}\ which\ disagrees\ with\ blocks.index"{}},\ (\textcolor{stringliteral}{"{}lb"{}},\ bnum)\ );}
+\DoxyCodeLine{00278\ \ \ \ cout\ <<\ \textcolor{stringliteral}{"{}blocks.log\ and\ blocks.index\ agree\ on\ number\ of\ blocks\(\backslash\)n"{}};}
+\DoxyCodeLine{00279\ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ delta\ =\ (td.last\_block\ +\ 8\ -\/\ td.first\_block)\ >>\ 3;}
+\DoxyCodeLine{00280\ \ \ \ \textcolor{keywordflow}{if}\ (delta\ <\ 1)}
+\DoxyCodeLine{00281\ \ \ \ \ \ \ delta\ =\ 1;}
+\DoxyCodeLine{00282\ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ n\ =\ td.first\_block;\ ;\ n\ +=\ delta)\ \{}
+\DoxyCodeLine{00283\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (n\ >\ td.last\_block)}
+\DoxyCodeLine{00284\ \ \ \ \ \ \ \ \ \ n\ =\ td.last\_block;}
+\DoxyCodeLine{00285\ \ \ \ \ \ \ td.block\_pos(n);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//check\ block\ 'n'\ is\ where\ blocks.index\ says}}
+\DoxyCodeLine{00286\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (n\ ==\ td.last\_block)}
+\DoxyCodeLine{00287\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00288\ \ \ \ \}}
+\DoxyCodeLine{00289\ \ \ \ cout\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)nno\ problems\ found\(\backslash\)n"{}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//if\ get\ here\ there\ were\ no\ exceptions}}
+\DoxyCodeLine{00290\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{programs_2sysio-blocklog_2main_8cpp_a37fad1474c0a90433ca0152870e1da72_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=220pt]{programs_2sysio-blocklog_2main_8cpp_a37fad1474c0a90433ca0152870e1da72_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{programs_2sysio-blocklog_2main_8cpp_a3cfbe737c1a84d19629ae9ffc5bc40a2}\index{main.cpp@{main.cpp}!trim\_blocklog\_end@{trim\_blocklog\_end}}
+\index{trim\_blocklog\_end@{trim\_blocklog\_end}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{trim\_blocklog\_end()}{trim\_blocklog\_end()}}
+{\footnotesize\ttfamily \label{programs_2sysio-blocklog_2main_8cpp_a3cfbe737c1a84d19629ae9ffc5bc40a2} 
+int trim\+\_\+blocklog\+\_\+end (\begin{DoxyParamCaption}\item[{bfs\+::path}]{block\+\_\+dir}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{n}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2sysio-blocklog_2main_8cpp_source_l00231}{231}} of file \mbox{\hyperlink{programs_2sysio-blocklog_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00231\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ \ \ \ \ \ \ \textcolor{comment}{//n\ is\ last\ block\ to\ keep\ (remove\ later\ blocks)}}
+\DoxyCodeLine{00232\ \ \ \ \mbox{\hyperlink{structreport__time}{report\_time}}\ rt(\textcolor{stringliteral}{"{}trimming\ blocklog\ end"{}});}
+\DoxyCodeLine{00233\ \ \ \ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacestd}{std}};}
+\DoxyCodeLine{00234\ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1trim__data}{trim\_data}}\ td(\mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a3426d59b828f63d073d546fed967330e}{block\_dir}});}
+\DoxyCodeLine{00235\ \ \ \ cout\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)nIn\ directory\ "{}}\ <<\ \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a3426d59b828f63d073d546fed967330e}{block\_dir}}\ <<\ \textcolor{stringliteral}{"{}\ will\ trim\ all\ blocks\ after\ block\ "{}}\ <<\ n\ <<\ \textcolor{stringliteral}{"{}\ from\ "{}}}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ <<\ td.block\_file\_name.generic\_string()\ <<\ \textcolor{stringliteral}{"{}\ and\ "{}}\ <<\ td.index\_file\_name.generic\_string()\ <<\ \textcolor{stringliteral}{"{}.\(\backslash\)n"{}};}
+\DoxyCodeLine{00237\ \ \ \ \textcolor{keywordflow}{if}\ (n\ <\ td.first\_block)\ \{}
+\DoxyCodeLine{00238\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_catch_a54c1ce08041448d684ae8edc14162cd2}{cerr}}\ <<\ \textcolor{stringliteral}{"{}All\ blocks\ are\ after\ block\ "{}}\ <<\ n\ <<\ \textcolor{stringliteral}{"{}\ so\ do\ nothing\ (trim\_end\ would\ delete\ entire\ blocks.log)\(\backslash\)n"{}};}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{00240\ \ \ \ \}}
+\DoxyCodeLine{00241\ \ \ \ \textcolor{keywordflow}{if}\ (n\ >=\ td.last\_block)\ \{}
+\DoxyCodeLine{00242\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_catch_a54c1ce08041448d684ae8edc14162cd2}{cerr}}\ <<\ \textcolor{stringliteral}{"{}There\ are\ no\ blocks\ after\ block\ "{}}\ <<\ n\ <<\ \textcolor{stringliteral}{"{}\ so\ do\ nothing\(\backslash\)n"{}};}
+\DoxyCodeLine{00243\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 2;}
+\DoxyCodeLine{00244\ \ \ \ \}}
+\DoxyCodeLine{00245\ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ end\_of\_new\_file\ =\ td.block\_pos(n\ +\ 1);}
+\DoxyCodeLine{00246\ \ \ \ bfs::resize\_file(td.block\_file\_name,\ end\_of\_new\_file);}
+\DoxyCodeLine{00247\ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ index\_end=\ td.block\_index(n)\ +\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}});\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//advance\ past\ record\ for\ block\ n}}
+\DoxyCodeLine{00248\ \ \ \ bfs::resize\_file(td.index\_file\_name,\ index\_end);}
+\DoxyCodeLine{00249\ \ \ \ cout\ <<\ \textcolor{stringliteral}{"{}blocks.index\ has\ been\ trimmed\ to\ "{}}\ <<\ index\_end\ <<\ \textcolor{stringliteral}{"{}\ bytes\(\backslash\)n"{}};}
+\DoxyCodeLine{00250\ \ \ \ rt.report();}
+\DoxyCodeLine{00251\ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00252\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{programs_2sysio-blocklog_2main_8cpp_a3cfbe737c1a84d19629ae9ffc5bc40a2_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=248pt]{programs_2sysio-blocklog_2main_8cpp_a3cfbe737c1a84d19629ae9ffc5bc40a2_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{programs_2sysio-blocklog_2main_8cpp_ace4e6c78c84c1c16b0486d5833afd9f2}\index{main.cpp@{main.cpp}!trim\_blocklog\_front@{trim\_blocklog\_front}}
+\index{trim\_blocklog\_front@{trim\_blocklog\_front}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{trim\_blocklog\_front()}{trim\_blocklog\_front()}}
+{\footnotesize\ttfamily \label{programs_2sysio-blocklog_2main_8cpp_ace4e6c78c84c1c16b0486d5833afd9f2} 
+bool trim\+\_\+blocklog\+\_\+front (\begin{DoxyParamCaption}\item[{bfs\+::path}]{block\+\_\+dir}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{n}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2sysio-blocklog_2main_8cpp_source_l00254}{254}} of file \mbox{\hyperlink{programs_2sysio-blocklog_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00254\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ \ \ \ \ \ \ \ \textcolor{comment}{//n\ is\ first\ block\ to\ keep\ (remove\ prior\ blocks)}}
+\DoxyCodeLine{00255\ \ \ \ \mbox{\hyperlink{structreport__time}{report\_time}}\ rt(\textcolor{stringliteral}{"{}trimming\ blocklog\ start"{}});}
+\DoxyCodeLine{00256\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ status\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1block__log_a00f24c3412cd6231b93394e2bbcea904}{block\_log::trim\_blocklog\_front}}(\mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a3426d59b828f63d073d546fed967330e}{block\_dir}},\ \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a3426d59b828f63d073d546fed967330e}{block\_dir}}\ /\ \textcolor{stringliteral}{"{}old"{}},\ n);}
+\DoxyCodeLine{00257\ \ \ \ rt.report();}
+\DoxyCodeLine{00258\ \ \ \ \textcolor{keywordflow}{return}\ status;}
+\DoxyCodeLine{00259\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{programs_2sysio-blocklog_2main_8cpp_ace4e6c78c84c1c16b0486d5833afd9f2_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=252pt]{programs_2sysio-blocklog_2main_8cpp_ace4e6c78c84c1c16b0486d5833afd9f2_icgraph}
+\end{center}
+\end{figure}

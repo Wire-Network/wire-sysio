@@ -1,0 +1,17 @@
+<map id="sysio::net_plugin_impl::sign_compact" name="sysio::net_plugin_impl::sign_compact">
+<area shape="rect" id="Node000001" title="Returns a signature of the digest using the corresponding private key of the signer." alt="" coords="5,47,156,88"/>
+<area shape="rect" id="Node000002" href="$namespacefc.html#a150ca4cd9c0318ca45dc0dc7df5d58b9" title=" " alt="" coords="403,59,478,84"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="148,44,203,33,280,25,313,26,356,33,402,49,400,54,354,38,313,31,280,30,204,38,149,49"/>
+<area shape="rect" id="Node000006" href="$classappbase_1_1plugin.html#a857288c2424b57a898c0579d25dacbb0" title=" " alt="" coords="210,47,348,88"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="156,65,194,65,194,70,156,70"/>
+<area shape="rect" id="Node000007" href="$classsysio_1_1producer__plugin.html#a58db07a465c2622e2135b2f2c69d678e" title=" " alt="" coords="204,112,355,153"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="145,86,202,105,200,110,144,91"/>
+<area shape="rect" id="Node000003" href="$namespacefc_1_1raw.html#a3a18d8161aa5b4f4f02b6fcfdff5e5d1" title=" " alt="" coords="546,29,643,55"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="478,62,531,52,532,57,479,67"/>
+<area shape="rect" id="Node000004" href="$classfc_1_1sha256_1_1encoder.html#a4d8b8181e912194cf98a56164671adf8" title=" " alt="" coords="526,79,663,120"/>
+<area shape="poly" id="edge4_Node000002_Node000004" title=" " alt="" coords="479,76,512,82,511,87,478,81"/>
+<area shape="poly" id="edge3_Node000003_Node000003" title=" " alt="" coords="568,30,563,21,566,11,577,5,595,3,613,5,623,12,620,16,611,10,594,8,579,10,570,15,568,20,573,28"/>
+<area shape="rect" id="Node000005" href="$classfc_1_1sha256.html#ab897537f6c524085b28049be51ed370d" title=" " alt="" coords="711,87,826,112"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="663,97,695,97,695,102,663,102"/>
+<area shape="poly" id="edge8_Node000007_Node000002" title=" " alt="" coords="334,109,390,88,392,93,336,114"/>
+</map>

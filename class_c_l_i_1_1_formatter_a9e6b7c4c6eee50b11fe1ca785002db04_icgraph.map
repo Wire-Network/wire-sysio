@@ -1,0 +1,9 @@
+<map id="CLI::Formatter::make_subcommands" name="CLI::Formatter::make_subcommands">
+<area shape="rect" id="Node000001" title="This prints out all the subcommands." alt="" coords="425,5,571,46"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_formatter.html#ade54fd392e2c9f5364744dca82408e60" title="This prints out a subcommand in help&#45;all." alt="" coords="231,5,377,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="409,37,377,37,377,32,409,32"/>
+<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_formatter.html#a838e0f47efa4fbd1b738eedb156887b9" title="This puts everything together." alt="" coords="5,42,183,68"/>
+<area shape="poly" id="edge4_Node000001_Node000003" title=" " alt="" coords="417,53,377,60,277,67,183,65,183,59,277,62,377,55,416,48"/>
+<area shape="poly" id="edge3_Node000002_Node000001" title=" " alt="" coords="392,14,424,14,424,20,392,19"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="215,41,183,45,183,40,214,35"/>
+</map>

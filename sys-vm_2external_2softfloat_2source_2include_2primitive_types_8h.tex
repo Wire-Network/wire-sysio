@@ -1,0 +1,188 @@
+\doxysection{libraries/sys-\/vm/external/softfloat/source/include/primitive\+Types.h File Reference}
+\hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h}{}\label{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h}\index{libraries/sys-\/vm/external/softfloat/source/include/primitiveTypes.h@{libraries/sys-\/vm/external/softfloat/source/include/primitiveTypes.h}}
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+Include dependency graph for primitive\+Types.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=203pt]{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=203pt]{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_a22ffd10aefa829eef57da03cff970e45}{word\+Incr}}~-\/1
+\item 
+\#define \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_a49446dd1193996f92b1e5bb62eaa4689}{index\+Word}}(total,  n)
+\item 
+\#define \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_aa3af452dd34ad7a607f4ad31c234fda7}{index\+Word\+Hi}}(total)
+\item 
+\#define \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_a28a8ad1b8455a20d428c59cf01e36a66}{index\+Word\+Lo}}(total)
+\item 
+\#define \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_aa11a9f124d46ec4c88f5645933b1196a}{index\+Multiword}}(total,  m,  n)
+\item 
+\#define \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_a016e8ca813d61983f044bcb6a01ff4b3}{index\+Multiword\+Hi}}(total,  n)
+\item 
+\#define \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_a17ea7f28b4e451b784902493243eb93b}{index\+Multiword\+Lo}}(total,  n)
+\item 
+\#define \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_a59d38bc3ebe0b9d0a0668dc8cd3de21b}{index\+Multiword\+Hi\+But}}(total,  n)
+\item 
+\#define \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_ae57dd9d99c575c28faf52b9db48c6a8b}{index\+Multiword\+Lo\+But}}(total,  n)
+\item 
+\#define \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_a0acb3f74d0e1902d53267d7b60e2aa38}{INIT\+\_\+\+UINTM4}}(v3,  v2,  v1,  v0)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_aa11a9f124d46ec4c88f5645933b1196a}\index{primitiveTypes.h@{primitiveTypes.h}!indexMultiword@{indexMultiword}}
+\index{indexMultiword@{indexMultiword}!primitiveTypes.h@{primitiveTypes.h}}
+\doxysubsubsection{\texorpdfstring{indexMultiword}{indexMultiword}}
+{\footnotesize\ttfamily \label{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_aa11a9f124d46ec4c88f5645933b1196a} 
+\#define index\+Multiword(\begin{DoxyParamCaption}\item[{}]{total}{, }\item[{}]{m}{, }\item[{}]{n}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((total)\ -\/\ 1\ -\/\ (m))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00076}{76}} of file \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source}{primitive\+Types.\+h}}.
+
+\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_a016e8ca813d61983f044bcb6a01ff4b3}\index{primitiveTypes.h@{primitiveTypes.h}!indexMultiwordHi@{indexMultiwordHi}}
+\index{indexMultiwordHi@{indexMultiwordHi}!primitiveTypes.h@{primitiveTypes.h}}
+\doxysubsubsection{\texorpdfstring{indexMultiwordHi}{indexMultiwordHi}}
+{\footnotesize\ttfamily \label{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_a016e8ca813d61983f044bcb6a01ff4b3} 
+\#define index\+Multiword\+Hi(\begin{DoxyParamCaption}\item[{}]{total}{, }\item[{}]{n}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{0}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00077}{77}} of file \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source}{primitive\+Types.\+h}}.
+
+\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_a59d38bc3ebe0b9d0a0668dc8cd3de21b}\index{primitiveTypes.h@{primitiveTypes.h}!indexMultiwordHiBut@{indexMultiwordHiBut}}
+\index{indexMultiwordHiBut@{indexMultiwordHiBut}!primitiveTypes.h@{primitiveTypes.h}}
+\doxysubsubsection{\texorpdfstring{indexMultiwordHiBut}{indexMultiwordHiBut}}
+{\footnotesize\ttfamily \label{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_a59d38bc3ebe0b9d0a0668dc8cd3de21b} 
+\#define index\+Multiword\+Hi\+But(\begin{DoxyParamCaption}\item[{}]{total}{, }\item[{}]{n}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{0}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00079}{79}} of file \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source}{primitive\+Types.\+h}}.
+
+\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_a17ea7f28b4e451b784902493243eb93b}\index{primitiveTypes.h@{primitiveTypes.h}!indexMultiwordLo@{indexMultiwordLo}}
+\index{indexMultiwordLo@{indexMultiwordLo}!primitiveTypes.h@{primitiveTypes.h}}
+\doxysubsubsection{\texorpdfstring{indexMultiwordLo}{indexMultiwordLo}}
+{\footnotesize\ttfamily \label{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_a17ea7f28b4e451b784902493243eb93b} 
+\#define index\+Multiword\+Lo(\begin{DoxyParamCaption}\item[{}]{total}{, }\item[{}]{n}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((total)\ -\/\ (n))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00078}{78}} of file \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source}{primitive\+Types.\+h}}.
+
+\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_ae57dd9d99c575c28faf52b9db48c6a8b}\index{primitiveTypes.h@{primitiveTypes.h}!indexMultiwordLoBut@{indexMultiwordLoBut}}
+\index{indexMultiwordLoBut@{indexMultiwordLoBut}!primitiveTypes.h@{primitiveTypes.h}}
+\doxysubsubsection{\texorpdfstring{indexMultiwordLoBut}{indexMultiwordLoBut}}
+{\footnotesize\ttfamily \label{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_ae57dd9d99c575c28faf52b9db48c6a8b} 
+\#define index\+Multiword\+Lo\+But(\begin{DoxyParamCaption}\item[{}]{total}{, }\item[{}]{n}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(n)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00080}{80}} of file \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source}{primitive\+Types.\+h}}.
+
+\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_a49446dd1193996f92b1e5bb62eaa4689}\index{primitiveTypes.h@{primitiveTypes.h}!indexWord@{indexWord}}
+\index{indexWord@{indexWord}!primitiveTypes.h@{primitiveTypes.h}}
+\doxysubsubsection{\texorpdfstring{indexWord}{indexWord}}
+{\footnotesize\ttfamily \label{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_a49446dd1193996f92b1e5bb62eaa4689} 
+\#define index\+Word(\begin{DoxyParamCaption}\item[{}]{total}{, }\item[{}]{n}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((total)\ -\/\ 1\ -\/\ (n))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00073}{73}} of file \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source}{primitive\+Types.\+h}}.
+
+\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_aa3af452dd34ad7a607f4ad31c234fda7}\index{primitiveTypes.h@{primitiveTypes.h}!indexWordHi@{indexWordHi}}
+\index{indexWordHi@{indexWordHi}!primitiveTypes.h@{primitiveTypes.h}}
+\doxysubsubsection{\texorpdfstring{indexWordHi}{indexWordHi}}
+{\footnotesize\ttfamily \label{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_aa3af452dd34ad7a607f4ad31c234fda7} 
+\#define index\+Word\+Hi(\begin{DoxyParamCaption}\item[{}]{total}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{0}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00074}{74}} of file \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source}{primitive\+Types.\+h}}.
+
+\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_a28a8ad1b8455a20d428c59cf01e36a66}\index{primitiveTypes.h@{primitiveTypes.h}!indexWordLo@{indexWordLo}}
+\index{indexWordLo@{indexWordLo}!primitiveTypes.h@{primitiveTypes.h}}
+\doxysubsubsection{\texorpdfstring{indexWordLo}{indexWordLo}}
+{\footnotesize\ttfamily \label{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_a28a8ad1b8455a20d428c59cf01e36a66} 
+\#define index\+Word\+Lo(\begin{DoxyParamCaption}\item[{}]{total}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((total)\ -\/\ 1)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00075}{75}} of file \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source}{primitive\+Types.\+h}}.
+
+\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_a0acb3f74d0e1902d53267d7b60e2aa38}\index{primitiveTypes.h@{primitiveTypes.h}!INIT\_UINTM4@{INIT\_UINTM4}}
+\index{INIT\_UINTM4@{INIT\_UINTM4}!primitiveTypes.h@{primitiveTypes.h}}
+\doxysubsubsection{\texorpdfstring{INIT\_UINTM4}{INIT\_UINTM4}}
+{\footnotesize\ttfamily \label{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_a0acb3f74d0e1902d53267d7b60e2aa38} 
+\#define INIT\+\_\+\+UINTM4(\begin{DoxyParamCaption}\item[{}]{v3}{, }\item[{}]{v2}{, }\item[{}]{v1}{, }\item[{}]{v0}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\{\ v3,\ v2,\ v1,\ v0\ \}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00081}{81}} of file \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source}{primitive\+Types.\+h}}.
+
+\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_a22ffd10aefa829eef57da03cff970e45}\index{primitiveTypes.h@{primitiveTypes.h}!wordIncr@{wordIncr}}
+\index{wordIncr@{wordIncr}!primitiveTypes.h@{primitiveTypes.h}}
+\doxysubsubsection{\texorpdfstring{wordIncr}{wordIncr}}
+{\footnotesize\ttfamily \label{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_a22ffd10aefa829eef57da03cff970e45} 
+\#define word\+Incr~-\/1}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00072}{72}} of file \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source}{primitive\+Types.\+h}}.
+

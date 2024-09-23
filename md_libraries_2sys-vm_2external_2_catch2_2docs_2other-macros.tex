@@ -1,0 +1,166 @@
+\chapter{other-\/macros}
+\hypertarget{md_libraries_2sys-vm_2external_2_catch2_2docs_2other-macros}{}\label{md_libraries_2sys-vm_2external_2_catch2_2docs_2other-macros}\index{other-\/macros@{other-\/macros}}
+\label{_top}%
+ \doxysection*{Other macros}
+
+This page serves as a reference for macros that are not documented elsewhere. For now, these macros are separated into 2 rough categories, "{}assertion related macros"{} and "{}test case related macros"{}.
+
+\doxysubsection*{Assertion related macros}
+
+
+\begin{DoxyItemize}
+\item {\ttfamily CHECKED\+\_\+\+IF} and {\ttfamily CHECKED\+\_\+\+ELSE}
+\end{DoxyItemize}
+
+{\ttfamily \doxylink{include_2catch_8hpp_a354466c7b989ec55784c02d74013263c}{CHECKED\+\_\+\+IF( expr )}} is an {\ttfamily if} replacement, that also applies Catch2\textquotesingle{}s stringification machinery to the {\itshape expr} and records the result. As with {\ttfamily if}, the block after a {\ttfamily CHECKED\+\_\+\+IF} is entered only if the expression evaluates to {\ttfamily true}. {\ttfamily \doxylink{include_2catch_8hpp_a5fa42bb950a65e22eac778c86b27d832}{CHECKED\+\_\+\+ELSE( expr )}} work similarly, but the block is entered only if the {\itshape expr} evaluated to {\ttfamily false}.
+
+Example\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordtype}{int}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ =\ ...;}
+\DoxyCodeLine{\textcolor{keywordtype}{int}\ b\ =\ ...;}
+\DoxyCodeLine{\mbox{\hyperlink{include_2catch_8hpp_a354466c7b989ec55784c02d74013263c}{CHECKED\_IF}}(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ ==\ b\ )\ \{}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ This\ block\ is\ entered\ when\ a\ ==\ b}}
+\DoxyCodeLine{\}\ \mbox{\hyperlink{include_2catch_8hpp_a5fa42bb950a65e22eac778c86b27d832}{CHECKED\_ELSE}}\ (\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ ==\ b\ )\ \{}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ This\ block\ is\ entered\ when\ a\ !=\ b}}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+
+\begin{DoxyItemize}
+\item {\ttfamily CHECK\+\_\+\+NOFAIL}
+\end{DoxyItemize}
+
+{\ttfamily \doxylink{include_2catch_8hpp_a13c6feaf82c3c419104c50dbb8caa3ef}{CHECK\+\_\+\+NOFAIL( expr )}} is a variant of {\ttfamily CHECK} that does not fail the test case if {\itshape expr} evaluates to {\ttfamily false}. This can be useful for checking some assumption, that might be violated without the test necessarily failing.
+
+Example output\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{main.cpp:6:}
+\DoxyCodeLine{FAILED\ -\/\ but\ was\ ok:}
+\DoxyCodeLine{\ \ CHECK\_NOFAIL(\ 1\ ==\ 2\ )}
+\DoxyCodeLine{}
+\DoxyCodeLine{main.cpp:7:}
+\DoxyCodeLine{PASSED:}
+\DoxyCodeLine{\ \ CHECK(\ 2\ ==\ 2\ )}
+
+\end{DoxyCode}
+
+
+
+\begin{DoxyItemize}
+\item {\ttfamily SUCCEED}
+\end{DoxyItemize}
+
+{\ttfamily \doxylink{gtest_8h_a75adcdf89f69b0b615e395daafc315af}{SUCCEED( msg )}} is mostly equivalent with {\ttfamily \doxylink{include_2catch_8hpp_a3ae64706314066fdc8b6c8029a915aa7}{INFO( msg )}; \doxylink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE( true )};}. In other words, {\ttfamily SUCCEED} is for cases where just reaching a certain line means that the test has been a success.
+
+Example usage\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\ \textcolor{stringliteral}{"{}SUCCEED\ showcase"{}}\ )\ \{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{int}\ I\ =\ 1;}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{gtest_8h_a75adcdf89f69b0b615e395daafc315af}{SUCCEED}}(\ \textcolor{stringliteral}{"{}I\ is\ "{}}\ <<\ I\ );}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+
+\begin{DoxyItemize}
+\item {\ttfamily STATIC\+\_\+\+REQUIRE}
+\end{DoxyItemize}
+
+{\ttfamily \doxylink{include_2catch_8hpp_abad9ff23b730469f209b010e0ac4687c}{STATIC\+\_\+\+REQUIRE( expr )}} is a macro that can be used the same way as a {\ttfamily static\+\_\+assert}, but also registers the success with Catch2, so it is reported as a success at runtime. The whole check can also be deferred to the runtime, by defining {\ttfamily CATCH\+\_\+\+CONFIG\+\_\+\+RUNTIME\+\_\+\+STATIC\+\_\+\+REQUIRE} before including the Catch2 header.
+
+Example\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\textcolor{stringliteral}{"{}STATIC\_REQUIRE\ showcase"{}},\ \textcolor{stringliteral}{"{}[traits]"{}})\ \{}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_abad9ff23b730469f209b010e0ac4687c}{STATIC\_REQUIRE}}(\ std::is\_void<void>::value\ );}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ae7506af68f12e7efdb22e951b911b5a0}{STATIC\_REQUIRE\_FALSE}}(\ std::is\_void<int>::value\ );}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection*{\doxylink{class_test}{Test} case related macros}
+
+
+\begin{DoxyItemize}
+\item {\ttfamily METHOD\+\_\+\+AS\+\_\+\+TEST\+\_\+\+CASE}
+\end{DoxyItemize}
+
+{\ttfamily METHOD\+\_\+\+AS\+\_\+\+TEST\+\_\+\+CASE( member-\/function-\/pointer, description )} lets you register a member function of a class as a Catch2 test case. The class will be separately instantiated for each method registered in this way.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{class\ }\mbox{\hyperlink{struct_test_class}{TestClass}}\ \{}
+\DoxyCodeLine{\ \ \ \ std::string\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{public}:}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{struct_test_class}{TestClass}}()}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ :\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}(\ \textcolor{stringliteral}{"{}hello"{}}\ )}
+\DoxyCodeLine{\ \ \ \ \{\}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{void}\ testCase()\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ ==\ \textcolor{stringliteral}{"{}hello"{}}\ );}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{\};}
+\DoxyCodeLine{}
+\DoxyCodeLine{}
+\DoxyCodeLine{\mbox{\hyperlink{include_2catch_8hpp_add790b4107e8b013f21b0272be7bcc76}{METHOD\_AS\_TEST\_CASE}}(\ TestClass::testCase,\ \textcolor{stringliteral}{"{}Use\ class's\ method\ as\ a\ test\ case"{}},\ \textcolor{stringliteral}{"{}[class]"{}}\ )}
+
+\end{DoxyCode}
+
+
+
+\begin{DoxyItemize}
+\item {\ttfamily REGISTER\+\_\+\+TEST\+\_\+\+CASE}
+\end{DoxyItemize}
+
+{\ttfamily \doxylink{include_2catch_8hpp_a784b9192db328b4f21186f9b26e4146e}{REGISTER\+\_\+\+TEST\+\_\+\+CASE( function, description )}} let\textquotesingle{}s you register a {\ttfamily function} as a test case. The function has to have {\ttfamily void()} signature, the description can contain both name and tags.
+
+Example\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{include_2catch_8hpp_a784b9192db328b4f21186f9b26e4146e}{REGISTER\_TEST\_CASE}}(\ someFunction,\ \textcolor{stringliteral}{"{}ManuallyRegistered"{}},\ \textcolor{stringliteral}{"{}[tags]"{}}\ );}
+
+\end{DoxyCode}
+
+
+{\itshape Note that the registration still has to happen before Catch2\textquotesingle{}s session is initiated. This means that it either needs to be done in a global constructor, or before Catch2\textquotesingle{}s session is created in user\textquotesingle{}s own main.}
+
+
+\begin{DoxyItemize}
+\item {\ttfamily ANON\+\_\+\+TEST\+\_\+\+CASE}
+\end{DoxyItemize}
+
+{\ttfamily ANON\+\_\+\+TEST\+\_\+\+CASE} is a {\ttfamily TEST\+\_\+\+CASE} replacement that will autogenerate unique name. The advantage of this is that you do not have to think of a name for the test case,\`{}the disadvantage is that the name doesn\textquotesingle{}t necessarily remain stable across different links, and thus it might be hard to run directly.
+
+Example\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{include_2catch_8hpp_ab41cb63be394c30d48fa579bf8352f18}{ANON\_TEST\_CASE}}()\ \{}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{gtest_8h_a75adcdf89f69b0b615e395daafc315af}{SUCCEED}}(\textcolor{stringliteral}{"{}Hello\ from\ anonymous\ test\ case"{}});}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+
+\begin{DoxyItemize}
+\item {\ttfamily DYNAMIC\+\_\+\+SECTION}
+\end{DoxyItemize}
+
+{\ttfamily DYNAMIC\+\_\+\+SECTION} is a {\ttfamily SECTION} where the user can use {\ttfamily operator\texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<}} to create the final name for that section. This can be useful with e.\+g. generators, or when creating a {\ttfamily SECTION} dynamically, within a loop.
+
+Example\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\ \textcolor{stringliteral}{"{}looped\ SECTION\ tests"{}}\ )\ \{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ =\ 1;}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keywordtype}{int}\ b\ =\ 0;\ b\ <\ 10;\ ++b\ )\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_aa1caa37b980555de35faefa9191b5128}{DYNAMIC\_SECTION}}(\ \textcolor{stringliteral}{"{}b\ is\ currently:\ "{}}\ <<\ b\ )\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ b\ >\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ );}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+ 

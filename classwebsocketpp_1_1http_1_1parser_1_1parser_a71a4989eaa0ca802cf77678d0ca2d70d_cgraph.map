@@ -1,0 +1,7 @@
+<map id="websocketpp::http::parser::parser::set_body" name="websocketpp::http::parser::parser::set_body">
+<area shape="rect" id="Node000001" title="Set body content." alt="" coords="5,53,168,94"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1http_1_1parser_1_1parser.html#a64ff49a6a1ddbf70b9767874ffdd513e" title="Remove a header from the parser." alt="" coords="216,5,368,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="167,55,200,48,201,53,168,60"/>
+<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1http_1_1parser_1_1parser.html#aba2991b2aa41ca60d9427950502b0b93" title="Set a value for an HTTP header, replacing an existing value." alt="" coords="216,85,368,141"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="168,86,201,93,200,98,167,92"/>
+</map>

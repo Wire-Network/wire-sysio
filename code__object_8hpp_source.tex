@@ -1,0 +1,46 @@
+\doxysection{code\+\_\+object.\+hpp}
+\hypertarget{code__object_8hpp_source}{}\label{code__object_8hpp_source}\index{libraries/chain/include/sysio/chain/code\_object.hpp@{libraries/chain/include/sysio/chain/code\_object.hpp}}
+\mbox{\hyperlink{code__object_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{code__object_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{code__object_8hpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{database__utils_8hpp}{sysio/chain/database\_utils.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{code__object_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <boost/tuple/tuple\_io.hpp>}}
+\DoxyCodeLine{\Hypertarget{code__object_8hpp_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{code__object_8hpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{multi__index__includes_8hpp}{multi\_index\_includes.hpp}}"{}}}
+\DoxyCodeLine{\Hypertarget{code__object_8hpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{code__object_8hpp_source_l00007}00007\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{\ \textcolor{keyword}{namespace\ }chain\ \{}
+\DoxyCodeLine{\Hypertarget{code__object_8hpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{code__object_8hpp_source_l00009}\mbox{\hyperlink{classsysio_1_1chain_1_1code__object}{00009}}\ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1chain_1_1code__object}{code\_object}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{structchainbase_1_1object}{chainbase::object}}<code\_object\_type,\ code\_object>\ \{}
+\DoxyCodeLine{\Hypertarget{code__object_8hpp_source_l00010}00010\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2types_8hpp_a4f726ee00eb9bbf2574c06492926cf73}{OBJECT\_CTOR}}(\mbox{\hyperlink{classsysio_1_1chain_1_1code__object}{code\_object}},\ (code))}
+\DoxyCodeLine{\Hypertarget{code__object_8hpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{code__object_8hpp_source_l00012}00012\ \ \ \ \ \ \ \mbox{\hyperlink{classchainbase_1_1oid}{id\_type}}\ \ \ \ \ \ id;}
+\DoxyCodeLine{\Hypertarget{code__object_8hpp_source_l00013}00013\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1sha256}{digest\_type}}\ \ code\_hash;\ \textcolor{comment}{//<\ code\_hash\ should\ not\ be\ changed\ within\ a\ chainbase\ modifier\ lambda}}
+\DoxyCodeLine{\Hypertarget{code__object_8hpp_source_l00014}00014\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1shared__blob}{shared\_blob}}\ \ code;}
+\DoxyCodeLine{\Hypertarget{code__object_8hpp_source_l00015}00015\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \ \ \ \ code\_ref\_count;}
+\DoxyCodeLine{\Hypertarget{code__object_8hpp_source_l00016}00016\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \ \ \ \ first\_block\_used;}
+\DoxyCodeLine{\Hypertarget{code__object_8hpp_source_l00017}00017\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1wasm__interface_a9053d9e65167e5f241f1f3f27b175f9c}{vm\_type}}\ =\ 0;\ \textcolor{comment}{//<\ vm\_type\ should\ not\ be\ changed\ within\ a\ chainbase\ modifier\ lambda}}
+\DoxyCodeLine{\Hypertarget{code__object_8hpp_source_l00018}00018\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \ \ \ \ \ vm\_version\ =\ 0;\ \textcolor{comment}{//<\ vm\_version\ should\ not\ be\ changed\ within\ a\ chainbase\ modifier\ lambda}}
+\DoxyCodeLine{\Hypertarget{code__object_8hpp_source_l00019}00019\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{code__object_8hpp_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{code__object_8hpp_source_l00021}00021\ \ \ \ \textcolor{keyword}{struct\ }by\_code\_hash;}
+\DoxyCodeLine{\Hypertarget{code__object_8hpp_source_l00022}\mbox{\hyperlink{namespacesysio_1_1chain_a0f69872bbb285f6f90ff8b5e30ef6aa8}{00022}}\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacesysio_1_1chain_a0f69872bbb285f6f90ff8b5e30ef6aa8}{code\_index}}\ =\ \mbox{\hyperlink{namespacechainbase_aba1e047495dcaa4e0d32ff25b8705f1f}{chainbase::shared\_multi\_index\_container}}<}
+\DoxyCodeLine{\Hypertarget{code__object_8hpp_source_l00023}00023\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1code__object}{code\_object}},}
+\DoxyCodeLine{\Hypertarget{code__object_8hpp_source_l00024}00024\ \ \ \ \ \ \ indexed\_by<}
+\DoxyCodeLine{\Hypertarget{code__object_8hpp_source_l00025}00025\ \ \ \ \ \ \ \ \ \ ordered\_unique<tag<by\_id>,\ member<code\_object,\ code\_object::id\_type,\ \&code\_object::id>>,}
+\DoxyCodeLine{\Hypertarget{code__object_8hpp_source_l00026}00026\ \ \ \ \ \ \ \ \ \ ordered\_unique<tag<by\_code\_hash>,}
+\DoxyCodeLine{\Hypertarget{code__object_8hpp_source_l00027}00027\ \ \ \ \ \ \ \ \ \ \ \ \ composite\_key<\ \mbox{\hyperlink{classsysio_1_1chain_1_1code__object}{code\_object}},}
+\DoxyCodeLine{\Hypertarget{code__object_8hpp_source_l00028}00028\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ member<code\_object,\ digest\_type,\ \&code\_object::code\_hash>,}
+\DoxyCodeLine{\Hypertarget{code__object_8hpp_source_l00029}00029\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ member<code\_object,\ uint8\_t,\ \ \ \ \ \&code\_object::vm\_type>,}
+\DoxyCodeLine{\Hypertarget{code__object_8hpp_source_l00030}00030\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ member<code\_object,\ uint8\_t,\ \ \ \ \ \&code\_object::vm\_version>}
+\DoxyCodeLine{\Hypertarget{code__object_8hpp_source_l00031}00031\ \ \ \ \ \ \ \ \ \ \ \ \ >}
+\DoxyCodeLine{\Hypertarget{code__object_8hpp_source_l00032}00032\ \ \ \ \ \ \ \ \ \ >}
+\DoxyCodeLine{\Hypertarget{code__object_8hpp_source_l00033}00033\ \ \ \ \ \ \ >}
+\DoxyCodeLine{\Hypertarget{code__object_8hpp_source_l00034}00034\ \ \ \ >;}
+\DoxyCodeLine{\Hypertarget{code__object_8hpp_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{code__object_8hpp_source_l00036}00036\ \}\ \}\ \textcolor{comment}{//\ sysio::chain}}
+\DoxyCodeLine{\Hypertarget{code__object_8hpp_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{code__object_8hpp_source_l00038}00038\ \mbox{\hyperlink{chainbase_8hpp_a789572f90cbf8d6a0c1909c170298a1a}{CHAINBASE\_SET\_INDEX\_TYPE}}(\mbox{\hyperlink{classsysio_1_1chain_1_1code__object}{sysio::chain::code\_object}},\ \mbox{\hyperlink{namespacesysio_1_1chain_a0f69872bbb285f6f90ff8b5e30ef6aa8}{sysio::chain::code\_index}})}
+\DoxyCodeLine{\Hypertarget{code__object_8hpp_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{code__object_8hpp_source_l00040}00040\ \mbox{\hyperlink{reflect_8hpp_a2ace850e636b1ca0b18fe3177e413d99}{FC\_REFLECT}}(\mbox{\hyperlink{classsysio_1_1chain_1_1code__object}{sysio::chain::code\_object}},\ (code\_hash)(code)(code\_ref\_count)(first\_block\_used)(vm\_type)(vm\_version))}
+
+\end{DoxyCode}

@@ -1,0 +1,23 @@
+<map id="StringRef" name="StringRef">
+<area shape="rect" id="Node000001" title="Mark a character pointer as constant string." alt="" coords="457,203,533,228"/>
+<area shape="rect" id="Node000002" href="$class_generic_value.html#a9b72b2e3347d4cd77b16c3b45e8decf1" title="Constructor for copy&#45;string (i.e. do make a copy of string)" alt="" coords="226,5,409,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="485,188,475,155,460,116,437,77,407,44,391,34,393,29,411,40,441,74,464,113,480,153,490,187"/>
+<area shape="rect" id="Node000003" href="$class_generic_value.html#a4d9af98141360cd801daab4ed1ca2c91" title="Constructor for constant string (i.e. do not make a copy of string)" alt="" coords="226,55,409,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="480,190,451,140,431,115,407,94,388,83,391,79,411,89,435,111,456,137,485,187"/>
+<area shape="rect" id="Node000004" href="$class_generic_value.html#a9ec2c7cda8c8845acfa3565c6b1b4e10" title="Constructor for copy&#45;string (i.e. do make a copy of string)" alt="" coords="226,104,409,130"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="470,193,442,167,408,143,383,133,385,128,410,138,445,163,474,189"/>
+<area shape="rect" id="Node000005" href="$class_generic_value.html#a76c68b72723a06045776dbd425f9e8b6" title="Explicit copy constructor (with allocator)" alt="" coords="226,153,409,179"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="442,202,408,193,370,182,371,177,410,188,443,197"/>
+<area shape="rect" id="Node000006" href="$class_catch_1_1_string_ref.html#a248568b467cf6599320903ae613c8eee" title=" " alt="" coords="236,203,399,228"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="442,218,399,218,399,213,442,213"/>
+<area shape="rect" id="Node000008" href="$valuetest_8cpp.html#ab024bed5c69229eb9fef9b80009c2e09" title=" " alt="" coords="290,252,345,278"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="443,234,410,243,346,260,345,255,408,238,442,229"/>
+<area shape="rect" id="Node000009" href="$valuetest_8cpp.html#a7375e84e88ce8ac6feba71f371aafe18" title=" " alt="" coords="290,301,345,327"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="474,242,445,268,410,293,378,306,346,313,345,308,376,300,408,288,442,264,470,238"/>
+<area shape="rect" id="Node000010" href="$valuetest_8cpp.html#a121a3968f392a9a7cab157ba967122a6" title=" " alt="" coords="290,351,345,376"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="485,244,456,294,435,320,410,342,378,357,346,364,345,359,377,352,408,337,431,316,451,291,480,241"/>
+<area shape="rect" id="Node000011" href="$_string_8tests_8cpp.html#a55695827e4a7adff3e9c6d0e28533414" title=" " alt="" coords="268,400,367,426"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="490,244,480,278,464,318,441,357,411,391,390,403,368,410,366,405,388,398,407,387,437,354,460,315,475,276,485,243"/>
+<area shape="rect" id="Node000007" href="$class_catch_1_1_capturer.html#a86b0b27acc803a4e1310c10820f3038f" title=" " alt="" coords="5,203,178,228"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="220,218,178,218,178,213,220,213"/>
+</map>

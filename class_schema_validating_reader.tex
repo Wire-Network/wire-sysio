@@ -1,0 +1,315 @@
+\doxysection{Schema\+Validating\+Reader\texorpdfstring{$<$}{<} parse\+Flags, Input\+Stream, Source\+Encoding, Schema\+Document\+Type, Stack\+Allocator \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{class_schema_validating_reader}{}\label{class_schema_validating_reader}\index{SchemaValidatingReader$<$ parseFlags, InputStream, SourceEncoding, SchemaDocumentType, StackAllocator $>$@{SchemaValidatingReader$<$ parseFlags, InputStream, SourceEncoding, SchemaDocumentType, StackAllocator $>$}}
+
+
+\doxylink{struct_a}{A} helper class for parsing with validation.  
+
+
+
+
+{\ttfamily \#include $<$schema.\+h$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef Schema\+Document\+Type\+::\+Pointer\+Type \mbox{\hyperlink{class_schema_validating_reader_a5454a0228f86989d2a0085be278a24f4}{Pointer\+Type}}
+\item 
+typedef Input\+Stream\+::\+Ch \mbox{\hyperlink{class_schema_validating_reader_a6532d7857007c910fcd401151c3fcb1e}{Ch}}
+\item 
+typedef \mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$ Source\+Encoding, Stack\+Allocator $>$ \mbox{\hyperlink{class_schema_validating_reader_a87c35b23c5ed0763cedeaf28f2a7ce94}{Value\+Type}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_schema_validating_reader_ae7945b71687ad3dd13b9c3d096892eac}{Schema\+Validating\+Reader}} (Input\+Stream \&is, const Schema\+Document\+Type \&sd)
+\begin{DoxyCompactList}\small\item\em Constructor. \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_handler}{Handler}} $>$ }\\bool \mbox{\hyperlink{class_schema_validating_reader_a7135d8d53aacd850fbce2901cca4a4c3}{operator()}} (\mbox{\hyperlink{classrapidjson_1_1_handler}{Handler}} \&handler)
+\item 
+const \mbox{\hyperlink{struct_parse_result}{Parse\+Result}} \& \mbox{\hyperlink{class_schema_validating_reader_acc40a173eed09563cb0abad84833e9b3}{Get\+Parse\+Result}} () const
+\item 
+bool \mbox{\hyperlink{class_schema_validating_reader_a3c04fa90a430a67a993a2b8876e89ff4}{Is\+Valid}} () const
+\item 
+const \mbox{\hyperlink{class_schema_validating_reader_a5454a0228f86989d2a0085be278a24f4}{Pointer\+Type}} \& \mbox{\hyperlink{class_schema_validating_reader_a5bdb2a12bfff9952f7b89069cae6905c}{Get\+Invalid\+Schema\+Pointer}} () const
+\item 
+const \mbox{\hyperlink{class_schema_validating_reader_a6532d7857007c910fcd401151c3fcb1e}{Ch}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_schema_validating_reader_aa1dbb9886be16ee82c91a7293f9614e5}{Get\+Invalid\+Schema\+Keyword}} () const
+\item 
+const \mbox{\hyperlink{class_schema_validating_reader_a5454a0228f86989d2a0085be278a24f4}{Pointer\+Type}} \& \mbox{\hyperlink{class_schema_validating_reader_a219ab1f4aa1623e0a8d67ff5d6cb54b9}{Get\+Invalid\+Document\+Pointer}} () const
+\item 
+const \mbox{\hyperlink{class_schema_validating_reader_a87c35b23c5ed0763cedeaf28f2a7ce94}{Value\+Type}} \& \mbox{\hyperlink{class_schema_validating_reader_ae9f1dde3317af2cf65ae165f060498b4}{Get\+Error}} () const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$unsigned parse\+Flags, typename Input\+Stream, typename Source\+Encoding, typename Schema\+Document\+Type = Schema\+Document, typename Stack\+Allocator = Crt\+Allocator$>$\newline
+class Schema\+Validating\+Reader$<$ parse\+Flags, Input\+Stream, Source\+Encoding, Schema\+Document\+Type, Stack\+Allocator $>$}
+This helper class is a functor, designed as a parameter of \doxylink{class_generic_document_ac30b4e8887974060b695be20c3ceb02c}{Generic\+Document\+::\+Populate()}.
+
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em parse\+Flags} & Combination of \doxylink{reader_8h_ab7be7dabe6ffcba60fad441505583450}{Parse\+Flag}. \\
+\hline
+{\em Input\+Stream} & Type of input stream, implementing Stream concept. \\
+\hline
+{\em Source\+Encoding} & Encoding of the input stream. \\
+\hline
+{\em Schema\+Document\+Type} & Type of schema document. \\
+\hline
+{\em Stack\+Allocator} & Allocator type for stack. \\
+\hline
+\end{DoxyTemplParams}
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l02437}{2437}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{class_schema_validating_reader_a6532d7857007c910fcd401151c3fcb1e}\index{SchemaValidatingReader$<$ parseFlags, InputStream, SourceEncoding, SchemaDocumentType, StackAllocator $>$@{SchemaValidatingReader$<$ parseFlags, InputStream, SourceEncoding, SchemaDocumentType, StackAllocator $>$}!Ch@{Ch}}
+\index{Ch@{Ch}!SchemaValidatingReader$<$ parseFlags, InputStream, SourceEncoding, SchemaDocumentType, StackAllocator $>$@{SchemaValidatingReader$<$ parseFlags, InputStream, SourceEncoding, SchemaDocumentType, StackAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{Ch}{Ch}}
+{\footnotesize\ttfamily \label{class_schema_validating_reader_a6532d7857007c910fcd401151c3fcb1e} 
+template$<$unsigned parse\+Flags, typename Input\+Stream , typename Source\+Encoding , typename Schema\+Document\+Type  = Schema\+Document, typename Stack\+Allocator  = Crt\+Allocator$>$ \\
+Input\+Stream\+::\+Ch \mbox{\hyperlink{class_schema_validating_reader}{Schema\+Validating\+Reader}}$<$ parse\+Flags, Input\+Stream, Source\+Encoding, Schema\+Document\+Type, Stack\+Allocator $>$\+::\+Ch}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l02440}{2440}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+\Hypertarget{class_schema_validating_reader_a5454a0228f86989d2a0085be278a24f4}\index{SchemaValidatingReader$<$ parseFlags, InputStream, SourceEncoding, SchemaDocumentType, StackAllocator $>$@{SchemaValidatingReader$<$ parseFlags, InputStream, SourceEncoding, SchemaDocumentType, StackAllocator $>$}!PointerType@{PointerType}}
+\index{PointerType@{PointerType}!SchemaValidatingReader$<$ parseFlags, InputStream, SourceEncoding, SchemaDocumentType, StackAllocator $>$@{SchemaValidatingReader$<$ parseFlags, InputStream, SourceEncoding, SchemaDocumentType, StackAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{PointerType}{PointerType}}
+{\footnotesize\ttfamily \label{class_schema_validating_reader_a5454a0228f86989d2a0085be278a24f4} 
+template$<$unsigned parse\+Flags, typename Input\+Stream , typename Source\+Encoding , typename Schema\+Document\+Type  = Schema\+Document, typename Stack\+Allocator  = Crt\+Allocator$>$ \\
+Schema\+Document\+Type\+::\+Pointer\+Type \mbox{\hyperlink{class_schema_validating_reader}{Schema\+Validating\+Reader}}$<$ parse\+Flags, Input\+Stream, Source\+Encoding, Schema\+Document\+Type, Stack\+Allocator $>$\+::\+Pointer\+Type}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l02439}{2439}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+\Hypertarget{class_schema_validating_reader_a87c35b23c5ed0763cedeaf28f2a7ce94}\index{SchemaValidatingReader$<$ parseFlags, InputStream, SourceEncoding, SchemaDocumentType, StackAllocator $>$@{SchemaValidatingReader$<$ parseFlags, InputStream, SourceEncoding, SchemaDocumentType, StackAllocator $>$}!ValueType@{ValueType}}
+\index{ValueType@{ValueType}!SchemaValidatingReader$<$ parseFlags, InputStream, SourceEncoding, SchemaDocumentType, StackAllocator $>$@{SchemaValidatingReader$<$ parseFlags, InputStream, SourceEncoding, SchemaDocumentType, StackAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{ValueType}{ValueType}}
+{\footnotesize\ttfamily \label{class_schema_validating_reader_a87c35b23c5ed0763cedeaf28f2a7ce94} 
+template$<$unsigned parse\+Flags, typename Input\+Stream , typename Source\+Encoding , typename Schema\+Document\+Type  = Schema\+Document, typename Stack\+Allocator  = Crt\+Allocator$>$ \\
+\mbox{\hyperlink{class_generic_value}{Generic\+Value}}$<$Source\+Encoding, Stack\+Allocator$>$ \mbox{\hyperlink{class_schema_validating_reader}{Schema\+Validating\+Reader}}$<$ parse\+Flags, Input\+Stream, Source\+Encoding, Schema\+Document\+Type, Stack\+Allocator $>$\+::\+Value\+Type}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l02441}{2441}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_schema_validating_reader_ae7945b71687ad3dd13b9c3d096892eac}\index{SchemaValidatingReader$<$ parseFlags, InputStream, SourceEncoding, SchemaDocumentType, StackAllocator $>$@{SchemaValidatingReader$<$ parseFlags, InputStream, SourceEncoding, SchemaDocumentType, StackAllocator $>$}!SchemaValidatingReader@{SchemaValidatingReader}}
+\index{SchemaValidatingReader@{SchemaValidatingReader}!SchemaValidatingReader$<$ parseFlags, InputStream, SourceEncoding, SchemaDocumentType, StackAllocator $>$@{SchemaValidatingReader$<$ parseFlags, InputStream, SourceEncoding, SchemaDocumentType, StackAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{SchemaValidatingReader()}{SchemaValidatingReader()}}
+{\footnotesize\ttfamily \label{class_schema_validating_reader_ae7945b71687ad3dd13b9c3d096892eac} 
+template$<$unsigned parse\+Flags, typename Input\+Stream , typename Source\+Encoding , typename Schema\+Document\+Type  = Schema\+Document, typename Stack\+Allocator  = Crt\+Allocator$>$ \\
+\mbox{\hyperlink{class_schema_validating_reader}{Schema\+Validating\+Reader}}$<$ parse\+Flags, Input\+Stream, Source\+Encoding, Schema\+Document\+Type, Stack\+Allocator $>$\mbox{\hyperlink{class_schema_validating_reader}{\+::\+Schema\+Validating\+Reader}} (\begin{DoxyParamCaption}\item[{Input\+Stream \&}]{is}{, }\item[{const Schema\+Document\+Type \&}]{sd}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+\begin{DoxyParams}{Parameters}
+{\em is} & Input stream. \\
+\hline
+{\em sd} & \doxylink{class_schema}{Schema} document. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l02448}{2448}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02448\ :\ is\_(is),\ sd\_(sd),\ invalidSchemaKeyword\_(),\ error\_(\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7a146f46700e905e8df96a6a90b5c7640f}{kObjectType}}),\ isValid\_(\textcolor{keyword}{true})\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_schema_validating_reader_ae9f1dde3317af2cf65ae165f060498b4}\index{SchemaValidatingReader$<$ parseFlags, InputStream, SourceEncoding, SchemaDocumentType, StackAllocator $>$@{SchemaValidatingReader$<$ parseFlags, InputStream, SourceEncoding, SchemaDocumentType, StackAllocator $>$}!GetError@{GetError}}
+\index{GetError@{GetError}!SchemaValidatingReader$<$ parseFlags, InputStream, SourceEncoding, SchemaDocumentType, StackAllocator $>$@{SchemaValidatingReader$<$ parseFlags, InputStream, SourceEncoding, SchemaDocumentType, StackAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{GetError()}{GetError()}}
+{\footnotesize\ttfamily \label{class_schema_validating_reader_ae9f1dde3317af2cf65ae165f060498b4} 
+template$<$unsigned parse\+Flags, typename Input\+Stream , typename Source\+Encoding , typename Schema\+Document\+Type  = Schema\+Document, typename Stack\+Allocator  = Crt\+Allocator$>$ \\
+const \mbox{\hyperlink{class_schema_validating_reader_a87c35b23c5ed0763cedeaf28f2a7ce94}{Value\+Type}} \& \mbox{\hyperlink{class_schema_validating_reader}{Schema\+Validating\+Reader}}$<$ parse\+Flags, Input\+Stream, Source\+Encoding, Schema\+Document\+Type, Stack\+Allocator $>$\+::\+Get\+Error (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l02478}{2478}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02478\ \{\ \textcolor{keywordflow}{return}\ error\_;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=283pt]{class_schema_validating_reader_ae9f1dde3317af2cf65ae165f060498b4_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_schema_validating_reader_a219ab1f4aa1623e0a8d67ff5d6cb54b9}\index{SchemaValidatingReader$<$ parseFlags, InputStream, SourceEncoding, SchemaDocumentType, StackAllocator $>$@{SchemaValidatingReader$<$ parseFlags, InputStream, SourceEncoding, SchemaDocumentType, StackAllocator $>$}!GetInvalidDocumentPointer@{GetInvalidDocumentPointer}}
+\index{GetInvalidDocumentPointer@{GetInvalidDocumentPointer}!SchemaValidatingReader$<$ parseFlags, InputStream, SourceEncoding, SchemaDocumentType, StackAllocator $>$@{SchemaValidatingReader$<$ parseFlags, InputStream, SourceEncoding, SchemaDocumentType, StackAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{GetInvalidDocumentPointer()}{GetInvalidDocumentPointer()}}
+{\footnotesize\ttfamily \label{class_schema_validating_reader_a219ab1f4aa1623e0a8d67ff5d6cb54b9} 
+template$<$unsigned parse\+Flags, typename Input\+Stream , typename Source\+Encoding , typename Schema\+Document\+Type  = Schema\+Document, typename Stack\+Allocator  = Crt\+Allocator$>$ \\
+const \mbox{\hyperlink{class_schema_validating_reader_a5454a0228f86989d2a0085be278a24f4}{Pointer\+Type}} \& \mbox{\hyperlink{class_schema_validating_reader}{Schema\+Validating\+Reader}}$<$ parse\+Flags, Input\+Stream, Source\+Encoding, Schema\+Document\+Type, Stack\+Allocator $>$\+::\+Get\+Invalid\+Document\+Pointer (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l02477}{2477}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02477\ \{\ \textcolor{keywordflow}{return}\ invalidDocumentPointer\_;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=300pt]{class_schema_validating_reader_a219ab1f4aa1623e0a8d67ff5d6cb54b9_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_schema_validating_reader_aa1dbb9886be16ee82c91a7293f9614e5}\index{SchemaValidatingReader$<$ parseFlags, InputStream, SourceEncoding, SchemaDocumentType, StackAllocator $>$@{SchemaValidatingReader$<$ parseFlags, InputStream, SourceEncoding, SchemaDocumentType, StackAllocator $>$}!GetInvalidSchemaKeyword@{GetInvalidSchemaKeyword}}
+\index{GetInvalidSchemaKeyword@{GetInvalidSchemaKeyword}!SchemaValidatingReader$<$ parseFlags, InputStream, SourceEncoding, SchemaDocumentType, StackAllocator $>$@{SchemaValidatingReader$<$ parseFlags, InputStream, SourceEncoding, SchemaDocumentType, StackAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{GetInvalidSchemaKeyword()}{GetInvalidSchemaKeyword()}}
+{\footnotesize\ttfamily \label{class_schema_validating_reader_aa1dbb9886be16ee82c91a7293f9614e5} 
+template$<$unsigned parse\+Flags, typename Input\+Stream , typename Source\+Encoding , typename Schema\+Document\+Type  = Schema\+Document, typename Stack\+Allocator  = Crt\+Allocator$>$ \\
+const \mbox{\hyperlink{class_schema_validating_reader_a6532d7857007c910fcd401151c3fcb1e}{Ch}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_schema_validating_reader}{Schema\+Validating\+Reader}}$<$ parse\+Flags, Input\+Stream, Source\+Encoding, Schema\+Document\+Type, Stack\+Allocator $>$\+::\+Get\+Invalid\+Schema\+Keyword (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l02476}{2476}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02476\ \{\ \textcolor{keywordflow}{return}\ invalidSchemaKeyword\_;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=298pt]{class_schema_validating_reader_aa1dbb9886be16ee82c91a7293f9614e5_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_schema_validating_reader_a5bdb2a12bfff9952f7b89069cae6905c}\index{SchemaValidatingReader$<$ parseFlags, InputStream, SourceEncoding, SchemaDocumentType, StackAllocator $>$@{SchemaValidatingReader$<$ parseFlags, InputStream, SourceEncoding, SchemaDocumentType, StackAllocator $>$}!GetInvalidSchemaPointer@{GetInvalidSchemaPointer}}
+\index{GetInvalidSchemaPointer@{GetInvalidSchemaPointer}!SchemaValidatingReader$<$ parseFlags, InputStream, SourceEncoding, SchemaDocumentType, StackAllocator $>$@{SchemaValidatingReader$<$ parseFlags, InputStream, SourceEncoding, SchemaDocumentType, StackAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{GetInvalidSchemaPointer()}{GetInvalidSchemaPointer()}}
+{\footnotesize\ttfamily \label{class_schema_validating_reader_a5bdb2a12bfff9952f7b89069cae6905c} 
+template$<$unsigned parse\+Flags, typename Input\+Stream , typename Source\+Encoding , typename Schema\+Document\+Type  = Schema\+Document, typename Stack\+Allocator  = Crt\+Allocator$>$ \\
+const \mbox{\hyperlink{class_schema_validating_reader_a5454a0228f86989d2a0085be278a24f4}{Pointer\+Type}} \& \mbox{\hyperlink{class_schema_validating_reader}{Schema\+Validating\+Reader}}$<$ parse\+Flags, Input\+Stream, Source\+Encoding, Schema\+Document\+Type, Stack\+Allocator $>$\+::\+Get\+Invalid\+Schema\+Pointer (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l02475}{2475}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02475\ \{\ \textcolor{keywordflow}{return}\ invalidSchemaPointer\_;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=291pt]{class_schema_validating_reader_a5bdb2a12bfff9952f7b89069cae6905c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_schema_validating_reader_acc40a173eed09563cb0abad84833e9b3}\index{SchemaValidatingReader$<$ parseFlags, InputStream, SourceEncoding, SchemaDocumentType, StackAllocator $>$@{SchemaValidatingReader$<$ parseFlags, InputStream, SourceEncoding, SchemaDocumentType, StackAllocator $>$}!GetParseResult@{GetParseResult}}
+\index{GetParseResult@{GetParseResult}!SchemaValidatingReader$<$ parseFlags, InputStream, SourceEncoding, SchemaDocumentType, StackAllocator $>$@{SchemaValidatingReader$<$ parseFlags, InputStream, SourceEncoding, SchemaDocumentType, StackAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{GetParseResult()}{GetParseResult()}}
+{\footnotesize\ttfamily \label{class_schema_validating_reader_acc40a173eed09563cb0abad84833e9b3} 
+template$<$unsigned parse\+Flags, typename Input\+Stream , typename Source\+Encoding , typename Schema\+Document\+Type  = Schema\+Document, typename Stack\+Allocator  = Crt\+Allocator$>$ \\
+const \mbox{\hyperlink{struct_parse_result}{Parse\+Result}} \& \mbox{\hyperlink{class_schema_validating_reader}{Schema\+Validating\+Reader}}$<$ parse\+Flags, Input\+Stream, Source\+Encoding, Schema\+Document\+Type, Stack\+Allocator $>$\+::\+Get\+Parse\+Result (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l02473}{2473}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02473\ \{\ \textcolor{keywordflow}{return}\ parseResult\_;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=283pt]{class_schema_validating_reader_acc40a173eed09563cb0abad84833e9b3_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_schema_validating_reader_a3c04fa90a430a67a993a2b8876e89ff4}\index{SchemaValidatingReader$<$ parseFlags, InputStream, SourceEncoding, SchemaDocumentType, StackAllocator $>$@{SchemaValidatingReader$<$ parseFlags, InputStream, SourceEncoding, SchemaDocumentType, StackAllocator $>$}!IsValid@{IsValid}}
+\index{IsValid@{IsValid}!SchemaValidatingReader$<$ parseFlags, InputStream, SourceEncoding, SchemaDocumentType, StackAllocator $>$@{SchemaValidatingReader$<$ parseFlags, InputStream, SourceEncoding, SchemaDocumentType, StackAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{IsValid()}{IsValid()}}
+{\footnotesize\ttfamily \label{class_schema_validating_reader_a3c04fa90a430a67a993a2b8876e89ff4} 
+template$<$unsigned parse\+Flags, typename Input\+Stream , typename Source\+Encoding , typename Schema\+Document\+Type  = Schema\+Document, typename Stack\+Allocator  = Crt\+Allocator$>$ \\
+bool \mbox{\hyperlink{class_schema_validating_reader}{Schema\+Validating\+Reader}}$<$ parse\+Flags, Input\+Stream, Source\+Encoding, Schema\+Document\+Type, Stack\+Allocator $>$\+::\+Is\+Valid (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l02474}{2474}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02474\ \{\ \textcolor{keywordflow}{return}\ isValid\_;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=283pt]{class_schema_validating_reader_a3c04fa90a430a67a993a2b8876e89ff4_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_schema_validating_reader_a7135d8d53aacd850fbce2901cca4a4c3}\index{SchemaValidatingReader$<$ parseFlags, InputStream, SourceEncoding, SchemaDocumentType, StackAllocator $>$@{SchemaValidatingReader$<$ parseFlags, InputStream, SourceEncoding, SchemaDocumentType, StackAllocator $>$}!operator()@{operator()}}
+\index{operator()@{operator()}!SchemaValidatingReader$<$ parseFlags, InputStream, SourceEncoding, SchemaDocumentType, StackAllocator $>$@{SchemaValidatingReader$<$ parseFlags, InputStream, SourceEncoding, SchemaDocumentType, StackAllocator $>$}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}}
+{\footnotesize\ttfamily \label{class_schema_validating_reader_a7135d8d53aacd850fbce2901cca4a4c3} 
+template$<$unsigned parse\+Flags, typename Input\+Stream , typename Source\+Encoding , typename Schema\+Document\+Type  = Schema\+Document, typename Stack\+Allocator  = Crt\+Allocator$>$ \\
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_handler}{Handler}} $>$ \\
+bool \mbox{\hyperlink{class_schema_validating_reader}{Schema\+Validating\+Reader}}$<$ parse\+Flags, Input\+Stream, Source\+Encoding, Schema\+Document\+Type, Stack\+Allocator $>$\+::operator() (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classrapidjson_1_1_handler}{Handler}} \&}]{handler}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l02451}{2451}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02451\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02452\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_reader}{GenericReader<SourceEncoding,\ typename\ SchemaDocumentType::EncodingType,\ StackAllocator>}}\ reader;}
+\DoxyCodeLine{02453\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_schema_validator}{GenericSchemaValidator<SchemaDocumentType,\ Handler>}}\ validator(sd\_,\ handler);}
+\DoxyCodeLine{02454\ \ \ \ \ \ \ \ \ parseResult\_\ =\ reader.template\ Parse<parseFlags>(is\_,\ validator);}
+\DoxyCodeLine{02455\ }
+\DoxyCodeLine{02456\ \ \ \ \ \ \ \ \ isValid\_\ =\ validator.IsValid();}
+\DoxyCodeLine{02457\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isValid\_)\ \{}
+\DoxyCodeLine{02458\ \ \ \ \ \ \ \ \ \ \ \ \ invalidSchemaPointer\_\ =\ \mbox{\hyperlink{class_schema_validating_reader_a5454a0228f86989d2a0085be278a24f4}{PointerType}}();}
+\DoxyCodeLine{02459\ \ \ \ \ \ \ \ \ \ \ \ \ invalidSchemaKeyword\_\ =\ 0;}
+\DoxyCodeLine{02460\ \ \ \ \ \ \ \ \ \ \ \ \ invalidDocumentPointer\_\ =\ \mbox{\hyperlink{class_schema_validating_reader_a5454a0228f86989d2a0085be278a24f4}{PointerType}}();}
+\DoxyCodeLine{02461\ \ \ \ \ \ \ \ \ \ \ \ \ error\_.SetObject();}
+\DoxyCodeLine{02462\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{02463\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{02464\ \ \ \ \ \ \ \ \ \ \ \ \ invalidSchemaPointer\_\ =\ validator.GetInvalidSchemaPointer();}
+\DoxyCodeLine{02465\ \ \ \ \ \ \ \ \ \ \ \ \ invalidSchemaKeyword\_\ =\ validator.GetInvalidSchemaKeyword();}
+\DoxyCodeLine{02466\ \ \ \ \ \ \ \ \ \ \ \ \ invalidDocumentPointer\_\ =\ validator.GetInvalidDocumentPointer();}
+\DoxyCodeLine{02467\ \ \ \ \ \ \ \ \ \ \ \ \ error\_.CopyFrom(validator.GetError(),\ allocator\_);}
+\DoxyCodeLine{02468\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{02469\ }
+\DoxyCodeLine{02470\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ parseResult\_;}
+\DoxyCodeLine{02471\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_schema_validating_reader_a7135d8d53aacd850fbce2901cca4a4c3_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/\mbox{\hyperlink{schema_8h}{schema.\+h}}\end{DoxyCompactItemize}

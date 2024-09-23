@@ -1,0 +1,280 @@
+\doxysection{fc\+::ip\+::address Class Reference}
+\hypertarget{classfc_1_1ip_1_1address}{}\label{classfc_1_1ip_1_1address}\index{fc::ip::address@{fc::ip::address}}
+
+
+{\ttfamily \#include $<$ip.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1ip_1_1address_aebc2d2f9bc831e6ad04399c9bd8406db}{address}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \+\_\+ip=0)
+\item 
+\mbox{\hyperlink{classfc_1_1ip_1_1address_a0992b23a0e958965171d03bccccedd3b}{address}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\item 
+\mbox{\hyperlink{classfc_1_1ip_1_1address}{address}} \& \mbox{\hyperlink{classfc_1_1ip_1_1address_a0560e2011b284ee0ae6d3f8b3b98cba8}{operator=}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\item 
+\mbox{\hyperlink{classfc_1_1ip_1_1address_a5f8c78759a8f7ce9a02215ebeb71d24c}{operator fc\+::string}} () const
+\item 
+\mbox{\hyperlink{classfc_1_1ip_1_1address_a705d307a09a6f079579933fa1cf54cdb}{operator uint32\+\_\+t}} () const
+\item 
+bool \mbox{\hyperlink{classfc_1_1ip_1_1address_a0fd7da64e9de2fc54b5dc537dad7aee2}{is\+\_\+private\+\_\+address}} () const
+\item 
+bool \mbox{\hyperlink{classfc_1_1ip_1_1address_a7365faef59d2df42310b3d68f62f61e4}{is\+\_\+multicast\+\_\+address}} () const
+\item 
+bool \mbox{\hyperlink{classfc_1_1ip_1_1address_a1481a21df38961dfc3c7eea41b1f79a7}{is\+\_\+public\+\_\+address}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{classfc_1_1ip_1_1address_aa0feacee1993c1338d13ea41f236d660}{operator==}} (const \mbox{\hyperlink{classfc_1_1ip_1_1address}{address}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, const \mbox{\hyperlink{classfc_1_1ip_1_1address}{address}} \&b)
+\item 
+bool \mbox{\hyperlink{classfc_1_1ip_1_1address_a259e8078e0b2dc8015bf497b96c2a1a2}{operator!=}} (const \mbox{\hyperlink{classfc_1_1ip_1_1address}{address}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, const \mbox{\hyperlink{classfc_1_1ip_1_1address}{address}} \&b)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{ip_8hpp_source_l00011}{11}} of file \mbox{\hyperlink{ip_8hpp_source}{ip.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1ip_1_1address_aebc2d2f9bc831e6ad04399c9bd8406db}\index{fc::ip::address@{fc::ip::address}!address@{address}}
+\index{address@{address}!fc::ip::address@{fc::ip::address}}
+\doxysubsubsection{\texorpdfstring{address()}{address()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1ip_1_1address_aebc2d2f9bc831e6ad04399c9bd8406db} 
+fc\+::ip\+::address\+::address (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{\+\_\+ip}{ = {\ttfamily 0}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{ip_8cpp_source_l00010}{10}} of file \mbox{\hyperlink{ip_8cpp_source}{ip.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00011\ \ \ :\_ip(ip)\{\}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1ip_1_1address_a0992b23a0e958965171d03bccccedd3b}\index{fc::ip::address@{fc::ip::address}!address@{address}}
+\index{address@{address}!fc::ip::address@{fc::ip::address}}
+\doxysubsubsection{\texorpdfstring{address()}{address()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1ip_1_1address_a0992b23a0e958965171d03bccccedd3b} 
+fc\+::ip\+::address\+::address (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} \&}]{s}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{ip_8cpp_source_l00013}{13}} of file \mbox{\hyperlink{ip_8cpp_source}{ip.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00014\ \ \ \{}
+\DoxyCodeLine{00015\ \ \ \ \ \textcolor{keywordflow}{try}}
+\DoxyCodeLine{00016\ \ \ \ \ \{}
+\DoxyCodeLine{00017\ \ \ \ \ \ \ \_ip\ =\ boost::asio::ip::address\_v4::from\_string(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.c\_str()).to\_ulong();}
+\DoxyCodeLine{00018\ \ \ \ \ \}}
+\DoxyCodeLine{00019\ \ \ \ \ \mbox{\hyperlink{exception_8hpp_af3731d6e3beb140d9e652adf7a18113b}{FC\_RETHROW\_EXCEPTIONS}}(error,\ \textcolor{stringliteral}{"{}Error\ parsing\ IP\ address\ \$\{address\}"{}},\ (\textcolor{stringliteral}{"{}address"{}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}))}
+\DoxyCodeLine{00020\ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1ip_1_1address_a7365faef59d2df42310b3d68f62f61e4}\index{fc::ip::address@{fc::ip::address}!is\_multicast\_address@{is\_multicast\_address}}
+\index{is\_multicast\_address@{is\_multicast\_address}!fc::ip::address@{fc::ip::address}}
+\doxysubsubsection{\texorpdfstring{is\_multicast\_address()}{is\_multicast\_address()}}
+{\footnotesize\ttfamily \label{classfc_1_1ip_1_1address_a7365faef59d2df42310b3d68f62f61e4} 
+bool fc\+::ip\+::address\+::is\+\_\+multicast\+\_\+address (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+224.\+0.\+0.\+0 to 239.\+255.\+255.\+255 
+
+Definition at line \mbox{\hyperlink{ip_8cpp_source_l00125}{125}} of file \mbox{\hyperlink{ip_8cpp_source}{ip.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00126\ \ \ \{}
+\DoxyCodeLine{00127\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classfc_1_1ip_1_1address_aebc2d2f9bc831e6ad04399c9bd8406db}{address}}\ min\_ip(\textcolor{stringliteral}{"{}224.0.0.0"{}});}
+\DoxyCodeLine{00128\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classfc_1_1ip_1_1address_aebc2d2f9bc831e6ad04399c9bd8406db}{address}}\ max\_ip(\textcolor{stringliteral}{"{}239.255.255.255"{}});}
+\DoxyCodeLine{00129\ \ \ \ \ \textcolor{keywordflow}{return}\ \ \_ip\ >=\ min\_ip.\_ip\ \ \&\&\ \_ip\ <=\ max\_ip.\_ip;}
+\DoxyCodeLine{00130\ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=309pt]{classfc_1_1ip_1_1address_a7365faef59d2df42310b3d68f62f61e4_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1ip_1_1address_a0fd7da64e9de2fc54b5dc537dad7aee2}\index{fc::ip::address@{fc::ip::address}!is\_private\_address@{is\_private\_address}}
+\index{is\_private\_address@{is\_private\_address}!fc::ip::address@{fc::ip::address}}
+\doxysubsubsection{\texorpdfstring{is\_private\_address()}{is\_private\_address()}}
+{\footnotesize\ttfamily \label{classfc_1_1ip_1_1address_a0fd7da64e9de2fc54b5dc537dad7aee2} 
+bool fc\+::ip\+::address\+::is\+\_\+private\+\_\+address (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+\begin{DoxyReturn}{Returns}
+true if the ip is in the following ranges\+:
+\end{DoxyReturn}
+10.\+0.\+0.\+0 to 10.\+255.\+255.\+255 172.\+16.\+0.\+0 to 172.\+31.\+255.\+255 192.\+168.\+0.\+0 to 192.\+168.\+255.\+255 169.\+254.\+0.\+0 to 169.\+254.\+255.\+255 
+
+Definition at line \mbox{\hyperlink{ip_8cpp_source_l00105}{105}} of file \mbox{\hyperlink{ip_8cpp_source}{ip.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00106\ \ \ \{}
+\DoxyCodeLine{00107\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classfc_1_1ip_1_1address_aebc2d2f9bc831e6ad04399c9bd8406db}{address}}\ min10\_ip(\textcolor{stringliteral}{"{}10.0.0.0"{}});}
+\DoxyCodeLine{00108\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classfc_1_1ip_1_1address_aebc2d2f9bc831e6ad04399c9bd8406db}{address}}\ max10\_ip(\textcolor{stringliteral}{"{}10.255.255.255"{}});}
+\DoxyCodeLine{00109\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classfc_1_1ip_1_1address_aebc2d2f9bc831e6ad04399c9bd8406db}{address}}\ min172\_ip(\textcolor{stringliteral}{"{}172.16.0.0"{}});}
+\DoxyCodeLine{00110\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classfc_1_1ip_1_1address_aebc2d2f9bc831e6ad04399c9bd8406db}{address}}\ max172\_ip(\textcolor{stringliteral}{"{}172.31.255.255"{}});}
+\DoxyCodeLine{00111\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classfc_1_1ip_1_1address_aebc2d2f9bc831e6ad04399c9bd8406db}{address}}\ min192\_ip(\textcolor{stringliteral}{"{}192.168.0.0"{}});}
+\DoxyCodeLine{00112\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classfc_1_1ip_1_1address_aebc2d2f9bc831e6ad04399c9bd8406db}{address}}\ max192\_ip(\textcolor{stringliteral}{"{}192.168.255.255"{}});}
+\DoxyCodeLine{00113\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classfc_1_1ip_1_1address_aebc2d2f9bc831e6ad04399c9bd8406db}{address}}\ min169\_ip(\textcolor{stringliteral}{"{}169.254.0.0"{}});}
+\DoxyCodeLine{00114\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classfc_1_1ip_1_1address_aebc2d2f9bc831e6ad04399c9bd8406db}{address}}\ max169\_ip(\textcolor{stringliteral}{"{}169.254.255.255"{}});}
+\DoxyCodeLine{00115\ \ \ \ \ \textcolor{keywordflow}{if}(\ \_ip\ >=\ min10\_ip.\_ip\ \&\&\ \_ip\ <=\ max10\_ip.\_ip\ )\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00116\ \ \ \ \ \textcolor{keywordflow}{if}(\ \_ip\ >=\ min172\_ip.\_ip\ \&\&\ \_ip\ <=\ max172\_ip.\_ip\ )\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00117\ \ \ \ \ \textcolor{keywordflow}{if}(\ \_ip\ >=\ min192\_ip.\_ip\ \&\&\ \_ip\ <=\ max192\_ip.\_ip\ )\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00118\ \ \ \ \ \textcolor{keywordflow}{if}(\ \_ip\ >=\ min169\_ip.\_ip\ \&\&\ \_ip\ <=\ max169\_ip.\_ip\ )\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00119\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00120\ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=300pt]{classfc_1_1ip_1_1address_a0fd7da64e9de2fc54b5dc537dad7aee2_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1ip_1_1address_a1481a21df38961dfc3c7eea41b1f79a7}\index{fc::ip::address@{fc::ip::address}!is\_public\_address@{is\_public\_address}}
+\index{is\_public\_address@{is\_public\_address}!fc::ip::address@{fc::ip::address}}
+\doxysubsubsection{\texorpdfstring{is\_public\_address()}{is\_public\_address()}}
+{\footnotesize\ttfamily \label{classfc_1_1ip_1_1address_a1481a21df38961dfc3c7eea41b1f79a7} 
+bool fc\+::ip\+::address\+::is\+\_\+public\+\_\+address (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+!private \& !multicast 
+
+Definition at line \mbox{\hyperlink{ip_8cpp_source_l00133}{133}} of file \mbox{\hyperlink{ip_8cpp_source}{ip.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00134\ \ \ \{}
+\DoxyCodeLine{00135\ \ \ \ \ \textcolor{keywordflow}{return}\ !(\ \mbox{\hyperlink{classfc_1_1ip_1_1address_a0fd7da64e9de2fc54b5dc537dad7aee2}{is\_private\_address}}()\ ||\ \mbox{\hyperlink{classfc_1_1ip_1_1address_a7365faef59d2df42310b3d68f62f61e4}{is\_multicast\_address}}()\ );}
+\DoxyCodeLine{00136\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=309pt]{classfc_1_1ip_1_1address_a1481a21df38961dfc3c7eea41b1f79a7_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1ip_1_1address_a5f8c78759a8f7ce9a02215ebeb71d24c}\index{fc::ip::address@{fc::ip::address}!operator fc::string@{operator fc::string}}
+\index{operator fc::string@{operator fc::string}!fc::ip::address@{fc::ip::address}}
+\doxysubsubsection{\texorpdfstring{operator fc::string()}{operator fc::string()}}
+{\footnotesize\ttfamily \label{classfc_1_1ip_1_1address_a5f8c78759a8f7ce9a02215ebeb71d24c} 
+fc\+::ip\+::address\+::operator \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{ip_8cpp_source_l00039}{39}} of file \mbox{\hyperlink{ip_8cpp_source}{ip.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00040\ \ \ \{}
+\DoxyCodeLine{00041\ \ \ \ \ \textcolor{keywordflow}{try}}
+\DoxyCodeLine{00042\ \ \ \ \ \{}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ boost::asio::ip::address\_v4(\_ip).to\_string().c\_str();}
+\DoxyCodeLine{00044\ \ \ \ \ \}}
+\DoxyCodeLine{00045\ \ \ \ \ \mbox{\hyperlink{exception_8hpp_af3731d6e3beb140d9e652adf7a18113b}{FC\_RETHROW\_EXCEPTIONS}}(error,\ \textcolor{stringliteral}{"{}Error\ parsing\ IP\ address\ to\ string"{}})}
+\DoxyCodeLine{00046\ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1ip_1_1address_a5f8c78759a8f7ce9a02215ebeb71d24c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1ip_1_1address_a705d307a09a6f079579933fa1cf54cdb}\index{fc::ip::address@{fc::ip::address}!operator uint32\_t@{operator uint32\_t}}
+\index{operator uint32\_t@{operator uint32\_t}!fc::ip::address@{fc::ip::address}}
+\doxysubsubsection{\texorpdfstring{operator uint32\_t()}{operator uint32\_t()}}
+{\footnotesize\ttfamily \label{classfc_1_1ip_1_1address_a705d307a09a6f079579933fa1cf54cdb} 
+fc\+::ip\+::address\+::operator \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{ip_8cpp_source_l00047}{47}} of file \mbox{\hyperlink{ip_8cpp_source}{ip.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00048\ \ \ \ \ \textcolor{keywordflow}{return}\ \_ip;}
+\DoxyCodeLine{00049\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1ip_1_1address_a0560e2011b284ee0ae6d3f8b3b98cba8}\index{fc::ip::address@{fc::ip::address}!operator=@{operator=}}
+\index{operator=@{operator=}!fc::ip::address@{fc::ip::address}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}}
+{\footnotesize\ttfamily \label{classfc_1_1ip_1_1address_a0560e2011b284ee0ae6d3f8b3b98cba8} 
+\mbox{\hyperlink{classfc_1_1ip_1_1address}{address}} \& fc\+::ip\+::address\+::operator= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} \&}]{s}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{ip_8cpp_source_l00029}{29}} of file \mbox{\hyperlink{ip_8cpp_source}{ip.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00030\ \ \ \{}
+\DoxyCodeLine{00031\ \ \ \ \ \textcolor{keywordflow}{try}}
+\DoxyCodeLine{00032\ \ \ \ \ \{}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \_ip\ =\ boost::asio::ip::address\_v4::from\_string(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.c\_str()).to\_ulong();}
+\DoxyCodeLine{00034\ \ \ \ \ \}}
+\DoxyCodeLine{00035\ \ \ \ \ \mbox{\hyperlink{exception_8hpp_af3731d6e3beb140d9e652adf7a18113b}{FC\_RETHROW\_EXCEPTIONS}}(error,\ \textcolor{stringliteral}{"{}Error\ parsing\ IP\ address\ \$\{address\}"{}},\ (\textcolor{stringliteral}{"{}address"{}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}))}
+\DoxyCodeLine{00036\ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00037\ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{classfc_1_1ip_1_1address_a259e8078e0b2dc8015bf497b96c2a1a2}\index{fc::ip::address@{fc::ip::address}!operator"!=@{operator"!=}}
+\index{operator"!=@{operator"!=}!fc::ip::address@{fc::ip::address}}
+\doxysubsubsection{\texorpdfstring{operator"!=}{operator!=}}
+{\footnotesize\ttfamily \label{classfc_1_1ip_1_1address_a259e8078e0b2dc8015bf497b96c2a1a2} 
+bool \mbox{\hyperlink{namespacefc_a40c368ac88294ae47b064cad937fdbf6}{operator!}}= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1ip_1_1address}{address}} \&}]{a}{, }\item[{const \mbox{\hyperlink{classfc_1_1ip_1_1address}{address}} \&}]{b}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{ip_8cpp_source_l00025}{25}} of file \mbox{\hyperlink{ip_8cpp_source}{ip.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00026\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})\ !=\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}(b);}
+\DoxyCodeLine{00027\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1ip_1_1address_aa0feacee1993c1338d13ea41f236d660}\index{fc::ip::address@{fc::ip::address}!operator==@{operator==}}
+\index{operator==@{operator==}!fc::ip::address@{fc::ip::address}}
+\doxysubsubsection{\texorpdfstring{operator==}{operator==}}
+{\footnotesize\ttfamily \label{classfc_1_1ip_1_1address_aa0feacee1993c1338d13ea41f236d660} 
+bool operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1ip_1_1address}{address}} \&}]{a}{, }\item[{const \mbox{\hyperlink{classfc_1_1ip_1_1address}{address}} \&}]{b}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{ip_8cpp_source_l00022}{22}} of file \mbox{\hyperlink{ip_8cpp_source}{ip.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00023\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})\ ==\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}(b);}
+\DoxyCodeLine{00024\ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/network/\mbox{\hyperlink{ip_8hpp}{ip.\+hpp}}\item 
+libraries/fc/src/network/\mbox{\hyperlink{ip_8cpp}{ip.\+cpp}}\end{DoxyCompactItemize}

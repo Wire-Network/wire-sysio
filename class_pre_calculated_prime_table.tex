@@ -1,0 +1,136 @@
+\doxysection{Pre\+Calculated\+Prime\+Table Class Reference}
+\hypertarget{class_pre_calculated_prime_table}{}\label{class_pre_calculated_prime_table}\index{PreCalculatedPrimeTable@{PreCalculatedPrimeTable}}
+
+
+{\ttfamily \#include $<$prime\+\_\+tables.\+h$>$}
+
+
+
+Inheritance diagram for Pre\+Calculated\+Prime\+Table\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=206pt]{class_pre_calculated_prime_table__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Pre\+Calculated\+Prime\+Table\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=206pt]{class_pre_calculated_prime_table__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_pre_calculated_prime_table_a6bb947504421e31da70d2c71576be350}{Pre\+Calculated\+Prime\+Table}} (int max)
+\item 
+virtual \mbox{\hyperlink{class_pre_calculated_prime_table_a6ceab295f80dbe2766b8d4f54138bbc4}{\texorpdfstring{$\sim$}{\string~}\+Pre\+Calculated\+Prime\+Table}} ()
+\item 
+virtual bool \mbox{\hyperlink{class_pre_calculated_prime_table_a8a9ab7f99b09e5e987933c260e7304cf}{Is\+Prime}} (int n) const
+\item 
+virtual int \mbox{\hyperlink{class_pre_calculated_prime_table_a0ff10b1fe13df7e56b8d7ed9f41d3998}{Get\+Next\+Prime}} (int \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}) const
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{class_prime_table}{Prime\+Table}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{class_prime_table_af2cdea4896fd86a42b4dfd5e5027d640}{\texorpdfstring{$\sim$}{\string~}\+Prime\+Table}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{prime__tables_8h_source_l00080}{80}} of file \mbox{\hyperlink{prime__tables_8h_source}{prime\+\_\+tables.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_pre_calculated_prime_table_a6bb947504421e31da70d2c71576be350}\index{PreCalculatedPrimeTable@{PreCalculatedPrimeTable}!PreCalculatedPrimeTable@{PreCalculatedPrimeTable}}
+\index{PreCalculatedPrimeTable@{PreCalculatedPrimeTable}!PreCalculatedPrimeTable@{PreCalculatedPrimeTable}}
+\doxysubsubsection{\texorpdfstring{PreCalculatedPrimeTable()}{PreCalculatedPrimeTable()}}
+{\footnotesize\ttfamily \label{class_pre_calculated_prime_table_a6bb947504421e31da70d2c71576be350} 
+Pre\+Calculated\+Prime\+Table\+::\+Pre\+Calculated\+Prime\+Table (\begin{DoxyParamCaption}\item[{int}]{max}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{prime__tables_8h_source_l00083}{83}} of file \mbox{\hyperlink{prime__tables_8h_source}{prime\+\_\+tables.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ :\ is\_prime\_size\_(max\ +\ 1),\ is\_prime\_(\textcolor{keyword}{new}\ \textcolor{keywordtype}{bool}[max\ +\ 1])\ \{}
+\DoxyCodeLine{00085\ \ \ \ \ CalculatePrimesUpTo(max);}
+\DoxyCodeLine{00086\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_pre_calculated_prime_table_a6ceab295f80dbe2766b8d4f54138bbc4}\index{PreCalculatedPrimeTable@{PreCalculatedPrimeTable}!````~PreCalculatedPrimeTable@{\texorpdfstring{$\sim$}{\string~}PreCalculatedPrimeTable}}
+\index{````~PreCalculatedPrimeTable@{\texorpdfstring{$\sim$}{\string~}PreCalculatedPrimeTable}!PreCalculatedPrimeTable@{PreCalculatedPrimeTable}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}PreCalculatedPrimeTable()}{\string~PreCalculatedPrimeTable()}}
+{\footnotesize\ttfamily \label{class_pre_calculated_prime_table_a6ceab295f80dbe2766b8d4f54138bbc4} 
+virtual Pre\+Calculated\+Prime\+Table\+::\texorpdfstring{$\sim$}{\string~}\+Pre\+Calculated\+Prime\+Table (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{prime__tables_8h_source_l00087}{87}} of file \mbox{\hyperlink{prime__tables_8h_source}{prime\+\_\+tables.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00087\ \{\ \textcolor{keyword}{delete}[]\ is\_prime\_;\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_pre_calculated_prime_table_a0ff10b1fe13df7e56b8d7ed9f41d3998}\index{PreCalculatedPrimeTable@{PreCalculatedPrimeTable}!GetNextPrime@{GetNextPrime}}
+\index{GetNextPrime@{GetNextPrime}!PreCalculatedPrimeTable@{PreCalculatedPrimeTable}}
+\doxysubsubsection{\texorpdfstring{GetNextPrime()}{GetNextPrime()}}
+{\footnotesize\ttfamily \label{class_pre_calculated_prime_table_a0ff10b1fe13df7e56b8d7ed9f41d3998} 
+virtual int Pre\+Calculated\+Prime\+Table\+::\+Get\+Next\+Prime (\begin{DoxyParamCaption}\item[{int}]{p}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{class_prime_table_ae537c939f56617d8937d57bbbae3ab30}{Prime\+Table}}.
+
+
+
+Definition at line \mbox{\hyperlink{prime__tables_8h_source_l00093}{93}} of file \mbox{\hyperlink{prime__tables_8h_source}{prime\+\_\+tables.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00094\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ n\ =\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ +\ 1;\ n\ <\ is\_prime\_size\_;\ n++)\ \{}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_prime\_[n])\ \textcolor{keywordflow}{return}\ n;}
+\DoxyCodeLine{00096\ \ \ \ \ \}}
+\DoxyCodeLine{00097\ }
+\DoxyCodeLine{00098\ \ \ \ \ \textcolor{keywordflow}{return}\ -\/1;}
+\DoxyCodeLine{00099\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_pre_calculated_prime_table_a8a9ab7f99b09e5e987933c260e7304cf}\index{PreCalculatedPrimeTable@{PreCalculatedPrimeTable}!IsPrime@{IsPrime}}
+\index{IsPrime@{IsPrime}!PreCalculatedPrimeTable@{PreCalculatedPrimeTable}}
+\doxysubsubsection{\texorpdfstring{IsPrime()}{IsPrime()}}
+{\footnotesize\ttfamily \label{class_pre_calculated_prime_table_a8a9ab7f99b09e5e987933c260e7304cf} 
+virtual bool Pre\+Calculated\+Prime\+Table\+::\+Is\+Prime (\begin{DoxyParamCaption}\item[{int}]{n}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{class_prime_table_a2ab9243364ded0c51541f641b2df362a}{Prime\+Table}}.
+
+
+
+Definition at line \mbox{\hyperlink{prime__tables_8h_source_l00089}{89}} of file \mbox{\hyperlink{prime__tables_8h_source}{prime\+\_\+tables.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00090\ \ \ \ \ \textcolor{keywordflow}{return}\ 0\ <=\ n\ \&\&\ n\ <\ is\_prime\_size\_\ \&\&\ is\_prime\_[n];}
+\DoxyCodeLine{00091\ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/samples/\mbox{\hyperlink{prime__tables_8h}{prime\+\_\+tables.\+h}}\end{DoxyCompactItemize}

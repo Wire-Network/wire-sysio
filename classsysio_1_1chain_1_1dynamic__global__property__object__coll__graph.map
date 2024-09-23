@@ -1,0 +1,5 @@
+<map id="sysio::chain::dynamic_global_property_object" name="sysio::chain::dynamic_global_property_object">
+<area shape="rect" id="Node000001" title="Maintains global state information that frequently change." alt="" coords="247,20,405,61"/>
+<area shape="rect" id="Node000002" href="$structchainbase_1_1object.html" title=" " alt="" coords="5,5,199,76"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="214,38,246,38,246,43,214,43"/>
+</map>

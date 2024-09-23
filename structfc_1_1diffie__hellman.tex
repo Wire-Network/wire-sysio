@@ -1,0 +1,289 @@
+\doxysection{fc\+::diffie\+\_\+hellman Struct Reference}
+\hypertarget{structfc_1_1diffie__hellman}{}\label{structfc_1_1diffie__hellman}\index{fc::diffie\_hellman@{fc::diffie\_hellman}}
+
+
+{\ttfamily \#include $<$dh.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structfc_1_1diffie__hellman_a61f575db3a932aad7a06132a696c9a1e}{diffie\+\_\+hellman}} ()
+\item 
+bool \mbox{\hyperlink{structfc_1_1diffie__hellman_ac7b158d18c815d628b6e55fc6176f2d0}{generate\+\_\+params}} (int \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{structfc_1_1diffie__hellman_a54629e9bbb6dc0636a2bcada5b447e7f}{g}})
+\item 
+bool \mbox{\hyperlink{structfc_1_1diffie__hellman_aeb3d4c02a68ccd1110200fedc38b0687}{generate\+\_\+pub\+\_\+key}} ()
+\item 
+bool \mbox{\hyperlink{structfc_1_1diffie__hellman_a3c855b77794dcac2a1322d623aa5a7ce}{compute\+\_\+shared\+\_\+key}} (const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\item 
+bool \mbox{\hyperlink{structfc_1_1diffie__hellman_a303a26a0c28e9d007cba7a217bad2aa8}{compute\+\_\+shared\+\_\+key}} (const std\+::vector$<$ char $>$ \&pubk)
+\item 
+bool \mbox{\hyperlink{structfc_1_1diffie__hellman_a4277769577389134e7274c1b19598685}{validate}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::vector$<$ char $>$ \mbox{\hyperlink{structfc_1_1diffie__hellman_a4ca2b2be06d99984411f55ca12f28a6a}{p}}
+\item 
+std\+::vector$<$ char $>$ \mbox{\hyperlink{structfc_1_1diffie__hellman_acbf40e922a71880db492397abcf1d652}{pub\+\_\+key}}
+\item 
+std\+::vector$<$ char $>$ \mbox{\hyperlink{structfc_1_1diffie__hellman_a1313b63b61ccb170d8bd2b7a591c0ec0}{priv\+\_\+key}}
+\item 
+std\+::vector$<$ char $>$ \mbox{\hyperlink{structfc_1_1diffie__hellman_a5a8270c545d3269f22598a60a290b27e}{shared\+\_\+key}}
+\item 
+bool \mbox{\hyperlink{structfc_1_1diffie__hellman_aeeff752202a422bd69a5b1b392e47d0c}{valid}}
+\item 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{structfc_1_1diffie__hellman_a54629e9bbb6dc0636a2bcada5b447e7f}{g}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{dh_8hpp_source_l00008}{8}} of file \mbox{\hyperlink{dh_8hpp_source}{dh.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structfc_1_1diffie__hellman_a61f575db3a932aad7a06132a696c9a1e}\index{fc::diffie\_hellman@{fc::diffie\_hellman}!diffie\_hellman@{diffie\_hellman}}
+\index{diffie\_hellman@{diffie\_hellman}!fc::diffie\_hellman@{fc::diffie\_hellman}}
+\doxysubsubsection{\texorpdfstring{diffie\_hellman()}{diffie\_hellman()}}
+{\footnotesize\ttfamily \label{structfc_1_1diffie__hellman_a61f575db3a932aad7a06132a696c9a1e} 
+fc\+::diffie\+\_\+hellman\+::diffie\+\_\+hellman (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{dh_8hpp_source_l00009}{9}} of file \mbox{\hyperlink{dh_8hpp_source}{dh.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00009\ :\mbox{\hyperlink{structfc_1_1diffie__hellman_aeeff752202a422bd69a5b1b392e47d0c}{valid}}(0),\mbox{\hyperlink{structfc_1_1diffie__hellman_a54629e9bbb6dc0636a2bcada5b447e7f}{g}}(5)\{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structfc_1_1diffie__hellman_a3c855b77794dcac2a1322d623aa5a7ce}\index{fc::diffie\_hellman@{fc::diffie\_hellman}!compute\_shared\_key@{compute\_shared\_key}}
+\index{compute\_shared\_key@{compute\_shared\_key}!fc::diffie\_hellman@{fc::diffie\_hellman}}
+\doxysubsubsection{\texorpdfstring{compute\_shared\_key()}{compute\_shared\_key()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structfc_1_1diffie__hellman_a3c855b77794dcac2a1322d623aa5a7ce} 
+bool fc\+::diffie\+\_\+hellman\+::compute\+\_\+shared\+\_\+key (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{buf}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{s}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{dh_8cpp_source_l00064}{64}} of file \mbox{\hyperlink{dh_8cpp_source}{dh.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ ssl\_dh\ \mbox{\hyperlink{namespace_xbyak_1_1util_a89660b620585363990da7271238c3d7f}{dh}}\ =\ DH\_new();}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ bn\_p\ =\ BN\_bin2bn(\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)\&\mbox{\hyperlink{structfc_1_1diffie__hellman_a4ca2b2be06d99984411f55ca12f28a6a}{p}}.front(),\ \mbox{\hyperlink{structfc_1_1diffie__hellman_a4ca2b2be06d99984411f55ca12f28a6a}{p}}.size(),\ NULL\ );}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ bn\_pub\_key\ =\ BN\_bin2bn(\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)\&\mbox{\hyperlink{structfc_1_1diffie__hellman_acbf40e922a71880db492397abcf1d652}{pub\_key}}.front(),\ \mbox{\hyperlink{structfc_1_1diffie__hellman_acbf40e922a71880db492397abcf1d652}{pub\_key}}.size(),\ NULL\ );}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ bn\_priv\_key\ =\ BN\_bin2bn(\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)\&\mbox{\hyperlink{structfc_1_1diffie__hellman_a1313b63b61ccb170d8bd2b7a591c0ec0}{priv\_key}}.front(),\ \mbox{\hyperlink{structfc_1_1diffie__hellman_a1313b63b61ccb170d8bd2b7a591c0ec0}{priv\_key}}.size(),\ NULL\ );}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ bn\_g\ =\ BN\_bin2bn(\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)\&\mbox{\hyperlink{structfc_1_1diffie__hellman_a54629e9bbb6dc0636a2bcada5b447e7f}{g}},\ 1,\ NULL\ );}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ DH\_set0\_pqg(\mbox{\hyperlink{namespace_xbyak_1_1util_a89660b620585363990da7271238c3d7f}{dh}}.obj,\ bn\_p,\ NULL,\ bn\_g);}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ DH\_set0\_key(\mbox{\hyperlink{namespace_xbyak_1_1util_a89660b620585363990da7271238c3d7f}{dh}}.obj,\ bn\_pub\_key,\ bn\_priv\_key);}
+\DoxyCodeLine{00072\ }
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ check;}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ DH\_check(dh,\&check);}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !fc::validate(\ dh,\ valid\ )\ )}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00079\ }
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ ssl\_bignum\ pk;}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ BN\_bin2bn(\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ pk\ );}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1diffie__hellman_a5a8270c545d3269f22598a60a290b27e}{shared\_key}}.resize(\ DH\_size(dh)\ );\ }
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ DH\_compute\_key(\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)\&\mbox{\hyperlink{structfc_1_1diffie__hellman_a5a8270c545d3269f22598a60a290b27e}{shared\_key}}.front(),\ pk,\ dh\ );}
+\DoxyCodeLine{00084\ }
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00086\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=346pt]{structfc_1_1diffie__hellman_a3c855b77794dcac2a1322d623aa5a7ce_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structfc_1_1diffie__hellman_a303a26a0c28e9d007cba7a217bad2aa8}\index{fc::diffie\_hellman@{fc::diffie\_hellman}!compute\_shared\_key@{compute\_shared\_key}}
+\index{compute\_shared\_key@{compute\_shared\_key}!fc::diffie\_hellman@{fc::diffie\_hellman}}
+\doxysubsubsection{\texorpdfstring{compute\_shared\_key()}{compute\_shared\_key()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structfc_1_1diffie__hellman_a303a26a0c28e9d007cba7a217bad2aa8} 
+bool fc\+::diffie\+\_\+hellman\+::compute\+\_\+shared\+\_\+key (\begin{DoxyParamCaption}\item[{const std\+::vector$<$ char $>$ \&}]{pubk}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{dh_8cpp_source_l00087}{87}} of file \mbox{\hyperlink{dh_8cpp_source}{dh.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structfc_1_1diffie__hellman_a3c855b77794dcac2a1322d623aa5a7ce}{compute\_shared\_key}}(\ \&pubk.front(),\ pubk.size()\ );}
+\DoxyCodeLine{00089\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=346pt]{structfc_1_1diffie__hellman_a303a26a0c28e9d007cba7a217bad2aa8_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structfc_1_1diffie__hellman_ac7b158d18c815d628b6e55fc6176f2d0}\index{fc::diffie\_hellman@{fc::diffie\_hellman}!generate\_params@{generate\_params}}
+\index{generate\_params@{generate\_params}!fc::diffie\_hellman@{fc::diffie\_hellman}}
+\doxysubsubsection{\texorpdfstring{generate\_params()}{generate\_params()}}
+{\footnotesize\ttfamily \label{structfc_1_1diffie__hellman_ac7b158d18c815d628b6e55fc6176f2d0} 
+bool fc\+::diffie\+\_\+hellman\+::generate\+\_\+params (\begin{DoxyParamCaption}\item[{int}]{s}{, }\item[{\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}}}]{g}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{dh_8cpp_source_l00013}{13}} of file \mbox{\hyperlink{dh_8cpp_source}{dh.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00014\ \ \ \ \{}
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \ \ ssl\_dh\ \mbox{\hyperlink{namespace_xbyak_1_1util_a89660b620585363990da7271238c3d7f}{dh}};}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \ \ DH\_generate\_parameters\_ex(\mbox{\hyperlink{namespace_xbyak_1_1util_a89660b620585363990da7271238c3d7f}{dh}}.obj,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ \mbox{\hyperlink{structfc_1_1diffie__hellman_a54629e9bbb6dc0636a2bcada5b447e7f}{g}},\ NULL);}
+\DoxyCodeLine{00017\ \ \ \ \ \ \ \ \ ssl\_bignum\ bn\_p;}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ DH\_get0\_pqg(\mbox{\hyperlink{namespace_xbyak_1_1util_a89660b620585363990da7271238c3d7f}{dh}}.obj,\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_a62125ea4e1d748a4a9c1aed9766f451a}{BIGNUM}}**)\&bn\_p.obj,\ NULL,\ NULL);}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1diffie__hellman_a4ca2b2be06d99984411f55ca12f28a6a}{p}}.resize(\ BN\_num\_bytes(\ bn\_p\ )\ );}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{structfc_1_1diffie__hellman_a4ca2b2be06d99984411f55ca12f28a6a}{p}}.size()\ )}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \ \ \ \ BN\_bn2bin(\ bn\_p,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)\&\mbox{\hyperlink{structfc_1_1diffie__hellman_a4ca2b2be06d99984411f55ca12f28a6a}{p}}.front()\ \ );}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ this-\/>\mbox{\hyperlink{structfc_1_1diffie__hellman_a54629e9bbb6dc0636a2bcada5b447e7f}{g}}\ =\ \mbox{\hyperlink{structfc_1_1diffie__hellman_a54629e9bbb6dc0636a2bcada5b447e7f}{g}};}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ fc::validate(\ dh,\ valid\ );}
+\DoxyCodeLine{00024\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structfc_1_1diffie__hellman_aeb3d4c02a68ccd1110200fedc38b0687}\index{fc::diffie\_hellman@{fc::diffie\_hellman}!generate\_pub\_key@{generate\_pub\_key}}
+\index{generate\_pub\_key@{generate\_pub\_key}!fc::diffie\_hellman@{fc::diffie\_hellman}}
+\doxysubsubsection{\texorpdfstring{generate\_pub\_key()}{generate\_pub\_key()}}
+{\footnotesize\ttfamily \label{structfc_1_1diffie__hellman_aeb3d4c02a68ccd1110200fedc38b0687} 
+bool fc\+::diffie\+\_\+hellman\+::generate\+\_\+pub\+\_\+key (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{dh_8cpp_source_l00037}{37}} of file \mbox{\hyperlink{dh_8cpp_source}{dh.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00038\ \ \ \ \{}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !\mbox{\hyperlink{structfc_1_1diffie__hellman_a4ca2b2be06d99984411f55ca12f28a6a}{p}}.size()\ )\ }
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ valid\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ ssl\_dh\ \mbox{\hyperlink{namespace_xbyak_1_1util_a89660b620585363990da7271238c3d7f}{dh}}\ =\ DH\_new();}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ bn\_p\ =\ BN\_bin2bn(\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)\&\mbox{\hyperlink{structfc_1_1diffie__hellman_a4ca2b2be06d99984411f55ca12f28a6a}{p}}.front(),\ \mbox{\hyperlink{structfc_1_1diffie__hellman_a4ca2b2be06d99984411f55ca12f28a6a}{p}}.size(),\ NULL\ );}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ bn\_g\ =\ BN\_bin2bn(\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)\&\mbox{\hyperlink{structfc_1_1diffie__hellman_a54629e9bbb6dc0636a2bcada5b447e7f}{g}},\ 1,\ NULL\ );}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ DH\_set0\_pqg(\mbox{\hyperlink{namespace_xbyak_1_1util_a89660b620585363990da7271238c3d7f}{dh}}.obj,\ bn\_p,\ NULL,\ bn\_g);}
+\DoxyCodeLine{00045\ }
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !fc::validate(\ dh,\ valid\ )\ )}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ DH\_generate\_key(dh);}
+\DoxyCodeLine{00051\ }
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ ssl\_bignum\ bn\_pub\_key;}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ ssl\_bignum\ bn\_priv\_key;}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ DH\_get0\_key(\mbox{\hyperlink{namespace_xbyak_1_1util_a89660b620585363990da7271238c3d7f}{dh}}.obj,\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_a62125ea4e1d748a4a9c1aed9766f451a}{BIGNUM}}**)\&bn\_pub\_key.obj,\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_a62125ea4e1d748a4a9c1aed9766f451a}{BIGNUM}}**)\&bn\_priv\_key.obj);}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1diffie__hellman_acbf40e922a71880db492397abcf1d652}{pub\_key}}.resize(\ BN\_num\_bytes(\ bn\_pub\_key\ )\ );}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1diffie__hellman_a1313b63b61ccb170d8bd2b7a591c0ec0}{priv\_key}}.resize(\ BN\_num\_bytes(\ bn\_priv\_key\ )\ );}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{structfc_1_1diffie__hellman_acbf40e922a71880db492397abcf1d652}{pub\_key}}.size()\ )}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \ \ \ BN\_bn2bin(\ bn\_pub\_key.obj,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)\&\mbox{\hyperlink{structfc_1_1diffie__hellman_acbf40e922a71880db492397abcf1d652}{pub\_key}}.front()\ \ );}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{structfc_1_1diffie__hellman_a1313b63b61ccb170d8bd2b7a591c0ec0}{priv\_key}}.size()\ )}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \ \ \ \ BN\_bn2bin(\ bn\_priv\_key.obj,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)\&\mbox{\hyperlink{structfc_1_1diffie__hellman_a1313b63b61ccb170d8bd2b7a591c0ec0}{priv\_key}}.front()\ \ );}
+\DoxyCodeLine{00061\ }
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00063\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structfc_1_1diffie__hellman_a4277769577389134e7274c1b19598685}\index{fc::diffie\_hellman@{fc::diffie\_hellman}!validate@{validate}}
+\index{validate@{validate}!fc::diffie\_hellman@{fc::diffie\_hellman}}
+\doxysubsubsection{\texorpdfstring{validate()}{validate()}}
+{\footnotesize\ttfamily \label{structfc_1_1diffie__hellman_a4277769577389134e7274c1b19598685} 
+bool fc\+::diffie\+\_\+hellman\+::validate (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{dh_8cpp_source_l00026}{26}} of file \mbox{\hyperlink{dh_8cpp_source}{dh.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00027\ \ \ \ \{}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !\mbox{\hyperlink{structfc_1_1diffie__hellman_a4ca2b2be06d99984411f55ca12f28a6a}{p}}.size()\ )\ }
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ valid\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ ssl\_dh\ \mbox{\hyperlink{namespace_xbyak_1_1util_a89660b620585363990da7271238c3d7f}{dh}}\ =\ DH\_new();}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ bn\_p\ =\ BN\_bin2bn(\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)\&\mbox{\hyperlink{structfc_1_1diffie__hellman_a4ca2b2be06d99984411f55ca12f28a6a}{p}}.front(),\ \mbox{\hyperlink{structfc_1_1diffie__hellman_a4ca2b2be06d99984411f55ca12f28a6a}{p}}.size(),\ NULL\ );}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ bn\_g\ =\ BN\_bin2bn(\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)\&\mbox{\hyperlink{structfc_1_1diffie__hellman_a54629e9bbb6dc0636a2bcada5b447e7f}{g}},\ 1,\ NULL\ );}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ DH\_set0\_pqg(\mbox{\hyperlink{namespace_xbyak_1_1util_a89660b620585363990da7271238c3d7f}{dh}}.obj,\ bn\_p,\ NULL,\ bn\_g);}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ fc::validate(\ dh,\ valid\ );}
+\DoxyCodeLine{00035\ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structfc_1_1diffie__hellman_a54629e9bbb6dc0636a2bcada5b447e7f}\index{fc::diffie\_hellman@{fc::diffie\_hellman}!g@{g}}
+\index{g@{g}!fc::diffie\_hellman@{fc::diffie\_hellman}}
+\doxysubsubsection{\texorpdfstring{g}{g}}
+{\footnotesize\ttfamily \label{structfc_1_1diffie__hellman_a54629e9bbb6dc0636a2bcada5b447e7f} 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} fc\+::diffie\+\_\+hellman\+::g}
+
+
+
+Definition at line \mbox{\hyperlink{dh_8hpp_source_l00021}{21}} of file \mbox{\hyperlink{dh_8hpp_source}{dh.\+hpp}}.
+
+\Hypertarget{structfc_1_1diffie__hellman_a4ca2b2be06d99984411f55ca12f28a6a}\index{fc::diffie\_hellman@{fc::diffie\_hellman}!p@{p}}
+\index{p@{p}!fc::diffie\_hellman@{fc::diffie\_hellman}}
+\doxysubsubsection{\texorpdfstring{p}{p}}
+{\footnotesize\ttfamily \label{structfc_1_1diffie__hellman_a4ca2b2be06d99984411f55ca12f28a6a} 
+std\+::vector$<$char$>$ fc\+::diffie\+\_\+hellman\+::p}
+
+
+
+Definition at line \mbox{\hyperlink{dh_8hpp_source_l00016}{16}} of file \mbox{\hyperlink{dh_8hpp_source}{dh.\+hpp}}.
+
+\Hypertarget{structfc_1_1diffie__hellman_a1313b63b61ccb170d8bd2b7a591c0ec0}\index{fc::diffie\_hellman@{fc::diffie\_hellman}!priv\_key@{priv\_key}}
+\index{priv\_key@{priv\_key}!fc::diffie\_hellman@{fc::diffie\_hellman}}
+\doxysubsubsection{\texorpdfstring{priv\_key}{priv\_key}}
+{\footnotesize\ttfamily \label{structfc_1_1diffie__hellman_a1313b63b61ccb170d8bd2b7a591c0ec0} 
+std\+::vector$<$char$>$ fc\+::diffie\+\_\+hellman\+::priv\+\_\+key}
+
+
+
+Definition at line \mbox{\hyperlink{dh_8hpp_source_l00018}{18}} of file \mbox{\hyperlink{dh_8hpp_source}{dh.\+hpp}}.
+
+\Hypertarget{structfc_1_1diffie__hellman_acbf40e922a71880db492397abcf1d652}\index{fc::diffie\_hellman@{fc::diffie\_hellman}!pub\_key@{pub\_key}}
+\index{pub\_key@{pub\_key}!fc::diffie\_hellman@{fc::diffie\_hellman}}
+\doxysubsubsection{\texorpdfstring{pub\_key}{pub\_key}}
+{\footnotesize\ttfamily \label{structfc_1_1diffie__hellman_acbf40e922a71880db492397abcf1d652} 
+std\+::vector$<$char$>$ fc\+::diffie\+\_\+hellman\+::pub\+\_\+key}
+
+
+
+Definition at line \mbox{\hyperlink{dh_8hpp_source_l00017}{17}} of file \mbox{\hyperlink{dh_8hpp_source}{dh.\+hpp}}.
+
+\Hypertarget{structfc_1_1diffie__hellman_a5a8270c545d3269f22598a60a290b27e}\index{fc::diffie\_hellman@{fc::diffie\_hellman}!shared\_key@{shared\_key}}
+\index{shared\_key@{shared\_key}!fc::diffie\_hellman@{fc::diffie\_hellman}}
+\doxysubsubsection{\texorpdfstring{shared\_key}{shared\_key}}
+{\footnotesize\ttfamily \label{structfc_1_1diffie__hellman_a5a8270c545d3269f22598a60a290b27e} 
+std\+::vector$<$char$>$ fc\+::diffie\+\_\+hellman\+::shared\+\_\+key}
+
+
+
+Definition at line \mbox{\hyperlink{dh_8hpp_source_l00019}{19}} of file \mbox{\hyperlink{dh_8hpp_source}{dh.\+hpp}}.
+
+\Hypertarget{structfc_1_1diffie__hellman_aeeff752202a422bd69a5b1b392e47d0c}\index{fc::diffie\_hellman@{fc::diffie\_hellman}!valid@{valid}}
+\index{valid@{valid}!fc::diffie\_hellman@{fc::diffie\_hellman}}
+\doxysubsubsection{\texorpdfstring{valid}{valid}}
+{\footnotesize\ttfamily \label{structfc_1_1diffie__hellman_aeeff752202a422bd69a5b1b392e47d0c} 
+bool fc\+::diffie\+\_\+hellman\+::valid}
+
+
+
+Definition at line \mbox{\hyperlink{dh_8hpp_source_l00020}{20}} of file \mbox{\hyperlink{dh_8hpp_source}{dh.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/\mbox{\hyperlink{dh_8hpp}{dh.\+hpp}}\item 
+libraries/fc/src/crypto/\mbox{\hyperlink{dh_8cpp}{dh.\+cpp}}\end{DoxyCompactItemize}

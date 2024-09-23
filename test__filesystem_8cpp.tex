@@ -1,0 +1,195 @@
+\doxysection{libraries/fc/test/test\+\_\+filesystem.cpp File Reference}
+\hypertarget{test__filesystem_8cpp}{}\label{test__filesystem_8cpp}\index{libraries/fc/test/test\_filesystem.cpp@{libraries/fc/test/test\_filesystem.cpp}}
+{\ttfamily \#include $<$boost/test/included/unit\+\_\+test.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/filesystem/fstream.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/filesystem.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/exception/exception.\+hpp$>$}\newline
+Include dependency graph for test\+\_\+filesystem.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__filesystem_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{test__filesystem_8cpp_a6b2a3852db8bb19ab6909bac01859985}{BOOST\+\_\+\+TEST\+\_\+\+MODULE}}~fc\+\_\+filesystem
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+std\+::string \mbox{\hyperlink{test__filesystem_8cpp_a119423b93f35cfa8a75160a7a24cf352}{get\+File\+Content}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&filename)
+\item 
+\mbox{\hyperlink{test__filesystem_8cpp_a47381248286b00d297447a283b81fcd3}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (dir\+\_\+copy)
+\item 
+\mbox{\hyperlink{test__filesystem_8cpp_ae70bfa24f5a3bc0917382b3c17fc033c}{FC\+\_\+\+LOG\+\_\+\+AND\+\_\+\+RETHROW}} ()
+\item 
+\mbox{\hyperlink{test__filesystem_8cpp_af13f94a6736b145e24b5571f96688201}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (file\+\_\+copy)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{test__filesystem_8cpp_a6b2a3852db8bb19ab6909bac01859985}\index{test\_filesystem.cpp@{test\_filesystem.cpp}!BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}}
+\index{BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}!test\_filesystem.cpp@{test\_filesystem.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_TEST\_MODULE}{BOOST\_TEST\_MODULE}}
+{\footnotesize\ttfamily \label{test__filesystem_8cpp_a6b2a3852db8bb19ab6909bac01859985} 
+\#define BOOST\+\_\+\+TEST\+\_\+\+MODULE~fc\+\_\+filesystem}
+
+
+
+Definition at line \mbox{\hyperlink{test__filesystem_8cpp_source_l00001}{1}} of file \mbox{\hyperlink{test__filesystem_8cpp_source}{test\+\_\+filesystem.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{test__filesystem_8cpp_a47381248286b00d297447a283b81fcd3}\index{test\_filesystem.cpp@{test\_filesystem.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!test\_filesystem.cpp@{test\_filesystem.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{test__filesystem_8cpp_a47381248286b00d297447a283b81fcd3} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{dir\+\_\+copy}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__filesystem_8cpp_source_l00019}{19}} of file \mbox{\hyperlink{test__filesystem_8cpp_source}{test\+\_\+filesystem.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00020\ \ \ \ \textcolor{comment}{//\ 1.\ check\ whether\ dir\ can\ be\ copied\ when\ target\ dir\ does\ not\ exist,\ }}
+\DoxyCodeLine{00021\ \ \ \ \textcolor{comment}{//\ but\ not\ recursively\ (compatible\ with\ 1.73)}}
+\DoxyCodeLine{00022\ \ \ \ }
+\DoxyCodeLine{00023\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\ src\_dir\ \{\textcolor{stringliteral}{"{}/tmp/fc\_copy\_test\_src"{}}\};}
+\DoxyCodeLine{00024\ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{namespacefc_a3fcf0d920aea28014aacae50a51d8485}{fc::exists}}(src\_dir))\ \{}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a76b0787468a9f403087b71a894c07ce2}{create\_directories}}(src\_dir);}
+\DoxyCodeLine{00026\ \ \ \ \}}
+\DoxyCodeLine{00027\ }
+\DoxyCodeLine{00028\ \ \ \ BOOST\_CHECK\_EQUAL(\mbox{\hyperlink{namespacefc_a3fcf0d920aea28014aacae50a51d8485}{fc::exists}}(src\_dir),\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00029\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\ test\_file\_name\ =\ \textcolor{stringliteral}{"{}fc\_copy\_test\_file"{}};}
+\DoxyCodeLine{00030\ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{namespacefc_a3fcf0d920aea28014aacae50a51d8485}{fc::exists}}(src\_dir\ +\ \textcolor{stringliteral}{"{}/"{}}\ +\ test\_file\_name))\ \{}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ boost::filesystem::ofstream\ \ ofs\ \{\ src\_dir\ +\ \textcolor{stringliteral}{"{}/"{}}\ +\ test\_file\_name\};}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ ofs\ <<\ \textcolor{stringliteral}{"{}This\ the\ test\ of\ fc\ system\ copy\ \(\backslash\)n"{}};}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ ofs.close();}
+\DoxyCodeLine{00034\ \ \ \ \}}
+\DoxyCodeLine{00035\ \ \ \ BOOST\_CHECK\_EQUAL(\mbox{\hyperlink{namespacefc_a3fcf0d920aea28014aacae50a51d8485}{fc::exists}}(src\_dir\ +\ \textcolor{stringliteral}{"{}/"{}}\ +\ test\_file\_name),\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ }
+\DoxyCodeLine{00037\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\ tgt\_dir\ \{\textcolor{stringliteral}{"{}/tmp/fc\_copy\_test\_tgt"{}}\};}
+\DoxyCodeLine{00038\ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacefc_a3fcf0d920aea28014aacae50a51d8485}{fc::exists}}(tgt\_dir))\ \{}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a50ad24e0099358d167967f9df2e368fc}{remove\_all}}(tgt\_dir);}
+\DoxyCodeLine{00040\ \ \ \ \}\ \ \ }
+\DoxyCodeLine{00041\ \ \ \ BOOST\_CHECK\_EQUAL(\mbox{\hyperlink{namespacefc_a3fcf0d920aea28014aacae50a51d8485}{fc::exists}}(tgt\_dir),\ \textcolor{keyword}{false});}
+\DoxyCodeLine{00042\ \ \ }
+\DoxyCodeLine{00043\ \ \ \ \mbox{\hyperlink{namespacefc_a79771837fffd80fcc4bc658ee2fc4b2b}{fc::copy}}(src\_dir,\ tgt\_dir);}
+\DoxyCodeLine{00044\ \ \ \ BOOST\_CHECK\_EQUAL(\mbox{\hyperlink{namespacefc_a3fcf0d920aea28014aacae50a51d8485}{fc::exists}}(tgt\_dir),\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00045\ \ \ \ \textcolor{comment}{//\ check\ not\ copied\ recursively}}
+\DoxyCodeLine{00046\ \ \ \ BOOST\_CHECK\_EQUAL(\mbox{\hyperlink{namespacefc_a3fcf0d920aea28014aacae50a51d8485}{fc::exists}}(tgt\_dir\ +\ \textcolor{stringliteral}{"{}/"{}}\ +\ test\_file\_name),\ \textcolor{keyword}{false});}
+\DoxyCodeLine{00047\ \ \ \ }
+\DoxyCodeLine{00048\ \ \ \ \textcolor{comment}{//\ 2.\ check\ whether\ exception\ be\ thrown\ (no\ overwritten)\ when\ target\ dir\ does\ exist,\ }}
+\DoxyCodeLine{00049\ \ \ \ BOOST\_CHECK\_EQUAL(\mbox{\hyperlink{namespacefc_a3fcf0d920aea28014aacae50a51d8485}{fc::exists}}(tgt\_dir),\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00050\ \ \ \ BOOST\_CHECK\_EXCEPTION(\mbox{\hyperlink{namespacefc_a79771837fffd80fcc4bc658ee2fc4b2b}{fc::copy}}(src\_dir,\ tgt\_dir),\ \mbox{\hyperlink{classfc_1_1exception}{fc::exception}},\ \ [](\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1exception}{fc::exception}}\&\ e)\ \{}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ e.\mbox{\hyperlink{classfc_1_1exception_a79a36225cde10dcd23057bbe19d3390f}{code}}()\ ==\ \mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca54c3c8b9caa13270a23c57af7bf9c52c}{fc::unspecified\_exception\_code}};}
+\DoxyCodeLine{00052\ \ \ \ \});}
+\DoxyCodeLine{00053\ }
+\DoxyCodeLine{00054\ \}\ \mbox{\hyperlink{test__filesystem_8cpp_ae70bfa24f5a3bc0917382b3c17fc033c}{FC\_LOG\_AND\_RETHROW}}();}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__filesystem_8cpp_a47381248286b00d297447a283b81fcd3_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__filesystem_8cpp_af13f94a6736b145e24b5571f96688201}\index{test\_filesystem.cpp@{test\_filesystem.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!test\_filesystem.cpp@{test\_filesystem.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{test__filesystem_8cpp_af13f94a6736b145e24b5571f96688201} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{file\+\_\+copy}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__filesystem_8cpp_source_l00056}{56}} of file \mbox{\hyperlink{test__filesystem_8cpp_source}{test\+\_\+filesystem.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00057\ \ \ \ \textcolor{comment}{//\ 1.\ check\ whether\ file\ can\ be\ copied\ when\ target\ file\ does\ not\ exist,\ }}
+\DoxyCodeLine{00058\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\ src\_dir\ \{\textcolor{stringliteral}{"{}/tmp/fc\_copy\_test\_src"{}}\};}
+\DoxyCodeLine{00059\ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{namespacefc_a3fcf0d920aea28014aacae50a51d8485}{fc::exists}}(src\_dir))\ \{}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a76b0787468a9f403087b71a894c07ce2}{create\_directories}}(src\_dir);}
+\DoxyCodeLine{00061\ \ \ \ \}}
+\DoxyCodeLine{00062\ }
+\DoxyCodeLine{00063\ \ \ \ BOOST\_CHECK\_EQUAL(\mbox{\hyperlink{namespacefc_a3fcf0d920aea28014aacae50a51d8485}{fc::exists}}(src\_dir),\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00064\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\ test\_file\_name\ =\ \textcolor{stringliteral}{"{}fc\_copy\_test\_file"{}};}
+\DoxyCodeLine{00065\ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{namespacefc_a3fcf0d920aea28014aacae50a51d8485}{fc::exists}}(src\_dir\ +\ \textcolor{stringliteral}{"{}/"{}}\ +\ test\_file\_name))\ \{}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ boost::filesystem::ofstream\ \ ofs\ \{\ src\_dir\ +\ \textcolor{stringliteral}{"{}/"{}}\ +\ test\_file\_name\};}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ ofs\ <<\ \textcolor{stringliteral}{"{}This\ the\ test\ of\ fc\ system\ copy\ \(\backslash\)n"{}};}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ ofs.close();}
+\DoxyCodeLine{00069\ \ \ \ \}}
+\DoxyCodeLine{00070\ \ \ \ BOOST\_CHECK\_EQUAL(\mbox{\hyperlink{namespacefc_a3fcf0d920aea28014aacae50a51d8485}{fc::exists}}(src\_dir\ +\ \textcolor{stringliteral}{"{}/"{}}\ +\ test\_file\_name),\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ }
+\DoxyCodeLine{00072\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\ tgt\_dir\ \{\textcolor{stringliteral}{"{}/tmp/fc\_copy\_test\_tgt"{}}\};}
+\DoxyCodeLine{00073\ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{namespacefc_a3fcf0d920aea28014aacae50a51d8485}{fc::exists}}(tgt\_dir))\ \{}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a79771837fffd80fcc4bc658ee2fc4b2b}{fc::copy}}(src\_dir,\ tgt\_dir);}
+\DoxyCodeLine{00075\ \ \ \ \}\ \ \ }
+\DoxyCodeLine{00076\ \ \ \ BOOST\_CHECK\_EQUAL(\mbox{\hyperlink{namespacefc_a3fcf0d920aea28014aacae50a51d8485}{fc::exists}}(tgt\_dir),\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00077\ \ \ \ BOOST\_CHECK\_EQUAL(\mbox{\hyperlink{namespacefc_a3fcf0d920aea28014aacae50a51d8485}{fc::exists}}(tgt\_dir\ +\ \textcolor{stringliteral}{"{}/"{}}\ +\ test\_file\_name),\ \textcolor{keyword}{false});}
+\DoxyCodeLine{00078\ \ \ \ \mbox{\hyperlink{namespacefc_a79771837fffd80fcc4bc658ee2fc4b2b}{fc::copy}}(src\_dir\ +\ \textcolor{stringliteral}{"{}/"{}}\ +\ test\_file\_name,\ tgt\_dir\ +\ \textcolor{stringliteral}{"{}/"{}}\ +\ test\_file\_name);}
+\DoxyCodeLine{00079\ \ \ \ BOOST\_CHECK\_EQUAL(\mbox{\hyperlink{namespacefc_a3fcf0d920aea28014aacae50a51d8485}{fc::exists}}(tgt\_dir\ +\ \textcolor{stringliteral}{"{}/"{}}\ +\ test\_file\_name),\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00080\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\ src\_file\_content\ =\ \mbox{\hyperlink{test__filesystem_8cpp_a119423b93f35cfa8a75160a7a24cf352}{getFileContent}}(src\_dir\ +\ \textcolor{stringliteral}{"{}/"{}}\ +\ test\_file\_name);}
+\DoxyCodeLine{00081\ \ \ \ BOOST\_CHECK\_EQUAL(src\_file\_content.empty(),\ \textcolor{keyword}{false});}
+\DoxyCodeLine{00082\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\ tgt\_file\_content\ =\ \mbox{\hyperlink{test__filesystem_8cpp_a119423b93f35cfa8a75160a7a24cf352}{getFileContent}}(tgt\_dir\ +\ \textcolor{stringliteral}{"{}/"{}}\ +\ test\_file\_name);}
+\DoxyCodeLine{00083\ \ \ \ BOOST\_CHECK\_EQUAL(src\_file\_content,\ tgt\_file\_content);}
+\DoxyCodeLine{00084\ }
+\DoxyCodeLine{00085\ \ \ \ \textcolor{comment}{//\ 2.\ check\ whether\ exception\ be\ thrown\ (no\ overwritten)\ when\ target\ file\ does\ exist,\ }}
+\DoxyCodeLine{00086\ \ \ \ BOOST\_CHECK\_EQUAL(\mbox{\hyperlink{namespacefc_a3fcf0d920aea28014aacae50a51d8485}{fc::exists}}(tgt\_dir\ +\ \textcolor{stringliteral}{"{}/"{}}\ +\ test\_file\_name),\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00087\ \ \ \ BOOST\_CHECK\_EXCEPTION(\mbox{\hyperlink{namespacefc_a79771837fffd80fcc4bc658ee2fc4b2b}{fc::copy}}(src\_dir\ +\ \textcolor{stringliteral}{"{}/"{}}\ +\ test\_file\_name,\ tgt\_dir\ +\ \textcolor{stringliteral}{"{}/"{}}\ +\ test\_file\_name),\ }
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1exception}{fc::exception}},\ \ }
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [](\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1exception}{fc::exception}}\&\ e)\ \{}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ e.\mbox{\hyperlink{classfc_1_1exception_a79a36225cde10dcd23057bbe19d3390f}{code}}()\ ==\ \mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca54c3c8b9caa13270a23c57af7bf9c52c}{fc::unspecified\_exception\_code}};}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00092\ \ \ \ }
+\DoxyCodeLine{00093\ \}\ \mbox{\hyperlink{test__filesystem_8cpp_ae70bfa24f5a3bc0917382b3c17fc033c}{FC\_LOG\_AND\_RETHROW}}();}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__filesystem_8cpp_af13f94a6736b145e24b5571f96688201_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__filesystem_8cpp_ae70bfa24f5a3bc0917382b3c17fc033c}\index{test\_filesystem.cpp@{test\_filesystem.cpp}!FC\_LOG\_AND\_RETHROW@{FC\_LOG\_AND\_RETHROW}}
+\index{FC\_LOG\_AND\_RETHROW@{FC\_LOG\_AND\_RETHROW}!test\_filesystem.cpp@{test\_filesystem.cpp}}
+\doxysubsubsection{\texorpdfstring{FC\_LOG\_AND\_RETHROW()}{FC\_LOG\_AND\_RETHROW()}}
+{\footnotesize\ttfamily \label{test__filesystem_8cpp_ae70bfa24f5a3bc0917382b3c17fc033c} 
+FC\+\_\+\+LOG\+\_\+\+AND\+\_\+\+RETHROW (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{test__filesystem_8cpp_a119423b93f35cfa8a75160a7a24cf352}\index{test\_filesystem.cpp@{test\_filesystem.cpp}!getFileContent@{getFileContent}}
+\index{getFileContent@{getFileContent}!test\_filesystem.cpp@{test\_filesystem.cpp}}
+\doxysubsubsection{\texorpdfstring{getFileContent()}{getFileContent()}}
+{\footnotesize\ttfamily \label{test__filesystem_8cpp_a119423b93f35cfa8a75160a7a24cf352} 
+std\+::string get\+File\+Content (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&}]{filename}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__filesystem_8cpp_source_l00009}{9}} of file \mbox{\hyperlink{test__filesystem_8cpp_source}{test\+\_\+filesystem.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00009\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00010\ \ \ \ \textcolor{keywordtype}{string}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00011\ \ \ \ boost::filesystem::ifstream\ \ ifs\ \{\ \mbox{\hyperlink{namespaceembed_clara_a1e1bd594f85f58f5dca6c41c0ac720fb}{filename}}\ \};}
+\DoxyCodeLine{00012\ \ \ \ ifs\ >>\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00013\ \ \ \ ifs.close();}
+\DoxyCodeLine{00014\ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00015\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=343pt]{test__filesystem_8cpp_a119423b93f35cfa8a75160a7a24cf352_icgraph}
+\end{center}
+\end{figure}

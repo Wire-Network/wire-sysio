@@ -1,0 +1,32 @@
+<map id="libraries/sys&#45;vm/external/Catch2/include/internal/catch_fatal_condition.cpp" name="libraries/sys&#45;vm/external/Catch2/include/internal/catch_fatal_condition.cpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="475,5,648,61"/>
+<area shape="rect" id="Node000002" href="$catch__fatal__condition_8h.html" title=" " alt="" coords="249,109,404,135"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="489,64,375,106,373,101,487,59"/>
+<area shape="rect" id="Node000007" href="$catch__context_8h.html" title=" " alt="" coords="504,109,619,135"/>
+<area shape="poly" id="edge8_Node000001_Node000007" title=" " alt="" coords="564,61,564,93,559,93,559,61"/>
+<area shape="rect" id="Node000009" href="$catch__interfaces__capture_8h.html" title=" " alt="" coords="643,109,821,135"/>
+<area shape="poly" id="edge10_Node000001_Node000009" title=" " alt="" coords="616,59,696,99,694,104,614,64"/>
+<area shape="rect" id="Node000003" href="$catch__platform_8h.html" title=" " alt="" coords="61,256,179,282"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="249,130,181,136,111,146,51,162,29,173,14,184,9,194,9,202,19,219,42,235,69,248,67,253,39,239,15,223,3,203,4,192,10,181,26,168,49,157,110,141,181,130,249,124"/>
+<area shape="rect" id="Node000004" href="$catch__compiler__capabilities_8h.html" title=" " alt="" coords="24,183,216,208"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="293,138,170,180,169,175,291,133"/>
+<area shape="rect" id="Node000005" href="$catch__windows__h__proxy_8h.html" title=" " alt="" coords="240,183,413,208"/>
+<area shape="poly" id="edge5_Node000002_Node000005" title=" " alt="" coords="329,135,329,167,324,167,324,135"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="438,183,504,208"/>
+<area shape="poly" id="edge7_Node000002_Node000006" title=" " alt="" coords="352,133,434,173,432,178,350,138"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="123,209,123,241,117,241,117,209"/>
+<area shape="poly" id="edge6_Node000005_Node000003" title=" " alt="" coords="293,211,170,253,169,248,291,206"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="529,183,597,208"/>
+<area shape="poly" id="edge9_Node000007_Node000008" title=" " alt="" coords="564,135,565,167,560,167,559,135"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="612,256,665,282"/>
+<area shape="poly" id="edge11_Node000009_Node000010" title=" " alt="" coords="713,137,687,157,664,184,651,213,644,242,639,240,646,211,659,181,684,153,710,133"/>
+<area shape="rect" id="Node000011" href="$catch__stringref_8h.html" title=" " alt="" coords="673,183,791,208"/>
+<area shape="poly" id="edge12_Node000009_Node000011" title=" " alt="" coords="735,135,735,167,729,167,729,135"/>
+<area shape="rect" id="Node000014" href="$catch__result__type_8h.html" title=" " alt="" coords="815,183,950,208"/>
+<area shape="poly" id="edge16_Node000009_Node000014" title=" " alt="" coords="759,133,845,173,842,178,757,138"/>
+<area shape="poly" id="edge14_Node000011_Node000010" title=" " alt="" coords="718,211,668,249,665,245,715,207"/>
+<area shape="rect" id="Node000012" title=" " alt="" coords="696,256,760,282"/>
+<area shape="poly" id="edge13_Node000011_Node000012" title=" " alt="" coords="734,209,732,241,727,241,729,208"/>
+<area shape="rect" id="Node000013" title=" " alt="" coords="784,256,843,282"/>
+<area shape="poly" id="edge15_Node000011_Node000013" title=" " alt="" coords="748,207,790,244,787,248,744,211"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="websocketpp::close::extract_code" name="websocketpp::close::extract_code">
+<area shape="rect" id="Node000001" title="Extract a close code value from a close payload." alt="" coords="5,39,143,79"/>
+<area shape="rect" id="Node000002" href="$namespacewebsocketpp_1_1close_1_1status.html#ad024f852889be28eadcec8209fdf9bc8" title="Test whether a close code is invalid on the wire." alt="" coords="191,5,328,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="142,44,175,38,176,43,143,49"/>
+<area shape="rect" id="Node000003" href="$namespacewebsocketpp_1_1close_1_1status.html#af26a61f8a8c3247cf656349f96ea3008" title="Test whether a close code is in a reserved range." alt="" coords="191,71,328,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="143,68,176,74,175,79,142,73"/>
+</map>

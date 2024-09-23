@@ -1,0 +1,601 @@
+\doxysection{libraries/fc/include/fc/reflect/reflect.hpp File Reference}
+\hypertarget{reflect_8hpp}{}\label{reflect_8hpp}\index{libraries/fc/include/fc/reflect/reflect.hpp@{libraries/fc/include/fc/reflect/reflect.hpp}}
+{\ttfamily \#include $<$fc/utility.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/lexical\+\_\+cast.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/preprocessor/seq/for\+\_\+each.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/preprocessor/seq/enum.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/preprocessor/seq/size.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/preprocessor/seq/seq.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/preprocessor/stringize.\+hpp$>$}\newline
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include $<$fc/reflect/typename.\+hpp$>$}\newline
+Include dependency graph for reflect.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{reflect_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{reflect_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structfc_1_1reflector}{fc\+::reflector$<$ T $>$}}
+\begin{DoxyCompactList}\small\item\em defines visit functions for T Unless this is specialized, visit() will not be defined for T. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{structfc_1_1has__reflector__init}{fc\+::has\+\_\+reflector\+\_\+init$<$ C $>$}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1reflect__init}{fc\+::reflect\+\_\+init}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1reflector__init__visitor}{fc\+::reflector\+\_\+init\+\_\+visitor$<$ Class $>$}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacefc}{fc}}
+\begin{DoxyCompactList}\small\item\em namespace \doxylink{namespacesysio_1_1chain}{sysio\+::chain} \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{reflect_8hpp_a52c788d78bead9df6c9742d07e2cd40b}{FC\+\_\+\+REFLECT\+\_\+\+VISIT\+\_\+\+BASE}}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},  visitor,  base)
+\item 
+\#define \mbox{\hyperlink{reflect_8hpp_a25ad5dd44c8ca5fbd10c3310605244af}{FC\+\_\+\+TEMPLATE}}~\mbox{\hyperlink{yubihsm__pkcs11_8c_a53ef06e29c840024a683512c1acd791a}{template}}
+\item 
+\#define \mbox{\hyperlink{reflect_8hpp_ac2869bd7a45cf89d13a36b8670ffe81c}{FC\+\_\+\+REFLECT\+\_\+\+VISIT\+\_\+\+MEMBER}}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},  visitor,  elem)
+\item 
+\#define \mbox{\hyperlink{reflect_8hpp_ab1e2d3906d3ec6b50589d7d85295ef6a}{FC\+\_\+\+REFLECT\+\_\+\+BASE\+\_\+\+MEMBER\+\_\+\+COUNT}}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},  \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_a95c6de750b0756fab562e81ef6306c2b}{OP}},  elem)
+\item 
+\#define \mbox{\hyperlink{reflect_8hpp_a7f5c0805b721d4cd8f1e7f1fe0a2df7d}{FC\+\_\+\+REFLECT\+\_\+\+MEMBER\+\_\+\+COUNT}}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},  \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_a95c6de750b0756fab562e81ef6306c2b}{OP}},  elem)
+\item 
+\#define \mbox{\hyperlink{reflect_8hpp_aa2030e357bc307cfd08229966cd1e028}{FC\+\_\+\+REFLECT\+\_\+\+DERIVED\+\_\+\+IMPL\+\_\+\+INLINE}}(TYPE,  INHERITS,  MEMBERS)
+\item 
+\#define \mbox{\hyperlink{reflect_8hpp_aa0d7f5f903fe59f4112ff0ffb42ef5d3}{FC\+\_\+\+REFLECT\+\_\+\+VISIT\+\_\+\+ENUM}}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},  enum\+\_\+type,  elem)
+\item 
+\#define \mbox{\hyperlink{reflect_8hpp_a8d38ea89cb2687279255c4730626e0ef}{FC\+\_\+\+REFLECT\+\_\+\+ENUM\+\_\+\+TO\+\_\+\+STRING}}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},  enum\+\_\+type,  elem)
+\item 
+\#define \mbox{\hyperlink{reflect_8hpp_ac50c97da3e854fe80fe3eb14fbd9f358}{FC\+\_\+\+REFLECT\+\_\+\+ENUM\+\_\+\+TO\+\_\+\+FC\+\_\+\+STRING}}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},  enum\+\_\+type,  elem)
+\item 
+\#define \mbox{\hyperlink{reflect_8hpp_a80d3716910453e13bee2ce264c65af69}{FC\+\_\+\+REFLECT\+\_\+\+ENUM\+\_\+\+FROM\+\_\+\+STRING}}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},  enum\+\_\+type,  elem)
+\item 
+\#define \mbox{\hyperlink{reflect_8hpp_ac1e36c48669326400aa60ca2b6cc3331}{FC\+\_\+\+REFLECT\+\_\+\+ENUM\+\_\+\+FROM\+\_\+\+STRING\+\_\+\+CASE}}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},  enum\+\_\+type,  elem)
+\item 
+\#define \mbox{\hyperlink{reflect_8hpp_a3243e9d5f0a24341d7f7e64f9cd525ee}{FC\+\_\+\+REFLECT\+\_\+\+ENUM}}(ENUM,  FIELDS)
+\item 
+\#define \mbox{\hyperlink{reflect_8hpp_ac649660d1bd3ca60197b339a1c25642e}{FC\+\_\+\+REFLECT\+\_\+\+DERIVED\+\_\+\+TEMPLATE}}(TEMPLATE\+\_\+\+ARGS,  TYPE,  INHERITS,  MEMBERS)
+\item 
+\#define \mbox{\hyperlink{reflect_8hpp_abd9da6cfee7b98ef83fac107d13275c7}{FC\+\_\+\+REFLECT\+\_\+\+DERIVED}}(TYPE,  INHERITS,  MEMBERS)
+\begin{DoxyCompactList}\small\item\em Specializes \doxylink{structfc_1_1reflector}{fc\+::reflector} for TYPE where type inherits other reflected classes. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{reflect_8hpp_a2ace850e636b1ca0b18fe3177e413d99}{FC\+\_\+\+REFLECT}}(TYPE,  MEMBERS)
+\begin{DoxyCompactList}\small\item\em Specializes \doxylink{structfc_1_1reflector}{fc\+::reflector} for TYPE. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{reflect_8hpp_a174ab7b071f1b6db5666a266315fe1b5}{FC\+\_\+\+REFLECT\+\_\+\+TEMPLATE}}(TEMPLATE\+\_\+\+ARGS,  TYPE,  MEMBERS)
+\item 
+\#define \mbox{\hyperlink{reflect_8hpp_afc5277135165e6bbca19931035ca313b}{FC\+\_\+\+REFLECT\+\_\+\+EMPTY}}(TYPE)
+\item 
+\#define \mbox{\hyperlink{reflect_8hpp_a215aebc2773910145178fc5e0292d01b}{FC\+\_\+\+REFLECT\+\_\+\+TYPENAME}}(TYPE)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{namespacefc_a68077fb0265729efb10412aa4261628c}{fc\+::throw\+\_\+bad\+\_\+enum\+\_\+cast}} (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} i, const char \texorpdfstring{$\ast$}{*}e)
+\item 
+void \mbox{\hyperlink{namespacefc_ad235d09561c970aa9a8de9d5b75bd487}{fc\+::throw\+\_\+bad\+\_\+enum\+\_\+cast}} (const char \texorpdfstring{$\ast$}{*}k, const char \texorpdfstring{$\ast$}{*}e)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{reflect_8hpp_a2ace850e636b1ca0b18fe3177e413d99}\index{reflect.hpp@{reflect.hpp}!FC\_REFLECT@{FC\_REFLECT}}
+\index{FC\_REFLECT@{FC\_REFLECT}!reflect.hpp@{reflect.hpp}}
+\doxysubsubsection{\texorpdfstring{FC\_REFLECT}{FC\_REFLECT}}
+{\footnotesize\ttfamily \label{reflect_8hpp_a2ace850e636b1ca0b18fe3177e413d99} 
+\#define FC\+\_\+\+REFLECT(\begin{DoxyParamCaption}\item[{}]{TYPE}{, }\item[{}]{MEMBERS}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{reflect_8hpp_abd9da6cfee7b98ef83fac107d13275c7}{FC\_REFLECT\_DERIVED}}(\ TYPE,\ BOOST\_PP\_SEQ\_NIL,\ MEMBERS\ )}
+
+\end{DoxyCode}
+
+\begin{DoxyParams}{Parameters}
+{\em MEMBERS} & -\/ a sequence of member names. (field1)(field2)(field3)\\
+\hline
+\end{DoxyParams}
+\begin{DoxySeeAlso}{See also}
+\doxylink{reflect_8hpp_abd9da6cfee7b98ef83fac107d13275c7}{FC\+\_\+\+REFLECT\+\_\+\+DERIVED} 
+\end{DoxySeeAlso}
+
+
+Definition at line \mbox{\hyperlink{reflect_8hpp_source_l00311}{311}} of file \mbox{\hyperlink{reflect_8hpp_source}{reflect.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00311\ \textcolor{preprocessor}{\#define\ FC\_REFLECT(\ TYPE,\ MEMBERS\ )\ \(\backslash\)}}
+\DoxyCodeLine{00312\ \textcolor{preprocessor}{\ \ \ \ FC\_REFLECT\_DERIVED(\ TYPE,\ BOOST\_PP\_SEQ\_NIL,\ MEMBERS\ )}}
+
+\end{DoxyCode}
+\Hypertarget{reflect_8hpp_ab1e2d3906d3ec6b50589d7d85295ef6a}\index{reflect.hpp@{reflect.hpp}!FC\_REFLECT\_BASE\_MEMBER\_COUNT@{FC\_REFLECT\_BASE\_MEMBER\_COUNT}}
+\index{FC\_REFLECT\_BASE\_MEMBER\_COUNT@{FC\_REFLECT\_BASE\_MEMBER\_COUNT}!reflect.hpp@{reflect.hpp}}
+\doxysubsubsection{\texorpdfstring{FC\_REFLECT\_BASE\_MEMBER\_COUNT}{FC\_REFLECT\_BASE\_MEMBER\_COUNT}}
+{\footnotesize\ttfamily \label{reflect_8hpp_ab1e2d3906d3ec6b50589d7d85295ef6a} 
+\#define FC\+\_\+\+REFLECT\+\_\+\+BASE\+\_\+\+MEMBER\+\_\+\+COUNT(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}}{, }\item[{}]{\mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_a95c6de750b0756fab562e81ef6306c2b}{OP}}}{, }\item[{}]{elem}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_a95c6de750b0756fab562e81ef6306c2b}{OP}}\ \mbox{\hyperlink{structfc_1_1reflector}{fc::reflector<elem>::total\_member\_count}}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{reflect_8hpp_source_l00160}{160}} of file \mbox{\hyperlink{reflect_8hpp_source}{reflect.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00160\ \textcolor{preprocessor}{\#define\ FC\_REFLECT\_BASE\_MEMBER\_COUNT(\ r,\ OP,\ elem\ )\ \(\backslash\)}}
+\DoxyCodeLine{00161\ \textcolor{preprocessor}{\ \ OP\ fc::reflector<elem>::total\_member\_count}}
+
+\end{DoxyCode}
+\Hypertarget{reflect_8hpp_abd9da6cfee7b98ef83fac107d13275c7}\index{reflect.hpp@{reflect.hpp}!FC\_REFLECT\_DERIVED@{FC\_REFLECT\_DERIVED}}
+\index{FC\_REFLECT\_DERIVED@{FC\_REFLECT\_DERIVED}!reflect.hpp@{reflect.hpp}}
+\doxysubsubsection{\texorpdfstring{FC\_REFLECT\_DERIVED}{FC\_REFLECT\_DERIVED}}
+{\footnotesize\ttfamily \label{reflect_8hpp_abd9da6cfee7b98ef83fac107d13275c7} 
+\#define FC\+\_\+\+REFLECT\+\_\+\+DERIVED(\begin{DoxyParamCaption}\item[{}]{TYPE}{, }\item[{}]{INHERITS}{, }\item[{}]{MEMBERS}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \mbox{\hyperlink{reflect_8hpp_ac649660d1bd3ca60197b339a1c25642e}{FC\_REFLECT\_DERIVED\_TEMPLATE}}(\ (),\ TYPE,\ INHERITS,\ MEMBERS\ )}
+
+\end{DoxyCode}
+
+\begin{DoxyParams}{Parameters}
+{\em INHERITS} & -\/ a sequence of base class names (basea)(baseb)(basec) \\
+\hline
+{\em MEMBERS} & -\/ a sequence of member names. (field1)(field2)(field3) \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{reflect_8hpp_source_l00298}{298}} of file \mbox{\hyperlink{reflect_8hpp_source}{reflect.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00298\ \textcolor{preprocessor}{\#define\ FC\_REFLECT\_DERIVED(\ TYPE,\ INHERITS,\ MEMBERS\ )\ \(\backslash\)}}
+\DoxyCodeLine{00299\ \textcolor{preprocessor}{\ \ \ FC\_REFLECT\_DERIVED\_TEMPLATE(\ (),\ TYPE,\ INHERITS,\ MEMBERS\ )}}
+
+\end{DoxyCode}
+\Hypertarget{reflect_8hpp_aa2030e357bc307cfd08229966cd1e028}\index{reflect.hpp@{reflect.hpp}!FC\_REFLECT\_DERIVED\_IMPL\_INLINE@{FC\_REFLECT\_DERIVED\_IMPL\_INLINE}}
+\index{FC\_REFLECT\_DERIVED\_IMPL\_INLINE@{FC\_REFLECT\_DERIVED\_IMPL\_INLINE}!reflect.hpp@{reflect.hpp}}
+\doxysubsubsection{\texorpdfstring{FC\_REFLECT\_DERIVED\_IMPL\_INLINE}{FC\_REFLECT\_DERIVED\_IMPL\_INLINE}}
+{\footnotesize\ttfamily \label{reflect_8hpp_aa2030e357bc307cfd08229966cd1e028} 
+\#define FC\+\_\+\+REFLECT\+\_\+\+DERIVED\+\_\+\+IMPL\+\_\+\+INLINE(\begin{DoxyParamCaption}\item[{}]{TYPE}{, }\item[{}]{INHERITS}{, }\item[{}]{MEMBERS}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{template}<\textcolor{keyword}{typename}\ Visitor>\(\backslash\)}
+\DoxyCodeLine{\textcolor{keyword}{static}\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ visit\_base(\ Visitor\&\&\ v\ )\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ BOOST\_PP\_SEQ\_FOR\_EACH(\ \mbox{\hyperlink{reflect_8hpp_a52c788d78bead9df6c9742d07e2cd40b}{FC\_REFLECT\_VISIT\_BASE}},\ v,\ INHERITS\ )\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ BOOST\_PP\_SEQ\_FOR\_EACH(\ \mbox{\hyperlink{reflect_8hpp_ac2869bd7a45cf89d13a36b8670ffe81c}{FC\_REFLECT\_VISIT\_MEMBER}},\ v,\ MEMBERS\ )\ \(\backslash\)}
+\DoxyCodeLine{\}\ \(\backslash\)}
+\DoxyCodeLine{\textcolor{keyword}{template}<\textcolor{keyword}{typename}\ Visitor>\(\backslash\)}
+\DoxyCodeLine{\textcolor{keyword}{static}\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ visit(\ Visitor\&\&\ v\ )\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ BOOST\_PP\_SEQ\_FOR\_EACH(\ \mbox{\hyperlink{reflect_8hpp_a52c788d78bead9df6c9742d07e2cd40b}{FC\_REFLECT\_VISIT\_BASE}},\ v,\ INHERITS\ )\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ BOOST\_PP\_SEQ\_FOR\_EACH(\ \mbox{\hyperlink{reflect_8hpp_ac2869bd7a45cf89d13a36b8670ffe81c}{FC\_REFLECT\_VISIT\_MEMBER}},\ v,\ MEMBERS\ )\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ init(\ std::forward<Visitor>(v)\ );\ \(\backslash\)}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{reflect_8hpp_source_l00166}{166}} of file \mbox{\hyperlink{reflect_8hpp_source}{reflect.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00166\ \textcolor{preprocessor}{\#define\ FC\_REFLECT\_DERIVED\_IMPL\_INLINE(\ TYPE,\ INHERITS,\ MEMBERS\ )\ \(\backslash\)}}
+\DoxyCodeLine{00167\ \textcolor{preprocessor}{template<typename\ Visitor>\(\backslash\)}}
+\DoxyCodeLine{00168\ \textcolor{preprocessor}{static\ inline\ void\ visit\_base(\ Visitor\&\&\ v\ )\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00169\ \textcolor{preprocessor}{\ \ \ \ BOOST\_PP\_SEQ\_FOR\_EACH(\ FC\_REFLECT\_VISIT\_BASE,\ v,\ INHERITS\ )\ \(\backslash\)}}
+\DoxyCodeLine{00170\ \textcolor{preprocessor}{\ \ \ \ BOOST\_PP\_SEQ\_FOR\_EACH(\ FC\_REFLECT\_VISIT\_MEMBER,\ v,\ MEMBERS\ )\ \(\backslash\)}}
+\DoxyCodeLine{00171\ \textcolor{preprocessor}{\}\ \(\backslash\)}}
+\DoxyCodeLine{00172\ \textcolor{preprocessor}{template<typename\ Visitor>\(\backslash\)}}
+\DoxyCodeLine{00173\ \textcolor{preprocessor}{static\ inline\ void\ visit(\ Visitor\&\&\ v\ )\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00174\ \textcolor{preprocessor}{\ \ \ \ BOOST\_PP\_SEQ\_FOR\_EACH(\ FC\_REFLECT\_VISIT\_BASE,\ v,\ INHERITS\ )\ \(\backslash\)}}
+\DoxyCodeLine{00175\ \textcolor{preprocessor}{\ \ \ \ BOOST\_PP\_SEQ\_FOR\_EACH(\ FC\_REFLECT\_VISIT\_MEMBER,\ v,\ MEMBERS\ )\ \(\backslash\)}}
+\DoxyCodeLine{00176\ \textcolor{preprocessor}{\ \ \ \ init(\ std::forward<Visitor>(v)\ );\ \(\backslash\)}}
+\DoxyCodeLine{00177\ \textcolor{preprocessor}{\}}}
+
+\end{DoxyCode}
+\Hypertarget{reflect_8hpp_ac649660d1bd3ca60197b339a1c25642e}\index{reflect.hpp@{reflect.hpp}!FC\_REFLECT\_DERIVED\_TEMPLATE@{FC\_REFLECT\_DERIVED\_TEMPLATE}}
+\index{FC\_REFLECT\_DERIVED\_TEMPLATE@{FC\_REFLECT\_DERIVED\_TEMPLATE}!reflect.hpp@{reflect.hpp}}
+\doxysubsubsection{\texorpdfstring{FC\_REFLECT\_DERIVED\_TEMPLATE}{FC\_REFLECT\_DERIVED\_TEMPLATE}}
+{\footnotesize\ttfamily \label{reflect_8hpp_ac649660d1bd3ca60197b339a1c25642e} 
+\#define FC\+\_\+\+REFLECT\+\_\+\+DERIVED\+\_\+\+TEMPLATE(\begin{DoxyParamCaption}\item[{}]{TEMPLATE\+\_\+\+ARGS}{, }\item[{}]{TYPE}{, }\item[{}]{INHERITS}{, }\item[{}]{MEMBERS}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}\ \{\ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \textcolor{keyword}{template}<BOOST\_PP\_SEQ\_ENUM(TEMPLATE\_ARGS)>\ \textcolor{keyword}{struct\ }get\_typename<TYPE>\ \ \{\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{structfc_1_1get__typename_a42811803db332f7c28c53993226b40b9}{name}}()\ \ \{\ \textcolor{keywordflow}{return}\ BOOST\_PP\_STRINGIZE(TYPE);\ \ \}\ \};\ \(\backslash\)}
+\DoxyCodeLine{\textcolor{keyword}{template}<BOOST\_PP\_SEQ\_ENUM(TEMPLATE\_ARGS)>\ \textcolor{keyword}{struct\ }reflector<TYPE>\ \{\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{typedef}\ TYPE\ \mbox{\hyperlink{structfc_1_1reflector_a2ab82a950a3f3d5ea6884428e0d4b442}{type}};\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{structfc_1_1true__type}{fc::true\_type}}\ \ \mbox{\hyperlink{structfc_1_1reflector_a7b958f4c6630e69f0157476481446b4c}{is\_defined}};\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{structfc_1_1false__type}{fc::false\_type}}\ \mbox{\hyperlink{structfc_1_1reflector_ab955c8262ae2b8dfb8db04fd840b5f6a}{is\_enum}};\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ Visitor>\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ init\_imp(Visitor\&\&\ v,\ \textcolor{keywordtype}{int})\ -\/>\ \textcolor{keyword}{decltype}(std::forward<Visitor>(v).reflector\_init(),\ void())\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ std::forward<Visitor>(v).reflector\_init();\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ Visitor>\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ init\_imp(Visitor\&\&\ v,\ \textcolor{keywordtype}{long})\ -\/>\ \textcolor{keyword}{decltype}(\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}},\ void())\ \{\}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ Visitor>\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{lib_8h_a02fd73d861ef2e4aabb38c0c9ff82947}{init}}(Visitor\&\&\ v)\ -\/>\ \textcolor{keyword}{decltype}(init\_imp(std::forward<Visitor>(v),\ 0),\ void())\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ init\_imp(std::forward<Visitor>(v),\ 0);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{enum}\ \ member\_count\_enum\ \{\ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ local\_member\_count\ =\ 0\ \ BOOST\_PP\_SEQ\_FOR\_EACH(\ \mbox{\hyperlink{reflect_8hpp_a7f5c0805b721d4cd8f1e7f1fe0a2df7d}{FC\_REFLECT\_MEMBER\_COUNT}},\ +,\ MEMBERS\ ),\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ total\_member\_count\ =\ local\_member\_count\ BOOST\_PP\_SEQ\_FOR\_EACH(\ \mbox{\hyperlink{reflect_8hpp_ab1e2d3906d3ec6b50589d7d85295ef6a}{FC\_REFLECT\_BASE\_MEMBER\_COUNT}},\ +,\ INHERITS\ )\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \};\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ FC\_REFLECT\_DERIVED\_IMPL\_INLINE(\ TYPE,\ INHERITS,\ MEMBERS\ )\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ static\_assert(\ not\ \mbox{\hyperlink{structfc_1_1has__reflector__init}{fc::has\_reflector\_init<TYPE>::value}}\ ||\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::is\_base\_of<fc::reflect\_init,\ TYPE>::value,\ \textcolor{stringliteral}{"{}must\ derive\ from\ fc::reflect\_init"{}}\ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ static\_assert(\ not\ std::is\_base\_of<fc::reflect\_init,\ TYPE>::value\ ||\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1has__reflector__init}{fc::has\_reflector\_init<TYPE>::value}},\ \textcolor{stringliteral}{"{}must\ provide\ reflector\_init()\ method"{}}\ );\ \(\backslash\)}
+\DoxyCodeLine{\};\ \}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{reflect_8hpp_source_l00270}{270}} of file \mbox{\hyperlink{reflect_8hpp_source}{reflect.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00270\ \textcolor{preprocessor}{\#define\ FC\_REFLECT\_DERIVED\_TEMPLATE(\ TEMPLATE\_ARGS,\ TYPE,\ INHERITS,\ MEMBERS\ )\ \(\backslash\)}}
+\DoxyCodeLine{00271\ \textcolor{preprocessor}{namespace\ fc\ \{\ \ \(\backslash\)}}
+\DoxyCodeLine{00272\ \textcolor{preprocessor}{\ \ template<BOOST\_PP\_SEQ\_ENUM(TEMPLATE\_ARGS)>\ struct\ get\_typename<TYPE>\ \ \{\ static\ const\ char*\ name()\ \ \{\ return\ BOOST\_PP\_STRINGIZE(TYPE);\ \ \}\ \};\ \(\backslash\)}}
+\DoxyCodeLine{00273\ \textcolor{preprocessor}{template<BOOST\_PP\_SEQ\_ENUM(TEMPLATE\_ARGS)>\ struct\ reflector<TYPE>\ \{\(\backslash\)}}
+\DoxyCodeLine{00274\ \textcolor{preprocessor}{\ \ \ \ typedef\ TYPE\ type;\ \(\backslash\)}}
+\DoxyCodeLine{00275\ \textcolor{preprocessor}{\ \ \ \ typedef\ fc::true\_type\ \ is\_defined;\ \(\backslash\)}}
+\DoxyCodeLine{00276\ \textcolor{preprocessor}{\ \ \ \ typedef\ fc::false\_type\ is\_enum;\ \(\backslash\)}}
+\DoxyCodeLine{00277\ \textcolor{preprocessor}{\ \ \ \ template<typename\ Visitor>\ \(\backslash\)}}
+\DoxyCodeLine{00278\ \textcolor{preprocessor}{\ \ \ \ static\ auto\ init\_imp(Visitor\&\&\ v,\ int)\ -\/>\ decltype(std::forward<Visitor>(v).reflector\_init(),\ void())\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00279\ \textcolor{preprocessor}{\ \ \ \ \ \ \ std::forward<Visitor>(v).reflector\_init();\ \(\backslash\)}}
+\DoxyCodeLine{00280\ \textcolor{preprocessor}{\ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00281\ \textcolor{preprocessor}{\ \ \ \ template<typename\ Visitor>\ \(\backslash\)}}
+\DoxyCodeLine{00282\ \textcolor{preprocessor}{\ \ \ \ static\ auto\ init\_imp(Visitor\&\&\ v,\ long)\ -\/>\ decltype(v,\ void())\ \{\}\ \(\backslash\)}}
+\DoxyCodeLine{00283\ \textcolor{preprocessor}{\ \ \ \ template<typename\ Visitor>\ \(\backslash\)}}
+\DoxyCodeLine{00284\ \textcolor{preprocessor}{\ \ \ \ static\ auto\ init(Visitor\&\&\ v)\ -\/>\ decltype(init\_imp(std::forward<Visitor>(v),\ 0),\ void())\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00285\ \textcolor{preprocessor}{\ \ \ \ \ \ \ init\_imp(std::forward<Visitor>(v),\ 0);\ \(\backslash\)}}
+\DoxyCodeLine{00286\ \textcolor{preprocessor}{\ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00287\ \textcolor{preprocessor}{\ \ \ \ enum\ \ member\_count\_enum\ \{\ \ \(\backslash\)}}
+\DoxyCodeLine{00288\ \textcolor{preprocessor}{\ \ \ \ \ \ local\_member\_count\ =\ 0\ \ BOOST\_PP\_SEQ\_FOR\_EACH(\ FC\_REFLECT\_MEMBER\_COUNT,\ +,\ MEMBERS\ ),\(\backslash\)}}
+\DoxyCodeLine{00289\ \textcolor{preprocessor}{\ \ \ \ \ \ total\_member\_count\ =\ local\_member\_count\ BOOST\_PP\_SEQ\_FOR\_EACH(\ FC\_REFLECT\_BASE\_MEMBER\_COUNT,\ +,\ INHERITS\ )\(\backslash\)}}
+\DoxyCodeLine{00290\ \textcolor{preprocessor}{\ \ \ \ \};\ \(\backslash\)}}
+\DoxyCodeLine{00291\ \textcolor{preprocessor}{\ \ \ \ FC\_REFLECT\_DERIVED\_IMPL\_INLINE(\ TYPE,\ INHERITS,\ MEMBERS\ )\ \(\backslash\)}}
+\DoxyCodeLine{00292\ \textcolor{preprocessor}{\ \ \ \ static\_assert(\ not\ fc::has\_reflector\_init<TYPE>::value\ ||\ \(\backslash\)}}
+\DoxyCodeLine{00293\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::is\_base\_of<fc::reflect\_init,\ TYPE>::value,\ "{}must\ derive\ from\ fc::reflect\_init"{}\ );\ \(\backslash\)}}
+\DoxyCodeLine{00294\ \textcolor{preprocessor}{\ \ \ \ static\_assert(\ not\ std::is\_base\_of<fc::reflect\_init,\ TYPE>::value\ ||\ \(\backslash\)}}
+\DoxyCodeLine{00295\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fc::has\_reflector\_init<TYPE>::value,\ "{}must\ provide\ reflector\_init()\ method"{}\ );\ \(\backslash\)}}
+\DoxyCodeLine{00296\ \textcolor{preprocessor}{\};\ \}}}
+
+\end{DoxyCode}
+\Hypertarget{reflect_8hpp_afc5277135165e6bbca19931035ca313b}\index{reflect.hpp@{reflect.hpp}!FC\_REFLECT\_EMPTY@{FC\_REFLECT\_EMPTY}}
+\index{FC\_REFLECT\_EMPTY@{FC\_REFLECT\_EMPTY}!reflect.hpp@{reflect.hpp}}
+\doxysubsubsection{\texorpdfstring{FC\_REFLECT\_EMPTY}{FC\_REFLECT\_EMPTY}}
+{\footnotesize\ttfamily \label{reflect_8hpp_afc5277135165e6bbca19931035ca313b} 
+\#define FC\+\_\+\+REFLECT\+\_\+\+EMPTY(\begin{DoxyParamCaption}\item[{}]{TYPE}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{reflect_8hpp_abd9da6cfee7b98ef83fac107d13275c7}{FC\_REFLECT\_DERIVED}}(\ TYPE,\ BOOST\_PP\_SEQ\_NIL,\ BOOST\_PP\_SEQ\_NIL\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{reflect_8hpp_source_l00317}{317}} of file \mbox{\hyperlink{reflect_8hpp_source}{reflect.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00317\ \textcolor{preprocessor}{\#define\ FC\_REFLECT\_EMPTY(\ TYPE\ )\ \(\backslash\)}}
+\DoxyCodeLine{00318\ \textcolor{preprocessor}{\ \ \ \ FC\_REFLECT\_DERIVED(\ TYPE,\ BOOST\_PP\_SEQ\_NIL,\ BOOST\_PP\_SEQ\_NIL\ )}}
+
+\end{DoxyCode}
+\Hypertarget{reflect_8hpp_a3243e9d5f0a24341d7f7e64f9cd525ee}\index{reflect.hpp@{reflect.hpp}!FC\_REFLECT\_ENUM@{FC\_REFLECT\_ENUM}}
+\index{FC\_REFLECT\_ENUM@{FC\_REFLECT\_ENUM}!reflect.hpp@{reflect.hpp}}
+\doxysubsubsection{\texorpdfstring{FC\_REFLECT\_ENUM}{FC\_REFLECT\_ENUM}}
+{\footnotesize\ttfamily \label{reflect_8hpp_a3243e9d5f0a24341d7f7e64f9cd525ee} 
+\#define FC\+\_\+\+REFLECT\+\_\+\+ENUM(\begin{DoxyParamCaption}\item[{}]{ENUM}{, }\item[{}]{FIELDS}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{reflect_8hpp_source_l00194}{194}} of file \mbox{\hyperlink{reflect_8hpp_source}{reflect.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00194\ \textcolor{preprocessor}{\#define\ FC\_REFLECT\_ENUM(\ ENUM,\ FIELDS\ )\ \(\backslash\)}}
+\DoxyCodeLine{00195\ \textcolor{preprocessor}{namespace\ fc\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00196\ \textcolor{preprocessor}{template<>\ struct\ reflector<ENUM>\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00197\ \textcolor{preprocessor}{\ \ \ \ typedef\ fc::true\_type\ is\_defined;\ \(\backslash\)}}
+\DoxyCodeLine{00198\ \textcolor{preprocessor}{\ \ \ \ typedef\ fc::true\_type\ is\_enum;\ \(\backslash\)}}
+\DoxyCodeLine{00199\ \textcolor{preprocessor}{\ \ \ \ static\ const\ char*\ to\_string(ENUM\ elem)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00200\ \textcolor{preprocessor}{\ \ \ \ \ \ switch(\ elem\ )\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00201\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ BOOST\_PP\_SEQ\_FOR\_EACH(\ FC\_REFLECT\_ENUM\_TO\_STRING,\ ENUM,\ FIELDS\ )\ \(\backslash\)}}
+\DoxyCodeLine{00202\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ default:\ \(\backslash\)}}
+\DoxyCodeLine{00203\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ fc::throw\_bad\_enum\_cast(\ fc::to\_string(int64\_t(elem)).c\_str(),\ BOOST\_PP\_STRINGIZE(ENUM)\ );\ \(\backslash\)}}
+\DoxyCodeLine{00204\ \textcolor{preprocessor}{\ \ \ \ \ \ \}\(\backslash\)}}
+\DoxyCodeLine{00205\ \textcolor{preprocessor}{\ \ \ \ \ \ return\ nullptr;\ \(\backslash\)}}
+\DoxyCodeLine{00206\ \textcolor{preprocessor}{\ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00207\ \textcolor{preprocessor}{\ \ \ \ static\ const\ char*\ to\_string(int64\_t\ i)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00208\ \textcolor{preprocessor}{\ \ \ \ \ \ return\ to\_string(ENUM(i));\ \(\backslash\)}}
+\DoxyCodeLine{00209\ \textcolor{preprocessor}{\ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00210\ \textcolor{preprocessor}{\ \ \ \ static\ fc::string\ to\_fc\_string(ENUM\ elem)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00211\ \textcolor{preprocessor}{\ \ \ \ \ \ switch(\ elem\ )\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00212\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ BOOST\_PP\_SEQ\_FOR\_EACH(\ FC\_REFLECT\_ENUM\_TO\_FC\_STRING,\ ENUM,\ FIELDS\ )\ \(\backslash\)}}
+\DoxyCodeLine{00213\ \textcolor{preprocessor}{\ \ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00214\ \textcolor{preprocessor}{\ \ \ \ \ \ return\ fc::to\_string(int64\_t(elem));\ \(\backslash\)}}
+\DoxyCodeLine{00215\ \textcolor{preprocessor}{\ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00216\ \textcolor{preprocessor}{\ \ \ \ static\ fc::string\ to\_fc\_string(int64\_t\ i)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00217\ \textcolor{preprocessor}{\ \ \ \ \ \ return\ to\_fc\_string(ENUM(i));\ \(\backslash\)}}
+\DoxyCodeLine{00218\ \textcolor{preprocessor}{\ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00219\ \textcolor{preprocessor}{\ \ \ \ static\ ENUM\ from\_int(int64\_t\ i)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00220\ \textcolor{preprocessor}{\ \ \ \ \ \ ENUM\ e\ =\ ENUM(i);\ \(\backslash\)}}
+\DoxyCodeLine{00221\ \textcolor{preprocessor}{\ \ \ \ \ \ switch(\ e\ )\ \(\backslash\)}}
+\DoxyCodeLine{00222\ \textcolor{preprocessor}{\ \ \ \ \ \ \{\ \(\backslash\)}}
+\DoxyCodeLine{00223\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ BOOST\_PP\_SEQ\_FOR\_EACH(\ FC\_REFLECT\_ENUM\_FROM\_STRING\_CASE,\ ENUM,\ FIELDS\ )\ \(\backslash\)}}
+\DoxyCodeLine{00224\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ break;\ \(\backslash\)}}
+\DoxyCodeLine{00225\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ default:\ \(\backslash\)}}
+\DoxyCodeLine{00226\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ fc::throw\_bad\_enum\_cast(\ i,\ BOOST\_PP\_STRINGIZE(ENUM)\ );\ \(\backslash\)}}
+\DoxyCodeLine{00227\ \textcolor{preprocessor}{\ \ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00228\ \textcolor{preprocessor}{\ \ \ \ \ \ return\ e;\(\backslash\)}}
+\DoxyCodeLine{00229\ \textcolor{preprocessor}{\ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00230\ \textcolor{preprocessor}{\ \ \ \ static\ ENUM\ from\_string(\ const\ char*\ s\ )\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00231\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ BOOST\_PP\_SEQ\_FOR\_EACH(\ FC\_REFLECT\_ENUM\_FROM\_STRING,\ ENUM,\ FIELDS\ )\ \(\backslash\)}}
+\DoxyCodeLine{00232\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ int64\_t\ i\ =\ 0;\ \(\backslash\)}}
+\DoxyCodeLine{00233\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ try\ \(\backslash\)}}
+\DoxyCodeLine{00234\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \{\ \(\backslash\)}}
+\DoxyCodeLine{00235\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ i\ =\ boost::lexical\_cast<int64\_t>(s);\ \(\backslash\)}}
+\DoxyCodeLine{00236\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00237\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ catch(\ const\ boost::bad\_lexical\_cast\&\ e\ )\ \(\backslash\)}}
+\DoxyCodeLine{00238\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \{\ \(\backslash\)}}
+\DoxyCodeLine{00239\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ fc::throw\_bad\_enum\_cast(\ s,\ BOOST\_PP\_STRINGIZE(ENUM)\ );\ \(\backslash\)}}
+\DoxyCodeLine{00240\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00241\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ return\ from\_int(i);\ \(\backslash\)}}
+\DoxyCodeLine{00242\ \textcolor{preprocessor}{\ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00243\ \textcolor{preprocessor}{\ \ \ \ template<\ typename\ Visitor\ >\ \(\backslash\)}}
+\DoxyCodeLine{00244\ \textcolor{preprocessor}{\ \ \ \ static\ void\ visit(\ Visitor\&\ v\ )\ \(\backslash\)}}
+\DoxyCodeLine{00245\ \textcolor{preprocessor}{\ \ \ \ \{\ \(\backslash\)}}
+\DoxyCodeLine{00246\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ BOOST\_PP\_SEQ\_FOR\_EACH(\ FC\_REFLECT\_VISIT\_ENUM,\ ENUM,\ FIELDS\ )\ \(\backslash\)}}
+\DoxyCodeLine{00247\ \textcolor{preprocessor}{\ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00248\ \textcolor{preprocessor}{\};\ \ \(\backslash\)}}
+\DoxyCodeLine{00249\ \textcolor{preprocessor}{template<>\ struct\ get\_typename<ENUM>\ \ \{\ static\ const\ char*\ name()\ \ \{\ return\ BOOST\_PP\_STRINGIZE(ENUM);\ \ \}\ \};\ \(\backslash\)}}
+\DoxyCodeLine{00250\ \textcolor{preprocessor}{\}}}
+
+\end{DoxyCode}
+\Hypertarget{reflect_8hpp_a80d3716910453e13bee2ce264c65af69}\index{reflect.hpp@{reflect.hpp}!FC\_REFLECT\_ENUM\_FROM\_STRING@{FC\_REFLECT\_ENUM\_FROM\_STRING}}
+\index{FC\_REFLECT\_ENUM\_FROM\_STRING@{FC\_REFLECT\_ENUM\_FROM\_STRING}!reflect.hpp@{reflect.hpp}}
+\doxysubsubsection{\texorpdfstring{FC\_REFLECT\_ENUM\_FROM\_STRING}{FC\_REFLECT\_ENUM\_FROM\_STRING}}
+{\footnotesize\ttfamily \label{reflect_8hpp_a80d3716910453e13bee2ce264c65af69} 
+\#define FC\+\_\+\+REFLECT\+\_\+\+ENUM\+\_\+\+FROM\+\_\+\+STRING(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}}{, }\item[{}]{enum\+\_\+type}{, }\item[{}]{elem}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \textcolor{keywordflow}{if}(\ strcmp(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ BOOST\_PP\_STRINGIZE(elem)\ \ )\ ==\ 0\ )\ \textcolor{keywordflow}{return}\ enum\_type::elem;}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{reflect_8hpp_source_l00189}{189}} of file \mbox{\hyperlink{reflect_8hpp_source}{reflect.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00189\ \textcolor{preprocessor}{\#define\ FC\_REFLECT\_ENUM\_FROM\_STRING(\ r,\ enum\_type,\ elem\ )\ \(\backslash\)}}
+\DoxyCodeLine{00190\ \textcolor{preprocessor}{\ \ if(\ strcmp(\ s,\ BOOST\_PP\_STRINGIZE(elem)\ \ )\ ==\ 0\ )\ return\ enum\_type::elem;}}
+
+\end{DoxyCode}
+\Hypertarget{reflect_8hpp_ac1e36c48669326400aa60ca2b6cc3331}\index{reflect.hpp@{reflect.hpp}!FC\_REFLECT\_ENUM\_FROM\_STRING\_CASE@{FC\_REFLECT\_ENUM\_FROM\_STRING\_CASE}}
+\index{FC\_REFLECT\_ENUM\_FROM\_STRING\_CASE@{FC\_REFLECT\_ENUM\_FROM\_STRING\_CASE}!reflect.hpp@{reflect.hpp}}
+\doxysubsubsection{\texorpdfstring{FC\_REFLECT\_ENUM\_FROM\_STRING\_CASE}{FC\_REFLECT\_ENUM\_FROM\_STRING\_CASE}}
+{\footnotesize\ttfamily \label{reflect_8hpp_ac1e36c48669326400aa60ca2b6cc3331} 
+\#define FC\+\_\+\+REFLECT\+\_\+\+ENUM\+\_\+\+FROM\+\_\+\+STRING\+\_\+\+CASE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}}{, }\item[{}]{enum\+\_\+type}{, }\item[{}]{elem}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \textcolor{keywordflow}{case}\ enum\_type::elem:}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{reflect_8hpp_source_l00191}{191}} of file \mbox{\hyperlink{reflect_8hpp_source}{reflect.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00191\ \textcolor{preprocessor}{\#define\ FC\_REFLECT\_ENUM\_FROM\_STRING\_CASE(\ r,\ enum\_type,\ elem\ )\ \(\backslash\)}}
+\DoxyCodeLine{00192\ \textcolor{preprocessor}{\ \ \ case\ enum\_type::elem:}}
+
+\end{DoxyCode}
+\Hypertarget{reflect_8hpp_ac50c97da3e854fe80fe3eb14fbd9f358}\index{reflect.hpp@{reflect.hpp}!FC\_REFLECT\_ENUM\_TO\_FC\_STRING@{FC\_REFLECT\_ENUM\_TO\_FC\_STRING}}
+\index{FC\_REFLECT\_ENUM\_TO\_FC\_STRING@{FC\_REFLECT\_ENUM\_TO\_FC\_STRING}!reflect.hpp@{reflect.hpp}}
+\doxysubsubsection{\texorpdfstring{FC\_REFLECT\_ENUM\_TO\_FC\_STRING}{FC\_REFLECT\_ENUM\_TO\_FC\_STRING}}
+{\footnotesize\ttfamily \label{reflect_8hpp_ac50c97da3e854fe80fe3eb14fbd9f358} 
+\#define FC\+\_\+\+REFLECT\+\_\+\+ENUM\+\_\+\+TO\+\_\+\+FC\+\_\+\+STRING(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}}{, }\item[{}]{enum\+\_\+type}{, }\item[{}]{elem}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \textcolor{keywordflow}{case}\ enum\_type::elem:\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc::string}}(BOOST\_PP\_STRINGIZE(elem));}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{reflect_8hpp_source_l00186}{186}} of file \mbox{\hyperlink{reflect_8hpp_source}{reflect.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00186\ \textcolor{preprocessor}{\#define\ FC\_REFLECT\_ENUM\_TO\_FC\_STRING(\ r,\ enum\_type,\ elem\ )\ \(\backslash\)}}
+\DoxyCodeLine{00187\ \textcolor{preprocessor}{\ \ \ case\ enum\_type::elem:\ return\ fc::string(BOOST\_PP\_STRINGIZE(elem));}}
+
+\end{DoxyCode}
+\Hypertarget{reflect_8hpp_a8d38ea89cb2687279255c4730626e0ef}\index{reflect.hpp@{reflect.hpp}!FC\_REFLECT\_ENUM\_TO\_STRING@{FC\_REFLECT\_ENUM\_TO\_STRING}}
+\index{FC\_REFLECT\_ENUM\_TO\_STRING@{FC\_REFLECT\_ENUM\_TO\_STRING}!reflect.hpp@{reflect.hpp}}
+\doxysubsubsection{\texorpdfstring{FC\_REFLECT\_ENUM\_TO\_STRING}{FC\_REFLECT\_ENUM\_TO\_STRING}}
+{\footnotesize\ttfamily \label{reflect_8hpp_a8d38ea89cb2687279255c4730626e0ef} 
+\#define FC\+\_\+\+REFLECT\+\_\+\+ENUM\+\_\+\+TO\+\_\+\+STRING(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}}{, }\item[{}]{enum\+\_\+type}{, }\item[{}]{elem}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \textcolor{keywordflow}{case}\ enum\_type::elem:\ \textcolor{keywordflow}{return}\ BOOST\_PP\_STRINGIZE(elem);}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{reflect_8hpp_source_l00184}{184}} of file \mbox{\hyperlink{reflect_8hpp_source}{reflect.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00184\ \textcolor{preprocessor}{\#define\ FC\_REFLECT\_ENUM\_TO\_STRING(\ r,\ enum\_type,\ elem\ )\ \(\backslash\)}}
+\DoxyCodeLine{00185\ \textcolor{preprocessor}{\ \ \ case\ enum\_type::elem:\ return\ BOOST\_PP\_STRINGIZE(elem);}}
+
+\end{DoxyCode}
+\Hypertarget{reflect_8hpp_a7f5c0805b721d4cd8f1e7f1fe0a2df7d}\index{reflect.hpp@{reflect.hpp}!FC\_REFLECT\_MEMBER\_COUNT@{FC\_REFLECT\_MEMBER\_COUNT}}
+\index{FC\_REFLECT\_MEMBER\_COUNT@{FC\_REFLECT\_MEMBER\_COUNT}!reflect.hpp@{reflect.hpp}}
+\doxysubsubsection{\texorpdfstring{FC\_REFLECT\_MEMBER\_COUNT}{FC\_REFLECT\_MEMBER\_COUNT}}
+{\footnotesize\ttfamily \label{reflect_8hpp_a7f5c0805b721d4cd8f1e7f1fe0a2df7d} 
+\#define FC\+\_\+\+REFLECT\+\_\+\+MEMBER\+\_\+\+COUNT(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}}{, }\item[{}]{\mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_a95c6de750b0756fab562e81ef6306c2b}{OP}}}{, }\item[{}]{elem}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \mbox{\hyperlink{sysio_2vm_2bitcode__writer_8hpp_a95c6de750b0756fab562e81ef6306c2b}{OP}}\ 1}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{reflect_8hpp_source_l00163}{163}} of file \mbox{\hyperlink{reflect_8hpp_source}{reflect.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00163\ \textcolor{preprocessor}{\#define\ FC\_REFLECT\_MEMBER\_COUNT(\ r,\ OP,\ elem\ )\ \(\backslash\)}}
+\DoxyCodeLine{00164\ \textcolor{preprocessor}{\ \ OP\ 1}}
+
+\end{DoxyCode}
+\Hypertarget{reflect_8hpp_a174ab7b071f1b6db5666a266315fe1b5}\index{reflect.hpp@{reflect.hpp}!FC\_REFLECT\_TEMPLATE@{FC\_REFLECT\_TEMPLATE}}
+\index{FC\_REFLECT\_TEMPLATE@{FC\_REFLECT\_TEMPLATE}!reflect.hpp@{reflect.hpp}}
+\doxysubsubsection{\texorpdfstring{FC\_REFLECT\_TEMPLATE}{FC\_REFLECT\_TEMPLATE}}
+{\footnotesize\ttfamily \label{reflect_8hpp_a174ab7b071f1b6db5666a266315fe1b5} 
+\#define FC\+\_\+\+REFLECT\+\_\+\+TEMPLATE(\begin{DoxyParamCaption}\item[{}]{TEMPLATE\+\_\+\+ARGS}{, }\item[{}]{TYPE}{, }\item[{}]{MEMBERS}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{reflect_8hpp_ac649660d1bd3ca60197b339a1c25642e}{FC\_REFLECT\_DERIVED\_TEMPLATE}}(\ TEMPLATE\_ARGS,\ TYPE,\ BOOST\_PP\_SEQ\_NIL,\ MEMBERS\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{reflect_8hpp_source_l00314}{314}} of file \mbox{\hyperlink{reflect_8hpp_source}{reflect.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00314\ \textcolor{preprocessor}{\#define\ FC\_REFLECT\_TEMPLATE(\ TEMPLATE\_ARGS,\ TYPE,\ MEMBERS\ )\ \(\backslash\)}}
+\DoxyCodeLine{00315\ \textcolor{preprocessor}{\ \ \ \ FC\_REFLECT\_DERIVED\_TEMPLATE(\ TEMPLATE\_ARGS,\ TYPE,\ BOOST\_PP\_SEQ\_NIL,\ MEMBERS\ )}}
+
+\end{DoxyCode}
+\Hypertarget{reflect_8hpp_a215aebc2773910145178fc5e0292d01b}\index{reflect.hpp@{reflect.hpp}!FC\_REFLECT\_TYPENAME@{FC\_REFLECT\_TYPENAME}}
+\index{FC\_REFLECT\_TYPENAME@{FC\_REFLECT\_TYPENAME}!reflect.hpp@{reflect.hpp}}
+\doxysubsubsection{\texorpdfstring{FC\_REFLECT\_TYPENAME}{FC\_REFLECT\_TYPENAME}}
+{\footnotesize\ttfamily \label{reflect_8hpp_a215aebc2773910145178fc5e0292d01b} 
+\#define FC\+\_\+\+REFLECT\+\_\+\+TYPENAME(\begin{DoxyParamCaption}\item[{}]{TYPE}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \textcolor{keyword}{template}<>\ \textcolor{keyword}{struct\ }get\_typename<TYPE>\ \ \{\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{structfc_1_1get__typename_a42811803db332f7c28c53993226b40b9}{name}}()\ \ \{\ \textcolor{keywordflow}{return}\ BOOST\_PP\_STRINGIZE(TYPE);\ \ \}\ \};\ \(\backslash\)}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{reflect_8hpp_source_l00320}{320}} of file \mbox{\hyperlink{reflect_8hpp_source}{reflect.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00320\ \textcolor{preprocessor}{\#define\ FC\_REFLECT\_TYPENAME(\ TYPE\ )\ \(\backslash\)}}
+\DoxyCodeLine{00321\ \textcolor{preprocessor}{namespace\ fc\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00322\ \textcolor{preprocessor}{\ \ template<>\ struct\ get\_typename<TYPE>\ \ \{\ static\ const\ char*\ name()\ \ \{\ return\ BOOST\_PP\_STRINGIZE(TYPE);\ \ \}\ \};\ \(\backslash\)}}
+\DoxyCodeLine{00323\ \textcolor{preprocessor}{\}}}
+
+\end{DoxyCode}
+\Hypertarget{reflect_8hpp_a52c788d78bead9df6c9742d07e2cd40b}\index{reflect.hpp@{reflect.hpp}!FC\_REFLECT\_VISIT\_BASE@{FC\_REFLECT\_VISIT\_BASE}}
+\index{FC\_REFLECT\_VISIT\_BASE@{FC\_REFLECT\_VISIT\_BASE}!reflect.hpp@{reflect.hpp}}
+\doxysubsubsection{\texorpdfstring{FC\_REFLECT\_VISIT\_BASE}{FC\_REFLECT\_VISIT\_BASE}}
+{\footnotesize\ttfamily \label{reflect_8hpp_a52c788d78bead9df6c9742d07e2cd40b} 
+\#define FC\+\_\+\+REFLECT\+\_\+\+VISIT\+\_\+\+BASE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}}{, }\item[{}]{visitor}{, }\item[{}]{base}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \mbox{\hyperlink{structfc_1_1reflector}{fc::reflector<base>::visit\_base}}(\ visitor\ );}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{reflect_8hpp_source_l00142}{142}} of file \mbox{\hyperlink{reflect_8hpp_source}{reflect.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00142\ \textcolor{preprocessor}{\#define\ FC\_REFLECT\_VISIT\_BASE(r,\ visitor,\ base)\ \(\backslash\)}}
+\DoxyCodeLine{00143\ \textcolor{preprocessor}{\ \ fc::reflector<base>::visit\_base(\ visitor\ );}}
+
+\end{DoxyCode}
+\Hypertarget{reflect_8hpp_aa0d7f5f903fe59f4112ff0ffb42ef5d3}\index{reflect.hpp@{reflect.hpp}!FC\_REFLECT\_VISIT\_ENUM@{FC\_REFLECT\_VISIT\_ENUM}}
+\index{FC\_REFLECT\_VISIT\_ENUM@{FC\_REFLECT\_VISIT\_ENUM}!reflect.hpp@{reflect.hpp}}
+\doxysubsubsection{\texorpdfstring{FC\_REFLECT\_VISIT\_ENUM}{FC\_REFLECT\_VISIT\_ENUM}}
+{\footnotesize\ttfamily \label{reflect_8hpp_aa0d7f5f903fe59f4112ff0ffb42ef5d3} 
+\#define FC\+\_\+\+REFLECT\+\_\+\+VISIT\+\_\+\+ENUM(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}}{, }\item[{}]{enum\+\_\+type}{, }\item[{}]{elem}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ v.operator()(BOOST\_PP\_STRINGIZE(elem),\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}(enum\_type::elem)\ );}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{reflect_8hpp_source_l00182}{182}} of file \mbox{\hyperlink{reflect_8hpp_source}{reflect.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00182\ \textcolor{preprocessor}{\#define\ FC\_REFLECT\_VISIT\_ENUM(\ r,\ enum\_type,\ elem\ )\ \(\backslash\)}}
+\DoxyCodeLine{00183\ \textcolor{preprocessor}{\ \ v.operator()(BOOST\_PP\_STRINGIZE(elem),\ int64\_t(enum\_type::elem)\ );}}
+
+\end{DoxyCode}
+\Hypertarget{reflect_8hpp_ac2869bd7a45cf89d13a36b8670ffe81c}\index{reflect.hpp@{reflect.hpp}!FC\_REFLECT\_VISIT\_MEMBER@{FC\_REFLECT\_VISIT\_MEMBER}}
+\index{FC\_REFLECT\_VISIT\_MEMBER@{FC\_REFLECT\_VISIT\_MEMBER}!reflect.hpp@{reflect.hpp}}
+\doxysubsubsection{\texorpdfstring{FC\_REFLECT\_VISIT\_MEMBER}{FC\_REFLECT\_VISIT\_MEMBER}}
+{\footnotesize\ttfamily \label{reflect_8hpp_ac2869bd7a45cf89d13a36b8670ffe81c} 
+\#define FC\+\_\+\+REFLECT\+\_\+\+VISIT\+\_\+\+MEMBER(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}}{, }\item[{}]{visitor}{, }\item[{}]{elem}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\{\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{decltype}((\textcolor{keyword}{static\_cast<}type*\textcolor{keyword}{>}(\textcolor{keyword}{nullptr}))-\/>elem)\ member\_type;\ \ \(\backslash\)}
+\DoxyCodeLine{\ \ visitor.FC\_TEMPLATE\ operator()<member\_type,\mbox{\hyperlink{yubihsm_8h_a1d127017fb298b889f4ba24752d08b8e}{type}},\&type::elem>(\ BOOST\_PP\_STRINGIZE(elem)\ );\ \(\backslash\)}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{reflect_8hpp_source_l00154}{154}} of file \mbox{\hyperlink{reflect_8hpp_source}{reflect.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00154\ \textcolor{preprocessor}{\#define\ FC\_REFLECT\_VISIT\_MEMBER(\ r,\ visitor,\ elem\ )\ \(\backslash\)}}
+\DoxyCodeLine{00155\ \textcolor{preprocessor}{\{\ typedef\ decltype((static\_cast<type*>(nullptr))-\/>elem)\ member\_type;\ \ \(\backslash\)}}
+\DoxyCodeLine{00156\ \textcolor{preprocessor}{\ \ visitor.FC\_TEMPLATE\ operator()<member\_type,type,\&type::elem>(\ BOOST\_PP\_STRINGIZE(elem)\ );\ \(\backslash\)}}
+\DoxyCodeLine{00157\ \textcolor{preprocessor}{\}}}
+
+\end{DoxyCode}
+\Hypertarget{reflect_8hpp_a25ad5dd44c8ca5fbd10c3310605244af}\index{reflect.hpp@{reflect.hpp}!FC\_TEMPLATE@{FC\_TEMPLATE}}
+\index{FC\_TEMPLATE@{FC\_TEMPLATE}!reflect.hpp@{reflect.hpp}}
+\doxysubsubsection{\texorpdfstring{FC\_TEMPLATE}{FC\_TEMPLATE}}
+{\footnotesize\ttfamily \label{reflect_8hpp_a25ad5dd44c8ca5fbd10c3310605244af} 
+\#define FC\+\_\+\+TEMPLATE~\mbox{\hyperlink{yubihsm__pkcs11_8c_a53ef06e29c840024a683512c1acd791a}{template}}}
+
+
+
+Definition at line \mbox{\hyperlink{reflect_8hpp_source_l00147}{147}} of file \mbox{\hyperlink{reflect_8hpp_source}{reflect.\+hpp}}.
+

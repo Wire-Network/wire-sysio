@@ -1,0 +1,42 @@
+\doxysection{catch\+\_\+benchmark.\+cpp}
+\hypertarget{catch__benchmark_8cpp_source}{}\label{catch__benchmark_8cpp_source}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_benchmark.cpp@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_benchmark.cpp}}
+\mbox{\hyperlink{catch__benchmark_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8cpp_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8cpp_source_l00002}00002\ \textcolor{comment}{\ *\ \ Created\ by\ Phil\ on\ 04/07/2017.}}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8cpp_source_l00003}00003\ \textcolor{comment}{\ *\ \ Copyright\ 2017\ Two\ Blue\ Cubes\ Ltd.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8cpp_source_l00004}00004\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8cpp_source_l00005}00005\ \textcolor{comment}{\ *\ \ Distributed\ under\ the\ Boost\ Software\ License,\ Version\ 1.0.\ (See\ accompanying}}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8cpp_source_l00006}00006\ \textcolor{comment}{\ *\ \ file\ LICENSE\_1\_0.txt\ or\ copy\ at\ http://www.boost.org/LICENSE\_1\_0.txt)}}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8cpp_source_l00007}00007\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8cpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8cpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__benchmark_8h}{catch\_benchmark.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8cpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__capture_8hpp}{catch\_capture.hpp}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8cpp_source_l00011}00011\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__interfaces__reporter_8h}{catch\_interfaces\_reporter.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8cpp_source_l00012}00012\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__context_8h}{catch\_context.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8cpp_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8cpp_source_l00014}00014\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8cpp_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8cpp_source_l00016}00016\ \ \ \ \ \textcolor{keyword}{auto}\ BenchmarkLooper::getResolution()\ -\/>\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8cpp_source_l00017}00017\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_catch_ac8e1ed37624bd0d97b2c0d4ec099d31f}{getEstimatedClockResolution}}()\ *\ \mbox{\hyperlink{namespace_catch_a228a625318bb6183842e394eeba17d50}{getCurrentContext}}().\mbox{\hyperlink{struct_catch_1_1_i_context_ad72743ae753feab0a6f5505f26f79ced}{getConfig}}()-\/>benchmarkResolutionMultiple();}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8cpp_source_l00018}00018\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8cpp_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8cpp_source_l00020}\mbox{\hyperlink{class_catch_1_1_benchmark_looper_a0697d1b266112b110edf2025b82c4e77}{00020}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_benchmark_looper_a0697d1b266112b110edf2025b82c4e77}{BenchmarkLooper::reportStart}}()\ \{}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8cpp_source_l00021}00021\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_catch_af718eeab870712f292ed8dc6ee3f6488}{getResultCapture}}().\mbox{\hyperlink{struct_catch_1_1_i_result_capture_a264ae12330c74b2daae41715a30d51bf}{benchmarkStarting}}(\ \{\ m\_name\ \}\ );}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8cpp_source_l00022}00022\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8cpp_source_l00023}\mbox{\hyperlink{class_catch_1_1_benchmark_looper_a97bd944521f519b1593a5d1d2f9998fa}{00023}}\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{class_catch_1_1_benchmark_looper_a97bd944521f519b1593a5d1d2f9998fa}{BenchmarkLooper::needsMoreIterations}}()\ -\/>\ \textcolor{keywordtype}{bool}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8cpp_source_l00024}00024\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ elapsed\ =\ m\_timer.getElapsedNanoseconds();}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8cpp_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8cpp_source_l00026}00026\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Exponentially\ increasing\ iterations\ until\ we're\ confident\ in\ our\ timer\ resolution}}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8cpp_source_l00027}00027\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ elapsed\ <\ m\_resolution\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8cpp_source_l00028}00028\ \ \ \ \ \ \ \ \ \ \ \ \ m\_iterationsToRun\ *=\ 10;}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8cpp_source_l00029}00029\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8cpp_source_l00030}00030\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8cpp_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8cpp_source_l00032}00032\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_catch_af718eeab870712f292ed8dc6ee3f6488}{getResultCapture}}().\mbox{\hyperlink{struct_catch_1_1_i_result_capture_a6e5e64f9d94211a888249012ab6cc7fb}{benchmarkEnded}}(\ \{\ \{\ m\_name\ \},\ m\_count,\ elapsed\ \}\ );}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8cpp_source_l00033}00033\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8cpp_source_l00034}00034\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8cpp_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{catch__benchmark_8cpp_source_l00036}00036\ \}\ \textcolor{comment}{//\ end\ namespace\ Catch}}
+
+\end{DoxyCode}

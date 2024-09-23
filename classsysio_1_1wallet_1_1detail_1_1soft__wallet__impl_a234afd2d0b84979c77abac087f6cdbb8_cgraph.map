@@ -1,0 +1,21 @@
+<map id="sysio::wallet::detail::soft_wallet_impl::save_wallet_file" name="sysio::wallet::detail::soft_wallet_impl::save_wallet_file">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,162,165,218"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl.html#a90036b5b55f9231d0e3cebca29d89b2f" title=" " alt="" coords="213,100,422,141"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="164,164,232,143,233,149,165,169"/>
+<area shape="rect" id="Node000006" href="$classfc_1_1json.html#ae6c022ab581a9552ae2c97ff5d73aaf8" title=" " alt="" coords="256,202,379,242"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="165,198,241,209,240,214,164,204"/>
+<area shape="rect" id="Node000003" href="$namespacefc.html#a71eea521fccf7c6c7a01402d66de6a3f" title=" " alt="" coords="485,5,596,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="355,98,469,41,485,34,487,39,471,46,357,103"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1wallet_1_1detail_1_1soft__wallet__impl.html#aad845509f4f1ceb87851c530a138a701" title=" " alt="" coords="470,56,611,111"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="422,101,454,95,455,101,423,106"/>
+<area shape="rect" id="Node000005" href="$namespacefc_1_1raw.html#a3a18d8161aa5b4f4f02b6fcfdff5e5d1" title=" " alt="" coords="492,160,589,186"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="408,139,478,156,476,161,407,144"/>
+<area shape="poly" id="edge5_Node000005_Node000005" title=" " alt="" coords="512,161,507,151,510,142,522,136,541,133,561,136,572,143,569,147,559,141,541,139,523,141,514,145,512,151,517,158"/>
+<area shape="rect" id="Node000007" href="$namespacefc.html#ac11f6266177ed5f42e899ccc37550181" title=" " alt="" coords="488,209,593,235"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="380,220,473,220,473,225,380,225"/>
+<area shape="rect" id="Node000008" href="$classfc_1_1json.html#aa6541960d7f05567559b866cfaf88dfa" title=" " alt="" coords="480,259,602,284"/>
+<area shape="poly" id="edge8_Node000006_Node000008" title=" " alt="" coords="380,233,465,252,464,257,379,238"/>
+<area shape="rect" id="Node000009" href="$namespacefc.html#af9bea69c5790941ddc601fcd96cce071" title=" " alt="" coords="659,259,758,284"/>
+<area shape="poly" id="edge9_Node000008_Node000009" title=" " alt="" coords="602,269,644,269,644,274,602,274"/>
+<area shape="poly" id="edge10_Node000009_Node000009" title=" " alt="" coords="680,260,674,250,678,240,689,234,709,232,729,235,740,241,737,246,727,240,708,237,691,239,682,244,680,249,685,257"/>
+</map>

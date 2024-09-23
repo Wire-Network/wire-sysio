@@ -1,0 +1,9 @@
+<map id="sysio::testing::base_tester::preactivate_all_builtin_protocol_features" name="sysio::testing::base_tester::preactivate_all_builtin_protocol_features">
+<area shape="rect" id="Node000001" title=" " alt="" coords="420,24,555,94"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1testing_1_1base__tester.html#a3a7b80b2b8b882ff77e5aadcc6a0fa43" title=" " alt="" coords="218,31,372,87"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="405,62,372,62,372,56,405,56"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1testing_1_1base__tester.html#a3fad525eaa1221febd10c786e9dbaaf0" title=" " alt="" coords="20,5,155,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="202,47,155,39,156,34,203,42"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1testing_1_1validating__tester.html#ab9513fc3de3a42dce6af2c9a14d4a3f2" title=" " alt="" coords="5,71,170,111"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="203,76,171,81,170,76,202,71"/>
+</map>

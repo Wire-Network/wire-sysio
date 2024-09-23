@@ -1,0 +1,239 @@
+\doxysection{CLI\+::Formatter\+Base Class Reference}
+\hypertarget{class_c_l_i_1_1_formatter_base}{}\label{class_c_l_i_1_1_formatter_base}\index{CLI::FormatterBase@{CLI::FormatterBase}}
+
+
+{\ttfamily \#include $<$CLI11.\+hpp$>$}
+
+
+
+Inheritance diagram for CLI\+::Formatter\+Base\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=292pt]{class_c_l_i_1_1_formatter_base__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for CLI\+::Formatter\+Base\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=199pt]{class_c_l_i_1_1_formatter_base__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{Indent}\textbf{ Basic}\par
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_c_l_i_1_1_formatter_base_a85811a9afbc33d19fb1d8d1a0553f2b1}{Formatter\+Base}} ()=default
+\item 
+\mbox{\hyperlink{class_c_l_i_1_1_formatter_base_abd363023789788a8242d2c8ccf394c48}{Formatter\+Base}} (const \mbox{\hyperlink{class_c_l_i_1_1_formatter_base}{Formatter\+Base}} \&)=default
+\item 
+\mbox{\hyperlink{class_c_l_i_1_1_formatter_base_a5552e960c2f477a570ee67541e15e8ea}{Formatter\+Base}} (\mbox{\hyperlink{class_c_l_i_1_1_formatter_base}{Formatter\+Base}} \&\&)=default
+\item 
+virtual \mbox{\hyperlink{class_c_l_i_1_1_formatter_base_ac634fe340a7679a3f4add85c969e4d98}{\texorpdfstring{$\sim$}{\string~}\+Formatter\+Base}} () noexcept
+\begin{DoxyCompactList}\small\item\em Adding a destructor in this form to work around bug in GCC 4.\+7. \end{DoxyCompactList}\item 
+virtual std\+::string \mbox{\hyperlink{class_c_l_i_1_1_formatter_base_ac8ab93655a645352634709e15087080b}{make\+\_\+help}} (const \mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \texorpdfstring{$\ast$}{*}, std\+::string, \mbox{\hyperlink{namespace_c_l_i_a97e7d97131e3889f32b721570eca119c}{App\+Format\+Mode}}) const =0
+\begin{DoxyCompactList}\small\item\em This is the key method that puts together help. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\end{Indent}
+\begin{Indent}\textbf{ Setters}\par
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{class_c_l_i_1_1_formatter_base_a73a17d81d04f5ee02a2cab32a59a8551}{label}} (std\+::string key, std\+::string val)
+\begin{DoxyCompactList}\small\item\em Set the "{}\+REQUIRED"{} label. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_c_l_i_1_1_formatter_base_acd8c03570a48e5937ab748bf6103ca2d}{column\+\_\+width}} (std\+::size\+\_\+t val)
+\begin{DoxyCompactList}\small\item\em Set the column width. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\end{Indent}
+\begin{Indent}\textbf{ Getters}\par
+\begin{DoxyCompactItemize}
+\item 
+std\+::string \mbox{\hyperlink{class_c_l_i_1_1_formatter_base_a7e8f9d7896c599f7befd84a9947d4cab}{get\+\_\+label}} (std\+::string key) const
+\begin{DoxyCompactList}\small\item\em Get the current value of a name (REQUIRED, etc.) \end{DoxyCompactList}\item 
+std\+::size\+\_\+t \mbox{\hyperlink{class_c_l_i_1_1_formatter_base_a41e32517e27b98dcf85acfb0fd169c97}{get\+\_\+column\+\_\+width}} () const
+\begin{DoxyCompactList}\small\item\em Get the current column width. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\end{Indent}
+\doxysubsubsection*{Protected Attributes}
+\begin{Indent}\textbf{ Options}\par
+\begin{DoxyCompactItemize}
+\item 
+std\+::size\+\_\+t \mbox{\hyperlink{class_c_l_i_1_1_formatter_base_a2427b2199dd9654b050d00c89d764332}{column\+\_\+width\+\_\+}} \{30\}
+\begin{DoxyCompactList}\small\item\em The width of the first column. \end{DoxyCompactList}\item 
+std\+::map$<$ std\+::string, std\+::string $>$ \mbox{\hyperlink{class_c_l_i_1_1_formatter_base_a2ee79421fa339b227d6cb9ca1bce4ad1}{labels\+\_\+}} \{\}
+\begin{DoxyCompactList}\small\item\em The required help printout labels (user changeable) Values are Needs, Excludes, etc. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\end{Indent}
+
+
+\doxysubsection{Detailed Description}
+This is the minimum requirements to run a formatter.
+
+\doxylink{struct_a}{A} user can subclass this is if they do not care at all about the structure in \doxylink{class_c_l_i_1_1_formatter}{CLI\+::\+Formatter}. 
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l03177}{3177}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_c_l_i_1_1_formatter_base_a85811a9afbc33d19fb1d8d1a0553f2b1}\index{CLI::FormatterBase@{CLI::FormatterBase}!FormatterBase@{FormatterBase}}
+\index{FormatterBase@{FormatterBase}!CLI::FormatterBase@{CLI::FormatterBase}}
+\doxysubsubsection{\texorpdfstring{FormatterBase()}{FormatterBase()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_formatter_base_a85811a9afbc33d19fb1d8d1a0553f2b1} 
+CLI\+::\+Formatter\+Base\+::\+Formatter\+Base (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [default]}}
+
+\Hypertarget{class_c_l_i_1_1_formatter_base_abd363023789788a8242d2c8ccf394c48}\index{CLI::FormatterBase@{CLI::FormatterBase}!FormatterBase@{FormatterBase}}
+\index{FormatterBase@{FormatterBase}!CLI::FormatterBase@{CLI::FormatterBase}}
+\doxysubsubsection{\texorpdfstring{FormatterBase()}{FormatterBase()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_formatter_base_abd363023789788a8242d2c8ccf394c48} 
+CLI\+::\+Formatter\+Base\+::\+Formatter\+Base (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_c_l_i_1_1_formatter_base}{Formatter\+Base}} \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [default]}}
+
+\Hypertarget{class_c_l_i_1_1_formatter_base_a5552e960c2f477a570ee67541e15e8ea}\index{CLI::FormatterBase@{CLI::FormatterBase}!FormatterBase@{FormatterBase}}
+\index{FormatterBase@{FormatterBase}!CLI::FormatterBase@{CLI::FormatterBase}}
+\doxysubsubsection{\texorpdfstring{FormatterBase()}{FormatterBase()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_formatter_base_a5552e960c2f477a570ee67541e15e8ea} 
+CLI\+::\+Formatter\+Base\+::\+Formatter\+Base (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_c_l_i_1_1_formatter_base}{Formatter\+Base}} \&\&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [default]}}
+
+\Hypertarget{class_c_l_i_1_1_formatter_base_ac634fe340a7679a3f4add85c969e4d98}\index{CLI::FormatterBase@{CLI::FormatterBase}!````~FormatterBase@{\texorpdfstring{$\sim$}{\string~}FormatterBase}}
+\index{````~FormatterBase@{\texorpdfstring{$\sim$}{\string~}FormatterBase}!CLI::FormatterBase@{CLI::FormatterBase}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}FormatterBase()}{\string~FormatterBase()}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_formatter_base_ac634fe340a7679a3f4add85c969e4d98} 
+virtual CLI\+::\+Formatter\+Base\+::\texorpdfstring{$\sim$}{\string~}\+Formatter\+Base (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l03199}{3199}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03199\ \{\}\ \textcolor{comment}{//\ NOLINT(modernize-\/use-\/equals-\/default)}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_c_l_i_1_1_formatter_base_acd8c03570a48e5937ab748bf6103ca2d}\index{CLI::FormatterBase@{CLI::FormatterBase}!column\_width@{column\_width}}
+\index{column\_width@{column\_width}!CLI::FormatterBase@{CLI::FormatterBase}}
+\doxysubsubsection{\texorpdfstring{column\_width()}{column\_width()}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_formatter_base_acd8c03570a48e5937ab748bf6103ca2d} 
+void CLI\+::\+Formatter\+Base\+::column\+\_\+width (\begin{DoxyParamCaption}\item[{std\+::size\+\_\+t}]{val}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l03212}{3212}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03212\ \{\ \mbox{\hyperlink{class_c_l_i_1_1_formatter_base_a2427b2199dd9654b050d00c89d764332}{column\_width\_}}\ =\ val;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_c_l_i_1_1_formatter_base_a41e32517e27b98dcf85acfb0fd169c97}\index{CLI::FormatterBase@{CLI::FormatterBase}!get\_column\_width@{get\_column\_width}}
+\index{get\_column\_width@{get\_column\_width}!CLI::FormatterBase@{CLI::FormatterBase}}
+\doxysubsubsection{\texorpdfstring{get\_column\_width()}{get\_column\_width()}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_formatter_base_a41e32517e27b98dcf85acfb0fd169c97} 
+std\+::size\+\_\+t CLI\+::\+Formatter\+Base\+::get\+\_\+column\+\_\+width (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l03227}{3227}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03227\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_c_l_i_1_1_formatter_base_a2427b2199dd9654b050d00c89d764332}{column\_width\_}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_c_l_i_1_1_formatter_base_a7e8f9d7896c599f7befd84a9947d4cab}\index{CLI::FormatterBase@{CLI::FormatterBase}!get\_label@{get\_label}}
+\index{get\_label@{get\_label}!CLI::FormatterBase@{CLI::FormatterBase}}
+\doxysubsubsection{\texorpdfstring{get\_label()}{get\_label()}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_formatter_base_a7e8f9d7896c599f7befd84a9947d4cab} 
+std\+::string CLI\+::\+Formatter\+Base\+::get\+\_\+label (\begin{DoxyParamCaption}\item[{std\+::string}]{key}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l03219}{3219}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03219\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{03220\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{class_c_l_i_1_1_formatter_base_a2ee79421fa339b227d6cb9ca1bce4ad1}{labels\_}}.find(key)\ ==\ \mbox{\hyperlink{class_c_l_i_1_1_formatter_base_a2ee79421fa339b227d6cb9ca1bce4ad1}{labels\_}}.end())}
+\DoxyCodeLine{03221\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubico__otp_8c_a9246c20bb98ad2b4c60313c053c70f08}{key}};}
+\DoxyCodeLine{03222\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{03223\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_c_l_i_1_1_formatter_base_a2ee79421fa339b227d6cb9ca1bce4ad1}{labels\_}}.at(key);}
+\DoxyCodeLine{03224\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_c_l_i_1_1_formatter_base_a7e8f9d7896c599f7befd84a9947d4cab_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_c_l_i_1_1_formatter_base_a73a17d81d04f5ee02a2cab32a59a8551}\index{CLI::FormatterBase@{CLI::FormatterBase}!label@{label}}
+\index{label@{label}!CLI::FormatterBase@{CLI::FormatterBase}}
+\doxysubsubsection{\texorpdfstring{label()}{label()}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_formatter_base_a73a17d81d04f5ee02a2cab32a59a8551} 
+void CLI\+::\+Formatter\+Base\+::label (\begin{DoxyParamCaption}\item[{std\+::string}]{key}{, }\item[{std\+::string}]{val}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l03209}{3209}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03209\ \{\ \mbox{\hyperlink{class_c_l_i_1_1_formatter_base_a2ee79421fa339b227d6cb9ca1bce4ad1}{labels\_}}[\mbox{\hyperlink{yubico__otp_8c_a9246c20bb98ad2b4c60313c053c70f08}{key}}]\ =\ val;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=326pt]{class_c_l_i_1_1_formatter_base_a73a17d81d04f5ee02a2cab32a59a8551_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_c_l_i_1_1_formatter_base_ac8ab93655a645352634709e15087080b}\index{CLI::FormatterBase@{CLI::FormatterBase}!make\_help@{make\_help}}
+\index{make\_help@{make\_help}!CLI::FormatterBase@{CLI::FormatterBase}}
+\doxysubsubsection{\texorpdfstring{make\_help()}{make\_help()}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_formatter_base_ac8ab93655a645352634709e15087080b} 
+virtual std\+::string CLI\+::\+Formatter\+Base\+::make\+\_\+help (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \texorpdfstring{$\ast$}{*}}]{}{, }\item[{std\+::string}]{}{, }\item[{\mbox{\hyperlink{namespace_c_l_i_a97e7d97131e3889f32b721570eca119c}{App\+Format\+Mode}}}]{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{class_c_l_i_1_1_formatter_a838e0f47efa4fbd1b738eedb156887b9}{CLI\+::\+Formatter}}, and \mbox{\hyperlink{class_c_l_i_1_1_formatter_lambda_a5eca71447c56251c67b97187e4a888e6}{CLI\+::\+Formatter\+Lambda}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{class_c_l_i_1_1_formatter_base_a2427b2199dd9654b050d00c89d764332}\index{CLI::FormatterBase@{CLI::FormatterBase}!column\_width\_@{column\_width\_}}
+\index{column\_width\_@{column\_width\_}!CLI::FormatterBase@{CLI::FormatterBase}}
+\doxysubsubsection{\texorpdfstring{column\_width\_}{column\_width\_}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_formatter_base_a2427b2199dd9654b050d00c89d764332} 
+std\+::size\+\_\+t CLI\+::\+Formatter\+Base\+::column\+\_\+width\+\_\+ \{30\}\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l03183}{3183}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03183\ \{30\};}
+
+\end{DoxyCode}
+\Hypertarget{class_c_l_i_1_1_formatter_base_a2ee79421fa339b227d6cb9ca1bce4ad1}\index{CLI::FormatterBase@{CLI::FormatterBase}!labels\_@{labels\_}}
+\index{labels\_@{labels\_}!CLI::FormatterBase@{CLI::FormatterBase}}
+\doxysubsubsection{\texorpdfstring{labels\_}{labels\_}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_formatter_base_a2ee79421fa339b227d6cb9ca1bce4ad1} 
+std\+::map$<$std\+::string, std\+::string$>$ CLI\+::\+Formatter\+Base\+::labels\+\_\+ \{\}\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l03187}{3187}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03187\ \{\};}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+programs/clio/\mbox{\hyperlink{_c_l_i11_8hpp}{CLI11.\+hpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,94 @@
+\doxysection{associative\+\_\+storage.\+cpp}
+\hypertarget{associative__storage_8cpp_source}{}\label{associative__storage_8cpp_source}\index{libraries/fc/vendor/websocketpp/examples/associative\_storage/associative\_storage.cpp@{libraries/fc/vendor/websocketpp/examples/associative\_storage/associative\_storage.cpp}}
+\mbox{\hyperlink{associative__storage_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <iostream>}}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <map>}}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <exception>}}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{asio__no__tls_8hpp}{websocketpp/config/asio\_no\_tls.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{server_8hpp}{websocketpp/server.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00007}\mbox{\hyperlink{associative__storage_8cpp_afc38239e3eef2a4200e324bff14d91d1}{00007}}\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1server}{websocketpp::server<websocketpp::config::asio>}}\ \mbox{\hyperlink{associative__storage_8cpp_afc38239e3eef2a4200e324bff14d91d1}{server}};}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00009}00009\ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{websocketpp::connection\_hdl}};}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00010}00010\ \textcolor{keyword}{using\ }websocketpp::lib::placeholders::\_1;}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00011}00011\ \textcolor{keyword}{using\ }websocketpp::lib::placeholders::\_2;}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00012}00012\ \textcolor{keyword}{using\ }websocketpp::lib::bind;}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00014}\mbox{\hyperlink{structconnection__data}{00014}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structconnection__data}{connection\_data}}\ \{}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00015}\mbox{\hyperlink{structconnection__data_aaa7435f644ad456b84123dedd50a2faa}{00015}}\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{structconnection__data_aaa7435f644ad456b84123dedd50a2faa}{sessionid}};}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00016}\mbox{\hyperlink{structconnection__data_aef2f7b97910903dd40bfdf58adb3e9e9}{00016}}\ \ \ \ \ std::string\ \mbox{\hyperlink{structconnection__data_aef2f7b97910903dd40bfdf58adb3e9e9}{name}};}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00017}00017\ \};}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00019}\mbox{\hyperlink{classprint__server}{00019}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classprint__server}{print\_server}}\ \{}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00020}00020\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00021}\mbox{\hyperlink{classprint__server_ab1b7c0e33a8466b329b8fc56af302ff0}{00021}}\ \ \ \ \ \mbox{\hyperlink{classprint__server_ab1b7c0e33a8466b329b8fc56af302ff0}{print\_server}}()\ :\ m\_next\_sessionid(1)\ \{}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00022}00022\ \ \ \ \ \ \ \ \ m\_server.init\_asio();}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00024}00024\ \ \ \ \ \ \ \ \ m\_server.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a5753d9848aefc04ee91da401c0cc65b8}{set\_open\_handler}}(bind(\&\mbox{\hyperlink{classprint__server_adc26c2f38649bdbbe97531dde369ad74}{print\_server::on\_open}},\textcolor{keyword}{this},::\_1));}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00025}00025\ \ \ \ \ \ \ \ \ m\_server.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a8d7d95bebc154879655211e2b0b5e069}{set\_close\_handler}}(bind(\&\mbox{\hyperlink{classprint__server_abb31736075d42768a36f1d953866b1c6}{print\_server::on\_close}},\textcolor{keyword}{this},::\_1));}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00026}00026\ \ \ \ \ \ \ \ \ m\_server.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a34a3a8351bff65ba878975be471cab85}{set\_message\_handler}}(bind(\&\mbox{\hyperlink{classprint__server_a08d4b374fa69846cb78ecf54b40cfd70}{print\_server::on\_message}},\textcolor{keyword}{this},::\_1,::\_2));}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00027}00027\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00029}\mbox{\hyperlink{classprint__server_adc26c2f38649bdbbe97531dde369ad74}{00029}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classprint__server_adc26c2f38649bdbbe97531dde369ad74}{on\_open}}(\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\_hdl}}\ hdl)\ \{}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00030}00030\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structconnection__data}{connection\_data}}\ data;}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00032}00032\ \ \ \ \ \ \ \ \ data.\mbox{\hyperlink{structconnection__data_aaa7435f644ad456b84123dedd50a2faa}{sessionid}}\ =\ m\_next\_sessionid++;}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00033}00033\ \ \ \ \ \ \ \ \ data.name.clear();}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00035}00035\ \ \ \ \ \ \ \ \ m\_connections[hdl]\ =\ data;}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00036}00036\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00038}\mbox{\hyperlink{classprint__server_abb31736075d42768a36f1d953866b1c6}{00038}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classprint__server_abb31736075d42768a36f1d953866b1c6}{on\_close}}(\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\_hdl}}\ hdl)\ \{}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00039}00039\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structconnection__data}{connection\_data}}\&\ data\ =\ \mbox{\hyperlink{classprint__server_a401dd533514c3d75134f63364d4e6c37}{get\_data\_from\_hdl}}(hdl);}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00041}00041\ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}Closing\ connection\ "{}}\ <<\ data.name}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00042}00042\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\ with\ sessionid\ "{}}\ <<\ data.sessionid\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00044}00044\ \ \ \ \ \ \ \ \ m\_connections.erase(hdl);}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00045}00045\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00047}\mbox{\hyperlink{classprint__server_a08d4b374fa69846cb78ecf54b40cfd70}{00047}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classprint__server_a08d4b374fa69846cb78ecf54b40cfd70}{on\_message}}(\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\_hdl}}\ hdl,\ \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a8097edab4feb0c36a69601c3786f0062}{server::message\_ptr}}\ msg)\ \{}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structconnection__data}{connection\_data}}\&\ data\ =\ \mbox{\hyperlink{classprint__server_a401dd533514c3d75134f63364d4e6c37}{get\_data\_from\_hdl}}(hdl);}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00050}00050\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (data.name.empty())\ \{}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00051}00051\ \ \ \ \ \ \ \ \ \ \ \ \ data.name\ =\ msg-\/>get\_payload();}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}Setting\ name\ of\ connection\ with\ sessionid\ "{}}}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ data.sessionid\ <<\ \textcolor{stringliteral}{"{}\ to\ "{}}\ <<\ data.name\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00054}00054\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}Got\ a\ message\ from\ connection\ "{}}\ <<\ data.name}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\ with\ sessionid\ "{}}\ <<\ data.sessionid\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00057}00057\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00058}00058\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00060}\mbox{\hyperlink{classprint__server_a401dd533514c3d75134f63364d4e6c37}{00060}}\ \ \ \ \ \mbox{\hyperlink{structconnection__data}{connection\_data}}\&\ \mbox{\hyperlink{classprint__server_a401dd533514c3d75134f63364d4e6c37}{get\_data\_from\_hdl}}(\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\_hdl}}\ hdl)\ \{}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00061}00061\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ it\ =\ m\_connections.find(hdl);}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00062}00062\ }
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00063}00063\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (it\ ==\ m\_connections.end())\ \{}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00064}00064\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ this\ connection\ is\ not\ in\ the\ list.\ This\ really\ shouldn't\ happen}}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00065}00065\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ and\ probably\ means\ something\ else\ is\ wrong.}}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00066}00066\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::invalid\_argument(\textcolor{stringliteral}{"{}No\ data\ available\ for\ session"{}});}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00067}00067\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00069}00069\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ it-\/>second;}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00070}00070\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00072}\mbox{\hyperlink{classprint__server_a724db97a6c441b5db090f6274c6112d8}{00072}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classprint__server_a724db97a6c441b5db090f6274c6112d8}{run}}(\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ port)\ \{}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00073}00073\ \ \ \ \ \ \ \ \ m\_server.listen(port);}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00074}00074\ \ \ \ \ \ \ \ \ m\_server.\mbox{\hyperlink{classwebsocketpp_1_1server_a0204a7d444144f7ea5b8bbcf14689fc1}{start\_accept}}();}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00075}00075\ \ \ \ \ \ \ \ \ m\_server.run();}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00076}00076\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00077}00077\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00078}00078\ \ \ \ \ \textcolor{keyword}{typedef}\ std::map<connection\_hdl,connection\_data,std::owner\_less<connection\_hdl>>\ con\_list;}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00080}00080\ \ \ \ \ \textcolor{keywordtype}{int}\ m\_next\_sessionid;}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00081}00081\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1server}{server}}\ m\_server;}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00082}00082\ \ \ \ \ con\_list\ m\_connections;}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00083}00083\ \};}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00084}00084\ }
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00085}\mbox{\hyperlink{associative__storage_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{00085}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{associative__storage_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}()\ \{}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00086}00086\ \ \ \ \ \mbox{\hyperlink{classprint__server}{print\_server}}\ \mbox{\hyperlink{associative__storage_8cpp_afc38239e3eef2a4200e324bff14d91d1}{server}};}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00087}00087\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1server}{server}}.run(9002);}
+\DoxyCodeLine{\Hypertarget{associative__storage_8cpp_source_l00088}00088\ \}}
+
+\end{DoxyCode}

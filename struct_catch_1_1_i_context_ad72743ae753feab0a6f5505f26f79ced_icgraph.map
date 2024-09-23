@@ -1,0 +1,11 @@
+<map id="Catch::IContext::getConfig" name="Catch::IContext::getConfig">
+<area shape="rect" id="Node000001" title=" " alt="" coords="447,42,625,68"/>
+<area shape="rect" id="Node000002" href="$class_catch_1_1_assertion_handler.html#a193bb3999494c46457f3059184c6b251" title=" " alt="" coords="235,5,399,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="431,44,399,39,400,34,432,38"/>
+<area shape="rect" id="Node000003" href="$namespace_catch.html#acf5ea05e942d2d7fe79111e12754ed76" title=" " alt="" coords="261,70,373,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="432,71,374,79,373,73,432,66"/>
+<area shape="rect" id="Node000004" href="$class_catch_1_1_generators_1_1_random_floating_generator.html#abce275ce88f7c3465addd7a98b6c408d" title=" " alt="" coords="5,15,187,71"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="245,73,187,62,188,57,246,68"/>
+<area shape="rect" id="Node000005" href="$class_catch_1_1_generators_1_1_random_integer_generator.html#a886d16c899ad70781b83a0e8f9d2cf96" title=" " alt="" coords="8,95,184,151"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="246,98,185,110,184,104,245,93"/>
+</map>

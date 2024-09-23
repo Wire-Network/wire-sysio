@@ -1,0 +1,7 @@
+<map id="host_def" name="host_def">
+<area shape="rect" id="Node000001" title=" " alt="" coords="55,184,126,210"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,59,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="32,46,33,101,38,131,49,159,59,171,71,182,68,186,55,175,45,161,33,132,27,101,26,46"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="82,5,216,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="150,47,142,101,134,132,122,161,105,185,101,182,118,159,129,130,137,100,145,46"/>
+</map>

@@ -1,0 +1,57 @@
+\doxysection{libraries/fc/src/network/http/http\+\_\+client.cpp File Reference}
+\hypertarget{http__client_8cpp}{}\label{http__client_8cpp}\index{libraries/fc/src/network/http/http\_client.cpp@{libraries/fc/src/network/http/http\_client.cpp}}
+{\ttfamily \#include $<$fc/network/http/http\+\_\+client.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/io/json.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/scoped\+\_\+exit.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/static\+\_\+variant.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/beast/core.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/beast/http.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/beast/version.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/asio/connect.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/asio/ip/tcp.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/asio/ssl/error.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/asio/ssl/stream.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/asio/local/stream\+\_\+protocol.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/asio/ssl/rfc2818\+\_\+verification.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/filesystem.\+hpp$>$}\newline
+Include dependency graph for http\+\_\+client.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{http__client_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classfc_1_1http__client__impl}{fc\+::http\+\_\+client\+\_\+impl}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1http__client__impl_1_1check__closed__visitor}{fc\+::http\+\_\+client\+\_\+impl\+::check\+\_\+closed\+\_\+visitor}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1http__client__impl_1_1write__request__visitor}{fc\+::http\+\_\+client\+\_\+impl\+::write\+\_\+request\+\_\+visitor}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1http__client__impl_1_1read__response__visitor}{fc\+::http\+\_\+client\+\_\+impl\+::read\+\_\+response\+\_\+visitor}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacefc}{fc}}
+\begin{DoxyCompactList}\small\item\em namespace \doxylink{namespacesysio_1_1chain}{sysio\+::chain} \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{http__client_8cpp_a2671c4a124c39d4d993506b36d8c59b6}{tcp}} = boost\+::asio\+::ip\+::tcp
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{http__client_8cpp_a2671c4a124c39d4d993506b36d8c59b6}\index{http\_client.cpp@{http\_client.cpp}!tcp@{tcp}}
+\index{tcp@{tcp}!http\_client.cpp@{http\_client.cpp}}
+\doxysubsubsection{\texorpdfstring{tcp}{tcp}}
+{\footnotesize\ttfamily \label{http__client_8cpp_a2671c4a124c39d4d993506b36d8c59b6} 
+typedef boost\+::asio\+::ip\+::tcp \mbox{\hyperlink{http__client_8cpp_a2671c4a124c39d4d993506b36d8c59b6}{tcp}} = boost\+::asio\+::ip\+::tcp}
+
+
+
+Definition at line \mbox{\hyperlink{http__client_8cpp_source_l00017}{17}} of file \mbox{\hyperlink{http__client_8cpp_source}{http\+\_\+client.\+cpp}}.
+

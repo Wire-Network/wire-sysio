@@ -1,0 +1,9 @@
+<map id="fc::logger::impl" name="fc::logger::impl">
+<area shape="rect" id="Node000001" title=" " alt="" coords="66,94,174,120"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,59,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="51,42,74,68,103,91,100,96,70,72,47,45"/>
+<area shape="rect" id="Node000003" href="$classfc_1_1logger.html" title=" " alt="" coords="82,5,158,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="123,47,123,94,117,94,117,47"/>
+<area shape="rect" id="Node000004" href="$classfc_1_1log__level.html" title=" " alt="" coords="182,5,274,31"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="206,44,174,72,140,96,137,91,170,68,203,40"/>
+</map>

@@ -1,0 +1,185 @@
+\doxysection{sysio\+::chain\+::shared\+\_\+key\+\_\+weight Struct Reference}
+\hypertarget{structsysio_1_1chain_1_1shared__key__weight}{}\label{structsysio_1_1chain_1_1shared__key__weight}\index{sysio::chain::shared\_key\_weight@{sysio::chain::shared\_key\_weight}}
+
+
+{\ttfamily \#include $<$authority.\+hpp$>$}
+
+
+
+Collaboration diagram for sysio\+::chain\+::shared\+\_\+key\+\_\+weight\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=184pt]{structsysio_1_1chain_1_1shared__key__weight__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1shared__key__weight_af5fcdd17aa1699c16c74db3f084dedaa}{shared\+\_\+key\+\_\+weight}} (\mbox{\hyperlink{namespacesysio_1_1chain_a186845b86d74b8ffea78104b254e36a4}{shared\+\_\+public\+\_\+key\+\_\+data}} \&\&k, const \mbox{\hyperlink{namespacesysio_1_1chain_abb0a383cca5adde7807bbcc3c48840d4}{weight\+\_\+type}} \&w)
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1shared__key__weight_a7621c04381b2f75d32c91947da7c30dd}{operator key\+\_\+weight}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static \mbox{\hyperlink{structsysio_1_1chain_1_1shared__key__weight}{shared\+\_\+key\+\_\+weight}} \mbox{\hyperlink{structsysio_1_1chain_1_1shared__key__weight_ad81ba46caa598caba8c68b015f217b2f}{convert}} (\mbox{\hyperlink{namespacechainbase_add7d4cf66ab3f2808fe613e6b0343b89}{chainbase\+::allocator}}$<$ char $>$ \mbox{\hyperlink{namespacechainbase_add7d4cf66ab3f2808fe613e6b0343b89}{allocator}}, const \mbox{\hyperlink{structsysio_1_1chain_1_1key__weight}{key\+\_\+weight}} \&k)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1shared__public__key}{shared\+\_\+public\+\_\+key}} \mbox{\hyperlink{structsysio_1_1chain_1_1shared__key__weight_a716d52f7e1d2761d0ea52912cecabdc3}{key}}
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_abb0a383cca5adde7807bbcc3c48840d4}{weight\+\_\+type}} \mbox{\hyperlink{structsysio_1_1chain_1_1shared__key__weight_a6d71327829e14f84ab59fbc4b93189a2}{weight}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{structsysio_1_1chain_1_1shared__key__weight_ac184a2e9624a616569a69fc5d60e9f6e}{operator==}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1shared__key__weight}{shared\+\_\+key\+\_\+weight}} \&lhs, const \mbox{\hyperlink{structsysio_1_1chain_1_1shared__key__weight}{shared\+\_\+key\+\_\+weight}} \&rhs)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{authority_8hpp_source_l00105}{105}} of file \mbox{\hyperlink{authority_8hpp_source}{authority.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structsysio_1_1chain_1_1shared__key__weight_af5fcdd17aa1699c16c74db3f084dedaa}\index{sysio::chain::shared\_key\_weight@{sysio::chain::shared\_key\_weight}!shared\_key\_weight@{shared\_key\_weight}}
+\index{shared\_key\_weight@{shared\_key\_weight}!sysio::chain::shared\_key\_weight@{sysio::chain::shared\_key\_weight}}
+\doxysubsubsection{\texorpdfstring{shared\_key\_weight()}{shared\_key\_weight()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1shared__key__weight_af5fcdd17aa1699c16c74db3f084dedaa} 
+sysio\+::chain\+::shared\+\_\+key\+\_\+weight\+::shared\+\_\+key\+\_\+weight (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacesysio_1_1chain_a186845b86d74b8ffea78104b254e36a4}{shared\+\_\+public\+\_\+key\+\_\+data}} \&\&}]{k}{, }\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_abb0a383cca5adde7807bbcc3c48840d4}{weight\+\_\+type}} \&}]{w}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{authority_8hpp_source_l00106}{106}} of file \mbox{\hyperlink{authority_8hpp_source}{authority.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1shared__key__weight_a716d52f7e1d2761d0ea52912cecabdc3}{key}}(std::move(k)),\ \mbox{\hyperlink{structsysio_1_1chain_1_1shared__key__weight_a6d71327829e14f84ab59fbc4b93189a2}{weight}}(w)\ \{\}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1shared__key__weight_af5fcdd17aa1699c16c74db3f084dedaa_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1chain_1_1shared__key__weight_ad81ba46caa598caba8c68b015f217b2f}\index{sysio::chain::shared\_key\_weight@{sysio::chain::shared\_key\_weight}!convert@{convert}}
+\index{convert@{convert}!sysio::chain::shared\_key\_weight@{sysio::chain::shared\_key\_weight}}
+\doxysubsubsection{\texorpdfstring{convert()}{convert()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1shared__key__weight_ad81ba46caa598caba8c68b015f217b2f} 
+static \mbox{\hyperlink{structsysio_1_1chain_1_1shared__key__weight}{shared\+\_\+key\+\_\+weight}} sysio\+::chain\+::shared\+\_\+key\+\_\+weight\+::convert (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacechainbase_add7d4cf66ab3f2808fe613e6b0343b89}{chainbase\+::allocator}}$<$ char $>$}]{allocator}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1key__weight}{key\+\_\+weight}} \&}]{k}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{authority_8hpp_source_l00113}{113}} of file \mbox{\hyperlink{authority_8hpp_source}{authority.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::visit(\mbox{\hyperlink{namespacesysio_1_1chain_ae5470abf94d0fdeff7866fda992ba844}{overloaded}}\ \{}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ [\&](\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ k1r1em)\ \{}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1chain_1_1shared__key__weight_af5fcdd17aa1699c16c74db3f084dedaa}{shared\_key\_weight}}(k1r1em,\ k.weight);}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ [\&](\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1crypto_1_1webauthn_1_1public__key}{fc::crypto::webauthn::public\_key}}\&\ \mbox{\hyperlink{allow__code__after__function__end__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}})\ \{}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ psz\ =\ \mbox{\hyperlink{namespacefc_1_1raw_a64937a5adc8041247f7007882224e225}{fc::raw::pack\_size}}(\mbox{\hyperlink{allow__code__after__function__end__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_a91a8c75d36e75e33f8a9ed2a3e724893}{shared\_string}}\ wa\_ss(std::move(\mbox{\hyperlink{namespacechainbase_add7d4cf66ab3f2808fe613e6b0343b89}{allocator}}));}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \ \ \ \ wa\_ss.resize\_and\_fill(\ psz,\ [\&\mbox{\hyperlink{allow__code__after__function__end__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}](\ \textcolor{keywordtype}{char}*\ data,\ std::size\_t\ sz\ )\ \{}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1datastream}{fc::datastream<char*>}}\ \mbox{\hyperlink{namespace_xbyak_1_1util_a4b2aef26182d21706896022467868f7c}{ds}}(data,\ sz);}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(ds,\ \mbox{\hyperlink{allow__code__after__function__end__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00125\ }
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1chain_1_1shared__key__weight_af5fcdd17aa1699c16c74db3f084dedaa}{shared\_key\_weight}}(std::move(wa\_ss),\ k.weight);}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \},\ k.key.\_storage);}
+\DoxyCodeLine{00129\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1shared__key__weight_ad81ba46caa598caba8c68b015f217b2f_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=336pt]{structsysio_1_1chain_1_1shared__key__weight_ad81ba46caa598caba8c68b015f217b2f_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1shared__key__weight_a7621c04381b2f75d32c91947da7c30dd}\index{sysio::chain::shared\_key\_weight@{sysio::chain::shared\_key\_weight}!operator key\_weight@{operator key\_weight}}
+\index{operator key\_weight@{operator key\_weight}!sysio::chain::shared\_key\_weight@{sysio::chain::shared\_key\_weight}}
+\doxysubsubsection{\texorpdfstring{operator key\_weight()}{operator key\_weight()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1shared__key__weight_a7621c04381b2f75d32c91947da7c30dd} 
+sysio\+::chain\+::shared\+\_\+key\+\_\+weight\+::operator \mbox{\hyperlink{structsysio_1_1chain_1_1key__weight}{key\+\_\+weight}} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{authority_8hpp_source_l00109}{109}} of file \mbox{\hyperlink{authority_8hpp_source}{authority.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ key\_weight\{\mbox{\hyperlink{structsysio_1_1chain_1_1shared__key__weight_a716d52f7e1d2761d0ea52912cecabdc3}{key}},\ \mbox{\hyperlink{structsysio_1_1chain_1_1shared__key__weight_a6d71327829e14f84ab59fbc4b93189a2}{weight}}\};}
+\DoxyCodeLine{00111\ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{structsysio_1_1chain_1_1shared__key__weight_ac184a2e9624a616569a69fc5d60e9f6e}\index{sysio::chain::shared\_key\_weight@{sysio::chain::shared\_key\_weight}!operator==@{operator==}}
+\index{operator==@{operator==}!sysio::chain::shared\_key\_weight@{sysio::chain::shared\_key\_weight}}
+\doxysubsubsection{\texorpdfstring{operator==}{operator==}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1shared__key__weight_ac184a2e9624a616569a69fc5d60e9f6e} 
+bool operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1shared__key__weight}{shared\+\_\+key\+\_\+weight}} \&}]{lhs}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1shared__key__weight}{shared\+\_\+key\+\_\+weight}} \&}]{rhs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{authority_8hpp_source_l00134}{134}} of file \mbox{\hyperlink{authority_8hpp_source}{authority.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ tie(\ lhs.key,\ lhs.weight\ )\ ==\ tie(\ rhs.key,\ rhs.weight\ );}
+\DoxyCodeLine{00136\ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1chain_1_1shared__key__weight_a716d52f7e1d2761d0ea52912cecabdc3}\index{sysio::chain::shared\_key\_weight@{sysio::chain::shared\_key\_weight}!key@{key}}
+\index{key@{key}!sysio::chain::shared\_key\_weight@{sysio::chain::shared\_key\_weight}}
+\doxysubsubsection{\texorpdfstring{key}{key}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1shared__key__weight_a716d52f7e1d2761d0ea52912cecabdc3} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1shared__public__key}{shared\+\_\+public\+\_\+key}} sysio\+::chain\+::shared\+\_\+key\+\_\+weight\+::key}
+
+
+
+Definition at line \mbox{\hyperlink{authority_8hpp_source_l00131}{131}} of file \mbox{\hyperlink{authority_8hpp_source}{authority.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1shared__key__weight_a6d71327829e14f84ab59fbc4b93189a2}\index{sysio::chain::shared\_key\_weight@{sysio::chain::shared\_key\_weight}!weight@{weight}}
+\index{weight@{weight}!sysio::chain::shared\_key\_weight@{sysio::chain::shared\_key\_weight}}
+\doxysubsubsection{\texorpdfstring{weight}{weight}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1shared__key__weight_a6d71327829e14f84ab59fbc4b93189a2} 
+\mbox{\hyperlink{namespacesysio_1_1chain_abb0a383cca5adde7807bbcc3c48840d4}{weight\+\_\+type}} sysio\+::chain\+::shared\+\_\+key\+\_\+weight\+::weight}
+
+
+
+Definition at line \mbox{\hyperlink{authority_8hpp_source_l00132}{132}} of file \mbox{\hyperlink{authority_8hpp_source}{authority.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{authority_8hpp}{authority.\+hpp}}\end{DoxyCompactItemize}

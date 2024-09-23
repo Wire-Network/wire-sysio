@@ -1,0 +1,15 @@
+\doxysection{appveyor\+Merge\+Coverage\+Script.\+py}
+\hypertarget{appveyor_merge_coverage_script_8py_source}{}\label{appveyor_merge_coverage_script_8py_source}\index{libraries/sys-\/vm/external/Catch2/misc/appveyorMergeCoverageScript.py@{libraries/sys-\/vm/external/Catch2/misc/appveyorMergeCoverageScript.py}}
+\mbox{\hyperlink{appveyor_merge_coverage_script_8py}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{appveyor_merge_coverage_script_8py_source_l00001}\mbox{\hyperlink{namespaceappveyor_merge_coverage_script}{00001}}\ \textcolor{comment}{\#!/usr/bin/env\ python2}}
+\DoxyCodeLine{\Hypertarget{appveyor_merge_coverage_script_8py_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{appveyor_merge_coverage_script_8py_source_l00003}00003\ \textcolor{keyword}{import}\ glob}
+\DoxyCodeLine{\Hypertarget{appveyor_merge_coverage_script_8py_source_l00004}00004\ \textcolor{keyword}{import}\ subprocess}
+\DoxyCodeLine{\Hypertarget{appveyor_merge_coverage_script_8py_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{appveyor_merge_coverage_script_8py_source_l00006}00006\ \textcolor{keywordflow}{if}\ \_\_name\_\_\ ==\ \textcolor{stringliteral}{'\_\_main\_\_'}:}
+\DoxyCodeLine{\Hypertarget{appveyor_merge_coverage_script_8py_source_l00007}\mbox{\hyperlink{namespaceappveyor_merge_coverage_script_a6cc767eb7353e3b5b5de61f15330fc16}{00007}}\ \ \ \ \ cov\_files\ =\ list(glob.glob(\textcolor{stringliteral}{'cov-\/report*.bin'}))}
+\DoxyCodeLine{\Hypertarget{appveyor_merge_coverage_script_8py_source_l00008}\mbox{\hyperlink{namespaceappveyor_merge_coverage_script_a6dcf95f6e6102800c60c5adcd86c54d5}{00008}}\ \ \ \ \ base\_cmd\ =\ [\textcolor{stringliteral}{'OpenCppCoverage'},\ \textcolor{stringliteral}{'-\/-\/quiet'},\ \textcolor{stringliteral}{'-\/-\/export\_type=cobertura:cobertura.xml'}]\ +\ [\textcolor{stringliteral}{'-\/-\/input\_coverage=\{\}'}.\mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}(f)\ \textcolor{keywordflow}{for}\ f\ \textcolor{keywordflow}{in}\ cov\_files]}
+\DoxyCodeLine{\Hypertarget{appveyor_merge_coverage_script_8py_source_l00009}00009\ \ \ \ \ subprocess.call(base\_cmd)}
+
+\end{DoxyCode}

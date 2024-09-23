@@ -1,0 +1,183 @@
+\doxysection{variant\+\_\+snapshot\+\_\+suite Struct Reference}
+\hypertarget{structvariant__snapshot__suite}{}\label{structvariant__snapshot__suite}\index{variant\_snapshot\_suite@{variant\_snapshot\_suite}}
+
+
+{\ttfamily \#include $<$snapshot\+\_\+suites.\+hpp$>$}
+
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structvariant__snapshot__suite_1_1reader}{reader}}
+\item 
+struct \mbox{\hyperlink{structvariant__snapshot__suite_1_1writer}{writer}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{structvariant__snapshot__suite_a0e45d60f1d314842730ae9b307c92dbc}{writer\+\_\+t}} = \mbox{\hyperlink{classsysio_1_1chain_1_1variant__snapshot__writer}{variant\+\_\+snapshot\+\_\+writer}}
+\item 
+using \mbox{\hyperlink{structvariant__snapshot__suite_a8278f173018017eb182e0e6e6356a0bb}{reader\+\_\+t}} = \mbox{\hyperlink{classsysio_1_1chain_1_1variant__snapshot__reader}{variant\+\_\+snapshot\+\_\+reader}}
+\item 
+using \mbox{\hyperlink{structvariant__snapshot__suite_acf1c55eb9b225aff216fbbfa03957903}{write\+\_\+storage\+\_\+t}} = \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc\+::mutable\+\_\+variant\+\_\+object}}
+\item 
+using \mbox{\hyperlink{structvariant__snapshot__suite_a778386700a73202cc14ffa518880ce75}{snapshot\+\_\+t}} = \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static auto \mbox{\hyperlink{structvariant__snapshot__suite_acbd5842584ce20bc4df8e2929efa513b}{get\+\_\+writer}} ()
+\item 
+static auto \mbox{\hyperlink{structvariant__snapshot__suite_adcca0a8b4a811f07d2dad9b309801c93}{finalize}} (const std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{structvariant__snapshot__suite_1_1writer}{writer}} $>$ \&w)
+\item 
+static auto \mbox{\hyperlink{structvariant__snapshot__suite_acfb886a65f8214a643997977200ffc94}{get\+\_\+reader}} (const \mbox{\hyperlink{structvariant__snapshot__suite_a778386700a73202cc14ffa518880ce75}{snapshot\+\_\+t}} \&buffer)
+\item 
+static \mbox{\hyperlink{structvariant__snapshot__suite_a778386700a73202cc14ffa518880ce75}{snapshot\+\_\+t}} \mbox{\hyperlink{structvariant__snapshot__suite_a5a0e33d4fa452671bcde330acd28fa72}{load\+\_\+from\+\_\+file}} (const std\+::string \&filename)
+\item 
+static void \mbox{\hyperlink{structvariant__snapshot__suite_a2e95f260be9da09f6b324eb596170407}{write\+\_\+to\+\_\+file}} (const std\+::string \&basename, const \mbox{\hyperlink{structvariant__snapshot__suite_a778386700a73202cc14ffa518880ce75}{snapshot\+\_\+t}} \&snapshot)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{snapshot__suites_8hpp_source_l00009}{9}} of file \mbox{\hyperlink{snapshot__suites_8hpp_source}{snapshot\+\_\+suites.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{structvariant__snapshot__suite_a8278f173018017eb182e0e6e6356a0bb}\index{variant\_snapshot\_suite@{variant\_snapshot\_suite}!reader\_t@{reader\_t}}
+\index{reader\_t@{reader\_t}!variant\_snapshot\_suite@{variant\_snapshot\_suite}}
+\doxysubsubsection{\texorpdfstring{reader\_t}{reader\_t}}
+{\footnotesize\ttfamily \label{structvariant__snapshot__suite_a8278f173018017eb182e0e6e6356a0bb} 
+using \mbox{\hyperlink{structvariant__snapshot__suite_a8278f173018017eb182e0e6e6356a0bb}{variant\+\_\+snapshot\+\_\+suite\+::reader\+\_\+t}} = \mbox{\hyperlink{classsysio_1_1chain_1_1variant__snapshot__reader}{variant\+\_\+snapshot\+\_\+reader}}}
+
+
+
+Definition at line \mbox{\hyperlink{snapshot__suites_8hpp_source_l00011}{11}} of file \mbox{\hyperlink{snapshot__suites_8hpp_source}{snapshot\+\_\+suites.\+hpp}}.
+
+\Hypertarget{structvariant__snapshot__suite_a778386700a73202cc14ffa518880ce75}\index{variant\_snapshot\_suite@{variant\_snapshot\_suite}!snapshot\_t@{snapshot\_t}}
+\index{snapshot\_t@{snapshot\_t}!variant\_snapshot\_suite@{variant\_snapshot\_suite}}
+\doxysubsubsection{\texorpdfstring{snapshot\_t}{snapshot\_t}}
+{\footnotesize\ttfamily \label{structvariant__snapshot__suite_a778386700a73202cc14ffa518880ce75} 
+using \mbox{\hyperlink{structvariant__snapshot__suite_a778386700a73202cc14ffa518880ce75}{variant\+\_\+snapshot\+\_\+suite\+::snapshot\+\_\+t}} = \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}}}
+
+
+
+Definition at line \mbox{\hyperlink{snapshot__suites_8hpp_source_l00013}{13}} of file \mbox{\hyperlink{snapshot__suites_8hpp_source}{snapshot\+\_\+suites.\+hpp}}.
+
+\Hypertarget{structvariant__snapshot__suite_acf1c55eb9b225aff216fbbfa03957903}\index{variant\_snapshot\_suite@{variant\_snapshot\_suite}!write\_storage\_t@{write\_storage\_t}}
+\index{write\_storage\_t@{write\_storage\_t}!variant\_snapshot\_suite@{variant\_snapshot\_suite}}
+\doxysubsubsection{\texorpdfstring{write\_storage\_t}{write\_storage\_t}}
+{\footnotesize\ttfamily \label{structvariant__snapshot__suite_acf1c55eb9b225aff216fbbfa03957903} 
+using \mbox{\hyperlink{structvariant__snapshot__suite_acf1c55eb9b225aff216fbbfa03957903}{variant\+\_\+snapshot\+\_\+suite\+::write\+\_\+storage\+\_\+t}} = \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc\+::mutable\+\_\+variant\+\_\+object}}}
+
+
+
+Definition at line \mbox{\hyperlink{snapshot__suites_8hpp_source_l00012}{12}} of file \mbox{\hyperlink{snapshot__suites_8hpp_source}{snapshot\+\_\+suites.\+hpp}}.
+
+\Hypertarget{structvariant__snapshot__suite_a0e45d60f1d314842730ae9b307c92dbc}\index{variant\_snapshot\_suite@{variant\_snapshot\_suite}!writer\_t@{writer\_t}}
+\index{writer\_t@{writer\_t}!variant\_snapshot\_suite@{variant\_snapshot\_suite}}
+\doxysubsubsection{\texorpdfstring{writer\_t}{writer\_t}}
+{\footnotesize\ttfamily \label{structvariant__snapshot__suite_a0e45d60f1d314842730ae9b307c92dbc} 
+using \mbox{\hyperlink{structvariant__snapshot__suite_a0e45d60f1d314842730ae9b307c92dbc}{variant\+\_\+snapshot\+\_\+suite\+::writer\+\_\+t}} = \mbox{\hyperlink{classsysio_1_1chain_1_1variant__snapshot__writer}{variant\+\_\+snapshot\+\_\+writer}}}
+
+
+
+Definition at line \mbox{\hyperlink{snapshot__suites_8hpp_source_l00010}{10}} of file \mbox{\hyperlink{snapshot__suites_8hpp_source}{snapshot\+\_\+suites.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structvariant__snapshot__suite_adcca0a8b4a811f07d2dad9b309801c93}\index{variant\_snapshot\_suite@{variant\_snapshot\_suite}!finalize@{finalize}}
+\index{finalize@{finalize}!variant\_snapshot\_suite@{variant\_snapshot\_suite}}
+\doxysubsubsection{\texorpdfstring{finalize()}{finalize()}}
+{\footnotesize\ttfamily \label{structvariant__snapshot__suite_adcca0a8b4a811f07d2dad9b309801c93} 
+static auto variant\+\_\+snapshot\+\_\+suite\+::finalize (\begin{DoxyParamCaption}\item[{const std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{structvariant__snapshot__suite_1_1writer}{writer}} $>$ \&}]{w}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{snapshot__suites_8hpp_source_l00037}{37}} of file \mbox{\hyperlink{snapshot__suites_8hpp_source}{snapshot\+\_\+suites.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ w-\/>finalize();}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structvariant__snapshot__suite_a778386700a73202cc14ffa518880ce75}{snapshot\_t}}(*w-\/>storage);}
+\DoxyCodeLine{00040\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structvariant__snapshot__suite_acfb886a65f8214a643997977200ffc94}\index{variant\_snapshot\_suite@{variant\_snapshot\_suite}!get\_reader@{get\_reader}}
+\index{get\_reader@{get\_reader}!variant\_snapshot\_suite@{variant\_snapshot\_suite}}
+\doxysubsubsection{\texorpdfstring{get\_reader()}{get\_reader()}}
+{\footnotesize\ttfamily \label{structvariant__snapshot__suite_acfb886a65f8214a643997977200ffc94} 
+static auto variant\+\_\+snapshot\+\_\+suite\+::get\+\_\+reader (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structvariant__snapshot__suite_a778386700a73202cc14ffa518880ce75}{snapshot\+\_\+t}} \&}]{buffer}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{snapshot__suites_8hpp_source_l00042}{42}} of file \mbox{\hyperlink{snapshot__suites_8hpp_source}{snapshot\+\_\+suites.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::make\_shared<reader>(buffer);}
+\DoxyCodeLine{00044\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structvariant__snapshot__suite_acbd5842584ce20bc4df8e2929efa513b}\index{variant\_snapshot\_suite@{variant\_snapshot\_suite}!get\_writer@{get\_writer}}
+\index{get\_writer@{get\_writer}!variant\_snapshot\_suite@{variant\_snapshot\_suite}}
+\doxysubsubsection{\texorpdfstring{get\_writer()}{get\_writer()}}
+{\footnotesize\ttfamily \label{structvariant__snapshot__suite_acbd5842584ce20bc4df8e2929efa513b} 
+static auto variant\+\_\+snapshot\+\_\+suite\+::get\+\_\+writer (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{snapshot__suites_8hpp_source_l00033}{33}} of file \mbox{\hyperlink{snapshot__suites_8hpp_source}{snapshot\+\_\+suites.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::make\_shared<writer>(std::make\_shared<write\_storage\_t>());}
+\DoxyCodeLine{00035\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structvariant__snapshot__suite_a5a0e33d4fa452671bcde330acd28fa72}\index{variant\_snapshot\_suite@{variant\_snapshot\_suite}!load\_from\_file@{load\_from\_file}}
+\index{load\_from\_file@{load\_from\_file}!variant\_snapshot\_suite@{variant\_snapshot\_suite}}
+\doxysubsubsection{\texorpdfstring{load\_from\_file()}{load\_from\_file()}}
+{\footnotesize\ttfamily \label{structvariant__snapshot__suite_a5a0e33d4fa452671bcde330acd28fa72} 
+static \mbox{\hyperlink{structvariant__snapshot__suite_a778386700a73202cc14ffa518880ce75}{snapshot\+\_\+t}} variant\+\_\+snapshot\+\_\+suite\+::load\+\_\+from\+\_\+file (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{filename}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{snapshot__suites_8hpp_source_l00046}{46}} of file \mbox{\hyperlink{snapshot__suites_8hpp_source}{snapshot\+\_\+suites.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ snapshot\_input\_file<snapshot::json>\ file(filename);}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ file.read();}
+\DoxyCodeLine{00049\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structvariant__snapshot__suite_a2e95f260be9da09f6b324eb596170407}\index{variant\_snapshot\_suite@{variant\_snapshot\_suite}!write\_to\_file@{write\_to\_file}}
+\index{write\_to\_file@{write\_to\_file}!variant\_snapshot\_suite@{variant\_snapshot\_suite}}
+\doxysubsubsection{\texorpdfstring{write\_to\_file()}{write\_to\_file()}}
+{\footnotesize\ttfamily \label{structvariant__snapshot__suite_a2e95f260be9da09f6b324eb596170407} 
+static void variant\+\_\+snapshot\+\_\+suite\+::write\+\_\+to\+\_\+file (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{basename}{, }\item[{const \mbox{\hyperlink{structvariant__snapshot__suite_a778386700a73202cc14ffa518880ce75}{snapshot\+\_\+t}} \&}]{snapshot}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{snapshot__suites_8hpp_source_l00051}{51}} of file \mbox{\hyperlink{snapshot__suites_8hpp_source}{snapshot\+\_\+suites.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00052\ \ \ \ \ \ snapshot\_output\_file<snapshot::json>\ file(basename);}
+\DoxyCodeLine{00053\ \ \ \ \ \ file.write<\mbox{\hyperlink{structvariant__snapshot__suite_a778386700a73202cc14ffa518880ce75}{snapshot\_t}}>(snapshot);}
+\DoxyCodeLine{00054\ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/testing/include/sysio/testing/\mbox{\hyperlink{snapshot__suites_8hpp}{snapshot\+\_\+suites.\+hpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,513 @@
+\doxysection{plugins/chain\+\_\+plugin/test/test\+\_\+trx\+\_\+retry\+\_\+db.cpp File Reference}
+\hypertarget{test__trx__retry__db_8cpp}{}\label{test__trx__retry__db_8cpp}\index{plugins/chain\_plugin/test/test\_trx\_retry\_db.cpp@{plugins/chain\_plugin/test/test\_trx\_retry\_db.cpp}}
+{\ttfamily \#include $<$boost/test/included/unit\+\_\+test.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain\+\_\+plugin/trx\+\_\+retry\+\_\+db.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/testing/tester.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/controller.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/genesis\+\_\+state.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/thread\+\_\+utils.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/transaction\+\_\+metadata.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/trace.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/name.\+hpp$>$}\newline
+{\ttfamily \#include $<$appbase/application.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/plugin\+\_\+interface.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/mock\+\_\+time.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/bitutil.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/asio.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/date\+\_\+time/posix\+\_\+time/posix\+\_\+time.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/filesystem.\+hpp$>$}\newline
+{\ttfamily \#include $<$thread$>$}\newline
+{\ttfamily \#include $<$condition\+\_\+variable$>$}\newline
+{\ttfamily \#include $<$deque$>$}\newline
+{\ttfamily \#include $<$memory$>$}\newline
+Include dependency graph for test\+\_\+trx\+\_\+retry\+\_\+db.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__trx__retry__db_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1test_1_1detail_1_1testit}{sysio\+::test\+::detail\+::testit}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1test}{sysio\+::test}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1test_1_1detail}{sysio\+::test\+::detail}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{test__trx__retry__db_8cpp_a6b2a3852db8bb19ab6909bac01859985}{BOOST\+\_\+\+TEST\+\_\+\+MODULE}}~transaction\+\_\+retry
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{test__trx__retry__db_8cpp_a253cc0c74fd06c934d9c7d4ee67ccf87}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (trx\+\_\+retry\+\_\+logic)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{test__trx__retry__db_8cpp_a6b2a3852db8bb19ab6909bac01859985}\index{test\_trx\_retry\_db.cpp@{test\_trx\_retry\_db.cpp}!BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}}
+\index{BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}!test\_trx\_retry\_db.cpp@{test\_trx\_retry\_db.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_TEST\_MODULE}{BOOST\_TEST\_MODULE}}
+{\footnotesize\ttfamily \label{test__trx__retry__db_8cpp_a6b2a3852db8bb19ab6909bac01859985} 
+\#define BOOST\+\_\+\+TEST\+\_\+\+MODULE~transaction\+\_\+retry}
+
+
+
+Definition at line \mbox{\hyperlink{test__trx__retry__db_8cpp_source_l00001}{1}} of file \mbox{\hyperlink{test__trx__retry__db_8cpp_source}{test\+\_\+trx\+\_\+retry\+\_\+db.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{test__trx__retry__db_8cpp_a253cc0c74fd06c934d9c7d4ee67ccf87}\index{test\_trx\_retry\_db.cpp@{test\_trx\_retry\_db.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!test\_trx\_retry\_db.cpp@{test\_trx\_retry\_db.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}}
+{\footnotesize\ttfamily \label{test__trx__retry__db_8cpp_a253cc0c74fd06c934d9c7d4ee67ccf87} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{trx\+\_\+retry\+\_\+logic}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__trx__retry__db_8cpp_source_l00199}{199}} of file \mbox{\hyperlink{test__trx__retry__db_8cpp_source}{test\+\_\+trx\+\_\+retry\+\_\+db.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00200\ \ \ \ boost::filesystem::path\ temp\ =\ boost::filesystem::temp\_directory\_path()\ /\ boost::filesystem::unique\_path();}
+\DoxyCodeLine{00201\ }
+\DoxyCodeLine{00202\ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1logger_a4e12ef2e794551d593e497b4b90601ab}{fc::logger::get}}(\mbox{\hyperlink{logger_8hpp_a8c7a288fea519c7e895518f8dff4888f}{DEFAULT\_LOGGER}}).\mbox{\hyperlink{classfc_1_1logger_a4c22e498cec41efb806fda9733662650}{set\_log\_level}}(\mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4a30d2de77e71beb8d09d530cac04efa25}{fc::log\_level::debug}});}
+\DoxyCodeLine{00204\ }
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \textcolor{comment}{//\ just\ need\ a\ controller\ for\ trx\_retry\_db,\ doesn't\ actually\ have\ to\ do\ anything}}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ std::optional<controller>\ chain;}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1genesis__state}{genesis\_state}}\ \mbox{\hyperlink{namespace_xbyak_1_1util_a051ad68b75c300988da81d4804273b56}{gs}}\{\};}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1controller_1_1config}{controller::config}}\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v1}{chain\_config}}\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1controller_1_1config}{controller::config}}();}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v1}{chain\_config}}.blocks\_dir\ =\ temp;}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v1}{chain\_config}}.state\_dir\ =\ temp;}
+\DoxyCodeLine{00212\ }
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ genesis\_chain\_id\ =\ \mbox{\hyperlink{namespace_xbyak_1_1util_a051ad68b75c300988da81d4804273b56}{gs}}.compute\_chain\_id();}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1protocol__feature__set}{protocol\_feature\_set}}\ pfs;}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \ \ \ chain.emplace(\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__config__v1}{chain\_config}},\ std::move(\ pfs\ ),\ genesis\_chain\_id\ );}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ \ chain-\/>add\_indices();}
+\DoxyCodeLine{00217\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00218\ }
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \textcolor{comment}{//\ control\ time\ by\ using\ set\_now,\ call\ before\ spawning\ any\ threads}}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ pnow\ =\ boost::posix\_time::time\_from\_string(\textcolor{stringliteral}{"{}2022-\/04-\/04\ 4:44:44.000"{}});}
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1mock__time__traits_a374e695ad10b80d8a13e7955cf5abbd8}{fc::mock\_time\_traits::set\_now}}(pnow);}
+\DoxyCodeLine{00222\ }
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \textcolor{comment}{//\ run\ app()\ so\ that\ channels::transaction\_ack\ work}}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ std::thread\ app\_thread(\ [\&]()\ \{}
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{appbase::app}}().\mbox{\hyperlink{classappbase_1_1application_a39286b0b034b97f6940568a00f44edaf}{exec}}();}
+\DoxyCodeLine{00226\ \ \ \ \ \ \ \}\ );}
+\DoxyCodeLine{00227\ }
+\DoxyCodeLine{00228\ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ max\_mem\_usage\_size\ =\ 5ul*1024*1024*1024;}
+\DoxyCodeLine{00229\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1microseconds}{fc::microseconds}}\ retry\_interval\ =\ \mbox{\hyperlink{namespacefc_a9623b8cae3f48bbed6aa1fc2afe9b174}{fc::seconds}}(10);}
+\DoxyCodeLine{00230\ \ \ \ \ \ \ boost::posix\_time::seconds\ pretry\_interval\ =\ boost::posix\_time::seconds(10);}
+\DoxyCodeLine{00231\ \ \ \ \ \ \ BOOST\_REQUIRE(retry\_interval.\mbox{\hyperlink{classfc_1_1microseconds_a20fba59ec7e1f50c6b8f2c9443cc9b92}{count}}()\ ==\ pretry\_interval.total\_microseconds());}
+\DoxyCodeLine{00232\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1microseconds}{fc::microseconds}}\ max\_expiration\_time\ =\ \mbox{\hyperlink{namespacefc_a6e85a2de1275728bcc4a3d01f14d9172}{fc::hours}}(1);}
+\DoxyCodeLine{00233\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain__apis_1_1trx__retry__db}{trx\_retry\_db}}\ trx\_retry(\ *chain,\ max\_mem\_usage\_size,\ retry\_interval,\ max\_expiration\_time,\ \mbox{\hyperlink{namespacefc_a9623b8cae3f48bbed6aa1fc2afe9b174}{fc::seconds}}(10)\ );}
+\DoxyCodeLine{00234\ }
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \textcolor{comment}{//\ provide\ a\ subscriber\ for\ the\ transaction\_ack\ channel}}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ blocking\_queue<std::pair<fc::exception\_ptr,\ packed\_transaction\_ptr>>\ transactions\_acked;}
+\DoxyCodeLine{00237\ \ \ \ \ \ \ plugin\_interface::compat::channels::transaction\_ack::channel\_type::handle\ incoming\_transaction\_ack\_subscription\ =}
+\DoxyCodeLine{00238\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{appbase::app}}().\mbox{\hyperlink{classappbase_1_1application_ac9e3f923a46466ea3ffbf4fea3187682}{get\_channel}}<\mbox{\hyperlink{structappbase_1_1channel__decl}{plugin\_interface::compat::channels::transaction\_ack}}>().subscribe(}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [\&transactions\_acked](\ \textcolor{keyword}{const}\ std::pair<fc::exception\_ptr,\ packed\_transaction\_ptr>\&\ t)\{}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ transactions\_acked.push(\ t\ );}
+\DoxyCodeLine{00241\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ );}
+\DoxyCodeLine{00242\ }
+\DoxyCodeLine{00243\ }
+\DoxyCodeLine{00244\ \ \ \ \ \ \ \textcolor{comment}{//\ test\ get\_max\_expiration\_time}}
+\DoxyCodeLine{00245\ \ \ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{fc::time\_point::now}}()\ +\ \mbox{\hyperlink{namespacefc_a6e85a2de1275728bcc4a3d01f14d9172}{fc::hours}}(1)\ ==\ \mbox{\hyperlink{classfc_1_1time__point}{fc::time\_point}}(\ trx\_retry.get\_max\_expiration\_time()\ )\ );}
+\DoxyCodeLine{00246\ }
+\DoxyCodeLine{00247\ \ \ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00248\ \ \ \ \ \ \ \textcolor{comment}{//\ test\ expired,\ not\ in\ a\ block}}
+\DoxyCodeLine{00249\ \ \ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00250\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ lib\ =\ std::optional<uint16\_t>\{\};}
+\DoxyCodeLine{00251\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ trx\_1\ =\ make\_unique\_trx(chain-\/>get\_chain\_id(),\ \mbox{\hyperlink{namespacefc_a9623b8cae3f48bbed6aa1fc2afe9b174}{fc::seconds}}(2),\ 1);}
+\DoxyCodeLine{00252\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ trx\_1\_expired\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00253\ \ \ \ \ \ \ trx\_retry.track\_transaction(\ trx\_1,\ lib,\ [\&trx\_1\_expired](\textcolor{keyword}{const}\ std::variant<\mbox{\hyperlink{namespacefc_a15170d1be1e682691dfe6ae09790edce}{fc::exception\_ptr}},\ std::unique\_ptr<fc::variant>>\&\ result)\{}
+\DoxyCodeLine{00254\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE(\ std::holds\_alternative<fc::exception\_ptr>(result)\ );}
+\DoxyCodeLine{00255\ \ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ std::get<fc::exception\_ptr>(result)-\/>code(),\ expired\_tx\_exception::code\_value\ );}
+\DoxyCodeLine{00256\ \ \ \ \ \ \ \ \ \ trx\_1\_expired\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00257\ \ \ \ \ \ \ \}\ );}
+\DoxyCodeLine{00258\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ trx\_2\ =\ make\_unique\_trx(chain-\/>get\_chain\_id(),\ \mbox{\hyperlink{namespacefc_a9623b8cae3f48bbed6aa1fc2afe9b174}{fc::seconds}}(4),\ 2);}
+\DoxyCodeLine{00259\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ trx\_2\_expired\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00260\ \ \ \ \ \ \ trx\_retry.track\_transaction(\ trx\_2,\ lib,\ [\&trx\_2\_expired](\textcolor{keyword}{const}\ std::variant<\mbox{\hyperlink{namespacefc_a15170d1be1e682691dfe6ae09790edce}{fc::exception\_ptr}},\ std::unique\_ptr<fc::variant>>\&\ result)\{}
+\DoxyCodeLine{00261\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE(\ std::holds\_alternative<fc::exception\_ptr>(result)\ );}
+\DoxyCodeLine{00262\ \ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ std::get<fc::exception\_ptr>(result)-\/>code(),\ expired\_tx\_exception::code\_value\ );}
+\DoxyCodeLine{00263\ \ \ \ \ \ \ \ \ \ trx\_2\_expired\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00264\ \ \ \ \ \ \ \}\ );}
+\DoxyCodeLine{00265\ \ \ \ \ \ \ \textcolor{comment}{//\ signal\ block,\ nothing\ should\ be\ expired\ as\ now\ has\ not\ changed}}
+\DoxyCodeLine{00266\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ bsp1\ =\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a7ad028261e9ab9a38fd557c8f7628615}{make\_block\_state}}(1,\ \{\});}
+\DoxyCodeLine{00267\ \ \ \ \ \ \ trx\_retry.on\_block\_start(1);}
+\DoxyCodeLine{00268\ \ \ \ \ \ \ trx\_retry.on\_accepted\_block(bsp1);}
+\DoxyCodeLine{00269\ \ \ \ \ \ \ trx\_retry.on\_irreversible\_block(bsp1);}
+\DoxyCodeLine{00270\ \ \ \ \ \ \ BOOST\_CHECK(!trx\_1\_expired);}
+\DoxyCodeLine{00271\ \ \ \ \ \ \ BOOST\_CHECK(!trx\_2\_expired);}
+\DoxyCodeLine{00272\ \ \ \ \ \ \ \textcolor{comment}{//\ increase\ time\ by\ 3\ seconds\ to\ expire\ first}}
+\DoxyCodeLine{00273\ \ \ \ \ \ \ pnow\ +=\ boost::posix\_time::seconds(3);}
+\DoxyCodeLine{00274\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1mock__time__traits_a374e695ad10b80d8a13e7955cf5abbd8}{fc::mock\_time\_traits::set\_now}}(pnow);}
+\DoxyCodeLine{00275\ \ \ \ \ \ \ \textcolor{comment}{//\ signal\ block,\ first\ transaction\ should\ expire}}
+\DoxyCodeLine{00276\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ bsp2\ =\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a7ad028261e9ab9a38fd557c8f7628615}{make\_block\_state}}(2,\ \{\});}
+\DoxyCodeLine{00277\ \ \ \ \ \ \ trx\_retry.on\_block\_start(2);}
+\DoxyCodeLine{00278\ \ \ \ \ \ \ trx\_retry.on\_accepted\_block(bsp2);}
+\DoxyCodeLine{00279\ \ \ \ \ \ \ trx\_retry.on\_irreversible\_block(bsp2);}
+\DoxyCodeLine{00280\ \ \ \ \ \ \ BOOST\_CHECK(trx\_1\_expired);}
+\DoxyCodeLine{00281\ \ \ \ \ \ \ BOOST\_CHECK(!trx\_2\_expired);}
+\DoxyCodeLine{00282\ \ \ \ \ \ \ \textcolor{comment}{//\ increase\ time\ by\ 2\ seconds\ to\ expire\ second}}
+\DoxyCodeLine{00283\ \ \ \ \ \ \ pnow\ +=\ boost::posix\_time::seconds(2);}
+\DoxyCodeLine{00284\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1mock__time__traits_a374e695ad10b80d8a13e7955cf5abbd8}{fc::mock\_time\_traits::set\_now}}(pnow);}
+\DoxyCodeLine{00285\ \ \ \ \ \ \ \textcolor{comment}{//\ signal\ block,\ second\ transaction\ should\ expire}}
+\DoxyCodeLine{00286\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ bsp3\ =\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a7ad028261e9ab9a38fd557c8f7628615}{make\_block\_state}}(3,\ \{\});}
+\DoxyCodeLine{00287\ \ \ \ \ \ \ trx\_retry.on\_block\_start(3);}
+\DoxyCodeLine{00288\ \ \ \ \ \ \ trx\_retry.on\_accepted\_block(bsp3);}
+\DoxyCodeLine{00289\ \ \ \ \ \ \ trx\_retry.on\_irreversible\_block(bsp3);}
+\DoxyCodeLine{00290\ \ \ \ \ \ \ BOOST\_CHECK(trx\_1\_expired);}
+\DoxyCodeLine{00291\ \ \ \ \ \ \ BOOST\_CHECK(trx\_2\_expired);}
+\DoxyCodeLine{00292\ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(0,\ trx\_retry.size());}
+\DoxyCodeLine{00293\ }
+\DoxyCodeLine{00294\ \ \ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00295\ \ \ \ \ \ \ \textcolor{comment}{//\ test\ resend\ trx\ if\ not\ in\ block}}
+\DoxyCodeLine{00296\ \ \ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00297\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ trx\_3\ =\ make\_unique\_trx(chain-\/>get\_chain\_id(),\ \mbox{\hyperlink{namespacefc_a9623b8cae3f48bbed6aa1fc2afe9b174}{fc::seconds}}(30),\ 3);}
+\DoxyCodeLine{00298\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ trx\_3\_expired\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00299\ \ \ \ \ \ \ trx\_retry.track\_transaction(\ trx\_3,\ lib,\ [\&trx\_3\_expired](\textcolor{keyword}{const}\ std::variant<\mbox{\hyperlink{namespacefc_a15170d1be1e682691dfe6ae09790edce}{fc::exception\_ptr}},\ std::unique\_ptr<fc::variant>>\&\ result)\{}
+\DoxyCodeLine{00300\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE(\ std::holds\_alternative<fc::exception\_ptr>(result)\ );}
+\DoxyCodeLine{00301\ \ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ std::get<fc::exception\_ptr>(result)-\/>code(),\ expired\_tx\_exception::code\_value\ );}
+\DoxyCodeLine{00302\ \ \ \ \ \ \ \ \ \ trx\_3\_expired\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00303\ \ \ \ \ \ \ \}\ );}
+\DoxyCodeLine{00304\ \ \ \ \ \ \ \textcolor{comment}{//\ increase\ time\ by\ 1\ seconds,\ so\ trx\_4\ retry\ interval\ diff\ than\ 3}}
+\DoxyCodeLine{00305\ \ \ \ \ \ \ pnow\ +=\ boost::posix\_time::seconds(1);}
+\DoxyCodeLine{00306\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1mock__time__traits_a374e695ad10b80d8a13e7955cf5abbd8}{fc::mock\_time\_traits::set\_now}}(pnow);}
+\DoxyCodeLine{00307\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ trx\_4\ =\ make\_unique\_trx(chain-\/>get\_chain\_id(),\ \mbox{\hyperlink{namespacefc_a9623b8cae3f48bbed6aa1fc2afe9b174}{fc::seconds}}(30),\ 4);}
+\DoxyCodeLine{00308\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ trx\_4\_expired\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00309\ \ \ \ \ \ \ trx\_retry.track\_transaction(\ trx\_4,\ lib,\ [\&trx\_4\_expired](\textcolor{keyword}{const}\ std::variant<\mbox{\hyperlink{namespacefc_a15170d1be1e682691dfe6ae09790edce}{fc::exception\_ptr}},\ std::unique\_ptr<fc::variant>>\&\ result)\{}
+\DoxyCodeLine{00310\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE(\ std::holds\_alternative<fc::exception\_ptr>(result)\ );}
+\DoxyCodeLine{00311\ \ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ std::get<fc::exception\_ptr>(result)-\/>code(),\ expired\_tx\_exception::code\_value\ );}
+\DoxyCodeLine{00312\ \ \ \ \ \ \ \ \ \ trx\_4\_expired\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00313\ \ \ \ \ \ \ \}\ );}
+\DoxyCodeLine{00314\ \ \ \ \ \ \ \textcolor{comment}{//\ increase\ time\ by\ interval\ to\ cause\ send}}
+\DoxyCodeLine{00315\ \ \ \ \ \ \ pnow\ +=\ (pretry\_interval\ -\/\ boost::posix\_time::seconds(1));}
+\DoxyCodeLine{00316\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1mock__time__traits_a374e695ad10b80d8a13e7955cf5abbd8}{fc::mock\_time\_traits::set\_now}}(pnow);}
+\DoxyCodeLine{00317\ \ \ \ \ \ \ \textcolor{comment}{//\ signal\ block,\ transaction\ 3\ should\ be\ sent}}
+\DoxyCodeLine{00318\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ bsp4\ =\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a7ad028261e9ab9a38fd557c8f7628615}{make\_block\_state}}(4,\ \{\});}
+\DoxyCodeLine{00319\ \ \ \ \ \ \ trx\_retry.on\_block\_start(4);}
+\DoxyCodeLine{00320\ \ \ \ \ \ \ trx\_retry.on\_accepted\_block(bsp4);}
+\DoxyCodeLine{00321\ \ \ \ \ \ \ BOOST\_CHECK(\ get\_id(transactions\_acked.pop().second)\ ==\ 3\ );}
+\DoxyCodeLine{00322\ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ 0,\ transactions\_acked.size()\ );}
+\DoxyCodeLine{00323\ \ \ \ \ \ \ \textcolor{comment}{//\ increase\ time\ by\ 1\ seconds,\ so\ trx\_4\ is\ sent}}
+\DoxyCodeLine{00324\ \ \ \ \ \ \ pnow\ +=\ boost::posix\_time::seconds(1);}
+\DoxyCodeLine{00325\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1mock__time__traits_a374e695ad10b80d8a13e7955cf5abbd8}{fc::mock\_time\_traits::set\_now}}(pnow);}
+\DoxyCodeLine{00326\ \ \ \ \ \ \ \textcolor{comment}{//\ signal\ block,\ transaction\ 4\ should\ be\ sent}}
+\DoxyCodeLine{00327\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ bsp5\ =\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a7ad028261e9ab9a38fd557c8f7628615}{make\_block\_state}}(5,\ \{\});}
+\DoxyCodeLine{00328\ \ \ \ \ \ \ trx\_retry.on\_block\_start(5);}
+\DoxyCodeLine{00329\ \ \ \ \ \ \ trx\_retry.on\_accepted\_block(bsp5);}
+\DoxyCodeLine{00330\ \ \ \ \ \ \ BOOST\_CHECK(\ get\_id(transactions\_acked.pop().second)\ ==\ 4\ );}
+\DoxyCodeLine{00331\ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ 0,\ transactions\_acked.size()\ );}
+\DoxyCodeLine{00332\ \ \ \ \ \ \ BOOST\_CHECK(!trx\_3\_expired);}
+\DoxyCodeLine{00333\ \ \ \ \ \ \ BOOST\_CHECK(!trx\_4\_expired);}
+\DoxyCodeLine{00334\ \ \ \ \ \ \ \textcolor{comment}{//\ go\ ahead\ and\ expire\ them\ now}}
+\DoxyCodeLine{00335\ \ \ \ \ \ \ pnow\ +=\ boost::posix\_time::seconds(30);}
+\DoxyCodeLine{00336\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1mock__time__traits_a374e695ad10b80d8a13e7955cf5abbd8}{fc::mock\_time\_traits::set\_now}}(pnow);}
+\DoxyCodeLine{00337\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ bsp6\ =\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a7ad028261e9ab9a38fd557c8f7628615}{make\_block\_state}}(6,\ \{\});}
+\DoxyCodeLine{00338\ \ \ \ \ \ \ trx\_retry.on\_block\_start(6);}
+\DoxyCodeLine{00339\ \ \ \ \ \ \ trx\_retry.on\_accepted\_block(bsp6);}
+\DoxyCodeLine{00340\ \ \ \ \ \ \ trx\_retry.on\_irreversible\_block(bsp4);}
+\DoxyCodeLine{00341\ \ \ \ \ \ \ trx\_retry.on\_irreversible\_block(bsp5);}
+\DoxyCodeLine{00342\ \ \ \ \ \ \ trx\_retry.on\_irreversible\_block(bsp6);}
+\DoxyCodeLine{00343\ \ \ \ \ \ \ BOOST\_CHECK(trx\_3\_expired);}
+\DoxyCodeLine{00344\ \ \ \ \ \ \ BOOST\_CHECK(trx\_4\_expired);}
+\DoxyCodeLine{00345\ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(0,\ trx\_retry.size());}
+\DoxyCodeLine{00346\ }
+\DoxyCodeLine{00347\ \ \ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00348\ \ \ \ \ \ \ \textcolor{comment}{//\ test\ reply\ to\ user}}
+\DoxyCodeLine{00349\ \ \ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00350\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ trx\_5\ =\ make\_unique\_trx(chain-\/>get\_chain\_id(),\ \mbox{\hyperlink{namespacefc_a9623b8cae3f48bbed6aa1fc2afe9b174}{fc::seconds}}(30),\ 5);}
+\DoxyCodeLine{00351\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ trx\_5\_variant\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00352\ \ \ \ \ \ \ trx\_retry.track\_transaction(\ trx\_5,\ lib,\ [\&trx\_5\_variant](\textcolor{keyword}{const}\ std::variant<\mbox{\hyperlink{namespacefc_a15170d1be1e682691dfe6ae09790edce}{fc::exception\_ptr}},\ std::unique\_ptr<fc::variant>>\&\ result)\{}
+\DoxyCodeLine{00353\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE(\ std::holds\_alternative<std::unique\_ptr<fc::variant>>(result)\ );}
+\DoxyCodeLine{00354\ \ \ \ \ \ \ \ \ \ BOOST\_CHECK(\ !!std::get<std::unique\_ptr<fc::variant>>(result)\ );}
+\DoxyCodeLine{00355\ \ \ \ \ \ \ \ \ \ trx\_5\_variant\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00356\ \ \ \ \ \ \ \}\ );}
+\DoxyCodeLine{00357\ \ \ \ \ \ \ \textcolor{comment}{//\ increase\ time\ by\ 1\ seconds,\ so\ trx\_6\ retry\ interval\ diff\ than\ 5}}
+\DoxyCodeLine{00358\ \ \ \ \ \ \ pnow\ +=\ boost::posix\_time::seconds(1);}
+\DoxyCodeLine{00359\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1mock__time__traits_a374e695ad10b80d8a13e7955cf5abbd8}{fc::mock\_time\_traits::set\_now}}(pnow);}
+\DoxyCodeLine{00360\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ trx\_6\ =\ make\_unique\_trx(chain-\/>get\_chain\_id(),\ \mbox{\hyperlink{namespacefc_a9623b8cae3f48bbed6aa1fc2afe9b174}{fc::seconds}}(30),\ 6);}
+\DoxyCodeLine{00361\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ trx\_6\_variant\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00362\ \ \ \ \ \ \ trx\_retry.track\_transaction(\ trx\_6,\ std::optional<uint32\_t>(2),\ [\&trx\_6\_variant](\textcolor{keyword}{const}\ std::variant<\mbox{\hyperlink{namespacefc_a15170d1be1e682691dfe6ae09790edce}{fc::exception\_ptr}},\ std::unique\_ptr<fc::variant>>\&\ result)\{}
+\DoxyCodeLine{00363\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE(\ std::holds\_alternative<std::unique\_ptr<fc::variant>>(result)\ );}
+\DoxyCodeLine{00364\ \ \ \ \ \ \ \ \ \ BOOST\_CHECK(\ !!std::get<std::unique\_ptr<fc::variant>>(result)\ );}
+\DoxyCodeLine{00365\ \ \ \ \ \ \ \ \ \ trx\_6\_variant\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00366\ \ \ \ \ \ \ \}\ );}
+\DoxyCodeLine{00367\ \ \ \ \ \ \ \textcolor{comment}{//\ not\ in\ block\ 7,\ so\ not\ returned\ to\ user}}
+\DoxyCodeLine{00368\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ bsp7\ =\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a7ad028261e9ab9a38fd557c8f7628615}{make\_block\_state}}(7,\ \{\});}
+\DoxyCodeLine{00369\ \ \ \ \ \ \ trx\_retry.on\_block\_start(7);}
+\DoxyCodeLine{00370\ \ \ \ \ \ \ trx\_retry.on\_accepted\_block(bsp7);}
+\DoxyCodeLine{00371\ \ \ \ \ \ \ BOOST\_CHECK(!trx\_5\_variant);}
+\DoxyCodeLine{00372\ \ \ \ \ \ \ BOOST\_CHECK(!trx\_6\_variant);}
+\DoxyCodeLine{00373\ \ \ \ \ \ \ \textcolor{comment}{//\ 5,6\ in\ block\ 8}}
+\DoxyCodeLine{00374\ \ \ \ \ \ \ pnow\ +=\ boost::posix\_time::seconds(1);\ \textcolor{comment}{//\ new\ block,\ new\ time}}
+\DoxyCodeLine{00375\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1mock__time__traits_a374e695ad10b80d8a13e7955cf5abbd8}{fc::mock\_time\_traits::set\_now}}(pnow);}
+\DoxyCodeLine{00376\ \ \ \ \ \ \ trx\_retry.on\_block\_start(8);}
+\DoxyCodeLine{00377\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ trace\_5\ =\ make\_transaction\_trace(\ trx\_5,\ 8);}
+\DoxyCodeLine{00378\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ trace\_6\ =\ make\_transaction\_trace(\ trx\_6,\ 8);}
+\DoxyCodeLine{00379\ \ \ \ \ \ \ trx\_retry.on\_applied\_transaction(trace\_5,\ trx\_5);}
+\DoxyCodeLine{00380\ \ \ \ \ \ \ trx\_retry.on\_applied\_transaction(trace\_6,\ trx\_6);}
+\DoxyCodeLine{00381\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ bsp8\ =\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a7ad028261e9ab9a38fd557c8f7628615}{make\_block\_state}}(8,\ \{trx\_5,\ trx\_6\});}
+\DoxyCodeLine{00382\ \ \ \ \ \ \ trx\_retry.on\_accepted\_block(bsp8);}
+\DoxyCodeLine{00383\ \ \ \ \ \ \ BOOST\_CHECK(!trx\_5\_variant);}
+\DoxyCodeLine{00384\ \ \ \ \ \ \ BOOST\_CHECK(!trx\_6\_variant);}
+\DoxyCodeLine{00385\ \ \ \ \ \ \ \textcolor{comment}{//\ need\ 2\ blocks\ before\ 6\ returned\ to\ user}}
+\DoxyCodeLine{00386\ \ \ \ \ \ \ pnow\ +=\ boost::posix\_time::seconds(1);\ \textcolor{comment}{//\ new\ block,\ new\ time}}
+\DoxyCodeLine{00387\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1mock__time__traits_a374e695ad10b80d8a13e7955cf5abbd8}{fc::mock\_time\_traits::set\_now}}(pnow);}
+\DoxyCodeLine{00388\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ bsp9\ =\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a7ad028261e9ab9a38fd557c8f7628615}{make\_block\_state}}(9,\ \{\});}
+\DoxyCodeLine{00389\ \ \ \ \ \ \ trx\_retry.on\_block\_start(9);}
+\DoxyCodeLine{00390\ \ \ \ \ \ \ trx\_retry.on\_accepted\_block(bsp9);}
+\DoxyCodeLine{00391\ \ \ \ \ \ \ BOOST\_CHECK(!trx\_5\_variant);}
+\DoxyCodeLine{00392\ \ \ \ \ \ \ BOOST\_CHECK(!trx\_6\_variant);}
+\DoxyCodeLine{00393\ \ \ \ \ \ \ pnow\ +=\ boost::posix\_time::seconds(1);\ \textcolor{comment}{//\ new\ block,\ new\ time}}
+\DoxyCodeLine{00394\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1mock__time__traits_a374e695ad10b80d8a13e7955cf5abbd8}{fc::mock\_time\_traits::set\_now}}(pnow);}
+\DoxyCodeLine{00395\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ bsp10\ =\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a7ad028261e9ab9a38fd557c8f7628615}{make\_block\_state}}(10,\ \{\});}
+\DoxyCodeLine{00396\ \ \ \ \ \ \ trx\_retry.on\_block\_start(10);}
+\DoxyCodeLine{00397\ \ \ \ \ \ \ trx\_retry.on\_accepted\_block(bsp10);}
+\DoxyCodeLine{00398\ \ \ \ \ \ \ BOOST\_CHECK(!trx\_5\_variant);}
+\DoxyCodeLine{00399\ \ \ \ \ \ \ BOOST\_CHECK(trx\_6\_variant);}
+\DoxyCodeLine{00400\ \ \ \ \ \ \ \textcolor{comment}{//\ now\ signal\ lib\ for\ trx\_6}}
+\DoxyCodeLine{00401\ \ \ \ \ \ \ pnow\ +=\ boost::posix\_time::seconds(1);\ \textcolor{comment}{//\ new\ block,\ new\ time}}
+\DoxyCodeLine{00402\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1mock__time__traits_a374e695ad10b80d8a13e7955cf5abbd8}{fc::mock\_time\_traits::set\_now}}(pnow);}
+\DoxyCodeLine{00403\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ bsp11\ =\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a7ad028261e9ab9a38fd557c8f7628615}{make\_block\_state}}(11,\ \{\});}
+\DoxyCodeLine{00404\ \ \ \ \ \ \ trx\_retry.on\_block\_start(11);}
+\DoxyCodeLine{00405\ \ \ \ \ \ \ trx\_retry.on\_accepted\_block(bsp11);}
+\DoxyCodeLine{00406\ \ \ \ \ \ \ BOOST\_CHECK(!trx\_5\_variant);}
+\DoxyCodeLine{00407\ \ \ \ \ \ \ BOOST\_CHECK(trx\_6\_variant);}
+\DoxyCodeLine{00408\ \ \ \ \ \ \ trx\_retry.on\_irreversible\_block(bsp7);}
+\DoxyCodeLine{00409\ \ \ \ \ \ \ BOOST\_CHECK(!trx\_5\_variant);}
+\DoxyCodeLine{00410\ \ \ \ \ \ \ BOOST\_CHECK(trx\_6\_variant);}
+\DoxyCodeLine{00411\ \ \ \ \ \ \ trx\_retry.on\_irreversible\_block(bsp8);}
+\DoxyCodeLine{00412\ \ \ \ \ \ \ BOOST\_CHECK(trx\_5\_variant);}
+\DoxyCodeLine{00413\ \ \ \ \ \ \ BOOST\_CHECK(trx\_6\_variant);}
+\DoxyCodeLine{00414\ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(0,\ trx\_retry.size());}
+\DoxyCodeLine{00415\ }
+\DoxyCodeLine{00416\ \ \ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00417\ \ \ \ \ \ \ \textcolor{comment}{//\ test\ forking}}
+\DoxyCodeLine{00418\ \ \ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00419\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ trx\_7\ =\ make\_unique\_trx(chain-\/>get\_chain\_id(),\ \mbox{\hyperlink{namespacefc_a9623b8cae3f48bbed6aa1fc2afe9b174}{fc::seconds}}(30),\ 7);}
+\DoxyCodeLine{00420\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ trx\_7\_variant\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00421\ \ \ \ \ \ \ trx\_retry.track\_transaction(\ trx\_7,\ lib,\ [\&trx\_7\_variant](\textcolor{keyword}{const}\ std::variant<\mbox{\hyperlink{namespacefc_a15170d1be1e682691dfe6ae09790edce}{fc::exception\_ptr}},\ std::unique\_ptr<fc::variant>>\&\ result)\{}
+\DoxyCodeLine{00422\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE(\ std::holds\_alternative<std::unique\_ptr<fc::variant>>(result)\ );}
+\DoxyCodeLine{00423\ \ \ \ \ \ \ \ \ \ BOOST\_CHECK(\ !!std::get<std::unique\_ptr<fc::variant>>(result)\ );}
+\DoxyCodeLine{00424\ \ \ \ \ \ \ \ \ \ trx\_7\_variant\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00425\ \ \ \ \ \ \ \}\ );}
+\DoxyCodeLine{00426\ \ \ \ \ \ \ \textcolor{comment}{//\ increase\ time\ by\ 1\ seconds,\ so\ trx\_8\ retry\ interval\ diff\ than\ 7}}
+\DoxyCodeLine{00427\ \ \ \ \ \ \ pnow\ +=\ boost::posix\_time::seconds(1);}
+\DoxyCodeLine{00428\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1mock__time__traits_a374e695ad10b80d8a13e7955cf5abbd8}{fc::mock\_time\_traits::set\_now}}(pnow);}
+\DoxyCodeLine{00429\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ trx\_8\ =\ make\_unique\_trx(chain-\/>get\_chain\_id(),\ \mbox{\hyperlink{namespacefc_a9623b8cae3f48bbed6aa1fc2afe9b174}{fc::seconds}}(30),\ 8);}
+\DoxyCodeLine{00430\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ trx\_8\_variant\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00431\ \ \ \ \ \ \ trx\_retry.track\_transaction(\ trx\_8,\ std::optional<uint32\_t>(3),\ [\&trx\_8\_variant](\textcolor{keyword}{const}\ std::variant<\mbox{\hyperlink{namespacefc_a15170d1be1e682691dfe6ae09790edce}{fc::exception\_ptr}},\ std::unique\_ptr<fc::variant>>\&\ result)\{}
+\DoxyCodeLine{00432\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE(\ std::holds\_alternative<std::unique\_ptr<fc::variant>>(result)\ );}
+\DoxyCodeLine{00433\ \ \ \ \ \ \ \ \ \ BOOST\_CHECK(\ !!std::get<std::unique\_ptr<fc::variant>>(result)\ );}
+\DoxyCodeLine{00434\ \ \ \ \ \ \ \ \ \ trx\_8\_variant\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00435\ \ \ \ \ \ \ \}\ );}
+\DoxyCodeLine{00436\ \ \ \ \ \ \ \textcolor{comment}{//\ one\ to\ expire,\ will\ be\ forked\ out\ never\ to\ return}}
+\DoxyCodeLine{00437\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ trx\_9\ =\ make\_unique\_trx(chain-\/>get\_chain\_id(),\ \mbox{\hyperlink{namespacefc_a9623b8cae3f48bbed6aa1fc2afe9b174}{fc::seconds}}(30),\ 9);}
+\DoxyCodeLine{00438\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ trx\_9\_expired\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00439\ \ \ \ \ \ \ trx\_retry.track\_transaction(\ trx\_9,\ lib,\ [\&trx\_9\_expired](\textcolor{keyword}{const}\ std::variant<\mbox{\hyperlink{namespacefc_a15170d1be1e682691dfe6ae09790edce}{fc::exception\_ptr}},\ std::unique\_ptr<fc::variant>>\&\ result)\{}
+\DoxyCodeLine{00440\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE(\ std::holds\_alternative<fc::exception\_ptr>(result)\ );}
+\DoxyCodeLine{00441\ \ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ std::get<fc::exception\_ptr>(result)-\/>code(),\ expired\_tx\_exception::code\_value\ );}
+\DoxyCodeLine{00442\ \ \ \ \ \ \ \ \ \ trx\_9\_expired\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00443\ \ \ \ \ \ \ \}\ );}
+\DoxyCodeLine{00444\ }
+\DoxyCodeLine{00445\ \ \ \ \ \ \ \textcolor{comment}{//\ not\ in\ block\ 12}}
+\DoxyCodeLine{00446\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ bsp12\ =\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a7ad028261e9ab9a38fd557c8f7628615}{make\_block\_state}}(12,\ \{\});}
+\DoxyCodeLine{00447\ \ \ \ \ \ \ trx\_retry.on\_block\_start(12);}
+\DoxyCodeLine{00448\ \ \ \ \ \ \ trx\_retry.on\_accepted\_block(bsp12);}
+\DoxyCodeLine{00449\ \ \ \ \ \ \ BOOST\_CHECK(!trx\_7\_variant);}
+\DoxyCodeLine{00450\ \ \ \ \ \ \ BOOST\_CHECK(!trx\_8\_variant);}
+\DoxyCodeLine{00451\ \ \ \ \ \ \ BOOST\_CHECK(!trx\_9\_expired);}
+\DoxyCodeLine{00452\ \ \ \ \ \ \ \textcolor{comment}{//\ 7,8\ in\ block\ 13}}
+\DoxyCodeLine{00453\ \ \ \ \ \ \ pnow\ +=\ boost::posix\_time::seconds(1);\ \textcolor{comment}{//\ new\ block,\ new\ time}}
+\DoxyCodeLine{00454\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1mock__time__traits_a374e695ad10b80d8a13e7955cf5abbd8}{fc::mock\_time\_traits::set\_now}}(pnow);}
+\DoxyCodeLine{00455\ \ \ \ \ \ \ trx\_retry.on\_block\_start(13);}
+\DoxyCodeLine{00456\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ trace\_7\ =\ make\_transaction\_trace(\ trx\_7,\ 13);}
+\DoxyCodeLine{00457\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ trace\_8\ =\ make\_transaction\_trace(\ trx\_8,\ 13);}
+\DoxyCodeLine{00458\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ trace\_9\ =\ make\_transaction\_trace(\ trx\_9,\ 13);}
+\DoxyCodeLine{00459\ \ \ \ \ \ \ trx\_retry.on\_applied\_transaction(trace\_7,\ trx\_7);}
+\DoxyCodeLine{00460\ \ \ \ \ \ \ trx\_retry.on\_applied\_transaction(trace\_8,\ trx\_8);}
+\DoxyCodeLine{00461\ \ \ \ \ \ \ trx\_retry.on\_applied\_transaction(trace\_9,\ trx\_9);}
+\DoxyCodeLine{00462\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ bsp13\ =\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a7ad028261e9ab9a38fd557c8f7628615}{make\_block\_state}}(13,\ \{trx\_7,\ trx\_8,\ trx\_9\});}
+\DoxyCodeLine{00463\ \ \ \ \ \ \ trx\_retry.on\_accepted\_block(bsp13);}
+\DoxyCodeLine{00464\ \ \ \ \ \ \ BOOST\_CHECK(!trx\_7\_variant);}
+\DoxyCodeLine{00465\ \ \ \ \ \ \ BOOST\_CHECK(!trx\_8\_variant);}
+\DoxyCodeLine{00466\ \ \ \ \ \ \ BOOST\_CHECK(!trx\_9\_expired);}
+\DoxyCodeLine{00467\ \ \ \ \ \ \ \textcolor{comment}{//\ need\ 3\ blocks\ before\ 8\ returned\ to\ user}}
+\DoxyCodeLine{00468\ \ \ \ \ \ \ pnow\ +=\ boost::posix\_time::seconds(1);\ \textcolor{comment}{//\ new\ block,\ new\ time,\ 1st\ block}}
+\DoxyCodeLine{00469\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1mock__time__traits_a374e695ad10b80d8a13e7955cf5abbd8}{fc::mock\_time\_traits::set\_now}}(pnow);}
+\DoxyCodeLine{00470\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ bsp14\ =\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a7ad028261e9ab9a38fd557c8f7628615}{make\_block\_state}}(14,\ \{\});}
+\DoxyCodeLine{00471\ \ \ \ \ \ \ trx\_retry.on\_block\_start(14);}
+\DoxyCodeLine{00472\ \ \ \ \ \ \ trx\_retry.on\_accepted\_block(bsp14);}
+\DoxyCodeLine{00473\ \ \ \ \ \ \ BOOST\_CHECK(!trx\_7\_variant);}
+\DoxyCodeLine{00474\ \ \ \ \ \ \ BOOST\_CHECK(!trx\_8\_variant);}
+\DoxyCodeLine{00475\ \ \ \ \ \ \ BOOST\_CHECK(!trx\_9\_expired);}
+\DoxyCodeLine{00476\ \ \ \ \ \ \ pnow\ +=\ boost::posix\_time::seconds(1);\ \textcolor{comment}{//\ new\ block,\ new\ time,\ 2nd\ block}}
+\DoxyCodeLine{00477\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1mock__time__traits_a374e695ad10b80d8a13e7955cf5abbd8}{fc::mock\_time\_traits::set\_now}}(pnow);}
+\DoxyCodeLine{00478\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ bsp15\ =\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a7ad028261e9ab9a38fd557c8f7628615}{make\_block\_state}}(15,\ \{\});}
+\DoxyCodeLine{00479\ \ \ \ \ \ \ trx\_retry.on\_block\_start(15);}
+\DoxyCodeLine{00480\ \ \ \ \ \ \ trx\_retry.on\_accepted\_block(bsp15);}
+\DoxyCodeLine{00481\ \ \ \ \ \ \ BOOST\_CHECK(!trx\_7\_variant);}
+\DoxyCodeLine{00482\ \ \ \ \ \ \ BOOST\_CHECK(!trx\_8\_variant);}
+\DoxyCodeLine{00483\ \ \ \ \ \ \ BOOST\_CHECK(!trx\_9\_expired);}
+\DoxyCodeLine{00484\ \ \ \ \ \ \ \textcolor{comment}{//\ now\ fork\ out\ including\ 13\ which\ had\ traces,\ trx\_9\ will\ be\ forked\ out\ and\ not\ re-\/appear}}
+\DoxyCodeLine{00485\ \ \ \ \ \ \ pnow\ +=\ boost::posix\_time::seconds(1);\ \textcolor{comment}{//\ new\ block,\ new\ time}}
+\DoxyCodeLine{00486\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1mock__time__traits_a374e695ad10b80d8a13e7955cf5abbd8}{fc::mock\_time\_traits::set\_now}}(pnow);}
+\DoxyCodeLine{00487\ \ \ \ \ \ \ trx\_retry.on\_block\_start(13);}
+\DoxyCodeLine{00488\ \ \ \ \ \ \ \textcolor{comment}{//\ should\ still\ be\ tracking\ them}}
+\DoxyCodeLine{00489\ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(3,\ trx\_retry.size());}
+\DoxyCodeLine{00490\ \ \ \ \ \ \ \textcolor{comment}{//\ now\ produce\ an\ empty\ 13}}
+\DoxyCodeLine{00491\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ bsp13b\ =\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a7ad028261e9ab9a38fd557c8f7628615}{make\_block\_state}}(13,\ \{\});\ \textcolor{comment}{//\ now\ 13\ has\ no\ traces}}
+\DoxyCodeLine{00492\ \ \ \ \ \ \ trx\_retry.on\_accepted\_block(bsp13b);}
+\DoxyCodeLine{00493\ \ \ \ \ \ \ \textcolor{comment}{//\ produced\ another\ empty\ block}}
+\DoxyCodeLine{00494\ \ \ \ \ \ \ pnow\ +=\ boost::posix\_time::seconds(1);\ \textcolor{comment}{//\ new\ block,\ new\ time}}
+\DoxyCodeLine{00495\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1mock__time__traits_a374e695ad10b80d8a13e7955cf5abbd8}{fc::mock\_time\_traits::set\_now}}(pnow);}
+\DoxyCodeLine{00496\ \ \ \ \ \ \ trx\_retry.on\_block\_start(14);}
+\DoxyCodeLine{00497\ \ \ \ \ \ \ \textcolor{comment}{//\ now\ produce\ an\ empty\ 14}}
+\DoxyCodeLine{00498\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ bsp14b\ =\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a7ad028261e9ab9a38fd557c8f7628615}{make\_block\_state}}(14,\ \{\});\ \textcolor{comment}{//\ empty}}
+\DoxyCodeLine{00499\ \ \ \ \ \ \ trx\_retry.on\_accepted\_block(bsp14b);}
+\DoxyCodeLine{00500\ \ \ \ \ \ \ \textcolor{comment}{//\ produce\ block\ with\ 7,8}}
+\DoxyCodeLine{00501\ \ \ \ \ \ \ trx\_retry.on\_block\_start(15);}
+\DoxyCodeLine{00502\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ trace\_7b\ =\ make\_transaction\_trace(\ trx\_7,\ 15);}
+\DoxyCodeLine{00503\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ trace\_8b\ =\ make\_transaction\_trace(\ trx\_8,\ 15);}
+\DoxyCodeLine{00504\ \ \ \ \ \ \ trx\_retry.on\_applied\_transaction(trace\_7b,\ trx\_7);}
+\DoxyCodeLine{00505\ \ \ \ \ \ \ trx\_retry.on\_applied\_transaction(trace\_8b,\ trx\_8);}
+\DoxyCodeLine{00506\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ bsp15b\ =\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a7ad028261e9ab9a38fd557c8f7628615}{make\_block\_state}}(15,\ \{trx\_7,\ trx\_8\});}
+\DoxyCodeLine{00507\ \ \ \ \ \ \ trx\_retry.on\_accepted\_block(bsp15b);}
+\DoxyCodeLine{00508\ \ \ \ \ \ \ \textcolor{comment}{//\ need\ 3\ blocks\ before\ 8\ returned\ to\ user}}
+\DoxyCodeLine{00509\ \ \ \ \ \ \ pnow\ +=\ boost::posix\_time::seconds(1);\ \textcolor{comment}{//\ new\ block,\ new\ time}}
+\DoxyCodeLine{00510\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1mock__time__traits_a374e695ad10b80d8a13e7955cf5abbd8}{fc::mock\_time\_traits::set\_now}}(pnow);}
+\DoxyCodeLine{00511\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ bsp16\ =\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a7ad028261e9ab9a38fd557c8f7628615}{make\_block\_state}}(16,\ \{\});}
+\DoxyCodeLine{00512\ \ \ \ \ \ \ trx\_retry.on\_block\_start(16);}
+\DoxyCodeLine{00513\ \ \ \ \ \ \ trx\_retry.on\_accepted\_block(bsp16);}
+\DoxyCodeLine{00514\ \ \ \ \ \ \ BOOST\_CHECK(!trx\_7\_variant);}
+\DoxyCodeLine{00515\ \ \ \ \ \ \ BOOST\_CHECK(!trx\_8\_variant);}
+\DoxyCodeLine{00516\ \ \ \ \ \ \ BOOST\_CHECK(!trx\_9\_expired);}
+\DoxyCodeLine{00517\ \ \ \ \ \ \ pnow\ +=\ boost::posix\_time::seconds(1);\ \textcolor{comment}{//\ new\ block,\ new\ time}}
+\DoxyCodeLine{00518\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1mock__time__traits_a374e695ad10b80d8a13e7955cf5abbd8}{fc::mock\_time\_traits::set\_now}}(pnow);}
+\DoxyCodeLine{00519\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ bsp17\ =\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a7ad028261e9ab9a38fd557c8f7628615}{make\_block\_state}}(17,\ \{\});}
+\DoxyCodeLine{00520\ \ \ \ \ \ \ trx\_retry.on\_block\_start(17);}
+\DoxyCodeLine{00521\ \ \ \ \ \ \ trx\_retry.on\_accepted\_block(bsp17);}
+\DoxyCodeLine{00522\ \ \ \ \ \ \ BOOST\_CHECK(!trx\_7\_variant);}
+\DoxyCodeLine{00523\ \ \ \ \ \ \ BOOST\_CHECK(!trx\_8\_variant);}
+\DoxyCodeLine{00524\ \ \ \ \ \ \ BOOST\_CHECK(!trx\_9\_expired);}
+\DoxyCodeLine{00525\ \ \ \ \ \ \ pnow\ +=\ boost::posix\_time::seconds(1);\ \textcolor{comment}{//\ new\ block,\ new\ time,\ 3rd\ one}}
+\DoxyCodeLine{00526\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1mock__time__traits_a374e695ad10b80d8a13e7955cf5abbd8}{fc::mock\_time\_traits::set\_now}}(pnow);}
+\DoxyCodeLine{00527\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ bsp18\ =\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a7ad028261e9ab9a38fd557c8f7628615}{make\_block\_state}}(18,\ \{\});}
+\DoxyCodeLine{00528\ \ \ \ \ \ \ trx\_retry.on\_block\_start(18);}
+\DoxyCodeLine{00529\ \ \ \ \ \ \ trx\_retry.on\_accepted\_block(bsp18);}
+\DoxyCodeLine{00530\ \ \ \ \ \ \ BOOST\_CHECK(!trx\_7\_variant);}
+\DoxyCodeLine{00531\ \ \ \ \ \ \ BOOST\_CHECK(trx\_8\_variant);}
+\DoxyCodeLine{00532\ \ \ \ \ \ \ BOOST\_CHECK(!trx\_9\_expired);}
+\DoxyCodeLine{00533\ \ \ \ \ \ \ trx\_retry.on\_irreversible\_block(bsp9);}
+\DoxyCodeLine{00534\ \ \ \ \ \ \ trx\_retry.on\_irreversible\_block(bsp10);}
+\DoxyCodeLine{00535\ \ \ \ \ \ \ trx\_retry.on\_irreversible\_block(bsp11);}
+\DoxyCodeLine{00536\ \ \ \ \ \ \ trx\_retry.on\_irreversible\_block(bsp12);}
+\DoxyCodeLine{00537\ \ \ \ \ \ \ trx\_retry.on\_irreversible\_block(bsp13b);}
+\DoxyCodeLine{00538\ \ \ \ \ \ \ trx\_retry.on\_irreversible\_block(bsp14b);}
+\DoxyCodeLine{00539\ \ \ \ \ \ \ BOOST\_CHECK(!trx\_7\_variant);}
+\DoxyCodeLine{00540\ \ \ \ \ \ \ BOOST\_CHECK(trx\_8\_variant);}
+\DoxyCodeLine{00541\ \ \ \ \ \ \ BOOST\_CHECK(!trx\_9\_expired);}
+\DoxyCodeLine{00542\ \ \ \ \ \ \ trx\_retry.on\_irreversible\_block(bsp15b);}
+\DoxyCodeLine{00543\ \ \ \ \ \ \ BOOST\_CHECK(trx\_7\_variant);}
+\DoxyCodeLine{00544\ \ \ \ \ \ \ BOOST\_CHECK(trx\_8\_variant);}
+\DoxyCodeLine{00545\ \ \ \ \ \ \ BOOST\_CHECK(!trx\_9\_expired);}
+\DoxyCodeLine{00546\ \ \ \ \ \ \ \textcolor{comment}{//\ verify\ trx\_9\ expires}}
+\DoxyCodeLine{00547\ \ \ \ \ \ \ pnow\ +=\ boost::posix\_time::seconds(21);\ \textcolor{comment}{//\ new\ block,\ new\ time,\ before\ expire}}
+\DoxyCodeLine{00548\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1mock__time__traits_a374e695ad10b80d8a13e7955cf5abbd8}{fc::mock\_time\_traits::set\_now}}(pnow);}
+\DoxyCodeLine{00549\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ bsp19\ =\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a7ad028261e9ab9a38fd557c8f7628615}{make\_block\_state}}(19,\ \{\});}
+\DoxyCodeLine{00550\ \ \ \ \ \ \ trx\_retry.on\_block\_start(19);}
+\DoxyCodeLine{00551\ \ \ \ \ \ \ trx\_retry.on\_accepted\_block(bsp19);}
+\DoxyCodeLine{00552\ \ \ \ \ \ \ trx\_retry.on\_irreversible\_block(bsp15);}
+\DoxyCodeLine{00553\ \ \ \ \ \ \ trx\_retry.on\_irreversible\_block(bsp16);}
+\DoxyCodeLine{00554\ \ \ \ \ \ \ trx\_retry.on\_irreversible\_block(bsp17);}
+\DoxyCodeLine{00555\ \ \ \ \ \ \ trx\_retry.on\_irreversible\_block(bsp18);}
+\DoxyCodeLine{00556\ \ \ \ \ \ \ trx\_retry.on\_irreversible\_block(bsp19);}
+\DoxyCodeLine{00557\ \ \ \ \ \ \ BOOST\_CHECK(trx\_7\_variant);}
+\DoxyCodeLine{00558\ \ \ \ \ \ \ BOOST\_CHECK(trx\_8\_variant);}
+\DoxyCodeLine{00559\ \ \ \ \ \ \ BOOST\_CHECK(!trx\_9\_expired);}
+\DoxyCodeLine{00560\ \ \ \ \ \ \ pnow\ +=\ boost::posix\_time::seconds(1);\ \textcolor{comment}{//\ new\ block,\ new\ time,\ trx\_9\ now\ expired}}
+\DoxyCodeLine{00561\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1mock__time__traits_a374e695ad10b80d8a13e7955cf5abbd8}{fc::mock\_time\_traits::set\_now}}(pnow);}
+\DoxyCodeLine{00562\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ bsp20\ =\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a7ad028261e9ab9a38fd557c8f7628615}{make\_block\_state}}(20,\ \{\});}
+\DoxyCodeLine{00563\ \ \ \ \ \ \ trx\_retry.on\_block\_start(20);}
+\DoxyCodeLine{00564\ \ \ \ \ \ \ trx\_retry.on\_accepted\_block(bsp20);}
+\DoxyCodeLine{00565\ \ \ \ \ \ \ \textcolor{comment}{//\ waits\ for\ LIB}}
+\DoxyCodeLine{00566\ \ \ \ \ \ \ BOOST\_CHECK(trx\_7\_variant);}
+\DoxyCodeLine{00567\ \ \ \ \ \ \ BOOST\_CHECK(trx\_8\_variant);}
+\DoxyCodeLine{00568\ \ \ \ \ \ \ BOOST\_CHECK(!trx\_9\_expired);}
+\DoxyCodeLine{00569\ \ \ \ \ \ \ trx\_retry.on\_irreversible\_block(bsp20);}
+\DoxyCodeLine{00570\ \ \ \ \ \ \ BOOST\_CHECK(trx\_7\_variant);}
+\DoxyCodeLine{00571\ \ \ \ \ \ \ BOOST\_CHECK(trx\_8\_variant);}
+\DoxyCodeLine{00572\ \ \ \ \ \ \ BOOST\_CHECK(trx\_9\_expired);}
+\DoxyCodeLine{00573\ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(0,\ trx\_retry.size());}
+\DoxyCodeLine{00574\ }
+\DoxyCodeLine{00575\ \ \ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00576\ \ \ \ \ \ \ \textcolor{comment}{//\ test\ reply\ to\ user\ for\ num\_blocks\ ==\ 0}}
+\DoxyCodeLine{00577\ \ \ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00578\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ trx\_10\ =\ make\_unique\_trx(chain-\/>get\_chain\_id(),\ \mbox{\hyperlink{namespacefc_a9623b8cae3f48bbed6aa1fc2afe9b174}{fc::seconds}}(30),\ 10);}
+\DoxyCodeLine{00579\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ trx\_10\_variant\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00580\ \ \ \ \ \ \ trx\_retry.track\_transaction(\ trx\_10,\ std::optional<uint32\_t>(0),\ [\&trx\_10\_variant](\textcolor{keyword}{const}\ std::variant<\mbox{\hyperlink{namespacefc_a15170d1be1e682691dfe6ae09790edce}{fc::exception\_ptr}},\ std::unique\_ptr<fc::variant>>\&\ result)\{}
+\DoxyCodeLine{00581\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE(\ std::holds\_alternative<std::unique\_ptr<fc::variant>>(result)\ );}
+\DoxyCodeLine{00582\ \ \ \ \ \ \ \ \ \ BOOST\_CHECK(\ !!std::get<std::unique\_ptr<fc::variant>>(result)\ );}
+\DoxyCodeLine{00583\ \ \ \ \ \ \ \ \ \ trx\_10\_variant\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00584\ \ \ \ \ \ \ \}\ );}
+\DoxyCodeLine{00585\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ trx\_11\ =\ make\_unique\_trx(chain-\/>get\_chain\_id(),\ \mbox{\hyperlink{namespacefc_a9623b8cae3f48bbed6aa1fc2afe9b174}{fc::seconds}}(30),\ 11);}
+\DoxyCodeLine{00586\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ trx\_11\_variant\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00587\ \ \ \ \ \ \ trx\_retry.track\_transaction(\ trx\_11,\ std::optional<uint32\_t>(1),\ [\&trx\_11\_variant](\textcolor{keyword}{const}\ std::variant<\mbox{\hyperlink{namespacefc_a15170d1be1e682691dfe6ae09790edce}{fc::exception\_ptr}},\ std::unique\_ptr<fc::variant>>\&\ result)\{}
+\DoxyCodeLine{00588\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE(\ std::holds\_alternative<std::unique\_ptr<fc::variant>>(result)\ );}
+\DoxyCodeLine{00589\ \ \ \ \ \ \ \ \ \ BOOST\_CHECK(\ !!std::get<std::unique\_ptr<fc::variant>>(result)\ );}
+\DoxyCodeLine{00590\ \ \ \ \ \ \ \ \ \ trx\_11\_variant\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00591\ \ \ \ \ \ \ \}\ );}
+\DoxyCodeLine{00592\ \ \ \ \ \ \ \textcolor{comment}{//\ seen\ in\ block\ immediately}}
+\DoxyCodeLine{00593\ \ \ \ \ \ \ trx\_retry.on\_block\_start(21);}
+\DoxyCodeLine{00594\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ trace\_10\ =\ make\_transaction\_trace(\ trx\_10,\ 21);}
+\DoxyCodeLine{00595\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ trace\_11\ =\ make\_transaction\_trace(\ trx\_11,\ 21);}
+\DoxyCodeLine{00596\ \ \ \ \ \ \ trx\_retry.on\_applied\_transaction(trace\_10,\ trx\_10);}
+\DoxyCodeLine{00597\ \ \ \ \ \ \ trx\_retry.on\_applied\_transaction(trace\_11,\ trx\_11);}
+\DoxyCodeLine{00598\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ bsp21\ =\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a7ad028261e9ab9a38fd557c8f7628615}{make\_block\_state}}(21,\ \{trx\_10,\ trx\_11\});}
+\DoxyCodeLine{00599\ \ \ \ \ \ \ trx\_retry.on\_accepted\_block(bsp21);}
+\DoxyCodeLine{00600\ \ \ \ \ \ \ BOOST\_CHECK(trx\_10\_variant);}
+\DoxyCodeLine{00601\ \ \ \ \ \ \ BOOST\_CHECK(!trx\_11\_variant);}
+\DoxyCodeLine{00602\ \ \ \ \ \ \ pnow\ +=\ boost::posix\_time::seconds(1);\ \textcolor{comment}{//\ new\ block,\ new\ time}}
+\DoxyCodeLine{00603\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1mock__time__traits_a374e695ad10b80d8a13e7955cf5abbd8}{fc::mock\_time\_traits::set\_now}}(pnow);}
+\DoxyCodeLine{00604\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ bsp22\ =\ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1test__common_a7ad028261e9ab9a38fd557c8f7628615}{make\_block\_state}}(22,\ \{\});}
+\DoxyCodeLine{00605\ \ \ \ \ \ \ trx\_retry.on\_block\_start(22);}
+\DoxyCodeLine{00606\ \ \ \ \ \ \ trx\_retry.on\_accepted\_block(bsp22);}
+\DoxyCodeLine{00607\ \ \ \ \ \ \ BOOST\_CHECK(trx\_10\_variant);}
+\DoxyCodeLine{00608\ \ \ \ \ \ \ BOOST\_CHECK(trx\_11\_variant);}
+\DoxyCodeLine{00609\ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(0,\ trx\_retry.size());}
+\DoxyCodeLine{00610\ }
+\DoxyCodeLine{00611\ }
+\DoxyCodeLine{00612\ \ \ \ \ \ \ \textcolor{comment}{//\ shutdown}}
+\DoxyCodeLine{00613\ \ \ \ \ \ \ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{appbase::app}}().\mbox{\hyperlink{classappbase_1_1application_a81aa58d3f94570b7976145039155fc46}{quit}}();}
+\DoxyCodeLine{00614\ \ \ \ \ \ \ app\_thread.join();}
+\DoxyCodeLine{00615\ }
+\DoxyCodeLine{00616\ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\ ...\ )\ \{}
+\DoxyCodeLine{00617\ \ \ \ \ \ \ boost::filesystem::remove\_all(\ temp\ );}
+\DoxyCodeLine{00618\ \ \ \ \ \ \ \textcolor{keywordflow}{throw};}
+\DoxyCodeLine{00619\ \ \ \ \}}
+\DoxyCodeLine{00620\ \ \ \ boost::filesystem::remove\_all(\ temp\ );}
+\DoxyCodeLine{00621\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__trx__retry__db_8cpp_a253cc0c74fd06c934d9c7d4ee67ccf87_cgraph}
+\end{center}
+\end{figure}

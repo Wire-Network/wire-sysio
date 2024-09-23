@@ -1,0 +1,295 @@
+\doxysection{incbin.\+h}
+\hypertarget{incbin_8h_source}{}\label{incbin_8h_source}\index{libraries/fc/include/fc/io/incbin.h@{libraries/fc/include/fc/io/incbin.h}}
+\mbox{\hyperlink{incbin_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00001}00001\ }
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00011}00011\ \textcolor{preprocessor}{\#ifndef\ INCBIN\_HDR}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00012}00012\ \textcolor{preprocessor}{\#define\ INCBIN\_HDR}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00013}00013\ \textcolor{preprocessor}{\#include\ <limits.h>}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00014}00014\ \textcolor{preprocessor}{\#if\ \ \ defined(\_\_AVX512BW\_\_)\ ||\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00015}00015\ \textcolor{preprocessor}{\ \ \ \ \ \ defined(\_\_AVX512CD\_\_)\ ||\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00016}00016\ \textcolor{preprocessor}{\ \ \ \ \ \ defined(\_\_AVX512DQ\_\_)\ ||\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00017}00017\ \textcolor{preprocessor}{\ \ \ \ \ \ defined(\_\_AVX512ER\_\_)\ ||\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00018}00018\ \textcolor{preprocessor}{\ \ \ \ \ \ defined(\_\_AVX512PF\_\_)\ ||\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00019}00019\ \textcolor{preprocessor}{\ \ \ \ \ \ defined(\_\_AVX512VL\_\_)\ ||\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00020}00020\ \textcolor{preprocessor}{\ \ \ \ \ \ defined(\_\_AVX512F\_\_)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00021}00021\ \textcolor{preprocessor}{\#\ define\ INCBIN\_ALIGNMENT\_INDEX\ 6}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00022}00022\ \textcolor{preprocessor}{\#elif\ defined(\_\_AVX\_\_)\ \ \ \ \ \ ||\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00023}00023\ \textcolor{preprocessor}{\ \ \ \ \ \ defined(\_\_AVX2\_\_)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00024}00024\ \textcolor{preprocessor}{\#\ define\ INCBIN\_ALIGNMENT\_INDEX\ 5}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00025}00025\ \textcolor{preprocessor}{\#elif\ defined(\_\_SSE\_\_)\ \ \ \ \ \ ||\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00026}00026\ \textcolor{preprocessor}{\ \ \ \ \ \ defined(\_\_SSE2\_\_)\ \ \ \ \ ||\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00027}00027\ \textcolor{preprocessor}{\ \ \ \ \ \ defined(\_\_SSE3\_\_)\ \ \ \ \ ||\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00028}00028\ \textcolor{preprocessor}{\ \ \ \ \ \ defined(\_\_SSSE3\_\_)\ \ \ \ ||\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00029}00029\ \textcolor{preprocessor}{\ \ \ \ \ \ defined(\_\_SSE4\_1\_\_)\ \ \ ||\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00030}00030\ \textcolor{preprocessor}{\ \ \ \ \ \ defined(\_\_SSE4\_2\_\_)\ \ \ ||\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00031}00031\ \textcolor{preprocessor}{\ \ \ \ \ \ defined(\_\_neon\_\_)\ \ \ \ \ ||\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00032}00032\ \textcolor{preprocessor}{\ \ \ \ \ \ defined(\_\_ARM\_NEON)\ \ \ ||\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00033}00033\ \textcolor{preprocessor}{\ \ \ \ \ \ defined(\_\_ALTIVEC\_\_)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00034}00034\ \textcolor{preprocessor}{\#\ define\ INCBIN\_ALIGNMENT\_INDEX\ 4}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00035}00035\ \textcolor{preprocessor}{\#elif\ ULONG\_MAX\ !=\ 0xffffffffu}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00036}\mbox{\hyperlink{incbin_8h_a2ac14c51ade01712816a6f982ed2d18f}{00036}}\ \textcolor{preprocessor}{\#\ define\ INCBIN\_ALIGNMENT\_INDEX\ 3}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00037}00037\ \textcolor{preprocessor}{\#\ else}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00038}00038\ \textcolor{preprocessor}{\#\ define\ INCBIN\_ALIGNMENT\_INDEX\ 2}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00039}00039\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00041}00041\ \textcolor{comment}{/*\ Lookup\ table\ of\ (1\ <<\ n)\ where\ \`{}n'\ is\ \`{}INCBIN\_ALIGNMENT\_INDEX'\ */}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00042}\mbox{\hyperlink{incbin_8h_afb9a92f49654b36fb067d071461c44c9}{00042}}\ \textcolor{preprocessor}{\#define\ INCBIN\_ALIGN\_SHIFT\_0\ 1}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00043}\mbox{\hyperlink{incbin_8h_a5f55561ed3a1c72e6c3b3106d245b1a0}{00043}}\ \textcolor{preprocessor}{\#define\ INCBIN\_ALIGN\_SHIFT\_1\ 2}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00044}\mbox{\hyperlink{incbin_8h_aea427a2895aa8cf4bcef8d6040e86a0a}{00044}}\ \textcolor{preprocessor}{\#define\ INCBIN\_ALIGN\_SHIFT\_2\ 4}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00045}\mbox{\hyperlink{incbin_8h_acc0584f36f996da3f6c4e8e7358d4652}{00045}}\ \textcolor{preprocessor}{\#define\ INCBIN\_ALIGN\_SHIFT\_3\ 8}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00046}\mbox{\hyperlink{incbin_8h_aa74ae7041a2bf6f919859d9883223669}{00046}}\ \textcolor{preprocessor}{\#define\ INCBIN\_ALIGN\_SHIFT\_4\ 16}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00047}\mbox{\hyperlink{incbin_8h_a111dd31eb3edfb4609db841f69a1eb90}{00047}}\ \textcolor{preprocessor}{\#define\ INCBIN\_ALIGN\_SHIFT\_5\ 32}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00048}\mbox{\hyperlink{incbin_8h_a4f5e64402b75c4ec9cfc3c5ce2c1924a}{00048}}\ \textcolor{preprocessor}{\#define\ INCBIN\_ALIGN\_SHIFT\_6\ 64}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00050}00050\ \textcolor{comment}{/*\ Actual\ alignment\ value\ */}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00051}\mbox{\hyperlink{incbin_8h_a2ebeb95a2b6da3689c9f1580e74d39f2}{00051}}\ \textcolor{preprocessor}{\#define\ INCBIN\_ALIGNMENT\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00052}00052\ \textcolor{preprocessor}{\ \ \ \ INCBIN\_CONCATENATE(\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00053}00053\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ INCBIN\_CONCATENATE(INCBIN\_ALIGN\_SHIFT,\ \_),\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00054}00054\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ INCBIN\_ALIGNMENT\_INDEX)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00056}00056\ \textcolor{comment}{/*\ Stringize\ */}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00057}\mbox{\hyperlink{incbin_8h_a45f50a27becdce34097f9a3a6a191d56}{00057}}\ \textcolor{preprocessor}{\#define\ INCBIN\_STR(X)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00058}00058\ \textcolor{preprocessor}{\ \ \ \ \#X}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00059}\mbox{\hyperlink{incbin_8h_aef514ccf98b975fe40e7a9d6c3375458}{00059}}\ \textcolor{preprocessor}{\#define\ INCBIN\_STRINGIZE(X)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00060}00060\ \textcolor{preprocessor}{\ \ \ \ INCBIN\_STR(X)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00061}00061\ \textcolor{comment}{/*\ Concatenate\ */}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00062}\mbox{\hyperlink{incbin_8h_aeb6b99bf84c3a926b6a291e862ce935a}{00062}}\ \textcolor{preprocessor}{\#define\ INCBIN\_CAT(X,\ Y)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00063}00063\ \textcolor{preprocessor}{\ \ \ \ X\ \#\#\ Y}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00064}\mbox{\hyperlink{incbin_8h_ad06604a969ca743d34eaa81695020fb9}{00064}}\ \textcolor{preprocessor}{\#define\ INCBIN\_CONCATENATE(X,\ Y)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00065}00065\ \textcolor{preprocessor}{\ \ \ \ INCBIN\_CAT(X,\ Y)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00066}00066\ \textcolor{comment}{/*\ Deferred\ macro\ expansion\ */}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00067}\mbox{\hyperlink{incbin_8h_a1bb4c45b4d945e6471d47b85be716cdb}{00067}}\ \textcolor{preprocessor}{\#define\ INCBIN\_EVAL(X)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00068}00068\ \textcolor{preprocessor}{\ \ \ \ X}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00069}\mbox{\hyperlink{incbin_8h_a548b434136a84218d89576032bc8ee98}{00069}}\ \textcolor{preprocessor}{\#define\ INCBIN\_INVOKE(N,\ ...)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00070}00070\ \textcolor{preprocessor}{\ \ \ \ INCBIN\_EVAL(N(\_\_VA\_ARGS\_\_))}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00071}00071\ \textcolor{comment}{/*\ Variable\ argument\ count\ for\ overloading\ by\ arity\ */}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00072}\mbox{\hyperlink{incbin_8h_a629a0427fbdc7f3c4318c6960a938c3b}{00072}}\ \textcolor{preprocessor}{\#define\ INCBIN\_VA\_ARG\_COUNTER(\_1,\ \_2,\ \_3,\ N,\ ...)\ N}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00073}\mbox{\hyperlink{incbin_8h_a631c855f5124398f8855683a1d7cbd1b}{00073}}\ \textcolor{preprocessor}{\#define\ INCBIN\_VA\_ARGC(...)\ INCBIN\_VA\_ARG\_COUNTER(\_\_VA\_ARGS\_\_,\ 3,\ 2,\ 1,\ 0)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00074}00074\ }
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00075}00075\ \textcolor{comment}{/*\ Green\ Hills\ uses\ a\ different\ directive\ for\ including\ binary\ data\ */}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00076}00076\ \textcolor{preprocessor}{\#if\ defined(\_\_ghs\_\_)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00077}00077\ \textcolor{preprocessor}{\#\ \ if\ (\_\_ghs\_asm\ ==\ 2)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00078}00078\ \textcolor{preprocessor}{\#\ \ \ \ define\ INCBIN\_MACRO\ "{}.file"{}}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00079}00079\ \textcolor{comment}{/*\ Or\ consider\ the\ "{}.myrawdata"{}\ entry\ in\ the\ ld\ file\ */}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00080}00080\ \textcolor{preprocessor}{\#\ \ else}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00081}00081\ \textcolor{preprocessor}{\#\ \ \ \ define\ INCBIN\_MACRO\ "{}\(\backslash\)tINCBIN"{}}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00082}00082\ \textcolor{preprocessor}{\#\ \ endif}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00083}00083\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00084}\mbox{\hyperlink{incbin_8h_a672b92915cc07af47c71aab722bca88b}{00084}}\ \textcolor{preprocessor}{\#\ \ define\ INCBIN\_MACRO\ "{}.incbin"{}}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00085}00085\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00086}00086\ }
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00087}00087\ \textcolor{preprocessor}{\#ifndef\ \_MSC\_VER}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00088}\mbox{\hyperlink{incbin_8h_a6a96711adeb9f59431d89dc75efe9f54}{00088}}\ \textcolor{preprocessor}{\#\ \ define\ INCBIN\_ALIGN\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00089}00089\ \textcolor{preprocessor}{\ \ \ \ \_\_attribute\_\_((aligned(INCBIN\_ALIGNMENT)))}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00090}00090\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00091}00091\ \textcolor{preprocessor}{\#\ \ define\ INCBIN\_ALIGN\ \_\_declspec(align(INCBIN\_ALIGNMENT))}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00092}00092\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00093}00093\ }
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00094}00094\ \textcolor{preprocessor}{\#if\ defined(\_\_arm\_\_)\ ||\ }\textcolor{comment}{/*\ GNU\ C\ and\ RealView\ */}\textcolor{preprocessor}{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00095}00095\ \textcolor{preprocessor}{\ \ \ \ defined(\_\_arm)\ ||\ }\textcolor{comment}{/*\ Diab\ */}\textcolor{preprocessor}{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00096}00096\ \textcolor{preprocessor}{\ \ \ \ defined(\_ARM)\ }\textcolor{comment}{/*\ ImageCraft\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00097}00097\ \textcolor{preprocessor}{\#\ \ define\ INCBIN\_ARM}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00098}00098\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00099}00099\ }
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00100}00100\ \textcolor{preprocessor}{\#ifdef\ \_\_GNUC\_\_}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00101}00101\ \textcolor{comment}{/*\ Utilize\ .balign\ where\ supported\ */}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00102}00102\ \textcolor{preprocessor}{\#\ \ define\ INCBIN\_ALIGN\_HOST\ "{}.balign\ "{}\ INCBIN\_STRINGIZE(INCBIN\_ALIGNMENT)\ "{}\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00103}00103\ \textcolor{preprocessor}{\#\ \ define\ INCBIN\_ALIGN\_BYTE\ "{}.balign\ 1\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00104}00104\ \textcolor{preprocessor}{\#elif\ defined(INCBIN\_ARM)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00105}00105\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00106}00106\ \textcolor{comment}{\ *\ On\ arm\ assemblers,\ the\ alignment\ value\ is\ calculated\ as\ (1\ <<\ n)\ where\ \`{}n'\ is}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00107}00107\ \textcolor{comment}{\ *\ the\ shift\ count.\ This\ is\ the\ value\ passed\ to\ \`{}.align'}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00108}00108\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00109}00109\ \textcolor{preprocessor}{\#\ \ define\ INCBIN\_ALIGN\_HOST\ "{}.align\ "{}\ INCBIN\_STRINGIZE(INCBIN\_ALIGNMENT\_INDEX)\ "{}\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00110}00110\ \textcolor{preprocessor}{\#\ \ define\ INCBIN\_ALIGN\_BYTE\ "{}.align\ 0\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00111}00111\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00112}00112\ \textcolor{comment}{/*\ We\ assume\ other\ inline\ assembler's\ treat\ \`{}.align'\ as\ \`{}.balign'\ */}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00113}\mbox{\hyperlink{incbin_8h_a0924974bd68298ea620216739275e81f}{00113}}\ \textcolor{preprocessor}{\#\ \ define\ INCBIN\_ALIGN\_HOST\ "{}.align\ "{}\ INCBIN\_STRINGIZE(INCBIN\_ALIGNMENT)\ "{}\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00114}\mbox{\hyperlink{incbin_8h_a05363235ce38d6acc8c87767f8c6bc88}{00114}}\ \textcolor{preprocessor}{\#\ \ define\ INCBIN\_ALIGN\_BYTE\ "{}.align\ 1\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00115}00115\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00116}00116\ }
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00117}00117\ \textcolor{comment}{/*\ INCBIN\_CONST\ is\ used\ by\ incbin.c\ generated\ files\ */}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00118}00118\ \textcolor{preprocessor}{\#if\ defined(\_\_cplusplus)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00119}00119\ \textcolor{preprocessor}{\#\ \ define\ INCBIN\_EXTERNAL\ extern\ "{}C"{}}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00120}00120\ \textcolor{preprocessor}{\#\ \ define\ INCBIN\_CONST\ \ \ \ extern\ const}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00121}00121\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00122}\mbox{\hyperlink{incbin_8h_ae8f73fc1cd4677f5d87c44f206f9fd1a}{00122}}\ \textcolor{preprocessor}{\#\ \ define\ INCBIN\_EXTERNAL\ extern}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00123}\mbox{\hyperlink{incbin_8h_af57339405f97cbdf9ac35636686d1045}{00123}}\ \textcolor{preprocessor}{\#\ \ define\ INCBIN\_CONST\ \ \ \ const}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00124}00124\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00125}00125\ }
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00133}00133\ \textcolor{preprocessor}{\#if\ !defined(INCBIN\_OUTPUT\_SECTION)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00134}00134\ \textcolor{preprocessor}{\#\ \ if\ defined(\_\_APPLE\_\_)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00135}00135\ \textcolor{preprocessor}{\#\ \ \ \ define\ INCBIN\_OUTPUT\_SECTION\ "{}.const\_data"{}}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00136}00136\ \textcolor{preprocessor}{\#\ \ else}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00137}\mbox{\hyperlink{incbin_8h_a94f1236019ea994587d0cf899322d8d5}{00137}}\ \textcolor{preprocessor}{\#\ \ \ \ define\ INCBIN\_OUTPUT\_SECTION\ "{}.rodata"{}}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00138}00138\ \textcolor{preprocessor}{\#\ \ endif}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00139}00139\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00140}00140\ }
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00147}00147\ \textcolor{preprocessor}{\#if\ !defined(INCBIN\_OUTPUT\_DATA\_SECTION)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00148}\mbox{\hyperlink{incbin_8h_a86596f6d704c6a5cb55bc76cce94f247}{00148}}\ \textcolor{preprocessor}{\#\ \ define\ INCBIN\_OUTPUT\_DATA\_SECTION\ INCBIN\_OUTPUT\_SECTION}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00149}00149\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00150}00150\ }
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00161}00161\ \textcolor{preprocessor}{\#if\ !defined(INCBIN\_OUTPUT\_SIZE\_SECTION)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00162}\mbox{\hyperlink{incbin_8h_a325986bbe344f31f7bdafe2b6c9305b7}{00162}}\ \textcolor{preprocessor}{\#\ \ define\ INCBIN\_OUTPUT\_SIZE\_SECTION\ INCBIN\_OUTPUT\_SECTION}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00163}00163\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00164}00164\ }
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00165}00165\ \textcolor{preprocessor}{\#if\ defined(\_\_APPLE\_\_)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00166}00166\ \textcolor{preprocessor}{\#\ \ include\ "{}TargetConditionals.h"{}}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00167}00167\ \textcolor{preprocessor}{\#\ \ if\ defined(TARGET\_OS\_IPHONE)\ \&\&\ !defined(INCBIN\_SILENCE\_BITCODE\_WARNING)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00168}00168\ \textcolor{preprocessor}{\#\ \ \ \ warning\ "{}incbin\ is\ incompatible\ with\ bitcode.\ Using\ the\ library\ will\ break\ upload\ to\ App\ Store\ if\ you\ have\ bitcode\ enabled.\ Add\ \`{}\#define\ INCBIN\_SILENCE\_BITCODE\_WARNING`\ before\ including\ this\ header\ to\ silence\ this\ warning."{}}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00169}00169\ \textcolor{preprocessor}{\#\ \ endif}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00170}00170\ \textcolor{comment}{/*\ The\ directives\ are\ different\ for\ Apple\ branded\ compilers\ */}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00171}00171\ \textcolor{preprocessor}{\#\ \ define\ INCBIN\_SECTION\ \ \ \ \ \ \ \ \ INCBIN\_OUTPUT\_SECTION\ "{}\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00172}00172\ \textcolor{preprocessor}{\#\ \ define\ INCBIN\_GLOBAL(NAME)\ \ \ \ "{}.globl\ "{}\ INCBIN\_MANGLE\ INCBIN\_STRINGIZE(INCBIN\_PREFIX)\ \#NAME\ "{}\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00173}00173\ \textcolor{preprocessor}{\#\ \ define\ INCBIN\_INT\ \ \ \ \ \ \ \ \ \ \ \ \ "{}.long\ "{}}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00174}00174\ \textcolor{preprocessor}{\#\ \ define\ INCBIN\_MANGLE\ \ \ \ \ \ \ \ \ \ "{}\_"{}}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00175}00175\ \textcolor{preprocessor}{\#\ \ define\ INCBIN\_BYTE\ \ \ \ \ \ \ \ \ \ \ \ "{}.byte\ "{}}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00176}00176\ \textcolor{preprocessor}{\#\ \ define\ INCBIN\_TYPE(...)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00177}00177\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00178}\mbox{\hyperlink{incbin_8h_acfa42080b3020a2d08650f1f1f31afb8}{00178}}\ \textcolor{preprocessor}{\#\ \ define\ INCBIN\_SECTION\ \ \ \ \ \ \ \ \ "{}.section\ "{}\ INCBIN\_OUTPUT\_SECTION\ "{}\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00179}\mbox{\hyperlink{incbin_8h_ac1164a784dea080f213662b37b682092}{00179}}\ \textcolor{preprocessor}{\#\ \ define\ INCBIN\_GLOBAL(NAME)\ \ \ \ "{}.global\ "{}\ INCBIN\_STRINGIZE(INCBIN\_PREFIX)\ \#NAME\ "{}\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00180}00180\ \textcolor{preprocessor}{\#\ \ if\ defined(\_\_ghs\_\_)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00181}00181\ \textcolor{preprocessor}{\#\ \ \ \ define\ INCBIN\_INT\ \ \ \ \ \ \ \ \ \ \ "{}.word\ "{}}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00182}00182\ \textcolor{preprocessor}{\#\ \ else}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00183}\mbox{\hyperlink{incbin_8h_a3068e8ea942a65007b069c6e069f2984}{00183}}\ \textcolor{preprocessor}{\#\ \ \ \ define\ INCBIN\_INT\ \ \ \ \ \ \ \ \ \ \ "{}.int\ "{}}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00184}00184\ \textcolor{preprocessor}{\#\ \ endif}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00185}00185\ \textcolor{preprocessor}{\#\ \ if\ defined(\_\_USER\_LABEL\_PREFIX\_\_)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00186}00186\ \textcolor{preprocessor}{\#\ \ \ \ define\ INCBIN\_MANGLE\ \ \ \ \ \ \ \ INCBIN\_STRINGIZE(\_\_USER\_LABEL\_PREFIX\_\_)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00187}00187\ \textcolor{preprocessor}{\#\ \ else}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00188}\mbox{\hyperlink{incbin_8h_aa11b19aab6b4cd6425759dabe00e8d29}{00188}}\ \textcolor{preprocessor}{\#\ \ \ \ define\ INCBIN\_MANGLE\ \ \ \ \ \ \ \ "{}"{}}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00189}00189\ \textcolor{preprocessor}{\#\ \ endif}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00190}00190\ \textcolor{preprocessor}{\#\ \ if\ defined(INCBIN\_ARM)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00191}00191\ \textcolor{comment}{/*\ On\ arm\ assemblers,\ \`{}@'\ is\ used\ as\ a\ line\ comment\ token\ */}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00192}00192\ \textcolor{preprocessor}{\#\ \ \ \ define\ INCBIN\_TYPE(NAME)\ \ \ \ "{}.type\ "{}\ INCBIN\_STRINGIZE(INCBIN\_PREFIX)\ \#NAME\ "{},\ \%object\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00193}00193\ \textcolor{preprocessor}{\#\ \ elif\ defined(\_\_MINGW32\_\_)\ ||\ defined(\_\_MINGW64\_\_)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00194}00194\ \textcolor{comment}{/*\ Mingw\ doesn't\ support\ this\ directive\ either\ */}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00195}00195\ \textcolor{preprocessor}{\#\ \ \ \ define\ INCBIN\_TYPE(NAME)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00196}00196\ \textcolor{preprocessor}{\#\ \ else}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00197}00197\ \textcolor{comment}{/*\ It's\ safe\ to\ use\ \`{}@'\ on\ other\ architectures\ */}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00198}\mbox{\hyperlink{incbin_8h_a876e8594595894992ba6e19c8aca18dc}{00198}}\ \textcolor{preprocessor}{\#\ \ \ \ define\ INCBIN\_TYPE(NAME)\ \ \ \ "{}.type\ "{}\ INCBIN\_STRINGIZE(INCBIN\_PREFIX)\ \#NAME\ "{},\ @object\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00199}00199\ \textcolor{preprocessor}{\#\ \ endif}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00200}\mbox{\hyperlink{incbin_8h_a6eb5e549d98191b9c0cef2ddcdf9de9a}{00200}}\ \textcolor{preprocessor}{\#\ \ define\ INCBIN\_BYTE\ \ \ \ \ \ \ \ \ \ \ \ "{}.byte\ "{}}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00201}00201\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00202}00202\ }
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00203}00203\ \textcolor{comment}{/*\ List\ of\ style\ types\ used\ for\ symbol\ names\ */}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00204}\mbox{\hyperlink{incbin_8h_a20fecbad4e1dce3395b2e82a353601bc}{00204}}\ \textcolor{preprocessor}{\#define\ INCBIN\_STYLE\_CAMEL\ 0}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00205}\mbox{\hyperlink{incbin_8h_a57db6ced0d576efb114749358ed7948d}{00205}}\ \textcolor{preprocessor}{\#define\ INCBIN\_STYLE\_SNAKE\ 1}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00206}00206\ }
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00223}00223\ \textcolor{preprocessor}{\#if\ !defined(INCBIN\_PREFIX)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00224}\mbox{\hyperlink{incbin_8h_afc747a8a73006a3292dcc184e82638dd}{00224}}\ \textcolor{preprocessor}{\#\ \ define\ INCBIN\_PREFIX\ g}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00225}00225\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00226}00226\ }
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00247}00247\ \textcolor{preprocessor}{\#if\ !defined(INCBIN\_STYLE)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00248}\mbox{\hyperlink{incbin_8h_afe015d68a6e8181f7999b6bab70f907c}{00248}}\ \textcolor{preprocessor}{\#\ \ define\ INCBIN\_STYLE\ INCBIN\_STYLE\_CAMEL}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00249}00249\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00250}00250\ }
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00251}00251\ \textcolor{comment}{/*\ Style\ lookup\ tables\ */}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00252}\mbox{\hyperlink{incbin_8h_aee87b6f048e8e717194c7f29dd4279d8}{00252}}\ \textcolor{preprocessor}{\#define\ INCBIN\_STYLE\_0\_DATA\ Data}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00253}\mbox{\hyperlink{incbin_8h_ab96c212f38dcae93014a8f1c2cd0a88f}{00253}}\ \textcolor{preprocessor}{\#define\ INCBIN\_STYLE\_0\_END\ End}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00254}\mbox{\hyperlink{incbin_8h_a1f296bf81c1eceebd277401547eb65eb}{00254}}\ \textcolor{preprocessor}{\#define\ INCBIN\_STYLE\_0\_SIZE\ Size}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00255}\mbox{\hyperlink{incbin_8h_aa01612de03978579b9133935efb23cee}{00255}}\ \textcolor{preprocessor}{\#define\ INCBIN\_STYLE\_1\_DATA\ \_data}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00256}\mbox{\hyperlink{incbin_8h_aeb86af942085160b8b6fe7aa38f64508}{00256}}\ \textcolor{preprocessor}{\#define\ INCBIN\_STYLE\_1\_END\ \_end}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00257}\mbox{\hyperlink{incbin_8h_ab653c280956504461f7a895e7c8faf56}{00257}}\ \textcolor{preprocessor}{\#define\ INCBIN\_STYLE\_1\_SIZE\ \_size}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00258}00258\ }
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00259}00259\ \textcolor{comment}{/*\ Style\ lookup:\ returning\ identifier\ */}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00260}\mbox{\hyperlink{incbin_8h_aab1f2c47a8d29be9e7295514b7749e3f}{00260}}\ \textcolor{preprocessor}{\#define\ INCBIN\_STYLE\_IDENT(TYPE)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00261}00261\ \textcolor{preprocessor}{\ \ \ \ INCBIN\_CONCATENATE(\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00262}00262\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ INCBIN\_STYLE\_,\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00263}00263\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ INCBIN\_CONCATENATE(\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00264}00264\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ INCBIN\_EVAL(INCBIN\_STYLE),\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00265}00265\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ INCBIN\_CONCATENATE(\_,\ TYPE)))}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00266}00266\ }
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00267}00267\ \textcolor{comment}{/*\ Style\ lookup:\ returning\ string\ literal\ */}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00268}\mbox{\hyperlink{incbin_8h_a9407337383853d264445fa44e0b37342}{00268}}\ \textcolor{preprocessor}{\#define\ INCBIN\_STYLE\_STRING(TYPE)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00269}00269\ \textcolor{preprocessor}{\ \ \ \ INCBIN\_STRINGIZE(\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00270}00270\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ INCBIN\_STYLE\_IDENT(TYPE))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00271}00271\ \textcolor{preprocessor}{}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00272}00272\ \textcolor{comment}{/*\ Generate\ the\ global\ labels\ by\ indirectly\ invoking\ the\ macro\ with\ our\ style}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00273}00273\ \textcolor{comment}{\ *\ type\ and\ concatenating\ the\ name\ against\ them.\ */}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00274}\mbox{\hyperlink{incbin_8h_a4e7e8e7219152d0c13f8cd2955b2a8b0}{00274}}\ \textcolor{preprocessor}{\#define\ INCBIN\_GLOBAL\_LABELS(NAME,\ TYPE)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00275}00275\ \textcolor{preprocessor}{\ \ \ \ INCBIN\_INVOKE(\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00276}00276\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ INCBIN\_GLOBAL,\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00277}00277\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ INCBIN\_CONCATENATE(\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00278}00278\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ NAME,\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00279}00279\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ INCBIN\_INVOKE(\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00280}00280\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ INCBIN\_STYLE\_IDENT,\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00281}00281\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ TYPE)))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00282}00282\ \textcolor{preprocessor}{\ \ \ \ INCBIN\_INVOKE(\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00283}00283\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ INCBIN\_TYPE,\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00284}00284\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ INCBIN\_CONCATENATE(\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00285}00285\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ NAME,\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00286}00286\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ INCBIN\_INVOKE(\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00287}00287\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ INCBIN\_STYLE\_IDENT,\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00288}00288\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ TYPE)))}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00289}00289\ }
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00321}\mbox{\hyperlink{incbin_8h_aec9b7bdfb5ebcf6a8abc32c35ebc81b3}{00321}}\ \textcolor{preprocessor}{\#define\ INCBIN\_EXTERN(...)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00322}00322\ \textcolor{preprocessor}{\ \ \ \ INCBIN\_CONCATENATE(INCBIN\_EXTERN\_,\ INCBIN\_VA\_ARGC(\_\_VA\_ARGS\_\_))(\_\_VA\_ARGS\_\_)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00323}\mbox{\hyperlink{incbin_8h_a05a6af8025125facffe29d35dde0ecec}{00323}}\ \textcolor{preprocessor}{\#define\ INCBIN\_EXTERN\_1(NAME,\ ...)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00324}00324\ \textcolor{preprocessor}{\ \ \ \ INCBIN\_EXTERN\_2(unsigned\ char,\ NAME)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00325}\mbox{\hyperlink{incbin_8h_a78405eb5693b1638754e8f9db61b3692}{00325}}\ \textcolor{preprocessor}{\#define\ INCBIN\_EXTERN\_2(TYPE,\ NAME)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00326}00326\ \textcolor{preprocessor}{\ \ \ \ INCBIN\_EXTERNAL\ const\ INCBIN\_ALIGN\ TYPE\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00327}00327\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ INCBIN\_CONCATENATE(\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00328}00328\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ INCBIN\_CONCATENATE(INCBIN\_PREFIX,\ NAME),\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00329}00329\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ INCBIN\_STYLE\_IDENT(DATA))[];\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00330}00330\ \textcolor{preprocessor}{\ \ \ \ INCBIN\_EXTERNAL\ const\ INCBIN\_ALIGN\ TYPE\ *const\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00331}00331\ \textcolor{preprocessor}{\ \ \ \ INCBIN\_CONCATENATE(\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00332}00332\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ INCBIN\_CONCATENATE(INCBIN\_PREFIX,\ NAME),\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00333}00333\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ INCBIN\_STYLE\_IDENT(END));\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00334}00334\ \textcolor{preprocessor}{\ \ \ \ INCBIN\_EXTERNAL\ const\ unsigned\ int\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00335}00335\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ INCBIN\_CONCATENATE(\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00336}00336\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ INCBIN\_CONCATENATE(INCBIN\_PREFIX,\ NAME),\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00337}00337\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ INCBIN\_STYLE\_IDENT(SIZE))}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00338}00338\ }
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00359}\mbox{\hyperlink{incbin_8h_a7773d2de7e7a5dba41822aa82ae42bd2}{00359}}\ \textcolor{preprocessor}{\#define\ INCTXT\_EXTERN(NAME)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00360}00360\ \textcolor{preprocessor}{\ \ \ \ INCBIN\_EXTERN\_2(char,\ NAME)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00361}00361\ }
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00401}00401\ \textcolor{preprocessor}{\#ifdef\ \_MSC\_VER}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00402}00402\ \textcolor{preprocessor}{\#\ \ define\ INCBIN(NAME,\ FILENAME)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00403}00403\ \textcolor{preprocessor}{\ \ \ \ \ \ INCBIN\_EXTERN(NAME)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00404}00404\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00405}\mbox{\hyperlink{incbin_8h_ac234567192c693b0f511b51c75a9b471}{00405}}\ \textcolor{preprocessor}{\#\ \ define\ INCBIN(...)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00406}00406\ \textcolor{preprocessor}{\ \ \ \ \ INCBIN\_CONCATENATE(INCBIN\_,\ INCBIN\_VA\_ARGC(\_\_VA\_ARGS\_\_))(\_\_VA\_ARGS\_\_)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00407}00407\ \textcolor{preprocessor}{\#\ \ if\ defined(\_\_GNUC\_\_)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00408}00408\ \textcolor{preprocessor}{\#\ \ \ \ define\ INCBIN\_1(...)\ \_Pragma("{}GCC\ error\ \(\backslash\)"{}Single\ argument\ INCBIN\ not\ allowed\(\backslash\)"{}"{})}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00409}00409\ \textcolor{preprocessor}{\#\ \ elif\ defined(\_\_clang\_\_)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00410}00410\ \textcolor{preprocessor}{\#\ \ \ \ define\ INCBIN\_1(...)\ \_Pragma("{}clang\ error\ \(\backslash\)"{}Single\ argument\ INCBIN\ not\ allowed\(\backslash\)"{}"{})}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00411}00411\ \textcolor{preprocessor}{\#\ \ else}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00412}\mbox{\hyperlink{incbin_8h_a7db686dee5716c401880874dcca9cd86}{00412}}\ \textcolor{preprocessor}{\#\ \ \ \ define\ INCBIN\_1(...)\ }\textcolor{comment}{/*\ Cannot\ do\ anything\ here\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00413}00413\ \textcolor{preprocessor}{\#\ \ endif}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00414}\mbox{\hyperlink{incbin_8h_af59269b019ba24a067da8f0abd0ff8d2}{00414}}\ \textcolor{preprocessor}{\#\ \ define\ INCBIN\_2(NAME,\ FILENAME)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00415}00415\ \textcolor{preprocessor}{\ \ \ \ \ \ INCBIN\_3(unsigned\ char,\ NAME,\ FILENAME)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00416}\mbox{\hyperlink{incbin_8h_a1ba7df28c2ab3dbde83ed4f7cb57704e}{00416}}\ \textcolor{preprocessor}{\#\ \ define\ INCBIN\_3(TYPE,\ NAME,\ FILENAME)\ INCBIN\_COMMON(TYPE,\ NAME,\ FILENAME,\ }\textcolor{comment}{/*\ No\ terminator\ for\ binary\ data\ */}\textcolor{preprocessor}{)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00417}\mbox{\hyperlink{incbin_8h_a7f1eed433259cc17d78c3d62196aaa57}{00417}}\ \textcolor{preprocessor}{\#\ \ define\ INCBIN\_COMMON(TYPE,\ NAME,\ FILENAME,\ TERMINATOR)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00418}00418\ \textcolor{preprocessor}{\ \ \ \ \_\_asm\_\_(INCBIN\_SECTION\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00419}00419\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ INCBIN\_GLOBAL\_LABELS(NAME,\ DATA)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00420}00420\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ INCBIN\_ALIGN\_HOST\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00421}00421\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ INCBIN\_MANGLE\ INCBIN\_STRINGIZE(INCBIN\_PREFIX)\ \#NAME\ INCBIN\_STYLE\_STRING(DATA)\ "{}:\(\backslash\)n"{}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00422}00422\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ INCBIN\_MACRO\ "{}\ \(\backslash\)"{}"{}\ FILENAME\ "{}\(\backslash\)"{}\(\backslash\)n"{}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00423}00423\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ TERMINATOR\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00424}00424\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ INCBIN\_GLOBAL\_LABELS(NAME,\ END)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00425}00425\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ INCBIN\_ALIGN\_BYTE\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00426}00426\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ INCBIN\_MANGLE\ INCBIN\_STRINGIZE(INCBIN\_PREFIX)\ \#NAME\ INCBIN\_STYLE\_STRING(END)\ "{}:\(\backslash\)n"{}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00427}00427\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ INCBIN\_BYTE\ "{}1\(\backslash\)n"{}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00428}00428\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ INCBIN\_GLOBAL\_LABELS(NAME,\ SIZE)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00429}00429\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ INCBIN\_ALIGN\_HOST\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00430}00430\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ INCBIN\_MANGLE\ INCBIN\_STRINGIZE(INCBIN\_PREFIX)\ \#NAME\ INCBIN\_STYLE\_STRING(SIZE)\ "{}:\(\backslash\)n"{}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00431}00431\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ INCBIN\_INT\ INCBIN\_MANGLE\ INCBIN\_STRINGIZE(INCBIN\_PREFIX)\ \#NAME\ INCBIN\_STYLE\_STRING(END)\ "{}\ -\/\ "{}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00432}00432\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ INCBIN\_MANGLE\ INCBIN\_STRINGIZE(INCBIN\_PREFIX)\ \#NAME\ INCBIN\_STYLE\_STRING(DATA)\ "{}\(\backslash\)n"{}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00433}00433\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ INCBIN\_ALIGN\_HOST\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00434}00434\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ "{}.text\(\backslash\)n"{}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00435}00435\ \textcolor{preprocessor}{\ \ \ \ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00436}00436\ \textcolor{preprocessor}{\ \ \ \ INCBIN\_EXTERN(TYPE,\ NAME)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00437}00437\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00438}00438\ }
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00470}00470\ \textcolor{preprocessor}{\#if\ defined(\_MSC\_VER)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00471}00471\ \textcolor{preprocessor}{\#\ \ define\ INCTXT(NAME,\ FILENAME)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00472}00472\ \textcolor{preprocessor}{\ \ \ \ \ INCBIN\_EXTERN(NAME)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00473}00473\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00474}\mbox{\hyperlink{incbin_8h_ab0ce08857f3b96bfabdb92f8a67e3d47}{00474}}\ \textcolor{preprocessor}{\#\ \ define\ INCTXT(NAME,\ FILENAME)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00475}00475\ \textcolor{preprocessor}{\ \ \ \ \ INCBIN\_COMMON(char,\ NAME,\ FILENAME,\ INCBIN\_BYTE\ "{}0\(\backslash\)n"{})}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00476}00476\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00477}00477\ }
+\DoxyCodeLine{\Hypertarget{incbin_8h_source_l00478}00478\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

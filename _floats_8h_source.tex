@@ -1,0 +1,126 @@
+\doxysection{Floats.\+h}
+\hypertarget{_floats_8h_source}{}\label{_floats_8h_source}\index{libraries/wasm-\/jit/Include/Inline/Floats.h@{libraries/wasm-\/jit/Include/Inline/Floats.h}}
+\mbox{\hyperlink{_floats_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00003}00003\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_basic_types_8h}{Inline/BasicTypes.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00004}00004\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_errors_8h}{Inline/Errors.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <cstdio>}}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00009}\mbox{\hyperlink{namespace_floats}{00009}}\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_floats}{Floats}}}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00010}00010\ \{\ \ \ }
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00011}00011\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ Float>}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00012}\mbox{\hyperlink{struct_floats_1_1_float_components}{00012}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_floats_1_1_float_components}{FloatComponents}};}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00014}00014\ \ \ \ \ \textcolor{comment}{//\ The\ components\ of\ a\ 64-\/bit\ float}}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00015}00015\ \ \ \ \ \textcolor{keyword}{template}<>}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00016}\mbox{\hyperlink{struct_floats_1_1_float_components_3_01_f64_01_4}{00016}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_floats_1_1_float_components}{FloatComponents}}<\mbox{\hyperlink{_basic_types_8h_adc9896ee12db3bb116fc63b3464c72c7}{F64}}>}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00017}00017\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00018}\mbox{\hyperlink{struct_floats_1_1_float_components_3_01_f64_01_4_a47c484234dcd9069e091a900b5ed65cb}{00018}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}}\ \mbox{\hyperlink{struct_floats_1_1_float_components_3_01_f64_01_4_a47c484234dcd9069e091a900b5ed65cb}{Bits}};}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00019}\mbox{\hyperlink{struct_floats_1_1_float_components_3_01_f64_01_4_abb091770b16ecb75717665b80961b49b}{00019}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{_basic_types_8h_adc9896ee12db3bb116fc63b3464c72c7}{F64}}\ \mbox{\hyperlink{struct_floats_1_1_float_components_3_01_f64_01_4_abb091770b16ecb75717665b80961b49b}{Float}};}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00021}\mbox{\hyperlink{struct_floats_1_1_float_components_3_01_f64_01_4_a1a2a3664f12cd37c562970cd25184ff0}{00021}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{enum}\ \mbox{\hyperlink{struct_floats_1_1_float_components_3_01_f64_01_4_a1a2a3664f12cd37c562970cd25184ff0}{Constants}}\ :\ \mbox{\hyperlink{_basic_types_8h_a416b74ff5b1dc365af5713a3f48fb8b9}{I64}}}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00022}00022\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00023}\mbox{\hyperlink{struct_floats_1_1_float_components_3_01_f64_01_4_a1a2a3664f12cd37c562970cd25184ff0ab81cc951c6126e14937e9816dae85994}{00023}}\ \ \ \ \ \ \ \ \ \ \ \ \ maxSignificand\ =\ 0xfffffffffffff,}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00024}\mbox{\hyperlink{struct_floats_1_1_float_components_3_01_f64_01_4_a1a2a3664f12cd37c562970cd25184ff0a481edd934349418d924760dadf678adc}{00024}}\ \ \ \ \ \ \ \ \ \ \ \ \ numSignificandBits\ =\ 52,}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00025}\mbox{\hyperlink{struct_floats_1_1_float_components_3_01_f64_01_4_a1a2a3664f12cd37c562970cd25184ff0a9955a9b4023cdf8a592a0cf42ca2010c}{00025}}\ \ \ \ \ \ \ \ \ \ \ \ \ numSignificandHexits\ =\ 13,}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00026}\mbox{\hyperlink{struct_floats_1_1_float_components_3_01_f64_01_4_a1a2a3664f12cd37c562970cd25184ff0a054c0c4ff8bacd472e855a08199a6298}{00026}}\ \ \ \ \ \ \ \ \ \ \ \ \ canonicalSignificand\ =\ 0x8000000000000ull,}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00028}\mbox{\hyperlink{struct_floats_1_1_float_components_3_01_f64_01_4_a1a2a3664f12cd37c562970cd25184ff0a6ac951bb398a1d6f2c65658b4b919cf6}{00028}}\ \ \ \ \ \ \ \ \ \ \ \ \ denormalExponent\ =\ -\/1023,}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00029}\mbox{\hyperlink{struct_floats_1_1_float_components_3_01_f64_01_4_a1a2a3664f12cd37c562970cd25184ff0aa1803b568706ab9c4ee6e277dc1e93ce}{00029}}\ \ \ \ \ \ \ \ \ \ \ \ \ minNormalExponent\ =\ -\/1022,}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00030}\mbox{\hyperlink{struct_floats_1_1_float_components_3_01_f64_01_4_a1a2a3664f12cd37c562970cd25184ff0a8fd992fb5d1e4855c230ee88ffc89e3c}{00030}}\ \ \ \ \ \ \ \ \ \ \ \ \ maxNormalExponent\ =\ 1023,}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00031}\mbox{\hyperlink{struct_floats_1_1_float_components_3_01_f64_01_4_a1a2a3664f12cd37c562970cd25184ff0ae6b98f41ccb86ba7b4a05542b182847c}{00031}}\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{fp128_8h_a27dcfb4c2f9f888ad75b26c2cc4e0ace}{exponentBias}}\ =\ 1023,}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00032}\mbox{\hyperlink{struct_floats_1_1_float_components_3_01_f64_01_4_a1a2a3664f12cd37c562970cd25184ff0ab8079386bcd6dded0676378a88e5386e}{00032}}\ \ \ \ \ \ \ \ \ \ \ \ \ maxExponentBits\ =\ 0x7ff,}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00033}00033\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00035}00035\ \ \ \ \ \ \ \ \ \textcolor{keyword}{union}}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00036}00036\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00037}00037\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{struct}}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00038}00038\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00039}\mbox{\hyperlink{struct_floats_1_1_float_components_3_01_f64_01_4_a7cb9ca463155603830dc75ef5060fdee}{00039}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}}\ \mbox{\hyperlink{struct_floats_1_1_float_components_3_01_f64_01_4_a7cb9ca463155603830dc75ef5060fdee}{significand}}\ :\ 52;}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00040}\mbox{\hyperlink{struct_floats_1_1_float_components_3_01_f64_01_4_a194f4f72a216bfd87ff29c107010804c}{00040}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}}\ \mbox{\hyperlink{struct_floats_1_1_float_components_3_01_f64_01_4_a194f4f72a216bfd87ff29c107010804c}{exponent}}\ :\ 11;}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00041}\mbox{\hyperlink{struct_floats_1_1_float_components_3_01_f64_01_4_a5656836dc260377a1bee30b61c83bf30}{00041}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}}\ \mbox{\hyperlink{struct_floats_1_1_float_components_3_01_f64_01_4_a5656836dc260377a1bee30b61c83bf30}{sign}}\ :\ 1;}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00042}\mbox{\hyperlink{struct_floats_1_1_float_components_3_01_f64_01_4_a5e545852f528578bac96324672c9961a}{00042}}\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ bits;}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00043}\mbox{\hyperlink{struct_floats_1_1_float_components_3_01_f64_01_4_a2a95fe515c5eb602cae55690b250164b}{00043}}\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_floats_1_1_float_components_3_01_f64_01_4_abb091770b16ecb75717665b80961b49b}{Float}}\ \mbox{\hyperlink{struct_floats_1_1_float_components_3_01_f64_01_4_a2a95fe515c5eb602cae55690b250164b}{value}};}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00044}\mbox{\hyperlink{struct_floats_1_1_float_components_3_01_f64_01_4_a11d593f64ee5b76a243222a609877baf}{00044}}\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_floats_1_1_float_components_3_01_f64_01_4_a47c484234dcd9069e091a900b5ed65cb}{Bits}}\ \mbox{\hyperlink{struct_floats_1_1_float_components_3_01_f64_01_4_a11d593f64ee5b76a243222a609877baf}{bitcastInt}};}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00045}00045\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00046}00046\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00048}00048\ \ \ \ \ \textcolor{comment}{//\ The\ components\ of\ a\ 32-\/bit\ float.}}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00049}00049\ \ \ \ \ \textcolor{keyword}{template}<>}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00050}\mbox{\hyperlink{struct_floats_1_1_float_components_3_01_f32_01_4}{00050}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_floats_1_1_float_components}{FloatComponents}}<\mbox{\hyperlink{_basic_types_8h_a841d3674577a1e86afdc2f4845f46c4b}{F32}}>}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00051}00051\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00052}\mbox{\hyperlink{struct_floats_1_1_float_components_3_01_f32_01_4_ad2ca25070f4f89d0eb918e12c566aece}{00052}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}\ \mbox{\hyperlink{struct_floats_1_1_float_components_3_01_f32_01_4_ad2ca25070f4f89d0eb918e12c566aece}{Bits}};}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00053}\mbox{\hyperlink{struct_floats_1_1_float_components_3_01_f32_01_4_af885c25c247c9dcdf1007f8494670c58}{00053}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{_basic_types_8h_a841d3674577a1e86afdc2f4845f46c4b}{F32}}\ \mbox{\hyperlink{struct_floats_1_1_float_components_3_01_f32_01_4_af885c25c247c9dcdf1007f8494670c58}{Float}};}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00054}00054\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00055}\mbox{\hyperlink{struct_floats_1_1_float_components_3_01_f32_01_4_adadea8a85095bfbe8e68ecc2372f635a}{00055}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{enum}\ \mbox{\hyperlink{struct_floats_1_1_float_components_3_01_f32_01_4_adadea8a85095bfbe8e68ecc2372f635a}{Constants}}\ :\ \mbox{\hyperlink{_basic_types_8h_a2f1a62071dd7dc3f6ef85c1b7612dc35}{I32}}}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00056}00056\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00057}\mbox{\hyperlink{struct_floats_1_1_float_components_3_01_f32_01_4_adadea8a85095bfbe8e68ecc2372f635aa71b37b259a307c08267dba4947ec4223}{00057}}\ \ \ \ \ \ \ \ \ \ \ \ \ maxSignificand\ =\ 0x7fffff,}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00058}\mbox{\hyperlink{struct_floats_1_1_float_components_3_01_f32_01_4_adadea8a85095bfbe8e68ecc2372f635aa2a458aba6dd2cfe9e969e0785d5583e2}{00058}}\ \ \ \ \ \ \ \ \ \ \ \ \ numSignificandBits\ =\ 23,}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00059}\mbox{\hyperlink{struct_floats_1_1_float_components_3_01_f32_01_4_adadea8a85095bfbe8e68ecc2372f635aaf4ac386b6c75a95e0ed56c21d2a546cb}{00059}}\ \ \ \ \ \ \ \ \ \ \ \ \ numSignificandHexits\ =\ 6,}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00060}\mbox{\hyperlink{struct_floats_1_1_float_components_3_01_f32_01_4_adadea8a85095bfbe8e68ecc2372f635aa7ad0be524a16ed1e481412c85433e0d9}{00060}}\ \ \ \ \ \ \ \ \ \ \ \ \ canonicalSignificand\ =\ 0x400000,}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00062}\mbox{\hyperlink{struct_floats_1_1_float_components_3_01_f32_01_4_adadea8a85095bfbe8e68ecc2372f635aa8689011e0c65aadcf0ae0a7b79ad3ff6}{00062}}\ \ \ \ \ \ \ \ \ \ \ \ \ denormalExponent\ =\ -\/127,}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00063}\mbox{\hyperlink{struct_floats_1_1_float_components_3_01_f32_01_4_adadea8a85095bfbe8e68ecc2372f635aa8ac0dadddc0cc4a51f4419ff7c1c28c0}{00063}}\ \ \ \ \ \ \ \ \ \ \ \ \ minNormalExponent\ =\ -\/126,}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00064}\mbox{\hyperlink{struct_floats_1_1_float_components_3_01_f32_01_4_adadea8a85095bfbe8e68ecc2372f635aa0e2011e7bedc61d5d20a0f4eb8666659}{00064}}\ \ \ \ \ \ \ \ \ \ \ \ \ maxNormalExponent\ =\ 127,}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00065}\mbox{\hyperlink{struct_floats_1_1_float_components_3_01_f32_01_4_adadea8a85095bfbe8e68ecc2372f635aa6d1a6b8a68fcae2a6255a0f48daff355}{00065}}\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{fp128_8h_a27dcfb4c2f9f888ad75b26c2cc4e0ace}{exponentBias}}\ =\ 127,}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00066}\mbox{\hyperlink{struct_floats_1_1_float_components_3_01_f32_01_4_adadea8a85095bfbe8e68ecc2372f635aa08ed580a5e8d940406ce5d97627a5ebe}{00066}}\ \ \ \ \ \ \ \ \ \ \ \ \ maxExponentBits\ =\ 0xff,}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00067}00067\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00069}00069\ \ \ \ \ \ \ \ \ \textcolor{keyword}{union}}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00070}00070\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00071}00071\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{struct}}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00073}\mbox{\hyperlink{struct_floats_1_1_float_components_3_01_f32_01_4_ac33a6f731b4e00deaa3bc8505793a978}{00073}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}\ \mbox{\hyperlink{struct_floats_1_1_float_components_3_01_f32_01_4_ac33a6f731b4e00deaa3bc8505793a978}{significand}}\ :\ 23;}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00074}\mbox{\hyperlink{struct_floats_1_1_float_components_3_01_f32_01_4_a7c95cabde9198387d3196e46524cd0c1}{00074}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}\ \mbox{\hyperlink{struct_floats_1_1_float_components_3_01_f32_01_4_a7c95cabde9198387d3196e46524cd0c1}{exponent}}\ :\ 8;}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00075}\mbox{\hyperlink{struct_floats_1_1_float_components_3_01_f32_01_4_ad2e3b85f50932ed324b1e6d2dde59cdf}{00075}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}\ \mbox{\hyperlink{struct_floats_1_1_float_components_3_01_f32_01_4_ad2e3b85f50932ed324b1e6d2dde59cdf}{sign}}\ :\ 1;}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00076}\mbox{\hyperlink{struct_floats_1_1_float_components_3_01_f32_01_4_aa34feb7323e28e7e5411923fc6442e15}{00076}}\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ bits;}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00077}\mbox{\hyperlink{struct_floats_1_1_float_components_3_01_f32_01_4_aade8a214be24ac9a0ae0a0655fe64aa5}{00077}}\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_floats_1_1_float_components_3_01_f32_01_4_af885c25c247c9dcdf1007f8494670c58}{Float}}\ \mbox{\hyperlink{struct_floats_1_1_float_components_3_01_f32_01_4_aade8a214be24ac9a0ae0a0655fe64aa5}{value}};}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00078}\mbox{\hyperlink{struct_floats_1_1_float_components_3_01_f32_01_4_a9f707c5c6ca42deecd801f364299aba4}{00078}}\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_floats_1_1_float_components_3_01_f32_01_4_ad2ca25070f4f89d0eb918e12c566aece}{Bits}}\ \mbox{\hyperlink{struct_floats_1_1_float_components_3_01_f32_01_4_a9f707c5c6ca42deecd801f364299aba4}{bitcastInt}};}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00079}00079\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00080}00080\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00081}00081\ }
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00082}00082\ \ \ \ \ \textcolor{comment}{//\ Prints\ a\ floating\ point\ value\ to\ a\ string,\ using\ the\ WebAssembly\ syntax\ for\ text\ floats.}}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00083}00083\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ Float>}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00084}\mbox{\hyperlink{namespace_floats_a910e7e5ea7e4d10bf994fc3fcd2fe52b}{00084}}\ \ \ \ \ std::string\ \mbox{\hyperlink{namespace_floats_a910e7e5ea7e4d10bf994fc3fcd2fe52b}{asString}}(Float\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00085}00085\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00086}00086\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_floats_1_1_float_components}{FloatComponents<Float>}}\ components;}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00087}00087\ \ \ \ \ \ \ \ \ components.value\ =\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}};}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00088}00088\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00089}00089\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ sign\ =\ std::string(components.bits.sign\ ?\ \textcolor{stringliteral}{"{}-\/"{}}\ :\ \textcolor{stringliteral}{"{}+"{}});}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00090}00090\ }
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00091}00091\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(components.bits.exponent\ ==\ \mbox{\hyperlink{struct_floats_1_1_float_components}{FloatComponents<Float>::maxExponentBits}})}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00092}00092\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00093}00093\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Handle\ infinity.}}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00094}00094\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(components.bits.significand\ ==\ 0)\ \{\ \textcolor{keywordflow}{return}\ sign\ +\ \textcolor{stringliteral}{"{}infinity"{}};\ \}}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00095}00095\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00096}00096\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00097}00097\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Handle\ NaN.}}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00098}00098\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ significandString[\mbox{\hyperlink{struct_floats_1_1_float_components}{FloatComponents<Float>::numSignificandHexits}}\ +\ 1];}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00099}00099\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ hexitIndex\ =\ 0;hexitIndex\ <\ FloatComponents<Float>::numSignificandHexits;++hexitIndex)}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00100}00100\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00101}00101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ hexitValue\ =\ char((components.bits.significand\ >>\ ((\mbox{\hyperlink{struct_floats_1_1_float_components}{FloatComponents<Float>::numSignificandHexits}}\ -\/\ hexitIndex\ -\/\ 1)\ *\ 4))\ \&\ 0xf);}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00102}00102\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ significandString[hexitIndex]\ =\ hexitValue\ >=\ 10\ ?\ (\textcolor{charliteral}{'a'}\ +\ hexitValue\ -\/\ 10)\ :\ (\textcolor{charliteral}{'0'}\ +\ hexitValue);}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00103}00103\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00104}00104\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ significandString[\mbox{\hyperlink{struct_floats_1_1_float_components}{FloatComponents<Float>::numSignificandHexits}}]\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00105}00105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ sign\ +\ \textcolor{stringliteral}{"{}nan:0x"{}}\ +\ significandString\ +\ \textcolor{stringliteral}{"{}"{}};}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00106}00106\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00107}00107\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00108}00108\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00109}00109\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00110}00110\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ it's\ not\ infinite\ or\ NaN,\ just\ use\ the\ STL\ hexadecimal\ float\ printing.}}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00111}00111\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ buffer[32];}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00112}00112\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ numChars\ =\ std::sprintf(buffer,\mbox{\hyperlink{struct_floats_1_1_float_components}{FloatComponents<Float>::numSignificandHexits}}\ ==\ 6\ ?\ \textcolor{stringliteral}{"{}\%.6a"{}}\ :\ \textcolor{stringliteral}{"{}\%.13a"{}},\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}});}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00113}00113\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\textcolor{keywordtype}{unsigned}(numChars)\ +\ 1\ >\ \textcolor{keyword}{sizeof}(buffer))}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00114}00114\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00115}00115\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_errors_aee5daf469584435300f91503f83b09fe}{Errors::fatal}}(\textcolor{stringliteral}{"{}not\ enough\ space\ in\ Floats::asString\ buffer"{}});}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00116}00116\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00117}00117\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ buffer;}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00118}00118\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00119}00119\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_floats_8h_source_l00120}00120\ \}}
+
+\end{DoxyCode}

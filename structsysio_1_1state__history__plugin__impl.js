@@ -1,0 +1,28 @@
+var structsysio_1_1state__history__plugin__impl =
+[
+    [ "session", "structsysio_1_1state__history__plugin__impl_1_1session.html", "structsysio_1_1state__history__plugin__impl_1_1session" ],
+    [ "clear_caches", "structsysio_1_1state__history__plugin__impl.html#a6283b64f4a4f7575b66117434c188893", null ],
+    [ "do_accept", "structsysio_1_1state__history__plugin__impl.html#a56b6db862623604c7dda3a358ab3d6f6", null ],
+    [ "get_block", "structsysio_1_1state__history__plugin__impl.html#a7ef3e3d06885019c0534ea6ce523a53b", null ],
+    [ "get_block_id", "structsysio_1_1state__history__plugin__impl.html#ace95f06f4285cacae5b90fd9d1d37d9b", null ],
+    [ "get_log_entry", "structsysio_1_1state__history__plugin__impl.html#a56d753369a9efd6baba579e7c78bc215", null ],
+    [ "listen", "structsysio_1_1state__history__plugin__impl.html#aa07f08c970ed998ace29eefae07b34a8", null ],
+    [ "on_accepted_block", "structsysio_1_1state__history__plugin__impl.html#aaa0729b45ec2388fbc2b5feefde76292", null ],
+    [ "on_applied_transaction", "structsysio_1_1state__history__plugin__impl.html#a7b2032a96cd68192060f52a0e3706509", null ],
+    [ "on_block_start", "structsysio_1_1state__history__plugin__impl.html#a5fe584dc482c6efb24bfee245a422aad", null ],
+    [ "store_chain_state", "structsysio_1_1state__history__plugin__impl.html#abada9ce88fb6a33aa4ac4c9d4726bf67", null ],
+    [ "store_traces", "structsysio_1_1state__history__plugin__impl.html#a2074796cb93f0dda90a98f2d5ef143ee", null ],
+    [ "accepted_block_connection", "structsysio_1_1state__history__plugin__impl.html#a20d4a6d1a901fe6aa14a2e13554a8834", null ],
+    [ "acceptor", "structsysio_1_1state__history__plugin__impl.html#a083a559f89920f6549db0cfa2ff19ea4", null ],
+    [ "applied_transaction_connection", "structsysio_1_1state__history__plugin__impl.html#aa276ab215f0a9cb920083343a0bbc02f", null ],
+    [ "block_start_connection", "structsysio_1_1state__history__plugin__impl.html#ab775b914c7586cd47b366f7bbb7007f9", null ],
+    [ "chain_plug", "structsysio_1_1state__history__plugin__impl.html#a654fe8a01daf92d5ae666b0188517279", null ],
+    [ "chain_state_log", "structsysio_1_1state__history__plugin__impl.html#ab0e254998fcee36e133e5877460fad60", null ],
+    [ "endpoint_address", "structsysio_1_1state__history__plugin__impl.html#a85a9831f498ad989b757699d91c64e0b", null ],
+    [ "endpoint_port", "structsysio_1_1state__history__plugin__impl.html#a675dbf4b298fdea99a1622ca781f474a", null ],
+    [ "sessions", "structsysio_1_1state__history__plugin__impl.html#a0b718f0ae6e2f9daa4d578a70ca1d6cf", null ],
+    [ "stopping", "structsysio_1_1state__history__plugin__impl.html#ae6d60f7f7d51ac9bdb5e371dc65fc689", null ],
+    [ "trace_converter", "structsysio_1_1state__history__plugin__impl.html#a3ee433db4de5dff30dae5963e7312618", null ],
+    [ "trace_debug_mode", "structsysio_1_1state__history__plugin__impl.html#aa15bf609ad3717258b4efeedb797b7d6", null ],
+    [ "trace_log", "structsysio_1_1state__history__plugin__impl.html#a0b55dd4e7ba346185889034127a928a7", null ]
+];

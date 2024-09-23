@@ -1,0 +1,438 @@
+\doxysection{Json\+Writer Class Reference}
+\hypertarget{class_json_writer}{}\label{class_json_writer}\index{JsonWriter@{JsonWriter}}
+
+
+{\ttfamily \#include $<$archiver.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_json_writer_ac236bb60b9ae908fd178baff276df0c8}{Json\+Writer}} ()
+\begin{DoxyCompactList}\small\item\em Constructor. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_json_writer_ac6555dd3dfadc937848046a58bd5f974}{\texorpdfstring{$\sim$}{\string~}\+Json\+Writer}} ()
+\begin{DoxyCompactList}\small\item\em Destructor. \end{DoxyCompactList}\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_json_writer_a69d5a42b3c5a94f5f05bb48d2489b281}{Get\+String}} () const
+\begin{DoxyCompactList}\small\item\em Obtains the serialized JSON string. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_json_writer_a2edfc9310cef0e08931bc9e56b4e08d2}{operator bool}} () const
+\item 
+\mbox{\hyperlink{class_json_writer}{Json\+Writer}} \& \mbox{\hyperlink{class_json_writer_ad70866aacab1b7581d13ec47e666be84}{Start\+Object}} ()
+\item 
+\mbox{\hyperlink{class_json_writer}{Json\+Writer}} \& \mbox{\hyperlink{class_json_writer_a4daf2f3c12e647e400c22021645a27ef}{Member}} (const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})
+\item 
+bool \mbox{\hyperlink{class_json_writer_adc9059e1fcc3a0c7db01d83f4e2993e5}{Has\+Member}} (const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}) const
+\item 
+\mbox{\hyperlink{class_json_writer}{Json\+Writer}} \& \mbox{\hyperlink{class_json_writer_a9c7be30ac963ee742375247fe4111744}{End\+Object}} ()
+\item 
+\mbox{\hyperlink{class_json_writer}{Json\+Writer}} \& \mbox{\hyperlink{class_json_writer_a932a385a8acfcbef01d340648b483fce}{Start\+Array}} (size\+\_\+t \texorpdfstring{$\ast$}{*}size=0)
+\item 
+\mbox{\hyperlink{class_json_writer}{Json\+Writer}} \& \mbox{\hyperlink{class_json_writer_ab62266adeeaf740eb07d3e2986e970d7}{End\+Array}} ()
+\item 
+\mbox{\hyperlink{class_json_writer}{Json\+Writer}} \& \mbox{\hyperlink{class_json_writer_a1df4abfba1f7fe03ad1f98ffeed2d56d}{operator\&}} (bool \&b)
+\item 
+\mbox{\hyperlink{class_json_writer}{Json\+Writer}} \& \mbox{\hyperlink{class_json_writer_ab7265ce6abf66d45c373f4cbca9d2f52}{operator\&}} (unsigned \&u)
+\item 
+\mbox{\hyperlink{class_json_writer}{Json\+Writer}} \& \mbox{\hyperlink{class_json_writer_ab9dde03922295bdede4f4d9704c9d55b}{operator\&}} (int \&i)
+\item 
+\mbox{\hyperlink{class_json_writer}{Json\+Writer}} \& \mbox{\hyperlink{class_json_writer_ae2ecb92ac8a02a438332682eb5b064f2}{operator\&}} (double \&d)
+\item 
+\mbox{\hyperlink{class_json_writer}{Json\+Writer}} \& \mbox{\hyperlink{class_json_writer_a19912507aa65df0e0cf2c1a75fb08a75}{operator\&}} (std\+::string \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\item 
+\mbox{\hyperlink{class_json_writer}{Json\+Writer}} \& \mbox{\hyperlink{class_json_writer_a346169b807a73fc75d86119ee8f2b06c}{Set\+Null}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static const bool \mbox{\hyperlink{class_json_writer_a451cef7701a1ddd4ca89340638e1282d}{Is\+Reader}} = false
+\item 
+static const bool \mbox{\hyperlink{class_json_writer_a75a06ce34de1390bba4a276fb3fb8e74}{Is\+Writer}} = !\mbox{\hyperlink{class_json_writer_a451cef7701a1ddd4ca89340638e1282d}{Is\+Reader}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{archiver_8h_source_l00103}{103}} of file \mbox{\hyperlink{archiver_8h_source}{archiver.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_json_writer_ac236bb60b9ae908fd178baff276df0c8}\index{JsonWriter@{JsonWriter}!JsonWriter@{JsonWriter}}
+\index{JsonWriter@{JsonWriter}!JsonWriter@{JsonWriter}}
+\doxysubsubsection{\texorpdfstring{JsonWriter()}{JsonWriter()}}
+{\footnotesize\ttfamily \label{class_json_writer_ac236bb60b9ae908fd178baff276df0c8} 
+Json\+Writer\+::\+Json\+Writer (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{archiver_8cpp_source_l00216}{216}} of file \mbox{\hyperlink{archiver_8cpp_source}{archiver.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ mWriter(),\ mStream()\ \{}
+\DoxyCodeLine{00217\ \ \ \ \ mStream\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{fwd_8h_ab956b6537825abf8aac4112e81cfad7e}{StringBuffer}};}
+\DoxyCodeLine{00218\ \ \ \ \ mWriter\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_pretty_writer}{PrettyWriter<StringBuffer>}}(*\mbox{\hyperlink{archiver_8cpp_aa57974323bef0262551029d83546b8e9}{STREAM}});}
+\DoxyCodeLine{00219\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_json_writer_ac6555dd3dfadc937848046a58bd5f974}\index{JsonWriter@{JsonWriter}!````~JsonWriter@{\texorpdfstring{$\sim$}{\string~}JsonWriter}}
+\index{````~JsonWriter@{\texorpdfstring{$\sim$}{\string~}JsonWriter}!JsonWriter@{JsonWriter}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}JsonWriter()}{\string~JsonWriter()}}
+{\footnotesize\ttfamily \label{class_json_writer_ac6555dd3dfadc937848046a58bd5f974} 
+Json\+Writer\+::\texorpdfstring{$\sim$}{\string~}\+Json\+Writer (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{archiver_8cpp_source_l00221}{221}} of file \mbox{\hyperlink{archiver_8cpp_source}{archiver.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ }
+\DoxyCodeLine{00222\ \ \ \ \ \textcolor{keyword}{delete}\ \mbox{\hyperlink{archiver_8cpp_a092368cb0c35415b27ffe320e390e82b}{WRITER}};}
+\DoxyCodeLine{00223\ \ \ \ \ \textcolor{keyword}{delete}\ \mbox{\hyperlink{archiver_8cpp_aa57974323bef0262551029d83546b8e9}{STREAM}};}
+\DoxyCodeLine{00224\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_json_writer_ab62266adeeaf740eb07d3e2986e970d7}\index{JsonWriter@{JsonWriter}!EndArray@{EndArray}}
+\index{EndArray@{EndArray}!JsonWriter@{JsonWriter}}
+\doxysubsubsection{\texorpdfstring{EndArray()}{EndArray()}}
+{\footnotesize\ttfamily \label{class_json_writer_ab62266adeeaf740eb07d3e2986e970d7} 
+\mbox{\hyperlink{class_json_writer}{Json\+Writer}} \& Json\+Writer\+::\+End\+Array (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{archiver_8cpp_source_l00256}{256}} of file \mbox{\hyperlink{archiver_8cpp_source}{archiver.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00256\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00257\ \ \ \ \ \mbox{\hyperlink{archiver_8cpp_a092368cb0c35415b27ffe320e390e82b}{WRITER}}-\/>EndArray();}
+\DoxyCodeLine{00258\ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00259\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=189pt]{class_json_writer_ab62266adeeaf740eb07d3e2986e970d7_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=189pt]{class_json_writer_ab62266adeeaf740eb07d3e2986e970d7_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_json_writer_a9c7be30ac963ee742375247fe4111744}\index{JsonWriter@{JsonWriter}!EndObject@{EndObject}}
+\index{EndObject@{EndObject}!JsonWriter@{JsonWriter}}
+\doxysubsubsection{\texorpdfstring{EndObject()}{EndObject()}}
+{\footnotesize\ttfamily \label{class_json_writer_a9c7be30ac963ee742375247fe4111744} 
+\mbox{\hyperlink{class_json_writer}{Json\+Writer}} \& Json\+Writer\+::\+End\+Object (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{archiver_8cpp_source_l00235}{235}} of file \mbox{\hyperlink{archiver_8cpp_source}{archiver.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00236\ \ \ \ \ \mbox{\hyperlink{archiver_8cpp_a092368cb0c35415b27ffe320e390e82b}{WRITER}}-\/>EndObject();}
+\DoxyCodeLine{00237\ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00238\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=194pt]{class_json_writer_a9c7be30ac963ee742375247fe4111744_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=194pt]{class_json_writer_a9c7be30ac963ee742375247fe4111744_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_json_writer_a69d5a42b3c5a94f5f05bb48d2489b281}\index{JsonWriter@{JsonWriter}!GetString@{GetString}}
+\index{GetString@{GetString}!JsonWriter@{JsonWriter}}
+\doxysubsubsection{\texorpdfstring{GetString()}{GetString()}}
+{\footnotesize\ttfamily \label{class_json_writer_a69d5a42b3c5a94f5f05bb48d2489b281} 
+const char \texorpdfstring{$\ast$}{*} Json\+Writer\+::\+Get\+String (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{archiver_8cpp_source_l00226}{226}} of file \mbox{\hyperlink{archiver_8cpp_source}{archiver.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00226\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00227\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{archiver_8cpp_aa57974323bef0262551029d83546b8e9}{STREAM}}-\/>GetString();}
+\DoxyCodeLine{00228\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_json_writer_a69d5a42b3c5a94f5f05bb48d2489b281_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_json_writer_adc9059e1fcc3a0c7db01d83f4e2993e5}\index{JsonWriter@{JsonWriter}!HasMember@{HasMember}}
+\index{HasMember@{HasMember}!JsonWriter@{JsonWriter}}
+\doxysubsubsection{\texorpdfstring{HasMember()}{HasMember()}}
+{\footnotesize\ttfamily \label{class_json_writer_adc9059e1fcc3a0c7db01d83f4e2993e5} 
+bool Json\+Writer\+::\+Has\+Member (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{name}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{archiver_8cpp_source_l00245}{245}} of file \mbox{\hyperlink{archiver_8cpp_source}{archiver.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00245\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00246\ \ \ \ \ \textcolor{comment}{//\ This\ function\ is\ for\ JsonReader\ only.}}
+\DoxyCodeLine{00247\ \ \ \ \ assert(\textcolor{keyword}{false});}
+\DoxyCodeLine{00248\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00249\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_json_writer_a4daf2f3c12e647e400c22021645a27ef}\index{JsonWriter@{JsonWriter}!Member@{Member}}
+\index{Member@{Member}!JsonWriter@{JsonWriter}}
+\doxysubsubsection{\texorpdfstring{Member()}{Member()}}
+{\footnotesize\ttfamily \label{class_json_writer_a4daf2f3c12e647e400c22021645a27ef} 
+\mbox{\hyperlink{class_json_writer}{Json\+Writer}} \& Json\+Writer\+::\+Member (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{name}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{archiver_8cpp_source_l00240}{240}} of file \mbox{\hyperlink{archiver_8cpp_source}{archiver.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00241\ \ \ \ \ \mbox{\hyperlink{archiver_8cpp_a092368cb0c35415b27ffe320e390e82b}{WRITER}}-\/>String(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\textcolor{keyword}{>}(strlen(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})));}
+\DoxyCodeLine{00242\ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00243\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_json_writer_a2edfc9310cef0e08931bc9e56b4e08d2}\index{JsonWriter@{JsonWriter}!operator bool@{operator bool}}
+\index{operator bool@{operator bool}!JsonWriter@{JsonWriter}}
+\doxysubsubsection{\texorpdfstring{operator bool()}{operator bool()}}
+{\footnotesize\ttfamily \label{class_json_writer_a2edfc9310cef0e08931bc9e56b4e08d2} 
+Json\+Writer\+::operator bool (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{archiver_8h_source_l00116}{116}} of file \mbox{\hyperlink{archiver_8h_source}{archiver.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00116\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_json_writer_a1df4abfba1f7fe03ad1f98ffeed2d56d}\index{JsonWriter@{JsonWriter}!operator\&@{operator\&}}
+\index{operator\&@{operator\&}!JsonWriter@{JsonWriter}}
+\doxysubsubsection{\texorpdfstring{operator\&()}{operator\&()}\hspace{0.1cm}{\footnotesize\ttfamily [1/5]}}
+{\footnotesize\ttfamily \label{class_json_writer_a1df4abfba1f7fe03ad1f98ffeed2d56d} 
+\mbox{\hyperlink{class_json_writer}{Json\+Writer}} \& Json\+Writer\+::operator\& (\begin{DoxyParamCaption}\item[{bool \&}]{b}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{archiver_8cpp_source_l00261}{261}} of file \mbox{\hyperlink{archiver_8cpp_source}{archiver.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00261\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00262\ \ \ \ \ \mbox{\hyperlink{archiver_8cpp_a092368cb0c35415b27ffe320e390e82b}{WRITER}}-\/>Bool(b);}
+\DoxyCodeLine{00263\ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00264\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_json_writer_ae2ecb92ac8a02a438332682eb5b064f2}\index{JsonWriter@{JsonWriter}!operator\&@{operator\&}}
+\index{operator\&@{operator\&}!JsonWriter@{JsonWriter}}
+\doxysubsubsection{\texorpdfstring{operator\&()}{operator\&()}\hspace{0.1cm}{\footnotesize\ttfamily [2/5]}}
+{\footnotesize\ttfamily \label{class_json_writer_ae2ecb92ac8a02a438332682eb5b064f2} 
+\mbox{\hyperlink{class_json_writer}{Json\+Writer}} \& Json\+Writer\+::operator\& (\begin{DoxyParamCaption}\item[{double \&}]{d}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{archiver_8cpp_source_l00276}{276}} of file \mbox{\hyperlink{archiver_8cpp_source}{archiver.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00276\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00277\ \ \ \ \ \mbox{\hyperlink{archiver_8cpp_a092368cb0c35415b27ffe320e390e82b}{WRITER}}-\/>Double(d);}
+\DoxyCodeLine{00278\ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00279\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_json_writer_ab9dde03922295bdede4f4d9704c9d55b}\index{JsonWriter@{JsonWriter}!operator\&@{operator\&}}
+\index{operator\&@{operator\&}!JsonWriter@{JsonWriter}}
+\doxysubsubsection{\texorpdfstring{operator\&()}{operator\&()}\hspace{0.1cm}{\footnotesize\ttfamily [3/5]}}
+{\footnotesize\ttfamily \label{class_json_writer_ab9dde03922295bdede4f4d9704c9d55b} 
+\mbox{\hyperlink{class_json_writer}{Json\+Writer}} \& Json\+Writer\+::operator\& (\begin{DoxyParamCaption}\item[{int \&}]{i}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{archiver_8cpp_source_l00271}{271}} of file \mbox{\hyperlink{archiver_8cpp_source}{archiver.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00271\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00272\ \ \ \ \ \mbox{\hyperlink{archiver_8cpp_a092368cb0c35415b27ffe320e390e82b}{WRITER}}-\/>Int(i);}
+\DoxyCodeLine{00273\ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00274\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_json_writer_a19912507aa65df0e0cf2c1a75fb08a75}\index{JsonWriter@{JsonWriter}!operator\&@{operator\&}}
+\index{operator\&@{operator\&}!JsonWriter@{JsonWriter}}
+\doxysubsubsection{\texorpdfstring{operator\&()}{operator\&()}\hspace{0.1cm}{\footnotesize\ttfamily [4/5]}}
+{\footnotesize\ttfamily \label{class_json_writer_a19912507aa65df0e0cf2c1a75fb08a75} 
+\mbox{\hyperlink{class_json_writer}{Json\+Writer}} \& Json\+Writer\+::operator\& (\begin{DoxyParamCaption}\item[{std\+::string \&}]{s}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{archiver_8cpp_source_l00281}{281}} of file \mbox{\hyperlink{archiver_8cpp_source}{archiver.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00281\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00282\ \ \ \ \ \mbox{\hyperlink{archiver_8cpp_a092368cb0c35415b27ffe320e390e82b}{WRITER}}-\/>String(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.c\_str(),\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\textcolor{keyword}{>}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.size()));}
+\DoxyCodeLine{00283\ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00284\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_json_writer_ab7265ce6abf66d45c373f4cbca9d2f52}\index{JsonWriter@{JsonWriter}!operator\&@{operator\&}}
+\index{operator\&@{operator\&}!JsonWriter@{JsonWriter}}
+\doxysubsubsection{\texorpdfstring{operator\&()}{operator\&()}\hspace{0.1cm}{\footnotesize\ttfamily [5/5]}}
+{\footnotesize\ttfamily \label{class_json_writer_ab7265ce6abf66d45c373f4cbca9d2f52} 
+\mbox{\hyperlink{class_json_writer}{Json\+Writer}} \& Json\+Writer\+::operator\& (\begin{DoxyParamCaption}\item[{unsigned \&}]{u}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{archiver_8cpp_source_l00266}{266}} of file \mbox{\hyperlink{archiver_8cpp_source}{archiver.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00266\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00267\ \ \ \ \ \mbox{\hyperlink{archiver_8cpp_a092368cb0c35415b27ffe320e390e82b}{WRITER}}-\/>Uint(u);}
+\DoxyCodeLine{00268\ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00269\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_json_writer_a346169b807a73fc75d86119ee8f2b06c}\index{JsonWriter@{JsonWriter}!SetNull@{SetNull}}
+\index{SetNull@{SetNull}!JsonWriter@{JsonWriter}}
+\doxysubsubsection{\texorpdfstring{SetNull()}{SetNull()}}
+{\footnotesize\ttfamily \label{class_json_writer_a346169b807a73fc75d86119ee8f2b06c} 
+\mbox{\hyperlink{class_json_writer}{Json\+Writer}} \& Json\+Writer\+::\+Set\+Null (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{archiver_8cpp_source_l00286}{286}} of file \mbox{\hyperlink{archiver_8cpp_source}{archiver.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00286\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00287\ \ \ \ \ \mbox{\hyperlink{archiver_8cpp_a092368cb0c35415b27ffe320e390e82b}{WRITER}}-\/>Null();}
+\DoxyCodeLine{00288\ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00289\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_json_writer_a932a385a8acfcbef01d340648b483fce}\index{JsonWriter@{JsonWriter}!StartArray@{StartArray}}
+\index{StartArray@{StartArray}!JsonWriter@{JsonWriter}}
+\doxysubsubsection{\texorpdfstring{StartArray()}{StartArray()}}
+{\footnotesize\ttfamily \label{class_json_writer_a932a385a8acfcbef01d340648b483fce} 
+\mbox{\hyperlink{class_json_writer}{Json\+Writer}} \& Json\+Writer\+::\+Start\+Array (\begin{DoxyParamCaption}\item[{size\+\_\+t \texorpdfstring{$\ast$}{*}}]{size}{ = {\ttfamily 0}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{archiver_8cpp_source_l00251}{251}} of file \mbox{\hyperlink{archiver_8cpp_source}{archiver.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00251\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00252\ \ \ \ \ \mbox{\hyperlink{archiver_8cpp_a092368cb0c35415b27ffe320e390e82b}{WRITER}}-\/>StartArray();\ \ \ }
+\DoxyCodeLine{00253\ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00254\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=193pt]{class_json_writer_a932a385a8acfcbef01d340648b483fce_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=193pt]{class_json_writer_a932a385a8acfcbef01d340648b483fce_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_json_writer_ad70866aacab1b7581d13ec47e666be84}\index{JsonWriter@{JsonWriter}!StartObject@{StartObject}}
+\index{StartObject@{StartObject}!JsonWriter@{JsonWriter}}
+\doxysubsubsection{\texorpdfstring{StartObject()}{StartObject()}}
+{\footnotesize\ttfamily \label{class_json_writer_ad70866aacab1b7581d13ec47e666be84} 
+\mbox{\hyperlink{class_json_writer}{Json\+Writer}} \& Json\+Writer\+::\+Start\+Object (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{archiver_8cpp_source_l00230}{230}} of file \mbox{\hyperlink{archiver_8cpp_source}{archiver.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00230\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00231\ \ \ \ \ \mbox{\hyperlink{archiver_8cpp_a092368cb0c35415b27ffe320e390e82b}{WRITER}}-\/>StartObject();}
+\DoxyCodeLine{00232\ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00233\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=198pt]{class_json_writer_ad70866aacab1b7581d13ec47e666be84_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=198pt]{class_json_writer_ad70866aacab1b7581d13ec47e666be84_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{class_json_writer_a451cef7701a1ddd4ca89340638e1282d}\index{JsonWriter@{JsonWriter}!IsReader@{IsReader}}
+\index{IsReader@{IsReader}!JsonWriter@{JsonWriter}}
+\doxysubsubsection{\texorpdfstring{IsReader}{IsReader}}
+{\footnotesize\ttfamily \label{class_json_writer_a451cef7701a1ddd4ca89340638e1282d} 
+const bool Json\+Writer\+::\+Is\+Reader = false\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{archiver_8h_source_l00133}{133}} of file \mbox{\hyperlink{archiver_8h_source}{archiver.\+h}}.
+
+\Hypertarget{class_json_writer_a75a06ce34de1390bba4a276fb3fb8e74}\index{JsonWriter@{JsonWriter}!IsWriter@{IsWriter}}
+\index{IsWriter@{IsWriter}!JsonWriter@{JsonWriter}}
+\doxysubsubsection{\texorpdfstring{IsWriter}{IsWriter}}
+{\footnotesize\ttfamily \label{class_json_writer_a75a06ce34de1390bba4a276fb3fb8e74} 
+const bool Json\+Writer\+::\+Is\+Writer = !\mbox{\hyperlink{class_json_writer_a451cef7701a1ddd4ca89340638e1282d}{Is\+Reader}}\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{archiver_8h_source_l00134}{134}} of file \mbox{\hyperlink{archiver_8h_source}{archiver.\+h}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/example/archiver/\mbox{\hyperlink{archiver_8h}{archiver.\+h}}\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/example/archiver/\mbox{\hyperlink{archiver_8cpp}{archiver.\+cpp}}\end{DoxyCompactItemize}

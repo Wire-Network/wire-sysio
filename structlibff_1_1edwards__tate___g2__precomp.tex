@@ -1,0 +1,132 @@
+\doxysection{libff\+::edwards\+\_\+tate\+\_\+\+G2\+\_\+precomp Struct Reference}
+\hypertarget{structlibff_1_1edwards__tate___g2__precomp}{}\label{structlibff_1_1edwards__tate___g2__precomp}\index{libff::edwards\_tate\_G2\_precomp@{libff::edwards\_tate\_G2\_precomp}}
+
+
+{\ttfamily \#include $<$edwards\+\_\+pairing.\+hpp$>$}
+
+
+
+Collaboration diagram for libff\+::edwards\+\_\+tate\+\_\+\+G2\+\_\+precomp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structlibff_1_1edwards__tate___g2__precomp__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{structlibff_1_1edwards__tate___g2__precomp_ae1a19b4f47810e6748d3661a4aa0ac04}{operator==}} (const \mbox{\hyperlink{structlibff_1_1edwards__tate___g2__precomp}{edwards\+\_\+tate\+\_\+\+G2\+\_\+precomp}} \&other) const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\+\_\+\+Fq3}} \mbox{\hyperlink{structlibff_1_1edwards__tate___g2__precomp_aeed27450102e01883a1e1637ee0991ce}{y0}}
+\item 
+\mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\+\_\+\+Fq3}} \mbox{\hyperlink{structlibff_1_1edwards__tate___g2__precomp_a10ccea9fc49fdd9bf331558570ef691d}{eta}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+std\+::ostream \& \mbox{\hyperlink{structlibff_1_1edwards__tate___g2__precomp_ad1d812175d2648e8bcdf0be58249bdf6}{operator$<$$<$}} (std\+::ostream \&out, const \mbox{\hyperlink{structlibff_1_1edwards__tate___g2__precomp}{edwards\+\_\+tate\+\_\+\+G2\+\_\+precomp}} \&prec\+\_\+Q)
+\item 
+std\+::istream \& \mbox{\hyperlink{structlibff_1_1edwards__tate___g2__precomp_acae8486a86f195968cbf0c137c31280c}{operator$>$$>$}} (std\+::istream \&in, \mbox{\hyperlink{structlibff_1_1edwards__tate___g2__precomp}{edwards\+\_\+tate\+\_\+\+G2\+\_\+precomp}} \&prec\+\_\+Q)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{edwards__pairing_8hpp_source_l00040}{40}} of file \mbox{\hyperlink{edwards__pairing_8hpp_source}{edwards\+\_\+pairing.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structlibff_1_1edwards__tate___g2__precomp_ae1a19b4f47810e6748d3661a4aa0ac04}\index{libff::edwards\_tate\_G2\_precomp@{libff::edwards\_tate\_G2\_precomp}!operator==@{operator==}}
+\index{operator==@{operator==}!libff::edwards\_tate\_G2\_precomp@{libff::edwards\_tate\_G2\_precomp}}
+\doxysubsubsection{\texorpdfstring{operator==()}{operator==()}}
+{\footnotesize\ttfamily \label{structlibff_1_1edwards__tate___g2__precomp_ae1a19b4f47810e6748d3661a4aa0ac04} 
+bool libff\+::edwards\+\_\+tate\+\_\+\+G2\+\_\+precomp\+::operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structlibff_1_1edwards__tate___g2__precomp}{edwards\+\_\+tate\+\_\+\+G2\+\_\+precomp}} \&}]{other}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__pairing_8cpp_source_l00073}{73}} of file \mbox{\hyperlink{edwards__pairing_8cpp_source}{edwards\+\_\+pairing.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00074\ \{}
+\DoxyCodeLine{00075\ \ \ \ \ \textcolor{keywordflow}{return}\ (this-\/>\mbox{\hyperlink{structlibff_1_1edwards__tate___g2__precomp_aeed27450102e01883a1e1637ee0991ce}{y0}}\ ==\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.y0\ \&\&}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ this-\/>eta\ ==\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.eta);}
+\DoxyCodeLine{00077\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{structlibff_1_1edwards__tate___g2__precomp_ad1d812175d2648e8bcdf0be58249bdf6}\index{libff::edwards\_tate\_G2\_precomp@{libff::edwards\_tate\_G2\_precomp}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!libff::edwards\_tate\_G2\_precomp@{libff::edwards\_tate\_G2\_precomp}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$}{operator<<}}
+{\footnotesize\ttfamily \label{structlibff_1_1edwards__tate___g2__precomp_ad1d812175d2648e8bcdf0be58249bdf6} 
+std\+::ostream \& operator$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{out}{, }\item[{const \mbox{\hyperlink{structlibff_1_1edwards__tate___g2__precomp}{edwards\+\_\+tate\+\_\+\+G2\+\_\+precomp}} \&}]{prec\+\_\+Q}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__pairing_8cpp_source_l00079}{79}} of file \mbox{\hyperlink{edwards__pairing_8cpp_source}{edwards\+\_\+pairing.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00080\ \{}
+\DoxyCodeLine{00081\ \ \ \ \ out\ <<\ prec\_Q.y0\ <<\ \mbox{\hyperlink{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_ad80cfbe7456c7d029544e8bc2cec16c8}{OUTPUT\_SEPARATOR}}\ <<\ prec\_Q.eta;}
+\DoxyCodeLine{00082\ \ \ \ \ \textcolor{keywordflow}{return}\ out;}
+\DoxyCodeLine{00083\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structlibff_1_1edwards__tate___g2__precomp_acae8486a86f195968cbf0c137c31280c}\index{libff::edwards\_tate\_G2\_precomp@{libff::edwards\_tate\_G2\_precomp}!operator$>$$>$@{operator$>$$>$}}
+\index{operator$>$$>$@{operator$>$$>$}!libff::edwards\_tate\_G2\_precomp@{libff::edwards\_tate\_G2\_precomp}}
+\doxysubsubsection{\texorpdfstring{operator$>$$>$}{operator>>}}
+{\footnotesize\ttfamily \label{structlibff_1_1edwards__tate___g2__precomp_acae8486a86f195968cbf0c137c31280c} 
+std\+::istream \& operator$>$$>$ (\begin{DoxyParamCaption}\item[{std\+::istream \&}]{in}{, }\item[{\mbox{\hyperlink{structlibff_1_1edwards__tate___g2__precomp}{edwards\+\_\+tate\+\_\+\+G2\+\_\+precomp}} \&}]{prec\+\_\+Q}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__pairing_8cpp_source_l00085}{85}} of file \mbox{\hyperlink{edwards__pairing_8cpp_source}{edwards\+\_\+pairing.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00086\ \{}
+\DoxyCodeLine{00087\ \ \ \ \ in\ >>\ prec\_Q.y0;}
+\DoxyCodeLine{00088\ \ \ \ \ \mbox{\hyperlink{namespacelibff_a3b7a446329c9be967e16ab1c04f260e6}{consume\_OUTPUT\_SEPARATOR}}(in);}
+\DoxyCodeLine{00089\ \ \ \ \ in\ >>\ prec\_Q.eta;}
+\DoxyCodeLine{00090\ \ \ \ \ \textcolor{keywordflow}{return}\ in;}
+\DoxyCodeLine{00091\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structlibff_1_1edwards__tate___g2__precomp_a10ccea9fc49fdd9bf331558570ef691d}\index{libff::edwards\_tate\_G2\_precomp@{libff::edwards\_tate\_G2\_precomp}!eta@{eta}}
+\index{eta@{eta}!libff::edwards\_tate\_G2\_precomp@{libff::edwards\_tate\_G2\_precomp}}
+\doxysubsubsection{\texorpdfstring{eta}{eta}}
+{\footnotesize\ttfamily \label{structlibff_1_1edwards__tate___g2__precomp_a10ccea9fc49fdd9bf331558570ef691d} 
+\mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\+\_\+\+Fq3}} libff\+::edwards\+\_\+tate\+\_\+\+G2\+\_\+precomp\+::eta}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__pairing_8hpp_source_l00041}{41}} of file \mbox{\hyperlink{edwards__pairing_8hpp_source}{edwards\+\_\+pairing.\+hpp}}.
+
+\Hypertarget{structlibff_1_1edwards__tate___g2__precomp_aeed27450102e01883a1e1637ee0991ce}\index{libff::edwards\_tate\_G2\_precomp@{libff::edwards\_tate\_G2\_precomp}!y0@{y0}}
+\index{y0@{y0}!libff::edwards\_tate\_G2\_precomp@{libff::edwards\_tate\_G2\_precomp}}
+\doxysubsubsection{\texorpdfstring{y0}{y0}}
+{\footnotesize\ttfamily \label{structlibff_1_1edwards__tate___g2__precomp_aeed27450102e01883a1e1637ee0991ce} 
+\mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\+\_\+\+Fq3}} libff\+::edwards\+\_\+tate\+\_\+\+G2\+\_\+precomp\+::y0}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__pairing_8hpp_source_l00041}{41}} of file \mbox{\hyperlink{edwards__pairing_8hpp_source}{edwards\+\_\+pairing.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/libraries/ff/libff/algebra/curves/edwards/\mbox{\hyperlink{edwards__pairing_8hpp}{edwards\+\_\+pairing.\+hpp}}\item 
+libraries/fc/libraries/ff/libff/algebra/curves/edwards/\mbox{\hyperlink{edwards__pairing_8cpp}{edwards\+\_\+pairing.\+cpp}}\end{DoxyCompactItemize}

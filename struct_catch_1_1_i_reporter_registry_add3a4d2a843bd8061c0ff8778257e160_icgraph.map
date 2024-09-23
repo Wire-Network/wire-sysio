@@ -1,0 +1,13 @@
+<map id="Catch::IReporterRegistry::getFactories" name="Catch::IReporterRegistry::getFactories">
+<area shape="rect" id="Node000001" title=" " alt="" coords="486,23,653,64"/>
+<area shape="rect" id="Node000002" href="$namespace_catch.html#a372777bee6b529124e0cae35748bb79c" title=" " alt="" coords="260,5,398,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="470,36,398,28,399,23,470,30"/>
+<area shape="rect" id="Node000004" href="$namespace_catch.html#add4f86f38bf30c7b49daacfac665aaff" title=" " alt="" coords="220,55,438,80"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="470,56,439,59,438,54,470,51"/>
+<area shape="rect" id="Node000003" href="$namespace_catch.html#a8267f077fd7ddf88bb182e8b9ead85d3" title=" " alt="" coords="48,5,129,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="244,21,130,21,130,16,244,16"/>
+<area shape="rect" id="Node000005" href="$class_catch_1_1_session.html#a4564992e2b028770e38a1dcc6fff8b34" title=" " alt="" coords="5,55,172,80"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="204,70,172,70,172,65,204,65"/>
+<area shape="rect" id="Node000006" href="$_cmd_line_8tests_8cpp.html#a44d5ced817b0c1ec9baafeab51cbe1fd" title=" " alt="" coords="39,104,138,130"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="248,87,139,109,138,104,247,81"/>
+</map>

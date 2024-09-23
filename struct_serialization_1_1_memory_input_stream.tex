@@ -1,0 +1,114 @@
+\doxysection{Serialization\+::Memory\+Input\+Stream Struct Reference}
+\hypertarget{struct_serialization_1_1_memory_input_stream}{}\label{struct_serialization_1_1_memory_input_stream}\index{Serialization::MemoryInputStream@{Serialization::MemoryInputStream}}
+
+
+{\ttfamily \#include $<$Serialization.\+h$>$}
+
+
+
+Inheritance diagram for Serialization\+::Memory\+Input\+Stream\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=212pt]{struct_serialization_1_1_memory_input_stream__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Serialization\+::Memory\+Input\+Stream\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=212pt]{struct_serialization_1_1_memory_input_stream__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_serialization_1_1_memory_input_stream_a09ddbe4a226083e5cadc9426958c24b2}{Memory\+Input\+Stream}} (const \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} \texorpdfstring{$\ast$}{*}begin, \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} num\+Bytes)
+\item 
+virtual \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} \mbox{\hyperlink{struct_serialization_1_1_memory_input_stream_a23beec28239d63e3ed3623c7a224dc7c}{capacity}} () const
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{struct_serialization_1_1_input_stream}{Serialization\+::\+Input\+Stream}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_serialization_1_1_input_stream_aab2721dd35672f8484a4e4045fd03e9f}{Input\+Stream}} (const \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} \texorpdfstring{$\ast$}{*}in\+Next, const \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} \texorpdfstring{$\ast$}{*}in\+End)
+\item 
+const \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{struct_serialization_1_1_input_stream_a172b7a3fd8d2e702daf092b8860c0946}{advance}} (\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} num\+Bytes)
+\item 
+const \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{struct_serialization_1_1_input_stream_a663d3d04bc19c80453a729e5a09a03cb}{peek}} (\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} num\+Bytes)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Public Types inherited from \mbox{\hyperlink{struct_serialization_1_1_input_stream}{Serialization\+::\+Input\+Stream}}}
+\begin{DoxyCompactItemize}
+\item 
+enum \{ \mbox{\hyperlink{struct_serialization_1_1_input_stream_a08472b9b8291abc571588af8862669afac94823bb11cb319cf6c9ceb9f1ac01a6}{is\+Input}} = true
+ \}
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Member Functions inherited from \mbox{\hyperlink{struct_serialization_1_1_input_stream}{Serialization\+::\+Input\+Stream}}}
+\doxysubsection*{Protected Attributes inherited from \mbox{\hyperlink{struct_serialization_1_1_input_stream}{Serialization\+::\+Input\+Stream}}}
+\begin{DoxyCompactItemize}
+\item 
+const \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{struct_serialization_1_1_input_stream_a3b710216e24ed9386dcf28ead395ef0d}{next}}
+\item 
+const \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{struct_serialization_1_1_input_stream_ac94b47818b240805db6babfe91814000}{end}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{_serialization_8h_source_l00124}{124}} of file \mbox{\hyperlink{_serialization_8h_source}{Serialization.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{struct_serialization_1_1_memory_input_stream_a09ddbe4a226083e5cadc9426958c24b2}\index{Serialization::MemoryInputStream@{Serialization::MemoryInputStream}!MemoryInputStream@{MemoryInputStream}}
+\index{MemoryInputStream@{MemoryInputStream}!Serialization::MemoryInputStream@{Serialization::MemoryInputStream}}
+\doxysubsubsection{\texorpdfstring{MemoryInputStream()}{MemoryInputStream()}}
+{\footnotesize\ttfamily \label{struct_serialization_1_1_memory_input_stream_a09ddbe4a226083e5cadc9426958c24b2} 
+Serialization\+::\+Memory\+Input\+Stream\+::\+Memory\+Input\+Stream (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} \texorpdfstring{$\ast$}{*}}]{begin}{, }\item[{\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}}]{num\+Bytes}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_serialization_8h_source_l00126}{126}} of file \mbox{\hyperlink{_serialization_8h_source}{Serialization.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00126\ :\ \mbox{\hyperlink{struct_serialization_1_1_input_stream_aab2721dd35672f8484a4e4045fd03e9f}{InputStream}}(begin,begin+numBytes)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_serialization_1_1_memory_input_stream_a23beec28239d63e3ed3623c7a224dc7c}\index{Serialization::MemoryInputStream@{Serialization::MemoryInputStream}!capacity@{capacity}}
+\index{capacity@{capacity}!Serialization::MemoryInputStream@{Serialization::MemoryInputStream}}
+\doxysubsubsection{\texorpdfstring{capacity()}{capacity()}}
+{\footnotesize\ttfamily \label{struct_serialization_1_1_memory_input_stream_a23beec28239d63e3ed3623c7a224dc7c} 
+virtual \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} Serialization\+::\+Memory\+Input\+Stream\+::capacity (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_serialization_1_1_input_stream_a960a261ed276a5f6e81472739c0958ca}{Serialization\+::\+Input\+Stream}}.
+
+
+
+Definition at line \mbox{\hyperlink{_serialization_8h_source_l00127}{127}} of file \mbox{\hyperlink{_serialization_8h_source}{Serialization.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00127\ \{\ \textcolor{keywordflow}{return}\ end\ -\/\ \mbox{\hyperlink{struct_serialization_1_1_input_stream_a3b710216e24ed9386dcf28ead395ef0d}{next}};\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_serialization_1_1_memory_input_stream_a23beec28239d63e3ed3623c7a224dc7c_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/wasm-\/jit/\+Include/\+Inline/\mbox{\hyperlink{_serialization_8h}{Serialization.\+h}}\end{DoxyCompactItemize}

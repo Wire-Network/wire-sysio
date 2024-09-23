@@ -1,0 +1,9 @@
+<map id="websocketpp::processor::hybi13::prepare_control" name="websocketpp::processor::hybi13::prepare_control">
+<area shape="rect" id="Node000001" title="Generic prepare control frame with opcode and payload." alt="" coords="217,71,381,111"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1processor_1_1hybi13.html#a8cbb98af828463c5ef80429a7ade715d" title=" " alt="" coords="5,5,169,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="216,68,155,49,156,44,217,63"/>
+<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1processor_1_1hybi13.html#a38d06bc30c10cd1947c9a7b3051f8961" title="Get URI." alt="" coords="5,71,169,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="201,94,169,94,169,88,201,88"/>
+<area shape="rect" id="Node000004" href="$classwebsocketpp_1_1processor_1_1hybi13.html#ab5ca972653c126e7c6a05c529b394321" title=" " alt="" coords="5,136,169,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="217,119,156,138,155,133,216,114"/>
+</map>

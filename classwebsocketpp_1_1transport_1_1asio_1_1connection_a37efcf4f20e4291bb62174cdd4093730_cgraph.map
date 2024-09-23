@@ -1,0 +1,26 @@
+<map id="websocketpp::transport::asio::connection::proxy_read" name="websocketpp::transport::asio::connection::proxy_read">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,264,202,305"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1transport_1_1asio_1_1connection.html#ac190efbc8cfd2654bc07b5b9382c36cc" title="Get a shared pointer to this component." alt="" coords="956,292,1114,348"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="202,286,697,306,941,314,940,320,697,311,202,291"/>
+<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1transport_1_1asio_1_1connection.html#abb5b33cf14e1f84aa5997e1fe8bffa0e" title="Proxy read callback." alt="" coords="250,166,420,222"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="156,261,247,225,249,230,158,266"/>
+<area shape="rect" id="Node000004" href="$namespacewebsocketpp_1_1lib_1_1asio.html#a1096d9d4bcff306bf568ba95842142b5" title=" " alt="" coords="959,5,1110,46"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="384,163,445,131,522,95,608,61,697,35,760,24,825,18,944,17,944,23,826,24,761,29,698,40,610,66,524,100,448,136,387,168"/>
+<area shape="rect" id="Node000005" href="$classwebsocketpp_1_1transport_1_1asio_1_1connection.html#ad640e3f3123494ba1e58ad9842c46169" title=" " alt="" coords="468,173,649,214"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="420,191,452,191,452,196,420,196"/>
+<area shape="poly" id="edge5_Node000005_Node000002" title=" " alt="" coords="596,212,644,237,698,259,760,277,824,291,941,309,940,314,823,296,759,282,696,264,642,242,594,217"/>
+<area shape="rect" id="Node000006" href="$classwebsocketpp_1_1transport_1_1asio_1_1connection.html#a6782049b9d8b324d85da34dd9e426950" title="Post init timeout callback." alt="" coords="705,50,876,106"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="594,170,696,115,707,110,710,115,699,120,597,175"/>
+<area shape="rect" id="Node000007" href="$classwebsocketpp_1_1transport_1_1asio_1_1connection.html#a8c21e2814d440c6fe49a4514f6cf5ff1" title="Post init timeout callback." alt="" coords="705,130,876,186"/>
+<area shape="poly" id="edge8_Node000005_Node000007" title=" " alt="" coords="650,177,689,171,690,176,650,182"/>
+<area shape="rect" id="Node000009" href="$classwebsocketpp_1_1transport_1_1asio_1_1connection.html#ab9db04550ee6b3dd2643cd7d23cda3f1" title="Call back a function after a period of time." alt="" coords="697,209,884,250"/>
+<area shape="poly" id="edge10_Node000005_Node000009" title=" " alt="" coords="650,205,682,210,681,215,650,210"/>
+<area shape="poly" id="edge7_Node000006_Node000004" title=" " alt="" coords="875,57,944,42,945,47,877,62"/>
+<area shape="rect" id="Node000008" href="$classwebsocketpp_1_1transport_1_1asio_1_1connection.html#ac4b63fadf2083ab4656ab7f1a47d3b5d" title="Cancel the underlying socket and log any errors." alt="" coords="950,83,1120,139"/>
+<area shape="poly" id="edge9_Node000007_Node000008" title=" " alt="" coords="876,139,934,127,935,133,877,144"/>
+<area shape="poly" id="edge11_Node000009_Node000002" title=" " alt="" coords="848,248,945,284,943,289,846,253"/>
+<area shape="rect" id="Node000010" href="$classwebsocketpp_1_1transport_1_1asio_1_1connection.html#a61ec4db64a17fcd38d2ca1c819dd2d9b" title="Timer callback." alt="" coords="932,163,1138,203"/>
+<area shape="poly" id="edge12_Node000009_Node000010" title=" " alt="" coords="884,209,916,203,917,208,885,214"/>
+<area shape="rect" id="Node000011" href="$namespacewebsocketpp_1_1lib_1_1asio.html#a38ce6cba13c37a134a65f3623d00090e" title=" " alt="" coords="959,228,1110,269"/>
+<area shape="poly" id="edge13_Node000009_Node000011" title=" " alt="" coords="884,234,944,239,943,244,884,239"/>
+</map>

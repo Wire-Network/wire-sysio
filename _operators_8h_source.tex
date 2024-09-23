@@ -1,0 +1,684 @@
+\doxysection{Operators.\+h}
+\hypertarget{_operators_8h_source}{}\label{_operators_8h_source}\index{libraries/wasm-\/jit/Include/IR/Operators.h@{libraries/wasm-\/jit/Include/IR/Operators.h}}
+\mbox{\hyperlink{_operators_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00003}00003\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_basic_types_8h}{Inline/BasicTypes.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00004}00004\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_i_r_8h}{IR.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00005}00005\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_types_8h}{Types.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00006}00006\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_serialization_8h}{Inline/Serialization.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00008}00008\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_i_r}{IR}}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00009}00009\ \{}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00010}00010\ \ \ \ \ \textcolor{comment}{//\ Structures\ for\ operator\ immediates}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00012}\mbox{\hyperlink{struct_i_r_1_1_no_imm}{00012}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_i_r_1_1_no_imm}{NoImm}}\ \{\};}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00013}\mbox{\hyperlink{struct_i_r_1_1_memory_imm}{00013}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_i_r_1_1_memory_imm}{MemoryImm}}\ \{\};}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00015}\mbox{\hyperlink{struct_i_r_1_1_control_structure_imm}{00015}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_i_r_1_1_control_structure_imm}{ControlStructureImm}}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00016}00016\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00017}\mbox{\hyperlink{struct_i_r_1_1_control_structure_imm_aeb701cf55047144f9cded296519cb742}{00017}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_i_r_ac56fb5355b338ad4a167c48ec539b90b}{ResultType}}\ \mbox{\hyperlink{struct_i_r_1_1_control_structure_imm_aeb701cf55047144f9cded296519cb742}{resultType}};}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00018}00018\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00020}\mbox{\hyperlink{struct_i_r_1_1_branch_imm}{00020}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_i_r_1_1_branch_imm}{BranchImm}}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00021}00021\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00022}\mbox{\hyperlink{struct_i_r_1_1_branch_imm_a593815bfc84d3b4ba4f7bd74efe99e19}{00022}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}\ \mbox{\hyperlink{struct_i_r_1_1_branch_imm_a593815bfc84d3b4ba4f7bd74efe99e19}{targetDepth}};}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00023}00023\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00025}\mbox{\hyperlink{struct_i_r_1_1_branch_table_imm}{00025}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_i_r_1_1_branch_table_imm}{BranchTableImm}}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00026}00026\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00027}\mbox{\hyperlink{struct_i_r_1_1_branch_table_imm_a9d63b9dbb2610daabb09735384f7ab67}{00027}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ \mbox{\hyperlink{struct_i_r_1_1_branch_table_imm_a9d63b9dbb2610daabb09735384f7ab67}{defaultTargetDepth}};}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00028}\mbox{\hyperlink{struct_i_r_1_1_branch_table_imm_a997ecb7055eee01f77e205f495f0cb9c}{00028}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ \mbox{\hyperlink{struct_i_r_1_1_branch_table_imm_a997ecb7055eee01f77e205f495f0cb9c}{branchTableIndex}};\ \textcolor{comment}{//\ An\ index\ into\ the\ FunctionDef's\ branchTables\ array.}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00029}00029\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00031}00031\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ Value>}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00032}\mbox{\hyperlink{struct_i_r_1_1_literal_imm}{00032}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_i_r_1_1_literal_imm}{LiteralImm}}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00033}00033\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00034}\mbox{\hyperlink{struct_i_r_1_1_literal_imm_a9b796ec65d16af24f33ed01887df92ca}{00034}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value}{Value}}\ \mbox{\hyperlink{struct_i_r_1_1_literal_imm_a9b796ec65d16af24f33ed01887df92ca}{value}};}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00035}00035\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00037}00037\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keywordtype}{bool}\ isGlobal>}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00038}\mbox{\hyperlink{struct_i_r_1_1_get_or_set_variable_imm}{00038}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_i_r_1_1_get_or_set_variable_imm}{GetOrSetVariableImm}}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00039}00039\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00040}\mbox{\hyperlink{struct_i_r_1_1_get_or_set_variable_imm_a58f67a9226981e4cae7686ac9e65b11b}{00040}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}\ \mbox{\hyperlink{struct_i_r_1_1_get_or_set_variable_imm_a58f67a9226981e4cae7686ac9e65b11b}{variableIndex}};}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00041}00041\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00043}\mbox{\hyperlink{struct_i_r_1_1_call_imm}{00043}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_i_r_1_1_call_imm}{CallImm}}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00044}00044\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00045}\mbox{\hyperlink{struct_i_r_1_1_call_imm_a79c3a5c31c922ca02ec83673d7f2c9cb}{00045}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}\ \mbox{\hyperlink{struct_i_r_1_1_call_imm_a79c3a5c31c922ca02ec83673d7f2c9cb}{functionIndex}};}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00046}00046\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00048}\mbox{\hyperlink{struct_i_r_1_1_call_indirect_imm}{00048}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_i_r_1_1_call_indirect_imm}{CallIndirectImm}}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00049}00049\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00050}\mbox{\hyperlink{struct_i_r_1_1_call_indirect_imm_ad5e749796116ddbe5569617b53396415}{00050}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_i_r_1_1_indexed_function_type}{IndexedFunctionType}}\ \mbox{\hyperlink{struct_i_r_1_1_call_indirect_imm_ad5e749796116ddbe5569617b53396415}{type}};}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00051}00051\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00052}00052\ }
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00053}00053\ \ \ \ \ \textcolor{keyword}{template}<Uptr\ naturalAlignmentLog2>}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00054}\mbox{\hyperlink{struct_i_r_1_1_load_or_store_imm}{00054}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_i_r_1_1_load_or_store_imm}{LoadOrStoreImm}}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00055}00055\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00056}\mbox{\hyperlink{struct_i_r_1_1_load_or_store_imm_a30107d37953b93bfe82f75d1974c42cb}{00056}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}\ \mbox{\hyperlink{struct_i_r_1_1_load_or_store_imm_a30107d37953b93bfe82f75d1974c42cb}{alignmentLog2}};}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00057}\mbox{\hyperlink{struct_i_r_1_1_load_or_store_imm_a7d5caef7b1309efc59a40aff46ef4ca1}{00057}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}\ \mbox{\hyperlink{struct_i_r_1_1_load_or_store_imm_a7d5caef7b1309efc59a40aff46ef4ca1}{offset}};}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00058}00058\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00060}00060\ \textcolor{preprocessor}{\ \ \ \ \#if\ ENABLE\_SIMD\_PROTOTYPE}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00061}00061\ \ \ \ \ \textcolor{keyword}{template}<Uptr\ numLanes>}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00062}00062\ \ \ \ \ \textcolor{keyword}{struct\ }LaneIndexImm}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00063}00063\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00064}00064\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}\ laneIndex;}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00065}00065\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00066}00066\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00067}00067\ \ \ \ \ \textcolor{keyword}{template}<Uptr\ numLanes>}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00068}00068\ \ \ \ \ \textcolor{keyword}{struct\ }ShuffleImm}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00069}00069\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00070}00070\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}\ laneIndices[numLanes];}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00071}00071\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00072}00072\ \textcolor{preprocessor}{\ \ \ \ \#endif}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00073}00073\ }
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00074}00074\ \textcolor{preprocessor}{\ \ \ \ \#if\ ENABLE\_THREADING\_PROTOTYPE}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00075}00075\ \ \ \ \ \textcolor{keyword}{struct\ }LaunchThreadImm\ \{\};}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00076}00076\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00077}00077\ \ \ \ \ \textcolor{keyword}{template}<Uptr\ naturalAlignmentLog2>}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00078}00078\ \ \ \ \ \textcolor{keyword}{struct\ }AtomicLoadOrStoreImm}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00079}00079\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00080}00080\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}\ alignmentLog2;}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00081}00081\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}\ offset;}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00082}00082\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00083}00083\ \textcolor{preprocessor}{\ \ \ \ \#endif}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00084}00084\ }
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00085}00085\ \ \ \ \ \textcolor{comment}{//\ Enumate\ the\ WebAssembly\ operators}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00086}00086\ }
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00087}\mbox{\hyperlink{_operators_8h_a5e50b7d6aa7880cd6280511c413c6d1c}{00087}}\ \textcolor{preprocessor}{\ \ \ \ \#define\ ENUM\_CONTROL\_OPERATORS(visitOp)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00088}00088\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x02,block,"{}block"{},ControlStructureImm,CONTROL)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00089}00089\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x03,loop,"{}loop"{},ControlStructureImm,CONTROL)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00090}00090\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x04,if\_,"{}if"{},ControlStructureImm,CONTROL)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00091}00091\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x05,else\_,"{}else"{},NoImm,CONTROL)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00092}00092\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x0b,end,"{}end"{},NoImm,CONTROL)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00093}00093\ }
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00094}\mbox{\hyperlink{_operators_8h_a7a91cf75d249808329d6c529b471ab19}{00094}}\ \textcolor{preprocessor}{\ \ \ \ \#define\ ENUM\_PARAMETRIC\_OPERATORS(visitOp)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00095}00095\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x00,unreachable,"{}unreachable"{},NoImm,UNREACHABLE)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00096}00096\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x0c,br,"{}br"{},BranchImm,BR)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00097}00097\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x0d,br\_if,"{}br\_if"{},BranchImm,BR\_IF)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00098}00098\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x0e,br\_table,"{}br\_table"{},BranchTableImm,BR\_TABLE)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00099}00099\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x0f,return\_,"{}return"{},NoImm,RETURN)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00100}00100\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x10,call,"{}call"{},CallImm,CALL)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00101}00101\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x11,call\_indirect,"{}call\_indirect"{},CallIndirectImm,CALLINDIRECT)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00102}00102\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x1a,drop,"{}drop"{},NoImm,DROP)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00103}00103\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x1b,select,"{}select"{},NoImm,SELECT)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00104}00104\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00105}00105\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x20,get\_local,"{}get\_local"{},GetOrSetVariableImm<false>,GETLOCAL)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00106}00106\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x21,set\_local,"{}set\_local"{},GetOrSetVariableImm<false>,SETLOCAL)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00107}00107\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x22,tee\_local,"{}tee\_local"{},GetOrSetVariableImm<false>,TEELOCAL)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00108}00108\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x23,get\_global,"{}get\_global"{},GetOrSetVariableImm<true>,GETGLOBAL)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00109}00109\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x24,set\_global,"{}set\_global"{},GetOrSetVariableImm<true>,SETGLOBAL)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00110}00110\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00111}00111\ \ \ \ \ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00112}00112\ \textcolor{comment}{\ \ \ \ \ \ \ \ Possible\ signatures\ used\ by\ ENUM\_NONCONTROL\_NONPARAMETRIC\_OPERATORS:}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00113}00113\ \textcolor{comment}{\ \ \ \ \ \ \ \ NULLARY(T)\ :\ ()\ -\/>\ T}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00114}00114\ \textcolor{comment}{\ \ \ \ \ \ \ \ UNARY(T,U)\ :\ T\ -\/>\ U}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00115}00115\ \textcolor{comment}{\ \ \ \ \ \ \ \ BINARY(T,U)\ :\ (T,T)\ -\/>\ U}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00116}00116\ \textcolor{comment}{\ \ \ \ \ \ \ \ LOAD(T)\ :\ i32\ -\/>\ T}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00117}00117\ \textcolor{comment}{\ \ \ \ \ \ \ \ STORE(T)\ :\ (i32,T)\ -\/>\ ()}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00118}00118\ \textcolor{comment}{\ \ \ \ \ \ \ \ VECTORSELECT(V)\ :\ (V,V,V)\ -\/>\ V}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00119}00119\ \textcolor{comment}{\ \ \ \ \ \ \ \ REPLACELANE(S,V)\ :\ (V,S)\ -\/>\ V}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00120}00120\ \textcolor{comment}{\ \ \ \ \ \ \ \ COMPAREEXCHANGE(T)\ :\ (i32,T,T)\ -\/>\ T}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00121}00121\ \textcolor{comment}{\ \ \ \ \ \ \ \ WAIT(T)\ :\ (i32,T,f64)\ -\/>\ i32}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00122}00122\ \textcolor{comment}{\ \ \ \ \ \ \ \ LAUNCHTHREAD\ :\ (i32,i32,i32)\ -\/>\ ()}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00123}00123\ \textcolor{comment}{\ \ \ \ \ \ \ \ ATOMICRMW\ :\ (i32,T)\ -\/>\ T}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00124}00124\ \textcolor{comment}{\ \ \ \ */}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00125}00125\ }
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00126}\mbox{\hyperlink{_operators_8h_afc055c4c723278726afb8d279f6b022f}{00126}}\ \textcolor{preprocessor}{\ \ \ \ \#define\ ENUM\_NONCONTROL\_NONPARAMETRIC\_OPERATORS(visitOp)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00127}00127\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x01,nop,"{}nop"{},NoImm,NULLARY(none))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00128}00128\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00129}00129\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x3f,current\_memory,"{}current\_memory"{},MemoryImm,NULLARY(i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00130}00130\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x40,grow\_memory,"{}grow\_memory"{},MemoryImm,UNARY(i32,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00131}00131\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00132}00132\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x28,i32\_load,"{}i32.load"{},LoadOrStoreImm<2>,LOAD(i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00133}00133\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x29,i64\_load,"{}i64.load"{},LoadOrStoreImm<3>,LOAD(i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00134}00134\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x2a,f32\_load,"{}f32.load"{},LoadOrStoreImm<2>,LOAD(f32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00135}00135\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x2b,f64\_load,"{}f64.load"{},LoadOrStoreImm<3>,LOAD(f64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00136}00136\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x2c,i32\_load8\_s,"{}i32.load8\_s"{},LoadOrStoreImm<0>,LOAD(i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00137}00137\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x2d,i32\_load8\_u,"{}i32.load8\_u"{},LoadOrStoreImm<0>,LOAD(i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00138}00138\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x2e,i32\_load16\_s,"{}i32.load16\_s"{},LoadOrStoreImm<1>,LOAD(i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00139}00139\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x2f,i32\_load16\_u,"{}i32.load16\_u"{},LoadOrStoreImm<1>,LOAD(i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00140}00140\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x30,i64\_load8\_s,"{}i64.load8\_s"{},LoadOrStoreImm<0>,LOAD(i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00141}00141\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x31,i64\_load8\_u,"{}i64.load8\_u"{},LoadOrStoreImm<0>,LOAD(i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00142}00142\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x32,i64\_load16\_s,"{}i64.load16\_s"{},LoadOrStoreImm<1>,LOAD(i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00143}00143\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x33,i64\_load16\_u,"{}i64.load16\_u"{},LoadOrStoreImm<1>,LOAD(i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00144}00144\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x34,i64\_load32\_s,"{}i64.load32\_s"{},LoadOrStoreImm<2>,LOAD(i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00145}00145\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x35,i64\_load32\_u,"{}i64.load32\_u"{},LoadOrStoreImm<2>,LOAD(i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00146}00146\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00147}00147\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x36,i32\_store,"{}i32.store"{},LoadOrStoreImm<2>,STORE(i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00148}00148\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x37,i64\_store,"{}i64.store"{},LoadOrStoreImm<3>,STORE(i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00149}00149\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x38,f32\_store,"{}f32.store"{},LoadOrStoreImm<2>,STORE(f32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00150}00150\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x39,f64\_store,"{}f64.store"{},LoadOrStoreImm<3>,STORE(f64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00151}00151\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x3a,i32\_store8,"{}i32.store8"{},LoadOrStoreImm<0>,STORE(i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00152}00152\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x3b,i32\_store16,"{}i32.store16"{},LoadOrStoreImm<1>,STORE(i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00153}00153\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x3c,i64\_store8,"{}i64.store8"{},LoadOrStoreImm<0>,STORE(i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00154}00154\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x3d,i64\_store16,"{}i64.store16"{},LoadOrStoreImm<1>,STORE(i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00155}00155\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x3e,i64\_store32,"{}i64.store32"{},LoadOrStoreImm<2>,STORE(i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00156}00156\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00157}00157\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x41,i32\_const,"{}i32.const"{},LiteralImm<I32>,NULLARY(i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00158}00158\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x42,i64\_const,"{}i64.const"{},LiteralImm<I64>,NULLARY(i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00159}00159\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x43,f32\_const,"{}f32.const"{},LiteralImm<F32>,NULLARY(f32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00160}00160\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x44,f64\_const,"{}f64.const"{},LiteralImm<F64>,NULLARY(f64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00161}00161\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00162}00162\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x45,i32\_eqz,"{}i32.eqz"{},NoImm,UNARY(i32,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00163}00163\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x46,i32\_eq,"{}i32.eq"{},NoImm,BINARY(i32,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00164}00164\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x47,i32\_ne,"{}i32.ne"{},NoImm,BINARY(i32,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00165}00165\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x48,i32\_lt\_s,"{}i32.lt\_s"{},NoImm,BINARY(i32,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00166}00166\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x49,i32\_lt\_u,"{}i32.lt\_u"{},NoImm,BINARY(i32,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00167}00167\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x4a,i32\_gt\_s,"{}i32.gt\_s"{},NoImm,BINARY(i32,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00168}00168\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x4b,i32\_gt\_u,"{}i32.gt\_u"{},NoImm,BINARY(i32,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00169}00169\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x4c,i32\_le\_s,"{}i32.le\_s"{},NoImm,BINARY(i32,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00170}00170\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x4d,i32\_le\_u,"{}i32.le\_u"{},NoImm,BINARY(i32,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00171}00171\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x4e,i32\_ge\_s,"{}i32.ge\_s"{},NoImm,BINARY(i32,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00172}00172\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x4f,i32\_ge\_u,"{}i32.ge\_u"{},NoImm,BINARY(i32,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00173}00173\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00174}00174\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x50,i64\_eqz,"{}i64.eqz"{},NoImm,UNARY(i64,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00175}00175\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x51,i64\_eq,"{}i64.eq"{},NoImm,BINARY(i64,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00176}00176\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x52,i64\_ne,"{}i64.ne"{},NoImm,BINARY(i64,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00177}00177\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x53,i64\_lt\_s,"{}i64.lt\_s"{},NoImm,BINARY(i64,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00178}00178\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x54,i64\_lt\_u,"{}i64.lt\_u"{},NoImm,BINARY(i64,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00179}00179\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x55,i64\_gt\_s,"{}i64.gt\_s"{},NoImm,BINARY(i64,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00180}00180\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x56,i64\_gt\_u,"{}i64.gt\_u"{},NoImm,BINARY(i64,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00181}00181\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x57,i64\_le\_s,"{}i64.le\_s"{},NoImm,BINARY(i64,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00182}00182\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x58,i64\_le\_u,"{}i64.le\_u"{},NoImm,BINARY(i64,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00183}00183\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x59,i64\_ge\_s,"{}i64.ge\_s"{},NoImm,BINARY(i64,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00184}00184\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x5a,i64\_ge\_u,"{}i64.ge\_u"{},NoImm,BINARY(i64,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00185}00185\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00186}00186\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x5b,f32\_eq,"{}f32.eq"{},NoImm,BINARY(f32,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00187}00187\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x5c,f32\_ne,"{}f32.ne"{},NoImm,BINARY(f32,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00188}00188\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x5d,f32\_lt,"{}f32.lt"{},NoImm,BINARY(f32,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00189}00189\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x5e,f32\_gt,"{}f32.gt"{},NoImm,BINARY(f32,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00190}00190\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x5f,f32\_le,"{}f32.le"{},NoImm,BINARY(f32,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00191}00191\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x60,f32\_ge,"{}f32.ge"{},NoImm,BINARY(f32,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00192}00192\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00193}00193\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x61,f64\_eq,"{}f64.eq"{},NoImm,BINARY(f64,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00194}00194\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x62,f64\_ne,"{}f64.ne"{},NoImm,BINARY(f64,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00195}00195\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x63,f64\_lt,"{}f64.lt"{},NoImm,BINARY(f64,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00196}00196\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x64,f64\_gt,"{}f64.gt"{},NoImm,BINARY(f64,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00197}00197\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x65,f64\_le,"{}f64.le"{},NoImm,BINARY(f64,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00198}00198\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x66,f64\_ge,"{}f64.ge"{},NoImm,BINARY(f64,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00199}00199\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00200}00200\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x67,i32\_clz,"{}i32.clz"{},NoImm,UNARY(i32,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00201}00201\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x68,i32\_ctz,"{}i32.ctz"{},NoImm,UNARY(i32,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00202}00202\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x69,i32\_popcnt,"{}i32.popcnt"{},NoImm,UNARY(i32,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00203}00203\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00204}00204\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x6a,i32\_add,"{}i32.add"{},NoImm,BINARY(i32,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00205}00205\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x6b,i32\_sub,"{}i32.sub"{},NoImm,BINARY(i32,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00206}00206\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x6c,i32\_mul,"{}i32.mul"{},NoImm,BINARY(i32,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00207}00207\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x6d,i32\_div\_s,"{}i32.div\_s"{},NoImm,BINARY(i32,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00208}00208\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x6e,i32\_div\_u,"{}i32.div\_u"{},NoImm,BINARY(i32,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00209}00209\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x6f,i32\_rem\_s,"{}i32.rem\_s"{},NoImm,BINARY(i32,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00210}00210\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x70,i32\_rem\_u,"{}i32.rem\_u"{},NoImm,BINARY(i32,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00211}00211\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x71,i32\_and,"{}i32.and"{},NoImm,BINARY(i32,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00212}00212\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x72,i32\_or,"{}i32.or"{},NoImm,BINARY(i32,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00213}00213\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x73,i32\_xor,"{}i32.xor"{},NoImm,BINARY(i32,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00214}00214\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x74,i32\_shl,"{}i32.shl"{},NoImm,BINARY(i32,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00215}00215\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x75,i32\_shr\_s,"{}i32.shr\_s"{},NoImm,BINARY(i32,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00216}00216\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x76,i32\_shr\_u,"{}i32.shr\_u"{},NoImm,BINARY(i32,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00217}00217\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x77,i32\_rotl,"{}i32.rotl"{},NoImm,BINARY(i32,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00218}00218\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x78,i32\_rotr,"{}i32.rotr"{},NoImm,BINARY(i32,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00219}00219\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00220}00220\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x79,i64\_clz,"{}i64.clz"{},NoImm,UNARY(i64,i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00221}00221\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x7a,i64\_ctz,"{}i64.ctz"{},NoImm,UNARY(i64,i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00222}00222\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x7b,i64\_popcnt,"{}i64.popcnt"{},NoImm,UNARY(i64,i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00223}00223\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00224}00224\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x7c,i64\_add,"{}i64.add"{},NoImm,BINARY(i64,i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00225}00225\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x7d,i64\_sub,"{}i64.sub"{},NoImm,BINARY(i64,i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00226}00226\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x7e,i64\_mul,"{}i64.mul"{},NoImm,BINARY(i64,i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00227}00227\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x7f,i64\_div\_s,"{}i64.div\_s"{},NoImm,BINARY(i64,i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00228}00228\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x80,i64\_div\_u,"{}i64.div\_u"{},NoImm,BINARY(i64,i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00229}00229\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x81,i64\_rem\_s,"{}i64.rem\_s"{},NoImm,BINARY(i64,i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00230}00230\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x82,i64\_rem\_u,"{}i64.rem\_u"{},NoImm,BINARY(i64,i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00231}00231\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x83,i64\_and,"{}i64.and"{},NoImm,BINARY(i64,i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00232}00232\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x84,i64\_or,"{}i64.or"{},NoImm,BINARY(i64,i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00233}00233\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x85,i64\_xor,"{}i64.xor"{},NoImm,BINARY(i64,i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00234}00234\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x86,i64\_shl,"{}i64.shl"{},NoImm,BINARY(i64,i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00235}00235\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x87,i64\_shr\_s,"{}i64.shr\_s"{},NoImm,BINARY(i64,i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00236}00236\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x88,i64\_shr\_u,"{}i64.shr\_u"{},NoImm,BINARY(i64,i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00237}00237\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x89,i64\_rotl,"{}i64.rotl"{},NoImm,BINARY(i64,i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00238}00238\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x8a,i64\_rotr,"{}i64.rotr"{},NoImm,BINARY(i64,i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00239}00239\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00240}00240\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x8b,f32\_abs,"{}f32.abs"{},NoImm,UNARY(f32,f32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00241}00241\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x8c,f32\_neg,"{}f32.neg"{},NoImm,UNARY(f32,f32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00242}00242\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x8d,f32\_ceil,"{}f32.ceil"{},NoImm,UNARY(f32,f32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00243}00243\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x8e,f32\_floor,"{}f32.floor"{},NoImm,UNARY(f32,f32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00244}00244\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x8f,f32\_trunc,"{}f32.trunc"{},NoImm,UNARY(f32,f32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00245}00245\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x90,f32\_nearest,"{}f32.nearest"{},NoImm,UNARY(f32,f32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00246}00246\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x91,f32\_sqrt,"{}f32.sqrt"{},NoImm,UNARY(f32,f32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00247}00247\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00248}00248\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x92,f32\_add,"{}f32.add"{},NoImm,BINARY(f32,f32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00249}00249\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x93,f32\_sub,"{}f32.sub"{},NoImm,BINARY(f32,f32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00250}00250\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x94,f32\_mul,"{}f32.mul"{},NoImm,BINARY(f32,f32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00251}00251\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x95,f32\_div,"{}f32.div"{},NoImm,BINARY(f32,f32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00252}00252\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x96,f32\_min,"{}f32.min"{},NoImm,BINARY(f32,f32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00253}00253\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x97,f32\_max,"{}f32.max"{},NoImm,BINARY(f32,f32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00254}00254\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x98,f32\_copysign,"{}f32.copysign"{},NoImm,BINARY(f32,f32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00255}00255\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00256}00256\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x99,f64\_abs,"{}f64.abs"{},NoImm,UNARY(f64,f64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00257}00257\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x9a,f64\_neg,"{}f64.neg"{},NoImm,UNARY(f64,f64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00258}00258\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x9b,f64\_ceil,"{}f64.ceil"{},NoImm,UNARY(f64,f64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00259}00259\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x9c,f64\_floor,"{}f64.floor"{},NoImm,UNARY(f64,f64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00260}00260\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x9d,f64\_trunc,"{}f64.trunc"{},NoImm,UNARY(f64,f64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00261}00261\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x9e,f64\_nearest,"{}f64.nearest"{},NoImm,UNARY(f64,f64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00262}00262\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0x9f,f64\_sqrt,"{}f64.sqrt"{},NoImm,UNARY(f64,f64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00263}00263\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00264}00264\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xa0,f64\_add,"{}f64.add"{},NoImm,BINARY(f64,f64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00265}00265\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xa1,f64\_sub,"{}f64.sub"{},NoImm,BINARY(f64,f64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00266}00266\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xa2,f64\_mul,"{}f64.mul"{},NoImm,BINARY(f64,f64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00267}00267\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xa3,f64\_div,"{}f64.div"{},NoImm,BINARY(f64,f64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00268}00268\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xa4,f64\_min,"{}f64.min"{},NoImm,BINARY(f64,f64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00269}00269\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xa5,f64\_max,"{}f64.max"{},NoImm,BINARY(f64,f64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00270}00270\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xa6,f64\_copysign,"{}f64.copysign"{},NoImm,BINARY(f64,f64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00271}00271\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00272}00272\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xa7,i32\_wrap\_i64,"{}i32.wrap/i64"{},NoImm,UNARY(i64,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00273}00273\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xa8,i32\_trunc\_s\_f32,"{}i32.trunc\_s/f32"{},NoImm,UNARY(f32,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00274}00274\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xa9,i32\_trunc\_u\_f32,"{}i32.trunc\_u/f32"{},NoImm,UNARY(f32,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00275}00275\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xaa,i32\_trunc\_s\_f64,"{}i32.trunc\_s/f64"{},NoImm,UNARY(f64,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00276}00276\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xab,i32\_trunc\_u\_f64,"{}i32.trunc\_u/f64"{},NoImm,UNARY(f64,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00277}00277\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xac,i64\_extend\_s\_i32,"{}i64.extend\_s/i32"{},NoImm,UNARY(i32,i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00278}00278\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xad,i64\_extend\_u\_i32,"{}i64.extend\_u/i32"{},NoImm,UNARY(i32,i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00279}00279\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xae,i64\_trunc\_s\_f32,"{}i64.trunc\_s/f32"{},NoImm,UNARY(f32,i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00280}00280\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xaf,i64\_trunc\_u\_f32,"{}i64.trunc\_u/f32"{},NoImm,UNARY(f32,i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00281}00281\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xb0,i64\_trunc\_s\_f64,"{}i64.trunc\_s/f64"{},NoImm,UNARY(f64,i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00282}00282\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xb1,i64\_trunc\_u\_f64,"{}i64.trunc\_u/f64"{},NoImm,UNARY(f64,i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00283}00283\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xb2,f32\_convert\_s\_i32,"{}f32.convert\_s/i32"{},NoImm,UNARY(i32,f32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00284}00284\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xb3,f32\_convert\_u\_i32,"{}f32.convert\_u/i32"{},NoImm,UNARY(i32,f32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00285}00285\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xb4,f32\_convert\_s\_i64,"{}f32.convert\_s/i64"{},NoImm,UNARY(i64,f32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00286}00286\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xb5,f32\_convert\_u\_i64,"{}f32.convert\_u/i64"{},NoImm,UNARY(i64,f32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00287}00287\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xb6,f32\_demote\_f64,"{}f32.demote/f64"{},NoImm,UNARY(f64,f32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00288}00288\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xb7,f64\_convert\_s\_i32,"{}f64.convert\_s/i32"{},NoImm,UNARY(i32,f64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00289}00289\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xb8,f64\_convert\_u\_i32,"{}f64.convert\_u/i32"{},NoImm,UNARY(i32,f64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00290}00290\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xb9,f64\_convert\_s\_i64,"{}f64.convert\_s/i64"{},NoImm,UNARY(i64,f64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00291}00291\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xba,f64\_convert\_u\_i64,"{}f64.convert\_u/i64"{},NoImm,UNARY(i64,f64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00292}00292\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xbb,f64\_promote\_f32,"{}f64.promote/f32"{},NoImm,UNARY(f32,f64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00293}00293\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xbc,i32\_reinterpret\_f32,"{}i32.reinterpret/f32"{},NoImm,UNARY(f32,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00294}00294\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xbd,i64\_reinterpret\_f64,"{}i64.reinterpret/f64"{},NoImm,UNARY(f64,i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00295}00295\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xbe,f32\_reinterpret\_i32,"{}f32.reinterpret/i32"{},NoImm,UNARY(i32,f32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00296}00296\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xbf,f64\_reinterpret\_i64,"{}f64.reinterpret/i64"{},NoImm,UNARY(i64,f64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00297}00297\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ ENUM\_SIMD\_OPERATORS(visitOp)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00298}00298\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ ENUM\_THREADING\_OPERATORS(visitOp)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00299}00299\ }
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00300}00300\ \textcolor{preprocessor}{\ \ \ \ \#if\ !ENABLE\_SIMD\_PROTOTYPE}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00301}\mbox{\hyperlink{_operators_8h_a0aba45d5fd83c62d61d2eac02075fd9a}{00301}}\ \textcolor{preprocessor}{\ \ \ \ \#define\ ENUM\_SIMD\_OPERATORS(visitOp)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00302}00302\ \textcolor{preprocessor}{\ \ \ \ \#else}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00303}00303\ \textcolor{preprocessor}{\ \ \ \ \#define\ SIMDOP(simdOpIndex)\ (0xfd00|simdOpIndex)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00304}00304\ \textcolor{preprocessor}{\ \ \ \ \#define\ ENUM\_SIMD\_OPERATORS(visitOp)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00305}00305\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(0),v128\_const,"{}v128.const"{},LiteralImm<V128>,NULLARY(v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00306}00306\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(1),v128\_load,"{}v128.load"{},LoadOrStoreImm<4>,LOAD(v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00307}00307\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(2),v128\_store,"{}v128.store"{},LoadOrStoreImm<4>,STORE(v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00308}00308\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00309}00309\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(3),i8x16\_splat,"{}i8x16.splat"{},NoImm,UNARY(i32,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00310}00310\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(4),i16x8\_splat,"{}i16x8.splat"{},NoImm,UNARY(i32,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00311}00311\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(5),i32x4\_splat,"{}i32x4.splat"{},NoImm,UNARY(i32,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00312}00312\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(6),i64x2\_splat,"{}i64x2.splat"{},NoImm,UNARY(i64,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00313}00313\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(7),f32x4\_splat,"{}f32x4.splat"{},NoImm,UNARY(f32,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00314}00314\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(8),f64x2\_splat,"{}f64x2.splat"{},NoImm,UNARY(f64,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00315}00315\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00316}00316\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(9),i8x16\_extract\_lane\_s,"{}i8x16.extract\_lane\_s"{},LaneIndexImm<16>,UNARY(v128,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00317}00317\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(10),i8x16\_extract\_lane\_u,"{}i8x16.extract\_lane\_u"{},LaneIndexImm<16>,UNARY(v128,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00318}00318\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(11),i16x8\_extract\_lane\_s,"{}i16x8.extract\_lane\_s"{},LaneIndexImm<8>,UNARY(v128,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00319}00319\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(12),i16x8\_extract\_lane\_u,"{}i16x8.extract\_lane\_u"{},LaneIndexImm<8>,UNARY(v128,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00320}00320\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(13),i32x4\_extract\_lane,"{}i32x4.extract\_lane"{},LaneIndexImm<4>,UNARY(v128,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00321}00321\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(14),i64x2\_extract\_lane,"{}i64x2.extract\_lane"{},LaneIndexImm<2>,UNARY(v128,i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00322}00322\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(15),f32x4\_extract\_lane,"{}f32x4.extract\_lane"{},LaneIndexImm<4>,UNARY(v128,f32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00323}00323\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(16),f64x2\_extract\_lane,"{}f64x2.extract\_lane"{},LaneIndexImm<2>,UNARY(v128,f64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00324}00324\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00325}00325\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(17),i8x16\_replace\_lane,"{}i8x16.replace\_lane"{},LaneIndexImm<16>,REPLACELANE(i32,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00326}00326\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(18),i16x8\_replace\_lane,"{}i16x8.replace\_lane"{},LaneIndexImm<8>,REPLACELANE(i32,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00327}00327\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(19),i32x4\_replace\_lane,"{}i32x4.replace\_lane"{},LaneIndexImm<4>,REPLACELANE(i32,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00328}00328\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(20),i64x2\_replace\_lane,"{}i64x2.replace\_lane"{},LaneIndexImm<2>,REPLACELANE(i64,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00329}00329\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(21),f32x4\_replace\_lane,"{}f32x4.replace\_lane"{},LaneIndexImm<4>,REPLACELANE(f32,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00330}00330\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(22),f64x2\_replace\_lane,"{}f64x2.replace\_lane"{},LaneIndexImm<2>,REPLACELANE(f64,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00331}00331\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00332}00332\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(23),v8x16\_shuffle,"{}v8x16.shuffle"{},ShuffleImm<16>,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00333}00333\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00334}00334\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(24),i8x16\_add,"{}i8x16.add"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00335}00335\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(25),i16x8\_add,"{}i16x8.add"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00336}00336\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(26),i32x4\_add,"{}i32x4.add"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00337}00337\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(27),i64x2\_add,"{}i64x2.add"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00338}00338\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00339}00339\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(28),i8x16\_sub,"{}i8x16.sub"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00340}00340\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(29),i16x8\_sub,"{}i16x8.sub"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00341}00341\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(30),i32x4\_sub,"{}i32x4.sub"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00342}00342\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(31),i64x2\_sub,"{}i64x2.sub"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00343}00343\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00344}00344\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(32),i8x16\_mul,"{}i8x16.mul"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00345}00345\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(33),i16x8\_mul,"{}i16x8.mul"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00346}00346\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(34),i32x4\_mul,"{}i32x4.mul"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00347}00347\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00348}00348\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(35),i8x16\_neg,"{}i8x16.neg"{},NoImm,UNARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00349}00349\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(36),i16x8\_neg,"{}i16x8.neg"{},NoImm,UNARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00350}00350\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(37),i32x4\_neg,"{}i32x4.neg"{},NoImm,UNARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00351}00351\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(38),i64x2\_neg,"{}i64x2.neg"{},NoImm,UNARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00352}00352\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00353}00353\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(39),i8x16\_add\_saturate\_s,"{}i8x16.add\_saturate\_s"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00354}00354\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(40),i8x16\_add\_saturate\_u,"{}i8x16.add\_saturate\_u"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00355}00355\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(41),i16x8\_add\_saturate\_s,"{}i16x8.add\_saturate\_s"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00356}00356\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(42),i16x8\_add\_saturate\_u,"{}i16x8.add\_saturate\_u"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00357}00357\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(43),i8x16\_sub\_saturate\_s,"{}i8x16.sub\_saturate\_s"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00358}00358\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(44),i8x16\_sub\_saturate\_u,"{}i8x16.sub\_saturate\_u"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00359}00359\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(45),i16x8\_sub\_saturate\_s,"{}i16x8.sub\_saturate\_s"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00360}00360\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(46),i16x8\_sub\_saturate\_u,"{}i16x8.sub\_saturate\_u"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00361}00361\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00362}00362\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(47),i8x16\_shl,"{}i8x16.shl"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00363}00363\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(48),i16x8\_shl,"{}i16x8.shl"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00364}00364\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(49),i32x4\_shl,"{}i32x4.shl"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00365}00365\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(50),i64x2\_shl,"{}i64x2.shl"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00366}00366\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00367}00367\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(51),i8x16\_shr\_s,"{}i8x16.shr\_s"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00368}00368\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(52),i8x16\_shr\_u,"{}i8x16.shr\_u"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00369}00369\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(53),i16x8\_shr\_s,"{}i16x8.shr\_s"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00370}00370\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(54),i16x8\_shr\_u,"{}i16x8.shr\_u"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00371}00371\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(55),i32x4\_shr\_s,"{}i32x4.shr\_s"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00372}00372\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(56),i32x4\_shr\_u,"{}i32x4.shr\_u"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00373}00373\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(57),i64x2\_shr\_s,"{}i64x2.shr\_s"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00374}00374\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(58),i64x2\_shr\_u,"{}i64x2.shr\_u"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00375}00375\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00376}00376\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(59),v128\_and,"{}v128.and"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00377}00377\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(60),v128\_or,"{}v128.or"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00378}00378\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(61),v128\_xor,"{}v128.xor"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00379}00379\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(62),v128\_not,"{}v128.not"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00380}00380\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00381}00381\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(63),v128\_bitselect,"{}v128.bitselect"{},NoImm,VECTORSELECT(v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00382}00382\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00383}00383\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(64),i8x16\_any\_true,"{}i8x16.any\_true"{},NoImm,UNARY(v128,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00384}00384\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(65),i16x8\_any\_true,"{}i16x8.any\_true"{},NoImm,UNARY(v128,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00385}00385\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(66),i32x4\_any\_true,"{}i32x4.any\_true"{},NoImm,UNARY(v128,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00386}00386\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(67),i64x2\_any\_true,"{}i64x2.any\_true"{},NoImm,UNARY(v128,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00387}00387\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00388}00388\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(68),i8x16\_all\_true,"{}i8x16.all\_true"{},NoImm,UNARY(v128,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00389}00389\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(69),i16x8\_all\_true,"{}i16x8.all\_true"{},NoImm,UNARY(v128,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00390}00390\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(70),i32x4\_all\_true,"{}i32x4.all\_true"{},NoImm,UNARY(v128,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00391}00391\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(71),i64x2\_all\_true,"{}i64x2.all\_true"{},NoImm,UNARY(v128,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00392}00392\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00393}00393\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(72),i8x16\_eq,"{}i8x16.eq"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00394}00394\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(73),i16x8\_eq,"{}i16x8.eq"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00395}00395\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(74),i32x4\_eq,"{}i32x4.eq"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00396}00396\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(75),f32x4\_eq,"{}f32x4.eq"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00397}00397\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(76),f64x2\_eq,"{}f64x2.eq"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00398}00398\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00399}00399\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(77),i8x16\_ne,"{}i8x16.ne"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00400}00400\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(78),i16x8\_ne,"{}i16x8.ne"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00401}00401\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(79),i32x4\_ne,"{}i32x4.ne"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00402}00402\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(80),f32x4\_ne,"{}f32x4.ne"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00403}00403\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(81),f64x2\_ne,"{}f64x2.ne"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00404}00404\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00405}00405\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(82),i8x16\_lt\_s,"{}i8x16.lt\_s"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00406}00406\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(83),i8x16\_lt\_u,"{}i8x16.lt\_u"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00407}00407\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(84),i16x8\_lt\_s,"{}i16x8.lt\_s"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00408}00408\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(85),i16x8\_lt\_u,"{}i16x8.lt\_u"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00409}00409\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(86),i32x4\_lt\_s,"{}i32x4.lt\_s"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00410}00410\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(87),i32x4\_lt\_u,"{}i32x4.lt\_u"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00411}00411\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(88),f32x4\_lt,"{}f32x4.lt"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00412}00412\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(89),f64x2\_lt,"{}f64x2.lt"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00413}00413\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00414}00414\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(90),i8x16\_le\_s,"{}i8x16.le\_s"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00415}00415\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(91),i8x16\_le\_u,"{}i8x16.le\_u"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00416}00416\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(92),i16x8\_le\_s,"{}i16x8.le\_s"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00417}00417\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(93),i16x8\_le\_u,"{}i16x8.le\_u"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00418}00418\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(94),i32x4\_le\_s,"{}i32x4.le\_s"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00419}00419\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(95),i32x4\_le\_u,"{}i32x4.le\_u"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00420}00420\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(96),f32x4\_le,"{}f32x4.le"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00421}00421\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(97),f64x2\_le,"{}f64x2.le"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00422}00422\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00423}00423\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(98),i8x16\_gt\_s,"{}i8x16.gt\_s"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00424}00424\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(99),i8x16\_gt\_u,"{}i8x16.gt\_u"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00425}00425\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(100),i16x8\_gt\_s,"{}i16x8.gt\_s"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00426}00426\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(101),i16x8\_gt\_u,"{}i16x8.gt\_u"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00427}00427\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(102),i32x4\_gt\_s,"{}i32x4.gt\_s"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00428}00428\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(103),i32x4\_gt\_u,"{}i32x4.gt\_u"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00429}00429\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(104),f32x4\_gt,"{}f32x4.gt"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00430}00430\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(105),f64x2\_gt,"{}f64x2.gt"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00431}00431\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00432}00432\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(106),i8x16\_ge\_s,"{}i8x16.ge\_s"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00433}00433\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(107),i8x16\_ge\_u,"{}i8x16.ge\_u"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00434}00434\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(108),i16x8\_ge\_s,"{}i16x8.ge\_s"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00435}00435\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(109),i16x8\_ge\_u,"{}i16x8.ge\_u"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00436}00436\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(110),i32x4\_ge\_s,"{}i32x4.ge\_s"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00437}00437\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(111),i32x4\_ge\_u,"{}i32x4.ge\_u"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00438}00438\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(112),f32x4\_ge,"{}f32x4.ge"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00439}00439\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(113),f64x2\_ge,"{}f64x2.ge"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00440}00440\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00441}00441\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(114),f32x4\_neg,"{}f32x4.neg"{},NoImm,UNARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00442}00442\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(115),f64x2\_neg,"{}f64x2.neg"{},NoImm,UNARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00443}00443\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00444}00444\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(116),f32x4\_abs,"{}f32x4.abs"{},NoImm,UNARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00445}00445\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(117),f64x2\_abs,"{}f64x2.abs"{},NoImm,UNARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00446}00446\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00447}00447\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(118),f32x4\_min,"{}f32x4.min"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00448}00448\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(119),f64x2\_min,"{}f64x2.min"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00449}00449\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00450}00450\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(120),f32x4\_max,"{}f32x4.max"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00451}00451\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(121),f64x2\_max,"{}f64x2.max"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00452}00452\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00453}00453\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(122),f32x4\_add,"{}f32x4.add"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00454}00454\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(123),f64x2\_add,"{}f64x2.add"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00455}00455\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00456}00456\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(124),f32x4\_sub,"{}f32x4.sub"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00457}00457\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(125),f64x2\_sub,"{}f64x2.sub"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00458}00458\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00459}00459\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(126),f32x4\_div,"{}f32x4.div"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00460}00460\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(127),f64x2\_div,"{}f64x2.div"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00461}00461\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00462}00462\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(128),f32x4\_mul,"{}f32x4.mul"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00463}00463\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(129),f64x2\_mul,"{}f64x2.mul"{},NoImm,BINARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00464}00464\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00465}00465\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(130),f32x4\_sqrt,"{}f32x4.sqrt"{},NoImm,UNARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00466}00466\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(131),f64x2\_sqrt,"{}f64x2.sqrt"{},NoImm,UNARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00467}00467\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00468}00468\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(132),f32x4\_convert\_s\_i32x4,"{}f32x4.convert\_s/i32x4"{},NoImm,UNARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00469}00469\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(133),f32x4\_convert\_u\_i32x4,"{}f32x4.convert\_u/i32x4"{},NoImm,UNARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00470}00470\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(134),f64x2\_convert\_s\_i64x2,"{}f64x2.convert\_s/i64x2"{},NoImm,UNARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00471}00471\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(135),f64x2\_convert\_u\_i64x2,"{}f64x2.convert\_u/i64x2"{},NoImm,UNARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00472}00472\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00473}00473\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(136),i32x4\_trunc\_s\_f32x4\_sat,"{}i32x4.trunc\_s/f32x4:sat"{},NoImm,UNARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00474}00474\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(137),i32x4\_trunc\_u\_f32x4\_sat,"{}i32x4.trunc\_u/f32x4:sat"{},NoImm,UNARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00475}00475\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(138),i64x2\_trunc\_s\_f64x2\_sat,"{}i64x2.trunc\_s/f64x2:sat"{},NoImm,UNARY(v128,v128))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00476}00476\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(SIMDOP(139),i64x2\_trunc\_u\_f64x2\_sat,"{}i64x2.trunc\_u/f64x2:sat"{},NoImm,UNARY(v128,v128))}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00477}00477\ \textcolor{preprocessor}{\ \ \ \ \#endif}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00478}00478\ }
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00479}00479\ \textcolor{preprocessor}{\ \ \ \ \#if\ !ENABLE\_THREADING\_PROTOTYPE}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00480}\mbox{\hyperlink{_operators_8h_a8e5eb28f538a0e0519b88c20fb1f9490}{00480}}\ \textcolor{preprocessor}{\ \ \ \ \#define\ ENUM\_THREADING\_OPERATORS(visitOp)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00481}00481\ \textcolor{preprocessor}{\ \ \ \ \#else}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00482}00482\ \textcolor{preprocessor}{\ \ \ \ \#define\ ENUM\_THREADING\_OPERATORS(visitOp)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00483}00483\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xc0,i32\_extend\_s\_i8,"{}i32.extend\_s/i8"{},NoImm,UNARY(i32,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00484}00484\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xc1,i32\_extend\_s\_i16,"{}i32.extend\_s/i16"{},NoImm,UNARY(i32,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00485}00485\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xc2,i64\_extend\_s\_i8,"{}i64.extend\_s/i8"{},NoImm,UNARY(i64,i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00486}00486\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xc3,i64\_extend\_s\_i16,"{}i64.extend\_s/i16"{},NoImm,UNARY(i64,i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00487}00487\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00488}00488\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe01,wake,"{}wake"{},AtomicLoadOrStoreImm<2>,BINARY(i32,i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00489}00489\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe02,i32\_wait,"{}i32.wait"{},AtomicLoadOrStoreImm<2>,WAIT(i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00490}00490\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe03,i64\_wait,"{}i64.wait"{},AtomicLoadOrStoreImm<3>,WAIT(i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00491}00491\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe04,launch\_thread,"{}launch\_thread"{},LaunchThreadImm,LAUNCHTHREAD)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00492}00492\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00493}00493\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe09,i32\_atomic\_rmw\_xchg,"{}i32.atomic.rmw.xchg"{},AtomicLoadOrStoreImm<2>,ATOMICRMW(i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00494}00494\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe0a,i64\_atomic\_rmw\_xchg,"{}i64.atomic.rmw.xchg"{},AtomicLoadOrStoreImm<3>,ATOMICRMW(i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00495}00495\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe0c,i32\_atomic\_rmw8\_u\_xchg,"{}i32.atomic.rmw8\_u.xchg"{},AtomicLoadOrStoreImm<0>,ATOMICRMW(i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00496}00496\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe0e,i32\_atomic\_rmw16\_u\_xchg,"{}i32.atomic.rmw16\_u.xchg"{},AtomicLoadOrStoreImm<1>,ATOMICRMW(i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00497}00497\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe10,i64\_atomic\_rmw8\_u\_xchg,"{}i64.atomic.rmw8\_u.xchg"{},AtomicLoadOrStoreImm<0>,ATOMICRMW(i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00498}00498\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe12,i64\_atomic\_rmw16\_u\_xchg,"{}i64.atomic.rmw16\_u.xchg"{},AtomicLoadOrStoreImm<1>,ATOMICRMW(i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00499}00499\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe14,i64\_atomic\_rmw32\_u\_xchg,"{}i64.atomic.rmw32\_u.xchg"{},AtomicLoadOrStoreImm<2>,ATOMICRMW(i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00500}00500\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00501}00501\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe15,i32\_atomic\_rmw\_cmpxchg,"{}i32.atomic.rmw.cmpxchg"{},AtomicLoadOrStoreImm<2>,COMPAREEXCHANGE(i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00502}00502\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe16,i64\_atomic\_rmw\_cmpxchg,"{}i64.atomic.rmw.cmpxchg"{},AtomicLoadOrStoreImm<3>,COMPAREEXCHANGE(i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00503}00503\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe18,i32\_atomic\_rmw8\_u\_cmpxchg,"{}i32.atomic.rmw8\_u.cmpxchg"{},AtomicLoadOrStoreImm<0>,COMPAREEXCHANGE(i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00504}00504\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe1a,i32\_atomic\_rmw16\_u\_cmpxchg,"{}i32.atomic.rmw16\_u.cmpxchg"{},AtomicLoadOrStoreImm<1>,COMPAREEXCHANGE(i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00505}00505\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe1c,i64\_atomic\_rmw8\_u\_cmpxchg,"{}i64.atomic.rmw8\_u.cmpxchg"{},AtomicLoadOrStoreImm<0>,COMPAREEXCHANGE(i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00506}00506\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe1e,i64\_atomic\_rmw16\_u\_cmpxchg,"{}i64.atomic.rmw16\_u.cmpxchg"{},AtomicLoadOrStoreImm<1>,COMPAREEXCHANGE(i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00507}00507\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe20,i64\_atomic\_rmw32\_u\_cmpxchg,"{}i64.atomic.rmw32\_u.cmpxchg"{},AtomicLoadOrStoreImm<2>,COMPAREEXCHANGE(i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00508}00508\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00509}00509\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe21,i32\_atomic\_load,"{}i32.atomic.load"{},AtomicLoadOrStoreImm<2>,LOAD(i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00510}00510\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe22,i64\_atomic\_load,"{}i64.atomic.load"{},AtomicLoadOrStoreImm<3>,LOAD(i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00511}00511\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe23,i32\_atomic\_load8\_u,"{}i32.atomic.load8\_u"{},AtomicLoadOrStoreImm<0>,LOAD(i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00512}00512\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe24,i32\_atomic\_load16\_u,"{}i32.atomic.load16\_u"{},AtomicLoadOrStoreImm<1>,LOAD(i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00513}00513\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe25,i64\_atomic\_load8\_u,"{}i64.atomic.load8\_u"{},AtomicLoadOrStoreImm<0>,LOAD(i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00514}00514\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe26,i64\_atomic\_load16\_u,"{}i64.atomic.load16\_u"{},AtomicLoadOrStoreImm<1>,LOAD(i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00515}00515\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe27,i64\_atomic\_load32\_u,"{}i64.atomic.load32\_u"{},AtomicLoadOrStoreImm<2>,LOAD(i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00516}00516\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe28,i32\_atomic\_store,"{}i32.atomic.store"{},AtomicLoadOrStoreImm<2>,STORE(i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00517}00517\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe29,i64\_atomic\_store,"{}i64.atomic.store"{},AtomicLoadOrStoreImm<3>,STORE(i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00518}00518\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe2a,f32\_atomic\_store,"{}f32.atomic.store"{},AtomicLoadOrStoreImm<2>,STORE(f32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00519}00519\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe2b,f64\_atomic\_store,"{}f64.atomic.store"{},AtomicLoadOrStoreImm<3>,STORE(f64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00520}00520\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe2c,i32\_atomic\_store8,"{}i32.atomic.store8"{},AtomicLoadOrStoreImm<0>,STORE(i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00521}00521\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe2d,i32\_atomic\_store16,"{}i32.atomic.store16"{},AtomicLoadOrStoreImm<1>,STORE(i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00522}00522\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe2e,i64\_atomic\_store8,"{}i64.atomic.store8"{},AtomicLoadOrStoreImm<0>,STORE(i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00523}00523\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe2f,i64\_atomic\_store16,"{}i64.atomic.store16"{},AtomicLoadOrStoreImm<1>,STORE(i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00524}00524\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe30,i64\_atomic\_store32,"{}i64.atomic.store32"{},AtomicLoadOrStoreImm<2>,STORE(i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00525}00525\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00526}00526\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe3f,i32\_atomic\_rmw\_add,"{}i32.atomic.rmw.add"{},AtomicLoadOrStoreImm<2>,ATOMICRMW(i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00527}00527\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe40,i64\_atomic\_rmw\_add,"{}i64.atomic.rmw.add"{},AtomicLoadOrStoreImm<3>,ATOMICRMW(i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00528}00528\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe42,i32\_atomic\_rmw8\_u\_add,"{}i32.atomic.rmw8\_u.add"{},AtomicLoadOrStoreImm<0>,ATOMICRMW(i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00529}00529\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe44,i32\_atomic\_rmw16\_u\_add,"{}i32.atomic.rmw16\_u.add"{},AtomicLoadOrStoreImm<1>,ATOMICRMW(i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00530}00530\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe46,i64\_atomic\_rmw8\_u\_add,"{}i64.atomic.rmw8\_u.add"{},AtomicLoadOrStoreImm<0>,ATOMICRMW(i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00531}00531\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe48,i64\_atomic\_rmw16\_u\_add,"{}i64.atomic.rmw16\_u.add"{},AtomicLoadOrStoreImm<1>,ATOMICRMW(i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00532}00532\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe4a,i64\_atomic\_rmw32\_u\_add,"{}i64.atomic.rmw32\_u.add"{},AtomicLoadOrStoreImm<2>,ATOMICRMW(i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00533}00533\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00534}00534\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe4b,i32\_atomic\_rmw\_sub,"{}i32.atomic.rmw.sub"{},AtomicLoadOrStoreImm<2>,ATOMICRMW(i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00535}00535\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe4c,i64\_atomic\_rmw\_sub,"{}i64.atomic.rmw.sub"{},AtomicLoadOrStoreImm<3>,ATOMICRMW(i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00536}00536\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe4e,i32\_atomic\_rmw8\_u\_sub,"{}i32.atomic.rmw8\_u.sub"{},AtomicLoadOrStoreImm<0>,ATOMICRMW(i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00537}00537\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe50,i32\_atomic\_rmw16\_u\_sub,"{}i32.atomic.rmw16\_u.sub"{},AtomicLoadOrStoreImm<1>,ATOMICRMW(i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00538}00538\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe52,i64\_atomic\_rmw8\_u\_sub,"{}i64.atomic.rmw8\_u.sub"{},AtomicLoadOrStoreImm<0>,ATOMICRMW(i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00539}00539\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe54,i64\_atomic\_rmw16\_u\_sub,"{}i64.atomic.rmw16\_u.sub"{},AtomicLoadOrStoreImm<1>,ATOMICRMW(i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00540}00540\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe56,i64\_atomic\_rmw32\_u\_sub,"{}i64.atomic.rmw32\_u.sub"{},AtomicLoadOrStoreImm<2>,ATOMICRMW(i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00541}00541\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00542}00542\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe57,i32\_atomic\_rmw\_and,"{}i32.atomic.rmw.and"{},AtomicLoadOrStoreImm<2>,ATOMICRMW(i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00543}00543\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe58,i64\_atomic\_rmw\_and,"{}i64.atomic.rmw.and"{},AtomicLoadOrStoreImm<3>,ATOMICRMW(i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00544}00544\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe5a,i32\_atomic\_rmw8\_u\_and,"{}i32.atomic.rmw8\_u.and"{},AtomicLoadOrStoreImm<0>,ATOMICRMW(i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00545}00545\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe5c,i32\_atomic\_rmw16\_u\_and,"{}i32.atomic.rmw16\_u.and"{},AtomicLoadOrStoreImm<1>,ATOMICRMW(i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00546}00546\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe5e,i64\_atomic\_rmw8\_u\_and,"{}i64.atomic.rmw8\_u.and"{},AtomicLoadOrStoreImm<0>,ATOMICRMW(i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00547}00547\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe60,i64\_atomic\_rmw16\_u\_and,"{}i64.atomic.rmw16\_u.and"{},AtomicLoadOrStoreImm<1>,ATOMICRMW(i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00548}00548\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe62,i64\_atomic\_rmw32\_u\_and,"{}i64.atomic.rmw32\_u.and"{},AtomicLoadOrStoreImm<2>,ATOMICRMW(i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00549}00549\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00550}00550\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe63,i32\_atomic\_rmw\_or,"{}i32.atomic.rmw.or"{},AtomicLoadOrStoreImm<2>,ATOMICRMW(i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00551}00551\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe64,i64\_atomic\_rmw\_or,"{}i64.atomic.rmw.or"{},AtomicLoadOrStoreImm<3>,ATOMICRMW(i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00552}00552\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe66,i32\_atomic\_rmw8\_u\_or,"{}i32.atomic.rmw8\_u.or"{},AtomicLoadOrStoreImm<0>,ATOMICRMW(i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00553}00553\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe68,i32\_atomic\_rmw16\_u\_or,"{}i32.atomic.rmw16\_u.or"{},AtomicLoadOrStoreImm<1>,ATOMICRMW(i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00554}00554\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe6a,i64\_atomic\_rmw8\_u\_or,"{}i64.atomic.rmw8\_u.or"{},AtomicLoadOrStoreImm<0>,ATOMICRMW(i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00555}00555\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe6c,i64\_atomic\_rmw16\_u\_or,"{}i64.atomic.rmw16\_u.or"{},AtomicLoadOrStoreImm<1>,ATOMICRMW(i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00556}00556\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe6e,i64\_atomic\_rmw32\_u\_or,"{}i64.atomic.rmw32\_u.or"{},AtomicLoadOrStoreImm<2>,ATOMICRMW(i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00557}00557\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00558}00558\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe6f,i32\_atomic\_rmw\_xor,"{}i32.atomic.rmw.xor"{},AtomicLoadOrStoreImm<2>,ATOMICRMW(i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00559}00559\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe70,i64\_atomic\_rmw\_xor,"{}i64.atomic.rmw.xor"{},AtomicLoadOrStoreImm<3>,ATOMICRMW(i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00560}00560\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe72,i32\_atomic\_rmw8\_u\_xor,"{}i32.atomic.rmw8\_u.xor"{},AtomicLoadOrStoreImm<0>,ATOMICRMW(i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00561}00561\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe74,i32\_atomic\_rmw16\_u\_xor,"{}i32.atomic.rmw16\_u.xor"{},AtomicLoadOrStoreImm<1>,ATOMICRMW(i32))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00562}00562\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe76,i64\_atomic\_rmw8\_u\_xor,"{}i64.atomic.rmw8\_u.xor"{},AtomicLoadOrStoreImm<0>,ATOMICRMW(i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00563}00563\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe78,i64\_atomic\_rmw16\_u\_xor,"{}i64.atomic.rmw16\_u.xor"{},AtomicLoadOrStoreImm<1>,ATOMICRMW(i64))\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00564}00564\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ visitOp(0xfe7a,i64\_atomic\_rmw32\_u\_xor,"{}i64.atomic.rmw32\_u.xor"{},AtomicLoadOrStoreImm<2>,ATOMICRMW(i64))}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00565}00565\ \textcolor{preprocessor}{\ \ \ \ \#endif}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00566}00566\ }
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00567}\mbox{\hyperlink{_operators_8h_a00ffff576f706ff1f69e93733a992e2d}{00567}}\ \textcolor{preprocessor}{\ \ \ \ \#define\ ENUM\_NONCONTROL\_OPERATORS(visitOp)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00568}00568\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ ENUM\_PARAMETRIC\_OPERATORS(visitOp)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00569}00569\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ ENUM\_NONCONTROL\_NONPARAMETRIC\_OPERATORS(visitOp)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00570}00570\ }
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00571}\mbox{\hyperlink{_operators_8h_a8b6ca1413466de9d4478329c481520a4}{00571}}\ \textcolor{preprocessor}{\ \ \ \ \#define\ ENUM\_OPERATORS(visitOp)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00572}00572\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ ENUM\_NONCONTROL\_OPERATORS(visitOp)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00573}00573\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ ENUM\_CONTROL\_OPERATORS(visitOp)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00574}00574\ }
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00575}\mbox{\hyperlink{namespace_i_r_a59653fd60bb296de971e5f945c66933a}{00575}}\ \ \ \ \ \textcolor{keyword}{enum\ class}\ \mbox{\hyperlink{namespace_i_r_a59653fd60bb296de971e5f945c66933a}{Opcode}}\ :\ \mbox{\hyperlink{_basic_types_8h_a0a0a322d5fa4a546d293a77ba8b4a71f}{U16}}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00576}00576\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00577}\mbox{\hyperlink{_operators_8h_adf7a6340d67debe214854f55841b5327}{00577}}\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#define\ VISIT\_OPCODE(opcode,name,...)\ name\ =\ opcode,}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00578}00578\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_operators_8h_a8b6ca1413466de9d4478329c481520a4}{ENUM\_OPERATORS}}(\mbox{\hyperlink{namespace_i_r_a59653fd60bb296de971e5f945c66933aa275346406ff338dd8adf063f9a066141}{VISIT\_OPCODE}})}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00579}00579\ \ \ \ \ \ \ \ \ \textcolor{preprocessor}{\#undef\ VISIT\_OPCODE}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00580}00580\ }
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00581}00581\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_i_r_a59653fd60bb296de971e5f945c66933aae1b7f601b4df0ad061b42fc480930a26}{maxSingleByteOpcode}}\ =\ 0xcf,}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00582}00582\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00583}00583\ }
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00584}\mbox{\hyperlink{namespace_i_r_af8f00e407eea27504c5e147c1298219e}{00584}}\ \ \ \ \ \mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_a22967196ef9b5ba8e54c8d9a0505d312}{PACKED\_STRUCT}}(}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00585}00585\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a53ef06e29c840024a683512c1acd791a}{template<typename\ Imm>}}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00586}00586\ \ \ \ \ \textcolor{keyword}{struct}\ OpcodeAndImm}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00587}00587\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00588}00588\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_i_r_a59653fd60bb296de971e5f945c66933a}{Opcode}}\ opcode;}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00589}00589\ \ \ \ \ \ \ \ \ Imm\ imm;}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00590}00590\ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00591}00591\ }
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00592}00592\ \ \ \ \ \textcolor{comment}{//\ Specialize\ for\ the\ empty\ immediate\ structs\ so\ they\ don't\ take\ an\ extra\ byte\ of\ space.}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00593}00593\ \ \ \ \ \textcolor{keyword}{template}<>}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00594}\mbox{\hyperlink{struct_i_r_1_1_opcode_and_imm_3_01_no_imm_01_4}{00594}}\ \ \ \ \ \textcolor{keyword}{struct\ }OpcodeAndImm<\mbox{\hyperlink{struct_i_r_1_1_no_imm}{NoImm}}>}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00595}00595\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00596}00596\ \ \ \ \ \ \ \ \ \textcolor{keyword}{union}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00597}00597\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00598}\mbox{\hyperlink{struct_i_r_1_1_opcode_and_imm_3_01_no_imm_01_4_ae655d376f3ff85908e5769f81357a9e1}{00598}}\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_i_r_a59653fd60bb296de971e5f945c66933a}{Opcode}}\ \mbox{\hyperlink{struct_i_r_1_1_opcode_and_imm_3_01_no_imm_01_4_ae655d376f3ff85908e5769f81357a9e1}{opcode}};}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00599}\mbox{\hyperlink{struct_i_r_1_1_opcode_and_imm_3_01_no_imm_01_4_a75df95868f32fdb8386f3beb5aea0e29}{00599}}\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_i_r_1_1_no_imm}{NoImm}}\ \mbox{\hyperlink{struct_i_r_1_1_opcode_and_imm_3_01_no_imm_01_4_a75df95868f32fdb8386f3beb5aea0e29}{imm}};}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00600}00600\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00601}00601\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00602}00602\ \ \ \ \ \textcolor{keyword}{template}<>}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00603}\mbox{\hyperlink{struct_i_r_1_1_opcode_and_imm_3_01_memory_imm_01_4}{00603}}\ \ \ \ \ \textcolor{keyword}{struct\ }OpcodeAndImm<\mbox{\hyperlink{struct_i_r_1_1_memory_imm}{MemoryImm}}>}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00604}00604\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00605}00605\ \ \ \ \ \ \ \ \ \textcolor{keyword}{union}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00606}00606\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00607}\mbox{\hyperlink{struct_i_r_1_1_opcode_and_imm_3_01_memory_imm_01_4_a5da88bdb74a8fb86f6d1cab640c88f28}{00607}}\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_i_r_a59653fd60bb296de971e5f945c66933a}{Opcode}}\ \mbox{\hyperlink{struct_i_r_1_1_opcode_and_imm_3_01_memory_imm_01_4_a5da88bdb74a8fb86f6d1cab640c88f28}{opcode}};}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00608}\mbox{\hyperlink{struct_i_r_1_1_opcode_and_imm_3_01_memory_imm_01_4_a0d8b9783f74085c385d84b86f85ced6b}{00608}}\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_i_r_1_1_memory_imm}{MemoryImm}}\ \mbox{\hyperlink{struct_i_r_1_1_opcode_and_imm_3_01_memory_imm_01_4_a0d8b9783f74085c385d84b86f85ced6b}{imm}};}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00609}00609\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00610}00610\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00611}00611\ }
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00612}00612\ \ \ \ \ \textcolor{comment}{//\ Decodes\ an\ operator\ from\ an\ input\ stream\ and\ dispatches\ by\ opcode.}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00613}\mbox{\hyperlink{struct_i_r_1_1_operator_decoder_stream}{00613}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_i_r_1_1_operator_decoder_stream}{OperatorDecoderStream}}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00614}00614\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00615}\mbox{\hyperlink{struct_i_r_1_1_operator_decoder_stream_a2408751c97a2f3643b36f8d2fea4e541}{00615}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_i_r_1_1_operator_decoder_stream_a2408751c97a2f3643b36f8d2fea4e541}{OperatorDecoderStream}}(\textcolor{keyword}{const}\ std::vector<U8>\&\ codeBytes)}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00616}00616\ \ \ \ \ \ \ \ \ :\ nextByte(codeBytes.data()),\ end(codeBytes.data()+codeBytes.size())\ \{\}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00617}00617\ }
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00618}\mbox{\hyperlink{struct_i_r_1_1_operator_decoder_stream_a863e05862d2e4c19136c04eb73a7fa84}{00618}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{operator}\ bool()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ nextByte\ <\ end;\ \}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00619}00619\ }
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00620}00620\ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ Visitor>}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00621}\mbox{\hyperlink{struct_i_r_1_1_operator_decoder_stream_a7b680638c09ef51617652259c47bd7db}{00621}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{typename}\ Visitor::Result\ \mbox{\hyperlink{struct_i_r_1_1_operator_decoder_stream_a7b680638c09ef51617652259c47bd7db}{decodeOp}}(Visitor\&\ visitor)}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00622}00622\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00623}00623\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_errors_8h_a03bec6af3af0dd492e348b40cbe40a46}{WAVM\_ASSERT\_THROW}}(nextByte\ +\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{namespace_i_r_a59653fd60bb296de971e5f945c66933a}{Opcode}})\ <=\ end);}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00624}00624\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_i_r_a59653fd60bb296de971e5f945c66933a}{Opcode}}\ opcode\ =\ *(\mbox{\hyperlink{namespace_i_r_a59653fd60bb296de971e5f945c66933a}{Opcode}}*)nextByte;}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00625}00625\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(opcode)}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00626}00626\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00627}00627\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \#define\ VISIT\_OPCODE(opcode,name,nameString,Imm,...)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00628}00628\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ case\ Opcode::name:\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00629}00629\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00630}00630\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ WAVM\_ASSERT\_THROW(nextByte\ +\ sizeof(OpcodeAndImm<Imm>)\ <=\ end);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00631}00631\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ OpcodeAndImm<Imm>*\ encodedOperator\ =\ (OpcodeAndImm<Imm>*)nextByte;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00632}00632\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ nextByte\ +=\ sizeof(OpcodeAndImm<Imm>);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00633}00633\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ return\ visitor.name(encodedOperator-\/>imm);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00634}00634\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00635}00635\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_operators_8h_a8b6ca1413466de9d4478329c481520a4}{ENUM\_OPERATORS}}(\mbox{\hyperlink{namespace_i_r_a59653fd60bb296de971e5f945c66933aa275346406ff338dd8adf063f9a066141}{VISIT\_OPCODE}})}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00636}00636\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{preprocessor}{\#undef\ VISIT\_OPCODE}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00637}00637\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00638}00638\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ nextByte\ +=\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{namespace_i_r_a59653fd60bb296de971e5f945c66933a}{Opcode}});}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00639}00639\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ visitor.unknown(opcode);}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00640}00640\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00641}00641\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00642}00642\ }
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00643}00643\ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ Visitor>}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00644}\mbox{\hyperlink{struct_i_r_1_1_operator_decoder_stream_a6b57501a0b3ca612c59e2c15ddc2edd5}{00644}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{typename}\ Visitor::Result\ \mbox{\hyperlink{struct_i_r_1_1_operator_decoder_stream_a6b57501a0b3ca612c59e2c15ddc2edd5}{decodeOpWithoutConsume}}(Visitor\&\ visitor)}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00645}00645\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00646}00646\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}*\ savedNextByte\ =\ nextByte;}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00647}00647\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typename}\ Visitor::Result\ result\ =\ \mbox{\hyperlink{struct_i_r_1_1_operator_decoder_stream_a7b680638c09ef51617652259c47bd7db}{decodeOp}}(visitor);}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00648}00648\ \ \ \ \ \ \ \ \ \ \ \ \ nextByte\ =\ savedNextByte;}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00649}00649\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00650}00650\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00651}00651\ }
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00652}00652\ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00653}00653\ }
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00654}00654\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}*\ nextByte;}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00655}00655\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}*\ end;}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00656}00656\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00657}00657\ }
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00658}00658\ \ \ \ \ \textcolor{comment}{//\ Encodes\ an\ operator\ to\ an\ output\ stream.}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00659}\mbox{\hyperlink{struct_i_r_1_1_operator_encoder_stream}{00659}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_i_r_1_1_operator_encoder_stream}{OperatorEncoderStream}}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00660}00660\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00661}\mbox{\hyperlink{struct_i_r_1_1_operator_encoder_stream_a86e2fe019c94880b58cab7ea6ab808d2}{00661}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_i_r_1_1_operator_encoder_stream_a86e2fe019c94880b58cab7ea6ab808d2}{OperatorEncoderStream}}(\mbox{\hyperlink{struct_serialization_1_1_output_stream}{Serialization::OutputStream}}\&\ inByteStream):\ byteStream(inByteStream)\ \{\}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00662}00662\ }
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00663}00663\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#define\ VISIT\_OPCODE(\_,name,nameString,Imm,...)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00664}00664\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ void\ name(Imm\ imm\ =\ \{\})\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00665}00665\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00666}00666\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ OpcodeAndImm<Imm>*\ encodedOperator\ =\ (OpcodeAndImm<Imm>*)byteStream.advance(sizeof(OpcodeAndImm<Imm>));\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00667}00667\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ encodedOperator-\/>opcode\ =\ Opcode::name;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00668}00668\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ encodedOperator-\/>imm\ =\ imm;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00669}00669\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \}}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00670}00670\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_operators_8h_a8b6ca1413466de9d4478329c481520a4}{ENUM\_OPERATORS}}(\mbox{\hyperlink{namespace_i_r_a59653fd60bb296de971e5f945c66933aa275346406ff338dd8adf063f9a066141}{VISIT\_OPCODE}})}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00671}00671\ \ \ \ \ \ \ \ \ \textcolor{preprocessor}{\#undef\ VISIT\_OPCODE}}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00672}00672\ }
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00673}00673\ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00674}00674\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_serialization_1_1_output_stream}{Serialization::OutputStream}}\&\ byteStream;}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00675}00675\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00676}00676\ }
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00677}00677\ \ \ \ \ \mbox{\hyperlink{_i_r_8h_a0ee024894bb6f700da724f2f1a120abb}{IR\_API}}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{namespace_i_r_a257e1a2dd0295c113d4bdf87dd466f4a}{getOpcodeName}}(\mbox{\hyperlink{namespace_i_r_a59653fd60bb296de971e5f945c66933a}{Opcode}}\ opcode);}
+\DoxyCodeLine{\Hypertarget{_operators_8h_source_l00678}00678\ \}}
+
+\end{DoxyCode}

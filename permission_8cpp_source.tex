@@ -1,0 +1,95 @@
+\doxysection{permission.\+cpp}
+\hypertarget{permission_8cpp_source}{}\label{permission_8cpp_source}\index{libraries/chain/webassembly/permission.cpp@{libraries/chain/webassembly/permission.cpp}}
+\mbox{\hyperlink{permission_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{interface_8hpp}{sysio/chain/webassembly/interface.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{authorization__manager_8hpp}{sysio/chain/authorization\_manager.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{transaction__context_8hpp}{sysio/chain/transaction\_context.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{apply__context_8hpp}{sysio/chain/apply\_context.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00006}00006\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{\ \textcolor{keyword}{namespace\ }chain\ \{\ \textcolor{keyword}{namespace\ }webassembly\ \{}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00007}\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_abce1275461092f9c79e4fea809eb6832}{00007}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_abce1275461092f9c79e4fea809eb6832}{unpack\_provided\_keys}}(\ flat\_set<public\_key\_type>\&\ keys,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ pubkeys\_data,\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ pubkeys\_size\ )\ \{}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00008}00008\ \ \ \ \ \ \ keys.clear();}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00009}00009\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ pubkeys\_size\ ==\ 0\ )\ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00011}00011\ \ \ \ \ \ \ keys\ =\ \mbox{\hyperlink{namespacefc_1_1raw_a0b442d98ceb22dd5a6ae84745e43ffab}{fc::raw::unpack<flat\_set<public\_key\_type>}}>(\ pubkeys\_data,\ pubkeys\_size\ );}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00012}00012\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00014}\mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a317d41cd1ecc723d8827f0429ae69a6e}{00014}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a317d41cd1ecc723d8827f0429ae69a6e}{unpack\_provided\_permissions}}(\ flat\_set<permission\_level>\&\ permissions,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ perms\_data,\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ perms\_size\ )\ \{}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00015}00015\ \ \ \ \ \ \ permissions.clear();}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00016}00016\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ perms\_size\ ==\ 0\ )\ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00018}00018\ \ \ \ \ \ \ permissions\ =\ \mbox{\hyperlink{namespacefc_1_1raw_a0b442d98ceb22dd5a6ae84745e43ffab}{fc::raw::unpack<flat\_set<permission\_level>}}>(\ perms\_data,\ perms\_size\ );}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00019}00019\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00021}\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_ae7e5ff8efd4cf566fa6fc0e5bae58ed6}{00021}}\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_ae7e5ff8efd4cf566fa6fc0e5bae58ed6}{interface::check\_transaction\_authorization}}(\ \mbox{\hyperlink{structsysio_1_1vm_1_1argument__proxy}{legacy\_span<const\ char>}}\ trx\_data,}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00022}00022\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1argument__proxy}{legacy\_span<const\ char>}}\ pubkeys\_data,}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00023}00023\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1argument__proxy}{legacy\_span<const\ char>}}\ perms\_data\ )\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00024}00024\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1transaction}{transaction}}\ trx\ =\ \mbox{\hyperlink{namespacefc_1_1raw_a0b442d98ceb22dd5a6ae84745e43ffab}{fc::raw::unpack<transaction>}}(\ trx\_data.data(),\ trx\_data.size()\ );}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00026}00026\ \ \ \ \ \ \ flat\_set<public\_key\_type>\ provided\_keys;}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00027}00027\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_abce1275461092f9c79e4fea809eb6832}{unpack\_provided\_keys}}(\ provided\_keys,\ pubkeys\_data.data(),\ pubkeys\_data.size()\ );}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00029}00029\ \ \ \ \ \ \ flat\_set<permission\_level>\ provided\_permissions;}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00030}00030\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a317d41cd1ecc723d8827f0429ae69a6e}{unpack\_provided\_permissions}}(\ provided\_permissions,\ perms\_data.data(),\ perms\_data.size()\ );}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00032}00032\ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00033}00033\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structcontext}{context}}.control}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00034}00034\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .get\_authorization\_manager()}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00035}00035\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .check\_authorization(\ trx.\mbox{\hyperlink{structsysio_1_1chain_1_1transaction_a407fcf1868b81bb30b85f80d388bbac2}{actions}},}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00036}00036\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ provided\_keys,}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00037}00037\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ provided\_permissions,}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00038}00038\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a9623b8cae3f48bbed6aa1fc2afe9b174}{fc::seconds}}(trx.\mbox{\hyperlink{structsysio_1_1chain_1_1transaction__header_a349b11695387e3dbe91f918ee759d4b4}{delay\_sec}}),}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00039}00039\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::bind(\&\mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_ac47cac1e2ac5625a8589686503dd1261}{transaction\_context::checktime}},\ \&\mbox{\hyperlink{structcontext}{context}}.trx\_context),}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00040}00040\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{false}}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00041}00041\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00042}00042\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00043}00043\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}(\ \textcolor{keyword}{const}\ authorization\_exception\&\ e\ )\ \{\}}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00045}00045\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00046}00046\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00048}\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_a1d7cd7338c9608021fb88fdcec58e681}{00048}}\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_a1d7cd7338c9608021fb88fdcec58e681}{interface::check\_permission\_authorization}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{account\_name}}\ account,\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{permission\_name}}\ permission,}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1argument__proxy}{legacy\_span<const\ char>}}\ pubkeys\_data,}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00050}00050\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1argument__proxy}{legacy\_span<const\ char>}}\ perms\_data,}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00051}00051\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ delay\_us\ )\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00052}00052\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ delay\_us\ <=\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\textcolor{keyword}{>}(std::numeric\_limits<int64\_t>::max()),}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_a764b50974b9b72a0e233e72176913d6b}{action\_validate\_exception}},\ \textcolor{stringliteral}{"{}provided\ delay\ is\ too\ large"{}}\ );}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00054}00054\ }
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00055}00055\ \ \ \ \ \ \ flat\_set<public\_key\_type>\ provided\_keys;}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00056}00056\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_abce1275461092f9c79e4fea809eb6832}{unpack\_provided\_keys}}(\ provided\_keys,\ pubkeys\_data.data(),\ pubkeys\_data.size()\ );}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00058}00058\ \ \ \ \ \ \ flat\_set<permission\_level>\ provided\_permissions;}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00059}00059\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a317d41cd1ecc723d8827f0429ae69a6e}{unpack\_provided\_permissions}}(\ provided\_permissions,\ perms\_data.data(),\ perms\_data.size()\ );}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00061}00061\ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00062}00062\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structcontext}{context}}.control}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .get\_authorization\_manager()}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00064}00064\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .check\_authorization(\ account,}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00065}00065\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ permission,}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00066}00066\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ provided\_keys,}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00067}00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ provided\_permissions,}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1microseconds}{fc::microseconds}}(delay\_us),}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::bind(\&\mbox{\hyperlink{classsysio_1_1chain_1_1transaction__context_ac47cac1e2ac5625a8589686503dd1261}{transaction\_context::checktime}},\ \&\mbox{\hyperlink{structcontext}{context}}.trx\_context),}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{false}}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00071}00071\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00073}00073\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}(\ \textcolor{keyword}{const}\ authorization\_exception\&\ e\ )\ \{\}}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00074}00074\ }
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00075}00075\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00076}00076\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00077}00077\ }
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00078}\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_adfcd50328d1d1b3db19070320649d581}{00078}}\ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_adfcd50328d1d1b3db19070320649d581}{interface::get\_permission\_last\_used}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{account\_name}}\ account,\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{permission\_name}}\ permission\ )\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00079}00079\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ am\ =\ \mbox{\hyperlink{structcontext}{context}}.control.get\_authorization\_manager();}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00080}00080\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ am.get\_permission\_last\_used(\ am.get\_permission(\{account,\ permission\})\ ).time\_since\_epoch().count();}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00081}00081\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00083}\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_ab9c50d651a2ee70bdcd687061dadadc5}{00083}}\ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_ab9c50d651a2ee70bdcd687061dadadc5}{interface::get\_account\_creation\_time}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{account\_name}}\ account\ )\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00084}00084\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}*\ acct\ =\ \mbox{\hyperlink{structcontext}{context}}.db.find<\mbox{\hyperlink{classsysio_1_1chain_1_1account__object}{account\_object}},\ by\_name>(account);}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00085}00085\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ acct\ !=\ \textcolor{keyword}{nullptr},\ \mbox{\hyperlink{namespacesysio_1_1chain_a764b50974b9b72a0e233e72176913d6b}{action\_validate\_exception}},}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00086}00086\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}account\ '\$\{account\}'\ does\ not\ exist"{}},\ (\textcolor{stringliteral}{"{}account"{}},\ account)\ );}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00087}00087\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1time__point}{time\_point}}(acct-\/>creation\_date).\mbox{\hyperlink{classfc_1_1time__point_abfea5efbe9ef58024cda814395ee9945}{time\_since\_epoch}}().\mbox{\hyperlink{classfc_1_1microseconds_a20fba59ec7e1f50c6b8f2c9443cc9b92}{count}}();}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00088}00088\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{permission_8cpp_source_l00089}00089\ \}\}\}\ \textcolor{comment}{//\ ns\ sysio::chain::webassembly}}
+
+\end{DoxyCode}

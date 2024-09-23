@@ -1,0 +1,553 @@
+\doxysection{application.\+cpp}
+\hypertarget{application_8cpp_source}{}\label{application_8cpp_source}\index{libraries/appbase/application.cpp@{libraries/appbase/application.cpp}}
+\mbox{\hyperlink{application_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{application_8hpp}{appbase/application.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{appbase_2include_2appbase_2version_8hpp}{appbase/version.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <boost/algorithm/string.hpp>}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <boost/filesystem.hpp>}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <boost/asio/signal\_set.hpp>}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <boost/algorithm/string.hpp>}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ <iostream>}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <fstream>}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00011}00011\ \textcolor{preprocessor}{\#include\ <unordered\_map>}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00012}00012\ \textcolor{preprocessor}{\#include\ <future>}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00013}00013\ \textcolor{preprocessor}{\#include\ <optional>}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00015}00015\ \textcolor{preprocessor}{\#include\ <unistd.h>}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00016}00016\ \textcolor{preprocessor}{\#include\ <signal.h>}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00018}\mbox{\hyperlink{namespaceappbase}{00018}}\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceappbase}{appbase}}\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00020}00020\ \textcolor{keyword}{namespace\ }bpo\ =\ boost::program\_options;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00021}00021\ \textcolor{keyword}{using\ }bpo::options\_description;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00022}00022\ \textcolor{keyword}{using\ }bpo::variables\_map;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00023}00023\ \textcolor{keyword}{using\ }std::cout;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00025}\mbox{\hyperlink{namespaceappbase_aade924f565cf5f8cfca31b35dcc289d9}{00025}}\ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespaceappbase_aade924f565cf5f8cfca31b35dcc289d9}{any\_type\_compare\_map}}\ =\ std::unordered\_map<std::type\_index,\ std::function<bool(\textcolor{keyword}{const}\ boost::any\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \textcolor{keyword}{const}\ boost::any\&\ b)>>;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00027}\mbox{\hyperlink{classappbase_1_1application__impl}{00027}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classappbase_1_1application__impl}{application\_impl}}\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00028}00028\ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00029}\mbox{\hyperlink{classappbase_1_1application__impl_aade87dbe7aecbf59edff84b93883ea9c}{00029}}\ \ \ \ \ \ \ \mbox{\hyperlink{classappbase_1_1application__impl_aade87dbe7aecbf59edff84b93883ea9c}{application\_impl}}():\mbox{\hyperlink{classappbase_1_1application__impl_aeaad17ab2e8496dfcddcde22001f71e9}{\_app\_options}}(\textcolor{stringliteral}{"{}Application\ Options"{}})\{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00030}00030\ \textcolor{preprocessor}{\#ifndef\ \_WIN32}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00031}00031\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Create\ a\ separate\ thread\ to\ handle\ signals,\ so\ that\ they\ don't\ interrupt\ I/O.}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00032}00032\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ stdio\ does\ not\ recover\ from\ EINTR.}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00033}00033\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classappbase_1_1application__impl_a8f84809f06f2633d7e36322138006c5b}{\_signal\_catching\_io\_ctx}}.emplace();}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00034}00034\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classappbase_1_1application__impl_a13ccdd1b4961e7ec26bb76f08bfe96c5}{\_signal\_catching\_thread}}\ =\ std::thread([\&ioctx\ =\ *\mbox{\hyperlink{classappbase_1_1application__impl_a8f84809f06f2633d7e36322138006c5b}{\_signal\_catching\_io\_ctx}}]()\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00035}00035\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ workwork\ =\ boost::asio::make\_work\_guard(ioctx);}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00036}00036\ \ \ \ \ \ \ \ \ \ \ \ \ ioctx.run();}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00037}00037\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00039}00039\ \ \ \ \ \ \ \ \ \ sigset\_t\ blocked\_signals;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00040}00040\ \ \ \ \ \ \ \ \ \ sigemptyset(\&blocked\_signals);}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00041}00041\ \ \ \ \ \ \ \ \ \ sigaddset(\&blocked\_signals,\ SIGINT);}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00042}00042\ \ \ \ \ \ \ \ \ \ sigaddset(\&blocked\_signals,\ SIGTERM);}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00043}00043\ \ \ \ \ \ \ \ \ \ sigaddset(\&blocked\_signals,\ SIGPIPE);}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00044}00044\ \ \ \ \ \ \ \ \ \ sigaddset(\&blocked\_signals,\ SIGHUP);}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00045}00045\ \ \ \ \ \ \ \ \ \ pthread\_sigmask(SIG\_BLOCK,\ \&blocked\_signals,\ \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00046}00046\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00047}00047\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00049}\mbox{\hyperlink{classappbase_1_1application__impl_a5882ebf1f096c40406db720883bfaae1}{00049}}\ \ \ \ \ \ \ \mbox{\hyperlink{classappbase_1_1application__impl_a5882ebf1f096c40406db720883bfaae1}{\string~application\_impl}}()\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00050}00050\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{classappbase_1_1application__impl_a13ccdd1b4961e7ec26bb76f08bfe96c5}{\_signal\_catching\_thread}}.joinable())\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00051}00051\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classappbase_1_1application__impl_a8f84809f06f2633d7e36322138006c5b}{\_signal\_catching\_io\_ctx}}-\/>stop();}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classappbase_1_1application__impl_a13ccdd1b4961e7ec26bb76f08bfe96c5}{\_signal\_catching\_thread}}.join();}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00054}00054\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00056}\mbox{\hyperlink{classappbase_1_1application__impl_aeaad17ab2e8496dfcddcde22001f71e9}{00056}}\ \ \ \ \ \ \ options\_description\ \ \ \ \ \mbox{\hyperlink{classappbase_1_1application__impl_aeaad17ab2e8496dfcddcde22001f71e9}{\_app\_options}};}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00057}\mbox{\hyperlink{classappbase_1_1application__impl_a4679e6fc2486345acb6fceb7ed836b57}{00057}}\ \ \ \ \ \ \ options\_description\ \ \ \ \ \mbox{\hyperlink{classappbase_1_1application__impl_a4679e6fc2486345acb6fceb7ed836b57}{\_cfg\_options}};}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00058}\mbox{\hyperlink{classappbase_1_1application__impl_a1fe6f4e56447859c1cc6bcae1e38d7fb}{00058}}\ \ \ \ \ \ \ variables\_map\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classappbase_1_1application__impl_a1fe6f4e56447859c1cc6bcae1e38d7fb}{\_options}};}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00060}\mbox{\hyperlink{classappbase_1_1application__impl_a16991047b49dae072cec342862666ded}{00060}}\ \ \ \ \ \ \ bfs::path\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classappbase_1_1application__impl_a16991047b49dae072cec342862666ded}{\_data\_dir}}\{\textcolor{stringliteral}{"{}data-\/dir"{}}\};}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00061}\mbox{\hyperlink{classappbase_1_1application__impl_aadb245a4b7200b02559678b7297c4796}{00061}}\ \ \ \ \ \ \ bfs::path\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classappbase_1_1application__impl_aadb245a4b7200b02559678b7297c4796}{\_config\_dir}}\{\textcolor{stringliteral}{"{}config-\/dir"{}}\};}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00062}\mbox{\hyperlink{classappbase_1_1application__impl_ab72d2102d709f8fec17cd87c4e1fcacb}{00062}}\ \ \ \ \ \ \ bfs::path\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classappbase_1_1application__impl_ab72d2102d709f8fec17cd87c4e1fcacb}{\_logging\_conf}}\{\textcolor{stringliteral}{"{}logging.json"{}}\};}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00063}\mbox{\hyperlink{classappbase_1_1application__impl_a138be1de4cc18850693da4ccd50f8308}{00063}}\ \ \ \ \ \ \ bfs::path\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classappbase_1_1application__impl_a138be1de4cc18850693da4ccd50f8308}{\_config\_file\_name}};}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00065}\mbox{\hyperlink{classappbase_1_1application__impl_a01df2a4f435ae8dd80599748419071f3}{00065}}\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classappbase_1_1application__impl_a01df2a4f435ae8dd80599748419071f3}{\_version}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00066}\mbox{\hyperlink{classappbase_1_1application__impl_a829cfc290b5ba1b689f643eadf3cb4fc}{00066}}\ \ \ \ \ \ \ std::string\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classappbase_1_1application__impl_a829cfc290b5ba1b689f643eadf3cb4fc}{\_version\_str}}\ =\ \mbox{\hyperlink{namespaceappbase_a5e40542184adc7d1355d331552e5959d}{appbase\_version\_string}};}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00067}\mbox{\hyperlink{classappbase_1_1application__impl_a8872583e2f920f5f9d603fa89ad1364e}{00067}}\ \ \ \ \ \ \ std::string\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classappbase_1_1application__impl_a8872583e2f920f5f9d603fa89ad1364e}{\_full\_version\_str}}\ =\ \mbox{\hyperlink{namespaceappbase_a5e40542184adc7d1355d331552e5959d}{appbase\_version\_string}};}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00069}\mbox{\hyperlink{classappbase_1_1application__impl_a4676ccb4254603ef5225105dc708b8b2}{00069}}\ \ \ \ \ \ \ std::atomic\_bool\ \ \ \ \ \ \ \ \mbox{\hyperlink{classappbase_1_1application__impl_a4676ccb4254603ef5225105dc708b8b2}{\_is\_quiting}}\{\textcolor{keyword}{false}\};}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00071}\mbox{\hyperlink{classappbase_1_1application__impl_a126c931d56805b86f758aaac212d68f4}{00071}}\ \ \ \ \ \ \ \mbox{\hyperlink{namespaceappbase_aade924f565cf5f8cfca31b35dcc289d9}{any\_type\_compare\_map}}\ \ \ \ \mbox{\hyperlink{classappbase_1_1application__impl_a126c931d56805b86f758aaac212d68f4}{\_any\_compare\_map}};}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00073}\mbox{\hyperlink{classappbase_1_1application__impl_a13ccdd1b4961e7ec26bb76f08bfe96c5}{00073}}\ \ \ \ \ \ \ std::thread\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classappbase_1_1application__impl_a13ccdd1b4961e7ec26bb76f08bfe96c5}{\_signal\_catching\_thread}};}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00074}\mbox{\hyperlink{classappbase_1_1application__impl_a8f84809f06f2633d7e36322138006c5b}{00074}}\ \ \ \ \ \ \ std::optional<boost::asio::io\_context>\ \mbox{\hyperlink{classappbase_1_1application__impl_a8f84809f06f2633d7e36322138006c5b}{\_signal\_catching\_io\_ctx}};}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00075}00075\ \};}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00076}00076\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00077}00077\ application::application()}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00078}00078\ :my(new\ \mbox{\hyperlink{classappbase_1_1application__impl}{application\_impl}}())\{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00079}00079\ \ \ \ io\_serv\ =\ std::make\_shared<boost::asio::io\_service>();}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00080}00080\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00081}00081\ \ \ \ register\_config\_type<std::string>();}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00082}00082\ \ \ \ register\_config\_type<bool>();}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00083}00083\ \ \ \ register\_config\_type<unsigned\ short>();}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00084}00084\ \ \ \ register\_config\_type<unsigned>();}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00085}00085\ \ \ \ register\_config\_type<unsigned\ long>();}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00086}00086\ \ \ \ register\_config\_type<unsigned\ long\ long>();}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00087}00087\ \ \ \ register\_config\_type<short>();}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00088}00088\ \ \ \ register\_config\_type<int>();}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00089}00089\ \ \ \ register\_config\_type<long>();}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00090}00090\ \ \ \ register\_config\_type<long\ long>();}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00091}00091\ \ \ \ register\_config\_type<double>();}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00092}00092\ \ \ \ register\_config\_type<std::vector<std::string>>();}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00093}00093\ \ \ \ register\_config\_type<boost::filesystem::path>();}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00094}00094\ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00095}00095\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00096}\mbox{\hyperlink{classappbase_1_1application_ae9b89e36574867b0eaf08a6755c67ce2}{00096}}\ \mbox{\hyperlink{classappbase_1_1application_ae9b89e36574867b0eaf08a6755c67ce2}{application::\string~application}}()\ \{\ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00097}00097\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00098}\mbox{\hyperlink{classappbase_1_1application_a2794807d31e9f29f1327811dda40820d}{00098}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classappbase_1_1application_a2794807d31e9f29f1327811dda40820d}{application::set\_version}}(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ version)\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00099}00099\ \ \ my-\/>\_version\ =\ \mbox{\hyperlink{classappbase_1_1application_ae4ec67aea2aa3bab8800c875590245b2}{version}};}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00100}00100\ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00101}00101\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00102}\mbox{\hyperlink{classappbase_1_1application_ae4ec67aea2aa3bab8800c875590245b2}{00102}}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{classappbase_1_1application_ae4ec67aea2aa3bab8800c875590245b2}{application::version}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00103}00103\ \ \ \textcolor{keywordflow}{return}\ my-\/>\_version;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00104}00104\ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00105}00105\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00106}\mbox{\hyperlink{classappbase_1_1application_a780543c4d0330fe88b912a3fa914f953}{00106}}\ \textcolor{keywordtype}{string}\ \mbox{\hyperlink{classappbase_1_1application_a780543c4d0330fe88b912a3fa914f953}{application::version\_string}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00107}00107\ \ \ \ \textcolor{keywordflow}{return}\ my-\/>\_version\_str;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00108}00108\ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00109}00109\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00110}\mbox{\hyperlink{classappbase_1_1application_a1d2a9932724a536b94eb3d5cff815ffc}{00110}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classappbase_1_1application_a1d2a9932724a536b94eb3d5cff815ffc}{application::set\_version\_string}}(\ std::string\ v\ )\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00111}00111\ \ \ \ my-\/>\_version\_str\ =\ std::move(\ v\ );}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00112}00112\ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00113}00113\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00114}\mbox{\hyperlink{classappbase_1_1application_ab53fa2d323d053e4e57adc832a9969bb}{00114}}\ \textcolor{keywordtype}{string}\ \mbox{\hyperlink{classappbase_1_1application_ab53fa2d323d053e4e57adc832a9969bb}{application::full\_version\_string}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00115}00115\ \ \ \ \textcolor{keywordflow}{return}\ my-\/>\_full\_version\_str;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00116}00116\ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00117}00117\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00118}\mbox{\hyperlink{classappbase_1_1application_ae894f512cb24cba9b754cf984dceaa84}{00118}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classappbase_1_1application_ae894f512cb24cba9b754cf984dceaa84}{application::set\_full\_version\_string}}(\ std::string\ v\ )\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00119}00119\ \ \ \ my-\/>\_full\_version\_str\ =\ std::move(\ v\ );}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00120}00120\ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00121}00121\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00122}\mbox{\hyperlink{classappbase_1_1application_af81fa07af200b5b24049ed5d197a864f}{00122}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classappbase_1_1application_af81fa07af200b5b24049ed5d197a864f}{application::set\_default\_data\_dir}}(\textcolor{keyword}{const}\ bfs::path\&\ data\_dir)\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00123}00123\ \ \ my-\/>\_data\_dir\ =\ \mbox{\hyperlink{classappbase_1_1application_a5dfd3cfb1124c57963fa17b3f4aabbe1}{data\_dir}};}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00124}00124\ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00125}00125\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00126}\mbox{\hyperlink{classappbase_1_1application_a49901c76b365337c933e6485649a50b6}{00126}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classappbase_1_1application_a49901c76b365337c933e6485649a50b6}{application::set\_default\_config\_dir}}(\textcolor{keyword}{const}\ bfs::path\&\ config\_dir)\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00127}00127\ \ \ my-\/>\_config\_dir\ =\ \mbox{\hyperlink{classappbase_1_1application_a9b2c99749c7209e218a3dbbe51cfdeac}{config\_dir}};}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00128}00128\ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00129}00129\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00130}\mbox{\hyperlink{classappbase_1_1application_a9abb5f5858e4dc6ba3ba45071ffdaed5}{00130}}\ bfs::path\ \mbox{\hyperlink{classappbase_1_1application_a9abb5f5858e4dc6ba3ba45071ffdaed5}{application::get\_logging\_conf}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00131}00131\ \ \ \textcolor{keywordflow}{return}\ my-\/>\_logging\_conf;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00132}00132\ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00133}00133\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00134}00134\ \textcolor{keywordtype}{void}\ application::wait\_for\_signal(std::shared\_ptr<boost::asio::signal\_set>\ ss)\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00135}00135\ \ \ \ ss-\/>async\_wait([\textcolor{keyword}{this},\ ss](\textcolor{keyword}{const}\ boost::system::error\_code\&\ ec,\ \textcolor{keywordtype}{int})\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00136}00136\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(ec)}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00137}00137\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00138}00138\ \ \ \ \ \ \ \mbox{\hyperlink{classappbase_1_1application_a81aa58d3f94570b7976145039155fc46}{quit}}();}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00139}00139\ \ \ \ \ \ \ wait\_for\_signal(ss);}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00140}00140\ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00141}00141\ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00142}00142\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00143}00143\ \textcolor{keywordtype}{void}\ application::setup\_signal\_handling\_on\_ios(boost::asio::io\_service\&\ ios,\ \textcolor{keywordtype}{bool}\ startup)\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00144}00144\ \ \ \ std::shared\_ptr<boost::asio::signal\_set>\ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}\ =\ std::make\_shared<boost::asio::signal\_set>(ios,\ SIGINT,\ SIGTERM);}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00145}00145\ \textcolor{preprocessor}{\#ifdef\ SIGPIPE}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00146}00146\ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}-\/>add(SIGPIPE);}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00147}00147\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00148}00148\ \textcolor{preprocessor}{\#ifdef\ SIGHUP}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00149}00149\ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{classappbase_1_1application_a3b77bd811744da79c9d8ba0d078e7668}{startup}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00150}00150\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}-\/>add(SIGHUP);}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00151}00151\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00152}00152\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00153}00153\ \ \ \ wait\_for\_signal(ss);}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00154}00154\ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00155}00155\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00156}\mbox{\hyperlink{classappbase_1_1application_a3b77bd811744da79c9d8ba0d078e7668}{00156}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classappbase_1_1application_a3b77bd811744da79c9d8ba0d078e7668}{application::startup}}()\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00157}00157\ \ \ \ \textcolor{comment}{//during\ startup,\ run\ a\ second\ thread\ to\ catch\ SIGINT/SIGTERM/SIGPIPE/SIGHUP}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00158}00158\ \ \ \ boost::asio::io\_service\ startup\_thread\_ios;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00159}00159\ \ \ \ setup\_signal\_handling\_on\_ios(startup\_thread\_ios,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00160}00160\ \ \ \ std::thread\ startup\_thread([\&startup\_thread\_ios]()\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00161}00161\ \ \ \ \ \ \ startup\_thread\_ios.run();}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00162}00162\ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00163}00163\ \ \ \ \textcolor{keyword}{auto}\ clean\_up\_signal\_thread\ =\ [\&startup\_thread\_ios,\ \&startup\_thread]()\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00164}00164\ \ \ \ \ \ \ startup\_thread\_ios.stop();}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00165}00165\ \ \ \ \ \ \ startup\_thread.join();}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00166}00166\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00167}00167\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00168}00168\ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00169}00169\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{classappbase_1_1plugin}{plugin}}\ :\ initialized\_plugins\ )\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00170}00170\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{classappbase_1_1application_aa47481ba83e2811dff7f84eff8662a56}{is\_quiting}}()\ )\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00171}00171\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classappbase_1_1plugin}{plugin}}-\/>\mbox{\hyperlink{classappbase_1_1plugin_a10e4e1c582bfadf67f510df76d87abfd}{startup}}();}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00172}00172\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00173}00173\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00174}00174\ \ \ \ \}\ \textcolor{keywordflow}{catch}(\ ...\ )\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00175}00175\ \ \ \ \ \ \ clean\_up\_signal\_thread();}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00176}00176\ \ \ \ \ \ \ \mbox{\hyperlink{classappbase_1_1application_a116e20109f980460cf8c38e349766bcc}{shutdown}}();}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00177}00177\ \ \ \ \ \ \ \textcolor{keywordflow}{throw};}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00178}00178\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00179}00179\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00180}00180\ \ \ \ \textcolor{comment}{//after\ startup,\ shut\ down\ the\ signal\ handling\ thread\ and\ catch\ the\ signals\ back\ on\ main\ io\_service}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00181}00181\ \ \ \ clean\_up\_signal\_thread();}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00182}00182\ \ \ \ setup\_signal\_handling\_on\_ios(\mbox{\hyperlink{classappbase_1_1application_a916a3366706654967671be9b82ab0e35}{get\_io\_service}}(),\ \textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00183}00183\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00184}00184\ \textcolor{preprocessor}{\#ifdef\ SIGHUP}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00185}00185\ \ \ \ std::shared\_ptr<boost::asio::signal\_set>\ sighup\_set(\textcolor{keyword}{new}\ boost::asio::signal\_set(\mbox{\hyperlink{classappbase_1_1application_a916a3366706654967671be9b82ab0e35}{get\_io\_service}}(),\ SIGHUP));}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00186}00186\ \ \ \ start\_sighup\_handler(\ sighup\_set\ );}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00187}00187\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00188}00188\ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00189}00189\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00190}00190\ \textcolor{keywordtype}{void}\ application::start\_sighup\_handler(\ std::shared\_ptr<boost::asio::signal\_set>\ sighup\_set\ )\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00191}00191\ \textcolor{preprocessor}{\#ifdef\ SIGHUP}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00192}00192\ \ \ \ sighup\_set-\/>async\_wait([sighup\_set,\ \textcolor{keyword}{this}](\textcolor{keyword}{const}\ boost::system::error\_code\&\ err,\ \textcolor{keywordtype}{int}\ \textcolor{comment}{/*num*/})\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00193}00193\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ err\ )\ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00194}00194\ \ \ \ \ \ \ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_a77aff91b861010fd61a616c59b310dcc}{post}}(\mbox{\hyperlink{structappbase_1_1priority_a89fc0f21b0f87574f0299932fc1724b4}{priority::medium}},\ [sighup\_set,\ \textcolor{keyword}{this}]()\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00195}00195\ \ \ \ \ \ \ \ \ \ sighup\_callback();}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00196}00196\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{classappbase_1_1plugin}{plugin}}\ :\ initialized\_plugins\ )\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00197}00197\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{classappbase_1_1application_aa47481ba83e2811dff7f84eff8662a56}{is\_quiting}}()\ )\ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00198}00198\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classappbase_1_1plugin}{plugin}}-\/>\mbox{\hyperlink{classappbase_1_1plugin_ab314bd778e71a91de584cd9b8a999867}{handle\_sighup}}();}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00199}00199\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00200}00200\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00201}00201\ \ \ \ \ \ \ start\_sighup\_handler(\ sighup\_set\ );}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00202}00202\ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00203}00203\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00204}00204\ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00205}00205\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00206}\mbox{\hyperlink{classappbase_1_1application_ac874b2659b400fe254f1ae4260d06ecf}{00206}}\ \mbox{\hyperlink{classappbase_1_1application}{application}}\&\ \mbox{\hyperlink{classappbase_1_1application_ac874b2659b400fe254f1ae4260d06ecf}{application::instance}}()\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00207}00207\ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classappbase_1_1application}{application}}\ \_app;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00208}00208\ \ \ \ \textcolor{keywordflow}{return}\ \_app;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00209}00209\ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00210}\mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{00210}}\ \mbox{\hyperlink{classappbase_1_1application}{application}}\&\ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}()\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classappbase_1_1application_ac874b2659b400fe254f1ae4260d06ecf}{application::instance}}();\ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00211}00211\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00212}\mbox{\hyperlink{classappbase_1_1application_a713c989466d9ce55f9fe3d7257f99009}{00212}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classappbase_1_1application_a713c989466d9ce55f9fe3d7257f99009}{application::register\_config\_type\_comparison}}(std::type\_index\ i,\ \mbox{\hyperlink{namespaceappbase_a34fffab26998c1f3c0607cbbda228faa}{config\_comparison\_f}}\ comp)\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00213}00213\ \ \ \ my-\/>\_any\_compare\_map.emplace(i,\ comp);}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00214}00214\ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00215}00215\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00216}00216\ \textcolor{keywordtype}{void}\ application::set\_program\_options()}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00217}00217\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00218}00218\ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\&\ plug\ :\ plugins)\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00219}00219\ \ \ \ \ \ \ boost::program\_options::options\_description\ plugin\_cli\_opts(\textcolor{stringliteral}{"{}Command\ Line\ Options\ for\ "{}}\ +\ plug.second-\/>name());}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00220}00220\ \ \ \ \ \ \ boost::program\_options::options\_description\ plugin\_cfg\_opts(\textcolor{stringliteral}{"{}Config\ Options\ for\ "{}}\ +\ plug.second-\/>name());}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00221}00221\ \ \ \ \ \ \ plug.second-\/>set\_program\_options(plugin\_cli\_opts,\ plugin\_cfg\_opts);}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00222}00222\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(plugin\_cfg\_opts.options().size())\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00223}00223\ \ \ \ \ \ \ \ \ \ my-\/>\_app\_options.add(plugin\_cfg\_opts);}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00224}00224\ \ \ \ \ \ \ \ \ \ my-\/>\_cfg\_options.add(plugin\_cfg\_opts);}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00225}00225\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00226}00226\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(plugin\_cli\_opts.options().size())}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00227}00227\ \ \ \ \ \ \ \ \ \ my-\/>\_app\_options.add(plugin\_cli\_opts);}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00228}00228\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00229}00229\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00230}00230\ \ \ \ options\_description\ app\_cfg\_opts(\ \textcolor{stringliteral}{"{}Application\ Config\ Options"{}}\ );}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00231}00231\ \ \ \ options\_description\ app\_cli\_opts(\ \textcolor{stringliteral}{"{}Application\ Command\ Line\ Options"{}}\ );}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00232}00232\ \ \ \ app\_cfg\_opts.add\_options()}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00233}00233\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}plugin"{}},\ bpo::value<\ vector<string>\ >()-\/>composing(),\ \textcolor{stringliteral}{"{}Plugin(s)\ to\ enable,\ may\ be\ specified\ multiple\ times"{}});}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00234}00234\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00235}00235\ \ \ \ app\_cli\_opts.add\_options()}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00236}00236\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}help,h"{}},\ \textcolor{stringliteral}{"{}Print\ this\ help\ message\ and\ exit."{}})}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00237}00237\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}version,v"{}},\ \textcolor{stringliteral}{"{}Print\ version\ information."{}})}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00238}00238\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}full-\/version"{}},\ \textcolor{stringliteral}{"{}Print\ full\ version\ information."{}})}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00239}00239\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}print-\/default-\/config"{}},\ \textcolor{stringliteral}{"{}Print\ default\ configuration\ template"{}})}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00240}00240\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}data-\/dir,d"{}},\ bpo::value<std::string>(),\ \textcolor{stringliteral}{"{}Directory\ containing\ program\ runtime\ data"{}})}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00241}00241\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}config-\/dir"{}},\ bpo::value<std::string>(),\ \textcolor{stringliteral}{"{}Directory\ containing\ configuration\ files\ such\ as\ config.ini"{}})}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00242}00242\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}config,c"{}},\ bpo::value<std::string>()-\/>default\_value(\ \textcolor{stringliteral}{"{}config.ini"{}}\ ),\ \textcolor{stringliteral}{"{}Configuration\ file\ name\ relative\ to\ config-\/dir"{}})}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00243}00243\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}logconf,l"{}},\ bpo::value<std::string>()-\/>default\_value(\ \textcolor{stringliteral}{"{}logging.json"{}}\ ),\ \textcolor{stringliteral}{"{}Logging\ configuration\ file\ name/path\ for\ library\ users"{}});}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00244}00244\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00245}00245\ \ \ \ my-\/>\_cfg\_options.add(app\_cfg\_opts);}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00246}00246\ \ \ \ my-\/>\_app\_options.add(app\_cfg\_opts);}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00247}00247\ \ \ \ my-\/>\_app\_options.add(app\_cli\_opts);}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00248}00248\ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00249}00249\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00250}\mbox{\hyperlink{classappbase_1_1application_adebe1a60f6663b205a196385d4bc6231}{00250}}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classappbase_1_1application_adebe1a60f6663b205a196385d4bc6231}{application::initialize\_impl}}(\textcolor{keywordtype}{int}\ argc,\ \textcolor{keywordtype}{char}**\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ vector<abstract\_plugin*>\ autostart\_plugins)\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00251}00251\ \ \ \ set\_program\_options();}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00252}00252\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00253}00253\ \ \ \ bpo::variables\_map\&\ options\ =\ my-\/>\_options;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00254}00254\ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00255}00255\ \ \ \ \ \ \ bpo::parsed\_options\ parsed\ =\ bpo::command\_line\_parser(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}).options(my-\/>\_app\_options).run();}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00256}00256\ \ \ \ \ \ \ bpo::store(parsed,\ options);}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00257}00257\ \ \ \ \ \ \ vector<string>\ positionals\ =\ bpo::collect\_unrecognized(parsed.options,\ bpo::include\_positional);}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00258}00258\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!positionals.empty())}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00259}00259\ \ \ \ \ \ \ \ \ \ BOOST\_THROW\_EXCEPTION(std::runtime\_error(\textcolor{stringliteral}{"{}Unknown\ option\ '"{}}\ +\ positionals[0]\ +\ \textcolor{stringliteral}{"{}'\ passed\ as\ command\ line\ argument"{}}));}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00260}00260\ \ \ \ \}\ \textcolor{keywordflow}{catch}(\ \textcolor{keyword}{const}\ boost::program\_options::unknown\_option\&\ e\ )\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00261}00261\ \ \ \ \ \ \ BOOST\_THROW\_EXCEPTION(std::runtime\_error(\textcolor{stringliteral}{"{}Unknown\ option\ '"{}}\ +\ e.get\_option\_name()\ +\ \textcolor{stringliteral}{"{}'\ passed\ as\ command\ line\ argument"{}}));}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00262}00262\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00263}00263\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00264}00264\ \ \ \ \textcolor{keywordflow}{if}(\ options.count(\ \textcolor{stringliteral}{"{}help"{}}\ )\ )\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00265}00265\ \ \ \ \ \ \ cout\ <<\ my-\/>\_app\_options\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00266}00266\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00267}00267\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00268}00268\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00269}00269\ \ \ \ \textcolor{keywordflow}{if}(\ options.count(\ \textcolor{stringliteral}{"{}version"{}}\ )\ )\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00270}00270\ \ \ \ \ \ \ cout\ <<\ \mbox{\hyperlink{classappbase_1_1application_a780543c4d0330fe88b912a3fa914f953}{version\_string}}()\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00271}00271\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00272}00272\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00273}00273\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00274}00274\ \ \ \ \textcolor{keywordflow}{if}(\ options.count(\ \textcolor{stringliteral}{"{}full-\/version"{}}\ )\ )\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00275}00275\ \ \ \ \ \ \ cout\ <<\ \mbox{\hyperlink{classappbase_1_1application_ab53fa2d323d053e4e57adc832a9969bb}{full\_version\_string}}()\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00276}00276\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00277}00277\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00278}00278\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00279}00279\ \ \ \ \textcolor{keywordflow}{if}(\ options.count(\ \textcolor{stringliteral}{"{}print-\/default-\/config"{}}\ )\ )\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00280}00280\ \ \ \ \ \ \ print\_default\_config(cout);}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00281}00281\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00282}00282\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00283}00283\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00284}00284\ \ \ \ \textcolor{keywordflow}{if}(\ options.count(\ \textcolor{stringliteral}{"{}data-\/dir"{}}\ )\ )\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00285}00285\ \ \ \ \ \ \ \textcolor{comment}{//\ Workaround\ for\ 10+\ year\ old\ Boost\ defect}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00286}00286\ \ \ \ \ \ \ \textcolor{comment}{//\ See\ https://svn.boost.org/trac10/ticket/8535}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00287}00287\ \ \ \ \ \ \ \textcolor{comment}{//\ Should\ be\ .as<bfs::path>()\ but\ paths\ with\ escaped\ spaces\ break\ bpo\ e.g.}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00288}00288\ \ \ \ \ \ \ \textcolor{comment}{//\ std::exception::what:\ the\ argument\ ('/path/with/white\(\backslash\)\ space')\ for\ option\ '-\/-\/data-\/dir'\ is\ invalid}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00289}00289\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ workaround\ =\ options[\textcolor{stringliteral}{"{}data-\/dir"{}}].as<std::string>();}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00290}00290\ \ \ \ \ \ \ bfs::path\ \mbox{\hyperlink{classappbase_1_1application_a5dfd3cfb1124c57963fa17b3f4aabbe1}{data\_dir}}\ =\ workaround;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00291}00291\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{classappbase_1_1application_a5dfd3cfb1124c57963fa17b3f4aabbe1}{data\_dir}}.is\_relative()\ )}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00292}00292\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classappbase_1_1application_a5dfd3cfb1124c57963fa17b3f4aabbe1}{data\_dir}}\ =\ bfs::current\_path()\ /\ \mbox{\hyperlink{classappbase_1_1application_a5dfd3cfb1124c57963fa17b3f4aabbe1}{data\_dir}};}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00293}00293\ \ \ \ \ \ \ my-\/>\_data\_dir\ =\ \mbox{\hyperlink{classappbase_1_1application_a5dfd3cfb1124c57963fa17b3f4aabbe1}{data\_dir}};}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00294}00294\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00295}00295\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00296}00296\ \ \ \ \textcolor{keywordflow}{if}(\ options.count(\ \textcolor{stringliteral}{"{}config-\/dir"{}}\ )\ )\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00297}00297\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ workaround\ =\ options[\textcolor{stringliteral}{"{}config-\/dir"{}}].as<std::string>();}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00298}00298\ \ \ \ \ \ \ bfs::path\ \mbox{\hyperlink{classappbase_1_1application_a9b2c99749c7209e218a3dbbe51cfdeac}{config\_dir}}\ =\ workaround;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00299}00299\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{classappbase_1_1application_a9b2c99749c7209e218a3dbbe51cfdeac}{config\_dir}}.is\_relative()\ )}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00300}00300\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classappbase_1_1application_a9b2c99749c7209e218a3dbbe51cfdeac}{config\_dir}}\ =\ bfs::current\_path()\ /\ \mbox{\hyperlink{classappbase_1_1application_a9b2c99749c7209e218a3dbbe51cfdeac}{config\_dir}};}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00301}00301\ \ \ \ \ \ \ my-\/>\_config\_dir\ =\ \mbox{\hyperlink{classappbase_1_1application_a9b2c99749c7209e218a3dbbe51cfdeac}{config\_dir}};}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00302}00302\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00303}00303\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00304}00304\ \ \ \ \textcolor{keyword}{auto}\ workaround\ =\ options[\textcolor{stringliteral}{"{}logconf"{}}].as<std::string>();}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00305}00305\ \ \ \ bfs::path\ logconf\ =\ workaround;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00306}00306\ \ \ \ \textcolor{keywordflow}{if}(\ logconf.is\_relative()\ )}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00307}00307\ \ \ \ \ \ \ logconf\ =\ my-\/>\_config\_dir\ /\ logconf;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00308}00308\ \ \ \ my-\/>\_logging\_conf\ =\ logconf;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00309}00309\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00310}00310\ \ \ \ workaround\ =\ options[\textcolor{stringliteral}{"{}config"{}}].as<std::string>();}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00311}00311\ \ \ \ my-\/>\_config\_file\_name\ =\ workaround;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00312}00312\ \ \ \ \textcolor{keywordflow}{if}(\ my-\/>\_config\_file\_name.is\_relative()\ )}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00313}00313\ \ \ \ \ \ \ my-\/>\_config\_file\_name\ =\ my-\/>\_config\_dir\ /\ my-\/>\_config\_file\_name;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00314}00314\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00315}00315\ \ \ \ \textcolor{keywordflow}{if}(!bfs::exists(my-\/>\_config\_file\_name))\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00316}00316\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(my-\/>\_config\_file\_name.compare(my-\/>\_config\_dir\ /\ \textcolor{stringliteral}{"{}config.ini"{}})\ !=\ 0)}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00317}00317\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00318}00318\ \ \ \ \ \ \ \ \ \ cout\ <<\ \textcolor{stringliteral}{"{}Config\ file\ "{}}\ <<\ my-\/>\_config\_file\_name\ <<\ \textcolor{stringliteral}{"{}\ missing."{}}\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00319}00319\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00320}00320\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00321}00321\ \ \ \ \ \ \ write\_default\_config(my-\/>\_config\_file\_name);}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00322}00322\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00323}00323\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00324}00324\ \ \ \ std::vector<\ bpo::basic\_option<char>\ >\ opts\_from\_config;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00325}00325\ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00326}00326\ \ \ \ \ \ \ bpo::parsed\_options\ parsed\_opts\_from\_config\ =\ bpo::parse\_config\_file<char>(my-\/>\_config\_file\_name.make\_preferred().string().c\_str(),\ my-\/>\_cfg\_options,\ \textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00327}00327\ \ \ \ \ \ \ bpo::store(parsed\_opts\_from\_config,\ options);}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00328}00328\ \ \ \ \ \ \ opts\_from\_config\ =\ parsed\_opts\_from\_config.options;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00329}00329\ \ \ \ \}\ \textcolor{keywordflow}{catch}(\ \textcolor{keyword}{const}\ boost::program\_options::unknown\_option\&\ e\ )\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00330}00330\ \ \ \ \ \ \ BOOST\_THROW\_EXCEPTION(std::runtime\_error(\textcolor{stringliteral}{"{}Unknown\ option\ '"{}}\ +\ e.get\_option\_name()\ +\ \textcolor{stringliteral}{"{}'\ inside\ the\ config\ file\ "{}}\ +\ \ \mbox{\hyperlink{classappbase_1_1application_a5ef9c293a86a7dd786641ce25a671208}{full\_config\_file\_path}}().\textcolor{keywordtype}{string}()));}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00331}00331\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00332}00332\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00333}00333\ \ \ \ std::vector<string>\ set\_but\_default\_list;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00334}00334\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00335}00335\ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ boost::shared\_ptr<bpo::option\_description>\&\ od\_ptr\ :\ my-\/>\_cfg\_options.options())\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00336}00336\ \ \ \ \ \ \ boost::any\ default\_val,\ config\_val;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00337}00337\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!od\_ptr-\/>semantic()-\/>apply\_default(default\_val))}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00338}00338\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00339}00339\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00340}00340\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(my-\/>\_any\_compare\_map.find(default\_val.type())\ ==\ my-\/>\_any\_compare\_map.end())\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00341}00341\ \ \ \ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}APPBASE:\ Developer\ -\/-\/\ the\ type\ "{}}\ <<\ default\_val.type().name()\ <<\ \textcolor{stringliteral}{"{}\ is\ not\ registered\ with\ appbase,"{}}\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00342}00342\ \ \ \ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ \ \ add\ a\ register\_config\_type<>()\ in\ your\ plugin's\ ctor"{}}\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00343}00343\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00344}00344\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00345}00345\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00346}00346\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ bpo::basic\_option<char>\&\ opt\ :\ opts\_from\_config)\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00347}00347\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(opt.string\_key\ !=\ od\_ptr-\/>long\_name())}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00348}00348\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00349}00349\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00350}00350\ \ \ \ \ \ \ \ \ \ od\_ptr-\/>semantic()-\/>parse(config\_val,\ opt.value,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00351}00351\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(my-\/>\_any\_compare\_map.at(default\_val.type())(default\_val,\ config\_val))}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00352}00352\ \ \ \ \ \ \ \ \ \ \ \ \ set\_but\_default\_list.push\_back(opt.string\_key);}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00353}00353\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00354}00354\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00355}00355\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00356}00356\ \ \ \ \textcolor{keywordflow}{if}(set\_but\_default\_list.size())\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00357}00357\ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}APPBASE:\ Warning:\ The\ following\ configuration\ items\ in\ the\ config.ini\ file\ are\ redundantly\ set\ to"{}}\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00358}00358\ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ \ \ their\ default\ value:"{}}\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00359}00359\ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ \ \ \ \ \ \ "{}};}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00360}00360\ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ chars\_on\_line\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00361}00361\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\ it\ =\ set\_but\_default\_list.cbegin();\ it\ !=\ set\_but\_default\_list.end();\ ++it)\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00362}00362\ \ \ \ \ \ \ \ \ \ std::cerr\ <<\ *it;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00363}00363\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(it\ +\ 1\ !=\ set\_but\_default\_list.end())}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00364}00364\ \ \ \ \ \ \ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{},\ "{}};}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00365}00365\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}((chars\_on\_line\ +=\ it-\/>size())\ >\ 65)\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00366}00366\ \ \ \ \ \ \ \ \ \ \ \ \ std::cerr\ <<\ std::endl\ <<\ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ \ \ \ \ \ \ "{}};}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00367}00367\ \ \ \ \ \ \ \ \ \ \ \ \ chars\_on\_line\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00368}00368\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00369}00369\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00370}00370\ \ \ \ \ \ \ std::cerr\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00371}00371\ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ \ \ Explicit\ values\ will\ override\ future\ changes\ to\ application\ defaults.\ Consider\ commenting\ out\ or"{}}\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00372}00372\ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ \ \ removing\ these\ items."{}}\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00373}00373\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00374}00374\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00375}00375\ \ \ \ \textcolor{keywordflow}{if}(options.count(\textcolor{stringliteral}{"{}plugin"{}})\ >\ 0)}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00376}00376\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00377}00377\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ plugins\ =\ options.at(\textcolor{stringliteral}{"{}plugin"{}}).as<std::vector<std::string>>();}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00378}00378\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\&\ arg\ :\ plugins)}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00379}00379\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00380}00380\ \ \ \ \ \ \ \ \ \ vector<string>\ names;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00381}00381\ \ \ \ \ \ \ \ \ \ boost::split(names,\ arg,\ boost::is\_any\_of(\textcolor{stringliteral}{"{}\ \(\backslash\)t,"{}}));}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00382}00382\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ std::string\&\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ :\ names)}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00383}00383\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classappbase_1_1application_a9e37a08603d6b3b3cc06d662fc4100eb}{get\_plugin}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}).initialize(options);}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00384}00384\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00385}00385\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00386}00386\ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00387}00387\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\ \mbox{\hyperlink{classappbase_1_1plugin}{plugin}}\ :\ autostart\_plugins)}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00388}00388\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classappbase_1_1plugin}{plugin}}\ !=\ \textcolor{keyword}{nullptr}\ \&\&\ \mbox{\hyperlink{classappbase_1_1plugin}{plugin}}-\/>\mbox{\hyperlink{classappbase_1_1plugin_a857288c2424b57a898c0579d25dacbb0}{get\_state}}()\ ==\ \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408ac712ce3482a78b8bf87080aefd77cf7d}{abstract\_plugin::registered}})}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00389}00389\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classappbase_1_1plugin}{plugin}}-\/>\mbox{\hyperlink{classappbase_1_1plugin_ac28755a82831d41e5d0ef0ce56b10fa9}{initialize}}(options);}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00390}00390\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00391}00391\ \ \ \ \ \ \ bpo::notify(options);}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00392}00392\ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00393}00393\ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}Failed\ to\ initialize\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00394}00394\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00395}00395\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00396}00396\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00397}00397\ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00398}00398\ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00399}00399\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00400}\mbox{\hyperlink{classappbase_1_1application_a116e20109f980460cf8c38e349766bcc}{00400}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classappbase_1_1application_a116e20109f980460cf8c38e349766bcc}{application::shutdown}}()\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00401}00401\ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\ ritr\ =\ running\_plugins.rbegin();}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00402}00402\ \ \ \ \ \ \ \ ritr\ !=\ running\_plugins.rend();\ ++ritr)\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00403}00403\ \ \ \ \ \ \ (*ritr)-\/>shutdown();}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00404}00404\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00405}00405\ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\ ritr\ =\ running\_plugins.rbegin();}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00406}00406\ \ \ \ \ \ \ \ ritr\ !=\ running\_plugins.rend();\ ++ritr)\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00407}00407\ \ \ \ \ \ \ plugins.erase((*ritr)-\/>name());}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00408}00408\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00409}00409\ \ \ \ running\_plugins.clear();}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00410}00410\ \ \ \ initialized\_plugins.clear();}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00411}00411\ \ \ \ plugins.clear();}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00412}00412\ \ \ \ \mbox{\hyperlink{classappbase_1_1application_a81aa58d3f94570b7976145039155fc46}{quit}}();}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00413}00413\ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00414}00414\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00415}\mbox{\hyperlink{classappbase_1_1application_a81aa58d3f94570b7976145039155fc46}{00415}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classappbase_1_1application_a81aa58d3f94570b7976145039155fc46}{application::quit}}()\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00416}00416\ \ \ \ my-\/>\_is\_quiting\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00417}00417\ \ \ \ io\_serv-\/>stop();}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00418}00418\ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00419}00419\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00420}\mbox{\hyperlink{classappbase_1_1application_aa47481ba83e2811dff7f84eff8662a56}{00420}}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classappbase_1_1application_aa47481ba83e2811dff7f84eff8662a56}{application::is\_quiting}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00421}00421\ \ \ \ \textcolor{keywordflow}{return}\ my-\/>\_is\_quiting;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00422}00422\ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00423}00423\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00424}\mbox{\hyperlink{classappbase_1_1application_a81b7e2878583791179e90e1ec5ba9131}{00424}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classappbase_1_1application_a81b7e2878583791179e90e1ec5ba9131}{application::set\_thread\_priority\_max}}()\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00425}00425\ \textcolor{preprocessor}{\#if\ \_\_has\_include(<pthread.h>)}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00426}00426\ \ \ \ pthread\_t\ this\_thread\ =\ pthread\_self();}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00427}00427\ \ \ \ \textcolor{keyword}{struct\ }sched\_param\ \mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}}\{\};}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00428}00428\ \ \ \ \textcolor{keywordtype}{int}\ policy\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00429}00429\ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ pthread\_getschedparam(this\_thread,\ \&policy,\ \&\mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}});}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00430}00430\ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ !=\ 0\ )\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00431}00431\ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}ERROR:\ Unable\ to\ get\ thread\ priority"{}}\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00432}00432\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00433}00433\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00434}00434\ \ \ \ \mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}}.sched\_priority\ =\ sched\_get\_priority\_max(policy);}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00435}00435\ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ pthread\_setschedparam(this\_thread,\ policy,\ \&\mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}});}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00436}00436\ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ !=\ 0\ )\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00437}00437\ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}ERROR:\ Unable\ to\ set\ thread\ priority"{}}\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00438}00438\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00439}00439\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00440}00440\ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00441}00441\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00442}\mbox{\hyperlink{classappbase_1_1application_a39286b0b034b97f6940568a00f44edaf}{00442}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classappbase_1_1application_a39286b0b034b97f6940568a00f44edaf}{application::exec}}()\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00443}00443\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00444}00444\ \ \ \ \ \ \ boost::asio::io\_service::work\ work(*io\_serv);}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00445}00445\ \ \ \ \ \ \ (void)work;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00446}00446\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ more\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00447}00447\ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\ more\ ||\ io\_serv-\/>run\_one()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00448}00448\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\ io\_serv-\/>poll\_one()\ )\ \{\}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00449}00449\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ execute\ the\ highest\ priority\ item}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00450}00450\ \ \ \ \ \ \ \ \ \ more\ =\ pri\_queue.\mbox{\hyperlink{classappbase_1_1execution__priority__queue_a86081d87bce3735b5addeeb6d44dbcb2}{execute\_highest}}();}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00451}00451\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00452}00452\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00453}00453\ \ \ \ \ \ \ \mbox{\hyperlink{classappbase_1_1application_a116e20109f980460cf8c38e349766bcc}{shutdown}}();\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00454}00454\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00455}00455\ \ \ \ io\_serv.reset();}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00456}00456\ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00457}00457\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00458}00458\ \textcolor{keywordtype}{void}\ application::write\_default\_config(\textcolor{keyword}{const}\ bfs::path\&\ cfg\_file)\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00459}00459\ \ \ \ \textcolor{keywordflow}{if}(!bfs::exists(cfg\_file.parent\_path()))}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00460}00460\ \ \ \ \ \ \ bfs::create\_directories(cfg\_file.parent\_path());}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00461}00461\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00462}00462\ \ \ \ std::ofstream\ out\_cfg(\ bfs::path(cfg\_file).make\_preferred().\textcolor{keywordtype}{string}());}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00463}00463\ \ \ \ print\_default\_config(out\_cfg);}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00464}00464\ \ \ \ out\_cfg.close();}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00465}00465\ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00466}00466\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00467}00467\ \textcolor{keywordtype}{void}\ application::print\_default\_config(std::ostream\&\ os)\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00468}00468\ \ \ \ std::map<std::string,\ std::string>\ option\_to\_plug;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00469}00469\ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\&\ plug\ :\ plugins)\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00470}00470\ \ \ \ \ \ \ boost::program\_options::options\_description\ plugin\_cli\_opts;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00471}00471\ \ \ \ \ \ \ boost::program\_options::options\_description\ plugin\_cfg\_opts;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00472}00472\ \ \ \ \ \ \ plug.second-\/>set\_program\_options(plugin\_cli\_opts,\ plugin\_cfg\_opts);}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00473}00473\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00474}00474\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ boost::shared\_ptr<bpo::option\_description>\&\ opt\ :\ plugin\_cfg\_opts.options())}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00475}00475\ \ \ \ \ \ \ \ \ \ option\_to\_plug[opt-\/>long\_name()]\ =\ plug.second-\/>name();}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00476}00476\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00477}00477\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00478}00478\ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ boost::shared\_ptr<bpo::option\_description>\&\ od\ :\ my-\/>\_cfg\_options.options())}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00479}00479\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00480}00480\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!od-\/>description().empty())\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00481}00481\ \ \ \ \ \ \ \ \ \ std::string\ desc\ =\ od-\/>description();}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00482}00482\ \ \ \ \ \ \ \ \ \ boost::replace\_all(desc,\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}},\ \textcolor{stringliteral}{"{}\(\backslash\)n\#\ "{}});}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00483}00483\ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}\#\ "{}}\ <<\ desc;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00484}00484\ \ \ \ \ \ \ \ \ \ std::map<std::string,\ std::string>::iterator\ it;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00485}00485\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}((it\ =\ option\_to\_plug.find(od-\/>long\_name()))\ !=\ option\_to\_plug.end())}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00486}00486\ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}\ ("{}}\ <<\ it-\/>second\ <<\ \textcolor{stringliteral}{"{})"{}};}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00487}00487\ \ \ \ \ \ \ \ \ \ os\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00488}00488\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00489}00489\ \ \ \ \ \ \ boost::any\ store;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00490}00490\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!od-\/>semantic()-\/>apply\_default(store))}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00491}00491\ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}\#\ "{}}\ <<\ od-\/>long\_name()\ <<\ \textcolor{stringliteral}{"{}\ =\ "{}}\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00492}00492\ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00493}00493\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ example\ =\ od-\/>format\_parameter();}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00494}00494\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(example.empty())}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00495}00495\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ This\ is\ a\ boolean\ switch}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00496}00496\ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}\#\ "{}}\ <<\ od-\/>long\_name()\ <<\ \textcolor{stringliteral}{"{}\ =\ "{}}\ <<\ \textcolor{stringliteral}{"{}false"{}}\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00497}00497\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(store.type()\ ==\ \textcolor{keyword}{typeid}(\textcolor{keywordtype}{bool}))}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00498}00498\ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}\#\ "{}}\ <<\ od-\/>long\_name()\ <<\ \textcolor{stringliteral}{"{}\ =\ "{}}\ <<\ (boost::any\_cast<bool\&>(store)\ ?\ \textcolor{stringliteral}{"{}true"{}}\ :\ \textcolor{stringliteral}{"{}false"{}})\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00499}00499\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00500}00500\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ The\ string\ is\ formatted\ "{}arg\ (=<interesting\ part>)"{}}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00501}00501\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ pos\ =\ example.find(\textcolor{stringliteral}{"{}(="{}});}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00502}00502\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(pos\ !=\ string::npos)\ example\ =\ example.substr(pos+2);}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00503}00503\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!example.empty())\ example.erase(example.length()-\/1);}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00504}00504\ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}\#\ "{}}\ <<\ od-\/>long\_name()\ <<\ \textcolor{stringliteral}{"{}\ =\ "{}}\ <<\ example\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00505}00505\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00506}00506\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00507}00507\ \ \ \ \ \ \ os\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00508}00508\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00509}00509\ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00510}00510\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00511}\mbox{\hyperlink{classappbase_1_1application_a1d2c585f90007be342c9c64ee9cc0f7c}{00511}}\ \mbox{\hyperlink{classappbase_1_1abstract__plugin}{abstract\_plugin}}*\ \mbox{\hyperlink{classappbase_1_1application_add09ef243c90b8f86636c9ee592db739}{application::find\_plugin}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\&\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})\textcolor{keyword}{const}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00512}00512\ \textcolor{keyword}{}\{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00513}00513\ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ plugins.find(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}});}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00514}00514\ \ \ \ \textcolor{keywordflow}{if}(itr\ ==\ plugins.end())\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00515}00515\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00516}00516\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00517}00517\ \ \ \ \textcolor{keywordflow}{return}\ itr-\/>second.get();}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00518}00518\ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00519}00519\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00520}\mbox{\hyperlink{classappbase_1_1application_a3c4b68a0667942b58f1369f454ce0ce3}{00520}}\ \mbox{\hyperlink{classappbase_1_1abstract__plugin}{abstract\_plugin}}\&\ \mbox{\hyperlink{classappbase_1_1application_a9e37a08603d6b3b3cc06d662fc4100eb}{application::get\_plugin}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\&\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})\textcolor{keyword}{const\ }\{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00521}00521\ \ \ \ \textcolor{keyword}{auto}\ ptr\ =\ \mbox{\hyperlink{classappbase_1_1application_add09ef243c90b8f86636c9ee592db739}{find\_plugin}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}});}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00522}00522\ \ \ \ \textcolor{keywordflow}{if}(!ptr)}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00523}00523\ \ \ \ \ \ \ BOOST\_THROW\_EXCEPTION(std::runtime\_error(\textcolor{stringliteral}{"{}unable\ to\ find\ plugin:\ "{}}\ +\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}));}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00524}00524\ \ \ \ \textcolor{keywordflow}{return}\ *ptr;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00525}00525\ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00526}00526\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00527}\mbox{\hyperlink{classappbase_1_1application_a5dfd3cfb1124c57963fa17b3f4aabbe1}{00527}}\ bfs::path\ \mbox{\hyperlink{classappbase_1_1application_a5dfd3cfb1124c57963fa17b3f4aabbe1}{application::data\_dir}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00528}00528\ \ \ \ \textcolor{keywordflow}{return}\ my-\/>\_data\_dir;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00529}00529\ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00530}00530\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00531}\mbox{\hyperlink{classappbase_1_1application_a9b2c99749c7209e218a3dbbe51cfdeac}{00531}}\ bfs::path\ \mbox{\hyperlink{classappbase_1_1application_a9b2c99749c7209e218a3dbbe51cfdeac}{application::config\_dir}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00532}00532\ \ \ \ \textcolor{keywordflow}{return}\ my-\/>\_config\_dir;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00533}00533\ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00534}00534\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00535}\mbox{\hyperlink{classappbase_1_1application_a5ef9c293a86a7dd786641ce25a671208}{00535}}\ bfs::path\ \mbox{\hyperlink{classappbase_1_1application_a5ef9c293a86a7dd786641ce25a671208}{application::full\_config\_file\_path}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00536}00536\ \ \ \ \textcolor{keywordflow}{return}\ bfs::canonical(my-\/>\_config\_file\_name);}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00537}00537\ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00538}00538\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00539}\mbox{\hyperlink{classappbase_1_1application_a741b1b2adb2974b9cf72f1fa129b1adf}{00539}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classappbase_1_1application_a741b1b2adb2974b9cf72f1fa129b1adf}{application::set\_sighup\_callback}}(std::function<\textcolor{keywordtype}{void}()>\ callback)\ \{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00540}00540\ \ \ \ sighup\_callback\ =\ callback;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00541}00541\ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00542}00542\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00543}\mbox{\hyperlink{classappbase_1_1application_a1cd05ae43f6400f07f9c60a09cc610cb}{00543}}\ \textcolor{keyword}{const}\ bpo::variables\_map\&\ \mbox{\hyperlink{classappbase_1_1application_a1cd05ae43f6400f07f9c60a09cc610cb}{application::get\_options}}()\textcolor{keyword}{\ const}\{}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00544}00544\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ my-\/>\_options;}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00545}00545\ \}}
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00546}00546\ }
+\DoxyCodeLine{\Hypertarget{application_8cpp_source_l00547}00547\ \}\ }
+
+\end{DoxyCode}

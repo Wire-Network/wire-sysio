@@ -1,0 +1,84 @@
+\doxysection{sysio\+::resource\+\_\+monitor\+::system\+\_\+file\+\_\+space\+\_\+provider Class Reference}
+\hypertarget{classsysio_1_1resource__monitor_1_1system__file__space__provider}{}\label{classsysio_1_1resource__monitor_1_1system__file__space__provider}\index{sysio::resource\_monitor::system\_file\_space\_provider@{sysio::resource\_monitor::system\_file\_space\_provider}}
+
+
+{\ttfamily \#include $<$system\+\_\+file\+\_\+space\+\_\+provider.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classsysio_1_1resource__monitor_1_1system__file__space__provider_a97ad6b334dc066868a55772314ca69cb}{system\+\_\+file\+\_\+space\+\_\+provider}} ()
+\item 
+int \mbox{\hyperlink{classsysio_1_1resource__monitor_1_1system__file__space__provider_a9f6a54a68113a771c2c543bc1bf5d727}{get\+\_\+stat}} (const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{classfc_1_1path}{path}}, struct stat \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}) const
+\item 
+bfs\+::space\+\_\+info \mbox{\hyperlink{classsysio_1_1resource__monitor_1_1system__file__space__provider_a8456041ce16297126d6e307a169f8785}{get\+\_\+space}} (const bfs\+::path \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}, boost\+::system\+::error\+\_\+code \&ec) const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{system__file__space__provider_8hpp_source_l00009}{9}} of file \mbox{\hyperlink{system__file__space__provider_8hpp_source}{system\+\_\+file\+\_\+space\+\_\+provider.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classsysio_1_1resource__monitor_1_1system__file__space__provider_a97ad6b334dc066868a55772314ca69cb}\index{sysio::resource\_monitor::system\_file\_space\_provider@{sysio::resource\_monitor::system\_file\_space\_provider}!system\_file\_space\_provider@{system\_file\_space\_provider}}
+\index{system\_file\_space\_provider@{system\_file\_space\_provider}!sysio::resource\_monitor::system\_file\_space\_provider@{sysio::resource\_monitor::system\_file\_space\_provider}}
+\doxysubsubsection{\texorpdfstring{system\_file\_space\_provider()}{system\_file\_space\_provider()}}
+{\footnotesize\ttfamily \label{classsysio_1_1resource__monitor_1_1system__file__space__provider_a97ad6b334dc066868a55772314ca69cb} 
+sysio\+::resource\+\_\+monitor\+::system\+\_\+file\+\_\+space\+\_\+provider\+::system\+\_\+file\+\_\+space\+\_\+provider (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{system__file__space__provider_8hpp_source_l00011}{11}} of file \mbox{\hyperlink{system__file__space__provider_8hpp_source}{system\+\_\+file\+\_\+space\+\_\+provider.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00012\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00013\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1resource__monitor_1_1system__file__space__provider_a8456041ce16297126d6e307a169f8785}\index{sysio::resource\_monitor::system\_file\_space\_provider@{sysio::resource\_monitor::system\_file\_space\_provider}!get\_space@{get\_space}}
+\index{get\_space@{get\_space}!sysio::resource\_monitor::system\_file\_space\_provider@{sysio::resource\_monitor::system\_file\_space\_provider}}
+\doxysubsubsection{\texorpdfstring{get\_space()}{get\_space()}}
+{\footnotesize\ttfamily \label{classsysio_1_1resource__monitor_1_1system__file__space__provider_a8456041ce16297126d6e307a169f8785} 
+bfs\+::space\+\_\+info sysio\+::resource\+\_\+monitor\+::system\+\_\+file\+\_\+space\+\_\+provider\+::get\+\_\+space (\begin{DoxyParamCaption}\item[{const bfs\+::path \&}]{p}{, }\item[{boost\+::system\+::error\+\_\+code \&}]{ec}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{system__file__space__provider_8cpp_source_l00010}{10}} of file \mbox{\hyperlink{system__file__space__provider_8cpp_source}{system\+\_\+file\+\_\+space\+\_\+provider.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00010\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00011\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ bfs::space(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\ ec);}
+\DoxyCodeLine{00012\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1resource__monitor_1_1system__file__space__provider_a9f6a54a68113a771c2c543bc1bf5d727}\index{sysio::resource\_monitor::system\_file\_space\_provider@{sysio::resource\_monitor::system\_file\_space\_provider}!get\_stat@{get\_stat}}
+\index{get\_stat@{get\_stat}!sysio::resource\_monitor::system\_file\_space\_provider@{sysio::resource\_monitor::system\_file\_space\_provider}}
+\doxysubsubsection{\texorpdfstring{get\_stat()}{get\_stat()}}
+{\footnotesize\ttfamily \label{classsysio_1_1resource__monitor_1_1system__file__space__provider_a9f6a54a68113a771c2c543bc1bf5d727} 
+int sysio\+::resource\+\_\+monitor\+::system\+\_\+file\+\_\+space\+\_\+provider\+::get\+\_\+stat (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{path}{, }\item[{struct stat \texorpdfstring{$\ast$}{*}}]{buf}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{system__file__space__provider_8cpp_source_l00006}{6}} of file \mbox{\hyperlink{system__file__space__provider_8cpp_source}{system\+\_\+file\+\_\+space\+\_\+provider.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00006\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00007\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ stat(path,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}});}
+\DoxyCodeLine{00008\ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+plugins/resource\+\_\+monitor\+\_\+plugin/include/sysio/resource\+\_\+monitor\+\_\+plugin/\mbox{\hyperlink{system__file__space__provider_8hpp}{system\+\_\+file\+\_\+space\+\_\+provider.\+hpp}}\item 
+plugins/resource\+\_\+monitor\+\_\+plugin/\mbox{\hyperlink{system__file__space__provider_8cpp}{system\+\_\+file\+\_\+space\+\_\+provider.\+cpp}}\end{DoxyCompactItemize}

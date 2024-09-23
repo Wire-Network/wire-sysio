@@ -1,0 +1,9 @@
+<map id="run_nonce_function_bip340_tests" name="run_nonce_function_bip340_tests">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,55,140,96"/>
+<area shape="rect" id="Node000002" href="$yubihsm__pkcs11_8c.html#adc4bd59a60361844aa0e852efa210105" title=" " alt="" coords="231,5,299,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="139,53,215,30,217,35,141,58"/>
+<area shape="rect" id="Node000003" href="$schnorrsig_2tests__impl_8h.html#ac5feade0e2d42bfe7b2d1aa2cc55abe9" title=" " alt="" coords="188,55,342,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="140,73,172,73,172,78,140,78"/>
+<area shape="rect" id="Node000004" href="$schnorrsig_2tests__impl_8h.html#a8d01c9b0c8d4c6576171ee1246fb2c61" title=" " alt="" coords="208,120,322,146"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="141,93,205,112,204,118,139,98"/>
+</map>

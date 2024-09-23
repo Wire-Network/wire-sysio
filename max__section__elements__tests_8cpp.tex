@@ -1,0 +1,151 @@
+\doxysection{libraries/sys-\/vm/tests/max\+\_\+section\+\_\+elements\+\_\+tests.cpp File Reference}
+\hypertarget{max__section__elements__tests_8cpp}{}\label{max__section__elements__tests_8cpp}\index{libraries/sys-\/vm/tests/max\_section\_elements\_tests.cpp@{libraries/sys-\/vm/tests/max\_section\_elements\_tests.cpp}}
+{\ttfamily \#include $<$sysio/vm/backend.\+hpp$>$}\newline
+{\ttfamily \#include "{}utils.\+hpp"{}}\newline
+{\ttfamily \#include $<$catch2/catch.\+hpp$>$}\newline
+Include dependency graph for max\+\_\+section\+\_\+elements\+\_\+tests.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{max__section__elements__tests_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{max__section__elements__tests_8cpp_a253a0f2e77a8b7901c9128a79b2fe190}{SECTION\+\_\+\+TEST\+\_\+\+CASE\+\_\+\+DEFS}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})
+\item 
+\#define \mbox{\hyperlink{max__section__elements__tests_8cpp_a639de2a2f3eb41bf5aa7f5e938ef8e7b}{SECTION\+\_\+\+TEST\+\_\+\+CASE\+\_\+\+IMPL}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  wasm)
+\item 
+\#define \mbox{\hyperlink{max__section__elements__tests_8cpp_a451dba70da3f1edb075dd80d4696481d}{SECTION\+\_\+\+TEST\+\_\+\+CASE}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  wasm)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+wasm\+\_\+allocator \mbox{\hyperlink{max__section__elements__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{max__section__elements__tests_8cpp_a451dba70da3f1edb075dd80d4696481d}\index{max\_section\_elements\_tests.cpp@{max\_section\_elements\_tests.cpp}!SECTION\_TEST\_CASE@{SECTION\_TEST\_CASE}}
+\index{SECTION\_TEST\_CASE@{SECTION\_TEST\_CASE}!max\_section\_elements\_tests.cpp@{max\_section\_elements\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{SECTION\_TEST\_CASE}{SECTION\_TEST\_CASE}}
+{\footnotesize\ttfamily \label{max__section__elements__tests_8cpp_a451dba70da3f1edb075dd80d4696481d} 
+\#define SECTION\+\_\+\+TEST\+\_\+\+CASE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{wasm}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \mbox{\hyperlink{max__section__elements__tests_8cpp_a253a0f2e77a8b7901c9128a79b2fe190}{SECTION\_TEST\_CASE\_DEFS}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})\ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ SECTION\_TEST\_CASE\_IMPL(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ wasm)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{max__section__elements__tests_8cpp_source_l00137}{137}} of file \mbox{\hyperlink{max__section__elements__tests_8cpp_source}{max\+\_\+section\+\_\+elements\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00137\ \textcolor{preprocessor}{\#define\ SECTION\_TEST\_CASE(name,\ wasm)\ \ \(\backslash\)}}
+\DoxyCodeLine{00138\ \textcolor{preprocessor}{\ \ \ SECTION\_TEST\_CASE\_DEFS(name)\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00139\ \textcolor{preprocessor}{\ \ \ SECTION\_TEST\_CASE\_IMPL(name,\ wasm)}}
+
+\end{DoxyCode}
+\Hypertarget{max__section__elements__tests_8cpp_a253a0f2e77a8b7901c9128a79b2fe190}\index{max\_section\_elements\_tests.cpp@{max\_section\_elements\_tests.cpp}!SECTION\_TEST\_CASE\_DEFS@{SECTION\_TEST\_CASE\_DEFS}}
+\index{SECTION\_TEST\_CASE\_DEFS@{SECTION\_TEST\_CASE\_DEFS}!max\_section\_elements\_tests.cpp@{max\_section\_elements\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{SECTION\_TEST\_CASE\_DEFS}{SECTION\_TEST\_CASE\_DEFS}}
+{\footnotesize\ttfamily \label{max__section__elements__tests_8cpp_a253a0f2e77a8b7901c9128a79b2fe190} 
+\#define SECTION\+\_\+\+TEST\+\_\+\+CASE\+\_\+\+DEFS(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{namespace\ }\{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\textcolor{keyword}{struct\ }\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ \#\#\ \_dynamic\_options\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ std::uint32\_t\ max\_\ \#\#\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ \#\#\ \_section\_elements;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\textcolor{keyword}{struct\ }\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ \#\#\ \_static\_options\_1\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ std::uint32\_t\ max\_\ \#\#\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ \#\#\ \_section\_elements\ =\ 1;\ \ \(\backslash\)}
+\DoxyCodeLine{\};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\textcolor{keyword}{struct\ }\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ \#\#\ \_static\_options\_2\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ std::uint32\_t\ max\_\ \#\#\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ \#\#\ \_section\_elements\ =\ 2;\ \ \(\backslash\)}
+\DoxyCodeLine{\};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{max__section__elements__tests_8cpp_source_l00109}{109}} of file \mbox{\hyperlink{max__section__elements__tests_8cpp_source}{max\+\_\+section\+\_\+elements\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00109\ \textcolor{preprocessor}{\#define\ SECTION\_TEST\_CASE\_DEFS(name)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00110\ \textcolor{preprocessor}{namespace\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00111\ \textcolor{preprocessor}{struct\ name\ \#\#\ \_dynamic\_options\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00112\ \textcolor{preprocessor}{\ \ \ std::uint32\_t\ max\_\ \#\#\ name\ \#\#\ \_section\_elements;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00113\ \textcolor{preprocessor}{\};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00114\ \textcolor{preprocessor}{struct\ name\ \#\#\ \_static\_options\_1\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00115\ \textcolor{preprocessor}{\ \ \ static\ constexpr\ std::uint32\_t\ max\_\ \#\#\ name\ \#\#\ \_section\_elements\ =\ 1;\ \ \(\backslash\)}}
+\DoxyCodeLine{00116\ \textcolor{preprocessor}{\};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00117\ \textcolor{preprocessor}{struct\ name\ \#\#\ \_static\_options\_2\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00118\ \textcolor{preprocessor}{\ \ \ static\ constexpr\ std::uint32\_t\ max\_\ \#\#\ name\ \#\#\ \_section\_elements\ =\ 2;\ \ \(\backslash\)}}
+\DoxyCodeLine{00119\ \textcolor{preprocessor}{\};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00120\ \textcolor{preprocessor}{\}}}
+
+\end{DoxyCode}
+\Hypertarget{max__section__elements__tests_8cpp_a639de2a2f3eb41bf5aa7f5e938ef8e7b}\index{max\_section\_elements\_tests.cpp@{max\_section\_elements\_tests.cpp}!SECTION\_TEST\_CASE\_IMPL@{SECTION\_TEST\_CASE\_IMPL}}
+\index{SECTION\_TEST\_CASE\_IMPL@{SECTION\_TEST\_CASE\_IMPL}!max\_section\_elements\_tests.cpp@{max\_section\_elements\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{SECTION\_TEST\_CASE\_IMPL}{SECTION\_TEST\_CASE\_IMPL}}
+{\footnotesize\ttfamily \label{max__section__elements__tests_8cpp_a639de2a2f3eb41bf5aa7f5e938ef8e7b} 
+\#define SECTION\+\_\+\+TEST\+\_\+\+CASE\+\_\+\+IMPL(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{wasm}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_a3e5f265967cb6d730cad8ca15e807ac2}{BACKEND\_TEST\_CASE}}(\textcolor{stringliteral}{"{}Test\ max\_"{}}\ \#\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ \textcolor{stringliteral}{"{}\_section\_elements"{}},\ \textcolor{stringliteral}{"{}[max\_section\_elements\_test]"{}})\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType>}}\ backend\_default(wasm,\ \&\mbox{\hyperlink{max__section__elements__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ empty\_options>}}\ backend\_empty(wasm,\ \&\mbox{\hyperlink{max__section__elements__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ CHECK\_THROWS\_AS((\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ static\_options\_1>}}(wasm,\ \&\mbox{\hyperlink{max__section__elements__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}})),\ wasm\_parse\_exception);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ static\_options\_2>}}\ backend\_static\_fallback(wasm,\ \&\mbox{\hyperlink{max__section__elements__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ CHECK\_THROWS\_AS((\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ dynamic\_options>}}(wasm,\ \textcolor{keyword}{nullptr},\ \{1\})),\ wasm\_parse\_exception);\ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ dynamic\_options>}}\ backend\_dynamic\_fallback(wasm,\ \textcolor{keyword}{nullptr},\ \{2\});\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ CHECK\_THROWS\_AS((\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ name\ \#\#\ \_static\_options\_1>}}(wasm,\ \&\mbox{\hyperlink{max__section__elements__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}})),\ wasm\_parse\_exception);\ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ name\ \#\#\ \_static\_options\_2>}}\ backend\_static(wasm,\ \&\mbox{\hyperlink{max__section__elements__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ CHECK\_THROWS\_AS((\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ name\ \#\#\ \_dynamic\_options>}}(wasm,\ \textcolor{keyword}{nullptr},\ \{1\})),\ wasm\_parse\_exception);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ name\ \#\#\ \_dynamic\_options>}}\ backend\_dynamic(wasm,\ \textcolor{keyword}{nullptr},\ \{2\});\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{max__section__elements__tests_8cpp_source_l00122}{122}} of file \mbox{\hyperlink{max__section__elements__tests_8cpp_source}{max\+\_\+section\+\_\+elements\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00122\ \textcolor{preprocessor}{\#define\ SECTION\_TEST\_CASE\_IMPL(name,\ wasm)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00123\ \textcolor{preprocessor}{BACKEND\_TEST\_CASE("{}Test\ max\_"{}\ \#name\ "{}\_section\_elements"{},\ "{}[max\_section\_elements\_test]"{})\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00124\ \textcolor{preprocessor}{\ \ \ backend<std::nullptr\_t,\ TestType>\ backend\_default(wasm,\ \&wa);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00125\ \textcolor{preprocessor}{\ \ \ backend<std::nullptr\_t,\ TestType,\ empty\_options>\ backend\_empty(wasm,\ \&wa);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00126\ \textcolor{preprocessor}{\ \ \ CHECK\_THROWS\_AS((backend<std::nullptr\_t,\ TestType,\ static\_options\_1>(wasm,\ \&wa)),\ wasm\_parse\_exception);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00127\ \textcolor{preprocessor}{\ \ \ backend<std::nullptr\_t,\ TestType,\ static\_options\_2>\ backend\_static\_fallback(wasm,\ \&wa);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00128\ \textcolor{preprocessor}{\ \ \ CHECK\_THROWS\_AS((backend<std::nullptr\_t,\ TestType,\ dynamic\_options>(wasm,\ nullptr,\ \{1\})),\ wasm\_parse\_exception);\ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00129\ \textcolor{preprocessor}{\ \ \ backend<std::nullptr\_t,\ TestType,\ dynamic\_options>\ backend\_dynamic\_fallback(wasm,\ nullptr,\ \{2\});\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00130\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00131\ \textcolor{preprocessor}{\ \ \ CHECK\_THROWS\_AS((backend<std::nullptr\_t,\ TestType,\ name\ \#\#\ \_static\_options\_1>(wasm,\ \&wa)),\ wasm\_parse\_exception);\ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00132\ \textcolor{preprocessor}{\ \ \ backend<std::nullptr\_t,\ TestType,\ name\ \#\#\ \_static\_options\_2>\ backend\_static(wasm,\ \&wa);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00133\ \textcolor{preprocessor}{\ \ \ CHECK\_THROWS\_AS((backend<std::nullptr\_t,\ TestType,\ name\ \#\#\ \_dynamic\_options>(wasm,\ nullptr,\ \{1\})),\ wasm\_parse\_exception);\ \(\backslash\)}}
+\DoxyCodeLine{00134\ \textcolor{preprocessor}{\ \ \ backend<std::nullptr\_t,\ TestType,\ name\ \#\#\ \_dynamic\_options>\ backend\_dynamic(wasm,\ nullptr,\ \{2\});\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00135\ \textcolor{preprocessor}{\}}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{max__section__elements__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}\index{max\_section\_elements\_tests.cpp@{max\_section\_elements\_tests.cpp}!wa@{wa}}
+\index{wa@{wa}!max\_section\_elements\_tests.cpp@{max\_section\_elements\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{wa}{wa}}
+{\footnotesize\ttfamily \label{max__section__elements__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89} 
+wasm\+\_\+allocator wa\hspace{0.3cm}{\ttfamily [extern]}}
+
+
+
+Definition at line \mbox{\hyperlink{libraries_2sys-vm_2tests_2main_8cpp_source_l00010}{10}} of file \mbox{\hyperlink{libraries_2sys-vm_2tests_2main_8cpp_source}{main.\+cpp}}.
+

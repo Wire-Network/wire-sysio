@@ -1,0 +1,55 @@
+\doxysection{s\+\_\+approx\+Recip\+Sqrt\+\_\+1\+Ks.\+c}
+\hypertarget{softfloat_2source_2s__approx_recip_sqrt__1_ks_8c_source}{}\label{softfloat_2source_2s__approx_recip_sqrt__1_ks_8c_source}\index{libraries/softfloat/source/s\_approxRecipSqrt\_1Ks.c@{libraries/softfloat/source/s\_approxRecipSqrt\_1Ks.c}}
+\mbox{\hyperlink{softfloat_2source_2s__approx_recip_sqrt__1_ks_8c}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2s__approx_recip_sqrt__1_ks_8c_source_l00001}00001\ }
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2s__approx_recip_sqrt__1_ks_8c_source_l00002}00002\ \textcolor{comment}{/*============================================================================}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2s__approx_recip_sqrt__1_ks_8c_source_l00003}00003\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2s__approx_recip_sqrt__1_ks_8c_source_l00004}00004\ \textcolor{comment}{This\ C\ source\ file\ is\ part\ of\ the\ SoftFloat\ IEEE\ Floating-\/Point\ Arithmetic}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2s__approx_recip_sqrt__1_ks_8c_source_l00005}00005\ \textcolor{comment}{Package,\ Release\ 3e,\ by\ John\ R.\ Hauser.}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2s__approx_recip_sqrt__1_ks_8c_source_l00006}00006\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2s__approx_recip_sqrt__1_ks_8c_source_l00007}00007\ \textcolor{comment}{Copyright\ 2011,\ 2012,\ 2013,\ 2014,\ 2015,\ 2016\ The\ Regents\ of\ the\ University\ of}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2s__approx_recip_sqrt__1_ks_8c_source_l00008}00008\ \textcolor{comment}{California.\ \ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2s__approx_recip_sqrt__1_ks_8c_source_l00009}00009\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2s__approx_recip_sqrt__1_ks_8c_source_l00010}00010\ \textcolor{comment}{Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2s__approx_recip_sqrt__1_ks_8c_source_l00011}00011\ \textcolor{comment}{modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are\ met:}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2s__approx_recip_sqrt__1_ks_8c_source_l00012}00012\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2s__approx_recip_sqrt__1_ks_8c_source_l00013}00013\ \textcolor{comment}{\ 1.\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright\ notice,}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2s__approx_recip_sqrt__1_ks_8c_source_l00014}00014\ \textcolor{comment}{\ \ \ \ this\ list\ of\ conditions,\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2s__approx_recip_sqrt__1_ks_8c_source_l00015}00015\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2s__approx_recip_sqrt__1_ks_8c_source_l00016}00016\ \textcolor{comment}{\ 2.\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above\ copyright\ notice,}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2s__approx_recip_sqrt__1_ks_8c_source_l00017}00017\ \textcolor{comment}{\ \ \ \ this\ list\ of\ conditions,\ and\ the\ following\ disclaimer\ in\ the\ documentation}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2s__approx_recip_sqrt__1_ks_8c_source_l00018}00018\ \textcolor{comment}{\ \ \ \ and/or\ other\ materials\ provided\ with\ the\ distribution.}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2s__approx_recip_sqrt__1_ks_8c_source_l00019}00019\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2s__approx_recip_sqrt__1_ks_8c_source_l00020}00020\ \textcolor{comment}{\ 3.\ Neither\ the\ name\ of\ the\ University\ nor\ the\ names\ of\ its\ contributors\ may}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2s__approx_recip_sqrt__1_ks_8c_source_l00021}00021\ \textcolor{comment}{\ \ \ \ be\ used\ to\ endorse\ or\ promote\ products\ derived\ from\ this\ software\ without}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2s__approx_recip_sqrt__1_ks_8c_source_l00022}00022\ \textcolor{comment}{\ \ \ \ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2s__approx_recip_sqrt__1_ks_8c_source_l00023}00023\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2s__approx_recip_sqrt__1_ks_8c_source_l00024}00024\ \textcolor{comment}{THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ REGENTS\ AND\ CONTRIBUTORS\ "{}AS\ IS"{},\ AND\ ANY}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2s__approx_recip_sqrt__1_ks_8c_source_l00025}00025\ \textcolor{comment}{EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ THE\ IMPLIED}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2s__approx_recip_sqrt__1_ks_8c_source_l00026}00026\ \textcolor{comment}{WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR\ A\ PARTICULAR\ PURPOSE,\ ARE}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2s__approx_recip_sqrt__1_ks_8c_source_l00027}00027\ \textcolor{comment}{DISCLAIMED.\ \ IN\ NO\ EVENT\ SHALL\ THE\ REGENTS\ OR\ CONTRIBUTORS\ BE\ LIABLE\ FOR\ ANY}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2s__approx_recip_sqrt__1_ks_8c_source_l00028}00028\ \textcolor{comment}{DIRECT,\ INDIRECT,\ INCIDENTAL,\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2s__approx_recip_sqrt__1_ks_8c_source_l00029}00029\ \textcolor{comment}{(INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2s__approx_recip_sqrt__1_ks_8c_source_l00030}00030\ \textcolor{comment}{LOSS\ OF\ USE,\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2s__approx_recip_sqrt__1_ks_8c_source_l00031}00031\ \textcolor{comment}{ON\ ANY\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2s__approx_recip_sqrt__1_ks_8c_source_l00032}00032\ \textcolor{comment}{(INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE\ OF\ THIS}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2s__approx_recip_sqrt__1_ks_8c_source_l00033}00033\ \textcolor{comment}{SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2s__approx_recip_sqrt__1_ks_8c_source_l00034}00034\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2s__approx_recip_sqrt__1_ks_8c_source_l00035}00035\ \textcolor{comment}{=============================================================================*/}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2s__approx_recip_sqrt__1_ks_8c_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2s__approx_recip_sqrt__1_ks_8c_source_l00037}00037\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{stdint_8h}{stdint.h}}>}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2s__approx_recip_sqrt__1_ks_8c_source_l00038}00038\ \textcolor{preprocessor}{\#include\ "{}platform.h"{}}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2s__approx_recip_sqrt__1_ks_8c_source_l00039}00039\ \textcolor{preprocessor}{\#include\ "{}primitives.h"{}}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2s__approx_recip_sqrt__1_ks_8c_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2s__approx_recip_sqrt__1_ks_8c_source_l00041}\mbox{\hyperlink{softfloat_2source_2f16__sqrt_8c_a0f7c742e708cc2e45f28f9d4ef7439ea}{00041}}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ \mbox{\hyperlink{softfloat_2source_2s__approx_recip_sqrt__1_ks_8c_a2eac782127ed0f981f079f1c142bc903}{softfloat\_approxRecipSqrt\_1k0s}}[16]\ =\ \{}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2s__approx_recip_sqrt__1_ks_8c_source_l00042}00042\ \ \ \ \ 0xB4C9,\ 0xFFAB,\ 0xAA7D,\ 0xF11C,\ 0xA1C5,\ 0xE4C7,\ 0x9A43,\ 0xDA29,}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2s__approx_recip_sqrt__1_ks_8c_source_l00043}00043\ \ \ \ \ 0x93B5,\ 0xD0E5,\ 0x8DED,\ 0xC8B7,\ 0x88C6,\ 0xC16D,\ 0x8424,\ 0xBAE1}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2s__approx_recip_sqrt__1_ks_8c_source_l00044}00044\ \};}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2s__approx_recip_sqrt__1_ks_8c_source_l00045}\mbox{\hyperlink{softfloat_2source_2f16__sqrt_8c_a2d2179ec501e4cdd4ac2c8dd2579d560}{00045}}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ \mbox{\hyperlink{softfloat_2source_2s__approx_recip_sqrt__1_ks_8c_ad03bbff555e8628c2e5ab07fa6be1883}{softfloat\_approxRecipSqrt\_1k1s}}[16]\ =\ \{}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2s__approx_recip_sqrt__1_ks_8c_source_l00046}00046\ \ \ \ \ 0xA5A5,\ 0xEA42,\ 0x8C21,\ 0xC62D,\ 0x788F,\ 0xAA7F,\ 0x6928,\ 0x94B6,}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2s__approx_recip_sqrt__1_ks_8c_source_l00047}00047\ \ \ \ \ 0x5CC7,\ 0x8335,\ 0x52A6,\ 0x74E2,\ 0x4A3E,\ 0x68FE,\ 0x432B,\ 0x5EFD}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2s__approx_recip_sqrt__1_ks_8c_source_l00048}00048\ \};}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2s__approx_recip_sqrt__1_ks_8c_source_l00049}00049\ }
+
+\end{DoxyCode}

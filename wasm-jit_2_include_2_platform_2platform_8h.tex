@@ -1,0 +1,144 @@
+\doxysection{libraries/wasm-\/jit/\+Include/\+Platform/\+Platform.h File Reference}
+\hypertarget{wasm-jit_2_include_2_platform_2platform_8h}{}\label{wasm-jit_2_include_2_platform_2platform_8h}\index{libraries/wasm-\/jit/Include/Platform/Platform.h@{libraries/wasm-\/jit/Include/Platform/Platform.h}}
+{\ttfamily \#include $<$vector$>$}\newline
+{\ttfamily \#include $<$functional$>$}\newline
+{\ttfamily \#include "{}Inline/\+Basic\+Types.\+h"{}}\newline
+{\ttfamily \#include "{}Inline/\+Errors.\+h"{}}\newline
+Include dependency graph for Platform.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{wasm-jit_2_include_2_platform_2platform_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{wasm-jit_2_include_2_platform_2platform_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespace_platform}{Platform}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_af8556c37f3acfa45992b8697930c501b}{THREAD\+\_\+\+LOCAL}}~\+\_\+\+\_\+thread
+\item 
+\#define \mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_a1ca888bd091694c05472e1b91df1a97b}{DLL\+\_\+\+EXPORT}}
+\item 
+\#define \mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_a14d005bd653c82f4e705b4ded2a4fc07}{DLL\+\_\+\+IMPORT}}
+\item 
+\#define \mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_a724fb9f82013c782db5c3c12ea36aac8}{FORCEINLINE}}~inline \+\_\+\+\_\+attribute\+\_\+\+\_\+((always\+\_\+inline))
+\item 
+\#define \mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_af754e908a4e63c2527b91fe55260059b}{SUPPRESS\+\_\+\+UNUSED}}(variable)
+\item 
+\#define \mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_a22967196ef9b5ba8e54c8d9a0505d312}{PACKED\+\_\+\+STRUCT}}(definition)
+\item 
+\#define \mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_aa0578dcc49794f43d92a24724d60af3f}{PLATFORM\+\_\+\+API}}~\mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_a14d005bd653c82f4e705b4ded2a4fc07}{DLL\+\_\+\+IMPORT}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}} \mbox{\hyperlink{namespace_platform_a881d22a3f51a7e519908f07f22b0d45b}{Platform\+::count\+Leading\+Zeroes}} (\mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}} \mbox{\hyperlink{namespace_platform_a9d8ab9694b20d773a5461807f52bcdd1}{Platform\+::count\+Leading\+Zeroes}} (\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+\mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}} \mbox{\hyperlink{namespace_platform_a39cf10b3b7c47517a25d8284d0f7813f}{Platform\+::count\+Trailing\+Zeroes}} (\mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}} \mbox{\hyperlink{namespace_platform_a739a36a7403c4d85a2f0228f9e913ba9}{Platform\+::count\+Trailing\+Zeroes}} (\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+\mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}} \mbox{\hyperlink{namespace_platform_aa618d555db82f8b59b0eeeac8d9a946a}{Platform\+::floor\+Log\+Two}} (\mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}} \mbox{\hyperlink{namespace_platform_a4f3d15d0115fe31b0bcdb65a24ed24ef}{Platform\+::floor\+Log\+Two}} (\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+\mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}} \mbox{\hyperlink{namespace_platform_aa87d100a441e9a04d55cb742410cdd48}{Platform\+::ceil\+Log\+Two}} (\mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}} \mbox{\hyperlink{namespace_platform_aae9e96348b025c85ff9dff116169a4e4}{Platform\+::ceil\+Log\+Two}} (\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{wasm-jit_2_include_2_platform_2platform_8h_a1ca888bd091694c05472e1b91df1a97b}\index{Platform.h@{Platform.h}!DLL\_EXPORT@{DLL\_EXPORT}}
+\index{DLL\_EXPORT@{DLL\_EXPORT}!Platform.h@{Platform.h}}
+\doxysubsubsection{\texorpdfstring{DLL\_EXPORT}{DLL\_EXPORT}}
+{\footnotesize\ttfamily \label{wasm-jit_2_include_2_platform_2platform_8h_a1ca888bd091694c05472e1b91df1a97b} 
+\#define DLL\+\_\+\+EXPORT}
+
+
+
+Definition at line \mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_source_l00011}{11}} of file \mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_source}{Platform.\+h}}.
+
+\Hypertarget{wasm-jit_2_include_2_platform_2platform_8h_a14d005bd653c82f4e705b4ded2a4fc07}\index{Platform.h@{Platform.h}!DLL\_IMPORT@{DLL\_IMPORT}}
+\index{DLL\_IMPORT@{DLL\_IMPORT}!Platform.h@{Platform.h}}
+\doxysubsubsection{\texorpdfstring{DLL\_IMPORT}{DLL\_IMPORT}}
+{\footnotesize\ttfamily \label{wasm-jit_2_include_2_platform_2platform_8h_a14d005bd653c82f4e705b4ded2a4fc07} 
+\#define DLL\+\_\+\+IMPORT}
+
+
+
+Definition at line \mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_source_l00012}{12}} of file \mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_source}{Platform.\+h}}.
+
+\Hypertarget{wasm-jit_2_include_2_platform_2platform_8h_a724fb9f82013c782db5c3c12ea36aac8}\index{Platform.h@{Platform.h}!FORCEINLINE@{FORCEINLINE}}
+\index{FORCEINLINE@{FORCEINLINE}!Platform.h@{Platform.h}}
+\doxysubsubsection{\texorpdfstring{FORCEINLINE}{FORCEINLINE}}
+{\footnotesize\ttfamily \label{wasm-jit_2_include_2_platform_2platform_8h_a724fb9f82013c782db5c3c12ea36aac8} 
+\#define FORCEINLINE~inline \+\_\+\+\_\+attribute\+\_\+\+\_\+((always\+\_\+inline))}
+
+
+
+Definition at line \mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_source_l00013}{13}} of file \mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_source}{Platform.\+h}}.
+
+\Hypertarget{wasm-jit_2_include_2_platform_2platform_8h_a22967196ef9b5ba8e54c8d9a0505d312}\index{Platform.h@{Platform.h}!PACKED\_STRUCT@{PACKED\_STRUCT}}
+\index{PACKED\_STRUCT@{PACKED\_STRUCT}!Platform.h@{Platform.h}}
+\doxysubsubsection{\texorpdfstring{PACKED\_STRUCT}{PACKED\_STRUCT}}
+{\footnotesize\ttfamily \label{wasm-jit_2_include_2_platform_2platform_8h_a22967196ef9b5ba8e54c8d9a0505d312} 
+\#define PACKED\+\_\+\+STRUCT(\begin{DoxyParamCaption}\item[{}]{definition}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{definition\ \_\_attribute\_\_((packed));}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_source_l00015}{15}} of file \mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_source}{Platform.\+h}}.
+
+\Hypertarget{wasm-jit_2_include_2_platform_2platform_8h_aa0578dcc49794f43d92a24724d60af3f}\index{Platform.h@{Platform.h}!PLATFORM\_API@{PLATFORM\_API}}
+\index{PLATFORM\_API@{PLATFORM\_API}!Platform.h@{Platform.h}}
+\doxysubsubsection{\texorpdfstring{PLATFORM\_API}{PLATFORM\_API}}
+{\footnotesize\ttfamily \label{wasm-jit_2_include_2_platform_2platform_8h_aa0578dcc49794f43d92a24724d60af3f} 
+\#define PLATFORM\+\_\+\+API~\mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_a14d005bd653c82f4e705b4ded2a4fc07}{DLL\+\_\+\+IMPORT}}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_source_l00018}{18}} of file \mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_source}{Platform.\+h}}.
+
+\Hypertarget{wasm-jit_2_include_2_platform_2platform_8h_af754e908a4e63c2527b91fe55260059b}\index{Platform.h@{Platform.h}!SUPPRESS\_UNUSED@{SUPPRESS\_UNUSED}}
+\index{SUPPRESS\_UNUSED@{SUPPRESS\_UNUSED}!Platform.h@{Platform.h}}
+\doxysubsubsection{\texorpdfstring{SUPPRESS\_UNUSED}{SUPPRESS\_UNUSED}}
+{\footnotesize\ttfamily \label{wasm-jit_2_include_2_platform_2platform_8h_af754e908a4e63c2527b91fe55260059b} 
+\#define SUPPRESS\+\_\+\+UNUSED(\begin{DoxyParamCaption}\item[{}]{variable}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(void)(variable);}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_source_l00014}{14}} of file \mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_source}{Platform.\+h}}.
+
+\Hypertarget{wasm-jit_2_include_2_platform_2platform_8h_af8556c37f3acfa45992b8697930c501b}\index{Platform.h@{Platform.h}!THREAD\_LOCAL@{THREAD\_LOCAL}}
+\index{THREAD\_LOCAL@{THREAD\_LOCAL}!Platform.h@{Platform.h}}
+\doxysubsubsection{\texorpdfstring{THREAD\_LOCAL}{THREAD\_LOCAL}}
+{\footnotesize\ttfamily \label{wasm-jit_2_include_2_platform_2platform_8h_af8556c37f3acfa45992b8697930c501b} 
+\#define THREAD\+\_\+\+LOCAL~\+\_\+\+\_\+thread}
+
+
+
+Definition at line \mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_source_l00010}{10}} of file \mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_source}{Platform.\+h}}.
+

@@ -1,0 +1,392 @@
+\doxysection{libraries/sys-\/vm/tests/preconditions\+\_\+tests.cpp File Reference}
+\hypertarget{preconditions__tests_8cpp}{}\label{preconditions__tests_8cpp}\index{libraries/sys-\/vm/tests/preconditions\_tests.cpp@{libraries/sys-\/vm/tests/preconditions\_tests.cpp}}
+{\ttfamily \#include $<$sysio/vm/backend.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/vm/host\+\_\+function.\+hpp$>$}\newline
+{\ttfamily \#include "{}utils.\+hpp"{}}\newline
+{\ttfamily \#include $<$catch2/catch.\+hpp$>$}\newline
+{\ttfamily \#include $<$exception$>$}\newline
+Include dependency graph for preconditions\+\_\+tests.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{preconditions__tests_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structcnv}{cnv}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{preconditions__tests_8cpp_ac7f94d5b44850c40c973df65c005f77d}{CHECK\+\_\+\+MSG}}(\mbox{\hyperlink{scp_8h_a2026a4fe4ea2811a4929044067ea1718}{Msg}}, ...)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{preconditions__tests_8cpp_a0b1ceaff9df8cc7afc3849bbe3b78bad}{test\+\_\+func\+\_\+a}} (int \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, float b)
+\item 
+void \mbox{\hyperlink{preconditions__tests_8cpp_a980b15843c458b641ccf0e5df8562f0d}{test\+\_\+func\+\_\+b}} (char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, float \texorpdfstring{$\ast$}{*}b, int \&c)
+\item 
+void \mbox{\hyperlink{preconditions__tests_8cpp_ae8b5bf3b0187cc638a1f14ed38a33951}{test\+\_\+func\+\_\+c}} (float \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, const char \texorpdfstring{$\ast$}{*}b, \mbox{\hyperlink{classsysio_1_1vm_1_1span}{span}}$<$ const char $>$ c, int d)
+\item 
+void \mbox{\hyperlink{preconditions__tests_8cpp_a133131dba89ff2fb086beb5ed5f40783}{test\+\_\+func\+\_\+d}} ()
+\item 
+void \mbox{\hyperlink{preconditions__tests_8cpp_a475029760796e6c17bd255887478f905}{test\+\_\+func\+\_\+e}} (float \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, const char \texorpdfstring{$\ast$}{*}b, \mbox{\hyperlink{classsysio_1_1vm_1_1span}{span}}$<$ const char $>$ c, int d)
+\item 
+{\footnotesize template$<$typename Ex , typename F $>$ }\\bool \mbox{\hyperlink{preconditions__tests_8cpp_aac54f0a689bb06f389fe2fca8976534e}{check\+\_\+exception\+\_\+msg}} (F \&\&func, const std\+::string \&chck)
+\item 
+\mbox{\hyperlink{preconditions__tests_8cpp_a8e3d55729143b277e93e57655851ea1a}{SYS\+\_\+\+VM\+\_\+\+PRECONDITION}} (int\+\_\+equals\+\_\+42, \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_a576aca63e32e4cbf42537c5876c0d95b}{SYS\+\_\+\+VM\+\_\+\+INVOKE\+\_\+\+ON}}(int, \mbox{[}\&\mbox{]}(auto arg, auto \&\&... rest) \{ \mbox{\hyperlink{yubihsm__pkcs11_8c_a75d8898b07aafc20a48a415a1c6e7bf0}{if}}(arg !=42) throw std\+::runtime\+\_\+error("{}arg != 42"{});\}))
+\item 
+\mbox{\hyperlink{preconditions__tests_8cpp_a70e71356c35e568784e97970c2e1299a}{SYS\+\_\+\+VM\+\_\+\+PRECONDITION}} (float\+\_\+equals\+\_\+42, \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_a576aca63e32e4cbf42537c5876c0d95b}{SYS\+\_\+\+VM\+\_\+\+INVOKE\+\_\+\+ON}}(float, \mbox{[}\&\mbox{]}(auto arg, auto \&\&... rest) \{ \mbox{\hyperlink{yubihsm__pkcs11_8c_a75d8898b07aafc20a48a415a1c6e7bf0}{if}}(arg !=42.\+42\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}) throw std\+::runtime\+\_\+error("{}arg != 42.\+42f"{});\}))
+\item 
+\mbox{\hyperlink{preconditions__tests_8cpp_aad05d5f204d8ae3520760f4941c619f4}{SYS\+\_\+\+VM\+\_\+\+PRECONDITION}} (str\+\_\+equals\+\_\+hello, \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_a576aca63e32e4cbf42537c5876c0d95b}{SYS\+\_\+\+VM\+\_\+\+INVOKE\+\_\+\+ON}}(const char \texorpdfstring{$\ast$}{*}, \mbox{[}\&\mbox{]}(auto arg, auto \&\&... rest) \{ \mbox{\hyperlink{yubihsm__pkcs11_8c_a75d8898b07aafc20a48a415a1c6e7bf0}{if}}(memcmp(arg, "{}hello"{}, 5) !=0) throw std\+::runtime\+\_\+error("{}str != hello"{});\}))
+\item 
+\mbox{\hyperlink{preconditions__tests_8cpp_ab70cd104ada133067b00f6b946dc314e}{SYS\+\_\+\+VM\+\_\+\+PRECONDITION}} (span\+\_\+and\+\_\+check, \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_a27c519adc3a74a176aba34c519f8d409}{SYS\+\_\+\+VM\+\_\+\+INVOKE\+\_\+\+ON\+\_\+\+ALL}}(\mbox{[}\&\mbox{]}(auto arg, auto \&\&... rest) \{ \mbox{\hyperlink{yubihsm__pkcs11_8c_a75d8898b07aafc20a48a415a1c6e7bf0}{if}} constexpr(is\+\_\+span\+\_\+type\+\_\+v$<$ decltype(arg)$>$) \{ \mbox{\hyperlink{yubihsm__pkcs11_8c_a75d8898b07aafc20a48a415a1c6e7bf0}{if}}(memcmp(arg.\+data(), "{}hellohe"{}, arg.\+size\+\_\+bytes()) !=0) throw std\+::runtime\+\_\+error("{}span$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$ != hellohe"{});\} \}))
+\item 
+\mbox{\hyperlink{preconditions__tests_8cpp_a9497f61d74b9bf37d8158d2605f44eab}{SYS\+\_\+\+VM\+\_\+\+PRECONDITION}} (check2\+\_\+once, \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_a1ddb4f842ec1c70bcd410d65e586a1ad}{SYS\+\_\+\+VM\+\_\+\+INVOKE\+\_\+\+ONCE}}(\mbox{[}\&\mbox{]}(auto \&\&... args) \{ check2++;\}))
+\item 
+\mbox{\hyperlink{preconditions__tests_8cpp_a8732baf842a41b96b4090aa0024bb159}{SYS\+\_\+\+VM\+\_\+\+PRECONDITION}} (check2\+\_\+all, \mbox{\hyperlink{sysio_2vm_2host__function_8hpp_a27c519adc3a74a176aba34c519f8d409}{SYS\+\_\+\+VM\+\_\+\+INVOKE\+\_\+\+ON\+\_\+\+ALL}}(\mbox{[}\&\mbox{]}(auto \&\&... args) \{ check2++;\}))
+\item 
+\mbox{\hyperlink{preconditions__tests_8cpp_ab6ebb1eb28c94cdff83d66d9ea24f935}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Testing invoke\+\_\+on"{}, "{}\mbox{[}preconditions\+\_\+tests\mbox{]}"{})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{preconditions__tests_8cpp_ac7f94d5b44850c40c973df65c005f77d}\index{preconditions\_tests.cpp@{preconditions\_tests.cpp}!CHECK\_MSG@{CHECK\_MSG}}
+\index{CHECK\_MSG@{CHECK\_MSG}!preconditions\_tests.cpp@{preconditions\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{CHECK\_MSG}{CHECK\_MSG}}
+{\footnotesize\ttfamily \label{preconditions__tests_8cpp_ac7f94d5b44850c40c973df65c005f77d} 
+\#define CHECK\+\_\+\+MSG(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{scp_8h_a2026a4fe4ea2811a4929044067ea1718}{Msg}}}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{preconditions__tests_8cpp_aac54f0a689bb06f389fe2fca8976534e}{check\_exception\_msg<std::runtime\_error>}}([\&]()\{\ \_\_VA\_ARGS\_\_;\ \},\ \mbox{\hyperlink{scp_8h_a2026a4fe4ea2811a4929044067ea1718}{Msg}}))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{preconditions__tests_8cpp_source_l00037}{37}} of file \mbox{\hyperlink{preconditions__tests_8cpp_source}{preconditions\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00037\ \textcolor{preprocessor}{\#define\ CHECK\_MSG(Msg,\ ...)\ \(\backslash\)}}
+\DoxyCodeLine{00038\ \textcolor{preprocessor}{\ \ \ CHECK(check\_exception\_msg<std::runtime\_error>([\&]()\{\ \_\_VA\_ARGS\_\_;\ \},\ Msg))}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{preconditions__tests_8cpp_ab6ebb1eb28c94cdff83d66d9ea24f935}\index{preconditions\_tests.cpp@{preconditions\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!preconditions\_tests.cpp@{preconditions\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}}
+{\footnotesize\ttfamily \label{preconditions__tests_8cpp_ab6ebb1eb28c94cdff83d66d9ea24f935} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Testing invoke\+\_\+on"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}preconditions\+\_\+tests\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{preconditions__tests_8cpp_source_l00085}{85}} of file \mbox{\hyperlink{preconditions__tests_8cpp_source}{preconditions\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00086\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{structsysio_1_1vm_1_1registered__host__functions}{rhf\_t}}\ =\ \mbox{\hyperlink{structsysio_1_1vm_1_1registered__host__functions}{registered\_host\_functions<standalone\_function\_t,\ execution\_interface,\ cnv>}};}
+\DoxyCodeLine{00087\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<rhf\_t,\ TestType>}};}
+\DoxyCodeLine{00088\ }
+\DoxyCodeLine{00089\ \textcolor{comment}{/*}}
+\DoxyCodeLine{00090\ \textcolor{comment}{(module}}
+\DoxyCodeLine{00091\ \textcolor{comment}{\ \ (type\ (;0;)\ (func\ (param\ i32\ i32\ i32)))}}
+\DoxyCodeLine{00092\ \textcolor{comment}{\ \ (type\ (;1;)\ (func\ (param\ i32\ f32)))}}
+\DoxyCodeLine{00093\ \textcolor{comment}{\ \ (type\ (;2;)\ (func\ (param)))}}
+\DoxyCodeLine{00094\ \textcolor{comment}{\ \ (type\ (;3;)\ (func\ (param\ f32\ i32\ i32\ i32\ i32)))}}
+\DoxyCodeLine{00095\ \textcolor{comment}{\ \ (import\ "{}env"{}\ "{}test\_func\_b"{}\ (func\ (;0;)\ (type\ 0)))}}
+\DoxyCodeLine{00096\ \textcolor{comment}{\ \ (import\ "{}env"{}\ "{}test\_func\_a"{}\ (func\ (;1;)\ (type\ 1)))}}
+\DoxyCodeLine{00097\ \textcolor{comment}{\ \ (import\ "{}env"{}\ "{}test\_func\_c"{}\ (func\ (;2;)\ (type\ 3)))}}
+\DoxyCodeLine{00098\ \textcolor{comment}{\ \ (import\ "{}env"{}\ "{}test\_func\_d"{}\ (func\ (;3;)\ (type\ 2)))}}
+\DoxyCodeLine{00099\ \textcolor{comment}{\ \ (import\ "{}env"{}\ "{}test\_func\_e"{}\ (func\ (;4;)\ (type\ 3)))}}
+\DoxyCodeLine{00100\ \textcolor{comment}{\ \ (func\ (;5;)\ (type\ 2)}}
+\DoxyCodeLine{00101\ \textcolor{comment}{\ \ \ \ i32.const\ 42}}
+\DoxyCodeLine{00102\ \textcolor{comment}{\ \ \ \ f32.const\ 42.42}}
+\DoxyCodeLine{00103\ \textcolor{comment}{\ \ \ \ call\ 1)}}
+\DoxyCodeLine{00104\ \textcolor{comment}{\ \ (func\ (;6;)\ (type\ 2)}}
+\DoxyCodeLine{00105\ \textcolor{comment}{\ \ \ \ i32.const\ 8208}}
+\DoxyCodeLine{00106\ \textcolor{comment}{\ \ \ \ i32.const\ 8232}}
+\DoxyCodeLine{00107\ \textcolor{comment}{\ \ \ \ i32.const\ 8232}}
+\DoxyCodeLine{00108\ \textcolor{comment}{\ \ \ \ call\ 0)}}
+\DoxyCodeLine{00109\ \textcolor{comment}{\ \ (func\ (;7;)\ (type\ 2)}}
+\DoxyCodeLine{00110\ \textcolor{comment}{\ \ \ \ i32.const\ 32}}
+\DoxyCodeLine{00111\ \textcolor{comment}{\ \ \ \ f32.const\ 42}}
+\DoxyCodeLine{00112\ \textcolor{comment}{\ \ \ \ call\ 1)}}
+\DoxyCodeLine{00113\ \textcolor{comment}{\ \ (func\ (;8;)\ (type\ 2)}}
+\DoxyCodeLine{00114\ \textcolor{comment}{\ \ \ \ i32.const\ 42}}
+\DoxyCodeLine{00115\ \textcolor{comment}{\ \ \ \ f32.const\ 32}}
+\DoxyCodeLine{00116\ \textcolor{comment}{\ \ \ \ call\ 1)}}
+\DoxyCodeLine{00117\ \textcolor{comment}{\ \ (func\ (;9;)\ (type\ 2)}}
+\DoxyCodeLine{00118\ \textcolor{comment}{\ \ \ \ i32.const\ 0}}
+\DoxyCodeLine{00119\ \textcolor{comment}{\ \ \ \ i32.const\ 0}}
+\DoxyCodeLine{00120\ \textcolor{comment}{\ \ \ \ i32.const\ 0}}
+\DoxyCodeLine{00121\ \textcolor{comment}{\ \ \ \ call\ 0)}}
+\DoxyCodeLine{00122\ \textcolor{comment}{\ \ (func\ (;10;)\ (type\ 2)}}
+\DoxyCodeLine{00123\ \textcolor{comment}{\ \ \ \ f32.const\ 42.42}}
+\DoxyCodeLine{00124\ \textcolor{comment}{\ \ \ \ i32.const\ 8208}}
+\DoxyCodeLine{00125\ \textcolor{comment}{\ \ \ \ i32.const\ 8208}}
+\DoxyCodeLine{00126\ \textcolor{comment}{\ \ \ \ i32.const\ 7}}
+\DoxyCodeLine{00127\ \textcolor{comment}{\ \ \ \ i32.const\ 77}}
+\DoxyCodeLine{00128\ \textcolor{comment}{\ \ \ \ call\ 2)}}
+\DoxyCodeLine{00129\ \textcolor{comment}{\ \ (func\ (;11;)\ (type\ 2)}}
+\DoxyCodeLine{00130\ \textcolor{comment}{\ \ \ \ f32.const\ 42.42}}
+\DoxyCodeLine{00131\ \textcolor{comment}{\ \ \ \ i32.const\ 8232}}
+\DoxyCodeLine{00132\ \textcolor{comment}{\ \ \ \ i32.const\ 8232}}
+\DoxyCodeLine{00133\ \textcolor{comment}{\ \ \ \ i32.const\ 4}}
+\DoxyCodeLine{00134\ \textcolor{comment}{\ \ \ \ i32.const\ 77}}
+\DoxyCodeLine{00135\ \textcolor{comment}{\ \ \ \ call\ 2)}}
+\DoxyCodeLine{00136\ \textcolor{comment}{\ \ (func\ (;12;)\ (type\ 2)}}
+\DoxyCodeLine{00137\ \textcolor{comment}{\ \ \ \ call\ 3)}}
+\DoxyCodeLine{00138\ \textcolor{comment}{\ \ (func\ (;13;)\ (type\ 2)}}
+\DoxyCodeLine{00139\ \textcolor{comment}{\ \ \ \ f32.const\ 42.42}}
+\DoxyCodeLine{00140\ \textcolor{comment}{\ \ \ \ i32.const\ 8232}}
+\DoxyCodeLine{00141\ \textcolor{comment}{\ \ \ \ i32.const\ 8232}}
+\DoxyCodeLine{00142\ \textcolor{comment}{\ \ \ \ i32.const\ 4}}
+\DoxyCodeLine{00143\ \textcolor{comment}{\ \ \ \ i32.const\ 77}}
+\DoxyCodeLine{00144\ \textcolor{comment}{\ \ \ \ call\ 4)}}
+\DoxyCodeLine{00145\ \textcolor{comment}{\ \ (memory\ (;0;)\ 1)}}
+\DoxyCodeLine{00146\ \textcolor{comment}{\ \ (export\ "{}call\_test\_a"{}\ (func\ 5))}}
+\DoxyCodeLine{00147\ \textcolor{comment}{\ \ (export\ "{}call\_test\_b"{}\ (func\ 6))}}
+\DoxyCodeLine{00148\ \textcolor{comment}{\ \ (export\ "{}call\_test\_c"{}\ (func\ 7))}}
+\DoxyCodeLine{00149\ \textcolor{comment}{\ \ (export\ "{}call\_test\_d"{}\ (func\ 8))}}
+\DoxyCodeLine{00150\ \textcolor{comment}{\ \ (export\ "{}call\_test\_e"{}\ (func\ 9))}}
+\DoxyCodeLine{00151\ \textcolor{comment}{\ \ (export\ "{}call\_test\_f"{}\ (func\ 10))}}
+\DoxyCodeLine{00152\ \textcolor{comment}{\ \ (export\ "{}call\_test\_g"{}\ (func\ 11))}}
+\DoxyCodeLine{00153\ \textcolor{comment}{\ \ (export\ "{}call\_test\_h"{}\ (func\ 12))}}
+\DoxyCodeLine{00154\ \textcolor{comment}{\ \ (export\ "{}call\_test\_j"{}\ (func\ 13))}}
+\DoxyCodeLine{00155\ \textcolor{comment}{\ \ (data\ (i32.const\ 8208)\ "{}hellohello\(\backslash\)00"{})}}
+\DoxyCodeLine{00156\ \textcolor{comment}{\ \ (data\ (i32.const\ 8232)\ "{}\(\backslash\)ff\(\backslash\)ff\(\backslash\)ff\(\backslash\)ff"{}))}}
+\DoxyCodeLine{00157\ \textcolor{comment}{*/}}
+\DoxyCodeLine{00158\ \ \ \ \mbox{\hyperlink{namespacesysio_1_1vm_a6ffa5796148f0f779a3d44799c3f0cce}{wasm\_code}}\ test\_wasm\ =\ \{}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ 0x00,\ 0x61,\ 0x73,\ 0x6d,\ 0x01,\ 0x00,\ 0x00,\ 0x00,\ 0x01,\ 0x17,\ 0x04,\ 0x60,}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ 0x03,\ 0x7f,\ 0x7f,\ 0x7f,\ 0x00,\ 0x60,\ 0x02,\ 0x7f,\ 0x7d,\ 0x00,\ 0x60,\ 0x00,}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ 0x00,\ 0x60,\ 0x05,\ 0x7d,\ 0x7f,\ 0x7f,\ 0x7f,\ 0x7f,\ 0x00,\ 0x02,\ 0x5b,\ 0x05,}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ 0x03,\ 0x65,\ 0x6e,\ 0x76,\ 0x0b,\ 0x74,\ 0x65,\ 0x73,\ 0x74,\ 0x5f,\ 0x66,\ 0x75,}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ 0x6e,\ 0x63,\ 0x5f,\ 0x62,\ 0x00,\ 0x00,\ 0x03,\ 0x65,\ 0x6e,\ 0x76,\ 0x0b,\ 0x74,}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ 0x65,\ 0x73,\ 0x74,\ 0x5f,\ 0x66,\ 0x75,\ 0x6e,\ 0x63,\ 0x5f,\ 0x61,\ 0x00,\ 0x01,}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ 0x03,\ 0x65,\ 0x6e,\ 0x76,\ 0x0b,\ 0x74,\ 0x65,\ 0x73,\ 0x74,\ 0x5f,\ 0x66,\ 0x75,}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ 0x6e,\ 0x63,\ 0x5f,\ 0x63,\ 0x00,\ 0x03,\ 0x03,\ 0x65,\ 0x6e,\ 0x76,\ 0x0b,\ 0x74,}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ 0x65,\ 0x73,\ 0x74,\ 0x5f,\ 0x66,\ 0x75,\ 0x6e,\ 0x63,\ 0x5f,\ 0x64,\ 0x00,\ 0x02,}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ 0x03,\ 0x65,\ 0x6e,\ 0x76,\ 0x0b,\ 0x74,\ 0x65,\ 0x73,\ 0x74,\ 0x5f,\ 0x66,\ 0x75,}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ 0x6e,\ 0x63,\ 0x5f,\ 0x65,\ 0x00,\ 0x03,\ 0x03,\ 0x0a,\ 0x09,\ 0x02,\ 0x02,\ 0x02,}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ 0x02,\ 0x02,\ 0x02,\ 0x02,\ 0x02,\ 0x02,\ 0x05,\ 0x03,\ 0x01,\ 0x00,\ 0x01,\ 0x07,}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ 0x7f,\ 0x09,\ 0x0b,\ 0x63,\ 0x61,\ 0x6c,\ 0x6c,\ 0x5f,\ 0x74,\ 0x65,\ 0x73,\ 0x74,}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ 0x5f,\ 0x61,\ 0x00,\ 0x05,\ 0x0b,\ 0x63,\ 0x61,\ 0x6c,\ 0x6c,\ 0x5f,\ 0x74,\ 0x65,}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ 0x73,\ 0x74,\ 0x5f,\ 0x62,\ 0x00,\ 0x06,\ 0x0b,\ 0x63,\ 0x61,\ 0x6c,\ 0x6c,\ 0x5f,}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ 0x74,\ 0x65,\ 0x73,\ 0x74,\ 0x5f,\ 0x63,\ 0x00,\ 0x07,\ 0x0b,\ 0x63,\ 0x61,\ 0x6c,}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ 0x6c,\ 0x5f,\ 0x74,\ 0x65,\ 0x73,\ 0x74,\ 0x5f,\ 0x64,\ 0x00,\ 0x08,\ 0x0b,\ 0x63,}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ 0x61,\ 0x6c,\ 0x6c,\ 0x5f,\ 0x74,\ 0x65,\ 0x73,\ 0x74,\ 0x5f,\ 0x65,\ 0x00,\ 0x09,}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ 0x0b,\ 0x63,\ 0x61,\ 0x6c,\ 0x6c,\ 0x5f,\ 0x74,\ 0x65,\ 0x73,\ 0x74,\ 0x5f,\ 0x66,}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ 0x00,\ 0x0a,\ 0x0b,\ 0x63,\ 0x61,\ 0x6c,\ 0x6c,\ 0x5f,\ 0x74,\ 0x65,\ 0x73,\ 0x74,}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ 0x5f,\ 0x67,\ 0x00,\ 0x0b,\ 0x0b,\ 0x63,\ 0x61,\ 0x6c,\ 0x6c,\ 0x5f,\ 0x74,\ 0x65,}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ 0x73,\ 0x74,\ 0x5f,\ 0x68,\ 0x00,\ 0x0c,\ 0x0b,\ 0x63,\ 0x61,\ 0x6c,\ 0x6c,\ 0x5f,}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ 0x74,\ 0x65,\ 0x73,\ 0x74,\ 0x5f,\ 0x6a,\ 0x00,\ 0x0d,\ 0x0a,\ 0x8b,\ 0x01,\ 0x09,}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ 0x0b,\ 0x00,\ 0x41,\ 0x2a,\ 0x43,\ 0x14,\ 0xae,\ 0x29,\ 0x42,\ 0x10,\ 0x01,\ 0x0b,}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ 0x10,\ 0x00,\ 0x41,\ 0x90,\ 0xc0,\ 0x00,\ 0x41,\ 0xa8,\ 0xc0,\ 0x00,\ 0x41,\ 0xa8,}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ 0xc0,\ 0x00,\ 0x10,\ 0x00,\ 0x0b,\ 0x0b,\ 0x00,\ 0x41,\ 0x20,\ 0x43,\ 0x00,\ 0x00,}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ 0x28,\ 0x42,\ 0x10,\ 0x01,\ 0x0b,\ 0x0b,\ 0x00,\ 0x41,\ 0x2a,\ 0x43,\ 0x00,\ 0x00,}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ 0x00,\ 0x42,\ 0x10,\ 0x01,\ 0x0b,\ 0x0a,\ 0x00,\ 0x41,\ 0x00,\ 0x41,\ 0x00,\ 0x41,}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ 0x00,\ 0x10,\ 0x00,\ 0x0b,\ 0x16,\ 0x00,\ 0x43,\ 0x14,\ 0xae,\ 0x29,\ 0x42,\ 0x41,}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ 0x90,\ 0xc0,\ 0x00,\ 0x41,\ 0x90,\ 0xc0,\ 0x00,\ 0x41,\ 0x07,\ 0x41,\ 0xcd,\ 0x00,}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ 0x10,\ 0x02,\ 0x0b,\ 0x16,\ 0x00,\ 0x43,\ 0x14,\ 0xae,\ 0x29,\ 0x42,\ 0x41,\ 0xa8,}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ 0xc0,\ 0x00,\ 0x41,\ 0xa8,\ 0xc0,\ 0x00,\ 0x41,\ 0x04,\ 0x41,\ 0xcd,\ 0x00,\ 0x10,}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ 0x02,\ 0x0b,\ 0x04,\ 0x00,\ 0x10,\ 0x03,\ 0x0b,\ 0x16,\ 0x00,\ 0x43,\ 0x14,\ 0xae,}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ 0x29,\ 0x42,\ 0x41,\ 0xa8,\ 0xc0,\ 0x00,\ 0x41,\ 0xa8,\ 0xc0,\ 0x00,\ 0x41,\ 0x04,}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ 0x41,\ 0xcd,\ 0x00,\ 0x10,\ 0x04,\ 0x0b,\ 0x0b,\ 0x1e,\ 0x02,\ 0x00,\ 0x41,\ 0x90,}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ 0xc0,\ 0x00,\ 0x0b,\ 0x0b,\ 0x68,\ 0x65,\ 0x6c,\ 0x6c,\ 0x6f,\ 0x68,\ 0x65,\ 0x6c,}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ 0x6c,\ 0x6f,\ 0x00,\ 0x00,\ 0x41,\ 0xa8,\ 0xc0,\ 0x00,\ 0x0b,\ 0x04,\ 0xff,\ 0xff,}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ 0xff,\ 0xff}
+\DoxyCodeLine{00197\ \ \ \ \};}
+\DoxyCodeLine{00198\ }
+\DoxyCodeLine{00199\ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1registered__host__functions_a11ed5e893c0eb9af80290f9024485be2}{rhf\_t::add<\&test\_func\_a,\ int\_equals\_42,\ float\_equals\_42>}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}test\_func\_a"{}});}
+\DoxyCodeLine{00200\ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1registered__host__functions_a11ed5e893c0eb9af80290f9024485be2}{rhf\_t::add<\&test\_func\_b,\ str\_equals\_hello>}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}test\_func\_b"{}});}
+\DoxyCodeLine{00201\ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1registered__host__functions_a11ed5e893c0eb9af80290f9024485be2}{rhf\_t::add<\&test\_func\_c,\ float\_equals\_42,\ str\_equals\_hello,\ span\_and\_check>}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}test\_func\_c"{}});}
+\DoxyCodeLine{00202\ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1registered__host__functions_a11ed5e893c0eb9af80290f9024485be2}{rhf\_t::add<\&test\_func\_d,\ check2\_once>}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}test\_func\_d"{}});}
+\DoxyCodeLine{00203\ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1registered__host__functions_a11ed5e893c0eb9af80290f9024485be2}{rhf\_t::add<\&test\_func\_e,\ check2\_all>}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}test\_func\_e"{}});}
+\DoxyCodeLine{00204\ }
+\DoxyCodeLine{00205\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator}{wasm\_allocator}}\ \mbox{\hyperlink{allow__code__after__function__end__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}};}
+\DoxyCodeLine{00206\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ \mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}(test\_wasm,\ \&\mbox{\hyperlink{allow__code__after__function__end__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00207\ }
+\DoxyCodeLine{00208\ \ \ \ check\ \ =\ 0;}
+\DoxyCodeLine{00209\ \ \ \ check2\ =\ 0;}
+\DoxyCodeLine{00210\ \ \ \ \mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}call\_test\_a"{}});}
+\DoxyCodeLine{00211\ \ \ \ \mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}call\_test\_b"{}});}
+\DoxyCodeLine{00212\ \ \ \ \mbox{\hyperlink{preconditions__tests_8cpp_ac7f94d5b44850c40c973df65c005f77d}{CHECK\_MSG}}(\textcolor{stringliteral}{"{}arg\ !=\ 42"{}},\ \mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}call\_test\_c"{}}));}
+\DoxyCodeLine{00213\ \ \ \ \mbox{\hyperlink{preconditions__tests_8cpp_ac7f94d5b44850c40c973df65c005f77d}{CHECK\_MSG}}(\textcolor{stringliteral}{"{}arg\ !=\ 42.42f"{}},\ \mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}call\_test\_d"{}}));}
+\DoxyCodeLine{00214\ \ \ \ \mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}call\_test\_e"{}});}
+\DoxyCodeLine{00215\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(check\ ==\ 0);}
+\DoxyCodeLine{00216\ \ \ \ \mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}call\_test\_f"{}});}
+\DoxyCodeLine{00217\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(check\ ==\ 77);}
+\DoxyCodeLine{00218\ }
+\DoxyCodeLine{00219\ \ \ \ \textcolor{comment}{//\ reset\ check}}
+\DoxyCodeLine{00220\ \ \ \ check\ =\ 0;}
+\DoxyCodeLine{00221\ \ \ \ \mbox{\hyperlink{preconditions__tests_8cpp_ac7f94d5b44850c40c973df65c005f77d}{CHECK\_MSG}}(\textcolor{stringliteral}{"{}str\ !=\ hello"{}},\ \mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}call\_test\_g"{}}));}
+\DoxyCodeLine{00222\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(check\ ==\ 0);}
+\DoxyCodeLine{00223\ }
+\DoxyCodeLine{00224\ \ \ \ \mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}call\_test\_h"{}});}
+\DoxyCodeLine{00225\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(check2\ ==\ 1);}
+\DoxyCodeLine{00226\ \ \ \ \mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}call\_test\_h"{}});}
+\DoxyCodeLine{00227\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(check2\ ==\ 2);}
+\DoxyCodeLine{00228\ }
+\DoxyCodeLine{00229\ \ \ \ check2\ =\ 0;}
+\DoxyCodeLine{00230\ \ \ \ \mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}call\_test\_j"{}});}
+\DoxyCodeLine{00231\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(check2\ ==\ 4);}
+\DoxyCodeLine{00232\ \ \ \ \mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}call\_test\_j"{}});}
+\DoxyCodeLine{00233\ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(check2\ ==\ 8);}
+\DoxyCodeLine{00234\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{preconditions__tests_8cpp_ab6ebb1eb28c94cdff83d66d9ea24f935_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{preconditions__tests_8cpp_aac54f0a689bb06f389fe2fca8976534e}\index{preconditions\_tests.cpp@{preconditions\_tests.cpp}!check\_exception\_msg@{check\_exception\_msg}}
+\index{check\_exception\_msg@{check\_exception\_msg}!preconditions\_tests.cpp@{preconditions\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{check\_exception\_msg()}{check\_exception\_msg()}}
+{\footnotesize\ttfamily \label{preconditions__tests_8cpp_aac54f0a689bb06f389fe2fca8976534e} 
+template$<$typename Ex , typename F $>$ \\
+bool check\+\_\+exception\+\_\+msg (\begin{DoxyParamCaption}\item[{F \&\&}]{func}{, }\item[{const std\+::string \&}]{chck}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{preconditions__tests_8cpp_source_l00028}{28}} of file \mbox{\hyperlink{preconditions__tests_8cpp_source}{preconditions\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00029\ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2}{func}}();}
+\DoxyCodeLine{00031\ \ \ \ \}\ \textcolor{keywordflow}{catch}(\ Ex\ ex\ )\ \{}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ex.what()\ ==\ chck;}
+\DoxyCodeLine{00033\ \ \ \ \}}
+\DoxyCodeLine{00034\ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00035\ \}}
+
+\end{DoxyCode}
+\Hypertarget{preconditions__tests_8cpp_a8732baf842a41b96b4090aa0024bb159}\index{preconditions\_tests.cpp@{preconditions\_tests.cpp}!SYS\_VM\_PRECONDITION@{SYS\_VM\_PRECONDITION}}
+\index{SYS\_VM\_PRECONDITION@{SYS\_VM\_PRECONDITION}!preconditions\_tests.cpp@{preconditions\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_PRECONDITION()}{SYS\_VM\_PRECONDITION()}\hspace{0.1cm}{\footnotesize\ttfamily [1/6]}}
+{\footnotesize\ttfamily \label{preconditions__tests_8cpp_a8732baf842a41b96b4090aa0024bb159} 
+SYS\+\_\+\+VM\+\_\+\+PRECONDITION (\begin{DoxyParamCaption}\item[{check2\+\_\+all}]{}{, }\item[{\mbox{\hyperlink{sysio_2vm_2host__function_8hpp_a27c519adc3a74a176aba34c519f8d409}{SYS\+\_\+\+VM\+\_\+\+INVOKE\+\_\+\+ON\+\_\+\+ALL}}(\mbox{[}\&\mbox{]}(auto \&\&... args) \{ check2++;\})}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{preconditions__tests_8cpp_a9497f61d74b9bf37d8158d2605f44eab}\index{preconditions\_tests.cpp@{preconditions\_tests.cpp}!SYS\_VM\_PRECONDITION@{SYS\_VM\_PRECONDITION}}
+\index{SYS\_VM\_PRECONDITION@{SYS\_VM\_PRECONDITION}!preconditions\_tests.cpp@{preconditions\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_PRECONDITION()}{SYS\_VM\_PRECONDITION()}\hspace{0.1cm}{\footnotesize\ttfamily [2/6]}}
+{\footnotesize\ttfamily \label{preconditions__tests_8cpp_a9497f61d74b9bf37d8158d2605f44eab} 
+SYS\+\_\+\+VM\+\_\+\+PRECONDITION (\begin{DoxyParamCaption}\item[{check2\+\_\+once}]{}{, }\item[{\mbox{\hyperlink{sysio_2vm_2host__function_8hpp_a1ddb4f842ec1c70bcd410d65e586a1ad}{SYS\+\_\+\+VM\+\_\+\+INVOKE\+\_\+\+ONCE}}(\mbox{[}\&\mbox{]}(auto \&\&... args) \{ check2++;\})}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{preconditions__tests_8cpp_a70e71356c35e568784e97970c2e1299a}\index{preconditions\_tests.cpp@{preconditions\_tests.cpp}!SYS\_VM\_PRECONDITION@{SYS\_VM\_PRECONDITION}}
+\index{SYS\_VM\_PRECONDITION@{SYS\_VM\_PRECONDITION}!preconditions\_tests.cpp@{preconditions\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_PRECONDITION()}{SYS\_VM\_PRECONDITION()}\hspace{0.1cm}{\footnotesize\ttfamily [3/6]}}
+{\footnotesize\ttfamily \label{preconditions__tests_8cpp_a70e71356c35e568784e97970c2e1299a} 
+SYS\+\_\+\+VM\+\_\+\+PRECONDITION (\begin{DoxyParamCaption}\item[{float\+\_\+equals\+\_\+42}]{}{, }\item[{\mbox{\hyperlink{sysio_2vm_2host__function_8hpp_a576aca63e32e4cbf42537c5876c0d95b}{SYS\+\_\+\+VM\+\_\+\+INVOKE\+\_\+\+ON}}(float,\mbox{[}\&\mbox{]}(auto arg, auto \&\&... rest) \{ \mbox{\hyperlink{yubihsm__pkcs11_8c_a75d8898b07aafc20a48a415a1c6e7bf0}{if}}(arg !=42.\+42\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}) throw std\+::runtime\+\_\+error("{}arg != 42.\+42f"{});\})}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{preconditions__tests_8cpp_a8e3d55729143b277e93e57655851ea1a}\index{preconditions\_tests.cpp@{preconditions\_tests.cpp}!SYS\_VM\_PRECONDITION@{SYS\_VM\_PRECONDITION}}
+\index{SYS\_VM\_PRECONDITION@{SYS\_VM\_PRECONDITION}!preconditions\_tests.cpp@{preconditions\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_PRECONDITION()}{SYS\_VM\_PRECONDITION()}\hspace{0.1cm}{\footnotesize\ttfamily [4/6]}}
+{\footnotesize\ttfamily \label{preconditions__tests_8cpp_a8e3d55729143b277e93e57655851ea1a} 
+SYS\+\_\+\+VM\+\_\+\+PRECONDITION (\begin{DoxyParamCaption}\item[{int\+\_\+equals\+\_\+42}]{}{, }\item[{\mbox{\hyperlink{sysio_2vm_2host__function_8hpp_a576aca63e32e4cbf42537c5876c0d95b}{SYS\+\_\+\+VM\+\_\+\+INVOKE\+\_\+\+ON}}(int,\mbox{[}\&\mbox{]}(auto arg, auto \&\&... rest) \{ \mbox{\hyperlink{yubihsm__pkcs11_8c_a75d8898b07aafc20a48a415a1c6e7bf0}{if}}(arg !=42) throw std\+::runtime\+\_\+error("{}arg != 42"{});\})}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{preconditions__tests_8cpp_ab70cd104ada133067b00f6b946dc314e}\index{preconditions\_tests.cpp@{preconditions\_tests.cpp}!SYS\_VM\_PRECONDITION@{SYS\_VM\_PRECONDITION}}
+\index{SYS\_VM\_PRECONDITION@{SYS\_VM\_PRECONDITION}!preconditions\_tests.cpp@{preconditions\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_PRECONDITION()}{SYS\_VM\_PRECONDITION()}\hspace{0.1cm}{\footnotesize\ttfamily [5/6]}}
+{\footnotesize\ttfamily \label{preconditions__tests_8cpp_ab70cd104ada133067b00f6b946dc314e} 
+SYS\+\_\+\+VM\+\_\+\+PRECONDITION (\begin{DoxyParamCaption}\item[{span\+\_\+and\+\_\+check}]{}{, }\item[{\mbox{\hyperlink{sysio_2vm_2host__function_8hpp_a27c519adc3a74a176aba34c519f8d409}{SYS\+\_\+\+VM\+\_\+\+INVOKE\+\_\+\+ON\+\_\+\+ALL}}(\mbox{[}\&\mbox{]}(auto arg, auto \&\&... rest) \{ \mbox{\hyperlink{yubihsm__pkcs11_8c_a75d8898b07aafc20a48a415a1c6e7bf0}{if}} constexpr(is\+\_\+span\+\_\+type\+\_\+v$<$ decltype(arg)$>$) \{ \mbox{\hyperlink{yubihsm__pkcs11_8c_a75d8898b07aafc20a48a415a1c6e7bf0}{if}}(memcmp(arg.\+data(), "{}hellohe"{}, arg.\+size\+\_\+bytes()) !=0) throw std\+::runtime\+\_\+error("{}span$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$ != hellohe"{});\} \})}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{preconditions__tests_8cpp_aad05d5f204d8ae3520760f4941c619f4}\index{preconditions\_tests.cpp@{preconditions\_tests.cpp}!SYS\_VM\_PRECONDITION@{SYS\_VM\_PRECONDITION}}
+\index{SYS\_VM\_PRECONDITION@{SYS\_VM\_PRECONDITION}!preconditions\_tests.cpp@{preconditions\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_PRECONDITION()}{SYS\_VM\_PRECONDITION()}\hspace{0.1cm}{\footnotesize\ttfamily [6/6]}}
+{\footnotesize\ttfamily \label{preconditions__tests_8cpp_aad05d5f204d8ae3520760f4941c619f4} 
+SYS\+\_\+\+VM\+\_\+\+PRECONDITION (\begin{DoxyParamCaption}\item[{str\+\_\+equals\+\_\+hello}]{}{, }\item[{\mbox{\hyperlink{sysio_2vm_2host__function_8hpp_a576aca63e32e4cbf42537c5876c0d95b}{SYS\+\_\+\+VM\+\_\+\+INVOKE\+\_\+\+ON}}(const char \texorpdfstring{$\ast$}{*},\mbox{[}\&\mbox{]}(auto arg, auto \&\&... rest) \{ \mbox{\hyperlink{yubihsm__pkcs11_8c_a75d8898b07aafc20a48a415a1c6e7bf0}{if}}(memcmp(arg, "{}hello"{}, 5) !=0) throw std\+::runtime\+\_\+error("{}str != hello"{});\})}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{preconditions__tests_8cpp_a0b1ceaff9df8cc7afc3849bbe3b78bad}\index{preconditions\_tests.cpp@{preconditions\_tests.cpp}!test\_func\_a@{test\_func\_a}}
+\index{test\_func\_a@{test\_func\_a}!preconditions\_tests.cpp@{preconditions\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{test\_func\_a()}{test\_func\_a()}}
+{\footnotesize\ttfamily \label{preconditions__tests_8cpp_a0b1ceaff9df8cc7afc3849bbe3b78bad} 
+void test\+\_\+func\+\_\+a (\begin{DoxyParamCaption}\item[{int}]{a}{, }\item[{float}]{b}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{preconditions__tests_8cpp_source_l00014}{14}} of file \mbox{\hyperlink{preconditions__tests_8cpp_source}{preconditions\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00014\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00015\ \}}
+
+\end{DoxyCode}
+\Hypertarget{preconditions__tests_8cpp_a980b15843c458b641ccf0e5df8562f0d}\index{preconditions\_tests.cpp@{preconditions\_tests.cpp}!test\_func\_b@{test\_func\_b}}
+\index{test\_func\_b@{test\_func\_b}!preconditions\_tests.cpp@{preconditions\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{test\_func\_b()}{test\_func\_b()}}
+{\footnotesize\ttfamily \label{preconditions__tests_8cpp_a980b15843c458b641ccf0e5df8562f0d} 
+void test\+\_\+func\+\_\+b (\begin{DoxyParamCaption}\item[{char \texorpdfstring{$\ast$}{*}}]{a}{, }\item[{float \texorpdfstring{$\ast$}{*}}]{b}{, }\item[{int \&}]{c}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{preconditions__tests_8cpp_source_l00016}{16}} of file \mbox{\hyperlink{preconditions__tests_8cpp_source}{preconditions\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00017\ \}}
+
+\end{DoxyCode}
+\Hypertarget{preconditions__tests_8cpp_ae8b5bf3b0187cc638a1f14ed38a33951}\index{preconditions\_tests.cpp@{preconditions\_tests.cpp}!test\_func\_c@{test\_func\_c}}
+\index{test\_func\_c@{test\_func\_c}!preconditions\_tests.cpp@{preconditions\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{test\_func\_c()}{test\_func\_c()}}
+{\footnotesize\ttfamily \label{preconditions__tests_8cpp_ae8b5bf3b0187cc638a1f14ed38a33951} 
+void test\+\_\+func\+\_\+c (\begin{DoxyParamCaption}\item[{float}]{a}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{b}{, }\item[{\mbox{\hyperlink{classsysio_1_1vm_1_1span}{span}}$<$ const char $>$}]{c}{, }\item[{int}]{d}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{preconditions__tests_8cpp_source_l00018}{18}} of file \mbox{\hyperlink{preconditions__tests_8cpp_source}{preconditions\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00019\ \ \ \ check\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}};}
+\DoxyCodeLine{00020\ \}}
+
+\end{DoxyCode}
+\Hypertarget{preconditions__tests_8cpp_a133131dba89ff2fb086beb5ed5f40783}\index{preconditions\_tests.cpp@{preconditions\_tests.cpp}!test\_func\_d@{test\_func\_d}}
+\index{test\_func\_d@{test\_func\_d}!preconditions\_tests.cpp@{preconditions\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{test\_func\_d()}{test\_func\_d()}}
+{\footnotesize\ttfamily \label{preconditions__tests_8cpp_a133131dba89ff2fb086beb5ed5f40783} 
+void test\+\_\+func\+\_\+d (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{preconditions__tests_8cpp_source_l00021}{21}} of file \mbox{\hyperlink{preconditions__tests_8cpp_source}{preconditions\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00022\ \}}
+
+\end{DoxyCode}
+\Hypertarget{preconditions__tests_8cpp_a475029760796e6c17bd255887478f905}\index{preconditions\_tests.cpp@{preconditions\_tests.cpp}!test\_func\_e@{test\_func\_e}}
+\index{test\_func\_e@{test\_func\_e}!preconditions\_tests.cpp@{preconditions\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{test\_func\_e()}{test\_func\_e()}}
+{\footnotesize\ttfamily \label{preconditions__tests_8cpp_a475029760796e6c17bd255887478f905} 
+void test\+\_\+func\+\_\+e (\begin{DoxyParamCaption}\item[{float}]{a}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{b}{, }\item[{\mbox{\hyperlink{classsysio_1_1vm_1_1span}{span}}$<$ const char $>$}]{c}{, }\item[{int}]{d}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{preconditions__tests_8cpp_source_l00023}{23}} of file \mbox{\hyperlink{preconditions__tests_8cpp_source}{preconditions\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00024\ \ \ \ check\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}};}
+\DoxyCodeLine{00025\ \}}
+
+\end{DoxyCode}

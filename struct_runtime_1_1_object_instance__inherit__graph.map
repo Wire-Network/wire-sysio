@@ -1,0 +1,15 @@
+<map id="Runtime::ObjectInstance" name="Runtime::ObjectInstance">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,104,172,130"/>
+<area shape="rect" id="Node000002" href="$struct_runtime_1_1_g_c_object.html" title=" " alt="" coords="220,104,356,130"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="187,114,219,114,219,120,187,120"/>
+<area shape="rect" id="Node000003" href="$struct_runtime_1_1_function_instance.html" title=" " alt="" coords="404,5,582,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="317,92,356,65,403,40,432,29,434,34,405,45,359,70,320,97"/>
+<area shape="rect" id="Node000004" href="$struct_runtime_1_1_global_instance.html" title=" " alt="" coords="410,55,576,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="359,97,436,78,437,84,360,102"/>
+<area shape="rect" id="Node000005" href="$struct_runtime_1_1_memory_instance.html" title=" " alt="" coords="406,104,581,130"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="372,114,405,114,405,120,372,120"/>
+<area shape="rect" id="Node000006" href="$struct_runtime_1_1_module_instance.html" title=" " alt="" coords="408,153,578,179"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="360,131,437,150,436,155,359,137"/>
+<area shape="rect" id="Node000007" href="$struct_runtime_1_1_table_instance.html" title=" " alt="" coords="414,203,573,228"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="320,137,359,164,405,189,434,200,432,205,403,194,356,169,317,141"/>
+</map>

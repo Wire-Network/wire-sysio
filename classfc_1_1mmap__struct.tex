@@ -1,0 +1,200 @@
+\doxysection{fc\+::mmap\+\_\+struct\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classfc_1_1mmap__struct}{}\label{classfc_1_1mmap__struct}\index{fc::mmap\_struct$<$ T $>$@{fc::mmap\_struct$<$ T $>$}}
+
+
+\doxylink{struct_a}{A} struct that has been mapped from a file.  
+
+
+
+
+{\ttfamily \#include $<$mmap\+\_\+struct.\+hpp$>$}
+
+
+
+Inheritance diagram for fc\+::mmap\+\_\+struct\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=223pt]{classfc_1_1mmap__struct__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for fc\+::mmap\+\_\+struct\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=223pt]{classfc_1_1mmap__struct__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1mmap__struct_a8a55339057f8e690da03c4872aef0e6e}{mmap\+\_\+struct}} ()
+\item 
+void \mbox{\hyperlink{classfc_1_1mmap__struct_acce9015a433bd1366d2eba95c4e53ab2}{open}} (const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&file, bool create=false)
+\item 
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classfc_1_1mmap__struct_a7d741878a72bea64ed9f57161dd43998}{operator-\/$>$}} ()
+\item 
+const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classfc_1_1mmap__struct_afe0006e61f96834590116a27c22627ef}{operator-\/$>$}} () const
+\item 
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classfc_1_1mmap__struct_acf78724ad1c41b726f452effc0383481}{operator\texorpdfstring{$\ast$}{*}}} ()
+\item 
+const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classfc_1_1mmap__struct_ad2c663d4174f7d04bde85d5e509ec3ab}{operator\texorpdfstring{$\ast$}{*}}} () const
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classfc_1_1detail_1_1mmap__struct__base}{fc\+::detail\+::mmap\+\_\+struct\+\_\+base}}}
+\begin{DoxyCompactItemize}
+\item 
+size\+\_\+t \mbox{\hyperlink{classfc_1_1detail_1_1mmap__struct__base_a21fe0dadcd678e4ed9fc839265cab733}{size}} () const
+\item 
+void \mbox{\hyperlink{classfc_1_1detail_1_1mmap__struct__base_a3711d51c2211d55864a8c8b83e2bf811}{flush}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Protected Member Functions inherited from \mbox{\hyperlink{classfc_1_1detail_1_1mmap__struct__base}{fc\+::detail\+::mmap\+\_\+struct\+\_\+base}}}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{classfc_1_1detail_1_1mmap__struct__base_a0328d6168aaa14fa81db688b623def57}{open}} (const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&file, size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, bool create)
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Attributes inherited from \mbox{\hyperlink{classfc_1_1detail_1_1mmap__struct__base}{fc\+::detail\+::mmap\+\_\+struct\+\_\+base}}}
+\begin{DoxyCompactItemize}
+\item 
+std\+::unique\+\_\+ptr$<$ \mbox{\hyperlink{classfc_1_1file__mapping}{fc\+::file\+\_\+mapping}} $>$ \mbox{\hyperlink{classfc_1_1detail_1_1mmap__struct__base_ae2fbc74484eb156d0ce6ec7c6c2aa90d}{\+\_\+file\+\_\+mapping}}
+\item 
+std\+::unique\+\_\+ptr$<$ \mbox{\hyperlink{classfc_1_1mapped__region}{fc\+::mapped\+\_\+region}} $>$ \mbox{\hyperlink{classfc_1_1detail_1_1mmap__struct__base_abbe030f02ae317c8044b14dbd3e9a001}{\+\_\+mapped\+\_\+region}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$\newline
+class fc\+::mmap\+\_\+struct$<$ T $>$}
+\begin{DoxyNote}{Note}
+T must be POD 
+\end{DoxyNote}
+
+
+Definition at line \mbox{\hyperlink{mmap__struct_8hpp_source_l00033}{33}} of file \mbox{\hyperlink{mmap__struct_8hpp_source}{mmap\+\_\+struct.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1mmap__struct_a8a55339057f8e690da03c4872aef0e6e}\index{fc::mmap\_struct$<$ T $>$@{fc::mmap\_struct$<$ T $>$}!mmap\_struct@{mmap\_struct}}
+\index{mmap\_struct@{mmap\_struct}!fc::mmap\_struct$<$ T $>$@{fc::mmap\_struct$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{mmap\_struct()}{mmap\_struct()}}
+{\footnotesize\ttfamily \label{classfc_1_1mmap__struct_a8a55339057f8e690da03c4872aef0e6e} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{classfc_1_1mmap__struct}{fc\+::mmap\+\_\+struct}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::mmap\+\_\+struct (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{mmap__struct_8hpp_source_l00036}{36}} of file \mbox{\hyperlink{mmap__struct_8hpp_source}{mmap\+\_\+struct.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00036\ :\_mapped\_struct(\textcolor{keyword}{nullptr})\{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1mmap__struct_acce9015a433bd1366d2eba95c4e53ab2}\index{fc::mmap\_struct$<$ T $>$@{fc::mmap\_struct$<$ T $>$}!open@{open}}
+\index{open@{open}!fc::mmap\_struct$<$ T $>$@{fc::mmap\_struct$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{open()}{open()}}
+{\footnotesize\ttfamily \label{classfc_1_1mmap__struct_acce9015a433bd1366d2eba95c4e53ab2} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+void \mbox{\hyperlink{classfc_1_1mmap__struct}{fc\+::mmap\+\_\+struct}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::open (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&}]{file}{, }\item[{bool}]{create}{ = {\ttfamily false}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Create the file if it does not exist or is of the wrong size if create is true, then maps the file to memory.
+
+
+\begin{DoxyExceptions}{Exceptions}
+{\em an} & exception if the file does not exist or is the wrong size and create is false \\
+\hline
+\end{DoxyExceptions}
+
+
+Definition at line \mbox{\hyperlink{mmap__struct_8hpp_source_l00043}{43}} of file \mbox{\hyperlink{mmap__struct_8hpp_source}{mmap\+\_\+struct.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1mmap__struct__base_a0328d6168aaa14fa81db688b623def57}{detail::mmap\_struct\_base::open}}(\ file,\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}),\ create\ );\ }
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \ \ \ \_mapped\_struct\ =\ (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*)\mbox{\hyperlink{classfc_1_1detail_1_1mmap__struct__base_abbe030f02ae317c8044b14dbd3e9a001}{\_mapped\_region}}-\/>get\_address();}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1mmap__struct_acce9015a433bd1366d2eba95c4e53ab2_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1mmap__struct_acf78724ad1c41b726f452effc0383481}\index{fc::mmap\_struct$<$ T $>$@{fc::mmap\_struct$<$ T $>$}!operator\texorpdfstring{$\ast$}{*}@{operator\texorpdfstring{$\ast$}{*}}}
+\index{operator\texorpdfstring{$\ast$}{*}@{operator\texorpdfstring{$\ast$}{*}}!fc::mmap\_struct$<$ T $>$@{fc::mmap\_struct$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{operator\texorpdfstring{$\ast$}{*}()}{operator*()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1mmap__struct_acf78724ad1c41b726f452effc0383481} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classfc_1_1mmap__struct}{fc\+::mmap\+\_\+struct}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::operator\texorpdfstring{$\ast$}{*} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{mmap__struct_8hpp_source_l00052}{52}} of file \mbox{\hyperlink{mmap__struct_8hpp_source}{mmap\+\_\+struct.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00052\ \{\ \textcolor{keywordflow}{return}\ *\_mapped\_struct;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1mmap__struct_ad2c663d4174f7d04bde85d5e509ec3ab}\index{fc::mmap\_struct$<$ T $>$@{fc::mmap\_struct$<$ T $>$}!operator\texorpdfstring{$\ast$}{*}@{operator\texorpdfstring{$\ast$}{*}}}
+\index{operator\texorpdfstring{$\ast$}{*}@{operator\texorpdfstring{$\ast$}{*}}!fc::mmap\_struct$<$ T $>$@{fc::mmap\_struct$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{operator\texorpdfstring{$\ast$}{*}()}{operator*()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1mmap__struct_ad2c663d4174f7d04bde85d5e509ec3ab} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classfc_1_1mmap__struct}{fc\+::mmap\+\_\+struct}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::operator\texorpdfstring{$\ast$}{*} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{mmap__struct_8hpp_source_l00053}{53}} of file \mbox{\hyperlink{mmap__struct_8hpp_source}{mmap\+\_\+struct.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00053\ \{\ \textcolor{keywordflow}{return}\ *\_mapped\_struct;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1mmap__struct_a7d741878a72bea64ed9f57161dd43998}\index{fc::mmap\_struct$<$ T $>$@{fc::mmap\_struct$<$ T $>$}!operator-\/$>$@{operator-\/$>$}}
+\index{operator-\/$>$@{operator-\/$>$}!fc::mmap\_struct$<$ T $>$@{fc::mmap\_struct$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{operator-\/$>$()}{operator->()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1mmap__struct_a7d741878a72bea64ed9f57161dd43998} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classfc_1_1mmap__struct}{fc\+::mmap\+\_\+struct}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::operator-\/$>$ (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{mmap__struct_8hpp_source_l00049}{49}} of file \mbox{\hyperlink{mmap__struct_8hpp_source}{mmap\+\_\+struct.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00049\ \{\ \textcolor{keywordflow}{return}\ \_mapped\_struct;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1mmap__struct_afe0006e61f96834590116a27c22627ef}\index{fc::mmap\_struct$<$ T $>$@{fc::mmap\_struct$<$ T $>$}!operator-\/$>$@{operator-\/$>$}}
+\index{operator-\/$>$@{operator-\/$>$}!fc::mmap\_struct$<$ T $>$@{fc::mmap\_struct$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{operator-\/$>$()}{operator->()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1mmap__struct_afe0006e61f96834590116a27c22627ef} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classfc_1_1mmap__struct}{fc\+::mmap\+\_\+struct}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::operator-\/$>$ (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{mmap__struct_8hpp_source_l00050}{50}} of file \mbox{\hyperlink{mmap__struct_8hpp_source}{mmap\+\_\+struct.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00050\ \{\ \textcolor{keywordflow}{return}\ \_mapped\_struct;\ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/interprocess/\mbox{\hyperlink{mmap__struct_8hpp}{mmap\+\_\+struct.\+hpp}}\end{DoxyCompactItemize}

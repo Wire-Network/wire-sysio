@@ -1,0 +1,80 @@
+\doxysection{libraries/sys-\/vm/tests/backend\+\_\+tests.cpp File Reference}
+\hypertarget{backend__tests_8cpp}{}\label{backend__tests_8cpp}\index{libraries/sys-\/vm/tests/backend\_tests.cpp@{libraries/sys-\/vm/tests/backend\_tests.cpp}}
+{\ttfamily \#include $<$sysio/vm/backend.\+hpp$>$}\newline
+{\ttfamily \#include $<$catch2/catch.\+hpp$>$}\newline
+{\ttfamily \#include "{}utils.\+hpp"{}}\newline
+Include dependency graph for backend\+\_\+tests.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{backend__tests_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{backend__tests_8cpp_ac2ce5606ac6b225cbe7cb3e36062c100}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Tests that the arguments of top level calls are validated"{}, "{}\mbox{[}call\+\_\+typecheck\mbox{]}"{})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+wasm\+\_\+allocator \mbox{\hyperlink{backend__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{backend__tests_8cpp_ac2ce5606ac6b225cbe7cb3e36062c100}\index{backend\_tests.cpp@{backend\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!backend\_tests.cpp@{backend\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}}
+{\footnotesize\ttfamily \label{backend__tests_8cpp_ac2ce5606ac6b225cbe7cb3e36062c100} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Tests that the arguments of top level calls are validated"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}call\+\_\+typecheck\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{backend__tests_8cpp_source_l00009}{9}} of file \mbox{\hyperlink{backend__tests_8cpp_source}{backend\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00010\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00011\ \ \ \ \textcolor{comment}{/*}}
+\DoxyCodeLine{00012\ \textcolor{comment}{\ \ \ \ *\ (module}}
+\DoxyCodeLine{00013\ \textcolor{comment}{\ \ \ \ *\ \ (func\ (export\ "{}f0"{}))}}
+\DoxyCodeLine{00014\ \textcolor{comment}{\ \ \ \ *\ \ (func\ (export\ "{}f1"{})\ (param\ i32))}}
+\DoxyCodeLine{00015\ \textcolor{comment}{\ \ \ \ *\ )}}
+\DoxyCodeLine{00016\ \textcolor{comment}{\ \ \ \ */}}
+\DoxyCodeLine{00017\ \ \ \ std::vector<uint8\_t>\ code\ =\ \{\ 0x00,\ 0x61,\ 0x73,\ 0x6d,\ 0x01,\ 0x00,\ 0x00,\ 0x00,\ 0x01,\ 0x08,\ 0x02,\ 0x60,}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x00,\ 0x00,\ 0x60,\ 0x01,\ 0x7f,\ 0x00,\ 0x03,\ 0x03,\ 0x02,\ 0x00,\ 0x01,\ 0x07,}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x0b,\ 0x02,\ 0x02,\ 0x66,\ 0x30,\ 0x00,\ 0x00,\ 0x02,\ 0x66,\ 0x31,\ 0x00,\ 0x01,}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x0a,\ 0x07,\ 0x02,\ 0x02,\ 0x00,\ 0x0b,\ 0x02,\ 0x00,\ 0x0b}
+\DoxyCodeLine{00021\ \ \ \ \};}
+\DoxyCodeLine{00022\ }
+\DoxyCodeLine{00023\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType>}};}
+\DoxyCodeLine{00024\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ \mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}(code,\ \&\mbox{\hyperlink{backend__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_a63fc40356b116cdac6cd50788b25eab1}{call}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}f0"{}},\ 0),\ std::exception);\ \textcolor{comment}{//\ too\ many\ arguments}}
+\DoxyCodeLine{00027\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_a63fc40356b116cdac6cd50788b25eab1}{call}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}f1"{}}),\ std::exception);\ \textcolor{comment}{//\ too\ few\ arguments}}
+\DoxyCodeLine{00028\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_a63fc40356b116cdac6cd50788b25eab1}{call}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}f1"{}},\ \mbox{\hyperlink{stdint_8h_a8da5373e041921aa34c2b6172ac3babc}{UINT64\_C}}(0)),\ std::exception);\ \textcolor{comment}{//\ wrong\ type\ of\ argument}}
+\DoxyCodeLine{00029\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_a63fc40356b116cdac6cd50788b25eab1}{call}}(\textcolor{stringliteral}{"{}env"{}},\ \textcolor{stringliteral}{"{}f1"{}},\ \mbox{\hyperlink{stdint_8h_a189f825ef34a1be844d384db2618ce12}{UINT32\_C}}(0),\ \mbox{\hyperlink{stdint_8h_a189f825ef34a1be844d384db2618ce12}{UINT32\_C}}(0)),\ std::exception);\ \textcolor{comment}{//\ too\ many\ arguments}}
+\DoxyCodeLine{00030\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=347pt]{backend__tests_8cpp_ac2ce5606ac6b225cbe7cb3e36062c100_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{backend__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}\index{backend\_tests.cpp@{backend\_tests.cpp}!wa@{wa}}
+\index{wa@{wa}!backend\_tests.cpp@{backend\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{wa}{wa}}
+{\footnotesize\ttfamily \label{backend__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89} 
+wasm\+\_\+allocator wa\hspace{0.3cm}{\ttfamily [extern]}}
+
+
+
+Definition at line \mbox{\hyperlink{libraries_2sys-vm_2tests_2main_8cpp_source_l00010}{10}} of file \mbox{\hyperlink{libraries_2sys-vm_2tests_2main_8cpp_source}{main.\+cpp}}.
+

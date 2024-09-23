@@ -1,0 +1,145 @@
+\doxysection{libff\+::edwards\+\_\+ate\+\_\+\+G1\+\_\+precomp Struct Reference}
+\hypertarget{structlibff_1_1edwards__ate___g1__precomp}{}\label{structlibff_1_1edwards__ate___g1__precomp}\index{libff::edwards\_ate\_G1\_precomp@{libff::edwards\_ate\_G1\_precomp}}
+
+
+{\ttfamily \#include $<$edwards\+\_\+pairing.\+hpp$>$}
+
+
+
+Collaboration diagram for libff\+::edwards\+\_\+ate\+\_\+\+G1\+\_\+precomp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=239pt]{structlibff_1_1edwards__ate___g1__precomp__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{structlibff_1_1edwards__ate___g1__precomp_ad1c5a4f4f2e9f4068a0b115b677bfe11}{operator==}} (const \mbox{\hyperlink{structlibff_1_1edwards__ate___g1__precomp}{edwards\+\_\+ate\+\_\+\+G1\+\_\+precomp}} \&other) const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacelibff_a2653629483aeb0df51eec08cb6635343}{edwards\+\_\+\+Fq}} \mbox{\hyperlink{structlibff_1_1edwards__ate___g1__precomp_af9e2b92b70313cdbeca4d10c1c8d1789}{P\+\_\+\+XY}}
+\item 
+\mbox{\hyperlink{namespacelibff_a2653629483aeb0df51eec08cb6635343}{edwards\+\_\+\+Fq}} \mbox{\hyperlink{structlibff_1_1edwards__ate___g1__precomp_ab528ee1579ec0e0b277f1e1036e107ee}{P\+\_\+\+XZ}}
+\item 
+\mbox{\hyperlink{namespacelibff_a2653629483aeb0df51eec08cb6635343}{edwards\+\_\+\+Fq}} \mbox{\hyperlink{structlibff_1_1edwards__ate___g1__precomp_abda23d6cd189ce3c91044932a79e229e}{P\+\_\+\+ZZplus\+YZ}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+std\+::ostream \& \mbox{\hyperlink{structlibff_1_1edwards__ate___g1__precomp_ab21f4d594d857f87ba5975af2c08ffaf}{operator$<$$<$}} (std\+::ostream \&out, const \mbox{\hyperlink{structlibff_1_1edwards__ate___g1__precomp}{edwards\+\_\+ate\+\_\+\+G1\+\_\+precomp}} \&prec\+\_\+P)
+\item 
+std\+::istream \& \mbox{\hyperlink{structlibff_1_1edwards__ate___g1__precomp_a40cb8f9d0fcad89286de0a1a43713822}{operator$>$$>$}} (std\+::istream \&in, \mbox{\hyperlink{structlibff_1_1edwards__ate___g1__precomp}{edwards\+\_\+ate\+\_\+\+G1\+\_\+precomp}} \&prec\+\_\+P)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{edwards__pairing_8hpp_source_l00075}{75}} of file \mbox{\hyperlink{edwards__pairing_8hpp_source}{edwards\+\_\+pairing.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structlibff_1_1edwards__ate___g1__precomp_ad1c5a4f4f2e9f4068a0b115b677bfe11}\index{libff::edwards\_ate\_G1\_precomp@{libff::edwards\_ate\_G1\_precomp}!operator==@{operator==}}
+\index{operator==@{operator==}!libff::edwards\_ate\_G1\_precomp@{libff::edwards\_ate\_G1\_precomp}}
+\doxysubsubsection{\texorpdfstring{operator==()}{operator==()}}
+{\footnotesize\ttfamily \label{structlibff_1_1edwards__ate___g1__precomp_ad1c5a4f4f2e9f4068a0b115b677bfe11} 
+bool libff\+::edwards\+\_\+ate\+\_\+\+G1\+\_\+precomp\+::operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structlibff_1_1edwards__ate___g1__precomp}{edwards\+\_\+ate\+\_\+\+G1\+\_\+precomp}} \&}]{other}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__pairing_8cpp_source_l00149}{149}} of file \mbox{\hyperlink{edwards__pairing_8cpp_source}{edwards\+\_\+pairing.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00150\ \{}
+\DoxyCodeLine{00151\ \ \ \ \ \textcolor{keywordflow}{return}\ (this-\/>\mbox{\hyperlink{structlibff_1_1edwards__ate___g1__precomp_af9e2b92b70313cdbeca4d10c1c8d1789}{P\_XY}}\ ==\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.P\_XY\ \&\&}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \ \ \ \ this-\/>P\_XZ\ ==\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.P\_XZ\ \&\&}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \ \ \ \ this-\/>P\_ZZplusYZ\ ==\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.P\_ZZplusYZ);}
+\DoxyCodeLine{00154\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{structlibff_1_1edwards__ate___g1__precomp_ab21f4d594d857f87ba5975af2c08ffaf}\index{libff::edwards\_ate\_G1\_precomp@{libff::edwards\_ate\_G1\_precomp}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!libff::edwards\_ate\_G1\_precomp@{libff::edwards\_ate\_G1\_precomp}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$}{operator<<}}
+{\footnotesize\ttfamily \label{structlibff_1_1edwards__ate___g1__precomp_ab21f4d594d857f87ba5975af2c08ffaf} 
+std\+::ostream \& operator$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{out}{, }\item[{const \mbox{\hyperlink{structlibff_1_1edwards__ate___g1__precomp}{edwards\+\_\+ate\+\_\+\+G1\+\_\+precomp}} \&}]{prec\+\_\+P}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__pairing_8cpp_source_l00156}{156}} of file \mbox{\hyperlink{edwards__pairing_8cpp_source}{edwards\+\_\+pairing.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00157\ \{}
+\DoxyCodeLine{00158\ \ \ \ \ out\ <<\ prec\_P.P\_XY\ <<\ \mbox{\hyperlink{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_ad80cfbe7456c7d029544e8bc2cec16c8}{OUTPUT\_SEPARATOR}}\ <<\ prec\_P.P\_XZ\ <<\ \mbox{\hyperlink{fc_2libraries_2ff_2libff_2common_2serialization_8hpp_ad80cfbe7456c7d029544e8bc2cec16c8}{OUTPUT\_SEPARATOR}}\ <<\ prec\_P.P\_ZZplusYZ;}
+\DoxyCodeLine{00159\ }
+\DoxyCodeLine{00160\ \ \ \ \ \textcolor{keywordflow}{return}\ out;}
+\DoxyCodeLine{00161\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structlibff_1_1edwards__ate___g1__precomp_a40cb8f9d0fcad89286de0a1a43713822}\index{libff::edwards\_ate\_G1\_precomp@{libff::edwards\_ate\_G1\_precomp}!operator$>$$>$@{operator$>$$>$}}
+\index{operator$>$$>$@{operator$>$$>$}!libff::edwards\_ate\_G1\_precomp@{libff::edwards\_ate\_G1\_precomp}}
+\doxysubsubsection{\texorpdfstring{operator$>$$>$}{operator>>}}
+{\footnotesize\ttfamily \label{structlibff_1_1edwards__ate___g1__precomp_a40cb8f9d0fcad89286de0a1a43713822} 
+std\+::istream \& operator$>$$>$ (\begin{DoxyParamCaption}\item[{std\+::istream \&}]{in}{, }\item[{\mbox{\hyperlink{structlibff_1_1edwards__ate___g1__precomp}{edwards\+\_\+ate\+\_\+\+G1\+\_\+precomp}} \&}]{prec\+\_\+P}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__pairing_8cpp_source_l00163}{163}} of file \mbox{\hyperlink{edwards__pairing_8cpp_source}{edwards\+\_\+pairing.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00164\ \{}
+\DoxyCodeLine{00165\ \ \ \ \ in\ >>\ prec\_P.P\_XY\ >>\ prec\_P.P\_XZ\ >>\ prec\_P.P\_ZZplusYZ;}
+\DoxyCodeLine{00166\ }
+\DoxyCodeLine{00167\ \ \ \ \ \textcolor{keywordflow}{return}\ in;}
+\DoxyCodeLine{00168\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structlibff_1_1edwards__ate___g1__precomp_af9e2b92b70313cdbeca4d10c1c8d1789}\index{libff::edwards\_ate\_G1\_precomp@{libff::edwards\_ate\_G1\_precomp}!P\_XY@{P\_XY}}
+\index{P\_XY@{P\_XY}!libff::edwards\_ate\_G1\_precomp@{libff::edwards\_ate\_G1\_precomp}}
+\doxysubsubsection{\texorpdfstring{P\_XY}{P\_XY}}
+{\footnotesize\ttfamily \label{structlibff_1_1edwards__ate___g1__precomp_af9e2b92b70313cdbeca4d10c1c8d1789} 
+\mbox{\hyperlink{namespacelibff_a2653629483aeb0df51eec08cb6635343}{edwards\+\_\+\+Fq}} libff\+::edwards\+\_\+ate\+\_\+\+G1\+\_\+precomp\+::\+P\+\_\+\+XY}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__pairing_8hpp_source_l00076}{76}} of file \mbox{\hyperlink{edwards__pairing_8hpp_source}{edwards\+\_\+pairing.\+hpp}}.
+
+\Hypertarget{structlibff_1_1edwards__ate___g1__precomp_ab528ee1579ec0e0b277f1e1036e107ee}\index{libff::edwards\_ate\_G1\_precomp@{libff::edwards\_ate\_G1\_precomp}!P\_XZ@{P\_XZ}}
+\index{P\_XZ@{P\_XZ}!libff::edwards\_ate\_G1\_precomp@{libff::edwards\_ate\_G1\_precomp}}
+\doxysubsubsection{\texorpdfstring{P\_XZ}{P\_XZ}}
+{\footnotesize\ttfamily \label{structlibff_1_1edwards__ate___g1__precomp_ab528ee1579ec0e0b277f1e1036e107ee} 
+\mbox{\hyperlink{namespacelibff_a2653629483aeb0df51eec08cb6635343}{edwards\+\_\+\+Fq}} libff\+::edwards\+\_\+ate\+\_\+\+G1\+\_\+precomp\+::\+P\+\_\+\+XZ}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__pairing_8hpp_source_l00077}{77}} of file \mbox{\hyperlink{edwards__pairing_8hpp_source}{edwards\+\_\+pairing.\+hpp}}.
+
+\Hypertarget{structlibff_1_1edwards__ate___g1__precomp_abda23d6cd189ce3c91044932a79e229e}\index{libff::edwards\_ate\_G1\_precomp@{libff::edwards\_ate\_G1\_precomp}!P\_ZZplusYZ@{P\_ZZplusYZ}}
+\index{P\_ZZplusYZ@{P\_ZZplusYZ}!libff::edwards\_ate\_G1\_precomp@{libff::edwards\_ate\_G1\_precomp}}
+\doxysubsubsection{\texorpdfstring{P\_ZZplusYZ}{P\_ZZplusYZ}}
+{\footnotesize\ttfamily \label{structlibff_1_1edwards__ate___g1__precomp_abda23d6cd189ce3c91044932a79e229e} 
+\mbox{\hyperlink{namespacelibff_a2653629483aeb0df51eec08cb6635343}{edwards\+\_\+\+Fq}} libff\+::edwards\+\_\+ate\+\_\+\+G1\+\_\+precomp\+::\+P\+\_\+\+ZZplus\+YZ}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__pairing_8hpp_source_l00078}{78}} of file \mbox{\hyperlink{edwards__pairing_8hpp_source}{edwards\+\_\+pairing.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/libraries/ff/libff/algebra/curves/edwards/\mbox{\hyperlink{edwards__pairing_8hpp}{edwards\+\_\+pairing.\+hpp}}\item 
+libraries/fc/libraries/ff/libff/algebra/curves/edwards/\mbox{\hyperlink{edwards__pairing_8cpp}{edwards\+\_\+pairing.\+cpp}}\end{DoxyCompactItemize}

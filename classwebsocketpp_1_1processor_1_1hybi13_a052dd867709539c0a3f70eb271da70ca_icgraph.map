@@ -1,0 +1,9 @@
+<map id="websocketpp::processor::hybi13::reset_headers" name="websocketpp::processor::hybi13::reset_headers">
+<area shape="rect" id="Node000001" title=" " alt="" coords="217,71,380,111"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1processor_1_1hybi13.html#a5c5e3234a0067c7f14fe0ceb4e647659" title="Process new websocket connection bytes." alt="" coords="5,5,169,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="215,68,155,49,156,44,217,63"/>
+<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1processor_1_1hybi13.html#a8fe09bba8cbe2821ef5c7cf3fd9573cd" title="Retrieves the most recently processed message." alt="" coords="5,71,169,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="201,94,169,94,169,88,201,88"/>
+<area shape="rect" id="Node000004" href="$classwebsocketpp_1_1processor_1_1hybi13.html#af07830f45e2733bd75db70fe951416cf" title=" " alt="" coords="5,136,169,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="217,119,156,138,155,133,215,114"/>
+</map>

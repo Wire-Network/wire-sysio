@@ -1,0 +1,49 @@
+\doxysection{tester\+\_\+network.\+cpp}
+\hypertarget{tester__network_8cpp_source}{}\label{tester__network_8cpp_source}\index{libraries/testing/tester\_network.cpp@{libraries/testing/tester\_network.cpp}}
+\mbox{\hyperlink{tester__network_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{tester__network_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{tester__network_8hpp}{sysio/testing/tester\_network.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{tester__network_8cpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{tester__network_8cpp_source_l00003}00003\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetesting}{testing}}\ \{}
+\DoxyCodeLine{\Hypertarget{tester__network_8cpp_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{tester__network_8cpp_source_l00005}\mbox{\hyperlink{classsysio_1_1testing_1_1tester__network_a9c9b830e5114d4f23d69db171b80dea6}{00005}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1testing_1_1tester__network_a9c9b830e5114d4f23d69db171b80dea6}{tester\_network::connect\_blockchain}}(\mbox{\hyperlink{classsysio_1_1testing_1_1base__tester}{base\_tester}}\ \&new\_blockchain)\ \{}
+\DoxyCodeLine{\Hypertarget{tester__network_8cpp_source_l00006}00006\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classsysio_1_1testing_1_1tester__network_a1845041cf846962d2b6d989a54dccfcd}{blockchains}}.count(\&new\_blockchain))}
+\DoxyCodeLine{\Hypertarget{tester__network_8cpp_source_l00007}00007\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{tester__network_8cpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{tester__network_8cpp_source_l00009}00009\ \ \ \ \ \ \ \textcolor{comment}{//\ If\ the\ network\ isn't\ empty,\ sync\ the\ new\ blockchain\ with\ one\ of\ the\ old\ ones.\ The\ old\ ones\ are\ already\ in\ sync\ with}}
+\DoxyCodeLine{\Hypertarget{tester__network_8cpp_source_l00010}00010\ \ \ \ \ \ \ \textcolor{comment}{//\ each\ other,\ so\ just\ grab\ one\ arbitrarily.\ The\ old\ blockchains\ are\ connected\ to\ the\ propagation\ signals,\ so\ when\ one}}
+\DoxyCodeLine{\Hypertarget{tester__network_8cpp_source_l00011}00011\ \ \ \ \ \ \ \textcolor{comment}{//\ of\ them\ gets\ synced,\ it\ will\ propagate\ blocks\ to\ the\ others\ as\ well.}}
+\DoxyCodeLine{\Hypertarget{tester__network_8cpp_source_l00012}00012\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{classsysio_1_1testing_1_1tester__network_a1845041cf846962d2b6d989a54dccfcd}{blockchains}}.empty())\ \{}
+\DoxyCodeLine{\Hypertarget{tester__network_8cpp_source_l00013}00013\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1testing_1_1tester__network_a1845041cf846962d2b6d989a54dccfcd}{blockchains}}.begin()-\/>first-\/>sync\_with(new\_blockchain);}
+\DoxyCodeLine{\Hypertarget{tester__network_8cpp_source_l00014}00014\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{tester__network_8cpp_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{tester__network_8cpp_source_l00016}00016\ \ \ \ \ \ \ \textcolor{comment}{//\ The\ new\ blockchain\ is\ now\ in\ sync\ with\ any\ old\ ones;\ go\ ahead\ and\ connect\ the\ propagation\ signal.}}
+\DoxyCodeLine{\Hypertarget{tester__network_8cpp_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{tester__network_8cpp_source_l00019}00019\ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{tester__network_8cpp_source_l00020}00020\ \ \ \ \ \ \ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{tester__network_8cpp_source_l00021}00021\ \textcolor{comment}{\ \ \ \ \ \ blockchains[\&new\_blockchain]\ =\ new\_blockchain.control-\/>applied\_block.connect(}}
+\DoxyCodeLine{\Hypertarget{tester__network_8cpp_source_l00022}00022\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ [this,\ \&new\_blockchain](const\ chain::block\_trace\&\ bt)\ \{}}
+\DoxyCodeLine{\Hypertarget{tester__network_8cpp_source_l00023}00023\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ propagate\_block(bt.block,\ new\_blockchain);}}
+\DoxyCodeLine{\Hypertarget{tester__network_8cpp_source_l00024}00024\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \});}}
+\DoxyCodeLine{\Hypertarget{tester__network_8cpp_source_l00025}00025\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ */}}
+\DoxyCodeLine{\Hypertarget{tester__network_8cpp_source_l00026}00026\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{tester__network_8cpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{tester__network_8cpp_source_l00028}\mbox{\hyperlink{classsysio_1_1testing_1_1tester__network_a185eee1d04eaeec842264b6a785bf3a2}{00028}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1testing_1_1tester__network_a185eee1d04eaeec842264b6a785bf3a2}{tester\_network::disconnect\_blockchain}}(\mbox{\hyperlink{classsysio_1_1testing_1_1base__tester}{base\_tester}}\ \&leaving\_blockchain)\ \{}
+\DoxyCodeLine{\Hypertarget{tester__network_8cpp_source_l00029}00029\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1testing_1_1tester__network_a1845041cf846962d2b6d989a54dccfcd}{blockchains}}.erase(\&leaving\_blockchain);}
+\DoxyCodeLine{\Hypertarget{tester__network_8cpp_source_l00030}00030\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{tester__network_8cpp_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{tester__network_8cpp_source_l00032}\mbox{\hyperlink{classsysio_1_1testing_1_1tester__network_a427768b3251b21855ab9a11adca108eb}{00032}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1testing_1_1tester__network_a427768b3251b21855ab9a11adca108eb}{tester\_network::disconnect\_all}}()\ \{}
+\DoxyCodeLine{\Hypertarget{tester__network_8cpp_source_l00033}00033\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1testing_1_1tester__network_a1845041cf846962d2b6d989a54dccfcd}{blockchains}}.clear();}
+\DoxyCodeLine{\Hypertarget{tester__network_8cpp_source_l00034}00034\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{tester__network_8cpp_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{tester__network_8cpp_source_l00036}\mbox{\hyperlink{classsysio_1_1testing_1_1tester__network_a387aeb702021c55f8278b47947d508a2}{00036}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1testing_1_1tester__network_a387aeb702021c55f8278b47947d508a2}{tester\_network::propagate\_block}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1signed__block}{signed\_block}}\ \&block,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1testing_1_1base__tester}{base\_tester}}\ \&skip\_blockchain)\ \{}
+\DoxyCodeLine{\Hypertarget{tester__network_8cpp_source_l00037}00037\ \ \ \ \ \textcolor{comment}{//\ \ for\ (const\ auto\ \&pair\ :\ blockchains)\ \{}}
+\DoxyCodeLine{\Hypertarget{tester__network_8cpp_source_l00038}00038\ \ \ \ \ \textcolor{comment}{//\ \ \ \ \ if\ (pair.first\ ==\ \&skip\_blockchain)\ continue;}}
+\DoxyCodeLine{\Hypertarget{tester__network_8cpp_source_l00039}00039\ \ \ \ \ \textcolor{comment}{//\ \ \ \ \ boost::signals2::shared\_connection\_block\ blocker(pair.second);}}
+\DoxyCodeLine{\Hypertarget{tester__network_8cpp_source_l00040}00040\ \ \ \ \ \textcolor{comment}{//\ \ \ \ \ pair.first-\/>control-\/>push\_block(block,\ sysio::chain::validation\_steps::created\_block);}}
+\DoxyCodeLine{\Hypertarget{tester__network_8cpp_source_l00041}00041\ \ \ \ \ \textcolor{comment}{//\ \ \}}}
+\DoxyCodeLine{\Hypertarget{tester__network_8cpp_source_l00042}00042\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{tester__network_8cpp_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{tester__network_8cpp_source_l00044}00044\ \}\ \}\ }
+
+\end{DoxyCode}

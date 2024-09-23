@@ -1,0 +1,1164 @@
+\doxysection{sysio\+::vm\+::span\texorpdfstring{$<$}{<} T, Extent \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classsysio_1_1vm_1_1span}{}\label{classsysio_1_1vm_1_1span}\index{sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}}
+
+
+{\ttfamily \#include $<$span.\+hpp$>$}
+
+
+
+Inheritance diagram for sysio\+::vm\+::span\texorpdfstring{$<$}{<} T, Extent \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=248pt]{classsysio_1_1vm_1_1span__inherit__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{classsysio_1_1vm_1_1span_a6abc38bd4f74b928c6e1e0d255369ea2}{element\+\_\+type}} = \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}
+\item 
+using \mbox{\hyperlink{classsysio_1_1vm_1_1span_af09be6f1cdaaf4150c948a45096d1cdc}{value\+\_\+type}} = std\+::remove\+\_\+cv\+\_\+t$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$
+\item 
+using \mbox{\hyperlink{classsysio_1_1vm_1_1span_aaefd0f86c0b64a2c050e3a192540a375}{size\+\_\+type}} = std\+::size\+\_\+t
+\item 
+using \mbox{\hyperlink{classsysio_1_1vm_1_1span_af497517fe7c1de834505a0fa91c6fee0}{difference\+\_\+type}} = std\+::ptrdiff\+\_\+t
+\item 
+using \mbox{\hyperlink{classsysio_1_1vm_1_1span_a312a999af0880476bfdc41d08491e9aa}{pointer}} = \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\texorpdfstring{$\ast$}{*}
+\item 
+using \mbox{\hyperlink{classsysio_1_1vm_1_1span_a02d1aa822049d68a2cb01df10ea4d03a}{const\+\_\+pointer}} = const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\texorpdfstring{$\ast$}{*}
+\item 
+using \mbox{\hyperlink{classsysio_1_1vm_1_1span_a2bf96daa9a47e8e99fb94592d638015f}{reference}} = \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&
+\item 
+using \mbox{\hyperlink{classsysio_1_1vm_1_1span_af98451991fb7694fc2e4eeaa471bb277}{const\+\_\+reference}} = const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&
+\item 
+using \mbox{\hyperlink{classsysio_1_1vm_1_1span_ad080e6e6ee2aa1aae056b9ce4d8d232b}{iterator}} = \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\texorpdfstring{$\ast$}{*}
+\item 
+using \mbox{\hyperlink{classsysio_1_1vm_1_1span_af8b87fabcb5a9df2f76c77b3e7ce88d7}{reverse\+\_\+iterator}} = std\+::reverse\+\_\+iterator$<$\mbox{\hyperlink{classsysio_1_1vm_1_1span_ad080e6e6ee2aa1aae056b9ce4d8d232b}{iterator}}$>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$std\+::size\+\_\+t E = Extent, typename Enable  = std\+::enable\+\_\+if\+\_\+t$<$\+E == dynamic\+\_\+extent \texorpdfstring{$\vert$}{|}\texorpdfstring{$\vert$}{|} E == 0$>$$>$ }\\constexpr \mbox{\hyperlink{classsysio_1_1vm_1_1span_acd2aaf68e86fdc2d5e5d2cbe098ec9f8}{span}} () noexcept
+\item 
+constexpr \mbox{\hyperlink{classsysio_1_1vm_1_1span_a9ee2cae9c92873be426534f5971d5d07}{span}} (\mbox{\hyperlink{classsysio_1_1vm_1_1span_a312a999af0880476bfdc41d08491e9aa}{pointer}} \mbox{\hyperlink{classsysio_1_1vm_1_1span_a9679822c5d4eb7085d9deb2b616fbd4b}{first}}, std\+::size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})
+\item 
+constexpr \mbox{\hyperlink{classsysio_1_1vm_1_1span_ab1a10ac37430d0379f6f4c2e6489bdd2}{span}} (\mbox{\hyperlink{classsysio_1_1vm_1_1span_a312a999af0880476bfdc41d08491e9aa}{pointer}} \mbox{\hyperlink{classsysio_1_1vm_1_1span_a9679822c5d4eb7085d9deb2b616fbd4b}{first}}, \mbox{\hyperlink{classsysio_1_1vm_1_1span_a312a999af0880476bfdc41d08491e9aa}{pointer}} \mbox{\hyperlink{classsysio_1_1vm_1_1span_a261460c1a7aa8f00c66142d12eeb79c4}{last}})
+\item 
+{\footnotesize template$<$std\+::size\+\_\+t N, typename Enable  = std\+::enable\+\_\+if\+\_\+t$<$(\+Extent == dynamic\+\_\+extent \texorpdfstring{$\vert$}{|}\texorpdfstring{$\vert$}{|} N == Extent)$>$$>$ }\\constexpr \mbox{\hyperlink{classsysio_1_1vm_1_1span_af4647be0f8aeb4fc12c0b6b8a037411e}{span}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}(\&arr)\mbox{[}\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\mbox{]}) noexcept
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{union_u}{U}} , std\+::size\+\_\+t N, typename Enable  = std\+::enable\+\_\+if\+\_\+t$<$(\+Extent == dynamic\+\_\+extent \texorpdfstring{$\vert$}{|}\texorpdfstring{$\vert$}{|} N == Extent) \&\& std\+::is\+\_\+convertible\+\_\+v$<$\+U(\texorpdfstring{$\ast$}{*})\mbox{[}$\,$\mbox{]}, T(\texorpdfstring{$\ast$}{*})\mbox{[}$\,$\mbox{]}$>$$>$$>$ }\\constexpr \mbox{\hyperlink{classsysio_1_1vm_1_1span_a86b8d7bc209624d4b584d6b82b843f86}{span}} (std\+::array$<$ \mbox{\hyperlink{union_u}{U}}, \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}} $>$ \&arr) noexcept
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{union_u}{U}} , std\+::size\+\_\+t N, typename Enable  = std\+::enable\+\_\+if\+\_\+t$<$(\+Extent == dynamic\+\_\+extent \texorpdfstring{$\vert$}{|}\texorpdfstring{$\vert$}{|} N == Extent) \&\& std\+::is\+\_\+convertible\+\_\+v$<$const U(\texorpdfstring{$\ast$}{*})\mbox{[}$\,$\mbox{]}, T(\texorpdfstring{$\ast$}{*})\mbox{[}$\,$\mbox{]}$>$$>$$>$ }\\constexpr \mbox{\hyperlink{classsysio_1_1vm_1_1span_a818502343bce8c6cbacc89638f71062d}{span}} (const std\+::array$<$ \mbox{\hyperlink{union_u}{U}}, \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}} $>$ \&arr) noexcept
+\item 
+constexpr \mbox{\hyperlink{classsysio_1_1vm_1_1span_a089134a003886a5d4ea6b95ebe528c78}{span}} (const \mbox{\hyperlink{classsysio_1_1vm_1_1span}{span}} \&)=default
+\item 
+constexpr \mbox{\hyperlink{classsysio_1_1vm_1_1span_a3f6f3df958650d5185ea1b8a77809dcf}{span}} (\mbox{\hyperlink{classsysio_1_1vm_1_1span}{span}} \&\&)=default
+\item 
+constexpr \mbox{\hyperlink{classsysio_1_1vm_1_1span}{span}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1span_ac79e7410e3601ae121d5d2929ac523af}{operator=}} (const \mbox{\hyperlink{classsysio_1_1vm_1_1span}{span}} \&)=default
+\item 
+constexpr \mbox{\hyperlink{classsysio_1_1vm_1_1span}{span}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1span_acb1b04fe2037144fe4387c9f9d3d2c81}{operator=}} (\mbox{\hyperlink{classsysio_1_1vm_1_1span}{span}} \&\&)=default
+\item 
+constexpr \mbox{\hyperlink{classsysio_1_1vm_1_1span_ad080e6e6ee2aa1aae056b9ce4d8d232b}{iterator}} \mbox{\hyperlink{classsysio_1_1vm_1_1span_a215749474f69ac311be47e38e841952e}{begin}} () const noexcept
+\item 
+constexpr \mbox{\hyperlink{classsysio_1_1vm_1_1span_ad080e6e6ee2aa1aae056b9ce4d8d232b}{iterator}} \mbox{\hyperlink{classsysio_1_1vm_1_1span_a9de529b728557cc6cb12824de27ec0fd}{end}} () const noexcept
+\item 
+constexpr \mbox{\hyperlink{classsysio_1_1vm_1_1span_af8b87fabcb5a9df2f76c77b3e7ce88d7}{reverse\+\_\+iterator}} \mbox{\hyperlink{classsysio_1_1vm_1_1span_a91787c7526db017baf61240d3e6d41b9}{rbegin}} () const noexcept
+\item 
+constexpr \mbox{\hyperlink{classsysio_1_1vm_1_1span_af8b87fabcb5a9df2f76c77b3e7ce88d7}{reverse\+\_\+iterator}} \mbox{\hyperlink{classsysio_1_1vm_1_1span_a74c064e517bd1d721640f0c226d608d6}{rend}} () const noexcept
+\item 
+constexpr \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1span_a521fc11cf53ba436a1807910bbb8290e}{front}} () const
+\item 
+constexpr \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1span_a8bf8d62ea7029c41846d55ae896485a1}{back}} () const
+\item 
+constexpr \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1span_a7e3eaced9d76a12984e57a2a58dabc25}{operator\mbox{[}$\,$\mbox{]}}} (std\+::size\+\_\+t n) const
+\item 
+constexpr \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classsysio_1_1vm_1_1span_a65d9e2641d763c860ae175a9a936a309}{data}} () const noexcept
+\item 
+constexpr std\+::size\+\_\+t \mbox{\hyperlink{classsysio_1_1vm_1_1span_a584ee0404e01edf225142e86d23d6d7d}{size}} () const noexcept
+\item 
+constexpr std\+::size\+\_\+t \mbox{\hyperlink{classsysio_1_1vm_1_1span_a0541e12c287d8e78efcf118f0869ff8f}{size\+\_\+bytes}} () const noexcept
+\item 
+constexpr bool \mbox{\hyperlink{classsysio_1_1vm_1_1span_add5154aa040035e175cf77996b03a6d2}{empty}} () const noexcept
+\item 
+constexpr \mbox{\hyperlink{classsysio_1_1vm_1_1span}{span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, dynamic\+\_\+extent $>$ \mbox{\hyperlink{classsysio_1_1vm_1_1span_a9679822c5d4eb7085d9deb2b616fbd4b}{first}} (std\+::size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}) const
+\item 
+constexpr \mbox{\hyperlink{classsysio_1_1vm_1_1span}{span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, dynamic\+\_\+extent $>$ \mbox{\hyperlink{classsysio_1_1vm_1_1span_a261460c1a7aa8f00c66142d12eeb79c4}{last}} (std\+::size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}) const
+\item 
+constexpr \mbox{\hyperlink{classsysio_1_1vm_1_1span}{span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, dynamic\+\_\+extent $>$ \mbox{\hyperlink{classsysio_1_1vm_1_1span_a5a9c0216b052bdbba147d49cde8c42b9}{subspan}} (std\+::size\+\_\+t offset, std\+::size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}=dynamic\+\_\+extent) const
+\item 
+{\footnotesize template$<$std\+::size\+\_\+t E = Extent, typename Enable  = std\+::enable\+\_\+if\+\_\+t$<$\+E == dynamic\+\_\+extent \texorpdfstring{$\vert$}{|}\texorpdfstring{$\vert$}{|} E == 0$>$$>$ }\\constexpr \mbox{\hyperlink{classsysio_1_1vm_1_1span_acd2aaf68e86fdc2d5e5d2cbe098ec9f8}{span}} () noexcept
+\item 
+constexpr \mbox{\hyperlink{classsysio_1_1vm_1_1span_a9ee2cae9c92873be426534f5971d5d07}{span}} (\mbox{\hyperlink{classsysio_1_1vm_1_1span_a312a999af0880476bfdc41d08491e9aa}{pointer}} \mbox{\hyperlink{classsysio_1_1vm_1_1span_a9679822c5d4eb7085d9deb2b616fbd4b}{first}}, std\+::size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})
+\item 
+constexpr \mbox{\hyperlink{classsysio_1_1vm_1_1span_ab1a10ac37430d0379f6f4c2e6489bdd2}{span}} (\mbox{\hyperlink{classsysio_1_1vm_1_1span_a312a999af0880476bfdc41d08491e9aa}{pointer}} \mbox{\hyperlink{classsysio_1_1vm_1_1span_a9679822c5d4eb7085d9deb2b616fbd4b}{first}}, \mbox{\hyperlink{classsysio_1_1vm_1_1span_a312a999af0880476bfdc41d08491e9aa}{pointer}} \mbox{\hyperlink{classsysio_1_1vm_1_1span_a261460c1a7aa8f00c66142d12eeb79c4}{last}})
+\item 
+{\footnotesize template$<$std\+::size\+\_\+t N, typename Enable  = std\+::enable\+\_\+if\+\_\+t$<$(\+Extent == dynamic\+\_\+extent \texorpdfstring{$\vert$}{|}\texorpdfstring{$\vert$}{|} N == Extent)$>$$>$ }\\constexpr \mbox{\hyperlink{classsysio_1_1vm_1_1span_af4647be0f8aeb4fc12c0b6b8a037411e}{span}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}(\&arr)\mbox{[}\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\mbox{]}) noexcept
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{union_u}{U}} , std\+::size\+\_\+t N, typename Enable  = std\+::enable\+\_\+if\+\_\+t$<$(\+Extent == dynamic\+\_\+extent \texorpdfstring{$\vert$}{|}\texorpdfstring{$\vert$}{|} N == Extent) \&\& std\+::is\+\_\+convertible\+\_\+v$<$\+U(\texorpdfstring{$\ast$}{*})\mbox{[}$\,$\mbox{]}, T(\texorpdfstring{$\ast$}{*})\mbox{[}$\,$\mbox{]}$>$$>$$>$ }\\constexpr \mbox{\hyperlink{classsysio_1_1vm_1_1span_a86b8d7bc209624d4b584d6b82b843f86}{span}} (std\+::array$<$ \mbox{\hyperlink{union_u}{U}}, \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}} $>$ \&arr) noexcept
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{union_u}{U}} , std\+::size\+\_\+t N, typename Enable  = std\+::enable\+\_\+if\+\_\+t$<$(\+Extent == dynamic\+\_\+extent \texorpdfstring{$\vert$}{|}\texorpdfstring{$\vert$}{|} N == Extent) \&\& std\+::is\+\_\+convertible\+\_\+v$<$const U(\texorpdfstring{$\ast$}{*})\mbox{[}$\,$\mbox{]}, T(\texorpdfstring{$\ast$}{*})\mbox{[}$\,$\mbox{]}$>$$>$$>$ }\\constexpr \mbox{\hyperlink{classsysio_1_1vm_1_1span_a818502343bce8c6cbacc89638f71062d}{span}} (const std\+::array$<$ \mbox{\hyperlink{union_u}{U}}, \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}} $>$ \&arr) noexcept
+\item 
+constexpr \mbox{\hyperlink{classsysio_1_1vm_1_1span_a089134a003886a5d4ea6b95ebe528c78}{span}} (const \mbox{\hyperlink{classsysio_1_1vm_1_1span}{span}} \&)=default
+\item 
+constexpr \mbox{\hyperlink{classsysio_1_1vm_1_1span_a3f6f3df958650d5185ea1b8a77809dcf}{span}} (\mbox{\hyperlink{classsysio_1_1vm_1_1span}{span}} \&\&)=default
+\item 
+constexpr \mbox{\hyperlink{classsysio_1_1vm_1_1span}{span}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1span_ac79e7410e3601ae121d5d2929ac523af}{operator=}} (const \mbox{\hyperlink{classsysio_1_1vm_1_1span}{span}} \&)=default
+\item 
+constexpr \mbox{\hyperlink{classsysio_1_1vm_1_1span}{span}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1span_acb1b04fe2037144fe4387c9f9d3d2c81}{operator=}} (\mbox{\hyperlink{classsysio_1_1vm_1_1span}{span}} \&\&)=default
+\item 
+constexpr \mbox{\hyperlink{classsysio_1_1vm_1_1span_ad080e6e6ee2aa1aae056b9ce4d8d232b}{iterator}} \mbox{\hyperlink{classsysio_1_1vm_1_1span_a215749474f69ac311be47e38e841952e}{begin}} () const noexcept
+\item 
+constexpr \mbox{\hyperlink{classsysio_1_1vm_1_1span_ad080e6e6ee2aa1aae056b9ce4d8d232b}{iterator}} \mbox{\hyperlink{classsysio_1_1vm_1_1span_a9de529b728557cc6cb12824de27ec0fd}{end}} () const noexcept
+\item 
+constexpr \mbox{\hyperlink{classsysio_1_1vm_1_1span_af8b87fabcb5a9df2f76c77b3e7ce88d7}{reverse\+\_\+iterator}} \mbox{\hyperlink{classsysio_1_1vm_1_1span_a91787c7526db017baf61240d3e6d41b9}{rbegin}} () const noexcept
+\item 
+constexpr \mbox{\hyperlink{classsysio_1_1vm_1_1span_af8b87fabcb5a9df2f76c77b3e7ce88d7}{reverse\+\_\+iterator}} \mbox{\hyperlink{classsysio_1_1vm_1_1span_a74c064e517bd1d721640f0c226d608d6}{rend}} () const noexcept
+\item 
+constexpr \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1span_a521fc11cf53ba436a1807910bbb8290e}{front}} () const
+\item 
+constexpr \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1span_a8bf8d62ea7029c41846d55ae896485a1}{back}} () const
+\item 
+constexpr \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1span_a7e3eaced9d76a12984e57a2a58dabc25}{operator\mbox{[}$\,$\mbox{]}}} (std\+::size\+\_\+t n) const
+\item 
+constexpr \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classsysio_1_1vm_1_1span_a65d9e2641d763c860ae175a9a936a309}{data}} () const noexcept
+\item 
+constexpr std\+::size\+\_\+t \mbox{\hyperlink{classsysio_1_1vm_1_1span_a584ee0404e01edf225142e86d23d6d7d}{size}} () const noexcept
+\item 
+constexpr std\+::size\+\_\+t \mbox{\hyperlink{classsysio_1_1vm_1_1span_a0541e12c287d8e78efcf118f0869ff8f}{size\+\_\+bytes}} () const noexcept
+\item 
+constexpr bool \mbox{\hyperlink{classsysio_1_1vm_1_1span_add5154aa040035e175cf77996b03a6d2}{empty}} () const noexcept
+\item 
+constexpr \mbox{\hyperlink{classsysio_1_1vm_1_1span}{span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, dynamic\+\_\+extent $>$ \mbox{\hyperlink{classsysio_1_1vm_1_1span_a9679822c5d4eb7085d9deb2b616fbd4b}{first}} (std\+::size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}) const
+\item 
+constexpr \mbox{\hyperlink{classsysio_1_1vm_1_1span}{span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, dynamic\+\_\+extent $>$ \mbox{\hyperlink{classsysio_1_1vm_1_1span_a261460c1a7aa8f00c66142d12eeb79c4}{last}} (std\+::size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}) const
+\item 
+constexpr \mbox{\hyperlink{classsysio_1_1vm_1_1span}{span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, dynamic\+\_\+extent $>$ \mbox{\hyperlink{classsysio_1_1vm_1_1span_a5a9c0216b052bdbba147d49cde8c42b9}{subspan}} (std\+::size\+\_\+t offset, std\+::size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}=dynamic\+\_\+extent) const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static constexpr std\+::size\+\_\+t \mbox{\hyperlink{classsysio_1_1vm_1_1span_a1a55c75be4e4722e6fe8661764e16bfe}{extent}} = Extent
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, std\+::size\+\_\+t Extent = dynamic\+\_\+extent$>$\newline
+class sysio\+::vm\+::span$<$ T, Extent $>$}
+
+
+Definition at line \mbox{\hyperlink{vm_2span_8hpp_source_l00014}{14}} of file \mbox{\hyperlink{vm_2span_8hpp_source}{span.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classsysio_1_1vm_1_1span_a02d1aa822049d68a2cb01df10ea4d03a}\index{sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}!const\_pointer@{const\_pointer}}
+\index{const\_pointer@{const\_pointer}!sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}}
+\doxysubsubsection{\texorpdfstring{const\_pointer}{const\_pointer}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1span_a02d1aa822049d68a2cb01df10ea4d03a} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t Extent = dynamic\+\_\+extent$>$ \\
+typedef const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classsysio_1_1vm_1_1span}{sysio\+::vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$\+::const\+\_\+pointer = const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\texorpdfstring{$\ast$}{*}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2span_8hpp_source_l00023}{23}} of file \mbox{\hyperlink{sysio_2vm_2span_8hpp_source}{span.\+hpp}}.
+
+\Hypertarget{classsysio_1_1vm_1_1span_af98451991fb7694fc2e4eeaa471bb277}\index{sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}!const\_reference@{const\_reference}}
+\index{const\_reference@{const\_reference}!sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}}
+\doxysubsubsection{\texorpdfstring{const\_reference}{const\_reference}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1span_af98451991fb7694fc2e4eeaa471bb277} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t Extent = dynamic\+\_\+extent$>$ \\
+typedef const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1span}{sysio\+::vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$\+::const\+\_\+reference = const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2span_8hpp_source_l00025}{25}} of file \mbox{\hyperlink{sysio_2vm_2span_8hpp_source}{span.\+hpp}}.
+
+\Hypertarget{classsysio_1_1vm_1_1span_af497517fe7c1de834505a0fa91c6fee0}\index{sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}!difference\_type@{difference\_type}}
+\index{difference\_type@{difference\_type}!sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}}
+\doxysubsubsection{\texorpdfstring{difference\_type}{difference\_type}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1span_af497517fe7c1de834505a0fa91c6fee0} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t Extent = dynamic\+\_\+extent$>$ \\
+typedef std\+::ptrdiff\+\_\+t \mbox{\hyperlink{classsysio_1_1vm_1_1span}{sysio\+::vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$\+::difference\+\_\+type = std\+::ptrdiff\+\_\+t}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2span_8hpp_source_l00021}{21}} of file \mbox{\hyperlink{sysio_2vm_2span_8hpp_source}{span.\+hpp}}.
+
+\Hypertarget{classsysio_1_1vm_1_1span_a6abc38bd4f74b928c6e1e0d255369ea2}\index{sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}!element\_type@{element\_type}}
+\index{element\_type@{element\_type}!sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}}
+\doxysubsubsection{\texorpdfstring{element\_type}{element\_type}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1span_a6abc38bd4f74b928c6e1e0d255369ea2} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t Extent = dynamic\+\_\+extent$>$ \\
+typedef \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{classsysio_1_1vm_1_1span}{sysio\+::vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$\+::element\+\_\+type = \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2span_8hpp_source_l00018}{18}} of file \mbox{\hyperlink{sysio_2vm_2span_8hpp_source}{span.\+hpp}}.
+
+\Hypertarget{classsysio_1_1vm_1_1span_ad080e6e6ee2aa1aae056b9ce4d8d232b}\index{sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}!iterator@{iterator}}
+\index{iterator@{iterator}!sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}}
+\doxysubsubsection{\texorpdfstring{iterator}{iterator}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1span_ad080e6e6ee2aa1aae056b9ce4d8d232b} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t Extent = dynamic\+\_\+extent$>$ \\
+typedef \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classsysio_1_1vm_1_1span}{sysio\+::vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$\+::iterator = \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\texorpdfstring{$\ast$}{*}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2span_8hpp_source_l00026}{26}} of file \mbox{\hyperlink{sysio_2vm_2span_8hpp_source}{span.\+hpp}}.
+
+\Hypertarget{classsysio_1_1vm_1_1span_a312a999af0880476bfdc41d08491e9aa}\index{sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}!pointer@{pointer}}
+\index{pointer@{pointer}!sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}}
+\doxysubsubsection{\texorpdfstring{pointer}{pointer}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1span_a312a999af0880476bfdc41d08491e9aa} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t Extent = dynamic\+\_\+extent$>$ \\
+typedef \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classsysio_1_1vm_1_1span}{sysio\+::vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$\+::pointer = \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\texorpdfstring{$\ast$}{*}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2span_8hpp_source_l00022}{22}} of file \mbox{\hyperlink{sysio_2vm_2span_8hpp_source}{span.\+hpp}}.
+
+\Hypertarget{classsysio_1_1vm_1_1span_a2bf96daa9a47e8e99fb94592d638015f}\index{sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}!reference@{reference}}
+\index{reference@{reference}!sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}}
+\doxysubsubsection{\texorpdfstring{reference}{reference}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1span_a2bf96daa9a47e8e99fb94592d638015f} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t Extent = dynamic\+\_\+extent$>$ \\
+typedef \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1span}{sysio\+::vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$\+::reference = \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2span_8hpp_source_l00024}{24}} of file \mbox{\hyperlink{sysio_2vm_2span_8hpp_source}{span.\+hpp}}.
+
+\Hypertarget{classsysio_1_1vm_1_1span_af8b87fabcb5a9df2f76c77b3e7ce88d7}\index{sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}!reverse\_iterator@{reverse\_iterator}}
+\index{reverse\_iterator@{reverse\_iterator}!sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}}
+\doxysubsubsection{\texorpdfstring{reverse\_iterator}{reverse\_iterator}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1span_af8b87fabcb5a9df2f76c77b3e7ce88d7} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t Extent = dynamic\+\_\+extent$>$ \\
+typedef std\+::reverse\+\_\+iterator$<$ \mbox{\hyperlink{classsysio_1_1vm_1_1span_ad080e6e6ee2aa1aae056b9ce4d8d232b}{iterator}} $>$ \mbox{\hyperlink{classsysio_1_1vm_1_1span}{sysio\+::vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$\+::reverse\+\_\+iterator = std\+::reverse\+\_\+iterator$<$\mbox{\hyperlink{classsysio_1_1vm_1_1span_ad080e6e6ee2aa1aae056b9ce4d8d232b}{iterator}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2span_8hpp_source_l00027}{27}} of file \mbox{\hyperlink{sysio_2vm_2span_8hpp_source}{span.\+hpp}}.
+
+\Hypertarget{classsysio_1_1vm_1_1span_aaefd0f86c0b64a2c050e3a192540a375}\index{sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}!size\_type@{size\_type}}
+\index{size\_type@{size\_type}!sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}}
+\doxysubsubsection{\texorpdfstring{size\_type}{size\_type}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1span_aaefd0f86c0b64a2c050e3a192540a375} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t Extent = dynamic\+\_\+extent$>$ \\
+typedef std\+::size\+\_\+t \mbox{\hyperlink{classsysio_1_1vm_1_1span}{sysio\+::vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$\+::size\+\_\+type = std\+::size\+\_\+t}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2span_8hpp_source_l00020}{20}} of file \mbox{\hyperlink{sysio_2vm_2span_8hpp_source}{span.\+hpp}}.
+
+\Hypertarget{classsysio_1_1vm_1_1span_af09be6f1cdaaf4150c948a45096d1cdc}\index{sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}!value\_type@{value\_type}}
+\index{value\_type@{value\_type}!sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}}
+\doxysubsubsection{\texorpdfstring{value\_type}{value\_type}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1span_af09be6f1cdaaf4150c948a45096d1cdc} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t Extent = dynamic\+\_\+extent$>$ \\
+typedef std\+::remove\+\_\+cv\+\_\+t$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \mbox{\hyperlink{classsysio_1_1vm_1_1span}{sysio\+::vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$\+::value\+\_\+type = std\+::remove\+\_\+cv\+\_\+t$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2span_8hpp_source_l00019}{19}} of file \mbox{\hyperlink{sysio_2vm_2span_8hpp_source}{span.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classsysio_1_1vm_1_1span_acd2aaf68e86fdc2d5e5d2cbe098ec9f8}\index{sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}!span@{span}}
+\index{span@{span}!sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}}
+\doxysubsubsection{\texorpdfstring{span()}{span()}\hspace{0.1cm}{\footnotesize\ttfamily [1/16]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1span_acd2aaf68e86fdc2d5e5d2cbe098ec9f8} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t Extent = dynamic\+\_\+extent$>$ \\
+template$<$std\+::size\+\_\+t E = Extent, typename Enable  = std\+::enable\+\_\+if\+\_\+t$<$\+E == dynamic\+\_\+extent \texorpdfstring{$\vert$}{|}\texorpdfstring{$\vert$}{|} E == 0$>$$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1span}{sysio\+::vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$\+::span (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2span_8hpp_source_l00031}{31}} of file \mbox{\hyperlink{sysio_2vm_2span_8hpp_source}{span.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00031\ :\ first\_elem(\textcolor{keyword}{nullptr}),\ last\_elem(\textcolor{keyword}{nullptr})\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1span_a9ee2cae9c92873be426534f5971d5d07}\index{sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}!span@{span}}
+\index{span@{span}!sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}}
+\doxysubsubsection{\texorpdfstring{span()}{span()}\hspace{0.1cm}{\footnotesize\ttfamily [2/16]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1span_a9ee2cae9c92873be426534f5971d5d07} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t Extent = dynamic\+\_\+extent$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1span}{sysio\+::vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$\+::span (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classsysio_1_1vm_1_1span_a312a999af0880476bfdc41d08491e9aa}{pointer}}}]{first}{, }\item[{std\+::size\+\_\+t}]{len}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2span_8hpp_source_l00035}{35}} of file \mbox{\hyperlink{sysio_2vm_2span_8hpp_source}{span.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ first\_elem(\mbox{\hyperlink{classsysio_1_1vm_1_1span_a9679822c5d4eb7085d9deb2b616fbd4b}{first}}),\ last\_elem(\mbox{\hyperlink{classsysio_1_1vm_1_1span_a9679822c5d4eb7085d9deb2b616fbd4b}{first}}\ +\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})\ \{}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(Extent\ ==\ dynamic\_extent\ ||\ Extent\ ==\ \mbox{\hyperlink{classsysio_1_1vm_1_1span_a584ee0404e01edf225142e86d23d6d7d}{size}}(),\ span\_exception,\ \textcolor{stringliteral}{"{}Wrong\ size\ for\ span\ with\ static\ extent"{}});}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=339pt]{classsysio_1_1vm_1_1span_a9ee2cae9c92873be426534f5971d5d07_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1span_ab1a10ac37430d0379f6f4c2e6489bdd2}\index{sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}!span@{span}}
+\index{span@{span}!sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}}
+\doxysubsubsection{\texorpdfstring{span()}{span()}\hspace{0.1cm}{\footnotesize\ttfamily [3/16]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1span_ab1a10ac37430d0379f6f4c2e6489bdd2} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t Extent = dynamic\+\_\+extent$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1span}{sysio\+::vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$\+::span (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classsysio_1_1vm_1_1span_a312a999af0880476bfdc41d08491e9aa}{pointer}}}]{first}{, }\item[{\mbox{\hyperlink{classsysio_1_1vm_1_1span_a312a999af0880476bfdc41d08491e9aa}{pointer}}}]{last}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2span_8hpp_source_l00038}{38}} of file \mbox{\hyperlink{sysio_2vm_2span_8hpp_source}{span.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ first\_elem(\mbox{\hyperlink{classsysio_1_1vm_1_1span_a9679822c5d4eb7085d9deb2b616fbd4b}{first}}),\ last\_elem(\mbox{\hyperlink{classsysio_1_1vm_1_1span_a261460c1a7aa8f00c66142d12eeb79c4}{last}})\ \{}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(\mbox{\hyperlink{classsysio_1_1vm_1_1span_a261460c1a7aa8f00c66142d12eeb79c4}{last}}\ >=\ \mbox{\hyperlink{classsysio_1_1vm_1_1span_a9679822c5d4eb7085d9deb2b616fbd4b}{first}},\ span\_exception,\ \textcolor{stringliteral}{"{}last\ iterator\ <\ first\ iterator"{}});}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(Extent\ ==\ dynamic\_extent\ ||\ Extent\ ==\ \mbox{\hyperlink{classsysio_1_1vm_1_1span_a584ee0404e01edf225142e86d23d6d7d}{size}}(),\ span\_exception,\ \textcolor{stringliteral}{"{}Wrong\ size\ for\ span\ with\ static\ extent"{}});}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1vm_1_1span_ab1a10ac37430d0379f6f4c2e6489bdd2_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1span_af4647be0f8aeb4fc12c0b6b8a037411e}\index{sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}!span@{span}}
+\index{span@{span}!sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}}
+\doxysubsubsection{\texorpdfstring{span()}{span()}\hspace{0.1cm}{\footnotesize\ttfamily [4/16]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1span_af4647be0f8aeb4fc12c0b6b8a037411e} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t Extent = dynamic\+\_\+extent$>$ \\
+template$<$std\+::size\+\_\+t N, typename Enable  = std\+::enable\+\_\+if\+\_\+t$<$(\+Extent == dynamic\+\_\+extent \texorpdfstring{$\vert$}{|}\texorpdfstring{$\vert$}{|} N == Extent)$>$$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1span}{sysio\+::vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$\+::span (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}(\&)}]{arr}{\mbox{[}\+N\mbox{]}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2span_8hpp_source_l00044}{44}} of file \mbox{\hyperlink{sysio_2vm_2span_8hpp_source}{span.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00044\ :\ first\_elem(\&arr[0]),\ last\_elem(\&arr[0]\ +\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}})\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1span_a86b8d7bc209624d4b584d6b82b843f86}\index{sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}!span@{span}}
+\index{span@{span}!sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}}
+\doxysubsubsection{\texorpdfstring{span()}{span()}\hspace{0.1cm}{\footnotesize\ttfamily [5/16]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1span_a86b8d7bc209624d4b584d6b82b843f86} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t Extent = dynamic\+\_\+extent$>$ \\
+template$<$typename \mbox{\hyperlink{union_u}{U}} , std\+::size\+\_\+t N, typename Enable  = std\+::enable\+\_\+if\+\_\+t$<$(\+Extent == dynamic\+\_\+extent \texorpdfstring{$\vert$}{|}\texorpdfstring{$\vert$}{|} N == Extent) \&\& std\+::is\+\_\+convertible\+\_\+v$<$\+U(\texorpdfstring{$\ast$}{*})\mbox{[}$\,$\mbox{]}, T(\texorpdfstring{$\ast$}{*})\mbox{[}$\,$\mbox{]}$>$$>$$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1span}{sysio\+::vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$\+::span (\begin{DoxyParamCaption}\item[{std\+::array$<$ \mbox{\hyperlink{union_u}{U}}, \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}} $>$ \&}]{arr}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2span_8hpp_source_l00048}{48}} of file \mbox{\hyperlink{sysio_2vm_2span_8hpp_source}{span.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00048\ :\ first\_elem(arr.data()),\ last\_elem(arr.data()\ +\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}})\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1span_a818502343bce8c6cbacc89638f71062d}\index{sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}!span@{span}}
+\index{span@{span}!sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}}
+\doxysubsubsection{\texorpdfstring{span()}{span()}\hspace{0.1cm}{\footnotesize\ttfamily [6/16]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1span_a818502343bce8c6cbacc89638f71062d} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t Extent = dynamic\+\_\+extent$>$ \\
+template$<$typename \mbox{\hyperlink{union_u}{U}} , std\+::size\+\_\+t N, typename Enable  = std\+::enable\+\_\+if\+\_\+t$<$(\+Extent == dynamic\+\_\+extent \texorpdfstring{$\vert$}{|}\texorpdfstring{$\vert$}{|} N == Extent) \&\& std\+::is\+\_\+convertible\+\_\+v$<$const U(\texorpdfstring{$\ast$}{*})\mbox{[}$\,$\mbox{]}, T(\texorpdfstring{$\ast$}{*})\mbox{[}$\,$\mbox{]}$>$$>$$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1span}{sysio\+::vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$\+::span (\begin{DoxyParamCaption}\item[{const std\+::array$<$ \mbox{\hyperlink{union_u}{U}}, \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}} $>$ \&}]{arr}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2span_8hpp_source_l00052}{52}} of file \mbox{\hyperlink{sysio_2vm_2span_8hpp_source}{span.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00052\ :\ first\_elem(arr.data()),\ last\_elem(arr.data()\ +\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}})\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1span_a089134a003886a5d4ea6b95ebe528c78}\index{sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}!span@{span}}
+\index{span@{span}!sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}}
+\doxysubsubsection{\texorpdfstring{span()}{span()}\hspace{0.1cm}{\footnotesize\ttfamily [7/16]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1span_a089134a003886a5d4ea6b95ebe528c78} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t Extent = dynamic\+\_\+extent$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1span}{sysio\+::vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$\+::span (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classsysio_1_1vm_1_1span}{span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$ \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}, {\ttfamily [default]}}
+
+\Hypertarget{classsysio_1_1vm_1_1span_a3f6f3df958650d5185ea1b8a77809dcf}\index{sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}!span@{span}}
+\index{span@{span}!sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}}
+\doxysubsubsection{\texorpdfstring{span()}{span()}\hspace{0.1cm}{\footnotesize\ttfamily [8/16]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1span_a3f6f3df958650d5185ea1b8a77809dcf} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t Extent = dynamic\+\_\+extent$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1span}{sysio\+::vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$\+::span (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classsysio_1_1vm_1_1span}{span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$ \&\&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}, {\ttfamily [default]}}
+
+\Hypertarget{classsysio_1_1vm_1_1span_acd2aaf68e86fdc2d5e5d2cbe098ec9f8}\index{sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}!span@{span}}
+\index{span@{span}!sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}}
+\doxysubsubsection{\texorpdfstring{span()}{span()}\hspace{0.1cm}{\footnotesize\ttfamily [9/16]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1span_acd2aaf68e86fdc2d5e5d2cbe098ec9f8} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t Extent = dynamic\+\_\+extent$>$ \\
+template$<$std\+::size\+\_\+t E = Extent, typename Enable  = std\+::enable\+\_\+if\+\_\+t$<$\+E == dynamic\+\_\+extent \texorpdfstring{$\vert$}{|}\texorpdfstring{$\vert$}{|} E == 0$>$$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1span}{sysio\+::vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$\+::span (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2span_8hpp_source_l00031}{31}} of file \mbox{\hyperlink{vm_2span_8hpp_source}{span.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00031\ :\ first\_elem(\textcolor{keyword}{nullptr}),\ last\_elem(\textcolor{keyword}{nullptr})\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1span_a9ee2cae9c92873be426534f5971d5d07}\index{sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}!span@{span}}
+\index{span@{span}!sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}}
+\doxysubsubsection{\texorpdfstring{span()}{span()}\hspace{0.1cm}{\footnotesize\ttfamily [10/16]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1span_a9ee2cae9c92873be426534f5971d5d07} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t Extent = dynamic\+\_\+extent$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1span}{sysio\+::vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$\+::span (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classsysio_1_1vm_1_1span_a312a999af0880476bfdc41d08491e9aa}{pointer}}}]{first}{, }\item[{std\+::size\+\_\+t}]{len}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2span_8hpp_source_l00035}{35}} of file \mbox{\hyperlink{vm_2span_8hpp_source}{span.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ first\_elem(\mbox{\hyperlink{classsysio_1_1vm_1_1span_a9679822c5d4eb7085d9deb2b616fbd4b}{first}}),\ last\_elem(\mbox{\hyperlink{classsysio_1_1vm_1_1span_a9679822c5d4eb7085d9deb2b616fbd4b}{first}}\ +\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})\ \{}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(Extent\ ==\ dynamic\_extent\ ||\ Extent\ ==\ \mbox{\hyperlink{classsysio_1_1vm_1_1span_a584ee0404e01edf225142e86d23d6d7d}{size}}(),\ span\_exception,\ \textcolor{stringliteral}{"{}Wrong\ size\ for\ span\ with\ static\ extent"{}});}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=339pt]{classsysio_1_1vm_1_1span_a9ee2cae9c92873be426534f5971d5d07_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1span_ab1a10ac37430d0379f6f4c2e6489bdd2}\index{sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}!span@{span}}
+\index{span@{span}!sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}}
+\doxysubsubsection{\texorpdfstring{span()}{span()}\hspace{0.1cm}{\footnotesize\ttfamily [11/16]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1span_ab1a10ac37430d0379f6f4c2e6489bdd2} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t Extent = dynamic\+\_\+extent$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1span}{sysio\+::vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$\+::span (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classsysio_1_1vm_1_1span_a312a999af0880476bfdc41d08491e9aa}{pointer}}}]{first}{, }\item[{\mbox{\hyperlink{classsysio_1_1vm_1_1span_a312a999af0880476bfdc41d08491e9aa}{pointer}}}]{last}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2span_8hpp_source_l00038}{38}} of file \mbox{\hyperlink{vm_2span_8hpp_source}{span.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ first\_elem(\mbox{\hyperlink{classsysio_1_1vm_1_1span_a9679822c5d4eb7085d9deb2b616fbd4b}{first}}),\ last\_elem(\mbox{\hyperlink{classsysio_1_1vm_1_1span_a261460c1a7aa8f00c66142d12eeb79c4}{last}})\ \{}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(\mbox{\hyperlink{classsysio_1_1vm_1_1span_a261460c1a7aa8f00c66142d12eeb79c4}{last}}\ >=\ \mbox{\hyperlink{classsysio_1_1vm_1_1span_a9679822c5d4eb7085d9deb2b616fbd4b}{first}},\ span\_exception,\ \textcolor{stringliteral}{"{}last\ iterator\ <\ first\ iterator"{}});}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(Extent\ ==\ dynamic\_extent\ ||\ Extent\ ==\ \mbox{\hyperlink{classsysio_1_1vm_1_1span_a584ee0404e01edf225142e86d23d6d7d}{size}}(),\ span\_exception,\ \textcolor{stringliteral}{"{}Wrong\ size\ for\ span\ with\ static\ extent"{}});}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1vm_1_1span_ab1a10ac37430d0379f6f4c2e6489bdd2_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1span_af4647be0f8aeb4fc12c0b6b8a037411e}\index{sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}!span@{span}}
+\index{span@{span}!sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}}
+\doxysubsubsection{\texorpdfstring{span()}{span()}\hspace{0.1cm}{\footnotesize\ttfamily [12/16]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1span_af4647be0f8aeb4fc12c0b6b8a037411e} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t Extent = dynamic\+\_\+extent$>$ \\
+template$<$std\+::size\+\_\+t N, typename Enable  = std\+::enable\+\_\+if\+\_\+t$<$(\+Extent == dynamic\+\_\+extent \texorpdfstring{$\vert$}{|}\texorpdfstring{$\vert$}{|} N == Extent)$>$$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1span}{sysio\+::vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$\+::span (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}(\&)}]{arr}{\mbox{[}\+N\mbox{]}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2span_8hpp_source_l00044}{44}} of file \mbox{\hyperlink{vm_2span_8hpp_source}{span.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00044\ :\ first\_elem(\&arr[0]),\ last\_elem(\&arr[0]\ +\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}})\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1span_a86b8d7bc209624d4b584d6b82b843f86}\index{sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}!span@{span}}
+\index{span@{span}!sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}}
+\doxysubsubsection{\texorpdfstring{span()}{span()}\hspace{0.1cm}{\footnotesize\ttfamily [13/16]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1span_a86b8d7bc209624d4b584d6b82b843f86} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t Extent = dynamic\+\_\+extent$>$ \\
+template$<$typename \mbox{\hyperlink{union_u}{U}} , std\+::size\+\_\+t N, typename Enable  = std\+::enable\+\_\+if\+\_\+t$<$(\+Extent == dynamic\+\_\+extent \texorpdfstring{$\vert$}{|}\texorpdfstring{$\vert$}{|} N == Extent) \&\& std\+::is\+\_\+convertible\+\_\+v$<$\+U(\texorpdfstring{$\ast$}{*})\mbox{[}$\,$\mbox{]}, T(\texorpdfstring{$\ast$}{*})\mbox{[}$\,$\mbox{]}$>$$>$$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1span}{sysio\+::vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$\+::span (\begin{DoxyParamCaption}\item[{std\+::array$<$ \mbox{\hyperlink{union_u}{U}}, \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}} $>$ \&}]{arr}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2span_8hpp_source_l00048}{48}} of file \mbox{\hyperlink{vm_2span_8hpp_source}{span.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00048\ :\ first\_elem(arr.data()),\ last\_elem(arr.data()\ +\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}})\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1span_a818502343bce8c6cbacc89638f71062d}\index{sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}!span@{span}}
+\index{span@{span}!sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}}
+\doxysubsubsection{\texorpdfstring{span()}{span()}\hspace{0.1cm}{\footnotesize\ttfamily [14/16]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1span_a818502343bce8c6cbacc89638f71062d} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t Extent = dynamic\+\_\+extent$>$ \\
+template$<$typename \mbox{\hyperlink{union_u}{U}} , std\+::size\+\_\+t N, typename Enable  = std\+::enable\+\_\+if\+\_\+t$<$(\+Extent == dynamic\+\_\+extent \texorpdfstring{$\vert$}{|}\texorpdfstring{$\vert$}{|} N == Extent) \&\& std\+::is\+\_\+convertible\+\_\+v$<$const U(\texorpdfstring{$\ast$}{*})\mbox{[}$\,$\mbox{]}, T(\texorpdfstring{$\ast$}{*})\mbox{[}$\,$\mbox{]}$>$$>$$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1span}{sysio\+::vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$\+::span (\begin{DoxyParamCaption}\item[{const std\+::array$<$ \mbox{\hyperlink{union_u}{U}}, \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}} $>$ \&}]{arr}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2span_8hpp_source_l00052}{52}} of file \mbox{\hyperlink{vm_2span_8hpp_source}{span.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00052\ :\ first\_elem(arr.data()),\ last\_elem(arr.data()\ +\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}})\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1span_a089134a003886a5d4ea6b95ebe528c78}\index{sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}!span@{span}}
+\index{span@{span}!sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}}
+\doxysubsubsection{\texorpdfstring{span()}{span()}\hspace{0.1cm}{\footnotesize\ttfamily [15/16]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1span_a089134a003886a5d4ea6b95ebe528c78} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t Extent = dynamic\+\_\+extent$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1span}{sysio\+::vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$\+::span (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classsysio_1_1vm_1_1span}{span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$ \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}, {\ttfamily [default]}}
+
+\Hypertarget{classsysio_1_1vm_1_1span_a3f6f3df958650d5185ea1b8a77809dcf}\index{sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}!span@{span}}
+\index{span@{span}!sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}}
+\doxysubsubsection{\texorpdfstring{span()}{span()}\hspace{0.1cm}{\footnotesize\ttfamily [16/16]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1span_a3f6f3df958650d5185ea1b8a77809dcf} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t Extent = dynamic\+\_\+extent$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1span}{sysio\+::vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$\+::span (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classsysio_1_1vm_1_1span}{span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$ \&\&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}, {\ttfamily [default]}}
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1vm_1_1span_a8bf8d62ea7029c41846d55ae896485a1}\index{sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}!back@{back}}
+\index{back@{back}!sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}}
+\doxysubsubsection{\texorpdfstring{back()}{back()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1span_a8bf8d62ea7029c41846d55ae896485a1} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t Extent = dynamic\+\_\+extent$>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1span}{sysio\+::vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$\+::back (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2span_8hpp_source_l00069}{69}} of file \mbox{\hyperlink{sysio_2vm_2span_8hpp_source}{span.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00069\ \{\ \textcolor{keywordflow}{return}\ *(last\_elem\ -\/\ 1);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1span_a8bf8d62ea7029c41846d55ae896485a1}\index{sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}!back@{back}}
+\index{back@{back}!sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}}
+\doxysubsubsection{\texorpdfstring{back()}{back()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1span_a8bf8d62ea7029c41846d55ae896485a1} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t Extent = dynamic\+\_\+extent$>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1span}{sysio\+::vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$\+::back (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2span_8hpp_source_l00069}{69}} of file \mbox{\hyperlink{vm_2span_8hpp_source}{span.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00069\ \{\ \textcolor{keywordflow}{return}\ *(last\_elem\ -\/\ 1);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1span_a215749474f69ac311be47e38e841952e}\index{sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}!begin@{begin}}
+\index{begin@{begin}!sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}}
+\doxysubsubsection{\texorpdfstring{begin()}{begin()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1span_a215749474f69ac311be47e38e841952e} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t Extent = dynamic\+\_\+extent$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1span_ad080e6e6ee2aa1aae056b9ce4d8d232b}{iterator}} \mbox{\hyperlink{classsysio_1_1vm_1_1span}{sysio\+::vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$\+::begin (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2span_8hpp_source_l00063}{63}} of file \mbox{\hyperlink{sysio_2vm_2span_8hpp_source}{span.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00063\ \{\ \textcolor{keywordflow}{return}\ first\_elem;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1span_a215749474f69ac311be47e38e841952e}\index{sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}!begin@{begin}}
+\index{begin@{begin}!sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}}
+\doxysubsubsection{\texorpdfstring{begin()}{begin()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1span_a215749474f69ac311be47e38e841952e} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t Extent = dynamic\+\_\+extent$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1span_ad080e6e6ee2aa1aae056b9ce4d8d232b}{iterator}} \mbox{\hyperlink{classsysio_1_1vm_1_1span}{sysio\+::vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$\+::begin (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2span_8hpp_source_l00063}{63}} of file \mbox{\hyperlink{vm_2span_8hpp_source}{span.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00063\ \{\ \textcolor{keywordflow}{return}\ first\_elem;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1span_a65d9e2641d763c860ae175a9a936a309}\index{sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}!data@{data}}
+\index{data@{data}!sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}}
+\doxysubsubsection{\texorpdfstring{data()}{data()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1span_a65d9e2641d763c860ae175a9a936a309} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t Extent = dynamic\+\_\+extent$>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classsysio_1_1vm_1_1span}{sysio\+::vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$\+::data (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2span_8hpp_source_l00072}{72}} of file \mbox{\hyperlink{sysio_2vm_2span_8hpp_source}{span.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00072\ \{\ \textcolor{keywordflow}{return}\ first\_elem;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{classsysio_1_1vm_1_1span_a65d9e2641d763c860ae175a9a936a309_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1span_a65d9e2641d763c860ae175a9a936a309}\index{sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}!data@{data}}
+\index{data@{data}!sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}}
+\doxysubsubsection{\texorpdfstring{data()}{data()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1span_a65d9e2641d763c860ae175a9a936a309} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t Extent = dynamic\+\_\+extent$>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classsysio_1_1vm_1_1span}{sysio\+::vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$\+::data (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2span_8hpp_source_l00072}{72}} of file \mbox{\hyperlink{vm_2span_8hpp_source}{span.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00072\ \{\ \textcolor{keywordflow}{return}\ first\_elem;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1span_add5154aa040035e175cf77996b03a6d2}\index{sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}!empty@{empty}}
+\index{empty@{empty}!sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}}
+\doxysubsubsection{\texorpdfstring{empty()}{empty()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1span_add5154aa040035e175cf77996b03a6d2} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t Extent = dynamic\+\_\+extent$>$ \\
+bool \mbox{\hyperlink{classsysio_1_1vm_1_1span}{sysio\+::vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$\+::empty (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2span_8hpp_source_l00075}{75}} of file \mbox{\hyperlink{sysio_2vm_2span_8hpp_source}{span.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00075\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1vm_1_1span_a584ee0404e01edf225142e86d23d6d7d}{size}}()\ ==\ 0;\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=345pt]{classsysio_1_1vm_1_1span_add5154aa040035e175cf77996b03a6d2_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1span_add5154aa040035e175cf77996b03a6d2}\index{sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}!empty@{empty}}
+\index{empty@{empty}!sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}}
+\doxysubsubsection{\texorpdfstring{empty()}{empty()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1span_add5154aa040035e175cf77996b03a6d2} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t Extent = dynamic\+\_\+extent$>$ \\
+bool \mbox{\hyperlink{classsysio_1_1vm_1_1span}{sysio\+::vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$\+::empty (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2span_8hpp_source_l00075}{75}} of file \mbox{\hyperlink{vm_2span_8hpp_source}{span.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00075\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1vm_1_1span_a584ee0404e01edf225142e86d23d6d7d}{size}}()\ ==\ 0;\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=345pt]{classsysio_1_1vm_1_1span_add5154aa040035e175cf77996b03a6d2_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1span_a9de529b728557cc6cb12824de27ec0fd}\index{sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}!end@{end}}
+\index{end@{end}!sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}}
+\doxysubsubsection{\texorpdfstring{end()}{end()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1span_a9de529b728557cc6cb12824de27ec0fd} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t Extent = dynamic\+\_\+extent$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1span_ad080e6e6ee2aa1aae056b9ce4d8d232b}{iterator}} \mbox{\hyperlink{classsysio_1_1vm_1_1span}{sysio\+::vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$\+::end (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2span_8hpp_source_l00064}{64}} of file \mbox{\hyperlink{sysio_2vm_2span_8hpp_source}{span.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00064\ \{\ \textcolor{keywordflow}{return}\ last\_elem;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1vm_1_1span_a9de529b728557cc6cb12824de27ec0fd_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1span_a9de529b728557cc6cb12824de27ec0fd}\index{sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}!end@{end}}
+\index{end@{end}!sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}}
+\doxysubsubsection{\texorpdfstring{end()}{end()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1span_a9de529b728557cc6cb12824de27ec0fd} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t Extent = dynamic\+\_\+extent$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1span_ad080e6e6ee2aa1aae056b9ce4d8d232b}{iterator}} \mbox{\hyperlink{classsysio_1_1vm_1_1span}{sysio\+::vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$\+::end (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2span_8hpp_source_l00064}{64}} of file \mbox{\hyperlink{vm_2span_8hpp_source}{span.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00064\ \{\ \textcolor{keywordflow}{return}\ last\_elem;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1vm_1_1span_a9de529b728557cc6cb12824de27ec0fd_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1span_a9679822c5d4eb7085d9deb2b616fbd4b}\index{sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}!first@{first}}
+\index{first@{first}!sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}}
+\doxysubsubsection{\texorpdfstring{first()}{first()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1span_a9679822c5d4eb7085d9deb2b616fbd4b} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t Extent = dynamic\+\_\+extent$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1span}{span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, dynamic\+\_\+extent $>$ \mbox{\hyperlink{classsysio_1_1vm_1_1span}{sysio\+::vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$\+::first (\begin{DoxyParamCaption}\item[{std\+::size\+\_\+t}]{len}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2span_8hpp_source_l00077}{77}} of file \mbox{\hyperlink{sysio_2vm_2span_8hpp_source}{span.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ <=\ \mbox{\hyperlink{classsysio_1_1vm_1_1span_a584ee0404e01edf225142e86d23d6d7d}{size}}(),\ span\_exception,\ \textcolor{stringliteral}{"{}length\ overflows\ span"{}});}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{first\_elem,\ first\_elem\ +\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\};}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=334pt]{classsysio_1_1vm_1_1span_a9679822c5d4eb7085d9deb2b616fbd4b_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=337pt]{classsysio_1_1vm_1_1span_a9679822c5d4eb7085d9deb2b616fbd4b_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1span_a9679822c5d4eb7085d9deb2b616fbd4b}\index{sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}!first@{first}}
+\index{first@{first}!sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}}
+\doxysubsubsection{\texorpdfstring{first()}{first()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1span_a9679822c5d4eb7085d9deb2b616fbd4b} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t Extent = dynamic\+\_\+extent$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1span}{span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, dynamic\+\_\+extent $>$ \mbox{\hyperlink{classsysio_1_1vm_1_1span}{sysio\+::vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$\+::first (\begin{DoxyParamCaption}\item[{std\+::size\+\_\+t}]{len}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2span_8hpp_source_l00077}{77}} of file \mbox{\hyperlink{vm_2span_8hpp_source}{span.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ <=\ \mbox{\hyperlink{classsysio_1_1vm_1_1span_a584ee0404e01edf225142e86d23d6d7d}{size}}(),\ span\_exception,\ \textcolor{stringliteral}{"{}length\ overflows\ span"{}});}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{first\_elem,\ first\_elem\ +\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\};}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=334pt]{classsysio_1_1vm_1_1span_a9679822c5d4eb7085d9deb2b616fbd4b_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1span_a521fc11cf53ba436a1807910bbb8290e}\index{sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}!front@{front}}
+\index{front@{front}!sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}}
+\doxysubsubsection{\texorpdfstring{front()}{front()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1span_a521fc11cf53ba436a1807910bbb8290e} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t Extent = dynamic\+\_\+extent$>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1span}{sysio\+::vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$\+::front (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2span_8hpp_source_l00068}{68}} of file \mbox{\hyperlink{sysio_2vm_2span_8hpp_source}{span.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00068\ \{\ \textcolor{keywordflow}{return}\ *first\_elem;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1span_a521fc11cf53ba436a1807910bbb8290e}\index{sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}!front@{front}}
+\index{front@{front}!sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}}
+\doxysubsubsection{\texorpdfstring{front()}{front()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1span_a521fc11cf53ba436a1807910bbb8290e} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t Extent = dynamic\+\_\+extent$>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1span}{sysio\+::vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$\+::front (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2span_8hpp_source_l00068}{68}} of file \mbox{\hyperlink{vm_2span_8hpp_source}{span.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00068\ \{\ \textcolor{keywordflow}{return}\ *first\_elem;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1span_a261460c1a7aa8f00c66142d12eeb79c4}\index{sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}!last@{last}}
+\index{last@{last}!sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}}
+\doxysubsubsection{\texorpdfstring{last()}{last()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1span_a261460c1a7aa8f00c66142d12eeb79c4} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t Extent = dynamic\+\_\+extent$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1span}{span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, dynamic\+\_\+extent $>$ \mbox{\hyperlink{classsysio_1_1vm_1_1span}{sysio\+::vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$\+::last (\begin{DoxyParamCaption}\item[{std\+::size\+\_\+t}]{len}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2span_8hpp_source_l00082}{82}} of file \mbox{\hyperlink{sysio_2vm_2span_8hpp_source}{span.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ <=\ \mbox{\hyperlink{classsysio_1_1vm_1_1span_a584ee0404e01edf225142e86d23d6d7d}{size}}(),\ span\_exception,\ \textcolor{stringliteral}{"{}length\ underflows\ span"{}});}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{last\_elem\ -\/\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ last\_elem\};}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=333pt]{classsysio_1_1vm_1_1span_a261460c1a7aa8f00c66142d12eeb79c4_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=336pt]{classsysio_1_1vm_1_1span_a261460c1a7aa8f00c66142d12eeb79c4_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1span_a261460c1a7aa8f00c66142d12eeb79c4}\index{sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}!last@{last}}
+\index{last@{last}!sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}}
+\doxysubsubsection{\texorpdfstring{last()}{last()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1span_a261460c1a7aa8f00c66142d12eeb79c4} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t Extent = dynamic\+\_\+extent$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1span}{span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, dynamic\+\_\+extent $>$ \mbox{\hyperlink{classsysio_1_1vm_1_1span}{sysio\+::vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$\+::last (\begin{DoxyParamCaption}\item[{std\+::size\+\_\+t}]{len}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2span_8hpp_source_l00082}{82}} of file \mbox{\hyperlink{vm_2span_8hpp_source}{span.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ <=\ \mbox{\hyperlink{classsysio_1_1vm_1_1span_a584ee0404e01edf225142e86d23d6d7d}{size}}(),\ span\_exception,\ \textcolor{stringliteral}{"{}length\ underflows\ span"{}});}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{last\_elem\ -\/\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ last\_elem\};}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=333pt]{classsysio_1_1vm_1_1span_a261460c1a7aa8f00c66142d12eeb79c4_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1span_ac79e7410e3601ae121d5d2929ac523af}\index{sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}!operator=@{operator=}}
+\index{operator=@{operator=}!sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1span_ac79e7410e3601ae121d5d2929ac523af} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t Extent = dynamic\+\_\+extent$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1span}{span}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1span}{sysio\+::vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$\+::operator= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classsysio_1_1vm_1_1span}{span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$ \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}, {\ttfamily [default]}}
+
+\Hypertarget{classsysio_1_1vm_1_1span_ac79e7410e3601ae121d5d2929ac523af}\index{sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}!operator=@{operator=}}
+\index{operator=@{operator=}!sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1span_ac79e7410e3601ae121d5d2929ac523af} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t Extent = dynamic\+\_\+extent$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1span}{span}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1span}{sysio\+::vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$\+::operator= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classsysio_1_1vm_1_1span}{span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$ \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}, {\ttfamily [default]}}
+
+\Hypertarget{classsysio_1_1vm_1_1span_acb1b04fe2037144fe4387c9f9d3d2c81}\index{sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}!operator=@{operator=}}
+\index{operator=@{operator=}!sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1span_acb1b04fe2037144fe4387c9f9d3d2c81} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t Extent = dynamic\+\_\+extent$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1span}{span}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1span}{sysio\+::vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$\+::operator= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classsysio_1_1vm_1_1span}{span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$ \&\&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}, {\ttfamily [default]}}
+
+\Hypertarget{classsysio_1_1vm_1_1span_acb1b04fe2037144fe4387c9f9d3d2c81}\index{sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}!operator=@{operator=}}
+\index{operator=@{operator=}!sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1span_acb1b04fe2037144fe4387c9f9d3d2c81} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t Extent = dynamic\+\_\+extent$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1span}{span}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1span}{sysio\+::vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$\+::operator= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classsysio_1_1vm_1_1span}{span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$ \&\&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}, {\ttfamily [default]}}
+
+\Hypertarget{classsysio_1_1vm_1_1span_a7e3eaced9d76a12984e57a2a58dabc25}\index{sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}!operator\mbox{[}\mbox{]}@{operator[]}}
+\index{operator\mbox{[}\mbox{]}@{operator[]}!sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}}
+\doxysubsubsection{\texorpdfstring{operator[]()}{operator[]()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1span_a7e3eaced9d76a12984e57a2a58dabc25} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t Extent = dynamic\+\_\+extent$>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1span}{sysio\+::vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$\+::operator\mbox{[}$\,$\mbox{]} (\begin{DoxyParamCaption}\item[{std\+::size\+\_\+t}]{n}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2span_8hpp_source_l00070}{70}} of file \mbox{\hyperlink{sysio_2vm_2span_8hpp_source}{span.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00070\ \{\ \textcolor{keywordflow}{return}\ first\_elem[n];\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1span_a7e3eaced9d76a12984e57a2a58dabc25}\index{sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}!operator\mbox{[}\mbox{]}@{operator[]}}
+\index{operator\mbox{[}\mbox{]}@{operator[]}!sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}}
+\doxysubsubsection{\texorpdfstring{operator[]()}{operator[]()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1span_a7e3eaced9d76a12984e57a2a58dabc25} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t Extent = dynamic\+\_\+extent$>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1span}{sysio\+::vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$\+::operator\mbox{[}$\,$\mbox{]} (\begin{DoxyParamCaption}\item[{std\+::size\+\_\+t}]{n}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2span_8hpp_source_l00070}{70}} of file \mbox{\hyperlink{vm_2span_8hpp_source}{span.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00070\ \{\ \textcolor{keywordflow}{return}\ first\_elem[n];\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1span_a91787c7526db017baf61240d3e6d41b9}\index{sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}!rbegin@{rbegin}}
+\index{rbegin@{rbegin}!sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}}
+\doxysubsubsection{\texorpdfstring{rbegin()}{rbegin()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1span_a91787c7526db017baf61240d3e6d41b9} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t Extent = dynamic\+\_\+extent$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1span_af8b87fabcb5a9df2f76c77b3e7ce88d7}{reverse\+\_\+iterator}} \mbox{\hyperlink{classsysio_1_1vm_1_1span}{sysio\+::vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$\+::rbegin (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2span_8hpp_source_l00065}{65}} of file \mbox{\hyperlink{sysio_2vm_2span_8hpp_source}{span.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00065\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1vm_1_1span_af8b87fabcb5a9df2f76c77b3e7ce88d7}{reverse\_iterator}}\{last\_elem\};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1span_a91787c7526db017baf61240d3e6d41b9}\index{sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}!rbegin@{rbegin}}
+\index{rbegin@{rbegin}!sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}}
+\doxysubsubsection{\texorpdfstring{rbegin()}{rbegin()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1span_a91787c7526db017baf61240d3e6d41b9} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t Extent = dynamic\+\_\+extent$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1span_af8b87fabcb5a9df2f76c77b3e7ce88d7}{reverse\+\_\+iterator}} \mbox{\hyperlink{classsysio_1_1vm_1_1span}{sysio\+::vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$\+::rbegin (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2span_8hpp_source_l00065}{65}} of file \mbox{\hyperlink{vm_2span_8hpp_source}{span.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00065\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1vm_1_1span_af8b87fabcb5a9df2f76c77b3e7ce88d7}{reverse\_iterator}}\{last\_elem\};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1span_a74c064e517bd1d721640f0c226d608d6}\index{sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}!rend@{rend}}
+\index{rend@{rend}!sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}}
+\doxysubsubsection{\texorpdfstring{rend()}{rend()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1span_a74c064e517bd1d721640f0c226d608d6} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t Extent = dynamic\+\_\+extent$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1span_af8b87fabcb5a9df2f76c77b3e7ce88d7}{reverse\+\_\+iterator}} \mbox{\hyperlink{classsysio_1_1vm_1_1span}{sysio\+::vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$\+::rend (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2span_8hpp_source_l00066}{66}} of file \mbox{\hyperlink{sysio_2vm_2span_8hpp_source}{span.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00066\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1vm_1_1span_af8b87fabcb5a9df2f76c77b3e7ce88d7}{reverse\_iterator}}\{first\_elem\};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1span_a74c064e517bd1d721640f0c226d608d6}\index{sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}!rend@{rend}}
+\index{rend@{rend}!sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}}
+\doxysubsubsection{\texorpdfstring{rend()}{rend()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1span_a74c064e517bd1d721640f0c226d608d6} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t Extent = dynamic\+\_\+extent$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1span_af8b87fabcb5a9df2f76c77b3e7ce88d7}{reverse\+\_\+iterator}} \mbox{\hyperlink{classsysio_1_1vm_1_1span}{sysio\+::vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$\+::rend (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2span_8hpp_source_l00066}{66}} of file \mbox{\hyperlink{vm_2span_8hpp_source}{span.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00066\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1vm_1_1span_af8b87fabcb5a9df2f76c77b3e7ce88d7}{reverse\_iterator}}\{first\_elem\};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1span_a584ee0404e01edf225142e86d23d6d7d}\index{sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}!size@{size}}
+\index{size@{size}!sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}}
+\doxysubsubsection{\texorpdfstring{size()}{size()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1span_a584ee0404e01edf225142e86d23d6d7d} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t Extent = dynamic\+\_\+extent$>$ \\
+std\+::size\+\_\+t \mbox{\hyperlink{classsysio_1_1vm_1_1span}{sysio\+::vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$\+::size (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2span_8hpp_source_l00073}{73}} of file \mbox{\hyperlink{sysio_2vm_2span_8hpp_source}{span.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00073\ \{\ \textcolor{keywordflow}{return}\ last\_elem\ -\/\ first\_elem;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{classsysio_1_1vm_1_1span_a584ee0404e01edf225142e86d23d6d7d_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1span_a584ee0404e01edf225142e86d23d6d7d}\index{sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}!size@{size}}
+\index{size@{size}!sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}}
+\doxysubsubsection{\texorpdfstring{size()}{size()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1span_a584ee0404e01edf225142e86d23d6d7d} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t Extent = dynamic\+\_\+extent$>$ \\
+std\+::size\+\_\+t \mbox{\hyperlink{classsysio_1_1vm_1_1span}{sysio\+::vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$\+::size (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2span_8hpp_source_l00073}{73}} of file \mbox{\hyperlink{vm_2span_8hpp_source}{span.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00073\ \{\ \textcolor{keywordflow}{return}\ last\_elem\ -\/\ first\_elem;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1span_a0541e12c287d8e78efcf118f0869ff8f}\index{sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}!size\_bytes@{size\_bytes}}
+\index{size\_bytes@{size\_bytes}!sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}}
+\doxysubsubsection{\texorpdfstring{size\_bytes()}{size\_bytes()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1span_a0541e12c287d8e78efcf118f0869ff8f} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t Extent = dynamic\+\_\+extent$>$ \\
+std\+::size\+\_\+t \mbox{\hyperlink{classsysio_1_1vm_1_1span}{sysio\+::vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$\+::size\+\_\+bytes (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2span_8hpp_source_l00074}{74}} of file \mbox{\hyperlink{sysio_2vm_2span_8hpp_source}{span.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00074\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1vm_1_1span_a584ee0404e01edf225142e86d23d6d7d}{size}}()\ *\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}});\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=336pt]{classsysio_1_1vm_1_1span_a0541e12c287d8e78efcf118f0869ff8f_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1span_a0541e12c287d8e78efcf118f0869ff8f}\index{sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}!size\_bytes@{size\_bytes}}
+\index{size\_bytes@{size\_bytes}!sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}}
+\doxysubsubsection{\texorpdfstring{size\_bytes()}{size\_bytes()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1span_a0541e12c287d8e78efcf118f0869ff8f} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t Extent = dynamic\+\_\+extent$>$ \\
+std\+::size\+\_\+t \mbox{\hyperlink{classsysio_1_1vm_1_1span}{sysio\+::vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$\+::size\+\_\+bytes (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2span_8hpp_source_l00074}{74}} of file \mbox{\hyperlink{vm_2span_8hpp_source}{span.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00074\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1vm_1_1span_a584ee0404e01edf225142e86d23d6d7d}{size}}()\ *\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}});\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=336pt]{classsysio_1_1vm_1_1span_a0541e12c287d8e78efcf118f0869ff8f_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1span_a5a9c0216b052bdbba147d49cde8c42b9}\index{sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}!subspan@{subspan}}
+\index{subspan@{subspan}!sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}}
+\doxysubsubsection{\texorpdfstring{subspan()}{subspan()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1span_a5a9c0216b052bdbba147d49cde8c42b9} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t Extent = dynamic\+\_\+extent$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1span}{span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, dynamic\+\_\+extent $>$ \mbox{\hyperlink{classsysio_1_1vm_1_1span}{sysio\+::vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$\+::subspan (\begin{DoxyParamCaption}\item[{std\+::size\+\_\+t}]{offset}{, }\item[{std\+::size\+\_\+t}]{len}{ = {\ttfamily dynamic\+\_\+extent}}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2span_8hpp_source_l00087}{87}} of file \mbox{\hyperlink{sysio_2vm_2span_8hpp_source}{span.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ ==\ dynamic\_extent)\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1span_a584ee0404e01edf225142e86d23d6d7d}{size}}()\ -\/\ offset;}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(first\_elem\ +\ offset\ +\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ <=\ last\_elem,\ span\_exception,\ \textcolor{stringliteral}{"{}length\ overflows\ span"{}});}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{first\_elem\ +\ offset,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\};}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1vm_1_1span_a5a9c0216b052bdbba147d49cde8c42b9_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1span_a5a9c0216b052bdbba147d49cde8c42b9}\index{sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}!subspan@{subspan}}
+\index{subspan@{subspan}!sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}}
+\doxysubsubsection{\texorpdfstring{subspan()}{subspan()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1span_a5a9c0216b052bdbba147d49cde8c42b9} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t Extent = dynamic\+\_\+extent$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1span}{span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, dynamic\+\_\+extent $>$ \mbox{\hyperlink{classsysio_1_1vm_1_1span}{sysio\+::vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$\+::subspan (\begin{DoxyParamCaption}\item[{std\+::size\+\_\+t}]{offset}{, }\item[{std\+::size\+\_\+t}]{len}{ = {\ttfamily dynamic\+\_\+extent}}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2span_8hpp_source_l00087}{87}} of file \mbox{\hyperlink{vm_2span_8hpp_source}{span.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ ==\ dynamic\_extent)\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1span_a584ee0404e01edf225142e86d23d6d7d}{size}}()\ -\/\ offset;}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(first\_elem\ +\ offset\ +\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ <=\ last\_elem,\ span\_exception,\ \textcolor{stringliteral}{"{}length\ overflows\ span"{}});}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{first\_elem\ +\ offset,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\};}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1vm_1_1span_a5a9c0216b052bdbba147d49cde8c42b9_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classsysio_1_1vm_1_1span_a1a55c75be4e4722e6fe8661764e16bfe}\index{sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}!extent@{extent}}
+\index{extent@{extent}!sysio::vm::span$<$ T, Extent $>$@{sysio::vm::span$<$ T, Extent $>$}}
+\doxysubsubsection{\texorpdfstring{extent}{extent}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1span_a1a55c75be4e4722e6fe8661764e16bfe} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , std\+::size\+\_\+t Extent = dynamic\+\_\+extent$>$ \\
+static constexpr std\+::size\+\_\+t \mbox{\hyperlink{classsysio_1_1vm_1_1span}{sysio\+::vm\+::span}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Extent $>$\+::extent = Extent\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2span_8hpp_source_l00028}{28}} of file \mbox{\hyperlink{sysio_2vm_2span_8hpp_source}{span.\+hpp}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/include/sysio/sysio/vm/\mbox{\hyperlink{sysio_2vm_2span_8hpp}{span.\+hpp}}\item 
+libraries/sys-\/vm/include/sysio/vm/\mbox{\hyperlink{vm_2span_8hpp}{span.\+hpp}}\end{DoxyCompactItemize}

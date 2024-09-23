@@ -1,0 +1,861 @@
+\doxysection{pump.\+py}
+\hypertarget{pump_8py_source}{}\label{pump_8py_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/scripts/pump.py@{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/scripts/pump.py}}
+\mbox{\hyperlink{pump_8py}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00001}\mbox{\hyperlink{namespacepump}{00001}}\ \textcolor{comment}{\#!/usr/bin/env\ python}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00002}00002\ \textcolor{comment}{\#}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00003}00003\ \textcolor{comment}{\#\ Copyright\ 2008,\ Google\ Inc.}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00004}00004\ \textcolor{comment}{\#\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00005}00005\ \textcolor{comment}{\#}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00006}00006\ \textcolor{comment}{\#\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00007}00007\ \textcolor{comment}{\#\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00008}00008\ \textcolor{comment}{\#\ met:}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00009}00009\ \textcolor{comment}{\#}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00010}00010\ \textcolor{comment}{\#\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00011}00011\ \textcolor{comment}{\#\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00012}00012\ \textcolor{comment}{\#\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00013}00013\ \textcolor{comment}{\#\ copyright\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00014}00014\ \textcolor{comment}{\#\ in\ the\ documentation\ and/or\ other\ materials\ provided\ with\ the}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00015}00015\ \textcolor{comment}{\#\ distribution.}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00016}00016\ \textcolor{comment}{\#\ \ \ \ \ *\ Neither\ the\ name\ of\ Google\ Inc.\ nor\ the\ names\ of\ its}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00017}00017\ \textcolor{comment}{\#\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products\ derived\ from}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00018}00018\ \textcolor{comment}{\#\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00019}00019\ \textcolor{comment}{\#}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00020}00020\ \textcolor{comment}{\#\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00021}00021\ \textcolor{comment}{\#\ "{}AS\ IS"{}\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00022}00022\ \textcolor{comment}{\#\ LIMITED\ TO,\ THE\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00023}00023\ \textcolor{comment}{\#\ A\ PARTICULAR\ PURPOSE\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ THE\ COPYRIGHT}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00024}00024\ \textcolor{comment}{\#\ OWNER\ OR\ CONTRIBUTORS\ BE\ LIABLE\ FOR\ ANY\ DIRECT,\ INDIRECT,\ INCIDENTAL,}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00025}00025\ \textcolor{comment}{\#\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES\ (INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00026}00026\ \textcolor{comment}{\#\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;\ LOSS\ OF\ USE,}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00027}00027\ \textcolor{comment}{\#\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND\ ON\ ANY}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00028}00028\ \textcolor{comment}{\#\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00029}00029\ \textcolor{comment}{\#\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00030}00030\ \textcolor{comment}{\#\ OF\ THIS\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00032}00032\ \textcolor{stringliteral}{"{}"{}"{}pump\ v0.2.0\ -\/\ Pretty\ Useful\ for\ Meta\ Programming.}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00033}00033\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00034}00034\ \textcolor{stringliteral}{A\ tool\ for\ preprocessor\ meta\ programming.\ \ Useful\ for\ generating}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00035}00035\ \textcolor{stringliteral}{repetitive\ boilerplate\ code.\ \ Especially\ useful\ for\ writing\ C++}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00036}00036\ \textcolor{stringliteral}{classes,\ functions,\ macros,\ and\ templates\ that\ need\ to\ work\ with}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00037}00037\ \textcolor{stringliteral}{various\ number\ of\ arguments.}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00038}00038\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00039}00039\ \textcolor{stringliteral}{USAGE:}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00040}00040\ \textcolor{stringliteral}{\ \ \ \ \ \ \ pump.py\ SOURCE\_FILE}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00041}00041\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00042}00042\ \textcolor{stringliteral}{EXAMPLES:}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00043}00043\ \textcolor{stringliteral}{\ \ \ \ \ \ \ pump.py\ foo.cc.pump}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00044}00044\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ Converts\ foo.cc.pump\ to\ foo.cc.}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00045}00045\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00046}00046\ \textcolor{stringliteral}{GRAMMAR:}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00047}00047\ \textcolor{stringliteral}{\ \ \ \ \ \ \ CODE\ ::=\ ATOMIC\_CODE*}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00048}00048\ \textcolor{stringliteral}{\ \ \ \ \ \ \ ATOMIC\_CODE\ ::=\ \$var\ ID\ =\ EXPRESSION}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00049}00049\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ |\ \$var\ ID\ =\ [[\ CODE\ ]]}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00050}00050\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ |\ \$range\ ID\ EXPRESSION..EXPRESSION}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00051}00051\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ |\ \$for\ ID\ SEPARATOR\ [[\ CODE\ ]]}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00052}00052\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ |\ \$(\$)}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00053}00053\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ |\ \$ID}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00054}00054\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ |\ \$(EXPRESSION)}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00055}00055\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ |\ \$if\ EXPRESSION\ [[\ CODE\ ]]\ ELSE\_BRANCH}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00056}00056\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ |\ [[\ CODE\ ]]}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00057}00057\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ |\ RAW\_CODE}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00058}00058\ \textcolor{stringliteral}{\ \ \ \ \ \ \ SEPARATOR\ ::=\ RAW\_CODE\ |\ EMPTY}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00059}00059\ \textcolor{stringliteral}{\ \ \ \ \ \ \ ELSE\_BRANCH\ ::=\ \$else\ [[\ CODE\ ]]}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00060}00060\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ |\ \$elif\ EXPRESSION\ [[\ CODE\ ]]\ ELSE\_BRANCH}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00061}00061\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ |\ EMPTY}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00062}00062\ \textcolor{stringliteral}{\ \ \ \ \ \ \ EXPRESSION\ has\ Python\ syntax.}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00063}00063\ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00065}00065\ \_\_author\_\_\ =\ \textcolor{stringliteral}{'wan@google.com\ (Zhanyong\ Wan)'}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00067}00067\ \textcolor{keyword}{import}\ os}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00068}00068\ \textcolor{keyword}{import}\ re}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00069}00069\ \textcolor{keyword}{import}\ sys}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00072}\mbox{\hyperlink{namespacepump_a132b35d1104c7f479aa21c345f413477}{00072}}\ TOKEN\_TABLE\ =\ [}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00073}00073\ \ \ \ \ (re.compile(\textcolor{stringliteral}{r'\(\backslash\)\$var\(\backslash\)s+'}),\ \textcolor{stringliteral}{'\$var'}),}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00074}00074\ \ \ \ \ (re.compile(\textcolor{stringliteral}{r'\(\backslash\)\$elif\(\backslash\)s+'}),\ \textcolor{stringliteral}{'\$elif'}),}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00075}00075\ \ \ \ \ (re.compile(\textcolor{stringliteral}{r'\(\backslash\)\$else\(\backslash\)s+'}),\ \textcolor{stringliteral}{'\$else'}),}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00076}00076\ \ \ \ \ (re.compile(\textcolor{stringliteral}{r'\(\backslash\)\$for\(\backslash\)s+'}),\ \textcolor{stringliteral}{'\$for'}),}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00077}00077\ \ \ \ \ (re.compile(\textcolor{stringliteral}{r'\(\backslash\)\$if\(\backslash\)s+'}),\ \textcolor{stringliteral}{'\$if'}),}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00078}00078\ \ \ \ \ (re.compile(\textcolor{stringliteral}{r'\(\backslash\)\$range\(\backslash\)s+'}),\ \textcolor{stringliteral}{'\$range'}),}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00079}00079\ \ \ \ \ (re.compile(\textcolor{stringliteral}{r'\(\backslash\)\$[\_A-\/Za-\/z]\(\backslash\)w*'}),\ \textcolor{stringliteral}{'\$id'}),}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00080}00080\ \ \ \ \ (re.compile(\textcolor{stringliteral}{r'\(\backslash\)\$\(\backslash\)(\(\backslash\)\$\(\backslash\))'}),\ \textcolor{stringliteral}{'\$(\$)'}),}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00081}00081\ \ \ \ \ (re.compile(\textcolor{stringliteral}{r'\(\backslash\)\$'}),\ \textcolor{stringliteral}{'\$'}),}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00082}00082\ \ \ \ \ (re.compile(\textcolor{stringliteral}{r'\(\backslash\)[\(\backslash\)[\(\backslash\)n?'}),\ \textcolor{stringliteral}{'[['}),}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00083}00083\ \ \ \ \ (re.compile(\textcolor{stringliteral}{r'\(\backslash\)]\(\backslash\)]\(\backslash\)n?'}),\ \textcolor{stringliteral}{']]'}),}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00084}00084\ \ \ \ \ ]}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00085}00085\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00086}00086\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00087}\mbox{\hyperlink{classpump_1_1_cursor}{00087}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classpump_1_1_cursor}{Cursor}}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00088}00088\ \ \ \textcolor{stringliteral}{"{}"{}"{}Represents\ a\ position\ (line\ and\ column)\ in\ a\ text\ file."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00089}00089\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00090}\mbox{\hyperlink{classpump_1_1_cursor_a733bac44d6c6a8c0e6932c72e2a2c55c}{00090}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classpump_1_1_cursor_a733bac44d6c6a8c0e6932c72e2a2c55c}{\_\_init\_\_}}(self,\ line=-\/1,\ column=-\/1):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00091}\mbox{\hyperlink{classpump_1_1_cursor_aee8d8b67360da7fc4e635540cb41d48c}{00091}}\ \ \ \ \ self.\mbox{\hyperlink{classpump_1_1_cursor_aee8d8b67360da7fc4e635540cb41d48c}{line}}\ =\ line}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00092}\mbox{\hyperlink{classpump_1_1_cursor_ae73db76c3a845a82afb334633864254e}{00092}}\ \ \ \ \ self.\mbox{\hyperlink{classpump_1_1_cursor_ae73db76c3a845a82afb334633864254e}{column}}\ =\ column}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00093}00093\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00094}\mbox{\hyperlink{classpump_1_1_cursor_a012a67506d0a3e81daec0394d18359b8}{00094}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classpump_1_1_cursor_a012a67506d0a3e81daec0394d18359b8}{\_\_eq\_\_}}(self,\ rhs):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00095}00095\ \ \ \ \ \textcolor{keywordflow}{return}\ self.\mbox{\hyperlink{classpump_1_1_cursor_aee8d8b67360da7fc4e635540cb41d48c}{line}}\ ==\ rhs.line\ \textcolor{keywordflow}{and}\ self.\mbox{\hyperlink{classpump_1_1_cursor_ae73db76c3a845a82afb334633864254e}{column}}\ ==\ rhs.column}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00096}00096\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00097}\mbox{\hyperlink{classpump_1_1_cursor_a6480281fc3721fcd6430ed7294d978fb}{00097}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classpump_1_1_cursor_a6480281fc3721fcd6430ed7294d978fb}{\_\_ne\_\_}}(self,\ rhs):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00098}00098\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keywordflow}{not}\ self\ ==\ rhs}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00099}00099\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00100}\mbox{\hyperlink{classpump_1_1_cursor_a7ec8a30a836133d7654fcaf81250fc77}{00100}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classpump_1_1_cursor_a7ec8a30a836133d7654fcaf81250fc77}{\_\_lt\_\_}}(self,\ rhs):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00101}00101\ \ \ \ \ \textcolor{keywordflow}{return}\ self.\mbox{\hyperlink{classpump_1_1_cursor_aee8d8b67360da7fc4e635540cb41d48c}{line}}\ <\ rhs.line\ \textcolor{keywordflow}{or}\ (}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00102}00102\ \ \ \ \ \ \ \ \ self.\mbox{\hyperlink{classpump_1_1_cursor_aee8d8b67360da7fc4e635540cb41d48c}{line}}\ ==\ rhs.line\ \textcolor{keywordflow}{and}\ self.\mbox{\hyperlink{classpump_1_1_cursor_ae73db76c3a845a82afb334633864254e}{column}}\ <\ rhs.column)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00103}00103\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00104}\mbox{\hyperlink{classpump_1_1_cursor_a18831ec16c4757038316afa6a644e895}{00104}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classpump_1_1_cursor_a18831ec16c4757038316afa6a644e895}{\_\_le\_\_}}(self,\ rhs):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00105}00105\ \ \ \ \ \textcolor{keywordflow}{return}\ self\ <\ rhs\ \textcolor{keywordflow}{or}\ self\ ==\ rhs}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00106}00106\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00107}\mbox{\hyperlink{classpump_1_1_cursor_abd63ecd2e2f3c4c166d1cdbb32271e65}{00107}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classpump_1_1_cursor_abd63ecd2e2f3c4c166d1cdbb32271e65}{\_\_gt\_\_}}(self,\ rhs):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00108}00108\ \ \ \ \ \textcolor{keywordflow}{return}\ rhs\ <\ self}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00109}00109\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00110}\mbox{\hyperlink{classpump_1_1_cursor_a905243f68d8d43c46febf0a534d6e818}{00110}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classpump_1_1_cursor_a905243f68d8d43c46febf0a534d6e818}{\_\_ge\_\_}}(self,\ rhs):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00111}00111\ \ \ \ \ \textcolor{keywordflow}{return}\ rhs\ <=\ self}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00112}00112\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00113}\mbox{\hyperlink{classpump_1_1_cursor_afca901b5f22d9b2bfe207beccdec7dfa}{00113}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classpump_1_1_cursor_afca901b5f22d9b2bfe207beccdec7dfa}{\_\_str\_\_}}(self):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00114}00114\ \ \ \ \ \textcolor{keywordflow}{if}\ self\ ==\ \mbox{\hyperlink{namespacepump_ac14faf54338baf78efb4cabd233f7d22}{Eof}}():}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00115}00115\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{'EOF'}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00116}00116\ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00117}00117\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{'\%s(\%s)'}\ \%\ (self.\mbox{\hyperlink{classpump_1_1_cursor_aee8d8b67360da7fc4e635540cb41d48c}{line}}\ +\ 1,\ self.\mbox{\hyperlink{classpump_1_1_cursor_ae73db76c3a845a82afb334633864254e}{column}})}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00118}00118\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00119}\mbox{\hyperlink{classpump_1_1_cursor_a7a565e3c30559d7b02ece7817ab1cf72}{00119}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classpump_1_1_cursor_a7a565e3c30559d7b02ece7817ab1cf72}{\_\_add\_\_}}(self,\ offset):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00120}00120\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classpump_1_1_cursor}{Cursor}}(self.\mbox{\hyperlink{classpump_1_1_cursor_aee8d8b67360da7fc4e635540cb41d48c}{line}},\ self.\mbox{\hyperlink{classpump_1_1_cursor_ae73db76c3a845a82afb334633864254e}{column}}\ +\ offset)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00121}00121\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00122}\mbox{\hyperlink{classpump_1_1_cursor_a8a9a818d6c242243bc08641deb3b007d}{00122}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classpump_1_1_cursor_a8a9a818d6c242243bc08641deb3b007d}{\_\_sub\_\_}}(self,\ offset):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00123}00123\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classpump_1_1_cursor}{Cursor}}(self.\mbox{\hyperlink{classpump_1_1_cursor_aee8d8b67360da7fc4e635540cb41d48c}{line}},\ self.\mbox{\hyperlink{classpump_1_1_cursor_ae73db76c3a845a82afb334633864254e}{column}}\ -\/\ offset)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00124}00124\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00125}\mbox{\hyperlink{classpump_1_1_cursor_ae5be3cd7be0409815feaa37cca01f0bf}{00125}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classpump_1_1_cursor_ae5be3cd7be0409815feaa37cca01f0bf}{Clone}}(self):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00126}00126\ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Returns\ a\ copy\ of\ self."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00127}00127\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00128}00128\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classpump_1_1_cursor}{Cursor}}(self.\mbox{\hyperlink{classpump_1_1_cursor_aee8d8b67360da7fc4e635540cb41d48c}{line}},\ self.\mbox{\hyperlink{classpump_1_1_cursor_ae73db76c3a845a82afb334633864254e}{column}})}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00129}00129\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00130}00130\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00131}00131\ \textcolor{comment}{\#\ Special\ cursor\ to\ indicate\ the\ end-\/of-\/file.}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00132}\mbox{\hyperlink{namespacepump_ac14faf54338baf78efb4cabd233f7d22}{00132}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacepump_ac14faf54338baf78efb4cabd233f7d22}{Eof}}():}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00133}00133\ \ \ \textcolor{stringliteral}{"{}"{}"{}Returns\ the\ special\ cursor\ to\ denote\ the\ end-\/of-\/file."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00134}00134\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classpump_1_1_cursor}{Cursor}}(-\/1,\ -\/1)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00135}00135\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00136}00136\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00137}\mbox{\hyperlink{classpump_1_1_token}{00137}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classpump_1_1_token}{Token}}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00138}00138\ \ \ \textcolor{stringliteral}{"{}"{}"{}Represents\ a\ token\ in\ a\ Pump\ source\ file."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00139}00139\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00140}\mbox{\hyperlink{classpump_1_1_token_aebb8620ab99b890c7cdc0aa64f6b10d7}{00140}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classpump_1_1_token_aebb8620ab99b890c7cdc0aa64f6b10d7}{\_\_init\_\_}}(self,\ start=None,\ end=None,\ value=None,\ token\_type=None):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00141}00141\ \ \ \ \ \textcolor{keywordflow}{if}\ start\ \textcolor{keywordflow}{is}\ \textcolor{keywordtype}{None}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00142}\mbox{\hyperlink{classpump_1_1_token_a53e3333a770bc8773224a5af78bca5bb}{00142}}\ \ \ \ \ \ \ self.\mbox{\hyperlink{classpump_1_1_token_a53e3333a770bc8773224a5af78bca5bb}{start}}\ =\ \mbox{\hyperlink{namespacepump_ac14faf54338baf78efb4cabd233f7d22}{Eof}}()}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00143}00143\ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00144}00144\ \ \ \ \ \ \ self.\mbox{\hyperlink{classpump_1_1_token_a53e3333a770bc8773224a5af78bca5bb}{start}}\ =\ start}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00145}00145\ \ \ \ \ \textcolor{keywordflow}{if}\ end\ \textcolor{keywordflow}{is}\ \textcolor{keywordtype}{None}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00146}\mbox{\hyperlink{classpump_1_1_token_abb88c0ece4274cfd974fd01d0468953c}{00146}}\ \ \ \ \ \ \ self.\mbox{\hyperlink{classpump_1_1_token_abb88c0ece4274cfd974fd01d0468953c}{end}}\ =\ \mbox{\hyperlink{namespacepump_ac14faf54338baf78efb4cabd233f7d22}{Eof}}()}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00147}00147\ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00148}00148\ \ \ \ \ \ \ self.\mbox{\hyperlink{classpump_1_1_token_abb88c0ece4274cfd974fd01d0468953c}{end}}\ =\ end}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00149}\mbox{\hyperlink{classpump_1_1_token_a5b7ab395a380b775b2bf0a8b0abfda86}{00149}}\ \ \ \ \ self.\mbox{\hyperlink{classpump_1_1_token_a5b7ab395a380b775b2bf0a8b0abfda86}{value}}\ =\ value}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00150}\mbox{\hyperlink{classpump_1_1_token_aeac105b76f6af13c8c64ba0a94e37d90}{00150}}\ \ \ \ \ self.\mbox{\hyperlink{classpump_1_1_token_aeac105b76f6af13c8c64ba0a94e37d90}{token\_type}}\ =\ token\_type}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00151}00151\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00152}\mbox{\hyperlink{classpump_1_1_token_a1a3dc1ee7b0d66e90f4ab7228b37fc0d}{00152}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classpump_1_1_token_a1a3dc1ee7b0d66e90f4ab7228b37fc0d}{\_\_str\_\_}}(self):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00153}00153\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{'Token\ @\%s:\ \(\backslash\)'\%s\(\backslash\)'\ type=\%s'}\ \%\ (}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00154}00154\ \ \ \ \ \ \ \ \ self.\mbox{\hyperlink{classpump_1_1_token_a53e3333a770bc8773224a5af78bca5bb}{start}},\ self.\mbox{\hyperlink{classpump_1_1_token_a5b7ab395a380b775b2bf0a8b0abfda86}{value}},\ self.\mbox{\hyperlink{classpump_1_1_token_aeac105b76f6af13c8c64ba0a94e37d90}{token\_type}})}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00155}00155\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00156}\mbox{\hyperlink{classpump_1_1_token_a808876dd5a7b1bf6c43a3855dc4a8868}{00156}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classpump_1_1_token_a808876dd5a7b1bf6c43a3855dc4a8868}{Clone}}(self):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00157}00157\ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Returns\ a\ copy\ of\ self."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00158}00158\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00159}00159\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classpump_1_1_token}{Token}}(self.\mbox{\hyperlink{classpump_1_1_token_a53e3333a770bc8773224a5af78bca5bb}{start}}.\mbox{\hyperlink{classpump_1_1_token_a808876dd5a7b1bf6c43a3855dc4a8868}{Clone}}(),\ self.\mbox{\hyperlink{classpump_1_1_token_abb88c0ece4274cfd974fd01d0468953c}{end}}.\mbox{\hyperlink{classpump_1_1_token_a808876dd5a7b1bf6c43a3855dc4a8868}{Clone}}(),\ self.\mbox{\hyperlink{classpump_1_1_token_a5b7ab395a380b775b2bf0a8b0abfda86}{value}},}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00160}00160\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ self.\mbox{\hyperlink{classpump_1_1_token_aeac105b76f6af13c8c64ba0a94e37d90}{token\_type}})}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00161}00161\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00162}00162\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00163}\mbox{\hyperlink{namespacepump_ad7c83dbd8026ccdf6e1064bf7cd42e7b}{00163}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacepump_ad7c83dbd8026ccdf6e1064bf7cd42e7b}{StartsWith}}(lines,\ pos,\ string):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00164}00164\ \ \ \textcolor{stringliteral}{"{}"{}"{}Returns\ True\ iff\ the\ given\ position\ in\ lines\ starts\ with\ 'string'."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00165}00165\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00166}00166\ \ \ \textcolor{keywordflow}{return}\ lines[pos.line][pos.column:].startswith(string)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00167}00167\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00168}00168\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00169}\mbox{\hyperlink{namespacepump_aa491950fc13b1e3485ab83915390ba11}{00169}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacepump_aa491950fc13b1e3485ab83915390ba11}{FindFirstInLine}}(line,\ token\_table):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00170}00170\ \ \ best\_match\_start\ =\ -\/1}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00171}00171\ \ \ \textcolor{keywordflow}{for}\ (regex,\ token\_type)\ \textcolor{keywordflow}{in}\ token\_table:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00172}00172\ \ \ \ \ m\ =\ regex.search(line)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00173}00173\ \ \ \ \ \textcolor{keywordflow}{if}\ m:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00174}00174\ \ \ \ \ \ \ \textcolor{comment}{\#\ We\ found\ regex\ in\ lines}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00175}00175\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ best\_match\_start\ <\ 0\ \textcolor{keywordflow}{or}\ m.start()\ <\ best\_match\_start:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00176}00176\ \ \ \ \ \ \ \ \ best\_match\_start\ =\ m.start()}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00177}00177\ \ \ \ \ \ \ \ \ best\_match\_length\ =\ m.end()\ -\/\ m.start()}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00178}00178\ \ \ \ \ \ \ \ \ best\_match\_token\_type\ =\ token\_type}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00179}00179\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00180}00180\ \ \ \textcolor{keywordflow}{if}\ best\_match\_start\ <\ 0:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00181}00181\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keywordtype}{None}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00182}00182\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00183}00183\ \ \ \textcolor{keywordflow}{return}\ (best\_match\_start,\ best\_match\_length,\ best\_match\_token\_type)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00184}00184\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00185}00185\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00186}\mbox{\hyperlink{namespacepump_a3253bdaf5346dd3dffeff52c022b6b5f}{00186}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacepump_a3253bdaf5346dd3dffeff52c022b6b5f}{FindFirst}}(lines,\ token\_table,\ cursor):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00187}00187\ \ \ \textcolor{stringliteral}{"{}"{}"{}Finds\ the\ first\ occurrence\ of\ any\ string\ in\ strings\ in\ lines."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00188}00188\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00189}00189\ \ \ start\ =\ cursor.Clone()}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00190}00190\ \ \ cur\_line\_number\ =\ cursor.line}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00191}00191\ \ \ \textcolor{keywordflow}{for}\ line\ \textcolor{keywordflow}{in}\ lines[start.line:]:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00192}00192\ \ \ \ \ \textcolor{keywordflow}{if}\ cur\_line\_number\ ==\ start.line:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00193}00193\ \ \ \ \ \ \ line\ =\ line[start.column:]}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00194}00194\ \ \ \ \ m\ =\ \mbox{\hyperlink{namespacepump_aa491950fc13b1e3485ab83915390ba11}{FindFirstInLine}}(line,\ token\_table)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00195}00195\ \ \ \ \ \textcolor{keywordflow}{if}\ m:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00196}00196\ \ \ \ \ \ \ \textcolor{comment}{\#\ We\ found\ a\ regex\ in\ line.}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00197}00197\ \ \ \ \ \ \ (start\_column,\ length,\ token\_type)\ =\ m}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00198}00198\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ cur\_line\_number\ ==\ start.line:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00199}00199\ \ \ \ \ \ \ \ \ start\_column\ +=\ start.column}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00200}00200\ \ \ \ \ \ \ found\_start\ =\ \mbox{\hyperlink{classpump_1_1_cursor}{Cursor}}(cur\_line\_number,\ start\_column)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00201}00201\ \ \ \ \ \ \ found\_end\ =\ found\_start\ +\ length}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00202}00202\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacepump_ad3f8d28d4a1be435876ec5c677be185a}{MakeToken}}(lines,\ found\_start,\ found\_end,\ token\_type)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00203}00203\ \ \ \ \ cur\_line\_number\ +=\ 1}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00204}00204\ \ \ \textcolor{comment}{\#\ We\ failed\ to\ find\ str\ in\ lines}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00205}00205\ \ \ \textcolor{keywordflow}{return}\ \textcolor{keywordtype}{None}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00206}00206\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00207}00207\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00208}\mbox{\hyperlink{namespacepump_a259e0b99da57fa05cfc49e82cd820f35}{00208}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacepump_a259e0b99da57fa05cfc49e82cd820f35}{SubString}}(lines,\ start,\ end):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00209}00209\ \ \ \textcolor{stringliteral}{"{}"{}"{}Returns\ a\ substring\ in\ lines."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00210}00210\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00211}00211\ \ \ \textcolor{keywordflow}{if}\ end\ ==\ \mbox{\hyperlink{namespacepump_ac14faf54338baf78efb4cabd233f7d22}{Eof}}():}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00212}00212\ \ \ \ \ end\ =\ \mbox{\hyperlink{classpump_1_1_cursor}{Cursor}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}(lines)\ -\/\ 1,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}(lines[-\/1]))}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00213}00213\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00214}00214\ \ \ \textcolor{keywordflow}{if}\ start\ >=\ end:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00215}00215\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{''}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00216}00216\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00217}00217\ \ \ \textcolor{keywordflow}{if}\ start.line\ ==\ end.line:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00218}00218\ \ \ \ \ \textcolor{keywordflow}{return}\ lines[start.line][start.column:end.column]}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00219}00219\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00220}00220\ \ \ result\_lines\ =\ ([lines[start.line][start.column:]]\ +}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00221}00221\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lines[start.line\ +\ 1:end.line]\ +}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00222}00222\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [lines[end.line][:end.column]])}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00223}00223\ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{''}.join(result\_lines)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00224}00224\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00225}00225\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00226}\mbox{\hyperlink{namespacepump_a5943e09143c90b811814bfe4515b887f}{00226}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacepump_a5943e09143c90b811814bfe4515b887f}{StripMetaComments}}(str):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00227}00227\ \ \ \textcolor{stringliteral}{"{}"{}"{}Strip\ meta\ comments\ from\ each\ line\ in\ the\ given\ string."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00228}00228\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00229}00229\ \ \ \textcolor{comment}{\#\ First,\ completely\ remove\ lines\ containing\ nothing\ but\ a\ meta}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00230}00230\ \ \ \textcolor{comment}{\#\ comment,\ including\ the\ trailing\ \(\backslash\)n.}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00231}00231\ \ \ str\ =\ re.sub(\textcolor{stringliteral}{r'\string^\(\backslash\)s*\(\backslash\)\$\(\backslash\)\$.*\(\backslash\)n'},\ \textcolor{stringliteral}{''},\ str)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00232}00232\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00233}00233\ \ \ \textcolor{comment}{\#\ Then,\ remove\ meta\ comments\ from\ contentful\ lines.}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00234}00234\ \ \ \textcolor{keywordflow}{return}\ re.sub(\textcolor{stringliteral}{r'\(\backslash\)s*\(\backslash\)\$\(\backslash\)\$.*'},\ \textcolor{stringliteral}{''},\ str)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00235}00235\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00236}00236\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00237}\mbox{\hyperlink{namespacepump_ad3f8d28d4a1be435876ec5c677be185a}{00237}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacepump_ad3f8d28d4a1be435876ec5c677be185a}{MakeToken}}(lines,\ start,\ end,\ token\_type):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00238}00238\ \ \ \textcolor{stringliteral}{"{}"{}"{}Creates\ a\ new\ instance\ of\ Token."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00239}00239\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00240}00240\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classpump_1_1_token}{Token}}(start,\ end,\ \mbox{\hyperlink{namespacepump_a259e0b99da57fa05cfc49e82cd820f35}{SubString}}(lines,\ start,\ end),\ token\_type)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00241}00241\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00242}00242\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00243}\mbox{\hyperlink{namespacepump_a9fad3180a76ca09bedbc539482126604}{00243}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacepump_a9fad3180a76ca09bedbc539482126604}{ParseToken}}(lines,\ pos,\ regex,\ token\_type):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00244}00244\ \ \ line\ =\ lines[pos.line][pos.column:]}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00245}00245\ \ \ m\ =\ regex.search(line)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00246}00246\ \ \ \textcolor{keywordflow}{if}\ m\ \textcolor{keywordflow}{and}\ \textcolor{keywordflow}{not}\ m.start():}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00247}00247\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacepump_ad3f8d28d4a1be435876ec5c677be185a}{MakeToken}}(lines,\ pos,\ pos\ +\ m.end(),\ token\_type)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00248}00248\ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00249}00249\ \ \ \ \ \textcolor{keywordflow}{print}\ \textcolor{stringliteral}{'ERROR:\ \%s\ expected\ at\ \%s.'}\ \%\ (token\_type,\ pos)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00250}00250\ \ \ \ \ sys.exit(1)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00251}00251\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00252}00252\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00253}\mbox{\hyperlink{namespacepump_a8e008923b6c378b8d3df611fb07d6dda}{00253}}\ ID\_REGEX\ =\ re.compile(\textcolor{stringliteral}{r'[\_A-\/Za-\/z]\(\backslash\)w*'})}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00254}\mbox{\hyperlink{namespacepump_a6397ed9bab62b5c6f60a6626f6b287e0}{00254}}\ EQ\_REGEX\ =\ re.compile(\textcolor{stringliteral}{r'='})}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00255}\mbox{\hyperlink{namespacepump_a4c1f68b32fcb8366051b574cf2e6aef1}{00255}}\ REST\_OF\_LINE\_REGEX\ =\ re.compile(\textcolor{stringliteral}{r'.*?(?=\$|\(\backslash\)\$\(\backslash\)\$)'})}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00256}\mbox{\hyperlink{namespacepump_a81f03eaffd2c0f4c6a453a0b179e51ca}{00256}}\ OPTIONAL\_WHITE\_SPACES\_REGEX\ =\ re.compile(\textcolor{stringliteral}{r'\(\backslash\)s*'})}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00257}\mbox{\hyperlink{namespacepump_a4ab1be351870f785a72d324bf56c8316}{00257}}\ WHITE\_SPACE\_REGEX\ =\ re.compile(\textcolor{stringliteral}{r'\(\backslash\)s'})}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00258}\mbox{\hyperlink{namespacepump_a45644ad738e584ec754f6d9f45fe693c}{00258}}\ DOT\_DOT\_REGEX\ =\ re.compile(\textcolor{stringliteral}{r'\(\backslash\).\(\backslash\).'})}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00259}00259\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00260}00260\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00261}\mbox{\hyperlink{namespacepump_adeff0ceb12e2835fccb71b04fbc49867}{00261}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacepump_adeff0ceb12e2835fccb71b04fbc49867}{Skip}}(lines,\ pos,\ regex):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00262}00262\ \ \ line\ =\ lines[pos.line][pos.column:]}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00263}00263\ \ \ m\ =\ re.search(regex,\ line)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00264}00264\ \ \ \textcolor{keywordflow}{if}\ m\ \textcolor{keywordflow}{and}\ \textcolor{keywordflow}{not}\ m.start():}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00265}00265\ \ \ \ \ \textcolor{keywordflow}{return}\ pos\ +\ m.end()}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00266}00266\ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00267}00267\ \ \ \ \ \textcolor{keywordflow}{return}\ pos}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00268}00268\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00269}00269\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00270}\mbox{\hyperlink{namespacepump_adbc79e0f59b6f43b0b413ba5f57002c9}{00270}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacepump_adbc79e0f59b6f43b0b413ba5f57002c9}{SkipUntil}}(lines,\ pos,\ regex,\ token\_type):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00271}00271\ \ \ line\ =\ lines[pos.line][pos.column:]}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00272}00272\ \ \ m\ =\ re.search(regex,\ line)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00273}00273\ \ \ \textcolor{keywordflow}{if}\ m:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00274}00274\ \ \ \ \ \textcolor{keywordflow}{return}\ pos\ +\ m.start()}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00275}00275\ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00276}00276\ \ \ \ \ \textcolor{keywordflow}{print}\ (\textcolor{stringliteral}{'ERROR:\ \%s\ expected\ on\ line\ \%s\ after\ column\ \%s.'}\ \%}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00277}00277\ \ \ \ \ \ \ \ \ \ \ \ (token\_type,\ pos.line\ +\ 1,\ pos.column))}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00278}00278\ \ \ \ \ sys.exit(1)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00279}00279\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00280}00280\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00281}\mbox{\hyperlink{namespacepump_a4b774d590b94815b9e74ac57bf47f9ee}{00281}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacepump_a4b774d590b94815b9e74ac57bf47f9ee}{ParseExpTokenInParens}}(lines,\ pos):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00282}00282\ \ \ \textcolor{keyword}{def\ }ParseInParens(pos):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00283}00283\ \ \ \ \ pos\ =\ \mbox{\hyperlink{namespacepump_adeff0ceb12e2835fccb71b04fbc49867}{Skip}}(lines,\ pos,\ OPTIONAL\_WHITE\_SPACES\_REGEX)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00284}00284\ \ \ \ \ pos\ =\ \mbox{\hyperlink{namespacepump_adeff0ceb12e2835fccb71b04fbc49867}{Skip}}(lines,\ pos,\ \textcolor{stringliteral}{r'\(\backslash\)('})}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00285}00285\ \ \ \ \ pos\ =\ Parse(pos)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00286}00286\ \ \ \ \ pos\ =\ \mbox{\hyperlink{namespacepump_adeff0ceb12e2835fccb71b04fbc49867}{Skip}}(lines,\ pos,\ \textcolor{stringliteral}{r'\(\backslash\))'})}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00287}00287\ \ \ \ \ \textcolor{keywordflow}{return}\ pos}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00288}00288\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00289}00289\ \ \ \textcolor{keyword}{def\ }Parse(pos):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00290}00290\ \ \ \ \ pos\ =\ \mbox{\hyperlink{namespacepump_adbc79e0f59b6f43b0b413ba5f57002c9}{SkipUntil}}(lines,\ pos,\ \textcolor{stringliteral}{r'\(\backslash\)(|\(\backslash\))'},\ \textcolor{stringliteral}{')'})}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00291}00291\ \ \ \ \ \textcolor{keywordflow}{if}\ \mbox{\hyperlink{namespacepump_a259e0b99da57fa05cfc49e82cd820f35}{SubString}}(lines,\ pos,\ pos\ +\ 1)\ ==\ \textcolor{stringliteral}{'('}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00292}00292\ \ \ \ \ \ \ pos\ =\ Parse(pos\ +\ 1)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00293}00293\ \ \ \ \ \ \ pos\ =\ \mbox{\hyperlink{namespacepump_adeff0ceb12e2835fccb71b04fbc49867}{Skip}}(lines,\ pos,\ \textcolor{stringliteral}{r'\(\backslash\))'})}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00294}00294\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Parse(pos)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00295}00295\ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00296}00296\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ pos}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00297}00297\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00298}00298\ \ \ start\ =\ pos.Clone()}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00299}00299\ \ \ pos\ =\ ParseInParens(pos)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00300}00300\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacepump_ad3f8d28d4a1be435876ec5c677be185a}{MakeToken}}(lines,\ start,\ pos,\ \textcolor{stringliteral}{'exp'})}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00301}00301\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00302}00302\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00303}\mbox{\hyperlink{namespacepump_a5e618f379feeb5ad68d46009f394f043}{00303}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacepump_a5e618f379feeb5ad68d46009f394f043}{RStripNewLineFromToken}}(token):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00304}00304\ \ \ \textcolor{keywordflow}{if}\ token.value.endswith(\textcolor{stringliteral}{'\(\backslash\)n'}):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00305}00305\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classpump_1_1_token}{Token}}(token.start,\ token.end,\ token.value[:-\/1],\ token.token\_type)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00306}00306\ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00307}00307\ \ \ \ \ \textcolor{keywordflow}{return}\ token}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00308}00308\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00309}00309\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00310}\mbox{\hyperlink{namespacepump_a719bbc37a1f1456e386dcdda3ae2bf94}{00310}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacepump_a719bbc37a1f1456e386dcdda3ae2bf94}{TokenizeLines}}(lines,\ pos):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00311}00311\ \ \ \textcolor{keywordflow}{while}\ \textcolor{keyword}{True}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00312}00312\ \ \ \ \ found\ =\ \mbox{\hyperlink{namespacepump_a3253bdaf5346dd3dffeff52c022b6b5f}{FindFirst}}(lines,\ TOKEN\_TABLE,\ pos)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00313}00313\ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keywordflow}{not}\ found:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00314}00314\ \ \ \ \ \ \ \textcolor{keywordflow}{yield}\ \mbox{\hyperlink{namespacepump_ad3f8d28d4a1be435876ec5c677be185a}{MakeToken}}(lines,\ pos,\ \mbox{\hyperlink{namespacepump_ac14faf54338baf78efb4cabd233f7d22}{Eof}}(),\ \textcolor{stringliteral}{'code'})}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00315}00315\ \ \ \ \ \ \ \textcolor{keywordflow}{return}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00316}00316\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00317}00317\ \ \ \ \ \textcolor{keywordflow}{if}\ found.start\ ==\ pos:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00318}00318\ \ \ \ \ \ \ prev\_token\ =\ \textcolor{keywordtype}{None}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00319}00319\ \ \ \ \ \ \ prev\_token\_rstripped\ =\ \textcolor{keywordtype}{None}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00320}00320\ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00321}00321\ \ \ \ \ \ \ prev\_token\ =\ \mbox{\hyperlink{namespacepump_ad3f8d28d4a1be435876ec5c677be185a}{MakeToken}}(lines,\ pos,\ found.start,\ \textcolor{stringliteral}{'code'})}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00322}00322\ \ \ \ \ \ \ prev\_token\_rstripped\ =\ \mbox{\hyperlink{namespacepump_a5e618f379feeb5ad68d46009f394f043}{RStripNewLineFromToken}}(prev\_token)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00323}00323\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00324}00324\ \ \ \ \ \textcolor{keywordflow}{if}\ found.token\_type\ ==\ \textcolor{stringliteral}{'\$var'}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00325}00325\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ prev\_token\_rstripped:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00326}00326\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{yield}\ prev\_token\_rstripped}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00327}00327\ \ \ \ \ \ \ \textcolor{keywordflow}{yield}\ found}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00328}00328\ \ \ \ \ \ \ id\_token\ =\ \mbox{\hyperlink{namespacepump_a9fad3180a76ca09bedbc539482126604}{ParseToken}}(lines,\ found.end,\ ID\_REGEX,\ \textcolor{stringliteral}{'id'})}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00329}00329\ \ \ \ \ \ \ \textcolor{keywordflow}{yield}\ id\_token}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00330}00330\ \ \ \ \ \ \ pos\ =\ \mbox{\hyperlink{namespacepump_adeff0ceb12e2835fccb71b04fbc49867}{Skip}}(lines,\ id\_token.end,\ OPTIONAL\_WHITE\_SPACES\_REGEX)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00331}00331\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00332}00332\ \ \ \ \ \ \ eq\_token\ =\ \mbox{\hyperlink{namespacepump_a9fad3180a76ca09bedbc539482126604}{ParseToken}}(lines,\ pos,\ EQ\_REGEX,\ \textcolor{stringliteral}{'='})}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00333}00333\ \ \ \ \ \ \ \textcolor{keywordflow}{yield}\ eq\_token}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00334}00334\ \ \ \ \ \ \ pos\ =\ \mbox{\hyperlink{namespacepump_adeff0ceb12e2835fccb71b04fbc49867}{Skip}}(lines,\ eq\_token.end,\ \textcolor{stringliteral}{r'\(\backslash\)s*'})}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00335}00335\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00336}00336\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \mbox{\hyperlink{namespacepump_a259e0b99da57fa05cfc49e82cd820f35}{SubString}}(lines,\ pos,\ pos\ +\ 2)\ !=\ \textcolor{stringliteral}{'[['}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00337}00337\ \ \ \ \ \ \ \ \ exp\_token\ =\ \mbox{\hyperlink{namespacepump_a9fad3180a76ca09bedbc539482126604}{ParseToken}}(lines,\ pos,\ REST\_OF\_LINE\_REGEX,\ \textcolor{stringliteral}{'exp'})}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00338}00338\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{yield}\ exp\_token}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00339}00339\ \ \ \ \ \ \ \ \ pos\ =\ \mbox{\hyperlink{classpump_1_1_cursor}{Cursor}}(exp\_token.end.line\ +\ 1,\ 0)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00340}00340\ \ \ \ \ \textcolor{keywordflow}{elif}\ found.token\_type\ ==\ \textcolor{stringliteral}{'\$for'}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00341}00341\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ prev\_token\_rstripped:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00342}00342\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{yield}\ prev\_token\_rstripped}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00343}00343\ \ \ \ \ \ \ \textcolor{keywordflow}{yield}\ found}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00344}00344\ \ \ \ \ \ \ id\_token\ =\ \mbox{\hyperlink{namespacepump_a9fad3180a76ca09bedbc539482126604}{ParseToken}}(lines,\ found.end,\ ID\_REGEX,\ \textcolor{stringliteral}{'id'})}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00345}00345\ \ \ \ \ \ \ \textcolor{keywordflow}{yield}\ id\_token}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00346}00346\ \ \ \ \ \ \ pos\ =\ \mbox{\hyperlink{namespacepump_adeff0ceb12e2835fccb71b04fbc49867}{Skip}}(lines,\ id\_token.end,\ WHITE\_SPACE\_REGEX)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00347}00347\ \ \ \ \ \textcolor{keywordflow}{elif}\ found.token\_type\ ==\ \textcolor{stringliteral}{'\$range'}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00348}00348\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ prev\_token\_rstripped:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00349}00349\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{yield}\ prev\_token\_rstripped}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00350}00350\ \ \ \ \ \ \ \textcolor{keywordflow}{yield}\ found}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00351}00351\ \ \ \ \ \ \ id\_token\ =\ \mbox{\hyperlink{namespacepump_a9fad3180a76ca09bedbc539482126604}{ParseToken}}(lines,\ found.end,\ ID\_REGEX,\ \textcolor{stringliteral}{'id'})}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00352}00352\ \ \ \ \ \ \ \textcolor{keywordflow}{yield}\ id\_token}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00353}00353\ \ \ \ \ \ \ pos\ =\ \mbox{\hyperlink{namespacepump_adeff0ceb12e2835fccb71b04fbc49867}{Skip}}(lines,\ id\_token.end,\ OPTIONAL\_WHITE\_SPACES\_REGEX)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00354}00354\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00355}00355\ \ \ \ \ \ \ dots\_pos\ =\ \mbox{\hyperlink{namespacepump_adbc79e0f59b6f43b0b413ba5f57002c9}{SkipUntil}}(lines,\ pos,\ DOT\_DOT\_REGEX,\ \textcolor{stringliteral}{'..'})}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00356}00356\ \ \ \ \ \ \ \textcolor{keywordflow}{yield}\ \mbox{\hyperlink{namespacepump_ad3f8d28d4a1be435876ec5c677be185a}{MakeToken}}(lines,\ pos,\ dots\_pos,\ \textcolor{stringliteral}{'exp'})}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00357}00357\ \ \ \ \ \ \ \textcolor{keywordflow}{yield}\ \mbox{\hyperlink{namespacepump_ad3f8d28d4a1be435876ec5c677be185a}{MakeToken}}(lines,\ dots\_pos,\ dots\_pos\ +\ 2,\ \textcolor{stringliteral}{'..'})}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00358}00358\ \ \ \ \ \ \ pos\ =\ dots\_pos\ +\ 2}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00359}00359\ \ \ \ \ \ \ new\_pos\ =\ \mbox{\hyperlink{classpump_1_1_cursor}{Cursor}}(pos.line\ +\ 1,\ 0)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00360}00360\ \ \ \ \ \ \ \textcolor{keywordflow}{yield}\ \mbox{\hyperlink{namespacepump_ad3f8d28d4a1be435876ec5c677be185a}{MakeToken}}(lines,\ pos,\ new\_pos,\ \textcolor{stringliteral}{'exp'})}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00361}00361\ \ \ \ \ \ \ pos\ =\ new\_pos}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00362}00362\ \ \ \ \ \textcolor{keywordflow}{elif}\ found.token\_type\ ==\ \textcolor{stringliteral}{'\$'}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00363}00363\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ prev\_token:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00364}00364\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{yield}\ prev\_token}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00365}00365\ \ \ \ \ \ \ \textcolor{keywordflow}{yield}\ found}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00366}00366\ \ \ \ \ \ \ exp\_token\ =\ \mbox{\hyperlink{namespacepump_a4b774d590b94815b9e74ac57bf47f9ee}{ParseExpTokenInParens}}(lines,\ found.end)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00367}00367\ \ \ \ \ \ \ \textcolor{keywordflow}{yield}\ exp\_token}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00368}00368\ \ \ \ \ \ \ pos\ =\ exp\_token.end}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00369}00369\ \ \ \ \ \textcolor{keywordflow}{elif}\ (found.token\_type\ ==\ \textcolor{stringliteral}{']]'}\ \textcolor{keywordflow}{or}\ found.token\_type\ ==\ \textcolor{stringliteral}{'\$if'}\ \textcolor{keywordflow}{or}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00370}00370\ \ \ \ \ \ \ \ \ \ \ found.token\_type\ ==\ \textcolor{stringliteral}{'\$elif'}\ \textcolor{keywordflow}{or}\ found.token\_type\ ==\ \textcolor{stringliteral}{'\$else'}):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00371}00371\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ prev\_token\_rstripped:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00372}00372\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{yield}\ prev\_token\_rstripped}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00373}00373\ \ \ \ \ \ \ \textcolor{keywordflow}{yield}\ found}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00374}00374\ \ \ \ \ \ \ pos\ =\ found.end}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00375}00375\ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00376}00376\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ prev\_token:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00377}00377\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{yield}\ prev\_token}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00378}00378\ \ \ \ \ \ \ \textcolor{keywordflow}{yield}\ found}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00379}00379\ \ \ \ \ \ \ pos\ =\ found.end}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00380}00380\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00381}00381\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00382}\mbox{\hyperlink{namespacepump_a6e35dc948abe4c47069f136d763b7778}{00382}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacepump_a6e35dc948abe4c47069f136d763b7778}{Tokenize}}(s):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00383}00383\ \ \ \textcolor{stringliteral}{"{}"{}"{}A\ generator\ that\ yields\ the\ tokens\ in\ the\ given\ string."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00384}00384\ \ \ \textcolor{keywordflow}{if}\ s\ !=\ \textcolor{stringliteral}{''}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00385}00385\ \ \ \ \ lines\ =\ s.splitlines(\textcolor{keyword}{True})}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00386}00386\ \ \ \ \ \textcolor{keywordflow}{for}\ token\ \textcolor{keywordflow}{in}\ \mbox{\hyperlink{namespacepump_a719bbc37a1f1456e386dcdda3ae2bf94}{TokenizeLines}}(lines,\ \mbox{\hyperlink{classpump_1_1_cursor}{Cursor}}(0,\ 0)):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00387}00387\ \ \ \ \ \ \ \textcolor{keywordflow}{yield}\ token}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00388}00388\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00389}00389\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00390}\mbox{\hyperlink{classpump_1_1_code_node}{00390}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classpump_1_1_code_node}{CodeNode}}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00391}\mbox{\hyperlink{classpump_1_1_code_node_af8af06d47645b926889a04cba5dde8a3}{00391}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classpump_1_1_code_node_af8af06d47645b926889a04cba5dde8a3}{\_\_init\_\_}}(self,\ atomic\_code\_list=None):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00392}\mbox{\hyperlink{classpump_1_1_code_node_ac7251110cc987c709e0e17d95521993e}{00392}}\ \ \ \ \ self.\mbox{\hyperlink{classpump_1_1_code_node_ac7251110cc987c709e0e17d95521993e}{atomic\_code}}\ =\ atomic\_code\_list}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00393}00393\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00394}00394\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00395}\mbox{\hyperlink{classpump_1_1_var_node}{00395}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classpump_1_1_var_node}{VarNode}}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00396}\mbox{\hyperlink{classpump_1_1_var_node_a3b1800c8a145c1cfcd8c616735821b53}{00396}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classpump_1_1_var_node_a3b1800c8a145c1cfcd8c616735821b53}{\_\_init\_\_}}(self,\ identifier=None,\ atomic\_code=None):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00397}\mbox{\hyperlink{classpump_1_1_var_node_aa2b634e2443646c3754f2d193efa4dc7}{00397}}\ \ \ \ \ self.\mbox{\hyperlink{classpump_1_1_var_node_aa2b634e2443646c3754f2d193efa4dc7}{identifier}}\ =\ identifier}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00398}\mbox{\hyperlink{classpump_1_1_var_node_ad6bef6a8577b994fbe9ccddf3c82d2fc}{00398}}\ \ \ \ \ self.\mbox{\hyperlink{classpump_1_1_var_node_ad6bef6a8577b994fbe9ccddf3c82d2fc}{atomic\_code}}\ =\ atomic\_code}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00399}00399\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00400}00400\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00401}\mbox{\hyperlink{classpump_1_1_range_node}{00401}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classpump_1_1_range_node}{RangeNode}}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00402}\mbox{\hyperlink{classpump_1_1_range_node_a0e25630248a4f5d2bb17ad6710a4eae8}{00402}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classpump_1_1_range_node_a0e25630248a4f5d2bb17ad6710a4eae8}{\_\_init\_\_}}(self,\ identifier=None,\ exp1=None,\ exp2=None):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00403}\mbox{\hyperlink{classpump_1_1_range_node_ae75b9f31ba8c3bd048cf09b22035efa0}{00403}}\ \ \ \ \ self.\mbox{\hyperlink{classpump_1_1_range_node_ae75b9f31ba8c3bd048cf09b22035efa0}{identifier}}\ =\ identifier}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00404}\mbox{\hyperlink{classpump_1_1_range_node_acbb59f8c5e23d23563ca03f21574ce63}{00404}}\ \ \ \ \ self.\mbox{\hyperlink{classpump_1_1_range_node_acbb59f8c5e23d23563ca03f21574ce63}{exp1}}\ =\ exp1}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00405}\mbox{\hyperlink{classpump_1_1_range_node_afe153ee472b121652a51c62c1522cc13}{00405}}\ \ \ \ \ self.\mbox{\hyperlink{classpump_1_1_range_node_afe153ee472b121652a51c62c1522cc13}{exp2}}\ =\ exp2}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00406}00406\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00407}00407\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00408}\mbox{\hyperlink{classpump_1_1_for_node}{00408}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classpump_1_1_for_node}{ForNode}}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00409}\mbox{\hyperlink{classpump_1_1_for_node_aa5a82fcbaf546a930088350a8ed96a90}{00409}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classpump_1_1_for_node_aa5a82fcbaf546a930088350a8ed96a90}{\_\_init\_\_}}(self,\ identifier=None,\ sep=None,\ code=None):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00410}\mbox{\hyperlink{classpump_1_1_for_node_a2444199e135e43696b3a006bd0d38982}{00410}}\ \ \ \ \ self.\mbox{\hyperlink{classpump_1_1_for_node_a2444199e135e43696b3a006bd0d38982}{identifier}}\ =\ identifier}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00411}\mbox{\hyperlink{classpump_1_1_for_node_a06b493278b3c1ad53363a2bcc3b8efb3}{00411}}\ \ \ \ \ self.\mbox{\hyperlink{classpump_1_1_for_node_a06b493278b3c1ad53363a2bcc3b8efb3}{sep}}\ =\ sep}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00412}\mbox{\hyperlink{classpump_1_1_for_node_afdb5f4f2a3bc772bbc6ea777dfde898e}{00412}}\ \ \ \ \ self.\mbox{\hyperlink{classpump_1_1_for_node_afdb5f4f2a3bc772bbc6ea777dfde898e}{code}}\ =\ code}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00413}00413\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00414}00414\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00415}\mbox{\hyperlink{classpump_1_1_else_node}{00415}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classpump_1_1_else_node}{ElseNode}}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00416}\mbox{\hyperlink{classpump_1_1_else_node_a65d0aed00918a5eecf7a2f6e2456d0a6}{00416}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classpump_1_1_else_node_a65d0aed00918a5eecf7a2f6e2456d0a6}{\_\_init\_\_}}(self,\ else\_branch=None):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00417}\mbox{\hyperlink{classpump_1_1_else_node_ac838a0fe9f5d713c7f56939eed5e128d}{00417}}\ \ \ \ \ self.\mbox{\hyperlink{classpump_1_1_else_node_ac838a0fe9f5d713c7f56939eed5e128d}{else\_branch}}\ =\ else\_branch}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00418}00418\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00419}00419\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00420}\mbox{\hyperlink{classpump_1_1_if_node}{00420}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classpump_1_1_if_node}{IfNode}}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00421}\mbox{\hyperlink{classpump_1_1_if_node_ac1e2b1e7144262ae32479d7d89ae8964}{00421}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classpump_1_1_if_node_ac1e2b1e7144262ae32479d7d89ae8964}{\_\_init\_\_}}(self,\ exp=None,\ then\_branch=None,\ else\_branch=None):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00422}\mbox{\hyperlink{classpump_1_1_if_node_a92042e4262196ffd7366350539f512d8}{00422}}\ \ \ \ \ self.\mbox{\hyperlink{classpump_1_1_if_node_a92042e4262196ffd7366350539f512d8}{exp}}\ =\ exp}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00423}\mbox{\hyperlink{classpump_1_1_if_node_aa9e2e488564629f8dc0d64d165a19ffa}{00423}}\ \ \ \ \ self.\mbox{\hyperlink{classpump_1_1_if_node_aa9e2e488564629f8dc0d64d165a19ffa}{then\_branch}}\ =\ then\_branch}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00424}\mbox{\hyperlink{classpump_1_1_if_node_a12e422b16ed4291f15cd95cd6e7f81eb}{00424}}\ \ \ \ \ self.\mbox{\hyperlink{classpump_1_1_if_node_a12e422b16ed4291f15cd95cd6e7f81eb}{else\_branch}}\ =\ else\_branch}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00425}00425\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00426}00426\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00427}\mbox{\hyperlink{classpump_1_1_raw_code_node}{00427}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classpump_1_1_raw_code_node}{RawCodeNode}}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00428}\mbox{\hyperlink{classpump_1_1_raw_code_node_a047c32758f7d4e062ea0904aa5719413}{00428}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classpump_1_1_raw_code_node_a047c32758f7d4e062ea0904aa5719413}{\_\_init\_\_}}(self,\ token=None):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00429}\mbox{\hyperlink{classpump_1_1_raw_code_node_ab36224d959e0d8f803e9fac8e6a0baab}{00429}}\ \ \ \ \ self.\mbox{\hyperlink{classpump_1_1_raw_code_node_ab36224d959e0d8f803e9fac8e6a0baab}{raw\_code}}\ =\ token}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00430}00430\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00431}00431\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00432}\mbox{\hyperlink{classpump_1_1_literal_dollar_node}{00432}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classpump_1_1_literal_dollar_node}{LiteralDollarNode}}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00433}\mbox{\hyperlink{classpump_1_1_literal_dollar_node_aa240a3e1bcf7bb7b48cd79765f72be8d}{00433}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classpump_1_1_literal_dollar_node_aa240a3e1bcf7bb7b48cd79765f72be8d}{\_\_init\_\_}}(self,\ token):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00434}\mbox{\hyperlink{classpump_1_1_literal_dollar_node_ab4c6e209635b8868bcdf0fe8053431c6}{00434}}\ \ \ \ \ self.\mbox{\hyperlink{classpump_1_1_literal_dollar_node_ab4c6e209635b8868bcdf0fe8053431c6}{token}}\ =\ token}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00435}00435\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00436}00436\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00437}\mbox{\hyperlink{classpump_1_1_exp_node}{00437}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classpump_1_1_exp_node}{ExpNode}}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00438}\mbox{\hyperlink{classpump_1_1_exp_node_ada627616e00e2421311f2828fef40636}{00438}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classpump_1_1_exp_node_ada627616e00e2421311f2828fef40636}{\_\_init\_\_}}(self,\ token,\ python\_exp):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00439}\mbox{\hyperlink{classpump_1_1_exp_node_ade05a5a32535d717dc5c194569aaf356}{00439}}\ \ \ \ \ self.\mbox{\hyperlink{classpump_1_1_exp_node_ade05a5a32535d717dc5c194569aaf356}{token}}\ =\ token}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00440}\mbox{\hyperlink{classpump_1_1_exp_node_adccfe4778c2e34f6b2c88118c0f1587f}{00440}}\ \ \ \ \ self.\mbox{\hyperlink{classpump_1_1_exp_node_adccfe4778c2e34f6b2c88118c0f1587f}{python\_exp}}\ =\ python\_exp}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00441}00441\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00442}00442\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00443}\mbox{\hyperlink{namespacepump_a0cadc246f229f5f9a709ff41b08b4aa4}{00443}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacepump_a0cadc246f229f5f9a709ff41b08b4aa4}{PopFront}}(a\_list):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00444}00444\ \ \ head\ =\ a\_list[0]}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00445}00445\ \ \ a\_list[:1]\ =\ []}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00446}00446\ \ \ \textcolor{keywordflow}{return}\ head}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00447}00447\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00448}00448\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00449}\mbox{\hyperlink{namespacepump_a1958e1d0a014ce8e90da2181f7124bd1}{00449}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacepump_a1958e1d0a014ce8e90da2181f7124bd1}{PushFront}}(a\_list,\ elem):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00450}00450\ \ \ a\_list[:0]\ =\ [elem]}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00451}00451\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00452}00452\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00453}\mbox{\hyperlink{namespacepump_a7d20c584c3ed189e0e88a57616e16bdd}{00453}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacepump_a7d20c584c3ed189e0e88a57616e16bdd}{PopToken}}(a\_list,\ token\_type=None):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00454}00454\ \ \ token\ =\ \mbox{\hyperlink{namespacepump_a0cadc246f229f5f9a709ff41b08b4aa4}{PopFront}}(a\_list)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00455}00455\ \ \ \textcolor{keywordflow}{if}\ token\_type\ \textcolor{keywordflow}{is}\ \textcolor{keywordflow}{not}\ \textcolor{keywordtype}{None}\ \textcolor{keywordflow}{and}\ token.token\_type\ !=\ token\_type:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00456}00456\ \ \ \ \ \textcolor{keywordflow}{print}\ \textcolor{stringliteral}{'ERROR:\ \%s\ expected\ at\ \%s'}\ \%\ (token\_type,\ token.start)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00457}00457\ \ \ \ \ \textcolor{keywordflow}{print}\ \textcolor{stringliteral}{'ERROR:\ \%s\ found\ instead'}\ \%\ (token,)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00458}00458\ \ \ \ \ sys.exit(1)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00459}00459\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00460}00460\ \ \ \textcolor{keywordflow}{return}\ token}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00461}00461\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00462}00462\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00463}\mbox{\hyperlink{namespacepump_ace11d61eea08452734115cf1559c3cf1}{00463}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacepump_ace11d61eea08452734115cf1559c3cf1}{PeekToken}}(a\_list):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00464}00464\ \ \ \textcolor{keywordflow}{if}\ \textcolor{keywordflow}{not}\ a\_list:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00465}00465\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keywordtype}{None}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00466}00466\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00467}00467\ \ \ \textcolor{keywordflow}{return}\ a\_list[0]}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00468}00468\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00469}00469\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00470}\mbox{\hyperlink{namespacepump_aebb5f3a6f426d4bf6422e018f8241712}{00470}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacepump_aebb5f3a6f426d4bf6422e018f8241712}{ParseExpNode}}(token):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00471}00471\ \ \ python\_exp\ =\ re.sub(\textcolor{stringliteral}{r'([\_A-\/Za-\/z]\(\backslash\)w*)'},\ \textcolor{stringliteral}{r'self.GetValue("{}\(\backslash\)1"{})'},\ token.value)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00472}00472\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classpump_1_1_exp_node}{ExpNode}}(token,\ python\_exp)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00473}00473\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00474}00474\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00475}\mbox{\hyperlink{namespacepump_aab64704221f9e93b52f73090b8adf83a}{00475}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacepump_aab64704221f9e93b52f73090b8adf83a}{ParseElseNode}}(tokens):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00476}00476\ \ \ \textcolor{keyword}{def\ }Pop(token\_type=None):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00477}00477\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacepump_a7d20c584c3ed189e0e88a57616e16bdd}{PopToken}}(tokens,\ token\_type)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00478}00478\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00479}00479\ \ \ next\ =\ \mbox{\hyperlink{namespacepump_ace11d61eea08452734115cf1559c3cf1}{PeekToken}}(tokens)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00480}00480\ \ \ \textcolor{keywordflow}{if}\ \textcolor{keywordflow}{not}\ next:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00481}00481\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keywordtype}{None}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00482}00482\ \ \ \textcolor{keywordflow}{if}\ next.token\_type\ ==\ \textcolor{stringliteral}{'\$else'}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00483}00483\ \ \ \ \ Pop(\textcolor{stringliteral}{'\$else'})}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00484}00484\ \ \ \ \ Pop(\textcolor{stringliteral}{'[['})}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00485}00485\ \ \ \ \ code\_node\ =\ \mbox{\hyperlink{namespacepump_ae8d797c38d2a3f44348753a2d996c406}{ParseCodeNode}}(tokens)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00486}00486\ \ \ \ \ Pop(\textcolor{stringliteral}{']]'})}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00487}00487\ \ \ \ \ \textcolor{keywordflow}{return}\ code\_node}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00488}00488\ \ \ \textcolor{keywordflow}{elif}\ next.token\_type\ ==\ \textcolor{stringliteral}{'\$elif'}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00489}00489\ \ \ \ \ Pop(\textcolor{stringliteral}{'\$elif'})}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00490}00490\ \ \ \ \ exp\ =\ Pop(\textcolor{stringliteral}{'code'})}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00491}00491\ \ \ \ \ Pop(\textcolor{stringliteral}{'[['})}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00492}00492\ \ \ \ \ code\_node\ =\ \mbox{\hyperlink{namespacepump_ae8d797c38d2a3f44348753a2d996c406}{ParseCodeNode}}(tokens)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00493}00493\ \ \ \ \ Pop(\textcolor{stringliteral}{']]'})}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00494}00494\ \ \ \ \ inner\_else\_node\ =\ \mbox{\hyperlink{namespacepump_aab64704221f9e93b52f73090b8adf83a}{ParseElseNode}}(tokens)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00495}00495\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classpump_1_1_code_node}{CodeNode}}([\mbox{\hyperlink{classpump_1_1_if_node}{IfNode}}(\mbox{\hyperlink{namespacepump_aebb5f3a6f426d4bf6422e018f8241712}{ParseExpNode}}(exp),\ code\_node,\ inner\_else\_node)])}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00496}00496\ \ \ \textcolor{keywordflow}{elif}\ \textcolor{keywordflow}{not}\ next.value.strip():}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00497}00497\ \ \ \ \ Pop(\textcolor{stringliteral}{'code'})}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00498}00498\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacepump_aab64704221f9e93b52f73090b8adf83a}{ParseElseNode}}(tokens)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00499}00499\ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00500}00500\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keywordtype}{None}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00501}00501\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00502}00502\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00503}\mbox{\hyperlink{namespacepump_a379fc1596936d379ee3f2d4acc67160e}{00503}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacepump_a379fc1596936d379ee3f2d4acc67160e}{ParseAtomicCodeNode}}(tokens):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00504}00504\ \ \ \textcolor{keyword}{def\ }Pop(token\_type=None):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00505}00505\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacepump_a7d20c584c3ed189e0e88a57616e16bdd}{PopToken}}(tokens,\ token\_type)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00506}00506\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00507}00507\ \ \ head\ =\ \mbox{\hyperlink{namespacepump_a0cadc246f229f5f9a709ff41b08b4aa4}{PopFront}}(tokens)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00508}00508\ \ \ t\ =\ head.token\_type}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00509}00509\ \ \ \textcolor{keywordflow}{if}\ t\ ==\ \textcolor{stringliteral}{'code'}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00510}00510\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classpump_1_1_raw_code_node}{RawCodeNode}}(head)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00511}00511\ \ \ \textcolor{keywordflow}{elif}\ t\ ==\ \textcolor{stringliteral}{'\$var'}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00512}00512\ \ \ \ \ id\_token\ =\ Pop(\textcolor{stringliteral}{'id'})}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00513}00513\ \ \ \ \ Pop(\textcolor{stringliteral}{'='})}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00514}00514\ \ \ \ \ next\ =\ \mbox{\hyperlink{namespacepump_ace11d61eea08452734115cf1559c3cf1}{PeekToken}}(tokens)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00515}00515\ \ \ \ \ \textcolor{keywordflow}{if}\ next.token\_type\ ==\ \textcolor{stringliteral}{'exp'}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00516}00516\ \ \ \ \ \ \ exp\_token\ =\ Pop()}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00517}00517\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classpump_1_1_var_node}{VarNode}}(id\_token,\ \mbox{\hyperlink{namespacepump_aebb5f3a6f426d4bf6422e018f8241712}{ParseExpNode}}(exp\_token))}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00518}00518\ \ \ \ \ Pop(\textcolor{stringliteral}{'[['})}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00519}00519\ \ \ \ \ code\_node\ =\ \mbox{\hyperlink{namespacepump_ae8d797c38d2a3f44348753a2d996c406}{ParseCodeNode}}(tokens)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00520}00520\ \ \ \ \ Pop(\textcolor{stringliteral}{']]'})}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00521}00521\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classpump_1_1_var_node}{VarNode}}(id\_token,\ code\_node)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00522}00522\ \ \ \textcolor{keywordflow}{elif}\ t\ ==\ \textcolor{stringliteral}{'\$for'}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00523}00523\ \ \ \ \ id\_token\ =\ Pop(\textcolor{stringliteral}{'id'})}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00524}00524\ \ \ \ \ next\_token\ =\ \mbox{\hyperlink{namespacepump_ace11d61eea08452734115cf1559c3cf1}{PeekToken}}(tokens)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00525}00525\ \ \ \ \ \textcolor{keywordflow}{if}\ next\_token.token\_type\ ==\ \textcolor{stringliteral}{'code'}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00526}00526\ \ \ \ \ \ \ sep\_token\ =\ next\_token}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00527}00527\ \ \ \ \ \ \ Pop(\textcolor{stringliteral}{'code'})}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00528}00528\ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00529}00529\ \ \ \ \ \ \ sep\_token\ =\ \textcolor{keywordtype}{None}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00530}00530\ \ \ \ \ Pop(\textcolor{stringliteral}{'[['})}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00531}00531\ \ \ \ \ code\_node\ =\ \mbox{\hyperlink{namespacepump_ae8d797c38d2a3f44348753a2d996c406}{ParseCodeNode}}(tokens)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00532}00532\ \ \ \ \ Pop(\textcolor{stringliteral}{']]'})}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00533}00533\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classpump_1_1_for_node}{ForNode}}(id\_token,\ sep\_token,\ code\_node)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00534}00534\ \ \ \textcolor{keywordflow}{elif}\ t\ ==\ \textcolor{stringliteral}{'\$if'}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00535}00535\ \ \ \ \ exp\_token\ =\ Pop(\textcolor{stringliteral}{'code'})}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00536}00536\ \ \ \ \ Pop(\textcolor{stringliteral}{'[['})}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00537}00537\ \ \ \ \ code\_node\ =\ \mbox{\hyperlink{namespacepump_ae8d797c38d2a3f44348753a2d996c406}{ParseCodeNode}}(tokens)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00538}00538\ \ \ \ \ Pop(\textcolor{stringliteral}{']]'})}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00539}00539\ \ \ \ \ else\_node\ =\ \mbox{\hyperlink{namespacepump_aab64704221f9e93b52f73090b8adf83a}{ParseElseNode}}(tokens)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00540}00540\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classpump_1_1_if_node}{IfNode}}(\mbox{\hyperlink{namespacepump_aebb5f3a6f426d4bf6422e018f8241712}{ParseExpNode}}(exp\_token),\ code\_node,\ else\_node)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00541}00541\ \ \ \textcolor{keywordflow}{elif}\ t\ ==\ \textcolor{stringliteral}{'\$range'}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00542}00542\ \ \ \ \ id\_token\ =\ Pop(\textcolor{stringliteral}{'id'})}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00543}00543\ \ \ \ \ exp1\_token\ =\ Pop(\textcolor{stringliteral}{'exp'})}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00544}00544\ \ \ \ \ Pop(\textcolor{stringliteral}{'..'})}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00545}00545\ \ \ \ \ exp2\_token\ =\ Pop(\textcolor{stringliteral}{'exp'})}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00546}00546\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classpump_1_1_range_node}{RangeNode}}(id\_token,\ \mbox{\hyperlink{namespacepump_aebb5f3a6f426d4bf6422e018f8241712}{ParseExpNode}}(exp1\_token),}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00547}00547\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacepump_aebb5f3a6f426d4bf6422e018f8241712}{ParseExpNode}}(exp2\_token))}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00548}00548\ \ \ \textcolor{keywordflow}{elif}\ t\ ==\ \textcolor{stringliteral}{'\$id'}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00549}00549\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacepump_aebb5f3a6f426d4bf6422e018f8241712}{ParseExpNode}}(\mbox{\hyperlink{classpump_1_1_token}{Token}}(head.start\ +\ 1,\ head.end,\ head.value[1:],\ \textcolor{stringliteral}{'id'}))}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00550}00550\ \ \ \textcolor{keywordflow}{elif}\ t\ ==\ \textcolor{stringliteral}{'\$(\$)'}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00551}00551\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classpump_1_1_literal_dollar_node}{LiteralDollarNode}}(head)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00552}00552\ \ \ \textcolor{keywordflow}{elif}\ t\ ==\ \textcolor{stringliteral}{'\$'}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00553}00553\ \ \ \ \ exp\_token\ =\ Pop(\textcolor{stringliteral}{'exp'})}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00554}00554\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacepump_aebb5f3a6f426d4bf6422e018f8241712}{ParseExpNode}}(exp\_token)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00555}00555\ \ \ \textcolor{keywordflow}{elif}\ t\ ==\ \textcolor{stringliteral}{'[['}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00556}00556\ \ \ \ \ code\_node\ =\ \mbox{\hyperlink{namespacepump_ae8d797c38d2a3f44348753a2d996c406}{ParseCodeNode}}(tokens)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00557}00557\ \ \ \ \ Pop(\textcolor{stringliteral}{']]'})}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00558}00558\ \ \ \ \ \textcolor{keywordflow}{return}\ code\_node}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00559}00559\ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00560}00560\ \ \ \ \ \mbox{\hyperlink{namespacepump_a1958e1d0a014ce8e90da2181f7124bd1}{PushFront}}(tokens,\ head)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00561}00561\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keywordtype}{None}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00562}00562\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00563}00563\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00564}\mbox{\hyperlink{namespacepump_ae8d797c38d2a3f44348753a2d996c406}{00564}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacepump_ae8d797c38d2a3f44348753a2d996c406}{ParseCodeNode}}(tokens):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00565}00565\ \ \ atomic\_code\_list\ =\ []}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00566}00566\ \ \ \textcolor{keywordflow}{while}\ \textcolor{keyword}{True}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00567}00567\ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keywordflow}{not}\ tokens:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00568}00568\ \ \ \ \ \ \ \textcolor{keywordflow}{break}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00569}00569\ \ \ \ \ atomic\_code\_node\ =\ \mbox{\hyperlink{namespacepump_a379fc1596936d379ee3f2d4acc67160e}{ParseAtomicCodeNode}}(tokens)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00570}00570\ \ \ \ \ \textcolor{keywordflow}{if}\ atomic\_code\_node:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00571}00571\ \ \ \ \ \ \ atomic\_code\_list.append(atomic\_code\_node)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00572}00572\ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00573}00573\ \ \ \ \ \ \ \textcolor{keywordflow}{break}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00574}00574\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classpump_1_1_code_node}{CodeNode}}(atomic\_code\_list)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00575}00575\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00576}00576\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00577}\mbox{\hyperlink{namespacepump_aeea8f40465c90ac854b7f54e77d89b82}{00577}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacepump_aeea8f40465c90ac854b7f54e77d89b82}{ParseToAST}}(pump\_src\_text):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00578}00578\ \ \ \textcolor{stringliteral}{"{}"{}"{}Convert\ the\ given\ Pump\ source\ text\ into\ an\ AST."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00579}00579\ \ \ tokens\ =\ list(\mbox{\hyperlink{namespacepump_a6e35dc948abe4c47069f136d763b7778}{Tokenize}}(pump\_src\_text))}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00580}00580\ \ \ code\_node\ =\ \mbox{\hyperlink{namespacepump_ae8d797c38d2a3f44348753a2d996c406}{ParseCodeNode}}(tokens)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00581}00581\ \ \ \textcolor{keywordflow}{return}\ code\_node}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00582}00582\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00583}00583\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00584}\mbox{\hyperlink{classpump_1_1_env}{00584}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classpump_1_1_env}{Env}}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00585}\mbox{\hyperlink{classpump_1_1_env_a2a1fc941b05e3bfb515013e85eaf3940}{00585}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classpump_1_1_env_a2a1fc941b05e3bfb515013e85eaf3940}{\_\_init\_\_}}(self):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00586}\mbox{\hyperlink{classpump_1_1_env_aba6456f3d0d23ac92bc9508c1b966bcd}{00586}}\ \ \ \ \ self.\mbox{\hyperlink{classpump_1_1_env_aba6456f3d0d23ac92bc9508c1b966bcd}{variables}}\ =\ []}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00587}\mbox{\hyperlink{classpump_1_1_env_a8d5fec087c1a9108de9b105922b34309}{00587}}\ \ \ \ \ self.\mbox{\hyperlink{classpump_1_1_env_a8d5fec087c1a9108de9b105922b34309}{ranges}}\ =\ []}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00588}00588\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00589}\mbox{\hyperlink{classpump_1_1_env_a04e121127581242e4019950e70d4a7fc}{00589}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classpump_1_1_env_a04e121127581242e4019950e70d4a7fc}{Clone}}(self):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00590}00590\ \ \ \ \ clone\ =\ \mbox{\hyperlink{classpump_1_1_env}{Env}}()}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00591}00591\ \ \ \ \ clone.variables\ =\ self.\mbox{\hyperlink{classpump_1_1_env_aba6456f3d0d23ac92bc9508c1b966bcd}{variables}}[:]}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00592}00592\ \ \ \ \ clone.ranges\ =\ self.\mbox{\hyperlink{classpump_1_1_env_a8d5fec087c1a9108de9b105922b34309}{ranges}}[:]}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00593}00593\ \ \ \ \ \textcolor{keywordflow}{return}\ clone}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00594}00594\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00595}\mbox{\hyperlink{classpump_1_1_env_a844fce087a5ae4f7cefc03d00ffc9091}{00595}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classpump_1_1_env_a844fce087a5ae4f7cefc03d00ffc9091}{PushVariable}}(self,\ var,\ value):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00596}00596\ \ \ \ \ \textcolor{comment}{\#\ If\ value\ looks\ like\ an\ int,\ store\ it\ as\ an\ int.}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00597}00597\ \ \ \ \ \textcolor{keywordflow}{try}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00598}00598\ \ \ \ \ \ \ int\_value\ =\ int(value)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00599}00599\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{stringliteral}{'\%s'}\ \%\ int\_value)\ ==\ value:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00600}00600\ \ \ \ \ \ \ \ \ value\ =\ int\_value}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00601}00601\ \ \ \ \ \textcolor{keywordflow}{except}\ Exception:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00602}00602\ \ \ \ \ \ \ \textcolor{keywordflow}{pass}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00603}00603\ \ \ \ \ self.\mbox{\hyperlink{classpump_1_1_env_aba6456f3d0d23ac92bc9508c1b966bcd}{variables}}[:0]\ =\ [(var,\ value)]}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00604}00604\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00605}\mbox{\hyperlink{classpump_1_1_env_a76331ce1f4681fbb6124aba0c012375e}{00605}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classpump_1_1_env_a76331ce1f4681fbb6124aba0c012375e}{PopVariable}}(self):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00606}00606\ \ \ \ \ self.\mbox{\hyperlink{classpump_1_1_env_aba6456f3d0d23ac92bc9508c1b966bcd}{variables}}[:1]\ =\ []}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00607}00607\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00608}\mbox{\hyperlink{classpump_1_1_env_a6588e98b89fb10e3e6801b01c9c33b50}{00608}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classpump_1_1_env_a6588e98b89fb10e3e6801b01c9c33b50}{PushRange}}(self,\ var,\ lower,\ upper):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00609}00609\ \ \ \ \ self.\mbox{\hyperlink{classpump_1_1_env_a8d5fec087c1a9108de9b105922b34309}{ranges}}[:0]\ =\ [(var,\ lower,\ upper)]}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00610}00610\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00611}\mbox{\hyperlink{classpump_1_1_env_a0401127dc23c391e962931e25564afb2}{00611}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classpump_1_1_env_a0401127dc23c391e962931e25564afb2}{PopRange}}(self):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00612}00612\ \ \ \ \ self.\mbox{\hyperlink{classpump_1_1_env_a8d5fec087c1a9108de9b105922b34309}{ranges}}[:1]\ =\ []}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00613}00613\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00614}\mbox{\hyperlink{classpump_1_1_env_ad3e3a11d5a2b161b31d01c4e7827c9db}{00614}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classpump_1_1_env_ad3e3a11d5a2b161b31d01c4e7827c9db}{GetValue}}(self,\ identifier):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00615}00615\ \ \ \ \ \textcolor{keywordflow}{for}\ (var,\ value)\ \textcolor{keywordflow}{in}\ self.\mbox{\hyperlink{classpump_1_1_env_aba6456f3d0d23ac92bc9508c1b966bcd}{variables}}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00616}00616\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ identifier\ ==\ var:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00617}00617\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ value}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00618}00618\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00619}00619\ \ \ \ \ \textcolor{keywordflow}{print}\ \textcolor{stringliteral}{'ERROR:\ meta\ variable\ \%s\ is\ undefined.'}\ \%\ (identifier,)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00620}00620\ \ \ \ \ sys.exit(1)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00621}00621\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00622}\mbox{\hyperlink{classpump_1_1_env_a8c745d8f88240c0669b87cb5297003ec}{00622}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classpump_1_1_env_a8c745d8f88240c0669b87cb5297003ec}{EvalExp}}(self,\ exp):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00623}00623\ \ \ \ \ \textcolor{keywordflow}{try}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00624}00624\ \ \ \ \ \ \ result\ =\ eval(exp.python\_exp)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00625}00625\ \ \ \ \ \textcolor{keywordflow}{except}\ Exception,\ e:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00626}00626\ \ \ \ \ \ \ \textcolor{keywordflow}{print}\ \textcolor{stringliteral}{'ERROR:\ caught\ exception\ \%s:\ \%s'}\ \%\ (e.\_\_class\_\_.\_\_name\_\_,\ e)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00627}00627\ \ \ \ \ \ \ \textcolor{keywordflow}{print}\ (\textcolor{stringliteral}{'ERROR:\ failed\ to\ evaluate\ meta\ expression\ \%s\ at\ \%s'}\ \%}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00628}00628\ \ \ \ \ \ \ \ \ \ \ \ \ \ (exp.python\_exp,\ exp.token.start))}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00629}00629\ \ \ \ \ \ \ sys.exit(1)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00630}00630\ \ \ \ \ \textcolor{keywordflow}{return}\ result}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00631}00631\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00632}\mbox{\hyperlink{classpump_1_1_env_a714179430fa0b9ec3f1a7b92dca0548b}{00632}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classpump_1_1_env_a714179430fa0b9ec3f1a7b92dca0548b}{GetRange}}(self,\ identifier):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00633}00633\ \ \ \ \ \textcolor{keywordflow}{for}\ (var,\ lower,\ upper)\ \textcolor{keywordflow}{in}\ self.\mbox{\hyperlink{classpump_1_1_env_a8d5fec087c1a9108de9b105922b34309}{ranges}}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00634}00634\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ identifier\ ==\ var:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00635}00635\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (lower,\ upper)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00636}00636\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00637}00637\ \ \ \ \ \textcolor{keywordflow}{print}\ \textcolor{stringliteral}{'ERROR:\ range\ \%s\ is\ undefined.'}\ \%\ (identifier,)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00638}00638\ \ \ \ \ sys.exit(1)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00639}00639\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00640}00640\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00641}\mbox{\hyperlink{classpump_1_1_output}{00641}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classpump_1_1_output}{Output}}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00642}\mbox{\hyperlink{classpump_1_1_output_ad9eb3d79a27a80554da21f3ff0eb8255}{00642}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classpump_1_1_output_ad9eb3d79a27a80554da21f3ff0eb8255}{\_\_init\_\_}}(self):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00643}\mbox{\hyperlink{classpump_1_1_output_a5e052b041f53b768aa7757a9075b4de7}{00643}}\ \ \ \ \ self.\mbox{\hyperlink{classpump_1_1_output_a5e052b041f53b768aa7757a9075b4de7}{string}}\ =\ \textcolor{stringliteral}{''}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00644}00644\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00645}\mbox{\hyperlink{classpump_1_1_output_a9c9c1a8e6a2fcdd8d3a895254aa88843}{00645}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classpump_1_1_output_a9c9c1a8e6a2fcdd8d3a895254aa88843}{GetLastLine}}(self):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00646}00646\ \ \ \ \ index\ =\ self.\mbox{\hyperlink{classpump_1_1_output_a5e052b041f53b768aa7757a9075b4de7}{string}}.rfind(\textcolor{stringliteral}{'\(\backslash\)n'})}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00647}00647\ \ \ \ \ \textcolor{keywordflow}{if}\ index\ <\ 0:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00648}00648\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{''}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00649}00649\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00650}00650\ \ \ \ \ \textcolor{keywordflow}{return}\ self.\mbox{\hyperlink{classpump_1_1_output_a5e052b041f53b768aa7757a9075b4de7}{string}}[index\ +\ 1:]}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00651}00651\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00652}\mbox{\hyperlink{classpump_1_1_output_ab7872ff730c785cedfe8101f8f3b2cc5}{00652}}\ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classpump_1_1_output_ab7872ff730c785cedfe8101f8f3b2cc5}{Append}}(self,\ s):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00653}00653\ \ \ \ \ self.\mbox{\hyperlink{classpump_1_1_output_a5e052b041f53b768aa7757a9075b4de7}{string}}\ +=\ s}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00654}00654\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00655}00655\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00656}\mbox{\hyperlink{namespacepump_a73acbe7bffb4c5bf1de7e1024f92e4e4}{00656}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacepump_a73acbe7bffb4c5bf1de7e1024f92e4e4}{RunAtomicCode}}(env,\ node,\ output):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00657}00657\ \ \ \textcolor{keywordflow}{if}\ isinstance(node,\ VarNode):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00658}00658\ \ \ \ \ identifier\ =\ node.identifier.value.strip()}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00659}00659\ \ \ \ \ result\ =\ \mbox{\hyperlink{classpump_1_1_output}{Output}}()}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00660}00660\ \ \ \ \ \mbox{\hyperlink{namespacepump_a73acbe7bffb4c5bf1de7e1024f92e4e4}{RunAtomicCode}}(env.Clone(),\ node.atomic\_code,\ result)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00661}00661\ \ \ \ \ value\ =\ result.string}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00662}00662\ \ \ \ \ env.PushVariable(identifier,\ value)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00663}00663\ \ \ \textcolor{keywordflow}{elif}\ isinstance(node,\ RangeNode):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00664}00664\ \ \ \ \ identifier\ =\ node.identifier.value.strip()}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00665}00665\ \ \ \ \ lower\ =\ int(env.EvalExp(node.exp1))}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00666}00666\ \ \ \ \ upper\ =\ int(env.EvalExp(node.exp2))}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00667}00667\ \ \ \ \ env.PushRange(identifier,\ lower,\ upper)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00668}00668\ \ \ \textcolor{keywordflow}{elif}\ isinstance(node,\ ForNode):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00669}00669\ \ \ \ \ identifier\ =\ node.identifier.value.strip()}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00670}00670\ \ \ \ \ \textcolor{keywordflow}{if}\ node.sep\ \textcolor{keywordflow}{is}\ \textcolor{keywordtype}{None}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00671}00671\ \ \ \ \ \ \ sep\ =\ \textcolor{stringliteral}{''}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00672}00672\ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00673}00673\ \ \ \ \ \ \ sep\ =\ node.sep.value}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00674}00674\ \ \ \ \ (lower,\ upper)\ =\ env.GetRange(identifier)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00675}00675\ \ \ \ \ \textcolor{keywordflow}{for}\ i\ \textcolor{keywordflow}{in}\ range(lower,\ upper\ +\ 1):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00676}00676\ \ \ \ \ \ \ new\_env\ =\ env.Clone()}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00677}00677\ \ \ \ \ \ \ new\_env.PushVariable(identifier,\ i)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00678}00678\ \ \ \ \ \ \ \mbox{\hyperlink{namespacepump_a5ebc34fa8c9e2d5710d87aad23253ae4}{RunCode}}(new\_env,\ node.code,\ output)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00679}00679\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ i\ !=\ upper:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00680}00680\ \ \ \ \ \ \ \ \ output.Append(sep)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00681}00681\ \ \ \textcolor{keywordflow}{elif}\ isinstance(node,\ RawCodeNode):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00682}00682\ \ \ \ \ output.Append(node.raw\_code.value)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00683}00683\ \ \ \textcolor{keywordflow}{elif}\ isinstance(node,\ IfNode):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00684}00684\ \ \ \ \ cond\ =\ env.EvalExp(node.exp)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00685}00685\ \ \ \ \ \textcolor{keywordflow}{if}\ cond:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00686}00686\ \ \ \ \ \ \ \mbox{\hyperlink{namespacepump_a5ebc34fa8c9e2d5710d87aad23253ae4}{RunCode}}(env.Clone(),\ node.then\_branch,\ output)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00687}00687\ \ \ \ \ \textcolor{keywordflow}{elif}\ node.else\_branch\ \textcolor{keywordflow}{is}\ \textcolor{keywordflow}{not}\ \textcolor{keywordtype}{None}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00688}00688\ \ \ \ \ \ \ \mbox{\hyperlink{namespacepump_a5ebc34fa8c9e2d5710d87aad23253ae4}{RunCode}}(env.Clone(),\ node.else\_branch,\ output)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00689}00689\ \ \ \textcolor{keywordflow}{elif}\ isinstance(node,\ ExpNode):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00690}00690\ \ \ \ \ value\ =\ env.EvalExp(node)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00691}00691\ \ \ \ \ output.Append(\textcolor{stringliteral}{'\%s'}\ \%\ (value,))}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00692}00692\ \ \ \textcolor{keywordflow}{elif}\ isinstance(node,\ LiteralDollarNode):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00693}00693\ \ \ \ \ output.Append(\textcolor{stringliteral}{'\$'})}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00694}00694\ \ \ \textcolor{keywordflow}{elif}\ isinstance(node,\ CodeNode):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00695}00695\ \ \ \ \ \mbox{\hyperlink{namespacepump_a5ebc34fa8c9e2d5710d87aad23253ae4}{RunCode}}(env.Clone(),\ node,\ output)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00696}00696\ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00697}00697\ \ \ \ \ \textcolor{keywordflow}{print}\ \textcolor{stringliteral}{'BAD'}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00698}00698\ \ \ \ \ \textcolor{keywordflow}{print}\ node}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00699}00699\ \ \ \ \ sys.exit(1)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00700}00700\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00701}00701\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00702}\mbox{\hyperlink{namespacepump_a5ebc34fa8c9e2d5710d87aad23253ae4}{00702}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacepump_a5ebc34fa8c9e2d5710d87aad23253ae4}{RunCode}}(env,\ code\_node,\ output):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00703}00703\ \ \ \textcolor{keywordflow}{for}\ atomic\_code\ \textcolor{keywordflow}{in}\ code\_node.atomic\_code:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00704}00704\ \ \ \ \ \mbox{\hyperlink{namespacepump_a73acbe7bffb4c5bf1de7e1024f92e4e4}{RunAtomicCode}}(env,\ atomic\_code,\ output)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00705}00705\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00706}00706\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00707}\mbox{\hyperlink{namespacepump_a6cbde33592e3d308bd988efdfd240612}{00707}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacepump_a6cbde33592e3d308bd988efdfd240612}{IsSingleLineComment}}(cur\_line):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00708}00708\ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{'//'}\ \textcolor{keywordflow}{in}\ cur\_line}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00709}00709\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00710}00710\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00711}\mbox{\hyperlink{namespacepump_aaa85201267fa862dae12d7da4ae2263c}{00711}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacepump_aaa85201267fa862dae12d7da4ae2263c}{IsInPreprocessorDirective}}(prev\_lines,\ cur\_line):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00712}00712\ \ \ \textcolor{keywordflow}{if}\ cur\_line.lstrip().startswith(\textcolor{stringliteral}{'\#'}):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00713}00713\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{True}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00714}00714\ \ \ \textcolor{keywordflow}{return}\ prev\_lines\ \textcolor{keywordflow}{and}\ prev\_lines[-\/1].endswith(\textcolor{stringliteral}{'\(\backslash\)\(\backslash\)'})}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00715}00715\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00716}00716\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00717}\mbox{\hyperlink{namespacepump_a4f402e77721e842f1b87ddc4ac218890}{00717}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacepump_a4f402e77721e842f1b87ddc4ac218890}{WrapComment}}(line,\ output):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00718}00718\ \ \ loc\ =\ line.find(\textcolor{stringliteral}{'//'})}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00719}00719\ \ \ before\_comment\ =\ line[:loc].rstrip()}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00720}00720\ \ \ \textcolor{keywordflow}{if}\ before\_comment\ ==\ \textcolor{stringliteral}{''}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00721}00721\ \ \ \ \ indent\ =\ loc}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00722}00722\ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00723}00723\ \ \ \ \ output.append(before\_comment)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00724}00724\ \ \ \ \ indent\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}(before\_comment)\ -\/\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}(before\_comment.lstrip())}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00725}00725\ \ \ prefix\ =\ indent*\textcolor{stringliteral}{'\ '}\ +\ \textcolor{stringliteral}{'//\ '}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00726}00726\ \ \ max\_len\ =\ 80\ -\/\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}(prefix)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00727}00727\ \ \ comment\ =\ line[loc\ +\ 2:].strip()}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00728}00728\ \ \ segs\ =\ [seg\ \textcolor{keywordflow}{for}\ seg\ \textcolor{keywordflow}{in}\ re.split(\textcolor{stringliteral}{r'(\(\backslash\)w+\(\backslash\)W*)'},\ comment)\ \textcolor{keywordflow}{if}\ seg\ !=\ \textcolor{stringliteral}{''}]}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00729}00729\ \ \ cur\_line\ =\ \textcolor{stringliteral}{''}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00730}00730\ \ \ \textcolor{keywordflow}{for}\ seg\ \textcolor{keywordflow}{in}\ segs:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00731}00731\ \ \ \ \ \textcolor{keywordflow}{if}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}((cur\_line\ +\ seg).rstrip())\ <\ max\_len:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00732}00732\ \ \ \ \ \ \ cur\_line\ +=\ seg}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00733}00733\ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00734}00734\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ cur\_line.strip()\ !=\ \textcolor{stringliteral}{''}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00735}00735\ \ \ \ \ \ \ \ \ output.append(prefix\ +\ cur\_line.rstrip())}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00736}00736\ \ \ \ \ \ \ cur\_line\ =\ seg.lstrip()}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00737}00737\ \ \ \textcolor{keywordflow}{if}\ cur\_line.strip()\ !=\ \textcolor{stringliteral}{''}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00738}00738\ \ \ \ \ output.append(prefix\ +\ cur\_line.strip())}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00739}00739\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00740}00740\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00741}\mbox{\hyperlink{namespacepump_a6116fedeec4ef8bd93d850c6e7298c4f}{00741}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacepump_a6116fedeec4ef8bd93d850c6e7298c4f}{WrapCode}}(line,\ line\_concat,\ output):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00742}00742\ \ \ indent\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}(line)\ -\/\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}(line.lstrip())}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00743}00743\ \ \ prefix\ =\ indent*\textcolor{stringliteral}{'\ '}\ \ \textcolor{comment}{\#\ Prefix\ of\ the\ current\ line}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00744}00744\ \ \ max\_len\ =\ 80\ -\/\ indent\ -\/\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}(line\_concat)\ \ \textcolor{comment}{\#\ Maximum\ length\ of\ the\ current\ line}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00745}00745\ \ \ new\_prefix\ =\ prefix\ +\ 4*\textcolor{stringliteral}{'\ '}\ \ \textcolor{comment}{\#\ Prefix\ of\ a\ continuation\ line}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00746}00746\ \ \ new\_max\_len\ =\ max\_len\ -\/\ 4\ \ \textcolor{comment}{\#\ Maximum\ length\ of\ a\ continuation\ line}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00747}00747\ \ \ \textcolor{comment}{\#\ Prefers\ to\ wrap\ a\ line\ after\ a\ ','\ or\ ';'.}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00748}00748\ \ \ segs\ =\ [seg\ \textcolor{keywordflow}{for}\ seg\ \textcolor{keywordflow}{in}\ re.split(\textcolor{stringliteral}{r'([\string^,;]+[,;]?)'},\ line.strip())\ \textcolor{keywordflow}{if}\ seg\ !=\ \textcolor{stringliteral}{''}]}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00749}00749\ \ \ cur\_line\ =\ \textcolor{stringliteral}{''}\ \ \textcolor{comment}{\#\ The\ current\ line\ without\ leading\ spaces.}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00750}00750\ \ \ \textcolor{keywordflow}{for}\ seg\ \textcolor{keywordflow}{in}\ segs:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00751}00751\ \ \ \ \ \textcolor{comment}{\#\ If\ the\ line\ is\ still\ too\ long,\ wrap\ at\ a\ space.}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00752}00752\ \ \ \ \ \textcolor{keywordflow}{while}\ cur\_line\ ==\ \textcolor{stringliteral}{''}\ \textcolor{keywordflow}{and}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}(seg.strip())\ >\ max\_len:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00753}00753\ \ \ \ \ \ \ seg\ =\ seg.lstrip()}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00754}00754\ \ \ \ \ \ \ split\_at\ =\ seg.rfind(\textcolor{stringliteral}{'\ '},\ 0,\ max\_len)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00755}00755\ \ \ \ \ \ \ output.append(prefix\ +\ seg[:split\_at].strip()\ +\ line\_concat)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00756}00756\ \ \ \ \ \ \ seg\ =\ seg[split\_at\ +\ 1:]}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00757}00757\ \ \ \ \ \ \ prefix\ =\ new\_prefix}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00758}00758\ \ \ \ \ \ \ max\_len\ =\ new\_max\_len}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00759}00759\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00760}00760\ \ \ \ \ \textcolor{keywordflow}{if}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}((cur\_line\ +\ seg).rstrip())\ <\ max\_len:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00761}00761\ \ \ \ \ \ \ cur\_line\ =\ (cur\_line\ +\ seg).lstrip()}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00762}00762\ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00763}00763\ \ \ \ \ \ \ output.append(prefix\ +\ cur\_line.rstrip()\ +\ line\_concat)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00764}00764\ \ \ \ \ \ \ prefix\ =\ new\_prefix}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00765}00765\ \ \ \ \ \ \ max\_len\ =\ new\_max\_len}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00766}00766\ \ \ \ \ \ \ cur\_line\ =\ seg.lstrip()}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00767}00767\ \ \ \textcolor{keywordflow}{if}\ cur\_line.strip()\ !=\ \textcolor{stringliteral}{''}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00768}00768\ \ \ \ \ output.append(prefix\ +\ cur\_line.strip())}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00769}00769\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00770}00770\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00771}\mbox{\hyperlink{namespacepump_ac8f69d3a2d1444f5e52401e77e7a2b86}{00771}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacepump_ac8f69d3a2d1444f5e52401e77e7a2b86}{WrapPreprocessorDirective}}(line,\ output):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00772}00772\ \ \ \mbox{\hyperlink{namespacepump_a6116fedeec4ef8bd93d850c6e7298c4f}{WrapCode}}(line,\ \textcolor{stringliteral}{'\ \(\backslash\)\(\backslash\)'},\ output)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00773}00773\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00774}00774\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00775}\mbox{\hyperlink{namespacepump_af47ce74fa4cbbeb33f600f7fc9d85456}{00775}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacepump_af47ce74fa4cbbeb33f600f7fc9d85456}{WrapPlainCode}}(line,\ output):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00776}00776\ \ \ \mbox{\hyperlink{namespacepump_a6116fedeec4ef8bd93d850c6e7298c4f}{WrapCode}}(line,\ \textcolor{stringliteral}{''},\ output)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00777}00777\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00778}00778\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00779}\mbox{\hyperlink{namespacepump_aab6da8a0926959d3de99f66249e92b1b}{00779}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacepump_aab6da8a0926959d3de99f66249e92b1b}{IsMultiLineIWYUPragma}}(line):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00780}00780\ \ \ \textcolor{keywordflow}{return}\ re.search(\textcolor{stringliteral}{r'/\(\backslash\)*\ IWYU\ pragma:\ '},\ line)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00781}00781\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00782}00782\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00783}\mbox{\hyperlink{namespacepump_a94c23cf89f963d56c96bfe9315f51870}{00783}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacepump_a94c23cf89f963d56c96bfe9315f51870}{IsHeaderGuardIncludeOrOneLineIWYUPragma}}(line):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00784}00784\ \ \ \textcolor{keywordflow}{return}\ (re.match(\textcolor{stringliteral}{r'\string^\#(ifndef|define|endif\(\backslash\)s*//)\(\backslash\)s*[\(\backslash\)w\_]+\(\backslash\)s*\$'},\ line)\ \textcolor{keywordflow}{or}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00785}00785\ \ \ \ \ \ \ \ \ \ \ re.match(\textcolor{stringliteral}{r'\string^\#include\(\backslash\)s'},\ line)\ \textcolor{keywordflow}{or}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00786}00786\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Don't\ break\ IWYU\ pragmas,\ either;\ that\ causes\ iwyu.py\ problems.}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00787}00787\ \ \ \ \ \ \ \ \ \ \ re.search(\textcolor{stringliteral}{r'//\ IWYU\ pragma:\ '},\ line))}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00788}00788\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00789}00789\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00790}\mbox{\hyperlink{namespacepump_aa2b6b134c1c016aa487a29a34095cc46}{00790}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacepump_aa2b6b134c1c016aa487a29a34095cc46}{WrapLongLine}}(line,\ output):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00791}00791\ \ \ line\ =\ line.rstrip()}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00792}00792\ \ \ \textcolor{keywordflow}{if}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}(line)\ <=\ 80:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00793}00793\ \ \ \ \ output.append(line)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00794}00794\ \ \ \textcolor{keywordflow}{elif}\ \mbox{\hyperlink{namespacepump_a6cbde33592e3d308bd988efdfd240612}{IsSingleLineComment}}(line):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00795}00795\ \ \ \ \ \textcolor{keywordflow}{if}\ \mbox{\hyperlink{namespacepump_a94c23cf89f963d56c96bfe9315f51870}{IsHeaderGuardIncludeOrOneLineIWYUPragma}}(line):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00796}00796\ \ \ \ \ \ \ \textcolor{comment}{\#\ The\ style\ guide\ made\ an\ exception\ to\ allow\ long\ header\ guard\ lines,}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00797}00797\ \ \ \ \ \ \ \textcolor{comment}{\#\ includes\ and\ IWYU\ pragmas.}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00798}00798\ \ \ \ \ \ \ output.append(line)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00799}00799\ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00800}00800\ \ \ \ \ \ \ \mbox{\hyperlink{namespacepump_a4f402e77721e842f1b87ddc4ac218890}{WrapComment}}(line,\ output)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00801}00801\ \ \ \textcolor{keywordflow}{elif}\ \mbox{\hyperlink{namespacepump_aaa85201267fa862dae12d7da4ae2263c}{IsInPreprocessorDirective}}(output,\ line):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00802}00802\ \ \ \ \ \textcolor{keywordflow}{if}\ \mbox{\hyperlink{namespacepump_a94c23cf89f963d56c96bfe9315f51870}{IsHeaderGuardIncludeOrOneLineIWYUPragma}}(line):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00803}00803\ \ \ \ \ \ \ \textcolor{comment}{\#\ The\ style\ guide\ made\ an\ exception\ to\ allow\ long\ header\ guard\ lines,}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00804}00804\ \ \ \ \ \ \ \textcolor{comment}{\#\ includes\ and\ IWYU\ pragmas.}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00805}00805\ \ \ \ \ \ \ output.append(line)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00806}00806\ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00807}00807\ \ \ \ \ \ \ \mbox{\hyperlink{namespacepump_ac8f69d3a2d1444f5e52401e77e7a2b86}{WrapPreprocessorDirective}}(line,\ output)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00808}00808\ \ \ \textcolor{keywordflow}{elif}\ \mbox{\hyperlink{namespacepump_aab6da8a0926959d3de99f66249e92b1b}{IsMultiLineIWYUPragma}}(line):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00809}00809\ \ \ \ \ output.append(line)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00810}00810\ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00811}00811\ \ \ \ \ \mbox{\hyperlink{namespacepump_af47ce74fa4cbbeb33f600f7fc9d85456}{WrapPlainCode}}(line,\ output)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00812}00812\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00813}00813\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00814}\mbox{\hyperlink{namespacepump_aba5eb70e8211aca5e61e474237f07e95}{00814}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacepump_aba5eb70e8211aca5e61e474237f07e95}{BeautifyCode}}(string):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00815}00815\ \ \ lines\ =\ string.splitlines()}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00816}00816\ \ \ output\ =\ []}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00817}00817\ \ \ \textcolor{keywordflow}{for}\ line\ \textcolor{keywordflow}{in}\ lines:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00818}00818\ \ \ \ \ \mbox{\hyperlink{namespacepump_aa2b6b134c1c016aa487a29a34095cc46}{WrapLongLine}}(line,\ output)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00819}00819\ \ \ output2\ =\ [line.rstrip()\ \textcolor{keywordflow}{for}\ line\ \textcolor{keywordflow}{in}\ output]}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00820}00820\ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{'\(\backslash\)n'}.join(output2)\ +\ \textcolor{stringliteral}{'\(\backslash\)n'}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00821}00821\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00822}00822\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00823}\mbox{\hyperlink{namespacepump_a4dd9bc508f57044d8dad91ad29b8edec}{00823}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacepump_a4dd9bc508f57044d8dad91ad29b8edec}{ConvertFromPumpSource}}(src\_text):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00824}00824\ \ \ \textcolor{stringliteral}{"{}"{}"{}Return\ the\ text\ generated\ from\ the\ given\ Pump\ source\ text."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00825}00825\ \ \ ast\ =\ \mbox{\hyperlink{namespacepump_aeea8f40465c90ac854b7f54e77d89b82}{ParseToAST}}(\mbox{\hyperlink{namespacepump_a5943e09143c90b811814bfe4515b887f}{StripMetaComments}}(src\_text))}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00826}00826\ \ \ output\ =\ \mbox{\hyperlink{classpump_1_1_output}{Output}}()}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00827}00827\ \ \ \mbox{\hyperlink{namespacepump_a5ebc34fa8c9e2d5710d87aad23253ae4}{RunCode}}(\mbox{\hyperlink{classpump_1_1_env}{Env}}(),\ ast,\ output)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00828}00828\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacepump_aba5eb70e8211aca5e61e474237f07e95}{BeautifyCode}}(output.string)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00829}00829\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00830}00830\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00831}\mbox{\hyperlink{namespacepump_a760f21153581a485a4cce742a6d92f68}{00831}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}(argv):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00832}00832\ \ \ \textcolor{keywordflow}{if}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}(argv)\ ==\ 1:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00833}00833\ \ \ \ \ \textcolor{keywordflow}{print}\ \_\_doc\_\_}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00834}00834\ \ \ \ \ sys.exit(1)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00835}00835\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00836}00836\ \ \ file\_path\ =\ argv[-\/1]}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00837}00837\ \ \ output\_str\ =\ \mbox{\hyperlink{namespacepump_a4dd9bc508f57044d8dad91ad29b8edec}{ConvertFromPumpSource}}(file(file\_path,\ \textcolor{stringliteral}{'r'}).read())}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00838}00838\ \ \ \textcolor{keywordflow}{if}\ file\_path.endswith(\textcolor{stringliteral}{'.pump'}):}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00839}00839\ \ \ \ \ output\_file\_path\ =\ file\_path[:-\/5]}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00840}00840\ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00841}00841\ \ \ \ \ output\_file\_path\ =\ \textcolor{stringliteral}{'-\/'}}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00842}00842\ \ \ \textcolor{keywordflow}{if}\ output\_file\_path\ ==\ \textcolor{stringliteral}{'-\/'}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00843}00843\ \ \ \ \ \textcolor{keywordflow}{print}\ output\_str,}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00844}00844\ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00845}00845\ \ \ \ \ output\_file\ =\ file(output\_file\_path,\ \textcolor{stringliteral}{'w'})}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00846}00846\ \ \ \ \ output\_file.write(\textcolor{stringliteral}{'//\ This\ file\ was\ GENERATED\ by\ command:\(\backslash\)n'})}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00847}00847\ \ \ \ \ output\_file.write(\textcolor{stringliteral}{'//\ \ \ \ \ \%s\ \%s\(\backslash\)n'}\ \%}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00848}00848\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (os.path.basename(\_\_file\_\_),\ os.path.basename(file\_path)))}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00849}00849\ \ \ \ \ output\_file.write(\textcolor{stringliteral}{'//\ DO\ NOT\ EDIT\ BY\ HAND!!!\(\backslash\)n\(\backslash\)n'})}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00850}00850\ \ \ \ \ output\_file.write(output\_str)}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00851}00851\ \ \ \ \ output\_file.close()}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00852}00852\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00853}00853\ }
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00854}00854\ \textcolor{keywordflow}{if}\ \_\_name\_\_\ ==\ \textcolor{stringliteral}{'\_\_main\_\_'}:}
+\DoxyCodeLine{\Hypertarget{pump_8py_source_l00855}00855\ \ \ \mbox{\hyperlink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}(sys.argv)}
+
+\end{DoxyCode}

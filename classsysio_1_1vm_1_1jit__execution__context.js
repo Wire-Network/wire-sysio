@@ -1,0 +1,25 @@
+var classsysio_1_1vm_1_1jit__execution__context =
+[
+    [ "jit_execution_context", "classsysio_1_1vm_1_1jit__execution__context.html#a96158c3ce116da5d36c4e3d6a1507a2a", null ],
+    [ "jit_execution_context", "classsysio_1_1vm_1_1jit__execution__context.html#a96158c3ce116da5d36c4e3d6a1507a2a", null ],
+    [ "call_host_function", "classsysio_1_1vm_1_1jit__execution__context.html#a6bd958664d7f20be65075b631855f33a", null ],
+    [ "call_host_function", "classsysio_1_1vm_1_1jit__execution__context.html#a6bd958664d7f20be65075b631855f33a", null ],
+    [ "execute", "classsysio_1_1vm_1_1jit__execution__context.html#a3a32bce66020501bfe2168765eba95cf", null ],
+    [ "execute", "classsysio_1_1vm_1_1jit__execution__context.html#a3a32bce66020501bfe2168765eba95cf", null ],
+    [ "execute", "classsysio_1_1vm_1_1jit__execution__context.html#abc08d4ee8c1657dfd870cb728a202d73", null ],
+    [ "get_interface", "classsysio_1_1vm_1_1jit__execution__context.html#ab48a9c325fcb2d2a4b532396eb2d65f3", null ],
+    [ "get_operand_stack", "classsysio_1_1vm_1_1jit__execution__context.html#a0b4188bd88810e7208c403c67ddd5354", null ],
+    [ "get_operand_stack", "classsysio_1_1vm_1_1jit__execution__context.html#ab889ea2c8f14eeb3a3df360125debb90", null ],
+    [ "linear_memory", "classsysio_1_1vm_1_1jit__execution__context.html#aad1ab4903de26a0564c8a02f05ac4fe6", null ],
+    [ "reset", "classsysio_1_1vm_1_1jit__execution__context.html#a55c6536bb63744dab05f72d6690bd3c5", null ],
+    [ "reset", "classsysio_1_1vm_1_1jit__execution__context.html#a55c6536bb63744dab05f72d6690bd3c5", null ],
+    [ "set_max_call_depth", "classsysio_1_1vm_1_1jit__execution__context.html#a6432508a2591567b41af7b8aebea02d4", null ],
+    [ "set_max_call_depth", "classsysio_1_1vm_1_1jit__execution__context.html#a6432508a2591567b41af7b8aebea02d4", null ],
+    [ "transform_arg", "classsysio_1_1vm_1_1jit__execution__context.html#a9186421702dc931bcea9329161edd992", null ],
+    [ "transform_arg", "classsysio_1_1vm_1_1jit__execution__context.html#a9186421702dc931bcea9329161edd992", null ],
+    [ "_error_code", "classsysio_1_1vm_1_1jit__execution__context.html#a60328b847940f19ecaf6de0a4d9de4aa", null ],
+    [ "_host", "classsysio_1_1vm_1_1jit__execution__context.html#ab7a88abe7f50acea3cd6ed677934d66a", null ],
+    [ "_mod", "classsysio_1_1vm_1_1jit__execution__context.html#a10264d78efee5ae7720bddc2853c1bc8", null ],
+    [ "_remaining_call_depth", "classsysio_1_1vm_1_1jit__execution__context.html#abddbc46dcfef76d04aaf37ad3440fec6", null ],
+    [ "_rhf", "classsysio_1_1vm_1_1jit__execution__context.html#afb21eb88496d63b7af1f1329cab1ef08", null ]
+];

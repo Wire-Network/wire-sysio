@@ -1,0 +1,17 @@
+<map id="fc_swap" name="fc_swap">
+<area shape="rect" id="Node000001" title=" " alt="" coords="217,153,287,179"/>
+<area shape="rect" id="Node000002" href="$classfc_1_1bigint.html#aec66b7c4e3adfc4bb40c748afcff0b3e" title=" " alt="" coords="18,5,156,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="237,140,210,91,190,66,167,44,148,34,151,29,170,40,194,62,214,88,242,138"/>
+<area shape="rect" id="Node000003" href="$classfc_1_1bigint.html#a3d6a9c0873e3b4e1546003ab9bb3f024" title=" " alt="" coords="20,55,154,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="228,144,201,118,167,94,144,83,146,78,170,89,204,114,232,140"/>
+<area shape="rect" id="Node000004" href="$classfc_1_1logger.html#a471fac59f62723ddc452c63f940e5568" title=" " alt="" coords="18,104,156,130"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="201,154,168,143,133,133,134,128,169,138,203,148"/>
+<area shape="rect" id="Node000005" href="$classfc_1_1unique__ptr.html#afbf8f122671380b172c9b2066d59270d" title=" " alt="" coords="5,153,169,179"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="201,169,169,169,169,164,201,164"/>
+<area shape="rect" id="Node000006" href="$classfc_1_1variant__object_1_1entry.html#a54669b8a1ba8a9dd3fa1d4fac4cec0bd" title=" " alt="" coords="26,203,148,244"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="203,186,148,205,147,200,201,181"/>
+<area shape="rect" id="Node000007" href="$classfc_1_1variant__object.html#a9b220de00d57176dc5b33022288b6a19" title=" " alt="" coords="26,268,148,309"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="234,193,206,226,170,258,149,270,146,266,167,253,202,222,230,190"/>
+<area shape="rect" id="Node000008" href="$classfc_1_1variant__object_1_1entry.html#a8f932d6b08e11f0448b82ebbcc63f2a3" title=" " alt="" coords="26,334,148,374"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="245,194,218,258,197,292,170,323,150,337,147,333,167,319,193,289,213,255,240,192"/>
+</map>

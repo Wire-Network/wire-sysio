@@ -1,0 +1,192 @@
+\doxysection{temp\+\_\+file\+\_\+fixture Struct Reference}
+\hypertarget{structtemp__file__fixture}{}\label{structtemp__file__fixture}\index{temp\_file\_fixture@{temp\_file\_fixture}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structtemp__file__fixture_a58f5d52e16991c9190b499fb5ca3a5a8}{temp\+\_\+file\+\_\+fixture}} ()
+\item 
+\mbox{\hyperlink{structtemp__file__fixture_a69439d16caa94c68351e3298374b7c83}{\texorpdfstring{$\sim$}{\string~}temp\+\_\+file\+\_\+fixture}} ()
+\item 
+std\+::string \mbox{\hyperlink{structtemp__file__fixture_a21628eec6c32716a967c1f8a50ade61f}{create\+\_\+temp\+\_\+file}} (const std\+::string \&contents)
+\item 
+std\+::string \mbox{\hyperlink{structtemp__file__fixture_a75984461592089af0b7acbb206bc362f}{create\+\_\+temp\+\_\+file}} (const void \texorpdfstring{$\ast$}{*}data, size\+\_\+t size)
+\item 
+\mbox{\hyperlink{structtemp__file__fixture_a58f5d52e16991c9190b499fb5ca3a5a8}{temp\+\_\+file\+\_\+fixture}} ()
+\item 
+\mbox{\hyperlink{structtemp__file__fixture_a69439d16caa94c68351e3298374b7c83}{\texorpdfstring{$\sim$}{\string~}temp\+\_\+file\+\_\+fixture}} ()
+\item 
+std\+::string \mbox{\hyperlink{structtemp__file__fixture_a21628eec6c32716a967c1f8a50ade61f}{create\+\_\+temp\+\_\+file}} (const std\+::string \&contents)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::list$<$ bfs\+::path $>$ \mbox{\hyperlink{structtemp__file__fixture_a8641500328301e32a05bce0f9d737560}{paths}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{test__compressed__file_8cpp_source_l00015}{15}} of file \mbox{\hyperlink{test__compressed__file_8cpp_source}{test\+\_\+compressed\+\_\+file.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structtemp__file__fixture_a58f5d52e16991c9190b499fb5ca3a5a8}\index{temp\_file\_fixture@{temp\_file\_fixture}!temp\_file\_fixture@{temp\_file\_fixture}}
+\index{temp\_file\_fixture@{temp\_file\_fixture}!temp\_file\_fixture@{temp\_file\_fixture}}
+\doxysubsubsection{\texorpdfstring{temp\_file\_fixture()}{temp\_file\_fixture()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structtemp__file__fixture_a58f5d52e16991c9190b499fb5ca3a5a8} 
+temp\+\_\+file\+\_\+fixture\+::temp\+\_\+file\+\_\+fixture (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{test__compressed__file_8cpp_source_l00016}{16}} of file \mbox{\hyperlink{test__compressed__file_8cpp_source}{test\+\_\+compressed\+\_\+file.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00016\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{structtemp__file__fixture_a69439d16caa94c68351e3298374b7c83}\index{temp\_file\_fixture@{temp\_file\_fixture}!````~temp\_file\_fixture@{\texorpdfstring{$\sim$}{\string~}temp\_file\_fixture}}
+\index{````~temp\_file\_fixture@{\texorpdfstring{$\sim$}{\string~}temp\_file\_fixture}!temp\_file\_fixture@{temp\_file\_fixture}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}temp\_file\_fixture()}{\string~temp\_file\_fixture()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structtemp__file__fixture_a69439d16caa94c68351e3298374b7c83} 
+temp\+\_\+file\+\_\+fixture\+::\texorpdfstring{$\sim$}{\string~}temp\+\_\+file\+\_\+fixture (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{test__compressed__file_8cpp_source_l00018}{18}} of file \mbox{\hyperlink{test__compressed__file_8cpp_source}{test\+\_\+compressed\+\_\+file.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}:\ \mbox{\hyperlink{structtemp__file__fixture_a8641500328301e32a05bce0f9d737560}{paths}})\ \{}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (bfs::exists(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}))\ \{}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \ \ \ \ bfs::remove(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}});}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00024\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structtemp__file__fixture_a58f5d52e16991c9190b499fb5ca3a5a8}\index{temp\_file\_fixture@{temp\_file\_fixture}!temp\_file\_fixture@{temp\_file\_fixture}}
+\index{temp\_file\_fixture@{temp\_file\_fixture}!temp\_file\_fixture@{temp\_file\_fixture}}
+\doxysubsubsection{\texorpdfstring{temp\_file\_fixture()}{temp\_file\_fixture()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structtemp__file__fixture_a58f5d52e16991c9190b499fb5ca3a5a8} 
+temp\+\_\+file\+\_\+fixture\+::temp\+\_\+file\+\_\+fixture (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{test__configuration__utils_8cpp_source_l00016}{16}} of file \mbox{\hyperlink{test__configuration__utils_8cpp_source}{test\+\_\+configuration\+\_\+utils.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00016\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{structtemp__file__fixture_a69439d16caa94c68351e3298374b7c83}\index{temp\_file\_fixture@{temp\_file\_fixture}!````~temp\_file\_fixture@{\texorpdfstring{$\sim$}{\string~}temp\_file\_fixture}}
+\index{````~temp\_file\_fixture@{\texorpdfstring{$\sim$}{\string~}temp\_file\_fixture}!temp\_file\_fixture@{temp\_file\_fixture}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}temp\_file\_fixture()}{\string~temp\_file\_fixture()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structtemp__file__fixture_a69439d16caa94c68351e3298374b7c83} 
+temp\+\_\+file\+\_\+fixture\+::\texorpdfstring{$\sim$}{\string~}temp\+\_\+file\+\_\+fixture (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{test__configuration__utils_8cpp_source_l00018}{18}} of file \mbox{\hyperlink{test__configuration__utils_8cpp_source}{test\+\_\+configuration\+\_\+utils.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}:\ \mbox{\hyperlink{structtemp__file__fixture_a8641500328301e32a05bce0f9d737560}{paths}})\ \{}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (bfs::exists(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}))\ \{}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \ \ \ \ bfs::remove(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}});}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00024\ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structtemp__file__fixture_a21628eec6c32716a967c1f8a50ade61f}\index{temp\_file\_fixture@{temp\_file\_fixture}!create\_temp\_file@{create\_temp\_file}}
+\index{create\_temp\_file@{create\_temp\_file}!temp\_file\_fixture@{temp\_file\_fixture}}
+\doxysubsubsection{\texorpdfstring{create\_temp\_file()}{create\_temp\_file()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{structtemp__file__fixture_a21628eec6c32716a967c1f8a50ade61f} 
+std\+::string temp\+\_\+file\+\_\+fixture\+::create\+\_\+temp\+\_\+file (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{contents}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{test__compressed__file_8cpp_source_l00026}{26}} of file \mbox{\hyperlink{test__compressed__file_8cpp_source}{test\+\_\+compressed\+\_\+file.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{classfc_1_1path}{path}}\ =\ bfs::temp\_directory\_path()\ /\ bfs::unique\_path();}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ os\ =\ bfs::ofstream(\mbox{\hyperlink{classfc_1_1path}{path}},\ std::ios\_base::out);}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ os\ <<\ contents;}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ os.close();}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structtemp__file__fixture_a8641500328301e32a05bce0f9d737560}{paths}}.emplace\_back(std::move(\mbox{\hyperlink{classfc_1_1path}{path}})).generic\_string();}
+\DoxyCodeLine{00032\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structtemp__file__fixture_a21628eec6c32716a967c1f8a50ade61f}\index{temp\_file\_fixture@{temp\_file\_fixture}!create\_temp\_file@{create\_temp\_file}}
+\index{create\_temp\_file@{create\_temp\_file}!temp\_file\_fixture@{temp\_file\_fixture}}
+\doxysubsubsection{\texorpdfstring{create\_temp\_file()}{create\_temp\_file()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{structtemp__file__fixture_a21628eec6c32716a967c1f8a50ade61f} 
+std\+::string temp\+\_\+file\+\_\+fixture\+::create\+\_\+temp\+\_\+file (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{contents}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{test__configuration__utils_8cpp_source_l00026}{26}} of file \mbox{\hyperlink{test__configuration__utils_8cpp_source}{test\+\_\+configuration\+\_\+utils.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{classfc_1_1path}{path}}\ =\ bfs::temp\_directory\_path()\ /\ bfs::unique\_path();}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ os\ =\ bfs::ofstream(\mbox{\hyperlink{classfc_1_1path}{path}},\ std::ios\_base::out);}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ os\ <<\ contents;}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ os.close();}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structtemp__file__fixture_a8641500328301e32a05bce0f9d737560}{paths}}.emplace\_back(std::move(\mbox{\hyperlink{classfc_1_1path}{path}})).generic\_string();}
+\DoxyCodeLine{00032\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structtemp__file__fixture_a75984461592089af0b7acbb206bc362f}\index{temp\_file\_fixture@{temp\_file\_fixture}!create\_temp\_file@{create\_temp\_file}}
+\index{create\_temp\_file@{create\_temp\_file}!temp\_file\_fixture@{temp\_file\_fixture}}
+\doxysubsubsection{\texorpdfstring{create\_temp\_file()}{create\_temp\_file()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{structtemp__file__fixture_a75984461592089af0b7acbb206bc362f} 
+std\+::string temp\+\_\+file\+\_\+fixture\+::create\+\_\+temp\+\_\+file (\begin{DoxyParamCaption}\item[{const void \texorpdfstring{$\ast$}{*}}]{data}{, }\item[{size\+\_\+t}]{size}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{test__compressed__file_8cpp_source_l00034}{34}} of file \mbox{\hyperlink{test__compressed__file_8cpp_source}{test\+\_\+compressed\+\_\+file.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{classfc_1_1path}{path}}\ =\ bfs::temp\_directory\_path()\ /\ bfs::unique\_path();}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ os\ =\ bfs::ofstream(\mbox{\hyperlink{classfc_1_1path}{path}},\ std::ios\_base::out|std::ios\_base::binary);}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (data\ \&\&\ size)}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ os.write(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(data),\ size);}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ os.close();}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structtemp__file__fixture_a8641500328301e32a05bce0f9d737560}{paths}}.emplace\_back(std::move(\mbox{\hyperlink{classfc_1_1path}{path}})).generic\_string();}
+\DoxyCodeLine{00041\ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structtemp__file__fixture_a8641500328301e32a05bce0f9d737560}\index{temp\_file\_fixture@{temp\_file\_fixture}!paths@{paths}}
+\index{paths@{paths}!temp\_file\_fixture@{temp\_file\_fixture}}
+\doxysubsubsection{\texorpdfstring{paths}{paths}}
+{\footnotesize\ttfamily \label{structtemp__file__fixture_a8641500328301e32a05bce0f9d737560} 
+std\+::list$<$ bfs\+::path $>$ temp\+\_\+file\+\_\+fixture\+::paths}
+
+
+
+Definition at line \mbox{\hyperlink{test__compressed__file_8cpp_source_l00043}{43}} of file \mbox{\hyperlink{test__compressed__file_8cpp_source}{test\+\_\+compressed\+\_\+file.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+plugins/trace\+\_\+api\+\_\+plugin/test/\mbox{\hyperlink{test__compressed__file_8cpp}{test\+\_\+compressed\+\_\+file.\+cpp}}\item 
+plugins/trace\+\_\+api\+\_\+plugin/test/\mbox{\hyperlink{test__configuration__utils_8cpp}{test\+\_\+configuration\+\_\+utils.\+cpp}}\end{DoxyCompactItemize}

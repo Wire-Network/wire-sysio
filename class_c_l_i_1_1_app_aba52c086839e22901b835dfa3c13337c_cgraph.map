@@ -1,0 +1,7 @@
+<map id="CLI::App::add_flag" name="CLI::App::add_flag">
+<area shape="rect" id="Node000001" title="Vector version to capture multiple flags." alt="" coords="5,46,136,72"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_option.html#a421a54aa82da9a5231b9457387afebbb" title="Take the last argument if given multiple times (or another policy)" alt="" coords="206,5,330,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="136,45,191,36,191,41,137,51"/>
+<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_option.html#a81a26e9320e4ec616fbbd6fa3ad60ef7" title=" " alt="" coords="184,71,353,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="137,67,169,72,168,77,136,72"/>
+</map>

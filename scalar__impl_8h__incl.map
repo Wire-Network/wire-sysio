@@ -1,0 +1,31 @@
+<map id="libraries/fc/secp256k1/secp256k1/src/scalar_impl.h" name="libraries/fc/secp256k1/secp256k1/src/scalar_impl.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="47,5,196,61"/>
+<area shape="rect" id="Node000002" href="$scalar_8h.html" title=" " alt="" coords="18,256,84,282"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="116,62,62,243,56,241,111,60"/>
+<area shape="rect" id="Node000003" href="$fc_2secp256k1_2secp256k1_2src_2util_8h.html" title=" " alt="" coords="142,330,192,356"/>
+<area shape="poly" id="edge11_Node000001_Node000003" title=" " alt="" coords="128,61,166,314,161,315,123,62"/>
+<area shape="rect" id="Node000010" href="$scalar__8x32__impl_8h.html" title=" " alt="" coords="172,109,306,135"/>
+<area shape="poly" id="edge12_Node000001_Node000010" title=" " alt="" coords="160,59,212,97,209,102,157,63"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="72,280,136,319,133,324,69,285"/>
+<area shape="rect" id="Node000009" href="$scalar__8x32_8h.html" title=" " alt="" coords="5,330,108,356"/>
+<area shape="poly" id="edge9_Node000002_Node000009" title=" " alt="" coords="55,282,57,314,52,315,49,282"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="292,404,355,429"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="193,353,284,394,282,399,191,358"/>
+<area shape="rect" id="Node000005" href="$stdint_8h.html" title=" " alt="" coords="44,404,109,429"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="153,358,105,396,102,392,150,354"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="125,477,188,503"/>
+<area shape="poly" id="edge8_Node000003_Node000006" title=" " alt="" coords="169,356,161,462,156,462,164,356"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="194,404,255,429"/>
+<area shape="poly" id="edge7_Node000003_Node000008" title=" " alt="" coords="179,354,207,390,203,393,175,358"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="92,428,134,465,130,469,88,432"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="34,477,100,503"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="78,430,73,462,68,462,72,429"/>
+<area shape="poly" id="edge10_Node000009_Node000005" title=" " alt="" coords="62,355,72,388,66,389,57,357"/>
+<area shape="rect" id="Node000011" href="$modinv32__impl_8h.html" title=" " alt="" coords="186,183,306,208"/>
+<area shape="poly" id="edge13_Node000010_Node000011" title=" " alt="" coords="243,135,246,167,241,167,238,135"/>
+<area shape="poly" id="edge16_Node000011_Node000003" title=" " alt="" coords="236,210,218,232,200,258,187,287,177,316,172,314,182,285,196,255,214,228,232,207"/>
+<area shape="poly" id="edge17_Node000011_Node000004" title=" " alt="" coords="267,207,291,227,312,255,324,290,330,326,329,388,324,388,324,326,319,291,307,258,288,231,263,211"/>
+<area shape="rect" id="Node000012" href="$modinv32_8h.html" title=" " alt="" coords="210,256,298,282"/>
+<area shape="poly" id="edge14_Node000011_Node000012" title=" " alt="" coords="250,208,253,241,248,241,245,209"/>
+<area shape="poly" id="edge15_Node000012_Node000003" title=" " alt="" coords="241,285,195,322,192,318,237,280"/>
+</map>

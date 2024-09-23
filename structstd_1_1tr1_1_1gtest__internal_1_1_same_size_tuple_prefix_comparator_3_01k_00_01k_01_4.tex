@@ -1,0 +1,48 @@
+\doxysection{std\+::tr1\+::gtest\+\_\+internal\+::Same\+Size\+Tuple\+Prefix\+Comparator\texorpdfstring{$<$}{<} k, k \texorpdfstring{$>$}{>} Struct Template Reference}
+\hypertarget{structstd_1_1tr1_1_1gtest__internal_1_1_same_size_tuple_prefix_comparator_3_01k_00_01k_01_4}{}\label{structstd_1_1tr1_1_1gtest__internal_1_1_same_size_tuple_prefix_comparator_3_01k_00_01k_01_4}\index{std::tr1::gtest\_internal::SameSizeTuplePrefixComparator$<$ k, k $>$@{std::tr1::gtest\_internal::SameSizeTuplePrefixComparator$<$ k, k $>$}}
+
+
+{\ttfamily \#include $<$gtest-\/tuple.\+h$>$}
+
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} Tuple1 , \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} Tuple2 $>$ }\\static bool \mbox{\hyperlink{structstd_1_1tr1_1_1gtest__internal_1_1_same_size_tuple_prefix_comparator_3_01k_00_01k_01_4_a5564fbade05a2d0522d9899da62c2119}{Eq}} (const Tuple1 \&t1, const Tuple2 \&t2)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$int k$>$\newline
+struct std\+::tr1\+::gtest\+\_\+internal\+::\+Same\+Size\+Tuple\+Prefix\+Comparator$<$ k, k $>$}
+
+
+Definition at line \mbox{\hyperlink{gtest-tuple_8h_source_l00963}{963}} of file \mbox{\hyperlink{gtest-tuple_8h_source}{gtest-\/tuple.\+h}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structstd_1_1tr1_1_1gtest__internal_1_1_same_size_tuple_prefix_comparator_3_01k_00_01k_01_4_a5564fbade05a2d0522d9899da62c2119}\index{std::tr1::gtest\_internal::SameSizeTuplePrefixComparator$<$ k, k $>$@{std::tr1::gtest\_internal::SameSizeTuplePrefixComparator$<$ k, k $>$}!Eq@{Eq}}
+\index{Eq@{Eq}!std::tr1::gtest\_internal::SameSizeTuplePrefixComparator$<$ k, k $>$@{std::tr1::gtest\_internal::SameSizeTuplePrefixComparator$<$ k, k $>$}}
+\doxysubsubsection{\texorpdfstring{Eq()}{Eq()}}
+{\footnotesize\ttfamily \label{structstd_1_1tr1_1_1gtest__internal_1_1_same_size_tuple_prefix_comparator_3_01k_00_01k_01_4_a5564fbade05a2d0522d9899da62c2119} 
+template$<$int k$>$ \\
+template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} Tuple1 , \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} Tuple2 $>$ \\
+static bool \mbox{\hyperlink{structstd_1_1tr1_1_1gtest__internal_1_1_same_size_tuple_prefix_comparator}{std\+::tr1\+::gtest\+\_\+internal\+::\+Same\+Size\+Tuple\+Prefix\+Comparator}}$<$ k, k $>$\+::\+Eq (\begin{DoxyParamCaption}\item[{const Tuple1 \&}]{t1}{, }\item[{const Tuple2 \&}]{t2}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-tuple_8h_source_l00965}{965}} of file \mbox{\hyperlink{gtest-tuple_8h_source}{gtest-\/tuple.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00965\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00966\ \ \ \ \ \textcolor{keywordflow}{return}\ SameSizeTuplePrefixComparator<k\ -\/\ 1,\ k\ -\/\ 1>::Eq(t1,\ t2)\ \&\&}
+\DoxyCodeLine{00967\ \ \ \ \ \ \ \ \ ::std::tr1::get<k\ -\/\ 1>(t1)\ ==\ ::std::tr1::get<k\ -\/\ 1>(t2);}
+\DoxyCodeLine{00968\ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/include/gtest/internal/\mbox{\hyperlink{gtest-tuple_8h}{gtest-\/tuple.\+h}}\end{DoxyCompactItemize}

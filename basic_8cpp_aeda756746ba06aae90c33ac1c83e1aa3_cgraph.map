@@ -1,0 +1,15 @@
+<map id="BOOST_AUTO_TEST_CASE" name="BOOST_AUTO_TEST_CASE">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,97,202,122"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1log_1_1basic.html#a35e70935ce8b7a30c6eafea45181907a" title=" " alt="" coords="250,56,412,97"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="195,94,234,88,235,93,196,99"/>
+<area shape="rect" id="Node000005" href="$classwebsocketpp_1_1log_1_1basic.html#a9f87a8c3e5d8e25e5f014756827a587a" title="Write a string message to the given channel." alt="" coords="250,121,412,162"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="200,121,235,125,234,131,199,126"/>
+<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1log_1_1basic.html#a46bedf7f2bca8e28b39d0b6a4816a8d1" title=" " alt="" coords="460,5,622,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="412,54,444,46,445,51,413,59"/>
+<area shape="rect" id="Node000004" href="$xbyak__mnemonic_8h.html#aa81aed607133209dade63a226818224d" title=" " alt="" coords="670,70,716,96"/>
+<area shape="poly" id="edge4_Node000002_Node000004" title=" " alt="" coords="412,75,655,80,654,85,412,80"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="598,44,657,67,655,72,596,49"/>
+<area shape="poly" id="edge7_Node000005_Node000004" title=" " alt="" coords="412,126,654,86,655,92,413,131"/>
+<area shape="rect" id="Node000006" href="$classwebsocketpp_1_1log_1_1basic.html#a8f443b4ff286da803a114897a8f97105" title=" " alt="" coords="460,171,622,211"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="413,158,445,166,444,171,412,163"/>
+</map>

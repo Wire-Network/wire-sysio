@@ -1,0 +1,254 @@
+\doxysection{CLI\+::Is\+Member Class Reference}
+\hypertarget{class_c_l_i_1_1_is_member}{}\label{class_c_l_i_1_1_is_member}\index{CLI::IsMember@{CLI::IsMember}}
+
+
+Verify items are in a set.  
+
+
+
+
+{\ttfamily \#include $<$CLI11.\+hpp$>$}
+
+
+
+Inheritance diagram for CLI\+::Is\+Member\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=161pt]{class_c_l_i_1_1_is_member__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for CLI\+::Is\+Member\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=161pt]{class_c_l_i_1_1_is_member__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{class_c_l_i_1_1_is_member_af0f5e865fff0bcca6faaa1a7cf825997}{filter\+\_\+fn\+\_\+t}} = std\+::function$<$std\+::string(std\+::string)$>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename... Args$>$ }\\\mbox{\hyperlink{class_c_l_i_1_1_is_member_abb1f2767188a5c8ded100fc2dc85a3b2}{Is\+Member}} (std\+::initializer\+\_\+list$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ values, Args \&\&... args)
+\begin{DoxyCompactList}\small\item\em This allows in-\/place construction using an initializer list. \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{class_c_l_i_1_1_is_member_a049497214ca79cde3e198d700a7280d2}{Is\+Member}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\&set)
+\begin{DoxyCompactList}\small\item\em This checks to see if an item is in a set (empty function) \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename F $>$ }\\\mbox{\hyperlink{class_c_l_i_1_1_is_member_a778da19fa2481912c7fcfe6b3c8b453a}{Is\+Member}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} set, F filter\+\_\+function)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename... Args$>$ }\\\mbox{\hyperlink{class_c_l_i_1_1_is_member_a8254fb3a00a351e43ba6e0ab93c183c0}{Is\+Member}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\&set, \mbox{\hyperlink{class_c_l_i_1_1_is_member_af0f5e865fff0bcca6faaa1a7cf825997}{filter\+\_\+fn\+\_\+t}} filter\+\_\+fn\+\_\+1, \mbox{\hyperlink{class_c_l_i_1_1_is_member_af0f5e865fff0bcca6faaa1a7cf825997}{filter\+\_\+fn\+\_\+t}} filter\+\_\+fn\+\_\+2, Args \&\&... other)
+\begin{DoxyCompactList}\small\item\em You can pass in as many filter functions as you like, they nest (string only currently) \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{class_c_l_i_1_1_validator}{CLI\+::\+Validator}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_c_l_i_1_1_validator_a918d82662319f6dc9dad53d580741569}{Validator}} ()=default
+\item 
+\mbox{\hyperlink{class_c_l_i_1_1_validator_a71df7c1c94c4abceee930eef957f5b76}{Validator}} (std\+::string validator\+\_\+desc)
+\begin{DoxyCompactList}\small\item\em Construct a \doxylink{class_c_l_i_1_1_validator}{Validator} with just the description string. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_c_l_i_1_1_validator_aede1b1a51a7f924342a92cbbd3ee41be}{Validator}} (std\+::function$<$ std\+::string(std\+::string \&)$>$ \mbox{\hyperlink{unionop}{op}}, std\+::string validator\+\_\+desc, std\+::string validator\+\_\+name="{}"{})
+\begin{DoxyCompactList}\small\item\em Construct \doxylink{class_c_l_i_1_1_validator}{Validator} from basic information. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_c_l_i_1_1_validator}{Validator}} \& \mbox{\hyperlink{class_c_l_i_1_1_validator_afc57c1bbaadbff4ce9c5772519818831}{operation}} (std\+::function$<$ std\+::string(std\+::string \&)$>$ \mbox{\hyperlink{unionop}{op}})
+\begin{DoxyCompactList}\small\item\em Set the \doxylink{class_c_l_i_1_1_validator}{Validator} operation function. \end{DoxyCompactList}\item 
+std\+::string \mbox{\hyperlink{class_c_l_i_1_1_validator_a97241be1f8ac1c8d2fabdcf2ec761f49}{operator()}} (std\+::string \&str) const
+\item 
+std\+::string \mbox{\hyperlink{class_c_l_i_1_1_validator_a3e4e7670d82455a43c0d3f8c9cc1db4f}{operator()}} (const std\+::string \&str) const
+\item 
+\mbox{\hyperlink{class_c_l_i_1_1_validator}{Validator}} \& \mbox{\hyperlink{class_c_l_i_1_1_validator_a35930c9b193bb0f7c5b7597dfe002e1f}{description}} (std\+::string validator\+\_\+desc)
+\begin{DoxyCompactList}\small\item\em Specify the type string. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_c_l_i_1_1_validator}{Validator}} \mbox{\hyperlink{class_c_l_i_1_1_validator_acb7942915861f00426ba4106c3fa1445}{description}} (std\+::string validator\+\_\+desc) const
+\begin{DoxyCompactList}\small\item\em Specify the type string. \end{DoxyCompactList}\item 
+std\+::string \mbox{\hyperlink{class_c_l_i_1_1_validator_a77c9d0a1f496ccaa4a8ef293a41bca78}{get\+\_\+description}} () const
+\begin{DoxyCompactList}\small\item\em Generate type description information for the \doxylink{class_c_l_i_1_1_validator}{Validator}. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_c_l_i_1_1_validator}{Validator}} \& \mbox{\hyperlink{class_c_l_i_1_1_validator_a8fc0ddaaa61f5dc5a7fa527d697991da}{name}} (std\+::string validator\+\_\+name)
+\begin{DoxyCompactList}\small\item\em Specify the type string. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_c_l_i_1_1_validator}{Validator}} \mbox{\hyperlink{class_c_l_i_1_1_validator_a56272c0571e4b28e5f1387787bee671c}{name}} (std\+::string validator\+\_\+name) const
+\begin{DoxyCompactList}\small\item\em Specify the type string. \end{DoxyCompactList}\item 
+const std\+::string \& \mbox{\hyperlink{class_c_l_i_1_1_validator_a688775a9b9dffb8f7e40cfb42af11697}{get\+\_\+name}} () const
+\begin{DoxyCompactList}\small\item\em Get the name of the \doxylink{class_c_l_i_1_1_validator}{Validator}. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_c_l_i_1_1_validator}{Validator}} \& \mbox{\hyperlink{class_c_l_i_1_1_validator_ac8f0bd247c6cca15729c2f0f5b822fe4}{active}} (bool active\+\_\+val=true)
+\begin{DoxyCompactList}\small\item\em Specify whether the \doxylink{class_c_l_i_1_1_validator}{Validator} is active or not. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_c_l_i_1_1_validator}{Validator}} \mbox{\hyperlink{class_c_l_i_1_1_validator_a98fa76ba029599613e3ab8609e25af4d}{active}} (bool active\+\_\+val=true) const
+\begin{DoxyCompactList}\small\item\em Specify whether the \doxylink{class_c_l_i_1_1_validator}{Validator} is active or not. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_c_l_i_1_1_validator}{Validator}} \& \mbox{\hyperlink{class_c_l_i_1_1_validator_a356d979d984dffff3489caf4baca9160}{non\+\_\+modifying}} (bool no\+\_\+modify=true)
+\begin{DoxyCompactList}\small\item\em Specify whether the \doxylink{class_c_l_i_1_1_validator}{Validator} can be modifying or not. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_c_l_i_1_1_validator}{Validator}} \& \mbox{\hyperlink{class_c_l_i_1_1_validator_ae24fb3eedf62301b733b3a20d2b93757}{application\+\_\+index}} (int app\+\_\+index)
+\begin{DoxyCompactList}\small\item\em Specify the application index of a validator. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_c_l_i_1_1_validator}{Validator}} \mbox{\hyperlink{class_c_l_i_1_1_validator_a5f621b1380d9a1a3694bc509a087d1cd}{application\+\_\+index}} (int app\+\_\+index) const
+\begin{DoxyCompactList}\small\item\em Specify the application index of a validator. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{class_c_l_i_1_1_validator_aa27699959ccccc236af305582d2b3e90}{get\+\_\+application\+\_\+index}} () const
+\begin{DoxyCompactList}\small\item\em Get the current value of the application index. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_c_l_i_1_1_validator_a1c08bcd3bca8c446e49e44d2c4e1413f}{get\+\_\+active}} () const
+\begin{DoxyCompactList}\small\item\em Get a boolean if the validator is active. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_c_l_i_1_1_validator_addb6df41feafbbbe6347a46151d55762}{get\+\_\+modifying}} () const
+\begin{DoxyCompactList}\small\item\em Get a boolean if the validator is allowed to modify the input returns true if it can modify the input. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_c_l_i_1_1_validator}{Validator}} \mbox{\hyperlink{class_c_l_i_1_1_validator_a52e52713e3e170d132a01bf91ea2b879}{operator\&}} (const \mbox{\hyperlink{class_c_l_i_1_1_validator}{Validator}} \&other) const
+\item 
+\mbox{\hyperlink{class_c_l_i_1_1_validator}{Validator}} \mbox{\hyperlink{class_c_l_i_1_1_validator_ac19919604a6ac47c5a1cbd34920991a4}{operator\texorpdfstring{$\vert$}{|}}} (const \mbox{\hyperlink{class_c_l_i_1_1_validator}{Validator}} \&other) const
+\item 
+\mbox{\hyperlink{class_c_l_i_1_1_validator}{Validator}} \mbox{\hyperlink{class_c_l_i_1_1_validator_ab113af781dbc286b22cdfeedd5204e68}{operator!}} () const
+\begin{DoxyCompactList}\small\item\em Create a validator that fails when a given validator succeeds. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Protected Attributes inherited from \mbox{\hyperlink{class_c_l_i_1_1_validator}{CLI\+::\+Validator}}}
+\begin{DoxyCompactItemize}
+\item 
+std\+::function$<$ std\+::string()$>$ \mbox{\hyperlink{class_c_l_i_1_1_validator_a9f00a86d01b79facfc300be76b7463d7}{desc\+\_\+function\+\_\+}} \{\mbox{[}$\,$\mbox{]}() \{ \mbox{\hyperlink{hello__driver_8cpp_a9717e7bbecb906637e86cef6da3d83c2}{return}} std\+::string\{\}; \}\}
+\begin{DoxyCompactList}\small\item\em This is the description function, if empty the description\+\_\+ will be used. \end{DoxyCompactList}\item 
+std\+::function$<$ std\+::string(std\+::string \&)$>$ \mbox{\hyperlink{class_c_l_i_1_1_validator_aa6c1eedd7839b91d88246539f2305ef3}{func\+\_\+}} \{\mbox{[}$\,$\mbox{]}(std\+::string \&) \{ \mbox{\hyperlink{hello__driver_8cpp_a9717e7bbecb906637e86cef6da3d83c2}{return}} std\+::string\{\}; \}\}
+\item 
+std\+::string \mbox{\hyperlink{class_c_l_i_1_1_validator_ac97b23ee16e15ae0b31253feb39706bf}{name\+\_\+}} \{\}
+\begin{DoxyCompactList}\small\item\em The name for search purposes of the \doxylink{class_c_l_i_1_1_validator}{Validator}. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{class_c_l_i_1_1_validator_a301ecf2851e4a7cdcad7c9b774598320}{application\+\_\+index\+\_\+}} = -\/1
+\begin{DoxyCompactList}\small\item\em \doxylink{struct_a}{A} \doxylink{class_c_l_i_1_1_validator}{Validator} will only apply to an indexed value (-\/1 is all elements) \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_c_l_i_1_1_validator_a558776377513d88bf637b5d775c4e31b}{active\+\_\+}} \{true\}
+\begin{DoxyCompactList}\small\item\em Enable for \doxylink{class_c_l_i_1_1_validator}{Validator} to allow it to be disabled if need be. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_c_l_i_1_1_validator_a60df532d1d80afc040ec0e8ed2736200}{non\+\_\+modifying\+\_\+}} \{false\}
+\begin{DoxyCompactList}\small\item\em specify that a validator should not modify the input \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l02712}{2712}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{class_c_l_i_1_1_is_member_af0f5e865fff0bcca6faaa1a7cf825997}\index{CLI::IsMember@{CLI::IsMember}!filter\_fn\_t@{filter\_fn\_t}}
+\index{filter\_fn\_t@{filter\_fn\_t}!CLI::IsMember@{CLI::IsMember}}
+\doxysubsubsection{\texorpdfstring{filter\_fn\_t}{filter\_fn\_t}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_is_member_af0f5e865fff0bcca6faaa1a7cf825997} 
+using \mbox{\hyperlink{class_c_l_i_1_1_is_member_af0f5e865fff0bcca6faaa1a7cf825997}{CLI\+::\+Is\+Member\+::filter\+\_\+fn\+\_\+t}} = std\+::function$<$std\+::string(std\+::string)$>$}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l02714}{2714}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_c_l_i_1_1_is_member_abb1f2767188a5c8ded100fc2dc85a3b2}\index{CLI::IsMember@{CLI::IsMember}!IsMember@{IsMember}}
+\index{IsMember@{IsMember}!CLI::IsMember@{CLI::IsMember}}
+\doxysubsubsection{\texorpdfstring{IsMember()}{IsMember()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_is_member_abb1f2767188a5c8ded100fc2dc85a3b2} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename... Args$>$ \\
+CLI\+::\+Is\+Member\+::\+Is\+Member (\begin{DoxyParamCaption}\item[{std\+::initializer\+\_\+list$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$}]{values}{, }\item[{Args \&\&...}]{args}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l02718}{2718}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02719\ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{class_c_l_i_1_1_is_member_abb1f2767188a5c8ded100fc2dc85a3b2}{IsMember}}(std::vector<T>(values),\ std::forward<Args>(args)...)\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{class_c_l_i_1_1_is_member_a049497214ca79cde3e198d700a7280d2}\index{CLI::IsMember@{CLI::IsMember}!IsMember@{IsMember}}
+\index{IsMember@{IsMember}!CLI::IsMember@{CLI::IsMember}}
+\doxysubsubsection{\texorpdfstring{IsMember()}{IsMember()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_is_member_a049497214ca79cde3e198d700a7280d2} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+CLI\+::\+Is\+Member\+::\+Is\+Member (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\&}]{set}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l02722}{2722}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02722\ :\ \mbox{\hyperlink{class_c_l_i_1_1_is_member_abb1f2767188a5c8ded100fc2dc85a3b2}{IsMember}}(std::forward<T>(set),\ \textcolor{keyword}{nullptr})\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{class_c_l_i_1_1_is_member_a778da19fa2481912c7fcfe6b3c8b453a}\index{CLI::IsMember@{CLI::IsMember}!IsMember@{IsMember}}
+\index{IsMember@{IsMember}!CLI::IsMember@{CLI::IsMember}}
+\doxysubsubsection{\texorpdfstring{IsMember()}{IsMember()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_is_member_a778da19fa2481912c7fcfe6b3c8b453a} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename F $>$ \\
+CLI\+::\+Is\+Member\+::\+Is\+Member (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}}]{set}{, }\item[{F}]{filter\+\_\+function}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+This checks to see if an item is in a set\+: pointer or copy version. You can pass in a function that will filter both sides of the comparison before computing the comparison. 
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l02726}{2726}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02726\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02727\ }
+\DoxyCodeLine{02728\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Get\ the\ type\ of\ the\ contained\ item\ -\/\ requires\ a\ container\ have\ ::value\_type}}
+\DoxyCodeLine{02729\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ if\ the\ type\ does\ not\ have\ first\_type\ and\ second\_type,\ these\ are\ both\ value\_type}}
+\DoxyCodeLine{02730\ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ }element\_t\ =\ \textcolor{keyword}{typename}\ \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1element__type_adbf21c191be366113f5b7f65c6518845}{detail::element\_type<T>::type}};\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Removes\ (smart)\ pointers\ if\ needed}}
+\DoxyCodeLine{02731\ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ }item\_t\ =\ \textcolor{keyword}{typename}\ \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1pair__adaptor_a8bcb95c4adfe14cc502c0446b0f01fc1}{detail::pair\_adaptor<element\_t>::first\_type}};\ \textcolor{comment}{//\ Is\ value\_type\ if\ not\ a\ map}}
+\DoxyCodeLine{02732\ }
+\DoxyCodeLine{02733\ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ }local\_item\_t\ =\ \textcolor{keyword}{typename}\ \mbox{\hyperlink{struct_c_l_i_1_1_is_member_type_a3950ba39eb222a3b1733f59c78e59bf7}{IsMemberType<item\_t>::type}};\ \textcolor{comment}{//\ This\ will\ convert\ bad\ types\ to\ good\ ones}}
+\DoxyCodeLine{02734\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ (const\ char\ *\ to\ std::string)}}
+\DoxyCodeLine{02735\ }
+\DoxyCodeLine{02736\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Make\ a\ local\ copy\ of\ the\ filter\ function,\ using\ a\ std::function\ if\ not\ one\ already}}
+\DoxyCodeLine{02737\ \ \ \ \ \ \ \ \ std::function<local\_item\_t(local\_item\_t)>\ filter\_fn\ =\ filter\_function;}
+\DoxyCodeLine{02738\ }
+\DoxyCodeLine{02739\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ This\ is\ the\ type\ name\ for\ help,\ it\ will\ take\ the\ current\ version\ of\ the\ set\ contents}}
+\DoxyCodeLine{02740\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_c_l_i_1_1_validator_a9f00a86d01b79facfc300be76b7463d7}{desc\_function\_}}\ =\ [\mbox{\hyperlink{yubihsm__pkcs11_8c_a893468abdce45d586a5b659094a25e6c}{set}}]()\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_a75f66945cfe53b556e4c311f9a88a155}{detail::generate\_set}}(\mbox{\hyperlink{namespace_c_l_i_1_1detail_a0c6cf48feae9d909d52e7b4c346cba29}{detail::smart\_deref}}(set));\ \};}
+\DoxyCodeLine{02741\ }
+\DoxyCodeLine{02742\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ This\ is\ the\ function\ that\ validates}}
+\DoxyCodeLine{02743\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ It\ stores\ a\ copy\ of\ the\ set\ pointer-\/like,\ so\ shared\_ptr\ will\ stay\ alive}}
+\DoxyCodeLine{02744\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_c_l_i_1_1_validator_aa6c1eedd7839b91d88246539f2305ef3}{func\_}}\ =\ [\mbox{\hyperlink{yubihsm__pkcs11_8c_a893468abdce45d586a5b659094a25e6c}{set}},\ filter\_fn](std::string\ \&input)\ \{}
+\DoxyCodeLine{02745\ \ \ \ \ \ \ \ \ \ \ \ \ local\_item\_t\ b;}
+\DoxyCodeLine{02746\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!detail::lexical\_cast(input,\ b))\ \{}
+\DoxyCodeLine{02747\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{namespace_c_l_i_a1d8108a219533f0b0361640a017f037ea8180c46099f957f51b2bc31f7f0f5c42}{ValidationError}}(input);\ \textcolor{comment}{//\ name\ is\ added\ later}}
+\DoxyCodeLine{02748\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{02749\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(filter\_fn)\ \{}
+\DoxyCodeLine{02750\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ b\ =\ filter\_fn(b);}
+\DoxyCodeLine{02751\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{02752\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ res\ =\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_aa4b4a0a97c9b07110595765887647385}{detail::search}}(set,\ b,\ filter\_fn);}
+\DoxyCodeLine{02753\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(res.first)\ \{}
+\DoxyCodeLine{02754\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Make\ sure\ the\ version\ in\ the\ input\ string\ is\ identical\ to\ the\ one\ in\ the\ set}}
+\DoxyCodeLine{02755\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(filter\_fn)\ \{}
+\DoxyCodeLine{02756\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ input\ =\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_a9a74f119a795b25c40db74ffa21d3c2d}{detail::value\_string}}(\mbox{\hyperlink{struct_c_l_i_1_1detail_1_1pair__adaptor_ab46a8b1544ac182fe15948fe94a75bd6}{detail::pair\_adaptor<element\_t>::first}}(*(res.second)));}
+\DoxyCodeLine{02757\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{02758\ }
+\DoxyCodeLine{02759\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Return\ empty\ error\ string\ (success)}}
+\DoxyCodeLine{02760\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::string\{\};}
+\DoxyCodeLine{02761\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{02762\ }
+\DoxyCodeLine{02763\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ you\ reach\ this\ point,\ the\ result\ was\ not\ found}}
+\DoxyCodeLine{02764\ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ out(\textcolor{stringliteral}{"{}\ not\ in\ "{}});}
+\DoxyCodeLine{02765\ \ \ \ \ \ \ \ \ \ \ \ \ out\ +=\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_a75f66945cfe53b556e4c311f9a88a155}{detail::generate\_set}}(\mbox{\hyperlink{namespace_c_l_i_1_1detail_a0c6cf48feae9d909d52e7b4c346cba29}{detail::smart\_deref}}(set));}
+\DoxyCodeLine{02766\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ out;}
+\DoxyCodeLine{02767\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{02768\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_c_l_i_1_1_is_member_a778da19fa2481912c7fcfe6b3c8b453a_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_c_l_i_1_1_is_member_a8254fb3a00a351e43ba6e0ab93c183c0}\index{CLI::IsMember@{CLI::IsMember}!IsMember@{IsMember}}
+\index{IsMember@{IsMember}!CLI::IsMember@{CLI::IsMember}}
+\doxysubsubsection{\texorpdfstring{IsMember()}{IsMember()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_is_member_a8254fb3a00a351e43ba6e0ab93c183c0} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename... Args$>$ \\
+CLI\+::\+Is\+Member\+::\+Is\+Member (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\&}]{set}{, }\item[{\mbox{\hyperlink{class_c_l_i_1_1_is_member_af0f5e865fff0bcca6faaa1a7cf825997}{filter\+\_\+fn\+\_\+t}}}]{filter\+\_\+fn\+\_\+1}{, }\item[{\mbox{\hyperlink{class_c_l_i_1_1_is_member_af0f5e865fff0bcca6faaa1a7cf825997}{filter\+\_\+fn\+\_\+t}}}]{filter\+\_\+fn\+\_\+2}{, }\item[{Args \&\&...}]{other}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l02772}{2772}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02773\ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{class_c_l_i_1_1_is_member_abb1f2767188a5c8ded100fc2dc85a3b2}{IsMember}}(}
+\DoxyCodeLine{02774\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::forward<T>(set),}
+\DoxyCodeLine{02775\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [filter\_fn\_1,\ filter\_fn\_2](std::string\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})\ \{\ \textcolor{keywordflow}{return}\ filter\_fn\_2(filter\_fn\_1(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}));\ \},}
+\DoxyCodeLine{02776\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}...)\ \{\}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+programs/clio/\mbox{\hyperlink{_c_l_i11_8hpp}{CLI11.\+hpp}}\end{DoxyCompactItemize}

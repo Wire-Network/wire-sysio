@@ -1,0 +1,11 @@
+<map id="sysio::producer_plugin::get_supported_protocol_features" name="sysio::producer_plugin::get_supported_protocol_features">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,121,170,177"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1chain_1_1controller.html#a67876c4bcb4b26fa679d347472ff14ee" title=" " alt="" coords="218,5,370,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="134,119,216,71,224,66,227,71,219,75,137,123"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1chain_1_1protocol__feature__manager.html#a9e6c1310749c4fd04035aa2c01310ce4" title=" " alt="" coords="218,85,370,141"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="169,132,202,126,203,132,170,137"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1chain_1_1controller.html#aea3612e7cb52dfcaa2e6afdc1b3e2f51" title=" " alt="" coords="218,165,370,206"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="170,161,203,167,202,172,169,166"/>
+<area shape="rect" id="Node000005" href="$namespacefc.html#a76ae235ec7e9b8862e70740058d7eb1b" title=" " alt="" coords="238,230,350,255"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="139,175,219,215,236,221,234,226,217,220,137,180"/>
+</map>

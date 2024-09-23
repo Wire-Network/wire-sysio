@@ -1,0 +1,22 @@
+<map id="CLI::Option_group" name="CLI::Option_group">
+<area shape="rect" id="Node000001" title="Extension of App to better manage groups of options." alt="" coords="96,589,224,615"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_app.html" title="Creates a command line program, with very few defaults." alt="" coords="145,471,218,496"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="179,512,165,589,160,588,174,511"/>
+<area shape="poly" id="edge11_Node000002_Node000002" title=" " alt="" coords="235,472,242,476,245,484,236,494,219,497,218,492,234,490,239,483,238,480,232,477"/>
+<area shape="rect" id="Node000006" href="$class_c_l_i_1_1_option.html" title=" " alt="" coords="289,589,377,615"/>
+<area shape="poly" id="edge10_Node000006_Node000002" title=" " alt="" coords="183,511,188,539,202,564,221,578,243,588,289,598,288,603,241,593,218,583,198,567,183,541,178,512"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="307,5,360,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="291,23,244,28,190,40,137,62,112,77,91,96,56,139,31,181,15,224,8,268,12,311,25,355,47,400,79,445,93,457,109,467,145,477,144,482,107,471,90,462,75,448,43,403,20,357,7,312,3,267,10,223,26,179,52,135,87,92,109,73,134,57,189,35,243,23,291,18"/>
+<area shape="rect" id="Node000005" href="$class_c_l_i_1_1_option_base.html" title=" " alt="" coords="101,94,331,120"/>
+<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="306,43,234,96,231,91,303,38"/>
+<area shape="poly" id="edge9_Node000006_Node000003" title=" " alt="" coords="354,42,370,71,377,105,377,485,373,527,358,566,345,590,340,588,354,564,368,526,372,485,372,106,365,73,350,45"/>
+<area shape="rect" id="Node000007" href="$class_c_l_i_1_1_option_base.html" title=" " alt="" coords="395,161,575,186"/>
+<area shape="poly" id="edge8_Node000007_Node000003" title=" " alt="" coords="372,37,395,53,422,80,447,110,480,159,476,162,442,113,418,84,392,57,369,41"/>
+<area shape="rect" id="Node000004" href="$class_c_l_i_1_1_option_defaults.html" title=" " alt="" coords="69,245,206,270"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="119,284,105,313,93,351,86,382,89,412,104,445,122,462,145,473,143,477,119,467,100,448,83,413,81,382,88,349,100,311,115,282"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="205,135,146,246,141,243,200,133"/>
+<area shape="poly" id="edge6_Node000002_Node000006" title=" " alt="" coords="299,582,281,567,266,544,260,533,250,522,212,499,215,495,254,518,264,530,270,541,285,564,302,578"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="488,202,486,271,474,366,462,418,446,471,424,521,395,567,381,581,365,591,362,587,378,577,391,564,419,518,441,469,457,417,469,366,481,271,483,202"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="230,245,287,270"/>
+<area shape="poly" id="edge12_Node000002_Node000008" title=" " alt="" coords="247,285,234,313,224,350,220,380,215,410,204,448,192,471,187,469,199,446,210,409,214,379,219,349,229,311,242,283"/>
+</map>

@@ -1,0 +1,359 @@
+\doxysection{fc\+::rpc\+::cli Class Reference}
+\hypertarget{classfc_1_1rpc_1_1cli}{}\label{classfc_1_1rpc_1_1cli}\index{fc::rpc::cli@{fc::rpc::cli}}
+
+
+{\ttfamily \#include $<$cli.\+hpp$>$}
+
+
+
+Inheritance diagram for fc\+::rpc\+::cli\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=179pt]{classfc_1_1rpc_1_1cli__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for fc\+::rpc\+::cli\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=179pt]{classfc_1_1rpc_1_1cli__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1rpc_1_1cli_aeb4ce839785088fcffe1c6d35532dfcf}{\texorpdfstring{$\sim$}{\string~}cli}} ()
+\item 
+virtual \mbox{\hyperlink{classfc_1_1variant}{variant}} \mbox{\hyperlink{classfc_1_1rpc_1_1cli_ab42308885a2df6f53bef3c9407d5e775}{send\+\_\+call}} (\mbox{\hyperlink{namespacefc_a18e9e0bd9c0a52896425ae1172bc4e2b}{api\+\_\+id\+\_\+type}} api\+\_\+id, \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} method\+\_\+name, \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}} args=\mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}())
+\item 
+virtual \mbox{\hyperlink{classfc_1_1variant}{variant}} \mbox{\hyperlink{classfc_1_1rpc_1_1cli_a386f494f901a7abfba5ab682be6dd489}{send\+\_\+callback}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} callback\+\_\+id, \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}} args=\mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}())
+\item 
+virtual void \mbox{\hyperlink{classfc_1_1rpc_1_1cli_afa3a01d9134551ba945efe8264838583}{send\+\_\+notice}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} callback\+\_\+id, \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}} args=\mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}())
+\item 
+void \mbox{\hyperlink{classfc_1_1rpc_1_1cli_a5ca2f4c807517379e93cbe65371f599d}{start}} ()
+\item 
+void \mbox{\hyperlink{classfc_1_1rpc_1_1cli_ae5e9817886a423fcf8f78fa3fbd894cc}{stop}} ()
+\item 
+void \mbox{\hyperlink{classfc_1_1rpc_1_1cli_ae273a9d552292105027c5a508403f934}{wait}} ()
+\item 
+void \mbox{\hyperlink{classfc_1_1rpc_1_1cli_af7966485df0bc34229281a078063f79b}{format\+\_\+result}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&method, std\+::function$<$ \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}}(\mbox{\hyperlink{classfc_1_1variant}{variant}}, const \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}} \&)$>$ formatter)
+\item 
+virtual void \mbox{\hyperlink{classfc_1_1rpc_1_1cli_a443954d4df8c200e9b07f9ef25a9782b}{getline}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} \&prompt, \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} \&line)
+\item 
+void \mbox{\hyperlink{classfc_1_1rpc_1_1cli_afbfce92d8307a2197c2d668c96f58f9c}{set\+\_\+prompt}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&prompt)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classfc_1_1api__connection}{fc\+::api\+\_\+connection}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1api__connection_a793a21850eb81a8c8494eedb84d59636}{api\+\_\+connection}} ()
+\item 
+virtual \mbox{\hyperlink{classfc_1_1api__connection_a194008fa45fe1107a454d47beeba3c39}{\texorpdfstring{$\sim$}{\string~}api\+\_\+connection}} ()
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{classfc_1_1api}{api}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \mbox{\hyperlink{classfc_1_1api__connection_a4b3cb72517e80d507bc6a780e8cab6cd}{get\+\_\+remote\+\_\+api}} (\mbox{\hyperlink{namespacefc_a18e9e0bd9c0a52896425ae1172bc4e2b}{api\+\_\+id\+\_\+type}} api\+\_\+id=0)
+\item 
+\mbox{\hyperlink{classfc_1_1variant}{variant}} \mbox{\hyperlink{classfc_1_1api__connection_aee1166b3d1f739ffd7759cf02b2e7efa}{receive\+\_\+call}} (\mbox{\hyperlink{namespacefc_a18e9e0bd9c0a52896425ae1172bc4e2b}{api\+\_\+id\+\_\+type}} api\+\_\+id, const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&method\+\_\+name, const \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}} \&args=\mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}()) const
+\item 
+\mbox{\hyperlink{classfc_1_1variant}{variant}} \mbox{\hyperlink{classfc_1_1api__connection_a16bc734461e2954bf42d2f97be137eb8}{receive\+\_\+callback}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} callback\+\_\+id, const \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}} \&args=\mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}()) const
+\item 
+void \mbox{\hyperlink{classfc_1_1api__connection_ad5bd634f7e967ca90ccc8fd4c3e9fac8}{receive\+\_\+notice}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} callback\+\_\+id, const \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}} \&args=\mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}()) const
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{class_interface}{Interface}} $>$ }\\\mbox{\hyperlink{namespacefc_a18e9e0bd9c0a52896425ae1172bc4e2b}{api\+\_\+id\+\_\+type}} \mbox{\hyperlink{classfc_1_1api__connection_aede0d0e920a2018f3f74841a3c98a270}{register\+\_\+api}} (const \mbox{\hyperlink{class_interface}{Interface}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})
+\item 
+{\footnotesize template$<$typename Signature $>$ }\\\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{classfc_1_1api__connection_a9c8aa3ef4091a3b634cb8413ac6979c7}{register\+\_\+callback}} (const std\+::function$<$ Signature $>$ \&cb)
+\item 
+std\+::vector$<$ std\+::string $>$ \mbox{\hyperlink{classfc_1_1api__connection_a31c921df625930a9a7d0ad114bb2ba1e}{get\+\_\+method\+\_\+names}} (\mbox{\hyperlink{namespacefc_a18e9e0bd9c0a52896425ae1172bc4e2b}{api\+\_\+id\+\_\+type}} local\+\_\+api\+\_\+id=0) const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Public Attributes inherited from \mbox{\hyperlink{classfc_1_1api__connection}{fc\+::api\+\_\+connection}}}
+\begin{DoxyCompactItemize}
+\item 
+fc\+::signal$<$ void()$>$ \mbox{\hyperlink{classfc_1_1api__connection_a7213e0fce1d2cf67df39ade2d9e06bd7}{closed}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Provides a simple wrapper for RPC calls to a given interface. 
+
+Definition at line \mbox{\hyperlink{cli_8hpp_source_l00016}{16}} of file \mbox{\hyperlink{cli_8hpp_source}{cli.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1rpc_1_1cli_aeb4ce839785088fcffe1c6d35532dfcf}\index{fc::rpc::cli@{fc::rpc::cli}!````~cli@{\texorpdfstring{$\sim$}{\string~}cli}}
+\index{````~cli@{\texorpdfstring{$\sim$}{\string~}cli}!fc::rpc::cli@{fc::rpc::cli}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}cli()}{\string~cli()}}
+{\footnotesize\ttfamily \label{classfc_1_1rpc_1_1cli_aeb4ce839785088fcffe1c6d35532dfcf} 
+fc\+::rpc\+::cli\+::\texorpdfstring{$\sim$}{\string~}cli (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{cli_8cpp_source_l00039}{39}} of file \mbox{\hyperlink{cli_8cpp_source}{cli.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00040\ \{}
+\DoxyCodeLine{00041\ \ \ \ \textcolor{keywordflow}{if}(\ \_run\_complete.valid()\ )}
+\DoxyCodeLine{00042\ \ \ \ \{}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1rpc_1_1cli_ae5e9817886a423fcf8f78fa3fbd894cc}{stop}}();}
+\DoxyCodeLine{00044\ \ \ \ \}}
+\DoxyCodeLine{00045\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=282pt]{classfc_1_1rpc_1_1cli_aeb4ce839785088fcffe1c6d35532dfcf_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1rpc_1_1cli_af7966485df0bc34229281a078063f79b}\index{fc::rpc::cli@{fc::rpc::cli}!format\_result@{format\_result}}
+\index{format\_result@{format\_result}!fc::rpc::cli@{fc::rpc::cli}}
+\doxysubsubsection{\texorpdfstring{format\_result()}{format\_result()}}
+{\footnotesize\ttfamily \label{classfc_1_1rpc_1_1cli_af7966485df0bc34229281a078063f79b} 
+void fc\+::rpc\+::cli\+::format\+\_\+result (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&}]{method}{, }\item[{std\+::function$<$ \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}}(\mbox{\hyperlink{classfc_1_1variant}{variant}}, const \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}} \&)$>$}]{formatter}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{cli_8cpp_source_l00079}{79}} of file \mbox{\hyperlink{cli_8cpp_source}{cli.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00080\ \{}
+\DoxyCodeLine{00081\ \ \ \ \_result\_formatters[\mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1state_a12f378e0c6dbf373781e7988ee4a0853a808f25179e5ccace33050c0f65571dee}{method}}]\ =\ formatter;}
+\DoxyCodeLine{00082\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1rpc_1_1cli_a443954d4df8c200e9b07f9ef25a9782b}\index{fc::rpc::cli@{fc::rpc::cli}!getline@{getline}}
+\index{getline@{getline}!fc::rpc::cli@{fc::rpc::cli}}
+\doxysubsubsection{\texorpdfstring{getline()}{getline()}}
+{\footnotesize\ttfamily \label{classfc_1_1rpc_1_1cli_a443954d4df8c200e9b07f9ef25a9782b} 
+void fc\+::rpc\+::cli\+::getline (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} \&}]{prompt}{, }\item[{\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} \&}]{line}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{cli_8cpp_source_l00191}{191}} of file \mbox{\hyperlink{cli_8cpp_source}{cli.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00192\ \{}
+\DoxyCodeLine{00193\ \ \ \ \textcolor{comment}{//\ getting\ file\ descriptor\ for\ C++\ streams\ is\ near\ impossible}}
+\DoxyCodeLine{00194\ \ \ \ \textcolor{comment}{//\ so\ we\ just\ assume\ it's\ the\ same\ as\ the\ C\ stream...}}
+\DoxyCodeLine{00195\ \textcolor{preprocessor}{\#ifdef\ HAVE\_READLINE}}
+\DoxyCodeLine{00196\ \textcolor{preprocessor}{\#ifndef\ WIN32\ \ \ }}
+\DoxyCodeLine{00197\ \ \ \ \textcolor{keywordflow}{if}(\ isatty(\ fileno(\ stdin\ )\ )\ )}
+\DoxyCodeLine{00198\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00199\ \ \ \ \textcolor{comment}{//\ it's\ implied\ by}}
+\DoxyCodeLine{00200\ \ \ \ \textcolor{comment}{//\ https://msdn.microsoft.com/en-\/us/library/f4s0ddew.aspx}}
+\DoxyCodeLine{00201\ \ \ \ \textcolor{comment}{//\ that\ this\ is\ the\ proper\ way\ to\ do\ this\ on\ Windows,\ but\ I\ have}}
+\DoxyCodeLine{00202\ \ \ \ \textcolor{comment}{//\ no\ access\ to\ a\ Windows\ compiler\ and\ thus,}}
+\DoxyCodeLine{00203\ \ \ \ \textcolor{comment}{//\ no\ idea\ if\ this\ actually\ works}}
+\DoxyCodeLine{00204\ \ \ \ \textcolor{keywordflow}{if}(\ \_isatty(\ \_fileno(\ stdin\ )\ )\ )}
+\DoxyCodeLine{00205\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00206\ \ \ \ \{}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ rl\_attempted\_completion\_function\ =\ cli\_completion;}
+\DoxyCodeLine{00208\ }
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \textcolor{keyword}{static}\ fc::thread\ getline\_thread(\textcolor{stringliteral}{"{}getline"{}});}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ getline\_thread.async(\ [\&]()\{}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}*\ line\_read\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \ \ \ std::cout.flush();\ \textcolor{comment}{//readline\ doesn't\ use\ cin,\ so\ we\ must\ manually\ flush\ \_out}}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \ \ \ line\_read\ =\ readline(prompt.c\_str());}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ line\_read\ ==\ \textcolor{keyword}{nullptr}\ )}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ fc::eof\_exception,\ \textcolor{stringliteral}{"{}"{}}\ );}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ \ rl\_bind\_key(\ \textcolor{charliteral}{'\(\backslash\)t'},\ rl\_complete\ );}
+\DoxyCodeLine{00217\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ *line\_read\ )}
+\DoxyCodeLine{00218\ \ \ \ \ \ \ \ \ \ \ \ \ add\_history(line\_read);}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}\ =\ line\_read;}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \ \ \ free(line\_read);}
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \}).\mbox{\hyperlink{classfc_1_1rpc_1_1cli_ae273a9d552292105027c5a508403f934}{wait}}();}
+\DoxyCodeLine{00222\ \ \ \ \}}
+\DoxyCodeLine{00223\ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00224\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00225\ \ \ \ \{}
+\DoxyCodeLine{00226\ \ \ \ \ \ \ std::cout\ <<\ prompt;}
+\DoxyCodeLine{00227\ \ \ \ \ \ \ \textcolor{comment}{//\ sync\_call(\ cin\_thread,\ [\&]()\{\ std::getline(\ *input\_stream,\ line\ );\ \},\ "{}getline"{});}}
+\DoxyCodeLine{00228\ \ \ \ \ \ \ fc::getline(\ fc::cin,\ line\ );}
+\DoxyCodeLine{00229\ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00230\ \ \ \ \}}
+\DoxyCodeLine{00231\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=294pt]{classfc_1_1rpc_1_1cli_a443954d4df8c200e9b07f9ef25a9782b_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1rpc_1_1cli_ab42308885a2df6f53bef3c9407d5e775}\index{fc::rpc::cli@{fc::rpc::cli}!send\_call@{send\_call}}
+\index{send\_call@{send\_call}!fc::rpc::cli@{fc::rpc::cli}}
+\doxysubsubsection{\texorpdfstring{send\_call()}{send\_call()}}
+{\footnotesize\ttfamily \label{classfc_1_1rpc_1_1cli_ab42308885a2df6f53bef3c9407d5e775} 
+\mbox{\hyperlink{classfc_1_1variant}{variant}} fc\+::rpc\+::cli\+::send\+\_\+call (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacefc_a18e9e0bd9c0a52896425ae1172bc4e2b}{api\+\_\+id\+\_\+type}}}]{api\+\_\+id}{, }\item[{\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}}}]{method\+\_\+name}{, }\item[{\mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}}]{args}{ = {\ttfamily \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}()}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+makes calls to the remote server 
+
+Implements \mbox{\hyperlink{classfc_1_1api__connection_a38d046b1803e1242ce10f36c694b9dea}{fc\+::api\+\_\+connection}}.
+
+
+
+Definition at line \mbox{\hyperlink{cli_8cpp_source_l00047}{47}} of file \mbox{\hyperlink{cli_8cpp_source}{cli.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00048\ \{}
+\DoxyCodeLine{00049\ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\textcolor{keyword}{false});}
+\DoxyCodeLine{00050\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1rpc_1_1cli_a386f494f901a7abfba5ab682be6dd489}\index{fc::rpc::cli@{fc::rpc::cli}!send\_callback@{send\_callback}}
+\index{send\_callback@{send\_callback}!fc::rpc::cli@{fc::rpc::cli}}
+\doxysubsubsection{\texorpdfstring{send\_callback()}{send\_callback()}}
+{\footnotesize\ttfamily \label{classfc_1_1rpc_1_1cli_a386f494f901a7abfba5ab682be6dd489} 
+\mbox{\hyperlink{classfc_1_1variant}{variant}} fc\+::rpc\+::cli\+::send\+\_\+callback (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{callback\+\_\+id}{, }\item[{\mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}}]{args}{ = {\ttfamily \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}()}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classfc_1_1api__connection_ae2a0f9123066ff0df3445ee86ee982d5}{fc\+::api\+\_\+connection}}.
+
+
+
+Definition at line \mbox{\hyperlink{cli_8cpp_source_l00052}{52}} of file \mbox{\hyperlink{cli_8cpp_source}{cli.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00053\ \{}
+\DoxyCodeLine{00054\ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\textcolor{keyword}{false});}
+\DoxyCodeLine{00055\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1rpc_1_1cli_afa3a01d9134551ba945efe8264838583}\index{fc::rpc::cli@{fc::rpc::cli}!send\_notice@{send\_notice}}
+\index{send\_notice@{send\_notice}!fc::rpc::cli@{fc::rpc::cli}}
+\doxysubsubsection{\texorpdfstring{send\_notice()}{send\_notice()}}
+{\footnotesize\ttfamily \label{classfc_1_1rpc_1_1cli_afa3a01d9134551ba945efe8264838583} 
+void fc\+::rpc\+::cli\+::send\+\_\+notice (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{callback\+\_\+id}{, }\item[{\mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}}]{args}{ = {\ttfamily \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}()}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classfc_1_1api__connection_acc9e1ac12402ebf9dcb3be57035a2623}{fc\+::api\+\_\+connection}}.
+
+
+
+Definition at line \mbox{\hyperlink{cli_8cpp_source_l00057}{57}} of file \mbox{\hyperlink{cli_8cpp_source}{cli.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00058\ \{}
+\DoxyCodeLine{00059\ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\textcolor{keyword}{false});}
+\DoxyCodeLine{00060\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1rpc_1_1cli_afbfce92d8307a2197c2d668c96f58f9c}\index{fc::rpc::cli@{fc::rpc::cli}!set\_prompt@{set\_prompt}}
+\index{set\_prompt@{set\_prompt}!fc::rpc::cli@{fc::rpc::cli}}
+\doxysubsubsection{\texorpdfstring{set\_prompt()}{set\_prompt()}}
+{\footnotesize\ttfamily \label{classfc_1_1rpc_1_1cli_afbfce92d8307a2197c2d668c96f58f9c} 
+void fc\+::rpc\+::cli\+::set\+\_\+prompt (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&}]{prompt}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{cli_8cpp_source_l00084}{84}} of file \mbox{\hyperlink{cli_8cpp_source}{cli.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00085\ \{}
+\DoxyCodeLine{00086\ \ \ \ \_prompt\ =\ prompt;}
+\DoxyCodeLine{00087\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1rpc_1_1cli_a5ca2f4c807517379e93cbe65371f599d}\index{fc::rpc::cli@{fc::rpc::cli}!start@{start}}
+\index{start@{start}!fc::rpc::cli@{fc::rpc::cli}}
+\doxysubsubsection{\texorpdfstring{start()}{start()}}
+{\footnotesize\ttfamily \label{classfc_1_1rpc_1_1cli_a5ca2f4c807517379e93cbe65371f599d} 
+void fc\+::rpc\+::cli\+::start (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{cli_8cpp_source_l00062}{62}} of file \mbox{\hyperlink{cli_8cpp_source}{cli.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00063\ \{}
+\DoxyCodeLine{00064\ \ \ \ cli\_commands()\ =\ \mbox{\hyperlink{classfc_1_1api__connection_a31c921df625930a9a7d0ad114bb2ba1e}{get\_method\_names}}(0);}
+\DoxyCodeLine{00065\ \ \ \ \_run\_complete\ =\ fc::async(\ [\&]()\{\ run();\ \}\ );}
+\DoxyCodeLine{00066\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=309pt]{classfc_1_1rpc_1_1cli_a5ca2f4c807517379e93cbe65371f599d_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1rpc_1_1cli_a5ca2f4c807517379e93cbe65371f599d_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1rpc_1_1cli_ae5e9817886a423fcf8f78fa3fbd894cc}\index{fc::rpc::cli@{fc::rpc::cli}!stop@{stop}}
+\index{stop@{stop}!fc::rpc::cli@{fc::rpc::cli}}
+\doxysubsubsection{\texorpdfstring{stop()}{stop()}}
+{\footnotesize\ttfamily \label{classfc_1_1rpc_1_1cli_ae5e9817886a423fcf8f78fa3fbd894cc} 
+void fc\+::rpc\+::cli\+::stop (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{cli_8cpp_source_l00068}{68}} of file \mbox{\hyperlink{cli_8cpp_source}{cli.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00069\ \{}
+\DoxyCodeLine{00070\ \ \ \ \_run\_complete.cancel();}
+\DoxyCodeLine{00071\ \ \ \ \_run\_complete.wait();}
+\DoxyCodeLine{00072\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=282pt]{classfc_1_1rpc_1_1cli_ae5e9817886a423fcf8f78fa3fbd894cc_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1rpc_1_1cli_ae273a9d552292105027c5a508403f934}\index{fc::rpc::cli@{fc::rpc::cli}!wait@{wait}}
+\index{wait@{wait}!fc::rpc::cli@{fc::rpc::cli}}
+\doxysubsubsection{\texorpdfstring{wait()}{wait()}}
+{\footnotesize\ttfamily \label{classfc_1_1rpc_1_1cli_ae273a9d552292105027c5a508403f934} 
+void fc\+::rpc\+::cli\+::wait (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{cli_8cpp_source_l00074}{74}} of file \mbox{\hyperlink{cli_8cpp_source}{cli.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00075\ \{}
+\DoxyCodeLine{00076\ \ \ \ \_run\_complete.wait();}
+\DoxyCodeLine{00077\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=294pt]{classfc_1_1rpc_1_1cli_ae273a9d552292105027c5a508403f934_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/rpc/\mbox{\hyperlink{cli_8hpp}{cli.\+hpp}}\item 
+libraries/fc/src/rpc/\mbox{\hyperlink{cli_8cpp}{cli.\+cpp}}\end{DoxyCompactItemize}

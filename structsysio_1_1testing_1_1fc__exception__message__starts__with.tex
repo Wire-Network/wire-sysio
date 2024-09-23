@@ -1,0 +1,103 @@
+\doxysection{sysio\+::testing\+::fc\+\_\+exception\+\_\+message\+\_\+starts\+\_\+with Struct Reference}
+\hypertarget{structsysio_1_1testing_1_1fc__exception__message__starts__with}{}\label{structsysio_1_1testing_1_1fc__exception__message__starts__with}\index{sysio::testing::fc\_exception\_message\_starts\_with@{sysio::testing::fc\_exception\_message\_starts\_with}}
+
+
+{\ttfamily \#include $<$tester.\+hpp$>$}
+
+
+
+Collaboration diagram for sysio\+::testing\+::fc\+\_\+exception\+\_\+message\+\_\+starts\+\_\+with\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=242pt]{structsysio_1_1testing_1_1fc__exception__message__starts__with__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1testing_1_1fc__exception__message__starts__with_ad60b21d5bffc73add1213444743b2f28}{fc\+\_\+exception\+\_\+message\+\_\+starts\+\_\+with}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&msg)
+\item 
+bool \mbox{\hyperlink{structsysio_1_1testing_1_1fc__exception__message__starts__with_aabb715d38ae2323e29575d3e61a06a1a}{operator()}} (const \mbox{\hyperlink{classfc_1_1exception}{fc\+::exception}} \&ex)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structsysio_1_1testing_1_1fc__exception__message__starts__with_ac712fed7e3c89f97f648acea137a00d9}{expected}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Utility predicate to check whether an \doxylink{classfc_1_1exception}{fc\+::exception} message starts with a given string 
+
+Definition at line \mbox{\hyperlink{tester_8hpp_source_l00667}{667}} of file \mbox{\hyperlink{tester_8hpp_source}{tester.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structsysio_1_1testing_1_1fc__exception__message__starts__with_ad60b21d5bffc73add1213444743b2f28}\index{sysio::testing::fc\_exception\_message\_starts\_with@{sysio::testing::fc\_exception\_message\_starts\_with}!fc\_exception\_message\_starts\_with@{fc\_exception\_message\_starts\_with}}
+\index{fc\_exception\_message\_starts\_with@{fc\_exception\_message\_starts\_with}!sysio::testing::fc\_exception\_message\_starts\_with@{sysio::testing::fc\_exception\_message\_starts\_with}}
+\doxysubsubsection{\texorpdfstring{fc\_exception\_message\_starts\_with()}{fc\_exception\_message\_starts\_with()}}
+{\footnotesize\ttfamily \label{structsysio_1_1testing_1_1fc__exception__message__starts__with_ad60b21d5bffc73add1213444743b2f28} 
+sysio\+::testing\+::fc\+\_\+exception\+\_\+message\+\_\+starts\+\_\+with\+::fc\+\_\+exception\+\_\+message\+\_\+starts\+\_\+with (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&}]{msg}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{tester_8hpp_source_l00668}{668}} of file \mbox{\hyperlink{tester_8hpp_source}{tester.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00669\ \ \ \ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{structsysio_1_1testing_1_1fc__exception__message__starts__with_ac712fed7e3c89f97f648acea137a00d9}{expected}}(\ msg\ )\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1testing_1_1fc__exception__message__starts__with_aabb715d38ae2323e29575d3e61a06a1a}\index{sysio::testing::fc\_exception\_message\_starts\_with@{sysio::testing::fc\_exception\_message\_starts\_with}!operator()@{operator()}}
+\index{operator()@{operator()}!sysio::testing::fc\_exception\_message\_starts\_with@{sysio::testing::fc\_exception\_message\_starts\_with}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}}
+{\footnotesize\ttfamily \label{structsysio_1_1testing_1_1fc__exception__message__starts__with_aabb715d38ae2323e29575d3e61a06a1a} 
+bool sysio\+::testing\+::fc\+\_\+exception\+\_\+message\+\_\+starts\+\_\+with\+::operator() (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1exception}{fc\+::exception}} \&}]{ex}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{tester_8cpp_source_l01209}{1209}} of file \mbox{\hyperlink{tester_8cpp_source}{tester.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01209\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01210\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ message\ =\ ex.\mbox{\hyperlink{classfc_1_1exception_a70b72c1e4fe0d17485a8b7a0a6f397de}{get\_log}}().at(\ 0\ ).get\_message();}
+\DoxyCodeLine{01211\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ match\ =\ boost::algorithm::starts\_with(\ message,\ \mbox{\hyperlink{structsysio_1_1testing_1_1fc__exception__message__starts__with_ac712fed7e3c89f97f648acea137a00d9}{expected}}\ );}
+\DoxyCodeLine{01212\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !match\ )\ \{}
+\DoxyCodeLine{01213\ \ \ \ \ \ \ \ \ \ BOOST\_TEST\_MESSAGE(\ \textcolor{stringliteral}{"{}LOG:\ expected:\ "{}}\ <<\ \mbox{\hyperlink{structsysio_1_1testing_1_1fc__exception__message__starts__with_ac712fed7e3c89f97f648acea137a00d9}{expected}}\ <<\ \textcolor{stringliteral}{"{},\ actual:\ "{}}\ <<\ message\ );}
+\DoxyCodeLine{01214\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01215\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ match;}
+\DoxyCodeLine{01216\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1testing_1_1fc__exception__message__starts__with_aabb715d38ae2323e29575d3e61a06a1a_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1testing_1_1fc__exception__message__starts__with_ac712fed7e3c89f97f648acea137a00d9}\index{sysio::testing::fc\_exception\_message\_starts\_with@{sysio::testing::fc\_exception\_message\_starts\_with}!expected@{expected}}
+\index{expected@{expected}!sysio::testing::fc\_exception\_message\_starts\_with@{sysio::testing::fc\_exception\_message\_starts\_with}}
+\doxysubsubsection{\texorpdfstring{expected}{expected}}
+{\footnotesize\ttfamily \label{structsysio_1_1testing_1_1fc__exception__message__starts__with_ac712fed7e3c89f97f648acea137a00d9} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::testing\+::fc\+\_\+exception\+\_\+message\+\_\+starts\+\_\+with\+::expected}
+
+
+
+Definition at line \mbox{\hyperlink{tester_8hpp_source_l00673}{673}} of file \mbox{\hyperlink{tester_8hpp_source}{tester.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/testing/include/sysio/testing/\mbox{\hyperlink{tester_8hpp}{tester.\+hpp}}\item 
+libraries/testing/\mbox{\hyperlink{tester_8cpp}{tester.\+cpp}}\end{DoxyCompactItemize}

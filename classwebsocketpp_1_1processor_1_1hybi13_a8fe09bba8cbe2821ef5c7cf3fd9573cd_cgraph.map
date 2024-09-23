@@ -1,0 +1,9 @@
+<map id="websocketpp::processor::hybi13::get_message" name="websocketpp::processor::hybi13::get_message">
+<area shape="rect" id="Node000001" title="Retrieves the most recently processed message." alt="" coords="5,71,169,111"/>
+<area shape="rect" id="Node000002" href="$namespacewebsocketpp_1_1frame_1_1opcode.html#aa5e7f94a35f8fb59a925fa01636f08ad" title="Check if an opcode is for a control frame." alt="" coords="229,5,368,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="154,68,215,49,216,54,156,73"/>
+<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1processor_1_1hybi13.html#af0e73b14cac728a873c8b5c0bc82ed03" title="Test whether or not the processor has a message ready." alt="" coords="217,71,380,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="169,88,201,88,201,94,169,94"/>
+<area shape="rect" id="Node000004" href="$classwebsocketpp_1_1processor_1_1hybi13.html#a052dd867709539c0a3f70eb271da70ca" title=" " alt="" coords="217,136,380,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="156,109,216,128,215,133,154,114"/>
+</map>

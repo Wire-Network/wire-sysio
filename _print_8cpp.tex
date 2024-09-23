@@ -1,0 +1,125 @@
+\doxysection{libraries/wasm-\/jit/\+Source/\+WAST/\+Print.cpp File Reference}
+\hypertarget{_print_8cpp}{}\label{_print_8cpp}\index{libraries/wasm-\/jit/Source/WAST/Print.cpp@{libraries/wasm-\/jit/Source/WAST/Print.cpp}}
+{\ttfamily \#include "{}Inline/\+Basic\+Types.\+h"{}}\newline
+{\ttfamily \#include "{}Inline/\+Floats.\+h"{}}\newline
+{\ttfamily \#include "{}WAST.\+h"{}}\newline
+{\ttfamily \#include "{}IR/\+Module.\+h"{}}\newline
+{\ttfamily \#include "{}IR/\+Operators.\+h"{}}\newline
+{\ttfamily \#include $<$map$>$}\newline
+Include dependency graph for Print.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{_print_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_w_a_s_t_1_1_scoped_tag_printer}{WAST\+::\+Scoped\+Tag\+Printer}}
+\item 
+struct \mbox{\hyperlink{struct_w_a_s_t_1_1_name_scope}{WAST\+::\+Name\+Scope}}
+\item 
+struct \mbox{\hyperlink{struct_w_a_s_t_1_1_module_print_context}{WAST\+::\+Module\+Print\+Context}}
+\item 
+struct \mbox{\hyperlink{struct_w_a_s_t_1_1_function_print_context}{WAST\+::\+Function\+Print\+Context}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespace_w_a_s_t}{WAST}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{_print_8cpp_a4d927e2dff3425fa9fc8f7b9982fb251}{INDENT\+\_\+\+STRING}}~"{}\textbackslash{}x\+E0\textbackslash{}x01"{}
+\item 
+\#define \mbox{\hyperlink{_print_8cpp_a95de3890728266fd2c1a416d55c1cafb}{DEDENT\+\_\+\+STRING}}~"{}\textbackslash{}x\+E0\textbackslash{}x02"{}
+\item 
+\#define \mbox{\hyperlink{_print_8cpp_a30dc1df40fdb14ba8c9ddb2d4907fe64}{PRINT\+\_\+\+OP}}(opcode,  \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  name\+String,  Imm,  print\+Operands)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+char \mbox{\hyperlink{namespace_w_a_s_t_ad103a4b3d99fda4a614de3bd2e6a50b0}{WAST\+::nibble\+To\+Hex\+Char}} (\mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+std\+::string \mbox{\hyperlink{namespace_w_a_s_t_a5289ca10863a134a961943f0e2089979}{WAST\+::escape\+String}} (const char \texorpdfstring{$\ast$}{*}string, \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} num\+Chars)
+\item 
+std\+::string \mbox{\hyperlink{namespace_w_a_s_t_aa50878b22fc84d3c627432d2c62f0595}{WAST\+::expand\+Indentation}} (std\+::string \&\&in\+String, \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} spaces\+Per\+Indent\+Level=2)
+\item 
+void \mbox{\hyperlink{namespace_w_a_s_t_a8590c2ba00bd5c84e51a477829c3451a}{WAST\+::print}} (std\+::string \&string, \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{Value\+Type}} type)
+\item 
+void \mbox{\hyperlink{namespace_w_a_s_t_ae825d82b1d6a7665e875a45a0e5e0408}{WAST\+::print}} (std\+::string \&string, \mbox{\hyperlink{namespace_i_r_ac56fb5355b338ad4a167c48ec539b90b}{Result\+Type}} type)
+\item 
+void \mbox{\hyperlink{namespace_w_a_s_t_a0e2234267f0a78cce9b56a4eb2289f7e}{WAST\+::print}} (std\+::string \&string, const \mbox{\hyperlink{struct_i_r_1_1_size_constraints}{Size\+Constraints}} \&size)
+\item 
+void \mbox{\hyperlink{namespace_w_a_s_t_aa9ee110560c7eeebefbe62815fc76fbe}{WAST\+::print}} (std\+::string \&string, const \mbox{\hyperlink{struct_i_r_1_1_function_type}{Function\+Type}} \texorpdfstring{$\ast$}{*}function\+Type)
+\item 
+void \mbox{\hyperlink{namespace_w_a_s_t_a14bfd2a89f2b7739a7318f88cf4ee01d}{WAST\+::print}} (std\+::string \&string, const \mbox{\hyperlink{struct_i_r_1_1_table_type}{Table\+Type}} \&type)
+\item 
+void \mbox{\hyperlink{namespace_w_a_s_t_a635c072dabbaf8b427133493d23089f8}{WAST\+::print}} (std\+::string \&string, const \mbox{\hyperlink{struct_i_r_1_1_memory_type}{Memory\+Type}} \&type)
+\item 
+void \mbox{\hyperlink{namespace_w_a_s_t_ab418aba8b6293832449742eb57dbb1a5}{WAST\+::print}} (std\+::string \&string, \mbox{\hyperlink{struct_i_r_1_1_global_type}{Global\+Type}} type)
+\item 
+void \mbox{\hyperlink{namespace_w_a_s_t_a193408df7bc6cc6719ab4f5099e21d3b}{WAST\+::print\+Control\+Signature}} (std\+::string \&string, \mbox{\hyperlink{namespace_i_r_ac56fb5355b338ad4a167c48ec539b90b}{Result\+Type}} result\+Type)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}} $>$ }\\void \mbox{\hyperlink{namespace_w_a_s_t_a8550106ad7b7088eaa4e1bc5eda655d3}{WAST\+::print\+Import\+Type}} (std\+::string \&string, const \mbox{\hyperlink{struct_i_r_1_1_module}{Module}} \&module, \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}} type)
+\item 
+template$<$$>$ void \mbox{\hyperlink{namespace_w_a_s_t_a218d2e26da6cfe8ee104b31071543e67}{WAST\+::print\+Import\+Type$<$ Indexed\+Function\+Type $>$}} (std\+::string \&string, const \mbox{\hyperlink{struct_i_r_1_1_module}{Module}} \&module, \mbox{\hyperlink{struct_i_r_1_1_indexed_function_type}{Indexed\+Function\+Type}} type)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}} $>$ }\\void \mbox{\hyperlink{namespace_w_a_s_t_acfea461e9d1989e37b963a730a903140}{WAST\+::print\+Import}} (std\+::string \&string, const \mbox{\hyperlink{struct_i_r_1_1_module}{Module}} \&module, const \mbox{\hyperlink{struct_i_r_1_1_import}{Import}}$<$ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}} $>$ \&import, \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} import\+Index, const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}, const char \texorpdfstring{$\ast$}{*}type\+Tag)
+\item 
+\mbox{\hyperlink{_w_a_s_t_8h_a4d4cd62fee2b2e181ef87d58fe61064c}{WAST\+\_\+\+API}} std\+::string \mbox{\hyperlink{namespace_w_a_s_t_aa6c1fd4b6c7ec43ba7e25dc6138d4899}{WAST\+::print}} (const \mbox{\hyperlink{struct_i_r_1_1_module}{IR\+::\+Module}} \&module)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{_print_8cpp_a95de3890728266fd2c1a416d55c1cafb}\index{Print.cpp@{Print.cpp}!DEDENT\_STRING@{DEDENT\_STRING}}
+\index{DEDENT\_STRING@{DEDENT\_STRING}!Print.cpp@{Print.cpp}}
+\doxysubsubsection{\texorpdfstring{DEDENT\_STRING}{DEDENT\_STRING}}
+{\footnotesize\ttfamily \label{_print_8cpp_a95de3890728266fd2c1a416d55c1cafb} 
+\#define DEDENT\+\_\+\+STRING~"{}\textbackslash{}x\+E0\textbackslash{}x02"{}}
+
+
+
+Definition at line \mbox{\hyperlink{_print_8cpp_source_l00014}{14}} of file \mbox{\hyperlink{_print_8cpp_source}{Print.\+cpp}}.
+
+\Hypertarget{_print_8cpp_a4d927e2dff3425fa9fc8f7b9982fb251}\index{Print.cpp@{Print.cpp}!INDENT\_STRING@{INDENT\_STRING}}
+\index{INDENT\_STRING@{INDENT\_STRING}!Print.cpp@{Print.cpp}}
+\doxysubsubsection{\texorpdfstring{INDENT\_STRING}{INDENT\_STRING}}
+{\footnotesize\ttfamily \label{_print_8cpp_a4d927e2dff3425fa9fc8f7b9982fb251} 
+\#define INDENT\+\_\+\+STRING~"{}\textbackslash{}x\+E0\textbackslash{}x01"{}}
+
+
+
+Definition at line \mbox{\hyperlink{_print_8cpp_source_l00013}{13}} of file \mbox{\hyperlink{_print_8cpp_source}{Print.\+cpp}}.
+
+\Hypertarget{_print_8cpp_a30dc1df40fdb14ba8c9ddb2d4907fe64}\index{Print.cpp@{Print.cpp}!PRINT\_OP@{PRINT\_OP}}
+\index{PRINT\_OP@{PRINT\_OP}!Print.cpp@{Print.cpp}}
+\doxysubsubsection{\texorpdfstring{PRINT\_OP}{PRINT\_OP}}
+{\footnotesize\ttfamily \label{_print_8cpp_a30dc1df40fdb14ba8c9ddb2d4907fe64} 
+\#define PRINT\+\_\+\+OP(\begin{DoxyParamCaption}\item[{}]{opcode}{, }\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{name\+String}{, }\item[{}]{Imm}{, }\item[{}]{print\+Operands}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(Imm\ imm)\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ +=\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}\ nameString;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ printImm(imm);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{_print_8cpp_source_l00397}{397}} of file \mbox{\hyperlink{_print_8cpp_source}{Print.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00397\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#define\ PRINT\_OP(opcode,name,nameString,Imm,printOperands)\ \(\backslash\)}}
+\DoxyCodeLine{00398\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ void\ name(Imm\ imm)\ \(\backslash\)}}
+\DoxyCodeLine{00399\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \{\ \(\backslash\)}}
+\DoxyCodeLine{00400\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ string\ +=\ "{}\(\backslash\)n"{}\ nameString;\ \(\backslash\)}}
+\DoxyCodeLine{00401\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ printImm(imm);\ \(\backslash\)}}
+\DoxyCodeLine{00402\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \}}}
+
+\end{DoxyCode}

@@ -1,0 +1,19 @@
+<map id="sysio::chain::symbol::from_string" name="sysio::chain::symbol::from_string">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,152,147,193"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1chain_1_1symbol.html#ab949c7fc3d0abdbd0cfc52903ff776b0" title=" " alt="" coords="195,71,336,111"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="124,149,201,115,203,120,126,154"/>
+<area shape="rect" id="Node000007" href="$namespacefc.html#afe327b84123fcbda675ea00418471c9a" title=" " alt="" coords="222,160,308,185"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="147,170,206,170,206,175,147,175"/>
+<area shape="rect" id="Node000008" href="$namespacefc.html#af74120b9a0be3c409b63ff3ba526cffc" title=" " alt="" coords="234,233,296,258"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="131,191,221,226,219,231,129,196"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1chain_1_1symbol.html#a31f998c4cfde2fa9148ac3232b11a25d" title=" " alt="" coords="384,71,525,111"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="336,88,369,88,369,94,336,94"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1chain_1_1symbol.html#a8e41beda74e6823bf4efe4d478440e88" title=" " alt="" coords="573,5,715,46"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="515,68,568,49,569,54,516,73"/>
+<area shape="rect" id="Node000005" href="$classsysio_1_1chain_1_1symbol.html#a067cd53c6a32da32671b1302a0c1909a" title=" " alt="" coords="573,71,715,111"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="526,88,558,88,558,94,526,94"/>
+<area shape="rect" id="Node000006" href="$classsysio_1_1chain_1_1symbol.html#a8f3fcd97b82083e359f91943b0674fc3" title=" " alt="" coords="573,136,715,177"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="516,109,569,128,568,133,515,114"/>
+<area shape="poly" id="edge7_Node000007_Node000007" title=" " alt="" coords="233,161,227,151,231,141,244,135,265,133,288,135,300,142,298,147,287,141,265,138,245,140,235,145,233,150,238,158"/>
+<area shape="poly" id="edge9_Node000008_Node000008" title=" " alt="" coords="233,234,227,224,231,215,244,208,265,206,288,209,300,215,298,220,287,214,265,211,245,213,235,218,233,224,238,231"/>
+</map>

@@ -1,0 +1,771 @@
+\doxysection{fc\+::exception Class Reference}
+\hypertarget{classfc_1_1exception}{}\label{classfc_1_1exception}\index{fc::exception@{fc::exception}}
+
+
+Used to generate a useful error report when an exception is thrown.  
+
+
+
+
+{\ttfamily \#include $<$exception.\+hpp$>$}
+
+
+
+Inheritance diagram for fc\+::exception\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1exception__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for fc\+::exception\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=276pt]{classfc_1_1exception__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{classfc_1_1exception_a2635b9fb22bb7f1471b8353463ef9b66}{code\+\_\+enum}} \{ \mbox{\hyperlink{classfc_1_1exception_a2635b9fb22bb7f1471b8353463ef9b66a6f4e6d3d84df9d159d7643c8d76a93b0}{code\+\_\+value}} = unspecified\+\_\+exception\+\_\+code
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1exception_a438cb875c834068b29e0a6cd3319e7f3}{exception}} (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{classfc_1_1exception_a79a36225cde10dcd23057bbe19d3390f}{code}}=\mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca54c3c8b9caa13270a23c57af7bf9c52c}{unspecified\+\_\+exception\+\_\+code}}, const std\+::string \&name\+\_\+value="{}exception"{}, const std\+::string \&what\+\_\+value="{}unspecified"{})
+\item 
+\mbox{\hyperlink{classfc_1_1exception_af4312be4f267fda7b0bf8bccbfac232b}{exception}} (\mbox{\hyperlink{classfc_1_1log__message}{log\+\_\+message}} \&\&, \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{classfc_1_1exception_a79a36225cde10dcd23057bbe19d3390f}{code}}=\mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca54c3c8b9caa13270a23c57af7bf9c52c}{unspecified\+\_\+exception\+\_\+code}}, const std\+::string \&name\+\_\+value="{}exception"{}, const std\+::string \&what\+\_\+value="{}unspecified"{})
+\item 
+\mbox{\hyperlink{classfc_1_1exception_a536774ba4cc639d3215bd91f412ffded}{exception}} (\mbox{\hyperlink{namespacefc_a54370140f7c964a12e90393d525605d1}{log\+\_\+messages}} \&\&, \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{classfc_1_1exception_a79a36225cde10dcd23057bbe19d3390f}{code}}=\mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca54c3c8b9caa13270a23c57af7bf9c52c}{unspecified\+\_\+exception\+\_\+code}}, const std\+::string \&name\+\_\+value="{}exception"{}, const std\+::string \&what\+\_\+value="{}unspecified"{})
+\item 
+\mbox{\hyperlink{classfc_1_1exception_a57f2149839df7dc42ee356ca62a2dc90}{exception}} (const \mbox{\hyperlink{namespacefc_a54370140f7c964a12e90393d525605d1}{log\+\_\+messages}} \&, \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{classfc_1_1exception_a79a36225cde10dcd23057bbe19d3390f}{code}}=\mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca54c3c8b9caa13270a23c57af7bf9c52c}{unspecified\+\_\+exception\+\_\+code}}, const std\+::string \&name\+\_\+value="{}exception"{}, const std\+::string \&what\+\_\+value="{}unspecified"{})
+\item 
+\mbox{\hyperlink{classfc_1_1exception_ae8accd0c86f53a5f0c0c473609b642dc}{exception}} (const \mbox{\hyperlink{classfc_1_1exception}{exception}} \&e)
+\item 
+\mbox{\hyperlink{classfc_1_1exception_acb133b17f42ee76692b472e887373720}{exception}} (\mbox{\hyperlink{classfc_1_1exception}{exception}} \&\&e)
+\item 
+virtual \mbox{\hyperlink{classfc_1_1exception_a72f637422588d6f2e59ce35d53882522}{\texorpdfstring{$\sim$}{\string~}exception}} ()
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classfc_1_1exception_aa5734af6ae6e44c7c8a9b3c4ea8131e1}{name}} () const  throw ()
+\item 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{classfc_1_1exception_a79a36225cde10dcd23057bbe19d3390f}{code}} () const  throw ()
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classfc_1_1exception_ab1104818bf0d9b6a29f0dfe036cf97f6}{what}} () const noexcept override
+\item 
+const \mbox{\hyperlink{namespacefc_a54370140f7c964a12e90393d525605d1}{log\+\_\+messages}} \& \mbox{\hyperlink{classfc_1_1exception_a70b72c1e4fe0d17485a8b7a0a6f397de}{get\+\_\+log}} () const
+\item 
+void \mbox{\hyperlink{classfc_1_1exception_a685fab238fa9b86dcf64b35417eb63b2}{append\+\_\+log}} (\mbox{\hyperlink{classfc_1_1log__message}{log\+\_\+message}} m)
+\item 
+std\+::string \mbox{\hyperlink{classfc_1_1exception_a7611ea8fbe25dde56649b685c2298a37}{to\+\_\+detail\+\_\+string}} (\mbox{\hyperlink{classfc_1_1log__level}{log\+\_\+level}} ll=\mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4a890e233ab2c5d4db2a1c26a10bd2de7d}{log\+\_\+level\+::all}}) const
+\item 
+std\+::string \mbox{\hyperlink{classfc_1_1exception_adbc4557b14bc29b74e9cf9f0ed5fb8d8}{to\+\_\+string}} (\mbox{\hyperlink{classfc_1_1log__level}{log\+\_\+level}} ll=\mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4afe6da1f3a75c3911b0b59bffaea070e1}{log\+\_\+level\+::info}}) const
+\item 
+std\+::string \mbox{\hyperlink{classfc_1_1exception_aeea900db85f79e5b4be0710a9df373db}{top\+\_\+message}} () const
+\item 
+virtual \mbox{\hyperlink{utility_8hpp_a9bc43e3ee0ae83643b65e07fe1fd0132}{NO\+\_\+\+RETURN}} void \mbox{\hyperlink{classfc_1_1exception_ace951e3b4efa51ea203b0e111f7e99a2}{dynamic\+\_\+rethrow\+\_\+exception}} () const
+\item 
+virtual std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classfc_1_1exception}{exception}} $>$ \mbox{\hyperlink{classfc_1_1exception_a38ac38d910ba13a339ce5855a51c9127}{dynamic\+\_\+copy\+\_\+exception}} () const
+\item 
+\mbox{\hyperlink{classfc_1_1exception}{exception}} \& \mbox{\hyperlink{classfc_1_1exception_afb0e1fac60179c7b2e171c87d295f690}{operator=}} (const \mbox{\hyperlink{classfc_1_1exception}{exception}} \&\mbox{\hyperlink{namespacefc_a79771837fffd80fcc4bc658ee2fc4b2b}{copy}})
+\item 
+\mbox{\hyperlink{classfc_1_1exception}{exception}} \& \mbox{\hyperlink{classfc_1_1exception_a4f257882990e94900d31d030be6601b2}{operator=}} (\mbox{\hyperlink{classfc_1_1exception}{exception}} \&\&\mbox{\hyperlink{namespacefc_a79771837fffd80fcc4bc658ee2fc4b2b}{copy}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static constexpr \mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}} \mbox{\hyperlink{classfc_1_1exception_a13463219d1d09f150e987fe1b0368752}{format\+\_\+time\+\_\+limit}} = \mbox{\hyperlink{namespacefc_a76ae235ec7e9b8862e70740058d7eb1b}{fc\+::milliseconds}}( 10 )
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::unique\+\_\+ptr$<$ detail\+::exception\+\_\+impl $>$ \mbox{\hyperlink{classfc_1_1exception_a91cc1ed42499761c2f750de4a89ce627}{my}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{classfc_1_1exception_a3c086911538b2c7cd63462c1d237c79d}{to\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1exception}{exception}} \&e, \mbox{\hyperlink{classfc_1_1variant}{variant}} \&v)
+\item 
+void \mbox{\hyperlink{classfc_1_1exception_a9b482ebad3fb861a17f968e015519e41}{from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{variant}} \&e, \mbox{\hyperlink{classfc_1_1exception}{exception}} \&ll)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+At each level in the stack where the exception is caught and rethrown a new \doxylink{classfc_1_1log__message}{log\+\_\+message} is added to the exception.
+
+exception\textquotesingle{}s are designed to be serialized to a variant and deserialized from an variant.
+
+\begin{DoxySeeAlso}{See also}
+\doxylink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\+\_\+\+THROW\+\_\+\+EXCEPTION} 
+
+\doxylink{exception_8hpp_ad1d295500555ec25b5cc63a27c2eaa59}{FC\+\_\+\+RETHROW\+\_\+\+EXCEPTION} 
+
+\doxylink{exception_8hpp_af3731d6e3beb140d9e652adf7a18113b}{FC\+\_\+\+RETHROW\+\_\+\+EXCEPTIONS} 
+\end{DoxySeeAlso}
+
+
+Definition at line \mbox{\hyperlink{exception_8hpp_source_l00057}{57}} of file \mbox{\hyperlink{exception_8hpp_source}{exception.\+hpp}}.
+
+
+
+\doxysubsection{Member Enumeration Documentation}
+\Hypertarget{classfc_1_1exception_a2635b9fb22bb7f1471b8353463ef9b66}\index{fc::exception@{fc::exception}!code\_enum@{code\_enum}}
+\index{code\_enum@{code\_enum}!fc::exception@{fc::exception}}
+\doxysubsubsection{\texorpdfstring{code\_enum}{code\_enum}}
+{\footnotesize\ttfamily \label{classfc_1_1exception_a2635b9fb22bb7f1471b8353463ef9b66} 
+enum \mbox{\hyperlink{classfc_1_1exception_a2635b9fb22bb7f1471b8353463ef9b66}{fc\+::exception\+::code\+\_\+enum}}}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{code\_value@{code\_value}!fc::exception@{fc::exception}}\index{fc::exception@{fc::exception}!code\_value@{code\_value}}}\Hypertarget{classfc_1_1exception_a2635b9fb22bb7f1471b8353463ef9b66a6f4e6d3d84df9d159d7643c8d76a93b0}\label{classfc_1_1exception_a2635b9fb22bb7f1471b8353463ef9b66} 
+code\+\_\+value&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{exception_8hpp_source_l00062}{62}} of file \mbox{\hyperlink{exception_8hpp_source}{exception.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1exception_a2635b9fb22bb7f1471b8353463ef9b66a6f4e6d3d84df9d159d7643c8d76a93b0}{code\_value}}\ =\ \mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca54c3c8b9caa13270a23c57af7bf9c52c}{unspecified\_exception\_code}}}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1exception_a438cb875c834068b29e0a6cd3319e7f3}\index{fc::exception@{fc::exception}!exception@{exception}}
+\index{exception@{exception}!fc::exception@{fc::exception}}
+\doxysubsubsection{\texorpdfstring{exception()}{exception()}\hspace{0.1cm}{\footnotesize\ttfamily [1/6]}}
+{\footnotesize\ttfamily \label{classfc_1_1exception_a438cb875c834068b29e0a6cd3319e7f3} 
+fc\+::exception\+::exception (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}}]{code}{ = {\ttfamily \mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca54c3c8b9caa13270a23c57af7bf9c52c}{unspecified\+\_\+exception\+\_\+code}}}, }\item[{const std\+::string \&}]{name\+\_\+value}{ = {\ttfamily "{}exception"{}}, }\item[{const std\+::string \&}]{what\+\_\+value}{ = {\ttfamily "{}unspecified"{}}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{exception_8cpp_source_l00093}{93}} of file \mbox{\hyperlink{exception_8cpp_source}{exception.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00096\ \ \ \ :\mbox{\hyperlink{classfc_1_1exception_a91cc1ed42499761c2f750de4a89ce627}{my}}(\ \textcolor{keyword}{new}\ detail::exception\_impl()\ )}
+\DoxyCodeLine{00097\ \ \ \ \{}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1exception_a91cc1ed42499761c2f750de4a89ce627}{my}}-\/>\_code\ =\ \mbox{\hyperlink{classfc_1_1exception_a79a36225cde10dcd23057bbe19d3390f}{code}};}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1exception_a91cc1ed42499761c2f750de4a89ce627}{my}}-\/>\_what\ =\ what\_value;}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1exception_a91cc1ed42499761c2f750de4a89ce627}{my}}-\/>\_name\ =\ name\_value;}
+\DoxyCodeLine{00101\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=336pt]{classfc_1_1exception_a438cb875c834068b29e0a6cd3319e7f3_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1exception_af4312be4f267fda7b0bf8bccbfac232b}\index{fc::exception@{fc::exception}!exception@{exception}}
+\index{exception@{exception}!fc::exception@{fc::exception}}
+\doxysubsubsection{\texorpdfstring{exception()}{exception()}\hspace{0.1cm}{\footnotesize\ttfamily [2/6]}}
+{\footnotesize\ttfamily \label{classfc_1_1exception_af4312be4f267fda7b0bf8bccbfac232b} 
+fc\+::exception\+::exception (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1log__message}{log\+\_\+message}} \&\&}]{msg}{, }\item[{\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}}]{code}{ = {\ttfamily \mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca54c3c8b9caa13270a23c57af7bf9c52c}{unspecified\+\_\+exception\+\_\+code}}}, }\item[{const std\+::string \&}]{name\+\_\+value}{ = {\ttfamily "{}exception"{}}, }\item[{const std\+::string \&}]{what\+\_\+value}{ = {\ttfamily "{}unspecified"{}}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{exception_8cpp_source_l00103}{103}} of file \mbox{\hyperlink{exception_8cpp_source}{exception.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00107\ \ \ \ :\mbox{\hyperlink{classfc_1_1exception_a91cc1ed42499761c2f750de4a89ce627}{my}}(\ \textcolor{keyword}{new}\ detail::exception\_impl()\ )}
+\DoxyCodeLine{00108\ \ \ \ \{}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1exception_a91cc1ed42499761c2f750de4a89ce627}{my}}-\/>\_code\ =\ \mbox{\hyperlink{classfc_1_1exception_a79a36225cde10dcd23057bbe19d3390f}{code}};}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1exception_a91cc1ed42499761c2f750de4a89ce627}{my}}-\/>\_what\ =\ what\_value;}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1exception_a91cc1ed42499761c2f750de4a89ce627}{my}}-\/>\_name\ =\ name\_value;}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1exception_a91cc1ed42499761c2f750de4a89ce627}{my}}-\/>\_elog.push\_back(\ fc::move(\ msg\ )\ );}
+\DoxyCodeLine{00113\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=336pt]{classfc_1_1exception_af4312be4f267fda7b0bf8bccbfac232b_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1exception_a536774ba4cc639d3215bd91f412ffded}\index{fc::exception@{fc::exception}!exception@{exception}}
+\index{exception@{exception}!fc::exception@{fc::exception}}
+\doxysubsubsection{\texorpdfstring{exception()}{exception()}\hspace{0.1cm}{\footnotesize\ttfamily [3/6]}}
+{\footnotesize\ttfamily \label{classfc_1_1exception_a536774ba4cc639d3215bd91f412ffded} 
+fc\+::exception\+::exception (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacefc_a54370140f7c964a12e90393d525605d1}{log\+\_\+messages}} \&\&}]{msgs}{, }\item[{\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}}]{code}{ = {\ttfamily \mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca54c3c8b9caa13270a23c57af7bf9c52c}{unspecified\+\_\+exception\+\_\+code}}}, }\item[{const std\+::string \&}]{name\+\_\+value}{ = {\ttfamily "{}exception"{}}, }\item[{const std\+::string \&}]{what\+\_\+value}{ = {\ttfamily "{}unspecified"{}}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{exception_8cpp_source_l00041}{41}} of file \mbox{\hyperlink{exception_8cpp_source}{exception.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00044\ \ \ \ :\mbox{\hyperlink{classfc_1_1exception_a91cc1ed42499761c2f750de4a89ce627}{my}}(\ \textcolor{keyword}{new}\ detail::exception\_impl()\ )}
+\DoxyCodeLine{00045\ \ \ \ \{}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1exception_a91cc1ed42499761c2f750de4a89ce627}{my}}-\/>\_code\ =\ \mbox{\hyperlink{classfc_1_1exception_a79a36225cde10dcd23057bbe19d3390f}{code}};}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1exception_a91cc1ed42499761c2f750de4a89ce627}{my}}-\/>\_what\ =\ what\_value;}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1exception_a91cc1ed42499761c2f750de4a89ce627}{my}}-\/>\_name\ =\ name\_value;}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1exception_a91cc1ed42499761c2f750de4a89ce627}{my}}-\/>\_elog\ =\ fc::move(msgs);}
+\DoxyCodeLine{00050\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=336pt]{classfc_1_1exception_a536774ba4cc639d3215bd91f412ffded_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1exception_a57f2149839df7dc42ee356ca62a2dc90}\index{fc::exception@{fc::exception}!exception@{exception}}
+\index{exception@{exception}!fc::exception@{fc::exception}}
+\doxysubsubsection{\texorpdfstring{exception()}{exception()}\hspace{0.1cm}{\footnotesize\ttfamily [4/6]}}
+{\footnotesize\ttfamily \label{classfc_1_1exception_a57f2149839df7dc42ee356ca62a2dc90} 
+fc\+::exception\+::exception (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a54370140f7c964a12e90393d525605d1}{log\+\_\+messages}} \&}]{msgs}{, }\item[{\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}}]{code}{ = {\ttfamily \mbox{\hyperlink{namespacefc_ab52b42f18c442a260897c74c66c3d35ca54c3c8b9caa13270a23c57af7bf9c52c}{unspecified\+\_\+exception\+\_\+code}}}, }\item[{const std\+::string \&}]{name\+\_\+value}{ = {\ttfamily "{}exception"{}}, }\item[{const std\+::string \&}]{what\+\_\+value}{ = {\ttfamily "{}unspecified"{}}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{exception_8cpp_source_l00052}{52}} of file \mbox{\hyperlink{exception_8cpp_source}{exception.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00057\ \ \ \ :\mbox{\hyperlink{classfc_1_1exception_a91cc1ed42499761c2f750de4a89ce627}{my}}(\ \textcolor{keyword}{new}\ detail::exception\_impl()\ )}
+\DoxyCodeLine{00058\ \ \ \ \{}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1exception_a91cc1ed42499761c2f750de4a89ce627}{my}}-\/>\_code\ =\ \mbox{\hyperlink{classfc_1_1exception_a79a36225cde10dcd23057bbe19d3390f}{code}};}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1exception_a91cc1ed42499761c2f750de4a89ce627}{my}}-\/>\_what\ =\ what\_value;}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1exception_a91cc1ed42499761c2f750de4a89ce627}{my}}-\/>\_name\ =\ name\_value;}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1exception_a91cc1ed42499761c2f750de4a89ce627}{my}}-\/>\_elog\ =\ msgs;}
+\DoxyCodeLine{00063\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=336pt]{classfc_1_1exception_a57f2149839df7dc42ee356ca62a2dc90_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1exception_ae8accd0c86f53a5f0c0c473609b642dc}\index{fc::exception@{fc::exception}!exception@{exception}}
+\index{exception@{exception}!fc::exception@{fc::exception}}
+\doxysubsubsection{\texorpdfstring{exception()}{exception()}\hspace{0.1cm}{\footnotesize\ttfamily [5/6]}}
+{\footnotesize\ttfamily \label{classfc_1_1exception_ae8accd0c86f53a5f0c0c473609b642dc} 
+fc\+::exception\+::exception (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1exception}{exception}} \&}]{e}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{exception_8cpp_source_l00114}{114}} of file \mbox{\hyperlink{exception_8cpp_source}{exception.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00115\ \ \ \ :\mbox{\hyperlink{classfc_1_1exception_a91cc1ed42499761c2f750de4a89ce627}{my}}(\ \textcolor{keyword}{new}\ detail::exception\_impl(*c.my)\ )}
+\DoxyCodeLine{00116\ \ \ \ \{\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1exception_acb133b17f42ee76692b472e887373720}\index{fc::exception@{fc::exception}!exception@{exception}}
+\index{exception@{exception}!fc::exception@{fc::exception}}
+\doxysubsubsection{\texorpdfstring{exception()}{exception()}\hspace{0.1cm}{\footnotesize\ttfamily [6/6]}}
+{\footnotesize\ttfamily \label{classfc_1_1exception_acb133b17f42ee76692b472e887373720} 
+fc\+::exception\+::exception (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1exception}{exception}} \&\&}]{e}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{exception_8cpp_source_l00117}{117}} of file \mbox{\hyperlink{exception_8cpp_source}{exception.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00118\ \ \ \ :\mbox{\hyperlink{classfc_1_1exception_a91cc1ed42499761c2f750de4a89ce627}{my}}(\ fc::move(c.my)\ )\{\}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1exception_a72f637422588d6f2e59ce35d53882522}\index{fc::exception@{fc::exception}!````~exception@{\texorpdfstring{$\sim$}{\string~}exception}}
+\index{````~exception@{\texorpdfstring{$\sim$}{\string~}exception}!fc::exception@{fc::exception}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}exception()}{\string~exception()}}
+{\footnotesize\ttfamily \label{classfc_1_1exception_a72f637422588d6f2e59ce35d53882522} 
+fc\+::exception\+::\texorpdfstring{$\sim$}{\string~}exception (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{exception_8cpp_source_l00124}{124}} of file \mbox{\hyperlink{exception_8cpp_source}{exception.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00124\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1exception_a685fab238fa9b86dcf64b35417eb63b2}\index{fc::exception@{fc::exception}!append\_log@{append\_log}}
+\index{append\_log@{append\_log}!fc::exception@{fc::exception}}
+\doxysubsubsection{\texorpdfstring{append\_log()}{append\_log()}}
+{\footnotesize\ttfamily \label{classfc_1_1exception_a685fab238fa9b86dcf64b35417eb63b2} 
+void fc\+::exception\+::append\+\_\+log (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1log__message}{log\+\_\+message}}}]{m}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{exception_8cpp_source_l00148}{148}} of file \mbox{\hyperlink{exception_8cpp_source}{exception.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00149\ \ \ \ \{}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1exception_a91cc1ed42499761c2f750de4a89ce627}{my}}-\/>\_elog.emplace\_back(\ fc::move(m)\ );}
+\DoxyCodeLine{00151\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1exception_a79a36225cde10dcd23057bbe19d3390f}\index{fc::exception@{fc::exception}!code@{code}}
+\index{code@{code}!fc::exception@{fc::exception}}
+\doxysubsubsection{\texorpdfstring{code()}{code()}}
+{\footnotesize\ttfamily \label{classfc_1_1exception_a79a36225cde10dcd23057bbe19d3390f} 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} fc\+::exception\+::code (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const throw ( ) }
+
+
+
+Definition at line \mbox{\hyperlink{exception_8cpp_source_l00122}{122}} of file \mbox{\hyperlink{exception_8cpp_source}{exception.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00122\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1exception_a91cc1ed42499761c2f750de4a89ce627}{my}}-\/>\_code;\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{classfc_1_1exception_a79a36225cde10dcd23057bbe19d3390f_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1exception_a38ac38d910ba13a339ce5855a51c9127}\index{fc::exception@{fc::exception}!dynamic\_copy\_exception@{dynamic\_copy\_exception}}
+\index{dynamic\_copy\_exception@{dynamic\_copy\_exception}!fc::exception@{fc::exception}}
+\doxysubsubsection{\texorpdfstring{dynamic\_copy\_exception()}{dynamic\_copy\_exception()}}
+{\footnotesize\ttfamily \label{classfc_1_1exception_a38ac38d910ba13a339ce5855a51c9127} 
+\mbox{\hyperlink{namespacefc_a15170d1be1e682691dfe6ae09790edce}{exception\+\_\+ptr}} fc\+::exception\+::dynamic\+\_\+copy\+\_\+exception (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [virtual]}}
+
+This is equivalent to\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordflow}{try}\ \{\ throwAsDynamic\_exception();\ \}}
+\DoxyCodeLine{\textcolor{keywordflow}{catch}(\ ...\ )\ \{\ \textcolor{keywordflow}{return}\ std::current\_exception();\ \}}
+
+\end{DoxyCode}
+ 
+
+Reimplemented in \mbox{\hyperlink{classfc_1_1std__exception__wrapper_a0c119bebf22a89df0f587147c71827a0}{fc\+::std\+\_\+exception\+\_\+wrapper}}, and \mbox{\hyperlink{classfc_1_1unhandled__exception_a7946c956fb83ac7167173be9fdcac3e8}{fc\+::unhandled\+\_\+exception}}.
+
+
+
+Definition at line \mbox{\hyperlink{exception_8cpp_source_l00264}{264}} of file \mbox{\hyperlink{exception_8cpp_source}{exception.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00265\ \ \ \ \{}
+\DoxyCodeLine{00266\ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::make\_shared<exception>(*\textcolor{keyword}{this});}
+\DoxyCodeLine{00267\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1exception_a38ac38d910ba13a339ce5855a51c9127_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1exception_ace951e3b4efa51ea203b0e111f7e99a2}\index{fc::exception@{fc::exception}!dynamic\_rethrow\_exception@{dynamic\_rethrow\_exception}}
+\index{dynamic\_rethrow\_exception@{dynamic\_rethrow\_exception}!fc::exception@{fc::exception}}
+\doxysubsubsection{\texorpdfstring{dynamic\_rethrow\_exception()}{dynamic\_rethrow\_exception()}}
+{\footnotesize\ttfamily \label{classfc_1_1exception_ace951e3b4efa51ea203b0e111f7e99a2} 
+\mbox{\hyperlink{utility_8hpp_a9bc43e3ee0ae83643b65e07fe1fd0132}{NO\+\_\+\+RETURN}} void fc\+::exception\+::dynamic\+\_\+rethrow\+\_\+exception (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [virtual]}}
+
+Throw this exception as its most derived type.
+
+\begin{DoxyNote}{Note}
+does not return.
+\end{DoxyNote}
+Rethrows the exception restoring the proper type based upon the error code. This is used to propagate exception types across conversions to/from JSON 
+
+Reimplemented in \mbox{\hyperlink{classfc_1_1std__exception__wrapper_a1de6d9d9e6af7a73c2c034f4a2b14fed}{fc\+::std\+\_\+exception\+\_\+wrapper}}, and \mbox{\hyperlink{classfc_1_1unhandled__exception_a8177e0f7154591583154cf4e4ccf0c9e}{fc\+::unhandled\+\_\+exception}}.
+
+
+
+Definition at line \mbox{\hyperlink{exception_8cpp_source_l00259}{259}} of file \mbox{\hyperlink{exception_8cpp_source}{exception.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00260\ \ \ \ \{}
+\DoxyCodeLine{00261\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1exception__factory_abd81007923f875be9136102a48609f8c}{exception\_factory::instance}}().\mbox{\hyperlink{classfc_1_1exception__factory_a61092b88bfa736748a4fcb860b18e5b2}{rethrow}}(\ *\textcolor{keyword}{this}\ );}
+\DoxyCodeLine{00262\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1exception_ace951e3b4efa51ea203b0e111f7e99a2_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1exception_ace951e3b4efa51ea203b0e111f7e99a2_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1exception_a70b72c1e4fe0d17485a8b7a0a6f397de}\index{fc::exception@{fc::exception}!get\_log@{get\_log}}
+\index{get\_log@{get\_log}!fc::exception@{fc::exception}}
+\doxysubsubsection{\texorpdfstring{get\_log()}{get\_log()}}
+{\footnotesize\ttfamily \label{classfc_1_1exception_a70b72c1e4fe0d17485a8b7a0a6f397de} 
+const \mbox{\hyperlink{namespacefc_a54370140f7c964a12e90393d525605d1}{log\+\_\+messages}} \& fc\+::exception\+::get\+\_\+log (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+\begin{DoxyReturn}{Returns}
+a reference to log messages that have been added to this log. 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{exception_8cpp_source_l00147}{147}} of file \mbox{\hyperlink{exception_8cpp_source}{exception.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00147\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1exception_a91cc1ed42499761c2f750de4a89ce627}{my}}-\/>\_elog;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1exception_a70b72c1e4fe0d17485a8b7a0a6f397de_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1exception_aa5734af6ae6e44c7c8a9b3c4ea8131e1}\index{fc::exception@{fc::exception}!name@{name}}
+\index{name@{name}!fc::exception@{fc::exception}}
+\doxysubsubsection{\texorpdfstring{name()}{name()}}
+{\footnotesize\ttfamily \label{classfc_1_1exception_aa5734af6ae6e44c7c8a9b3c4ea8131e1} 
+const char \texorpdfstring{$\ast$}{*} fc\+::exception\+::name (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const throw ( ) }
+
+
+
+Definition at line \mbox{\hyperlink{exception_8cpp_source_l00120}{120}} of file \mbox{\hyperlink{exception_8cpp_source}{exception.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00120\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1exception_a91cc1ed42499761c2f750de4a89ce627}{my}}-\/>\_name.c\_str();\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1exception_aa5734af6ae6e44c7c8a9b3c4ea8131e1_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1exception_afb0e1fac60179c7b2e171c87d295f690}\index{fc::exception@{fc::exception}!operator=@{operator=}}
+\index{operator=@{operator=}!fc::exception@{fc::exception}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1exception_afb0e1fac60179c7b2e171c87d295f690} 
+\mbox{\hyperlink{classfc_1_1exception}{exception}} \& fc\+::exception\+::operator= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1exception}{exception}} \&}]{copy}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{exception_8cpp_source_l00293}{293}} of file \mbox{\hyperlink{exception_8cpp_source}{exception.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00294\ \ \ \ \{}
+\DoxyCodeLine{00295\ \ \ \ \ \ \ *\mbox{\hyperlink{classfc_1_1exception_a91cc1ed42499761c2f750de4a89ce627}{my}}\ =\ *\mbox{\hyperlink{namespacefc_a79771837fffd80fcc4bc658ee2fc4b2b}{copy}}.my;}
+\DoxyCodeLine{00296\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00297\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1exception_afb0e1fac60179c7b2e171c87d295f690_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1exception_a4f257882990e94900d31d030be6601b2}\index{fc::exception@{fc::exception}!operator=@{operator=}}
+\index{operator=@{operator=}!fc::exception@{fc::exception}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1exception_a4f257882990e94900d31d030be6601b2} 
+\mbox{\hyperlink{classfc_1_1exception}{exception}} \& fc\+::exception\+::operator= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1exception}{exception}} \&\&}]{copy}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{exception_8cpp_source_l00299}{299}} of file \mbox{\hyperlink{exception_8cpp_source}{exception.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00300\ \ \ \ \{}
+\DoxyCodeLine{00301\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1exception_a91cc1ed42499761c2f750de4a89ce627}{my}}\ =\ std::move(\mbox{\hyperlink{namespacefc_a79771837fffd80fcc4bc658ee2fc4b2b}{copy}}.my);}
+\DoxyCodeLine{00302\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00303\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1exception_a4f257882990e94900d31d030be6601b2_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1exception_a7611ea8fbe25dde56649b685c2298a37}\index{fc::exception@{fc::exception}!to\_detail\_string@{to\_detail\_string}}
+\index{to\_detail\_string@{to\_detail\_string}!fc::exception@{fc::exception}}
+\doxysubsubsection{\texorpdfstring{to\_detail\_string()}{to\_detail\_string()}}
+{\footnotesize\ttfamily \label{classfc_1_1exception_a7611ea8fbe25dde56649b685c2298a37} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} fc\+::exception\+::to\+\_\+detail\+\_\+string (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1log__level}{log\+\_\+level}}}]{ll}{ = {\ttfamily \mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4a890e233ab2c5d4db2a1c26a10bd2de7d}{log\+\_\+level\+::all}}}}\end{DoxyParamCaption}) const}
+
+Generates a detailed string including file, line, method, and other information that is generally only useful for developers. 
+
+Definition at line \mbox{\hyperlink{exception_8cpp_source_l00158}{158}} of file \mbox{\hyperlink{exception_8cpp_source}{exception.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00159\ \ \ \ \{}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ deadline\ =\ \mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{fc::time\_point::now}}()\ +\ \mbox{\hyperlink{classfc_1_1exception_a13463219d1d09f150e987fe1b0368752}{format\_time\_limit}};}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ std::stringstream\ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}};}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}\ <<\ variant(\ \mbox{\hyperlink{classfc_1_1exception_a91cc1ed42499761c2f750de4a89ce627}{my}}-\/>\_code\ ).as\_string();}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}(\ std::bad\_alloc\&\ )\ \{}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw};}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}(\ ...\ )\ \{}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}\ <<\ \textcolor{stringliteral}{"{}<-\/\ exception\ in\ to\_detail\_string."{}};}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}\ <<\ \textcolor{stringliteral}{"{}\ "{}}\ <<\ \mbox{\hyperlink{classfc_1_1exception_a91cc1ed42499761c2f750de4a89ce627}{my}}-\/>\_name\ <<\ \textcolor{stringliteral}{"{}:\ "{}}\ <<\ \mbox{\hyperlink{classfc_1_1exception_a91cc1ed42499761c2f750de4a89ce627}{my}}-\/>\_what\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\ itr\ =\ \mbox{\hyperlink{classfc_1_1exception_a91cc1ed42499761c2f750de4a89ce627}{my}}-\/>\_elog.begin();\ itr\ !=\ \mbox{\hyperlink{classfc_1_1exception_a91cc1ed42499761c2f750de4a89ce627}{my}}-\/>\_elog.end();\ ++itr\ )\ \{}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}\ <<\ itr-\/>get\_message()\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};\ \textcolor{comment}{//fc::format\_string(\ itr-\/>get\_format(),\ itr-\/>get\_data()\ )\ <<"{}\(\backslash\)n"{};}}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}\ <<\ \textcolor{stringliteral}{"{}\ \ \ \ "{}}\ <<\ \mbox{\hyperlink{classfc_1_1json_aa6541960d7f05567559b866cfaf88dfa}{json::to\_string}}(\ itr-\/>get\_data(),\ deadline\ )\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}\ <<\ \textcolor{stringliteral}{"{}\ \ \ \ "{}}\ <<\ itr-\/>get\_context().to\_string()\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}(\ std::bad\_alloc\&\ )\ \{}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw};}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}(\ \textcolor{keyword}{const}\ fc::timeout\_exception\&\ e)\ \{}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}\ <<\ \textcolor{stringliteral}{"{}<-\/\ timeout\ exception\ in\ to\_detail\_string:\ "{}}\ <<\ e.what()\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}(\ ...\ )\ \{}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}\ <<\ \textcolor{stringliteral}{"{}<-\/\ exception\ in\ to\_detail\_string.\(\backslash\)n"{}};}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}(\ std::bad\_alloc\&\ )\ \{}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw};}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}(\ ...\ )\ \{}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}\ <<\ \textcolor{stringliteral}{"{}<-\/\ exception\ in\ to\_detail\_string.\(\backslash\)n"{}};}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}.str();}
+\DoxyCodeLine{00191\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1exception_a7611ea8fbe25dde56649b685c2298a37_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{classfc_1_1exception_a7611ea8fbe25dde56649b685c2298a37_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1exception_adbc4557b14bc29b74e9cf9f0ed5fb8d8}\index{fc::exception@{fc::exception}!to\_string@{to\_string}}
+\index{to\_string@{to\_string}!fc::exception@{fc::exception}}
+\doxysubsubsection{\texorpdfstring{to\_string()}{to\_string()}}
+{\footnotesize\ttfamily \label{classfc_1_1exception_adbc4557b14bc29b74e9cf9f0ed5fb8d8} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} fc\+::exception\+::to\+\_\+string (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1log__level}{log\+\_\+level}}}]{ll}{ = {\ttfamily \mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4afe6da1f3a75c3911b0b59bffaea070e1}{log\+\_\+level\+::info}}}}\end{DoxyParamCaption}) const}
+
+Generates a user-\/friendly error report. 
+
+Definition at line \mbox{\hyperlink{exception_8cpp_source_l00196}{196}} of file \mbox{\hyperlink{exception_8cpp_source}{exception.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00197\ \ \ \ \{}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ deadline\ =\ \mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{fc::time\_point::now}}()\ +\ \mbox{\hyperlink{classfc_1_1exception_a13463219d1d09f150e987fe1b0368752}{format\_time\_limit}};}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ std::stringstream\ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}};}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}\ <<\ \mbox{\hyperlink{classfc_1_1exception_a91cc1ed42499761c2f750de4a89ce627}{my}}-\/>\_what;}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}\ <<\ \textcolor{stringliteral}{"{}\ ("{}}\ <<\ variant(\ \mbox{\hyperlink{classfc_1_1exception_a91cc1ed42499761c2f750de4a89ce627}{my}}-\/>\_code\ ).as\_string()\ <<\ \textcolor{stringliteral}{"{})\(\backslash\)n"{}};}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}(\ std::bad\_alloc\&\ )\ \{}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw};}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}(\ ...\ )\ \{}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}\ <<\ \textcolor{stringliteral}{"{}<-\/\ exception\ in\ to\_string.\(\backslash\)n"{}};}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\ itr\ =\ \mbox{\hyperlink{classfc_1_1exception_a91cc1ed42499761c2f750de4a89ce627}{my}}-\/>\_elog.begin();\ itr\ !=\ \mbox{\hyperlink{classfc_1_1exception_a91cc1ed42499761c2f750de4a89ce627}{my}}-\/>\_elog.end();\ ++itr\ )\ \{}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a03f2a3185ee8e8b39a309dfd336b64b5}{FC\_CHECK\_DEADLINE}}(deadline);}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}\ <<\ \mbox{\hyperlink{namespacefc_acd5129981ae93fce3154d3fed6f6acbc}{fc::format\_string}}(\ itr-\/>get\_format(),\ itr-\/>get\_data(),\ \textcolor{keyword}{true})\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ \ \ \ \ \ ss\ <<\ "{}\ \ \ \ "{}\ <<\ itr-\/>get\_context().to\_string()\ <<"{}\(\backslash\)n"{};}}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}(\ std::bad\_alloc\&\ )\ \{}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw};}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}(\ \textcolor{keyword}{const}\ fc::timeout\_exception\&\ e)\ \{}
+\DoxyCodeLine{00217\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}\ <<\ \textcolor{stringliteral}{"{}<-\/\ timeout\ exception\ in\ to\_string:\ "{}}\ <<\ e.what();}
+\DoxyCodeLine{00218\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}(\ ...\ )\ \{}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}\ <<\ \textcolor{stringliteral}{"{}<-\/\ exception\ in\ to\_string.\(\backslash\)n"{}};}
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}.str();}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}(\ std::bad\_alloc\&\ )\ \{}
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw};}
+\DoxyCodeLine{00226\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}(\ ...\ )\ \{}
+\DoxyCodeLine{00227\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}\ <<\ \textcolor{stringliteral}{"{}<-\/\ exception\ in\ to\_string.\(\backslash\)n"{}};}
+\DoxyCodeLine{00228\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00229\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}.str();}
+\DoxyCodeLine{00230\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1exception_adbc4557b14bc29b74e9cf9f0ed5fb8d8_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1exception_adbc4557b14bc29b74e9cf9f0ed5fb8d8_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1exception_aeea900db85f79e5b4be0710a9df373db}\index{fc::exception@{fc::exception}!top\_message@{top\_message}}
+\index{top\_message@{top\_message}!fc::exception@{fc::exception}}
+\doxysubsubsection{\texorpdfstring{top\_message()}{top\_message()}}
+{\footnotesize\ttfamily \label{classfc_1_1exception_aeea900db85f79e5b4be0710a9df373db} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} fc\+::exception\+::top\+\_\+message (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+Generates a user-\/friendly error report. 
+
+Definition at line \mbox{\hyperlink{exception_8cpp_source_l00235}{235}} of file \mbox{\hyperlink{exception_8cpp_source}{exception.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00236\ \ \ \ \{}
+\DoxyCodeLine{00237\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\ itr\ =\ \mbox{\hyperlink{classfc_1_1exception_a91cc1ed42499761c2f750de4a89ce627}{my}}-\/>\_elog.begin();\ itr\ !=\ \mbox{\hyperlink{classfc_1_1exception_a91cc1ed42499761c2f750de4a89ce627}{my}}-\/>\_elog.end();\ ++itr\ )}
+\DoxyCodeLine{00238\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ =\ \mbox{\hyperlink{namespacefc_acd5129981ae93fce3154d3fed6f6acbc}{fc::format\_string}}(\ itr-\/>get\_format(),\ itr-\/>get\_data()\ );}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.empty())\ \{}
+\DoxyCodeLine{00241\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{00242\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00243\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00244\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}}();}
+\DoxyCodeLine{00245\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1exception_aeea900db85f79e5b4be0710a9df373db_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1exception_aeea900db85f79e5b4be0710a9df373db_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1exception_ab1104818bf0d9b6a29f0dfe036cf97f6}\index{fc::exception@{fc::exception}!what@{what}}
+\index{what@{what}!fc::exception@{fc::exception}}
+\doxysubsubsection{\texorpdfstring{what()}{what()}}
+{\footnotesize\ttfamily \label{classfc_1_1exception_ab1104818bf0d9b6a29f0dfe036cf97f6} 
+const char \texorpdfstring{$\ast$}{*} fc\+::exception\+::what (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{exception_8cpp_source_l00121}{121}} of file \mbox{\hyperlink{exception_8cpp_source}{exception.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00121\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1exception_a91cc1ed42499761c2f750de4a89ce627}{my}}-\/>\_what.c\_str();\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1exception_ab1104818bf0d9b6a29f0dfe036cf97f6_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{classfc_1_1exception_a9b482ebad3fb861a17f968e015519e41}\index{fc::exception@{fc::exception}!from\_variant@{from\_variant}}
+\index{from\_variant@{from\_variant}!fc::exception@{fc::exception}}
+\doxysubsubsection{\texorpdfstring{from\_variant}{from\_variant}}
+{\footnotesize\ttfamily \label{classfc_1_1exception_a9b482ebad3fb861a17f968e015519e41} 
+void from\+\_\+variant (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1variant}{variant}} \&}]{e}{, }\item[{\mbox{\hyperlink{classfc_1_1exception}{exception}} \&}]{ll}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{exception_8cpp_source_l00134}{134}} of file \mbox{\hyperlink{exception_8cpp_source}{exception.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00135\ \ \ \ \{}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ obj\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.get\_object();}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ obj.contains(\ \textcolor{stringliteral}{"{}stack"{}}\ )\ )}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \ ll.my-\/>\_elog\ =\ \ obj[\textcolor{stringliteral}{"{}stack"{}}].as<\mbox{\hyperlink{namespacefc_a54370140f7c964a12e90393d525605d1}{log\_messages}}>();}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ obj.contains(\ \textcolor{stringliteral}{"{}code"{}}\ )\ )}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \ ll.my-\/>\_code\ =\ obj[\textcolor{stringliteral}{"{}code"{}}].as\_int64();}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ obj.contains(\ \textcolor{stringliteral}{"{}name"{}}\ )\ )}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \ ll.my-\/>\_name\ =\ obj[\textcolor{stringliteral}{"{}name"{}}].as\_string();}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ obj.contains(\ \textcolor{stringliteral}{"{}message"{}}\ )\ )}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ \ ll.my-\/>\_what\ =\ obj[\textcolor{stringliteral}{"{}message"{}}].as\_string();}
+\DoxyCodeLine{00145\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1exception_a3c086911538b2c7cd63462c1d237c79d}\index{fc::exception@{fc::exception}!to\_variant@{to\_variant}}
+\index{to\_variant@{to\_variant}!fc::exception@{fc::exception}}
+\doxysubsubsection{\texorpdfstring{to\_variant}{to\_variant}}
+{\footnotesize\ttfamily \label{classfc_1_1exception_a3c086911538b2c7cd63462c1d237c79d} 
+void to\+\_\+variant (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1exception}{exception}} \&}]{e}{, }\item[{\mbox{\hyperlink{classfc_1_1variant}{variant}} \&}]{v}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{exception_8cpp_source_l00126}{126}} of file \mbox{\hyperlink{exception_8cpp_source}{exception.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00127\ \ \ \ \{}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ =\ mutable\_variant\_object(\ \textcolor{stringliteral}{"{}code"{}},\ e.code()\ )}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\ \textcolor{stringliteral}{"{}name"{}},\ e.name()\ )}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\ \textcolor{stringliteral}{"{}message"{}},\ e.what()\ )}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\ \textcolor{stringliteral}{"{}stack"{}},\ e.get\_log()\ );}
+\DoxyCodeLine{00132\ }
+\DoxyCodeLine{00133\ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classfc_1_1exception_a13463219d1d09f150e987fe1b0368752}\index{fc::exception@{fc::exception}!format\_time\_limit@{format\_time\_limit}}
+\index{format\_time\_limit@{format\_time\_limit}!fc::exception@{fc::exception}}
+\doxysubsubsection{\texorpdfstring{format\_time\_limit}{format\_time\_limit}}
+{\footnotesize\ttfamily \label{classfc_1_1exception_a13463219d1d09f150e987fe1b0368752} 
+\mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}} fc\+::exception\+::format\+\_\+time\+\_\+limit = \mbox{\hyperlink{namespacefc_a76ae235ec7e9b8862e70740058d7eb1b}{fc\+::milliseconds}}( 10 )\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{exception_8hpp_source_l00060}{60}} of file \mbox{\hyperlink{exception_8hpp_source}{exception.\+hpp}}.
+
+\Hypertarget{classfc_1_1exception_a91cc1ed42499761c2f750de4a89ce627}\index{fc::exception@{fc::exception}!my@{my}}
+\index{my@{my}!fc::exception@{fc::exception}}
+\doxysubsubsection{\texorpdfstring{my}{my}}
+{\footnotesize\ttfamily \label{classfc_1_1exception_a91cc1ed42499761c2f750de4a89ce627} 
+std\+::unique\+\_\+ptr$<$detail\+::exception\+\_\+impl$>$ fc\+::exception\+::my\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{exception_8hpp_source_l00134}{134}} of file \mbox{\hyperlink{exception_8hpp_source}{exception.\+hpp}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/exception/\mbox{\hyperlink{exception_8hpp}{exception.\+hpp}}\item 
+libraries/fc/src/\mbox{\hyperlink{exception_8cpp}{exception.\+cpp}}\end{DoxyCompactItemize}

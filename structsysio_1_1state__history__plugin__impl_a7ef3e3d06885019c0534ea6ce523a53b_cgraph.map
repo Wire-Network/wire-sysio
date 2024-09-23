@@ -1,0 +1,12 @@
+<map id="sysio::state_history_plugin_impl::get_block" name="sysio::state_history_plugin_impl::get_block">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,71,163,111"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1chain__plugin.html#a14a5e77b31ecf267c8062267d03440ae" title=" " alt="" coords="228,5,360,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="151,68,212,48,214,53,152,73"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1chain_1_1controller.html#a1379e43325b7e517a058bddce15571eb" title=" " alt="" coords="211,71,378,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="163,88,195,88,195,94,163,94"/>
+<area shape="rect" id="Node000005" href="$namespacefc_1_1raw.html#a3a18d8161aa5b4f4f02b6fcfdff5e5d1" title=" " alt="" coords="246,160,343,185"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="140,109,245,151,243,156,138,114"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1chain_1_1controller.html#a04f3c55da09b359224510af99502490f" title=" " alt="" coords="426,71,629,111"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="378,88,410,88,410,94,378,94"/>
+<area shape="poly" id="edge5_Node000005_Node000005" title=" " alt="" coords="259,161,252,151,257,141,271,135,294,133,320,136,333,142,331,147,319,141,294,138,272,140,260,145,258,150,264,158"/>
+</map>

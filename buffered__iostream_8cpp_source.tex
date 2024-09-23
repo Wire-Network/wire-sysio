@@ -1,0 +1,215 @@
+\doxysection{buffered\+\_\+iostream.\+cpp}
+\hypertarget{buffered__iostream_8cpp_source}{}\label{buffered__iostream_8cpp_source}\index{libraries/fc/src/io/buffered\_iostream.cpp@{libraries/fc/src/io/buffered\_iostream.cpp}}
+\mbox{\hyperlink{buffered__iostream_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{buffered__iostream_8hpp}{fc/io/buffered\_iostream.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{exception_8hpp}{fc/exception/exception.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <boost/asio/streambuf.hpp>}}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <iostream>}}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{logger_8hpp}{fc/log/logger.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00008}00008\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00009}00009\ \{}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00010}00010\ \ \ \ \ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacedetail}{detail}}}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00011}00011\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00012}\mbox{\hyperlink{classfc_1_1detail_1_1buffered__istream__impl}{00012}}\ \ \ \ \ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classfc_1_1detail_1_1buffered__istream__impl}{buffered\_istream\_impl}}}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00013}00013\ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00014}00014\ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00015}\mbox{\hyperlink{classfc_1_1detail_1_1buffered__istream__impl_af20f26d197bdb35d0d6ecff86af7bad1}{00015}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1buffered__istream__impl_af20f26d197bdb35d0d6ecff86af7bad1}{buffered\_istream\_impl}}(\ istream\_ptr\ is\ )\ :}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00016}00016\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1buffered__istream__impl_a4c7e115dea44a4c4304c25957987474f}{\_istr}}(\mbox{\hyperlink{namespacefc}{fc}}::move(is))}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00017}00017\ \#ifndef\ NDEBUG}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00018}00018\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ,\mbox{\hyperlink{classfc_1_1detail_1_1buffered__istream__impl_adf0f33b0bdafe179e2206ef2b5e6baed}{\_shared\_read\_buffer\_in\_use}}(false)}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00019}00019\ \#endif}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00020}00020\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\}}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00022}\mbox{\hyperlink{classfc_1_1detail_1_1buffered__istream__impl_a4c7e115dea44a4c4304c25957987474f}{00022}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ istream\_ptr\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1buffered__istream__impl_a4c7e115dea44a4c4304c25957987474f}{\_istr}};}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00023}\mbox{\hyperlink{classfc_1_1detail_1_1buffered__istream__impl_a478e492b90bded062eeef5880d60d621}{00023}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::asio::streambuf\ \mbox{\hyperlink{classfc_1_1detail_1_1buffered__istream__impl_a478e492b90bded062eeef5880d60d621}{\_rdbuf}};}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00024}\mbox{\hyperlink{classfc_1_1detail_1_1buffered__istream__impl_a9ba5510d813e3206c1052ff069a1929a}{00024}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ std::shared\_ptr<char>\ \ \mbox{\hyperlink{classfc_1_1detail_1_1buffered__istream__impl_a9ba5510d813e3206c1052ff069a1929a}{\_shared\_read\_buffer}};}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00025}00025\ \textcolor{preprocessor}{\#ifndef\ NDEBUG}}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00026}\mbox{\hyperlink{classfc_1_1detail_1_1buffered__istream__impl_adf0f33b0bdafe179e2206ef2b5e6baed}{00026}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1buffered__istream__impl_adf0f33b0bdafe179e2206ef2b5e6baed}{\_shared\_read\_buffer\_in\_use}};}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00027}00027\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00028}00028\ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00029}00029\ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ minimum\_read\_size\ =\ 1024;}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00030}00030\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00032}\mbox{\hyperlink{classfc_1_1buffered__istream_a2685f9f7e8514c848839b859d173dec6}{00032}}\ \ \ \ \ \mbox{\hyperlink{classfc_1_1buffered__istream_a2685f9f7e8514c848839b859d173dec6}{buffered\_istream::buffered\_istream}}(\ istream\_ptr\ is\ )}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00033}00033\ \ \ \ \ :my(\ new\ \mbox{\hyperlink{namespacedetail}{detail}}::buffered\_istream\_impl(\ \mbox{\hyperlink{namespacefc}{fc}}::move(is)\ )\ )}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00034}00034\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00035}00035\ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ my-\/>\_istr\ !=\ \textcolor{keyword}{nullptr},\ \textcolor{stringliteral}{"{}\ this\ shouldn't\ be\ null"{}}\ );}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00036}00036\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00038}\mbox{\hyperlink{classfc_1_1buffered__istream_a6af022ec9841657f60d00089ddd2de90}{00038}}\ \ \ \ \ \mbox{\hyperlink{classfc_1_1buffered__istream_a2685f9f7e8514c848839b859d173dec6}{buffered\_istream::buffered\_istream}}(\ \mbox{\hyperlink{classfc_1_1buffered__istream}{buffered\_istream}}\&\&\ o\ )}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00039}00039\ \ \ \ \ :my(\ \mbox{\hyperlink{namespacefc}{fc}}::move(o.my)\ )\{\}}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00041}\mbox{\hyperlink{classfc_1_1buffered__istream_aa312532164c62e95fc7ecb2927d15465}{00041}}\ \ \ \ \ \mbox{\hyperlink{classfc_1_1buffered__istream}{buffered\_istream}}\&\ \mbox{\hyperlink{classfc_1_1buffered__istream_aa312532164c62e95fc7ecb2927d15465}{buffered\_istream::operator=}}(\ \mbox{\hyperlink{classfc_1_1buffered__istream}{buffered\_istream}}\&\&\ i\ )}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00042}00042\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00043}00043\ \ \ \ \ \ \ \ my\ =\ fc::move(i.my);}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00044}00044\ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00045}00045\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00047}\mbox{\hyperlink{classfc_1_1buffered__istream_a263ef4eed4e11c939cfa7d97333c83f5}{00047}}\ \ \ \ \ \mbox{\hyperlink{classfc_1_1buffered__istream_a263ef4eed4e11c939cfa7d97333c83f5}{buffered\_istream::\string~buffered\_istream}}()\{\}}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00049}00049\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classfc_1_1buffered__istream_aeadf77cad3bfaa31b52fe719f6b01fce}{buffered\_istream::readsome}}(\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ )}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00050}00050\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00051}00051\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ bytes\_from\_rdbuf\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(my-\/>\_rdbuf.sgetn(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}));}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00052}00052\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (bytes\_from\_rdbuf)}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ bytes\_from\_rdbuf;}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00054}00054\ }
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00056}00056\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ >\ detail::minimum\_read\_size\ )\ }
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ my-\/>\_istr-\/>readsome(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}});}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00059}00059\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ tmp[detail::minimum\_read\_size];}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00060}00060\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ bytes\_read\ =\ my-\/>\_istr-\/>readsome(\ tmp,\ detail::minimum\_read\_size\ );}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00062}00062\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ bytes\_to\_deliver\_immediately\ =\ std::min<size\_t>(bytes\_read,\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}});}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00064}00064\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ tmp,\ bytes\_to\_deliver\_immediately\ );}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00065}00065\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00067}00067\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ bytes\_read\ >\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ )}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00068}00068\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \ \ my-\/>\_rdbuf.sputn(\ tmp\ +\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ bytes\_read\ -\/\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ );}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00070}00070\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00072}00072\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ bytes\_to\_deliver\_immediately;}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00073}00073\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00074}00074\ }
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00075}\mbox{\hyperlink{classfc_1_1buffered__istream_a462190e5205b4aaad1ad0108f31dd7d4}{00075}}\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classfc_1_1buffered__istream_aeadf77cad3bfaa31b52fe719f6b01fce}{buffered\_istream::readsome}}(\ \textcolor{keyword}{const}\ std::shared\_ptr<char>\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ \textcolor{keywordtype}{size\_t}\ offset\ )}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00076}00076\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00077}00077\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ bytes\_from\_rdbuf\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(my-\/>\_rdbuf.sgetn(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}.get()\ +\ offset,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}));}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00078}00078\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (bytes\_from\_rdbuf)}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ bytes\_from\_rdbuf;}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00080}00080\ }
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00081}00081\ }
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00082}00082\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ >\ detail::minimum\_read\_size\ )\ }
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00083}00083\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ my-\/>\_istr-\/>readsome(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}.get()\ +\ offset,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}});}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00084}00084\ }
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00085}00085\ \textcolor{preprocessor}{\#ifndef\ NDEBUG}}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00086}00086\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ This\ code\ was\ written\ with\ the\ assumption\ that\ you'd\ only\ be\ making\ one\ call\ to\ readsome\ }}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00087}00087\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ at\ a\ time\ so\ it\ reuses\ \_shared\_read\_buffer.\ \ If\ you\ really\ need\ to\ make\ concurrent\ calls\ to\ }}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00088}00088\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ readsome(),\ you'll\ need\ to\ prevent\ reusing\ \_shared\_read\_buffer\ here}}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00089}00089\ \ \ \ \ \ \ \ \ \textcolor{keyword}{struct\ }check\_buffer\_in\_use\ \{}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00090}00090\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\&\ \_buffer\_in\_use;}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00091}00091\ \ \ \ \ \ \ \ \ \ \ check\_buffer\_in\_use(\textcolor{keywordtype}{bool}\&\ buffer\_in\_use)\ :\ \_buffer\_in\_use(buffer\_in\_use)\ \{\ assert(!\_buffer\_in\_use);\ \_buffer\_in\_use\ =\ \textcolor{keyword}{true};\ \}}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00092}00092\ \ \ \ \ \ \ \ \ \ \ \string~check\_buffer\_in\_use()\ \{\ assert(\_buffer\_in\_use);\ \_buffer\_in\_use\ =\ \textcolor{keyword}{false};\ \}}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00093}00093\ \ \ \ \ \ \ \ \ \}\ buffer\_in\_use\_checker(my-\/>\_shared\_read\_buffer\_in\_use);}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00094}00094\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00095}00095\ }
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00096}00096\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!my-\/>\_shared\_read\_buffer)}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00097}00097\ \ \ \ \ \ \ \ \ \ \ my-\/>\_shared\_read\_buffer.reset(\textcolor{keyword}{new}\ \textcolor{keywordtype}{char}[detail::minimum\_read\_size],\ [](\textcolor{keywordtype}{char}*\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})\{\ \textcolor{keyword}{delete}[]\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}};\ \});}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00098}00098\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ bytes\_read\ =\ my-\/>\_istr-\/>readsome(\ my-\/>\_shared\_read\_buffer,\ detail::minimum\_read\_size,\ 0\ );}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00099}00099\ }
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00100}00100\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ bytes\_to\_deliver\_immediately\ =\ std::min<size\_t>(bytes\_read,\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}});}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00101}00101\ }
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00102}00102\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}.get()\ +\ offset,\ my-\/>\_shared\_read\_buffer.get(),\ bytes\_to\_deliver\_immediately\ );}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00103}00103\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00104}00104\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ bytes\_read\ >\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ )}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00105}00105\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00106}00106\ \ \ \ \ \ \ \ \ \ \ \ my-\/>\_rdbuf.sputn(\ my-\/>\_shared\_read\_buffer.get()\ +\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ bytes\_read\ -\/\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ );}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00107}00107\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00108}00108\ }
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00109}00109\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ bytes\_to\_deliver\_immediately;}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00110}00110\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00111}00111\ }
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00112}\mbox{\hyperlink{classfc_1_1buffered__istream_a35c2540f97e42e3281457af50a7717b9}{00112}}\ \ \ \ \ \textcolor{keywordtype}{char}\ \ \mbox{\hyperlink{classfc_1_1buffered__istream_a35c2540f97e42e3281457af50a7717b9}{buffered\_istream::peek}}()\textcolor{keyword}{const}}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00113}00113\ \textcolor{keyword}{\ \ \ \ }\{}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00114}00114\ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ my-\/>\_rdbuf.size()\ )}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00115}00115\ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00116}00116\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ my-\/>\_rdbuf.sgetc();}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00117}00117\ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00118}00118\ }
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00119}00119\ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ tmp[detail::minimum\_read\_size];}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00120}00120\ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ bytes\_read\ =\ my-\/>\_istr-\/>readsome(\ tmp,\ detail::minimum\_read\_size\ );}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00121}00121\ \ \ \ \ \ \ \ my-\/>\_rdbuf.sputn(\ tmp,\ bytes\_read\ );}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00122}00122\ }
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00123}00123\ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ my-\/>\_rdbuf.size()\ )}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00124}00124\ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00125}00125\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ my-\/>\_rdbuf.sgetc();}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00126}00126\ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00127}00127\ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ assert\_exception,\ }
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00128}00128\ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}at\ least\ one\ byte\ should\ be\ available,\ or\ eof\ should\ have\ been\ thrown"{}}\ );}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00129}00129\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00130}00130\ }
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00131}00131\ }
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00132}00132\ \ \ \ \ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacedetail}{detail}}}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00133}00133\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00134}\mbox{\hyperlink{classfc_1_1detail_1_1buffered__ostream__impl}{00134}}\ \ \ \ \ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classfc_1_1detail_1_1buffered__ostream__impl}{buffered\_ostream\_impl}}}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00135}00135\ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00136}00136\ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00137}\mbox{\hyperlink{classfc_1_1detail_1_1buffered__ostream__impl_afb5a9c7366e4724c2f7a5d42bdb4bc37}{00137}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1buffered__ostream__impl_afb5a9c7366e4724c2f7a5d42bdb4bc37}{buffered\_ostream\_impl}}(\ ostream\_ptr\ os\ )\ :}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00138}00138\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1buffered__ostream__impl_a478a7f64f25359f4b6b4685b0891d1df}{\_ostr}}(\mbox{\hyperlink{namespacefc}{fc}}::move(os))}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00139}00139\ \#ifndef\ NDEBUG}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00140}00140\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ,\mbox{\hyperlink{classfc_1_1detail_1_1buffered__ostream__impl_aeb1d23dc08f41b686dab2b3e0259c4ad}{\_shared\_write\_buffer\_in\_use}}(false)}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00141}00141\ \#endif}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00142}00142\ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\}}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00143}00143\ }
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00144}\mbox{\hyperlink{classfc_1_1detail_1_1buffered__ostream__impl_a478a7f64f25359f4b6b4685b0891d1df}{00144}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ ostream\_ptr\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1buffered__ostream__impl_a478a7f64f25359f4b6b4685b0891d1df}{\_ostr}};}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00145}\mbox{\hyperlink{classfc_1_1detail_1_1buffered__ostream__impl_a861ea76552f1bf8771f13cae5a7cb140}{00145}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::asio::streambuf\ \mbox{\hyperlink{classfc_1_1detail_1_1buffered__ostream__impl_a861ea76552f1bf8771f13cae5a7cb140}{\_rdbuf}};}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00146}\mbox{\hyperlink{classfc_1_1detail_1_1buffered__ostream__impl_acb5cfd74cbd745724b88ee93b5d7f0c6}{00146}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ std::shared\_ptr<char>\ \ \mbox{\hyperlink{classfc_1_1detail_1_1buffered__ostream__impl_acb5cfd74cbd745724b88ee93b5d7f0c6}{\_shared\_write\_buffer}};}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00147}00147\ \textcolor{preprocessor}{\#ifndef\ NDEBUG}}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00148}\mbox{\hyperlink{classfc_1_1detail_1_1buffered__ostream__impl_aeb1d23dc08f41b686dab2b3e0259c4ad}{00148}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1buffered__ostream__impl_aeb1d23dc08f41b686dab2b3e0259c4ad}{\_shared\_write\_buffer\_in\_use}};}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00149}00149\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00150}00150\ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00151}00151\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00152}00152\ }
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00153}\mbox{\hyperlink{classfc_1_1buffered__ostream_a4367cbee8f5059b5e7e35a23b1304170}{00153}}\ \ \ \ \ \mbox{\hyperlink{classfc_1_1buffered__ostream_a4367cbee8f5059b5e7e35a23b1304170}{buffered\_ostream::buffered\_ostream}}(\ ostream\_ptr\ os,\ \textcolor{keywordtype}{size\_t}\ bufsize\ )}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00154}00154\ \ \ \ \ :my(\ new\ \mbox{\hyperlink{namespacedetail}{detail}}::buffered\_ostream\_impl(\ \mbox{\hyperlink{namespacefc}{fc}}::move(os)\ )\ )}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00155}00155\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00156}00156\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00157}00157\ }
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00158}\mbox{\hyperlink{classfc_1_1buffered__ostream_a14ece07d037569bcb5eccc00fcd2ad67}{00158}}\ \ \ \ \ \mbox{\hyperlink{classfc_1_1buffered__ostream_a4367cbee8f5059b5e7e35a23b1304170}{buffered\_ostream::buffered\_ostream}}(\ \mbox{\hyperlink{classfc_1_1buffered__ostream}{buffered\_ostream}}\&\&\ o\ )}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00159}00159\ \ \ \ \ :my(\ \mbox{\hyperlink{namespacefc}{fc}}::move(o.my)\ )\{\}}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00160}00160\ }
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00161}\mbox{\hyperlink{classfc_1_1buffered__ostream_ac6b4fd3956ec31f976ad50da28bbef2b}{00161}}\ \ \ \ \ \mbox{\hyperlink{classfc_1_1buffered__ostream}{buffered\_ostream}}\&\ \mbox{\hyperlink{classfc_1_1buffered__ostream_ac6b4fd3956ec31f976ad50da28bbef2b}{buffered\_ostream::operator=}}(\ \mbox{\hyperlink{classfc_1_1buffered__ostream}{buffered\_ostream}}\&\&\ i\ )}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00162}00162\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00163}00163\ \ \ \ \ \ \ \ my\ =\ fc::move(i.my);}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00164}00164\ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00165}00165\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00166}00166\ }
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00167}\mbox{\hyperlink{classfc_1_1buffered__ostream_a16fb3f4b8780d6b83f08d603b7e5f350}{00167}}\ \ \ \ \ \mbox{\hyperlink{classfc_1_1buffered__ostream_a16fb3f4b8780d6b83f08d603b7e5f350}{buffered\_ostream::\string~buffered\_ostream}}()\{\}}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00168}00168\ }
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00169}\mbox{\hyperlink{classfc_1_1buffered__ostream_a97aa6bcd47b0506a080779840fffd493}{00169}}\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classfc_1_1buffered__ostream_a97aa6bcd47b0506a080779840fffd493}{buffered\_ostream::writesome}}(\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ )}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00170}00170\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00171}00171\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ written\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(my-\/>\_rdbuf.sputn(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ ));}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00172}00172\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ written\ <\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ )\ \{\ \mbox{\hyperlink{classfc_1_1buffered__ostream_a2701105d24596d7990e73ec940b134ab}{flush}}();\ \}}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00173}00173\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ written\ +\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(my-\/>\_rdbuf.sputn(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}+written,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}-\/written\ ));}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00174}00174\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00175}00175\ }
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00176}\mbox{\hyperlink{classfc_1_1buffered__ostream_a5cb49f9fc76f6de2ff3014fc35c46d50}{00176}}\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classfc_1_1buffered__ostream_a97aa6bcd47b0506a080779840fffd493}{buffered\_ostream::writesome}}(\ \textcolor{keyword}{const}\ std::shared\_ptr<const\ char>\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ \textcolor{keywordtype}{size\_t}\ offset\ )}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00177}00177\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00178}00178\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1buffered__ostream_a97aa6bcd47b0506a080779840fffd493}{writesome}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}.get()\ +\ offset,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}});}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00179}00179\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00180}00180\ }
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00181}\mbox{\hyperlink{classfc_1_1buffered__ostream_a2701105d24596d7990e73ec940b134ab}{00181}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \ \mbox{\hyperlink{classfc_1_1buffered__ostream_a2701105d24596d7990e73ec940b134ab}{buffered\_ostream::flush}}()}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00182}00182\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00183}00183\ \textcolor{preprocessor}{\#ifndef\ NDEBUG}}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00184}00184\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ This\ code\ was\ written\ with\ the\ assumption\ that\ you'd\ only\ be\ making\ one\ call\ to\ flush\ }}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00185}00185\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ at\ a\ time\ so\ it\ reuses\ \_shared\_write\_buffer.\ \ If\ you\ really\ need\ to\ make\ concurrent\ calls\ to\ }}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00186}00186\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ flush(),\ you'll\ need\ to\ prevent\ reusing\ \_shared\_write\_buffer\ here}}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00187}00187\ \ \ \ \ \ \ \ \ \textcolor{keyword}{struct\ }check\_buffer\_in\_use\ \{}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00188}00188\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\&\ \_buffer\_in\_use;}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00189}00189\ \ \ \ \ \ \ \ \ \ \ check\_buffer\_in\_use(\textcolor{keywordtype}{bool}\&\ buffer\_in\_use)\ :\ \_buffer\_in\_use(buffer\_in\_use)\ \{\ assert(!\_buffer\_in\_use);\ \_buffer\_in\_use\ =\ \textcolor{keyword}{true};\ \}}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00190}00190\ \ \ \ \ \ \ \ \ \ \ \string~check\_buffer\_in\_use()\ \{\ assert(\_buffer\_in\_use);\ \_buffer\_in\_use\ =\ \textcolor{keyword}{false};\ \}}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00191}00191\ \ \ \ \ \ \ \ \ \}\ buffer\_in\_use\_checker(my-\/>\_shared\_write\_buffer\_in\_use);}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00192}00192\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00193}00193\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ write\_buffer\_size\ =\ 2048;}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00194}00194\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!my-\/>\_shared\_write\_buffer)}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00195}00195\ \ \ \ \ \ \ \ \ \ \ my-\/>\_shared\_write\_buffer.reset(\textcolor{keyword}{new}\ \textcolor{keywordtype}{char}[write\_buffer\_size],\ [](\textcolor{keywordtype}{char}*\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})\{\ \textcolor{keyword}{delete}[]\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}};\ \});}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00196}00196\ }
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00197}00197\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\ \textcolor{keywordtype}{size\_t}\ bytes\_from\_rdbuf\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(my-\/>\_rdbuf.sgetn(my-\/>\_shared\_write\_buffer.get(),\ write\_buffer\_size))\ )}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00198}00198\ \ \ \ \ \ \ \ \ \ \ \ my-\/>\_ostr-\/>write(\ my-\/>\_shared\_write\_buffer,\ bytes\_from\_rdbuf\ );}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00199}00199\ \ \ \ \ \ \ \ \ my-\/>\_ostr-\/>flush();}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00200}00200\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00201}00201\ }
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00202}\mbox{\hyperlink{classfc_1_1buffered__ostream_a6eb86db89b1da6af7fd4cbe52c24a0ed}{00202}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \ \mbox{\hyperlink{classfc_1_1buffered__ostream_a6eb86db89b1da6af7fd4cbe52c24a0ed}{buffered\_ostream::close}}()}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00203}00203\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00204}00204\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1buffered__ostream_a2701105d24596d7990e73ec940b134ab}{flush}}();}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00205}00205\ \ \ \ \ \ \ \ \ my-\/>\_ostr-\/>close();}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00206}00206\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00207}00207\ }
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00208}00208\ }
+\DoxyCodeLine{\Hypertarget{buffered__iostream_8cpp_source_l00209}00209\ \}}
+
+\end{DoxyCode}

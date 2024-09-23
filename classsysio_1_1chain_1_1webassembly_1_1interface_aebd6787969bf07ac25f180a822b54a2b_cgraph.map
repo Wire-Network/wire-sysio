@@ -1,0 +1,11 @@
+<map id="sysio::chain::webassembly::interface::set_proposed_producers" name="sysio::chain::webassembly::interface::set_proposed_producers">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,18,185,74"/>
+<area shape="rect" id="Node000002" href="$programs_2sysio-launcher_2main_8cpp.html#a6d42fdcc89e90507ee6f095c8e92fa2b" title=" " alt="" coords="509,5,587,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="185,20,232,12,296,6,347,6,461,12,493,13,493,18,461,17,347,12,297,12,233,17,186,25"/>
+<area shape="rect" id="Node000003" href="$namespacesysio_1_1chain_1_1webassembly.html#a36703bea4b4322951a6be4a908f23299" title=" " alt="" coords="233,26,461,66"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="185,44,217,44,217,49,185,49"/>
+<area shape="rect" id="Node000004" href="$namespacefc_1_1raw.html#a0b442d98ceb22dd5a6ae84745e43ffab" title=" " alt="" coords="291,115,402,140"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="184,72,291,107,289,112,183,77"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="461,28,493,23,494,28,462,33"/>
+<area shape="poly" id="edge5_Node000004_Node000004" title=" " alt="" coords="313,116,307,106,311,96,324,90,347,88,372,91,384,98,382,102,370,96,347,93,326,95,314,100,312,105,317,113"/>
+</map>

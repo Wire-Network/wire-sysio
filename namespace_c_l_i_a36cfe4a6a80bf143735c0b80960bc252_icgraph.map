@@ -1,0 +1,9 @@
+<map id="CLI::retire_option" name="CLI::retire_option">
+<area shape="rect" id="Node000001" title="Helper function to mark an option as retired." alt="" coords="175,55,296,80"/>
+<area shape="rect" id="Node000002" href="$namespace_c_l_i.html#a77cd1a3639a91dea33a7d144ea476df6" title="Helper function to mark an option as retired." alt="" coords="5,5,127,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="173,52,112,34,114,29,175,47"/>
+<area shape="rect" id="Node000003" href="$namespace_c_l_i.html#a52390f850f663cf38a27e134c1a39b61" title="Helper function to mark an option as retired." alt="" coords="5,55,127,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="159,70,127,70,127,65,159,65"/>
+<area shape="rect" id="Node000004" href="$namespace_c_l_i.html#ad9ac23b01e2ef840ec123f5a115302ab" title="Helper function to mark an option as retired." alt="" coords="5,104,127,130"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="175,88,114,106,112,101,173,83"/>
+</map>

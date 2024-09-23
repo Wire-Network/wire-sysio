@@ -1,0 +1,308 @@
+\doxysection{test\+\_\+modular\+\_\+arithmetic.\+cpp}
+\hypertarget{test__modular__arithmetic_8cpp_source}{}\label{test__modular__arithmetic_8cpp_source}\index{libraries/fc/test/crypto/test\_modular\_arithmetic.cpp@{libraries/fc/test/crypto/test\_modular\_arithmetic.cpp}}
+\mbox{\hyperlink{test__modular__arithmetic_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00001}\mbox{\hyperlink{test__modular__arithmetic_8cpp_a6b2a3852db8bb19ab6909bac01859985}{00001}}\ \textcolor{preprocessor}{\#define\ BOOST\_TEST\_MODULE\ modular\_arithmetic}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <boost/test/included/unit\_test.hpp>}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{exception_8hpp}{fc/exception/exception.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{hex_8hpp}{fc/crypto/hex.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{modular__arithmetic_8hpp}{fc/crypto/modular\_arithmetic.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{utility_8hpp}{fc/utility.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ <chrono>}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <random>}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00011}00011\ \textcolor{preprocessor}{\#include\ <limits>}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00013}00013\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacefc}{fc}};}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00014}00014\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{test__utils_8hpp}{test\_utils.hpp}}"{}}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00016}00016\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacestd}{std}}\ \{}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00017}\mbox{\hyperlink{namespacestd_a26c08359ed9bed0577d855906d09f402}{00017}}\ std::ostream\&\ \mbox{\hyperlink{namespacestd_aa723876b3fe465de1898817742c90b93}{operator<<}}(std::ostream\&\ st,\ \textcolor{keyword}{const}\ std::variant<fc::modular\_arithmetic\_error,\ bytes>\&\ err)}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00018}00018\ \{}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00019}00019\ \ \ \ \ \textcolor{keywordflow}{if}(std::holds\_alternative<fc::modular\_arithmetic\_error>(err))}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00020}00020\ \ \ \ \ \ \ \ \ st\ <<\ static\_cast<int32\_t>(std::get<fc::modular\_arithmetic\_error>(err));}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00021}00021\ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00022}00022\ \ \ \ \ \ \ \ \ st\ <<\ fc::to\_hex(std::get<bytes>(err));}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00023}00023\ \ \ \ \ \textcolor{keywordflow}{return}\ st;}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00024}00024\ \}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00025}00025\ \}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00028}00028\ BOOST\_AUTO\_TEST\_SUITE(modular\_arithmetic)}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00030}\mbox{\hyperlink{test__modular__arithmetic_8cpp_aa5c16699529d520f104f2ac289f9e195}{00030}}\ \mbox{\hyperlink{test__modular__arithmetic_8cpp_aa5c16699529d520f104f2ac289f9e195}{BOOST\_AUTO\_TEST\_CASE}}(\mbox{\hyperlink{namespacefc_a281277066c9c4feee4ced185bc0a182d}{modexp}})\ \mbox{\hyperlink{hello__driver_8cpp_abe4cc9788f52e49485473dc699537388}{try}}\ \{}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00033}00033\ \ \ \ \ \textcolor{keyword}{using\ }modexp\_test\ =\ std::tuple<std::vector<string>,\ std::variant<fc::modular\_arithmetic\_error,\ bytes>>;}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00035}00035\ \ \ \ \ \textcolor{keyword}{const}\ std::vector<modexp\_test>\ tests\ \{}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00036}00036\ \ \ \ \ \ \ \ \ \textcolor{comment}{//test1}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00037}00037\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00038}00038\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00039}00039\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}03"{}},}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00040}00040\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}fffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2e"{}},}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00041}00041\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}fffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2f"{}},}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00042}00042\ \ \ \ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00043}00043\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{test__utils_8hpp_af42811e238a2a23276bd4200e2b40dde}{to\_bytes}}(\textcolor{stringliteral}{"{}0000000000000000000000000000000000000000000000000000000000000001"{}}),}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00044}00044\ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00046}00046\ \ \ \ \ \ \ \ \ \textcolor{comment}{//test2}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00047}00047\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}"{}},}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00050}00050\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}fffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2e"{}},}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00051}00051\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}fffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2f"{}},}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{test__utils_8hpp_af42811e238a2a23276bd4200e2b40dde}{to\_bytes}}(\textcolor{stringliteral}{"{}0000000000000000000000000000000000000000000000000000000000000000"{}})}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00054}00054\ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00056}00056\ \ \ \ \ \ \ \ \ \textcolor{comment}{//test3}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00057}00057\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00059}00059\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}01"{}},}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}fffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2e"{}},}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00061}00061\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}"{}},}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00062}00062\ \ \ \ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \ \ \ modular\_arithmetic\_error::modulus\_len\_zero}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00064}00064\ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00066}00066\ \ \ \ \ \ \ \ \ \textcolor{comment}{//test4}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00067}00067\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}01"{}},}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}fffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2e"{}},}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00071}00071\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}0000"{}},}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00073}00073\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{test__utils_8hpp_af42811e238a2a23276bd4200e2b40dde}{to\_bytes}}(\textcolor{stringliteral}{"{}0000"{}})}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00074}00074\ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00075}00075\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00076}00076\ \ \ \ \ \ \ \ \ \textcolor{comment}{//test5}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00077}00077\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00078}00078\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}00"{}},}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00080}00080\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}00"{}},}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00081}00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}0F"{}},}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00082}00082\ \ \ \ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00083}00083\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{test__utils_8hpp_af42811e238a2a23276bd4200e2b40dde}{to\_bytes}}(\textcolor{stringliteral}{"{}01"{}}),}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00084}00084\ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00085}00085\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00086}00086\ \ \ \ \ \ \ \ \ \textcolor{comment}{//test6}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00087}00087\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00088}00088\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00089}00089\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}00"{}},}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00090}00090\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}01"{}},}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00091}00091\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}0F"{}},}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00092}00092\ \ \ \ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00093}00093\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{test__utils_8hpp_af42811e238a2a23276bd4200e2b40dde}{to\_bytes}}(\textcolor{stringliteral}{"{}00"{}}),}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00094}00094\ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00095}00095\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00096}00096\ \ \ \ \ \ \ \ \ \textcolor{comment}{//test7}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00097}00097\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00098}00098\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00099}00099\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}01"{}},}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00100}00100\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}00"{}},}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00101}00101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}0F"{}},}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00102}00102\ \ \ \ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00103}00103\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{test__utils_8hpp_af42811e238a2a23276bd4200e2b40dde}{to\_bytes}}(\textcolor{stringliteral}{"{}01"{}}),}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00104}00104\ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00105}00105\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00106}00106\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00107}00107\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00108}00108\ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ test\ :\ tests)\ \{}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00109}00109\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ parts\ \ \ \ \ \ \ \ \ \ \ =\ std::get<0>(test);}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00110}00110\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{ssh_8c_a2cd19dc464a5cf91cd7c2e717b9dffd7}{expected\_result}}\ =\ std::get<1>(test);}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00111}00111\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00112}00112\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ base\ =\ \mbox{\hyperlink{test__utils_8hpp_af42811e238a2a23276bd4200e2b40dde}{to\_bytes}}(parts[0]);}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00113}00113\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ exponent\ =\ \mbox{\hyperlink{test__utils_8hpp_af42811e238a2a23276bd4200e2b40dde}{to\_bytes}}(parts[1]);}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00114}00114\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ modulus\ =\ \mbox{\hyperlink{test__utils_8hpp_af42811e238a2a23276bd4200e2b40dde}{to\_bytes}}(parts[2]);}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00115}00115\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00116}00116\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ res\ =\ \mbox{\hyperlink{namespacefc_a281277066c9c4feee4ced185bc0a182d}{fc::modexp}}(base,\ exponent,\ modulus);}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00117}00117\ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(res,\ \mbox{\hyperlink{ssh_8c_a2cd19dc464a5cf91cd7c2e717b9dffd7}{expected\_result}});}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00118}00118\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00119}00119\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00120}\mbox{\hyperlink{test__modular__arithmetic_8cpp_ae70bfa24f5a3bc0917382b3c17fc033c}{00120}}\ \}\ \mbox{\hyperlink{test__modular__arithmetic_8cpp_ae70bfa24f5a3bc0917382b3c17fc033c}{FC\_LOG\_AND\_RETHROW}}();}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00121}00121\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00122}\mbox{\hyperlink{test__modular__arithmetic_8cpp_a9d9c1c14a7021503b2a196771c4d4615}{00122}}\ \mbox{\hyperlink{test__modular__arithmetic_8cpp_aa5c16699529d520f104f2ac289f9e195}{BOOST\_AUTO\_TEST\_CASE}}(modexp\_benchmarking)\ \textcolor{keyword}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00123}00123\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00124}00124\ \ \ \ \ std::mt19937\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}(0x11223344);}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00125}00125\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00126}00126\ \ \ \ \ \textcolor{keyword}{auto}\ generate\_random\_bytes\ =\ [](std::mt19937\&\ rand\_eng,\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ num\_bytes)\ \{}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00127}00127\ \ \ \ \ \ \ \ \ std::vector<char>\ result(num\_bytes);}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00128}00128\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00129}00129\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a8f075c759c74e109e8184306c663809d}{uint\_fast32\_t}}\ v\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00130}00130\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int}\ byte\_pos\ =\ 0,\ end\ =\ result.size();\ byte\_pos\ <\ end;\ ++byte\_pos)\ \{}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00131}00131\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((byte\_pos\ \&\ 0x03)\ ==\ 0)\ \{\ \textcolor{comment}{//\ if\ divisible\ by\ 4}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00132}00132\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ v\ =\ rand\_eng();}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00133}00133\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00134}00134\ \ \ \ \ \ \ \ \ \ \ \ \ result[byte\_pos]\ =\ v\ \&\ 0xFF;}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00135}00135\ \ \ \ \ \ \ \ \ \ \ \ \ v\ >>=\ 8;}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00136}00136\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00137}00137\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00138}00138\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00139}00139\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00140}00140\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00141}00141\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ num\_trials\ =\ 10;\ \textcolor{comment}{//\ 10000}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00142}00142\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00143}00143\ \ \ \ \ \textcolor{keyword}{static\_assert}(num\_trials\ >\ 0);}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00144}00144\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00145}00145\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ bit\_calc\_limit\ =\ 101;\ \textcolor{comment}{//\ 120}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00146}00146\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00147}00147\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ start\_num\_bytes\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00148}00148\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ end\_num\_bytes\ \ \ =\ 1\ <<\ ((bit\_calc\_limit\ +\ 7)/8);}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00149}00149\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00150}00150\ \ \ \ \ \textcolor{keyword}{static\_assert}(start\_num\_bytes\ <=\ end\_num\_bytes);}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00151}00151\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00152}00152\ \ \ \ \ \textcolor{keyword}{struct\ }statistics\ \{}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00153}00153\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ modulus\_bit\_size;\ \ \textcolor{comment}{//\ bit\ size\ of\ modulus\ and\ base}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00154}00154\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ exponent\_bit\_size;\ \textcolor{comment}{//\ bit\ size\ of\ exponent}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00155}00155\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ \ \ \ \ \ min\_time\_ns;}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00156}00156\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ \ \ \ \ \ max\_time\_ns;}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00157}00157\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ \ \ \ \ \ avg\_time\_ns;}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00158}00158\ \ \ \ \ \};\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00159}00159\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00160}00160\ \ \ \ \ std::vector<statistics>\ stats;}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00161}00161\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00162}00162\ \ \ \ \ \textcolor{keyword}{auto}\ ceil\_log2\ =\ [](\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ n)\ -\/>\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \{}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00163}00163\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (n\ <=\ 1)\ \{}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00164}00164\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00165}00165\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00166}00166\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 32\ -\/\ \_\_builtin\_clz(n\ -\/\ 1);}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00167}00167\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00168}00168\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00169}00169\ \ \ \ \ BOOST\_CHECK(ceil\_log2(0)\ ==\ 0);}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00170}00170\ \ \ \ \ BOOST\_CHECK(ceil\_log2(1)\ ==\ 0);}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00171}00171\ \ \ \ \ BOOST\_CHECK(ceil\_log2(2)\ ==\ 1);}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00172}00172\ \ \ \ \ BOOST\_CHECK(ceil\_log2(3)\ ==\ 2);}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00173}00173\ \ \ \ \ BOOST\_CHECK(ceil\_log2(4)\ ==\ 2);}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00174}00174\ \ \ \ \ BOOST\_CHECK(ceil\_log2(5)\ ==\ 3);}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00175}00175\ \ \ \ \ BOOST\_CHECK(ceil\_log2(15)\ ==\ 4);}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00176}00176\ \ \ \ \ BOOST\_CHECK(ceil\_log2(16)\ ==\ 4);}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00177}00177\ \ \ \ \ BOOST\_CHECK(ceil\_log2(17)\ ==\ 5);}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00178}00178\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00179}00179\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ n\ =\ start\_num\_bytes;\ n\ <=\ end\_num\_bytes;\ n\ *=\ 2)\ \{}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00180}00180\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ bit\_calc\ =\ 8\ *\ ceil\_log2(n);}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00181}00181\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ exponent\_num\_bytes\ =\ 1;\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00182}00182\ \ \ \ \ \ \ \ \ \ \ \ \ \ exponent\_num\_bytes\ <=\ 2*n\ \&\&\ bit\_calc\ <=\ bit\_calc\_limit;\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00183}00183\ \ \ \ \ \ \ \ \ \ \ \ \ \ exponent\_num\_bytes\ *=\ 2,\ bit\_calc\ +=\ 5)\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00184}00184\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00185}00185\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ min\_duration\_ns\ =\ std::numeric\_limits<int64\_t>::max();}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00186}00186\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ max\_duration\_ns\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00187}00187\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ total\_duration\_ns\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00188}00188\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00189}00189\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ trial\ =\ 0;\ trial\ <\ num\_trials;\ ++trial)\ \{}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00190}00190\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ base\ \ \ \ \ =\ generate\_random\_bytes(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ n);}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00191}00191\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ exponent\ =\ generate\_random\_bytes(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ exponent\_num\_bytes);}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00192}00192\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ modulus\ \ =\ generate\_random\_bytes(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ n);}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00193}00193\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00194}00194\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ start\_time\ =\ std::chrono::steady\_clock::now();}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00195}00195\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00196}00196\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ res\ =\ \mbox{\hyperlink{namespacefc_a281277066c9c4feee4ced185bc0a182d}{fc::modexp}}(base,\ exponent,\ modulus);}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00197}00197\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00198}00198\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ end\_time\ =\ std::chrono::steady\_clock::now();}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00199}00199\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00200}00200\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ duration\_ns\ =\ std::chrono::duration\_cast<std::chrono::nanoseconds>(end\_time\ -\/\ start\_time).count();}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00201}00201\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00202}00202\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//ilog("{}(\$\{base\})\string^(\$\{exp\})\ \%\ \$\{mod\}\ =\ \$\{result\}\ [took\ \$\{duration\}\ ns]"{},\ }}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00203}00203\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ \ \ \ \ ("{}base"{},\ base)("{}exp"{},\ exponent)("{}mod"{},\ modulus)("{}result"{},\ std::get<bytes>(res))("{}duration"{},\ duration\_ns)}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00204}00204\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ \ \ \ );}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00205}00205\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00206}00206\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ min\_duration\_ns\ =\ std::min(min\_duration\_ns,\ duration\_ns);}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00207}00207\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ max\_duration\_ns\ =\ std::max(max\_duration\_ns,\ duration\_ns);}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00208}00208\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ total\_duration\_ns\ +=\ duration\_ns;}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00209}00209\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00210}00210\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00211}00211\ \ \ \ \ \ \ \ \ \ \ \ \ stats.push\_back(statistics\{}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00212}00212\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .modulus\_bit\_size\ \ =\ n\ *\ 8,}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00213}00213\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .exponent\_bit\_size\ =\ exponent\_num\_bytes\ *\ 8,\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00214}00214\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .min\_time\_ns\ \ \ \ \ \ \ =\ min\_duration\_ns,}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00215}00215\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .max\_time\_ns\ \ \ \ \ \ \ =\ max\_duration\_ns,}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00216}00216\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .avg\_time\_ns\ \ \ \ \ \ \ =\ (total\_duration\_ns\ /\ num\_trials),}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00217}00217\ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00218}00218\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00219}00219\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ stat\ =\ stats.back();}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00220}00220\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00221}00221\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\textcolor{stringliteral}{"{}Completed\ random\ runs\ of\ mod\_exp\ with\ \$\{bit\_width\}-\/bit\ width\ base\ and\ modulus\ values\ and\ "{}}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00222}00222\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\$\{exp\_bit\_width\}-\/bit\ width\ exponent\ values.\ "{}}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00223}00223\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Min\ time:\ \$\{min\}\ ns;\ Average\ time:\ \$\{avg\}\ ns;\ Max\ time:\ \$\{max\}\ ns."{}},}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00224}00224\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}bit\_width"{}},\ stat.modulus\_bit\_size)(\textcolor{stringliteral}{"{}exp\_bit\_width"{}},\ stat.exponent\_bit\_size)}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00225}00225\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}min"{}},\ stat.min\_time\_ns)(\textcolor{stringliteral}{"{}avg"{}},\ stat.avg\_time\_ns)(\textcolor{stringliteral}{"{}max"{}},\ stat.max\_time\_ns)}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00226}00226\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00227}00227\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00228}00228\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00229}00229\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00230}00230\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00231}00231\ \ \ \ \ std::string\ stats\_output\ =\ \textcolor{stringliteral}{"{}Table\ (in\ csv\ format)\ summarizing\ statistics\ from\ runs:\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00232}00232\ \ \ \ \ stats\_output\ +=\ \textcolor{stringliteral}{"{}Modulus/Base\ Bit\ Size,Exponent\ Bit\ Size,Average\ Time\ (ns)\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00233}00233\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ stat\ :\ stats)\ \{}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00234}00234\ \ \ \ \ \ \ \ \ stats\_output\ +=\ std::to\_string(stat.modulus\_bit\_size);}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00235}00235\ \ \ \ \ \ \ \ \ stats\_output\ +=\ \textcolor{charliteral}{','};}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00236}00236\ \ \ \ \ \ \ \ \ stats\_output\ +=\ std::to\_string(stat.exponent\_bit\_size);}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00237}00237\ \ \ \ \ \ \ \ \ stats\_output\ +=\ \textcolor{charliteral}{','};}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00238}00238\ \ \ \ \ \ \ \ \ stats\_output\ +=\ std::to\_string(stat.avg\_time\_ns);}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00239}00239\ \ \ \ \ \ \ \ \ stats\_output\ +=\ \textcolor{charliteral}{'\(\backslash\)n'};}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00240}00240\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00241}00241\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00242}00242\ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(stats\_output);}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00243}00243\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00244}00244\ \ \ \ \ \textcolor{comment}{//\ Running\ the\ above\ benchmark\ (using\ commented\ values\ for\ num\_trials\ and\ bit\_calc\_limit)\ with\ a\ release\ build\ on\ }}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00245}00245\ \ \ \ \ \textcolor{comment}{//\ an\ AMD\ 3.4\ GHz\ CPU\ provides\ average\ durations\ for\ executing\ mod\_exp\ for\ varying\ bit\ sizes\ for\ the\ values\ }}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00246}00246\ \ \ \ \ \textcolor{comment}{//\ (but\ with\ base\ and\ modulus\ bit\ sizes\ kept\ equal\ to\ one\ another).}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00247}00247\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00248}00248\ \ \ \ \ \textcolor{comment}{//\ Holding\ the\ base/modulus\ bit\ size\ constant\ and\ increasing\ the\ exponent\ bit\ size\ shows\ a\ linear\ relationship\ with\ increasing\ bit}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00249}00249\ \ \ \ \ \textcolor{comment}{//\ size\ on\ the\ average\ time\ to\ execute\ the\ modular\ exponentiation.\ The\ slope\ of\ the\ best\ fit\ line\ to\ the\ empirical\ data\ appears}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00250}00250\ \ \ \ \ \textcolor{comment}{//\ to\ scale\ super-\/linearly\ with\ base/modulus\ size.\ A\ quadratic\ (degree\ 2)\ fit\ works\ okay,\ but\ it\ appears\ that\ a\ better\ fit\ is\ to}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00251}00251\ \ \ \ \ \textcolor{comment}{//\ model\ the\ slope\ of\ the\ linear\ relationship\ between\ average\ time\ and\ exponent\ bit\ size\ as\ a\ the\ base/modulus\ bit\ size\ taken\ to}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00252}00252\ \ \ \ \ \textcolor{comment}{//\ the\ 1.6\ power\ and\ then\ scaled\ by\ some\ constant.}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00253}00253\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00254}00254\ \ \ \ \ \textcolor{comment}{//\ Holding\ the\ exponent\ bit\ size\ constant\ and\ increasing\ the\ base/modulus\ bit\ size\ shows\ a\ super-\/linear\ relationship\ with}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00255}00255\ \ \ \ \ \textcolor{comment}{//\ increasing\ bit\ size\ on\ the\ average\ time\ to\ execute\ the\ modular\ exponentiation.\ A\ quadratic\ relationship\ works\ pretty\ well}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00256}00256\ \ \ \ \ \textcolor{comment}{//\ but\ perhaps\ a\ fractional\ exponent\ between\ 1\ and\ 2\ (e.g.\ 1.6)\ would\ work\ well\ as\ well.}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00257}00257\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00258}00258\ \ \ \ \ \textcolor{comment}{//\ What\ is\ particularly\ revealing\ is\ plotting\ the\ average\ time\ with\ respect\ to\ some\ combination\ of\ the\ bit\ sizes\ of\ base/modulus\ and}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00259}00259\ \ \ \ \ \textcolor{comment}{//\ exponent.\ If\ the\ independent\ variable\ is\ the\ product\ of\ the\ exponent\ bit\ size\ and\ the\ base/modulus\ bit\ size,\ the\ correlation\ is}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00260}00260\ \ \ \ \ \textcolor{comment}{//\ not\ great.\ Even\ if\ the\ independent\ variable\ is\ the\ product\ of\ the\ exponent\ bit\ size\ and\ the\ base/modulus\ bit\ size\ taken\ to\ some\ power,}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00261}00261\ \ \ \ \ \textcolor{comment}{//\ the\ correlation\ is\ still\ not\ great.}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00262}00262\ \ \ \ \ \textcolor{comment}{//\ It\ seems\ that\ trying\ to\ capture\ all\ the\ data\ using\ a\ model\ like\ that\ breaks\ down\ when\ the\ exponent\ bit\ size\ is\ greater\ than\ the}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00263}00263\ \ \ \ \ \textcolor{comment}{//\ base/modulus\ bit\ size.}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00264}00264\ \ \ \ \ \textcolor{comment}{//\ If\ we\ filter\ out\ all\ the\ data\ points\ where\ the\ exponent\ bit\ size\ is\ greater\ than\ the\ base/modulus\ bit\ size,\ and\ then\ choose\ as}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00265}00265\ \ \ \ \ \textcolor{comment}{//\ then\ independent\ variable\ the\ product\ of\ the\ exponent\ bit\ size\ and\ the\ base/modulus\ bit\ size\ taken\ to\ some\ power,\ then\ we\ get}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00266}00266\ \ \ \ \ \textcolor{comment}{//\ a\ pretty\ good\ linear\ correlation\ when\ a\ power\ of\ 1.6\ is\ chosen.}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00267}00267\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00268}00268\ \ \ \ \ \textcolor{comment}{//\ TODO:\ See\ if\ theoretical\ analysis\ of\ the\ modular\ exponentiation\ algorithm\ also\ justifies\ these\ scaling\ properties.}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00269}00269\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00270}00270\ \ \ \ \ \textcolor{comment}{//\ Example\ results\ for\ average\ time:}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00271}00271\ \ \ \ \ \textcolor{comment}{//\ |\ Modulus/Base\ Bit\ Size\ |\ Exponent\ Bit\ Size\ |\ Average\ Time\ (ns)\ |}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00272}00272\ \ \ \ \ \textcolor{comment}{//\ |\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\ |\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\ |\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\ |}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00273}00273\ \ \ \ \ \textcolor{comment}{//\ |\ 2048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ 32\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ \ \ \ \ \ \ \ \ \ \ \ \ 33826\ |}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00274}00274\ \ \ \ \ \textcolor{comment}{//\ |\ 2048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ 256\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ \ \ \ \ \ \ \ \ \ \ \ 250067\ |}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00275}00275\ \ \ \ \ \textcolor{comment}{//\ |\ 2048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ 2048\ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ \ \ \ \ \ \ \ \ \ \ 1891095\ |}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00276}00276\ \ \ \ \ \textcolor{comment}{//\ |\ 4096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ 32\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ \ \ \ \ \ \ \ \ \ \ \ 129181\ |}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00277}00277\ \ \ \ \ \textcolor{comment}{//\ |\ 4096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ 256\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ \ \ \ \ \ \ \ \ \ \ \ 954024\ |}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00278}00278\ \ \ \ \ \textcolor{comment}{//\ |\ 4096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ 2048\ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ \ \ \ \ \ \ \ \ \ \ 7205115\ |}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00279}00279\ \ \ \ \ \textcolor{comment}{//\ |\ 8192\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ 32\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ \ \ \ \ \ \ \ \ \ \ \ 347938\ |}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00280}00280\ \ \ \ \ \textcolor{comment}{//\ |\ 8192\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ 256\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ \ \ \ \ \ \ \ \ \ \ 2503652\ |}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00281}00281\ \ \ \ \ \textcolor{comment}{//\ |\ 8192\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ 2048\ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ \ \ \ \ \ \ \ \ \ 19199775\ |}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00282}00282\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00283}00283\ \ \ \ \ \textcolor{comment}{//\ The\ empirical\ results\ show\ that\ the\ average\ time\ stays\ well\ below\ 5\ ms\ if\ the\ exponent\ bit\ size\ does\ not\ exceed\ the}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00284}00284\ \ \ \ \ \textcolor{comment}{//\ modulus/base\ bit\ size\ and\ the\ product\ of\ the\ exponent\ bit\ size\ and\ the\ }}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00285}00285\ \ \ \ \ \textcolor{comment}{//\ (modulus/base\ bit\ size)\string^1.6\ does\ not\ exceed\ 550,000,000.}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00286}00286\ \ \ \ \ \textcolor{comment}{//\ Another\ way\ of\ satisfying\ that\ constraint\ is\ to\ require\ that\ the\ 5*ceil(log2(exponent\ bit\ size))\ +\ 8*ceil(log2(modulus\ bit\ size))\ }}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00287}00287\ \ \ \ \ \textcolor{comment}{//\ be\ less\ than\ or\ equal\ to\ 5*floor(log2(500000000))\ =\ 145.}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00288}00288\ \ \ \ \ \textcolor{comment}{//\ Or\ equivalently,\ assuming\ the\ bit\ sizes\ are\ multiples\ of\ 8:}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00289}00289\ \ \ \ \ \textcolor{comment}{//\ 5*ceil(log2(exponent\ bit\ size/8))\ +\ 8*ceil(log2(modulus\ bit\ size/8))\ <=\ 106.}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00290}00290\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00291}00291\ \ \ \ \ \textcolor{comment}{//\ Take,\ as\ an\ example,\ a\ 8192-\/bit\ modulus/base\ and\ a\ 128-\/bit\ exponent\ (which\ on\ average\ took\ 1.29\ ms).}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00292}00292\ \ \ \ \ \textcolor{comment}{//\ 5*ceil(log2(128))\ +\ 8*ceil(log2(8192))\ =\ 5*7\ +\ 8*13\ =\ 139\ which\ is\ less\ than\ the\ limit\ of\ 145.}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00293}00293\ \ \ \ \ \textcolor{comment}{//\ }}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00294}00294\ \ \ \ \ \textcolor{comment}{//\ Or,\ as\ an\ other\ example,\ a\ 2048-\/bit\ modulus/base\ and\ a\ 2048-\/bit\ exponent\ (which\ on\ average\ took\ 1.89\ ms).}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00295}00295\ \ \ \ \ \textcolor{comment}{//\ 5*ceil(log2(2048))\ +\ 8*ceil(log2(2048))\ =\ 5*11\ +\ 8*11\ =\ 143\ which\ is\ less\ than\ the\ limit\ of\ 145.}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00296}00296\ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00297}00297\ \ \ \ \ \textcolor{comment}{//\ On\ the\ other\ hand,\ consider\ a\ 4096-\/bit\ modulus/base\ and\ a\ 1024-\/bit\ exponent\ (which\ on\ average\ took\ 3.69\ ms).}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00298}00298\ \ \ \ \ \textcolor{comment}{//\ 5*ceil(log2(1024))\ +\ 8*ceil(log2(4096))\ =\ 5*10\ +\ 8*12\ =\ 146\ which\ is\ greater\ than\ the\ limit\ of\ 145.}}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00299}00299\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00300}00300\ \}\ \mbox{\hyperlink{test__modular__arithmetic_8cpp_ae70bfa24f5a3bc0917382b3c17fc033c}{FC\_LOG\_AND\_RETHROW}}();}
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00301}00301\ }
+\DoxyCodeLine{\Hypertarget{test__modular__arithmetic_8cpp_source_l00302}00302\ BOOST\_AUTO\_TEST\_SUITE\_END()}
+
+\end{DoxyCode}

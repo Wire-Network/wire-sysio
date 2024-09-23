@@ -1,0 +1,77 @@
+\doxysection{libraries/chain/include/sysio/chain/wasm\+\_\+sysio\+\_\+validation.hpp File Reference}
+\hypertarget{wasm__sysio__validation_8hpp}{}\label{wasm__sysio__validation_8hpp}\index{libraries/chain/include/sysio/chain/wasm\_sysio\_validation.hpp@{libraries/chain/include/sysio/chain/wasm\_sysio\_validation.hpp}}
+{\ttfamily \#include $<$fc/exception/exception.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/exceptions.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/controller.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/wasm\+\_\+sysio\+\_\+binary\+\_\+ops.\+hpp$>$}\newline
+{\ttfamily \#include $<$functional$>$}\newline
+{\ttfamily \#include $<$vector$>$}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include "{}IR/\+Module.\+h"{}}\newline
+{\ttfamily \#include "{}IR/\+Operators.\+h"{}}\newline
+{\ttfamily \#include "{}WASM/\+WASM.\+h"{}}\newline
+Include dependency graph for wasm\+\_\+sysio\+\_\+validation.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{wasm__sysio__validation_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=314pt]{wasm__sysio__validation_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__validations_1_1noop__validation__visitor}{sysio\+::chain\+::wasm\+\_\+validations\+::noop\+\_\+validation\+\_\+visitor}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__validations_1_1memories__validation__visitor}{sysio\+::chain\+::wasm\+\_\+validations\+::memories\+\_\+validation\+\_\+visitor}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__validations_1_1data__segments__validation__visitor}{sysio\+::chain\+::wasm\+\_\+validations\+::data\+\_\+segments\+\_\+validation\+\_\+visitor}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__validations_1_1tables__validation__visitor}{sysio\+::chain\+::wasm\+\_\+validations\+::tables\+\_\+validation\+\_\+visitor}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__validations_1_1globals__validation__visitor}{sysio\+::chain\+::wasm\+\_\+validations\+::globals\+\_\+validation\+\_\+visitor}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__validations_1_1maximum__function__stack__visitor}{sysio\+::chain\+::wasm\+\_\+validations\+::maximum\+\_\+function\+\_\+stack\+\_\+visitor}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__validations_1_1ensure__apply__exported__visitor}{sysio\+::chain\+::wasm\+\_\+validations\+::ensure\+\_\+apply\+\_\+exported\+\_\+visitor}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__validations_1_1no__constraints__validators}{sysio\+::chain\+::wasm\+\_\+validations\+::no\+\_\+constraints\+\_\+validators}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__validations_1_1whitelist__validator}{sysio\+::chain\+::wasm\+\_\+validations\+::whitelist\+\_\+validator}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__validations_1_1large__offset__validator}{sysio\+::chain\+::wasm\+\_\+validations\+::large\+\_\+offset\+\_\+validator$<$ T $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__validations_1_1debug__printer}{sysio\+::chain\+::wasm\+\_\+validations\+::debug\+\_\+printer}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__validations_1_1wasm__opcode__no__disposition__exception}{sysio\+::chain\+::wasm\+\_\+validations\+::wasm\+\_\+opcode\+\_\+no\+\_\+disposition\+\_\+exception}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__validations_1_1blacklist__validator}{sysio\+::chain\+::wasm\+\_\+validations\+::blacklist\+\_\+validator}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__validations_1_1nested__validator}{sysio\+::chain\+::wasm\+\_\+validations\+::nested\+\_\+validator}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__validations_1_1op__constrainers}{sysio\+::chain\+::wasm\+\_\+validations\+::op\+\_\+constrainers}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__validations_1_1constraints__validators}{sysio\+::chain\+::wasm\+\_\+validations\+::constraints\+\_\+validators$<$ Visitors $>$}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1chain_1_1wasm__validations_1_1wasm__binary__validation}{sysio\+::chain\+::wasm\+\_\+validations\+::wasm\+\_\+binary\+\_\+validation}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain}{sysio\+::chain}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__validations}{sysio\+::chain\+::wasm\+\_\+validations}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__validations_ac1f7edd66e5f6677d90f1792320b965b}{sysio\+::chain\+::wasm\+\_\+validations\+::wasm\+\_\+validate\+\_\+func}} = std\+::function$<$void(\mbox{\hyperlink{struct_i_r_1_1_module}{IR\+::\+Module}}\&)$>$
+\end{DoxyCompactItemize}

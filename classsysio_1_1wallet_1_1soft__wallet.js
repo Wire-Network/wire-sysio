@@ -1,0 +1,26 @@
+var classsysio_1_1wallet_1_1soft__wallet =
+[
+    [ "soft_wallet", "classsysio_1_1wallet_1_1soft__wallet.html#a3b8322d9b15fdf2f73c2cf57304d6944", null ],
+    [ "~soft_wallet", "classsysio_1_1wallet_1_1soft__wallet.html#a7aa89c34c2c036415f4ba8ba88357ecf", null ],
+    [ "check_password", "classsysio_1_1wallet_1_1soft__wallet.html#a3ff3985b2c647656b60b68c15e1c1f46", null ],
+    [ "copy_wallet_file", "classsysio_1_1wallet_1_1soft__wallet.html#ab7abac2db02de371a197c0b220579861", null ],
+    [ "create_key", "classsysio_1_1wallet_1_1soft__wallet.html#a41306d0f8872a6688a35f37f1e7b6210", null ],
+    [ "encrypt_keys", "classsysio_1_1wallet_1_1soft__wallet.html#ae0daf585f72ac4bd8190a3fba22ef940", null ],
+    [ "get_private_key", "classsysio_1_1wallet_1_1soft__wallet.html#a210c46e3ff1ce16ee6c19f6fbb497781", null ],
+    [ "get_private_key_from_password", "classsysio_1_1wallet_1_1soft__wallet.html#a47688c85ab6bb72515e501d245017e0b", null ],
+    [ "get_wallet_filename", "classsysio_1_1wallet_1_1soft__wallet.html#a2920a796958fb2beb279d56fde615146", null ],
+    [ "import_key", "classsysio_1_1wallet_1_1soft__wallet.html#a9eabfe672a49da445a4873a0233920a7", null ],
+    [ "is_locked", "classsysio_1_1wallet_1_1soft__wallet.html#a0f1f6ec6056b8692d44054360d6b175a", null ],
+    [ "is_new", "classsysio_1_1wallet_1_1soft__wallet.html#a634d1018d794300f7784478e6a6619f8", null ],
+    [ "list_keys", "classsysio_1_1wallet_1_1soft__wallet.html#a1dae33892bc1f21ea028a5fdf008d71d", null ],
+    [ "list_public_keys", "classsysio_1_1wallet_1_1soft__wallet.html#a9bc82129f2f36979c9e8a56c3409dc49", null ],
+    [ "load_wallet_file", "classsysio_1_1wallet_1_1soft__wallet.html#a2a084a3f7db4ae508d945e095452feac", null ],
+    [ "lock", "classsysio_1_1wallet_1_1soft__wallet.html#a785790f5903fe246b806c56378cab721", null ],
+    [ "remove_key", "classsysio_1_1wallet_1_1soft__wallet.html#ae13b6057e9b411dd857cd958ae9c04bb", null ],
+    [ "save_wallet_file", "classsysio_1_1wallet_1_1soft__wallet.html#adc5e089096704e36ced45308c3506f4d", null ],
+    [ "set_password", "classsysio_1_1wallet_1_1soft__wallet.html#a7e4e271bd0a7ffd9693f0e3105455647", null ],
+    [ "set_wallet_filename", "classsysio_1_1wallet_1_1soft__wallet.html#a05ff22c01edba017ab0492bcec0d6aa7", null ],
+    [ "try_sign_digest", "classsysio_1_1wallet_1_1soft__wallet.html#acfa5640033a5036c71b890f8c330af89", null ],
+    [ "unlock", "classsysio_1_1wallet_1_1soft__wallet.html#a0ed449df8ef1f615fb6656778578fb17", null ],
+    [ "my", "classsysio_1_1wallet_1_1soft__wallet.html#a220c5ac347580fc83fe32f93bd537d8b", null ]
+];

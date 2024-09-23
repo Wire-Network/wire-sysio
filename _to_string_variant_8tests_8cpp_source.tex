@@ -1,0 +1,97 @@
+\doxysection{To\+String\+Variant.\+tests.\+cpp}
+\hypertarget{_to_string_variant_8tests_8cpp_source}{}\label{_to_string_variant_8tests_8cpp_source}\index{libraries/sys-\/vm/external/Catch2/projects/SelfTest/UsageTests/ToStringVariant.tests.cpp@{libraries/sys-\/vm/external/Catch2/projects/SelfTest/UsageTests/ToStringVariant.tests.cpp}}
+\mbox{\hyperlink{_to_string_variant_8tests_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00001}\mbox{\hyperlink{_to_string_variant_8tests_8cpp_ad6e7c518fcd8a36337cd4bd2f007f0e2}{00001}}\ \textcolor{preprocessor}{\#define\ CATCH\_CONFIG\_ENABLE\_VARIANT\_STRINGMAKER}}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ "{}catch.hpp"{}}}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#if\ defined(CATCH\_CONFIG\_CPP17\_VARIANT)}}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <variant>}}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00009}00009\ \textcolor{comment}{//\ We\ need\ 2\ types\ with\ non-\/trivial\ copies/moves}}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00010}00010\ \textcolor{keyword}{struct\ }MyType1\ \{}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00011}00011\ \ \ \ \ MyType1()\ =\ \textcolor{keywordflow}{default};}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00012}00012\ \ \ \ \ MyType1(MyType1\ \textcolor{keyword}{const}\&)\ \{\ \textcolor{keywordflow}{throw}\ 1;\ \}}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00013}00013\ \ \ \ \ MyType1\&\ operator=(MyType1\ \textcolor{keyword}{const}\&)\ \{\ \textcolor{keywordflow}{throw}\ 3;\ \}}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00014}00014\ \};}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00015}00015\ \textcolor{keyword}{struct\ }MyType2\ \{}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00016}00016\ \ \ \ \ MyType2()\ =\ \textcolor{keywordflow}{default};}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00017}00017\ \ \ \ \ MyType2(MyType2\ \textcolor{keyword}{const}\&)\ \{\ \textcolor{keywordflow}{throw}\ 2;\ \}}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00018}00018\ \ \ \ \ MyType2\&\ operator=(MyType2\ \textcolor{keyword}{const}\&)\ \{\ \textcolor{keywordflow}{throw}\ 4;\ \}}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00019}00019\ \};}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00021}00021\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\ \textcolor{stringliteral}{"{}variant<std::monostate>"{}},\ \textcolor{stringliteral}{"{}[toString][variant][approvals]"{}})}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00022}00022\ \{}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00023}00023\ \ \ \ \ \textcolor{keyword}{using\ }type\ =\ std::variant<std::monostate>;}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00024}00024\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ \textcolor{stringliteral}{"{}\{\ \}"{}}\ ==\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(type\{\})\ );}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00025}00025\ \ \ \ \ type\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ \{\};}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00026}00026\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ \textcolor{stringliteral}{"{}\{\ \}"{}}\ ==\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})\ );}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00027}00027\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ \textcolor{stringliteral}{"{}\{\ \}"{}}\ ==\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(std::get<0>(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}))\ );}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00028}00028\ \}}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00030}00030\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\ \textcolor{stringliteral}{"{}variant<int>"{}},\ \textcolor{stringliteral}{"{}[toString][variant][approvals]"{}})}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00031}00031\ \{}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00032}00032\ \ \ \ \ \textcolor{keyword}{using\ }type\ =\ std::variant<int>;}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00033}00033\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ \textcolor{stringliteral}{"{}0"{}}\ ==\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(type\{0\})\ );}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00034}00034\ \}}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00036}00036\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\ \textcolor{stringliteral}{"{}variant<float,\ int>"{}},\ \textcolor{stringliteral}{"{}[toString][variant][approvals]"{}})}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00037}00037\ \{}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00038}00038\ \ \ \ \ \textcolor{keyword}{using\ }type\ =\ std::variant<float,\ int>;}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00039}00039\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ \textcolor{stringliteral}{"{}0.5f"{}}\ ==\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(type\{0.5f\})\ );}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00040}00040\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ \textcolor{stringliteral}{"{}0"{}}\ ==\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(type\{0\})\ );}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00041}00041\ \}}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00043}00043\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\ \textcolor{stringliteral}{"{}variant\ -\/-\/\ valueless-\/by-\/exception"{}},\ \textcolor{stringliteral}{"{}[toString][variant][approvals]"{}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00044}00044\ \ \ \ \ \textcolor{keyword}{using\ }type\ =\ std::variant<MyType1,\ MyType2>;}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00046}00046\ \ \ \ \ type\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}};}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00047}00047\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ae24a059e3c28ff3eea69be48282f5f81}{REQUIRE\_THROWS\_AS}}(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}.emplace<MyType2>(MyType2\{\}),\ \textcolor{keywordtype}{int});}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00048}00048\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}.valueless\_by\_exception());}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00049}00049\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\textcolor{stringliteral}{"{}\{valueless\ variant\}"{}}\ ==\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}));}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00050}00050\ \}}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00052}00052\ }
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00053}00053\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\ \textcolor{stringliteral}{"{}variant<string,\ int>"{}},\ \textcolor{stringliteral}{"{}[toString][variant][approvals]"{}})}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00054}00054\ \{}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00055}00055\ \ \ \ \ \textcolor{keyword}{using\ }type\ =\ std::variant<std::string,\ int>;}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00056}00056\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ \textcolor{stringliteral}{"{}\(\backslash\)"{}foo\(\backslash\)"{}"{}}\ ==\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(type\{\textcolor{stringliteral}{"{}foo"{}}\})\ );}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00057}00057\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ \textcolor{stringliteral}{"{}0"{}}\ ==\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(type\{0\})\ );}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00058}00058\ \}}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00060}00060\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\ \textcolor{stringliteral}{"{}variant<variant<float,\ int>,\ string>"{}},\ \textcolor{stringliteral}{"{}[toString][variant][approvals]"{}})}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00061}00061\ \{}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00062}00062\ \ \ \ \ \textcolor{keyword}{using\ }inner\ =\ std::variant<MyType1,\ float,\ int>;}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00063}00063\ \ \ \ \ \textcolor{keyword}{using\ }type\ =\ std::variant<inner,\ std::string>;}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00064}00064\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ \textcolor{stringliteral}{"{}0.5f"{}}\ ==\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(type\{0.5f\})\ );}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00065}00065\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ \textcolor{stringliteral}{"{}0"{}}\ ==\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(type\{0\})\ );}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00066}00066\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ \textcolor{stringliteral}{"{}\(\backslash\)"{}foo\(\backslash\)"{}"{}}\ ==\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(type\{\textcolor{stringliteral}{"{}foo"{}}\})\ );}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00067}00067\ }
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00068}00068\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\textcolor{stringliteral}{"{}valueless\ nested\ variant"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00069}00069\ \ \ \ \ \ \ \ \ type\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ =\ inner\{0.5f\};}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00070}00070\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ std::holds\_alternative<inner>(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})\ );}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00071}00071\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ std::holds\_alternative<float>(std::get<inner>(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}))\ );}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00073}00073\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ae24a059e3c28ff3eea69be48282f5f81}{REQUIRE\_THROWS\_AS}}(\ std::get<0>(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}).emplace<MyType1>(MyType1\{\}),\ int\ );}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00074}00074\ }
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00075}00075\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ outer\ variant\ is\ still\ valid\ and\ contains\ inner}}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00076}00076\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ std::holds\_alternative<inner>(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})\ );}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00077}00077\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ inner\ variant\ is\ valueless}}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00078}00078\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ std::get<inner>(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}).valueless\_by\_exception()\ );}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00079}00079\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ \textcolor{stringliteral}{"{}\{valueless\ variant\}"{}}\ ==\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})\ );}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00080}00080\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00081}00081\ \}}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00083}00083\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\ \textcolor{stringliteral}{"{}variant<nullptr,int,const\ char\ *>"{}},\ \textcolor{stringliteral}{"{}[toString][variant][approvals]"{}}\ )}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00084}00084\ \{}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00085}00085\ \ \ \ \ \textcolor{keyword}{using\ }type\ =\ std::variant<std::nullptr\_t,int,const\ char\ *>;}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00086}00086\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ \textcolor{stringliteral}{"{}nullptr"{}}\ ==\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(type\{\textcolor{keyword}{nullptr}\})\ );}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00087}00087\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ \textcolor{stringliteral}{"{}42"{}}\ ==\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(type\{42\})\ );}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00088}00088\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ \textcolor{stringliteral}{"{}\(\backslash\)"{}Catch\ me\(\backslash\)"{}"{}}\ ==\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(type\{\textcolor{stringliteral}{"{}Catch\ me"{}}\})\ );}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00089}00089\ \}}
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00090}00090\ }
+\DoxyCodeLine{\Hypertarget{_to_string_variant_8tests_8cpp_source_l00091}00091\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ CATCH\_INTERNAL\_CONFIG\_CPP17\_VARIANT}}
+
+\end{DoxyCode}

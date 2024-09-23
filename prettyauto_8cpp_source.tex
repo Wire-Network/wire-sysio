@@ -1,0 +1,62 @@
+\doxysection{prettyauto.\+cpp}
+\hypertarget{prettyauto_8cpp_source}{}\label{prettyauto_8cpp_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/example/prettyauto/prettyauto.cpp@{libraries/fc/include/fc/crypto/webauthn\_json/example/prettyauto/prettyauto.cpp}}
+\mbox{\hyperlink{prettyauto_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{prettyauto_8cpp_source_l00001}00001\ \textcolor{comment}{//\ JSON\ pretty\ formatting\ example}}
+\DoxyCodeLine{\Hypertarget{prettyauto_8cpp_source_l00002}00002\ \textcolor{comment}{//\ This\ example\ can\ handle\ UTF-\/8/UTF-\/16LE/UTF-\/16BE/UTF-\/32LE/UTF-\/32BE.}}
+\DoxyCodeLine{\Hypertarget{prettyauto_8cpp_source_l00003}00003\ \textcolor{comment}{//\ The\ input\ firstly\ convert\ to\ UTF8,\ and\ then\ write\ to\ the\ original\ encoding\ with\ pretty\ formatting.}}
+\DoxyCodeLine{\Hypertarget{prettyauto_8cpp_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{prettyauto_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{reader_8h}{rapidjson/reader.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{prettyauto_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{prettywriter_8h}{rapidjson/prettywriter.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{prettyauto_8cpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{filereadstream_8h}{rapidjson/filereadstream.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{prettyauto_8cpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{filewritestream_8h}{rapidjson/filewritestream.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{prettyauto_8cpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{encodedstream_8h}{rapidjson/encodedstream.h}}"{}}\ \ \ \ \textcolor{comment}{//\ NEW}}
+\DoxyCodeLine{\Hypertarget{prettyauto_8cpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{en_8h}{rapidjson/error/en.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{prettyauto_8cpp_source_l00011}00011\ \textcolor{preprocessor}{\#ifdef\ \_WIN32}}
+\DoxyCodeLine{\Hypertarget{prettyauto_8cpp_source_l00012}00012\ \textcolor{preprocessor}{\#include\ <fcntl.h>}}
+\DoxyCodeLine{\Hypertarget{prettyauto_8cpp_source_l00013}00013\ \textcolor{preprocessor}{\#include\ <io.h>}}
+\DoxyCodeLine{\Hypertarget{prettyauto_8cpp_source_l00014}00014\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{prettyauto_8cpp_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{prettyauto_8cpp_source_l00016}00016\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacerapidjson}{rapidjson}};}
+\DoxyCodeLine{\Hypertarget{prettyauto_8cpp_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{prettyauto_8cpp_source_l00018}\mbox{\hyperlink{prettyauto_8cpp_a81ce304348a420752ee080480d2b3095}{00018}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}(\textcolor{keywordtype}{int},\ \textcolor{keywordtype}{char}*[])\ \{}
+\DoxyCodeLine{\Hypertarget{prettyauto_8cpp_source_l00019}00019\ \textcolor{preprocessor}{\#ifdef\ \_WIN32}}
+\DoxyCodeLine{\Hypertarget{prettyauto_8cpp_source_l00020}00020\ \ \ \ \ \textcolor{comment}{//\ Prevent\ Windows\ converting\ between\ CR+LF\ and\ LF}}
+\DoxyCodeLine{\Hypertarget{prettyauto_8cpp_source_l00021}00021\ \ \ \ \ \_setmode(\_fileno(stdin),\ \_O\_BINARY);\ \ \ \ \textcolor{comment}{//\ NEW}}
+\DoxyCodeLine{\Hypertarget{prettyauto_8cpp_source_l00022}00022\ \ \ \ \ \_setmode(\_fileno(stdout),\ \_O\_BINARY);\ \ \ \textcolor{comment}{//\ NEW}}
+\DoxyCodeLine{\Hypertarget{prettyauto_8cpp_source_l00023}00023\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{prettyauto_8cpp_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{prettyauto_8cpp_source_l00025}00025\ \ \ \ \ \textcolor{comment}{//\ Prepare\ reader\ and\ input\ stream.}}
+\DoxyCodeLine{\Hypertarget{prettyauto_8cpp_source_l00026}00026\ \ \ \ \ \textcolor{comment}{//Reader\ reader;}}
+\DoxyCodeLine{\Hypertarget{prettyauto_8cpp_source_l00027}00027\ \ \ \ \ \mbox{\hyperlink{class_generic_reader}{GenericReader<AutoUTF<unsigned>}},\ \mbox{\hyperlink{struct_u_t_f8}{UTF8<>}}\ >\ reader;\ \ \ \ \ \ \ \textcolor{comment}{//\ CHANGED}}
+\DoxyCodeLine{\Hypertarget{prettyauto_8cpp_source_l00028}00028\ \ \ \ \ \textcolor{keywordtype}{char}\ readBuffer[65536];}
+\DoxyCodeLine{\Hypertarget{prettyauto_8cpp_source_l00029}00029\ \ \ \ \ \mbox{\hyperlink{class_file_read_stream}{FileReadStream}}\ is(stdin,\ readBuffer,\ \textcolor{keyword}{sizeof}(readBuffer));}
+\DoxyCodeLine{\Hypertarget{prettyauto_8cpp_source_l00030}00030\ \ \ \ \ \mbox{\hyperlink{class_auto_u_t_f_input_stream}{AutoUTFInputStream<unsigned,\ FileReadStream>}}\ eis(is);\ \ \ \textcolor{comment}{//\ NEW}}
+\DoxyCodeLine{\Hypertarget{prettyauto_8cpp_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{prettyauto_8cpp_source_l00032}00032\ \ \ \ \ \textcolor{comment}{//\ Prepare\ writer\ and\ output\ stream.}}
+\DoxyCodeLine{\Hypertarget{prettyauto_8cpp_source_l00033}00033\ \ \ \ \ \textcolor{keywordtype}{char}\ writeBuffer[65536];}
+\DoxyCodeLine{\Hypertarget{prettyauto_8cpp_source_l00034}00034\ \ \ \ \ \mbox{\hyperlink{class_file_write_stream}{FileWriteStream}}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}(stdout,\ writeBuffer,\ \textcolor{keyword}{sizeof}(writeBuffer));}
+\DoxyCodeLine{\Hypertarget{prettyauto_8cpp_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{prettyauto_8cpp_source_l00036}00036\ \textcolor{preprocessor}{\#if\ 1}}
+\DoxyCodeLine{\Hypertarget{prettyauto_8cpp_source_l00037}00037\ \ \ \ \ \textcolor{comment}{//\ Use\ the\ same\ Encoding\ of\ the\ input.\ Also\ use\ BOM\ according\ to\ input.}}
+\DoxyCodeLine{\Hypertarget{prettyauto_8cpp_source_l00038}00038\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{class_auto_u_t_f_output_stream}{AutoUTFOutputStream<unsigned,\ FileWriteStream>}}\ OutputStream;\ \ \ \ \textcolor{comment}{//\ NEW}}
+\DoxyCodeLine{\Hypertarget{prettyauto_8cpp_source_l00039}00039\ \ \ \ \ OutputStream\ eos(os,\ eis.\mbox{\hyperlink{class_auto_u_t_f_input_stream_ad8e8b71e852db11a841fbba40431c5d1}{GetType}}(),\ eis.\mbox{\hyperlink{class_auto_u_t_f_input_stream_a8831def623c28a3ec1d59b75abe5b20e}{HasBOM}}());\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ NEW}}
+\DoxyCodeLine{\Hypertarget{prettyauto_8cpp_source_l00040}00040\ \ \ \ \ \mbox{\hyperlink{class_pretty_writer}{PrettyWriter<OutputStream,\ UTF8<>}},\ \mbox{\hyperlink{struct_auto_u_t_f}{AutoUTF<unsigned>}}\ >\ writer(eos);\ \ \ \ \ \textcolor{comment}{//\ CHANGED}}
+\DoxyCodeLine{\Hypertarget{prettyauto_8cpp_source_l00041}00041\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{prettyauto_8cpp_source_l00042}00042\ \ \ \ \ \textcolor{comment}{//\ You\ may\ also\ use\ static\ bound\ encoding\ type,\ such\ as\ output\ to\ UTF-\/16LE\ with\ BOM}}
+\DoxyCodeLine{\Hypertarget{prettyauto_8cpp_source_l00043}00043\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{class_encoded_output_stream}{EncodedOutputStream<UTF16LE<>}},\mbox{\hyperlink{class_file_write_stream}{FileWriteStream}}>\ OutputStream;\ \ \ \ \textcolor{comment}{//\ NEW}}
+\DoxyCodeLine{\Hypertarget{prettyauto_8cpp_source_l00044}00044\ \ \ \ \ OutputStream\ eos(os,\ \textcolor{keyword}{true});\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ NEW}}
+\DoxyCodeLine{\Hypertarget{prettyauto_8cpp_source_l00045}00045\ \ \ \ \ \mbox{\hyperlink{class_pretty_writer}{PrettyWriter<OutputStream,\ UTF8<>}},\ \mbox{\hyperlink{struct_u_t_f16_l_e}{UTF16LE<>}}\ >\ writer(eos);\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ CHANGED}}
+\DoxyCodeLine{\Hypertarget{prettyauto_8cpp_source_l00046}00046\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{prettyauto_8cpp_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{prettyauto_8cpp_source_l00048}00048\ \ \ \ \ \textcolor{comment}{//\ JSON\ reader\ parse\ from\ the\ input\ stream\ and\ let\ writer\ generate\ the\ output.}}
+\DoxyCodeLine{\Hypertarget{prettyauto_8cpp_source_l00049}00049\ \ \ \ \ \textcolor{comment}{//if\ (!reader.Parse<kParseValidateEncodingFlag>(is,\ writer))\ \{}}
+\DoxyCodeLine{\Hypertarget{prettyauto_8cpp_source_l00050}00050\ \ \ \ \ \textcolor{keywordflow}{if}\ (!reader.\mbox{\hyperlink{class_generic_reader_a0c450620d14ff1824e58bb7bd9b42099}{Parse}}<\mbox{\hyperlink{reader_8h_ab7be7dabe6ffcba60fad441505583450a9b3baa16346575d2dc072b23a88e1928}{kParseValidateEncodingFlag}}>(eis,\ writer))\ \{\ \ \ \textcolor{comment}{//\ CHANGED}}
+\DoxyCodeLine{\Hypertarget{prettyauto_8cpp_source_l00051}00051\ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}\(\backslash\)nError(\%u):\ \%s\(\backslash\)n"{}},\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\textcolor{keyword}{>}(reader.\mbox{\hyperlink{class_generic_reader_ae9008523ccd06d839a57335835cb4091}{GetErrorOffset}}()),\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_ga28835eb93d2c3c07bbea13515eb31415}{GetParseError\_En}}(reader.\mbox{\hyperlink{class_generic_reader_a937bf90919f50e1c370b312cee5833e8}{GetParseErrorCode}}()));}
+\DoxyCodeLine{\Hypertarget{prettyauto_8cpp_source_l00052}00052\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{\Hypertarget{prettyauto_8cpp_source_l00053}00053\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{prettyauto_8cpp_source_l00054}00054\ }
+\DoxyCodeLine{\Hypertarget{prettyauto_8cpp_source_l00055}00055\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{prettyauto_8cpp_source_l00056}00056\ \}}
+
+\end{DoxyCode}

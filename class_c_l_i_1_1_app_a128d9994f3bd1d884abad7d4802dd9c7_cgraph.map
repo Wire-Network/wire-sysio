@@ -1,0 +1,11 @@
+<map id="CLI::App::add_set" name="CLI::App::add_set">
+<area shape="rect" id="Node000001" title="Add set of options (with default, static set, such as an inline set) DEPRECATED." alt="" coords="5,31,133,56"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_app.html#a8c812d42c7720ecb5cd0aec41b5aa941" title=" " alt="" coords="181,5,325,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="133,32,165,28,165,33,134,37"/>
+<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_option.html#ae94ff5bfc6549f9c86aff629be829353" title="Adds a Validator with a built in type name." alt="" coords="187,55,318,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="134,49,172,54,172,60,133,54"/>
+<area shape="rect" id="Node000004" href="$class_c_l_i_1_1_validator.html#a8fc0ddaaa61f5dc5a7fa527d697991da" title="Specify the type string." alt="" coords="373,25,513,51"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="318,55,357,49,358,54,319,60"/>
+<area shape="rect" id="Node000005" href="$class_c_l_i_1_1_validator.html#a356d979d984dffff3489caf4baca9160" title="Specify whether the Validator can be modifying or not." alt="" coords="378,75,508,116"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="319,74,364,81,363,86,318,80"/>
+</map>

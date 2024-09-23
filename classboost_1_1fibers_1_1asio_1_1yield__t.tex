@@ -1,0 +1,86 @@
+\doxysection{boost\+::fibers\+::asio\+::yield\+\_\+t Class Reference}
+\hypertarget{classboost_1_1fibers_1_1asio_1_1yield__t}{}\label{classboost_1_1fibers_1_1asio_1_1yield__t}\index{boost::fibers::asio::yield\_t@{boost::fibers::asio::yield\_t}}
+
+
+{\ttfamily \#include $<$yield.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1yield__t_a7e6087ec984afa58b77416ccb4d139bb}{yield\+\_\+t}} ()=default
+\item 
+\mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1yield__t}{yield\+\_\+t}} \mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1yield__t_ad4a1463b1c817b2d8ebe9658d09be002}{operator\mbox{[}$\,$\mbox{]}}} (boost\+::system\+::error\+\_\+code \&ec) const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+boost\+::system\+::error\+\_\+code \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1yield__t_a4908b45c6c123136bfbc1093ba963a0b}{ec\+\_\+}} \{ nullptr \}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{yield_8hpp_source_l00022}{22}} of file \mbox{\hyperlink{yield_8hpp_source}{yield.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classboost_1_1fibers_1_1asio_1_1yield__t_a7e6087ec984afa58b77416ccb4d139bb}\index{boost::fibers::asio::yield\_t@{boost::fibers::asio::yield\_t}!yield\_t@{yield\_t}}
+\index{yield\_t@{yield\_t}!boost::fibers::asio::yield\_t@{boost::fibers::asio::yield\_t}}
+\doxysubsubsection{\texorpdfstring{yield\_t()}{yield\_t()}}
+{\footnotesize\ttfamily \label{classboost_1_1fibers_1_1asio_1_1yield__t_a7e6087ec984afa58b77416ccb4d139bb} 
+boost\+::fibers\+::asio\+::yield\+\_\+t\+::yield\+\_\+t (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [default]}}
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classboost_1_1fibers_1_1asio_1_1yield__t_ad4a1463b1c817b2d8ebe9658d09be002}\index{boost::fibers::asio::yield\_t@{boost::fibers::asio::yield\_t}!operator\mbox{[}\mbox{]}@{operator[]}}
+\index{operator\mbox{[}\mbox{]}@{operator[]}!boost::fibers::asio::yield\_t@{boost::fibers::asio::yield\_t}}
+\doxysubsubsection{\texorpdfstring{operator[]()}{operator[]()}}
+{\footnotesize\ttfamily \label{classboost_1_1fibers_1_1asio_1_1yield__t_ad4a1463b1c817b2d8ebe9658d09be002} 
+\mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1yield__t}{yield\+\_\+t}} boost\+::fibers\+::asio\+::yield\+\_\+t\+::operator\mbox{[}$\,$\mbox{]} (\begin{DoxyParamCaption}\item[{boost\+::system\+::error\+\_\+code \&}]{ec}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{static}\ \mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1yield__t_a7e6087ec984afa58b77416ccb4d139bb}{yield\_t}}\ \mbox{\hyperlink{namespaceboost_1_1fibers_1_1asio_a65142b77539b20ba6d2abb35a0d4f5d2}{yield}};}
+\DoxyCodeLine{boost::system::error\_code\ myec;}
+\DoxyCodeLine{\mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2}{func}}(\mbox{\hyperlink{namespaceboost_1_1fibers_1_1asio_a65142b77539b20ba6d2abb35a0d4f5d2}{yield}}[myec]);}
+
+\end{DoxyCode}
+ {\ttfamily yield}\mbox{[}myec\mbox{]} returns an instance of {\ttfamily \doxylink{classboost_1_1fibers_1_1asio_1_1yield__t}{yield\+\_\+t}} whose {\ttfamily ec\+\_\+} points to {\ttfamily myec}. The expression {\ttfamily yield}\mbox{[}myec\mbox{]} "{}binds"{} {\ttfamily myec} to that (anonymous) {\ttfamily \doxylink{classboost_1_1fibers_1_1asio_1_1yield__t}{yield\+\_\+t}} instance, instructing {\ttfamily func()} to store any {\ttfamily error\+\_\+code} it might produce into {\ttfamily myec} rather than throwing {\ttfamily boost\+::system\+::system\+\_\+error}. 
+
+Definition at line \mbox{\hyperlink{yield_8hpp_source_l00038}{38}} of file \mbox{\hyperlink{yield_8hpp_source}{yield.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1yield__t_a7e6087ec984afa58b77416ccb4d139bb}{yield\_t}}\ tmp;}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ tmp.ec\_\ =\ \&\ ec;}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ tmp;}
+\DoxyCodeLine{00042\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classboost_1_1fibers_1_1asio_1_1yield__t_a4908b45c6c123136bfbc1093ba963a0b}\index{boost::fibers::asio::yield\_t@{boost::fibers::asio::yield\_t}!ec\_@{ec\_}}
+\index{ec\_@{ec\_}!boost::fibers::asio::yield\_t@{boost::fibers::asio::yield\_t}}
+\doxysubsubsection{\texorpdfstring{ec\_}{ec\_}}
+{\footnotesize\ttfamily \label{classboost_1_1fibers_1_1asio_1_1yield__t_a4908b45c6c123136bfbc1093ba963a0b} 
+boost\+::system\+::error\+\_\+code\texorpdfstring{$\ast$}{*} boost\+::fibers\+::asio\+::yield\+\_\+t\+::ec\+\_\+ \{ nullptr \}}
+
+
+
+Definition at line \mbox{\hyperlink{yield_8hpp_source_l00046}{46}} of file \mbox{\hyperlink{yield_8hpp_source}{yield.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00046\ \{\ \textcolor{keyword}{nullptr}\ \};}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/src/thread/asio/\mbox{\hyperlink{yield_8hpp}{yield.\+hpp}}\end{DoxyCompactItemize}

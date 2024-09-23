@@ -1,0 +1,241 @@
+\doxysection{sysio\+::http\+\_\+plugin\+\_\+impl\+::in\+\_\+flight\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>} Struct Template Reference}
+\hypertarget{structsysio_1_1http__plugin__impl_1_1in__flight}{}\label{structsysio_1_1http__plugin__impl_1_1in__flight}\index{sysio::http\_plugin\_impl::in\_flight$<$ T $>$@{sysio::http\_plugin\_impl::in\_flight$<$ T $>$}}
+
+
+Collaboration diagram for sysio\+::http\+\_\+plugin\+\_\+impl\+::in\+\_\+flight\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=183pt]{structsysio_1_1http__plugin__impl_1_1in__flight__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1http__plugin__impl_1_1in__flight_ae3bed859d74c8e3acf1e1b8730f61bcf}{in\+\_\+flight}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\&\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}, \mbox{\hyperlink{namespacesysio_adc3b23bd13a9947e7bb7430a1cd6336d}{http\+\_\+plugin\+\_\+impl\+\_\+ptr}} impl)
+\item 
+\mbox{\hyperlink{structsysio_1_1http__plugin__impl_1_1in__flight_acf19590fea61abe9358d0e893b36e218}{\texorpdfstring{$\sim$}{\string~}in\+\_\+flight}} ()
+\item 
+\mbox{\hyperlink{structsysio_1_1http__plugin__impl_1_1in__flight_a8660b7777f96b485f1d4a26863dcec1d}{in\+\_\+flight}} (const \mbox{\hyperlink{structsysio_1_1http__plugin__impl_1_1in__flight}{in\+\_\+flight}} \&)=delete
+\item 
+\mbox{\hyperlink{structsysio_1_1http__plugin__impl_1_1in__flight_a0cc038eaf3f74e250d1208cf409ce1e4}{in\+\_\+flight}} (\mbox{\hyperlink{structsysio_1_1http__plugin__impl_1_1in__flight}{in\+\_\+flight}} \&\&from)
+\item 
+\mbox{\hyperlink{structsysio_1_1http__plugin__impl_1_1in__flight}{in\+\_\+flight}} \& \mbox{\hyperlink{structsysio_1_1http__plugin__impl_1_1in__flight_a7f2082d20fde08911cc15d38a2027708}{operator=}} (const \mbox{\hyperlink{structsysio_1_1http__plugin__impl_1_1in__flight}{in\+\_\+flight}} \&)=delete
+\item 
+\mbox{\hyperlink{structsysio_1_1http__plugin__impl_1_1in__flight}{in\+\_\+flight}} \& \mbox{\hyperlink{structsysio_1_1http__plugin__impl_1_1in__flight_a9f56b18f0011fffde8dcc9425ec10e7d}{operator=}} (\mbox{\hyperlink{structsysio_1_1http__plugin__impl_1_1in__flight}{in\+\_\+flight}} \&\&from)
+\item 
+const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{structsysio_1_1http__plugin__impl_1_1in__flight_afc091ff5c3a0bd9c26fb925b1de45f5d}{operator\texorpdfstring{$\ast$}{*}}} () const
+\item 
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{structsysio_1_1http__plugin__impl_1_1in__flight_a1bd7cec62c1f3e6e2737b41b5ef854ca}{operator\texorpdfstring{$\ast$}{*}}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{structsysio_1_1http__plugin__impl_1_1in__flight_af7676f01a2dafb8887936342cf60c127}{\+\_\+object}}
+\item 
+size\+\_\+t \mbox{\hyperlink{structsysio_1_1http__plugin__impl_1_1in__flight_a93028aa7c43abadef36794543912ec06}{\+\_\+count}}
+\item 
+\mbox{\hyperlink{namespacesysio_adc3b23bd13a9947e7bb7430a1cd6336d}{http\+\_\+plugin\+\_\+impl\+\_\+ptr}} \mbox{\hyperlink{structsysio_1_1http__plugin__impl_1_1in__flight_abc593228eb1574ecba4fc7817f923050}{\+\_\+impl}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$\newline
+struct sysio\+::http\+\_\+plugin\+\_\+impl\+::in\+\_\+flight$<$ T $>$}
+Helper type that wraps an object of type T and records its "{}in flight"{} size to \doxylink{classsysio_1_1http__plugin__impl_a96638486ee91563aed0aeb5bae4f6b98}{http\+\_\+plugin\+\_\+impl\+::bytes\+\_\+in\+\_\+flight} using RAII semantics
+
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em T} & -\/ the contained Type \\
+\hline
+\end{DoxyTemplParams}
+
+
+Definition at line \mbox{\hyperlink{http__plugin_8cpp_source_l00405}{405}} of file \mbox{\hyperlink{http__plugin_8cpp_source}{http\+\_\+plugin.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structsysio_1_1http__plugin__impl_1_1in__flight_ae3bed859d74c8e3acf1e1b8730f61bcf}\index{sysio::http\_plugin\_impl::in\_flight$<$ T $>$@{sysio::http\_plugin\_impl::in\_flight$<$ T $>$}!in\_flight@{in\_flight}}
+\index{in\_flight@{in\_flight}!sysio::http\_plugin\_impl::in\_flight$<$ T $>$@{sysio::http\_plugin\_impl::in\_flight$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{in\_flight()}{in\_flight()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{structsysio_1_1http__plugin__impl_1_1in__flight_ae3bed859d74c8e3acf1e1b8730f61bcf} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{structsysio_1_1http__plugin__impl_1_1in__flight}{sysio\+::http\+\_\+plugin\+\_\+impl\+::in\+\_\+flight}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::in\+\_\+flight (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\&}]{object}{, }\item[{\mbox{\hyperlink{namespacesysio_adc3b23bd13a9947e7bb7430a1cd6336d}{http\+\_\+plugin\+\_\+impl\+\_\+ptr}}}]{impl}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{http__plugin_8cpp_source_l00406}{406}} of file \mbox{\hyperlink{http__plugin_8cpp_source}{http\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00407\ \ \ \ \ \ \ \ \ \ \ \ \ :\mbox{\hyperlink{structsysio_1_1http__plugin__impl_1_1in__flight_af7676f01a2dafb8887936342cf60c127}{\_object}}(std::move(\textcolor{keywordtype}{object}))}
+\DoxyCodeLine{00408\ \ \ \ \ \ \ \ \ \ \ \ \ ,\mbox{\hyperlink{structsysio_1_1http__plugin__impl_1_1in__flight_abc593228eb1574ecba4fc7817f923050}{\_impl}}(std::move(impl))}
+\DoxyCodeLine{00409\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00410\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1http__plugin__impl_1_1in__flight_a93028aa7c43abadef36794543912ec06}{\_count}}\ =\ detail::in\_flight\_sizeof(\mbox{\hyperlink{structsysio_1_1http__plugin__impl_1_1in__flight_af7676f01a2dafb8887936342cf60c127}{\_object}});}
+\DoxyCodeLine{00411\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1http__plugin__impl_1_1in__flight_abc593228eb1574ecba4fc7817f923050}{\_impl}}-\/>bytes\_in\_flight\ +=\ \mbox{\hyperlink{structsysio_1_1http__plugin__impl_1_1in__flight_a93028aa7c43abadef36794543912ec06}{\_count}};}
+\DoxyCodeLine{00412\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1http__plugin__impl_1_1in__flight_acf19590fea61abe9358d0e893b36e218}\index{sysio::http\_plugin\_impl::in\_flight$<$ T $>$@{sysio::http\_plugin\_impl::in\_flight$<$ T $>$}!````~in\_flight@{\texorpdfstring{$\sim$}{\string~}in\_flight}}
+\index{````~in\_flight@{\texorpdfstring{$\sim$}{\string~}in\_flight}!sysio::http\_plugin\_impl::in\_flight$<$ T $>$@{sysio::http\_plugin\_impl::in\_flight$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}in\_flight()}{\string~in\_flight()}}
+{\footnotesize\ttfamily \label{structsysio_1_1http__plugin__impl_1_1in__flight_acf19590fea61abe9358d0e893b36e218} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{structsysio_1_1http__plugin__impl_1_1in__flight}{sysio\+::http\+\_\+plugin\+\_\+impl\+::in\+\_\+flight}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::\texorpdfstring{$\sim$}{\string~}\mbox{\hyperlink{structsysio_1_1http__plugin__impl_1_1in__flight}{in\+\_\+flight}} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{http__plugin_8cpp_source_l00414}{414}} of file \mbox{\hyperlink{http__plugin_8cpp_source}{http\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00414\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00415\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structsysio_1_1http__plugin__impl_1_1in__flight_a93028aa7c43abadef36794543912ec06}{\_count}})\ \{}
+\DoxyCodeLine{00416\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1http__plugin__impl_1_1in__flight_abc593228eb1574ecba4fc7817f923050}{\_impl}}-\/>bytes\_in\_flight\ -\/=\ \mbox{\hyperlink{structsysio_1_1http__plugin__impl_1_1in__flight_a93028aa7c43abadef36794543912ec06}{\_count}};}
+\DoxyCodeLine{00417\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00418\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1http__plugin__impl_1_1in__flight_a8660b7777f96b485f1d4a26863dcec1d}\index{sysio::http\_plugin\_impl::in\_flight$<$ T $>$@{sysio::http\_plugin\_impl::in\_flight$<$ T $>$}!in\_flight@{in\_flight}}
+\index{in\_flight@{in\_flight}!sysio::http\_plugin\_impl::in\_flight$<$ T $>$@{sysio::http\_plugin\_impl::in\_flight$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{in\_flight()}{in\_flight()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{structsysio_1_1http__plugin__impl_1_1in__flight_a8660b7777f96b485f1d4a26863dcec1d} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{structsysio_1_1http__plugin__impl_1_1in__flight}{sysio\+::http\+\_\+plugin\+\_\+impl\+::in\+\_\+flight}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::in\+\_\+flight (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1http__plugin__impl_1_1in__flight}{in\+\_\+flight}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [delete]}}
+
+\Hypertarget{structsysio_1_1http__plugin__impl_1_1in__flight_a0cc038eaf3f74e250d1208cf409ce1e4}\index{sysio::http\_plugin\_impl::in\_flight$<$ T $>$@{sysio::http\_plugin\_impl::in\_flight$<$ T $>$}!in\_flight@{in\_flight}}
+\index{in\_flight@{in\_flight}!sysio::http\_plugin\_impl::in\_flight$<$ T $>$@{sysio::http\_plugin\_impl::in\_flight$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{in\_flight()}{in\_flight()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{structsysio_1_1http__plugin__impl_1_1in__flight_a0cc038eaf3f74e250d1208cf409ce1e4} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{structsysio_1_1http__plugin__impl_1_1in__flight}{sysio\+::http\+\_\+plugin\+\_\+impl\+::in\+\_\+flight}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::in\+\_\+flight (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1http__plugin__impl_1_1in__flight}{in\+\_\+flight}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&\&}]{from}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{http__plugin_8cpp_source_l00422}{422}} of file \mbox{\hyperlink{http__plugin_8cpp_source}{http\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00423\ \ \ \ \ \ \ \ \ \ \ \ \ :\mbox{\hyperlink{structsysio_1_1http__plugin__impl_1_1in__flight_af7676f01a2dafb8887936342cf60c127}{\_object}}(std::move(from.\_object))}
+\DoxyCodeLine{00424\ \ \ \ \ \ \ \ \ \ \ \ \ ,\mbox{\hyperlink{structsysio_1_1http__plugin__impl_1_1in__flight_a93028aa7c43abadef36794543912ec06}{\_count}}(from.\_count)}
+\DoxyCodeLine{00425\ \ \ \ \ \ \ \ \ \ \ \ \ ,\mbox{\hyperlink{structsysio_1_1http__plugin__impl_1_1in__flight_abc593228eb1574ecba4fc7817f923050}{\_impl}}(std::move(from.\_impl))}
+\DoxyCodeLine{00426\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00427\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ from.\_count\ =\ 0;}
+\DoxyCodeLine{00428\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1http__plugin__impl_1_1in__flight_a1bd7cec62c1f3e6e2737b41b5ef854ca}\index{sysio::http\_plugin\_impl::in\_flight$<$ T $>$@{sysio::http\_plugin\_impl::in\_flight$<$ T $>$}!operator\texorpdfstring{$\ast$}{*}@{operator\texorpdfstring{$\ast$}{*}}}
+\index{operator\texorpdfstring{$\ast$}{*}@{operator\texorpdfstring{$\ast$}{*}}!sysio::http\_plugin\_impl::in\_flight$<$ T $>$@{sysio::http\_plugin\_impl::in\_flight$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{operator\texorpdfstring{$\ast$}{*}()}{operator*()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1http__plugin__impl_1_1in__flight_a1bd7cec62c1f3e6e2737b41b5ef854ca} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{structsysio_1_1http__plugin__impl_1_1in__flight}{sysio\+::http\+\_\+plugin\+\_\+impl\+::in\+\_\+flight}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::operator\texorpdfstring{$\ast$}{*} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+mutable accessor (can be moved frmo) \begin{DoxyReturn}{Returns}
+mutable reference to the contained object 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{http__plugin_8cpp_source_l00451}{451}} of file \mbox{\hyperlink{http__plugin_8cpp_source}{http\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00451\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00452\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1http__plugin__impl_1_1in__flight_af7676f01a2dafb8887936342cf60c127}{\_object}};}
+\DoxyCodeLine{00453\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1http__plugin__impl_1_1in__flight_afc091ff5c3a0bd9c26fb925b1de45f5d}\index{sysio::http\_plugin\_impl::in\_flight$<$ T $>$@{sysio::http\_plugin\_impl::in\_flight$<$ T $>$}!operator\texorpdfstring{$\ast$}{*}@{operator\texorpdfstring{$\ast$}{*}}}
+\index{operator\texorpdfstring{$\ast$}{*}@{operator\texorpdfstring{$\ast$}{*}}!sysio::http\_plugin\_impl::in\_flight$<$ T $>$@{sysio::http\_plugin\_impl::in\_flight$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{operator\texorpdfstring{$\ast$}{*}()}{operator*()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1http__plugin__impl_1_1in__flight_afc091ff5c3a0bd9c26fb925b1de45f5d} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{structsysio_1_1http__plugin__impl_1_1in__flight}{sysio\+::http\+\_\+plugin\+\_\+impl\+::in\+\_\+flight}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::operator\texorpdfstring{$\ast$}{*} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+const accessor \begin{DoxyReturn}{Returns}
+const reference to the contained object 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{http__plugin_8cpp_source_l00443}{443}} of file \mbox{\hyperlink{http__plugin_8cpp_source}{http\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00443\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00444\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1http__plugin__impl_1_1in__flight_af7676f01a2dafb8887936342cf60c127}{\_object}};}
+\DoxyCodeLine{00445\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1http__plugin__impl_1_1in__flight_a7f2082d20fde08911cc15d38a2027708}\index{sysio::http\_plugin\_impl::in\_flight$<$ T $>$@{sysio::http\_plugin\_impl::in\_flight$<$ T $>$}!operator=@{operator=}}
+\index{operator=@{operator=}!sysio::http\_plugin\_impl::in\_flight$<$ T $>$@{sysio::http\_plugin\_impl::in\_flight$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1http__plugin__impl_1_1in__flight_a7f2082d20fde08911cc15d38a2027708} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{structsysio_1_1http__plugin__impl_1_1in__flight}{in\+\_\+flight}} \& \mbox{\hyperlink{structsysio_1_1http__plugin__impl_1_1in__flight}{sysio\+::http\+\_\+plugin\+\_\+impl\+::in\+\_\+flight}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::operator= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1http__plugin__impl_1_1in__flight}{in\+\_\+flight}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [delete]}}
+
+\Hypertarget{structsysio_1_1http__plugin__impl_1_1in__flight_a9f56b18f0011fffde8dcc9425ec10e7d}\index{sysio::http\_plugin\_impl::in\_flight$<$ T $>$@{sysio::http\_plugin\_impl::in\_flight$<$ T $>$}!operator=@{operator=}}
+\index{operator=@{operator=}!sysio::http\_plugin\_impl::in\_flight$<$ T $>$@{sysio::http\_plugin\_impl::in\_flight$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1http__plugin__impl_1_1in__flight_a9f56b18f0011fffde8dcc9425ec10e7d} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{structsysio_1_1http__plugin__impl_1_1in__flight}{in\+\_\+flight}} \& \mbox{\hyperlink{structsysio_1_1http__plugin__impl_1_1in__flight}{sysio\+::http\+\_\+plugin\+\_\+impl\+::in\+\_\+flight}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::operator= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1http__plugin__impl_1_1in__flight}{in\+\_\+flight}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&\&}]{from}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{http__plugin_8cpp_source_l00432}{432}} of file \mbox{\hyperlink{http__plugin_8cpp_source}{http\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00432\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00433\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1http__plugin__impl_1_1in__flight_af7676f01a2dafb8887936342cf60c127}{\_object}}\ =\ std::move(from.\_object);}
+\DoxyCodeLine{00434\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1http__plugin__impl_1_1in__flight_a93028aa7c43abadef36794543912ec06}{\_count}}\ =\ from.\_count;}
+\DoxyCodeLine{00435\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1http__plugin__impl_1_1in__flight_abc593228eb1574ecba4fc7817f923050}{\_impl}}\ =\ std::move(from.\_impl);}
+\DoxyCodeLine{00436\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ from.\_count\ =\ 0;}
+\DoxyCodeLine{00437\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1http__plugin__impl_1_1in__flight_a93028aa7c43abadef36794543912ec06}\index{sysio::http\_plugin\_impl::in\_flight$<$ T $>$@{sysio::http\_plugin\_impl::in\_flight$<$ T $>$}!\_count@{\_count}}
+\index{\_count@{\_count}!sysio::http\_plugin\_impl::in\_flight$<$ T $>$@{sysio::http\_plugin\_impl::in\_flight$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{\_count}{\_count}}
+{\footnotesize\ttfamily \label{structsysio_1_1http__plugin__impl_1_1in__flight_a93028aa7c43abadef36794543912ec06} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+size\+\_\+t \mbox{\hyperlink{structsysio_1_1http__plugin__impl_1_1in__flight}{sysio\+::http\+\_\+plugin\+\_\+impl\+::in\+\_\+flight}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::\+\_\+count}
+
+
+
+Definition at line \mbox{\hyperlink{http__plugin_8cpp_source_l00456}{456}} of file \mbox{\hyperlink{http__plugin_8cpp_source}{http\+\_\+plugin.\+cpp}}.
+
+\Hypertarget{structsysio_1_1http__plugin__impl_1_1in__flight_abc593228eb1574ecba4fc7817f923050}\index{sysio::http\_plugin\_impl::in\_flight$<$ T $>$@{sysio::http\_plugin\_impl::in\_flight$<$ T $>$}!\_impl@{\_impl}}
+\index{\_impl@{\_impl}!sysio::http\_plugin\_impl::in\_flight$<$ T $>$@{sysio::http\_plugin\_impl::in\_flight$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{\_impl}{\_impl}}
+{\footnotesize\ttfamily \label{structsysio_1_1http__plugin__impl_1_1in__flight_abc593228eb1574ecba4fc7817f923050} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{namespacesysio_adc3b23bd13a9947e7bb7430a1cd6336d}{http\+\_\+plugin\+\_\+impl\+\_\+ptr}} \mbox{\hyperlink{structsysio_1_1http__plugin__impl_1_1in__flight}{sysio\+::http\+\_\+plugin\+\_\+impl\+::in\+\_\+flight}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::\+\_\+impl}
+
+
+
+Definition at line \mbox{\hyperlink{http__plugin_8cpp_source_l00457}{457}} of file \mbox{\hyperlink{http__plugin_8cpp_source}{http\+\_\+plugin.\+cpp}}.
+
+\Hypertarget{structsysio_1_1http__plugin__impl_1_1in__flight_af7676f01a2dafb8887936342cf60c127}\index{sysio::http\_plugin\_impl::in\_flight$<$ T $>$@{sysio::http\_plugin\_impl::in\_flight$<$ T $>$}!\_object@{\_object}}
+\index{\_object@{\_object}!sysio::http\_plugin\_impl::in\_flight$<$ T $>$@{sysio::http\_plugin\_impl::in\_flight$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{\_object}{\_object}}
+{\footnotesize\ttfamily \label{structsysio_1_1http__plugin__impl_1_1in__flight_af7676f01a2dafb8887936342cf60c127} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{structsysio_1_1http__plugin__impl_1_1in__flight}{sysio\+::http\+\_\+plugin\+\_\+impl\+::in\+\_\+flight}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::\+\_\+object}
+
+
+
+Definition at line \mbox{\hyperlink{http__plugin_8cpp_source_l00455}{455}} of file \mbox{\hyperlink{http__plugin_8cpp_source}{http\+\_\+plugin.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+plugins/http\+\_\+plugin/\mbox{\hyperlink{http__plugin_8cpp}{http\+\_\+plugin.\+cpp}}\end{DoxyCompactItemize}

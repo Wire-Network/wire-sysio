@@ -1,0 +1,17 @@
+<map id="internal::StrLen" name="internal::StrLen">
+<area shape="rect" id="Node000001" title="Custom strlen() which works on different character types." alt="" coords="255,152,364,178"/>
+<area shape="rect" id="Node000002" href="$class_generic_pointer.html#a4ad549b8a826c3c2dedf03fcc07be9b0" title="Constructor that parses a string or URI fragment representation." alt="" coords="5,5,207,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="291,140,256,90,232,65,205,44,184,34,186,29,208,40,236,61,260,87,295,137"/>
+<area shape="rect" id="Node000003" href="$class_pretty_writer.html#a4b2a2a6eef02c12d7a3fd77966bd4499" title=" " alt="" coords="45,79,167,104"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="270,147,206,118,167,106,168,101,208,113,272,142"/>
+<area shape="rect" id="Node000004" href="$class_writer.html#ab6057b7fa9737edb4da55a7afefa966d" title=" " alt="" coords="63,152,149,178"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="239,168,150,168,150,162,239,162"/>
+<area shape="rect" id="Node000005" href="$class_pretty_writer.html#a7e85689355a827d273f272c26b447225" title="Simpler but slower overload." alt="" coords="40,225,172,251"/>
+<area shape="poly" id="edge6_Node000001_Node000005" title=" " alt="" coords="258,186,145,227,143,222,256,181"/>
+<area shape="rect" id="Node000006" href="$class_writer.html#a2a2c6f51644b2013471aec4dac0d7466" title="Simpler but slower overload." alt="" coords="57,299,155,324"/>
+<area shape="poly" id="edge8_Node000001_Node000006" title=" " alt="" coords="289,191,253,228,208,266,175,285,143,300,141,296,173,281,205,261,249,224,285,188"/>
+<area shape="poly" id="edge3_Node000003_Node000003" title=" " alt="" coords="141,66,129,60,106,57,85,59,73,64,71,69,76,77,72,80,65,70,69,60,83,54,106,52,131,55,144,62"/>
+<area shape="poly" id="edge5_Node000004_Node000004" title=" " alt="" coords="141,140,129,133,106,131,85,133,73,137,71,143,76,150,72,153,65,143,69,134,83,127,106,125,131,128,144,135"/>
+<area shape="poly" id="edge7_Node000005_Node000005" title=" " alt="" coords="141,213,129,206,106,204,85,206,73,211,71,216,76,223,72,227,65,217,69,207,83,201,106,199,131,201,144,208"/>
+<area shape="poly" id="edge9_Node000006_Node000006" title=" " alt="" coords="141,286,129,280,106,277,85,279,73,284,71,289,76,297,72,300,65,290,69,280,83,274,106,272,131,275,144,282"/>
+</map>

@@ -1,0 +1,11 @@
+<map id="bn::ecop::ScalarMult" name="bn::ecop::ScalarMult">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,29,147,55"/>
+<area shape="rect" id="Node000002" href="$namespacebn_1_1ecop.html#a4a6928bb915f1eef461635202d2e4c30" title=" " alt="" coords="380,5,487,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="128,26,194,14,283,10,365,11,365,16,283,15,195,19,129,31"/>
+<area shape="rect" id="Node000003" href="$namespacebn_1_1ecop.html#abcaa67b67f6c2af1201769cd15cbbed9" title=" " alt="" coords="195,29,316,55"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="147,40,179,40,179,45,147,45"/>
+<area shape="rect" id="Node000004" href="$namespacebn_1_1ecop.html#a0e64ca6d01c24fb266f1986ebce3a07d" title=" " alt="" coords="364,55,503,80"/>
+<area shape="poly" id="edge5_Node000001_Node000004" title=" " alt="" coords="129,53,195,65,274,70,348,69,349,74,273,75,194,70,128,58"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="316,31,364,25,365,30,317,37"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="317,48,349,53,348,58,316,53"/>
+</map>

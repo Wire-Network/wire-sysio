@@ -1,0 +1,265 @@
+\doxysection{sysiosystem\+::powerup\+\_\+state\+\_\+resource Struct Reference}
+\hypertarget{structsysiosystem_1_1powerup__state__resource}{}\label{structsysiosystem_1_1powerup__state__resource}\index{sysiosystem::powerup\_state\_resource@{sysiosystem::powerup\_state\_resource}}
+
+
+{\ttfamily \#include $<$sysio.\+system.\+hpp$>$}
+
+
+
+Collaboration diagram for sysiosystem\+::powerup\+\_\+state\+\_\+resource\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysiosystem_1_1powerup__state__resource__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1powerup__state__resource_a76cec20cc927ede14da0e06e6cd286bb}{version}} = 0
+\item 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1powerup__state__resource_a3982055a238765dcb0266efabf9573ef}{weight}} = 0
+\item 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1powerup__state__resource_a05d8d68065b2519fe8a2402e1192640f}{weight\+\_\+ratio}} = 0
+\item 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1powerup__state__resource_ae58913bdfb47036cd3a7077a522b32bf}{assumed\+\_\+stake\+\_\+weight}} = 0
+\item 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1powerup__state__resource_a3ea28db502c6d077566345821fa28416}{initial\+\_\+weight\+\_\+ratio}} = \mbox{\hyperlink{namespacesysiosystem_a0c870d7ce8b7146e2f9fbc64203aa0d0}{powerup\+\_\+frac}}
+\item 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1powerup__state__resource_ae501a9f3a65fbe90e26c38570a27b3b1}{target\+\_\+weight\+\_\+ratio}} = \mbox{\hyperlink{namespacesysiosystem_a0c870d7ce8b7146e2f9fbc64203aa0d0}{powerup\+\_\+frac}} / 100
+\item 
+\mbox{\hyperlink{classfc_1_1time__point__sec}{time\+\_\+point\+\_\+sec}} \mbox{\hyperlink{structsysiosystem_1_1powerup__state__resource_a64407e3d25c49c860defbdc9a8d56cf4}{initial\+\_\+timestamp}} = \{\}
+\item 
+\mbox{\hyperlink{classfc_1_1time__point__sec}{time\+\_\+point\+\_\+sec}} \mbox{\hyperlink{structsysiosystem_1_1powerup__state__resource_ab6f349d7ea3d3191600a1fb21f48a9de}{target\+\_\+timestamp}} = \{\}
+\item 
+double \mbox{\hyperlink{structsysiosystem_1_1powerup__state__resource_aae3935887f08c2bfaad03f487c78e35b}{exponent}} = \mbox{\hyperlink{structsysiosystem_1_1powerup__state__resource_a5c42292b9857335e4ce23504224385e4}{default\+\_\+exponent}}
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1powerup__state__resource_abdafc9d5e96ed5dabd534e8225083aa1}{decay\+\_\+secs}} = \mbox{\hyperlink{structsysiosystem_1_1powerup__state__resource_a58945270e2cb8561cd1b0f8cd5818e2e}{default\+\_\+decay\+\_\+secs}}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \mbox{\hyperlink{structsysiosystem_1_1powerup__state__resource_adffbea2f28ca2c4e5fa33d2fbcd8096d}{min\+\_\+price}} = \{\}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \mbox{\hyperlink{structsysiosystem_1_1powerup__state__resource_a72113b3ad7b2bfd37cb2dfd9b81f8bbc}{max\+\_\+price}} = \{\}
+\item 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1powerup__state__resource_afd423dc8fae1a13be14a6680f0428dd6}{utilization}} = 0
+\item 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1powerup__state__resource_a558370c61c0a9ef4b116f3849ad5b494}{adjusted\+\_\+utilization}} = 0
+\item 
+\mbox{\hyperlink{classfc_1_1time__point__sec}{time\+\_\+point\+\_\+sec}} \mbox{\hyperlink{structsysiosystem_1_1powerup__state__resource_aaa4afcb7dc5bd33be50830c4c14e3705}{utilization\+\_\+timestamp}} = \{\}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static constexpr double \mbox{\hyperlink{structsysiosystem_1_1powerup__state__resource_a5c42292b9857335e4ce23504224385e4}{default\+\_\+exponent}} = 2.\+0
+\item 
+static constexpr \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1powerup__state__resource_a58945270e2cb8561cd1b0f8cd5818e2e}{default\+\_\+decay\+\_\+secs}} = 1 \texorpdfstring{$\ast$}{*} seconds\+\_\+per\+\_\+day
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00596}{596}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysiosystem_1_1powerup__state__resource_a558370c61c0a9ef4b116f3849ad5b494}\index{sysiosystem::powerup\_state\_resource@{sysiosystem::powerup\_state\_resource}!adjusted\_utilization@{adjusted\_utilization}}
+\index{adjusted\_utilization@{adjusted\_utilization}!sysiosystem::powerup\_state\_resource@{sysiosystem::powerup\_state\_resource}}
+\doxysubsubsection{\texorpdfstring{adjusted\_utilization}{adjusted\_utilization}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1powerup__state__resource_a558370c61c0a9ef4b116f3849ad5b494} 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} sysiosystem\+::powerup\+\_\+state\+\_\+resource\+::adjusted\+\_\+utilization = 0}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00628}{628}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1powerup__state__resource_ae58913bdfb47036cd3a7077a522b32bf}\index{sysiosystem::powerup\_state\_resource@{sysiosystem::powerup\_state\_resource}!assumed\_stake\_weight@{assumed\_stake\_weight}}
+\index{assumed\_stake\_weight@{assumed\_stake\_weight}!sysiosystem::powerup\_state\_resource@{sysiosystem::powerup\_state\_resource}}
+\doxysubsubsection{\texorpdfstring{assumed\_stake\_weight}{assumed\_stake\_weight}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1powerup__state__resource_ae58913bdfb47036cd3a7077a522b32bf} 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} sysiosystem\+::powerup\+\_\+state\+\_\+resource\+::assumed\+\_\+stake\+\_\+weight = 0}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00613}{613}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1powerup__state__resource_abdafc9d5e96ed5dabd534e8225083aa1}\index{sysiosystem::powerup\_state\_resource@{sysiosystem::powerup\_state\_resource}!decay\_secs@{decay\_secs}}
+\index{decay\_secs@{decay\_secs}!sysiosystem::powerup\_state\_resource@{sysiosystem::powerup\_state\_resource}}
+\doxysubsubsection{\texorpdfstring{decay\_secs}{decay\_secs}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1powerup__state__resource_abdafc9d5e96ed5dabd534e8225083aa1} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysiosystem\+::powerup\+\_\+state\+\_\+resource\+::decay\+\_\+secs = \mbox{\hyperlink{structsysiosystem_1_1powerup__state__resource_a58945270e2cb8561cd1b0f8cd5818e2e}{default\+\_\+decay\+\_\+secs}}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00620}{620}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1powerup__state__resource_a58945270e2cb8561cd1b0f8cd5818e2e}\index{sysiosystem::powerup\_state\_resource@{sysiosystem::powerup\_state\_resource}!default\_decay\_secs@{default\_decay\_secs}}
+\index{default\_decay\_secs@{default\_decay\_secs}!sysiosystem::powerup\_state\_resource@{sysiosystem::powerup\_state\_resource}}
+\doxysubsubsection{\texorpdfstring{default\_decay\_secs}{default\_decay\_secs}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1powerup__state__resource_a58945270e2cb8561cd1b0f8cd5818e2e} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysiosystem\+::powerup\+\_\+state\+\_\+resource\+::default\+\_\+decay\+\_\+secs = 1 \texorpdfstring{$\ast$}{*} seconds\+\_\+per\+\_\+day\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00600}{600}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1powerup__state__resource_a5c42292b9857335e4ce23504224385e4}\index{sysiosystem::powerup\_state\_resource@{sysiosystem::powerup\_state\_resource}!default\_exponent@{default\_exponent}}
+\index{default\_exponent@{default\_exponent}!sysiosystem::powerup\_state\_resource@{sysiosystem::powerup\_state\_resource}}
+\doxysubsubsection{\texorpdfstring{default\_exponent}{default\_exponent}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1powerup__state__resource_a5c42292b9857335e4ce23504224385e4} 
+double sysiosystem\+::powerup\+\_\+state\+\_\+resource\+::default\+\_\+exponent = 2.\+0\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00597}{597}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1powerup__state__resource_aae3935887f08c2bfaad03f487c78e35b}\index{sysiosystem::powerup\_state\_resource@{sysiosystem::powerup\_state\_resource}!exponent@{exponent}}
+\index{exponent@{exponent}!sysiosystem::powerup\_state\_resource@{sysiosystem::powerup\_state\_resource}}
+\doxysubsubsection{\texorpdfstring{exponent}{exponent}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1powerup__state__resource_aae3935887f08c2bfaad03f487c78e35b} 
+double sysiosystem\+::powerup\+\_\+state\+\_\+resource\+::exponent = \mbox{\hyperlink{structsysiosystem_1_1powerup__state__resource_a5c42292b9857335e4ce23504224385e4}{default\+\_\+exponent}}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00619}{619}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1powerup__state__resource_a64407e3d25c49c860defbdc9a8d56cf4}\index{sysiosystem::powerup\_state\_resource@{sysiosystem::powerup\_state\_resource}!initial\_timestamp@{initial\_timestamp}}
+\index{initial\_timestamp@{initial\_timestamp}!sysiosystem::powerup\_state\_resource@{sysiosystem::powerup\_state\_resource}}
+\doxysubsubsection{\texorpdfstring{initial\_timestamp}{initial\_timestamp}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1powerup__state__resource_a64407e3d25c49c860defbdc9a8d56cf4} 
+\mbox{\hyperlink{classfc_1_1time__point__sec}{time\+\_\+point\+\_\+sec}} sysiosystem\+::powerup\+\_\+state\+\_\+resource\+::initial\+\_\+timestamp = \{\}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00616}{616}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00616\ \{\};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ When\ weight\_ratio\ shrinkage\ started}}
+
+\end{DoxyCode}
+\Hypertarget{structsysiosystem_1_1powerup__state__resource_a3ea28db502c6d077566345821fa28416}\index{sysiosystem::powerup\_state\_resource@{sysiosystem::powerup\_state\_resource}!initial\_weight\_ratio@{initial\_weight\_ratio}}
+\index{initial\_weight\_ratio@{initial\_weight\_ratio}!sysiosystem::powerup\_state\_resource@{sysiosystem::powerup\_state\_resource}}
+\doxysubsubsection{\texorpdfstring{initial\_weight\_ratio}{initial\_weight\_ratio}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1powerup__state__resource_a3ea28db502c6d077566345821fa28416} 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} sysiosystem\+::powerup\+\_\+state\+\_\+resource\+::initial\+\_\+weight\+\_\+ratio = \mbox{\hyperlink{namespacesysiosystem_a0c870d7ce8b7146e2f9fbc64203aa0d0}{powerup\+\_\+frac}}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00614}{614}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1powerup__state__resource_a72113b3ad7b2bfd37cb2dfd9b81f8bbc}\index{sysiosystem::powerup\_state\_resource@{sysiosystem::powerup\_state\_resource}!max\_price@{max\_price}}
+\index{max\_price@{max\_price}!sysiosystem::powerup\_state\_resource@{sysiosystem::powerup\_state\_resource}}
+\doxysubsubsection{\texorpdfstring{max\_price}{max\_price}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1powerup__state__resource_a72113b3ad7b2bfd37cb2dfd9b81f8bbc} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} sysiosystem\+::powerup\+\_\+state\+\_\+resource\+::max\+\_\+price = \{\}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00624}{624}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00624\ \{\};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Fee\ needed\ to\ reserve\ the\ entire\ resource\ market\ weight\ at}}
+
+\end{DoxyCode}
+\Hypertarget{structsysiosystem_1_1powerup__state__resource_adffbea2f28ca2c4e5fa33d2fbcd8096d}\index{sysiosystem::powerup\_state\_resource@{sysiosystem::powerup\_state\_resource}!min\_price@{min\_price}}
+\index{min\_price@{min\_price}!sysiosystem::powerup\_state\_resource@{sysiosystem::powerup\_state\_resource}}
+\doxysubsubsection{\texorpdfstring{min\_price}{min\_price}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1powerup__state__resource_adffbea2f28ca2c4e5fa33d2fbcd8096d} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} sysiosystem\+::powerup\+\_\+state\+\_\+resource\+::min\+\_\+price = \{\}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00622}{622}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00622\ \{\};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Fee\ needed\ to\ reserve\ the\ entire\ resource\ market\ weight\ at}}
+
+\end{DoxyCode}
+\Hypertarget{structsysiosystem_1_1powerup__state__resource_ab6f349d7ea3d3191600a1fb21f48a9de}\index{sysiosystem::powerup\_state\_resource@{sysiosystem::powerup\_state\_resource}!target\_timestamp@{target\_timestamp}}
+\index{target\_timestamp@{target\_timestamp}!sysiosystem::powerup\_state\_resource@{sysiosystem::powerup\_state\_resource}}
+\doxysubsubsection{\texorpdfstring{target\_timestamp}{target\_timestamp}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1powerup__state__resource_ab6f349d7ea3d3191600a1fb21f48a9de} 
+\mbox{\hyperlink{classfc_1_1time__point__sec}{time\+\_\+point\+\_\+sec}} sysiosystem\+::powerup\+\_\+state\+\_\+resource\+::target\+\_\+timestamp = \{\}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00617}{617}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00617\ \{\};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Stop\ automatic\ weight\_ratio\ shrinkage\ at\ this\ time.\ Once\ this}}
+
+\end{DoxyCode}
+\Hypertarget{structsysiosystem_1_1powerup__state__resource_ae501a9f3a65fbe90e26c38570a27b3b1}\index{sysiosystem::powerup\_state\_resource@{sysiosystem::powerup\_state\_resource}!target\_weight\_ratio@{target\_weight\_ratio}}
+\index{target\_weight\_ratio@{target\_weight\_ratio}!sysiosystem::powerup\_state\_resource@{sysiosystem::powerup\_state\_resource}}
+\doxysubsubsection{\texorpdfstring{target\_weight\_ratio}{target\_weight\_ratio}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1powerup__state__resource_ae501a9f3a65fbe90e26c38570a27b3b1} 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} sysiosystem\+::powerup\+\_\+state\+\_\+resource\+::target\+\_\+weight\+\_\+ratio = \mbox{\hyperlink{namespacesysiosystem_a0c870d7ce8b7146e2f9fbc64203aa0d0}{powerup\+\_\+frac}} / 100}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00615}{615}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1powerup__state__resource_afd423dc8fae1a13be14a6680f0428dd6}\index{sysiosystem::powerup\_state\_resource@{sysiosystem::powerup\_state\_resource}!utilization@{utilization}}
+\index{utilization@{utilization}!sysiosystem::powerup\_state\_resource@{sysiosystem::powerup\_state\_resource}}
+\doxysubsubsection{\texorpdfstring{utilization}{utilization}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1powerup__state__resource_afd423dc8fae1a13be14a6680f0428dd6} 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} sysiosystem\+::powerup\+\_\+state\+\_\+resource\+::utilization = 0}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00626}{626}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1powerup__state__resource_aaa4afcb7dc5bd33be50830c4c14e3705}\index{sysiosystem::powerup\_state\_resource@{sysiosystem::powerup\_state\_resource}!utilization\_timestamp@{utilization\_timestamp}}
+\index{utilization\_timestamp@{utilization\_timestamp}!sysiosystem::powerup\_state\_resource@{sysiosystem::powerup\_state\_resource}}
+\doxysubsubsection{\texorpdfstring{utilization\_timestamp}{utilization\_timestamp}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1powerup__state__resource_aaa4afcb7dc5bd33be50830c4c14e3705} 
+\mbox{\hyperlink{classfc_1_1time__point__sec}{time\+\_\+point\+\_\+sec}} sysiosystem\+::powerup\+\_\+state\+\_\+resource\+::utilization\+\_\+timestamp = \{\}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00630}{630}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00630\ \{\};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ When\ adjusted\_utilization\ was\ last\ updated}}
+
+\end{DoxyCode}
+\Hypertarget{structsysiosystem_1_1powerup__state__resource_a76cec20cc927ede14da0e06e6cd286bb}\index{sysiosystem::powerup\_state\_resource@{sysiosystem::powerup\_state\_resource}!version@{version}}
+\index{version@{version}!sysiosystem::powerup\_state\_resource@{sysiosystem::powerup\_state\_resource}}
+\doxysubsubsection{\texorpdfstring{version}{version}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1powerup__state__resource_a76cec20cc927ede14da0e06e6cd286bb} 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} sysiosystem\+::powerup\+\_\+state\+\_\+resource\+::version = 0}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00606}{606}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1powerup__state__resource_a3982055a238765dcb0266efabf9573ef}\index{sysiosystem::powerup\_state\_resource@{sysiosystem::powerup\_state\_resource}!weight@{weight}}
+\index{weight@{weight}!sysiosystem::powerup\_state\_resource@{sysiosystem::powerup\_state\_resource}}
+\doxysubsubsection{\texorpdfstring{weight}{weight}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1powerup__state__resource_a3982055a238765dcb0266efabf9573ef} 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} sysiosystem\+::powerup\+\_\+state\+\_\+resource\+::weight = 0}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00607}{607}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1powerup__state__resource_a05d8d68065b2519fe8a2402e1192640f}\index{sysiosystem::powerup\_state\_resource@{sysiosystem::powerup\_state\_resource}!weight\_ratio@{weight\_ratio}}
+\index{weight\_ratio@{weight\_ratio}!sysiosystem::powerup\_state\_resource@{sysiosystem::powerup\_state\_resource}}
+\doxysubsubsection{\texorpdfstring{weight\_ratio}{weight\_ratio}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1powerup__state__resource_a05d8d68065b2519fe8a2402e1192640f} 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} sysiosystem\+::powerup\+\_\+state\+\_\+resource\+::weight\+\_\+ratio = 0}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00610}{610}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/svetlasyrimis/\+Desktop/wire-\/network/\+WN-\/org/wire-\/system-\/contracts/contracts/sysio.\+system/include/sysio.\+system/\mbox{\hyperlink{sysio_8system_8hpp}{sysio.\+system.\+hpp}}\end{DoxyCompactItemize}

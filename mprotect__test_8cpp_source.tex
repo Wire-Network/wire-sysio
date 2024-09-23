@@ -1,0 +1,43 @@
+\doxysection{mprotect\+\_\+test.\+cpp}
+\hypertarget{mprotect__test_8cpp_source}{}\label{mprotect__test_8cpp_source}\index{libraries/fc/libraries/ff/depends/xbyak/test/mprotect\_test.cpp@{libraries/fc/libraries/ff/depends/xbyak/test/mprotect\_test.cpp}}
+\mbox{\hyperlink{mprotect__test_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{mprotect__test_8cpp_source_l00001}\mbox{\hyperlink{mprotect__test_8cpp_a3ede98665532cce0e33f614fac5150f9}{00001}}\ \textcolor{preprocessor}{\#define\ XBYAK\_NO\_OP\_NAMES}}
+\DoxyCodeLine{\Hypertarget{mprotect__test_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{xbyak_8h}{xbyak/xbyak.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{mprotect__test_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <string.h>}}
+\DoxyCodeLine{\Hypertarget{mprotect__test_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{\Hypertarget{mprotect__test_8cpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{mprotect__test_8cpp_source_l00006}00006\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_code}{Code}}\ :\ \mbox{\hyperlink{class_xbyak_1_1_code_generator}{Xbyak::CodeGenerator}}\ \{}
+\DoxyCodeLine{\Hypertarget{mprotect__test_8cpp_source_l00007}\mbox{\hyperlink{struct_code_aab2bb94865c85c9c5c02e76fc3116577}{00007}}\ \ \ \ \ \mbox{\hyperlink{struct_code_aab2bb94865c85c9c5c02e76fc3116577}{Code}}(\textcolor{keywordtype}{int}\ x)}
+\DoxyCodeLine{\Hypertarget{mprotect__test_8cpp_source_l00008}00008\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{mprotect__test_8cpp_source_l00009}00009\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_code_generator_ac01f285f4da251eb2fa144d5c49c9e3e}{mov}}(\mbox{\hyperlink{class_xbyak_1_1_code_generator_a682bca64626bf98c33660e1e245392d1}{eax}},\ x);}
+\DoxyCodeLine{\Hypertarget{mprotect__test_8cpp_source_l00010}00010\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}();}
+\DoxyCodeLine{\Hypertarget{mprotect__test_8cpp_source_l00011}00011\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{mprotect__test_8cpp_source_l00012}00012\ \};}
+\DoxyCodeLine{\Hypertarget{mprotect__test_8cpp_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{mprotect__test_8cpp_source_l00014}\mbox{\hyperlink{mprotect__test_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{00014}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{mprotect__test_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}()}
+\DoxyCodeLine{\Hypertarget{mprotect__test_8cpp_source_l00015}00015\ \ \ \ \ \textcolor{keyword}{try}}
+\DoxyCodeLine{\Hypertarget{mprotect__test_8cpp_source_l00016}00016\ \{}
+\DoxyCodeLine{\Hypertarget{mprotect__test_8cpp_source_l00017}00017\ \textcolor{preprocessor}{\#ifdef\ XBYAK\_USE\_MMAP\_ALLOCATOR}}
+\DoxyCodeLine{\Hypertarget{mprotect__test_8cpp_source_l00018}00018\ \ \ \ \ puts(\textcolor{stringliteral}{"{}use\ Allocator\ with\ mmap"{}});}
+\DoxyCodeLine{\Hypertarget{mprotect__test_8cpp_source_l00019}00019\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{mprotect__test_8cpp_source_l00020}00020\ \ \ \ \ puts(\textcolor{stringliteral}{"{}use\ Allocator\ with\ posix\_memalign"{}});}
+\DoxyCodeLine{\Hypertarget{mprotect__test_8cpp_source_l00021}00021\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{mprotect__test_8cpp_source_l00022}00022\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\ =\ 70000;}
+\DoxyCodeLine{\Hypertarget{mprotect__test_8cpp_source_l00023}00023\ \ \ \ \ std::vector<Code*>\ v(\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}});}
+\DoxyCodeLine{\Hypertarget{mprotect__test_8cpp_source_l00024}00024\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}};\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{mprotect__test_8cpp_source_l00025}00025\ \ \ \ \ \ \ \ \ v[i]\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{struct_code}{Code}}(i);}
+\DoxyCodeLine{\Hypertarget{mprotect__test_8cpp_source_l00026}00026\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{mprotect__test_8cpp_source_l00027}00027\ \ \ \ \ \textcolor{keywordtype}{long}\ \textcolor{keywordtype}{long}\ sum\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{mprotect__test_8cpp_source_l00028}00028\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}};\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{mprotect__test_8cpp_source_l00029}00029\ \ \ \ \ \ \ \ \ sum\ +=\ v[i]-\/>getCode<int\ (*)()>()();}
+\DoxyCodeLine{\Hypertarget{mprotect__test_8cpp_source_l00030}00030\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{mprotect__test_8cpp_source_l00031}00031\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}};\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{mprotect__test_8cpp_source_l00032}00032\ \ \ \ \ \ \ \ \ \textcolor{keyword}{delete}\ v[i];}
+\DoxyCodeLine{\Hypertarget{mprotect__test_8cpp_source_l00033}00033\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{mprotect__test_8cpp_source_l00034}00034\ \ \ \ \ printf(\textcolor{stringliteral}{"{}sum=\%lld\(\backslash\)n"{}},\ sum);}
+\DoxyCodeLine{\Hypertarget{mprotect__test_8cpp_source_l00035}00035\ \}\ \textcolor{keywordflow}{catch}\ (std::exception\&\ e)\ \{}
+\DoxyCodeLine{\Hypertarget{mprotect__test_8cpp_source_l00036}00036\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}ERR\ \%s\(\backslash\)n"{}},\ e.what());}
+\DoxyCodeLine{\Hypertarget{mprotect__test_8cpp_source_l00037}00037\ \}}
+
+\end{DoxyCode}

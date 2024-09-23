@@ -1,0 +1,96 @@
+\doxysection{utf8\+::invalid\+\_\+utf8 Class Reference}
+\hypertarget{classutf8_1_1invalid__utf8}{}\label{classutf8_1_1invalid__utf8}\index{utf8::invalid\_utf8@{utf8::invalid\_utf8}}
+
+
+{\ttfamily \#include $<$checked.\+h$>$}
+
+
+
+Inheritance diagram for utf8\+::invalid\+\_\+utf8\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=168pt]{classutf8_1_1invalid__utf8__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for utf8\+::invalid\+\_\+utf8\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=168pt]{classutf8_1_1invalid__utf8__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classutf8_1_1invalid__utf8_a161e63ef9ceb25f5e916d7b580d001a0}{invalid\+\_\+utf8}} (\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} u)
+\item 
+virtual const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classutf8_1_1invalid__utf8_aff82477eba7cc0e8b98b8c534d131033}{what}} () const  throw ()
+\item 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{classutf8_1_1invalid__utf8_af55a81b00bd7a0bd3fc59b993fbcfaea}{utf8\+\_\+octet}} () const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{checked_8h_source_l00049}{49}} of file \mbox{\hyperlink{checked_8h_source}{checked.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classutf8_1_1invalid__utf8_a161e63ef9ceb25f5e916d7b580d001a0}\index{utf8::invalid\_utf8@{utf8::invalid\_utf8}!invalid\_utf8@{invalid\_utf8}}
+\index{invalid\_utf8@{invalid\_utf8}!utf8::invalid\_utf8@{utf8::invalid\_utf8}}
+\doxysubsubsection{\texorpdfstring{invalid\_utf8()}{invalid\_utf8()}}
+{\footnotesize\ttfamily \label{classutf8_1_1invalid__utf8_a161e63ef9ceb25f5e916d7b580d001a0} 
+utf8\+::invalid\+\_\+utf8\+::invalid\+\_\+utf8 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}}}]{u}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{checked_8h_source_l00052}{52}} of file \mbox{\hyperlink{checked_8h_source}{checked.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00052\ :\ u8(u)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classutf8_1_1invalid__utf8_af55a81b00bd7a0bd3fc59b993fbcfaea}\index{utf8::invalid\_utf8@{utf8::invalid\_utf8}!utf8\_octet@{utf8\_octet}}
+\index{utf8\_octet@{utf8\_octet}!utf8::invalid\_utf8@{utf8::invalid\_utf8}}
+\doxysubsubsection{\texorpdfstring{utf8\_octet()}{utf8\_octet()}}
+{\footnotesize\ttfamily \label{classutf8_1_1invalid__utf8_af55a81b00bd7a0bd3fc59b993fbcfaea} 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} utf8\+::invalid\+\_\+utf8\+::utf8\+\_\+octet (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{checked_8h_source_l00054}{54}} of file \mbox{\hyperlink{checked_8h_source}{checked.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00054\ \{\textcolor{keywordflow}{return}\ u8;\}}
+
+\end{DoxyCode}
+\Hypertarget{classutf8_1_1invalid__utf8_aff82477eba7cc0e8b98b8c534d131033}\index{utf8::invalid\_utf8@{utf8::invalid\_utf8}!what@{what}}
+\index{what@{what}!utf8::invalid\_utf8@{utf8::invalid\_utf8}}
+\doxysubsubsection{\texorpdfstring{what()}{what()}}
+{\footnotesize\ttfamily \label{classutf8_1_1invalid__utf8_aff82477eba7cc0e8b98b8c534d131033} 
+virtual const char \texorpdfstring{$\ast$}{*} utf8\+::invalid\+\_\+utf8\+::what (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const throw ( ) \hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{checked_8h_source_l00053}{53}} of file \mbox{\hyperlink{checked_8h_source}{checked.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00053\ \{\ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Invalid\ UTF-\/8"{}};\ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/src/utf8/\mbox{\hyperlink{checked_8h}{checked.\+h}}\end{DoxyCompactItemize}

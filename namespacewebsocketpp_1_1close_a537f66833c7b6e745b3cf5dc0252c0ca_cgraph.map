@@ -1,0 +1,5 @@
+<map id="websocketpp::close::extract_reason" name="websocketpp::close::extract_reason">
+<area shape="rect" id="Node000001" title="Extract the reason string from a close payload." alt="" coords="5,5,143,46"/>
+<area shape="rect" id="Node000002" href="$namespacewebsocketpp_1_1utf8__validator.html#ad088137c6f18e6844e20496d8782c835" title="Validate a UTF8 string." alt="" coords="191,5,375,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="143,23,175,23,175,28,143,28"/>
+</map>

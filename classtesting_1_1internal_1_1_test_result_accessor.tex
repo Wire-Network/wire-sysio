@@ -1,0 +1,81 @@
+\doxysection{testing\+::internal\+::Test\+Result\+Accessor Class Reference}
+\hypertarget{classtesting_1_1internal_1_1_test_result_accessor}{}\label{classtesting_1_1internal_1_1_test_result_accessor}\index{testing::internal::TestResultAccessor@{testing::internal::TestResultAccessor}}
+
+
+{\ttfamily \#include $<$gtest-\/internal-\/inl.\+h$>$}
+
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static void \mbox{\hyperlink{classtesting_1_1internal_1_1_test_result_accessor_abcc4b32d1b201eeef92f0ec0ae161cf9}{Record\+Property}} (\mbox{\hyperlink{classtesting_1_1_test_result}{Test\+Result}} \texorpdfstring{$\ast$}{*}test\+\_\+result, const std\+::string \&xml\+\_\+element, const \mbox{\hyperlink{classtesting_1_1_test_property}{Test\+Property}} \&property)
+\item 
+static void \mbox{\hyperlink{classtesting_1_1internal_1_1_test_result_accessor_a53c626632bac65d82d88e432072b866b}{Clear\+Test\+Part\+Results}} (\mbox{\hyperlink{classtesting_1_1_test_result}{Test\+Result}} \texorpdfstring{$\ast$}{*}test\+\_\+result)
+\item 
+static const std\+::vector$<$ \mbox{\hyperlink{classtesting_1_1_test_part_result}{testing\+::\+Test\+Part\+Result}} $>$ \& \mbox{\hyperlink{classtesting_1_1internal_1_1_test_result_accessor_ab3e3abe2186c23ebc4428cabb7ba6479}{test\+\_\+part\+\_\+results}} (const \mbox{\hyperlink{classtesting_1_1_test_result}{Test\+Result}} \&test\+\_\+result)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{gtest-internal-inl_8h_source_l01006}{1006}} of file \mbox{\hyperlink{gtest-internal-inl_8h_source}{gtest-\/internal-\/inl.\+h}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_test_result_accessor_a53c626632bac65d82d88e432072b866b}\index{testing::internal::TestResultAccessor@{testing::internal::TestResultAccessor}!ClearTestPartResults@{ClearTestPartResults}}
+\index{ClearTestPartResults@{ClearTestPartResults}!testing::internal::TestResultAccessor@{testing::internal::TestResultAccessor}}
+\doxysubsubsection{\texorpdfstring{ClearTestPartResults()}{ClearTestPartResults()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_test_result_accessor_a53c626632bac65d82d88e432072b866b} 
+static void testing\+::internal\+::\+Test\+Result\+Accessor\+::\+Clear\+Test\+Part\+Results (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classtesting_1_1_test_result}{Test\+Result}} \texorpdfstring{$\ast$}{*}}]{test\+\_\+result}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-internal-inl_8h_source_l01014}{1014}} of file \mbox{\hyperlink{gtest-internal-inl_8h_source}{gtest-\/internal-\/inl.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01014\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01015\ \ \ \ \ test\_result-\/>ClearTestPartResults();}
+\DoxyCodeLine{01016\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1internal_1_1_test_result_accessor_abcc4b32d1b201eeef92f0ec0ae161cf9}\index{testing::internal::TestResultAccessor@{testing::internal::TestResultAccessor}!RecordProperty@{RecordProperty}}
+\index{RecordProperty@{RecordProperty}!testing::internal::TestResultAccessor@{testing::internal::TestResultAccessor}}
+\doxysubsubsection{\texorpdfstring{RecordProperty()}{RecordProperty()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_test_result_accessor_abcc4b32d1b201eeef92f0ec0ae161cf9} 
+static void testing\+::internal\+::\+Test\+Result\+Accessor\+::\+Record\+Property (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classtesting_1_1_test_result}{Test\+Result}} \texorpdfstring{$\ast$}{*}}]{test\+\_\+result}{, }\item[{const std\+::string \&}]{xml\+\_\+element}{, }\item[{const \mbox{\hyperlink{classtesting_1_1_test_property}{Test\+Property}} \&}]{property}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-internal-inl_8h_source_l01008}{1008}} of file \mbox{\hyperlink{gtest-internal-inl_8h_source}{gtest-\/internal-\/inl.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01010\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01011\ \ \ \ \ test\_result-\/>RecordProperty(xml\_element,\ property);}
+\DoxyCodeLine{01012\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1internal_1_1_test_result_accessor_ab3e3abe2186c23ebc4428cabb7ba6479}\index{testing::internal::TestResultAccessor@{testing::internal::TestResultAccessor}!test\_part\_results@{test\_part\_results}}
+\index{test\_part\_results@{test\_part\_results}!testing::internal::TestResultAccessor@{testing::internal::TestResultAccessor}}
+\doxysubsubsection{\texorpdfstring{test\_part\_results()}{test\_part\_results()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_test_result_accessor_ab3e3abe2186c23ebc4428cabb7ba6479} 
+static const std\+::vector$<$ \mbox{\hyperlink{classtesting_1_1_test_part_result}{testing\+::\+Test\+Part\+Result}} $>$ \& testing\+::internal\+::\+Test\+Result\+Accessor\+::test\+\_\+part\+\_\+results (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classtesting_1_1_test_result}{Test\+Result}} \&}]{test\+\_\+result}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-internal-inl_8h_source_l01018}{1018}} of file \mbox{\hyperlink{gtest-internal-inl_8h_source}{gtest-\/internal-\/inl.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01019\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01020\ \ \ \ \ \textcolor{keywordflow}{return}\ test\_result.test\_part\_results();}
+\DoxyCodeLine{01021\ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/src/\mbox{\hyperlink{gtest-internal-inl_8h}{gtest-\/internal-\/inl.\+h}}\end{DoxyCompactItemize}

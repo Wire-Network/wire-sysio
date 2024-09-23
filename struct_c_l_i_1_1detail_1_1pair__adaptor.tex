@@ -1,0 +1,143 @@
+\doxysection{CLI\+::detail\+::pair\+\_\+adaptor\texorpdfstring{$<$}{<} T, \+\_\+ \texorpdfstring{$>$}{>} Struct Template Reference}
+\hypertarget{struct_c_l_i_1_1detail_1_1pair__adaptor}{}\label{struct_c_l_i_1_1detail_1_1pair__adaptor}\index{CLI::detail::pair\_adaptor$<$ T, \_ $>$@{CLI::detail::pair\_adaptor$<$ T, \_ $>$}}
+
+
+Adaptor for set-\/like structure\+: This just wraps a normal container in a few utilities that do almost nothing.  
+
+
+
+
+{\ttfamily \#include $<$CLI11.\+hpp$>$}
+
+
+
+Inheritance diagram for CLI\+::detail\+::pair\+\_\+adaptor\texorpdfstring{$<$}{<} T, \+\_\+ \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=200pt]{struct_c_l_i_1_1detail_1_1pair__adaptor__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for CLI\+::detail\+::pair\+\_\+adaptor\texorpdfstring{$<$}{<} T, \+\_\+ \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=200pt]{struct_c_l_i_1_1detail_1_1pair__adaptor__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1pair__adaptor_a024ff3813a5217cc3ce9e9096015b5df}{value\+\_\+type}} = typename T\+::value\+\_\+type
+\item 
+using \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1pair__adaptor_a8bcb95c4adfe14cc502c0446b0f01fc1}{first\+\_\+type}} = typename std\+::remove\+\_\+const$<$\mbox{\hyperlink{struct_c_l_i_1_1detail_1_1pair__adaptor_a024ff3813a5217cc3ce9e9096015b5df}{value\+\_\+type}}$>$\+::type
+\item 
+using \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1pair__adaptor_a5efab96578f39e5d5183aeb23a5ae52b}{second\+\_\+type}} = typename std\+::remove\+\_\+const$<$\mbox{\hyperlink{struct_c_l_i_1_1detail_1_1pair__adaptor_a024ff3813a5217cc3ce9e9096015b5df}{value\+\_\+type}}$>$\+::type
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename Q $>$ }\\static auto \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1pair__adaptor_ab46a8b1544ac182fe15948fe94a75bd6}{first}} (Q \&\&pair\+\_\+value) -\/$>$ decltype(std\+::forward$<$ Q $>$(pair\+\_\+value))
+\begin{DoxyCompactList}\small\item\em Get the first value (really just the underlying value) \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename Q $>$ }\\static auto \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1pair__adaptor_a69f2f87359de8d01c72ac645c6ada8c8}{second}} (Q \&\&pair\+\_\+value) -\/$>$ decltype(std\+::forward$<$ Q $>$(pair\+\_\+value))
+\begin{DoxyCompactList}\small\item\em Get the second value (really just the underlying value) \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, typename \mbox{\hyperlink{localize_8hpp_a6554a5ea005e85d0f84f2f34c11de938}{\+\_\+}} = void$>$\newline
+struct CLI\+::detail\+::pair\+\_\+adaptor$<$ T, \+\_\+ $>$}
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l00929}{929}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{struct_c_l_i_1_1detail_1_1pair__adaptor_a8bcb95c4adfe14cc502c0446b0f01fc1}\index{CLI::detail::pair\_adaptor$<$ T, \_ $>$@{CLI::detail::pair\_adaptor$<$ T, \_ $>$}!first\_type@{first\_type}}
+\index{first\_type@{first\_type}!CLI::detail::pair\_adaptor$<$ T, \_ $>$@{CLI::detail::pair\_adaptor$<$ T, \_ $>$}}
+\doxysubsubsection{\texorpdfstring{first\_type}{first\_type}}
+{\footnotesize\ttfamily \label{struct_c_l_i_1_1detail_1_1pair__adaptor_a8bcb95c4adfe14cc502c0446b0f01fc1} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{localize_8hpp_a6554a5ea005e85d0f84f2f34c11de938}{\+\_\+}}  = void$>$ \\
+using \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1pair__adaptor}{CLI\+::detail\+::pair\+\_\+adaptor}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{localize_8hpp_a6554a5ea005e85d0f84f2f34c11de938}{\+\_\+}} $>$\+::first\+\_\+type = typename std\+::remove\+\_\+const$<$\mbox{\hyperlink{struct_c_l_i_1_1detail_1_1pair__adaptor_a024ff3813a5217cc3ce9e9096015b5df}{value\+\_\+type}}$>$\+::type}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l00931}{931}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+\Hypertarget{struct_c_l_i_1_1detail_1_1pair__adaptor_a5efab96578f39e5d5183aeb23a5ae52b}\index{CLI::detail::pair\_adaptor$<$ T, \_ $>$@{CLI::detail::pair\_adaptor$<$ T, \_ $>$}!second\_type@{second\_type}}
+\index{second\_type@{second\_type}!CLI::detail::pair\_adaptor$<$ T, \_ $>$@{CLI::detail::pair\_adaptor$<$ T, \_ $>$}}
+\doxysubsubsection{\texorpdfstring{second\_type}{second\_type}}
+{\footnotesize\ttfamily \label{struct_c_l_i_1_1detail_1_1pair__adaptor_a5efab96578f39e5d5183aeb23a5ae52b} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{localize_8hpp_a6554a5ea005e85d0f84f2f34c11de938}{\+\_\+}}  = void$>$ \\
+using \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1pair__adaptor}{CLI\+::detail\+::pair\+\_\+adaptor}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{localize_8hpp_a6554a5ea005e85d0f84f2f34c11de938}{\+\_\+}} $>$\+::second\+\_\+type = typename std\+::remove\+\_\+const$<$\mbox{\hyperlink{struct_c_l_i_1_1detail_1_1pair__adaptor_a024ff3813a5217cc3ce9e9096015b5df}{value\+\_\+type}}$>$\+::type}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l00932}{932}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+\Hypertarget{struct_c_l_i_1_1detail_1_1pair__adaptor_a024ff3813a5217cc3ce9e9096015b5df}\index{CLI::detail::pair\_adaptor$<$ T, \_ $>$@{CLI::detail::pair\_adaptor$<$ T, \_ $>$}!value\_type@{value\_type}}
+\index{value\_type@{value\_type}!CLI::detail::pair\_adaptor$<$ T, \_ $>$@{CLI::detail::pair\_adaptor$<$ T, \_ $>$}}
+\doxysubsubsection{\texorpdfstring{value\_type}{value\_type}}
+{\footnotesize\ttfamily \label{struct_c_l_i_1_1detail_1_1pair__adaptor_a024ff3813a5217cc3ce9e9096015b5df} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{localize_8hpp_a6554a5ea005e85d0f84f2f34c11de938}{\+\_\+}}  = void$>$ \\
+using \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1pair__adaptor}{CLI\+::detail\+::pair\+\_\+adaptor}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{localize_8hpp_a6554a5ea005e85d0f84f2f34c11de938}{\+\_\+}} $>$\+::value\+\_\+type = typename T\+::value\+\_\+type}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l00930}{930}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_c_l_i_1_1detail_1_1pair__adaptor_ab46a8b1544ac182fe15948fe94a75bd6}\index{CLI::detail::pair\_adaptor$<$ T, \_ $>$@{CLI::detail::pair\_adaptor$<$ T, \_ $>$}!first@{first}}
+\index{first@{first}!CLI::detail::pair\_adaptor$<$ T, \_ $>$@{CLI::detail::pair\_adaptor$<$ T, \_ $>$}}
+\doxysubsubsection{\texorpdfstring{first()}{first()}}
+{\footnotesize\ttfamily \label{struct_c_l_i_1_1detail_1_1pair__adaptor_ab46a8b1544ac182fe15948fe94a75bd6} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{localize_8hpp_a6554a5ea005e85d0f84f2f34c11de938}{\+\_\+}}  = void$>$ \\
+template$<$typename Q $>$ \\
+static auto \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1pair__adaptor}{CLI\+::detail\+::pair\+\_\+adaptor}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{localize_8hpp_a6554a5ea005e85d0f84f2f34c11de938}{\+\_\+}} $>$\+::first (\begin{DoxyParamCaption}\item[{Q \&\&}]{pair\+\_\+value}{}\end{DoxyParamCaption}) -\/$>$ decltype(std\+::forward$<$Q$>$(pair\+\_\+value)) \hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l00935}{935}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00935\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00936\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::forward<Q>(pair\_value);}
+\DoxyCodeLine{00937\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_c_l_i_1_1detail_1_1pair__adaptor_ab46a8b1544ac182fe15948fe94a75bd6_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_c_l_i_1_1detail_1_1pair__adaptor_a69f2f87359de8d01c72ac645c6ada8c8}\index{CLI::detail::pair\_adaptor$<$ T, \_ $>$@{CLI::detail::pair\_adaptor$<$ T, \_ $>$}!second@{second}}
+\index{second@{second}!CLI::detail::pair\_adaptor$<$ T, \_ $>$@{CLI::detail::pair\_adaptor$<$ T, \_ $>$}}
+\doxysubsubsection{\texorpdfstring{second()}{second()}}
+{\footnotesize\ttfamily \label{struct_c_l_i_1_1detail_1_1pair__adaptor_a69f2f87359de8d01c72ac645c6ada8c8} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{localize_8hpp_a6554a5ea005e85d0f84f2f34c11de938}{\+\_\+}}  = void$>$ \\
+template$<$typename Q $>$ \\
+static auto \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1pair__adaptor}{CLI\+::detail\+::pair\+\_\+adaptor}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{localize_8hpp_a6554a5ea005e85d0f84f2f34c11de938}{\+\_\+}} $>$\+::second (\begin{DoxyParamCaption}\item[{Q \&\&}]{pair\+\_\+value}{}\end{DoxyParamCaption}) -\/$>$ decltype(std\+::forward$<$Q$>$(pair\+\_\+value)) \hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l00939}{939}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00939\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00940\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::forward<Q>(pair\_value);}
+\DoxyCodeLine{00941\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+programs/clio/\mbox{\hyperlink{_c_l_i11_8hpp}{CLI11.\+hpp}}\end{DoxyCompactItemize}

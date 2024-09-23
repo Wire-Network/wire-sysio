@@ -1,0 +1,65 @@
+\doxysection{300-\/Gen-\/\+Own\+Generator.cpp}
+\hypertarget{300-_gen-_own_generator_8cpp_source}{}\label{300-_gen-_own_generator_8cpp_source}\index{libraries/sys-\/vm/external/Catch2/examples/300-\/Gen-\/OwnGenerator.cpp@{libraries/sys-\/vm/external/Catch2/examples/300-\/Gen-\/OwnGenerator.cpp}}
+\mbox{\hyperlink{300-_gen-_own_generator_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{300-_gen-_own_generator_8cpp_source_l00001}00001\ \textcolor{comment}{//\ 300-\/Gen-\/OwnGenerator.cpp}}
+\DoxyCodeLine{\Hypertarget{300-_gen-_own_generator_8cpp_source_l00002}00002\ \textcolor{comment}{//\ Shows\ how\ to\ define\ a\ custom\ generator.}}
+\DoxyCodeLine{\Hypertarget{300-_gen-_own_generator_8cpp_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{300-_gen-_own_generator_8cpp_source_l00004}00004\ \textcolor{comment}{//\ Specifically\ we\ will\ implement\ a\ random\ number\ generator\ for\ integers}}
+\DoxyCodeLine{\Hypertarget{300-_gen-_own_generator_8cpp_source_l00005}00005\ \textcolor{comment}{//\ It\ will\ have\ infinite\ capacity\ and\ settable\ lower/upper\ bound}}
+\DoxyCodeLine{\Hypertarget{300-_gen-_own_generator_8cpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{300-_gen-_own_generator_8cpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{single__include_2catch2_2catch_8hpp}{catch2/catch.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{300-_gen-_own_generator_8cpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{300-_gen-_own_generator_8cpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ <random>}}
+\DoxyCodeLine{\Hypertarget{300-_gen-_own_generator_8cpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{300-_gen-_own_generator_8cpp_source_l00011}00011\ \textcolor{comment}{//\ This\ class\ shows\ how\ to\ implement\ a\ simple\ generator\ for\ Catch\ tests}}
+\DoxyCodeLine{\Hypertarget{300-_gen-_own_generator_8cpp_source_l00012}\mbox{\hyperlink{class_random_int_generator}{00012}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_random_int_generator}{RandomIntGenerator}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{struct_catch_1_1_generators_1_1_i_generator}{Catch::Generators::IGenerator}}<int>\ \{}
+\DoxyCodeLine{\Hypertarget{300-_gen-_own_generator_8cpp_source_l00013}00013\ \ \ \ \ std::minstd\_rand\ m\_rand;}
+\DoxyCodeLine{\Hypertarget{300-_gen-_own_generator_8cpp_source_l00014}00014\ \ \ \ \ std::uniform\_int\_distribution<>\ m\_dist;}
+\DoxyCodeLine{\Hypertarget{300-_gen-_own_generator_8cpp_source_l00015}00015\ \ \ \ \ \textcolor{keywordtype}{int}\ current\_number;}
+\DoxyCodeLine{\Hypertarget{300-_gen-_own_generator_8cpp_source_l00016}00016\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{300-_gen-_own_generator_8cpp_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{300-_gen-_own_generator_8cpp_source_l00018}\mbox{\hyperlink{class_random_int_generator_a176a0e629577687ab7fa77a2b656ef8a}{00018}}\ \ \ \ \ \mbox{\hyperlink{class_random_int_generator_a176a0e629577687ab7fa77a2b656ef8a}{RandomIntGenerator}}(\textcolor{keywordtype}{int}\ low,\ \textcolor{keywordtype}{int}\ high):}
+\DoxyCodeLine{\Hypertarget{300-_gen-_own_generator_8cpp_source_l00019}00019\ \ \ \ \ \ \ \ \ m\_rand(\mbox{\hyperlink{namespacestd}{std}}::random\_device\{\}()),}
+\DoxyCodeLine{\Hypertarget{300-_gen-_own_generator_8cpp_source_l00020}00020\ \ \ \ \ \ \ \ \ m\_dist(low,\ high)}
+\DoxyCodeLine{\Hypertarget{300-_gen-_own_generator_8cpp_source_l00021}00021\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{300-_gen-_own_generator_8cpp_source_l00022}00022\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{void}\textcolor{keyword}{>}(\mbox{\hyperlink{class_random_int_generator_a665ebd2a72423f7c953278e591cd0dd3}{next}}());}
+\DoxyCodeLine{\Hypertarget{300-_gen-_own_generator_8cpp_source_l00023}00023\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{300-_gen-_own_generator_8cpp_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{300-_gen-_own_generator_8cpp_source_l00025}00025\ \ \ \ \ \textcolor{keywordtype}{int}\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{class_random_int_generator_ac6fffa166da96d59763b69573c67d918}{get}}()\ \textcolor{keyword}{const\ override};}
+\DoxyCodeLine{\Hypertarget{300-_gen-_own_generator_8cpp_source_l00026}\mbox{\hyperlink{class_random_int_generator_a665ebd2a72423f7c953278e591cd0dd3}{00026}}\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_random_int_generator_a665ebd2a72423f7c953278e591cd0dd3}{next}}()\textcolor{keyword}{\ override\ }\{}
+\DoxyCodeLine{\Hypertarget{300-_gen-_own_generator_8cpp_source_l00027}00027\ \ \ \ \ \ \ \ \ current\_number\ =\ m\_dist(m\_rand);}
+\DoxyCodeLine{\Hypertarget{300-_gen-_own_generator_8cpp_source_l00028}00028\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{300-_gen-_own_generator_8cpp_source_l00029}00029\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{300-_gen-_own_generator_8cpp_source_l00030}00030\ \};}
+\DoxyCodeLine{\Hypertarget{300-_gen-_own_generator_8cpp_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{300-_gen-_own_generator_8cpp_source_l00032}00032\ \textcolor{comment}{//\ Avoids\ -\/Wweak-\/vtables}}
+\DoxyCodeLine{\Hypertarget{300-_gen-_own_generator_8cpp_source_l00033}\mbox{\hyperlink{class_random_int_generator_ac6fffa166da96d59763b69573c67d918}{00033}}\ \textcolor{keywordtype}{int}\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{class_random_int_generator_ac6fffa166da96d59763b69573c67d918}{RandomIntGenerator::get}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{300-_gen-_own_generator_8cpp_source_l00034}00034\ \ \ \ \ \textcolor{keywordflow}{return}\ current\_number;}
+\DoxyCodeLine{\Hypertarget{300-_gen-_own_generator_8cpp_source_l00035}00035\ \}}
+\DoxyCodeLine{\Hypertarget{300-_gen-_own_generator_8cpp_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{300-_gen-_own_generator_8cpp_source_l00037}00037\ \textcolor{comment}{//\ This\ helper\ function\ provides\ a\ nicer\ UX\ when\ instantiating\ the\ generator}}
+\DoxyCodeLine{\Hypertarget{300-_gen-_own_generator_8cpp_source_l00038}00038\ \textcolor{comment}{//\ Notice\ that\ it\ returns\ an\ instance\ of\ GeneratorWrapper<int>,\ which}}
+\DoxyCodeLine{\Hypertarget{300-_gen-_own_generator_8cpp_source_l00039}00039\ \textcolor{comment}{//\ is\ a\ value-\/wrapper\ around\ std::unique\_ptr<IGenerator<int>>.}}
+\DoxyCodeLine{\Hypertarget{300-_gen-_own_generator_8cpp_source_l00040}\mbox{\hyperlink{300-_gen-_own_generator_8cpp_afdd9308d0d4beaa89febe21aab594386}{00040}}\ \mbox{\hyperlink{class_catch_1_1_generators_1_1_generator_wrapper}{Catch::Generators::GeneratorWrapper<int>}}\ \mbox{\hyperlink{yubico__otp_8c_a7ba1784f91d04c32f9b3139bc6fd8137}{random}}(\textcolor{keywordtype}{int}\ low,\ \textcolor{keywordtype}{int}\ high)\ \{}
+\DoxyCodeLine{\Hypertarget{300-_gen-_own_generator_8cpp_source_l00041}00041\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_catch_1_1_generators_1_1_generator_wrapper}{Catch::Generators::GeneratorWrapper<int>}}(std::unique\_ptr<\mbox{\hyperlink{struct_catch_1_1_generators_1_1_i_generator}{Catch::Generators::IGenerator<int>}}>(\textcolor{keyword}{new}\ \mbox{\hyperlink{class_random_int_generator}{RandomIntGenerator}}(low,\ high)));}
+\DoxyCodeLine{\Hypertarget{300-_gen-_own_generator_8cpp_source_l00042}00042\ \}}
+\DoxyCodeLine{\Hypertarget{300-_gen-_own_generator_8cpp_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{300-_gen-_own_generator_8cpp_source_l00044}00044\ \textcolor{comment}{//\ The\ two\ sections\ in\ this\ test\ case\ are\ equivalent,\ but\ the\ first\ one}}
+\DoxyCodeLine{\Hypertarget{300-_gen-_own_generator_8cpp_source_l00045}00045\ \textcolor{comment}{//\ is\ much\ more\ readable/nicer\ to\ use}}
+\DoxyCodeLine{\Hypertarget{300-_gen-_own_generator_8cpp_source_l00046}\mbox{\hyperlink{300-_gen-_own_generator_8cpp_a8b5d564a90741635b5a3880d81be9f83}{00046}}\ \mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\textcolor{stringliteral}{"{}Generating\ random\ ints"{}},\ \textcolor{stringliteral}{"{}[example][generator]"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{300-_gen-_own_generator_8cpp_source_l00047}00047\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\textcolor{stringliteral}{"{}Nice\ UX"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{300-_gen-_own_generator_8cpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ i\ =\ \mbox{\hyperlink{catch__generators_8hpp_a4941c6427cfa36ee7c52d734e460f9df}{GENERATE}}(take(100,\ \mbox{\hyperlink{yubico__otp_8c_a7ba1784f91d04c32f9b3139bc6fd8137}{random}}(-\/100,\ 100)));}
+\DoxyCodeLine{\Hypertarget{300-_gen-_own_generator_8cpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(i\ >=\ -\/100);}
+\DoxyCodeLine{\Hypertarget{300-_gen-_own_generator_8cpp_source_l00050}00050\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(i\ <=\ 100);}
+\DoxyCodeLine{\Hypertarget{300-_gen-_own_generator_8cpp_source_l00051}00051\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{300-_gen-_own_generator_8cpp_source_l00052}00052\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\textcolor{stringliteral}{"{}Creating\ the\ random\ generator\ directly"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{300-_gen-_own_generator_8cpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ i\ =\ \mbox{\hyperlink{catch__generators_8hpp_a4941c6427cfa36ee7c52d734e460f9df}{GENERATE}}(take(100,\ GeneratorWrapper<int>(std::unique\_ptr<IGenerator<int>>(\textcolor{keyword}{new}\ \mbox{\hyperlink{class_random_int_generator}{RandomIntGenerator}}(-\/100,\ 100)))));}
+\DoxyCodeLine{\Hypertarget{300-_gen-_own_generator_8cpp_source_l00054}00054\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(i\ >=\ -\/100);}
+\DoxyCodeLine{\Hypertarget{300-_gen-_own_generator_8cpp_source_l00055}00055\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(i\ <=\ 100);}
+\DoxyCodeLine{\Hypertarget{300-_gen-_own_generator_8cpp_source_l00056}00056\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{300-_gen-_own_generator_8cpp_source_l00057}00057\ \}}
+\DoxyCodeLine{\Hypertarget{300-_gen-_own_generator_8cpp_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{300-_gen-_own_generator_8cpp_source_l00059}00059\ \textcolor{comment}{//\ Compiling\ and\ running\ this\ file\ will\ result\ in\ 400\ successful\ assertions}}
+
+\end{DoxyCode}

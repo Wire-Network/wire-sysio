@@ -1,0 +1,22 @@
+<map id="websocketpp::frame::opcode::is_control" name="websocketpp::frame::opcode::is_control">
+<area shape="rect" id="Node000001" title="Check if an opcode is for a control frame." alt="" coords="461,142,600,182"/>
+<area shape="rect" id="Node000002" href="$hybi13_8cpp.html#ae8fa75d088192976938f98253c21555f" title=" " alt="" coords="217,5,413,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="501,132,461,91,412,52,370,34,372,29,414,48,465,87,505,128"/>
+<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1processor_1_1hybi13.html#a5c5e3234a0067c7f14fe0ceb4e647659" title="Process new websocket connection bytes." alt="" coords="5,114,169,154"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="489,135,453,113,412,97,359,85,316,83,217,97,143,116,142,111,216,92,315,78,359,80,414,92,455,108,492,130"/>
+<area shape="rect" id="Node000004" href="$classwebsocketpp_1_1processor_1_1hybi13.html#a8fe09bba8cbe2821ef5c7cf3fd9573cd" title="Retrieves the most recently processed message." alt="" coords="233,106,396,146"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="445,151,396,142,397,137,446,145"/>
+<area shape="rect" id="Node000005" href="$classwebsocketpp_1_1processor_1_1hybi13.html#a5aa8f27959beeeef73997a80c2560663" title="Generic prepare control frame with opcode and payload." alt="" coords="233,315,397,356"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="511,197,471,252,444,280,415,304,392,317,389,312,411,300,441,276,467,248,507,194"/>
+<area shape="rect" id="Node000009" href="$classwebsocketpp_1_1processor_1_1hybi13.html#a72f4833d66eb51e37a956f434895b3ab" title="Prepare a user data message for writing." alt="" coords="220,250,410,290"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="491,194,455,218,414,241,388,252,386,247,412,236,452,214,488,189"/>
+<area shape="rect" id="Node000010" href="$classwebsocketpp_1_1processor_1_1hybi13.html#a0c549a5e2766288fb625c03e507cc9ad" title="Validate an incoming basic header." alt="" coords="225,170,404,226"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="446,179,405,186,404,181,445,174"/>
+<area shape="rect" id="Node000006" href="$classwebsocketpp_1_1processor_1_1hybi13.html#a8cbb98af828463c5ef80429a7ade715d" title=" " alt="" coords="5,250,169,290"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="227,313,160,294,161,289,228,308"/>
+<area shape="rect" id="Node000007" href="$classwebsocketpp_1_1processor_1_1hybi13.html#a38d06bc30c10cd1947c9a7b3051f8961" title="Get URI." alt="" coords="5,315,169,356"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="217,338,169,338,169,333,217,333"/>
+<area shape="rect" id="Node000008" href="$classwebsocketpp_1_1processor_1_1hybi13.html#ab5ca972653c126e7c6a05c529b394321" title=" " alt="" coords="5,380,169,421"/>
+<area shape="poly" id="edge7_Node000005_Node000008" title=" " alt="" coords="228,363,161,382,160,377,227,358"/>
+<area shape="poly" id="edge10_Node000010_Node000003" title=" " alt="" coords="209,171,161,158,163,153,211,166"/>
+</map>

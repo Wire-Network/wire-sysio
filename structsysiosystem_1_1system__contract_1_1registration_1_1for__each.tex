@@ -1,0 +1,50 @@
+\doxysection{sysiosystem\+::system\+\_\+contract\+::registration\texorpdfstring{$<$}{<} Ptrs \texorpdfstring{$>$}{>}\+::for\+\_\+each\texorpdfstring{$<$}{<} P, Ps \texorpdfstring{$>$}{>} Struct Template Reference}
+\hypertarget{structsysiosystem_1_1system__contract_1_1registration_1_1for__each}{}\label{structsysiosystem_1_1system__contract_1_1registration_1_1for__each}\index{sysiosystem::system\_contract::registration$<$ Ptrs $>$::for\_each$<$ P, Ps $>$@{sysiosystem::system\_contract::registration$<$ Ptrs $>$::for\_each$<$ P, Ps $>$}}
+
+
+{\ttfamily \#include $<$sysio.\+system.\+hpp$>$}
+
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename... Args$>$ }\\static constexpr void \mbox{\hyperlink{structsysiosystem_1_1system__contract_1_1registration_1_1for__each_a9b6fc1bf7c8d813a95b38a050fb461b0}{call}} (\mbox{\hyperlink{classsysiosystem_1_1system__contract}{system\+\_\+contract}} \texorpdfstring{$\ast$}{*}this\+\_\+contract, Args \&\&... args)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$auto system\+\_\+contract\+::\texorpdfstring{$\ast$}{*}... Ptrs$>$\newline
+template$<$auto system\+\_\+contract\+::\texorpdfstring{$\ast$}{*} P, auto system\+\_\+contract\+::\texorpdfstring{$\ast$}{*}... Ps$>$\newline
+struct sysiosystem\+::system\+\_\+contract\+::registration$<$ Ptrs $>$\+::for\+\_\+each$<$ P, Ps $>$}
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l01521}{1521}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysiosystem_1_1system__contract_1_1registration_1_1for__each_a9b6fc1bf7c8d813a95b38a050fb461b0}\index{sysiosystem::system\_contract::registration$<$ Ptrs $>$::for\_each$<$ P, Ps $>$@{sysiosystem::system\_contract::registration$<$ Ptrs $>$::for\_each$<$ P, Ps $>$}!call@{call}}
+\index{call@{call}!sysiosystem::system\_contract::registration$<$ Ptrs $>$::for\_each$<$ P, Ps $>$@{sysiosystem::system\_contract::registration$<$ Ptrs $>$::for\_each$<$ P, Ps $>$}}
+\doxysubsubsection{\texorpdfstring{call()}{call()}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1system__contract_1_1registration_1_1for__each_a9b6fc1bf7c8d813a95b38a050fb461b0} 
+template$<$auto system\+\_\+contract\+::\texorpdfstring{$\ast$}{*}... Ptrs$>$ \\
+template$<$auto system\+\_\+contract\+::\texorpdfstring{$\ast$}{*} P, auto system\+\_\+contract\+::\texorpdfstring{$\ast$}{*}... Ps$>$ \\
+template$<$typename... Args$>$ \\
+static constexpr void sysiosystem\+::system\+\_\+contract\+::registration$<$ Ptrs $>$\+::for\+\_\+each$<$ \mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}}, Ps $>$\+::call (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classsysiosystem_1_1system__contract}{system\+\_\+contract}} \texorpdfstring{$\ast$}{*}}]{this\+\_\+contract}{, }\item[{Args \&\&...}]{args}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l01523}{1523}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01524\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01525\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::invoke(\ \mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}},\ this\_contract,\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}...\ );}
+\DoxyCodeLine{01526\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysiosystem_1_1system__contract_1_1registration_1_1for__each_a9b6fc1bf7c8d813a95b38a050fb461b0}{for\_each<Ps...>::call}}(\ this\_contract,\ std::forward<Args>(args)...\ );}
+\DoxyCodeLine{01527\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/svetlasyrimis/\+Desktop/wire-\/network/\+WN-\/org/wire-\/system-\/contracts/contracts/sysio.\+system/include/sysio.\+system/\mbox{\hyperlink{sysio_8system_8hpp}{sysio.\+system.\+hpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,143 @@
+\doxysection{gtest\+\_\+env\+\_\+var\+\_\+test.\+GTest\+Env\+Var\+Test Class Reference}
+\hypertarget{classgtest__env__var__test_1_1_g_test_env_var_test}{}\label{classgtest__env__var__test_1_1_g_test_env_var_test}\index{gtest\_env\_var\_test.GTestEnvVarTest@{gtest\_env\_var\_test.GTestEnvVarTest}}
+
+
+Inheritance diagram for gtest\+\_\+env\+\_\+var\+\_\+test.\+GTest\+Env\+Var\+Test\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=209pt]{classgtest__env__var__test_1_1_g_test_env_var_test__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for gtest\+\_\+env\+\_\+var\+\_\+test.\+GTest\+Env\+Var\+Test\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=209pt]{classgtest__env__var__test_1_1_g_test_env_var_test__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classgtest__env__var__test_1_1_g_test_env_var_test_a863960622641e8305fb574c7054ae7be}{test\+Env\+Var\+Affects\+Flag}} (self)
+\item 
+\mbox{\hyperlink{classgtest__env__var__test_1_1_g_test_env_var_test_a8d340f27313b0cac2c5cc888bb3b77a6}{test\+Xml\+Output\+File}} (self)
+\item 
+\mbox{\hyperlink{classgtest__env__var__test_1_1_g_test_env_var_test_ae4667cf19187d4b862ff2e6481b91282}{test\+Xml\+Output\+File\+Override}} (self)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{gtest__env__var__test_8py_source_l00083}{83}} of file \mbox{\hyperlink{gtest__env__var__test_8py_source}{gtest\+\_\+env\+\_\+var\+\_\+test.\+py}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classgtest__env__var__test_1_1_g_test_env_var_test_a863960622641e8305fb574c7054ae7be}\index{gtest\_env\_var\_test.GTestEnvVarTest@{gtest\_env\_var\_test.GTestEnvVarTest}!testEnvVarAffectsFlag@{testEnvVarAffectsFlag}}
+\index{testEnvVarAffectsFlag@{testEnvVarAffectsFlag}!gtest\_env\_var\_test.GTestEnvVarTest@{gtest\_env\_var\_test.GTestEnvVarTest}}
+\doxysubsubsection{\texorpdfstring{testEnvVarAffectsFlag()}{testEnvVarAffectsFlag()}}
+{\footnotesize\ttfamily \label{classgtest__env__var__test_1_1_g_test_env_var_test_a863960622641e8305fb574c7054ae7be} 
+gtest\+\_\+env\+\_\+var\+\_\+test.\+GTest\+Env\+Var\+Test.\+test\+Env\+Var\+Affects\+Flag (\begin{DoxyParamCaption}\item[{}]{self}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Tests that environment variable should affect the corresponding flag.\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{gtest__env__var__test_8py_source_l00085}{85}} of file \mbox{\hyperlink{gtest__env__var__test_8py_source}{gtest\+\_\+env\+\_\+var\+\_\+test.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00085\ \ \ \textcolor{keyword}{def\ }testEnvVarAffectsFlag(self):}
+\DoxyCodeLine{00086\ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Tests\ that\ environment\ variable\ should\ affect\ the\ corresponding\ flag."{}"{}"{}}}
+\DoxyCodeLine{00087\ }
+\DoxyCodeLine{00088\ \ \ \ \ TestFlag(\textcolor{stringliteral}{'break\_on\_failure'},\ \textcolor{stringliteral}{'1'},\ \textcolor{stringliteral}{'0'})}
+\DoxyCodeLine{00089\ \ \ \ \ TestFlag(\textcolor{stringliteral}{'color'},\ \textcolor{stringliteral}{'yes'},\ \textcolor{stringliteral}{'auto'})}
+\DoxyCodeLine{00090\ \ \ \ \ TestFlag(\textcolor{stringliteral}{'filter'},\ \textcolor{stringliteral}{'FooTest.Bar'},\ \textcolor{stringliteral}{'*'})}
+\DoxyCodeLine{00091\ \ \ \ \ SetEnvVar(\textcolor{stringliteral}{'XML\_OUTPUT\_FILE'},\ \textcolor{keywordtype}{None})\ \ \textcolor{comment}{\#\ For\ 'output'\ test}}
+\DoxyCodeLine{00092\ \ \ \ \ TestFlag(\textcolor{stringliteral}{'output'},\ \textcolor{stringliteral}{'xml:tmp/foo.xml'},\ \textcolor{stringliteral}{''})}
+\DoxyCodeLine{00093\ \ \ \ \ TestFlag(\textcolor{stringliteral}{'print\_time'},\ \textcolor{stringliteral}{'0'},\ \textcolor{stringliteral}{'1'})}
+\DoxyCodeLine{00094\ \ \ \ \ TestFlag(\textcolor{stringliteral}{'repeat'},\ \textcolor{stringliteral}{'999'},\ \textcolor{stringliteral}{'1'})}
+\DoxyCodeLine{00095\ \ \ \ \ TestFlag(\textcolor{stringliteral}{'throw\_on\_failure'},\ \textcolor{stringliteral}{'1'},\ \textcolor{stringliteral}{'0'})}
+\DoxyCodeLine{00096\ \ \ \ \ TestFlag(\textcolor{stringliteral}{'death\_test\_style'},\ \textcolor{stringliteral}{'threadsafe'},\ \textcolor{stringliteral}{'fast'})}
+\DoxyCodeLine{00097\ \ \ \ \ TestFlag(\textcolor{stringliteral}{'catch\_exceptions'},\ \textcolor{stringliteral}{'0'},\ \textcolor{stringliteral}{'1'})}
+\DoxyCodeLine{00098\ }
+\DoxyCodeLine{00099\ \ \ \ \ \textcolor{keywordflow}{if}\ IS\_LINUX:}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ TestFlag(\textcolor{stringliteral}{'death\_test\_use\_fork'},\ \textcolor{stringliteral}{'1'},\ \textcolor{stringliteral}{'0'})}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ TestFlag(\textcolor{stringliteral}{'stack\_trace\_depth'},\ \textcolor{stringliteral}{'0'},\ \textcolor{stringliteral}{'100'})}
+\DoxyCodeLine{00102\ }
+\DoxyCodeLine{00103\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classgtest__env__var__test_1_1_g_test_env_var_test_a863960622641e8305fb574c7054ae7be_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classgtest__env__var__test_1_1_g_test_env_var_test_a8d340f27313b0cac2c5cc888bb3b77a6}\index{gtest\_env\_var\_test.GTestEnvVarTest@{gtest\_env\_var\_test.GTestEnvVarTest}!testXmlOutputFile@{testXmlOutputFile}}
+\index{testXmlOutputFile@{testXmlOutputFile}!gtest\_env\_var\_test.GTestEnvVarTest@{gtest\_env\_var\_test.GTestEnvVarTest}}
+\doxysubsubsection{\texorpdfstring{testXmlOutputFile()}{testXmlOutputFile()}}
+{\footnotesize\ttfamily \label{classgtest__env__var__test_1_1_g_test_env_var_test_a8d340f27313b0cac2c5cc888bb3b77a6} 
+gtest\+\_\+env\+\_\+var\+\_\+test.\+GTest\+Env\+Var\+Test.\+test\+Xml\+Output\+File (\begin{DoxyParamCaption}\item[{}]{self}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Tests that $XML_OUTPUT_FILE affects the output flag.\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{gtest__env__var__test_8py_source_l00104}{104}} of file \mbox{\hyperlink{gtest__env__var__test_8py_source}{gtest\+\_\+env\+\_\+var\+\_\+test.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00104\ \ \ \textcolor{keyword}{def\ }testXmlOutputFile(self):}
+\DoxyCodeLine{00105\ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Tests\ that\ \$XML\_OUTPUT\_FILE\ affects\ the\ output\ flag."{}"{}"{}}}
+\DoxyCodeLine{00106\ }
+\DoxyCodeLine{00107\ \ \ \ \ SetEnvVar(\textcolor{stringliteral}{'GTEST\_OUTPUT'},\ \textcolor{keywordtype}{None})}
+\DoxyCodeLine{00108\ \ \ \ \ SetEnvVar(\textcolor{stringliteral}{'XML\_OUTPUT\_FILE'},\ \textcolor{stringliteral}{'tmp/bar.xml'})}
+\DoxyCodeLine{00109\ \ \ \ \ AssertEq(\textcolor{stringliteral}{'xml:tmp/bar.xml'},\ GetFlag(\textcolor{stringliteral}{'output'}))}
+\DoxyCodeLine{00110\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classgtest__env__var__test_1_1_g_test_env_var_test_a8d340f27313b0cac2c5cc888bb3b77a6_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classgtest__env__var__test_1_1_g_test_env_var_test_ae4667cf19187d4b862ff2e6481b91282}\index{gtest\_env\_var\_test.GTestEnvVarTest@{gtest\_env\_var\_test.GTestEnvVarTest}!testXmlOutputFileOverride@{testXmlOutputFileOverride}}
+\index{testXmlOutputFileOverride@{testXmlOutputFileOverride}!gtest\_env\_var\_test.GTestEnvVarTest@{gtest\_env\_var\_test.GTestEnvVarTest}}
+\doxysubsubsection{\texorpdfstring{testXmlOutputFileOverride()}{testXmlOutputFileOverride()}}
+{\footnotesize\ttfamily \label{classgtest__env__var__test_1_1_g_test_env_var_test_ae4667cf19187d4b862ff2e6481b91282} 
+gtest\+\_\+env\+\_\+var\+\_\+test.\+GTest\+Env\+Var\+Test.\+test\+Xml\+Output\+File\+Override (\begin{DoxyParamCaption}\item[{}]{self}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Tests that $XML_OUTPUT_FILE is overridden by $GTEST_OUTPUT.\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{gtest__env__var__test_8py_source_l00111}{111}} of file \mbox{\hyperlink{gtest__env__var__test_8py_source}{gtest\+\_\+env\+\_\+var\+\_\+test.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00111\ \ \ \textcolor{keyword}{def\ }testXmlOutputFileOverride(self):}
+\DoxyCodeLine{00112\ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Tests\ that\ \$XML\_OUTPUT\_FILE\ is\ overridden\ by\ \$GTEST\_OUTPUT."{}"{}"{}}}
+\DoxyCodeLine{00113\ }
+\DoxyCodeLine{00114\ \ \ \ \ SetEnvVar(\textcolor{stringliteral}{'GTEST\_OUTPUT'},\ \textcolor{stringliteral}{'xml:tmp/foo.xml'})}
+\DoxyCodeLine{00115\ \ \ \ \ SetEnvVar(\textcolor{stringliteral}{'XML\_OUTPUT\_FILE'},\ \textcolor{stringliteral}{'tmp/bar.xml'})}
+\DoxyCodeLine{00116\ \ \ \ \ AssertEq(\textcolor{stringliteral}{'xml:tmp/foo.xml'},\ GetFlag(\textcolor{stringliteral}{'output'}))}
+\DoxyCodeLine{00117\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classgtest__env__var__test_1_1_g_test_env_var_test_ae4667cf19187d4b862ff2e6481b91282_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/test/\mbox{\hyperlink{gtest__env__var__test_8py}{gtest\+\_\+env\+\_\+var\+\_\+test.\+py}}\end{DoxyCompactItemize}

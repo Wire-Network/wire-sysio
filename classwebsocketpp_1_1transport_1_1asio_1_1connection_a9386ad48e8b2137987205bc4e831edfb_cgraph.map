@@ -1,0 +1,5 @@
+<map id="websocketpp::transport::asio::connection::handle_async_shutdown_timeout" name="websocketpp::transport::asio::connection::handle_async_shutdown_timeout">
+<area shape="rect" id="Node000001" title="Async shutdown timeout handler." alt="" coords="5,5,182,61"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1transport_1_1asio_1_1connection.html#ac4b63fadf2083ab4656ab7f1a47d3b5d" title="Cancel the underlying socket and log any errors." alt="" coords="230,5,400,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="182,30,214,30,214,36,182,36"/>
+</map>

@@ -1,0 +1,175 @@
+\doxysection{time.\+cpp}
+\hypertarget{time_8cpp_source}{}\label{time_8cpp_source}\index{libraries/fc/src/time.cpp@{libraries/fc/src/time.cpp}}
+\mbox{\hyperlink{time_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{include_2fc_2time_8hpp}{fc/time.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{mock__time_8hpp}{fc/mock\_time.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{fc_2include_2fc_2variant_8hpp}{fc/variant.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <boost/chrono/system\_clocks.hpp>}}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <boost/date\_time/posix\_time/posix\_time.hpp>}}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <sstream>}}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{string_8hpp}{fc/string.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{exception_8hpp}{fc/exception/exception.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00010}00010\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}\ \{}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00012}00012\ \ \ \textcolor{keyword}{namespace\ }bch\ =\ boost::chrono;}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00014}\mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{00014}}\ \ \ \mbox{\hyperlink{classfc_1_1time__point}{time\_point}}\ \mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{time\_point::now}}()}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00015}00015\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00016}00016\ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{exception_8hpp_ab10d0a221f4d7a706701b806c8135fd7}{UNLIKELY}}(\mbox{\hyperlink{classfc_1_1mock__time__traits_adddeebdf472c33f927827c111ddbf0b1}{mock\_time\_traits::is\_set}}())\ )\ \{}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00017}00017\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1mock__time__traits_a0bed781012a73b8c15882648397b56be}{mock\_time\_traits::fc\_now}}();}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00018}00018\ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00019}00019\ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1time__point_ab46781dcaab4880902bc136f36e39e5e}{time\_point}}(\ \mbox{\hyperlink{classfc_1_1microseconds}{microseconds}}(\ bch::duration\_cast<bch::microseconds>(\ bch::system\_clock::now().\mbox{\hyperlink{classfc_1_1time__point_abfea5efbe9ef58024cda814395ee9945}{time\_since\_epoch}}()\ ).\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}()\ )\ );}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00020}00020\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00022}\mbox{\hyperlink{classfc_1_1time__point__sec_af4d8950d1c0a61e119b1851b2f05b829}{00022}}\ \ \ \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc::string}}\ \mbox{\hyperlink{classfc_1_1time__point__sec_af4d8950d1c0a61e119b1851b2f05b829}{time\_point\_sec::to\_non\_delimited\_iso\_string}}()\textcolor{keyword}{const}}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00023}00023\ \textcolor{keyword}{\ \ }\{}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00024}00024\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ ptime\ =\ boost::posix\_time::from\_time\_t(\ time\_t(\ \mbox{\hyperlink{classfc_1_1time__point__sec_ab537213a0f1caf331b0c43cee6297b3f}{sec\_since\_epoch}}()\ )\ );}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00025}00025\ \ \ \ \ \textcolor{keywordflow}{return}\ boost::posix\_time::to\_iso\_string(\ ptime\ );}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00026}00026\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00028}\mbox{\hyperlink{classfc_1_1time__point__sec_a94e7bdb2227057a0d2dced107519be04}{00028}}\ \ \ \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc::string}}\ \mbox{\hyperlink{classfc_1_1time__point__sec_a94e7bdb2227057a0d2dced107519be04}{time\_point\_sec::to\_iso\_string}}()\textcolor{keyword}{const}}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00029}00029\ \textcolor{keyword}{\ \ }\{}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00030}00030\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ ptime\ =\ boost::posix\_time::from\_time\_t(\ time\_t(\ \mbox{\hyperlink{classfc_1_1time__point__sec_ab537213a0f1caf331b0c43cee6297b3f}{sec\_since\_epoch}}()\ )\ );}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00031}00031\ \ \ \ \ \textcolor{keywordflow}{return}\ boost::posix\_time::to\_iso\_extended\_string(\ ptime\ );}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00032}00032\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00034}\mbox{\hyperlink{classfc_1_1time__point__sec_aa1e40297c563eca6a9337e402a009d63}{00034}}\ \ \ time\_point\_sec::operator\ \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc::string}}()\textcolor{keyword}{const}}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00035}00035\ \textcolor{keyword}{\ \ }\{}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00036}00036\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ this-\/>to\_iso\_string();}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00037}00037\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00039}\mbox{\hyperlink{classfc_1_1time__point__sec_ac2a18f665e7718f6992d17e4d80fc15f}{00039}}\ \ \ \mbox{\hyperlink{classfc_1_1time__point__sec}{time\_point\_sec}}\ \mbox{\hyperlink{classfc_1_1time__point__sec_ac2a18f665e7718f6992d17e4d80fc15f}{time\_point\_sec::from\_iso\_string}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc::string}}\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ )}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00040}00040\ \ \ \{\ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00041}00041\ \ \ \ \ \ \ \textcolor{keyword}{static}\ boost::posix\_time::ptime\ epoch\ =\ boost::posix\_time::from\_time\_t(\ 0\ );}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00042}00042\ \ \ \ \ \ \ boost::posix\_time::ptime\ pt;}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00043}00043\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.size()\ >=\ 5\ \&\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.at(\ 4\ )\ ==\ \textcolor{charliteral}{'-\/'}\ )\ \textcolor{comment}{//\ http://en.wikipedia.org/wiki/ISO\_8601}}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00044}00044\ \ \ \ \ \ \ \ \ \ \ pt\ =\ boost::date\_time::parse\_delimited\_time<boost::posix\_time::ptime>(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ \textcolor{charliteral}{'T'}\ );}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00045}00045\ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00046}00046\ \ \ \ \ \ \ \ \ \ \ pt\ =\ boost::posix\_time::from\_iso\_string(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ );}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00047}00047\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1time__point__sec}{fc::time\_point\_sec}}(\ (pt\ -\/\ epoch).total\_seconds()\ );}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00048}00048\ \ \ \}\ \mbox{\hyperlink{exception_8hpp_af3731d6e3beb140d9e652adf7a18113b}{FC\_RETHROW\_EXCEPTIONS}}(\ warn,\ \textcolor{stringliteral}{"{}unable\ to\ convert\ ISO-\/formatted\ string\ to\ fc::time\_point\_sec"{}}\ )\ \}}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00050}\mbox{\hyperlink{classfc_1_1time__point_acf01edf36668a361a460192dd1765904}{00050}}\ \ \ \ time\_point::operator\ \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc::string}}()\textcolor{keyword}{const}}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00051}00051\ \textcolor{keyword}{\ \ \ }\{}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00052}00052\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ =\ elapsed.count();}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00053}00053\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ >=\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ secs\ =\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ /\ 1000000ULL;}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ msec\ =\ ((\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ \%\ 1000000ULL)\ /\ 1000ULL;}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ padded\_ms\ =\ \mbox{\hyperlink{namespacefc_a4e07b3870aa72f8c38bdd5f78044dad1}{to\_string}}((\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})(msec\ +\ 1000ULL)).substr(1);}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ ptime\ =\ boost::posix\_time::from\_time\_t(time\_t(secs));}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ boost::posix\_time::to\_iso\_extended\_string(ptime)\ +\ \textcolor{stringliteral}{"{}."{}}\ +\ padded\_ms;}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00059}00059\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ negative\ time\_points\ serialized\ as\ "{}durations"{}\ in\ the\ ISO\ form\ with\ boost}}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00061}00061\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ this\ is\ not\ very\ human\ readable\ but\ fits\ the\ precedent\ set\ by\ the\ above}}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00062}00062\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ as\_duration\ =\ boost::posix\_time::microseconds(\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}});}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ boost::posix\_time::to\_iso\_string(as\_duration);}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00064}00064\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00065}00065\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00067}\mbox{\hyperlink{classfc_1_1time__point_acf917831e171906dbbbd46b17bc6e0a5}{00067}}\ \ \ \mbox{\hyperlink{classfc_1_1time__point}{time\_point}}\ \mbox{\hyperlink{classfc_1_1time__point_acf917831e171906dbbbd46b17bc6e0a5}{time\_point::from\_iso\_string}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc::string}}\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ )}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00068}00068\ \ \ \{\ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00069}00069\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ dot\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.find(\ \textcolor{charliteral}{'.'}\ );}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00070}00070\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ dot\ ==\ std::string::npos\ )}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00071}00071\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1time__point_ab46781dcaab4880902bc136f36e39e5e}{time\_point}}(\ \mbox{\hyperlink{classfc_1_1time__point__sec_ac2a18f665e7718f6992d17e4d80fc15f}{time\_point\_sec::from\_iso\_string}}(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ )\ );}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00072}00072\ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00073}00073\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ ms\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.substr(\ dot\ );}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00074}00074\ \ \ \ \ \ \ \ \ \ ms[0]\ =\ \textcolor{charliteral}{'1'};}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00075}00075\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\ ms.size()\ <\ 4\ )\ ms.push\_back(\textcolor{charliteral}{'0'});}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1time__point_ab46781dcaab4880902bc136f36e39e5e}{time\_point}}(\ \mbox{\hyperlink{classfc_1_1time__point__sec_ac2a18f665e7718f6992d17e4d80fc15f}{time\_point\_sec::from\_iso\_string}}(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ )\ )\ +\ \mbox{\hyperlink{namespacefc_a76ae235ec7e9b8862e70740058d7eb1b}{milliseconds}}(\ \mbox{\hyperlink{namespacefc_afe327b84123fcbda675ea00418471c9a}{to\_int64}}(ms)\ -\/\ 1000\ );}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00077}00077\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00078}00078\ \ \ \}\ \mbox{\hyperlink{exception_8hpp_af3731d6e3beb140d9e652adf7a18113b}{FC\_RETHROW\_EXCEPTIONS}}(\ warn,\ \textcolor{stringliteral}{"{}unable\ to\ convert\ ISO-\/formatted\ string\ to\ fc::time\_point"{}}\ )\ \}}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00080}\mbox{\hyperlink{namespacefc_af8910fe916a48b80934350e360515a08}{00080}}\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefc_adea61f2343de94d0fbcb920a32332ad9}{to\_variant}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1time__point}{fc::time\_point}}\&\ t,\ \mbox{\hyperlink{classfc_1_1variant}{variant}}\&\ v\ )\ \{}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00081}00081\ \ \ \ \ v\ =\ \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc::string}}(\ t\ );}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00082}00082\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00083}\mbox{\hyperlink{namespacefc_a1aa200e8e1cbe0da59c52053ee6e00f4}{00083}}\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefc_accef08adf4ee05c36ccc550d8101b08f}{from\_variant}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}\&\ v,\ \mbox{\hyperlink{classfc_1_1time__point}{fc::time\_point}}\&\ t\ )\ \{}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00084}00084\ \ \ \ \ t\ =\ \mbox{\hyperlink{classfc_1_1time__point_acf917831e171906dbbbd46b17bc6e0a5}{fc::time\_point::from\_iso\_string}}(\ v.as\_string()\ );}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00085}00085\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00086}\mbox{\hyperlink{namespacefc_a24a8c1f007a72d150ba477d5b9863d4e}{00086}}\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefc_adea61f2343de94d0fbcb920a32332ad9}{to\_variant}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1time__point__sec}{fc::time\_point\_sec}}\&\ t,\ \mbox{\hyperlink{classfc_1_1variant}{variant}}\&\ v\ )\ \{}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00087}00087\ \ \ \ \ v\ =\ \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc::string}}(\ t\ );}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00088}00088\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00089}\mbox{\hyperlink{namespacefc_a6a143ca3e334e9c18ad4264a3e1ee055}{00089}}\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefc_accef08adf4ee05c36ccc550d8101b08f}{from\_variant}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}\&\ v,\ \mbox{\hyperlink{classfc_1_1time__point__sec}{fc::time\_point\_sec}}\&\ t\ )\ \{}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00090}00090\ \ \ \ \ t\ =\ \mbox{\hyperlink{classfc_1_1time__point__sec_ac2a18f665e7718f6992d17e4d80fc15f}{fc::time\_point\_sec::from\_iso\_string}}(\ v.as\_string()\ );}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00091}00091\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00092}00092\ }
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00093}00093\ \ \ \textcolor{comment}{//\ inspired\ by\ show\_date\_relative()\ in\ git's\ date.c}}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00094}\mbox{\hyperlink{namespacefc_ac76f6058bf7a33bb07ab1a147eeb24bf}{00094}}\ \ \ \textcolor{keywordtype}{string}\ \mbox{\hyperlink{namespacefc_ac76f6058bf7a33bb07ab1a147eeb24bf}{get\_approximate\_relative\_time\_string}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1time__point__sec}{time\_point\_sec}}\&\ event\_time,}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00095}00095\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1time__point__sec}{time\_point\_sec}}\&\ relative\_to\_time\ \textcolor{comment}{/*\ =\ fc::time\_point::now()\ */},}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00096}00096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::string\&\ default\_ago\ \textcolor{comment}{/*\ =\ "{}\ ago"{}\ */})\ \{}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00097}00097\ }
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00098}00098\ }
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00099}00099\ \ \ \ \ \textcolor{keywordtype}{string}\ ago\ =\ default\_ago;}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00100}00100\ \ \ \ \ \mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}}\ seconds\_ago\ =\ relative\_to\_time.\mbox{\hyperlink{classfc_1_1time__point__sec_ab537213a0f1caf331b0c43cee6297b3f}{sec\_since\_epoch}}()\ -\/\ event\_time.\mbox{\hyperlink{classfc_1_1time__point__sec_ab537213a0f1caf331b0c43cee6297b3f}{sec\_since\_epoch}}();}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00101}00101\ \ \ \ \ \textcolor{keywordflow}{if}\ (seconds\_ago\ <\ 0)}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00102}00102\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00103}00103\ \ \ \ \ \ \ \ ago\ =\ \textcolor{stringliteral}{"{}\ in\ the\ future"{}};}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00104}00104\ \ \ \ \ \ \ \ seconds\_ago\ =\ -\/seconds\_ago;}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00105}00105\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00106}00106\ \ \ \ \ std::stringstream\ result;}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00107}00107\ \ \ \ \ \textcolor{keywordflow}{if}\ (seconds\_ago\ <\ 90)}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00108}00108\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00109}00109\ \ \ \ \ \ \ result\ <<\ seconds\_ago\ <<\ \textcolor{stringliteral}{"{}\ second"{}}\ <<\ (seconds\_ago\ >\ 1\ ?\ \textcolor{stringliteral}{"{}s"{}}\ :\ \textcolor{stringliteral}{"{}"{}})\ <<\ ago;}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00110}00110\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result.str();}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00111}00111\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00112}00112\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ minutes\_ago\ =\ (seconds\_ago\ +\ 30)\ /\ 60;}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00113}00113\ \ \ \ \ \textcolor{keywordflow}{if}\ (minutes\_ago\ <\ 90)}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00114}00114\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00115}00115\ \ \ \ \ \ \ result\ <<\ minutes\_ago\ <<\ \textcolor{stringliteral}{"{}\ minute"{}}\ <<\ (minutes\_ago\ >\ 1\ ?\ \textcolor{stringliteral}{"{}s"{}}\ :\ \textcolor{stringliteral}{"{}"{}})\ <<\ ago;}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00116}00116\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result.str();}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00117}00117\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00118}00118\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ hours\_ago\ =\ (minutes\_ago\ +\ 30)\ /\ 60;}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00119}00119\ \ \ \ \ \textcolor{keywordflow}{if}\ (hours\_ago\ <\ 90)}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00120}00120\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00121}00121\ \ \ \ \ \ \ result\ <<\ hours\_ago\ <<\ \textcolor{stringliteral}{"{}\ hour"{}}\ <<\ (hours\_ago\ >\ 1\ ?\ \textcolor{stringliteral}{"{}s"{}}\ :\ \textcolor{stringliteral}{"{}"{}})\ <<\ ago;}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00122}00122\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result.str();}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00123}00123\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00124}00124\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ days\_ago\ =\ (hours\_ago\ +\ 12)\ /\ 24;}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00125}00125\ \ \ \ \ \textcolor{keywordflow}{if}\ (days\_ago\ <\ 90)}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00126}00126\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00127}00127\ \ \ \ \ \ \ result\ <<\ days\_ago\ <<\ \textcolor{stringliteral}{"{}\ day"{}}\ <<\ (days\_ago\ >\ 1\ ?\ \textcolor{stringliteral}{"{}s"{}}\ :\ \textcolor{stringliteral}{"{}"{}})\ <<\ ago;}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00128}00128\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result.str();}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00129}00129\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00130}00130\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ weeks\_ago\ =\ (days\_ago\ +\ 3)\ /\ 7;}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00131}00131\ \ \ \ \ \textcolor{keywordflow}{if}\ (weeks\_ago\ <\ 70)}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00132}00132\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00133}00133\ \ \ \ \ \ \ result\ <<\ weeks\_ago\ <<\ \textcolor{stringliteral}{"{}\ week"{}}\ <<\ (weeks\_ago\ >\ 1\ ?\ \textcolor{stringliteral}{"{}s"{}}\ :\ \textcolor{stringliteral}{"{}"{}})\ <<\ ago;}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00134}00134\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result.str();}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00135}00135\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00136}00136\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ months\_ago\ =\ (days\_ago\ +\ 15)\ /\ 30;}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00137}00137\ \ \ \ \ \textcolor{keywordflow}{if}\ (months\_ago\ <\ 12)}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00138}00138\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00139}00139\ \ \ \ \ \ \ result\ <<\ months\_ago\ <<\ \textcolor{stringliteral}{"{}\ month"{}}\ <<\ (months\_ago\ >\ 1\ ?\ \textcolor{stringliteral}{"{}s"{}}\ :\ \textcolor{stringliteral}{"{}"{}})\ <<\ ago;}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00140}00140\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result.str();}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00141}00141\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00142}00142\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ years\_ago\ =\ days\_ago\ /\ 365;}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00143}00143\ \ \ \ \ result\ <<\ years\_ago\ <<\ \textcolor{stringliteral}{"{}\ year"{}}\ <<\ (months\_ago\ >\ 1\ ?\ \textcolor{stringliteral}{"{}s"{}}\ :\ \textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00144}00144\ \ \ \ \ \textcolor{keywordflow}{if}\ (months\_ago\ <\ 12\ *\ 5)}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00145}00145\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00146}00146\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ leftover\_days\ =\ days\_ago\ -\/\ (years\_ago\ *\ 365);}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00147}00147\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ leftover\_months\ =\ (leftover\_days\ +\ 15)\ /\ 30;}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00148}00148\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (leftover\_months)}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00149}00149\ \ \ \ \ \ \ \ \ result\ <<\ leftover\_months\ <<\ \ \textcolor{stringliteral}{"{}\ month"{}}\ <<\ (months\_ago\ >\ 1\ ?\ \textcolor{stringliteral}{"{}s"{}}\ :\ \textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00150}00150\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00151}00151\ \ \ \ \ result\ <<\ ago;}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00152}00152\ \ \ \ \ \textcolor{keywordflow}{return}\ result.str();}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00153}00153\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00154}\mbox{\hyperlink{namespacefc_af05f153d4d325d4186d87d2fab5ae3dd}{00154}}\ \ \ \textcolor{keywordtype}{string}\ \mbox{\hyperlink{namespacefc_ac76f6058bf7a33bb07ab1a147eeb24bf}{get\_approximate\_relative\_time\_string}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1time__point}{time\_point}}\&\ event\_time,}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00155}00155\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1time__point}{time\_point}}\&\ relative\_to\_time\ \textcolor{comment}{/*\ =\ fc::time\_point::now()\ */},}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00156}00156\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::string\&\ ago\ \textcolor{comment}{/*\ =\ "{}\ ago"{}\ */})\ \{}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00157}00157\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_ac76f6058bf7a33bb07ab1a147eeb24bf}{get\_approximate\_relative\_time\_string}}(\mbox{\hyperlink{classfc_1_1time__point__sec}{time\_point\_sec}}(event\_time),\ \mbox{\hyperlink{classfc_1_1time__point__sec}{time\_point\_sec}}(relative\_to\_time),\ ago);}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00158}00158\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00159}00159\ }
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00160}\mbox{\hyperlink{namespacefc_a91859540574b996a87eca48e36990a47}{00160}}\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefc_adea61f2343de94d0fbcb920a32332ad9}{to\_variant}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1microseconds}{microseconds}}\&\ input\_microseconds,\ \ \mbox{\hyperlink{classfc_1_1variant}{variant}}\&\ output\_variant\ )}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00161}00161\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00162}00162\ \ \ \ \ output\_variant\ =\ input\_microseconds.\mbox{\hyperlink{classfc_1_1microseconds_a20fba59ec7e1f50c6b8f2c9443cc9b92}{count}}();}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00163}00163\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00164}\mbox{\hyperlink{namespacefc_adbd4dad54bd3fa870eb0ba0962f373ec}{00164}}\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefc_accef08adf4ee05c36ccc550d8101b08f}{from\_variant}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1variant}{variant}}\&\ input\_variant,\ \ \mbox{\hyperlink{classfc_1_1microseconds}{microseconds}}\&\ output\_microseconds\ )}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00165}00165\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00166}00166\ \ \ \ \ output\_microseconds\ =\ \mbox{\hyperlink{classfc_1_1microseconds}{microseconds}}(input\_variant.\mbox{\hyperlink{classfc_1_1variant_ab5d7877d2c19dbd6ac9eac7a1205dbeb}{as\_int64}}());}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00167}00167\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00168}00168\ }
+\DoxyCodeLine{\Hypertarget{time_8cpp_source_l00169}00169\ \}\ \textcolor{comment}{//namespace\ fc}}
+
+\end{DoxyCode}

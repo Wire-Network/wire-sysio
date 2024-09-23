@@ -1,0 +1,346 @@
+\doxysection{Base\+Reader\+Handler\texorpdfstring{$<$}{<} Encoding, Derived \texorpdfstring{$>$}{>} Struct Template Reference}
+\hypertarget{struct_base_reader_handler}{}\label{struct_base_reader_handler}\index{BaseReaderHandler$<$ Encoding, Derived $>$@{BaseReaderHandler$<$ Encoding, Derived $>$}}
+
+
+Default implementation of Handler.  
+
+
+
+
+{\ttfamily \#include $<$reader.\+h$>$}
+
+
+
+Inheritance diagram for Base\+Reader\+Handler\texorpdfstring{$<$}{<} Encoding, Derived \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=190pt]{struct_base_reader_handler__inherit__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef Encoding\+::\+Ch \mbox{\hyperlink{struct_base_reader_handler_a36e099ee68f179e6007a5d8f6feafd61}{Ch}}
+\item 
+typedef internal\+::\+Select\+If$<$ internal\+::\+Is\+Same$<$ Derived, void $>$, \mbox{\hyperlink{struct_base_reader_handler}{Base\+Reader\+Handler}}, Derived $>$\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{\+::\+Type}} \mbox{\hyperlink{struct_base_reader_handler_aa1c54d48609862055fc3cd4ae0bd5234}{Override}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{struct_base_reader_handler_a836437f6ccc37f08ff933f009b18a78c}{Default}} ()
+\item 
+bool \mbox{\hyperlink{struct_base_reader_handler_ae2ebbde4628bf3659ddc5d18520935f5}{Null}} ()
+\item 
+bool \mbox{\hyperlink{struct_base_reader_handler_aa1c3ce42dbb856b3349792dc9d963587}{Bool}} (bool)
+\item 
+bool \mbox{\hyperlink{struct_base_reader_handler_a85e813aaf7189a2f87bd53953324fafc}{Int}} (int)
+\item 
+bool \mbox{\hyperlink{struct_base_reader_handler_a0e683306cbb7b4e350a35c18c5246f2a}{Uint}} (unsigned)
+\item 
+bool \mbox{\hyperlink{struct_base_reader_handler_a04011733ea584739c97ad5c6afa15a35}{Int64}} (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}})
+\item 
+bool \mbox{\hyperlink{struct_base_reader_handler_a351aa3cd81856a487c21022e9cc64d2b}{Uint64}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}})
+\item 
+bool \mbox{\hyperlink{struct_base_reader_handler_a8156ea6ae5b8cd23a8b700e92a8af1eb}{Double}} (double)
+\item 
+bool \mbox{\hyperlink{struct_base_reader_handler_a9ed0d83d5e6c8f5e4b32ca3735ff0bb7}{Raw\+Number}} (const \mbox{\hyperlink{struct_base_reader_handler_a36e099ee68f179e6007a5d8f6feafd61}{Ch}} \texorpdfstring{$\ast$}{*}str, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}, bool copy)
+\begin{DoxyCompactList}\small\item\em enabled via k\+Parse\+Numbers\+As\+Strings\+Flag, string is not null-\/terminated (use length) \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{struct_base_reader_handler_a3ac69e6326d0aeef7b1f2619742bbe00}{String}} (const \mbox{\hyperlink{struct_base_reader_handler_a36e099ee68f179e6007a5d8f6feafd61}{Ch}} \texorpdfstring{$\ast$}{*}, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}, bool)
+\item 
+bool \mbox{\hyperlink{struct_base_reader_handler_ab0a7d9bcececb8d6ed748656f67f4917}{Start\+Object}} ()
+\item 
+bool \mbox{\hyperlink{struct_base_reader_handler_abc50b2e7e411b7b731715e05cd01e2eb}{Key}} (const \mbox{\hyperlink{struct_base_reader_handler_a36e099ee68f179e6007a5d8f6feafd61}{Ch}} \texorpdfstring{$\ast$}{*}str, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}, bool copy)
+\item 
+bool \mbox{\hyperlink{struct_base_reader_handler_a0406cee0af26bc3a0b7fb2414537b0ab}{End\+Object}} (\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}})
+\item 
+bool \mbox{\hyperlink{struct_base_reader_handler_a9dbb1143a250a904bb18a174553a3a00}{Start\+Array}} ()
+\item 
+bool \mbox{\hyperlink{struct_base_reader_handler_ae9d60a8779b6a77a7f283d64961879fb}{End\+Array}} (\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} = UTF8$<$$>$, typename Derived = void$>$\newline
+struct Base\+Reader\+Handler$<$ Encoding, Derived $>$}
+This can be used as base class of any reader handler. \begin{DoxyNote}{Note}
+implements Handler concept 
+\end{DoxyNote}
+
+
+Definition at line \mbox{\hyperlink{reader_8h_source_l00196}{196}} of file \mbox{\hyperlink{reader_8h_source}{reader.\+h}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{struct_base_reader_handler_a36e099ee68f179e6007a5d8f6feafd61}\index{BaseReaderHandler$<$ Encoding, Derived $>$@{BaseReaderHandler$<$ Encoding, Derived $>$}!Ch@{Ch}}
+\index{Ch@{Ch}!BaseReaderHandler$<$ Encoding, Derived $>$@{BaseReaderHandler$<$ Encoding, Derived $>$}}
+\doxysubsubsection{\texorpdfstring{Ch}{Ch}}
+{\footnotesize\ttfamily \label{struct_base_reader_handler_a36e099ee68f179e6007a5d8f6feafd61} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}  = UTF8$<$$>$, typename Derived  = void$>$ \\
+Encoding\+::\+Ch \mbox{\hyperlink{struct_base_reader_handler}{Base\+Reader\+Handler}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, Derived $>$\+::\+Ch}
+
+
+
+Definition at line \mbox{\hyperlink{reader_8h_source_l00197}{197}} of file \mbox{\hyperlink{reader_8h_source}{reader.\+h}}.
+
+\Hypertarget{struct_base_reader_handler_aa1c54d48609862055fc3cd4ae0bd5234}\index{BaseReaderHandler$<$ Encoding, Derived $>$@{BaseReaderHandler$<$ Encoding, Derived $>$}!Override@{Override}}
+\index{Override@{Override}!BaseReaderHandler$<$ Encoding, Derived $>$@{BaseReaderHandler$<$ Encoding, Derived $>$}}
+\doxysubsubsection{\texorpdfstring{Override}{Override}}
+{\footnotesize\ttfamily \label{struct_base_reader_handler_aa1c54d48609862055fc3cd4ae0bd5234} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}  = UTF8$<$$>$, typename Derived  = void$>$ \\
+internal\+::\+Select\+If$<$internal\+::\+Is\+Same$<$Derived,void$>$,\mbox{\hyperlink{struct_base_reader_handler}{Base\+Reader\+Handler}},Derived$>$\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{\+::\+Type}} \mbox{\hyperlink{struct_base_reader_handler}{Base\+Reader\+Handler}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, Derived $>$\+::\+Override}
+
+
+
+Definition at line \mbox{\hyperlink{reader_8h_source_l00199}{199}} of file \mbox{\hyperlink{reader_8h_source}{reader.\+h}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_base_reader_handler_aa1c3ce42dbb856b3349792dc9d963587}\index{BaseReaderHandler$<$ Encoding, Derived $>$@{BaseReaderHandler$<$ Encoding, Derived $>$}!Bool@{Bool}}
+\index{Bool@{Bool}!BaseReaderHandler$<$ Encoding, Derived $>$@{BaseReaderHandler$<$ Encoding, Derived $>$}}
+\doxysubsubsection{\texorpdfstring{Bool()}{Bool()}}
+{\footnotesize\ttfamily \label{struct_base_reader_handler_aa1c3ce42dbb856b3349792dc9d963587} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}  = UTF8$<$$>$, typename Derived  = void$>$ \\
+bool \mbox{\hyperlink{struct_base_reader_handler}{Base\+Reader\+Handler}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, Derived $>$\mbox{\hyperlink{struct_bool}{\+::\+Bool}} (\begin{DoxyParamCaption}\item[{bool}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{reader_8h_source_l00203}{203}} of file \mbox{\hyperlink{reader_8h_source}{reader.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00203\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{struct_base_reader_handler_aa1c54d48609862055fc3cd4ae0bd5234}{Override}}\&\textcolor{keyword}{>}(*this).Default();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_base_reader_handler_a836437f6ccc37f08ff933f009b18a78c}\index{BaseReaderHandler$<$ Encoding, Derived $>$@{BaseReaderHandler$<$ Encoding, Derived $>$}!Default@{Default}}
+\index{Default@{Default}!BaseReaderHandler$<$ Encoding, Derived $>$@{BaseReaderHandler$<$ Encoding, Derived $>$}}
+\doxysubsubsection{\texorpdfstring{Default()}{Default()}}
+{\footnotesize\ttfamily \label{struct_base_reader_handler_a836437f6ccc37f08ff933f009b18a78c} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}  = UTF8$<$$>$, typename Derived  = void$>$ \\
+bool \mbox{\hyperlink{struct_base_reader_handler}{Base\+Reader\+Handler}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, Derived $>$\+::\+Default (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{reader_8h_source_l00201}{201}} of file \mbox{\hyperlink{reader_8h_source}{reader.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00201\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_base_reader_handler_a8156ea6ae5b8cd23a8b700e92a8af1eb}\index{BaseReaderHandler$<$ Encoding, Derived $>$@{BaseReaderHandler$<$ Encoding, Derived $>$}!Double@{Double}}
+\index{Double@{Double}!BaseReaderHandler$<$ Encoding, Derived $>$@{BaseReaderHandler$<$ Encoding, Derived $>$}}
+\doxysubsubsection{\texorpdfstring{Double()}{Double()}}
+{\footnotesize\ttfamily \label{struct_base_reader_handler_a8156ea6ae5b8cd23a8b700e92a8af1eb} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}  = UTF8$<$$>$, typename Derived  = void$>$ \\
+bool \mbox{\hyperlink{struct_base_reader_handler}{Base\+Reader\+Handler}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, Derived $>$\+::\+Double (\begin{DoxyParamCaption}\item[{double}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{reader_8h_source_l00208}{208}} of file \mbox{\hyperlink{reader_8h_source}{reader.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00208\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{struct_base_reader_handler_aa1c54d48609862055fc3cd4ae0bd5234}{Override}}\&\textcolor{keyword}{>}(*this).Default();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_base_reader_handler_ae9d60a8779b6a77a7f283d64961879fb}\index{BaseReaderHandler$<$ Encoding, Derived $>$@{BaseReaderHandler$<$ Encoding, Derived $>$}!EndArray@{EndArray}}
+\index{EndArray@{EndArray}!BaseReaderHandler$<$ Encoding, Derived $>$@{BaseReaderHandler$<$ Encoding, Derived $>$}}
+\doxysubsubsection{\texorpdfstring{EndArray()}{EndArray()}}
+{\footnotesize\ttfamily \label{struct_base_reader_handler_ae9d60a8779b6a77a7f283d64961879fb} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}  = UTF8$<$$>$, typename Derived  = void$>$ \\
+bool \mbox{\hyperlink{struct_base_reader_handler}{Base\+Reader\+Handler}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, Derived $>$\+::\+End\+Array (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{reader_8h_source_l00216}{216}} of file \mbox{\hyperlink{reader_8h_source}{reader.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00216\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{struct_base_reader_handler_aa1c54d48609862055fc3cd4ae0bd5234}{Override}}\&\textcolor{keyword}{>}(*this).Default();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_base_reader_handler_a0406cee0af26bc3a0b7fb2414537b0ab}\index{BaseReaderHandler$<$ Encoding, Derived $>$@{BaseReaderHandler$<$ Encoding, Derived $>$}!EndObject@{EndObject}}
+\index{EndObject@{EndObject}!BaseReaderHandler$<$ Encoding, Derived $>$@{BaseReaderHandler$<$ Encoding, Derived $>$}}
+\doxysubsubsection{\texorpdfstring{EndObject()}{EndObject()}}
+{\footnotesize\ttfamily \label{struct_base_reader_handler_a0406cee0af26bc3a0b7fb2414537b0ab} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}  = UTF8$<$$>$, typename Derived  = void$>$ \\
+bool \mbox{\hyperlink{struct_base_reader_handler}{Base\+Reader\+Handler}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, Derived $>$\+::\+End\+Object (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{reader_8h_source_l00214}{214}} of file \mbox{\hyperlink{reader_8h_source}{reader.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00214\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{struct_base_reader_handler_aa1c54d48609862055fc3cd4ae0bd5234}{Override}}\&\textcolor{keyword}{>}(*this).Default();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_base_reader_handler_a85e813aaf7189a2f87bd53953324fafc}\index{BaseReaderHandler$<$ Encoding, Derived $>$@{BaseReaderHandler$<$ Encoding, Derived $>$}!Int@{Int}}
+\index{Int@{Int}!BaseReaderHandler$<$ Encoding, Derived $>$@{BaseReaderHandler$<$ Encoding, Derived $>$}}
+\doxysubsubsection{\texorpdfstring{Int()}{Int()}}
+{\footnotesize\ttfamily \label{struct_base_reader_handler_a85e813aaf7189a2f87bd53953324fafc} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}  = UTF8$<$$>$, typename Derived  = void$>$ \\
+bool \mbox{\hyperlink{struct_base_reader_handler}{Base\+Reader\+Handler}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, Derived $>$\+::\+Int (\begin{DoxyParamCaption}\item[{int}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{reader_8h_source_l00204}{204}} of file \mbox{\hyperlink{reader_8h_source}{reader.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00204\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{struct_base_reader_handler_aa1c54d48609862055fc3cd4ae0bd5234}{Override}}\&\textcolor{keyword}{>}(*this).Default();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_base_reader_handler_a04011733ea584739c97ad5c6afa15a35}\index{BaseReaderHandler$<$ Encoding, Derived $>$@{BaseReaderHandler$<$ Encoding, Derived $>$}!Int64@{Int64}}
+\index{Int64@{Int64}!BaseReaderHandler$<$ Encoding, Derived $>$@{BaseReaderHandler$<$ Encoding, Derived $>$}}
+\doxysubsubsection{\texorpdfstring{Int64()}{Int64()}}
+{\footnotesize\ttfamily \label{struct_base_reader_handler_a04011733ea584739c97ad5c6afa15a35} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}  = UTF8$<$$>$, typename Derived  = void$>$ \\
+bool \mbox{\hyperlink{struct_base_reader_handler}{Base\+Reader\+Handler}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, Derived $>$\+::\+Int64 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{reader_8h_source_l00206}{206}} of file \mbox{\hyperlink{reader_8h_source}{reader.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00206\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{struct_base_reader_handler_aa1c54d48609862055fc3cd4ae0bd5234}{Override}}\&\textcolor{keyword}{>}(*this).Default();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_base_reader_handler_abc50b2e7e411b7b731715e05cd01e2eb}\index{BaseReaderHandler$<$ Encoding, Derived $>$@{BaseReaderHandler$<$ Encoding, Derived $>$}!Key@{Key}}
+\index{Key@{Key}!BaseReaderHandler$<$ Encoding, Derived $>$@{BaseReaderHandler$<$ Encoding, Derived $>$}}
+\doxysubsubsection{\texorpdfstring{Key()}{Key()}}
+{\footnotesize\ttfamily \label{struct_base_reader_handler_abc50b2e7e411b7b731715e05cd01e2eb} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}  = UTF8$<$$>$, typename Derived  = void$>$ \\
+bool \mbox{\hyperlink{struct_base_reader_handler}{Base\+Reader\+Handler}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, Derived $>$\+::\+Key (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct_base_reader_handler_a36e099ee68f179e6007a5d8f6feafd61}{Ch}} \texorpdfstring{$\ast$}{*}}]{str}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{len}{, }\item[{bool}]{copy}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{reader_8h_source_l00213}{213}} of file \mbox{\hyperlink{reader_8h_source}{reader.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00213\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{struct_base_reader_handler_aa1c54d48609862055fc3cd4ae0bd5234}{Override}}\&\textcolor{keyword}{>}(*this).String(str,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ copy);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_base_reader_handler_ae2ebbde4628bf3659ddc5d18520935f5}\index{BaseReaderHandler$<$ Encoding, Derived $>$@{BaseReaderHandler$<$ Encoding, Derived $>$}!Null@{Null}}
+\index{Null@{Null}!BaseReaderHandler$<$ Encoding, Derived $>$@{BaseReaderHandler$<$ Encoding, Derived $>$}}
+\doxysubsubsection{\texorpdfstring{Null()}{Null()}}
+{\footnotesize\ttfamily \label{struct_base_reader_handler_ae2ebbde4628bf3659ddc5d18520935f5} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}  = UTF8$<$$>$, typename Derived  = void$>$ \\
+bool \mbox{\hyperlink{struct_base_reader_handler}{Base\+Reader\+Handler}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, Derived $>$\+::\+Null (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{reader_8h_source_l00202}{202}} of file \mbox{\hyperlink{reader_8h_source}{reader.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00202\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{struct_base_reader_handler_aa1c54d48609862055fc3cd4ae0bd5234}{Override}}\&\textcolor{keyword}{>}(*this).Default();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_base_reader_handler_a9ed0d83d5e6c8f5e4b32ca3735ff0bb7}\index{BaseReaderHandler$<$ Encoding, Derived $>$@{BaseReaderHandler$<$ Encoding, Derived $>$}!RawNumber@{RawNumber}}
+\index{RawNumber@{RawNumber}!BaseReaderHandler$<$ Encoding, Derived $>$@{BaseReaderHandler$<$ Encoding, Derived $>$}}
+\doxysubsubsection{\texorpdfstring{RawNumber()}{RawNumber()}}
+{\footnotesize\ttfamily \label{struct_base_reader_handler_a9ed0d83d5e6c8f5e4b32ca3735ff0bb7} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}  = UTF8$<$$>$, typename Derived  = void$>$ \\
+bool \mbox{\hyperlink{struct_base_reader_handler}{Base\+Reader\+Handler}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, Derived $>$\+::\+Raw\+Number (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct_base_reader_handler_a36e099ee68f179e6007a5d8f6feafd61}{Ch}} \texorpdfstring{$\ast$}{*}}]{str}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{len}{, }\item[{bool}]{copy}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{reader_8h_source_l00210}{210}} of file \mbox{\hyperlink{reader_8h_source}{reader.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00210\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{struct_base_reader_handler_aa1c54d48609862055fc3cd4ae0bd5234}{Override}}\&\textcolor{keyword}{>}(*this).String(str,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ copy);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_base_reader_handler_a9dbb1143a250a904bb18a174553a3a00}\index{BaseReaderHandler$<$ Encoding, Derived $>$@{BaseReaderHandler$<$ Encoding, Derived $>$}!StartArray@{StartArray}}
+\index{StartArray@{StartArray}!BaseReaderHandler$<$ Encoding, Derived $>$@{BaseReaderHandler$<$ Encoding, Derived $>$}}
+\doxysubsubsection{\texorpdfstring{StartArray()}{StartArray()}}
+{\footnotesize\ttfamily \label{struct_base_reader_handler_a9dbb1143a250a904bb18a174553a3a00} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}  = UTF8$<$$>$, typename Derived  = void$>$ \\
+bool \mbox{\hyperlink{struct_base_reader_handler}{Base\+Reader\+Handler}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, Derived $>$\+::\+Start\+Array (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{reader_8h_source_l00215}{215}} of file \mbox{\hyperlink{reader_8h_source}{reader.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00215\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{struct_base_reader_handler_aa1c54d48609862055fc3cd4ae0bd5234}{Override}}\&\textcolor{keyword}{>}(*this).Default();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_base_reader_handler_ab0a7d9bcececb8d6ed748656f67f4917}\index{BaseReaderHandler$<$ Encoding, Derived $>$@{BaseReaderHandler$<$ Encoding, Derived $>$}!StartObject@{StartObject}}
+\index{StartObject@{StartObject}!BaseReaderHandler$<$ Encoding, Derived $>$@{BaseReaderHandler$<$ Encoding, Derived $>$}}
+\doxysubsubsection{\texorpdfstring{StartObject()}{StartObject()}}
+{\footnotesize\ttfamily \label{struct_base_reader_handler_ab0a7d9bcececb8d6ed748656f67f4917} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}  = UTF8$<$$>$, typename Derived  = void$>$ \\
+bool \mbox{\hyperlink{struct_base_reader_handler}{Base\+Reader\+Handler}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, Derived $>$\+::\+Start\+Object (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{reader_8h_source_l00212}{212}} of file \mbox{\hyperlink{reader_8h_source}{reader.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00212\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{struct_base_reader_handler_aa1c54d48609862055fc3cd4ae0bd5234}{Override}}\&\textcolor{keyword}{>}(*this).Default();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_base_reader_handler_a3ac69e6326d0aeef7b1f2619742bbe00}\index{BaseReaderHandler$<$ Encoding, Derived $>$@{BaseReaderHandler$<$ Encoding, Derived $>$}!String@{String}}
+\index{String@{String}!BaseReaderHandler$<$ Encoding, Derived $>$@{BaseReaderHandler$<$ Encoding, Derived $>$}}
+\doxysubsubsection{\texorpdfstring{String()}{String()}}
+{\footnotesize\ttfamily \label{struct_base_reader_handler_a3ac69e6326d0aeef7b1f2619742bbe00} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}  = UTF8$<$$>$, typename Derived  = void$>$ \\
+bool \mbox{\hyperlink{struct_base_reader_handler}{Base\+Reader\+Handler}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, Derived $>$\+::\+String (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct_base_reader_handler_a36e099ee68f179e6007a5d8f6feafd61}{Ch}} \texorpdfstring{$\ast$}{*}}]{}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{}{, }\item[{bool}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{reader_8h_source_l00211}{211}} of file \mbox{\hyperlink{reader_8h_source}{reader.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00211\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{struct_base_reader_handler_aa1c54d48609862055fc3cd4ae0bd5234}{Override}}\&\textcolor{keyword}{>}(*this).Default();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_base_reader_handler_a0e683306cbb7b4e350a35c18c5246f2a}\index{BaseReaderHandler$<$ Encoding, Derived $>$@{BaseReaderHandler$<$ Encoding, Derived $>$}!Uint@{Uint}}
+\index{Uint@{Uint}!BaseReaderHandler$<$ Encoding, Derived $>$@{BaseReaderHandler$<$ Encoding, Derived $>$}}
+\doxysubsubsection{\texorpdfstring{Uint()}{Uint()}}
+{\footnotesize\ttfamily \label{struct_base_reader_handler_a0e683306cbb7b4e350a35c18c5246f2a} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}  = UTF8$<$$>$, typename Derived  = void$>$ \\
+bool \mbox{\hyperlink{struct_base_reader_handler}{Base\+Reader\+Handler}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, Derived $>$\+::\+Uint (\begin{DoxyParamCaption}\item[{unsigned}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{reader_8h_source_l00205}{205}} of file \mbox{\hyperlink{reader_8h_source}{reader.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00205\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{struct_base_reader_handler_aa1c54d48609862055fc3cd4ae0bd5234}{Override}}\&\textcolor{keyword}{>}(*this).Default();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_base_reader_handler_a351aa3cd81856a487c21022e9cc64d2b}\index{BaseReaderHandler$<$ Encoding, Derived $>$@{BaseReaderHandler$<$ Encoding, Derived $>$}!Uint64@{Uint64}}
+\index{Uint64@{Uint64}!BaseReaderHandler$<$ Encoding, Derived $>$@{BaseReaderHandler$<$ Encoding, Derived $>$}}
+\doxysubsubsection{\texorpdfstring{Uint64()}{Uint64()}}
+{\footnotesize\ttfamily \label{struct_base_reader_handler_a351aa3cd81856a487c21022e9cc64d2b} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}  = UTF8$<$$>$, typename Derived  = void$>$ \\
+bool \mbox{\hyperlink{struct_base_reader_handler}{Base\+Reader\+Handler}}$<$ \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}, Derived $>$\+::\+Uint64 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{reader_8h_source_l00207}{207}} of file \mbox{\hyperlink{reader_8h_source}{reader.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00207\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{struct_base_reader_handler_aa1c54d48609862055fc3cd4ae0bd5234}{Override}}\&\textcolor{keyword}{>}(*this).Default();\ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/\mbox{\hyperlink{fwd_8h}{fwd.\+h}}\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/\mbox{\hyperlink{reader_8h}{reader.\+h}}\end{DoxyCompactItemize}

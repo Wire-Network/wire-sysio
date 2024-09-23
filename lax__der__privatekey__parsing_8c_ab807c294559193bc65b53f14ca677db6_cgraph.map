@@ -1,0 +1,9 @@
+<map id="ec_privkey_import_der" name="ec_privkey_import_der">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,55,158,80"/>
+<area shape="rect" id="Node000002" href="$yubihsm__pkcs11_8c.html#ae785d5badbf1f08b491af31f32a135a1" title=" " alt="" coords="247,5,318,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="136,51,231,28,233,33,138,57"/>
+<area shape="rect" id="Node000003" href="$yubihsm__pkcs11_8c.html#adc4bd59a60361844aa0e852efa210105" title=" " alt="" coords="249,55,317,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="158,65,234,65,234,70,158,70"/>
+<area shape="rect" id="Node000004" href="$secp256k1_8c.html#a6015346bdaee22c65e5ebca71693d9b1" title=" " alt="" coords="206,104,360,145"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="130,78,195,97,194,102,129,84"/>
+</map>

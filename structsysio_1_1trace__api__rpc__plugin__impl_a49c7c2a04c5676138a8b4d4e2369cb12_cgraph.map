@@ -1,0 +1,23 @@
+<map id="sysio::trace_api_rpc_plugin_impl::calc_deadline" name="sysio::trace_api_rpc_plugin_impl::calc_deadline">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,54,186,94"/>
+<area shape="rect" id="Node000002" href="$classfc_1_1microseconds.html#afc3eb0bfd792c7b1cda062e559e30c2e" title=" " alt="" coords="447,5,633,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="186,54,233,46,431,24,432,29,234,51,187,59"/>
+<area shape="rect" id="Node000004" href="$classfc_1_1time__point.html#aeccf1b70aa34b132c5269313b8a50573" title=" " alt="" coords="234,61,399,87"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="186,72,218,72,218,77,186,77"/>
+<area shape="rect" id="Node000006" href="$classfc_1_1time__point.html#aa164ff1268a16d4b32afcff181f6100e" title=" " alt="" coords="250,128,382,154"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="166,93,257,120,256,125,164,98"/>
+<area shape="rect" id="Node000003" href="$classfc_1_1microseconds.html#a0c79856cd3ab96153901a64961bf216f" title=" " alt="" coords="681,5,892,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="634,16,666,16,666,21,634,21"/>
+<area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="370,58,470,33,471,38,371,63"/>
+<area shape="rect" id="Node000005" href="$classfc_1_1time__point.html#ab46781dcaab4880902bc136f36e39e5e" title=" " alt="" coords="474,55,607,96"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="399,72,458,72,458,78,399,77"/>
+<area shape="poly" id="edge10_Node000006_Node000005" title=" " alt="" coords="362,125,458,97,459,102,364,130"/>
+<area shape="rect" id="Node000007" href="$classfc_1_1mock__time__traits.html#a0bed781012a73b8c15882648397b56be" title=" " alt="" coords="470,120,610,161"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="383,138,454,138,454,144,383,144"/>
+<area shape="rect" id="Node000009" href="$classfc_1_1mock__time__traits.html#adddeebdf472c33f927827c111ddbf0b1" title=" " alt="" coords="470,186,610,226"/>
+<area shape="poly" id="edge9_Node000006_Node000009" title=" " alt="" coords="364,152,456,179,454,184,362,157"/>
+<area shape="rect" id="Node000010" href="$classfc_1_1time__point.html#abfea5efbe9ef58024cda814395ee9945" title=" " alt="" coords="474,251,607,292"/>
+<area shape="poly" id="edge11_Node000006_Node000010" title=" " alt="" coords="334,152,383,192,448,236,461,242,458,247,446,240,380,197,330,156"/>
+<area shape="rect" id="Node000008" href="$classfc_1_1mock__time__traits.html#a0d7245b32fd62b3bc712f658250cc4db" title=" " alt="" coords="700,128,873,154"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="611,138,685,138,685,144,611,144"/>
+</map>

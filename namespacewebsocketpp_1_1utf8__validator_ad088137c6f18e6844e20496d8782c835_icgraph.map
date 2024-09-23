@@ -1,0 +1,13 @@
+<map id="websocketpp::utf8_validator::validate" name="websocketpp::utf8_validator::validate">
+<area shape="rect" id="Node000001" title="Validate a UTF8 string." alt="" coords="488,71,672,111"/>
+<area shape="rect" id="Node000002" href="$namespacewebsocketpp_1_1close.html#a537f66833c7b6e745b3cf5dc0252c0ca" title="Extract the reason string from a close payload." alt="" coords="276,5,414,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="489,69,413,47,415,42,491,63"/>
+<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1processor_1_1hybi00.html#a919aaed345cab679875be1d95c7302ec" title="Prepare a message for writing." alt="" coords="250,71,440,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="472,94,441,94,441,88,472,88"/>
+<area shape="rect" id="Node000006" href="$classwebsocketpp_1_1processor_1_1hybi13.html#a72f4833d66eb51e37a956f434895b3ab" title="Prepare a user data message for writing." alt="" coords="250,136,440,177"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="491,119,422,138,420,133,489,113"/>
+<area shape="rect" id="Node000004" href="$hybi00_8cpp.html#ae8fa75d088192976938f98253c21555f" title=" " alt="" coords="5,54,202,80"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="234,83,202,79,202,74,234,77"/>
+<area shape="rect" id="Node000005" href="$hybi00_8cpp.html#abb0b7aa704fbeecbfd602779c7a8c6b8" title=" " alt="" coords="5,104,202,129"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="234,105,202,109,202,103,234,100"/>
+</map>

@@ -1,0 +1,239 @@
+\doxysection{Catch\+::Timer Class Reference}
+\hypertarget{class_catch_1_1_timer}{}\label{class_catch_1_1_timer}\index{Catch::Timer@{Catch::Timer}}
+
+
+{\ttfamily \#include $<$catch\+\_\+timer.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{class_catch_1_1_timer_a0a56e879e43f36c102bf9ea8b5fc8b72}{start}} ()
+\item 
+auto \mbox{\hyperlink{class_catch_1_1_timer_a57be5d17ca868a2d6fb1eea84de665cf}{get\+Elapsed\+Nanoseconds}} () const -\/$>$ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}
+\item 
+auto \mbox{\hyperlink{class_catch_1_1_timer_a545de17a61a6fee1dbe3de5b0723e5fa}{get\+Elapsed\+Microseconds}} () const -\/$>$ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}
+\item 
+auto \mbox{\hyperlink{class_catch_1_1_timer_a30aaf458dbb59dd8ac8971c9c62e0eac}{get\+Elapsed\+Milliseconds}} () const -\/$>$ unsigned int
+\item 
+auto \mbox{\hyperlink{class_catch_1_1_timer_a065e37e3c9eb16bd4dcf41971d8deedc}{get\+Elapsed\+Seconds}} () const -\/$>$ double
+\item 
+void \mbox{\hyperlink{class_catch_1_1_timer_a0a56e879e43f36c102bf9ea8b5fc8b72}{start}} ()
+\item 
+auto \mbox{\hyperlink{class_catch_1_1_timer_a57be5d17ca868a2d6fb1eea84de665cf}{get\+Elapsed\+Nanoseconds}} () const -\/$>$ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}
+\item 
+auto \mbox{\hyperlink{class_catch_1_1_timer_a545de17a61a6fee1dbe3de5b0723e5fa}{get\+Elapsed\+Microseconds}} () const -\/$>$ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}
+\item 
+auto \mbox{\hyperlink{class_catch_1_1_timer_a30aaf458dbb59dd8ac8971c9c62e0eac}{get\+Elapsed\+Milliseconds}} () const -\/$>$ unsigned int
+\item 
+auto \mbox{\hyperlink{class_catch_1_1_timer_a065e37e3c9eb16bd4dcf41971d8deedc}{get\+Elapsed\+Seconds}} () const -\/$>$ double
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source_l02518}{2518}} of file \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source}{catch.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_catch_1_1_timer_a545de17a61a6fee1dbe3de5b0723e5fa}\index{Catch::Timer@{Catch::Timer}!getElapsedMicroseconds@{getElapsedMicroseconds}}
+\index{getElapsedMicroseconds@{getElapsedMicroseconds}!Catch::Timer@{Catch::Timer}}
+\doxysubsubsection{\texorpdfstring{getElapsedMicroseconds()}{getElapsedMicroseconds()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_timer_a545de17a61a6fee1dbe3de5b0723e5fa} 
+auto Catch\+::\+Timer\+::get\+Elapsed\+Microseconds (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const -\/$>$ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__timer_8cpp_source_l00063}{63}} of file \mbox{\hyperlink{catch__timer_8cpp_source}{catch\+\_\+timer.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_catch_1_1_timer_a57be5d17ca868a2d6fb1eea84de665cf}{getElapsedNanoseconds}}()/1000;}
+\DoxyCodeLine{00065\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_timer_a545de17a61a6fee1dbe3de5b0723e5fa_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_timer_a545de17a61a6fee1dbe3de5b0723e5fa_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_timer_a545de17a61a6fee1dbe3de5b0723e5fa}\index{Catch::Timer@{Catch::Timer}!getElapsedMicroseconds@{getElapsedMicroseconds}}
+\index{getElapsedMicroseconds@{getElapsedMicroseconds}!Catch::Timer@{Catch::Timer}}
+\doxysubsubsection{\texorpdfstring{getElapsedMicroseconds()}{getElapsedMicroseconds()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_timer_a545de17a61a6fee1dbe3de5b0723e5fa} 
+auto Catch\+::\+Timer\+::get\+Elapsed\+Microseconds (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const -\/$>$  \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}
+
+\Hypertarget{class_catch_1_1_timer_a30aaf458dbb59dd8ac8971c9c62e0eac}\index{Catch::Timer@{Catch::Timer}!getElapsedMilliseconds@{getElapsedMilliseconds}}
+\index{getElapsedMilliseconds@{getElapsedMilliseconds}!Catch::Timer@{Catch::Timer}}
+\doxysubsubsection{\texorpdfstring{getElapsedMilliseconds()}{getElapsedMilliseconds()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_timer_a30aaf458dbb59dd8ac8971c9c62e0eac} 
+auto Catch\+::\+Timer\+::get\+Elapsed\+Milliseconds (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const -\/$>$ unsigned int}
+
+
+
+Definition at line \mbox{\hyperlink{catch__timer_8cpp_source_l00066}{66}} of file \mbox{\hyperlink{catch__timer_8cpp_source}{catch\+\_\+timer.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\textcolor{keyword}{>}(\mbox{\hyperlink{class_catch_1_1_timer_a545de17a61a6fee1dbe3de5b0723e5fa}{getElapsedMicroseconds}}()/1000);}
+\DoxyCodeLine{00068\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_timer_a30aaf458dbb59dd8ac8971c9c62e0eac_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_timer_a30aaf458dbb59dd8ac8971c9c62e0eac_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_timer_a30aaf458dbb59dd8ac8971c9c62e0eac}\index{Catch::Timer@{Catch::Timer}!getElapsedMilliseconds@{getElapsedMilliseconds}}
+\index{getElapsedMilliseconds@{getElapsedMilliseconds}!Catch::Timer@{Catch::Timer}}
+\doxysubsubsection{\texorpdfstring{getElapsedMilliseconds()}{getElapsedMilliseconds()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_timer_a30aaf458dbb59dd8ac8971c9c62e0eac} 
+auto Catch\+::\+Timer\+::get\+Elapsed\+Milliseconds (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const -\/$>$  unsigned int}
+
+\Hypertarget{class_catch_1_1_timer_a57be5d17ca868a2d6fb1eea84de665cf}\index{Catch::Timer@{Catch::Timer}!getElapsedNanoseconds@{getElapsedNanoseconds}}
+\index{getElapsedNanoseconds@{getElapsedNanoseconds}!Catch::Timer@{Catch::Timer}}
+\doxysubsubsection{\texorpdfstring{getElapsedNanoseconds()}{getElapsedNanoseconds()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_timer_a57be5d17ca868a2d6fb1eea84de665cf} 
+auto Catch\+::\+Timer\+::get\+Elapsed\+Nanoseconds (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const -\/$>$ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__timer_8cpp_source_l00060}{60}} of file \mbox{\hyperlink{catch__timer_8cpp_source}{catch\+\_\+timer.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_catch_a98d058468488c486a9cb5c8463f3ba29}{getCurrentNanosecondsSinceEpoch}}()\ -\/\ m\_nanoseconds;}
+\DoxyCodeLine{00062\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_timer_a57be5d17ca868a2d6fb1eea84de665cf_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_timer_a57be5d17ca868a2d6fb1eea84de665cf_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_timer_a57be5d17ca868a2d6fb1eea84de665cf}\index{Catch::Timer@{Catch::Timer}!getElapsedNanoseconds@{getElapsedNanoseconds}}
+\index{getElapsedNanoseconds@{getElapsedNanoseconds}!Catch::Timer@{Catch::Timer}}
+\doxysubsubsection{\texorpdfstring{getElapsedNanoseconds()}{getElapsedNanoseconds()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_timer_a57be5d17ca868a2d6fb1eea84de665cf} 
+auto Catch\+::\+Timer\+::get\+Elapsed\+Nanoseconds (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const -\/$>$  \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}
+
+\Hypertarget{class_catch_1_1_timer_a065e37e3c9eb16bd4dcf41971d8deedc}\index{Catch::Timer@{Catch::Timer}!getElapsedSeconds@{getElapsedSeconds}}
+\index{getElapsedSeconds@{getElapsedSeconds}!Catch::Timer@{Catch::Timer}}
+\doxysubsubsection{\texorpdfstring{getElapsedSeconds()}{getElapsedSeconds()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_timer_a065e37e3c9eb16bd4dcf41971d8deedc} 
+auto Catch\+::\+Timer\+::get\+Elapsed\+Seconds (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const -\/$>$ double}
+
+
+
+Definition at line \mbox{\hyperlink{catch__timer_8cpp_source_l00069}{69}} of file \mbox{\hyperlink{catch__timer_8cpp_source}{catch\+\_\+timer.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_catch_1_1_timer_a545de17a61a6fee1dbe3de5b0723e5fa}{getElapsedMicroseconds}}()/1000000.0;}
+\DoxyCodeLine{00071\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_timer_a065e37e3c9eb16bd4dcf41971d8deedc_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_timer_a065e37e3c9eb16bd4dcf41971d8deedc_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_timer_a065e37e3c9eb16bd4dcf41971d8deedc}\index{Catch::Timer@{Catch::Timer}!getElapsedSeconds@{getElapsedSeconds}}
+\index{getElapsedSeconds@{getElapsedSeconds}!Catch::Timer@{Catch::Timer}}
+\doxysubsubsection{\texorpdfstring{getElapsedSeconds()}{getElapsedSeconds()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_timer_a065e37e3c9eb16bd4dcf41971d8deedc} 
+auto Catch\+::\+Timer\+::get\+Elapsed\+Seconds (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const -\/$>$  double}
+
+\Hypertarget{class_catch_1_1_timer_a0a56e879e43f36c102bf9ea8b5fc8b72}\index{Catch::Timer@{Catch::Timer}!start@{start}}
+\index{start@{start}!Catch::Timer@{Catch::Timer}}
+\doxysubsubsection{\texorpdfstring{start()}{start()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_timer_a0a56e879e43f36c102bf9ea8b5fc8b72} 
+void Catch\+::\+Timer\+::start (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__timer_8cpp_source_l00057}{57}} of file \mbox{\hyperlink{catch__timer_8cpp_source}{catch\+\_\+timer.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ m\_nanoseconds\ =\ \mbox{\hyperlink{namespace_catch_a98d058468488c486a9cb5c8463f3ba29}{getCurrentNanosecondsSinceEpoch}}();}
+\DoxyCodeLine{00059\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_timer_a0a56e879e43f36c102bf9ea8b5fc8b72_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_timer_a0a56e879e43f36c102bf9ea8b5fc8b72_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_timer_a0a56e879e43f36c102bf9ea8b5fc8b72}\index{Catch::Timer@{Catch::Timer}!start@{start}}
+\index{start@{start}!Catch::Timer@{Catch::Timer}}
+\doxysubsubsection{\texorpdfstring{start()}{start()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_timer_a0a56e879e43f36c102bf9ea8b5fc8b72} 
+void Catch\+::\+Timer\+::start (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_timer_a0a56e879e43f36c102bf9ea8b5fc8b72_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__timer_8h}{catch\+\_\+timer.\+h}}\item 
+libraries/sys-\/vm/external/\+Catch2/single\+\_\+include/catch2/\mbox{\hyperlink{single__include_2catch2_2catch_8hpp}{catch.\+hpp}}\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__timer_8cpp}{catch\+\_\+timer.\+cpp}}\end{DoxyCompactItemize}

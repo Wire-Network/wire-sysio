@@ -1,0 +1,569 @@
+\doxysection{fc\+::ecc\+::public\+\_\+key Class Reference}
+\hypertarget{classfc_1_1ecc_1_1public__key}{}\label{classfc_1_1ecc_1_1public__key}\index{fc::ecc::public\_key@{fc::ecc::public\_key}}
+
+
+contains only the public point of an elliptic curve key.  
+
+
+
+
+{\ttfamily \#include $<$elliptic.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1ecc_1_1public__key_a36809db96f0dd7c702da3d80d512a24c}{public\+\_\+key}} ()
+\item 
+\mbox{\hyperlink{classfc_1_1ecc_1_1public__key_ae8fa92fd81301f57adccdbfa307c05b6}{public\+\_\+key}} (const \mbox{\hyperlink{classfc_1_1ecc_1_1public__key}{public\+\_\+key}} \&k)
+\item 
+\mbox{\hyperlink{classfc_1_1ecc_1_1public__key_a66dc1c404c6ff1d91d49eecf2e53a501}{\texorpdfstring{$\sim$}{\string~}public\+\_\+key}} ()
+\item 
+\mbox{\hyperlink{namespacefc_1_1ecc_a86376367df56783963d35795bebddce6}{public\+\_\+key\+\_\+data}} \mbox{\hyperlink{classfc_1_1ecc_1_1public__key_a066502d87da28f82ccc3c6942491cd48}{serialize}} () const
+\item 
+\mbox{\hyperlink{namespacefc_1_1ecc_a021e8958c600635ce437f74d6d9919d1}{public\+\_\+key\+\_\+point\+\_\+data}} \mbox{\hyperlink{classfc_1_1ecc_1_1public__key_ad66e70893ee796b7553b9c430dfc9b01}{serialize\+\_\+ecc\+\_\+point}} () const
+\item 
+\mbox{\hyperlink{classfc_1_1ecc_1_1public__key_a4123143ccd9ce438a44a88738fc5e493}{operator public\+\_\+key\+\_\+data}} () const
+\item 
+\mbox{\hyperlink{classfc_1_1ecc_1_1public__key_ab74d3843d36531fa314f18f4b833aa05}{public\+\_\+key}} (const \mbox{\hyperlink{namespacefc_1_1ecc_a86376367df56783963d35795bebddce6}{public\+\_\+key\+\_\+data}} \&v)
+\item 
+\mbox{\hyperlink{classfc_1_1ecc_1_1public__key_ad2d07d406b637abe5d58767f501829a1}{public\+\_\+key}} (const \mbox{\hyperlink{namespacefc_1_1ecc_a021e8958c600635ce437f74d6d9919d1}{public\+\_\+key\+\_\+point\+\_\+data}} \&v)
+\item 
+\mbox{\hyperlink{classfc_1_1ecc_1_1public__key_a9bddb3f771958bbeefd71f3177640998}{public\+\_\+key}} (const \mbox{\hyperlink{namespacefc_1_1ecc_a6eacb8ab0952f02d67d5596a088ae347}{compact\+\_\+signature}} \&c, const \mbox{\hyperlink{classfc_1_1sha256}{fc\+::sha256}} \&\mbox{\hyperlink{namespacefc_a150ca4cd9c0318ca45dc0dc7df5d58b9}{digest}}, bool check\+\_\+canonical=true)
+\item 
+\mbox{\hyperlink{classfc_1_1ecc_1_1public__key}{public\+\_\+key}} \mbox{\hyperlink{classfc_1_1ecc_1_1public__key_a18b332ed5ccee4bea959fb85120b2837}{child}} (const \mbox{\hyperlink{classfc_1_1sha256}{fc\+::sha256}} \&offset) const
+\item 
+bool \mbox{\hyperlink{classfc_1_1ecc_1_1public__key_a4d0285e78d1f43a8df59ab7d80c15cea}{valid}} () const
+\item 
+\mbox{\hyperlink{classfc_1_1ecc_1_1public__key_ac5218540b5d2ef38d8b13fa1a00a54f3}{public\+\_\+key}} (\mbox{\hyperlink{classfc_1_1ecc_1_1public__key}{public\+\_\+key}} \&\&pk)
+\item 
+\mbox{\hyperlink{classfc_1_1ecc_1_1public__key}{public\+\_\+key}} \& \mbox{\hyperlink{classfc_1_1ecc_1_1public__key_a896c349b93b67c049c5f08c4cbb2b70f}{operator=}} (\mbox{\hyperlink{classfc_1_1ecc_1_1public__key}{public\+\_\+key}} \&\&pk)
+\item 
+\mbox{\hyperlink{classfc_1_1ecc_1_1public__key}{public\+\_\+key}} \& \mbox{\hyperlink{classfc_1_1ecc_1_1public__key_a22e892436cb6e8d7e56b5125e32b9e9d}{operator=}} (const \mbox{\hyperlink{classfc_1_1ecc_1_1public__key}{public\+\_\+key}} \&pk)
+\item 
+std\+::string \mbox{\hyperlink{classfc_1_1ecc_1_1public__key_a21a7c7923e874f8e93410fdc6301a205}{to\+\_\+base58}} () const
+\begin{DoxyCompactList}\small\item\em Allows to convert current public key object into base58 number. \end{DoxyCompactList}\item 
+unsigned int \mbox{\hyperlink{classfc_1_1ecc_1_1public__key_a3d7851242d88d7927653efcc3cd8c0ca}{fingerprint}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static std\+::string \mbox{\hyperlink{classfc_1_1ecc_1_1public__key_a83b654848353a7b8a76c1d8ffc99f72d}{to\+\_\+base58}} (const \mbox{\hyperlink{namespacefc_1_1ecc_a86376367df56783963d35795bebddce6}{public\+\_\+key\+\_\+data}} \&key)
+\item 
+static \mbox{\hyperlink{classfc_1_1ecc_1_1public__key}{public\+\_\+key}} \mbox{\hyperlink{classfc_1_1ecc_1_1public__key_a9671dae78f391e2d1d6e8243432c8cb9}{from\+\_\+base58}} (const std\+::string \&b58)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classfc_1_1ecc_1_1public__key_ae1389c6c19ec8630ce31970de2294915}{private\+\_\+key}}
+\item 
+bool \mbox{\hyperlink{classfc_1_1ecc_1_1public__key_a4f2610bdec460bf2b0203684a9599da5}{operator==}} (const \mbox{\hyperlink{classfc_1_1ecc_1_1public__key}{public\+\_\+key}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, const \mbox{\hyperlink{classfc_1_1ecc_1_1public__key}{public\+\_\+key}} \&b)
+\item 
+bool \mbox{\hyperlink{classfc_1_1ecc_1_1public__key_a5faa639eb95ed12c1be5d8ae65c7cb54}{operator!=}} (const \mbox{\hyperlink{classfc_1_1ecc_1_1public__key}{public\+\_\+key}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, const \mbox{\hyperlink{classfc_1_1ecc_1_1public__key}{public\+\_\+key}} \&b)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{elliptic_8hpp_source_l00035}{35}} of file \mbox{\hyperlink{elliptic_8hpp_source}{elliptic.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1ecc_1_1public__key_a36809db96f0dd7c702da3d80d512a24c}\index{fc::ecc::public\_key@{fc::ecc::public\_key}!public\_key@{public\_key}}
+\index{public\_key@{public\_key}!fc::ecc::public\_key@{fc::ecc::public\_key}}
+\doxysubsubsection{\texorpdfstring{public\_key()}{public\_key()}\hspace{0.1cm}{\footnotesize\ttfamily [1/6]}}
+{\footnotesize\ttfamily \label{classfc_1_1ecc_1_1public__key_a36809db96f0dd7c702da3d80d512a24c} 
+fc\+::ecc\+::public\+\_\+key\+::public\+\_\+key (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic__impl__pub_8cpp_source_l00142}{142}} of file \mbox{\hyperlink{elliptic__impl__pub_8cpp_source}{elliptic\+\_\+impl\+\_\+pub.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00142\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1ecc_1_1public__key_ae8fa92fd81301f57adccdbfa307c05b6}\index{fc::ecc::public\_key@{fc::ecc::public\_key}!public\_key@{public\_key}}
+\index{public\_key@{public\_key}!fc::ecc::public\_key@{fc::ecc::public\_key}}
+\doxysubsubsection{\texorpdfstring{public\_key()}{public\_key()}\hspace{0.1cm}{\footnotesize\ttfamily [2/6]}}
+{\footnotesize\ttfamily \label{classfc_1_1ecc_1_1public__key_ae8fa92fd81301f57adccdbfa307c05b6} 
+fc\+::ecc\+::public\+\_\+key\+::public\+\_\+key (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1ecc_1_1public__key}{public\+\_\+key}} \&}]{k}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic__impl__pub_8cpp_source_l00144}{144}} of file \mbox{\hyperlink{elliptic__impl__pub_8cpp_source}{elliptic\+\_\+impl\+\_\+pub.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00144\ :\ my(\ pk.my\ )\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1ecc_1_1public__key_a66dc1c404c6ff1d91d49eecf2e53a501}\index{fc::ecc::public\_key@{fc::ecc::public\_key}!````~public\_key@{\texorpdfstring{$\sim$}{\string~}public\_key}}
+\index{````~public\_key@{\texorpdfstring{$\sim$}{\string~}public\_key}!fc::ecc::public\_key@{fc::ecc::public\_key}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}public\_key()}{\string~public\_key()}}
+{\footnotesize\ttfamily \label{classfc_1_1ecc_1_1public__key_a66dc1c404c6ff1d91d49eecf2e53a501} 
+fc\+::ecc\+::public\+\_\+key\+::\texorpdfstring{$\sim$}{\string~}public\+\_\+key (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic__impl__pub_8cpp_source_l00148}{148}} of file \mbox{\hyperlink{elliptic__impl__pub_8cpp_source}{elliptic\+\_\+impl\+\_\+pub.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00148\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1ecc_1_1public__key_ab74d3843d36531fa314f18f4b833aa05}\index{fc::ecc::public\_key@{fc::ecc::public\_key}!public\_key@{public\_key}}
+\index{public\_key@{public\_key}!fc::ecc::public\_key@{fc::ecc::public\_key}}
+\doxysubsubsection{\texorpdfstring{public\_key()}{public\_key()}\hspace{0.1cm}{\footnotesize\ttfamily [3/6]}}
+{\footnotesize\ttfamily \label{classfc_1_1ecc_1_1public__key_ab74d3843d36531fa314f18f4b833aa05} 
+fc\+::ecc\+::public\+\_\+key\+::public\+\_\+key (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_1_1ecc_a86376367df56783963d35795bebddce6}{public\+\_\+key\+\_\+data}} \&}]{v}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic__impl__pub_8cpp_source_l00306}{306}} of file \mbox{\hyperlink{elliptic__impl__pub_8cpp_source}{elliptic\+\_\+impl\+\_\+pub.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00307\ \ \ \ \ \{}
+\DoxyCodeLine{00308\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ front\ =\ \&dat.data[0];}
+\DoxyCodeLine{00309\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ *front\ ==\ 0\ )\{\}}
+\DoxyCodeLine{00310\ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00311\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00312\ \ \ \ \ \ \ \ \ \ my-\/>\_key\ =\ EC\_KEY\_new\_by\_curve\_name(\ NID\_secp256k1\ );}
+\DoxyCodeLine{00313\ \ \ \ \ \ \ \ \ \ my-\/>\_key\ =\ o2i\_ECPublicKey(\ \&my-\/>\_key,\ (\textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}**)\&front,\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{namespacefc_1_1ecc_a86376367df56783963d35795bebddce6}{public\_key\_data}})\ );}
+\DoxyCodeLine{00314\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !my-\/>\_key\ )}
+\DoxyCodeLine{00315\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00316\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ exception,\ \textcolor{stringliteral}{"{}error\ decoding\ public\ key"{}},\ (\textcolor{stringliteral}{"{}s"{}},\ ERR\_error\_string(\ ERR\_get\_error(),\ \textcolor{keyword}{nullptr})\ )\ );}
+\DoxyCodeLine{00317\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00318\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00319\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1ecc_1_1public__key_ad2d07d406b637abe5d58767f501829a1}\index{fc::ecc::public\_key@{fc::ecc::public\_key}!public\_key@{public\_key}}
+\index{public\_key@{public\_key}!fc::ecc::public\_key@{fc::ecc::public\_key}}
+\doxysubsubsection{\texorpdfstring{public\_key()}{public\_key()}\hspace{0.1cm}{\footnotesize\ttfamily [4/6]}}
+{\footnotesize\ttfamily \label{classfc_1_1ecc_1_1public__key_ad2d07d406b637abe5d58767f501829a1} 
+fc\+::ecc\+::public\+\_\+key\+::public\+\_\+key (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_1_1ecc_a021e8958c600635ce437f74d6d9919d1}{public\+\_\+key\+\_\+point\+\_\+data}} \&}]{v}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic__impl__pub_8cpp_source_l00292}{292}} of file \mbox{\hyperlink{elliptic__impl__pub_8cpp_source}{elliptic\+\_\+impl\+\_\+pub.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00293\ \ \ \ \ \{}
+\DoxyCodeLine{00294\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ front\ =\ \&dat.data[0];}
+\DoxyCodeLine{00295\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ *front\ ==\ 0\ )\{\}}
+\DoxyCodeLine{00296\ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00297\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00298\ \ \ \ \ \ \ \ \ \ my-\/>\_key\ =\ EC\_KEY\_new\_by\_curve\_name(\ NID\_secp256k1\ );}
+\DoxyCodeLine{00299\ \ \ \ \ \ \ \ \ \ my-\/>\_key\ =\ o2i\_ECPublicKey(\ \&my-\/>\_key,\ (\textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}**)\&front,\ \textcolor{keyword}{sizeof}(dat)\ \ );}
+\DoxyCodeLine{00300\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !my-\/>\_key\ )}
+\DoxyCodeLine{00301\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00302\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ exception,\ \textcolor{stringliteral}{"{}error\ decoding\ public\ key"{}},\ (\textcolor{stringliteral}{"{}s"{}},\ ERR\_error\_string(\ ERR\_get\_error(),\ \textcolor{keyword}{nullptr})\ )\ );}
+\DoxyCodeLine{00303\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00304\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00305\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1ecc_1_1public__key_a9bddb3f771958bbeefd71f3177640998}\index{fc::ecc::public\_key@{fc::ecc::public\_key}!public\_key@{public\_key}}
+\index{public\_key@{public\_key}!fc::ecc::public\_key@{fc::ecc::public\_key}}
+\doxysubsubsection{\texorpdfstring{public\_key()}{public\_key()}\hspace{0.1cm}{\footnotesize\ttfamily [5/6]}}
+{\footnotesize\ttfamily \label{classfc_1_1ecc_1_1public__key_a9bddb3f771958bbeefd71f3177640998} 
+fc\+::ecc\+::public\+\_\+key\+::public\+\_\+key (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_1_1ecc_a6eacb8ab0952f02d67d5596a088ae347}{compact\+\_\+signature}} \&}]{c}{, }\item[{const \mbox{\hyperlink{classfc_1_1sha256}{fc\+::sha256}} \&}]{digest}{, }\item[{bool}]{check\+\_\+canonical}{ = {\ttfamily true}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic__impl__pub_8cpp_source_l00326}{326}} of file \mbox{\hyperlink{elliptic__impl__pub_8cpp_source}{elliptic\+\_\+impl\+\_\+pub.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00327\ \ \ \ \ \{}
+\DoxyCodeLine{00328\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ nV\ =\ c.data[0];}
+\DoxyCodeLine{00329\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (nV<27\ ||\ nV>=35)}
+\DoxyCodeLine{00330\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ exception,\ \textcolor{stringliteral}{"{}unable\ to\ reconstruct\ public\ key\ from\ signature"{}}\ );}
+\DoxyCodeLine{00331\ }
+\DoxyCodeLine{00332\ \ \ \ \ \ \ \ \ ECDSA\_SIG\ *sig\ =\ ECDSA\_SIG\_new();}
+\DoxyCodeLine{00333\ \ \ \ \ \ \ \ \ BN\_bin2bn(\&c.data[1],32,sig-\/>r);}
+\DoxyCodeLine{00334\ \ \ \ \ \ \ \ \ BN\_bin2bn(\&c.data[33],32,sig-\/>s);}
+\DoxyCodeLine{00335\ }
+\DoxyCodeLine{00336\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ check\_canonical\ )}
+\DoxyCodeLine{00337\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00338\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ is\_canonical(\ c\ ),\ \textcolor{stringliteral}{"{}signature\ is\ not\ canonical"{}}\ );}
+\DoxyCodeLine{00339\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00340\ }
+\DoxyCodeLine{00341\ \ \ \ \ \ \ \ \ my-\/>\_key\ =\ EC\_KEY\_new\_by\_curve\_name(NID\_secp256k1);}
+\DoxyCodeLine{00342\ }
+\DoxyCodeLine{00343\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (nV\ >=\ 31)}
+\DoxyCodeLine{00344\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00345\ \ \ \ \ \ \ \ \ \ \ \ \ EC\_KEY\_set\_conv\_form(\ my-\/>\_key,\ POINT\_CONVERSION\_COMPRESSED\ );}
+\DoxyCodeLine{00346\ \ \ \ \ \ \ \ \ \ \ \ \ nV\ -\/=\ 4;}
+\DoxyCodeLine{00347\ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ \ \ fprintf(\ stderr,\ "{}compressed\(\backslash\)n"{}\ );}}
+\DoxyCodeLine{00348\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00349\ }
+\DoxyCodeLine{00350\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classfc_1_1ecc_1_1detail_1_1public__key__impl_a9b79e279e77c8ec1227e3bcb596cf74a}{detail::public\_key\_impl::ECDSA\_SIG\_recover\_key\_GFp}}(my-\/>\_key,\ sig,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)\&\mbox{\hyperlink{namespacefc_a150ca4cd9c0318ca45dc0dc7df5d58b9}{digest}},\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{namespacefc_a150ca4cd9c0318ca45dc0dc7df5d58b9}{digest}}),\ nV\ -\/\ 27,\ 0)\ ==\ 1)}
+\DoxyCodeLine{00351\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00352\ \ \ \ \ \ \ \ \ \ \ \ \ ECDSA\_SIG\_free(sig);}
+\DoxyCodeLine{00353\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00354\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00355\ \ \ \ \ \ \ \ \ ECDSA\_SIG\_free(sig);}
+\DoxyCodeLine{00356\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ exception,\ \textcolor{stringliteral}{"{}unable\ to\ reconstruct\ public\ key\ from\ signature"{}}\ );}
+\DoxyCodeLine{00357\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1ecc_1_1public__key_a9bddb3f771958bbeefd71f3177640998_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1ecc_1_1public__key_ac5218540b5d2ef38d8b13fa1a00a54f3}\index{fc::ecc::public\_key@{fc::ecc::public\_key}!public\_key@{public\_key}}
+\index{public\_key@{public\_key}!fc::ecc::public\_key@{fc::ecc::public\_key}}
+\doxysubsubsection{\texorpdfstring{public\_key()}{public\_key()}\hspace{0.1cm}{\footnotesize\ttfamily [6/6]}}
+{\footnotesize\ttfamily \label{classfc_1_1ecc_1_1public__key_ac5218540b5d2ef38d8b13fa1a00a54f3} 
+fc\+::ecc\+::public\+\_\+key\+::public\+\_\+key (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1ecc_1_1public__key}{public\+\_\+key}} \&\&}]{pk}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic__impl__pub_8cpp_source_l00146}{146}} of file \mbox{\hyperlink{elliptic__impl__pub_8cpp_source}{elliptic\+\_\+impl\+\_\+pub.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00146\ :\ my(\ std::move(\ pk.my\ )\ )\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1ecc_1_1public__key_a18b332ed5ccee4bea959fb85120b2837}\index{fc::ecc::public\_key@{fc::ecc::public\_key}!child@{child}}
+\index{child@{child}!fc::ecc::public\_key@{fc::ecc::public\_key}}
+\doxysubsubsection{\texorpdfstring{child()}{child()}}
+{\footnotesize\ttfamily \label{classfc_1_1ecc_1_1public__key_a18b332ed5ccee4bea959fb85120b2837} 
+\mbox{\hyperlink{classfc_1_1ecc_1_1public__key}{public\+\_\+key}} fc\+::ecc\+::public\+\_\+key\+::child (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1sha256}{fc\+::sha256}} \&}]{offset}{}\end{DoxyParamCaption}) const}
+
+\Hypertarget{classfc_1_1ecc_1_1public__key_a3d7851242d88d7927653efcc3cd8c0ca}\index{fc::ecc::public\_key@{fc::ecc::public\_key}!fingerprint@{fingerprint}}
+\index{fingerprint@{fingerprint}!fc::ecc::public\_key@{fc::ecc::public\_key}}
+\doxysubsubsection{\texorpdfstring{fingerprint()}{fingerprint()}}
+{\footnotesize\ttfamily \label{classfc_1_1ecc_1_1public__key_a3d7851242d88d7927653efcc3cd8c0ca} 
+unsigned int fc\+::ecc\+::public\+\_\+key\+::fingerprint (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic__common_8cpp_source_l00144}{144}} of file \mbox{\hyperlink{elliptic__common_8cpp_source}{elliptic\+\_\+common.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00145\ \ \ \ \ \{}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1ecc_a86376367df56783963d35795bebddce6}{public\_key\_data}}\ key\ =\ \mbox{\hyperlink{classfc_1_1ecc_1_1public__key_a066502d87da28f82ccc3c6942491cd48}{serialize}}();}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain__apis_ac78dd757cd6cb873652b7a9a224722f8}{ripemd160}}\ hash\ =\ \mbox{\hyperlink{classfc_1_1ripemd160_a7d43ada80e62a7a73ca472365138f863}{ripemd160::hash}}(\ \mbox{\hyperlink{classfc_1_1sha256_a474784de7d6213b855abd7e952df5e36}{sha256::hash}}(\ key.begin(),\ key.size()\ )\ );}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*\ fp\ =\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*)\ hash.\_hash;}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (fp[0]\ <<\ 24)\ |\ (fp[1]\ <<\ 16)\ |\ (fp[2]\ <<\ 8)\ |\ fp[3];}
+\DoxyCodeLine{00150\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1ecc_1_1public__key_a3d7851242d88d7927653efcc3cd8c0ca_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=317pt]{classfc_1_1ecc_1_1public__key_a3d7851242d88d7927653efcc3cd8c0ca_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1ecc_1_1public__key_a9671dae78f391e2d1d6e8243432c8cb9}\index{fc::ecc::public\_key@{fc::ecc::public\_key}!from\_base58@{from\_base58}}
+\index{from\_base58@{from\_base58}!fc::ecc::public\_key@{fc::ecc::public\_key}}
+\doxysubsubsection{\texorpdfstring{from\_base58()}{from\_base58()}}
+{\footnotesize\ttfamily \label{classfc_1_1ecc_1_1public__key_a9671dae78f391e2d1d6e8243432c8cb9} 
+\mbox{\hyperlink{classfc_1_1ecc_1_1public__key}{public\+\_\+key}} fc\+::ecc\+::public\+\_\+key\+::from\+\_\+base58 (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{b58}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic__common_8cpp_source_l00131}{131}} of file \mbox{\hyperlink{elliptic__common_8cpp_source}{elliptic\+\_\+common.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00132\ \ \ \ \ \{}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ array<char,\ 37>\ data;}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ =\ \mbox{\hyperlink{namespacefc_ab9aa48ceb035b5fc4b0ff9e48b40bc1d}{fc::from\_base58}}(b58,\ (\textcolor{keywordtype}{char}*)\&data,\ \textcolor{keyword}{sizeof}(data)\ );}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ ==\ \textcolor{keyword}{sizeof}(data)\ );}
+\DoxyCodeLine{00136\ }
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1ecc_a86376367df56783963d35795bebddce6}{public\_key\_data}}\ \mbox{\hyperlink{yubico__otp_8c_a9246c20bb98ad2b4c60313c053c70f08}{key}};}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ check\ =\ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})\mbox{\hyperlink{classfc_1_1sha256_a474784de7d6213b855abd7e952df5e36}{sha256::hash}}(data.data,\ \textcolor{keyword}{sizeof}(key)).\mbox{\hyperlink{classfc_1_1sha256_ac933820516182c134a6473227db0e7da}{\_hash}}[0];}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ memcmp(\ (\textcolor{keywordtype}{char}*)\&check,\ data.data\ +\ \textcolor{keyword}{sizeof}(key),\ \textcolor{keyword}{sizeof}(check)\ )\ ==\ 0\ );}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(\ (\textcolor{keywordtype}{char}*)key.data,\ data.data,\ \textcolor{keyword}{sizeof}(key)\ );}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ from\_key\_data(key);}
+\DoxyCodeLine{00142\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1ecc_1_1public__key_a9671dae78f391e2d1d6e8243432c8cb9_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1ecc_1_1public__key_a4123143ccd9ce438a44a88738fc5e493}\index{fc::ecc::public\_key@{fc::ecc::public\_key}!operator public\_key\_data@{operator public\_key\_data}}
+\index{operator public\_key\_data@{operator public\_key\_data}!fc::ecc::public\_key@{fc::ecc::public\_key}}
+\doxysubsubsection{\texorpdfstring{operator public\_key\_data()}{operator public\_key\_data()}}
+{\footnotesize\ttfamily \label{classfc_1_1ecc_1_1public__key_a4123143ccd9ce438a44a88738fc5e493} 
+fc\+::ecc\+::public\+\_\+key\+::operator \mbox{\hyperlink{namespacefc_1_1ecc_a86376367df56783963d35795bebddce6}{public\+\_\+key\+\_\+data}} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic_8hpp_source_l00045}{45}} of file \mbox{\hyperlink{elliptic_8hpp_source}{elliptic.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00045\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1ecc_1_1public__key_a066502d87da28f82ccc3c6942491cd48}{serialize}}();\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=345pt]{classfc_1_1ecc_1_1public__key_a4123143ccd9ce438a44a88738fc5e493_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1ecc_1_1public__key_a22e892436cb6e8d7e56b5125e32b9e9d}\index{fc::ecc::public\_key@{fc::ecc::public\_key}!operator=@{operator=}}
+\index{operator=@{operator=}!fc::ecc::public\_key@{fc::ecc::public\_key}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1ecc_1_1public__key_a22e892436cb6e8d7e56b5125e32b9e9d} 
+\mbox{\hyperlink{classfc_1_1ecc_1_1public__key}{public\+\_\+key}} \& fc\+::ecc\+::public\+\_\+key\+::operator= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1ecc_1_1public__key}{public\+\_\+key}} \&}]{pk}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic__impl__pub_8cpp_source_l00156}{156}} of file \mbox{\hyperlink{elliptic__impl__pub_8cpp_source}{elliptic\+\_\+impl\+\_\+pub.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00157\ \ \ \ \ \{}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ my\ =\ pk.my;}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00160\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1ecc_1_1public__key_a896c349b93b67c049c5f08c4cbb2b70f}\index{fc::ecc::public\_key@{fc::ecc::public\_key}!operator=@{operator=}}
+\index{operator=@{operator=}!fc::ecc::public\_key@{fc::ecc::public\_key}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1ecc_1_1public__key_a896c349b93b67c049c5f08c4cbb2b70f} 
+\mbox{\hyperlink{classfc_1_1ecc_1_1public__key}{public\+\_\+key}} \& fc\+::ecc\+::public\+\_\+key\+::operator= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1ecc_1_1public__key}{public\+\_\+key}} \&\&}]{pk}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic__impl__pub_8cpp_source_l00150}{150}} of file \mbox{\hyperlink{elliptic__impl__pub_8cpp_source}{elliptic\+\_\+impl\+\_\+pub.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00151\ \ \ \ \ \{}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ my\ =\ std::move(pk.my);}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00154\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1ecc_1_1public__key_a066502d87da28f82ccc3c6942491cd48}\index{fc::ecc::public\_key@{fc::ecc::public\_key}!serialize@{serialize}}
+\index{serialize@{serialize}!fc::ecc::public\_key@{fc::ecc::public\_key}}
+\doxysubsubsection{\texorpdfstring{serialize()}{serialize()}}
+{\footnotesize\ttfamily \label{classfc_1_1ecc_1_1public__key_a066502d87da28f82ccc3c6942491cd48} 
+\mbox{\hyperlink{namespacefc_1_1ecc_a86376367df56783963d35795bebddce6}{public\+\_\+key\+\_\+data}} fc\+::ecc\+::public\+\_\+key\+::serialize (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic__impl__pub_8cpp_source_l00266}{266}} of file \mbox{\hyperlink{elliptic__impl__pub_8cpp_source}{elliptic\+\_\+impl\+\_\+pub.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00267\ \ \ \ \ \{}
+\DoxyCodeLine{00268\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1ecc_a86376367df56783963d35795bebddce6}{public\_key\_data}}\ dat;}
+\DoxyCodeLine{00269\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !my-\/>\_key\ )\ \textcolor{keywordflow}{return}\ dat;}
+\DoxyCodeLine{00270\ \ \ \ \ \ \ EC\_KEY\_set\_conv\_form(\ my-\/>\_key,\ POINT\_CONVERSION\_COMPRESSED\ );}
+\DoxyCodeLine{00271\ \ \ \ \ \ \ \textcolor{comment}{/*size\_t\ nbytes\ =\ i2o\_ECPublicKey(\ my-\/>\_key,\ nullptr\ );\ */}}
+\DoxyCodeLine{00272\ \ \ \ \ \ \ \textcolor{comment}{/*assert(\ nbytes\ ==\ 33\ )*/}}
+\DoxyCodeLine{00273\ \ \ \ \ \ \ \textcolor{keywordtype}{char}*\ front\ =\ \&dat.data[0];}
+\DoxyCodeLine{00274\ \ \ \ \ \ \ i2o\_ECPublicKey(\ my-\/>\_key,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}**)\&front\ );\ \textcolor{comment}{//\ FIXME:\ questionable\ memory\ handling}}
+\DoxyCodeLine{00275\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ dat;}
+\DoxyCodeLine{00276\ \ \ \ \ \ \ \textcolor{comment}{/*}}
+\DoxyCodeLine{00277\ \textcolor{comment}{\ \ \ \ \ \ \ EC\_POINT*\ pub\ \ \ =\ EC\_KEY\_get0\_public\_key(\ my-\/>\_key\ );}}
+\DoxyCodeLine{00278\ \textcolor{comment}{\ \ \ \ \ \ \ EC\_GROUP*\ group\ =\ EC\_KEY\_get0\_group(\ my-\/>\_key\ );}}
+\DoxyCodeLine{00279\ \textcolor{comment}{\ \ \ \ \ \ \ EC\_POINT\_get\_affine\_coordinates\_GFp(\ group,\ pub,\ self.my-\/>\_pub\_x.get(),\ self.my-\/>\_pub\_y.get(),\ nullptr\ );}}
+\DoxyCodeLine{00280\ \textcolor{comment}{\ \ \ \ \ \ \ */}}
+\DoxyCodeLine{00281\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1ecc_1_1public__key_a066502d87da28f82ccc3c6942491cd48_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1ecc_1_1public__key_ad66e70893ee796b7553b9c430dfc9b01}\index{fc::ecc::public\_key@{fc::ecc::public\_key}!serialize\_ecc\_point@{serialize\_ecc\_point}}
+\index{serialize\_ecc\_point@{serialize\_ecc\_point}!fc::ecc::public\_key@{fc::ecc::public\_key}}
+\doxysubsubsection{\texorpdfstring{serialize\_ecc\_point()}{serialize\_ecc\_point()}}
+{\footnotesize\ttfamily \label{classfc_1_1ecc_1_1public__key_ad66e70893ee796b7553b9c430dfc9b01} 
+\mbox{\hyperlink{namespacefc_1_1ecc_a021e8958c600635ce437f74d6d9919d1}{public\+\_\+key\+\_\+point\+\_\+data}} fc\+::ecc\+::public\+\_\+key\+::serialize\+\_\+ecc\+\_\+point (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic__impl__pub_8cpp_source_l00282}{282}} of file \mbox{\hyperlink{elliptic__impl__pub_8cpp_source}{elliptic\+\_\+impl\+\_\+pub.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00283\ \ \ \ \ \{}
+\DoxyCodeLine{00284\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1ecc_a021e8958c600635ce437f74d6d9919d1}{public\_key\_point\_data}}\ dat;}
+\DoxyCodeLine{00285\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !my-\/>\_key\ )\ \textcolor{keywordflow}{return}\ dat;}
+\DoxyCodeLine{00286\ \ \ \ \ \ \ EC\_KEY\_set\_conv\_form(\ my-\/>\_key,\ POINT\_CONVERSION\_UNCOMPRESSED\ );}
+\DoxyCodeLine{00287\ \ \ \ \ \ \ \textcolor{keywordtype}{char}*\ front\ =\ \&dat.data[0];}
+\DoxyCodeLine{00288\ \ \ \ \ \ \ i2o\_ECPublicKey(\ my-\/>\_key,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}**)\&front\ );\ \textcolor{comment}{//\ FIXME:\ questionable\ memory\ handling}}
+\DoxyCodeLine{00289\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ dat;}
+\DoxyCodeLine{00290\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1ecc_1_1public__key_a21a7c7923e874f8e93410fdc6301a205}\index{fc::ecc::public\_key@{fc::ecc::public\_key}!to\_base58@{to\_base58}}
+\index{to\_base58@{to\_base58}!fc::ecc::public\_key@{fc::ecc::public\_key}}
+\doxysubsubsection{\texorpdfstring{to\_base58()}{to\_base58()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1ecc_1_1public__key_a21a7c7923e874f8e93410fdc6301a205} 
+std\+::string fc\+::ecc\+::public\+\_\+key\+::to\+\_\+base58 (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic__impl__pub_8cpp_source_l00238}{238}} of file \mbox{\hyperlink{elliptic__impl__pub_8cpp_source}{elliptic\+\_\+impl\+\_\+pub.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00239\ \ \ \ \ \{}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1ecc_a86376367df56783963d35795bebddce6}{public\_key\_data}}\ key\ =\ \mbox{\hyperlink{classfc_1_1ecc_1_1public__key_a066502d87da28f82ccc3c6942491cd48}{serialize}}();}
+\DoxyCodeLine{00241\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1ecc_1_1public__key_a21a7c7923e874f8e93410fdc6301a205}{to\_base58}}(\ key\ );}
+\DoxyCodeLine{00242\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=313pt]{classfc_1_1ecc_1_1public__key_a21a7c7923e874f8e93410fdc6301a205_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=179pt]{classfc_1_1ecc_1_1public__key_a21a7c7923e874f8e93410fdc6301a205_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1ecc_1_1public__key_a83b654848353a7b8a76c1d8ffc99f72d}\index{fc::ecc::public\_key@{fc::ecc::public\_key}!to\_base58@{to\_base58}}
+\index{to\_base58@{to\_base58}!fc::ecc::public\_key@{fc::ecc::public\_key}}
+\doxysubsubsection{\texorpdfstring{to\_base58()}{to\_base58()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1ecc_1_1public__key_a83b654848353a7b8a76c1d8ffc99f72d} 
+std\+::string fc\+::ecc\+::public\+\_\+key\+::to\+\_\+base58 (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_1_1ecc_a86376367df56783963d35795bebddce6}{public\+\_\+key\+\_\+data}} \&}]{key}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic__common_8cpp_source_l00121}{121}} of file \mbox{\hyperlink{elliptic__common_8cpp_source}{elliptic\+\_\+common.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00122\ \ \ \ \ \{}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ check\ =\ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})\mbox{\hyperlink{classfc_1_1sha256_a474784de7d6213b855abd7e952df5e36}{sha256::hash}}(key.data,\ \textcolor{keyword}{sizeof}(key)).\mbox{\hyperlink{classfc_1_1sha256_ac933820516182c134a6473227db0e7da}{\_hash}}[0];}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \textcolor{keyword}{static\_assert}(\textcolor{keyword}{sizeof}(\mbox{\hyperlink{yubico__otp_8c_a9246c20bb98ad2b4c60313c053c70f08}{key}})\ +\ \textcolor{keyword}{sizeof}(check)\ ==\ 37,\ \textcolor{stringliteral}{"{}"{}});\ \textcolor{comment}{//\ hack\ around\ gcc\ bug:\ key.size()\ should\ be\ constexpr,\ but\ isn't}}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ array<char,\ 37>\ data;}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(data.data,\ key.begin(),\ key.size());}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(data.begin()\ +\ key.size(),\ (\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*)\&check,\ \textcolor{keyword}{sizeof}(check));}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_a0dd6c1e5792e0823aa1987e06513a4ce}{fc::to\_base58}}(data.begin(),\ data.size(),\ \mbox{\hyperlink{classfc_1_1optional__delegate}{fc::yield\_function\_t}}());}
+\DoxyCodeLine{00129\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1ecc_1_1public__key_a83b654848353a7b8a76c1d8ffc99f72d_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1ecc_1_1public__key_a4d0285e78d1f43a8df59ab7d80c15cea}\index{fc::ecc::public\_key@{fc::ecc::public\_key}!valid@{valid}}
+\index{valid@{valid}!fc::ecc::public\_key@{fc::ecc::public\_key}}
+\doxysubsubsection{\texorpdfstring{valid()}{valid()}}
+{\footnotesize\ttfamily \label{classfc_1_1ecc_1_1public__key_a4d0285e78d1f43a8df59ab7d80c15cea} 
+bool fc\+::ecc\+::public\+\_\+key\+::valid (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic__impl__pub_8cpp_source_l00162}{162}} of file \mbox{\hyperlink{elliptic__impl__pub_8cpp_source}{elliptic\+\_\+impl\+\_\+pub.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00163\ \ \ \ \ \{}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ my-\/>\_key\ !=\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00165\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=313pt]{classfc_1_1ecc_1_1public__key_a4d0285e78d1f43a8df59ab7d80c15cea_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{classfc_1_1ecc_1_1public__key_a5faa639eb95ed12c1be5d8ae65c7cb54}\index{fc::ecc::public\_key@{fc::ecc::public\_key}!operator"!=@{operator"!=}}
+\index{operator"!=@{operator"!=}!fc::ecc::public\_key@{fc::ecc::public\_key}}
+\doxysubsubsection{\texorpdfstring{operator"!=}{operator!=}}
+{\footnotesize\ttfamily \label{classfc_1_1ecc_1_1public__key_a5faa639eb95ed12c1be5d8ae65c7cb54} 
+bool \mbox{\hyperlink{namespacefc_a40c368ac88294ae47b064cad937fdbf6}{operator!}}= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1ecc_1_1public__key}{public\+\_\+key}} \&}]{a}{, }\item[{const \mbox{\hyperlink{classfc_1_1ecc_1_1public__key}{public\+\_\+key}} \&}]{b}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic_8hpp_source_l00064}{64}} of file \mbox{\hyperlink{elliptic_8hpp_source}{elliptic.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.serialize()\ !=\ b.serialize();}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1ecc_1_1public__key_a4f2610bdec460bf2b0203684a9599da5}\index{fc::ecc::public\_key@{fc::ecc::public\_key}!operator==@{operator==}}
+\index{operator==@{operator==}!fc::ecc::public\_key@{fc::ecc::public\_key}}
+\doxysubsubsection{\texorpdfstring{operator==}{operator==}}
+{\footnotesize\ttfamily \label{classfc_1_1ecc_1_1public__key_a4f2610bdec460bf2b0203684a9599da5} 
+bool operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1ecc_1_1public__key}{public\+\_\+key}} \&}]{a}{, }\item[{const \mbox{\hyperlink{classfc_1_1ecc_1_1public__key}{public\+\_\+key}} \&}]{b}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic_8hpp_source_l00060}{60}} of file \mbox{\hyperlink{elliptic_8hpp_source}{elliptic.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.serialize()\ ==\ b.serialize();}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1ecc_1_1public__key_ae1389c6c19ec8630ce31970de2294915}\index{fc::ecc::public\_key@{fc::ecc::public\_key}!private\_key@{private\_key}}
+\index{private\_key@{private\_key}!fc::ecc::public\_key@{fc::ecc::public\_key}}
+\doxysubsubsection{\texorpdfstring{private\_key}{private\_key}}
+{\footnotesize\ttfamily \label{classfc_1_1ecc_1_1public__key_ae1389c6c19ec8630ce31970de2294915} 
+friend \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classfc_1_1ecc_1_1private__key}{private\+\_\+key}}\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic_8hpp_source_l00077}{77}} of file \mbox{\hyperlink{elliptic_8hpp_source}{elliptic.\+hpp}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/\mbox{\hyperlink{elliptic_8hpp}{elliptic.\+hpp}}\item 
+libraries/fc/src/crypto/\mbox{\hyperlink{elliptic__common_8cpp}{elliptic\+\_\+common.\+cpp}}\item 
+libraries/fc/src/crypto/\mbox{\hyperlink{elliptic__impl__pub_8cpp}{elliptic\+\_\+impl\+\_\+pub.\+cpp}}\item 
+libraries/fc/src/crypto/\mbox{\hyperlink{elliptic__secp256k1_8cpp}{elliptic\+\_\+secp256k1.\+cpp}}\end{DoxyCompactItemize}

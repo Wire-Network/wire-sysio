@@ -1,0 +1,70 @@
+\doxysection{allow\+\_\+invalid\+\_\+empty\+\_\+local\+\_\+set\+\_\+tests.\+cpp}
+\hypertarget{allow__invalid__empty__local__set__tests_8cpp_source}{}\label{allow__invalid__empty__local__set__tests_8cpp_source}\index{libraries/sys-\/vm/tests/allow\_invalid\_empty\_local\_set\_tests.cpp@{libraries/sys-\/vm/tests/allow\_invalid\_empty\_local\_set\_tests.cpp}}
+\mbox{\hyperlink{allow__invalid__empty__local__set__tests_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <sysio/vm/backend.hpp>}}
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{sys-vm_2tests_2utils_8hpp}{utils.hpp}}"{}}}
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{single__include_2catch2_2catch_8hpp}{catch2/catch.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00006}00006\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacesysio_1_1vm}{sysio::vm}};}
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00008}00008\ \textcolor{keyword}{extern}\ \mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator}{wasm\_allocator}}\ \mbox{\hyperlink{allow__invalid__empty__local__set__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}};}
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00010}00010\ \textcolor{keyword}{namespace\ }\{}
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00012}00012\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00013}00013\ \textcolor{comment}{\ *\ (module}}
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00014}00014\ \textcolor{comment}{\ *\ \ (func\ (local\ /illegal/))}}
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00015}00015\ \textcolor{comment}{\ *\ )}}
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00016}00016\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00017}00017\ std::vector<uint8\_t>\ bad\_local\_wasm\ =\ \{}
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00018}00018\ \ \ \ 0x00,\ 0x61,\ 0x73,\ 0x6d,\ 0x01,\ 0x00,\ 0x00,\ 0x00,\ 0x01,\ 0x04,\ 0x01,\ 0x60,}
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00019}00019\ \ \ \ 0x00,\ 0x00,\ 0x03,\ 0x02,\ 0x01,\ 0x00,\ 0x0a,\ 0x06,\ 0x01,\ 0x04,\ 0x01,\ 0x00,}
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00020}00020\ \ \ \ 0x00,\ 0x0b}
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00021}00021\ \};}
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00023}00023\ \textcolor{keyword}{struct\ }empty\_options\ \{\};}
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00024}00024\ \textcolor{keyword}{struct\ }static\_options\_false\ \{}
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00025}00025\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{bool}\ allow\_invalid\_empty\_local\_set\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00026}00026\ \};}
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00027}00027\ \textcolor{keyword}{struct\ }static\_options\_true\ \{}
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00028}00028\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{bool}\ allow\_invalid\_empty\_local\_set\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00029}00029\ \};}
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00030}00030\ \textcolor{keyword}{struct\ }dynamic\_options\ \{}
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00031}00031\ \ \ \ \textcolor{keywordtype}{bool}\ allow\_invalid\_empty\_local\_set;}
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00032}00032\ \};}
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00034}00034\ \}}
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00036}\mbox{\hyperlink{allow__invalid__empty__local__set__tests_8cpp_ad25c517a0ef7dcf1a676b6e6814d9f75}{00036}}\ \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_a3e5f265967cb6d730cad8ca15e807ac2}{BACKEND\_TEST\_CASE}}(\textcolor{stringliteral}{"{}Test\ allow\_invalid\_empty\_local\_set\ default"{}},\ \textcolor{stringliteral}{"{}[allow\_invalid\_empty\_local\_set\_test]"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00037}00037\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType>}};}
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00038}00038\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(bad\_local\_wasm,\ \&\mbox{\hyperlink{allow__invalid__empty__local__set__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00039}00039\ \}}
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00041}\mbox{\hyperlink{allow__invalid__empty__local__set__tests_8cpp_a52364df777f68928553d6dc5f09890a0}{00041}}\ \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_a3e5f265967cb6d730cad8ca15e807ac2}{BACKEND\_TEST\_CASE}}(\textcolor{stringliteral}{"{}Test\ allow\_invalid\_empty\_local\_set\ empty"{}},\ \textcolor{stringliteral}{"{}[allow\_invalid\_empty\_local\_set\_test]"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00042}00042\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ empty\_options>}};}
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00043}00043\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(bad\_local\_wasm,\ \&\mbox{\hyperlink{allow__invalid__empty__local__set__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00044}00044\ \}}
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00046}\mbox{\hyperlink{allow__invalid__empty__local__set__tests_8cpp_afcf088e52d7eb86db282f9a70bc1199c}{00046}}\ \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_a3e5f265967cb6d730cad8ca15e807ac2}{BACKEND\_TEST\_CASE}}(\textcolor{stringliteral}{"{}Test\ allow\_invalid\_empty\_local\_set\ static\ fail"{}},\ \textcolor{stringliteral}{"{}[allow\_invalid\_empty\_local\_set\_test]"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00047}00047\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ static\_options\_false>}};}
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00048}00048\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(bad\_local\_wasm,\ \&\mbox{\hyperlink{allow__invalid__empty__local__set__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00049}00049\ \}}
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00051}\mbox{\hyperlink{allow__invalid__empty__local__set__tests_8cpp_a0b7d258a8e05b27ebc1701f70645267c}{00051}}\ \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_a3e5f265967cb6d730cad8ca15e807ac2}{BACKEND\_TEST\_CASE}}(\textcolor{stringliteral}{"{}Test\ allow\_invalid\_empty\_local\_set\ static\ pass"{}},\ \textcolor{stringliteral}{"{}[allow\_invalid\_empty\_local\_set\_test]"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00052}00052\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ static\_options\_true>}};}
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00053}00053\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend}}(bad\_local\_wasm,\ \&\mbox{\hyperlink{allow__invalid__empty__local__set__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00054}00054\ \}}
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00056}\mbox{\hyperlink{allow__invalid__empty__local__set__tests_8cpp_ae3f682ba231d8000aa8a423e09aba9ae}{00056}}\ \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_a3e5f265967cb6d730cad8ca15e807ac2}{BACKEND\_TEST\_CASE}}(\textcolor{stringliteral}{"{}Test\ allow\_invalid\_empty\_local\_set\ dynamic\ fail"{}},\ \textcolor{stringliteral}{"{}[allow\_invalid\_empty\_local\_set\_test]"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00057}00057\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ dynamic\_options>}};}
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00058}00058\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(bad\_local\_wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\{\textcolor{keyword}{false}\}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00059}00059\ \}}
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00061}\mbox{\hyperlink{allow__invalid__empty__local__set__tests_8cpp_af23902fdd1b10fabbfeacac4eee21121}{00061}}\ \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_a3e5f265967cb6d730cad8ca15e807ac2}{BACKEND\_TEST\_CASE}}(\textcolor{stringliteral}{"{}Test\ allow\_invalid\_empty\_local\_set\ dynamic\ pass"{}},\ \textcolor{stringliteral}{"{}[allow\_invalid\_empty\_local\_set\_test]"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00062}00062\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ dynamic\_options>}};}
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00063}00063\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend}}(bad\_local\_wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\{\textcolor{keyword}{true}\});}
+\DoxyCodeLine{\Hypertarget{allow__invalid__empty__local__set__tests_8cpp_source_l00064}00064\ \}}
+
+\end{DoxyCode}

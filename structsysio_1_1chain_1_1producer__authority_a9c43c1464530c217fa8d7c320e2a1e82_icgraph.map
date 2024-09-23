@@ -1,0 +1,9 @@
+<map id="sysio::chain::producer_authority::keys_satisfy_and_relevant" name="sysio::chain::producer_authority::keys_satisfy_and_relevant">
+<area shape="rect" id="Node000001" title=" " alt="" coords="397,45,557,101"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1producer__authority.html#aec8c3a6e1e7c09990917840855cd9abf" title=" " alt="" coords="189,5,349,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="382,58,349,51,350,46,383,52"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1chain_1_1block__header__state.html#a4ded46997461243ef09a378d91ae018d" title=" " alt="" coords="197,85,340,141"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="383,94,342,102,341,97,382,89"/>
+<area shape="rect" id="Node000004" href="$structsysio_1_1chain_1_1block__header__state.html#ad6bed0401f3114c1b8be58c2a6faf4cc" title=" " alt="" coords="5,93,141,134"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="182,116,141,116,141,110,182,110"/>
+</map>

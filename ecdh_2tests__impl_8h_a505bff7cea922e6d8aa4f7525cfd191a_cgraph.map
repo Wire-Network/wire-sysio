@@ -1,0 +1,14 @@
+<map id="test_bad_scalar" name="test_bad_scalar">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,100,119,125"/>
+<area shape="rect" id="Node000002" href="$ecdh_2tests__impl_8h.html#a76454f307a6df9e790f6db8adf3b81d5" title=" " alt="" coords="175,5,312,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="86,97,165,55,176,50,178,55,168,60,88,101"/>
+<area shape="rect" id="Node000003" href="$tests_8c.html#a01cf4b4fc9b4ab8cb3e04fd3dc2ff57f" title=" " alt="" coords="173,70,315,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="119,101,157,94,158,100,119,106"/>
+<area shape="rect" id="Node000004" href="$secp256k1_8c.html#ac5806cffd3278e64f863027eaa8e1284" title=" " alt="" coords="167,120,321,161"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="119,118,152,123,151,129,119,124"/>
+<area shape="rect" id="Node000006" href="$ecdh_2main__impl_8h.html#a41a6133ba49bca6d023c75739b191544" title=" " alt="" coords="184,185,304,210"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="85,124,123,147,168,170,184,177,182,182,166,175,120,151,82,128"/>
+<area shape="rect" id="Node000005" href="$yubihsm__pkcs11_8c.html#adc4bd59a60361844aa0e852efa210105" title=" " alt="" coords="369,157,437,182"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="322,152,354,158,353,163,321,157"/>
+<area shape="poly" id="edge6_Node000006_Node000005" title=" " alt="" coords="303,185,353,176,354,181,304,190"/>
+</map>

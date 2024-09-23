@@ -1,0 +1,19 @@
+<map id="libraries/sys&#45;vm/external/Catch2/projects/SelfTest/SurrogateCpps/catch_console_colour.cpp" name="libraries/sys&#45;vm/external/Catch2/projects/SelfTest/SurrogateCpps/catch_console_colour.cpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="100,5,300,76"/>
+<area shape="rect" id="Node000002" href="$catch__suppress__warnings_8h.html" title=" " alt="" coords="31,124,190,165"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="172,78,140,114,136,111,168,74"/>
+<area shape="rect" id="Node000003" href="$catch__console__colour_8h.html" title=" " alt="" coords="215,124,366,165"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="233,74,265,111,261,114,229,78"/>
+<area shape="rect" id="Node000004" href="$catch__common_8h.html" title=" " alt="" coords="230,213,352,238"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="294,165,294,197,288,197,288,165"/>
+<area shape="rect" id="Node000005" href="$catch__compiler__capabilities_8h.html" title=" " alt="" coords="5,286,198,312"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="260,241,149,283,147,278,258,236"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="221,286,280,312"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="287,240,267,274,263,272,282,237"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="304,286,358,312"/>
+<area shape="poly" id="edge7_Node000004_Node000008" title=" " alt="" coords="300,237,319,272,314,274,295,240"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="382,286,442,312"/>
+<area shape="poly" id="edge8_Node000004_Node000009" title=" " alt="" coords="313,237,380,276,377,280,310,241"/>
+<area shape="rect" id="Node000006" href="$catch__platform_8h.html" title=" " alt="" coords="42,360,161,386"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="104,312,104,344,99,344,99,312"/>
+</map>

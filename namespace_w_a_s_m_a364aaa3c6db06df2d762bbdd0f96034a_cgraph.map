@@ -1,0 +1,19 @@
+<map id="WASM::serializeStartSection" name="WASM::serializeStartSection">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,160,196,185"/>
+<area shape="rect" id="Node000002" href="$namespace_w_a_s_m.html#aabc6a5be38bb15441f53d566f8ecbbeb" title=" " alt="" coords="244,128,406,153"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="195,156,228,151,229,157,196,161"/>
+<area shape="rect" id="Node000007" href="$namespace_serialization.html#a1ea6ecb2f4de00340f936648398f4f66" title=" " alt="" coords="465,185,613,226"/>
+<area shape="poly" id="edge9_Node000001_Node000007" title=" " alt="" coords="196,177,449,196,449,202,196,182"/>
+<area shape="rect" id="Node000003" href="$struct_serialization_1_1_array_output_stream.html#aaf6d663f4644239d5960b4cbdd426488" title=" " alt="" coords="454,5,624,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="346,125,453,62,475,51,478,55,455,67,348,129"/>
+<area shape="rect" id="Node000004" href="$namespace_serialization.html#aee190f414695b837a7b75cd86adc516f" title=" " alt="" coords="672,92,821,133"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="368,124,454,106,559,100,657,102,657,108,559,105,454,111,369,129"/>
+<area shape="rect" id="Node000006" href="$namespace_serialization.html#acbd5d61d25bec4a37a4ecc33f7734155" title=" " alt="" coords="465,120,613,161"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="406,138,449,138,449,143,406,143"/>
+<area shape="poly" id="edge7_Node000002_Node000007" title=" " alt="" coords="370,151,456,178,455,183,369,156"/>
+<area shape="rect" id="Node000005" href="$yubihsm__pkcs11_8c.html#ae785d5badbf1f08b491af31f32a135a1" title=" " alt="" coords="869,100,940,125"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="821,110,853,110,853,115,821,115"/>
+<area shape="poly" id="edge6_Node000006_Node000004" title=" " alt="" coords="613,128,657,122,657,127,614,133"/>
+<area shape="rect" id="Node000008" href="$namespace_serialization.html#a7542db4eecbd9af4bc8398241da2614d" title=" " alt="" coords="672,185,821,226"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="614,203,656,203,656,208,614,208"/>
+</map>

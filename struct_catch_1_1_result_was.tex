@@ -1,0 +1,331 @@
+\doxysection{Catch\+::Result\+Was Struct Reference}
+\hypertarget{struct_catch_1_1_result_was}{}\label{struct_catch_1_1_result_was}\index{Catch::ResultWas@{Catch::ResultWas}}
+
+
+{\ttfamily \#include $<$catch\+\_\+result\+\_\+type.\+h$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef}{Of\+Type}} \{ \newline
+\mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa18b7bfef24524824dc1acf3ff5bccd9e}{Unknown}} = -\/1
+, \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efacff2783ae5a0ec92d7907d55233aa695}{Ok}} = 0
+, \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efae8d83c08b4e070286dd95134ad2152bb}{Info}} = 1
+, \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa22806493991ee90456cfbd973ae8d1ab}{Warning}} = 2
+, \newline
+\mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efadbb05c8a5a093c8ca0926c22ba34a6cc}{Failure\+Bit}} = 0x10
+, \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efac7062ac2bdea77a68bac4675c4315570}{Expression\+Failed}} = Failure\+Bit \texorpdfstring{$\vert$}{|} 1
+, \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa0c08e9a7cc2a689bfb86ca3a6cfc6444}{Explicit\+Failure}} = Failure\+Bit \texorpdfstring{$\vert$}{|} 2
+, \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa94b8ecf31cd791e2e4ddc46f25e3aaf4}{Exception}} = 0x100 \texorpdfstring{$\vert$}{|} Failure\+Bit
+, \newline
+\mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa765782e127faff9d9796388edb4d7fcd}{Threw\+Exception}} = Exception \texorpdfstring{$\vert$}{|} 1
+, \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa982f9c220de9fb76881da3bbf22b1a85}{Didnt\+Throw\+Exception}} = Exception \texorpdfstring{$\vert$}{|} 2
+, \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efac7f0c2afadf75d1d24bf8729ebd32cee}{Fatal\+Error\+Condition}} = 0x200 \texorpdfstring{$\vert$}{|} Failure\+Bit
+, \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa18b7bfef24524824dc1acf3ff5bccd9e}{Unknown}} = -\/1
+, \newline
+\mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efacff2783ae5a0ec92d7907d55233aa695}{Ok}} = 0
+, \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efae8d83c08b4e070286dd95134ad2152bb}{Info}} = 1
+, \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa22806493991ee90456cfbd973ae8d1ab}{Warning}} = 2
+, \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efadbb05c8a5a093c8ca0926c22ba34a6cc}{Failure\+Bit}} = 0x10
+, \newline
+\mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efac7062ac2bdea77a68bac4675c4315570}{Expression\+Failed}} = Failure\+Bit \texorpdfstring{$\vert$}{|} 1
+, \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa0c08e9a7cc2a689bfb86ca3a6cfc6444}{Explicit\+Failure}} = Failure\+Bit \texorpdfstring{$\vert$}{|} 2
+, \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa94b8ecf31cd791e2e4ddc46f25e3aaf4}{Exception}} = 0x100 \texorpdfstring{$\vert$}{|} Failure\+Bit
+, \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa765782e127faff9d9796388edb4d7fcd}{Threw\+Exception}} = Exception \texorpdfstring{$\vert$}{|} 1
+, \newline
+\mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa982f9c220de9fb76881da3bbf22b1a85}{Didnt\+Throw\+Exception}} = Exception \texorpdfstring{$\vert$}{|} 2
+, \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efac7f0c2afadf75d1d24bf8729ebd32cee}{Fatal\+Error\+Condition}} = 0x200 \texorpdfstring{$\vert$}{|} Failure\+Bit
+ \}
+\item 
+enum \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef}{Of\+Type}} \{ \newline
+\mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa18b7bfef24524824dc1acf3ff5bccd9e}{Unknown}} = -\/1
+, \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efacff2783ae5a0ec92d7907d55233aa695}{Ok}} = 0
+, \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efae8d83c08b4e070286dd95134ad2152bb}{Info}} = 1
+, \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa22806493991ee90456cfbd973ae8d1ab}{Warning}} = 2
+, \newline
+\mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efadbb05c8a5a093c8ca0926c22ba34a6cc}{Failure\+Bit}} = 0x10
+, \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efac7062ac2bdea77a68bac4675c4315570}{Expression\+Failed}} = Failure\+Bit \texorpdfstring{$\vert$}{|} 1
+, \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa0c08e9a7cc2a689bfb86ca3a6cfc6444}{Explicit\+Failure}} = Failure\+Bit \texorpdfstring{$\vert$}{|} 2
+, \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa94b8ecf31cd791e2e4ddc46f25e3aaf4}{Exception}} = 0x100 \texorpdfstring{$\vert$}{|} Failure\+Bit
+, \newline
+\mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa765782e127faff9d9796388edb4d7fcd}{Threw\+Exception}} = Exception \texorpdfstring{$\vert$}{|} 1
+, \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa982f9c220de9fb76881da3bbf22b1a85}{Didnt\+Throw\+Exception}} = Exception \texorpdfstring{$\vert$}{|} 2
+, \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efac7f0c2afadf75d1d24bf8729ebd32cee}{Fatal\+Error\+Condition}} = 0x200 \texorpdfstring{$\vert$}{|} Failure\+Bit
+, \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa18b7bfef24524824dc1acf3ff5bccd9e}{Unknown}} = -\/1
+, \newline
+\mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efacff2783ae5a0ec92d7907d55233aa695}{Ok}} = 0
+, \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efae8d83c08b4e070286dd95134ad2152bb}{Info}} = 1
+, \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa22806493991ee90456cfbd973ae8d1ab}{Warning}} = 2
+, \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efadbb05c8a5a093c8ca0926c22ba34a6cc}{Failure\+Bit}} = 0x10
+, \newline
+\mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efac7062ac2bdea77a68bac4675c4315570}{Expression\+Failed}} = Failure\+Bit \texorpdfstring{$\vert$}{|} 1
+, \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa0c08e9a7cc2a689bfb86ca3a6cfc6444}{Explicit\+Failure}} = Failure\+Bit \texorpdfstring{$\vert$}{|} 2
+, \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa94b8ecf31cd791e2e4ddc46f25e3aaf4}{Exception}} = 0x100 \texorpdfstring{$\vert$}{|} Failure\+Bit
+, \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa765782e127faff9d9796388edb4d7fcd}{Threw\+Exception}} = Exception \texorpdfstring{$\vert$}{|} 1
+, \newline
+\mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa982f9c220de9fb76881da3bbf22b1a85}{Didnt\+Throw\+Exception}} = Exception \texorpdfstring{$\vert$}{|} 2
+, \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efac7f0c2afadf75d1d24bf8729ebd32cee}{Fatal\+Error\+Condition}} = 0x200 \texorpdfstring{$\vert$}{|} Failure\+Bit
+ \}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source_l01063}{1063}} of file \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source}{catch.\+hpp}}.
+
+
+
+\doxysubsection{Member Enumeration Documentation}
+\Hypertarget{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef}\index{Catch::ResultWas@{Catch::ResultWas}!OfType@{OfType}}
+\index{OfType@{OfType}!Catch::ResultWas@{Catch::ResultWas}}
+\doxysubsubsection{\texorpdfstring{OfType}{OfType}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef} 
+enum \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef}{Catch\+::\+Result\+Was\+::\+Of\+Type}}}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Unknown@{Unknown}!Catch::ResultWas@{Catch::ResultWas}}\index{Catch::ResultWas@{Catch::ResultWas}!Unknown@{Unknown}}}\Hypertarget{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa18b7bfef24524824dc1acf3ff5bccd9e}\label{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef} 
+Unknown&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Ok@{Ok}!Catch::ResultWas@{Catch::ResultWas}}\index{Catch::ResultWas@{Catch::ResultWas}!Ok@{Ok}}}\Hypertarget{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efacff2783ae5a0ec92d7907d55233aa695}\label{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef} 
+Ok&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Info@{Info}!Catch::ResultWas@{Catch::ResultWas}}\index{Catch::ResultWas@{Catch::ResultWas}!Info@{Info}}}\Hypertarget{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efae8d83c08b4e070286dd95134ad2152bb}\label{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef} 
+Info&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Warning@{Warning}!Catch::ResultWas@{Catch::ResultWas}}\index{Catch::ResultWas@{Catch::ResultWas}!Warning@{Warning}}}\Hypertarget{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa22806493991ee90456cfbd973ae8d1ab}\label{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef} 
+Warning&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{FailureBit@{FailureBit}!Catch::ResultWas@{Catch::ResultWas}}\index{Catch::ResultWas@{Catch::ResultWas}!FailureBit@{FailureBit}}}\Hypertarget{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efadbb05c8a5a093c8ca0926c22ba34a6cc}\label{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef} 
+Failure\+Bit&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ExpressionFailed@{ExpressionFailed}!Catch::ResultWas@{Catch::ResultWas}}\index{Catch::ResultWas@{Catch::ResultWas}!ExpressionFailed@{ExpressionFailed}}}\Hypertarget{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efac7062ac2bdea77a68bac4675c4315570}\label{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef} 
+Expression\+Failed&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ExplicitFailure@{ExplicitFailure}!Catch::ResultWas@{Catch::ResultWas}}\index{Catch::ResultWas@{Catch::ResultWas}!ExplicitFailure@{ExplicitFailure}}}\Hypertarget{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa0c08e9a7cc2a689bfb86ca3a6cfc6444}\label{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef} 
+Explicit\+Failure&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Exception@{Exception}!Catch::ResultWas@{Catch::ResultWas}}\index{Catch::ResultWas@{Catch::ResultWas}!Exception@{Exception}}}\Hypertarget{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa94b8ecf31cd791e2e4ddc46f25e3aaf4}\label{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef} 
+Exception&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ThrewException@{ThrewException}!Catch::ResultWas@{Catch::ResultWas}}\index{Catch::ResultWas@{Catch::ResultWas}!ThrewException@{ThrewException}}}\Hypertarget{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa765782e127faff9d9796388edb4d7fcd}\label{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef} 
+Threw\+Exception&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{DidntThrowException@{DidntThrowException}!Catch::ResultWas@{Catch::ResultWas}}\index{Catch::ResultWas@{Catch::ResultWas}!DidntThrowException@{DidntThrowException}}}\Hypertarget{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa982f9c220de9fb76881da3bbf22b1a85}\label{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef} 
+Didnt\+Throw\+Exception&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{FatalErrorCondition@{FatalErrorCondition}!Catch::ResultWas@{Catch::ResultWas}}\index{Catch::ResultWas@{Catch::ResultWas}!FatalErrorCondition@{FatalErrorCondition}}}\Hypertarget{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efac7f0c2afadf75d1d24bf8729ebd32cee}\label{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef} 
+Fatal\+Error\+Condition&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Unknown@{Unknown}!Catch::ResultWas@{Catch::ResultWas}}\index{Catch::ResultWas@{Catch::ResultWas}!Unknown@{Unknown}}}\Hypertarget{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa18b7bfef24524824dc1acf3ff5bccd9e}\label{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef} 
+Unknown&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Ok@{Ok}!Catch::ResultWas@{Catch::ResultWas}}\index{Catch::ResultWas@{Catch::ResultWas}!Ok@{Ok}}}\Hypertarget{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efacff2783ae5a0ec92d7907d55233aa695}\label{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef} 
+Ok&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Info@{Info}!Catch::ResultWas@{Catch::ResultWas}}\index{Catch::ResultWas@{Catch::ResultWas}!Info@{Info}}}\Hypertarget{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efae8d83c08b4e070286dd95134ad2152bb}\label{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef} 
+Info&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Warning@{Warning}!Catch::ResultWas@{Catch::ResultWas}}\index{Catch::ResultWas@{Catch::ResultWas}!Warning@{Warning}}}\Hypertarget{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa22806493991ee90456cfbd973ae8d1ab}\label{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef} 
+Warning&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{FailureBit@{FailureBit}!Catch::ResultWas@{Catch::ResultWas}}\index{Catch::ResultWas@{Catch::ResultWas}!FailureBit@{FailureBit}}}\Hypertarget{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efadbb05c8a5a093c8ca0926c22ba34a6cc}\label{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef} 
+Failure\+Bit&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ExpressionFailed@{ExpressionFailed}!Catch::ResultWas@{Catch::ResultWas}}\index{Catch::ResultWas@{Catch::ResultWas}!ExpressionFailed@{ExpressionFailed}}}\Hypertarget{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efac7062ac2bdea77a68bac4675c4315570}\label{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef} 
+Expression\+Failed&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ExplicitFailure@{ExplicitFailure}!Catch::ResultWas@{Catch::ResultWas}}\index{Catch::ResultWas@{Catch::ResultWas}!ExplicitFailure@{ExplicitFailure}}}\Hypertarget{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa0c08e9a7cc2a689bfb86ca3a6cfc6444}\label{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef} 
+Explicit\+Failure&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Exception@{Exception}!Catch::ResultWas@{Catch::ResultWas}}\index{Catch::ResultWas@{Catch::ResultWas}!Exception@{Exception}}}\Hypertarget{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa94b8ecf31cd791e2e4ddc46f25e3aaf4}\label{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef} 
+Exception&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ThrewException@{ThrewException}!Catch::ResultWas@{Catch::ResultWas}}\index{Catch::ResultWas@{Catch::ResultWas}!ThrewException@{ThrewException}}}\Hypertarget{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa765782e127faff9d9796388edb4d7fcd}\label{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef} 
+Threw\+Exception&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{DidntThrowException@{DidntThrowException}!Catch::ResultWas@{Catch::ResultWas}}\index{Catch::ResultWas@{Catch::ResultWas}!DidntThrowException@{DidntThrowException}}}\Hypertarget{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa982f9c220de9fb76881da3bbf22b1a85}\label{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef} 
+Didnt\+Throw\+Exception&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{FatalErrorCondition@{FatalErrorCondition}!Catch::ResultWas@{Catch::ResultWas}}\index{Catch::ResultWas@{Catch::ResultWas}!FatalErrorCondition@{FatalErrorCondition}}}\Hypertarget{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efac7f0c2afadf75d1d24bf8729ebd32cee}\label{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef} 
+Fatal\+Error\+Condition&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{catch__result__type_8h_source_l00014}{14}} of file \mbox{\hyperlink{catch__result__type_8h_source}{catch\+\_\+result\+\_\+type.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00014\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ \textcolor{keyword}{enum}\ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef}{OfType}}\ \{}
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \ \ Unknown\ =\ -\/1,}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efacff2783ae5a0ec92d7907d55233aa695}{Ok}}\ =\ 0,}
+\DoxyCodeLine{00017\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efae8d83c08b4e070286dd95134ad2152bb}{Info}}\ =\ 1,}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa22806493991ee90456cfbd973ae8d1ab}{Warning}}\ =\ 2,}
+\DoxyCodeLine{00019\ }
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efadbb05c8a5a093c8ca0926c22ba34a6cc}{FailureBit}}\ =\ 0x10,}
+\DoxyCodeLine{00021\ }
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efac7062ac2bdea77a68bac4675c4315570}{ExpressionFailed}}\ =\ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efadbb05c8a5a093c8ca0926c22ba34a6cc}{FailureBit}}\ |\ 1,}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa0c08e9a7cc2a689bfb86ca3a6cfc6444}{ExplicitFailure}}\ =\ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efadbb05c8a5a093c8ca0926c22ba34a6cc}{FailureBit}}\ |\ 2,}
+\DoxyCodeLine{00024\ }
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ Exception\ =\ 0x100\ |\ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efadbb05c8a5a093c8ca0926c22ba34a6cc}{FailureBit}},}
+\DoxyCodeLine{00026\ }
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa765782e127faff9d9796388edb4d7fcd}{ThrewException}}\ =\ Exception\ |\ 1,}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa982f9c220de9fb76881da3bbf22b1a85}{DidntThrowException}}\ =\ Exception\ |\ 2,}
+\DoxyCodeLine{00029\ }
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efac7f0c2afadf75d1d24bf8729ebd32cee}{FatalErrorCondition}}\ =\ 0x200\ |\ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efadbb05c8a5a093c8ca0926c22ba34a6cc}{FailureBit}}}
+\DoxyCodeLine{00031\ }
+\DoxyCodeLine{00032\ \ \ \ \ \};\ \};}
+
+\end{DoxyCode}
+\Hypertarget{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef}\index{Catch::ResultWas@{Catch::ResultWas}!OfType@{OfType}}
+\index{OfType@{OfType}!Catch::ResultWas@{Catch::ResultWas}}
+\doxysubsubsection{\texorpdfstring{OfType}{OfType}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef} 
+enum \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef}{Catch\+::\+Result\+Was\+::\+Of\+Type}}}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Unknown@{Unknown}!Catch::ResultWas@{Catch::ResultWas}}\index{Catch::ResultWas@{Catch::ResultWas}!Unknown@{Unknown}}}\Hypertarget{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa18b7bfef24524824dc1acf3ff5bccd9e}\label{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef} 
+Unknown&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Ok@{Ok}!Catch::ResultWas@{Catch::ResultWas}}\index{Catch::ResultWas@{Catch::ResultWas}!Ok@{Ok}}}\Hypertarget{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efacff2783ae5a0ec92d7907d55233aa695}\label{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef} 
+Ok&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Info@{Info}!Catch::ResultWas@{Catch::ResultWas}}\index{Catch::ResultWas@{Catch::ResultWas}!Info@{Info}}}\Hypertarget{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efae8d83c08b4e070286dd95134ad2152bb}\label{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef} 
+Info&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Warning@{Warning}!Catch::ResultWas@{Catch::ResultWas}}\index{Catch::ResultWas@{Catch::ResultWas}!Warning@{Warning}}}\Hypertarget{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa22806493991ee90456cfbd973ae8d1ab}\label{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef} 
+Warning&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{FailureBit@{FailureBit}!Catch::ResultWas@{Catch::ResultWas}}\index{Catch::ResultWas@{Catch::ResultWas}!FailureBit@{FailureBit}}}\Hypertarget{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efadbb05c8a5a093c8ca0926c22ba34a6cc}\label{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef} 
+Failure\+Bit&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ExpressionFailed@{ExpressionFailed}!Catch::ResultWas@{Catch::ResultWas}}\index{Catch::ResultWas@{Catch::ResultWas}!ExpressionFailed@{ExpressionFailed}}}\Hypertarget{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efac7062ac2bdea77a68bac4675c4315570}\label{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef} 
+Expression\+Failed&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ExplicitFailure@{ExplicitFailure}!Catch::ResultWas@{Catch::ResultWas}}\index{Catch::ResultWas@{Catch::ResultWas}!ExplicitFailure@{ExplicitFailure}}}\Hypertarget{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa0c08e9a7cc2a689bfb86ca3a6cfc6444}\label{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef} 
+Explicit\+Failure&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Exception@{Exception}!Catch::ResultWas@{Catch::ResultWas}}\index{Catch::ResultWas@{Catch::ResultWas}!Exception@{Exception}}}\Hypertarget{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa94b8ecf31cd791e2e4ddc46f25e3aaf4}\label{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef} 
+Exception&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ThrewException@{ThrewException}!Catch::ResultWas@{Catch::ResultWas}}\index{Catch::ResultWas@{Catch::ResultWas}!ThrewException@{ThrewException}}}\Hypertarget{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa765782e127faff9d9796388edb4d7fcd}\label{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef} 
+Threw\+Exception&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{DidntThrowException@{DidntThrowException}!Catch::ResultWas@{Catch::ResultWas}}\index{Catch::ResultWas@{Catch::ResultWas}!DidntThrowException@{DidntThrowException}}}\Hypertarget{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa982f9c220de9fb76881da3bbf22b1a85}\label{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef} 
+Didnt\+Throw\+Exception&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{FatalErrorCondition@{FatalErrorCondition}!Catch::ResultWas@{Catch::ResultWas}}\index{Catch::ResultWas@{Catch::ResultWas}!FatalErrorCondition@{FatalErrorCondition}}}\Hypertarget{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efac7f0c2afadf75d1d24bf8729ebd32cee}\label{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef} 
+Fatal\+Error\+Condition&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Unknown@{Unknown}!Catch::ResultWas@{Catch::ResultWas}}\index{Catch::ResultWas@{Catch::ResultWas}!Unknown@{Unknown}}}\Hypertarget{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa18b7bfef24524824dc1acf3ff5bccd9e}\label{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef} 
+Unknown&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Ok@{Ok}!Catch::ResultWas@{Catch::ResultWas}}\index{Catch::ResultWas@{Catch::ResultWas}!Ok@{Ok}}}\Hypertarget{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efacff2783ae5a0ec92d7907d55233aa695}\label{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef} 
+Ok&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Info@{Info}!Catch::ResultWas@{Catch::ResultWas}}\index{Catch::ResultWas@{Catch::ResultWas}!Info@{Info}}}\Hypertarget{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efae8d83c08b4e070286dd95134ad2152bb}\label{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef} 
+Info&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Warning@{Warning}!Catch::ResultWas@{Catch::ResultWas}}\index{Catch::ResultWas@{Catch::ResultWas}!Warning@{Warning}}}\Hypertarget{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa22806493991ee90456cfbd973ae8d1ab}\label{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef} 
+Warning&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{FailureBit@{FailureBit}!Catch::ResultWas@{Catch::ResultWas}}\index{Catch::ResultWas@{Catch::ResultWas}!FailureBit@{FailureBit}}}\Hypertarget{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efadbb05c8a5a093c8ca0926c22ba34a6cc}\label{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef} 
+Failure\+Bit&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ExpressionFailed@{ExpressionFailed}!Catch::ResultWas@{Catch::ResultWas}}\index{Catch::ResultWas@{Catch::ResultWas}!ExpressionFailed@{ExpressionFailed}}}\Hypertarget{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efac7062ac2bdea77a68bac4675c4315570}\label{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef} 
+Expression\+Failed&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ExplicitFailure@{ExplicitFailure}!Catch::ResultWas@{Catch::ResultWas}}\index{Catch::ResultWas@{Catch::ResultWas}!ExplicitFailure@{ExplicitFailure}}}\Hypertarget{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa0c08e9a7cc2a689bfb86ca3a6cfc6444}\label{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef} 
+Explicit\+Failure&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Exception@{Exception}!Catch::ResultWas@{Catch::ResultWas}}\index{Catch::ResultWas@{Catch::ResultWas}!Exception@{Exception}}}\Hypertarget{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa94b8ecf31cd791e2e4ddc46f25e3aaf4}\label{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef} 
+Exception&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ThrewException@{ThrewException}!Catch::ResultWas@{Catch::ResultWas}}\index{Catch::ResultWas@{Catch::ResultWas}!ThrewException@{ThrewException}}}\Hypertarget{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa765782e127faff9d9796388edb4d7fcd}\label{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef} 
+Threw\+Exception&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{DidntThrowException@{DidntThrowException}!Catch::ResultWas@{Catch::ResultWas}}\index{Catch::ResultWas@{Catch::ResultWas}!DidntThrowException@{DidntThrowException}}}\Hypertarget{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa982f9c220de9fb76881da3bbf22b1a85}\label{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef} 
+Didnt\+Throw\+Exception&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{FatalErrorCondition@{FatalErrorCondition}!Catch::ResultWas@{Catch::ResultWas}}\index{Catch::ResultWas@{Catch::ResultWas}!FatalErrorCondition@{FatalErrorCondition}}}\Hypertarget{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efac7f0c2afadf75d1d24bf8729ebd32cee}\label{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef} 
+Fatal\+Error\+Condition&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source_l01063}{1063}} of file \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source}{catch.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ \textcolor{keyword}{enum}\ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef}{OfType}}\ \{}
+\DoxyCodeLine{01064\ \ \ \ \ \ \ \ \ Unknown\ =\ -\/1,}
+\DoxyCodeLine{01065\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efacff2783ae5a0ec92d7907d55233aa695}{Ok}}\ =\ 0,}
+\DoxyCodeLine{01066\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efae8d83c08b4e070286dd95134ad2152bb}{Info}}\ =\ 1,}
+\DoxyCodeLine{01067\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa22806493991ee90456cfbd973ae8d1ab}{Warning}}\ =\ 2,}
+\DoxyCodeLine{01068\ }
+\DoxyCodeLine{01069\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efadbb05c8a5a093c8ca0926c22ba34a6cc}{FailureBit}}\ =\ 0x10,}
+\DoxyCodeLine{01070\ }
+\DoxyCodeLine{01071\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efac7062ac2bdea77a68bac4675c4315570}{ExpressionFailed}}\ =\ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efadbb05c8a5a093c8ca0926c22ba34a6cc}{FailureBit}}\ |\ 1,}
+\DoxyCodeLine{01072\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa0c08e9a7cc2a689bfb86ca3a6cfc6444}{ExplicitFailure}}\ =\ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efadbb05c8a5a093c8ca0926c22ba34a6cc}{FailureBit}}\ |\ 2,}
+\DoxyCodeLine{01073\ }
+\DoxyCodeLine{01074\ \ \ \ \ \ \ \ \ Exception\ =\ 0x100\ |\ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efadbb05c8a5a093c8ca0926c22ba34a6cc}{FailureBit}},}
+\DoxyCodeLine{01075\ }
+\DoxyCodeLine{01076\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa765782e127faff9d9796388edb4d7fcd}{ThrewException}}\ =\ Exception\ |\ 1,}
+\DoxyCodeLine{01077\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa982f9c220de9fb76881da3bbf22b1a85}{DidntThrowException}}\ =\ Exception\ |\ 2,}
+\DoxyCodeLine{01078\ }
+\DoxyCodeLine{01079\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efac7f0c2afadf75d1d24bf8729ebd32cee}{FatalErrorCondition}}\ =\ 0x200\ |\ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efadbb05c8a5a093c8ca0926c22ba34a6cc}{FailureBit}}}
+\DoxyCodeLine{01080\ }
+\DoxyCodeLine{01081\ \ \ \ \ \};\ \};}
+
+\end{DoxyCode}
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__result__type_8h}{catch\+\_\+result\+\_\+type.\+h}}\item 
+libraries/sys-\/vm/external/\+Catch2/single\+\_\+include/catch2/\mbox{\hyperlink{single__include_2catch2_2catch_8hpp}{catch.\+hpp}}\end{DoxyCompactItemize}

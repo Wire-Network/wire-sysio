@@ -1,0 +1,110 @@
+\doxysection{functional.\+hpp}
+\hypertarget{functional_8hpp_source}{}\label{functional_8hpp_source}\index{libraries/fc/vendor/websocketpp/websocketpp/common/functional.hpp@{libraries/fc/vendor/websocketpp/websocketpp/common/functional.hpp}}
+\mbox{\hyperlink{functional_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2014,\ Peter\ Thorson.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00004}00004\ \textcolor{comment}{\ *\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00005}00005\ \textcolor{comment}{\ *\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are\ met:}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00006}00006\ \textcolor{comment}{\ *\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00007}00007\ \textcolor{comment}{\ *\ \ \ \ \ \ \ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00008}00008\ \textcolor{comment}{\ *\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00009}00009\ \textcolor{comment}{\ *\ \ \ \ \ \ \ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer\ in\ the}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00010}00010\ \textcolor{comment}{\ *\ \ \ \ \ \ \ documentation\ and/or\ other\ materials\ provided\ with\ the\ distribution.}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00011}00011\ \textcolor{comment}{\ *\ \ \ \ \ *\ Neither\ the\ name\ of\ the\ WebSocket++\ Project\ nor\ the}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00012}00012\ \textcolor{comment}{\ *\ \ \ \ \ \ \ names\ of\ its\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00013}00013\ \textcolor{comment}{\ *\ \ \ \ \ \ \ derived\ from\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00014}00014\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00015}00015\ \textcolor{comment}{\ *\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS\ "{}AS\ IS"{}}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00016}00016\ \textcolor{comment}{\ *\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ THE}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00017}00017\ \textcolor{comment}{\ *\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR\ A\ PARTICULAR\ PURPOSE}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00018}00018\ \textcolor{comment}{\ *\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ PETER\ THORSON\ BE\ LIABLE\ FOR\ ANY}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00019}00019\ \textcolor{comment}{\ *\ DIRECT,\ INDIRECT,\ INCIDENTAL,\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00020}00020\ \textcolor{comment}{\ *\ (INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00021}00021\ \textcolor{comment}{\ *\ LOSS\ OF\ USE,\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00022}00022\ \textcolor{comment}{\ *\ ON\ ANY\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00023}00023\ \textcolor{comment}{\ *\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE\ OF\ THIS}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00024}00024\ \textcolor{comment}{\ *\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00025}00025\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00026}00026\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00028}00028\ \textcolor{preprocessor}{\#ifndef\ WEBSOCKETPP\_COMMON\_FUNCTIONAL\_HPP}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00029}00029\ \textcolor{preprocessor}{\#define\ WEBSOCKETPP\_COMMON\_FUNCTIONAL\_HPP}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00031}00031\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{cpp11_8hpp}{websocketpp/common/cpp11.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00033}00033\ \textcolor{comment}{//\ If\ we've\ determined\ that\ we're\ in\ full\ C++11\ mode\ and\ the\ user\ hasn't}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00034}00034\ \textcolor{comment}{//\ explicitly\ disabled\ the\ use\ of\ C++11\ functional\ header,\ then\ prefer\ it\ to}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00035}00035\ \textcolor{comment}{//\ boost.}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00036}00036\ \textcolor{preprocessor}{\#if\ defined\ \_WEBSOCKETPP\_CPP11\_INTERNAL\_\ \&\&\ !defined\ \_WEBSOCKETPP\_NO\_CPP11\_FUNCTIONAL\_}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00037}00037\ \textcolor{preprocessor}{\ \ \ \ \#ifndef\ \_WEBSOCKETPP\_CPP11\_FUNCTIONAL\_}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00038}00038\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#define\ \_WEBSOCKETPP\_CPP11\_FUNCTIONAL\_}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00039}00039\ \textcolor{preprocessor}{\ \ \ \ \#endif}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00040}00040\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00042}00042\ \textcolor{comment}{//\ If\ we're\ on\ Visual\ Studio\ 2010\ or\ higher\ and\ haven't\ explicitly\ disabled}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00043}00043\ \textcolor{comment}{//\ the\ use\ of\ C++11\ functional\ header\ then\ prefer\ it\ to\ boost.}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00044}00044\ \textcolor{preprocessor}{\#if\ defined(\_MSC\_VER)\ \&\&\ \_MSC\_VER\ >=\ 1600\ \&\&\ !defined\ \_WEBSOCKETPP\_NO\_CPP11\_FUNCTIONAL\_}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00045}00045\ \textcolor{preprocessor}{\ \ \ \ \#ifndef\ \_WEBSOCKETPP\_CPP11\_FUNCTIONAL\_}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00046}00046\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#define\ \_WEBSOCKETPP\_CPP11\_FUNCTIONAL\_}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00047}00047\ \textcolor{preprocessor}{\ \ \ \ \#endif}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00048}00048\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00052}00052\ \textcolor{preprocessor}{\#ifdef\ \_WEBSOCKETPP\_CPP11\_FUNCTIONAL\_}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00053}00053\ \textcolor{preprocessor}{\ \ \ \ \#include\ <functional>}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00054}00054\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00055}00055\ \textcolor{preprocessor}{\ \ \ \ \#include\ <boost/bind.hpp>}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00056}00056\ \textcolor{preprocessor}{\ \ \ \ \#include\ <boost/function.hpp>}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00057}00057\ \textcolor{preprocessor}{\ \ \ \ \#include\ <boost/ref.hpp>}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00058}00058\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00062}00062\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacewebsocketpp}{websocketpp}}\ \{}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00063}00063\ \textcolor{keyword}{namespace\ }lib\ \{}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00065}00065\ \textcolor{preprocessor}{\#ifdef\ \_WEBSOCKETPP\_CPP11\_FUNCTIONAL\_}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00066}00066\ \ \ \ \ \textcolor{keyword}{using\ }std::function;}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00067}00067\ \ \ \ \ \textcolor{keyword}{using\ }std::bind;}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00068}00068\ \ \ \ \ \textcolor{keyword}{using\ }std::ref;}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00069}00069\ \ \ \ \ \textcolor{keyword}{namespace\ }placeholders\ =\ std::placeholders;}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00071}00071\ \ \ \ \ \textcolor{comment}{//\ There\ are\ some\ cases\ where\ a\ C++11\ compiler\ balks\ at\ using\ std::ref}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00072}00072\ \ \ \ \ \textcolor{comment}{//\ but\ a\ C++03\ compiler\ using\ boost\ function\ requires\ boost::ref.\ As\ such}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00073}00073\ \ \ \ \ \textcolor{comment}{//\ lib::ref\ is\ not\ useful\ in\ these\ cases.\ Instead\ this\ macro\ allows\ the\ use}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00074}00074\ \ \ \ \ \textcolor{comment}{//\ of\ boost::ref\ in\ the\ case\ of\ a\ boost\ compile\ or\ no\ reference\ wrapper\ at}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00075}00075\ \ \ \ \ \textcolor{comment}{//\ all\ in\ the\ case\ of\ a\ C++11\ compile}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00076}00076\ \textcolor{preprocessor}{\ \ \ \ \#define\ \_WEBSOCKETPP\_REF(x)\ x}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00077}00077\ }
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00078}00078\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00079}00079\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacewebsocketpp_1_1lib_ae781ac2d4191bb30a65742279cfdeca4}{clear\_function}}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \&\ x)\ \{}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00080}00080\ \ \ \ \ \ \ \ \ x\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00081}00081\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00082}00082\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00083}00083\ \ \ \ \ \textcolor{keyword}{using\ }boost::function;}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00084}00084\ \ \ \ \ \textcolor{keyword}{using\ }boost::bind;}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00085}00085\ \ \ \ \ \textcolor{keyword}{using\ }boost::ref;}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00086}\mbox{\hyperlink{namespacewebsocketpp_1_1lib_1_1placeholders}{00086}}\ \ \ \ \ \textcolor{keyword}{namespace\ }placeholders\ \{}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00088}00088\ \ \ \ \ \ \ \ \ using\ ::\_1;}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00089}00089\ \ \ \ \ \ \ \ \ using\ ::\_2;}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00090}00090\ \ \ \ \ \ \ \ \ using\ ::\_3;}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00091}00091\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00092}00092\ }
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00093}00093\ \ \ \ \ \textcolor{comment}{//\ See\ above\ definition\ for\ more\ details\ on\ what\ this\ is\ and\ why\ it\ exists}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00094}\mbox{\hyperlink{functional_8hpp_ae8aa19b4188b68809e54367fe9b6eec7}{00094}}\ \textcolor{preprocessor}{\ \ \ \ \#define\ \_WEBSOCKETPP\_REF(x)\ boost::ref(x)}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00095}00095\ }
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00096}00096\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00097}\mbox{\hyperlink{namespacewebsocketpp_1_1lib_ae781ac2d4191bb30a65742279cfdeca4}{00097}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacewebsocketpp_1_1lib_ae781ac2d4191bb30a65742279cfdeca4}{clear\_function}}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \&\ x)\ \{}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00098}00098\ \ \ \ \ \ \ \ \ x.clear();}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00099}00099\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00100}00100\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00101}00101\ }
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00102}00102\ \}\ \textcolor{comment}{//\ namespace\ lib}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00103}00103\ \}\ \textcolor{comment}{//\ namespace\ websocketpp}}
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00104}00104\ }
+\DoxyCodeLine{\Hypertarget{functional_8hpp_source_l00105}00105\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ WEBSOCKETPP\_COMMON\_FUNCTIONAL\_HPP}}
+
+\end{DoxyCode}

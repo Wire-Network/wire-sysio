@@ -1,0 +1,7 @@
+<map id="sysio::chain::fork_database_impl" name="sysio::chain::fork_database_impl">
+<area shape="rect" id="Node000001" title=" " alt="" coords="483,248,604,288"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,392,331"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="407,226,483,248,481,253,406,231"/>
+<area shape="rect" id="Node000003" href="$classfc_1_1path.html" title="wraps boost::filesystem::path to provide platform independent path manipulation." alt="" coords="166,355,231,381"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="247,364,316,356,391,340,453,315,507,287,509,291,456,320,392,345,316,362,247,369"/>
+</map>

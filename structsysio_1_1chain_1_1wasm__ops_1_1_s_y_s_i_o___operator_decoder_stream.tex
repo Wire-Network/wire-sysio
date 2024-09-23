@@ -1,0 +1,169 @@
+\doxysection{sysio\+::chain\+::wasm\+\_\+ops\+::SYSIO\+\_\+\+Operator\+Decoder\+Stream\texorpdfstring{$<$}{<} Op\+\_\+\+Types \texorpdfstring{$>$}{>} Struct Template Reference}
+\hypertarget{structsysio_1_1chain_1_1wasm__ops_1_1_s_y_s_i_o___operator_decoder_stream}{}\label{structsysio_1_1chain_1_1wasm__ops_1_1_s_y_s_i_o___operator_decoder_stream}\index{sysio::chain::wasm\_ops::SYSIO\_OperatorDecoderStream$<$ Op\_Types $>$@{sysio::chain::wasm\_ops::SYSIO\_OperatorDecoderStream$<$ Op\_Types $>$}}
+
+
+{\ttfamily \#include $<$wasm\+\_\+sysio\+\_\+binary\+\_\+ops.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1_s_y_s_i_o___operator_decoder_stream_ab90ca434831b042147e99bdc5b82f7de}{SYSIO\+\_\+\+Operator\+Decoder\+Stream}} (const std\+::vector$<$ \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} $>$ \&code\+Bytes)
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1_s_y_s_i_o___operator_decoder_stream_a3d17e1381b426d1d5769816b8a80a65e}{operator bool}} () const
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1instr}{instr}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1_s_y_s_i_o___operator_decoder_stream_aa12d4dd63dadb1d67b32171d0865567a}{decode\+Op}} ()
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1instr}{instr}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1_s_y_s_i_o___operator_decoder_stream_a6fb74a9955312d049304e171b2080730}{decode\+Op\+Without\+Consume}} ()
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1_s_y_s_i_o___operator_decoder_stream_ae197d6085fac624ce06f616ac76a31eb}{index}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} Op\+\_\+\+Types$>$\newline
+struct sysio\+::chain\+::wasm\+\_\+ops\+::\+SYSIO\+\_\+\+Operator\+Decoder\+Stream$<$ Op\+\_\+\+Types $>$}
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_source_l00655}{655}} of file \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_source}{wasm\+\_\+sysio\+\_\+binary\+\_\+ops.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structsysio_1_1chain_1_1wasm__ops_1_1_s_y_s_i_o___operator_decoder_stream_ab90ca434831b042147e99bdc5b82f7de}\index{sysio::chain::wasm\_ops::SYSIO\_OperatorDecoderStream$<$ Op\_Types $>$@{sysio::chain::wasm\_ops::SYSIO\_OperatorDecoderStream$<$ Op\_Types $>$}!SYSIO\_OperatorDecoderStream@{SYSIO\_OperatorDecoderStream}}
+\index{SYSIO\_OperatorDecoderStream@{SYSIO\_OperatorDecoderStream}!sysio::chain::wasm\_ops::SYSIO\_OperatorDecoderStream$<$ Op\_Types $>$@{sysio::chain::wasm\_ops::SYSIO\_OperatorDecoderStream$<$ Op\_Types $>$}}
+\doxysubsubsection{\texorpdfstring{SYSIO\_OperatorDecoderStream()}{SYSIO\_OperatorDecoderStream()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__ops_1_1_s_y_s_i_o___operator_decoder_stream_ab90ca434831b042147e99bdc5b82f7de} 
+template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} Op\+\_\+\+Types $>$ \\
+\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1_s_y_s_i_o___operator_decoder_stream}{sysio\+::chain\+::wasm\+\_\+ops\+::\+SYSIO\+\_\+\+Operator\+Decoder\+Stream}}$<$ Op\+\_\+\+Types $>$\+::\+SYSIO\+\_\+\+Operator\+Decoder\+Stream (\begin{DoxyParamCaption}\item[{const std\+::vector$<$ \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} $>$ \&}]{code\+Bytes}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_source_l00657}{657}} of file \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_source}{wasm\+\_\+sysio\+\_\+binary\+\_\+ops.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00658\ \ \ \ :\ start(codeBytes.data()),\ nextByte(codeBytes.data()),\ end(codeBytes.data()+codeBytes.size())\ \{}
+\DoxyCodeLine{00659\ \ \ \ \ \ \textcolor{keywordflow}{if}(!\_cached\_ops)}
+\DoxyCodeLine{00660\ \ \ \ \ \ \ \ \ \_cached\_ops\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1wasm__ops_1_1cached__ops_a98fce1bc6d26a31ead0269f1d0294a55}{cached\_ops<Op\_Types>::get\_cached\_ops}}();}
+\DoxyCodeLine{00661\ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1chain_1_1wasm__ops_1_1_s_y_s_i_o___operator_decoder_stream_aa12d4dd63dadb1d67b32171d0865567a}\index{sysio::chain::wasm\_ops::SYSIO\_OperatorDecoderStream$<$ Op\_Types $>$@{sysio::chain::wasm\_ops::SYSIO\_OperatorDecoderStream$<$ Op\_Types $>$}!decodeOp@{decodeOp}}
+\index{decodeOp@{decodeOp}!sysio::chain::wasm\_ops::SYSIO\_OperatorDecoderStream$<$ Op\_Types $>$@{sysio::chain::wasm\_ops::SYSIO\_OperatorDecoderStream$<$ Op\_Types $>$}}
+\doxysubsubsection{\texorpdfstring{decodeOp()}{decodeOp()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__ops_1_1_s_y_s_i_o___operator_decoder_stream_aa12d4dd63dadb1d67b32171d0865567a} 
+template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} Op\+\_\+\+Types $>$ \\
+\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1instr}{instr}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1_s_y_s_i_o___operator_decoder_stream}{sysio\+::chain\+::wasm\+\_\+ops\+::\+SYSIO\+\_\+\+Operator\+Decoder\+Stream}}$<$ Op\+\_\+\+Types $>$\+::decode\+Op (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_source_l00665}{665}} of file \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_source}{wasm\+\_\+sysio\+\_\+binary\+\_\+ops.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00665\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00666\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(nextByte\ +\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{namespace_i_r_a59653fd60bb296de971e5f945c66933a}{IR::Opcode}})\ <=\ end,\ \mbox{\hyperlink{namespacesysio_1_1chain_a489ddfe76234ed9479deafde7d26c2b9}{wasm\_exception}},\ \textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{00667\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_i_r_a59653fd60bb296de971e5f945c66933a}{IR::Opcode}}\ \mbox{\hyperlink{namespacesysio_1_1vm_af1bb7d8ae2889df51b65eaef31f1ea74}{opcode}}\ =\ *(\mbox{\hyperlink{namespace_i_r_a59653fd60bb296de971e5f945c66933a}{IR::Opcode}}*)nextByte;\ \ }
+\DoxyCodeLine{00668\ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(opcode)}
+\DoxyCodeLine{00669\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00670\ \textcolor{preprocessor}{\ \ \ \ \ \ \#define\ VISIT\_OPCODE(opcode,name,nameString,Imm,...)\ \(\backslash\)}}
+\DoxyCodeLine{00671\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ case\ IR::Opcode::name:\ \(\backslash\)}}
+\DoxyCodeLine{00672\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \{\ \(\backslash\)}}
+\DoxyCodeLine{00673\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ SYS\_ASSERT(nextByte\ +\ sizeof(IR::OpcodeAndImm<IR::Imm>)\ <=\ end,\ wasm\_exception,\ "{}"{});\ \(\backslash\)}}
+\DoxyCodeLine{00674\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ IR::OpcodeAndImm<IR::Imm>*\ encodedOperator\ =\ (IR::OpcodeAndImm<IR::Imm>*)nextByte;\ \(\backslash\)}}
+\DoxyCodeLine{00675\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ nextByte\ +=\ sizeof(IR::OpcodeAndImm<IR::Imm>);\ \(\backslash\)}}
+\DoxyCodeLine{00676\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ auto\ op\ =\ \_cached\_ops-\/>at(BOOST\_PP\_CAT(name,\ \_code));\ \(\backslash\)}}
+\DoxyCodeLine{00677\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ op-\/>unpack(\ reinterpret\_cast<char*>(\&(encodedOperator-\/>imm))\ );\ \(\backslash\)}}
+\DoxyCodeLine{00678\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ return\ op;\ \ \(\backslash\)}}
+\DoxyCodeLine{00679\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \}}}
+\DoxyCodeLine{00680\ \ \ \ \ \ \ \mbox{\hyperlink{_operators_8h_a8b6ca1413466de9d4478329c481520a4}{ENUM\_OPERATORS}}(\mbox{\hyperlink{namespace_i_r_a59653fd60bb296de971e5f945c66933aa275346406ff338dd8adf063f9a066141}{VISIT\_OPCODE}})}
+\DoxyCodeLine{00681\ \ \ \ \ \ \ \textcolor{preprocessor}{\#undef\ VISIT\_OPCODE}}
+\DoxyCodeLine{00682\ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00683\ \ \ \ \ \ \ \ \ \ nextByte\ +=\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{namespace_i_r_a59653fd60bb296de971e5f945c66933a}{IR::Opcode}});}
+\DoxyCodeLine{00684\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \_cached\_ops-\/>at(error\_code);\ }
+\DoxyCodeLine{00685\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00686\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1wasm__ops_1_1_s_y_s_i_o___operator_decoder_stream_aa12d4dd63dadb1d67b32171d0865567a_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1wasm__ops_1_1_s_y_s_i_o___operator_decoder_stream_a6fb74a9955312d049304e171b2080730}\index{sysio::chain::wasm\_ops::SYSIO\_OperatorDecoderStream$<$ Op\_Types $>$@{sysio::chain::wasm\_ops::SYSIO\_OperatorDecoderStream$<$ Op\_Types $>$}!decodeOpWithoutConsume@{decodeOpWithoutConsume}}
+\index{decodeOpWithoutConsume@{decodeOpWithoutConsume}!sysio::chain::wasm\_ops::SYSIO\_OperatorDecoderStream$<$ Op\_Types $>$@{sysio::chain::wasm\_ops::SYSIO\_OperatorDecoderStream$<$ Op\_Types $>$}}
+\doxysubsubsection{\texorpdfstring{decodeOpWithoutConsume()}{decodeOpWithoutConsume()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__ops_1_1_s_y_s_i_o___operator_decoder_stream_a6fb74a9955312d049304e171b2080730} 
+template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} Op\+\_\+\+Types $>$ \\
+\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1instr}{instr}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1_s_y_s_i_o___operator_decoder_stream}{sysio\+::chain\+::wasm\+\_\+ops\+::\+SYSIO\+\_\+\+Operator\+Decoder\+Stream}}$<$ Op\+\_\+\+Types $>$\+::decode\+Op\+Without\+Consume (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_source_l00688}{688}} of file \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_source}{wasm\+\_\+sysio\+\_\+binary\+\_\+ops.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00688\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00689\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}*\ savedNextByte\ =\ nextByte;}
+\DoxyCodeLine{00690\ \ \ \ \ \ \ instr*\ result\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1_s_y_s_i_o___operator_decoder_stream_aa12d4dd63dadb1d67b32171d0865567a}{decodeOp}}();}
+\DoxyCodeLine{00691\ \ \ \ \ \ \ nextByte\ =\ savedNextByte;}
+\DoxyCodeLine{00692\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00693\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1wasm__ops_1_1_s_y_s_i_o___operator_decoder_stream_a6fb74a9955312d049304e171b2080730_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1wasm__ops_1_1_s_y_s_i_o___operator_decoder_stream_ae197d6085fac624ce06f616ac76a31eb}\index{sysio::chain::wasm\_ops::SYSIO\_OperatorDecoderStream$<$ Op\_Types $>$@{sysio::chain::wasm\_ops::SYSIO\_OperatorDecoderStream$<$ Op\_Types $>$}!index@{index}}
+\index{index@{index}!sysio::chain::wasm\_ops::SYSIO\_OperatorDecoderStream$<$ Op\_Types $>$@{sysio::chain::wasm\_ops::SYSIO\_OperatorDecoderStream$<$ Op\_Types $>$}}
+\doxysubsubsection{\texorpdfstring{index()}{index()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__ops_1_1_s_y_s_i_o___operator_decoder_stream_ae197d6085fac624ce06f616ac76a31eb} 
+template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} Op\+\_\+\+Types $>$ \\
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1_s_y_s_i_o___operator_decoder_stream}{sysio\+::chain\+::wasm\+\_\+ops\+::\+SYSIO\+\_\+\+Operator\+Decoder\+Stream}}$<$ Op\+\_\+\+Types $>$\+::index (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_source_l00694}{694}} of file \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_source}{wasm\+\_\+sysio\+\_\+binary\+\_\+ops.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00694\ \{\ \textcolor{keywordflow}{return}\ nextByte\ -\/\ start;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1wasm__ops_1_1_s_y_s_i_o___operator_decoder_stream_ae197d6085fac624ce06f616ac76a31eb_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1wasm__ops_1_1_s_y_s_i_o___operator_decoder_stream_a3d17e1381b426d1d5769816b8a80a65e}\index{sysio::chain::wasm\_ops::SYSIO\_OperatorDecoderStream$<$ Op\_Types $>$@{sysio::chain::wasm\_ops::SYSIO\_OperatorDecoderStream$<$ Op\_Types $>$}!operator bool@{operator bool}}
+\index{operator bool@{operator bool}!sysio::chain::wasm\_ops::SYSIO\_OperatorDecoderStream$<$ Op\_Types $>$@{sysio::chain::wasm\_ops::SYSIO\_OperatorDecoderStream$<$ Op\_Types $>$}}
+\doxysubsubsection{\texorpdfstring{operator bool()}{operator bool()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__ops_1_1_s_y_s_i_o___operator_decoder_stream_a3d17e1381b426d1d5769816b8a80a65e} 
+template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} Op\+\_\+\+Types $>$ \\
+\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__ops_1_1_s_y_s_i_o___operator_decoder_stream}{sysio\+::chain\+::wasm\+\_\+ops\+::\+SYSIO\+\_\+\+Operator\+Decoder\+Stream}}$<$ Op\+\_\+\+Types $>$\+::operator bool (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_source_l00663}{663}} of file \mbox{\hyperlink{wasm__sysio__binary__ops_8hpp_source}{wasm\+\_\+sysio\+\_\+binary\+\_\+ops.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00663\ \{\ \textcolor{keywordflow}{return}\ nextByte\ <\ end;\ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{wasm__sysio__binary__ops_8hpp}{wasm\+\_\+sysio\+\_\+binary\+\_\+ops.\+hpp}}\end{DoxyCompactItemize}

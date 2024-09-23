@@ -1,0 +1,117 @@
+\doxysection{yh\+\_\+session Struct Reference}
+\hypertarget{structyh__session}{}\label{structyh__session}\index{yh\_session@{yh\_session}}
+
+
+{\ttfamily \#include $<$internal.\+h$>$}
+
+
+
+Collaboration diagram for yh\+\_\+session\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=190pt]{structyh__session__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structyh__connector}{yh\+\_\+connector}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structyh__session_a481fb0215d72e52bb619d6c934078167}{parent}}
+\item 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{structyh__session_a6c208ce524e1f71bde33103fd883db5a}{authkey\+\_\+id}}
+\item 
+bool \mbox{\hyperlink{structyh__session_a2bcf5cb8c6bfb10b2300ed5f3a4f6e7b}{recreate}}
+\item 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{structyh__session_a2cce834e130b57e28a660ede08039e02}{key\+\_\+enc}} \mbox{[}\mbox{\hyperlink{scp_8h_a25905234f13446437b28c85d0504216d}{SCP\+\_\+\+KEY\+\_\+\+LEN}}\mbox{]}
+\item 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{structyh__session_a88795cd7a6018303e3cea5cc3bdf02cf}{key\+\_\+mac}} \mbox{[}\mbox{\hyperlink{scp_8h_a25905234f13446437b28c85d0504216d}{SCP\+\_\+\+KEY\+\_\+\+LEN}}\mbox{]}
+\item 
+\mbox{\hyperlink{struct_scp__ctx}{Scp\+\_\+ctx}} \mbox{\hyperlink{structyh__session_a5582d82fd5b88d1e26738437268fb285}{s}}
+\item 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{structyh__session_a92d2141eb31c70c19d90519c6446c12d}{context}} \mbox{[}\mbox{\hyperlink{scp_8h_a2a7a1f4b618c112a923cf452cdb1f506}{SCP\+\_\+\+CONTEXT\+\_\+\+LEN}}\mbox{]}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{lib_2internal_8h_source_l00025}{25}} of file \mbox{\hyperlink{lib_2internal_8h_source}{internal.\+h}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structyh__session_a6c208ce524e1f71bde33103fd883db5a}\index{yh\_session@{yh\_session}!authkey\_id@{authkey\_id}}
+\index{authkey\_id@{authkey\_id}!yh\_session@{yh\_session}}
+\doxysubsubsection{\texorpdfstring{authkey\_id}{authkey\_id}}
+{\footnotesize\ttfamily \label{structyh__session_a6c208ce524e1f71bde33103fd883db5a} 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} yh\+\_\+session\+::authkey\+\_\+id}
+
+
+
+Definition at line \mbox{\hyperlink{lib_2internal_8h_source_l00027}{27}} of file \mbox{\hyperlink{lib_2internal_8h_source}{internal.\+h}}.
+
+\Hypertarget{structyh__session_a92d2141eb31c70c19d90519c6446c12d}\index{yh\_session@{yh\_session}!context@{context}}
+\index{context@{context}!yh\_session@{yh\_session}}
+\doxysubsubsection{\texorpdfstring{context}{context}}
+{\footnotesize\ttfamily \label{structyh__session_a92d2141eb31c70c19d90519c6446c12d} 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} yh\+\_\+session\+::context\mbox{[}\mbox{\hyperlink{scp_8h_a2a7a1f4b618c112a923cf452cdb1f506}{SCP\+\_\+\+CONTEXT\+\_\+\+LEN}}\mbox{]}}
+
+
+
+Definition at line \mbox{\hyperlink{lib_2internal_8h_source_l00032}{32}} of file \mbox{\hyperlink{lib_2internal_8h_source}{internal.\+h}}.
+
+\Hypertarget{structyh__session_a2cce834e130b57e28a660ede08039e02}\index{yh\_session@{yh\_session}!key\_enc@{key\_enc}}
+\index{key\_enc@{key\_enc}!yh\_session@{yh\_session}}
+\doxysubsubsection{\texorpdfstring{key\_enc}{key\_enc}}
+{\footnotesize\ttfamily \label{structyh__session_a2cce834e130b57e28a660ede08039e02} 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} yh\+\_\+session\+::key\+\_\+enc\mbox{[}\mbox{\hyperlink{scp_8h_a25905234f13446437b28c85d0504216d}{SCP\+\_\+\+KEY\+\_\+\+LEN}}\mbox{]}}
+
+
+
+Definition at line \mbox{\hyperlink{lib_2internal_8h_source_l00029}{29}} of file \mbox{\hyperlink{lib_2internal_8h_source}{internal.\+h}}.
+
+\Hypertarget{structyh__session_a88795cd7a6018303e3cea5cc3bdf02cf}\index{yh\_session@{yh\_session}!key\_mac@{key\_mac}}
+\index{key\_mac@{key\_mac}!yh\_session@{yh\_session}}
+\doxysubsubsection{\texorpdfstring{key\_mac}{key\_mac}}
+{\footnotesize\ttfamily \label{structyh__session_a88795cd7a6018303e3cea5cc3bdf02cf} 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} yh\+\_\+session\+::key\+\_\+mac\mbox{[}\mbox{\hyperlink{scp_8h_a25905234f13446437b28c85d0504216d}{SCP\+\_\+\+KEY\+\_\+\+LEN}}\mbox{]}}
+
+
+
+Definition at line \mbox{\hyperlink{lib_2internal_8h_source_l00030}{30}} of file \mbox{\hyperlink{lib_2internal_8h_source}{internal.\+h}}.
+
+\Hypertarget{structyh__session_a481fb0215d72e52bb619d6c934078167}\index{yh\_session@{yh\_session}!parent@{parent}}
+\index{parent@{parent}!yh\_session@{yh\_session}}
+\doxysubsubsection{\texorpdfstring{parent}{parent}}
+{\footnotesize\ttfamily \label{structyh__session_a481fb0215d72e52bb619d6c934078167} 
+struct \mbox{\hyperlink{structyh__connector}{yh\+\_\+connector}}\texorpdfstring{$\ast$}{*} yh\+\_\+session\+::parent}
+
+
+
+Definition at line \mbox{\hyperlink{lib_2internal_8h_source_l00026}{26}} of file \mbox{\hyperlink{lib_2internal_8h_source}{internal.\+h}}.
+
+\Hypertarget{structyh__session_a2bcf5cb8c6bfb10b2300ed5f3a4f6e7b}\index{yh\_session@{yh\_session}!recreate@{recreate}}
+\index{recreate@{recreate}!yh\_session@{yh\_session}}
+\doxysubsubsection{\texorpdfstring{recreate}{recreate}}
+{\footnotesize\ttfamily \label{structyh__session_a2bcf5cb8c6bfb10b2300ed5f3a4f6e7b} 
+bool yh\+\_\+session\+::recreate}
+
+
+
+Definition at line \mbox{\hyperlink{lib_2internal_8h_source_l00028}{28}} of file \mbox{\hyperlink{lib_2internal_8h_source}{internal.\+h}}.
+
+\Hypertarget{structyh__session_a5582d82fd5b88d1e26738437268fb285}\index{yh\_session@{yh\_session}!s@{s}}
+\index{s@{s}!yh\_session@{yh\_session}}
+\doxysubsubsection{\texorpdfstring{s}{s}}
+{\footnotesize\ttfamily \label{structyh__session_a5582d82fd5b88d1e26738437268fb285} 
+\mbox{\hyperlink{struct_scp__ctx}{Scp\+\_\+ctx}} yh\+\_\+session\+::s}
+
+
+
+Definition at line \mbox{\hyperlink{lib_2internal_8h_source_l00031}{31}} of file \mbox{\hyperlink{lib_2internal_8h_source}{internal.\+h}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/yubihsm/lib/\mbox{\hyperlink{lib_2internal_8h}{internal.\+h}}\end{DoxyCompactItemize}

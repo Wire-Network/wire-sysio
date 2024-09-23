@@ -1,0 +1,15 @@
+<map id="Catch::ScopedMessage::ScopedMessage" name="Catch::ScopedMessage::ScopedMessage">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,79,167,120"/>
+<area shape="rect" id="Node000002" href="$namespace_catch.html#af718eeab870712f292ed8dc6ee3f6488" title=" " alt="" coords="241,29,407,55"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="166,77,214,65,249,56,251,62,215,70,168,82"/>
+<area shape="rect" id="Node000005" href="$struct_catch_1_1_i_result_capture.html#a91d154c1e087e383dcde5aad95cb6a05" title=" " alt="" coords="247,79,401,120"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="167,97,231,97,231,102,167,102"/>
+<area shape="rect" id="Node000006" href="$class_catch_1_1_reusable_string_stream.html#a0e9ecf260b2a5d35f4886ef0d51f6270" title=" " alt="" coords="215,168,433,194"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="149,118,270,160,268,165,147,123"/>
+<area shape="poly" id="edge4_Node000002_Node000002" title=" " alt="" coords="285,31,277,21,281,11,297,5,324,3,353,6,368,13,366,17,352,11,324,8,299,10,285,15,282,20,289,27"/>
+<area shape="rect" id="Node000003" href="$namespace_catch.html#a228a625318bb6183842e394eeba17d50" title=" " alt="" coords="481,29,652,55"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="407,40,465,40,465,45,407,45"/>
+<area shape="rect" id="Node000004" href="$namespace_catch.html#a710841d4732b86c06f816bd4822bd425" title=" " alt="" coords="700,22,872,62"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="652,40,685,40,685,45,652,45"/>
+<area shape="poly" id="edge7_Node000006_Node000006" title=" " alt="" coords="285,169,277,159,281,150,297,143,324,141,353,144,368,151,366,156,352,149,324,147,299,149,285,153,282,159,289,166"/>
+</map>

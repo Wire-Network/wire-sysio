@@ -1,0 +1,139 @@
+\doxysection{api.\+hpp}
+\hypertarget{api_8hpp_source}{}\label{api_8hpp_source}\index{libraries/fc/include/fc/api.hpp@{libraries/fc/include/fc/api.hpp}}
+\mbox{\hyperlink{api_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once\ }}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <fc/thread/future.hpp>}}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{any_8hpp}{fc/any.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <functional>}}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <boost/config.hpp>}}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00007}00007\ \textcolor{comment}{//\ ms\ visual\ c++\ (as\ of\ 2013)\ doesn't\ accept\ the\ standard\ syntax\ for\ calling\ a\ }}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00008}00008\ \textcolor{comment}{//\ templated\ member\ function\ (foo-\/>template\ bar();)}}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00009}00009\ \textcolor{preprocessor}{\#ifdef\ \_MSC\_VER}}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00010}00010\ \textcolor{preprocessor}{\#\ define\ FC\_CALL\_MEMBER\_TEMPLATE\_KEYWORD}}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00011}00011\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00012}\mbox{\hyperlink{api_8hpp_ae02d776534813ddce29fb1d978eaf4fa}{00012}}\ \textcolor{preprocessor}{\#\ define\ FC\_CALL\_MEMBER\_TEMPLATE\_KEYWORD\ template}}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00013}00013\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00015}00015\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}\ \{}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00016}\mbox{\hyperlink{structfc_1_1identity__member}{00016}}\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structfc_1_1identity__member}{identity\_member}}\ \{\ }
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00017}00017\ \ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}},\ \textcolor{keyword}{typename}\ C,\ \textcolor{keyword}{typename}\ \mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}},\ \textcolor{keyword}{typename}...\ Args>}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00018}\mbox{\hyperlink{structfc_1_1identity__member_ada117c7f5125c5e805589ccbb9b49c51}{00018}}\ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ std::function<\mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}(Args...)>\ \mbox{\hyperlink{structfc_1_1identity__member_ada117c7f5125c5e805589ccbb9b49c51}{functor}}(\ \mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}}\&\&\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}\ (C::*mem\_func)(Args...)\ );}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00019}00019\ \ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}},\ \textcolor{keyword}{typename}\ C,\ \textcolor{keyword}{typename}\ \mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}},\ \textcolor{keyword}{typename}...\ Args>}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00020}\mbox{\hyperlink{structfc_1_1identity__member_aff0d280c58c7fd04276ec00b2b6cd062}{00020}}\ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ std::function<\mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}(Args...)>\ \mbox{\hyperlink{structfc_1_1identity__member_aff0d280c58c7fd04276ec00b2b6cd062}{functor}}(\ \mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}}\&\&\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}\ (C::*mem\_func)(Args...)const\ );}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00021}00021\ \ \ \};}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00022}00022\ \ \ \ }
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00023}00023\ \ \ \textcolor{keyword}{template}<\ \textcolor{keyword}{typename}\ Interface,\ \textcolor{keyword}{typename}\ Transform\ \ >}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00024}\mbox{\hyperlink{structfc_1_1vtable}{00024}}\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structfc_1_1vtable}{vtable}}\ \ :\ \textcolor{keyword}{public}\ std::enable\_shared\_from\_this<vtable<Interface,Transform>>\ }
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00025}00025\ \ \ \{\ \textcolor{keyword}{private}:\ \mbox{\hyperlink{structfc_1_1vtable}{vtable}}();\ \};}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00026}00026\ \ \ }
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00027}00027\ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ OtherType>}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00028}\mbox{\hyperlink{structfc_1_1vtable__copy__visitor}{00028}}\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structfc_1_1vtable__copy__visitor}{vtable\_copy\_visitor}}\ \{}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00029}\mbox{\hyperlink{structfc_1_1vtable__copy__visitor_a63c61d8ad28ff11fcd5f5b0d9c0cfc4d}{00029}}\ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ OtherType\ \mbox{\hyperlink{structfc_1_1vtable__copy__visitor_a63c61d8ad28ff11fcd5f5b0d9c0cfc4d}{other\_type}};}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00031}\mbox{\hyperlink{structfc_1_1vtable__copy__visitor_a6a3feeed69edef79c950faa852c6fed9}{00031}}\ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1vtable__copy__visitor_a6a3feeed69edef79c950faa852c6fed9}{vtable\_copy\_visitor}}(\ OtherType\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}):\mbox{\hyperlink{structfc_1_1vtable__copy__visitor_a1feff63c4724f4c192b76522f5f81aed}{\_source}}(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ )\{\}}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00032}00032\ \ \ }
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00033}00033\ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}},\ \textcolor{keyword}{typename}\ MemberPtr,\ \textcolor{keyword}{typename}...\ Args>}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00034}\mbox{\hyperlink{structfc_1_1vtable__copy__visitor_a8f21e689d562619f58ced3f8a0ef8c00}{00034}}\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structfc_1_1vtable__copy__visitor_a8f21e689d562619f58ced3f8a0ef8c00}{operator()}}(\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ std::function<\mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}(Args...)>\&\ memb,\ MemberPtr\ m\ )\textcolor{keyword}{const\ }\{}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00035}00035\ \ \ \ \ \ \ \ \ OtherType*\ src\ =\ \&\mbox{\hyperlink{structfc_1_1vtable__copy__visitor_a1feff63c4724f4c192b76522f5f81aed}{\_source}};}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00036}00036\ \ \ \ \ \ \ \ \ memb\ =\ [src,m](\ Args...\ args\ )\{\ \textcolor{keywordflow}{return}\ (src-\/>*m)(args...);\ \};}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00037}00037\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00038}\mbox{\hyperlink{structfc_1_1vtable__copy__visitor_a1feff63c4724f4c192b76522f5f81aed}{00038}}\ \ \ \ \ \ \ OtherType\&\ \mbox{\hyperlink{structfc_1_1vtable__copy__visitor_a1feff63c4724f4c192b76522f5f81aed}{\_source}};}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00039}00039\ \ \ \};}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00041}00041\ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ Interface,\ \textcolor{keyword}{typename}\ Transform\ >}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00042}00042\ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classfc_1_1api}{api}};}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00044}00044\ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classfc_1_1api__connection}{api\_connection}};}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00046}\mbox{\hyperlink{namespacefc_a18e9e0bd9c0a52896425ae1172bc4e2b}{00046}}\ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{namespacefc_a18e9e0bd9c0a52896425ae1172bc4e2b}{api\_id\_type}};}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00048}\mbox{\hyperlink{classfc_1_1api__base}{00048}}\ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classfc_1_1api__base}{api\_base}}}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00049}00049\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00050}00050\ \ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00051}\mbox{\hyperlink{classfc_1_1api__base_a8defc5c5b610084dcb77e9ddcdef3e2e}{00051}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1api__base_a8defc5c5b610084dcb77e9ddcdef3e2e}{api\_base}}()\ \{\}}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00052}\mbox{\hyperlink{classfc_1_1api__base_a7191e098deecfd91e0859de0db8440db}{00052}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classfc_1_1api__base_a7191e098deecfd91e0859de0db8440db}{\string~api\_base}}()\ \{\}}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00054}\mbox{\hyperlink{classfc_1_1api__base_a101030d0c1e946040fc8dade7f051309}{00054}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{classfc_1_1api__base_a101030d0c1e946040fc8dade7f051309}{get\_handle}}()\textcolor{keyword}{const}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00056}\mbox{\hyperlink{classfc_1_1api__base_a999476d6eb0dd3a40d40a496c9c1a318}{00056}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{namespacefc_a18e9e0bd9c0a52896425ae1172bc4e2b}{api\_id\_type}}\ \mbox{\hyperlink{classfc_1_1api__base_a999476d6eb0dd3a40d40a496c9c1a318}{register\_api}}(\ \mbox{\hyperlink{classfc_1_1api__connection}{api\_connection}}\&\ conn\ )\textcolor{keyword}{const}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00058}00058\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ defined\ in\ api\_connection.hpp}}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00059}00059\ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}<\ \textcolor{keyword}{typename}\ T\ >}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00060}\mbox{\hyperlink{classfc_1_1api__base_a570f3175e653255270219c3613ad7996}{00060}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1api}{api<T,\ identity\_member>}}\ \mbox{\hyperlink{classfc_1_1api__base_a570f3175e653255270219c3613ad7996}{as}}();}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00061}00061\ \ \ \};}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00062}\mbox{\hyperlink{namespacefc_abc7fa69d18531d7645307d15b3102886}{00062}}\ \ \ \textcolor{keyword}{typedef}\ std::shared\_ptr<\ api\_base\ >\ \mbox{\hyperlink{namespacefc_abc7fa69d18531d7645307d15b3102886}{api\_ptr}};}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00064}00064\ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classfc_1_1api__connection}{api\_connection}};}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00066}00066\ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ Interface,\ \textcolor{keyword}{typename}\ Transform\ =\ \textcolor{keywordtype}{id}entity\_member\ >}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00067}\mbox{\hyperlink{classfc_1_1api}{00067}}\ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classfc_1_1api}{api}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classfc_1_1api__base}{api\_base}}\ \{}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00068}00068\ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00069}\mbox{\hyperlink{classfc_1_1api_a3ba64f50365ee99a375f9d7431987b5a}{00069}}\ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{structfc_1_1vtable}{vtable<Interface,Transform>}}\ \mbox{\hyperlink{classfc_1_1api_a3ba64f50365ee99a375f9d7431987b5a}{vtable\_type}};}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00071}\mbox{\hyperlink{classfc_1_1api_a255981b8f6e5350f515a81b4ade179cf}{00071}}\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1api_a255981b8f6e5350f515a81b4ade179cf}{api}}():\mbox{\hyperlink{classfc_1_1api_ad1617b790322c5a8e41f2af06c88c0e6}{\_vtable}}(\ \mbox{\hyperlink{namespacestd}{std}}::make\_shared<\mbox{\hyperlink{structfc_1_1vtable}{vtable\_type}}>()\ )\ \{\}}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00074}00074\ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T\ >}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00075}\mbox{\hyperlink{classfc_1_1api_aa98da82a201c30c8efd4cad46c878a8b}{00075}}\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1api_aa98da82a201c30c8efd4cad46c878a8b}{api}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ )}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00076}00076\ \ \ \ \ \ \ :\mbox{\hyperlink{classfc_1_1api_ad1617b790322c5a8e41f2af06c88c0e6}{\_vtable}}(\ \mbox{\hyperlink{namespacestd}{std}}::make\_shared<\mbox{\hyperlink{structfc_1_1vtable}{vtable\_type}}>()\ )}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00077}00077\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00078}00078\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1api_a8f70f7e0e85f5fa0a7ab1f5667f3a88f}{\_data}}\ =\ std::make\_shared<fc::any>(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}});}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ ptr\ =\ boost::any\_cast<T\&>(*\mbox{\hyperlink{classfc_1_1api_a8f70f7e0e85f5fa0a7ab1f5667f3a88f}{\_data}});}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00080}00080\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ pointed\_at\ =\ *ptr;}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00081}00081\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{typename}\ std::remove\_reference<\textcolor{keyword}{decltype}(pointed\_at)>::type\ source\_vtable\_type;}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00082}00082\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1api_ad1617b790322c5a8e41f2af06c88c0e6}{\_vtable}}-\/>FC\_CALL\_MEMBER\_TEMPLATE\_KEYWORD\ visit\_other(\ \mbox{\hyperlink{structfc_1_1vtable__copy__visitor}{vtable\_copy\_visitor<source\_vtable\_type>}}(pointed\_at)\ );}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00083}00083\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00084}00084\ }
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00085}\mbox{\hyperlink{classfc_1_1api_a6c20ba1caacd7897d0d0579df8a6ba1a}{00085}}\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1api_a6c20ba1caacd7897d0d0579df8a6ba1a}{api}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1api}{api}}\&\ cpy\ ):\mbox{\hyperlink{classfc_1_1api_ad1617b790322c5a8e41f2af06c88c0e6}{\_vtable}}(cpy.\mbox{\hyperlink{classfc_1_1api_ad1617b790322c5a8e41f2af06c88c0e6}{\_vtable}}),\mbox{\hyperlink{classfc_1_1api_a8f70f7e0e85f5fa0a7ab1f5667f3a88f}{\_data}}(cpy.\mbox{\hyperlink{classfc_1_1api_a8f70f7e0e85f5fa0a7ab1f5667f3a88f}{\_data}})\ \{\}}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00086}\mbox{\hyperlink{classfc_1_1api_a14db4007b51ba85ba8d8e34009997299}{00086}}\ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classfc_1_1api_a14db4007b51ba85ba8d8e34009997299}{\string~api}}()\ \{\}}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00087}00087\ }
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00088}\mbox{\hyperlink{classfc_1_1api_a200d5382cff45db8633a0fc427650338}{00088}}\ \ \ \ \ \ \ \textcolor{keyword}{friend}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classfc_1_1api_a200d5382cff45db8633a0fc427650338}{operator\ ==\ }}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1api}{api}}\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1api}{api}}\&\ b\ )\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.\_data\ ==\ b.\mbox{\hyperlink{classfc_1_1api_a8f70f7e0e85f5fa0a7ab1f5667f3a88f}{\_data}}\ \&\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.\_vtable\ ==\ b.\mbox{\hyperlink{classfc_1_1api_ad1617b790322c5a8e41f2af06c88c0e6}{\_vtable}};\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00089}\mbox{\hyperlink{classfc_1_1api_abc65e9cb0c531a4fe0ba91ee2eea6644}{00089}}\ \ \ \ \ \ \ \textcolor{keyword}{friend}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classfc_1_1api_abc65e9cb0c531a4fe0ba91ee2eea6644}{operator\ !=\ }}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1api}{api}}\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1api}{api}}\&\ b\ )\ \{\ \textcolor{keywordflow}{return}\ !(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.\_data\ ==\ b.\mbox{\hyperlink{classfc_1_1api_a8f70f7e0e85f5fa0a7ab1f5667f3a88f}{\_data}}\ \&\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.\_vtable\ ==\ b.\mbox{\hyperlink{classfc_1_1api_ad1617b790322c5a8e41f2af06c88c0e6}{\_vtable}});\ \}}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00090}\mbox{\hyperlink{classfc_1_1api_a3a8b466e0de4641b7afec6cf846492c5}{00090}}\ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{classfc_1_1api_a3a8b466e0de4641b7afec6cf846492c5}{get\_handle}}()\textcolor{keyword}{const\ override\ }\{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}(\mbox{\hyperlink{classfc_1_1api_a8f70f7e0e85f5fa0a7ab1f5667f3a88f}{\_data}}.get());\ \}}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00091}00091\ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{namespacefc_a18e9e0bd9c0a52896425ae1172bc4e2b}{api\_id\_type}}\ \mbox{\hyperlink{classfc_1_1api_a0fc48f47c158c42785ac9a7b21bf8788}{register\_api}}(\ \mbox{\hyperlink{classfc_1_1api__connection}{api\_connection}}\&\ conn\ )\textcolor{keyword}{const\ override};\ \ \ \ \textcolor{comment}{//\ defined\ in\ api\_connection.hpp}}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00092}00092\ }
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00093}\mbox{\hyperlink{classfc_1_1api_a1335009eb090b58f33810cf75dd52e3d}{00093}}\ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1vtable}{vtable\_type}}\&\ \mbox{\hyperlink{classfc_1_1api_a1335009eb090b58f33810cf75dd52e3d}{operator*}}()\textcolor{keyword}{const\ \ }\{\ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ \mbox{\hyperlink{classfc_1_1api_ad1617b790322c5a8e41f2af06c88c0e6}{\_vtable}}\ );\ \textcolor{keywordflow}{return}\ *\mbox{\hyperlink{classfc_1_1api_ad1617b790322c5a8e41f2af06c88c0e6}{\_vtable}};\ \}}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00094}\mbox{\hyperlink{classfc_1_1api_a73cfc6782195141e368974f6970f6f61}{00094}}\ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1vtable}{vtable\_type}}*\ \mbox{\hyperlink{classfc_1_1api_a73cfc6782195141e368974f6970f6f61}{operator-\/>}}()\textcolor{keyword}{const\ }\{\ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ \mbox{\hyperlink{classfc_1_1api_ad1617b790322c5a8e41f2af06c88c0e6}{\_vtable}}\ );\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1api_ad1617b790322c5a8e41f2af06c88c0e6}{\_vtable}}.get();\ \}}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00095}00095\ }
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00096}00096\ \ \ \ \ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00097}\mbox{\hyperlink{classfc_1_1api_ad1617b790322c5a8e41f2af06c88c0e6}{00097}}\ \ \ \ \ \ \ std::shared\_ptr<vtable\_type>\ \ \ \ \mbox{\hyperlink{classfc_1_1api_ad1617b790322c5a8e41f2af06c88c0e6}{\_vtable}};}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00098}\mbox{\hyperlink{classfc_1_1api_a8f70f7e0e85f5fa0a7ab1f5667f3a88f}{00098}}\ \ \ \ \ \ \ std::shared\_ptr<fc::any>\ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1api_a8f70f7e0e85f5fa0a7ab1f5667f3a88f}{\_data}};}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00099}00099\ \ \ \};}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00100}00100\ }
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00101}00101\ \}\ \textcolor{comment}{//\ namespace\ fc}}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00102}00102\ }
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00103}00103\ \textcolor{preprocessor}{\#include\ <boost/preprocessor/repeat.hpp>}}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00104}00104\ \textcolor{preprocessor}{\#include\ <boost/preprocessor/repetition/enum\_binary\_params.hpp>}}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00105}00105\ \textcolor{preprocessor}{\#include\ <boost/preprocessor/repetition/enum\_params.hpp>}}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00106}00106\ \textcolor{preprocessor}{\#include\ <boost/preprocessor/repetition/enum\_trailing\_params.hpp>}}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00107}00107\ \textcolor{preprocessor}{\#include\ <boost/preprocessor/facilities/empty.hpp>}}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00108}00108\ \textcolor{preprocessor}{\#include\ <boost/preprocessor/seq/for\_each.hpp>}}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00109}00109\ \textcolor{preprocessor}{\#include\ <boost/preprocessor/stringize.hpp>}}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00110}00110\ }
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00111}\mbox{\hyperlink{api_8hpp_a6c552d37d1537b71a94be8c5c09785b6}{00111}}\ \textcolor{preprocessor}{\#define\ FC\_API\_VTABLE\_DEFINE\_MEMBER(\ r,\ data,\ elem\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00112}00112\ \textcolor{preprocessor}{\ \ \ \ \ \ decltype(Transform::functor(\ (data*)nullptr,\ \&data::elem))\ elem;\ }}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00113}\mbox{\hyperlink{api_8hpp_a802f3c76beea2c07584d9725b6a150ae}{00113}}\ \textcolor{preprocessor}{\#define\ FC\_API\_VTABLE\_DEFINE\_VISIT\_OTHER(\ r,\ data,\ elem\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00114}00114\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \{\ typedef\ typename\ Visitor::other\_type\ OtherType;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00115}00115\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ v(\ BOOST\_PP\_STRINGIZE(elem),\ elem,\ \&OtherType::elem\ );\ \}}}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00116}\mbox{\hyperlink{api_8hpp_a496866640ae62dfb29364c74994b1b97}{00116}}\ \textcolor{preprocessor}{\#define\ FC\_API\_VTABLE\_DEFINE\_VISIT(\ r,\ data,\ elem\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00117}00117\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ v(\ BOOST\_PP\_STRINGIZE(elem),\ elem\ );\ }}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00118}00118\ }
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00119}\mbox{\hyperlink{api_8hpp_a5fa35b6e46680bd8d98771c5aa2bec0b}{00119}}\ \textcolor{preprocessor}{\#define\ FC\_API(\ CLASS,\ METHODS\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00120}00120\ \textcolor{preprocessor}{namespace\ fc\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00121}00121\ \textcolor{preprocessor}{\ \ template<typename\ Transform>\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00122}00122\ \textcolor{preprocessor}{\ \ struct\ vtable<CLASS,Transform>\ :\ public\ std::enable\_shared\_from\_this<vtable<CLASS,Transform>>\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00123}00123\ \textcolor{preprocessor}{\ \ \ \ \ \ BOOST\_PP\_SEQ\_FOR\_EACH(\ FC\_API\_VTABLE\_DEFINE\_MEMBER,\ CLASS,\ METHODS\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00124}00124\ \textcolor{preprocessor}{\ \ \ \ \ \ template<typename\ Visitor>\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00125}00125\ \textcolor{preprocessor}{\ \ \ \ \ \ void\ visit\_other(\ Visitor\&\&\ v\ )\{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00126}00126\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ BOOST\_PP\_SEQ\_FOR\_EACH(\ FC\_API\_VTABLE\_DEFINE\_VISIT\_OTHER,\ CLASS,\ METHODS\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00127}00127\ \textcolor{preprocessor}{\ \ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00128}00128\ \textcolor{preprocessor}{\ \ \ \ \ \ template<typename\ Visitor>\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00129}00129\ \textcolor{preprocessor}{\ \ \ \ \ \ void\ visit(\ Visitor\&\&\ v\ )\{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00130}00130\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ BOOST\_PP\_SEQ\_FOR\_EACH(\ FC\_API\_VTABLE\_DEFINE\_VISIT,\ CLASS,\ METHODS\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00131}00131\ \textcolor{preprocessor}{\ \ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00132}00132\ \textcolor{preprocessor}{\ \ \};\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00133}00133\ \textcolor{preprocessor}{\}\ \ }}
+\DoxyCodeLine{\Hypertarget{api_8hpp_source_l00134}00134\ }
+
+\end{DoxyCode}

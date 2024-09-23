@@ -1,0 +1,208 @@
+\doxysection{sysio\+::chain\+::transaction\+\_\+checktime\+\_\+timer Struct Reference}
+\hypertarget{structsysio_1_1chain_1_1transaction__checktime__timer}{}\label{structsysio_1_1chain_1_1transaction__checktime__timer}\index{sysio::chain::transaction\_checktime\_timer@{sysio::chain::transaction\_checktime\_timer}}
+
+
+{\ttfamily \#include $<$transaction\+\_\+context.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1transaction__checktime__timer_ae2b6276397aaf3de6730a0e1db06f4c2}{transaction\+\_\+checktime\+\_\+timer}} ()=delete
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1transaction__checktime__timer_a7fefaefe168d9b8e4033068ebdd2edbe}{transaction\+\_\+checktime\+\_\+timer}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__checktime__timer}{transaction\+\_\+checktime\+\_\+timer}} \&)=delete
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1transaction__checktime__timer_a29b0e30bbca8662282cadb70f88d40ad}{transaction\+\_\+checktime\+\_\+timer}} (\mbox{\hyperlink{structsysio_1_1chain_1_1transaction__checktime__timer}{transaction\+\_\+checktime\+\_\+timer}} \&\&)=default
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1transaction__checktime__timer_a5ade074ca4ee80878f7ea74383264b66}{transaction\+\_\+checktime\+\_\+timer}} (\mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer}{platform\+\_\+timer}} \&timer)
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1transaction__checktime__timer_a05ca36147adfd661c6a20101244bc16f}{\texorpdfstring{$\sim$}{\string~}transaction\+\_\+checktime\+\_\+timer}} ()
+\item 
+void \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__checktime__timer_aef90525b3674b77efd2bb44da3405fc6}{start}} (\mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}} tp)
+\item 
+void \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__checktime__timer_ad84002d0816f8b4b6aa3c2dd3772d1fe}{stop}} ()
+\item 
+void \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__checktime__timer_a8d521e32027600dda6369c50f01a10c9}{set\+\_\+expiration\+\_\+callback}} (void(\texorpdfstring{$\ast$}{*}func)(void \texorpdfstring{$\ast$}{*}), void \texorpdfstring{$\ast$}{*}user)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::atomic\+\_\+bool \& \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__checktime__timer_a957951b0f382670abeac7531d35924c1}{expired}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{transaction__context_8hpp_source_l00009}{9}} of file \mbox{\hyperlink{transaction__context_8hpp_source}{transaction\+\_\+context.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structsysio_1_1chain_1_1transaction__checktime__timer_ae2b6276397aaf3de6730a0e1db06f4c2}\index{sysio::chain::transaction\_checktime\_timer@{sysio::chain::transaction\_checktime\_timer}!transaction\_checktime\_timer@{transaction\_checktime\_timer}}
+\index{transaction\_checktime\_timer@{transaction\_checktime\_timer}!sysio::chain::transaction\_checktime\_timer@{sysio::chain::transaction\_checktime\_timer}}
+\doxysubsubsection{\texorpdfstring{transaction\_checktime\_timer()}{transaction\_checktime\_timer()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1transaction__checktime__timer_ae2b6276397aaf3de6730a0e1db06f4c2} 
+sysio\+::chain\+::transaction\+\_\+checktime\+\_\+timer\+::transaction\+\_\+checktime\+\_\+timer (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [delete]}}
+
+\Hypertarget{structsysio_1_1chain_1_1transaction__checktime__timer_a7fefaefe168d9b8e4033068ebdd2edbe}\index{sysio::chain::transaction\_checktime\_timer@{sysio::chain::transaction\_checktime\_timer}!transaction\_checktime\_timer@{transaction\_checktime\_timer}}
+\index{transaction\_checktime\_timer@{transaction\_checktime\_timer}!sysio::chain::transaction\_checktime\_timer@{sysio::chain::transaction\_checktime\_timer}}
+\doxysubsubsection{\texorpdfstring{transaction\_checktime\_timer()}{transaction\_checktime\_timer()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1transaction__checktime__timer_a7fefaefe168d9b8e4033068ebdd2edbe} 
+sysio\+::chain\+::transaction\+\_\+checktime\+\_\+timer\+::transaction\+\_\+checktime\+\_\+timer (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__checktime__timer}{transaction\+\_\+checktime\+\_\+timer}} \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [delete]}}
+
+\Hypertarget{structsysio_1_1chain_1_1transaction__checktime__timer_a29b0e30bbca8662282cadb70f88d40ad}\index{sysio::chain::transaction\_checktime\_timer@{sysio::chain::transaction\_checktime\_timer}!transaction\_checktime\_timer@{transaction\_checktime\_timer}}
+\index{transaction\_checktime\_timer@{transaction\_checktime\_timer}!sysio::chain::transaction\_checktime\_timer@{sysio::chain::transaction\_checktime\_timer}}
+\doxysubsubsection{\texorpdfstring{transaction\_checktime\_timer()}{transaction\_checktime\_timer()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1transaction__checktime__timer_a29b0e30bbca8662282cadb70f88d40ad} 
+sysio\+::chain\+::transaction\+\_\+checktime\+\_\+timer\+::transaction\+\_\+checktime\+\_\+timer (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1transaction__checktime__timer}{transaction\+\_\+checktime\+\_\+timer}} \&\&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [default]}}
+
+\Hypertarget{structsysio_1_1chain_1_1transaction__checktime__timer_a5ade074ca4ee80878f7ea74383264b66}\index{sysio::chain::transaction\_checktime\_timer@{sysio::chain::transaction\_checktime\_timer}!transaction\_checktime\_timer@{transaction\_checktime\_timer}}
+\index{transaction\_checktime\_timer@{transaction\_checktime\_timer}!sysio::chain::transaction\_checktime\_timer@{sysio::chain::transaction\_checktime\_timer}}
+\doxysubsubsection{\texorpdfstring{transaction\_checktime\_timer()}{transaction\_checktime\_timer()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1transaction__checktime__timer_a5ade074ca4ee80878f7ea74383264b66} 
+sysio\+::chain\+::transaction\+\_\+checktime\+\_\+timer\+::transaction\+\_\+checktime\+\_\+timer (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer}{platform\+\_\+timer}} \&}]{timer}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{transaction__context_8cpp_source_l00025}{25}} of file \mbox{\hyperlink{transaction__context_8cpp_source}{transaction\+\_\+context.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__checktime__timer_a957951b0f382670abeac7531d35924c1}{expired}}(timer.expired),\ \_timer(timer)\ \{}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__checktime__timer_a957951b0f382670abeac7531d35924c1}{expired}}\ =\ 0;}
+\DoxyCodeLine{00028\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1transaction__checktime__timer_a05ca36147adfd661c6a20101244bc16f}\index{sysio::chain::transaction\_checktime\_timer@{sysio::chain::transaction\_checktime\_timer}!````~transaction\_checktime\_timer@{\texorpdfstring{$\sim$}{\string~}transaction\_checktime\_timer}}
+\index{````~transaction\_checktime\_timer@{\texorpdfstring{$\sim$}{\string~}transaction\_checktime\_timer}!sysio::chain::transaction\_checktime\_timer@{sysio::chain::transaction\_checktime\_timer}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}transaction\_checktime\_timer()}{\string~transaction\_checktime\_timer()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1transaction__checktime__timer_a05ca36147adfd661c6a20101244bc16f} 
+sysio\+::chain\+::transaction\+\_\+checktime\+\_\+timer\+::\texorpdfstring{$\sim$}{\string~}transaction\+\_\+checktime\+\_\+timer (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{transaction__context_8cpp_source_l00042}{42}} of file \mbox{\hyperlink{transaction__context_8cpp_source}{transaction\+\_\+context.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__checktime__timer_ad84002d0816f8b4b6aa3c2dd3772d1fe}{stop}}();}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \_timer.\mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_a5fd5d9852eeb86bed7975076db770b10}{set\_expiration\_callback}}(\textcolor{keyword}{nullptr},\ \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{00045\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1transaction__checktime__timer_a05ca36147adfd661c6a20101244bc16f_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1chain_1_1transaction__checktime__timer_a8d521e32027600dda6369c50f01a10c9}\index{sysio::chain::transaction\_checktime\_timer@{sysio::chain::transaction\_checktime\_timer}!set\_expiration\_callback@{set\_expiration\_callback}}
+\index{set\_expiration\_callback@{set\_expiration\_callback}!sysio::chain::transaction\_checktime\_timer@{sysio::chain::transaction\_checktime\_timer}}
+\doxysubsubsection{\texorpdfstring{set\_expiration\_callback()}{set\_expiration\_callback()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1transaction__checktime__timer_a8d521e32027600dda6369c50f01a10c9} 
+void sysio\+::chain\+::transaction\+\_\+checktime\+\_\+timer\+::set\+\_\+expiration\+\_\+callback (\begin{DoxyParamCaption}\item[{void(\texorpdfstring{$\ast$}{*}}]{func~}{)(void \texorpdfstring{$\ast$}{*}), }\item[{void \texorpdfstring{$\ast$}{*}}]{user}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{transaction__context_8cpp_source_l00038}{38}} of file \mbox{\hyperlink{transaction__context_8cpp_source}{transaction\+\_\+context.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \_timer.\mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_a5fd5d9852eeb86bed7975076db770b10}{set\_expiration\_callback}}(func,\ user);}
+\DoxyCodeLine{00040\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1transaction__checktime__timer_a8d521e32027600dda6369c50f01a10c9_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1transaction__checktime__timer_aef90525b3674b77efd2bb44da3405fc6}\index{sysio::chain::transaction\_checktime\_timer@{sysio::chain::transaction\_checktime\_timer}!start@{start}}
+\index{start@{start}!sysio::chain::transaction\_checktime\_timer@{sysio::chain::transaction\_checktime\_timer}}
+\doxysubsubsection{\texorpdfstring{start()}{start()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1transaction__checktime__timer_aef90525b3674b77efd2bb44da3405fc6} 
+void sysio\+::chain\+::transaction\+\_\+checktime\+\_\+timer\+::start (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}}}]{tp}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{transaction__context_8cpp_source_l00030}{30}} of file \mbox{\hyperlink{transaction__context_8cpp_source}{transaction\+\_\+context.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \_timer.\mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_a8396e86c6a626dd2632cb075bd254ad4}{start}}(tp);}
+\DoxyCodeLine{00032\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1transaction__checktime__timer_aef90525b3674b77efd2bb44da3405fc6_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1transaction__checktime__timer_aef90525b3674b77efd2bb44da3405fc6_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1transaction__checktime__timer_ad84002d0816f8b4b6aa3c2dd3772d1fe}\index{sysio::chain::transaction\_checktime\_timer@{sysio::chain::transaction\_checktime\_timer}!stop@{stop}}
+\index{stop@{stop}!sysio::chain::transaction\_checktime\_timer@{sysio::chain::transaction\_checktime\_timer}}
+\doxysubsubsection{\texorpdfstring{stop()}{stop()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1transaction__checktime__timer_ad84002d0816f8b4b6aa3c2dd3772d1fe} 
+void sysio\+::chain\+::transaction\+\_\+checktime\+\_\+timer\+::stop (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{transaction__context_8cpp_source_l00034}{34}} of file \mbox{\hyperlink{transaction__context_8cpp_source}{transaction\+\_\+context.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \_timer.\mbox{\hyperlink{structsysio_1_1chain_1_1platform__timer_a5cb70a095755d00bf02d37d31b6e46af}{stop}}();}
+\DoxyCodeLine{00036\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=348pt]{structsysio_1_1chain_1_1transaction__checktime__timer_ad84002d0816f8b4b6aa3c2dd3772d1fe_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1transaction__checktime__timer_ad84002d0816f8b4b6aa3c2dd3772d1fe_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1chain_1_1transaction__checktime__timer_a957951b0f382670abeac7531d35924c1}\index{sysio::chain::transaction\_checktime\_timer@{sysio::chain::transaction\_checktime\_timer}!expired@{expired}}
+\index{expired@{expired}!sysio::chain::transaction\_checktime\_timer@{sysio::chain::transaction\_checktime\_timer}}
+\doxysubsubsection{\texorpdfstring{expired}{expired}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1transaction__checktime__timer_a957951b0f382670abeac7531d35924c1} 
+std\+::atomic\+\_\+bool\& sysio\+::chain\+::transaction\+\_\+checktime\+\_\+timer\+::expired}
+
+
+
+Definition at line \mbox{\hyperlink{transaction__context_8hpp_source_l00025}{25}} of file \mbox{\hyperlink{transaction__context_8hpp_source}{transaction\+\_\+context.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{transaction__context_8hpp}{transaction\+\_\+context.\+hpp}}\item 
+libraries/chain/\mbox{\hyperlink{transaction__context_8cpp}{transaction\+\_\+context.\+cpp}}\end{DoxyCompactItemize}

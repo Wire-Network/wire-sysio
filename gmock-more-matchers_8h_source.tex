@@ -1,0 +1,97 @@
+\doxysection{gmock-\/more-\/matchers.h}
+\hypertarget{gmock-more-matchers_8h_source}{}\label{gmock-more-matchers_8h_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googlemock/include/gmock/gmock-\/more-\/matchers.h@{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googlemock/include/gmock/gmock-\/more-\/matchers.h}}
+\mbox{\hyperlink{gmock-more-matchers_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00001}00001\ \textcolor{comment}{//\ Copyright\ 2013,\ Google\ Inc.}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00002}00002\ \textcolor{comment}{//\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00003}00003\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00004}00004\ \textcolor{comment}{//\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00005}00005\ \textcolor{comment}{//\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00006}00006\ \textcolor{comment}{//\ met:}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00007}00007\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00008}00008\ \textcolor{comment}{//\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00009}00009\ \textcolor{comment}{//\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00010}00010\ \textcolor{comment}{//\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00011}00011\ \textcolor{comment}{//\ copyright\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00012}00012\ \textcolor{comment}{//\ in\ the\ documentation\ and/or\ other\ materials\ provided\ with\ the}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00013}00013\ \textcolor{comment}{//\ distribution.}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00014}00014\ \textcolor{comment}{//\ \ \ \ \ *\ Neither\ the\ name\ of\ Google\ Inc.\ nor\ the\ names\ of\ its}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00015}00015\ \textcolor{comment}{//\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products\ derived\ from}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00016}00016\ \textcolor{comment}{//\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00017}00017\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00018}00018\ \textcolor{comment}{//\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00019}00019\ \textcolor{comment}{//\ "{}AS\ IS"{}\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00020}00020\ \textcolor{comment}{//\ LIMITED\ TO,\ THE\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00021}00021\ \textcolor{comment}{//\ A\ PARTICULAR\ PURPOSE\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ THE\ COPYRIGHT}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00022}00022\ \textcolor{comment}{//\ OWNER\ OR\ CONTRIBUTORS\ BE\ LIABLE\ FOR\ ANY\ DIRECT,\ INDIRECT,\ INCIDENTAL,}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00023}00023\ \textcolor{comment}{//\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES\ (INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00024}00024\ \textcolor{comment}{//\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;\ LOSS\ OF\ USE,}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00025}00025\ \textcolor{comment}{//\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND\ ON\ ANY}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00026}00026\ \textcolor{comment}{//\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00027}00027\ \textcolor{comment}{//\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00028}00028\ \textcolor{comment}{//\ OF\ THIS\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00029}00029\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00030}00030\ \textcolor{comment}{//\ Author:\ marcus.boerger@google.com\ (Marcus\ Boerger)}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00032}00032\ \textcolor{comment}{//\ Google\ Mock\ -\/\ a\ framework\ for\ writing\ C++\ mock\ classes.}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00033}00033\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00034}00034\ \textcolor{comment}{//\ This\ file\ implements\ some\ matchers\ that\ depend\ on\ gmock-\/generated-\/matchers.h.}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00035}00035\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00036}00036\ \textcolor{comment}{//\ Note\ that\ tests\ are\ implemented\ in\ gmock-\/matchers\_test.cc\ rather\ than}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00037}00037\ \textcolor{comment}{//\ gmock-\/more-\/matchers-\/test.cc.}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00039}00039\ \textcolor{preprocessor}{\#ifndef\ GMOCK\_GMOCK\_MORE\_MATCHERS\_H\_}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00040}00040\ \textcolor{preprocessor}{\#define\ GMOCK\_GMOCK\_MORE\_MATCHERS\_H\_}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00042}00042\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{gmock-generated-matchers_8h}{gmock/gmock-\/generated-\/matchers.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00044}00044\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetesting}{testing}}\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00046}00046\ \textcolor{comment}{//\ Silence\ C4100\ (unreferenced\ formal}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00047}00047\ \textcolor{comment}{//\ parameter)\ for\ MSVC}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00048}00048\ \textcolor{preprocessor}{\#ifdef\ \_MSC\_VER}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00049}00049\ \textcolor{preprocessor}{\#\ pragma\ warning(push)}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00050}00050\ \textcolor{preprocessor}{\#\ pragma\ warning(disable:4100)}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00051}00051\ \textcolor{preprocessor}{\#if\ (\_MSC\_VER\ ==\ 1900)}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00052}00052\ \textcolor{comment}{//\ and\ silence\ C4800\ (C4800:\ 'int\ *const\ ':\ forcing\ value}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00053}00053\ \textcolor{comment}{//\ to\ bool\ 'true'\ or\ 'false')\ for\ MSVC\ 14}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00054}00054\ \textcolor{preprocessor}{\#\ pragma\ warning(disable:4800)}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00055}00055\ \textcolor{preprocessor}{\ \ \#endif}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00056}00056\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00058}00058\ \textcolor{comment}{//\ Defines\ a\ matcher\ that\ matches\ an\ empty\ container.\ The\ container\ must}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00059}00059\ \textcolor{comment}{//\ support\ both\ size()\ and\ empty(),\ which\ all\ STL-\/like\ containers\ provide.}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00060}\mbox{\hyperlink{namespacetesting_a4fcb3f407119590471bea5a90a8d2dda}{00060}}\ \mbox{\hyperlink{gmock-generated-matchers_8h_af4fe73ff8e2b0494f4970b575b65ddff}{MATCHER}}(IsEmpty,\ negation\ ?\ \textcolor{stringliteral}{"{}isn't\ empty"{}}\ :\ \textcolor{stringliteral}{"{}is\ empty"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00061}00061\ \ \ \textcolor{keywordflow}{if}\ (arg.empty())\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00062}00062\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00063}00063\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00064}00064\ \ \ *result\_listener\ <<\ \textcolor{stringliteral}{"{}whose\ size\ is\ "{}}\ <<\ arg.size();}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00065}00065\ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00066}00066\ \}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00067}00067\ }
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00068}00068\ \textcolor{comment}{//\ Define\ a\ matcher\ that\ matches\ a\ value\ that\ evaluates\ in\ boolean}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00069}00069\ \textcolor{comment}{//\ context\ to\ true.\ \ Useful\ for\ types\ that\ define\ "{}explicit\ operator}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00070}00070\ \textcolor{comment}{//\ bool"{}\ operators\ and\ so\ can't\ be\ compared\ for\ equality\ with\ true}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00071}00071\ \textcolor{comment}{//\ and\ false.}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00072}\mbox{\hyperlink{namespacetesting_ab2b645db6909220993662cf43ed0d9e8}{00072}}\ \mbox{\hyperlink{gmock-generated-matchers_8h_af4fe73ff8e2b0494f4970b575b65ddff}{MATCHER}}(IsTrue,\ negation\ ?\ \textcolor{stringliteral}{"{}is\ false"{}}\ :\ \textcolor{stringliteral}{"{}is\ true"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00073}00073\ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{bool}\textcolor{keyword}{>}(arg);}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00074}00074\ \}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00075}00075\ }
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00076}00076\ \textcolor{comment}{//\ Define\ a\ matcher\ that\ matches\ a\ value\ that\ evaluates\ in\ boolean}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00077}00077\ \textcolor{comment}{//\ context\ to\ false.\ \ Useful\ for\ types\ that\ define\ "{}explicit\ operator}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00078}00078\ \textcolor{comment}{//\ bool"{}\ operators\ and\ so\ can't\ be\ compared\ for\ equality\ with\ true}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00079}00079\ \textcolor{comment}{//\ and\ false.}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00080}\mbox{\hyperlink{namespacetesting_a03fb223cceaefc67991ac36286dcbb34}{00080}}\ \mbox{\hyperlink{gmock-generated-matchers_8h_af4fe73ff8e2b0494f4970b575b65ddff}{MATCHER}}(IsFalse,\ negation\ ?\ \textcolor{stringliteral}{"{}is\ true"{}}\ :\ \textcolor{stringliteral}{"{}is\ false"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00081}00081\ \ \ \textcolor{keywordflow}{return}\ !\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{bool}\textcolor{keyword}{>}(arg);}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00082}00082\ \}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00083}00083\ }
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00084}00084\ \textcolor{preprocessor}{\#ifdef\ \_MSC\_VER}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00085}00085\ \textcolor{preprocessor}{\#\ pragma\ warning(pop)}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00086}00086\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00087}00087\ }
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00088}00088\ }
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00089}00089\ \}\ \ \textcolor{comment}{//\ namespace\ testing}}
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00090}00090\ }
+\DoxyCodeLine{\Hypertarget{gmock-more-matchers_8h_source_l00091}00091\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GMOCK\_GMOCK\_MORE\_MATCHERS\_H\_}}
+
+\end{DoxyCode}

@@ -1,0 +1,151 @@
+\doxysection{libraries/yubihsm/common/parsing.h File Reference}
+\hypertarget{parsing_8h}{}\label{parsing_8h}\index{libraries/yubihsm/common/parsing.h@{libraries/yubihsm/common/parsing.h}}
+{\ttfamily \#include $<$stdbool.\+h$>$}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+Include dependency graph for parsing.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=210pt]{parsing_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{parsing_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{parsing_8h_ab06b84c4848a12847ba134dd739fe5f0}{READ\+\_\+\+STR\+\_\+\+PROMPT\+\_\+\+BASE}}~"{}Enter \%s\+: "{}
+\item 
+\#define \mbox{\hyperlink{parsing_8h_aa1c48ca7b894657e01905d3074b38b8c}{YH\+\_\+\+INTERNAL}}~\+\_\+\+\_\+attribute\+\_\+\+\_\+((visibility("{}hidden"{})))
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{aes_8h_a3f74f478154eb204fc614b5e9fcde0d1}{YH\+\_\+\+INTERNAL}} \mbox{\hyperlink{parsing_8h_a4e281d72bb866bf05237e615adb744b4}{parse\+\_\+pw}} (const char \texorpdfstring{$\ast$}{*}prompt, char \texorpdfstring{$\ast$}{*}pw, char \texorpdfstring{$\ast$}{*}parsed, size\+\_\+t \texorpdfstring{$\ast$}{*}parsed\+\_\+len)
+\item 
+bool \mbox{\hyperlink{aes_8h_a3f74f478154eb204fc614b5e9fcde0d1}{YH\+\_\+\+INTERNAL}} \mbox{\hyperlink{parsing_8h_acc4860ff7d56dbfdd32a9a4d92aa420b}{read\+\_\+string}} (const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}, char \texorpdfstring{$\ast$}{*}str\+\_\+buf, size\+\_\+t str\+\_\+buf\+\_\+len, bool hidden)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{parsing_8h_ab06b84c4848a12847ba134dd739fe5f0}\index{parsing.h@{parsing.h}!READ\_STR\_PROMPT\_BASE@{READ\_STR\_PROMPT\_BASE}}
+\index{READ\_STR\_PROMPT\_BASE@{READ\_STR\_PROMPT\_BASE}!parsing.h@{parsing.h}}
+\doxysubsubsection{\texorpdfstring{READ\_STR\_PROMPT\_BASE}{READ\_STR\_PROMPT\_BASE}}
+{\footnotesize\ttfamily \label{parsing_8h_ab06b84c4848a12847ba134dd739fe5f0} 
+\#define READ\+\_\+\+STR\+\_\+\+PROMPT\+\_\+\+BASE~"{}Enter \%s\+: "{}}
+
+
+
+Definition at line \mbox{\hyperlink{parsing_8h_source_l00025}{25}} of file \mbox{\hyperlink{parsing_8h_source}{parsing.\+h}}.
+
+\Hypertarget{parsing_8h_aa1c48ca7b894657e01905d3074b38b8c}\index{parsing.h@{parsing.h}!YH\_INTERNAL@{YH\_INTERNAL}}
+\index{YH\_INTERNAL@{YH\_INTERNAL}!parsing.h@{parsing.h}}
+\doxysubsubsection{\texorpdfstring{YH\_INTERNAL}{YH\_INTERNAL}}
+{\footnotesize\ttfamily \label{parsing_8h_aa1c48ca7b894657e01905d3074b38b8c} 
+\#define YH\+\_\+\+INTERNAL~\+\_\+\+\_\+attribute\+\_\+\+\_\+((visibility("{}hidden"{})))}
+
+
+
+Definition at line \mbox{\hyperlink{parsing_8h_source_l00027}{27}} of file \mbox{\hyperlink{parsing_8h_source}{parsing.\+h}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{parsing_8h_a4e281d72bb866bf05237e615adb744b4}\index{parsing.h@{parsing.h}!parse\_pw@{parse\_pw}}
+\index{parse\_pw@{parse\_pw}!parsing.h@{parsing.h}}
+\doxysubsubsection{\texorpdfstring{parse\_pw()}{parse\_pw()}}
+{\footnotesize\ttfamily \label{parsing_8h_a4e281d72bb866bf05237e615adb744b4} 
+bool \mbox{\hyperlink{aes_8h_a3f74f478154eb204fc614b5e9fcde0d1}{YH\+\_\+\+INTERNAL}} parse\+\_\+pw (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{prompt}{, }\item[{char \texorpdfstring{$\ast$}{*}}]{pw}{, }\item[{char \texorpdfstring{$\ast$}{*}}]{parsed}{, }\item[{size\+\_\+t \texorpdfstring{$\ast$}{*}}]{parsed\+\_\+len}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{parsing_8c_source_l00061}{61}} of file \mbox{\hyperlink{parsing_8c_source}{parsing.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00062\ \ \ \textcolor{keywordflow}{if}\ (strlen(pw)\ >\ *parsed\_len)\ \{}
+\DoxyCodeLine{00063\ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Unable\ to\ read\ name,\ buffer\ too\ small\(\backslash\)n"{}});}
+\DoxyCodeLine{00064\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00065\ \ \ \}}
+\DoxyCodeLine{00066\ }
+\DoxyCodeLine{00067\ \ \ \textcolor{keywordflow}{if}\ (strlen(pw)\ ==\ 0)\ \{}
+\DoxyCodeLine{00068\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{parsing_8c_a07b9f982e6a2f33addd688340f3bf89e}{read\_string}}(prompt,\ parsed,\ *parsed\_len,\ \textcolor{keyword}{true})\ ==\ \textcolor{keyword}{false})\ \{}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00070\ \ \ \ \ \}}
+\DoxyCodeLine{00071\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00072\ \ \ \ \ strncpy(parsed,\ pw,\ *parsed\_len);}
+\DoxyCodeLine{00073\ \ \ \}}
+\DoxyCodeLine{00074\ }
+\DoxyCodeLine{00075\ \ \ *parsed\_len\ =\ strlen(parsed);}
+\DoxyCodeLine{00076\ }
+\DoxyCodeLine{00077\ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00078\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=238pt]{parsing_8h_a4e281d72bb866bf05237e615adb744b4_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{parsing_8h_acc4860ff7d56dbfdd32a9a4d92aa420b}\index{parsing.h@{parsing.h}!read\_string@{read\_string}}
+\index{read\_string@{read\_string}!parsing.h@{parsing.h}}
+\doxysubsubsection{\texorpdfstring{read\_string()}{read\_string()}}
+{\footnotesize\ttfamily \label{parsing_8h_acc4860ff7d56dbfdd32a9a4d92aa420b} 
+bool \mbox{\hyperlink{aes_8h_a3f74f478154eb204fc614b5e9fcde0d1}{YH\+\_\+\+INTERNAL}} read\+\_\+string (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{name}{, }\item[{char \texorpdfstring{$\ast$}{*}}]{str\+\_\+buf}{, }\item[{size\+\_\+t}]{str\+\_\+buf\+\_\+len}{, }\item[{bool}]{hidden}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{parsing_8c_source_l00026}{26}} of file \mbox{\hyperlink{parsing_8c_source}{parsing.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00028\ }
+\DoxyCodeLine{00029\ \ \ \textcolor{keywordtype}{char}\ prompt[\textcolor{keyword}{sizeof}(\mbox{\hyperlink{parsing_8c_ab06b84c4848a12847ba134dd739fe5f0}{READ\_STR\_PROMPT\_BASE}})\ +\ 32]\ =\ \{0\};}
+\DoxyCodeLine{00030\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00031\ }
+\DoxyCodeLine{00032\ \ \ \textcolor{keywordflow}{if}\ (str\_buf\_len\ <\ 1)\ \{}
+\DoxyCodeLine{00033\ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Unable\ to\ read\ \%s:\ buffer\ too\ small\(\backslash\)n"{}},\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}});}
+\DoxyCodeLine{00034\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00035\ \ \ \}}
+\DoxyCodeLine{00036\ }
+\DoxyCodeLine{00037\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ snprintf(prompt,\ \textcolor{keyword}{sizeof}(prompt),\ \mbox{\hyperlink{parsing_8c_ab06b84c4848a12847ba134dd739fe5f0}{READ\_STR\_PROMPT\_BASE}},\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}});}
+\DoxyCodeLine{00038\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ <\ 0\ ||\ ((\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int})\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}})\ >\ (\textcolor{keyword}{sizeof}(prompt)\ -\/\ 1))\ \{}
+\DoxyCodeLine{00039\ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Unable\ to\ read\ \%s:\ snprintf\ failed\(\backslash\)n"{}},\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}});}
+\DoxyCodeLine{00040\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00041\ \ \ \}}
+\DoxyCodeLine{00042\ }
+\DoxyCodeLine{00043\ \ \ \textcolor{keywordflow}{if}\ (hidden\ ==\ \textcolor{keyword}{true})\ \{}
+\DoxyCodeLine{00044\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ EVP\_read\_pw\_string(str\_buf,\ str\_buf\_len,\ prompt,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00045\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ !=\ 0)\ \{}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Retrieving\ \%s\ failed\ (\%d)\(\backslash\)n"{}},\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}});}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00048\ \ \ \ \ \}}
+\DoxyCodeLine{00049\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00050\ \ \ \ \ fprintf(stdout,\ \textcolor{stringliteral}{"{}\%s"{}},\ prompt);}
+\DoxyCodeLine{00051\ \ \ \ \ str\_buf\ =\ fgets(str\_buf,\ str\_buf\_len,\ stdin);}
+\DoxyCodeLine{00052\ \ \ \ \ \textcolor{keywordflow}{if}\ (str\_buf\ ==\ NULL)\ \{}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00054\ \ \ \ \ \}}
+\DoxyCodeLine{00055\ \ \ \ \ str\_buf[strlen(str\_buf)\ -\/\ 1]\ =\ \textcolor{charliteral}{'\(\backslash\)0'};}
+\DoxyCodeLine{00056\ \ \ \}}
+\DoxyCodeLine{00057\ }
+\DoxyCodeLine{00058\ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00059\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=238pt]{parsing_8h_acc4860ff7d56dbfdd32a9a4d92aa420b_icgraph}
+\end{center}
+\end{figure}

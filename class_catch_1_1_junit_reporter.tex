@@ -1,0 +1,789 @@
+\doxysection{Catch\+::Junit\+Reporter Class Reference}
+\hypertarget{class_catch_1_1_junit_reporter}{}\label{class_catch_1_1_junit_reporter}\index{Catch::JunitReporter@{Catch::JunitReporter}}
+
+
+{\ttfamily \#include $<$catch\+\_\+reporter\+\_\+junit.\+h$>$}
+
+
+
+Inheritance diagram for Catch\+::Junit\+Reporter\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=215pt]{class_catch_1_1_junit_reporter__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Catch\+::Junit\+Reporter\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_junit_reporter__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_catch_1_1_junit_reporter_a36f825f13c7216a9244ecf8067e00207}{Junit\+Reporter}} (\mbox{\hyperlink{struct_catch_1_1_reporter_config}{Reporter\+Config}} const \&\+\_\+config)
+\item 
+\mbox{\hyperlink{class_catch_1_1_junit_reporter_a89248f3a387a71c90e5750b2763dea92}{\texorpdfstring{$\sim$}{\string~}\+Junit\+Reporter}} () override
+\item 
+void \mbox{\hyperlink{class_catch_1_1_junit_reporter_adc452888bb18f416fd7c1b74bca6ee14}{no\+Matching\+Test\+Cases}} (std\+::string const \&) override
+\item 
+void \mbox{\hyperlink{class_catch_1_1_junit_reporter_a416da4586bd135749eea5adc8aa41280}{test\+Run\+Starting}} (\mbox{\hyperlink{struct_catch_1_1_test_run_info}{Test\+Run\+Info}} const \&run\+Info) override
+\item 
+void \mbox{\hyperlink{class_catch_1_1_junit_reporter_a40421d8e1a8a6498cc302595c35cfed5}{test\+Group\+Starting}} (\mbox{\hyperlink{struct_catch_1_1_group_info}{Group\+Info}} const \&group\+Info) override
+\item 
+void \mbox{\hyperlink{class_catch_1_1_junit_reporter_a1e099029f5c138d5bcda0fdd184ef3ee}{test\+Case\+Starting}} (\mbox{\hyperlink{struct_catch_1_1_test_case_info}{Test\+Case\+Info}} const \&test\+Case\+Info) override
+\item 
+bool \mbox{\hyperlink{class_catch_1_1_junit_reporter_afcd8fb806f6ba5295ecd86985b3ac1df}{assertion\+Ended}} (\mbox{\hyperlink{struct_catch_1_1_assertion_stats}{Assertion\+Stats}} const \&assertion\+Stats) override
+\item 
+void \mbox{\hyperlink{class_catch_1_1_junit_reporter_ad04704cfa67f64ca6bf540e9cbe108f4}{test\+Case\+Ended}} (\mbox{\hyperlink{struct_catch_1_1_test_case_stats}{Test\+Case\+Stats}} const \&test\+Case\+Stats) override
+\item 
+void \mbox{\hyperlink{class_catch_1_1_junit_reporter_aa91e71b824c3a7733993821668fe7e6e}{test\+Group\+Ended}} (\mbox{\hyperlink{struct_catch_1_1_test_group_stats}{Test\+Group\+Stats}} const \&test\+Group\+Stats) override
+\item 
+void \mbox{\hyperlink{class_catch_1_1_junit_reporter_a529ba203e91db27821519f8c41ac7905}{test\+Run\+Ended\+Cumulative}} () override
+\item 
+void \mbox{\hyperlink{class_catch_1_1_junit_reporter_a13caa24a5b9bcfdb398702fe3146e066}{write\+Group}} (\mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a0d18cb91a442f50c12f32cbb61e701d1}{Test\+Group\+Node}} const \&group\+Node, double suite\+Time)
+\item 
+void \mbox{\hyperlink{class_catch_1_1_junit_reporter_ae0b70c4ea05bd99d8be6727e27b8dd71}{write\+Test\+Case}} (\mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_aaa25c59c56acf15cdab3d622ce3b9c96}{Test\+Case\+Node}} const \&test\+Case\+Node)
+\item 
+void \mbox{\hyperlink{class_catch_1_1_junit_reporter_a8dcc9668b6f52aeb23cc479b835f681f}{write\+Section}} (std\+::string const \&class\+Name, std\+::string const \&root\+Name, Section\+Node const \&section\+Node)
+\item 
+void \mbox{\hyperlink{class_catch_1_1_junit_reporter_ace9a2e3a52dee4591e8dc9ed7b82b5ff}{write\+Assertions}} (Section\+Node const \&section\+Node)
+\item 
+void \mbox{\hyperlink{class_catch_1_1_junit_reporter_a5f357b138781615261724e3271600aaa}{write\+Assertion}} (\mbox{\hyperlink{struct_catch_1_1_assertion_stats}{Assertion\+Stats}} const \&stats)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base}{Catch\+::\+Cumulative\+Reporter\+Base$<$ Junit\+Reporter $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_ad51e1c1fcdd79b4a6db911f0af104ff5}{Cumulative\+Reporter\+Base}} (\mbox{\hyperlink{struct_catch_1_1_reporter_config}{Reporter\+Config}} const \&\+\_\+config)
+\item 
+\mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_aa9a14e93900a83228ea73772746a17b8}{\texorpdfstring{$\sim$}{\string~}\+Cumulative\+Reporter\+Base}} () override=default
+\item 
+\mbox{\hyperlink{struct_catch_1_1_reporter_preferences}{Reporter\+Preferences}} \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a45960ead3e300a607d6b2e7237a712ab}{get\+Preferences}} () const override
+\item 
+void \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a179ba3a2d5c94ab93b53be42fa0bdb0a}{section\+Starting}} (\mbox{\hyperlink{struct_catch_1_1_section_info}{Section\+Info}} const \&section\+Info) override
+\item 
+void \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a1e5ae547b7bef0be697f6e77add75d9c}{assertion\+Starting}} (\mbox{\hyperlink{struct_catch_1_1_assertion_info}{Assertion\+Info}} const \&) override
+\item 
+void \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a105f802576dcac9ddab9c10b10d6cd86}{section\+Ended}} (\mbox{\hyperlink{struct_catch_1_1_section_stats}{Section\+Stats}} const \&section\+Stats) override
+\item 
+void \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a86b6b628c217ed77c16de39b844c9eb8}{test\+Run\+Ended}} (\mbox{\hyperlink{struct_catch_1_1_test_run_stats}{Test\+Run\+Stats}} const \&test\+Run\+Stats) override
+\item 
+void \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_ad3fd3b17f7385ae4efcae8958987fdef}{skip\+Test}} (\mbox{\hyperlink{struct_catch_1_1_test_case_info}{Test\+Case\+Info}} const \&) override
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter}{Catch\+::\+IStreaming\+Reporter}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_a7edcaeb7bb35258b4faa4b79a20320e1}{\texorpdfstring{$\sim$}{\string~}\+IStreaming\+Reporter}} ()=default
+\item 
+virtual void \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_ac0b61a3ef04ee287937751c043a7013a}{benchmark\+Starting}} (\mbox{\hyperlink{struct_catch_1_1_benchmark_info}{Benchmark\+Info}} const \&)
+\item 
+virtual void \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_aed607b9cde8193cc470c2749f106b4fa}{benchmark\+Ended}} (\mbox{\hyperlink{struct_catch_1_1_benchmark_stats}{Benchmark\+Stats}} const \&)
+\item 
+virtual void \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_ad5001d7247cc94e5fec26b0e702f134f}{fatal\+Error\+Encountered}} (\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})
+\item 
+virtual bool \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_a6ca0329f20ad8b8ec7b3d1958f1fa73f}{is\+Multi}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static std\+::string \mbox{\hyperlink{class_catch_1_1_junit_reporter_ae5f1a7cac555d694ef27fbcc8f78d964}{get\+Description}} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Static Public Member Functions inherited from \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base}{Catch\+::\+Cumulative\+Reporter\+Base$<$ Junit\+Reporter $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+static std\+::set$<$ \mbox{\hyperlink{namespace_catch_af85c0d46dfe687d923a157362fd07737}{Verbosity}} $>$ \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_af7195efab6ce7dff1762c81e6a4324b2}{get\+Supported\+Verbosities}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_catch_1_1_xml_writer}{Xml\+Writer}} \mbox{\hyperlink{class_catch_1_1_junit_reporter_af231b6bde7a01a85ff595ee7036c1ba3}{xml}}
+\item 
+\mbox{\hyperlink{class_catch_1_1_timer}{Timer}} \mbox{\hyperlink{class_catch_1_1_junit_reporter_a20417e9762efdad95d1a5c68d08f74c1}{suite\+Timer}}
+\item 
+std\+::string \mbox{\hyperlink{class_catch_1_1_junit_reporter_a25402dec57e499d4c87738b392415b64}{std\+Out\+For\+Suite}}
+\item 
+std\+::string \mbox{\hyperlink{class_catch_1_1_junit_reporter_a1efe5ba1ad030a9c7b79e40d1ad1eda0}{std\+Err\+For\+Suite}}
+\item 
+unsigned int \mbox{\hyperlink{class_catch_1_1_junit_reporter_ae8028373148d6190b8c3cdf4a62e8565}{unexpected\+Exceptions}} = 0
+\item 
+bool \mbox{\hyperlink{class_catch_1_1_junit_reporter_a85294c341a998b2488ea1951baa8b4a6}{m\+\_\+ok\+To\+Fail}} = false
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes inherited from \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base}{Catch\+::\+Cumulative\+Reporter\+Base$<$ Junit\+Reporter $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespace_catch_a961f6f5f07e265684c220a8ae014d7d6}{IConfig\+Ptr}} \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a2f9067f97068a6b92def5463f6ff483a}{m\+\_\+config}}
+\item 
+std\+::ostream \& \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a89e3447c9751c8fa72b2a12746880d81}{stream}}
+\item 
+std\+::vector$<$ \mbox{\hyperlink{struct_catch_1_1_assertion_stats}{Assertion\+Stats}} $>$ \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_ac1d8cc6406e46cbbbbdff0f4440a11b2}{m\+\_\+assertions}}
+\item 
+std\+::vector$<$ std\+::vector$<$ std\+::shared\+\_\+ptr$<$ Section\+Node $>$ $>$ $>$ \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a636b100a82f4e0df0a71e491df4ac7f6}{m\+\_\+sections}}
+\item 
+std\+::vector$<$ std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_aaa25c59c56acf15cdab3d622ce3b9c96}{Test\+Case\+Node}} $>$ $>$ \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a6850ef07b579478d0c7bd7d098db7ee6}{m\+\_\+test\+Cases}}
+\item 
+std\+::vector$<$ std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a0d18cb91a442f50c12f32cbb61e701d1}{Test\+Group\+Node}} $>$ $>$ \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a8f368439d89460c1c583037dcb18c225}{m\+\_\+test\+Groups}}
+\item 
+std\+::vector$<$ std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a6480567a0eff5f984f95458b4a96d787}{Test\+Run\+Node}} $>$ $>$ \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a6ef3e2abd8ff6e8187e3761bff85ae69}{m\+\_\+test\+Runs}}
+\item 
+std\+::shared\+\_\+ptr$<$ Section\+Node $>$ \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a35587696a4f2f1568da6b10c978e78d4}{m\+\_\+root\+Section}}
+\item 
+std\+::shared\+\_\+ptr$<$ Section\+Node $>$ \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a0b30dfcc3ea5b7f063109a7f1ef78b5f}{m\+\_\+deepest\+Section}}
+\item 
+std\+::vector$<$ std\+::shared\+\_\+ptr$<$ Section\+Node $>$ $>$ \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_ae786938c43bd980fa5ea70f59dc520d7}{m\+\_\+section\+Stack}}
+\item 
+\mbox{\hyperlink{struct_catch_1_1_reporter_preferences}{Reporter\+Preferences}} \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a397bbd433fe1062e43b418ffe4c39c49}{m\+\_\+reporter\+Prefs}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Public Types inherited from \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base}{Catch\+::\+Cumulative\+Reporter\+Base$<$ Junit\+Reporter $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_aaa25c59c56acf15cdab3d622ce3b9c96}{Test\+Case\+Node}}
+\item 
+using \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a0d18cb91a442f50c12f32cbb61e701d1}{Test\+Group\+Node}}
+\item 
+using \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a6480567a0eff5f984f95458b4a96d787}{Test\+Run\+Node}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__junit_8h_source_l00017}{17}} of file \mbox{\hyperlink{catch__reporter__junit_8h_source}{catch\+\_\+reporter\+\_\+junit.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_catch_1_1_junit_reporter_a36f825f13c7216a9244ecf8067e00207}\index{Catch::JunitReporter@{Catch::JunitReporter}!JunitReporter@{JunitReporter}}
+\index{JunitReporter@{JunitReporter}!Catch::JunitReporter@{Catch::JunitReporter}}
+\doxysubsubsection{\texorpdfstring{JunitReporter()}{JunitReporter()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_junit_reporter_a36f825f13c7216a9244ecf8067e00207} 
+Catch\+::\+Junit\+Reporter\+::\+Junit\+Reporter (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_reporter_config}{Reporter\+Config}} const \&}]{\+\_\+config}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__junit_8cpp_source_l00060}{60}} of file \mbox{\hyperlink{catch__reporter__junit_8cpp_source}{catch\+\_\+reporter\+\_\+junit.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ :\ \ \ \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_ad51e1c1fcdd79b4a6db911f0af104ff5}{CumulativeReporterBase}}(\ \_config\ ),}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_junit_reporter_af231b6bde7a01a85ff595ee7036c1ba3}{xml}}(\ \_config.stream()\ )}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a397bbd433fe1062e43b418ffe4c39c49}{m\_reporterPrefs}}.\mbox{\hyperlink{struct_catch_1_1_reporter_preferences_a434511c4080edbbc12e0d1c31ea14769}{shouldRedirectStdOut}}\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a397bbd433fe1062e43b418ffe4c39c49}{m\_reporterPrefs}}.\mbox{\hyperlink{struct_catch_1_1_reporter_preferences_a10e13e10dfdc9a97dde0a72c573d7419}{shouldReportAllAssertions}}\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_junit_reporter_a89248f3a387a71c90e5750b2763dea92}\index{Catch::JunitReporter@{Catch::JunitReporter}!````~JunitReporter@{\texorpdfstring{$\sim$}{\string~}JunitReporter}}
+\index{````~JunitReporter@{\texorpdfstring{$\sim$}{\string~}JunitReporter}!Catch::JunitReporter@{Catch::JunitReporter}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}JunitReporter()}{\string~JunitReporter()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_junit_reporter_a89248f3a387a71c90e5750b2763dea92} 
+Catch\+::\+Junit\+Reporter\+::\texorpdfstring{$\sim$}{\string~}\+Junit\+Reporter (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__junit_8cpp_source_l00068}{68}} of file \mbox{\hyperlink{catch__reporter__junit_8cpp_source}{catch\+\_\+reporter\+\_\+junit.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00068\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_catch_1_1_junit_reporter_afcd8fb806f6ba5295ecd86985b3ac1df}\index{Catch::JunitReporter@{Catch::JunitReporter}!assertionEnded@{assertionEnded}}
+\index{assertionEnded@{assertionEnded}!Catch::JunitReporter@{Catch::JunitReporter}}
+\doxysubsubsection{\texorpdfstring{assertionEnded()}{assertionEnded()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_junit_reporter_afcd8fb806f6ba5295ecd86985b3ac1df} 
+bool Catch\+::\+Junit\+Reporter\+::assertion\+Ended (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_assertion_stats}{Assertion\+Stats}} const \&}]{assertion\+Stats}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_ad64bc50fc91ce50f3ecbfc0de5de6e2c}{Catch\+::\+Cumulative\+Reporter\+Base$<$ Junit\+Reporter $>$}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__junit_8cpp_source_l00093}{93}} of file \mbox{\hyperlink{catch__reporter__junit_8cpp_source}{catch\+\_\+reporter\+\_\+junit.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ assertionStats.assertionResult.getResultType()\ ==\ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa765782e127faff9d9796388edb4d7fcd}{ResultWas::ThrewException}}\ \&\&\ !\mbox{\hyperlink{class_catch_1_1_junit_reporter_a85294c341a998b2488ea1951baa8b4a6}{m\_okToFail}}\ )}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_junit_reporter_ae8028373148d6190b8c3cdf4a62e8565}{unexpectedExceptions}}++;}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_ad64bc50fc91ce50f3ecbfc0de5de6e2c}{CumulativeReporterBase::assertionEnded}}(\ assertionStats\ );}
+\DoxyCodeLine{00097\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_junit_reporter_afcd8fb806f6ba5295ecd86985b3ac1df_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_junit_reporter_ae5f1a7cac555d694ef27fbcc8f78d964}\index{Catch::JunitReporter@{Catch::JunitReporter}!getDescription@{getDescription}}
+\index{getDescription@{getDescription}!Catch::JunitReporter@{Catch::JunitReporter}}
+\doxysubsubsection{\texorpdfstring{getDescription()}{getDescription()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_junit_reporter_ae5f1a7cac555d694ef27fbcc8f78d964} 
+std\+::string Catch\+::\+Junit\+Reporter\+::get\+Description (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__junit_8cpp_source_l00070}{70}} of file \mbox{\hyperlink{catch__reporter__junit_8cpp_source}{catch\+\_\+reporter\+\_\+junit.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Reports\ test\ results\ in\ an\ XML\ format\ that\ looks\ like\ Ant's\ junitreport\ target"{}};}
+\DoxyCodeLine{00072\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_junit_reporter_adc452888bb18f416fd7c1b74bca6ee14}\index{Catch::JunitReporter@{Catch::JunitReporter}!noMatchingTestCases@{noMatchingTestCases}}
+\index{noMatchingTestCases@{noMatchingTestCases}!Catch::JunitReporter@{Catch::JunitReporter}}
+\doxysubsubsection{\texorpdfstring{noMatchingTestCases()}{noMatchingTestCases()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_junit_reporter_adc452888bb18f416fd7c1b74bca6ee14} 
+void Catch\+::\+Junit\+Reporter\+::no\+Matching\+Test\+Cases (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter_aaa0ea1d8250b48fafc8d36f86e6d1d80}{Catch\+::\+IStreaming\+Reporter}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__junit_8cpp_source_l00074}{74}} of file \mbox{\hyperlink{catch__reporter__junit_8cpp_source}{catch\+\_\+reporter\+\_\+junit.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00074\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_junit_reporter_ad04704cfa67f64ca6bf540e9cbe108f4}\index{Catch::JunitReporter@{Catch::JunitReporter}!testCaseEnded@{testCaseEnded}}
+\index{testCaseEnded@{testCaseEnded}!Catch::JunitReporter@{Catch::JunitReporter}}
+\doxysubsubsection{\texorpdfstring{testCaseEnded()}{testCaseEnded()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_junit_reporter_ad04704cfa67f64ca6bf540e9cbe108f4} 
+void Catch\+::\+Junit\+Reporter\+::test\+Case\+Ended (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_test_case_stats}{Test\+Case\+Stats}} const \&}]{test\+Case\+Stats}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a74282d5b47c5994e0337b1bebce21ee4}{Catch\+::\+Cumulative\+Reporter\+Base$<$ Junit\+Reporter $>$}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__junit_8cpp_source_l00099}{99}} of file \mbox{\hyperlink{catch__reporter__junit_8cpp_source}{catch\+\_\+reporter\+\_\+junit.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_junit_reporter_a25402dec57e499d4c87738b392415b64}{stdOutForSuite}}\ +=\ testCaseStats.stdOut;}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_junit_reporter_a1efe5ba1ad030a9c7b79e40d1ad1eda0}{stdErrForSuite}}\ +=\ testCaseStats.stdErr;}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a74282d5b47c5994e0337b1bebce21ee4}{CumulativeReporterBase::testCaseEnded}}(\ testCaseStats\ );}
+\DoxyCodeLine{00103\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_junit_reporter_ad04704cfa67f64ca6bf540e9cbe108f4_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_junit_reporter_a1e099029f5c138d5bcda0fdd184ef3ee}\index{Catch::JunitReporter@{Catch::JunitReporter}!testCaseStarting@{testCaseStarting}}
+\index{testCaseStarting@{testCaseStarting}!Catch::JunitReporter@{Catch::JunitReporter}}
+\doxysubsubsection{\texorpdfstring{testCaseStarting()}{testCaseStarting()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_junit_reporter_a1e099029f5c138d5bcda0fdd184ef3ee} 
+void Catch\+::\+Junit\+Reporter\+::test\+Case\+Starting (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_test_case_info}{Test\+Case\+Info}} const \&}]{test\+Case\+Info}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a5ac5bcd607982d0a33829893ea6963c9}{Catch\+::\+Cumulative\+Reporter\+Base$<$ Junit\+Reporter $>$}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__junit_8cpp_source_l00089}{89}} of file \mbox{\hyperlink{catch__reporter__junit_8cpp_source}{catch\+\_\+reporter\+\_\+junit.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_junit_reporter_a85294c341a998b2488ea1951baa8b4a6}{m\_okToFail}}\ =\ testCaseInfo.okToFail();}
+\DoxyCodeLine{00091\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=330pt]{class_catch_1_1_junit_reporter_a1e099029f5c138d5bcda0fdd184ef3ee_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_junit_reporter_aa91e71b824c3a7733993821668fe7e6e}\index{Catch::JunitReporter@{Catch::JunitReporter}!testGroupEnded@{testGroupEnded}}
+\index{testGroupEnded@{testGroupEnded}!Catch::JunitReporter@{Catch::JunitReporter}}
+\doxysubsubsection{\texorpdfstring{testGroupEnded()}{testGroupEnded()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_junit_reporter_aa91e71b824c3a7733993821668fe7e6e} 
+void Catch\+::\+Junit\+Reporter\+::test\+Group\+Ended (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_test_group_stats}{Test\+Group\+Stats}} const \&}]{test\+Group\+Stats}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a7e33466bcd3a32923d8808bcc0fe9fe7}{Catch\+::\+Cumulative\+Reporter\+Base$<$ Junit\+Reporter $>$}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__junit_8cpp_source_l00105}{105}} of file \mbox{\hyperlink{catch__reporter__junit_8cpp_source}{catch\+\_\+reporter\+\_\+junit.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ suiteTime\ =\ \mbox{\hyperlink{class_catch_1_1_junit_reporter_a20417e9762efdad95d1a5c68d08f74c1}{suiteTimer}}.\mbox{\hyperlink{class_catch_1_1_timer_a065e37e3c9eb16bd4dcf41971d8deedc}{getElapsedSeconds}}();}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a7e33466bcd3a32923d8808bcc0fe9fe7}{CumulativeReporterBase::testGroupEnded}}(\ testGroupStats\ );}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_junit_reporter_a13caa24a5b9bcfdb398702fe3146e066}{writeGroup}}(\ *\mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a8f368439d89460c1c583037dcb18c225}{m\_testGroups}}.back(),\ suiteTime\ );}
+\DoxyCodeLine{00109\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_junit_reporter_aa91e71b824c3a7733993821668fe7e6e_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_junit_reporter_a40421d8e1a8a6498cc302595c35cfed5}\index{Catch::JunitReporter@{Catch::JunitReporter}!testGroupStarting@{testGroupStarting}}
+\index{testGroupStarting@{testGroupStarting}!Catch::JunitReporter@{Catch::JunitReporter}}
+\doxysubsubsection{\texorpdfstring{testGroupStarting()}{testGroupStarting()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_junit_reporter_a40421d8e1a8a6498cc302595c35cfed5} 
+void Catch\+::\+Junit\+Reporter\+::test\+Group\+Starting (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_group_info}{Group\+Info}} const \&}]{group\+Info}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a2422d4701dd7796d1c60dfb90a99b9d0}{Catch\+::\+Cumulative\+Reporter\+Base$<$ Junit\+Reporter $>$}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__junit_8cpp_source_l00081}{81}} of file \mbox{\hyperlink{catch__reporter__junit_8cpp_source}{catch\+\_\+reporter\+\_\+junit.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_junit_reporter_a20417e9762efdad95d1a5c68d08f74c1}{suiteTimer}}.\mbox{\hyperlink{class_catch_1_1_timer_a0a56e879e43f36c102bf9ea8b5fc8b72}{start}}();}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_junit_reporter_a25402dec57e499d4c87738b392415b64}{stdOutForSuite}}.clear();}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_junit_reporter_a1efe5ba1ad030a9c7b79e40d1ad1eda0}{stdErrForSuite}}.clear();}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_junit_reporter_ae8028373148d6190b8c3cdf4a62e8565}{unexpectedExceptions}}\ =\ 0;}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a2422d4701dd7796d1c60dfb90a99b9d0}{CumulativeReporterBase::testGroupStarting}}(\ groupInfo\ );}
+\DoxyCodeLine{00087\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_junit_reporter_a40421d8e1a8a6498cc302595c35cfed5_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_junit_reporter_a529ba203e91db27821519f8c41ac7905}\index{Catch::JunitReporter@{Catch::JunitReporter}!testRunEndedCumulative@{testRunEndedCumulative}}
+\index{testRunEndedCumulative@{testRunEndedCumulative}!Catch::JunitReporter@{Catch::JunitReporter}}
+\doxysubsubsection{\texorpdfstring{testRunEndedCumulative()}{testRunEndedCumulative()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_junit_reporter_a529ba203e91db27821519f8c41ac7905} 
+void Catch\+::\+Junit\+Reporter\+::test\+Run\+Ended\+Cumulative (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a71dae102874b1950ad7c686d5efd66b7}{Catch\+::\+Cumulative\+Reporter\+Base$<$ Junit\+Reporter $>$}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__junit_8cpp_source_l00111}{111}} of file \mbox{\hyperlink{catch__reporter__junit_8cpp_source}{catch\+\_\+reporter\+\_\+junit.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_junit_reporter_af231b6bde7a01a85ff595ee7036c1ba3}{xml}}.\mbox{\hyperlink{class_catch_1_1_xml_writer_a8fcaa0821b6c2c1750c654af0b33c823}{endElement}}();}
+\DoxyCodeLine{00113\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_junit_reporter_a529ba203e91db27821519f8c41ac7905_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_junit_reporter_a416da4586bd135749eea5adc8aa41280}\index{Catch::JunitReporter@{Catch::JunitReporter}!testRunStarting@{testRunStarting}}
+\index{testRunStarting@{testRunStarting}!Catch::JunitReporter@{Catch::JunitReporter}}
+\doxysubsubsection{\texorpdfstring{testRunStarting()}{testRunStarting()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_junit_reporter_a416da4586bd135749eea5adc8aa41280} 
+void Catch\+::\+Junit\+Reporter\+::test\+Run\+Starting (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_test_run_info}{Test\+Run\+Info}} const \&}]{run\+Info}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a99061d05f2f9e162989f616c68670dbb}{Catch\+::\+Cumulative\+Reporter\+Base$<$ Junit\+Reporter $>$}}.
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__junit_8cpp_source_l00076}{76}} of file \mbox{\hyperlink{catch__reporter__junit_8cpp_source}{catch\+\_\+reporter\+\_\+junit.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a99061d05f2f9e162989f616c68670dbb}{CumulativeReporterBase::testRunStarting}}(\ runInfo\ );}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_junit_reporter_af231b6bde7a01a85ff595ee7036c1ba3}{xml}}.\mbox{\hyperlink{class_catch_1_1_xml_writer_a6114b9d8038cd4f159ccd016f12d4992}{startElement}}(\ \textcolor{stringliteral}{"{}testsuites"{}}\ );}
+\DoxyCodeLine{00079\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_junit_reporter_a416da4586bd135749eea5adc8aa41280_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_junit_reporter_a5f357b138781615261724e3271600aaa}\index{Catch::JunitReporter@{Catch::JunitReporter}!writeAssertion@{writeAssertion}}
+\index{writeAssertion@{writeAssertion}!Catch::JunitReporter@{Catch::JunitReporter}}
+\doxysubsubsection{\texorpdfstring{writeAssertion()}{writeAssertion()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_junit_reporter_a5f357b138781615261724e3271600aaa} 
+void Catch\+::\+Junit\+Reporter\+::write\+Assertion (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_assertion_stats}{Assertion\+Stats}} const \&}]{stats}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__junit_8cpp_source_l00215}{215}} of file \mbox{\hyperlink{catch__reporter__junit_8cpp_source}{catch\+\_\+reporter\+\_\+junit.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ AssertionResult\ \textcolor{keyword}{const}\&\ result\ =\ stats.assertionResult;}
+\DoxyCodeLine{00217\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !result.isOk()\ )\ \{}
+\DoxyCodeLine{00218\ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ elementName;}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(\ result.getResultType()\ )\ \{}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa765782e127faff9d9796388edb4d7fcd}{ResultWas::ThrewException}}:}
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efac7f0c2afadf75d1d24bf8729ebd32cee}{ResultWas::FatalErrorCondition}}:}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ elementName\ =\ \textcolor{stringliteral}{"{}error"{}};}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa0c08e9a7cc2a689bfb86ca3a6cfc6444}{ResultWas::ExplicitFailure}}:}
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ elementName\ =\ \textcolor{stringliteral}{"{}failure"{}};}
+\DoxyCodeLine{00226\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00227\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efac7062ac2bdea77a68bac4675c4315570}{ResultWas::ExpressionFailed}}:}
+\DoxyCodeLine{00228\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ elementName\ =\ \textcolor{stringliteral}{"{}failure"{}};}
+\DoxyCodeLine{00229\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00230\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa982f9c220de9fb76881da3bbf22b1a85}{ResultWas::DidntThrowException}}:}
+\DoxyCodeLine{00231\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ elementName\ =\ \textcolor{stringliteral}{"{}failure"{}};}
+\DoxyCodeLine{00232\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00233\ }
+\DoxyCodeLine{00234\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ We\ should\ never\ see\ these\ here:}}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efae8d83c08b4e070286dd95134ad2152bb}{ResultWas::Info}}:}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa22806493991ee90456cfbd973ae8d1ab}{ResultWas::Warning}}:}
+\DoxyCodeLine{00237\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efacff2783ae5a0ec92d7907d55233aa695}{ResultWas::Ok}}:}
+\DoxyCodeLine{00238\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa18b7bfef24524824dc1acf3ff5bccd9e}{ResultWas::Unknown}}:}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efadbb05c8a5a093c8ca0926c22ba34a6cc}{ResultWas::FailureBit}}:}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efa94b8ecf31cd791e2e4ddc46f25e3aaf4}{ResultWas::Exception}}:}
+\DoxyCodeLine{00241\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ elementName\ =\ \textcolor{stringliteral}{"{}internalError"{}};}
+\DoxyCodeLine{00242\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00243\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00244\ }
+\DoxyCodeLine{00245\ \ \ \ \ \ \ \ \ \ \ \ \ XmlWriter::ScopedElement\ e\ =\ \mbox{\hyperlink{class_catch_1_1_junit_reporter_af231b6bde7a01a85ff595ee7036c1ba3}{xml}}.\mbox{\hyperlink{class_catch_1_1_xml_writer_a48f1a53e3255938813ff91f9fec9b690}{scopedElement}}(\ elementName\ );}
+\DoxyCodeLine{00246\ }
+\DoxyCodeLine{00247\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_junit_reporter_af231b6bde7a01a85ff595ee7036c1ba3}{xml}}.\mbox{\hyperlink{class_catch_1_1_xml_writer_ad433310b59d30e0fedc7130dc11c563b}{writeAttribute}}(\ \textcolor{stringliteral}{"{}message"{}},\ result.getExpandedExpression()\ );}
+\DoxyCodeLine{00248\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_junit_reporter_af231b6bde7a01a85ff595ee7036c1ba3}{xml}}.\mbox{\hyperlink{class_catch_1_1_xml_writer_ad433310b59d30e0fedc7130dc11c563b}{writeAttribute}}(\ \textcolor{stringliteral}{"{}type"{}},\ result.getTestMacroName()\ );}
+\DoxyCodeLine{00249\ }
+\DoxyCodeLine{00250\ \ \ \ \ \ \ \ \ \ \ \ \ ReusableStringStream\ rss;}
+\DoxyCodeLine{00251\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !result.getMessage().empty()\ )}
+\DoxyCodeLine{00252\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ rss\ <<\ result.getMessage()\ <<\ \textcolor{charliteral}{'\(\backslash\)n'};}
+\DoxyCodeLine{00253\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\ \textcolor{keyword}{const}\&\ msg\ :\ stats.infoMessages\ )}
+\DoxyCodeLine{00254\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ msg.type\ ==\ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efae8d83c08b4e070286dd95134ad2152bb}{ResultWas::Info}}\ )}
+\DoxyCodeLine{00255\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ rss\ <<\ msg.message\ <<\ \textcolor{charliteral}{'\(\backslash\)n'};}
+\DoxyCodeLine{00256\ }
+\DoxyCodeLine{00257\ \ \ \ \ \ \ \ \ \ \ \ \ rss\ <<\ \textcolor{stringliteral}{"{}at\ "{}}\ <<\ result.getSourceInfo();}
+\DoxyCodeLine{00258\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_junit_reporter_af231b6bde7a01a85ff595ee7036c1ba3}{xml}}.\mbox{\hyperlink{class_catch_1_1_xml_writer_a4c49775bdf7b5bd870b34ab22af62a9c}{writeText}}(\ rss.str(),\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{00259\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00260\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_junit_reporter_a5f357b138781615261724e3271600aaa_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_junit_reporter_a5f357b138781615261724e3271600aaa_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_junit_reporter_ace9a2e3a52dee4591e8dc9ed7b82b5ff}\index{Catch::JunitReporter@{Catch::JunitReporter}!writeAssertions@{writeAssertions}}
+\index{writeAssertions@{writeAssertions}!Catch::JunitReporter@{Catch::JunitReporter}}
+\doxysubsubsection{\texorpdfstring{writeAssertions()}{writeAssertions()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_junit_reporter_ace9a2e3a52dee4591e8dc9ed7b82b5ff} 
+void Catch\+::\+Junit\+Reporter\+::write\+Assertions (\begin{DoxyParamCaption}\item[{Section\+Node const \&}]{section\+Node}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__junit_8cpp_source_l00210}{210}} of file \mbox{\hyperlink{catch__reporter__junit_8cpp_source}{catch\+\_\+reporter\+\_\+junit.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\ \textcolor{keyword}{const}\&\ assertion\ :\ sectionNode.assertions\ )}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_junit_reporter_a5f357b138781615261724e3271600aaa}{writeAssertion}}(\ assertion\ );}
+\DoxyCodeLine{00213\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_junit_reporter_ace9a2e3a52dee4591e8dc9ed7b82b5ff_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_junit_reporter_ace9a2e3a52dee4591e8dc9ed7b82b5ff_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_junit_reporter_a13caa24a5b9bcfdb398702fe3146e066}\index{Catch::JunitReporter@{Catch::JunitReporter}!writeGroup@{writeGroup}}
+\index{writeGroup@{writeGroup}!Catch::JunitReporter@{Catch::JunitReporter}}
+\doxysubsubsection{\texorpdfstring{writeGroup()}{writeGroup()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_junit_reporter_a13caa24a5b9bcfdb398702fe3146e066} 
+void Catch\+::\+Junit\+Reporter\+::write\+Group (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a0d18cb91a442f50c12f32cbb61e701d1}{Test\+Group\+Node}} const \&}]{group\+Node}{, }\item[{double}]{suite\+Time}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__junit_8cpp_source_l00115}{115}} of file \mbox{\hyperlink{catch__reporter__junit_8cpp_source}{catch\+\_\+reporter\+\_\+junit.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ XmlWriter::ScopedElement\ e\ =\ \mbox{\hyperlink{class_catch_1_1_junit_reporter_af231b6bde7a01a85ff595ee7036c1ba3}{xml}}.\mbox{\hyperlink{class_catch_1_1_xml_writer_a48f1a53e3255938813ff91f9fec9b690}{scopedElement}}(\ \textcolor{stringliteral}{"{}testsuite"{}}\ );}
+\DoxyCodeLine{00117\ }
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ TestGroupStats\ \textcolor{keyword}{const}\&\ stats\ =\ groupNode.value;}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_junit_reporter_af231b6bde7a01a85ff595ee7036c1ba3}{xml}}.\mbox{\hyperlink{class_catch_1_1_xml_writer_ad433310b59d30e0fedc7130dc11c563b}{writeAttribute}}(\ \textcolor{stringliteral}{"{}name"{}},\ stats.groupInfo.name\ );}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_junit_reporter_af231b6bde7a01a85ff595ee7036c1ba3}{xml}}.\mbox{\hyperlink{class_catch_1_1_xml_writer_ad433310b59d30e0fedc7130dc11c563b}{writeAttribute}}(\ \textcolor{stringliteral}{"{}errors"{}},\ \mbox{\hyperlink{class_catch_1_1_junit_reporter_ae8028373148d6190b8c3cdf4a62e8565}{unexpectedExceptions}}\ );}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_junit_reporter_af231b6bde7a01a85ff595ee7036c1ba3}{xml}}.\mbox{\hyperlink{class_catch_1_1_xml_writer_ad433310b59d30e0fedc7130dc11c563b}{writeAttribute}}(\ \textcolor{stringliteral}{"{}failures"{}},\ stats.totals.assertions.failed-\/\mbox{\hyperlink{class_catch_1_1_junit_reporter_ae8028373148d6190b8c3cdf4a62e8565}{unexpectedExceptions}}\ );}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_junit_reporter_af231b6bde7a01a85ff595ee7036c1ba3}{xml}}.\mbox{\hyperlink{class_catch_1_1_xml_writer_ad433310b59d30e0fedc7130dc11c563b}{writeAttribute}}(\ \textcolor{stringliteral}{"{}tests"{}},\ stats.totals.assertions.total()\ );}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_junit_reporter_af231b6bde7a01a85ff595ee7036c1ba3}{xml}}.\mbox{\hyperlink{class_catch_1_1_xml_writer_ad433310b59d30e0fedc7130dc11c563b}{writeAttribute}}(\ \textcolor{stringliteral}{"{}hostname"{}},\ \textcolor{stringliteral}{"{}tbd"{}}\ );\ \textcolor{comment}{//\ !TBD}}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a2f9067f97068a6b92def5463f6ff483a}{m\_config}}-\/>showDurations()\ ==\ \mbox{\hyperlink{struct_catch_1_1_show_durations_a82fa0174554187220c1eda175f122ee1afc4d0bcc3cfc91c312329d4a53fbf906}{ShowDurations::Never}}\ )}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_junit_reporter_af231b6bde7a01a85ff595ee7036c1ba3}{xml}}.\mbox{\hyperlink{class_catch_1_1_xml_writer_ad433310b59d30e0fedc7130dc11c563b}{writeAttribute}}(\ \textcolor{stringliteral}{"{}time"{}},\ \textcolor{stringliteral}{"{}"{}}\ );}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_junit_reporter_af231b6bde7a01a85ff595ee7036c1ba3}{xml}}.\mbox{\hyperlink{class_catch_1_1_xml_writer_ad433310b59d30e0fedc7130dc11c563b}{writeAttribute}}(\ \textcolor{stringliteral}{"{}time"{}},\ suiteTime\ );}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_junit_reporter_af231b6bde7a01a85ff595ee7036c1ba3}{xml}}.\mbox{\hyperlink{class_catch_1_1_xml_writer_ad433310b59d30e0fedc7130dc11c563b}{writeAttribute}}(\ \textcolor{stringliteral}{"{}timestamp"{}},\ getCurrentTimestamp()\ );}
+\DoxyCodeLine{00129\ }
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Write\ properties\ if\ there\ are\ any}}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a2f9067f97068a6b92def5463f6ff483a}{m\_config}}-\/>hasTestFilters()\ ||\ \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a2f9067f97068a6b92def5463f6ff483a}{m\_config}}-\/>rngSeed()\ !=\ 0)\ \{}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ properties\ =\ \mbox{\hyperlink{class_catch_1_1_junit_reporter_af231b6bde7a01a85ff595ee7036c1ba3}{xml}}.\mbox{\hyperlink{class_catch_1_1_xml_writer_a48f1a53e3255938813ff91f9fec9b690}{scopedElement}}(\textcolor{stringliteral}{"{}properties"{}});}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a2f9067f97068a6b92def5463f6ff483a}{m\_config}}-\/>hasTestFilters())\ \{}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_junit_reporter_af231b6bde7a01a85ff595ee7036c1ba3}{xml}}.\mbox{\hyperlink{class_catch_1_1_xml_writer_a48f1a53e3255938813ff91f9fec9b690}{scopedElement}}(\textcolor{stringliteral}{"{}property"{}})}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .\mbox{\hyperlink{class_catch_1_1_xml_writer_1_1_scoped_element_a33b1fe4123c56d644abe8f4cab3edb45}{writeAttribute}}(\textcolor{stringliteral}{"{}name"{}},\ \textcolor{stringliteral}{"{}filters"{}})}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .\mbox{\hyperlink{class_catch_1_1_xml_writer_1_1_scoped_element_a33b1fe4123c56d644abe8f4cab3edb45}{writeAttribute}}(\textcolor{stringliteral}{"{}value"{}},\ \mbox{\hyperlink{namespace_catch_a517007deae24c241b3402b4433160a9b}{serializeFilters}}(\mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a2f9067f97068a6b92def5463f6ff483a}{m\_config}}-\/>getTestsOrTags()));}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a2f9067f97068a6b92def5463f6ff483a}{m\_config}}-\/>rngSeed()\ !=\ 0)\ \{}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_junit_reporter_af231b6bde7a01a85ff595ee7036c1ba3}{xml}}.\mbox{\hyperlink{class_catch_1_1_xml_writer_a48f1a53e3255938813ff91f9fec9b690}{scopedElement}}(\textcolor{stringliteral}{"{}property"{}})}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .\mbox{\hyperlink{class_catch_1_1_xml_writer_1_1_scoped_element_a33b1fe4123c56d644abe8f4cab3edb45}{writeAttribute}}(\textcolor{stringliteral}{"{}name"{}},\ \textcolor{stringliteral}{"{}random-\/seed"{}})}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .\mbox{\hyperlink{class_catch_1_1_xml_writer_1_1_scoped_element_a33b1fe4123c56d644abe8f4cab3edb45}{writeAttribute}}(\textcolor{stringliteral}{"{}value"{}},\ \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a2f9067f97068a6b92def5463f6ff483a}{m\_config}}-\/>rngSeed());}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00144\ }
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Write\ test\ cases}}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\ \textcolor{keyword}{const}\&\ child\ :\ groupNode.children\ )}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_junit_reporter_ae0b70c4ea05bd99d8be6727e27b8dd71}{writeTestCase}}(\ *child\ );}
+\DoxyCodeLine{00148\ }
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_junit_reporter_af231b6bde7a01a85ff595ee7036c1ba3}{xml}}.\mbox{\hyperlink{class_catch_1_1_xml_writer_a48f1a53e3255938813ff91f9fec9b690}{scopedElement}}(\ \textcolor{stringliteral}{"{}system-\/out"{}}\ ).\mbox{\hyperlink{class_catch_1_1_xml_writer_1_1_scoped_element_a189c87f530ce85304ce4e1075609d2f5}{writeText}}(\ \mbox{\hyperlink{namespace_catch_a084108b47f37d8bfd5db51c50c7451b3}{trim}}(\ \mbox{\hyperlink{class_catch_1_1_junit_reporter_a25402dec57e499d4c87738b392415b64}{stdOutForSuite}}\ ),\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_junit_reporter_af231b6bde7a01a85ff595ee7036c1ba3}{xml}}.\mbox{\hyperlink{class_catch_1_1_xml_writer_a48f1a53e3255938813ff91f9fec9b690}{scopedElement}}(\ \textcolor{stringliteral}{"{}system-\/err"{}}\ ).\mbox{\hyperlink{class_catch_1_1_xml_writer_1_1_scoped_element_a189c87f530ce85304ce4e1075609d2f5}{writeText}}(\ \mbox{\hyperlink{namespace_catch_a084108b47f37d8bfd5db51c50c7451b3}{trim}}(\ \mbox{\hyperlink{class_catch_1_1_junit_reporter_a1efe5ba1ad030a9c7b79e40d1ad1eda0}{stdErrForSuite}}\ ),\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{00151\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_junit_reporter_a13caa24a5b9bcfdb398702fe3146e066_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=330pt]{class_catch_1_1_junit_reporter_a13caa24a5b9bcfdb398702fe3146e066_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_junit_reporter_a8dcc9668b6f52aeb23cc479b835f681f}\index{Catch::JunitReporter@{Catch::JunitReporter}!writeSection@{writeSection}}
+\index{writeSection@{writeSection}!Catch::JunitReporter@{Catch::JunitReporter}}
+\doxysubsubsection{\texorpdfstring{writeSection()}{writeSection()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_junit_reporter_a8dcc9668b6f52aeb23cc479b835f681f} 
+void Catch\+::\+Junit\+Reporter\+::write\+Section (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{class\+Name}{, }\item[{std\+::string const \&}]{root\+Name}{, }\item[{Section\+Node const \&}]{section\+Node}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__junit_8cpp_source_l00175}{175}} of file \mbox{\hyperlink{catch__reporter__junit_8cpp_source}{catch\+\_\+reporter\+\_\+junit.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ std::string\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ =\ \mbox{\hyperlink{namespace_catch_a084108b47f37d8bfd5db51c50c7451b3}{trim}}(\ sectionNode.stats.sectionInfo.name\ );}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !rootName.empty()\ )}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ =\ rootName\ +\ \textcolor{charliteral}{'/'}\ +\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}};}
+\DoxyCodeLine{00181\ }
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !sectionNode.assertions.empty()\ ||}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \ \ \ \ \ \ !sectionNode.stdOut.empty()\ ||}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ \ \ \ \ !sectionNode.stdErr.empty()\ )\ \{}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \ \ \ \ \ \ XmlWriter::ScopedElement\ e\ =\ \mbox{\hyperlink{class_catch_1_1_junit_reporter_af231b6bde7a01a85ff595ee7036c1ba3}{xml}}.\mbox{\hyperlink{class_catch_1_1_xml_writer_a48f1a53e3255938813ff91f9fec9b690}{scopedElement}}(\ \textcolor{stringliteral}{"{}testcase"{}}\ );}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ className.empty()\ )\ \{}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_junit_reporter_af231b6bde7a01a85ff595ee7036c1ba3}{xml}}.\mbox{\hyperlink{class_catch_1_1_xml_writer_ad433310b59d30e0fedc7130dc11c563b}{writeAttribute}}(\ \textcolor{stringliteral}{"{}classname"{}},\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ );}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_junit_reporter_af231b6bde7a01a85ff595ee7036c1ba3}{xml}}.\mbox{\hyperlink{class_catch_1_1_xml_writer_ad433310b59d30e0fedc7130dc11c563b}{writeAttribute}}(\ \textcolor{stringliteral}{"{}name"{}},\ \textcolor{stringliteral}{"{}root"{}}\ );}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_junit_reporter_af231b6bde7a01a85ff595ee7036c1ba3}{xml}}.\mbox{\hyperlink{class_catch_1_1_xml_writer_ad433310b59d30e0fedc7130dc11c563b}{writeAttribute}}(\ \textcolor{stringliteral}{"{}classname"{}},\ className\ );}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_junit_reporter_af231b6bde7a01a85ff595ee7036c1ba3}{xml}}.\mbox{\hyperlink{class_catch_1_1_xml_writer_ad433310b59d30e0fedc7130dc11c563b}{writeAttribute}}(\ \textcolor{stringliteral}{"{}name"{}},\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ );}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_junit_reporter_af231b6bde7a01a85ff595ee7036c1ba3}{xml}}.\mbox{\hyperlink{class_catch_1_1_xml_writer_ad433310b59d30e0fedc7130dc11c563b}{writeAttribute}}(\ \textcolor{stringliteral}{"{}time"{}},\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{::Catch::Detail::stringify}}(\ sectionNode.stats.durationInSeconds\ )\ );}
+\DoxyCodeLine{00195\ }
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_junit_reporter_ace9a2e3a52dee4591e8dc9ed7b82b5ff}{writeAssertions}}(\ sectionNode\ );}
+\DoxyCodeLine{00197\ }
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !sectionNode.stdOut.empty()\ )}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_junit_reporter_af231b6bde7a01a85ff595ee7036c1ba3}{xml}}.\mbox{\hyperlink{class_catch_1_1_xml_writer_a48f1a53e3255938813ff91f9fec9b690}{scopedElement}}(\ \textcolor{stringliteral}{"{}system-\/out"{}}\ ).\mbox{\hyperlink{class_catch_1_1_xml_writer_1_1_scoped_element_a189c87f530ce85304ce4e1075609d2f5}{writeText}}(\ \mbox{\hyperlink{namespace_catch_a084108b47f37d8bfd5db51c50c7451b3}{trim}}(\ sectionNode.stdOut\ ),\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !sectionNode.stdErr.empty()\ )}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_junit_reporter_af231b6bde7a01a85ff595ee7036c1ba3}{xml}}.\mbox{\hyperlink{class_catch_1_1_xml_writer_a48f1a53e3255938813ff91f9fec9b690}{scopedElement}}(\ \textcolor{stringliteral}{"{}system-\/err"{}}\ ).\mbox{\hyperlink{class_catch_1_1_xml_writer_1_1_scoped_element_a189c87f530ce85304ce4e1075609d2f5}{writeText}}(\ \mbox{\hyperlink{namespace_catch_a084108b47f37d8bfd5db51c50c7451b3}{trim}}(\ sectionNode.stdErr\ ),\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\ \textcolor{keyword}{const}\&\ childNode\ :\ sectionNode.childSections\ )}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ className.empty()\ )}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_junit_reporter_a8dcc9668b6f52aeb23cc479b835f681f}{writeSection}}(\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ \textcolor{stringliteral}{"{}"{}},\ *childNode\ );}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_junit_reporter_a8dcc9668b6f52aeb23cc479b835f681f}{writeSection}}(\ className,\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ *childNode\ );}
+\DoxyCodeLine{00208\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_junit_reporter_a8dcc9668b6f52aeb23cc479b835f681f_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_junit_reporter_a8dcc9668b6f52aeb23cc479b835f681f_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_junit_reporter_ae0b70c4ea05bd99d8be6727e27b8dd71}\index{Catch::JunitReporter@{Catch::JunitReporter}!writeTestCase@{writeTestCase}}
+\index{writeTestCase@{writeTestCase}!Catch::JunitReporter@{Catch::JunitReporter}}
+\doxysubsubsection{\texorpdfstring{writeTestCase()}{writeTestCase()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_junit_reporter_ae0b70c4ea05bd99d8be6727e27b8dd71} 
+void Catch\+::\+Junit\+Reporter\+::write\+Test\+Case (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_aaa25c59c56acf15cdab3d622ce3b9c96}{Test\+Case\+Node}} const \&}]{test\+Case\+Node}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__junit_8cpp_source_l00153}{153}} of file \mbox{\hyperlink{catch__reporter__junit_8cpp_source}{catch\+\_\+reporter\+\_\+junit.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ TestCaseStats\ \textcolor{keyword}{const}\&\ stats\ =\ testCaseNode.value;}
+\DoxyCodeLine{00155\ }
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ All\ test\ cases\ have\ exactly\ one\ section\ -\/\ which\ represents\ the}}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ test\ case\ itself.\ That\ section\ may\ have\ 0-\/n\ nested\ sections}}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ assert(\ testCaseNode.children.size()\ ==\ 1\ );}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ SectionNode\ \textcolor{keyword}{const}\&\ rootSection\ =\ *testCaseNode.children.front();}
+\DoxyCodeLine{00160\ }
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ std::string\ className\ =\ stats.testInfo.className;}
+\DoxyCodeLine{00162\ }
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ className.empty()\ )\ \{}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ \ \ \ \ className\ =\ fileNameTag(stats.testInfo.tags);}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ className.empty()\ )}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ className\ =\ \textcolor{stringliteral}{"{}global"{}};}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00168\ }
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ !\mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a2f9067f97068a6b92def5463f6ff483a}{m\_config}}-\/>name().empty()\ )}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \ \ \ \ className\ =\ \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_a2f9067f97068a6b92def5463f6ff483a}{m\_config}}-\/>name()\ +\ \textcolor{stringliteral}{"{}."{}}\ +\ className;}
+\DoxyCodeLine{00171\ }
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_junit_reporter_a8dcc9668b6f52aeb23cc479b835f681f}{writeSection}}(\ className,\ \textcolor{stringliteral}{"{}"{}},\ rootSection\ );}
+\DoxyCodeLine{00173\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_junit_reporter_ae0b70c4ea05bd99d8be6727e27b8dd71_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_junit_reporter_ae0b70c4ea05bd99d8be6727e27b8dd71_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{class_catch_1_1_junit_reporter_a85294c341a998b2488ea1951baa8b4a6}\index{Catch::JunitReporter@{Catch::JunitReporter}!m\_okToFail@{m\_okToFail}}
+\index{m\_okToFail@{m\_okToFail}!Catch::JunitReporter@{Catch::JunitReporter}}
+\doxysubsubsection{\texorpdfstring{m\_okToFail}{m\_okToFail}}
+{\footnotesize\ttfamily \label{class_catch_1_1_junit_reporter_a85294c341a998b2488ea1951baa8b4a6} 
+bool Catch\+::\+Junit\+Reporter\+::m\+\_\+ok\+To\+Fail = false}
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__junit_8h_source_l00056}{56}} of file \mbox{\hyperlink{catch__reporter__junit_8h_source}{catch\+\_\+reporter\+\_\+junit.\+h}}.
+
+\Hypertarget{class_catch_1_1_junit_reporter_a1efe5ba1ad030a9c7b79e40d1ad1eda0}\index{Catch::JunitReporter@{Catch::JunitReporter}!stdErrForSuite@{stdErrForSuite}}
+\index{stdErrForSuite@{stdErrForSuite}!Catch::JunitReporter@{Catch::JunitReporter}}
+\doxysubsubsection{\texorpdfstring{stdErrForSuite}{stdErrForSuite}}
+{\footnotesize\ttfamily \label{class_catch_1_1_junit_reporter_a1efe5ba1ad030a9c7b79e40d1ad1eda0} 
+std\+::string Catch\+::\+Junit\+Reporter\+::std\+Err\+For\+Suite}
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__junit_8h_source_l00054}{54}} of file \mbox{\hyperlink{catch__reporter__junit_8h_source}{catch\+\_\+reporter\+\_\+junit.\+h}}.
+
+\Hypertarget{class_catch_1_1_junit_reporter_a25402dec57e499d4c87738b392415b64}\index{Catch::JunitReporter@{Catch::JunitReporter}!stdOutForSuite@{stdOutForSuite}}
+\index{stdOutForSuite@{stdOutForSuite}!Catch::JunitReporter@{Catch::JunitReporter}}
+\doxysubsubsection{\texorpdfstring{stdOutForSuite}{stdOutForSuite}}
+{\footnotesize\ttfamily \label{class_catch_1_1_junit_reporter_a25402dec57e499d4c87738b392415b64} 
+std\+::string Catch\+::\+Junit\+Reporter\+::std\+Out\+For\+Suite}
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__junit_8h_source_l00053}{53}} of file \mbox{\hyperlink{catch__reporter__junit_8h_source}{catch\+\_\+reporter\+\_\+junit.\+h}}.
+
+\Hypertarget{class_catch_1_1_junit_reporter_a20417e9762efdad95d1a5c68d08f74c1}\index{Catch::JunitReporter@{Catch::JunitReporter}!suiteTimer@{suiteTimer}}
+\index{suiteTimer@{suiteTimer}!Catch::JunitReporter@{Catch::JunitReporter}}
+\doxysubsubsection{\texorpdfstring{suiteTimer}{suiteTimer}}
+{\footnotesize\ttfamily \label{class_catch_1_1_junit_reporter_a20417e9762efdad95d1a5c68d08f74c1} 
+\mbox{\hyperlink{class_catch_1_1_timer}{Timer}} Catch\+::\+Junit\+Reporter\+::suite\+Timer}
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__junit_8h_source_l00052}{52}} of file \mbox{\hyperlink{catch__reporter__junit_8h_source}{catch\+\_\+reporter\+\_\+junit.\+h}}.
+
+\Hypertarget{class_catch_1_1_junit_reporter_ae8028373148d6190b8c3cdf4a62e8565}\index{Catch::JunitReporter@{Catch::JunitReporter}!unexpectedExceptions@{unexpectedExceptions}}
+\index{unexpectedExceptions@{unexpectedExceptions}!Catch::JunitReporter@{Catch::JunitReporter}}
+\doxysubsubsection{\texorpdfstring{unexpectedExceptions}{unexpectedExceptions}}
+{\footnotesize\ttfamily \label{class_catch_1_1_junit_reporter_ae8028373148d6190b8c3cdf4a62e8565} 
+unsigned int Catch\+::\+Junit\+Reporter\+::unexpected\+Exceptions = 0}
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__junit_8h_source_l00055}{55}} of file \mbox{\hyperlink{catch__reporter__junit_8h_source}{catch\+\_\+reporter\+\_\+junit.\+h}}.
+
+\Hypertarget{class_catch_1_1_junit_reporter_af231b6bde7a01a85ff595ee7036c1ba3}\index{Catch::JunitReporter@{Catch::JunitReporter}!xml@{xml}}
+\index{xml@{xml}!Catch::JunitReporter@{Catch::JunitReporter}}
+\doxysubsubsection{\texorpdfstring{xml}{xml}}
+{\footnotesize\ttfamily \label{class_catch_1_1_junit_reporter_af231b6bde7a01a85ff595ee7036c1ba3} 
+\mbox{\hyperlink{class_catch_1_1_xml_writer}{Xml\+Writer}} Catch\+::\+Junit\+Reporter\+::xml}
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__junit_8h_source_l00051}{51}} of file \mbox{\hyperlink{catch__reporter__junit_8h_source}{catch\+\_\+reporter\+\_\+junit.\+h}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/include/reporters/\mbox{\hyperlink{catch__reporter__junit_8h}{catch\+\_\+reporter\+\_\+junit.\+h}}\item 
+libraries/sys-\/vm/external/\+Catch2/include/reporters/\mbox{\hyperlink{catch__reporter__junit_8cpp}{catch\+\_\+reporter\+\_\+junit.\+cpp}}\end{DoxyCompactItemize}

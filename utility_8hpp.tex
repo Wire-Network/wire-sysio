@@ -1,0 +1,209 @@
+\doxysection{libraries/fc/include/fc/utility.hpp File Reference}
+\hypertarget{utility_8hpp}{}\label{utility_8hpp}\index{libraries/fc/include/fc/utility.hpp@{libraries/fc/include/fc/utility.hpp}}
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include $<$algorithm$>$}\newline
+{\ttfamily \#include $<$functional$>$}\newline
+{\ttfamily \#include $<$new$>$}\newline
+{\ttfamily \#include $<$vector$>$}\newline
+{\ttfamily \#include $<$type\+\_\+traits$>$}\newline
+{\ttfamily \#include $<$tuple$>$}\newline
+{\ttfamily \#include $<$memory$>$}\newline
+Include dependency graph for utility.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{utility_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{utility_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structfc_1_1remove__reference}{fc\+::remove\+\_\+reference$<$ T $>$}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1remove__reference_3_01_t_01_6_01_4}{fc\+::remove\+\_\+reference$<$ T \& $>$}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1remove__reference_3_01_t_01_6_6_01_4}{fc\+::remove\+\_\+reference$<$ T \&\& $>$}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1deduce}{fc\+::deduce$<$ T $>$}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1deduce_3_01_t_01_6_01_4}{fc\+::deduce$<$ T \& $>$}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1deduce_3_01const_01_t_01_6_01_4}{fc\+::deduce$<$ const T \& $>$}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1deduce_3_01_t_01_6_6_01_4}{fc\+::deduce$<$ T \&\& $>$}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1deduce_3_01const_01_t_01_6_6_01_4}{fc\+::deduce$<$ const T \&\& $>$}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1true__type}{fc\+::true\+\_\+type}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1false__type}{fc\+::false\+\_\+type}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1detail_1_1supports__allocator}{fc\+::detail\+::supports\+\_\+allocator$<$ T, A, Args $>$}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1is__class}{fc\+::is\+\_\+class$<$ T $>$}}
+\item 
+class \mbox{\hyperlink{classfc_1_1optional__delegate_3_01_r_07_args_8_8_8_08_4}{fc\+::optional\+\_\+delegate$<$ R(\+Args...)$>$}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacefc}{fc}}
+\begin{DoxyCompactList}\small\item\em namespace \doxylink{namespacesysio_1_1chain}{sysio\+::chain} \end{DoxyCompactList}\item 
+namespace \mbox{\hyperlink{namespacefc_1_1detail}{fc\+::detail}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{utility_8hpp_a9bc43e3ee0ae83643b65e07fe1fd0132}{NO\+\_\+\+RETURN}}~\+\_\+\+\_\+attribute\+\_\+\+\_\+((noreturn))
+\item 
+\#define \mbox{\hyperlink{utility_8hpp_ad647a8ed8233ea2357905dde291af0f6}{MAX\+\_\+\+NUM\+\_\+\+ARRAY\+\_\+\+ELEMENTS}}~(1024\texorpdfstring{$\ast$}{*}1024)
+\item 
+\#define \mbox{\hyperlink{utility_8hpp_a5e3c645782d12166c98f3654471efd61}{MAX\+\_\+\+SIZE\+\_\+\+OF\+\_\+\+BYTE\+\_\+\+ARRAYS}}~(20\texorpdfstring{$\ast$}{*}1024\texorpdfstring{$\ast$}{*}1024)
+\item 
+\#define \mbox{\hyperlink{utility_8hpp_af97d840c05ea7148946377cfaeaa9ea1}{LLCONST}}(constant)
+\item 
+\#define \mbox{\hyperlink{utility_8hpp_afe0982d49e7eca41bffe07ad94b6f73d}{ULLCONST}}(constant)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef decltype(nullptr) \mbox{\hyperlink{namespacefc_aeffaff8d6d824699c60630a03055fd2f}{fc\+::nullptr\+\_\+t}}
+\item 
+using \mbox{\hyperlink{namespacefc_a978f9e97f64eb2ce6cbe892d3cc93397}{fc\+::yield\+\_\+function\+\_\+t}} = \mbox{\hyperlink{classfc_1_1optional__delegate}{optional\+\_\+delegate}}$<$void()$>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{structfc_1_1true__type}{fc\+::true\+\_\+type}} \mbox{\hyperlink{namespacefc_1_1detail_a75838eccf5c7f0c857d3ae4ca1884694}{fc\+::detail\+::is\+\_\+class\+\_\+helper}} (void(T\+::\texorpdfstring{$\ast$}{*})())
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{struct_a}{A}} , typename... Args$>$ }\\auto \mbox{\hyperlink{namespacefc_1_1detail_a7a3cca8250a11a9085badcf3264ac9d6}{fc\+::detail\+::construct\+\_\+maybe\+\_\+with\+\_\+allocator}} (\mbox{\hyperlink{struct_a}{A}} \&\&allocator, Args \&\&... args) -\/$>$ std\+::enable\+\_\+if\+\_\+t$<$ \mbox{\hyperlink{structfc_1_1detail_1_1supports__allocator}{supports\+\_\+allocator}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{struct_a}{A}} $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}} \&\&\mbox{\hyperlink{structfc_1_1detail_1_1supports__allocator}{supports\+\_\+allocator}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{struct_a}{A}} $>$\+::leading\+\_\+allocator, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{struct_a}{A}} , typename... Args$>$ }\\auto \mbox{\hyperlink{namespacefc_1_1detail_a96db523ac0dda6593bfb5bf0b2e8bac9}{fc\+::detail\+::maybe\+\_\+augment\+\_\+constructor\+\_\+arguments\+\_\+with\+\_\+allocator}} (\mbox{\hyperlink{struct_a}{A}} \&\&allocator, std\+::tuple$<$ Args \&\&... $>$ args, std\+::enable\+\_\+if\+\_\+t$<$ \mbox{\hyperlink{structfc_1_1detail_1_1supports__allocator}{supports\+\_\+allocator}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{struct_a}{A}} $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}} \&\&\mbox{\hyperlink{structfc_1_1detail_1_1supports__allocator}{supports\+\_\+allocator}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{struct_a}{A}} $>$\+::leading\+\_\+allocator, int $>$=0)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{struct_a}{A}} , typename... Args$>$ }\\auto \mbox{\hyperlink{namespacefc_1_1detail_a66ce45d922c8720b448d1238855ad487}{fc\+::detail\+::maybe\+\_\+augment\+\_\+constructor\+\_\+arguments\+\_\+with\+\_\+allocator}} (\mbox{\hyperlink{struct_a}{A}} \&\&allocator, std\+::tuple$<$$>$, std\+::enable\+\_\+if\+\_\+t$<$ \mbox{\hyperlink{structfc_1_1detail_1_1supports__allocator}{supports\+\_\+allocator}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{struct_a}{A}} $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}} \&\&\mbox{\hyperlink{structfc_1_1detail_1_1supports__allocator}{supports\+\_\+allocator}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{struct_a}{A}} $>$\+::leading\+\_\+allocator, int $>$=0)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{struct_a}{A}} , typename... Args$>$ }\\auto \mbox{\hyperlink{namespacefc_1_1detail_a60b5e7a322075e7951de1d58fa42def1}{fc\+::detail\+::maybe\+\_\+augment\+\_\+constructor\+\_\+arguments\+\_\+with\+\_\+allocator}} (\mbox{\hyperlink{struct_a}{A}} \&\&allocator, std\+::tuple$<$ Args \&\&... $>$ args, std\+::enable\+\_\+if\+\_\+t$<$ \mbox{\hyperlink{structfc_1_1detail_1_1supports__allocator}{supports\+\_\+allocator}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{struct_a}{A}} $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}} \&\&!\mbox{\hyperlink{structfc_1_1detail_1_1supports__allocator}{supports\+\_\+allocator}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{struct_a}{A}} $>$\+::leading\+\_\+allocator, int $>$=0)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{struct_a}{A}} , typename... Args$>$ }\\auto \mbox{\hyperlink{namespacefc_1_1detail_a5f7bb9a86c8ad5a36c87e395b79ec55f}{fc\+::detail\+::maybe\+\_\+augment\+\_\+constructor\+\_\+arguments\+\_\+with\+\_\+allocator}} (\mbox{\hyperlink{struct_a}{A}} \&\&allocator, std\+::tuple$<$$>$, std\+::enable\+\_\+if\+\_\+t$<$ \mbox{\hyperlink{structfc_1_1detail_1_1supports__allocator}{supports\+\_\+allocator}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{struct_a}{A}} $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}} \&\&!\mbox{\hyperlink{structfc_1_1detail_1_1supports__allocator}{supports\+\_\+allocator}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{struct_a}{A}} $>$\+::leading\+\_\+allocator, int $>$=0)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{struct_a}{A}} , typename... Args$>$ }\\auto \mbox{\hyperlink{namespacefc_1_1detail_a44c9bd067821801fc8e0e8a66ddb9f5d}{fc\+::detail\+::maybe\+\_\+augment\+\_\+constructor\+\_\+arguments\+\_\+with\+\_\+allocator}} (\mbox{\hyperlink{struct_a}{A}} \&\&, std\+::tuple$<$ Args \&\&... $>$ args, std\+::enable\+\_\+if\+\_\+t$<$!\mbox{\hyperlink{structfc_1_1detail_1_1supports__allocator}{supports\+\_\+allocator}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{struct_a}{A}} $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}}, int $>$=0)
+\item 
+{\footnotesize template$<$typename T1 , typename T2 , typename \mbox{\hyperlink{struct_a}{A}} $>$ }\\std\+::pair$<$ T1, T2 $>$ \mbox{\hyperlink{namespacefc_1_1detail_abc084808b8a1de1231a150b9a720e014}{fc\+::detail\+::default\+\_\+construct\+\_\+pair\+\_\+maybe\+\_\+with\+\_\+allocator}} (\mbox{\hyperlink{struct_a}{A}} \&\&allocator)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{namespacefc_aa3ea11c18de71ec23b19c3cc571fb8ff}{fc\+::min}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&b)
+\item 
+constexpr size\+\_\+t \mbox{\hyperlink{namespacefc_a3ef687c18276fdf95a78c568b0b27a32}{fc\+::const\+\_\+strlen}} (const char \texorpdfstring{$\ast$}{*}str)
+\item 
+{\footnotesize template$<$typename Container $>$ }\\void \mbox{\hyperlink{namespacefc_a219f556e23004060631ffb2baaeaff02}{fc\+::move\+\_\+append}} (Container \&dest, Container \&\&src)
+\item 
+{\footnotesize template$<$typename Container $>$ }\\void \mbox{\hyperlink{namespacefc_ae70a5f1393fe54670dd9c2740dea8ed9}{fc\+::copy\+\_\+append}} (Container \&dest, const Container \&src)
+\item 
+{\footnotesize template$<$typename Container $>$ }\\void \mbox{\hyperlink{namespacefc_a327e01e157671d77c13b218791b901bf}{fc\+::deduplicate}} (Container \&entries)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{utility_8hpp_aa8fc7454c03dcfc9e542977e3b9250fa}{fc\+\_\+swap}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&b)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{structfc_1_1false__type}{fc\+::false\+\_\+type}} \mbox{\hyperlink{namespacefc_1_1detail_ac597471ddb6b0dcf3f3798a4b4d590d3}{fc\+::detail\+::is\+\_\+class\+\_\+helper}} (...)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{utility_8hpp_af97d840c05ea7148946377cfaeaa9ea1}\index{utility.hpp@{utility.hpp}!LLCONST@{LLCONST}}
+\index{LLCONST@{LLCONST}!utility.hpp@{utility.hpp}}
+\doxysubsubsection{\texorpdfstring{LLCONST}{LLCONST}}
+{\footnotesize\ttfamily \label{utility_8hpp_af97d840c05ea7148946377cfaeaa9ea1} 
+\#define LLCONST(\begin{DoxyParamCaption}\item[{}]{constant}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\textcolor{keyword}{>}(constant\#\#ll)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{utility_8hpp_source_l00217}{217}} of file \mbox{\hyperlink{utility_8hpp_source}{utility.\+hpp}}.
+
+\Hypertarget{utility_8hpp_ad647a8ed8233ea2357905dde291af0f6}\index{utility.hpp@{utility.hpp}!MAX\_NUM\_ARRAY\_ELEMENTS@{MAX\_NUM\_ARRAY\_ELEMENTS}}
+\index{MAX\_NUM\_ARRAY\_ELEMENTS@{MAX\_NUM\_ARRAY\_ELEMENTS}!utility.hpp@{utility.hpp}}
+\doxysubsubsection{\texorpdfstring{MAX\_NUM\_ARRAY\_ELEMENTS}{MAX\_NUM\_ARRAY\_ELEMENTS}}
+{\footnotesize\ttfamily \label{utility_8hpp_ad647a8ed8233ea2357905dde291af0f6} 
+\#define MAX\+\_\+\+NUM\+\_\+\+ARRAY\+\_\+\+ELEMENTS~(1024\texorpdfstring{$\ast$}{*}1024)}
+
+
+
+Definition at line \mbox{\hyperlink{utility_8hpp_source_l00018}{18}} of file \mbox{\hyperlink{utility_8hpp_source}{utility.\+hpp}}.
+
+\Hypertarget{utility_8hpp_a5e3c645782d12166c98f3654471efd61}\index{utility.hpp@{utility.hpp}!MAX\_SIZE\_OF\_BYTE\_ARRAYS@{MAX\_SIZE\_OF\_BYTE\_ARRAYS}}
+\index{MAX\_SIZE\_OF\_BYTE\_ARRAYS@{MAX\_SIZE\_OF\_BYTE\_ARRAYS}!utility.hpp@{utility.hpp}}
+\doxysubsubsection{\texorpdfstring{MAX\_SIZE\_OF\_BYTE\_ARRAYS}{MAX\_SIZE\_OF\_BYTE\_ARRAYS}}
+{\footnotesize\ttfamily \label{utility_8hpp_a5e3c645782d12166c98f3654471efd61} 
+\#define MAX\+\_\+\+SIZE\+\_\+\+OF\+\_\+\+BYTE\+\_\+\+ARRAYS~(20\texorpdfstring{$\ast$}{*}1024\texorpdfstring{$\ast$}{*}1024)}
+
+
+
+Definition at line \mbox{\hyperlink{utility_8hpp_source_l00019}{19}} of file \mbox{\hyperlink{utility_8hpp_source}{utility.\+hpp}}.
+
+\Hypertarget{utility_8hpp_a9bc43e3ee0ae83643b65e07fe1fd0132}\index{utility.hpp@{utility.hpp}!NO\_RETURN@{NO\_RETURN}}
+\index{NO\_RETURN@{NO\_RETURN}!utility.hpp@{utility.hpp}}
+\doxysubsubsection{\texorpdfstring{NO\_RETURN}{NO\_RETURN}}
+{\footnotesize\ttfamily \label{utility_8hpp_a9bc43e3ee0ae83643b65e07fe1fd0132} 
+\#define NO\+\_\+\+RETURN~\+\_\+\+\_\+attribute\+\_\+\+\_\+((noreturn))}
+
+
+
+Definition at line \mbox{\hyperlink{utility_8hpp_source_l00015}{15}} of file \mbox{\hyperlink{utility_8hpp_source}{utility.\+hpp}}.
+
+\Hypertarget{utility_8hpp_afe0982d49e7eca41bffe07ad94b6f73d}\index{utility.hpp@{utility.hpp}!ULLCONST@{ULLCONST}}
+\index{ULLCONST@{ULLCONST}!utility.hpp@{utility.hpp}}
+\doxysubsubsection{\texorpdfstring{ULLCONST}{ULLCONST}}
+{\footnotesize\ttfamily \label{utility_8hpp_afe0982d49e7eca41bffe07ad94b6f73d} 
+\#define ULLCONST(\begin{DoxyParamCaption}\item[{}]{constant}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\textcolor{keyword}{>}(constant\#\#ull)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{utility_8hpp_source_l00218}{218}} of file \mbox{\hyperlink{utility_8hpp_source}{utility.\+hpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{utility_8hpp_aa8fc7454c03dcfc9e542977e3b9250fa}\index{utility.hpp@{utility.hpp}!fc\_swap@{fc\_swap}}
+\index{fc\_swap@{fc\_swap}!utility.hpp@{utility.hpp}}
+\doxysubsubsection{\texorpdfstring{fc\_swap()}{fc\_swap()}}
+{\footnotesize\ttfamily \label{utility_8hpp_aa8fc7454c03dcfc9e542977e3b9250fa} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+void fc\+\_\+swap (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{a}{, }\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{b}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{utility_8hpp_source_l00211}{211}} of file \mbox{\hyperlink{utility_8hpp_source}{utility.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00212\ \ \ \ \ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ tmp\ =\ fc::move(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{00213\ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ =\ fc::move(b);}
+\DoxyCodeLine{00214\ \ \ \ \ b\ =\ fc::move(tmp);}
+\DoxyCodeLine{00215\ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=291pt]{utility_8hpp_aa8fc7454c03dcfc9e542977e3b9250fa_icgraph}
+\end{center}
+\end{figure}

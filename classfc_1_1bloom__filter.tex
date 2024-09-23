@@ -1,0 +1,1176 @@
+\doxysection{fc\+::bloom\+\_\+filter Class Reference}
+\hypertarget{classfc_1_1bloom__filter}{}\label{classfc_1_1bloom__filter}\index{fc::bloom\_filter@{fc::bloom\_filter}}
+
+
+{\ttfamily \#include $<$bloom\+\_\+filter.\+hpp$>$}
+
+
+
+Collaboration diagram for fc\+::bloom\+\_\+filter\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=330pt]{classfc_1_1bloom__filter__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1bloom__filter_a7e7427cbb9e7cf1fe3b293ed18db0a8e}{bloom\+\_\+filter}} ()
+\item 
+\mbox{\hyperlink{classfc_1_1bloom__filter_abfb929dc1b4099975cbd770e94df393b}{bloom\+\_\+filter}} (const \mbox{\hyperlink{classfc_1_1bloom__parameters}{bloom\+\_\+parameters}} \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})
+\item 
+\mbox{\hyperlink{classfc_1_1bloom__filter_a2a3dc854d9e13ba0959b88bbbc4a95f5}{bloom\+\_\+filter}} (const \mbox{\hyperlink{classfc_1_1bloom__filter}{bloom\+\_\+filter}} \&filter)
+\item 
+bool \mbox{\hyperlink{classfc_1_1bloom__filter_a84ebbb3010a0ec2bfba07738deb7990b}{operator==}} (const \mbox{\hyperlink{classfc_1_1bloom__filter}{bloom\+\_\+filter}} \&\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}) const
+\item 
+bool \mbox{\hyperlink{classfc_1_1bloom__filter_ae8f909c2a5c07dfeb84438dfbacbadd5}{operator!=}} (const \mbox{\hyperlink{classfc_1_1bloom__filter}{bloom\+\_\+filter}} \&\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}) const
+\item 
+\mbox{\hyperlink{classfc_1_1bloom__filter}{bloom\+\_\+filter}} \& \mbox{\hyperlink{classfc_1_1bloom__filter_a5a32b81e9f0ff5824c6760d5a7fac63d}{operator=}} (const \mbox{\hyperlink{classfc_1_1bloom__filter}{bloom\+\_\+filter}} \&\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})
+\item 
+virtual \mbox{\hyperlink{classfc_1_1bloom__filter_ad2dae7aae11aad2bc1d7399eaa4692fd}{\texorpdfstring{$\sim$}{\string~}bloom\+\_\+filter}} ()
+\item 
+bool \mbox{\hyperlink{classfc_1_1bloom__filter_a948856dcae6bdd746147a2e7ffa6e09b}{operator!}} () const
+\item 
+void \mbox{\hyperlink{classfc_1_1bloom__filter_a4ec7826f181bf204946cec0ef2b27842}{clear}} ()
+\item 
+void \mbox{\hyperlink{classfc_1_1bloom__filter_a024a01a04bcfef5c6fb20c0a29022b08}{insert}} (const unsigned char \texorpdfstring{$\ast$}{*}key\+\_\+begin, const std\+::size\+\_\+t \&length)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{classfc_1_1bloom__filter_a64116c7139c55bfbea36662e5c5e5c91}{insert}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&t)
+\item 
+void \mbox{\hyperlink{classfc_1_1bloom__filter_a4094b9d7a34d14c55d1cf61be2d6d019}{insert}} (const std\+::string \&key)
+\item 
+void \mbox{\hyperlink{classfc_1_1bloom__filter_a6573afbce511a80567622577f26808f6}{insert}} (const char \texorpdfstring{$\ast$}{*}data, const std\+::size\+\_\+t \&length)
+\item 
+{\footnotesize template$<$typename Input\+Iterator $>$ }\\void \mbox{\hyperlink{classfc_1_1bloom__filter_a9c3b1a6d79deb07f906e836dd97ee696}{insert}} (const Input\+Iterator begin, const Input\+Iterator end)
+\item 
+virtual bool \mbox{\hyperlink{classfc_1_1bloom__filter_a7a533ef13bc53b922afe050c23bd7095}{contains}} (const unsigned char \texorpdfstring{$\ast$}{*}key\+\_\+begin, const std\+::size\+\_\+t length) const
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\bool \mbox{\hyperlink{classfc_1_1bloom__filter_a8d8fa605fe3266a8381b3d89bd39dbf0}{contains}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&t) const
+\item 
+bool \mbox{\hyperlink{classfc_1_1bloom__filter_a8cfa671af82c4429140315c16312f8f2}{contains}} (const std\+::string \&key) const
+\item 
+bool \mbox{\hyperlink{classfc_1_1bloom__filter_a804653831725e9cf0fa9d6e7172c92e0}{contains}} (const char \texorpdfstring{$\ast$}{*}data, const std\+::size\+\_\+t \&length) const
+\item 
+{\footnotesize template$<$typename Input\+Iterator $>$ }\\Input\+Iterator \mbox{\hyperlink{classfc_1_1bloom__filter_a563940aeaaa3889a52b9e78fa18fbed2}{contains\+\_\+all}} (const Input\+Iterator begin, const Input\+Iterator end) const
+\item 
+{\footnotesize template$<$typename Input\+Iterator $>$ }\\Input\+Iterator \mbox{\hyperlink{classfc_1_1bloom__filter_a4bd29f86037d8faf5caa6dfa5eca7a15}{contains\+\_\+none}} (const Input\+Iterator begin, const Input\+Iterator end) const
+\item 
+virtual unsigned long long int \mbox{\hyperlink{classfc_1_1bloom__filter_a2ce933340ddf63a8c99599d26877d62b}{size}} () const
+\item 
+std\+::size\+\_\+t \mbox{\hyperlink{classfc_1_1bloom__filter_a428146893da62df826a82c0114bb1a1f}{element\+\_\+count}} () const
+\item 
+double \mbox{\hyperlink{classfc_1_1bloom__filter_a5aa4a5e6c72746145eea809fb547a697}{effective\+\_\+fpp}} () const
+\item 
+\mbox{\hyperlink{classfc_1_1bloom__filter}{bloom\+\_\+filter}} \& \mbox{\hyperlink{classfc_1_1bloom__filter_ae55df09a4236a9fffdf07c9a90641d7d}{operator\&=}} (const \mbox{\hyperlink{classfc_1_1bloom__filter}{bloom\+\_\+filter}} \&\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})
+\item 
+\mbox{\hyperlink{classfc_1_1bloom__filter}{bloom\+\_\+filter}} \& \mbox{\hyperlink{classfc_1_1bloom__filter_ae05028039e60a840ec19bbbd7065a352}{operator\texorpdfstring{$\vert$}{|}=}} (const \mbox{\hyperlink{classfc_1_1bloom__filter}{bloom\+\_\+filter}} \&\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})
+\item 
+\mbox{\hyperlink{classfc_1_1bloom__filter}{bloom\+\_\+filter}} \& \mbox{\hyperlink{classfc_1_1bloom__filter_adce1d4bcc09ee5a68b92b1ac2b8ad52c}{operator\texorpdfstring{$^\wedge$}{\string^}=}} (const \mbox{\hyperlink{classfc_1_1bloom__filter}{bloom\+\_\+filter}} \&\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})
+\item 
+const \mbox{\hyperlink{classfc_1_1bloom__filter_aba3c0b9bcab3ae195506ccdb03d3401f}{cell\+\_\+type}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classfc_1_1bloom__filter_a50def5a412b272a559aeff90a30da282}{table}} () const
+\item 
+std\+::size\+\_\+t \mbox{\hyperlink{classfc_1_1bloom__filter_ae07d22fd8cad4d753e4dfd67132c5e7d}{hash\+\_\+count}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::vector$<$ \mbox{\hyperlink{classfc_1_1bloom__filter_a712a27ba8f26a107057b4982303a20ce}{bloom\+\_\+type}} $>$ \mbox{\hyperlink{classfc_1_1bloom__filter_a4aa68713801e124ed96fdeb6acdc91da}{salt\+\_\+}}
+\item 
+std\+::vector$<$ unsigned char $>$ \mbox{\hyperlink{classfc_1_1bloom__filter_a1456955c8ec72e48d83454a3a82a7a59}{bit\+\_\+table\+\_\+}}
+\item 
+unsigned int \mbox{\hyperlink{classfc_1_1bloom__filter_a0ce6a19263b4df2b9b8ef1170603507b}{salt\+\_\+count\+\_\+}}
+\item 
+unsigned long long int \mbox{\hyperlink{classfc_1_1bloom__filter_a7288d926a8bfe6e783b65641e84b4c64}{table\+\_\+size\+\_\+}}
+\item 
+unsigned long long int \mbox{\hyperlink{classfc_1_1bloom__filter_abf3a0473b9cf4df2c4f000ca87f6649d}{raw\+\_\+table\+\_\+size\+\_\+}}
+\item 
+unsigned long long int \mbox{\hyperlink{classfc_1_1bloom__filter_aa60f2c26fc7e77e3757e11649ddb68df}{projected\+\_\+element\+\_\+count\+\_\+}}
+\item 
+unsigned int \mbox{\hyperlink{classfc_1_1bloom__filter_aeb75fe01b8b19f559c8ea27c2e6e54b6}{inserted\+\_\+element\+\_\+count\+\_\+}}
+\item 
+unsigned long long int \mbox{\hyperlink{classfc_1_1bloom__filter_afca8eb2c8812ac907106407a5e9324da}{random\+\_\+seed\+\_\+}}
+\item 
+double \mbox{\hyperlink{classfc_1_1bloom__filter_ae5376d38d0df19b97e30172e9b7f9d64}{desired\+\_\+false\+\_\+positive\+\_\+probability\+\_\+}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef unsigned int \mbox{\hyperlink{classfc_1_1bloom__filter_a712a27ba8f26a107057b4982303a20ce}{bloom\+\_\+type}}
+\item 
+typedef unsigned char \mbox{\hyperlink{classfc_1_1bloom__filter_aba3c0b9bcab3ae195506ccdb03d3401f}{cell\+\_\+type}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual void \mbox{\hyperlink{classfc_1_1bloom__filter_a782a4ca932e2f8a03b11dd41652a5e69}{compute\+\_\+indices}} (const \mbox{\hyperlink{classfc_1_1bloom__filter_a712a27ba8f26a107057b4982303a20ce}{bloom\+\_\+type}} \&hash, std\+::size\+\_\+t \&bit\+\_\+index, std\+::size\+\_\+t \&\mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}}) const
+\item 
+void \mbox{\hyperlink{classfc_1_1bloom__filter_a8f2e62c9d3c975c761d37669e92c38db}{generate\+\_\+unique\+\_\+salt}} ()
+\item 
+\mbox{\hyperlink{classfc_1_1bloom__filter_a712a27ba8f26a107057b4982303a20ce}{bloom\+\_\+type}} \mbox{\hyperlink{classfc_1_1bloom__filter_a953b432cacd40b9d2493ff910b0672fa}{hash\+\_\+ap}} (const unsigned char \texorpdfstring{$\ast$}{*}begin, std\+::size\+\_\+t remaining\+\_\+length, \mbox{\hyperlink{classfc_1_1bloom__filter_a712a27ba8f26a107057b4982303a20ce}{bloom\+\_\+type}} hash) const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{bloom__filter_8hpp_source_l00161}{161}} of file \mbox{\hyperlink{bloom__filter_8hpp_source}{bloom\+\_\+filter.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classfc_1_1bloom__filter_a712a27ba8f26a107057b4982303a20ce}\index{fc::bloom\_filter@{fc::bloom\_filter}!bloom\_type@{bloom\_type}}
+\index{bloom\_type@{bloom\_type}!fc::bloom\_filter@{fc::bloom\_filter}}
+\doxysubsubsection{\texorpdfstring{bloom\_type}{bloom\_type}}
+{\footnotesize\ttfamily \label{classfc_1_1bloom__filter_a712a27ba8f26a107057b4982303a20ce} 
+unsigned int \mbox{\hyperlink{classfc_1_1bloom__filter_a712a27ba8f26a107057b4982303a20ce}{fc\+::bloom\+\_\+filter\+::bloom\+\_\+type}}\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{bloom__filter_8hpp_source_l00165}{165}} of file \mbox{\hyperlink{bloom__filter_8hpp_source}{bloom\+\_\+filter.\+hpp}}.
+
+\Hypertarget{classfc_1_1bloom__filter_aba3c0b9bcab3ae195506ccdb03d3401f}\index{fc::bloom\_filter@{fc::bloom\_filter}!cell\_type@{cell\_type}}
+\index{cell\_type@{cell\_type}!fc::bloom\_filter@{fc::bloom\_filter}}
+\doxysubsubsection{\texorpdfstring{cell\_type}{cell\_type}}
+{\footnotesize\ttfamily \label{classfc_1_1bloom__filter_aba3c0b9bcab3ae195506ccdb03d3401f} 
+unsigned char \mbox{\hyperlink{classfc_1_1bloom__filter_aba3c0b9bcab3ae195506ccdb03d3401f}{fc\+::bloom\+\_\+filter\+::cell\+\_\+type}}\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{bloom__filter_8hpp_source_l00166}{166}} of file \mbox{\hyperlink{bloom__filter_8hpp_source}{bloom\+\_\+filter.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1bloom__filter_a7e7427cbb9e7cf1fe3b293ed18db0a8e}\index{fc::bloom\_filter@{fc::bloom\_filter}!bloom\_filter@{bloom\_filter}}
+\index{bloom\_filter@{bloom\_filter}!fc::bloom\_filter@{fc::bloom\_filter}}
+\doxysubsubsection{\texorpdfstring{bloom\_filter()}{bloom\_filter()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{classfc_1_1bloom__filter_a7e7427cbb9e7cf1fe3b293ed18db0a8e} 
+fc\+::bloom\+\_\+filter\+::bloom\+\_\+filter (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bloom__filter_8hpp_source_l00170}{170}} of file \mbox{\hyperlink{bloom__filter_8hpp_source}{bloom\+\_\+filter.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00171\ \ \ \ :\ \mbox{\hyperlink{classfc_1_1bloom__filter_a0ce6a19263b4df2b9b8ef1170603507b}{salt\_count\_}}(0),}
+\DoxyCodeLine{00172\ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bloom__filter_a7288d926a8bfe6e783b65641e84b4c64}{table\_size\_}}(0),}
+\DoxyCodeLine{00173\ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bloom__filter_abf3a0473b9cf4df2c4f000ca87f6649d}{raw\_table\_size\_}}(0),}
+\DoxyCodeLine{00174\ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bloom__filter_aa60f2c26fc7e77e3757e11649ddb68df}{projected\_element\_count\_}}(0),}
+\DoxyCodeLine{00175\ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bloom__filter_aeb75fe01b8b19f559c8ea27c2e6e54b6}{inserted\_element\_count\_}}(0),}
+\DoxyCodeLine{00176\ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bloom__filter_afca8eb2c8812ac907106407a5e9324da}{random\_seed\_}}(0),}
+\DoxyCodeLine{00177\ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bloom__filter_ae5376d38d0df19b97e30172e9b7f9d64}{desired\_false\_positive\_probability\_}}(0.0)}
+\DoxyCodeLine{00178\ \ \ \ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1bloom__filter_abfb929dc1b4099975cbd770e94df393b}\index{fc::bloom\_filter@{fc::bloom\_filter}!bloom\_filter@{bloom\_filter}}
+\index{bloom\_filter@{bloom\_filter}!fc::bloom\_filter@{fc::bloom\_filter}}
+\doxysubsubsection{\texorpdfstring{bloom\_filter()}{bloom\_filter()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{classfc_1_1bloom__filter_abfb929dc1b4099975cbd770e94df393b} 
+fc\+::bloom\+\_\+filter\+::bloom\+\_\+filter (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1bloom__parameters}{bloom\+\_\+parameters}} \&}]{p}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bloom__filter_8hpp_source_l00180}{180}} of file \mbox{\hyperlink{bloom__filter_8hpp_source}{bloom\+\_\+filter.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00181\ \ \ \ :\ \mbox{\hyperlink{classfc_1_1bloom__filter_aa60f2c26fc7e77e3757e11649ddb68df}{projected\_element\_count\_}}(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.projected\_element\_count),}
+\DoxyCodeLine{00182\ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bloom__filter_aeb75fe01b8b19f559c8ea27c2e6e54b6}{inserted\_element\_count\_}}(0),}
+\DoxyCodeLine{00183\ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bloom__filter_afca8eb2c8812ac907106407a5e9324da}{random\_seed\_}}((\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.random\_seed\ *\ 0xA5A5A5A5)\ +\ 1),}
+\DoxyCodeLine{00184\ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bloom__filter_ae5376d38d0df19b97e30172e9b7f9d64}{desired\_false\_positive\_probability\_}}(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.false\_positive\_probability)}
+\DoxyCodeLine{00185\ \ \ \ \{}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bloom__filter_a0ce6a19263b4df2b9b8ef1170603507b}{salt\_count\_}}\ =\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.optimal\_parameters.number\_of\_hashes;}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bloom__filter_a7288d926a8bfe6e783b65641e84b4c64}{table\_size\_}}\ =\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.optimal\_parameters.table\_size;}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bloom__filter_a8f2e62c9d3c975c761d37669e92c38db}{generate\_unique\_salt}}();}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bloom__filter_abf3a0473b9cf4df2c4f000ca87f6649d}{raw\_table\_size\_}}\ =\ \mbox{\hyperlink{classfc_1_1bloom__filter_a7288d926a8bfe6e783b65641e84b4c64}{table\_size\_}}\ /\ bits\_per\_char;}
+\DoxyCodeLine{00190\ }
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bloom__filter_a1456955c8ec72e48d83454a3a82a7a59}{bit\_table\_}}.resize(\ \textcolor{keyword}{static\_cast<}std::size\_t\textcolor{keyword}{>}(\mbox{\hyperlink{classfc_1_1bloom__filter_abf3a0473b9cf4df2c4f000ca87f6649d}{raw\_table\_size\_}})\ );}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \textcolor{comment}{//bit\_table\_\ =\ new\ cell\_type[static\_cast<std::size\_t>(raw\_table\_size\_)];}}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ std::fill\_n(\mbox{\hyperlink{classfc_1_1bloom__filter_a1456955c8ec72e48d83454a3a82a7a59}{bit\_table\_}}.data(),\mbox{\hyperlink{classfc_1_1bloom__filter_abf3a0473b9cf4df2c4f000ca87f6649d}{raw\_table\_size\_}},0x00);}
+\DoxyCodeLine{00194\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1bloom__filter_abfb929dc1b4099975cbd770e94df393b_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1bloom__filter_a2a3dc854d9e13ba0959b88bbbc4a95f5}\index{fc::bloom\_filter@{fc::bloom\_filter}!bloom\_filter@{bloom\_filter}}
+\index{bloom\_filter@{bloom\_filter}!fc::bloom\_filter@{fc::bloom\_filter}}
+\doxysubsubsection{\texorpdfstring{bloom\_filter()}{bloom\_filter()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{classfc_1_1bloom__filter_a2a3dc854d9e13ba0959b88bbbc4a95f5} 
+fc\+::bloom\+\_\+filter\+::bloom\+\_\+filter (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1bloom__filter}{bloom\+\_\+filter}} \&}]{filter}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bloom__filter_8hpp_source_l00196}{196}} of file \mbox{\hyperlink{bloom__filter_8hpp_source}{bloom\+\_\+filter.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00197\ \ \ \ \{}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ this-\/>\mbox{\hyperlink{classfc_1_1bloom__filter_a5a32b81e9f0ff5824c6760d5a7fac63d}{operator=}}(filter);}
+\DoxyCodeLine{00199\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1bloom__filter_a2a3dc854d9e13ba0959b88bbbc4a95f5_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1bloom__filter_ad2dae7aae11aad2bc1d7399eaa4692fd}\index{fc::bloom\_filter@{fc::bloom\_filter}!````~bloom\_filter@{\texorpdfstring{$\sim$}{\string~}bloom\_filter}}
+\index{````~bloom\_filter@{\texorpdfstring{$\sim$}{\string~}bloom\_filter}!fc::bloom\_filter@{fc::bloom\_filter}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}bloom\_filter()}{\string~bloom\_filter()}}
+{\footnotesize\ttfamily \label{classfc_1_1bloom__filter_ad2dae7aae11aad2bc1d7399eaa4692fd} 
+virtual fc\+::bloom\+\_\+filter\+::\texorpdfstring{$\sim$}{\string~}bloom\+\_\+filter (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{bloom__filter_8hpp_source_l00243}{243}} of file \mbox{\hyperlink{bloom__filter_8hpp_source}{bloom\+\_\+filter.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00244\ \ \ \ \{}
+\DoxyCodeLine{00245\ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1bloom__filter_a4ec7826f181bf204946cec0ef2b27842}\index{fc::bloom\_filter@{fc::bloom\_filter}!clear@{clear}}
+\index{clear@{clear}!fc::bloom\_filter@{fc::bloom\_filter}}
+\doxysubsubsection{\texorpdfstring{clear()}{clear()}}
+{\footnotesize\ttfamily \label{classfc_1_1bloom__filter_a4ec7826f181bf204946cec0ef2b27842} 
+void fc\+::bloom\+\_\+filter\+::clear (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bloom__filter_8hpp_source_l00252}{252}} of file \mbox{\hyperlink{bloom__filter_8hpp_source}{bloom\+\_\+filter.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00253\ \ \ \ \{}
+\DoxyCodeLine{00254\ \ \ \ \ \ \ std::fill\_n(\mbox{\hyperlink{classfc_1_1bloom__filter_a1456955c8ec72e48d83454a3a82a7a59}{bit\_table\_}}.data(),\mbox{\hyperlink{classfc_1_1bloom__filter_abf3a0473b9cf4df2c4f000ca87f6649d}{raw\_table\_size\_}},0x00);}
+\DoxyCodeLine{00255\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bloom__filter_aeb75fe01b8b19f559c8ea27c2e6e54b6}{inserted\_element\_count\_}}\ =\ 0;}
+\DoxyCodeLine{00256\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1bloom__filter_a782a4ca932e2f8a03b11dd41652a5e69}\index{fc::bloom\_filter@{fc::bloom\_filter}!compute\_indices@{compute\_indices}}
+\index{compute\_indices@{compute\_indices}!fc::bloom\_filter@{fc::bloom\_filter}}
+\doxysubsubsection{\texorpdfstring{compute\_indices()}{compute\_indices()}}
+{\footnotesize\ttfamily \label{classfc_1_1bloom__filter_a782a4ca932e2f8a03b11dd41652a5e69} 
+virtual void fc\+::bloom\+\_\+filter\+::compute\+\_\+indices (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1bloom__filter_a712a27ba8f26a107057b4982303a20ce}{bloom\+\_\+type}} \&}]{hash}{, }\item[{std\+::size\+\_\+t \&}]{bit\+\_\+index}{, }\item[{std\+::size\+\_\+t \&}]{bit}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{bloom__filter_8hpp_source_l00443}{443}} of file \mbox{\hyperlink{bloom__filter_8hpp_source}{bloom\+\_\+filter.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00444\ \ \ \ \{}
+\DoxyCodeLine{00445\ \ \ \ \ \ \ bit\_index\ =\ hash\ \%\ \mbox{\hyperlink{classfc_1_1bloom__filter_a7288d926a8bfe6e783b65641e84b4c64}{table\_size\_}};}
+\DoxyCodeLine{00446\ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}}\ =\ bit\_index\ \%\ bits\_per\_char;}
+\DoxyCodeLine{00447\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1bloom__filter_a782a4ca932e2f8a03b11dd41652a5e69_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1bloom__filter_a804653831725e9cf0fa9d6e7172c92e0}\index{fc::bloom\_filter@{fc::bloom\_filter}!contains@{contains}}
+\index{contains@{contains}!fc::bloom\_filter@{fc::bloom\_filter}}
+\doxysubsubsection{\texorpdfstring{contains()}{contains()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{classfc_1_1bloom__filter_a804653831725e9cf0fa9d6e7172c92e0} 
+bool fc\+::bloom\+\_\+filter\+::contains (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{data}{, }\item[{const std\+::size\+\_\+t \&}]{length}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bloom__filter_8hpp_source_l00323}{323}} of file \mbox{\hyperlink{bloom__filter_8hpp_source}{bloom\+\_\+filter.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00324\ \ \ \ \{}
+\DoxyCodeLine{00325\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1bloom__filter_a7a533ef13bc53b922afe050c23bd7095}{contains}}(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*\textcolor{keyword}{>}(data),length);}
+\DoxyCodeLine{00326\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1bloom__filter_a804653831725e9cf0fa9d6e7172c92e0_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1bloom__filter_a8cfa671af82c4429140315c16312f8f2}\index{fc::bloom\_filter@{fc::bloom\_filter}!contains@{contains}}
+\index{contains@{contains}!fc::bloom\_filter@{fc::bloom\_filter}}
+\doxysubsubsection{\texorpdfstring{contains()}{contains()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{classfc_1_1bloom__filter_a8cfa671af82c4429140315c16312f8f2} 
+bool fc\+::bloom\+\_\+filter\+::contains (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{key}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bloom__filter_8hpp_source_l00318}{318}} of file \mbox{\hyperlink{bloom__filter_8hpp_source}{bloom\+\_\+filter.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00319\ \ \ \ \{}
+\DoxyCodeLine{00320\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1bloom__filter_a7a533ef13bc53b922afe050c23bd7095}{contains}}(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*\textcolor{keyword}{>}(key.c\_str()),key.size());}
+\DoxyCodeLine{00321\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1bloom__filter_a8cfa671af82c4429140315c16312f8f2_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1bloom__filter_a8d8fa605fe3266a8381b3d89bd39dbf0}\index{fc::bloom\_filter@{fc::bloom\_filter}!contains@{contains}}
+\index{contains@{contains}!fc::bloom\_filter@{fc::bloom\_filter}}
+\doxysubsubsection{\texorpdfstring{contains()}{contains()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{classfc_1_1bloom__filter_a8d8fa605fe3266a8381b3d89bd39dbf0} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+bool fc\+::bloom\+\_\+filter\+::contains (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{t}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bloom__filter_8hpp_source_l00313}{313}} of file \mbox{\hyperlink{bloom__filter_8hpp_source}{bloom\+\_\+filter.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00314\ \ \ \ \{}
+\DoxyCodeLine{00315\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1bloom__filter_a7a533ef13bc53b922afe050c23bd7095}{contains}}(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*\textcolor{keyword}{>}(\&t),\textcolor{keyword}{static\_cast<}std::size\_t\textcolor{keyword}{>}(\textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}})));}
+\DoxyCodeLine{00316\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1bloom__filter_a8d8fa605fe3266a8381b3d89bd39dbf0_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1bloom__filter_a7a533ef13bc53b922afe050c23bd7095}\index{fc::bloom\_filter@{fc::bloom\_filter}!contains@{contains}}
+\index{contains@{contains}!fc::bloom\_filter@{fc::bloom\_filter}}
+\doxysubsubsection{\texorpdfstring{contains()}{contains()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{classfc_1_1bloom__filter_a7a533ef13bc53b922afe050c23bd7095} 
+virtual bool fc\+::bloom\+\_\+filter\+::contains (\begin{DoxyParamCaption}\item[{const unsigned char \texorpdfstring{$\ast$}{*}}]{key\+\_\+begin}{, }\item[{const std\+::size\+\_\+t}]{length}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{bloom__filter_8hpp_source_l00297}{297}} of file \mbox{\hyperlink{bloom__filter_8hpp_source}{bloom\+\_\+filter.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00298\ \ \ \ \{}
+\DoxyCodeLine{00299\ \ \ \ \ \ \ std::size\_t\ bit\_index\ =\ 0;}
+\DoxyCodeLine{00300\ \ \ \ \ \ \ std::size\_t\ \mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}}\ =\ 0;}
+\DoxyCodeLine{00301\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (std::size\_t\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{classfc_1_1bloom__filter_a4aa68713801e124ed96fdeb6acdc91da}{salt\_}}.size();\ ++i)}
+\DoxyCodeLine{00302\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00303\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bloom__filter_a782a4ca932e2f8a03b11dd41652a5e69}{compute\_indices}}(\mbox{\hyperlink{classfc_1_1bloom__filter_a953b432cacd40b9d2493ff910b0672fa}{hash\_ap}}(key\_begin,length,\mbox{\hyperlink{classfc_1_1bloom__filter_a4aa68713801e124ed96fdeb6acdc91da}{salt\_}}[i]),bit\_index,\mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}});}
+\DoxyCodeLine{00304\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((\mbox{\hyperlink{classfc_1_1bloom__filter_a1456955c8ec72e48d83454a3a82a7a59}{bit\_table\_}}[bit\_index\ /\ bits\_per\_char]\ \&\ bit\_mask[\mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}}])\ !=\ bit\_mask[\mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}}])}
+\DoxyCodeLine{00305\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00306\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00307\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00308\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00309\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00310\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1bloom__filter_a7a533ef13bc53b922afe050c23bd7095_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1bloom__filter_a7a533ef13bc53b922afe050c23bd7095_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1bloom__filter_a563940aeaaa3889a52b9e78fa18fbed2}\index{fc::bloom\_filter@{fc::bloom\_filter}!contains\_all@{contains\_all}}
+\index{contains\_all@{contains\_all}!fc::bloom\_filter@{fc::bloom\_filter}}
+\doxysubsubsection{\texorpdfstring{contains\_all()}{contains\_all()}}
+{\footnotesize\ttfamily \label{classfc_1_1bloom__filter_a563940aeaaa3889a52b9e78fa18fbed2} 
+template$<$typename Input\+Iterator $>$ \\
+Input\+Iterator fc\+::bloom\+\_\+filter\+::contains\+\_\+all (\begin{DoxyParamCaption}\item[{const Input\+Iterator}]{begin}{, }\item[{const Input\+Iterator}]{end}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bloom__filter_8hpp_source_l00329}{329}} of file \mbox{\hyperlink{bloom__filter_8hpp_source}{bloom\+\_\+filter.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00330\ \ \ \ \{}
+\DoxyCodeLine{00331\ \ \ \ \ \ \ InputIterator\ itr\ =\ begin;}
+\DoxyCodeLine{00332\ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (end\ !=\ itr)}
+\DoxyCodeLine{00333\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00334\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{classfc_1_1bloom__filter_a7a533ef13bc53b922afe050c23bd7095}{contains}}(*itr))}
+\DoxyCodeLine{00335\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00336\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ itr;}
+\DoxyCodeLine{00337\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00338\ \ \ \ \ \ \ \ \ \ ++itr;}
+\DoxyCodeLine{00339\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00340\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ end;}
+\DoxyCodeLine{00341\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1bloom__filter_a563940aeaaa3889a52b9e78fa18fbed2_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1bloom__filter_a4bd29f86037d8faf5caa6dfa5eca7a15}\index{fc::bloom\_filter@{fc::bloom\_filter}!contains\_none@{contains\_none}}
+\index{contains\_none@{contains\_none}!fc::bloom\_filter@{fc::bloom\_filter}}
+\doxysubsubsection{\texorpdfstring{contains\_none()}{contains\_none()}}
+{\footnotesize\ttfamily \label{classfc_1_1bloom__filter_a4bd29f86037d8faf5caa6dfa5eca7a15} 
+template$<$typename Input\+Iterator $>$ \\
+Input\+Iterator fc\+::bloom\+\_\+filter\+::contains\+\_\+none (\begin{DoxyParamCaption}\item[{const Input\+Iterator}]{begin}{, }\item[{const Input\+Iterator}]{end}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bloom__filter_8hpp_source_l00344}{344}} of file \mbox{\hyperlink{bloom__filter_8hpp_source}{bloom\+\_\+filter.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00345\ \ \ \ \{}
+\DoxyCodeLine{00346\ \ \ \ \ \ \ InputIterator\ itr\ =\ begin;}
+\DoxyCodeLine{00347\ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (end\ !=\ itr)}
+\DoxyCodeLine{00348\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00349\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classfc_1_1bloom__filter_a7a533ef13bc53b922afe050c23bd7095}{contains}}(*itr))}
+\DoxyCodeLine{00350\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00351\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ itr;}
+\DoxyCodeLine{00352\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00353\ \ \ \ \ \ \ \ \ \ ++itr;}
+\DoxyCodeLine{00354\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00355\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ end;}
+\DoxyCodeLine{00356\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1bloom__filter_a4bd29f86037d8faf5caa6dfa5eca7a15_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1bloom__filter_a5aa4a5e6c72746145eea809fb547a697}\index{fc::bloom\_filter@{fc::bloom\_filter}!effective\_fpp@{effective\_fpp}}
+\index{effective\_fpp@{effective\_fpp}!fc::bloom\_filter@{fc::bloom\_filter}}
+\doxysubsubsection{\texorpdfstring{effective\_fpp()}{effective\_fpp()}}
+{\footnotesize\ttfamily \label{classfc_1_1bloom__filter_a5aa4a5e6c72746145eea809fb547a697} 
+double fc\+::bloom\+\_\+filter\+::effective\+\_\+fpp (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bloom__filter_8hpp_source_l00368}{368}} of file \mbox{\hyperlink{bloom__filter_8hpp_source}{bloom\+\_\+filter.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00369\ \ \ \ \{}
+\DoxyCodeLine{00370\ \ \ \ \ \ \ \textcolor{comment}{/*}}
+\DoxyCodeLine{00371\ \textcolor{comment}{\ \ \ \ \ \ \ \ Note:}}
+\DoxyCodeLine{00372\ \textcolor{comment}{\ \ \ \ \ \ \ \ The\ effective\ false\ positive\ probability\ is\ calculated\ using\ the}}
+\DoxyCodeLine{00373\ \textcolor{comment}{\ \ \ \ \ \ \ \ designated\ table\ size\ and\ hash\ function\ count\ in\ conjunction\ with}}
+\DoxyCodeLine{00374\ \textcolor{comment}{\ \ \ \ \ \ \ \ the\ current\ number\ of\ inserted\ elements\ -\/\ not\ the\ user\ defined}}
+\DoxyCodeLine{00375\ \textcolor{comment}{\ \ \ \ \ \ \ \ predicated/expected\ number\ of\ inserted\ elements.}}
+\DoxyCodeLine{00376\ \textcolor{comment}{\ \ \ \ \ \ */}}
+\DoxyCodeLine{00377\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::pow(1.0\ -\/\ std::exp(-\/1.0\ *\ \mbox{\hyperlink{classfc_1_1bloom__filter_a4aa68713801e124ed96fdeb6acdc91da}{salt\_}}.size()\ *\ \mbox{\hyperlink{classfc_1_1bloom__filter_aeb75fe01b8b19f559c8ea27c2e6e54b6}{inserted\_element\_count\_}}\ /\ \mbox{\hyperlink{classfc_1_1bloom__filter_a2ce933340ddf63a8c99599d26877d62b}{size}}()),\ 1.0\ *\ \mbox{\hyperlink{classfc_1_1bloom__filter_a4aa68713801e124ed96fdeb6acdc91da}{salt\_}}.size());}
+\DoxyCodeLine{00378\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1bloom__filter_a5aa4a5e6c72746145eea809fb547a697_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1bloom__filter_a428146893da62df826a82c0114bb1a1f}\index{fc::bloom\_filter@{fc::bloom\_filter}!element\_count@{element\_count}}
+\index{element\_count@{element\_count}!fc::bloom\_filter@{fc::bloom\_filter}}
+\doxysubsubsection{\texorpdfstring{element\_count()}{element\_count()}}
+{\footnotesize\ttfamily \label{classfc_1_1bloom__filter_a428146893da62df826a82c0114bb1a1f} 
+std\+::size\+\_\+t fc\+::bloom\+\_\+filter\+::element\+\_\+count (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bloom__filter_8hpp_source_l00363}{363}} of file \mbox{\hyperlink{bloom__filter_8hpp_source}{bloom\+\_\+filter.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00364\ \ \ \ \{}
+\DoxyCodeLine{00365\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1bloom__filter_aeb75fe01b8b19f559c8ea27c2e6e54b6}{inserted\_element\_count\_}};}
+\DoxyCodeLine{00366\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1bloom__filter_a8f2e62c9d3c975c761d37669e92c38db}\index{fc::bloom\_filter@{fc::bloom\_filter}!generate\_unique\_salt@{generate\_unique\_salt}}
+\index{generate\_unique\_salt@{generate\_unique\_salt}!fc::bloom\_filter@{fc::bloom\_filter}}
+\doxysubsubsection{\texorpdfstring{generate\_unique\_salt()}{generate\_unique\_salt()}}
+{\footnotesize\ttfamily \label{classfc_1_1bloom__filter_a8f2e62c9d3c975c761d37669e92c38db} 
+void fc\+::bloom\+\_\+filter\+::generate\+\_\+unique\+\_\+salt (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{bloom__filter_8hpp_source_l00449}{449}} of file \mbox{\hyperlink{bloom__filter_8hpp_source}{bloom\+\_\+filter.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00450\ \ \ \ \{}
+\DoxyCodeLine{00451\ \ \ \ \ \ \ \textcolor{comment}{/*}}
+\DoxyCodeLine{00452\ \textcolor{comment}{\ \ \ \ \ \ \ \ Note:}}
+\DoxyCodeLine{00453\ \textcolor{comment}{\ \ \ \ \ \ \ \ A\ distinct\ hash\ function\ need\ not\ be\ implementation-\/wise}}
+\DoxyCodeLine{00454\ \textcolor{comment}{\ \ \ \ \ \ \ \ distinct.\ In\ the\ current\ implementation\ "{}seeding"{}\ a\ common}}
+\DoxyCodeLine{00455\ \textcolor{comment}{\ \ \ \ \ \ \ \ hash\ function\ with\ different\ values\ seems\ to\ be\ adequate.}}
+\DoxyCodeLine{00456\ \textcolor{comment}{\ \ \ \ \ \ */}}
+\DoxyCodeLine{00457\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ predef\_salt\_count\ =\ 128;}
+\DoxyCodeLine{00458\ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1bloom__filter_a712a27ba8f26a107057b4982303a20ce}{bloom\_type}}\ predef\_salt[predef\_salt\_count]\ =}
+\DoxyCodeLine{00459\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00460\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0xAAAAAAAA,\ 0x55555555,\ 0x33333333,\ 0xCCCCCCCC,}
+\DoxyCodeLine{00461\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x66666666,\ 0x99999999,\ 0xB5B5B5B5,\ 0x4B4B4B4B,}
+\DoxyCodeLine{00462\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0xAA55AA55,\ 0x55335533,\ 0x33CC33CC,\ 0xCC66CC66,}
+\DoxyCodeLine{00463\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x66996699,\ 0x99B599B5,\ 0xB54BB54B,\ 0x4BAA4BAA,}
+\DoxyCodeLine{00464\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0xAA33AA33,\ 0x55CC55CC,\ 0x33663366,\ 0xCC99CC99,}
+\DoxyCodeLine{00465\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x66B566B5,\ 0x994B994B,\ 0xB5AAB5AA,\ 0xAAAAAA33,}
+\DoxyCodeLine{00466\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x555555CC,\ 0x33333366,\ 0xCCCCCC99,\ 0x666666B5,}
+\DoxyCodeLine{00467\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x9999994B,\ 0xB5B5B5AA,\ 0xFFFFFFFF,\ 0xFFFF0000,}
+\DoxyCodeLine{00468\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0xB823D5EB,\ 0xC1191CDF,\ 0xF623AEB3,\ 0xDB58499F,}
+\DoxyCodeLine{00469\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0xC8D42E70,\ 0xB173F616,\ 0xA91A5967,\ 0xDA427D63,}
+\DoxyCodeLine{00470\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0xB1E8A2EA,\ 0xF6C0D155,\ 0x4909FEA3,\ 0xA68CC6A7,}
+\DoxyCodeLine{00471\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0xC395E782,\ 0xA26057EB,\ 0x0CD5DA28,\ 0x467C5492,}
+\DoxyCodeLine{00472\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0xF15E6982,\ 0x61C6FAD3,\ 0x9615E352,\ 0x6E9E355A,}
+\DoxyCodeLine{00473\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x689B563E,\ 0x0C9831A8,\ 0x6753C18B,\ 0xA622689B,}
+\DoxyCodeLine{00474\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x8CA63C47,\ 0x42CC2884,\ 0x8E89919B,\ 0x6EDBD7D3,}
+\DoxyCodeLine{00475\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x15B6796C,\ 0x1D6FDFE4,\ 0x63FF9092,\ 0xE7401432,}
+\DoxyCodeLine{00476\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0xEFFE9412,\ 0xAEAEDF79,\ 0x9F245A31,\ 0x83C136FC,}
+\DoxyCodeLine{00477\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0xC3DA4A8C,\ 0xA5112C8C,\ 0x5271F491,\ 0x9A948DAB,}
+\DoxyCodeLine{00478\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0xCEE59A8D,\ 0xB5F525AB,\ 0x59D13217,\ 0x24E7C331,}
+\DoxyCodeLine{00479\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x697C2103,\ 0x84B0A460,\ 0x86156DA9,\ 0xAEF2AC68,}
+\DoxyCodeLine{00480\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x23243DA5,\ 0x3F649643,\ 0x5FA495A8,\ 0x67710DF8,}
+\DoxyCodeLine{00481\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x9A6C499E,\ 0xDCFB0227,\ 0x46A43433,\ 0x1832B07A,}
+\DoxyCodeLine{00482\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0xC46AFF3C,\ 0xB9C8FFF0,\ 0xC9500467,\ 0x34431BDF,}
+\DoxyCodeLine{00483\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0xB652432B,\ 0xE367F12B,\ 0x427F4C1B,\ 0x224C006E,}
+\DoxyCodeLine{00484\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x2E7E5A89,\ 0x96F99AA5,\ 0x0BEB452A,\ 0x2FD87C39,}
+\DoxyCodeLine{00485\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x74B2E1FB,\ 0x222EFD24,\ 0xF357F60C,\ 0x440FCB1E,}
+\DoxyCodeLine{00486\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x8BBE030F,\ 0x6704DC29,\ 0x1144D12F,\ 0x948B1355,}
+\DoxyCodeLine{00487\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x6D8FD7E9,\ 0x1C11A014,\ 0xADD1592F,\ 0xFB3C712E,}
+\DoxyCodeLine{00488\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0xFC77642F,\ 0xF9C4CE8C,\ 0x31312FB9,\ 0x08B0DD79,}
+\DoxyCodeLine{00489\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x318FA6E7,\ 0xC040D23D,\ 0xC0589AA7,\ 0x0CA5C075,}
+\DoxyCodeLine{00490\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0xF874B172,\ 0x0CF914D5,\ 0x784D3280,\ 0x4E8CFEBC,}
+\DoxyCodeLine{00491\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0xC569F575,\ 0xCDB2A091,\ 0x2CC016B4,\ 0x5C5F4421}
+\DoxyCodeLine{00492\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00493\ }
+\DoxyCodeLine{00494\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classfc_1_1bloom__filter_a0ce6a19263b4df2b9b8ef1170603507b}{salt\_count\_}}\ <=\ predef\_salt\_count)}
+\DoxyCodeLine{00495\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00496\ \ \ \ \ \ \ \ \ \ std::copy(predef\_salt,}
+\DoxyCodeLine{00497\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ predef\_salt\ +\ \mbox{\hyperlink{classfc_1_1bloom__filter_a0ce6a19263b4df2b9b8ef1170603507b}{salt\_count\_}},}
+\DoxyCodeLine{00498\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::back\_inserter(\mbox{\hyperlink{classfc_1_1bloom__filter_a4aa68713801e124ed96fdeb6acdc91da}{salt\_}}));}
+\DoxyCodeLine{00499\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{classfc_1_1bloom__filter_a4aa68713801e124ed96fdeb6acdc91da}{salt\_}}.size();\ ++i)}
+\DoxyCodeLine{00500\ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00501\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{/*}}
+\DoxyCodeLine{00502\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ Note:}}
+\DoxyCodeLine{00503\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ This\ is\ done\ to\ integrate\ the\ user\ defined\ random\ seed,}}
+\DoxyCodeLine{00504\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ so\ as\ to\ allow\ for\ the\ generation\ of\ unique\ bloom\ filter}}
+\DoxyCodeLine{00505\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ instances.}}
+\DoxyCodeLine{00506\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ */}}
+\DoxyCodeLine{00507\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bloom__filter_a4aa68713801e124ed96fdeb6acdc91da}{salt\_}}[i]\ =\ \mbox{\hyperlink{classfc_1_1bloom__filter_a4aa68713801e124ed96fdeb6acdc91da}{salt\_}}[i]\ *\ \mbox{\hyperlink{classfc_1_1bloom__filter_a4aa68713801e124ed96fdeb6acdc91da}{salt\_}}[(i\ +\ 3)\ \%\ \mbox{\hyperlink{classfc_1_1bloom__filter_a4aa68713801e124ed96fdeb6acdc91da}{salt\_}}.size()]\ +\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{classfc_1_1bloom__filter_a712a27ba8f26a107057b4982303a20ce}{bloom\_type}}\textcolor{keyword}{>}(\mbox{\hyperlink{classfc_1_1bloom__filter_afca8eb2c8812ac907106407a5e9324da}{random\_seed\_}});}
+\DoxyCodeLine{00508\ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00509\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00510\ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00511\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00512\ \ \ \ \ \ \ \ \ \ std::copy(predef\_salt,predef\_salt\ +\ predef\_salt\_count,std::back\_inserter(\mbox{\hyperlink{classfc_1_1bloom__filter_a4aa68713801e124ed96fdeb6acdc91da}{salt\_}}));}
+\DoxyCodeLine{00513\ \ \ \ \ \ \ \ \ \ srand(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\textcolor{keyword}{>}(\mbox{\hyperlink{classfc_1_1bloom__filter_afca8eb2c8812ac907106407a5e9324da}{random\_seed\_}}));}
+\DoxyCodeLine{00514\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (\mbox{\hyperlink{classfc_1_1bloom__filter_a4aa68713801e124ed96fdeb6acdc91da}{salt\_}}.size()\ <\ \mbox{\hyperlink{classfc_1_1bloom__filter_a0ce6a19263b4df2b9b8ef1170603507b}{salt\_count\_}})}
+\DoxyCodeLine{00515\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00516\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bloom__filter_a712a27ba8f26a107057b4982303a20ce}{bloom\_type}}\ current\_salt\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{classfc_1_1bloom__filter_a712a27ba8f26a107057b4982303a20ce}{bloom\_type}}\textcolor{keyword}{>}(rand())\ *\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{classfc_1_1bloom__filter_a712a27ba8f26a107057b4982303a20ce}{bloom\_type}}\textcolor{keyword}{>}(rand());}
+\DoxyCodeLine{00517\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (0\ ==\ current\_salt)\ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{00518\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classfc_1_1bloom__filter_a4aa68713801e124ed96fdeb6acdc91da}{salt\_}}.end()\ ==\ std::find(\mbox{\hyperlink{classfc_1_1bloom__filter_a4aa68713801e124ed96fdeb6acdc91da}{salt\_}}.begin(),\ \mbox{\hyperlink{classfc_1_1bloom__filter_a4aa68713801e124ed96fdeb6acdc91da}{salt\_}}.end(),\ current\_salt))}
+\DoxyCodeLine{00519\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00520\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bloom__filter_a4aa68713801e124ed96fdeb6acdc91da}{salt\_}}.push\_back(current\_salt);}
+\DoxyCodeLine{00521\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00522\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00523\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00524\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1bloom__filter_a8f2e62c9d3c975c761d37669e92c38db_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1bloom__filter_a953b432cacd40b9d2493ff910b0672fa}\index{fc::bloom\_filter@{fc::bloom\_filter}!hash\_ap@{hash\_ap}}
+\index{hash\_ap@{hash\_ap}!fc::bloom\_filter@{fc::bloom\_filter}}
+\doxysubsubsection{\texorpdfstring{hash\_ap()}{hash\_ap()}}
+{\footnotesize\ttfamily \label{classfc_1_1bloom__filter_a953b432cacd40b9d2493ff910b0672fa} 
+\mbox{\hyperlink{classfc_1_1bloom__filter_a712a27ba8f26a107057b4982303a20ce}{bloom\+\_\+type}} fc\+::bloom\+\_\+filter\+::hash\+\_\+ap (\begin{DoxyParamCaption}\item[{const unsigned char \texorpdfstring{$\ast$}{*}}]{begin}{, }\item[{std\+::size\+\_\+t}]{remaining\+\_\+length}{, }\item[{\mbox{\hyperlink{classfc_1_1bloom__filter_a712a27ba8f26a107057b4982303a20ce}{bloom\+\_\+type}}}]{hash}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{bloom__filter_8hpp_source_l00526}{526}} of file \mbox{\hyperlink{bloom__filter_8hpp_source}{bloom\+\_\+filter.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00527\ \ \ \ \{}
+\DoxyCodeLine{00528\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*\ itr\ =\ begin;}
+\DoxyCodeLine{00529\ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ loop\ =\ 0;}
+\DoxyCodeLine{00530\ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (remaining\_length\ >=\ 8)}
+\DoxyCodeLine{00531\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00532\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\&\ i1\ =\ *(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}*\textcolor{keyword}{>}(itr));\ itr\ +=\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{unsigned}\ int);}
+\DoxyCodeLine{00533\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\&\ i2\ =\ *(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}*\textcolor{keyword}{>}(itr));\ itr\ +=\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{unsigned}\ int);}
+\DoxyCodeLine{00534\ \ \ \ \ \ \ \ \ \ hash\ \string^=\ (hash\ <<\ \ 7)\ \string^\ \ i1\ *\ (hash\ >>\ 3)\ \string^}
+\DoxyCodeLine{00535\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\string~((hash\ <<\ 11)\ +\ (i2\ \string^\ (hash\ >>\ 5))));}
+\DoxyCodeLine{00536\ \ \ \ \ \ \ \ \ \ remaining\_length\ -\/=\ 8;}
+\DoxyCodeLine{00537\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00538\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (remaining\_length)}
+\DoxyCodeLine{00539\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00540\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (remaining\_length\ >=\ 4)}
+\DoxyCodeLine{00541\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00542\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\&\ i\ =\ *(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}*\textcolor{keyword}{>}(itr));}
+\DoxyCodeLine{00543\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (loop\ \&\ 0x01)}
+\DoxyCodeLine{00544\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ hash\ \string^=\ \ \ \ (hash\ <<\ \ 7)\ \string^\ \ i\ *\ (hash\ >>\ 3);}
+\DoxyCodeLine{00545\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00546\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ hash\ \string^=\ (\string~((hash\ <<\ 11)\ +\ (i\ \string^\ (hash\ >>\ 5))));}
+\DoxyCodeLine{00547\ \ \ \ \ \ \ \ \ \ \ \ \ ++loop;}
+\DoxyCodeLine{00548\ \ \ \ \ \ \ \ \ \ \ \ \ remaining\_length\ -\/=\ 4;}
+\DoxyCodeLine{00549\ \ \ \ \ \ \ \ \ \ \ \ \ itr\ +=\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{unsigned}\ int);}
+\DoxyCodeLine{00550\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00551\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (remaining\_length\ >=\ 2)}
+\DoxyCodeLine{00552\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00553\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{short}\&\ i\ =\ *(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{short}*\textcolor{keyword}{>}(itr));}
+\DoxyCodeLine{00554\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (loop\ \&\ 0x01)}
+\DoxyCodeLine{00555\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ hash\ \string^=\ \ \ \ (hash\ <<\ \ 7)\ \string^\ \ i\ *\ (hash\ >>\ 3);}
+\DoxyCodeLine{00556\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00557\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ hash\ \string^=\ (\string~((hash\ <<\ 11)\ +\ (i\ \string^\ (hash\ >>\ 5))));}
+\DoxyCodeLine{00558\ \ \ \ \ \ \ \ \ \ \ \ \ ++loop;}
+\DoxyCodeLine{00559\ \ \ \ \ \ \ \ \ \ \ \ \ remaining\_length\ -\/=\ 2;}
+\DoxyCodeLine{00560\ \ \ \ \ \ \ \ \ \ \ \ \ itr\ +=\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{unsigned}\ short);}
+\DoxyCodeLine{00561\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00562\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (remaining\_length)}
+\DoxyCodeLine{00563\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00564\ \ \ \ \ \ \ \ \ \ \ \ \ hash\ +=\ ((*itr)\ \string^\ (hash\ *\ 0xA5A5A5A5))\ +\ loop;}
+\DoxyCodeLine{00565\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00566\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00567\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ hash;}
+\DoxyCodeLine{00568\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1bloom__filter_a953b432cacd40b9d2493ff910b0672fa_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1bloom__filter_ae07d22fd8cad4d753e4dfd67132c5e7d}\index{fc::bloom\_filter@{fc::bloom\_filter}!hash\_count@{hash\_count}}
+\index{hash\_count@{hash\_count}!fc::bloom\_filter@{fc::bloom\_filter}}
+\doxysubsubsection{\texorpdfstring{hash\_count()}{hash\_count()}}
+{\footnotesize\ttfamily \label{classfc_1_1bloom__filter_ae07d22fd8cad4d753e4dfd67132c5e7d} 
+std\+::size\+\_\+t fc\+::bloom\+\_\+filter\+::hash\+\_\+count (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bloom__filter_8hpp_source_l00436}{436}} of file \mbox{\hyperlink{bloom__filter_8hpp_source}{bloom\+\_\+filter.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00437\ \ \ \ \{}
+\DoxyCodeLine{00438\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1bloom__filter_a4aa68713801e124ed96fdeb6acdc91da}{salt\_}}.size();}
+\DoxyCodeLine{00439\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1bloom__filter_a6573afbce511a80567622577f26808f6}\index{fc::bloom\_filter@{fc::bloom\_filter}!insert@{insert}}
+\index{insert@{insert}!fc::bloom\_filter@{fc::bloom\_filter}}
+\doxysubsubsection{\texorpdfstring{insert()}{insert()}\hspace{0.1cm}{\footnotesize\ttfamily [1/5]}}
+{\footnotesize\ttfamily \label{classfc_1_1bloom__filter_a6573afbce511a80567622577f26808f6} 
+void fc\+::bloom\+\_\+filter\+::insert (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{data}{, }\item[{const std\+::size\+\_\+t \&}]{length}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bloom__filter_8hpp_source_l00282}{282}} of file \mbox{\hyperlink{bloom__filter_8hpp_source}{bloom\+\_\+filter.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00283\ \ \ \ \{}
+\DoxyCodeLine{00284\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bloom__filter_a024a01a04bcfef5c6fb20c0a29022b08}{insert}}(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*\textcolor{keyword}{>}(data),length);}
+\DoxyCodeLine{00285\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1bloom__filter_a6573afbce511a80567622577f26808f6_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1bloom__filter_a9c3b1a6d79deb07f906e836dd97ee696}\index{fc::bloom\_filter@{fc::bloom\_filter}!insert@{insert}}
+\index{insert@{insert}!fc::bloom\_filter@{fc::bloom\_filter}}
+\doxysubsubsection{\texorpdfstring{insert()}{insert()}\hspace{0.1cm}{\footnotesize\ttfamily [2/5]}}
+{\footnotesize\ttfamily \label{classfc_1_1bloom__filter_a9c3b1a6d79deb07f906e836dd97ee696} 
+template$<$typename Input\+Iterator $>$ \\
+void fc\+::bloom\+\_\+filter\+::insert (\begin{DoxyParamCaption}\item[{const Input\+Iterator}]{begin}{, }\item[{const Input\+Iterator}]{end}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bloom__filter_8hpp_source_l00288}{288}} of file \mbox{\hyperlink{bloom__filter_8hpp_source}{bloom\+\_\+filter.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00289\ \ \ \ \{}
+\DoxyCodeLine{00290\ \ \ \ \ \ \ InputIterator\ itr\ =\ begin;}
+\DoxyCodeLine{00291\ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (end\ !=\ itr)}
+\DoxyCodeLine{00292\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00293\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bloom__filter_a024a01a04bcfef5c6fb20c0a29022b08}{insert}}(*(itr++));}
+\DoxyCodeLine{00294\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00295\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1bloom__filter_a9c3b1a6d79deb07f906e836dd97ee696_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1bloom__filter_a4094b9d7a34d14c55d1cf61be2d6d019}\index{fc::bloom\_filter@{fc::bloom\_filter}!insert@{insert}}
+\index{insert@{insert}!fc::bloom\_filter@{fc::bloom\_filter}}
+\doxysubsubsection{\texorpdfstring{insert()}{insert()}\hspace{0.1cm}{\footnotesize\ttfamily [3/5]}}
+{\footnotesize\ttfamily \label{classfc_1_1bloom__filter_a4094b9d7a34d14c55d1cf61be2d6d019} 
+void fc\+::bloom\+\_\+filter\+::insert (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{key}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bloom__filter_8hpp_source_l00277}{277}} of file \mbox{\hyperlink{bloom__filter_8hpp_source}{bloom\+\_\+filter.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00278\ \ \ \ \{}
+\DoxyCodeLine{00279\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bloom__filter_a024a01a04bcfef5c6fb20c0a29022b08}{insert}}(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*\textcolor{keyword}{>}(key.c\_str()),key.size());}
+\DoxyCodeLine{00280\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1bloom__filter_a4094b9d7a34d14c55d1cf61be2d6d019_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1bloom__filter_a64116c7139c55bfbea36662e5c5e5c91}\index{fc::bloom\_filter@{fc::bloom\_filter}!insert@{insert}}
+\index{insert@{insert}!fc::bloom\_filter@{fc::bloom\_filter}}
+\doxysubsubsection{\texorpdfstring{insert()}{insert()}\hspace{0.1cm}{\footnotesize\ttfamily [4/5]}}
+{\footnotesize\ttfamily \label{classfc_1_1bloom__filter_a64116c7139c55bfbea36662e5c5e5c91} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+void fc\+::bloom\+\_\+filter\+::insert (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{t}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bloom__filter_8hpp_source_l00271}{271}} of file \mbox{\hyperlink{bloom__filter_8hpp_source}{bloom\+\_\+filter.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00272\ \ \ \ \{}
+\DoxyCodeLine{00273\ \ \ \ \ \ \ \textcolor{comment}{//\ Note:\ T\ must\ be\ a\ C++\ POD\ type.}}
+\DoxyCodeLine{00274\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bloom__filter_a024a01a04bcfef5c6fb20c0a29022b08}{insert}}(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*\textcolor{keyword}{>}(\&t),\textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}));}
+\DoxyCodeLine{00275\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1bloom__filter_a64116c7139c55bfbea36662e5c5e5c91_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1bloom__filter_a024a01a04bcfef5c6fb20c0a29022b08}\index{fc::bloom\_filter@{fc::bloom\_filter}!insert@{insert}}
+\index{insert@{insert}!fc::bloom\_filter@{fc::bloom\_filter}}
+\doxysubsubsection{\texorpdfstring{insert()}{insert()}\hspace{0.1cm}{\footnotesize\ttfamily [5/5]}}
+{\footnotesize\ttfamily \label{classfc_1_1bloom__filter_a024a01a04bcfef5c6fb20c0a29022b08} 
+void fc\+::bloom\+\_\+filter\+::insert (\begin{DoxyParamCaption}\item[{const unsigned char \texorpdfstring{$\ast$}{*}}]{key\+\_\+begin}{, }\item[{const std\+::size\+\_\+t \&}]{length}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bloom__filter_8hpp_source_l00258}{258}} of file \mbox{\hyperlink{bloom__filter_8hpp_source}{bloom\+\_\+filter.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00259\ \ \ \ \{}
+\DoxyCodeLine{00260\ \ \ \ \ \ \ std::size\_t\ bit\_index\ =\ 0;}
+\DoxyCodeLine{00261\ \ \ \ \ \ \ std::size\_t\ \mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}}\ =\ 0;}
+\DoxyCodeLine{00262\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (std::size\_t\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{classfc_1_1bloom__filter_a4aa68713801e124ed96fdeb6acdc91da}{salt\_}}.size();\ ++i)}
+\DoxyCodeLine{00263\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00264\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bloom__filter_a782a4ca932e2f8a03b11dd41652a5e69}{compute\_indices}}(\mbox{\hyperlink{classfc_1_1bloom__filter_a953b432cacd40b9d2493ff910b0672fa}{hash\_ap}}(key\_begin,length,\mbox{\hyperlink{classfc_1_1bloom__filter_a4aa68713801e124ed96fdeb6acdc91da}{salt\_}}[i]),bit\_index,\mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}});}
+\DoxyCodeLine{00265\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bloom__filter_a1456955c8ec72e48d83454a3a82a7a59}{bit\_table\_}}[bit\_index\ /\ bits\_per\_char]\ |=\ bit\_mask[\mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}}];}
+\DoxyCodeLine{00266\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00267\ \ \ \ \ \ \ ++\mbox{\hyperlink{classfc_1_1bloom__filter_aeb75fe01b8b19f559c8ea27c2e6e54b6}{inserted\_element\_count\_}};}
+\DoxyCodeLine{00268\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1bloom__filter_a024a01a04bcfef5c6fb20c0a29022b08_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=337pt]{classfc_1_1bloom__filter_a024a01a04bcfef5c6fb20c0a29022b08_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1bloom__filter_a948856dcae6bdd746147a2e7ffa6e09b}\index{fc::bloom\_filter@{fc::bloom\_filter}!operator"!@{operator"!}}
+\index{operator"!@{operator"!}!fc::bloom\_filter@{fc::bloom\_filter}}
+\doxysubsubsection{\texorpdfstring{operator"!()}{operator!()}}
+{\footnotesize\ttfamily \label{classfc_1_1bloom__filter_a948856dcae6bdd746147a2e7ffa6e09b} 
+bool fc\+::bloom\+\_\+filter\+::operator! (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bloom__filter_8hpp_source_l00247}{247}} of file \mbox{\hyperlink{bloom__filter_8hpp_source}{bloom\+\_\+filter.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00248\ \ \ \ \{}
+\DoxyCodeLine{00249\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (0\ ==\ \mbox{\hyperlink{classfc_1_1bloom__filter_a7288d926a8bfe6e783b65641e84b4c64}{table\_size\_}});}
+\DoxyCodeLine{00250\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1bloom__filter_ae8f909c2a5c07dfeb84438dfbacbadd5}\index{fc::bloom\_filter@{fc::bloom\_filter}!operator"!=@{operator"!=}}
+\index{operator"!=@{operator"!=}!fc::bloom\_filter@{fc::bloom\_filter}}
+\doxysubsubsection{\texorpdfstring{operator"!=()}{operator!=()}}
+{\footnotesize\ttfamily \label{classfc_1_1bloom__filter_ae8f909c2a5c07dfeb84438dfbacbadd5} 
+bool \mbox{\hyperlink{classfc_1_1bloom__filter_a948856dcae6bdd746147a2e7ffa6e09b}{fc\+::bloom\+\_\+filter\+::operator!}}= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1bloom__filter}{bloom\+\_\+filter}} \&}]{f}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bloom__filter_8hpp_source_l00220}{220}} of file \mbox{\hyperlink{bloom__filter_8hpp_source}{bloom\+\_\+filter.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00221\ \ \ \ \{}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !\mbox{\hyperlink{classfc_1_1bloom__filter_a84ebbb3010a0ec2bfba07738deb7990b}{operator==}}(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}});}
+\DoxyCodeLine{00223\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1bloom__filter_ae8f909c2a5c07dfeb84438dfbacbadd5_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1bloom__filter_ae55df09a4236a9fffdf07c9a90641d7d}\index{fc::bloom\_filter@{fc::bloom\_filter}!operator\&=@{operator\&=}}
+\index{operator\&=@{operator\&=}!fc::bloom\_filter@{fc::bloom\_filter}}
+\doxysubsubsection{\texorpdfstring{operator\&=()}{operator\&=()}}
+{\footnotesize\ttfamily \label{classfc_1_1bloom__filter_ae55df09a4236a9fffdf07c9a90641d7d} 
+\mbox{\hyperlink{classfc_1_1bloom__filter}{bloom\+\_\+filter}} \& fc\+::bloom\+\_\+filter\+::operator\&= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1bloom__filter}{bloom\+\_\+filter}} \&}]{f}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bloom__filter_8hpp_source_l00380}{380}} of file \mbox{\hyperlink{bloom__filter_8hpp_source}{bloom\+\_\+filter.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00381\ \ \ \ \{}
+\DoxyCodeLine{00382\ \ \ \ \ \ \ \textcolor{comment}{/*\ intersection\ */}}
+\DoxyCodeLine{00383\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (}
+\DoxyCodeLine{00384\ \ \ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{classfc_1_1bloom__filter_a0ce6a19263b4df2b9b8ef1170603507b}{salt\_count\_}}\ \ ==\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}.salt\_count\_)\ \&\&}
+\DoxyCodeLine{00385\ \ \ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{classfc_1_1bloom__filter_a7288d926a8bfe6e783b65641e84b4c64}{table\_size\_}}\ \ ==\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}.table\_size\_)\ \&\&}
+\DoxyCodeLine{00386\ \ \ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{classfc_1_1bloom__filter_afca8eb2c8812ac907106407a5e9324da}{random\_seed\_}}\ ==\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}.random\_seed\_)}
+\DoxyCodeLine{00387\ \ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{00388\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00389\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (std::size\_t\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{classfc_1_1bloom__filter_abf3a0473b9cf4df2c4f000ca87f6649d}{raw\_table\_size\_}};\ ++i)}
+\DoxyCodeLine{00390\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00391\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bloom__filter_a1456955c8ec72e48d83454a3a82a7a59}{bit\_table\_}}[i]\ \&=\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}.bit\_table\_[i];}
+\DoxyCodeLine{00392\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00393\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00394\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00395\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1bloom__filter_a5a32b81e9f0ff5824c6760d5a7fac63d}\index{fc::bloom\_filter@{fc::bloom\_filter}!operator=@{operator=}}
+\index{operator=@{operator=}!fc::bloom\_filter@{fc::bloom\_filter}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}}
+{\footnotesize\ttfamily \label{classfc_1_1bloom__filter_a5a32b81e9f0ff5824c6760d5a7fac63d} 
+\mbox{\hyperlink{classfc_1_1bloom__filter}{bloom\+\_\+filter}} \& fc\+::bloom\+\_\+filter\+::operator= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1bloom__filter}{bloom\+\_\+filter}} \&}]{f}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bloom__filter_8hpp_source_l00225}{225}} of file \mbox{\hyperlink{bloom__filter_8hpp_source}{bloom\+\_\+filter.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00226\ \ \ \ \{}
+\DoxyCodeLine{00227\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{this}\ !=\ \&\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})}
+\DoxyCodeLine{00228\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00229\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bloom__filter_a0ce6a19263b4df2b9b8ef1170603507b}{salt\_count\_}}\ =\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}.salt\_count\_;}
+\DoxyCodeLine{00230\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bloom__filter_a7288d926a8bfe6e783b65641e84b4c64}{table\_size\_}}\ =\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}.table\_size\_;}
+\DoxyCodeLine{00231\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bloom__filter_abf3a0473b9cf4df2c4f000ca87f6649d}{raw\_table\_size\_}}\ =\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}.raw\_table\_size\_;}
+\DoxyCodeLine{00232\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bloom__filter_aa60f2c26fc7e77e3757e11649ddb68df}{projected\_element\_count\_}}\ =\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}.projected\_element\_count\_;}
+\DoxyCodeLine{00233\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bloom__filter_aeb75fe01b8b19f559c8ea27c2e6e54b6}{inserted\_element\_count\_}}\ =\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}.inserted\_element\_count\_;}
+\DoxyCodeLine{00234\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bloom__filter_afca8eb2c8812ac907106407a5e9324da}{random\_seed\_}}\ =\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}.random\_seed\_;}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bloom__filter_ae5376d38d0df19b97e30172e9b7f9d64}{desired\_false\_positive\_probability\_}}\ =\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}.desired\_false\_positive\_probability\_;}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bloom__filter_a1456955c8ec72e48d83454a3a82a7a59}{bit\_table\_}}.resize(\ \mbox{\hyperlink{classfc_1_1bloom__filter_abf3a0473b9cf4df2c4f000ca87f6649d}{raw\_table\_size\_}}\ );}
+\DoxyCodeLine{00237\ \ \ \ \ \ \ \ \ \ std::copy(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}.bit\_table\_.data(),\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}.bit\_table\_.data()\ +\ \mbox{\hyperlink{classfc_1_1bloom__filter_abf3a0473b9cf4df2c4f000ca87f6649d}{raw\_table\_size\_}},\mbox{\hyperlink{classfc_1_1bloom__filter_a1456955c8ec72e48d83454a3a82a7a59}{bit\_table\_}}.data());}
+\DoxyCodeLine{00238\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bloom__filter_a4aa68713801e124ed96fdeb6acdc91da}{salt\_}}\ =\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}.salt\_;}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00241\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1bloom__filter_a5a32b81e9f0ff5824c6760d5a7fac63d_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1bloom__filter_a84ebbb3010a0ec2bfba07738deb7990b}\index{fc::bloom\_filter@{fc::bloom\_filter}!operator==@{operator==}}
+\index{operator==@{operator==}!fc::bloom\_filter@{fc::bloom\_filter}}
+\doxysubsubsection{\texorpdfstring{operator==()}{operator==()}}
+{\footnotesize\ttfamily \label{classfc_1_1bloom__filter_a84ebbb3010a0ec2bfba07738deb7990b} 
+bool fc\+::bloom\+\_\+filter\+::operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1bloom__filter}{bloom\+\_\+filter}} \&}]{f}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bloom__filter_8hpp_source_l00201}{201}} of file \mbox{\hyperlink{bloom__filter_8hpp_source}{bloom\+\_\+filter.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00202\ \ \ \ \{}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{this}\ !=\ \&\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{classfc_1_1bloom__filter_a0ce6a19263b4df2b9b8ef1170603507b}{salt\_count\_}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ==\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}.salt\_count\_)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\&}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{classfc_1_1bloom__filter_a7288d926a8bfe6e783b65641e84b4c64}{table\_size\_}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ==\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}.table\_size\_)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\&}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{classfc_1_1bloom__filter_abf3a0473b9cf4df2c4f000ca87f6649d}{raw\_table\_size\_}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ==\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}.raw\_table\_size\_)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\&}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{classfc_1_1bloom__filter_aa60f2c26fc7e77e3757e11649ddb68df}{projected\_element\_count\_}}\ \ \ \ \ \ \ \ \ \ \ \ ==\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}.projected\_element\_count\_)\ \ \ \ \ \ \ \ \ \ \ \ \&\&}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{classfc_1_1bloom__filter_aeb75fe01b8b19f559c8ea27c2e6e54b6}{inserted\_element\_count\_}}\ \ \ \ \ \ \ \ \ \ \ \ \ ==\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}.inserted\_element\_count\_)\ \ \ \ \ \ \ \ \ \ \ \ \ \&\&}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{classfc_1_1bloom__filter_afca8eb2c8812ac907106407a5e9324da}{random\_seed\_}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ==\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}.random\_seed\_)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\&}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{classfc_1_1bloom__filter_ae5376d38d0df19b97e30172e9b7f9d64}{desired\_false\_positive\_probability\_}}\ ==\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}.desired\_false\_positive\_probability\_)\ \&\&}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{classfc_1_1bloom__filter_a4aa68713801e124ed96fdeb6acdc91da}{salt\_}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ==\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}.salt\_)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\&}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ \ \ \ \ std::equal(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}.bit\_table\_.data(),\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}.bit\_table\_.data()\ +\ \mbox{\hyperlink{classfc_1_1bloom__filter_abf3a0473b9cf4df2c4f000ca87f6649d}{raw\_table\_size\_}},\mbox{\hyperlink{classfc_1_1bloom__filter_a1456955c8ec72e48d83454a3a82a7a59}{bit\_table\_}}.data());}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00217\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00218\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1bloom__filter_a84ebbb3010a0ec2bfba07738deb7990b_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1bloom__filter_adce1d4bcc09ee5a68b92b1ac2b8ad52c}\index{fc::bloom\_filter@{fc::bloom\_filter}!operator\texorpdfstring{$^\wedge$}{\string^}=@{operator\texorpdfstring{$^\wedge$}{\string^}=}}
+\index{operator\texorpdfstring{$^\wedge$}{\string^}=@{operator\texorpdfstring{$^\wedge$}{\string^}=}!fc::bloom\_filter@{fc::bloom\_filter}}
+\doxysubsubsection{\texorpdfstring{operator\texorpdfstring{$^\wedge$}{\string^}=()}{operator\string^=()}}
+{\footnotesize\ttfamily \label{classfc_1_1bloom__filter_adce1d4bcc09ee5a68b92b1ac2b8ad52c} 
+\mbox{\hyperlink{classfc_1_1bloom__filter}{bloom\+\_\+filter}} \& fc\+::bloom\+\_\+filter\+::operator\texorpdfstring{$^\wedge$}{\string^}= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1bloom__filter}{bloom\+\_\+filter}} \&}]{f}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bloom__filter_8hpp_source_l00414}{414}} of file \mbox{\hyperlink{bloom__filter_8hpp_source}{bloom\+\_\+filter.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00415\ \ \ \ \{}
+\DoxyCodeLine{00416\ \ \ \ \ \ \ \textcolor{comment}{/*\ difference\ */}}
+\DoxyCodeLine{00417\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (}
+\DoxyCodeLine{00418\ \ \ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{classfc_1_1bloom__filter_a0ce6a19263b4df2b9b8ef1170603507b}{salt\_count\_}}\ \ ==\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}.salt\_count\_)\ \&\&}
+\DoxyCodeLine{00419\ \ \ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{classfc_1_1bloom__filter_a7288d926a8bfe6e783b65641e84b4c64}{table\_size\_}}\ \ ==\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}.table\_size\_)\ \&\&}
+\DoxyCodeLine{00420\ \ \ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{classfc_1_1bloom__filter_afca8eb2c8812ac907106407a5e9324da}{random\_seed\_}}\ ==\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}.random\_seed\_)}
+\DoxyCodeLine{00421\ \ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{00422\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00423\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (std::size\_t\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{classfc_1_1bloom__filter_abf3a0473b9cf4df2c4f000ca87f6649d}{raw\_table\_size\_}};\ ++i)}
+\DoxyCodeLine{00424\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00425\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bloom__filter_a1456955c8ec72e48d83454a3a82a7a59}{bit\_table\_}}[i]\ \string^=\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}.bit\_table\_[i];}
+\DoxyCodeLine{00426\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00427\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00428\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00429\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1bloom__filter_ae05028039e60a840ec19bbbd7065a352}\index{fc::bloom\_filter@{fc::bloom\_filter}!operator\texttt{"|}=@{operator\texttt{"|}=}}
+\index{operator\texttt{"|}=@{operator\texttt{"|}=}!fc::bloom\_filter@{fc::bloom\_filter}}
+\doxysubsubsection{\texorpdfstring{operator\texttt{"|}=()}{operator|=()}}
+{\footnotesize\ttfamily \label{classfc_1_1bloom__filter_ae05028039e60a840ec19bbbd7065a352} 
+\mbox{\hyperlink{classfc_1_1bloom__filter}{bloom\+\_\+filter}} \& fc\+::bloom\+\_\+filter\+::operator\texorpdfstring{$\vert$}{|}= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1bloom__filter}{bloom\+\_\+filter}} \&}]{f}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bloom__filter_8hpp_source_l00397}{397}} of file \mbox{\hyperlink{bloom__filter_8hpp_source}{bloom\+\_\+filter.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00398\ \ \ \ \{}
+\DoxyCodeLine{00399\ \ \ \ \ \ \ \textcolor{comment}{/*\ union\ */}}
+\DoxyCodeLine{00400\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (}
+\DoxyCodeLine{00401\ \ \ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{classfc_1_1bloom__filter_a0ce6a19263b4df2b9b8ef1170603507b}{salt\_count\_}}\ \ ==\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}.salt\_count\_)\ \&\&}
+\DoxyCodeLine{00402\ \ \ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{classfc_1_1bloom__filter_a7288d926a8bfe6e783b65641e84b4c64}{table\_size\_}}\ \ ==\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}.table\_size\_)\ \&\&}
+\DoxyCodeLine{00403\ \ \ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{classfc_1_1bloom__filter_afca8eb2c8812ac907106407a5e9324da}{random\_seed\_}}\ ==\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}.random\_seed\_)}
+\DoxyCodeLine{00404\ \ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{00405\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00406\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (std::size\_t\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{classfc_1_1bloom__filter_abf3a0473b9cf4df2c4f000ca87f6649d}{raw\_table\_size\_}};\ ++i)}
+\DoxyCodeLine{00407\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00408\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1bloom__filter_a1456955c8ec72e48d83454a3a82a7a59}{bit\_table\_}}[i]\ |=\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}.bit\_table\_[i];}
+\DoxyCodeLine{00409\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00410\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00411\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00412\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1bloom__filter_a2ce933340ddf63a8c99599d26877d62b}\index{fc::bloom\_filter@{fc::bloom\_filter}!size@{size}}
+\index{size@{size}!fc::bloom\_filter@{fc::bloom\_filter}}
+\doxysubsubsection{\texorpdfstring{size()}{size()}}
+{\footnotesize\ttfamily \label{classfc_1_1bloom__filter_a2ce933340ddf63a8c99599d26877d62b} 
+virtual unsigned long long int fc\+::bloom\+\_\+filter\+::size (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{bloom__filter_8hpp_source_l00358}{358}} of file \mbox{\hyperlink{bloom__filter_8hpp_source}{bloom\+\_\+filter.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00359\ \ \ \ \{}
+\DoxyCodeLine{00360\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1bloom__filter_a7288d926a8bfe6e783b65641e84b4c64}{table\_size\_}};}
+\DoxyCodeLine{00361\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1bloom__filter_a2ce933340ddf63a8c99599d26877d62b_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1bloom__filter_a50def5a412b272a559aeff90a30da282}\index{fc::bloom\_filter@{fc::bloom\_filter}!table@{table}}
+\index{table@{table}!fc::bloom\_filter@{fc::bloom\_filter}}
+\doxysubsubsection{\texorpdfstring{table()}{table()}}
+{\footnotesize\ttfamily \label{classfc_1_1bloom__filter_a50def5a412b272a559aeff90a30da282} 
+const \mbox{\hyperlink{classfc_1_1bloom__filter_aba3c0b9bcab3ae195506ccdb03d3401f}{cell\+\_\+type}} \texorpdfstring{$\ast$}{*} fc\+::bloom\+\_\+filter\+::table (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bloom__filter_8hpp_source_l00431}{431}} of file \mbox{\hyperlink{bloom__filter_8hpp_source}{bloom\+\_\+filter.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00432\ \ \ \ \{}
+\DoxyCodeLine{00433\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1bloom__filter_a1456955c8ec72e48d83454a3a82a7a59}{bit\_table\_}}.data();}
+\DoxyCodeLine{00434\ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classfc_1_1bloom__filter_a1456955c8ec72e48d83454a3a82a7a59}\index{fc::bloom\_filter@{fc::bloom\_filter}!bit\_table\_@{bit\_table\_}}
+\index{bit\_table\_@{bit\_table\_}!fc::bloom\_filter@{fc::bloom\_filter}}
+\doxysubsubsection{\texorpdfstring{bit\_table\_}{bit\_table\_}}
+{\footnotesize\ttfamily \label{classfc_1_1bloom__filter_a1456955c8ec72e48d83454a3a82a7a59} 
+std\+::vector$<$unsigned char$>$ fc\+::bloom\+\_\+filter\+::bit\+\_\+table\+\_\+}
+
+
+
+Definition at line \mbox{\hyperlink{bloom__filter_8hpp_source_l00572}{572}} of file \mbox{\hyperlink{bloom__filter_8hpp_source}{bloom\+\_\+filter.\+hpp}}.
+
+\Hypertarget{classfc_1_1bloom__filter_ae5376d38d0df19b97e30172e9b7f9d64}\index{fc::bloom\_filter@{fc::bloom\_filter}!desired\_false\_positive\_probability\_@{desired\_false\_positive\_probability\_}}
+\index{desired\_false\_positive\_probability\_@{desired\_false\_positive\_probability\_}!fc::bloom\_filter@{fc::bloom\_filter}}
+\doxysubsubsection{\texorpdfstring{desired\_false\_positive\_probability\_}{desired\_false\_positive\_probability\_}}
+{\footnotesize\ttfamily \label{classfc_1_1bloom__filter_ae5376d38d0df19b97e30172e9b7f9d64} 
+double fc\+::bloom\+\_\+filter\+::desired\+\_\+false\+\_\+positive\+\_\+probability\+\_\+}
+
+
+
+Definition at line \mbox{\hyperlink{bloom__filter_8hpp_source_l00579}{579}} of file \mbox{\hyperlink{bloom__filter_8hpp_source}{bloom\+\_\+filter.\+hpp}}.
+
+\Hypertarget{classfc_1_1bloom__filter_aeb75fe01b8b19f559c8ea27c2e6e54b6}\index{fc::bloom\_filter@{fc::bloom\_filter}!inserted\_element\_count\_@{inserted\_element\_count\_}}
+\index{inserted\_element\_count\_@{inserted\_element\_count\_}!fc::bloom\_filter@{fc::bloom\_filter}}
+\doxysubsubsection{\texorpdfstring{inserted\_element\_count\_}{inserted\_element\_count\_}}
+{\footnotesize\ttfamily \label{classfc_1_1bloom__filter_aeb75fe01b8b19f559c8ea27c2e6e54b6} 
+unsigned int fc\+::bloom\+\_\+filter\+::inserted\+\_\+element\+\_\+count\+\_\+}
+
+
+
+Definition at line \mbox{\hyperlink{bloom__filter_8hpp_source_l00577}{577}} of file \mbox{\hyperlink{bloom__filter_8hpp_source}{bloom\+\_\+filter.\+hpp}}.
+
+\Hypertarget{classfc_1_1bloom__filter_aa60f2c26fc7e77e3757e11649ddb68df}\index{fc::bloom\_filter@{fc::bloom\_filter}!projected\_element\_count\_@{projected\_element\_count\_}}
+\index{projected\_element\_count\_@{projected\_element\_count\_}!fc::bloom\_filter@{fc::bloom\_filter}}
+\doxysubsubsection{\texorpdfstring{projected\_element\_count\_}{projected\_element\_count\_}}
+{\footnotesize\ttfamily \label{classfc_1_1bloom__filter_aa60f2c26fc7e77e3757e11649ddb68df} 
+unsigned long long int fc\+::bloom\+\_\+filter\+::projected\+\_\+element\+\_\+count\+\_\+}
+
+
+
+Definition at line \mbox{\hyperlink{bloom__filter_8hpp_source_l00576}{576}} of file \mbox{\hyperlink{bloom__filter_8hpp_source}{bloom\+\_\+filter.\+hpp}}.
+
+\Hypertarget{classfc_1_1bloom__filter_afca8eb2c8812ac907106407a5e9324da}\index{fc::bloom\_filter@{fc::bloom\_filter}!random\_seed\_@{random\_seed\_}}
+\index{random\_seed\_@{random\_seed\_}!fc::bloom\_filter@{fc::bloom\_filter}}
+\doxysubsubsection{\texorpdfstring{random\_seed\_}{random\_seed\_}}
+{\footnotesize\ttfamily \label{classfc_1_1bloom__filter_afca8eb2c8812ac907106407a5e9324da} 
+unsigned long long int fc\+::bloom\+\_\+filter\+::random\+\_\+seed\+\_\+}
+
+
+
+Definition at line \mbox{\hyperlink{bloom__filter_8hpp_source_l00578}{578}} of file \mbox{\hyperlink{bloom__filter_8hpp_source}{bloom\+\_\+filter.\+hpp}}.
+
+\Hypertarget{classfc_1_1bloom__filter_abf3a0473b9cf4df2c4f000ca87f6649d}\index{fc::bloom\_filter@{fc::bloom\_filter}!raw\_table\_size\_@{raw\_table\_size\_}}
+\index{raw\_table\_size\_@{raw\_table\_size\_}!fc::bloom\_filter@{fc::bloom\_filter}}
+\doxysubsubsection{\texorpdfstring{raw\_table\_size\_}{raw\_table\_size\_}}
+{\footnotesize\ttfamily \label{classfc_1_1bloom__filter_abf3a0473b9cf4df2c4f000ca87f6649d} 
+unsigned long long int fc\+::bloom\+\_\+filter\+::raw\+\_\+table\+\_\+size\+\_\+}
+
+
+
+Definition at line \mbox{\hyperlink{bloom__filter_8hpp_source_l00575}{575}} of file \mbox{\hyperlink{bloom__filter_8hpp_source}{bloom\+\_\+filter.\+hpp}}.
+
+\Hypertarget{classfc_1_1bloom__filter_a4aa68713801e124ed96fdeb6acdc91da}\index{fc::bloom\_filter@{fc::bloom\_filter}!salt\_@{salt\_}}
+\index{salt\_@{salt\_}!fc::bloom\_filter@{fc::bloom\_filter}}
+\doxysubsubsection{\texorpdfstring{salt\_}{salt\_}}
+{\footnotesize\ttfamily \label{classfc_1_1bloom__filter_a4aa68713801e124ed96fdeb6acdc91da} 
+std\+::vector$<$\mbox{\hyperlink{classfc_1_1bloom__filter_a712a27ba8f26a107057b4982303a20ce}{bloom\+\_\+type}}$>$ fc\+::bloom\+\_\+filter\+::salt\+\_\+}
+
+
+
+Definition at line \mbox{\hyperlink{bloom__filter_8hpp_source_l00571}{571}} of file \mbox{\hyperlink{bloom__filter_8hpp_source}{bloom\+\_\+filter.\+hpp}}.
+
+\Hypertarget{classfc_1_1bloom__filter_a0ce6a19263b4df2b9b8ef1170603507b}\index{fc::bloom\_filter@{fc::bloom\_filter}!salt\_count\_@{salt\_count\_}}
+\index{salt\_count\_@{salt\_count\_}!fc::bloom\_filter@{fc::bloom\_filter}}
+\doxysubsubsection{\texorpdfstring{salt\_count\_}{salt\_count\_}}
+{\footnotesize\ttfamily \label{classfc_1_1bloom__filter_a0ce6a19263b4df2b9b8ef1170603507b} 
+unsigned int fc\+::bloom\+\_\+filter\+::salt\+\_\+count\+\_\+}
+
+
+
+Definition at line \mbox{\hyperlink{bloom__filter_8hpp_source_l00573}{573}} of file \mbox{\hyperlink{bloom__filter_8hpp_source}{bloom\+\_\+filter.\+hpp}}.
+
+\Hypertarget{classfc_1_1bloom__filter_a7288d926a8bfe6e783b65641e84b4c64}\index{fc::bloom\_filter@{fc::bloom\_filter}!table\_size\_@{table\_size\_}}
+\index{table\_size\_@{table\_size\_}!fc::bloom\_filter@{fc::bloom\_filter}}
+\doxysubsubsection{\texorpdfstring{table\_size\_}{table\_size\_}}
+{\footnotesize\ttfamily \label{classfc_1_1bloom__filter_a7288d926a8bfe6e783b65641e84b4c64} 
+unsigned long long int fc\+::bloom\+\_\+filter\+::table\+\_\+size\+\_\+}
+
+
+
+Definition at line \mbox{\hyperlink{bloom__filter_8hpp_source_l00574}{574}} of file \mbox{\hyperlink{bloom__filter_8hpp_source}{bloom\+\_\+filter.\+hpp}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/\mbox{\hyperlink{bloom__filter_8hpp}{bloom\+\_\+filter.\+hpp}}\end{DoxyCompactItemize}

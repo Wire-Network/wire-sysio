@@ -1,0 +1,17 @@
+<map id="Catch::RunContext::sectionStarted" name="Catch::RunContext::sectionStarted">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,169,148,210"/>
+<area shape="rect" id="Node000002" href="$class_catch_1_1_test_case_tracking_1_1_section_tracker.html#a30bdd2cd2f15dd29bb4f14ddc029b332" title=" " alt="" coords="196,136,366,177"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="147,175,180,170,181,175,148,181"/>
+<area shape="rect" id="Node000008" href="$struct_catch_1_1_test_case_tracking_1_1_i_tracker.html#a72617a6781de28006a37218b3d9cc624" title=" " alt="" coords="196,201,366,242"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="148,198,181,203,180,209,147,203"/>
+<area shape="rect" id="Node000003" href="$struct_catch_1_1_test_case_tracking_1_1_i_tracker.html#afd8da278a151a96992f2bf029f7a70c0" title=" " alt="" coords="440,5,610,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="304,133,352,95,413,57,428,50,430,54,415,61,355,99,307,137"/>
+<area shape="rect" id="Node000004" href="$class_catch_1_1_test_case_tracking_1_1_tracker_context.html#ab1af8d52dfe96cdb55a7a6da24cb70d6" title=" " alt="" coords="414,71,635,111"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="358,133,431,113,432,119,360,138"/>
+<area shape="rect" id="Node000005" href="$class_catch_1_1_test_case_tracking_1_1_tracker_context.html#a9294627e8f7cb5774cc17579f3558d0d" title=" " alt="" coords="419,136,630,177"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="367,154,403,154,403,159,367,159"/>
+<area shape="rect" id="Node000006" href="$struct_catch_1_1_test_case_tracking_1_1_i_tracker.html#a6d3d8fa8b48f03df71eaf994a2edc528" title=" " alt="" coords="440,201,610,242"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="360,175,432,194,431,199,358,180"/>
+<area shape="rect" id="Node000007" href="$class_catch_1_1_test_case_tracking_1_1_tracker_base.html#a7a54f86908113aba82b1ce281ea5dfd8" title=" " alt="" coords="417,267,632,307"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="347,175,368,188,383,204,392,221,400,236,416,252,424,257,421,261,412,256,396,240,387,223,379,207,364,192,345,180"/>
+</map>

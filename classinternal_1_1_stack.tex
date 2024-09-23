@@ -1,0 +1,562 @@
+\doxysection{internal\+::Stack\texorpdfstring{$<$}{<} Allocator \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classinternal_1_1_stack}{}\label{classinternal_1_1_stack}\index{internal::Stack$<$ Allocator $>$@{internal::Stack$<$ Allocator $>$}}
+
+
+\doxylink{struct_a}{A} type-\/unsafe stack for storing different types of data.  
+
+
+
+
+{\ttfamily \#include $<$stack.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classinternal_1_1_stack_af09ab91f9e5143deccf7c9af837f451e}{Stack}} (\mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} \texorpdfstring{$\ast$}{*}allocator, size\+\_\+t stack\+Capacity)
+\item 
+\mbox{\hyperlink{classinternal_1_1_stack_afedce84c8816abe9277a71ebd5e1808a}{\texorpdfstring{$\sim$}{\string~}\+Stack}} ()
+\item 
+void \mbox{\hyperlink{classinternal_1_1_stack_a5e601199a21d84b1ac612f558be0f2c3}{Swap}} (\mbox{\hyperlink{classinternal_1_1_stack}{Stack}} \&rhs) RAPIDJSON\+\_\+\+NOEXCEPT
+\item 
+void \mbox{\hyperlink{classinternal_1_1_stack_a02da31665a372738e81ded2f7b7d598e}{Clear}} ()
+\item 
+void \mbox{\hyperlink{classinternal_1_1_stack_a3852b8494d69c91f6a238a51572e591e}{Shrink\+To\+Fit}} ()
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\RAPIDJSON\+\_\+\+FORCEINLINE void \mbox{\hyperlink{classinternal_1_1_stack_a7ae5de892834b7fc16099eb5e23dd97c}{Reserve}} (size\+\_\+t \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}=1)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\RAPIDJSON\+\_\+\+FORCEINLINE \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classinternal_1_1_stack_a2d3b995140893ce92e9b94ada11ee3f3}{Push}} (size\+\_\+t \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}=1)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\RAPIDJSON\+\_\+\+FORCEINLINE \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classinternal_1_1_stack_a8b82b6705a41aa259936a81b927bcac0}{Push\+Unsafe}} (size\+\_\+t \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}=1)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classinternal_1_1_stack_a1cb63cab765815c0624c6676b3712b03}{Pop}} (size\+\_\+t \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classinternal_1_1_stack_a9c2611699081d74be865ebe67315dc6d}{Top}} ()
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classinternal_1_1_stack_a18e79cab61089f955d42b6c45bb51c23}{Top}} () const
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classinternal_1_1_stack_acb8a65d110faf22be514db83524409c5}{End}} ()
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classinternal_1_1_stack_a242967361d9e254d13b85cfc2161861e}{End}} () const
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classinternal_1_1_stack_a6acd2f7a16458184084c40d9f06f4a55}{Bottom}} ()
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classinternal_1_1_stack_aeb6c4af6d6de57865232e1926dc0834e}{Bottom}} () const
+\item 
+bool \mbox{\hyperlink{classinternal_1_1_stack_a657ae4d477b25d4e0045aee0efd809c3}{Has\+Allocator}} () const
+\item 
+\mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} \& \mbox{\hyperlink{classinternal_1_1_stack_aa6f933acc7ecd92a2b567db5fa8cd43a}{Get\+Allocator}} ()
+\item 
+bool \mbox{\hyperlink{classinternal_1_1_stack_a2b8bda380e33838a99e3c73ff9785f03}{Empty}} () const
+\item 
+size\+\_\+t \mbox{\hyperlink{classinternal_1_1_stack_ac484468a2791bd3e9ba609bd1600ab48}{Get\+Size}} () const
+\item 
+size\+\_\+t \mbox{\hyperlink{classinternal_1_1_stack_a67d5d7ee9424d3dd46cf9d001b6cdc6b}{Get\+Capacity}} () const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}$>$\newline
+class internal\+::\+Stack$<$ Allocator $>$}
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em Allocator} & Allocator for allocating stack memory. \\
+\hline
+\end{DoxyTemplParams}
+
+
+Definition at line \mbox{\hyperlink{stack_8h_source_l00037}{37}} of file \mbox{\hyperlink{stack_8h_source}{stack.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classinternal_1_1_stack_af09ab91f9e5143deccf7c9af837f451e}\index{internal::Stack$<$ Allocator $>$@{internal::Stack$<$ Allocator $>$}!Stack@{Stack}}
+\index{Stack@{Stack}!internal::Stack$<$ Allocator $>$@{internal::Stack$<$ Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{Stack()}{Stack()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_stack_af09ab91f9e5143deccf7c9af837f451e} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+\mbox{\hyperlink{classinternal_1_1_stack}{internal\+::\+Stack}}$<$ \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Stack (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} \texorpdfstring{$\ast$}{*}}]{allocator}{, }\item[{size\+\_\+t}]{stack\+Capacity}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{stack_8h_source_l00041}{41}} of file \mbox{\hyperlink{stack_8h_source}{stack.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ allocator\_(allocator),\ ownAllocator\_(0),\ stack\_(0),\ stackTop\_(0),\ stackEnd\_(0),\ initialCapacity\_(stackCapacity)\ \{}
+\DoxyCodeLine{00042\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classinternal_1_1_stack_afedce84c8816abe9277a71ebd5e1808a}\index{internal::Stack$<$ Allocator $>$@{internal::Stack$<$ Allocator $>$}!````~Stack@{\texorpdfstring{$\sim$}{\string~}Stack}}
+\index{````~Stack@{\texorpdfstring{$\sim$}{\string~}Stack}!internal::Stack$<$ Allocator $>$@{internal::Stack$<$ Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}Stack()}{\string~Stack()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_stack_afedce84c8816abe9277a71ebd5e1808a} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+\mbox{\hyperlink{classinternal_1_1_stack}{internal\+::\+Stack}}$<$ \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\texorpdfstring{$\sim$}{\string~}\mbox{\hyperlink{classinternal_1_1_stack}{Stack}} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{stack_8h_source_l00062}{62}} of file \mbox{\hyperlink{stack_8h_source}{stack.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ Destroy();}
+\DoxyCodeLine{00064\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classinternal_1_1_stack_a6acd2f7a16458184084c40d9f06f4a55}\index{internal::Stack$<$ Allocator $>$@{internal::Stack$<$ Allocator $>$}!Bottom@{Bottom}}
+\index{Bottom@{Bottom}!internal::Stack$<$ Allocator $>$@{internal::Stack$<$ Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{Bottom()}{Bottom()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classinternal_1_1_stack_a6acd2f7a16458184084c40d9f06f4a55} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classinternal_1_1_stack}{internal\+::\+Stack}}$<$ \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Bottom (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{stack_8h_source_l00163}{163}} of file \mbox{\hyperlink{stack_8h_source}{stack.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00163\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\textcolor{keyword}{>}(stack\_);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classinternal_1_1_stack_aeb6c4af6d6de57865232e1926dc0834e}\index{internal::Stack$<$ Allocator $>$@{internal::Stack$<$ Allocator $>$}!Bottom@{Bottom}}
+\index{Bottom@{Bottom}!internal::Stack$<$ Allocator $>$@{internal::Stack$<$ Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{Bottom()}{Bottom()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classinternal_1_1_stack_aeb6c4af6d6de57865232e1926dc0834e} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classinternal_1_1_stack}{internal\+::\+Stack}}$<$ \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Bottom (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{stack_8h_source_l00166}{166}} of file \mbox{\hyperlink{stack_8h_source}{stack.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00166\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\textcolor{keyword}{>}(stack\_);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classinternal_1_1_stack_a02da31665a372738e81ded2f7b7d598e}\index{internal::Stack$<$ Allocator $>$@{internal::Stack$<$ Allocator $>$}!Clear@{Clear}}
+\index{Clear@{Clear}!internal::Stack$<$ Allocator $>$@{internal::Stack$<$ Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{Clear()}{Clear()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_stack_a02da31665a372738e81ded2f7b7d598e} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+void \mbox{\hyperlink{classinternal_1_1_stack}{internal\+::\+Stack}}$<$ \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Clear (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{stack_8h_source_l00099}{99}} of file \mbox{\hyperlink{stack_8h_source}{stack.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00099\ \{\ stackTop\_\ =\ stack\_;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classinternal_1_1_stack_a02da31665a372738e81ded2f7b7d598e_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classinternal_1_1_stack_a2b8bda380e33838a99e3c73ff9785f03}\index{internal::Stack$<$ Allocator $>$@{internal::Stack$<$ Allocator $>$}!Empty@{Empty}}
+\index{Empty@{Empty}!internal::Stack$<$ Allocator $>$@{internal::Stack$<$ Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{Empty()}{Empty()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_stack_a2b8bda380e33838a99e3c73ff9785f03} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+bool \mbox{\hyperlink{classinternal_1_1_stack}{internal\+::\+Stack}}$<$ \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Empty (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{stack_8h_source_l00177}{177}} of file \mbox{\hyperlink{stack_8h_source}{stack.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00177\ \{\ \textcolor{keywordflow}{return}\ stackTop\_\ ==\ stack\_;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{classinternal_1_1_stack_a2b8bda380e33838a99e3c73ff9785f03_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classinternal_1_1_stack_acb8a65d110faf22be514db83524409c5}\index{internal::Stack$<$ Allocator $>$@{internal::Stack$<$ Allocator $>$}!End@{End}}
+\index{End@{End}!internal::Stack$<$ Allocator $>$@{internal::Stack$<$ Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{End()}{End()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classinternal_1_1_stack_acb8a65d110faf22be514db83524409c5} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classinternal_1_1_stack}{internal\+::\+Stack}}$<$ \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+End (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{stack_8h_source_l00157}{157}} of file \mbox{\hyperlink{stack_8h_source}{stack.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00157\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\textcolor{keyword}{>}(stackTop\_);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classinternal_1_1_stack_a242967361d9e254d13b85cfc2161861e}\index{internal::Stack$<$ Allocator $>$@{internal::Stack$<$ Allocator $>$}!End@{End}}
+\index{End@{End}!internal::Stack$<$ Allocator $>$@{internal::Stack$<$ Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{End()}{End()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classinternal_1_1_stack_a242967361d9e254d13b85cfc2161861e} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classinternal_1_1_stack}{internal\+::\+Stack}}$<$ \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+End (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{stack_8h_source_l00160}{160}} of file \mbox{\hyperlink{stack_8h_source}{stack.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00160\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\textcolor{keyword}{>}(stackTop\_);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classinternal_1_1_stack_aa6f933acc7ecd92a2b567db5fa8cd43a}\index{internal::Stack$<$ Allocator $>$@{internal::Stack$<$ Allocator $>$}!GetAllocator@{GetAllocator}}
+\index{GetAllocator@{GetAllocator}!internal::Stack$<$ Allocator $>$@{internal::Stack$<$ Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{GetAllocator()}{GetAllocator()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_stack_aa6f933acc7ecd92a2b567db5fa8cd43a} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+\mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} \& \mbox{\hyperlink{classinternal_1_1_stack}{internal\+::\+Stack}}$<$ \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Get\+Allocator (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{stack_8h_source_l00172}{172}} of file \mbox{\hyperlink{stack_8h_source}{stack.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(allocator\_);}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *allocator\_;}
+\DoxyCodeLine{00175\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{classinternal_1_1_stack_aa6f933acc7ecd92a2b567db5fa8cd43a_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classinternal_1_1_stack_a67d5d7ee9424d3dd46cf9d001b6cdc6b}\index{internal::Stack$<$ Allocator $>$@{internal::Stack$<$ Allocator $>$}!GetCapacity@{GetCapacity}}
+\index{GetCapacity@{GetCapacity}!internal::Stack$<$ Allocator $>$@{internal::Stack$<$ Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{GetCapacity()}{GetCapacity()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_stack_a67d5d7ee9424d3dd46cf9d001b6cdc6b} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+size\+\_\+t \mbox{\hyperlink{classinternal_1_1_stack}{internal\+::\+Stack}}$<$ \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Get\+Capacity (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{stack_8h_source_l00179}{179}} of file \mbox{\hyperlink{stack_8h_source}{stack.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00179\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(stackEnd\_\ -\/\ stack\_);\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classinternal_1_1_stack_a67d5d7ee9424d3dd46cf9d001b6cdc6b_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classinternal_1_1_stack_ac484468a2791bd3e9ba609bd1600ab48}\index{internal::Stack$<$ Allocator $>$@{internal::Stack$<$ Allocator $>$}!GetSize@{GetSize}}
+\index{GetSize@{GetSize}!internal::Stack$<$ Allocator $>$@{internal::Stack$<$ Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{GetSize()}{GetSize()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_stack_ac484468a2791bd3e9ba609bd1600ab48} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+size\+\_\+t \mbox{\hyperlink{classinternal_1_1_stack}{internal\+::\+Stack}}$<$ \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Get\+Size (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{stack_8h_source_l00178}{178}} of file \mbox{\hyperlink{stack_8h_source}{stack.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00178\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(stackTop\_\ -\/\ stack\_);\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classinternal_1_1_stack_ac484468a2791bd3e9ba609bd1600ab48_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classinternal_1_1_stack_a657ae4d477b25d4e0045aee0efd809c3}\index{internal::Stack$<$ Allocator $>$@{internal::Stack$<$ Allocator $>$}!HasAllocator@{HasAllocator}}
+\index{HasAllocator@{HasAllocator}!internal::Stack$<$ Allocator $>$@{internal::Stack$<$ Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{HasAllocator()}{HasAllocator()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_stack_a657ae4d477b25d4e0045aee0efd809c3} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+bool \mbox{\hyperlink{classinternal_1_1_stack}{internal\+::\+Stack}}$<$ \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Has\+Allocator (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{stack_8h_source_l00168}{168}} of file \mbox{\hyperlink{stack_8h_source}{stack.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ allocator\_\ !=\ 0;}
+\DoxyCodeLine{00170\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{classinternal_1_1_stack_a657ae4d477b25d4e0045aee0efd809c3_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classinternal_1_1_stack_a1cb63cab765815c0624c6676b3712b03}\index{internal::Stack$<$ Allocator $>$@{internal::Stack$<$ Allocator $>$}!Pop@{Pop}}
+\index{Pop@{Pop}!internal::Stack$<$ Allocator $>$@{internal::Stack$<$ Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{Pop()}{Pop()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_stack_a1cb63cab765815c0624c6676b3712b03} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classinternal_1_1_stack}{internal\+::\+Stack}}$<$ \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Pop (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{count}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{stack_8h_source_l00138}{138}} of file \mbox{\hyperlink{stack_8h_source}{stack.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\mbox{\hyperlink{classinternal_1_1_stack_ac484468a2791bd3e9ba609bd1600ab48}{GetSize}}()\ >=\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ *\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}));}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ stackTop\_\ -\/=\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ *\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}});}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\textcolor{keyword}{>}(stackTop\_);}
+\DoxyCodeLine{00142\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=339pt]{classinternal_1_1_stack_a1cb63cab765815c0624c6676b3712b03_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classinternal_1_1_stack_a2d3b995140893ce92e9b94ada11ee3f3}\index{internal::Stack$<$ Allocator $>$@{internal::Stack$<$ Allocator $>$}!Push@{Push}}
+\index{Push@{Push}!internal::Stack$<$ Allocator $>$@{internal::Stack$<$ Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{Push()}{Push()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_stack_a2d3b995140893ce92e9b94ada11ee3f3} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+RAPIDJSON\+\_\+\+FORCEINLINE \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classinternal_1_1_stack}{internal\+::\+Stack}}$<$ \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Push (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{count}{ = {\ttfamily 1}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{stack_8h_source_l00123}{123}} of file \mbox{\hyperlink{stack_8h_source}{stack.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classinternal_1_1_stack_a7ae5de892834b7fc16099eb5e23dd97c}{Reserve<T>}}(\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}});}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classinternal_1_1_stack_a8b82b6705a41aa259936a81b927bcac0}{PushUnsafe<T>}}(\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}});}
+\DoxyCodeLine{00126\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classinternal_1_1_stack_a2d3b995140893ce92e9b94ada11ee3f3_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classinternal_1_1_stack_a8b82b6705a41aa259936a81b927bcac0}\index{internal::Stack$<$ Allocator $>$@{internal::Stack$<$ Allocator $>$}!PushUnsafe@{PushUnsafe}}
+\index{PushUnsafe@{PushUnsafe}!internal::Stack$<$ Allocator $>$@{internal::Stack$<$ Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{PushUnsafe()}{PushUnsafe()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_stack_a8b82b6705a41aa259936a81b927bcac0} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+RAPIDJSON\+\_\+\+FORCEINLINE \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classinternal_1_1_stack}{internal\+::\+Stack}}$<$ \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Push\+Unsafe (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{count}{ = {\ttfamily 1}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{stack_8h_source_l00129}{129}} of file \mbox{\hyperlink{stack_8h_source}{stack.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(stackTop\_);}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\textcolor{keyword}{static\_cast<}std::ptrdiff\_t\textcolor{keyword}{>}(\textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}})\ *\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}})\ <=\ (stackEnd\_\ -\/\ stackTop\_));}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\textcolor{keyword}{>}(stackTop\_);}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ stackTop\_\ +=\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}})\ *\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}};}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00135\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classinternal_1_1_stack_a8b82b6705a41aa259936a81b927bcac0_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classinternal_1_1_stack_a7ae5de892834b7fc16099eb5e23dd97c}\index{internal::Stack$<$ Allocator $>$@{internal::Stack$<$ Allocator $>$}!Reserve@{Reserve}}
+\index{Reserve@{Reserve}!internal::Stack$<$ Allocator $>$@{internal::Stack$<$ Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{Reserve()}{Reserve()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_stack_a7ae5de892834b7fc16099eb5e23dd97c} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+RAPIDJSON\+\_\+\+FORCEINLINE void \mbox{\hyperlink{classinternal_1_1_stack}{internal\+::\+Stack}}$<$ \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Reserve (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{count}{ = {\ttfamily 1}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{stack_8h_source_l00116}{116}} of file \mbox{\hyperlink{stack_8h_source}{stack.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Expand\ the\ stack\ if\ needed}}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_ga6a2b1695c13e77ae425e3cbac980ccb5}{RAPIDJSON\_UNLIKELY}}(\textcolor{keyword}{static\_cast<}std::ptrdiff\_t\textcolor{keyword}{>}(\textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}})\ *\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}})\ >\ (stackEnd\_\ -\/\ stackTop\_)))}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ \ \ \ Expand<T>(\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}});}
+\DoxyCodeLine{00120\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=345pt]{classinternal_1_1_stack_a7ae5de892834b7fc16099eb5e23dd97c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classinternal_1_1_stack_a3852b8494d69c91f6a238a51572e591e}\index{internal::Stack$<$ Allocator $>$@{internal::Stack$<$ Allocator $>$}!ShrinkToFit@{ShrinkToFit}}
+\index{ShrinkToFit@{ShrinkToFit}!internal::Stack$<$ Allocator $>$@{internal::Stack$<$ Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{ShrinkToFit()}{ShrinkToFit()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_stack_a3852b8494d69c91f6a238a51572e591e} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+void \mbox{\hyperlink{classinternal_1_1_stack}{internal\+::\+Stack}}$<$ \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Shrink\+To\+Fit (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{stack_8h_source_l00101}{101}} of file \mbox{\hyperlink{stack_8h_source}{stack.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ }
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classinternal_1_1_stack_a2b8bda380e33838a99e3c73ff9785f03}{Empty}}())\ \{}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ the\ stack\ is\ empty,\ completely\ deallocate\ the\ memory.}}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ \ \ \ Allocator::Free(stack\_);\ \textcolor{comment}{//\ NOLINT\ (+clang-\/analyzer-\/unix.Malloc)}}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \ \ \ stack\_\ =\ 0;}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \ \ \ \ stackTop\_\ =\ 0;}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \ \ \ \ stackEnd\_\ =\ 0;}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \ \ \ \ Resize(\mbox{\hyperlink{classinternal_1_1_stack_ac484468a2791bd3e9ba609bd1600ab48}{GetSize}}());}
+\DoxyCodeLine{00111\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classinternal_1_1_stack_a3852b8494d69c91f6a238a51572e591e_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classinternal_1_1_stack_a5e601199a21d84b1ac612f558be0f2c3}\index{internal::Stack$<$ Allocator $>$@{internal::Stack$<$ Allocator $>$}!Swap@{Swap}}
+\index{Swap@{Swap}!internal::Stack$<$ Allocator $>$@{internal::Stack$<$ Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{Swap()}{Swap()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_stack_a5e601199a21d84b1ac612f558be0f2c3} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+void \mbox{\hyperlink{classinternal_1_1_stack}{internal\+::\+Stack}}$<$ \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Swap (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classinternal_1_1_stack}{Stack}}$<$ \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \&}]{rhs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{stack_8h_source_l00090}{90}} of file \mbox{\hyperlink{stack_8h_source}{stack.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a72b2c71d36273b9691487f58c671ce04}{internal::Swap}}(allocator\_,\ rhs.allocator\_);}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a72b2c71d36273b9691487f58c671ce04}{internal::Swap}}(ownAllocator\_,\ rhs.ownAllocator\_);}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a72b2c71d36273b9691487f58c671ce04}{internal::Swap}}(stack\_,\ rhs.stack\_);}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a72b2c71d36273b9691487f58c671ce04}{internal::Swap}}(stackTop\_,\ rhs.stackTop\_);}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a72b2c71d36273b9691487f58c671ce04}{internal::Swap}}(stackEnd\_,\ rhs.stackEnd\_);}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceinternal_a72b2c71d36273b9691487f58c671ce04}{internal::Swap}}(initialCapacity\_,\ rhs.initialCapacity\_);}
+\DoxyCodeLine{00097\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=304pt]{classinternal_1_1_stack_a5e601199a21d84b1ac612f558be0f2c3_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classinternal_1_1_stack_a5e601199a21d84b1ac612f558be0f2c3_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classinternal_1_1_stack_a9c2611699081d74be865ebe67315dc6d}\index{internal::Stack$<$ Allocator $>$@{internal::Stack$<$ Allocator $>$}!Top@{Top}}
+\index{Top@{Top}!internal::Stack$<$ Allocator $>$@{internal::Stack$<$ Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{Top()}{Top()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classinternal_1_1_stack_a9c2611699081d74be865ebe67315dc6d} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classinternal_1_1_stack}{internal\+::\+Stack}}$<$ \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Top (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{stack_8h_source_l00145}{145}} of file \mbox{\hyperlink{stack_8h_source}{stack.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ }
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\mbox{\hyperlink{classinternal_1_1_stack_ac484468a2791bd3e9ba609bd1600ab48}{GetSize}}()\ >=\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}));}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\textcolor{keyword}{>}(stackTop\_\ -\/\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}));}
+\DoxyCodeLine{00148\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=337pt]{classinternal_1_1_stack_a9c2611699081d74be865ebe67315dc6d_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classinternal_1_1_stack_a18e79cab61089f955d42b6c45bb51c23}\index{internal::Stack$<$ Allocator $>$@{internal::Stack$<$ Allocator $>$}!Top@{Top}}
+\index{Top@{Top}!internal::Stack$<$ Allocator $>$@{internal::Stack$<$ Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{Top()}{Top()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classinternal_1_1_stack_a18e79cab61089f955d42b6c45bb51c23} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classinternal_1_1_stack}{internal\+::\+Stack}}$<$ \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$\+::\+Top (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{stack_8h_source_l00151}{151}} of file \mbox{\hyperlink{stack_8h_source}{stack.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\mbox{\hyperlink{classinternal_1_1_stack_ac484468a2791bd3e9ba609bd1600ab48}{GetSize}}()\ >=\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}));}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\textcolor{keyword}{>}(stackTop\_\ -\/\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}));}
+\DoxyCodeLine{00154\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=337pt]{classinternal_1_1_stack_a18e79cab61089f955d42b6c45bb51c23_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/internal/\mbox{\hyperlink{stack_8h}{stack.\+h}}\end{DoxyCompactItemize}

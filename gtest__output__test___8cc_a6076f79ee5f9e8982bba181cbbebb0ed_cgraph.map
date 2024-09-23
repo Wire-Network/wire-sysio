@@ -1,0 +1,9 @@
+<map id="TEST" name="TEST">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,61,56"/>
+<area shape="rect" id="Node000002" href="$gtest__output__test___8cc.html#a14e796981ca8d3c71dbd2b839c1ce784" title=" " alt="" coords="109,31,236,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="61,41,93,41,93,46,61,46"/>
+<area shape="rect" id="Node000003" href="$classtesting_1_1_test.html#a5e83604628ef542af888d631566ff60c" title=" " alt="" coords="284,5,477,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="236,33,268,29,269,34,237,38"/>
+<area shape="rect" id="Node000004" href="$gtest__output__test___8cc.html#a8f28d985b030c6dd2714d1e884c62c41" title=" " alt="" coords="346,55,415,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="237,48,331,59,330,64,236,53"/>
+</map>

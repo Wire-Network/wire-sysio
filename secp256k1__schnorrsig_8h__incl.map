@@ -1,0 +1,10 @@
+<map id="libraries/fc/secp256k1/secp256k1/include/secp256k1_schnorrsig.h" name="libraries/fc/secp256k1/secp256k1/include/secp256k1_schnorrsig.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,206,61"/>
+<area shape="rect" id="Node000002" href="$secp256k1_8h.html" title=" " alt="" coords="58,183,153,208"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="90,62,76,97,73,115,75,134,90,169,86,171,70,135,68,115,71,95,85,60"/>
+<area shape="rect" id="Node000004" href="$secp256k1__extrakeys_8h.html" title=" " alt="" coords="84,109,244,135"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="126,60,150,94,145,97,122,63"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="71,256,140,282"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="108,209,108,241,103,241,103,209"/>
+<area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="157,137,127,172,123,169,152,133"/>
+</map>

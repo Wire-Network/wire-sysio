@@ -1,0 +1,119 @@
+\doxysection{testing\+::internal\+::Random Class Reference}
+\hypertarget{classtesting_1_1internal_1_1_random}{}\label{classtesting_1_1internal_1_1_random}\index{testing::internal::Random@{testing::internal::Random}}
+
+
+{\ttfamily \#include $<$gtest-\/internal.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_random_a6e112be5e7cce00551f6383025f69460}{Random}} (\mbox{\hyperlink{namespacetesting_1_1internal_a40d4fffcd2bf56f18b1c380615aa85e3}{UInt32}} seed)
+\item 
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_random_adf2f24199318a46f885c78f50d89a69e}{Reseed}} (\mbox{\hyperlink{namespacetesting_1_1internal_a40d4fffcd2bf56f18b1c380615aa85e3}{UInt32}} seed)
+\item 
+\mbox{\hyperlink{namespacetesting_1_1internal_a40d4fffcd2bf56f18b1c380615aa85e3}{UInt32}} \mbox{\hyperlink{classtesting_1_1internal_1_1_random_a25a21f94e4727084e94676c553a1c9d2}{Generate}} (\mbox{\hyperlink{namespacetesting_1_1internal_a40d4fffcd2bf56f18b1c380615aa85e3}{UInt32}} range)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static const \mbox{\hyperlink{namespacetesting_1_1internal_a40d4fffcd2bf56f18b1c380615aa85e3}{UInt32}} \mbox{\hyperlink{classtesting_1_1internal_1_1_random_a36d72dd7063d0b5338f229e75382fdd2}{k\+Max\+Range}} = 1u $<$$<$ 31
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{gtest-internal_8h_source_l00735}{735}} of file \mbox{\hyperlink{gtest-internal_8h_source}{gtest-\/internal.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_random_a6e112be5e7cce00551f6383025f69460}\index{testing::internal::Random@{testing::internal::Random}!Random@{Random}}
+\index{Random@{Random}!testing::internal::Random@{testing::internal::Random}}
+\doxysubsubsection{\texorpdfstring{Random()}{Random()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_random_a6e112be5e7cce00551f6383025f69460} 
+testing\+::internal\+::\+Random\+::\+Random (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacetesting_1_1internal_a40d4fffcd2bf56f18b1c380615aa85e3}{UInt32}}}]{seed}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-internal_8h_source_l00739}{739}} of file \mbox{\hyperlink{gtest-internal_8h_source}{gtest-\/internal.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00739\ :\ state\_(seed)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_random_a25a21f94e4727084e94676c553a1c9d2}\index{testing::internal::Random@{testing::internal::Random}!Generate@{Generate}}
+\index{Generate@{Generate}!testing::internal::Random@{testing::internal::Random}}
+\doxysubsubsection{\texorpdfstring{Generate()}{Generate()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_random_a25a21f94e4727084e94676c553a1c9d2} 
+\mbox{\hyperlink{namespacetesting_1_1internal_a40d4fffcd2bf56f18b1c380615aa85e3}{UInt32}} Random\+::\+Generate (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacetesting_1_1internal_a40d4fffcd2bf56f18b1c380615aa85e3}{UInt32}}}]{range}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8cc_source_l00319}{319}} of file \mbox{\hyperlink{gtest_8cc_source}{gtest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00319\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00320\ \ \ \textcolor{comment}{//\ These\ constants\ are\ the\ same\ as\ are\ used\ in\ glibc's\ rand(3).}}
+\DoxyCodeLine{00321\ \ \ \textcolor{comment}{//\ Use\ wider\ types\ than\ necessary\ to\ prevent\ unsigned\ overflow\ diagnostics.}}
+\DoxyCodeLine{00322\ \ \ state\_\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{namespacetesting_1_1internal_a40d4fffcd2bf56f18b1c380615aa85e3}{UInt32}}\textcolor{keyword}{>}(1103515245ULL*state\_\ +\ 12345U)\ \%\ \mbox{\hyperlink{classtesting_1_1internal_1_1_random_a36d72dd7063d0b5338f229e75382fdd2}{kMaxRange}};}
+\DoxyCodeLine{00323\ }
+\DoxyCodeLine{00324\ \ \ \mbox{\hyperlink{gtest-port_8h_ab54343f0a36dc4cb0ce8a478dd7847b8}{GTEST\_CHECK\_}}(range\ >\ 0)}
+\DoxyCodeLine{00325\ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}Cannot\ generate\ a\ number\ in\ the\ range\ [0,\ 0)."{}};}
+\DoxyCodeLine{00326\ \ \ \mbox{\hyperlink{gtest-port_8h_ab54343f0a36dc4cb0ce8a478dd7847b8}{GTEST\_CHECK\_}}(range\ <=\ \mbox{\hyperlink{classtesting_1_1internal_1_1_random_a36d72dd7063d0b5338f229e75382fdd2}{kMaxRange}})}
+\DoxyCodeLine{00327\ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}Generation\ of\ a\ number\ in\ [0,\ "{}}\ <<\ range\ <<\ \textcolor{stringliteral}{"{})\ was\ requested,\ "{}}}
+\DoxyCodeLine{00328\ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}but\ this\ can\ only\ generate\ numbers\ in\ [0,\ "{}}\ <<\ \mbox{\hyperlink{classtesting_1_1internal_1_1_random_a36d72dd7063d0b5338f229e75382fdd2}{kMaxRange}}\ <<\ \textcolor{stringliteral}{"{})."{}};}
+\DoxyCodeLine{00329\ }
+\DoxyCodeLine{00330\ \ \ \textcolor{comment}{//\ Converting\ via\ modulus\ introduces\ a\ bit\ of\ downward\ bias,\ but}}
+\DoxyCodeLine{00331\ \ \ \textcolor{comment}{//\ it's\ simple,\ and\ a\ linear\ congruential\ generator\ isn't\ too\ good}}
+\DoxyCodeLine{00332\ \ \ \textcolor{comment}{//\ to\ begin\ with.}}
+\DoxyCodeLine{00333\ \ \ \textcolor{keywordflow}{return}\ state\_\ \%\ range;}
+\DoxyCodeLine{00334\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1internal_1_1_random_adf2f24199318a46f885c78f50d89a69e}\index{testing::internal::Random@{testing::internal::Random}!Reseed@{Reseed}}
+\index{Reseed@{Reseed}!testing::internal::Random@{testing::internal::Random}}
+\doxysubsubsection{\texorpdfstring{Reseed()}{Reseed()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_random_adf2f24199318a46f885c78f50d89a69e} 
+void testing\+::internal\+::\+Random\+::\+Reseed (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacetesting_1_1internal_a40d4fffcd2bf56f18b1c380615aa85e3}{UInt32}}}]{seed}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-internal_8h_source_l00741}{741}} of file \mbox{\hyperlink{gtest-internal_8h_source}{gtest-\/internal.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00741\ \{\ state\_\ =\ seed;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_random_adf2f24199318a46f885c78f50d89a69e_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_random_a36d72dd7063d0b5338f229e75382fdd2}\index{testing::internal::Random@{testing::internal::Random}!kMaxRange@{kMaxRange}}
+\index{kMaxRange@{kMaxRange}!testing::internal::Random@{testing::internal::Random}}
+\doxysubsubsection{\texorpdfstring{kMaxRange}{kMaxRange}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_random_a36d72dd7063d0b5338f229e75382fdd2} 
+const \mbox{\hyperlink{namespacetesting_1_1internal_a40d4fffcd2bf56f18b1c380615aa85e3}{UInt32}} testing\+::internal\+::\+Random\+::k\+Max\+Range = 1u $<$$<$ 31\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-internal_8h_source_l00737}{737}} of file \mbox{\hyperlink{gtest-internal_8h_source}{gtest-\/internal.\+h}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/include/gtest/internal/\mbox{\hyperlink{gtest-internal_8h}{gtest-\/internal.\+h}}\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/src/\mbox{\hyperlink{gtest_8cc}{gtest.\+cc}}\end{DoxyCompactItemize}

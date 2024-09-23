@@ -1,0 +1,520 @@
+\doxysection{gtest\+\_\+shuffle\+\_\+test Namespace Reference}
+\hypertarget{namespacegtest__shuffle__test}{}\label{namespacegtest__shuffle__test}\index{gtest\_shuffle\_test@{gtest\_shuffle\_test}}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classgtest__shuffle__test_1_1_g_test_shuffle_unit_test}{GTest\+Shuffle\+Unit\+Test}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacegtest__shuffle__test_a20069bf6743b827007e91a708a622d51}{Also\+Run\+Disabled\+Tests\+Flag}} ()
+\item 
+\mbox{\hyperlink{namespacegtest__shuffle__test_a448133259d44395f06e00e914d382112}{Filter\+Flag}} (test\+\_\+filter)
+\item 
+\mbox{\hyperlink{namespacegtest__shuffle__test_adffb7cacf9023023749a15ec2a66ef68}{Repeat\+Flag}} (n)
+\item 
+\mbox{\hyperlink{namespacegtest__shuffle__test_a489bbd025a7ddba5c8607349265c0c52}{Shuffle\+Flag}} ()
+\item 
+\mbox{\hyperlink{namespacegtest__shuffle__test_a7bb61f49e37b831c7f4ee20a30736e74}{Random\+Seed\+Flag}} (n)
+\item 
+\mbox{\hyperlink{namespacegtest__shuffle__test_a8e6a3ad4102d91a2d90487a7ed64c07f}{Run\+And\+Return\+Output}} (extra\+\_\+env, args)
+\item 
+\mbox{\hyperlink{namespacegtest__shuffle__test_a729a90dc6fa4a90dbcd6490f51593708}{Get\+Tests\+For\+All\+Iterations}} (extra\+\_\+env, args)
+\item 
+\mbox{\hyperlink{namespacegtest__shuffle__test_ae0ef601e243e38eb2e6df09e17ab61b4}{Get\+Test\+Cases}} (tests)
+\item 
+\mbox{\hyperlink{namespacegtest__shuffle__test_a4b3549c585569a12d0fcad283eb0ea7e}{Calculate\+Test\+Lists}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacegtest__shuffle__test_a33b8a2fc24ccd6476d1e27b084142a25}{COMMAND}} = \mbox{\hyperlink{namespacegtest__test__utils_a239f43ff0e44144cb5a1e14f3453c273}{gtest\+\_\+test\+\_\+utils.\+Get\+Test\+Executable\+Path}}(\textquotesingle{}gtest\+\_\+shuffle\+\_\+test\+\_\+\textquotesingle{})
+\item 
+str \mbox{\hyperlink{namespacegtest__shuffle__test_ae308b0367efac6f7c40999590593ffa0}{TOTAL\+\_\+\+SHARDS\+\_\+\+ENV\+\_\+\+VAR}} = \textquotesingle{}GTEST\+\_\+\+TOTAL\+\_\+\+SHARDS\textquotesingle{}
+\item 
+str \mbox{\hyperlink{namespacegtest__shuffle__test_a0418bc61c30e3c4f5611c949b61cef03}{SHARD\+\_\+\+INDEX\+\_\+\+ENV\+\_\+\+VAR}} = \textquotesingle{}GTEST\+\_\+\+SHARD\+\_\+\+INDEX\textquotesingle{}
+\item 
+str \mbox{\hyperlink{namespacegtest__shuffle__test_afb3e0bed1bced169e5d882b79cfb3a32}{TEST\+\_\+\+FILTER}} = \textquotesingle{}\mbox{\hyperlink{struct_a}{A}}\texorpdfstring{$\ast$}{*}.A\+:A\texorpdfstring{$\ast$}{*}.B\+:C\texorpdfstring{$\ast$}{*}\textquotesingle{}
+\item 
+list \mbox{\hyperlink{namespacegtest__shuffle__test_aede96442ff7a7c9ac9a8baaaeb48e86c}{ALL\+\_\+\+TESTS}} = \mbox{[}$\,$\mbox{]}
+\item 
+list \mbox{\hyperlink{namespacegtest__shuffle__test_acd6d827819dcc06b9bf061cd4849b082}{ACTIVE\+\_\+\+TESTS}} = \mbox{[}$\,$\mbox{]}
+\item 
+list \mbox{\hyperlink{namespacegtest__shuffle__test_a35011532d6bd14ac29c891111ce1a911}{FILTERED\+\_\+\+TESTS}} = \mbox{[}$\,$\mbox{]}
+\item 
+list \mbox{\hyperlink{namespacegtest__shuffle__test_ad9bd126c3dc9894a3977a907e97e71e8}{SHARDED\+\_\+\+TESTS}} = \mbox{[}$\,$\mbox{]}
+\item 
+list \mbox{\hyperlink{namespacegtest__shuffle__test_a6128f9c522f40c64ffb3917ff17080b8}{SHUFFLED\+\_\+\+ALL\+\_\+\+TESTS}} = \mbox{[}$\,$\mbox{]}
+\item 
+list \mbox{\hyperlink{namespacegtest__shuffle__test_ac3bfd4eae8e6f35a83e73cfd9d9611d5}{SHUFFLED\+\_\+\+ACTIVE\+\_\+\+TESTS}} = \mbox{[}$\,$\mbox{]}
+\item 
+list \mbox{\hyperlink{namespacegtest__shuffle__test_aa9502dcb42a1d690d17558cc71388e45}{SHUFFLED\+\_\+\+FILTERED\+\_\+\+TESTS}} = \mbox{[}$\,$\mbox{]}
+\item 
+list \mbox{\hyperlink{namespacegtest__shuffle__test_a3603885677e36438fd2d7521db51bcb4}{SHUFFLED\+\_\+\+SHARDED\+\_\+\+TESTS}} = \mbox{[}$\,$\mbox{]}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\begin{DoxyVerb}Verifies that test shuffling works.\end{DoxyVerb}
+ 
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacegtest__shuffle__test_a20069bf6743b827007e91a708a622d51}\index{gtest\_shuffle\_test@{gtest\_shuffle\_test}!AlsoRunDisabledTestsFlag@{AlsoRunDisabledTestsFlag}}
+\index{AlsoRunDisabledTestsFlag@{AlsoRunDisabledTestsFlag}!gtest\_shuffle\_test@{gtest\_shuffle\_test}}
+\doxysubsubsection{\texorpdfstring{AlsoRunDisabledTestsFlag()}{AlsoRunDisabledTestsFlag()}}
+{\footnotesize\ttfamily \label{namespacegtest__shuffle__test_a20069bf6743b827007e91a708a622d51} 
+gtest\+\_\+shuffle\+\_\+test.\+Also\+Run\+Disabled\+Tests\+Flag (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest__shuffle__test_8py_source_l00058}{58}} of file \mbox{\hyperlink{gtest__shuffle__test_8py_source}{gtest\+\_\+shuffle\+\_\+test.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00058\ \textcolor{keyword}{def\ }AlsoRunDisabledTestsFlag():}
+\DoxyCodeLine{00059\ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{'-\/-\/gtest\_also\_run\_disabled\_tests'}}
+\DoxyCodeLine{00060\ }
+\DoxyCodeLine{00061\ }
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacegtest__shuffle__test_a20069bf6743b827007e91a708a622d51_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacegtest__shuffle__test_a4b3549c585569a12d0fcad283eb0ea7e}\index{gtest\_shuffle\_test@{gtest\_shuffle\_test}!CalculateTestLists@{CalculateTestLists}}
+\index{CalculateTestLists@{CalculateTestLists}!gtest\_shuffle\_test@{gtest\_shuffle\_test}}
+\doxysubsubsection{\texorpdfstring{CalculateTestLists()}{CalculateTestLists()}}
+{\footnotesize\ttfamily \label{namespacegtest__shuffle__test_a4b3549c585569a12d0fcad283eb0ea7e} 
+gtest\+\_\+shuffle\+\_\+test.\+Calculate\+Test\+Lists (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Calculates the list of tests run under different flags.\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{gtest__shuffle__test_8py_source_l00130}{130}} of file \mbox{\hyperlink{gtest__shuffle__test_8py_source}{gtest\+\_\+shuffle\+\_\+test.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00130\ \textcolor{keyword}{def\ }CalculateTestLists():}
+\DoxyCodeLine{00131\ \ \ \textcolor{stringliteral}{"{}"{}"{}Calculates\ the\ list\ of\ tests\ run\ under\ different\ flags."{}"{}"{}}}
+\DoxyCodeLine{00132\ }
+\DoxyCodeLine{00133\ \ \ \textcolor{keywordflow}{if}\ \textcolor{keywordflow}{not}\ ALL\_TESTS:}
+\DoxyCodeLine{00134\ \ \ \ \ ALL\_TESTS.extend(}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ GetTestsForAllIterations(\{\},\ [AlsoRunDisabledTestsFlag()])[0])}
+\DoxyCodeLine{00136\ }
+\DoxyCodeLine{00137\ \ \ \textcolor{keywordflow}{if}\ \textcolor{keywordflow}{not}\ ACTIVE\_TESTS:}
+\DoxyCodeLine{00138\ \ \ \ \ ACTIVE\_TESTS.extend(GetTestsForAllIterations(\{\},\ [])[0])}
+\DoxyCodeLine{00139\ }
+\DoxyCodeLine{00140\ \ \ \textcolor{keywordflow}{if}\ \textcolor{keywordflow}{not}\ FILTERED\_TESTS:}
+\DoxyCodeLine{00141\ \ \ \ \ FILTERED\_TESTS.extend(}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ GetTestsForAllIterations(\{\},\ [FilterFlag(TEST\_FILTER)])[0])}
+\DoxyCodeLine{00143\ }
+\DoxyCodeLine{00144\ \ \ \textcolor{keywordflow}{if}\ \textcolor{keywordflow}{not}\ SHARDED\_TESTS:}
+\DoxyCodeLine{00145\ \ \ \ \ SHARDED\_TESTS.extend(}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ GetTestsForAllIterations(\{TOTAL\_SHARDS\_ENV\_VAR:\ \textcolor{stringliteral}{'3'},}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ SHARD\_INDEX\_ENV\_VAR:\ \textcolor{stringliteral}{'1'}\},}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [])[0])}
+\DoxyCodeLine{00149\ }
+\DoxyCodeLine{00150\ \ \ \textcolor{keywordflow}{if}\ \textcolor{keywordflow}{not}\ SHUFFLED\_ALL\_TESTS:}
+\DoxyCodeLine{00151\ \ \ \ \ SHUFFLED\_ALL\_TESTS.extend(GetTestsForAllIterations(}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \{\},\ [AlsoRunDisabledTestsFlag(),\ ShuffleFlag(),\ RandomSeedFlag(1)])[0])}
+\DoxyCodeLine{00153\ }
+\DoxyCodeLine{00154\ \ \ \textcolor{keywordflow}{if}\ \textcolor{keywordflow}{not}\ SHUFFLED\_ACTIVE\_TESTS:}
+\DoxyCodeLine{00155\ \ \ \ \ SHUFFLED\_ACTIVE\_TESTS.extend(GetTestsForAllIterations(}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \{\},\ [ShuffleFlag(),\ RandomSeedFlag(1)])[0])}
+\DoxyCodeLine{00157\ }
+\DoxyCodeLine{00158\ \ \ \textcolor{keywordflow}{if}\ \textcolor{keywordflow}{not}\ SHUFFLED\_FILTERED\_TESTS:}
+\DoxyCodeLine{00159\ \ \ \ \ SHUFFLED\_FILTERED\_TESTS.extend(GetTestsForAllIterations(}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \{\},\ [ShuffleFlag(),\ RandomSeedFlag(1),\ FilterFlag(TEST\_FILTER)])[0])}
+\DoxyCodeLine{00161\ }
+\DoxyCodeLine{00162\ \ \ \textcolor{keywordflow}{if}\ \textcolor{keywordflow}{not}\ SHUFFLED\_SHARDED\_TESTS:}
+\DoxyCodeLine{00163\ \ \ \ \ SHUFFLED\_SHARDED\_TESTS.extend(}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ GetTestsForAllIterations(\{TOTAL\_SHARDS\_ENV\_VAR:\ \textcolor{stringliteral}{'3'},}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ SHARD\_INDEX\_ENV\_VAR:\ \textcolor{stringliteral}{'1'}\},}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [ShuffleFlag(),\ RandomSeedFlag(1)])[0])}
+\DoxyCodeLine{00167\ }
+\DoxyCodeLine{00168\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacegtest__shuffle__test_a4b3549c585569a12d0fcad283eb0ea7e_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacegtest__shuffle__test_a4b3549c585569a12d0fcad283eb0ea7e_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacegtest__shuffle__test_a448133259d44395f06e00e914d382112}\index{gtest\_shuffle\_test@{gtest\_shuffle\_test}!FilterFlag@{FilterFlag}}
+\index{FilterFlag@{FilterFlag}!gtest\_shuffle\_test@{gtest\_shuffle\_test}}
+\doxysubsubsection{\texorpdfstring{FilterFlag()}{FilterFlag()}}
+{\footnotesize\ttfamily \label{namespacegtest__shuffle__test_a448133259d44395f06e00e914d382112} 
+gtest\+\_\+shuffle\+\_\+test.\+Filter\+Flag (\begin{DoxyParamCaption}\item[{}]{test\+\_\+filter}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest__shuffle__test_8py_source_l00062}{62}} of file \mbox{\hyperlink{gtest__shuffle__test_8py_source}{gtest\+\_\+shuffle\+\_\+test.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00062\ \textcolor{keyword}{def\ }FilterFlag(test\_filter):}
+\DoxyCodeLine{00063\ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{'-\/-\/gtest\_filter=\%s'}\ \%\ (test\_filter,)}
+\DoxyCodeLine{00064\ }
+\DoxyCodeLine{00065\ }
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacegtest__shuffle__test_a448133259d44395f06e00e914d382112_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacegtest__shuffle__test_ae0ef601e243e38eb2e6df09e17ab61b4}\index{gtest\_shuffle\_test@{gtest\_shuffle\_test}!GetTestCases@{GetTestCases}}
+\index{GetTestCases@{GetTestCases}!gtest\_shuffle\_test@{gtest\_shuffle\_test}}
+\doxysubsubsection{\texorpdfstring{GetTestCases()}{GetTestCases()}}
+{\footnotesize\ttfamily \label{namespacegtest__shuffle__test_ae0ef601e243e38eb2e6df09e17ab61b4} 
+gtest\+\_\+shuffle\+\_\+test.\+Get\+Test\+Cases (\begin{DoxyParamCaption}\item[{}]{tests}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Returns a list of test cases in the given full test names.
+
+Args:
+  tests: a list of full test names
+
+Returns:
+  A list of test cases from 'tests', in their original order.
+  Consecutive duplicates are removed.
+\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{gtest__shuffle__test_8py_source_l00110}{110}} of file \mbox{\hyperlink{gtest__shuffle__test_8py_source}{gtest\+\_\+shuffle\+\_\+test.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00110\ \textcolor{keyword}{def\ }GetTestCases(tests):}
+\DoxyCodeLine{00111\ \ \ \textcolor{stringliteral}{"{}"{}"{}Returns\ a\ list\ of\ test\ cases\ in\ the\ given\ full\ test\ names.}}
+\DoxyCodeLine{00112\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00113\ \textcolor{stringliteral}{\ \ Args:}}
+\DoxyCodeLine{00114\ \textcolor{stringliteral}{\ \ \ \ tests:\ a\ list\ of\ full\ test\ names}}
+\DoxyCodeLine{00115\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00116\ \textcolor{stringliteral}{\ \ Returns:}}
+\DoxyCodeLine{00117\ \textcolor{stringliteral}{\ \ \ \ A\ list\ of\ test\ cases\ from\ 'tests',\ in\ their\ original\ order.}}
+\DoxyCodeLine{00118\ \textcolor{stringliteral}{\ \ \ \ Consecutive\ duplicates\ are\ removed.}}
+\DoxyCodeLine{00119\ \textcolor{stringliteral}{\ \ "{}"{}"{}}}
+\DoxyCodeLine{00120\ }
+\DoxyCodeLine{00121\ \ \ test\_cases\ =\ []}
+\DoxyCodeLine{00122\ \ \ \textcolor{keywordflow}{for}\ test\ \textcolor{keywordflow}{in}\ tests:}
+\DoxyCodeLine{00123\ \ \ \ \ test\_case\ =\ test.split(\textcolor{stringliteral}{'.'})[0]}
+\DoxyCodeLine{00124\ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keywordflow}{not}\ test\_case\ \textcolor{keywordflow}{in}\ test\_cases:}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ test\_cases.append(test\_case)}
+\DoxyCodeLine{00126\ }
+\DoxyCodeLine{00127\ \ \ \textcolor{keywordflow}{return}\ test\_cases}
+\DoxyCodeLine{00128\ }
+\DoxyCodeLine{00129\ }
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacegtest__shuffle__test_ae0ef601e243e38eb2e6df09e17ab61b4_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacegtest__shuffle__test_a729a90dc6fa4a90dbcd6490f51593708}\index{gtest\_shuffle\_test@{gtest\_shuffle\_test}!GetTestsForAllIterations@{GetTestsForAllIterations}}
+\index{GetTestsForAllIterations@{GetTestsForAllIterations}!gtest\_shuffle\_test@{gtest\_shuffle\_test}}
+\doxysubsubsection{\texorpdfstring{GetTestsForAllIterations()}{GetTestsForAllIterations()}}
+{\footnotesize\ttfamily \label{namespacegtest__shuffle__test_a729a90dc6fa4a90dbcd6490f51593708} 
+gtest\+\_\+shuffle\+\_\+test.\+Get\+Tests\+For\+All\+Iterations (\begin{DoxyParamCaption}\item[{}]{extra\+\_\+env}{, }\item[{}]{args}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Runs the test program and returns a list of test lists.
+
+Args:
+  extra_env: a map from environment variables to their values
+  args: command line flags to pass to gtest_shuffle_test_
+
+Returns:
+  A list where the i-th element is the list of tests run in the i-th
+  test iteration.
+\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{gtest__shuffle__test_8py_source_l00087}{87}} of file \mbox{\hyperlink{gtest__shuffle__test_8py_source}{gtest\+\_\+shuffle\+\_\+test.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00087\ \textcolor{keyword}{def\ }GetTestsForAllIterations(extra\_env,\ args):}
+\DoxyCodeLine{00088\ \ \ \textcolor{stringliteral}{"{}"{}"{}Runs\ the\ test\ program\ and\ returns\ a\ list\ of\ test\ lists.}}
+\DoxyCodeLine{00089\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00090\ \textcolor{stringliteral}{\ \ Args:}}
+\DoxyCodeLine{00091\ \textcolor{stringliteral}{\ \ \ \ extra\_env:\ a\ map\ from\ environment\ variables\ to\ their\ values}}
+\DoxyCodeLine{00092\ \textcolor{stringliteral}{\ \ \ \ args:\ command\ line\ flags\ to\ pass\ to\ gtest\_shuffle\_test\_}}
+\DoxyCodeLine{00093\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00094\ \textcolor{stringliteral}{\ \ Returns:}}
+\DoxyCodeLine{00095\ \textcolor{stringliteral}{\ \ \ \ A\ list\ where\ the\ i-\/th\ element\ is\ the\ list\ of\ tests\ run\ in\ the\ i-\/th}}
+\DoxyCodeLine{00096\ \textcolor{stringliteral}{\ \ \ \ test\ iteration.}}
+\DoxyCodeLine{00097\ \textcolor{stringliteral}{\ \ "{}"{}"{}}}
+\DoxyCodeLine{00098\ }
+\DoxyCodeLine{00099\ \ \ test\_iterations\ =\ []}
+\DoxyCodeLine{00100\ \ \ \textcolor{keywordflow}{for}\ line\ \textcolor{keywordflow}{in}\ RunAndReturnOutput(extra\_env,\ args).split(\textcolor{stringliteral}{'\(\backslash\)n'}):}
+\DoxyCodeLine{00101\ \ \ \ \ \textcolor{keywordflow}{if}\ line.startswith(\textcolor{stringliteral}{'-\/-\/-\/-\/'}):}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ tests\ =\ []}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ test\_iterations.append(tests)}
+\DoxyCodeLine{00104\ \ \ \ \ \textcolor{keywordflow}{elif}\ line.strip():}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ tests.append(line.strip())\ \ \textcolor{comment}{\#\ 'TestCaseName.TestName'}}
+\DoxyCodeLine{00106\ }
+\DoxyCodeLine{00107\ \ \ \textcolor{keywordflow}{return}\ test\_iterations}
+\DoxyCodeLine{00108\ }
+\DoxyCodeLine{00109\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacegtest__shuffle__test_a729a90dc6fa4a90dbcd6490f51593708_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacegtest__shuffle__test_a729a90dc6fa4a90dbcd6490f51593708_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacegtest__shuffle__test_a7bb61f49e37b831c7f4ee20a30736e74}\index{gtest\_shuffle\_test@{gtest\_shuffle\_test}!RandomSeedFlag@{RandomSeedFlag}}
+\index{RandomSeedFlag@{RandomSeedFlag}!gtest\_shuffle\_test@{gtest\_shuffle\_test}}
+\doxysubsubsection{\texorpdfstring{RandomSeedFlag()}{RandomSeedFlag()}}
+{\footnotesize\ttfamily \label{namespacegtest__shuffle__test_a7bb61f49e37b831c7f4ee20a30736e74} 
+gtest\+\_\+shuffle\+\_\+test.\+Random\+Seed\+Flag (\begin{DoxyParamCaption}\item[{}]{n}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest__shuffle__test_8py_source_l00074}{74}} of file \mbox{\hyperlink{gtest__shuffle__test_8py_source}{gtest\+\_\+shuffle\+\_\+test.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00074\ \textcolor{keyword}{def\ }RandomSeedFlag(n):}
+\DoxyCodeLine{00075\ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{'-\/-\/gtest\_random\_seed=\%s'}\ \%\ (n,)}
+\DoxyCodeLine{00076\ }
+\DoxyCodeLine{00077\ }
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacegtest__shuffle__test_a7bb61f49e37b831c7f4ee20a30736e74_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacegtest__shuffle__test_adffb7cacf9023023749a15ec2a66ef68}\index{gtest\_shuffle\_test@{gtest\_shuffle\_test}!RepeatFlag@{RepeatFlag}}
+\index{RepeatFlag@{RepeatFlag}!gtest\_shuffle\_test@{gtest\_shuffle\_test}}
+\doxysubsubsection{\texorpdfstring{RepeatFlag()}{RepeatFlag()}}
+{\footnotesize\ttfamily \label{namespacegtest__shuffle__test_adffb7cacf9023023749a15ec2a66ef68} 
+gtest\+\_\+shuffle\+\_\+test.\+Repeat\+Flag (\begin{DoxyParamCaption}\item[{}]{n}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest__shuffle__test_8py_source_l00066}{66}} of file \mbox{\hyperlink{gtest__shuffle__test_8py_source}{gtest\+\_\+shuffle\+\_\+test.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00066\ \textcolor{keyword}{def\ }RepeatFlag(n):}
+\DoxyCodeLine{00067\ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{'-\/-\/gtest\_repeat=\%s'}\ \%\ (n,)}
+\DoxyCodeLine{00068\ }
+\DoxyCodeLine{00069\ }
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacegtest__shuffle__test_adffb7cacf9023023749a15ec2a66ef68_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacegtest__shuffle__test_a8e6a3ad4102d91a2d90487a7ed64c07f}\index{gtest\_shuffle\_test@{gtest\_shuffle\_test}!RunAndReturnOutput@{RunAndReturnOutput}}
+\index{RunAndReturnOutput@{RunAndReturnOutput}!gtest\_shuffle\_test@{gtest\_shuffle\_test}}
+\doxysubsubsection{\texorpdfstring{RunAndReturnOutput()}{RunAndReturnOutput()}}
+{\footnotesize\ttfamily \label{namespacegtest__shuffle__test_a8e6a3ad4102d91a2d90487a7ed64c07f} 
+gtest\+\_\+shuffle\+\_\+test.\+Run\+And\+Return\+Output (\begin{DoxyParamCaption}\item[{}]{extra\+\_\+env}{, }\item[{}]{args}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Runs the test program and returns its output.\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{gtest__shuffle__test_8py_source_l00078}{78}} of file \mbox{\hyperlink{gtest__shuffle__test_8py_source}{gtest\+\_\+shuffle\+\_\+test.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00078\ \textcolor{keyword}{def\ }RunAndReturnOutput(extra\_env,\ args):}
+\DoxyCodeLine{00079\ \ \ \textcolor{stringliteral}{"{}"{}"{}Runs\ the\ test\ program\ and\ returns\ its\ output."{}"{}"{}}}
+\DoxyCodeLine{00080\ }
+\DoxyCodeLine{00081\ \ \ environ\_copy\ =\ os.environ.copy()}
+\DoxyCodeLine{00082\ \ \ environ\_copy.update(extra\_env)}
+\DoxyCodeLine{00083\ }
+\DoxyCodeLine{00084\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classgtest__test__utils_1_1_subprocess}{gtest\_test\_utils.Subprocess}}([COMMAND]\ +\ args,\ env=environ\_copy).output}
+\DoxyCodeLine{00085\ }
+\DoxyCodeLine{00086\ }
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacegtest__shuffle__test_a8e6a3ad4102d91a2d90487a7ed64c07f_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacegtest__shuffle__test_a489bbd025a7ddba5c8607349265c0c52}\index{gtest\_shuffle\_test@{gtest\_shuffle\_test}!ShuffleFlag@{ShuffleFlag}}
+\index{ShuffleFlag@{ShuffleFlag}!gtest\_shuffle\_test@{gtest\_shuffle\_test}}
+\doxysubsubsection{\texorpdfstring{ShuffleFlag()}{ShuffleFlag()}}
+{\footnotesize\ttfamily \label{namespacegtest__shuffle__test_a489bbd025a7ddba5c8607349265c0c52} 
+gtest\+\_\+shuffle\+\_\+test.\+Shuffle\+Flag (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest__shuffle__test_8py_source_l00070}{70}} of file \mbox{\hyperlink{gtest__shuffle__test_8py_source}{gtest\+\_\+shuffle\+\_\+test.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00070\ \textcolor{keyword}{def\ }ShuffleFlag():}
+\DoxyCodeLine{00071\ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{'-\/-\/gtest\_shuffle'}}
+\DoxyCodeLine{00072\ }
+\DoxyCodeLine{00073\ }
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacegtest__shuffle__test_a489bbd025a7ddba5c8607349265c0c52_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{namespacegtest__shuffle__test_acd6d827819dcc06b9bf061cd4849b082}\index{gtest\_shuffle\_test@{gtest\_shuffle\_test}!ACTIVE\_TESTS@{ACTIVE\_TESTS}}
+\index{ACTIVE\_TESTS@{ACTIVE\_TESTS}!gtest\_shuffle\_test@{gtest\_shuffle\_test}}
+\doxysubsubsection{\texorpdfstring{ACTIVE\_TESTS}{ACTIVE\_TESTS}}
+{\footnotesize\ttfamily \label{namespacegtest__shuffle__test_acd6d827819dcc06b9bf061cd4849b082} 
+list gtest\+\_\+shuffle\+\_\+test.\+ACTIVE\+\_\+\+TESTS = \mbox{[}$\,$\mbox{]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest__shuffle__test_8py_source_l00048}{48}} of file \mbox{\hyperlink{gtest__shuffle__test_8py_source}{gtest\+\_\+shuffle\+\_\+test.\+py}}.
+
+\Hypertarget{namespacegtest__shuffle__test_aede96442ff7a7c9ac9a8baaaeb48e86c}\index{gtest\_shuffle\_test@{gtest\_shuffle\_test}!ALL\_TESTS@{ALL\_TESTS}}
+\index{ALL\_TESTS@{ALL\_TESTS}!gtest\_shuffle\_test@{gtest\_shuffle\_test}}
+\doxysubsubsection{\texorpdfstring{ALL\_TESTS}{ALL\_TESTS}}
+{\footnotesize\ttfamily \label{namespacegtest__shuffle__test_aede96442ff7a7c9ac9a8baaaeb48e86c} 
+list gtest\+\_\+shuffle\+\_\+test.\+ALL\+\_\+\+TESTS = \mbox{[}$\,$\mbox{]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest__shuffle__test_8py_source_l00047}{47}} of file \mbox{\hyperlink{gtest__shuffle__test_8py_source}{gtest\+\_\+shuffle\+\_\+test.\+py}}.
+
+\Hypertarget{namespacegtest__shuffle__test_a33b8a2fc24ccd6476d1e27b084142a25}\index{gtest\_shuffle\_test@{gtest\_shuffle\_test}!COMMAND@{COMMAND}}
+\index{COMMAND@{COMMAND}!gtest\_shuffle\_test@{gtest\_shuffle\_test}}
+\doxysubsubsection{\texorpdfstring{COMMAND}{COMMAND}}
+{\footnotesize\ttfamily \label{namespacegtest__shuffle__test_a33b8a2fc24ccd6476d1e27b084142a25} 
+gtest\+\_\+shuffle\+\_\+test.\+COMMAND = \mbox{\hyperlink{namespacegtest__test__utils_a239f43ff0e44144cb5a1e14f3453c273}{gtest\+\_\+test\+\_\+utils.\+Get\+Test\+Executable\+Path}}(\textquotesingle{}gtest\+\_\+shuffle\+\_\+test\+\_\+\textquotesingle{})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest__shuffle__test_8py_source_l00039}{39}} of file \mbox{\hyperlink{gtest__shuffle__test_8py_source}{gtest\+\_\+shuffle\+\_\+test.\+py}}.
+
+\Hypertarget{namespacegtest__shuffle__test_a35011532d6bd14ac29c891111ce1a911}\index{gtest\_shuffle\_test@{gtest\_shuffle\_test}!FILTERED\_TESTS@{FILTERED\_TESTS}}
+\index{FILTERED\_TESTS@{FILTERED\_TESTS}!gtest\_shuffle\_test@{gtest\_shuffle\_test}}
+\doxysubsubsection{\texorpdfstring{FILTERED\_TESTS}{FILTERED\_TESTS}}
+{\footnotesize\ttfamily \label{namespacegtest__shuffle__test_a35011532d6bd14ac29c891111ce1a911} 
+list gtest\+\_\+shuffle\+\_\+test.\+FILTERED\+\_\+\+TESTS = \mbox{[}$\,$\mbox{]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest__shuffle__test_8py_source_l00049}{49}} of file \mbox{\hyperlink{gtest__shuffle__test_8py_source}{gtest\+\_\+shuffle\+\_\+test.\+py}}.
+
+\Hypertarget{namespacegtest__shuffle__test_a0418bc61c30e3c4f5611c949b61cef03}\index{gtest\_shuffle\_test@{gtest\_shuffle\_test}!SHARD\_INDEX\_ENV\_VAR@{SHARD\_INDEX\_ENV\_VAR}}
+\index{SHARD\_INDEX\_ENV\_VAR@{SHARD\_INDEX\_ENV\_VAR}!gtest\_shuffle\_test@{gtest\_shuffle\_test}}
+\doxysubsubsection{\texorpdfstring{SHARD\_INDEX\_ENV\_VAR}{SHARD\_INDEX\_ENV\_VAR}}
+{\footnotesize\ttfamily \label{namespacegtest__shuffle__test_a0418bc61c30e3c4f5611c949b61cef03} 
+str gtest\+\_\+shuffle\+\_\+test.\+SHARD\+\_\+\+INDEX\+\_\+\+ENV\+\_\+\+VAR = \textquotesingle{}GTEST\+\_\+\+SHARD\+\_\+\+INDEX\textquotesingle{}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest__shuffle__test_8py_source_l00043}{43}} of file \mbox{\hyperlink{gtest__shuffle__test_8py_source}{gtest\+\_\+shuffle\+\_\+test.\+py}}.
+
+\Hypertarget{namespacegtest__shuffle__test_ad9bd126c3dc9894a3977a907e97e71e8}\index{gtest\_shuffle\_test@{gtest\_shuffle\_test}!SHARDED\_TESTS@{SHARDED\_TESTS}}
+\index{SHARDED\_TESTS@{SHARDED\_TESTS}!gtest\_shuffle\_test@{gtest\_shuffle\_test}}
+\doxysubsubsection{\texorpdfstring{SHARDED\_TESTS}{SHARDED\_TESTS}}
+{\footnotesize\ttfamily \label{namespacegtest__shuffle__test_ad9bd126c3dc9894a3977a907e97e71e8} 
+list gtest\+\_\+shuffle\+\_\+test.\+SHARDED\+\_\+\+TESTS = \mbox{[}$\,$\mbox{]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest__shuffle__test_8py_source_l00050}{50}} of file \mbox{\hyperlink{gtest__shuffle__test_8py_source}{gtest\+\_\+shuffle\+\_\+test.\+py}}.
+
+\Hypertarget{namespacegtest__shuffle__test_ac3bfd4eae8e6f35a83e73cfd9d9611d5}\index{gtest\_shuffle\_test@{gtest\_shuffle\_test}!SHUFFLED\_ACTIVE\_TESTS@{SHUFFLED\_ACTIVE\_TESTS}}
+\index{SHUFFLED\_ACTIVE\_TESTS@{SHUFFLED\_ACTIVE\_TESTS}!gtest\_shuffle\_test@{gtest\_shuffle\_test}}
+\doxysubsubsection{\texorpdfstring{SHUFFLED\_ACTIVE\_TESTS}{SHUFFLED\_ACTIVE\_TESTS}}
+{\footnotesize\ttfamily \label{namespacegtest__shuffle__test_ac3bfd4eae8e6f35a83e73cfd9d9611d5} 
+list gtest\+\_\+shuffle\+\_\+test.\+SHUFFLED\+\_\+\+ACTIVE\+\_\+\+TESTS = \mbox{[}$\,$\mbox{]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest__shuffle__test_8py_source_l00053}{53}} of file \mbox{\hyperlink{gtest__shuffle__test_8py_source}{gtest\+\_\+shuffle\+\_\+test.\+py}}.
+
+\Hypertarget{namespacegtest__shuffle__test_a6128f9c522f40c64ffb3917ff17080b8}\index{gtest\_shuffle\_test@{gtest\_shuffle\_test}!SHUFFLED\_ALL\_TESTS@{SHUFFLED\_ALL\_TESTS}}
+\index{SHUFFLED\_ALL\_TESTS@{SHUFFLED\_ALL\_TESTS}!gtest\_shuffle\_test@{gtest\_shuffle\_test}}
+\doxysubsubsection{\texorpdfstring{SHUFFLED\_ALL\_TESTS}{SHUFFLED\_ALL\_TESTS}}
+{\footnotesize\ttfamily \label{namespacegtest__shuffle__test_a6128f9c522f40c64ffb3917ff17080b8} 
+list gtest\+\_\+shuffle\+\_\+test.\+SHUFFLED\+\_\+\+ALL\+\_\+\+TESTS = \mbox{[}$\,$\mbox{]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest__shuffle__test_8py_source_l00052}{52}} of file \mbox{\hyperlink{gtest__shuffle__test_8py_source}{gtest\+\_\+shuffle\+\_\+test.\+py}}.
+
+\Hypertarget{namespacegtest__shuffle__test_aa9502dcb42a1d690d17558cc71388e45}\index{gtest\_shuffle\_test@{gtest\_shuffle\_test}!SHUFFLED\_FILTERED\_TESTS@{SHUFFLED\_FILTERED\_TESTS}}
+\index{SHUFFLED\_FILTERED\_TESTS@{SHUFFLED\_FILTERED\_TESTS}!gtest\_shuffle\_test@{gtest\_shuffle\_test}}
+\doxysubsubsection{\texorpdfstring{SHUFFLED\_FILTERED\_TESTS}{SHUFFLED\_FILTERED\_TESTS}}
+{\footnotesize\ttfamily \label{namespacegtest__shuffle__test_aa9502dcb42a1d690d17558cc71388e45} 
+list gtest\+\_\+shuffle\+\_\+test.\+SHUFFLED\+\_\+\+FILTERED\+\_\+\+TESTS = \mbox{[}$\,$\mbox{]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest__shuffle__test_8py_source_l00054}{54}} of file \mbox{\hyperlink{gtest__shuffle__test_8py_source}{gtest\+\_\+shuffle\+\_\+test.\+py}}.
+
+\Hypertarget{namespacegtest__shuffle__test_a3603885677e36438fd2d7521db51bcb4}\index{gtest\_shuffle\_test@{gtest\_shuffle\_test}!SHUFFLED\_SHARDED\_TESTS@{SHUFFLED\_SHARDED\_TESTS}}
+\index{SHUFFLED\_SHARDED\_TESTS@{SHUFFLED\_SHARDED\_TESTS}!gtest\_shuffle\_test@{gtest\_shuffle\_test}}
+\doxysubsubsection{\texorpdfstring{SHUFFLED\_SHARDED\_TESTS}{SHUFFLED\_SHARDED\_TESTS}}
+{\footnotesize\ttfamily \label{namespacegtest__shuffle__test_a3603885677e36438fd2d7521db51bcb4} 
+list gtest\+\_\+shuffle\+\_\+test.\+SHUFFLED\+\_\+\+SHARDED\+\_\+\+TESTS = \mbox{[}$\,$\mbox{]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest__shuffle__test_8py_source_l00055}{55}} of file \mbox{\hyperlink{gtest__shuffle__test_8py_source}{gtest\+\_\+shuffle\+\_\+test.\+py}}.
+
+\Hypertarget{namespacegtest__shuffle__test_afb3e0bed1bced169e5d882b79cfb3a32}\index{gtest\_shuffle\_test@{gtest\_shuffle\_test}!TEST\_FILTER@{TEST\_FILTER}}
+\index{TEST\_FILTER@{TEST\_FILTER}!gtest\_shuffle\_test@{gtest\_shuffle\_test}}
+\doxysubsubsection{\texorpdfstring{TEST\_FILTER}{TEST\_FILTER}}
+{\footnotesize\ttfamily \label{namespacegtest__shuffle__test_afb3e0bed1bced169e5d882b79cfb3a32} 
+str gtest\+\_\+shuffle\+\_\+test.\+TEST\+\_\+\+FILTER = \textquotesingle{}\mbox{\hyperlink{struct_a}{A}}\texorpdfstring{$\ast$}{*}.A\+:A\texorpdfstring{$\ast$}{*}.B\+:C\texorpdfstring{$\ast$}{*}\textquotesingle{}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest__shuffle__test_8py_source_l00045}{45}} of file \mbox{\hyperlink{gtest__shuffle__test_8py_source}{gtest\+\_\+shuffle\+\_\+test.\+py}}.
+
+\Hypertarget{namespacegtest__shuffle__test_ae308b0367efac6f7c40999590593ffa0}\index{gtest\_shuffle\_test@{gtest\_shuffle\_test}!TOTAL\_SHARDS\_ENV\_VAR@{TOTAL\_SHARDS\_ENV\_VAR}}
+\index{TOTAL\_SHARDS\_ENV\_VAR@{TOTAL\_SHARDS\_ENV\_VAR}!gtest\_shuffle\_test@{gtest\_shuffle\_test}}
+\doxysubsubsection{\texorpdfstring{TOTAL\_SHARDS\_ENV\_VAR}{TOTAL\_SHARDS\_ENV\_VAR}}
+{\footnotesize\ttfamily \label{namespacegtest__shuffle__test_ae308b0367efac6f7c40999590593ffa0} 
+str gtest\+\_\+shuffle\+\_\+test.\+TOTAL\+\_\+\+SHARDS\+\_\+\+ENV\+\_\+\+VAR = \textquotesingle{}GTEST\+\_\+\+TOTAL\+\_\+\+SHARDS\textquotesingle{}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest__shuffle__test_8py_source_l00042}{42}} of file \mbox{\hyperlink{gtest__shuffle__test_8py_source}{gtest\+\_\+shuffle\+\_\+test.\+py}}.
+

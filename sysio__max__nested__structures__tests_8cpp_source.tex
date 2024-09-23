@@ -1,0 +1,96 @@
+\doxysection{sysio\+\_\+max\+\_\+nested\+\_\+structures\+\_\+tests.\+cpp}
+\hypertarget{sysio__max__nested__structures__tests_8cpp_source}{}\label{sysio__max__nested__structures__tests_8cpp_source}\index{libraries/sys-\/vm/tests/sysio\_max\_nested\_structures\_tests.cpp@{libraries/sys-\/vm/tests/sysio\_max\_nested\_structures\_tests.cpp}}
+\mbox{\hyperlink{sysio__max__nested__structures__tests_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <sysio/vm/backend.hpp>}}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{sys-vm_2tests_2utils_8hpp}{utils.hpp}}"{}}}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{single__include_2catch2_2catch_8hpp}{catch2/catch.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00006}00006\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacesysio_1_1vm}{sysio::vm}};}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00008}00008\ \textcolor{keyword}{extern}\ \mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator}{wasm\_allocator}}\ \mbox{\hyperlink{sysio__max__nested__structures__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}};}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00010}00010\ \textcolor{keyword}{namespace\ }\{}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00012}00012\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00013}00013\ \textcolor{comment}{\ *\ (module}}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00014}00014\ \textcolor{comment}{\ *\ \ \ (func)}}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00015}00015\ \textcolor{comment}{\ *\ \ \ (func}}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00016}00016\ \textcolor{comment}{\ *\ \ \ \ \ (if\ (i32.const\ 0)\ (then)\ (else\ (drop\ (i32.const\ 0))))}}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00017}00017\ \textcolor{comment}{\ *\ \ \ \ \ (block\ (block))}}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00018}00018\ \textcolor{comment}{\ *\ \ \ )}}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00019}00019\ \textcolor{comment}{\ *\ )}}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00020}00020\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00021}00021\ std::vector<uint8\_t>\ nested\_4\_wasm\ =\ \{}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00022}00022\ \ \ \ 0x00,\ 0x61,\ 0x73,\ 0x6d,\ 0x01,\ 0x00,\ 0x00,\ 0x00,\ 0x01,\ 0x04,\ 0x01,\ 0x60,}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00023}00023\ \ \ \ 0x00,\ 0x00,\ 0x03,\ 0x03,\ 0x02,\ 0x00,\ 0x00,\ 0x0a,\ 0x16,\ 0x02,\ 0x02,\ 0x00,}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00024}00024\ \ \ \ 0x0b,\ 0x11,\ 0x00,\ 0x41,\ 0x00,\ 0x04,\ 0x40,\ 0x05,\ 0x41,\ 0x00,\ 0x1a,\ 0x0b,}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00025}00025\ \ \ \ 0x02,\ 0x40,\ 0x02,\ 0x40,\ 0x0b,\ 0x0b,\ 0x0b}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00026}00026\ \};}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00028}00028\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00029}00029\ \textcolor{comment}{\ *\ (module}}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00030}00030\ \textcolor{comment}{\ *\ \ \ (func}}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00031}00031\ \textcolor{comment}{\ *\ \ \ \ \ (if\ (i32.const\ 0)\ (then)\ (else\ (drop\ (i32.const\ 0))))}}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00032}00032\ \textcolor{comment}{\ *\ \ \ \ \ (block\ (block\ (block)))}}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00033}00033\ \textcolor{comment}{\ *\ \ \ )}}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00034}00034\ \textcolor{comment}{\ *\ )}}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00035}00035\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00036}00036\ std::vector<uint8\_t>\ nested\_4\_wasm\_2\ =\ \{}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00037}00037\ \ \ 0x00,\ 0x61,\ 0x73,\ 0x6d,\ 0x01,\ 0x00,\ 0x00,\ 0x00,\ 0x01,\ 0x04,\ 0x01,\ 0x60,}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00038}00038\ \ \ 0x00,\ 0x00,\ 0x03,\ 0x02,\ 0x01,\ 0x00,\ 0x0a,\ 0x16,\ 0x01,\ 0x14,\ 0x00,\ 0x41,}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00039}00039\ \ \ 0x00,\ 0x04,\ 0x40,\ 0x05,\ 0x41,\ 0x00,\ 0x1a,\ 0x0b,\ 0x02,\ 0x40,\ 0x02,\ 0x40,}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00040}00040\ \ \ 0x02,\ 0x40,\ 0x0b,\ 0x0b,\ 0x0b,\ 0x0b}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00041}00041\ \};}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00043}00043\ \textcolor{keyword}{struct\ }empty\_options\ \{\};}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00044}00044\ \textcolor{keyword}{struct\ }static\_options\_3\ \{}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00045}00045\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ std::uint32\_t\ sysio\_max\_nested\_structures\ =\ 3;}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00046}00046\ \};}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00047}00047\ \textcolor{keyword}{struct\ }static\_options\_4\ \{}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00048}00048\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ std::uint32\_t\ sysio\_max\_nested\_structures\ =\ 4;}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00049}00049\ \};}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00050}00050\ \textcolor{keyword}{struct\ }dynamic\_options\ \{}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00051}00051\ \ \ \ std::uint32\_t\ sysio\_max\_nested\_structures;}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00052}00052\ \};}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00054}00054\ \}}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00056}\mbox{\hyperlink{sysio__max__nested__structures__tests_8cpp_a77a140e09c655e70a8e7bf3e4615dbe0}{00056}}\ \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_a3e5f265967cb6d730cad8ca15e807ac2}{BACKEND\_TEST\_CASE}}(\textcolor{stringliteral}{"{}Test\ sysio\_max\_nested\_structures\ default"{}},\ \textcolor{stringliteral}{"{}[sysio\_max\_nested\_structures\_test]"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00057}00057\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType>}};}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00058}00058\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend}}(nested\_4\_wasm,\ \&\mbox{\hyperlink{sysio__max__nested__structures__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00059}00059\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend2(nested\_4\_wasm\_2,\ \&\mbox{\hyperlink{sysio__max__nested__structures__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00060}00060\ \}}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00062}\mbox{\hyperlink{sysio__max__nested__structures__tests_8cpp_ad8286fb96d3248f108a72cdd17f6482d}{00062}}\ \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_a3e5f265967cb6d730cad8ca15e807ac2}{BACKEND\_TEST\_CASE}}(\textcolor{stringliteral}{"{}Test\ sysio\_max\_nested\_structures\ unlimited"{}},\ \textcolor{stringliteral}{"{}[sysio\_max\_nested\_structures\_test]"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00063}00063\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ empty\_options>}};}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00064}00064\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend}}(nested\_4\_wasm,\ \&\mbox{\hyperlink{sysio__max__nested__structures__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00065}00065\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend2(nested\_4\_wasm\_2,\ \&\mbox{\hyperlink{sysio__max__nested__structures__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00066}00066\ \}}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00067}00067\ }
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00068}\mbox{\hyperlink{sysio__max__nested__structures__tests_8cpp_a59a4628fefa60b10cf8700b5ac2785be}{00068}}\ \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_a3e5f265967cb6d730cad8ca15e807ac2}{BACKEND\_TEST\_CASE}}(\textcolor{stringliteral}{"{}Test\ sysio\_max\_nested\_structures\ static\ fail"{}},\ \textcolor{stringliteral}{"{}[sysio\_max\_nested\_structures\_test]"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00069}00069\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ static\_options\_3>}};}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00070}00070\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(nested\_4\_wasm,\ \&\mbox{\hyperlink{sysio__max__nested__structures__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00071}00071\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(nested\_4\_wasm\_2,\ \&\mbox{\hyperlink{sysio__max__nested__structures__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00072}00072\ \}}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00073}00073\ }
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00074}\mbox{\hyperlink{sysio__max__nested__structures__tests_8cpp_aa3fbe85c5edf68258cea748015680c9c}{00074}}\ \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_a3e5f265967cb6d730cad8ca15e807ac2}{BACKEND\_TEST\_CASE}}(\textcolor{stringliteral}{"{}Test\ sysio\_max\_nested\_structures\ static\ pass"{}},\ \textcolor{stringliteral}{"{}[sysio\_max\_nested\_structures\_test]"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00075}00075\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ static\_options\_4>}};}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00076}00076\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend}}(nested\_4\_wasm,\ \&\mbox{\hyperlink{sysio__max__nested__structures__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00077}00077\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend2(nested\_4\_wasm\_2,\ \&\mbox{\hyperlink{sysio__max__nested__structures__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00078}00078\ \}}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00080}\mbox{\hyperlink{sysio__max__nested__structures__tests_8cpp_a51aeb61c8c6b3837d00fa3d8677f6e59}{00080}}\ \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_a3e5f265967cb6d730cad8ca15e807ac2}{BACKEND\_TEST\_CASE}}(\textcolor{stringliteral}{"{}Test\ sysio\_max\_nested\_structures\ dynamic\ fail"{}},\ \textcolor{stringliteral}{"{}[sysio\_max\_nested\_structures\_test]"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00081}00081\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ dynamic\_options>}};}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00082}00082\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(nested\_4\_wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\{3\}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00083}00083\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(nested\_4\_wasm\_2,\ \textcolor{keyword}{nullptr},\ dynamic\_options\{3\}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00084}00084\ \}}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00085}00085\ }
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00086}\mbox{\hyperlink{sysio__max__nested__structures__tests_8cpp_aaa753c196974fe8b5fe80e76cd927c7e}{00086}}\ \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_a3e5f265967cb6d730cad8ca15e807ac2}{BACKEND\_TEST\_CASE}}(\textcolor{stringliteral}{"{}Test\ sysio\_max\_nested\_structures\ dynamic\ pass"{}},\ \textcolor{stringliteral}{"{}[sysio\_max\_nested\_structures\_test]"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00087}00087\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ dynamic\_options>}};}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00088}00088\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend}}(nested\_4\_wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\{4\});}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00089}00089\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend2(nested\_4\_wasm\_2,\ \textcolor{keyword}{nullptr},\ dynamic\_options\{4\});}
+\DoxyCodeLine{\Hypertarget{sysio__max__nested__structures__tests_8cpp_source_l00090}00090\ \}}
+
+\end{DoxyCode}

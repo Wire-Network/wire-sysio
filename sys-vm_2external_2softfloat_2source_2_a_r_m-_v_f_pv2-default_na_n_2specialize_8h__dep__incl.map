@@ -1,0 +1,25 @@
+<map id="libraries/sys&#45;vm/external/softfloat/source/ARM&#45;VFPv2&#45;defaultNaN/specialize.h" name="libraries/sys&#45;vm/external/softfloat/source/ARM&#45;VFPv2&#45;defaultNaN/specialize.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="1454,5,1648,61"/>
+<area shape="rect" id="Node000002" href="$sys-vm_2external_2softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2s__common_na_n_to_ext_f80_m_8c.html" title=" " alt="" coords="5,109,270,165"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1439,39,1224,45,937,58,611,79,282,112,270,113,270,108,281,106,610,74,937,53,1224,40,1439,34"/>
+<area shape="rect" id="Node000003" href="$sys-vm_2external_2softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2s__common_na_n_to_ext_f80_u_i_8c.html" title=" " alt="" coords="293,109,560,165"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="1439,42,1055,65,815,85,574,112,561,113,561,108,573,106,815,80,1055,60,1439,37"/>
+<area shape="rect" id="Node000004" href="$sys-vm_2external_2softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2s__common_na_n_to_f128_m_8c.html" title=" " alt="" coords="585,109,836,165"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="1439,46,1170,72,850,112,837,114,837,108,849,106,1169,67,1438,41"/>
+<area shape="rect" id="Node000005" href="$sys-vm_2external_2softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2s__common_na_n_to_f128_u_i_8c.html" title=" " alt="" coords="861,109,1115,165"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="1439,56,1127,112,1116,114,1115,108,1126,106,1438,51"/>
+<area shape="rect" id="Node000006" href="$sys-vm_2external_2softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2s__propagate_na_n_ext_f80_m_8c.html" title=" " alt="" coords="1140,109,1397,165"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="1462,69,1345,111,1343,106,1460,64"/>
+<area shape="rect" id="Node000007" href="$sys-vm_2external_2softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2s__propagate_na_n_ext_f80_u_i_8c.html" title=" " alt="" coords="1421,109,1681,165"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="1554,77,1554,108,1548,108,1548,77"/>
+<area shape="rect" id="Node000008" href="$sys-vm_2external_2softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2s__propagate_na_n_f128_m_8c.html" title=" " alt="" coords="1705,109,1949,165"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="1640,64,1754,106,1752,111,1638,69"/>
+<area shape="rect" id="Node000009" href="$sys-vm_2external_2softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2s__propagate_na_n_f128_u_i_8c.html" title=" " alt="" coords="1972,109,2220,165"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="1664,52,1962,106,1973,108,1972,114,1961,112,1663,57"/>
+<area shape="rect" id="Node000010" href="$sys-vm_2external_2softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2s__propagate_na_n_f16_u_i_8c.html" title=" " alt="" coords="2244,109,2484,165"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="1663,41,1924,67,2233,106,2244,108,2243,113,2232,112,1923,72,1663,46"/>
+<area shape="rect" id="Node000011" href="$sys-vm_2external_2softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2s__propagate_na_n_f32_u_i_8c.html" title=" " alt="" coords="2508,109,2748,165"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="1663,36,2034,59,2265,79,2497,106,2508,108,2507,113,2496,112,2264,84,2034,64,1663,42"/>
+<area shape="rect" id="Node000012" href="$sys-vm_2external_2softfloat_2source_2_a_r_m-_v_f_pv2-default_na_n_2s__propagate_na_n_f64_u_i_8c.html" title=" " alt="" coords="2772,109,3012,165"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="1663,34,1868,40,2141,52,2450,74,2760,106,2772,108,2771,113,2760,112,2449,79,2141,57,1868,45,1663,39"/>
+</map>

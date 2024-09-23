@@ -1,0 +1,125 @@
+\doxysection{sysio\+::chain\+::resource\+\_\+limits\+::resource\+\_\+limits\+\_\+object Struct Reference}
+\hypertarget{structsysio_1_1chain_1_1resource__limits_1_1resource__limits__object}{}\label{structsysio_1_1chain_1_1resource__limits_1_1resource__limits__object}\index{sysio::chain::resource\_limits::resource\_limits\_object@{sysio::chain::resource\_limits::resource\_limits\_object}}
+
+
+{\ttfamily \#include $<$resource\+\_\+limits\+\_\+private.\+hpp$>$}
+
+
+
+Inheritance diagram for sysio\+::chain\+::resource\+\_\+limits\+::resource\+\_\+limits\+\_\+object\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=197pt]{structsysio_1_1chain_1_1resource__limits_1_1resource__limits__object__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for sysio\+::chain\+::resource\+\_\+limits\+::resource\+\_\+limits\+\_\+object\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1resource__limits_1_1resource__limits__object__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structchainbase_1_1object_a7c6a0efb95ee67d538a976cfa5be9df9}{id\+\_\+type}} \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1resource__limits__object_a738fed7f5b438c447b79f203679837db}{id}}
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1resource__limits__object_a406a648c8480204e81501d3065914627}{owner}}
+\item 
+bool \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1resource__limits__object_a744e55bc07b8d47261d4b00f738d6d47}{pending}} = false
+\item 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1resource__limits__object_a9eaec91376588de2dd82766e23750f87}{net\+\_\+weight}} = -\/1
+\item 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1resource__limits__object_aaeaa8f4c3c9e4cd8c823ecb22cc3f982}{cpu\+\_\+weight}} = -\/1
+\item 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1resource__limits__object_a7e7945f847d9e441e69f938921270836}{ram\+\_\+bytes}} = -\/1
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Public Types inherited from \mbox{\hyperlink{structchainbase_1_1object}{chainbase\+::object$<$ resource\+\_\+limits\+\_\+object\+\_\+type, resource\+\_\+limits\+\_\+object $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{classchainbase_1_1oid}{oid}}$<$ resource\+\_\+limits\+\_\+object $>$ \mbox{\hyperlink{structchainbase_1_1object_a7c6a0efb95ee67d538a976cfa5be9df9}{id\+\_\+type}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Static Public Attributes inherited from \mbox{\hyperlink{structchainbase_1_1object}{chainbase\+::object$<$ resource\+\_\+limits\+\_\+object\+\_\+type, resource\+\_\+limits\+\_\+object $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+static const \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{structchainbase_1_1object_a30d3a5340e6fc59b4a2e044fcd42f0a2}{type\+\_\+id}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Every account that authorizes a transaction is billed for the full size of that transaction. This object tracks the average usage of that account. 
+
+Definition at line \mbox{\hyperlink{resource__limits__private_8hpp_source_l00197}{197}} of file \mbox{\hyperlink{resource__limits__private_8hpp_source}{resource\+\_\+limits\+\_\+private.\+hpp}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1chain_1_1resource__limits_1_1resource__limits__object_aaeaa8f4c3c9e4cd8c823ecb22cc3f982}\index{sysio::chain::resource\_limits::resource\_limits\_object@{sysio::chain::resource\_limits::resource\_limits\_object}!cpu\_weight@{cpu\_weight}}
+\index{cpu\_weight@{cpu\_weight}!sysio::chain::resource\_limits::resource\_limits\_object@{sysio::chain::resource\_limits::resource\_limits\_object}}
+\doxysubsubsection{\texorpdfstring{cpu\_weight}{cpu\_weight}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1resource__limits_1_1resource__limits__object_aaeaa8f4c3c9e4cd8c823ecb22cc3f982} 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} sysio\+::chain\+::resource\+\_\+limits\+::resource\+\_\+limits\+\_\+object\+::cpu\+\_\+weight = -\/1}
+
+
+
+Definition at line \mbox{\hyperlink{resource__limits__private_8hpp_source_l00206}{206}} of file \mbox{\hyperlink{resource__limits__private_8hpp_source}{resource\+\_\+limits\+\_\+private.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1resource__limits_1_1resource__limits__object_a738fed7f5b438c447b79f203679837db}\index{sysio::chain::resource\_limits::resource\_limits\_object@{sysio::chain::resource\_limits::resource\_limits\_object}!id@{id}}
+\index{id@{id}!sysio::chain::resource\_limits::resource\_limits\_object@{sysio::chain::resource\_limits::resource\_limits\_object}}
+\doxysubsubsection{\texorpdfstring{id}{id}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1resource__limits_1_1resource__limits__object_a738fed7f5b438c447b79f203679837db} 
+\mbox{\hyperlink{structchainbase_1_1object_a7c6a0efb95ee67d538a976cfa5be9df9}{id\+\_\+type}} sysio\+::chain\+::resource\+\_\+limits\+::resource\+\_\+limits\+\_\+object\+::id}
+
+
+
+Definition at line \mbox{\hyperlink{resource__limits__private_8hpp_source_l00201}{201}} of file \mbox{\hyperlink{resource__limits__private_8hpp_source}{resource\+\_\+limits\+\_\+private.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1resource__limits_1_1resource__limits__object_a9eaec91376588de2dd82766e23750f87}\index{sysio::chain::resource\_limits::resource\_limits\_object@{sysio::chain::resource\_limits::resource\_limits\_object}!net\_weight@{net\_weight}}
+\index{net\_weight@{net\_weight}!sysio::chain::resource\_limits::resource\_limits\_object@{sysio::chain::resource\_limits::resource\_limits\_object}}
+\doxysubsubsection{\texorpdfstring{net\_weight}{net\_weight}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1resource__limits_1_1resource__limits__object_a9eaec91376588de2dd82766e23750f87} 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} sysio\+::chain\+::resource\+\_\+limits\+::resource\+\_\+limits\+\_\+object\+::net\+\_\+weight = -\/1}
+
+
+
+Definition at line \mbox{\hyperlink{resource__limits__private_8hpp_source_l00205}{205}} of file \mbox{\hyperlink{resource__limits__private_8hpp_source}{resource\+\_\+limits\+\_\+private.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1resource__limits_1_1resource__limits__object_a406a648c8480204e81501d3065914627}\index{sysio::chain::resource\_limits::resource\_limits\_object@{sysio::chain::resource\_limits::resource\_limits\_object}!owner@{owner}}
+\index{owner@{owner}!sysio::chain::resource\_limits::resource\_limits\_object@{sysio::chain::resource\_limits::resource\_limits\_object}}
+\doxysubsubsection{\texorpdfstring{owner}{owner}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1resource__limits_1_1resource__limits__object_a406a648c8480204e81501d3065914627} 
+\mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} sysio\+::chain\+::resource\+\_\+limits\+::resource\+\_\+limits\+\_\+object\+::owner}
+
+
+
+Definition at line \mbox{\hyperlink{resource__limits__private_8hpp_source_l00202}{202}} of file \mbox{\hyperlink{resource__limits__private_8hpp_source}{resource\+\_\+limits\+\_\+private.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1resource__limits_1_1resource__limits__object_a744e55bc07b8d47261d4b00f738d6d47}\index{sysio::chain::resource\_limits::resource\_limits\_object@{sysio::chain::resource\_limits::resource\_limits\_object}!pending@{pending}}
+\index{pending@{pending}!sysio::chain::resource\_limits::resource\_limits\_object@{sysio::chain::resource\_limits::resource\_limits\_object}}
+\doxysubsubsection{\texorpdfstring{pending}{pending}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1resource__limits_1_1resource__limits__object_a744e55bc07b8d47261d4b00f738d6d47} 
+bool sysio\+::chain\+::resource\+\_\+limits\+::resource\+\_\+limits\+\_\+object\+::pending = false}
+
+
+
+Definition at line \mbox{\hyperlink{resource__limits__private_8hpp_source_l00203}{203}} of file \mbox{\hyperlink{resource__limits__private_8hpp_source}{resource\+\_\+limits\+\_\+private.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1resource__limits_1_1resource__limits__object_a7e7945f847d9e441e69f938921270836}\index{sysio::chain::resource\_limits::resource\_limits\_object@{sysio::chain::resource\_limits::resource\_limits\_object}!ram\_bytes@{ram\_bytes}}
+\index{ram\_bytes@{ram\_bytes}!sysio::chain::resource\_limits::resource\_limits\_object@{sysio::chain::resource\_limits::resource\_limits\_object}}
+\doxysubsubsection{\texorpdfstring{ram\_bytes}{ram\_bytes}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1resource__limits_1_1resource__limits__object_a7e7945f847d9e441e69f938921270836} 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} sysio\+::chain\+::resource\+\_\+limits\+::resource\+\_\+limits\+\_\+object\+::ram\+\_\+bytes = -\/1}
+
+
+
+Definition at line \mbox{\hyperlink{resource__limits__private_8hpp_source_l00207}{207}} of file \mbox{\hyperlink{resource__limits__private_8hpp_source}{resource\+\_\+limits\+\_\+private.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{resource__limits__private_8hpp}{resource\+\_\+limits\+\_\+private.\+hpp}}\end{DoxyCompactItemize}

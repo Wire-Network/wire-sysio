@@ -1,0 +1,13 @@
+var classfc_1_1datastream_3_01_container_00_01typename_01std_1_1enable__if__t_3_07std_1_1is__same__vfd96e234dc1149e01c9f4c631faf0080 =
+[
+    [ "datastream", "classfc_1_1datastream_3_01_container_00_01typename_01std_1_1enable__if__t_3_07std_1_1is__same__vfd96e234dc1149e01c9f4c631faf0080.html#a99b00489f4f21962648bb8a9f0cd311a", null ],
+    [ "get", "classfc_1_1datastream_3_01_container_00_01typename_01std_1_1enable__if__t_3_07std_1_1is__same__vfd96e234dc1149e01c9f4c631faf0080.html#a88330899c6fd885af1eac11272225693", null ],
+    [ "read", "classfc_1_1datastream_3_01_container_00_01typename_01std_1_1enable__if__t_3_07std_1_1is__same__vfd96e234dc1149e01c9f4c631faf0080.html#ae1d48fd201000f333d905847ad93fdef", null ],
+    [ "remaining", "classfc_1_1datastream_3_01_container_00_01typename_01std_1_1enable__if__t_3_07std_1_1is__same__vfd96e234dc1149e01c9f4c631faf0080.html#a6fe08bcfddbfa3f069b15f5d1260ba63", null ],
+    [ "seekp", "classfc_1_1datastream_3_01_container_00_01typename_01std_1_1enable__if__t_3_07std_1_1is__same__vfd96e234dc1149e01c9f4c631faf0080.html#ab136bb21331412d964e41488a20535d7", null ],
+    [ "skip", "classfc_1_1datastream_3_01_container_00_01typename_01std_1_1enable__if__t_3_07std_1_1is__same__vfd96e234dc1149e01c9f4c631faf0080.html#a2072198bb30321e728c4202a296f213c", null ],
+    [ "storage", "classfc_1_1datastream_3_01_container_00_01typename_01std_1_1enable__if__t_3_07std_1_1is__same__vfd96e234dc1149e01c9f4c631faf0080.html#a5d3214edc6ac28ae3d97615c0a2b80e8", null ],
+    [ "storage", "classfc_1_1datastream_3_01_container_00_01typename_01std_1_1enable__if__t_3_07std_1_1is__same__vfd96e234dc1149e01c9f4c631faf0080.html#ab5e53c00a008862d37114acaec236862", null ],
+    [ "tellp", "classfc_1_1datastream_3_01_container_00_01typename_01std_1_1enable__if__t_3_07std_1_1is__same__vfd96e234dc1149e01c9f4c631faf0080.html#a6e9ae30357cca6b75ced6967b3eb6077", null ],
+    [ "write", "classfc_1_1datastream_3_01_container_00_01typename_01std_1_1enable__if__t_3_07std_1_1is__same__vfd96e234dc1149e01c9f4c631faf0080.html#ad4ce54361082c97ea698f0af96bad6f5", null ]
+];

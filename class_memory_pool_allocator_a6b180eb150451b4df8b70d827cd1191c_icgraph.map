@@ -1,0 +1,7 @@
+<map id="MemoryPoolAllocator::Free" name="MemoryPoolAllocator::Free">
+<area shape="rect" id="Node000001" title="Frees a memory block (concept Allocator)" alt="" coords="285,35,430,75"/>
+<area shape="rect" id="Node000002" href="$class_remote_schema_document_provider.html#ab1881e7a19c67977bd7050fa9eb347d6" title=" " alt="" coords="5,5,237,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="269,47,237,43,238,37,270,41"/>
+<area shape="rect" id="Node000003" href="$unittest_2schematest_8cpp.html#ad5dcf99ad5149b042298ea200495c701" title=" " alt="" coords="93,70,149,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="270,68,149,82,149,77,269,63"/>
+</map>

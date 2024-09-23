@@ -1,0 +1,36 @@
+\doxysection{libraries/fc/src/crypto/base64.cpp File Reference}
+\hypertarget{base64_8cpp}{}\label{base64_8cpp}\index{libraries/fc/src/crypto/base64.cpp@{libraries/fc/src/crypto/base64.cpp}}
+{\ttfamily \#include $<$fc/crypto/base64.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/exception/exception.\+hpp$>$}\newline
+{\ttfamily \#include $<$ctype.\+h$>$}\newline
+Include dependency graph for base64.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{base64_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacefc}{fc}}
+\begin{DoxyCompactList}\small\item\em namespace \doxylink{namespacesysio_1_1chain}{sysio\+::chain} \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+std\+::string \mbox{\hyperlink{namespacefc_a7c8b089501fd00e09e068aa02eacf3de}{fc\+::base64\+\_\+encode\+\_\+impl}} (unsigned char const \texorpdfstring{$\ast$}{*}bytes\+\_\+to\+\_\+encode, unsigned int \mbox{\hyperlink{yubihsm__pkcs11_8c_af352138fec1245efdaee143f770c01ef}{in\+\_\+len}}, const char \texorpdfstring{$\ast$}{*}const b64\+\_\+chars)
+\item 
+std\+::string \mbox{\hyperlink{namespacefc_a3668095306e6c6c4c53de5d7701e4dde}{fc\+::base64\+\_\+encode}} (unsigned char const \texorpdfstring{$\ast$}{*}bytes\+\_\+to\+\_\+encode, unsigned int \mbox{\hyperlink{yubihsm__pkcs11_8c_af352138fec1245efdaee143f770c01ef}{in\+\_\+len}})
+\item 
+std\+::string \mbox{\hyperlink{namespacefc_a7007f44b8d50af43e7cc0874ceaed58e}{fc\+::base64\+\_\+encode}} (const std\+::string \&enc)
+\item 
+std\+::string \mbox{\hyperlink{namespacefc_a4d30681e99b9cacc0c9b3b8985a5daa4}{fc\+::base64url\+\_\+encode}} (unsigned char const \texorpdfstring{$\ast$}{*}bytes\+\_\+to\+\_\+encode, unsigned int \mbox{\hyperlink{yubihsm__pkcs11_8c_af352138fec1245efdaee143f770c01ef}{in\+\_\+len}})
+\item 
+std\+::string \mbox{\hyperlink{namespacefc_aa0c8904b0be7b022b9be22b18f0cb656}{fc\+::base64url\+\_\+encode}} (const std\+::string \&enc)
+\item 
+std\+::string \mbox{\hyperlink{namespacefc_a06d292833045ce4d8c4d7be2b08fe22f}{fc\+::base64\+\_\+decode\+\_\+impl}} (std\+::string const \&encoded\+\_\+string, const char \texorpdfstring{$\ast$}{*}const b64\+\_\+chars)
+\item 
+std\+::string \mbox{\hyperlink{namespacefc_ae8deb03ba4f32aa68c5dcc62578ea2de}{fc\+::base64\+\_\+decode}} (const std\+::string \&encoded\+\_\+string)
+\item 
+std\+::string \mbox{\hyperlink{namespacefc_a68369d37f3fb275fd019ce5c1f2e92ed}{fc\+::base64url\+\_\+decode}} (const std\+::string \&encoded\+\_\+string)
+\end{DoxyCompactItemize}

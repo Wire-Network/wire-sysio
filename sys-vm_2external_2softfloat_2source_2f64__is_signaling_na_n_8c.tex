@@ -1,0 +1,43 @@
+\doxysection{libraries/sys-\/vm/external/softfloat/source/f64\+\_\+is\+Signaling\+NaN.c File Reference}
+\hypertarget{sys-vm_2external_2softfloat_2source_2f64__is_signaling_na_n_8c}{}\label{sys-vm_2external_2softfloat_2source_2f64__is_signaling_na_n_8c}\index{libraries/sys-\/vm/external/softfloat/source/f64\_isSignalingNaN.c@{libraries/sys-\/vm/external/softfloat/source/f64\_isSignalingNaN.c}}
+{\ttfamily \#include $<$stdbool.\+h$>$}\newline
+{\ttfamily \#include "{}platform.\+h"{}}\newline
+{\ttfamily \#include "{}internals.\+h"{}}\newline
+{\ttfamily \#include "{}specialize.\+h"{}}\newline
+{\ttfamily \#include "{}softfloat.\+h"{}}\newline
+Include dependency graph for f64\+\_\+is\+Signaling\+Na\+N.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sys-vm_2external_2softfloat_2source_2f64__is_signaling_na_n_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2f64__is_signaling_na_n_8c_a1be06bfadd55cc8be73309341c70df4f}{f64\+\_\+is\+Signaling\+NaN}} (\mbox{\hyperlink{structfloat64__t}{float64\+\_\+t}} \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{sys-vm_2external_2softfloat_2source_2f64__is_signaling_na_n_8c_a1be06bfadd55cc8be73309341c70df4f}\index{f64\_isSignalingNaN.c@{f64\_isSignalingNaN.c}!f64\_isSignalingNaN@{f64\_isSignalingNaN}}
+\index{f64\_isSignalingNaN@{f64\_isSignalingNaN}!f64\_isSignalingNaN.c@{f64\_isSignalingNaN.c}}
+\doxysubsubsection{\texorpdfstring{f64\_isSignalingNaN()}{f64\_isSignalingNaN()}}
+{\footnotesize\ttfamily \label{sys-vm_2external_2softfloat_2source_2f64__is_signaling_na_n_8c_a1be06bfadd55cc8be73309341c70df4f} 
+bool f64\+\_\+is\+Signaling\+NaN (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structfloat64__t}{float64\+\_\+t}}}]{a}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2f64__is_signaling_na_n_8c_source_l00043}{43}} of file \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2f64__is_signaling_na_n_8c_source}{f64\+\_\+is\+Signaling\+Na\+N.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00044\ \{}
+\DoxyCodeLine{00045\ \ \ \ \ \textcolor{keyword}{union\ }\mbox{\hyperlink{unionui64__f64}{ui64\_f64}}\ uA;}
+\DoxyCodeLine{00046\ }
+\DoxyCodeLine{00047\ \ \ \ \ uA.\mbox{\hyperlink{unionui64__f64_a6c3253c08850759ca3c64dd956c6b4dd}{f}}\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}};}
+\DoxyCodeLine{00048\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2specialize_8h_a894f3f1fcd86adbdd3c27fa55d7f7ee1}{softfloat\_isSigNaNF64UI}}(\ uA.ui\ );}
+\DoxyCodeLine{00049\ }
+\DoxyCodeLine{00050\ \}}
+
+\end{DoxyCode}

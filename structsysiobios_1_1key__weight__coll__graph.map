@@ -1,0 +1,5 @@
+<map id="sysiobios::key_weight" name="sysiobios::key_weight">
+<area shape="rect" id="Node000001" title=" " alt="" coords="13,94,163,120"/>
+<area shape="rect" id="Node000002" href="$classfc_1_1crypto_1_1r1_1_1public__key.html" title="contains only the public point of an elliptic curve key." alt="" coords="5,5,171,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="91,47,91,94,85,94,85,47"/>
+</map>

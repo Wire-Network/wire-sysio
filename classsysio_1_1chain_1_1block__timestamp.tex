@@ -1,0 +1,380 @@
+\doxysection{sysio\+::chain\+::block\+\_\+timestamp\texorpdfstring{$<$}{<} Interval\+Ms, Epoch\+Ms \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classsysio_1_1chain_1_1block__timestamp}{}\label{classsysio_1_1chain_1_1block__timestamp}\index{sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$@{sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$}}
+
+
+{\ttfamily \#include $<$block\+\_\+timestamp.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp_a3fa049f1a91294814a9cda7ae0745d14}{block\+\_\+timestamp}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}=0)
+\item 
+\mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp_a60e7c5d84fa5914f1ed6e32220c5882f}{block\+\_\+timestamp}} (const \mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}} \&t)
+\item 
+\mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp_ad78655966fc6e1525ed5c0a33bd459a8}{block\+\_\+timestamp}} (const \mbox{\hyperlink{classfc_1_1time__point__sec}{fc\+::time\+\_\+point\+\_\+sec}} \&t)
+\item 
+\mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{block\+\_\+timestamp}} \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp_a3ef407f67d34fc8d5a85f9f2fb0e5f6f}{next}} () const
+\item 
+\mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}} \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp_aa1d88152d9cc082b5ad651c3aeadfb8f}{to\+\_\+time\+\_\+point}} () const
+\item 
+\mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp_ac9f311c4215d958e910935468e7a2f16}{operator fc\+::time\+\_\+point}} () const
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp_ad04450f092062a6bcc112c76ab7d7fbe}{operator=}} (const \mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}} \&t)
+\item 
+bool \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp_a468825f893feef03aaaf7b475eff724c}{operator$>$}} (const \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{block\+\_\+timestamp}} \&t) const
+\item 
+bool \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp_afacfc1de1681ce4983d378ddedfbb242}{operator$>$=}} (const \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{block\+\_\+timestamp}} \&t) const
+\item 
+bool \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp_a0d057d2c727deb3a6e075764034ea9e6}{operator$<$}} (const \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{block\+\_\+timestamp}} \&t) const
+\item 
+bool \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp_a374267474c43f003ef70ff374c701e61}{operator$<$=}} (const \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{block\+\_\+timestamp}} \&t) const
+\item 
+bool \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp_a5f34f109dacb35d48dd76502a212e8c0}{operator==}} (const \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{block\+\_\+timestamp}} \&t) const
+\item 
+bool \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp_ad9ba17007058a94d199946d83f3a34e2}{operator!=}} (const \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{block\+\_\+timestamp}} \&t) const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{block\+\_\+timestamp}} \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp_a38be995dac109b115c5dca22862bb855}{maximum}} ()
+\item 
+static \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{block\+\_\+timestamp}} \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp_a61569851f76974e2dd25fecc7d16821e}{min}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp_a1bdb67323980085a2d4002d877b6c232}{slot}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} Interval\+Ms, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} Epoch\+Ms$>$\newline
+class sysio\+::chain\+::block\+\_\+timestamp$<$ Interval\+Ms, Epoch\+Ms $>$}
+This class is used in the block headers to represent the block time It is a parameterised class that takes an Epoch in milliseconds and and an interval in milliseconds and computes the number of slots. 
+
+Definition at line \mbox{\hyperlink{block__timestamp_8hpp_source_l00018}{18}} of file \mbox{\hyperlink{block__timestamp_8hpp_source}{block\+\_\+timestamp.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classsysio_1_1chain_1_1block__timestamp_a3fa049f1a91294814a9cda7ae0745d14}\index{sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$@{sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$}!block\_timestamp@{block\_timestamp}}
+\index{block\_timestamp@{block\_timestamp}!sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$@{sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$}}
+\doxysubsubsection{\texorpdfstring{block\_timestamp()}{block\_timestamp()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1block__timestamp_a3fa049f1a91294814a9cda7ae0745d14} 
+template$<$\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} Interval\+Ms, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} Epoch\+Ms$>$ \\
+\mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{sysio\+::chain\+::block\+\_\+timestamp}}$<$ Interval\+Ms, Epoch\+Ms $>$\+::block\+\_\+timestamp (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{s}{ = {\ttfamily 0}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{block__timestamp_8hpp_source_l00020}{20}} of file \mbox{\hyperlink{block__timestamp_8hpp_source}{block\+\_\+timestamp.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00020\ :\mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp_a1bdb67323980085a2d4002d877b6c232}{slot}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})\{\}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1block__timestamp_a3fa049f1a91294814a9cda7ae0745d14_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1block__timestamp_a60e7c5d84fa5914f1ed6e32220c5882f}\index{sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$@{sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$}!block\_timestamp@{block\_timestamp}}
+\index{block\_timestamp@{block\_timestamp}!sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$@{sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$}}
+\doxysubsubsection{\texorpdfstring{block\_timestamp()}{block\_timestamp()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1block__timestamp_a60e7c5d84fa5914f1ed6e32220c5882f} 
+template$<$\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} Interval\+Ms, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} Epoch\+Ms$>$ \\
+\mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{sysio\+::chain\+::block\+\_\+timestamp}}$<$ Interval\+Ms, Epoch\+Ms $>$\+::block\+\_\+timestamp (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}} \&}]{t}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{block__timestamp_8hpp_source_l00022}{22}} of file \mbox{\hyperlink{block__timestamp_8hpp_source}{block\+\_\+timestamp.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \ \ \ \ set\_time\_point(t);}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1block__timestamp_ad78655966fc6e1525ed5c0a33bd459a8}\index{sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$@{sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$}!block\_timestamp@{block\_timestamp}}
+\index{block\_timestamp@{block\_timestamp}!sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$@{sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$}}
+\doxysubsubsection{\texorpdfstring{block\_timestamp()}{block\_timestamp()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1block__timestamp_ad78655966fc6e1525ed5c0a33bd459a8} 
+template$<$\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} Interval\+Ms, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} Epoch\+Ms$>$ \\
+\mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{sysio\+::chain\+::block\+\_\+timestamp}}$<$ Interval\+Ms, Epoch\+Ms $>$\+::block\+\_\+timestamp (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1time__point__sec}{fc\+::time\+\_\+point\+\_\+sec}} \&}]{t}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{block__timestamp_8hpp_source_l00026}{26}} of file \mbox{\hyperlink{block__timestamp_8hpp_source}{block\+\_\+timestamp.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \ \ \ \ set\_time\_point(t);}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1chain_1_1block__timestamp_a38be995dac109b115c5dca22862bb855}\index{sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$@{sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$}!maximum@{maximum}}
+\index{maximum@{maximum}!sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$@{sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$}}
+\doxysubsubsection{\texorpdfstring{maximum()}{maximum()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1block__timestamp_a38be995dac109b115c5dca22862bb855} 
+template$<$\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} Interval\+Ms, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} Epoch\+Ms$>$ \\
+static \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{block\+\_\+timestamp}} \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{sysio\+::chain\+::block\+\_\+timestamp}}$<$ Interval\+Ms, Epoch\+Ms $>$\+::maximum (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{block__timestamp_8hpp_source_l00030}{30}} of file \mbox{\hyperlink{block__timestamp_8hpp_source}{block\+\_\+timestamp.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00030\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp_a3fa049f1a91294814a9cda7ae0745d14}{block\_timestamp}}(\ 0xffff\ );\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1block__timestamp_a38be995dac109b115c5dca22862bb855_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1block__timestamp_a61569851f76974e2dd25fecc7d16821e}\index{sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$@{sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$}!min@{min}}
+\index{min@{min}!sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$@{sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$}}
+\doxysubsubsection{\texorpdfstring{min()}{min()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1block__timestamp_a61569851f76974e2dd25fecc7d16821e} 
+template$<$\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} Interval\+Ms, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} Epoch\+Ms$>$ \\
+static \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{block\+\_\+timestamp}} \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{sysio\+::chain\+::block\+\_\+timestamp}}$<$ Interval\+Ms, Epoch\+Ms $>$\+::min (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{block__timestamp_8hpp_source_l00031}{31}} of file \mbox{\hyperlink{block__timestamp_8hpp_source}{block\+\_\+timestamp.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00031\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp_a3fa049f1a91294814a9cda7ae0745d14}{block\_timestamp}}(0);\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1block__timestamp_a61569851f76974e2dd25fecc7d16821e_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1block__timestamp_a3ef407f67d34fc8d5a85f9f2fb0e5f6f}\index{sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$@{sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$}!next@{next}}
+\index{next@{next}!sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$@{sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$}}
+\doxysubsubsection{\texorpdfstring{next()}{next()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1block__timestamp_a3ef407f67d34fc8d5a85f9f2fb0e5f6f} 
+template$<$\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} Interval\+Ms, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} Epoch\+Ms$>$ \\
+\mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{block\+\_\+timestamp}} \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{sysio\+::chain\+::block\+\_\+timestamp}}$<$ Interval\+Ms, Epoch\+Ms $>$\+::next (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{block__timestamp_8hpp_source_l00033}{33}} of file \mbox{\hyperlink{block__timestamp_8hpp_source}{block\+\_\+timestamp.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ std::numeric\_limits<uint32\_t>::max()\ -\/\ \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp_a1bdb67323980085a2d4002d877b6c232}{slot}}\ >=\ 1,\ fc::overflow\_exception,\ \textcolor{stringliteral}{"{}block\ timestamp\ overflow"{}}\ );}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ result\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp_a3fa049f1a91294814a9cda7ae0745d14}{block\_timestamp}}(*\textcolor{keyword}{this});}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ \ \ \ result.slot\ +=\ 1;}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1block__timestamp_a3ef407f67d34fc8d5a85f9f2fb0e5f6f_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1block__timestamp_ac9f311c4215d958e910935468e7a2f16}\index{sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$@{sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$}!operator fc::time\_point@{operator fc::time\_point}}
+\index{operator fc::time\_point@{operator fc::time\_point}!sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$@{sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$}}
+\doxysubsubsection{\texorpdfstring{operator fc::time\_point()}{operator fc::time\_point()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1block__timestamp_ac9f311c4215d958e910935468e7a2f16} 
+template$<$\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} Interval\+Ms, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} Epoch\+Ms$>$ \\
+\mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{sysio\+::chain\+::block\+\_\+timestamp}}$<$ Interval\+Ms, Epoch\+Ms $>$\+::operator \mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{block__timestamp_8hpp_source_l00044}{44}} of file \mbox{\hyperlink{block__timestamp_8hpp_source}{block\+\_\+timestamp.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ msec\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp_a1bdb67323980085a2d4002d877b6c232}{slot}}\ *\ (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}})IntervalMs;}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \ \ \ msec\ +=\ EpochMs;}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1time__point}{fc::time\_point}}(\mbox{\hyperlink{namespacefc_a76ae235ec7e9b8862e70740058d7eb1b}{fc::milliseconds}}(msec));}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=318pt]{classsysio_1_1chain_1_1block__timestamp_ac9f311c4215d958e910935468e7a2f16_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1block__timestamp_ad9ba17007058a94d199946d83f3a34e2}\index{sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$@{sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$}!operator"!=@{operator"!=}}
+\index{operator"!=@{operator"!=}!sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$@{sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$}}
+\doxysubsubsection{\texorpdfstring{operator"!=()}{operator!=()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1block__timestamp_ad9ba17007058a94d199946d83f3a34e2} 
+template$<$\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} Interval\+Ms, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} Epoch\+Ms$>$ \\
+bool \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{sysio\+::chain\+::block\+\_\+timestamp}}$<$ Interval\+Ms, Epoch\+Ms $>$\mbox{\hyperlink{namespacefc_a40c368ac88294ae47b064cad937fdbf6}{\+::operator!}}= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{block\+\_\+timestamp}}$<$ Interval\+Ms, Epoch\+Ms $>$ \&}]{t}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{block__timestamp_8hpp_source_l00059}{59}} of file \mbox{\hyperlink{block__timestamp_8hpp_source}{block\+\_\+timestamp.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00059\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp_a1bdb67323980085a2d4002d877b6c232}{slot}}\ !=\ t.slot;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1block__timestamp_a0d057d2c727deb3a6e075764034ea9e6}\index{sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$@{sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$}!operator$<$@{operator$<$}}
+\index{operator$<$@{operator$<$}!sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$@{sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$}}
+\doxysubsubsection{\texorpdfstring{operator$<$()}{operator<()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1block__timestamp_a0d057d2c727deb3a6e075764034ea9e6} 
+template$<$\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} Interval\+Ms, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} Epoch\+Ms$>$ \\
+bool \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{sysio\+::chain\+::block\+\_\+timestamp}}$<$ Interval\+Ms, Epoch\+Ms $>$\+::operator$<$ (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{block\+\_\+timestamp}}$<$ Interval\+Ms, Epoch\+Ms $>$ \&}]{t}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{block__timestamp_8hpp_source_l00056}{56}} of file \mbox{\hyperlink{block__timestamp_8hpp_source}{block\+\_\+timestamp.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00056\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp_a1bdb67323980085a2d4002d877b6c232}{slot}}\ <\ \ t.slot;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1block__timestamp_a374267474c43f003ef70ff374c701e61}\index{sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$@{sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$}!operator$<$=@{operator$<$=}}
+\index{operator$<$=@{operator$<$=}!sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$@{sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$}}
+\doxysubsubsection{\texorpdfstring{operator$<$=()}{operator<=()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1block__timestamp_a374267474c43f003ef70ff374c701e61} 
+template$<$\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} Interval\+Ms, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} Epoch\+Ms$>$ \\
+bool \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{sysio\+::chain\+::block\+\_\+timestamp}}$<$ Interval\+Ms, Epoch\+Ms $>$\+::operator$<$= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{block\+\_\+timestamp}}$<$ Interval\+Ms, Epoch\+Ms $>$ \&}]{t}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{block__timestamp_8hpp_source_l00057}{57}} of file \mbox{\hyperlink{block__timestamp_8hpp_source}{block\+\_\+timestamp.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00057\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp_a1bdb67323980085a2d4002d877b6c232}{slot}}\ <=\ t.slot;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1block__timestamp_ad04450f092062a6bcc112c76ab7d7fbe}\index{sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$@{sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$}!operator=@{operator=}}
+\index{operator=@{operator=}!sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$@{sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1block__timestamp_ad04450f092062a6bcc112c76ab7d7fbe} 
+template$<$\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} Interval\+Ms, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} Epoch\+Ms$>$ \\
+void \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{sysio\+::chain\+::block\+\_\+timestamp}}$<$ Interval\+Ms, Epoch\+Ms $>$\+::operator= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}} \&}]{t}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{block__timestamp_8hpp_source_l00050}{50}} of file \mbox{\hyperlink{block__timestamp_8hpp_source}{block\+\_\+timestamp.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ set\_time\_point(t);}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1block__timestamp_a5f34f109dacb35d48dd76502a212e8c0}\index{sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$@{sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$}!operator==@{operator==}}
+\index{operator==@{operator==}!sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$@{sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$}}
+\doxysubsubsection{\texorpdfstring{operator==()}{operator==()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1block__timestamp_a5f34f109dacb35d48dd76502a212e8c0} 
+template$<$\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} Interval\+Ms, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} Epoch\+Ms$>$ \\
+bool \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{sysio\+::chain\+::block\+\_\+timestamp}}$<$ Interval\+Ms, Epoch\+Ms $>$\+::operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{block\+\_\+timestamp}}$<$ Interval\+Ms, Epoch\+Ms $>$ \&}]{t}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{block__timestamp_8hpp_source_l00058}{58}} of file \mbox{\hyperlink{block__timestamp_8hpp_source}{block\+\_\+timestamp.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00058\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp_a1bdb67323980085a2d4002d877b6c232}{slot}}\ ==\ t.slot;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1block__timestamp_a468825f893feef03aaaf7b475eff724c}\index{sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$@{sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$}!operator$>$@{operator$>$}}
+\index{operator$>$@{operator$>$}!sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$@{sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$}}
+\doxysubsubsection{\texorpdfstring{operator$>$()}{operator>()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1block__timestamp_a468825f893feef03aaaf7b475eff724c} 
+template$<$\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} Interval\+Ms, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} Epoch\+Ms$>$ \\
+bool \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{sysio\+::chain\+::block\+\_\+timestamp}}$<$ Interval\+Ms, Epoch\+Ms $>$\+::operator$>$ (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{block\+\_\+timestamp}}$<$ Interval\+Ms, Epoch\+Ms $>$ \&}]{t}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{block__timestamp_8hpp_source_l00054}{54}} of file \mbox{\hyperlink{block__timestamp_8hpp_source}{block\+\_\+timestamp.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00054\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp_a1bdb67323980085a2d4002d877b6c232}{slot}}\ >\ \ t.slot;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1block__timestamp_afacfc1de1681ce4983d378ddedfbb242}\index{sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$@{sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$}!operator$>$=@{operator$>$=}}
+\index{operator$>$=@{operator$>$=}!sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$@{sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$}}
+\doxysubsubsection{\texorpdfstring{operator$>$=()}{operator>=()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1block__timestamp_afacfc1de1681ce4983d378ddedfbb242} 
+template$<$\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} Interval\+Ms, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} Epoch\+Ms$>$ \\
+bool \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{sysio\+::chain\+::block\+\_\+timestamp}}$<$ Interval\+Ms, Epoch\+Ms $>$\+::operator$>$= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{block\+\_\+timestamp}}$<$ Interval\+Ms, Epoch\+Ms $>$ \&}]{t}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{block__timestamp_8hpp_source_l00055}{55}} of file \mbox{\hyperlink{block__timestamp_8hpp_source}{block\+\_\+timestamp.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00055\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp_a1bdb67323980085a2d4002d877b6c232}{slot}}\ >=\ t.slot;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1block__timestamp_aa1d88152d9cc082b5ad651c3aeadfb8f}\index{sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$@{sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$}!to\_time\_point@{to\_time\_point}}
+\index{to\_time\_point@{to\_time\_point}!sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$@{sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$}}
+\doxysubsubsection{\texorpdfstring{to\_time\_point()}{to\_time\_point()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1block__timestamp_aa1d88152d9cc082b5ad651c3aeadfb8f} 
+template$<$\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} Interval\+Ms, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} Epoch\+Ms$>$ \\
+\mbox{\hyperlink{classfc_1_1time__point}{fc\+::time\+\_\+point}} \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{sysio\+::chain\+::block\+\_\+timestamp}}$<$ Interval\+Ms, Epoch\+Ms $>$\+::to\+\_\+time\+\_\+point (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{block__timestamp_8hpp_source_l00040}{40}} of file \mbox{\hyperlink{block__timestamp_8hpp_source}{block\+\_\+timestamp.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (\mbox{\hyperlink{classfc_1_1time__point}{fc::time\_point}})(*this);}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1block__timestamp_aa1d88152d9cc082b5ad651c3aeadfb8f_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classsysio_1_1chain_1_1block__timestamp_a1bdb67323980085a2d4002d877b6c232}\index{sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$@{sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$}!slot@{slot}}
+\index{slot@{slot}!sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$@{sysio::chain::block\_timestamp$<$ IntervalMs, EpochMs $>$}}
+\doxysubsubsection{\texorpdfstring{slot}{slot}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1block__timestamp_a1bdb67323980085a2d4002d877b6c232} 
+template$<$\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} Interval\+Ms, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} Epoch\+Ms$>$ \\
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{sysio\+::chain\+::block\+\_\+timestamp}}$<$ Interval\+Ms, Epoch\+Ms $>$\+::slot}
+
+
+
+Definition at line \mbox{\hyperlink{block__timestamp_8hpp_source_l00060}{60}} of file \mbox{\hyperlink{block__timestamp_8hpp_source}{block\+\_\+timestamp.\+hpp}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{block__timestamp_8hpp}{block\+\_\+timestamp.\+hpp}}\end{DoxyCompactItemize}

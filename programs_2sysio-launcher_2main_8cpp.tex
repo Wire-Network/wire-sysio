@@ -1,0 +1,581 @@
+\doxysection{programs/sysio-\/launcher/main.cpp File Reference}
+\hypertarget{programs_2sysio-launcher_2main_8cpp}{}\label{programs_2sysio-launcher_2main_8cpp}\index{programs/sysio-\/launcher/main.cpp@{programs/sysio-\/launcher/main.cpp}}
+{\ttfamily \#include $<$string$>$}\newline
+{\ttfamily \#include $<$vector$>$}\newline
+{\ttfamily \#include $<$math.\+h$>$}\newline
+{\ttfamily \#include $<$sstream$>$}\newline
+{\ttfamily \#include $<$regex$>$}\newline
+{\ttfamily \#include $<$boost/algorithm/string.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/asio/ip/tcp.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/asio/ip/host\+\_\+name.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/program\+\_\+options.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/process/child.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/process/env.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/process/system.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/process/io.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/lexical\+\_\+cast.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/filesystem.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/filesystem/path.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/filesystem/fstream.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/crypto/private\+\_\+key.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/crypto/public\+\_\+key.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/io/json.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/network/ip.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/reflect/variant.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/log/logger\+\_\+config.\+hpp$>$}\newline
+{\ttfamily \#include $<$ifaddrs.\+h$>$}\newline
+{\ttfamily \#include $<$sys/types.\+h$>$}\newline
+{\ttfamily \#include $<$netinet/in.\+h$>$}\newline
+{\ttfamily \#include $<$net/if.\+h$>$}\newline
+{\ttfamily \#include $<$sysio/chain/genesis\+\_\+state.\+hpp$>$}\newline
+{\ttfamily \#include "{}config.\+hpp"{}}\newline
+Include dependency graph for main.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{programs_2sysio-launcher_2main_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structlocal__identity}{local\+\_\+identity}}
+\item 
+class \mbox{\hyperlink{classhost__def}{host\+\_\+def}}
+\item 
+class \mbox{\hyperlink{classeosd__def}{eosd\+\_\+def}}
+\item 
+class \mbox{\hyperlink{classtn__node__def}{tn\+\_\+node\+\_\+def}}
+\item 
+struct \mbox{\hyperlink{structremote__deploy}{remote\+\_\+deploy}}
+\item 
+struct \mbox{\hyperlink{structtestnet__def}{testnet\+\_\+def}}
+\item 
+struct \mbox{\hyperlink{structprodkey__def}{prodkey\+\_\+def}}
+\item 
+struct \mbox{\hyperlink{structproducer__set__def}{producer\+\_\+set\+\_\+def}}
+\item 
+struct \mbox{\hyperlink{structserver__name__def}{server\+\_\+name\+\_\+def}}
+\item 
+struct \mbox{\hyperlink{structserver__identities}{server\+\_\+identities}}
+\item 
+struct \mbox{\hyperlink{structnode__rt__info}{node\+\_\+rt\+\_\+info}}
+\item 
+struct \mbox{\hyperlink{structlast__run__def}{last\+\_\+run\+\_\+def}}
+\item 
+class \mbox{\hyperlink{classproducer__names}{producer\+\_\+names}}
+\item 
+struct \mbox{\hyperlink{structlauncher__def}{launcher\+\_\+def}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a759690ed22a7306147759efee4b4545c}{launch\+\_\+modes}} \{ \newline
+\mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a759690ed22a7306147759efee4b4545ca606f02e8575e469962b062880db7cedb}{LM\+\_\+\+NONE}}
+, \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a759690ed22a7306147759efee4b4545cab7c6501dc21ea9e8d644f84ce2034e92}{LM\+\_\+\+LOCAL}}
+, \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a759690ed22a7306147759efee4b4545cac1388e679c0a60e9be5f104eb9387485}{LM\+\_\+\+REMOTE}}
+, \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a759690ed22a7306147759efee4b4545ca92d0684dd33749ee2e44d788b5640b1e}{LM\+\_\+\+NAMED}}
+, \newline
+\mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a759690ed22a7306147759efee4b4545ca8870d76231061d2441fe007135468e59}{LM\+\_\+\+ALL}}
+, \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a759690ed22a7306147759efee4b4545ca93b8b432ea0ef632b2ec624fb327521c}{LM\+\_\+\+VERIFY}}
+ \}
+\item 
+enum \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_ab01c8de587c7ad64f990fcfaf8c7d1f7}{allowed\+\_\+connection}} \+: char \{ \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_ab01c8de587c7ad64f990fcfaf8c7d1f7a8b659f6321d06de30296bd2a35c6a241}{PC\+\_\+\+NONE}} = 0
+, \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_ab01c8de587c7ad64f990fcfaf8c7d1f7a9af42f99ea99c442af8532705d96ccef}{PC\+\_\+\+PRODUCERS}} = 1 \texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<} 0
+, \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_ab01c8de587c7ad64f990fcfaf8c7d1f7af16814aa95694b338f7b4119f14727f2}{PC\+\_\+\+SPECIFIED}} = 1 \texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<} 1
+, \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_ab01c8de587c7ad64f990fcfaf8c7d1f7aee6446e41430bd12ed924fecbc7d7777}{PC\+\_\+\+ANY}} = 1 \texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<} 2
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} enum\+\_\+type , \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}}  = typename std\+::enable\+\_\+if$<$std\+::is\+\_\+enum$<$enum\+\_\+type$>$\+::value$>$\+::type$>$ }\\enum\+\_\+type \& \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a33498dd91a3a20244bc2bddeaa62d8d4}{operator\texorpdfstring{$\vert$}{|}=}} (enum\+\_\+type \&lhs, const enum\+\_\+type \&rhs)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_aca820fbde48c0fbd90e73279e9770384}{retrieve\+\_\+paired\+\_\+array\+\_\+parameters}} (const variables\+\_\+map \&vmap, const std\+::string \&num\+\_\+selector, const std\+::string \&paired\+\_\+selector, std\+::map$<$ uint, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&selector\+\_\+map)
+\item 
+void \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_aae54f18181d7763de2b11b899440daeb}{write\+\_\+default\+\_\+config}} (const bfs\+::path \&cfg\+\_\+file, const options\+\_\+description \&cfg)
+\item 
+int \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a0ddf1224851353fc92bfbff6f499fa97}{main}} (int argc, char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}\mbox{[}$\,$\mbox{]})
+\item 
+\mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a3b595e82066a2ece1bf6f8cda974aabf}{FC\+\_\+\+REFLECT}} (\mbox{\hyperlink{structremote__deploy}{remote\+\_\+deploy}},(ssh\+\_\+cmd)(scp\+\_\+cmd)(ssh\+\_\+identity)(ssh\+\_\+args)) FC\+\_\+\+REFLECT(\mbox{\hyperlink{structprodkey__def}{prodkey\+\_\+def}}
+\item 
+\mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_af3e300c02a95a1230283a8ea2bb1ad70}{producer\+\_\+name}} (block\+\_\+signing\+\_\+key)) \mbox{\hyperlink{reflect_8hpp_a2ace850e636b1ca0b18fe3177e413d99}{FC\+\_\+\+REFLECT}}(\mbox{\hyperlink{structproducer__set__def}{producer\+\_\+set\+\_\+def}}
+\item 
+schedule \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a108495e65b6b1d854b078fe58f432d5e}{FC\+\_\+\+REFLECT}} (\mbox{\hyperlink{classhost__def}{host\+\_\+def}},(genesis)(ssh\+\_\+identity)(ssh\+\_\+args)(\mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_ac42026bee78732d5a5cce83818b9e973}{sysio\+\_\+home}})(host\+\_\+name)(public\+\_\+name)(base\+\_\+p2p\+\_\+port)(base\+\_\+http\+\_\+port)(def\+\_\+file\+\_\+size)(instances)) FC\+\_\+\+REFLECT(\mbox{\hyperlink{classeosd__def}{eosd\+\_\+def}}
+\item 
+schedule config\+\_\+dir\+\_\+name data\+\_\+dir\+\_\+name p2p\+\_\+port http\+\_\+port file\+\_\+size \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}} \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a8d747b8417c90b78c386111de7934753}{host}} (p2p\+\_\+endpoint)) \mbox{\hyperlink{reflect_8hpp_a2ace850e636b1ca0b18fe3177e413d99}{FC\+\_\+\+REFLECT}}(\mbox{\hyperlink{classtn__node__def}{tn\+\_\+node\+\_\+def}}
+\item 
+schedule config\+\_\+dir\+\_\+name data\+\_\+dir\+\_\+name p2p\+\_\+port http\+\_\+port file\+\_\+size \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}} \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}} keys peers \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a6d42fdcc89e90507ee6f095c8e92fa2b}{producers}} (dont\+\_\+start)) \mbox{\hyperlink{reflect_8hpp_a2ace850e636b1ca0b18fe3177e413d99}{FC\+\_\+\+REFLECT}}(\mbox{\hyperlink{structtestnet__def}{testnet\+\_\+def}}
+\item 
+schedule config\+\_\+dir\+\_\+name data\+\_\+dir\+\_\+name p2p\+\_\+port http\+\_\+port file\+\_\+size \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}} \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}} keys peers \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}} \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a661084764718f01bb3adf07537320d98}{ssh\+\_\+helper}} (nodes)) \mbox{\hyperlink{reflect_8hpp_a2ace850e636b1ca0b18fe3177e413d99}{FC\+\_\+\+REFLECT}}(\mbox{\hyperlink{structserver__name__def}{server\+\_\+name\+\_\+def}}
+\item 
+schedule config\+\_\+dir\+\_\+name data\+\_\+dir\+\_\+name p2p\+\_\+port http\+\_\+port file\+\_\+size \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}} \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}} keys peers \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}} ipaddr \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}} has\+\_\+bios \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_ac42026bee78732d5a5cce83818b9e973}{sysio\+\_\+home}} (instances)) \mbox{\hyperlink{reflect_8hpp_a2ace850e636b1ca0b18fe3177e413d99}{FC\+\_\+\+REFLECT}}(\mbox{\hyperlink{structserver__identities}{server\+\_\+identities}}
+\item 
+schedule config\+\_\+dir\+\_\+name data\+\_\+dir\+\_\+name p2p\+\_\+port http\+\_\+port file\+\_\+size \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}} \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}} keys peers \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}} ipaddr \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}} has\+\_\+bios producer nonprod db \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a648210c815258f0bc4625bdc0e7864f5}{default\+\_\+sysio\+\_\+home}} (ssh)) \mbox{\hyperlink{reflect_8hpp_a2ace850e636b1ca0b18fe3177e413d99}{FC\+\_\+\+REFLECT}}(\mbox{\hyperlink{structnode__rt__info}{node\+\_\+rt\+\_\+info}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+const string \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a3426d59b828f63d073d546fed967330e}{block\+\_\+dir}} = "{}blocks"{}
+\item 
+const string \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a0995d763aebc677936adecfcde571807}{shared\+\_\+mem\+\_\+dir}} = "{}state"{}
+\item 
+struct \mbox{\hyperlink{structlocal__identity}{local\+\_\+identity}} \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a3b2140dc0a459ef22d3aaa4db00f7f38}{local\+\_\+id}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{programs_2sysio-launcher_2main_8cpp_ab01c8de587c7ad64f990fcfaf8c7d1f7}\index{main.cpp@{main.cpp}!allowed\_connection@{allowed\_connection}}
+\index{allowed\_connection@{allowed\_connection}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{allowed\_connection}{allowed\_connection}}
+{\footnotesize\ttfamily \label{programs_2sysio-launcher_2main_8cpp_ab01c8de587c7ad64f990fcfaf8c7d1f7} 
+enum \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_ab01c8de587c7ad64f990fcfaf8c7d1f7}{allowed\+\_\+connection}} \+: char}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PC\_NONE@{PC\_NONE}!main.cpp@{main.cpp}}\index{main.cpp@{main.cpp}!PC\_NONE@{PC\_NONE}}}\Hypertarget{programs_2sysio-launcher_2main_8cpp_ab01c8de587c7ad64f990fcfaf8c7d1f7a8b659f6321d06de30296bd2a35c6a241}\label{programs_2sysio-launcher_2main_8cpp_ab01c8de587c7ad64f990fcfaf8c7d1f7} 
+PC\+\_\+\+NONE&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PC\_PRODUCERS@{PC\_PRODUCERS}!main.cpp@{main.cpp}}\index{main.cpp@{main.cpp}!PC\_PRODUCERS@{PC\_PRODUCERS}}}\Hypertarget{programs_2sysio-launcher_2main_8cpp_ab01c8de587c7ad64f990fcfaf8c7d1f7a9af42f99ea99c442af8532705d96ccef}\label{programs_2sysio-launcher_2main_8cpp_ab01c8de587c7ad64f990fcfaf8c7d1f7} 
+PC\+\_\+\+PRODUCERS&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PC\_SPECIFIED@{PC\_SPECIFIED}!main.cpp@{main.cpp}}\index{main.cpp@{main.cpp}!PC\_SPECIFIED@{PC\_SPECIFIED}}}\Hypertarget{programs_2sysio-launcher_2main_8cpp_ab01c8de587c7ad64f990fcfaf8c7d1f7af16814aa95694b338f7b4119f14727f2}\label{programs_2sysio-launcher_2main_8cpp_ab01c8de587c7ad64f990fcfaf8c7d1f7} 
+PC\+\_\+\+SPECIFIED&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PC\_ANY@{PC\_ANY}!main.cpp@{main.cpp}}\index{main.cpp@{main.cpp}!PC\_ANY@{PC\_ANY}}}\Hypertarget{programs_2sysio-launcher_2main_8cpp_ab01c8de587c7ad64f990fcfaf8c7d1f7aee6446e41430bd12ed924fecbc7d7777}\label{programs_2sysio-launcher_2main_8cpp_ab01c8de587c7ad64f990fcfaf8c7d1f7} 
+PC\+\_\+\+ANY&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source_l00333}{333}} of file \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00333\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \textcolor{keywordtype}{char}\ \{}
+\DoxyCodeLine{00334\ \ \ \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_ab01c8de587c7ad64f990fcfaf8c7d1f7a8b659f6321d06de30296bd2a35c6a241}{PC\_NONE}}\ =\ 0,}
+\DoxyCodeLine{00335\ \ \ \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_ab01c8de587c7ad64f990fcfaf8c7d1f7a9af42f99ea99c442af8532705d96ccef}{PC\_PRODUCERS}}\ =\ 1\ <<\ 0,}
+\DoxyCodeLine{00336\ \ \ \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_ab01c8de587c7ad64f990fcfaf8c7d1f7af16814aa95694b338f7b4119f14727f2}{PC\_SPECIFIED}}\ =\ 1\ <<\ 1,}
+\DoxyCodeLine{00337\ \ \ \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_ab01c8de587c7ad64f990fcfaf8c7d1f7aee6446e41430bd12ed924fecbc7d7777}{PC\_ANY}}\ =\ 1\ <<\ 2}
+\DoxyCodeLine{00338\ \};}
+
+\end{DoxyCode}
+\Hypertarget{programs_2sysio-launcher_2main_8cpp_a759690ed22a7306147759efee4b4545c}\index{main.cpp@{main.cpp}!launch\_modes@{launch\_modes}}
+\index{launch\_modes@{launch\_modes}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{launch\_modes}{launch\_modes}}
+{\footnotesize\ttfamily \label{programs_2sysio-launcher_2main_8cpp_a759690ed22a7306147759efee4b4545c} 
+enum \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a759690ed22a7306147759efee4b4545c}{launch\+\_\+modes}}}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{LM\_NONE@{LM\_NONE}!main.cpp@{main.cpp}}\index{main.cpp@{main.cpp}!LM\_NONE@{LM\_NONE}}}\Hypertarget{programs_2sysio-launcher_2main_8cpp_a759690ed22a7306147759efee4b4545ca606f02e8575e469962b062880db7cedb}\label{programs_2sysio-launcher_2main_8cpp_a759690ed22a7306147759efee4b4545c} 
+LM\+\_\+\+NONE&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{LM\_LOCAL@{LM\_LOCAL}!main.cpp@{main.cpp}}\index{main.cpp@{main.cpp}!LM\_LOCAL@{LM\_LOCAL}}}\Hypertarget{programs_2sysio-launcher_2main_8cpp_a759690ed22a7306147759efee4b4545cab7c6501dc21ea9e8d644f84ce2034e92}\label{programs_2sysio-launcher_2main_8cpp_a759690ed22a7306147759efee4b4545c} 
+LM\+\_\+\+LOCAL&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{LM\_REMOTE@{LM\_REMOTE}!main.cpp@{main.cpp}}\index{main.cpp@{main.cpp}!LM\_REMOTE@{LM\_REMOTE}}}\Hypertarget{programs_2sysio-launcher_2main_8cpp_a759690ed22a7306147759efee4b4545cac1388e679c0a60e9be5f104eb9387485}\label{programs_2sysio-launcher_2main_8cpp_a759690ed22a7306147759efee4b4545c} 
+LM\+\_\+\+REMOTE&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{LM\_NAMED@{LM\_NAMED}!main.cpp@{main.cpp}}\index{main.cpp@{main.cpp}!LM\_NAMED@{LM\_NAMED}}}\Hypertarget{programs_2sysio-launcher_2main_8cpp_a759690ed22a7306147759efee4b4545ca92d0684dd33749ee2e44d788b5640b1e}\label{programs_2sysio-launcher_2main_8cpp_a759690ed22a7306147759efee4b4545c} 
+LM\+\_\+\+NAMED&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{LM\_ALL@{LM\_ALL}!main.cpp@{main.cpp}}\index{main.cpp@{main.cpp}!LM\_ALL@{LM\_ALL}}}\Hypertarget{programs_2sysio-launcher_2main_8cpp_a759690ed22a7306147759efee4b4545ca8870d76231061d2441fe007135468e59}\label{programs_2sysio-launcher_2main_8cpp_a759690ed22a7306147759efee4b4545c} 
+LM\+\_\+\+ALL&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{LM\_VERIFY@{LM\_VERIFY}!main.cpp@{main.cpp}}\index{main.cpp@{main.cpp}!LM\_VERIFY@{LM\_VERIFY}}}\Hypertarget{programs_2sysio-launcher_2main_8cpp_a759690ed22a7306147759efee4b4545ca93b8b432ea0ef632b2ec624fb327521c}\label{programs_2sysio-launcher_2main_8cpp_a759690ed22a7306147759efee4b4545c} 
+LM\+\_\+\+VERIFY&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source_l00324}{324}} of file \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00324\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00325\ \ \ \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a759690ed22a7306147759efee4b4545ca606f02e8575e469962b062880db7cedb}{LM\_NONE}},}
+\DoxyCodeLine{00326\ \ \ \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a759690ed22a7306147759efee4b4545cab7c6501dc21ea9e8d644f84ce2034e92}{LM\_LOCAL}},}
+\DoxyCodeLine{00327\ \ \ \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a759690ed22a7306147759efee4b4545cac1388e679c0a60e9be5f104eb9387485}{LM\_REMOTE}},}
+\DoxyCodeLine{00328\ \ \ \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a759690ed22a7306147759efee4b4545ca92d0684dd33749ee2e44d788b5640b1e}{LM\_NAMED}},}
+\DoxyCodeLine{00329\ \ \ \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a759690ed22a7306147759efee4b4545ca8870d76231061d2441fe007135468e59}{LM\_ALL}},}
+\DoxyCodeLine{00330\ \ \ \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a759690ed22a7306147759efee4b4545ca93b8b432ea0ef632b2ec624fb327521c}{LM\_VERIFY}}}
+\DoxyCodeLine{00331\ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{programs_2sysio-launcher_2main_8cpp_a648210c815258f0bc4625bdc0e7864f5}\index{main.cpp@{main.cpp}!default\_sysio\_home@{default\_sysio\_home}}
+\index{default\_sysio\_home@{default\_sysio\_home}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{default\_sysio\_home()}{default\_sysio\_home()}}
+{\footnotesize\ttfamily \label{programs_2sysio-launcher_2main_8cpp_a648210c815258f0bc4625bdc0e7864f5} 
+schedule config\+\_\+dir\+\_\+name data\+\_\+dir\+\_\+name p2p\+\_\+port http\+\_\+port file\+\_\+size \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}} \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}} keys peers \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}} ipaddr \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}} has\+\_\+bios producer nonprod db default\+\_\+sysio\+\_\+home (\begin{DoxyParamCaption}\item[{ssh}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{programs_2sysio-launcher_2main_8cpp_a108495e65b6b1d854b078fe58f432d5e}\index{main.cpp@{main.cpp}!FC\_REFLECT@{FC\_REFLECT}}
+\index{FC\_REFLECT@{FC\_REFLECT}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{FC\_REFLECT()}{FC\_REFLECT()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{programs_2sysio-launcher_2main_8cpp_a108495e65b6b1d854b078fe58f432d5e} 
+schedule FC\+\_\+\+REFLECT (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classhost__def}{host\+\_\+def}}}]{}{, }\item[{(genesis)(ssh\+\_\+identity)(ssh\+\_\+args)(\mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_ac42026bee78732d5a5cce83818b9e973}{sysio\+\_\+home}})(host\+\_\+name)(public\+\_\+name)(base\+\_\+p2p\+\_\+port)(base\+\_\+http\+\_\+port)(def\+\_\+file\+\_\+size)(instances)}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{programs_2sysio-launcher_2main_8cpp_a3b595e82066a2ece1bf6f8cda974aabf}\index{main.cpp@{main.cpp}!FC\_REFLECT@{FC\_REFLECT}}
+\index{FC\_REFLECT@{FC\_REFLECT}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{FC\_REFLECT()}{FC\_REFLECT()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{programs_2sysio-launcher_2main_8cpp_a3b595e82066a2ece1bf6f8cda974aabf} 
+FC\+\_\+\+REFLECT (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structremote__deploy}{remote\+\_\+deploy}}}]{}{, }\item[{(ssh\+\_\+cmd)(scp\+\_\+cmd)(ssh\+\_\+identity)(ssh\+\_\+args)}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{programs_2sysio-launcher_2main_8cpp_a8d747b8417c90b78c386111de7934753}\index{main.cpp@{main.cpp}!host@{host}}
+\index{host@{host}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{host()}{host()}}
+{\footnotesize\ttfamily \label{programs_2sysio-launcher_2main_8cpp_a8d747b8417c90b78c386111de7934753} 
+schedule config\+\_\+dir\+\_\+name data\+\_\+dir\+\_\+name p2p\+\_\+port http\+\_\+port file\+\_\+size \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}} host (\begin{DoxyParamCaption}\item[{p2p\+\_\+endpoint}]{}{}\end{DoxyParamCaption})}
+
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{programs_2sysio-launcher_2main_8cpp_a8d747b8417c90b78c386111de7934753_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{programs_2sysio-launcher_2main_8cpp_a0ddf1224851353fc92bfbff6f499fa97}\index{main.cpp@{main.cpp}!main@{main}}
+\index{main@{main}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{programs_2sysio-launcher_2main_8cpp_a0ddf1224851353fc92bfbff6f499fa97} 
+int main (\begin{DoxyParamCaption}\item[{int}]{argc}{, }\item[{char \texorpdfstring{$\ast$}{*}}]{argv}{\mbox{[}$\,$\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source_l01983}{1983}} of file \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01983\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01984\ }
+\DoxyCodeLine{01985\ \ \ variables\_map\ vmap;}
+\DoxyCodeLine{01986\ \ \ options\_description\ cfg\ (\textcolor{stringliteral}{"{}Testnet\ launcher\ config\ options"{}});}
+\DoxyCodeLine{01987\ \ \ options\_description\ \mbox{\hyperlink{xbyak__mnemonic_8h_a4229a9b84f8b8673326f12bd41acd27c}{cli}}\ (\textcolor{stringliteral}{"{}launcher\ command\ line\ options"{}});}
+\DoxyCodeLine{01988\ \ \ \mbox{\hyperlink{structlauncher__def}{launcher\_def}}\ top;}
+\DoxyCodeLine{01989\ \ \ \textcolor{keywordtype}{string}\ gts;}
+\DoxyCodeLine{01990\ \ \ \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a759690ed22a7306147759efee4b4545c}{launch\_modes}}\ mode;}
+\DoxyCodeLine{01991\ \ \ \textcolor{keywordtype}{string}\ kill\_arg;}
+\DoxyCodeLine{01992\ \ \ \textcolor{keywordtype}{string}\ bounce\_nodes;}
+\DoxyCodeLine{01993\ \ \ \textcolor{keywordtype}{string}\ down\_nodes;}
+\DoxyCodeLine{01994\ \ \ \textcolor{keywordtype}{string}\ roll\_nodes;}
+\DoxyCodeLine{01995\ \ \ bfs::path\ config\_dir;}
+\DoxyCodeLine{01996\ \ \ bfs::path\ \mbox{\hyperlink{namespaceversiongenerate_afdfd8d6de9b62e742923b2b3326798e6}{config\_file}};}
+\DoxyCodeLine{01997\ }
+\DoxyCodeLine{01998\ \ \ \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a3b2140dc0a459ef22d3aaa4db00f7f38}{local\_id}}.initialize();}
+\DoxyCodeLine{01999\ \ \ top.\mbox{\hyperlink{structlauncher__def_a1cb1885545cb81aad9c087f135bf8b66}{set\_options}}(cfg);}
+\DoxyCodeLine{02000\ }
+\DoxyCodeLine{02001\ \ \ \mbox{\hyperlink{xbyak__mnemonic_8h_a4229a9b84f8b8673326f12bd41acd27c}{cli}}.add\_options()}
+\DoxyCodeLine{02002\ \ \ \ \ (\textcolor{stringliteral}{"{}timestamp,i"{}},bpo::value<string>(\&gts),\textcolor{stringliteral}{"{}set\ the\ timestamp\ for\ the\ first\ block.\ Use\ \(\backslash\)"{}now\(\backslash\)"{}\ to\ indicate\ the\ current\ time"{}})}
+\DoxyCodeLine{02003\ \ \ \ \ (\textcolor{stringliteral}{"{}launch,l"{}},bpo::value<string>(),\ \textcolor{stringliteral}{"{}select\ a\ subset\ of\ nodes\ to\ launch.\ Currently\ may\ be\ \(\backslash\)"{}all\(\backslash\)"{},\ \(\backslash\)"{}none\(\backslash\)"{},\ or\ \(\backslash\)"{}local\(\backslash\)"{}.\ If\ not\ set,\ the\ default\ is\ to\ launch\ all\ unless\ an\ output\ file\ is\ named,\ in\ which\ case\ it\ starts\ none."{}})}
+\DoxyCodeLine{02004\ \ \ \ \ (\textcolor{stringliteral}{"{}output,o"{}},bpo::value<bfs::path>(\&top.\mbox{\hyperlink{structlauncher__def_acd9a944cbdb5b0e0418419601e7b4973}{output}}),\textcolor{stringliteral}{"{}save\ a\ copy\ of\ the\ generated\ topology\ in\ this\ file"{}})}
+\DoxyCodeLine{02005\ \ \ \ \ (\textcolor{stringliteral}{"{}kill,k"{}},\ bpo::value<string>(\&kill\_arg),\textcolor{stringliteral}{"{}The\ launcher\ retrieves\ the\ previously\ started\ process\ ids\ and\ issues\ a\ kill\ to\ each."{}})}
+\DoxyCodeLine{02006\ \ \ \ \ (\textcolor{stringliteral}{"{}down"{}},\ bpo::value<string>(\&down\_nodes),\textcolor{stringliteral}{"{}comma-\/separated\ list\ of\ node\ numbers\ that\ will\ be\ taken\ down\ using\ the\ sysio-\/tn\_down.sh\ script"{}})}
+\DoxyCodeLine{02007\ \ \ \ \ (\textcolor{stringliteral}{"{}bounce"{}},\ bpo::value<string>(\&bounce\_nodes),\textcolor{stringliteral}{"{}comma-\/separated\ list\ of\ node\ numbers\ that\ will\ be\ restarted\ using\ the\ sysio-\/tn\_bounce.sh\ script"{}})}
+\DoxyCodeLine{02008\ \ \ \ \ (\textcolor{stringliteral}{"{}roll"{}},\ bpo::value<string>(\&roll\_nodes),\textcolor{stringliteral}{"{}comma-\/separated\ list\ of\ host\ names\ where\ the\ nodes\ should\ be\ rolled\ to\ a\ new\ version\ using\ the\ sysio-\/tn\_roll.sh\ script"{}})}
+\DoxyCodeLine{02009\ \ \ \ \ (\textcolor{stringliteral}{"{}version,v"{}},\ \textcolor{stringliteral}{"{}print\ version\ information"{}})}
+\DoxyCodeLine{02010\ \ \ \ \ (\textcolor{stringliteral}{"{}help,h"{}},\textcolor{stringliteral}{"{}print\ this\ list"{}})}
+\DoxyCodeLine{02011\ \ \ \ \ (\textcolor{stringliteral}{"{}config-\/dir"{}},\ bpo::value<bfs::path>(),\ \textcolor{stringliteral}{"{}Directory\ containing\ configuration\ files\ such\ as\ config.ini"{}})}
+\DoxyCodeLine{02012\ \ \ \ \ (\textcolor{stringliteral}{"{}config,c"{}},\ bpo::value<bfs::path>()-\/>default\_value(\ \textcolor{stringliteral}{"{}config.ini"{}}\ ),\ \textcolor{stringliteral}{"{}Configuration\ file\ name\ relative\ to\ config-\/dir"{}});}
+\DoxyCodeLine{02013\ }
+\DoxyCodeLine{02014\ \ \ \mbox{\hyperlink{xbyak__mnemonic_8h_a4229a9b84f8b8673326f12bd41acd27c}{cli}}.add(cfg);}
+\DoxyCodeLine{02015\ }
+\DoxyCodeLine{02016\ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{02017\ \ \ \ \ bpo::store(bpo::parse\_command\_line(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \mbox{\hyperlink{xbyak__mnemonic_8h_a4229a9b84f8b8673326f12bd41acd27c}{cli}}),\ vmap);}
+\DoxyCodeLine{02018\ \ \ \ \ bpo::notify(vmap);}
+\DoxyCodeLine{02019\ }
+\DoxyCodeLine{02020\ \ \ \ \ top.\mbox{\hyperlink{structlauncher__def_af3c15f068ff5a367e343aa83be62c3a3}{initialize}}(vmap);}
+\DoxyCodeLine{02021\ }
+\DoxyCodeLine{02022\ \ \ \ \ \textcolor{keywordflow}{if}\ (vmap.count(\textcolor{stringliteral}{"{}help"{}})\ >\ 0)\ \{}
+\DoxyCodeLine{02023\ \ \ \ \ \ \ \mbox{\hyperlink{xbyak__mnemonic_8h_a4229a9b84f8b8673326f12bd41acd27c}{cli}}.print(cerr);}
+\DoxyCodeLine{02024\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{02025\ \ \ \ \ \}}
+\DoxyCodeLine{02026\ \ \ \ \ \textcolor{keywordflow}{if}\ (vmap.count(\textcolor{stringliteral}{"{}version"{}})\ >\ 0)\ \{}
+\DoxyCodeLine{02027\ \ \ \ \ \ \ cout\ <<\ sysio::launcher::config::version\_str\ <<\ endl;}
+\DoxyCodeLine{02028\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{02029\ \ \ \ \ \}}
+\DoxyCodeLine{02030\ }
+\DoxyCodeLine{02031\ \ \ \ \ \textcolor{keywordflow}{if}(\ vmap.count(\ \textcolor{stringliteral}{"{}config-\/dir"{}}\ )\ )\ \{}
+\DoxyCodeLine{02032\ \ \ \ \ \ \ config\_dir\ =\ vmap[\textcolor{stringliteral}{"{}config-\/dir"{}}].as<bfs::path>();}
+\DoxyCodeLine{02033\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ config\_dir.is\_relative()\ )}
+\DoxyCodeLine{02034\ \ \ \ \ \ \ \ \ \ config\_dir\ =\ bfs::current\_path()\ /\ config\_dir;}
+\DoxyCodeLine{02035\ \ \ \ \ \}}
+\DoxyCodeLine{02036\ }
+\DoxyCodeLine{02037\ \ \ \ bfs::path\ config\_file\_name\ =\ config\_dir\ /\ \textcolor{stringliteral}{"{}config.ini"{}};}
+\DoxyCodeLine{02038\ \ \ \ \textcolor{keywordflow}{if}(\ vmap.count(\ \textcolor{stringliteral}{"{}config"{}}\ )\ )\ \{}
+\DoxyCodeLine{02039\ \ \ \ \ \ \ config\_file\_name\ =\ vmap[\textcolor{stringliteral}{"{}config"{}}].as<bfs::path>();}
+\DoxyCodeLine{02040\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ config\_file\_name.is\_relative()\ )}
+\DoxyCodeLine{02041\ \ \ \ \ \ \ \ \ \ config\_file\_name\ =\ config\_dir\ /\ config\_file\_name;}
+\DoxyCodeLine{02042\ \ \ \ \}}
+\DoxyCodeLine{02043\ }
+\DoxyCodeLine{02044\ \ \ \ \textcolor{keywordflow}{if}(!bfs::exists(config\_file\_name))\ \{}
+\DoxyCodeLine{02045\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(config\_file\_name.compare(config\_dir\ /\ \textcolor{stringliteral}{"{}config.ini"{}})\ !=\ 0)}
+\DoxyCodeLine{02046\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02047\ \ \ \ \ \ \ \ \ \ cout\ <<\ \textcolor{stringliteral}{"{}Config\ file\ "{}}\ <<\ config\_file\_name\ <<\ \textcolor{stringliteral}{"{}\ missing."{}}\ <<\ std::endl;}
+\DoxyCodeLine{02048\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ -\/1;}
+\DoxyCodeLine{02049\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{02050\ \ \ \ \ \ \ \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_aae54f18181d7763de2b11b899440daeb}{write\_default\_config}}(config\_file\_name,\ cfg);}
+\DoxyCodeLine{02051\ \ \ \ \}}
+\DoxyCodeLine{02052\ }
+\DoxyCodeLine{02053\ }
+\DoxyCodeLine{02054\ \ \ \ bpo::store(bpo::parse\_config\_file<char>(config\_file\_name.make\_preferred().string().c\_str(),}
+\DoxyCodeLine{02055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ cfg,\ \textcolor{keyword}{true}),\ vmap);}
+\DoxyCodeLine{02056\ }
+\DoxyCodeLine{02057\ }
+\DoxyCodeLine{02058\ }
+\DoxyCodeLine{02059\ \ \ \ \ \textcolor{keywordflow}{if}\ (vmap.count(\textcolor{stringliteral}{"{}launch"{}}))\ \{}
+\DoxyCodeLine{02060\ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}\ =\ vmap[\textcolor{stringliteral}{"{}launch"{}}].as<\textcolor{keywordtype}{string}>();}
+\DoxyCodeLine{02061\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (boost::iequals(\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}},\textcolor{stringliteral}{"{}all"{}}))}
+\DoxyCodeLine{02062\ \ \ \ \ \ \ \ \ mode\ =\ \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a759690ed22a7306147759efee4b4545ca8870d76231061d2441fe007135468e59}{LM\_ALL}};}
+\DoxyCodeLine{02063\ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (boost::iequals(\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}},\textcolor{stringliteral}{"{}local"{}}))}
+\DoxyCodeLine{02064\ \ \ \ \ \ \ \ \ mode\ =\ \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a759690ed22a7306147759efee4b4545cab7c6501dc21ea9e8d644f84ce2034e92}{LM\_LOCAL}};}
+\DoxyCodeLine{02065\ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (boost::iequals(\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}},\textcolor{stringliteral}{"{}remote"{}}))}
+\DoxyCodeLine{02066\ \ \ \ \ \ \ \ \ mode\ =\ \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a759690ed22a7306147759efee4b4545cac1388e679c0a60e9be5f104eb9387485}{LM\_REMOTE}};}
+\DoxyCodeLine{02067\ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (boost::iequals(\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}},\textcolor{stringliteral}{"{}none"{}}))}
+\DoxyCodeLine{02068\ \ \ \ \ \ \ \ \ mode\ =\ \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a759690ed22a7306147759efee4b4545ca606f02e8575e469962b062880db7cedb}{LM\_NONE}};}
+\DoxyCodeLine{02069\ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (boost::iequals(\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}},\textcolor{stringliteral}{"{}verify"{}}))}
+\DoxyCodeLine{02070\ \ \ \ \ \ \ \ \ mode\ =\ \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a759690ed22a7306147759efee4b4545ca93b8b432ea0ef632b2ec624fb327521c}{LM\_VERIFY}};}
+\DoxyCodeLine{02071\ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{02072\ \ \ \ \ \ \ \ \ mode\ =\ \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a759690ed22a7306147759efee4b4545ca92d0684dd33749ee2e44d788b5640b1e}{LM\_NAMED}};}
+\DoxyCodeLine{02073\ \ \ \ \ \ \ \ \ top.\mbox{\hyperlink{structlauncher__def_a666bcc5ca7db69c6cb12e6647b9788c2}{launch\_name}}\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}};}
+\DoxyCodeLine{02074\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{02075\ \ \ \ \ \}}
+\DoxyCodeLine{02076\ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{02077\ \ \ \ \ \ \ mode\ =\ !kill\_arg.empty()\ ||\ top.\mbox{\hyperlink{structlauncher__def_acd9a944cbdb5b0e0418419601e7b4973}{output}}.empty()\ ?\ \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a759690ed22a7306147759efee4b4545ca8870d76231061d2441fe007135468e59}{LM\_ALL}}\ :\ \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a759690ed22a7306147759efee4b4545ca606f02e8575e469962b062880db7cedb}{LM\_NONE}};}
+\DoxyCodeLine{02078\ \ \ \ \ \}}
+\DoxyCodeLine{02079\ }
+\DoxyCodeLine{02080\ \ \ \ \ \textcolor{keywordflow}{if}\ (!kill\_arg.empty())\ \{}
+\DoxyCodeLine{02081\ \ \ \ \ \ \ cout\ <<\ \textcolor{stringliteral}{"{}killing"{}}\ <<\ std::endl;}
+\DoxyCodeLine{02082\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (kill\_arg[0]\ !=\ \textcolor{charliteral}{'-\/'})\ \{}
+\DoxyCodeLine{02083\ \ \ \ \ \ \ \ \ kill\_arg\ =\ \textcolor{stringliteral}{"{}-\/"{}}\ +\ kill\_arg;}
+\DoxyCodeLine{02084\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{02085\ \ \ \ \ \ \ top.\mbox{\hyperlink{structlauncher__def_ae482f4211c61affef1625564844ddcd3}{kill}}\ (mode,\ kill\_arg);}
+\DoxyCodeLine{02086\ \ \ \ \ \}}
+\DoxyCodeLine{02087\ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (!bounce\_nodes.empty())\ \{}
+\DoxyCodeLine{02088\ \ \ \ \ \ \ \ top.\mbox{\hyperlink{structlauncher__def_a500893d4e0bbd09b4c33bca41fd07790}{bounce}}(bounce\_nodes);}
+\DoxyCodeLine{02089\ \ \ \ \ \}}
+\DoxyCodeLine{02090\ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (!down\_nodes.empty())\ \{}
+\DoxyCodeLine{02091\ \ \ \ \ \ \ \ top.\mbox{\hyperlink{structlauncher__def_a0508d513aecd0e758140675d33e65054}{down}}(down\_nodes);}
+\DoxyCodeLine{02092\ \ \ \ \ \}}
+\DoxyCodeLine{02093\ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (!roll\_nodes.empty())\ \{}
+\DoxyCodeLine{02094\ \ \ \ \ \ \ \ top.\mbox{\hyperlink{structlauncher__def_a4a62e759ad911ad59b7d6ca08a72f665}{roll}}(roll\_nodes);}
+\DoxyCodeLine{02095\ \ \ \ \ \}}
+\DoxyCodeLine{02096\ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{02097\ \ \ \ \ \ \ top.\mbox{\hyperlink{structlauncher__def_aba7038ee47ccc688104d0d527fa99843}{generate}}();}
+\DoxyCodeLine{02098\ \ \ \ \ \ \ top.\mbox{\hyperlink{structlauncher__def_a94d21163ede9d4d2dd2d4b0638a7b4f8}{start\_all}}(gts,\ mode);}
+\DoxyCodeLine{02099\ \ \ \ \ \ \ top.\mbox{\hyperlink{structlauncher__def_a774763197fe2f2055152f8e80bfbae8e}{ignite}}();}
+\DoxyCodeLine{02100\ \ \ \ \ \}}
+\DoxyCodeLine{02101\ \ \ \}\ \textcolor{keywordflow}{catch}\ (bpo::unknown\_option\ \&ex)\ \{}
+\DoxyCodeLine{02102\ \ \ \ \ \mbox{\hyperlink{namespace_catch_a54c1ce08041448d684ae8edc14162cd2}{cerr}}\ <<\ ex.what()\ <<\ endl;}
+\DoxyCodeLine{02103\ \ \ \ \ \mbox{\hyperlink{xbyak__mnemonic_8h_a4229a9b84f8b8673326f12bd41acd27c}{cli}}.print\ (cerr);}
+\DoxyCodeLine{02104\ \ \ \}}
+\DoxyCodeLine{02105\ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{02106\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{programs_2sysio-launcher_2main_8cpp_a0ddf1224851353fc92bfbff6f499fa97_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{programs_2sysio-launcher_2main_8cpp_a33498dd91a3a20244bc2bddeaa62d8d4}\index{main.cpp@{main.cpp}!operator\texttt{"|}=@{operator\texttt{"|}=}}
+\index{operator\texttt{"|}=@{operator\texttt{"|}=}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{operator\texttt{"|}=()}{operator|=()}}
+{\footnotesize\ttfamily \label{programs_2sysio-launcher_2main_8cpp_a33498dd91a3a20244bc2bddeaa62d8d4} 
+template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} enum\+\_\+type , \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}}  = typename std\+::enable\+\_\+if$<$std\+::is\+\_\+enum$<$enum\+\_\+type$>$\+::value$>$\+::type$>$ \\
+enum\+\_\+type \& operator\texorpdfstring{$\vert$}{|}= (\begin{DoxyParamCaption}\item[{enum\+\_\+type \&}]{lhs}{, }\item[{const enum\+\_\+type \&}]{rhs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source_l00511}{511}} of file \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00512\ \{}
+\DoxyCodeLine{00513\ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ =\ std::underlying\_type\_t\ <enum\_type>;}
+\DoxyCodeLine{00514\ \ \ \textcolor{keywordflow}{return}\ lhs\ =\ \textcolor{keyword}{static\_cast<}enum\_type\textcolor{keyword}{>}(\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\textcolor{keyword}{>}(lhs)\ |\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\textcolor{keyword}{>}(rhs));}
+\DoxyCodeLine{00515\ \}}
+
+\end{DoxyCode}
+\Hypertarget{programs_2sysio-launcher_2main_8cpp_af3e300c02a95a1230283a8ea2bb1ad70}\index{main.cpp@{main.cpp}!producer\_name@{producer\_name}}
+\index{producer\_name@{producer\_name}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{producer\_name()}{producer\_name()}}
+{\footnotesize\ttfamily \label{programs_2sysio-launcher_2main_8cpp_af3e300c02a95a1230283a8ea2bb1ad70} 
+producer\+\_\+name (\begin{DoxyParamCaption}\item[{block\+\_\+signing\+\_\+key}]{}{}\end{DoxyParamCaption})}
+
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{programs_2sysio-launcher_2main_8cpp_af3e300c02a95a1230283a8ea2bb1ad70_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{programs_2sysio-launcher_2main_8cpp_a6d42fdcc89e90507ee6f095c8e92fa2b}\index{main.cpp@{main.cpp}!producers@{producers}}
+\index{producers@{producers}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{producers()}{producers()}}
+{\footnotesize\ttfamily \label{programs_2sysio-launcher_2main_8cpp_a6d42fdcc89e90507ee6f095c8e92fa2b} 
+schedule config\+\_\+dir\+\_\+name data\+\_\+dir\+\_\+name p2p\+\_\+port http\+\_\+port file\+\_\+size \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}} \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}} keys peers producers (\begin{DoxyParamCaption}\item[{dont\+\_\+start}]{}{}\end{DoxyParamCaption})}
+
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{programs_2sysio-launcher_2main_8cpp_a6d42fdcc89e90507ee6f095c8e92fa2b_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{programs_2sysio-launcher_2main_8cpp_aca820fbde48c0fbd90e73279e9770384}\index{main.cpp@{main.cpp}!retrieve\_paired\_array\_parameters@{retrieve\_paired\_array\_parameters}}
+\index{retrieve\_paired\_array\_parameters@{retrieve\_paired\_array\_parameters}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{retrieve\_paired\_array\_parameters()}{retrieve\_paired\_array\_parameters()}}
+{\footnotesize\ttfamily \label{programs_2sysio-launcher_2main_8cpp_aca820fbde48c0fbd90e73279e9770384} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+void retrieve\+\_\+paired\+\_\+array\+\_\+parameters (\begin{DoxyParamCaption}\item[{const variables\+\_\+map \&}]{vmap}{, }\item[{const std\+::string \&}]{num\+\_\+selector}{, }\item[{const std\+::string \&}]{paired\+\_\+selector}{, }\item[{std\+::map$<$ uint, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&}]{selector\+\_\+map}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source_l00518}{518}} of file \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00518\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00519\ \ \ \ \textcolor{keywordflow}{if}\ (vmap.count(num\_selector))\ \{}
+\DoxyCodeLine{00520\ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ specific\_nums\ =\ vmap[num\_selector].as<vector<uint>>();}
+\DoxyCodeLine{00521\ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ specific\_args\ =\ vmap[paired\_selector].as<vector<string>>();}
+\DoxyCodeLine{00522\ \ \ \ \ \ \textcolor{keywordflow}{if}\ (specific\_nums.size()\ !=\ specific\_args.size())\ \{}
+\DoxyCodeLine{00523\ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_catch_a54c1ce08041448d684ae8edc14162cd2}{cerr}}\ <<\ \textcolor{stringliteral}{"{}ERROR:\ every\ "{}}\ <<\ num\_selector\ <<\ \textcolor{stringliteral}{"{}\ argument\ must\ be\ paired\ with\ a\ "{}}\ <<\ paired\_selector\ <<\ \textcolor{stringliteral}{"{}\ argument"{}}\ <<\ endl;}
+\DoxyCodeLine{00524\ \ \ \ \ \ \ \ exit\ (-\/1);}
+\DoxyCodeLine{00525\ \ \ \ \ \ \}}
+\DoxyCodeLine{00526\ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ total\_nodes\ =\ vmap[\textcolor{stringliteral}{"{}nodes"{}}].as<\textcolor{keywordtype}{size\_t}>();}
+\DoxyCodeLine{00527\ \ \ \ \ \ \textcolor{keywordflow}{for}(uint\ i\ =\ 0;\ i\ <\ specific\_nums.size();\ ++i)}
+\DoxyCodeLine{00528\ \ \ \ \ \ \{}
+\DoxyCodeLine{00529\ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6a0fc3cfbc27e91ea60a787de13dae3e3c}{num}}\ =\ specific\_nums[i];}
+\DoxyCodeLine{00530\ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (num\ >=\ total\_nodes)\ \{}
+\DoxyCodeLine{00531\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_catch_a54c1ce08041448d684ae8edc14162cd2}{cerr}}\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)"{}-\/-\/"{}}\ <<\ num\_selector\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)"{}\ provided\ value=\ "{}}\ <<\ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6a0fc3cfbc27e91ea60a787de13dae3e3c}{num}}\ <<\ \textcolor{stringliteral}{"{}\ is\ higher\ than\ \(\backslash\)"{}-\/-\/nodes\(\backslash\)"{}\ provided\ value="{}}\ <<\ total\_nodes\ <<\ endl;}
+\DoxyCodeLine{00532\ \ \ \ \ \ \ \ \ \ exit\ (-\/1);}
+\DoxyCodeLine{00533\ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00534\ \ \ \ \ \ \ \ selector\_map[\mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6a0fc3cfbc27e91ea60a787de13dae3e3c}{num}}]\ =\ specific\_args[i];}
+\DoxyCodeLine{00535\ \ \ \ \ \ \}}
+\DoxyCodeLine{00536\ \ \ \ \}}
+\DoxyCodeLine{00537\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{programs_2sysio-launcher_2main_8cpp_aca820fbde48c0fbd90e73279e9770384_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{programs_2sysio-launcher_2main_8cpp_a661084764718f01bb3adf07537320d98}\index{main.cpp@{main.cpp}!ssh\_helper@{ssh\_helper}}
+\index{ssh\_helper@{ssh\_helper}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{ssh\_helper()}{ssh\_helper()}}
+{\footnotesize\ttfamily \label{programs_2sysio-launcher_2main_8cpp_a661084764718f01bb3adf07537320d98} 
+schedule config\+\_\+dir\+\_\+name data\+\_\+dir\+\_\+name p2p\+\_\+port http\+\_\+port file\+\_\+size \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}} \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}} keys peers \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}} ssh\+\_\+helper (\begin{DoxyParamCaption}\item[{nodes}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{programs_2sysio-launcher_2main_8cpp_ac42026bee78732d5a5cce83818b9e973}\index{main.cpp@{main.cpp}!sysio\_home@{sysio\_home}}
+\index{sysio\_home@{sysio\_home}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{sysio\_home()}{sysio\_home()}}
+{\footnotesize\ttfamily \label{programs_2sysio-launcher_2main_8cpp_ac42026bee78732d5a5cce83818b9e973} 
+schedule config\+\_\+dir\+\_\+name data\+\_\+dir\+\_\+name p2p\+\_\+port http\+\_\+port file\+\_\+size \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}} \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}} keys peers \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}} ipaddr \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}} has\+\_\+bios sysio\+\_\+home (\begin{DoxyParamCaption}\item[{instances}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{programs_2sysio-launcher_2main_8cpp_aae54f18181d7763de2b11b899440daeb}\index{main.cpp@{main.cpp}!write\_default\_config@{write\_default\_config}}
+\index{write\_default\_config@{write\_default\_config}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{write\_default\_config()}{write\_default\_config()}}
+{\footnotesize\ttfamily \label{programs_2sysio-launcher_2main_8cpp_aae54f18181d7763de2b11b899440daeb} 
+void write\+\_\+default\+\_\+config (\begin{DoxyParamCaption}\item[{const bfs\+::path \&}]{cfg\+\_\+file}{, }\item[{const options\+\_\+description \&}]{cfg}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source_l01941}{1941}} of file \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01941\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01942\ \ \ \ bfs::path\ parent\ =\ cfg\_file.parent\_path();}
+\DoxyCodeLine{01943\ \ \ \ \textcolor{keywordflow}{if}\ (parent.empty())\ \{}
+\DoxyCodeLine{01944\ \ \ \ \ \ \ parent\ =\ \textcolor{stringliteral}{"{}."{}};}
+\DoxyCodeLine{01945\ \ \ \ \}}
+\DoxyCodeLine{01946\ \ \ \ \textcolor{keywordflow}{if}(!bfs::exists(parent))\ \{}
+\DoxyCodeLine{01947\ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{01948\ \ \ \ \ \ \ \ \ \ bfs::create\_directories(parent);}
+\DoxyCodeLine{01949\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (bfs::filesystem\_error\ \&ex)\ \{}
+\DoxyCodeLine{01950\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_catch_a54c1ce08041448d684ae8edc14162cd2}{cerr}}\ <<\ \textcolor{stringliteral}{"{}could\ not\ create\ new\ directory:\ "{}}\ <<\ cfg\_file.parent\_path()}
+\DoxyCodeLine{01951\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\ caught\ "{}}\ <<\ ex.what()\ <<\ endl;}
+\DoxyCodeLine{01952\ \ \ \ \ \ \ \ \ \ exit\ (-\/1);}
+\DoxyCodeLine{01953\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01954\ \ \ \ \}}
+\DoxyCodeLine{01955\ }
+\DoxyCodeLine{01956\ \ \ \ std::ofstream\ out\_cfg(\ bfs::path(cfg\_file).make\_preferred().\textcolor{keywordtype}{string}());}
+\DoxyCodeLine{01957\ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ boost::shared\_ptr<bpo::option\_description>\&\ od\ :\ cfg.options())}
+\DoxyCodeLine{01958\ \ \ \ \{}
+\DoxyCodeLine{01959\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!od-\/>description().empty())\ \{}
+\DoxyCodeLine{01960\ \ \ \ \ \ \ \ \ \ out\_cfg\ <<\ \textcolor{stringliteral}{"{}\#\ "{}}\ <<\ od-\/>description()\ <<\ std::endl;}
+\DoxyCodeLine{01961\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01962\ \ \ \ \ \ \ boost::any\ store;}
+\DoxyCodeLine{01963\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!od-\/>semantic()-\/>apply\_default(store))}
+\DoxyCodeLine{01964\ \ \ \ \ \ \ \ \ \ out\_cfg\ <<\ \textcolor{stringliteral}{"{}\#\ "{}}\ <<\ od-\/>long\_name()\ <<\ \textcolor{stringliteral}{"{}\ =\ "{}}\ <<\ std::endl;}
+\DoxyCodeLine{01965\ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{01966\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ example\ =\ od-\/>format\_parameter();}
+\DoxyCodeLine{01967\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(example.empty())}
+\DoxyCodeLine{01968\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ This\ is\ a\ boolean\ switch}}
+\DoxyCodeLine{01969\ \ \ \ \ \ \ \ \ \ \ \ \ out\_cfg\ <<\ od-\/>long\_name()\ <<\ \textcolor{stringliteral}{"{}\ =\ "{}}\ <<\ \textcolor{stringliteral}{"{}false"{}}\ <<\ std::endl;}
+\DoxyCodeLine{01970\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{01971\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ The\ string\ is\ formatted\ "{}arg\ (=<interesting\ part>)"{}}}
+\DoxyCodeLine{01972\ \ \ \ \ \ \ \ \ \ \ \ \ example.erase(0,\ 6);}
+\DoxyCodeLine{01973\ \ \ \ \ \ \ \ \ \ \ \ \ example.erase(example.length()-\/1);}
+\DoxyCodeLine{01974\ \ \ \ \ \ \ \ \ \ \ \ \ out\_cfg\ <<\ od-\/>long\_name()\ <<\ \textcolor{stringliteral}{"{}\ =\ "{}}\ <<\ example\ <<\ std::endl;}
+\DoxyCodeLine{01975\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01976\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01977\ \ \ \ \ \ \ out\_cfg\ <<\ std::endl;}
+\DoxyCodeLine{01978\ \ \ \ \}}
+\DoxyCodeLine{01979\ \ \ \ out\_cfg.close();}
+\DoxyCodeLine{01980\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=256pt]{programs_2sysio-launcher_2main_8cpp_aae54f18181d7763de2b11b899440daeb_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{programs_2sysio-launcher_2main_8cpp_a3426d59b828f63d073d546fed967330e}\index{main.cpp@{main.cpp}!block\_dir@{block\_dir}}
+\index{block\_dir@{block\_dir}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{block\_dir}{block\_dir}}
+{\footnotesize\ttfamily \label{programs_2sysio-launcher_2main_8cpp_a3426d59b828f63d073d546fed967330e} 
+const string block\+\_\+dir = "{}blocks"{}}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source_l00048}{48}} of file \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{programs_2sysio-launcher_2main_8cpp_a3b2140dc0a459ef22d3aaa4db00f7f38}\index{main.cpp@{main.cpp}!local\_id@{local\_id}}
+\index{local\_id@{local\_id}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{local\_id}{local\_id}}
+{\footnotesize\ttfamily \label{programs_2sysio-launcher_2main_8cpp_a3b2140dc0a459ef22d3aaa4db00f7f38} 
+struct \mbox{\hyperlink{structlocal__identity}{local\+\_\+identity}} local\+\_\+id}
+
+\Hypertarget{programs_2sysio-launcher_2main_8cpp_a0995d763aebc677936adecfcde571807}\index{main.cpp@{main.cpp}!shared\_mem\_dir@{shared\_mem\_dir}}
+\index{shared\_mem\_dir@{shared\_mem\_dir}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{shared\_mem\_dir}{shared\_mem\_dir}}
+{\footnotesize\ttfamily \label{programs_2sysio-launcher_2main_8cpp_a0995d763aebc677936adecfcde571807} 
+const string shared\+\_\+mem\+\_\+dir = "{}state"{}}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source_l00049}{49}} of file \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_source}{main.\+cpp}}.
+

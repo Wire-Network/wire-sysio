@@ -1,0 +1,33 @@
+<map id="libraries/yubihsm/pkcs11/util_pkcs11.h" name="libraries/yubihsm/pkcs11/util_pkcs11.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="169,5,334,46"/>
+<area shape="rect" id="Node000002" href="$yubihsm_8h.html" title=" " alt="" coords="126,241,207,267"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="247,48,179,228,174,226,242,46"/>
+<area shape="rect" id="Node000009" href="$pkcs11y_8h.html" title=" " alt="" coords="221,168,301,193"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="256,46,262,152,257,152,250,46"/>
+<area shape="rect" id="Node000011" href="$yubihsm__pkcs11_8h.html" title=" " alt="" coords="289,94,420,120"/>
+<area shape="poly" id="edge12_Node000001_Node000011" title=" " alt="" coords="279,44,328,82,325,86,275,49"/>
+<area shape="rect" id="Node000003" href="$stdint_8h.html" title=" " alt="" coords="49,315,113,341"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="154,270,108,307,105,303,150,265"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="316,315,390,341"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="199,265,308,306,306,311,197,270"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="223,315,291,341"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="183,265,232,303,228,308,180,270"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="138,315,198,341"/>
+<area shape="poly" id="edge7_Node000002_Node000008" title=" " alt="" coords="169,267,170,299,164,299,164,267"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="5,389,69,414"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="76,342,55,377,50,374,71,339"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="93,389,160,414"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="91,339,113,374,108,377,86,342"/>
+<area shape="poly" id="edge11_Node000009_Node000002" title=" " alt="" coords="247,196,196,234,193,230,243,192"/>
+<area shape="rect" id="Node000010" href="$pkcs11_8h.html" title=" " alt="" coords="230,241,305,267"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="265,193,268,226,262,226,259,194"/>
+<area shape="poly" id="edge10_Node000010_Node000007" title=" " alt="" coords="269,268,264,300,258,299,263,267"/>
+<area shape="poly" id="edge13_Node000011_Node000009" title=" " alt="" coords="340,122,290,160,287,156,337,118"/>
+<area shape="rect" id="Node000012" href="$list_8h.html" title=" " alt="" coords="328,241,378,267"/>
+<area shape="poly" id="edge14_Node000011_Node000012" title=" " alt="" coords="357,120,356,226,351,226,352,120"/>
+<area shape="rect" id="Node000013" title=" " alt="" coords="382,168,484,193"/>
+<area shape="poly" id="edge16_Node000011_Node000013" title=" " alt="" coords="369,118,410,155,407,159,366,122"/>
+<area shape="rect" id="Node000014" title=" " alt="" coords="508,168,590,193"/>
+<area shape="poly" id="edge17_Node000011_Node000014" title=" " alt="" coords="388,118,502,159,501,164,386,123"/>
+<area shape="poly" id="edge15_Node000012_Node000006" title=" " alt="" coords="356,267,356,299,350,299,350,267"/>
+</map>

@@ -1,0 +1,17 @@
+<map id="sysio::chain::asset::operator&#45;" name="sysio::chain::asset::operator&#45;">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,71,137,111"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1asset.html#ae1bdaa1519f4c6a01ae1e4ebea043818" title=" " alt="" coords="185,37,316,78"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="137,76,169,70,170,75,138,81"/>
+<area shape="rect" id="Node000008" href="$structsysio_1_1chain_1_1asset.html#a807aa81522392e1869c5180289b3a41d" title=" " alt="" coords="185,103,316,143"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="138,100,170,106,169,111,137,105"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1chain_1_1asset.html#a0fb34915bbb8b149ec3e6f9ec19234ef" title=" " alt="" coords="364,5,533,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="316,44,348,39,349,44,317,50"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1chain_1_1symbol.html#a31f998c4cfde2fa9148ac3232b11a25d" title=" " alt="" coords="378,71,519,111"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="317,66,363,74,362,79,316,71"/>
+<area shape="rect" id="Node000005" href="$classsysio_1_1chain_1_1symbol.html#a8e41beda74e6823bf4efe4d478440e88" title=" " alt="" coords="581,5,723,46"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="513,68,571,49,573,54,515,73"/>
+<area shape="rect" id="Node000006" href="$classsysio_1_1chain_1_1symbol.html#a067cd53c6a32da32671b1302a0c1909a" title=" " alt="" coords="581,71,723,111"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="520,88,566,88,566,94,520,94"/>
+<area shape="rect" id="Node000007" href="$classsysio_1_1chain_1_1symbol.html#a8f3fcd97b82083e359f91943b0674fc3" title=" " alt="" coords="581,136,723,177"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="515,109,573,128,571,133,513,114"/>
+</map>

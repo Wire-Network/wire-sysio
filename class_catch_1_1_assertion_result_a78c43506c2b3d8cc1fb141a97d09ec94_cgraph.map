@@ -1,0 +1,17 @@
+<map id="Catch::AssertionResult::hasExpandedExpression" name="Catch::AssertionResult::hasExpandedExpression">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,63,179,103"/>
+<area shape="rect" id="Node000002" href="$class_catch_1_1_assertion_result.html#aaa46070791a6c07caaed86229b8d9d75" title=" " alt="" coords="227,63,397,103"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="179,80,211,80,211,86,179,86"/>
+<area shape="rect" id="Node000003" href="$class_catch_1_1_assertion_result.html#a26a777f3959353c729544cb2ace0d279" title=" " alt="" coords="459,5,616,46"/>
+<area shape="poly" id="edge7_Node000001_Node000003" title=" " alt="" coords="171,59,226,48,339,35,444,27,444,32,339,40,227,54,172,65"/>
+<area shape="rect" id="Node000007" href="$class_catch_1_1_assertion_result.html#aba37b4fef1015989df2136592958e984" title=" " alt="" coords="233,128,390,169"/>
+<area shape="poly" id="edge8_Node000001_Node000007" title=" " alt="" coords="163,101,227,120,226,126,162,106"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="394,60,443,47,444,52,395,65"/>
+<area shape="rect" id="Node000005" href="$struct_catch_1_1_assertion_result_data.html#a21c9d6ed92a8beaeeb229302ca8cffbb" title=" " alt="" coords="445,72,630,113"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="398,84,429,85,429,91,397,89"/>
+<area shape="rect" id="Node000004" href="$namespace_catch.html#a93ef4e3e307a2021ca0d41b32c0e54b0" title=" " alt="" coords="722,10,853,36"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="617,22,706,21,706,27,617,27"/>
+<area shape="rect" id="Node000006" href="$class_catch_1_1_reusable_string_stream.html#a0e9ecf260b2a5d35f4886ef0d51f6270" title=" " alt="" coords="678,84,897,109"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="631,91,663,92,663,97,631,96"/>
+<area shape="poly" id="edge6_Node000006_Node000006" title=" " alt="" coords="746,85,738,75,743,65,760,59,788,57,819,60,834,67,832,72,817,65,787,62,761,64,747,69,743,74,750,81"/>
+</map>

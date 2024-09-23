@@ -1,0 +1,209 @@
+\doxysection{libraries/chain/include/sysio/chain/database\+\_\+utils.hpp File Reference}
+\hypertarget{database__utils_8hpp}{}\label{database__utils_8hpp}\index{libraries/chain/include/sysio/chain/database\_utils.hpp@{libraries/chain/include/sysio/chain/database\_utils.hpp}}
+{\ttfamily \#include $<$sysio/chain/types.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/io/raw.\+hpp$>$}\newline
+{\ttfamily \#include $<$softfloat.\+hpp$>$}\newline
+Include dependency graph for database\+\_\+utils.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{database__utils_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{database__utils_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classsysio_1_1chain_1_1index__utils}{sysio\+::chain\+::index\+\_\+utils$<$ Index $>$}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1chain_1_1index__set_3_01_index_01_4}{sysio\+::chain\+::index\+\_\+set$<$ Index $>$}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1chain_1_1index__set_3_01_first_index_00_01_remaining_indices_8_8_8_01_4}{sysio\+::chain\+::index\+\_\+set$<$ First\+Index, Remaining\+Indices... $>$}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain}{sysio\+::chain}}
+\item 
+namespace \mbox{\hyperlink{namespacefc}{fc}}
+\begin{DoxyCompactList}\small\item\em namespace \doxylink{namespacesysio_1_1chain}{sysio\+::chain} \end{DoxyCompactList}\item 
+namespace \mbox{\hyperlink{namespacechainbase}{chainbase}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename Data\+Stream $>$ }\\Data\+Stream \& \mbox{\hyperlink{namespacesysio_1_1chain_abe71c7f1c6ae066be72de23cd6c873f6}{sysio\+::chain\+::operator$<$$<$}} (Data\+Stream \&ds, const \mbox{\hyperlink{classsysio_1_1chain_1_1shared__blob}{shared\+\_\+blob}} \&b)
+\item 
+{\footnotesize template$<$typename Data\+Stream $>$ }\\Data\+Stream \& \mbox{\hyperlink{namespacesysio_1_1chain_aaab6e29d6a4ae67d46f680a81f35082a}{sysio\+::chain\+::operator$>$$>$}} (Data\+Stream \&ds, \mbox{\hyperlink{classsysio_1_1chain_1_1shared__blob}{shared\+\_\+blob}} \&b)
+\item 
+{\footnotesize template$<$typename Oid\+Type $>$ }\\void \mbox{\hyperlink{namespacefc_ab2c3b3c46b757ea1e321be00abd2658d}{fc\+::to\+\_\+variant}} (const \mbox{\hyperlink{classchainbase_1_1oid}{chainbase\+::oid}}$<$ Oid\+Type $>$ \&oid, \mbox{\hyperlink{classfc_1_1variant}{variant}} \&v)
+\item 
+{\footnotesize template$<$typename Oid\+Type $>$ }\\void \mbox{\hyperlink{namespacefc_a55c9ecccaf5c040bc14112b93c1d4441}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{variant}} \&v, \mbox{\hyperlink{classchainbase_1_1oid}{chainbase\+::oid}}$<$ Oid\+Type $>$ \&oid)
+\item 
+void \mbox{\hyperlink{namespacefc_af1935a142a2509b876cdac5aa150bdef}{fc\+::float64\+\_\+to\+\_\+double}} (const \mbox{\hyperlink{structfloat64__t}{float64\+\_\+t}} \&\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}, double \&d)
+\item 
+void \mbox{\hyperlink{namespacefc_a6bf522e3a9abacb2700aa3790f3c9261}{fc\+::double\+\_\+to\+\_\+float64}} (const double \&d, \mbox{\hyperlink{structfloat64__t}{float64\+\_\+t}} \&\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})
+\item 
+void \mbox{\hyperlink{namespacefc_ab605b1e0e077b96cf24fc3c64dcfc262}{fc\+::float128\+\_\+to\+\_\+uint128}} (const \mbox{\hyperlink{structfloat128__t}{float128\+\_\+t}} \&\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}, \mbox{\hyperlink{namespacesysio_1_1chain_a896515137d9a7844105786ee3a6b1d47}{sysio\+::chain\+::uint128\+\_\+t}} \&u)
+\item 
+void \mbox{\hyperlink{namespacefc_a532d37ecf09d0c5d09864fd9ebb2d36a}{fc\+::uint128\+\_\+to\+\_\+float128}} (const \mbox{\hyperlink{namespacesysio_1_1chain_a896515137d9a7844105786ee3a6b1d47}{sysio\+::chain\+::uint128\+\_\+t}} \&u, \mbox{\hyperlink{structfloat128__t}{float128\+\_\+t}} \&\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})
+\item 
+void \mbox{\hyperlink{namespacefc_a3ca36417881156b0c5c475a1b6faad1b}{fc\+::to\+\_\+variant}} (const \mbox{\hyperlink{structfloat64__t}{float64\+\_\+t}} \&\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}, \mbox{\hyperlink{classfc_1_1variant}{variant}} \&v)
+\item 
+void \mbox{\hyperlink{namespacefc_a5570cc72ea7997a545c3e425dd00d521}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{variant}} \&v, \mbox{\hyperlink{structfloat64__t}{float64\+\_\+t}} \&\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})
+\item 
+void \mbox{\hyperlink{namespacefc_ad1eefb6ee05cf1aebaeda0dfc2296a93}{fc\+::to\+\_\+variant}} (const \mbox{\hyperlink{structfloat128__t}{float128\+\_\+t}} \&\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}, \mbox{\hyperlink{classfc_1_1variant}{variant}} \&v)
+\item 
+void \mbox{\hyperlink{namespacefc_ac5868ffe5077daf80a8c32301358ff21}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{variant}} \&v, \mbox{\hyperlink{structfloat128__t}{float128\+\_\+t}} \&\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})
+\item 
+void \mbox{\hyperlink{namespacefc_aca41b0c1700055e70d486bcadb13f55c}{fc\+::to\+\_\+variant}} (const \mbox{\hyperlink{namespacesysio_1_1chain_a91a8c75d36e75e33f8a9ed2a3e724893}{sysio\+::chain\+::shared\+\_\+string}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, \mbox{\hyperlink{classfc_1_1variant}{variant}} \&v)
+\item 
+void \mbox{\hyperlink{namespacefc_a00ada9ee942ba1f67f3fbce0be65e8c2}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{variant}} \&v, \mbox{\hyperlink{namespacesysio_1_1chain_a91a8c75d36e75e33f8a9ed2a3e724893}{sysio\+::chain\+::shared\+\_\+string}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\item 
+void \mbox{\hyperlink{namespacefc_a348798b2bdfe7531b3d5602db9c11a40}{fc\+::to\+\_\+variant}} (const \mbox{\hyperlink{classsysio_1_1chain_1_1shared__blob}{sysio\+::chain\+::shared\+\_\+blob}} \&b, \mbox{\hyperlink{classfc_1_1variant}{variant}} \&v)
+\item 
+void \mbox{\hyperlink{namespacefc_af6289a855139562122177becefa48296}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{variant}} \&v, \mbox{\hyperlink{classsysio_1_1chain_1_1shared__blob}{sysio\+::chain\+::shared\+\_\+blob}} \&b)
+\item 
+void \mbox{\hyperlink{namespacefc_a3353fd9c1626f07cba4c35f522f1efd0}{fc\+::to\+\_\+variant}} (const \mbox{\hyperlink{structfc_1_1blob}{blob}} \&b, \mbox{\hyperlink{classfc_1_1variant}{variant}} \&v)
+\item 
+void \mbox{\hyperlink{namespacefc_ac2c1cdb7900b6ed71097bfffafd30886}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{variant}} \&v, \mbox{\hyperlink{structfc_1_1blob}{blob}} \&b)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{namespacefc_ab887808ae17a8cebc088f0a7d53ca08a}{fc\+::to\+\_\+variant}} (const \mbox{\hyperlink{namespacesysio_1_1chain_a915de5728df4a4ce45da87438053ee90}{sysio\+::chain\+::shared\+\_\+vector}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&sv, \mbox{\hyperlink{classfc_1_1variant}{variant}} \&v)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{namespacefc_a047eec05d6224e5fb7bed55dff3148a3}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{variant}} \&v, \mbox{\hyperlink{namespacesysio_1_1chain_a915de5728df4a4ce45da87438053ee90}{sysio\+::chain\+::shared\+\_\+vector}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&sv)
+\item 
+{\footnotesize template$<$typename Data\+Stream , typename Oid\+Type $>$ }\\Data\+Stream \& \mbox{\hyperlink{namespacechainbase_a31de493974b1fdcfe8e90c6b0bdb3c48}{chainbase\+::operator$<$$<$}} (Data\+Stream \&ds, const \mbox{\hyperlink{classchainbase_1_1oid}{oid}}$<$ Oid\+Type $>$ \&\mbox{\hyperlink{classchainbase_1_1oid}{oid}})
+\item 
+{\footnotesize template$<$typename Data\+Stream , typename Oid\+Type $>$ }\\Data\+Stream \& \mbox{\hyperlink{namespacechainbase_af11f5eb228d3b92726e394e54660e34a}{chainbase\+::operator$>$$>$}} (Data\+Stream \&ds, \mbox{\hyperlink{classchainbase_1_1oid}{oid}}$<$ Oid\+Type $>$ \&\mbox{\hyperlink{classchainbase_1_1oid}{oid}})
+\item 
+{\footnotesize template$<$typename Data\+Stream $>$ }\\Data\+Stream \& \mbox{\hyperlink{database__utils_8hpp_a9c651062fd345156256e69573165086c}{operator$<$$<$}} (Data\+Stream \&ds, const \mbox{\hyperlink{structfloat64__t}{float64\+\_\+t}} \&v)
+\item 
+{\footnotesize template$<$typename Data\+Stream $>$ }\\Data\+Stream \& \mbox{\hyperlink{database__utils_8hpp_af1974b0cdd31ad663ba272df85c75d52}{operator$>$$>$}} (Data\+Stream \&ds, \mbox{\hyperlink{structfloat64__t}{float64\+\_\+t}} \&v)
+\item 
+{\footnotesize template$<$typename Data\+Stream $>$ }\\Data\+Stream \& \mbox{\hyperlink{database__utils_8hpp_af4ad97bf1091b352e8d263606296d0f4}{operator$<$$<$}} (Data\+Stream \&ds, const \mbox{\hyperlink{structfloat128__t}{float128\+\_\+t}} \&v)
+\item 
+{\footnotesize template$<$typename Data\+Stream $>$ }\\Data\+Stream \& \mbox{\hyperlink{database__utils_8hpp_a64153d2d2c2f443aea4f6ff4118f3e29}{operator$>$$>$}} (Data\+Stream \&ds, \mbox{\hyperlink{structfloat128__t}{float128\+\_\+t}} \&v)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{database__utils_8hpp_af4ad97bf1091b352e8d263606296d0f4}\index{database\_utils.hpp@{database\_utils.hpp}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!database\_utils.hpp@{database\_utils.hpp}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{database__utils_8hpp_af4ad97bf1091b352e8d263606296d0f4} 
+template$<$typename Data\+Stream $>$ \\
+Data\+Stream \& operator$<$$<$ (\begin{DoxyParamCaption}\item[{Data\+Stream \&}]{ds}{, }\item[{const \mbox{\hyperlink{structfloat128__t}{float128\+\_\+t}} \&}]{v}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{database__utils_8hpp_source_l00246}{246}} of file \mbox{\hyperlink{database__utils_8hpp_source}{database\+\_\+utils.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00246\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00247\ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_a896515137d9a7844105786ee3a6b1d47}{sysio::chain::uint128\_t}}\ uint128\_v;}
+\DoxyCodeLine{00248\ \ \ \ \mbox{\hyperlink{namespacefc_ab605b1e0e077b96cf24fc3c64dcfc262}{fc::float128\_to\_uint128}}(v,\ uint128\_v);}
+\DoxyCodeLine{00249\ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(ds,\ uint128\_v);}
+\DoxyCodeLine{00250\ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_xbyak_1_1util_a4b2aef26182d21706896022467868f7c}{ds}};}
+\DoxyCodeLine{00251\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{database__utils_8hpp_af4ad97bf1091b352e8d263606296d0f4_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{database__utils_8hpp_a9c651062fd345156256e69573165086c}\index{database\_utils.hpp@{database\_utils.hpp}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!database\_utils.hpp@{database\_utils.hpp}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{database__utils_8hpp_a9c651062fd345156256e69573165086c} 
+template$<$typename Data\+Stream $>$ \\
+Data\+Stream \& operator$<$$<$ (\begin{DoxyParamCaption}\item[{Data\+Stream \&}]{ds}{, }\item[{const \mbox{\hyperlink{structfloat64__t}{float64\+\_\+t}} \&}]{v}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{database__utils_8hpp_source_l00230}{230}} of file \mbox{\hyperlink{database__utils_8hpp_source}{database\+\_\+utils.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00230\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00231\ \ \ \ \textcolor{keywordtype}{double}\ double\_v;}
+\DoxyCodeLine{00232\ \ \ \ \mbox{\hyperlink{namespacefc_af1935a142a2509b876cdac5aa150bdef}{fc::float64\_to\_double}}(v,\ double\_v);}
+\DoxyCodeLine{00233\ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(ds,\ double\_v);}
+\DoxyCodeLine{00234\ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_xbyak_1_1util_a4b2aef26182d21706896022467868f7c}{ds}};}
+\DoxyCodeLine{00235\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{database__utils_8hpp_a9c651062fd345156256e69573165086c_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{database__utils_8hpp_a64153d2d2c2f443aea4f6ff4118f3e29}\index{database\_utils.hpp@{database\_utils.hpp}!operator$>$$>$@{operator$>$$>$}}
+\index{operator$>$$>$@{operator$>$$>$}!database\_utils.hpp@{database\_utils.hpp}}
+\doxysubsubsection{\texorpdfstring{operator$>$$>$()}{operator>>()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{database__utils_8hpp_a64153d2d2c2f443aea4f6ff4118f3e29} 
+template$<$typename Data\+Stream $>$ \\
+Data\+Stream \& operator$>$$>$ (\begin{DoxyParamCaption}\item[{Data\+Stream \&}]{ds}{, }\item[{\mbox{\hyperlink{structfloat128__t}{float128\+\_\+t}} \&}]{v}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{database__utils_8hpp_source_l00254}{254}} of file \mbox{\hyperlink{database__utils_8hpp_source}{database\+\_\+utils.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00254\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00255\ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_a896515137d9a7844105786ee3a6b1d47}{sysio::chain::uint128\_t}}\ uint128\_v;}
+\DoxyCodeLine{00256\ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a0b442d98ceb22dd5a6ae84745e43ffab}{fc::raw::unpack}}(ds,\ uint128\_v);}
+\DoxyCodeLine{00257\ \ \ \ \mbox{\hyperlink{namespacefc_a532d37ecf09d0c5d09864fd9ebb2d36a}{fc::uint128\_to\_float128}}(uint128\_v,\ v);}
+\DoxyCodeLine{00258\ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_xbyak_1_1util_a4b2aef26182d21706896022467868f7c}{ds}};}
+\DoxyCodeLine{00259\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{database__utils_8hpp_a64153d2d2c2f443aea4f6ff4118f3e29_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{database__utils_8hpp_af1974b0cdd31ad663ba272df85c75d52}\index{database\_utils.hpp@{database\_utils.hpp}!operator$>$$>$@{operator$>$$>$}}
+\index{operator$>$$>$@{operator$>$$>$}!database\_utils.hpp@{database\_utils.hpp}}
+\doxysubsubsection{\texorpdfstring{operator$>$$>$()}{operator>>()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{database__utils_8hpp_af1974b0cdd31ad663ba272df85c75d52} 
+template$<$typename Data\+Stream $>$ \\
+Data\+Stream \& operator$>$$>$ (\begin{DoxyParamCaption}\item[{Data\+Stream \&}]{ds}{, }\item[{\mbox{\hyperlink{structfloat64__t}{float64\+\_\+t}} \&}]{v}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{database__utils_8hpp_source_l00238}{238}} of file \mbox{\hyperlink{database__utils_8hpp_source}{database\+\_\+utils.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00238\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00239\ \ \ \ \textcolor{keywordtype}{double}\ double\_v;}
+\DoxyCodeLine{00240\ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a0b442d98ceb22dd5a6ae84745e43ffab}{fc::raw::unpack}}(ds,\ double\_v);}
+\DoxyCodeLine{00241\ \ \ \ \mbox{\hyperlink{namespacefc_a6bf522e3a9abacb2700aa3790f3c9261}{fc::double\_to\_float64}}(double\_v,\ v);}
+\DoxyCodeLine{00242\ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_xbyak_1_1util_a4b2aef26182d21706896022467868f7c}{ds}};}
+\DoxyCodeLine{00243\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{database__utils_8hpp_af1974b0cdd31ad663ba272df85c75d52_cgraph}
+\end{center}
+\end{figure}

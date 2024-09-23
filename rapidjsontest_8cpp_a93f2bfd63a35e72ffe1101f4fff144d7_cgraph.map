@@ -1,0 +1,6 @@
+<map id="TEST_F" name="TEST_F">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,29,76,55"/>
+<area shape="rect" id="Node000002" href="$rapidjsontest_8cpp.html#af9d33af8023a2f15d5e4b40cc41acf68" title=" " alt="" coords="124,29,196,55"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="76,40,108,40,108,45,76,45"/>
+<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="139,30,135,21,137,11,146,5,160,3,175,5,183,12,179,16,173,10,160,8,148,10,142,14,140,20,144,28"/>
+</map>

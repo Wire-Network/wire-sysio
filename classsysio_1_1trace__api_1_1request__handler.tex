@@ -1,0 +1,170 @@
+\doxysection{sysio\+::trace\+\_\+api\+::request\+\_\+handler\texorpdfstring{$<$}{<} Logfile\+Provider, Data\+Handler\+Provider \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classsysio_1_1trace__api_1_1request__handler}{}\label{classsysio_1_1trace__api_1_1request__handler}\index{sysio::trace\_api::request\_handler$<$ LogfileProvider, DataHandlerProvider $>$@{sysio::trace\_api::request\_handler$<$ LogfileProvider, DataHandlerProvider $>$}}
+
+
+{\ttfamily \#include $<$request\+\_\+handler.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classsysio_1_1trace__api_1_1request__handler_a168e09856038bd115e121943bb4b28de}{request\+\_\+handler}} (Logfile\+Provider \&\&logfile\+\_\+provider, Data\+Handler\+Provider \&\&data\+\_\+handler\+\_\+provider, \mbox{\hyperlink{namespacesysio_1_1trace__api_ac599662bf2df3135abffd5ff3adbca19}{log\+\_\+handler}} log)
+\item 
+\mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \mbox{\hyperlink{classsysio_1_1trace__api_1_1request__handler_a8c834f0e13d54dd42ac3c6d2e978793f}{get\+\_\+block\+\_\+trace}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} block\+\_\+height, const \mbox{\hyperlink{namespacesysio_1_1trace__api_a24d1d2b642518b3d627011e7ef39ae9a}{yield\+\_\+function}} \&yield=\{\})
+\item 
+\mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \mbox{\hyperlink{classsysio_1_1trace__api_1_1request__handler_aba4acfed2d43f5f8d74bd6d80e28f777}{get\+\_\+transaction\+\_\+trace}} (\mbox{\hyperlink{namespacesysio_1_1chain_aa85a3b49b3b219d1e3840567579e7e63}{chain\+::transaction\+\_\+id\+\_\+type}} trxid, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} block\+\_\+height, const \mbox{\hyperlink{namespacesysio_1_1trace__api_a24d1d2b642518b3d627011e7ef39ae9a}{yield\+\_\+function}} \&yield=\{\})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Logfile\+Provider, typename Data\+Handler\+Provider$>$\newline
+class sysio\+::trace\+\_\+api\+::request\+\_\+handler$<$ Logfile\+Provider, Data\+Handler\+Provider $>$}
+
+
+Definition at line \mbox{\hyperlink{request__handler_8hpp_source_l00019}{19}} of file \mbox{\hyperlink{request__handler_8hpp_source}{request\+\_\+handler.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classsysio_1_1trace__api_1_1request__handler_a168e09856038bd115e121943bb4b28de}\index{sysio::trace\_api::request\_handler$<$ LogfileProvider, DataHandlerProvider $>$@{sysio::trace\_api::request\_handler$<$ LogfileProvider, DataHandlerProvider $>$}!request\_handler@{request\_handler}}
+\index{request\_handler@{request\_handler}!sysio::trace\_api::request\_handler$<$ LogfileProvider, DataHandlerProvider $>$@{sysio::trace\_api::request\_handler$<$ LogfileProvider, DataHandlerProvider $>$}}
+\doxysubsubsection{\texorpdfstring{request\_handler()}{request\_handler()}}
+{\footnotesize\ttfamily \label{classsysio_1_1trace__api_1_1request__handler_a168e09856038bd115e121943bb4b28de} 
+template$<$typename Logfile\+Provider , typename Data\+Handler\+Provider $>$ \\
+\mbox{\hyperlink{classsysio_1_1trace__api_1_1request__handler}{sysio\+::trace\+\_\+api\+::request\+\_\+handler}}$<$ Logfile\+Provider, Data\+Handler\+Provider $>$\+::request\+\_\+handler (\begin{DoxyParamCaption}\item[{Logfile\+Provider \&\&}]{logfile\+\_\+provider}{, }\item[{Data\+Handler\+Provider \&\&}]{data\+\_\+handler\+\_\+provider}{, }\item[{\mbox{\hyperlink{namespacesysio_1_1trace__api_ac599662bf2df3135abffd5ff3adbca19}{log\+\_\+handler}}}]{log}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{request__handler_8hpp_source_l00021}{21}} of file \mbox{\hyperlink{request__handler_8hpp_source}{request\+\_\+handler.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ :logfile\_provider(std::move(logfile\_provider))}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ ,data\_handler\_provider(std::move(data\_handler\_provider))}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ ,\_log(log)}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \_log(\textcolor{stringliteral}{"{}Constructed\ request\_handler"{}});}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1trace__api_1_1request__handler_a8c834f0e13d54dd42ac3c6d2e978793f}\index{sysio::trace\_api::request\_handler$<$ LogfileProvider, DataHandlerProvider $>$@{sysio::trace\_api::request\_handler$<$ LogfileProvider, DataHandlerProvider $>$}!get\_block\_trace@{get\_block\_trace}}
+\index{get\_block\_trace@{get\_block\_trace}!sysio::trace\_api::request\_handler$<$ LogfileProvider, DataHandlerProvider $>$@{sysio::trace\_api::request\_handler$<$ LogfileProvider, DataHandlerProvider $>$}}
+\doxysubsubsection{\texorpdfstring{get\_block\_trace()}{get\_block\_trace()}}
+{\footnotesize\ttfamily \label{classsysio_1_1trace__api_1_1request__handler_a8c834f0e13d54dd42ac3c6d2e978793f} 
+template$<$typename Logfile\+Provider , typename Data\+Handler\+Provider $>$ \\
+\mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \mbox{\hyperlink{classsysio_1_1trace__api_1_1request__handler}{sysio\+::trace\+\_\+api\+::request\+\_\+handler}}$<$ Logfile\+Provider, Data\+Handler\+Provider $>$\+::get\+\_\+block\+\_\+trace (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{block\+\_\+height}{, }\item[{const \mbox{\hyperlink{namespacesysio_1_1trace__api_a24d1d2b642518b3d627011e7ef39ae9a}{yield\+\_\+function}} \&}]{yield}{ = {\ttfamily \{\}}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Fetch the trace for a given block height and convert it to a \doxylink{classfc_1_1variant}{fc\+::variant} for conversion to a final format (eg JSON)
+
+
+\begin{DoxyParams}{Parameters}
+{\em block\+\_\+height} & -\/ the height of the block whose trace is requested \\
+\hline
+{\em yield} & -\/ a yield function to allow cooperation during long running tasks \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a properly formatted variant representing the trace for the given block height if it exists, an empty variant otherwise. 
+\end{DoxyReturn}
+
+\begin{DoxyExceptions}{Exceptions}
+{\em \doxylink{classsysio_1_1trace__api_1_1yield__exception}{yield\+\_\+exception}} & if a call to {\ttfamily yield} throws. \\
+\hline
+{\em \doxylink{classsysio_1_1trace__api_1_1bad__data__exception}{bad\+\_\+data\+\_\+exception}} & when there are issues with the underlying data preventing processing. \\
+\hline
+\end{DoxyExceptions}
+
+
+Definition at line \mbox{\hyperlink{request__handler_8hpp_source_l00040}{40}} of file \mbox{\hyperlink{request__handler_8hpp_source}{request\+\_\+handler.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\})\ \{}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ data\ =\ logfile\_provider.get\_block(block\_height,\ yield);}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!data)\ \{}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \ \ \ \_log(\textcolor{stringliteral}{"{}No\ block\ found\ at\ block\ height\ "{}}\ +\ std::to\_string(block\_height)\ );}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{\};}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00046\ }
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceboost_1_1fibers_1_1asio_a65142b77539b20ba6d2abb35a0d4f5d2}{yield}}();}
+\DoxyCodeLine{00048\ }
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ data\_handler\ =\ [\textcolor{keyword}{this}](\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{structaction}{action}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1trace__api_a24d1d2b642518b3d627011e7ef39ae9a}{yield\_function}}\&\ \mbox{\hyperlink{namespaceboost_1_1fibers_1_1asio_a65142b77539b20ba6d2abb35a0d4f5d2}{yield}})\ -\/>\ std::tuple<\mbox{\hyperlink{classfc_1_1variant}{fc::variant}},\ std::optional<fc::variant>>\ \{}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::visit([\&](\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ action\_trace\_t)\ \{}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ data\_handler\_provider.serialize\_to\_variant(action\_trace\_t,\ yield);}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \ \ \},\ \mbox{\hyperlink{structaction}{action}});}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00054\ }
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1detail_1_1response__formatter_a0d5fa7307ab3dfca56f3892da858ccef}{detail::response\_formatter::process\_block}}(std::get<0>(*data),\ std::get<1>(*data),\ data\_handler,\ yield);}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1trace__api_1_1request__handler_aba4acfed2d43f5f8d74bd6d80e28f777}\index{sysio::trace\_api::request\_handler$<$ LogfileProvider, DataHandlerProvider $>$@{sysio::trace\_api::request\_handler$<$ LogfileProvider, DataHandlerProvider $>$}!get\_transaction\_trace@{get\_transaction\_trace}}
+\index{get\_transaction\_trace@{get\_transaction\_trace}!sysio::trace\_api::request\_handler$<$ LogfileProvider, DataHandlerProvider $>$@{sysio::trace\_api::request\_handler$<$ LogfileProvider, DataHandlerProvider $>$}}
+\doxysubsubsection{\texorpdfstring{get\_transaction\_trace()}{get\_transaction\_trace()}}
+{\footnotesize\ttfamily \label{classsysio_1_1trace__api_1_1request__handler_aba4acfed2d43f5f8d74bd6d80e28f777} 
+template$<$typename Logfile\+Provider , typename Data\+Handler\+Provider $>$ \\
+\mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \mbox{\hyperlink{classsysio_1_1trace__api_1_1request__handler}{sysio\+::trace\+\_\+api\+::request\+\_\+handler}}$<$ Logfile\+Provider, Data\+Handler\+Provider $>$\+::get\+\_\+transaction\+\_\+trace (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacesysio_1_1chain_aa85a3b49b3b219d1e3840567579e7e63}{chain\+::transaction\+\_\+id\+\_\+type}}}]{trxid}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{block\+\_\+height}{, }\item[{const \mbox{\hyperlink{namespacesysio_1_1trace__api_a24d1d2b642518b3d627011e7ef39ae9a}{yield\+\_\+function}} \&}]{yield}{ = {\ttfamily \{\}}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Fetch the trace for a given transaction id and convert it to a \doxylink{classfc_1_1variant}{fc\+::variant} for conversion to a final format (eg JSON)
+
+
+\begin{DoxyParams}{Parameters}
+{\em trxid} & -\/ the transaction id whose trace is requested \\
+\hline
+{\em block\+\_\+height} & -\/ the height of the block whose trace contains requested transaction trace \\
+\hline
+{\em yield} & -\/ a yield function to allow cooperation during long running tasks \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a properly formatted variant representing the trace for the given transaction id if it exists, an empty variant otherwise. 
+\end{DoxyReturn}
+
+\begin{DoxyExceptions}{Exceptions}
+{\em \doxylink{classsysio_1_1trace__api_1_1yield__exception}{yield\+\_\+exception}} & if a call to {\ttfamily yield} throws. \\
+\hline
+{\em \doxylink{classsysio_1_1trace__api_1_1bad__data__exception}{bad\+\_\+data\+\_\+exception}} & when there are issues with the underlying data preventing processing. \\
+\hline
+\end{DoxyExceptions}
+
+
+Definition at line \mbox{\hyperlink{request__handler_8hpp_source_l00070}{70}} of file \mbox{\hyperlink{request__handler_8hpp_source}{request\+\_\+handler.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\})\{}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \_log(\textcolor{stringliteral}{"{}get\_transaction\_trace\ called"{}}\ );}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}\ result\ =\ \{\};}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ extract\ the\ transaction\ trace\ from\ the\ block\ trace}}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ resp\ =\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1request__handler_a8c834f0e13d54dd42ac3c6d2e978793f}{get\_block\_trace}}(block\_height,\ yield);}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!resp.is\_null())\ \{}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ b\_mvo\ =\ resp.get\_object();}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (b\_mvo.contains(\textcolor{stringliteral}{"{}transactions"{}}))\ \{}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ transactions\ =\ b\_mvo[\textcolor{stringliteral}{"{}transactions"{}}];}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ input\_id\ =\ trxid.str();}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ i\ =\ 0;\ i\ <\ transactions.size();\ ++i)\ \{}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (transactions[i].is\_null())\ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ t\_mvo\ =\ transactions[i].get\_object();}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (t\_mvo.contains(\textcolor{stringliteral}{"{}id"{}}))\ \{}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ t\_id\ =\ t\_mvo[\textcolor{stringliteral}{"{}id"{}}].get\_string();}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (t\_id\ ==\ input\_id)\ \{}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ result\ =\ transactions[i];}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ result.is\_null()\ )}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_log(\textcolor{stringliteral}{"{}Exhausted\ all\ "{}}\ +\ std::to\_string(transactions.size())\ +\ \textcolor{stringliteral}{"{}\ transactions\ in\ block\ "{}}\ +\ b\_mvo[\textcolor{stringliteral}{"{}number"{}}].as\_string()\ +\ \textcolor{stringliteral}{"{}\ without\ finding\ trxid\ "{}}\ +\ trxid.str());}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+plugins/trace\+\_\+api\+\_\+plugin/include/sysio/trace\+\_\+api/\mbox{\hyperlink{request__handler_8hpp}{request\+\_\+handler.\+hpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,26 @@
+<map id="BOOST_AUTO_TEST_CASE" name="BOOST_AUTO_TEST_CASE">
+<area shape="rect" id="Node000001" title="Test automatic allocation when advancing the read_ptr to the end." alt="" coords="5,266,202,292"/>
+<area shape="rect" id="Node000002" href="$classfc_1_1message__buffer.html#a5c055debbcd5603bce13c26364836226" title=" " alt="" coords="260,5,396,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="108,265,126,225,156,170,197,110,248,57,254,52,257,56,251,61,201,114,161,173,131,227,113,267"/>
+<area shape="rect" id="Node000004" href="$classfc_1_1message__buffer.html#a22920e143abfb93de992f9a14607dea9" title=" " alt="" coords="261,71,394,111"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="112,264,165,198,204,158,248,122,257,117,259,121,251,126,208,162,169,202,116,267"/>
+<area shape="rect" id="Node000006" href="$classfc_1_1message__buffer.html#af4540535b3ef876e42631178c997e59b" title=" " alt="" coords="261,136,394,177"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="125,263,248,193,269,182,272,186,251,197,128,268"/>
+<area shape="rect" id="Node000007" href="$classfc_1_1message__buffer.html#ae7bf97576095b33852c68dbc3cd7737e" title=" " alt="" coords="478,164,612,205"/>
+<area shape="poly" id="edge10_Node000001_Node000007" title=" " alt="" coords="149,263,249,236,463,195,464,200,250,242,150,268"/>
+<area shape="rect" id="Node000008" href="$classfc_1_1message__buffer.html#a7d14c84a452f14a0616f90cc3771efa9" title=" " alt="" coords="250,251,406,307"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="202,276,234,276,234,282,202,282"/>
+<area shape="rect" id="Node000009" href="$classfc_1_1message__buffer.html#ae7cea2fb674c209dc11ca459156b2041" title=" " alt="" coords="261,331,394,371"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="147,290,248,323,247,328,145,295"/>
+<area shape="rect" id="Node000010" href="$classfc_1_1message__buffer.html#afa923dc3e69fb4409903c141e2e35a62" title=" " alt="" coords="261,396,394,437"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="123,290,178,333,251,381,262,386,259,391,248,385,175,337,119,294"/>
+<area shape="rect" id="Node000011" href="$classfc_1_1message__buffer.html#a84051edbb5bbe011122d7c94edb5070a" title=" " alt="" coords="261,461,394,502"/>
+<area shape="poly" id="edge11_Node000001_Node000011" title=" " alt="" coords="115,291,167,363,206,407,251,446,259,451,256,456,248,450,203,411,163,366,111,294"/>
+<area shape="rect" id="Node000012" href="$classfc_1_1message__buffer.html#a379d7b684cb512d44740c1e8731348d4" title=" " alt="" coords="261,527,394,567"/>
+<area shape="poly" id="edge12_Node000001_Node000012" title=" " alt="" coords="112,291,129,333,159,391,200,455,224,485,251,512,257,516,253,520,248,516,220,489,195,458,154,394,125,335,107,293"/>
+<area shape="rect" id="Node000003" href="$classfc_1_1message__buffer.html#a79e090da87bf9c39df42c98ee72c4917" title=" " alt="" coords="478,5,612,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="396,23,463,23,463,28,396,28"/>
+<area shape="rect" id="Node000005" href="$classfc_1_1message__buffer.html#a00128a76bfce283e52ceebd61c30a544" title=" " alt="" coords="454,71,636,111"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="395,88,438,88,438,94,395,94"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="395,162,464,171,463,176,394,168"/>
+</map>

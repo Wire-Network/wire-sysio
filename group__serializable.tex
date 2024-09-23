@@ -1,0 +1,28 @@
+\doxysection{Serializable \+\_\+types}
+\hypertarget{group__serializable}{}\label{group__serializable}\index{Serializable \_types@{Serializable \_types}}
+
+
+Clas\+\_\+ses that may be converted to/from an variant.  
+
+
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classfc_1_1exception}{fc\+::exception}}
+\begin{DoxyCompactList}\small\item\em Used to generate a useful error report when an exception is thrown. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{classfc_1_1unhandled__exception}{fc\+::unhandled\+\_\+exception}}
+\begin{DoxyCompactList}\small\item\em re-\/thrown whenever an unhandled exception is caught.
+
+Any exceptions thrown by 3rd party libraries that are not caught get wrapped in an \doxylink{classfc_1_1unhandled__exception}{unhandled\+\_\+exception} exception. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+To make a class \textquotesingle{}serializable\textquotesingle{} the following methods must be available for your Serializable\+\_\+type
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordtype}{void}\ \ \ \mbox{\hyperlink{namespacefc_adea61f2343de94d0fbcb920a32332ad9}{to\_variant}}(\ \textcolor{keyword}{const}\ Serializable\_type\&\ e,\ \mbox{\hyperlink{classfc_1_1variant}{variant}}\&\ v\ );}
+\DoxyCodeLine{\textcolor{keywordtype}{void}\ \ \ \mbox{\hyperlink{namespacefc_accef08adf4ee05c36ccc550d8101b08f}{from\_variant}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1variant}{variant}}\&\ e,\ Serializable\_type\&\ ll\ );}
+
+\end{DoxyCode}
+ 

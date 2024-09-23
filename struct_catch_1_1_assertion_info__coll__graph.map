@@ -1,0 +1,9 @@
+<map id="Catch::AssertionInfo" name="Catch::AssertionInfo">
+<area shape="rect" id="Node000001" title=" " alt="" coords="69,198,210,223"/>
+<area shape="rect" id="Node000002" href="$class_catch_1_1_string_ref.html" title=" " alt="" coords="5,94,125,120"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="65,135,66,154,74,172,86,185,102,195,99,199,83,189,69,175,61,156,59,135"/>
+<area shape="rect" id="Node000003" href="$struct_catch_1_1_source_line_info.html" title=" " alt="" coords="149,94,301,120"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="217,136,192,175,163,199,159,195,188,172,212,133"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="197,5,253,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="228,47,228,94,222,94,222,47"/>
+</map>

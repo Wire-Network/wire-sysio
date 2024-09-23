@@ -1,0 +1,92 @@
+\doxysection{testing\+::internal\+::Param\+Iterator\+Interface\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classtesting_1_1internal_1_1_param_iterator_interface}{}\label{classtesting_1_1internal_1_1_param_iterator_interface}\index{testing::internal::ParamIteratorInterface$<$ T $>$@{testing::internal::ParamIteratorInterface$<$ T $>$}}
+
+
+{\ttfamily \#include $<$gtest-\/param-\/util.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_interface_adf6ba49e6b54a6e3b15dbd5733988bef}{\texorpdfstring{$\sim$}{\string~}\+Param\+Iterator\+Interface}} ()
+\item 
+virtual const \mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator_interface}{Param\+Generator\+Interface}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_interface_a717c299a43b4db6c85b94b827276b8a1}{Base\+Generator}} () const =0
+\item 
+virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_interface_a600dbd35fcb551463e379516a1abea48}{Advance}} ()=0
+\item 
+virtual \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_interface}{Param\+Iterator\+Interface}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_interface_a1a320971ce300a235669fa340b7dda3f}{Clone}} () const =0
+\item 
+virtual const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_interface_a7a4cac3986c1c59a048f24f5c5e26bf4}{Current}} () const =0
+\item 
+virtual bool \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_interface_a9d811697a752d46f7bd6a0082f9040a3}{Equals}} (const \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_interface}{Param\+Iterator\+Interface}} \&other) const =0
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$\newline
+class testing\+::internal\+::\+Param\+Iterator\+Interface$<$ T $>$}
+
+
+Definition at line \mbox{\hyperlink{gtest-param-util_8h_source_l00088}{88}} of file \mbox{\hyperlink{gtest-param-util_8h_source}{gtest-\/param-\/util.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_param_iterator_interface_adf6ba49e6b54a6e3b15dbd5733988bef}\index{testing::internal::ParamIteratorInterface$<$ T $>$@{testing::internal::ParamIteratorInterface$<$ T $>$}!````~ParamIteratorInterface@{\texorpdfstring{$\sim$}{\string~}ParamIteratorInterface}}
+\index{````~ParamIteratorInterface@{\texorpdfstring{$\sim$}{\string~}ParamIteratorInterface}!testing::internal::ParamIteratorInterface$<$ T $>$@{testing::internal::ParamIteratorInterface$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}ParamIteratorInterface()}{\string~ParamIteratorInterface()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_param_iterator_interface_adf6ba49e6b54a6e3b15dbd5733988bef} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+virtual \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_interface}{testing\+::internal\+::\+Param\+Iterator\+Interface}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::\texorpdfstring{$\sim$}{\string~}\mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_interface}{Param\+Iterator\+Interface}} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-param-util_8h_source_l00090}{90}} of file \mbox{\hyperlink{gtest-param-util_8h_source}{gtest-\/param-\/util.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00090\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_param_iterator_interface_a600dbd35fcb551463e379516a1abea48}\index{testing::internal::ParamIteratorInterface$<$ T $>$@{testing::internal::ParamIteratorInterface$<$ T $>$}!Advance@{Advance}}
+\index{Advance@{Advance}!testing::internal::ParamIteratorInterface$<$ T $>$@{testing::internal::ParamIteratorInterface$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{Advance()}{Advance()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_param_iterator_interface_a600dbd35fcb551463e379516a1abea48} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_interface}{testing\+::internal\+::\+Param\+Iterator\+Interface}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::\+Advance (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+\Hypertarget{classtesting_1_1internal_1_1_param_iterator_interface_a717c299a43b4db6c85b94b827276b8a1}\index{testing::internal::ParamIteratorInterface$<$ T $>$@{testing::internal::ParamIteratorInterface$<$ T $>$}!BaseGenerator@{BaseGenerator}}
+\index{BaseGenerator@{BaseGenerator}!testing::internal::ParamIteratorInterface$<$ T $>$@{testing::internal::ParamIteratorInterface$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{BaseGenerator()}{BaseGenerator()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_param_iterator_interface_a717c299a43b4db6c85b94b827276b8a1} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+virtual const \mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator_interface}{Param\+Generator\+Interface}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_interface}{testing\+::internal\+::\+Param\+Iterator\+Interface}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::\+Base\+Generator (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+\Hypertarget{classtesting_1_1internal_1_1_param_iterator_interface_a1a320971ce300a235669fa340b7dda3f}\index{testing::internal::ParamIteratorInterface$<$ T $>$@{testing::internal::ParamIteratorInterface$<$ T $>$}!Clone@{Clone}}
+\index{Clone@{Clone}!testing::internal::ParamIteratorInterface$<$ T $>$@{testing::internal::ParamIteratorInterface$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{Clone()}{Clone()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_param_iterator_interface_a1a320971ce300a235669fa340b7dda3f} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+virtual \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_interface}{Param\+Iterator\+Interface}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_interface}{testing\+::internal\+::\+Param\+Iterator\+Interface}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::\+Clone (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+\Hypertarget{classtesting_1_1internal_1_1_param_iterator_interface_a7a4cac3986c1c59a048f24f5c5e26bf4}\index{testing::internal::ParamIteratorInterface$<$ T $>$@{testing::internal::ParamIteratorInterface$<$ T $>$}!Current@{Current}}
+\index{Current@{Current}!testing::internal::ParamIteratorInterface$<$ T $>$@{testing::internal::ParamIteratorInterface$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{Current()}{Current()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_param_iterator_interface_a7a4cac3986c1c59a048f24f5c5e26bf4} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+virtual const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_interface}{testing\+::internal\+::\+Param\+Iterator\+Interface}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::\+Current (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+\Hypertarget{classtesting_1_1internal_1_1_param_iterator_interface_a9d811697a752d46f7bd6a0082f9040a3}\index{testing::internal::ParamIteratorInterface$<$ T $>$@{testing::internal::ParamIteratorInterface$<$ T $>$}!Equals@{Equals}}
+\index{Equals@{Equals}!testing::internal::ParamIteratorInterface$<$ T $>$@{testing::internal::ParamIteratorInterface$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{Equals()}{Equals()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_param_iterator_interface_a9d811697a752d46f7bd6a0082f9040a3} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+virtual bool \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_interface}{testing\+::internal\+::\+Param\+Iterator\+Interface}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::\+Equals (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_interface}{Param\+Iterator\+Interface}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&}]{other}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/include/gtest/internal/\mbox{\hyperlink{gtest-param-util_8h}{gtest-\/param-\/util.\+h}}\end{DoxyCompactItemize}

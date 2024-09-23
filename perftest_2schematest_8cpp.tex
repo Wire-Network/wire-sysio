@@ -1,0 +1,97 @@
+\doxysection{libraries/fc/include/fc/crypto/webauthn\+\_\+json/test/perftest/schematest.cpp File Reference}
+\hypertarget{perftest_2schematest_8cpp}{}\label{perftest_2schematest_8cpp}\index{libraries/fc/include/fc/crypto/webauthn\_json/test/perftest/schematest.cpp@{libraries/fc/include/fc/crypto/webauthn\_json/test/perftest/schematest.cpp}}
+{\ttfamily \#include "{}perftest.\+h"{}}\newline
+{\ttfamily \#include "{}rapidjson/schema.\+h"{}}\newline
+{\ttfamily \#include $<$ctime$>$}\newline
+{\ttfamily \#include $<$string$>$}\newline
+{\ttfamily \#include $<$vector$>$}\newline
+Include dependency graph for schematest.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{perftest_2schematest_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{class_schema}{Schema}}
+\item 
+struct \mbox{\hyperlink{struct_schema_1_1_test_suite}{Schema\+::\+Test\+Suite}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{perftest_2schematest_8cpp_a25f003de16c08a4888b69f619d70f427}{ARRAY\+\_\+\+SIZE}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{perftest_2schematest_8cpp_a2c5e22c20fbad50bc8a47803b79d552e}{TEST\+\_\+F}} (\mbox{\hyperlink{class_schema}{Schema}}, Test\+Suite)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{perftest_2schematest_8cpp_a25f003de16c08a4888b69f619d70f427}\index{schematest.cpp@{schematest.cpp}!ARRAY\_SIZE@{ARRAY\_SIZE}}
+\index{ARRAY\_SIZE@{ARRAY\_SIZE}!schematest.cpp@{schematest.cpp}}
+\doxysubsubsection{\texorpdfstring{ARRAY\_SIZE}{ARRAY\_SIZE}}
+{\footnotesize\ttfamily \label{perftest_2schematest_8cpp_a25f003de16c08a4888b69f619d70f427} 
+\#define ARRAY\+\_\+\+SIZE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{sizeof}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})\ /\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}[0])}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{perftest_2schematest_8cpp_source_l00010}{10}} of file \mbox{\hyperlink{perftest_2schematest_8cpp_source}{schematest.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{perftest_2schematest_8cpp_a2c5e22c20fbad50bc8a47803b79d552e}\index{schematest.cpp@{schematest.cpp}!TEST\_F@{TEST\_F}}
+\index{TEST\_F@{TEST\_F}!schematest.cpp@{schematest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_F()}{TEST\_F()}}
+{\footnotesize\ttfamily \label{perftest_2schematest_8cpp_a2c5e22c20fbad50bc8a47803b79d552e} 
+TEST\+\_\+F (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_schema}{Schema}}}]{}{, }\item[{Test\+Suite}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{perftest_2schematest_8cpp_source_l00198}{198}} of file \mbox{\hyperlink{perftest_2schematest_8cpp_source}{schematest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00199\ \ \ \ \ \textcolor{keywordtype}{char}\ validatorBuffer[65536];}
+\DoxyCodeLine{00200\ \ \ \ \ \mbox{\hyperlink{class_memory_pool_allocator}{MemoryPoolAllocator<>}}\ validatorAllocator(validatorBuffer,\ \textcolor{keyword}{sizeof}(validatorBuffer));}
+\DoxyCodeLine{00201\ }
+\DoxyCodeLine{00202\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ trialCount\ =\ 100000;}
+\DoxyCodeLine{00203\ \ \ \ \ \textcolor{keywordtype}{int}\ testCount\ =\ 0;}
+\DoxyCodeLine{00204\ \ \ \ \ clock\_t\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103aea2b2676c28c0db26d39331a336c6b92}{start}}\ =\ clock();}
+\DoxyCodeLine{00205\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ trialCount;\ i++)\ \{}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (TestSuiteList::const\_iterator\ itr\ =\ testSuites.begin();\ itr\ !=\ testSuites.end();\ ++itr)\ \{}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ TestSuite\&\ ts\ =\ **itr;}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_schema_validator}{GenericSchemaValidator<SchemaDocument,\ BaseReaderHandler<UTF8<>}}\ >,\ \mbox{\hyperlink{class_memory_pool_allocator}{MemoryPoolAllocator<>}}\ >\ \ validator(*ts.schema,\ \&validatorAllocator);}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (DocumentList::const\_iterator\ testItr\ =\ ts.tests.begin();\ testItr\ !=\ ts.tests.end();\ ++testItr)\ \{}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ validator.Reset();}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (*testItr)-\/>Accept(validator);}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ testCount++;}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ \ \ \ \ validatorAllocator.Clear();}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00216\ \ \ \ \ \}}
+\DoxyCodeLine{00217\ \ \ \ \ clock\_t\ end\ =\ clock();}
+\DoxyCodeLine{00218\ \ \ \ \ \textcolor{keywordtype}{double}\ duration\ =\ double(end\ -\/\ start)\ /\ CLOCKS\_PER\_SEC;}
+\DoxyCodeLine{00219\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\%d\ trials\ in\ \%f\ s\ -\/>\ \%f\ trials\ per\ sec\(\backslash\)n"{}},\ trialCount,\ duration,\ trialCount\ /\ duration);}
+\DoxyCodeLine{00220\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\%d\ tests\ per\ trial\(\backslash\)n"{}},\ testCount\ /\ trialCount);}
+\DoxyCodeLine{00221\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=292pt]{perftest_2schematest_8cpp_a2c5e22c20fbad50bc8a47803b79d552e_cgraph}
+\end{center}
+\end{figure}

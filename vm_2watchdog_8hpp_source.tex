@@ -1,0 +1,86 @@
+\doxysection{watchdog.\+hpp}
+\hypertarget{vm_2watchdog_8hpp_source}{}\label{vm_2watchdog_8hpp_source}\index{libraries/sys-\/vm/include/sysio/vm/watchdog.hpp@{libraries/sys-\/vm/include/sysio/vm/watchdog.hpp}}
+\mbox{\hyperlink{vm_2watchdog_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <chrono>}}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <functional>}}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <thread>}}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <mutex>}}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <condition\_variable>}}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00009}00009\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{\ \textcolor{keyword}{namespace\ }vm\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00013}\mbox{\hyperlink{classsysio_1_1vm_1_1watchdog}{00013}}\ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1vm_1_1watchdog}{watchdog}}\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00014}00014\ \ \ \ \ \ \ \textcolor{keyword}{class\ }guard;}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00015}00015\ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00018}00018\ \ \ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ TimeUnits>}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00019}\mbox{\hyperlink{classsysio_1_1vm_1_1watchdog_adde1058f7ddf2e05fbc4b88aedff358f}{00019}}\ \ \ \ \ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classsysio_1_1vm_1_1watchdog_adde1058f7ddf2e05fbc4b88aedff358f}{watchdog}}(\textcolor{keyword}{const}\ TimeUnits\&\ duration)\ :\ \_duration(duration)\ \{\}}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00025}00025\ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ F>}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00026}\mbox{\hyperlink{classsysio_1_1vm_1_1watchdog_ad5c68209f9c3174da6785c6c9afc084d}{00026}}\ \ \ \ \ \ \ [[nodiscard]]\ guard\ \mbox{\hyperlink{classsysio_1_1vm_1_1watchdog_ad5c68209f9c3174da6785c6c9afc084d}{scoped\_run}}(F\&\&\ callback)\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00027}00027\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ guard(\_duration,\ \textcolor{keyword}{static\_cast<}F\&\&\textcolor{keyword}{>}(callback));}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00028}00028\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00030}00030\ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00031}00031\ \ \ \ \ \ \ \textcolor{keyword}{class\ }guard\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00032}00032\ \ \ \ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00033}00033\ \ \ \ \ \ \ \ \ \ guard(\textcolor{keyword}{const}\ guard\&)\ =\ \textcolor{keyword}{delete};}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00034}00034\ \ \ \ \ \ \ \ \ \ guard\&\ operator=(\textcolor{keyword}{const}\ guard\&)\ =\ \textcolor{keyword}{delete};}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00036}00036\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ TimeUnits,\ \textcolor{keyword}{typename}\ F>}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00037}00037\ \ \ \ \ \ \ \ \ \ guard(\textcolor{keyword}{const}\ TimeUnits\&\ duration,\ F\&\&\ callback)}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00038}00038\ \ \ \ \ \ \ \ \ \ \ \ \ :\ \_callback(static\_cast<F\&\&>(callback)),}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00039}00039\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_run\_state(running),}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00040}00040\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_duration(duration),}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00041}00041\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_start(\mbox{\hyperlink{namespacestd}{std}}::chrono::steady\_clock::now())\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00042}00042\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Must\ be\ started\ after\ all\ other\ initialization\ to\ avoid\ races.}}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00043}00043\ \ \ \ \ \ \ \ \ \ \ \ \ \_timer\ =\ std::thread(\&guard::runner,\ \textcolor{keyword}{this});}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00044}00044\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00045}00045\ \ \ \ \ \ \ \ \ \ \string~guard()\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00046}00046\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00047}00047\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \_lock\ =\ std::unique\_lock(\_mutex);}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_run\_state\ =\ stopped;}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00050}00050\ \ \ \ \ \ \ \ \ \ \ \ \ \_cond.notify\_one();}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00051}00051\ \ \ \ \ \ \ \ \ \ \ \ \ \_timer.join();}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00054}00054\ \ \ \ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ worker\ thread}}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Implementation\ notes:\ This\ implementation\ creates\ a\ thread\ for}}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ each\ watchdog.\ \ If\ there\ are\ many\ watchdogs,\ it\ might\ be\ more}}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ efficient\ to\ create\ a\ single\ thread\ for\ them\ all.}}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00059}00059\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ runner()\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \_lock\ =\ std::unique\_lock(\_mutex);}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00061}00061\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ wait\ until\ the\ timer\ expires\ or\ someone\ stops\ it.}}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00062}00062\ \ \ \ \ \ \ \ \ \ \ \ \ \_cond.wait\_until(\_lock,\ \_start\ +\ \_duration,\ [\&]()\ \{\ \textcolor{keywordflow}{return}\ \_run\_state\ !=\ running;\ \});}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\_run\_state\ ==\ running)\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00064}00064\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_run\_state\ =\ interrupted;}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00065}00065\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_callback();}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00066}00066\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00067}00067\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{enum}\ \mbox{\hyperlink{structstate__t}{state\_t}}\ \{\ running,\ interrupted,\ stopped\ \};}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ }time\_point\_type\ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ std::chrono::time\_point<std::chrono::steady\_clock>;}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ }duration\_type\ =\ std::chrono::steady\_clock::duration;}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00071}00071\ \ \ \ \ \ \ \ \ \ std::thread\ \ \ \ \ \ \ \ \ \ \ \_timer;}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00072}00072\ \ \ \ \ \ \ \ \ \ std::mutex\ \ \ \ \ \ \ \ \ \ \ \ \_mutex;}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00073}00073\ \ \ \ \ \ \ \ \ \ std::condition\_variable\ \_cond;}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00074}00074\ \ \ \ \ \ \ \ \ \ std::function<void()>\ \_callback;}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00075}00075\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate__t}{state\_t}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_run\_state\ =\ stopped;}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00076}00076\ \ \ \ \ \ \ \ \ \ duration\_type\ \ \ \ \ \ \ \ \ \_duration;}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00077}00077\ \ \ \ \ \ \ \ \ \ time\_point\_type\ \ \ \ \ \ \ \_start;}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00078}00078\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00079}00079\ \ \ \ \ \ \ std::chrono::steady\_clock::duration\ \_duration;}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00080}00080\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00081}00081\ }
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00082}\mbox{\hyperlink{classsysio_1_1vm_1_1null__watchdog}{00082}}\ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1vm_1_1null__watchdog}{null\_watchdog}}\ \{}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00083}00083\ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00084}00084\ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ F>}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00085}\mbox{\hyperlink{classsysio_1_1vm_1_1null__watchdog_a05513b8512b6337cdc26fcb932753307}{00085}}\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1null__watchdog}{null\_watchdog}}\ \mbox{\hyperlink{classsysio_1_1vm_1_1null__watchdog_a05513b8512b6337cdc26fcb932753307}{scoped\_run}}(F\&\&)\ \{\ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};\ \}}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00086}\mbox{\hyperlink{classsysio_1_1vm_1_1null__watchdog_a13968d56a43f0e640c4d4441e362d109}{00086}}\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1null__watchdog_a13968d56a43f0e640c4d4441e362d109}{\string~null\_watchdog}}()\ \{\}\ \textcolor{comment}{//\ avoid\ unused\ variable\ warnings}}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00087}00087\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00088}00088\ }
+\DoxyCodeLine{\Hypertarget{vm_2watchdog_8hpp_source_l00089}00089\ \}\}\ \textcolor{comment}{//\ namespace\ sysio::vm}}
+
+\end{DoxyCode}

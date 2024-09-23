@@ -1,0 +1,163 @@
+\doxysection{libraries/yubihsm/src/yubihsm-\/shell.h File Reference}
+\hypertarget{yubihsm-shell_8h}{}\label{yubihsm-shell_8h}\index{libraries/yubihsm/src/yubihsm-\/shell.h@{libraries/yubihsm/src/yubihsm-\/shell.h}}
+{\ttfamily \#include $<$assert.\+h$>$}\newline
+{\ttfamily \#include $<$yubihsm.\+h$>$}\newline
+{\ttfamily \#include $<$ykyh.\+h$>$}\newline
+{\ttfamily \#include $<$cmdline.\+h$>$}\newline
+Include dependency graph for yubihsm-\/shell.h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{yubihsm-shell_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=329pt]{yubihsm-shell_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structyubihsm__context}{yubihsm\+\_\+context}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{yubihsm-shell_8h_a86d500a34c624c2cae56bc25a31b12f3}{UNUSED}}(x)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{yubihsm-shell_8h_a78db5959e08d52cc64e7032bf1b1e708}{cmd\+\_\+format}} \{ \newline
+\mbox{\hyperlink{yubihsm-shell_8h_a78db5959e08d52cc64e7032bf1b1e708a499429c2fb9763bdca869915d60d3740}{fmt\+\_\+nofmt}}
+, \mbox{\hyperlink{yubihsm-shell_8h_a78db5959e08d52cc64e7032bf1b1e708add674d756d2c6341a834a330a874b550}{fmt\+\_\+base64}}
+, \mbox{\hyperlink{yubihsm-shell_8h_a78db5959e08d52cc64e7032bf1b1e708a701725c70fb214e14a2feee390939a09}{fmt\+\_\+binary}}
+, \mbox{\hyperlink{yubihsm-shell_8h_a78db5959e08d52cc64e7032bf1b1e708acce29e9764c448874d69cb6c90b02401}{fmt\+\_\+hex}}
+, \newline
+\mbox{\hyperlink{yubihsm-shell_8h_a78db5959e08d52cc64e7032bf1b1e708aa8908f2c651567ae288c587240e71d3e}{fmt\+\_\+\+PEM}}
+, \mbox{\hyperlink{yubihsm-shell_8h_a78db5959e08d52cc64e7032bf1b1e708ad58942468b13601c21c14f2269dbca57}{fmt\+\_\+password}}
+, \mbox{\hyperlink{yubihsm-shell_8h_a78db5959e08d52cc64e7032bf1b1e708a4fff5e64ffe63c6c03b00438c0b09282}{fmt\+\_\+\+ASCII}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{yubihsm-shell_8h_a3170cae4a8a99a70e6aa1b7d41ecc4c8}{actions\+\_\+run}} (struct gengetopt\+\_\+args\+\_\+info \texorpdfstring{$\ast$}{*}args\+\_\+info)
+\item 
+int \mbox{\hyperlink{yubihsm-shell_8h_ab7701f74a496b63bef193d6595005124}{do\+\_\+put\+\_\+key}} (\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}enc\+\_\+key, \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}mac\+\_\+key, \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{yubihsm__pkcs11_8c_ada12860f8f9f5f3cac5b179ef352434c}{key\+\_\+id}}, \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{yubihsm__pkcs11_8c_a5420fd4d2f76428942c2716b1cb7e863}{domains}}, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{yubihsm__pkcs11_8c_a08393519edfd7c59fb01fb8db97514b5}{capabilities}}, \mbox{\hyperlink{structyh__session}{yh\+\_\+session}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__shell__tests_8c_a06390486523e3578750748be3bea88d4}{ses}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{yubihsm-shell_8h_a86d500a34c624c2cae56bc25a31b12f3}\index{yubihsm-\/shell.h@{yubihsm-\/shell.h}!UNUSED@{UNUSED}}
+\index{UNUSED@{UNUSED}!yubihsm-\/shell.h@{yubihsm-\/shell.h}}
+\doxysubsubsection{\texorpdfstring{UNUSED}{UNUSED}}
+{\footnotesize\ttfamily \label{yubihsm-shell_8h_a86d500a34c624c2cae56bc25a31b12f3} 
+\#define UNUSED(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(void)\ (x)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{yubihsm-shell_8h_source_l00026}{26}} of file \mbox{\hyperlink{yubihsm-shell_8h_source}{yubihsm-\/shell.\+h}}.
+
+
+
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{yubihsm-shell_8h_a78db5959e08d52cc64e7032bf1b1e708}\index{yubihsm-\/shell.h@{yubihsm-\/shell.h}!cmd\_format@{cmd\_format}}
+\index{cmd\_format@{cmd\_format}!yubihsm-\/shell.h@{yubihsm-\/shell.h}}
+\doxysubsubsection{\texorpdfstring{cmd\_format}{cmd\_format}}
+{\footnotesize\ttfamily \label{yubihsm-shell_8h_a78db5959e08d52cc64e7032bf1b1e708} 
+enum \mbox{\hyperlink{yubihsm-shell_8h_a78db5959e08d52cc64e7032bf1b1e708}{cmd\+\_\+format}}}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{fmt\_nofmt@{fmt\_nofmt}!yubihsm-\/shell.h@{yubihsm-\/shell.h}}\index{yubihsm-\/shell.h@{yubihsm-\/shell.h}!fmt\_nofmt@{fmt\_nofmt}}}\Hypertarget{yubihsm-shell_8h_a78db5959e08d52cc64e7032bf1b1e708a499429c2fb9763bdca869915d60d3740}\label{yubihsm-shell_8h_a78db5959e08d52cc64e7032bf1b1e708} 
+fmt\+\_\+nofmt&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{fmt\_base64@{fmt\_base64}!yubihsm-\/shell.h@{yubihsm-\/shell.h}}\index{yubihsm-\/shell.h@{yubihsm-\/shell.h}!fmt\_base64@{fmt\_base64}}}\Hypertarget{yubihsm-shell_8h_a78db5959e08d52cc64e7032bf1b1e708add674d756d2c6341a834a330a874b550}\label{yubihsm-shell_8h_a78db5959e08d52cc64e7032bf1b1e708} 
+fmt\+\_\+base64&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{fmt\_binary@{fmt\_binary}!yubihsm-\/shell.h@{yubihsm-\/shell.h}}\index{yubihsm-\/shell.h@{yubihsm-\/shell.h}!fmt\_binary@{fmt\_binary}}}\Hypertarget{yubihsm-shell_8h_a78db5959e08d52cc64e7032bf1b1e708a701725c70fb214e14a2feee390939a09}\label{yubihsm-shell_8h_a78db5959e08d52cc64e7032bf1b1e708} 
+fmt\+\_\+binary&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{fmt\_hex@{fmt\_hex}!yubihsm-\/shell.h@{yubihsm-\/shell.h}}\index{yubihsm-\/shell.h@{yubihsm-\/shell.h}!fmt\_hex@{fmt\_hex}}}\Hypertarget{yubihsm-shell_8h_a78db5959e08d52cc64e7032bf1b1e708acce29e9764c448874d69cb6c90b02401}\label{yubihsm-shell_8h_a78db5959e08d52cc64e7032bf1b1e708} 
+fmt\+\_\+hex&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{fmt\_PEM@{fmt\_PEM}!yubihsm-\/shell.h@{yubihsm-\/shell.h}}\index{yubihsm-\/shell.h@{yubihsm-\/shell.h}!fmt\_PEM@{fmt\_PEM}}}\Hypertarget{yubihsm-shell_8h_a78db5959e08d52cc64e7032bf1b1e708aa8908f2c651567ae288c587240e71d3e}\label{yubihsm-shell_8h_a78db5959e08d52cc64e7032bf1b1e708} 
+fmt\+\_\+\+PEM&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{fmt\_password@{fmt\_password}!yubihsm-\/shell.h@{yubihsm-\/shell.h}}\index{yubihsm-\/shell.h@{yubihsm-\/shell.h}!fmt\_password@{fmt\_password}}}\Hypertarget{yubihsm-shell_8h_a78db5959e08d52cc64e7032bf1b1e708ad58942468b13601c21c14f2269dbca57}\label{yubihsm-shell_8h_a78db5959e08d52cc64e7032bf1b1e708} 
+fmt\+\_\+password&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{fmt\_ASCII@{fmt\_ASCII}!yubihsm-\/shell.h@{yubihsm-\/shell.h}}\index{yubihsm-\/shell.h@{yubihsm-\/shell.h}!fmt\_ASCII@{fmt\_ASCII}}}\Hypertarget{yubihsm-shell_8h_a78db5959e08d52cc64e7032bf1b1e708a4fff5e64ffe63c6c03b00438c0b09282}\label{yubihsm-shell_8h_a78db5959e08d52cc64e7032bf1b1e708} 
+fmt\+\_\+\+ASCII&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{yubihsm-shell_8h_source_l00028}{28}} of file \mbox{\hyperlink{yubihsm-shell_8h_source}{yubihsm-\/shell.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00029\ \ \ \mbox{\hyperlink{yubihsm-shell_8h_a78db5959e08d52cc64e7032bf1b1e708a499429c2fb9763bdca869915d60d3740}{fmt\_nofmt}},}
+\DoxyCodeLine{00030\ \ \ \mbox{\hyperlink{yubihsm-shell_8h_a78db5959e08d52cc64e7032bf1b1e708add674d756d2c6341a834a330a874b550}{fmt\_base64}},}
+\DoxyCodeLine{00031\ \ \ \mbox{\hyperlink{yubihsm-shell_8h_a78db5959e08d52cc64e7032bf1b1e708a701725c70fb214e14a2feee390939a09}{fmt\_binary}},}
+\DoxyCodeLine{00032\ \ \ \mbox{\hyperlink{yubihsm-shell_8h_a78db5959e08d52cc64e7032bf1b1e708acce29e9764c448874d69cb6c90b02401}{fmt\_hex}},}
+\DoxyCodeLine{00033\ \ \ \mbox{\hyperlink{yubihsm-shell_8h_a78db5959e08d52cc64e7032bf1b1e708aa8908f2c651567ae288c587240e71d3e}{fmt\_PEM}},}
+\DoxyCodeLine{00034\ \ \ \mbox{\hyperlink{yubihsm-shell_8h_a78db5959e08d52cc64e7032bf1b1e708ad58942468b13601c21c14f2269dbca57}{fmt\_password}},}
+\DoxyCodeLine{00035\ \ \ \mbox{\hyperlink{yubihsm-shell_8h_a78db5959e08d52cc64e7032bf1b1e708a4fff5e64ffe63c6c03b00438c0b09282}{fmt\_ASCII}}}
+\DoxyCodeLine{00036\ \}\ \mbox{\hyperlink{yubihsm-shell_8h_a78db5959e08d52cc64e7032bf1b1e708}{cmd\_format}};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{yubihsm-shell_8h_a3170cae4a8a99a70e6aa1b7d41ecc4c8}\index{yubihsm-\/shell.h@{yubihsm-\/shell.h}!actions\_run@{actions\_run}}
+\index{actions\_run@{actions\_run}!yubihsm-\/shell.h@{yubihsm-\/shell.h}}
+\doxysubsubsection{\texorpdfstring{actions\_run()}{actions\_run()}}
+{\footnotesize\ttfamily \label{yubihsm-shell_8h_a3170cae4a8a99a70e6aa1b7d41ecc4c8} 
+int actions\+\_\+run (\begin{DoxyParamCaption}\item[{struct gengetopt\+\_\+args\+\_\+info \texorpdfstring{$\ast$}{*}}]{args\+\_\+info}{}\end{DoxyParamCaption})}
+
+\Hypertarget{yubihsm-shell_8h_ab7701f74a496b63bef193d6595005124}\index{yubihsm-\/shell.h@{yubihsm-\/shell.h}!do\_put\_key@{do\_put\_key}}
+\index{do\_put\_key@{do\_put\_key}!yubihsm-\/shell.h@{yubihsm-\/shell.h}}
+\doxysubsubsection{\texorpdfstring{do\_put\_key()}{do\_put\_key()}}
+{\footnotesize\ttfamily \label{yubihsm-shell_8h_ab7701f74a496b63bef193d6595005124} 
+int do\+\_\+put\+\_\+key (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{enc\+\_\+key}{, }\item[{\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{mac\+\_\+key}{, }\item[{\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}}}]{key\+\_\+id}{, }\item[{\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}}}]{domains}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{capabilities}{, }\item[{\mbox{\hyperlink{structyh__session}{yh\+\_\+session}} \texorpdfstring{$\ast$}{*}}]{ses}{}\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}\index{yubihsm-\/shell.h@{yubihsm-\/shell.h}!format@{format}}
+\index{format@{format}!yubihsm-\/shell.h@{yubihsm-\/shell.h}}
+\doxysubsubsection{\texorpdfstring{format}{format}}
+{\footnotesize\ttfamily \label{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97} 
+\mbox{\hyperlink{yubihsm-shell_8h_a78db5959e08d52cc64e7032bf1b1e708}{cmd\+\_\+format}} format}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm-shell_8h_source_l00040}{40}} of file \mbox{\hyperlink{yubihsm-shell_8h_source}{yubihsm-\/shell.\+h}}.
+
+\Hypertarget{yubihsm-shell_8h_a8f8f80d37794cde9472343e4487ba3eb}\index{yubihsm-\/shell.h@{yubihsm-\/shell.h}!name@{name}}
+\index{name@{name}!yubihsm-\/shell.h@{yubihsm-\/shell.h}}
+\doxysubsubsection{\texorpdfstring{name}{name}}
+{\footnotesize\ttfamily \label{yubihsm-shell_8h_a8f8f80d37794cde9472343e4487ba3eb} 
+const char\texorpdfstring{$\ast$}{*} name}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm-shell_8h_source_l00039}{39}} of file \mbox{\hyperlink{yubihsm-shell_8h_source}{yubihsm-\/shell.\+h}}.
+

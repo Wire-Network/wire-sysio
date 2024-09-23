@@ -1,0 +1,19 @@
+<map id="libraries/fc/secp256k1/secp256k1/src/scalar.h" name="libraries/fc/secp256k1/secp256k1/src/scalar.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="26,5,186,46"/>
+<area shape="rect" id="Node000002" href="$fc_2secp256k1_2secp256k1_2src_2util_8h.html" title=" " alt="" coords="132,94,181,120"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="121,45,143,79,138,82,116,48"/>
+<area shape="rect" id="Node000008" href="$scalar__8x32_8h.html" title=" " alt="" coords="5,94,108,120"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="96,48,74,82,70,79,91,45"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="113,168,176,193"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="157,120,152,153,146,152,152,119"/>
+<area shape="rect" id="Node000004" href="$stdint_8h.html" title=" " alt="" coords="24,168,89,193"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="141,122,87,160,84,156,138,118"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="148,241,211,267"/>
+<area shape="poly" id="edge7_Node000002_Node000005" title=" " alt="" coords="168,119,181,140,191,167,194,198,190,227,184,226,188,198,186,168,176,143,163,122"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="252,168,312,193"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="179,118,249,157,246,162,176,123"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="79,192,147,231,144,236,76,196"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="23,241,90,267"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="59,194,59,226,54,226,54,194"/>
+<area shape="poly" id="edge9_Node000008_Node000004" title=" " alt="" coords="59,120,59,152,54,152,54,120"/>
+</map>

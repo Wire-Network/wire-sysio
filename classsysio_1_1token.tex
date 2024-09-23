@@ -1,0 +1,487 @@
+\doxysection{sysio\+::token Class Reference}
+\hypertarget{classsysio_1_1token}{}\label{classsysio_1_1token}\index{sysio::token@{sysio::token}}
+
+
+{\ttfamily \#include $<$sysio.\+token.\+hpp$>$}
+
+
+
+Inheritance diagram for sysio\+::token\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=149pt]{classsysio_1_1token__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for sysio\+::token\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=149pt]{classsysio_1_1token__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{classsysio_1_1token_a0b33aaf5b397ec3fa9ef8aae43c034dc}{create\+\_\+action}} = sysio\+::action\+\_\+wrapper$<$"{}create"{}\+\_\+n, \&\mbox{\hyperlink{classsysio_1_1token_a27f5ce106975915ac27305c724295b57}{token\+::create}}$>$
+\item 
+using \mbox{\hyperlink{classsysio_1_1token_a03e64f227cb14be0979e35e6cac78617}{issue\+\_\+action}} = sysio\+::action\+\_\+wrapper$<$"{}issue"{}\+\_\+n, \&\mbox{\hyperlink{classsysio_1_1token_a75467d50fd202f98187877e822eba564}{token\+::issue}}$>$
+\item 
+using \mbox{\hyperlink{classsysio_1_1token_ac4bb977ff9ae54c674a56d4cafbb0b1c}{retire\+\_\+action}} = sysio\+::action\+\_\+wrapper$<$"{}retire"{}\+\_\+n, \&\mbox{\hyperlink{classsysio_1_1token_a992c14eabff6f66c05d4b0d0a9f08f5d}{token\+::retire}}$>$
+\item 
+using \mbox{\hyperlink{classsysio_1_1token_a104313ae127b80733cf26925f5246379}{transfer\+\_\+action}} = sysio\+::action\+\_\+wrapper$<$"{}transfer"{}\+\_\+n, \&\mbox{\hyperlink{classsysio_1_1token_ab64ba816fc29c53f1e06367aa786588a}{token\+::transfer}}$>$
+\item 
+using \mbox{\hyperlink{classsysio_1_1token_a2eae1df3efabd124c6a6f2d0f59be2ae}{open\+\_\+action}} = sysio\+::action\+\_\+wrapper$<$"{}open"{}\+\_\+n, \&\mbox{\hyperlink{classsysio_1_1token_af9ccc6b22fdc9133b987f1f171f2bf06}{token\+::open}}$>$
+\item 
+using \mbox{\hyperlink{classsysio_1_1token_a75f6049f45800620ff1adb68c2651114}{close\+\_\+action}} = sysio\+::action\+\_\+wrapper$<$"{}close"{}\+\_\+n, \&\mbox{\hyperlink{classsysio_1_1token_a0095b24d66bcb8d2321429c875854a68}{token\+::close}}$>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{classsysio_1_1token_a27f5ce106975915ac27305c724295b57}{create}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&issuer, const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&maximum\+\_\+supply)
+\item 
+void \mbox{\hyperlink{classsysio_1_1token_a75467d50fd202f98187877e822eba564}{issue}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&to, const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&quantity, const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&memo)
+\item 
+void \mbox{\hyperlink{classsysio_1_1token_a992c14eabff6f66c05d4b0d0a9f08f5d}{retire}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&quantity, const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&memo)
+\item 
+void \mbox{\hyperlink{classsysio_1_1token_ab64ba816fc29c53f1e06367aa786588a}{transfer}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&from, const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&to, const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&quantity, const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&memo)
+\item 
+void \mbox{\hyperlink{classsysio_1_1token_af9ccc6b22fdc9133b987f1f171f2bf06}{open}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&owner, const \mbox{\hyperlink{classsysio_1_1chain_1_1symbol}{symbol}} \&\mbox{\hyperlink{classsysio_1_1chain_1_1symbol}{symbol}}, const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&ram\+\_\+payer)
+\item 
+void \mbox{\hyperlink{classsysio_1_1token_a0095b24d66bcb8d2321429c875854a68}{close}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&owner, const \mbox{\hyperlink{classsysio_1_1chain_1_1symbol}{symbol}} \&\mbox{\hyperlink{classsysio_1_1chain_1_1symbol}{symbol}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \mbox{\hyperlink{classsysio_1_1token_a39b1dd52a6510808e8692ca6d6d0f636}{get\+\_\+supply}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&token\+\_\+contract\+\_\+account, const \mbox{\hyperlink{structsysio_1_1chain_1_1symbol__code}{symbol\+\_\+code}} \&sym\+\_\+code)
+\item 
+static \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \mbox{\hyperlink{classsysio_1_1token_a0ad8a403e4e6cffa134a3613b6944982}{get\+\_\+balance}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&token\+\_\+contract\+\_\+account, const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&owner, const \mbox{\hyperlink{structsysio_1_1chain_1_1symbol__code}{symbol\+\_\+code}} \&sym\+\_\+code)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+The {\ttfamily \doxylink{classsysio_1_1token}{sysio.\+token}} sample system contract defines the structures and actions that allow users to create, issue, and manage tokens for EOSIO based blockchains. It demonstrates one way to implement a smart contract which allows for creation and management of tokens. It is possible for one to create a similar contract which suits different needs. However, it is recommended that if one only needs a token with the below listed actions, that one uses the {\ttfamily \doxylink{classsysio_1_1token}{sysio.\+token}} contract instead of developing their own.
+
+The {\ttfamily \doxylink{classsysio_1_1token}{sysio.\+token}} contract class also implements two useful public static methods\+: {\ttfamily get\+\_\+supply} and {\ttfamily get\+\_\+balance}. The first allows one to check the total supply of a specified token, created by an account and the second allows one to check the balance of a token for a specified account (the token creator account has to be specified as well).
+
+The {\ttfamily \doxylink{classsysio_1_1token}{sysio.\+token}} contract manages the set of tokens, accounts and their corresponding balances, by using two internal multi-\/index structures\+: the {\ttfamily accounts} and {\ttfamily stats}. The {\ttfamily accounts} multi-\/index table holds, for each row, instances of {\ttfamily account} object and the {\ttfamily account} object holds information about the balance of one token. The {\ttfamily accounts} table is scoped to an EOSIO account, and it keeps the rows indexed based on the token\textquotesingle{}s symbol. This means that when one queries the {\ttfamily accounts} multi-\/index table for an account name the result is all the tokens that account holds at the moment.
+
+Similarly, the {\ttfamily stats} multi-\/index table, holds instances of {\ttfamily currency\+\_\+stats} objects for each row, which contains information about current supply, maximum supply, and the creator account for a symbol token. The {\ttfamily stats} table is scoped to the token symbol. Therefore, when one queries the {\ttfamily stats} table for a token symbol the result is one single entry/row corresponding to the queried symbol token if it was previously created, or nothing, otherwise. 
+
+Definition at line \mbox{\hyperlink{sysio_8token_8hpp_source_l00025}{25}} of file \mbox{\hyperlink{sysio_8token_8hpp_source}{sysio.\+token.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classsysio_1_1token_a75f6049f45800620ff1adb68c2651114}\index{sysio::token@{sysio::token}!close\_action@{close\_action}}
+\index{close\_action@{close\_action}!sysio::token@{sysio::token}}
+\doxysubsubsection{\texorpdfstring{close\_action}{close\_action}}
+{\footnotesize\ttfamily \label{classsysio_1_1token_a75f6049f45800620ff1adb68c2651114} 
+using \mbox{\hyperlink{classsysio_1_1token_a75f6049f45800620ff1adb68c2651114}{sysio\+::token\+::close\+\_\+action}} = sysio\+::action\+\_\+wrapper$<$"{}close"{}\+\_\+n, \&\mbox{\hyperlink{classsysio_1_1token_a0095b24d66bcb8d2321429c875854a68}{token\+::close}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8token_8hpp_source_l00123}{123}} of file \mbox{\hyperlink{sysio_8token_8hpp_source}{sysio.\+token.\+hpp}}.
+
+\Hypertarget{classsysio_1_1token_a0b33aaf5b397ec3fa9ef8aae43c034dc}\index{sysio::token@{sysio::token}!create\_action@{create\_action}}
+\index{create\_action@{create\_action}!sysio::token@{sysio::token}}
+\doxysubsubsection{\texorpdfstring{create\_action}{create\_action}}
+{\footnotesize\ttfamily \label{classsysio_1_1token_a0b33aaf5b397ec3fa9ef8aae43c034dc} 
+using \mbox{\hyperlink{classsysio_1_1token_a0b33aaf5b397ec3fa9ef8aae43c034dc}{sysio\+::token\+::create\+\_\+action}} = sysio\+::action\+\_\+wrapper$<$"{}create"{}\+\_\+n, \&\mbox{\hyperlink{classsysio_1_1token_a27f5ce106975915ac27305c724295b57}{token\+::create}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8token_8hpp_source_l00118}{118}} of file \mbox{\hyperlink{sysio_8token_8hpp_source}{sysio.\+token.\+hpp}}.
+
+\Hypertarget{classsysio_1_1token_a03e64f227cb14be0979e35e6cac78617}\index{sysio::token@{sysio::token}!issue\_action@{issue\_action}}
+\index{issue\_action@{issue\_action}!sysio::token@{sysio::token}}
+\doxysubsubsection{\texorpdfstring{issue\_action}{issue\_action}}
+{\footnotesize\ttfamily \label{classsysio_1_1token_a03e64f227cb14be0979e35e6cac78617} 
+using \mbox{\hyperlink{classsysio_1_1token_a03e64f227cb14be0979e35e6cac78617}{sysio\+::token\+::issue\+\_\+action}} = sysio\+::action\+\_\+wrapper$<$"{}issue"{}\+\_\+n, \&\mbox{\hyperlink{classsysio_1_1token_a75467d50fd202f98187877e822eba564}{token\+::issue}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8token_8hpp_source_l00119}{119}} of file \mbox{\hyperlink{sysio_8token_8hpp_source}{sysio.\+token.\+hpp}}.
+
+\Hypertarget{classsysio_1_1token_a2eae1df3efabd124c6a6f2d0f59be2ae}\index{sysio::token@{sysio::token}!open\_action@{open\_action}}
+\index{open\_action@{open\_action}!sysio::token@{sysio::token}}
+\doxysubsubsection{\texorpdfstring{open\_action}{open\_action}}
+{\footnotesize\ttfamily \label{classsysio_1_1token_a2eae1df3efabd124c6a6f2d0f59be2ae} 
+using \mbox{\hyperlink{classsysio_1_1token_a2eae1df3efabd124c6a6f2d0f59be2ae}{sysio\+::token\+::open\+\_\+action}} = sysio\+::action\+\_\+wrapper$<$"{}open"{}\+\_\+n, \&\mbox{\hyperlink{classsysio_1_1token_af9ccc6b22fdc9133b987f1f171f2bf06}{token\+::open}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8token_8hpp_source_l00122}{122}} of file \mbox{\hyperlink{sysio_8token_8hpp_source}{sysio.\+token.\+hpp}}.
+
+\Hypertarget{classsysio_1_1token_ac4bb977ff9ae54c674a56d4cafbb0b1c}\index{sysio::token@{sysio::token}!retire\_action@{retire\_action}}
+\index{retire\_action@{retire\_action}!sysio::token@{sysio::token}}
+\doxysubsubsection{\texorpdfstring{retire\_action}{retire\_action}}
+{\footnotesize\ttfamily \label{classsysio_1_1token_ac4bb977ff9ae54c674a56d4cafbb0b1c} 
+using \mbox{\hyperlink{classsysio_1_1token_ac4bb977ff9ae54c674a56d4cafbb0b1c}{sysio\+::token\+::retire\+\_\+action}} = sysio\+::action\+\_\+wrapper$<$"{}retire"{}\+\_\+n, \&\mbox{\hyperlink{classsysio_1_1token_a992c14eabff6f66c05d4b0d0a9f08f5d}{token\+::retire}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8token_8hpp_source_l00120}{120}} of file \mbox{\hyperlink{sysio_8token_8hpp_source}{sysio.\+token.\+hpp}}.
+
+\Hypertarget{classsysio_1_1token_a104313ae127b80733cf26925f5246379}\index{sysio::token@{sysio::token}!transfer\_action@{transfer\_action}}
+\index{transfer\_action@{transfer\_action}!sysio::token@{sysio::token}}
+\doxysubsubsection{\texorpdfstring{transfer\_action}{transfer\_action}}
+{\footnotesize\ttfamily \label{classsysio_1_1token_a104313ae127b80733cf26925f5246379} 
+using \mbox{\hyperlink{classsysio_1_1token_a104313ae127b80733cf26925f5246379}{sysio\+::token\+::transfer\+\_\+action}} = sysio\+::action\+\_\+wrapper$<$"{}transfer"{}\+\_\+n, \&\mbox{\hyperlink{classsysio_1_1token_ab64ba816fc29c53f1e06367aa786588a}{token\+::transfer}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8token_8hpp_source_l00121}{121}} of file \mbox{\hyperlink{sysio_8token_8hpp_source}{sysio.\+token.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1token_a0095b24d66bcb8d2321429c875854a68}\index{sysio::token@{sysio::token}!close@{close}}
+\index{close@{close}!sysio::token@{sysio::token}}
+\doxysubsubsection{\texorpdfstring{close()}{close()}}
+{\footnotesize\ttfamily \label{classsysio_1_1token_a0095b24d66bcb8d2321429c875854a68} 
+void sysio\+::token\+::close (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&}]{owner}{, }\item[{const \mbox{\hyperlink{classsysio_1_1chain_1_1symbol}{symbol}} \&}]{symbol}{}\end{DoxyParamCaption})}
+
+This action is the opposite for open, it closes the account {\ttfamily owner} for token {\ttfamily symbol}.
+
+
+\begin{DoxyParams}{Parameters}
+{\em owner} & -\/ the owner account to execute the close action for, \\
+\hline
+{\em symbol} & -\/ the symbol of the token to execute the close action for.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyPrecond}{Precondition}
+The pair of owner plus symbol has to exist otherwise no action is executed, 
+
+If the pair of owner plus symbol exists, the balance has to be zero. 
+\end{DoxyPrecond}
+
+
+Definition at line \mbox{\hyperlink{sysio_8token_8cpp_source_l00148}{148}} of file \mbox{\hyperlink{sysio_8token_8cpp_source}{sysio.\+token.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00149\ \{}
+\DoxyCodeLine{00150\ \ \ \ require\_auth(\ owner\ );}
+\DoxyCodeLine{00151\ \ \ \ accounts\ acnts(\ get\_self(),\ owner.value\ );}
+\DoxyCodeLine{00152\ \ \ \ \textcolor{keyword}{auto}\ it\ =\ acnts.find(\ symbol.code().raw()\ );}
+\DoxyCodeLine{00153\ \ \ \ check(\ it\ !=\ acnts.end(),\ \textcolor{stringliteral}{"{}Balance\ row\ already\ deleted\ or\ never\ existed.\ Action\ won't\ have\ any\ effect."{}}\ );}
+\DoxyCodeLine{00154\ \ \ \ check(\ it-\/>balance.amount\ ==\ 0,\ \textcolor{stringliteral}{"{}Cannot\ close\ because\ the\ balance\ is\ not\ zero."{}}\ );}
+\DoxyCodeLine{00155\ \ \ \ acnts.erase(\ it\ );}
+\DoxyCodeLine{00156\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1token_a27f5ce106975915ac27305c724295b57}\index{sysio::token@{sysio::token}!create@{create}}
+\index{create@{create}!sysio::token@{sysio::token}}
+\doxysubsubsection{\texorpdfstring{create()}{create()}}
+{\footnotesize\ttfamily \label{classsysio_1_1token_a27f5ce106975915ac27305c724295b57} 
+void sysio\+::token\+::create (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&}]{issuer}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&}]{maximum\+\_\+supply}{}\end{DoxyParamCaption})}
+
+Allows {\ttfamily issuer} account to create a token in supply of {\ttfamily maximum\+\_\+supply}. If validation is successful a new entry in statstable for token symbol scope gets created.
+
+
+\begin{DoxyParams}{Parameters}
+{\em issuer} & -\/ the account that creates the token, \\
+\hline
+{\em maximum\+\_\+supply} & -\/ the maximum supply set for the token created.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyPrecond}{Precondition}
+Token symbol has to be valid, 
+
+Token symbol must not be already created, 
+
+maximum\+\_\+supply has to be smaller than the maximum supply allowed by the system\+: 1\texorpdfstring{$^\wedge$}{\string^}62 -\/ 1. 
+
+Maximum supply must be positive; 
+\end{DoxyPrecond}
+
+
+Definition at line \mbox{\hyperlink{sysio_8token_8cpp_source_l00005}{5}} of file \mbox{\hyperlink{sysio_8token_8cpp_source}{sysio.\+token.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00007\ \{}
+\DoxyCodeLine{00008\ \ \ \ \ require\_auth(\ get\_self()\ );}
+\DoxyCodeLine{00009\ }
+\DoxyCodeLine{00010\ \ \ \ \ \textcolor{keyword}{auto}\ sym\ =\ maximum\_supply.symbol;}
+\DoxyCodeLine{00011\ \ \ \ \ check(\ maximum\_supply.is\_valid(),\ \textcolor{stringliteral}{"{}invalid\ supply"{}});}
+\DoxyCodeLine{00012\ \ \ \ \ check(\ maximum\_supply.amount\ >\ 0,\ \textcolor{stringliteral}{"{}max-\/supply\ must\ be\ positive"{}});}
+\DoxyCodeLine{00013\ }
+\DoxyCodeLine{00014\ \ \ \ \ stats\ statstable(\ get\_self(),\ sym.code().raw()\ );}
+\DoxyCodeLine{00015\ \ \ \ \ \textcolor{keyword}{auto}\ existing\ =\ statstable.find(\ sym.code().raw()\ );}
+\DoxyCodeLine{00016\ \ \ \ \ check(\ existing\ ==\ statstable.end(),\ \textcolor{stringliteral}{"{}token\ with\ symbol\ already\ exists"{}}\ );}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \ \ \ \ statstable.emplace(\ get\_self(),\ [\&](\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ )\ \{}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.supply.symbol\ =\ maximum\_supply.symbol;}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.max\_supply\ \ \ \ =\ maximum\_supply;}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.issuer\ \ \ \ \ \ \ \ =\ issuer;}
+\DoxyCodeLine{00022\ \ \ \ \ \});}
+\DoxyCodeLine{00023\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1token_a27f5ce106975915ac27305c724295b57_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1token_a0ad8a403e4e6cffa134a3613b6944982}\index{sysio::token@{sysio::token}!get\_balance@{get\_balance}}
+\index{get\_balance@{get\_balance}!sysio::token@{sysio::token}}
+\doxysubsubsection{\texorpdfstring{get\_balance()}{get\_balance()}}
+{\footnotesize\ttfamily \label{classsysio_1_1token_a0ad8a403e4e6cffa134a3613b6944982} 
+static \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} sysio\+::token\+::get\+\_\+balance (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&}]{token\+\_\+contract\+\_\+account}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&}]{owner}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1symbol__code}{symbol\+\_\+code}} \&}]{sym\+\_\+code}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8token_8hpp_source_l00111}{111}} of file \mbox{\hyperlink{sysio_8token_8hpp_source}{sysio.\+token.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \ \ \ \ accounts\ accountstable(\ token\_contract\_account,\ owner.value\ );}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ ac\ =\ accountstable.get(\ sym\_code.raw(),\ \textcolor{stringliteral}{"{}no\ balance\ with\ specified\ symbol"{}}\ );}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ac.balance;}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1token_a39b1dd52a6510808e8692ca6d6d0f636}\index{sysio::token@{sysio::token}!get\_supply@{get\_supply}}
+\index{get\_supply@{get\_supply}!sysio::token@{sysio::token}}
+\doxysubsubsection{\texorpdfstring{get\_supply()}{get\_supply()}}
+{\footnotesize\ttfamily \label{classsysio_1_1token_a39b1dd52a6510808e8692ca6d6d0f636} 
+static \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} sysio\+::token\+::get\+\_\+supply (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&}]{token\+\_\+contract\+\_\+account}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1symbol__code}{symbol\+\_\+code}} \&}]{sym\+\_\+code}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8token_8hpp_source_l00104}{104}} of file \mbox{\hyperlink{sysio_8token_8hpp_source}{sysio.\+token.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \ \ \ \ stats\ statstable(\ token\_contract\_account,\ sym\_code.raw()\ );}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ st\ =\ statstable.get(\ sym\_code.raw(),\ \textcolor{stringliteral}{"{}invalid\ supply\ symbol\ code"{}}\ );}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ st.supply;}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1token_a39b1dd52a6510808e8692ca6d6d0f636_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1token_a75467d50fd202f98187877e822eba564}\index{sysio::token@{sysio::token}!issue@{issue}}
+\index{issue@{issue}!sysio::token@{sysio::token}}
+\doxysubsubsection{\texorpdfstring{issue()}{issue()}}
+{\footnotesize\ttfamily \label{classsysio_1_1token_a75467d50fd202f98187877e822eba564} 
+void sysio\+::token\+::issue (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&}]{to}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&}]{quantity}{, }\item[{const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&}]{memo}{}\end{DoxyParamCaption})}
+
+This action issues to {\ttfamily to} account a {\ttfamily quantity} of tokens.
+
+
+\begin{DoxyParams}{Parameters}
+{\em to} & -\/ the account to issue tokens to, it must be the same as the issuer, \\
+\hline
+{\em quantity} & -\/ the amount of tokens to be issued, @memo -\/ the memo string that accompanies the token issue transaction. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{sysio_8token_8cpp_source_l00026}{26}} of file \mbox{\hyperlink{sysio_8token_8cpp_source}{sysio.\+token.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00027\ \{}
+\DoxyCodeLine{00028\ \ \ \ \ \textcolor{keyword}{auto}\ sym\ =\ quantity.symbol;}
+\DoxyCodeLine{00029\ \ \ \ \ check(\ sym.is\_valid(),\ \textcolor{stringliteral}{"{}invalid\ symbol\ name"{}}\ );}
+\DoxyCodeLine{00030\ \ \ \ \ check(\ memo.size()\ <=\ 256,\ \textcolor{stringliteral}{"{}memo\ has\ more\ than\ 256\ bytes"{}}\ );}
+\DoxyCodeLine{00031\ }
+\DoxyCodeLine{00032\ \ \ \ \ stats\ statstable(\ get\_self(),\ sym.code().raw()\ );}
+\DoxyCodeLine{00033\ \ \ \ \ \textcolor{keyword}{auto}\ existing\ =\ statstable.find(\ sym.code().raw()\ );}
+\DoxyCodeLine{00034\ \ \ \ \ check(\ existing\ !=\ statstable.end(),\ \textcolor{stringliteral}{"{}token\ with\ symbol\ does\ not\ exist,\ create\ token\ before\ issue"{}}\ );}
+\DoxyCodeLine{00035\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ st\ =\ *existing;}
+\DoxyCodeLine{00036\ \ \ \ \ check(\ to\ ==\ st.issuer,\ \textcolor{stringliteral}{"{}tokens\ can\ only\ be\ issued\ to\ issuer\ account"{}}\ );}
+\DoxyCodeLine{00037\ }
+\DoxyCodeLine{00038\ \ \ \ \ require\_auth(\ st.issuer\ );}
+\DoxyCodeLine{00039\ \ \ \ \ check(\ quantity.is\_valid(),\ \textcolor{stringliteral}{"{}invalid\ quantity"{}}\ );}
+\DoxyCodeLine{00040\ \ \ \ \ check(\ quantity.amount\ >\ 0,\ \textcolor{stringliteral}{"{}must\ issue\ positive\ quantity"{}}\ );}
+\DoxyCodeLine{00041\ }
+\DoxyCodeLine{00042\ \ \ \ \ check(\ quantity.symbol\ ==\ st.supply.symbol,\ \textcolor{stringliteral}{"{}symbol\ precision\ mismatch"{}}\ );}
+\DoxyCodeLine{00043\ \ \ \ \ check(\ quantity.amount\ <=\ st.max\_supply.amount\ -\/\ st.supply.amount,\ \textcolor{stringliteral}{"{}quantity\ exceeds\ available\ supply"{}});}
+\DoxyCodeLine{00044\ }
+\DoxyCodeLine{00045\ \ \ \ \ statstable.modify(\ st,\ same\_payer,\ [\&](\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ )\ \{}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.supply\ +=\ quantity;}
+\DoxyCodeLine{00047\ \ \ \ \ \});}
+\DoxyCodeLine{00048\ }
+\DoxyCodeLine{00049\ \ \ \ \ add\_balance(\ st.issuer,\ quantity,\ st.issuer\ );}
+\DoxyCodeLine{00050\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1token_a75467d50fd202f98187877e822eba564_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1token_af9ccc6b22fdc9133b987f1f171f2bf06}\index{sysio::token@{sysio::token}!open@{open}}
+\index{open@{open}!sysio::token@{sysio::token}}
+\doxysubsubsection{\texorpdfstring{open()}{open()}}
+{\footnotesize\ttfamily \label{classsysio_1_1token_af9ccc6b22fdc9133b987f1f171f2bf06} 
+void sysio\+::token\+::open (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&}]{owner}{, }\item[{const \mbox{\hyperlink{classsysio_1_1chain_1_1symbol}{symbol}} \&}]{symbol}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&}]{ram\+\_\+payer}{}\end{DoxyParamCaption})}
+
+Allows {\ttfamily ram\+\_\+payer} to create an account {\ttfamily owner} with zero balance for token {\ttfamily symbol} at the expense of {\ttfamily ram\+\_\+payer}.
+
+
+\begin{DoxyParams}{Parameters}
+{\em owner} & -\/ the account to be created, \\
+\hline
+{\em symbol} & -\/ the token to be payed with by {\ttfamily ram\+\_\+payer}, \\
+\hline
+{\em ram\+\_\+payer} & -\/ the account that supports the cost of this action.\\
+\hline
+\end{DoxyParams}
+More information can be read \href{https://github.com/EOSIO/sysio.contracts/issues/62}{\texttt{ here}} and \href{https://github.com/EOSIO/sysio.contracts/issues/61}{\texttt{ here}}. 
+
+Definition at line \mbox{\hyperlink{sysio_8token_8cpp_source_l00128}{128}} of file \mbox{\hyperlink{sysio_8token_8cpp_source}{sysio.\+token.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00129\ \{}
+\DoxyCodeLine{00130\ \ \ \ require\_auth(\ ram\_payer\ );}
+\DoxyCodeLine{00131\ }
+\DoxyCodeLine{00132\ \ \ \ check(\ is\_account(\ owner\ ),\ \textcolor{stringliteral}{"{}owner\ account\ does\ not\ exist"{}}\ );}
+\DoxyCodeLine{00133\ }
+\DoxyCodeLine{00134\ \ \ \ \textcolor{keyword}{auto}\ sym\_code\_raw\ =\ symbol.code().raw();}
+\DoxyCodeLine{00135\ \ \ \ stats\ statstable(\ get\_self(),\ sym\_code\_raw\ );}
+\DoxyCodeLine{00136\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ st\ =\ statstable.get(\ sym\_code\_raw,\ \textcolor{stringliteral}{"{}symbol\ does\ not\ exist"{}}\ );}
+\DoxyCodeLine{00137\ \ \ \ check(\ st.supply.symbol\ ==\ symbol,\ \textcolor{stringliteral}{"{}symbol\ precision\ mismatch"{}}\ );}
+\DoxyCodeLine{00138\ }
+\DoxyCodeLine{00139\ \ \ \ accounts\ acnts(\ get\_self(),\ owner.value\ );}
+\DoxyCodeLine{00140\ \ \ \ \textcolor{keyword}{auto}\ it\ =\ acnts.find(\ sym\_code\_raw\ );}
+\DoxyCodeLine{00141\ \ \ \ \textcolor{keywordflow}{if}(\ it\ ==\ acnts.end()\ )\ \{}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ acnts.emplace(\ ram\_payer,\ [\&](\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ )\{}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.balance\ =\ asset\{0,\ symbol\};}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00145\ \ \ \ \}}
+\DoxyCodeLine{00146\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1token_a992c14eabff6f66c05d4b0d0a9f08f5d}\index{sysio::token@{sysio::token}!retire@{retire}}
+\index{retire@{retire}!sysio::token@{sysio::token}}
+\doxysubsubsection{\texorpdfstring{retire()}{retire()}}
+{\footnotesize\ttfamily \label{classsysio_1_1token_a992c14eabff6f66c05d4b0d0a9f08f5d} 
+void sysio\+::token\+::retire (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&}]{quantity}{, }\item[{const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&}]{memo}{}\end{DoxyParamCaption})}
+
+The opposite for create action, if all validations succeed, it debits the statstable.\+supply amount.
+
+
+\begin{DoxyParams}{Parameters}
+{\em quantity} & -\/ the quantity of tokens to retire, \\
+\hline
+{\em memo} & -\/ the memo string to accompany the transaction. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{sysio_8token_8cpp_source_l00052}{52}} of file \mbox{\hyperlink{sysio_8token_8cpp_source}{sysio.\+token.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00053\ \{}
+\DoxyCodeLine{00054\ \ \ \ \ \textcolor{keyword}{auto}\ sym\ =\ quantity.symbol;}
+\DoxyCodeLine{00055\ \ \ \ \ check(\ sym.is\_valid(),\ \textcolor{stringliteral}{"{}invalid\ symbol\ name"{}}\ );}
+\DoxyCodeLine{00056\ \ \ \ \ check(\ memo.size()\ <=\ 256,\ \textcolor{stringliteral}{"{}memo\ has\ more\ than\ 256\ bytes"{}}\ );}
+\DoxyCodeLine{00057\ }
+\DoxyCodeLine{00058\ \ \ \ \ stats\ statstable(\ get\_self(),\ sym.code().raw()\ );}
+\DoxyCodeLine{00059\ \ \ \ \ \textcolor{keyword}{auto}\ existing\ =\ statstable.find(\ sym.code().raw()\ );}
+\DoxyCodeLine{00060\ \ \ \ \ check(\ existing\ !=\ statstable.end(),\ \textcolor{stringliteral}{"{}token\ with\ symbol\ does\ not\ exist"{}}\ );}
+\DoxyCodeLine{00061\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ st\ =\ *existing;}
+\DoxyCodeLine{00062\ }
+\DoxyCodeLine{00063\ \ \ \ \ require\_auth(\ st.issuer\ );}
+\DoxyCodeLine{00064\ \ \ \ \ check(\ quantity.is\_valid(),\ \textcolor{stringliteral}{"{}invalid\ quantity"{}}\ );}
+\DoxyCodeLine{00065\ \ \ \ \ check(\ quantity.amount\ >\ 0,\ \textcolor{stringliteral}{"{}must\ retire\ positive\ quantity"{}}\ );}
+\DoxyCodeLine{00066\ }
+\DoxyCodeLine{00067\ \ \ \ \ check(\ quantity.symbol\ ==\ st.supply.symbol,\ \textcolor{stringliteral}{"{}symbol\ precision\ mismatch"{}}\ );}
+\DoxyCodeLine{00068\ }
+\DoxyCodeLine{00069\ \ \ \ \ statstable.modify(\ st,\ same\_payer,\ [\&](\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ )\ \{}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.supply\ -\/=\ quantity;}
+\DoxyCodeLine{00071\ \ \ \ \ \});}
+\DoxyCodeLine{00072\ }
+\DoxyCodeLine{00073\ \ \ \ \ sub\_balance(\ st.issuer,\ quantity\ );}
+\DoxyCodeLine{00074\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1token_a992c14eabff6f66c05d4b0d0a9f08f5d_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1token_ab64ba816fc29c53f1e06367aa786588a}\index{sysio::token@{sysio::token}!transfer@{transfer}}
+\index{transfer@{transfer}!sysio::token@{sysio::token}}
+\doxysubsubsection{\texorpdfstring{transfer()}{transfer()}}
+{\footnotesize\ttfamily \label{classsysio_1_1token_ab64ba816fc29c53f1e06367aa786588a} 
+void sysio\+::token\+::transfer (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&}]{from}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&}]{to}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&}]{quantity}{, }\item[{const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&}]{memo}{}\end{DoxyParamCaption})}
+
+Allows {\ttfamily from} account to transfer to {\ttfamily to} account the {\ttfamily quantity} tokens. One account is debited and the other is credited with quantity tokens.
+
+
+\begin{DoxyParams}{Parameters}
+{\em from} & -\/ the account to transfer from, \\
+\hline
+{\em to} & -\/ the account to be transferred to, \\
+\hline
+{\em quantity} & -\/ the quantity of tokens to be transferred, \\
+\hline
+{\em memo} & -\/ the memo string to accompany the transaction. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{sysio_8token_8cpp_source_l00076}{76}} of file \mbox{\hyperlink{sysio_8token_8cpp_source}{sysio.\+token.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00080\ \{}
+\DoxyCodeLine{00081\ \ \ \ \ check(\ from\ !=\ to,\ \textcolor{stringliteral}{"{}cannot\ transfer\ to\ self"{}}\ );}
+\DoxyCodeLine{00082\ \ \ \ \ require\_auth(\ from\ );}
+\DoxyCodeLine{00083\ \ \ \ \ check(\ is\_account(\ to\ ),\ \textcolor{stringliteral}{"{}to\ account\ does\ not\ exist"{}});}
+\DoxyCodeLine{00084\ \ \ \ \ \textcolor{keyword}{auto}\ sym\ =\ quantity.symbol.code();}
+\DoxyCodeLine{00085\ \ \ \ \ stats\ statstable(\ get\_self(),\ sym.raw()\ );}
+\DoxyCodeLine{00086\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ st\ =\ statstable.get(\ sym.raw()\ );}
+\DoxyCodeLine{00087\ }
+\DoxyCodeLine{00088\ \ \ \ \ require\_recipient(\ from\ );}
+\DoxyCodeLine{00089\ \ \ \ \ require\_recipient(\ to\ );}
+\DoxyCodeLine{00090\ }
+\DoxyCodeLine{00091\ \ \ \ \ check(\ quantity.is\_valid(),\ \textcolor{stringliteral}{"{}invalid\ quantity"{}}\ );}
+\DoxyCodeLine{00092\ \ \ \ \ check(\ quantity.amount\ >\ 0,\ \textcolor{stringliteral}{"{}must\ transfer\ positive\ quantity"{}}\ );}
+\DoxyCodeLine{00093\ \ \ \ \ check(\ quantity.symbol\ ==\ st.supply.symbol,\ \textcolor{stringliteral}{"{}symbol\ precision\ mismatch"{}}\ );}
+\DoxyCodeLine{00094\ \ \ \ \ check(\ memo.size()\ <=\ 256,\ \textcolor{stringliteral}{"{}memo\ has\ more\ than\ 256\ bytes"{}}\ );}
+\DoxyCodeLine{00095\ }
+\DoxyCodeLine{00096\ \ \ \ \ \textcolor{keyword}{auto}\ payer\ =\ has\_auth(\ to\ )\ ?\ to\ :\ from;}
+\DoxyCodeLine{00097\ }
+\DoxyCodeLine{00098\ \ \ \ \ sub\_balance(\ from,\ quantity\ );}
+\DoxyCodeLine{00099\ \ \ \ \ add\_balance(\ to,\ quantity,\ payer\ );}
+\DoxyCodeLine{00100\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1token_ab64ba816fc29c53f1e06367aa786588a_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/svetlasyrimis/\+Desktop/wire-\/network/\+WN-\/org/wire-\/system-\/contracts/contracts/sysio.\+token/include/sysio.\+token/\mbox{\hyperlink{sysio_8token_8hpp}{sysio.\+token.\+hpp}}\item 
+/\+Users/svetlasyrimis/\+Desktop/wire-\/network/\+WN-\/org/wire-\/system-\/contracts/contracts/sysio.\+token/src/\mbox{\hyperlink{sysio_8token_8cpp}{sysio.\+token.\+cpp}}\end{DoxyCompactItemize}

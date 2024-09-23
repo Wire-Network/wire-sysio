@@ -1,0 +1,52 @@
+\doxysection{sysio\+::chain\+::database\+\_\+header\+\_\+object Class Reference}
+\hypertarget{classsysio_1_1chain_1_1database__header__object}{}\label{classsysio_1_1chain_1_1database__header__object}\index{sysio::chain::database\_header\_object@{sysio::chain::database\_header\_object}}
+
+
+tracks the version of the application data stored in the database  
+
+
+
+
+{\ttfamily \#include $<$database\+\_\+header\+\_\+object.\+hpp$>$}
+
+
+
+Inheritance diagram for sysio\+::chain\+::database\+\_\+header\+\_\+object\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=205pt]{classsysio_1_1chain_1_1database__header__object__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for sysio\+::chain\+::database\+\_\+header\+\_\+object\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=205pt]{classsysio_1_1chain_1_1database__header__object__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Public Types inherited from \mbox{\hyperlink{structchainbase_1_1object}{chainbase\+::object$<$ database\+\_\+header\+\_\+object\+\_\+type, database\+\_\+header\+\_\+object $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{classchainbase_1_1oid}{oid}}$<$ database\+\_\+header\+\_\+object $>$ \mbox{\hyperlink{structchainbase_1_1object_a7c6a0efb95ee67d538a976cfa5be9df9}{id\+\_\+type}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Static Public Attributes inherited from \mbox{\hyperlink{structchainbase_1_1object}{chainbase\+::object$<$ database\+\_\+header\+\_\+object\+\_\+type, database\+\_\+header\+\_\+object $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+static const \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{structchainbase_1_1object_a30d3a5340e6fc59b4a2e044fcd42f0a2}{type\+\_\+id}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+the in-\/memory database expects that binay structures of data do not shift between executions. Some upgrades will bump this version to indicate that the expectations of the binary application data have changed. When it is safe to directly use an older version that will be allowed though cases where this is possible may be rare. 
+
+Definition at line \mbox{\hyperlink{database__header__object_8hpp_source_l00016}{16}} of file \mbox{\hyperlink{database__header__object_8hpp_source}{database\+\_\+header\+\_\+object.\+hpp}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{database__header__object_8hpp}{database\+\_\+header\+\_\+object.\+hpp}}\end{DoxyCompactItemize}

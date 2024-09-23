@@ -1,0 +1,47 @@
+\doxysection{catch\+\_\+totals.\+h}
+\hypertarget{catch__totals_8h_source}{}\label{catch__totals_8h_source}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_totals.h@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_totals.h}}
+\mbox{\hyperlink{catch__totals_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{catch__totals_8h_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{catch__totals_8h_source_l00002}00002\ \textcolor{comment}{\ *\ \ Created\ by\ Phil\ Nash\ on\ 23/02/2012.}}
+\DoxyCodeLine{\Hypertarget{catch__totals_8h_source_l00003}00003\ \textcolor{comment}{\ *\ \ Copyright\ (c)\ 2012\ Two\ Blue\ Cubes\ Ltd.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{catch__totals_8h_source_l00004}00004\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{catch__totals_8h_source_l00005}00005\ \textcolor{comment}{\ *\ \ Distributed\ under\ the\ Boost\ Software\ License,\ Version\ 1.0.\ (See\ accompanying}}
+\DoxyCodeLine{\Hypertarget{catch__totals_8h_source_l00006}00006\ \textcolor{comment}{\ *\ \ file\ LICENSE\_1\_0.txt\ or\ copy\ at\ http://www.boost.org/LICENSE\_1\_0.txt)}}
+\DoxyCodeLine{\Hypertarget{catch__totals_8h_source_l00007}00007\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{catch__totals_8h_source_l00008}00008\ \textcolor{preprocessor}{\#ifndef\ TWOBLUECUBES\_CATCH\_TOTALS\_HPP\_INCLUDED}}
+\DoxyCodeLine{\Hypertarget{catch__totals_8h_source_l00009}00009\ \textcolor{preprocessor}{\#define\ TWOBLUECUBES\_CATCH\_TOTALS\_HPP\_INCLUDED}}
+\DoxyCodeLine{\Hypertarget{catch__totals_8h_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{catch__totals_8h_source_l00011}00011\ \textcolor{preprocessor}{\#include\ <cstddef>}}
+\DoxyCodeLine{\Hypertarget{catch__totals_8h_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{catch__totals_8h_source_l00013}00013\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__totals_8h_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{catch__totals_8h_source_l00015}00015\ \ \ \ \ \textcolor{keyword}{struct\ }Counts\ \{}
+\DoxyCodeLine{\Hypertarget{catch__totals_8h_source_l00016}00016\ \ \ \ \ \ \ \ \ Counts\ \mbox{\hyperlink{struct_catch_1_1_counts_aaa10666f559057e3e860d2a5a6fae4c4}{operator\ -\/\ }}(\ Counts\ \textcolor{keyword}{const}\&\ other\ )\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{catch__totals_8h_source_l00017}00017\ \ \ \ \ \ \ \ \ Counts\&\ \mbox{\hyperlink{struct_catch_1_1_counts_a0c4a2295b896e189cdf4663377e156df}{operator\ +=\ }}(\ Counts\ \textcolor{keyword}{const}\&\ other\ );}
+\DoxyCodeLine{\Hypertarget{catch__totals_8h_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{catch__totals_8h_source_l00019}00019\ \ \ \ \ \ \ \ \ std::size\_t\ \mbox{\hyperlink{struct_catch_1_1_counts_a94f969c09cf52d1339c085c9603cd1d3}{total}}()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{catch__totals_8h_source_l00020}00020\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_catch_1_1_counts_a84999490e0ecaa3de5e121bf48eda1b3}{allPassed}}()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{catch__totals_8h_source_l00021}00021\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_catch_1_1_counts_a33bd996e016030155b99fe1c51c08991}{allOk}}()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{catch__totals_8h_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{catch__totals_8h_source_l00023}\mbox{\hyperlink{struct_catch_1_1_counts_ad28daaf3de28006400208b6dd0c631e6}{00023}}\ \ \ \ \ \ \ \ \ std::size\_t\ \mbox{\hyperlink{struct_catch_1_1_counts_ad28daaf3de28006400208b6dd0c631e6}{passed}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{catch__totals_8h_source_l00024}\mbox{\hyperlink{struct_catch_1_1_counts_a19982a3817a3bc2c07f0290e71f497a3}{00024}}\ \ \ \ \ \ \ \ \ std::size\_t\ \mbox{\hyperlink{struct_catch_1_1_counts_a19982a3817a3bc2c07f0290e71f497a3}{failed}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{catch__totals_8h_source_l00025}\mbox{\hyperlink{struct_catch_1_1_counts_ac090973a2ff51394cd452718e75c073e}{00025}}\ \ \ \ \ \ \ \ \ std::size\_t\ \mbox{\hyperlink{struct_catch_1_1_counts_ac090973a2ff51394cd452718e75c073e}{failedButOk}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{catch__totals_8h_source_l00026}00026\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{catch__totals_8h_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{catch__totals_8h_source_l00028}00028\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_catch_1_1_totals}{Totals}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__totals_8h_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{catch__totals_8h_source_l00030}00030\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_totals}{Totals}}\ \mbox{\hyperlink{struct_catch_1_1_totals_a9279ed39139cb7e7b291918a6d08290e}{operator\ -\/\ }}(\ \mbox{\hyperlink{struct_catch_1_1_totals}{Totals}}\ \textcolor{keyword}{const}\&\ other\ )\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{catch__totals_8h_source_l00031}00031\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_totals}{Totals}}\&\ \mbox{\hyperlink{struct_catch_1_1_totals_aa809975b6055917ecb1b1ae7c25149a8}{operator\ +=\ }}(\ \mbox{\hyperlink{struct_catch_1_1_totals}{Totals}}\ \textcolor{keyword}{const}\&\ other\ );}
+\DoxyCodeLine{\Hypertarget{catch__totals_8h_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{catch__totals_8h_source_l00033}00033\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_totals}{Totals}}\ \mbox{\hyperlink{struct_catch_1_1_totals_a1a94a654f5f3786b75695e081fc9bca2}{delta}}(\ \mbox{\hyperlink{struct_catch_1_1_totals}{Totals}}\ \textcolor{keyword}{const}\&\ prevTotals\ )\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{catch__totals_8h_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{catch__totals_8h_source_l00035}\mbox{\hyperlink{struct_catch_1_1_totals_a6ea14c7de7ea735a14f172a26e08a239}{00035}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ error\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{catch__totals_8h_source_l00036}\mbox{\hyperlink{struct_catch_1_1_totals_a885ded66df752147b30c3d45aa602ec9}{00036}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_counts}{Counts}}\ \mbox{\hyperlink{struct_catch_1_1_totals_a885ded66df752147b30c3d45aa602ec9}{assertions}};}
+\DoxyCodeLine{\Hypertarget{catch__totals_8h_source_l00037}\mbox{\hyperlink{struct_catch_1_1_totals_adb195fe477aedee2ecea88c888f16506}{00037}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_counts}{Counts}}\ \mbox{\hyperlink{struct_catch_1_1_totals_adb195fe477aedee2ecea88c888f16506}{testCases}};}
+\DoxyCodeLine{\Hypertarget{catch__totals_8h_source_l00038}00038\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{catch__totals_8h_source_l00039}00039\ \}}
+\DoxyCodeLine{\Hypertarget{catch__totals_8h_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{catch__totals_8h_source_l00041}00041\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ TWOBLUECUBES\_CATCH\_TOTALS\_HPP\_INCLUDED}}
+
+\end{DoxyCode}

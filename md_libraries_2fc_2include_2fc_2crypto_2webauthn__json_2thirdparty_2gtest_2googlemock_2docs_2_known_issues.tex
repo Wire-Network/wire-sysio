@@ -1,0 +1,19 @@
+\chapter{Known\+Issues}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2thirdparty_2gtest_2googlemock_2docs_2_known_issues}{}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2thirdparty_2gtest_2googlemock_2docs_2_known_issues}\index{KnownIssues@{KnownIssues}}
+As any non-\/trivial software system, Google \doxylink{class_mock}{Mock} has some known limitations and problems. We are working on improving it, and welcome your help! The follow is a list of issues we know about.
+
+\doxysubsection*{README contains outdated information on Google \doxylink{class_mock}{Mock}\textquotesingle{}s compatibility with other testing frameworks}
+
+The {\ttfamily README} file in release 1.\+1.\+0 still says that Google \doxylink{class_mock}{Mock} only works with Google \doxylink{class_test}{Test}. Actually, you can configure Google \doxylink{class_mock}{Mock} to work with any testing framework you choose.
+
+\doxysubsection*{Tests failing on machines using Power PC CPUs (e.\+g. some Macs)}
+
+{\ttfamily \doxylink{namespacegmock__output__test}{gmock\+\_\+output\+\_\+test}} and {\ttfamily gmock-\/printers\+\_\+test} are known to fail with Power PC CPUs. This is due to portability issues with these tests, and is not an indication of problems in Google \doxylink{class_mock}{Mock} itself. You can safely ignore them.
+
+\doxysubsection*{Failed to resolve libgtest.\+so.\+0 in tests when built against installed Google \doxylink{class_test}{Test}}
+
+This only applies if you manually built and installed Google \doxylink{class_test}{Test}, and then built a Google \doxylink{class_mock}{Mock} against it (either explicitly, or because gtest-\/config was in your path post-\/install). In this situation, Libtool has a known issue with certain systems\textquotesingle{} ldconfig setup\+:
+
+\href{http://article.gmane.org/gmane.comp.sysutils.automake.general/9025}{\texttt{ http\+://article.\+gmane.\+org/gmane.\+comp.\+sysutils.\+automake.\+general/9025}}
+
+This requires a manual run of "{}sudo ldconfig"{} after the "{}sudo make install"{} for Google \doxylink{class_test}{Test} before any binaries which link against it can be executed. This isn\textquotesingle{}t a bug in our install, but we should at least have documented it or hacked a work-\/around into our install. We should have one of these solutions in our next release. 

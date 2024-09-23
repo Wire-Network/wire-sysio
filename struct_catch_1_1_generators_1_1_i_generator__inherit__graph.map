@@ -1,0 +1,30 @@
+<map id="Catch::Generators::IGenerator&lt; T &gt;" name="Catch::Generators::IGenerator&lt; T &gt;">
+<area shape="rect" id="Node000001" title=" " alt="" coords="211,258,347,299"/>
+<area shape="rect" id="Node000003" href="$class_catch_1_1_generators_1_1_filter_generator.html" title=" " alt="" coords="418,5,554,61"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="293,243,331,164,359,121,393,83,430,59,433,64,397,87,363,125,335,167,297,245"/>
+<area shape="poly" id="edge4_Node000001_Node000003" title=" " alt="" coords="287,243,302,201,325,152,355,103,393,59,415,43,419,48,397,63,359,106,329,155,307,203,292,244"/>
+<area shape="rect" id="Node000004" href="$class_catch_1_1_generators_1_1_fixed_values_generator.html" title=" " alt="" coords="395,85,576,126"/>
+<area shape="poly" id="edge5_Node000001_Node000004" title=" " alt="" coords="304,244,343,195,367,170,393,148,418,134,444,124,446,129,420,139,397,153,371,174,347,199,309,247"/>
+<area shape="poly" id="edge6_Node000001_Node000004" title=" " alt="" coords="293,243,334,183,362,151,393,124,394,124,397,128,397,129,365,155,338,186,297,246"/>
+<area shape="rect" id="Node000005" href="$class_catch_1_1_generators_1_1_generators.html" title=" " alt="" coords="418,150,554,191"/>
+<area shape="poly" id="edge7_Node000001_Node000005" title=" " alt="" coords="334,247,394,212,449,189,451,194,396,217,337,252"/>
+<area shape="poly" id="edge8_Node000001_Node000005" title=" " alt="" coords="306,246,347,216,394,188,416,178,418,183,396,193,350,220,309,250"/>
+<area shape="rect" id="Node000006" href="$class_catch_1_1_generators_1_1_map_generator.html" title=" " alt="" coords="414,215,557,270"/>
+<area shape="poly" id="edge9_Node000001_Node000006" title=" " alt="" coords="362,270,413,261,414,266,363,275"/>
+<area shape="poly" id="edge10_Node000001_Node000006" title=" " alt="" coords="362,253,413,244,414,249,363,258"/>
+<area shape="rect" id="Node000007" href="$class_catch_1_1_generators_1_1_range_generator.html" title=" " alt="" coords="412,294,560,335"/>
+<area shape="poly" id="edge11_Node000001_Node000007" title=" " alt="" coords="363,299,411,308,411,313,362,304"/>
+<area shape="poly" id="edge12_Node000001_Node000007" title=" " alt="" coords="363,282,415,291,414,296,362,287"/>
+<area shape="rect" id="Node000008" href="$class_catch_1_1_generators_1_1_repeat_generator.html" title=" " alt="" coords="410,360,562,400"/>
+<area shape="poly" id="edge13_Node000001_Node000008" title=" " alt="" coords="312,306,352,332,396,356,410,362,408,367,394,361,349,337,309,311"/>
+<area shape="poly" id="edge14_Node000001_Node000008" title=" " alt="" coords="344,304,396,332,454,357,452,361,394,337,342,309"/>
+<area shape="rect" id="Node000009" href="$class_catch_1_1_generators_1_1_single_value_generator.html" title=" " alt="" coords="396,425,575,466"/>
+<area shape="poly" id="edge15_Node000001_Node000009" title=" " alt="" coords="298,311,339,368,366,397,397,422,398,422,395,427,393,426,363,401,335,371,294,314"/>
+<area shape="poly" id="edge16_Node000001_Node000009" title=" " alt="" coords="310,310,348,355,397,398,421,411,446,422,444,427,418,416,393,402,345,358,306,313"/>
+<area shape="rect" id="Node000010" href="$class_catch_1_1_generators_1_1_take_generator.html" title=" " alt="" coords="416,490,555,531"/>
+<area shape="poly" id="edge17_Node000001_Node000010" title=" " alt="" coords="292,313,307,353,329,400,359,447,397,487,418,501,415,505,393,491,355,450,325,403,302,355,287,315"/>
+<area shape="poly" id="edge18_Node000001_Node000010" title=" " alt="" coords="298,312,336,388,363,428,397,463,418,477,442,487,440,492,416,482,393,467,359,431,331,391,293,314"/>
+<area shape="rect" id="Node000002" href="$class_catch_1_1_generators_1_1_generator_untyped_base.html" title=" " alt="" coords="5,258,163,299"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="178,285,210,284,210,290,178,290"/>
+<area shape="poly" id="edge2_Node000001_Node000002" title=" " alt="" coords="178,267,210,267,210,273,178,272"/>
+</map>

@@ -1,0 +1,104 @@
+\doxysection{sysiosystem\+::limit\+\_\+auth\+\_\+change Struct Reference}
+\hypertarget{structsysiosystem_1_1limit__auth__change}{}\label{structsysiosystem_1_1limit__auth__change}\index{sysiosystem::limit\_auth\_change@{sysiosystem::limit\_auth\_change}}
+
+
+{\ttfamily \#include $<$limit\+\_\+auth\+\_\+changes.\+hpp$>$}
+
+
+
+Collaboration diagram for sysiosystem\+::limit\+\_\+auth\+\_\+change\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=179pt]{structsysiosystem_1_1limit__auth__change__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1limit__auth__change_a12877d57fa8d94ccbe1928074e63b14a}{primary\+\_\+key}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1limit__auth__change_aceede7269997728ea53e7147d1216260}{version}} = 0
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \mbox{\hyperlink{structsysiosystem_1_1limit__auth__change_a13e2638d9ce0878e92005a94946589b0}{account}}
+\item 
+std\+::vector$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$ \mbox{\hyperlink{structsysiosystem_1_1limit__auth__change_a560ed8d19aeed5766126bb58917853df}{allow\+\_\+perms}}
+\item 
+std\+::vector$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$ \mbox{\hyperlink{structsysiosystem_1_1limit__auth__change_af24c50baf6d0c6bffa1721c5a4b3ca06}{disallow\+\_\+perms}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{limit__auth__changes_8hpp_source_l00008}{8}} of file \mbox{\hyperlink{limit__auth__changes_8hpp_source}{limit\+\_\+auth\+\_\+changes.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysiosystem_1_1limit__auth__change_a12877d57fa8d94ccbe1928074e63b14a}\index{sysiosystem::limit\_auth\_change@{sysiosystem::limit\_auth\_change}!primary\_key@{primary\_key}}
+\index{primary\_key@{primary\_key}!sysiosystem::limit\_auth\_change@{sysiosystem::limit\_auth\_change}}
+\doxysubsubsection{\texorpdfstring{primary\_key()}{primary\_key()}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1limit__auth__change_a12877d57fa8d94ccbe1928074e63b14a} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} sysiosystem\+::limit\+\_\+auth\+\_\+change\+::primary\+\_\+key (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{limit__auth__changes_8hpp_source_l00014}{14}} of file \mbox{\hyperlink{limit__auth__changes_8hpp_source}{limit\+\_\+auth\+\_\+changes.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00014\ \{\ \textcolor{keywordflow}{return}\ account.value;\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysiosystem_1_1limit__auth__change_a13e2638d9ce0878e92005a94946589b0}\index{sysiosystem::limit\_auth\_change@{sysiosystem::limit\_auth\_change}!account@{account}}
+\index{account@{account}!sysiosystem::limit\_auth\_change@{sysiosystem::limit\_auth\_change}}
+\doxysubsubsection{\texorpdfstring{account}{account}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1limit__auth__change_a13e2638d9ce0878e92005a94946589b0} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} sysiosystem\+::limit\+\_\+auth\+\_\+change\+::account}
+
+
+
+Definition at line \mbox{\hyperlink{limit__auth__changes_8hpp_source_l00010}{10}} of file \mbox{\hyperlink{limit__auth__changes_8hpp_source}{limit\+\_\+auth\+\_\+changes.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1limit__auth__change_a560ed8d19aeed5766126bb58917853df}\index{sysiosystem::limit\_auth\_change@{sysiosystem::limit\_auth\_change}!allow\_perms@{allow\_perms}}
+\index{allow\_perms@{allow\_perms}!sysiosystem::limit\_auth\_change@{sysiosystem::limit\_auth\_change}}
+\doxysubsubsection{\texorpdfstring{allow\_perms}{allow\_perms}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1limit__auth__change_a560ed8d19aeed5766126bb58917853df} 
+std\+::vector$<$\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}$>$ sysiosystem\+::limit\+\_\+auth\+\_\+change\+::allow\+\_\+perms}
+
+
+
+Definition at line \mbox{\hyperlink{limit__auth__changes_8hpp_source_l00011}{11}} of file \mbox{\hyperlink{limit__auth__changes_8hpp_source}{limit\+\_\+auth\+\_\+changes.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1limit__auth__change_af24c50baf6d0c6bffa1721c5a4b3ca06}\index{sysiosystem::limit\_auth\_change@{sysiosystem::limit\_auth\_change}!disallow\_perms@{disallow\_perms}}
+\index{disallow\_perms@{disallow\_perms}!sysiosystem::limit\_auth\_change@{sysiosystem::limit\_auth\_change}}
+\doxysubsubsection{\texorpdfstring{disallow\_perms}{disallow\_perms}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1limit__auth__change_af24c50baf6d0c6bffa1721c5a4b3ca06} 
+std\+::vector$<$\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}$>$ sysiosystem\+::limit\+\_\+auth\+\_\+change\+::disallow\+\_\+perms}
+
+
+
+Definition at line \mbox{\hyperlink{limit__auth__changes_8hpp_source_l00012}{12}} of file \mbox{\hyperlink{limit__auth__changes_8hpp_source}{limit\+\_\+auth\+\_\+changes.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1limit__auth__change_aceede7269997728ea53e7147d1216260}\index{sysiosystem::limit\_auth\_change@{sysiosystem::limit\_auth\_change}!version@{version}}
+\index{version@{version}!sysiosystem::limit\_auth\_change@{sysiosystem::limit\_auth\_change}}
+\doxysubsubsection{\texorpdfstring{version}{version}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1limit__auth__change_aceede7269997728ea53e7147d1216260} 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} sysiosystem\+::limit\+\_\+auth\+\_\+change\+::version = 0}
+
+
+
+Definition at line \mbox{\hyperlink{limit__auth__changes_8hpp_source_l00009}{9}} of file \mbox{\hyperlink{limit__auth__changes_8hpp_source}{limit\+\_\+auth\+\_\+changes.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/svetlasyrimis/\+Desktop/wire-\/network/\+WN-\/org/wire-\/system-\/contracts/contracts/sysio.\+system/include/sysio.\+system/\mbox{\hyperlink{limit__auth__changes_8hpp}{limit\+\_\+auth\+\_\+changes.\+hpp}}\end{DoxyCompactItemize}

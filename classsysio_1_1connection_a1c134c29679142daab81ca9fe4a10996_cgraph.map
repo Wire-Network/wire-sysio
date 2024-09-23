@@ -1,0 +1,17 @@
+<map id="sysio::connection::send_time" name="sysio::connection::send_time">
+<area shape="rect" id="Node000001" title="Populate and queue time_message." alt="" coords="5,71,137,111"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1connection.html#ad6a1bcdfc4bd9d2c7ab2278240def6b6" title=" " alt="" coords="185,37,316,78"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="137,76,169,70,170,75,138,81"/>
+<area shape="rect" id="Node000008" href="$classsysio_1_1connection.html#aa74b147947e087bc084d72a3d892a06f" title="Read system time and convert to a 64 bit integer." alt="" coords="185,103,316,143"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="138,100,170,106,169,111,137,105"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1buffer__factory.html#a480d021121170a01b8148078a6f4e29f" title="caches result for subsequent calls, only provide same net_message instance for each invocation" alt="" coords="364,5,504,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="316,44,348,38,349,43,317,49"/>
+<area shape="rect" id="Node000004" href="$namespacesysio.html#a19cc0c616331757f980d857722b4e07e" title=" " alt="" coords="366,71,502,111"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="317,67,351,73,350,79,316,72"/>
+<area shape="rect" id="Node000005" href="$namespaceappbase.html#a99374dc23934f008a09f2f79be9eae40" title=" " alt="" coords="573,49,672,74"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="502,78,558,69,558,74,502,83"/>
+<area shape="rect" id="Node000007" href="$classappbase_1_1application.html#a81aa58d3f94570b7976145039155fc46" title=" " alt="" coords="552,99,693,139"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="502,98,537,104,536,109,502,104"/>
+<area shape="rect" id="Node000006" href="$classappbase_1_1application.html#ac874b2659b400fe254f1ae4260d06ecf" title=" " alt="" coords="741,41,881,82"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="673,59,725,59,725,64,673,64"/>
+</map>

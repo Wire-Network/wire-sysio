@@ -1,0 +1,73 @@
+\doxysection{secp256k1\+\_\+schnorrsig\+\_\+extraparams Struct Reference}
+\hypertarget{structsecp256k1__schnorrsig__extraparams}{}\label{structsecp256k1__schnorrsig__extraparams}\index{secp256k1\_schnorrsig\_extraparams@{secp256k1\_schnorrsig\_extraparams}}
+
+
+{\ttfamily \#include $<$secp256k1\+\_\+schnorrsig.\+h$>$}
+
+
+
+Collaboration diagram for secp256k1\+\_\+schnorrsig\+\_\+extraparams\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=194pt]{structsecp256k1__schnorrsig__extraparams__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+unsigned char \mbox{\hyperlink{structsecp256k1__schnorrsig__extraparams_ad90ca666fb9cee5fb047d83bea870798}{magic}} \mbox{[}4\mbox{]}
+\item 
+\mbox{\hyperlink{secp256k1__schnorrsig_8h_a134d980bb4432c6d70e3298979c8f5ec}{secp256k1\+\_\+nonce\+\_\+function\+\_\+hardened}} \mbox{\hyperlink{structsecp256k1__schnorrsig__extraparams_a2077f4d9419810e53d252d9d91de33e4}{noncefp}}
+\item 
+void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structsecp256k1__schnorrsig__extraparams_a2b41a75d3d43b71f1f8e04703c1a857d}{ndata}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\doxylink{struct_data}{Data} structure that contains additional arguments for schnorrsig\+\_\+sign\+\_\+custom.
+
+\doxylink{struct_a}{A} schnorrsig\+\_\+extraparams structure object can be initialized correctly by setting it to SECP256\+K1\+\_\+\+SCHNORRSIG\+\_\+\+EXTRAPARAMS\+\_\+\+INIT.
+
+Members\+: magic\+: set to SECP256\+K1\+\_\+\+SCHNORRSIG\+\_\+\+EXTRAPARAMS\+\_\+\+MAGIC at initialization and has no other function than making sure the object is initialized. noncefp\+: pointer to a nonce generation function. If NULL, secp256k1\+\_\+nonce\+\_\+function\+\_\+bip340 is used ndata\+: pointer to arbitrary data used by the nonce generation function (can be NULL). If it is non-\/\+NULL and secp256k1\+\_\+nonce\+\_\+function\+\_\+bip340 is used, then ndata must be a pointer to 32-\/byte auxiliary randomness as per BIP-\/340. 
+
+Definition at line \mbox{\hyperlink{secp256k1__schnorrsig_8h_source_l00082}{82}} of file \mbox{\hyperlink{secp256k1__schnorrsig_8h_source}{secp256k1\+\_\+schnorrsig.\+h}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsecp256k1__schnorrsig__extraparams_ad90ca666fb9cee5fb047d83bea870798}\index{secp256k1\_schnorrsig\_extraparams@{secp256k1\_schnorrsig\_extraparams}!magic@{magic}}
+\index{magic@{magic}!secp256k1\_schnorrsig\_extraparams@{secp256k1\_schnorrsig\_extraparams}}
+\doxysubsubsection{\texorpdfstring{magic}{magic}}
+{\footnotesize\ttfamily \label{structsecp256k1__schnorrsig__extraparams_ad90ca666fb9cee5fb047d83bea870798} 
+unsigned char secp256k1\+\_\+schnorrsig\+\_\+extraparams\+::magic\mbox{[}4\mbox{]}}
+
+
+
+Definition at line \mbox{\hyperlink{secp256k1__schnorrsig_8h_source_l00083}{83}} of file \mbox{\hyperlink{secp256k1__schnorrsig_8h_source}{secp256k1\+\_\+schnorrsig.\+h}}.
+
+\Hypertarget{structsecp256k1__schnorrsig__extraparams_a2b41a75d3d43b71f1f8e04703c1a857d}\index{secp256k1\_schnorrsig\_extraparams@{secp256k1\_schnorrsig\_extraparams}!ndata@{ndata}}
+\index{ndata@{ndata}!secp256k1\_schnorrsig\_extraparams@{secp256k1\_schnorrsig\_extraparams}}
+\doxysubsubsection{\texorpdfstring{ndata}{ndata}}
+{\footnotesize\ttfamily \label{structsecp256k1__schnorrsig__extraparams_a2b41a75d3d43b71f1f8e04703c1a857d} 
+void\texorpdfstring{$\ast$}{*} secp256k1\+\_\+schnorrsig\+\_\+extraparams\+::ndata}
+
+
+
+Definition at line \mbox{\hyperlink{secp256k1__schnorrsig_8h_source_l00085}{85}} of file \mbox{\hyperlink{secp256k1__schnorrsig_8h_source}{secp256k1\+\_\+schnorrsig.\+h}}.
+
+\Hypertarget{structsecp256k1__schnorrsig__extraparams_a2077f4d9419810e53d252d9d91de33e4}\index{secp256k1\_schnorrsig\_extraparams@{secp256k1\_schnorrsig\_extraparams}!noncefp@{noncefp}}
+\index{noncefp@{noncefp}!secp256k1\_schnorrsig\_extraparams@{secp256k1\_schnorrsig\_extraparams}}
+\doxysubsubsection{\texorpdfstring{noncefp}{noncefp}}
+{\footnotesize\ttfamily \label{structsecp256k1__schnorrsig__extraparams_a2077f4d9419810e53d252d9d91de33e4} 
+\mbox{\hyperlink{secp256k1__schnorrsig_8h_a134d980bb4432c6d70e3298979c8f5ec}{secp256k1\+\_\+nonce\+\_\+function\+\_\+hardened}} secp256k1\+\_\+schnorrsig\+\_\+extraparams\+::noncefp}
+
+
+
+Definition at line \mbox{\hyperlink{secp256k1__schnorrsig_8h_source_l00084}{84}} of file \mbox{\hyperlink{secp256k1__schnorrsig_8h_source}{secp256k1\+\_\+schnorrsig.\+h}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/secp256k1/secp256k1/include/\mbox{\hyperlink{secp256k1__schnorrsig_8h}{secp256k1\+\_\+schnorrsig.\+h}}\end{DoxyCompactItemize}

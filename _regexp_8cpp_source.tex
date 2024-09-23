@@ -1,0 +1,347 @@
+\doxysection{Regexp.\+cpp}
+\hypertarget{_regexp_8cpp_source}{}\label{_regexp_8cpp_source}\index{libraries/wasm-\/jit/Source/WAST/Regexp.cpp@{libraries/wasm-\/jit/Source/WAST/Regexp.cpp}}
+\mbox{\hyperlink{_regexp_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_basic_types_8h}{Inline/BasicTypes.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_errors_8h}{Inline/Errors.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_regexp_8h}{Regexp.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_n_f_a_8h}{NFA.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <assert.h>}}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00008}\mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4}{00008}}\ \textcolor{keyword}{enum\ class}\ \mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4}{NodeType}}\ :\ \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00009}00009\ \{}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00010}00010\ \ \ \ \ \mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4aef28f869b241b00b879922832b14da10}{lit}},}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00011}00011\ \ \ \ \ \mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4a77d6109f8802447a9223690829168071}{zeroOrMore}},}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00012}00012\ \ \ \ \ \mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4a22d65e6655e324ddadaa0a522c1b549e}{oneOrMore}},}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00013}00013\ \ \ \ \ \mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4ad57c24f3fe52d16e7169b912dd647f0d}{optional}},}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00014}00014\ \ \ \ \ \mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4a34823136d0dd91d0f5d22db740f7679c}{alt}},}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00015}00015\ \ \ \ \ \mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4ae068c2de26d760f20cf10afc4b87ef0f}{seq}},}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00016}00016\ \};}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00017}\mbox{\hyperlink{struct_node}{00017}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_node}{Node}}}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00018}00018\ \{}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00019}\mbox{\hyperlink{struct_node_adf0cbf3c4ed6bcc23d4befaa861c2cc8}{00019}}\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4}{NodeType}}\ \mbox{\hyperlink{struct_node_adf0cbf3c4ed6bcc23d4befaa861c2cc8}{type}};}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00020}\mbox{\hyperlink{struct_node_a1926a7bf0247e8c70851c95d279fef23}{00020}}\ \ \ \ \ \mbox{\hyperlink{struct_node_a1926a7bf0247e8c70851c95d279fef23}{Node}}(\mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4}{NodeType}}\ inType):\ type(inType)\ \{\}}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00021}\mbox{\hyperlink{struct_node_af5e3fa79300bf5f3f2f3ecae6e795a94}{00021}}\ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{struct_node_af5e3fa79300bf5f3f2f3ecae6e795a94}{\string~Node}}()\ \{\}}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00022}00022\ \};}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00023}\mbox{\hyperlink{struct_lit}{00023}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_lit}{Lit}}\ :\ \mbox{\hyperlink{struct_node}{Node}}}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00024}00024\ \{}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00025}\mbox{\hyperlink{struct_lit_aca99fb32a7aec842b4e10b436fc61fb5}{00025}}\ \ \ \ \ \mbox{\hyperlink{struct_dense_static_int_set}{NFA::CharSet}}\ \mbox{\hyperlink{struct_lit_aca99fb32a7aec842b4e10b436fc61fb5}{charSet}};}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00026}\mbox{\hyperlink{struct_lit_aa2afbe5f4ab488ce9801449562a642a1}{00026}}\ \ \ \ \ \mbox{\hyperlink{struct_lit_aa2afbe5f4ab488ce9801449562a642a1}{Lit}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_dense_static_int_set}{NFA::CharSet}}\&\ inCharSet):\ \mbox{\hyperlink{struct_node}{Node}}(\mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4}{NodeType}}::\mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4aef28f869b241b00b879922832b14da10}{lit}}),\ \mbox{\hyperlink{struct_lit_aca99fb32a7aec842b4e10b436fc61fb5}{charSet}}(inCharSet)\ \{\}}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00027}00027\ \};}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00028}00028\ \textcolor{keyword}{template}<NodeType\ inType>}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00029}\mbox{\hyperlink{struct_unary}{00029}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_unary}{Unary}}\ :\ \mbox{\hyperlink{struct_node}{Node}}}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00030}00030\ \{}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00031}\mbox{\hyperlink{struct_unary_a686d6e1f001fafa426689eedaee3b070}{00031}}\ \ \ \ \ \mbox{\hyperlink{struct_node}{Node}}*\ \mbox{\hyperlink{struct_unary_a686d6e1f001fafa426689eedaee3b070}{child}};}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00032}\mbox{\hyperlink{struct_unary_a91fab4dda925a78db5f4594001be6c40}{00032}}\ \ \ \ \ \mbox{\hyperlink{struct_unary_a91fab4dda925a78db5f4594001be6c40}{Unary}}(\mbox{\hyperlink{struct_node}{Node}}*\ inChild):\ \mbox{\hyperlink{struct_node}{Node}}(inType),\ \mbox{\hyperlink{struct_unary_a686d6e1f001fafa426689eedaee3b070}{child}}(inChild)\ \{\}}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00033}\mbox{\hyperlink{struct_unary_a29abd2e26e39b46db854230e17b28a7f}{00033}}\ \ \ \ \ \mbox{\hyperlink{struct_unary_a29abd2e26e39b46db854230e17b28a7f}{\string~Unary}}()\ \{\ \textcolor{keyword}{delete}\ \mbox{\hyperlink{struct_unary_a686d6e1f001fafa426689eedaee3b070}{child}};\ \}}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00034}00034\ \};}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00035}00035\ \textcolor{keyword}{template}<NodeType\ inType>}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00036}\mbox{\hyperlink{struct_binary}{00036}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_binary}{Binary}}\ :\ \mbox{\hyperlink{struct_node}{Node}}}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00037}00037\ \{}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00038}\mbox{\hyperlink{struct_binary_a07baa7a3980615b418daf277f2869532}{00038}}\ \ \ \ \ \mbox{\hyperlink{struct_node}{Node}}*\ \mbox{\hyperlink{struct_binary_a07baa7a3980615b418daf277f2869532}{firstChild}};}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00039}\mbox{\hyperlink{struct_binary_a64ad28d31d54ee6f87c054f68e571134}{00039}}\ \ \ \ \ \mbox{\hyperlink{struct_node}{Node}}*\ \mbox{\hyperlink{struct_binary_a64ad28d31d54ee6f87c054f68e571134}{secondChild}};}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00040}\mbox{\hyperlink{struct_binary_a981a42c63999a8d399a6616a93d4e645}{00040}}\ \ \ \ \ \mbox{\hyperlink{struct_binary_a981a42c63999a8d399a6616a93d4e645}{Binary}}(\mbox{\hyperlink{struct_node}{Node}}*\ inFirstChild,\mbox{\hyperlink{struct_node}{Node}}*\ inSecondChild)}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00041}00041\ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{struct_node}{Node}}(inType)}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00042}00042\ \ \ \ \ \ \ \ \ ,\ \mbox{\hyperlink{struct_binary_a07baa7a3980615b418daf277f2869532}{firstChild}}(inFirstChild)}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00043}00043\ \ \ \ \ \ \ \ \ ,\ \mbox{\hyperlink{struct_binary_a64ad28d31d54ee6f87c054f68e571134}{secondChild}}(inSecondChild)}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00044}00044\ \ \ \ \ \{\}}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00045}\mbox{\hyperlink{struct_binary_a84b0bb0a456e3ed05a52f1f385106ae2}{00045}}\ \ \ \ \ \mbox{\hyperlink{struct_binary_a84b0bb0a456e3ed05a52f1f385106ae2}{\string~Binary}}()}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00046}00046\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00047}00047\ \ \ \ \ \ \ \ \ \textcolor{keyword}{delete}\ \mbox{\hyperlink{struct_binary_a07baa7a3980615b418daf277f2869532}{firstChild}};}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \textcolor{keyword}{delete}\ \mbox{\hyperlink{struct_binary_a64ad28d31d54ee6f87c054f68e571134}{secondChild}};}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00049}00049\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00050}00050\ \};}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00051}\mbox{\hyperlink{_regexp_8cpp_ab2f8476ad871178175a5966ce193498f}{00051}}\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{struct_unary}{Unary<NodeType::zeroOrMore>}}\ \mbox{\hyperlink{_regexp_8cpp_ab2f8476ad871178175a5966ce193498f}{ZeroOrMore}};}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00052}\mbox{\hyperlink{_regexp_8cpp_ab1330681406120f58c2a9cdbdc9ab0a0}{00052}}\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{struct_unary}{Unary<NodeType::oneOrMore>}}\ \mbox{\hyperlink{_regexp_8cpp_ab1330681406120f58c2a9cdbdc9ab0a0}{OneOrMore}};}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00053}\mbox{\hyperlink{_regexp_8cpp_a14e38f4a8adc8f3150baff82db66dbdd}{00053}}\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{struct_unary}{Unary<NodeType::optional>}}\ \mbox{\hyperlink{_regexp_8cpp_a14e38f4a8adc8f3150baff82db66dbdd}{Optional}};}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00054}\mbox{\hyperlink{_regexp_8cpp_a5a887ac128ddf629616f8429bf78f30a}{00054}}\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{struct_binary}{Binary<NodeType::alt>}}\ \mbox{\hyperlink{_regexp_8cpp_a5a887ac128ddf629616f8429bf78f30a}{Alt}};}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00055}\mbox{\hyperlink{_regexp_8cpp_ac5c1a9d4c11d6f747a5340bd710a2656}{00055}}\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{struct_binary}{Binary<NodeType::seq>}}\ \mbox{\hyperlink{_regexp_8cpp_ac5c1a9d4c11d6f747a5340bd710a2656}{Seq}};}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00057}00057\ \textcolor{keyword}{template}<\textcolor{keywordtype}{bool}\ inSet>}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00058}00058\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{bool}\ isMetachar(\textcolor{keywordtype}{char}\ c)}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00059}00059\ \{}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00060}00060\ \ \ \ \ \textcolor{keywordflow}{switch}(c)}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00061}00061\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00062}00062\ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\string^'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)\(\backslash\)'}:}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00063}00063\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00064}00064\ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'-\/'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{']'}:}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00065}00065\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ inSet;}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00066}00066\ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\$'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'.'}:}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00067}00067\ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'|'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'*'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'+'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'?'}:}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00068}00068\ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'('}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{')'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'['}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\{'}:}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00069}00069\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !inSet;}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00070}00070\ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00071}00071\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00072}00072\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00073}00073\ \}}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00074}00074\ }
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00075}00075\ \textcolor{keyword}{template}<\textcolor{keywordtype}{bool}\ inSet>}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00076}00076\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{char}\ parseChar(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\&\ nextChar)}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00077}00077\ \{}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00078}00078\ \ \ \ \ \textcolor{keywordflow}{if}(*nextChar\ ==\ \textcolor{charliteral}{'\(\backslash\)\(\backslash\)'})}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00079}00079\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00080}00080\ \ \ \ \ \ \ \ \ ++nextChar;}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00081}00081\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!isMetachar<inSet>(*nextChar))}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00082}00082\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00083}00083\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_errors_a719a329951edb01e45afe1443dfa2a92}{Errors::fatalf}}(\textcolor{stringliteral}{"{}'\%c'\ is\ not\ a\ metachar\ in\ this\ context"{}},*nextChar);}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00084}00084\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00085}00085\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00086}00086\ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(isMetachar<inSet>(*nextChar))}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00087}00087\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00088}00088\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_errors_a719a329951edb01e45afe1443dfa2a92}{Errors::fatalf}}(\textcolor{stringliteral}{"{}'\%c'\ is\ a\ metachar\ in\ this\ context"{}},*nextChar);}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00089}00089\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00090}00090\ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(*nextChar\ ==\ 0)}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00091}00091\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00092}00092\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_errors_a719a329951edb01e45afe1443dfa2a92}{Errors::fatalf}}(\textcolor{stringliteral}{"{}unexpected\ end\ of\ string"{}});}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00093}00093\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00094}00094\ \ \ \ \ \textcolor{keywordflow}{return}\ *nextChar++;}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00095}00095\ \}}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00096}00096\ }
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00097}00097\ \textcolor{keyword}{template}<\textcolor{keywordtype}{bool}\ inSet>}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00098}00098\ \textcolor{keyword}{static}\ \mbox{\hyperlink{struct_dense_static_int_set}{NFA::CharSet}}\ parseLit(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\&\ nextChar)}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00099}00099\ \{}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00100}00100\ \ \ \ \ \mbox{\hyperlink{struct_dense_static_int_set}{NFA::CharSet}}\ result;}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00101}00101\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ c\ =\ parseChar<inSet>(nextChar);}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00102}00102\ \ \ \ \ \textcolor{keywordflow}{if}(inSet\ \&\&\ *nextChar\ ==\ \textcolor{charliteral}{'-\/'})}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00103}00103\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00104}00104\ \ \ \ \ \ \ \ \ ++nextChar;}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00105}00105\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ =\ parseChar<inSet>(nextChar);}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00106}00106\ \ \ \ \ \ \ \ \ result.addRange((\mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}})c,(\mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}})d);}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00107}00107\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00108}00108\ \ \ \ \ \textcolor{keywordflow}{else}\ \{\ result.add((\mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}})c);\ \}}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00109}00109\ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00110}00110\ \}}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00111}00111\ }
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00112}00112\ \textcolor{keyword}{template}<\textcolor{keywordtype}{bool}\ inSet>}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00113}00113\ \textcolor{keyword}{static}\ \mbox{\hyperlink{struct_dense_static_int_set}{NFA::CharSet}}\ parseCharClass(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\&\ nextChar)}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00114}00114\ \{}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00115}00115\ \ \ \ \ \textcolor{keywordflow}{if}(*nextChar\ !=\ \textcolor{charliteral}{'\(\backslash\)\(\backslash\)'})\ \{\ \textcolor{keywordflow}{return}\ parseLit<inSet>(nextChar);\ \}}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00116}00116\ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00117}00117\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00118}00118\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_dense_static_int_set}{NFA::CharSet}}\ result;}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00119}00119\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(nextChar[1])}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00120}00120\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00121}00121\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'d'}:\ result.addRange(\textcolor{charliteral}{'0'},\textcolor{charliteral}{'9'});\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00122}00122\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'w'}:\ result.addRange(\textcolor{charliteral}{'a'},\textcolor{charliteral}{'z'});\ result.addRange(\textcolor{charliteral}{'A'},\textcolor{charliteral}{'Z'});\ result.addRange(\textcolor{charliteral}{'0'},\textcolor{charliteral}{'9'});\ result.add(\textcolor{charliteral}{'\_'});\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00123}00123\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'s'}:\ result.add(\textcolor{charliteral}{'\ '});\ result.add(\textcolor{charliteral}{'\(\backslash\)t'});\ result.add(\textcolor{charliteral}{'\(\backslash\)f'});\ result.add(\textcolor{charliteral}{'\(\backslash\)r'});\ result.add(\textcolor{charliteral}{'\(\backslash\)n'});\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00124}00124\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00125}00125\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!isMetachar<inSet>(nextChar[1]))}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00126}00126\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00127}00127\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_errors_a719a329951edb01e45afe1443dfa2a92}{Errors::fatalf}}(\textcolor{stringliteral}{"{}'\%c'\ is\ not\ a\ metachar\ in\ this\ context"{}},nextChar[1]);}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00128}00128\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00129}00129\ \ \ \ \ \ \ \ \ \ \ \ \ result.add(nextChar[1]);}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00130}00130\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00131}00131\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00132}00132\ \ \ \ \ \ \ \ \ nextChar\ +=\ 2;}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00133}00133\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00134}00134\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00135}00135\ \}}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00136}00136\ }
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00137}00137\ \textcolor{keyword}{static}\ \mbox{\hyperlink{struct_dense_static_int_set}{NFA::CharSet}}\ parseSet(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\&\ nextChar)}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00138}00138\ \{}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00139}00139\ \ \ \ \ \mbox{\hyperlink{struct_dense_static_int_set}{NFA::CharSet}}\ result;}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00140}00140\ }
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00141}00141\ \ \ \ \ \mbox{\hyperlink{_errors_8h_a03bec6af3af0dd492e348b40cbe40a46}{WAVM\_ASSERT\_THROW}}(*nextChar\ ==\ \textcolor{charliteral}{'['});}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00142}00142\ \ \ \ \ ++nextChar;}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00143}00143\ }
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00144}00144\ \ \ \ \ \textcolor{keywordtype}{bool}\ isNegative\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00145}00145\ \ \ \ \ \textcolor{keywordflow}{if}(*nextChar\ ==\ \textcolor{charliteral}{'\string^'})}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00146}00146\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00147}00147\ \ \ \ \ \ \ \ \ isNegative\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00148}00148\ \ \ \ \ \ \ \ \ ++nextChar;}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00149}00149\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00150}00150\ }
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00151}00151\ \ \ \ \ \textcolor{keywordflow}{while}(*nextChar\ \&\&\ *nextChar\ !=\ \textcolor{charliteral}{']'})}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00152}00152\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00153}00153\ \ \ \ \ \ \ \ \ result\ =\ result\ |\ parseCharClass<true>(nextChar);\ }
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00154}00154\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00155}00155\ \ \ \ \ ++nextChar;}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00156}00156\ }
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00157}00157\ \ \ \ \ \textcolor{keywordflow}{if}(isNegative)}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00158}00158\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00159}00159\ \ \ \ \ \ \ \ \ result\ =\ \string~result;}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00160}00160\ \ \ \ \ \ \ \ \ result.remove(0);}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00161}00161\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00162}00162\ }
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00163}00163\ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00164}00164\ \}}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00165}00165\ }
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00166}00166\ \textcolor{keyword}{static}\ \mbox{\hyperlink{struct_node}{Node}}*\ parseElementary(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\&\ nextChar,\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ groupDepth)}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00167}00167\ \{}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00168}00168\ \ \ \ \ \mbox{\hyperlink{struct_dense_static_int_set}{NFA::CharSet}}\ charSet;}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00169}00169\ \ \ \ \ \textcolor{keywordflow}{switch}(*nextChar)}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00170}00170\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00171}00171\ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'['}:}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00172}00172\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00173}00173\ \ \ \ \ \ \ \ \ charSet\ =\ parseSet(nextChar);}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00174}00174\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00175}00175\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00176}00176\ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'.'}:}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00177}00177\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00178}00178\ \ \ \ \ \ \ \ \ charSet\ =\ \mbox{\hyperlink{namespace_n_f_a}{\string~NFA}}::CharSet(0);}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00179}00179\ \ \ \ \ \ \ \ \ ++nextChar;}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00180}00180\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00181}00181\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00182}00182\ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\$'}:}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00183}00183\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00184}00184\ \ \ \ \ \ \ \ \ charSet.\mbox{\hyperlink{struct_dense_static_int_set_abd86ddd57ca2a9bca54d35959dc4d674}{add}}(\textcolor{charliteral}{'\(\backslash\)n'});}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00185}00185\ \ \ \ \ \ \ \ \ ++nextChar;}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00186}00186\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00187}00187\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00188}00188\ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00189}00189\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00190}00190\ \ \ \ \ \ \ \ \ charSet\ =\ parseCharClass<false>(nextChar);}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00191}00191\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00192}00192\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00193}00193\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00194}00194\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{struct_lit}{Lit}}(charSet);}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00195}00195\ \}}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00196}00196\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00197}00197\ \textcolor{keyword}{static}\ \mbox{\hyperlink{struct_node}{Node}}*\ parseUnion(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\&\ nextChar,\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ groupDepth);}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00198}00198\ \textcolor{keyword}{static}\ \mbox{\hyperlink{struct_node}{Node}}*\ parseGroup(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\&\ nextChar,\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ groupDepth)}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00199}00199\ \{}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00200}00200\ \ \ \ \ \textcolor{keywordflow}{if}(*nextChar\ !=\ \textcolor{charliteral}{'('})\ \{\ \textcolor{keywordflow}{return}\ parseElementary(nextChar,groupDepth);\ \}}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00201}00201\ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00202}00202\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00203}00203\ \ \ \ \ \ \ \ \ ++nextChar;}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00204}00204\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_node}{Node}}*\ result\ =\ parseUnion(nextChar,groupDepth+1);}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00205}00205\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_errors_8h_a03bec6af3af0dd492e348b40cbe40a46}{WAVM\_ASSERT\_THROW}}(*nextChar\ ==\ \textcolor{charliteral}{')'});}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00206}00206\ \ \ \ \ \ \ \ \ ++nextChar;}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00207}00207\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00208}00208\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00209}00209\ \}}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00210}00210\ }
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00211}00211\ \textcolor{keyword}{static}\ \mbox{\hyperlink{struct_node}{Node}}*\ parseQuantifier(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\&\ nextChar,\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ groupDepth)}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00212}00212\ \{}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00213}00213\ \ \ \ \ \mbox{\hyperlink{struct_node}{Node}}*\ result\ =\ parseGroup(nextChar,groupDepth);}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00214}00214\ }
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00215}00215\ \ \ \ \ \textcolor{keywordflow}{switch}(*nextChar)}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00216}00216\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00217}00217\ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'+'}:\ ++nextChar;\ result\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{_regexp_8cpp_ab1330681406120f58c2a9cdbdc9ab0a0}{OneOrMore}}(result);\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00218}00218\ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'*'}:\ ++nextChar;\ result\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{_regexp_8cpp_ab2f8476ad871178175a5966ce193498f}{ZeroOrMore}}(result);\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00219}00219\ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'?'}:\ ++nextChar;\ result\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{_regexp_8cpp_a14e38f4a8adc8f3150baff82db66dbdd}{Optional}}(result);\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00220}00220\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00221}00221\ }
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00222}00222\ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00223}00223\ \}}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00224}00224\ }
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00225}00225\ \textcolor{keyword}{static}\ \mbox{\hyperlink{struct_node}{Node}}*\ parseSeq(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\&\ nextChar,\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ groupDepth)}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00226}00226\ \{}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00227}00227\ \ \ \ \ \mbox{\hyperlink{struct_node}{Node}}*\ result\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00228}00228\ \ \ \ \ \textcolor{keywordflow}{while}(\textcolor{keyword}{true})}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00229}00229\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00230}00230\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_node}{Node}}*\ newNode\ =\ parseQuantifier(nextChar,groupDepth);}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00231}00231\ \ \ \ \ \ \ \ \ result\ =\ result\ ?\ \textcolor{keyword}{new}\ \mbox{\hyperlink{_regexp_8cpp_ac5c1a9d4c11d6f747a5340bd710a2656}{Seq}}(result,newNode)\ :\ newNode;}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00232}00232\ }
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00233}00233\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(*nextChar)}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00234}00234\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00235}00235\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{')'}:}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00236}00236\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(groupDepth\ ==\ 0)\ \{\ \mbox{\hyperlink{namespace_errors_a719a329951edb01e45afe1443dfa2a92}{Errors::fatalf}}(\textcolor{stringliteral}{"{}unexpected\ ')'"{}});\ \}}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00237}00237\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00238}00238\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ 0:}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00239}00239\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(groupDepth\ !=\ 0)\ \{\ \mbox{\hyperlink{namespace_errors_a719a329951edb01e45afe1443dfa2a92}{Errors::fatalf}}(\textcolor{stringliteral}{"{}unexpected\ end\ of\ string"{}});\ \}}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00240}00240\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00241}00241\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'|'}:}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00242}00242\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00243}00243\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00244}00244\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00245}00245\ \}}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00246}00246\ }
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00247}00247\ \textcolor{keyword}{static}\ \mbox{\hyperlink{struct_node}{Node}}*\ parseUnion(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\&\ nextChar,\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ groupDepth)}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00248}00248\ \{}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00249}00249\ \ \ \ \ \mbox{\hyperlink{struct_node}{Node}}*\ result\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00250}00250\ \ \ \ \ \textcolor{keywordflow}{while}(\textcolor{keyword}{true})}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00251}00251\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00252}00252\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_node}{Node}}*\ newNode\ =\ parseSeq(nextChar,groupDepth);}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00253}00253\ \ \ \ \ \ \ \ \ result\ =\ result\ ?\ \textcolor{keyword}{new}\ \mbox{\hyperlink{_regexp_8cpp_a5a887ac128ddf629616f8429bf78f30a}{Alt}}(result,newNode)\ :\ newNode;}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00254}00254\ }
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00255}00255\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(*nextChar)}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00256}00256\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00257}00257\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{')'}:}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00258}00258\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(groupDepth\ ==\ 0)\ \{\ \mbox{\hyperlink{namespace_errors_a719a329951edb01e45afe1443dfa2a92}{Errors::fatalf}}(\textcolor{stringliteral}{"{}unexpected\ ')'"{}});\ \}}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00259}00259\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00260}00260\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ 0:}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00261}00261\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(groupDepth\ !=\ 0)\ \{\ \mbox{\hyperlink{namespace_errors_a719a329951edb01e45afe1443dfa2a92}{Errors::fatalf}}(\textcolor{stringliteral}{"{}unexpected\ end\ of\ string"{}});\ \}}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00262}00262\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00263}00263\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'|'}:}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00264}00264\ \ \ \ \ \ \ \ \ \ \ \ \ ++nextChar;}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00265}00265\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00266}00266\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00267}00267\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_errors_a719a329951edb01e45afe1443dfa2a92}{Errors::fatalf}}(\textcolor{stringliteral}{"{}unrecognized\ input"{}});}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00268}00268\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00269}00269\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00270}00270\ \}}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00271}00271\ }
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00272}00272\ \textcolor{keyword}{static}\ \mbox{\hyperlink{struct_node}{Node}}*\ parse(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \textcolor{keywordtype}{string})}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00273}00273\ \{}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00274}00274\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ nextChar\ =\ string;}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00275}00275\ \ \ \ \ \mbox{\hyperlink{struct_node}{Node}}*\ node\ =\ parseUnion(nextChar,0);}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00276}00276\ \ \ \ \ \textcolor{keywordflow}{if}(*nextChar\ !=\ 0)\ \{\ \mbox{\hyperlink{namespace_errors_a719a329951edb01e45afe1443dfa2a92}{Errors::fatalf}}(\textcolor{stringliteral}{"{}failed\ to\ parse\ entire\ regexp"{}});\ \}}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00277}00277\ \ \ \ \ \textcolor{keywordflow}{return}\ node;}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00278}00278\ \}}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00279}00279\ }
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00280}00280\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ createNFA(\mbox{\hyperlink{struct_n_f_a_1_1_builder}{NFA::Builder}}*\ nfaBuilder,\mbox{\hyperlink{struct_node}{Node}}*\ node,\mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{NFA::StateIndex}}\ initialState,\mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{NFA::StateIndex}}\ finalState)}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00281}00281\ \{}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00282}00282\ \ \ \ \ \textcolor{keywordflow}{switch}(node-\/>\mbox{\hyperlink{struct_node_adf0cbf3c4ed6bcc23d4befaa861c2cc8}{type}})}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00283}00283\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00284}00284\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4aef28f869b241b00b879922832b14da10}{NodeType::lit}}:}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00285}00285\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00286}00286\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4aef28f869b241b00b879922832b14da10}{lit}}\ =\ (\mbox{\hyperlink{struct_lit}{Lit}}*)node;}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00287}00287\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_n_f_a_a7fcfabbb0aaf904f594a4c6d72e9e54c}{NFA::addEdge}}(nfaBuilder,initialState,\mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4aef28f869b241b00b879922832b14da10}{lit}}-\/>charSet,finalState);}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00288}00288\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00289}00289\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00290}00290\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4a77d6109f8802447a9223690829168071}{NodeType::zeroOrMore}}:}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00291}00291\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00292}00292\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4a77d6109f8802447a9223690829168071}{zeroOrMore}}\ =\ (\mbox{\hyperlink{struct_unary}{ZeroOrMore}}*)node;}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00293}00293\ \ \ \ \ \ \ \ \ createNFA(nfaBuilder,\mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4a77d6109f8802447a9223690829168071}{zeroOrMore}}-\/>child,initialState,initialState);}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00294}00294\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_n_f_a_acfdce2879b3ebd805fc8512239d7dd44}{NFA::addEpsilonEdge}}(nfaBuilder,initialState,finalState);}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00295}00295\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00296}00296\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00297}00297\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4a22d65e6655e324ddadaa0a522c1b549e}{NodeType::oneOrMore}}:}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00298}00298\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00299}00299\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4a22d65e6655e324ddadaa0a522c1b549e}{oneOrMore}}\ =\ (\mbox{\hyperlink{struct_unary}{OneOrMore}}*)node;}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00300}00300\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ intermediateState\ =\ \mbox{\hyperlink{namespace_n_f_a_aa1fa2de1cb3ea820ec7ae1994d624803}{NFA::addState}}(nfaBuilder);}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00301}00301\ \ \ \ \ \ \ \ \ createNFA(nfaBuilder,\mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4a22d65e6655e324ddadaa0a522c1b549e}{oneOrMore}}-\/>child,initialState,intermediateState);}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00302}00302\ \ \ \ \ \ \ \ \ createNFA(nfaBuilder,\mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4a22d65e6655e324ddadaa0a522c1b549e}{oneOrMore}}-\/>child,intermediateState,intermediateState);}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00303}00303\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_n_f_a_acfdce2879b3ebd805fc8512239d7dd44}{NFA::addEpsilonEdge}}(nfaBuilder,intermediateState,finalState);}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00304}00304\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00305}00305\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00306}00306\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4ad57c24f3fe52d16e7169b912dd647f0d}{NodeType::optional}}:}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00307}00307\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00308}00308\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ optional\ =\ (\mbox{\hyperlink{struct_unary}{Optional}}*)node;}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00309}00309\ \ \ \ \ \ \ \ \ createNFA(nfaBuilder,optional-\/>child,initialState,finalState);}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00310}00310\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_n_f_a_acfdce2879b3ebd805fc8512239d7dd44}{NFA::addEpsilonEdge}}(nfaBuilder,initialState,finalState);}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00311}00311\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00312}00312\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00313}00313\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4a34823136d0dd91d0f5d22db740f7679c}{NodeType::alt}}:}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00314}00314\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00315}00315\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4a34823136d0dd91d0f5d22db740f7679c}{alt}}\ =\ (\mbox{\hyperlink{struct_binary}{Alt}}*)node;}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00316}00316\ \ \ \ \ \ \ \ \ createNFA(nfaBuilder,\mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4a34823136d0dd91d0f5d22db740f7679c}{alt}}-\/>firstChild,initialState,finalState);}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00317}00317\ \ \ \ \ \ \ \ \ createNFA(nfaBuilder,\mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4a34823136d0dd91d0f5d22db740f7679c}{alt}}-\/>secondChild,initialState,finalState);}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00318}00318\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00319}00319\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00320}00320\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4ae068c2de26d760f20cf10afc4b87ef0f}{NodeType::seq}}:}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00321}00321\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00322}00322\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4ae068c2de26d760f20cf10afc4b87ef0f}{seq}}\ =\ (\mbox{\hyperlink{struct_binary}{Seq}}*)node;}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00323}00323\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ intermediateState\ =\ \mbox{\hyperlink{namespace_n_f_a_aa1fa2de1cb3ea820ec7ae1994d624803}{NFA::addState}}(nfaBuilder);}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00324}00324\ \ \ \ \ \ \ \ \ createNFA(nfaBuilder,\mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4ae068c2de26d760f20cf10afc4b87ef0f}{seq}}-\/>firstChild,initialState,intermediateState);}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00325}00325\ \ \ \ \ \ \ \ \ createNFA(nfaBuilder,\mbox{\hyperlink{_regexp_8cpp_aabcc21a08b981a76503b1d19b5e4c6f4ae068c2de26d760f20cf10afc4b87ef0f}{seq}}-\/>secondChild,intermediateState,finalState);}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00326}00326\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00327}00327\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00328}00328\ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00329}00329\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_errors_a6959930ad6159fe3eb2e04ebf87c1b84}{Errors::unreachable}}();}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00330}00330\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00331}00331\ \}}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00332}00332\ }
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00333}\mbox{\hyperlink{namespace_regexp}{00333}}\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_regexp}{Regexp}}}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00334}00334\ \{}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00335}\mbox{\hyperlink{namespace_regexp_aadd46f06c56abd08dd3844b0eac3d28e}{00335}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespace_regexp_aadd46f06c56abd08dd3844b0eac3d28e}{addToNFA}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ regexpString,\mbox{\hyperlink{struct_n_f_a_1_1_builder}{NFA::Builder}}*\ nfaBuilder,\mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{NFA::StateIndex}}\ initialState,\mbox{\hyperlink{namespace_n_f_a_af873c000199f1286bda163adc2deeb5c}{NFA::StateIndex}}\ finalState)}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00336}00336\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00337}00337\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_node}{Node}}*\ rootNode\ =\ parse(regexpString);}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00338}00338\ \ \ \ \ \ \ \ \ createNFA(nfaBuilder,rootNode,initialState,finalState);}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00339}00339\ \ \ \ \ \ \ \ \ \textcolor{keyword}{delete}\ rootNode;}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00340}00340\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_regexp_8cpp_source_l00341}00341\ \};}
+
+\end{DoxyCode}

@@ -1,0 +1,10 @@
+<map id="sysio::chain::webassembly::interface::_sysio_f32_neg" name="sysio::chain::webassembly::interface::_sysio_f32_neg">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,23,185,64"/>
+<area shape="rect" id="Node000002" href="$softfloat_2source_2include_2softfloat_8hpp.html#aa9844e6aebaaa652c490e1731c80ba86" title=" " alt="" coords="233,5,348,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="184,29,217,25,218,30,185,35"/>
+<area shape="rect" id="Node000004" href="$softfloat_2source_2include_2softfloat_8hpp.html#a11898b253b776079f3963d5d44903bc3" title=" " alt="" coords="240,55,340,80"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="185,52,225,57,225,62,184,57"/>
+<area shape="rect" id="Node000003" href="$yubihsm__pkcs11_8c.html#ae785d5badbf1f08b491af31f32a135a1" title=" " alt="" coords="396,31,467,56"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="349,26,381,32,380,37,348,31"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="340,56,380,49,381,55,341,62"/>
+</map>

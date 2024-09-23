@@ -1,0 +1,7 @@
+<map id="sysio::connection::send_time" name="sysio::connection::send_time">
+<area shape="rect" id="Node000001" title="Populate and queue time_message." alt="" coords="185,39,316,79"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1connection.html#ad02fe050af3c833e156bea91308d6c1b" title="Check heartbeat time and send Time_message." alt="" coords="5,5,137,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="169,47,137,41,138,35,170,41"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1connection.html#a674cbe920ea083be64a0746c0ce76c86" title="Process time_message." alt="" coords="5,71,137,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="170,76,138,82,137,77,169,71"/>
+</map>

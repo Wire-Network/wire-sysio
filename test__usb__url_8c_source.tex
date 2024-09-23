@@ -1,0 +1,60 @@
+\doxysection{test\+\_\+usb\+\_\+url.\+c}
+\hypertarget{test__usb__url_8c_source}{}\label{test__usb__url_8c_source}\index{libraries/yubihsm/lib/tests/test\_usb\_url.c@{libraries/yubihsm/lib/tests/test\_usb\_url.c}}
+\mbox{\hyperlink{test__usb__url_8c}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{test__usb__url_8c_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{test__usb__url_8c_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ 2015-\/2018\ Yubico\ AB}}
+\DoxyCodeLine{\Hypertarget{test__usb__url_8c_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{test__usb__url_8c_source_l00004}00004\ \textcolor{comment}{\ *\ Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{\Hypertarget{test__usb__url_8c_source_l00005}00005\ \textcolor{comment}{\ *\ you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{test__usb__url_8c_source_l00006}00006\ \textcolor{comment}{\ *\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{\Hypertarget{test__usb__url_8c_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{test__usb__url_8c_source_l00008}00008\ \textcolor{comment}{\ *\ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{\Hypertarget{test__usb__url_8c_source_l00009}00009\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{test__usb__url_8c_source_l00010}00010\ \textcolor{comment}{\ *\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{\Hypertarget{test__usb__url_8c_source_l00011}00011\ \textcolor{comment}{\ *\ distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{\Hypertarget{test__usb__url_8c_source_l00012}00012\ \textcolor{comment}{\ *\ WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{\Hypertarget{test__usb__url_8c_source_l00013}00013\ \textcolor{comment}{\ *\ See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{\Hypertarget{test__usb__url_8c_source_l00014}00014\ \textcolor{comment}{\ *\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{test__usb__url_8c_source_l00015}00015\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{test__usb__url_8c_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{test__usb__url_8c_source_l00017}00017\ \textcolor{preprocessor}{\#ifdef\ NDEBUG}}
+\DoxyCodeLine{\Hypertarget{test__usb__url_8c_source_l00018}00018\ \textcolor{preprocessor}{\#undef\ NDEBUG}}
+\DoxyCodeLine{\Hypertarget{test__usb__url_8c_source_l00019}00019\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{test__usb__url_8c_source_l00020}00020\ \textcolor{preprocessor}{\#include\ <assert.h>}}
+\DoxyCodeLine{\Hypertarget{test__usb__url_8c_source_l00021}00021\ \textcolor{preprocessor}{\#include\ <stdio.h>}}
+\DoxyCodeLine{\Hypertarget{test__usb__url_8c_source_l00022}00022\ \textcolor{preprocessor}{\#include\ <string.h>}}
+\DoxyCodeLine{\Hypertarget{test__usb__url_8c_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{test__usb__url_8c_source_l00024}00024\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{yubihsm_8h}{yubihsm.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{test__usb__url_8c_source_l00025}00025\ \textcolor{preprocessor}{\#include\ "{}internal.h"{}}}
+\DoxyCodeLine{\Hypertarget{test__usb__url_8c_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{test__usb__url_8c_source_l00027}\mbox{\hyperlink{debug__lib_8h_a4ba5f59460a312e3f5f14926f4b2299e}{00027}}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \mbox{\hyperlink{test__usb__url_8c_a4ba5f59460a312e3f5f14926f4b2299e}{\_yh\_verbosity}}\ =\ \mbox{\hyperlink{yubihsm_8h_a15dbe0ac973691939ca6e9148b181ccd}{YH\_VERB\_ALL}};}
+\DoxyCodeLine{\Hypertarget{test__usb__url_8c_source_l00028}\mbox{\hyperlink{debug__lib_8h_a76ba6bc136c2b38b71a9e3c56282cd3a}{00028}}\ FILE\ *\mbox{\hyperlink{test__usb__url_8c_a76ba6bc136c2b38b71a9e3c56282cd3a}{\_yh\_output}};}
+\DoxyCodeLine{\Hypertarget{test__usb__url_8c_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{test__usb__url_8c_source_l00030}00030\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ test\_urls(\textcolor{keywordtype}{void})\ \{}
+\DoxyCodeLine{\Hypertarget{test__usb__url_8c_source_l00031}00031\ \ \ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{\Hypertarget{test__usb__url_8c_source_l00032}00032\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *string;}
+\DoxyCodeLine{\Hypertarget{test__usb__url_8c_source_l00033}00033\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a1149ca4bd0659030412db8e77bebdf88}{serial}};}
+\DoxyCodeLine{\Hypertarget{test__usb__url_8c_source_l00034}00034\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{\Hypertarget{test__usb__url_8c_source_l00035}00035\ \ \ \}\ tests[]\ =\ \{}
+\DoxyCodeLine{\Hypertarget{test__usb__url_8c_source_l00036}00036\ \ \ \ \ \{\textcolor{stringliteral}{"{}yhusb://serial=12345"{}},\ 12345,\ \textcolor{keyword}{true}\},}
+\DoxyCodeLine{\Hypertarget{test__usb__url_8c_source_l00037}00037\ \ \ \ \ \{\textcolor{stringliteral}{"{}"{}},\ 0,\ \textcolor{keyword}{false}\},}
+\DoxyCodeLine{\Hypertarget{test__usb__url_8c_source_l00038}00038\ \ \ \ \ \{\textcolor{stringliteral}{"{}yhusb://"{}},\ 0,\ \textcolor{keyword}{true}\},}
+\DoxyCodeLine{\Hypertarget{test__usb__url_8c_source_l00039}00039\ \ \ \ \ \{\textcolor{stringliteral}{"{}yhusb://foo=bar\&serial=1000000"{}},\ 1000000,\ \textcolor{keyword}{true}\},}
+\DoxyCodeLine{\Hypertarget{test__usb__url_8c_source_l00040}00040\ \ \ \};}
+\DoxyCodeLine{\Hypertarget{test__usb__url_8c_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{test__usb__url_8c_source_l00042}00042\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ \textcolor{keyword}{sizeof}(tests)\ /\ \textcolor{keyword}{sizeof}(tests[0]);\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{test__usb__url_8c_source_l00043}00043\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a1149ca4bd0659030412db8e77bebdf88}{serial}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{test__usb__url_8c_source_l00044}00044\ \ \ \ \ assert(\mbox{\hyperlink{lib_2internal_8h_a8d799abe67a90b2664d589b02092fc53}{parse\_usb\_url}}(tests[i].\textcolor{keywordtype}{string},\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a1149ca4bd0659030412db8e77bebdf88}{serial}})\ ==\ tests[i].\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}});}
+\DoxyCodeLine{\Hypertarget{test__usb__url_8c_source_l00045}00045\ \ \ \ \ \textcolor{keywordflow}{if}\ (tests[i].\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}})\ \{}
+\DoxyCodeLine{\Hypertarget{test__usb__url_8c_source_l00046}00046\ \ \ \ \ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a1149ca4bd0659030412db8e77bebdf88}{serial}}\ ==\ tests[i].\mbox{\hyperlink{yubihsm__pkcs11_8c_a1149ca4bd0659030412db8e77bebdf88}{serial}});}
+\DoxyCodeLine{\Hypertarget{test__usb__url_8c_source_l00047}00047\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__usb__url_8c_source_l00048}00048\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__usb__url_8c_source_l00049}00049\ \}}
+\DoxyCodeLine{\Hypertarget{test__usb__url_8c_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{test__usb__url_8c_source_l00051}\mbox{\hyperlink{test__usb__url_8c_a840291bc02cba5474a4cb46a9b9566fe}{00051}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{test__usb__url_8c_a840291bc02cba5474a4cb46a9b9566fe}{main}}(\textcolor{keywordtype}{void})\ \{}
+\DoxyCodeLine{\Hypertarget{test__usb__url_8c_source_l00052}00052\ \ \ \mbox{\hyperlink{test__usb__url_8c_a76ba6bc136c2b38b71a9e3c56282cd3a}{\_yh\_output}}\ =\ stderr;}
+\DoxyCodeLine{\Hypertarget{test__usb__url_8c_source_l00053}00053\ \ \ test\_urls();}
+\DoxyCodeLine{\Hypertarget{test__usb__url_8c_source_l00054}00054\ \}}
+
+\end{DoxyCode}

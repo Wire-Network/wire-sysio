@@ -1,0 +1,76 @@
+\doxysection{libraries/fc/include/fc/crypto/webauthn\+\_\+json/example/messagereader/messagereader.cpp File Reference}
+\hypertarget{messagereader_8cpp}{}\label{messagereader_8cpp}\index{libraries/fc/include/fc/crypto/webauthn\_json/example/messagereader/messagereader.cpp@{libraries/fc/include/fc/crypto/webauthn\_json/example/messagereader/messagereader.cpp}}
+{\ttfamily \#include "{}rapidjson/reader.\+h"{}}\newline
+{\ttfamily \#include "{}rapidjson/error/en.\+h"{}}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$string$>$}\newline
+{\ttfamily \#include $<$map$>$}\newline
+Include dependency graph for messagereader.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{messagereader_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_message_handler}{Message\+Handler}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef map$<$ string, string $>$ \mbox{\hyperlink{messagereader_8cpp_ae2c5980b5eb04369faa7f72447e6d664}{Message\+Map}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{messagereader_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{messagereader_8cpp_ae2c5980b5eb04369faa7f72447e6d664}\index{messagereader.cpp@{messagereader.cpp}!MessageMap@{MessageMap}}
+\index{MessageMap@{MessageMap}!messagereader.cpp@{messagereader.cpp}}
+\doxysubsubsection{\texorpdfstring{MessageMap}{MessageMap}}
+{\footnotesize\ttfamily \label{messagereader_8cpp_ae2c5980b5eb04369faa7f72447e6d664} 
+typedef map$<$string, string$>$ \mbox{\hyperlink{messagereader_8cpp_ae2c5980b5eb04369faa7f72447e6d664}{Message\+Map}}}
+
+
+
+Definition at line \mbox{\hyperlink{messagereader_8cpp_source_l00013}{13}} of file \mbox{\hyperlink{messagereader_8cpp_source}{messagereader.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{messagereader_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}\index{messagereader.cpp@{messagereader.cpp}!main@{main}}
+\index{main@{main}!messagereader.cpp@{messagereader.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{messagereader_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4} 
+int main (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{messagereader_8cpp_source_l00089}{89}} of file \mbox{\hyperlink{messagereader_8cpp_source}{messagereader.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00090\ \ \ \ \ \mbox{\hyperlink{messagereader_8cpp_ae2c5980b5eb04369faa7f72447e6d664}{MessageMap}}\ messages;}
+\DoxyCodeLine{00091\ }
+\DoxyCodeLine{00092\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ json1\ =\ \textcolor{stringliteral}{"{}\{\ \(\backslash\)"{}greeting\(\backslash\)"{}\ :\ \(\backslash\)"{}Hello!\(\backslash\)"{},\ \(\backslash\)"{}farewell\(\backslash\)"{}\ :\ \(\backslash\)"{}bye-\/bye!\(\backslash\)"{}\ \}"{}};}
+\DoxyCodeLine{00093\ \ \ \ \ cout\ <<\ json1\ <<\ endl;}
+\DoxyCodeLine{00094\ \ \ \ \ ParseMessages(json1,\ messages);}
+\DoxyCodeLine{00095\ }
+\DoxyCodeLine{00096\ \ \ \ \ \textcolor{keywordflow}{for}\ (MessageMap::const\_iterator\ itr\ =\ messages.begin();\ itr\ !=\ messages.end();\ ++itr)}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ cout\ <<\ itr-\/>first\ <<\ \textcolor{stringliteral}{"{}:\ "{}}\ <<\ itr-\/>second\ <<\ endl;}
+\DoxyCodeLine{00098\ }
+\DoxyCodeLine{00099\ \ \ \ \ cout\ <<\ endl\ <<\ \textcolor{stringliteral}{"{}Parse\ a\ JSON\ with\ invalid\ schema."{}}\ <<\ endl;}
+\DoxyCodeLine{00100\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ json2\ =\ \textcolor{stringliteral}{"{}\{\ \(\backslash\)"{}greeting\(\backslash\)"{}\ :\ \(\backslash\)"{}Hello!\(\backslash\)"{},\ \(\backslash\)"{}farewell\(\backslash\)"{}\ :\ \(\backslash\)"{}bye-\/bye!\(\backslash\)"{},\ \(\backslash\)"{}foo\(\backslash\)"{}\ :\ \{\}\ \}"{}};}
+\DoxyCodeLine{00101\ \ \ \ \ cout\ <<\ json2\ <<\ endl;}
+\DoxyCodeLine{00102\ \ \ \ \ ParseMessages(json2,\ messages);}
+\DoxyCodeLine{00103\ }
+\DoxyCodeLine{00104\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00105\ \}}
+
+\end{DoxyCode}

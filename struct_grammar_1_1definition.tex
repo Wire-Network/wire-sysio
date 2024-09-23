@@ -1,0 +1,152 @@
+\doxysection{Grammar\+::definition\texorpdfstring{$<$}{<} ScannerT \texorpdfstring{$>$}{>} Struct Template Reference}
+\hypertarget{struct_grammar_1_1definition}{}\label{struct_grammar_1_1definition}\index{Grammar::definition$<$ ScannerT $>$@{Grammar::definition$<$ ScannerT $>$}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_grammar_1_1definition_a8cec5c1bd053c0de70c42d0e01225bea}{definition}} (const \mbox{\hyperlink{struct_grammar}{Grammar}} \&self)
+\item 
+const boost\+::spirit\+::classic\+::rule$<$ ScannerT $>$ \& \mbox{\hyperlink{struct_grammar_1_1definition_a95f99cb64798b113574c61e00c30e88c}{start}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+boost\+::spirit\+::classic\+::rule$<$ ScannerT $>$ \mbox{\hyperlink{struct_grammar_1_1definition_a8177a2c5ebf6a4931f362cafa805cea4}{poly0}}
+\item 
+boost\+::spirit\+::classic\+::rule$<$ ScannerT $>$ \mbox{\hyperlink{struct_grammar_1_1definition_a81db946f633882e4b87597f8e158e5c0}{poly1}}
+\item 
+boost\+::spirit\+::classic\+::rule$<$ ScannerT $>$ \mbox{\hyperlink{struct_grammar_1_1definition_adce4680c056a0422988fb5dbe30b7b51}{poly2}}
+\item 
+boost\+::spirit\+::classic\+::rule$<$ ScannerT $>$ \mbox{\hyperlink{struct_grammar_1_1definition_a9a9a89950e23601717956e5513ecd587}{var}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename ScannerT$>$\newline
+struct Grammar\+::definition$<$ Scanner\+T $>$}
+
+
+Definition at line \mbox{\hyperlink{calc_8cpp_source_l00135}{135}} of file \mbox{\hyperlink{calc_8cpp_source}{calc.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{struct_grammar_1_1definition_a8cec5c1bd053c0de70c42d0e01225bea}\index{Grammar::definition$<$ ScannerT $>$@{Grammar::definition$<$ ScannerT $>$}!definition@{definition}}
+\index{definition@{definition}!Grammar::definition$<$ ScannerT $>$@{Grammar::definition$<$ ScannerT $>$}}
+\doxysubsubsection{\texorpdfstring{definition()}{definition()}}
+{\footnotesize\ttfamily \label{struct_grammar_1_1definition_a8cec5c1bd053c0de70c42d0e01225bea} 
+template$<$typename ScannerT $>$ \\
+\mbox{\hyperlink{struct_grammar_1_1definition}{Grammar\+::definition}}$<$ ScannerT $>$\+::definition (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct_grammar}{Grammar}} \&}]{self}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{calc_8cpp_source_l00138}{138}} of file \mbox{\hyperlink{calc_8cpp_source}{calc.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespaceboost}{boost}};}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ namespace\ }boost::spirit::classic;}
+\DoxyCodeLine{00142\ }
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_grammar_1_1definition_a8177a2c5ebf6a4931f362cafa805cea4}{poly0}}\ =\ \mbox{\hyperlink{struct_grammar_1_1definition_a81db946f633882e4b87597f8e158e5c0}{poly1}}\ >>\ *((\textcolor{charliteral}{'+'}\ >>\ \mbox{\hyperlink{struct_grammar_1_1definition_a81db946f633882e4b87597f8e158e5c0}{poly1}})[bind(\&\mbox{\hyperlink{class_func_gen_a991cb45b149db007d78c36510be8a1e2}{FuncGen::genAdd}},\ ref(\mbox{\hyperlink{namespacesysio_a5c18cd9d34b8c5d3af8e2de75577673fa1f42b089b0bc1105b38f19140a65cc2a}{self}}.f\_),\ \_1,\ \_2)]}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ (\textcolor{charliteral}{'-\/'}\ >>\ \mbox{\hyperlink{struct_grammar_1_1definition_a81db946f633882e4b87597f8e158e5c0}{poly1}})[bind(\&\mbox{\hyperlink{class_func_gen_ab89436d6f5201778e2d2897bc119e9e0}{FuncGen::genSub}},\ ref(\mbox{\hyperlink{namespacesysio_a5c18cd9d34b8c5d3af8e2de75577673fa1f42b089b0bc1105b38f19140a65cc2a}{self}}.f\_),\ \_1,\ \_2)]);}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_grammar_1_1definition_a81db946f633882e4b87597f8e158e5c0}{poly1}}\ =\ \mbox{\hyperlink{struct_grammar_1_1definition_adce4680c056a0422988fb5dbe30b7b51}{poly2}}\ >>\ *((\textcolor{charliteral}{'*'}\ >>\ \mbox{\hyperlink{struct_grammar_1_1definition_adce4680c056a0422988fb5dbe30b7b51}{poly2}})[bind(\&\mbox{\hyperlink{class_func_gen_a91ebff06a6f14e8c4268b71c582ac0f0}{FuncGen::genMul}},\ ref(\mbox{\hyperlink{namespacesysio_a5c18cd9d34b8c5d3af8e2de75577673fa1f42b089b0bc1105b38f19140a65cc2a}{self}}.f\_),\ \_1,\ \_2)]}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ (\textcolor{charliteral}{'/'}\ >>\ \mbox{\hyperlink{struct_grammar_1_1definition_adce4680c056a0422988fb5dbe30b7b51}{poly2}})[bind(\&\mbox{\hyperlink{class_func_gen_a6a031f1b5df2c1a4e3f58228a114719b}{FuncGen::genDiv}},\ ref(\mbox{\hyperlink{namespacesysio_a5c18cd9d34b8c5d3af8e2de75577673fa1f42b089b0bc1105b38f19140a65cc2a}{self}}.f\_),\ \_1,\ \_2)]);}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_grammar_1_1definition_a9a9a89950e23601717956e5513ecd587}{var}}\ =\ (+alpha\_p)[bind(\&\mbox{\hyperlink{class_func_gen_ad3975a9ef3b9ca19733a13ab25a2e050}{FuncGen::genVal}},\ ref(\mbox{\hyperlink{namespacesysio_a5c18cd9d34b8c5d3af8e2de75577673fa1f42b089b0bc1105b38f19140a65cc2a}{self}}.f\_),\ \_1,\ \_2)];}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_grammar_1_1definition_adce4680c056a0422988fb5dbe30b7b51}{poly2}}\ =\ real\_p[bind(\&\mbox{\hyperlink{class_func_gen_a7b43b8b04a687e8e4e75cc2962a2a562}{FuncGen::genPush}},\ ref(\mbox{\hyperlink{namespacesysio_a5c18cd9d34b8c5d3af8e2de75577673fa1f42b089b0bc1105b38f19140a65cc2a}{self}}.f\_),\ \_1)]}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ \mbox{\hyperlink{struct_grammar_1_1definition_a9a9a89950e23601717956e5513ecd587}{var}}}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ \textcolor{charliteral}{'('}\ >>\ \mbox{\hyperlink{struct_grammar_1_1definition_a8177a2c5ebf6a4931f362cafa805cea4}{poly0}}\ >>\ \textcolor{charliteral}{')'};}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_grammar_1_1definition_a8cec5c1bd053c0de70c42d0e01225bea_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=333pt]{struct_grammar_1_1definition_a8cec5c1bd053c0de70c42d0e01225bea_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_grammar_1_1definition_a95f99cb64798b113574c61e00c30e88c}\index{Grammar::definition$<$ ScannerT $>$@{Grammar::definition$<$ ScannerT $>$}!start@{start}}
+\index{start@{start}!Grammar::definition$<$ ScannerT $>$@{Grammar::definition$<$ ScannerT $>$}}
+\doxysubsubsection{\texorpdfstring{start()}{start()}}
+{\footnotesize\ttfamily \label{struct_grammar_1_1definition_a95f99cb64798b113574c61e00c30e88c} 
+template$<$typename ScannerT $>$ \\
+const boost\+::spirit\+::classic\+::rule$<$ ScannerT $>$ \& \mbox{\hyperlink{struct_grammar_1_1definition}{Grammar\+::definition}}$<$ ScannerT $>$\+::start (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{calc_8cpp_source_l00152}{152}} of file \mbox{\hyperlink{calc_8cpp_source}{calc.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00152\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_grammar_1_1definition_a8177a2c5ebf6a4931f362cafa805cea4}{poly0}};\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_grammar_1_1definition_a95f99cb64798b113574c61e00c30e88c_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_grammar_1_1definition_a8177a2c5ebf6a4931f362cafa805cea4}\index{Grammar::definition$<$ ScannerT $>$@{Grammar::definition$<$ ScannerT $>$}!poly0@{poly0}}
+\index{poly0@{poly0}!Grammar::definition$<$ ScannerT $>$@{Grammar::definition$<$ ScannerT $>$}}
+\doxysubsubsection{\texorpdfstring{poly0}{poly0}}
+{\footnotesize\ttfamily \label{struct_grammar_1_1definition_a8177a2c5ebf6a4931f362cafa805cea4} 
+template$<$typename ScannerT $>$ \\
+boost\+::spirit\+::classic\+::rule$<$ScannerT$>$ \mbox{\hyperlink{struct_grammar_1_1definition}{Grammar\+::definition}}$<$ ScannerT $>$\+::poly0}
+
+
+
+Definition at line \mbox{\hyperlink{calc_8cpp_source_l00136}{136}} of file \mbox{\hyperlink{calc_8cpp_source}{calc.\+cpp}}.
+
+\Hypertarget{struct_grammar_1_1definition_a81db946f633882e4b87597f8e158e5c0}\index{Grammar::definition$<$ ScannerT $>$@{Grammar::definition$<$ ScannerT $>$}!poly1@{poly1}}
+\index{poly1@{poly1}!Grammar::definition$<$ ScannerT $>$@{Grammar::definition$<$ ScannerT $>$}}
+\doxysubsubsection{\texorpdfstring{poly1}{poly1}}
+{\footnotesize\ttfamily \label{struct_grammar_1_1definition_a81db946f633882e4b87597f8e158e5c0} 
+template$<$typename ScannerT $>$ \\
+boost\+::spirit\+::classic\+::rule$<$ScannerT$>$ \mbox{\hyperlink{struct_grammar_1_1definition}{Grammar\+::definition}}$<$ ScannerT $>$\+::poly1}
+
+
+
+Definition at line \mbox{\hyperlink{calc_8cpp_source_l00136}{136}} of file \mbox{\hyperlink{calc_8cpp_source}{calc.\+cpp}}.
+
+\Hypertarget{struct_grammar_1_1definition_adce4680c056a0422988fb5dbe30b7b51}\index{Grammar::definition$<$ ScannerT $>$@{Grammar::definition$<$ ScannerT $>$}!poly2@{poly2}}
+\index{poly2@{poly2}!Grammar::definition$<$ ScannerT $>$@{Grammar::definition$<$ ScannerT $>$}}
+\doxysubsubsection{\texorpdfstring{poly2}{poly2}}
+{\footnotesize\ttfamily \label{struct_grammar_1_1definition_adce4680c056a0422988fb5dbe30b7b51} 
+template$<$typename ScannerT $>$ \\
+boost\+::spirit\+::classic\+::rule$<$ScannerT$>$ \mbox{\hyperlink{struct_grammar_1_1definition}{Grammar\+::definition}}$<$ ScannerT $>$\+::poly2}
+
+
+
+Definition at line \mbox{\hyperlink{calc_8cpp_source_l00136}{136}} of file \mbox{\hyperlink{calc_8cpp_source}{calc.\+cpp}}.
+
+\Hypertarget{struct_grammar_1_1definition_a9a9a89950e23601717956e5513ecd587}\index{Grammar::definition$<$ ScannerT $>$@{Grammar::definition$<$ ScannerT $>$}!var@{var}}
+\index{var@{var}!Grammar::definition$<$ ScannerT $>$@{Grammar::definition$<$ ScannerT $>$}}
+\doxysubsubsection{\texorpdfstring{var}{var}}
+{\footnotesize\ttfamily \label{struct_grammar_1_1definition_a9a9a89950e23601717956e5513ecd587} 
+template$<$typename ScannerT $>$ \\
+boost\+::spirit\+::classic\+::rule$<$ScannerT$>$ \mbox{\hyperlink{struct_grammar_1_1definition}{Grammar\+::definition}}$<$ ScannerT $>$\+::var}
+
+
+
+Definition at line \mbox{\hyperlink{calc_8cpp_source_l00136}{136}} of file \mbox{\hyperlink{calc_8cpp_source}{calc.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/libraries/ff/depends/xbyak/sample/\mbox{\hyperlink{calc_8cpp}{calc.\+cpp}}\end{DoxyCompactItemize}

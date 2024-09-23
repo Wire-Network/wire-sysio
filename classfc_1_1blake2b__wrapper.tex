@@ -1,0 +1,90 @@
+\doxysection{fc\+::blake2b\+\_\+wrapper Class Reference}
+\hypertarget{classfc_1_1blake2b__wrapper}{}\label{classfc_1_1blake2b__wrapper}\index{fc::blake2b\_wrapper@{fc::blake2b\_wrapper}}
+
+
+{\ttfamily \#include $<$blake2.\+hpp$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{classfc_1_1blake2b__wrapper_ab5ed83d43802fe97430dbf64defc5d9e}{blake2b\+\_\+constant}} \{ \mbox{\hyperlink{classfc_1_1blake2b__wrapper_ab5ed83d43802fe97430dbf64defc5d9ead79d25776489a9abf71b324356028826}{BLAKE2\+B\+\_\+\+BLOCKBYTES}} = 128
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{classfc_1_1blake2b__wrapper_aa207b9c4cb00bfca265163a11a1fc9de}{blake2b\+\_\+compress}} (\mbox{\hyperlink{structfc_1_1blake2b__state}{blake2b\+\_\+state}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{struct_s}{S}}, const \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} block\mbox{[}\mbox{\hyperlink{classfc_1_1blake2b__wrapper_ab5ed83d43802fe97430dbf64defc5d9ead79d25776489a9abf71b324356028826}{BLAKE2\+B\+\_\+\+BLOCKBYTES}}\mbox{]}, size\+\_\+t \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}, const \mbox{\hyperlink{namespacefc_a978f9e97f64eb2ce6cbe892d3cc93397}{yield\+\_\+function\+\_\+t}} \&yield)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{blake2_8hpp_source_l00026}{26}} of file \mbox{\hyperlink{blake2_8hpp_source}{blake2.\+hpp}}.
+
+
+
+\doxysubsection{Member Enumeration Documentation}
+\Hypertarget{classfc_1_1blake2b__wrapper_ab5ed83d43802fe97430dbf64defc5d9e}\index{fc::blake2b\_wrapper@{fc::blake2b\_wrapper}!blake2b\_constant@{blake2b\_constant}}
+\index{blake2b\_constant@{blake2b\_constant}!fc::blake2b\_wrapper@{fc::blake2b\_wrapper}}
+\doxysubsubsection{\texorpdfstring{blake2b\_constant}{blake2b\_constant}}
+{\footnotesize\ttfamily \label{classfc_1_1blake2b__wrapper_ab5ed83d43802fe97430dbf64defc5d9e} 
+enum \mbox{\hyperlink{classfc_1_1blake2b__wrapper_ab5ed83d43802fe97430dbf64defc5d9e}{fc\+::blake2b\+\_\+wrapper\+::blake2b\+\_\+constant}}}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{BLAKE2B\_BLOCKBYTES@{BLAKE2B\_BLOCKBYTES}!fc::blake2b\_wrapper@{fc::blake2b\_wrapper}}\index{fc::blake2b\_wrapper@{fc::blake2b\_wrapper}!BLAKE2B\_BLOCKBYTES@{BLAKE2B\_BLOCKBYTES}}}\Hypertarget{classfc_1_1blake2b__wrapper_ab5ed83d43802fe97430dbf64defc5d9ead79d25776489a9abf71b324356028826}\label{classfc_1_1blake2b__wrapper_ab5ed83d43802fe97430dbf64defc5d9e} 
+BLAKE2\+B\+\_\+\+BLOCKBYTES&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{blake2_8hpp_source_l00028}{28}} of file \mbox{\hyperlink{blake2_8hpp_source}{blake2.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00028\ \{\ \mbox{\hyperlink{classfc_1_1blake2b__wrapper_ab5ed83d43802fe97430dbf64defc5d9ead79d25776489a9abf71b324356028826}{BLAKE2B\_BLOCKBYTES}}\ =\ 128\ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1blake2b__wrapper_aa207b9c4cb00bfca265163a11a1fc9de}\index{fc::blake2b\_wrapper@{fc::blake2b\_wrapper}!blake2b\_compress@{blake2b\_compress}}
+\index{blake2b\_compress@{blake2b\_compress}!fc::blake2b\_wrapper@{fc::blake2b\_wrapper}}
+\doxysubsubsection{\texorpdfstring{blake2b\_compress()}{blake2b\_compress()}}
+{\footnotesize\ttfamily \label{classfc_1_1blake2b__wrapper_aa207b9c4cb00bfca265163a11a1fc9de} 
+void fc\+::blake2b\+\_\+wrapper\+::blake2b\+\_\+compress (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structfc_1_1blake2b__state}{blake2b\+\_\+state}} \texorpdfstring{$\ast$}{*}}]{S}{, }\item[{const \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}}}]{block}{\mbox{[}\+BLAKE2\+B\+\_\+\+BLOCKBYTES\mbox{]}, }\item[{size\+\_\+t}]{r}{, }\item[{const \mbox{\hyperlink{namespacefc_a978f9e97f64eb2ce6cbe892d3cc93397}{yield\+\_\+function\+\_\+t}} \&}]{yield}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{blake2_8cpp_source_l00067}{67}} of file \mbox{\hyperlink{blake2_8cpp_source}{blake2.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00068\ \ \ \ \ blake2b\_compress\_init(\mbox{\hyperlink{struct_s}{S}},\ block,\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}});}
+\DoxyCodeLine{00069\ }
+\DoxyCodeLine{00070\ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};\ ++i)\ \{}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ ROUND(i\ \%\ 10);}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (i\ \%\ 100)\ \{}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceboost_1_1fibers_1_1asio_a65142b77539b20ba6d2abb35a0d4f5d2}{yield}}();}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00075\ \ \ \ \ \}}
+\DoxyCodeLine{00076\ }
+\DoxyCodeLine{00077\ \ \ \ \ blake2b\_compress\_end(\mbox{\hyperlink{struct_s}{S}});}
+\DoxyCodeLine{00078\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1blake2b__wrapper_aa207b9c4cb00bfca265163a11a1fc9de_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/\mbox{\hyperlink{blake2_8hpp}{blake2.\+hpp}}\item 
+libraries/fc/src/crypto/\mbox{\hyperlink{blake2_8cpp}{blake2.\+cpp}}\end{DoxyCompactItemize}

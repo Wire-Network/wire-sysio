@@ -1,0 +1,16 @@
+\doxysection{platform\+\_\+timer\+\_\+posix\+\_\+test.\+c}
+\hypertarget{platform__timer__posix__test_8c_source}{}\label{platform__timer__posix__test_8c_source}\index{libraries/chain/platform\_timer\_posix\_test.c@{libraries/chain/platform\_timer\_posix\_test.c}}
+\mbox{\hyperlink{platform__timer__posix__test_8c}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix__test_8c_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <signal.h>}}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix__test_8c_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <sys/time.h>}}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix__test_8c_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <stdlib.h>}}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix__test_8c_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{platform__timer__posix__test_8c_source_l00005}\mbox{\hyperlink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{00005}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}()\ \{}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix__test_8c_source_l00006}00006\ \ \ \ \textcolor{keyword}{struct\ }itimerval\ enable\ =\ \{\{0,\ 0\},\ \{0,\ 1000u\}\};}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix__test_8c_source_l00007}00007\ \ \ \ \textcolor{keywordflow}{if}(setitimer(ITIMER\_REAL,\ \&enable,\ NULL))}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix__test_8c_source_l00008}00008\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix__test_8c_source_l00009}00009\ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{platform__timer__posix__test_8c_source_l00010}00010\ \}}
+
+\end{DoxyCode}

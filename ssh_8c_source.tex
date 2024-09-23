@@ -1,0 +1,317 @@
+\doxysection{ssh.\+c}
+\hypertarget{ssh_8c_source}{}\label{ssh_8c_source}\index{libraries/yubihsm/examples/ssh.c@{libraries/yubihsm/examples/ssh.c}}
+\mbox{\hyperlink{ssh_8c}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ 2015-\/2018\ Yubico\ AB}}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00004}00004\ \textcolor{comment}{\ *\ Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00005}00005\ \textcolor{comment}{\ *\ you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00006}00006\ \textcolor{comment}{\ *\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00008}00008\ \textcolor{comment}{\ *\ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00009}00009\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00010}00010\ \textcolor{comment}{\ *\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00011}00011\ \textcolor{comment}{\ *\ distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00012}00012\ \textcolor{comment}{\ *\ WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00013}00013\ \textcolor{comment}{\ *\ See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00014}00014\ \textcolor{comment}{\ *\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00015}00015\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00017}00017\ \textcolor{preprocessor}{\#ifdef\ NDEBUG}}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00018}00018\ \textcolor{preprocessor}{\#undef\ NDEBUG}}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00019}00019\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00020}00020\ \textcolor{preprocessor}{\#include\ <assert.h>}}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00021}00021\ \textcolor{preprocessor}{\#include\ <stdbool.h>}}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00022}00022\ \textcolor{preprocessor}{\#include\ <stdio.h>}}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00023}00023\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{stdint_8h}{stdint.h}}>}}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00024}00024\ \textcolor{preprocessor}{\#include\ <stdlib.h>}}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00025}00025\ \textcolor{preprocessor}{\#include\ <string.h>}}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00027}00027\ \textcolor{preprocessor}{\#include\ "{}util.h"{}}}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00028}00028\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{openssl-compat_8h}{openssl-\/compat.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00030}00030\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{yubihsm_8h}{yubihsm.h}}>}}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00032}00032\ \textcolor{preprocessor}{\#ifndef\ DEFAULT\_CONNECTOR\_URL}}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00033}\mbox{\hyperlink{ssh_8c_a377ec96b1eb26c7b26b84bb5b0c9a928}{00033}}\ \textcolor{preprocessor}{\#define\ DEFAULT\_CONNECTOR\_URL\ "{}http://127.0.0.1:12345"{}}}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00034}00034\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00036}\mbox{\hyperlink{ssh_8c_a474ca95e02ab1106e22735c9fd6249ab}{00036}}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{ssh_8c_a474ca95e02ab1106e22735c9fd6249ab}{ssh\_ca\_pvtkey\_file}}[]\ =\ \textcolor{stringliteral}{"{}ssh\_ca\_pvtkey.pem"{}};}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00037}\mbox{\hyperlink{ssh_8c_a870e61ded67e4529500d708a5f1af286}{00037}}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{ssh_8c_a870e61ded67e4529500d708a5f1af286}{key\_label}}\ =\ \textcolor{stringliteral}{"{}label"{}};}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00038}\mbox{\hyperlink{ssh_8c_abd7f8a696584d8ab4b9f4d1e1970be37}{00038}}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ password[]\ =\ \textcolor{stringliteral}{"{}password"{}};}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00039}\mbox{\hyperlink{ssh_8c_a1164213ac6329ae2ed8667857da56645}{00039}}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{ssh_8c_a1164213ac6329ae2ed8667857da56645}{template\_dat}}[]\ =\ \{}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00040}00040\ \ \ \textcolor{comment}{//\ Timestamp\ key\ algorithm\ RSA2048}}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00041}00041\ \ \ 0x01,\ 0x00,\ 0x01,\ 0x09,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00042}00042\ \ \ \textcolor{comment}{//\ Timestamp\ public\ key}}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00043}00043\ \ \ 0x02,\ 0x01,\ 0x00,\ 0xc2,\ 0x55,\ 0x62,\ 0x08,\ 0xf5,\ 0xd2,\ 0xc2,\ 0x81,\ 0xb8,\ 0xa5,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00044}00044\ \ \ 0x16,\ 0xfd,\ 0x27,\ 0x25,\ 0xe6,\ 0x7e,\ 0x88,\ 0xcd,\ 0xc5,\ 0xd2,\ 0xcf,\ 0xdf,\ 0xd3,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00045}00045\ \ \ 0xea,\ 0x2d,\ 0x35,\ 0xdf,\ 0x35,\ 0x27,\ 0x93,\ 0x44,\ 0x45,\ 0xa6,\ 0x14,\ 0x84,\ 0xee,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00046}00046\ \ \ 0xcb,\ 0x02,\ 0xc4,\ 0x7b,\ 0x67,\ 0xc5,\ 0x94,\ 0x16,\ 0xde,\ 0xe4,\ 0xa6,\ 0x1f,\ 0x25,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00047}00047\ \ \ 0x52,\ 0x4b,\ 0x27,\ 0x9d,\ 0x4d,\ 0x09,\ 0xb1,\ 0x9b,\ 0x3e,\ 0xc5,\ 0x89,\ 0xde,\ 0xe2,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00048}00048\ \ \ 0x90,\ 0xda,\ 0xa0,\ 0x64,\ 0xc7,\ 0xb3,\ 0xaa,\ 0xae,\ 0xc7,\ 0x23,\ 0x55,\ 0x37,\ 0xa0,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00049}00049\ \ \ 0xea,\ 0x63,\ 0xb4,\ 0x1b,\ 0x65,\ 0x4a,\ 0x7f,\ 0x71,\ 0xc6,\ 0x5c,\ 0xc2,\ 0x34,\ 0xfe,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00050}00050\ \ \ 0xa6,\ 0x02,\ 0xc9,\ 0xd6,\ 0x65,\ 0x13,\ 0x5d,\ 0xca,\ 0x74,\ 0x32,\ 0xf8,\ 0x7c,\ 0x01,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00051}00051\ \ \ 0x4b,\ 0x67,\ 0x61,\ 0xdf,\ 0x27,\ 0xdd,\ 0x1d,\ 0xed,\ 0x2f,\ 0x71,\ 0xcb,\ 0x8b,\ 0x23,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00052}00052\ \ \ 0x74,\ 0x4c,\ 0xfc,\ 0x99,\ 0xe2,\ 0x23,\ 0xed,\ 0xa5,\ 0xd8,\ 0x41,\ 0xe2,\ 0x9f,\ 0x82,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00053}00053\ \ \ 0x19,\ 0xbd,\ 0xae,\ 0x50,\ 0xfb,\ 0xb9,\ 0xc7,\ 0xe6,\ 0x83,\ 0x01,\ 0xac,\ 0x1c,\ 0x63,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00054}00054\ \ \ 0x89,\ 0xb2,\ 0xac,\ 0xa7,\ 0xfd,\ 0x01,\ 0x2a,\ 0xa3,\ 0xd4,\ 0x0d,\ 0x88,\ 0xf4,\ 0xcf,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00055}00055\ \ \ 0x9f,\ 0xed,\ 0xc1,\ 0x19,\ 0xc8,\ 0x64,\ 0x71,\ 0xd3,\ 0x02,\ 0x6b,\ 0x9f,\ 0x0d,\ 0xc2,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00056}00056\ \ \ 0xdf,\ 0x81,\ 0x5d,\ 0x53,\ 0x82,\ 0x3e,\ 0xa0,\ 0xab,\ 0xf2,\ 0x93,\ 0xc9,\ 0xa4,\ 0xa8,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00057}00057\ \ \ 0x3b,\ 0x71,\ 0xc1,\ 0xf4,\ 0xe3,\ 0x31,\ 0xa5,\ 0xdc,\ 0xfe,\ 0xc7,\ 0x9e,\ 0x7f,\ 0xd8,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00058}00058\ \ \ 0x2d,\ 0xd9,\ 0xfc,\ 0x90,\ 0xde,\ 0xa8,\ 0xdb,\ 0x77,\ 0x0b,\ 0x2f,\ 0xb0,\ 0xf4,\ 0x49,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00059}00059\ \ \ 0x21,\ 0x95,\ 0x95,\ 0x4b,\ 0x7e,\ 0xa0,\ 0x6f,\ 0x15,\ 0x8f,\ 0x95,\ 0xdd,\ 0x72,\ 0x39,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00060}00060\ \ \ 0x7a,\ 0x13,\ 0xb6,\ 0xcc,\ 0xfa,\ 0x9a,\ 0x07,\ 0x2d,\ 0x41,\ 0xcf,\ 0x12,\ 0xaf,\ 0x8e,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00061}00061\ \ \ 0x87,\ 0x9f,\ 0x97,\ 0xf1,\ 0x1e,\ 0x00,\ 0xac,\ 0xce,\ 0x2d,\ 0x12,\ 0xd4,\ 0x34,\ 0x0c,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00062}00062\ \ \ 0x40,\ 0x84,\ 0x33,\ 0x3a,\ 0x6c,\ 0x9f,\ 0x22,\ 0x7d,\ 0x6f,\ 0x89,\ 0x87,\ 0xfb,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00063}00063\ \ \ \textcolor{comment}{//\ CA\ key\ whitelist\ (0x0001,\ 0x00ab,\ 0x0014,\ 0x0005,\ 0x003a)}}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00064}00064\ \ \ 0x03,\ 0x00,\ 0x0a,\ 0x00,\ 0x01,\ 0x00,\ 0xab,\ 0x00,\ 0x14,\ 0x00,\ 0x05,\ 0x00,\ 0x3a,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00065}00065\ \ \ \textcolor{comment}{//\ Not\ before}}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00066}00066\ \ \ 0x04,\ 0x00,\ 0x04,\ 0x00,\ 0x00,\ 0x00,\ 0x00,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00067}00067\ \ \ \textcolor{comment}{//\ Not\ after}}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00068}00068\ \ \ 0x05,\ 0x00,\ 0x04,\ 0xff,\ 0xff,\ 0xff,\ 0xff,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00069}00069\ \ \ \textcolor{comment}{//\ Principals\ blacklist\ (root,\ toor)}}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00070}00070\ \ \ 0x06,\ 0x00,\ 0x0a,\ 0x72,\ 0x6f,\ 0x6f,\ 0x74,\ 0x00,\ 0x74,\ 0x6f,\ 0x6f,\ 0x72,\ 0x00\};}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00071}\mbox{\hyperlink{ssh_8c_a9443d1cc78332e27a0177ce6abff78db}{00071}}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{ssh_8c_a9443d1cc78332e27a0177ce6abff78db}{ssh\_req\_file}}[]\ =\ \textcolor{stringliteral}{"{}ssh\_req.dat"{}};}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00073}\mbox{\hyperlink{ssh_8c_a2cd19dc464a5cf91cd7c2e717b9dffd7}{00073}}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{ssh_8c_a2cd19dc464a5cf91cd7c2e717b9dffd7}{expected\_result}}[]\ =}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00074}00074\ \ \ \{0x00,\ 0x00,\ 0x00,\ 0x1c,\ 0x73,\ 0x73,\ 0x68,\ 0x2d,\ 0x72,\ 0x73,\ 0x61,\ 0x2d,\ 0x63,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00075}00075\ \ \ \ 0x65,\ 0x72,\ 0x74,\ 0x2d,\ 0x76,\ 0x30,\ 0x31,\ 0x40,\ 0x6f,\ 0x70,\ 0x65,\ 0x6e,\ 0x73,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00076}00076\ \ \ \ 0x73,\ 0x68,\ 0x2e,\ 0x63,\ 0x6f,\ 0x6d,\ 0x00,\ 0x00,\ 0x00,\ 0x20,\ 0x91,\ 0xe7,\ 0x84,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00077}00077\ \ \ \ 0x34,\ 0x8a,\ 0xbd,\ 0x1f,\ 0x52,\ 0x2c,\ 0x4f,\ 0xa7,\ 0x59,\ 0xfb,\ 0x97,\ 0xd2,\ 0x4b,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00078}00078\ \ \ \ 0x07,\ 0xbd,\ 0xad,\ 0x1f,\ 0xaf,\ 0x53,\ 0x9a,\ 0x50,\ 0x35,\ 0x71,\ 0xb0,\ 0x63,\ 0x64,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00079}00079\ \ \ \ 0xe2,\ 0x88,\ 0xcf,\ 0x00,\ 0x00,\ 0x00,\ 0x03,\ 0x01,\ 0x00,\ 0x01,\ 0x00,\ 0x00,\ 0x01,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00080}00080\ \ \ \ 0x01,\ 0x00,\ 0xd8,\ 0x2a,\ 0x18,\ 0x56,\ 0x40,\ 0x5b,\ 0xe5,\ 0xc7,\ 0xed,\ 0x94,\ 0x6f,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00081}00081\ \ \ \ 0x1f,\ 0x18,\ 0x87,\ 0x33,\ 0x10,\ 0xc6,\ 0xfa,\ 0x00,\ 0x1e,\ 0xdf,\ 0xf8,\ 0xf5,\ 0xaf,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00082}00082\ \ \ \ 0x89,\ 0xda,\ 0x5d,\ 0x05,\ 0x39,\ 0xd2,\ 0x15,\ 0x55,\ 0x78,\ 0x41,\ 0xb7,\ 0x89,\ 0x51,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00083}00083\ \ \ \ 0x9c,\ 0x0b,\ 0xe0,\ 0xbc,\ 0x3c,\ 0x65,\ 0x40,\ 0xdf,\ 0x84,\ 0xd2,\ 0xf1,\ 0xaf,\ 0xd8,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00084}00084\ \ \ \ 0x0f,\ 0x0b,\ 0x40,\ 0x7e,\ 0x59,\ 0x84,\ 0x92,\ 0x24,\ 0xa9,\ 0xaa,\ 0x83,\ 0x70,\ 0x0b,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00085}00085\ \ \ \ 0x6e,\ 0x6a,\ 0xbc,\ 0xb1,\ 0x60,\ 0xbe,\ 0xa1,\ 0xad,\ 0xa1,\ 0x4f,\ 0x96,\ 0xe8,\ 0xa7,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00086}00086\ \ \ \ 0xfe,\ 0xc3,\ 0x21,\ 0x41,\ 0xa7,\ 0x73,\ 0xbc,\ 0x10,\ 0x0a,\ 0xdb,\ 0x4c,\ 0xfd,\ 0x7a,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00087}00087\ \ \ \ 0xef,\ 0x85,\ 0xac,\ 0x99,\ 0xe7,\ 0xfb,\ 0x94,\ 0x7e,\ 0x09,\ 0xb7,\ 0xb6,\ 0x8d,\ 0x5d,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00088}00088\ \ \ \ 0x03,\ 0x4b,\ 0x9c,\ 0x2e,\ 0xc6,\ 0xcc,\ 0x3b,\ 0x9c,\ 0xb3,\ 0xb2,\ 0xaf,\ 0x5d,\ 0x48,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00089}00089\ \ \ \ 0xd3,\ 0x51,\ 0x33,\ 0xc2,\ 0xb8,\ 0xc2,\ 0x21,\ 0x10,\ 0x40,\ 0x8e,\ 0x54,\ 0x26,\ 0x2e,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00090}00090\ \ \ \ 0xbb,\ 0x32,\ 0x6e,\ 0x69,\ 0x4b,\ 0x6d,\ 0xe9,\ 0x4a,\ 0xa3,\ 0x0b,\ 0xc6,\ 0xa3,\ 0x13,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00091}00091\ \ \ \ 0x1c,\ 0x72,\ 0x7d,\ 0x23,\ 0x4b,\ 0x29,\ 0xe9,\ 0x3b,\ 0xfb,\ 0x26,\ 0x4e,\ 0xe2,\ 0xa4,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00092}00092\ \ \ \ 0xbc,\ 0xad,\ 0xa0,\ 0x9c,\ 0xf2,\ 0xdd,\ 0xb4,\ 0x63,\ 0x21,\ 0x3b,\ 0x25,\ 0xb3,\ 0xd9,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00093}00093\ \ \ \ 0x20,\ 0xb8,\ 0x62,\ 0xdb,\ 0x0c,\ 0xd3,\ 0xdc,\ 0xdf,\ 0x9f,\ 0xdf,\ 0x0e,\ 0xea,\ 0x74,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00094}00094\ \ \ \ 0xd0,\ 0x3f,\ 0xb7,\ 0x04,\ 0x67,\ 0xac,\ 0xb7,\ 0xea,\ 0xe2,\ 0xc9,\ 0x0c,\ 0xe2,\ 0x44,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00095}00095\ \ \ \ 0x03,\ 0x3c,\ 0x6f,\ 0x9c,\ 0x56,\ 0xee,\ 0x7b,\ 0x0d,\ 0x7c,\ 0xfc,\ 0xe6,\ 0x76,\ 0xac,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00096}00096\ \ \ \ 0x7b,\ 0x10,\ 0x26,\ 0xf1,\ 0xb9,\ 0xaf,\ 0x53,\ 0x6c,\ 0x74,\ 0xbb,\ 0x8a,\ 0x24,\ 0xd5,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00097}00097\ \ \ \ 0x91,\ 0xd8,\ 0xc8,\ 0x72,\ 0xfb,\ 0x6f,\ 0x52,\ 0x58,\ 0x94,\ 0xeb,\ 0x8d,\ 0xc2,\ 0x12,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00098}00098\ \ \ \ 0xbc,\ 0xd1,\ 0xde,\ 0xfb,\ 0x49,\ 0xf3,\ 0x39,\ 0x51,\ 0x86,\ 0xd4,\ 0x32,\ 0x9f,\ 0x36,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00099}00099\ \ \ \ 0x1b,\ 0x37,\ 0xb7,\ 0x8a,\ 0x4f,\ 0x43,\ 0x7b,\ 0xd9,\ 0xf0,\ 0x26,\ 0x5f,\ 0x00,\ 0x00,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00100}00100\ \ \ \ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x01,\ 0x00,\ 0x00,\ 0x00,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00101}00101\ \ \ \ 0x08,\ 0x69,\ 0x64,\ 0x65,\ 0x6e,\ 0x74,\ 0x69,\ 0x74,\ 0x79,\ 0x00,\ 0x00,\ 0x00,\ 0x12,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00102}00102\ \ \ \ 0x00,\ 0x00,\ 0x00,\ 0x05,\ 0x75,\ 0x73,\ 0x65,\ 0x72,\ 0x31,\ 0x00,\ 0x00,\ 0x00,\ 0x05,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00103}00103\ \ \ \ 0x75,\ 0x73,\ 0x65,\ 0x72,\ 0x32,\ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x00,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00104}00104\ \ \ \ 0xff,\ 0xff,\ 0xff,\ 0xff,\ 0xff,\ 0xff,\ 0xff,\ 0xff,\ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x00,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00105}00105\ \ \ \ 0x00,\ 0x00,\ 0x82,\ 0x00,\ 0x00,\ 0x00,\ 0x15,\ 0x70,\ 0x65,\ 0x72,\ 0x6d,\ 0x69,\ 0x74,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00106}00106\ \ \ \ 0x2d,\ 0x58,\ 0x31,\ 0x31,\ 0x2d,\ 0x66,\ 0x6f,\ 0x72,\ 0x77,\ 0x61,\ 0x72,\ 0x64,\ 0x69,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00107}00107\ \ \ \ 0x6e,\ 0x67,\ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x17,\ 0x70,\ 0x65,\ 0x72,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00108}00108\ \ \ \ 0x6d,\ 0x69,\ 0x74,\ 0x2d,\ 0x61,\ 0x67,\ 0x65,\ 0x6e,\ 0x74,\ 0x2d,\ 0x66,\ 0x6f,\ 0x72,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00109}00109\ \ \ \ 0x77,\ 0x61,\ 0x72,\ 0x64,\ 0x69,\ 0x6e,\ 0x67,\ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x00,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00110}00110\ \ \ \ 0x00,\ 0x16,\ 0x70,\ 0x65,\ 0x72,\ 0x6d,\ 0x69,\ 0x74,\ 0x2d,\ 0x70,\ 0x6f,\ 0x72,\ 0x74,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00111}00111\ \ \ \ 0x2d,\ 0x66,\ 0x6f,\ 0x72,\ 0x77,\ 0x61,\ 0x72,\ 0x64,\ 0x69,\ 0x6e,\ 0x67,\ 0x00,\ 0x00,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00112}00112\ \ \ \ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x0a,\ 0x70,\ 0x65,\ 0x72,\ 0x6d,\ 0x69,\ 0x74,\ 0x2d,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00113}00113\ \ \ \ 0x70,\ 0x74,\ 0x79,\ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x0e,\ 0x70,\ 0x65,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00114}00114\ \ \ \ 0x72,\ 0x6d,\ 0x69,\ 0x74,\ 0x2d,\ 0x75,\ 0x73,\ 0x65,\ 0x72,\ 0x2d,\ 0x72,\ 0x63,\ 0x00,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00115}00115\ \ \ \ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x01,\ 0x17,\ 0x00,\ 0x00,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00116}00116\ \ \ \ 0x00,\ 0x07,\ 0x73,\ 0x73,\ 0x68,\ 0x2d,\ 0x72,\ 0x73,\ 0x61,\ 0x00,\ 0x00,\ 0x00,\ 0x03,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00117}00117\ \ \ \ 0x01,\ 0x00,\ 0x01,\ 0x00,\ 0x00,\ 0x01,\ 0x01,\ 0x00,\ 0xd3,\ 0x35,\ 0xad,\ 0x1a,\ 0x8a,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00118}00118\ \ \ \ 0xe2,\ 0x4d,\ 0x09,\ 0xaa,\ 0xb4,\ 0x29,\ 0x8b,\ 0x1e,\ 0xbd,\ 0xc9,\ 0x41,\ 0x22,\ 0xbe,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00119}00119\ \ \ \ 0x11,\ 0xd3,\ 0x0e,\ 0xab,\ 0x25,\ 0xed,\ 0xbc,\ 0x5e,\ 0x2f,\ 0xaa,\ 0xf2,\ 0x48,\ 0x14,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00120}00120\ \ \ \ 0x5b,\ 0x14,\ 0xee,\ 0xe3,\ 0x03,\ 0x9b,\ 0xf1,\ 0x52,\ 0x87,\ 0x0d,\ 0x61,\ 0x09,\ 0x51,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00121}00121\ \ \ \ 0x60,\ 0xc9,\ 0x9b,\ 0xbb,\ 0x3f,\ 0xbe,\ 0xfe,\ 0x45,\ 0x46,\ 0x88,\ 0x30,\ 0x05,\ 0x04,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00122}00122\ \ \ \ 0x6e,\ 0xd6,\ 0x0a,\ 0x17,\ 0x8b,\ 0xd8,\ 0xbc,\ 0xf3,\ 0xf1,\ 0x50,\ 0x50,\ 0xcb,\ 0xd5,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00123}00123\ \ \ \ 0x8c,\ 0x87,\ 0x17,\ 0xa5,\ 0x6c,\ 0x36,\ 0xfc,\ 0x24,\ 0x30,\ 0xd0,\ 0xd2,\ 0x99,\ 0x16,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00124}00124\ \ \ \ 0x72,\ 0x0f,\ 0xa9,\ 0x47,\ 0xe4,\ 0x3f,\ 0xd0,\ 0x15,\ 0xc1,\ 0x86,\ 0x66,\ 0xd9,\ 0xfa,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00125}00125\ \ \ \ 0x47,\ 0x3d,\ 0x52,\ 0x7c,\ 0x9b,\ 0xb2,\ 0x9e,\ 0xb4,\ 0xfe,\ 0xfd,\ 0x99,\ 0x6d,\ 0x33,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00126}00126\ \ \ \ 0xf3,\ 0x6b,\ 0xa1,\ 0xd7,\ 0x5a,\ 0x21,\ 0x30,\ 0x36,\ 0xdc,\ 0xd4,\ 0xa6,\ 0x26,\ 0xb2,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00127}00127\ \ \ \ 0x22,\ 0xfe,\ 0x5c,\ 0x26,\ 0xe6,\ 0xfa,\ 0xee,\ 0xbc,\ 0x54,\ 0x09,\ 0xec,\ 0x90,\ 0xf8,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00128}00128\ \ \ \ 0xfa,\ 0xd8,\ 0x91,\ 0xf2,\ 0x22,\ 0xce,\ 0xa9,\ 0x6b,\ 0x06,\ 0x5e,\ 0x55,\ 0x2d,\ 0x21,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00129}00129\ \ \ \ 0x70,\ 0xed,\ 0xd3,\ 0xdb,\ 0x10,\ 0xb3,\ 0xef,\ 0xc7,\ 0x09,\ 0xbc,\ 0xe2,\ 0x1d,\ 0x47,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00130}00130\ \ \ \ 0xa8,\ 0x58,\ 0xff,\ 0x13,\ 0x4a,\ 0x98,\ 0x4a,\ 0x7d,\ 0xce,\ 0x8b,\ 0x8c,\ 0xdb,\ 0x52,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00131}00131\ \ \ \ 0xc7,\ 0xaa,\ 0x66,\ 0xca,\ 0x70,\ 0xb6,\ 0xc1,\ 0x11,\ 0x7b,\ 0x2d,\ 0x87,\ 0x74,\ 0x0a,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00132}00132\ \ \ \ 0x6e,\ 0xcd,\ 0xab,\ 0x41,\ 0xd0,\ 0xfb,\ 0x13,\ 0xf1,\ 0xb9,\ 0xa0,\ 0x41,\ 0x59,\ 0xea,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00133}00133\ \ \ \ 0x9d,\ 0x29,\ 0x42,\ 0x7b,\ 0xff,\ 0x44,\ 0x6a,\ 0xb7,\ 0xbb,\ 0x26,\ 0xac,\ 0x61,\ 0x9c,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00134}00134\ \ \ \ 0xa9,\ 0x6b,\ 0xb7,\ 0x3f,\ 0xdc,\ 0xb1,\ 0x73,\ 0x18,\ 0x98,\ 0x56,\ 0x51,\ 0x60,\ 0x65,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00135}00135\ \ \ \ 0x20,\ 0x40,\ 0x51,\ 0x58,\ 0xc7,\ 0x31,\ 0x86,\ 0x82,\ 0x46,\ 0x25,\ 0x99,\ 0x28,\ 0xfb,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00136}00136\ \ \ \ 0x3a,\ 0xc0,\ 0x34,\ 0xd8,\ 0x9c,\ 0x93,\ 0x81,\ 0x13,\ 0xdb,\ 0xc5,\ 0xa8,\ 0x71,\ 0xe3,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00137}00137\ \ \ \ 0x4f,\ 0xee,\ 0xe6,\ 0x9f,\ 0x00,\ 0x00,\ 0x01,\ 0x0f,\ 0x00,\ 0x00,\ 0x00,\ 0x07,\ 0x73,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00138}00138\ \ \ \ 0x73,\ 0x68,\ 0x2d,\ 0x72,\ 0x73,\ 0x61,\ 0x00,\ 0x00,\ 0x01,\ 0x00,\ 0x0a,\ 0xcc,\ 0x96,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00139}00139\ \ \ \ 0xd1,\ 0xc3,\ 0xa5,\ 0x05,\ 0xfb,\ 0x20,\ 0x2f,\ 0x3a,\ 0x70,\ 0x89,\ 0x73,\ 0x42,\ 0x01,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00140}00140\ \ \ \ 0x21,\ 0x14,\ 0x44,\ 0xc6,\ 0x61,\ 0xbd,\ 0xc7,\ 0x5f,\ 0xf0,\ 0x8b,\ 0x04,\ 0x30,\ 0xa8,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00141}00141\ \ \ \ 0x81,\ 0x81,\ 0x17,\ 0x6e,\ 0x8a,\ 0xe5,\ 0x88,\ 0x2a,\ 0x4a,\ 0xf8,\ 0x58,\ 0x82,\ 0x1c,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00142}00142\ \ \ \ 0x67,\ 0x18,\ 0x26,\ 0x9a,\ 0x24,\ 0xb5,\ 0xf9,\ 0x1c,\ 0xc9,\ 0xe8,\ 0x12,\ 0xe2,\ 0x93,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00143}00143\ \ \ \ 0xdc,\ 0x63,\ 0xc1,\ 0x4d,\ 0x39,\ 0x37,\ 0x44,\ 0xb4,\ 0x06,\ 0x27,\ 0x29,\ 0x53,\ 0x3b,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00144}00144\ \ \ \ 0xa1,\ 0x72,\ 0xb1,\ 0xb0,\ 0x7f,\ 0xec,\ 0x76,\ 0x88,\ 0x68,\ 0x54,\ 0xba,\ 0xff,\ 0xe4,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00145}00145\ \ \ \ 0x29,\ 0x67,\ 0xbc,\ 0xae,\ 0x0b,\ 0x33,\ 0xc3,\ 0x78,\ 0xf8,\ 0x90,\ 0xe0,\ 0x33,\ 0xda,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00146}00146\ \ \ \ 0x1c,\ 0x76,\ 0x5a,\ 0x18,\ 0xcf,\ 0xdf,\ 0x22,\ 0x17,\ 0x7a,\ 0xba,\ 0x7d,\ 0x84,\ 0x3f,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00147}00147\ \ \ \ 0xd1,\ 0x4a,\ 0x18,\ 0x6d,\ 0x67,\ 0x8c,\ 0xa0,\ 0x64,\ 0xe9,\ 0x57,\ 0xdc,\ 0xb9,\ 0x99,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00148}00148\ \ \ \ 0x89,\ 0x85,\ 0xd6,\ 0x28,\ 0x82,\ 0x33,\ 0x3f,\ 0x95,\ 0xda,\ 0xfb,\ 0x8b,\ 0x92,\ 0x35,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00149}00149\ \ \ \ 0xd2,\ 0x73,\ 0x1f,\ 0xdd,\ 0x4a,\ 0x62,\ 0x0a,\ 0x67,\ 0xfb,\ 0xdc,\ 0x08,\ 0x6d,\ 0x4b,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00150}00150\ \ \ \ 0xe4,\ 0xed,\ 0x9f,\ 0x22,\ 0xda,\ 0xe0,\ 0x02,\ 0x8e,\ 0x8c,\ 0xcb,\ 0x33,\ 0xe6,\ 0x08,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00151}00151\ \ \ \ 0x91,\ 0x4d,\ 0x26,\ 0xf3,\ 0xc7,\ 0xdd,\ 0xad,\ 0x08,\ 0xec,\ 0x63,\ 0xf0,\ 0xe8,\ 0x09,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00152}00152\ \ \ \ 0x14,\ 0x78,\ 0xd4,\ 0xf3,\ 0xc0,\ 0xb7,\ 0xd7,\ 0x5c,\ 0x9d,\ 0x62,\ 0x00,\ 0x8c,\ 0xde,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00153}00153\ \ \ \ 0xde,\ 0xcd,\ 0x75,\ 0x5c,\ 0x9b,\ 0xfb,\ 0x85,\ 0xce,\ 0x3d,\ 0x58,\ 0xb0,\ 0x4a,\ 0xc8,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00154}00154\ \ \ \ 0xc3,\ 0xc5,\ 0x86,\ 0xe5,\ 0x3f,\ 0xf4,\ 0x86,\ 0x29,\ 0x57,\ 0x2e,\ 0x7a,\ 0xd4,\ 0x64,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00155}00155\ \ \ \ 0x29,\ 0xa8,\ 0x42,\ 0xba,\ 0xf3,\ 0xb4,\ 0x92,\ 0x3f,\ 0x77,\ 0xc3,\ 0x44,\ 0xaa,\ 0xcc,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00156}00156\ \ \ \ 0x30,\ 0xb8,\ 0x82,\ 0xb2,\ 0xcb,\ 0x29,\ 0x9c,\ 0xea,\ 0x84,\ 0xa5,\ 0x0f,\ 0x58,\ 0x59,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00157}00157\ \ \ \ 0x3d,\ 0x43,\ 0xe3,\ 0xc4,\ 0xdd,\ 0x18,\ 0xdf,\ 0xe4,\ 0x82,\ 0x45,\ 0x22,\ 0xea,\ 0xa7,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00158}00158\ \ \ \ 0xe2,\ 0x26,\ 0xc8,\ 0x41,\ 0xfb,\ 0x37\};}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00159}00159\ }
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00160}\mbox{\hyperlink{ssh_8c_a840291bc02cba5474a4cb46a9b9566fe}{00160}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{ssh_8c_a840291bc02cba5474a4cb46a9b9566fe}{main}}(\textcolor{keywordtype}{void})\ \{}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00161}00161\ \ \ \mbox{\hyperlink{structyh__connector}{yh\_connector}}\ *connector\ =\ NULL;}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00162}00162\ \ \ \mbox{\hyperlink{structyh__session}{yh\_session}}\ *\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}}\ =\ NULL;}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00163}00163\ \ \ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366}{yh\_rc}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a39fbc5bce29b178582419ae9d31ad252}{YHR\_GENERIC\_ERROR}};}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00164}00164\ }
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00165}00165\ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ authkey\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00166}00166\ }
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00167}00167\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *connector\_url;}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00168}00168\ }
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00169}00169\ \ \ connector\_url\ =\ getenv(\textcolor{stringliteral}{"{}DEFAULT\_CONNECTOR\_URL"{}});}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00170}00170\ \ \ \textcolor{keywordflow}{if}\ (connector\_url\ ==\ NULL)\ \{}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00171}00171\ \ \ \ \ connector\_url\ =\ \mbox{\hyperlink{ssh_8c_a377ec96b1eb26c7b26b84bb5b0c9a928}{DEFAULT\_CONNECTOR\_URL}};}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00172}00172\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00173}00173\ }
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00174}00174\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a5392844a98c6220c69fe08d3dcf8f1bc}{yh\_init}}();}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00175}00175\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00176}00176\ }
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00177}00177\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a9c700747902a722d6c1d2073277de294}{yh\_init\_connector}}(connector\_url,\ \&connector);}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00178}00178\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00179}00179\ }
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00180}00180\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_aa19be6ac70a2a5d1cef8d7e6902fe05f}{yh\_connect}}(connector,\ 0);}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00181}00181\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00182}00182\ }
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00183}00183\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a3be331dcf8907ff3569e4dc230e1c615}{yh\_create\_session\_derived}}(connector,\ authkey,\ password,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00184}00184\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{sizeof}(password),\ \textcolor{keyword}{false},\ \&\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}});}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00185}00185\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00186}00186\ }
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00187}00187\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a77870209747d5ccd90f9da3aae2bdfa8}{yh\_authenticate\_session}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}});}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00188}00188\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00189}00189\ }
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00190}00190\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ session\_id;}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00191}00191\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_aeabf472faf1ba8d963b39866e04df6b0}{yh\_get\_session\_id}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}},\ \&session\_id);}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00192}00192\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00193}00193\ }
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00194}00194\ \ \ printf(\textcolor{stringliteral}{"{}Successfully\ established\ session\ \%02d\(\backslash\)n"{}},\ session\_id);}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00195}00195\ }
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00196}00196\ \ \ FILE\ *fp\ =\ fopen(\mbox{\hyperlink{ssh_8c_a474ca95e02ab1106e22735c9fd6249ab}{ssh\_ca\_pvtkey\_file}},\ \textcolor{stringliteral}{"{}rb"{}});}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00197}00197\ \ \ assert(fp\ !=\ NULL);}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00198}00198\ }
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00199}00199\ \ \ \mbox{\hyperlink{yubihsm_8h_a498937b5a72accbb0ef21bb1dcdd55ca}{yh\_algorithm}}\ \mbox{\hyperlink{yubihsm_8h_a67bb26eddc39413f8e94c98aedbbd391}{algorithm}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00200}00200\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ key[2048];}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00201}00201\ \ \ \textcolor{keywordtype}{size\_t}\ key\_material\_len\ =\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{yubico__otp_8c_a9246c20bb98ad2b4c60313c053c70f08}{key}});}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00202}00202\ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{util_8c_ad07cc3629c0f077bad477d9a05c1081b}{read\_file}}(fp,\ key,\ \&key\_material\_len))\ \{}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00203}00203\ \ \ \ \ assert(\textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00204}00204\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00205}00205\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{util_8c_ae88d850a063cdc9ed3c114feab9af651}{read\_private\_key}}(key,\ key\_material\_len,\ \&\mbox{\hyperlink{yubihsm_8h_a67bb26eddc39413f8e94c98aedbbd391}{algorithm}},\ key,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00206}00206\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&key\_material\_len,\ \textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00207}00207\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ ==\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00208}00208\ \ \ assert(\mbox{\hyperlink{yubihsm_8h_a67bb26eddc39413f8e94c98aedbbd391}{algorithm}}\ ==\ \mbox{\hyperlink{yubihsm_8h_a498937b5a72accbb0ef21bb1dcdd55caaafe94e6a770edb51c6db84f77d98d2c6}{YH\_ALGO\_RSA\_2048}});}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00209}00209\ }
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00210}00210\ \ \ \mbox{\hyperlink{structyh__capabilities}{yh\_capabilities}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a08393519edfd7c59fb01fb8db97514b5}{capabilities}}\ =\ \{\{0\}\};}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00211}00211\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_aab440e1cb671d9ba7a2e7d1243960e42}{yh\_string\_to\_capabilities}}(\textcolor{stringliteral}{"{}sign-\/ssh-\/certificate"{}},\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a08393519edfd7c59fb01fb8db97514b5}{capabilities}});}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00212}00212\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00213}00213\ }
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00214}00214\ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ domain\_five\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00215}00215\ \ \ \mbox{\hyperlink{yubihsm_8c_a96a4c751a281515d5610adb8fd779438}{yh\_string\_to\_domains}}(\textcolor{stringliteral}{"{}5"{}},\ \&domain\_five);}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00216}00216\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00217}00217\ }
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00218}00218\ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ ca\_key\_id\ =}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00219}00219\ \ \ \ \ 5;\ \textcolor{comment}{//\ We\ use\ ID\ 5\ because\ it\ is\ in\ the\ template's\ whitelist}}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00220}00220\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a7b5f1f0c1cbca11fbe21e7e4e6b29a1b}{yh\_util\_get\_object\_info}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}},\ ca\_key\_id,\ \mbox{\hyperlink{yubihsm_8h_a2fe39512cb4df34b270a67dbb8e13583ab71424e16384319d6e6a12f9a3d8ceae}{YH\_ASYMMETRIC\_KEY}},\ NULL);}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00221}00221\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}})\ \{}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00222}00222\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_ae736702f9463878db4adfd45b6a597f9}{yh\_util\_delete\_object}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}},\ ca\_key\_id,\ \mbox{\hyperlink{yubihsm_8h_a2fe39512cb4df34b270a67dbb8e13583ab71424e16384319d6e6a12f9a3d8ceae}{YH\_ASYMMETRIC\_KEY}});}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00223}00223\ \ \ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00224}00224\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00225}00225\ \ \ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a9bc4026d75a26dcaa51ba3310d6b8393}{YHR\_DEVICE\_OBJECT\_NOT\_FOUND}});}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00226}00226\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00227}00227\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_ab0ca24007ce6942d2185859560c43e8a}{yh\_util\_import\_rsa\_key}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}},\ \&ca\_key\_id,\ \mbox{\hyperlink{ssh_8c_a870e61ded67e4529500d708a5f1af286}{key\_label}},\ domain\_five,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00228}00228\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a08393519edfd7c59fb01fb8db97514b5}{capabilities}},\ \mbox{\hyperlink{yubihsm_8h_a67bb26eddc39413f8e94c98aedbbd391}{algorithm}},\ key,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00229}00229\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ key\ +\ (key\_material\_len\ /\ 2));}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00230}00230\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00231}00231\ }
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00232}00232\ \ \ printf(\textcolor{stringliteral}{"{}Key\ imported\ with\ ID\ \%04x\(\backslash\)n"{}},\ ca\_key\_id);}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00233}00233\ }
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00234}00234\ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ template\_id\ =\ 10;}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00235}00235\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a7b5f1f0c1cbca11fbe21e7e4e6b29a1b}{yh\_util\_get\_object\_info}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}},\ template\_id,\ \mbox{\hyperlink{yubihsm_8h_a2fe39512cb4df34b270a67dbb8e13583a96244762de5ce4175e60157239e7a097}{YH\_TEMPLATE}},\ NULL);}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00236}00236\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}})\ \{}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00237}00237\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_ae736702f9463878db4adfd45b6a597f9}{yh\_util\_delete\_object}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}},\ template\_id,\ \mbox{\hyperlink{yubihsm_8h_a2fe39512cb4df34b270a67dbb8e13583a96244762de5ce4175e60157239e7a097}{YH\_TEMPLATE}});}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00238}00238\ \ \ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00239}00239\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00240}00240\ \ \ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a9bc4026d75a26dcaa51ba3310d6b8393}{YHR\_DEVICE\_OBJECT\_NOT\_FOUND}});}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00241}00241\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00242}00242\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_ae0fc8d6520950868365011d1a9f450f1}{yh\_util\_import\_template}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}},\ \&template\_id,\ \mbox{\hyperlink{ssh_8c_a870e61ded67e4529500d708a5f1af286}{key\_label}},\ domain\_five,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00243}00243\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a08393519edfd7c59fb01fb8db97514b5}{capabilities}},\ \mbox{\hyperlink{yubihsm_8h_a498937b5a72accbb0ef21bb1dcdd55caad75fd14ef18fed62ae13cd3657fce3b2}{YH\_ALGO\_TEMPLATE\_SSH}},}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00244}00244\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ssh_8c_a1164213ac6329ae2ed8667857da56645}{template\_dat}},\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{ssh_8c_a1164213ac6329ae2ed8667857da56645}{template\_dat}}));}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00245}00245\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00246}00246\ }
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00247}00247\ \ \ printf(\textcolor{stringliteral}{"{}Template\ imported\ with\ ID\ \%04x\(\backslash\)n"{}},\ template\_id);}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00248}00248\ }
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00249}00249\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ template2[\textcolor{keyword}{sizeof}(\mbox{\hyperlink{ssh_8c_a1164213ac6329ae2ed8667857da56645}{template\_dat}})];}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00250}00250\ \ \ \textcolor{keywordtype}{size\_t}\ template2\_len\ =\ \textcolor{keyword}{sizeof}(template2);}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00251}00251\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a47768ae0e72beba49f02db1baddf4823}{yh\_util\_get\_template}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}},\ template\_id,\ template2,\ \&template2\_len);}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00252}00252\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00253}00253\ }
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00254}00254\ \ \ assert(\textcolor{keyword}{sizeof}(\mbox{\hyperlink{ssh_8c_a1164213ac6329ae2ed8667857da56645}{template\_dat}})\ ==\ template2\_len);}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00255}00255\ \ \ assert(memcmp(\mbox{\hyperlink{ssh_8c_a1164213ac6329ae2ed8667857da56645}{template\_dat}},\ template2,\ template2\_len)\ ==\ 0);}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00256}00256\ }
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00257}00257\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ ssh\_req[2048];}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00258}00258\ \ \ \textcolor{keywordtype}{size\_t}\ ssh\_req\_len\ =\ \textcolor{keyword}{sizeof}(ssh\_req);}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00259}00259\ }
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00260}00260\ \ \ fp\ =\ fopen(\mbox{\hyperlink{ssh_8c_a9443d1cc78332e27a0177ce6abff78db}{ssh\_req\_file}},\ \textcolor{stringliteral}{"{}rb"{}});}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00261}00261\ \ \ assert(fp\ !=\ NULL);}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00262}00262\ }
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00263}00263\ \ \ fseek(fp,\ 0,\ SEEK\_END);}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00264}00264\ \ \ ssh\_req\_len\ =\ ftell(fp);}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00265}00265\ \ \ assert(ssh\_req\_len\ <=\ \textcolor{keyword}{sizeof}(ssh\_req));}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00266}00266\ \ \ fseek(fp,\ 0,\ SEEK\_SET);}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00267}00267\ }
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00268}00268\ \ \ \textcolor{keywordtype}{size\_t}\ read\ =\ fread(ssh\_req,\ 1,\ ssh\_req\_len,\ fp);}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00269}00269\ \ \ fclose(fp);}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00270}00270\ \ \ printf(\textcolor{stringliteral}{"{}actually\ read\ \%zu,\ expected\ \%zu\(\backslash\)n"{}},\ read,\ ssh\_req\_len);}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00271}00271\ \ \ assert(read\ ==\ ssh\_req\_len);}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00272}00272\ }
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00273}00273\ \ \ \textcolor{keywordtype}{size\_t}\ ssh\_cert\_len\ =\ \textcolor{keyword}{sizeof}(ssh\_req)\ -\/\ ssh\_req\_len;}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00274}00274\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00275}00275\ \ \ \ \ \mbox{\hyperlink{yubihsm_8c_a45c32b993856be818a70c0ffad589cbd}{yh\_util\_sign\_ssh\_certificate}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}},\ ca\_key\_id,\ template\_id,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00276}00276\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm_8h_a498937b5a72accbb0ef21bb1dcdd55caa1982e3db182a679514674f454e2b79ad}{YH\_ALGO\_RSA\_PKCS1\_SHA1}},\ ssh\_req,\ ssh\_req\_len,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00277}00277\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ssh\_req\ +\ ssh\_req\_len,\ \&ssh\_cert\_len);}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00278}00278\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00279}00279\ \ \ assert(memcmp(\mbox{\hyperlink{ssh_8c_a2cd19dc464a5cf91cd7c2e717b9dffd7}{expected\_result}},\ ssh\_req\ +\ 4\ +\ 256,\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{ssh_8c_a2cd19dc464a5cf91cd7c2e717b9dffd7}{expected\_result}}))\ ==}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00280}00280\ \ \ \ \ \ \ \ \ \ 0);}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00281}00281\ }
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00282}00282\ \ \ BIO\ *bio;}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00283}00283\ \ \ BIO\ *b64;}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00284}00284\ }
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00285}00285\ \ \ b64\ =\ BIO\_new(BIO\_f\_base64());}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00286}00286\ \ \ bio\ =\ BIO\_new\_fp(stdout,\ BIO\_NOCLOSE);}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00287}00287\ \ \ bio\ =\ BIO\_push(b64,\ bio);}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00288}00288\ }
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00289}00289\ \ \ fprintf(stdout,\ \textcolor{stringliteral}{"{}ssh-\/rsa-\/cert-\/v01@openssh.com\ "{}});}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00290}00290\ \ \ (void)\ BIO\_set\_flags(bio,\ BIO\_FLAGS\_BASE64\_NO\_NL);}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00291}00291\ \ \ (void)\ BIO\_write(bio,\ ssh\_req\ +\ 4\ +\ 256,}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00292}00292\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ssh\_req\_len\ +\ ssh\_cert\_len\ -\/\ 4\ -\/\ 256);}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00293}00293\ \ \ (void)\ BIO\_flush(bio);}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00294}00294\ \ \ fprintf(stdout,\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00295}00295\ }
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00296}00296\ \ \ BIO\_free\_all(bio);}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00297}00297\ }
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00298}00298\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a61ab8dbab67b1cceb49cd306f8c3f4b1}{yh\_util\_close\_session}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}});}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00299}00299\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00300}00300\ }
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00301}00301\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a1a35f8ae5a739848408633a514e41b2d}{yh\_destroy\_session}}(\&\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}});}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00302}00302\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00303}00303\ }
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00304}00304\ \ \ \mbox{\hyperlink{yubihsm_8c_ab12d5a42d2219741bd3630b99ed1c7d2}{yh\_disconnect}}(connector);}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00305}00305\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00306}00306\ }
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00307}00307\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a36e3d9a07c6689e14a9339ca1ebb7259}{yh\_exit}}();}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00308}00308\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00309}00309\ }
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00310}00310\ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{ssh_8c_source_l00311}00311\ \}}
+
+\end{DoxyCode}

@@ -1,0 +1,31 @@
+<map id="sysio::producer_plugin_impl" name="sysio::producer_plugin_impl">
+<area shape="rect" id="Node000001" title=" " alt="" coords="922,340,1104,366"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="500,5,644,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="660,17,718,15,781,20,843,35,873,48,900,66,931,96,956,132,976,172,990,212,1008,288,1014,340,1008,340,1002,288,985,214,971,174,952,135,927,99,896,70,870,53,841,40,780,25,718,20,660,22"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="520,86,625,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="640,86,700,83,767,87,836,102,869,115,900,132,926,155,948,181,981,241,1002,298,1012,339,1007,341,997,299,976,243,944,184,922,158,896,137,867,120,835,107,767,92,700,88,641,91"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1chain_1_1unapplied__transaction__queue.html" title=" " alt="" coords="495,136,650,176"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="665,151,798,155,858,162,899,176,922,193,943,213,975,259,998,305,1010,339,1005,341,993,307,971,262,939,217,919,197,897,181,856,168,798,160,665,156"/>
+<area shape="rect" id="Node000005" href="$classfc_1_1microseconds.html" title=" " alt="" coords="512,207,633,233"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="649,227,798,247,899,267,929,282,958,302,1000,338,997,342,954,306,927,287,897,272,798,253,648,232"/>
+<area shape="rect" id="Node000006" href="$classfc_1_1time__point.html" title=" " alt="" coords="522,256,622,282"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="638,272,760,286,899,312,979,337,977,342,897,317,759,292,638,277"/>
+<area shape="rect" id="Node000007" href="$classsysio_1_1chain__plugin.html" title=" " alt="" coords="506,306,638,331"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="654,322,922,343,921,349,654,328"/>
+<area shape="rect" id="Node000008" href="$classappbase_1_1plugin.html" title=" " alt="" coords="221,298,376,339"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="392,316,506,316,506,321,392,321"/>
+<area shape="rect" id="Node000009" href="$classappbase_1_1abstract__plugin.html" title=" " alt="" coords="5,306,172,331"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="187,316,221,316,221,321,187,321"/>
+<area shape="rect" id="Node000010" href="$classappbase_1_1channel.html" title=" " alt="" coords="489,355,656,396"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="672,378,781,378,898,372,952,364,953,369,898,377,781,384,672,383"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="432,421,713,581"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="727,455,897,399,982,364,984,369,899,404,729,460"/>
+<area shape="rect" id="Node000012" title=" " alt="" coords="426,606,719,751"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="718,595,808,537,896,470,956,413,999,365,1003,368,959,417,900,474,811,541,721,600"/>
+<area shape="rect" id="Node000013" href="$classsysio_1_1subjective__billing.html" title=" " alt="" coords="493,775,652,801"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="666,778,718,761,777,729,819,696,855,656,896,601,936,536,968,468,1005,366,1010,368,973,470,941,539,900,604,859,660,823,700,780,733,720,766,668,783"/>
+<area shape="rect" id="Node000014" title=" " alt="" coords="500,825,645,866"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="660,846,719,841,782,829,843,806,871,789,896,769,918,738,937,691,955,633,971,570,995,448,1007,366,1013,367,1000,449,976,571,960,635,943,693,922,740,900,773,874,794,846,811,784,834,720,847,661,851"/>
+<area shape="rect" id="Node000015" title=" " alt="" coords="543,890,602,915"/>
+<area shape="poly" id="edge14_Node000001_Node000015" title=" " alt="" coords="617,908,679,915,754,913,793,907,830,897,865,881,896,858,910,842,922,821,944,763,963,692,978,614,999,464,1008,366,1014,367,1004,465,984,615,968,693,950,765,927,823,914,845,900,862,868,885,832,902,794,913,755,919,679,920,617,914"/>
+</map>

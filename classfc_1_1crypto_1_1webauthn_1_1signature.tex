@@ -1,0 +1,245 @@
+\doxysection{fc\+::crypto\+::webauthn\+::signature Class Reference}
+\hypertarget{classfc_1_1crypto_1_1webauthn_1_1signature}{}\label{classfc_1_1crypto_1_1webauthn_1_1signature}\index{fc::crypto::webauthn::signature@{fc::crypto::webauthn::signature}}
+
+
+{\ttfamily \#include $<$elliptic\+\_\+webauthn.\+hpp$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{classfc_1_1crypto_1_1webauthn_1_1signature_aad2d0aff992f5d9acb2ea92af00e2e9b}{data\+\_\+type}} = \mbox{\hyperlink{classfc_1_1crypto_1_1webauthn_1_1signature}{signature}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1crypto_1_1webauthn_1_1signature}{signature}} \mbox{\hyperlink{classfc_1_1crypto_1_1webauthn_1_1signature_a0ec6acd249be38529e942defdacdb698}{serialize}} () const
+\item 
+\mbox{\hyperlink{classfc_1_1crypto_1_1webauthn_1_1signature_acc3bce0f865201b8c7b5762f0feace2f}{signature}} ()
+\item 
+\mbox{\hyperlink{classfc_1_1crypto_1_1webauthn_1_1signature_acd4fead5ba9cc3299e4d4d7d5a512586}{signature}} (const \mbox{\hyperlink{namespacefc_1_1crypto_1_1r1_ae05a9b8a3e71b719d56c0a87c491a8f6}{fc\+::crypto\+::r1\+::compact\+\_\+signature}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, const std\+::vector$<$ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} $>$ \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, const std\+::string \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}})
+\item 
+\mbox{\hyperlink{classfc_1_1crypto_1_1webauthn_1_1public__key}{public\+\_\+key}} \mbox{\hyperlink{classfc_1_1crypto_1_1webauthn_1_1signature_a28633b0f40d89bedb305e2343d9ac4ca}{recover}} (const \mbox{\hyperlink{classfc_1_1sha256}{sha256}} \&\mbox{\hyperlink{namespacefc_a150ca4cd9c0318ca45dc0dc7df5d58b9}{digest}}, bool check\+\_\+canonical) const
+\item 
+size\+\_\+t \mbox{\hyperlink{classfc_1_1crypto_1_1webauthn_1_1signature_ae0bf6b562a0e4b30c388fcc49c090ae9}{variable\+\_\+size}} () const
+\item 
+bool \mbox{\hyperlink{classfc_1_1crypto_1_1webauthn_1_1signature_a85d5c85c8570c4fa5c0dfa7807e3c6b2}{operator==}} (const \mbox{\hyperlink{classfc_1_1crypto_1_1webauthn_1_1signature}{signature}} \&o) const
+\item 
+bool \mbox{\hyperlink{classfc_1_1crypto_1_1webauthn_1_1signature_a787fa174931d8dced81d0a4d2d3f8faa}{operator$<$}} (const \mbox{\hyperlink{classfc_1_1crypto_1_1webauthn_1_1signature}{signature}} \&o) const
+\item 
+size\+\_\+t \mbox{\hyperlink{classfc_1_1crypto_1_1webauthn_1_1signature_a149821dda07dd2af31ce043198d7429c}{get\+\_\+hash}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{classfc_1_1crypto_1_1webauthn_1_1signature_ab92b4440e0af4c095266c47134de4194}{fc\+::reflector$<$ signature $>$}}
+\item 
+\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classfc_1_1crypto_1_1webauthn_1_1signature_a02ee1fa9fb75a71bb167b80862443a52}{public\+\_\+key}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{elliptic__webauthn_8hpp_source_l00074}{74}} of file \mbox{\hyperlink{elliptic__webauthn_8hpp_source}{elliptic\+\_\+webauthn.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classfc_1_1crypto_1_1webauthn_1_1signature_aad2d0aff992f5d9acb2ea92af00e2e9b}\index{fc::crypto::webauthn::signature@{fc::crypto::webauthn::signature}!data\_type@{data\_type}}
+\index{data\_type@{data\_type}!fc::crypto::webauthn::signature@{fc::crypto::webauthn::signature}}
+\doxysubsubsection{\texorpdfstring{data\_type}{data\_type}}
+{\footnotesize\ttfamily \label{classfc_1_1crypto_1_1webauthn_1_1signature_aad2d0aff992f5d9acb2ea92af00e2e9b} 
+using fc\+::crypto\+::webauthn\+::signature\+::data\+\_\+type = \mbox{\hyperlink{classfc_1_1crypto_1_1webauthn_1_1signature}{signature}}}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic__webauthn_8hpp_source_l00077}{77}} of file \mbox{\hyperlink{elliptic__webauthn_8hpp_source}{elliptic\+\_\+webauthn.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1crypto_1_1webauthn_1_1signature_acc3bce0f865201b8c7b5762f0feace2f}\index{fc::crypto::webauthn::signature@{fc::crypto::webauthn::signature}!signature@{signature}}
+\index{signature@{signature}!fc::crypto::webauthn::signature@{fc::crypto::webauthn::signature}}
+\doxysubsubsection{\texorpdfstring{signature()}{signature()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1crypto_1_1webauthn_1_1signature_acc3bce0f865201b8c7b5762f0feace2f} 
+fc\+::crypto\+::webauthn\+::signature\+::signature (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic__webauthn_8hpp_source_l00080}{80}} of file \mbox{\hyperlink{elliptic__webauthn_8hpp_source}{elliptic\+\_\+webauthn.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00080\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1crypto_1_1webauthn_1_1signature_acd4fead5ba9cc3299e4d4d7d5a512586}\index{fc::crypto::webauthn::signature@{fc::crypto::webauthn::signature}!signature@{signature}}
+\index{signature@{signature}!fc::crypto::webauthn::signature@{fc::crypto::webauthn::signature}}
+\doxysubsubsection{\texorpdfstring{signature()}{signature()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1crypto_1_1webauthn_1_1signature_acd4fead5ba9cc3299e4d4d7d5a512586} 
+fc\+::crypto\+::webauthn\+::signature\+::signature (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_1_1crypto_1_1r1_ae05a9b8a3e71b719d56c0a87c491a8f6}{fc\+::crypto\+::r1\+::compact\+\_\+signature}} \&}]{s}{, }\item[{const std\+::vector$<$ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} $>$ \&}]{a}{, }\item[{const std\+::string \&}]{j}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic__webauthn_8hpp_source_l00081}{81}} of file \mbox{\hyperlink{elliptic__webauthn_8hpp_source}{elliptic\+\_\+webauthn.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ compact\_signature(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}),\ auth\_data(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}),\ client\_json(\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}})\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1crypto_1_1webauthn_1_1signature_a149821dda07dd2af31ce043198d7429c}\index{fc::crypto::webauthn::signature@{fc::crypto::webauthn::signature}!get\_hash@{get\_hash}}
+\index{get\_hash@{get\_hash}!fc::crypto::webauthn::signature@{fc::crypto::webauthn::signature}}
+\doxysubsubsection{\texorpdfstring{get\_hash()}{get\_hash()}}
+{\footnotesize\ttfamily \label{classfc_1_1crypto_1_1webauthn_1_1signature_a149821dda07dd2af31ce043198d7429c} 
+size\+\_\+t fc\+::crypto\+::webauthn\+::signature\+::get\+\_\+hash (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic__webauthn_8hpp_source_l00103}{103}} of file \mbox{\hyperlink{elliptic__webauthn_8hpp_source}{elliptic\+\_\+webauthn.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *(\textcolor{keywordtype}{size\_t}*)\&compact\_signature.\mbox{\hyperlink{classfc_1_1array_ad01e4627be17148ee922c37944c48626}{data}}[32-\/\textcolor{keyword}{sizeof}(\textcolor{keywordtype}{size\_t})]\ +\ *(\textcolor{keywordtype}{size\_t}*)\&compact\_signature.\mbox{\hyperlink{classfc_1_1array_ad01e4627be17148ee922c37944c48626}{data}}[64-\/\textcolor{keyword}{sizeof}(\textcolor{keywordtype}{size\_t})];}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=339pt]{classfc_1_1crypto_1_1webauthn_1_1signature_a149821dda07dd2af31ce043198d7429c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1crypto_1_1webauthn_1_1signature_a787fa174931d8dced81d0a4d2d3f8faa}\index{fc::crypto::webauthn::signature@{fc::crypto::webauthn::signature}!operator$<$@{operator$<$}}
+\index{operator$<$@{operator$<$}!fc::crypto::webauthn::signature@{fc::crypto::webauthn::signature}}
+\doxysubsubsection{\texorpdfstring{operator$<$()}{operator<()}}
+{\footnotesize\ttfamily \label{classfc_1_1crypto_1_1webauthn_1_1signature_a787fa174931d8dced81d0a4d2d3f8faa} 
+bool fc\+::crypto\+::webauthn\+::signature\+::operator$<$ (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1crypto_1_1webauthn_1_1signature}{signature}} \&}]{o}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic__webauthn_8hpp_source_l00098}{98}} of file \mbox{\hyperlink{elliptic__webauthn_8hpp_source}{elliptic\+\_\+webauthn.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::tie(compact\_signature,\ auth\_data,\ client\_json)\ <\ std::tie(o.compact\_signature,\ o.auth\_data,\ o.client\_json);}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1crypto_1_1webauthn_1_1signature_a85d5c85c8570c4fa5c0dfa7807e3c6b2}\index{fc::crypto::webauthn::signature@{fc::crypto::webauthn::signature}!operator==@{operator==}}
+\index{operator==@{operator==}!fc::crypto::webauthn::signature@{fc::crypto::webauthn::signature}}
+\doxysubsubsection{\texorpdfstring{operator==()}{operator==()}}
+{\footnotesize\ttfamily \label{classfc_1_1crypto_1_1webauthn_1_1signature_a85d5c85c8570c4fa5c0dfa7807e3c6b2} 
+bool fc\+::crypto\+::webauthn\+::signature\+::operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1crypto_1_1webauthn_1_1signature}{signature}} \&}]{o}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic__webauthn_8hpp_source_l00092}{92}} of file \mbox{\hyperlink{elliptic__webauthn_8hpp_source}{elliptic\+\_\+webauthn.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ compact\_signature\ ==\ o.compact\_signature\ \&\&}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ auth\_data\ ==\ o.auth\_data\ \ \ \ \ \ \ \ \ \&\&}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ client\_json\ ==\ o.client\_json;}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1crypto_1_1webauthn_1_1signature_a28633b0f40d89bedb305e2343d9ac4ca}\index{fc::crypto::webauthn::signature@{fc::crypto::webauthn::signature}!recover@{recover}}
+\index{recover@{recover}!fc::crypto::webauthn::signature@{fc::crypto::webauthn::signature}}
+\doxysubsubsection{\texorpdfstring{recover()}{recover()}}
+{\footnotesize\ttfamily \label{classfc_1_1crypto_1_1webauthn_1_1signature_a28633b0f40d89bedb305e2343d9ac4ca} 
+\mbox{\hyperlink{classfc_1_1crypto_1_1webauthn_1_1public__key}{public\+\_\+key}} fc\+::crypto\+::webauthn\+::signature\+::recover (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1sha256}{sha256}} \&}]{digest}{, }\item[{bool}]{check\+\_\+canonical}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic__webauthn_8hpp_source_l00084}{84}} of file \mbox{\hyperlink{elliptic__webauthn_8hpp_source}{elliptic\+\_\+webauthn.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1crypto_1_1webauthn_1_1signature_a02ee1fa9fb75a71bb167b80862443a52}{public\_key}}(*\textcolor{keyword}{this},\ \mbox{\hyperlink{namespacefc_a150ca4cd9c0318ca45dc0dc7df5d58b9}{digest}},\ check\_canonical);}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1crypto_1_1webauthn_1_1signature_a28633b0f40d89bedb305e2343d9ac4ca_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1crypto_1_1webauthn_1_1signature_a28633b0f40d89bedb305e2343d9ac4ca_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1crypto_1_1webauthn_1_1signature_a0ec6acd249be38529e942defdacdb698}\index{fc::crypto::webauthn::signature@{fc::crypto::webauthn::signature}!serialize@{serialize}}
+\index{serialize@{serialize}!fc::crypto::webauthn::signature@{fc::crypto::webauthn::signature}}
+\doxysubsubsection{\texorpdfstring{serialize()}{serialize()}}
+{\footnotesize\ttfamily \label{classfc_1_1crypto_1_1webauthn_1_1signature_a0ec6acd249be38529e942defdacdb698} 
+\mbox{\hyperlink{classfc_1_1crypto_1_1webauthn_1_1signature}{signature}} fc\+::crypto\+::webauthn\+::signature\+::serialize (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic__webauthn_8hpp_source_l00078}{78}} of file \mbox{\hyperlink{elliptic__webauthn_8hpp_source}{elliptic\+\_\+webauthn.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00078\ \{\ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1crypto_1_1webauthn_1_1signature_ae0bf6b562a0e4b30c388fcc49c090ae9}\index{fc::crypto::webauthn::signature@{fc::crypto::webauthn::signature}!variable\_size@{variable\_size}}
+\index{variable\_size@{variable\_size}!fc::crypto::webauthn::signature@{fc::crypto::webauthn::signature}}
+\doxysubsubsection{\texorpdfstring{variable\_size()}{variable\_size()}}
+{\footnotesize\ttfamily \label{classfc_1_1crypto_1_1webauthn_1_1signature_ae0bf6b562a0e4b30c388fcc49c090ae9} 
+size\+\_\+t fc\+::crypto\+::webauthn\+::signature\+::variable\+\_\+size (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic__webauthn_8hpp_source_l00088}{88}} of file \mbox{\hyperlink{elliptic__webauthn_8hpp_source}{elliptic\+\_\+webauthn.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ auth\_data.size()\ +\ client\_json.size();}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{classfc_1_1crypto_1_1webauthn_1_1signature_ab92b4440e0af4c095266c47134de4194}\index{fc::crypto::webauthn::signature@{fc::crypto::webauthn::signature}!fc::reflector$<$ signature $>$@{fc::reflector$<$ signature $>$}}
+\index{fc::reflector$<$ signature $>$@{fc::reflector$<$ signature $>$}!fc::crypto::webauthn::signature@{fc::crypto::webauthn::signature}}
+\doxysubsubsection{\texorpdfstring{fc::reflector$<$ signature $>$}{fc::reflector< signature >}}
+{\footnotesize\ttfamily \label{classfc_1_1crypto_1_1webauthn_1_1signature_ab92b4440e0af4c095266c47134de4194} 
+friend struct \mbox{\hyperlink{structfc_1_1reflector}{fc\+::reflector}}$<$ \mbox{\hyperlink{classfc_1_1crypto_1_1webauthn_1_1signature}{signature}} $>$\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic__webauthn_8hpp_source_l00103}{103}} of file \mbox{\hyperlink{elliptic__webauthn_8hpp_source}{elliptic\+\_\+webauthn.\+hpp}}.
+
+\Hypertarget{classfc_1_1crypto_1_1webauthn_1_1signature_a02ee1fa9fb75a71bb167b80862443a52}\index{fc::crypto::webauthn::signature@{fc::crypto::webauthn::signature}!public\_key@{public\_key}}
+\index{public\_key@{public\_key}!fc::crypto::webauthn::signature@{fc::crypto::webauthn::signature}}
+\doxysubsubsection{\texorpdfstring{public\_key}{public\_key}}
+{\footnotesize\ttfamily \label{classfc_1_1crypto_1_1webauthn_1_1signature_a02ee1fa9fb75a71bb167b80862443a52} 
+friend \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classfc_1_1crypto_1_1webauthn_1_1public__key}{public\+\_\+key}}\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic__webauthn_8hpp_source_l00108}{108}} of file \mbox{\hyperlink{elliptic__webauthn_8hpp_source}{elliptic\+\_\+webauthn.\+hpp}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/\mbox{\hyperlink{elliptic__webauthn_8hpp}{elliptic\+\_\+webauthn.\+hpp}}\end{DoxyCompactItemize}

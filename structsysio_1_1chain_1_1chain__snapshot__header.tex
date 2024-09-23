@@ -1,0 +1,119 @@
+\doxysection{sysio\+::chain\+::chain\+\_\+snapshot\+\_\+header Struct Reference}
+\hypertarget{structsysio_1_1chain_1_1chain__snapshot__header}{}\label{structsysio_1_1chain_1_1chain__snapshot__header}\index{sysio::chain::chain\_snapshot\_header@{sysio::chain::chain\_snapshot\_header}}
+
+
+{\ttfamily \#include $<$chain\+\_\+snapshot.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{structsysio_1_1chain_1_1chain__snapshot__header_a6f183a866ea3a474243c55484f0c700e}{validate}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1chain__snapshot__header_a57ba8d21e5d5c9e1325e9ef03f96d54e}{version}} = \mbox{\hyperlink{structsysio_1_1chain_1_1chain__snapshot__header_ad7357c9cee48e084e060efb76dce03e4}{current\+\_\+version}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static constexpr \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1chain__snapshot__header_a1332d618e749d49b9281dc4ff605e469}{minimum\+\_\+compatible\+\_\+version}} = 2
+\item 
+static constexpr \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1chain__snapshot__header_ad7357c9cee48e084e060efb76dce03e4}{current\+\_\+version}} = 6
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{chain__snapshot_8hpp_source_l00007}{7}} of file \mbox{\hyperlink{chain__snapshot_8hpp_source}{chain\+\_\+snapshot.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1chain_1_1chain__snapshot__header_a6f183a866ea3a474243c55484f0c700e}\index{sysio::chain::chain\_snapshot\_header@{sysio::chain::chain\_snapshot\_header}!validate@{validate}}
+\index{validate@{validate}!sysio::chain::chain\_snapshot\_header@{sysio::chain::chain\_snapshot\_header}}
+\doxysubsubsection{\texorpdfstring{validate()}{validate()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1chain__snapshot__header_a6f183a866ea3a474243c55484f0c700e} 
+void sysio\+::chain\+::chain\+\_\+snapshot\+\_\+header\+::validate (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{chain__snapshot_8hpp_source_l00033}{33}} of file \mbox{\hyperlink{chain__snapshot_8hpp_source}{chain\+\_\+snapshot.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacefc_aa3ea11c18de71ec23b19c3cc571fb8ff}{min}}\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__snapshot__header_a1332d618e749d49b9281dc4ff605e469}{minimum\_compatible\_version}};}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ max\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__snapshot__header_ad7357c9cee48e084e060efb76dce03e4}{current\_version}};}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\mbox{\hyperlink{structsysio_1_1chain_1_1chain__snapshot__header_a57ba8d21e5d5c9e1325e9ef03f96d54e}{version}}\ >=\ \mbox{\hyperlink{namespacefc_aa3ea11c18de71ec23b19c3cc571fb8ff}{min}}\ \&\&\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__snapshot__header_a57ba8d21e5d5c9e1325e9ef03f96d54e}{version}}\ <=\ max,}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ snapshot\_validation\_exception,}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Unsupported\ version\ of\ chain\ snapshot:\ \$\{version\}.\ Supported\ version\ must\ be\ between\ \$\{min\}\ and\ \$\{max\}\ inclusive."{}},}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}version"{}},\mbox{\hyperlink{structsysio_1_1chain_1_1chain__snapshot__header_a57ba8d21e5d5c9e1325e9ef03f96d54e}{version}})(\textcolor{stringliteral}{"{}min"{}},\mbox{\hyperlink{namespacefc_aa3ea11c18de71ec23b19c3cc571fb8ff}{min}})(\textcolor{stringliteral}{"{}max"{}},max));}
+\DoxyCodeLine{00040\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=297pt]{structsysio_1_1chain_1_1chain__snapshot__header_a6f183a866ea3a474243c55484f0c700e_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1chain__snapshot__header_a6f183a866ea3a474243c55484f0c700e_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1chain_1_1chain__snapshot__header_ad7357c9cee48e084e060efb76dce03e4}\index{sysio::chain::chain\_snapshot\_header@{sysio::chain::chain\_snapshot\_header}!current\_version@{current\_version}}
+\index{current\_version@{current\_version}!sysio::chain::chain\_snapshot\_header@{sysio::chain::chain\_snapshot\_header}}
+\doxysubsubsection{\texorpdfstring{current\_version}{current\_version}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1chain__snapshot__header_ad7357c9cee48e084e060efb76dce03e4} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::chain\+::chain\+\_\+snapshot\+\_\+header\+::current\+\_\+version = 6\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{chain__snapshot_8hpp_source_l00029}{29}} of file \mbox{\hyperlink{chain__snapshot_8hpp_source}{chain\+\_\+snapshot.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1chain__snapshot__header_a1332d618e749d49b9281dc4ff605e469}\index{sysio::chain::chain\_snapshot\_header@{sysio::chain::chain\_snapshot\_header}!minimum\_compatible\_version@{minimum\_compatible\_version}}
+\index{minimum\_compatible\_version@{minimum\_compatible\_version}!sysio::chain::chain\_snapshot\_header@{sysio::chain::chain\_snapshot\_header}}
+\doxysubsubsection{\texorpdfstring{minimum\_compatible\_version}{minimum\_compatible\_version}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1chain__snapshot__header_a1332d618e749d49b9281dc4ff605e469} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::chain\+::chain\+\_\+snapshot\+\_\+header\+::minimum\+\_\+compatible\+\_\+version = 2\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+Version history 1\+: initial version 2\+: Updated chain snapshot for v1.\+8.\+0 initial protocol features release\+:
+\begin{DoxyItemize}
+\item Incompatible with version 1.
+\item Adds new indices for\+: \doxylink{classsysio_1_1chain_1_1protocol__state__object}{protocol\+\_\+state\+\_\+object} and \doxylink{classsysio_1_1chain_1_1account__ram__correction__object}{account\+\_\+ram\+\_\+correction\+\_\+object} 3\+: Updated for v2.\+0.\+0 protocol features\+:
+\item forwards compatible with version 2
+\item Web\+Authn keys
+\item wtmsig block siganatures\+: the block header state changed to include producer authorities and additional signatures
+\item removed \doxylink{structsysio_1_1chain_1_1genesis__state}{genesis\+\_\+state} and added chain ID to \doxylink{classsysio_1_1chain_1_1global__property__object}{global\+\_\+property\+\_\+object} 4\+: Updated for v3.\+0.\+0 protocol features\+:
+\item forwards compatible with versions 2 and 3
+\item kv database
+\item Configurable wasm limits 5\+: Updated for v3.\+0.\+0 eos features\+:
+\item chain\+\_\+config update 6\+: Updated for v3.\+1.\+0 release 
+\end{DoxyItemize}
+
+Definition at line \mbox{\hyperlink{chain__snapshot_8hpp_source_l00028}{28}} of file \mbox{\hyperlink{chain__snapshot_8hpp_source}{chain\+\_\+snapshot.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1chain__snapshot__header_a57ba8d21e5d5c9e1325e9ef03f96d54e}\index{sysio::chain::chain\_snapshot\_header@{sysio::chain::chain\_snapshot\_header}!version@{version}}
+\index{version@{version}!sysio::chain::chain\_snapshot\_header@{sysio::chain::chain\_snapshot\_header}}
+\doxysubsubsection{\texorpdfstring{version}{version}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1chain__snapshot__header_a57ba8d21e5d5c9e1325e9ef03f96d54e} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::chain\+::chain\+\_\+snapshot\+\_\+header\+::version = \mbox{\hyperlink{structsysio_1_1chain_1_1chain__snapshot__header_ad7357c9cee48e084e060efb76dce03e4}{current\+\_\+version}}}
+
+
+
+Definition at line \mbox{\hyperlink{chain__snapshot_8hpp_source_l00031}{31}} of file \mbox{\hyperlink{chain__snapshot_8hpp_source}{chain\+\_\+snapshot.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{chain__snapshot_8hpp}{chain\+\_\+snapshot.\+hpp}}\end{DoxyCompactItemize}

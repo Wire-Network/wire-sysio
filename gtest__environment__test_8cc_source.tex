@@ -1,0 +1,195 @@
+\doxysection{gtest\+\_\+environment\+\_\+test.\+cc}
+\hypertarget{gtest__environment__test_8cc_source}{}\label{gtest__environment__test_8cc_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/test/gtest\_environment\_test.cc@{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/test/gtest\_environment\_test.cc}}
+\mbox{\hyperlink{gtest__environment__test_8cc}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00001}00001\ \textcolor{comment}{//\ Copyright\ 2007,\ Google\ Inc.}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00002}00002\ \textcolor{comment}{//\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00003}00003\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00004}00004\ \textcolor{comment}{//\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00005}00005\ \textcolor{comment}{//\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00006}00006\ \textcolor{comment}{//\ met:}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00007}00007\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00008}00008\ \textcolor{comment}{//\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00009}00009\ \textcolor{comment}{//\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00010}00010\ \textcolor{comment}{//\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00011}00011\ \textcolor{comment}{//\ copyright\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00012}00012\ \textcolor{comment}{//\ in\ the\ documentation\ and/or\ other\ materials\ provided\ with\ the}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00013}00013\ \textcolor{comment}{//\ distribution.}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00014}00014\ \textcolor{comment}{//\ \ \ \ \ *\ Neither\ the\ name\ of\ Google\ Inc.\ nor\ the\ names\ of\ its}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00015}00015\ \textcolor{comment}{//\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products\ derived\ from}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00016}00016\ \textcolor{comment}{//\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00017}00017\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00018}00018\ \textcolor{comment}{//\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00019}00019\ \textcolor{comment}{//\ "{}AS\ IS"{}\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00020}00020\ \textcolor{comment}{//\ LIMITED\ TO,\ THE\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00021}00021\ \textcolor{comment}{//\ A\ PARTICULAR\ PURPOSE\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ THE\ COPYRIGHT}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00022}00022\ \textcolor{comment}{//\ OWNER\ OR\ CONTRIBUTORS\ BE\ LIABLE\ FOR\ ANY\ DIRECT,\ INDIRECT,\ INCIDENTAL,}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00023}00023\ \textcolor{comment}{//\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES\ (INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00024}00024\ \textcolor{comment}{//\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;\ LOSS\ OF\ USE,}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00025}00025\ \textcolor{comment}{//\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND\ ON\ ANY}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00026}00026\ \textcolor{comment}{//\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00027}00027\ \textcolor{comment}{//\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00028}00028\ \textcolor{comment}{//\ OF\ THIS\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00029}00029\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00030}00030\ \textcolor{comment}{//\ Author:\ wan@google.com\ (Zhanyong\ Wan)}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00031}00031\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00032}00032\ \textcolor{comment}{//\ Tests\ using\ global\ test\ environments.}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00034}00034\ \textcolor{preprocessor}{\#include\ <stdlib.h>}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00035}00035\ \textcolor{preprocessor}{\#include\ <stdio.h>}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00036}00036\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{gtest_8h}{gtest/gtest.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00037}00037\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{gtest-internal-inl_8h}{src/gtest-\/internal-\/inl.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00039}00039\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetesting}{testing}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00040}00040\ \mbox{\hyperlink{gtest-port_8h_a9f74eee05f7ee5534139a622fe7da7dd}{GTEST\_DECLARE\_string\_}}(filter);}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00041}00041\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00043}00043\ \textcolor{keyword}{namespace\ }\{}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00045}00045\ \textcolor{keyword}{enum}\ FailureType\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00046}00046\ \ \ NO\_FAILURE,\ NON\_FATAL\_FAILURE,\ FATAL\_FAILURE}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00047}00047\ \};}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00049}00049\ \textcolor{comment}{//\ For\ testing\ using\ global\ test\ environments.}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00050}00050\ \textcolor{keyword}{class\ }MyEnvironment\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1_environment}{testing::Environment}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00051}00051\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00052}00052\ \ \ MyEnvironment()\ \{\ \mbox{\hyperlink{struct_reset}{Reset}}();\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00054}00054\ \ \ \textcolor{comment}{//\ Depending\ on\ the\ value\ of\ failure\_in\_set\_up\_,\ SetUp()\ will}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00055}00055\ \ \ \textcolor{comment}{//\ generate\ a\ non-\/fatal\ failure,\ generate\ a\ fatal\ failure,\ or}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00056}00056\ \ \ \textcolor{comment}{//\ succeed.}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00057}00057\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ SetUp()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00058}00058\ \ \ \ \ set\_up\_was\_run\_\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00060}00060\ \ \ \ \ \textcolor{keywordflow}{switch}\ (failure\_in\_set\_up\_)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00061}00061\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ NON\_FATAL\_FAILURE:}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00062}00062\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_adc16b5b0a740c39084ea5c9e960e3063}{ADD\_FAILURE}}()\ <<\ \textcolor{stringliteral}{"{}Expected\ non-\/fatal\ failure\ in\ global\ set-\/up."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00063}00063\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00064}00064\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ FATAL\_FAILURE:}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00065}00065\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a3e26a8d27caa386ed0ea7ce9d5b7c4ed}{FAIL}}()\ <<\ \textcolor{stringliteral}{"{}Expected\ fatal\ failure\ in\ global\ set-\/up."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00066}00066\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00067}00067\ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00068}00068\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00069}00069\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00070}00070\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00072}00072\ \ \ \textcolor{comment}{//\ Generates\ a\ non-\/fatal\ failure.}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00073}00073\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ TearDown()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00074}00074\ \ \ \ \ tear\_down\_was\_run\_\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00075}00075\ \ \ \ \ \mbox{\hyperlink{gtest_8h_adc16b5b0a740c39084ea5c9e960e3063}{ADD\_FAILURE}}()\ <<\ \textcolor{stringliteral}{"{}Expected\ non-\/fatal\ failure\ in\ global\ tear-\/down."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00076}00076\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00077}00077\ }
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00078}00078\ \ \ \textcolor{comment}{//\ Resets\ the\ state\ of\ the\ environment\ s.t.\ it\ can\ be\ reused.}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00079}00079\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_reset}{Reset}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00080}00080\ \ \ \ \ failure\_in\_set\_up\_\ =\ NO\_FAILURE;}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00081}00081\ \ \ \ \ set\_up\_was\_run\_\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00082}00082\ \ \ \ \ tear\_down\_was\_run\_\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00083}00083\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00084}00084\ }
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00085}00085\ \ \ \textcolor{comment}{//\ We\ call\ this\ function\ to\ set\ the\ type\ of\ failure\ SetUp()\ should}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00086}00086\ \ \ \textcolor{comment}{//\ generate.}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00087}00087\ \ \ \textcolor{keywordtype}{void}\ set\_failure\_in\_set\_up(FailureType\ type)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00088}00088\ \ \ \ \ failure\_in\_set\_up\_\ =\ \mbox{\hyperlink{yubihsm_8h_a1d127017fb298b889f4ba24752d08b8e}{type}};}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00089}00089\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00090}00090\ }
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00091}00091\ \ \ \textcolor{comment}{//\ Was\ SetUp()\ run?}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00092}00092\ \ \ \textcolor{keywordtype}{bool}\ set\_up\_was\_run()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ set\_up\_was\_run\_;\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00093}00093\ }
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00094}00094\ \ \ \textcolor{comment}{//\ Was\ TearDown()\ run?}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00095}00095\ \ \ \textcolor{keywordtype}{bool}\ tear\_down\_was\_run()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ tear\_down\_was\_run\_;\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00096}00096\ }
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00097}00097\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00098}00098\ \ \ FailureType\ failure\_in\_set\_up\_;}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00099}00099\ \ \ \textcolor{keywordtype}{bool}\ set\_up\_was\_run\_;}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00100}00100\ \ \ \textcolor{keywordtype}{bool}\ tear\_down\_was\_run\_;}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00101}00101\ \};}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00102}00102\ }
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00103}00103\ \textcolor{comment}{//\ Was\ the\ TEST\ run?}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00104}00104\ \textcolor{keywordtype}{bool}\ test\_was\_run;}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00105}00105\ }
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00106}00106\ \textcolor{comment}{//\ The\ sole\ purpose\ of\ this\ TEST\ is\ to\ enable\ us\ to\ check\ whether\ it}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00107}00107\ \textcolor{comment}{//\ was\ run.}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00108}00108\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(FooTest,\ Bar)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00109}00109\ \ \ test\_was\_run\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00110}00110\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00111}00111\ }
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00112}00112\ \textcolor{comment}{//\ Prints\ the\ message\ and\ aborts\ the\ program\ if\ condition\ is\ false.}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00113}00113\ \textcolor{keywordtype}{void}\ Check(\textcolor{keywordtype}{bool}\ condition,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ msg)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00114}00114\ \ \ \textcolor{keywordflow}{if}\ (!condition)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00115}00115\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}FAILED:\ \%s\(\backslash\)n"{}},\ msg);}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00116}00116\ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_1_1posix_a69b8278c59359dd6a6f941b4643db9fb}{testing::internal::posix::Abort}}();}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00117}00117\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00118}00118\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00119}00119\ }
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00120}00120\ \textcolor{comment}{//\ Runs\ the\ tests.\ \ Return\ true\ iff\ successful.}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00121}00121\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00122}00122\ \textcolor{comment}{//\ The\ 'failure'\ parameter\ specifies\ the\ type\ of\ failure\ that\ should}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00123}00123\ \textcolor{comment}{//\ be\ generated\ by\ the\ global\ set-\/up.}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00124}00124\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{gtest__output__test___8cc_ae0ca194f6b730e168850ce3179ad4f63}{RunAllTests}}(MyEnvironment*\ env,\ FailureType\ failure)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00125}00125\ \ \ env-\/>Reset();}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00126}00126\ \ \ env-\/>set\_failure\_in\_set\_up(failure);}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00127}00127\ \ \ test\_was\_run\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00128}00128\ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a9bd0caf5d16512de38b39599c13ee634}{testing::internal::GetUnitTestImpl}}()-\/>\mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl_ac44629cc4fa12b788779d4aa76939510}{ClearAdHocTestResult}}();}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00129}00129\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{gtest_8h_a853a3792807489591d3d4a2f2ff9359f}{RUN\_ALL\_TESTS}}();}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00130}00130\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00131}00131\ }
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00132}00132\ \}\ \ \textcolor{comment}{//\ namespace}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00133}00133\ }
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00134}\mbox{\hyperlink{gtest__environment__test_8cc_a3c04138a5bfe5d72780bb7e82a18e627}{00134}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}(\textcolor{keywordtype}{int}\ argc,\ \textcolor{keywordtype}{char}\ **\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}})\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00135}00135\ \ \ \mbox{\hyperlink{namespacetesting_afd726ae08c9bd16dc52f78c822d9946b}{testing::InitGoogleTest}}(\&argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}});}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00136}00136\ }
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00137}00137\ \ \ \textcolor{comment}{//\ Registers\ a\ global\ test\ environment,\ and\ verifies\ that\ the}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00138}00138\ \ \ \textcolor{comment}{//\ registration\ function\ returns\ its\ argument.}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00139}00139\ \ \ MyEnvironment*\ \textcolor{keyword}{const}\ env\ =\ \textcolor{keyword}{new}\ MyEnvironment;}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00140}00140\ \ \ Check(\mbox{\hyperlink{namespacetesting_a224caeebdb6586b728d204367fea1087}{testing::AddGlobalTestEnvironment}}(env)\ ==\ env,}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00141}00141\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}AddGlobalTestEnvironment()\ should\ return\ its\ argument."{}});}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00142}00142\ }
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00143}00143\ \ \ \textcolor{comment}{//\ Verifies\ that\ RUN\_ALL\_TESTS()\ runs\ the\ tests\ when\ the\ global}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00144}00144\ \ \ \textcolor{comment}{//\ set-\/up\ is\ successful.}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00145}00145\ \ \ Check(\mbox{\hyperlink{gtest__output__test___8cc_ae0ca194f6b730e168850ce3179ad4f63}{RunAllTests}}(env,\ NO\_FAILURE)\ !=\ 0,}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00146}00146\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}RUN\_ALL\_TESTS()\ should\ return\ non-\/zero,\ as\ the\ global\ tear-\/down\ "{}}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00147}00147\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}should\ generate\ a\ failure."{}});}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00148}00148\ \ \ Check(test\_was\_run,}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00149}00149\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}The\ tests\ should\ run,\ as\ the\ global\ set-\/up\ should\ generate\ no\ "{}}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00150}00150\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}failure"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00151}00151\ \ \ Check(env-\/>tear\_down\_was\_run(),}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00152}00152\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}The\ global\ tear-\/down\ should\ run,\ as\ the\ global\ set-\/up\ was\ run."{}});}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00153}00153\ }
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00154}00154\ \ \ \textcolor{comment}{//\ Verifies\ that\ RUN\_ALL\_TESTS()\ runs\ the\ tests\ when\ the\ global}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00155}00155\ \ \ \textcolor{comment}{//\ set-\/up\ generates\ no\ fatal\ failure.}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00156}00156\ \ \ Check(\mbox{\hyperlink{gtest__output__test___8cc_ae0ca194f6b730e168850ce3179ad4f63}{RunAllTests}}(env,\ NON\_FATAL\_FAILURE)\ !=\ 0,}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00157}00157\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}RUN\_ALL\_TESTS()\ should\ return\ non-\/zero,\ as\ both\ the\ global\ set-\/up\ "{}}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00158}00158\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}and\ the\ global\ tear-\/down\ should\ generate\ a\ non-\/fatal\ failure."{}});}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00159}00159\ \ \ Check(test\_was\_run,}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00160}00160\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}The\ tests\ should\ run,\ as\ the\ global\ set-\/up\ should\ generate\ no\ "{}}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00161}00161\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}fatal\ failure."{}});}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00162}00162\ \ \ Check(env-\/>tear\_down\_was\_run(),}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00163}00163\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}The\ global\ tear-\/down\ should\ run,\ as\ the\ global\ set-\/up\ was\ run."{}});}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00164}00164\ }
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00165}00165\ \ \ \textcolor{comment}{//\ Verifies\ that\ RUN\_ALL\_TESTS()\ runs\ no\ test\ when\ the\ global\ set-\/up}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00166}00166\ \ \ \textcolor{comment}{//\ generates\ a\ fatal\ failure.}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00167}00167\ \ \ Check(\mbox{\hyperlink{gtest__output__test___8cc_ae0ca194f6b730e168850ce3179ad4f63}{RunAllTests}}(env,\ FATAL\_FAILURE)\ !=\ 0,}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00168}00168\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}RUN\_ALL\_TESTS()\ should\ return\ non-\/zero,\ as\ the\ global\ set-\/up\ "{}}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00169}00169\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}should\ generate\ a\ fatal\ failure."{}});}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00170}00170\ \ \ Check(!test\_was\_run,}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00171}00171\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}The\ tests\ should\ not\ run,\ as\ the\ global\ set-\/up\ should\ generate\ "{}}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00172}00172\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}a\ fatal\ failure."{}});}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00173}00173\ \ \ Check(env-\/>tear\_down\_was\_run(),}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00174}00174\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}The\ global\ tear-\/down\ should\ run,\ as\ the\ global\ set-\/up\ was\ run."{}});}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00175}00175\ }
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00176}00176\ \ \ \textcolor{comment}{//\ Verifies\ that\ RUN\_ALL\_TESTS()\ doesn't\ do\ global\ set-\/up\ or}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00177}00177\ \ \ \textcolor{comment}{//\ tear-\/down\ when\ there\ is\ no\ test\ to\ run.}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00178}00178\ \ \ testing::GTEST\_FLAG(filter)\ =\ \textcolor{stringliteral}{"{}-\/*"{}};}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00179}00179\ \ \ Check(\mbox{\hyperlink{gtest__output__test___8cc_ae0ca194f6b730e168850ce3179ad4f63}{RunAllTests}}(env,\ NO\_FAILURE)\ ==\ 0,}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00180}00180\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}RUN\_ALL\_TESTS()\ should\ return\ zero,\ as\ there\ is\ no\ test\ to\ run."{}});}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00181}00181\ \ \ Check(!env-\/>set\_up\_was\_run(),}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00182}00182\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}The\ global\ set-\/up\ should\ not\ run,\ as\ there\ is\ no\ test\ to\ run."{}});}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00183}00183\ \ \ Check(!env-\/>tear\_down\_was\_run(),}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00184}00184\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}The\ global\ tear-\/down\ should\ not\ run,\ "{}}}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00185}00185\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}as\ the\ global\ set-\/up\ was\ not\ run."{}});}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00186}00186\ }
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00187}00187\ \ \ printf(\textcolor{stringliteral}{"{}PASS\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00188}00188\ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest__environment__test_8cc_source_l00189}00189\ \}}
+
+\end{DoxyCode}

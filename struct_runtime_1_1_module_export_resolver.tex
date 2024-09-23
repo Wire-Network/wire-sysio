@@ -1,0 +1,75 @@
+\doxysection{Runtime\+::Module\+Export\+Resolver Struct Reference}
+\hypertarget{struct_runtime_1_1_module_export_resolver}{}\label{struct_runtime_1_1_module_export_resolver}\index{Runtime::ModuleExportResolver@{Runtime::ModuleExportResolver}}
+
+
+{\ttfamily \#include $<$Linker.\+h$>$}
+
+
+
+Inheritance diagram for Runtime\+::Module\+Export\+Resolver\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=238pt]{struct_runtime_1_1_module_export_resolver__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Runtime\+::Module\+Export\+Resolver\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=238pt]{struct_runtime_1_1_module_export_resolver__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_runtime_1_1_module_export_resolver_ab887e7d30d7e2ccde81f0737cdab1ad8}{Module\+Export\+Resolver}} (const \mbox{\hyperlink{struct_i_r_1_1_module}{IR\+::\+Module}} \&in\+Module, \mbox{\hyperlink{struct_runtime_1_1_module_instance}{Module\+Instance}} \texorpdfstring{$\ast$}{*}in\+Module\+Instance)
+\item 
+bool \mbox{\hyperlink{struct_runtime_1_1_module_export_resolver_af72a8f24c5c5c1501466dc94b57eb97f}{resolve}} (const std\+::string \&module\+Name, const std\+::string \&export\+Name, \mbox{\hyperlink{struct_i_r_1_1_object_type}{IR\+::\+Object\+Type}} type, \mbox{\hyperlink{struct_runtime_1_1_object_instance}{Object\+Instance}} \texorpdfstring{$\ast$}{*}\&out\+Object) override
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{struct_runtime_1_1_resolver}{Runtime\+::\+Resolver}}}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{_linker_8h_source_l00024}{24}} of file \mbox{\hyperlink{_linker_8h_source}{Linker.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{struct_runtime_1_1_module_export_resolver_ab887e7d30d7e2ccde81f0737cdab1ad8}\index{Runtime::ModuleExportResolver@{Runtime::ModuleExportResolver}!ModuleExportResolver@{ModuleExportResolver}}
+\index{ModuleExportResolver@{ModuleExportResolver}!Runtime::ModuleExportResolver@{Runtime::ModuleExportResolver}}
+\doxysubsubsection{\texorpdfstring{ModuleExportResolver()}{ModuleExportResolver()}}
+{\footnotesize\ttfamily \label{struct_runtime_1_1_module_export_resolver_ab887e7d30d7e2ccde81f0737cdab1ad8} 
+Runtime\+::\+Module\+Export\+Resolver\+::\+Module\+Export\+Resolver (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct_i_r_1_1_module}{IR\+::\+Module}} \&}]{in\+Module}{, }\item[{\mbox{\hyperlink{struct_runtime_1_1_module_instance}{Module\+Instance}} \texorpdfstring{$\ast$}{*}}]{in\+Module\+Instance}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_linker_8h_source_l00026}{26}} of file \mbox{\hyperlink{_linker_8h_source}{Linker.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00026\ :\ module(inModule),\ moduleInstance(inModuleInstance)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_runtime_1_1_module_export_resolver_af72a8f24c5c5c1501466dc94b57eb97f}\index{Runtime::ModuleExportResolver@{Runtime::ModuleExportResolver}!resolve@{resolve}}
+\index{resolve@{resolve}!Runtime::ModuleExportResolver@{Runtime::ModuleExportResolver}}
+\doxysubsubsection{\texorpdfstring{resolve()}{resolve()}}
+{\footnotesize\ttfamily \label{struct_runtime_1_1_module_export_resolver_af72a8f24c5c5c1501466dc94b57eb97f} 
+bool Runtime\+::\+Module\+Export\+Resolver\+::resolve (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{module\+Name}{, }\item[{const std\+::string \&}]{export\+Name}{, }\item[{\mbox{\hyperlink{struct_i_r_1_1_object_type}{IR\+::\+Object\+Type}}}]{type}{, }\item[{\mbox{\hyperlink{struct_runtime_1_1_object_instance}{Object\+Instance}} \texorpdfstring{$\ast$}{*}\&}]{out\+Object}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{struct_runtime_1_1_resolver_a8387253cf2addc917647cba230a00334}{Runtime\+::\+Resolver}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/wasm-\/jit/\+Include/\+Runtime/\mbox{\hyperlink{_linker_8h}{Linker.\+h}}\end{DoxyCompactItemize}

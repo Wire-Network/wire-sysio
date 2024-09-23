@@ -1,0 +1,373 @@
+\doxysection{libraries/fc/test/crypto/test\+\_\+modular\+\_\+arithmetic.cpp File Reference}
+\hypertarget{test__modular__arithmetic_8cpp}{}\label{test__modular__arithmetic_8cpp}\index{libraries/fc/test/crypto/test\_modular\_arithmetic.cpp@{libraries/fc/test/crypto/test\_modular\_arithmetic.cpp}}
+{\ttfamily \#include $<$boost/test/included/unit\+\_\+test.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/exception/exception.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/crypto/hex.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/crypto/modular\+\_\+arithmetic.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/utility.\+hpp$>$}\newline
+{\ttfamily \#include $<$chrono$>$}\newline
+{\ttfamily \#include $<$random$>$}\newline
+{\ttfamily \#include $<$limits$>$}\newline
+{\ttfamily \#include "{}test\+\_\+utils.\+hpp"{}}\newline
+Include dependency graph for test\+\_\+modular\+\_\+arithmetic.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__modular__arithmetic_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacestd}{std}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{test__modular__arithmetic_8cpp_a6b2a3852db8bb19ab6909bac01859985}{BOOST\+\_\+\+TEST\+\_\+\+MODULE}}~modular\+\_\+arithmetic
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+std\+::ostream \& \mbox{\hyperlink{namespacestd_a26c08359ed9bed0577d855906d09f402}{std\+::operator$<$$<$}} (std\+::ostream \&st, const std\+::variant$<$ \mbox{\hyperlink{namespacefc_ae7d2486e4d99ebde343787521e928f69}{fc\+::modular\+\_\+arithmetic\+\_\+error}}, \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}} $>$ \&err)
+\item 
+\mbox{\hyperlink{test__modular__arithmetic_8cpp_aa5c16699529d520f104f2ac289f9e195}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (modexp)
+\item 
+\mbox{\hyperlink{test__modular__arithmetic_8cpp_ae70bfa24f5a3bc0917382b3c17fc033c}{FC\+\_\+\+LOG\+\_\+\+AND\+\_\+\+RETHROW}} ()
+\item 
+\mbox{\hyperlink{test__modular__arithmetic_8cpp_a9d9c1c14a7021503b2a196771c4d4615}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (modexp\+\_\+benchmarking)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{test__modular__arithmetic_8cpp_a6b2a3852db8bb19ab6909bac01859985}\index{test\_modular\_arithmetic.cpp@{test\_modular\_arithmetic.cpp}!BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}}
+\index{BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}!test\_modular\_arithmetic.cpp@{test\_modular\_arithmetic.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_TEST\_MODULE}{BOOST\_TEST\_MODULE}}
+{\footnotesize\ttfamily \label{test__modular__arithmetic_8cpp_a6b2a3852db8bb19ab6909bac01859985} 
+\#define BOOST\+\_\+\+TEST\+\_\+\+MODULE~modular\+\_\+arithmetic}
+
+
+
+Definition at line \mbox{\hyperlink{test__modular__arithmetic_8cpp_source_l00001}{1}} of file \mbox{\hyperlink{test__modular__arithmetic_8cpp_source}{test\+\_\+modular\+\_\+arithmetic.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{test__modular__arithmetic_8cpp_aa5c16699529d520f104f2ac289f9e195}\index{test\_modular\_arithmetic.cpp@{test\_modular\_arithmetic.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!test\_modular\_arithmetic.cpp@{test\_modular\_arithmetic.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{test__modular__arithmetic_8cpp_aa5c16699529d520f104f2ac289f9e195} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{modexp}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__modular__arithmetic_8cpp_source_l00030}{30}} of file \mbox{\hyperlink{test__modular__arithmetic_8cpp_source}{test\+\_\+modular\+\_\+arithmetic.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00031\ }
+\DoxyCodeLine{00032\ }
+\DoxyCodeLine{00033\ \ \ \ \ \textcolor{keyword}{using\ }modexp\_test\ =\ std::tuple<std::vector<string>,\ std::variant<fc::modular\_arithmetic\_error,\ bytes>>;}
+\DoxyCodeLine{00034\ }
+\DoxyCodeLine{00035\ \ \ \ \ \textcolor{keyword}{const}\ std::vector<modexp\_test>\ tests\ \{}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \textcolor{comment}{//test1}}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}03"{}},}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}fffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2e"{}},}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}fffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2f"{}},}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{test__utils_8hpp_af42811e238a2a23276bd4200e2b40dde}{to\_bytes}}(\textcolor{stringliteral}{"{}0000000000000000000000000000000000000000000000000000000000000001"{}}),}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{00045\ }
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \textcolor{comment}{//test2}}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}"{}},}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}fffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2e"{}},}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}fffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2f"{}},}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{test__utils_8hpp_af42811e238a2a23276bd4200e2b40dde}{to\_bytes}}(\textcolor{stringliteral}{"{}0000000000000000000000000000000000000000000000000000000000000000"{}})}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{00055\ }
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \textcolor{comment}{//test3}}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}01"{}},}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}fffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2e"{}},}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}"{}},}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ modular\_arithmetic\_error::modulus\_len\_zero}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{00065\ }
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \textcolor{comment}{//test4}}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}01"{}},}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}fffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2e"{}},}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}0000"{}},}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{test__utils_8hpp_af42811e238a2a23276bd4200e2b40dde}{to\_bytes}}(\textcolor{stringliteral}{"{}0000"{}})}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{00075\ }
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \textcolor{comment}{//test5}}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}00"{}},}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}00"{}},}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}0F"{}},}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{test__utils_8hpp_af42811e238a2a23276bd4200e2b40dde}{to\_bytes}}(\textcolor{stringliteral}{"{}01"{}}),}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{00085\ }
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \textcolor{comment}{//test6}}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}00"{}},}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}01"{}},}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}0F"{}},}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{test__utils_8hpp_af42811e238a2a23276bd4200e2b40dde}{to\_bytes}}(\textcolor{stringliteral}{"{}00"{}}),}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{00095\ }
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \textcolor{comment}{//test7}}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}01"{}},}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}00"{}},}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}0F"{}},}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{test__utils_8hpp_af42811e238a2a23276bd4200e2b40dde}{to\_bytes}}(\textcolor{stringliteral}{"{}01"{}}),}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{00105\ }
+\DoxyCodeLine{00106\ \ \ \ \ \};}
+\DoxyCodeLine{00107\ }
+\DoxyCodeLine{00108\ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ test\ :\ tests)\ \{}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ parts\ \ \ \ \ \ \ \ \ \ \ =\ std::get<0>(test);}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{ssh_8c_a2cd19dc464a5cf91cd7c2e717b9dffd7}{expected\_result}}\ =\ std::get<1>(test);}
+\DoxyCodeLine{00111\ }
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ base\ =\ \mbox{\hyperlink{test__utils_8hpp_af42811e238a2a23276bd4200e2b40dde}{to\_bytes}}(parts[0]);}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ exponent\ =\ \mbox{\hyperlink{test__utils_8hpp_af42811e238a2a23276bd4200e2b40dde}{to\_bytes}}(parts[1]);}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ modulus\ =\ \mbox{\hyperlink{test__utils_8hpp_af42811e238a2a23276bd4200e2b40dde}{to\_bytes}}(parts[2]);}
+\DoxyCodeLine{00115\ }
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ res\ =\ \mbox{\hyperlink{namespacefc_a281277066c9c4feee4ced185bc0a182d}{fc::modexp}}(base,\ exponent,\ modulus);}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(res,\ \mbox{\hyperlink{ssh_8c_a2cd19dc464a5cf91cd7c2e717b9dffd7}{expected\_result}});}
+\DoxyCodeLine{00118\ \ \ \ \ \}}
+\DoxyCodeLine{00119\ }
+\DoxyCodeLine{00120\ \}\ \mbox{\hyperlink{test__modular__arithmetic_8cpp_ae70bfa24f5a3bc0917382b3c17fc033c}{FC\_LOG\_AND\_RETHROW}}();}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__modular__arithmetic_8cpp_aa5c16699529d520f104f2ac289f9e195_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__modular__arithmetic_8cpp_a9d9c1c14a7021503b2a196771c4d4615}\index{test\_modular\_arithmetic.cpp@{test\_modular\_arithmetic.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!test\_modular\_arithmetic.cpp@{test\_modular\_arithmetic.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{test__modular__arithmetic_8cpp_a9d9c1c14a7021503b2a196771c4d4615} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{modexp\+\_\+benchmarking}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__modular__arithmetic_8cpp_source_l00122}{122}} of file \mbox{\hyperlink{test__modular__arithmetic_8cpp_source}{test\+\_\+modular\+\_\+arithmetic.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00123\ }
+\DoxyCodeLine{00124\ \ \ \ \ std::mt19937\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}(0x11223344);}
+\DoxyCodeLine{00125\ }
+\DoxyCodeLine{00126\ \ \ \ \ \textcolor{keyword}{auto}\ generate\_random\_bytes\ =\ [](std::mt19937\&\ rand\_eng,\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ num\_bytes)\ \{}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ std::vector<char>\ result(num\_bytes);}
+\DoxyCodeLine{00128\ }
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a8f075c759c74e109e8184306c663809d}{uint\_fast32\_t}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ =\ 0;}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int}\ byte\_pos\ =\ 0,\ end\ =\ result.size();\ byte\_pos\ <\ end;\ ++byte\_pos)\ \{}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((byte\_pos\ \&\ 0x03)\ ==\ 0)\ \{\ \textcolor{comment}{//\ if\ divisible\ by\ 4}}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ =\ rand\_eng();}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \ \ \ \ result[byte\_pos]\ =\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ \&\ 0xFF;}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ >>=\ 8;}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00137\ }
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00139\ \ \ \ \ \};}
+\DoxyCodeLine{00140\ }
+\DoxyCodeLine{00141\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ num\_trials\ =\ 10;\ \textcolor{comment}{//\ 10000}}
+\DoxyCodeLine{00142\ }
+\DoxyCodeLine{00143\ \ \ \ \ \textcolor{keyword}{static\_assert}(num\_trials\ >\ 0);}
+\DoxyCodeLine{00144\ }
+\DoxyCodeLine{00145\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ bit\_calc\_limit\ =\ 101;\ \textcolor{comment}{//\ 120}}
+\DoxyCodeLine{00146\ }
+\DoxyCodeLine{00147\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ start\_num\_bytes\ =\ 1;}
+\DoxyCodeLine{00148\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ end\_num\_bytes\ \ \ =\ 1\ <<\ ((bit\_calc\_limit\ +\ 7)/8);}
+\DoxyCodeLine{00149\ }
+\DoxyCodeLine{00150\ \ \ \ \ \textcolor{keyword}{static\_assert}(start\_num\_bytes\ <=\ end\_num\_bytes);}
+\DoxyCodeLine{00151\ }
+\DoxyCodeLine{00152\ \ \ \ \ \textcolor{keyword}{struct\ }statistics\ \{}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ modulus\_bit\_size;\ \ \textcolor{comment}{//\ bit\ size\ of\ modulus\ and\ base}}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ exponent\_bit\_size;\ \textcolor{comment}{//\ bit\ size\ of\ exponent}}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ \ \ \ \ \ min\_time\_ns;}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ \ \ \ \ \ max\_time\_ns;}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ \ \ \ \ \ avg\_time\_ns;}
+\DoxyCodeLine{00158\ \ \ \ \ \};\ }
+\DoxyCodeLine{00159\ }
+\DoxyCodeLine{00160\ \ \ \ \ std::vector<statistics>\ stats;}
+\DoxyCodeLine{00161\ }
+\DoxyCodeLine{00162\ \ \ \ \ \textcolor{keyword}{auto}\ ceil\_log2\ =\ [](\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ n)\ -\/>\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \{}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (n\ <=\ 1)\ \{}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 32\ -\/\ \_\_builtin\_clz(n\ -\/\ 1);}
+\DoxyCodeLine{00167\ \ \ \ \ \};}
+\DoxyCodeLine{00168\ }
+\DoxyCodeLine{00169\ \ \ \ \ BOOST\_CHECK(ceil\_log2(0)\ ==\ 0);}
+\DoxyCodeLine{00170\ \ \ \ \ BOOST\_CHECK(ceil\_log2(1)\ ==\ 0);}
+\DoxyCodeLine{00171\ \ \ \ \ BOOST\_CHECK(ceil\_log2(2)\ ==\ 1);}
+\DoxyCodeLine{00172\ \ \ \ \ BOOST\_CHECK(ceil\_log2(3)\ ==\ 2);}
+\DoxyCodeLine{00173\ \ \ \ \ BOOST\_CHECK(ceil\_log2(4)\ ==\ 2);}
+\DoxyCodeLine{00174\ \ \ \ \ BOOST\_CHECK(ceil\_log2(5)\ ==\ 3);}
+\DoxyCodeLine{00175\ \ \ \ \ BOOST\_CHECK(ceil\_log2(15)\ ==\ 4);}
+\DoxyCodeLine{00176\ \ \ \ \ BOOST\_CHECK(ceil\_log2(16)\ ==\ 4);}
+\DoxyCodeLine{00177\ \ \ \ \ BOOST\_CHECK(ceil\_log2(17)\ ==\ 5);}
+\DoxyCodeLine{00178\ }
+\DoxyCodeLine{00179\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ n\ =\ start\_num\_bytes;\ n\ <=\ end\_num\_bytes;\ n\ *=\ 2)\ \{}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ bit\_calc\ =\ 8\ *\ ceil\_log2(n);}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ exponent\_num\_bytes\ =\ 1;\ }
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \ \ \ \ \ exponent\_num\_bytes\ <=\ 2*n\ \&\&\ bit\_calc\ <=\ bit\_calc\_limit;\ }
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \ \ \ \ \ \ \ exponent\_num\_bytes\ *=\ 2,\ bit\_calc\ +=\ 5)\ }
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ min\_duration\_ns\ =\ std::numeric\_limits<int64\_t>::max();}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ max\_duration\_ns\ =\ 0;}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ total\_duration\_ns\ =\ 0;}
+\DoxyCodeLine{00188\ }
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ trial\ =\ 0;\ trial\ <\ num\_trials;\ ++trial)\ \{}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ base\ \ \ \ \ =\ generate\_random\_bytes(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ n);}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ exponent\ =\ generate\_random\_bytes(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ exponent\_num\_bytes);}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ modulus\ \ =\ generate\_random\_bytes(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ n);}
+\DoxyCodeLine{00193\ }
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacelibff_af8ae91a4bcbdd7c4e71db45703edaae3}{start\_time}}\ =\ std::chrono::steady\_clock::now();}
+\DoxyCodeLine{00195\ }
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ res\ =\ \mbox{\hyperlink{namespacefc_a281277066c9c4feee4ced185bc0a182d}{fc::modexp}}(base,\ exponent,\ modulus);}
+\DoxyCodeLine{00197\ }
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ end\_time\ =\ std::chrono::steady\_clock::now();}
+\DoxyCodeLine{00199\ }
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ duration\_ns\ =\ std::chrono::duration\_cast<std::chrono::nanoseconds>(end\_time\ -\/\ start\_time).count();}
+\DoxyCodeLine{00201\ }
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//ilog("{}(\$\{base\})\string^(\$\{exp\})\ \%\ \$\{mod\}\ =\ \$\{result\}\ [took\ \$\{duration\}\ ns]"{},\ }}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ \ \ \ \ ("{}base"{},\ base)("{}exp"{},\ exponent)("{}mod"{},\ modulus)("{}result"{},\ std::get<bytes>(res))("{}duration"{},\ duration\_ns)}}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ \ \ \ );}}
+\DoxyCodeLine{00205\ }
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ min\_duration\_ns\ =\ std::min(min\_duration\_ns,\ duration\_ns);}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ max\_duration\_ns\ =\ std::max(max\_duration\_ns,\ duration\_ns);}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ total\_duration\_ns\ +=\ duration\_ns;}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00210\ }
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \ \ \ \ \ \ stats.push\_back(statistics\{}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .modulus\_bit\_size\ \ =\ n\ *\ 8,}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .exponent\_bit\_size\ =\ exponent\_num\_bytes\ *\ 8,\ }
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .min\_time\_ns\ \ \ \ \ \ \ =\ min\_duration\_ns,}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .max\_time\_ns\ \ \ \ \ \ \ =\ max\_duration\_ns,}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .avg\_time\_ns\ \ \ \ \ \ \ =\ (total\_duration\_ns\ /\ num\_trials),}
+\DoxyCodeLine{00217\ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00218\ }
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ stat\ =\ stats.back();}
+\DoxyCodeLine{00220\ }
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\textcolor{stringliteral}{"{}Completed\ random\ runs\ of\ mod\_exp\ with\ \$\{bit\_width\}-\/bit\ width\ base\ and\ modulus\ values\ and\ "{}}}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\$\{exp\_bit\_width\}-\/bit\ width\ exponent\ values.\ "{}}}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Min\ time:\ \$\{min\}\ ns;\ Average\ time:\ \$\{avg\}\ ns;\ Max\ time:\ \$\{max\}\ ns."{}},}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}bit\_width"{}},\ stat.modulus\_bit\_size)(\textcolor{stringliteral}{"{}exp\_bit\_width"{}},\ stat.exponent\_bit\_size)}
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}min"{}},\ stat.min\_time\_ns)(\textcolor{stringliteral}{"{}avg"{}},\ stat.avg\_time\_ns)(\textcolor{stringliteral}{"{}max"{}},\ stat.max\_time\_ns)}
+\DoxyCodeLine{00226\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00227\ }
+\DoxyCodeLine{00228\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00229\ \ \ \ \ \}}
+\DoxyCodeLine{00230\ }
+\DoxyCodeLine{00231\ \ \ \ \ std::string\ stats\_output\ =\ \textcolor{stringliteral}{"{}Table\ (in\ csv\ format)\ summarizing\ statistics\ from\ runs:\(\backslash\)n"{}};}
+\DoxyCodeLine{00232\ \ \ \ \ stats\_output\ +=\ \textcolor{stringliteral}{"{}Modulus/Base\ Bit\ Size,Exponent\ Bit\ Size,Average\ Time\ (ns)\(\backslash\)n"{}};}
+\DoxyCodeLine{00233\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ stat\ :\ stats)\ \{}
+\DoxyCodeLine{00234\ \ \ \ \ \ \ \ \ stats\_output\ +=\ std::to\_string(stat.modulus\_bit\_size);}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \ \ stats\_output\ +=\ \textcolor{charliteral}{','};}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ stats\_output\ +=\ std::to\_string(stat.exponent\_bit\_size);}
+\DoxyCodeLine{00237\ \ \ \ \ \ \ \ \ stats\_output\ +=\ \textcolor{charliteral}{','};}
+\DoxyCodeLine{00238\ \ \ \ \ \ \ \ \ stats\_output\ +=\ std::to\_string(stat.avg\_time\_ns);}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ stats\_output\ +=\ \textcolor{charliteral}{'\(\backslash\)n'};}
+\DoxyCodeLine{00240\ \ \ \ \ \}}
+\DoxyCodeLine{00241\ }
+\DoxyCodeLine{00242\ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(stats\_output);}
+\DoxyCodeLine{00243\ }
+\DoxyCodeLine{00244\ \ \ \ \ \textcolor{comment}{//\ Running\ the\ above\ benchmark\ (using\ commented\ values\ for\ num\_trials\ and\ bit\_calc\_limit)\ with\ a\ release\ build\ on\ }}
+\DoxyCodeLine{00245\ \ \ \ \ \textcolor{comment}{//\ an\ AMD\ 3.4\ GHz\ CPU\ provides\ average\ durations\ for\ executing\ mod\_exp\ for\ varying\ bit\ sizes\ for\ the\ values\ }}
+\DoxyCodeLine{00246\ \ \ \ \ \textcolor{comment}{//\ (but\ with\ base\ and\ modulus\ bit\ sizes\ kept\ equal\ to\ one\ another).}}
+\DoxyCodeLine{00247\ }
+\DoxyCodeLine{00248\ \ \ \ \ \textcolor{comment}{//\ Holding\ the\ base/modulus\ bit\ size\ constant\ and\ increasing\ the\ exponent\ bit\ size\ shows\ a\ linear\ relationship\ with\ increasing\ bit}}
+\DoxyCodeLine{00249\ \ \ \ \ \textcolor{comment}{//\ size\ on\ the\ average\ time\ to\ execute\ the\ modular\ exponentiation.\ The\ slope\ of\ the\ best\ fit\ line\ to\ the\ empirical\ data\ appears}}
+\DoxyCodeLine{00250\ \ \ \ \ \textcolor{comment}{//\ to\ scale\ super-\/linearly\ with\ base/modulus\ size.\ A\ quadratic\ (degree\ 2)\ fit\ works\ okay,\ but\ it\ appears\ that\ a\ better\ fit\ is\ to}}
+\DoxyCodeLine{00251\ \ \ \ \ \textcolor{comment}{//\ model\ the\ slope\ of\ the\ linear\ relationship\ between\ average\ time\ and\ exponent\ bit\ size\ as\ a\ the\ base/modulus\ bit\ size\ taken\ to}}
+\DoxyCodeLine{00252\ \ \ \ \ \textcolor{comment}{//\ the\ 1.6\ power\ and\ then\ scaled\ by\ some\ constant.}}
+\DoxyCodeLine{00253\ }
+\DoxyCodeLine{00254\ \ \ \ \ \textcolor{comment}{//\ Holding\ the\ exponent\ bit\ size\ constant\ and\ increasing\ the\ base/modulus\ bit\ size\ shows\ a\ super-\/linear\ relationship\ with}}
+\DoxyCodeLine{00255\ \ \ \ \ \textcolor{comment}{//\ increasing\ bit\ size\ on\ the\ average\ time\ to\ execute\ the\ modular\ exponentiation.\ A\ quadratic\ relationship\ works\ pretty\ well}}
+\DoxyCodeLine{00256\ \ \ \ \ \textcolor{comment}{//\ but\ perhaps\ a\ fractional\ exponent\ between\ 1\ and\ 2\ (e.g.\ 1.6)\ would\ work\ well\ as\ well.}}
+\DoxyCodeLine{00257\ \ \ \ \ }
+\DoxyCodeLine{00258\ \ \ \ \ \textcolor{comment}{//\ What\ is\ particularly\ revealing\ is\ plotting\ the\ average\ time\ with\ respect\ to\ some\ combination\ of\ the\ bit\ sizes\ of\ base/modulus\ and}}
+\DoxyCodeLine{00259\ \ \ \ \ \textcolor{comment}{//\ exponent.\ If\ the\ independent\ variable\ is\ the\ product\ of\ the\ exponent\ bit\ size\ and\ the\ base/modulus\ bit\ size,\ the\ correlation\ is}}
+\DoxyCodeLine{00260\ \ \ \ \ \textcolor{comment}{//\ not\ great.\ Even\ if\ the\ independent\ variable\ is\ the\ product\ of\ the\ exponent\ bit\ size\ and\ the\ base/modulus\ bit\ size\ taken\ to\ some\ power,}}
+\DoxyCodeLine{00261\ \ \ \ \ \textcolor{comment}{//\ the\ correlation\ is\ still\ not\ great.}}
+\DoxyCodeLine{00262\ \ \ \ \ \textcolor{comment}{//\ It\ seems\ that\ trying\ to\ capture\ all\ the\ data\ using\ a\ model\ like\ that\ breaks\ down\ when\ the\ exponent\ bit\ size\ is\ greater\ than\ the}}
+\DoxyCodeLine{00263\ \ \ \ \ \textcolor{comment}{//\ base/modulus\ bit\ size.}}
+\DoxyCodeLine{00264\ \ \ \ \ \textcolor{comment}{//\ If\ we\ filter\ out\ all\ the\ data\ points\ where\ the\ exponent\ bit\ size\ is\ greater\ than\ the\ base/modulus\ bit\ size,\ and\ then\ choose\ as}}
+\DoxyCodeLine{00265\ \ \ \ \ \textcolor{comment}{//\ then\ independent\ variable\ the\ product\ of\ the\ exponent\ bit\ size\ and\ the\ base/modulus\ bit\ size\ taken\ to\ some\ power,\ then\ we\ get}}
+\DoxyCodeLine{00266\ \ \ \ \ \textcolor{comment}{//\ a\ pretty\ good\ linear\ correlation\ when\ a\ power\ of\ 1.6\ is\ chosen.}}
+\DoxyCodeLine{00267\ }
+\DoxyCodeLine{00268\ \ \ \ \ \textcolor{comment}{//\ TODO:\ See\ if\ theoretical\ analysis\ of\ the\ modular\ exponentiation\ algorithm\ also\ justifies\ these\ scaling\ properties.}}
+\DoxyCodeLine{00269\ }
+\DoxyCodeLine{00270\ \ \ \ \ \textcolor{comment}{//\ Example\ results\ for\ average\ time:}}
+\DoxyCodeLine{00271\ \ \ \ \ \textcolor{comment}{//\ |\ Modulus/Base\ Bit\ Size\ |\ Exponent\ Bit\ Size\ |\ Average\ Time\ (ns)\ |}}
+\DoxyCodeLine{00272\ \ \ \ \ \textcolor{comment}{//\ |\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\ |\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\ |\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\ |}}
+\DoxyCodeLine{00273\ \ \ \ \ \textcolor{comment}{//\ |\ 2048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ 32\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ \ \ \ \ \ \ \ \ \ \ \ \ 33826\ |}}
+\DoxyCodeLine{00274\ \ \ \ \ \textcolor{comment}{//\ |\ 2048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ 256\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ \ \ \ \ \ \ \ \ \ \ \ 250067\ |}}
+\DoxyCodeLine{00275\ \ \ \ \ \textcolor{comment}{//\ |\ 2048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ 2048\ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ \ \ \ \ \ \ \ \ \ \ 1891095\ |}}
+\DoxyCodeLine{00276\ \ \ \ \ \textcolor{comment}{//\ |\ 4096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ 32\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ \ \ \ \ \ \ \ \ \ \ \ 129181\ |}}
+\DoxyCodeLine{00277\ \ \ \ \ \textcolor{comment}{//\ |\ 4096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ 256\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ \ \ \ \ \ \ \ \ \ \ \ 954024\ |}}
+\DoxyCodeLine{00278\ \ \ \ \ \textcolor{comment}{//\ |\ 4096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ 2048\ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ \ \ \ \ \ \ \ \ \ \ 7205115\ |}}
+\DoxyCodeLine{00279\ \ \ \ \ \textcolor{comment}{//\ |\ 8192\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ 32\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ \ \ \ \ \ \ \ \ \ \ \ 347938\ |}}
+\DoxyCodeLine{00280\ \ \ \ \ \textcolor{comment}{//\ |\ 8192\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ 256\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ \ \ \ \ \ \ \ \ \ \ 2503652\ |}}
+\DoxyCodeLine{00281\ \ \ \ \ \textcolor{comment}{//\ |\ 8192\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ 2048\ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ \ \ \ \ \ \ \ \ \ 19199775\ |}}
+\DoxyCodeLine{00282\ }
+\DoxyCodeLine{00283\ \ \ \ \ \textcolor{comment}{//\ The\ empirical\ results\ show\ that\ the\ average\ time\ stays\ well\ below\ 5\ ms\ if\ the\ exponent\ bit\ size\ does\ not\ exceed\ the}}
+\DoxyCodeLine{00284\ \ \ \ \ \textcolor{comment}{//\ modulus/base\ bit\ size\ and\ the\ product\ of\ the\ exponent\ bit\ size\ and\ the\ }}
+\DoxyCodeLine{00285\ \ \ \ \ \textcolor{comment}{//\ (modulus/base\ bit\ size)\string^1.6\ does\ not\ exceed\ 550,000,000.}}
+\DoxyCodeLine{00286\ \ \ \ \ \textcolor{comment}{//\ Another\ way\ of\ satisfying\ that\ constraint\ is\ to\ require\ that\ the\ 5*ceil(log2(exponent\ bit\ size))\ +\ 8*ceil(log2(modulus\ bit\ size))\ }}
+\DoxyCodeLine{00287\ \ \ \ \ \textcolor{comment}{//\ be\ less\ than\ or\ equal\ to\ 5*floor(log2(500000000))\ =\ 145.}}
+\DoxyCodeLine{00288\ \ \ \ \ \textcolor{comment}{//\ Or\ equivalently,\ assuming\ the\ bit\ sizes\ are\ multiples\ of\ 8:}}
+\DoxyCodeLine{00289\ \ \ \ \ \textcolor{comment}{//\ 5*ceil(log2(exponent\ bit\ size/8))\ +\ 8*ceil(log2(modulus\ bit\ size/8))\ <=\ 106.}}
+\DoxyCodeLine{00290\ }
+\DoxyCodeLine{00291\ \ \ \ \ \textcolor{comment}{//\ Take,\ as\ an\ example,\ a\ 8192-\/bit\ modulus/base\ and\ a\ 128-\/bit\ exponent\ (which\ on\ average\ took\ 1.29\ ms).}}
+\DoxyCodeLine{00292\ \ \ \ \ \textcolor{comment}{//\ 5*ceil(log2(128))\ +\ 8*ceil(log2(8192))\ =\ 5*7\ +\ 8*13\ =\ 139\ which\ is\ less\ than\ the\ limit\ of\ 145.}}
+\DoxyCodeLine{00293\ \ \ \ \ \textcolor{comment}{//\ }}
+\DoxyCodeLine{00294\ \ \ \ \ \textcolor{comment}{//\ Or,\ as\ an\ other\ example,\ a\ 2048-\/bit\ modulus/base\ and\ a\ 2048-\/bit\ exponent\ (which\ on\ average\ took\ 1.89\ ms).}}
+\DoxyCodeLine{00295\ \ \ \ \ \textcolor{comment}{//\ 5*ceil(log2(2048))\ +\ 8*ceil(log2(2048))\ =\ 5*11\ +\ 8*11\ =\ 143\ which\ is\ less\ than\ the\ limit\ of\ 145.}}
+\DoxyCodeLine{00296\ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00297\ \ \ \ \ \textcolor{comment}{//\ On\ the\ other\ hand,\ consider\ a\ 4096-\/bit\ modulus/base\ and\ a\ 1024-\/bit\ exponent\ (which\ on\ average\ took\ 3.69\ ms).}}
+\DoxyCodeLine{00298\ \ \ \ \ \textcolor{comment}{//\ 5*ceil(log2(1024))\ +\ 8*ceil(log2(4096))\ =\ 5*10\ +\ 8*12\ =\ 146\ which\ is\ greater\ than\ the\ limit\ of\ 145.}}
+\DoxyCodeLine{00299\ }
+\DoxyCodeLine{00300\ \}\ \mbox{\hyperlink{test__modular__arithmetic_8cpp_ae70bfa24f5a3bc0917382b3c17fc033c}{FC\_LOG\_AND\_RETHROW}}();}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=328pt]{test__modular__arithmetic_8cpp_a9d9c1c14a7021503b2a196771c4d4615_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__modular__arithmetic_8cpp_ae70bfa24f5a3bc0917382b3c17fc033c}\index{test\_modular\_arithmetic.cpp@{test\_modular\_arithmetic.cpp}!FC\_LOG\_AND\_RETHROW@{FC\_LOG\_AND\_RETHROW}}
+\index{FC\_LOG\_AND\_RETHROW@{FC\_LOG\_AND\_RETHROW}!test\_modular\_arithmetic.cpp@{test\_modular\_arithmetic.cpp}}
+\doxysubsubsection{\texorpdfstring{FC\_LOG\_AND\_RETHROW()}{FC\_LOG\_AND\_RETHROW()}}
+{\footnotesize\ttfamily \label{test__modular__arithmetic_8cpp_ae70bfa24f5a3bc0917382b3c17fc033c} 
+FC\+\_\+\+LOG\+\_\+\+AND\+\_\+\+RETHROW (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+

@@ -1,0 +1,30 @@
+<map id="main" name="main">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,133,55,159"/>
+<area shape="rect" id="Node000002" href="$echo__server__tls_8cpp.html#aff7dbd699b23a5b8bc3389dd4480c49a" title=" " alt="" coords="149,5,213,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="35,132,59,87,78,62,101,40,133,25,135,29,104,44,82,65,63,90,39,134"/>
+<area shape="rect" id="Node000003" href="$echo__server__tls_8cpp.html#a9a10d63d7c00e9917ce373bf47bda4b6" title=" " alt="" coords="133,55,228,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="44,131,70,110,101,89,117,82,119,87,104,94,73,114,47,135"/>
+<area shape="rect" id="Node000004" href="$echo__server__tls_8cpp.html#afb6a48dfa998680f779255227e2e4a0e" title=" " alt="" coords="141,104,221,130"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="55,139,125,125,126,130,56,144"/>
+<area shape="rect" id="Node000006" href="$classwebsocketpp_1_1endpoint.html#a511874384b71238b042968cf736bc510" title=" " alt="" coords="103,154,258,194"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="56,148,88,154,87,159,55,153"/>
+<area shape="rect" id="Node000007" href="$classwebsocketpp_1_1endpoint.html#a34a3a8351bff65ba878975be471cab85" title=" " alt="" coords="103,219,259,260"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="46,157,72,181,104,204,114,210,111,214,101,208,69,185,43,161"/>
+<area shape="rect" id="Node000008" href="$classwebsocketpp_1_1server.html#a0204a7d444144f7ea5b8bbcf14689fc1" title="Starts the server&#39;s async connection acceptance loop (exception free)" alt="" coords="110,284,252,325"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="38,158,61,211,80,242,105,270,110,274,106,278,101,273,76,245,57,214,33,160"/>
+<area shape="rect" id="Node000005" href="$echo__server__tls_8cpp.html#af91460ab530c2375f8a4a11dd0e99c04" title=" " alt="" coords="327,104,429,130"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="222,114,311,114,311,120,222,120"/>
+<area shape="rect" id="Node000009" href="$classwebsocketpp_1_1server.html#a9146c63ed1afb5bdec29eca52c487226" title="Create and initialize a new connection." alt="" coords="307,207,449,248"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="234,281,309,252,311,257,236,286"/>
+<area shape="rect" id="Node000011" href="$classwebsocketpp_1_1server.html#aa24feb1c5d2bde47de8b11f5369c54d4" title="Handler callback for start_accept." alt="" coords="307,284,449,325"/>
+<area shape="poly" id="edge10_Node000008_Node000011" title=" " alt="" coords="252,302,292,302,292,308,252,308"/>
+<area shape="rect" id="Node000013" href="$namespacewebsocketpp_1_1error.html#a3344622df8c36e8ae03c59164e7b5e89" title=" " alt="" coords="312,350,444,390"/>
+<area shape="poly" id="edge13_Node000008_Node000013" title=" " alt="" coords="245,323,301,342,299,347,243,328"/>
+<area shape="rect" id="Node000010" href="$classwebsocketpp_1_1endpoint.html#abfbee4cb244700560ef80594a913cd95" title=" " alt="" coords="497,195,653,236"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="449,221,482,219,482,224,450,226"/>
+<area shape="rect" id="Node000012" href="$classwebsocketpp_1_1server.html#ab61bcdf9fd532fe7ebd934f8d84fdfea" title="Starts the server&#39;s async connection acceptance loop." alt="" coords="504,284,646,325"/>
+<area shape="poly" id="edge11_Node000011_Node000012" title=" " alt="" coords="450,302,489,302,489,308,450,308"/>
+<area shape="poly" id="edge12_Node000012_Node000012" title=" " alt="" coords="538,284,536,275,542,266,555,260,575,258,596,260,609,267,607,271,595,265,575,263,556,265,545,270,541,276,543,283"/>
+<area shape="rect" id="Node000014" href="$namespacewebsocketpp_1_1error.html#ac1acac2bfb24bbd2b1791db80993b0c2" title=" " alt="" coords="509,350,641,390"/>
+<area shape="poly" id="edge14_Node000013_Node000014" title=" " alt="" coords="445,368,493,368,493,373,445,373"/>
+</map>

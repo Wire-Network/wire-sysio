@@ -1,0 +1,94 @@
+\doxysection{plugins/net\+\_\+plugin/include/sysio/net\+\_\+plugin/protocol.hpp File Reference}
+\hypertarget{plugins_2net__plugin_2include_2sysio_2net__plugin_2protocol_8hpp}{}\label{plugins_2net__plugin_2include_2sysio_2net__plugin_2protocol_8hpp}\index{plugins/net\_plugin/include/sysio/net\_plugin/protocol.hpp@{plugins/net\_plugin/include/sysio/net\_plugin/protocol.hpp}}
+{\ttfamily \#include $<$sysio/chain/block.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/types.\+hpp$>$}\newline
+{\ttfamily \#include $<$chrono$>$}\newline
+Include dependency graph for protocol.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{plugins_2net__plugin_2include_2sysio_2net__plugin_2protocol_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{plugins_2net__plugin_2include_2sysio_2net__plugin_2protocol_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain__size__message}{sysio\+::chain\+\_\+size\+\_\+message}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1handshake__message}{sysio\+::handshake\+\_\+message}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1go__away__message}{sysio\+::go\+\_\+away\+\_\+message}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1time__message}{sysio\+::time\+\_\+message}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1select__ids}{sysio\+::select\+\_\+ids$<$ T $>$}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1notice__message}{sysio\+::notice\+\_\+message}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1request__message}{sysio\+::request\+\_\+message}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1sync__request__message}{sysio\+::sync\+\_\+request\+\_\+message}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef std\+::chrono\+::system\+\_\+clock\+::duration\+::rep \mbox{\hyperlink{namespacesysio_a42c15380188aaacda97b061d7c538d13}{sysio\+::tstamp}}
+\item 
+using \mbox{\hyperlink{namespacesysio_ac86b0fc29d2b45bfaa69e65a796bc207}{sysio\+::ordered\+\_\+txn\+\_\+ids}} = \mbox{\hyperlink{structsysio_1_1select__ids}{select\+\_\+ids}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_aa85a3b49b3b219d1e3840567579e7e63}{transaction\+\_\+id\+\_\+type}}$>$
+\item 
+using \mbox{\hyperlink{namespacesysio_a55fd65c60ac7fe53c9b93a7a4982cded}{sysio\+::ordered\+\_\+blk\+\_\+ids}} = \mbox{\hyperlink{structsysio_1_1select__ids}{select\+\_\+ids}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{block\+\_\+id\+\_\+type}}$>$
+\item 
+using \mbox{\hyperlink{namespacesysio_a783ade47a6f13a71a9b75cd2c68d9965}{sysio\+::net\+\_\+message}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{namespacesysio_a5c18cd9d34b8c5d3af8e2de75577673f}{sysio\+::go\+\_\+away\+\_\+reason}} \{ \newline
+\mbox{\hyperlink{namespacesysio_a5c18cd9d34b8c5d3af8e2de75577673fa35a3ee195246082e99a69c2636252839}{sysio\+::no\+\_\+reason}}
+, \mbox{\hyperlink{namespacesysio_a5c18cd9d34b8c5d3af8e2de75577673fa1f42b089b0bc1105b38f19140a65cc2a}{sysio\+::self}}
+, \mbox{\hyperlink{namespacesysio_a5c18cd9d34b8c5d3af8e2de75577673fa0e69706b2240fb348d4933bc1fe7e883}{sysio\+::duplicate}}
+, \mbox{\hyperlink{namespacesysio_a5c18cd9d34b8c5d3af8e2de75577673fa6beb3e193600b115b972b9e8a811ee91}{sysio\+::wrong\+\_\+chain}}
+, \newline
+\mbox{\hyperlink{namespacesysio_a5c18cd9d34b8c5d3af8e2de75577673fa756f81d28cc81faaeb96abc5172a3e5c}{sysio\+::wrong\+\_\+version}}
+, \mbox{\hyperlink{namespacesysio_a5c18cd9d34b8c5d3af8e2de75577673fabef20168d801a8a971daa13b44bae640}{sysio\+::forked}}
+, \mbox{\hyperlink{namespacesysio_a5c18cd9d34b8c5d3af8e2de75577673fa79e3384c490218a3f7bccf54a0448735}{sysio\+::unlinkable}}
+, \mbox{\hyperlink{namespacesysio_a5c18cd9d34b8c5d3af8e2de75577673fa7d8c2bdb86399f67218c9e0695877c87}{sysio\+::bad\+\_\+transaction}}
+, \newline
+\mbox{\hyperlink{namespacesysio_a5c18cd9d34b8c5d3af8e2de75577673faf33f5d368dfd5563446edd1687b908bb}{sysio\+::validation}}
+, \mbox{\hyperlink{namespacesysio_a5c18cd9d34b8c5d3af8e2de75577673fafd1331a94b3ecffdc5fcfdcd3d03687c}{sysio\+::benign\+\_\+other}}
+, \mbox{\hyperlink{namespacesysio_a5c18cd9d34b8c5d3af8e2de75577673fa834d6ee2ad87c888db23aa35bfe5a7eb}{sysio\+::fatal\+\_\+other}}
+, \mbox{\hyperlink{namespacesysio_a5c18cd9d34b8c5d3af8e2de75577673fad2a37e2f8300c685976362d71bfe9de5}{sysio\+::authentication}}
+ \}
+\item 
+enum \mbox{\hyperlink{namespacesysio_a3a283f786468e0f0e35b0177214ca59e}{sysio\+::id\+\_\+list\+\_\+modes}} \{ \mbox{\hyperlink{namespacesysio_a3a283f786468e0f0e35b0177214ca59ea3820b1d3d12c986267353dcda2fdf2d6}{sysio\+::none}}
+, \mbox{\hyperlink{namespacesysio_a3a283f786468e0f0e35b0177214ca59ea9b09221c2cc0fc2ea1d69a00b99ea58f}{sysio\+::catch\+\_\+up}}
+, \mbox{\hyperlink{namespacesysio_a3a283f786468e0f0e35b0177214ca59ea528a803ed30b308213498b10d8048e62}{sysio\+::last\+\_\+irr\+\_\+catch\+\_\+up}}
+, \mbox{\hyperlink{namespacesysio_a3a283f786468e0f0e35b0177214ca59ea13cebc41fab7b311a3f8f8bfae78f2ae}{sysio\+::normal}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+constexpr auto \mbox{\hyperlink{namespacesysio_a9d60317a4b83cb3c91674336886005ee}{sysio\+::reason\+\_\+str}} (\mbox{\hyperlink{namespacesysio_a5c18cd9d34b8c5d3af8e2de75577673f}{go\+\_\+away\+\_\+reason}} rsn)
+\item 
+constexpr auto \mbox{\hyperlink{namespacesysio_a454edd6d34c5564da3a8c796090837fe}{sysio\+::modes\+\_\+str}} (\mbox{\hyperlink{namespacesysio_a3a283f786468e0f0e35b0177214ca59e}{id\+\_\+list\+\_\+modes}} m)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+constexpr size\+\_\+t \mbox{\hyperlink{namespacesysio_aaf6ae4a29f942a879217e395bfcd58fe}{sysio\+::max\+\_\+p2p\+\_\+address\+\_\+length}} = 253 + 6
+\item 
+constexpr size\+\_\+t \mbox{\hyperlink{namespacesysio_a221fdeb3635b31daaa70c0ef5dedb044}{sysio\+::max\+\_\+handshake\+\_\+str\+\_\+length}} = 384
+\end{DoxyCompactItemize}

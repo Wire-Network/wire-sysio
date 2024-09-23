@@ -1,0 +1,23 @@
+<map id="sysio::vm::detail::vector::size" name="sysio::vm::detail::vector::size">
+<area shape="rect" id="Node000001" title=" " alt="" coords="627,145,753,186"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1vm_1_1detail_1_1vector.html#ac277a0c3dcf579d18e84c349357dce61" title=" " alt="" coords="269,5,394,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="661,135,624,98,602,81,578,67,532,49,484,38,394,28,395,23,485,32,534,44,580,62,605,76,628,94,665,131"/>
+<area shape="rect" id="Node000004" href="$structsysio_1_1vm_1_1binary__parser_1_1local__types__t.html#a3fc214a6f34520181db7eb4fdaba9ae8" title=" " alt="" coords="25,256,189,312"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="642,196,536,248,472,273,407,291,365,297,332,296,257,291,189,290,190,284,257,286,332,291,364,291,405,286,471,268,534,243,639,191"/>
+<area shape="rect" id="Node000005" href="$classsysio_1_1vm_1_1detail_1_1vector.html#afc1d102d8b0144266a1adbc474bbdb40" title=" " alt="" coords="454,145,579,186"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="612,168,580,168,580,163,612,163"/>
+<area shape="rect" id="Node000007" href="$vector__tests_8cpp.html#a2fb187e0f026cf062cb36d11ca6598eb" title=" " alt="" coords="57,121,157,146"/>
+<area shape="poly" id="edge12_Node000001_Node000007" title=" " alt="" coords="613,143,579,136,461,125,343,123,238,126,157,132,157,126,238,121,343,118,461,120,580,131,614,138"/>
+<area shape="rect" id="Node000009" href="$classsysio_1_1vm_1_1detail_1_1vector.html#a1f3f2b0014a7487b6d7f8e044ae13556" title=" " alt="" coords="454,351,579,391"/>
+<area shape="poly" id="edge11_Node000001_Node000009" title=" " alt="" coords="674,202,636,267,610,302,581,334,558,352,555,348,578,330,606,298,631,264,669,199"/>
+<area shape="rect" id="Node000003" href="$classconanfile_1_1_catch_conan.html#a9b889f440bf552649b6b0a7e4a2033bb" title=" " alt="" coords="5,13,209,38"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="253,28,209,28,209,23,253,23"/>
+<area shape="poly" id="edge5_Node000005_Node000002" title=" " alt="" coords="475,138,358,48,361,44,478,134"/>
+<area shape="rect" id="Node000006" href="$classsysio_1_1vm_1_1detail_1_1vector.html#a9b8945d9c76c3ae28e78101d91b5ea9f" title=" " alt="" coords="257,171,406,211"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="439,179,407,183,406,178,438,174"/>
+<area shape="poly" id="edge10_Node000005_Node000007" title=" " alt="" coords="438,162,157,140,157,135,439,157"/>
+<area shape="rect" id="Node000008" href="$classsysio_1_1vm_1_1detail_1_1vector.html#a9f4d37cc24f1b29d403366a9e5074659" title=" " alt="" coords="267,236,396,277"/>
+<area shape="poly" id="edge8_Node000005_Node000008" title=" " alt="" coords="465,196,407,225,381,238,379,233,405,221,462,191"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="241,171,156,149,158,144,242,165"/>
+<area shape="poly" id="edge9_Node000008_Node000004" title=" " alt="" coords="252,269,190,277,189,271,252,264"/>
+</map>

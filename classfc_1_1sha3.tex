@@ -1,0 +1,595 @@
+\doxysection{fc\+::sha3 Class Reference}
+\hypertarget{classfc_1_1sha3}{}\label{classfc_1_1sha3}\index{fc::sha3@{fc::sha3}}
+
+
+{\ttfamily \#include $<$sha3.\+hpp$>$}
+
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classfc_1_1sha3_1_1encoder}{encoder}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1sha3_ab83fb4c2c4c1739ca108baeef30bae6c}{sha3}} ()
+\item 
+\mbox{\hyperlink{classfc_1_1sha3_a36d29010b79f8e90df48dda48e4280b7}{\texorpdfstring{$\sim$}{\string~}sha3}} ()
+\item 
+\mbox{\hyperlink{classfc_1_1sha3_ac56b3a2ed48dad6378bad1d072122472}{sha3}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&hex\+\_\+str)
+\item 
+\mbox{\hyperlink{classfc_1_1sha3_a4a46e9346c845d9b1938cff8d63d9b00}{sha3}} (const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{classfc_1_1sha3_a44258f46ed71886fde86785da18a4e3b}{data}}, size\+\_\+t size)
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{classfc_1_1sha3_a7a1230e3d747a88da042331db9d50d6f}{str}} () const
+\item 
+\mbox{\hyperlink{classfc_1_1sha3_aaff35475d2ae1fa2401c052246ca6d36}{operator string}} () const
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classfc_1_1sha3_a44258f46ed71886fde86785da18a4e3b}{data}} () const
+\item 
+char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classfc_1_1sha3_a2ab75c3f97e52ae7b953be3aba46fb28}{data}} ()
+\item 
+size\+\_\+t \mbox{\hyperlink{classfc_1_1sha3_a532269648aa24e10da4d8a906a27ee27}{data\+\_\+size}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static \mbox{\hyperlink{classfc_1_1sha3}{sha3}} \mbox{\hyperlink{classfc_1_1sha3_ab47e22ec4bb69f566052b99c74f4056a}{hash}} (const char \texorpdfstring{$\ast$}{*}d, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} dlen, bool is\+\_\+nist=true)
+\item 
+static \mbox{\hyperlink{classfc_1_1sha3}{sha3}} \mbox{\hyperlink{classfc_1_1sha3_a097822d297d94d8ede783d68028bd871}{hash}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, bool is\+\_\+nist=true)
+\item 
+static \mbox{\hyperlink{classfc_1_1sha3}{sha3}} \mbox{\hyperlink{classfc_1_1sha3_a06bf3958d07eec45cc99d106a139ea7a}{hash}} (const \mbox{\hyperlink{classfc_1_1sha3}{sha3}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, bool is\+\_\+nist=true)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\static \mbox{\hyperlink{classfc_1_1sha3}{sha3}} \mbox{\hyperlink{classfc_1_1sha3_a72673c713db6dd143713b29b221a6194}{hash}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&t, bool is\+\_\+nist=true)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{classfc_1_1sha3_ad590e9c94055d7cd7e71c07f97131157}{\+\_\+hash}} \mbox{[}4\mbox{]}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classfc_1_1sha3_a1bc3d3865ea7bb52cb37ad872fd92af3}{operator$<$$<$}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&ds, const \mbox{\hyperlink{classfc_1_1sha3}{sha3}} \&ep)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{classfc_1_1sha3_a5c4ec6766a74d8f7ae1ef3b62026d0cf}{operator$>$$>$}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&ds, \mbox{\hyperlink{classfc_1_1sha3}{sha3}} \&ep)
+\item 
+\mbox{\hyperlink{classfc_1_1sha3}{sha3}} \mbox{\hyperlink{classfc_1_1sha3_a3928d4ed66f0eb9ddb6c14aa29ce6ad0}{operator$<$$<$}} (const \mbox{\hyperlink{classfc_1_1sha3}{sha3}} \&h1, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} i)
+\item 
+\mbox{\hyperlink{classfc_1_1sha3}{sha3}} \mbox{\hyperlink{classfc_1_1sha3_a9963ffda5b523dd10919ef3e41bfdfb2}{operator$>$$>$}} (const \mbox{\hyperlink{classfc_1_1sha3}{sha3}} \&h1, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} i)
+\item 
+bool \mbox{\hyperlink{classfc_1_1sha3_ac1c38d30b126ac61dc6a0372144669d8}{operator==}} (const \mbox{\hyperlink{classfc_1_1sha3}{sha3}} \&h1, const \mbox{\hyperlink{classfc_1_1sha3}{sha3}} \&h2)
+\item 
+bool \mbox{\hyperlink{classfc_1_1sha3_a12a4620167e9d9404eaacdf6036846a5}{operator!=}} (const \mbox{\hyperlink{classfc_1_1sha3}{sha3}} \&h1, const \mbox{\hyperlink{classfc_1_1sha3}{sha3}} \&h2)
+\item 
+\mbox{\hyperlink{classfc_1_1sha3}{sha3}} \mbox{\hyperlink{classfc_1_1sha3_ae00883ce4174f8fbd869ca34e82721fc}{operator\texorpdfstring{$^\wedge$}{\string^}}} (const \mbox{\hyperlink{classfc_1_1sha3}{sha3}} \&h1, const \mbox{\hyperlink{classfc_1_1sha3}{sha3}} \&h2)
+\item 
+bool \mbox{\hyperlink{classfc_1_1sha3_a5b8e807bf2b7b0dff0c578c59545e4dc}{operator$>$=}} (const \mbox{\hyperlink{classfc_1_1sha3}{sha3}} \&h1, const \mbox{\hyperlink{classfc_1_1sha3}{sha3}} \&h2)
+\item 
+bool \mbox{\hyperlink{classfc_1_1sha3_a8e56da3d03cf7773e09246423e6db42a}{operator$>$}} (const \mbox{\hyperlink{classfc_1_1sha3}{sha3}} \&h1, const \mbox{\hyperlink{classfc_1_1sha3}{sha3}} \&h2)
+\item 
+bool \mbox{\hyperlink{classfc_1_1sha3_ab4e4e7b980832171ad1a2474611f51bf}{operator$<$}} (const \mbox{\hyperlink{classfc_1_1sha3}{sha3}} \&h1, const \mbox{\hyperlink{classfc_1_1sha3}{sha3}} \&h2)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{sha3_8hpp_source_l00010}{10}} of file \mbox{\hyperlink{sha3_8hpp_source}{sha3.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1sha3_ab83fb4c2c4c1739ca108baeef30bae6c}\index{fc::sha3@{fc::sha3}!sha3@{sha3}}
+\index{sha3@{sha3}!fc::sha3@{fc::sha3}}
+\doxysubsubsection{\texorpdfstring{sha3()}{sha3()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{classfc_1_1sha3_ab83fb4c2c4c1739ca108baeef30bae6c} 
+fc\+::sha3\+::sha3 (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sha3_8cpp_source_l00176}{176}} of file \mbox{\hyperlink{sha3_8cpp_source}{sha3.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00177\ \{}
+\DoxyCodeLine{00178\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(\mbox{\hyperlink{classfc_1_1sha3_ad590e9c94055d7cd7e71c07f97131157}{\_hash}},\ 0,\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{classfc_1_1sha3_ad590e9c94055d7cd7e71c07f97131157}{\_hash}}));}
+\DoxyCodeLine{00179\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=246pt]{classfc_1_1sha3_ab83fb4c2c4c1739ca108baeef30bae6c_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1sha3_a36d29010b79f8e90df48dda48e4280b7}\index{fc::sha3@{fc::sha3}!````~sha3@{\texorpdfstring{$\sim$}{\string~}sha3}}
+\index{````~sha3@{\texorpdfstring{$\sim$}{\string~}sha3}!fc::sha3@{fc::sha3}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}sha3()}{\string~sha3()}}
+{\footnotesize\ttfamily \label{classfc_1_1sha3_a36d29010b79f8e90df48dda48e4280b7} 
+fc\+::sha3\+::\texorpdfstring{$\sim$}{\string~}sha3 (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sha3_8hpp_source_l00014}{14}} of file \mbox{\hyperlink{sha3_8hpp_source}{sha3.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00014\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1sha3_ac56b3a2ed48dad6378bad1d072122472}\index{fc::sha3@{fc::sha3}!sha3@{sha3}}
+\index{sha3@{sha3}!fc::sha3@{fc::sha3}}
+\doxysubsubsection{\texorpdfstring{sha3()}{sha3()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{classfc_1_1sha3_ac56b3a2ed48dad6378bad1d072122472} 
+fc\+::sha3\+::sha3 (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&}]{hex\+\_\+str}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{sha3_8cpp_source_l00186}{186}} of file \mbox{\hyperlink{sha3_8cpp_source}{sha3.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00187\ \{}
+\DoxyCodeLine{00188\ \ \ \ \ \textcolor{keyword}{auto}\ bytes\_written\ =\ \mbox{\hyperlink{namespacefc_a6a0fb5b79914774be4ab66462362b292}{fc::from\_hex}}(hex\_str,\ (\textcolor{keywordtype}{char}\ *)\mbox{\hyperlink{classfc_1_1sha3_ad590e9c94055d7cd7e71c07f97131157}{\_hash}},\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{classfc_1_1sha3_ad590e9c94055d7cd7e71c07f97131157}{\_hash}}));}
+\DoxyCodeLine{00189\ \ \ \ \ \textcolor{keywordflow}{if}\ (bytes\_written\ <\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{classfc_1_1sha3_ad590e9c94055d7cd7e71c07f97131157}{\_hash}}))}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}((\textcolor{keywordtype}{char}\ *)\mbox{\hyperlink{classfc_1_1sha3_ad590e9c94055d7cd7e71c07f97131157}{\_hash}}\ +\ bytes\_written,\ 0,\ (\textcolor{keyword}{sizeof}(\mbox{\hyperlink{classfc_1_1sha3_ad590e9c94055d7cd7e71c07f97131157}{\_hash}})\ -\/\ bytes\_written));}
+\DoxyCodeLine{00191\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=265pt]{classfc_1_1sha3_ac56b3a2ed48dad6378bad1d072122472_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1sha3_a4a46e9346c845d9b1938cff8d63d9b00}\index{fc::sha3@{fc::sha3}!sha3@{sha3}}
+\index{sha3@{sha3}!fc::sha3@{fc::sha3}}
+\doxysubsubsection{\texorpdfstring{sha3()}{sha3()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{classfc_1_1sha3_a4a46e9346c845d9b1938cff8d63d9b00} 
+fc\+::sha3\+::sha3 (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{data}{, }\item[{size\+\_\+t}]{size}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{sha3_8cpp_source_l00180}{180}} of file \mbox{\hyperlink{sha3_8cpp_source}{sha3.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00181\ \{}
+\DoxyCodeLine{00182\ \ \ \ \ \textcolor{keywordflow}{if}\ (size\ !=\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{classfc_1_1sha3_ad590e9c94055d7cd7e71c07f97131157}{\_hash}}))}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(exception,\ \textcolor{stringliteral}{"{}sha3:\ size\ mismatch"{}});}
+\DoxyCodeLine{00184\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(\mbox{\hyperlink{classfc_1_1sha3_ad590e9c94055d7cd7e71c07f97131157}{\_hash}},\ data,\ size);}
+\DoxyCodeLine{00185\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=248pt]{classfc_1_1sha3_a4a46e9346c845d9b1938cff8d63d9b00_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1sha3_a2ab75c3f97e52ae7b953be3aba46fb28}\index{fc::sha3@{fc::sha3}!data@{data}}
+\index{data@{data}!fc::sha3@{fc::sha3}}
+\doxysubsubsection{\texorpdfstring{data()}{data()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1sha3_a2ab75c3f97e52ae7b953be3aba46fb28} 
+char \texorpdfstring{$\ast$}{*} fc\+::sha3\+::data (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sha3_8cpp_source_l00200}{200}} of file \mbox{\hyperlink{sha3_8cpp_source}{sha3.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00200\ \{\ \textcolor{keywordflow}{return}\ (\textcolor{keywordtype}{char}\ *)\&\mbox{\hyperlink{classfc_1_1sha3_ad590e9c94055d7cd7e71c07f97131157}{\_hash}}[0];\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1sha3_a44258f46ed71886fde86785da18a4e3b}\index{fc::sha3@{fc::sha3}!data@{data}}
+\index{data@{data}!fc::sha3@{fc::sha3}}
+\doxysubsubsection{\texorpdfstring{data()}{data()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1sha3_a44258f46ed71886fde86785da18a4e3b} 
+const char \texorpdfstring{$\ast$}{*} fc\+::sha3\+::data (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{sha3_8cpp_source_l00199}{199}} of file \mbox{\hyperlink{sha3_8cpp_source}{sha3.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00199\ \{\ \textcolor{keywordflow}{return}\ (\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *)\&\mbox{\hyperlink{classfc_1_1sha3_ad590e9c94055d7cd7e71c07f97131157}{\_hash}}[0];\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1sha3_a44258f46ed71886fde86785da18a4e3b_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1sha3_a532269648aa24e10da4d8a906a27ee27}\index{fc::sha3@{fc::sha3}!data\_size@{data\_size}}
+\index{data\_size@{data\_size}!fc::sha3@{fc::sha3}}
+\doxysubsubsection{\texorpdfstring{data\_size()}{data\_size()}}
+{\footnotesize\ttfamily \label{classfc_1_1sha3_a532269648aa24e10da4d8a906a27ee27} 
+size\+\_\+t fc\+::sha3\+::data\+\_\+size (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sha3_8hpp_source_l00023}{23}} of file \mbox{\hyperlink{sha3_8hpp_source}{sha3.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00023\ \{\ \textcolor{keywordflow}{return}\ 256\ /\ 8;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1sha3_ab47e22ec4bb69f566052b99c74f4056a}\index{fc::sha3@{fc::sha3}!hash@{hash}}
+\index{hash@{hash}!fc::sha3@{fc::sha3}}
+\doxysubsubsection{\texorpdfstring{hash()}{hash()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{classfc_1_1sha3_ab47e22ec4bb69f566052b99c74f4056a} 
+static \mbox{\hyperlink{classfc_1_1sha3}{sha3}} fc\+::sha3\+::hash (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{d}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{dlen}{, }\item[{bool}]{is\+\_\+nist}{ = {\ttfamily true}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{sha3_8hpp_source_l00025}{25}} of file \mbox{\hyperlink{sha3_8hpp_source}{sha3.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ encoder\ e;}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ e.write(d,\ dlen);}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ sha\ =\ e.result(is\_nist);}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ sha;}
+\DoxyCodeLine{00030\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1sha3_ab47e22ec4bb69f566052b99c74f4056a_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=342pt]{classfc_1_1sha3_ab47e22ec4bb69f566052b99c74f4056a_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1sha3_a06bf3958d07eec45cc99d106a139ea7a}\index{fc::sha3@{fc::sha3}!hash@{hash}}
+\index{hash@{hash}!fc::sha3@{fc::sha3}}
+\doxysubsubsection{\texorpdfstring{hash()}{hash()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{classfc_1_1sha3_a06bf3958d07eec45cc99d106a139ea7a} 
+static \mbox{\hyperlink{classfc_1_1sha3}{sha3}} fc\+::sha3\+::hash (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1sha3}{sha3}} \&}]{s}{, }\item[{bool}]{is\+\_\+nist}{ = {\ttfamily true}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{sha3_8hpp_source_l00032}{32}} of file \mbox{\hyperlink{sha3_8hpp_source}{sha3.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00032\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1sha3_ab47e22ec4bb69f566052b99c74f4056a}{hash}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.data(),\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.\_hash),\ is\_nist);\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=158pt]{classfc_1_1sha3_a06bf3958d07eec45cc99d106a139ea7a_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=158pt]{classfc_1_1sha3_a06bf3958d07eec45cc99d106a139ea7a_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1sha3_a097822d297d94d8ede783d68028bd871}\index{fc::sha3@{fc::sha3}!hash@{hash}}
+\index{hash@{hash}!fc::sha3@{fc::sha3}}
+\doxysubsubsection{\texorpdfstring{hash()}{hash()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{classfc_1_1sha3_a097822d297d94d8ede783d68028bd871} 
+static \mbox{\hyperlink{classfc_1_1sha3}{sha3}} fc\+::sha3\+::hash (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&}]{s}{, }\item[{bool}]{is\+\_\+nist}{ = {\ttfamily true}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{sha3_8hpp_source_l00031}{31}} of file \mbox{\hyperlink{sha3_8hpp_source}{sha3.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00031\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1sha3_ab47e22ec4bb69f566052b99c74f4056a}{hash}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.c\_str(),\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.size(),\ is\_nist);\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=158pt]{classfc_1_1sha3_a097822d297d94d8ede783d68028bd871_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=158pt]{classfc_1_1sha3_a097822d297d94d8ede783d68028bd871_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1sha3_a72673c713db6dd143713b29b221a6194}\index{fc::sha3@{fc::sha3}!hash@{hash}}
+\index{hash@{hash}!fc::sha3@{fc::sha3}}
+\doxysubsubsection{\texorpdfstring{hash()}{hash()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{classfc_1_1sha3_a72673c713db6dd143713b29b221a6194} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+static \mbox{\hyperlink{classfc_1_1sha3}{sha3}} fc\+::sha3\+::hash (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{t}{, }\item[{bool}]{is\+\_\+nist}{ = {\ttfamily true}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{sha3_8hpp_source_l00035}{35}} of file \mbox{\hyperlink{sha3_8hpp_source}{sha3.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00036\ \ \ \ \ \{}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ sha3::encoder\ e;}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(e,\ t);}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ e.result(is\_nist);}
+\DoxyCodeLine{00040\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1sha3_a72673c713db6dd143713b29b221a6194_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1sha3_aaff35475d2ae1fa2401c052246ca6d36}\index{fc::sha3@{fc::sha3}!operator string@{operator string}}
+\index{operator string@{operator string}!fc::sha3@{fc::sha3}}
+\doxysubsubsection{\texorpdfstring{operator string()}{operator string()}}
+{\footnotesize\ttfamily \label{classfc_1_1sha3_aaff35475d2ae1fa2401c052246ca6d36} 
+fc\+::sha3\+::operator \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{sha3_8cpp_source_l00197}{197}} of file \mbox{\hyperlink{sha3_8cpp_source}{sha3.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00197\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1sha3_a7a1230e3d747a88da042331db9d50d6f}{str}}();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1sha3_a7a1230e3d747a88da042331db9d50d6f}\index{fc::sha3@{fc::sha3}!str@{str}}
+\index{str@{str}!fc::sha3@{fc::sha3}}
+\doxysubsubsection{\texorpdfstring{str()}{str()}}
+{\footnotesize\ttfamily \label{classfc_1_1sha3_a7a1230e3d747a88da042331db9d50d6f} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} fc\+::sha3\+::str (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{sha3_8cpp_source_l00193}{193}} of file \mbox{\hyperlink{sha3_8cpp_source}{sha3.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00194\ \{}
+\DoxyCodeLine{00195\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_aab567c89004d329f560014d9943afcd6}{fc::to\_hex}}((\textcolor{keywordtype}{char}\ *)\mbox{\hyperlink{classfc_1_1sha3_ad590e9c94055d7cd7e71c07f97131157}{\_hash}},\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{classfc_1_1sha3_ad590e9c94055d7cd7e71c07f97131157}{\_hash}}));}
+\DoxyCodeLine{00196\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=244pt]{classfc_1_1sha3_a7a1230e3d747a88da042331db9d50d6f_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{classfc_1_1sha3_a12a4620167e9d9404eaacdf6036846a5}\index{fc::sha3@{fc::sha3}!operator"!=@{operator"!=}}
+\index{operator"!=@{operator"!=}!fc::sha3@{fc::sha3}}
+\doxysubsubsection{\texorpdfstring{operator"!=}{operator!=}}
+{\footnotesize\ttfamily \label{classfc_1_1sha3_a12a4620167e9d9404eaacdf6036846a5} 
+bool \mbox{\hyperlink{namespacefc_a40c368ac88294ae47b064cad937fdbf6}{operator!}}= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1sha3}{sha3}} \&}]{h1}{, }\item[{const \mbox{\hyperlink{classfc_1_1sha3}{sha3}} \&}]{h2}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{sha3_8cpp_source_l00262}{262}} of file \mbox{\hyperlink{sha3_8cpp_source}{sha3.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00263\ \{}
+\DoxyCodeLine{00264\ \ \ \ \ \textcolor{keywordflow}{return}\ !(h1\ ==\ h2);}
+\DoxyCodeLine{00265\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1sha3_ab4e4e7b980832171ad1a2474611f51bf}\index{fc::sha3@{fc::sha3}!operator$<$@{operator$<$}}
+\index{operator$<$@{operator$<$}!fc::sha3@{fc::sha3}}
+\doxysubsubsection{\texorpdfstring{operator$<$}{operator<}}
+{\footnotesize\ttfamily \label{classfc_1_1sha3_ab4e4e7b980832171ad1a2474611f51bf} 
+bool operator$<$ (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1sha3}{sha3}} \&}]{h1}{, }\item[{const \mbox{\hyperlink{classfc_1_1sha3}{sha3}} \&}]{h2}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{sha3_8cpp_source_l00258}{258}} of file \mbox{\hyperlink{sha3_8cpp_source}{sha3.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00259\ \{}
+\DoxyCodeLine{00260\ \ \ \ \ \textcolor{keywordflow}{return}\ memcmp(h1.\_hash,\ h2.\_hash,\ \textcolor{keyword}{sizeof}(h1.\_hash))\ <\ 0;}
+\DoxyCodeLine{00261\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1sha3_a3928d4ed66f0eb9ddb6c14aa29ce6ad0}\index{fc::sha3@{fc::sha3}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!fc::sha3@{fc::sha3}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$}{operator<<}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1sha3_a3928d4ed66f0eb9ddb6c14aa29ce6ad0} 
+\mbox{\hyperlink{classfc_1_1sha3}{sha3}} operator$<$$<$ (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1sha3}{sha3}} \&}]{h1}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{i}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{sha3_8cpp_source_l00229}{229}} of file \mbox{\hyperlink{sha3_8cpp_source}{sha3.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00230\ \{}
+\DoxyCodeLine{00231\ \ \ \ \ \mbox{\hyperlink{classfc_1_1sha3_ab83fb4c2c4c1739ca108baeef30bae6c}{sha3}}\ result;}
+\DoxyCodeLine{00232\ \ \ \ \ fc::detail::shift\_l(h1.data(),\ result.data(),\ result.data\_size(),\ i);}
+\DoxyCodeLine{00233\ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00234\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1sha3_a1bc3d3865ea7bb52cb37ad872fd92af3}\index{fc::sha3@{fc::sha3}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!fc::sha3@{fc::sha3}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$}{operator<<}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1sha3_a1bc3d3865ea7bb52cb37ad872fd92af3} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& operator$<$$<$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{ds}{, }\item[{const \mbox{\hyperlink{classfc_1_1sha3}{sha3}} \&}]{ep}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{sha3_8hpp_source_l00059}{59}} of file \mbox{\hyperlink{sha3_8hpp_source}{sha3.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00060\ \ \ \ \ \{}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_a4b2aef26182d21706896022467868f7c}{ds}}.write(ep.data(),\ \textcolor{keyword}{sizeof}(ep));}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_xbyak_1_1util_a4b2aef26182d21706896022467868f7c}{ds}};}
+\DoxyCodeLine{00063\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1sha3_ac1c38d30b126ac61dc6a0372144669d8}\index{fc::sha3@{fc::sha3}!operator==@{operator==}}
+\index{operator==@{operator==}!fc::sha3@{fc::sha3}}
+\doxysubsubsection{\texorpdfstring{operator==}{operator==}}
+{\footnotesize\ttfamily \label{classfc_1_1sha3_ac1c38d30b126ac61dc6a0372144669d8} 
+bool operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1sha3}{sha3}} \&}]{h1}{, }\item[{const \mbox{\hyperlink{classfc_1_1sha3}{sha3}} \&}]{h2}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{sha3_8cpp_source_l00266}{266}} of file \mbox{\hyperlink{sha3_8cpp_source}{sha3.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00267\ \{}
+\DoxyCodeLine{00268\ \ \ \ \ \textcolor{comment}{//\ idea\ to\ not\ use\ memcmp,\ from:}}
+\DoxyCodeLine{00269\ \ \ \ \ \textcolor{comment}{//\ \ \ https://lemire.me/blog/2018/08/22/avoid-\/lexicographical-\/comparisons-\/when-\/testing-\/for-\/string-\/equality/}}
+\DoxyCodeLine{00270\ \ \ \ \ \textcolor{keywordflow}{return}\ h1.\_hash[0]\ ==\ h2.\_hash[0]\ \&\&}
+\DoxyCodeLine{00271\ \ \ \ \ \ \ \ \ \ \ \ \ \ h1.\_hash[1]\ ==\ h2.\_hash[1]\ \&\&}
+\DoxyCodeLine{00272\ \ \ \ \ \ \ \ \ \ \ \ \ \ h1.\_hash[2]\ ==\ h2.\_hash[2]\ \&\&}
+\DoxyCodeLine{00273\ \ \ \ \ \ \ \ \ \ \ \ \ \ h1.\_hash[3]\ ==\ h2.\_hash[3];}
+\DoxyCodeLine{00274\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1sha3_a8e56da3d03cf7773e09246423e6db42a}\index{fc::sha3@{fc::sha3}!operator$>$@{operator$>$}}
+\index{operator$>$@{operator$>$}!fc::sha3@{fc::sha3}}
+\doxysubsubsection{\texorpdfstring{operator$>$}{operator>}}
+{\footnotesize\ttfamily \label{classfc_1_1sha3_a8e56da3d03cf7773e09246423e6db42a} 
+bool operator$>$ (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1sha3}{sha3}} \&}]{h1}{, }\item[{const \mbox{\hyperlink{classfc_1_1sha3}{sha3}} \&}]{h2}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{sha3_8cpp_source_l00254}{254}} of file \mbox{\hyperlink{sha3_8cpp_source}{sha3.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00255\ \{}
+\DoxyCodeLine{00256\ \ \ \ \ \textcolor{keywordflow}{return}\ memcmp(h1.\_hash,\ h2.\_hash,\ \textcolor{keyword}{sizeof}(h1.\_hash))\ >\ 0;}
+\DoxyCodeLine{00257\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1sha3_a5b8e807bf2b7b0dff0c578c59545e4dc}\index{fc::sha3@{fc::sha3}!operator$>$=@{operator$>$=}}
+\index{operator$>$=@{operator$>$=}!fc::sha3@{fc::sha3}}
+\doxysubsubsection{\texorpdfstring{operator$>$=}{operator>=}}
+{\footnotesize\ttfamily \label{classfc_1_1sha3_a5b8e807bf2b7b0dff0c578c59545e4dc} 
+bool operator$>$= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1sha3}{sha3}} \&}]{h1}{, }\item[{const \mbox{\hyperlink{classfc_1_1sha3}{sha3}} \&}]{h2}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{sha3_8cpp_source_l00250}{250}} of file \mbox{\hyperlink{sha3_8cpp_source}{sha3.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00251\ \{}
+\DoxyCodeLine{00252\ \ \ \ \ \textcolor{keywordflow}{return}\ memcmp(h1.\_hash,\ h2.\_hash,\ \textcolor{keyword}{sizeof}(h1.\_hash))\ >=\ 0;}
+\DoxyCodeLine{00253\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1sha3_a9963ffda5b523dd10919ef3e41bfdfb2}\index{fc::sha3@{fc::sha3}!operator$>$$>$@{operator$>$$>$}}
+\index{operator$>$$>$@{operator$>$$>$}!fc::sha3@{fc::sha3}}
+\doxysubsubsection{\texorpdfstring{operator$>$$>$}{operator>>}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1sha3_a9963ffda5b523dd10919ef3e41bfdfb2} 
+\mbox{\hyperlink{classfc_1_1sha3}{sha3}} operator$>$$>$ (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1sha3}{sha3}} \&}]{h1}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{i}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{sha3_8cpp_source_l00235}{235}} of file \mbox{\hyperlink{sha3_8cpp_source}{sha3.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00236\ \{}
+\DoxyCodeLine{00237\ \ \ \ \ \mbox{\hyperlink{classfc_1_1sha3_ab83fb4c2c4c1739ca108baeef30bae6c}{sha3}}\ result;}
+\DoxyCodeLine{00238\ \ \ \ \ fc::detail::shift\_r(h1.data(),\ result.data(),\ result.data\_size(),\ i);}
+\DoxyCodeLine{00239\ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00240\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1sha3_a5c4ec6766a74d8f7ae1ef3b62026d0cf}\index{fc::sha3@{fc::sha3}!operator$>$$>$@{operator$>$$>$}}
+\index{operator$>$$>$@{operator$>$$>$}!fc::sha3@{fc::sha3}}
+\doxysubsubsection{\texorpdfstring{operator$>$$>$}{operator>>}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1sha3_a5c4ec6766a74d8f7ae1ef3b62026d0cf} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& operator$>$$>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{ds}{, }\item[{\mbox{\hyperlink{classfc_1_1sha3}{sha3}} \&}]{ep}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{sha3_8hpp_source_l00066}{66}} of file \mbox{\hyperlink{sha3_8hpp_source}{sha3.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00067\ \ \ \ \ \{}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_a4b2aef26182d21706896022467868f7c}{ds}}.read(ep.data(),\ \textcolor{keyword}{sizeof}(ep));}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_xbyak_1_1util_a4b2aef26182d21706896022467868f7c}{ds}};}
+\DoxyCodeLine{00070\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1sha3_ae00883ce4174f8fbd869ca34e82721fc}\index{fc::sha3@{fc::sha3}!operator\texorpdfstring{$^\wedge$}{\string^}@{operator\texorpdfstring{$^\wedge$}{\string^}}}
+\index{operator\texorpdfstring{$^\wedge$}{\string^}@{operator\texorpdfstring{$^\wedge$}{\string^}}!fc::sha3@{fc::sha3}}
+\doxysubsubsection{\texorpdfstring{operator\texorpdfstring{$^\wedge$}{\string^}}{operator\string^}}
+{\footnotesize\ttfamily \label{classfc_1_1sha3_ae00883ce4174f8fbd869ca34e82721fc} 
+\mbox{\hyperlink{classfc_1_1sha3}{sha3}} operator\texorpdfstring{$^\wedge$}{\string^} (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1sha3}{sha3}} \&}]{h1}{, }\item[{const \mbox{\hyperlink{classfc_1_1sha3}{sha3}} \&}]{h2}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{sha3_8cpp_source_l00241}{241}} of file \mbox{\hyperlink{sha3_8cpp_source}{sha3.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00242\ \{}
+\DoxyCodeLine{00243\ \ \ \ \ \mbox{\hyperlink{classfc_1_1sha3_ab83fb4c2c4c1739ca108baeef30bae6c}{sha3}}\ result;}
+\DoxyCodeLine{00244\ \ \ \ \ result.\_hash[0]\ =\ h1.\_hash[0]\ \string^\ h2.\_hash[0];}
+\DoxyCodeLine{00245\ \ \ \ \ result.\_hash[1]\ =\ h1.\_hash[1]\ \string^\ h2.\_hash[1];}
+\DoxyCodeLine{00246\ \ \ \ \ result.\_hash[2]\ =\ h1.\_hash[2]\ \string^\ h2.\_hash[2];}
+\DoxyCodeLine{00247\ \ \ \ \ result.\_hash[3]\ =\ h1.\_hash[3]\ \string^\ h2.\_hash[3];}
+\DoxyCodeLine{00248\ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00249\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classfc_1_1sha3_ad590e9c94055d7cd7e71c07f97131157}\index{fc::sha3@{fc::sha3}!\_hash@{\_hash}}
+\index{\_hash@{\_hash}!fc::sha3@{fc::sha3}}
+\doxysubsubsection{\texorpdfstring{\_hash}{\_hash}}
+{\footnotesize\ttfamily \label{classfc_1_1sha3_ad590e9c94055d7cd7e71c07f97131157} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} fc\+::sha3\+::\+\_\+hash\mbox{[}4\mbox{]}}
+
+
+
+Definition at line \mbox{\hyperlink{sha3_8hpp_source_l00080}{80}} of file \mbox{\hyperlink{sha3_8hpp_source}{sha3.\+hpp}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/\mbox{\hyperlink{sha3_8hpp}{sha3.\+hpp}}\item 
+libraries/fc/src/crypto/\mbox{\hyperlink{sha3_8cpp}{sha3.\+cpp}}\end{DoxyCompactItemize}

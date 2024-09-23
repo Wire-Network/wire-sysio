@@ -1,0 +1,91 @@
+\doxysection{blockinfo\+\_\+tester.\+cpp}
+\hypertarget{blockinfo__tester_8cpp_source}{}\label{blockinfo__tester_8cpp_source}\index{/Users/svetlasyrimis/Desktop/wire-\/network/WN-\/org/wire-\/system-\/contracts/contracts/test\_contracts/blockinfo\_tester/src/blockinfo\_tester.cpp@{/Users/svetlasyrimis/Desktop/wire-\/network/WN-\/org/wire-\/system-\/contracts/contracts/test\_contracts/blockinfo\_tester/src/blockinfo\_tester.cpp}}
+\mbox{\hyperlink{blockinfo__tester_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{blockinfo__tester_8hpp}{blockinfo\_tester/blockinfo\_tester.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <type\_traits>}}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <sysio/action.hpp>}}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <sysio/check.hpp>}}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <sysio/datastream.hpp>}}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ <sysio/name.hpp>}}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <sysio/print.hpp>}}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00012}00012\ \textcolor{keyword}{namespace\ }\{}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00014}00014\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysiosystem_1_1block__info}{block\_info}}\ =\ \mbox{\hyperlink{namespacesysiosystem_1_1block__info}{sysiosystem::block\_info}};}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00016}00016\ \}}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00017}00017\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester}{system\_contracts::testing::test\_contracts::blockinfo\_tester}}\ \{}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00019}\mbox{\hyperlink{namespacesystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_a705f35a783c6830287ee92b4f8146d49}{00019}}\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacesystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_a705f35a783c6830287ee92b4f8146d49}{process}}(\mbox{\hyperlink{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1get__latest__block__batch__info}{get\_latest\_block\_batch\_info}}\ request)\ -\/>\ \mbox{\hyperlink{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result}{latest\_block\_batch\_info\_result}}}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00020}00020\ \{}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00021}00021\ \ \ \ \mbox{\hyperlink{structsystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_1_1latest__block__batch__info__result}{latest\_block\_batch\_info\_result}}\ response;}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00023}00023\ \ \ \ \mbox{\hyperlink{structsysiosystem_1_1block__info_1_1latest__block__batch__info__result}{block\_info::latest\_block\_batch\_info\_result}}\ res\ =}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00024}00024\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysiosystem_1_1block__info_aaac02db22145c90ec190da119ea3bd33}{block\_info::get\_latest\_block\_batch\_info}}(request.batch\_start\_height\_offset,\ request.batch\_size);}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00026}00026\ \ \ \ response.result\ \ \ \ \ \ \ \ \ \ \ =\ std::move(res.\mbox{\hyperlink{structsysiosystem_1_1block__info_1_1latest__block__batch__info__result_aa41379f75d3f41c51f70ff42a99a2715}{result}});}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00027}00027\ \ \ \ response.error\_code.value\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\textcolor{keyword}{>}(res.\mbox{\hyperlink{structsysiosystem_1_1block__info_1_1latest__block__batch__info__result_a0ee8d69440be76b6a6f3e60db3e672da}{error\_code}});}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00029}00029\ \ \ \ sysio::print(\textcolor{stringliteral}{"{}get\_latest\_block\_batch\_info:\ response\ error\_code\ =\ "{}},\ response.error\_code.value,\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00030}00030\ \ \ \ \textcolor{keywordflow}{if}\ (response.result.has\_value())\ \{}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00031}00031\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ result\ =\ *response.result;}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00032}00032\ \ \ \ \ \ \ sysio::print(\textcolor{stringliteral}{"{}get\_latest\_block\_batch\_info:\ response\ result:\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00033}00033\ \ \ \ \ \ \ sysio::print(\textcolor{stringliteral}{"{}\ \ \ \ batch\_start\_height\ \ \ \ \ \ \ \ \ \ =\ "{}},\ result.batch\_start\_height,\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00034}00034\ \ \ \ \ \ \ sysio::print(\textcolor{stringliteral}{"{}\ \ \ \ batch\_current\_end\_height\ \ \ \ =\ "{}},\ result.batch\_current\_end\_height,\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00035}00035\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00037}00037\ \ \ \ \textcolor{keywordflow}{return}\ response;}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00038}00038\ \}}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00040}\mbox{\hyperlink{namespacesystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_a363d3c4aeaaf0d43dc7d2c8b36f35ed6}{00040}}\ \mbox{\hyperlink{namespacesystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_a0b95068352c90188d1859d7fb88844d4}{output\_type}}\ \mbox{\hyperlink{namespacesystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_a363d3c4aeaaf0d43dc7d2c8b36f35ed6}{process\_call}}(\mbox{\hyperlink{namespacesystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_a089ac244fc33f0091ba57ec3121b7c12}{input\_type}}\ input)}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00041}00041\ \{}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00042}00042\ \ \ \ \textcolor{keywordflow}{return}\ std::visit([](\textcolor{keyword}{auto}\&\&\ arg)\ -\/>\ \mbox{\hyperlink{namespacesystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_a0b95068352c90188d1859d7fb88844d4}{output\_type}}\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacesystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester_a705f35a783c6830287ee92b4f8146d49}{process}}(std::move(arg));\ \},\ std::move(input));}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00043}00043\ \}}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00045}00045\ \}\ \textcolor{comment}{//\ namespace\ system\_contracts::testing::test\_contracts::blockinfo\_tester}}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00047}\mbox{\hyperlink{blockinfo__tester_8cpp_a979735e53c71ba52bb8515d2c4437059}{00047}}\ [[sysio::wasm\_entry]]\ \textcolor{keyword}{extern}\ \textcolor{stringliteral}{"{}C"{}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{blockinfo__tester_8cpp_a979735e53c71ba52bb8515d2c4437059}{apply}}(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ receiver,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ code,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{structaction}{action}})}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00048}00048\ \{}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00049}00049\ \ \ \ \textcolor{keyword}{namespace\ }ns\ =\ \mbox{\hyperlink{namespacesystem__contracts_1_1testing_1_1test__contracts_1_1blockinfo__tester}{system\_contracts::testing::test\_contracts::blockinfo\_tester}};}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00051}00051\ \ \ \ \textcolor{keywordflow}{if}\ (receiver\ ==\ code)\ \{}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00052}00052\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structaction}{action}}\ ==\ \textcolor{stringliteral}{"{}call"{}}\_n.value)\ \{}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \ ns::input\_type\ input;}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00054}00054\ }
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \ \ \ std::vector<char>\ buffer;}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \ \ \ buffer.resize(sysio::action\_data\_size());}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \ \ \ sysio::read\_action\_data(buffer.data(),\ buffer.size());}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1datastream}{sysio::datastream<const\ char*>}}\ input\_ds(\textcolor{keyword}{static\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(buffer.data()),\ buffer.size());}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00061}00061\ \ \ \ \ \ \ \ \ \ \ \ \ input\_ds\ >>\ input;}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00062}00062\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00064}00064\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ output\ =\ ns::process\_call(std::move(input));}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00065}00065\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_assert}(std::is\_same\_v<\textcolor{keyword}{decltype}(output),\ ns::output\_type>);}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00067}00067\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1action}{sysio::action}}\ return\_action;}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \ \ \ return\_action.\mbox{\hyperlink{structsysio_1_1chain_1_1action__base_a3598da3f8df67037e69dab758ce168be}{account}}\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{sysio::name}}\{receiver\};}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \ \ \ return\_action.\mbox{\hyperlink{structsysio_1_1chain_1_1action__base_a013fae07403bd6deffcade4fd5be095c}{name}}\ \ \ \ =\ \textcolor{stringliteral}{"{}return"{}}\_n;}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1datastream}{sysio::datastream<size\_t>}}\ output\_size\_ds;}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00073}00073\ \ \ \ \ \ \ \ \ \ \ \ \ output\_size\_ds\ <<\ output;}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00074}00074\ \ \ \ \ \ \ \ \ \ \ \ \ return\_action.\mbox{\hyperlink{structsysio_1_1chain_1_1action_abeb8e7f99c1779b22ebcd13f534f0205}{data}}.resize(output\_size\_ds.tellp());}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00075}00075\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1datastream}{sysio::datastream<char*>}}\ output\_ds(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(return\_action.\mbox{\hyperlink{structsysio_1_1chain_1_1action_abeb8e7f99c1779b22ebcd13f534f0205}{data}}.data()),}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ return\_action.\mbox{\hyperlink{structsysio_1_1chain_1_1action_abeb8e7f99c1779b22ebcd13f534f0205}{data}}.size());}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ output\_ds\ <<\ output;}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \ \ \ return\_action.send();}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00080}00080\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00081}00081\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structaction}{action}}\ ==\ \textcolor{stringliteral}{"{}abort"{}}\_n.value)\ \{}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00082}00082\ \ \ \ \ \ \ \ \ \ sysio::check(\textcolor{keyword}{false},\ 0ull);}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00083}00083\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00084}00084\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{blockinfo__tester_8cpp_source_l00085}00085\ \}}
+
+\end{DoxyCode}

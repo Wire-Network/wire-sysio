@@ -1,0 +1,27 @@
+<map id="fc::message_buffer::advance_index" name="fc::message_buffer::advance_index">
+<area shape="rect" id="Node000001" title=" " alt="" coords="707,223,841,263"/>
+<area shape="rect" id="Node000002" href="$classfc_1_1message__buffer.html#aaf26c3308fd006fad3860f4f2c4111aa" title=" " alt="" coords="510,95,643,135"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="729,216,658,168,611,138,614,134,661,163,732,211"/>
+<area shape="rect" id="Node000007" href="$classfc_1_1message__buffer.html#a5c055debbcd5603bce13c26364836226" title=" " alt="" coords="509,177,644,218"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="691,227,644,216,645,211,692,222"/>
+<area shape="rect" id="Node000009" href="$classfc_1_1message__buffer.html#aa313c06931d9d0d21c5cf2a653898121" title=" " alt="" coords="510,267,643,307"/>
+<area shape="poly" id="edge12_Node000001_Node000009" title=" " alt="" coords="693,264,644,275,643,270,692,259"/>
+<area shape="rect" id="Node000010" href="$classfc_1_1mb__peek__datastream.html#a0a889c998e1d2a99f1e484a27b29399b" title=" " alt="" coords="494,332,659,373"/>
+<area shape="poly" id="edge15_Node000001_Node000010" title=" " alt="" coords="734,275,661,321,635,334,632,329,658,317,731,270"/>
+<area shape="rect" id="Node000003" href="$test__message__buffer_8cpp.html#ac64fd5998672b472a05dead509a6e008" title="Test buffer growth and shrinking." alt="" coords="250,94,446,120"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="495,115,446,113,447,108,495,109"/>
+<area shape="rect" id="Node000004" href="$test__message__buffer_8cpp.html#a6687d4ea18cd8c8a2244e87202a36dfe" title=" " alt="" coords="250,144,446,169"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="495,132,423,146,422,140,494,127"/>
+<area shape="rect" id="Node000005" href="$classfc_1_1message__buffer.html#a535ef4f901ac8e5f9008524eafad9447" title=" " alt="" coords="281,29,414,70"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="494,94,414,71,416,66,496,89"/>
+<area shape="poly" id="edge6_Node000005_Node000005" title=" " alt="" coords="385,16,371,10,348,8,326,10,313,15,308,21,310,28,305,29,303,19,310,10,325,5,348,3,373,5,387,11"/>
+<area shape="rect" id="Node000006" href="$test__message__buffer_8cpp.html#ae9f66dfac041e0941e63b810d0cb5315" title="Test peek and read across multiple buffers." alt="" coords="5,194,202,220"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="268,75,251,84,210,111,173,142,119,196,115,192,169,138,207,107,248,79,266,71"/>
+<area shape="poly" id="edge8_Node000007_Node000003" title=" " alt="" coords="526,172,445,133,412,123,413,118,447,129,528,167"/>
+<area shape="poly" id="edge11_Node000007_Node000004" title=" " alt="" coords="493,185,422,172,423,167,494,180"/>
+<area shape="poly" id="edge9_Node000007_Node000006" title=" " alt="" coords="493,202,202,208,202,202,493,197"/>
+<area shape="rect" id="Node000008" href="$test__message__buffer_8cpp.html#a51213da5fa9bc94beae58bc546fe060c" title="Test automatic allocation when advancing the read_ptr to the end." alt="" coords="250,245,446,270"/>
+<area shape="poly" id="edge10_Node000007_Node000008" title=" " alt="" coords="495,222,401,247,399,242,493,217"/>
+<area shape="poly" id="edge13_Node000009_Node000006" title=" " alt="" coords="495,299,378,302,313,297,249,286,212,273,177,256,122,223,125,218,179,252,214,268,250,280,313,292,378,297,495,294"/>
+<area shape="poly" id="edge14_Node000009_Node000009" title=" " alt="" coords="609,253,597,248,577,245,558,247,547,252,542,258,544,265,539,267,537,257,543,248,557,242,577,240,598,242,611,249"/>
+</map>

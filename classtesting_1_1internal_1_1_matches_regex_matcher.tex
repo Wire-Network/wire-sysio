@@ -1,0 +1,163 @@
+\doxysection{testing\+::internal\+::Matches\+Regex\+Matcher Class Reference}
+\hypertarget{classtesting_1_1internal_1_1_matches_regex_matcher}{}\label{classtesting_1_1internal_1_1_matches_regex_matcher}\index{testing::internal::MatchesRegexMatcher@{testing::internal::MatchesRegexMatcher}}
+
+
+{\ttfamily \#include $<$gmock-\/matchers.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_matches_regex_matcher_acce0beb9c72166b1c5771869cfebedd1}{Matches\+Regex\+Matcher}} (const \mbox{\hyperlink{classtesting_1_1internal_1_1_r_e}{RE}} \texorpdfstring{$\ast$}{*}regex, bool full\+\_\+match)
+\item 
+{\footnotesize template$<$typename Char\+Type $>$ }\\bool \mbox{\hyperlink{classtesting_1_1internal_1_1_matches_regex_matcher_a00f5f9b19a5308d8daacc502c88a91ba}{Match\+And\+Explain}} (Char\+Type \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, \mbox{\hyperlink{classtesting_1_1_match_result_listener}{Match\+Result\+Listener}} \texorpdfstring{$\ast$}{*}listener) const
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} Matchee\+String\+Type $>$ }\\bool \mbox{\hyperlink{classtesting_1_1internal_1_1_matches_regex_matcher_a57042ed4ce640738728d976f63f0702e}{Match\+And\+Explain}} (const Matchee\+String\+Type \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, \mbox{\hyperlink{classtesting_1_1_match_result_listener}{Match\+Result\+Listener}} \texorpdfstring{$\ast$}{*}) const
+\item 
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_matches_regex_matcher_a8ebd3a0cf33a7bad04a3daf4b0653d8f}{Describe\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}os) const
+\item 
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_matches_regex_matcher_a63154c9c572c1e44a130d58539fde707}{Describe\+Negation\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}os) const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l01547}{1547}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_matches_regex_matcher_acce0beb9c72166b1c5771869cfebedd1}\index{testing::internal::MatchesRegexMatcher@{testing::internal::MatchesRegexMatcher}!MatchesRegexMatcher@{MatchesRegexMatcher}}
+\index{MatchesRegexMatcher@{MatchesRegexMatcher}!testing::internal::MatchesRegexMatcher@{testing::internal::MatchesRegexMatcher}}
+\doxysubsubsection{\texorpdfstring{MatchesRegexMatcher()}{MatchesRegexMatcher()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_matches_regex_matcher_acce0beb9c72166b1c5771869cfebedd1} 
+testing\+::internal\+::\+Matches\+Regex\+Matcher\+::\+Matches\+Regex\+Matcher (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classtesting_1_1internal_1_1_r_e}{RE}} \texorpdfstring{$\ast$}{*}}]{regex}{, }\item[{bool}]{full\+\_\+match}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l01549}{1549}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01550\ \ \ \ \ \ \ :\ regex\_(regex),\ full\_match\_(full\_match)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_matches_regex_matcher_a63154c9c572c1e44a130d58539fde707}\index{testing::internal::MatchesRegexMatcher@{testing::internal::MatchesRegexMatcher}!DescribeNegationTo@{DescribeNegationTo}}
+\index{DescribeNegationTo@{DescribeNegationTo}!testing::internal::MatchesRegexMatcher@{testing::internal::MatchesRegexMatcher}}
+\doxysubsubsection{\texorpdfstring{DescribeNegationTo()}{DescribeNegationTo()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_matches_regex_matcher_a63154c9c572c1e44a130d58539fde707} 
+void testing\+::internal\+::\+Matches\+Regex\+Matcher\+::\+Describe\+Negation\+To (\begin{DoxyParamCaption}\item[{\+::std\+::ostream \texorpdfstring{$\ast$}{*}}]{os}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l01587}{1587}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01587\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01588\ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}doesn't\ "{}}\ <<\ (full\_match\_\ ?\ \textcolor{stringliteral}{"{}match"{}}\ :\ \textcolor{stringliteral}{"{}contain"{}})}
+\DoxyCodeLine{01589\ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\ regular\ expression\ "{}};}
+\DoxyCodeLine{01590\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_universal_printer_aecec021e1abbaa260b701e24e3fe33eb}{UniversalPrinter<std::string>::Print}}(regex\_-\/>pattern(),\ os);}
+\DoxyCodeLine{01591\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_matches_regex_matcher_a63154c9c572c1e44a130d58539fde707_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_matches_regex_matcher_a8ebd3a0cf33a7bad04a3daf4b0653d8f}\index{testing::internal::MatchesRegexMatcher@{testing::internal::MatchesRegexMatcher}!DescribeTo@{DescribeTo}}
+\index{DescribeTo@{DescribeTo}!testing::internal::MatchesRegexMatcher@{testing::internal::MatchesRegexMatcher}}
+\doxysubsubsection{\texorpdfstring{DescribeTo()}{DescribeTo()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_matches_regex_matcher_a8ebd3a0cf33a7bad04a3daf4b0653d8f} 
+void testing\+::internal\+::\+Matches\+Regex\+Matcher\+::\+Describe\+To (\begin{DoxyParamCaption}\item[{\+::std\+::ostream \texorpdfstring{$\ast$}{*}}]{os}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l01581}{1581}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01581\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01582\ \ \ \ \ *os\ <<\ (full\_match\_\ ?\ \textcolor{stringliteral}{"{}matches"{}}\ :\ \textcolor{stringliteral}{"{}contains"{}})}
+\DoxyCodeLine{01583\ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\ regular\ expression\ "{}};}
+\DoxyCodeLine{01584\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_universal_printer_aecec021e1abbaa260b701e24e3fe33eb}{UniversalPrinter<std::string>::Print}}(regex\_-\/>pattern(),\ os);}
+\DoxyCodeLine{01585\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_matches_regex_matcher_a8ebd3a0cf33a7bad04a3daf4b0653d8f_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_matches_regex_matcher_a00f5f9b19a5308d8daacc502c88a91ba}\index{testing::internal::MatchesRegexMatcher@{testing::internal::MatchesRegexMatcher}!MatchAndExplain@{MatchAndExplain}}
+\index{MatchAndExplain@{MatchAndExplain}!testing::internal::MatchesRegexMatcher@{testing::internal::MatchesRegexMatcher}}
+\doxysubsubsection{\texorpdfstring{MatchAndExplain()}{MatchAndExplain()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_matches_regex_matcher_a00f5f9b19a5308d8daacc502c88a91ba} 
+template$<$typename Char\+Type $>$ \\
+bool testing\+::internal\+::\+Matches\+Regex\+Matcher\+::\+Match\+And\+Explain (\begin{DoxyParamCaption}\item[{Char\+Type \texorpdfstring{$\ast$}{*}}]{s}{, }\item[{\mbox{\hyperlink{classtesting_1_1_match_result_listener}{Match\+Result\+Listener}} \texorpdfstring{$\ast$}{*}}]{listener}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l01565}{1565}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01565\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01566\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ !=\ NULL\ \&\&\ \mbox{\hyperlink{classtesting_1_1internal_1_1_matches_regex_matcher_a00f5f9b19a5308d8daacc502c88a91ba}{MatchAndExplain}}(std::string(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}),\ listener);}
+\DoxyCodeLine{01567\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=197pt]{classtesting_1_1internal_1_1_matches_regex_matcher_a00f5f9b19a5308d8daacc502c88a91ba_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=197pt]{classtesting_1_1internal_1_1_matches_regex_matcher_a00f5f9b19a5308d8daacc502c88a91ba_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_matches_regex_matcher_a57042ed4ce640738728d976f63f0702e}\index{testing::internal::MatchesRegexMatcher@{testing::internal::MatchesRegexMatcher}!MatchAndExplain@{MatchAndExplain}}
+\index{MatchAndExplain@{MatchAndExplain}!testing::internal::MatchesRegexMatcher@{testing::internal::MatchesRegexMatcher}}
+\doxysubsubsection{\texorpdfstring{MatchAndExplain()}{MatchAndExplain()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_matches_regex_matcher_a57042ed4ce640738728d976f63f0702e} 
+template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} Matchee\+String\+Type $>$ \\
+bool testing\+::internal\+::\+Matches\+Regex\+Matcher\+::\+Match\+And\+Explain (\begin{DoxyParamCaption}\item[{const Matchee\+String\+Type \&}]{s}{, }\item[{\mbox{\hyperlink{classtesting_1_1_match_result_listener}{Match\+Result\+Listener}} \texorpdfstring{$\ast$}{*}}]{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l01574}{1574}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01575\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01576\ \ \ \ \ \textcolor{keyword}{const}\ std::string\&\ s2(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{01577\ \ \ \ \ \textcolor{keywordflow}{return}\ full\_match\_\ ?\ \mbox{\hyperlink{classtesting_1_1internal_1_1_r_e_aa79a950758d0f1d62f7762d1e9cefe86}{RE::FullMatch}}(s2,\ *regex\_)\ :}
+\DoxyCodeLine{01578\ \ \ \ \ \ \ \ \ RE::PartialMatch(s2,\ *regex\_);}
+\DoxyCodeLine{01579\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=324pt]{classtesting_1_1internal_1_1_matches_regex_matcher_a57042ed4ce640738728d976f63f0702e_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/include/gmock/\mbox{\hyperlink{gmock-matchers_8h}{gmock-\/matchers.\+h}}\end{DoxyCompactItemize}

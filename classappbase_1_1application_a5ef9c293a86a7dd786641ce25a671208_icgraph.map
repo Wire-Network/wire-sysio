@@ -1,0 +1,9 @@
+<map id="appbase::application::full_config_file_path" name="appbase::application::full_config_file_path">
+<area shape="rect" id="Node000001" title="Get full config.ini path." alt="" coords="626,5,771,46"/>
+<area shape="rect" id="Node000002" href="$classappbase_1_1application.html#adebe1a60f6663b205a196385d4bc6231" title=" " alt="" coords="438,5,578,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="610,28,579,28,579,23,610,23"/>
+<area shape="rect" id="Node000003" href="$classappbase_1_1application.html#a29ed51314f78ebe6795930a4ca910fd6" title="Looks for the –plugin commandline / config option and calls initialize on those plugins." alt="" coords="250,5,390,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="423,28,390,28,390,23,423,23"/>
+<area shape="rect" id="Node000004" href="$test__trx__full_8cpp.html#afdace07785a80c02d7fbb1d13154c2c4" title=" " alt="" coords="5,13,202,38"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="234,28,202,28,202,23,234,23"/>
+</map>

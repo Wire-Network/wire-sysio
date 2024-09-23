@@ -1,0 +1,16 @@
+<map id="Catch::Matchers::Vector::ApproxMatcher&lt; T &gt;" name="Catch::Matchers::Vector::ApproxMatcher&lt; T &gt;">
+<area shape="rect" id="Node000001" title=" " alt="" coords="666,37,830,78"/>
+<area shape="rect" id="Node000002" href="$struct_catch_1_1_matchers_1_1_impl_1_1_matcher_base.html" title=" " alt="" coords="423,37,575,78"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="591,64,665,64,665,69,591,69"/>
+<area shape="poly" id="edge7_Node000001_Node000002" title=" " alt="" coords="591,46,665,46,665,52,591,52"/>
+<area shape="rect" id="Node000003" href="$class_catch_1_1_matchers_1_1_impl_1_1_matcher_untyped_base.html" title=" " alt="" coords="219,5,374,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="389,47,423,52,423,57,388,52"/>
+<area shape="poly" id="edge5_Node000002_Node000003" title=" " alt="" coords="390,29,423,34,422,40,389,34"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="5,13,59,38"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="74,23,219,23,219,28,74,28"/>
+<area shape="rect" id="Node000005" href="$struct_catch_1_1_matchers_1_1_impl_1_1_matcher_method.html" title=" " alt="" coords="221,71,372,111"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="387,82,424,76,425,81,388,88"/>
+<area shape="poly" id="edge6_Node000002_Node000005" title=" " alt="" coords="385,65,423,59,423,64,386,70"/>
+<area shape="rect" id="Node000006" href="$class_catch_1_1_detail_1_1_approx.html" title=" " alt="" coords="425,102,573,128"/>
+<area shape="poly" id="edge8_Node000001_Node000006" title=" " alt="" coords="572,96,665,74,666,79,573,101"/>
+</map>

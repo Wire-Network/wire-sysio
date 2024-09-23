@@ -1,0 +1,815 @@
+\doxysection{chainbase Namespace Reference}
+\hypertarget{namespacechainbase}{}\label{namespacechainbase}\index{chainbase@{chainbase}}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classchainbase_1_1abstract__index}{abstract\+\_\+index}}
+\item 
+class \mbox{\hyperlink{classchainbase_1_1abstract__session}{abstract\+\_\+session}}
+\item 
+class \mbox{\hyperlink{classchainbase_1_1chainbase__error__category}{chainbase\+\_\+error\+\_\+category}}
+\item 
+class \mbox{\hyperlink{classchainbase_1_1chainbase__node__allocator}{chainbase\+\_\+node\+\_\+allocator}}
+\item 
+class \mbox{\hyperlink{classchainbase_1_1database}{database}}
+\item 
+struct \mbox{\hyperlink{structchainbase_1_1db__header}{db\+\_\+header}}
+\item 
+struct \mbox{\hyperlink{structchainbase_1_1environment}{environment}}
+\item 
+struct \mbox{\hyperlink{structchainbase_1_1get__index__type}{get\+\_\+index\+\_\+type}}
+\item 
+struct \mbox{\hyperlink{structchainbase_1_1get__key}{get\+\_\+key}}
+\item 
+class \mbox{\hyperlink{classchainbase_1_1index}{index}}
+\item 
+class \mbox{\hyperlink{classchainbase_1_1index__impl}{index\+\_\+impl}}
+\item 
+struct \mbox{\hyperlink{structchainbase_1_1index__tag__impl}{index\+\_\+tag\+\_\+impl}}
+\item 
+struct \mbox{\hyperlink{structchainbase_1_1index__tag__impl_3_01_index_3_01boost_1_1multi__index_1_1tag_3_01_tag_01_4_00_01_t_8_8_8_01_4_01_4}{index\+\_\+tag\+\_\+impl$<$ Index$<$ boost\+::multi\+\_\+index\+::tag$<$ Tag $>$, T... $>$ $>$}}
+\item 
+class \mbox{\hyperlink{classchainbase_1_1int__incrementer}{int\+\_\+incrementer}}
+\item 
+struct \mbox{\hyperlink{structchainbase_1_1mi__to__ui__ii}{mi\+\_\+to\+\_\+ui\+\_\+ii}}
+\item 
+struct \mbox{\hyperlink{structchainbase_1_1mi__to__ui__ii_3_01_t_00_01boost_1_1mp11_1_1mp__list_3_01_i_8_8_8_01_4_00_01_a_01_4}{mi\+\_\+to\+\_\+ui\+\_\+ii$<$ T, boost\+::mp11\+::mp\+\_\+list$<$ I... $>$, A $>$}}
+\item 
+struct \mbox{\hyperlink{structchainbase_1_1multi__index__to__undo__index__impl}{multi\+\_\+index\+\_\+to\+\_\+undo\+\_\+index\+\_\+impl}}
+\item 
+struct \mbox{\hyperlink{structchainbase_1_1multi__index__to__undo__index__impl_3_01boost_1_1multi__index__container_3_01_t_00_01_i_00_01_a_01_4_01_4}{multi\+\_\+index\+\_\+to\+\_\+undo\+\_\+index\+\_\+impl$<$ boost\+::multi\+\_\+index\+\_\+container$<$ T, I, A $>$ $>$}}
+\item 
+struct \mbox{\hyperlink{structchainbase_1_1object}{object}}
+\item 
+struct \mbox{\hyperlink{structchainbase_1_1offset__node__base}{offset\+\_\+node\+\_\+base}}
+\item 
+struct \mbox{\hyperlink{structchainbase_1_1offset__node__traits}{offset\+\_\+node\+\_\+traits}}
+\item 
+struct \mbox{\hyperlink{structchainbase_1_1offset__node__value__traits}{offset\+\_\+node\+\_\+value\+\_\+traits}}
+\item 
+class \mbox{\hyperlink{classchainbase_1_1oid}{oid}}
+\item 
+class \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file}{pinnable\+\_\+mapped\+\_\+file}}
+\item 
+class \mbox{\hyperlink{classchainbase_1_1read__write__mutex__manager}{read\+\_\+write\+\_\+mutex\+\_\+manager}}
+\item 
+struct \mbox{\hyperlink{structchainbase_1_1scope__exit}{scope\+\_\+exit}}
+\item 
+class \mbox{\hyperlink{classchainbase_1_1session__impl}{session\+\_\+impl}}
+\item 
+struct \mbox{\hyperlink{structchainbase_1_1set__impl}{set\+\_\+impl}}
+\item 
+class \mbox{\hyperlink{classchainbase_1_1shared__cow__string}{shared\+\_\+cow\+\_\+string}}
+\item 
+struct \mbox{\hyperlink{structchainbase_1_1to__mp11}{to\+\_\+mp11}}
+\item 
+class \mbox{\hyperlink{classchainbase_1_1undo__index}{undo\+\_\+index}}
+\item 
+struct \mbox{\hyperlink{structchainbase_1_1value__holder}{value\+\_\+holder}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\using \mbox{\hyperlink{namespacechainbase_add7d4cf66ab3f2808fe613e6b0343b89}{allocator}} = bip\+::allocator$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a550aa643b3bd7335e48afd94f1089d2b}{pinnable\+\_\+mapped\+\_\+file\+::segment\+\_\+manager}}$>$
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\using \mbox{\hyperlink{namespacechainbase_a5235419f9dd4d8333aa4b5a2aa8f6125}{node\+\_\+allocator}} = \mbox{\hyperlink{classchainbase_1_1chainbase__node__allocator}{chainbase\+\_\+node\+\_\+allocator}}$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a550aa643b3bd7335e48afd94f1089d2b}{pinnable\+\_\+mapped\+\_\+file\+::segment\+\_\+manager}}$>$
+\item 
+using \mbox{\hyperlink{namespacechainbase_a895da7b5480367dc984b326d363552c8}{shared\+\_\+string}} = \mbox{\hyperlink{classchainbase_1_1shared__cow__string}{shared\+\_\+cow\+\_\+string}}
+\item 
+typedef boost\+::interprocess\+::interprocess\+\_\+sharable\+\_\+mutex \mbox{\hyperlink{namespacechainbase_aad8e368b62fa8230255e90840a42dc2a}{read\+\_\+write\+\_\+mutex}}
+\item 
+typedef boost\+::interprocess\+::sharable\+\_\+lock$<$ \mbox{\hyperlink{namespacechainbase_aad8e368b62fa8230255e90840a42dc2a}{read\+\_\+write\+\_\+mutex}} $>$ \mbox{\hyperlink{namespacechainbase_af9c751cb717344c32889e0a797c50803}{read\+\_\+lock}}
+\item 
+{\footnotesize template$<$typename Multi\+Index\+Type $>$ }\\using \mbox{\hyperlink{namespacechainbase_a3ba122cfc1e47fa4ddf024212ec17431}{generic\+\_\+index}} = \mbox{\hyperlink{namespacechainbase_a8f797a59401f3deae45451f837bd6ebe}{multi\+\_\+index\+\_\+to\+\_\+undo\+\_\+index}}$<$Multi\+Index\+Type$>$
+\item 
+{\footnotesize template$<$typename Object , typename... Args$>$ }\\using \mbox{\hyperlink{namespacechainbase_aba1e047495dcaa4e0d32ff25b8705f1f}{shared\+\_\+multi\+\_\+index\+\_\+container}} = boost\+::multi\+\_\+index\+\_\+container$<$Object,Args..., \mbox{\hyperlink{namespacechainbase_a5235419f9dd4d8333aa4b5a2aa8f6125}{chainbase\+::node\+\_\+allocator}}$<$Object$>$ $>$
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} , typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\using \mbox{\hyperlink{namespacechainbase_ab393a73784cf7c18f134020f89ec4d8e}{rebind\+\_\+alloc\+\_\+t}} = typename std\+::allocator\+\_\+traits$<$\mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}$>$\mbox{\hyperlink{yubihsm__pkcs11_8c_a53ef06e29c840024a683512c1acd791a}{\+::template}} rebind\+\_\+alloc$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$
+\item 
+{\footnotesize template$<$typename Index $>$ }\\using \mbox{\hyperlink{namespacechainbase_a53a1a10db2a565e854e5e3a1f25623ac}{index\+\_\+tag}} = typename \mbox{\hyperlink{structchainbase_1_1index__tag__impl}{index\+\_\+tag\+\_\+impl}}$<$Index$>$\+::type
+\item 
+{\footnotesize template$<$typename Tag , typename... Indices$>$ }\\using \mbox{\hyperlink{namespacechainbase_a724422843d7f02bc2b77bbb03169f530}{find\+\_\+tag}} = boost\+::mp11\+::mp\+\_\+find$<$boost\+::mp11\+::mp\+\_\+list$<$\mbox{\hyperlink{namespacechainbase_a53a1a10db2a565e854e5e3a1f25623ac}{index\+\_\+tag}}$<$Indices$>$...$>$, Tag$>$
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{make__512_8cpp_a3d4e997ddc51e0c06c306fe4862826c0}{K}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ }\\using \mbox{\hyperlink{namespacechainbase_aeccf7abd24979f2c4c91764b42473a25}{hook}} = \mbox{\hyperlink{structchainbase_1_1offset__node__base}{offset\+\_\+node\+\_\+base}}$<$\mbox{\hyperlink{make__512_8cpp_a3d4e997ddc51e0c06c306fe4862826c0}{K}}$>$
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{struct_node}{Node}} , typename Ordered\+Index $>$ }\\using \mbox{\hyperlink{namespacechainbase_a33abc5322d42584391451ecb393b69ef}{set\+\_\+base}}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{struct_node}{Node}} , typename Tag $>$ }\\using \mbox{\hyperlink{namespacechainbase_a83f750f92c09e4b3046069370df53cb3}{list\+\_\+base}}
+\item 
+{\footnotesize template$<$typename Multi\+Index\+Container $>$ }\\using \mbox{\hyperlink{namespacechainbase_a8f797a59401f3deae45451f837bd6ebe}{multi\+\_\+index\+\_\+to\+\_\+undo\+\_\+index}} = typename \mbox{\hyperlink{structchainbase_1_1multi__index__to__undo__index__impl}{multi\+\_\+index\+\_\+to\+\_\+undo\+\_\+index\+\_\+impl}}$<$Multi\+Index\+Container$>$\+::type
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3}{db\+\_\+error\+\_\+code}} \{ \newline
+\mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3ac3fdc8e4e3df74b216721e3ae1fd4945}{ok}} = 0
+, \mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3a8251c5ee6c4498d42adb2b1a0aa286af}{dirty}}
+, \mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3a5930c2c995a1d73d95f81298c603a1f6}{incompatible}}
+, \mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3a6bfa63b7b57c5c68e76f9f172d60146d}{incorrect\+\_\+db\+\_\+version}}
+, \newline
+\mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3a38fedd2f0ecf76dcc0d1757f8d45ab41}{not\+\_\+found}}
+, \mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3a879ce3cfde213e7781b0af14bc8f5882}{bad\+\_\+size}}
+, \mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3ad93329bc939212e26c7aa54ff55b9738}{unsupported\+\_\+win32\+\_\+mode}}
+, \mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3a337ee0b30f7db83f8837cbb7fb17e4c2}{bad\+\_\+header}}
+, \newline
+\mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3ad55e98bcfae349c5f8896278142b755c}{no\+\_\+access}}
+, \mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3ac065ca1b36da471ff7499ebeed558fb6}{aborted}}
+, \mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3a4672b7d7aeb6cc7e8c973ef5e0fbc698}{no\+\_\+mlock}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename Data\+Stream , typename Oid\+Type $>$ }\\Data\+Stream \& \mbox{\hyperlink{namespacechainbase_a31de493974b1fdcfe8e90c6b0bdb3c48}{operator$<$$<$}} (Data\+Stream \&ds, const \mbox{\hyperlink{classchainbase_1_1oid}{oid}}$<$ Oid\+Type $>$ \&\mbox{\hyperlink{classchainbase_1_1oid}{oid}})
+\item 
+{\footnotesize template$<$typename Data\+Stream , typename Oid\+Type $>$ }\\Data\+Stream \& \mbox{\hyperlink{namespacechainbase_af11f5eb228d3b92726e394e54660e34a}{operator$>$$>$}} (Data\+Stream \&ds, \mbox{\hyperlink{classchainbase_1_1oid}{oid}}$<$ Oid\+Type $>$ \&\mbox{\hyperlink{classchainbase_1_1oid}{oid}})
+\item 
+{\footnotesize template$<$typename Data\+Stream $>$ }\\Data\+Stream \& \mbox{\hyperlink{namespacechainbase_abb0c97ebd98434014db91bef3afafadd}{operator$<$$<$}} (Data\+Stream \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, const \mbox{\hyperlink{classchainbase_1_1shared__cow__string}{chainbase\+::shared\+\_\+cow\+\_\+string}} \&v)
+\item 
+{\footnotesize template$<$typename Data\+Stream $>$ }\\Data\+Stream \& \mbox{\hyperlink{namespacechainbase_a42fa77a4b7fd878c28a83b4ebbb63789}{operator$>$$>$}} (Data\+Stream \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, \mbox{\hyperlink{classchainbase_1_1shared__cow__string}{chainbase\+::shared\+\_\+cow\+\_\+string}} \&v)
+\item 
+struct \mbox{\hyperlink{structchainbase_1_1environment}{chainbase\+::environment}} \mbox{\hyperlink{namespacechainbase_ae035193195fb0b2f1d8c652f21df45ff}{\+\_\+\+\_\+attribute\+\_\+\+\_\+}} ((packed))
+\item 
+std\+::ostream \& \mbox{\hyperlink{namespacechainbase_a95429aafa8b5bf2fda83a052e67d71c7}{operator$<$$<$}} (std\+::ostream \&os, const \mbox{\hyperlink{structchainbase_1_1environment}{chainbase\+::environment}} \&dt)
+\item 
+const std\+::error\+\_\+category \& \mbox{\hyperlink{namespacechainbase_ae09d7fc4436a627f73b16fde609ddb91}{chainbase\+\_\+error\+\_\+category}} ()
+\item 
+std\+::error\+\_\+code \mbox{\hyperlink{namespacechainbase_a0e543f894d75318b5f34a661e9b6b7c8}{make\+\_\+error\+\_\+code}} (\mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3}{db\+\_\+error\+\_\+code}} e) noexcept
+\item 
+std\+::istream \& \mbox{\hyperlink{namespacechainbase_a5abe58c7240700d6a137700b6b1aa22b}{operator$>$$>$}} (std\+::istream \&in, \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a7fe6684b11f441d2e971fe65166d7d5f}{pinnable\+\_\+mapped\+\_\+file\+::map\+\_\+mode}} \&runtime)
+\item 
+std\+::ostream \& \mbox{\hyperlink{namespacechainbase_a2f58c82416f5b05b25b45f825f47904f}{operator$<$$<$}} (std\+::ostream \&osm, \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a7fe6684b11f441d2e971fe65166d7d5f}{pinnable\+\_\+mapped\+\_\+file\+::map\+\_\+mode}} m)
+\item 
+{\footnotesize template$<$typename L , typename It , typename Pred , typename Disposer $>$ }\\void \mbox{\hyperlink{namespacechainbase_aec4740f07ccecf1428a4b8e9afbfddd8}{remove\+\_\+if\+\_\+after\+\_\+and\+\_\+dispose}} (L \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}, It it, It end, Pred \&\&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}, Disposer \&\&d)
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a53ef06e29c840024a683512c1acd791a}{template}}$<$ typename $>$ \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} A, typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\auto \& \mbox{\hyperlink{namespacechainbase_a2f6d9d0be71ceec29f4addc19c04cf8e}{propagate\+\_\+allocator}} (\mbox{\hyperlink{struct_a}{A}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{struct_s}{S}} $>$ }\\auto \& \mbox{\hyperlink{namespacechainbase_a19f53993eadfa12c519b5b76cc896274}{propagate\+\_\+allocator}} (boost\+::interprocess\+::allocator$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{struct_s}{S}} $>$ \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{struct_s}{S}} , std\+::size\+\_\+t N$>$ }\\auto \mbox{\hyperlink{namespacechainbase_a96c38a4337e82e2dfb3fdee13209a5d6}{propagate\+\_\+allocator}} (boost\+::interprocess\+::node\+\_\+allocator$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{struct_s}{S}}, \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}} $>$ \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{struct_s}{S}} , std\+::size\+\_\+t N$>$ }\\auto \mbox{\hyperlink{namespacechainbase_ab8bf024c26382945b93ab51037b650ab}{propagate\+\_\+allocator}} (boost\+::interprocess\+::private\+\_\+node\+\_\+allocator$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{struct_s}{S}}, \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}} $>$ \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{struct_s}{S}} $>$ }\\auto \mbox{\hyperlink{namespacechainbase_a761257075b1f3b6833f0e4a9df22cdaa}{propagate\+\_\+allocator}} (\mbox{\hyperlink{classchainbase_1_1chainbase__node__allocator}{chainbase\+::chainbase\+\_\+node\+\_\+allocator}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{struct_s}{S}} $>$ \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+constexpr size\+\_\+t \mbox{\hyperlink{namespacechainbase_a3553db3334a3279bf83b5951ab9be322}{header\+\_\+size}} = 1024
+\item 
+constexpr \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{namespacechainbase_a390fbf5c3ed14d5389ea5ee4f92eb1b6}{header\+\_\+id}} = 0x3242444f49534f45\+ULL
+\item 
+constexpr size\+\_\+t \mbox{\hyperlink{namespacechainbase_a281dadbe1ae02170ae8922387c134875}{header\+\_\+dirty\+\_\+bit\+\_\+offset}} = offsetof(\mbox{\hyperlink{structchainbase_1_1db__header}{db\+\_\+header}}, \mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3a8251c5ee6c4498d42adb2b1a0aa286af}{dirty}})
+\item 
+{\footnotesize template$<$typename Ordered\+Index $>$ }\\constexpr bool \mbox{\hyperlink{namespacechainbase_a90a397df3938592d7f8b76c0d4d3c4a6}{is\+\_\+valid\+\_\+index}} = false
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{namespacechainbase_add7d4cf66ab3f2808fe613e6b0343b89}\index{chainbase@{chainbase}!allocator@{allocator}}
+\index{allocator@{allocator}!chainbase@{chainbase}}
+\doxysubsubsection{\texorpdfstring{allocator}{allocator}}
+{\footnotesize\ttfamily \label{namespacechainbase_add7d4cf66ab3f2808fe613e6b0343b89} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+using \mbox{\hyperlink{namespacechainbase_add7d4cf66ab3f2808fe613e6b0343b89}{chainbase\+::allocator}} = bip\+::allocator$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a550aa643b3bd7335e48afd94f1089d2b}{pinnable\+\_\+mapped\+\_\+file\+::segment\+\_\+manager}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00056}{56}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+\Hypertarget{namespacechainbase_a724422843d7f02bc2b77bbb03169f530}\index{chainbase@{chainbase}!find\_tag@{find\_tag}}
+\index{find\_tag@{find\_tag}!chainbase@{chainbase}}
+\doxysubsubsection{\texorpdfstring{find\_tag}{find\_tag}}
+{\footnotesize\ttfamily \label{namespacechainbase_a724422843d7f02bc2b77bbb03169f530} 
+template$<$typename Tag , typename... Indices$>$ \\
+using \mbox{\hyperlink{namespacechainbase_a724422843d7f02bc2b77bbb03169f530}{chainbase\+::find\+\_\+tag}} = boost\+::mp11\+::mp\+\_\+find$<$boost\+::mp11\+::mp\+\_\+list$<$\mbox{\hyperlink{namespacechainbase_a53a1a10db2a565e854e5e3a1f25623ac}{index\+\_\+tag}}$<$Indices$>$...$>$, Tag$>$}
+
+
+
+Definition at line \mbox{\hyperlink{undo__index_8hpp_source_l00150}{150}} of file \mbox{\hyperlink{undo__index_8hpp_source}{undo\+\_\+index.\+hpp}}.
+
+\Hypertarget{namespacechainbase_a3ba122cfc1e47fa4ddf024212ec17431}\index{chainbase@{chainbase}!generic\_index@{generic\_index}}
+\index{generic\_index@{generic\_index}!chainbase@{chainbase}}
+\doxysubsubsection{\texorpdfstring{generic\_index}{generic\_index}}
+{\footnotesize\ttfamily \label{namespacechainbase_a3ba122cfc1e47fa4ddf024212ec17431} 
+template$<$typename Multi\+Index\+Type $>$ \\
+using \mbox{\hyperlink{namespacechainbase_a3ba122cfc1e47fa4ddf024212ec17431}{chainbase\+::generic\+\_\+index}} = \mbox{\hyperlink{namespacechainbase_a8f797a59401f3deae45451f837bd6ebe}{multi\+\_\+index\+\_\+to\+\_\+undo\+\_\+index}}$<$Multi\+Index\+Type$>$}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00136}{136}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+\Hypertarget{namespacechainbase_aeccf7abd24979f2c4c91764b42473a25}\index{chainbase@{chainbase}!hook@{hook}}
+\index{hook@{hook}!chainbase@{chainbase}}
+\doxysubsubsection{\texorpdfstring{hook}{hook}}
+{\footnotesize\ttfamily \label{namespacechainbase_aeccf7abd24979f2c4c91764b42473a25} 
+template$<$typename \mbox{\hyperlink{make__512_8cpp_a3d4e997ddc51e0c06c306fe4862826c0}{K}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+using \mbox{\hyperlink{namespacechainbase_aeccf7abd24979f2c4c91764b42473a25}{chainbase\+::hook}} = \mbox{\hyperlink{structchainbase_1_1offset__node__base}{offset\+\_\+node\+\_\+base}}$<$\mbox{\hyperlink{make__512_8cpp_a3d4e997ddc51e0c06c306fe4862826c0}{K}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{undo__index_8hpp_source_l00153}{153}} of file \mbox{\hyperlink{undo__index_8hpp_source}{undo\+\_\+index.\+hpp}}.
+
+\Hypertarget{namespacechainbase_a53a1a10db2a565e854e5e3a1f25623ac}\index{chainbase@{chainbase}!index\_tag@{index\_tag}}
+\index{index\_tag@{index\_tag}!chainbase@{chainbase}}
+\doxysubsubsection{\texorpdfstring{index\_tag}{index\_tag}}
+{\footnotesize\ttfamily \label{namespacechainbase_a53a1a10db2a565e854e5e3a1f25623ac} 
+template$<$typename Index $>$ \\
+using \mbox{\hyperlink{namespacechainbase_a53a1a10db2a565e854e5e3a1f25623ac}{chainbase\+::index\+\_\+tag}} = typename \mbox{\hyperlink{structchainbase_1_1index__tag__impl}{index\+\_\+tag\+\_\+impl}}$<$Index$>$\+::type}
+
+
+
+Definition at line \mbox{\hyperlink{undo__index_8hpp_source_l00147}{147}} of file \mbox{\hyperlink{undo__index_8hpp_source}{undo\+\_\+index.\+hpp}}.
+
+\Hypertarget{namespacechainbase_a83f750f92c09e4b3046069370df53cb3}\index{chainbase@{chainbase}!list\_base@{list\_base}}
+\index{list\_base@{list\_base}!chainbase@{chainbase}}
+\doxysubsubsection{\texorpdfstring{list\_base}{list\_base}}
+{\footnotesize\ttfamily \label{namespacechainbase_a83f750f92c09e4b3046069370df53cb3} 
+template$<$typename \mbox{\hyperlink{struct_node}{Node}} , typename Tag $>$ \\
+using \mbox{\hyperlink{namespacechainbase_a83f750f92c09e4b3046069370df53cb3}{chainbase\+::list\+\_\+base}}}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ boost::intrusive::slist<}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keyword}{typename}\ Node::value\_type,}
+\DoxyCodeLine{\ \ \ \ \ \ boost::intrusive::value\_traits<offset\_node\_value\_traits<Node,\ Tag>>>}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{undo__index_8hpp_source_l00168}{168}} of file \mbox{\hyperlink{undo__index_8hpp_source}{undo\+\_\+index.\+hpp}}.
+
+\Hypertarget{namespacechainbase_a8f797a59401f3deae45451f837bd6ebe}\index{chainbase@{chainbase}!multi\_index\_to\_undo\_index@{multi\_index\_to\_undo\_index}}
+\index{multi\_index\_to\_undo\_index@{multi\_index\_to\_undo\_index}!chainbase@{chainbase}}
+\doxysubsubsection{\texorpdfstring{multi\_index\_to\_undo\_index}{multi\_index\_to\_undo\_index}}
+{\footnotesize\ttfamily \label{namespacechainbase_a8f797a59401f3deae45451f837bd6ebe} 
+template$<$typename Multi\+Index\+Container $>$ \\
+using \mbox{\hyperlink{namespacechainbase_a8f797a59401f3deae45451f837bd6ebe}{chainbase\+::multi\+\_\+index\+\_\+to\+\_\+undo\+\_\+index}} = typename \mbox{\hyperlink{structchainbase_1_1multi__index__to__undo__index__impl}{multi\+\_\+index\+\_\+to\+\_\+undo\+\_\+index\+\_\+impl}}$<$Multi\+Index\+Container$>$\+::type}
+
+
+
+Definition at line \mbox{\hyperlink{undo__index_8hpp_source_l00929}{929}} of file \mbox{\hyperlink{undo__index_8hpp_source}{undo\+\_\+index.\+hpp}}.
+
+\Hypertarget{namespacechainbase_a5235419f9dd4d8333aa4b5a2aa8f6125}\index{chainbase@{chainbase}!node\_allocator@{node\_allocator}}
+\index{node\_allocator@{node\_allocator}!chainbase@{chainbase}}
+\doxysubsubsection{\texorpdfstring{node\_allocator}{node\_allocator}}
+{\footnotesize\ttfamily \label{namespacechainbase_a5235419f9dd4d8333aa4b5a2aa8f6125} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+using \mbox{\hyperlink{namespacechainbase_a5235419f9dd4d8333aa4b5a2aa8f6125}{chainbase\+::node\+\_\+allocator}} = \mbox{\hyperlink{classchainbase_1_1chainbase__node__allocator}{chainbase\+\_\+node\+\_\+allocator}}$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a550aa643b3bd7335e48afd94f1089d2b}{pinnable\+\_\+mapped\+\_\+file\+::segment\+\_\+manager}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00059}{59}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+\Hypertarget{namespacechainbase_af9c751cb717344c32889e0a797c50803}\index{chainbase@{chainbase}!read\_lock@{read\_lock}}
+\index{read\_lock@{read\_lock}!chainbase@{chainbase}}
+\doxysubsubsection{\texorpdfstring{read\_lock}{read\_lock}}
+{\footnotesize\ttfamily \label{namespacechainbase_af9c751cb717344c32889e0a797c50803} 
+typedef boost\+::interprocess\+::sharable\+\_\+lock$<$ \mbox{\hyperlink{namespacechainbase_aad8e368b62fa8230255e90840a42dc2a}{read\+\_\+write\+\_\+mutex}} $>$ \mbox{\hyperlink{namespacechainbase_af9c751cb717344c32889e0a797c50803}{chainbase\+::read\+\_\+lock}}}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00064}{64}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+\Hypertarget{namespacechainbase_aad8e368b62fa8230255e90840a42dc2a}\index{chainbase@{chainbase}!read\_write\_mutex@{read\_write\_mutex}}
+\index{read\_write\_mutex@{read\_write\_mutex}!chainbase@{chainbase}}
+\doxysubsubsection{\texorpdfstring{read\_write\_mutex}{read\_write\_mutex}}
+{\footnotesize\ttfamily \label{namespacechainbase_aad8e368b62fa8230255e90840a42dc2a} 
+typedef boost\+::interprocess\+::interprocess\+\_\+sharable\+\_\+mutex \mbox{\hyperlink{namespacechainbase_aad8e368b62fa8230255e90840a42dc2a}{chainbase\+::read\+\_\+write\+\_\+mutex}}}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00063}{63}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+\Hypertarget{namespacechainbase_ab393a73784cf7c18f134020f89ec4d8e}\index{chainbase@{chainbase}!rebind\_alloc\_t@{rebind\_alloc\_t}}
+\index{rebind\_alloc\_t@{rebind\_alloc\_t}!chainbase@{chainbase}}
+\doxysubsubsection{\texorpdfstring{rebind\_alloc\_t}{rebind\_alloc\_t}}
+{\footnotesize\ttfamily \label{namespacechainbase_ab393a73784cf7c18f134020f89ec4d8e} 
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} , typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+using \mbox{\hyperlink{namespacechainbase_ab393a73784cf7c18f134020f89ec4d8e}{chainbase\+::rebind\+\_\+alloc\+\_\+t}} = typename std\+::allocator\+\_\+traits$<$\mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}$>$\mbox{\hyperlink{yubihsm__pkcs11_8c_a53ef06e29c840024a683512c1acd791a}{\+::template}} rebind\+\_\+alloc$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{undo__index_8hpp_source_l00140}{140}} of file \mbox{\hyperlink{undo__index_8hpp_source}{undo\+\_\+index.\+hpp}}.
+
+\Hypertarget{namespacechainbase_a33abc5322d42584391451ecb393b69ef}\index{chainbase@{chainbase}!set\_base@{set\_base}}
+\index{set\_base@{set\_base}!chainbase@{chainbase}}
+\doxysubsubsection{\texorpdfstring{set\_base}{set\_base}}
+{\footnotesize\ttfamily \label{namespacechainbase_a33abc5322d42584391451ecb393b69ef} 
+template$<$typename \mbox{\hyperlink{struct_node}{Node}} , typename Ordered\+Index $>$ \\
+using \mbox{\hyperlink{namespacechainbase_a33abc5322d42584391451ecb393b69ef}{chainbase\+::set\+\_\+base}}}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ boost::intrusive::avltree<}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keyword}{typename}\ Node::value\_type,}
+\DoxyCodeLine{\ \ \ \ \ \ boost::intrusive::value\_traits<offset\_node\_value\_traits<Node,\ OrderedIndex>>,}
+\DoxyCodeLine{\ \ \ \ \ \ boost::intrusive::key\_of\_value<get\_key<typename\ OrderedIndex::key\_from\_value\_type,\ typename\ Node::value\_type>>,}
+\DoxyCodeLine{\ \ \ \ \ \ boost::intrusive::compare<typename\ OrderedIndex::compare\_type>>}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{undo__index_8hpp_source_l00156}{156}} of file \mbox{\hyperlink{undo__index_8hpp_source}{undo\+\_\+index.\+hpp}}.
+
+\Hypertarget{namespacechainbase_aba1e047495dcaa4e0d32ff25b8705f1f}\index{chainbase@{chainbase}!shared\_multi\_index\_container@{shared\_multi\_index\_container}}
+\index{shared\_multi\_index\_container@{shared\_multi\_index\_container}!chainbase@{chainbase}}
+\doxysubsubsection{\texorpdfstring{shared\_multi\_index\_container}{shared\_multi\_index\_container}}
+{\footnotesize\ttfamily \label{namespacechainbase_aba1e047495dcaa4e0d32ff25b8705f1f} 
+template$<$typename Object , typename... Args$>$ \\
+using \mbox{\hyperlink{namespacechainbase_aba1e047495dcaa4e0d32ff25b8705f1f}{chainbase\+::shared\+\_\+multi\+\_\+index\+\_\+container}} = boost\+::multi\+\_\+index\+\_\+container$<$Object,Args..., \mbox{\hyperlink{namespacechainbase_a5235419f9dd4d8333aa4b5a2aa8f6125}{chainbase\+::node\+\_\+allocator}}$<$Object$>$ $>$}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00558}{558}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+\Hypertarget{namespacechainbase_a895da7b5480367dc984b326d363552c8}\index{chainbase@{chainbase}!shared\_string@{shared\_string}}
+\index{shared\_string@{shared\_string}!chainbase@{chainbase}}
+\doxysubsubsection{\texorpdfstring{shared\_string}{shared\_string}}
+{\footnotesize\ttfamily \label{namespacechainbase_a895da7b5480367dc984b326d363552c8} 
+using \mbox{\hyperlink{namespacechainbase_a895da7b5480367dc984b326d363552c8}{chainbase\+::shared\+\_\+string}} = \mbox{\hyperlink{classchainbase_1_1shared__cow__string}{shared\+\_\+cow\+\_\+string}}}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00061}{61}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3}\index{chainbase@{chainbase}!db\_error\_code@{db\_error\_code}}
+\index{db\_error\_code@{db\_error\_code}!chainbase@{chainbase}}
+\doxysubsubsection{\texorpdfstring{db\_error\_code}{db\_error\_code}}
+{\footnotesize\ttfamily \label{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3} 
+enum \mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3}{chainbase\+::db\+\_\+error\+\_\+code}}}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ok@{ok}!chainbase@{chainbase}}\index{chainbase@{chainbase}!ok@{ok}}}\Hypertarget{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3ac3fdc8e4e3df74b216721e3ae1fd4945}\label{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3} 
+ok&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{dirty@{dirty}!chainbase@{chainbase}}\index{chainbase@{chainbase}!dirty@{dirty}}}\Hypertarget{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3a8251c5ee6c4498d42adb2b1a0aa286af}\label{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3} 
+dirty&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{incompatible@{incompatible}!chainbase@{chainbase}}\index{chainbase@{chainbase}!incompatible@{incompatible}}}\Hypertarget{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3a5930c2c995a1d73d95f81298c603a1f6}\label{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3} 
+incompatible&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{incorrect\_db\_version@{incorrect\_db\_version}!chainbase@{chainbase}}\index{chainbase@{chainbase}!incorrect\_db\_version@{incorrect\_db\_version}}}\Hypertarget{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3a6bfa63b7b57c5c68e76f9f172d60146d}\label{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3} 
+incorrect\+\_\+db\+\_\+version&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{not\_found@{not\_found}!chainbase@{chainbase}}\index{chainbase@{chainbase}!not\_found@{not\_found}}}\Hypertarget{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3a38fedd2f0ecf76dcc0d1757f8d45ab41}\label{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3} 
+not\+\_\+found&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{bad\_size@{bad\_size}!chainbase@{chainbase}}\index{chainbase@{chainbase}!bad\_size@{bad\_size}}}\Hypertarget{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3a879ce3cfde213e7781b0af14bc8f5882}\label{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3} 
+bad\+\_\+size&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{unsupported\_win32\_mode@{unsupported\_win32\_mode}!chainbase@{chainbase}}\index{chainbase@{chainbase}!unsupported\_win32\_mode@{unsupported\_win32\_mode}}}\Hypertarget{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3ad93329bc939212e26c7aa54ff55b9738}\label{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3} 
+unsupported\+\_\+win32\+\_\+mode&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{bad\_header@{bad\_header}!chainbase@{chainbase}}\index{chainbase@{chainbase}!bad\_header@{bad\_header}}}\Hypertarget{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3a337ee0b30f7db83f8837cbb7fb17e4c2}\label{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3} 
+bad\+\_\+header&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{no\_access@{no\_access}!chainbase@{chainbase}}\index{chainbase@{chainbase}!no\_access@{no\_access}}}\Hypertarget{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3ad55e98bcfae349c5f8896278142b755c}\label{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3} 
+no\+\_\+access&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{aborted@{aborted}!chainbase@{chainbase}}\index{chainbase@{chainbase}!aborted@{aborted}}}\Hypertarget{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3ac065ca1b36da471ff7499ebeed558fb6}\label{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3} 
+aborted&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{no\_mlock@{no\_mlock}!chainbase@{chainbase}}\index{chainbase@{chainbase}!no\_mlock@{no\_mlock}}}\Hypertarget{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3a4672b7d7aeb6cc7e8c973ef5e0fbc698}\label{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3} 
+no\+\_\+mlock&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{pinnable__mapped__file_8hpp_source_l00014}{14}} of file \mbox{\hyperlink{pinnable__mapped__file_8hpp_source}{pinnable\+\_\+mapped\+\_\+file.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00014\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00015\ \ \ \ \mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3ac3fdc8e4e3df74b216721e3ae1fd4945}{ok}}\ =\ 0,}
+\DoxyCodeLine{00016\ \ \ \ \mbox{\hyperlink{code__cache_8cpp_ad25edacba00e4d0666a9959053b7cc10}{dirty}},}
+\DoxyCodeLine{00017\ \ \ \ \mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3a5930c2c995a1d73d95f81298c603a1f6}{incompatible}},}
+\DoxyCodeLine{00018\ \ \ \ \mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3a6bfa63b7b57c5c68e76f9f172d60146d}{incorrect\_db\_version}},}
+\DoxyCodeLine{00019\ \ \ \ \mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3a38fedd2f0ecf76dcc0d1757f8d45ab41}{not\_found}},}
+\DoxyCodeLine{00020\ \ \ \ \mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3a879ce3cfde213e7781b0af14bc8f5882}{bad\_size}},}
+\DoxyCodeLine{00021\ \ \ \ \mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3ad93329bc939212e26c7aa54ff55b9738}{unsupported\_win32\_mode}},}
+\DoxyCodeLine{00022\ \ \ \ \mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3a337ee0b30f7db83f8837cbb7fb17e4c2}{bad\_header}},}
+\DoxyCodeLine{00023\ \ \ \ \mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3ad55e98bcfae349c5f8896278142b755c}{no\_access}},}
+\DoxyCodeLine{00024\ \ \ \ \mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3ac065ca1b36da471ff7499ebeed558fb6}{aborted}},}
+\DoxyCodeLine{00025\ \ \ \ \mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3a4672b7d7aeb6cc7e8c973ef5e0fbc698}{no\_mlock}}}
+\DoxyCodeLine{00026\ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacechainbase_ae035193195fb0b2f1d8c652f21df45ff}\index{chainbase@{chainbase}!\_\_attribute\_\_@{\_\_attribute\_\_}}
+\index{\_\_attribute\_\_@{\_\_attribute\_\_}!chainbase@{chainbase}}
+\doxysubsubsection{\texorpdfstring{\_\_attribute\_\_()}{\_\_attribute\_\_()}}
+{\footnotesize\ttfamily \label{namespacechainbase_ae035193195fb0b2f1d8c652f21df45ff} 
+struct \mbox{\hyperlink{structchainbase_1_1db__header}{chainbase\+::db\+\_\+header}} chainbase\+::\+\_\+\+\_\+attribute\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{(packed)}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{namespacechainbase_ae09d7fc4436a627f73b16fde609ddb91}\index{chainbase@{chainbase}!chainbase\_error\_category@{chainbase\_error\_category}}
+\index{chainbase\_error\_category@{chainbase\_error\_category}!chainbase@{chainbase}}
+\doxysubsubsection{\texorpdfstring{chainbase\_error\_category()}{chainbase\_error\_category()}}
+{\footnotesize\ttfamily \label{namespacechainbase_ae09d7fc4436a627f73b16fde609ddb91} 
+const std\+::error\+\_\+category \& chainbase\+::chainbase\+\_\+error\+\_\+category (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pinnable__mapped__file_8cpp_source_l00048}{48}} of file \mbox{\hyperlink{pinnable__mapped__file_8cpp_source}{pinnable\+\_\+mapped\+\_\+file.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00049\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classchainbase_1_1chainbase__error__category}{chainbase\_error\_category}}\ the\_category;}
+\DoxyCodeLine{00050\ \ \ \ \textcolor{keywordflow}{return}\ the\_category;}
+\DoxyCodeLine{00051\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacechainbase_ae09d7fc4436a627f73b16fde609ddb91_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacechainbase_a0e543f894d75318b5f34a661e9b6b7c8}\index{chainbase@{chainbase}!make\_error\_code@{make\_error\_code}}
+\index{make\_error\_code@{make\_error\_code}!chainbase@{chainbase}}
+\doxysubsubsection{\texorpdfstring{make\_error\_code()}{make\_error\_code()}}
+{\footnotesize\ttfamily \label{namespacechainbase_a0e543f894d75318b5f34a661e9b6b7c8} 
+std\+::error\+\_\+code chainbase\+::make\+\_\+error\+\_\+code (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3}{db\+\_\+error\+\_\+code}}}]{e}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{pinnable__mapped__file_8hpp_source_l00030}{30}} of file \mbox{\hyperlink{pinnable__mapped__file_8hpp_source}{pinnable\+\_\+mapped\+\_\+file.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00031\ \ \ \ \textcolor{keywordflow}{return}\ std::error\_code(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(e),\ \mbox{\hyperlink{classchainbase_1_1chainbase__error__category}{chainbase\_error\_category}}());}
+\DoxyCodeLine{00032\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacechainbase_a0e543f894d75318b5f34a661e9b6b7c8_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacechainbase_a0e543f894d75318b5f34a661e9b6b7c8_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacechainbase_a31de493974b1fdcfe8e90c6b0bdb3c48}\index{chainbase@{chainbase}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!chainbase@{chainbase}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{namespacechainbase_a31de493974b1fdcfe8e90c6b0bdb3c48} 
+template$<$typename Data\+Stream , typename Oid\+Type $>$ \\
+Data\+Stream \& chainbase\+::operator$<$$<$ (\begin{DoxyParamCaption}\item[{Data\+Stream \&}]{ds}{, }\item[{const \mbox{\hyperlink{classchainbase_1_1oid}{oid}}$<$ Oid\+Type $>$ \&}]{oid}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{database__utils_8hpp_source_l00216}{216}} of file \mbox{\hyperlink{database__utils_8hpp_source}{database\+\_\+utils.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00217\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(ds,\ \mbox{\hyperlink{classchainbase_1_1oid}{oid}}.\mbox{\hyperlink{classchainbase_1_1oid_a572c4ef080a7db37d93631ab0fbb123a}{\_id}});}
+\DoxyCodeLine{00218\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ds;}
+\DoxyCodeLine{00219\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=303pt]{namespacechainbase_a31de493974b1fdcfe8e90c6b0bdb3c48_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacechainbase_abb0c97ebd98434014db91bef3afafadd}\index{chainbase@{chainbase}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!chainbase@{chainbase}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{namespacechainbase_abb0c97ebd98434014db91bef3afafadd} 
+template$<$typename Data\+Stream $>$ \\
+Data\+Stream \& chainbase\+::operator$<$$<$ (\begin{DoxyParamCaption}\item[{Data\+Stream \&}]{s}{, }\item[{const \mbox{\hyperlink{classchainbase_1_1shared__cow__string}{chainbase\+::shared\+\_\+cow\+\_\+string}} \&}]{v}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{chain_2include_2sysio_2chain_2types_8hpp_source_l00392}{392}} of file \mbox{\hyperlink{chain_2include_2sysio_2chain_2types_8hpp_source}{types.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00392\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00393\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ v.size()\ <=\ \mbox{\hyperlink{utility_8hpp_a5e3c645782d12166c98f3654471efd61}{MAX\_SIZE\_OF\_BYTE\_ARRAYS}}\ );}
+\DoxyCodeLine{00394\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ \mbox{\hyperlink{structfc_1_1unsigned__int}{fc::unsigned\_int}}((\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})v.size()));}
+\DoxyCodeLine{00395\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ v.size()\ )\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.write(\ v.data(),\ v.size()\ );}
+\DoxyCodeLine{00396\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{00397\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=303pt]{namespacechainbase_abb0c97ebd98434014db91bef3afafadd_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacechainbase_a95429aafa8b5bf2fda83a052e67d71c7}\index{chainbase@{chainbase}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!chainbase@{chainbase}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{namespacechainbase_a95429aafa8b5bf2fda83a052e67d71c7} 
+std\+::ostream \& chainbase\+::operator$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{os}{, }\item[{const \mbox{\hyperlink{structchainbase_1_1environment}{chainbase\+::environment}} \&}]{dt}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pinnable__mapped__file_8cpp_source_l00377}{377}} of file \mbox{\hyperlink{pinnable__mapped__file_8cpp_source}{pinnable\+\_\+mapped\+\_\+file.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00377\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00378\ \ \ \ os\ <<\ std::right\ <<\ std::setw(17)\ <<\ \textcolor{stringliteral}{"{}Compiler:\ "{}}\ <<\ dt.\mbox{\hyperlink{structchainbase_1_1environment_a5877d3a8ae187320facd1c7935ae40fc}{compiler}}\ <<\ std::endl;}
+\DoxyCodeLine{00379\ \ \ \ os\ <<\ std::right\ <<\ std::setw(17)\ <<\ \textcolor{stringliteral}{"{}Debug:\ "{}}\ <<\ (dt.\mbox{\hyperlink{structchainbase_1_1environment_a328120bb740176a5215fb32d641800b8}{debug}}\ ?\ \textcolor{stringliteral}{"{}Yes"{}}\ :\ \textcolor{stringliteral}{"{}No"{}})\ <<\ std::endl;}
+\DoxyCodeLine{00380\ \ \ \ os\ <<\ std::right\ <<\ std::setw(17)\ <<\ \textcolor{stringliteral}{"{}OS:\ "{}}\ <<\ print\_os(dt.\mbox{\hyperlink{structchainbase_1_1environment_a29626f3d5a8c2e741807d4818800455d}{os}})\ <<\ std::endl;}
+\DoxyCodeLine{00381\ \ \ \ os\ <<\ std::right\ <<\ std::setw(17)\ <<\ \textcolor{stringliteral}{"{}Arch:\ "{}}\ <<\ print\_arch(dt.\mbox{\hyperlink{structchainbase_1_1environment_ab83a258982dca21a9bbe652773295e30}{arch}})\ <<\ std::endl;}
+\DoxyCodeLine{00382\ \ \ \ os\ <<\ std::right\ <<\ std::setw(17)\ <<\ \textcolor{stringliteral}{"{}Boost:\ "{}}\ <<\ dt.\mbox{\hyperlink{structchainbase_1_1environment_a4244eac72c418fa7d07f97cc1e3bdfd4}{boost\_version}}/100000\ <<\ \textcolor{stringliteral}{"{}."{}}}
+\DoxyCodeLine{00383\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ dt.\mbox{\hyperlink{structchainbase_1_1environment_a4244eac72c418fa7d07f97cc1e3bdfd4}{boost\_version}}/100\%1000\ <<\ \textcolor{stringliteral}{"{}."{}}}
+\DoxyCodeLine{00384\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ dt.\mbox{\hyperlink{structchainbase_1_1environment_a4244eac72c418fa7d07f97cc1e3bdfd4}{boost\_version}}\%100\ <<\ std::endl;}
+\DoxyCodeLine{00385\ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}};}
+\DoxyCodeLine{00386\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacechainbase_a2f58c82416f5b05b25b45f825f47904f}\index{chainbase@{chainbase}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!chainbase@{chainbase}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{namespacechainbase_a2f58c82416f5b05b25b45f825f47904f} 
+std\+::ostream \& chainbase\+::operator$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{osm}{, }\item[{\mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a7fe6684b11f441d2e971fe65166d7d5f}{pinnable\+\_\+mapped\+\_\+file\+::map\+\_\+mode}}}]{m}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pinnable__mapped__file_8cpp_source_l00347}{347}} of file \mbox{\hyperlink{pinnable__mapped__file_8cpp_source}{pinnable\+\_\+mapped\+\_\+file.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00347\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00348\ \ \ \ \textcolor{keywordflow}{if}(m\ ==\ pinnable\_mapped\_file::map\_mode::mapped)}
+\DoxyCodeLine{00349\ \ \ \ \ \ \ osm\ <<\ \textcolor{stringliteral}{"{}mapped"{}};}
+\DoxyCodeLine{00350\ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (m\ ==\ pinnable\_mapped\_file::map\_mode::heap)}
+\DoxyCodeLine{00351\ \ \ \ \ \ \ osm\ <<\ \textcolor{stringliteral}{"{}heap"{}};}
+\DoxyCodeLine{00352\ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (m\ ==\ pinnable\_mapped\_file::map\_mode::locked)}
+\DoxyCodeLine{00353\ \ \ \ \ \ \ osm\ <<\ \textcolor{stringliteral}{"{}locked"{}};}
+\DoxyCodeLine{00354\ }
+\DoxyCodeLine{00355\ \ \ \ \textcolor{keywordflow}{return}\ osm;}
+\DoxyCodeLine{00356\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacechainbase_af11f5eb228d3b92726e394e54660e34a}\index{chainbase@{chainbase}!operator$>$$>$@{operator$>$$>$}}
+\index{operator$>$$>$@{operator$>$$>$}!chainbase@{chainbase}}
+\doxysubsubsection{\texorpdfstring{operator$>$$>$()}{operator>>()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{namespacechainbase_af11f5eb228d3b92726e394e54660e34a} 
+template$<$typename Data\+Stream , typename Oid\+Type $>$ \\
+Data\+Stream \& chainbase\+::operator$>$$>$ (\begin{DoxyParamCaption}\item[{Data\+Stream \&}]{ds}{, }\item[{\mbox{\hyperlink{classchainbase_1_1oid}{oid}}$<$ Oid\+Type $>$ \&}]{oid}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{database__utils_8hpp_source_l00222}{222}} of file \mbox{\hyperlink{database__utils_8hpp_source}{database\+\_\+utils.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a0b442d98ceb22dd5a6ae84745e43ffab}{fc::raw::unpack}}(ds,\ \mbox{\hyperlink{classchainbase_1_1oid}{oid}}.\mbox{\hyperlink{classchainbase_1_1oid_a572c4ef080a7db37d93631ab0fbb123a}{\_id}});}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ds;}
+\DoxyCodeLine{00225\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=313pt]{namespacechainbase_af11f5eb228d3b92726e394e54660e34a_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacechainbase_a42fa77a4b7fd878c28a83b4ebbb63789}\index{chainbase@{chainbase}!operator$>$$>$@{operator$>$$>$}}
+\index{operator$>$$>$@{operator$>$$>$}!chainbase@{chainbase}}
+\doxysubsubsection{\texorpdfstring{operator$>$$>$()}{operator>>()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{namespacechainbase_a42fa77a4b7fd878c28a83b4ebbb63789} 
+template$<$typename Data\+Stream $>$ \\
+Data\+Stream \& chainbase\+::operator$>$$>$ (\begin{DoxyParamCaption}\item[{Data\+Stream \&}]{s}{, }\item[{\mbox{\hyperlink{classchainbase_1_1shared__cow__string}{chainbase\+::shared\+\_\+cow\+\_\+string}} \&}]{v}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{chain_2include_2sysio_2chain_2types_8hpp_source_l00399}{399}} of file \mbox{\hyperlink{chain_2include_2sysio_2chain_2types_8hpp_source}{types.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00399\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00400\ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1unsigned__int}{fc::unsigned\_int}}\ size;\ \mbox{\hyperlink{namespacefc_1_1raw_a0b442d98ceb22dd5a6ae84745e43ffab}{fc::raw::unpack}}(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ size\ );}
+\DoxyCodeLine{00401\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ size.\mbox{\hyperlink{structfc_1_1unsigned__int_ac54ac972d3e38a5852616aaee955ff3f}{value}}\ <=\ \mbox{\hyperlink{utility_8hpp_a5e3c645782d12166c98f3654471efd61}{MAX\_SIZE\_OF\_BYTE\_ARRAYS}}\ );}
+\DoxyCodeLine{00402\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ v.size()\ ==\ 0\ );}
+\DoxyCodeLine{00403\ \ \ \ \ \ \ v.resize\_and\_fill(size.\mbox{\hyperlink{structfc_1_1unsigned__int_ac54ac972d3e38a5852616aaee955ff3f}{value}},\ [\&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}](\textcolor{keywordtype}{char}*\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ std::size\_t\ sz)\ \{\ s.read(buf,\ sz);\ \});}
+\DoxyCodeLine{00404\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{00405\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=313pt]{namespacechainbase_a42fa77a4b7fd878c28a83b4ebbb63789_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacechainbase_a5abe58c7240700d6a137700b6b1aa22b}\index{chainbase@{chainbase}!operator$>$$>$@{operator$>$$>$}}
+\index{operator$>$$>$@{operator$>$$>$}!chainbase@{chainbase}}
+\doxysubsubsection{\texorpdfstring{operator$>$$>$()}{operator>>()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{namespacechainbase_a5abe58c7240700d6a137700b6b1aa22b} 
+std\+::istream \& chainbase\+::operator$>$$>$ (\begin{DoxyParamCaption}\item[{std\+::istream \&}]{in}{, }\item[{\mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a7fe6684b11f441d2e971fe65166d7d5f}{pinnable\+\_\+mapped\+\_\+file\+::map\+\_\+mode}} \&}]{runtime}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pinnable__mapped__file_8cpp_source_l00333}{333}} of file \mbox{\hyperlink{pinnable__mapped__file_8cpp_source}{pinnable\+\_\+mapped\+\_\+file.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00333\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00334\ \ \ \ std::string\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{00335\ \ \ \ in\ >>\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{00336\ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ ==\ \textcolor{stringliteral}{"{}mapped"{}})}
+\DoxyCodeLine{00337\ \ \ \ \ \ \ runtime\ =\ pinnable\_mapped\_file::map\_mode::mapped;}
+\DoxyCodeLine{00338\ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ ==\ \textcolor{stringliteral}{"{}heap"{}})}
+\DoxyCodeLine{00339\ \ \ \ \ \ \ runtime\ =\ pinnable\_mapped\_file::map\_mode::heap;}
+\DoxyCodeLine{00340\ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ ==\ \textcolor{stringliteral}{"{}locked"{}})}
+\DoxyCodeLine{00341\ \ \ \ \ \ \ runtime\ =\ pinnable\_mapped\_file::map\_mode::locked;}
+\DoxyCodeLine{00342\ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00343\ \ \ \ \ \ \ in.setstate(std::ios\_base::failbit);}
+\DoxyCodeLine{00344\ \ \ \ \textcolor{keywordflow}{return}\ in;}
+\DoxyCodeLine{00345\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacechainbase_a2f6d9d0be71ceec29f4addc19c04cf8e}\index{chainbase@{chainbase}!propagate\_allocator@{propagate\_allocator}}
+\index{propagate\_allocator@{propagate\_allocator}!chainbase@{chainbase}}
+\doxysubsubsection{\texorpdfstring{propagate\_allocator()}{propagate\_allocator()}\hspace{0.1cm}{\footnotesize\ttfamily [1/5]}}
+{\footnotesize\ttfamily \label{namespacechainbase_a2f6d9d0be71ceec29f4addc19c04cf8e} 
+template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a53ef06e29c840024a683512c1acd791a}{template}}$<$ typename $>$ \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} A, typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+auto \& chainbase\+::propagate\+\_\+allocator (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_a}{A}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&}]{a}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{undo__index_8hpp_source_l00222}{222}} of file \mbox{\hyperlink{undo__index_8hpp_source}{undo\+\_\+index.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00222\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}};\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{namespacechainbase_a2f6d9d0be71ceec29f4addc19c04cf8e_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacechainbase_a19f53993eadfa12c519b5b76cc896274}\index{chainbase@{chainbase}!propagate\_allocator@{propagate\_allocator}}
+\index{propagate\_allocator@{propagate\_allocator}!chainbase@{chainbase}}
+\doxysubsubsection{\texorpdfstring{propagate\_allocator()}{propagate\_allocator()}\hspace{0.1cm}{\footnotesize\ttfamily [2/5]}}
+{\footnotesize\ttfamily \label{namespacechainbase_a19f53993eadfa12c519b5b76cc896274} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{struct_s}{S}} $>$ \\
+auto \& chainbase\+::propagate\+\_\+allocator (\begin{DoxyParamCaption}\item[{boost\+::interprocess\+::allocator$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{struct_s}{S}} $>$ \&}]{a}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{undo__index_8hpp_source_l00224}{224}} of file \mbox{\hyperlink{undo__index_8hpp_source}{undo\+\_\+index.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00224\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacechainbase_a96c38a4337e82e2dfb3fdee13209a5d6}\index{chainbase@{chainbase}!propagate\_allocator@{propagate\_allocator}}
+\index{propagate\_allocator@{propagate\_allocator}!chainbase@{chainbase}}
+\doxysubsubsection{\texorpdfstring{propagate\_allocator()}{propagate\_allocator()}\hspace{0.1cm}{\footnotesize\ttfamily [3/5]}}
+{\footnotesize\ttfamily \label{namespacechainbase_a96c38a4337e82e2dfb3fdee13209a5d6} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{struct_s}{S}} , std\+::size\+\_\+t N$>$ \\
+auto chainbase\+::propagate\+\_\+allocator (\begin{DoxyParamCaption}\item[{boost\+::interprocess\+::node\+\_\+allocator$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{struct_s}{S}}, \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}} $>$ \&}]{a}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{undo__index_8hpp_source_l00226}{226}} of file \mbox{\hyperlink{undo__index_8hpp_source}{undo\+\_\+index.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00226\ \{\ \textcolor{keywordflow}{return}\ boost::interprocess::allocator<T,\ S>\{\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.get\_segment\_manager()\};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacechainbase_ab8bf024c26382945b93ab51037b650ab}\index{chainbase@{chainbase}!propagate\_allocator@{propagate\_allocator}}
+\index{propagate\_allocator@{propagate\_allocator}!chainbase@{chainbase}}
+\doxysubsubsection{\texorpdfstring{propagate\_allocator()}{propagate\_allocator()}\hspace{0.1cm}{\footnotesize\ttfamily [4/5]}}
+{\footnotesize\ttfamily \label{namespacechainbase_ab8bf024c26382945b93ab51037b650ab} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{struct_s}{S}} , std\+::size\+\_\+t N$>$ \\
+auto chainbase\+::propagate\+\_\+allocator (\begin{DoxyParamCaption}\item[{boost\+::interprocess\+::private\+\_\+node\+\_\+allocator$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{struct_s}{S}}, \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}} $>$ \&}]{a}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{undo__index_8hpp_source_l00228}{228}} of file \mbox{\hyperlink{undo__index_8hpp_source}{undo\+\_\+index.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00228\ \{\ \textcolor{keywordflow}{return}\ boost::interprocess::allocator<T,\ S>\{\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.get\_segment\_manager()\};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacechainbase_a761257075b1f3b6833f0e4a9df22cdaa}\index{chainbase@{chainbase}!propagate\_allocator@{propagate\_allocator}}
+\index{propagate\_allocator@{propagate\_allocator}!chainbase@{chainbase}}
+\doxysubsubsection{\texorpdfstring{propagate\_allocator()}{propagate\_allocator()}\hspace{0.1cm}{\footnotesize\ttfamily [5/5]}}
+{\footnotesize\ttfamily \label{namespacechainbase_a761257075b1f3b6833f0e4a9df22cdaa} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{struct_s}{S}} $>$ \\
+auto chainbase\+::propagate\+\_\+allocator (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classchainbase_1_1chainbase__node__allocator}{chainbase\+::chainbase\+\_\+node\+\_\+allocator}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{struct_s}{S}} $>$ \&}]{a}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{undo__index_8hpp_source_l00230}{230}} of file \mbox{\hyperlink{undo__index_8hpp_source}{undo\+\_\+index.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00230\ \{\ \textcolor{keywordflow}{return}\ boost::interprocess::allocator<T,\ S>\{\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.get\_segment\_manager()\};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacechainbase_aec4740f07ccecf1428a4b8e9afbfddd8}\index{chainbase@{chainbase}!remove\_if\_after\_and\_dispose@{remove\_if\_after\_and\_dispose}}
+\index{remove\_if\_after\_and\_dispose@{remove\_if\_after\_and\_dispose}!chainbase@{chainbase}}
+\doxysubsubsection{\texorpdfstring{remove\_if\_after\_and\_dispose()}{remove\_if\_after\_and\_dispose()}}
+{\footnotesize\ttfamily \label{namespacechainbase_aec4740f07ccecf1428a4b8e9afbfddd8} 
+template$<$typename L , typename It , typename Pred , typename Disposer $>$ \\
+void chainbase\+::remove\+\_\+if\+\_\+after\+\_\+and\+\_\+dispose (\begin{DoxyParamCaption}\item[{L \&}]{l}{, }\item[{It}]{it}{, }\item[{It}]{end}{, }\item[{Pred \&\&}]{p}{, }\item[{Disposer \&\&}]{d}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{undo__index_8hpp_source_l00173}{173}} of file \mbox{\hyperlink{undo__index_8hpp_source}{undo\+\_\+index.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(;;)\ \{}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \ It\ next\ =\ it;}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \ ++next;}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(next\ ==\ end)\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}(*next))\ \{\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}.erase\_after\_and\_dispose(it,\ d);\ \}}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{\ it\ =\ next;\ \}}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00181\ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{namespacechainbase_a281dadbe1ae02170ae8922387c134875}\index{chainbase@{chainbase}!header\_dirty\_bit\_offset@{header\_dirty\_bit\_offset}}
+\index{header\_dirty\_bit\_offset@{header\_dirty\_bit\_offset}!chainbase@{chainbase}}
+\doxysubsubsection{\texorpdfstring{header\_dirty\_bit\_offset}{header\_dirty\_bit\_offset}}
+{\footnotesize\ttfamily \label{namespacechainbase_a281dadbe1ae02170ae8922387c134875} 
+size\+\_\+t chainbase\+::header\+\_\+dirty\+\_\+bit\+\_\+offset = offsetof(\mbox{\hyperlink{structchainbase_1_1db__header}{db\+\_\+header}}, \mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3a8251c5ee6c4498d42adb2b1a0aa286af}{dirty}})\hspace{0.3cm}{\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{environment_8hpp_source_l00073}{73}} of file \mbox{\hyperlink{environment_8hpp_source}{environment.\+hpp}}.
+
+\Hypertarget{namespacechainbase_a390fbf5c3ed14d5389ea5ee4f92eb1b6}\index{chainbase@{chainbase}!header\_id@{header\_id}}
+\index{header\_id@{header\_id}!chainbase@{chainbase}}
+\doxysubsubsection{\texorpdfstring{header\_id}{header\_id}}
+{\footnotesize\ttfamily \label{namespacechainbase_a390fbf5c3ed14d5389ea5ee4f92eb1b6} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} chainbase\+::header\+\_\+id = 0x3242444f49534f45\+ULL\hspace{0.3cm}{\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{environment_8hpp_source_l00008}{8}} of file \mbox{\hyperlink{environment_8hpp_source}{environment.\+hpp}}.
+
+\Hypertarget{namespacechainbase_a3553db3334a3279bf83b5951ab9be322}\index{chainbase@{chainbase}!header\_size@{header\_size}}
+\index{header\_size@{header\_size}!chainbase@{chainbase}}
+\doxysubsubsection{\texorpdfstring{header\_size}{header\_size}}
+{\footnotesize\ttfamily \label{namespacechainbase_a3553db3334a3279bf83b5951ab9be322} 
+size\+\_\+t chainbase\+::header\+\_\+size = 1024\hspace{0.3cm}{\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{environment_8hpp_source_l00007}{7}} of file \mbox{\hyperlink{environment_8hpp_source}{environment.\+hpp}}.
+
+\Hypertarget{namespacechainbase_a90a397df3938592d7f8b76c0d4d3c4a6}\index{chainbase@{chainbase}!is\_valid\_index@{is\_valid\_index}}
+\index{is\_valid\_index@{is\_valid\_index}!chainbase@{chainbase}}
+\doxysubsubsection{\texorpdfstring{is\_valid\_index}{is\_valid\_index}}
+{\footnotesize\ttfamily \label{namespacechainbase_a90a397df3938592d7f8b76c0d4d3c4a6} 
+template$<$typename Ordered\+Index $>$ \\
+bool chainbase\+::is\+\_\+valid\+\_\+index$<$ boost\+::multi\+\_\+index\+::ordered\+\_\+unique$<$ T... $>$ $>$ = false\hspace{0.3cm}{\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{undo__index_8hpp_source_l00163}{163}} of file \mbox{\hyperlink{undo__index_8hpp_source}{undo\+\_\+index.\+hpp}}.
+

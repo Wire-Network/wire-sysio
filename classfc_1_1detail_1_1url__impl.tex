@@ -1,0 +1,207 @@
+\doxysection{fc\+::detail\+::url\+\_\+impl Class Reference}
+\hypertarget{classfc_1_1detail_1_1url__impl}{}\label{classfc_1_1detail_1_1url__impl}\index{fc::detail::url\_impl@{fc::detail::url\_impl}}
+
+
+Collaboration diagram for fc\+::detail\+::url\+\_\+impl\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=173pt]{classfc_1_1detail_1_1url__impl__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{classfc_1_1detail_1_1url__impl_a0ed4bcf63521e25aaa66f34fb527a28f}{parse}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{classfc_1_1detail_1_1url__impl_a2a9017b7b0ff4e16ce586d66bf0da10f}{\+\_\+proto}}
+\item 
+\mbox{\hyperlink{namespacefc_a219cf01fcfa97b5eac3acb755e8177e0}{ostring}} \mbox{\hyperlink{classfc_1_1detail_1_1url__impl_a7bb9afe8a57aee7f05bc4c99bf92df6d}{\+\_\+host}}
+\item 
+\mbox{\hyperlink{namespacefc_a219cf01fcfa97b5eac3acb755e8177e0}{ostring}} \mbox{\hyperlink{classfc_1_1detail_1_1url__impl_aa2d5d415d73e71ce6043052eb9ec466a}{\+\_\+user}}
+\item 
+\mbox{\hyperlink{namespacefc_a219cf01fcfa97b5eac3acb755e8177e0}{ostring}} \mbox{\hyperlink{classfc_1_1detail_1_1url__impl_a3e6148093136ca32bb025d77b4787eb4}{\+\_\+pass}}
+\item 
+\mbox{\hyperlink{namespacefc_a5ae6411384740f7c33fc8ef2fefca580}{opath}} \mbox{\hyperlink{classfc_1_1detail_1_1url__impl_acde0bf9eeff2a6a485cc4de69d19fa64}{\+\_\+path}}
+\item 
+\mbox{\hyperlink{namespacefc_a219cf01fcfa97b5eac3acb755e8177e0}{ostring}} \mbox{\hyperlink{classfc_1_1detail_1_1url__impl_a311be70208a08bb1a4516a6645df6b53}{\+\_\+query}}
+\item 
+\mbox{\hyperlink{namespacefc_a97da71aef0dc7bf1196351036e688886}{ovariant\+\_\+object}} \mbox{\hyperlink{classfc_1_1detail_1_1url__impl_a9f89420dc16583539217535fb9ac2fc8}{\+\_\+args}}
+\item 
+std\+::optional$<$ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} $>$ \mbox{\hyperlink{classfc_1_1detail_1_1url__impl_a43283fc80789638e3eec4b231881fbb0}{\+\_\+port}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{url_8cpp_source_l00012}{12}} of file \mbox{\hyperlink{url_8cpp_source}{url.\+cpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1detail_1_1url__impl_a0ed4bcf63521e25aaa66f34fb527a28f}\index{fc::detail::url\_impl@{fc::detail::url\_impl}!parse@{parse}}
+\index{parse@{parse}!fc::detail::url\_impl@{fc::detail::url\_impl}}
+\doxysubsubsection{\texorpdfstring{parse()}{parse()}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1url__impl_a0ed4bcf63521e25aaa66f34fb527a28f} 
+void fc\+::detail\+::url\+\_\+impl\+::parse (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc\+::string}} \&}]{s}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{url_8cpp_source_l00015}{15}} of file \mbox{\hyperlink{url_8cpp_source}{url.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00017\ \ \ \ \ \ \ \ \ \ \ \ std::stringstream\ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ \ \ \ std::string\ skip,\_lpath,\_largs,luser,lpass;}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ \ \ \ std::getline(\ ss,\ \mbox{\hyperlink{classfc_1_1detail_1_1url__impl_a2a9017b7b0ff4e16ce586d66bf0da10f}{\_proto}},\ \textcolor{charliteral}{':'}\ );}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \ \ \ std::getline(\ ss,\ skip,\ \textcolor{charliteral}{'/'}\ );}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \ \ \ std::getline(\ ss,\ skip,\ \textcolor{charliteral}{'/'}\ );}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.find(\textcolor{charliteral}{'@'})\ !=\ \textcolor{keywordtype}{size\_t}(fc::string::npos)\ )\ \{}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc::string}}\ user\_pass;}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \ \ \ \ \ std::getline(\ ss,\ user\_pass,\ \textcolor{charliteral}{'@'}\ );}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \ \ \ \ std::stringstream\ upss(user\_pass);}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ user\_pass.find(\ \textcolor{charliteral}{':'}\ )\ !=\ \textcolor{keywordtype}{size\_t}(fc::string::npos)\ )\ \{}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::getline(\ upss,\ luser,\ \textcolor{charliteral}{':'}\ );}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::getline(\ upss,\ lpass,\ \textcolor{charliteral}{':'}\ );}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1url__impl_aa2d5d415d73e71ce6043052eb9ec466a}{\_user}}\ =\ fc::move(luser);}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1url__impl_a3e6148093136ca32bb025d77b4787eb4}{\_pass}}\ =\ fc::move(lpass);}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1url__impl_aa2d5d415d73e71ce6043052eb9ec466a}{\_user}}\ =\ fc::move(user\_pass);}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{fc::string}}\ host\_port;}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ std::getline(\ ss,\ host\_port,\ \textcolor{charliteral}{'/'}\ );}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ pos\ =\ host\_port.find(\ \textcolor{charliteral}{':'}\ );}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ pos\ !=\ fc::string::npos\ )\ \{}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1url__impl_a43283fc80789638e3eec4b231881fbb0}{\_port}}\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\textcolor{keyword}{>}(\mbox{\hyperlink{namespacefc_ab20c9acf886f89fabeb8a0d9ebc9abb8}{to\_uint64}}(\ host\_port.substr(\ pos+1\ )\ ));}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\ ...\ )\ \{}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}Unable\ to\ parse\ port\ field\ in\ url"{}},(\ \textcolor{stringliteral}{"{}url"{}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ )\ );}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1url__impl_a7bb9afe8a57aee7f05bc4c99bf92df6d}{\_host}}\ =\ host\_port.substr(0,pos);}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1url__impl_a7bb9afe8a57aee7f05bc4c99bf92df6d}{\_host}}\ =\ fc::move(host\_port);}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \ \ \ std::getline(\ ss,\ \_lpath,\ \textcolor{charliteral}{'?'}\ );}
+\DoxyCodeLine{00050\ \textcolor{preprocessor}{\#ifdef\ WIN32}}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ On\ windows,\ a\ URL\ like\ file:///c:/autoexec.bat\ would\ result\ in\ \_lpath\ =\ c:/autoexec.bat}}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ which\ is\ what\ we\ really\ want\ (it's\ already\ an\ absolute\ path)}}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!stricmp(\mbox{\hyperlink{classfc_1_1detail_1_1url__impl_a2a9017b7b0ff4e16ce586d66bf0da10f}{\_proto}}.c\_str(),\ \textcolor{stringliteral}{"{}file"{}}))}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1url__impl_acde0bf9eeff2a6a485cc4de69d19fa64}{\_path}}\ =\ \_lpath;}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1url__impl_acde0bf9eeff2a6a485cc4de69d19fa64}{\_path}}\ =\ \mbox{\hyperlink{classfc_1_1path}{fc::path}}(\ \textcolor{stringliteral}{"{}/"{}}\ )\ /\ \_lpath;\ \textcolor{comment}{//\ let\ other\ schemes\ behave\ like\ unix}}
+\DoxyCodeLine{00057\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ On\ unix,\ a\ URL\ like\ file:///etc/rc.local\ would\ result\ in\ \_lpath\ =\ etc/rc.local}}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ but\ we\ really\ want\ to\ make\ it\ the\ absolute\ path\ /etc/rc.local}}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1url__impl_acde0bf9eeff2a6a485cc4de69d19fa64}{\_path}}\ =\ \mbox{\hyperlink{classfc_1_1path}{fc::path}}(\ \textcolor{stringliteral}{"{}/"{}}\ )\ /\ \_lpath;}
+\DoxyCodeLine{00061\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \ \ std::getline(\ ss,\ \_largs\ );}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{classfc_1_1detail_1_1url__impl_a9f89420dc16583539217535fb9ac2fc8}{\_args}}\ \&\&\ \mbox{\hyperlink{classfc_1_1detail_1_1url__impl_a9f89420dc16583539217535fb9ac2fc8}{\_args}}-\/>size()\ )\ }
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ TODO:\ args\ =\ fc::move(\_args);}}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1url__impl_a311be70208a08bb1a4516a6645df6b53}{\_query}}\ =\ fc::move(\_largs);}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=279pt]{classfc_1_1detail_1_1url__impl_a0ed4bcf63521e25aaa66f34fb527a28f_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classfc_1_1detail_1_1url__impl_a9f89420dc16583539217535fb9ac2fc8}\index{fc::detail::url\_impl@{fc::detail::url\_impl}!\_args@{\_args}}
+\index{\_args@{\_args}!fc::detail::url\_impl@{fc::detail::url\_impl}}
+\doxysubsubsection{\texorpdfstring{\_args}{\_args}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1url__impl_a9f89420dc16583539217535fb9ac2fc8} 
+\mbox{\hyperlink{namespacefc_a97da71aef0dc7bf1196351036e688886}{ovariant\+\_\+object}} fc\+::detail\+::url\+\_\+impl\+::\+\_\+args}
+
+
+
+Definition at line \mbox{\hyperlink{url_8cpp_source_l00076}{76}} of file \mbox{\hyperlink{url_8cpp_source}{url.\+cpp}}.
+
+\Hypertarget{classfc_1_1detail_1_1url__impl_a7bb9afe8a57aee7f05bc4c99bf92df6d}\index{fc::detail::url\_impl@{fc::detail::url\_impl}!\_host@{\_host}}
+\index{\_host@{\_host}!fc::detail::url\_impl@{fc::detail::url\_impl}}
+\doxysubsubsection{\texorpdfstring{\_host}{\_host}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1url__impl_a7bb9afe8a57aee7f05bc4c99bf92df6d} 
+\mbox{\hyperlink{namespacefc_a219cf01fcfa97b5eac3acb755e8177e0}{ostring}} fc\+::detail\+::url\+\_\+impl\+::\+\_\+host}
+
+
+
+Definition at line \mbox{\hyperlink{url_8cpp_source_l00071}{71}} of file \mbox{\hyperlink{url_8cpp_source}{url.\+cpp}}.
+
+\Hypertarget{classfc_1_1detail_1_1url__impl_a3e6148093136ca32bb025d77b4787eb4}\index{fc::detail::url\_impl@{fc::detail::url\_impl}!\_pass@{\_pass}}
+\index{\_pass@{\_pass}!fc::detail::url\_impl@{fc::detail::url\_impl}}
+\doxysubsubsection{\texorpdfstring{\_pass}{\_pass}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1url__impl_a3e6148093136ca32bb025d77b4787eb4} 
+\mbox{\hyperlink{namespacefc_a219cf01fcfa97b5eac3acb755e8177e0}{ostring}} fc\+::detail\+::url\+\_\+impl\+::\+\_\+pass}
+
+
+
+Definition at line \mbox{\hyperlink{url_8cpp_source_l00073}{73}} of file \mbox{\hyperlink{url_8cpp_source}{url.\+cpp}}.
+
+\Hypertarget{classfc_1_1detail_1_1url__impl_acde0bf9eeff2a6a485cc4de69d19fa64}\index{fc::detail::url\_impl@{fc::detail::url\_impl}!\_path@{\_path}}
+\index{\_path@{\_path}!fc::detail::url\_impl@{fc::detail::url\_impl}}
+\doxysubsubsection{\texorpdfstring{\_path}{\_path}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1url__impl_acde0bf9eeff2a6a485cc4de69d19fa64} 
+\mbox{\hyperlink{namespacefc_a5ae6411384740f7c33fc8ef2fefca580}{opath}} fc\+::detail\+::url\+\_\+impl\+::\+\_\+path}
+
+
+
+Definition at line \mbox{\hyperlink{url_8cpp_source_l00074}{74}} of file \mbox{\hyperlink{url_8cpp_source}{url.\+cpp}}.
+
+\Hypertarget{classfc_1_1detail_1_1url__impl_a43283fc80789638e3eec4b231881fbb0}\index{fc::detail::url\_impl@{fc::detail::url\_impl}!\_port@{\_port}}
+\index{\_port@{\_port}!fc::detail::url\_impl@{fc::detail::url\_impl}}
+\doxysubsubsection{\texorpdfstring{\_port}{\_port}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1url__impl_a43283fc80789638e3eec4b231881fbb0} 
+std\+::optional$<$\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}}$>$ fc\+::detail\+::url\+\_\+impl\+::\+\_\+port}
+
+
+
+Definition at line \mbox{\hyperlink{url_8cpp_source_l00077}{77}} of file \mbox{\hyperlink{url_8cpp_source}{url.\+cpp}}.
+
+\Hypertarget{classfc_1_1detail_1_1url__impl_a2a9017b7b0ff4e16ce586d66bf0da10f}\index{fc::detail::url\_impl@{fc::detail::url\_impl}!\_proto@{\_proto}}
+\index{\_proto@{\_proto}!fc::detail::url\_impl@{fc::detail::url\_impl}}
+\doxysubsubsection{\texorpdfstring{\_proto}{\_proto}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1url__impl_a2a9017b7b0ff4e16ce586d66bf0da10f} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} fc\+::detail\+::url\+\_\+impl\+::\+\_\+proto}
+
+
+
+Definition at line \mbox{\hyperlink{url_8cpp_source_l00070}{70}} of file \mbox{\hyperlink{url_8cpp_source}{url.\+cpp}}.
+
+\Hypertarget{classfc_1_1detail_1_1url__impl_a311be70208a08bb1a4516a6645df6b53}\index{fc::detail::url\_impl@{fc::detail::url\_impl}!\_query@{\_query}}
+\index{\_query@{\_query}!fc::detail::url\_impl@{fc::detail::url\_impl}}
+\doxysubsubsection{\texorpdfstring{\_query}{\_query}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1url__impl_a311be70208a08bb1a4516a6645df6b53} 
+\mbox{\hyperlink{namespacefc_a219cf01fcfa97b5eac3acb755e8177e0}{ostring}} fc\+::detail\+::url\+\_\+impl\+::\+\_\+query}
+
+
+
+Definition at line \mbox{\hyperlink{url_8cpp_source_l00075}{75}} of file \mbox{\hyperlink{url_8cpp_source}{url.\+cpp}}.
+
+\Hypertarget{classfc_1_1detail_1_1url__impl_aa2d5d415d73e71ce6043052eb9ec466a}\index{fc::detail::url\_impl@{fc::detail::url\_impl}!\_user@{\_user}}
+\index{\_user@{\_user}!fc::detail::url\_impl@{fc::detail::url\_impl}}
+\doxysubsubsection{\texorpdfstring{\_user}{\_user}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1url__impl_aa2d5d415d73e71ce6043052eb9ec466a} 
+\mbox{\hyperlink{namespacefc_a219cf01fcfa97b5eac3acb755e8177e0}{ostring}} fc\+::detail\+::url\+\_\+impl\+::\+\_\+user}
+
+
+
+Definition at line \mbox{\hyperlink{url_8cpp_source_l00072}{72}} of file \mbox{\hyperlink{url_8cpp_source}{url.\+cpp}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/src/network/\mbox{\hyperlink{url_8cpp}{url.\+cpp}}\end{DoxyCompactItemize}

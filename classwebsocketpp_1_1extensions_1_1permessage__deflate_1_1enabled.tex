@@ -1,0 +1,622 @@
+\doxysection{websocketpp\+::extensions\+::permessage\+\_\+deflate\+::enabled\texorpdfstring{$<$}{<} config \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled}{}\label{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled}\index{websocketpp::extensions::permessage\_deflate::enabled$<$ config $>$@{websocketpp::extensions::permessage\_deflate::enabled$<$ config $>$}}
+
+
+{\ttfamily \#include $<$enabled.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled_a3f0008a567db57dd73f3233ebe54086f}{enabled}} ()
+\item 
+\mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled_aa0c3a9af501b48f3cf946a84aa8a88bb}{\texorpdfstring{$\sim$}{\string~}enabled}} ()
+\item 
+lib\+::error\+\_\+code \mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled_a0d842cb0cd2add8016e739dfcd675ba0}{init}} (bool is\+\_\+server)
+\begin{DoxyCompactList}\small\item\em Initialize zlib state. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled_a76a196b1428865e739fe99e951f03e68}{is\+\_\+implemented}} () const
+\begin{DoxyCompactList}\small\item\em \doxylink{class_test}{Test} if this object implements the permessage-\/deflate specification. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled_a5190a82b1571a94704cef6959ed78ce2}{is\+\_\+enabled}} () const
+\begin{DoxyCompactList}\small\item\em \doxylink{class_test}{Test} if the extension was negotiated for this connection. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled_a9275c22cfd6782ef72a722168d663d8b}{enable\+\_\+server\+\_\+no\+\_\+context\+\_\+takeover}} ()
+\begin{DoxyCompactList}\small\item\em \doxylink{struct_reset}{Reset} server\textquotesingle{}s outgoing LZ77 sliding window for each new message. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled_a21e8e0200cab9dd276842ce9ecbd6639}{enable\+\_\+client\+\_\+no\+\_\+context\+\_\+takeover}} ()
+\begin{DoxyCompactList}\small\item\em \doxylink{struct_reset}{Reset} client\textquotesingle{}s outgoing LZ77 sliding window for each new message. \end{DoxyCompactList}\item 
+lib\+::error\+\_\+code \mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled_ac2f1bd776c26b4d54afaceded1841394}{set\+\_\+server\+\_\+max\+\_\+window\+\_\+bits}} (\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} bits, \mbox{\hyperlink{namespacewebsocketpp_1_1extensions_1_1permessage__deflate_1_1mode_ae06aef93260cb0b5f5bd729a82564120}{mode\+::value}} mode)
+\begin{DoxyCompactList}\small\item\em Limit server LZ77 sliding window size. \end{DoxyCompactList}\item 
+lib\+::error\+\_\+code \mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled_a5bfcf29752865c0e9c8e8092ee21b5af}{set\+\_\+client\+\_\+max\+\_\+window\+\_\+bits}} (\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} bits, \mbox{\hyperlink{namespacewebsocketpp_1_1extensions_1_1permessage__deflate_1_1mode_ae06aef93260cb0b5f5bd729a82564120}{mode\+::value}} mode)
+\begin{DoxyCompactList}\small\item\em Limit client LZ77 sliding window size. \end{DoxyCompactList}\item 
+std\+::string \mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled_adc342a368792f5beee8dddbbc5981846}{generate\+\_\+offer}} () const
+\begin{DoxyCompactList}\small\item\em Generate extension offer. \end{DoxyCompactList}\item 
+lib\+::error\+\_\+code \mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled_acf45724e34c174a0b8a5166192f659de}{validate\+\_\+offer}} (http\+::attribute\+\_\+list const \&)
+\begin{DoxyCompactList}\small\item\em Validate extension response. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{namespacewebsocketpp_abecf95d53c9387716b157daae84441f3}{err\+\_\+str\+\_\+pair}} \mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled_aa05eda4f6a0231c13708445480181ff4}{negotiate}} (http\+::attribute\+\_\+list const \&offer)
+\begin{DoxyCompactList}\small\item\em Negotiate extension. \end{DoxyCompactList}\item 
+lib\+::error\+\_\+code \mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled_a3002ea83fbc0066f9ecf23b4be082365}{compress}} (std\+::string const \&in, std\+::string \&out)
+\begin{DoxyCompactList}\small\item\em Compress bytes. \end{DoxyCompactList}\item 
+lib\+::error\+\_\+code \mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled_a55efd7772443eaf07435042a146cc5f7}{decompress}} (\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} const \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}, size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}, std\+::string \&out)
+\begin{DoxyCompactList}\small\item\em Decompress bytes. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{classconfig}{config}}$>$\newline
+class websocketpp\+::extensions\+::permessage\+\_\+deflate\+::enabled$<$ config $>$}
+
+
+Definition at line \mbox{\hyperlink{enabled_8hpp_source_l00205}{205}} of file \mbox{\hyperlink{enabled_8hpp_source}{enabled.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled_a3f0008a567db57dd73f3233ebe54086f}\index{websocketpp::extensions::permessage\_deflate::enabled$<$ config $>$@{websocketpp::extensions::permessage\_deflate::enabled$<$ config $>$}!enabled@{enabled}}
+\index{enabled@{enabled}!websocketpp::extensions::permessage\_deflate::enabled$<$ config $>$@{websocketpp::extensions::permessage\_deflate::enabled$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{enabled()}{enabled()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled_a3f0008a567db57dd73f3233ebe54086f} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+\mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled}{websocketpp\+::extensions\+::permessage\+\_\+deflate\+::enabled}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::enabled (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{enabled_8hpp_source_l00207}{207}} of file \mbox{\hyperlink{enabled_8hpp_source}{enabled.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ :\ m\_enabled(\textcolor{keyword}{false})}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ ,\ m\_server\_no\_context\_takeover(\textcolor{keyword}{false})}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ ,\ m\_client\_no\_context\_takeover(\textcolor{keyword}{false})}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ ,\ m\_server\_max\_window\_bits(15)}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ ,\ m\_client\_max\_window\_bits(15)}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ ,\ m\_server\_max\_window\_bits\_mode(\mbox{\hyperlink{namespacewebsocketpp_1_1extensions_1_1permessage__deflate_1_1mode_ae06aef93260cb0b5f5bd729a82564120ac001b9dafe12f8f4f812588d9c41e9da}{mode::accept}})}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ ,\ m\_client\_max\_window\_bits\_mode(\mbox{\hyperlink{namespacewebsocketpp_1_1extensions_1_1permessage__deflate_1_1mode_ae06aef93260cb0b5f5bd729a82564120ac001b9dafe12f8f4f812588d9c41e9da}{mode::accept}})}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ ,\ m\_initialized(\textcolor{keyword}{false})}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ ,\ m\_compress\_buffer\_size(16384)}
+\DoxyCodeLine{00217\ \ \ \ \ \{}
+\DoxyCodeLine{00218\ \ \ \ \ \ \ \ \ m\_dstate.zalloc\ =\ Z\_NULL;}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \ \ m\_dstate.zfree\ =\ Z\_NULL;}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \ \ m\_dstate.opaque\ =\ Z\_NULL;}
+\DoxyCodeLine{00221\ }
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \ \ m\_istate.zalloc\ =\ Z\_NULL;}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \ \ m\_istate.zfree\ =\ Z\_NULL;}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \ \ m\_istate.opaque\ =\ Z\_NULL;}
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \ \ m\_istate.avail\_in\ =\ 0;}
+\DoxyCodeLine{00226\ \ \ \ \ \ \ \ \ m\_istate.next\_in\ =\ Z\_NULL;}
+\DoxyCodeLine{00227\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled_aa0c3a9af501b48f3cf946a84aa8a88bb}\index{websocketpp::extensions::permessage\_deflate::enabled$<$ config $>$@{websocketpp::extensions::permessage\_deflate::enabled$<$ config $>$}!````~enabled@{\texorpdfstring{$\sim$}{\string~}enabled}}
+\index{````~enabled@{\texorpdfstring{$\sim$}{\string~}enabled}!websocketpp::extensions::permessage\_deflate::enabled$<$ config $>$@{websocketpp::extensions::permessage\_deflate::enabled$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}enabled()}{\string~enabled()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled_aa0c3a9af501b48f3cf946a84aa8a88bb} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+\mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled}{websocketpp\+::extensions\+::permessage\+\_\+deflate\+::enabled}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::\texorpdfstring{$\sim$}{\string~}\mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled}{enabled}} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{enabled_8hpp_source_l00229}{229}} of file \mbox{\hyperlink{enabled_8hpp_source}{enabled.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00229\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00230\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!m\_initialized)\ \{}
+\DoxyCodeLine{00231\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00232\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00233\ }
+\DoxyCodeLine{00234\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ deflateEnd(\&m\_dstate);}
+\DoxyCodeLine{00235\ }
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ !=\ Z\_OK)\ \{}
+\DoxyCodeLine{00237\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//std::cout\ <<\ "{}error\ cleaning\ up\ zlib\ compression\ state"{}}}
+\DoxyCodeLine{00238\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ <<\ std::endl;}}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00240\ }
+\DoxyCodeLine{00241\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ inflateEnd(\&m\_istate);}
+\DoxyCodeLine{00242\ }
+\DoxyCodeLine{00243\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ !=\ Z\_OK)\ \{}
+\DoxyCodeLine{00244\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//std::cout\ <<\ "{}error\ cleaning\ up\ zlib\ decompression\ state"{}}}
+\DoxyCodeLine{00245\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ <<\ std::endl;}}
+\DoxyCodeLine{00246\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00247\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled_a3002ea83fbc0066f9ecf23b4be082365}\index{websocketpp::extensions::permessage\_deflate::enabled$<$ config $>$@{websocketpp::extensions::permessage\_deflate::enabled$<$ config $>$}!compress@{compress}}
+\index{compress@{compress}!websocketpp::extensions::permessage\_deflate::enabled$<$ config $>$@{websocketpp::extensions::permessage\_deflate::enabled$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{compress()}{compress()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled_a3002ea83fbc0066f9ecf23b4be082365} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+lib\+::error\+\_\+code \mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled}{websocketpp\+::extensions\+::permessage\+\_\+deflate\+::enabled}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::compress (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{in}{, }\item[{std\+::string \&}]{out}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\begin{DoxyRefDesc}{Todo}
+\item[\mbox{\hyperlink{todo__todo000014}{Todo}}]\+: avail\+\_\+in/out is 32 bit, need to fix for cases of \texorpdfstring{$>$}{>}32 bit frames on 64 bit machines.\end{DoxyRefDesc}
+
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em in} & String to compress \\
+\hline
+\mbox{\texttt{ out}}  & {\em out} & String to append compressed bytes to \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Error or status code 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{enabled_8hpp_source_l00506}{506}} of file \mbox{\hyperlink{enabled_8hpp_source}{enabled.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00506\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00507\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!m\_initialized)\ \{}
+\DoxyCodeLine{00508\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ make\_error\_code(\mbox{\hyperlink{namespacewebsocketpp_1_1extensions_1_1permessage__deflate_1_1error_a38e53d7586dd60059cc99a5833bbe54eaa7d37064915d0ef64357e41763b42b7e}{error::uninitialized}});}
+\DoxyCodeLine{00509\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00510\ }
+\DoxyCodeLine{00511\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ output;}
+\DoxyCodeLine{00512\ }
+\DoxyCodeLine{00513\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (in.empty())\ \{}
+\DoxyCodeLine{00514\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}[6]\ =\ \{0x02,\ 0x00,\ 0x00,\ 0x00,\ 0xff,\ 0xff\};}
+\DoxyCodeLine{00515\ \ \ \ \ \ \ \ \ \ \ \ \ out.append((\textcolor{keywordtype}{char}\ *)(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}),6);}
+\DoxyCodeLine{00516\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ lib::error\_code();}
+\DoxyCodeLine{00517\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00518\ }
+\DoxyCodeLine{00519\ \ \ \ \ \ \ \ \ m\_dstate.avail\_in\ =\ in.size();}
+\DoxyCodeLine{00520\ \ \ \ \ \ \ \ \ m\_dstate.next\_in\ =\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)(\textcolor{keyword}{const\_cast<}\textcolor{keywordtype}{char}\ *\textcolor{keyword}{>}(in.data()));}
+\DoxyCodeLine{00521\ }
+\DoxyCodeLine{00522\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{do}\ \{}
+\DoxyCodeLine{00523\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Output\ to\ local\ buffer}}
+\DoxyCodeLine{00524\ \ \ \ \ \ \ \ \ \ \ \ \ m\_dstate.avail\_out\ =\ m\_compress\_buffer\_size;}
+\DoxyCodeLine{00525\ \ \ \ \ \ \ \ \ \ \ \ \ m\_dstate.next\_out\ =\ m\_compress\_buffer.get();}
+\DoxyCodeLine{00526\ }
+\DoxyCodeLine{00527\ \ \ \ \ \ \ \ \ \ \ \ \ deflate(\&m\_dstate,\ m\_flush);}
+\DoxyCodeLine{00528\ }
+\DoxyCodeLine{00529\ \ \ \ \ \ \ \ \ \ \ \ \ output\ =\ m\_compress\_buffer\_size\ -\/\ m\_dstate.avail\_out;}
+\DoxyCodeLine{00530\ }
+\DoxyCodeLine{00531\ \ \ \ \ \ \ \ \ \ \ \ \ out.append((\textcolor{keywordtype}{char}\ *)(m\_compress\_buffer.get()),output);}
+\DoxyCodeLine{00532\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{while}\ (m\_dstate.avail\_out\ ==\ 0);}
+\DoxyCodeLine{00533\ }
+\DoxyCodeLine{00534\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ lib::error\_code();}
+\DoxyCodeLine{00535\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled_a55efd7772443eaf07435042a146cc5f7}\index{websocketpp::extensions::permessage\_deflate::enabled$<$ config $>$@{websocketpp::extensions::permessage\_deflate::enabled$<$ config $>$}!decompress@{decompress}}
+\index{decompress@{decompress}!websocketpp::extensions::permessage\_deflate::enabled$<$ config $>$@{websocketpp::extensions::permessage\_deflate::enabled$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{decompress()}{decompress()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled_a55efd7772443eaf07435042a146cc5f7} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+lib\+::error\+\_\+code \mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled}{websocketpp\+::extensions\+::permessage\+\_\+deflate\+::enabled}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::decompress (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} const \texorpdfstring{$\ast$}{*}}]{buf}{, }\item[{size\+\_\+t}]{len}{, }\item[{std\+::string \&}]{out}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+\begin{DoxyParams}{Parameters}
+{\em buf} & Byte buffer to decompress \\
+\hline
+{\em len} & Length of buf \\
+\hline
+{\em out} & String to append decompressed bytes to \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Error or status code 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{enabled_8hpp_source_l00544}{544}} of file \mbox{\hyperlink{enabled_8hpp_source}{enabled.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00546\ \ \ \ \ \{}
+\DoxyCodeLine{00547\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!m\_initialized)\ \{}
+\DoxyCodeLine{00548\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ make\_error\_code(\mbox{\hyperlink{namespacewebsocketpp_1_1extensions_1_1permessage__deflate_1_1error_a38e53d7586dd60059cc99a5833bbe54eaa7d37064915d0ef64357e41763b42b7e}{error::uninitialized}});}
+\DoxyCodeLine{00549\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00550\ }
+\DoxyCodeLine{00551\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00552\ }
+\DoxyCodeLine{00553\ \ \ \ \ \ \ \ \ m\_istate.avail\_in\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}};}
+\DoxyCodeLine{00554\ \ \ \ \ \ \ \ \ m\_istate.next\_in\ =\ \textcolor{keyword}{const\_cast<}\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *\textcolor{keyword}{>}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}});}
+\DoxyCodeLine{00555\ }
+\DoxyCodeLine{00556\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{do}\ \{}
+\DoxyCodeLine{00557\ \ \ \ \ \ \ \ \ \ \ \ \ m\_istate.avail\_out\ =\ m\_compress\_buffer\_size;}
+\DoxyCodeLine{00558\ \ \ \ \ \ \ \ \ \ \ \ \ m\_istate.next\_out\ =\ m\_compress\_buffer.get();}
+\DoxyCodeLine{00559\ }
+\DoxyCodeLine{00560\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ inflate(\&m\_istate,\ Z\_SYNC\_FLUSH);}
+\DoxyCodeLine{00561\ }
+\DoxyCodeLine{00562\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ ==\ Z\_NEED\_DICT\ ||\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ ==\ Z\_DATA\_ERROR\ ||\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ ==\ Z\_MEM\_ERROR)\ \{}
+\DoxyCodeLine{00563\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ make\_error\_code(\mbox{\hyperlink{namespacewebsocketpp_1_1extensions_1_1permessage__deflate_1_1error_a38e53d7586dd60059cc99a5833bbe54ea9c98b21e33391203ce5f968428c03f3a}{error::zlib\_error}});}
+\DoxyCodeLine{00564\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00565\ }
+\DoxyCodeLine{00566\ \ \ \ \ \ \ \ \ \ \ \ \ out.append(}
+\DoxyCodeLine{00567\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{char}\ *\textcolor{keyword}{>}(m\_compress\_buffer.get()),}
+\DoxyCodeLine{00568\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_compress\_buffer\_size\ -\/\ m\_istate.avail\_out}
+\DoxyCodeLine{00569\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00570\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{while}\ (m\_istate.avail\_out\ ==\ 0);}
+\DoxyCodeLine{00571\ }
+\DoxyCodeLine{00572\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ lib::error\_code();}
+\DoxyCodeLine{00573\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled_a21e8e0200cab9dd276842ce9ecbd6639}\index{websocketpp::extensions::permessage\_deflate::enabled$<$ config $>$@{websocketpp::extensions::permessage\_deflate::enabled$<$ config $>$}!enable\_client\_no\_context\_takeover@{enable\_client\_no\_context\_takeover}}
+\index{enable\_client\_no\_context\_takeover@{enable\_client\_no\_context\_takeover}!websocketpp::extensions::permessage\_deflate::enabled$<$ config $>$@{websocketpp::extensions::permessage\_deflate::enabled$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{enable\_client\_no\_context\_takeover()}{enable\_client\_no\_context\_takeover()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled_a21e8e0200cab9dd276842ce9ecbd6639} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled}{websocketpp\+::extensions\+::permessage\+\_\+deflate\+::enabled}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::enable\+\_\+client\+\_\+no\+\_\+context\+\_\+takeover (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Enabling this setting will cause the client\textquotesingle{}s compressor to reset the compression state (the LZ77 sliding window) for every message. This means that the compressor will not look back to patterns in previous messages to improve compression. This will reduce the compression efficiency for large messages somewhat and small messages drastically.
+
+This option may reduce client compressor memory usage and server decompressor memory usage. \begin{DoxyRefDesc}{Todo}
+\item[\mbox{\hyperlink{todo__todo000013}{Todo}}]Document to what extent memory usage will be reduced\end{DoxyRefDesc}
+
+
+This option is supported by all compliant clients and servers. Enabling it via either endpoint should be sufficient to ensure it is used. 
+
+Definition at line \mbox{\hyperlink{enabled_8hpp_source_l00367}{367}} of file \mbox{\hyperlink{enabled_8hpp_source}{enabled.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00367\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00368\ \ \ \ \ \ \ \ \ m\_client\_no\_context\_takeover\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00369\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled_a9275c22cfd6782ef72a722168d663d8b}\index{websocketpp::extensions::permessage\_deflate::enabled$<$ config $>$@{websocketpp::extensions::permessage\_deflate::enabled$<$ config $>$}!enable\_server\_no\_context\_takeover@{enable\_server\_no\_context\_takeover}}
+\index{enable\_server\_no\_context\_takeover@{enable\_server\_no\_context\_takeover}!websocketpp::extensions::permessage\_deflate::enabled$<$ config $>$@{websocketpp::extensions::permessage\_deflate::enabled$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{enable\_server\_no\_context\_takeover()}{enable\_server\_no\_context\_takeover()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled_a9275c22cfd6782ef72a722168d663d8b} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+void \mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled}{websocketpp\+::extensions\+::permessage\+\_\+deflate\+::enabled}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::enable\+\_\+server\+\_\+no\+\_\+context\+\_\+takeover (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Enabling this setting will cause the server\textquotesingle{}s compressor to reset the compression state (the LZ77 sliding window) for every message. This means that the compressor will not look back to patterns in previous messages to improve compression. This will reduce the compression efficiency for large messages somewhat and small messages drastically.
+
+This option may reduce server compressor memory usage and client decompressor memory usage. \begin{DoxyRefDesc}{Todo}
+\item[\mbox{\hyperlink{todo__todo000012}{Todo}}]Document to what extent memory usage will be reduced\end{DoxyRefDesc}
+
+
+For clients, this option is dependent on server support. Enabling it via this method does not guarantee that it will be successfully negotiated, only that it will be requested.
+
+For servers, no client support is required. Enabling this option on a server will result in its use. The server will signal to clients that the option will be in use so they can optimize resource usage if they are able. 
+
+Definition at line \mbox{\hyperlink{enabled_8hpp_source_l00348}{348}} of file \mbox{\hyperlink{enabled_8hpp_source}{enabled.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00348\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00349\ \ \ \ \ \ \ \ \ m\_server\_no\_context\_takeover\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00350\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled_adc342a368792f5beee8dddbbc5981846}\index{websocketpp::extensions::permessage\_deflate::enabled$<$ config $>$@{websocketpp::extensions::permessage\_deflate::enabled$<$ config $>$}!generate\_offer@{generate\_offer}}
+\index{generate\_offer@{generate\_offer}!websocketpp::extensions::permessage\_deflate::enabled$<$ config $>$@{websocketpp::extensions::permessage\_deflate::enabled$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{generate\_offer()}{generate\_offer()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled_adc342a368792f5beee8dddbbc5981846} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+std\+::string \mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled}{websocketpp\+::extensions\+::permessage\+\_\+deflate\+::enabled}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::generate\+\_\+offer (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+Creates an offer string to include in the Sec-\/\+Web\+Socket-\/\+Extensions header of outgoing client requests.
+
+\begin{DoxyReturn}{Returns}
+\doxylink{struct_a}{A} Web\+Socket extension offer string for this extension 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{enabled_8hpp_source_l00441}{441}} of file \mbox{\hyperlink{enabled_8hpp_source}{enabled.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00441\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00442\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ TODO:\ this\ should\ be\ dynamically\ generated\ based\ on\ user\ settings}}
+\DoxyCodeLine{00443\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}permessage-\/deflate;\ client\_no\_context\_takeover;\ client\_max\_window\_bits"{}};}
+\DoxyCodeLine{00444\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled_a0d842cb0cd2add8016e739dfcd675ba0}\index{websocketpp::extensions::permessage\_deflate::enabled$<$ config $>$@{websocketpp::extensions::permessage\_deflate::enabled$<$ config $>$}!init@{init}}
+\index{init@{init}!websocketpp::extensions::permessage\_deflate::enabled$<$ config $>$@{websocketpp::extensions::permessage\_deflate::enabled$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{init()}{init()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled_a0d842cb0cd2add8016e739dfcd675ba0} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+lib\+::error\+\_\+code \mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled}{websocketpp\+::extensions\+::permessage\+\_\+deflate\+::enabled}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::init (\begin{DoxyParamCaption}\item[{bool}]{is\+\_\+server}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Note\+: this should be called {\itshape after} the negotiation methods. It will use information from the negotiation to determine how to initialize the zlib data structures.
+
+\begin{DoxyRefDesc}{Todo}
+\item[\mbox{\hyperlink{todo__todo000011}{Todo}}]memory level, strategy, etc are hardcoded\end{DoxyRefDesc}
+
+
+
+\begin{DoxyParams}{Parameters}
+{\em is\+\_\+server} & True to initialize as a server, false for a client. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\doxylink{struct_a}{A} code representing the error that occurred, if any 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{enabled_8hpp_source_l00260}{260}} of file \mbox{\hyperlink{enabled_8hpp_source}{enabled.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00260\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00261\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ deflate\_bits;}
+\DoxyCodeLine{00262\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ inflate\_bits;}
+\DoxyCodeLine{00263\ }
+\DoxyCodeLine{00264\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_server)\ \{}
+\DoxyCodeLine{00265\ \ \ \ \ \ \ \ \ \ \ \ \ deflate\_bits\ =\ m\_server\_max\_window\_bits;}
+\DoxyCodeLine{00266\ \ \ \ \ \ \ \ \ \ \ \ \ inflate\_bits\ =\ m\_client\_max\_window\_bits;}
+\DoxyCodeLine{00267\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00268\ \ \ \ \ \ \ \ \ \ \ \ \ deflate\_bits\ =\ m\_client\_max\_window\_bits;}
+\DoxyCodeLine{00269\ \ \ \ \ \ \ \ \ \ \ \ \ inflate\_bits\ =\ m\_server\_max\_window\_bits;}
+\DoxyCodeLine{00270\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00271\ }
+\DoxyCodeLine{00272\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ deflateInit2(}
+\DoxyCodeLine{00273\ \ \ \ \ \ \ \ \ \ \ \ \ \&m\_dstate,}
+\DoxyCodeLine{00274\ \ \ \ \ \ \ \ \ \ \ \ \ Z\_DEFAULT\_COMPRESSION,}
+\DoxyCodeLine{00275\ \ \ \ \ \ \ \ \ \ \ \ \ Z\_DEFLATED,}
+\DoxyCodeLine{00276\ \ \ \ \ \ \ \ \ \ \ \ \ -\/1*deflate\_bits,}
+\DoxyCodeLine{00277\ \ \ \ \ \ \ \ \ \ \ \ \ 4,\ \textcolor{comment}{//\ memory\ level\ 1-\/9}}
+\DoxyCodeLine{00278\ \ \ \ \ \ \ \ \ \ \ \ \ Z\_DEFAULT\_STRATEGY}
+\DoxyCodeLine{00279\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00280\ }
+\DoxyCodeLine{00281\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ !=\ Z\_OK)\ \{}
+\DoxyCodeLine{00282\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ make\_error\_code(\mbox{\hyperlink{namespacewebsocketpp_1_1extensions_1_1permessage__deflate_1_1error_a38e53d7586dd60059cc99a5833bbe54ea9c98b21e33391203ce5f968428c03f3a}{error::zlib\_error}});}
+\DoxyCodeLine{00283\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00284\ }
+\DoxyCodeLine{00285\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ inflateInit2(}
+\DoxyCodeLine{00286\ \ \ \ \ \ \ \ \ \ \ \ \ \&m\_istate,}
+\DoxyCodeLine{00287\ \ \ \ \ \ \ \ \ \ \ \ \ -\/1*inflate\_bits}
+\DoxyCodeLine{00288\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00289\ }
+\DoxyCodeLine{00290\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ !=\ Z\_OK)\ \{}
+\DoxyCodeLine{00291\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ make\_error\_code(\mbox{\hyperlink{namespacewebsocketpp_1_1extensions_1_1permessage__deflate_1_1error_a38e53d7586dd60059cc99a5833bbe54ea9c98b21e33391203ce5f968428c03f3a}{error::zlib\_error}});}
+\DoxyCodeLine{00292\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00293\ }
+\DoxyCodeLine{00294\ \ \ \ \ \ \ \ \ m\_compress\_buffer.reset(\textcolor{keyword}{new}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}[m\_compress\_buffer\_size]);}
+\DoxyCodeLine{00295\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((m\_server\_no\_context\_takeover\ \&\&\ is\_server)\ ||}
+\DoxyCodeLine{00296\ \ \ \ \ \ \ \ \ \ \ \ \ (m\_client\_no\_context\_takeover\ \&\&\ !is\_server))}
+\DoxyCodeLine{00297\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00298\ \ \ \ \ \ \ \ \ \ \ \ \ m\_flush\ =\ Z\_FULL\_FLUSH;}
+\DoxyCodeLine{00299\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00300\ \ \ \ \ \ \ \ \ \ \ \ \ m\_flush\ =\ Z\_SYNC\_FLUSH;}
+\DoxyCodeLine{00301\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00302\ \ \ \ \ \ \ \ \ m\_initialized\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00303\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ lib::error\_code();}
+\DoxyCodeLine{00304\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled_a5190a82b1571a94704cef6959ed78ce2}\index{websocketpp::extensions::permessage\_deflate::enabled$<$ config $>$@{websocketpp::extensions::permessage\_deflate::enabled$<$ config $>$}!is\_enabled@{is\_enabled}}
+\index{is\_enabled@{is\_enabled}!websocketpp::extensions::permessage\_deflate::enabled$<$ config $>$@{websocketpp::extensions::permessage\_deflate::enabled$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{is\_enabled()}{is\_enabled()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled_a5190a82b1571a94704cef6959ed78ce2} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+bool \mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled}{websocketpp\+::extensions\+::permessage\+\_\+deflate\+::enabled}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::is\+\_\+enabled (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+Retrieves whether or not this extension is in use based on the initial handshake extension negotiations.
+
+\begin{DoxyReturn}{Returns}
+Whether or not the extension is in use 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{enabled_8hpp_source_l00323}{323}} of file \mbox{\hyperlink{enabled_8hpp_source}{enabled.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00323\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00324\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_enabled;}
+\DoxyCodeLine{00325\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled_a76a196b1428865e739fe99e951f03e68}\index{websocketpp::extensions::permessage\_deflate::enabled$<$ config $>$@{websocketpp::extensions::permessage\_deflate::enabled$<$ config $>$}!is\_implemented@{is\_implemented}}
+\index{is\_implemented@{is\_implemented}!websocketpp::extensions::permessage\_deflate::enabled$<$ config $>$@{websocketpp::extensions::permessage\_deflate::enabled$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{is\_implemented()}{is\_implemented()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled_a76a196b1428865e739fe99e951f03e68} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+bool \mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled}{websocketpp\+::extensions\+::permessage\+\_\+deflate\+::enabled}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::is\+\_\+implemented (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+Because this object does implieent it, it will always return true.
+
+\begin{DoxyReturn}{Returns}
+Whether or not this object implements permessage-\/deflate 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{enabled_8hpp_source_l00312}{312}} of file \mbox{\hyperlink{enabled_8hpp_source}{enabled.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00312\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00313\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00314\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled_aa05eda4f6a0231c13708445480181ff4}\index{websocketpp::extensions::permessage\_deflate::enabled$<$ config $>$@{websocketpp::extensions::permessage\_deflate::enabled$<$ config $>$}!negotiate@{negotiate}}
+\index{negotiate@{negotiate}!websocketpp::extensions::permessage\_deflate::enabled$<$ config $>$@{websocketpp::extensions::permessage\_deflate::enabled$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{negotiate()}{negotiate()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled_aa05eda4f6a0231c13708445480181ff4} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+\mbox{\hyperlink{namespacewebsocketpp_abecf95d53c9387716b157daae84441f3}{err\+\_\+str\+\_\+pair}} \mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled}{websocketpp\+::extensions\+::permessage\+\_\+deflate\+::enabled}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::negotiate (\begin{DoxyParamCaption}\item[{http\+::attribute\+\_\+list const \&}]{offer}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Confirm that the client\textquotesingle{}s extension negotiation offer has settings compatible with local policy. If so, generate a reply and apply those settings to the extension state.
+
+
+\begin{DoxyParams}{Parameters}
+{\em offer} & Attribute from client\textquotesingle{}s offer \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Status code and value to return to remote endpoint 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{enabled_8hpp_source_l00467}{467}} of file \mbox{\hyperlink{enabled_8hpp_source}{enabled.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00467\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00468\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_abecf95d53c9387716b157daae84441f3}{err\_str\_pair}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00469\ }
+\DoxyCodeLine{00470\ \ \ \ \ \ \ \ \ http::attribute\_list::const\_iterator\ it;}
+\DoxyCodeLine{00471\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (it\ =\ offer.begin();\ it\ !=\ offer.end();\ ++it)\ \{}
+\DoxyCodeLine{00472\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (it-\/>first\ ==\ \textcolor{stringliteral}{"{}server\_no\_context\_takeover"{}})\ \{}
+\DoxyCodeLine{00473\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ negotiate\_server\_no\_context\_takeover(it-\/>second,\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.first);}
+\DoxyCodeLine{00474\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (it-\/>first\ ==\ \textcolor{stringliteral}{"{}client\_no\_context\_takeover"{}})\ \{}
+\DoxyCodeLine{00475\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ negotiate\_client\_no\_context\_takeover(it-\/>second,\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.first);}
+\DoxyCodeLine{00476\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (it-\/>first\ ==\ \textcolor{stringliteral}{"{}server\_max\_window\_bits"{}})\ \{}
+\DoxyCodeLine{00477\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ negotiate\_server\_max\_window\_bits(it-\/>second,\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.first);}
+\DoxyCodeLine{00478\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (it-\/>first\ ==\ \textcolor{stringliteral}{"{}client\_max\_window\_bits"{}})\ \{}
+\DoxyCodeLine{00479\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ negotiate\_client\_max\_window\_bits(it-\/>second,\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.first);}
+\DoxyCodeLine{00480\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00481\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.first\ =\ make\_error\_code(\mbox{\hyperlink{namespacewebsocketpp_1_1extensions_1_1permessage__deflate_1_1error_a38e53d7586dd60059cc99a5833bbe54eae5f446fcc9f28756b471d89e879f7670}{error::invalid\_attributes}});}
+\DoxyCodeLine{00482\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00483\ }
+\DoxyCodeLine{00484\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.first)\ \{}
+\DoxyCodeLine{00485\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00486\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00487\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00488\ }
+\DoxyCodeLine{00489\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.first\ ==\ lib::error\_code())\ \{}
+\DoxyCodeLine{00490\ \ \ \ \ \ \ \ \ \ \ \ \ m\_enabled\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00491\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.second\ =\ generate\_response();}
+\DoxyCodeLine{00492\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00493\ }
+\DoxyCodeLine{00494\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00495\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled_a5bfcf29752865c0e9c8e8092ee21b5af}\index{websocketpp::extensions::permessage\_deflate::enabled$<$ config $>$@{websocketpp::extensions::permessage\_deflate::enabled$<$ config $>$}!set\_client\_max\_window\_bits@{set\_client\_max\_window\_bits}}
+\index{set\_client\_max\_window\_bits@{set\_client\_max\_window\_bits}!websocketpp::extensions::permessage\_deflate::enabled$<$ config $>$@{websocketpp::extensions::permessage\_deflate::enabled$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{set\_client\_max\_window\_bits()}{set\_client\_max\_window\_bits()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled_a5bfcf29752865c0e9c8e8092ee21b5af} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+lib\+::error\+\_\+code \mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled}{websocketpp\+::extensions\+::permessage\+\_\+deflate\+::enabled}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::set\+\_\+client\+\_\+max\+\_\+window\+\_\+bits (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}}}]{bits}{, }\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1extensions_1_1permessage__deflate_1_1mode_ae06aef93260cb0b5f5bd729a82564120}{mode\+::value}}}]{mode}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+The bits setting is the base 2 logarithm of the window size that the client must use to compress outgoing messages. The permitted range is 8 to 15 inclusive. 8 represents a 256 byte window and 15 a 32KiB window. The default setting is 15.
+
+Mode Options\+:
+\begin{DoxyItemize}
+\item accept\+: Accept whatever the remote endpoint offers.
+\item decline\+: Decline any offers to deviate from the defaults
+\item largest\+: Accept largest window size acceptable to both endpoints
+\item smallest\+: Accept smallest window size acceptiable to both endpoints
+\end{DoxyItemize}
+
+This setting is dependent on client support. \doxylink{struct_a}{A} client may limit its own outgoing window size unilaterally. \doxylink{struct_a}{A} server may only limit the client\textquotesingle{}s window size if the remote client supports that feature.
+
+
+\begin{DoxyParams}{Parameters}
+{\em bits} & The size to request for the outgoing window size \\
+\hline
+{\em mode} & The mode to use for negotiating this parameter \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\doxylink{struct_a}{A} status code 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{enabled_8hpp_source_l00424}{424}} of file \mbox{\hyperlink{enabled_8hpp_source}{enabled.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00424\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00425\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (bits\ <\ min\_client\_max\_window\_bits\ ||\ bits\ >\ max\_client\_max\_window\_bits)\ \{}
+\DoxyCodeLine{00426\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacewebsocketpp_1_1extensions_1_1permessage__deflate_1_1error_a9e955844ce4acf0ade5425c98af861ce}{error::make\_error\_code}}(\mbox{\hyperlink{namespacewebsocketpp_1_1extensions_1_1permessage__deflate_1_1error_a38e53d7586dd60059cc99a5833bbe54ea23eace97896da0a8136d213fb1e4e987}{error::invalid\_max\_window\_bits}});}
+\DoxyCodeLine{00427\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00428\ \ \ \ \ \ \ \ \ m\_client\_max\_window\_bits\ =\ bits;}
+\DoxyCodeLine{00429\ \ \ \ \ \ \ \ \ m\_client\_max\_window\_bits\_mode\ =\ mode;}
+\DoxyCodeLine{00430\ }
+\DoxyCodeLine{00431\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ lib::error\_code();}
+\DoxyCodeLine{00432\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled_a5bfcf29752865c0e9c8e8092ee21b5af_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled_ac2f1bd776c26b4d54afaceded1841394}\index{websocketpp::extensions::permessage\_deflate::enabled$<$ config $>$@{websocketpp::extensions::permessage\_deflate::enabled$<$ config $>$}!set\_server\_max\_window\_bits@{set\_server\_max\_window\_bits}}
+\index{set\_server\_max\_window\_bits@{set\_server\_max\_window\_bits}!websocketpp::extensions::permessage\_deflate::enabled$<$ config $>$@{websocketpp::extensions::permessage\_deflate::enabled$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{set\_server\_max\_window\_bits()}{set\_server\_max\_window\_bits()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled_ac2f1bd776c26b4d54afaceded1841394} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+lib\+::error\+\_\+code \mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled}{websocketpp\+::extensions\+::permessage\+\_\+deflate\+::enabled}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::set\+\_\+server\+\_\+max\+\_\+window\+\_\+bits (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}}}]{bits}{, }\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1extensions_1_1permessage__deflate_1_1mode_ae06aef93260cb0b5f5bd729a82564120}{mode\+::value}}}]{mode}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+The bits setting is the base 2 logarithm of the maximum window size that the server must use to compress outgoing messages. The permitted range is 8 to 15 inclusive. 8 represents a 256 byte window and 15 a 32KiB window. The default setting is 15.
+
+Mode Options\+:
+\begin{DoxyItemize}
+\item accept\+: Accept whatever the remote endpoint offers.
+\item decline\+: Decline any offers to deviate from the defaults
+\item largest\+: Accept largest window size acceptable to both endpoints
+\item smallest\+: Accept smallest window size acceptiable to both endpoints
+\end{DoxyItemize}
+
+This setting is dependent on server support. \doxylink{struct_a}{A} client requesting this setting may be rejected by the server or have the exact value used adjusted by the server. \doxylink{struct_a}{A} server may unilaterally set this value without client support.
+
+
+\begin{DoxyParams}{Parameters}
+{\em bits} & The size to request for the outgoing window size \\
+\hline
+{\em mode} & The mode to use for negotiating this parameter \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\doxylink{struct_a}{A} status code 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{enabled_8hpp_source_l00393}{393}} of file \mbox{\hyperlink{enabled_8hpp_source}{enabled.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00393\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00394\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (bits\ <\ min\_server\_max\_window\_bits\ ||\ bits\ >\ max\_server\_max\_window\_bits)\ \{}
+\DoxyCodeLine{00395\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacewebsocketpp_1_1extensions_1_1permessage__deflate_1_1error_a9e955844ce4acf0ade5425c98af861ce}{error::make\_error\_code}}(\mbox{\hyperlink{namespacewebsocketpp_1_1extensions_1_1permessage__deflate_1_1error_a38e53d7586dd60059cc99a5833bbe54ea23eace97896da0a8136d213fb1e4e987}{error::invalid\_max\_window\_bits}});}
+\DoxyCodeLine{00396\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00397\ \ \ \ \ \ \ \ \ m\_server\_max\_window\_bits\ =\ bits;}
+\DoxyCodeLine{00398\ \ \ \ \ \ \ \ \ m\_server\_max\_window\_bits\_mode\ =\ mode;}
+\DoxyCodeLine{00399\ }
+\DoxyCodeLine{00400\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ lib::error\_code();}
+\DoxyCodeLine{00401\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled_ac2f1bd776c26b4d54afaceded1841394_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled_acf45724e34c174a0b8a5166192f659de}\index{websocketpp::extensions::permessage\_deflate::enabled$<$ config $>$@{websocketpp::extensions::permessage\_deflate::enabled$<$ config $>$}!validate\_offer@{validate\_offer}}
+\index{validate\_offer@{validate\_offer}!websocketpp::extensions::permessage\_deflate::enabled$<$ config $>$@{websocketpp::extensions::permessage\_deflate::enabled$<$ config $>$}}
+\doxysubsubsection{\texorpdfstring{validate\_offer()}{validate\_offer()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled_acf45724e34c174a0b8a5166192f659de} 
+template$<$typename \mbox{\hyperlink{classconfig}{config}} $>$ \\
+lib\+::error\+\_\+code \mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled}{websocketpp\+::extensions\+::permessage\+\_\+deflate\+::enabled}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$\+::validate\+\_\+offer (\begin{DoxyParamCaption}\item[{http\+::attribute\+\_\+list const \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Confirm that the server has negotiated settings compatible with our original offer and apply those settings to the extension state.
+
+
+\begin{DoxyParams}{Parameters}
+{\em response} & The server response attribute list to validate \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Validation error or 0 on success 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{enabled_8hpp_source_l00454}{454}} of file \mbox{\hyperlink{enabled_8hpp_source}{enabled.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00454\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00455\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ lib::error\_code();}
+\DoxyCodeLine{00456\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/vendor/websocketpp/websocketpp/extensions/permessage\+\_\+deflate/\mbox{\hyperlink{enabled_8hpp}{enabled.\+hpp}}\end{DoxyCompactItemize}

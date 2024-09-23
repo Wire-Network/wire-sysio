@@ -1,0 +1,9 @@
+<map id="sysio::chain::block_header_state::next" name="sysio::chain::block_header_state::next">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,93,142,134"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1block__header__state.html#a8f4d0dd8e0ba11e3a7688e224bd3036e" title=" " alt="" coords="210,5,364,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="129,90,196,64,198,69,131,95"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1chain_1_1block__header__state.html#a7822f9f962659ac6c6d45c2e1ac4e4b9" title=" " alt="" coords="190,85,385,141"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="142,110,174,110,174,116,142,116"/>
+<area shape="rect" id="Node000004" href="$yubihsm__pkcs11_8c.html#ae785d5badbf1f08b491af31f32a135a1" title=" " alt="" coords="252,166,323,191"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="133,131,190,151,237,164,236,169,189,156,131,137"/>
+</map>

@@ -1,0 +1,25 @@
+<map id="bench_data" name="bench_data">
+<area shape="rect" id="Node000001" title=" " alt="" coords="1008,225,1096,251"/>
+<area shape="rect" id="Node000002" href="$structsecp256k1__context__struct.html" title=" " alt="" coords="736,112,910,137"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="926,133,957,142,985,156,1005,171,1022,189,1046,223,1041,226,1018,192,1002,175,983,160,955,147,925,138"/>
+<area shape="rect" id="Node000003" href="$structsecp256k1__ecmult__gen__context.html" title=" " alt="" coords="428,63,587,104"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="602,87,711,99,762,109,761,114,710,105,602,92"/>
+<area shape="rect" id="Node000004" href="$structsecp256k1__gej.html" title=" " alt="" coords="167,70,275,96"/>
+<area shape="poly" id="edge11_Node000001_Node000004" title=" " alt="" coords="283,64,299,61,363,52,428,49,565,46,671,53,777,70,911,97,950,101,967,105,986,116,1010,141,1029,171,1050,224,1045,226,1024,174,1006,145,982,120,965,110,949,106,911,102,776,75,671,58,565,51,428,54,364,57,299,66,284,69"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="291,81,428,81,428,86,291,86"/>
+<area shape="rect" id="Node000005" href="$structsecp256k1__fe.html" title=" " alt="" coords="5,136,108,161"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="104,127,185,94,187,99,106,132"/>
+<area shape="rect" id="Node000010" href="$structsecp256k1__ge.html" title=" " alt="" coords="299,213,404,239"/>
+<area shape="poly" id="edge10_Node000010_Node000005" title=" " alt="" coords="124,163,300,210,299,215,122,168"/>
+<area shape="rect" id="Node000006" href="$structsecp256k1__callback.html" title=" " alt="" coords="438,145,577,171"/>
+<area shape="poly" id="edge12_Node000001_Node000006" title=" " alt="" coords="593,162,773,183,879,198,985,217,1008,222,1007,227,983,222,879,203,773,188,592,168"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="592,146,735,131,735,136,593,152"/>
+<area shape="rect" id="Node000007" href="$structsecp256k1__scratch__space__struct.html" title=" " alt="" coords="735,275,911,316"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="926,283,983,269,1028,249,1030,254,985,274,927,288"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="479,338,536,364"/>
+<area shape="poly" id="edge13_Node000001_Node000008" title=" " alt="" coords="551,362,622,379,713,393,763,395,813,392,863,385,910,370,953,345,991,311,1020,277,1040,250,1045,253,1025,280,995,315,957,349,912,375,864,390,814,398,763,400,713,398,621,385,550,367"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="550,341,734,308,735,314,551,346"/>
+<area shape="rect" id="Node000009" href="$structsecp256k1__scalar.html" title=" " alt="" coords="760,433,886,459"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="901,454,944,449,964,442,982,431,1002,412,1017,389,1037,338,1046,288,1048,251,1054,251,1051,289,1042,339,1022,392,1006,416,986,435,967,447,945,454,902,459"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="420,224,1008,235,1008,240,420,230"/>
+</map>

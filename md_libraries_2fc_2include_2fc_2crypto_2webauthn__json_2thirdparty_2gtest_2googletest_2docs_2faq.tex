@@ -1,0 +1,993 @@
+\chapter{faq}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2thirdparty_2gtest_2googletest_2docs_2faq}{}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2thirdparty_2gtest_2googletest_2docs_2faq}\index{faq@{faq}}
+If you cannot find the answer to your question here, and you have read \doxysectlink{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2thirdparty_2gtest_2googletest_2docs_2primer}{Primer}{0} and \doxysectlink{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2thirdparty_2gtest_2googletest_2docs_2advanced}{Advanced\+Guide}{0}, send it to \href{mailto:googletestframework@googlegroups.com}{\texttt{ googletestframework@googlegroups.\+com}}.
+
+\doxysubsection*{Why should I use Google \doxylink{class_test}{Test} instead of my favorite C++ testing framework?}
+
+First, let us say clearly that we don\textquotesingle{}t want to get into the debate of which C++ testing framework is {\bfseries{the best}}. There exist many fine frameworks for writing C++ tests, and we have tremendous respect for the developers and users of them. We don\textquotesingle{}t think there is (or will be) a single best framework -\/ you have to pick the right tool for the particular task you are tackling.
+
+We created Google \doxylink{class_test}{Test} because we couldn\textquotesingle{}t find the right combination of features and conveniences in an existing framework to satisfy {\itshape our} needs. The following is a list of things that {\itshape we} like about Google \doxylink{class_test}{Test}. We don\textquotesingle{}t claim them to be unique to Google \doxylink{class_test}{Test} -\/ rather, the combination of them makes Google \doxylink{class_test}{Test} the choice for us. We hope this list can help you decide whether it is for you too.
+
+
+\begin{DoxyItemize}
+\item Google \doxylink{class_test}{Test} is designed to be portable\+: it doesn\textquotesingle{}t require exceptions or RTTI; it works around various bugs in various compilers and environments; etc. As a result, it works on Linux, Mac OS X, Windows and several embedded operating systems.
+\item Nonfatal assertions ({\ttfamily EXPECT\+\_\+\texorpdfstring{$\ast$}{*}}) have proven to be great time savers, as they allow a test to report multiple failures in a single edit-\/compile-\/test cycle.
+\item It\textquotesingle{}s easy to write assertions that generate informative messages\+: you just use the stream syntax to append any additional information, e.\+g. {\ttfamily \doxylink{gtest_8h_a1a6db8b1338ee7040329322b77779086}{ASSERT\+\_\+\+EQ(5, Foo(i))} \texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<} "{} where i = "{} \texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<} i;}. It doesn\textquotesingle{}t require a new set of macros or special functions.
+\item Google \doxylink{class_test}{Test} automatically detects your tests and doesn\textquotesingle{}t require you to enumerate them in order to run them.
+\item Death tests are pretty handy for ensuring that your asserts in production code are triggered by the right conditions.
+\item {\ttfamily SCOPED\+\_\+\+TRACE} helps you understand the context of an assertion failure when it comes from inside a sub-\/routine or loop.
+\item You can decide which tests to run using name patterns. This saves time when you want to quickly reproduce a test failure.
+\item Google \doxylink{class_test}{Test} can generate XML test result reports that can be parsed by popular continuous build system like Hudson.
+\item Simple things are easy in Google \doxylink{class_test}{Test}, while hard things are possible\+: in addition to advanced features like \href{advanced.md\#global-set-up-and-tear-down}{\texttt{ global test environments}} and tests parameterized by \href{advanced.md\#value-parameterized-tests}{\texttt{ values}} or \href{docs/advanced.md\#typed-tests}{\texttt{ types}}, Google \doxylink{class_test}{Test} supports various ways for the user to extend the framework -- if Google \doxylink{class_test}{Test} doesn\textquotesingle{}t do something out of the box, chances are that a user can implement the feature using Google \doxylink{class_test}{Test}\textquotesingle{}s public API, without changing Google \doxylink{class_test}{Test} itself. In particular, you can\+:
+\begin{DoxyItemize}
+\item expand your testing vocabulary by defining \href{advanced.md\#predicate-assertions-for-better-error-messages}{\texttt{ custom predicates}},
+\item teach Google \doxylink{class_test}{Test} how to \href{advanced.md\#teaching-google-test-how-to-print-your-values}{\texttt{ print your types}},
+\item define your own testing macros or utilities and verify them using Google \doxylink{class_test}{Test}\textquotesingle{}s \href{advanced.md\#catching-failures}{\texttt{ Service Provider Interface}}, and
+\item reflect on the test cases or change the test output format by intercepting the \href{advanced.md\#extending-google-test-by-handling-test-events}{\texttt{ test events}}.
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+\doxysubsection*{I\textquotesingle{}m getting warnings when compiling Google \doxylink{class_test}{Test}. Would you fix them?}
+
+We strive to minimize compiler warnings Google \doxylink{class_test}{Test} generates. Before releasing a new version, we test to make sure that it doesn\textquotesingle{}t generate warnings when compiled using its CMake script on Windows, Linux, and Mac OS.
+
+Unfortunately, this doesn\textquotesingle{}t mean you are guaranteed to see no warnings when compiling Google \doxylink{class_test}{Test} in your environment\+:
+
+
+\begin{DoxyItemize}
+\item You may be using a different compiler as we use, or a different version of the same compiler. We cannot possibly test for all compilers.
+\item You may be compiling on a different platform as we do.
+\item Your project may be using different compiler flags as we do.
+\end{DoxyItemize}
+
+It is not always possible to make Google \doxylink{class_test}{Test} warning-\/free for everyone. Or, it may not be desirable if the warning is rarely enabled and fixing the violations makes the code more complex.
+
+If you see warnings when compiling Google \doxylink{class_test}{Test}, we suggest that you use the {\ttfamily -\/isystem} flag (assuming your are using GCC) to mark Google \doxylink{class_test}{Test} headers as system headers. That\textquotesingle{}ll suppress warnings from Google \doxylink{class_test}{Test} headers.
+
+\doxysubsection*{Why should not test case names and test names contain underscore?}
+
+Underscore ({\ttfamily \+\_\+}) is special, as C++ reserves the following to be used by the compiler and the standard library\+:
+
+
+\begin{DoxyEnumerate}
+\item any identifier that starts with an {\ttfamily \+\_\+} followed by an upper-\/case letter, and
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item any identifier that contains two consecutive underscores (i.\+e. {\ttfamily \+\_\+\+\_\+}) {\itshape anywhere} in its name.
+\end{DoxyEnumerate}
+
+User code is {\itshape prohibited} from using such identifiers.
+
+Now let\textquotesingle{}s look at what this means for {\ttfamily TEST} and {\ttfamily TEST\+\_\+F}.
+
+Currently {\ttfamily \doxylink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST(\+Test\+Case\+Name, Test\+Name)}} generates a class named {\ttfamily Test\+Case\+Name\+\_\+\+Test\+Name\+\_\+\+Test}. What happens if {\ttfamily Test\+Case\+Name} or {\ttfamily Test\+Name} contains {\ttfamily \+\_\+}?
+
+
+\begin{DoxyEnumerate}
+\item If {\ttfamily Test\+Case\+Name} starts with an {\ttfamily \+\_\+} followed by an upper-\/case letter (say, {\ttfamily \+\_\+\+Foo}), we end up with {\ttfamily \+\_\+\+Foo\+\_\+\+Test\+Name\+\_\+\+Test}, which is reserved and thus invalid.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item If {\ttfamily Test\+Case\+Name} ends with an {\ttfamily \+\_\+} (say, {\ttfamily Foo\+\_\+}), we get {\ttfamily Foo\+\_\+\+\_\+\+Test\+Name\+\_\+\+Test}, which is invalid.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item If {\ttfamily Test\+Name} starts with an {\ttfamily \+\_\+} (say, {\ttfamily \+\_\+\+Bar}), we get {\ttfamily Test\+Case\+Name\+\_\+\+\_\+\+Bar\+\_\+\+Test}, which is invalid.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item If {\ttfamily Test\+Name} ends with an {\ttfamily \+\_\+} (say, {\ttfamily Bar\+\_\+}), we get {\ttfamily Test\+Case\+Name\+\_\+\+Bar\+\_\+\+\_\+\+Test}, which is invalid.
+\end{DoxyEnumerate}
+
+So clearly {\ttfamily Test\+Case\+Name} and {\ttfamily Test\+Name} cannot start or end with {\ttfamily \+\_\+} (Actually, {\ttfamily Test\+Case\+Name} can start with {\ttfamily \+\_\+} -- as long as the {\ttfamily \+\_\+} isn\textquotesingle{}t followed by an upper-\/case letter. But that\textquotesingle{}s getting complicated. So for simplicity we just say that it cannot start with {\ttfamily \+\_\+}.).
+
+It may seem fine for {\ttfamily Test\+Case\+Name} and {\ttfamily Test\+Name} to contain {\ttfamily \+\_\+} in the middle. However, consider this\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ ++}
+\DoxyCodeLine{\mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(Time,\ Flies\_Like\_An\_Arrow)\ \{\ ...\ \}}
+\DoxyCodeLine{\mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(Time\_Flies,\ Like\_An\_Arrow)\ \{\ ...\ \}}
+
+\end{DoxyCode}
+
+
+Now, the two {\ttfamily TEST}s will both generate the same class ({\ttfamily Time\+\_\+\+Files\+\_\+\+Like\+\_\+\+An\+\_\+\+Arrow\+\_\+\+Test}). That\textquotesingle{}s not good.
+
+So for simplicity, we just ask the users to avoid {\ttfamily \+\_\+} in {\ttfamily Test\+Case\+Name} and {\ttfamily Test\+Name}. The rule is more constraining than necessary, but it\textquotesingle{}s simple and easy to remember. It also gives Google \doxylink{class_test}{Test} some wiggle room in case its implementation needs to change in the future.
+
+If you violate the rule, there may not be immediately consequences, but your test may (just may) break with a new compiler (or a new version of the compiler you are using) or with a new version of Google \doxylink{class_test}{Test}. Therefore it\textquotesingle{}s best to follow the rule.
+
+\doxysubsection*{Why is it not recommended to install a pre-\/compiled copy of Google \doxylink{class_test}{Test} (for example, into /usr/local)?}
+
+In the early days, we said that you could install compiled Google \doxylink{class_test}{Test} libraries on {\ttfamily \texorpdfstring{$\ast$}{*}}nix systems using {\ttfamily make install}. Then every user of your machine can write tests without recompiling Google \doxylink{class_test}{Test}.
+
+This seemed like a good idea, but it has a got-\/cha\+: every user needs to compile their tests using the {\itshape same} compiler flags used to compile the installed Google \doxylink{class_test}{Test} libraries; otherwise they may run into undefined behaviors (i.\+e. the tests can behave strangely and may even crash for no obvious reasons).
+
+Why? Because C++ has this thing called the One-\/\+Definition Rule\+: if two C++ source files contain different definitions of the same class/function/variable, and you link them together, you violate the rule. The linker may or may not catch the error (in many cases it\textquotesingle{}s not required by the C++ standard to catch the violation). If it doesn\textquotesingle{}t, you get strange run-\/time behaviors that are unexpected and hard to debug.
+
+If you compile Google \doxylink{class_test}{Test} and your test code using different compiler flags, they may see different definitions of the same class/function/variable (e.\+g. due to the use of {\ttfamily \#if} in Google \doxylink{class_test}{Test}). Therefore, for your sanity, we recommend to avoid installing pre-\/compiled Google \doxylink{class_test}{Test} libraries. Instead, each project should compile Google \doxylink{class_test}{Test} itself such that it can be sure that the same flags are used for both Google \doxylink{class_test}{Test} and the tests.
+
+\doxysubsection*{How do I generate 64-\/bit binaries on Windows (using Visual Studio 2008)?}
+
+(Answered by Trevor Robinson)
+
+Load the supplied Visual Studio solution file, either {\ttfamily msvc\textbackslash{}gtest-\/md.\+sln} or {\ttfamily msvc\textbackslash{}gtest.\+sln}. Go through the migration wizard to migrate the solution and project files to Visual Studio 2008. Select {\ttfamily Configuration Manager...} from the {\ttfamily Build} menu. Select {\ttfamily \texorpdfstring{$<$}{<}New...\texorpdfstring{$>$}{>}} from the {\ttfamily Active solution platform} dropdown. Select {\ttfamily x64} from the new platform dropdown, leave {\ttfamily Copy settings from} set to {\ttfamily Win32} and {\ttfamily Create new project platforms} checked, then click {\ttfamily OK}. You now have {\ttfamily Win32} and {\ttfamily x64} platform configurations, selectable from the {\ttfamily Standard} toolbar, which allow you to toggle between building 32-\/bit or 64-\/bit binaries (or both at once using Batch Build).
+
+In order to prevent build output files from overwriting one another, you\textquotesingle{}ll need to change the {\ttfamily Intermediate Directory} settings for the newly created platform configuration across all the projects. To do this, multi-\/select (e.\+g. using shift-\/click) all projects (but not the solution) in the {\ttfamily Solution Explorer}. Right-\/click one of them and select {\ttfamily Properties}. In the left pane, select {\ttfamily Configuration Properties}, and from the {\ttfamily Configuration} dropdown, select {\ttfamily All Configurations}. Make sure the selected platform is {\ttfamily x64}. For the {\ttfamily Intermediate Directory} setting, change the value from {\ttfamily \$(Platform\+Name)\textbackslash{}\$(Configuration\+Name)} to {\ttfamily \$(Out\+Dir)\textbackslash{}\$(Project\+Name)}. Click {\ttfamily OK} and then build the solution. When the build is complete, the 64-\/bit binaries will be in the {\ttfamily msvc\textbackslash{}x64\textbackslash{}Debug} directory.
+
+\doxysubsection*{Can I use Google \doxylink{class_test}{Test} on Min\+GW?}
+
+We haven\textquotesingle{}t tested this ourselves, but Per Abrahamsen reported that he was able to compile and install Google \doxylink{class_test}{Test} successfully when using Min\+GW from Cygwin. You\textquotesingle{}ll need to configure it with\+:
+
+{\ttfamily PATH/\+TO/configure CC="{}gcc -\/mno-\/cygwin"{} CXX="{}g++ -\/mno-\/cygwin"{}}
+
+You should be able to replace the {\ttfamily -\/mno-\/cygwin} option with direct links to the real Min\+GW binaries, but we haven\textquotesingle{}t tried that.
+
+Caveats\+:
+
+
+\begin{DoxyItemize}
+\item There are many warnings when compiling.
+\item {\ttfamily make check} will produce some errors as not all tests for Google \doxylink{class_test}{Test} itself are compatible with Min\+GW.
+\end{DoxyItemize}
+
+We also have reports on successful cross compilation of Google \doxylink{class_test}{Test} Min\+GW binaries on Linux using \href{http://wiki.wxwidgets.org/Cross-Compiling_Under_Linux\#Cross-compiling_under_Linux_for_MS_Windows}{\texttt{ these instructions}} on the Wx\+Widgets site.
+
+Please contact {\ttfamily googletestframework@googlegroups.\+com} if you are interested in improving the support for Min\+GW.
+
+\doxysubsection*{Why does Google \doxylink{class_test}{Test} support \doxylink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\+\_\+\+EQ(\+NULL, ptr)} and \doxylink{gtest_8h_a1a6db8b1338ee7040329322b77779086}{ASSERT\+\_\+\+EQ(\+NULL, ptr)} but not \doxylink{gtest_8h_a6ae7443947f25abc58bfcfcfc56b0d75}{EXPECT\+\_\+\+NE(\+NULL, ptr)} and \doxylink{gtest_8h_aa866c8dece57912e6f51495ed3e8d8d5}{ASSERT\+\_\+\+NE(\+NULL, ptr)}?}
+
+Due to some peculiarity of C++, it requires some non-\/trivial template meta programming tricks to support using {\ttfamily NULL} as an argument of the {\ttfamily EXPECT\+\_\+\+XX()} and {\ttfamily ASSERT\+\_\+\+XX()} macros. Therefore we only do it where it\textquotesingle{}s most needed (otherwise we make the implementation of Google \doxylink{class_test}{Test} harder to maintain and more error-\/prone than necessary).
+
+The {\ttfamily \doxylink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\+\_\+\+EQ()}} macro takes the {\itshape expected} value as its first argument and the {\itshape actual} value as the second. It\textquotesingle{}s reasonable that someone wants to write {\ttfamily \doxylink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\+\_\+\+EQ(\+NULL, some\+\_\+expression)}}, and this indeed was requested several times. Therefore we implemented it.
+
+The need for {\ttfamily \doxylink{gtest_8h_a6ae7443947f25abc58bfcfcfc56b0d75}{EXPECT\+\_\+\+NE(\+NULL, ptr)}} isn\textquotesingle{}t nearly as strong. When the assertion fails, you already know that {\ttfamily ptr} must be {\ttfamily NULL}, so it doesn\textquotesingle{}t add any information to print ptr in this case. That means {\ttfamily EXPECT\+\_\+\+TRUE(ptr != NULL)} works just as well.
+
+If we were to support {\ttfamily \doxylink{gtest_8h_a6ae7443947f25abc58bfcfcfc56b0d75}{EXPECT\+\_\+\+NE(\+NULL, ptr)}}, for consistency we\textquotesingle{}ll have to support {\ttfamily \doxylink{gtest_8h_a6ae7443947f25abc58bfcfcfc56b0d75}{EXPECT\+\_\+\+NE(ptr, NULL)}} as well, as unlike {\ttfamily EXPECT\+\_\+\+EQ}, we don\textquotesingle{}t have a convention on the order of the two arguments for {\ttfamily EXPECT\+\_\+\+NE}. This means using the template meta programming tricks twice in the implementation, making it even harder to understand and maintain. We believe the benefit doesn\textquotesingle{}t justify the cost.
+
+Finally, with the growth of Google \doxylink{class_mock}{Mock}\textquotesingle{}s \href{../../googlemock/docs/CookBook.md\#using-matchers-in-google-test-assertions}{\texttt{ matcher}} library, we are encouraging people to use the unified {\ttfamily \doxylink{gmock-matchers_8h_ac31e206123aa702e1152bb2735b31409}{EXPECT\+\_\+\+THAT(value, matcher)}} syntax more often in tests. One significant advantage of the matcher approach is that matchers can be easily combined to form new matchers, while the {\ttfamily EXPECT\+\_\+\+NE}, etc, macros cannot be easily combined. Therefore we want to invest more in the matchers than in the {\ttfamily EXPECT\+\_\+\+XX()} macros.
+
+\doxysubsection*{Does Google \doxylink{class_test}{Test} support running tests in parallel?}
+
+\doxylink{class_test}{Test} runners tend to be tightly coupled with the build/test environment, and Google \doxylink{class_test}{Test} doesn\textquotesingle{}t try to solve the problem of running tests in parallel. Instead, we tried to make Google \doxylink{class_test}{Test} work nicely with test runners. For example, Google \doxylink{class_test}{Test}\textquotesingle{}s XML report contains the time spent on each test, and its {\ttfamily gtest\+\_\+list\+\_\+tests} and {\ttfamily gtest\+\_\+filter} flags can be used for splitting the execution of test methods into multiple processes. These functionalities can help the test runner run the tests in parallel.
+
+\doxysubsection*{Why don\textquotesingle{}t Google \doxylink{class_test}{Test} run the tests in different threads to speed things up?}
+
+It\textquotesingle{}s difficult to write thread-\/safe code. Most tests are not written with thread-\/safety in mind, and thus may not work correctly in a multi-\/threaded setting.
+
+If you think about it, it\textquotesingle{}s already hard to make your code work when you know what other threads are doing. It\textquotesingle{}s much harder, and sometimes even impossible, to make your code work when you don\textquotesingle{}t know what other threads are doing (remember that test methods can be added, deleted, or modified after your test was written). If you want to run the tests in parallel, you\textquotesingle{}d better run them in different processes.
+
+\doxysubsection*{Why aren\textquotesingle{}t Google \doxylink{class_test}{Test} assertions implemented using exceptions?}
+
+Our original motivation was to be able to use Google \doxylink{class_test}{Test} in projects that disable exceptions. Later we realized some additional benefits of this approach\+:
+
+
+\begin{DoxyEnumerate}
+\item Throwing in a destructor is undefined behavior in C++. Not using exceptions means Google \doxylink{class_test}{Test}\textquotesingle{}s assertions are safe to use in destructors.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item The {\ttfamily EXPECT\+\_\+\texorpdfstring{$\ast$}{*}} family of macros will continue even after a failure, allowing multiple failures in a {\ttfamily TEST} to be reported in a single run. This is a popular feature, as in C++ the edit-\/compile-\/test cycle is usually quite long and being able to fixing more than one thing at a time is a blessing.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item If assertions are implemented using exceptions, a test may falsely ignore a failure if it\textquotesingle{}s caught by user code\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ ++}
+\DoxyCodeLine{\textcolor{keywordflow}{try}\ \{\ ...\ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(...)\ ...\ \}}
+\DoxyCodeLine{\textcolor{keywordflow}{catch}\ (...)\ \{\ ...\ \}}
+
+\end{DoxyCode}
+ The above code will pass even if the {\ttfamily ASSERT\+\_\+\+TRUE} throws. While it\textquotesingle{}s unlikely for someone to write this in a test, it\textquotesingle{}s possible to run into this pattern when you write assertions in callbacks that are called by the code under test.
+\end{DoxyEnumerate}
+
+The downside of not using exceptions is that {\ttfamily ASSERT\+\_\+\texorpdfstring{$\ast$}{*}} (implemented using {\ttfamily return}) will only abort the current function, not the current {\ttfamily TEST}.
+
+\doxysubsection*{Why do we use two different macros for tests with and without fixtures?}
+
+Unfortunately, C++\textquotesingle{}s macro system doesn\textquotesingle{}t allow us to use the same macro for both cases. One possibility is to provide only one macro for tests with fixtures, and require the user to define an empty fixture sometimes\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ ++}
+\DoxyCodeLine{\textcolor{keyword}{class\ }FooTest\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1_test}{::testing::Test}}\ \{\};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(FooTest,\ DoesThis)\ \{\ ...\ \}}
+
+\end{DoxyCode}
+ or 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ ++}
+\DoxyCodeLine{\textcolor{keyword}{typedef}\ \mbox{\hyperlink{classtesting_1_1_test}{::testing::Test}}\ FooTest;}
+\DoxyCodeLine{}
+\DoxyCodeLine{\mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(FooTest,\ DoesThat)\ \{\ ...\ \}}
+
+\end{DoxyCode}
+
+
+Yet, many people think this is one line too many. \+:-\/) Our goal was to make it really easy to write tests, so we tried to make simple tests trivial to create. That means using a separate macro for such tests.
+
+We think neither approach is ideal, yet either of them is reasonable. In the end, it probably doesn\textquotesingle{}t matter much either way.
+
+\doxysubsection*{Why don\textquotesingle{}t we use structs as test fixtures?}
+
+We like to use structs only when representing passive data. This distinction between structs and classes is good for documenting the intent of the code\textquotesingle{}s author. Since test fixtures have logic like {\ttfamily Set\+Up()} and {\ttfamily Tear\+Down()}, they are better defined as classes.
+
+\doxysubsection*{Why are death tests implemented as assertions instead of using a test runner?}
+
+Our goal was to make death tests as convenient for a user as C++ possibly allows. In particular\+:
+
+
+\begin{DoxyItemize}
+\item The runner-\/style requires to split the information into two pieces\+: the definition of the death test itself, and the specification for the runner on how to run the death test and what to expect. The death test would be written in C++, while the runner spec may or may not be. \doxylink{struct_a}{A} user needs to carefully keep the two in sync. {\ttfamily ASSERT\+\_\+\+DEATH(statement, expected\+\_\+message)} specifies all necessary information in one place, in one language, without boilerplate code. It is very declarative.
+\item {\ttfamily ASSERT\+\_\+\+DEATH} has a similar syntax and error-\/reporting semantics as other Google \doxylink{class_test}{Test} assertions, and thus is easy to learn.
+\item {\ttfamily ASSERT\+\_\+\+DEATH} can be mixed with other assertions and other logic at your will. You are not limited to one death test per test method. For example, you can write something like\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{++}
+\DoxyCodeLine{\ \ \ \textcolor{keywordflow}{if}\ (FooCondition())\ \{}
+\DoxyCodeLine{\ \ \ \ \ ASSERT\_DEATH(Bar(),\ \textcolor{stringliteral}{"{}blah"{}});}
+\DoxyCodeLine{\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a1a6db8b1338ee7040329322b77779086}{ASSERT\_EQ}}(5,\ Bar());}
+\DoxyCodeLine{\ \ \ \}}
+
+\end{DoxyCode}
+ If you prefer one death test per test method, you can write your tests in that style too, but we don\textquotesingle{}t want to impose that on the users. The fewer artificial limitations the better.
+\item {\ttfamily ASSERT\+\_\+\+DEATH} can reference local variables in the current function, and you can decide how many death tests you want based on run-\/time information. For example, 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{++}
+\DoxyCodeLine{\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ =\ GetCount();\ \ \textcolor{comment}{//\ Only\ known\ at\ run\ time.}}
+\DoxyCodeLine{\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 1;\ i\ <=\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}};\ i++)\ \{}
+\DoxyCodeLine{\ \ \ \ \ ASSERT\_DEATH(\{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \textcolor{keywordtype}{double}*\ buffer\ =\ \textcolor{keyword}{new}\ \textcolor{keywordtype}{double}[i];}
+\DoxyCodeLine{\ \ \ \ \ \ \ ...\ initializes\ buffer\ ...}
+\DoxyCodeLine{\ \ \ \ \ \ \ \mbox{\hyperlink{struct_foo}{Foo}}(buffer,\ i)}
+\DoxyCodeLine{\ \ \ \ \ \},\ \textcolor{stringliteral}{"{}blah\ blah"{}});}
+\DoxyCodeLine{\ \ \ \}}
+
+\end{DoxyCode}
+ The runner-\/based approach tends to be more static and less flexible, or requires more user effort to get this kind of flexibility.
+\end{DoxyItemize}
+
+Another interesting thing about {\ttfamily ASSERT\+\_\+\+DEATH} is that it calls {\ttfamily fork()} to create a child process to run the death test. This is lightening fast, as {\ttfamily fork()} uses copy-\/on-\/write pages and incurs almost zero overhead, and the child process starts from the user-\/supplied statement directly, skipping all global and local initialization and any code leading to the given statement. If you launch the child process from scratch, it can take seconds just to load everything and start running if the test links to many libraries dynamically.
+
+\doxysubsection*{My death test modifies some state, but the change seems lost after the death test finishes. Why?}
+
+Death tests ({\ttfamily EXPECT\+\_\+\+DEATH}, etc) are executed in a sub-\/process s.\+t. the expected crash won\textquotesingle{}t kill the test program (i.\+e. the parent process). As a result, any in-\/memory side effects they incur are observable in their respective sub-\/processes, but not in the parent process. You can think of them as running in a parallel universe, more or less.
+
+\doxysubsection*{The compiler complains about "{}undefined references"{} to some static const member variables, but I did define them in the class body. What\textquotesingle{}s wrong?}
+
+If your class has a static data member\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ ++}
+\DoxyCodeLine{\textcolor{comment}{//\ foo.h}}
+\DoxyCodeLine{\textcolor{keyword}{class\ }\mbox{\hyperlink{struct_foo}{Foo}}\ \{}
+\DoxyCodeLine{\ \ ...}
+\DoxyCodeLine{\ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ kBar\ =\ 100;}
+\DoxyCodeLine{\};}
+
+\end{DoxyCode}
+
+
+You also need to define it {\itshape outside} of the class body in {\ttfamily foo.\+cc}\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ ++}
+\DoxyCodeLine{\textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ Foo::kBar;\ \ \textcolor{comment}{//\ No\ initializer\ here.}}
+
+\end{DoxyCode}
+
+
+Otherwise your code is {\bfseries{invalid C++}}, and may break in unexpected ways. In particular, using it in Google \doxylink{class_test}{Test} comparison assertions ({\ttfamily EXPECT\+\_\+\+EQ}, etc) will generate an "{}undefined reference"{} linker error.
+
+\doxysubsection*{I have an interface that has several implementations. Can I write a set of tests once and repeat them over all the implementations?}
+
+Google \doxylink{class_test}{Test} doesn\textquotesingle{}t yet have good support for this kind of tests, or data-\/driven tests in general. We hope to be able to make improvements in this area soon.
+
+\doxysubsection*{Can I derive a test fixture from another?}
+
+Yes.
+
+Each test fixture has a corresponding and same named test case. This means only one test case can use a particular fixture. Sometimes, however, multiple test cases may want to use the same or slightly different fixtures. For example, you may want to make sure that all of a GUI library\textquotesingle{}s test cases don\textquotesingle{}t leak important system resources like fonts and brushes.
+
+In Google \doxylink{class_test}{Test}, you share a fixture among test cases by putting the shared logic in a base test fixture, then deriving from that base a separate fixture for each test case that wants to use this common logic. You then use {\ttfamily \doxylink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\+\_\+\+F()}} to write tests using each derived fixture.
+
+Typically, your code looks like this\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ ++}
+\DoxyCodeLine{\textcolor{comment}{//\ Defines\ a\ base\ test\ fixture.}}
+\DoxyCodeLine{\textcolor{keyword}{class\ }BaseTest\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1_test}{::testing::Test}}\ \{}
+\DoxyCodeLine{\ \ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{\ \ \ ...}
+\DoxyCodeLine{\};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ Derives\ a\ fixture\ FooTest\ from\ BaseTest.}}
+\DoxyCodeLine{\textcolor{keyword}{class\ }FooTest\ :\ \textcolor{keyword}{public}\ BaseTest\ \{}
+\DoxyCodeLine{\ \ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1_test_a190315150c303ddf801313fd1a777733}{SetUp}}()\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ BaseTest::SetUp();\ \ \textcolor{comment}{//\ Sets\ up\ the\ base\ fixture\ first.}}
+\DoxyCodeLine{\ \ \ \ \ \ ...\ additional\ set-\/up\ work\ ...}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1_test_a5f0ab439802cbe0ef7552f1a9f791923}{TearDown}}()\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ ...\ clean-\/up\ work\ \textcolor{keywordflow}{for}\ FooTest\ ...}
+\DoxyCodeLine{\ \ \ \ \ \ BaseTest::TearDown();\ \ \textcolor{comment}{//\ Remember\ to\ tear\ down\ the\ base\ fixture}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ after\ cleaning\ up\ FooTest!}}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{\ \ \ \ ...\ functions\ and\ variables\ \textcolor{keywordflow}{for}\ FooTest\ ...}
+\DoxyCodeLine{\};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ Tests\ that\ use\ the\ fixture\ FooTest.}}
+\DoxyCodeLine{\mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(FooTest,\ Bar)\ \{\ ...\ \}}
+\DoxyCodeLine{\mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(FooTest,\ Baz)\ \{\ ...\ \}}
+\DoxyCodeLine{}
+\DoxyCodeLine{...\ additional\ fixtures\ derived\ from\ BaseTest\ ...}
+
+\end{DoxyCode}
+
+
+If necessary, you can continue to derive test fixtures from a derived fixture. Google \doxylink{class_test}{Test} has no limit on how deep the hierarchy can be.
+
+For a complete example using derived test fixtures, see \href{../samples/sample5_unittest.cc}{\texttt{ sample5}}.
+
+\doxysubsection*{My compiler complains "{}void value not ignored as it ought to be."{} What does this mean?}
+
+You\textquotesingle{}re probably using an {\ttfamily ASSERT\+\_\+\texorpdfstring{$\ast$}{*}()} in a function that doesn\textquotesingle{}t return {\ttfamily void}. {\ttfamily ASSERT\+\_\+\texorpdfstring{$\ast$}{*}()} can only be used in {\ttfamily void} functions.
+
+\doxysubsection*{My death test hangs (or seg-\/faults). How do I fix it?}
+
+In Google \doxylink{class_test}{Test}, death tests are run in a child process and the way they work is delicate. To write death tests you really need to understand how they work. Please make sure you have read this.
+
+In particular, death tests don\textquotesingle{}t like having multiple threads in the parent process. So the first thing you can try is to eliminate creating threads outside of {\ttfamily EXPECT\+\_\+\+DEATH()}.
+
+Sometimes this is impossible as some library you must use may be creating threads before {\ttfamily \doxylink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main()}} is even reached. In this case, you can try to minimize the chance of conflicts by either moving as many activities as possible inside {\ttfamily EXPECT\+\_\+\+DEATH()} (in the extreme case, you want to move everything inside), or leaving as few things as possible in it. Also, you can try to set the death test style to {\ttfamily "{}threadsafe"{}}, which is safer but slower, and see if it helps.
+
+If you go with thread-\/safe death tests, remember that they rerun the test program from the beginning in the child process. Therefore make sure your program can run side-\/by-\/side with itself and is deterministic.
+
+In the end, this boils down to good concurrent programming. You have to make sure that there is no race conditions or dead locks in your program. No silver bullet -\/ sorry!
+
+\doxysubsection*{Should I use the constructor/destructor of the test fixture or the set-\/up/tear-\/down function?}
+
+The first thing to remember is that Google \doxylink{class_test}{Test} does not reuse the same test fixture object across multiple tests. For each {\ttfamily TEST\+\_\+F}, Google \doxylink{class_test}{Test} will create a fresh test fixture object, {\itshape immediately} call {\ttfamily Set\+Up()}, run the test body, call {\ttfamily Tear\+Down()}, and then {\itshape immediately} delete the test fixture object.
+
+When you need to write per-\/test set-\/up and tear-\/down logic, you have the choice between using the test fixture constructor/destructor or {\ttfamily Set\+Up()/\+Tear\+Down()}. The former is usually preferred, as it has the following benefits\+:
+
+
+\begin{DoxyItemize}
+\item By initializing a member variable in the constructor, we have the option to make it {\ttfamily const}, which helps prevent accidental changes to its value and makes the tests more obviously correct.
+\item In case we need to subclass the test fixture class, the subclass\textquotesingle{} constructor is guaranteed to call the base class\textquotesingle{} constructor first, and the subclass\textquotesingle{} destructor is guaranteed to call the base class\textquotesingle{} destructor afterward. With {\ttfamily Set\+Up()/\+Tear\+Down()}, a subclass may make the mistake of forgetting to call the base class\textquotesingle{} {\ttfamily Set\+Up()/\+Tear\+Down()} or call them at the wrong moment.
+\end{DoxyItemize}
+
+You may still want to use {\ttfamily Set\+Up()/\+Tear\+Down()} in the following rare cases\+:
+\begin{DoxyItemize}
+\item If the tear-\/down operation could throw an exception, you must use {\ttfamily Tear\+Down()} as opposed to the destructor, as throwing in a destructor leads to undefined behavior and usually will kill your program right away. Note that many standard libraries (like STL) may throw when exceptions are enabled in the compiler. Therefore you should prefer {\ttfamily Tear\+Down()} if you want to write portable tests that work with or without exceptions.
+\item The assertion macros throw an exception when flag {\ttfamily -\/-\/gtest\+\_\+throw\+\_\+on\+\_\+failure} is specified. Therefore, you shouldn\textquotesingle{}t use Google \doxylink{class_test}{Test} assertions in a destructor if you plan to run your tests with this flag.
+\item In a constructor or destructor, you cannot make a virtual function call on this object. (You can call a method declared as virtual, but it will be statically bound.) Therefore, if you need to call a method that will be overridden in a derived class, you have to use {\ttfamily Set\+Up()/\+Tear\+Down()}.
+\end{DoxyItemize}
+
+\doxysubsection*{The compiler complains "{}no matching function to call"{} when I use ASSERT\+\_\+\+PREDn. How do I fix it?}
+
+If the predicate function you use in {\ttfamily ASSERT\+\_\+\+PRED\texorpdfstring{$\ast$}{*}} or {\ttfamily EXPECT\+\_\+\+PRED\texorpdfstring{$\ast$}{*}} is overloaded or a template, the compiler will have trouble figuring out which overloaded version it should use. {\ttfamily ASSERT\+\_\+\+PRED\+\_\+\+FORMAT\texorpdfstring{$\ast$}{*}} and {\ttfamily EXPECT\+\_\+\+PRED\+\_\+\+FORMAT\texorpdfstring{$\ast$}{*}} don\textquotesingle{}t have this problem.
+
+If you see this error, you might want to switch to {\ttfamily (ASSERT\texorpdfstring{$\vert$}{|}\+EXPECT)\+\_\+\+PRED\+\_\+\+FORMAT\texorpdfstring{$\ast$}{*}}, which will also give you a better failure message. If, however, that is not an option, you can resolve the problem by explicitly telling the compiler which version to pick.
+
+For example, suppose you have
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ ++}
+\DoxyCodeLine{\textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacetesting_1_1gmock__matchers__test_a70e728cf67d0224c3ebb9eb8959cc39d}{IsPositive}}(\textcolor{keywordtype}{int}\ n)\ \{}
+\DoxyCodeLine{\ \ \textcolor{keywordflow}{return}\ n\ >\ 0;}
+\DoxyCodeLine{\}}
+\DoxyCodeLine{\textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacetesting_1_1gmock__matchers__test_a70e728cf67d0224c3ebb9eb8959cc39d}{IsPositive}}(\textcolor{keywordtype}{double}\ x)\ \{}
+\DoxyCodeLine{\ \ \textcolor{keywordflow}{return}\ x\ >\ 0;}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+you will get a compiler error if you write
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ ++}
+\DoxyCodeLine{\mbox{\hyperlink{gtest__pred__impl_8h_a6d09aa83f8d297481380c7c073c9f070}{EXPECT\_PRED1}}(IsPositive,\ 5);}
+
+\end{DoxyCode}
+
+
+However, this will work\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ ++}
+\DoxyCodeLine{\mbox{\hyperlink{gtest__pred__impl_8h_a6d09aa83f8d297481380c7c073c9f070}{EXPECT\_PRED1}}(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{bool}\ (*)(\textcolor{keywordtype}{int})\textcolor{keyword}{>}(IsPositive),\ 5);}
+
+\end{DoxyCode}
+
+
+(The stuff inside the angled brackets for the {\ttfamily static\+\_\+cast} operator is the type of the function pointer for the {\ttfamily int}-\/version of {\ttfamily Is\+Positive()}.)
+
+As another example, when you have a template function
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ ++}
+\DoxyCodeLine{\textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\textcolor{keywordtype}{bool}\ IsNegative(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ x)\ \{}
+\DoxyCodeLine{\ \ \textcolor{keywordflow}{return}\ x\ <\ 0;}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+you can use it in a predicate assertion like this\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ ++}
+\DoxyCodeLine{\mbox{\hyperlink{gtest__pred__impl_8h_a7d72f779b7d39b8f73a563ebc6d0604b}{ASSERT\_PRED1}}(IsNegative<int>,\ -\/5);}
+
+\end{DoxyCode}
+
+
+Things are more interesting if your template has more than one parameters. The following won\textquotesingle{}t compile\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ ++}
+\DoxyCodeLine{\mbox{\hyperlink{gtest__pred__impl_8h_a4e9b777cce4e5423f4c2e491be7aa818}{ASSERT\_PRED2}}(GreaterThan<int,\ int>,\ 5,\ 0);}
+
+\end{DoxyCode}
+
+
+as the C++ pre-\/processor thinks you are giving {\ttfamily ASSERT\+\_\+\+PRED2} 4 arguments, which is one more than expected. The workaround is to wrap the predicate function in parentheses\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ ++}
+\DoxyCodeLine{\mbox{\hyperlink{gtest__pred__impl_8h_a4e9b777cce4e5423f4c2e491be7aa818}{ASSERT\_PRED2}}((GreaterThan<int,\ int>),\ 5,\ 0);}
+
+\end{DoxyCode}
+
+
+\doxysubsection*{My compiler complains about "{}ignoring return value"{} when I call \doxylink{gtest_8h_a853a3792807489591d3d4a2f2ff9359f}{RUN\+\_\+\+ALL\+\_\+\+TESTS()}. Why?}
+
+Some people had been ignoring the return value of {\ttfamily \doxylink{gtest_8h_a853a3792807489591d3d4a2f2ff9359f}{RUN\+\_\+\+ALL\+\_\+\+TESTS()}}. That is, instead of
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ ++}
+\DoxyCodeLine{\textcolor{keywordflow}{return}\ \mbox{\hyperlink{gtest_8h_a853a3792807489591d3d4a2f2ff9359f}{RUN\_ALL\_TESTS}}();}
+
+\end{DoxyCode}
+
+
+they write
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ ++}
+\DoxyCodeLine{\mbox{\hyperlink{gtest_8h_a853a3792807489591d3d4a2f2ff9359f}{RUN\_ALL\_TESTS}}();}
+
+\end{DoxyCode}
+
+
+This is wrong and dangerous. \doxylink{struct_a}{A} test runner needs to see the return value of {\ttfamily \doxylink{gtest_8h_a853a3792807489591d3d4a2f2ff9359f}{RUN\+\_\+\+ALL\+\_\+\+TESTS()}} in order to determine if a test has passed. If your {\ttfamily \doxylink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main()}} function ignores it, your test will be considered successful even if it has a Google \doxylink{class_test}{Test} assertion failure. Very bad.
+
+To help the users avoid this dangerous bug, the implementation of {\ttfamily \doxylink{gtest_8h_a853a3792807489591d3d4a2f2ff9359f}{RUN\+\_\+\+ALL\+\_\+\+TESTS()}} causes gcc to raise this warning, when the return value is ignored. If you see this warning, the fix is simple\+: just make sure its value is used as the return value of {\ttfamily \doxylink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main()}}.
+
+\doxysubsection*{My compiler complains that a constructor (or destructor) cannot return a value. What\textquotesingle{}s going on?}
+
+Due to a peculiarity of C++, in order to support the syntax for streaming messages to an {\ttfamily ASSERT\+\_\+\texorpdfstring{$\ast$}{*}}, e.\+g.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ ++}
+\DoxyCodeLine{\mbox{\hyperlink{gtest_8h_a1a6db8b1338ee7040329322b77779086}{ASSERT\_EQ}}(1,\ \mbox{\hyperlink{struct_foo}{Foo}}())\ <<\ \textcolor{stringliteral}{"{}blah\ blah"{}}\ <<\ \mbox{\hyperlink{namespacefoo}{foo}};}
+
+\end{DoxyCode}
+
+
+we had to give up using {\ttfamily ASSERT\texorpdfstring{$\ast$}{*}} and {\ttfamily FAIL\texorpdfstring{$\ast$}{*}} (but not {\ttfamily EXPECT\texorpdfstring{$\ast$}{*}} and {\ttfamily ADD\+\_\+\+FAILURE\texorpdfstring{$\ast$}{*}}) in constructors and destructors. The workaround is to move the content of your constructor/destructor to a private void member function, or switch to {\ttfamily EXPECT\+\_\+\texorpdfstring{$\ast$}{*}()} if that works. This section in the user\textquotesingle{}s guide explains it.
+
+\doxysubsection*{My set-\/up function is not called. Why?}
+
+C++ is case-\/sensitive. It should be spelled as {\ttfamily Set\+Up()}. Did you spell it as {\ttfamily Setup()}?
+
+Similarly, sometimes people spell {\ttfamily Set\+Up\+Test\+Case()} as {\ttfamily Setup\+Test\+Case()} and wonder why it\textquotesingle{}s never called.
+
+\doxysubsection*{How do I jump to the line of a failure in Emacs directly?}
+
+Google \doxylink{class_test}{Test}\textquotesingle{}s failure message format is understood by Emacs and many other IDEs, like acme and XCode. If a Google \doxylink{class_test}{Test} message is in a compilation buffer in Emacs, then it\textquotesingle{}s clickable. You can now hit {\ttfamily enter} on a message to jump to the corresponding source code, or use {\ttfamily C-\/x}\`{} to jump to the next failure.
+
+\doxysubsection*{I have several test cases which share the same test fixture logic, do I have to define a new test fixture class for each of them? This seems pretty tedious.}
+
+You don\textquotesingle{}t have to. Instead of
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ ++}
+\DoxyCodeLine{\textcolor{keyword}{class\ }FooTest\ :\ \textcolor{keyword}{public}\ BaseTest\ \{\};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(FooTest,\ Abc)\ \{\ ...\ \}}
+\DoxyCodeLine{\mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(FooTest,\ Def)\ \{\ ...\ \}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{class\ }BarTest\ :\ \textcolor{keyword}{public}\ BaseTest\ \{\};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(BarTest,\ Abc)\ \{\ ...\ \}}
+\DoxyCodeLine{\mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(BarTest,\ Def)\ \{\ ...\ \}}
+
+\end{DoxyCode}
+
+
+you can simply {\ttfamily typedef} the test fixtures\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ ++}
+\DoxyCodeLine{\textcolor{keyword}{typedef}\ BaseTest\ FooTest;}
+\DoxyCodeLine{}
+\DoxyCodeLine{\mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(FooTest,\ Abc)\ \{\ ...\ \}}
+\DoxyCodeLine{\mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(FooTest,\ Def)\ \{\ ...\ \}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{typedef}\ BaseTest\ BarTest;}
+\DoxyCodeLine{}
+\DoxyCodeLine{\mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(BarTest,\ Abc)\ \{\ ...\ \}}
+\DoxyCodeLine{\mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(BarTest,\ Def)\ \{\ ...\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection*{The Google \doxylink{class_test}{Test} output is buried in a whole bunch of log messages. What do I do?}
+
+The Google \doxylink{class_test}{Test} output is meant to be a concise and human-\/friendly report. If your test generates textual output itself, it will mix with the Google \doxylink{class_test}{Test} output, making it hard to read. However, there is an easy solution to this problem.
+
+Since most log messages go to stderr, we decided to let Google \doxylink{class_test}{Test} output go to stdout. This way, you can easily separate the two using redirection. For example\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{./my\_test\ >\ googletest\_output.txt}
+
+\end{DoxyCode}
+
+
+\doxysubsection*{Why should I prefer test fixtures over global variables?}
+
+There are several good reasons\+:
+\begin{DoxyEnumerate}
+\item It\textquotesingle{}s likely your test needs to change the states of its global variables. This makes it difficult to keep side effects from escaping one test and contaminating others, making debugging difficult. By using fixtures, each test has a fresh set of variables that\textquotesingle{}s different (but with the same names). Thus, tests are kept independent of each other.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Global variables pollute the global namespace.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item \doxylink{class_test}{Test} fixtures can be reused via subclassing, which cannot be done easily with global variables. This is useful if many test cases have something in common.
+\end{DoxyEnumerate}
+
+\doxysubsection*{How do I test private class members without writing \doxylink{gtest__prod_8h_a8d443b4cc1d87a7a17943b8fbdbf3910}{FRIEND\+\_\+\+TEST()}s?}
+
+You should try to write testable code, which means classes should be easily tested from their public interface. One way to achieve this is the Pimpl idiom\+: you move all private members of a class into a helper class, and make all members of the helper class public.
+
+You have several other options that don\textquotesingle{}t require using {\ttfamily FRIEND\+\_\+\+TEST}\+:
+\begin{DoxyItemize}
+\item Write the tests as members of the fixture class\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ ++}
+\DoxyCodeLine{\textcolor{keyword}{class\ }\mbox{\hyperlink{struct_foo}{Foo}}\ \{}
+\DoxyCodeLine{\ \ \textcolor{keyword}{friend}\ \textcolor{keyword}{class\ }FooTest;}
+\DoxyCodeLine{\ \ ...}
+\DoxyCodeLine{\};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{class\ }FooTest\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1_test}{::testing::Test}}\ \{}
+\DoxyCodeLine{\ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{\ \ ...}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{void}\ Test1()\ \{...\}\ \textcolor{comment}{//\ This\ accesses\ private\ members\ of\ class\ Foo.}}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{void}\ Test2()\ \{...\}\ \textcolor{comment}{//\ So\ does\ this\ one.}}
+\DoxyCodeLine{\};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(FooTest,\ Test1)\ \{}
+\DoxyCodeLine{\ \ Test1();}
+\DoxyCodeLine{\}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(FooTest,\ Test2)\ \{}
+\DoxyCodeLine{\ \ Test2();}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+\item In the fixture class, write accessors for the tested class\textquotesingle{} private members, then use the accessors in your tests\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ ++}
+\DoxyCodeLine{\textcolor{keyword}{class\ }\mbox{\hyperlink{struct_foo}{Foo}}\ \{}
+\DoxyCodeLine{\ \ \textcolor{keyword}{friend}\ \textcolor{keyword}{class\ }FooTest;}
+\DoxyCodeLine{\ \ ...}
+\DoxyCodeLine{\};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{class\ }FooTest\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1_test}{::testing::Test}}\ \{}
+\DoxyCodeLine{\ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{\ \ ...}
+\DoxyCodeLine{\ \ T1\ get\_private\_member1(\mbox{\hyperlink{struct_foo}{Foo}}*\ obj)\ \{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{return}\ obj-\/>private\_member1\_;}
+\DoxyCodeLine{\ \ \}}
+\DoxyCodeLine{\};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(FooTest,\ Test1)\ \{}
+\DoxyCodeLine{\ \ ...}
+\DoxyCodeLine{\ \ get\_private\_member1(x)}
+\DoxyCodeLine{\ \ ...}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+\item If the methods are declared {\bfseries{protected}}, you can change their access level in a test-\/only subclass\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ ++}
+\DoxyCodeLine{\textcolor{keyword}{class\ }YourClass\ \{}
+\DoxyCodeLine{\ \ ...}
+\DoxyCodeLine{\ \textcolor{keyword}{protected}:\ \textcolor{comment}{//\ protected\ access\ for\ testability.}}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{int}\ DoSomethingReturningInt();}
+\DoxyCodeLine{\ \ ...}
+\DoxyCodeLine{\};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ in\ the\ your\_class\_test.cc\ file:}}
+\DoxyCodeLine{\textcolor{keyword}{class\ }TestableYourClass\ :\ \textcolor{keyword}{public}\ YourClass\ \{}
+\DoxyCodeLine{\ \ ...}
+\DoxyCodeLine{\ \textcolor{keyword}{public}:\ \textcolor{keyword}{using\ }YourClass::DoSomethingReturningInt;\ \textcolor{comment}{//\ changes\ access\ rights}}
+\DoxyCodeLine{\ \ ...}
+\DoxyCodeLine{\};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(YourClassTest,\ DoSomethingTest)\ \{}
+\DoxyCodeLine{\ \ TestableYourClass\ obj;}
+\DoxyCodeLine{\ \ assertEquals(expected\_value,\ obj.DoSomethingReturningInt());}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+\end{DoxyItemize}
+
+\doxysubsection*{How do I test private class static members without writing \doxylink{gtest__prod_8h_a8d443b4cc1d87a7a17943b8fbdbf3910}{FRIEND\+\_\+\+TEST()}s?}
+
+We find private static methods clutter the header file. They are implementation details and ideally should be kept out of a .h. So often I make them free functions instead.
+
+Instead of\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ ++}
+\DoxyCodeLine{\textcolor{comment}{//\ foo.h}}
+\DoxyCodeLine{\textcolor{keyword}{class\ }\mbox{\hyperlink{struct_foo}{Foo}}\ \{}
+\DoxyCodeLine{\ \ ...}
+\DoxyCodeLine{\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{bool}\ Func(\textcolor{keywordtype}{int}\ n);}
+\DoxyCodeLine{\};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ foo.cc}}
+\DoxyCodeLine{\textcolor{keywordtype}{bool}\ Foo::Func(\textcolor{keywordtype}{int}\ n)\ \{\ ...\ \}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ foo\_test.cc}}
+\DoxyCodeLine{\mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(Foo::Func(12345));}
+
+\end{DoxyCode}
+
+
+You probably should better write\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ ++}
+\DoxyCodeLine{\textcolor{comment}{//\ foo.h}}
+\DoxyCodeLine{\textcolor{keyword}{class\ }\mbox{\hyperlink{struct_foo}{Foo}}\ \{}
+\DoxyCodeLine{\ \ ...}
+\DoxyCodeLine{\};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ foo.cc}}
+\DoxyCodeLine{\textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceinternal}{internal}}\ \{}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{bool}\ Func(\textcolor{keywordtype}{int}\ n)\ \{\ ...\ \}}
+\DoxyCodeLine{\}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ foo\_test.cc}}
+\DoxyCodeLine{\textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceinternal}{internal}}\ \{}
+\DoxyCodeLine{\ \ \textcolor{keywordtype}{bool}\ Func(\textcolor{keywordtype}{int}\ n);}
+\DoxyCodeLine{\}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(internal::Func(12345));}
+
+\end{DoxyCode}
+
+
+\doxysubsection*{I would like to run a test several times with different parameters. Do I need to write several similar copies of it?}
+
+No. You can use a feature called \href{advanced.md\#Value_Parameterized_Tests}{\texttt{ value-\/parameterized tests}} which lets you repeat your tests with different parameters, without defining it more than once.
+
+\doxysubsection*{How do I test a file that defines \doxylink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main()}?}
+
+To test a {\ttfamily foo.\+cc} file, you need to compile and link it into your unit test program. However, when the file contains a definition for the {\ttfamily \doxylink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main()}} function, it will clash with the {\ttfamily \doxylink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main()}} of your unit test, and will result in a build error.
+
+The right solution is to split it into three files\+:
+\begin{DoxyEnumerate}
+\item {\ttfamily foo.\+h} which contains the declarations,
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item {\ttfamily foo.\+cc} which contains the definitions except {\ttfamily \doxylink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main()}}, and
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item {\ttfamily foo\+\_\+main.\+cc} which contains nothing but the definition of {\ttfamily \doxylink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main()}}.
+\end{DoxyEnumerate}
+
+Then {\ttfamily foo.\+cc} can be easily tested.
+
+If you are adding tests to an existing file and don\textquotesingle{}t want an intrusive change like this, there is a hack\+: just include the entire {\ttfamily foo.\+cc} file in your unit test. For example\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ ++}
+\DoxyCodeLine{\textcolor{comment}{//\ File\ foo\_unittest.cc}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ The\ headers\ section}}
+\DoxyCodeLine{...}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ Renames\ main()\ in\ foo.cc\ to\ make\ room\ for\ the\ unit\ test\ main()}}
+\DoxyCodeLine{\#define\ \mbox{\hyperlink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}\ FooMain}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{preprocessor}{\#include\ "{}a/b/foo.cc"{}}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ The\ tests\ start\ here.}}
+\DoxyCodeLine{...}
+
+\end{DoxyCode}
+
+
+However, please remember this is a hack and should only be used as the last resort.
+
+\doxysubsection*{What can the statement argument in ASSERT\+\_\+\+DEATH() be?}
+
+{\ttfamily ASSERT\+\_\+\+DEATH(\+\_\+statement\+\_\+, \+\_\+regex\+\_\+)} (or any death assertion macro) can be used wherever {\ttfamily \+\_\+statement\+\_\+} is valid. So basically {\ttfamily \+\_\+statement\+\_\+} can be any C++ statement that makes sense in the current context. In particular, it can reference global and/or local variables, and can be\+:
+\begin{DoxyItemize}
+\item a simple function call (often the case),
+\item a complex expression, or
+\item a compound statement.
+\end{DoxyItemize}
+
+Some examples are shown here\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ ++}
+\DoxyCodeLine{\textcolor{comment}{//\ A\ death\ test\ can\ be\ a\ simple\ function\ call.}}
+\DoxyCodeLine{\mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(MyDeathTest,\ FunctionCall)\ \{}
+\DoxyCodeLine{\ \ ASSERT\_DEATH(Xyz(5),\ \textcolor{stringliteral}{"{}Xyz\ failed"{}});}
+\DoxyCodeLine{\}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ Or\ a\ complex\ expression\ that\ references\ variables\ and\ functions.}}
+\DoxyCodeLine{\mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(MyDeathTest,\ ComplexExpression)\ \{}
+\DoxyCodeLine{\ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ c\ =\ Condition();}
+\DoxyCodeLine{\ \ ASSERT\_DEATH((c\ ?\ Func1(0)\ :\ object2.Method(\textcolor{stringliteral}{"{}test"{}})),}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}(Func1|Method)\ failed"{}});}
+\DoxyCodeLine{\}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ Death\ assertions\ can\ be\ used\ any\ where\ in\ a\ function.\ In}}
+\DoxyCodeLine{\textcolor{comment}{//\ particular,\ they\ can\ be\ inside\ a\ loop.}}
+\DoxyCodeLine{\mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(MyDeathTest,\ InsideLoop)\ \{}
+\DoxyCodeLine{\ \ \textcolor{comment}{//\ Verifies\ that\ Foo(0),\ Foo(1),\ ...,\ and\ Foo(4)\ all\ die.}}
+\DoxyCodeLine{\ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ 5;\ i++)\ \{}
+\DoxyCodeLine{\ \ \ \ EXPECT\_DEATH\_M(\mbox{\hyperlink{struct_foo}{Foo}}(i),\ \textcolor{stringliteral}{"{}Foo\ has\ \(\backslash\)\(\backslash\)d+\ errors"{}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1_message}{::testing::Message}}()\ <<\ \textcolor{stringliteral}{"{}where\ i\ is\ "{}}\ <<\ i);}
+\DoxyCodeLine{\ \ \}}
+\DoxyCodeLine{\}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ A\ death\ assertion\ can\ contain\ a\ compound\ statement.}}
+\DoxyCodeLine{\mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(MyDeathTest,\ CompoundStatement)\ \{}
+\DoxyCodeLine{\ \ \textcolor{comment}{//\ Verifies\ that\ at\ lease\ one\ of\ Bar(0),\ Bar(1),\ ...,\ and}}
+\DoxyCodeLine{\ \ \textcolor{comment}{//\ Bar(4)\ dies.}}
+\DoxyCodeLine{\ \ ASSERT\_DEATH(\{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ 5;\ i++)\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ Bar(i);}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{\ \ \},}
+\DoxyCodeLine{\ \ \textcolor{stringliteral}{"{}Bar\ has\ \(\backslash\)\(\backslash\)d+\ errors"{}});\}}
+
+\end{DoxyCode}
+
+
+{\ttfamily googletest\+\_\+unittest.\+cc} contains more examples if you are interested.
+
+\doxysubsection*{What syntax does the regular expression in ASSERT\+\_\+\+DEATH use?}
+
+On POSIX systems, Google \doxylink{class_test}{Test} uses the POSIX Extended regular expression syntax (\href{http://en.wikipedia.org/wiki/Regular_expression\#POSIX_Extended_Regular_Expressions}{\texttt{ http\+://en.\+wikipedia.\+org/wiki/\+Regular\+\_\+expression\#\+POSIX\+\_\+\+Extended\+\_\+\+Regular\+\_\+\+Expressions}}). On Windows, it uses a limited variant of regular expression syntax. For more details, see the \href{advanced.md\#Regular_Expression_Syntax}{\texttt{ regular expression syntax}}.
+
+\doxysubsection*{I have a fixture class \doxylink{struct_foo}{Foo}, but \doxylink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\+\_\+\+F(\+Foo, Bar)} gives me error "{}no matching function for call to Foo\+::\+Foo()"{}. Why?}
+
+Google \doxylink{class_test}{Test} needs to be able to create objects of your test fixture class, so it must have a default constructor. Normally the compiler will define one for you. However, there are cases where you have to define your own\+:
+\begin{DoxyItemize}
+\item If you explicitly declare a non-\/default constructor for class {\ttfamily \doxylink{struct_foo}{Foo}}, then you need to define a default constructor, even if it would be empty.
+\item If {\ttfamily \doxylink{struct_foo}{Foo}} has a const non-\/static data member, then you have to define the default constructor {\itshape and} initialize the const member in the initializer list of the constructor. (Early versions of {\ttfamily gcc} doesn\textquotesingle{}t force you to initialize the const member. It\textquotesingle{}s a bug that has been fixed in {\ttfamily gcc 4}.)
+\end{DoxyItemize}
+
+\doxysubsection*{Why does ASSERT\+\_\+\+DEATH complain about previous threads that were already joined?}
+
+With the Linux pthread library, there is no turning back once you cross the line from single thread to multiple threads. The first time you create a thread, a manager thread is created in addition, so you get 3, not 2, threads. Later when the thread you create joins the main thread, the thread count decrements by 1, but the manager thread will never be killed, so you still have 2 threads, which means you cannot safely run a death test.
+
+The new NPTL thread library doesn\textquotesingle{}t suffer from this problem, as it doesn\textquotesingle{}t create a manager thread. However, if you don\textquotesingle{}t control which machine your test runs on, you shouldn\textquotesingle{}t depend on this.
+
+\doxysubsection*{Why does Google \doxylink{class_test}{Test} require the entire test case, instead of individual tests, to be named FOODeath\+Test when it uses ASSERT\+\_\+\+DEATH?}
+
+Google \doxylink{class_test}{Test} does not interleave tests from different test cases. That is, it runs all tests in one test case first, and then runs all tests in the next test case, and so on. Google \doxylink{class_test}{Test} does this because it needs to set up a test case before the first test in it is run, and tear it down afterwords. Splitting up the test case would require multiple set-\/up and tear-\/down processes, which is inefficient and makes the semantics unclean.
+
+If we were to determine the order of tests based on test name instead of test case name, then we would have a problem with the following situation\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ ++}
+\DoxyCodeLine{\mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(FooTest,\ AbcDeathTest)\ \{\ ...\ \}}
+\DoxyCodeLine{\mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(FooTest,\ Uvw)\ \{\ ...\ \}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(BarTest,\ DefDeathTest)\ \{\ ...\ \}}
+\DoxyCodeLine{\mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(BarTest,\ Xyz)\ \{\ ...\ \}}
+
+\end{DoxyCode}
+
+
+Since {\ttfamily Foo\+Test.\+Abc\+Death\+Test} needs to run before {\ttfamily Bar\+Test.\+Xyz}, and we don\textquotesingle{}t interleave tests from different test cases, we need to run all tests in the {\ttfamily \doxylink{class_foo_test}{Foo\+Test}} case before running any test in the {\ttfamily Bar\+Test} case. This contradicts with the requirement to run {\ttfamily Bar\+Test.\+Def\+Death\+Test} before {\ttfamily Foo\+Test.\+Uvw}.
+
+\doxysubsection*{But I don\textquotesingle{}t like calling my entire test case FOODeath\+Test when it contains both death tests and non-\/death tests. What do I do?}
+
+You don\textquotesingle{}t have to, but if you like, you may split up the test case into {\ttfamily \doxylink{class_foo_test}{Foo\+Test}} and {\ttfamily Foo\+Death\+Test}, where the names make it clear that they are related\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ ++}
+\DoxyCodeLine{\textcolor{keyword}{class\ }FooTest\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1_test}{::testing::Test}}\ \{\ ...\ \};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(FooTest,\ Abc)\ \{\ ...\ \}}
+\DoxyCodeLine{\mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(FooTest,\ Def)\ \{\ ...\ \}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{typedef}\ FooTest\ FooDeathTest;}
+\DoxyCodeLine{}
+\DoxyCodeLine{\mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(FooDeathTest,\ Uvw)\ \{\ ...\ EXPECT\_DEATH(...)\ ...\ \}}
+\DoxyCodeLine{\mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(FooDeathTest,\ Xyz)\ \{\ ...\ ASSERT\_DEATH(...)\ ...\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection*{The compiler complains about "{}no match for \textquotesingle{}operator$<$$<$\textquotesingle{}"{} when I use an assertion. What gives?}
+
+If you use a user-\/defined type {\ttfamily Foo\+Type} in an assertion, you must make sure there is an {\ttfamily std\+::ostream\& operator\texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<}(std\+::ostream\&, const Foo\+Type\&)} function defined such that we can print a value of {\ttfamily Foo\+Type}.
+
+In addition, if {\ttfamily Foo\+Type} is declared in a name space, the {\ttfamily \texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<}} operator also needs to be defined in the {\itshape same} name space.
+
+\doxysubsection*{How do I suppress the memory leak messages on Windows?}
+
+Since the statically initialized Google \doxylink{class_test}{Test} singleton requires allocations on the heap, the Visual C++ memory leak detector will report memory leaks at the end of the program run. The easiest way to avoid this is to use the {\ttfamily \+\_\+\+Crt\+Mem\+Checkpoint} and {\ttfamily \+\_\+\+Crt\+Mem\+Dump\+All\+Objects\+Since} calls to not report any statically initialized heap objects. See MSDN for more details and additional heap check/debug routines.
+
+\doxysubsection*{I am building my project with Google \doxylink{class_test}{Test} in Visual Studio and all I\textquotesingle{}m getting is a bunch of linker errors (or warnings). Help!}
+
+You may get a number of the following linker error or warnings if you attempt to link your test project with the Google \doxylink{class_test}{Test} library when your project and the are not built using the same compiler settings.
+
+
+\begin{DoxyItemize}
+\item LNK2005\+: symbol already defined in object
+\item LNK4217\+: locally defined symbol \textquotesingle{}symbol\textquotesingle{} imported in function \textquotesingle{}function\textquotesingle{}
+\item LNK4049\+: locally defined symbol \textquotesingle{}symbol\textquotesingle{} imported
+\end{DoxyItemize}
+
+The Google \doxylink{class_test}{Test} project (gtest.\+vcproj) has the \doxylink{namespace_runtime}{Runtime} Library option set to /\+MT (use multi-\/threaded static libraries, /\+MTd for debug). If your project uses something else, for example /\+MD (use multi-\/threaded DLLs, /\+MDd for debug), you need to change the setting in the Google \doxylink{class_test}{Test} project to match your project\textquotesingle{}s.
+
+To update this setting open the project properties in the Visual Studio IDE then select the branch Configuration Properties \texorpdfstring{$\vert$}{|} C/\+C++ \texorpdfstring{$\vert$}{|} \doxylink{struct_code}{Code} Generation and change the option "{}\+Runtime Library"{}. You may also try using gtest-\/md.\+vcproj instead of gtest.\+vcproj.
+
+\doxysubsection*{I put my tests in a library and Google \doxylink{class_test}{Test} doesn\textquotesingle{}t run them. What\textquotesingle{}s happening?}
+
+Have you read a \href{primer.md\#important-note-for-visual-c-users}{\texttt{ warning}} on the Google \doxylink{class_test}{Test} Primer page?
+
+\doxysubsection*{I want to use Google \doxylink{class_test}{Test} with Visual Studio but don\textquotesingle{}t know where to start.}
+
+Many people are in your position and one of them posted his solution to our mailing list.
+
+\doxysubsection*{I am seeing compile errors mentioning std\+::type\+\_\+traits when I try to use Google \doxylink{class_test}{Test} on Solaris.}
+
+Google \doxylink{class_test}{Test} uses parts of the standard C++ library that Sun\+Studio does not support. Our users reported success using alternative implementations. Try running the build after running this command\+:
+
+`export CC=cc CXX=CC CXXFLAGS='-\/library=stlport4\textquotesingle{}\`{}
+
+\doxysubsection*{How can my code detect if it is running in a test?}
+
+If you write code that sniffs whether it\textquotesingle{}s running in a test and does different things accordingly, you are leaking test-\/only logic into production code and there is no easy way to ensure that the test-\/only code paths aren\textquotesingle{}t run by mistake in production. Such cleverness also leads to \href{http://en.wikipedia.org/wiki/Unusual_software_bug\#Heisenbug}{\texttt{ Heisenbugs}}. Therefore we strongly advise against the practice, and Google \doxylink{class_test}{Test} doesn\textquotesingle{}t provide a way to do it.
+
+In general, the recommended way to cause the code to behave differently under test is \href{http://jamesshore.com/Blog/Dependency-Injection-Demystified.html}{\texttt{ dependency injection}}. You can inject different functionality from the test and from the production code. Since your production code doesn\textquotesingle{}t link in the for-\/test logic at all, there is no danger in accidentally running it.
+
+However, if you {\itshape really}, {\itshape really}, {\itshape really} have no choice, and if you follow the rule of ending your test program names with {\ttfamily \+\_\+test}, you can use the {\itshape horrible} hack of sniffing your executable name ({\ttfamily argv\mbox{[}0\mbox{]}} in {\ttfamily \doxylink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main()}}) to know whether the code is under test.
+
+\doxysubsection*{Google \doxylink{class_test}{Test} defines a macro that clashes with one defined by another library. How do I deal with that?}
+
+In C++, macros don\textquotesingle{}t obey namespaces. Therefore two libraries that both define a macro of the same name will clash if you {\ttfamily \#include} both definitions. In case a Google \doxylink{class_test}{Test} macro clashes with another library, you can force Google \doxylink{class_test}{Test} to rename its macro to avoid the conflict.
+
+Specifically, if both Google \doxylink{class_test}{Test} and some other code define macro {\ttfamily FOO}, you can add 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{-\/DGTEST\_DONT\_DEFINE\_FOO=1}
+
+\end{DoxyCode}
+ to the compiler flags to tell Google \doxylink{class_test}{Test} to change the macro\textquotesingle{}s name from {\ttfamily FOO} to {\ttfamily GTEST\+\_\+\+FOO}. For example, with {\ttfamily -\/DGTEST\+\_\+\+DONT\+\_\+\+DEFINE\+\_\+\+TEST=1}, you\textquotesingle{}ll need to write 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{++}
+\DoxyCodeLine{\ \mbox{\hyperlink{gtest_8h_a725b565bedc3a34dc109901854214cc4}{GTEST\_TEST}}(SomeTest,\ DoesThis)\ \{\ ...\ \}}
+
+\end{DoxyCode}
+ instead of 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{++}
+\DoxyCodeLine{\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(SomeTest,\ DoesThis)\ \{\ ...\ \}}
+
+\end{DoxyCode}
+ in order to define a test.
+
+Currently, the following {\ttfamily TEST}, {\ttfamily FAIL}, {\ttfamily SUCCEED}, and the basic comparison assertion macros can have . You can see the full list of covered macros \href{../include/gtest/gtest.h}{\texttt{ here}}. More information can be found in the "{}\+Avoiding Macro Name Clashes"{} section of the README file.
+
+\doxysubsection*{Is it OK if I have two separate {\ttfamily \doxylink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST(\+Foo, Bar)}} test methods defined in different namespaces?}
+
+Yes.
+
+The rule is {\bfseries{all test methods in the same test case must use the same fixture class}}. This means that the following is {\bfseries{allowed}} because both tests use the same fixture class ({\ttfamily \doxylink{classtesting_1_1_test}{testing\+::\+Test}}).
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ ++}
+\DoxyCodeLine{\textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefoo}{foo}}\ \{}
+\DoxyCodeLine{\mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(CoolTest,\ DoSomething)\ \{}
+\DoxyCodeLine{\ \ \mbox{\hyperlink{gtest_8h_a75adcdf89f69b0b615e395daafc315af}{SUCCEED}}();}
+\DoxyCodeLine{\}}
+\DoxyCodeLine{\}\ \ \textcolor{comment}{//\ namespace\ foo}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacebar}{bar}}\ \{}
+\DoxyCodeLine{\mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(CoolTest,\ DoSomething)\ \{}
+\DoxyCodeLine{\ \ \mbox{\hyperlink{gtest_8h_a75adcdf89f69b0b615e395daafc315af}{SUCCEED}}();}
+\DoxyCodeLine{\}}
+\DoxyCodeLine{\}\ \ \textcolor{comment}{//\ namespace\ bar}}
+
+\end{DoxyCode}
+
+
+However, the following code is {\bfseries{not allowed}} and will produce a runtime error from Google \doxylink{class_test}{Test} because the test methods are using different test fixture classes with the same test case name.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ ++}
+\DoxyCodeLine{\textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefoo}{foo}}\ \{}
+\DoxyCodeLine{\textcolor{keyword}{class\ }CoolTest\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1_test}{::testing::Test}}\ \{\};\ \ \textcolor{comment}{//\ Fixture\ foo::CoolTest}}
+\DoxyCodeLine{\mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(CoolTest,\ DoSomething)\ \{}
+\DoxyCodeLine{\ \ \mbox{\hyperlink{gtest_8h_a75adcdf89f69b0b615e395daafc315af}{SUCCEED}}();}
+\DoxyCodeLine{\}}
+\DoxyCodeLine{\}\ \ \textcolor{comment}{//\ namespace\ foo}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacebar}{bar}}\ \{}
+\DoxyCodeLine{\textcolor{keyword}{class\ }CoolTest\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1_test}{::testing::Test}}\ \{\};\ \ \textcolor{comment}{//\ Fixture:\ bar::CoolTest}}
+\DoxyCodeLine{\mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(CoolTest,\ DoSomething)\ \{}
+\DoxyCodeLine{\ \ \mbox{\hyperlink{gtest_8h_a75adcdf89f69b0b615e395daafc315af}{SUCCEED}}();}
+\DoxyCodeLine{\}}
+\DoxyCodeLine{\}\ \ \textcolor{comment}{//\ namespace\ bar}}
+
+\end{DoxyCode}
+
+
+\doxysubsection*{How do I build Google Testing Framework with Xcode 4?}
+
+If you try to build Google \doxylink{class_test}{Test}\textquotesingle{}s Xcode project with Xcode 4.\+0 or later, you may encounter an error message that looks like "{}\+Missing SDK in target gtest\textbackslash{}\+\_\+framework\+: /\+Developer/\+SDKs/\+Mac\+OSX10.\+4u.\+sdk"{}. That means that Xcode does not support the SDK the project is targeting. See the Xcode section in the \doxylink{README.md_md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2thirdparty_2gtest_2googletest_2_r_e_a_d_m_e}{README} file on how to resolve this.
+
+\doxysubsection*{How do I easily discover the flags needed for Google\+Test?}
+
+Google\+Test (and Google\+Mock) now support discovering all necessary flags using pkg-\/config. See the \doxysectlink{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2thirdparty_2gtest_2googletest_2docs_2_pkgconfig}{pkg-\/config guide}{0} on how you can easily discover all compiler and linker flags using pkg-\/config.
+
+\doxysubsection*{My question is not covered in your FAQ!}
+
+If you cannot find the answer to your question in this FAQ, there are some other resources you can use\+:
+
+
+\begin{DoxyEnumerate}
+\item read other \href{../docs}{\texttt{ wiki pages}},
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item search the mailing list \href{https://groups.google.com/forum/\#!forum/googletestframework}{\texttt{ archive}},
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item ask it on \href{mailto:googletestframework@googlegroups.com}{\texttt{ googletestframework@googlegroups.\+com}} and someone will answer it (to prevent spam, we require you to join the \href{http://groups.google.com/group/googletestframework}{\texttt{ discussion group}} before you can post.).
+\end{DoxyEnumerate}
+
+Please note that creating an issue in the \href{https://github.com/google/googletest/issues}{\texttt{ issue tracker}} is {\itshape not} a good way to get your answer, as it is monitored infrequently by a very small number of people.
+
+When asking a question, it\textquotesingle{}s helpful to provide as much of the following information as possible (people cannot help you if there\textquotesingle{}s not enough information in your question)\+:
+
+
+\begin{DoxyItemize}
+\item the version (or the commit hash if you check out from Git directly) of Google \doxylink{class_test}{Test} you use (Google \doxylink{class_test}{Test} is under active development, so it\textquotesingle{}s possible that your problem has been solved in a later version),
+\item your operating system,
+\item the name and version of your compiler,
+\item the complete command line flags you give to your compiler,
+\item the complete compiler error messages (if the question is about compilation),
+\item the {\itshape actual} code (ideally, a minimal but complete program) that has the problem you encounter. 
+\end{DoxyItemize}

@@ -1,0 +1,196 @@
+\doxysection{libraries/sys-\/vm/include/sysio/sysio/vm/error\+\_\+codes\+\_\+def.hpp File Reference}
+\hypertarget{sysio_2vm_2error__codes__def_8hpp}{}\label{sysio_2vm_2error__codes__def_8hpp}\index{libraries/sys-\/vm/include/sysio/sysio/vm/error\_codes\_def.hpp@{libraries/sys-\/vm/include/sysio/sysio/vm/error\_codes\_def.hpp}}
+{\ttfamily \#include "{}error\+\_\+codes\+\_\+pp.\+hpp"{}}\newline
+Include dependency graph for error\+\_\+codes\+\_\+def.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sysio_2vm_2error__codes__def_8hpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{sysio_2vm_2error__codes__def_8hpp_a389048a34ccdf74797e4a7d156ee1e2d}{SYS\+\_\+\+VM\+\_\+\+OPEN\+\_\+\+NAMESPACE}}~namespace sysio\+::vm \{
+\item 
+\#define \mbox{\hyperlink{sysio_2vm_2error__codes__def_8hpp_a9e85cfe956f1298abba8c72a379e59f6}{SYS\+\_\+\+VM\+\_\+\+CLOSE\+\_\+\+NAMESPACE}}~\}
+\item 
+\#define \mbox{\hyperlink{sysio_2vm_2error__codes__def_8hpp_a70069f4e9d201836eba0eb82490f799f}{PARSER\+\_\+\+ERRORS}}(macro)
+\item 
+\#define \mbox{\hyperlink{sysio_2vm_2error__codes__def_8hpp_a22041f74515ff3b91cdc74a54e3018a1}{MEMORY\+\_\+\+ERRORS}}(macro)
+\item 
+\#define \mbox{\hyperlink{sysio_2vm_2error__codes__def_8hpp_a7561101113a1c0fe8bc3c66ead9e53e3}{SYSTEM\+\_\+\+ERRORS}}(macro)
+\item 
+\#define \mbox{\hyperlink{sysio_2vm_2error__codes__def_8hpp_a5d899e0fd895fc66f7a2534ced322441}{AUXILIARY\+\_\+\+ERRORS}}(macro)
+\item 
+\#define \mbox{\hyperlink{sysio_2vm_2error__codes__def_8hpp_afe09300e7f5bf14fb01d5865a56793ba}{\+\_\+\+SYS\+\_\+\+VM\+\_\+\+ASSERT}}(expr,  err\+\_\+type)
+\item 
+\#define \mbox{\hyperlink{sysio_2vm_2error__codes__def_8hpp_a07280a4381f7ab6c76e7282118027f66}{SYS\+\_\+\+VM\+\_\+\+ASSERT\+\_\+\+INVALIDATE}}(expr,  err\+\_\+type)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{sysio_2vm_2error__codes__def_8hpp_afe09300e7f5bf14fb01d5865a56793ba}\index{error\_codes\_def.hpp@{error\_codes\_def.hpp}!\_SYS\_VM\_ASSERT@{\_SYS\_VM\_ASSERT}}
+\index{\_SYS\_VM\_ASSERT@{\_SYS\_VM\_ASSERT}!error\_codes\_def.hpp@{error\_codes\_def.hpp}}
+\doxysubsubsection{\texorpdfstring{\_SYS\_VM\_ASSERT}{\_SYS\_VM\_ASSERT}}
+{\footnotesize\ttfamily \label{sysio_2vm_2error__codes__def_8hpp_afe09300e7f5bf14fb01d5865a56793ba} 
+\#define \+\_\+\+SYS\+\_\+\+VM\+\_\+\+ASSERT(\begin{DoxyParamCaption}\item[{}]{expr}{, }\item[{}]{err\+\_\+type}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{exception_8hpp_ab10d0a221f4d7a706701b806c8135fd7}{UNLIKELY}}(expr))\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keywordflow}{return}\ err\_type;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2error__codes__def_8hpp_source_l00039}{39}} of file \mbox{\hyperlink{sysio_2vm_2error__codes__def_8hpp_source}{error\+\_\+codes\+\_\+def.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00039\ \textcolor{preprocessor}{\#define\ \_SYS\_VM\_ASSERT(expr,\ err\_type)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00040\ \textcolor{preprocessor}{\ \ \ if\ (!UNLIKELY(expr))\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00041\ \textcolor{preprocessor}{\ \ \ \ \ \ return\ err\_type;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00042\ \textcolor{preprocessor}{\ \ \ \}}}
+
+\end{DoxyCode}
+\Hypertarget{sysio_2vm_2error__codes__def_8hpp_a5d899e0fd895fc66f7a2534ced322441}\index{error\_codes\_def.hpp@{error\_codes\_def.hpp}!AUXILIARY\_ERRORS@{AUXILIARY\_ERRORS}}
+\index{AUXILIARY\_ERRORS@{AUXILIARY\_ERRORS}!error\_codes\_def.hpp@{error\_codes\_def.hpp}}
+\doxysubsubsection{\texorpdfstring{AUXILIARY\_ERRORS}{AUXILIARY\_ERRORS}}
+{\footnotesize\ttfamily \label{sysio_2vm_2error__codes__def_8hpp_a5d899e0fd895fc66f7a2534ced322441} 
+\#define AUXILIARY\+\_\+\+ERRORS(\begin{DoxyParamCaption}\item[{}]{macro}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ macro(auxiliary\_errors,\ checktime)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2error__codes__def_8hpp_source_l00029}{29}} of file \mbox{\hyperlink{sysio_2vm_2error__codes__def_8hpp_source}{error\+\_\+codes\+\_\+def.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00029\ \textcolor{preprocessor}{\#define\ AUXILIARY\_ERRORS(macro)\ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00030\ \textcolor{preprocessor}{\ \ macro(auxiliary\_errors,\ checktime)}}
+
+\end{DoxyCode}
+\Hypertarget{sysio_2vm_2error__codes__def_8hpp_a22041f74515ff3b91cdc74a54e3018a1}\index{error\_codes\_def.hpp@{error\_codes\_def.hpp}!MEMORY\_ERRORS@{MEMORY\_ERRORS}}
+\index{MEMORY\_ERRORS@{MEMORY\_ERRORS}!error\_codes\_def.hpp@{error\_codes\_def.hpp}}
+\doxysubsubsection{\texorpdfstring{MEMORY\_ERRORS}{MEMORY\_ERRORS}}
+{\footnotesize\ttfamily \label{sysio_2vm_2error__codes__def_8hpp_a22041f74515ff3b91cdc74a54e3018a1} 
+\#define MEMORY\+\_\+\+ERRORS(\begin{DoxyParamCaption}\item[{}]{macro}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ macro(memory\_errors,\ bad\_alloc)\ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ macro(memory\_errors,\ double\_free)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2error__codes__def_8hpp_source_l00021}{21}} of file \mbox{\hyperlink{sysio_2vm_2error__codes__def_8hpp_source}{error\+\_\+codes\+\_\+def.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#define\ MEMORY\_ERRORS(macro)\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\ \ macro(memory\_errors,\ bad\_alloc)\ \ \ \(\backslash\)}}
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\ \ macro(memory\_errors,\ double\_free)}}
+
+\end{DoxyCode}
+\Hypertarget{sysio_2vm_2error__codes__def_8hpp_a70069f4e9d201836eba0eb82490f799f}\index{error\_codes\_def.hpp@{error\_codes\_def.hpp}!PARSER\_ERRORS@{PARSER\_ERRORS}}
+\index{PARSER\_ERRORS@{PARSER\_ERRORS}!error\_codes\_def.hpp@{error\_codes\_def.hpp}}
+\doxysubsubsection{\texorpdfstring{PARSER\_ERRORS}{PARSER\_ERRORS}}
+{\footnotesize\ttfamily \label{sysio_2vm_2error__codes__def_8hpp_a70069f4e9d201836eba0eb82490f799f} 
+\#define PARSER\+\_\+\+ERRORS(\begin{DoxyParamCaption}\item[{}]{macro}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ macro(parser\_errors,\ invalid\_magic\_number)\ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ macro(parser\_errors,\ invalid\_version)\ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ macro(parser\_errors,\ invalid\_section\_id)\ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ macro(parser\_errors,\ general\_parsing\_failure)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2error__codes__def_8hpp_source_l00015}{15}} of file \mbox{\hyperlink{sysio_2vm_2error__codes__def_8hpp_source}{error\+\_\+codes\+\_\+def.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\#define\ PARSER\_ERRORS(macro)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\ \ \ macro(parser\_errors,\ invalid\_magic\_number)\ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\ \ \ macro(parser\_errors,\ invalid\_version)\ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\ \ \ macro(parser\_errors,\ invalid\_section\_id)\ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\ \ \ macro(parser\_errors,\ general\_parsing\_failure)}}
+
+\end{DoxyCode}
+\Hypertarget{sysio_2vm_2error__codes__def_8hpp_a07280a4381f7ab6c76e7282118027f66}\index{error\_codes\_def.hpp@{error\_codes\_def.hpp}!SYS\_VM\_ASSERT\_INVALIDATE@{SYS\_VM\_ASSERT\_INVALIDATE}}
+\index{SYS\_VM\_ASSERT\_INVALIDATE@{SYS\_VM\_ASSERT\_INVALIDATE}!error\_codes\_def.hpp@{error\_codes\_def.hpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_ASSERT\_INVALIDATE}{SYS\_VM\_ASSERT\_INVALIDATE}}
+{\footnotesize\ttfamily \label{sysio_2vm_2error__codes__def_8hpp_a07280a4381f7ab6c76e7282118027f66} 
+\#define SYS\+\_\+\+VM\+\_\+\+ASSERT\+\_\+\+INVALIDATE(\begin{DoxyParamCaption}\item[{}]{expr}{, }\item[{}]{err\+\_\+type}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \textcolor{keywordflow}{if}\ (\_valid\ =\ \textcolor{keyword}{false};\ !\mbox{\hyperlink{exception_8hpp_ab10d0a221f4d7a706701b806c8135fd7}{UNLIKELY}}(expr))\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keywordflow}{return}\ err\_type;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2error__codes__def_8hpp_source_l00045}{45}} of file \mbox{\hyperlink{sysio_2vm_2error__codes__def_8hpp_source}{error\+\_\+codes\+\_\+def.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00045\ \textcolor{preprocessor}{\#define\ SYS\_VM\_ASSERT\_INVALIDATE(expr,\ err\_type)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00046\ \textcolor{preprocessor}{\ \ \ if\ (\_valid\ =\ false;\ !UNLIKELY(expr))\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00047\ \textcolor{preprocessor}{\ \ \ \ \ \ return\ err\_type;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00048\ \textcolor{preprocessor}{\ \ \ \}}}
+
+\end{DoxyCode}
+\Hypertarget{sysio_2vm_2error__codes__def_8hpp_a9e85cfe956f1298abba8c72a379e59f6}\index{error\_codes\_def.hpp@{error\_codes\_def.hpp}!SYS\_VM\_CLOSE\_NAMESPACE@{SYS\_VM\_CLOSE\_NAMESPACE}}
+\index{SYS\_VM\_CLOSE\_NAMESPACE@{SYS\_VM\_CLOSE\_NAMESPACE}!error\_codes\_def.hpp@{error\_codes\_def.hpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_CLOSE\_NAMESPACE}{SYS\_VM\_CLOSE\_NAMESPACE}}
+{\footnotesize\ttfamily \label{sysio_2vm_2error__codes__def_8hpp_a9e85cfe956f1298abba8c72a379e59f6} 
+\#define SYS\+\_\+\+VM\+\_\+\+CLOSE\+\_\+\+NAMESPACE~\}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2error__codes__def_8hpp_source_l00004}{4}} of file \mbox{\hyperlink{sysio_2vm_2error__codes__def_8hpp_source}{error\+\_\+codes\+\_\+def.\+hpp}}.
+
+\Hypertarget{sysio_2vm_2error__codes__def_8hpp_a389048a34ccdf74797e4a7d156ee1e2d}\index{error\_codes\_def.hpp@{error\_codes\_def.hpp}!SYS\_VM\_OPEN\_NAMESPACE@{SYS\_VM\_OPEN\_NAMESPACE}}
+\index{SYS\_VM\_OPEN\_NAMESPACE@{SYS\_VM\_OPEN\_NAMESPACE}!error\_codes\_def.hpp@{error\_codes\_def.hpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_OPEN\_NAMESPACE}{SYS\_VM\_OPEN\_NAMESPACE}}
+{\footnotesize\ttfamily \label{sysio_2vm_2error__codes__def_8hpp_a389048a34ccdf74797e4a7d156ee1e2d} 
+\#define SYS\+\_\+\+VM\+\_\+\+OPEN\+\_\+\+NAMESPACE~namespace sysio\+::vm \{}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2error__codes__def_8hpp_source_l00003}{3}} of file \mbox{\hyperlink{sysio_2vm_2error__codes__def_8hpp_source}{error\+\_\+codes\+\_\+def.\+hpp}}.
+
+\Hypertarget{sysio_2vm_2error__codes__def_8hpp_a7561101113a1c0fe8bc3c66ead9e53e3}\index{error\_codes\_def.hpp@{error\_codes\_def.hpp}!SYSTEM\_ERRORS@{SYSTEM\_ERRORS}}
+\index{SYSTEM\_ERRORS@{SYSTEM\_ERRORS}!error\_codes\_def.hpp@{error\_codes\_def.hpp}}
+\doxysubsubsection{\texorpdfstring{SYSTEM\_ERRORS}{SYSTEM\_ERRORS}}
+{\footnotesize\ttfamily \label{sysio_2vm_2error__codes__def_8hpp_a7561101113a1c0fe8bc3c66ead9e53e3} 
+\#define SYSTEM\+\_\+\+ERRORS(\begin{DoxyParamCaption}\item[{}]{macro}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ macro(system\_errors,\ constructor\_failure)\ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ macro(system\_errors,\ unimplemented\_failure)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2error__codes__def_8hpp_source_l00025}{25}} of file \mbox{\hyperlink{sysio_2vm_2error__codes__def_8hpp_source}{error\+\_\+codes\+\_\+def.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00025\ \textcolor{preprocessor}{\#define\ SYSTEM\_ERRORS(macro)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00026\ \textcolor{preprocessor}{\ \ macro(system\_errors,\ constructor\_failure)\ \ \ \(\backslash\)}}
+\DoxyCodeLine{00027\ \textcolor{preprocessor}{\ \ macro(system\_errors,\ unimplemented\_failure)}}
+
+\end{DoxyCode}

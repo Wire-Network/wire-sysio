@@ -1,0 +1,5 @@
+<map id="sysio::chain::pending_block_header_state" name="sysio::chain::pending_block_header_state">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,109,150,150"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1detail_1_1block__header__state__common.html" title=" " alt="" coords="6,5,149,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="80,77,80,109,75,109,75,77"/>
+</map>

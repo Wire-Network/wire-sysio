@@ -1,0 +1,72 @@
+\doxysection{libraries/sys-\/vm/external/\+Catch2/projects/\+Self\+Test/\+Usage\+Tests/\+Benchmark.tests.\+cpp File Reference}
+\hypertarget{_benchmark_8tests_8cpp}{}\label{_benchmark_8tests_8cpp}\index{libraries/sys-\/vm/external/Catch2/projects/SelfTest/UsageTests/Benchmark.tests.cpp@{libraries/sys-\/vm/external/Catch2/projects/SelfTest/UsageTests/Benchmark.tests.cpp}}
+{\ttfamily \#include "{}catch.\+hpp"{}}\newline
+{\ttfamily \#include $<$map$>$}\newline
+Include dependency graph for Benchmark.\+tests.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=248pt]{_benchmark_8tests_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{_benchmark_8tests_8cpp_a0873206f758708df986666696255ec6f}{TEST\+\_\+\+CASE}} ("{}benchmarked"{}, "{}\mbox{[}!benchmark\mbox{]}"{})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{_benchmark_8tests_8cpp_a0873206f758708df986666696255ec6f}\index{Benchmark.tests.cpp@{Benchmark.tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!Benchmark.tests.cpp@{Benchmark.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}}
+{\footnotesize\ttfamily \label{_benchmark_8tests_8cpp_a0873206f758708df986666696255ec6f} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}benchmarked"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}!benchmark\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_benchmark_8tests_8cpp_source_l00005}{5}} of file \mbox{\hyperlink{_benchmark_8tests_8cpp_source}{Benchmark.\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00005\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00006\ }
+\DoxyCodeLine{00007\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ size\ =\ 100;}
+\DoxyCodeLine{00008\ }
+\DoxyCodeLine{00009\ \ \ \ \ std::vector<int>\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{00010\ \ \ \ \ std::map<int,\ int>\ m;}
+\DoxyCodeLine{00011\ }
+\DoxyCodeLine{00012\ \ \ \ \ \mbox{\hyperlink{catch__benchmark_8h_aaba0eec6ef0736ca2b022a98a7c855e4}{BENCHMARK}}(\ \textcolor{stringliteral}{"{}Load\ up\ a\ vector"{}}\ )\ \{}
+\DoxyCodeLine{00013\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ =\ std::vector<int>();}
+\DoxyCodeLine{00014\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int}\ i\ =0;\ i\ <\ size;\ ++i\ )}
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.push\_back(\ i\ );}
+\DoxyCodeLine{00016\ \ \ \ \ \}}
+\DoxyCodeLine{00017\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.size()\ ==\ size\ );}
+\DoxyCodeLine{00018\ }
+\DoxyCodeLine{00019\ \ \ \ \ \mbox{\hyperlink{catch__benchmark_8h_aaba0eec6ef0736ca2b022a98a7c855e4}{BENCHMARK}}(\ \textcolor{stringliteral}{"{}Load\ up\ a\ map"{}}\ )\ \{}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ m\ =\ std::map<int,\ int>();}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int}\ i\ =0;\ i\ <\ size;\ ++i\ )}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \ \ \ \ m.insert(\ \{\ i,\ i+1\ \}\ );}
+\DoxyCodeLine{00023\ \ \ \ \ \}}
+\DoxyCodeLine{00024\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ m.size()\ ==\ size\ );}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \ \ \ \ \mbox{\hyperlink{catch__benchmark_8h_aaba0eec6ef0736ca2b022a98a7c855e4}{BENCHMARK}}(\ \textcolor{stringliteral}{"{}Reserved\ vector"{}}\ )\ \{}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ =\ std::vector<int>();}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.reserve(size);}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int}\ i\ =0;\ i\ <\ size;\ ++i\ )}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.push\_back(\ i\ );}
+\DoxyCodeLine{00031\ \ \ \ \ \}}
+\DoxyCodeLine{00032\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.size()\ ==\ size\ );}
+\DoxyCodeLine{00033\ }
+\DoxyCodeLine{00034\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacepicojson_ac1e72166adfe3d96dc58cddc7ebd536a}{array}}[size];}
+\DoxyCodeLine{00035\ \ \ \ \ \mbox{\hyperlink{catch__benchmark_8h_aaba0eec6ef0736ca2b022a98a7c855e4}{BENCHMARK}}(\ \textcolor{stringliteral}{"{}A\ fixed\ size\ array\ that\ should\ require\ no\ allocations"{}}\ )\ \{}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int}\ i\ =0;\ i\ <\ size;\ ++i\ )}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ array[i]\ =\ i;}
+\DoxyCodeLine{00038\ \ \ \ \ \}}
+\DoxyCodeLine{00039\ \ \ \ \ \textcolor{keywordtype}{int}\ sum\ =\ 0;}
+\DoxyCodeLine{00040\ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int}\ i\ =0;\ i\ <\ size;\ ++i\ )}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ sum\ +=\ array[i];}
+\DoxyCodeLine{00042\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ sum\ >\ size\ );}
+\DoxyCodeLine{00043\ \}}
+
+\end{DoxyCode}

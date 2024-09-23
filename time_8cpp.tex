@@ -1,0 +1,41 @@
+\doxysection{libraries/fc/src/time.cpp File Reference}
+\hypertarget{time_8cpp}{}\label{time_8cpp}\index{libraries/fc/src/time.cpp@{libraries/fc/src/time.cpp}}
+{\ttfamily \#include $<$fc/time.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/mock\+\_\+time.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/variant.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/chrono/system\+\_\+clocks.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/date\+\_\+time/posix\+\_\+time/posix\+\_\+time.\+hpp$>$}\newline
+{\ttfamily \#include $<$sstream$>$}\newline
+{\ttfamily \#include $<$fc/string.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/exception/exception.\+hpp$>$}\newline
+Include dependency graph for time.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{time_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacefc}{fc}}
+\begin{DoxyCompactList}\small\item\em namespace \doxylink{namespacesysio_1_1chain}{sysio\+::chain} \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{namespacefc_af8910fe916a48b80934350e360515a08}{fc\+::to\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} \&var, \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&vo)
+\item 
+void \mbox{\hyperlink{namespacefc_a1aa200e8e1cbe0da59c52053ee6e00f4}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&var, \mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} \&vo)
+\item 
+void \mbox{\hyperlink{namespacefc_a24a8c1f007a72d150ba477d5b9863d4e}{fc\+::to\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1time__point__sec}{time\+\_\+point\+\_\+sec}} \&var, \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&vo)
+\item 
+void \mbox{\hyperlink{namespacefc_a6a143ca3e334e9c18ad4264a3e1ee055}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&var, \mbox{\hyperlink{classfc_1_1time__point__sec}{time\+\_\+point\+\_\+sec}} \&vo)
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacefc_ac76f6058bf7a33bb07ab1a147eeb24bf}{fc\+::get\+\_\+approximate\+\_\+relative\+\_\+time\+\_\+string}} (const \mbox{\hyperlink{classfc_1_1time__point__sec}{time\+\_\+point\+\_\+sec}} \&event\+\_\+time, const \mbox{\hyperlink{classfc_1_1time__point__sec}{time\+\_\+point\+\_\+sec}} \&relative\+\_\+to\+\_\+time=\mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{fc\+::time\+\_\+point\+::now}}(), const std\+::string \&ago="{} ago"{})
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacefc_af05f153d4d325d4186d87d2fab5ae3dd}{fc\+::get\+\_\+approximate\+\_\+relative\+\_\+time\+\_\+string}} (const \mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} \&event\+\_\+time, const \mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} \&relative\+\_\+to\+\_\+time=\mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{fc\+::time\+\_\+point\+::now}}(), const std\+::string \&ago="{} ago"{})
+\item 
+void \mbox{\hyperlink{namespacefc_a91859540574b996a87eca48e36990a47}{fc\+::to\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}} \&, \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&)
+\item 
+void \mbox{\hyperlink{namespacefc_adbd4dad54bd3fa870eb0ba0962f373ec}{fc\+::from\+\_\+variant}} (const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&, \mbox{\hyperlink{classfc_1_1microseconds}{fc\+::microseconds}} \&)
+\end{DoxyCompactItemize}

@@ -1,0 +1,385 @@
+\doxysection{fc\+::tracked\+\_\+storage\texorpdfstring{$<$}{<} Container\+Type \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classfc_1_1tracked__storage}{}\label{classfc_1_1tracked__storage}\index{fc::tracked\_storage$<$ ContainerType $>$@{fc::tracked\_storage$<$ ContainerType $>$}}
+
+
+tracks the size of storage allocated to its underlying multi\+\_\+index  
+
+
+
+
+{\ttfamily \#include $<$tracked\+\_\+storage.\+hpp$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef Container\+Type\+::template nth\+\_\+index$<$ 0 $>$\+::type \mbox{\hyperlink{classfc_1_1tracked__storage_a39342cd3dcb5251e92d8e8773f4be99e}{primary\+\_\+index\+\_\+type}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1tracked__storage_a1a66733ba4007eb1f6ed793fd5fb8bc0}{tracked\+\_\+storage}} ()=default
+\item 
+bool \mbox{\hyperlink{classfc_1_1tracked__storage_ab9a0d44de1cddf62794cacf82c0d92e4}{read}} (\mbox{\hyperlink{classfc_1_1cfile__datastream}{fc\+::cfile\+\_\+datastream}} \&ds, size\+\_\+t max\+\_\+memory)
+\item 
+void \mbox{\hyperlink{classfc_1_1tracked__storage_ae0443e061d47c3862e61e13a5aead400}{write}} (\mbox{\hyperlink{classfc_1_1cfile}{fc\+::cfile}} \&dat\+\_\+content) const
+\item 
+std\+::pair$<$ typename primary\+\_\+index\+\_\+type\+::iterator, bool $>$ \mbox{\hyperlink{classfc_1_1tracked__storage_a6d24a6bf4512b48a846d88a1bf44b5b8}{insert}} (typename Container\+Type\+::value\+\_\+type obj)
+\item 
+{\footnotesize template$<$typename Key $>$ }\\primary\+\_\+index\+\_\+type\+::iterator \mbox{\hyperlink{classfc_1_1tracked__storage_adc1778619d5a0ef17222e82bfce775e8}{find}} (const Key \&key)
+\item 
+{\footnotesize template$<$typename Key $>$ }\\primary\+\_\+index\+\_\+type\+::const\+\_\+iterator \mbox{\hyperlink{classfc_1_1tracked__storage_ae49462bfd832c24b2407c3f31fb10620}{find}} (const Key \&key) const
+\item 
+{\footnotesize template$<$typename Lam $>$ }\\void \mbox{\hyperlink{classfc_1_1tracked__storage_a857cf0f6d4ca31111b633b9d4c923ffe}{modify}} (typename primary\+\_\+index\+\_\+type\+::iterator itr, Lam lam)
+\item 
+{\footnotesize template$<$typename Key $>$ }\\void \mbox{\hyperlink{classfc_1_1tracked__storage_a51396073d7aa4bd1a431e318f5557924}{erase}} (const Key \&key)
+\item 
+void \mbox{\hyperlink{classfc_1_1tracked__storage_ac6ca9f9dedda856ea1b1b9ee40d522a3}{erase}} (typename primary\+\_\+index\+\_\+type\+::iterator itr)
+\item 
+size\+\_\+t \mbox{\hyperlink{classfc_1_1tracked__storage_a5bd678ec2e09568df574c8ecaa184962}{memory\+\_\+size}} () const
+\item 
+const Container\+Type \& \mbox{\hyperlink{classfc_1_1tracked__storage_ab578f3765c80c8cee1d758d440c99e90}{index}} () const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Container\+Type$>$\newline
+class fc\+::tracked\+\_\+storage$<$ Container\+Type $>$}
+This class wraps a multi\+\_\+index container and tracks the memory allocated as the container creates, modifies, and deletes. It also provides read and write methods for persistence.
+
+Requires Container\+Type\+::value\+\_\+type to have a size() method that represents the memory used for that object or specialized tracked\+::size() and is required to be a pack/unpack-\/able type. 
+
+Definition at line \mbox{\hyperlink{tracked__storage_8hpp_source_l00035}{35}} of file \mbox{\hyperlink{tracked__storage_8hpp_source}{tracked\+\_\+storage.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classfc_1_1tracked__storage_a39342cd3dcb5251e92d8e8773f4be99e}\index{fc::tracked\_storage$<$ ContainerType $>$@{fc::tracked\_storage$<$ ContainerType $>$}!primary\_index\_type@{primary\_index\_type}}
+\index{primary\_index\_type@{primary\_index\_type}!fc::tracked\_storage$<$ ContainerType $>$@{fc::tracked\_storage$<$ ContainerType $>$}}
+\doxysubsubsection{\texorpdfstring{primary\_index\_type}{primary\_index\_type}}
+{\footnotesize\ttfamily \label{classfc_1_1tracked__storage_a39342cd3dcb5251e92d8e8773f4be99e} 
+template$<$typename Container\+Type $>$ \\
+Container\+Type\+::template nth\+\_\+index$<$0$>$\+::type \mbox{\hyperlink{classfc_1_1tracked__storage}{fc\+::tracked\+\_\+storage}}$<$ Container\+Type $>$\+::primary\+\_\+index\+\_\+type}
+
+
+
+Definition at line \mbox{\hyperlink{tracked__storage_8hpp_source_l00040}{40}} of file \mbox{\hyperlink{tracked__storage_8hpp_source}{tracked\+\_\+storage.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1tracked__storage_a1a66733ba4007eb1f6ed793fd5fb8bc0}\index{fc::tracked\_storage$<$ ContainerType $>$@{fc::tracked\_storage$<$ ContainerType $>$}!tracked\_storage@{tracked\_storage}}
+\index{tracked\_storage@{tracked\_storage}!fc::tracked\_storage$<$ ContainerType $>$@{fc::tracked\_storage$<$ ContainerType $>$}}
+\doxysubsubsection{\texorpdfstring{tracked\_storage()}{tracked\_storage()}}
+{\footnotesize\ttfamily \label{classfc_1_1tracked__storage_a1a66733ba4007eb1f6ed793fd5fb8bc0} 
+template$<$typename Container\+Type $>$ \\
+\mbox{\hyperlink{classfc_1_1tracked__storage}{fc\+::tracked\+\_\+storage}}$<$ Container\+Type $>$\+::tracked\+\_\+storage (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [default]}}
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1tracked__storage_a51396073d7aa4bd1a431e318f5557924}\index{fc::tracked\_storage$<$ ContainerType $>$@{fc::tracked\_storage$<$ ContainerType $>$}!erase@{erase}}
+\index{erase@{erase}!fc::tracked\_storage$<$ ContainerType $>$@{fc::tracked\_storage$<$ ContainerType $>$}}
+\doxysubsubsection{\texorpdfstring{erase()}{erase()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1tracked__storage_a51396073d7aa4bd1a431e318f5557924} 
+template$<$typename Container\+Type $>$ \\
+template$<$typename Key $>$ \\
+void \mbox{\hyperlink{classfc_1_1tracked__storage}{fc\+::tracked\+\_\+storage}}$<$ Container\+Type $>$\+::erase (\begin{DoxyParamCaption}\item[{const Key \&}]{key}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{tracked__storage_8hpp_source_l00102}{102}} of file \mbox{\hyperlink{tracked__storage_8hpp_source}{tracked\+\_\+storage.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ \_index.find(key);}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (itr\ ==\ \_index.end())}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00106\ }
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \ \_memory\_size\ -\/=\ \mbox{\hyperlink{namespacefc_1_1tracked_a7a874ea77f5afa2de8f3d5fb6d19a241}{tracked::memory\_size}}(*itr);}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \ \_index.erase(itr);}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=343pt]{classfc_1_1tracked__storage_a51396073d7aa4bd1a431e318f5557924_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1tracked__storage_a51396073d7aa4bd1a431e318f5557924_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1tracked__storage_ac6ca9f9dedda856ea1b1b9ee40d522a3}\index{fc::tracked\_storage$<$ ContainerType $>$@{fc::tracked\_storage$<$ ContainerType $>$}!erase@{erase}}
+\index{erase@{erase}!fc::tracked\_storage$<$ ContainerType $>$@{fc::tracked\_storage$<$ ContainerType $>$}}
+\doxysubsubsection{\texorpdfstring{erase()}{erase()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1tracked__storage_ac6ca9f9dedda856ea1b1b9ee40d522a3} 
+template$<$typename Container\+Type $>$ \\
+void \mbox{\hyperlink{classfc_1_1tracked__storage}{fc\+::tracked\+\_\+storage}}$<$ Container\+Type $>$\+::erase (\begin{DoxyParamCaption}\item[{typename primary\+\_\+index\+\_\+type\+::iterator}]{itr}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{tracked__storage_8hpp_source_l00111}{111}} of file \mbox{\hyperlink{tracked__storage_8hpp_source}{tracked\+\_\+storage.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \ \_memory\_size\ -\/=\ \mbox{\hyperlink{namespacefc_1_1tracked_a7a874ea77f5afa2de8f3d5fb6d19a241}{tracked::memory\_size}}(*itr);}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \ \_index.erase(itr);}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=343pt]{classfc_1_1tracked__storage_ac6ca9f9dedda856ea1b1b9ee40d522a3_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1tracked__storage_adc1778619d5a0ef17222e82bfce775e8}\index{fc::tracked\_storage$<$ ContainerType $>$@{fc::tracked\_storage$<$ ContainerType $>$}!find@{find}}
+\index{find@{find}!fc::tracked\_storage$<$ ContainerType $>$@{fc::tracked\_storage$<$ ContainerType $>$}}
+\doxysubsubsection{\texorpdfstring{find()}{find()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1tracked__storage_adc1778619d5a0ef17222e82bfce775e8} 
+template$<$typename Container\+Type $>$ \\
+template$<$typename Key $>$ \\
+primary\+\_\+index\+\_\+type\+::iterator \mbox{\hyperlink{classfc_1_1tracked__storage}{fc\+::tracked\+\_\+storage}}$<$ Container\+Type $>$\+::find (\begin{DoxyParamCaption}\item[{const Key \&}]{key}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{tracked__storage_8hpp_source_l00082}{82}} of file \mbox{\hyperlink{tracked__storage_8hpp_source}{tracked\+\_\+storage.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1tracked__storage_a39342cd3dcb5251e92d8e8773f4be99e}{primary\_index\_type}}\&\ primary\_idx\ =\ \_index.template\ get<0>();}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ primary\_idx.find(key);}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1tracked__storage_adc1778619d5a0ef17222e82bfce775e8_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1tracked__storage_ae49462bfd832c24b2407c3f31fb10620}\index{fc::tracked\_storage$<$ ContainerType $>$@{fc::tracked\_storage$<$ ContainerType $>$}!find@{find}}
+\index{find@{find}!fc::tracked\_storage$<$ ContainerType $>$@{fc::tracked\_storage$<$ ContainerType $>$}}
+\doxysubsubsection{\texorpdfstring{find()}{find()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1tracked__storage_ae49462bfd832c24b2407c3f31fb10620} 
+template$<$typename Container\+Type $>$ \\
+template$<$typename Key $>$ \\
+primary\+\_\+index\+\_\+type\+::const\+\_\+iterator \mbox{\hyperlink{classfc_1_1tracked__storage}{fc\+::tracked\+\_\+storage}}$<$ Container\+Type $>$\+::find (\begin{DoxyParamCaption}\item[{const Key \&}]{key}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{tracked__storage_8hpp_source_l00088}{88}} of file \mbox{\hyperlink{tracked__storage_8hpp_source}{tracked\+\_\+storage.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1tracked__storage_a39342cd3dcb5251e92d8e8773f4be99e}{primary\_index\_type}}\&\ primary\_idx\ =\ \_index.template\ get<0>();}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ primary\_idx.find(key);}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1tracked__storage_ab578f3765c80c8cee1d758d440c99e90}\index{fc::tracked\_storage$<$ ContainerType $>$@{fc::tracked\_storage$<$ ContainerType $>$}!index@{index}}
+\index{index@{index}!fc::tracked\_storage$<$ ContainerType $>$@{fc::tracked\_storage$<$ ContainerType $>$}}
+\doxysubsubsection{\texorpdfstring{index()}{index()}}
+{\footnotesize\ttfamily \label{classfc_1_1tracked__storage_ab578f3765c80c8cee1d758d440c99e90} 
+template$<$typename Container\+Type $>$ \\
+const Container\+Type \& \mbox{\hyperlink{classfc_1_1tracked__storage}{fc\+::tracked\+\_\+storage}}$<$ Container\+Type $>$\+::index (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{tracked__storage_8hpp_source_l00120}{120}} of file \mbox{\hyperlink{tracked__storage_8hpp_source}{tracked\+\_\+storage.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \_index;}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1tracked__storage_ab578f3765c80c8cee1d758d440c99e90_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1tracked__storage_a6d24a6bf4512b48a846d88a1bf44b5b8}\index{fc::tracked\_storage$<$ ContainerType $>$@{fc::tracked\_storage$<$ ContainerType $>$}!insert@{insert}}
+\index{insert@{insert}!fc::tracked\_storage$<$ ContainerType $>$@{fc::tracked\_storage$<$ ContainerType $>$}}
+\doxysubsubsection{\texorpdfstring{insert()}{insert()}}
+{\footnotesize\ttfamily \label{classfc_1_1tracked__storage_a6d24a6bf4512b48a846d88a1bf44b5b8} 
+template$<$typename Container\+Type $>$ \\
+std\+::pair$<$ typename primary\+\_\+index\+\_\+type\+::iterator, bool $>$ \mbox{\hyperlink{classfc_1_1tracked__storage}{fc\+::tracked\+\_\+storage}}$<$ Container\+Type $>$\+::insert (\begin{DoxyParamCaption}\item[{typename Container\+Type\+::value\+\_\+type}]{obj}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{tracked__storage_8hpp_source_l00072}{72}} of file \mbox{\hyperlink{tracked__storage_8hpp_source}{tracked\+\_\+storage.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ size\ =\ \mbox{\hyperlink{namespacefc_1_1tracked_a7a874ea77f5afa2de8f3d5fb6d19a241}{tracked::memory\_size}}(obj);}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ result\ =\ \_index.insert(std::move(obj));}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (result.second)\ \{}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ \_memory\_size\ +=\ size;}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=343pt]{classfc_1_1tracked__storage_a6d24a6bf4512b48a846d88a1bf44b5b8_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1tracked__storage_a6d24a6bf4512b48a846d88a1bf44b5b8_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1tracked__storage_a5bd678ec2e09568df574c8ecaa184962}\index{fc::tracked\_storage$<$ ContainerType $>$@{fc::tracked\_storage$<$ ContainerType $>$}!memory\_size@{memory\_size}}
+\index{memory\_size@{memory\_size}!fc::tracked\_storage$<$ ContainerType $>$@{fc::tracked\_storage$<$ ContainerType $>$}}
+\doxysubsubsection{\texorpdfstring{memory\_size()}{memory\_size()}}
+{\footnotesize\ttfamily \label{classfc_1_1tracked__storage_a5bd678ec2e09568df574c8ecaa184962} 
+template$<$typename Container\+Type $>$ \\
+size\+\_\+t \mbox{\hyperlink{classfc_1_1tracked__storage}{fc\+::tracked\+\_\+storage}}$<$ Container\+Type $>$\+::memory\+\_\+size (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{tracked__storage_8hpp_source_l00116}{116}} of file \mbox{\hyperlink{tracked__storage_8hpp_source}{tracked\+\_\+storage.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \_memory\_size;}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1tracked__storage_a5bd678ec2e09568df574c8ecaa184962_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1tracked__storage_a857cf0f6d4ca31111b633b9d4c923ffe}\index{fc::tracked\_storage$<$ ContainerType $>$@{fc::tracked\_storage$<$ ContainerType $>$}!modify@{modify}}
+\index{modify@{modify}!fc::tracked\_storage$<$ ContainerType $>$@{fc::tracked\_storage$<$ ContainerType $>$}}
+\doxysubsubsection{\texorpdfstring{modify()}{modify()}}
+{\footnotesize\ttfamily \label{classfc_1_1tracked__storage_a857cf0f6d4ca31111b633b9d4c923ffe} 
+template$<$typename Container\+Type $>$ \\
+template$<$typename Lam $>$ \\
+void \mbox{\hyperlink{classfc_1_1tracked__storage}{fc\+::tracked\+\_\+storage}}$<$ Container\+Type $>$\+::modify (\begin{DoxyParamCaption}\item[{typename primary\+\_\+index\+\_\+type\+::iterator}]{itr}{, }\item[{Lam}]{lam}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{tracked__storage_8hpp_source_l00094}{94}} of file \mbox{\hyperlink{tracked__storage_8hpp_source}{tracked\+\_\+storage.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \_memory\_size\ -\/=\ \mbox{\hyperlink{namespacefc_1_1tracked_a7a874ea77f5afa2de8f3d5fb6d19a241}{tracked::memory\_size}}(*itr);}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\_index.modify(\ itr,\ std::move(lam)))\ \{}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \ \ \ \_memory\_size\ +=\ \mbox{\hyperlink{namespacefc_1_1tracked_a7a874ea77f5afa2de8f3d5fb6d19a241}{tracked::memory\_size}}(*itr);}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=343pt]{classfc_1_1tracked__storage_a857cf0f6d4ca31111b633b9d4c923ffe_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1tracked__storage_a857cf0f6d4ca31111b633b9d4c923ffe_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1tracked__storage_ab9a0d44de1cddf62794cacf82c0d92e4}\index{fc::tracked\_storage$<$ ContainerType $>$@{fc::tracked\_storage$<$ ContainerType $>$}!read@{read}}
+\index{read@{read}!fc::tracked\_storage$<$ ContainerType $>$@{fc::tracked\_storage$<$ ContainerType $>$}}
+\doxysubsubsection{\texorpdfstring{read()}{read()}}
+{\footnotesize\ttfamily \label{classfc_1_1tracked__storage_ab9a0d44de1cddf62794cacf82c0d92e4} 
+template$<$typename Container\+Type $>$ \\
+bool \mbox{\hyperlink{classfc_1_1tracked__storage}{fc\+::tracked\+\_\+storage}}$<$ Container\+Type $>$\+::read (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1cfile__datastream}{fc\+::cfile\+\_\+datastream}} \&}]{ds}{, }\item[{size\+\_\+t}]{max\+\_\+memory}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{tracked__storage_8hpp_source_l00047}{47}} of file \mbox{\hyperlink{tracked__storage_8hpp_source}{tracked\+\_\+storage.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ container\_size\ =\ \_index.size();}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a0b442d98ceb22dd5a6ae84745e43ffab}{fc::raw::unpack}}(ds,\ container\_size);}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ container\_size;\ ++i)\ \{}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classfc_1_1tracked__storage_a5bd678ec2e09568df574c8ecaa184962}{memory\_size}}()\ >=\ max\_memory)\ \{}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typename}\ ContainerType::value\_type\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a0b442d98ceb22dd5a6ae84745e43ffab}{fc::raw::unpack}}(ds,\ v);}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1tracked__storage_a6d24a6bf4512b48a846d88a1bf44b5b8}{insert}}(std::move(v));}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00058\ }
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1tracked__storage_ab9a0d44de1cddf62794cacf82c0d92e4_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1tracked__storage_ae0443e061d47c3862e61e13a5aead400}\index{fc::tracked\_storage$<$ ContainerType $>$@{fc::tracked\_storage$<$ ContainerType $>$}!write@{write}}
+\index{write@{write}!fc::tracked\_storage$<$ ContainerType $>$@{fc::tracked\_storage$<$ ContainerType $>$}}
+\doxysubsubsection{\texorpdfstring{write()}{write()}}
+{\footnotesize\ttfamily \label{classfc_1_1tracked__storage_ae0443e061d47c3862e61e13a5aead400} 
+template$<$typename Container\+Type $>$ \\
+void \mbox{\hyperlink{classfc_1_1tracked__storage}{fc\+::tracked\+\_\+storage}}$<$ Container\+Type $>$\+::write (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1cfile}{fc\+::cfile}} \&}]{dat\+\_\+content}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{tracked__storage_8hpp_source_l00062}{62}} of file \mbox{\hyperlink{tracked__storage_8hpp_source}{tracked\+\_\+storage.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ container\_size\ =\ \_index.size();}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ dat\_content.\mbox{\hyperlink{classfc_1_1cfile_af6ad44b8179f355db75a9d01de931235}{write}}(\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(\&container\_size),\ \textcolor{keyword}{sizeof}(container\_size)\ );}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ item\ :\ \_index)\ \{}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ data\ =\ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(item);}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \ \ \ dat\_content.\mbox{\hyperlink{classfc_1_1cfile_af6ad44b8179f355db75a9d01de931235}{write}}(data.data(),\ data.size());}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1tracked__storage_ae0443e061d47c3862e61e13a5aead400_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/container/\mbox{\hyperlink{tracked__storage_8hpp}{tracked\+\_\+storage.\+hpp}}\end{DoxyCompactItemize}

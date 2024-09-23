@@ -1,0 +1,86 @@
+\doxysection{libraries/softfloat/source/softfloat\+\_\+state.c File Reference}
+\hypertarget{softfloat_2source_2softfloat__state_8c}{}\label{softfloat_2source_2softfloat__state_8c}\index{libraries/softfloat/source/softfloat\_state.c@{libraries/softfloat/source/softfloat\_state.c}}
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include "{}platform.\+h"{}}\newline
+{\ttfamily \#include "{}internals.\+h"{}}\newline
+{\ttfamily \#include "{}specialize.\+h"{}}\newline
+{\ttfamily \#include "{}softfloat.\+h"{}}\newline
+Include dependency graph for softfloat\+\_\+state.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{softfloat_2source_2softfloat__state_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{softfloat_2source_2softfloat__state_8c_af8556c37f3acfa45992b8697930c501b}{THREAD\+\_\+\+LOCAL}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{softfloat_2source_2include_2softfloat_8h_af8556c37f3acfa45992b8697930c501b}{THREAD\+\_\+\+LOCAL}} \mbox{\hyperlink{stdint_8h_ad0fca8b15c218d2c687f8c373a71d228}{uint\+\_\+fast8\+\_\+t}} \mbox{\hyperlink{softfloat_2source_2softfloat__state_8c_a19d5372ff59b68b11ad0d4603bf36e5b}{softfloat\+\_\+rounding\+Mode}} = \mbox{\hyperlink{softfloat_2source_2include_2softfloat_8h_ae6dceca96ec2c7a1b4aa211264a87ef6ac7142048287cdd0ae5e97c5caa8c8c0e}{softfloat\+\_\+round\+\_\+near\+\_\+even}}
+\item 
+\mbox{\hyperlink{softfloat_2source_2include_2softfloat_8h_af8556c37f3acfa45992b8697930c501b}{THREAD\+\_\+\+LOCAL}} \mbox{\hyperlink{stdint_8h_ad0fca8b15c218d2c687f8c373a71d228}{uint\+\_\+fast8\+\_\+t}} \mbox{\hyperlink{softfloat_2source_2softfloat__state_8c_aa9f9467be57882b7c9fd860cc241ede5}{softfloat\+\_\+detect\+Tininess}} = \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2specialize_8h_ace136b6779a3c3a05887b19a8db6097e}{init\+\_\+detect\+Tininess}}
+\item 
+\mbox{\hyperlink{softfloat_2source_2include_2softfloat_8h_af8556c37f3acfa45992b8697930c501b}{THREAD\+\_\+\+LOCAL}} \mbox{\hyperlink{stdint_8h_ad0fca8b15c218d2c687f8c373a71d228}{uint\+\_\+fast8\+\_\+t}} \mbox{\hyperlink{softfloat_2source_2softfloat__state_8c_a85766d49cdf41a4451e770c60e8f7a28}{softfloat\+\_\+exception\+Flags}} = 0
+\item 
+\mbox{\hyperlink{softfloat_2source_2include_2softfloat_8h_af8556c37f3acfa45992b8697930c501b}{THREAD\+\_\+\+LOCAL}} \mbox{\hyperlink{stdint_8h_ad0fca8b15c218d2c687f8c373a71d228}{uint\+\_\+fast8\+\_\+t}} \mbox{\hyperlink{softfloat_2source_2softfloat__state_8c_a3168325d2c93de8d86044c4d4db68b69}{ext\+F80\+\_\+rounding\+Precision}} = 80
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{softfloat_2source_2softfloat__state_8c_af8556c37f3acfa45992b8697930c501b}\index{softfloat\_state.c@{softfloat\_state.c}!THREAD\_LOCAL@{THREAD\_LOCAL}}
+\index{THREAD\_LOCAL@{THREAD\_LOCAL}!softfloat\_state.c@{softfloat\_state.c}}
+\doxysubsubsection{\texorpdfstring{THREAD\_LOCAL}{THREAD\_LOCAL}}
+{\footnotesize\ttfamily \label{softfloat_2source_2softfloat__state_8c_af8556c37f3acfa45992b8697930c501b} 
+\#define THREAD\+\_\+\+LOCAL}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2softfloat__state_8c_source_l00044}{44}} of file \mbox{\hyperlink{softfloat_2source_2softfloat__state_8c_source}{softfloat\+\_\+state.\+c}}.
+
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{softfloat_2source_2softfloat__state_8c_a3168325d2c93de8d86044c4d4db68b69}\index{softfloat\_state.c@{softfloat\_state.c}!extF80\_roundingPrecision@{extF80\_roundingPrecision}}
+\index{extF80\_roundingPrecision@{extF80\_roundingPrecision}!softfloat\_state.c@{softfloat\_state.c}}
+\doxysubsubsection{\texorpdfstring{extF80\_roundingPrecision}{extF80\_roundingPrecision}}
+{\footnotesize\ttfamily \label{softfloat_2source_2softfloat__state_8c_a3168325d2c93de8d86044c4d4db68b69} 
+\mbox{\hyperlink{softfloat_2source_2include_2softfloat_8h_af8556c37f3acfa45992b8697930c501b}{THREAD\+\_\+\+LOCAL}} \mbox{\hyperlink{stdint_8h_ad0fca8b15c218d2c687f8c373a71d228}{uint\+\_\+fast8\+\_\+t}} ext\+F80\+\_\+rounding\+Precision = 80}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2softfloat__state_8c_source_l00051}{51}} of file \mbox{\hyperlink{softfloat_2source_2softfloat__state_8c_source}{softfloat\+\_\+state.\+c}}.
+
+\Hypertarget{softfloat_2source_2softfloat__state_8c_aa9f9467be57882b7c9fd860cc241ede5}\index{softfloat\_state.c@{softfloat\_state.c}!softfloat\_detectTininess@{softfloat\_detectTininess}}
+\index{softfloat\_detectTininess@{softfloat\_detectTininess}!softfloat\_state.c@{softfloat\_state.c}}
+\doxysubsubsection{\texorpdfstring{softfloat\_detectTininess}{softfloat\_detectTininess}}
+{\footnotesize\ttfamily \label{softfloat_2source_2softfloat__state_8c_aa9f9467be57882b7c9fd860cc241ede5} 
+\mbox{\hyperlink{softfloat_2source_2include_2softfloat_8h_af8556c37f3acfa45992b8697930c501b}{THREAD\+\_\+\+LOCAL}} \mbox{\hyperlink{stdint_8h_ad0fca8b15c218d2c687f8c373a71d228}{uint\+\_\+fast8\+\_\+t}} softfloat\+\_\+detect\+Tininess = \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2specialize_8h_ace136b6779a3c3a05887b19a8db6097e}{init\+\_\+detect\+Tininess}}}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2softfloat__state_8c_source_l00048}{48}} of file \mbox{\hyperlink{softfloat_2source_2softfloat__state_8c_source}{softfloat\+\_\+state.\+c}}.
+
+\Hypertarget{softfloat_2source_2softfloat__state_8c_a85766d49cdf41a4451e770c60e8f7a28}\index{softfloat\_state.c@{softfloat\_state.c}!softfloat\_exceptionFlags@{softfloat\_exceptionFlags}}
+\index{softfloat\_exceptionFlags@{softfloat\_exceptionFlags}!softfloat\_state.c@{softfloat\_state.c}}
+\doxysubsubsection{\texorpdfstring{softfloat\_exceptionFlags}{softfloat\_exceptionFlags}}
+{\footnotesize\ttfamily \label{softfloat_2source_2softfloat__state_8c_a85766d49cdf41a4451e770c60e8f7a28} 
+\mbox{\hyperlink{softfloat_2source_2include_2softfloat_8h_af8556c37f3acfa45992b8697930c501b}{THREAD\+\_\+\+LOCAL}} \mbox{\hyperlink{stdint_8h_ad0fca8b15c218d2c687f8c373a71d228}{uint\+\_\+fast8\+\_\+t}} softfloat\+\_\+exception\+Flags = 0}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2softfloat__state_8c_source_l00049}{49}} of file \mbox{\hyperlink{softfloat_2source_2softfloat__state_8c_source}{softfloat\+\_\+state.\+c}}.
+
+\Hypertarget{softfloat_2source_2softfloat__state_8c_a19d5372ff59b68b11ad0d4603bf36e5b}\index{softfloat\_state.c@{softfloat\_state.c}!softfloat\_roundingMode@{softfloat\_roundingMode}}
+\index{softfloat\_roundingMode@{softfloat\_roundingMode}!softfloat\_state.c@{softfloat\_state.c}}
+\doxysubsubsection{\texorpdfstring{softfloat\_roundingMode}{softfloat\_roundingMode}}
+{\footnotesize\ttfamily \label{softfloat_2source_2softfloat__state_8c_a19d5372ff59b68b11ad0d4603bf36e5b} 
+\mbox{\hyperlink{softfloat_2source_2include_2softfloat_8h_af8556c37f3acfa45992b8697930c501b}{THREAD\+\_\+\+LOCAL}} \mbox{\hyperlink{stdint_8h_ad0fca8b15c218d2c687f8c373a71d228}{uint\+\_\+fast8\+\_\+t}} softfloat\+\_\+rounding\+Mode = \mbox{\hyperlink{softfloat_2source_2include_2softfloat_8h_ae6dceca96ec2c7a1b4aa211264a87ef6ac7142048287cdd0ae5e97c5caa8c8c0e}{softfloat\+\_\+round\+\_\+near\+\_\+even}}}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2softfloat__state_8c_source_l00047}{47}} of file \mbox{\hyperlink{softfloat_2source_2softfloat__state_8c_source}{softfloat\+\_\+state.\+c}}.
+

@@ -1,0 +1,133 @@
+\doxysection{prime\+\_\+tables.\+h}
+\hypertarget{prime__tables_8h_source}{}\label{prime__tables_8h_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/samples/prime\_tables.h@{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/samples/prime\_tables.h}}
+\mbox{\hyperlink{prime__tables_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00001}00001\ \textcolor{comment}{//\ Copyright\ 2008\ Google\ Inc.}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00002}00002\ \textcolor{comment}{//\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00003}00003\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00004}00004\ \textcolor{comment}{//\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00005}00005\ \textcolor{comment}{//\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00006}00006\ \textcolor{comment}{//\ met:}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00007}00007\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00008}00008\ \textcolor{comment}{//\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00009}00009\ \textcolor{comment}{//\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00010}00010\ \textcolor{comment}{//\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00011}00011\ \textcolor{comment}{//\ copyright\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00012}00012\ \textcolor{comment}{//\ in\ the\ documentation\ and/or\ other\ materials\ provided\ with\ the}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00013}00013\ \textcolor{comment}{//\ distribution.}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00014}00014\ \textcolor{comment}{//\ \ \ \ \ *\ Neither\ the\ name\ of\ Google\ Inc.\ nor\ the\ names\ of\ its}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00015}00015\ \textcolor{comment}{//\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products\ derived\ from}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00016}00016\ \textcolor{comment}{//\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00017}00017\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00018}00018\ \textcolor{comment}{//\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00019}00019\ \textcolor{comment}{//\ "{}AS\ IS"{}\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00020}00020\ \textcolor{comment}{//\ LIMITED\ TO,\ THE\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00021}00021\ \textcolor{comment}{//\ A\ PARTICULAR\ PURPOSE\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ THE\ COPYRIGHT}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00022}00022\ \textcolor{comment}{//\ OWNER\ OR\ CONTRIBUTORS\ BE\ LIABLE\ FOR\ ANY\ DIRECT,\ INDIRECT,\ INCIDENTAL,}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00023}00023\ \textcolor{comment}{//\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES\ (INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00024}00024\ \textcolor{comment}{//\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;\ LOSS\ OF\ USE,}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00025}00025\ \textcolor{comment}{//\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND\ ON\ ANY}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00026}00026\ \textcolor{comment}{//\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00027}00027\ \textcolor{comment}{//\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00028}00028\ \textcolor{comment}{//\ OF\ THIS\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00029}00029\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00030}00030\ \textcolor{comment}{//\ Author:\ wan@google.com\ (Zhanyong\ Wan)}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00031}00031\ \textcolor{comment}{//\ Author:\ vladl@google.com\ (Vlad\ Losev)}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00033}00033\ \textcolor{comment}{//\ This\ provides\ interface\ PrimeTable\ that\ determines\ whether\ a\ number\ is\ a}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00034}00034\ \textcolor{comment}{//\ prime\ and\ determines\ a\ next\ prime\ number.\ This\ interface\ is\ used}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00035}00035\ \textcolor{comment}{//\ in\ Google\ Test\ samples\ demonstrating\ use\ of\ parameterized\ tests.}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00037}00037\ \textcolor{preprocessor}{\#ifndef\ GTEST\_SAMPLES\_PRIME\_TABLES\_H\_}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00038}00038\ \textcolor{preprocessor}{\#define\ GTEST\_SAMPLES\_PRIME\_TABLES\_H\_}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00040}00040\ \textcolor{preprocessor}{\#include\ <algorithm>}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00042}00042\ \textcolor{comment}{//\ The\ prime\ table\ interface.}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00043}\mbox{\hyperlink{class_prime_table}{00043}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_prime_table}{PrimeTable}}\ \{}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00044}00044\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00045}\mbox{\hyperlink{class_prime_table_af2cdea4896fd86a42b4dfd5e5027d640}{00045}}\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{class_prime_table_af2cdea4896fd86a42b4dfd5e5027d640}{\string~PrimeTable}}()\ \{\}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00047}00047\ \ \ \textcolor{comment}{//\ Returns\ true\ iff\ n\ is\ a\ prime\ number.}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00048}\mbox{\hyperlink{class_prime_table_a2ab9243364ded0c51541f641b2df362a}{00048}}\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_prime_table_a2ab9243364ded0c51541f641b2df362a}{IsPrime}}(\textcolor{keywordtype}{int}\ n)\ \textcolor{keyword}{const}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00050}00050\ \ \ \textcolor{comment}{//\ Returns\ the\ smallest\ prime\ number\ greater\ than\ p;\ or\ returns\ -\/1}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00051}00051\ \ \ \textcolor{comment}{//\ if\ the\ next\ prime\ is\ beyond\ the\ capacity\ of\ the\ table.}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00052}\mbox{\hyperlink{class_prime_table_ae537c939f56617d8937d57bbbae3ab30}{00052}}\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{class_prime_table_ae537c939f56617d8937d57bbbae3ab30}{GetNextPrime}}(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})\ \textcolor{keyword}{const}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00053}00053\ \};}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00054}00054\ }
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00055}00055\ \textcolor{comment}{//\ Implementation\ \#1\ calculates\ the\ primes\ on-\/the-\/fly.}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00056}\mbox{\hyperlink{class_on_the_fly_prime_table}{00056}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_on_the_fly_prime_table}{OnTheFlyPrimeTable}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{class_prime_table}{PrimeTable}}\ \{}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00057}00057\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00058}\mbox{\hyperlink{class_on_the_fly_prime_table_a1d49b78f79e018441289e79d75680067}{00058}}\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_on_the_fly_prime_table_a1d49b78f79e018441289e79d75680067}{IsPrime}}(\textcolor{keywordtype}{int}\ n)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00059}00059\ \ \ \ \ \textcolor{keywordflow}{if}\ (n\ <=\ 1)\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00061}00061\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 2;\ i*i\ <=\ n;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00062}00062\ \ \ \ \ \ \ \textcolor{comment}{//\ n\ is\ divisible\ by\ an\ integer\ other\ than\ 1\ and\ itself.}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00063}00063\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((n\ \%\ i)\ ==\ 0)\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00064}00064\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00066}00066\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00067}00067\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00069}\mbox{\hyperlink{class_on_the_fly_prime_table_a5a4644fedd95d33136723f33b9302bfc}{00069}}\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{class_on_the_fly_prime_table_a5a4644fedd95d33136723f33b9302bfc}{GetNextPrime}}(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00070}00070\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ n\ =\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ +\ 1;\ n\ >\ 0;\ n++)\ \{}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00071}00071\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_on_the_fly_prime_table_a1d49b78f79e018441289e79d75680067}{IsPrime}}(n))\ \textcolor{keywordflow}{return}\ n;}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00072}00072\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00073}00073\ }
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00074}00074\ \ \ \ \ \textcolor{keywordflow}{return}\ -\/1;}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00075}00075\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00076}00076\ \};}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00077}00077\ }
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00078}00078\ \textcolor{comment}{//\ Implementation\ \#2\ pre-\/calculates\ the\ primes\ and\ stores\ the\ result}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00079}00079\ \textcolor{comment}{//\ in\ an\ array.}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00080}\mbox{\hyperlink{class_pre_calculated_prime_table}{00080}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_pre_calculated_prime_table}{PreCalculatedPrimeTable}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{class_prime_table}{PrimeTable}}\ \{}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00081}00081\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00082}00082\ \ \ \textcolor{comment}{//\ 'max'\ specifies\ the\ maximum\ number\ the\ prime\ table\ holds.}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00083}\mbox{\hyperlink{class_pre_calculated_prime_table_a6bb947504421e31da70d2c71576be350}{00083}}\ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{class_pre_calculated_prime_table_a6bb947504421e31da70d2c71576be350}{PreCalculatedPrimeTable}}(\textcolor{keywordtype}{int}\ max)}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00084}00084\ \ \ \ \ \ \ :\ is\_prime\_size\_(max\ +\ 1),\ is\_prime\_(new\ bool[max\ +\ 1])\ \{}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00085}00085\ \ \ \ \ CalculatePrimesUpTo(max);}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00086}00086\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00087}\mbox{\hyperlink{class_pre_calculated_prime_table_a6ceab295f80dbe2766b8d4f54138bbc4}{00087}}\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{class_pre_calculated_prime_table_a6ceab295f80dbe2766b8d4f54138bbc4}{\string~PreCalculatedPrimeTable}}()\ \{\ \textcolor{keyword}{delete}[]\ is\_prime\_;\ \}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00088}00088\ }
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00089}\mbox{\hyperlink{class_pre_calculated_prime_table_a8a9ab7f99b09e5e987933c260e7304cf}{00089}}\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_pre_calculated_prime_table_a8a9ab7f99b09e5e987933c260e7304cf}{IsPrime}}(\textcolor{keywordtype}{int}\ n)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00090}00090\ \ \ \ \ \textcolor{keywordflow}{return}\ 0\ <=\ n\ \&\&\ n\ <\ is\_prime\_size\_\ \&\&\ is\_prime\_[n];}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00091}00091\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00092}00092\ }
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00093}\mbox{\hyperlink{class_pre_calculated_prime_table_a0ff10b1fe13df7e56b8d7ed9f41d3998}{00093}}\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{class_pre_calculated_prime_table_a0ff10b1fe13df7e56b8d7ed9f41d3998}{GetNextPrime}}(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00094}00094\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ n\ =\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ +\ 1;\ n\ <\ is\_prime\_size\_;\ n++)\ \{}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00095}00095\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_prime\_[n])\ \textcolor{keywordflow}{return}\ n;}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00096}00096\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00097}00097\ }
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00098}00098\ \ \ \ \ \textcolor{keywordflow}{return}\ -\/1;}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00099}00099\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00100}00100\ }
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00101}00101\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00102}00102\ \ \ \textcolor{keywordtype}{void}\ CalculatePrimesUpTo(\textcolor{keywordtype}{int}\ max)\ \{}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00103}00103\ \ \ \ \ ::std::fill(is\_prime\_,\ is\_prime\_\ +\ is\_prime\_size\_,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00104}00104\ \ \ \ \ is\_prime\_[0]\ =\ is\_prime\_[1]\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00105}00105\ }
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00106}00106\ \ \ \ \ \textcolor{comment}{//\ Checks\ every\ candidate\ for\ prime\ number\ (we\ know\ that\ 2\ is\ the\ only\ even}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00107}00107\ \ \ \ \ \textcolor{comment}{//\ prime).}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00108}00108\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 2;\ i*i\ <=\ max;\ i\ +=\ i\%2+1)\ \{}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00109}00109\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!is\_prime\_[i])\ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00110}00110\ }
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00111}00111\ \ \ \ \ \ \ \textcolor{comment}{//\ Marks\ all\ multiples\ of\ i\ (except\ i\ itself)\ as\ non-\/prime.}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00112}00112\ \ \ \ \ \ \ \textcolor{comment}{//\ We\ are\ starting\ here\ from\ i-\/th\ multiplier,\ because\ all\ smaller}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00113}00113\ \ \ \ \ \ \ \textcolor{comment}{//\ complex\ numbers\ were\ already\ marked.}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00114}00114\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ =\ i*i;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ <=\ max;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ +=\ i)\ \{}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00115}00115\ \ \ \ \ \ \ \ \ is\_prime\_[\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}]\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00116}00116\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00117}00117\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00118}00118\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00119}00119\ }
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00120}00120\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ is\_prime\_size\_;}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00121}00121\ \ \ \textcolor{keywordtype}{bool}*\ \textcolor{keyword}{const}\ is\_prime\_;}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00122}00122\ }
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00123}00123\ \ \ \textcolor{comment}{//\ Disables\ compiler\ warning\ "{}assignment\ operator\ could\ not\ be\ generated."{}}}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00124}00124\ \ \ \textcolor{keywordtype}{void}\ operator=(\textcolor{keyword}{const}\ \mbox{\hyperlink{class_pre_calculated_prime_table}{PreCalculatedPrimeTable}}\&\ rhs);}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00125}00125\ \};}
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00126}00126\ }
+\DoxyCodeLine{\Hypertarget{prime__tables_8h_source_l00127}00127\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_SAMPLES\_PRIME\_TABLES\_H\_}}
+
+\end{DoxyCode}

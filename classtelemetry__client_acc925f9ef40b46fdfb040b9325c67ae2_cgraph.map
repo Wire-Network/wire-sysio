@@ -1,0 +1,9 @@
+<map id="telemetry_client::telemetry_loop" name="telemetry_client::telemetry_loop">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,78,212,104"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1endpoint.html#a1d9163813aa02ed32100f443b4ddbd8e" title="Get reference to access logger." alt="" coords="260,5,415,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="155,75,248,48,249,53,157,80"/>
+<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1endpoint.html#a5341f59de7ef1a565a2fd93daba212d5" title="Create a message and add it to the outgoing send queue (exception free)" alt="" coords="260,71,415,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="212,88,244,88,244,94,212,94"/>
+<area shape="rect" id="Node000004" href="$xbyak__mnemonic_8h.html#aa3b21853f890838c88d047d6c2786917" title=" " alt="" coords="315,136,360,161"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="164,102,300,137,299,142,162,107"/>
+</map>

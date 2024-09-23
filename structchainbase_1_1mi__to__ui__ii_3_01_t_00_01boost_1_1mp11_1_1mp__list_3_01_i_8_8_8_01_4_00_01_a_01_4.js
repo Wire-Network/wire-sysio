@@ -1,0 +1,4 @@
+var structchainbase_1_1mi__to__ui__ii_3_01_t_00_01boost_1_1mp11_1_1mp__list_3_01_i_8_8_8_01_4_00_01_a_01_4 =
+[
+    [ "type", "structchainbase_1_1mi__to__ui__ii_3_01_t_00_01boost_1_1mp11_1_1mp__list_3_01_i_8_8_8_01_4_00_01_a_01_4.html#a650a402fa7efeb44562a6e1a5a3c3b0c", null ]
+];

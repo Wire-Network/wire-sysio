@@ -1,0 +1,5 @@
+<map id="websocketpp::transport::asio::endpoint::run" name="websocketpp::transport::asio::endpoint::run">
+<area shape="rect" id="Node000001" title="wraps the run method of the internal io_service object" alt="" coords="250,5,407,46"/>
+<area shape="rect" id="Node000002" href="$timers_8cpp.html#a54b22724b0bf3188576fd1db09594a16" title=" " alt="" coords="5,13,202,38"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="234,28,202,28,202,23,234,23"/>
+</map>

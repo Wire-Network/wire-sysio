@@ -1,0 +1,7 @@
+<map id="Xbyak::Operand::isExt8bit" name="Xbyak::Operand::isExt8bit">
+<area shape="rect" id="Node000001" title=" " alt="" coords="222,31,396,56"/>
+<area shape="rect" id="Node000002" href="$class_xbyak_1_1_reg.html#a7f2634fdd8b876a9bab2f207b1815051" title=" " alt="" coords="11,5,168,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="206,34,168,30,168,25,207,29"/>
+<area shape="rect" id="Node000003" href="$class_xbyak_1_1_operand.html#af45f32fe9206c761ea3c230b5e049548" title=" " alt="" coords="5,55,174,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="207,57,175,61,174,56,206,52"/>
+</map>

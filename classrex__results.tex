@@ -1,0 +1,195 @@
+\doxysection{rex\+\_\+results Class Reference}
+\hypertarget{classrex__results}{}\label{classrex__results}\index{rex\_results@{rex\_results}}
+
+
+{\ttfamily \#include $<$rex.\+results.\+hpp$>$}
+
+
+
+Inheritance diagram for rex\+\_\+results\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=144pt]{classrex__results__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for rex\+\_\+results\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=144pt]{classrex__results__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{classrex__results_ad4414abfcdbc98787ff8195a62d6d848}{buyresult\+\_\+action}} = action\+\_\+wrapper$<$"{}buyresult"{}\+\_\+n, \&\mbox{\hyperlink{classrex__results_a955ccff2c80578de034ee8c16bb29b47}{rex\+\_\+results\+::buyresult}}$>$
+\item 
+using \mbox{\hyperlink{classrex__results_a131d5bc79c6ec44898e7760f4e2ceeb2}{sellresult\+\_\+action}} = action\+\_\+wrapper$<$"{}sellresult"{}\+\_\+n, \&\mbox{\hyperlink{classrex__results_a2fdb9897a541ee103c618e8b311afab9}{rex\+\_\+results\+::sellresult}}$>$
+\item 
+using \mbox{\hyperlink{classrex__results_a9cc818bbdd737994bf6c6c028cbadf88}{orderresult\+\_\+action}} = action\+\_\+wrapper$<$"{}orderresult"{}\+\_\+n, \&\mbox{\hyperlink{classrex__results_aadee1538b7d17cbbe6efd8438fa46ae1}{rex\+\_\+results\+::orderresult}}$>$
+\item 
+using \mbox{\hyperlink{classrex__results_a55dcfa6ac376d5967deacaa562072738}{rentresult\+\_\+action}} = action\+\_\+wrapper$<$"{}rentresult"{}\+\_\+n, \&\mbox{\hyperlink{classrex__results_ab9cb69866c17d4344e0d50ea810ecef4}{rex\+\_\+results\+::rentresult}}$>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{classrex__results_a955ccff2c80578de034ee8c16bb29b47}{buyresult}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&rex\+\_\+received)
+\item 
+void \mbox{\hyperlink{classrex__results_a2fdb9897a541ee103c618e8b311afab9}{sellresult}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&proceeds)
+\item 
+void \mbox{\hyperlink{classrex__results_aadee1538b7d17cbbe6efd8438fa46ae1}{orderresult}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&owner, const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&proceeds)
+\item 
+void \mbox{\hyperlink{classrex__results_ab9cb69866c17d4344e0d50ea810ecef4}{rentresult}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&rented\+\_\+tokens)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+The actions {\ttfamily buyresult}, {\ttfamily sellresult}, {\ttfamily rentresult}, and {\ttfamily orderresult} of {\ttfamily rex.\+results} are all no-\/ops. They are added as inline convenience actions to {\ttfamily rentnet}, {\ttfamily rentcpu}, {\ttfamily buyrex}, {\ttfamily unstaketorex}, and {\ttfamily sellrex}. An inline convenience action does not have any effect, however, its data includes the result of the parent action and appears in its trace. 
+
+Definition at line \mbox{\hyperlink{rex_8results_8hpp_source_l00017}{17}} of file \mbox{\hyperlink{rex_8results_8hpp_source}{rex.\+results.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classrex__results_ad4414abfcdbc98787ff8195a62d6d848}\index{rex\_results@{rex\_results}!buyresult\_action@{buyresult\_action}}
+\index{buyresult\_action@{buyresult\_action}!rex\_results@{rex\_results}}
+\doxysubsubsection{\texorpdfstring{buyresult\_action}{buyresult\_action}}
+{\footnotesize\ttfamily \label{classrex__results_ad4414abfcdbc98787ff8195a62d6d848} 
+using \mbox{\hyperlink{classrex__results_ad4414abfcdbc98787ff8195a62d6d848}{rex\+\_\+results\+::buyresult\+\_\+action}} = action\+\_\+wrapper$<$"{}buyresult"{}\+\_\+n, \&\mbox{\hyperlink{classrex__results_a955ccff2c80578de034ee8c16bb29b47}{rex\+\_\+results\+::buyresult}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{rex_8results_8hpp_source_l00055}{55}} of file \mbox{\hyperlink{rex_8results_8hpp_source}{rex.\+results.\+hpp}}.
+
+\Hypertarget{classrex__results_a9cc818bbdd737994bf6c6c028cbadf88}\index{rex\_results@{rex\_results}!orderresult\_action@{orderresult\_action}}
+\index{orderresult\_action@{orderresult\_action}!rex\_results@{rex\_results}}
+\doxysubsubsection{\texorpdfstring{orderresult\_action}{orderresult\_action}}
+{\footnotesize\ttfamily \label{classrex__results_a9cc818bbdd737994bf6c6c028cbadf88} 
+using \mbox{\hyperlink{classrex__results_a9cc818bbdd737994bf6c6c028cbadf88}{rex\+\_\+results\+::orderresult\+\_\+action}} = action\+\_\+wrapper$<$"{}orderresult"{}\+\_\+n, \&\mbox{\hyperlink{classrex__results_aadee1538b7d17cbbe6efd8438fa46ae1}{rex\+\_\+results\+::orderresult}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{rex_8results_8hpp_source_l00057}{57}} of file \mbox{\hyperlink{rex_8results_8hpp_source}{rex.\+results.\+hpp}}.
+
+\Hypertarget{classrex__results_a55dcfa6ac376d5967deacaa562072738}\index{rex\_results@{rex\_results}!rentresult\_action@{rentresult\_action}}
+\index{rentresult\_action@{rentresult\_action}!rex\_results@{rex\_results}}
+\doxysubsubsection{\texorpdfstring{rentresult\_action}{rentresult\_action}}
+{\footnotesize\ttfamily \label{classrex__results_a55dcfa6ac376d5967deacaa562072738} 
+using \mbox{\hyperlink{classrex__results_a55dcfa6ac376d5967deacaa562072738}{rex\+\_\+results\+::rentresult\+\_\+action}} = action\+\_\+wrapper$<$"{}rentresult"{}\+\_\+n, \&\mbox{\hyperlink{classrex__results_ab9cb69866c17d4344e0d50ea810ecef4}{rex\+\_\+results\+::rentresult}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{rex_8results_8hpp_source_l00058}{58}} of file \mbox{\hyperlink{rex_8results_8hpp_source}{rex.\+results.\+hpp}}.
+
+\Hypertarget{classrex__results_a131d5bc79c6ec44898e7760f4e2ceeb2}\index{rex\_results@{rex\_results}!sellresult\_action@{sellresult\_action}}
+\index{sellresult\_action@{sellresult\_action}!rex\_results@{rex\_results}}
+\doxysubsubsection{\texorpdfstring{sellresult\_action}{sellresult\_action}}
+{\footnotesize\ttfamily \label{classrex__results_a131d5bc79c6ec44898e7760f4e2ceeb2} 
+using \mbox{\hyperlink{classrex__results_a131d5bc79c6ec44898e7760f4e2ceeb2}{rex\+\_\+results\+::sellresult\+\_\+action}} = action\+\_\+wrapper$<$"{}sellresult"{}\+\_\+n, \&\mbox{\hyperlink{classrex__results_a2fdb9897a541ee103c618e8b311afab9}{rex\+\_\+results\+::sellresult}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{rex_8results_8hpp_source_l00056}{56}} of file \mbox{\hyperlink{rex_8results_8hpp_source}{rex.\+results.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classrex__results_a955ccff2c80578de034ee8c16bb29b47}\index{rex\_results@{rex\_results}!buyresult@{buyresult}}
+\index{buyresult@{buyresult}!rex\_results@{rex\_results}}
+\doxysubsubsection{\texorpdfstring{buyresult()}{buyresult()}}
+{\footnotesize\ttfamily \label{classrex__results_a955ccff2c80578de034ee8c16bb29b47} 
+void rex\+\_\+results\+::buyresult (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&}]{rex\+\_\+received}{}\end{DoxyParamCaption})}
+
+Buyresult action.
+
+
+\begin{DoxyParams}{Parameters}
+{\em rex\+\_\+received} & -\/ amount of tokens used in buy order \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{rex_8results_8cpp_source_l00003}{3}} of file \mbox{\hyperlink{rex_8results_8cpp_source}{rex.\+results.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00003\ \{\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classrex__results_aadee1538b7d17cbbe6efd8438fa46ae1}\index{rex\_results@{rex\_results}!orderresult@{orderresult}}
+\index{orderresult@{orderresult}!rex\_results@{rex\_results}}
+\doxysubsubsection{\texorpdfstring{orderresult()}{orderresult()}}
+{\footnotesize\ttfamily \label{classrex__results_aadee1538b7d17cbbe6efd8438fa46ae1} 
+void rex\+\_\+results\+::orderresult (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&}]{owner}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&}]{proceeds}{}\end{DoxyParamCaption})}
+
+Orderresult action.
+
+
+\begin{DoxyParams}{Parameters}
+{\em owner} & -\/ the owner of the order \\
+\hline
+{\em proceeds} & -\/ amount of tokens used in order \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{rex_8results_8cpp_source_l00007}{7}} of file \mbox{\hyperlink{rex_8results_8cpp_source}{rex.\+results.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00007\ \{\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classrex__results_ab9cb69866c17d4344e0d50ea810ecef4}\index{rex\_results@{rex\_results}!rentresult@{rentresult}}
+\index{rentresult@{rentresult}!rex\_results@{rex\_results}}
+\doxysubsubsection{\texorpdfstring{rentresult()}{rentresult()}}
+{\footnotesize\ttfamily \label{classrex__results_ab9cb69866c17d4344e0d50ea810ecef4} 
+void rex\+\_\+results\+::rentresult (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&}]{rented\+\_\+tokens}{}\end{DoxyParamCaption})}
+
+Rentresult action.
+
+
+\begin{DoxyParams}{Parameters}
+{\em rented\+\_\+tokens} & -\/ amount of rented tokens \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{rex_8results_8cpp_source_l00009}{9}} of file \mbox{\hyperlink{rex_8results_8cpp_source}{rex.\+results.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00009\ \{\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classrex__results_a2fdb9897a541ee103c618e8b311afab9}\index{rex\_results@{rex\_results}!sellresult@{sellresult}}
+\index{sellresult@{sellresult}!rex\_results@{rex\_results}}
+\doxysubsubsection{\texorpdfstring{sellresult()}{sellresult()}}
+{\footnotesize\ttfamily \label{classrex__results_a2fdb9897a541ee103c618e8b311afab9} 
+void rex\+\_\+results\+::sellresult (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \&}]{proceeds}{}\end{DoxyParamCaption})}
+
+Sellresult action.
+
+
+\begin{DoxyParams}{Parameters}
+{\em proceeds} & -\/ amount of tokens used in sell order \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{rex_8results_8cpp_source_l00005}{5}} of file \mbox{\hyperlink{rex_8results_8cpp_source}{rex.\+results.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00005\ \{\ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/svetlasyrimis/\+Desktop/wire-\/network/\+WN-\/org/wire-\/system-\/contracts/contracts/sysio.\+system/include/sysio.\+system/\mbox{\hyperlink{rex_8results_8hpp}{rex.\+results.\+hpp}}\item 
+/\+Users/svetlasyrimis/\+Desktop/wire-\/network/\+WN-\/org/wire-\/system-\/contracts/contracts/sysio.\+system/src/\mbox{\hyperlink{rex_8results_8cpp}{rex.\+results.\+cpp}}\end{DoxyCompactItemize}

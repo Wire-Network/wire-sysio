@@ -1,0 +1,7 @@
+<map id="boost::asio::async_result&lt; boost::fibers::asio::detail::yield_handler&lt; T &gt; &gt;::get" name="boost::asio::async_result&lt; boost::fibers::asio::detail::yield_handler&lt; T &gt; &gt;::get">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,150,76"/>
+<area shape="rect" id="Node000002" href="$classboost_1_1fibers_1_1asio_1_1detail_1_1async__result__base.html#a5aadf61dad90a784b5623db1bfb19f38" title=" " alt="" coords="198,13,340,68"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="150,38,182,38,182,43,150,43"/>
+<area shape="rect" id="Node000003" href="$structboost_1_1fibers_1_1asio_1_1detail_1_1yield__completion.html#abe924cb1844f3bdbc6ea1fa1a52fb15d" title=" " alt="" coords="388,20,585,61"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="341,38,372,38,372,43,341,43"/>
+</map>

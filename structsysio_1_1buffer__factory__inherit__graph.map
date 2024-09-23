@@ -1,0 +1,7 @@
+<map id="sysio::buffer_factory" name="sysio::buffer_factory">
+<area shape="rect" id="Node000001" title=" " alt="" coords="86,5,226,31"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1block__buffer__factory.html" title=" " alt="" coords="5,79,137,120"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="134,44,94,81,90,77,130,40"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1trx__buffer__factory.html" title=" " alt="" coords="160,86,323,112"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="182,40,230,84,227,88,178,43"/>
+</map>

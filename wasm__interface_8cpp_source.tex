@@ -1,0 +1,134 @@
+\doxysection{wasm\+\_\+interface.\+cpp}
+\hypertarget{wasm__interface_8cpp_source}{}\label{wasm__interface_8cpp_source}\index{libraries/chain/wasm\_interface.cpp@{libraries/chain/wasm\_interface.cpp}}
+\mbox{\hyperlink{wasm__interface_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{interface_8hpp}{sysio/chain/webassembly/interface.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{sys-vm_8hpp}{sysio/chain/webassembly/sys-\/vm.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{wasm__interface_8hpp}{sysio/chain/wasm\_interface.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{apply__context_8hpp}{sysio/chain/apply\_context.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{controller_8hpp}{sysio/chain/controller.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{transaction__context_8hpp}{sysio/chain/transaction\_context.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{producer__schedule_8hpp}{sysio/chain/producer\_schedule.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp}{sysio/chain/exceptions.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ <boost/core/ignore\_unused.hpp>}}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{authorization__manager_8hpp}{sysio/chain/authorization\_manager.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00011}00011\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{resource__limits_8hpp}{sysio/chain/resource\_limits.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00012}00012\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{wasm__interface__private_8hpp}{sysio/chain/wasm\_interface\_private.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00013}00013\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{wasm__sysio__validation_8hpp}{sysio/chain/wasm\_sysio\_validation.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00014}00014\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{wasm__sysio__injection_8hpp}{sysio/chain/wasm\_sysio\_injection.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00015}00015\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{global__property__object_8hpp}{sysio/chain/global\_property\_object.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00016}00016\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{protocol__state__object_8hpp}{sysio/chain/protocol\_state\_object.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00017}00017\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{account__object_8hpp}{sysio/chain/account\_object.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00018}00018\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{exception_8hpp}{fc/exception/exception.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00019}00019\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{sha256_8hpp}{fc/crypto/sha256.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00020}00020\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{include_2fc_2crypto_2sha1_8hpp}{fc/crypto/sha1.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00021}00021\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{raw_8hpp}{fc/io/raw.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00023}00023\ \textcolor{preprocessor}{\#include\ <softfloat.hpp>}}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00024}00024\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{compiler__builtins_8hpp}{compiler\_builtins.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00025}00025\ \textcolor{preprocessor}{\#include\ <boost/asio.hpp>}}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00026}00026\ \textcolor{preprocessor}{\#include\ <boost/bind.hpp>}}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00027}00027\ \textcolor{preprocessor}{\#include\ <fstream>}}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00028}00028\ \textcolor{preprocessor}{\#include\ <string.h>}}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00030}00030\ \textcolor{preprocessor}{\#if\ defined(SYSIO\_SYS\_VM\_RUNTIME\_ENABLED)\ ||\ defined(SYSIO\_SYS\_VM\_JIT\_RUNTIME\_ENABLED)}}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00031}00031\ \textcolor{preprocessor}{\#include\ <sysio/vm/allocator.hpp>}}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00032}00032\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00034}00034\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{\ \textcolor{keyword}{namespace\ }chain\ \{}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00036}\mbox{\hyperlink{classsysio_1_1chain_1_1wasm__interface_a0547edde05433a2d5aebee6770103a2e}{00036}}\ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1wasm__interface_a0547edde05433a2d5aebee6770103a2e}{wasm\_interface::wasm\_interface}}(\mbox{\hyperlink{classsysio_1_1chain_1_1wasm__interface_a9053d9e65167e5f241f1f3f27b175f9c}{vm\_type}}\ vm,\ \textcolor{keywordtype}{bool}\ eosvmoc\_tierup,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classchainbase_1_1database}{chainbase::database}}\&\ d,\ \textcolor{keyword}{const}\ boost::filesystem::path\ data\_dir,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1config}{eosvmoc::config}}\&\ eosvmoc\_config,\ \textcolor{keywordtype}{bool}\ profile)}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00037}00037\ \ \ \ \ \ :\ my(\ new\ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__interface__impl}{wasm\_interface\_impl}}(vm,\ eosvmoc\_tierup,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}},\ data\_dir,\ eosvmoc\_config,\ profile)\ )\ \{\}}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00039}\mbox{\hyperlink{classsysio_1_1chain_1_1wasm__interface_a023361edceeb4c291bfe2cd96d03834d}{00039}}\ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1wasm__interface_a023361edceeb4c291bfe2cd96d03834d}{wasm\_interface::\string~wasm\_interface}}()\ \{\}}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00041}\mbox{\hyperlink{classsysio_1_1chain_1_1wasm__interface_a0748761343232176fe57ede67dd254ae}{00041}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1wasm__interface_a0748761343232176fe57ede67dd254ae}{wasm\_interface::validate}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1chain_1_1controller}{controller}}\&\ control,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1vector}{bytes}}\&\ code)\ \{}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00042}00042\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ pso\ =\ control.\mbox{\hyperlink{classsysio_1_1chain_1_1controller_a0c79d00dae8c0d90efc18f4d091b2391}{db}}().\mbox{\hyperlink{classchainbase_1_1database_afcfe00f81a526c1376d4f51197dd3a9a}{get}}<\mbox{\hyperlink{classsysio_1_1chain_1_1protocol__state__object}{protocol\_state\_object}}>();}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00044}00044\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (control.\mbox{\hyperlink{classsysio_1_1chain_1_1controller_aa808acf858e93c567ff983ccbf8fb6d3}{is\_builtin\_activated}}(\mbox{\hyperlink{namespacesysio_1_1chain_a406d45a184cdba0af316b5bf34bf56cfa3afd605f2e67ff58dfd806199c86cd5c}{builtin\_protocol\_feature\_t::configurable\_wasm\_limits}}))\ \{}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00045}00045\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ gpo\ =\ control.\mbox{\hyperlink{classsysio_1_1chain_1_1controller_a0bb11e832a05b6437c79bf81758b1b7d}{get\_global\_properties}}();}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00046}00046\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_a78d9d364a9ab60de8d18b4660f592d5f}{webassembly::eos\_vm\_runtime::validate}}(\ code,\ gpo.wasm\_configuration,\ pso.whitelisted\_intrinsics\ );}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00047}00047\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00048}00048\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00049}00049\ \ \ \ \ \ \ \mbox{\hyperlink{struct_i_r_1_1_module}{Module}}\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}};}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00050}00050\ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00051}00051\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_serialization_1_1_memory_input_stream}{Serialization::MemoryInputStream}}\ stream((\mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}*)code.data(),\ code.size());}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_serialization_a2a05c5aff4847073ca0fb887d20ac485}{WASM::serialize}}(stream,\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}});}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00053}00053\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_serialization_1_1_fatal_serialization_exception}{Serialization::FatalSerializationException}}\&\ e)\ \{}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\textcolor{keyword}{false},\ wasm\_serialization\_error,\ e.\mbox{\hyperlink{struct_serialization_1_1_fatal_serialization_exception_ae65cd23b2cf7b4f0c9a062d3584bbdde}{message}}.c\_str());}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00055}00055\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_i_r_1_1_validation_exception}{IR::ValidationException}}\&\ e)\ \{}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\textcolor{keyword}{false},\ wasm\_serialization\_error,\ e.\mbox{\hyperlink{struct_serialization_1_1_fatal_serialization_exception_ae65cd23b2cf7b4f0c9a062d3584bbdde}{message}}.c\_str());}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00057}00057\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00059}00059\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1wasm__validations_1_1wasm__binary__validation}{wasm\_validations::wasm\_binary\_validation}}\ validator(control,\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}});}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00060}00060\ \ \ \ \ \ \ validator.\mbox{\hyperlink{classsysio_1_1chain_1_1wasm__validations_1_1wasm__binary__validation_a223aeb74a457949878b0e94813c8d402}{validate}}();}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00062}00062\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_a78d9d364a9ab60de8d18b4660f592d5f}{webassembly::eos\_vm\_runtime::validate}}(\ code,\ pso.whitelisted\_intrinsics\ );}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00064}00064\ \ \ \ \ \ \ \textcolor{comment}{//there\ are\ a\ couple\ opportunties\ for\ improvement\ here-\/-\/}}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00065}00065\ \ \ \ \ \ \ \textcolor{comment}{//Easy:\ Cache\ the\ Module\ created\ here\ so\ it\ can\ be\ reused\ for\ instantiaion}}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00066}00066\ \ \ \ \ \ \ \textcolor{comment}{//Hard:\ Kick\ off\ instantiation\ in\ a\ separate\ thread\ at\ this\ location}}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00067}00067\ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00069}\mbox{\hyperlink{classsysio_1_1chain_1_1wasm__interface_a19880ffbb9e16695bb78903e3e8ce93e}{00069}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1wasm__interface_a19880ffbb9e16695bb78903e3e8ce93e}{wasm\_interface::indicate\_shutting\_down}}()\ \{}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00070}00070\ \ \ \ \ \ \ my-\/>is\_shutting\_down\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00071}00071\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00073}\mbox{\hyperlink{classsysio_1_1chain_1_1wasm__interface_a90666a22ee62c3f63f051da86beb5020}{00073}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1wasm__interface_a90666a22ee62c3f63f051da86beb5020}{wasm\_interface::code\_block\_num\_last\_used}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha256}{digest\_type}}\&\ code\_hash,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\&\ \mbox{\hyperlink{classsysio_1_1chain_1_1wasm__interface_a9053d9e65167e5f241f1f3f27b175f9c}{vm\_type}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\&\ vm\_version,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\&\ block\_num)\ \{}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00074}00074\ \ \ \ \ \ \ my-\/>code\_block\_num\_last\_used(code\_hash,\ \mbox{\hyperlink{classsysio_1_1chain_1_1wasm__interface_a9053d9e65167e5f241f1f3f27b175f9c}{vm\_type}},\ vm\_version,\ block\_num);}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00075}00075\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00076}00076\ }
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00077}\mbox{\hyperlink{classsysio_1_1chain_1_1wasm__interface_ab8938ee3dc1cd9964f4d13671f0058bd}{00077}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1wasm__interface_ab8938ee3dc1cd9964f4d13671f0058bd}{wasm\_interface::current\_lib}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ lib)\ \{}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00078}00078\ \ \ \ \ \ \ my-\/>current\_lib(lib);}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00079}00079\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00080}00080\ }
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00081}\mbox{\hyperlink{classsysio_1_1chain_1_1wasm__interface_add575021d7a77e579238267f4c9331c9}{00081}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1wasm__interface_add575021d7a77e579238267f4c9331c9}{wasm\_interface::apply}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha256}{digest\_type}}\&\ code\_hash,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\&\ \mbox{\hyperlink{classsysio_1_1chain_1_1wasm__interface_a9053d9e65167e5f241f1f3f27b175f9c}{vm\_type}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\&\ vm\_version,\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context}{apply\_context}}\&\ \mbox{\hyperlink{structcontext}{context}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00082}00082\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{classsysio_1_1chain_1_1wasm__interface_ab90466fe41ab3c130c9f7fb050a5860b}{substitute\_apply}}\ \&\&\ \mbox{\hyperlink{classsysio_1_1chain_1_1wasm__interface_ab90466fe41ab3c130c9f7fb050a5860b}{substitute\_apply}}(code\_hash,\ \mbox{\hyperlink{classsysio_1_1chain_1_1wasm__interface_a9053d9e65167e5f241f1f3f27b175f9c}{vm\_type}},\ vm\_version,\ \mbox{\hyperlink{structcontext}{context}}))}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00083}00083\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00084}00084\ \textcolor{preprocessor}{\#ifdef\ SYSIO\_SYS\_VM\_OC\_RUNTIME\_ENABLED}}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00085}00085\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(my-\/>eosvmoc)\ \{}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00086}00086\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1code__descriptor}{chain::eosvmoc::code\_descriptor}}*\ cd\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00087}00087\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00088}00088\ \ \ \ \ \ \ \ \ \ \ \ \ cd\ =\ my-\/>eosvmoc-\/>cc.get\_descriptor\_for\_code(code\_hash,\ vm\_version);}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00089}00089\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00090}00090\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{catch}(...)\ \{}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00091}00091\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//swallow\ errors\ here,\ if\ SYS\ VM\ OC\ has\ gone\ in\ to\ the\ weeds\ we\ shouldn't\ bail:\ continue\ to\ try\ and\ run\ baseline}}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00092}00092\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//In\ the\ future,\ consider\ moving\ bits\ of\ SYS\ VM\ that\ can\ fire\ exceptions\ and\ such\ out\ of\ this\ call\ path}}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00093}00093\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{bool}\ once\_is\_enough;}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00094}00094\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!once\_is\_enough)}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00095}00095\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}}(\textcolor{stringliteral}{"{}SYS\ VM\ OC\ has\ encountered\ an\ unexpected\ failure"{}});}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00096}00096\ \ \ \ \ \ \ \ \ \ \ \ \ once\_is\_enough\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00097}00097\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00098}00098\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(cd)\ \{}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00099}00099\ \ \ \ \ \ \ \ \ \ \ \ \ my-\/>eosvmoc-\/>exec.execute(*cd,\ my-\/>eosvmoc-\/>mem,\ \mbox{\hyperlink{structcontext}{context}});}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00100}00100\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00101}00101\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00102}00102\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00103}00103\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00104}00104\ \ \ \ \ \ \ my-\/>get\_instantiated\_module(code\_hash,\ \mbox{\hyperlink{classsysio_1_1chain_1_1wasm__interface_a9053d9e65167e5f241f1f3f27b175f9c}{vm\_type}},\ vm\_version,\ \mbox{\hyperlink{structcontext}{context}}.trx\_context)-\/>apply(\mbox{\hyperlink{structcontext}{context}});}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00105}00105\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00106}00106\ }
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00107}\mbox{\hyperlink{classsysio_1_1chain_1_1wasm__interface_a74acdfce15c2cb95607caef60525a388}{00107}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1wasm__interface_a74acdfce15c2cb95607caef60525a388}{wasm\_interface::exit}}()\ \{}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00108}00108\ \ \ \ \ \ \ my-\/>runtime\_interface-\/>immediately\_exit\_currently\_running\_module();}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00109}00109\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00110}00110\ }
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00111}\mbox{\hyperlink{classsysio_1_1chain_1_1wasm__instantiated__module__interface_a6a4e1f257d7f7ca382e8d4736ddbe047}{00111}}\ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1wasm__instantiated__module__interface_a6a4e1f257d7f7ca382e8d4736ddbe047}{wasm\_instantiated\_module\_interface::\string~wasm\_instantiated\_module\_interface}}()\ \{\}}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00112}\mbox{\hyperlink{classsysio_1_1chain_1_1wasm__runtime__interface_ab9681628db17cab5fd9c9f878f17bf52}{00112}}\ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1wasm__runtime__interface_ab9681628db17cab5fd9c9f878f17bf52}{wasm\_runtime\_interface::\string~wasm\_runtime\_interface}}()\ \{\}}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00113}00113\ }
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00114}\mbox{\hyperlink{namespacesysio_1_1chain_a122db6b99f7e77768c8e9b31c025d86f}{00114}}\ std::istream\&\ \mbox{\hyperlink{namespacefc_adf88e2d042e971232a527f98764ffbfb}{operator>>}}(std::istream\&\ in,\ \mbox{\hyperlink{classsysio_1_1chain_1_1wasm__interface_a9053d9e65167e5f241f1f3f27b175f9c}{wasm\_interface::vm\_type}}\&\ runtime)\ \{}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00115}00115\ \ \ \ std::string\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00116}00116\ \ \ \ in\ >>\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00117}00117\ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ ==\ \textcolor{stringliteral}{"{}sys-\/vm"{}})}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00118}00118\ \ \ \ \ \ \ runtime\ =\ sysio::chain::wasm\_interface::vm\_type::eos\_vm;}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00119}00119\ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ ==\ \textcolor{stringliteral}{"{}sys-\/vm-\/jit"{}})}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00120}00120\ \ \ \ \ \ \ runtime\ =\ sysio::chain::wasm\_interface::vm\_type::eos\_vm\_jit;}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00121}00121\ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ ==\ \textcolor{stringliteral}{"{}sys-\/vm-\/oc"{}})}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00122}00122\ \ \ \ \ \ \ runtime\ =\ sysio::chain::wasm\_interface::vm\_type::eos\_vm\_oc;}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00123}00123\ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00124}00124\ \ \ \ \ \ \ in.setstate(std::ios\_base::failbit);}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00125}00125\ \ \ \ \textcolor{keywordflow}{return}\ in;}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00126}00126\ \}}
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00127}00127\ }
+\DoxyCodeLine{\Hypertarget{wasm__interface_8cpp_source_l00128}00128\ \}\ \}\ }
+
+\end{DoxyCode}

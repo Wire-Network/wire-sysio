@@ -1,0 +1,89 @@
+\doxysection{libraries/fc/include/fc/crypto/webauthn\+\_\+json/example/simplepullreader/simplepullreader.cpp File Reference}
+\hypertarget{simplepullreader_8cpp}{}\label{simplepullreader_8cpp}\index{libraries/fc/include/fc/crypto/webauthn\_json/example/simplepullreader/simplepullreader.cpp@{libraries/fc/include/fc/crypto/webauthn\_json/example/simplepullreader/simplepullreader.cpp}}
+{\ttfamily \#include "{}rapidjson/reader.\+h"{}}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$sstream$>$}\newline
+Include dependency graph for simplepullreader.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{simplepullreader_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_my_handler}{My\+Handler}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\std\+::string \mbox{\hyperlink{simplepullreader_8cpp_a43b8f2b628e0f7f9342371359889a778}{stringify}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} x)
+\item 
+int \mbox{\hyperlink{simplepullreader_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{simplepullreader_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}\index{simplepullreader.cpp@{simplepullreader.cpp}!main@{main}}
+\index{main@{main}!simplepullreader.cpp@{simplepullreader.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{simplepullreader_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4} 
+int main (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{simplepullreader_8cpp_source_l00040}{40}} of file \mbox{\hyperlink{simplepullreader_8cpp_source}{simplepullreader.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00041\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ json[]\ =\ \textcolor{stringliteral}{"{}\ \{\ \(\backslash\)"{}hello\(\backslash\)"{}\ :\ \(\backslash\)"{}world\(\backslash\)"{},\ \(\backslash\)"{}t\(\backslash\)"{}\ :\ true\ ,\ \(\backslash\)"{}f\(\backslash\)"{}\ :\ false,\ \(\backslash\)"{}n\(\backslash\)"{}:\ null,\ \(\backslash\)"{}i\(\backslash\)"{}:123,\ \(\backslash\)"{}pi\(\backslash\)"{}:\ 3.1416,\ \(\backslash\)"{}a\(\backslash\)"{}:[1,\ 2,\ 3,\ 4]\ \}\ "{}};}
+\DoxyCodeLine{00042\ }
+\DoxyCodeLine{00043\ \ \ \ \ \mbox{\hyperlink{struct_my_handler}{MyHandler}}\ handler;}
+\DoxyCodeLine{00044\ \ \ \ \ \mbox{\hyperlink{class_generic_reader}{Reader}}\ reader;}
+\DoxyCodeLine{00045\ \ \ \ \ \mbox{\hyperlink{struct_generic_string_stream}{StringStream}}\ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}(json);}
+\DoxyCodeLine{00046\ \ \ \ \ reader.\mbox{\hyperlink{class_generic_reader_a7de472eda2ad9de13cfd8c1de74f1754}{IterativeParseInit}}();}
+\DoxyCodeLine{00047\ \ \ \ \ \textcolor{keywordflow}{while}\ (!reader.\mbox{\hyperlink{class_generic_reader_aa1e9e1eef614fde971550ed2f955151d}{IterativeParseComplete}}())\ \{}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ reader.\mbox{\hyperlink{class_generic_reader_a257891331e0c259903e7066fb4cebf92}{IterativeParseNext}}<\mbox{\hyperlink{reader_8h_ab7be7dabe6ffcba60fad441505583450a9104b0946d648e9467cb7a967401ec80}{kParseDefaultFlags}}>(\mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}},\ handler);}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ cout\ <<\ handler.\mbox{\hyperlink{struct_my_handler_a5ddbe6be6982b231315cdfae9e839971}{type}}\ <<\ handler.\mbox{\hyperlink{struct_my_handler_a408932a0e3cc57b0d997cd9b0801fefc}{data}}\ <<\ endl;}
+\DoxyCodeLine{00050\ \ \ \ \ \}}
+\DoxyCodeLine{00051\ }
+\DoxyCodeLine{00052\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00053\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{simplepullreader_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{simplepullreader_8cpp_a43b8f2b628e0f7f9342371359889a778}\index{simplepullreader.cpp@{simplepullreader.cpp}!stringify@{stringify}}
+\index{stringify@{stringify}!simplepullreader.cpp@{simplepullreader.cpp}}
+\doxysubsubsection{\texorpdfstring{stringify()}{stringify()}}
+{\footnotesize\ttfamily \label{simplepullreader_8cpp_a43b8f2b628e0f7f9342371359889a778} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+std\+::string stringify (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}}]{x}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{simplepullreader_8cpp_source_l00009}{9}} of file \mbox{\hyperlink{simplepullreader_8cpp_source}{simplepullreader.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00009\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00010\ \ \ \ \ std::stringstream\ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}};}
+\DoxyCodeLine{00011\ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}\ <<\ x;}
+\DoxyCodeLine{00012\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}.str();}
+\DoxyCodeLine{00013\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=309pt]{simplepullreader_8cpp_a43b8f2b628e0f7f9342371359889a778_icgraph}
+\end{center}
+\end{figure}

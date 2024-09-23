@@ -1,0 +1,11 @@
+<map id="CLI::Validator::description" name="CLI::Validator::description">
+<area shape="rect" id="Node000001" title="Specify the type string." alt="" coords="228,108,399,133"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_as_number_with_unit.html#af5d2fc29cd92c1821e653a97f91b00cb" title=" " alt="" coords="11,5,174,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="269,103,179,61,148,49,150,44,181,57,272,98"/>
+<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_as_size_value.html#a2b4907603d2a0539df639bbc468e0ec0" title=" " alt="" coords="5,71,180,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="212,110,180,105,180,100,212,104"/>
+<area shape="rect" id="Node000004" href="$class_c_l_i_1_1_bound.html#ad8963dee44fa7484a9d28df994cf722c" title=" " alt="" coords="26,136,159,161"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="212,136,160,143,159,137,212,131"/>
+<area shape="rect" id="Node000005" href="$class_c_l_i_1_1_range.html#acdc2184cbc527fed68c9500c6aae15be" title=" " alt="" coords="25,185,160,210"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="268,142,181,176,146,187,145,182,179,171,266,137"/>
+</map>

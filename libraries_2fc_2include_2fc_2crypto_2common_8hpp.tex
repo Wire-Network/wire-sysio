@@ -1,0 +1,72 @@
+\doxysection{libraries/fc/include/fc/crypto/common.hpp File Reference}
+\hypertarget{libraries_2fc_2include_2fc_2crypto_2common_8hpp}{}\label{libraries_2fc_2include_2fc_2crypto_2common_8hpp}\index{libraries/fc/include/fc/crypto/common.hpp@{libraries/fc/include/fc/crypto/common.hpp}}
+{\ttfamily \#include $<$fc/crypto/ripemd160.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/reflect/reflect.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/crypto/base58.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/io/raw.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/utility.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/static\+\_\+variant.\+hpp$>$}\newline
+Include dependency graph for common.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{libraries_2fc_2include_2fc_2crypto_2common_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{libraries_2fc_2include_2fc_2crypto_2common_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structfc_1_1crypto_1_1checksummed__data}{fc\+::crypto\+::checksummed\+\_\+data$<$ Data\+Type $>$}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1crypto_1_1base58__str__parser__impl_3_01_result_00_01_prefixes_00_01_position_00_01_key_type_00_01_rem_8_8_8_01_4}{fc\+::crypto\+::base58\+\_\+str\+\_\+parser\+\_\+impl$<$ Result, Prefixes, Position, Key\+Type, Rem... $>$}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1crypto_1_1base58__str__parser__impl_3_01_result_00_01_prefixes_00_01_position_01_4}{fc\+::crypto\+::base58\+\_\+str\+\_\+parser\+\_\+impl$<$ Result, Prefixes, Position $>$}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1crypto_1_1base58__str__parser_3_01std_1_1variant_3_01_ts_8_8_8_01_4_00_01_prefixes_01_4}{fc\+::crypto\+::base58\+\_\+str\+\_\+parser$<$ std\+::variant$<$ Ts... $>$, Prefixes $>$}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1crypto_1_1base58str__visitor}{fc\+::crypto\+::base58str\+\_\+visitor$<$ Storage, Prefixes, Default\+Position $>$}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1crypto_1_1eq__comparator}{fc\+::crypto\+::eq\+\_\+comparator$<$ T $>$}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1crypto_1_1eq__comparator_3_01std_1_1variant_3_01_ts_8_8_8_01_4_01_4}{fc\+::crypto\+::eq\+\_\+comparator$<$ std\+::variant$<$ Ts... $>$ $>$}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1crypto_1_1eq__comparator_3_01std_1_1variant_3_01_ts_8_8_8_01_4_01_4_1_1visitor}{fc\+::crypto\+::eq\+\_\+comparator$<$ std\+::variant$<$ Ts... $>$ $>$\+::visitor}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1crypto_1_1less__comparator}{fc\+::crypto\+::less\+\_\+comparator$<$ T $>$}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1crypto_1_1less__comparator_3_01std_1_1variant_3_01_ts_8_8_8_01_4_01_4}{fc\+::crypto\+::less\+\_\+comparator$<$ std\+::variant$<$ Ts... $>$ $>$}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1crypto_1_1less__comparator_3_01std_1_1variant_3_01_ts_8_8_8_01_4_01_4_1_1visitor}{fc\+::crypto\+::less\+\_\+comparator$<$ std\+::variant$<$ Ts... $>$ $>$\+::visitor}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1crypto_1_1shim}{fc\+::crypto\+::shim$<$ Data $>$}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacefc}{fc}}
+\begin{DoxyCompactList}\small\item\em namespace \doxylink{namespacesysio_1_1chain}{sysio\+::chain} \end{DoxyCompactList}\item 
+namespace \mbox{\hyperlink{namespacefc_1_1crypto}{fc\+::crypto}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{namespacefc_1_1crypto_adbd074892feb2e888a1a22592aa7c195}{fc\+::crypto\+::prefix\+\_\+matches}} (const char \texorpdfstring{$\ast$}{*}prefix, const std\+::string \&str)
+\item 
+\mbox{\hyperlink{libraries_2fc_2include_2fc_2crypto_2common_8hpp_a592fe9660d798597725382202736810a}{FC\+\_\+\+REFLECT\+\_\+\+TEMPLATE}} ((typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}), \mbox{\hyperlink{structfc_1_1crypto_1_1checksummed__data}{fc\+::crypto\+::checksummed\+\_\+data}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$,(data)(check)) FC\+\_\+\+REFLECT\+\_\+\+TEMPLATE((typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{libraries_2fc_2include_2fc_2crypto_2common_8hpp_a592fe9660d798597725382202736810a}\index{common.hpp@{common.hpp}!FC\_REFLECT\_TEMPLATE@{FC\_REFLECT\_TEMPLATE}}
+\index{FC\_REFLECT\_TEMPLATE@{FC\_REFLECT\_TEMPLATE}!common.hpp@{common.hpp}}
+\doxysubsubsection{\texorpdfstring{FC\_REFLECT\_TEMPLATE()}{FC\_REFLECT\_TEMPLATE()}}
+{\footnotesize\ttfamily \label{libraries_2fc_2include_2fc_2crypto_2common_8hpp_a592fe9660d798597725382202736810a} 
+FC\+\_\+\+REFLECT\+\_\+\+TEMPLATE (\begin{DoxyParamCaption}\item[{(typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}})}]{}{, }\item[{\mbox{\hyperlink{structfc_1_1crypto_1_1checksummed__data}{fc\+::crypto\+::checksummed\+\_\+data}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$}]{}{, }\item[{(data)(check)}]{}{}\end{DoxyParamCaption})}
+

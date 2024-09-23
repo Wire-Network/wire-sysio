@@ -1,0 +1,137 @@
+\doxysection{asio.\+hpp}
+\hypertarget{common_2asio_8hpp_source}{}\label{common_2asio_8hpp_source}\index{libraries/fc/vendor/websocketpp/websocketpp/common/asio.hpp@{libraries/fc/vendor/websocketpp/websocketpp/common/asio.hpp}}
+\mbox{\hyperlink{common_2asio_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2015,\ Peter\ Thorson.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00004}00004\ \textcolor{comment}{\ *\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00005}00005\ \textcolor{comment}{\ *\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are\ met:}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00006}00006\ \textcolor{comment}{\ *\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00007}00007\ \textcolor{comment}{\ *\ \ \ \ \ \ \ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00008}00008\ \textcolor{comment}{\ *\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00009}00009\ \textcolor{comment}{\ *\ \ \ \ \ \ \ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer\ in\ the}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00010}00010\ \textcolor{comment}{\ *\ \ \ \ \ \ \ documentation\ and/or\ other\ materials\ provided\ with\ the\ distribution.}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00011}00011\ \textcolor{comment}{\ *\ \ \ \ \ *\ Neither\ the\ name\ of\ the\ WebSocket++\ Project\ nor\ the}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00012}00012\ \textcolor{comment}{\ *\ \ \ \ \ \ \ names\ of\ its\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00013}00013\ \textcolor{comment}{\ *\ \ \ \ \ \ \ derived\ from\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00014}00014\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00015}00015\ \textcolor{comment}{\ *\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS\ "{}AS\ IS"{}}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00016}00016\ \textcolor{comment}{\ *\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ THE}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00017}00017\ \textcolor{comment}{\ *\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR\ A\ PARTICULAR\ PURPOSE}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00018}00018\ \textcolor{comment}{\ *\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ PETER\ THORSON\ BE\ LIABLE\ FOR\ ANY}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00019}00019\ \textcolor{comment}{\ *\ DIRECT,\ INDIRECT,\ INCIDENTAL,\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00020}00020\ \textcolor{comment}{\ *\ (INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00021}00021\ \textcolor{comment}{\ *\ LOSS\ OF\ USE,\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00022}00022\ \textcolor{comment}{\ *\ ON\ ANY\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00023}00023\ \textcolor{comment}{\ *\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE\ OF\ THIS}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00024}00024\ \textcolor{comment}{\ *\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00025}00025\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00026}00026\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00028}00028\ \textcolor{preprocessor}{\#ifndef\ WEBSOCKETPP\_COMMON\_ASIO\_HPP}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00029}00029\ \textcolor{preprocessor}{\#define\ WEBSOCKETPP\_COMMON\_ASIO\_HPP}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00031}00031\ \textcolor{comment}{//\ This\ file\ goes\ to\ some\ length\ to\ preserve\ compatibility\ with\ versions\ of\ }}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00032}00032\ \textcolor{comment}{//\ boost\ older\ than\ 1.49\ (where\ the\ first\ modern\ steady\_timer\ timer\ based\ on\ }}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00033}00033\ \textcolor{comment}{//\ boost/std\ chrono\ was\ introduced.}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00034}00034\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00035}00035\ \textcolor{comment}{//\ For\ the\ versions\ older\ than\ 1.49,\ the\ deadline\_timer\ is\ used\ instead.\ this}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00036}00036\ \textcolor{comment}{//\ brings\ in\ dependencies\ on\ boost\ date\_time\ and\ it\ has\ a\ different\ interface}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00037}00037\ \textcolor{comment}{//\ that\ is\ normalized\ by\ the\ \`{}lib::asio::is\_neg`\ and\ \`{}lib::asio::milliseconds`}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00038}00038\ \textcolor{comment}{//\ wrappers\ provided\ by\ this\ file.}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00039}00039\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00040}00040\ \textcolor{comment}{//\ The\ primary\ reason\ for\ this\ continued\ support\ is\ that\ boost\ 1.48\ is\ the}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00041}00041\ \textcolor{comment}{//\ default\ and\ not\ easily\ changeable\ version\ of\ boost\ supplied\ by\ the\ package}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00042}00042\ \textcolor{comment}{//\ manager\ of\ popular\ Linux\ distributions\ like\ Ubuntu\ 12.04\ LTS.\ Once\ the\ need}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00043}00043\ \textcolor{comment}{//\ for\ this\ has\ passed\ this\ should\ be\ cleaned\ up\ and\ simplified.}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00045}00045\ \textcolor{preprocessor}{\#ifdef\ ASIO\_STANDALONE}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00046}00046\ \textcolor{preprocessor}{\ \ \ \ \#include\ <asio/version.hpp>}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00047}00047\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00048}00048\ \textcolor{preprocessor}{\ \ \ \ \#if\ (ASIO\_VERSION/100000)\ ==\ 1\ \&\&\ ((ASIO\_VERSION/100)\%1000)\ <\ 8}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_assert}(\textcolor{keyword}{false},\ \textcolor{stringliteral}{"{}The\ minimum\ version\ of\ standalone\ Asio\ is\ 1.8.0"{}});}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00050}00050\ \textcolor{preprocessor}{\ \ \ \ \#endif}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00051}00051\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00052}00052\ \textcolor{preprocessor}{\ \ \ \ \#include\ <\mbox{\hyperlink{common_2asio_8hpp}{asio.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00053}00053\ \textcolor{preprocessor}{\ \ \ \ \#include\ <asio/steady\_timer.hpp>}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00054}00054\ \textcolor{preprocessor}{\ \ \ \ \#include\ <\mbox{\hyperlink{chrono_8hpp}{websocketpp/common/chrono.hpp}}>}\ }
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00055}00055\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00056}00056\ \textcolor{preprocessor}{\ \ \ \ \#include\ <boost/version.hpp>}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00057}00057\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00058}00058\ \ \ \ \ \textcolor{comment}{//\ See\ note\ above\ about\ boost\ <1.49\ compatibility.\ If\ we\ are\ running\ on\ }}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00059}00059\ \ \ \ \ \textcolor{comment}{//\ boost\ >\ 1.48\ pull\ in\ the\ steady\ timer\ and\ chrono\ library}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00060}00060\ \textcolor{preprocessor}{\ \ \ \ \#if\ (BOOST\_VERSION/100000)\ ==\ 1\ \&\&\ ((BOOST\_VERSION/100)\%1000)\ >\ 48}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00061}00061\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#include\ <boost/asio/steady\_timer.hpp>}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00062}00062\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#include\ <\mbox{\hyperlink{chrono_8hpp}{websocketpp/common/chrono.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00063}00063\ \textcolor{preprocessor}{\ \ \ \ \#endif}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00064}00064\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00065}00065\ \textcolor{preprocessor}{\ \ \ \ \#include\ <boost/asio.hpp>}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00066}00066\ \textcolor{preprocessor}{\ \ \ \ \#include\ <boost/system/error\_code.hpp>}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00067}00067\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00069}00069\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacewebsocketpp}{websocketpp}}\ \{}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00070}\mbox{\hyperlink{namespacewebsocketpp_1_1lib}{00070}}\ \textcolor{keyword}{namespace\ }lib\ \{}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00072}00072\ \textcolor{preprocessor}{\#ifdef\ ASIO\_STANDALONE}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00073}00073\ \ \ \ \ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacewebsocketpp_1_1lib_1_1asio}{asio}}\ \{}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00074}00074\ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ namespace\ }::\mbox{\hyperlink{namespacewebsocketpp_1_1lib_1_1asio}{asio}};}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00075}00075\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Here\ we\ assume\ that\ we\ will\ be\ using\ std::error\_code\ with\ standalone}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00076}00076\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Asio.\ This\ is\ probably\ a\ good\ assumption,\ but\ it\ is\ possible\ in\ rare}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00077}00077\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ cases\ that\ local\ Asio\ versions\ would\ be\ used.}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00078}00078\ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ }std::errc;}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00079}00079\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00080}00080\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ See\ note\ above\ about\ boost\ <1.49\ compatibility.\ Because\ we\ require}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00081}00081\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ a\ standalone\ Asio\ version\ of\ 1.8+\ we\ are\ guaranteed\ to\ have\ }}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00082}00082\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ steady\_timer\ available.\ By\ convention\ we\ require\ the\ chrono\ library}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00083}00083\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ (either\ boost\ or\ std)\ for\ use\ with\ standalone\ Asio.}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00084}00084\ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00085}00085\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacewebsocketpp_1_1lib_1_1asio_a1096d9d4bcff306bf568ba95842142b5}{is\_neg}}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ duration)\ \{}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00086}00086\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ duration.count()\ <\ 0;}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00087}00087\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00088}00088\ \ \ \ \ \ \ \ \ \textcolor{keyword}{inline}\ lib::chrono::milliseconds\ \mbox{\hyperlink{namespacewebsocketpp_1_1lib_1_1asio_a38ce6cba13c37a134a65f3623d00090e}{milliseconds}}(\textcolor{keywordtype}{long}\ duration)\ \{}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00089}00089\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ lib::chrono::milliseconds(duration);}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00090}00090\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00091}00091\ \ \ \ \ \}\ \textcolor{comment}{//\ namespace\ asio}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00092}00092\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00093}00093\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00094}\mbox{\hyperlink{namespacewebsocketpp_1_1lib_1_1asio}{00094}}\ \ \ \ \ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacewebsocketpp_1_1lib_1_1asio}{asio}}\ \{}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00095}00095\ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespaceboost_1_1asio}{boost::asio}};}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00096}00096\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00097}00097\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ See\ note\ above\ about\ boost\ <1.49\ compatibility}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00098}00098\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#if\ (BOOST\_VERSION/100000)\ ==\ 1\ \&\&\ ((BOOST\_VERSION/100)\%1000)\ >\ 48}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00099}00099\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Using\ boost::asio\ >=1.49\ so\ we\ use\ chrono\ and\ steady\_timer}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00100}00100\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00101}00101\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacewebsocketpp_1_1lib_1_1asio_a1096d9d4bcff306bf568ba95842142b5}{is\_neg}}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ duration)\ \{}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00102}00102\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ duration.count()\ <\ 0;}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00103}00103\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00104}00104\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{inline}\ lib::chrono::milliseconds\ \mbox{\hyperlink{namespacewebsocketpp_1_1lib_1_1asio_a38ce6cba13c37a134a65f3623d00090e}{milliseconds}}(\textcolor{keywordtype}{long}\ duration)\ \{}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00105}00105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ lib::chrono::milliseconds(duration);}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00106}00106\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00107}00107\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#else}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00108}00108\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Using\ boost::asio\ <1.49\ we\ pretend\ a\ deadline\ timer\ is\ a\ steady}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00109}00109\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ timer\ and\ wrap\ the\ negative\ detection\ and\ duration\ conversion}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00110}00110\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ appropriately.}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00111}\mbox{\hyperlink{namespacewebsocketpp_1_1lib_1_1asio_a156f3dad489fb17e3bc79d2009d2656f}{00111}}\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ boost::asio::deadline\_timer\ \mbox{\hyperlink{namespacewebsocketpp_1_1lib_1_1asio_a156f3dad489fb17e3bc79d2009d2656f}{steady\_timer}};}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00112}00112\ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00113}00113\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00114}\mbox{\hyperlink{namespacewebsocketpp_1_1lib_1_1asio_a1096d9d4bcff306bf568ba95842142b5}{00114}}\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacewebsocketpp_1_1lib_1_1asio_a1096d9d4bcff306bf568ba95842142b5}{is\_neg}}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ duration)\ \{}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00115}00115\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ duration.is\_negative();}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00116}00116\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00117}\mbox{\hyperlink{namespacewebsocketpp_1_1lib_1_1asio_a38ce6cba13c37a134a65f3623d00090e}{00117}}\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{inline}\ boost::posix\_time::time\_duration\ \mbox{\hyperlink{namespacewebsocketpp_1_1lib_1_1asio_a38ce6cba13c37a134a65f3623d00090e}{milliseconds}}(\textcolor{keywordtype}{long}\ duration)\ \{}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00118}00118\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ boost::posix\_time::milliseconds(duration);}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00119}00119\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00120}00120\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#endif}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00121}00121\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00122}00122\ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ }boost::system::error\_code;}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00123}00123\ \ \ \ \ \ \ \ \ \textcolor{keyword}{namespace\ }errc\ =\ boost::system::errc;}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00124}00124\ \ \ \ \ \}\ \textcolor{comment}{//\ namespace\ asio}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00125}00125\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00126}00126\ }
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00127}00127\ }
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00128}00128\ \}\ \textcolor{comment}{//\ namespace\ lib}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00129}00129\ \}\ \textcolor{comment}{//\ namespace\ websocketpp}}
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00130}00130\ }
+\DoxyCodeLine{\Hypertarget{common_2asio_8hpp_source_l00131}00131\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ WEBSOCKETPP\_COMMON\_ASIO\_HPP}}
+
+\end{DoxyCode}

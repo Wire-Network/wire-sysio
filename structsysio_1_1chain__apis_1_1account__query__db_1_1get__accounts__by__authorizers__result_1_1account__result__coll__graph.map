@@ -1,0 +1,5 @@
+<map id="sysio::chain_apis::account_query_db::get_accounts_by_authorizers_result::account_result" name="sysio::chain_apis::account_query_db::get_accounts_by_authorizers_result::account_result">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,109,179,180"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1name.html" title="Immutable except for fc::from_variant." alt="" coords="26,5,158,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="95,47,95,109,89,109,89,47"/>
+</map>

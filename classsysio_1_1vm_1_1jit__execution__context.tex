@@ -1,0 +1,813 @@
+\doxysection{sysio\+::vm\+::jit\+\_\+execution\+\_\+context\texorpdfstring{$<$}{<} Host, Enable\+Backtrace \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classsysio_1_1vm_1_1jit__execution__context}{}\label{classsysio_1_1vm_1_1jit__execution__context}\index{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$@{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$}}
+
+
+{\ttfamily \#include $<$execution\+\_\+context.\+hpp$>$}
+
+
+
+Inheritance diagram for sysio\+::vm\+::jit\+\_\+execution\+\_\+context\texorpdfstring{$<$}{<} Host, Enable\+Backtrace \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1vm_1_1jit__execution__context__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for sysio\+::vm\+::jit\+\_\+execution\+\_\+context\texorpdfstring{$<$}{<} Host, Enable\+Backtrace \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1vm_1_1jit__execution__context__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_a96158c3ce116da5d36c4e3d6a1507a2a}{jit\+\_\+execution\+\_\+context}} (\mbox{\hyperlink{structsysio_1_1vm_1_1module}{module}} \&m, std\+::uint32\+\_\+t \mbox{\hyperlink{namespacesysio_1_1vm_a0ae6751a77293216df4656dee5081eb2a2b205b0f9a2199e9e6bf7d96d768f15a}{max\+\_\+call\+\_\+depth}})
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_a6432508a2591567b41af7b8aebea02d4}{set\+\_\+max\+\_\+call\+\_\+depth}} (std\+::uint32\+\_\+t \mbox{\hyperlink{namespacesysio_1_1vm_a0ae6751a77293216df4656dee5081eb2a2b205b0f9a2199e9e6bf7d96d768f15a}{max\+\_\+call\+\_\+depth}})
+\item 
+\mbox{\hyperlink{unionsysio_1_1vm_1_1native__value}{native\+\_\+value}} \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_a6bd958664d7f20be65075b631855f33a}{call\+\_\+host\+\_\+function}} (\mbox{\hyperlink{unionsysio_1_1vm_1_1native__value}{native\+\_\+value}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{classsysio_1_1vm_1_1stack}{stack}}, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} index)
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_a55c6536bb63744dab05f72d6690bd3c5}{reset}} ()
+\item 
+{\footnotesize template$<$typename... Args$>$ }\\std\+::optional$<$ \mbox{\hyperlink{classsysio_1_1vm_1_1operand__stack__elem}{operand\+\_\+stack\+\_\+elem}} $>$ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_a3a32bce66020501bfe2168765eba95cf}{execute}} (host\+\_\+type \texorpdfstring{$\ast$}{*}host, \mbox{\hyperlink{structsysio_1_1vm_1_1jit__visitor}{jit\+\_\+visitor}}, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} func\+\_\+index, Args... args)
+\item 
+\mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_a96158c3ce116da5d36c4e3d6a1507a2a}{jit\+\_\+execution\+\_\+context}} (\mbox{\hyperlink{structsysio_1_1vm_1_1module}{module}} \&m, std\+::uint32\+\_\+t \mbox{\hyperlink{namespacesysio_1_1vm_a0ae6751a77293216df4656dee5081eb2a2b205b0f9a2199e9e6bf7d96d768f15a}{max\+\_\+call\+\_\+depth}})
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_a6432508a2591567b41af7b8aebea02d4}{set\+\_\+max\+\_\+call\+\_\+depth}} (std\+::uint32\+\_\+t \mbox{\hyperlink{namespacesysio_1_1vm_a0ae6751a77293216df4656dee5081eb2a2b205b0f9a2199e9e6bf7d96d768f15a}{max\+\_\+call\+\_\+depth}})
+\item 
+\mbox{\hyperlink{unionsysio_1_1vm_1_1native__value}{native\+\_\+value}} \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_a6bd958664d7f20be65075b631855f33a}{call\+\_\+host\+\_\+function}} (\mbox{\hyperlink{unionsysio_1_1vm_1_1native__value}{native\+\_\+value}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{classsysio_1_1vm_1_1stack}{stack}}, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} index)
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_a55c6536bb63744dab05f72d6690bd3c5}{reset}} ()
+\item 
+{\footnotesize template$<$typename... Args$>$ }\\std\+::optional$<$ \mbox{\hyperlink{classsysio_1_1vm_1_1operand__stack__elem}{operand\+\_\+stack\+\_\+elem}} $>$ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_a3a32bce66020501bfe2168765eba95cf}{execute}} (host\+\_\+type \texorpdfstring{$\ast$}{*}host, \mbox{\hyperlink{structsysio_1_1vm_1_1jit__visitor}{jit\+\_\+visitor}}, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} func\+\_\+index, Args... args)
+\item 
+{\footnotesize template$<$typename Visitor , typename... Args$>$ }\\std\+::optional$<$ \mbox{\hyperlink{classsysio_1_1vm_1_1operand__stack__elem}{operand\+\_\+stack\+\_\+elem}} $>$ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_abc08d4ee8c1657dfd870cb728a202d73}{execute}} (host\+\_\+type \texorpdfstring{$\ast$}{*}host, Visitor \&\&\mbox{\hyperlink{structfc_1_1visitor}{visitor}}, const std\+::string\+\_\+view \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2}{func}}, Args... args)
+\item 
+auto \& \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_a0b4188bd88810e7208c403c67ddd5354}{get\+\_\+operand\+\_\+stack}} ()
+\item 
+const auto \& \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_ab889ea2c8f14eeb3a3df360125debb90}{get\+\_\+operand\+\_\+stack}} () const
+\item 
+char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_aad1ab4903de26a0564c8a02f05ac4fe6}{linear\+\_\+memory}} ()
+\item 
+auto \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_ab48a9c325fcb2d2a4b532396eb2d65f3}{get\+\_\+interface}} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base}{sysio\+::vm\+::execution\+\_\+context\+\_\+base$<$ jit\+\_\+execution\+\_\+context$<$ Host, false $>$, Host $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context}{jit\+\_\+execution\+\_\+context}}$<$ Host, false $>$ \& \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base_a7e732e0cf69fe1d17790eb404c18f7a6}{derived}} ()
+\item 
+\mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context}{jit\+\_\+execution\+\_\+context}}$<$ Host, false $>$ \& \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base_a7e732e0cf69fe1d17790eb404c18f7a6}{derived}} ()
+\item 
+\mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base_a20cde357ba3b172a48ab8d7c5477b703}{execution\+\_\+context\+\_\+base}} (\mbox{\hyperlink{structsysio_1_1vm_1_1module}{module}} \&m)
+\item 
+\mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base_a20cde357ba3b172a48ab8d7c5477b703}{execution\+\_\+context\+\_\+base}} (\mbox{\hyperlink{structsysio_1_1vm_1_1module}{module}} \&m)
+\item 
+\mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\+\_\+t}} \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base_a500f64a4c221a4b05a726d018c0ece47}{grow\+\_\+linear\+\_\+memory}} (\mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\+\_\+t}} pages)
+\item 
+\mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\+\_\+t}} \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base_a500f64a4c221a4b05a726d018c0ece47}{grow\+\_\+linear\+\_\+memory}} (\mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\+\_\+t}} pages)
+\item 
+\mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\+\_\+t}} \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base_af7a7b2061cdfaae55d8125e13e5be185}{current\+\_\+linear\+\_\+memory}} () const
+\item 
+\mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\+\_\+t}} \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base_af7a7b2061cdfaae55d8125e13e5be185}{current\+\_\+linear\+\_\+memory}} () const
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base_af8ec54d93e1bcf8c2bbb694ff6bdc5cb}{exit}} (std\+::error\+\_\+code err=std\+::error\+\_\+code())
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base_af8ec54d93e1bcf8c2bbb694ff6bdc5cb}{exit}} (std\+::error\+\_\+code err=std\+::error\+\_\+code())
+\item 
+\mbox{\hyperlink{structsysio_1_1vm_1_1module}{module}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base_a863571b049ae80af9b9384a0114c8e82}{get\+\_\+module}} ()
+\item 
+\mbox{\hyperlink{structsysio_1_1vm_1_1module}{module}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base_a863571b049ae80af9b9384a0114c8e82}{get\+\_\+module}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base_a90a6d0025dbbccab0ec2f0185197d1ae}{set\+\_\+wasm\+\_\+allocator}} (\mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator}{wasm\+\_\+allocator}} \texorpdfstring{$\ast$}{*}alloc)
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base_a90a6d0025dbbccab0ec2f0185197d1ae}{set\+\_\+wasm\+\_\+allocator}} (\mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator}{wasm\+\_\+allocator}} \texorpdfstring{$\ast$}{*}alloc)
+\item 
+auto \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base_a7aaca95cd6fbe51d568f1290e54eb017}{get\+\_\+wasm\+\_\+allocator}} ()
+\item 
+auto \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base_a7aaca95cd6fbe51d568f1290e54eb017}{get\+\_\+wasm\+\_\+allocator}} ()
+\item 
+char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base_aad1ab4903de26a0564c8a02f05ac4fe6}{linear\+\_\+memory}} ()
+\item 
+char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base_aad1ab4903de26a0564c8a02f05ac4fe6}{linear\+\_\+memory}} ()
+\item 
+auto \& \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base_a0b4188bd88810e7208c403c67ddd5354}{get\+\_\+operand\+\_\+stack}} ()
+\item 
+const auto \& \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base_ab889ea2c8f14eeb3a3df360125debb90}{get\+\_\+operand\+\_\+stack}} () const
+\item 
+auto \& \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base_a0b4188bd88810e7208c403c67ddd5354}{get\+\_\+operand\+\_\+stack}} ()
+\item 
+const auto \& \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base_ab889ea2c8f14eeb3a3df360125debb90}{get\+\_\+operand\+\_\+stack}} () const
+\item 
+auto \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base_ab48a9c325fcb2d2a4b532396eb2d65f3}{get\+\_\+interface}} ()
+\item 
+auto \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base_ab48a9c325fcb2d2a4b532396eb2d65f3}{get\+\_\+interface}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base_ae3875fa4e318d090889db24536fce550}{set\+\_\+max\+\_\+pages}} (std\+::uint32\+\_\+t \mbox{\hyperlink{namespacesysio_1_1vm_a0ae6751a77293216df4656dee5081eb2a95b0fd1e8f1e450ae134af180be894f3}{max\+\_\+pages}})
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base_ae3875fa4e318d090889db24536fce550}{set\+\_\+max\+\_\+pages}} (std\+::uint32\+\_\+t \mbox{\hyperlink{namespacesysio_1_1vm_a0ae6751a77293216df4656dee5081eb2a95b0fd1e8f1e450ae134af180be894f3}{max\+\_\+pages}})
+\item 
+std\+::error\+\_\+code \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base_a689fcf5cdec89398a3cf05e7834546dc}{get\+\_\+error\+\_\+code}} () const
+\item 
+std\+::error\+\_\+code \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base_a689fcf5cdec89398a3cf05e7834546dc}{get\+\_\+error\+\_\+code}} () const
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base_a7ff12ef5c12cdbdaf4e22014846079e5}{reset}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base_a7ff12ef5c12cdbdaf4e22014846079e5}{reset}} ()
+\item 
+std\+::optional$<$ \mbox{\hyperlink{classsysio_1_1vm_1_1operand__stack__elem}{operand\+\_\+stack\+\_\+elem}} $>$ \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base_abc08d4ee8c1657dfd870cb728a202d73}{execute}} (host\+\_\+type \texorpdfstring{$\ast$}{*}host, Visitor \&\&\mbox{\hyperlink{structfc_1_1visitor}{visitor}}, const std\+::string\+\_\+view \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2}{func}}, Args... args)
+\item 
+std\+::optional$<$ \mbox{\hyperlink{classsysio_1_1vm_1_1operand__stack__elem}{operand\+\_\+stack\+\_\+elem}} $>$ \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base_abc08d4ee8c1657dfd870cb728a202d73}{execute}} (host\+\_\+type \texorpdfstring{$\ast$}{*}host, Visitor \&\&\mbox{\hyperlink{structfc_1_1visitor}{visitor}}, const std\+::string\+\_\+view \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2}{func}}, Args... args)
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base_ab7566e2440f2d83af6ea733557c06021}{execute\+\_\+start}} (host\+\_\+type \texorpdfstring{$\ast$}{*}host, Visitor \&\&\mbox{\hyperlink{structfc_1_1visitor}{visitor}})
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base_ab7566e2440f2d83af6ea733557c06021}{execute\+\_\+start}} (host\+\_\+type \texorpdfstring{$\ast$}{*}host, Visitor \&\&\mbox{\hyperlink{structfc_1_1visitor}{visitor}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static void \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_adbb09aabc8ed0d1310fde20211c550e5}{handle\+\_\+signal}} (int sig)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1vm_1_1module}{module}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_a10264d78efee5ae7720bddc2853c1bc8}{\+\_\+mod}}
+\item 
+\mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_affd752998217b56f9a027d41f1e47d34}{detail\+::host\+\_\+invoker\+\_\+t}}$<$ Host $>$ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_afb21eb88496d63b7af1f1329cab1ef08}{\+\_\+rhf}}
+\item 
+std\+::error\+\_\+code \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_a60328b847940f19ecaf6de0a4d9de4aa}{\+\_\+error\+\_\+code}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{unionsysio_1_1vm_1_1native__value}{native\+\_\+value}} \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_a9186421702dc931bcea9329161edd992}{transform\+\_\+arg}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{unionsysio_1_1vm_1_1native__value}{native\+\_\+value}} \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_a9186421702dc931bcea9329161edd992}{transform\+\_\+arg}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+host\+\_\+type \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_ab7a88abe7f50acea3cd6ed677934d66a}{\+\_\+host}} = nullptr
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_abddbc46dcfef76d04aaf37ad3440fec6}{\+\_\+remaining\+\_\+call\+\_\+depth}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Attributes inherited from \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base}{sysio\+::vm\+::execution\+\_\+context\+\_\+base$<$ jit\+\_\+execution\+\_\+context$<$ Host, false $>$, Host $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base_a547ccd31976e472f437163f65a2b2e57}{\+\_\+linear\+\_\+memory}}
+\item 
+\mbox{\hyperlink{structsysio_1_1vm_1_1module}{module}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base_a10264d78efee5ae7720bddc2853c1bc8}{\+\_\+mod}}
+\item 
+\mbox{\hyperlink{classsysio_1_1vm_1_1wasm__allocator}{wasm\+\_\+allocator}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base_ae39c6d22c72f01ce0b6e795f009dd201}{\+\_\+wasm\+\_\+alloc}}
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base_a3451a7f27c6424c8989a515b2ff8c4f0}{\+\_\+max\+\_\+pages}}
+\item 
+\mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_affd752998217b56f9a027d41f1e47d34}{detail\+::host\+\_\+invoker\+\_\+t}}$<$ Host $>$ \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base_afb21eb88496d63b7af1f1329cab1ef08}{\+\_\+rhf}}
+\item 
+std\+::error\+\_\+code \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base_a60328b847940f19ecaf6de0a4d9de4aa}{\+\_\+error\+\_\+code}}
+\item 
+\mbox{\hyperlink{namespacesysio_1_1vm_a80b2c5cc5651a70a1f86e6390546fbd6}{operand\+\_\+stack}} \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base_af14c2171e884ca3cbffec0f21d57fceb}{\+\_\+os}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Static Protected Member Functions inherited from \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base}{sysio\+::vm\+::execution\+\_\+context\+\_\+base$<$ jit\+\_\+execution\+\_\+context$<$ Host, false $>$, Host $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+static void \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base_a3216ee9d029d8647ced8e787d32f91de}{type\+\_\+check\+\_\+args}} (const \mbox{\hyperlink{structsysio_1_1vm_1_1func__type}{func\+\_\+type}} \&ft, Args \&\&...)
+\item 
+static void \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base_a3216ee9d029d8647ced8e787d32f91de}{type\+\_\+check\+\_\+args}} (const \mbox{\hyperlink{structsysio_1_1vm_1_1func__type}{func\+\_\+type}} \&ft, Args \&\&...)
+\item 
+static void \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base_adbb09aabc8ed0d1310fde20211c550e5}{handle\+\_\+signal}} (int sig)
+\item 
+static void \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base_adbb09aabc8ed0d1310fde20211c550e5}{handle\+\_\+signal}} (int sig)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Host, bool Enable\+Backtrace = false$>$\newline
+class sysio\+::vm\+::jit\+\_\+execution\+\_\+context$<$ Host, Enable\+Backtrace $>$}
+
+
+Definition at line \mbox{\hyperlink{vm_2execution__context_8hpp_source_l00212}{212}} of file \mbox{\hyperlink{vm_2execution__context_8hpp_source}{execution\+\_\+context.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classsysio_1_1vm_1_1jit__execution__context_a96158c3ce116da5d36c4e3d6a1507a2a}\index{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$@{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$}!jit\_execution\_context@{jit\_execution\_context}}
+\index{jit\_execution\_context@{jit\_execution\_context}!sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$@{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$}}
+\doxysubsubsection{\texorpdfstring{jit\_execution\_context()}{jit\_execution\_context()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1jit__execution__context_a96158c3ce116da5d36c4e3d6a1507a2a} 
+template$<$typename Host , bool Enable\+Backtrace = false$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context}{sysio\+::vm\+::jit\+\_\+execution\+\_\+context}}$<$ Host, Enable\+Backtrace $>$\+::jit\+\_\+execution\+\_\+context (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1vm_1_1module}{module}} \&}]{m}{, }\item[{std\+::uint32\+\_\+t}]{max\+\_\+call\+\_\+depth}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2execution__context_8hpp_source_l00226}{226}} of file \mbox{\hyperlink{sysio_2vm_2execution__context_8hpp_source}{execution\+\_\+context.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00226\ :\ base\_type(m),\ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_abddbc46dcfef76d04aaf37ad3440fec6}{\_remaining\_call\_depth}}(\mbox{\hyperlink{namespacesysio_1_1vm_a0ae6751a77293216df4656dee5081eb2a2b205b0f9a2199e9e6bf7d96d768f15a}{max\_call\_depth}})\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1jit__execution__context_a96158c3ce116da5d36c4e3d6a1507a2a}\index{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$@{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$}!jit\_execution\_context@{jit\_execution\_context}}
+\index{jit\_execution\_context@{jit\_execution\_context}!sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$@{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$}}
+\doxysubsubsection{\texorpdfstring{jit\_execution\_context()}{jit\_execution\_context()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1jit__execution__context_a96158c3ce116da5d36c4e3d6a1507a2a} 
+template$<$typename Host , bool Enable\+Backtrace = false$>$ \\
+\mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context}{sysio\+::vm\+::jit\+\_\+execution\+\_\+context}}$<$ Host, Enable\+Backtrace $>$\+::jit\+\_\+execution\+\_\+context (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1vm_1_1module}{module}} \&}]{m}{, }\item[{std\+::uint32\+\_\+t}]{max\+\_\+call\+\_\+depth}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2execution__context_8hpp_source_l00226}{226}} of file \mbox{\hyperlink{vm_2execution__context_8hpp_source}{execution\+\_\+context.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00226\ :\ base\_type(m),\ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_abddbc46dcfef76d04aaf37ad3440fec6}{\_remaining\_call\_depth}}(\mbox{\hyperlink{namespacesysio_1_1vm_a0ae6751a77293216df4656dee5081eb2a2b205b0f9a2199e9e6bf7d96d768f15a}{max\_call\_depth}})\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1vm_1_1jit__execution__context_a6bd958664d7f20be65075b631855f33a}\index{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$@{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$}!call\_host\_function@{call\_host\_function}}
+\index{call\_host\_function@{call\_host\_function}!sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$@{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$}}
+\doxysubsubsection{\texorpdfstring{call\_host\_function()}{call\_host\_function()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1jit__execution__context_a6bd958664d7f20be65075b631855f33a} 
+template$<$typename Host , bool Enable\+Backtrace = false$>$ \\
+\mbox{\hyperlink{unionsysio_1_1vm_1_1native__value}{native\+\_\+value}} \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context}{sysio\+::vm\+::jit\+\_\+execution\+\_\+context}}$<$ Host, Enable\+Backtrace $>$\+::call\+\_\+host\+\_\+function (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{unionsysio_1_1vm_1_1native__value}{native\+\_\+value}} \texorpdfstring{$\ast$}{*}}]{stack}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{index}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2execution__context_8hpp_source_l00232}{232}} of file \mbox{\hyperlink{sysio_2vm_2execution__context_8hpp_source}{execution\+\_\+context.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00232\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00233\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ ft\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_a10264d78efee5ae7720bddc2853c1bc8}{\_mod}}.\mbox{\hyperlink{structsysio_1_1vm_1_1module_ab377c16704ff6297e91ded7803aec9ab}{get\_function\_type}}(index);}
+\DoxyCodeLine{00234\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ num\_params\ =\ ft.param\_types.size();}
+\DoxyCodeLine{00235\ \textcolor{preprocessor}{\#ifndef\ NDEBUG}}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ original\_operands\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_a0b4188bd88810e7208c403c67ddd5354}{get\_operand\_stack}}().size();}
+\DoxyCodeLine{00237\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00238\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ i\ =\ 0;\ i\ <\ ft.param\_types.size();\ ++i)\ \{}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(ft.param\_types[i])\ \{}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a92daad2923cccf614e49762dfec06413}{i32}}:\ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_a0b4188bd88810e7208c403c67ddd5354}{get\_operand\_stack}}().push(i32\_const\_t\{\mbox{\hyperlink{namespacesysio_1_1vm_abc94c8e9af7289dc068a502c63ad98d4afac2a47adace059aff113283a03f6760}{stack}}[num\_params\ -\/\ i\ -\/\ 1].i32\});\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00241\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55ab99a2242df60834800f4d1ddae2e1098}{i64}}:\ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_a0b4188bd88810e7208c403c67ddd5354}{get\_operand\_stack}}().push(i64\_const\_t\{\mbox{\hyperlink{namespacesysio_1_1vm_abc94c8e9af7289dc068a502c63ad98d4afac2a47adace059aff113283a03f6760}{stack}}[num\_params\ -\/\ i\ -\/\ 1].i64\});\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00242\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55abe4b7040744e061573d139d21eaab385}{f32}}:\ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_a0b4188bd88810e7208c403c67ddd5354}{get\_operand\_stack}}().push(f32\_const\_t\{\mbox{\hyperlink{namespacesysio_1_1vm_abc94c8e9af7289dc068a502c63ad98d4afac2a47adace059aff113283a03f6760}{stack}}[num\_params\ -\/\ i\ -\/\ 1].f32\});\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00243\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a44ae1089ba06a14a59c168d259bff806}{f64}}:\ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_a0b4188bd88810e7208c403c67ddd5354}{get\_operand\_stack}}().push(f64\_const\_t\{\mbox{\hyperlink{namespacesysio_1_1vm_abc94c8e9af7289dc068a502c63ad98d4afac2a47adace059aff113283a03f6760}{stack}}[num\_params\ -\/\ i\ -\/\ 1].f64\});\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00244\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:\ assert(!\textcolor{stringliteral}{"{}Unexpected\ type\ in\ param\_types."{}});}
+\DoxyCodeLine{00245\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00246\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00247\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_afb21eb88496d63b7af1f1329cab1ef08}{\_rhf}}(\mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_ab7a88abe7f50acea3cd6ed677934d66a}{\_host}},\ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_ab48a9c325fcb2d2a4b532396eb2d65f3}{get\_interface}}(),\ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_a10264d78efee5ae7720bddc2853c1bc8}{\_mod}}.\mbox{\hyperlink{structsysio_1_1vm_1_1module_a6e86c4054e32c0da26f6e78f69c29041}{import\_functions}}[index]);}
+\DoxyCodeLine{00248\ \ \ \ \ \ \ \ \ \ native\_value\ result\{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\{0\}\};}
+\DoxyCodeLine{00249\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ guarantee\ that\ the\ junk\ bits\ are\ zero,\ to\ avoid\ problems.}}
+\DoxyCodeLine{00250\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ set\_result\ =\ [\&result](\textcolor{keyword}{auto}\ val)\ \{\ std::memcpy(\&result,\ \&val,\ \textcolor{keyword}{sizeof}(val));\ \};}
+\DoxyCodeLine{00251\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(ft.return\_count)\ \{}
+\DoxyCodeLine{00252\ \ \ \ \ \ \ \ \ \ \ \ \ operand\_stack\_elem\ el\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_a0b4188bd88810e7208c403c67ddd5354}{get\_operand\_stack}}().pop();}
+\DoxyCodeLine{00253\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(ft.return\_type)\ \{}
+\DoxyCodeLine{00254\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a92daad2923cccf614e49762dfec06413}{i32}}:\ set\_result(el.to\_ui32());\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00255\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55ab99a2242df60834800f4d1ddae2e1098}{i64}}:\ set\_result(el.to\_ui64());\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00256\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55abe4b7040744e061573d139d21eaab385}{f32}}:\ set\_result(el.to\_f32());\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00257\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a44ae1089ba06a14a59c168d259bff806}{f64}}:\ set\_result(el.to\_f64());\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00258\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:\ assert(!\textcolor{stringliteral}{"{}Unexpected\ function\ return\ type."{}});}
+\DoxyCodeLine{00259\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00260\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00261\ }
+\DoxyCodeLine{00262\ \ \ \ \ \ \ \ \ \ assert(\mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_a0b4188bd88810e7208c403c67ddd5354}{get\_operand\_stack}}().size()\ ==\ original\_operands);}
+\DoxyCodeLine{00263\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00264\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1vm_1_1jit__execution__context_a6bd958664d7f20be65075b631855f33a_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1jit__execution__context_a6bd958664d7f20be65075b631855f33a}\index{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$@{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$}!call\_host\_function@{call\_host\_function}}
+\index{call\_host\_function@{call\_host\_function}!sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$@{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$}}
+\doxysubsubsection{\texorpdfstring{call\_host\_function()}{call\_host\_function()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1jit__execution__context_a6bd958664d7f20be65075b631855f33a} 
+template$<$typename Host , bool Enable\+Backtrace = false$>$ \\
+\mbox{\hyperlink{unionsysio_1_1vm_1_1native__value}{native\+\_\+value}} \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context}{sysio\+::vm\+::jit\+\_\+execution\+\_\+context}}$<$ Host, Enable\+Backtrace $>$\+::call\+\_\+host\+\_\+function (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{unionsysio_1_1vm_1_1native__value}{native\+\_\+value}} \texorpdfstring{$\ast$}{*}}]{stack}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{index}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2execution__context_8hpp_source_l00232}{232}} of file \mbox{\hyperlink{vm_2execution__context_8hpp_source}{execution\+\_\+context.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00232\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00233\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ ft\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_a10264d78efee5ae7720bddc2853c1bc8}{\_mod}}.\mbox{\hyperlink{structsysio_1_1vm_1_1module_ab377c16704ff6297e91ded7803aec9ab}{get\_function\_type}}(index);}
+\DoxyCodeLine{00234\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ num\_params\ =\ ft.param\_types.size();}
+\DoxyCodeLine{00235\ \textcolor{preprocessor}{\#ifndef\ NDEBUG}}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ original\_operands\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_a0b4188bd88810e7208c403c67ddd5354}{get\_operand\_stack}}().size();}
+\DoxyCodeLine{00237\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00238\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ i\ =\ 0;\ i\ <\ ft.param\_types.size();\ ++i)\ \{}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(ft.param\_types[i])\ \{}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a92daad2923cccf614e49762dfec06413}{i32}}:\ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_a0b4188bd88810e7208c403c67ddd5354}{get\_operand\_stack}}().push(i32\_const\_t\{\mbox{\hyperlink{namespacesysio_1_1vm_abc94c8e9af7289dc068a502c63ad98d4afac2a47adace059aff113283a03f6760}{stack}}[num\_params\ -\/\ i\ -\/\ 1].i32\});\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00241\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55ab99a2242df60834800f4d1ddae2e1098}{i64}}:\ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_a0b4188bd88810e7208c403c67ddd5354}{get\_operand\_stack}}().push(i64\_const\_t\{\mbox{\hyperlink{namespacesysio_1_1vm_abc94c8e9af7289dc068a502c63ad98d4afac2a47adace059aff113283a03f6760}{stack}}[num\_params\ -\/\ i\ -\/\ 1].i64\});\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00242\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55abe4b7040744e061573d139d21eaab385}{f32}}:\ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_a0b4188bd88810e7208c403c67ddd5354}{get\_operand\_stack}}().push(f32\_const\_t\{\mbox{\hyperlink{namespacesysio_1_1vm_abc94c8e9af7289dc068a502c63ad98d4afac2a47adace059aff113283a03f6760}{stack}}[num\_params\ -\/\ i\ -\/\ 1].f32\});\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00243\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a44ae1089ba06a14a59c168d259bff806}{f64}}:\ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_a0b4188bd88810e7208c403c67ddd5354}{get\_operand\_stack}}().push(f64\_const\_t\{\mbox{\hyperlink{namespacesysio_1_1vm_abc94c8e9af7289dc068a502c63ad98d4afac2a47adace059aff113283a03f6760}{stack}}[num\_params\ -\/\ i\ -\/\ 1].f64\});\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00244\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:\ assert(!\textcolor{stringliteral}{"{}Unexpected\ type\ in\ param\_types."{}});}
+\DoxyCodeLine{00245\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00246\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00247\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_afb21eb88496d63b7af1f1329cab1ef08}{\_rhf}}(\mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_ab7a88abe7f50acea3cd6ed677934d66a}{\_host}},\ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_ab48a9c325fcb2d2a4b532396eb2d65f3}{get\_interface}}(),\ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_a10264d78efee5ae7720bddc2853c1bc8}{\_mod}}.\mbox{\hyperlink{structsysio_1_1vm_1_1module_a6e86c4054e32c0da26f6e78f69c29041}{import\_functions}}[index]);}
+\DoxyCodeLine{00248\ \ \ \ \ \ \ \ \ \ native\_value\ result\{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\{0\}\};}
+\DoxyCodeLine{00249\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ guarantee\ that\ the\ junk\ bits\ are\ zero,\ to\ avoid\ problems.}}
+\DoxyCodeLine{00250\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ set\_result\ =\ [\&result](\textcolor{keyword}{auto}\ val)\ \{\ std::memcpy(\&result,\ \&val,\ \textcolor{keyword}{sizeof}(val));\ \};}
+\DoxyCodeLine{00251\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(ft.return\_count)\ \{}
+\DoxyCodeLine{00252\ \ \ \ \ \ \ \ \ \ \ \ \ operand\_stack\_elem\ el\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_a0b4188bd88810e7208c403c67ddd5354}{get\_operand\_stack}}().pop();}
+\DoxyCodeLine{00253\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(ft.return\_type)\ \{}
+\DoxyCodeLine{00254\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a92daad2923cccf614e49762dfec06413}{i32}}:\ set\_result(el.to\_ui32());\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00255\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55ab99a2242df60834800f4d1ddae2e1098}{i64}}:\ set\_result(el.to\_ui64());\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00256\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55abe4b7040744e061573d139d21eaab385}{f32}}:\ set\_result(el.to\_f32());\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00257\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a44ae1089ba06a14a59c168d259bff806}{f64}}:\ set\_result(el.to\_f64());\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00258\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:\ assert(!\textcolor{stringliteral}{"{}Unexpected\ function\ return\ type."{}});}
+\DoxyCodeLine{00259\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00260\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00261\ }
+\DoxyCodeLine{00262\ \ \ \ \ \ \ \ \ \ assert(\mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_a0b4188bd88810e7208c403c67ddd5354}{get\_operand\_stack}}().size()\ ==\ original\_operands);}
+\DoxyCodeLine{00263\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00264\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1vm_1_1jit__execution__context_a6bd958664d7f20be65075b631855f33a_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1jit__execution__context_a3a32bce66020501bfe2168765eba95cf}\index{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$@{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$}!execute@{execute}}
+\index{execute@{execute}!sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$@{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$}}
+\doxysubsubsection{\texorpdfstring{execute()}{execute()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1jit__execution__context_a3a32bce66020501bfe2168765eba95cf} 
+template$<$typename Host , bool Enable\+Backtrace = false$>$ \\
+template$<$typename... Args$>$ \\
+std\+::optional$<$ \mbox{\hyperlink{classsysio_1_1vm_1_1operand__stack__elem}{operand\+\_\+stack\+\_\+elem}} $>$ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context}{sysio\+::vm\+::jit\+\_\+execution\+\_\+context}}$<$ Host, Enable\+Backtrace $>$\+::execute (\begin{DoxyParamCaption}\item[{host\+\_\+type \texorpdfstring{$\ast$}{*}}]{host}{, }\item[{\mbox{\hyperlink{structsysio_1_1vm_1_1jit__visitor}{jit\+\_\+visitor}}}]{}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{func\+\_\+index}{, }\item[{Args...}]{args}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2execution__context_8hpp_source_l00272}{272}} of file \mbox{\hyperlink{sysio_2vm_2execution__context_8hpp_source}{execution\+\_\+context.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00272\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00273\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ saved\_host\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_ab7a88abe7f50acea3cd6ed677934d66a}{\_host}};}
+\DoxyCodeLine{00274\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ saved\_os\_size\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_a0b4188bd88810e7208c403c67ddd5354}{get\_operand\_stack}}().size();}
+\DoxyCodeLine{00275\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ g\ =\ scope\_guard([\&]()\{\ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_ab7a88abe7f50acea3cd6ed677934d66a}{\_host}}\ =\ saved\_host;\ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_a0b4188bd88810e7208c403c67ddd5354}{get\_operand\_stack}}().eat(saved\_os\_size);\ \});}
+\DoxyCodeLine{00276\ }
+\DoxyCodeLine{00277\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_ab7a88abe7f50acea3cd6ed677934d66a}{\_host}}\ =\ \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a8d747b8417c90b78c386111de7934753}{host}};}
+\DoxyCodeLine{00278\ }
+\DoxyCodeLine{00279\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ func\_type\&\ ft\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_a10264d78efee5ae7720bddc2853c1bc8}{\_mod}}.\mbox{\hyperlink{structsysio_1_1vm_1_1module_ab377c16704ff6297e91ded7803aec9ab}{get\_function\_type}}(func\_index);}
+\DoxyCodeLine{00280\ \ \ \ \ \ \ \ \ \ this-\/>\mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base_a3216ee9d029d8647ced8e787d32f91de}{type\_check\_args}}(ft,\ \textcolor{keyword}{static\_cast<}Args\&\&\textcolor{keyword}{>}(args)...);}
+\DoxyCodeLine{00281\ \ \ \ \ \ \ \ \ \ native\_value\ result;}
+\DoxyCodeLine{00282\ \ \ \ \ \ \ \ \ \ native\_value\ args\_raw[]\ =\ \{\ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_a9186421702dc931bcea9329161edd992}{transform\_arg}}(\textcolor{keyword}{static\_cast<}Args\&\&\textcolor{keyword}{>}(args))...\ \};}
+\DoxyCodeLine{00283\ }
+\DoxyCodeLine{00284\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00285\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (func\_index\ <\ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_a10264d78efee5ae7720bddc2853c1bc8}{\_mod}}.\mbox{\hyperlink{structsysio_1_1vm_1_1module_a67b6373270a1985597a83e5427091e9a}{get\_imported\_functions\_size}}())\ \{}
+\DoxyCodeLine{00286\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::reverse(args\_raw\ +\ 0,\ args\_raw\ +\ \textcolor{keyword}{sizeof}...(Args));}
+\DoxyCodeLine{00287\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ result\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_a6bd958664d7f20be65075b631855f33a}{call\_host\_function}}(args\_raw,\ func\_index);}
+\DoxyCodeLine{00288\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00289\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::size\_t\ maximum\_stack\_usage\ =}
+\DoxyCodeLine{00290\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_a10264d78efee5ae7720bddc2853c1bc8}{\_mod}}.\mbox{\hyperlink{structsysio_1_1vm_1_1module_ae93c7f023ed1002946179eb8eea63ec1}{maximum\_stack}}\ +\ 2\ \textcolor{comment}{/*frame\ ptr\ +\ return\ ptr*/})\ *\ (\mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_abddbc46dcfef76d04aaf37ad3440fec6}{\_remaining\_call\_depth}}\ +\ 1)\ +}
+\DoxyCodeLine{00291\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{sizeof}...(Args)\ +\ 4\ \textcolor{comment}{/*\ scratch\ space\ */};}
+\DoxyCodeLine{00292\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ stack\_allocator\ alt\_stack(maximum\_stack\_usage\ *\ \textcolor{keyword}{sizeof}(native\_value));}
+\DoxyCodeLine{00293\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ reserve\ 24\ bytes\ for\ data\ accessed\ by\ inline\ assembly}}
+\DoxyCodeLine{00294\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}*\ \mbox{\hyperlink{namespacesysio_1_1vm_abc94c8e9af7289dc068a502c63ad98d4afac2a47adace059aff113283a03f6760}{stack}}\ =\ alt\_stack.top();}
+\DoxyCodeLine{00295\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{namespacesysio_1_1vm_abc94c8e9af7289dc068a502c63ad98d4afac2a47adace059aff113283a03f6760}{stack}})\ \{}
+\DoxyCodeLine{00296\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1vm_abc94c8e9af7289dc068a502c63ad98d4afac2a47adace059aff113283a03f6760}{stack}}\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(\mbox{\hyperlink{namespacesysio_1_1vm_abc94c8e9af7289dc068a502c63ad98d4afac2a47adace059aff113283a03f6760}{stack}})\ -\/\ 24;}
+\DoxyCodeLine{00297\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00298\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_1_1eosvmoc_ac6593044ffde3f1589b705c6e21f342d}{fn}}\ =\ \textcolor{keyword}{reinterpret\_cast<}native\_value\ (*)(\textcolor{keywordtype}{void}*,\ \textcolor{keywordtype}{void}*)\textcolor{keyword}{>}(\mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_a10264d78efee5ae7720bddc2853c1bc8}{\_mod}}.\mbox{\hyperlink{structsysio_1_1vm_1_1module_ad3e101bc4e1e2c50ecee2c3eb7b049f3}{code}}[func\_index\ -\/\ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_a10264d78efee5ae7720bddc2853c1bc8}{\_mod}}.\mbox{\hyperlink{structsysio_1_1vm_1_1module_a67b6373270a1985597a83e5427091e9a}{get\_imported\_functions\_size}}()].jit\_code\_offset\ +\ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_a10264d78efee5ae7720bddc2853c1bc8}{\_mod}}.\mbox{\hyperlink{structsysio_1_1vm_1_1module_ac33decc1891ebc381079263e8829bd7a}{allocator}}.\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1d8add8bc04002ce9dd681dab5550d0d}{\_code\_base}});}
+\DoxyCodeLine{00299\ }
+\DoxyCodeLine{00300\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keyword}{constexpr}(EnableBacktrace)\ \{}
+\DoxyCodeLine{00301\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sigset\_t\ block\_mask;}
+\DoxyCodeLine{00302\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sigemptyset(\&block\_mask);}
+\DoxyCodeLine{00303\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sigaddset(\&block\_mask,\ SIGPROF);}
+\DoxyCodeLine{00304\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ pthread\_sigmask(SIG\_BLOCK,\ \&block\_mask,\ nullptr);}
+\DoxyCodeLine{00305\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ auto\ restore\ =\ scope\_guard\{[this,\ \&block\_mask]\ \{}
+\DoxyCodeLine{00306\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ this-\/>\_top\_frame\ =\ nullptr;}
+\DoxyCodeLine{00307\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ this-\/>\_bottom\_frame\ =\ nullptr;}
+\DoxyCodeLine{00308\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ pthread\_sigmask(SIG\_UNBLOCK,\ \&block\_mask,\ nullptr);}
+\DoxyCodeLine{00309\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\};}
+\DoxyCodeLine{00310\ }
+\DoxyCodeLine{00311\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1vm_a071298ad9404d4cd62434edde161b767}{vm::invoke\_with\_signal\_handler}}([\&]()\ \{}
+\DoxyCodeLine{00312\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ result\ =\ execute<sizeof...(Args)>(args\_raw,\ fn,\ this,\ base\_type::linear\_memory(),\ stack);}
+\DoxyCodeLine{00313\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \},\ \&\mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_adbb09aabc8ed0d1310fde20211c550e5}{handle\_signal}});}
+\DoxyCodeLine{00314\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00315\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1vm_a071298ad9404d4cd62434edde161b767}{vm::invoke\_with\_signal\_handler}}([\&]()\ \{}
+\DoxyCodeLine{00316\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ result\ =\ execute<\textcolor{keyword}{sizeof}...(Args)>(args\_raw,\ fn,\ \textcolor{keyword}{this},\ \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base_aad1ab4903de26a0564c8a02f05ac4fe6}{base\_type::linear\_memory}}(),\ \mbox{\hyperlink{namespacesysio_1_1vm_abc94c8e9af7289dc068a502c63ad98d4afac2a47adace059aff113283a03f6760}{stack}});}
+\DoxyCodeLine{00317\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \},\ \&\mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_adbb09aabc8ed0d1310fde20211c550e5}{handle\_signal}});}
+\DoxyCodeLine{00318\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00319\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00320\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}(wasm\_exit\_exception\&)\ \{}
+\DoxyCodeLine{00321\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{\};}
+\DoxyCodeLine{00322\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00323\ }
+\DoxyCodeLine{00324\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!ft.return\_count)}
+\DoxyCodeLine{00325\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{\};}
+\DoxyCodeLine{00326\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{switch}\ (ft.return\_type)\ \{}
+\DoxyCodeLine{00327\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a92daad2923cccf614e49762dfec06413}{i32}}:\ \textcolor{keywordflow}{return}\ \{i32\_const\_t\{result.i32\}\};}
+\DoxyCodeLine{00328\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55ab99a2242df60834800f4d1ddae2e1098}{i64}}:\ \textcolor{keywordflow}{return}\ \{i64\_const\_t\{result.i64\}\};}
+\DoxyCodeLine{00329\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55abe4b7040744e061573d139d21eaab385}{f32}}:\ \textcolor{keywordflow}{return}\ \{f32\_const\_t\{result.f32\}\};}
+\DoxyCodeLine{00330\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a44ae1089ba06a14a59c168d259bff806}{f64}}:\ \textcolor{keywordflow}{return}\ \{f64\_const\_t\{result.f64\}\};}
+\DoxyCodeLine{00331\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:\ assert(!\textcolor{stringliteral}{"{}Unexpected\ function\ return\ type"{}});}
+\DoxyCodeLine{00332\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00333\ \ \ \ \ \ \ \ \ \ \_\_builtin\_unreachable();}
+\DoxyCodeLine{00334\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1vm_1_1jit__execution__context_a3a32bce66020501bfe2168765eba95cf_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1jit__execution__context_a3a32bce66020501bfe2168765eba95cf}\index{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$@{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$}!execute@{execute}}
+\index{execute@{execute}!sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$@{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$}}
+\doxysubsubsection{\texorpdfstring{execute()}{execute()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1jit__execution__context_a3a32bce66020501bfe2168765eba95cf} 
+template$<$typename Host , bool Enable\+Backtrace = false$>$ \\
+template$<$typename... Args$>$ \\
+std\+::optional$<$ \mbox{\hyperlink{classsysio_1_1vm_1_1operand__stack__elem}{operand\+\_\+stack\+\_\+elem}} $>$ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context}{sysio\+::vm\+::jit\+\_\+execution\+\_\+context}}$<$ Host, Enable\+Backtrace $>$\+::execute (\begin{DoxyParamCaption}\item[{host\+\_\+type \texorpdfstring{$\ast$}{*}}]{host}{, }\item[{\mbox{\hyperlink{structsysio_1_1vm_1_1jit__visitor}{jit\+\_\+visitor}}}]{}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{func\+\_\+index}{, }\item[{Args...}]{args}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2execution__context_8hpp_source_l00272}{272}} of file \mbox{\hyperlink{vm_2execution__context_8hpp_source}{execution\+\_\+context.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00272\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00273\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ saved\_host\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_ab7a88abe7f50acea3cd6ed677934d66a}{\_host}};}
+\DoxyCodeLine{00274\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ saved\_os\_size\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_a0b4188bd88810e7208c403c67ddd5354}{get\_operand\_stack}}().size();}
+\DoxyCodeLine{00275\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ g\ =\ scope\_guard([\&]()\{\ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_ab7a88abe7f50acea3cd6ed677934d66a}{\_host}}\ =\ saved\_host;\ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_a0b4188bd88810e7208c403c67ddd5354}{get\_operand\_stack}}().eat(saved\_os\_size);\ \});}
+\DoxyCodeLine{00276\ }
+\DoxyCodeLine{00277\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_ab7a88abe7f50acea3cd6ed677934d66a}{\_host}}\ =\ \mbox{\hyperlink{programs_2sysio-launcher_2main_8cpp_a8d747b8417c90b78c386111de7934753}{host}};}
+\DoxyCodeLine{00278\ }
+\DoxyCodeLine{00279\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ func\_type\&\ ft\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_a10264d78efee5ae7720bddc2853c1bc8}{\_mod}}.\mbox{\hyperlink{structsysio_1_1vm_1_1module_ab377c16704ff6297e91ded7803aec9ab}{get\_function\_type}}(func\_index);}
+\DoxyCodeLine{00280\ \ \ \ \ \ \ \ \ \ this-\/>\mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base_a3216ee9d029d8647ced8e787d32f91de}{type\_check\_args}}(ft,\ \textcolor{keyword}{static\_cast<}Args\&\&\textcolor{keyword}{>}(args)...);}
+\DoxyCodeLine{00281\ \ \ \ \ \ \ \ \ \ native\_value\ result;}
+\DoxyCodeLine{00282\ \ \ \ \ \ \ \ \ \ native\_value\ args\_raw[]\ =\ \{\ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_a9186421702dc931bcea9329161edd992}{transform\_arg}}(\textcolor{keyword}{static\_cast<}Args\&\&\textcolor{keyword}{>}(args))...\ \};}
+\DoxyCodeLine{00283\ }
+\DoxyCodeLine{00284\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00285\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (func\_index\ <\ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_a10264d78efee5ae7720bddc2853c1bc8}{\_mod}}.\mbox{\hyperlink{structsysio_1_1vm_1_1module_a67b6373270a1985597a83e5427091e9a}{get\_imported\_functions\_size}}())\ \{}
+\DoxyCodeLine{00286\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::reverse(args\_raw\ +\ 0,\ args\_raw\ +\ \textcolor{keyword}{sizeof}...(Args));}
+\DoxyCodeLine{00287\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ result\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_a6bd958664d7f20be65075b631855f33a}{call\_host\_function}}(args\_raw,\ func\_index);}
+\DoxyCodeLine{00288\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00289\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::size\_t\ maximum\_stack\_usage\ =}
+\DoxyCodeLine{00290\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_a10264d78efee5ae7720bddc2853c1bc8}{\_mod}}.\mbox{\hyperlink{structsysio_1_1vm_1_1module_ae93c7f023ed1002946179eb8eea63ec1}{maximum\_stack}}\ +\ 2\ \textcolor{comment}{/*frame\ ptr\ +\ return\ ptr*/})\ *\ (\mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_abddbc46dcfef76d04aaf37ad3440fec6}{\_remaining\_call\_depth}}\ +\ 1)\ +}
+\DoxyCodeLine{00291\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{sizeof}...(Args)\ +\ 4\ \textcolor{comment}{/*\ scratch\ space\ */};}
+\DoxyCodeLine{00292\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ stack\_allocator\ alt\_stack(maximum\_stack\_usage\ *\ \textcolor{keyword}{sizeof}(native\_value));}
+\DoxyCodeLine{00293\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ reserve\ 24\ bytes\ for\ data\ accessed\ by\ inline\ assembly}}
+\DoxyCodeLine{00294\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}*\ \mbox{\hyperlink{namespacesysio_1_1vm_abc94c8e9af7289dc068a502c63ad98d4afac2a47adace059aff113283a03f6760}{stack}}\ =\ alt\_stack.top();}
+\DoxyCodeLine{00295\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{namespacesysio_1_1vm_abc94c8e9af7289dc068a502c63ad98d4afac2a47adace059aff113283a03f6760}{stack}})\ \{}
+\DoxyCodeLine{00296\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1vm_abc94c8e9af7289dc068a502c63ad98d4afac2a47adace059aff113283a03f6760}{stack}}\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(\mbox{\hyperlink{namespacesysio_1_1vm_abc94c8e9af7289dc068a502c63ad98d4afac2a47adace059aff113283a03f6760}{stack}})\ -\/\ 24;}
+\DoxyCodeLine{00297\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00298\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_1_1eosvmoc_ac6593044ffde3f1589b705c6e21f342d}{fn}}\ =\ \textcolor{keyword}{reinterpret\_cast<}native\_value\ (*)(\textcolor{keywordtype}{void}*,\ \textcolor{keywordtype}{void}*)\textcolor{keyword}{>}(\mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_a10264d78efee5ae7720bddc2853c1bc8}{\_mod}}.\mbox{\hyperlink{structsysio_1_1vm_1_1module_ad3e101bc4e1e2c50ecee2c3eb7b049f3}{code}}[func\_index\ -\/\ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_a10264d78efee5ae7720bddc2853c1bc8}{\_mod}}.\mbox{\hyperlink{structsysio_1_1vm_1_1module_a67b6373270a1985597a83e5427091e9a}{get\_imported\_functions\_size}}()].jit\_code\_offset\ +\ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_a10264d78efee5ae7720bddc2853c1bc8}{\_mod}}.\mbox{\hyperlink{structsysio_1_1vm_1_1module_ac33decc1891ebc381079263e8829bd7a}{allocator}}.\mbox{\hyperlink{classsysio_1_1vm_1_1growable__allocator_a1d8add8bc04002ce9dd681dab5550d0d}{\_code\_base}});}
+\DoxyCodeLine{00299\ }
+\DoxyCodeLine{00300\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keyword}{constexpr}(EnableBacktrace)\ \{}
+\DoxyCodeLine{00301\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sigset\_t\ block\_mask;}
+\DoxyCodeLine{00302\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sigemptyset(\&block\_mask);}
+\DoxyCodeLine{00303\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sigaddset(\&block\_mask,\ SIGPROF);}
+\DoxyCodeLine{00304\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ pthread\_sigmask(SIG\_BLOCK,\ \&block\_mask,\ nullptr);}
+\DoxyCodeLine{00305\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ auto\ restore\ =\ scope\_guard\{[this,\ \&block\_mask]\ \{}
+\DoxyCodeLine{00306\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ this-\/>\_top\_frame\ =\ nullptr;}
+\DoxyCodeLine{00307\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ this-\/>\_bottom\_frame\ =\ nullptr;}
+\DoxyCodeLine{00308\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ pthread\_sigmask(SIG\_UNBLOCK,\ \&block\_mask,\ nullptr);}
+\DoxyCodeLine{00309\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\};}
+\DoxyCodeLine{00310\ }
+\DoxyCodeLine{00311\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1vm_a071298ad9404d4cd62434edde161b767}{vm::invoke\_with\_signal\_handler}}([\&]()\ \{}
+\DoxyCodeLine{00312\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ result\ =\ execute<sizeof...(Args)>(args\_raw,\ fn,\ this,\ base\_type::linear\_memory(),\ stack);}
+\DoxyCodeLine{00313\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \},\ \&\mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_adbb09aabc8ed0d1310fde20211c550e5}{handle\_signal}});}
+\DoxyCodeLine{00314\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00315\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1vm_a071298ad9404d4cd62434edde161b767}{vm::invoke\_with\_signal\_handler}}([\&]()\ \{}
+\DoxyCodeLine{00316\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ result\ =\ execute<\textcolor{keyword}{sizeof}...(Args)>(args\_raw,\ fn,\ \textcolor{keyword}{this},\ \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base_aad1ab4903de26a0564c8a02f05ac4fe6}{base\_type::linear\_memory}}(),\ \mbox{\hyperlink{namespacesysio_1_1vm_abc94c8e9af7289dc068a502c63ad98d4afac2a47adace059aff113283a03f6760}{stack}});}
+\DoxyCodeLine{00317\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \},\ \&\mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_adbb09aabc8ed0d1310fde20211c550e5}{handle\_signal}});}
+\DoxyCodeLine{00318\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00319\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00320\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}(wasm\_exit\_exception\&)\ \{}
+\DoxyCodeLine{00321\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{\};}
+\DoxyCodeLine{00322\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00323\ }
+\DoxyCodeLine{00324\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!ft.return\_count)}
+\DoxyCodeLine{00325\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{\};}
+\DoxyCodeLine{00326\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{switch}\ (ft.return\_type)\ \{}
+\DoxyCodeLine{00327\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a92daad2923cccf614e49762dfec06413}{i32}}:\ \textcolor{keywordflow}{return}\ \{i32\_const\_t\{result.i32\}\};}
+\DoxyCodeLine{00328\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55ab99a2242df60834800f4d1ddae2e1098}{i64}}:\ \textcolor{keywordflow}{return}\ \{i64\_const\_t\{result.i64\}\};}
+\DoxyCodeLine{00329\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55abe4b7040744e061573d139d21eaab385}{f32}}:\ \textcolor{keywordflow}{return}\ \{f32\_const\_t\{result.f32\}\};}
+\DoxyCodeLine{00330\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a44ae1089ba06a14a59c168d259bff806}{f64}}:\ \textcolor{keywordflow}{return}\ \{f64\_const\_t\{result.f64\}\};}
+\DoxyCodeLine{00331\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:\ assert(!\textcolor{stringliteral}{"{}Unexpected\ function\ return\ type"{}});}
+\DoxyCodeLine{00332\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00333\ \ \ \ \ \ \ \ \ \ \_\_builtin\_unreachable();}
+\DoxyCodeLine{00334\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1vm_1_1jit__execution__context_a3a32bce66020501bfe2168765eba95cf_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1jit__execution__context_abc08d4ee8c1657dfd870cb728a202d73}\index{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$@{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$}!execute@{execute}}
+\index{execute@{execute}!sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$@{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$}}
+\doxysubsubsection{\texorpdfstring{execute()}{execute()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1jit__execution__context_abc08d4ee8c1657dfd870cb728a202d73} 
+template$<$typename Host , bool Enable\+Backtrace = false$>$ \\
+template$<$typename Visitor , typename... Args$>$ \\
+std\+::optional$<$ \mbox{\hyperlink{classsysio_1_1vm_1_1operand__stack__elem}{operand\+\_\+stack\+\_\+elem}} $>$ \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base}{sysio\+::vm\+::execution\+\_\+context\+\_\+base}}$<$ Derived, Host $>$\+::execute (\begin{DoxyParamCaption}\item[{host\+\_\+type \texorpdfstring{$\ast$}{*}}]{host}{, }\item[{Visitor \&\&}]{visitor}{, }\item[{const std\+::string\+\_\+view}]{func}{, }\item[{Args...}]{args}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2execution__context_8hpp_source_l00151}{151}} of file \mbox{\hyperlink{sysio_2vm_2execution__context_8hpp_source}{execution\+\_\+context.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ func\_index\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_a10264d78efee5ae7720bddc2853c1bc8}{\_mod}}.\mbox{\hyperlink{structsysio_1_1vm_1_1module_a0c79890e0b0f354fafeab5b1a45cbc39}{get\_exported\_function}}(\mbox{\hyperlink{namespacesysio_1_1vm_aea2b0c85e98f4073b07115a97b46ae55a6b56c53a1b24e55124ff7f71bb9817d2}{func}});}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base_a7e732e0cf69fe1d17790eb404c18f7a6}{derived}}().execute(host,\ std::forward<Visitor>(visitor),\ func\_index,\ std::forward<Args>(args)...);}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1jit__execution__context_ab48a9c325fcb2d2a4b532396eb2d65f3}\index{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$@{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$}!get\_interface@{get\_interface}}
+\index{get\_interface@{get\_interface}!sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$@{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$}}
+\doxysubsubsection{\texorpdfstring{get\_interface()}{get\_interface()}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1jit__execution__context_ab48a9c325fcb2d2a4b532396eb2d65f3} 
+template$<$typename Host , bool Enable\+Backtrace = false$>$ \\
+auto \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base}{sysio\+::vm\+::execution\+\_\+context\+\_\+base}}$<$ Derived, Host $>$\+::get\+\_\+interface (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2execution__context_8hpp_source_l00118}{118}} of file \mbox{\hyperlink{sysio_2vm_2execution__context_8hpp_source}{execution\+\_\+context.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00118\ \{\ \textcolor{keywordflow}{return}\ execution\_interface\{\ \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base_a547ccd31976e472f437163f65a2b2e57}{\_linear\_memory}},\ \&\mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base_af14c2171e884ca3cbffec0f21d57fceb}{\_os}}\ \};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1jit__execution__context_a0b4188bd88810e7208c403c67ddd5354}\index{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$@{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$}!get\_operand\_stack@{get\_operand\_stack}}
+\index{get\_operand\_stack@{get\_operand\_stack}!sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$@{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$}}
+\doxysubsubsection{\texorpdfstring{get\_operand\_stack()}{get\_operand\_stack()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1jit__execution__context_a0b4188bd88810e7208c403c67ddd5354} 
+template$<$typename Host , bool Enable\+Backtrace = false$>$ \\
+auto \& \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base}{sysio\+::vm\+::execution\+\_\+context\+\_\+base}}$<$ Derived, Host $>$\+::get\+\_\+operand\+\_\+stack (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2execution__context_8hpp_source_l00116}{116}} of file \mbox{\hyperlink{sysio_2vm_2execution__context_8hpp_source}{execution\+\_\+context.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00116\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base_af14c2171e884ca3cbffec0f21d57fceb}{\_os}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1jit__execution__context_ab889ea2c8f14eeb3a3df360125debb90}\index{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$@{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$}!get\_operand\_stack@{get\_operand\_stack}}
+\index{get\_operand\_stack@{get\_operand\_stack}!sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$@{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$}}
+\doxysubsubsection{\texorpdfstring{get\_operand\_stack()}{get\_operand\_stack()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1jit__execution__context_ab889ea2c8f14eeb3a3df360125debb90} 
+template$<$typename Host , bool Enable\+Backtrace = false$>$ \\
+const auto \& \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base}{sysio\+::vm\+::execution\+\_\+context\+\_\+base}}$<$ Derived, Host $>$\+::get\+\_\+operand\+\_\+stack (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2execution__context_8hpp_source_l00117}{117}} of file \mbox{\hyperlink{sysio_2vm_2execution__context_8hpp_source}{execution\+\_\+context.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00117\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base_af14c2171e884ca3cbffec0f21d57fceb}{\_os}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1jit__execution__context_adbb09aabc8ed0d1310fde20211c550e5}\index{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$@{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$}!handle\_signal@{handle\_signal}}
+\index{handle\_signal@{handle\_signal}!sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$@{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$}}
+\doxysubsubsection{\texorpdfstring{handle\_signal()}{handle\_signal()}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1jit__execution__context_adbb09aabc8ed0d1310fde20211c550e5} 
+template$<$typename Host , bool Enable\+Backtrace = false$>$ \\
+static void \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base}{sysio\+::vm\+::execution\+\_\+context\+\_\+base}}$<$ Derived, Host $>$\+::handle\+\_\+signal (\begin{DoxyParamCaption}\item[{int}]{sig}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2execution__context_8hpp_source_l00172}{172}} of file \mbox{\hyperlink{sysio_2vm_2execution__context_8hpp_source}{execution\+\_\+context.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(sig)\ \{}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ SIGSEGV:}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ SIGBUS:}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ SIGFPE:}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ TODO\ fix\ this\ */}}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \ \ \ \ assert(!\textcolor{stringliteral}{"{}??????"{}});}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ wasm\_memory\_exception\{\ \textcolor{stringliteral}{"{}wasm\ memory\ out-\/of-\/bounds"{}}\ \};}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1jit__execution__context_aad1ab4903de26a0564c8a02f05ac4fe6}\index{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$@{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$}!linear\_memory@{linear\_memory}}
+\index{linear\_memory@{linear\_memory}!sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$@{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$}}
+\doxysubsubsection{\texorpdfstring{linear\_memory()}{linear\_memory()}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1jit__execution__context_aad1ab4903de26a0564c8a02f05ac4fe6} 
+template$<$typename Host , bool Enable\+Backtrace = false$>$ \\
+char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base}{sysio\+::vm\+::execution\+\_\+context\+\_\+base}}$<$ Derived, Host $>$\+::linear\+\_\+memory (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2execution__context_8hpp_source_l00115}{115}} of file \mbox{\hyperlink{sysio_2vm_2execution__context_8hpp_source}{execution\+\_\+context.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00115\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base_a547ccd31976e472f437163f65a2b2e57}{\_linear\_memory}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1jit__execution__context_a55c6536bb63744dab05f72d6690bd3c5}\index{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$@{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$}!reset@{reset}}
+\index{reset@{reset}!sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$@{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$}}
+\doxysubsubsection{\texorpdfstring{reset()}{reset()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1jit__execution__context_a55c6536bb63744dab05f72d6690bd3c5} 
+template$<$typename Host , bool Enable\+Backtrace = false$>$ \\
+void \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context}{sysio\+::vm\+::jit\+\_\+execution\+\_\+context}}$<$ Host, Enable\+Backtrace $>$\+::reset (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2execution__context_8hpp_source_l00266}{266}} of file \mbox{\hyperlink{sysio_2vm_2execution__context_8hpp_source}{execution\+\_\+context.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00266\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00267\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base_a7ff12ef5c12cdbdaf4e22014846079e5}{base\_type::reset}}();}
+\DoxyCodeLine{00268\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_a0b4188bd88810e7208c403c67ddd5354}{get\_operand\_stack}}().eat(0);}
+\DoxyCodeLine{00269\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1jit__execution__context_a55c6536bb63744dab05f72d6690bd3c5}\index{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$@{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$}!reset@{reset}}
+\index{reset@{reset}!sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$@{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$}}
+\doxysubsubsection{\texorpdfstring{reset()}{reset()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1jit__execution__context_a55c6536bb63744dab05f72d6690bd3c5} 
+template$<$typename Host , bool Enable\+Backtrace = false$>$ \\
+void \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context}{sysio\+::vm\+::jit\+\_\+execution\+\_\+context}}$<$ Host, Enable\+Backtrace $>$\+::reset (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2execution__context_8hpp_source_l00266}{266}} of file \mbox{\hyperlink{vm_2execution__context_8hpp_source}{execution\+\_\+context.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00266\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00267\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base_a7ff12ef5c12cdbdaf4e22014846079e5}{base\_type::reset}}();}
+\DoxyCodeLine{00268\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_a0b4188bd88810e7208c403c67ddd5354}{get\_operand\_stack}}().eat(0);}
+\DoxyCodeLine{00269\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1jit__execution__context_a6432508a2591567b41af7b8aebea02d4}\index{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$@{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$}!set\_max\_call\_depth@{set\_max\_call\_depth}}
+\index{set\_max\_call\_depth@{set\_max\_call\_depth}!sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$@{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$}}
+\doxysubsubsection{\texorpdfstring{set\_max\_call\_depth()}{set\_max\_call\_depth()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1jit__execution__context_a6432508a2591567b41af7b8aebea02d4} 
+template$<$typename Host , bool Enable\+Backtrace = false$>$ \\
+void \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context}{sysio\+::vm\+::jit\+\_\+execution\+\_\+context}}$<$ Host, Enable\+Backtrace $>$\+::set\+\_\+max\+\_\+call\+\_\+depth (\begin{DoxyParamCaption}\item[{std\+::uint32\+\_\+t}]{max\+\_\+call\+\_\+depth}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2execution__context_8hpp_source_l00228}{228}} of file \mbox{\hyperlink{sysio_2vm_2execution__context_8hpp_source}{execution\+\_\+context.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00228\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00229\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_abddbc46dcfef76d04aaf37ad3440fec6}{\_remaining\_call\_depth}}\ =\ \mbox{\hyperlink{namespacesysio_1_1vm_a0ae6751a77293216df4656dee5081eb2a2b205b0f9a2199e9e6bf7d96d768f15a}{max\_call\_depth}};}
+\DoxyCodeLine{00230\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1jit__execution__context_a6432508a2591567b41af7b8aebea02d4}\index{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$@{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$}!set\_max\_call\_depth@{set\_max\_call\_depth}}
+\index{set\_max\_call\_depth@{set\_max\_call\_depth}!sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$@{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$}}
+\doxysubsubsection{\texorpdfstring{set\_max\_call\_depth()}{set\_max\_call\_depth()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1jit__execution__context_a6432508a2591567b41af7b8aebea02d4} 
+template$<$typename Host , bool Enable\+Backtrace = false$>$ \\
+void \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context}{sysio\+::vm\+::jit\+\_\+execution\+\_\+context}}$<$ Host, Enable\+Backtrace $>$\+::set\+\_\+max\+\_\+call\+\_\+depth (\begin{DoxyParamCaption}\item[{std\+::uint32\+\_\+t}]{max\+\_\+call\+\_\+depth}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2execution__context_8hpp_source_l00228}{228}} of file \mbox{\hyperlink{vm_2execution__context_8hpp_source}{execution\+\_\+context.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00228\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00229\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_abddbc46dcfef76d04aaf37ad3440fec6}{\_remaining\_call\_depth}}\ =\ \mbox{\hyperlink{namespacesysio_1_1vm_a0ae6751a77293216df4656dee5081eb2a2b205b0f9a2199e9e6bf7d96d768f15a}{max\_call\_depth}};}
+\DoxyCodeLine{00230\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1jit__execution__context_a9186421702dc931bcea9329161edd992}\index{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$@{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$}!transform\_arg@{transform\_arg}}
+\index{transform\_arg@{transform\_arg}!sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$@{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$}}
+\doxysubsubsection{\texorpdfstring{transform\_arg()}{transform\_arg()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1jit__execution__context_a9186421702dc931bcea9329161edd992} 
+template$<$typename Host , bool Enable\+Backtrace = false$>$ \\
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{unionsysio_1_1vm_1_1native__value}{native\+\_\+value}} \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context}{sysio\+::vm\+::jit\+\_\+execution\+\_\+context}}$<$ Host, Enable\+Backtrace $>$\+::transform\+\_\+arg (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\&}]{value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2execution__context_8hpp_source_l00400}{400}} of file \mbox{\hyperlink{sysio_2vm_2execution__context_8hpp_source}{execution\+\_\+context.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00400\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00401\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ make\ sure\ that\ the\ garbage\ bits\ are\ always\ zero.}}
+\DoxyCodeLine{00402\ \ \ \ \ \ \ \ \ \ native\_value\ result;}
+\DoxyCodeLine{00403\ \ \ \ \ \ \ \ \ \ std::memset(\&result,\ 0,\ \textcolor{keyword}{sizeof}(result));}
+\DoxyCodeLine{00404\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ tc\ =\ \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a57bb3eb0b0c335a0007e53cbee0fb777}{detail::type\_converter\_t<Host>}}\{\mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_ab7a88abe7f50acea3cd6ed677934d66a}{\_host}},\ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_ab48a9c325fcb2d2a4b532396eb2d65f3}{get\_interface}}()\};}
+\DoxyCodeLine{00405\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ transformed\_value\ =\ \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_ac0309c0bf6af90775a6bebd9b524cc8c}{detail::resolve\_result}}(tc,\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\&\textcolor{keyword}{>}(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})).data;}
+\DoxyCodeLine{00406\ \ \ \ \ \ \ \ \ \ std::memcpy(\&result,\ \&transformed\_value,\ \textcolor{keyword}{sizeof}(transformed\_value));}
+\DoxyCodeLine{00407\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00408\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1jit__execution__context_a9186421702dc931bcea9329161edd992}\index{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$@{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$}!transform\_arg@{transform\_arg}}
+\index{transform\_arg@{transform\_arg}!sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$@{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$}}
+\doxysubsubsection{\texorpdfstring{transform\_arg()}{transform\_arg()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1jit__execution__context_a9186421702dc931bcea9329161edd992} 
+template$<$typename Host , bool Enable\+Backtrace = false$>$ \\
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{unionsysio_1_1vm_1_1native__value}{native\+\_\+value}} \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context}{sysio\+::vm\+::jit\+\_\+execution\+\_\+context}}$<$ Host, Enable\+Backtrace $>$\+::transform\+\_\+arg (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\&}]{value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2execution__context_8hpp_source_l00400}{400}} of file \mbox{\hyperlink{vm_2execution__context_8hpp_source}{execution\+\_\+context.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00400\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00401\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ make\ sure\ that\ the\ garbage\ bits\ are\ always\ zero.}}
+\DoxyCodeLine{00402\ \ \ \ \ \ \ \ \ \ native\_value\ result;}
+\DoxyCodeLine{00403\ \ \ \ \ \ \ \ \ \ std::memset(\&result,\ 0,\ \textcolor{keyword}{sizeof}(result));}
+\DoxyCodeLine{00404\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ tc\ =\ \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_a57bb3eb0b0c335a0007e53cbee0fb777}{detail::type\_converter\_t<Host>}}\{\mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_ab7a88abe7f50acea3cd6ed677934d66a}{\_host}},\ \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context_ab48a9c325fcb2d2a4b532396eb2d65f3}{get\_interface}}()\};}
+\DoxyCodeLine{00405\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ transformed\_value\ =\ \mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_ac0309c0bf6af90775a6bebd9b524cc8c}{detail::resolve\_result}}(tc,\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\&\textcolor{keyword}{>}(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})).data;}
+\DoxyCodeLine{00406\ \ \ \ \ \ \ \ \ \ std::memcpy(\&result,\ \&transformed\_value,\ \textcolor{keyword}{sizeof}(transformed\_value));}
+\DoxyCodeLine{00407\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00408\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classsysio_1_1vm_1_1jit__execution__context_a60328b847940f19ecaf6de0a4d9de4aa}\index{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$@{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$}!\_error\_code@{\_error\_code}}
+\index{\_error\_code@{\_error\_code}!sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$@{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$}}
+\doxysubsubsection{\texorpdfstring{\_error\_code}{\_error\_code}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1jit__execution__context_a60328b847940f19ecaf6de0a4d9de4aa} 
+template$<$typename Host , bool Enable\+Backtrace = false$>$ \\
+std\+::error\+\_\+code \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base}{sysio\+::vm\+::execution\+\_\+context\+\_\+base}}$<$ Derived, Host $>$\+::\+\_\+error\+\_\+code}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2execution__context_8hpp_source_l00190}{190}} of file \mbox{\hyperlink{sysio_2vm_2execution__context_8hpp_source}{execution\+\_\+context.\+hpp}}.
+
+\Hypertarget{classsysio_1_1vm_1_1jit__execution__context_ab7a88abe7f50acea3cd6ed677934d66a}\index{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$@{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$}!\_host@{\_host}}
+\index{\_host@{\_host}!sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$@{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$}}
+\doxysubsubsection{\texorpdfstring{\_host}{\_host}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1jit__execution__context_ab7a88abe7f50acea3cd6ed677934d66a} 
+template$<$typename Host , bool Enable\+Backtrace = false$>$ \\
+host\+\_\+type \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context}{sysio\+::vm\+::jit\+\_\+execution\+\_\+context}}$<$ Host, Enable\+Backtrace $>$\+::\+\_\+host = nullptr\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2execution__context_8hpp_source_l00478}{478}} of file \mbox{\hyperlink{sysio_2vm_2execution__context_8hpp_source}{execution\+\_\+context.\+hpp}}.
+
+\Hypertarget{classsysio_1_1vm_1_1jit__execution__context_a10264d78efee5ae7720bddc2853c1bc8}\index{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$@{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$}!\_mod@{\_mod}}
+\index{\_mod@{\_mod}!sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$@{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$}}
+\doxysubsubsection{\texorpdfstring{\_mod}{\_mod}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1jit__execution__context_a10264d78efee5ae7720bddc2853c1bc8} 
+template$<$typename Host , bool Enable\+Backtrace = false$>$ \\
+\mbox{\hyperlink{structsysio_1_1vm_1_1module}{module}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base}{sysio\+::vm\+::execution\+\_\+context\+\_\+base}}$<$ Derived, Host $>$\+::\+\_\+mod}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2execution__context_8hpp_source_l00186}{186}} of file \mbox{\hyperlink{sysio_2vm_2execution__context_8hpp_source}{execution\+\_\+context.\+hpp}}.
+
+\Hypertarget{classsysio_1_1vm_1_1jit__execution__context_abddbc46dcfef76d04aaf37ad3440fec6}\index{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$@{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$}!\_remaining\_call\_depth@{\_remaining\_call\_depth}}
+\index{\_remaining\_call\_depth@{\_remaining\_call\_depth}!sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$@{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$}}
+\doxysubsubsection{\texorpdfstring{\_remaining\_call\_depth}{\_remaining\_call\_depth}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1jit__execution__context_abddbc46dcfef76d04aaf37ad3440fec6} 
+template$<$typename Host , bool Enable\+Backtrace = false$>$ \\
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classsysio_1_1vm_1_1jit__execution__context}{sysio\+::vm\+::jit\+\_\+execution\+\_\+context}}$<$ Host, Enable\+Backtrace $>$\+::\+\_\+remaining\+\_\+call\+\_\+depth\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2execution__context_8hpp_source_l00479}{479}} of file \mbox{\hyperlink{sysio_2vm_2execution__context_8hpp_source}{execution\+\_\+context.\+hpp}}.
+
+\Hypertarget{classsysio_1_1vm_1_1jit__execution__context_afb21eb88496d63b7af1f1329cab1ef08}\index{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$@{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$}!\_rhf@{\_rhf}}
+\index{\_rhf@{\_rhf}!sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$@{sysio::vm::jit\_execution\_context$<$ Host, EnableBacktrace $>$}}
+\doxysubsubsection{\texorpdfstring{\_rhf}{\_rhf}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1jit__execution__context_afb21eb88496d63b7af1f1329cab1ef08} 
+template$<$typename Host , bool Enable\+Backtrace = false$>$ \\
+\mbox{\hyperlink{namespacesysio_1_1vm_1_1detail_affd752998217b56f9a027d41f1e47d34}{detail\+::host\+\_\+invoker\+\_\+t}}$<$ Host $>$ \mbox{\hyperlink{classsysio_1_1vm_1_1execution__context__base}{sysio\+::vm\+::execution\+\_\+context\+\_\+base}}$<$ Derived, Host $>$\+::\+\_\+rhf}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2execution__context_8hpp_source_l00189}{189}} of file \mbox{\hyperlink{sysio_2vm_2execution__context_8hpp_source}{execution\+\_\+context.\+hpp}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/include/sysio/sysio/vm/\mbox{\hyperlink{sysio_2vm_2execution__context_8hpp}{execution\+\_\+context.\+hpp}}\item 
+libraries/sys-\/vm/include/sysio/vm/\mbox{\hyperlink{vm_2execution__context_8hpp}{execution\+\_\+context.\+hpp}}\end{DoxyCompactItemize}

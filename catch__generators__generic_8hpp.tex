@@ -1,0 +1,55 @@
+\doxysection{libraries/sys-\/vm/external/\+Catch2/include/internal/catch\+\_\+generators\+\_\+generic.hpp File Reference}
+\hypertarget{catch__generators__generic_8hpp}{}\label{catch__generators__generic_8hpp}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_generators\_generic.hpp@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_generators\_generic.hpp}}
+{\ttfamily \#include "{}catch\+\_\+generators.\+hpp"{}}\newline
+Include dependency graph for catch\+\_\+generators\+\_\+generic.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{catch__generators__generic_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=230pt]{catch__generators__generic_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{class_catch_1_1_generators_1_1_take_generator}{Catch\+::\+Generators\+::\+Take\+Generator$<$ T $>$}}
+\item 
+class \mbox{\hyperlink{class_catch_1_1_generators_1_1_filter_generator}{Catch\+::\+Generators\+::\+Filter\+Generator$<$ T, Predicate $>$}}
+\item 
+class \mbox{\hyperlink{class_catch_1_1_generators_1_1_repeat_generator}{Catch\+::\+Generators\+::\+Repeat\+Generator$<$ T $>$}}
+\item 
+class \mbox{\hyperlink{class_catch_1_1_generators_1_1_map_generator}{Catch\+::\+Generators\+::\+Map\+Generator$<$ T, U, Func $>$}}
+\item 
+class \mbox{\hyperlink{class_catch_1_1_generators_1_1_chunk_generator}{Catch\+::\+Generators\+::\+Chunk\+Generator$<$ T $>$}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespace_catch}{Catch}}
+\item 
+namespace \mbox{\hyperlink{namespace_catch_1_1_generators}{Catch\+::\+Generators}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename Func , typename \mbox{\hyperlink{union_u}{U}} $>$ }\\using \mbox{\hyperlink{namespace_catch_1_1_generators_a0b16fd50d3af1a2f1e0b9635a6358cca}{Catch\+::\+Generators\+::\+Map\+Function\+Return\+Type}} = typename std\+::remove\+\_\+reference$<$typename std\+::remove\+\_\+cv$<$typename std\+::result\+\_\+of$<$Func(\mbox{\hyperlink{union_u}{U}})$>$\+::type$>$\+::type$>$\+::type
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{class_catch_1_1_generators_1_1_generator_wrapper}{Generator\+Wrapper}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \mbox{\hyperlink{namespace_catch_1_1_generators_adedfdb318219078ce9107690745d2f2f}{Catch\+::\+Generators\+::take}} (size\+\_\+t target, \mbox{\hyperlink{class_catch_1_1_generators_1_1_generator_wrapper}{Generator\+Wrapper}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&\&generator)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{namespace_catch_1_1_matchers_a70a7c65c44f6ea7f739402c0b6f28657}{Predicate}} $>$ }\\\mbox{\hyperlink{class_catch_1_1_generators_1_1_generator_wrapper}{Generator\+Wrapper}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \mbox{\hyperlink{namespace_catch_1_1_generators_a4df89be8072a9685ee89b6776a54bb93}{Catch\+::\+Generators\+::filter}} (\mbox{\hyperlink{namespace_catch_1_1_matchers_a70a7c65c44f6ea7f739402c0b6f28657}{Predicate}} \&\&pred, \mbox{\hyperlink{class_catch_1_1_generators_1_1_generator_wrapper}{Generator\+Wrapper}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&\&generator)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{class_catch_1_1_generators_1_1_generator_wrapper}{Generator\+Wrapper}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \mbox{\hyperlink{namespace_catch_1_1_generators_a510cc0d72a7bab8f967827e695b981ba}{Catch\+::\+Generators\+::repeat}} (size\+\_\+t repeats, \mbox{\hyperlink{class_catch_1_1_generators_1_1_generator_wrapper}{Generator\+Wrapper}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&\&generator)
+\item 
+{\footnotesize template$<$typename Func , typename \mbox{\hyperlink{union_u}{U}} , typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}  = Map\+Function\+Return\+Type$<$\+Func, U$>$$>$ }\\\mbox{\hyperlink{class_catch_1_1_generators_1_1_generator_wrapper}{Generator\+Wrapper}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \mbox{\hyperlink{namespace_catch_1_1_generators_af33fd06c51ac9173c3bee2ddee2559a6}{Catch\+::\+Generators\+::map}} (Func \&\&function, \mbox{\hyperlink{class_catch_1_1_generators_1_1_generator_wrapper}{Generator\+Wrapper}}$<$ \mbox{\hyperlink{union_u}{U}} $>$ \&\&generator)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{class_catch_1_1_generators_1_1_generator_wrapper}{Generator\+Wrapper}}$<$ std\+::vector$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ $>$ \mbox{\hyperlink{namespace_catch_1_1_generators_acb4654b4e840e438e3bc204ac4d8e157}{Catch\+::\+Generators\+::chunk}} (size\+\_\+t size, \mbox{\hyperlink{class_catch_1_1_generators_1_1_generator_wrapper}{Generator\+Wrapper}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&\&generator)
+\end{DoxyCompactItemize}

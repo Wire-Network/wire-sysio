@@ -1,0 +1,258 @@
+\doxysection{chainbase\+::chainbase\+\_\+node\+\_\+allocator\texorpdfstring{$<$}{<} T, S \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classchainbase_1_1chainbase__node__allocator}{}\label{classchainbase_1_1chainbase__node__allocator}\index{chainbase::chainbase\_node\_allocator$<$ T, S $>$@{chainbase::chainbase\_node\_allocator$<$ T, S $>$}}
+
+
+{\ttfamily \#include $<$chainbase\+\_\+node\+\_\+allocator.\+hpp$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{classchainbase_1_1chainbase__node__allocator_ae3c367ce3525571f2aa5e2241024bec5}{value\+\_\+type}} = \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}
+\item 
+using \mbox{\hyperlink{classchainbase_1_1chainbase__node__allocator_a11b8d1c722f00dc9e7edd55df72ed87a}{pointer}} = bip\+::offset\+\_\+ptr$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$
+\item 
+using \mbox{\hyperlink{classchainbase_1_1chainbase__node__allocator_afa121559a33e676d0d489a63d4a1ebff}{segment\+\_\+manager}} = \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a550aa643b3bd7335e48afd94f1089d2b}{pinnable\+\_\+mapped\+\_\+file\+::segment\+\_\+manager}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classchainbase_1_1chainbase__node__allocator_a3c13dc1a3af16341a8c604b2c5e42307}{chainbase\+\_\+node\+\_\+allocator}} (\mbox{\hyperlink{classchainbase_1_1chainbase__node__allocator_afa121559a33e676d0d489a63d4a1ebff}{segment\+\_\+manager}} \texorpdfstring{$\ast$}{*}manager)
+\item 
+\mbox{\hyperlink{classchainbase_1_1chainbase__node__allocator_a48f8aec85dc6b7af4f8d33d028cdb143}{chainbase\+\_\+node\+\_\+allocator}} (const \mbox{\hyperlink{classchainbase_1_1chainbase__node__allocator}{chainbase\+\_\+node\+\_\+allocator}} \&other)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{union_u}{U}} $>$ }\\\mbox{\hyperlink{classchainbase_1_1chainbase__node__allocator_af5c5976000839093ac68eb869f639679}{chainbase\+\_\+node\+\_\+allocator}} (const \mbox{\hyperlink{classchainbase_1_1chainbase__node__allocator}{chainbase\+\_\+node\+\_\+allocator}}$<$ \mbox{\hyperlink{union_u}{U}}, \mbox{\hyperlink{struct_s}{S}} $>$ \&other)
+\item 
+\mbox{\hyperlink{classchainbase_1_1chainbase__node__allocator_a11b8d1c722f00dc9e7edd55df72ed87a}{pointer}} \mbox{\hyperlink{classchainbase_1_1chainbase__node__allocator_ae2c84fd1a60a6606f1828a911632436b}{allocate}} (std\+::size\+\_\+t num)
+\item 
+void \mbox{\hyperlink{classchainbase_1_1chainbase__node__allocator_a63c3da0c4807832f314fd18ff6661ce3}{deallocate}} (const \mbox{\hyperlink{classchainbase_1_1chainbase__node__allocator_a11b8d1c722f00dc9e7edd55df72ed87a}{pointer}} \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}, std\+::size\+\_\+t num)
+\item 
+bool \mbox{\hyperlink{classchainbase_1_1chainbase__node__allocator_a1c8d35a1efed917beae917358c3cd5cb}{operator==}} (const \mbox{\hyperlink{classchainbase_1_1chainbase__node__allocator}{chainbase\+\_\+node\+\_\+allocator}} \&other) const
+\item 
+bool \mbox{\hyperlink{classchainbase_1_1chainbase__node__allocator_a95ab9586080318227b5896c3ff4208ef}{operator!=}} (const \mbox{\hyperlink{classchainbase_1_1chainbase__node__allocator}{chainbase\+\_\+node\+\_\+allocator}} \&other) const
+\item 
+\mbox{\hyperlink{classchainbase_1_1chainbase__node__allocator_afa121559a33e676d0d489a63d4a1ebff}{segment\+\_\+manager}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classchainbase_1_1chainbase__node__allocator_ab932ddbbd8e5e194316b22b46cb77d6d}{get\+\_\+segment\+\_\+manager}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename T2 , typename S2 $>$ }\\\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classchainbase_1_1chainbase__node__allocator_a3c6821587de0fcd0839045f800f93722}{chainbase\+\_\+node\+\_\+allocator}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, typename \mbox{\hyperlink{struct_s}{S}}$>$\newline
+class chainbase\+::chainbase\+\_\+node\+\_\+allocator$<$ T, S $>$}
+
+
+Definition at line \mbox{\hyperlink{undo__index_8hpp_source_l00218}{218}} of file \mbox{\hyperlink{undo__index_8hpp_source}{undo\+\_\+index.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classchainbase_1_1chainbase__node__allocator_a11b8d1c722f00dc9e7edd55df72ed87a}\index{chainbase::chainbase\_node\_allocator$<$ T, S $>$@{chainbase::chainbase\_node\_allocator$<$ T, S $>$}!pointer@{pointer}}
+\index{pointer@{pointer}!chainbase::chainbase\_node\_allocator$<$ T, S $>$@{chainbase::chainbase\_node\_allocator$<$ T, S $>$}}
+\doxysubsubsection{\texorpdfstring{pointer}{pointer}}
+{\footnotesize\ttfamily \label{classchainbase_1_1chainbase__node__allocator_a11b8d1c722f00dc9e7edd55df72ed87a} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{struct_s}{S}} $>$ \\
+using \mbox{\hyperlink{classchainbase_1_1chainbase__node__allocator}{chainbase\+::chainbase\+\_\+node\+\_\+allocator}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{struct_s}{S}} $>$\+::pointer = bip\+::offset\+\_\+ptr$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase__node__allocator_8hpp_source_l00016}{16}} of file \mbox{\hyperlink{chainbase__node__allocator_8hpp_source}{chainbase\+\_\+node\+\_\+allocator.\+hpp}}.
+
+\Hypertarget{classchainbase_1_1chainbase__node__allocator_afa121559a33e676d0d489a63d4a1ebff}\index{chainbase::chainbase\_node\_allocator$<$ T, S $>$@{chainbase::chainbase\_node\_allocator$<$ T, S $>$}!segment\_manager@{segment\_manager}}
+\index{segment\_manager@{segment\_manager}!chainbase::chainbase\_node\_allocator$<$ T, S $>$@{chainbase::chainbase\_node\_allocator$<$ T, S $>$}}
+\doxysubsubsection{\texorpdfstring{segment\_manager}{segment\_manager}}
+{\footnotesize\ttfamily \label{classchainbase_1_1chainbase__node__allocator_afa121559a33e676d0d489a63d4a1ebff} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{struct_s}{S}} $>$ \\
+using \mbox{\hyperlink{classchainbase_1_1chainbase__node__allocator}{chainbase\+::chainbase\+\_\+node\+\_\+allocator}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{struct_s}{S}} $>$\+::segment\+\_\+manager = \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a550aa643b3bd7335e48afd94f1089d2b}{pinnable\+\_\+mapped\+\_\+file\+::segment\+\_\+manager}}}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase__node__allocator_8hpp_source_l00017}{17}} of file \mbox{\hyperlink{chainbase__node__allocator_8hpp_source}{chainbase\+\_\+node\+\_\+allocator.\+hpp}}.
+
+\Hypertarget{classchainbase_1_1chainbase__node__allocator_ae3c367ce3525571f2aa5e2241024bec5}\index{chainbase::chainbase\_node\_allocator$<$ T, S $>$@{chainbase::chainbase\_node\_allocator$<$ T, S $>$}!value\_type@{value\_type}}
+\index{value\_type@{value\_type}!chainbase::chainbase\_node\_allocator$<$ T, S $>$@{chainbase::chainbase\_node\_allocator$<$ T, S $>$}}
+\doxysubsubsection{\texorpdfstring{value\_type}{value\_type}}
+{\footnotesize\ttfamily \label{classchainbase_1_1chainbase__node__allocator_ae3c367ce3525571f2aa5e2241024bec5} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{struct_s}{S}} $>$ \\
+using \mbox{\hyperlink{classchainbase_1_1chainbase__node__allocator}{chainbase\+::chainbase\+\_\+node\+\_\+allocator}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{struct_s}{S}} $>$\+::value\+\_\+type = \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase__node__allocator_8hpp_source_l00015}{15}} of file \mbox{\hyperlink{chainbase__node__allocator_8hpp_source}{chainbase\+\_\+node\+\_\+allocator.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classchainbase_1_1chainbase__node__allocator_a3c13dc1a3af16341a8c604b2c5e42307}\index{chainbase::chainbase\_node\_allocator$<$ T, S $>$@{chainbase::chainbase\_node\_allocator$<$ T, S $>$}!chainbase\_node\_allocator@{chainbase\_node\_allocator}}
+\index{chainbase\_node\_allocator@{chainbase\_node\_allocator}!chainbase::chainbase\_node\_allocator$<$ T, S $>$@{chainbase::chainbase\_node\_allocator$<$ T, S $>$}}
+\doxysubsubsection{\texorpdfstring{chainbase\_node\_allocator()}{chainbase\_node\_allocator()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{classchainbase_1_1chainbase__node__allocator_a3c13dc1a3af16341a8c604b2c5e42307} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{struct_s}{S}} $>$ \\
+\mbox{\hyperlink{classchainbase_1_1chainbase__node__allocator}{chainbase\+::chainbase\+\_\+node\+\_\+allocator}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{struct_s}{S}} $>$\+::chainbase\+\_\+node\+\_\+allocator (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classchainbase_1_1chainbase__node__allocator_afa121559a33e676d0d489a63d4a1ebff}{segment\+\_\+manager}} \texorpdfstring{$\ast$}{*}}]{manager}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase__node__allocator_8hpp_source_l00018}{18}} of file \mbox{\hyperlink{chainbase__node__allocator_8hpp_source}{chainbase\+\_\+node\+\_\+allocator.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00018\ :\ \_manager\{manager\}\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classchainbase_1_1chainbase__node__allocator_a48f8aec85dc6b7af4f8d33d028cdb143}\index{chainbase::chainbase\_node\_allocator$<$ T, S $>$@{chainbase::chainbase\_node\_allocator$<$ T, S $>$}!chainbase\_node\_allocator@{chainbase\_node\_allocator}}
+\index{chainbase\_node\_allocator@{chainbase\_node\_allocator}!chainbase::chainbase\_node\_allocator$<$ T, S $>$@{chainbase::chainbase\_node\_allocator$<$ T, S $>$}}
+\doxysubsubsection{\texorpdfstring{chainbase\_node\_allocator()}{chainbase\_node\_allocator()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{classchainbase_1_1chainbase__node__allocator_a48f8aec85dc6b7af4f8d33d028cdb143} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{struct_s}{S}} $>$ \\
+\mbox{\hyperlink{classchainbase_1_1chainbase__node__allocator}{chainbase\+::chainbase\+\_\+node\+\_\+allocator}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{struct_s}{S}} $>$\+::chainbase\+\_\+node\+\_\+allocator (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classchainbase_1_1chainbase__node__allocator}{chainbase\+\_\+node\+\_\+allocator}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{struct_s}{S}} $>$ \&}]{other}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase__node__allocator_8hpp_source_l00019}{19}} of file \mbox{\hyperlink{chainbase__node__allocator_8hpp_source}{chainbase\+\_\+node\+\_\+allocator.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00019\ :\ \_manager(\mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.\_manager)\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classchainbase_1_1chainbase__node__allocator_af5c5976000839093ac68eb869f639679}\index{chainbase::chainbase\_node\_allocator$<$ T, S $>$@{chainbase::chainbase\_node\_allocator$<$ T, S $>$}!chainbase\_node\_allocator@{chainbase\_node\_allocator}}
+\index{chainbase\_node\_allocator@{chainbase\_node\_allocator}!chainbase::chainbase\_node\_allocator$<$ T, S $>$@{chainbase::chainbase\_node\_allocator$<$ T, S $>$}}
+\doxysubsubsection{\texorpdfstring{chainbase\_node\_allocator()}{chainbase\_node\_allocator()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{classchainbase_1_1chainbase__node__allocator_af5c5976000839093ac68eb869f639679} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{struct_s}{S}} $>$ \\
+template$<$typename \mbox{\hyperlink{union_u}{U}} $>$ \\
+\mbox{\hyperlink{classchainbase_1_1chainbase__node__allocator}{chainbase\+::chainbase\+\_\+node\+\_\+allocator}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{struct_s}{S}} $>$\+::chainbase\+\_\+node\+\_\+allocator (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classchainbase_1_1chainbase__node__allocator}{chainbase\+\_\+node\+\_\+allocator}}$<$ \mbox{\hyperlink{union_u}{U}}, \mbox{\hyperlink{struct_s}{S}} $>$ \&}]{other}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase__node__allocator_8hpp_source_l00021}{21}} of file \mbox{\hyperlink{chainbase__node__allocator_8hpp_source}{chainbase\+\_\+node\+\_\+allocator.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00021\ :\ \_manager(\mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.\_manager)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classchainbase_1_1chainbase__node__allocator_ae2c84fd1a60a6606f1828a911632436b}\index{chainbase::chainbase\_node\_allocator$<$ T, S $>$@{chainbase::chainbase\_node\_allocator$<$ T, S $>$}!allocate@{allocate}}
+\index{allocate@{allocate}!chainbase::chainbase\_node\_allocator$<$ T, S $>$@{chainbase::chainbase\_node\_allocator$<$ T, S $>$}}
+\doxysubsubsection{\texorpdfstring{allocate()}{allocate()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1chainbase__node__allocator_ae2c84fd1a60a6606f1828a911632436b} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{struct_s}{S}} $>$ \\
+\mbox{\hyperlink{classchainbase_1_1chainbase__node__allocator_a11b8d1c722f00dc9e7edd55df72ed87a}{pointer}} \mbox{\hyperlink{classchainbase_1_1chainbase__node__allocator}{chainbase\+::chainbase\+\_\+node\+\_\+allocator}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{struct_s}{S}} $>$\+::allocate (\begin{DoxyParamCaption}\item[{std\+::size\+\_\+t}]{num}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase__node__allocator_8hpp_source_l00022}{22}} of file \mbox{\hyperlink{chainbase__node__allocator_8hpp_source}{chainbase\+\_\+node\+\_\+allocator.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (num\ ==\ 1)\ \{}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\_freelist\ ==\ \textcolor{keyword}{nullptr})\ \{}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ get\_some();}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \ \ \ \ list\_item*\ result\ =\ \&*\_freelist;}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \ \ \ \ \_freelist\ =\ \_freelist-\/>\_next;}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ \ \ \ result-\/>\string~list\_item();}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classchainbase_1_1chainbase__node__allocator_a11b8d1c722f00dc9e7edd55df72ed87a}{pointer}}\{(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*)result\};}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classchainbase_1_1chainbase__node__allocator_a11b8d1c722f00dc9e7edd55df72ed87a}{pointer}}\{(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*)\_manager-\/>allocate(num*\textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}))\};}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classchainbase_1_1chainbase__node__allocator_a63c3da0c4807832f314fd18ff6661ce3}\index{chainbase::chainbase\_node\_allocator$<$ T, S $>$@{chainbase::chainbase\_node\_allocator$<$ T, S $>$}!deallocate@{deallocate}}
+\index{deallocate@{deallocate}!chainbase::chainbase\_node\_allocator$<$ T, S $>$@{chainbase::chainbase\_node\_allocator$<$ T, S $>$}}
+\doxysubsubsection{\texorpdfstring{deallocate()}{deallocate()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1chainbase__node__allocator_a63c3da0c4807832f314fd18ff6661ce3} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{struct_s}{S}} $>$ \\
+void \mbox{\hyperlink{classchainbase_1_1chainbase__node__allocator}{chainbase\+::chainbase\+\_\+node\+\_\+allocator}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{struct_s}{S}} $>$\+::deallocate (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classchainbase_1_1chainbase__node__allocator_a11b8d1c722f00dc9e7edd55df72ed87a}{pointer}} \&}]{p}{, }\item[{std\+::size\+\_\+t}]{num}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase__node__allocator_8hpp_source_l00035}{35}} of file \mbox{\hyperlink{chainbase__node__allocator_8hpp_source}{chainbase\+\_\+node\+\_\+allocator.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (num\ ==\ 1)\ \{}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ \_freelist\ =\ \textcolor{keyword}{new}\ (\&*\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})\ list\_item\{\_freelist\};}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ \_manager-\/>deallocate(\&*\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}});}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classchainbase_1_1chainbase__node__allocator_ab932ddbbd8e5e194316b22b46cb77d6d}\index{chainbase::chainbase\_node\_allocator$<$ T, S $>$@{chainbase::chainbase\_node\_allocator$<$ T, S $>$}!get\_segment\_manager@{get\_segment\_manager}}
+\index{get\_segment\_manager@{get\_segment\_manager}!chainbase::chainbase\_node\_allocator$<$ T, S $>$@{chainbase::chainbase\_node\_allocator$<$ T, S $>$}}
+\doxysubsubsection{\texorpdfstring{get\_segment\_manager()}{get\_segment\_manager()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1chainbase__node__allocator_ab932ddbbd8e5e194316b22b46cb77d6d} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{struct_s}{S}} $>$ \\
+\mbox{\hyperlink{classchainbase_1_1chainbase__node__allocator_afa121559a33e676d0d489a63d4a1ebff}{segment\+\_\+manager}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classchainbase_1_1chainbase__node__allocator}{chainbase\+::chainbase\+\_\+node\+\_\+allocator}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{struct_s}{S}} $>$\+::get\+\_\+segment\+\_\+manager (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase__node__allocator_8hpp_source_l00044}{44}} of file \mbox{\hyperlink{chainbase__node__allocator_8hpp_source}{chainbase\+\_\+node\+\_\+allocator.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00044\ \{\ \textcolor{keywordflow}{return}\ \_manager.get();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classchainbase_1_1chainbase__node__allocator_a95ab9586080318227b5896c3ff4208ef}\index{chainbase::chainbase\_node\_allocator$<$ T, S $>$@{chainbase::chainbase\_node\_allocator$<$ T, S $>$}!operator"!=@{operator"!=}}
+\index{operator"!=@{operator"!=}!chainbase::chainbase\_node\_allocator$<$ T, S $>$@{chainbase::chainbase\_node\_allocator$<$ T, S $>$}}
+\doxysubsubsection{\texorpdfstring{operator"!=()}{operator!=()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1chainbase__node__allocator_a95ab9586080318227b5896c3ff4208ef} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{struct_s}{S}} $>$ \\
+bool \mbox{\hyperlink{classchainbase_1_1chainbase__node__allocator}{chainbase\+::chainbase\+\_\+node\+\_\+allocator}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{struct_s}{S}} $>$\+::operator!= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classchainbase_1_1chainbase__node__allocator}{chainbase\+\_\+node\+\_\+allocator}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{struct_s}{S}} $>$ \&}]{other}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase__node__allocator_8hpp_source_l00043}{43}} of file \mbox{\hyperlink{chainbase__node__allocator_8hpp_source}{chainbase\+\_\+node\+\_\+allocator.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00043\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{this}\ !=\ \&\mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classchainbase_1_1chainbase__node__allocator_a1c8d35a1efed917beae917358c3cd5cb}\index{chainbase::chainbase\_node\_allocator$<$ T, S $>$@{chainbase::chainbase\_node\_allocator$<$ T, S $>$}!operator==@{operator==}}
+\index{operator==@{operator==}!chainbase::chainbase\_node\_allocator$<$ T, S $>$@{chainbase::chainbase\_node\_allocator$<$ T, S $>$}}
+\doxysubsubsection{\texorpdfstring{operator==()}{operator==()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1chainbase__node__allocator_a1c8d35a1efed917beae917358c3cd5cb} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{struct_s}{S}} $>$ \\
+bool \mbox{\hyperlink{classchainbase_1_1chainbase__node__allocator}{chainbase\+::chainbase\+\_\+node\+\_\+allocator}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{struct_s}{S}} $>$\+::operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classchainbase_1_1chainbase__node__allocator}{chainbase\+\_\+node\+\_\+allocator}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{struct_s}{S}} $>$ \&}]{other}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase__node__allocator_8hpp_source_l00042}{42}} of file \mbox{\hyperlink{chainbase__node__allocator_8hpp_source}{chainbase\+\_\+node\+\_\+allocator.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00042\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{this}\ ==\ \&\mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}};\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{classchainbase_1_1chainbase__node__allocator_a3c6821587de0fcd0839045f800f93722}\index{chainbase::chainbase\_node\_allocator$<$ T, S $>$@{chainbase::chainbase\_node\_allocator$<$ T, S $>$}!chainbase\_node\_allocator@{chainbase\_node\_allocator}}
+\index{chainbase\_node\_allocator@{chainbase\_node\_allocator}!chainbase::chainbase\_node\_allocator$<$ T, S $>$@{chainbase::chainbase\_node\_allocator$<$ T, S $>$}}
+\doxysubsubsection{\texorpdfstring{chainbase\_node\_allocator}{chainbase\_node\_allocator}}
+{\footnotesize\ttfamily \label{classchainbase_1_1chainbase__node__allocator_a3c6821587de0fcd0839045f800f93722} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{struct_s}{S}} $>$ \\
+template$<$typename T2 , typename S2 $>$ \\
+friend \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classchainbase_1_1chainbase__node__allocator}{chainbase\+\_\+node\+\_\+allocator}}\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase__node__allocator_8hpp_source_l00047}{47}} of file \mbox{\hyperlink{chainbase__node__allocator_8hpp_source}{chainbase\+\_\+node\+\_\+allocator.\+hpp}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chainbase/include/chainbase/\mbox{\hyperlink{chainbase__node__allocator_8hpp}{chainbase\+\_\+node\+\_\+allocator.\+hpp}}\item 
+libraries/chainbase/include/chainbase/\mbox{\hyperlink{undo__index_8hpp}{undo\+\_\+index.\+hpp}}\end{DoxyCompactItemize}

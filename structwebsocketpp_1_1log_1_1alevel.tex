@@ -1,0 +1,299 @@
+\doxysection{websocketpp\+::log\+::alevel Struct Reference}
+\hypertarget{structwebsocketpp_1_1log_1_1alevel}{}\label{structwebsocketpp_1_1log_1_1alevel}\index{websocketpp::log::alevel@{websocketpp::log::alevel}}
+
+
+Package of log levels for logging access events.  
+
+
+
+
+{\ttfamily \#include $<$levels.\+hpp$>$}
+
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static char const \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a0f093e7e6c40fd86353c174eac1e0313}{channel\+\_\+name}} (\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}} channel)
+\begin{DoxyCompactList}\small\item\em Get the textual name of a channel given a channel id. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static \mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}} const \mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a4cf0520816094999975fe73081cf30f2}{none}} = 0x0
+\begin{DoxyCompactList}\small\item\em Special aggregate value representing "{}no levels"{}. \end{DoxyCompactList}\item 
+static \mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}} const \mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_aac3e16b6df297567ba2533233d477d57}{connect}} = 0x1
+\begin{DoxyCompactList}\small\item\em Information about new connections. \end{DoxyCompactList}\item 
+static \mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}} const \mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_af19681d3edb28e0407688eeda8f0005c}{disconnect}} = 0x2
+\begin{DoxyCompactList}\small\item\em One line for each closed connection. Includes closing codes and reasons. \end{DoxyCompactList}\item 
+static \mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}} const \mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_ae67e6466bf3d9daf45cc865e8d48f445}{control}} = 0x4
+\begin{DoxyCompactList}\small\item\em One line per control frame. \end{DoxyCompactList}\item 
+static \mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}} const \mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_ac25fc7cb5fc229abb6fc893f16ffb678}{frame\+\_\+header}} = 0x8
+\begin{DoxyCompactList}\small\item\em One line per frame, includes the full frame header. \end{DoxyCompactList}\item 
+static \mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}} const \mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_aa38cfdf7a82f33cac319438462707e90}{frame\+\_\+payload}} = 0x10
+\begin{DoxyCompactList}\small\item\em One line per frame, includes the full message payload (warning\+: chatty) \end{DoxyCompactList}\item 
+static \mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}} const \mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_ae05d0972bc4d68cca49faf8c82d40304}{message\+\_\+header}} = 0x20
+\begin{DoxyCompactList}\small\item\em Reserved. \end{DoxyCompactList}\item 
+static \mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}} const \mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_ace7d9b9c9ed82029ec93c4f45081b7ac}{message\+\_\+payload}} = 0x40
+\begin{DoxyCompactList}\small\item\em Reserved. \end{DoxyCompactList}\item 
+static \mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}} const \mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_ad35433a6b8793f2bd1f5595386a09c73}{endpoint}} = 0x80
+\begin{DoxyCompactList}\small\item\em Reserved. \end{DoxyCompactList}\item 
+static \mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}} const \mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a5756fbbc77e431534a43072f944283fc}{debug\+\_\+handshake}} = 0x100
+\begin{DoxyCompactList}\small\item\em Extra information about opening handshakes. \end{DoxyCompactList}\item 
+static \mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}} const \mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a8af43767d3814885f55495bf9f5f4df4}{debug\+\_\+close}} = 0x200
+\begin{DoxyCompactList}\small\item\em Extra information about closing handshakes. \end{DoxyCompactList}\item 
+static \mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}} const \mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}{devel}} = 0x400
+\begin{DoxyCompactList}\small\item\em Development messages (warning\+: very chatty) \end{DoxyCompactList}\item 
+static \mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}} const \mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_aaf67c94a68502c49308489ff01d8d0a8}{app}} = 0x800
+\begin{DoxyCompactList}\small\item\em Special channel for application specific logs. Not used by the library. \end{DoxyCompactList}\item 
+static \mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}} const \mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_af6e731e5771ab1a2267f79e5b9b8183a}{http}} = 0x1000
+\begin{DoxyCompactList}\small\item\em Access related to HTTP requests. \end{DoxyCompactList}\item 
+static \mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}} const \mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a2e485329910f92f8f6356cf27bafd4a2}{fail}} = 0x2000
+\begin{DoxyCompactList}\small\item\em One line for each failed Web\+Socket connection with details. \end{DoxyCompactList}\item 
+static \mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}} const \mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_af5fdb4de43a77cacb4c3a5b01b816750}{access\+\_\+core}} = 0x00003003
+\item 
+static \mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}} const \mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a853aa0b8976e53f3181af3bc398d493e}{all}} = 0xffffffff
+\begin{DoxyCompactList}\small\item\em Special aggregate value representing "{}all levels"{}. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{levels_8hpp_source_l00112}{112}} of file \mbox{\hyperlink{levels_8hpp_source}{levels.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structwebsocketpp_1_1log_1_1alevel_a0f093e7e6c40fd86353c174eac1e0313}\index{websocketpp::log::alevel@{websocketpp::log::alevel}!channel\_name@{channel\_name}}
+\index{channel\_name@{channel\_name}!websocketpp::log::alevel@{websocketpp::log::alevel}}
+\doxysubsubsection{\texorpdfstring{channel\_name()}{channel\_name()}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1log_1_1alevel_a0f093e7e6c40fd86353c174eac1e0313} 
+static char const  \texorpdfstring{$\ast$}{*} websocketpp\+::log\+::alevel\+::channel\+\_\+name (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}}}]{channel}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+Get the textual name of a channel given a channel id. The id must be that of a single channel. Passing an aggregate channel package results in undefined behavior.
+
+
+\begin{DoxyParams}{Parameters}
+{\em channel} & The channelid to look up.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The name of the specified channel. 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{levels_8hpp_source_l00164}{164}} of file \mbox{\hyperlink{levels_8hpp_source}{levels.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(channel)\ \{}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_aac3e16b6df297567ba2533233d477d57}{connect}}:}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}connect"{}};}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_af19681d3edb28e0407688eeda8f0005c}{disconnect}}:}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}disconnect"{}};}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_ae67e6466bf3d9daf45cc865e8d48f445}{control}}:}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}control"{}};}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_ac25fc7cb5fc229abb6fc893f16ffb678}{frame\_header}}:}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}frame\_header"{}};}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_aa38cfdf7a82f33cac319438462707e90}{frame\_payload}}:}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}frame\_payload"{}};}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_ae05d0972bc4d68cca49faf8c82d40304}{message\_header}}:}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}message\_header"{}};}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_ace7d9b9c9ed82029ec93c4f45081b7ac}{message\_payload}}:}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}message\_payload"{}};}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_ad35433a6b8793f2bd1f5595386a09c73}{endpoint}}:}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}endpoint"{}};}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a5756fbbc77e431534a43072f944283fc}{debug\_handshake}}:}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}debug\_handshake"{}};}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a8af43767d3814885f55495bf9f5f4df4}{debug\_close}}:}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}debug\_close"{}};}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}{devel}}:}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}devel"{}};}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_aaf67c94a68502c49308489ff01d8d0a8}{app}}:}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}application"{}};}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_af6e731e5771ab1a2267f79e5b9b8183a}{http}}:}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}http"{}};}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a2e485329910f92f8f6356cf27bafd4a2}{fail}}:}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}fail"{}};}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}unknown"{}};}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00197\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structwebsocketpp_1_1log_1_1alevel_af5fdb4de43a77cacb4c3a5b01b816750}\index{websocketpp::log::alevel@{websocketpp::log::alevel}!access\_core@{access\_core}}
+\index{access\_core@{access\_core}!websocketpp::log::alevel@{websocketpp::log::alevel}}
+\doxysubsubsection{\texorpdfstring{access\_core}{access\_core}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1log_1_1alevel_af5fdb4de43a77cacb4c3a5b01b816750} 
+\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}} const websocketpp\+::log\+::alevel\+::access\+\_\+core = 0x00003003\hspace{0.3cm}{\ttfamily [static]}}
+
+Aggregate package representing the commonly used core access channels Connect, Disconnect, Fail, and HTTP 
+
+Definition at line \mbox{\hyperlink{levels_8hpp_source_l00150}{150}} of file \mbox{\hyperlink{levels_8hpp_source}{levels.\+hpp}}.
+
+\Hypertarget{structwebsocketpp_1_1log_1_1alevel_a853aa0b8976e53f3181af3bc398d493e}\index{websocketpp::log::alevel@{websocketpp::log::alevel}!all@{all}}
+\index{all@{all}!websocketpp::log::alevel@{websocketpp::log::alevel}}
+\doxysubsubsection{\texorpdfstring{all}{all}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1log_1_1alevel_a853aa0b8976e53f3181af3bc398d493e} 
+\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}} const websocketpp\+::log\+::alevel\+::all = 0xffffffff\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{levels_8hpp_source_l00152}{152}} of file \mbox{\hyperlink{levels_8hpp_source}{levels.\+hpp}}.
+
+\Hypertarget{structwebsocketpp_1_1log_1_1alevel_aaf67c94a68502c49308489ff01d8d0a8}\index{websocketpp::log::alevel@{websocketpp::log::alevel}!app@{app}}
+\index{app@{app}!websocketpp::log::alevel@{websocketpp::log::alevel}}
+\doxysubsubsection{\texorpdfstring{app}{app}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1log_1_1alevel_aaf67c94a68502c49308489ff01d8d0a8} 
+\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}} const websocketpp\+::log\+::alevel\+::app = 0x800\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{levels_8hpp_source_l00143}{143}} of file \mbox{\hyperlink{levels_8hpp_source}{levels.\+hpp}}.
+
+\Hypertarget{structwebsocketpp_1_1log_1_1alevel_aac3e16b6df297567ba2533233d477d57}\index{websocketpp::log::alevel@{websocketpp::log::alevel}!connect@{connect}}
+\index{connect@{connect}!websocketpp::log::alevel@{websocketpp::log::alevel}}
+\doxysubsubsection{\texorpdfstring{connect}{connect}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1log_1_1alevel_aac3e16b6df297567ba2533233d477d57} 
+\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}} const websocketpp\+::log\+::alevel\+::connect = 0x1\hspace{0.3cm}{\ttfamily [static]}}
+
+One line for each new connection that includes a host of information including\+: the remote address, websocket version, requested resource, http code, remote user agent 
+
+Definition at line \mbox{\hyperlink{levels_8hpp_source_l00121}{121}} of file \mbox{\hyperlink{levels_8hpp_source}{levels.\+hpp}}.
+
+\Hypertarget{structwebsocketpp_1_1log_1_1alevel_ae67e6466bf3d9daf45cc865e8d48f445}\index{websocketpp::log::alevel@{websocketpp::log::alevel}!control@{control}}
+\index{control@{control}!websocketpp::log::alevel@{websocketpp::log::alevel}}
+\doxysubsubsection{\texorpdfstring{control}{control}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1log_1_1alevel_ae67e6466bf3d9daf45cc865e8d48f445} 
+\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}} const websocketpp\+::log\+::alevel\+::control = 0x4\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{levels_8hpp_source_l00125}{125}} of file \mbox{\hyperlink{levels_8hpp_source}{levels.\+hpp}}.
+
+\Hypertarget{structwebsocketpp_1_1log_1_1alevel_a8af43767d3814885f55495bf9f5f4df4}\index{websocketpp::log::alevel@{websocketpp::log::alevel}!debug\_close@{debug\_close}}
+\index{debug\_close@{debug\_close}!websocketpp::log::alevel@{websocketpp::log::alevel}}
+\doxysubsubsection{\texorpdfstring{debug\_close}{debug\_close}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1log_1_1alevel_a8af43767d3814885f55495bf9f5f4df4} 
+\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}} const websocketpp\+::log\+::alevel\+::debug\+\_\+close = 0x200\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{levels_8hpp_source_l00139}{139}} of file \mbox{\hyperlink{levels_8hpp_source}{levels.\+hpp}}.
+
+\Hypertarget{structwebsocketpp_1_1log_1_1alevel_a5756fbbc77e431534a43072f944283fc}\index{websocketpp::log::alevel@{websocketpp::log::alevel}!debug\_handshake@{debug\_handshake}}
+\index{debug\_handshake@{debug\_handshake}!websocketpp::log::alevel@{websocketpp::log::alevel}}
+\doxysubsubsection{\texorpdfstring{debug\_handshake}{debug\_handshake}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1log_1_1alevel_a5756fbbc77e431534a43072f944283fc} 
+\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}} const websocketpp\+::log\+::alevel\+::debug\+\_\+handshake = 0x100\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{levels_8hpp_source_l00137}{137}} of file \mbox{\hyperlink{levels_8hpp_source}{levels.\+hpp}}.
+
+\Hypertarget{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576}\index{websocketpp::log::alevel@{websocketpp::log::alevel}!devel@{devel}}
+\index{devel@{devel}!websocketpp::log::alevel@{websocketpp::log::alevel}}
+\doxysubsubsection{\texorpdfstring{devel}{devel}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1log_1_1alevel_a65ec21c75999c993c25c72569018f576} 
+\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}} const websocketpp\+::log\+::alevel\+::devel = 0x400\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{levels_8hpp_source_l00141}{141}} of file \mbox{\hyperlink{levels_8hpp_source}{levels.\+hpp}}.
+
+\Hypertarget{structwebsocketpp_1_1log_1_1alevel_af19681d3edb28e0407688eeda8f0005c}\index{websocketpp::log::alevel@{websocketpp::log::alevel}!disconnect@{disconnect}}
+\index{disconnect@{disconnect}!websocketpp::log::alevel@{websocketpp::log::alevel}}
+\doxysubsubsection{\texorpdfstring{disconnect}{disconnect}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1log_1_1alevel_af19681d3edb28e0407688eeda8f0005c} 
+\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}} const websocketpp\+::log\+::alevel\+::disconnect = 0x2\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{levels_8hpp_source_l00123}{123}} of file \mbox{\hyperlink{levels_8hpp_source}{levels.\+hpp}}.
+
+\Hypertarget{structwebsocketpp_1_1log_1_1alevel_ad35433a6b8793f2bd1f5595386a09c73}\index{websocketpp::log::alevel@{websocketpp::log::alevel}!endpoint@{endpoint}}
+\index{endpoint@{endpoint}!websocketpp::log::alevel@{websocketpp::log::alevel}}
+\doxysubsubsection{\texorpdfstring{endpoint}{endpoint}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1log_1_1alevel_ad35433a6b8793f2bd1f5595386a09c73} 
+\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}} const websocketpp\+::log\+::alevel\+::endpoint = 0x80\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{levels_8hpp_source_l00135}{135}} of file \mbox{\hyperlink{levels_8hpp_source}{levels.\+hpp}}.
+
+\Hypertarget{structwebsocketpp_1_1log_1_1alevel_a2e485329910f92f8f6356cf27bafd4a2}\index{websocketpp::log::alevel@{websocketpp::log::alevel}!fail@{fail}}
+\index{fail@{fail}!websocketpp::log::alevel@{websocketpp::log::alevel}}
+\doxysubsubsection{\texorpdfstring{fail}{fail}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1log_1_1alevel_a2e485329910f92f8f6356cf27bafd4a2} 
+\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}} const websocketpp\+::log\+::alevel\+::fail = 0x2000\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{levels_8hpp_source_l00147}{147}} of file \mbox{\hyperlink{levels_8hpp_source}{levels.\+hpp}}.
+
+\Hypertarget{structwebsocketpp_1_1log_1_1alevel_ac25fc7cb5fc229abb6fc893f16ffb678}\index{websocketpp::log::alevel@{websocketpp::log::alevel}!frame\_header@{frame\_header}}
+\index{frame\_header@{frame\_header}!websocketpp::log::alevel@{websocketpp::log::alevel}}
+\doxysubsubsection{\texorpdfstring{frame\_header}{frame\_header}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1log_1_1alevel_ac25fc7cb5fc229abb6fc893f16ffb678} 
+\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}} const websocketpp\+::log\+::alevel\+::frame\+\_\+header = 0x8\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{levels_8hpp_source_l00127}{127}} of file \mbox{\hyperlink{levels_8hpp_source}{levels.\+hpp}}.
+
+\Hypertarget{structwebsocketpp_1_1log_1_1alevel_aa38cfdf7a82f33cac319438462707e90}\index{websocketpp::log::alevel@{websocketpp::log::alevel}!frame\_payload@{frame\_payload}}
+\index{frame\_payload@{frame\_payload}!websocketpp::log::alevel@{websocketpp::log::alevel}}
+\doxysubsubsection{\texorpdfstring{frame\_payload}{frame\_payload}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1log_1_1alevel_aa38cfdf7a82f33cac319438462707e90} 
+\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}} const websocketpp\+::log\+::alevel\+::frame\+\_\+payload = 0x10\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{levels_8hpp_source_l00129}{129}} of file \mbox{\hyperlink{levels_8hpp_source}{levels.\+hpp}}.
+
+\Hypertarget{structwebsocketpp_1_1log_1_1alevel_af6e731e5771ab1a2267f79e5b9b8183a}\index{websocketpp::log::alevel@{websocketpp::log::alevel}!http@{http}}
+\index{http@{http}!websocketpp::log::alevel@{websocketpp::log::alevel}}
+\doxysubsubsection{\texorpdfstring{http}{http}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1log_1_1alevel_af6e731e5771ab1a2267f79e5b9b8183a} 
+\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}} const websocketpp\+::log\+::alevel\+::http = 0x1000\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{levels_8hpp_source_l00145}{145}} of file \mbox{\hyperlink{levels_8hpp_source}{levels.\+hpp}}.
+
+\Hypertarget{structwebsocketpp_1_1log_1_1alevel_ae05d0972bc4d68cca49faf8c82d40304}\index{websocketpp::log::alevel@{websocketpp::log::alevel}!message\_header@{message\_header}}
+\index{message\_header@{message\_header}!websocketpp::log::alevel@{websocketpp::log::alevel}}
+\doxysubsubsection{\texorpdfstring{message\_header}{message\_header}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1log_1_1alevel_ae05d0972bc4d68cca49faf8c82d40304} 
+\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}} const websocketpp\+::log\+::alevel\+::message\+\_\+header = 0x20\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{levels_8hpp_source_l00131}{131}} of file \mbox{\hyperlink{levels_8hpp_source}{levels.\+hpp}}.
+
+\Hypertarget{structwebsocketpp_1_1log_1_1alevel_ace7d9b9c9ed82029ec93c4f45081b7ac}\index{websocketpp::log::alevel@{websocketpp::log::alevel}!message\_payload@{message\_payload}}
+\index{message\_payload@{message\_payload}!websocketpp::log::alevel@{websocketpp::log::alevel}}
+\doxysubsubsection{\texorpdfstring{message\_payload}{message\_payload}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1log_1_1alevel_ace7d9b9c9ed82029ec93c4f45081b7ac} 
+\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}} const websocketpp\+::log\+::alevel\+::message\+\_\+payload = 0x40\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{levels_8hpp_source_l00133}{133}} of file \mbox{\hyperlink{levels_8hpp_source}{levels.\+hpp}}.
+
+\Hypertarget{structwebsocketpp_1_1log_1_1alevel_a4cf0520816094999975fe73081cf30f2}\index{websocketpp::log::alevel@{websocketpp::log::alevel}!none@{none}}
+\index{none@{none}!websocketpp::log::alevel@{websocketpp::log::alevel}}
+\doxysubsubsection{\texorpdfstring{none}{none}}
+{\footnotesize\ttfamily \label{structwebsocketpp_1_1log_1_1alevel_a4cf0520816094999975fe73081cf30f2} 
+\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}} const websocketpp\+::log\+::alevel\+::none = 0x0\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{levels_8hpp_source_l00114}{114}} of file \mbox{\hyperlink{levels_8hpp_source}{levels.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/vendor/websocketpp/websocketpp/logger/\mbox{\hyperlink{levels_8hpp}{levels.\+hpp}}\end{DoxyCompactItemize}

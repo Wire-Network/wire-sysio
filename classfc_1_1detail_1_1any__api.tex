@@ -1,0 +1,223 @@
+\doxysection{fc\+::detail\+::any\+\_\+api Class Reference}
+\hypertarget{classfc_1_1detail_1_1any__api}{}\label{classfc_1_1detail_1_1any__api}\index{fc::detail::any\_api@{fc::detail::any\_api}}
+
+
+{\ttfamily \#include $<$api\+\_\+connection.\+hpp$>$}
+
+
+
+Inheritance diagram for fc\+::detail\+::any\+\_\+api\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=173pt]{classfc_1_1detail_1_1any__api__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for fc\+::detail\+::any\+\_\+api\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=173pt]{classfc_1_1detail_1_1any__api__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1detail_1_1any__api_a4ca3597c7722daa10cbe3e780d7a7d36}{any\+\_\+api}} (\mbox{\hyperlink{namespacefc_a18e9e0bd9c0a52896425ae1172bc4e2b}{api\+\_\+id\+\_\+type}} api\+\_\+id, const std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classfc_1_1api__connection}{fc\+::api\+\_\+connection}} $>$ \&con)
+\item 
+virtual \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{classfc_1_1detail_1_1any__api_a7b5ec2a4fdd53f29b311528c1576aa89}{get\+\_\+handle}} () const override
+\item 
+virtual \mbox{\hyperlink{namespacefc_a18e9e0bd9c0a52896425ae1172bc4e2b}{api\+\_\+id\+\_\+type}} \mbox{\hyperlink{classfc_1_1detail_1_1any__api_a57544c4d7f1dbb7aba824f4a9f618dd4}{register\+\_\+api}} (\mbox{\hyperlink{classfc_1_1api__connection}{api\+\_\+connection}} \&conn) const override
+\item 
+\mbox{\hyperlink{classfc_1_1detail_1_1any__api_abf5fa014c501ee0bd0447e939de0fd07}{any\+\_\+api}} (\mbox{\hyperlink{namespacefc_a18e9e0bd9c0a52896425ae1172bc4e2b}{api\+\_\+id\+\_\+type}} api\+\_\+id, const std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classfc_1_1binary__api__connection}{fc\+::binary\+\_\+api\+\_\+connection}} $>$ \&con)
+\item 
+virtual \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{classfc_1_1detail_1_1any__api_a7b5ec2a4fdd53f29b311528c1576aa89}{get\+\_\+handle}} () const override
+\item 
+virtual \mbox{\hyperlink{namespacefc_a18e9e0bd9c0a52896425ae1172bc4e2b}{api\+\_\+id\+\_\+type}} \mbox{\hyperlink{classfc_1_1detail_1_1any__api_a06cabf40fd68e9983f28854d8a1df828}{register\+\_\+api}} (\mbox{\hyperlink{classfc_1_1binary__api__connection}{binary\+\_\+api\+\_\+connection}} \&conn) const override
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classfc_1_1api__base}{fc\+::api\+\_\+base}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1api__base_a8defc5c5b610084dcb77e9ddcdef3e2e}{api\+\_\+base}} ()
+\item 
+virtual \mbox{\hyperlink{classfc_1_1api__base_a7191e098deecfd91e0859de0db8440db}{\texorpdfstring{$\sim$}{\string~}api\+\_\+base}} ()
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{classfc_1_1api}{api}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{structfc_1_1identity__member}{identity\+\_\+member}} $>$ \mbox{\hyperlink{classfc_1_1api__base_a570f3175e653255270219c3613ad7996}{as}} ()
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{classfc_1_1api}{api}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \mbox{\hyperlink{classfc_1_1api__base_acd5bdfb71e2f032cf843b67b6043f063}{as}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacefc_a18e9e0bd9c0a52896425ae1172bc4e2b}{api\+\_\+id\+\_\+type}} \mbox{\hyperlink{classfc_1_1detail_1_1any__api_a534d5a13911c242a2d49a21c9785760d}{\+\_\+api\+\_\+id}}
+\item 
+std\+::weak\+\_\+ptr$<$ \mbox{\hyperlink{classfc_1_1api__connection}{fc\+::api\+\_\+connection}} $>$ \mbox{\hyperlink{classfc_1_1detail_1_1any__api_aae058b58c4a7d62908df6de21ad6a73a}{\+\_\+api\+\_\+connection}}
+\item 
+std\+::weak\+\_\+ptr$<$ \mbox{\hyperlink{classfc_1_1binary__api__connection}{fc\+::binary\+\_\+api\+\_\+connection}} $>$ \mbox{\hyperlink{classfc_1_1detail_1_1any__api_a623cda476ceed1743d3e4b7b1bd86e61}{\+\_\+binary\+\_\+api\+\_\+connection}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+If api$<$\+T$>$ is returned from a remote method, the API is eagerly bound to api$<$\+T$>$ of the correct type in api\+\_\+visitor\+::from\+\_\+variant(). This binding \mbox{[}1\mbox{]} needs a reference to the \doxylink{classfc_1_1api__connection}{api\+\_\+connection}, which is made available to \doxylink{namespacefc_accef08adf4ee05c36ccc550d8101b08f}{from\+\_\+variant()} as a parameter.
+
+However, in the case of a remote method which returns \doxylink{classfc_1_1api__base}{api\+\_\+base} which can subsequently be cast by the caller with as$<$\+T$>$, we need to keep track of the connection because the binding is done later (when the client code actually calls as$<$\+T$>$).
+
+\mbox{[}1\mbox{]} The binding actually happens in get\+\_\+remote\+\_\+api().
+
+If api$<$\+T$>$ is returned from a remote method, the API is eagerly bound to api$<$\+T$>$ of the correct type in api\+\_\+visitor\+::from\+\_\+variant(). This binding \mbox{[}1\mbox{]} needs a reference to the \doxylink{classfc_1_1binary__api__connection}{binary\+\_\+api\+\_\+connection}, which is made available to \doxylink{namespacefc_accef08adf4ee05c36ccc550d8101b08f}{from\+\_\+variant()} as a parameter.
+
+However, in the case of a remote method which returns \doxylink{classfc_1_1api__base}{api\+\_\+base} which can subsequently be cast by the caller with as$<$\+T$>$, we need to keep track of the connection because the binding is done later (when the client code actually calls as$<$\+T$>$).
+
+\mbox{[}1\mbox{]} The binding actually happens in get\+\_\+remote\+\_\+api(). 
+
+Definition at line \mbox{\hyperlink{binary__api__connection_8hpp_source_l00079}{79}} of file \mbox{\hyperlink{binary__api__connection_8hpp_source}{binary\+\_\+api\+\_\+connection.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1detail_1_1any__api_a4ca3597c7722daa10cbe3e780d7a7d36}\index{fc::detail::any\_api@{fc::detail::any\_api}!any\_api@{any\_api}}
+\index{any\_api@{any\_api}!fc::detail::any\_api@{fc::detail::any\_api}}
+\doxysubsubsection{\texorpdfstring{any\_api()}{any\_api()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1any__api_a4ca3597c7722daa10cbe3e780d7a7d36} 
+fc\+::detail\+::any\+\_\+api\+::any\+\_\+api (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacefc_a18e9e0bd9c0a52896425ae1172bc4e2b}{api\+\_\+id\+\_\+type}}}]{api\+\_\+id}{, }\item[{const std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classfc_1_1api__connection}{fc\+::api\+\_\+connection}} $>$ \&}]{con}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{api__connection_8hpp_source_l00081}{81}} of file \mbox{\hyperlink{api__connection_8hpp_source}{api\+\_\+connection.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{classfc_1_1detail_1_1any__api_a534d5a13911c242a2d49a21c9785760d}{\_api\_id}}(api\_id),\ \mbox{\hyperlink{classfc_1_1detail_1_1any__api_aae058b58c4a7d62908df6de21ad6a73a}{\_api\_connection}}(con)\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1detail_1_1any__api_abf5fa014c501ee0bd0447e939de0fd07}\index{fc::detail::any\_api@{fc::detail::any\_api}!any\_api@{any\_api}}
+\index{any\_api@{any\_api}!fc::detail::any\_api@{fc::detail::any\_api}}
+\doxysubsubsection{\texorpdfstring{any\_api()}{any\_api()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1any__api_abf5fa014c501ee0bd0447e939de0fd07} 
+fc\+::detail\+::any\+\_\+api\+::any\+\_\+api (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacefc_a18e9e0bd9c0a52896425ae1172bc4e2b}{api\+\_\+id\+\_\+type}}}]{api\+\_\+id}{, }\item[{const std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classfc_1_1binary__api__connection}{fc\+::binary\+\_\+api\+\_\+connection}} $>$ \&}]{con}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{binary__api__connection_8hpp_source_l00082}{82}} of file \mbox{\hyperlink{binary__api__connection_8hpp_source}{binary\+\_\+api\+\_\+connection.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{classfc_1_1detail_1_1any__api_a534d5a13911c242a2d49a21c9785760d}{\_api\_id}}(api\_id),\ \mbox{\hyperlink{classfc_1_1detail_1_1any__api_a623cda476ceed1743d3e4b7b1bd86e61}{\_binary\_api\_connection}}(con)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1detail_1_1any__api_a7b5ec2a4fdd53f29b311528c1576aa89}\index{fc::detail::any\_api@{fc::detail::any\_api}!get\_handle@{get\_handle}}
+\index{get\_handle@{get\_handle}!fc::detail::any\_api@{fc::detail::any\_api}}
+\doxysubsubsection{\texorpdfstring{get\_handle()}{get\_handle()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1any__api_a7b5ec2a4fdd53f29b311528c1576aa89} 
+virtual \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} fc\+::detail\+::any\+\_\+api\+::get\+\_\+handle (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classfc_1_1api__base_a101030d0c1e946040fc8dade7f051309}{fc\+::api\+\_\+base}}.
+
+
+
+Definition at line \mbox{\hyperlink{api__connection_8hpp_source_l00084}{84}} of file \mbox{\hyperlink{api__connection_8hpp_source}{api\+\_\+connection.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \ \ \ \ \{\ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1detail_1_1any__api_a534d5a13911c242a2d49a21c9785760d}{\_api\_id}};\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1detail_1_1any__api_a7b5ec2a4fdd53f29b311528c1576aa89}\index{fc::detail::any\_api@{fc::detail::any\_api}!get\_handle@{get\_handle}}
+\index{get\_handle@{get\_handle}!fc::detail::any\_api@{fc::detail::any\_api}}
+\doxysubsubsection{\texorpdfstring{get\_handle()}{get\_handle()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1any__api_a7b5ec2a4fdd53f29b311528c1576aa89} 
+virtual \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} fc\+::detail\+::any\+\_\+api\+::get\+\_\+handle (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classfc_1_1api__base_a101030d0c1e946040fc8dade7f051309}{fc\+::api\+\_\+base}}.
+
+
+
+Definition at line \mbox{\hyperlink{binary__api__connection_8hpp_source_l00085}{85}} of file \mbox{\hyperlink{binary__api__connection_8hpp_source}{binary\+\_\+api\+\_\+connection.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \ \ \ \ \{\ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1detail_1_1any__api_a534d5a13911c242a2d49a21c9785760d}{\_api\_id}};\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1detail_1_1any__api_a57544c4d7f1dbb7aba824f4a9f618dd4}\index{fc::detail::any\_api@{fc::detail::any\_api}!register\_api@{register\_api}}
+\index{register\_api@{register\_api}!fc::detail::any\_api@{fc::detail::any\_api}}
+\doxysubsubsection{\texorpdfstring{register\_api()}{register\_api()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1any__api_a57544c4d7f1dbb7aba824f4a9f618dd4} 
+virtual \mbox{\hyperlink{namespacefc_a18e9e0bd9c0a52896425ae1172bc4e2b}{api\+\_\+id\+\_\+type}} fc\+::detail\+::any\+\_\+api\+::register\+\_\+api (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1api__connection}{api\+\_\+connection}} \&}]{conn}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classfc_1_1api__base_a999476d6eb0dd3a40d40a496c9c1a318}{fc\+::api\+\_\+base}}.
+
+
+
+Definition at line \mbox{\hyperlink{api__connection_8hpp_source_l00087}{87}} of file \mbox{\hyperlink{api__connection_8hpp_source}{api\+\_\+connection.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \ \ \ \{\ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ \textcolor{keyword}{false}\ );\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_a18e9e0bd9c0a52896425ae1172bc4e2b}{api\_id\_type}}();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1detail_1_1any__api_a06cabf40fd68e9983f28854d8a1df828}\index{fc::detail::any\_api@{fc::detail::any\_api}!register\_api@{register\_api}}
+\index{register\_api@{register\_api}!fc::detail::any\_api@{fc::detail::any\_api}}
+\doxysubsubsection{\texorpdfstring{register\_api()}{register\_api()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1any__api_a06cabf40fd68e9983f28854d8a1df828} 
+virtual \mbox{\hyperlink{namespacefc_a18e9e0bd9c0a52896425ae1172bc4e2b}{api\+\_\+id\+\_\+type}} fc\+::detail\+::any\+\_\+api\+::register\+\_\+api (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1binary__api__connection}{binary\+\_\+api\+\_\+connection}} \&}]{conn}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{binary__api__connection_8hpp_source_l00088}{88}} of file \mbox{\hyperlink{binary__api__connection_8hpp_source}{binary\+\_\+api\+\_\+connection.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \ \{\ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ \textcolor{keyword}{false}\ );\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_a18e9e0bd9c0a52896425ae1172bc4e2b}{api\_id\_type}}();\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classfc_1_1detail_1_1any__api_aae058b58c4a7d62908df6de21ad6a73a}\index{fc::detail::any\_api@{fc::detail::any\_api}!\_api\_connection@{\_api\_connection}}
+\index{\_api\_connection@{\_api\_connection}!fc::detail::any\_api@{fc::detail::any\_api}}
+\doxysubsubsection{\texorpdfstring{\_api\_connection}{\_api\_connection}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1any__api_aae058b58c4a7d62908df6de21ad6a73a} 
+std\+::weak\+\_\+ptr$<$\mbox{\hyperlink{classfc_1_1api__connection}{fc\+::api\+\_\+connection}}$>$ fc\+::detail\+::any\+\_\+api\+::\+\_\+api\+\_\+connection}
+
+
+
+Definition at line \mbox{\hyperlink{api__connection_8hpp_source_l00091}{91}} of file \mbox{\hyperlink{api__connection_8hpp_source}{api\+\_\+connection.\+hpp}}.
+
+\Hypertarget{classfc_1_1detail_1_1any__api_a534d5a13911c242a2d49a21c9785760d}\index{fc::detail::any\_api@{fc::detail::any\_api}!\_api\_id@{\_api\_id}}
+\index{\_api\_id@{\_api\_id}!fc::detail::any\_api@{fc::detail::any\_api}}
+\doxysubsubsection{\texorpdfstring{\_api\_id}{\_api\_id}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1any__api_a534d5a13911c242a2d49a21c9785760d} 
+\mbox{\hyperlink{namespacefc_a18e9e0bd9c0a52896425ae1172bc4e2b}{api\+\_\+id\+\_\+type}} fc\+::detail\+::any\+\_\+api\+::\+\_\+api\+\_\+id}
+
+
+
+Definition at line \mbox{\hyperlink{api__connection_8hpp_source_l00090}{90}} of file \mbox{\hyperlink{api__connection_8hpp_source}{api\+\_\+connection.\+hpp}}.
+
+\Hypertarget{classfc_1_1detail_1_1any__api_a623cda476ceed1743d3e4b7b1bd86e61}\index{fc::detail::any\_api@{fc::detail::any\_api}!\_binary\_api\_connection@{\_binary\_api\_connection}}
+\index{\_binary\_api\_connection@{\_binary\_api\_connection}!fc::detail::any\_api@{fc::detail::any\_api}}
+\doxysubsubsection{\texorpdfstring{\_binary\_api\_connection}{\_binary\_api\_connection}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1any__api_a623cda476ceed1743d3e4b7b1bd86e61} 
+std\+::weak\+\_\+ptr$<$\mbox{\hyperlink{classfc_1_1binary__api__connection}{fc\+::binary\+\_\+api\+\_\+connection}}$>$ fc\+::detail\+::any\+\_\+api\+::\+\_\+binary\+\_\+api\+\_\+connection}
+
+
+
+Definition at line \mbox{\hyperlink{binary__api__connection_8hpp_source_l00092}{92}} of file \mbox{\hyperlink{binary__api__connection_8hpp_source}{binary\+\_\+api\+\_\+connection.\+hpp}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/rpc/\mbox{\hyperlink{api__connection_8hpp}{api\+\_\+connection.\+hpp}}\item 
+libraries/fc/include/fc/rpc/\mbox{\hyperlink{binary__api__connection_8hpp}{binary\+\_\+api\+\_\+connection.\+hpp}}\end{DoxyCompactItemize}

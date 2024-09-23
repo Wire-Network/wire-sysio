@@ -1,0 +1,9 @@
+<map id="Catch::TestCaseTracking::NameAndLocation" name="Catch::TestCaseTracking::NameAndLocation">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,183,176,223"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="30,94,84,120"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="69,133,86,181,81,183,64,135"/>
+<area shape="rect" id="Node000003" href="$struct_catch_1_1_source_line_info.html" title=" " alt="" coords="108,94,260,120"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="163,133,112,184,108,180,159,129"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="156,5,212,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="186,47,186,94,181,94,181,47"/>
+</map>

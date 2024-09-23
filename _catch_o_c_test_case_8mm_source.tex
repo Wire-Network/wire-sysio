@@ -1,0 +1,92 @@
+\doxysection{Catch\+OCTest\+Case.\+mm}
+\hypertarget{_catch_o_c_test_case_8mm_source}{}\label{_catch_o_c_test_case_8mm_source}\index{libraries/sys-\/vm/external/Catch2/projects/XCode/OCTest/OCTest/CatchOCTestCase.mm@{libraries/sys-\/vm/external/Catch2/projects/XCode/OCTest/OCTest/CatchOCTestCase.mm}}
+\mbox{\hyperlink{_catch_o_c_test_case_8mm}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00001}00001\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00002}00002\ \textcolor{comment}{//\ \ CatchOCTestCase.mm}}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00003}00003\ \textcolor{comment}{//\ \ OCTest}}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00004}00004\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00005}00005\ \textcolor{comment}{//\ \ Created\ by\ Phil\ Nash\ on\ 13/11/2010.}}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00006}00006\ \textcolor{comment}{//\ \ Copyright\ 2010\ Two\ Blue\ Cubes\ Ltd.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00007}00007\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00008}00008\ \textcolor{comment}{//\ \ Distributed\ under\ the\ Boost\ Software\ License,\ Version\ 1.0.\ (See\ accompanying}}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00009}00009\ \textcolor{comment}{//\ \ file\ LICENSE\_1\_0.txt\ or\ copy\ at\ http://www.boost.org/LICENSE\_1\_0.txt)}}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00011}00011\ \textcolor{preprocessor}{\#import\ "{}\mbox{\hyperlink{_catch_o_c_test_case_8h}{CatchOCTestCase.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00014}00014\ \textcolor{keyword}{@implementation\ }\mbox{\hyperlink{interface_test_fixture}{TestFixture}}}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00017}00017\ -\/(void)\ \mbox{\hyperlink{protocol_oc_fixture-p_a881fb286076ba8962da99296cebf03c6}{setUp}}}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00018}00018\ \{}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00019}00019\ \ \ \ \ \mbox{\hyperlink{interface_test_fixture_a539fa22023c932062c37290ff315d85e}{obj}}\ =\ [[\mbox{\hyperlink{interface_test_obj}{TestObj}}\ alloc]\ init];}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00020}00020\ \}}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00022}00022\ -\/(void)\ \mbox{\hyperlink{protocol_oc_fixture-p_ab6d2d9aa342d1c95f37471d03bb2f242}{tearDown}}}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00023}00023\ \{}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00024}00024\ \ \ \ \ \mbox{\hyperlink{catch__objc__arc_8hpp_a1f6b4a44e1eaaa87534d1f28669897dc}{arcSafeRelease}}(\ \mbox{\hyperlink{interface_test_fixture_a539fa22023c932062c37290ff315d85e}{obj}}\ );}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00025}00025\ \}}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00027}00027\ \mbox{\hyperlink{catch__objc_8hpp_a648ab6307626eb2d0afc76440a699c3f}{OC\_TEST\_CASE}}(\ \textcolor{stringliteral}{"{}This\ is\ a\ test\ case"{}},\ \textcolor{stringliteral}{"{}"{}}\ )}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00028}00028\ \{}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00029}00029\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{interface_test_fixture_a539fa22023c932062c37290ff315d85e}{obj}}.\mbox{\hyperlink{interface_test_obj_a226fb46a690876881e686dcf4bdb04ca}{int\_val}}\ ==\ 0\ );}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00031}00031\ \ \ \ \ \mbox{\hyperlink{interface_test_fixture_a539fa22023c932062c37290ff315d85e}{obj}}.\mbox{\hyperlink{interface_test_obj_a226fb46a690876881e686dcf4bdb04ca}{int\_val}}\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00033}00033\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{interface_test_fixture_a539fa22023c932062c37290ff315d85e}{obj}}.\mbox{\hyperlink{interface_test_obj_a226fb46a690876881e686dcf4bdb04ca}{int\_val}}\ ==\ 1\ );}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00034}00034\ \}}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00036}00036\ \mbox{\hyperlink{catch__objc_8hpp_a648ab6307626eb2d0afc76440a699c3f}{OC\_TEST\_CASE}}(\ \textcolor{stringliteral}{"{}This\ is\ another\ test\ case"{}},\ \textcolor{stringliteral}{"{}"{}}\ )}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00037}00037\ \{}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00038}00038\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{interface_test_fixture_a539fa22023c932062c37290ff315d85e}{obj}}.\mbox{\hyperlink{interface_test_obj_a226fb46a690876881e686dcf4bdb04ca}{int\_val}}\ ==\ 0\ );}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00040}00040\ \ \ \ \ \mbox{\hyperlink{interface_test_fixture_a539fa22023c932062c37290ff315d85e}{obj}}.\mbox{\hyperlink{interface_test_obj_a226fb46a690876881e686dcf4bdb04ca}{int\_val}}\ =\ 2;}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00042}00042\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{interface_test_fixture_a539fa22023c932062c37290ff315d85e}{obj}}.\mbox{\hyperlink{interface_test_obj_a226fb46a690876881e686dcf4bdb04ca}{int\_val}}\ ==\ 2\ );}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00043}00043\ \}}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00045}00045\ \mbox{\hyperlink{catch__objc_8hpp_a648ab6307626eb2d0afc76440a699c3f}{OC\_TEST\_CASE}}(\ \textcolor{stringliteral}{"{}tests\ a\ boolean\ value"{}},\ \textcolor{stringliteral}{"{}[!shouldfail]"{}}\ )}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00046}00046\ \{}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00047}00047\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ [\mbox{\hyperlink{interface_test_fixture_a539fa22023c932062c37290ff315d85e}{obj}}\ isTrue]\ ==\ NO\ );}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00048}00048\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ [\mbox{\hyperlink{interface_test_fixture_a539fa22023c932062c37290ff315d85e}{obj}}\ isFalse]\ ==\ YES\ );}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00049}00049\ \}}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00051}00051\ \mbox{\hyperlink{catch__objc_8hpp_a648ab6307626eb2d0afc76440a699c3f}{OC\_TEST\_CASE}}(\ \textcolor{stringliteral}{"{}throws\ an\ Objective-\/C\ exception"{}},\ \textcolor{stringliteral}{"{}[!throws][!shouldfail]"{}}\ )}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00052}00052\ \{}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00053}00053\ \ \ \ \ \textcolor{keyword}{@throw}\ [[NSException\ alloc]\ initWithName:\ NSGenericException}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ reason:\ @"{}Objective-\/C\ exception"{}}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ userInfo:\ nil];}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00056}00056\ \}}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00057}00057\ \mbox{\hyperlink{catch__objc_8hpp_a648ab6307626eb2d0afc76440a699c3f}{OC\_TEST\_CASE}}(\ \textcolor{stringliteral}{"{}throws\ a\ std\ c++\ exception"{}},\ \textcolor{stringliteral}{"{}[!throws][!shouldfail]"{}}\ )}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00058}00058\ \{}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00059}00059\ \ \ \ \ \textcolor{keywordflow}{throw}\ std::domain\_error(\ \textcolor{stringliteral}{"{}std\ C++\ exception"{}}\ );}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00060}00060\ \}}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00063}00063\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00064}00064\ \textcolor{keywordtype}{void}\ useObject(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ \textcolor{keywordtype}{object}\ )\{\}}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00066}00066\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00067}00067\ \textcolor{keywordtype}{void}\ useObject(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ \textcolor{keywordtype}{object}\ )\{\}}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00069}00069\ \mbox{\hyperlink{catch__objc_8hpp_a648ab6307626eb2d0afc76440a699c3f}{OC\_TEST\_CASE}}(\ \textcolor{stringliteral}{"{}Matches\ work\ with\ OC\ types\ (NSString\ so\ far)"{}},\ \textcolor{stringliteral}{"{}[!shouldfail]"{}}\ )}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00070}00070\ \{}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00071}00071\ \ \ \ \ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespace_catch_1_1_matchers}{Catch::Matchers}};}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00073}00073\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ac1354db6f3e9c1e0a8eda0eea7ff1f0a}{REQUIRE\_THAT}}(\ \textcolor{stringliteral}{@"{}This\ is\ a\ string"{}},\ \mbox{\hyperlink{namespace_catch_1_1_matchers_a7130e11f26473da0efe7cd340579a843}{Equals}}(\ \textcolor{stringliteral}{@"{}This\ isn't\ a\ string"{}}\ )\ );}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00074}00074\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ac1354db6f3e9c1e0a8eda0eea7ff1f0a}{REQUIRE\_THAT}}(\ \textcolor{stringliteral}{@"{}This\ is\ a\ string"{}},\ Contains(\ \textcolor{stringliteral}{@"{}is\ a"{}}\ )\ );}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00075}00075\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ac1354db6f3e9c1e0a8eda0eea7ff1f0a}{REQUIRE\_THAT}}(\ \textcolor{stringliteral}{@"{}This\ is\ a\ string"{}},\ StartsWith(\ \textcolor{stringliteral}{@"{}This"{}}\ )\ );}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00076}00076\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ac1354db6f3e9c1e0a8eda0eea7ff1f0a}{REQUIRE\_THAT}}(\ \textcolor{stringliteral}{@"{}This\ is\ a\ string"{}},\ EndsWith(\ \textcolor{stringliteral}{@"{}string"{}}\ )\ );}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00077}00077\ \}}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00079}00079\ \mbox{\hyperlink{catch__objc_8hpp_a648ab6307626eb2d0afc76440a699c3f}{OC\_TEST\_CASE}}(\ \textcolor{stringliteral}{"{}nil\ NSString\ should\ not\ crash\ the\ test"{}},\ \textcolor{stringliteral}{"{}[!shouldfail]"{}}\ )}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00080}00080\ \{}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00081}00081\ \ \ \ \ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespace_catch_1_1_matchers}{Catch::Matchers}};}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00083}00083\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a5b8c33c63e0804d4458e2c761370b75d}{CHECK\_THAT}}(\ (NSString*)nil,\ \mbox{\hyperlink{namespace_catch_1_1_matchers_a7130e11f26473da0efe7cd340579a843}{Equals}}(\ \textcolor{stringliteral}{@"{}This\ should\ fail,\ but\ not\ crash"{}}\ )\ );}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00084}00084\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a5b8c33c63e0804d4458e2c761370b75d}{CHECK\_THAT}}(\ (NSString*)nil,\ StartsWith(\ \textcolor{stringliteral}{@"{}anything"{}}\ )\ );}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00085}00085\ \}}
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00086}00086\ }
+\DoxyCodeLine{\Hypertarget{_catch_o_c_test_case_8mm_source_l00087}00087\ \textcolor{keyword}{@end}}
+
+\end{DoxyCode}

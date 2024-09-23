@@ -1,0 +1,52 @@
+\doxysection{modinv64.\+h}
+\hypertarget{modinv64_8h_source}{}\label{modinv64_8h_source}\index{libraries/fc/secp256k1/secp256k1/src/modinv64.h@{libraries/fc/secp256k1/secp256k1/src/modinv64.h}}
+\mbox{\hyperlink{modinv64_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{modinv64_8h_source_l00001}00001\ \textcolor{comment}{/***********************************************************************}}
+\DoxyCodeLine{\Hypertarget{modinv64_8h_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2020\ Peter\ Dettman\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{modinv64_8h_source_l00003}00003\ \textcolor{comment}{\ *\ Distributed\ under\ the\ MIT\ software\ license,\ see\ the\ accompanying\ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{modinv64_8h_source_l00004}00004\ \textcolor{comment}{\ *\ file\ COPYING\ or\ https://www.opensource.org/licenses/mit-\/license.php.*}}
+\DoxyCodeLine{\Hypertarget{modinv64_8h_source_l00005}00005\ \textcolor{comment}{\ **********************************************************************/}}
+\DoxyCodeLine{\Hypertarget{modinv64_8h_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{modinv64_8h_source_l00007}00007\ \textcolor{preprocessor}{\#ifndef\ SECP256K1\_MODINV64\_H}}
+\DoxyCodeLine{\Hypertarget{modinv64_8h_source_l00008}00008\ \textcolor{preprocessor}{\#define\ SECP256K1\_MODINV64\_H}}
+\DoxyCodeLine{\Hypertarget{modinv64_8h_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{modinv64_8h_source_l00010}00010\ \textcolor{preprocessor}{\#if\ defined\ HAVE\_CONFIG\_H}}
+\DoxyCodeLine{\Hypertarget{modinv64_8h_source_l00011}00011\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{libsecp256k1-config_8h}{libsecp256k1-\/config.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{modinv64_8h_source_l00012}00012\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{modinv64_8h_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{modinv64_8h_source_l00014}00014\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h}{util.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{modinv64_8h_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{modinv64_8h_source_l00016}00016\ \textcolor{preprocessor}{\#ifndef\ SECP256K1\_WIDEMUL\_INT128}}
+\DoxyCodeLine{\Hypertarget{modinv64_8h_source_l00017}00017\ \textcolor{preprocessor}{\#error\ "{}modinv64\ requires\ 128-\/bit\ wide\ multiplication\ support"{}}}
+\DoxyCodeLine{\Hypertarget{modinv64_8h_source_l00018}00018\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{modinv64_8h_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{modinv64_8h_source_l00020}00020\ \textcolor{comment}{/*\ A\ signed\ 62-\/bit\ limb\ representation\ of\ integers.}}
+\DoxyCodeLine{\Hypertarget{modinv64_8h_source_l00021}00021\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{modinv64_8h_source_l00022}00022\ \textcolor{comment}{\ *\ Its\ value\ is\ sum(v[i]\ *\ 2\string^(62*i),\ i=0..4).\ */}}
+\DoxyCodeLine{\Hypertarget{modinv64_8h_source_l00023}\mbox{\hyperlink{structsecp256k1__modinv64__signed62}{00023}}\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{\Hypertarget{modinv64_8h_source_l00024}\mbox{\hyperlink{structsecp256k1__modinv64__signed62_af1fde609ef5b78a36b1cff68f174ea58}{00024}}\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ v[5];}
+\DoxyCodeLine{\Hypertarget{modinv64_8h_source_l00025}00025\ \}\ \mbox{\hyperlink{structsecp256k1__modinv64__signed62}{secp256k1\_modinv64\_signed62}};}
+\DoxyCodeLine{\Hypertarget{modinv64_8h_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{modinv64_8h_source_l00027}\mbox{\hyperlink{structsecp256k1__modinv64__modinfo}{00027}}\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{\Hypertarget{modinv64_8h_source_l00028}00028\ \ \ \ \ \textcolor{comment}{/*\ The\ modulus\ in\ signed62\ notation,\ must\ be\ odd\ and\ in\ [3,\ 2\string^256].\ */}}
+\DoxyCodeLine{\Hypertarget{modinv64_8h_source_l00029}\mbox{\hyperlink{structsecp256k1__modinv64__modinfo_abccbf5d5ac77c9b77efe6f370f2ddbac}{00029}}\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__modinv64__signed62}{secp256k1\_modinv64\_signed62}}\ \mbox{\hyperlink{structsecp256k1__modinv64__modinfo_abccbf5d5ac77c9b77efe6f370f2ddbac}{modulus}};}
+\DoxyCodeLine{\Hypertarget{modinv64_8h_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{modinv64_8h_source_l00031}00031\ \ \ \ \ \textcolor{comment}{/*\ modulus\string^\{-\/1\}\ mod\ 2\string^62\ */}}
+\DoxyCodeLine{\Hypertarget{modinv64_8h_source_l00032}\mbox{\hyperlink{structsecp256k1__modinv64__modinfo_aaee13b9136056d43be6c8c3d4ed1ac5d}{00032}}\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{structsecp256k1__modinv64__modinfo_aaee13b9136056d43be6c8c3d4ed1ac5d}{modulus\_inv62}};}
+\DoxyCodeLine{\Hypertarget{modinv64_8h_source_l00033}00033\ \}\ \mbox{\hyperlink{structsecp256k1__modinv64__modinfo}{secp256k1\_modinv64\_modinfo}};}
+\DoxyCodeLine{\Hypertarget{modinv64_8h_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{modinv64_8h_source_l00035}00035\ \textcolor{comment}{/*\ Replace\ x\ with\ its\ modular\ inverse\ mod\ modinfo-\/>modulus.\ x\ must\ be\ in\ range\ [0,\ modulus).}}
+\DoxyCodeLine{\Hypertarget{modinv64_8h_source_l00036}00036\ \textcolor{comment}{\ *\ If\ x\ is\ zero,\ the\ result\ will\ be\ zero\ as\ well.\ If\ not,\ the\ inverse\ must\ exist\ (i.e.,\ the\ gcd\ of}}
+\DoxyCodeLine{\Hypertarget{modinv64_8h_source_l00037}00037\ \textcolor{comment}{\ *\ x\ and\ modulus\ must\ be\ 1).\ These\ rules\ are\ automatically\ satisfied\ if\ the\ modulus\ is\ prime.}}
+\DoxyCodeLine{\Hypertarget{modinv64_8h_source_l00038}00038\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{modinv64_8h_source_l00039}00039\ \textcolor{comment}{\ *\ On\ output,\ all\ of\ x's\ limbs\ will\ be\ in\ [0,\ 2\string^62).}}
+\DoxyCodeLine{\Hypertarget{modinv64_8h_source_l00040}00040\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{modinv64_8h_source_l00041}00041\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_modinv64\_var(\mbox{\hyperlink{structsecp256k1__modinv64__signed62}{secp256k1\_modinv64\_signed62}}\ *x,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__modinv64__modinfo}{secp256k1\_modinv64\_modinfo}}\ *modinfo);}
+\DoxyCodeLine{\Hypertarget{modinv64_8h_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{modinv64_8h_source_l00043}00043\ \textcolor{comment}{/*\ Same\ as\ secp256k1\_modinv64\_var,\ but\ constant\ time\ in\ x\ (not\ in\ the\ modulus).\ */}}
+\DoxyCodeLine{\Hypertarget{modinv64_8h_source_l00044}00044\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_modinv64(\mbox{\hyperlink{structsecp256k1__modinv64__signed62}{secp256k1\_modinv64\_signed62}}\ *x,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__modinv64__modinfo}{secp256k1\_modinv64\_modinfo}}\ *modinfo);}
+\DoxyCodeLine{\Hypertarget{modinv64_8h_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{modinv64_8h_source_l00046}00046\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{/*\ SECP256K1\_MODINV64\_H\ */}\textcolor{preprocessor}{}}
+
+\end{DoxyCode}

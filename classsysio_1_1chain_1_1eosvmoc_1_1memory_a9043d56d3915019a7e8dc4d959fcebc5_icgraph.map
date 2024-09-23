@@ -1,0 +1,7 @@
+<map id="sysio::chain::eosvmoc::memory::get_control_block" name="sysio::chain::eosvmoc::memory::get_control_block">
+<area shape="rect" id="Node000001" title=" " alt="" coords="471,13,657,54"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1chain_1_1eosvmoc_1_1executor.html#a53e27b539f049d467aa2f64c5dccff93" title=" " alt="" coords="271,13,423,54"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="455,36,424,36,424,30,455,30"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1chain_1_1webassembly_1_1eosvmoc_1_1eosvmoc__instantiated__module.html#a4832906addea3310a04753ee52792b21" title=" " alt="" coords="5,5,223,61"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="255,36,223,36,223,30,255,30"/>
+</map>

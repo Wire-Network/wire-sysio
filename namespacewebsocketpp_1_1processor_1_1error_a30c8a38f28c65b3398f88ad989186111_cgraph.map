@@ -1,0 +1,5 @@
+<map id="websocketpp::processor::error::to_ws" name="websocketpp::processor::error::to_ws">
+<area shape="rect" id="Node000001" title="Converts a processor error_code into a websocket close code." alt="" coords="5,13,169,54"/>
+<area shape="rect" id="Node000002" href="$namespacewebsocketpp_1_1processor_1_1error.html#a05888e4f40358343536893ef37f855a7" title="Get a reference to a static copy of the processor error category." alt="" coords="217,5,380,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="169,30,201,30,201,36,169,36"/>
+</map>

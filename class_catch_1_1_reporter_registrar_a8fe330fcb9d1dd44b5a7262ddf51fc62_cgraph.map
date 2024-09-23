@@ -1,0 +1,9 @@
+<map id="Catch::ReporterRegistrar::ReporterRegistrar" name="Catch::ReporterRegistrar::ReporterRegistrar">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,27,173,68"/>
+<area shape="rect" id="Node000002" href="$namespace_catch.html#a585459763f2c7610e57de2dd22dd1ad8" title=" " alt="" coords="221,5,422,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="173,34,205,30,206,35,174,40"/>
+<area shape="rect" id="Node000004" href="$struct_catch_1_1_i_mutable_registry_hub.html#a1c0ac202ac31ee9f88e8ff5cbac4b243" title=" " alt="" coords="228,55,415,96"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="174,55,212,60,212,65,173,60"/>
+<area shape="rect" id="Node000003" href="$class_catch_1_1_singleton.html#a8c18286fe40405813c5bab05e20ce4f0" title=" " alt="" coords="470,5,660,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="422,16,454,16,454,21,422,21"/>
+</map>

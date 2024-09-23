@@ -1,0 +1,100 @@
+\doxysection{sysio\+::chain\+::impl\+::abi\+\_\+to\+\_\+variant\+\_\+visitor\texorpdfstring{$<$}{<} T, Resolver \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classsysio_1_1chain_1_1impl_1_1abi__to__variant__visitor}{}\label{classsysio_1_1chain_1_1impl_1_1abi__to__variant__visitor}\index{sysio::chain::impl::abi\_to\_variant\_visitor$<$ T, Resolver $>$@{sysio::chain::impl::abi\_to\_variant\_visitor$<$ T, Resolver $>$}}
+
+
+{\ttfamily \#include $<$abi\+\_\+serializer.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classsysio_1_1chain_1_1impl_1_1abi__to__variant__visitor_a3b436fee0b26fad15f0beb6f452d2e94}{abi\+\_\+to\+\_\+variant\+\_\+visitor}} (\mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\+\_\+variant\+\_\+object}} \&\+\_\+mvo, const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\+\_\+val, Resolver \+\_\+resolver, \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1abi__traverse__context}{abi\+\_\+traverse\+\_\+context}} \&\+\_\+ctx)
+\item 
+{\footnotesize template$<$typename Member , \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} Class , Member Class\+::\texorpdfstring{$\ast$}{*} member$>$ }\\void \mbox{\hyperlink{classsysio_1_1chain_1_1impl_1_1abi__to__variant__visitor_a162199538f761761f8d80118f4b404b0}{operator()}} (const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}) const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, typename Resolver$>$\newline
+class sysio\+::chain\+::impl\+::abi\+\_\+to\+\_\+variant\+\_\+visitor$<$ T, Resolver $>$}
+Reflection visitor that uses a resolver to resolve ABIs for nested types this will degrade to the common \doxylink{namespacefc_adea61f2343de94d0fbcb920a32332ad9}{fc\+::to\+\_\+variant} as soon as the type no longer contains ABI related info
+
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em Reslover} & -\/ callable with the signature (const name\& code\+\_\+account) -\/\texorpdfstring{$>$}{>} std\+::optional$<$abi\+\_\+def$>$ \\
+\hline
+\end{DoxyTemplParams}
+
+
+Definition at line \mbox{\hyperlink{abi__serializer_8hpp_source_l00666}{666}} of file \mbox{\hyperlink{abi__serializer_8hpp_source}{abi\+\_\+serializer.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classsysio_1_1chain_1_1impl_1_1abi__to__variant__visitor_a3b436fee0b26fad15f0beb6f452d2e94}\index{sysio::chain::impl::abi\_to\_variant\_visitor$<$ T, Resolver $>$@{sysio::chain::impl::abi\_to\_variant\_visitor$<$ T, Resolver $>$}!abi\_to\_variant\_visitor@{abi\_to\_variant\_visitor}}
+\index{abi\_to\_variant\_visitor@{abi\_to\_variant\_visitor}!sysio::chain::impl::abi\_to\_variant\_visitor$<$ T, Resolver $>$@{sysio::chain::impl::abi\_to\_variant\_visitor$<$ T, Resolver $>$}}
+\doxysubsubsection{\texorpdfstring{abi\_to\_variant\_visitor()}{abi\_to\_variant\_visitor()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1impl_1_1abi__to__variant__visitor_a3b436fee0b26fad15f0beb6f452d2e94} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename Resolver $>$ \\
+\mbox{\hyperlink{classsysio_1_1chain_1_1impl_1_1abi__to__variant__visitor}{sysio\+::chain\+::impl\+::abi\+\_\+to\+\_\+variant\+\_\+visitor}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Resolver $>$\+::abi\+\_\+to\+\_\+variant\+\_\+visitor (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\+\_\+variant\+\_\+object}} \&}]{\+\_\+mvo}{, }\item[{const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{\+\_\+val}{, }\item[{Resolver}]{\+\_\+resolver}{, }\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1abi__traverse__context}{abi\+\_\+traverse\+\_\+context}} \&}]{\+\_\+ctx}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{abi__serializer_8hpp_source_l00669}{669}} of file \mbox{\hyperlink{abi__serializer_8hpp_source}{abi\+\_\+serializer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00670\ \ \ \ \ \ \ \ \ \ :\_vo(\_mvo)}
+\DoxyCodeLine{00671\ \ \ \ \ \ \ \ \ \ ,\_val(\_val)}
+\DoxyCodeLine{00672\ \ \ \ \ \ \ \ \ \ ,\_resolver(\_resolver)}
+\DoxyCodeLine{00673\ \ \ \ \ \ \ \ \ \ ,\_ctx(\_ctx)}
+\DoxyCodeLine{00674\ \ \ \ \ \ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1chain_1_1impl_1_1abi__to__variant__visitor_a162199538f761761f8d80118f4b404b0}\index{sysio::chain::impl::abi\_to\_variant\_visitor$<$ T, Resolver $>$@{sysio::chain::impl::abi\_to\_variant\_visitor$<$ T, Resolver $>$}!operator()@{operator()}}
+\index{operator()@{operator()}!sysio::chain::impl::abi\_to\_variant\_visitor$<$ T, Resolver $>$@{sysio::chain::impl::abi\_to\_variant\_visitor$<$ T, Resolver $>$}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1impl_1_1abi__to__variant__visitor_a162199538f761761f8d80118f4b404b0} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename Resolver $>$ \\
+template$<$typename Member , \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} Class , Member Class\+::\texorpdfstring{$\ast$}{*} member$>$ \\
+void \mbox{\hyperlink{classsysio_1_1chain_1_1impl_1_1abi__to__variant__visitor}{sysio\+::chain\+::impl\+::abi\+\_\+to\+\_\+variant\+\_\+visitor}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Resolver $>$\+::operator() (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{name}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+Visit a single member and add it to the variant object 
+\begin{DoxyTemplParams}{Template Parameters}
+{\em Member} & -\/ the member to visit \\
+\hline
+{\em Class} & -\/ the class we are traversing \\
+\hline
+{\em member} & -\/ pointer to the member \\
+\hline
+\end{DoxyTemplParams}
+
+\begin{DoxyParams}{Parameters}
+{\em name} & -\/ the name of the member \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{abi__serializer_8hpp_source_l00684}{684}} of file \mbox{\hyperlink{abi__serializer_8hpp_source}{abi\+\_\+serializer.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00685\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00686\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1abi__to__variant_abbeb188777872cd76843f89e974dcf0e}{abi\_to\_variant::add}}(\ \_vo,\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ (\_val.*member),\ \_resolver,\ \_ctx\ );}
+\DoxyCodeLine{00687\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1impl_1_1abi__to__variant__visitor_a162199538f761761f8d80118f4b404b0_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{abi__serializer_8hpp}{abi\+\_\+serializer.\+hpp}}\end{DoxyCompactItemize}

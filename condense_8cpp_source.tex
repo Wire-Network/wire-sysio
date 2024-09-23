@@ -1,0 +1,38 @@
+\doxysection{condense.\+cpp}
+\hypertarget{condense_8cpp_source}{}\label{condense_8cpp_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/example/condense/condense.cpp@{libraries/fc/include/fc/crypto/webauthn\_json/example/condense/condense.cpp}}
+\mbox{\hyperlink{condense_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{condense_8cpp_source_l00001}00001\ \textcolor{comment}{//\ JSON\ condenser\ example}}
+\DoxyCodeLine{\Hypertarget{condense_8cpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{condense_8cpp_source_l00003}00003\ \textcolor{comment}{//\ This\ example\ parses\ JSON\ text\ from\ stdin\ with\ validation,\ }}
+\DoxyCodeLine{\Hypertarget{condense_8cpp_source_l00004}00004\ \textcolor{comment}{//\ and\ re-\/output\ the\ JSON\ content\ to\ stdout\ without\ whitespace.}}
+\DoxyCodeLine{\Hypertarget{condense_8cpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{condense_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{reader_8h}{rapidjson/reader.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{condense_8cpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{writer_8h}{rapidjson/writer.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{condense_8cpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{filereadstream_8h}{rapidjson/filereadstream.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{condense_8cpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{filewritestream_8h}{rapidjson/filewritestream.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{condense_8cpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{en_8h}{rapidjson/error/en.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{condense_8cpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{condense_8cpp_source_l00012}00012\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacerapidjson}{rapidjson}};}
+\DoxyCodeLine{\Hypertarget{condense_8cpp_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{condense_8cpp_source_l00014}\mbox{\hyperlink{condense_8cpp_a81ce304348a420752ee080480d2b3095}{00014}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}(\textcolor{keywordtype}{int},\ \textcolor{keywordtype}{char}*[])\ \{}
+\DoxyCodeLine{\Hypertarget{condense_8cpp_source_l00015}00015\ \ \ \ \ \textcolor{comment}{//\ Prepare\ JSON\ reader\ and\ input\ stream.}}
+\DoxyCodeLine{\Hypertarget{condense_8cpp_source_l00016}00016\ \ \ \ \ \mbox{\hyperlink{class_generic_reader}{Reader}}\ reader;}
+\DoxyCodeLine{\Hypertarget{condense_8cpp_source_l00017}00017\ \ \ \ \ \textcolor{keywordtype}{char}\ readBuffer[65536];}
+\DoxyCodeLine{\Hypertarget{condense_8cpp_source_l00018}00018\ \ \ \ \ \mbox{\hyperlink{class_file_read_stream}{FileReadStream}}\ is(stdin,\ readBuffer,\ \textcolor{keyword}{sizeof}(readBuffer));}
+\DoxyCodeLine{\Hypertarget{condense_8cpp_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{condense_8cpp_source_l00020}00020\ \ \ \ \ \textcolor{comment}{//\ Prepare\ JSON\ writer\ and\ output\ stream.}}
+\DoxyCodeLine{\Hypertarget{condense_8cpp_source_l00021}00021\ \ \ \ \ \textcolor{keywordtype}{char}\ writeBuffer[65536];}
+\DoxyCodeLine{\Hypertarget{condense_8cpp_source_l00022}00022\ \ \ \ \ \mbox{\hyperlink{class_file_write_stream}{FileWriteStream}}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}(stdout,\ writeBuffer,\ \textcolor{keyword}{sizeof}(writeBuffer));}
+\DoxyCodeLine{\Hypertarget{condense_8cpp_source_l00023}00023\ \ \ \ \ \mbox{\hyperlink{class_writer}{Writer<FileWriteStream>}}\ writer(os);}
+\DoxyCodeLine{\Hypertarget{condense_8cpp_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{condense_8cpp_source_l00025}00025\ \ \ \ \ \textcolor{comment}{//\ JSON\ reader\ parse\ from\ the\ input\ stream\ and\ let\ writer\ generate\ the\ output.}}
+\DoxyCodeLine{\Hypertarget{condense_8cpp_source_l00026}00026\ \ \ \ \ \textcolor{keywordflow}{if}\ (!reader.\mbox{\hyperlink{class_generic_reader_a0c450620d14ff1824e58bb7bd9b42099}{Parse}}(is,\ writer))\ \{}
+\DoxyCodeLine{\Hypertarget{condense_8cpp_source_l00027}00027\ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}\(\backslash\)nError(\%u):\ \%s\(\backslash\)n"{}},\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\textcolor{keyword}{>}(reader.\mbox{\hyperlink{class_generic_reader_ae9008523ccd06d839a57335835cb4091}{GetErrorOffset}}()),\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_ga28835eb93d2c3c07bbea13515eb31415}{GetParseError\_En}}(reader.\mbox{\hyperlink{class_generic_reader_a937bf90919f50e1c370b312cee5833e8}{GetParseErrorCode}}()));}
+\DoxyCodeLine{\Hypertarget{condense_8cpp_source_l00028}00028\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{\Hypertarget{condense_8cpp_source_l00029}00029\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{condense_8cpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{condense_8cpp_source_l00031}00031\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{condense_8cpp_source_l00032}00032\ \}}
+
+\end{DoxyCode}

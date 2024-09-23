@@ -1,0 +1,149 @@
+\doxysection{libraries/fc/include/fc/crypto/webauthn\+\_\+json/test/unittest/istreamwrappertest.cpp File Reference}
+\hypertarget{istreamwrappertest_8cpp}{}\label{istreamwrappertest_8cpp}\index{libraries/fc/include/fc/crypto/webauthn\_json/test/unittest/istreamwrappertest.cpp@{libraries/fc/include/fc/crypto/webauthn\_json/test/unittest/istreamwrappertest.cpp}}
+{\ttfamily \#include "{}unittest.\+h"{}}\newline
+{\ttfamily \#include "{}rapidjson/istreamwrapper.\+h"{}}\newline
+{\ttfamily \#include "{}rapidjson/encodedstream.\+h"{}}\newline
+{\ttfamily \#include "{}rapidjson/document.\+h"{}}\newline
+{\ttfamily \#include $<$sstream$>$}\newline
+{\ttfamily \#include $<$fstream$>$}\newline
+Include dependency graph for istreamwrappertest.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{istreamwrappertest_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{istreamwrappertest_8cpp_a094c4188ee3ce4059b610931fae7584d}{TEST}} (\mbox{\hyperlink{class_i_stream_wrapper}{IStream\+Wrapper}}, istringstream)
+\item 
+\mbox{\hyperlink{istreamwrappertest_8cpp_a7623e3f1efdf5824e2060120907ee4b1}{TEST}} (\mbox{\hyperlink{class_i_stream_wrapper}{IStream\+Wrapper}}, stringstream)
+\item 
+\mbox{\hyperlink{istreamwrappertest_8cpp_ab7e3e7d322c547de212c4e641225139d}{TEST}} (\mbox{\hyperlink{class_i_stream_wrapper}{IStream\+Wrapper}}, wistringstream)
+\item 
+\mbox{\hyperlink{istreamwrappertest_8cpp_a930ba314abcb4e4f1a4f59f288880dba}{TEST}} (\mbox{\hyperlink{class_i_stream_wrapper}{IStream\+Wrapper}}, wstringstream)
+\item 
+\mbox{\hyperlink{istreamwrappertest_8cpp_a9c5c165e99d252d037f449731a524177}{TEST}} (\mbox{\hyperlink{class_i_stream_wrapper}{IStream\+Wrapper}}, ifstream)
+\item 
+\mbox{\hyperlink{istreamwrappertest_8cpp_a6b91d174b12191c11cf2771d4d41fa31}{TEST}} (\mbox{\hyperlink{class_i_stream_wrapper}{IStream\+Wrapper}}, fstream)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{istreamwrappertest_8cpp_a6b91d174b12191c11cf2771d4d41fa31}\index{istreamwrappertest.cpp@{istreamwrappertest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!istreamwrappertest.cpp@{istreamwrappertest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [1/6]}}
+{\footnotesize\ttfamily \label{istreamwrappertest_8cpp_a6b91d174b12191c11cf2771d4d41fa31} 
+TEST (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_i_stream_wrapper}{IStream\+Wrapper}}}]{}{, }\item[{fstream}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{istreamwrappertest_8cpp_source_l00135}{135}} of file \mbox{\hyperlink{istreamwrappertest_8cpp_source}{istreamwrappertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00136\ \ \ \ \ fstream\ \mbox{\hyperlink{namespace_xbyak_1_1util_a15900ed04e2e3994c89596ee26c4462b}{fs}};}
+\DoxyCodeLine{00137\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(Open(fs,\ \textcolor{stringliteral}{"{}utf8bom.json"{}}));}
+\DoxyCodeLine{00138\ \ \ \ \ \mbox{\hyperlink{class_i_stream_wrapper}{IStreamWrapper}}\ isw(fs);}
+\DoxyCodeLine{00139\ \ \ \ \ \mbox{\hyperlink{class_encoded_input_stream}{EncodedInputStream<UTF8<>}},\ \mbox{\hyperlink{class_i_stream_wrapper}{IStreamWrapper}}>\ eis(isw);}
+\DoxyCodeLine{00140\ \ \ \ \ \mbox{\hyperlink{class_generic_document}{Document}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}};}
+\DoxyCodeLine{00141\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(!\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.ParseStream(eis).HasParseError());}
+\DoxyCodeLine{00142\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.IsObject());}
+\DoxyCodeLine{00143\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(5u,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.MemberCount());}
+\DoxyCodeLine{00144\ \}}
+
+\end{DoxyCode}
+\Hypertarget{istreamwrappertest_8cpp_a9c5c165e99d252d037f449731a524177}\index{istreamwrappertest.cpp@{istreamwrappertest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!istreamwrappertest.cpp@{istreamwrappertest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [2/6]}}
+{\footnotesize\ttfamily \label{istreamwrappertest_8cpp_a9c5c165e99d252d037f449731a524177} 
+TEST (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_i_stream_wrapper}{IStream\+Wrapper}}}]{}{, }\item[{ifstream}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{istreamwrappertest_8cpp_source_l00124}{124}} of file \mbox{\hyperlink{istreamwrappertest_8cpp_source}{istreamwrappertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00125\ \ \ \ \ ifstream\ ifs;}
+\DoxyCodeLine{00126\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(Open(ifs,\ \textcolor{stringliteral}{"{}utf8bom.json"{}}));}
+\DoxyCodeLine{00127\ \ \ \ \ \mbox{\hyperlink{class_i_stream_wrapper}{IStreamWrapper}}\ isw(ifs);}
+\DoxyCodeLine{00128\ \ \ \ \ \mbox{\hyperlink{class_encoded_input_stream}{EncodedInputStream<UTF8<>}},\ \mbox{\hyperlink{class_i_stream_wrapper}{IStreamWrapper}}>\ eis(isw);}
+\DoxyCodeLine{00129\ \ \ \ \ \mbox{\hyperlink{class_generic_document}{Document}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}};}
+\DoxyCodeLine{00130\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(!\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.ParseStream(eis).HasParseError());}
+\DoxyCodeLine{00131\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.IsObject());}
+\DoxyCodeLine{00132\ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(5u,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.MemberCount());}
+\DoxyCodeLine{00133\ \}}
+
+\end{DoxyCode}
+\Hypertarget{istreamwrappertest_8cpp_a094c4188ee3ce4059b610931fae7584d}\index{istreamwrappertest.cpp@{istreamwrappertest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!istreamwrappertest.cpp@{istreamwrappertest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [3/6]}}
+{\footnotesize\ttfamily \label{istreamwrappertest_8cpp_a094c4188ee3ce4059b610931fae7584d} 
+TEST (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_i_stream_wrapper}{IStream\+Wrapper}}}]{}{, }\item[{istringstream}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{istreamwrappertest_8cpp_source_l00089}{89}} of file \mbox{\hyperlink{istreamwrappertest_8cpp_source}{istreamwrappertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00090\ \ \ \ \ TestStringStream<istringstream>();}
+\DoxyCodeLine{00091\ \}}
+
+\end{DoxyCode}
+\Hypertarget{istreamwrappertest_8cpp_a7623e3f1efdf5824e2060120907ee4b1}\index{istreamwrappertest.cpp@{istreamwrappertest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!istreamwrappertest.cpp@{istreamwrappertest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [4/6]}}
+{\footnotesize\ttfamily \label{istreamwrappertest_8cpp_a7623e3f1efdf5824e2060120907ee4b1} 
+TEST (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_i_stream_wrapper}{IStream\+Wrapper}}}]{}{, }\item[{stringstream}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{istreamwrappertest_8cpp_source_l00093}{93}} of file \mbox{\hyperlink{istreamwrappertest_8cpp_source}{istreamwrappertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00094\ \ \ \ \ TestStringStream<stringstream>();}
+\DoxyCodeLine{00095\ \}}
+
+\end{DoxyCode}
+\Hypertarget{istreamwrappertest_8cpp_ab7e3e7d322c547de212c4e641225139d}\index{istreamwrappertest.cpp@{istreamwrappertest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!istreamwrappertest.cpp@{istreamwrappertest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [5/6]}}
+{\footnotesize\ttfamily \label{istreamwrappertest_8cpp_ab7e3e7d322c547de212c4e641225139d} 
+TEST (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_i_stream_wrapper}{IStream\+Wrapper}}}]{}{, }\item[{wistringstream}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{istreamwrappertest_8cpp_source_l00097}{97}} of file \mbox{\hyperlink{istreamwrappertest_8cpp_source}{istreamwrappertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00098\ \ \ \ \ TestStringStream<wistringstream>();}
+\DoxyCodeLine{00099\ \}}
+
+\end{DoxyCode}
+\Hypertarget{istreamwrappertest_8cpp_a930ba314abcb4e4f1a4f59f288880dba}\index{istreamwrappertest.cpp@{istreamwrappertest.cpp}!TEST@{TEST}}
+\index{TEST@{TEST}!istreamwrappertest.cpp@{istreamwrappertest.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST()}{TEST()}\hspace{0.1cm}{\footnotesize\ttfamily [6/6]}}
+{\footnotesize\ttfamily \label{istreamwrappertest_8cpp_a930ba314abcb4e4f1a4f59f288880dba} 
+TEST (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_i_stream_wrapper}{IStream\+Wrapper}}}]{}{, }\item[{wstringstream}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{istreamwrappertest_8cpp_source_l00101}{101}} of file \mbox{\hyperlink{istreamwrappertest_8cpp_source}{istreamwrappertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00102\ \ \ \ \ TestStringStream<wstringstream>();}
+\DoxyCodeLine{00103\ \}}
+
+\end{DoxyCode}

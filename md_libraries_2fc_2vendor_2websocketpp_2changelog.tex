@@ -1,0 +1,178 @@
+\chapter{changelog}
+\hypertarget{md_libraries_2fc_2vendor_2websocketpp_2changelog}{}\label{md_libraries_2fc_2vendor_2websocketpp_2changelog}\index{changelog@{changelog}}
+HEAD
+
+0.\+7.\+0 -\/ 2016-\/02-\/22
+\begin{DoxyItemize}
+\item MINOR BREAKING SOCKET POLICY CHANGE\+: Asio transport socket policy method {\ttfamily cancel\+\_\+socket} will now return {\ttfamily lib\+::asio\+::error\+\_\+code} instead of {\ttfamily void}. Custom Asio transport socket policies will need to be updated accordingly. This does not affect anyone using the bundled socket policies.
+\item Feature\+: Basic support for the permessage-\/deflate extension. \#344
+\item Feature\+: Allow accessing the local endpoint when using the Asio transport. This allows inspection of the address and port in cases where they are chosen by the operating system rather than the user. Thank you Andreas Weis and Muzahid Hussain for reporting and related code. \#458
+\item Feature\+: Add support for subprotocols in Hybi00. Thank you Lukas Obermann for reporting and a patch. \#518
+\item Improvement\+: Better automatic std\+::chrono feature detection for Visual Studio
+\item Improvement\+: Major refactoring to bundled CMake build system. CMake can now be used to build all of the examples and the test suite. Thank you Thijs Wenker for a significant portion of this code. \#378, \#435, \#449
+\item Improvement\+: In build environments where {\ttfamily lib\+::error\+\_\+code} and {\ttfamily lib\+::asio\+::error\+\_\+code} match (such as using {\ttfamily \doxylink{namespaceboost_1_1asio}{boost\+::asio}} with {\ttfamily boost\+::system\+\_\+error} or standalone asio with {\ttfamily std\+::system\+\_\+error}, transport errors are passed through natively rather than being reported as a translated {\ttfamily pass\+\_\+through} error type.
+\item Improvement\+: Add a {\ttfamily get\+\_\+transport\+\_\+error} method to Asio transport connections to allow retrieving a machine readable native transport error.
+\item Improvement\+: Add {\ttfamily connection\+::get\+\_\+response}, {\ttfamily connection\+::get\+\_\+response\+\_\+code}, and {\ttfamily connection\+::get\+\_\+response\+\_\+msg} methods to allow accessing additional information about the HTTP responses that Web\+Socket++ sends. \#465 Thank you Flow86 for reporting.
+\item Improvement\+: Removes use of empty strings ("{}"{}) in favor of {\ttfamily string\+::clear()} and {\ttfamily string\+::empty()}. This avoids generating unnecessary temporary objects. \#468 Thank you Vladislav Yaroslavlev for reporting and a patch.
+\item Documentation\+: Adds an example demonstrating the use of external {\ttfamily io\+\_\+service}
+\item Documentation\+: Adds a simple echo\+\_\+client example.
+\item Documentation\+: Begins migration of the web based user manual into Doxygen.
+\item Bug\+: Fix memory leak when init\+\_\+asio produces an error. \#454 Thank you Mark Grimes for reporting and fixing.
+\item Bug\+: Fix crash when processing a specially crafted HTTP header. Thank you Eli Fidler for reporting, test cases, and a patch. \#456
+\item Bug\+: Fix an issue where standalone Asio builds that use TLS would not compile due to lingering boost code. \#448 Thank you mjsp for reporting
+\item Bug\+: Fix an issue where canceling a socket could throw an exception on some older Windows XP platforms. It now prints an appropriate set of log messages instead. Thank you Thijs Wenker for reporting and researching solutions. \#460
+\item Bug\+: Fix an issue where deferred HTTP connections that start sending a very long response before their HTTP handler ends would result in a second set of HTTP headers being injected into the output. Thank you Kevin Smith for reporting and providing test case details. \#443
+\item Bug\+: Fix an issue where the wrong type of strand was being created. Thank you Bastien Brunnenstein for reporting and a patch. \#462
+\item Bug\+: Fix an issue where TLS includes were broken for Asio Standalone builds. Thank you giachi and Bastien Brunnenstein for reporting. \#491
+\item Bug\+: Remove the use of cached read and write handlers in the Asio transport. This feature caused memory leaks when the io\+\_\+service the connection was running on was abruptly stopped. There isn\textquotesingle{}t a clean and safe way of using this optimization without global state and the associated locks. The locks perform worse. Thank you Xavier Gibert for reporting, test cases, and code. Fixes \#490.
+\item Bug\+: Fix a heap buffer overflow when checking very short URIs. Thank you Xavier Gibert for reporting and a patch \#524
+\item Compatibility\+: Fixes a number of build \& config issues on Visual Studio 2015
+\item Compatibility\+: Removes non-\/standards compliant masking behavior. \#395, \#469
+\item Compatibility\+: Replace deprecated use of auto\+\_\+ptr on systems where unique\+\_\+ptr is available.
+\end{DoxyItemize}
+
+0.\+6.\+0 -\/ 2015-\/06-\/02
+\begin{DoxyItemize}
+\item MINOR BREAKING TRANSPORT POLICY CHANGE\+: Custom transport policies will now be required to include a new method {\ttfamily void set\+\_\+uri(uri\+\_\+ptr u)}. An implementation is not required. The stub transport policy includes an example stub method that can be added to any existing custom transport policy to fulfill this requirement. This does not affect anyone using the bundled transports or configs.
+\item MINOR BREAKING SOCKET POLICY CHANGE\+: Custom asio transport socket policies will now be required to include a new method {\ttfamily void set\+\_\+uri(uri\+\_\+ptr u)}. Like with the transport layer, an implementation is not required. This does not affect anyone using the bundled socket policies.
+\item MINOR BREAKING DEPENDENCY CHANGE\+: When using Boost versions greater than or equal to 1.\+49 in C++03 mode, {\ttfamily libboost-\/chrono} is needed now instead of {\ttfamily libboost-\/date\+\_\+time}. Users with C++11 compilers or using Boost versions 1.\+48 and earlier are not affected. Note\+: This change affects the bundled unit test suite.
+\item Feature\+: Web\+Socket++ Asio transport policy can now be used with the standalone version of Asio (1.\+8.\+0+) when a C++11 compiler and standard library are present. This means that it is possible now to use Web\+Socket++\textquotesingle{}s Asio transport entirely without Boost. Thank you Robert Seiler for proof of concept code that was used as a guide for this implementation. Fixes \#324
+\item Feature\+: Adds a vectored/scatter-\/gather write handler to the iostream transport.
+\item Feature\+: Adds the ability to defer sending an HTTP response until sometime after the {\ttfamily http\+\_\+handler} is run. This allows processing of long running http handlers to defer their response until it is ready without blocking the network thread. references \#425
+\item Improvement\+: {\ttfamily echo\+\_\+server\+\_\+tls} has been update to demonstrate how to configure it for Mozilla\textquotesingle{}s recommended intermediate and modern TLS security profiles.
+\item Improvement\+: {\ttfamily endpoint\+::set\+\_\+timer} now uses a steady clock provided by {\ttfamily boost\+::chrono} or {\ttfamily std\+::chrono} where available instead of the non-\/monotonic system clock. Thank you breyed for reporting. fixes \#241
+\item Improvement\+: Outgoing TLS connections to servers using the SNI extension to choose a certificate will now work. Thank you moozzyk for reporting. Fixes \#400
+\item Improvement\+: Removes an unnecessary mutex lock in {\ttfamily get\+\_\+con\+\_\+from\+\_\+hdl}.
+\item Cleanup\+: Asio transport policy has been refactored to remove many Boost dependencies. On C++03 compilers the {\ttfamily boost\+::noncopyable} dependency has been removed and the {\ttfamily boost\+::date\+\_\+time} dependency has been replaced with the newer {\ttfamily boost\+::chrono} when possible. On C++11 compilers the {\ttfamily boost\+::aligned\+\_\+storage} and {\ttfamily boost\+::date\+\_\+time} dependencies are gone, replaced with equivalent C++11 standard library features.
+\item Bug\+: Fixes a potential dangling pointer and inconsistent error message handling in {\ttfamily \doxylink{classwebsocketpp_1_1exception}{websocketpp\+::exception}}. \#432 Thank you Tom Swirly for the fix.
+\end{DoxyItemize}
+
+0.\+5.\+1 -\/ 2015-\/02-\/27
+\begin{DoxyItemize}
+\item Bug\+: Fixes an issue where some frame data was counted against the max header size limit, resulting in connections that included a lot of frame data immediately after the opening handshake to fail.
+\item Bug\+: Fix a typo in the name of the set method for {\ttfamily max\+\_\+http\+\_\+body\+\_\+size}. \#406 Thank you jplatte for reporting.
+\end{DoxyItemize}
+
+0.\+5.\+0 -\/ 2015-\/01-\/22
+\begin{DoxyItemize}
+\item BREAKING UTILITY CHANGE\+: Deprecated methods {\ttfamily \href{http::parser::parse_headers}{\texttt{ http\+::parser\+::parse\+\_\+headers}}}, {\ttfamily \href{http::response::parse_complete}{\texttt{ http\+::response\+::parse\+\_\+complete}}}, and {\ttfamily \href{http::request::parse_complete}{\texttt{ http\+::request\+::parse\+\_\+complete}}} have been removed.
+\item Security\+: Disabled SSLv3 in example servers.
+\item Feature\+: Adds basic support for accessing HTTP request bodies in the http handler. \#181
+\item Feature\+: Adds the ability to register a shutdown handler when using the iostream transport. This provides a clean interface for triggering the shut down of external sockets and other cleanup without hooking in to higher level Web\+Socket handlers.
+\item Feature\+: Adds the ability to register a write handler when using the iostream transport. This handler can be used to handle transport output in place of registering an ostream to write to.
+\item Feature\+: Adds a new logging policy that outputs to syslog. \#386 Thank you Tom Hughes for submitting the initial version of this policy.
+\item Improvement\+: Message payload logging now prints text for text messages rather than binary.
+\item Improvement\+: Overhaul of handshake state machine. Should make it impossible for exceptions to bubble out of transport methods like {\ttfamily io\+\_\+service\+::run}.
+\item Improvement\+: Overhaul of handshake error reporting. Fail handler error codes will be more detailed and precise. Adds new \mbox{[}fail\mbox{]} and \mbox{[}http\mbox{]} logging channels that log failed websocket connections and successful HTTP connections respectively. \doxylink{struct_a}{A} new aggregate channel package, {\ttfamily alevel\+::access\+\_\+core}, allows enabling connect, disconnect, fail, and http together. Successful HTTP connections will no longer trigger a fail handler.
+\item Improvement\+: Ability to terminate connection during an http handler to cleanly suppress the default outgoing HTTP response.
+\item Documentation\+: Add Sending \& Receiving Messages step to chapter one of the {\ttfamily utility\+\_\+client} tutorial. Update {\ttfamily utility\+\_\+client} example to match.
+\item Cleanup\+: Removes unused files \& STL includes. Adds required STL includes. Normalizes include order.
+\item Bug\+: Fixes a fatal state error when a handshake response is completed immediately after that handshake times out. \#389
+\item Bug\+: Min\+GW fixes; C++11 feature detection, localtime use. \#393 Thank you Schebb for reporting, code, and testing.
+\item Bug\+: Fixes an issue where {\ttfamily \doxylink{classwebsocketpp_1_1exception_a62dabd977bc59faaca6dc268744a6089}{websocketpp\+::exception\+::what()}} could return an out of scope pointer. \#397 Thank you fabioang for reporting.
+\item Bug\+: Fixes an issue where endpoints were not reset properly after a call to {\ttfamily endpoint\+::listen} failed. \#390 Thank you wyyqyl for reporting.
+\end{DoxyItemize}
+
+0.\+4.\+0 -\/ 2014-\/11-\/04
+\begin{DoxyItemize}
+\item BREAKING API CHANGE\+: All Web\+Socket++ methods now throw an exception of type {\ttfamily \doxylink{classwebsocketpp_1_1exception}{websocketpp\+::exception}} which derives from {\ttfamily std\+::exception}. This normalizes all exception types under the standard exception hierarchy and allows Web\+Socket++ exceptions to be caught in the same statement as others. The error code that was previously thrown is wrapped in the exception object and can be accessed via the {\ttfamily \doxylink{classwebsocketpp_1_1exception_a2ca743bae5d6ba2be63d1a64bc2f878f}{websocketpp\+::exception\+::code()}} method.
+\item BREAKING API CHANGE\+: Custom logging policies have some new required constructors that take generic config settings rather than pointers to std\+::ostreams. This allows writing logging policies that do not involve the use of std\+::ostream. This does not affect anyone using the built in logging policies.
+\item BREAKING UTILITY CHANGE\+: {\ttfamily websocketpp\+::lib\+::net\+::htonll} and {\ttfamily websocketpp\+::lib\+::net\+::ntohll} have been prefixed with an underscore to avoid conflicts with similarly named macros in some operating systems. If you are using the Web\+Socket++ provided 64 bit host/network byte order functions you will need to switch to the prefixed versions.
+\item BREAKING UTILITY CHANGE\+: The signature of {\ttfamily base64\+\_\+encode} has changed from {\ttfamily websocketpp\+::base64\+\_\+encode(unsigned char const \texorpdfstring{$\ast$}{*}, unsigned int)} to {\ttfamily \doxylink{namespacewebsocketpp_aff36d40583424a2c879df02219133af8}{websocketpp\+::base64\+\_\+encode(unsigned char const \texorpdfstring{$\ast$}{*}, size\+\_\+t)}}.
+\item BREAKING UTILITY CHANGE\+: The signature of {\ttfamily sha1\+::calc} has changed from {\ttfamily websocketpp\+::sha1\+::calc(void const \texorpdfstring{$\ast$}{*}, int, unsigned char \texorpdfstring{$\ast$}{*})} to {\ttfamily \doxylink{namespacewebsocketpp_1_1sha1_ad75335df7a69d69b3fb8fef3f4594812}{websocketpp\+::sha1\+::calc(void const \texorpdfstring{$\ast$}{*}, size\+\_\+t, unsigned char \texorpdfstring{$\ast$}{*})}}
+\item Feature\+: Adds incomplete {\ttfamily minimal\+\_\+server} and {\ttfamily minimal\+\_\+client} configs that can be used to build custom configs without pulling in the dependencies of {\ttfamily core} or {\ttfamily core\+\_\+client}. These configs will offer a stable base config to future-\/proof custom configs.
+\item Improvement\+: Core library no longer has std\+::iostream as a dependency. std\+::iostream is still required for the optional iostream logging policy and iostream transport.
+\item Bug\+: C++11 Chrono support was being incorrectly detected by the {\ttfamily boost\+\_\+config} header. Thank you Max Dmitrichenko for reporting and a patch.
+\item Bug\+: use of {\ttfamily std\+::put\+\_\+time} is now guarded by a unique flag rather than a chrono library flag. Thank you Max Dmitrichenko for reporting.
+\item Bug\+: Fixes non-\/thread safe use of std\+::localtime. \#347 \#383
+\item Compatibility\+: Adjust usage of std\+::min to be more compatible with systems that define a min(...) macro.
+\item Compatibility\+: Removes unused parameters from all library, test, and example code. This assists with those developing with -\/Werror and -\/Wunused-\/parameter \#376
+\item Compatibility\+: Renames ntohll and htonll methods to avoid conflicts with platform specific macros. \#358 \#381, \#382 Thank you logotype, unphased, svendjo
+\item Cleanup\+: Removes unused functions, fixes variable shadow warnings, normalizes all whitespace in library, examples, and tests to 4 spaces. \#376
+\end{DoxyItemize}
+
+0.\+3.\+0 -\/ 2014-\/08-\/10
+\begin{DoxyItemize}
+\item Feature\+: Adds {\ttfamily start\+\_\+perpetual} and {\ttfamily stop\+\_\+perpetual} methods to asio transport These may be used to replace manually managed {\ttfamily asio\+::io\+\_\+service\+::work} objects
+\item Feature\+: Allow setting pong and handshake timeouts at runtime.
+\item Feature\+: Allows changing the listen backlog queue length.
+\item Feature\+: Split tcp init into pre and post init.
+\item Feature\+: Adds URI method to extract query string from URI. Thank you Banaan for code. \#298
+\item Feature\+: Adds a compile time switch to asio transport config to disable certain multithreading features (some locks, asio strands)
+\item Feature\+: Adds the ability to pause reading on a connection. Paused connections will not read more data from their socket, allowing TCP flow control to work without blocking the main thread.
+\item Feature\+: Adds the ability to specify whether or not to use the {\ttfamily SO\+\_\+\+REUSEADDR} TCP socket option. The default for this value has been changed from {\ttfamily true} to {\ttfamily false}.
+\item Feature\+: Adds the ability to specify a maximum message size.
+\item Feature\+: Adds {\ttfamily close\+::status\+::get\+\_\+string(...)} method to look up a human readable string given a close code value.
+\item Feature\+: Adds {\ttfamily connection\+::read\+\_\+all(...)} method to iostream transport as a convenience method for reading all data into the connection buffer without the end user needing to manually loop on {\ttfamily read\+\_\+some}.
+\item Improvement\+: Open, close, and pong timeouts can be disabled entirely by setting their duration to 0.
+\item Improvement\+: Numerous performance improvements. Including\+: tuned default buffer sizes based on profiling, caching of handler binding for async reads/writes, non-\/malloc allocators for read/write handlers, disabling of a number of questionably useful range sanity checks in tight inner loops.
+\item Improvement\+: Cleaned up the handling of TLS related errors. TLS errors will now be reported with more detail on the info channel rather than all being {\ttfamily tls\+\_\+short\+\_\+read} or {\ttfamily pass\+\_\+through}. In addition, many cases where a TLS short read was in fact expected are no longer classified as errors. Expected TLS short reads and quasi-\/expected socket shutdown related errors will no longer be reported as unclean Web\+Socket shutdowns to the application. Information about them will remain in the info error channel for debugging purposes.
+\item Improvement\+: {\ttfamily start\+\_\+accept} and {\ttfamily listen} errors are now reported to the caller either via an exception or an ec parameter.
+\item Improvement\+: Outgoing writes are now batched for improved message throughput and reduced system call and TCP frame overhead.
+\item Bug\+: Fix some cases of calls to empty lib\+::function objects.
+\item Bug\+: Fix memory leak of connection objects due to cached handlers holding on to reference counted pointers. \#310 Thank you otaras for reporting.
+\item Bug\+: Fix issue with const endpoint accessors (such as {\ttfamily get\+\_\+user\+\_\+agent}) not compiling due to non-\/const mutex use. \#292 Thank you logofive for reporting.
+\item Bug\+: Fix handler allocation crash with multithreaded {\ttfamily io\+\_\+service}.
+\item Bug\+: Fixes incorrect whitespace handling in header parsing. \#301 Thank you Wolfram Schroers for reporting
+\item Bug\+: Fix a crash when parsing empty HTTP headers. Thank you Thingol for reporting.
+\item Bug\+: Fix a crash following use of the {\ttfamily stop\+\_\+listening} function. Thank you Thingol for reporting.
+\item Bug\+: Fix use of variable names that shadow function parameters. The library should compile cleanly with -\/Wshadow now. Thank you giszo for reporting. \#318
+\item Bug\+: Fix an issue where {\ttfamily set\+\_\+open\+\_\+handshake\+\_\+timeout} was ignored by server code. Thank you Robin Rowe for reporting.
+\item Bug\+: Fix an issue where custom timeout values weren\textquotesingle{}t being propagated from endpoints to new connections.
+\item Bug\+: Fix a number of memory leaks related to server connection failures. \#323 \#333 \#334 \#335 Thank you droppy and aydany for reporting and patches. reporting.
+\item Compatibility\+: Fix compile time conflict with Visual Studio\textquotesingle{}s MIN/\+MAX macros. Thank you Robin Rowe for reporting.
+\item Documentation\+: Examples and test suite build system now defaults to clang on OS X
+\end{DoxyItemize}
+
+0.\+3.\+0-\/alpha4 -\/ 2013-\/10-\/11
+\begin{DoxyItemize}
+\item HTTP requests ending normally are no longer logged as errors. Thank you Banaan for reporting. \#294
+\item Eliminates spurious expired timers in certain error conditions. Thank you Banaan for reporting. \#295
+\item Consolidates all bundled library licenses into the COPYING file. \#294
+\item Updates bundled sha1 library to one with a cleaner interface and more straight-\/forward license. Thank you lotodore for reporting and Evgeni Golov for reviewing. \#294
+\item Re-\/introduces strands to asio transport, allowing {\ttfamily io\+\_\+service} thread pools to be used (with some limitations).
+\item Removes endpoint code that kept track of a connection list that was never used anywhere. Removes a lock and reduces connection creation/deletion complexity from O(log n) to O(1) in the number of connections.
+\item \doxylink{struct_a}{A} number of internal changes to transport APIs
+\item Deprecates iostream transport {\ttfamily readsome} in favor of {\ttfamily read\+\_\+some} which is more consistent with the naming of the rest of the library.
+\item Adds preliminary signaling to iostream transport of eof and fatal transport errors
+\item Updates transport code to use shared pointers rather than raw pointers to prevent asio from retaining pointers to connection methods after the connection goes out of scope. \#293 Thank you otaras for reporting.
+\item Fixes an issue where custom headers couldn\textquotesingle{}t be set for client connections Thank you Jerry Win and Wolfram Schroers for reporting.
+\item Fixes a compile error on visual studio when using interrupts. Thank you Javier Rey Neira for reporting this.
+\item Adds new 1012 and 1013 close codes per IANA registry
+\item Add {\ttfamily set\+\_\+remote\+\_\+endpoint} method to iostream transport.
+\item Add {\ttfamily set\+\_\+secure} method to iostream transport.
+\item Fix typo in .gitattributes file. Thank you jstarasov for reporting this. \#280
+\item Add missing locale include. Thank you Toninoso for reporting this. \#281
+\item Refactors {\ttfamily asio\+\_\+transport} endpoint and adds full documentation and exception free varients of all methods.
+\item Removes {\ttfamily asio\+\_\+transport} endpoint method cancel(). Use {\ttfamily stop\+\_\+listen()} instead
+\item Wrap internal {\ttfamily io\+\_\+service} {\ttfamily run\+\_\+one()} method
+\item Suppress error when trying to shut down a connection that was already closed
+\end{DoxyItemize}
+
+0.\+3.\+0-\/alpha3 -\/ 2013-\/07-\/16
+\begin{DoxyItemize}
+\item Minor refactor to bundled sha1 library
+\item HTTP header comparisons are now case insensitive. \#220, \#275
+\item Refactors URI to be exception free and not use regular expressions. This eliminates the dependency on boost or C++11 regex libraries allowing native C++11 usage on GCC 4.\+4 and higher and significantly reduces staticly built binary sizes.
+\item Updates handling of Server and User-\/\+Agent headers to better handle custom settings and allow suppression of these headers for security purposes.
+\item Fix issue where pong timeout handler always fired. Thank you Steven Klassen for reporting this bug.
+\item Add ping and pong endpoint wrapper methods
+\item Add {\ttfamily get\+\_\+request()} pass through method to connection to allow calling methods specific to the HTTP policy in use.
+\item Fix issue compile error with {\ttfamily WEBSOCKETPP\+\_\+\+STRICT\+\_\+\+MASKING} enabled and another issue where {\ttfamily WEBSOCKETPP\+\_\+\+STRICT\+\_\+\+MASKING} was not applied to incoming messages. Thank you Petter Norby for reporting and testing these bugs. \#264
+\item Add additional macro guards for use with boost\+\_\+config. Thank you breyed for testing and code. \#261
+\end{DoxyItemize}
+
+0.\+3.\+0-\/alpha2 -\/ 2013-\/06-\/09
+\begin{DoxyItemize}
+\item Fix a regression that caused servers being sent two close frames in a row to end a connection uncleanly. \#259
+\item Fix a regression that caused spurious frames following a legitimate close frames to erroneously trigger handlers. \#258
+\item Change default HTTP response error code when no http\+\_\+handler is defined from 500/\+Internal Server Error to 426/\+Upgrade Required
+\item Remove timezone from logger timestamp to work around issues with the Windows implementation of strftime. Thank you breyed for testing and code. \#257
+\item Switch integer literals to char literals to improve VCPP compatibility. Thank you breyed for testing and code. \#257
+\item Add MSVCPP warning suppression for the bundled SHA1 library. Thank you breyed for testing and code. \#257
+\end{DoxyItemize}
+
+0.\+3.\+0-\/alpha1 -\/ 2013-\/06-\/09
+\begin{DoxyItemize}
+\item Initial Release 
+\end{DoxyItemize}

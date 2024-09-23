@@ -1,0 +1,51 @@
+\doxysection{catch\+\_\+interfaces\+\_\+enum\+\_\+values\+\_\+registry.\+h}
+\hypertarget{catch__interfaces__enum__values__registry_8h_source}{}\label{catch__interfaces__enum__values__registry_8h_source}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_interfaces\_enum\_values\_registry.h@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_interfaces\_enum\_values\_registry.h}}
+\mbox{\hyperlink{catch__interfaces__enum__values__registry_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{catch__interfaces__enum__values__registry_8h_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{catch__interfaces__enum__values__registry_8h_source_l00002}00002\ \textcolor{comment}{\ *\ \ Created\ by\ Phil\ on\ 4/4/2019.}}
+\DoxyCodeLine{\Hypertarget{catch__interfaces__enum__values__registry_8h_source_l00003}00003\ \textcolor{comment}{\ *\ \ Copyright\ 2019\ Two\ Blue\ Cubes\ Ltd.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{catch__interfaces__enum__values__registry_8h_source_l00004}00004\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{catch__interfaces__enum__values__registry_8h_source_l00005}00005\ \textcolor{comment}{\ *\ \ Distributed\ under\ the\ Boost\ Software\ License,\ Version\ 1.0.\ (See\ accompanying}}
+\DoxyCodeLine{\Hypertarget{catch__interfaces__enum__values__registry_8h_source_l00006}00006\ \textcolor{comment}{\ *\ \ file\ LICENSE\_1\_0.txt\ or\ copy\ at\ http://www.boost.org/LICENSE\_1\_0.txt)}}
+\DoxyCodeLine{\Hypertarget{catch__interfaces__enum__values__registry_8h_source_l00007}00007\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{catch__interfaces__enum__values__registry_8h_source_l00008}00008\ \textcolor{preprocessor}{\#ifndef\ TWOBLUECUBES\_CATCH\_INTERFACESENUMVALUESREGISTRY\_H\_INCLUDED}}
+\DoxyCodeLine{\Hypertarget{catch__interfaces__enum__values__registry_8h_source_l00009}00009\ \textcolor{preprocessor}{\#define\ TWOBLUECUBES\_CATCH\_INTERFACESENUMVALUESREGISTRY\_H\_INCLUDED}}
+\DoxyCodeLine{\Hypertarget{catch__interfaces__enum__values__registry_8h_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{catch__interfaces__enum__values__registry_8h_source_l00011}00011\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__stringref_8h}{catch\_stringref.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__interfaces__enum__values__registry_8h_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{catch__interfaces__enum__values__registry_8h_source_l00013}00013\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{\Hypertarget{catch__interfaces__enum__values__registry_8h_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{catch__interfaces__enum__values__registry_8h_source_l00015}00015\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__interfaces__enum__values__registry_8h_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{catch__interfaces__enum__values__registry_8h_source_l00017}00017\ \ \ \ \ \textcolor{keyword}{namespace\ }Detail\ \{}
+\DoxyCodeLine{\Hypertarget{catch__interfaces__enum__values__registry_8h_source_l00018}\mbox{\hyperlink{struct_catch_1_1_detail_1_1_enum_info}{00018}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_catch_1_1_detail_1_1_enum_info}{EnumInfo}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__interfaces__enum__values__registry_8h_source_l00019}\mbox{\hyperlink{struct_catch_1_1_detail_1_1_enum_info_a16ecfd3a7e11439433aabbdf6ecb676c}{00019}}\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_string_ref}{StringRef}}\ \mbox{\hyperlink{struct_catch_1_1_detail_1_1_enum_info_a16ecfd3a7e11439433aabbdf6ecb676c}{m\_name}};}
+\DoxyCodeLine{\Hypertarget{catch__interfaces__enum__values__registry_8h_source_l00020}\mbox{\hyperlink{struct_catch_1_1_detail_1_1_enum_info_a1093082858366071bae0eba1fb3c3388}{00020}}\ \ \ \ \ \ \ \ \ \ \ \ \ std::vector<std::pair<int,\ std::string>>\ \mbox{\hyperlink{struct_catch_1_1_detail_1_1_enum_info_a1093082858366071bae0eba1fb3c3388}{m\_values}};}
+\DoxyCodeLine{\Hypertarget{catch__interfaces__enum__values__registry_8h_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{catch__interfaces__enum__values__registry_8h_source_l00022}00022\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_detail_1_1_enum_info_ab6608593c00614a688045fe8d911258d}{\string~EnumInfo}}();}
+\DoxyCodeLine{\Hypertarget{catch__interfaces__enum__values__registry_8h_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{catch__interfaces__enum__values__registry_8h_source_l00024}00024\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_string_ref}{StringRef}}\ \mbox{\hyperlink{struct_catch_1_1_detail_1_1_enum_info_a2fdfacc411d7afb1cb690366e5e49cb3}{lookup}}(\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ )\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{catch__interfaces__enum__values__registry_8h_source_l00025}00025\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{catch__interfaces__enum__values__registry_8h_source_l00026}00026\ \ \ \ \ \}\ \textcolor{comment}{//\ namespace\ Detail}}
+\DoxyCodeLine{\Hypertarget{catch__interfaces__enum__values__registry_8h_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{catch__interfaces__enum__values__registry_8h_source_l00028}\mbox{\hyperlink{struct_catch_1_1_i_mutable_enum_values_registry}{00028}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_catch_1_1_i_mutable_enum_values_registry}{IMutableEnumValuesRegistry}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__interfaces__enum__values__registry_8h_source_l00029}00029\ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{struct_catch_1_1_i_mutable_enum_values_registry_a438c16ba32f3ecbbbbd8b3d49a530dcb}{\string~IMutableEnumValuesRegistry}}();}
+\DoxyCodeLine{\Hypertarget{catch__interfaces__enum__values__registry_8h_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{catch__interfaces__enum__values__registry_8h_source_l00031}\mbox{\hyperlink{struct_catch_1_1_i_mutable_enum_values_registry_a56e9726c383ed48731621c7183730310}{00031}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{struct_catch_1_1_detail_1_1_enum_info}{Detail::EnumInfo}}\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{struct_catch_1_1_i_mutable_enum_values_registry_a56e9726c383ed48731621c7183730310}{registerEnum}}(\ \mbox{\hyperlink{class_catch_1_1_string_ref}{StringRef}}\ enumName,\ \mbox{\hyperlink{class_catch_1_1_string_ref}{StringRef}}\ allEnums,\ std::vector<int>\ \textcolor{keyword}{const}\&\ values\ )\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{catch__interfaces__enum__values__registry_8h_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{catch__interfaces__enum__values__registry_8h_source_l00033}00033\ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ E>}
+\DoxyCodeLine{\Hypertarget{catch__interfaces__enum__values__registry_8h_source_l00034}\mbox{\hyperlink{struct_catch_1_1_i_mutable_enum_values_registry_ac1f8c7d3d97100ec30e09a3866f69904}{00034}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_detail_1_1_enum_info}{Detail::EnumInfo}}\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{struct_catch_1_1_i_mutable_enum_values_registry_ac1f8c7d3d97100ec30e09a3866f69904}{registerEnum}}(\ \mbox{\hyperlink{class_catch_1_1_string_ref}{StringRef}}\ enumName,\ \mbox{\hyperlink{class_catch_1_1_string_ref}{StringRef}}\ allEnums,\ std::initializer\_list<E>\ values\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__interfaces__enum__values__registry_8h_source_l00035}00035\ \ \ \ \ \ \ \ \ \ \ \ \ std::vector<int>\ intValues;}
+\DoxyCodeLine{\Hypertarget{catch__interfaces__enum__values__registry_8h_source_l00036}00036\ \ \ \ \ \ \ \ \ \ \ \ \ intValues.reserve(\ values.size()\ );}
+\DoxyCodeLine{\Hypertarget{catch__interfaces__enum__values__registry_8h_source_l00037}00037\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\ enumValue\ :\ values\ )}
+\DoxyCodeLine{\Hypertarget{catch__interfaces__enum__values__registry_8h_source_l00038}00038\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ intValues.push\_back(\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(\ enumValue\ )\ );}
+\DoxyCodeLine{\Hypertarget{catch__interfaces__enum__values__registry_8h_source_l00039}00039\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_catch_1_1_i_mutable_enum_values_registry_a56e9726c383ed48731621c7183730310}{registerEnum}}(\ enumName,\ allEnums,\ intValues\ );}
+\DoxyCodeLine{\Hypertarget{catch__interfaces__enum__values__registry_8h_source_l00040}00040\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__interfaces__enum__values__registry_8h_source_l00041}00041\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{catch__interfaces__enum__values__registry_8h_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{catch__interfaces__enum__values__registry_8h_source_l00043}00043\ \}\ \textcolor{comment}{//\ Catch}}
+\DoxyCodeLine{\Hypertarget{catch__interfaces__enum__values__registry_8h_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{catch__interfaces__enum__values__registry_8h_source_l00045}00045\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//TWOBLUECUBES\_CATCH\_INTERFACESENUMVALUESREGISTRY\_H\_INCLUDED}}
+
+\end{DoxyCode}

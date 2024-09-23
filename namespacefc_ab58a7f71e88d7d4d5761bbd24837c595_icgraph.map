@@ -1,0 +1,17 @@
+<map id="fc::set_os_thread_name" name="fc::set_os_thread_name">
+<area shape="rect" id="Node000001" title=" " alt="" coords="484,187,645,213"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1chain_1_1eosvmoc_1_1code__cache__async.html#ab5e9f17c574c6388b10a05dcedea7fde" title=" " alt="" coords="251,5,428,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="541,177,495,126,466,99,435,75,415,64,417,59,437,71,469,95,499,123,545,173"/>
+<area shape="rect" id="Node000003" href="$classfc_1_1zipkin_1_1impl.html#a5e8f2cb25258af6f392ccd8226457856" title=" " alt="" coords="274,86,405,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="531,180,486,152,435,126,401,114,402,109,437,121,489,148,534,176"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1chain_1_1named__thread__pool.html#a0f1e730d72e86361eb8edfa66c9e3cfb" title=" " alt="" coords="268,136,410,192"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="468,187,411,178,411,173,469,182"/>
+<area shape="rect" id="Node000005" href="$structsysio_1_1chain_1_1platform__timer.html#a73955c69921017b77b595476e8de4eea" title=" " alt="" coords="265,216,414,256"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="469,218,414,227,414,221,468,213"/>
+<area shape="rect" id="Node000006" href="$classsysio_1_1resource__monitor__plugin__impl.html#ae06c885da6f082b29ca5b5ff8c5724e4" title=" " alt="" coords="248,281,430,322"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="529,223,437,270,406,283,404,278,435,265,526,218"/>
+<area shape="rect" id="Node000007" href="$classsysio_1_1trace__api_1_1slice__directory.html#a7c7ccb0852100b5ab21daef4ac3133cc" title=" " alt="" coords="243,345,436,401"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="546,227,500,281,470,310,438,335,418,347,415,342,434,331,467,306,496,277,542,224"/>
+<area shape="rect" id="Node000008" href="$classsysio_1_1trace__api_1_1store__provider.html#afbe277e7852b60426b1cad9b7fb81c4a" title=" " alt="" coords="5,345,195,401"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="227,376,195,376,195,370,227,370"/>
+</map>

@@ -1,0 +1,225 @@
+\chapter{Java class files(under construction)}
+\hypertarget{md_libraries_2fc_2libraries_2ff_2depends_2ate-pairing_2java_2java}{}\label{md_libraries_2fc_2libraries_2ff_2depends_2ate-pairing_2java_2java}\index{Java class files(under construction)@{Java class files(under construction)}}
+\doxysection*{Build}
+
+
+\begin{DoxyItemize}
+\item Install \href{http://www.swig.org/}{\texttt{ swig}} and Java.
+\end{DoxyItemize}
+
+\doxysubsection*{Windows}
+
+
+\begin{DoxyItemize}
+\item set SWIG to the path to swig in make\+\_\+wrap.\+bat
+\item set JAVA\+\_\+\+DIR to the path to java in set-\/java-\/path.\+bat.
+\item Use the follogin commands\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{>\ cd\ java}
+\DoxyCodeLine{>\ make\_wrap.bat}
+
+\end{DoxyCode}
+
+\item bin/bn254\+\_\+if\+\_\+wrap.\+dll is a dll for java.
+\end{DoxyItemize}
+
+\doxysubsection*{Linux}
+
+
+\begin{DoxyItemize}
+\item set JAVA\+\_\+\+INC to the path to Java in Makefile
+\end{DoxyItemize}
+
+\begin{quote}
+make test \end{quote}
+
+\begin{DoxyItemize}
+\item bin/libbn254\+\_\+if\+\_\+wrap.\+so is a shared library for java.
+\end{DoxyItemize}
+
+\doxysection*{API and Class}
+
+\doxysubsection*{Setup}
+
+
+\begin{DoxyItemize}
+\item At first, call these functions. 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{>\ System.loadLibrary("{}bn254\_if\_wrap"{});}
+\DoxyCodeLine{>\ BN254.SystemInit();}
+
+\end{DoxyCode}
+ \doxysubsection*{class \doxylink{class_mpz}{Mpz}}
+\end{DoxyItemize}
+
+
+\begin{DoxyItemize}
+\item a wrapped class of mpz\+\_\+class of GMP.
+\item \doxylink{class_mpz}{Mpz(int)}, \doxylink{class_mpz}{Mpz(\+String)}
+\item void \doxylink{yubihsm__pkcs11_8c_a893468abdce45d586a5b659094a25e6c}{set(int x)}
+\begin{DoxyItemize}
+\item Set x to this.
+\end{DoxyItemize}
+\item void \doxylink{yubihsm__pkcs11_8c_a893468abdce45d586a5b659094a25e6c}{set(\+String x)}
+\begin{DoxyItemize}
+\item Set x to this.
+\end{DoxyItemize}
+\item void add(\+Mpz x)
+\begin{DoxyItemize}
+\item Set (this + x) to this.
+\end{DoxyItemize}
+\item void sub(\+Mpz x)
+\begin{DoxyItemize}
+\item Set (this -\/ x) to this.
+\end{DoxyItemize}
+\item void mul(\+Mpz x)
+\begin{DoxyItemize}
+\item Set (this \texorpdfstring{$\ast$}{*} x) to this.
+\end{DoxyItemize}
+\item void mod(\+Mpz x)
+\begin{DoxyItemize}
+\item Set (this \% x) to this.
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+\doxysubsection*{class \doxylink{class_fp}{Fp}, \doxylink{class_fp2}{Fp2}, \doxylink{class_fp12}{Fp12}}
+
+
+\begin{DoxyItemize}
+\item a wrapped class of \doxylink{namespacebn_a790c0215583382a829e202ecb0c844b9}{bn\+::\+Fp}, \doxylink{namespacebn_afe11bd65aac84b50b31d9984d059be92}{bn\+::\+Fp2}, \doxylink{namespacebn_abd6ddb9ecff5d59c093581706e088644}{bn\+::\+Fp12}.
+\end{DoxyItemize}
+
+\doxysubsubsection*{common method}
+
+
+\begin{DoxyItemize}
+\item \doxylink{class_fp}{Fp(int)}, \doxylink{class_fp}{Fp(\+String)}
+\item void \doxylink{yubihsm__pkcs11_8c_a893468abdce45d586a5b659094a25e6c}{set(int x)}
+\begin{DoxyItemize}
+\item Set x to this.
+\end{DoxyItemize}
+\item void \doxylink{yubihsm__pkcs11_8c_a893468abdce45d586a5b659094a25e6c}{set(\+String x)}
+\begin{DoxyItemize}
+\item Set x to this.
+\item The format of \doxylink{class_fp}{Fp} is "{}123"{}, "{}0xabc"{}
+\item The format of \doxylink{class_fp2}{Fp2} is "{}\mbox{[}a,b\mbox{]}"{} ; a, b are the format of \doxylink{class_fp}{Fp}
+\item The format of \doxylink{class_fp12}{Fp12} is "{}\mbox{[}\mbox{[}\mbox{[}a0,b0\mbox{]},\mbox{[}a1,b1\mbox{]},\mbox{[}a2,b2\mbox{]}\mbox{]}, \mbox{[}\mbox{[}a3,b3\mbox{]},\mbox{[}a4,b4\mbox{]},\mbox{[}a5,b5\mbox{]}\mbox{]}\mbox{]}"{}
+\end{DoxyItemize}
+\item void add(\+Fp x)
+\begin{DoxyItemize}
+\item Set (this + x) to this.
+\end{DoxyItemize}
+\item void sub(\+Fp x)
+\begin{DoxyItemize}
+\item Set (this -\/ x) to this.
+\end{DoxyItemize}
+\item void mul(\+Fp x)
+\begin{DoxyItemize}
+\item Set (this \texorpdfstring{$\ast$}{*} x) to this.
+\end{DoxyItemize}
+\item void power(\+Mpz x)
+\begin{DoxyItemize}
+\item Set (this \texorpdfstring{$^\wedge$}{\string^} x) to this.
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+\doxysubsubsection*{\doxylink{class_fp2}{Fp2}}
+
+
+\begin{DoxyItemize}
+\item \doxylink{class_fp2}{Fp2(int a, int b)}
+\begin{DoxyItemize}
+\item Set (a, b) to this.
+\end{DoxyItemize}
+\item \doxylink{class_fp2}{Fp2(\+Fp a, Fp b)}
+\begin{DoxyItemize}
+\item Set (a, b) to this.
+\end{DoxyItemize}
+\item \doxylink{class_fp2}{Fp2(\+String a, String b)}
+\begin{DoxyItemize}
+\item Set (a, b) to this.
+\end{DoxyItemize}
+\item \doxylink{class_fp}{Fp} get\+A()
+\begin{DoxyItemize}
+\item Return the reference to a where this = (a, b).
+\end{DoxyItemize}
+\item \doxylink{class_fp}{Fp} get\+B()
+\begin{DoxyItemize}
+\item Return the reference to b where this = (a, b).
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+\doxysubsubsection*{\doxylink{class_fp12}{Fp12}}
+
+
+\begin{DoxyItemize}
+\item pairing(\+Ec2 ec2, Ec1 ec1)
+\begin{DoxyItemize}
+\item Set opt\+\_\+ate\+\_\+pairing(ec2, ec1) to this.
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+\doxysubsection*{\doxylink{class_ec1}{Ec1}, \doxylink{class_ec2}{Ec2}}
+
+
+\begin{DoxyItemize}
+\item a wrapped class of \doxylink{namespacebn_ae14c8fdf84d628aae3b455d439782b56}{bn\+::\+Ec1} and \doxylink{namespacebn_ab9c11a8074c768f1149f5bdc7332a8c5}{bn\+::\+Ec2}.
+\item \doxylink{class_ec1}{Ec1(\+Fp x, Fp y)}
+\begin{DoxyItemize}
+\item Set (x, y, 1) to this.
+\end{DoxyItemize}
+\item \doxylink{class_ec1}{Ec1(\+Fp x, Fp y, Fp z)}
+\begin{DoxyItemize}
+\item Set (x\+:y\+:z) to this.
+\end{DoxyItemize}
+\item \doxylink{class_ec1}{Ec1(\+String x)}
+\begin{DoxyItemize}
+\item Set x to this.
+\item The format of \doxylink{class_ec1}{Ec1} is "{}x\+\_\+y"{} or "{}0"{} ; x, y are the format of \doxylink{class_fp}{Fp}. "{}0"{} is the infinity point.
+\item The format of \doxylink{class_ec2}{Ec2} is "{}x\+\_\+y"{} or "{}0"{} ; x, y are the format of \doxylink{class_fp2}{Fp2}.
+\end{DoxyItemize}
+\item Boolean is\+Valid()
+\begin{DoxyItemize}
+\item Is (x\+:y\+:z) on the curve?
+\end{DoxyItemize}
+\item Boolean is\+Zero()
+\begin{DoxyItemize}
+\item Is this equal to the infinity point?
+\end{DoxyItemize}
+\item void \doxylink{wrap__data_8c_ac08cbd67ab213a122acbaf421f839005}{clear()}
+\begin{DoxyItemize}
+\item set this to the infinity point.
+\end{DoxyItemize}
+\item dbl()
+\begin{DoxyItemize}
+\item set (this \texorpdfstring{$\ast$}{*} 2) to this.
+\end{DoxyItemize}
+\item \doxylink{xbyak__mnemonic_8h_a60e985d483cb1cb6e46b5d464f61297a}{neg()}
+\begin{DoxyItemize}
+\item Set (-\/this) to this.
+\end{DoxyItemize}
+\item add(\+Ec1 x)
+\begin{DoxyItemize}
+\item Set (this + x) to this.
+\end{DoxyItemize}
+\item sub(\+Ec1 x)
+\begin{DoxyItemize}
+\item Set (this -\/ x) to this.
+\end{DoxyItemize}
+\item mul(\+Mpz\& x)
+\begin{DoxyItemize}
+\item Set (this \texorpdfstring{$\ast$}{*} x) to this.
+\end{DoxyItemize}
+\item \doxylink{class_fp}{Fp} get\+X()
+\begin{DoxyItemize}
+\item Return the value of x.
+\end{DoxyItemize}
+\item \doxylink{class_fp}{Fp} get\+Y()
+\begin{DoxyItemize}
+\item Return the value of y.
+\end{DoxyItemize}
+\item \doxylink{class_fp}{Fp} get\+Z()
+\begin{DoxyItemize}
+\item Return the value of z. 
+\end{DoxyItemize}
+\end{DoxyItemize}

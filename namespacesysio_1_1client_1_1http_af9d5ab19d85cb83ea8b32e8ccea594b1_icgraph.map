@@ -1,0 +1,6 @@
+<map id="sysio::client::http::resolve_url" name="sysio::client::http::resolve_url">
+<area shape="rect" id="Node000001" title=" " alt="" coords="197,29,318,70"/>
+<area shape="poly" id="edge2_Node000001_Node000001" title=" " alt="" coords="286,16,275,10,257,8,240,10,230,14,226,20,228,28,223,29,221,19,227,10,239,5,257,3,277,5,289,11"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1client_1_1http_1_1connection__param.html#a94e5ed32e61c553d37116e0ec1a81c61" title=" " alt="" coords="5,22,149,78"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="181,52,149,52,149,47,181,47"/>
+</map>

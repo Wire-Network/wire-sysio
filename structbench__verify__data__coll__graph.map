@@ -1,0 +1,15 @@
+<map id="bench_verify_data" name="bench_verify_data">
+<area shape="rect" id="Node000001" title=" " alt="" coords="178,435,306,461"/>
+<area shape="rect" id="Node000002" href="$structsecp256k1__context__struct.html" title=" " alt="" coords="84,331,258,357"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="190,368,236,433,231,436,186,371"/>
+<area shape="rect" id="Node000003" href="$structsecp256k1__ecmult__gen__context.html" title=" " alt="" coords="5,213,164,253"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="106,265,135,306,158,329,155,333,130,309,101,268"/>
+<area shape="rect" id="Node000004" href="$structsecp256k1__gej.html" title=" " alt="" coords="30,124,139,150"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="87,165,87,212,82,212,82,165"/>
+<area shape="rect" id="Node000005" href="$structsecp256k1__fe.html" title=" " alt="" coords="33,5,136,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="87,47,87,123,82,123,82,47"/>
+<area shape="rect" id="Node000006" href="$structsecp256k1__callback.html" title=" " alt="" coords="188,220,328,246"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="254,262,245,286,231,309,216,323,199,333,196,329,212,319,226,306,240,283,249,260"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="283,331,339,357"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="297,371,252,436,248,433,292,368"/>
+</map>

@@ -1,0 +1,146 @@
+\doxysection{libraries/fc/libraries/ff/depends/xbyak/sample/bf.cpp File Reference}
+\hypertarget{bf_8cpp}{}\label{bf_8cpp}\index{libraries/fc/libraries/ff/depends/xbyak/sample/bf.cpp@{libraries/fc/libraries/ff/depends/xbyak/sample/bf.cpp}}
+{\ttfamily \#include "{}xbyak/xbyak.\+h"{}}\newline
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$stack$>$}\newline
+{\ttfamily \#include $<$fstream$>$}\newline
+Include dependency graph for bf.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{bf_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{class_brainfuck}{Brainfuck}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{bf_8cpp_a3ede98665532cce0e33f614fac5150f9}{XBYAK\+\_\+\+NO\+\_\+\+OP\+\_\+\+NAMES}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{bf_8cpp_aa1a0876ece49daecd637103c6c7f587c}{dump}} (const \mbox{\hyperlink{normalize__prefix_8cpp_adde6aaee8457bee49c2a92621fe22b79}{Xbyak\+::uint8}} \texorpdfstring{$\ast$}{*}code, size\+\_\+t size)
+\item 
+int \mbox{\hyperlink{bf_8cpp_a0ddf1224851353fc92bfbff6f499fa97}{main}} (int argc, char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}\mbox{[}$\,$\mbox{]})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{bf_8cpp_a3ede98665532cce0e33f614fac5150f9}\index{bf.cpp@{bf.cpp}!XBYAK\_NO\_OP\_NAMES@{XBYAK\_NO\_OP\_NAMES}}
+\index{XBYAK\_NO\_OP\_NAMES@{XBYAK\_NO\_OP\_NAMES}!bf.cpp@{bf.cpp}}
+\doxysubsubsection{\texorpdfstring{XBYAK\_NO\_OP\_NAMES}{XBYAK\_NO\_OP\_NAMES}}
+{\footnotesize\ttfamily \label{bf_8cpp_a3ede98665532cce0e33f614fac5150f9} 
+\#define XBYAK\+\_\+\+NO\+\_\+\+OP\+\_\+\+NAMES}
+
+
+
+Definition at line \mbox{\hyperlink{bf_8cpp_source_l00001}{1}} of file \mbox{\hyperlink{bf_8cpp_source}{bf.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{bf_8cpp_aa1a0876ece49daecd637103c6c7f587c}\index{bf.cpp@{bf.cpp}!dump@{dump}}
+\index{dump@{dump}!bf.cpp@{bf.cpp}}
+\doxysubsubsection{\texorpdfstring{dump()}{dump()}}
+{\footnotesize\ttfamily \label{bf_8cpp_aa1a0876ece49daecd637103c6c7f587c} 
+void dump (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{normalize__prefix_8cpp_adde6aaee8457bee49c2a92621fe22b79}{Xbyak\+::uint8}} \texorpdfstring{$\ast$}{*}}]{code}{, }\item[{size\+\_\+t}]{size}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bf_8cpp_source_l00153}{153}} of file \mbox{\hyperlink{bf_8cpp_source}{bf.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00154\ \{}
+\DoxyCodeLine{00155\ \ \ \ \ puts(\textcolor{stringliteral}{"{}\#include\ <stdio.h>\(\backslash\)nstatic\ int\ stack[128\ *\ 1024];"{}});}
+\DoxyCodeLine{00156\ \textcolor{preprocessor}{\#ifdef\ \_MSC\_VER}}
+\DoxyCodeLine{00157\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}static\ \_\_declspec(align(4096))\ "{}});}
+\DoxyCodeLine{00158\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00159\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}static\ \_\_attribute\_\_((aligned(4096)))"{}});}
+\DoxyCodeLine{00160\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00161\ \ \ \ \ puts(\textcolor{stringliteral}{"{}const\ unsigned\ char\ code[]\ =\ \{"{}});}
+\DoxyCodeLine{00162\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ size;\ i++)\ \{}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}0x\%02x,"{}},\ code[i]);\ \textcolor{keywordflow}{if}\ ((i\ \%\ 16)\ ==\ 15)\ putchar(\textcolor{charliteral}{'\(\backslash\)n'});}
+\DoxyCodeLine{00164\ \ \ \ \ \}}
+\DoxyCodeLine{00165\ \ \ \ \ puts(\textcolor{stringliteral}{"{}\(\backslash\)n\};"{}});}
+\DoxyCodeLine{00166\ \textcolor{preprocessor}{\#ifdef\ \_MSC\_VER}}
+\DoxyCodeLine{00167\ \ \ \ \ puts(\textcolor{stringliteral}{"{}\#include\ <windows.h>"{}});}
+\DoxyCodeLine{00168\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00169\ \ \ \ \ puts(\textcolor{stringliteral}{"{}\#include\ <unistd.h>"{}});}
+\DoxyCodeLine{00170\ \ \ \ \ puts(\textcolor{stringliteral}{"{}\#include\ <sys/mman.h>"{}});}
+\DoxyCodeLine{00171\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00172\ \ \ \ \ puts(\textcolor{stringliteral}{"{}int\ main()\(\backslash\)n\{"{}});}
+\DoxyCodeLine{00173\ \textcolor{preprocessor}{\#ifdef\ \_MSC\_VER}}
+\DoxyCodeLine{00174\ \ \ \ \ puts(\textcolor{stringliteral}{"{}\(\backslash\)tDWORD\ oldProtect;"{}});}
+\DoxyCodeLine{00175\ \ \ \ \ puts(\textcolor{stringliteral}{"{}\(\backslash\)tVirtualProtect((void*)code,\ sizeof(code),\ PAGE\_EXECUTE\_READWRITE,\ \&oldProtect);"{}});}
+\DoxyCodeLine{00176\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00177\ \ \ \ \ puts(\textcolor{stringliteral}{"{}\(\backslash\)tlong\ pageSize\ =\ sysconf(\_SC\_PAGESIZE)\ -\/\ 1;"{}});}
+\DoxyCodeLine{00178\ \ \ \ \ puts(\textcolor{stringliteral}{"{}\(\backslash\)tmprotect((void*)code,\ (sizeof(code)\ +\ pageSize)\ \&\ \string~pageSize,\ PROT\_READ\ |\ PROT\_EXEC);"{}});}
+\DoxyCodeLine{00179\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00180\ \ \ \ \ puts(}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)t((void\ (*)(void*,\ void*,\ int\ *))code)((void*)putchar,\ (void*)getchar,\ stack);\(\backslash\)n"{}}}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\}"{}}}
+\DoxyCodeLine{00183\ \ \ \ \ );}
+\DoxyCodeLine{00184\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=193pt]{bf_8cpp_aa1a0876ece49daecd637103c6c7f587c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{bf_8cpp_a0ddf1224851353fc92bfbff6f499fa97}\index{bf.cpp@{bf.cpp}!main@{main}}
+\index{main@{main}!bf.cpp@{bf.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{bf_8cpp_a0ddf1224851353fc92bfbff6f499fa97} 
+int main (\begin{DoxyParamCaption}\item[{int}]{argc}{, }\item[{char \texorpdfstring{$\ast$}{*}}]{argv}{\mbox{[}$\,$\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bf_8cpp_source_l00186}{186}} of file \mbox{\hyperlink{bf_8cpp_source}{bf.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00187\ \{}
+\DoxyCodeLine{00188\ \textcolor{preprocessor}{\#ifdef\ XBYAK32}}
+\DoxyCodeLine{00189\ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}32bit\ mode\(\backslash\)n"{}});}
+\DoxyCodeLine{00190\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00191\ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}64bit\ mode\(\backslash\)n"{}});}
+\DoxyCodeLine{00192\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00193\ \ \ \ \ \textcolor{keywordflow}{if}\ (argc\ ==\ 1)\ \{}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}bf\ filename.bf\ [0|1]\(\backslash\)n"{}});}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{00196\ \ \ \ \ \}}
+\DoxyCodeLine{00197\ \ \ \ \ std::ifstream\ ifs(\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[1]);}
+\DoxyCodeLine{00198\ \ \ \ \ \textcolor{keywordtype}{int}\ mode\ =\ argc\ ==\ 3\ ?\ atoi(\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[2])\ :\ 0;}
+\DoxyCodeLine{00199\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_brainfuck}{Brainfuck}}\ bf(ifs);}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (mode\ ==\ 0)\ \{}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespacesysio_1_1vm_abc94c8e9af7289dc068a502c63ad98d4afac2a47adace059aff113283a03f6760}{stack}}[128\ *\ 1024];}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ \ \ \ \ \ \ bf.getCode<void\ (*)(\textcolor{keywordtype}{void}*,\ \textcolor{keywordtype}{void}*,\ \textcolor{keywordtype}{int}\ *)>()(\mbox{\hyperlink{namespace_xbyak_ad60ea5f6215534109ed45a19f413a6f0}{Xbyak::CastTo<void*>}}(putchar),\ \mbox{\hyperlink{namespace_xbyak_ad60ea5f6215534109ed45a19f413a6f0}{Xbyak::CastTo<void*>}}(getchar),\ \mbox{\hyperlink{namespacesysio_1_1vm_abc94c8e9af7289dc068a502c63ad98d4afac2a47adace059aff113283a03f6760}{stack}});}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bf_8cpp_aa1a0876ece49daecd637103c6c7f587c}{dump}}(bf.getCode(),\ bf.getSize());}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00207\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (std::exception\&\ e)\ \{}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}ERR:\%s\(\backslash\)n"{}},\ e.what());}
+\DoxyCodeLine{00209\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}unknown\ error\(\backslash\)n"{}});}
+\DoxyCodeLine{00211\ \ \ \ \ \}}
+\DoxyCodeLine{00212\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=292pt]{bf_8cpp_a0ddf1224851353fc92bfbff6f499fa97_cgraph}
+\end{center}
+\end{figure}

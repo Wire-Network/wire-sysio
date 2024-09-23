@@ -1,0 +1,39 @@
+\doxysection{libraries/wasm-\/jit/\+Source/\+Runtime/\+Linker.cpp File Reference}
+\hypertarget{_linker_8cpp}{}\label{_linker_8cpp}\index{libraries/wasm-\/jit/Source/Runtime/Linker.cpp@{libraries/wasm-\/jit/Source/Runtime/Linker.cpp}}
+{\ttfamily \#include "{}Inline/\+Basic\+Types.\+h"{}}\newline
+{\ttfamily \#include "{}Runtime.\+h"{}}\newline
+{\ttfamily \#include "{}Platform/\+Platform.\+h"{}}\newline
+{\ttfamily \#include "{}Runtime\+Private.\+h"{}}\newline
+{\ttfamily \#include "{}Linker.\+h"{}}\newline
+{\ttfamily \#include "{}Intrinsics.\+h"{}}\newline
+{\ttfamily \#include "{}IR/\+Module.\+h"{}}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+Include dependency graph for Linker.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{_linker_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespace_runtime}{Runtime}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{_runtime_8h_aae02bf1df7927dd0f69c6412fce40fc4}{RUNTIME\+\_\+\+API}} bool \mbox{\hyperlink{namespace_runtime_a6235ca7597f3333aa3932daeca2e4746}{Runtime\+::isA}} (\mbox{\hyperlink{struct_runtime_1_1_object_instance}{Object\+Instance}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a85d991d90970121ba1480cd98d93aab9}{object}}, const \mbox{\hyperlink{struct_i_r_1_1_object_type}{IR\+::\+Object\+Type}} \&type)
+\item 
+const \mbox{\hyperlink{struct_i_r_1_1_function_type}{Function\+Type}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_runtime_af40041510449ec497955b86aef476361}{Runtime\+::resolve\+Import\+Type}} (const \mbox{\hyperlink{struct_i_r_1_1_module}{IR\+::\+Module}} \&\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}, \mbox{\hyperlink{struct_i_r_1_1_indexed_function_type}{Indexed\+Function\+Type}} type)
+\item 
+\mbox{\hyperlink{struct_i_r_1_1_table_type}{Table\+Type}} \mbox{\hyperlink{namespace_runtime_ae56c16612ef19b473226ea3cc96f4b47}{Runtime\+::resolve\+Import\+Type}} (const \mbox{\hyperlink{struct_i_r_1_1_module}{IR\+::\+Module}} \&\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}, \mbox{\hyperlink{struct_i_r_1_1_table_type}{Table\+Type}} type)
+\item 
+\mbox{\hyperlink{struct_i_r_1_1_memory_type}{Memory\+Type}} \mbox{\hyperlink{namespace_runtime_a4b0c16257f5d55304a27e9813fa6de33}{Runtime\+::resolve\+Import\+Type}} (const \mbox{\hyperlink{struct_i_r_1_1_module}{IR\+::\+Module}} \&\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}, \mbox{\hyperlink{struct_i_r_1_1_memory_type}{Memory\+Type}} type)
+\item 
+\mbox{\hyperlink{struct_i_r_1_1_global_type}{Global\+Type}} \mbox{\hyperlink{namespace_runtime_a6c681d1d6859a965384d82505874cbed}{Runtime\+::resolve\+Import\+Type}} (const \mbox{\hyperlink{struct_i_r_1_1_module}{IR\+::\+Module}} \&\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}, \mbox{\hyperlink{struct_i_r_1_1_global_type}{Global\+Type}} type)
+\item 
+{\footnotesize template$<$typename Instance , typename \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}} $>$ }\\void \mbox{\hyperlink{namespace_runtime_ada75cac5f6ce651416e6a2371e4a3398}{Runtime\+::link\+Import}} (const \mbox{\hyperlink{struct_i_r_1_1_module}{IR\+::\+Module}} \&\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}, const \mbox{\hyperlink{struct_i_r_1_1_import}{Import}}$<$ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}} $>$ \&import, \mbox{\hyperlink{struct_runtime_1_1_resolver}{Resolver}} \&resolver, \mbox{\hyperlink{struct_runtime_1_1_link_result}{Link\+Result}} \&link\+Result, std\+::vector$<$ Instance \texorpdfstring{$\ast$}{*} $>$ \&resolved\+Imports)
+\item 
+\mbox{\hyperlink{_runtime_8h_aae02bf1df7927dd0f69c6412fce40fc4}{RUNTIME\+\_\+\+API}} \mbox{\hyperlink{struct_runtime_1_1_link_result}{Link\+Result}} \mbox{\hyperlink{namespace_runtime_a74a9b1ac9621ecedb5ea0c634211ccec}{Runtime\+::link\+Module}} (const \mbox{\hyperlink{struct_i_r_1_1_module}{IR\+::\+Module}} \&\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}, \mbox{\hyperlink{struct_runtime_1_1_resolver}{Resolver}} \&resolver)
+\end{DoxyCompactItemize}

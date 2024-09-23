@@ -1,0 +1,298 @@
+\doxysection{sysio\+::chain\+::incremental\+\_\+merkle\+\_\+impl\texorpdfstring{$<$}{<} Digest\+Type, Container, Args \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classsysio_1_1chain_1_1incremental__merkle__impl}{}\label{classsysio_1_1chain_1_1incremental__merkle__impl}\index{sysio::chain::incremental\_merkle\_impl$<$ DigestType, Container, Args $>$@{sysio::chain::incremental\_merkle\_impl$<$ DigestType, Container, Args $>$}}
+
+
+detail  
+
+
+
+
+{\ttfamily \#include $<$incremental\+\_\+merkle.\+hpp$>$}
+
+
+
+Collaboration diagram for sysio\+::chain\+::incremental\+\_\+merkle\+\_\+impl\texorpdfstring{$<$}{<} Digest\+Type, Container, Args \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=215pt]{classsysio_1_1chain_1_1incremental__merkle__impl__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl_ac99d8e01e28d02fa609b783a0ebd0af8}{incremental\+\_\+merkle\+\_\+impl}} ()
+\item 
+\mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl_abe69a28e8afcf187714b8a4d6546c609}{incremental\+\_\+merkle\+\_\+impl}} (const \mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl}{incremental\+\_\+merkle\+\_\+impl}} \&)=default
+\item 
+\mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl_ad2794bd3ccd8f0f75c45497dba80c104}{incremental\+\_\+merkle\+\_\+impl}} (\mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl}{incremental\+\_\+merkle\+\_\+impl}} \&\&)=default
+\item 
+\mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl}{incremental\+\_\+merkle\+\_\+impl}} \& \mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl_a189c517565c5733a2a5e4aa1a47971ff}{operator=}} (const \mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl}{incremental\+\_\+merkle\+\_\+impl}} \&)=default
+\item 
+\mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl}{incremental\+\_\+merkle\+\_\+impl}} \& \mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl_a34013a415c8106c7585be2addb3237ab}{operator=}} (\mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl}{incremental\+\_\+merkle\+\_\+impl}} \&\&)=default
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} , std\+::enable\+\_\+if\+\_\+t$<$!std\+::is\+\_\+same$<$ std\+::decay\+\_\+t$<$ \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$, \mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl}{incremental\+\_\+merkle\+\_\+impl}} $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}}, int $>$  = 0$>$ }\\\mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl_ab99b2dca68e1d5384b82f016b1aa0f2b}{incremental\+\_\+merkle\+\_\+impl}} (\mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} \&\&alloc)
+\item 
+const Digest\+Type \& \mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl_a4192de0909a94a3eadcf2938079c5adb}{append}} (const Digest\+Type \&\mbox{\hyperlink{namespacefc_a150ca4cd9c0318ca45dc0dc7df5d58b9}{digest}})
+\item 
+Digest\+Type \mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl_ab760e92a9b454f1f0281a8cc053e0965}{get\+\_\+root}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl_ac877442baeeb8db5ff69267bd9c46cc5}{\+\_\+node\+\_\+count}}
+\item 
+Container$<$ Digest\+Type, Args... $>$ \mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl_a60ab24f98b31e15542b84427d77a0fc1}{\+\_\+active\+\_\+nodes}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Digest\+Type, \mbox{\hyperlink{yubihsm__pkcs11_8c_a53ef06e29c840024a683512c1acd791a}{template}}$<$ typename ... $>$ \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} Container = vector, typename ... Args$>$\newline
+class sysio\+::chain\+::incremental\+\_\+merkle\+\_\+impl$<$ Digest\+Type, Container, Args $>$}
+\doxylink{struct_a}{A} balanced merkle tree built in such that the set of leaf nodes can be appended to without triggering the reconstruction of inner nodes that represent a complete subset of previous nodes.
+
+to achieve this new nodes can either imply an set of future nodes that achieve a balanced tree OR realize one of these future nodes.
+
+Once a sub-\/tree contains only realized nodes its sub-\/root will never change. This allows proofs based on this merkle to be very stable after some time has past only needing to update or add a single value to maintain validity. 
+
+Definition at line \mbox{\hyperlink{incremental__merkle_8hpp_source_l00095}{95}} of file \mbox{\hyperlink{incremental__merkle_8hpp_source}{incremental\+\_\+merkle.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classsysio_1_1chain_1_1incremental__merkle__impl_ac99d8e01e28d02fa609b783a0ebd0af8}\index{sysio::chain::incremental\_merkle\_impl$<$ DigestType, Container, Args $>$@{sysio::chain::incremental\_merkle\_impl$<$ DigestType, Container, Args $>$}!incremental\_merkle\_impl@{incremental\_merkle\_impl}}
+\index{incremental\_merkle\_impl@{incremental\_merkle\_impl}!sysio::chain::incremental\_merkle\_impl$<$ DigestType, Container, Args $>$@{sysio::chain::incremental\_merkle\_impl$<$ DigestType, Container, Args $>$}}
+\doxysubsubsection{\texorpdfstring{incremental\_merkle\_impl()}{incremental\_merkle\_impl()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1incremental__merkle__impl_ac99d8e01e28d02fa609b783a0ebd0af8} 
+template$<$typename Digest\+Type , \mbox{\hyperlink{yubihsm__pkcs11_8c_a53ef06e29c840024a683512c1acd791a}{template}}$<$ typename ... $>$ \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} Container = vector, typename ... Args$>$ \\
+\mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl}{sysio\+::chain\+::incremental\+\_\+merkle\+\_\+impl}}$<$ Digest\+Type, Container, Args $>$\+::incremental\+\_\+merkle\+\_\+impl (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{incremental__merkle_8hpp_source_l00097}{97}} of file \mbox{\hyperlink{incremental__merkle_8hpp_source}{incremental\+\_\+merkle.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ :\mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl_ac877442baeeb8db5ff69267bd9c46cc5}{\_node\_count}}(0)}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1incremental__merkle__impl_abe69a28e8afcf187714b8a4d6546c609}\index{sysio::chain::incremental\_merkle\_impl$<$ DigestType, Container, Args $>$@{sysio::chain::incremental\_merkle\_impl$<$ DigestType, Container, Args $>$}!incremental\_merkle\_impl@{incremental\_merkle\_impl}}
+\index{incremental\_merkle\_impl@{incremental\_merkle\_impl}!sysio::chain::incremental\_merkle\_impl$<$ DigestType, Container, Args $>$@{sysio::chain::incremental\_merkle\_impl$<$ DigestType, Container, Args $>$}}
+\doxysubsubsection{\texorpdfstring{incremental\_merkle\_impl()}{incremental\_merkle\_impl()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1incremental__merkle__impl_abe69a28e8afcf187714b8a4d6546c609} 
+template$<$typename Digest\+Type , \mbox{\hyperlink{yubihsm__pkcs11_8c_a53ef06e29c840024a683512c1acd791a}{template}}$<$ typename ... $>$ \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} Container = vector, typename ... Args$>$ \\
+\mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl}{sysio\+::chain\+::incremental\+\_\+merkle\+\_\+impl}}$<$ Digest\+Type, Container, Args $>$\+::incremental\+\_\+merkle\+\_\+impl (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl}{incremental\+\_\+merkle\+\_\+impl}}$<$ Digest\+Type, Container, Args $>$ \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [default]}}
+
+\Hypertarget{classsysio_1_1chain_1_1incremental__merkle__impl_ad2794bd3ccd8f0f75c45497dba80c104}\index{sysio::chain::incremental\_merkle\_impl$<$ DigestType, Container, Args $>$@{sysio::chain::incremental\_merkle\_impl$<$ DigestType, Container, Args $>$}!incremental\_merkle\_impl@{incremental\_merkle\_impl}}
+\index{incremental\_merkle\_impl@{incremental\_merkle\_impl}!sysio::chain::incremental\_merkle\_impl$<$ DigestType, Container, Args $>$@{sysio::chain::incremental\_merkle\_impl$<$ DigestType, Container, Args $>$}}
+\doxysubsubsection{\texorpdfstring{incremental\_merkle\_impl()}{incremental\_merkle\_impl()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1incremental__merkle__impl_ad2794bd3ccd8f0f75c45497dba80c104} 
+template$<$typename Digest\+Type , \mbox{\hyperlink{yubihsm__pkcs11_8c_a53ef06e29c840024a683512c1acd791a}{template}}$<$ typename ... $>$ \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} Container = vector, typename ... Args$>$ \\
+\mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl}{sysio\+::chain\+::incremental\+\_\+merkle\+\_\+impl}}$<$ Digest\+Type, Container, Args $>$\+::incremental\+\_\+merkle\+\_\+impl (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl}{incremental\+\_\+merkle\+\_\+impl}}$<$ Digest\+Type, Container, Args $>$ \&\&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [default]}}
+
+\Hypertarget{classsysio_1_1chain_1_1incremental__merkle__impl_ab99b2dca68e1d5384b82f016b1aa0f2b}\index{sysio::chain::incremental\_merkle\_impl$<$ DigestType, Container, Args $>$@{sysio::chain::incremental\_merkle\_impl$<$ DigestType, Container, Args $>$}!incremental\_merkle\_impl@{incremental\_merkle\_impl}}
+\index{incremental\_merkle\_impl@{incremental\_merkle\_impl}!sysio::chain::incremental\_merkle\_impl$<$ DigestType, Container, Args $>$@{sysio::chain::incremental\_merkle\_impl$<$ DigestType, Container, Args $>$}}
+\doxysubsubsection{\texorpdfstring{incremental\_merkle\_impl()}{incremental\_merkle\_impl()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1incremental__merkle__impl_ab99b2dca68e1d5384b82f016b1aa0f2b} 
+template$<$typename Digest\+Type , \mbox{\hyperlink{yubihsm__pkcs11_8c_a53ef06e29c840024a683512c1acd791a}{template}}$<$ typename ... $>$ \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} Container = vector, typename ... Args$>$ \\
+template$<$typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} , std\+::enable\+\_\+if\+\_\+t$<$!std\+::is\+\_\+same$<$ std\+::decay\+\_\+t$<$ \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$, \mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl}{incremental\+\_\+merkle\+\_\+impl}} $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}}, int $>$  = 0$>$ \\
+\mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl}{sysio\+::chain\+::incremental\+\_\+merkle\+\_\+impl}}$<$ Digest\+Type, Container, Args $>$\+::incremental\+\_\+merkle\+\_\+impl (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} \&\&}]{alloc}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{incremental__merkle_8hpp_source_l00107}{107}} of file \mbox{\hyperlink{incremental__merkle_8hpp_source}{incremental\+\_\+merkle.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00107\ :\mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl_a60ab24f98b31e15542b84427d77a0fc1}{\_active\_nodes}}(forward<Allocator>(alloc))\{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1chain_1_1incremental__merkle__impl_a4192de0909a94a3eadcf2938079c5adb}\index{sysio::chain::incremental\_merkle\_impl$<$ DigestType, Container, Args $>$@{sysio::chain::incremental\_merkle\_impl$<$ DigestType, Container, Args $>$}!append@{append}}
+\index{append@{append}!sysio::chain::incremental\_merkle\_impl$<$ DigestType, Container, Args $>$@{sysio::chain::incremental\_merkle\_impl$<$ DigestType, Container, Args $>$}}
+\doxysubsubsection{\texorpdfstring{append()}{append()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1incremental__merkle__impl_a4192de0909a94a3eadcf2938079c5adb} 
+template$<$typename Digest\+Type , \mbox{\hyperlink{yubihsm__pkcs11_8c_a53ef06e29c840024a683512c1acd791a}{template}}$<$ typename ... $>$ \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} Container = vector, typename ... Args$>$ \\
+const Digest\+Type \& \mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl}{sysio\+::chain\+::incremental\+\_\+merkle\+\_\+impl}}$<$ Digest\+Type, Container, Args $>$\+::append (\begin{DoxyParamCaption}\item[{const Digest\+Type \&}]{digest}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Add a node to the incremental tree and recalculate the \+\_\+active\+\_\+nodes so they are prepared for the next append.
+
+The algorithm for this is to start at the new node and retreat through the tree for any node that is the concatenation of a fully-\/realized node and a partially realized node we must record the value of the fully-\/realized node in the new \+\_\+active\+\_\+nodes so that the next append can fetch it. Fully realized nodes and Fully implied nodes do not have an effect on the \+\_\+active\+\_\+nodes.
+
+For convention {\itshape AND} to allow appends when the \+\_\+node\+\_\+count is a power-\/of-\/2, the current root of the incremental tree is always appended to the end of the new \+\_\+active\+\_\+nodes.
+
+In practice, this can be done iteratively by recording any "{}left"{} value that is to be combined with an implied node.
+
+If the appended node is a "{}left"{} node in its pair, it will immediately push itself into the new active nodes list.
+
+If the new node is a "{}right"{} node it will begin collapsing upward in the tree, reading and discarding the "{}left"{} node data from the old active nodes list, until it becomes a "{}left"{} node. It must then push the "{}top"{} of its current collapsed sub-\/tree into the new active nodes list.
+
+Once any value has been added to the new active nodes, all remaining "{}left"{} nodes should be present in the order they are needed in the previous active nodes as an artifact of the previous append. As they are read from the old active nodes, they will need to be copied in to the new active nodes list as they are still needed for future appends.
+
+As a result, if an append collapses the entire tree while always being the "{}right"{} node, the new list of active nodes will be empty and by definition the tree contains a power-\/of-\/2 number of nodes.
+
+Regardless of the contents of the new active nodes list, the top "{}collapsed"{} value is appended. If this tree is {\itshape not} a power-\/of-\/2 number of nodes, this node will not be used in the next append but still serves as a conventional place to access the root of the current tree. If this {\itshape is} a power-\/of-\/2 number of nodes, this node will be needed during then collapse phase of the next append so, it serves double duty as a legitimate active node and the conventional storage location of the root.
+
+
+\begin{DoxyParams}{Parameters}
+{\em digest} & -\/ the node to add \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+-\/ the new root 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{incremental__merkle_8hpp_source_l00168}{168}} of file \mbox{\hyperlink{incremental__merkle_8hpp_source}{incremental\+\_\+merkle.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ partial\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ max\_depth\ =\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1detail_a4792d9890e3eac4dcda1701a5205b6a0}{detail::calcluate\_max\_depth}}(\mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl_ac877442baeeb8db5ff69267bd9c46cc5}{\_node\_count}}\ +\ 1);}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ current\_depth\ =\ max\_depth\ -\/\ 1;}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ index\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl_ac877442baeeb8db5ff69267bd9c46cc5}{\_node\_count}};}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ top\ =\ \mbox{\hyperlink{namespacefc_a150ca4cd9c0318ca45dc0dc7df5d58b9}{digest}};}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ active\_iter\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl_a60ab24f98b31e15542b84427d77a0fc1}{\_active\_nodes}}.begin();}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ updated\_active\_nodes\ =\ vector<DigestType>();}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \ updated\_active\_nodes.reserve(max\_depth);}
+\DoxyCodeLine{00177\ }
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (current\_depth\ >\ 0)\ \{}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!(index\ \&\ 0x1))\ \{}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ we\ are\ collapsing\ from\ a\ "{}left"{}\ value\ and\ an\ implied\ "{}right"{}\ creating\ a\ partial\ node}}
+\DoxyCodeLine{00181\ }
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ we\ only\ need\ to\ append\ this\ node\ if\ it\ is\ fully-\/realized\ and\ by\ definition}}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ if\ we\ have\ encountered\ a\ partial\ node\ during\ collapse\ this\ cannot\ be}}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ fully-\/realized}}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!partial)\ \{}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ updated\_active\_nodes.emplace\_back(top);}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00188\ }
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ calculate\ the\ partially\ realized\ node\ value\ by\ implying\ the\ "{}right"{}\ value\ is\ identical}}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ to\ the\ "{}left"{}\ value}}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ top\ =\ DigestType::hash(\mbox{\hyperlink{namespacesysio_1_1chain_aaef17ed9b59c73f49f1889fe7484314f}{make\_canonical\_pair}}(top,\ top));}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ partial\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ we\ are\ collapsing\ from\ a\ "{}right"{}\ value\ and\ an\ fully-\/realized\ "{}left"{}}}
+\DoxyCodeLine{00195\ }
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ pull\ a\ "{}left"{}\ value\ from\ the\ previous\ active\ nodes}}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ left\_value\ =\ *active\_iter;}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++active\_iter;}
+\DoxyCodeLine{00199\ }
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ if\ the\ "{}right"{}\ value\ is\ a\ partial\ node\ we\ will\ need\ to\ copy\ the\ "{}left"{}\ as\ future\ appends\ still\ need\ it}}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ otherwise,\ it\ can\ be\ dropped\ from\ the\ set\ of\ active\ nodes\ as\ we\ are\ collapsing\ a\ fully-\/realized\ node}}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (partial)\ \{}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ updated\_active\_nodes.emplace\_back(left\_value);}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00205\ }
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ calculate\ the\ node}}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ top\ =\ DigestType::hash(\mbox{\hyperlink{namespacesysio_1_1chain_aaef17ed9b59c73f49f1889fe7484314f}{make\_canonical\_pair}}(left\_value,\ top));}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00209\ }
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ move\ up\ a\ level\ in\ the\ tree}}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \ \ \ \ \ \ current\_depth-\/-\/;}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \ \ \ \ \ \ index\ =\ index\ >>\ 1;}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00214\ }
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ append\ the\ top\ of\ the\ collapsed\ tree\ (aka\ the\ root\ of\ the\ merkle)}}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ \ updated\_active\_nodes.emplace\_back(top);}
+\DoxyCodeLine{00217\ }
+\DoxyCodeLine{00218\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ store\ the\ new\ active\_nodes}}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1detail_ae701f28aaa83d39549003f9df7b5dd7a}{detail::move\_nodes}}(\mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl_a60ab24f98b31e15542b84427d77a0fc1}{\_active\_nodes}},\ std::move(updated\_active\_nodes));}
+\DoxyCodeLine{00220\ }
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ update\ the\ node\ count}}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl_ac877442baeeb8db5ff69267bd9c46cc5}{\_node\_count}}++;}
+\DoxyCodeLine{00223\ }
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl_a60ab24f98b31e15542b84427d77a0fc1}{\_active\_nodes}}.back();}
+\DoxyCodeLine{00225\ }
+\DoxyCodeLine{00226\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1incremental__merkle__impl_a4192de0909a94a3eadcf2938079c5adb_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1incremental__merkle__impl_ab760e92a9b454f1f0281a8cc053e0965}\index{sysio::chain::incremental\_merkle\_impl$<$ DigestType, Container, Args $>$@{sysio::chain::incremental\_merkle\_impl$<$ DigestType, Container, Args $>$}!get\_root@{get\_root}}
+\index{get\_root@{get\_root}!sysio::chain::incremental\_merkle\_impl$<$ DigestType, Container, Args $>$@{sysio::chain::incremental\_merkle\_impl$<$ DigestType, Container, Args $>$}}
+\doxysubsubsection{\texorpdfstring{get\_root()}{get\_root()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1incremental__merkle__impl_ab760e92a9b454f1f0281a8cc053e0965} 
+template$<$typename Digest\+Type , \mbox{\hyperlink{yubihsm__pkcs11_8c_a53ef06e29c840024a683512c1acd791a}{template}}$<$ typename ... $>$ \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} Container = vector, typename ... Args$>$ \\
+Digest\+Type \mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl}{sysio\+::chain\+::incremental\+\_\+merkle\+\_\+impl}}$<$ Digest\+Type, Container, Args $>$\+::get\+\_\+root (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+l return the current root of the incremental merkle
+
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{incremental__merkle_8hpp_source_l00233}{233}} of file \mbox{\hyperlink{incremental__merkle_8hpp_source}{incremental\+\_\+merkle.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00233\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00234\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl_ac877442baeeb8db5ff69267bd9c46cc5}{\_node\_count}}\ >\ 0)\ \{}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl_a60ab24f98b31e15542b84427d77a0fc1}{\_active\_nodes}}.back();}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00237\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ DigestType();}
+\DoxyCodeLine{00238\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1incremental__merkle__impl_ab760e92a9b454f1f0281a8cc053e0965_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1incremental__merkle__impl_a189c517565c5733a2a5e4aa1a47971ff}\index{sysio::chain::incremental\_merkle\_impl$<$ DigestType, Container, Args $>$@{sysio::chain::incremental\_merkle\_impl$<$ DigestType, Container, Args $>$}!operator=@{operator=}}
+\index{operator=@{operator=}!sysio::chain::incremental\_merkle\_impl$<$ DigestType, Container, Args $>$@{sysio::chain::incremental\_merkle\_impl$<$ DigestType, Container, Args $>$}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1incremental__merkle__impl_a189c517565c5733a2a5e4aa1a47971ff} 
+template$<$typename Digest\+Type , \mbox{\hyperlink{yubihsm__pkcs11_8c_a53ef06e29c840024a683512c1acd791a}{template}}$<$ typename ... $>$ \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} Container = vector, typename ... Args$>$ \\
+\mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl}{incremental\+\_\+merkle\+\_\+impl}} \& \mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl}{sysio\+::chain\+::incremental\+\_\+merkle\+\_\+impl}}$<$ Digest\+Type, Container, Args $>$\+::operator= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl}{incremental\+\_\+merkle\+\_\+impl}}$<$ Digest\+Type, Container, Args $>$ \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [default]}}
+
+\Hypertarget{classsysio_1_1chain_1_1incremental__merkle__impl_a34013a415c8106c7585be2addb3237ab}\index{sysio::chain::incremental\_merkle\_impl$<$ DigestType, Container, Args $>$@{sysio::chain::incremental\_merkle\_impl$<$ DigestType, Container, Args $>$}!operator=@{operator=}}
+\index{operator=@{operator=}!sysio::chain::incremental\_merkle\_impl$<$ DigestType, Container, Args $>$@{sysio::chain::incremental\_merkle\_impl$<$ DigestType, Container, Args $>$}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1incremental__merkle__impl_a34013a415c8106c7585be2addb3237ab} 
+template$<$typename Digest\+Type , \mbox{\hyperlink{yubihsm__pkcs11_8c_a53ef06e29c840024a683512c1acd791a}{template}}$<$ typename ... $>$ \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} Container = vector, typename ... Args$>$ \\
+\mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl}{incremental\+\_\+merkle\+\_\+impl}} \& \mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl}{sysio\+::chain\+::incremental\+\_\+merkle\+\_\+impl}}$<$ Digest\+Type, Container, Args $>$\+::operator= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl}{incremental\+\_\+merkle\+\_\+impl}}$<$ Digest\+Type, Container, Args $>$ \&\&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [default]}}
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classsysio_1_1chain_1_1incremental__merkle__impl_a60ab24f98b31e15542b84427d77a0fc1}\index{sysio::chain::incremental\_merkle\_impl$<$ DigestType, Container, Args $>$@{sysio::chain::incremental\_merkle\_impl$<$ DigestType, Container, Args $>$}!\_active\_nodes@{\_active\_nodes}}
+\index{\_active\_nodes@{\_active\_nodes}!sysio::chain::incremental\_merkle\_impl$<$ DigestType, Container, Args $>$@{sysio::chain::incremental\_merkle\_impl$<$ DigestType, Container, Args $>$}}
+\doxysubsubsection{\texorpdfstring{\_active\_nodes}{\_active\_nodes}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1incremental__merkle__impl_a60ab24f98b31e15542b84427d77a0fc1} 
+template$<$typename Digest\+Type , \mbox{\hyperlink{yubihsm__pkcs11_8c_a53ef06e29c840024a683512c1acd791a}{template}}$<$ typename ... $>$ \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} Container = vector, typename ... Args$>$ \\
+Container$<$Digest\+Type, Args...$>$ \mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl}{sysio\+::chain\+::incremental\+\_\+merkle\+\_\+impl}}$<$ Digest\+Type, Container, Args $>$\+::\+\_\+active\+\_\+nodes}
+
+
+
+Definition at line \mbox{\hyperlink{incremental__merkle_8hpp_source_l00243}{243}} of file \mbox{\hyperlink{incremental__merkle_8hpp_source}{incremental\+\_\+merkle.\+hpp}}.
+
+\Hypertarget{classsysio_1_1chain_1_1incremental__merkle__impl_ac877442baeeb8db5ff69267bd9c46cc5}\index{sysio::chain::incremental\_merkle\_impl$<$ DigestType, Container, Args $>$@{sysio::chain::incremental\_merkle\_impl$<$ DigestType, Container, Args $>$}!\_node\_count@{\_node\_count}}
+\index{\_node\_count@{\_node\_count}!sysio::chain::incremental\_merkle\_impl$<$ DigestType, Container, Args $>$@{sysio::chain::incremental\_merkle\_impl$<$ DigestType, Container, Args $>$}}
+\doxysubsubsection{\texorpdfstring{\_node\_count}{\_node\_count}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1incremental__merkle__impl_ac877442baeeb8db5ff69267bd9c46cc5} 
+template$<$typename Digest\+Type , \mbox{\hyperlink{yubihsm__pkcs11_8c_a53ef06e29c840024a683512c1acd791a}{template}}$<$ typename ... $>$ \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} Container = vector, typename ... Args$>$ \\
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{classsysio_1_1chain_1_1incremental__merkle__impl}{sysio\+::chain\+::incremental\+\_\+merkle\+\_\+impl}}$<$ Digest\+Type, Container, Args $>$\+::\+\_\+node\+\_\+count}
+
+
+
+Definition at line \mbox{\hyperlink{incremental__merkle_8hpp_source_l00242}{242}} of file \mbox{\hyperlink{incremental__merkle_8hpp_source}{incremental\+\_\+merkle.\+hpp}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{incremental__merkle_8hpp}{incremental\+\_\+merkle.\+hpp}}\end{DoxyCompactItemize}

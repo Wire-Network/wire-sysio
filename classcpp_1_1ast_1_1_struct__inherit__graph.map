@@ -1,0 +1,11 @@
+<map id="cpp.ast.Struct" name="cpp.ast.Struct">
+<area shape="rect" id="Node000001" title=" " alt="" coords="47,300,150,326"/>
+<area shape="rect" id="Node000002" href="$classcpp_1_1ast_1_1_class.html" title=" " alt="" coords="47,226,150,252"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="101,267,101,300,96,300,96,267"/>
+<area shape="rect" id="Node000003" href="$classcpp_1_1ast_1_1___generic_declaration.html" title=" " alt="" coords="5,153,192,178"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="101,194,101,226,96,226,96,194"/>
+<area shape="rect" id="Node000004" href="$classcpp_1_1ast_1_1_node.html" title=" " alt="" coords="49,79,148,105"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="101,120,101,152,96,152,96,120"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="70,5,127,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="101,46,101,79,96,79,96,46"/>
+</map>

@@ -1,0 +1,146 @@
+\doxysection{libraries/fc/vendor/websocketpp/test/utility/sha1.cpp File Reference}
+\hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp}{}\label{vendor_2websocketpp_2test_2utility_2sha1_8cpp}\index{libraries/fc/vendor/websocketpp/test/utility/sha1.cpp@{libraries/fc/vendor/websocketpp/test/utility/sha1.cpp}}
+{\ttfamily \#include $<$boost/test/unit\+\_\+test.\+hpp$>$}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$string$>$}\newline
+{\ttfamily \#include $<$websocketpp/sha1/sha1.\+hpp$>$}\newline
+{\ttfamily \#include $<$websocketpp/utilities.\+hpp$>$}\newline
+Include dependency graph for sha1.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{vendor_2websocketpp_2test_2utility_2sha1_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{vendor_2websocketpp_2test_2utility_2sha1_8cpp_a6b2a3852db8bb19ab6909bac01859985}{BOOST\+\_\+\+TEST\+\_\+\+MODULE}}~sha1
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{vendor_2websocketpp_2test_2utility_2sha1_8cpp_acc1942645bdf69bea0447343cd0557bc}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (sha1\+\_\+test\+\_\+a)
+\item 
+\mbox{\hyperlink{vendor_2websocketpp_2test_2utility_2sha1_8cpp_ac7c6e297a2903e7ba2c9082e9ebb4afc}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (sha1\+\_\+test\+\_\+b)
+\item 
+\mbox{\hyperlink{vendor_2websocketpp_2test_2utility_2sha1_8cpp_a001a8b9cfa45ffd5e2fa9eb09d1f53e3}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (sha1\+\_\+test\+\_\+c)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_a6b2a3852db8bb19ab6909bac01859985}\index{sha1.cpp@{sha1.cpp}!BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}}
+\index{BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}!sha1.cpp@{sha1.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_TEST\_MODULE}{BOOST\_TEST\_MODULE}}
+{\footnotesize\ttfamily \label{vendor_2websocketpp_2test_2utility_2sha1_8cpp_a6b2a3852db8bb19ab6909bac01859985} 
+\#define BOOST\+\_\+\+TEST\+\_\+\+MODULE~sha1}
+
+
+
+Definition at line \mbox{\hyperlink{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00028}{28}} of file \mbox{\hyperlink{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source}{sha1.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_acc1942645bdf69bea0447343cd0557bc}\index{sha1.cpp@{sha1.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!sha1.cpp@{sha1.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{vendor_2websocketpp_2test_2utility_2sha1_8cpp_acc1942645bdf69bea0447343cd0557bc} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{sha1\+\_\+test\+\_\+a}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00039}{39}} of file \mbox{\hyperlink{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source}{sha1.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00040\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ hash[20];}
+\DoxyCodeLine{00041\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ reference[20]\ =\ \{0xa9,\ 0x99,\ 0x3e,\ 0x36,\ 0x47,}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x06,\ 0x81,\ 0x6a,\ 0xba,\ 0x3e,}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x25,\ 0x71,\ 0x78,\ 0x50,\ 0xc2,}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x6c,\ 0x9c,\ 0xd0,\ 0xd8,\ 0x9d\};}
+\DoxyCodeLine{00045\ }
+\DoxyCodeLine{00046\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1sha1_ad75335df7a69d69b3fb8fef3f4594812}{websocketpp::sha1::calc}}(\textcolor{stringliteral}{"{}abc"{}},3,hash);}
+\DoxyCodeLine{00047\ }
+\DoxyCodeLine{00048\ \ \ \ \ BOOST\_CHECK\_EQUAL\_COLLECTIONS(hash,\ hash+20,\ reference,\ reference+20);}
+\DoxyCodeLine{00049\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{vendor_2websocketpp_2test_2utility_2sha1_8cpp_acc1942645bdf69bea0447343cd0557bc_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_ac7c6e297a2903e7ba2c9082e9ebb4afc}\index{sha1.cpp@{sha1.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!sha1.cpp@{sha1.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{vendor_2websocketpp_2test_2utility_2sha1_8cpp_ac7c6e297a2903e7ba2c9082e9ebb4afc} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{sha1\+\_\+test\+\_\+b}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00051}{51}} of file \mbox{\hyperlink{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source}{sha1.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00052\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ hash[20];}
+\DoxyCodeLine{00053\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ reference[20]\ =\ \{0x84,\ 0x98,\ 0x3e,\ 0x44,\ 0x1c,}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x3b,\ 0xd2,\ 0x6e,\ 0xba,\ 0xae,}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x4a,\ 0xa1,\ 0xf9,\ 0x51,\ 0x29,}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0xe5,\ 0xe5,\ 0x46,\ 0x70,\ 0xf1\};}
+\DoxyCodeLine{00057\ }
+\DoxyCodeLine{00058\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1sha1_ad75335df7a69d69b3fb8fef3f4594812}{websocketpp::sha1::calc}}(}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq"{}},56,hash);}
+\DoxyCodeLine{00060\ }
+\DoxyCodeLine{00061\ \ \ \ \ BOOST\_CHECK\_EQUAL\_COLLECTIONS(hash,\ hash+20,\ reference,\ reference+20);}
+\DoxyCodeLine{00062\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{vendor_2websocketpp_2test_2utility_2sha1_8cpp_ac7c6e297a2903e7ba2c9082e9ebb4afc_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_a001a8b9cfa45ffd5e2fa9eb09d1f53e3}\index{sha1.cpp@{sha1.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!sha1.cpp@{sha1.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{vendor_2websocketpp_2test_2utility_2sha1_8cpp_a001a8b9cfa45ffd5e2fa9eb09d1f53e3} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{sha1\+\_\+test\+\_\+c}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00064}{64}} of file \mbox{\hyperlink{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source}{sha1.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00065\ \ \ \ \ std::string\ input;}
+\DoxyCodeLine{00066\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ hash[20];}
+\DoxyCodeLine{00067\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ reference[20]\ =\ \{0x34,\ 0xaa,\ 0x97,\ 0x3c,\ 0xd4,}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0xc4,\ 0xda,\ 0xa4,\ 0xf6,\ 0x1e,}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0xeb,\ 0x2b,\ 0xdb,\ 0xad,\ 0x27,}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x31,\ 0x65,\ 0x34,\ 0x01,\ 0x6f\};}
+\DoxyCodeLine{00071\ }
+\DoxyCodeLine{00072\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ 1000000;\ i++)\ \{}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ input\ +=\ \textcolor{charliteral}{'a'};}
+\DoxyCodeLine{00074\ \ \ \ \ \}}
+\DoxyCodeLine{00075\ }
+\DoxyCodeLine{00076\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1sha1_ad75335df7a69d69b3fb8fef3f4594812}{websocketpp::sha1::calc}}(input.c\_str(),input.size(),hash);}
+\DoxyCodeLine{00077\ }
+\DoxyCodeLine{00078\ \ \ \ \ BOOST\_CHECK\_EQUAL\_COLLECTIONS(hash,\ hash+20,\ reference,\ reference+20);}
+\DoxyCodeLine{00079\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{vendor_2websocketpp_2test_2utility_2sha1_8cpp_a001a8b9cfa45ffd5e2fa9eb09d1f53e3_cgraph}
+\end{center}
+\end{figure}

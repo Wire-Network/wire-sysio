@@ -1,0 +1,50 @@
+\doxysection{mmap\+\_\+struct.\+hpp}
+\hypertarget{mmap__struct_8hpp_source}{}\label{mmap__struct_8hpp_source}\index{libraries/fc/include/fc/interprocess/mmap\_struct.hpp@{libraries/fc/include/fc/interprocess/mmap\_struct.hpp}}
+\mbox{\hyperlink{mmap__struct_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{mmap__struct_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{mmap__struct_8hpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{file__mapping_8hpp}{fc/interprocess/file\_mapping.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{mmap__struct_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <memory>}}
+\DoxyCodeLine{\Hypertarget{mmap__struct_8hpp_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{mmap__struct_8hpp_source_l00005}00005\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}}
+\DoxyCodeLine{\Hypertarget{mmap__struct_8hpp_source_l00006}00006\ \{}
+\DoxyCodeLine{\Hypertarget{mmap__struct_8hpp_source_l00007}00007\ \ \ \ \textcolor{keyword}{class\ }path;}
+\DoxyCodeLine{\Hypertarget{mmap__struct_8hpp_source_l00008}00008\ \ \ \ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacedetail}{detail}}}
+\DoxyCodeLine{\Hypertarget{mmap__struct_8hpp_source_l00009}00009\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{mmap__struct_8hpp_source_l00013}\mbox{\hyperlink{classfc_1_1detail_1_1mmap__struct__base}{00013}}\ \ \ \ \ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classfc_1_1detail_1_1mmap__struct__base}{mmap\_struct\_base}}}
+\DoxyCodeLine{\Hypertarget{mmap__struct_8hpp_source_l00014}00014\ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{mmap__struct_8hpp_source_l00015}00015\ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{mmap__struct_8hpp_source_l00016}00016\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classfc_1_1detail_1_1mmap__struct__base_a21fe0dadcd678e4ed9fc839265cab733}{size}}()\textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{mmap__struct_8hpp_source_l00017}00017\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1detail_1_1mmap__struct__base_a3711d51c2211d55864a8c8b83e2bf811}{flush}}();}
+\DoxyCodeLine{\Hypertarget{mmap__struct_8hpp_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{mmap__struct_8hpp_source_l00019}00019\ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{\Hypertarget{mmap__struct_8hpp_source_l00020}00020\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1detail_1_1mmap__struct__base_a0328d6168aaa14fa81db688b623def57}{open}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1path}{fc::path}}\&\ file,\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ \textcolor{keywordtype}{bool}\ create\ );}
+\DoxyCodeLine{\Hypertarget{mmap__struct_8hpp_source_l00021}\mbox{\hyperlink{classfc_1_1detail_1_1mmap__struct__base_ae2fbc74484eb156d0ce6ec7c6c2aa90d}{00021}}\ \ \ \ \ \ \ \ \ \ \ \ \ std::unique\_ptr<fc::file\_mapping>\ \ \mbox{\hyperlink{classfc_1_1detail_1_1mmap__struct__base_ae2fbc74484eb156d0ce6ec7c6c2aa90d}{\_file\_mapping}};}
+\DoxyCodeLine{\Hypertarget{mmap__struct_8hpp_source_l00022}\mbox{\hyperlink{classfc_1_1detail_1_1mmap__struct__base_abbe030f02ae317c8044b14dbd3e9a001}{00022}}\ \ \ \ \ \ \ \ \ \ \ \ \ std::unique\_ptr<fc::mapped\_region>\ \mbox{\hyperlink{classfc_1_1detail_1_1mmap__struct__base_abbe030f02ae317c8044b14dbd3e9a001}{\_mapped\_region}};}
+\DoxyCodeLine{\Hypertarget{mmap__struct_8hpp_source_l00023}00023\ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{mmap__struct_8hpp_source_l00024}00024\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{mmap__struct_8hpp_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{mmap__struct_8hpp_source_l00032}00032\ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{mmap__struct_8hpp_source_l00033}\mbox{\hyperlink{classfc_1_1mmap__struct}{00033}}\ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classfc_1_1mmap__struct}{mmap\_struct}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classfc_1_1detail_1_1mmap__struct__base}{detail::mmap\_struct\_base}}}
+\DoxyCodeLine{\Hypertarget{mmap__struct_8hpp_source_l00034}00034\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{mmap__struct_8hpp_source_l00035}00035\ \ \ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{mmap__struct_8hpp_source_l00036}\mbox{\hyperlink{classfc_1_1mmap__struct_a8a55339057f8e690da03c4872aef0e6e}{00036}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1mmap__struct_a8a55339057f8e690da03c4872aef0e6e}{mmap\_struct}}():\_mapped\_struct(nullptr)\{\}}
+\DoxyCodeLine{\Hypertarget{mmap__struct_8hpp_source_l00043}\mbox{\hyperlink{classfc_1_1mmap__struct_acce9015a433bd1366d2eba95c4e53ab2}{00043}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1mmap__struct_acce9015a433bd1366d2eba95c4e53ab2}{open}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1path}{fc::path}}\&\ file,\ \textcolor{keywordtype}{bool}\ create\ =\ \textcolor{keyword}{false}\ )}
+\DoxyCodeLine{\Hypertarget{mmap__struct_8hpp_source_l00044}00044\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{mmap__struct_8hpp_source_l00045}00045\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1mmap__struct__base_a0328d6168aaa14fa81db688b623def57}{detail::mmap\_struct\_base::open}}(\ file,\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}),\ create\ );\ }
+\DoxyCodeLine{\Hypertarget{mmap__struct_8hpp_source_l00046}00046\ \ \ \ \ \ \ \ \ \ \ \ \ \_mapped\_struct\ =\ (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*)\mbox{\hyperlink{classfc_1_1detail_1_1mmap__struct__base_abbe030f02ae317c8044b14dbd3e9a001}{\_mapped\_region}}-\/>get\_address();}
+\DoxyCodeLine{\Hypertarget{mmap__struct_8hpp_source_l00047}00047\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{mmap__struct_8hpp_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{mmap__struct_8hpp_source_l00049}\mbox{\hyperlink{classfc_1_1mmap__struct_a7d741878a72bea64ed9f57161dd43998}{00049}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1mmap__struct_a7d741878a72bea64ed9f57161dd43998}{operator-\/>}}()\ \ \ \ \ \ \{\ \textcolor{keywordflow}{return}\ \_mapped\_struct;\ \}}
+\DoxyCodeLine{\Hypertarget{mmap__struct_8hpp_source_l00050}\mbox{\hyperlink{classfc_1_1mmap__struct_afe0006e61f96834590116a27c22627ef}{00050}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ \mbox{\hyperlink{classfc_1_1mmap__struct_afe0006e61f96834590116a27c22627ef}{operator-\/>}}()\textcolor{keyword}{const\ }\{\ \textcolor{keywordflow}{return}\ \_mapped\_struct;\ \}}
+\DoxyCodeLine{\Hypertarget{mmap__struct_8hpp_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{mmap__struct_8hpp_source_l00052}\mbox{\hyperlink{classfc_1_1mmap__struct_acf78724ad1c41b726f452effc0383481}{00052}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1mmap__struct_acf78724ad1c41b726f452effc0383481}{operator*}}()\ \ \ \ \ \ \ \{\ \textcolor{keywordflow}{return}\ *\_mapped\_struct;\ \}}
+\DoxyCodeLine{\Hypertarget{mmap__struct_8hpp_source_l00053}\mbox{\hyperlink{classfc_1_1mmap__struct_ad2c663d4174f7d04bde85d5e509ec3ab}{00053}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ \mbox{\hyperlink{classfc_1_1mmap__struct_ad2c663d4174f7d04bde85d5e509ec3ab}{operator*}}()\textcolor{keyword}{const\ \ }\{\ \textcolor{keywordflow}{return}\ *\_mapped\_struct;\ \}}
+\DoxyCodeLine{\Hypertarget{mmap__struct_8hpp_source_l00054}00054\ }
+\DoxyCodeLine{\Hypertarget{mmap__struct_8hpp_source_l00055}00055\ \ \ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{mmap__struct_8hpp_source_l00056}00056\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_mapped\_struct;}
+\DoxyCodeLine{\Hypertarget{mmap__struct_8hpp_source_l00057}00057\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{mmap__struct_8hpp_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{mmap__struct_8hpp_source_l00059}00059\ \}}
+
+\end{DoxyCode}

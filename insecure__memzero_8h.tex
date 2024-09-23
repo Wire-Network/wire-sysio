@@ -1,0 +1,40 @@
+\doxysection{libraries/yubihsm/common/insecure\+\_\+memzero.h File Reference}
+\hypertarget{insecure__memzero_8h}{}\label{insecure__memzero_8h}\index{libraries/yubihsm/common/insecure\_memzero.h@{libraries/yubihsm/common/insecure\_memzero.h}}
+{\ttfamily \#include $<$openssl/crypto.\+h$>$}\newline
+Include dependency graph for insecure\+\_\+memzero.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=210pt]{insecure__memzero_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{insecure__memzero_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{insecure__memzero_8h_a0794f9275fd1036ecba6ff0a901a320b}{insecure\+\_\+memzero}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},  \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{insecure__memzero_8h_a0794f9275fd1036ecba6ff0a901a320b}\index{insecure\_memzero.h@{insecure\_memzero.h}!insecure\_memzero@{insecure\_memzero}}
+\index{insecure\_memzero@{insecure\_memzero}!insecure\_memzero.h@{insecure\_memzero.h}}
+\doxysubsubsection{\texorpdfstring{insecure\_memzero}{insecure\_memzero}}
+{\footnotesize\ttfamily \label{insecure__memzero_8h_a0794f9275fd1036ecba6ff0a901a320b} 
+\#define insecure\+\_\+memzero(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}}{, }\item[{}]{\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{OPENSSL\_cleanse(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{insecure__memzero_8h_source_l00031}{31}} of file \mbox{\hyperlink{insecure__memzero_8h_source}{insecure\+\_\+memzero.\+h}}.
+

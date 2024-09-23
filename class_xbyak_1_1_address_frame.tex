@@ -1,0 +1,112 @@
+\doxysection{Xbyak\+::Address\+Frame Class Reference}
+\hypertarget{class_xbyak_1_1_address_frame}{}\label{class_xbyak_1_1_address_frame}\index{Xbyak::AddressFrame@{Xbyak::AddressFrame}}
+
+
+{\ttfamily \#include $<$xbyak.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_xbyak_1_1_address_frame_a3c8559aebbb29a01c6ffc0a4bf4e6190}{Address\+Frame}} (\mbox{\hyperlink{namespace_xbyak_a880d0e902046fa68ba57ae3fbc4acdf3}{uint32}} \mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}}, bool broadcast=false)
+\item 
+\mbox{\hyperlink{class_xbyak_1_1_address}{Address}} \mbox{\hyperlink{class_xbyak_1_1_address_frame_ad7fb7f011dbc05f3697c6ef05e480e2d}{operator\mbox{[}$\,$\mbox{]}}} (const \mbox{\hyperlink{class_xbyak_1_1_reg_exp}{Reg\+Exp}} \&e) const
+\item 
+\mbox{\hyperlink{class_xbyak_1_1_address}{Address}} \mbox{\hyperlink{class_xbyak_1_1_address_frame_a7c20654105f8f47958ff6df162c5e4a6}{operator\mbox{[}$\,$\mbox{]}}} (const void \texorpdfstring{$\ast$}{*}disp) const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+const \mbox{\hyperlink{namespace_xbyak_a880d0e902046fa68ba57ae3fbc4acdf3}{uint32}} \mbox{\hyperlink{class_xbyak_1_1_address_frame_abec12608c7f868da8f542a187bbc48f9}{bit\+\_\+}}
+\item 
+const bool \mbox{\hyperlink{class_xbyak_1_1_address_frame_aed429defc24eb0859f82f471efef3c96}{broadcast\+\_\+}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l01056}{1056}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_xbyak_1_1_address_frame_a3c8559aebbb29a01c6ffc0a4bf4e6190}\index{Xbyak::AddressFrame@{Xbyak::AddressFrame}!AddressFrame@{AddressFrame}}
+\index{AddressFrame@{AddressFrame}!Xbyak::AddressFrame@{Xbyak::AddressFrame}}
+\doxysubsubsection{\texorpdfstring{AddressFrame()}{AddressFrame()}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_address_frame_a3c8559aebbb29a01c6ffc0a4bf4e6190} 
+Xbyak\+::\+Address\+Frame\+::\+Address\+Frame (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespace_xbyak_a880d0e902046fa68ba57ae3fbc4acdf3}{uint32}}}]{bit}{, }\item[{bool}]{broadcast}{ = {\ttfamily false}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l01062}{1062}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01062\ :\ \mbox{\hyperlink{class_xbyak_1_1_address_frame_abec12608c7f868da8f542a187bbc48f9}{bit\_}}(\mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}}),\ \mbox{\hyperlink{class_xbyak_1_1_address_frame_aed429defc24eb0859f82f471efef3c96}{broadcast\_}}(broadcast)\ \{\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_xbyak_1_1_address_frame_ad7fb7f011dbc05f3697c6ef05e480e2d}\index{Xbyak::AddressFrame@{Xbyak::AddressFrame}!operator\mbox{[}\mbox{]}@{operator[]}}
+\index{operator\mbox{[}\mbox{]}@{operator[]}!Xbyak::AddressFrame@{Xbyak::AddressFrame}}
+\doxysubsubsection{\texorpdfstring{operator[]()}{operator[]()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_address_frame_ad7fb7f011dbc05f3697c6ef05e480e2d} 
+\mbox{\hyperlink{class_xbyak_1_1_address}{Address}} Xbyak\+::\+Address\+Frame\+::operator\mbox{[}$\,$\mbox{]} (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_xbyak_1_1_reg_exp}{Reg\+Exp}} \&}]{e}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l01063}{1063}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01064\ \ \ \ \ \{}
+\DoxyCodeLine{01065\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Address(\mbox{\hyperlink{class_xbyak_1_1_address_frame_abec12608c7f868da8f542a187bbc48f9}{bit\_}},\ \mbox{\hyperlink{class_xbyak_1_1_address_frame_aed429defc24eb0859f82f471efef3c96}{broadcast\_}},\ e);}
+\DoxyCodeLine{01066\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_xbyak_1_1_address_frame_a7c20654105f8f47958ff6df162c5e4a6}\index{Xbyak::AddressFrame@{Xbyak::AddressFrame}!operator\mbox{[}\mbox{]}@{operator[]}}
+\index{operator\mbox{[}\mbox{]}@{operator[]}!Xbyak::AddressFrame@{Xbyak::AddressFrame}}
+\doxysubsubsection{\texorpdfstring{operator[]()}{operator[]()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_address_frame_a7c20654105f8f47958ff6df162c5e4a6} 
+\mbox{\hyperlink{class_xbyak_1_1_address}{Address}} Xbyak\+::\+Address\+Frame\+::operator\mbox{[}$\,$\mbox{]} (\begin{DoxyParamCaption}\item[{const void \texorpdfstring{$\ast$}{*}}]{disp}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l01067}{1067}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01068\ \ \ \ \ \{}
+\DoxyCodeLine{01069\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Address(\mbox{\hyperlink{class_xbyak_1_1_address_frame_abec12608c7f868da8f542a187bbc48f9}{bit\_}},\ \mbox{\hyperlink{class_xbyak_1_1_address_frame_aed429defc24eb0859f82f471efef3c96}{broadcast\_}},\ RegExp(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(disp)));}
+\DoxyCodeLine{01070\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{class_xbyak_1_1_address_frame_abec12608c7f868da8f542a187bbc48f9}\index{Xbyak::AddressFrame@{Xbyak::AddressFrame}!bit\_@{bit\_}}
+\index{bit\_@{bit\_}!Xbyak::AddressFrame@{Xbyak::AddressFrame}}
+\doxysubsubsection{\texorpdfstring{bit\_}{bit\_}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_address_frame_abec12608c7f868da8f542a187bbc48f9} 
+const \mbox{\hyperlink{namespace_xbyak_a880d0e902046fa68ba57ae3fbc4acdf3}{uint32}} Xbyak\+::\+Address\+Frame\+::bit\+\_\+}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l01060}{1060}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+\Hypertarget{class_xbyak_1_1_address_frame_aed429defc24eb0859f82f471efef3c96}\index{Xbyak::AddressFrame@{Xbyak::AddressFrame}!broadcast\_@{broadcast\_}}
+\index{broadcast\_@{broadcast\_}!Xbyak::AddressFrame@{Xbyak::AddressFrame}}
+\doxysubsubsection{\texorpdfstring{broadcast\_}{broadcast\_}}
+{\footnotesize\ttfamily \label{class_xbyak_1_1_address_frame_aed429defc24eb0859f82f471efef3c96} 
+const bool Xbyak\+::\+Address\+Frame\+::broadcast\+\_\+}
+
+
+
+Definition at line \mbox{\hyperlink{xbyak_8h_source_l01061}{1061}} of file \mbox{\hyperlink{xbyak_8h_source}{xbyak.\+h}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/libraries/ff/depends/xbyak/xbyak/\mbox{\hyperlink{xbyak_8h}{xbyak.\+h}}\end{DoxyCompactItemize}

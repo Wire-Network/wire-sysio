@@ -1,0 +1,5 @@
+<map id="websocketpp::http::parser::extract_token" name="websocketpp::http::parser::extract_token">
+<area shape="rect" id="Node000001" title="Read and return the next token in the stream." alt="" coords="5,5,150,46"/>
+<area shape="rect" id="Node000002" href="$namespacewebsocketpp_1_1http.html#a45a9b60b72b68de7b32fb75d89ad4c04" title="Is the character a non&#45;token." alt="" coords="198,5,334,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="150,23,182,23,182,28,150,28"/>
+</map>

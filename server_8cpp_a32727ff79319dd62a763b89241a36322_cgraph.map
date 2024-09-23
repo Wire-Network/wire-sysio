@@ -1,0 +1,13 @@
+<map id="BOOST_AUTO_TEST_CASE" name="BOOST_AUTO_TEST_CASE">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,112,202,138"/>
+<area shape="rect" id="Node000002" href="$server_8cpp.html#af04788c64ca897bdbce79cbf69ce68d6" title=" " alt="" coords="258,5,414,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="123,109,178,75,249,40,264,34,266,39,251,45,181,80,126,114"/>
+<area shape="rect" id="Node000003" href="$server_8cpp.html#abd12c8271190339b1c63038d6addb4ac" title=" " alt="" coords="280,55,392,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="158,109,265,82,266,87,159,114"/>
+<area shape="rect" id="Node000004" href="$classwebsocketpp_1_1endpoint.html#a06a703c52196d900d1e58b79d6657cc8" title="Sets the user agent string that this endpoint will use." alt="" coords="258,104,414,145"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="202,122,243,122,243,128,202,128"/>
+<area shape="rect" id="Node000005" href="$debug__server_8cpp.html#a76b106c484654b62313da8bace255c9a" title=" " alt="" coords="303,169,369,195"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="159,136,288,168,287,173,158,141"/>
+<area shape="rect" id="Node000006" href="$server_8cpp.html#a2f5fb1e864be468411d5f0008d000401" title=" " alt="" coords="250,219,422,244"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="126,136,181,170,251,205,266,211,264,216,249,210,178,175,123,141"/>
+</map>

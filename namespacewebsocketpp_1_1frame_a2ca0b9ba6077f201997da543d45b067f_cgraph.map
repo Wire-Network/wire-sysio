@@ -1,0 +1,13 @@
+<map id="websocketpp::frame::get_payload_size" name="websocketpp::frame::get_payload_size">
+<area shape="rect" id="Node000001" title="Extract the full payload size field from a WebSocket header." alt="" coords="5,71,145,111"/>
+<area shape="rect" id="Node000002" href="$namespacewebsocketpp_1_1frame.html#a2ceb63e6a2fe19964d13363ba2bb9e15" title="Extracts the raw payload length specified in the basic header." alt="" coords="193,5,332,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="134,68,187,49,189,54,136,73"/>
+<area shape="rect" id="Node000003" href="$namespacewebsocketpp_1_1frame.html#a5ae0cc87ac44bb78c5dc41983c43a0c4" title="Extract the extended size field from an extended header." alt="" coords="193,71,332,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="145,88,177,88,177,94,145,94"/>
+<area shape="rect" id="Node000004" href="$namespacewebsocketpp_1_1frame.html#ac55b672bcd3baf4c5a074816f6eb035b" title="Extract the jumbo size field from an extended header." alt="" coords="193,136,332,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="136,109,189,128,187,133,134,114"/>
+<area shape="rect" id="Node000005" href="$namespacewebsocketpp_1_1lib_1_1net.html#ae2011914840da1dcbcac7266213a8709" title="Convert 64 bit value to host byte order." alt="" coords="380,136,525,177"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="332,154,364,154,364,159,332,159"/>
+<area shape="rect" id="Node000006" href="$namespacewebsocketpp_1_1lib_1_1net.html#ab3e62ef8d23c6e35b1d726fa1fa1c537" title="Convert 64 bit value to network byte order." alt="" coords="573,136,719,177"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="526,154,558,154,558,159,526,159"/>
+</map>

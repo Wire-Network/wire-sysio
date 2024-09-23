@@ -1,0 +1,193 @@
+\doxysection{timers.\+cpp}
+\hypertarget{timers_8cpp_source}{}\label{timers_8cpp_source}\index{libraries/fc/vendor/websocketpp/test/transport/asio/timers.cpp@{libraries/fc/vendor/websocketpp/test/transport/asio/timers.cpp}}
+\mbox{\hyperlink{timers_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2014,\ Peter\ Thorson.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00004}00004\ \textcolor{comment}{\ *\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00005}00005\ \textcolor{comment}{\ *\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are\ met:}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00006}00006\ \textcolor{comment}{\ *\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00007}00007\ \textcolor{comment}{\ *\ \ \ \ \ \ \ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00008}00008\ \textcolor{comment}{\ *\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00009}00009\ \textcolor{comment}{\ *\ \ \ \ \ \ \ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer\ in\ the}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00010}00010\ \textcolor{comment}{\ *\ \ \ \ \ \ \ documentation\ and/or\ other\ materials\ provided\ with\ the\ distribution.}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00011}00011\ \textcolor{comment}{\ *\ \ \ \ \ *\ Neither\ the\ name\ of\ the\ WebSocket++\ Project\ nor\ the}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00012}00012\ \textcolor{comment}{\ *\ \ \ \ \ \ \ names\ of\ its\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00013}00013\ \textcolor{comment}{\ *\ \ \ \ \ \ \ derived\ from\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00014}00014\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00015}00015\ \textcolor{comment}{\ *\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS\ "{}AS\ IS"{}}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00016}00016\ \textcolor{comment}{\ *\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ THE}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00017}00017\ \textcolor{comment}{\ *\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR\ A\ PARTICULAR\ PURPOSE}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00018}00018\ \textcolor{comment}{\ *\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ PETER\ THORSON\ BE\ LIABLE\ FOR\ ANY}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00019}00019\ \textcolor{comment}{\ *\ DIRECT,\ INDIRECT,\ INCIDENTAL,\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00020}00020\ \textcolor{comment}{\ *\ (INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00021}00021\ \textcolor{comment}{\ *\ LOSS\ OF\ USE,\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00022}00022\ \textcolor{comment}{\ *\ ON\ ANY\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00023}00023\ \textcolor{comment}{\ *\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE\ OF\ THIS}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00024}00024\ \textcolor{comment}{\ *\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00025}00025\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00026}00026\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00027}00027\ \textcolor{comment}{//\#define\ BOOST\_TEST\_DYN\_LINK}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00028}\mbox{\hyperlink{timers_8cpp_a6b2a3852db8bb19ab6909bac01859985}{00028}}\ \textcolor{preprocessor}{\#define\ BOOST\_TEST\_MODULE\ transport\_asio\_timers}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00029}00029\ \textcolor{preprocessor}{\#include\ <boost/test/unit\_test.hpp>}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00031}00031\ \textcolor{preprocessor}{\#include\ <exception>}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00032}00032\ \textcolor{preprocessor}{\#include\ <iostream>}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00034}00034\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{thread_8hpp}{websocketpp/common/thread.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00036}00036\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{transport_2asio_2endpoint_8hpp}{websocketpp/transport/asio/endpoint.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00037}00037\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{tls_8hpp}{websocketpp/transport/asio/security/tls.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00039}00039\ \textcolor{comment}{//\ Concurrency}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00040}00040\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{concurrency_2none_8hpp}{websocketpp/concurrency/none.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00042}00042\ \textcolor{comment}{//\ HTTP}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00043}00043\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{request_8hpp}{websocketpp/http/request.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00044}00044\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{response_8hpp}{websocketpp/http/response.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00046}00046\ \textcolor{comment}{//\ Loggers}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00047}00047\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{stub_8hpp}{websocketpp/logger/stub.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00048}00048\ \textcolor{comment}{//\#include\ <websocketpp/logger/basic.hpp>}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00050}00050\ \textcolor{preprocessor}{\#include\ <boost/asio.hpp>}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00052}00052\ \textcolor{comment}{//\ Accept\ a\ connection,\ read\ data,\ and\ discard\ until\ EOF}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00053}\mbox{\hyperlink{timers_8cpp_adae8a838e5ff1800e984ce3dcf4d2428}{00053}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{timers_8cpp_adae8a838e5ff1800e984ce3dcf4d2428}{run\_dummy\_server}}(\textcolor{keywordtype}{int}\ port)\ \{}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00054}00054\ \ \ \ \ \textcolor{keyword}{using\ }boost::asio::ip::tcp;}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00056}00056\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00057}00057\ \ \ \ \ \ \ \ \ boost::asio::io\_service\ io\_service;}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00058}00058\ \ \ \ \ \ \ \ \ tcp::acceptor\ acceptor(io\_service,\ tcp::endpoint(tcp::v6(),\ port));}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00059}00059\ \ \ \ \ \ \ \ \ tcp::socket\ socket(io\_service);}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00061}00061\ \ \ \ \ \ \ \ \ acceptor.accept(socket);}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00062}00062\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (;;)\ \{}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ data[512];}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00064}00064\ \ \ \ \ \ \ \ \ \ \ \ \ boost::system::error\_code\ ec;}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00065}00065\ \ \ \ \ \ \ \ \ \ \ \ \ socket.read\_some(boost::asio::buffer(data),\ ec);}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00066}00066\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ec\ ==\ boost::asio::error::eof)\ \{}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00067}00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (ec)\ \{}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ other\ error}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ ec;}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00071}00071\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00072}00072\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00073}00073\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (std::exception\ \&\ e)\ \{}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00074}00074\ \ \ \ \ \ \ \ \ std::cout\ <<\ e.what()\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00075}00075\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (boost::system::error\_code\ \&\ ec)\ \{}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00076}00076\ \ \ \ \ \ \ \ \ std::cout\ <<\ ec.message()\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00077}00077\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00078}00078\ \}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00080}00080\ \textcolor{comment}{//\ Wait\ for\ the\ specified\ time\ period\ then\ fail\ the\ test}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00081}\mbox{\hyperlink{timers_8cpp_a1bf8ac77e31c334f7241e82557a6722c}{00081}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{timers_8cpp_a1bf8ac77e31c334f7241e82557a6722c}{run\_test\_timer}}(\textcolor{keywordtype}{long}\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})\ \{}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00082}00082\ \ \ \ \ boost::asio::io\_service\ ios;}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00083}00083\ \ \ \ \ boost::asio::deadline\_timer\ t(ios,boost::posix\_time::milliseconds(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}));}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00084}00084\ \ \ \ \ boost::system::error\_code\ ec;}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00085}00085\ \ \ \ \ t.wait(ec);}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00086}00086\ \ \ \ \ BOOST\_FAIL(\ \textcolor{stringliteral}{"{}Test\ timed\ out"{}}\ );}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00087}00087\ \}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00088}00088\ }
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00089}00089\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{classconfig}{config}}\ \{}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00090}\mbox{\hyperlink{classconfig_aa8013bee20c6f5e73a0abdebde8a42eb}{00090}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1concurrency_1_1none}{websocketpp::concurrency::none}}\ \mbox{\hyperlink{classconfig_aa8013bee20c6f5e73a0abdebde8a42eb}{concurrency\_type}};}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00091}00091\ \ \ \ \ \textcolor{comment}{//typedef\ websocketpp::log::basic<concurrency\_type,websocketpp::log::alevel>\ alog\_type;}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00092}\mbox{\hyperlink{classconfig_a37ccc45537429f7261b14158f5d186d9}{00092}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1log_1_1stub}{websocketpp::log::stub}}\ \mbox{\hyperlink{classconfig_a37ccc45537429f7261b14158f5d186d9}{alog\_type}};}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00093}\mbox{\hyperlink{classconfig_a76c3017599abc2c20e11073baf689b68}{00093}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1log_1_1stub}{websocketpp::log::stub}}\ \mbox{\hyperlink{classconfig_a76c3017599abc2c20e11073baf689b68}{elog\_type}};}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00094}00094\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1request}{websocketpp::http::parser::request}}\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1request}{request\_type}};}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00095}\mbox{\hyperlink{classconfig_a2a1c240fc47992ca3a8481ff7cd55178}{00095}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1response}{websocketpp::http::parser::response}}\ \mbox{\hyperlink{classconfig_a2a1c240fc47992ca3a8481ff7cd55178}{response\_type}};}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00096}\mbox{\hyperlink{classconfig_ae936c1c70d055ea6b5472b7ee3b1aeb7}{00096}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1tls__socket_1_1endpoint}{websocketpp::transport::asio::tls\_socket::endpoint}}\ \mbox{\hyperlink{classconfig_ae936c1c70d055ea6b5472b7ee3b1aeb7}{socket\_type}};}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00097}00097\ }
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00098}\mbox{\hyperlink{classconfig_ad2ff809121a7a0c3ca9fa74190b6a683}{00098}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classconfig_ad2ff809121a7a0c3ca9fa74190b6a683}{enable\_multithreading}}\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00099}00099\ }
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00100}\mbox{\hyperlink{classconfig_ab70f11c91b7d43a9dbf4710df9d5b886}{00100}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{classconfig_ab70f11c91b7d43a9dbf4710df9d5b886}{timeout\_socket\_pre\_init}}\ =\ 1000;}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00101}\mbox{\hyperlink{classconfig_a8b5ede90c164880d9c509a06fbe74cb4}{00101}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{classconfig_a8b5ede90c164880d9c509a06fbe74cb4}{timeout\_proxy}}\ =\ 1000;}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00102}\mbox{\hyperlink{classconfig_a32ac20993fbbaa83117d944c9ffb14a5}{00102}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{classconfig_a32ac20993fbbaa83117d944c9ffb14a5}{timeout\_socket\_post\_init}}\ =\ 1000;}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00103}\mbox{\hyperlink{classconfig_aa38fcb59d8b21a938c35a87c6acb34fc}{00103}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{classconfig_aa38fcb59d8b21a938c35a87c6acb34fc}{timeout\_dns\_resolve}}\ =\ 1000;}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00104}\mbox{\hyperlink{classconfig_a2b37e99733d9bdcb7782be8303fa9458}{00104}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{classconfig_a2b37e99733d9bdcb7782be8303fa9458}{timeout\_connect}}\ =\ 1000;}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00105}\mbox{\hyperlink{classconfig_a0e33b5245daabd6441db5cfd3cd32ccf}{00105}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{classconfig_a0e33b5245daabd6441db5cfd3cd32ccf}{timeout\_socket\_shutdown}}\ =\ 1000;}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00106}00106\ \};}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00107}00107\ }
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00108}00108\ \textcolor{comment}{//\ Mock\ context\ that\ does\ no\ validation}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00109}\mbox{\hyperlink{timers_8cpp_ab68ea3df896e32c1d2fb314a96c46a8f}{00109}}\ \textcolor{keyword}{typedef}\ websocketpp::lib::shared\_ptr<boost::asio::ssl::context>\ \mbox{\hyperlink{timers_8cpp_ab68ea3df896e32c1d2fb314a96c46a8f}{context\_ptr}};}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00110}\mbox{\hyperlink{timers_8cpp_a229e17346c83a4dada1a58b39ad47c79}{00110}}\ \mbox{\hyperlink{debug__client_8cpp_ab68ea3df896e32c1d2fb314a96c46a8f}{context\_ptr}}\ \mbox{\hyperlink{timers_8cpp_a229e17346c83a4dada1a58b39ad47c79}{on\_tls\_init}}(\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{websocketpp::connection\_hdl}})\ \{}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00111}00111\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{timers_8cpp_ab68ea3df896e32c1d2fb314a96c46a8f}{context\_ptr}}(\textcolor{keyword}{new}\ boost::asio::ssl::context(boost::asio::ssl::context::sslv23));}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00112}00112\ \}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00113}00113\ }
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00114}00114\ \textcolor{comment}{//\ Mock\ connection}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00115}\mbox{\hyperlink{structmock__con}{00115}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structmock__con}{mock\_con}}:\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection}{websocketpp::transport::asio::connection}}<config>\ \{}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00116}\mbox{\hyperlink{structmock__con_aff3ee8903ba9e0bc81f4ad7b1c456926}{00116}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection}{websocketpp::transport::asio::connection<config>}}\ \mbox{\hyperlink{structmock__con_aff3ee8903ba9e0bc81f4ad7b1c456926}{base}};}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00117}00117\ }
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00118}\mbox{\hyperlink{structmock__con_a7492a7e931f3415ef6aec45655dc38a1}{00118}}\ \ \ \ \ \mbox{\hyperlink{structmock__con_a7492a7e931f3415ef6aec45655dc38a1}{mock\_con}}(\textcolor{keywordtype}{bool}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ config::alog\_type\&\ b,\ config::elog\_type\&\ c)\ :\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection}{base}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},b,c)\ \{\}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00119}00119\ }
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00120}\mbox{\hyperlink{structmock__con_a76adb10b2073f73cf11f310f113adf55}{00120}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structmock__con_a76adb10b2073f73cf11f310f113adf55}{start}}()\ \{}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00121}00121\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection_ae09d85b808498f06bcc8d938c9107e8e}{base::init}}(websocketpp::lib::bind(\&\mbox{\hyperlink{structmock__con_a786e965628529c84c83de9db6700dd5f}{mock\_con::handle\_start}},\textcolor{keyword}{this},}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00122}00122\ \ \ \ \ \ \ \ \ \ \ \ \ websocketpp::lib::placeholders::\_1));}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00123}00123\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00124}00124\ }
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00125}\mbox{\hyperlink{structmock__con_a786e965628529c84c83de9db6700dd5f}{00125}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structmock__con_a786e965628529c84c83de9db6700dd5f}{handle\_start}}(\textcolor{keyword}{const}\ websocketpp::lib::error\_code\&\ ec)\ \{}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00126}00126\ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1asio_1_1socket_a9e5cb8d54b6d0d1376168955a99fe458}{websocketpp::transport::asio::socket::make\_error\_code}};}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00127}00127\ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1asio_1_1socket_1_1error_a828ddaa5ed63a761e1b557465a35f05aa6ae4c96e0d2a177bb3c8eab1c45ccda0}{websocketpp::transport::asio::socket::error::tls\_handshake\_timeout}};}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00128}00128\ }
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00129}00129\ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ ec,\ make\_error\_code(tls\_handshake\_timeout)\ );}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00130}00130\ }
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00131}00131\ \ \ \ \ \ \ \ \ base::cancel\_socket();}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00132}00132\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00133}00133\ \};}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00134}00134\ }
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00135}\mbox{\hyperlink{timers_8cpp_aeba2eb59b450548f59b752134a1fa9f3}{00135}}\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1connection}{websocketpp::transport::asio::connection<config>}}\ \mbox{\hyperlink{timers_8cpp_aeba2eb59b450548f59b752134a1fa9f3}{con\_type}};}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00136}\mbox{\hyperlink{timers_8cpp_ae77e432dffa334791c9db57e10b636ca}{00136}}\ \textcolor{keyword}{typedef}\ websocketpp::lib::shared\_ptr<mock\_con>\ \mbox{\hyperlink{timers_8cpp_ae77e432dffa334791c9db57e10b636ca}{connection\_ptr}};}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00137}00137\ }
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00138}\mbox{\hyperlink{structmock__endpoint}{00138}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structmock__endpoint}{mock\_endpoint}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1endpoint}{websocketpp::transport::asio::endpoint}}<config>\ \{}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00139}\mbox{\hyperlink{structmock__endpoint_af7e449e8629c6a8c6de264792b410113}{00139}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1endpoint}{websocketpp::transport::asio::endpoint<config>}}\ \mbox{\hyperlink{structmock__endpoint_af7e449e8629c6a8c6de264792b410113}{base}};}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00140}00140\ }
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00141}\mbox{\hyperlink{structmock__endpoint_ac8289dd49b44a75ea155985a8ddbab50}{00141}}\ \ \ \ \ \mbox{\hyperlink{structmock__endpoint_ac8289dd49b44a75ea155985a8ddbab50}{mock\_endpoint}}()\ \{}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00142}00142\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structmock__endpoint_a432a9a06304d34f4164284283bbff708}{alog}}.set\_channels(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a853aa0b8976e53f3181af3bc398d493e}{websocketpp::log::alevel::all}});}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00143}00143\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1endpoint_a26ad1ad26277ed99a691559e69d47932}{base::init\_logging}}(\&\mbox{\hyperlink{structmock__endpoint_a432a9a06304d34f4164284283bbff708}{alog}},\&\mbox{\hyperlink{structmock__endpoint_a59b61ec062e7f2e4a75af9fa2e1d3e64}{elog}});}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00144}00144\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1endpoint_a22938eec899a9ab2b9ada2b76172f798}{init\_asio}}();}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00145}00145\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00146}00146\ }
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00147}\mbox{\hyperlink{structmock__endpoint_acf190f7ee5faaae2599125bf9d8513af}{00147}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structmock__endpoint_acf190f7ee5faaae2599125bf9d8513af}{connect}}(std::string\ u)\ \{}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00148}00148\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structmock__endpoint_a5ba0b312d46374e7fd08ccd7d7b6f822}{m\_con}}.reset(\textcolor{keyword}{new}\ \mbox{\hyperlink{structmock__con}{mock\_con}}(\textcolor{keyword}{false},\mbox{\hyperlink{structmock__endpoint_a432a9a06304d34f4164284283bbff708}{alog}},\mbox{\hyperlink{structmock__endpoint_a59b61ec062e7f2e4a75af9fa2e1d3e64}{elog}}));}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00149}00149\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_aae370ea5ac83a8ece7712cb39fc23f5b}{websocketpp::uri\_ptr}}\ uri(\textcolor{keyword}{new}\ \mbox{\hyperlink{classwebsocketpp_1_1uri}{websocketpp::uri}}(u));}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00150}00150\ }
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00151}00151\ \ \ \ \ \ \ \ \ BOOST\_CHECK(\ uri-\/>get\_valid()\ );}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00152}00152\ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1endpoint_a756059ab3ecd99d7c2a845b40729c7c8}{base::init}}(\mbox{\hyperlink{structmock__endpoint_a5ba0b312d46374e7fd08ccd7d7b6f822}{m\_con}}),\ websocketpp::lib::error\_code()\ );}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00153}00153\ }
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00154}00154\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1endpoint_a1ca12e4d72c691e6cc1ce1f5316e3243}{base::async\_connect}}(}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00155}00155\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structmock__endpoint_a5ba0b312d46374e7fd08ccd7d7b6f822}{m\_con}},}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00156}00156\ \ \ \ \ \ \ \ \ \ \ \ \ uri,}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00157}00157\ \ \ \ \ \ \ \ \ \ \ \ \ websocketpp::lib::bind(}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00158}00158\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{structmock__endpoint_a64fddd1db62bfe3fb324cd223c8165cd}{mock\_endpoint::handle\_connect}},}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00159}00159\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{this},}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00160}00160\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structmock__endpoint_a5ba0b312d46374e7fd08ccd7d7b6f822}{m\_con}},}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00161}00161\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ websocketpp::lib::placeholders::\_1}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00162}00162\ \ \ \ \ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00163}00163\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00164}00164\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00165}00165\ }
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00166}\mbox{\hyperlink{structmock__endpoint_a64fddd1db62bfe3fb324cd223c8165cd}{00166}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structmock__endpoint_a64fddd1db62bfe3fb324cd223c8165cd}{handle\_connect}}(\mbox{\hyperlink{timers_8cpp_ae77e432dffa334791c9db57e10b636ca}{connection\_ptr}}\ con,\ websocketpp::lib::error\_code\ \textcolor{keyword}{const}\ \&\ ec)}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00167}00167\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00168}00168\ \ \ \ \ \ \ \ \ BOOST\_CHECK(\ !ec\ );}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00169}00169\ \ \ \ \ \ \ \ \ con-\/>start();}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00170}00170\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00171}00171\ }
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00172}\mbox{\hyperlink{structmock__endpoint_a5ba0b312d46374e7fd08ccd7d7b6f822}{00172}}\ \ \ \ \ \mbox{\hyperlink{timers_8cpp_ae77e432dffa334791c9db57e10b636ca}{connection\_ptr}}\ \mbox{\hyperlink{structmock__endpoint_a5ba0b312d46374e7fd08ccd7d7b6f822}{m\_con}};}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00173}\mbox{\hyperlink{structmock__endpoint_a432a9a06304d34f4164284283bbff708}{00173}}\ \ \ \ \ config::alog\_type\ \mbox{\hyperlink{structmock__endpoint_a432a9a06304d34f4164284283bbff708}{alog}};}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00174}\mbox{\hyperlink{structmock__endpoint_a59b61ec062e7f2e4a75af9fa2e1d3e64}{00174}}\ \ \ \ \ config::elog\_type\ \mbox{\hyperlink{structmock__endpoint_a59b61ec062e7f2e4a75af9fa2e1d3e64}{elog}};}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00175}00175\ \};}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00176}00176\ }
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00177}\mbox{\hyperlink{timers_8cpp_a54b22724b0bf3188576fd1db09594a16}{00177}}\ \mbox{\hyperlink{timers_8cpp_a54b22724b0bf3188576fd1db09594a16}{BOOST\_AUTO\_TEST\_CASE}}(\ tls\_handshake\_timeout\ )\ \{}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00178}00178\ \ \ \ \ websocketpp::lib::thread\ dummy\_server(websocketpp::lib::bind(\&\mbox{\hyperlink{timers_8cpp_adae8a838e5ff1800e984ce3dcf4d2428}{run\_dummy\_server}},9005));}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00179}00179\ \ \ \ \ websocketpp::lib::thread\ timer(websocketpp::lib::bind(\&\mbox{\hyperlink{timers_8cpp_a1bf8ac77e31c334f7241e82557a6722c}{run\_test\_timer}},5000));}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00180}00180\ \ \ \ \ dummy\_server.detach();}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00181}00181\ \ \ \ \ timer.detach();}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00182}00182\ }
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00183}00183\ \ \ \ \ \mbox{\hyperlink{structmock__endpoint}{mock\_endpoint}}\ endpoint;}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00184}00184\ \ \ \ \ endpoint.set\_tls\_init\_handler(\&\mbox{\hyperlink{timers_8cpp_a229e17346c83a4dada1a58b39ad47c79}{on\_tls\_init}});}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00185}00185\ \ \ \ \ endpoint.\mbox{\hyperlink{structmock__endpoint_acf190f7ee5faaae2599125bf9d8513af}{connect}}(\textcolor{stringliteral}{"{}wss://localhost:9005"{}});}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00186}00186\ \ \ \ \ endpoint.\mbox{\hyperlink{classwebsocketpp_1_1transport_1_1asio_1_1endpoint_a5c457ea6734a1d8aafe6c6f364996dfe}{run}}();}
+\DoxyCodeLine{\Hypertarget{timers_8cpp_source_l00187}00187\ \}}
+
+\end{DoxyCode}

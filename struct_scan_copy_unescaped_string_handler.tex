@@ -1,0 +1,124 @@
+\doxysection{Scan\+Copy\+Unescaped\+String\+Handler Struct Reference}
+\hypertarget{struct_scan_copy_unescaped_string_handler}{}\label{struct_scan_copy_unescaped_string_handler}\index{ScanCopyUnescapedStringHandler@{ScanCopyUnescapedStringHandler}}
+
+
+Inheritance diagram for Scan\+Copy\+Unescaped\+String\+Handler\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=251pt]{struct_scan_copy_unescaped_string_handler__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Scan\+Copy\+Unescaped\+String\+Handler\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=251pt]{struct_scan_copy_unescaped_string_handler__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{struct_scan_copy_unescaped_string_handler_abf625333ec66a62a94ec85e55aa6a66e}{String}} (const char \texorpdfstring{$\ast$}{*}str, size\+\_\+t length, bool)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{struct_base_reader_handler}{Base\+Reader\+Handler$<$ UTF8$<$$>$, Scan\+Copy\+Unescaped\+String\+Handler $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{struct_base_reader_handler_a836437f6ccc37f08ff933f009b18a78c}{Default}} ()
+\item 
+bool \mbox{\hyperlink{struct_base_reader_handler_ae2ebbde4628bf3659ddc5d18520935f5}{Null}} ()
+\item 
+bool \mbox{\hyperlink{struct_base_reader_handler_aa1c3ce42dbb856b3349792dc9d963587}{Bool}} (bool)
+\item 
+bool \mbox{\hyperlink{struct_base_reader_handler_a85e813aaf7189a2f87bd53953324fafc}{Int}} (int)
+\item 
+bool \mbox{\hyperlink{struct_base_reader_handler_a0e683306cbb7b4e350a35c18c5246f2a}{Uint}} (unsigned)
+\item 
+bool \mbox{\hyperlink{struct_base_reader_handler_a04011733ea584739c97ad5c6afa15a35}{Int64}} (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}})
+\item 
+bool \mbox{\hyperlink{struct_base_reader_handler_a351aa3cd81856a487c21022e9cc64d2b}{Uint64}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}})
+\item 
+bool \mbox{\hyperlink{struct_base_reader_handler_a8156ea6ae5b8cd23a8b700e92a8af1eb}{Double}} (double)
+\item 
+bool \mbox{\hyperlink{struct_base_reader_handler_a9ed0d83d5e6c8f5e4b32ca3735ff0bb7}{Raw\+Number}} (const \mbox{\hyperlink{struct_base_reader_handler_a36e099ee68f179e6007a5d8f6feafd61}{Ch}} \texorpdfstring{$\ast$}{*}str, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}, bool copy)
+\begin{DoxyCompactList}\small\item\em enabled via k\+Parse\+Numbers\+As\+Strings\+Flag, string is not null-\/terminated (use length) \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{struct_base_reader_handler_a3ac69e6326d0aeef7b1f2619742bbe00}{String}} (const \mbox{\hyperlink{struct_base_reader_handler_a36e099ee68f179e6007a5d8f6feafd61}{Ch}} \texorpdfstring{$\ast$}{*}, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}, bool)
+\item 
+bool \mbox{\hyperlink{struct_base_reader_handler_ab0a7d9bcececb8d6ed748656f67f4917}{Start\+Object}} ()
+\item 
+bool \mbox{\hyperlink{struct_base_reader_handler_abc50b2e7e411b7b731715e05cd01e2eb}{Key}} (const \mbox{\hyperlink{struct_base_reader_handler_a36e099ee68f179e6007a5d8f6feafd61}{Ch}} \texorpdfstring{$\ast$}{*}str, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}, bool copy)
+\item 
+bool \mbox{\hyperlink{struct_base_reader_handler_a0406cee0af26bc3a0b7fb2414537b0ab}{End\+Object}} (\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}})
+\item 
+bool \mbox{\hyperlink{struct_base_reader_handler_a9dbb1143a250a904bb18a174553a3a00}{Start\+Array}} ()
+\item 
+bool \mbox{\hyperlink{struct_base_reader_handler_ae9d60a8779b6a77a7f283d64961879fb}{End\+Array}} (\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+char \mbox{\hyperlink{struct_scan_copy_unescaped_string_handler_a8ae41ebb6b89eae12b71d5fc33a74559}{buffer}} \mbox{[}1024+5+32\mbox{]}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Public Types inherited from \mbox{\hyperlink{struct_base_reader_handler}{Base\+Reader\+Handler$<$ UTF8$<$$>$, Scan\+Copy\+Unescaped\+String\+Handler $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{struct_u_t_f8}{UTF8}}$<$$>$\+::\+Ch \mbox{\hyperlink{struct_base_reader_handler_a36e099ee68f179e6007a5d8f6feafd61}{Ch}}
+\item 
+typedef internal\+::\+Select\+If$<$ internal\+::\+Is\+Same$<$ \mbox{\hyperlink{struct_scan_copy_unescaped_string_handler}{Scan\+Copy\+Unescaped\+String\+Handler}}, void $>$, \mbox{\hyperlink{struct_base_reader_handler}{Base\+Reader\+Handler}}, \mbox{\hyperlink{struct_scan_copy_unescaped_string_handler}{Scan\+Copy\+Unescaped\+String\+Handler}} $>$\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{\+::\+Type}} \mbox{\hyperlink{struct_base_reader_handler_aa1c54d48609862055fc3cd4ae0bd5234}{Override}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{simdtest_8cpp_source_l00102}{102}} of file \mbox{\hyperlink{simdtest_8cpp_source}{simdtest.\+cpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_scan_copy_unescaped_string_handler_abf625333ec66a62a94ec85e55aa6a66e}\index{ScanCopyUnescapedStringHandler@{ScanCopyUnescapedStringHandler}!String@{String}}
+\index{String@{String}!ScanCopyUnescapedStringHandler@{ScanCopyUnescapedStringHandler}}
+\doxysubsubsection{\texorpdfstring{String()}{String()}}
+{\footnotesize\ttfamily \label{struct_scan_copy_unescaped_string_handler_abf625333ec66a62a94ec85e55aa6a66e} 
+bool Scan\+Copy\+Unescaped\+String\+Handler\+::\+String (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{str}{, }\item[{size\+\_\+t}]{length}{, }\item[{bool}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{simdtest_8cpp_source_l00103}{103}} of file \mbox{\hyperlink{simdtest_8cpp_source}{simdtest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(\mbox{\hyperlink{struct_scan_copy_unescaped_string_handler_a8ae41ebb6b89eae12b71d5fc33a74559}{buffer}},\ str,\ length\ +\ 1);}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00106\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=340pt]{struct_scan_copy_unescaped_string_handler_abf625333ec66a62a94ec85e55aa6a66e_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_scan_copy_unescaped_string_handler_a8ae41ebb6b89eae12b71d5fc33a74559}\index{ScanCopyUnescapedStringHandler@{ScanCopyUnescapedStringHandler}!buffer@{buffer}}
+\index{buffer@{buffer}!ScanCopyUnescapedStringHandler@{ScanCopyUnescapedStringHandler}}
+\doxysubsubsection{\texorpdfstring{buffer}{buffer}}
+{\footnotesize\ttfamily \label{struct_scan_copy_unescaped_string_handler_a8ae41ebb6b89eae12b71d5fc33a74559} 
+char Scan\+Copy\+Unescaped\+String\+Handler\+::buffer\mbox{[}1024+5+32\mbox{]}}
+
+
+
+Definition at line \mbox{\hyperlink{simdtest_8cpp_source_l00107}{107}} of file \mbox{\hyperlink{simdtest_8cpp_source}{simdtest.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/test/unittest/\mbox{\hyperlink{simdtest_8cpp}{simdtest.\+cpp}}\end{DoxyCompactItemize}

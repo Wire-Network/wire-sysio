@@ -1,0 +1,647 @@
+\doxysection{libraries/sys-\/vm/external/\+Catch2/include/internal/catch\+\_\+preprocessor.hpp File Reference}
+\hypertarget{catch__preprocessor_8hpp}{}\label{catch__preprocessor_8hpp}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_preprocessor.hpp@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_preprocessor.hpp}}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{catch__preprocessor_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{catch__preprocessor_8hpp_aedfa83a9b9671b2f3ce5d64207eab45f}{CATCH\+\_\+\+RECURSION\+\_\+\+LEVEL0}}(...)
+\item 
+\#define \mbox{\hyperlink{catch__preprocessor_8hpp_ad1cc1127b3a8ed84d336fd86c25571a9}{CATCH\+\_\+\+RECURSION\+\_\+\+LEVEL1}}(...)
+\item 
+\#define \mbox{\hyperlink{catch__preprocessor_8hpp_a2a7ccfd6ceda0c723d1c81ed0a8ea7aa}{CATCH\+\_\+\+RECURSION\+\_\+\+LEVEL2}}(...)
+\item 
+\#define \mbox{\hyperlink{catch__preprocessor_8hpp_ac5ead3b79069ca9b5de9cad80029bc71}{CATCH\+\_\+\+RECURSION\+\_\+\+LEVEL3}}(...)
+\item 
+\#define \mbox{\hyperlink{catch__preprocessor_8hpp_a7738534acacfd54ef5b9f89cf07fa16d}{CATCH\+\_\+\+RECURSION\+\_\+\+LEVEL4}}(...)
+\item 
+\#define \mbox{\hyperlink{catch__preprocessor_8hpp_a761d2ca7a5b0393ae7a6edf086a9c3da}{CATCH\+\_\+\+RECURSION\+\_\+\+LEVEL5}}(...)
+\item 
+\#define \mbox{\hyperlink{catch__preprocessor_8hpp_ae3ce5d9c8e50eba755111a19a62432e5}{CATCH\+\_\+\+RECURSE}}(...)
+\item 
+\#define \mbox{\hyperlink{catch__preprocessor_8hpp_aebb9e7be881ac3dcd10db9fb45830649}{CATCH\+\_\+\+REC\+\_\+\+END}}(...)
+\item 
+\#define \mbox{\hyperlink{catch__preprocessor_8hpp_ab469d9696504fd14e36fd1d8b6e47b7f}{CATCH\+\_\+\+REC\+\_\+\+OUT}}
+\item 
+\#define \mbox{\hyperlink{catch__preprocessor_8hpp_a8ac224562b8423a7c07e368216d0f0e9}{CATCH\+\_\+\+EMPTY}}()
+\item 
+\#define \mbox{\hyperlink{catch__preprocessor_8hpp_a83c1ab15f3d715f25fe504c114cf6144}{CATCH\+\_\+\+DEFER}}(\mbox{\hyperlink{code__cache_8cpp_aa0efefe21f4700d78692edc823e763be}{id}})
+\item 
+\#define \mbox{\hyperlink{catch__preprocessor_8hpp_aa335d39d6fdb7e20c94edaa4de21d1a3}{CATCH\+\_\+\+REC\+\_\+\+GET\+\_\+\+END2}}()
+\item 
+\#define \mbox{\hyperlink{catch__preprocessor_8hpp_a476d332d716d4691f874195acea4931b}{CATCH\+\_\+\+REC\+\_\+\+GET\+\_\+\+END1}}(...)
+\item 
+\#define \mbox{\hyperlink{catch__preprocessor_8hpp_a536dd24bc8e72ec8eb14c3676f20c778}{CATCH\+\_\+\+REC\+\_\+\+GET\+\_\+\+END}}(...)
+\item 
+\#define \mbox{\hyperlink{catch__preprocessor_8hpp_ae25889c34b72704724f5797b6103c463}{CATCH\+\_\+\+REC\+\_\+\+NEXT0}}(test,  next, ...)
+\item 
+\#define \mbox{\hyperlink{catch__preprocessor_8hpp_a0ddf3b75cc3780765a2cb551d6536721}{CATCH\+\_\+\+REC\+\_\+\+NEXT1}}(test,  next)
+\item 
+\#define \mbox{\hyperlink{catch__preprocessor_8hpp_abaddf93f755cea9e20aee254aa566adf}{CATCH\+\_\+\+REC\+\_\+\+NEXT}}(test,  next)
+\item 
+\#define \mbox{\hyperlink{catch__preprocessor_8hpp_a3e07fd613c41bd44cb4bd14fccc3c388}{CATCH\+\_\+\+REC\+\_\+\+LIST0}}(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}},  x,  peek, ...)
+\item 
+\#define \mbox{\hyperlink{catch__preprocessor_8hpp_abedd1ae08e12478704233e9bf29e0fe9}{CATCH\+\_\+\+REC\+\_\+\+LIST1}}(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}},  x,  peek, ...)
+\item 
+\#define \mbox{\hyperlink{catch__preprocessor_8hpp_abe3c205d4ba8406d45439abb91366ce9}{CATCH\+\_\+\+REC\+\_\+\+LIST2}}(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}},  x,  peek, ...)
+\item 
+\#define \mbox{\hyperlink{catch__preprocessor_8hpp_aea894953d28c5ed83e59ce6c74d0a665}{CATCH\+\_\+\+REC\+\_\+\+LIST0\+\_\+\+UD}}(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}},  userdata,  x,  peek, ...)
+\item 
+\#define \mbox{\hyperlink{catch__preprocessor_8hpp_abbcff29ced4d413bc121f7b761558c16}{CATCH\+\_\+\+REC\+\_\+\+LIST1\+\_\+\+UD}}(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}},  userdata,  x,  peek, ...)
+\item 
+\#define \mbox{\hyperlink{catch__preprocessor_8hpp_a0c2dd548d178fbc2202ecd74ce4be91b}{CATCH\+\_\+\+REC\+\_\+\+LIST2\+\_\+\+UD}}(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}},  userdata,  x,  peek, ...)
+\item 
+\#define \mbox{\hyperlink{catch__preprocessor_8hpp_a8e404d42a6d0402698c1d4d16e831d28}{CATCH\+\_\+\+REC\+\_\+\+LIST\+\_\+\+UD}}(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}},  userdata, ...)
+\item 
+\#define \mbox{\hyperlink{catch__preprocessor_8hpp_a060f5fa141c247b4d07dfe9bf3c54079}{CATCH\+\_\+\+REC\+\_\+\+LIST}}(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}, ...)
+\item 
+\#define \mbox{\hyperlink{catch__preprocessor_8hpp_afec78f8054a97a6ecb38ff098f275efb}{INTERNAL\+\_\+\+CATCH\+\_\+\+EXPAND1}}(param)
+\item 
+\#define \mbox{\hyperlink{catch__preprocessor_8hpp_a163ac3d9bea0921d546f125ef5d58a2d}{INTERNAL\+\_\+\+CATCH\+\_\+\+EXPAND2}}(...)
+\item 
+\#define \mbox{\hyperlink{catch__preprocessor_8hpp_a053610cf96d1be50463e9cb08e818ed1}{INTERNAL\+\_\+\+CATCH\+\_\+\+DEF}}(...)
+\item 
+\#define \mbox{\hyperlink{catch__preprocessor_8hpp_a6868a4eb7481605e628a3aaf0c1fbb01}{INTERNAL\+\_\+\+CATCH\+\_\+\+NOINTERNAL\+\_\+\+CATCH\+\_\+\+DEF}}
+\item 
+\#define \mbox{\hyperlink{catch__preprocessor_8hpp_a13733e49e752d29b735e94d9e72c7d6b}{INTERNAL\+\_\+\+CATCH\+\_\+\+STRINGIZE}}(...)
+\item 
+\#define \mbox{\hyperlink{catch__preprocessor_8hpp_a6fedc6934bac0e22dbbd13aabf81ad3f}{INTERNAL\+\_\+\+CATCH\+\_\+\+STRINGIZE2}}(...)
+\item 
+\#define \mbox{\hyperlink{catch__preprocessor_8hpp_aa66562537dd49bc33e53f9aa01acedaf}{INTERNAL\+\_\+\+CATCH\+\_\+\+STRINGIZE\+\_\+\+WITHOUT\+\_\+\+PARENS}}(param)
+\item 
+\#define \mbox{\hyperlink{catch__preprocessor_8hpp_adf5ede19321b27ce635d01688551e782}{INTERNAL\+\_\+\+CATCH\+\_\+\+REMOVE\+\_\+\+PARENS}}(...)
+\item 
+\#define \mbox{\hyperlink{catch__preprocessor_8hpp_ab5904058e163fd663012ec59c9c15411}{INTERNAL\+\_\+\+CATCH\+\_\+\+TEMPLATE\+\_\+\+UNIQUE\+\_\+\+NAME2}}(Name, ...)
+\item 
+\#define \mbox{\hyperlink{catch__preprocessor_8hpp_a148dd668623eff0bf6f121808708d403}{INTERNAL\+\_\+\+CATCH\+\_\+\+TEMPLATE\+\_\+\+UNIQUE\+\_\+\+NAME3}}(Name, ...)
+\item 
+\#define \mbox{\hyperlink{catch__preprocessor_8hpp_a8943b350c92f4732c53db42264f463ab}{INTERNAL\+\_\+\+CATCH\+\_\+\+TEMPLATE\+\_\+\+UNIQUE\+\_\+\+NAME}}(Name, ...)
+\item 
+\#define \mbox{\hyperlink{catch__preprocessor_8hpp_aec759b1a62379a441b001169f2d6a2fe}{INTERNAL\+\_\+\+CATCH\+\_\+\+MAKE\+\_\+\+TYPE\+\_\+\+LIST}}(types)
+\item 
+\#define \mbox{\hyperlink{catch__preprocessor_8hpp_aa48345a3d206462d571f98297654ca47}{INTERNAL\+\_\+\+CATCH\+\_\+\+MAKE\+\_\+\+TYPE\+\_\+\+LISTS\+\_\+\+FROM\+\_\+\+TYPES}}(types)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{catch__preprocessor_8hpp_a83c1ab15f3d715f25fe504c114cf6144}\index{catch\_preprocessor.hpp@{catch\_preprocessor.hpp}!CATCH\_DEFER@{CATCH\_DEFER}}
+\index{CATCH\_DEFER@{CATCH\_DEFER}!catch\_preprocessor.hpp@{catch\_preprocessor.hpp}}
+\doxysubsubsection{\texorpdfstring{CATCH\_DEFER}{CATCH\_DEFER}}
+{\footnotesize\ttfamily \label{catch__preprocessor_8hpp_a83c1ab15f3d715f25fe504c114cf6144} 
+\#define CATCH\+\_\+\+DEFER(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{code__cache_8cpp_aa0efefe21f4700d78692edc823e763be}{id}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordtype}{id}\ \mbox{\hyperlink{catch__preprocessor_8hpp_a8ac224562b8423a7c07e368216d0f0e9}{CATCH\_EMPTY}}()}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__preprocessor_8hpp_source_l00032}{32}} of file \mbox{\hyperlink{catch__preprocessor_8hpp_source}{catch\+\_\+preprocessor.\+hpp}}.
+
+\Hypertarget{catch__preprocessor_8hpp_a8ac224562b8423a7c07e368216d0f0e9}\index{catch\_preprocessor.hpp@{catch\_preprocessor.hpp}!CATCH\_EMPTY@{CATCH\_EMPTY}}
+\index{CATCH\_EMPTY@{CATCH\_EMPTY}!catch\_preprocessor.hpp@{catch\_preprocessor.hpp}}
+\doxysubsubsection{\texorpdfstring{CATCH\_EMPTY}{CATCH\_EMPTY}}
+{\footnotesize\ttfamily \label{catch__preprocessor_8hpp_a8ac224562b8423a7c07e368216d0f0e9} 
+\#define CATCH\+\_\+\+EMPTY(\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__preprocessor_8hpp_source_l00031}{31}} of file \mbox{\hyperlink{catch__preprocessor_8hpp_source}{catch\+\_\+preprocessor.\+hpp}}.
+
+\Hypertarget{catch__preprocessor_8hpp_aebb9e7be881ac3dcd10db9fb45830649}\index{catch\_preprocessor.hpp@{catch\_preprocessor.hpp}!CATCH\_REC\_END@{CATCH\_REC\_END}}
+\index{CATCH\_REC\_END@{CATCH\_REC\_END}!catch\_preprocessor.hpp@{catch\_preprocessor.hpp}}
+\doxysubsubsection{\texorpdfstring{CATCH\_REC\_END}{CATCH\_REC\_END}}
+{\footnotesize\ttfamily \label{catch__preprocessor_8hpp_aebb9e7be881ac3dcd10db9fb45830649} 
+\#define CATCH\+\_\+\+REC\+\_\+\+END(\begin{DoxyParamCaption}\item[{}]{}...{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__preprocessor_8hpp_source_l00028}{28}} of file \mbox{\hyperlink{catch__preprocessor_8hpp_source}{catch\+\_\+preprocessor.\+hpp}}.
+
+\Hypertarget{catch__preprocessor_8hpp_a536dd24bc8e72ec8eb14c3676f20c778}\index{catch\_preprocessor.hpp@{catch\_preprocessor.hpp}!CATCH\_REC\_GET\_END@{CATCH\_REC\_GET\_END}}
+\index{CATCH\_REC\_GET\_END@{CATCH\_REC\_GET\_END}!catch\_preprocessor.hpp@{catch\_preprocessor.hpp}}
+\doxysubsubsection{\texorpdfstring{CATCH\_REC\_GET\_END}{CATCH\_REC\_GET\_END}}
+{\footnotesize\ttfamily \label{catch__preprocessor_8hpp_a536dd24bc8e72ec8eb14c3676f20c778} 
+\#define CATCH\+\_\+\+REC\+\_\+\+GET\+\_\+\+END(\begin{DoxyParamCaption}\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__preprocessor_8hpp_a476d332d716d4691f874195acea4931b}{CATCH\_REC\_GET\_END1}}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__preprocessor_8hpp_source_l00036}{36}} of file \mbox{\hyperlink{catch__preprocessor_8hpp_source}{catch\+\_\+preprocessor.\+hpp}}.
+
+\Hypertarget{catch__preprocessor_8hpp_a476d332d716d4691f874195acea4931b}\index{catch\_preprocessor.hpp@{catch\_preprocessor.hpp}!CATCH\_REC\_GET\_END1@{CATCH\_REC\_GET\_END1}}
+\index{CATCH\_REC\_GET\_END1@{CATCH\_REC\_GET\_END1}!catch\_preprocessor.hpp@{catch\_preprocessor.hpp}}
+\doxysubsubsection{\texorpdfstring{CATCH\_REC\_GET\_END1}{CATCH\_REC\_GET\_END1}}
+{\footnotesize\ttfamily \label{catch__preprocessor_8hpp_a476d332d716d4691f874195acea4931b} 
+\#define CATCH\+\_\+\+REC\+\_\+\+GET\+\_\+\+END1(\begin{DoxyParamCaption}\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__preprocessor_8hpp_aa335d39d6fdb7e20c94edaa4de21d1a3}{CATCH\_REC\_GET\_END2}}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__preprocessor_8hpp_source_l00035}{35}} of file \mbox{\hyperlink{catch__preprocessor_8hpp_source}{catch\+\_\+preprocessor.\+hpp}}.
+
+\Hypertarget{catch__preprocessor_8hpp_aa335d39d6fdb7e20c94edaa4de21d1a3}\index{catch\_preprocessor.hpp@{catch\_preprocessor.hpp}!CATCH\_REC\_GET\_END2@{CATCH\_REC\_GET\_END2}}
+\index{CATCH\_REC\_GET\_END2@{CATCH\_REC\_GET\_END2}!catch\_preprocessor.hpp@{catch\_preprocessor.hpp}}
+\doxysubsubsection{\texorpdfstring{CATCH\_REC\_GET\_END2}{CATCH\_REC\_GET\_END2}}
+{\footnotesize\ttfamily \label{catch__preprocessor_8hpp_aa335d39d6fdb7e20c94edaa4de21d1a3} 
+\#define CATCH\+\_\+\+REC\+\_\+\+GET\+\_\+\+END2(\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{0,\ \mbox{\hyperlink{catch__preprocessor_8hpp_aebb9e7be881ac3dcd10db9fb45830649}{CATCH\_REC\_END}}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__preprocessor_8hpp_source_l00034}{34}} of file \mbox{\hyperlink{catch__preprocessor_8hpp_source}{catch\+\_\+preprocessor.\+hpp}}.
+
+\Hypertarget{catch__preprocessor_8hpp_a060f5fa141c247b4d07dfe9bf3c54079}\index{catch\_preprocessor.hpp@{catch\_preprocessor.hpp}!CATCH\_REC\_LIST@{CATCH\_REC\_LIST}}
+\index{CATCH\_REC\_LIST@{CATCH\_REC\_LIST}!catch\_preprocessor.hpp@{catch\_preprocessor.hpp}}
+\doxysubsubsection{\texorpdfstring{CATCH\_REC\_LIST}{CATCH\_REC\_LIST}}
+{\footnotesize\ttfamily \label{catch__preprocessor_8hpp_a060f5fa141c247b4d07dfe9bf3c54079} 
+\#define CATCH\+\_\+\+REC\+\_\+\+LIST(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__preprocessor_8hpp_ae3ce5d9c8e50eba755111a19a62432e5}{CATCH\_RECURSE}}(\mbox{\hyperlink{catch__preprocessor_8hpp_abe3c205d4ba8406d45439abb91366ce9}{CATCH\_REC\_LIST2}}(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}},\ \_\_VA\_ARGS\_\_,\ ()()(),\ ()()(),\ ()()(),\ 0))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__preprocessor_8hpp_source_l00054}{54}} of file \mbox{\hyperlink{catch__preprocessor_8hpp_source}{catch\+\_\+preprocessor.\+hpp}}.
+
+\Hypertarget{catch__preprocessor_8hpp_a3e07fd613c41bd44cb4bd14fccc3c388}\index{catch\_preprocessor.hpp@{catch\_preprocessor.hpp}!CATCH\_REC\_LIST0@{CATCH\_REC\_LIST0}}
+\index{CATCH\_REC\_LIST0@{CATCH\_REC\_LIST0}!catch\_preprocessor.hpp@{catch\_preprocessor.hpp}}
+\doxysubsubsection{\texorpdfstring{CATCH\_REC\_LIST0}{CATCH\_REC\_LIST0}}
+{\footnotesize\ttfamily \label{catch__preprocessor_8hpp_a3e07fd613c41bd44cb4bd14fccc3c388} 
+\#define CATCH\+\_\+\+REC\+\_\+\+LIST0(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}}{, }\item[{}]{x}{, }\item[{}]{peek}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{,\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}(x)\ \mbox{\hyperlink{catch__preprocessor_8hpp_a83c1ab15f3d715f25fe504c114cf6144}{CATCH\_DEFER}}\ (\ \mbox{\hyperlink{catch__preprocessor_8hpp_abaddf93f755cea9e20aee254aa566adf}{CATCH\_REC\_NEXT}}(peek,\ \mbox{\hyperlink{catch__preprocessor_8hpp_abedd1ae08e12478704233e9bf29e0fe9}{CATCH\_REC\_LIST1}})\ )\ (\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}},\ peek,\ \_\_VA\_ARGS\_\_\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__preprocessor_8hpp_source_l00041}{41}} of file \mbox{\hyperlink{catch__preprocessor_8hpp_source}{catch\+\_\+preprocessor.\+hpp}}.
+
+\Hypertarget{catch__preprocessor_8hpp_aea894953d28c5ed83e59ce6c74d0a665}\index{catch\_preprocessor.hpp@{catch\_preprocessor.hpp}!CATCH\_REC\_LIST0\_UD@{CATCH\_REC\_LIST0\_UD}}
+\index{CATCH\_REC\_LIST0\_UD@{CATCH\_REC\_LIST0\_UD}!catch\_preprocessor.hpp@{catch\_preprocessor.hpp}}
+\doxysubsubsection{\texorpdfstring{CATCH\_REC\_LIST0\_UD}{CATCH\_REC\_LIST0\_UD}}
+{\footnotesize\ttfamily \label{catch__preprocessor_8hpp_aea894953d28c5ed83e59ce6c74d0a665} 
+\#define CATCH\+\_\+\+REC\+\_\+\+LIST0\+\_\+\+UD(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}}{, }\item[{}]{userdata}{, }\item[{}]{x}{, }\item[{}]{peek}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{,\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}(userdata,\ x)\ \mbox{\hyperlink{catch__preprocessor_8hpp_a83c1ab15f3d715f25fe504c114cf6144}{CATCH\_DEFER}}\ (\ \mbox{\hyperlink{catch__preprocessor_8hpp_abaddf93f755cea9e20aee254aa566adf}{CATCH\_REC\_NEXT}}(peek,\ \mbox{\hyperlink{catch__preprocessor_8hpp_abbcff29ced4d413bc121f7b761558c16}{CATCH\_REC\_LIST1\_UD}})\ )\ (\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}},\ userdata,\ peek,\ \_\_VA\_ARGS\_\_\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__preprocessor_8hpp_source_l00045}{45}} of file \mbox{\hyperlink{catch__preprocessor_8hpp_source}{catch\+\_\+preprocessor.\+hpp}}.
+
+\Hypertarget{catch__preprocessor_8hpp_abedd1ae08e12478704233e9bf29e0fe9}\index{catch\_preprocessor.hpp@{catch\_preprocessor.hpp}!CATCH\_REC\_LIST1@{CATCH\_REC\_LIST1}}
+\index{CATCH\_REC\_LIST1@{CATCH\_REC\_LIST1}!catch\_preprocessor.hpp@{catch\_preprocessor.hpp}}
+\doxysubsubsection{\texorpdfstring{CATCH\_REC\_LIST1}{CATCH\_REC\_LIST1}}
+{\footnotesize\ttfamily \label{catch__preprocessor_8hpp_abedd1ae08e12478704233e9bf29e0fe9} 
+\#define CATCH\+\_\+\+REC\+\_\+\+LIST1(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}}{, }\item[{}]{x}{, }\item[{}]{peek}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{,\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}(x)\ \mbox{\hyperlink{catch__preprocessor_8hpp_a83c1ab15f3d715f25fe504c114cf6144}{CATCH\_DEFER}}\ (\ \mbox{\hyperlink{catch__preprocessor_8hpp_abaddf93f755cea9e20aee254aa566adf}{CATCH\_REC\_NEXT}}(peek,\ \mbox{\hyperlink{catch__preprocessor_8hpp_a3e07fd613c41bd44cb4bd14fccc3c388}{CATCH\_REC\_LIST0}})\ )\ (\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}},\ peek,\ \_\_VA\_ARGS\_\_\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__preprocessor_8hpp_source_l00042}{42}} of file \mbox{\hyperlink{catch__preprocessor_8hpp_source}{catch\+\_\+preprocessor.\+hpp}}.
+
+\Hypertarget{catch__preprocessor_8hpp_abbcff29ced4d413bc121f7b761558c16}\index{catch\_preprocessor.hpp@{catch\_preprocessor.hpp}!CATCH\_REC\_LIST1\_UD@{CATCH\_REC\_LIST1\_UD}}
+\index{CATCH\_REC\_LIST1\_UD@{CATCH\_REC\_LIST1\_UD}!catch\_preprocessor.hpp@{catch\_preprocessor.hpp}}
+\doxysubsubsection{\texorpdfstring{CATCH\_REC\_LIST1\_UD}{CATCH\_REC\_LIST1\_UD}}
+{\footnotesize\ttfamily \label{catch__preprocessor_8hpp_abbcff29ced4d413bc121f7b761558c16} 
+\#define CATCH\+\_\+\+REC\+\_\+\+LIST1\+\_\+\+UD(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}}{, }\item[{}]{userdata}{, }\item[{}]{x}{, }\item[{}]{peek}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{,\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}(userdata,\ x)\ \mbox{\hyperlink{catch__preprocessor_8hpp_a83c1ab15f3d715f25fe504c114cf6144}{CATCH\_DEFER}}\ (\ \mbox{\hyperlink{catch__preprocessor_8hpp_abaddf93f755cea9e20aee254aa566adf}{CATCH\_REC\_NEXT}}(peek,\ \mbox{\hyperlink{catch__preprocessor_8hpp_aea894953d28c5ed83e59ce6c74d0a665}{CATCH\_REC\_LIST0\_UD}})\ )\ (\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}},\ userdata,\ peek,\ \_\_VA\_ARGS\_\_\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__preprocessor_8hpp_source_l00046}{46}} of file \mbox{\hyperlink{catch__preprocessor_8hpp_source}{catch\+\_\+preprocessor.\+hpp}}.
+
+\Hypertarget{catch__preprocessor_8hpp_abe3c205d4ba8406d45439abb91366ce9}\index{catch\_preprocessor.hpp@{catch\_preprocessor.hpp}!CATCH\_REC\_LIST2@{CATCH\_REC\_LIST2}}
+\index{CATCH\_REC\_LIST2@{CATCH\_REC\_LIST2}!catch\_preprocessor.hpp@{catch\_preprocessor.hpp}}
+\doxysubsubsection{\texorpdfstring{CATCH\_REC\_LIST2}{CATCH\_REC\_LIST2}}
+{\footnotesize\ttfamily \label{catch__preprocessor_8hpp_abe3c205d4ba8406d45439abb91366ce9} 
+\#define CATCH\+\_\+\+REC\+\_\+\+LIST2(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}}{, }\item[{}]{x}{, }\item[{}]{peek}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}(x)\ \mbox{\hyperlink{catch__preprocessor_8hpp_a83c1ab15f3d715f25fe504c114cf6144}{CATCH\_DEFER}}\ (\ \mbox{\hyperlink{catch__preprocessor_8hpp_abaddf93f755cea9e20aee254aa566adf}{CATCH\_REC\_NEXT}}(peek,\ \mbox{\hyperlink{catch__preprocessor_8hpp_abedd1ae08e12478704233e9bf29e0fe9}{CATCH\_REC\_LIST1}})\ )\ (\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}},\ peek,\ \_\_VA\_ARGS\_\_\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__preprocessor_8hpp_source_l00043}{43}} of file \mbox{\hyperlink{catch__preprocessor_8hpp_source}{catch\+\_\+preprocessor.\+hpp}}.
+
+\Hypertarget{catch__preprocessor_8hpp_a0c2dd548d178fbc2202ecd74ce4be91b}\index{catch\_preprocessor.hpp@{catch\_preprocessor.hpp}!CATCH\_REC\_LIST2\_UD@{CATCH\_REC\_LIST2\_UD}}
+\index{CATCH\_REC\_LIST2\_UD@{CATCH\_REC\_LIST2\_UD}!catch\_preprocessor.hpp@{catch\_preprocessor.hpp}}
+\doxysubsubsection{\texorpdfstring{CATCH\_REC\_LIST2\_UD}{CATCH\_REC\_LIST2\_UD}}
+{\footnotesize\ttfamily \label{catch__preprocessor_8hpp_a0c2dd548d178fbc2202ecd74ce4be91b} 
+\#define CATCH\+\_\+\+REC\+\_\+\+LIST2\+\_\+\+UD(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}}{, }\item[{}]{userdata}{, }\item[{}]{x}{, }\item[{}]{peek}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}(userdata,\ x)\ \mbox{\hyperlink{catch__preprocessor_8hpp_a83c1ab15f3d715f25fe504c114cf6144}{CATCH\_DEFER}}\ (\ \mbox{\hyperlink{catch__preprocessor_8hpp_abaddf93f755cea9e20aee254aa566adf}{CATCH\_REC\_NEXT}}(peek,\ \mbox{\hyperlink{catch__preprocessor_8hpp_abbcff29ced4d413bc121f7b761558c16}{CATCH\_REC\_LIST1\_UD}})\ )\ (\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}},\ userdata,\ peek,\ \_\_VA\_ARGS\_\_\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__preprocessor_8hpp_source_l00047}{47}} of file \mbox{\hyperlink{catch__preprocessor_8hpp_source}{catch\+\_\+preprocessor.\+hpp}}.
+
+\Hypertarget{catch__preprocessor_8hpp_a8e404d42a6d0402698c1d4d16e831d28}\index{catch\_preprocessor.hpp@{catch\_preprocessor.hpp}!CATCH\_REC\_LIST\_UD@{CATCH\_REC\_LIST\_UD}}
+\index{CATCH\_REC\_LIST\_UD@{CATCH\_REC\_LIST\_UD}!catch\_preprocessor.hpp@{catch\_preprocessor.hpp}}
+\doxysubsubsection{\texorpdfstring{CATCH\_REC\_LIST\_UD}{CATCH\_REC\_LIST\_UD}}
+{\footnotesize\ttfamily \label{catch__preprocessor_8hpp_a8e404d42a6d0402698c1d4d16e831d28} 
+\#define CATCH\+\_\+\+REC\+\_\+\+LIST\+\_\+\+UD(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}}{, }\item[{}]{userdata}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__preprocessor_8hpp_ae3ce5d9c8e50eba755111a19a62432e5}{CATCH\_RECURSE}}(\mbox{\hyperlink{catch__preprocessor_8hpp_a0c2dd548d178fbc2202ecd74ce4be91b}{CATCH\_REC\_LIST2\_UD}}(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}},\ userdata,\ \_\_VA\_ARGS\_\_,\ ()()(),\ ()()(),\ ()()(),\ 0))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__preprocessor_8hpp_source_l00052}{52}} of file \mbox{\hyperlink{catch__preprocessor_8hpp_source}{catch\+\_\+preprocessor.\+hpp}}.
+
+\Hypertarget{catch__preprocessor_8hpp_abaddf93f755cea9e20aee254aa566adf}\index{catch\_preprocessor.hpp@{catch\_preprocessor.hpp}!CATCH\_REC\_NEXT@{CATCH\_REC\_NEXT}}
+\index{CATCH\_REC\_NEXT@{CATCH\_REC\_NEXT}!catch\_preprocessor.hpp@{catch\_preprocessor.hpp}}
+\doxysubsubsection{\texorpdfstring{CATCH\_REC\_NEXT}{CATCH\_REC\_NEXT}}
+{\footnotesize\ttfamily \label{catch__preprocessor_8hpp_abaddf93f755cea9e20aee254aa566adf} 
+\#define CATCH\+\_\+\+REC\+\_\+\+NEXT(\begin{DoxyParamCaption}\item[{}]{test}{, }\item[{}]{next}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__preprocessor_8hpp_a0ddf3b75cc3780765a2cb551d6536721}{CATCH\_REC\_NEXT1}}(\mbox{\hyperlink{catch__preprocessor_8hpp_a536dd24bc8e72ec8eb14c3676f20c778}{CATCH\_REC\_GET\_END}}\ test,\ next)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__preprocessor_8hpp_source_l00039}{39}} of file \mbox{\hyperlink{catch__preprocessor_8hpp_source}{catch\+\_\+preprocessor.\+hpp}}.
+
+\Hypertarget{catch__preprocessor_8hpp_ae25889c34b72704724f5797b6103c463}\index{catch\_preprocessor.hpp@{catch\_preprocessor.hpp}!CATCH\_REC\_NEXT0@{CATCH\_REC\_NEXT0}}
+\index{CATCH\_REC\_NEXT0@{CATCH\_REC\_NEXT0}!catch\_preprocessor.hpp@{catch\_preprocessor.hpp}}
+\doxysubsubsection{\texorpdfstring{CATCH\_REC\_NEXT0}{CATCH\_REC\_NEXT0}}
+{\footnotesize\ttfamily \label{catch__preprocessor_8hpp_ae25889c34b72704724f5797b6103c463} 
+\#define CATCH\+\_\+\+REC\+\_\+\+NEXT0(\begin{DoxyParamCaption}\item[{}]{test}{, }\item[{}]{next}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{next\ \mbox{\hyperlink{catch__preprocessor_8hpp_ab469d9696504fd14e36fd1d8b6e47b7f}{CATCH\_REC\_OUT}}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__preprocessor_8hpp_source_l00037}{37}} of file \mbox{\hyperlink{catch__preprocessor_8hpp_source}{catch\+\_\+preprocessor.\+hpp}}.
+
+\Hypertarget{catch__preprocessor_8hpp_a0ddf3b75cc3780765a2cb551d6536721}\index{catch\_preprocessor.hpp@{catch\_preprocessor.hpp}!CATCH\_REC\_NEXT1@{CATCH\_REC\_NEXT1}}
+\index{CATCH\_REC\_NEXT1@{CATCH\_REC\_NEXT1}!catch\_preprocessor.hpp@{catch\_preprocessor.hpp}}
+\doxysubsubsection{\texorpdfstring{CATCH\_REC\_NEXT1}{CATCH\_REC\_NEXT1}}
+{\footnotesize\ttfamily \label{catch__preprocessor_8hpp_a0ddf3b75cc3780765a2cb551d6536721} 
+\#define CATCH\+\_\+\+REC\+\_\+\+NEXT1(\begin{DoxyParamCaption}\item[{}]{test}{, }\item[{}]{next}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__preprocessor_8hpp_a83c1ab15f3d715f25fe504c114cf6144}{CATCH\_DEFER}}\ (\ \mbox{\hyperlink{catch__preprocessor_8hpp_ae25889c34b72704724f5797b6103c463}{CATCH\_REC\_NEXT0}}\ )\ (\ test,\ next,\ 0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__preprocessor_8hpp_source_l00038}{38}} of file \mbox{\hyperlink{catch__preprocessor_8hpp_source}{catch\+\_\+preprocessor.\+hpp}}.
+
+\Hypertarget{catch__preprocessor_8hpp_ab469d9696504fd14e36fd1d8b6e47b7f}\index{catch\_preprocessor.hpp@{catch\_preprocessor.hpp}!CATCH\_REC\_OUT@{CATCH\_REC\_OUT}}
+\index{CATCH\_REC\_OUT@{CATCH\_REC\_OUT}!catch\_preprocessor.hpp@{catch\_preprocessor.hpp}}
+\doxysubsubsection{\texorpdfstring{CATCH\_REC\_OUT}{CATCH\_REC\_OUT}}
+{\footnotesize\ttfamily \label{catch__preprocessor_8hpp_ab469d9696504fd14e36fd1d8b6e47b7f} 
+\#define CATCH\+\_\+\+REC\+\_\+\+OUT}
+
+
+
+Definition at line \mbox{\hyperlink{catch__preprocessor_8hpp_source_l00029}{29}} of file \mbox{\hyperlink{catch__preprocessor_8hpp_source}{catch\+\_\+preprocessor.\+hpp}}.
+
+\Hypertarget{catch__preprocessor_8hpp_ae3ce5d9c8e50eba755111a19a62432e5}\index{catch\_preprocessor.hpp@{catch\_preprocessor.hpp}!CATCH\_RECURSE@{CATCH\_RECURSE}}
+\index{CATCH\_RECURSE@{CATCH\_RECURSE}!catch\_preprocessor.hpp@{catch\_preprocessor.hpp}}
+\doxysubsubsection{\texorpdfstring{CATCH\_RECURSE}{CATCH\_RECURSE}}
+{\footnotesize\ttfamily \label{catch__preprocessor_8hpp_ae3ce5d9c8e50eba755111a19a62432e5} 
+\#define CATCH\+\_\+\+RECURSE(\begin{DoxyParamCaption}\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__preprocessor_8hpp_a761d2ca7a5b0393ae7a6edf086a9c3da}{CATCH\_RECURSION\_LEVEL5}}(\_\_VA\_ARGS\_\_)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__preprocessor_8hpp_source_l00025}{25}} of file \mbox{\hyperlink{catch__preprocessor_8hpp_source}{catch\+\_\+preprocessor.\+hpp}}.
+
+\Hypertarget{catch__preprocessor_8hpp_aedfa83a9b9671b2f3ce5d64207eab45f}\index{catch\_preprocessor.hpp@{catch\_preprocessor.hpp}!CATCH\_RECURSION\_LEVEL0@{CATCH\_RECURSION\_LEVEL0}}
+\index{CATCH\_RECURSION\_LEVEL0@{CATCH\_RECURSION\_LEVEL0}!catch\_preprocessor.hpp@{catch\_preprocessor.hpp}}
+\doxysubsubsection{\texorpdfstring{CATCH\_RECURSION\_LEVEL0}{CATCH\_RECURSION\_LEVEL0}}
+{\footnotesize\ttfamily \label{catch__preprocessor_8hpp_aedfa83a9b9671b2f3ce5d64207eab45f} 
+\#define CATCH\+\_\+\+RECURSION\+\_\+\+LEVEL0(\begin{DoxyParamCaption}\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\_\_VA\_ARGS\_\_}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__preprocessor_8hpp_source_l00012}{12}} of file \mbox{\hyperlink{catch__preprocessor_8hpp_source}{catch\+\_\+preprocessor.\+hpp}}.
+
+\Hypertarget{catch__preprocessor_8hpp_ad1cc1127b3a8ed84d336fd86c25571a9}\index{catch\_preprocessor.hpp@{catch\_preprocessor.hpp}!CATCH\_RECURSION\_LEVEL1@{CATCH\_RECURSION\_LEVEL1}}
+\index{CATCH\_RECURSION\_LEVEL1@{CATCH\_RECURSION\_LEVEL1}!catch\_preprocessor.hpp@{catch\_preprocessor.hpp}}
+\doxysubsubsection{\texorpdfstring{CATCH\_RECURSION\_LEVEL1}{CATCH\_RECURSION\_LEVEL1}}
+{\footnotesize\ttfamily \label{catch__preprocessor_8hpp_ad1cc1127b3a8ed84d336fd86c25571a9} 
+\#define CATCH\+\_\+\+RECURSION\+\_\+\+LEVEL1(\begin{DoxyParamCaption}\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__preprocessor_8hpp_aedfa83a9b9671b2f3ce5d64207eab45f}{CATCH\_RECURSION\_LEVEL0}}(\mbox{\hyperlink{catch__preprocessor_8hpp_aedfa83a9b9671b2f3ce5d64207eab45f}{CATCH\_RECURSION\_LEVEL0}}(\mbox{\hyperlink{catch__preprocessor_8hpp_aedfa83a9b9671b2f3ce5d64207eab45f}{CATCH\_RECURSION\_LEVEL0}}(\_\_VA\_ARGS\_\_)))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__preprocessor_8hpp_source_l00013}{13}} of file \mbox{\hyperlink{catch__preprocessor_8hpp_source}{catch\+\_\+preprocessor.\+hpp}}.
+
+\Hypertarget{catch__preprocessor_8hpp_a2a7ccfd6ceda0c723d1c81ed0a8ea7aa}\index{catch\_preprocessor.hpp@{catch\_preprocessor.hpp}!CATCH\_RECURSION\_LEVEL2@{CATCH\_RECURSION\_LEVEL2}}
+\index{CATCH\_RECURSION\_LEVEL2@{CATCH\_RECURSION\_LEVEL2}!catch\_preprocessor.hpp@{catch\_preprocessor.hpp}}
+\doxysubsubsection{\texorpdfstring{CATCH\_RECURSION\_LEVEL2}{CATCH\_RECURSION\_LEVEL2}}
+{\footnotesize\ttfamily \label{catch__preprocessor_8hpp_a2a7ccfd6ceda0c723d1c81ed0a8ea7aa} 
+\#define CATCH\+\_\+\+RECURSION\+\_\+\+LEVEL2(\begin{DoxyParamCaption}\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__preprocessor_8hpp_ad1cc1127b3a8ed84d336fd86c25571a9}{CATCH\_RECURSION\_LEVEL1}}(\mbox{\hyperlink{catch__preprocessor_8hpp_ad1cc1127b3a8ed84d336fd86c25571a9}{CATCH\_RECURSION\_LEVEL1}}(\mbox{\hyperlink{catch__preprocessor_8hpp_ad1cc1127b3a8ed84d336fd86c25571a9}{CATCH\_RECURSION\_LEVEL1}}(\_\_VA\_ARGS\_\_)))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__preprocessor_8hpp_source_l00014}{14}} of file \mbox{\hyperlink{catch__preprocessor_8hpp_source}{catch\+\_\+preprocessor.\+hpp}}.
+
+\Hypertarget{catch__preprocessor_8hpp_ac5ead3b79069ca9b5de9cad80029bc71}\index{catch\_preprocessor.hpp@{catch\_preprocessor.hpp}!CATCH\_RECURSION\_LEVEL3@{CATCH\_RECURSION\_LEVEL3}}
+\index{CATCH\_RECURSION\_LEVEL3@{CATCH\_RECURSION\_LEVEL3}!catch\_preprocessor.hpp@{catch\_preprocessor.hpp}}
+\doxysubsubsection{\texorpdfstring{CATCH\_RECURSION\_LEVEL3}{CATCH\_RECURSION\_LEVEL3}}
+{\footnotesize\ttfamily \label{catch__preprocessor_8hpp_ac5ead3b79069ca9b5de9cad80029bc71} 
+\#define CATCH\+\_\+\+RECURSION\+\_\+\+LEVEL3(\begin{DoxyParamCaption}\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__preprocessor_8hpp_a2a7ccfd6ceda0c723d1c81ed0a8ea7aa}{CATCH\_RECURSION\_LEVEL2}}(\mbox{\hyperlink{catch__preprocessor_8hpp_a2a7ccfd6ceda0c723d1c81ed0a8ea7aa}{CATCH\_RECURSION\_LEVEL2}}(\mbox{\hyperlink{catch__preprocessor_8hpp_a2a7ccfd6ceda0c723d1c81ed0a8ea7aa}{CATCH\_RECURSION\_LEVEL2}}(\_\_VA\_ARGS\_\_)))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__preprocessor_8hpp_source_l00015}{15}} of file \mbox{\hyperlink{catch__preprocessor_8hpp_source}{catch\+\_\+preprocessor.\+hpp}}.
+
+\Hypertarget{catch__preprocessor_8hpp_a7738534acacfd54ef5b9f89cf07fa16d}\index{catch\_preprocessor.hpp@{catch\_preprocessor.hpp}!CATCH\_RECURSION\_LEVEL4@{CATCH\_RECURSION\_LEVEL4}}
+\index{CATCH\_RECURSION\_LEVEL4@{CATCH\_RECURSION\_LEVEL4}!catch\_preprocessor.hpp@{catch\_preprocessor.hpp}}
+\doxysubsubsection{\texorpdfstring{CATCH\_RECURSION\_LEVEL4}{CATCH\_RECURSION\_LEVEL4}}
+{\footnotesize\ttfamily \label{catch__preprocessor_8hpp_a7738534acacfd54ef5b9f89cf07fa16d} 
+\#define CATCH\+\_\+\+RECURSION\+\_\+\+LEVEL4(\begin{DoxyParamCaption}\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__preprocessor_8hpp_ac5ead3b79069ca9b5de9cad80029bc71}{CATCH\_RECURSION\_LEVEL3}}(\mbox{\hyperlink{catch__preprocessor_8hpp_ac5ead3b79069ca9b5de9cad80029bc71}{CATCH\_RECURSION\_LEVEL3}}(\mbox{\hyperlink{catch__preprocessor_8hpp_ac5ead3b79069ca9b5de9cad80029bc71}{CATCH\_RECURSION\_LEVEL3}}(\_\_VA\_ARGS\_\_)))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__preprocessor_8hpp_source_l00016}{16}} of file \mbox{\hyperlink{catch__preprocessor_8hpp_source}{catch\+\_\+preprocessor.\+hpp}}.
+
+\Hypertarget{catch__preprocessor_8hpp_a761d2ca7a5b0393ae7a6edf086a9c3da}\index{catch\_preprocessor.hpp@{catch\_preprocessor.hpp}!CATCH\_RECURSION\_LEVEL5@{CATCH\_RECURSION\_LEVEL5}}
+\index{CATCH\_RECURSION\_LEVEL5@{CATCH\_RECURSION\_LEVEL5}!catch\_preprocessor.hpp@{catch\_preprocessor.hpp}}
+\doxysubsubsection{\texorpdfstring{CATCH\_RECURSION\_LEVEL5}{CATCH\_RECURSION\_LEVEL5}}
+{\footnotesize\ttfamily \label{catch__preprocessor_8hpp_a761d2ca7a5b0393ae7a6edf086a9c3da} 
+\#define CATCH\+\_\+\+RECURSION\+\_\+\+LEVEL5(\begin{DoxyParamCaption}\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__preprocessor_8hpp_a7738534acacfd54ef5b9f89cf07fa16d}{CATCH\_RECURSION\_LEVEL4}}(\mbox{\hyperlink{catch__preprocessor_8hpp_a7738534acacfd54ef5b9f89cf07fa16d}{CATCH\_RECURSION\_LEVEL4}}(\mbox{\hyperlink{catch__preprocessor_8hpp_a7738534acacfd54ef5b9f89cf07fa16d}{CATCH\_RECURSION\_LEVEL4}}(\_\_VA\_ARGS\_\_)))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__preprocessor_8hpp_source_l00017}{17}} of file \mbox{\hyperlink{catch__preprocessor_8hpp_source}{catch\+\_\+preprocessor.\+hpp}}.
+
+\Hypertarget{catch__preprocessor_8hpp_a053610cf96d1be50463e9cb08e818ed1}\index{catch\_preprocessor.hpp@{catch\_preprocessor.hpp}!INTERNAL\_CATCH\_DEF@{INTERNAL\_CATCH\_DEF}}
+\index{INTERNAL\_CATCH\_DEF@{INTERNAL\_CATCH\_DEF}!catch\_preprocessor.hpp@{catch\_preprocessor.hpp}}
+\doxysubsubsection{\texorpdfstring{INTERNAL\_CATCH\_DEF}{INTERNAL\_CATCH\_DEF}}
+{\footnotesize\ttfamily \label{catch__preprocessor_8hpp_a053610cf96d1be50463e9cb08e818ed1} 
+\#define INTERNAL\+\_\+\+CATCH\+\_\+\+DEF(\begin{DoxyParamCaption}\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__preprocessor_8hpp_a053610cf96d1be50463e9cb08e818ed1}{INTERNAL\_CATCH\_DEF}}\ \_\_VA\_ARGS\_\_}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__preprocessor_8hpp_source_l00058}{58}} of file \mbox{\hyperlink{catch__preprocessor_8hpp_source}{catch\+\_\+preprocessor.\+hpp}}.
+
+\Hypertarget{catch__preprocessor_8hpp_afec78f8054a97a6ecb38ff098f275efb}\index{catch\_preprocessor.hpp@{catch\_preprocessor.hpp}!INTERNAL\_CATCH\_EXPAND1@{INTERNAL\_CATCH\_EXPAND1}}
+\index{INTERNAL\_CATCH\_EXPAND1@{INTERNAL\_CATCH\_EXPAND1}!catch\_preprocessor.hpp@{catch\_preprocessor.hpp}}
+\doxysubsubsection{\texorpdfstring{INTERNAL\_CATCH\_EXPAND1}{INTERNAL\_CATCH\_EXPAND1}}
+{\footnotesize\ttfamily \label{catch__preprocessor_8hpp_afec78f8054a97a6ecb38ff098f275efb} 
+\#define INTERNAL\+\_\+\+CATCH\+\_\+\+EXPAND1(\begin{DoxyParamCaption}\item[{}]{param}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__preprocessor_8hpp_a163ac3d9bea0921d546f125ef5d58a2d}{INTERNAL\_CATCH\_EXPAND2}}(param)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__preprocessor_8hpp_source_l00056}{56}} of file \mbox{\hyperlink{catch__preprocessor_8hpp_source}{catch\+\_\+preprocessor.\+hpp}}.
+
+\Hypertarget{catch__preprocessor_8hpp_a163ac3d9bea0921d546f125ef5d58a2d}\index{catch\_preprocessor.hpp@{catch\_preprocessor.hpp}!INTERNAL\_CATCH\_EXPAND2@{INTERNAL\_CATCH\_EXPAND2}}
+\index{INTERNAL\_CATCH\_EXPAND2@{INTERNAL\_CATCH\_EXPAND2}!catch\_preprocessor.hpp@{catch\_preprocessor.hpp}}
+\doxysubsubsection{\texorpdfstring{INTERNAL\_CATCH\_EXPAND2}{INTERNAL\_CATCH\_EXPAND2}}
+{\footnotesize\ttfamily \label{catch__preprocessor_8hpp_a163ac3d9bea0921d546f125ef5d58a2d} 
+\#define INTERNAL\+\_\+\+CATCH\+\_\+\+EXPAND2(\begin{DoxyParamCaption}\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{INTERNAL\_CATCH\_NO\#\#\ \_\_VA\_ARGS\_\_}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__preprocessor_8hpp_source_l00057}{57}} of file \mbox{\hyperlink{catch__preprocessor_8hpp_source}{catch\+\_\+preprocessor.\+hpp}}.
+
+\Hypertarget{catch__preprocessor_8hpp_aec759b1a62379a441b001169f2d6a2fe}\index{catch\_preprocessor.hpp@{catch\_preprocessor.hpp}!INTERNAL\_CATCH\_MAKE\_TYPE\_LIST@{INTERNAL\_CATCH\_MAKE\_TYPE\_LIST}}
+\index{INTERNAL\_CATCH\_MAKE\_TYPE\_LIST@{INTERNAL\_CATCH\_MAKE\_TYPE\_LIST}!catch\_preprocessor.hpp@{catch\_preprocessor.hpp}}
+\doxysubsubsection{\texorpdfstring{INTERNAL\_CATCH\_MAKE\_TYPE\_LIST}{INTERNAL\_CATCH\_MAKE\_TYPE\_LIST}}
+{\footnotesize\ttfamily \label{catch__preprocessor_8hpp_aec759b1a62379a441b001169f2d6a2fe} 
+\#define INTERNAL\+\_\+\+CATCH\+\_\+\+MAKE\+\_\+\+TYPE\+\_\+\+LIST(\begin{DoxyParamCaption}\item[{}]{types}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{struct_catch_1_1_type_list}{Catch::TypeList}}<\mbox{\hyperlink{catch__preprocessor_8hpp_adf5ede19321b27ce635d01688551e782}{INTERNAL\_CATCH\_REMOVE\_PARENS}}(types)>}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__preprocessor_8hpp_source_l00084}{84}} of file \mbox{\hyperlink{catch__preprocessor_8hpp_source}{catch\+\_\+preprocessor.\+hpp}}.
+
+\Hypertarget{catch__preprocessor_8hpp_aa48345a3d206462d571f98297654ca47}\index{catch\_preprocessor.hpp@{catch\_preprocessor.hpp}!INTERNAL\_CATCH\_MAKE\_TYPE\_LISTS\_FROM\_TYPES@{INTERNAL\_CATCH\_MAKE\_TYPE\_LISTS\_FROM\_TYPES}}
+\index{INTERNAL\_CATCH\_MAKE\_TYPE\_LISTS\_FROM\_TYPES@{INTERNAL\_CATCH\_MAKE\_TYPE\_LISTS\_FROM\_TYPES}!catch\_preprocessor.hpp@{catch\_preprocessor.hpp}}
+\doxysubsubsection{\texorpdfstring{INTERNAL\_CATCH\_MAKE\_TYPE\_LISTS\_FROM\_TYPES}{INTERNAL\_CATCH\_MAKE\_TYPE\_LISTS\_FROM\_TYPES}}
+{\footnotesize\ttfamily \label{catch__preprocessor_8hpp_aa48345a3d206462d571f98297654ca47} 
+\#define INTERNAL\+\_\+\+CATCH\+\_\+\+MAKE\+\_\+\+TYPE\+\_\+\+LISTS\+\_\+\+FROM\+\_\+\+TYPES(\begin{DoxyParamCaption}\item[{}]{types}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{catch__preprocessor_8hpp_a060f5fa141c247b4d07dfe9bf3c54079}{CATCH\_REC\_LIST}}(\mbox{\hyperlink{catch__preprocessor_8hpp_aec759b1a62379a441b001169f2d6a2fe}{INTERNAL\_CATCH\_MAKE\_TYPE\_LIST}},\mbox{\hyperlink{catch__preprocessor_8hpp_adf5ede19321b27ce635d01688551e782}{INTERNAL\_CATCH\_REMOVE\_PARENS}}(types))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__preprocessor_8hpp_source_l00086}{86}} of file \mbox{\hyperlink{catch__preprocessor_8hpp_source}{catch\+\_\+preprocessor.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00086\ \textcolor{preprocessor}{\#define\ INTERNAL\_CATCH\_MAKE\_TYPE\_LISTS\_FROM\_TYPES(types)\(\backslash\)}}
+\DoxyCodeLine{00087\ \textcolor{preprocessor}{\ \ \ \ CATCH\_REC\_LIST(INTERNAL\_CATCH\_MAKE\_TYPE\_LIST,INTERNAL\_CATCH\_REMOVE\_PARENS(types))}}
+
+\end{DoxyCode}
+\Hypertarget{catch__preprocessor_8hpp_a6868a4eb7481605e628a3aaf0c1fbb01}\index{catch\_preprocessor.hpp@{catch\_preprocessor.hpp}!INTERNAL\_CATCH\_NOINTERNAL\_CATCH\_DEF@{INTERNAL\_CATCH\_NOINTERNAL\_CATCH\_DEF}}
+\index{INTERNAL\_CATCH\_NOINTERNAL\_CATCH\_DEF@{INTERNAL\_CATCH\_NOINTERNAL\_CATCH\_DEF}!catch\_preprocessor.hpp@{catch\_preprocessor.hpp}}
+\doxysubsubsection{\texorpdfstring{INTERNAL\_CATCH\_NOINTERNAL\_CATCH\_DEF}{INTERNAL\_CATCH\_NOINTERNAL\_CATCH\_DEF}}
+{\footnotesize\ttfamily \label{catch__preprocessor_8hpp_a6868a4eb7481605e628a3aaf0c1fbb01} 
+\#define INTERNAL\+\_\+\+CATCH\+\_\+\+NOINTERNAL\+\_\+\+CATCH\+\_\+\+DEF}
+
+
+
+Definition at line \mbox{\hyperlink{catch__preprocessor_8hpp_source_l00059}{59}} of file \mbox{\hyperlink{catch__preprocessor_8hpp_source}{catch\+\_\+preprocessor.\+hpp}}.
+
+\Hypertarget{catch__preprocessor_8hpp_adf5ede19321b27ce635d01688551e782}\index{catch\_preprocessor.hpp@{catch\_preprocessor.hpp}!INTERNAL\_CATCH\_REMOVE\_PARENS@{INTERNAL\_CATCH\_REMOVE\_PARENS}}
+\index{INTERNAL\_CATCH\_REMOVE\_PARENS@{INTERNAL\_CATCH\_REMOVE\_PARENS}!catch\_preprocessor.hpp@{catch\_preprocessor.hpp}}
+\doxysubsubsection{\texorpdfstring{INTERNAL\_CATCH\_REMOVE\_PARENS}{INTERNAL\_CATCH\_REMOVE\_PARENS}}
+{\footnotesize\ttfamily \label{catch__preprocessor_8hpp_adf5ede19321b27ce635d01688551e782} 
+\#define INTERNAL\+\_\+\+CATCH\+\_\+\+REMOVE\+\_\+\+PARENS(\begin{DoxyParamCaption}\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__preprocessor_8hpp_afec78f8054a97a6ecb38ff098f275efb}{INTERNAL\_CATCH\_EXPAND1}}(\mbox{\hyperlink{catch__preprocessor_8hpp_a053610cf96d1be50463e9cb08e818ed1}{INTERNAL\_CATCH\_DEF}}\ \_\_VA\_ARGS\_\_)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__preprocessor_8hpp_source_l00071}{71}} of file \mbox{\hyperlink{catch__preprocessor_8hpp_source}{catch\+\_\+preprocessor.\+hpp}}.
+
+\Hypertarget{catch__preprocessor_8hpp_a13733e49e752d29b735e94d9e72c7d6b}\index{catch\_preprocessor.hpp@{catch\_preprocessor.hpp}!INTERNAL\_CATCH\_STRINGIZE@{INTERNAL\_CATCH\_STRINGIZE}}
+\index{INTERNAL\_CATCH\_STRINGIZE@{INTERNAL\_CATCH\_STRINGIZE}!catch\_preprocessor.hpp@{catch\_preprocessor.hpp}}
+\doxysubsubsection{\texorpdfstring{INTERNAL\_CATCH\_STRINGIZE}{INTERNAL\_CATCH\_STRINGIZE}}
+{\footnotesize\ttfamily \label{catch__preprocessor_8hpp_a13733e49e752d29b735e94d9e72c7d6b} 
+\#define INTERNAL\+\_\+\+CATCH\+\_\+\+STRINGIZE(\begin{DoxyParamCaption}\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__preprocessor_8hpp_a6fedc6934bac0e22dbbd13aabf81ad3f}{INTERNAL\_CATCH\_STRINGIZE2}}(\_\_VA\_ARGS\_\_)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__preprocessor_8hpp_source_l00060}{60}} of file \mbox{\hyperlink{catch__preprocessor_8hpp_source}{catch\+\_\+preprocessor.\+hpp}}.
+
+\Hypertarget{catch__preprocessor_8hpp_a6fedc6934bac0e22dbbd13aabf81ad3f}\index{catch\_preprocessor.hpp@{catch\_preprocessor.hpp}!INTERNAL\_CATCH\_STRINGIZE2@{INTERNAL\_CATCH\_STRINGIZE2}}
+\index{INTERNAL\_CATCH\_STRINGIZE2@{INTERNAL\_CATCH\_STRINGIZE2}!catch\_preprocessor.hpp@{catch\_preprocessor.hpp}}
+\doxysubsubsection{\texorpdfstring{INTERNAL\_CATCH\_STRINGIZE2}{INTERNAL\_CATCH\_STRINGIZE2}}
+{\footnotesize\ttfamily \label{catch__preprocessor_8hpp_a6fedc6934bac0e22dbbd13aabf81ad3f} 
+\#define INTERNAL\+\_\+\+CATCH\+\_\+\+STRINGIZE2(\begin{DoxyParamCaption}\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{preprocessor}{\#\_\_VA\_ARGS\_\_}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__preprocessor_8hpp_source_l00062}{62}} of file \mbox{\hyperlink{catch__preprocessor_8hpp_source}{catch\+\_\+preprocessor.\+hpp}}.
+
+\Hypertarget{catch__preprocessor_8hpp_aa66562537dd49bc33e53f9aa01acedaf}\index{catch\_preprocessor.hpp@{catch\_preprocessor.hpp}!INTERNAL\_CATCH\_STRINGIZE\_WITHOUT\_PARENS@{INTERNAL\_CATCH\_STRINGIZE\_WITHOUT\_PARENS}}
+\index{INTERNAL\_CATCH\_STRINGIZE\_WITHOUT\_PARENS@{INTERNAL\_CATCH\_STRINGIZE\_WITHOUT\_PARENS}!catch\_preprocessor.hpp@{catch\_preprocessor.hpp}}
+\doxysubsubsection{\texorpdfstring{INTERNAL\_CATCH\_STRINGIZE\_WITHOUT\_PARENS}{INTERNAL\_CATCH\_STRINGIZE\_WITHOUT\_PARENS}}
+{\footnotesize\ttfamily \label{catch__preprocessor_8hpp_aa66562537dd49bc33e53f9aa01acedaf} 
+\#define INTERNAL\+\_\+\+CATCH\+\_\+\+STRINGIZE\+\_\+\+WITHOUT\+\_\+\+PARENS(\begin{DoxyParamCaption}\item[{}]{param}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__preprocessor_8hpp_a13733e49e752d29b735e94d9e72c7d6b}{INTERNAL\_CATCH\_STRINGIZE}}(\mbox{\hyperlink{catch__preprocessor_8hpp_adf5ede19321b27ce635d01688551e782}{INTERNAL\_CATCH\_REMOVE\_PARENS}}(param))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__preprocessor_8hpp_source_l00063}{63}} of file \mbox{\hyperlink{catch__preprocessor_8hpp_source}{catch\+\_\+preprocessor.\+hpp}}.
+
+\Hypertarget{catch__preprocessor_8hpp_a8943b350c92f4732c53db42264f463ab}\index{catch\_preprocessor.hpp@{catch\_preprocessor.hpp}!INTERNAL\_CATCH\_TEMPLATE\_UNIQUE\_NAME@{INTERNAL\_CATCH\_TEMPLATE\_UNIQUE\_NAME}}
+\index{INTERNAL\_CATCH\_TEMPLATE\_UNIQUE\_NAME@{INTERNAL\_CATCH\_TEMPLATE\_UNIQUE\_NAME}!catch\_preprocessor.hpp@{catch\_preprocessor.hpp}}
+\doxysubsubsection{\texorpdfstring{INTERNAL\_CATCH\_TEMPLATE\_UNIQUE\_NAME}{INTERNAL\_CATCH\_TEMPLATE\_UNIQUE\_NAME}}
+{\footnotesize\ttfamily \label{catch__preprocessor_8hpp_a8943b350c92f4732c53db42264f463ab} 
+\#define INTERNAL\+\_\+\+CATCH\+\_\+\+TEMPLATE\+\_\+\+UNIQUE\+\_\+\+NAME(\begin{DoxyParamCaption}\item[{}]{Name}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__preprocessor_8hpp_ab5904058e163fd663012ec59c9c15411}{INTERNAL\_CATCH\_TEMPLATE\_UNIQUE\_NAME2}}(Name,\ \mbox{\hyperlink{catch__preprocessor_8hpp_adf5ede19321b27ce635d01688551e782}{INTERNAL\_CATCH\_REMOVE\_PARENS}}(\_\_VA\_ARGS\_\_))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__preprocessor_8hpp_source_l00076}{76}} of file \mbox{\hyperlink{catch__preprocessor_8hpp_source}{catch\+\_\+preprocessor.\+hpp}}.
+
+\Hypertarget{catch__preprocessor_8hpp_ab5904058e163fd663012ec59c9c15411}\index{catch\_preprocessor.hpp@{catch\_preprocessor.hpp}!INTERNAL\_CATCH\_TEMPLATE\_UNIQUE\_NAME2@{INTERNAL\_CATCH\_TEMPLATE\_UNIQUE\_NAME2}}
+\index{INTERNAL\_CATCH\_TEMPLATE\_UNIQUE\_NAME2@{INTERNAL\_CATCH\_TEMPLATE\_UNIQUE\_NAME2}!catch\_preprocessor.hpp@{catch\_preprocessor.hpp}}
+\doxysubsubsection{\texorpdfstring{INTERNAL\_CATCH\_TEMPLATE\_UNIQUE\_NAME2}{INTERNAL\_CATCH\_TEMPLATE\_UNIQUE\_NAME2}}
+{\footnotesize\ttfamily \label{catch__preprocessor_8hpp_ab5904058e163fd663012ec59c9c15411} 
+\#define INTERNAL\+\_\+\+CATCH\+\_\+\+TEMPLATE\+\_\+\+UNIQUE\+\_\+\+NAME2(\begin{DoxyParamCaption}\item[{}]{Name}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__preprocessor_8hpp_a148dd668623eff0bf6f121808708d403}{INTERNAL\_CATCH\_TEMPLATE\_UNIQUE\_NAME3}}(Name,\ \_\_VA\_ARGS\_\_)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__preprocessor_8hpp_source_l00073}{73}} of file \mbox{\hyperlink{catch__preprocessor_8hpp_source}{catch\+\_\+preprocessor.\+hpp}}.
+
+\Hypertarget{catch__preprocessor_8hpp_a148dd668623eff0bf6f121808708d403}\index{catch\_preprocessor.hpp@{catch\_preprocessor.hpp}!INTERNAL\_CATCH\_TEMPLATE\_UNIQUE\_NAME3@{INTERNAL\_CATCH\_TEMPLATE\_UNIQUE\_NAME3}}
+\index{INTERNAL\_CATCH\_TEMPLATE\_UNIQUE\_NAME3@{INTERNAL\_CATCH\_TEMPLATE\_UNIQUE\_NAME3}!catch\_preprocessor.hpp@{catch\_preprocessor.hpp}}
+\doxysubsubsection{\texorpdfstring{INTERNAL\_CATCH\_TEMPLATE\_UNIQUE\_NAME3}{INTERNAL\_CATCH\_TEMPLATE\_UNIQUE\_NAME3}}
+{\footnotesize\ttfamily \label{catch__preprocessor_8hpp_a148dd668623eff0bf6f121808708d403} 
+\#define INTERNAL\+\_\+\+CATCH\+\_\+\+TEMPLATE\+\_\+\+UNIQUE\+\_\+\+NAME3(\begin{DoxyParamCaption}\item[{}]{Name}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{Name\ \textcolor{stringliteral}{"{}\ -\/\ "{}}\ \#\_\_VA\_ARGS\_\_}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__preprocessor_8hpp_source_l00075}{75}} of file \mbox{\hyperlink{catch__preprocessor_8hpp_source}{catch\+\_\+preprocessor.\+hpp}}.
+

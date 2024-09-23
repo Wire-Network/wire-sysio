@@ -1,0 +1,463 @@
+\chapter{Internals}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals}{}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals}\index{Internals@{Internals}}
+This section records some design and implementation details.\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_Architecture}{}\doxysection{\texorpdfstring{Architecture}{Architecture}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_Architecture}
+\doxysubsection*{SAX and DOM}
+
+The basic relationships of SAX and DOM is shown in the following UML diagram.
+
+
+
+The core of the relationship is the {\ttfamily Handler} concept. From the SAX side, {\ttfamily Reader} parses a JSON from a stream and publish events to a {\ttfamily Handler}. {\ttfamily \doxylink{class_writer}{Writer}} implements the {\ttfamily Handler} concept to handle the same set of events. From the DOM side, {\ttfamily Document} implements the {\ttfamily Handler} concept to build a DOM according to the events. {\ttfamily Value} supports a {\ttfamily Value\+::\+Accept(Handler\&)} function, which traverses the DOM to publish events.
+
+With this design, SAX is not dependent on DOM. Even {\ttfamily Reader} and {\ttfamily \doxylink{class_writer}{Writer}} have no dependencies between them. This provides flexibility to chain event publisher and handlers. Besides, {\ttfamily Value} does not depends on SAX as well. So, in addition to stringify a DOM to JSON, user may also stringify it to a XML writer, or do anything else.
+
+\doxysubsection*{Utility Classes}
+
+Both SAX and DOM APIs depends on 3 additional concepts\+: {\ttfamily Allocator}, {\ttfamily Encoding} and {\ttfamily Stream}. Their inheritance hierarchy is shown as below.
+
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_Value}{}\doxysection{\texorpdfstring{Value}{Value}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_Value}
+{\ttfamily Value} (actually a typedef of {\ttfamily \doxylink{class_generic_value}{Generic\+Value}\texorpdfstring{$<$}{<}\doxylink{struct_u_t_f8}{UTF8}\texorpdfstring{$<$}{<}\texorpdfstring{$>$}{>}\texorpdfstring{$>$}{>}}) is the core of DOM API. This section describes the design of it.\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_DataLayout}{}\doxysubsection{\texorpdfstring{Data Layout}{Data Layout}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_DataLayout}
+{\ttfamily Value} is a \href{http://en.wikipedia.org/wiki/Variant_type}{\texttt{ variant type}}. In Rapid\+JSON\textquotesingle{}s context, an instance of {\ttfamily Value} can contain 1 of 6 JSON value types. This is possible by using {\ttfamily union}. Each {\ttfamily Value} contains two members\+: {\ttfamily union \doxylink{struct_data}{Data} data\+\_\+} and a{\ttfamily unsigned flags\+\_\+}. The {\ttfamily flags\+\_\+} indicates the JSON type, and also additional information.
+
+The following tables show the data layout of each type. The 32-\/bit/64-\/bit columns indicates the size of the field in bytes.
+
+\tabulinesep=1mm
+\begin{longtabu}spread 0pt [c]{*{4}{|X[-1]}|}
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Null   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 32-\/bit   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 64-\/bit    }\\\cline{1-4}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Null   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 32-\/bit   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 64-\/bit    }\\\cline{1-4}
+\endhead
+(unused)   &&\PBS\centering 4   &\PBS\centering 8    \\\cline{1-4}
+(unused)   &&\PBS\centering 4   &\PBS\centering 4    \\\cline{1-4}
+(unused)   &&\PBS\centering 4   &\PBS\centering 4    \\\cline{1-4}
+{\ttfamily unsigned flags\+\_\+}   &{\ttfamily k\+Null\+Type k\+Null\+Flag}   &\PBS\centering 4   &\PBS\centering 4   \\\cline{1-4}
+\end{longtabu}
+
+
+\tabulinesep=1mm
+\begin{longtabu}spread 0pt [c]{*{4}{|X[-1]}|}
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ \doxylink{struct_bool}{Bool}   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 32-\/bit   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 64-\/bit    }\\\cline{1-4}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ \doxylink{struct_bool}{Bool}   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 32-\/bit   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 64-\/bit    }\\\cline{1-4}
+\endhead
+(unused)   &&\PBS\centering 4   &\PBS\centering 8    \\\cline{1-4}
+(unused)   &&\PBS\centering 4   &\PBS\centering 4    \\\cline{1-4}
+(unused)   &&\PBS\centering 4   &\PBS\centering 4    \\\cline{1-4}
+{\ttfamily unsigned flags\+\_\+}   &{\ttfamily k\+Bool\+Type} (either {\ttfamily k\+True\+Flag} or {\ttfamily k\+False\+Flag})   &\PBS\centering 4   &\PBS\centering 4   \\\cline{1-4}
+\end{longtabu}
+
+
+\tabulinesep=1mm
+\begin{longtabu}spread 0pt [c]{*{4}{|X[-1]}|}
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ String   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 32-\/bit   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 64-\/bit    }\\\cline{1-4}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ String   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 32-\/bit   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 64-\/bit    }\\\cline{1-4}
+\endhead
+{\ttfamily Ch\texorpdfstring{$\ast$}{*} str}   &Pointer to the string (may own)   &\PBS\centering 4   &\PBS\centering 8    \\\cline{1-4}
+{\ttfamily Size\+Type length}   &Length of string   &\PBS\centering 4   &\PBS\centering 4    \\\cline{1-4}
+(unused)   &&\PBS\centering 4   &\PBS\centering 4    \\\cline{1-4}
+{\ttfamily unsigned flags\+\_\+}   &{\ttfamily k\+String\+Type k\+String\+Flag ...}   &\PBS\centering 4   &\PBS\centering 4   \\\cline{1-4}
+\end{longtabu}
+
+
+\tabulinesep=1mm
+\begin{longtabu}spread 0pt [c]{*{4}{|X[-1]}|}
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Object   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 32-\/bit   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 64-\/bit    }\\\cline{1-4}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Object   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 32-\/bit   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 64-\/bit    }\\\cline{1-4}
+\endhead
+{\ttfamily Member\texorpdfstring{$\ast$}{*} members}   &Pointer to array of members (owned)   &\PBS\centering 4   &\PBS\centering 8    \\\cline{1-4}
+{\ttfamily Size\+Type size}   &Number of members   &\PBS\centering 4   &\PBS\centering 4    \\\cline{1-4}
+{\ttfamily Size\+Type capacity}   &Capacity of members   &\PBS\centering 4   &\PBS\centering 4    \\\cline{1-4}
+{\ttfamily unsigned flags\+\_\+}   &{\ttfamily k\+Object\+Type k\+Object\+Flag}   &\PBS\centering 4   &\PBS\centering 4   \\\cline{1-4}
+\end{longtabu}
+
+
+\tabulinesep=1mm
+\begin{longtabu}spread 0pt [c]{*{4}{|X[-1]}|}
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Array   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 32-\/bit   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 64-\/bit    }\\\cline{1-4}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Array   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 32-\/bit   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 64-\/bit    }\\\cline{1-4}
+\endhead
+{\ttfamily Value\texorpdfstring{$\ast$}{*} values}   &Pointer to array of values (owned)   &\PBS\centering 4   &\PBS\centering 8    \\\cline{1-4}
+{\ttfamily Size\+Type size}   &Number of values   &\PBS\centering 4   &\PBS\centering 4    \\\cline{1-4}
+{\ttfamily Size\+Type capacity}   &Capacity of values   &\PBS\centering 4   &\PBS\centering 4    \\\cline{1-4}
+{\ttfamily unsigned flags\+\_\+}   &{\ttfamily k\+Array\+Type k\+Array\+Flag}   &\PBS\centering 4   &\PBS\centering 4   \\\cline{1-4}
+\end{longtabu}
+
+
+\tabulinesep=1mm
+\begin{longtabu}spread 0pt [c]{*{4}{|X[-1]}|}
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Number (Int)   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 32-\/bit   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 64-\/bit    }\\\cline{1-4}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Number (Int)   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 32-\/bit   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 64-\/bit    }\\\cline{1-4}
+\endhead
+{\ttfamily int i}   &32-\/bit signed integer   &\PBS\centering 4   &\PBS\centering 4    \\\cline{1-4}
+(zero padding)   &0   &\PBS\centering 4   &\PBS\centering 4    \\\cline{1-4}
+(unused)   &&\PBS\centering 4   &\PBS\centering 8    \\\cline{1-4}
+{\ttfamily unsigned flags\+\_\+}   &{\ttfamily k\+Number\+Type k\+Number\+Flag k\+Int\+Flag k\+Int64\+Flag ...}   &\PBS\centering 4   &\PBS\centering 4   \\\cline{1-4}
+\end{longtabu}
+
+
+\tabulinesep=1mm
+\begin{longtabu}spread 0pt [c]{*{4}{|X[-1]}|}
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Number (UInt)   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 32-\/bit   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 64-\/bit    }\\\cline{1-4}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Number (UInt)   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 32-\/bit   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 64-\/bit    }\\\cline{1-4}
+\endhead
+{\ttfamily unsigned u}   &32-\/bit unsigned integer   &\PBS\centering 4   &\PBS\centering 4    \\\cline{1-4}
+(zero padding)   &0   &\PBS\centering 4   &\PBS\centering 4    \\\cline{1-4}
+(unused)   &&\PBS\centering 4   &\PBS\centering 8    \\\cline{1-4}
+{\ttfamily unsigned flags\+\_\+}   &{\ttfamily k\+Number\+Type k\+Number\+Flag k\+UInt\+Flag k\+UInt64\+Flag ...}   &\PBS\centering 4   &\PBS\centering 4   \\\cline{1-4}
+\end{longtabu}
+
+
+\tabulinesep=1mm
+\begin{longtabu}spread 0pt [c]{*{4}{|X[-1]}|}
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Number (Int64)   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 32-\/bit   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 64-\/bit    }\\\cline{1-4}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Number (Int64)   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 32-\/bit   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 64-\/bit    }\\\cline{1-4}
+\endhead
+{\ttfamily int64\+\_\+t i64}   &64-\/bit signed integer   &\PBS\centering 8   &\PBS\centering 8    \\\cline{1-4}
+(unused)   &&\PBS\centering 4   &\PBS\centering 8    \\\cline{1-4}
+{\ttfamily unsigned flags\+\_\+}   &{\ttfamily k\+Number\+Type k\+Number\+Flag k\+Int64\+Flag ...}   &\PBS\centering 4   &\PBS\centering 4   \\\cline{1-4}
+\end{longtabu}
+
+
+\tabulinesep=1mm
+\begin{longtabu}spread 0pt [c]{*{4}{|X[-1]}|}
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Number (Uint64)   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 32-\/bit   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 64-\/bit    }\\\cline{1-4}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Number (Uint64)   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 32-\/bit   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 64-\/bit    }\\\cline{1-4}
+\endhead
+{\ttfamily uint64\+\_\+t i64}   &64-\/bit unsigned integer   &\PBS\centering 8   &\PBS\centering 8    \\\cline{1-4}
+(unused)   &&\PBS\centering 4   &\PBS\centering 8    \\\cline{1-4}
+{\ttfamily unsigned flags\+\_\+}   &{\ttfamily k\+Number\+Type k\+Number\+Flag k\+Int64\+Flag ...}   &\PBS\centering 4   &\PBS\centering 4   \\\cline{1-4}
+\end{longtabu}
+
+
+\tabulinesep=1mm
+\begin{longtabu}spread 0pt [c]{*{4}{|X[-1]}|}
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Number (Double)   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 32-\/bit   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 64-\/bit    }\\\cline{1-4}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Number (Double)   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 32-\/bit   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 64-\/bit    }\\\cline{1-4}
+\endhead
+{\ttfamily uint64\+\_\+t i64}   &Double precision floating-\/point   &\PBS\centering 8   &\PBS\centering 8    \\\cline{1-4}
+(unused)   &&\PBS\centering 4   &\PBS\centering 8    \\\cline{1-4}
+{\ttfamily unsigned flags\+\_\+}   &{\ttfamily k\+Number\+Type k\+Number\+Flag k\+Double\+Flag}   &\PBS\centering 4   &\PBS\centering 4   \\\cline{1-4}
+\end{longtabu}
+
+
+Here are some notes\+:
+\begin{DoxyItemize}
+\item To reduce memory consumption for 64-\/bit architecture, {\ttfamily Size\+Type} is typedef as {\ttfamily unsigned} instead of {\ttfamily size\+\_\+t}.
+\item Zero padding for 32-\/bit number may be placed after or before the actual type, according to the endianness. This makes possible for interpreting a 32-\/bit integer as a 64-\/bit integer, without any conversion.
+\item An {\ttfamily Int} is always an {\ttfamily Int64}, but the converse is not always true.
+\end{DoxyItemize}\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_Flags}{}\doxysubsection{\texorpdfstring{Flags}{Flags}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_Flags}
+The 32-\/bit {\ttfamily flags\+\_\+} contains both JSON type and other additional information. As shown in the above tables, each JSON type contains redundant {\ttfamily k\+XXXType} and {\ttfamily k\+XXXFlag}. This design is for optimizing the operation of testing bit-\/flags ({\ttfamily Is\+Number()}) and obtaining a sequential number for each type ({\ttfamily Get\+Type()}).
+
+String has two optional flags. {\ttfamily k\+Copy\+Flag} means that the string owns a copy of the string. {\ttfamily k\+Inline\+Str\+Flag} means using \doxysectlink{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_ShortString}{Short-\/\+String Optimization}{2}.
+
+Number is a bit more complicated. For normal integer values, it can contains {\ttfamily k\+Int\+Flag}, {\ttfamily k\+Uint\+Flag}, {\ttfamily k\+Int64\+Flag} and/or {\ttfamily k\+Uint64\+Flag}, according to the range of the integer. For numbers with fraction, and integers larger than 64-\/bit range, they will be stored as {\ttfamily double} with {\ttfamily k\+Double\+Flag}.\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_ShortString}{}\doxysubsection{\texorpdfstring{Short-\/\+String Optimization}{Short-\/\+String Optimization}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_ShortString}
+\href{https://github.com/Kosta-Github}{\texttt{ Kosta}} provided a very neat short-\/string optimization. The optimization idea is given as follow. Excluding the {\ttfamily flags\+\_\+}, a {\ttfamily Value} has 12 or 16 bytes (32-\/bit or 64-\/bit) for storing actual data. Instead of storing a pointer to a string, it is possible to store short strings in these space internally. For encoding with 1-\/byte character type (e.\+g. {\ttfamily char}), it can store maximum 11 or 15 characters string inside the {\ttfamily Value} type.
+
+\tabulinesep=1mm
+\begin{longtabu}spread 0pt [c]{*{4}{|X[-1]}|}
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Short\+String (Ch=char)   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 32-\/bit   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 64-\/bit    }\\\cline{1-4}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Short\+String (Ch=char)   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 32-\/bit   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 64-\/bit    }\\\cline{1-4}
+\endhead
+{\ttfamily Ch str\mbox{[}Max\+Chars\mbox{]}}   &String buffer   &\PBS\centering 11   &\PBS\centering 15    \\\cline{1-4}
+{\ttfamily Ch inv\+Length}   &Max\+Chars -\/ Length   &\PBS\centering 1   &\PBS\centering 1    \\\cline{1-4}
+{\ttfamily unsigned flags\+\_\+}   &{\ttfamily k\+String\+Type k\+String\+Flag ...}   &\PBS\centering 4   &\PBS\centering 4   \\\cline{1-4}
+\end{longtabu}
+
+
+\doxylink{struct_a}{A} special technique is applied. Instead of storing the length of string directly, it stores (Max\+Chars -\/ length). This make it possible to store 11 characters with trailing {\ttfamily \textbackslash{}0}.
+
+This optimization can reduce memory usage for copy-\/string. It can also improve cache-\/coherence thus improve runtime performance.\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_InternalAllocator}{}\doxysection{\texorpdfstring{Allocator}{Allocator}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_InternalAllocator}
+{\ttfamily Allocator} is a concept in Rapid\+JSON\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{concept\ }\mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}\ \{}
+\DoxyCodeLine{\ \ \ \ static\ \mbox{\hyperlink{namespaceupload_a985aa9a71de3eb507344df65700c696d}{const}}\ bool\ kNeedFree;\ \ \ \ }
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ Allocate\ a\ memory\ block.}}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ \(\backslash\)param\ size\ of\ the\ memory\ block\ in\ bytes.}}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ \(\backslash\)returns\ pointer\ to\ the\ memory\ block.}}
+\DoxyCodeLine{\ \ \ \ void*\ Malloc(size\_t\ size);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ Resize\ a\ memory\ block.}}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ \(\backslash\)param\ originalPtr\ The\ pointer\ to\ current\ memory\ block.\ Null\ pointer\ is\ permitted.}}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ \(\backslash\)param\ originalSize\ The\ current\ size\ in\ bytes.\ (Design\ issue:\ since\ some\ allocator\ may\ not\ book-\/keep\ this,\ explicitly\ pass\ to\ it\ can\ save\ memory.)}}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ \(\backslash\)param\ newSize\ the\ new\ size\ in\ bytes.}}
+\DoxyCodeLine{\ \ \ \ void*\ Realloc(void*\ originalPtr,\ size\_t\ originalSize,\ size\_t\ newSize);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ Free\ a\ memory\ block.}}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ \(\backslash\)param\ pointer\ to\ the\ memory\ block.\ Null\ pointer\ is\ permitted.}}
+\DoxyCodeLine{\ \ \ \ static\ void\ Free(void\ *ptr);}
+\DoxyCodeLine{\};}
+
+\end{DoxyCode}
+
+
+Note that {\ttfamily Malloc()} and {\ttfamily Realloc()} are member functions but {\ttfamily Free()} is static member function.\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_MemoryPoolAllocator}{}\doxysubsection{\texorpdfstring{Memory\+Pool\+Allocator}{Memory\+Pool\+Allocator}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_MemoryPoolAllocator}
+{\ttfamily \doxylink{class_memory_pool_allocator}{Memory\+Pool\+Allocator}} is the default allocator for DOM. It allocate but do not free memory. This is suitable for building a DOM tree.
+
+Internally, it allocates chunks of memory from the base allocator (by default {\ttfamily \doxylink{class_crt_allocator}{Crt\+Allocator}}) and stores the chunks as a singly linked list. When user requests an allocation, it allocates memory from the following order\+:
+
+
+\begin{DoxyEnumerate}
+\item User supplied buffer if it is available. (See \doxylink{dom_8md}{User Buffer section in DOM})
+\item If user supplied buffer is full, use the current memory chunk.
+\item If the current block is full, allocate a new block of memory.
+\end{DoxyEnumerate}\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_ParsingOptimization}{}\doxysection{\texorpdfstring{Parsing Optimization}{Parsing Optimization}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_ParsingOptimization}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_SkipwhitespaceWithSIMD}{}\doxysubsection{\texorpdfstring{Skip Whitespaces with SIMD}{Skip Whitespaces with SIMD}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_SkipwhitespaceWithSIMD}
+When parsing JSON from a stream, the parser need to skip 4 whitespace characters\+:
+
+
+\begin{DoxyEnumerate}
+\item Space ({\ttfamily U+0020})
+\item Character Tabulation ({\ttfamily U+000B})
+\item Line Feed ({\ttfamily U+000A})
+\item Carriage Return ({\ttfamily U+000D})
+\end{DoxyEnumerate}
+
+\doxylink{struct_a}{A} simple implementation will be simply\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordtype}{void}\ \mbox{\hyperlink{reader_8h_a60338858b2582eca23f3e509a2d82e0e}{SkipWhitespace}}(InputStream\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})\ \{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{while}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.Peek()\ ==\ \textcolor{charliteral}{'\ '}\ ||\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.Peek()\ ==\ \textcolor{charliteral}{'\(\backslash\)n'}\ ||\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.Peek()\ ==\ \textcolor{charliteral}{'\(\backslash\)r'}\ ||\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.Peek()\ ==\ \textcolor{charliteral}{'\(\backslash\)t'})}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.Take();}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+However, this requires 4 comparisons and a few branching for each character. This was found to be a hot spot.
+
+To accelerate this process, SIMD was applied to compare 16 characters with 4 white spaces for each iteration. Currently Rapid\+JSON supports SSE2, SSE4.\+2 and ARM Neon instructions for this. And it is only activated for UTF-\/8 memory streams, including string stream or {\itshape in situ} parsing.
+
+To enable this optimization, need to define {\ttfamily RAPIDJSON\+\_\+\+SSE2}, {\ttfamily RAPIDJSON\+\_\+\+SSE42} or {\ttfamily RAPIDJSON\+\_\+\+NEON} before including {\ttfamily \doxylink{rapidjson_8h}{rapidjson.\+h}}. Some compilers can detect the setting, as in {\ttfamily \doxylink{perftest_8h}{perftest.\+h}}\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{comment}{//\ \_\_SSE2\_\_\ and\ \_\_SSE4\_2\_\_\ are\ recognized\ by\ gcc,\ clang,\ and\ the\ Intel\ compiler.}}
+\DoxyCodeLine{\textcolor{comment}{//\ We\ use\ -\/march=native\ with\ gmake\ to\ enable\ -\/msse2\ and\ -\/msse4.2,\ if\ supported.}}
+\DoxyCodeLine{\textcolor{comment}{//\ Likewise,\ \_\_ARM\_NEON\ is\ used\ to\ detect\ Neon.}}
+\DoxyCodeLine{\textcolor{preprocessor}{\#if\ defined(\_\_SSE4\_2\_\_)}}
+\DoxyCodeLine{\textcolor{preprocessor}{\#\ \ define\ RAPIDJSON\_SSE42}}
+\DoxyCodeLine{\textcolor{preprocessor}{\#elif\ defined(\_\_SSE2\_\_)}}
+\DoxyCodeLine{\textcolor{preprocessor}{\#\ \ define\ RAPIDJSON\_SSE2}}
+\DoxyCodeLine{\textcolor{preprocessor}{\#elif\ defined(\_\_ARM\_NEON)}}
+\DoxyCodeLine{\textcolor{preprocessor}{\#\ \ define\ RAPIDJSON\_NEON}}
+\DoxyCodeLine{\textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}
+
+
+Note that, these are compile-\/time settings. Running the executable on a machine without such instruction set support will make it crash.
+
+\doxysubsubsection*{Page boundary issue}
+
+In an early version of Rapid\+JSON, \href{https://code.google.com/archive/p/rapidjson/issues/104}{\texttt{ an issue}} reported that the {\ttfamily Skip\+Whitespace\+\_\+\+SIMD()} causes crash very rarely (around 1 in 500,000). After investigation, it is suspected that {\ttfamily \+\_\+mm\+\_\+loadu\+\_\+si128()} accessed bytes after `'\textbackslash{}0\textquotesingle{}\`{}, and across a protected page boundary.
+
+In \href{http://www.intel.com/content/www/us/en/architecture-and-technology/64-ia-32-architectures-optimization-manual.html}{\texttt{ Intel® 64 and IA-\/32 Architectures Optimization Reference Manual}}, section 10.\+2.\+1\+:
+
+\begin{quote}
+To support algorithms requiring unaligned 128-\/bit SIMD memory accesses, memory buffer allocation by a caller function should consider adding some pad space so that a callee function can safely use the address pointer safely with unaligned 128-\/bit SIMD memory operations. The minimal padding size should be the width of the SIMD register that might be used in conjunction with unaligned SIMD memory access. \end{quote}
+This is not feasible as Rapid\+JSON should not enforce such requirement.
+
+To fix this issue, currently the routine process bytes up to the next aligned address. After tha, use aligned read to perform SIMD processing. Also see \href{https://github.com/Tencent/rapidjson/issues/85}{\texttt{ \#85}}.\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_LocalStreamCopy}{}\doxysubsection{\texorpdfstring{Local Stream Copy}{Local Stream Copy}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_LocalStreamCopy}
+During optimization, it is found that some compilers cannot localize some member data access of streams into local variables or registers. Experimental results show that for some stream types, making a copy of the stream and used it in inner-\/loop can improve performance. For example, the actual (non-\/\+SIMD) implementation of {\ttfamily \doxylink{reader_8h_a60338858b2582eca23f3e509a2d82e0e}{Skip\+Whitespace()}} is implemented as\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{template}<\textcolor{keyword}{typename}\ InputStream>}
+\DoxyCodeLine{\textcolor{keywordtype}{void}\ \mbox{\hyperlink{reader_8h_a60338858b2582eca23f3e509a2d82e0e}{SkipWhitespace}}(InputStream\&\ is)\ \{}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{classinternal_1_1_stream_local_copy}{internal::StreamLocalCopy<InputStream>}}\ \mbox{\hyperlink{namespacefc_a79771837fffd80fcc4bc658ee2fc4b2b}{copy}}(is);}
+\DoxyCodeLine{\ \ \ \ InputStream\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}(\mbox{\hyperlink{namespacefc_a79771837fffd80fcc4bc658ee2fc4b2b}{copy}}.s);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{while}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.Peek()\ ==\ \textcolor{charliteral}{'\ '}\ ||\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.Peek()\ ==\ \textcolor{charliteral}{'\(\backslash\)n'}\ ||\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.Peek()\ ==\ \textcolor{charliteral}{'\(\backslash\)r'}\ ||\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.Peek()\ ==\ \textcolor{charliteral}{'\(\backslash\)t'})}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.Take();}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+Depending on the traits of stream, {\ttfamily Stream\+Local\+Copy} will make (or not make) a copy of the stream object, use it locally and copy the states of stream back to the original stream.\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_ParsingDouble}{}\doxysubsection{\texorpdfstring{Parsing to Double}{Parsing to Double}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_ParsingDouble}
+Parsing string into {\ttfamily double} is difficult. The standard library function {\ttfamily \doxylink{_parse_numbers_8cpp_a20d704fe51ff7001184f5bec5e2f7f8d}{strtod()}} can do the job but it is slow. By default, the parsers use normal precision setting. This has has maximum 3 \href{http://en.wikipedia.org/wiki/Unit_in_the_last_place}{\texttt{ ULP}} error and implemented in {\ttfamily \doxylink{namespaceinternal_a9e5fac4695310f09892fe52b1d24ab19}{internal\+::\+Strtod\+Normal\+Precision()}}.
+
+When using {\ttfamily k\+Parse\+Full\+Precision\+Flag}, the parsers calls {\ttfamily \doxylink{namespaceinternal_a899ff5a0c5f9b203d720bb6f5631ed10}{internal\+::\+Strtod\+Full\+Precision()}} instead, and this function actually implemented 3 versions of conversion methods.
+\begin{DoxyEnumerate}
+\item \href{http://www.exploringbinary.com/fast-path-decimal-to-floating-point-conversion/}{\texttt{ Fast-\/\+Path}}.
+\item Custom DIY-\/\+FP implementation as in \href{https://github.com/floitsch/double-conversion}{\texttt{ double-\/conversion}}.
+\item Big Integer Method as in (Clinger, William D.\+ \+How to read floating point numbers accurately. Vol. 25. No. 6. ACM, 1990).
+\end{DoxyEnumerate}
+
+If the first conversion methods fail, it will try the second, and so on.\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_GenerationOptimization}{}\doxysection{\texorpdfstring{Generation Optimization}{Generation Optimization}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_GenerationOptimization}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_itoa}{}\doxysubsection{\texorpdfstring{Integer-\/to-\/\+String conversion}{Integer-\/to-\/\+String conversion}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_itoa}
+The naive algorithm for integer-\/to-\/string conversion involves division per each decimal digit. We have implemented various implementations and evaluated them in \href{https://github.com/miloyip/itoa-benchmark}{\texttt{ itoa-\/benchmark}}.
+
+Although SSE2 version is the fastest but the difference is minor by comparing to the first running-\/up {\ttfamily branchlut}. And {\ttfamily branchlut} is pure C++ implementation so we adopt {\ttfamily branchlut} in Rapid\+JSON.\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_dtoa}{}\doxysubsection{\texorpdfstring{Double-\/to-\/\+String conversion}{Double-\/to-\/\+String conversion}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_dtoa}
+Originally Rapid\+JSON uses {\ttfamily snprintf(..., ..., "{}\%g"{})} to achieve double-\/to-\/string conversion. This is not accurate as the default precision is 6. Later we also find that this is slow and there is an alternative.
+
+Google\textquotesingle{}s V8 \href{https://github.com/floitsch/double-conversion}{\texttt{ double-\/conversion}} implemented a newer, fast algorithm called Grisu3 (Loitsch, Florian. "{}\+Printing floating-\/point numbers quickly and accurately with integers."{} \+ACM Sigplan Notices 45.6 (2010)\+: 233-\/243.).
+
+However, since it is not header-\/only so that we implemented a header-\/only version of Grisu2. This algorithm guarantees that the result is always accurate. And in most of cases it produces the shortest (optimal) string representation.
+
+The header-\/only conversion function has been evaluated in \href{https://github.com/miloyip/dtoa-benchmark}{\texttt{ dtoa-\/benchmark}}.\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_Parser}{}\doxysection{\texorpdfstring{Parser}{Parser}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_Parser}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_IterativeParser}{}\doxysubsection{\texorpdfstring{Iterative Parser}{Iterative Parser}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_IterativeParser}
+The iterative parser is a recursive descent LL(1) parser implemented in a non-\/recursive manner.\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_IterativeParserGrammar}{}\doxysubsubsection{\texorpdfstring{Grammar}{Grammar}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_IterativeParserGrammar}
+The grammar used for this parser is based on strict JSON syntax\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{S\ -\/>\ array\ |\ object}
+\DoxyCodeLine{array\ -\/>\ [\ values\ ]}
+\DoxyCodeLine{object\ -\/>\ \{\ members\ \}}
+\DoxyCodeLine{values\ -\/>\ non-\/empty-\/values\ |\ ε}
+\DoxyCodeLine{non-\/empty-\/values\ -\/>\ value\ addition-\/values}
+\DoxyCodeLine{addition-\/values\ -\/>\ ε\ |\ ,\ non-\/empty-\/values}
+\DoxyCodeLine{members\ -\/>\ non-\/empty-\/members\ |\ ε}
+\DoxyCodeLine{non-\/empty-\/members\ -\/>\ member\ addition-\/members}
+\DoxyCodeLine{addition-\/members\ -\/>\ ε\ |\ ,\ non-\/empty-\/members}
+\DoxyCodeLine{member\ -\/>\ STRING\ :\ value}
+\DoxyCodeLine{value\ -\/>\ STRING\ |\ NUMBER\ |\ NULL\ |\ BOOLEAN\ |\ object\ |\ array}
+
+\end{DoxyCode}
+
+
+Note that left factoring is applied to non-\/terminals {\ttfamily values} and {\ttfamily members} to make the grammar be LL(1).\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_IterativeParserParsingTable}{}\doxysubsubsection{\texorpdfstring{Parsing Table}{Parsing Table}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_IterativeParserParsingTable}
+Based on the grammar, we can construct the FIRST and FOLLOW set.
+
+The FIRST set of non-\/terminals is listed below\+:
+
+\tabulinesep=1mm
+\begin{longtabu}spread 0pt [c]{*{2}{|X[-1]}|}
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ NON-\/\+TERMINAL   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ FIRST    }\\\cline{1-2}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ NON-\/\+TERMINAL   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ FIRST    }\\\cline{1-2}
+\endhead
+\PBS\centering array   &\PBS\centering \mbox{[}    \\\cline{1-2}
+\PBS\centering object   &\PBS\centering \{    \\\cline{1-2}
+\PBS\centering values   &\PBS\centering ε STRING NUMBER NULL BOOLEAN \{ \mbox{[}    \\\cline{1-2}
+\PBS\centering addition-\/values   &\PBS\centering ε COMMA    \\\cline{1-2}
+\PBS\centering members   &\PBS\centering ε STRING    \\\cline{1-2}
+\PBS\centering addition-\/members   &\PBS\centering ε COMMA    \\\cline{1-2}
+\PBS\centering member   &\PBS\centering STRING    \\\cline{1-2}
+\PBS\centering value   &\PBS\centering STRING NUMBER NULL BOOLEAN \{ \mbox{[}    \\\cline{1-2}
+\PBS\centering \doxylink{struct_s}{S}   &\PBS\centering \mbox{[} \{    \\\cline{1-2}
+\PBS\centering non-\/empty-\/members   &\PBS\centering STRING    \\\cline{1-2}
+\PBS\centering non-\/empty-\/values   &\PBS\centering STRING NUMBER NULL BOOLEAN \{ \mbox{[}   \\\cline{1-2}
+\end{longtabu}
+
+
+The FOLLOW set is listed below\+:
+
+\tabulinesep=1mm
+\begin{longtabu}spread 0pt [c]{*{2}{|X[-1]}|}
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ NON-\/\+TERMINAL   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ FOLLOW    }\\\cline{1-2}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ NON-\/\+TERMINAL   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ FOLLOW    }\\\cline{1-2}
+\endhead
+\PBS\centering \doxylink{struct_s}{S}   &\PBS\centering \$    \\\cline{1-2}
+\PBS\centering array   &\PBS\centering , \$ \} \mbox{]}    \\\cline{1-2}
+\PBS\centering object   &\PBS\centering , \$ \} \mbox{]}    \\\cline{1-2}
+\PBS\centering values   &\PBS\centering \mbox{]}    \\\cline{1-2}
+\PBS\centering non-\/empty-\/values   &\PBS\centering \mbox{]}    \\\cline{1-2}
+\PBS\centering addition-\/values   &\PBS\centering \mbox{]}    \\\cline{1-2}
+\PBS\centering members   &\PBS\centering \}    \\\cline{1-2}
+\PBS\centering non-\/empty-\/members   &\PBS\centering \}    \\\cline{1-2}
+\PBS\centering addition-\/members   &\PBS\centering \}    \\\cline{1-2}
+\PBS\centering member   &\PBS\centering , \}    \\\cline{1-2}
+\PBS\centering value   &\PBS\centering , \} \mbox{]}   \\\cline{1-2}
+\end{longtabu}
+
+
+Finally the parsing table can be constructed from FIRST and FOLLOW set\+:
+
+\tabulinesep=1mm
+\begin{longtabu}spread 0pt [c]{*{11}{|X[-1]}|}
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ NON-\/\+TERMINAL   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ \mbox{[}   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ \{   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ ,   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ \+:   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ \mbox{]}   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ \}   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ STRING   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ NUMBER   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ NULL   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ BOOLEAN    }\\\cline{1-11}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ NON-\/\+TERMINAL   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ \mbox{[}   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ \{   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ ,   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ \+:   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ \mbox{]}   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ \}   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ STRING   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ NUMBER   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ NULL   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ BOOLEAN    }\\\cline{1-11}
+\endhead
+\PBS\centering \doxylink{struct_s}{S}   &\PBS\centering array   &\PBS\centering object   &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering \\\cline{1-11}
+\PBS\centering array   &\PBS\centering \mbox{[} values \mbox{]}   &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering \\\cline{1-11}
+\PBS\centering object   &\PBS\centering &\PBS\centering \{ members \}   &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering \\\cline{1-11}
+\PBS\centering values   &\PBS\centering non-\/empty-\/values   &\PBS\centering non-\/empty-\/values   &\PBS\centering &\PBS\centering &\PBS\centering ε   &\PBS\centering &\PBS\centering non-\/empty-\/values   &\PBS\centering non-\/empty-\/values   &\PBS\centering non-\/empty-\/values   &\PBS\centering non-\/empty-\/values    \\\cline{1-11}
+\PBS\centering non-\/empty-\/values   &\PBS\centering value addition-\/values   &\PBS\centering value addition-\/values   &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering value addition-\/values   &\PBS\centering value addition-\/values   &\PBS\centering value addition-\/values   &\PBS\centering value addition-\/values    \\\cline{1-11}
+\PBS\centering addition-\/values   &\PBS\centering &\PBS\centering &\PBS\centering , non-\/empty-\/values   &\PBS\centering &\PBS\centering ε   &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering \\\cline{1-11}
+\PBS\centering members   &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering ε   &\PBS\centering non-\/empty-\/members   &\PBS\centering &\PBS\centering &\PBS\centering \\\cline{1-11}
+\PBS\centering non-\/empty-\/members   &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering member addition-\/members   &\PBS\centering &\PBS\centering &\PBS\centering \\\cline{1-11}
+\PBS\centering addition-\/members   &\PBS\centering &\PBS\centering &\PBS\centering , non-\/empty-\/members   &\PBS\centering &\PBS\centering &\PBS\centering ε   &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering \\\cline{1-11}
+\PBS\centering member   &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering STRING \+: value   &\PBS\centering &\PBS\centering &\PBS\centering \\\cline{1-11}
+\PBS\centering value   &\PBS\centering array   &\PBS\centering object   &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering &\PBS\centering STRING   &\PBS\centering NUMBER   &\PBS\centering NULL   &\PBS\centering BOOLEAN   \\\cline{1-11}
+\end{longtabu}
+
+
+There is a great \href{http://hackingoff.com/compilers/predict-first-follow-set}{\texttt{ tool}} for above grammar analysis.\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_IterativeParserImplementation}{}\doxysubsubsection{\texorpdfstring{Implementation}{Implementation}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2internals_8zh-cn_IterativeParserImplementation}
+Based on the parsing table, a direct(or conventional) implementation that pushes the production body in reverse order while generating a production could work.
+
+In Rapid\+JSON, several modifications(or adaptations to current design) are made to a direct implementation.
+
+First, the parsing table is encoded in a state machine in Rapid\+JSON. States are constructed by the head and body of production. State transitions are constructed by production rules. Besides, extra states are added for productions involved with {\ttfamily array} and {\ttfamily object}. In this way the generation of array values or object members would be a single state transition, rather than several pop/push operations in the direct implementation. This also makes the estimation of stack size more easier.
+
+The state diagram is shown as follows\+:
+
+
+
+Second, the iterative parser also keeps track of array\textquotesingle{}s value count and object\textquotesingle{}s member count in its internal stack, which may be different from a conventional implementation. 

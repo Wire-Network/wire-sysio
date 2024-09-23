@@ -1,0 +1,14 @@
+<map id="fc::ecc::signature_shim::recover" name="fc::ecc::signature_shim::recover">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,79,128,120"/>
+<area shape="rect" id="Node000002" href="$namespacefc.html#a150ca4cd9c0318ca45dc0dc7df5d58b9" title=" " alt="" coords="225,57,300,83"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="128,88,210,75,210,81,128,93"/>
+<area shape="rect" id="Node000006" href="$structfc_1_1crypto_1_1shim.html#a4b5c1963c31a11f2415a0dcd481ec49a" title=" " alt="" coords="176,107,350,148"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="128,106,160,110,160,115,128,111"/>
+<area shape="rect" id="Node000003" href="$namespacefc_1_1raw.html#a3a18d8161aa5b4f4f02b6fcfdff5e5d1" title=" " alt="" coords="418,29,515,55"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="301,62,401,48,402,54,301,68"/>
+<area shape="rect" id="Node000004" href="$classfc_1_1sha256_1_1encoder.html#a4d8b8181e912194cf98a56164671adf8" title=" " alt="" coords="398,79,534,120"/>
+<area shape="poly" id="edge4_Node000002_Node000004" title=" " alt="" coords="301,73,383,85,382,90,301,78"/>
+<area shape="poly" id="edge3_Node000003_Node000003" title=" " alt="" coords="437,30,431,21,434,11,447,5,466,3,487,5,498,12,496,16,486,10,466,8,448,10,438,15,436,20,441,28"/>
+<area shape="rect" id="Node000005" href="$classfc_1_1sha256.html#ab897537f6c524085b28049be51ed370d" title=" " alt="" coords="582,87,698,112"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="535,97,566,97,566,102,535,102"/>
+</map>

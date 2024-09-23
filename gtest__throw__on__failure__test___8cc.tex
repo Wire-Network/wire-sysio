@@ -1,0 +1,83 @@
+\doxysection{libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/test/gtest\+\_\+throw\+\_\+on\+\_\+failure\+\_\+test\+\_\+.cc File Reference}
+\hypertarget{gtest__throw__on__failure__test___8cc}{}\label{gtest__throw__on__failure__test___8cc}\index{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/test/gtest\_throw\_on\_failure\_test\_.cc@{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/test/gtest\_throw\_on\_failure\_test\_.cc}}
+{\ttfamily \#include "{}gtest/gtest.\+h"{}}\newline
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$exception$>$}\newline
+Include dependency graph for gtest\+\_\+throw\+\_\+on\+\_\+failure\+\_\+test\+\_\+.\+cc\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{gtest__throw__on__failure__test___8cc__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{gtest__throw__on__failure__test___8cc_a478ad0386ef3cac98d230812ed07eeda}{Terminate\+Handler}} ()
+\item 
+int \mbox{\hyperlink{gtest__throw__on__failure__test___8cc_a3c04138a5bfe5d72780bb7e82a18e627}{main}} (int argc, char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{gtest__throw__on__failure__test___8cc_a3c04138a5bfe5d72780bb7e82a18e627}\index{gtest\_throw\_on\_failure\_test\_.cc@{gtest\_throw\_on\_failure\_test\_.cc}!main@{main}}
+\index{main@{main}!gtest\_throw\_on\_failure\_test\_.cc@{gtest\_throw\_on\_failure\_test\_.cc}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{gtest__throw__on__failure__test___8cc_a3c04138a5bfe5d72780bb7e82a18e627} 
+int main (\begin{DoxyParamCaption}\item[{int}]{argc}{, }\item[{char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{argv}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest__throw__on__failure__test___8cc_source_l00053}{53}} of file \mbox{\hyperlink{gtest__throw__on__failure__test___8cc_source}{gtest\+\_\+throw\+\_\+on\+\_\+failure\+\_\+test\+\_\+.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00054\ \textcolor{preprocessor}{\#if\ GTEST\_HAS\_EXCEPTIONS}}
+\DoxyCodeLine{00055\ \ \ std::set\_terminate(\&\mbox{\hyperlink{struct_terminate_handler}{TerminateHandler}});}
+\DoxyCodeLine{00056\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00057\ \ \ \mbox{\hyperlink{namespacetesting_afd726ae08c9bd16dc52f78c822d9946b}{testing::InitGoogleTest}}(\&argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}});}
+\DoxyCodeLine{00058\ }
+\DoxyCodeLine{00059\ \ \ \textcolor{comment}{//\ We\ want\ to\ ensure\ that\ people\ can\ use\ Google\ Test\ assertions\ in}}
+\DoxyCodeLine{00060\ \ \ \textcolor{comment}{//\ other\ testing\ frameworks,\ as\ long\ as\ they\ initialize\ Google\ Test}}
+\DoxyCodeLine{00061\ \ \ \textcolor{comment}{//\ properly\ and\ set\ the\ throw-\/on-\/failure\ mode.\ \ Therefore,\ we\ don't}}
+\DoxyCodeLine{00062\ \ \ \textcolor{comment}{//\ use\ Google\ Test's\ constructs\ for\ defining\ and\ running\ tests}}
+\DoxyCodeLine{00063\ \ \ \textcolor{comment}{//\ (e.g.\ TEST\ and\ RUN\_ALL\_TESTS)\ here.}}
+\DoxyCodeLine{00064\ }
+\DoxyCodeLine{00065\ \ \ \textcolor{comment}{//\ In\ the\ throw-\/on-\/failure\ mode\ with\ exceptions\ disabled,\ this}}
+\DoxyCodeLine{00066\ \ \ \textcolor{comment}{//\ assertion\ will\ cause\ the\ program\ to\ exit\ with\ a\ non-\/zero\ code.}}
+\DoxyCodeLine{00067\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(2,\ 3);}
+\DoxyCodeLine{00068\ }
+\DoxyCodeLine{00069\ \ \ \textcolor{comment}{//\ When\ not\ in\ the\ throw-\/on-\/failure\ mode,\ the\ control\ will\ reach}}
+\DoxyCodeLine{00070\ \ \ \textcolor{comment}{//\ here.}}
+\DoxyCodeLine{00071\ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00072\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{gtest__throw__on__failure__test___8cc_a3c04138a5bfe5d72780bb7e82a18e627_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{gtest__throw__on__failure__test___8cc_a478ad0386ef3cac98d230812ed07eeda}\index{gtest\_throw\_on\_failure\_test\_.cc@{gtest\_throw\_on\_failure\_test\_.cc}!TerminateHandler@{TerminateHandler}}
+\index{TerminateHandler@{TerminateHandler}!gtest\_throw\_on\_failure\_test\_.cc@{gtest\_throw\_on\_failure\_test\_.cc}}
+\doxysubsubsection{\texorpdfstring{TerminateHandler()}{TerminateHandler()}}
+{\footnotesize\ttfamily \label{gtest__throw__on__failure__test___8cc_a478ad0386ef3cac98d230812ed07eeda} 
+void Terminate\+Handler (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest__throw__on__failure__test___8cc_source_l00047}{47}} of file \mbox{\hyperlink{gtest__throw__on__failure__test___8cc_source}{gtest\+\_\+throw\+\_\+on\+\_\+failure\+\_\+test\+\_\+.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00048\ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}\%s\(\backslash\)n"{}},\ \textcolor{stringliteral}{"{}Unhandled\ C++\ exception\ terminating\ the\ program."{}});}
+\DoxyCodeLine{00049\ \ \ fflush(NULL);}
+\DoxyCodeLine{00050\ \ \ exit(1);}
+\DoxyCodeLine{00051\ \}}
+
+\end{DoxyCode}

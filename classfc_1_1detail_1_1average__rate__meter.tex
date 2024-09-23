@@ -1,0 +1,110 @@
+\doxysection{fc\+::detail\+::average\+\_\+rate\+\_\+meter Class Reference}
+\hypertarget{classfc_1_1detail_1_1average__rate__meter}{}\label{classfc_1_1detail_1_1average__rate__meter}\index{fc::detail::average\_rate\_meter@{fc::detail::average\_rate\_meter}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1detail_1_1average__rate__meter_a2c2e91656d9daa3ba382ca11251bb1c4}{average\+\_\+rate\+\_\+meter}} (const \mbox{\hyperlink{classfc_1_1microseconds}{microseconds}} \&time\+\_\+constant=\mbox{\hyperlink{namespacefc_a9623b8cae3f48bbed6aa1fc2afe9b174}{seconds}}(10))
+\item 
+void \mbox{\hyperlink{classfc_1_1detail_1_1average__rate__meter_aacdc090efdf58910f9b4626000ff23f3}{set\+\_\+time\+\_\+constant}} (const \mbox{\hyperlink{classfc_1_1microseconds}{microseconds}} \&time\+\_\+constant)
+\item 
+void \mbox{\hyperlink{classfc_1_1detail_1_1average__rate__meter_ada9b561ff55964f5c3dd3f56a68858dc}{update}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} bytes\+\_\+transferred=0)
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classfc_1_1detail_1_1average__rate__meter_abb72c81fbcef39cf923a9e9071b40ef7}{get\+\_\+average\+\_\+rate}} () const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00134}{134}} of file \mbox{\hyperlink{rate__limiting_8cpp_source}{rate\+\_\+limiting.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1detail_1_1average__rate__meter_a2c2e91656d9daa3ba382ca11251bb1c4}\index{fc::detail::average\_rate\_meter@{fc::detail::average\_rate\_meter}!average\_rate\_meter@{average\_rate\_meter}}
+\index{average\_rate\_meter@{average\_rate\_meter}!fc::detail::average\_rate\_meter@{fc::detail::average\_rate\_meter}}
+\doxysubsubsection{\texorpdfstring{average\_rate\_meter()}{average\_rate\_meter()}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1average__rate__meter_a2c2e91656d9daa3ba382ca11251bb1c4} 
+fc\+::detail\+::average\+\_\+rate\+\_\+meter\+::average\+\_\+rate\+\_\+meter (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1microseconds}{microseconds}} \&}]{time\+\_\+constant}{ = {\ttfamily \mbox{\hyperlink{namespacefc_a9623b8cae3f48bbed6aa1fc2afe9b174}{seconds}}(10)}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00149}{149}} of file \mbox{\hyperlink{rate__limiting_8cpp_source}{rate\+\_\+limiting.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \_average\_rate(0.),}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \_unaccounted\_bytes(0),}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \_last\_update\_time(\mbox{\hyperlink{classfc_1_1time__point__sec_a539f4b4286974c6a85e6ea0774ac1609}{time\_point\_sec::min}}()),}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \_time\_constant(time\_constant)}
+\DoxyCodeLine{00154\ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1detail_1_1average__rate__meter_abb72c81fbcef39cf923a9e9071b40ef7}\index{fc::detail::average\_rate\_meter@{fc::detail::average\_rate\_meter}!get\_average\_rate@{get\_average\_rate}}
+\index{get\_average\_rate@{get\_average\_rate}!fc::detail::average\_rate\_meter@{fc::detail::average\_rate\_meter}}
+\doxysubsubsection{\texorpdfstring{get\_average\_rate()}{get\_average\_rate()}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1average__rate__meter_abb72c81fbcef39cf923a9e9071b40ef7} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} fc\+::detail\+::average\+\_\+rate\+\_\+meter\+::get\+\_\+average\+\_\+rate (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00185}{185}} of file \mbox{\hyperlink{rate__limiting_8cpp_source}{rate\+\_\+limiting.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00186\ \ \ \ \ \{}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ update\_const();}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})\_average\_rate;}
+\DoxyCodeLine{00189\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1detail_1_1average__rate__meter_aacdc090efdf58910f9b4626000ff23f3}\index{fc::detail::average\_rate\_meter@{fc::detail::average\_rate\_meter}!set\_time\_constant@{set\_time\_constant}}
+\index{set\_time\_constant@{set\_time\_constant}!fc::detail::average\_rate\_meter@{fc::detail::average\_rate\_meter}}
+\doxysubsubsection{\texorpdfstring{set\_time\_constant()}{set\_time\_constant()}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1average__rate__meter_aacdc090efdf58910f9b4626000ff23f3} 
+void fc\+::detail\+::average\+\_\+rate\+\_\+meter\+::set\+\_\+time\+\_\+constant (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1microseconds}{microseconds}} \&}]{time\+\_\+constant}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00155}{155}} of file \mbox{\hyperlink{rate__limiting_8cpp_source}{rate\+\_\+limiting.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00156\ \ \ \ \ \{}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \_time\_constant\ =\ time\_constant;}
+\DoxyCodeLine{00158\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1detail_1_1average__rate__meter_ada9b561ff55964f5c3dd3f56a68858dc}\index{fc::detail::average\_rate\_meter@{fc::detail::average\_rate\_meter}!update@{update}}
+\index{update@{update}!fc::detail::average\_rate\_meter@{fc::detail::average\_rate\_meter}}
+\doxysubsubsection{\texorpdfstring{update()}{update()}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1average__rate__meter_ada9b561ff55964f5c3dd3f56a68858dc} 
+void fc\+::detail\+::average\+\_\+rate\+\_\+meter\+::update (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{bytes\+\_\+transferred}{ = {\ttfamily 0}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00159}{159}} of file \mbox{\hyperlink{rate__limiting_8cpp_source}{rate\+\_\+limiting.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00160\ \ \ \ \ \{}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ update\_const(bytes\_transferred);}
+\DoxyCodeLine{00162\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1detail_1_1average__rate__meter_ada9b561ff55964f5c3dd3f56a68858dc_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/src/network/\mbox{\hyperlink{rate__limiting_8cpp}{rate\+\_\+limiting.\+cpp}}\end{DoxyCompactItemize}

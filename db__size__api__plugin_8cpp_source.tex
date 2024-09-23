@@ -1,0 +1,58 @@
+\doxysection{db\+\_\+size\+\_\+api\+\_\+plugin.\+cpp}
+\hypertarget{db__size__api__plugin_8cpp_source}{}\label{db__size__api__plugin_8cpp_source}\index{plugins/db\_size\_api\_plugin/db\_size\_api\_plugin.cpp@{plugins/db\_size\_api\_plugin/db\_size\_api\_plugin.cpp}}
+\mbox{\hyperlink{db__size__api__plugin_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{db__size__api__plugin_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{fc_2include_2fc_2variant_8hpp}{fc/variant.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{db__size__api__plugin_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{json_8hpp}{fc/io/json.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{db__size__api__plugin_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{db__size__api__plugin_8hpp}{sysio/db\_size\_api\_plugin/db\_size\_api\_plugin.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{db__size__api__plugin_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{http__plugin_8hpp}{sysio/http\_plugin/http\_plugin.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{db__size__api__plugin_8cpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{db__size__api__plugin_8cpp_source_l00006}00006\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{}
+\DoxyCodeLine{\Hypertarget{db__size__api__plugin_8cpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{db__size__api__plugin_8cpp_source_l00008}00008\ \textcolor{keyword}{static}\ \mbox{\hyperlink{classappbase_1_1abstract__plugin}{appbase::abstract\_plugin}}\&\ \_db\_size\_api\_plugin\ =\ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_a87e84549150056c56c0327cc4976cc2a}{register\_plugin}}<db\_size\_api\_plugin>();}
+\DoxyCodeLine{\Hypertarget{db__size__api__plugin_8cpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{db__size__api__plugin_8cpp_source_l00010}00010\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}};}
+\DoxyCodeLine{\Hypertarget{db__size__api__plugin_8cpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{db__size__api__plugin_8cpp_source_l00012}\mbox{\hyperlink{db__size__api__plugin_8cpp_afb00f07822ae80766057c9439f2d8118}{00012}}\ \textcolor{preprocessor}{\#define\ CALL\_WITH\_400(api\_name,\ api\_handle,\ call\_name,\ INVOKE,\ http\_response\_code)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{db__size__api__plugin_8cpp_source_l00013}00013\ \textcolor{preprocessor}{\{std::string("{}/v1/"{}\ \#api\_name\ "{}/"{}\ \#call\_name),\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{db__size__api__plugin_8cpp_source_l00014}00014\ \textcolor{preprocessor}{\ \ \ [api\_handle](string,\ string\ body,\ url\_response\_callback\ cb)\ mutable\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{db__size__api__plugin_8cpp_source_l00015}00015\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ try\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{db__size__api__plugin_8cpp_source_l00016}00016\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ body\ =\ parse\_params<std::string,\ http\_params\_types::no\_params>(body);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{db__size__api__plugin_8cpp_source_l00017}00017\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ INVOKE\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{db__size__api__plugin_8cpp_source_l00018}00018\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ cb(http\_response\_code,\ fc::variant(result));\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{db__size__api__plugin_8cpp_source_l00019}00019\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \}\ catch\ (...)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{db__size__api__plugin_8cpp_source_l00020}00020\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ http\_plugin::handle\_exception(\#api\_name,\ \#call\_name,\ body,\ cb);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{db__size__api__plugin_8cpp_source_l00021}00021\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{db__size__api__plugin_8cpp_source_l00022}00022\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \}\}}}
+\DoxyCodeLine{\Hypertarget{db__size__api__plugin_8cpp_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{db__size__api__plugin_8cpp_source_l00024}\mbox{\hyperlink{db__size__api__plugin_8cpp_a57be4224a1ade2bd8b3923d6a344d98b}{00024}}\ \textcolor{preprocessor}{\#define\ INVOKE\_R\_V(api\_handle,\ call\_name)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{db__size__api__plugin_8cpp_source_l00025}00025\ \textcolor{preprocessor}{\ \ \ \ \ auto\ result\ =\ api\_handle-\/>call\_name();}}
+\DoxyCodeLine{\Hypertarget{db__size__api__plugin_8cpp_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{db__size__api__plugin_8cpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{db__size__api__plugin_8cpp_source_l00028}\mbox{\hyperlink{classsysio_1_1db__size__api__plugin_a3a20daea4fbe6f944c2bb267541bc943}{00028}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1db__size__api__plugin_a3a20daea4fbe6f944c2bb267541bc943}{db\_size\_api\_plugin::plugin\_startup}}()\ \{}
+\DoxyCodeLine{\Hypertarget{db__size__api__plugin_8cpp_source_l00029}00029\ \ \ \ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_a3c4b68a0667942b58f1369f454ce0ce3}{get\_plugin}}<\mbox{\hyperlink{classsysio_1_1http__plugin}{http\_plugin}}>().add\_api(\{}
+\DoxyCodeLine{\Hypertarget{db__size__api__plugin_8cpp_source_l00030}00030\ \ \ \ \ \ \ \ \mbox{\hyperlink{chain__api__plugin_8cpp_ab9297a5c7b7f085c77cad8641f734ba6}{CALL\_WITH\_400}}(db\_size,\ \textcolor{keyword}{this},\ get,\ \ \mbox{\hyperlink{db__size__api__plugin_8cpp_a57be4224a1ade2bd8b3923d6a344d98b}{INVOKE\_R\_V}}(\textcolor{keyword}{this},\ get),\ 200),}
+\DoxyCodeLine{\Hypertarget{db__size__api__plugin_8cpp_source_l00031}00031\ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{db__size__api__plugin_8cpp_source_l00032}00032\ \}}
+\DoxyCodeLine{\Hypertarget{db__size__api__plugin_8cpp_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{db__size__api__plugin_8cpp_source_l00034}\mbox{\hyperlink{classsysio_1_1db__size__api__plugin_a0eebb0648f8aae6c451a320dbe24143c}{00034}}\ \mbox{\hyperlink{structsysio_1_1db__size__stats}{db\_size\_stats}}\ \mbox{\hyperlink{classsysio_1_1db__size__api__plugin_a0eebb0648f8aae6c451a320dbe24143c}{db\_size\_api\_plugin::get}}()\ \{}
+\DoxyCodeLine{\Hypertarget{db__size__api__plugin_8cpp_source_l00035}00035\ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classchainbase_1_1database}{chainbase::database}}\&\ db\ =\ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_a3c4b68a0667942b58f1369f454ce0ce3}{get\_plugin}}<\mbox{\hyperlink{classsysio_1_1chain__plugin}{chain\_plugin}}>().chain().db();}
+\DoxyCodeLine{\Hypertarget{db__size__api__plugin_8cpp_source_l00036}00036\ \ \ \ \mbox{\hyperlink{structsysio_1_1db__size__stats}{db\_size\_stats}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{\Hypertarget{db__size__api__plugin_8cpp_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{db__size__api__plugin_8cpp_source_l00038}00038\ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.\mbox{\hyperlink{structsysio_1_1db__size__stats_aea9f9ac1a36721306c2ccf2846e29ed1}{free\_bytes}}\ =\ db.\mbox{\hyperlink{classchainbase_1_1database_a64133afb9e0ae374eeab86bd1d4db08b}{get\_segment\_manager}}()-\/>get\_free\_memory();}
+\DoxyCodeLine{\Hypertarget{db__size__api__plugin_8cpp_source_l00039}00039\ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.size\ =\ db.\mbox{\hyperlink{classchainbase_1_1database_a64133afb9e0ae374eeab86bd1d4db08b}{get\_segment\_manager}}()-\/>get\_size();}
+\DoxyCodeLine{\Hypertarget{db__size__api__plugin_8cpp_source_l00040}00040\ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.used\_bytes\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.size\ -\/\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.free\_bytes;}
+\DoxyCodeLine{\Hypertarget{db__size__api__plugin_8cpp_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{db__size__api__plugin_8cpp_source_l00042}00042\ \ \ \ \mbox{\hyperlink{classchainbase_1_1database_a7780c270726e90372b252a354095ea3a}{chainbase::database::database\_index\_row\_count\_multiset}}\ indices\ =\ db.\mbox{\hyperlink{classchainbase_1_1database_ae1a365762e37490551a8de3adda5665e}{row\_count\_per\_index}}();}
+\DoxyCodeLine{\Hypertarget{db__size__api__plugin_8cpp_source_l00043}00043\ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ i\ :\ indices)}
+\DoxyCodeLine{\Hypertarget{db__size__api__plugin_8cpp_source_l00044}00044\ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}.indices.emplace\_back(\mbox{\hyperlink{structsysio_1_1db__size__index__count}{db\_size\_index\_count}}\{i.second,\ i.first\});}
+\DoxyCodeLine{\Hypertarget{db__size__api__plugin_8cpp_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{db__size__api__plugin_8cpp_source_l00046}00046\ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{\Hypertarget{db__size__api__plugin_8cpp_source_l00047}00047\ \}}
+\DoxyCodeLine{\Hypertarget{db__size__api__plugin_8cpp_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{db__size__api__plugin_8cpp_source_l00049}00049\ \textcolor{preprocessor}{\#undef\ INVOKE\_R\_V}}
+\DoxyCodeLine{\Hypertarget{db__size__api__plugin_8cpp_source_l00050}00050\ \textcolor{preprocessor}{\#undef\ CALL}}
+\DoxyCodeLine{\Hypertarget{db__size__api__plugin_8cpp_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{db__size__api__plugin_8cpp_source_l00052}00052\ \}}
+
+\end{DoxyCode}

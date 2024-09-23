@@ -1,0 +1,203 @@
+\doxysection{WAST\+::Module\+Parse\+State Struct Reference}
+\hypertarget{struct_w_a_s_t_1_1_module_parse_state}{}\label{struct_w_a_s_t_1_1_module_parse_state}\index{WAST::ModuleParseState@{WAST::ModuleParseState}}
+
+
+{\ttfamily \#include $<$Parse.\+h$>$}
+
+
+
+Inheritance diagram for WAST\+::Module\+Parse\+State\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=209pt]{struct_w_a_s_t_1_1_module_parse_state__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for WAST\+::Module\+Parse\+State\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_w_a_s_t_1_1_module_parse_state__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_w_a_s_t_1_1_module_parse_state_a76372901588b10e38760c813a7552028}{Module\+Parse\+State}} (const char \texorpdfstring{$\ast$}{*}in\+String, const \mbox{\hyperlink{struct_w_a_s_t_1_1_line_info}{Line\+Info}} \texorpdfstring{$\ast$}{*}in\+Line\+Info, std\+::vector$<$ \mbox{\hyperlink{struct_w_a_s_t_1_1_unresolved_error}{Unresolved\+Error}} $>$ \&in\+Errors, const Token \texorpdfstring{$\ast$}{*}in\+Next\+Token, \mbox{\hyperlink{struct_i_r_1_1_module}{IR\+::\+Module}} \&in\+Module)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{WAST\+::\+Parse\+State}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state_a80ce3e02bd5f5a10b35ace17f0f26ec2}{Parse\+State}} (const char \texorpdfstring{$\ast$}{*}in\+String, const \mbox{\hyperlink{struct_w_a_s_t_1_1_line_info}{Line\+Info}} \texorpdfstring{$\ast$}{*}in\+Line\+Info, std\+::vector$<$ \mbox{\hyperlink{struct_w_a_s_t_1_1_unresolved_error}{Unresolved\+Error}} $>$ \&in\+Errors, const Token \texorpdfstring{$\ast$}{*}in\+Next\+Token)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_i_r_1_1_module}{IR\+::\+Module}} \& \mbox{\hyperlink{struct_w_a_s_t_1_1_module_parse_state_a7c4c471c69d471eb81695cc9a74d9312}{module}}
+\item 
+std\+::map$<$ const \mbox{\hyperlink{struct_i_r_1_1_function_type}{IR\+::\+Function\+Type}} \texorpdfstring{$\ast$}{*}, \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}} $>$ \mbox{\hyperlink{struct_w_a_s_t_1_1_module_parse_state_af237a7ca492c2a219c585cd968fe60d3}{function\+Type\+To\+Index\+Map}}
+\item 
+\mbox{\hyperlink{namespace_w_a_s_t_a2d9d3ba4e83db4fbb314c3068261afa5}{Name\+To\+Index\+Map}} \mbox{\hyperlink{struct_w_a_s_t_1_1_module_parse_state_a699292c5ec8bc493c8b0ffbd6ed9ebce}{type\+Name\+To\+Index\+Map}}
+\item 
+\mbox{\hyperlink{namespace_w_a_s_t_a2d9d3ba4e83db4fbb314c3068261afa5}{Name\+To\+Index\+Map}} \mbox{\hyperlink{struct_w_a_s_t_1_1_module_parse_state_a897a596297f121bfe1af3158e8c2edc5}{function\+Name\+To\+Index\+Map}}
+\item 
+\mbox{\hyperlink{namespace_w_a_s_t_a2d9d3ba4e83db4fbb314c3068261afa5}{Name\+To\+Index\+Map}} \mbox{\hyperlink{struct_w_a_s_t_1_1_module_parse_state_a87372ef450c8d65189a25a0c1067896c}{table\+Name\+To\+Index\+Map}}
+\item 
+\mbox{\hyperlink{namespace_w_a_s_t_a2d9d3ba4e83db4fbb314c3068261afa5}{Name\+To\+Index\+Map}} \mbox{\hyperlink{struct_w_a_s_t_1_1_module_parse_state_ad3169322a0142f0482a9762d6bbd6eae}{memory\+Name\+To\+Index\+Map}}
+\item 
+\mbox{\hyperlink{namespace_w_a_s_t_a2d9d3ba4e83db4fbb314c3068261afa5}{Name\+To\+Index\+Map}} \mbox{\hyperlink{struct_w_a_s_t_1_1_module_parse_state_a655a616e07a5d961a15c0d76728679bb}{global\+Name\+To\+Index\+Map}}
+\item 
+\mbox{\hyperlink{struct_i_r_1_1_disassembly_names}{IR\+::\+Disassembly\+Names}} \mbox{\hyperlink{struct_w_a_s_t_1_1_module_parse_state_a65f8e8f4921d07c9ab3f6d66bd39c0e2}{disassembly\+Names}}
+\item 
+std\+::vector$<$ std\+::function$<$ void(\mbox{\hyperlink{struct_w_a_s_t_1_1_module_parse_state}{Module\+Parse\+State}} \&)$>$ $>$ \mbox{\hyperlink{struct_w_a_s_t_1_1_module_parse_state_a1c93ca4a3f2305beccefe869a88a5da4}{post\+Type\+Callbacks}}
+\item 
+std\+::vector$<$ std\+::function$<$ void(\mbox{\hyperlink{struct_w_a_s_t_1_1_module_parse_state}{Module\+Parse\+State}} \&)$>$ $>$ \mbox{\hyperlink{struct_w_a_s_t_1_1_module_parse_state_a0441abc37cbbd96ab5981d2604e50367}{post\+Declaration\+Callbacks}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes inherited from \mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{WAST\+::\+Parse\+State}}}
+\begin{DoxyCompactItemize}
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state_aa0756e24fc46d44cf21e3f447f7a8bde}{string}}
+\item 
+const \mbox{\hyperlink{struct_w_a_s_t_1_1_line_info}{Line\+Info}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state_a2f6f78f2d0ed37f48d49da19b52ccadd}{line\+Info}}
+\item 
+std\+::vector$<$ \mbox{\hyperlink{struct_w_a_s_t_1_1_unresolved_error}{Unresolved\+Error}} $>$ \& \mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state_ac8bc40a0614e2b9aa88ca995dce9d7ba}{errors}}
+\item 
+const Token \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state_aed44236c3beecfffdb5807d5a5af3e7a}{next\+Token}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{_parse_8h_source_l00115}{115}} of file \mbox{\hyperlink{_parse_8h_source}{Parse.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{struct_w_a_s_t_1_1_module_parse_state_a76372901588b10e38760c813a7552028}\index{WAST::ModuleParseState@{WAST::ModuleParseState}!ModuleParseState@{ModuleParseState}}
+\index{ModuleParseState@{ModuleParseState}!WAST::ModuleParseState@{WAST::ModuleParseState}}
+\doxysubsubsection{\texorpdfstring{ModuleParseState()}{ModuleParseState()}}
+{\footnotesize\ttfamily \label{struct_w_a_s_t_1_1_module_parse_state_a76372901588b10e38760c813a7552028} 
+WAST\+::\+Module\+Parse\+State\+::\+Module\+Parse\+State (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{in\+String}{, }\item[{const \mbox{\hyperlink{struct_w_a_s_t_1_1_line_info}{Line\+Info}} \texorpdfstring{$\ast$}{*}}]{in\+Line\+Info}{, }\item[{std\+::vector$<$ \mbox{\hyperlink{struct_w_a_s_t_1_1_unresolved_error}{Unresolved\+Error}} $>$ \&}]{in\+Errors}{, }\item[{const Token \texorpdfstring{$\ast$}{*}}]{in\+Next\+Token}{, }\item[{\mbox{\hyperlink{struct_i_r_1_1_module}{IR\+::\+Module}} \&}]{in\+Module}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_8h_source_l00135}{135}} of file \mbox{\hyperlink{_parse_8h_source}{Parse.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state_a80ce3e02bd5f5a10b35ace17f0f26ec2}{ParseState}}(inString,inLineInfo,inErrors,inNextToken)}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ ,\ \mbox{\hyperlink{struct_w_a_s_t_1_1_module_parse_state_a7c4c471c69d471eb81695cc9a74d9312}{module}}(inModule)}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_w_a_s_t_1_1_module_parse_state_a65f8e8f4921d07c9ab3f6d66bd39c0e2}\index{WAST::ModuleParseState@{WAST::ModuleParseState}!disassemblyNames@{disassemblyNames}}
+\index{disassemblyNames@{disassemblyNames}!WAST::ModuleParseState@{WAST::ModuleParseState}}
+\doxysubsubsection{\texorpdfstring{disassemblyNames}{disassemblyNames}}
+{\footnotesize\ttfamily \label{struct_w_a_s_t_1_1_module_parse_state_a65f8e8f4921d07c9ab3f6d66bd39c0e2} 
+\mbox{\hyperlink{struct_i_r_1_1_disassembly_names}{IR\+::\+Disassembly\+Names}} WAST\+::\+Module\+Parse\+State\+::disassembly\+Names}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_8h_source_l00127}{127}} of file \mbox{\hyperlink{_parse_8h_source}{Parse.\+h}}.
+
+\Hypertarget{struct_w_a_s_t_1_1_module_parse_state_a897a596297f121bfe1af3158e8c2edc5}\index{WAST::ModuleParseState@{WAST::ModuleParseState}!functionNameToIndexMap@{functionNameToIndexMap}}
+\index{functionNameToIndexMap@{functionNameToIndexMap}!WAST::ModuleParseState@{WAST::ModuleParseState}}
+\doxysubsubsection{\texorpdfstring{functionNameToIndexMap}{functionNameToIndexMap}}
+{\footnotesize\ttfamily \label{struct_w_a_s_t_1_1_module_parse_state_a897a596297f121bfe1af3158e8c2edc5} 
+\mbox{\hyperlink{namespace_w_a_s_t_a2d9d3ba4e83db4fbb314c3068261afa5}{Name\+To\+Index\+Map}} WAST\+::\+Module\+Parse\+State\+::function\+Name\+To\+Index\+Map}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_8h_source_l00122}{122}} of file \mbox{\hyperlink{_parse_8h_source}{Parse.\+h}}.
+
+\Hypertarget{struct_w_a_s_t_1_1_module_parse_state_af237a7ca492c2a219c585cd968fe60d3}\index{WAST::ModuleParseState@{WAST::ModuleParseState}!functionTypeToIndexMap@{functionTypeToIndexMap}}
+\index{functionTypeToIndexMap@{functionTypeToIndexMap}!WAST::ModuleParseState@{WAST::ModuleParseState}}
+\doxysubsubsection{\texorpdfstring{functionTypeToIndexMap}{functionTypeToIndexMap}}
+{\footnotesize\ttfamily \label{struct_w_a_s_t_1_1_module_parse_state_af237a7ca492c2a219c585cd968fe60d3} 
+std\+::map$<$const \mbox{\hyperlink{struct_i_r_1_1_function_type}{IR\+::\+Function\+Type}}\texorpdfstring{$\ast$}{*},\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}}$>$ WAST\+::\+Module\+Parse\+State\+::function\+Type\+To\+Index\+Map}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_8h_source_l00119}{119}} of file \mbox{\hyperlink{_parse_8h_source}{Parse.\+h}}.
+
+\Hypertarget{struct_w_a_s_t_1_1_module_parse_state_a655a616e07a5d961a15c0d76728679bb}\index{WAST::ModuleParseState@{WAST::ModuleParseState}!globalNameToIndexMap@{globalNameToIndexMap}}
+\index{globalNameToIndexMap@{globalNameToIndexMap}!WAST::ModuleParseState@{WAST::ModuleParseState}}
+\doxysubsubsection{\texorpdfstring{globalNameToIndexMap}{globalNameToIndexMap}}
+{\footnotesize\ttfamily \label{struct_w_a_s_t_1_1_module_parse_state_a655a616e07a5d961a15c0d76728679bb} 
+\mbox{\hyperlink{namespace_w_a_s_t_a2d9d3ba4e83db4fbb314c3068261afa5}{Name\+To\+Index\+Map}} WAST\+::\+Module\+Parse\+State\+::global\+Name\+To\+Index\+Map}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_8h_source_l00125}{125}} of file \mbox{\hyperlink{_parse_8h_source}{Parse.\+h}}.
+
+\Hypertarget{struct_w_a_s_t_1_1_module_parse_state_ad3169322a0142f0482a9762d6bbd6eae}\index{WAST::ModuleParseState@{WAST::ModuleParseState}!memoryNameToIndexMap@{memoryNameToIndexMap}}
+\index{memoryNameToIndexMap@{memoryNameToIndexMap}!WAST::ModuleParseState@{WAST::ModuleParseState}}
+\doxysubsubsection{\texorpdfstring{memoryNameToIndexMap}{memoryNameToIndexMap}}
+{\footnotesize\ttfamily \label{struct_w_a_s_t_1_1_module_parse_state_ad3169322a0142f0482a9762d6bbd6eae} 
+\mbox{\hyperlink{namespace_w_a_s_t_a2d9d3ba4e83db4fbb314c3068261afa5}{Name\+To\+Index\+Map}} WAST\+::\+Module\+Parse\+State\+::memory\+Name\+To\+Index\+Map}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_8h_source_l00124}{124}} of file \mbox{\hyperlink{_parse_8h_source}{Parse.\+h}}.
+
+\Hypertarget{struct_w_a_s_t_1_1_module_parse_state_a7c4c471c69d471eb81695cc9a74d9312}\index{WAST::ModuleParseState@{WAST::ModuleParseState}!module@{module}}
+\index{module@{module}!WAST::ModuleParseState@{WAST::ModuleParseState}}
+\doxysubsubsection{\texorpdfstring{module}{module}}
+{\footnotesize\ttfamily \label{struct_w_a_s_t_1_1_module_parse_state_a7c4c471c69d471eb81695cc9a74d9312} 
+\mbox{\hyperlink{struct_i_r_1_1_module}{IR\+::\+Module}}\& WAST\+::\+Module\+Parse\+State\+::module}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_8h_source_l00117}{117}} of file \mbox{\hyperlink{_parse_8h_source}{Parse.\+h}}.
+
+\Hypertarget{struct_w_a_s_t_1_1_module_parse_state_a0441abc37cbbd96ab5981d2604e50367}\index{WAST::ModuleParseState@{WAST::ModuleParseState}!postDeclarationCallbacks@{postDeclarationCallbacks}}
+\index{postDeclarationCallbacks@{postDeclarationCallbacks}!WAST::ModuleParseState@{WAST::ModuleParseState}}
+\doxysubsubsection{\texorpdfstring{postDeclarationCallbacks}{postDeclarationCallbacks}}
+{\footnotesize\ttfamily \label{struct_w_a_s_t_1_1_module_parse_state_a0441abc37cbbd96ab5981d2604e50367} 
+std\+::vector$<$std\+::function$<$void(\mbox{\hyperlink{struct_w_a_s_t_1_1_module_parse_state}{Module\+Parse\+State}}\&)$>$ $>$ WAST\+::\+Module\+Parse\+State\+::post\+Declaration\+Callbacks}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_8h_source_l00133}{133}} of file \mbox{\hyperlink{_parse_8h_source}{Parse.\+h}}.
+
+\Hypertarget{struct_w_a_s_t_1_1_module_parse_state_a1c93ca4a3f2305beccefe869a88a5da4}\index{WAST::ModuleParseState@{WAST::ModuleParseState}!postTypeCallbacks@{postTypeCallbacks}}
+\index{postTypeCallbacks@{postTypeCallbacks}!WAST::ModuleParseState@{WAST::ModuleParseState}}
+\doxysubsubsection{\texorpdfstring{postTypeCallbacks}{postTypeCallbacks}}
+{\footnotesize\ttfamily \label{struct_w_a_s_t_1_1_module_parse_state_a1c93ca4a3f2305beccefe869a88a5da4} 
+std\+::vector$<$std\+::function$<$void(\mbox{\hyperlink{struct_w_a_s_t_1_1_module_parse_state}{Module\+Parse\+State}}\&)$>$ $>$ WAST\+::\+Module\+Parse\+State\+::post\+Type\+Callbacks}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_8h_source_l00130}{130}} of file \mbox{\hyperlink{_parse_8h_source}{Parse.\+h}}.
+
+\Hypertarget{struct_w_a_s_t_1_1_module_parse_state_a87372ef450c8d65189a25a0c1067896c}\index{WAST::ModuleParseState@{WAST::ModuleParseState}!tableNameToIndexMap@{tableNameToIndexMap}}
+\index{tableNameToIndexMap@{tableNameToIndexMap}!WAST::ModuleParseState@{WAST::ModuleParseState}}
+\doxysubsubsection{\texorpdfstring{tableNameToIndexMap}{tableNameToIndexMap}}
+{\footnotesize\ttfamily \label{struct_w_a_s_t_1_1_module_parse_state_a87372ef450c8d65189a25a0c1067896c} 
+\mbox{\hyperlink{namespace_w_a_s_t_a2d9d3ba4e83db4fbb314c3068261afa5}{Name\+To\+Index\+Map}} WAST\+::\+Module\+Parse\+State\+::table\+Name\+To\+Index\+Map}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_8h_source_l00123}{123}} of file \mbox{\hyperlink{_parse_8h_source}{Parse.\+h}}.
+
+\Hypertarget{struct_w_a_s_t_1_1_module_parse_state_a699292c5ec8bc493c8b0ffbd6ed9ebce}\index{WAST::ModuleParseState@{WAST::ModuleParseState}!typeNameToIndexMap@{typeNameToIndexMap}}
+\index{typeNameToIndexMap@{typeNameToIndexMap}!WAST::ModuleParseState@{WAST::ModuleParseState}}
+\doxysubsubsection{\texorpdfstring{typeNameToIndexMap}{typeNameToIndexMap}}
+{\footnotesize\ttfamily \label{struct_w_a_s_t_1_1_module_parse_state_a699292c5ec8bc493c8b0ffbd6ed9ebce} 
+\mbox{\hyperlink{namespace_w_a_s_t_a2d9d3ba4e83db4fbb314c3068261afa5}{Name\+To\+Index\+Map}} WAST\+::\+Module\+Parse\+State\+::type\+Name\+To\+Index\+Map}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_8h_source_l00120}{120}} of file \mbox{\hyperlink{_parse_8h_source}{Parse.\+h}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/wasm-\/jit/\+Source/\+WAST/\mbox{\hyperlink{_parse_8h}{Parse.\+h}}\end{DoxyCompactItemize}

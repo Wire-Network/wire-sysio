@@ -1,0 +1,54 @@
+\doxysection{sysio\+::chain\+::permission\+\_\+link\+\_\+object Class Reference}
+\hypertarget{classsysio_1_1chain_1_1permission__link__object}{}\label{classsysio_1_1chain_1_1permission__link__object}\index{sysio::chain::permission\_link\_object@{sysio::chain::permission\_link\_object}}
+
+
+The \doxylink{classsysio_1_1chain_1_1permission__link__object}{permission\+\_\+link\+\_\+object} class assigns permission\+\_\+objects to message types.  
+
+
+
+
+{\ttfamily \#include $<$permission\+\_\+link\+\_\+object.\+hpp$>$}
+
+
+
+Inheritance diagram for sysio\+::chain\+::permission\+\_\+link\+\_\+object\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=202pt]{classsysio_1_1chain_1_1permission__link__object__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for sysio\+::chain\+::permission\+\_\+link\+\_\+object\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=202pt]{classsysio_1_1chain_1_1permission__link__object__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Public Types inherited from \mbox{\hyperlink{structchainbase_1_1object}{chainbase\+::object$<$ permission\+\_\+link\+\_\+object\+\_\+type, permission\+\_\+link\+\_\+object $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{classchainbase_1_1oid}{oid}}$<$ permission\+\_\+link\+\_\+object $>$ \mbox{\hyperlink{structchainbase_1_1object_a7c6a0efb95ee67d538a976cfa5be9df9}{id\+\_\+type}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Static Public Attributes inherited from \mbox{\hyperlink{structchainbase_1_1object}{chainbase\+::object$<$ permission\+\_\+link\+\_\+object\+\_\+type, permission\+\_\+link\+\_\+object $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+static const \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{structchainbase_1_1object_a30d3a5340e6fc59b4a2e044fcd42f0a2}{type\+\_\+id}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+This class records the links from contracts and message types within those contracts to permission\+\_\+objects defined by the user to record the authority required to execute those messages within those contracts. For example, suppose we have a contract called "{}currency"{} and that contract defines a message called "{}transfer"{}. Furthermore, suppose a user, "{}joe"{}, has a permission level called "{}money"{} and joe would like to require that permission level in order for his account to invoke currency.\+transfer. To do this, joe would create a \doxylink{classsysio_1_1chain_1_1permission__link__object}{permission\+\_\+link\+\_\+object} for his account with "{}currency"{} as the code account, "{}transfer"{} as the message\+\_\+type, and "{}money"{} as the required\+\_\+permission. After this, in order to validate, any message to "{}currency"{} of type "{}transfer"{} that requires joe\textquotesingle{}s approval would require signatures sufficient to satisfy joe\textquotesingle{}s "{}money"{} authority.
+
+Accounts may set links to individual message types, or may set default permission requirements for all messages to a given contract. To set the default for all messages to a given contract, set message\+\_\+type to the empty string. When looking up which permission to use, if a link is found for a particular \{account, code, message\+\_\+type\} triplet, then the required\+\_\+permission from that link is used. If no such link is found, but a link is found for \{account, code, "{}"{}\}, then the required\+\_\+permission from that link is used. If no such link is found, account\textquotesingle{}s active authority is used. 
+
+Definition at line \mbox{\hyperlink{permission__link__object_8hpp_source_l00026}{26}} of file \mbox{\hyperlink{permission__link__object_8hpp_source}{permission\+\_\+link\+\_\+object.\+hpp}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{permission__link__object_8hpp}{permission\+\_\+link\+\_\+object.\+hpp}}\end{DoxyCompactItemize}

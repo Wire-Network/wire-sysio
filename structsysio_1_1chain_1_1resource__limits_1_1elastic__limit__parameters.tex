@@ -1,0 +1,187 @@
+\doxysection{sysio\+::chain\+::resource\+\_\+limits\+::elastic\+\_\+limit\+\_\+parameters Struct Reference}
+\hypertarget{structsysio_1_1chain_1_1resource__limits_1_1elastic__limit__parameters}{}\label{structsysio_1_1chain_1_1resource__limits_1_1elastic__limit__parameters}\index{sysio::chain::resource\_limits::elastic\_limit\_parameters@{sysio::chain::resource\_limits::elastic\_limit\_parameters}}
+
+
+{\ttfamily \#include $<$resource\+\_\+limits.\+hpp$>$}
+
+
+
+Collaboration diagram for sysio\+::chain\+::resource\+\_\+limits\+::elastic\+\_\+limit\+\_\+parameters\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=196pt]{structsysio_1_1chain_1_1resource__limits_1_1elastic__limit__parameters__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1elastic__limit__parameters_a5535b786bf4289eccf551d6b15e5c839}{validate}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1elastic__limit__parameters_a37c489e0f66e5a1ccb3d2e7a4f6ced33}{target}}
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1elastic__limit__parameters_aad235df38f1610bb755b89c1b6e9205a}{max}}
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1elastic__limit__parameters_a38d39aa4bea732e345f3241e5a694b33}{periods}}
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1elastic__limit__parameters_a9b3667de6cae7b5012abd3c5a179f9a8}{max\+\_\+multiplier}}
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1resource__limits_acbeb3d309e353ed8190a55b47d484868}{ratio}} \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1elastic__limit__parameters_adaca231933dffd76677d9f3038cf830d}{contract\+\_\+rate}}
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1resource__limits_acbeb3d309e353ed8190a55b47d484868}{ratio}} \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1elastic__limit__parameters_a9e748ed99e9b3753b49cc753d8031913}{expand\+\_\+rate}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1elastic__limit__parameters_afc7ae3931eb27ae78f4c647122ea65d1}{operator==}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1elastic__limit__parameters}{elastic\+\_\+limit\+\_\+parameters}} \&lhs, const \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1elastic__limit__parameters}{elastic\+\_\+limit\+\_\+parameters}} \&rhs)
+\item 
+bool \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1elastic__limit__parameters_a5ecbe9d721c815a25cee32ab9f5d12d0}{operator!=}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1elastic__limit__parameters}{elastic\+\_\+limit\+\_\+parameters}} \&lhs, const \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1elastic__limit__parameters}{elastic\+\_\+limit\+\_\+parameters}} \&rhs)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{resource__limits_8hpp_source_l00034}{34}} of file \mbox{\hyperlink{resource__limits_8hpp_source}{resource\+\_\+limits.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1chain_1_1resource__limits_1_1elastic__limit__parameters_a5535b786bf4289eccf551d6b15e5c839}\index{sysio::chain::resource\_limits::elastic\_limit\_parameters@{sysio::chain::resource\_limits::elastic\_limit\_parameters}!validate@{validate}}
+\index{validate@{validate}!sysio::chain::resource\_limits::elastic\_limit\_parameters@{sysio::chain::resource\_limits::elastic\_limit\_parameters}}
+\doxysubsubsection{\texorpdfstring{validate()}{validate()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1resource__limits_1_1elastic__limit__parameters_a5535b786bf4289eccf551d6b15e5c839} 
+void sysio\+::chain\+::resource\+\_\+limits\+::elastic\+\_\+limit\+\_\+parameters\+::validate (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{resource__limits_8cpp_source_l00032}{32}} of file \mbox{\hyperlink{resource__limits_8cpp_source}{resource\+\_\+limits.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00033\ \ \ \ \textcolor{comment}{//\ At\ the\ very\ least\ ensure\ parameters\ are\ not\ set\ to\ values\ that\ will\ cause\ divide\ by\ zero\ errors\ later\ on.}}
+\DoxyCodeLine{00034\ \ \ \ \textcolor{comment}{//\ Stricter\ checks\ for\ sensible\ values\ can\ be\ added\ later.}}
+\DoxyCodeLine{00035\ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1elastic__limit__parameters_a38d39aa4bea732e345f3241e5a694b33}{periods}}\ >\ 0,\ resource\_limit\_exception,\ \textcolor{stringliteral}{"{}elastic\ limit\ parameter\ 'periods'\ cannot\ be\ zero"{}}\ );}
+\DoxyCodeLine{00036\ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1elastic__limit__parameters_adaca231933dffd76677d9f3038cf830d}{contract\_rate}}.\mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1ratio_af665e471f6d066272fc308f463c5437d}{denominator}}\ >\ 0,\ resource\_limit\_exception,\ \textcolor{stringliteral}{"{}elastic\ limit\ parameter\ 'contract\_rate'\ is\ not\ a\ well-\/defined\ ratio"{}}\ );}
+\DoxyCodeLine{00037\ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1elastic__limit__parameters_a9e748ed99e9b3753b49cc753d8031913}{expand\_rate}}.\mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1impl_1_1ratio_af665e471f6d066272fc308f463c5437d}{denominator}}\ >\ 0,\ resource\_limit\_exception,\ \textcolor{stringliteral}{"{}elastic\ limit\ parameter\ 'expand\_rate'\ is\ not\ a\ well-\/defined\ ratio"{}}\ );}
+\DoxyCodeLine{00038\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1resource__limits_1_1elastic__limit__parameters_a5535b786bf4289eccf551d6b15e5c839_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{structsysio_1_1chain_1_1resource__limits_1_1elastic__limit__parameters_a5ecbe9d721c815a25cee32ab9f5d12d0}\index{sysio::chain::resource\_limits::elastic\_limit\_parameters@{sysio::chain::resource\_limits::elastic\_limit\_parameters}!operator"!=@{operator"!=}}
+\index{operator"!=@{operator"!=}!sysio::chain::resource\_limits::elastic\_limit\_parameters@{sysio::chain::resource\_limits::elastic\_limit\_parameters}}
+\doxysubsubsection{\texorpdfstring{operator"!=}{operator!=}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1resource__limits_1_1elastic__limit__parameters_a5ecbe9d721c815a25cee32ab9f5d12d0} 
+bool \mbox{\hyperlink{namespacefc_a40c368ac88294ae47b064cad937fdbf6}{operator!}}= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1elastic__limit__parameters}{elastic\+\_\+limit\+\_\+parameters}} \&}]{lhs}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1elastic__limit__parameters}{elastic\+\_\+limit\+\_\+parameters}} \&}]{rhs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{resource__limits_8hpp_source_l00050}{50}} of file \mbox{\hyperlink{resource__limits_8hpp_source}{resource\+\_\+limits.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !(lhs\ ==\ rhs);}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1resource__limits_1_1elastic__limit__parameters_afc7ae3931eb27ae78f4c647122ea65d1}\index{sysio::chain::resource\_limits::elastic\_limit\_parameters@{sysio::chain::resource\_limits::elastic\_limit\_parameters}!operator==@{operator==}}
+\index{operator==@{operator==}!sysio::chain::resource\_limits::elastic\_limit\_parameters@{sysio::chain::resource\_limits::elastic\_limit\_parameters}}
+\doxysubsubsection{\texorpdfstring{operator==}{operator==}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1resource__limits_1_1elastic__limit__parameters_afc7ae3931eb27ae78f4c647122ea65d1} 
+bool operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1elastic__limit__parameters}{elastic\+\_\+limit\+\_\+parameters}} \&}]{lhs}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1elastic__limit__parameters}{elastic\+\_\+limit\+\_\+parameters}} \&}]{rhs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{resource__limits_8hpp_source_l00045}{45}} of file \mbox{\hyperlink{resource__limits_8hpp_source}{resource\+\_\+limits.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::tie(lhs.target,\ lhs.max,\ lhs.periods,\ lhs.max\_multiplier,\ lhs.contract\_rate,\ lhs.expand\_rate)}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ==\ std::tie(rhs.target,\ rhs.max,\ rhs.periods,\ rhs.max\_multiplier,\ rhs.contract\_rate,\ rhs.expand\_rate);}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1chain_1_1resource__limits_1_1elastic__limit__parameters_adaca231933dffd76677d9f3038cf830d}\index{sysio::chain::resource\_limits::elastic\_limit\_parameters@{sysio::chain::resource\_limits::elastic\_limit\_parameters}!contract\_rate@{contract\_rate}}
+\index{contract\_rate@{contract\_rate}!sysio::chain::resource\_limits::elastic\_limit\_parameters@{sysio::chain::resource\_limits::elastic\_limit\_parameters}}
+\doxysubsubsection{\texorpdfstring{contract\_rate}{contract\_rate}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1resource__limits_1_1elastic__limit__parameters_adaca231933dffd76677d9f3038cf830d} 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1resource__limits_acbeb3d309e353ed8190a55b47d484868}{ratio}} sysio\+::chain\+::resource\+\_\+limits\+::elastic\+\_\+limit\+\_\+parameters\+::contract\+\_\+rate}
+
+
+
+Definition at line \mbox{\hyperlink{resource__limits_8hpp_source_l00040}{40}} of file \mbox{\hyperlink{resource__limits_8hpp_source}{resource\+\_\+limits.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1resource__limits_1_1elastic__limit__parameters_a9e748ed99e9b3753b49cc753d8031913}\index{sysio::chain::resource\_limits::elastic\_limit\_parameters@{sysio::chain::resource\_limits::elastic\_limit\_parameters}!expand\_rate@{expand\_rate}}
+\index{expand\_rate@{expand\_rate}!sysio::chain::resource\_limits::elastic\_limit\_parameters@{sysio::chain::resource\_limits::elastic\_limit\_parameters}}
+\doxysubsubsection{\texorpdfstring{expand\_rate}{expand\_rate}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1resource__limits_1_1elastic__limit__parameters_a9e748ed99e9b3753b49cc753d8031913} 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1resource__limits_acbeb3d309e353ed8190a55b47d484868}{ratio}} sysio\+::chain\+::resource\+\_\+limits\+::elastic\+\_\+limit\+\_\+parameters\+::expand\+\_\+rate}
+
+
+
+Definition at line \mbox{\hyperlink{resource__limits_8hpp_source_l00041}{41}} of file \mbox{\hyperlink{resource__limits_8hpp_source}{resource\+\_\+limits.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1resource__limits_1_1elastic__limit__parameters_aad235df38f1610bb755b89c1b6e9205a}\index{sysio::chain::resource\_limits::elastic\_limit\_parameters@{sysio::chain::resource\_limits::elastic\_limit\_parameters}!max@{max}}
+\index{max@{max}!sysio::chain::resource\_limits::elastic\_limit\_parameters@{sysio::chain::resource\_limits::elastic\_limit\_parameters}}
+\doxysubsubsection{\texorpdfstring{max}{max}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1resource__limits_1_1elastic__limit__parameters_aad235df38f1610bb755b89c1b6e9205a} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} sysio\+::chain\+::resource\+\_\+limits\+::elastic\+\_\+limit\+\_\+parameters\+::max}
+
+
+
+Definition at line \mbox{\hyperlink{resource__limits_8hpp_source_l00036}{36}} of file \mbox{\hyperlink{resource__limits_8hpp_source}{resource\+\_\+limits.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1resource__limits_1_1elastic__limit__parameters_a9b3667de6cae7b5012abd3c5a179f9a8}\index{sysio::chain::resource\_limits::elastic\_limit\_parameters@{sysio::chain::resource\_limits::elastic\_limit\_parameters}!max\_multiplier@{max\_multiplier}}
+\index{max\_multiplier@{max\_multiplier}!sysio::chain::resource\_limits::elastic\_limit\_parameters@{sysio::chain::resource\_limits::elastic\_limit\_parameters}}
+\doxysubsubsection{\texorpdfstring{max\_multiplier}{max\_multiplier}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1resource__limits_1_1elastic__limit__parameters_a9b3667de6cae7b5012abd3c5a179f9a8} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::chain\+::resource\+\_\+limits\+::elastic\+\_\+limit\+\_\+parameters\+::max\+\_\+multiplier}
+
+
+
+Definition at line \mbox{\hyperlink{resource__limits_8hpp_source_l00039}{39}} of file \mbox{\hyperlink{resource__limits_8hpp_source}{resource\+\_\+limits.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1resource__limits_1_1elastic__limit__parameters_a38d39aa4bea732e345f3241e5a694b33}\index{sysio::chain::resource\_limits::elastic\_limit\_parameters@{sysio::chain::resource\_limits::elastic\_limit\_parameters}!periods@{periods}}
+\index{periods@{periods}!sysio::chain::resource\_limits::elastic\_limit\_parameters@{sysio::chain::resource\_limits::elastic\_limit\_parameters}}
+\doxysubsubsection{\texorpdfstring{periods}{periods}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1resource__limits_1_1elastic__limit__parameters_a38d39aa4bea732e345f3241e5a694b33} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::chain\+::resource\+\_\+limits\+::elastic\+\_\+limit\+\_\+parameters\+::periods}
+
+
+
+Definition at line \mbox{\hyperlink{resource__limits_8hpp_source_l00037}{37}} of file \mbox{\hyperlink{resource__limits_8hpp_source}{resource\+\_\+limits.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1resource__limits_1_1elastic__limit__parameters_a37c489e0f66e5a1ccb3d2e7a4f6ced33}\index{sysio::chain::resource\_limits::elastic\_limit\_parameters@{sysio::chain::resource\_limits::elastic\_limit\_parameters}!target@{target}}
+\index{target@{target}!sysio::chain::resource\_limits::elastic\_limit\_parameters@{sysio::chain::resource\_limits::elastic\_limit\_parameters}}
+\doxysubsubsection{\texorpdfstring{target}{target}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1resource__limits_1_1elastic__limit__parameters_a37c489e0f66e5a1ccb3d2e7a4f6ced33} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} sysio\+::chain\+::resource\+\_\+limits\+::elastic\+\_\+limit\+\_\+parameters\+::target}
+
+
+
+Definition at line \mbox{\hyperlink{resource__limits_8hpp_source_l00035}{35}} of file \mbox{\hyperlink{resource__limits_8hpp_source}{resource\+\_\+limits.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{resource__limits_8hpp}{resource\+\_\+limits.\+hpp}}\item 
+libraries/chain/\mbox{\hyperlink{resource__limits_8cpp}{resource\+\_\+limits.\+cpp}}\end{DoxyCompactItemize}

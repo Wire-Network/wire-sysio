@@ -1,0 +1,11 @@
+<map id="libff::Fp_model::size_in_bits" name="libff::Fp_model::size_in_bits">
+<area shape="rect" id="Node000001" title=" " alt="" coords="200,104,339,145"/>
+<area shape="rect" id="Node000002" href="$classlibff_1_1bn128___g1.html#a631f2c3f27848124ef24a4f65b361b73" title=" " alt="" coords="8,5,149,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="218,98,150,61,125,49,128,44,153,57,221,94"/>
+<area shape="rect" id="Node000003" href="$classlibff_1_1bn128___g2.html#ab61a3fe263337d06244282fff6d0d2cc" title=" " alt="" coords="8,71,149,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="184,112,149,106,150,101,184,107"/>
+<area shape="rect" id="Node000004" href="$classlibff_1_1_fp2__model.html#afa7b54df4a7fc2d7ec5d5407a8ed2f39" title=" " alt="" coords="5,136,152,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="184,141,152,147,152,141,184,136"/>
+<area shape="rect" id="Node000005" href="$classlibff_1_1_fp3__model.html#a42632944bde8f169a8fdebf4df8ceb7a" title=" " alt="" coords="5,201,152,242"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="220,155,153,191,127,203,125,198,150,186,217,150"/>
+</map>

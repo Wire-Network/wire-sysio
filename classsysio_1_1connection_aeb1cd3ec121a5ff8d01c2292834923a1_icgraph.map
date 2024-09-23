@@ -1,0 +1,19 @@
+<map id="sysio::connection::current" name="sysio::connection::current">
+<area shape="rect" id="Node000001" title=" " alt="" coords="764,120,896,161"/>
+<area shape="rect" id="Node000002" href="$classvalidate__reflection_1_1_reflections.html#a60911cc3416070e9573c4b085bc8df37" title=" " alt="" coords="495,5,716,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="788,113,754,89,715,67,674,49,676,44,718,62,756,84,791,108"/>
+<area shape="rect" id="Node000003" href="$classvalidate__reflection_1_1_reflections.html#a1e9c57ee99963e105d57f104baea9534" title=" " alt="" coords="222,36,447,61"/>
+<area shape="poly" id="edge10_Node000001_Node000003" title=" " alt="" coords="748,119,716,111,574,84,443,64,444,59,575,79,717,106,750,114"/>
+<area shape="rect" id="Node000004" href="$classvalidate__reflection_1_1_empty_scope.html#a925d1896ca428d2e6d7f09beb9a3be76" title=" " alt="" coords="522,120,690,161"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="749,143,690,143,690,138,749,138"/>
+<area shape="rect" id="Node000006" href="$classvalidate__reflection_1_1_empty_scope.html#a1fb4f76506790294268dc078986d7430" title=" " alt="" coords="5,173,174,214"/>
+<area shape="poly" id="edge9_Node000001_Node000006" title=" " alt="" coords="784,171,752,187,717,200,581,235,525,244,472,248,361,244,221,228,163,217,164,212,222,223,362,239,472,242,524,238,580,229,716,195,750,182,781,166"/>
+<area shape="rect" id="Node000007" href="$classvalidate__reflection_1_1_empty_scope.html#a9bd3a6dd1dcb61702b25d26dbef38028" title=" " alt="" coords="250,173,418,214"/>
+<area shape="poly" id="edge8_Node000001_Node000007" title=" " alt="" coords="751,168,717,175,638,186,559,192,419,197,419,192,559,187,638,180,716,170,749,163"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="480,39,448,42,447,36,479,34"/>
+<area shape="rect" id="Node000005" href="$classvalidate__reflection_1_1_class_struct.html#aefe6dbd570e4dca3b3c1c354dc3945bf" title=" " alt="" coords="252,108,416,149"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="506,139,417,135,417,129,506,133"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="507,162,419,180,418,175,506,157"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="241,156,169,175,168,170,240,151"/>
+<area shape="poly" id="edge7_Node000007_Node000006" title=" " alt="" coords="235,196,174,196,174,191,235,191"/>
+</map>

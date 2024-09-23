@@ -1,0 +1,86 @@
+\doxysection{precompute\+\_\+ecmult\+\_\+gen.\+c}
+\hypertarget{precompute__ecmult__gen_8c_source}{}\label{precompute__ecmult__gen_8c_source}\index{libraries/fc/secp256k1/secp256k1/src/precompute\_ecmult\_gen.c@{libraries/fc/secp256k1/secp256k1/src/precompute\_ecmult\_gen.c}}
+\mbox{\hyperlink{precompute__ecmult__gen_8c}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00001}00001\ \textcolor{comment}{/*********************************************************************************}}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2013,\ 2014,\ 2015,\ 2021\ Thomas\ Daede,\ Cory\ Fields,\ Pieter\ Wuille\ *}}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00003}00003\ \textcolor{comment}{\ *\ Distributed\ under\ the\ MIT\ software\ license,\ see\ the\ accompanying\ \ \ \ \ \ \ \ \ \ \ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00004}00004\ \textcolor{comment}{\ *\ file\ COPYING\ or\ https://www.opensource.org/licenses/mit-\/license.php.\ \ \ \ \ \ \ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00005}00005\ \textcolor{comment}{\ *********************************************************************************/}}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{inttypes_8h}{inttypes.h}}>}}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <stdio.h>}}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00010}00010\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{secp256k1_8h}{../include/secp256k1.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00011}00011\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{assumptions_8h}{assumptions.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00012}00012\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h}{util.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00013}00013\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{group_8h}{group.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00014}00014\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ecmult__gen_8h}{ecmult\_gen.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00015}00015\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ecmult__gen__compute__table__impl_8h}{ecmult\_gen\_compute\_table\_impl.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00017}\mbox{\hyperlink{precompute__ecmult__gen_8c_a3c04138a5bfe5d72780bb7e82a18e627}{00017}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}(\textcolor{keywordtype}{int}\ argc,\ \textcolor{keywordtype}{char}\ **\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}})\ \{}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00018}00018\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ outfile[]\ =\ \textcolor{stringliteral}{"{}src/precomputed\_ecmult\_gen.c"{}};}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00019}00019\ \ \ \ \ FILE*\ fp;}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00020}00020\ \ \ \ \ \textcolor{keywordtype}{int}\ bits;}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00022}00022\ \ \ \ \ (void)argc;}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00023}00023\ \ \ \ \ (void)\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}};}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00025}00025\ \ \ \ \ fp\ =\ fopen(outfile,\ \textcolor{stringliteral}{"{}w"{}});}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00026}00026\ \ \ \ \ \textcolor{keywordflow}{if}\ (fp\ ==\ NULL)\ \{}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00027}00027\ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Could\ not\ open\ \%s\ for\ writing!\(\backslash\)n"{}},\ outfile);}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00028}00028\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ -\/1;}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00029}00029\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00031}00031\ \ \ \ \ fprintf(fp,\ \textcolor{stringliteral}{"{}/*\ This\ file\ was\ automatically\ generated\ by\ precompute\_ecmult\_gen.\ */\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00032}00032\ \ \ \ \ fprintf(fp,\ \textcolor{stringliteral}{"{}/*\ See\ ecmult\_gen\_impl.h\ for\ details\ about\ the\ contents\ of\ this\ file.\ */\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00033}00033\ \ \ \ \ fprintf(fp,\ \textcolor{stringliteral}{"{}\#if\ defined\ HAVE\_CONFIG\_H\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00034}00034\ \ \ \ \ fprintf(fp,\ \textcolor{stringliteral}{"{}\#\ \ \ \ include\ \(\backslash\)"{}libsecp256k1-\/config.h\(\backslash\)"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00035}00035\ \ \ \ \ fprintf(fp,\ \textcolor{stringliteral}{"{}\#endif\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00036}00036\ \ \ \ \ fprintf(fp,\ \textcolor{stringliteral}{"{}\#include\ \(\backslash\)"{}../include/secp256k1.h\(\backslash\)"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00037}00037\ \ \ \ \ fprintf(fp,\ \textcolor{stringliteral}{"{}\#include\ \(\backslash\)"{}group.h\(\backslash\)"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00038}00038\ \ \ \ \ fprintf(fp,\ \textcolor{stringliteral}{"{}\#include\ \(\backslash\)"{}ecmult\_gen.h\(\backslash\)"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00039}00039\ \ \ \ \ fprintf(fp,\ \textcolor{stringliteral}{"{}\#include\ \(\backslash\)"{}precomputed\_ecmult\_gen.h\(\backslash\)"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00040}00040\ \ \ \ \ fprintf(fp,\ \textcolor{stringliteral}{"{}\#ifdef\ EXHAUSTIVE\_TEST\_ORDER\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00041}00041\ \ \ \ \ fprintf(fp,\ \textcolor{stringliteral}{"{}\#\ \ \ \ error\ Cannot\ compile\ precomputed\_ecmult\_gen.c\ in\ exhaustive\ test\ mode\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00042}00042\ \ \ \ \ fprintf(fp,\ \textcolor{stringliteral}{"{}\#endif\ /*\ EXHAUSTIVE\_TEST\_ORDER\ */\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00043}00043\ \ \ \ \ fprintf(fp,\ \textcolor{stringliteral}{"{}\#define\ S(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p)\ SECP256K1\_GE\_STORAGE\_CONST(0x\#\#a\#\#u,0x\#\#b\#\#u,0x\#\#c\#\#u,0x\#\#d\#\#u,0x\#\#e\#\#u,0x\#\#f\#\#u,0x\#\#g\#\#u,0x\#\#h\#\#u,0x\#\#i\#\#u,0x\#\#j\#\#u,0x\#\#k\#\#u,0x\#\#l\#\#u,0x\#\#m\#\#u,0x\#\#n\#\#u,0x\#\#o\#\#u,0x\#\#p\#\#u)\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00044}00044\ \ \ \ \ fprintf(fp,\ \textcolor{stringliteral}{"{}const\ secp256k1\_ge\_storage\ secp256k1\_ecmult\_gen\_prec\_table[ECMULT\_GEN\_PREC\_N(ECMULT\_GEN\_PREC\_BITS)][ECMULT\_GEN\_PREC\_G(ECMULT\_GEN\_PREC\_BITS)]\ =\ \{\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00046}00046\ \ \ \ \ \textcolor{keywordflow}{for}\ (bits\ =\ 2;\ bits\ <=\ 8;\ bits\ *=\ 2)\ \{}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00047}00047\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ g\ =\ \mbox{\hyperlink{ecmult__gen_8h_a1019fca261221b07435dd45c33bae38f}{ECMULT\_GEN\_PREC\_G}}(bits);}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00048}00048\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ n\ =\ \mbox{\hyperlink{ecmult__gen_8h_af7eb6942e607b19354d5466fcc52909f}{ECMULT\_GEN\_PREC\_N}}(bits);}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00049}00049\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ inner,\ outer;}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00051}00051\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsecp256k1__ge__storage}{secp256k1\_ge\_storage}}*\ table\ =\ checked\_malloc(\&default\_error\_callback,\ n\ *\ g\ *\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{structsecp256k1__ge__storage}{secp256k1\_ge\_storage}}));}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00052}00052\ \ \ \ \ \ \ \ \ secp256k1\_ecmult\_gen\_compute\_table(table,\ \&secp256k1\_ge\_const\_g,\ bits);}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00054}00054\ \ \ \ \ \ \ \ \ fprintf(fp,\ \textcolor{stringliteral}{"{}\#if\ ECMULT\_GEN\_PREC\_BITS\ ==\ \%d\(\backslash\)n"{}},\ bits);}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00055}00055\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(outer\ =\ 0;\ outer\ !=\ n;\ outer++)\ \{}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \ \ \ fprintf(fp,\textcolor{stringliteral}{"{}\{"{}});}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(inner\ =\ 0;\ inner\ !=\ g;\ inner++)\ \{}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fprintf(fp,\ \textcolor{stringliteral}{"{}S(\%"{}}\mbox{\hyperlink{inttypes_8h_a80ca66bcc9e366733f02c90ed4b0838c}{PRIx32}}\textcolor{stringliteral}{"{},\%"{}}\mbox{\hyperlink{inttypes_8h_a80ca66bcc9e366733f02c90ed4b0838c}{PRIx32}}\textcolor{stringliteral}{"{},\%"{}}\mbox{\hyperlink{inttypes_8h_a80ca66bcc9e366733f02c90ed4b0838c}{PRIx32}}\textcolor{stringliteral}{"{},\%"{}}\mbox{\hyperlink{inttypes_8h_a80ca66bcc9e366733f02c90ed4b0838c}{PRIx32}}\textcolor{stringliteral}{"{},\%"{}}\mbox{\hyperlink{inttypes_8h_a80ca66bcc9e366733f02c90ed4b0838c}{PRIx32}}\textcolor{stringliteral}{"{},\%"{}}\mbox{\hyperlink{inttypes_8h_a80ca66bcc9e366733f02c90ed4b0838c}{PRIx32}}\textcolor{stringliteral}{"{},\%"{}}\mbox{\hyperlink{inttypes_8h_a80ca66bcc9e366733f02c90ed4b0838c}{PRIx32}}\textcolor{stringliteral}{"{},\%"{}}\mbox{\hyperlink{inttypes_8h_a80ca66bcc9e366733f02c90ed4b0838c}{PRIx32}}}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00059}00059\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{},\%"{}}\mbox{\hyperlink{inttypes_8h_a80ca66bcc9e366733f02c90ed4b0838c}{PRIx32}}\textcolor{stringliteral}{"{},\%"{}}\mbox{\hyperlink{inttypes_8h_a80ca66bcc9e366733f02c90ed4b0838c}{PRIx32}}\textcolor{stringliteral}{"{},\%"{}}\mbox{\hyperlink{inttypes_8h_a80ca66bcc9e366733f02c90ed4b0838c}{PRIx32}}\textcolor{stringliteral}{"{},\%"{}}\mbox{\hyperlink{inttypes_8h_a80ca66bcc9e366733f02c90ed4b0838c}{PRIx32}}\textcolor{stringliteral}{"{},\%"{}}\mbox{\hyperlink{inttypes_8h_a80ca66bcc9e366733f02c90ed4b0838c}{PRIx32}}\textcolor{stringliteral}{"{},\%"{}}\mbox{\hyperlink{inttypes_8h_a80ca66bcc9e366733f02c90ed4b0838c}{PRIx32}}\textcolor{stringliteral}{"{},\%"{}}\mbox{\hyperlink{inttypes_8h_a80ca66bcc9e366733f02c90ed4b0838c}{PRIx32}}\textcolor{stringliteral}{"{},\%"{}}\mbox{\hyperlink{inttypes_8h_a80ca66bcc9e366733f02c90ed4b0838c}{PRIx32}}\textcolor{stringliteral}{"{})"{}},}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group_8h_adefefa4ed4193a466784391616bc2f9f}{SECP256K1\_GE\_STORAGE\_CONST\_GET}}(table[outer\ *\ g\ +\ inner]));}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00061}00061\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (inner\ !=\ g\ -\/\ 1)\ \{}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00062}00062\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fprintf(fp,\textcolor{stringliteral}{"{},\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ }
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00064}00064\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00065}00065\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (outer\ !=\ n\ -\/\ 1)\ \{}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00066}00066\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fprintf(fp,\textcolor{stringliteral}{"{}\},\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00067}00067\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fprintf(fp,\textcolor{stringliteral}{"{}\}\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00070}00070\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00071}00071\ \ \ \ \ \ \ \ \ fprintf(fp,\ \textcolor{stringliteral}{"{}\#endif\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00072}00072\ \ \ \ \ \ \ \ \ free(table);}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00073}00073\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00074}00074\ }
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00075}00075\ \ \ \ \ fprintf(fp,\ \textcolor{stringliteral}{"{}\};\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00076}00076\ \ \ \ \ fprintf(fp,\ \textcolor{stringliteral}{"{}\#undef\ S\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00077}00077\ \ \ \ \ fclose(fp);}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00079}00079\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{precompute__ecmult__gen_8c_source_l00080}00080\ \}}
+
+\end{DoxyCode}

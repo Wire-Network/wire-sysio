@@ -1,0 +1,15 @@
+<map id="sysio::chain_apis::trx_finality_status_processing_impl::ensure_storage" name="sysio::chain_apis::trx_finality_status_processing_impl::ensure_storage">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,121,175,192"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1chain_1_1block__timestamp.html#a3fa049f1a91294814a9cda7ae0745d14" title=" " alt="" coords="223,5,419,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="131,118,174,86,221,57,235,50,237,55,224,61,177,91,135,122"/>
+<area shape="rect" id="Node000003" href="$classfc_1_1tracked__storage.html#a51396073d7aa4bd1a431e318f5557924" title=" " alt="" coords="254,71,388,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="174,130,239,111,240,116,176,135"/>
+<area shape="rect" id="Node000005" href="$classfc_1_1tracked__storage.html#ab578f3765c80c8cee1d758d440c99e90" title=" " alt="" coords="254,136,388,177"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="175,154,239,154,239,159,175,159"/>
+<area shape="rect" id="Node000006" href="$classfc_1_1tracked__storage.html#a5bd678ec2e09568df574c8ecaa184962" title=" " alt="" coords="254,201,388,242"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="176,178,240,196,239,201,174,183"/>
+<area shape="rect" id="Node000007" href="$classsysio_1_1chain_1_1block__timestamp.html#aa1d88152d9cc082b5ad651c3aeadfb8f" title=" " alt="" coords="233,267,408,307"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="135,190,177,222,224,251,237,258,235,263,221,256,174,226,131,194"/>
+<area shape="rect" id="Node000004" href="$namespacefc_1_1tracked.html#a7a874ea77f5afa2de8f3d5fb6d19a241" title=" " alt="" coords="467,78,636,104"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="388,88,452,88,452,94,388,94"/>
+</map>

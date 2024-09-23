@@ -1,0 +1,81 @@
+\doxysection{IR\+::Operator\+Printer Struct Reference}
+\hypertarget{struct_i_r_1_1_operator_printer}{}\label{struct_i_r_1_1_operator_printer}\index{IR::OperatorPrinter@{IR::OperatorPrinter}}
+
+
+{\ttfamily \#include $<$Operator\+Printer.\+h$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef std\+::string \mbox{\hyperlink{struct_i_r_1_1_operator_printer_a09c93218a6e710797e5905aed83743af}{Result}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_i_r_1_1_operator_printer_a070f8560b53be013d9c1d0c942063ffb}{Operator\+Printer}} (const \mbox{\hyperlink{struct_i_r_1_1_module}{Module}} \&in\+Module, const \mbox{\hyperlink{struct_i_r_1_1_function_def}{Function\+Def}} \&in\+Function\+Def)
+\item 
+std\+::string \mbox{\hyperlink{struct_i_r_1_1_operator_printer_a4cb3aa62f40cb458a67127836911298f}{unknown}} (\mbox{\hyperlink{namespace_i_r_a59653fd60bb296de971e5f945c66933a}{Opcode}} opcode)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{_operator_printer_8h_source_l00011}{11}} of file \mbox{\hyperlink{_operator_printer_8h_source}{Operator\+Printer.\+h}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{struct_i_r_1_1_operator_printer_a09c93218a6e710797e5905aed83743af}\index{IR::OperatorPrinter@{IR::OperatorPrinter}!Result@{Result}}
+\index{Result@{Result}!IR::OperatorPrinter@{IR::OperatorPrinter}}
+\doxysubsubsection{\texorpdfstring{Result}{Result}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_operator_printer_a09c93218a6e710797e5905aed83743af} 
+std\+::string \mbox{\hyperlink{struct_i_r_1_1_operator_printer_a09c93218a6e710797e5905aed83743af}{IR\+::\+Operator\+Printer\+::\+Result}}}
+
+
+
+Definition at line \mbox{\hyperlink{_operator_printer_8h_source_l00013}{13}} of file \mbox{\hyperlink{_operator_printer_8h_source}{Operator\+Printer.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{struct_i_r_1_1_operator_printer_a070f8560b53be013d9c1d0c942063ffb}\index{IR::OperatorPrinter@{IR::OperatorPrinter}!OperatorPrinter@{OperatorPrinter}}
+\index{OperatorPrinter@{OperatorPrinter}!IR::OperatorPrinter@{IR::OperatorPrinter}}
+\doxysubsubsection{\texorpdfstring{OperatorPrinter()}{OperatorPrinter()}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_operator_printer_a070f8560b53be013d9c1d0c942063ffb} 
+IR\+::\+Operator\+Printer\+::\+Operator\+Printer (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct_i_r_1_1_module}{Module}} \&}]{in\+Module}{, }\item[{const \mbox{\hyperlink{struct_i_r_1_1_function_def}{Function\+Def}} \&}]{in\+Function\+Def}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_operator_printer_8h_source_l00015}{15}} of file \mbox{\hyperlink{_operator_printer_8h_source}{Operator\+Printer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \ \ :\ module(inModule),\ functionDef(inFunctionDef)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_i_r_1_1_operator_printer_a4cb3aa62f40cb458a67127836911298f}\index{IR::OperatorPrinter@{IR::OperatorPrinter}!unknown@{unknown}}
+\index{unknown@{unknown}!IR::OperatorPrinter@{IR::OperatorPrinter}}
+\doxysubsubsection{\texorpdfstring{unknown()}{unknown()}}
+{\footnotesize\ttfamily \label{struct_i_r_1_1_operator_printer_a4cb3aa62f40cb458a67127836911298f} 
+std\+::string IR\+::\+Operator\+Printer\+::unknown (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespace_i_r_a59653fd60bb296de971e5f945c66933a}{Opcode}}}]{opcode}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_operator_printer_8h_source_l00026}{26}} of file \mbox{\hyperlink{_operator_printer_8h_source}{Operator\+Printer.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}<unknown\ opcode\ "{}}\ +\ std::to\_string((\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}})opcode)\ +\ \textcolor{stringliteral}{"{}>"{}};}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/wasm-\/jit/\+Include/\+IR/\mbox{\hyperlink{_operator_printer_8h}{Operator\+Printer.\+h}}\end{DoxyCompactItemize}

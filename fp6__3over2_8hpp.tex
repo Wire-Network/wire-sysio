@@ -1,0 +1,60 @@
+\doxysection{libraries/fc/libraries/ff/libff/algebra/fields/fp6\+\_\+3over2.hpp File Reference}
+\hypertarget{fp6__3over2_8hpp}{}\label{fp6__3over2_8hpp}\index{libraries/fc/libraries/ff/libff/algebra/fields/fp6\_3over2.hpp@{libraries/fc/libraries/ff/libff/algebra/fields/fp6\_3over2.hpp}}
+{\ttfamily \#include $<$vector$>$}\newline
+{\ttfamily \#include $<$libff/algebra/fields/fp.\+hpp$>$}\newline
+{\ttfamily \#include $<$libff/algebra/fields/fp2.\+hpp$>$}\newline
+{\ttfamily \#include $<$libff/algebra/fields/fp6\+\_\+3over2.\+tcc$>$}\newline
+Include dependency graph for fp6\+\_\+3over2.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{fp6__3over2_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{fp6__3over2_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classlibff_1_1_fp6__3over2__model}{libff\+::\+Fp6\+\_\+3over2\+\_\+model$<$ n, modulus $>$}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacelibff}{libff}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ }\\std\+::ostream \& \mbox{\hyperlink{namespacelibff_a27996bd6ed8214c48949863d69924edd}{libff\+::operator$<$$<$}} (std\+::ostream \&, const \mbox{\hyperlink{classlibff_1_1_fp6__3over2__model}{Fp6\+\_\+3over2\+\_\+model}}$<$ n, modulus $>$ \&)
+\item 
+{\footnotesize template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ }\\std\+::istream \& \mbox{\hyperlink{namespacelibff_a327c5b134e8c0b5b099fb0cadc394cd6}{libff\+::operator$>$$>$}} (std\+::istream \&in, \mbox{\hyperlink{classlibff_1_1_fp6__3over2__model}{Fp6\+\_\+3over2\+\_\+model}}$<$ n, modulus $>$ \&el)
+\item 
+{\footnotesize template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ }\\std\+::ostream \& \mbox{\hyperlink{namespacelibff_a55d654abf2e78e07a2f0f260284df351}{libff\+::operator$<$$<$}} (std\+::ostream \&out, const std\+::vector$<$ \mbox{\hyperlink{classlibff_1_1_fp6__3over2__model}{Fp6\+\_\+3over2\+\_\+model}}$<$ n, modulus $>$ $>$ \&v)
+\item 
+{\footnotesize template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ }\\std\+::istream \& \mbox{\hyperlink{namespacelibff_a5712ba0fc51400981a971a71c31b9b60}{libff\+::operator$>$$>$}} (std\+::istream \&in, std\+::vector$<$ \mbox{\hyperlink{classlibff_1_1_fp6__3over2__model}{Fp6\+\_\+3over2\+\_\+model}}$<$ n, modulus $>$ $>$ \&v)
+\item 
+{\footnotesize template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ }\\\mbox{\hyperlink{classlibff_1_1_fp6__3over2__model}{Fp6\+\_\+3over2\+\_\+model}}$<$ n, modulus $>$ \mbox{\hyperlink{namespacelibff_a6052b36755877c2e03fba8661b0322ba}{libff\+::operator\texorpdfstring{$\ast$}{*}}} (const \mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}}$<$ n, modulus $>$ \&lhs, const \mbox{\hyperlink{classlibff_1_1_fp6__3over2__model}{Fp6\+\_\+3over2\+\_\+model}}$<$ n, modulus $>$ \&rhs)
+\item 
+{\footnotesize template$<$mp\+\_\+size\+\_\+t n, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \& modulus$>$ }\\\mbox{\hyperlink{classlibff_1_1_fp6__3over2__model}{Fp6\+\_\+3over2\+\_\+model}}$<$ n, modulus $>$ \mbox{\hyperlink{namespacelibff_a313b5167c754aaafcd9e9cdc98a7b412}{libff\+::operator\texorpdfstring{$\ast$}{*}}} (const \mbox{\hyperlink{classlibff_1_1_fp2__model}{Fp2\+\_\+model}}$<$ n, modulus $>$ \&lhs, const \mbox{\hyperlink{classlibff_1_1_fp6__3over2__model}{Fp6\+\_\+3over2\+\_\+model}}$<$ n, modulus $>$ \&rhs)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Declaration of arithmetic in the finite field F\mbox{[}(p\texorpdfstring{$^\wedge$}{\string^}2)\texorpdfstring{$^\wedge$}{\string^}3\mbox{]}
+
+\begin{DoxyAuthor}{Author}
+This file is part of libff, developed by SCIPR Lab and contributors (see AUTHORS). 
+\end{DoxyAuthor}
+\begin{DoxyCopyright}{Copyright}
+MIT license (see LICENSE file) 
+\end{DoxyCopyright}
+
+
+Definition in file \mbox{\hyperlink{fp6__3over2_8hpp_source}{fp6\+\_\+3over2.\+hpp}}.
+

@@ -1,0 +1,1098 @@
+\doxysection{plugins/trace\+\_\+api\+\_\+plugin/test/test\+\_\+trace\+\_\+file.cpp File Reference}
+\hypertarget{test__trace__file_8cpp}{}\label{test__trace__file_8cpp}\index{plugins/trace\_api\_plugin/test/test\_trace\_file.cpp@{plugins/trace\_api\_plugin/test/test\_trace\_file.cpp}}
+{\ttfamily \#include $<$boost/test/included/unit\+\_\+test.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/io/cfile.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/trace\+\_\+api/test\+\_\+common.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/trace\+\_\+api/store\+\_\+provider.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/filesystem.\+hpp$>$}\newline
+Include dependency graph for test\+\_\+trace\+\_\+file.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__trace__file_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{test__trace__file_8cpp_a6b2a3852db8bb19ab6909bac01859985}{BOOST\+\_\+\+TEST\+\_\+\+MODULE}}~trace\+\_\+trace\+\_\+file
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{test__trace__file_8cpp_a198834d0a121ab5b82820ffa8361e521}{open\+\_\+state}} = \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a532effe653319aa639caa41b48709ae0}{slice\+\_\+directory\+::open\+\_\+state}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{test__trace__file_8cpp_a9dad05b7acee8b1c0b7a8f345f13efed}{BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE}} (write\+\_\+data\+\_\+trace, test\+\_\+fixture)
+\item 
+\mbox{\hyperlink{test__trace__file_8cpp_a27bd099dbfda309095d62e3e2ab8cafa}{BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE}} (write\+\_\+data\+\_\+multi\+\_\+trace\+\_\+version, test\+\_\+fixture)
+\item 
+\mbox{\hyperlink{test__trace__file_8cpp_a002dd15999bbf46e61258b144662d871}{BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE}} (write\+\_\+metadata\+\_\+trace, test\+\_\+fixture)
+\item 
+\mbox{\hyperlink{test__trace__file_8cpp_ab71d7ab106f333fc4a26cbd547f5acc9}{BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE}} (slice\+\_\+number, test\+\_\+fixture)
+\item 
+\mbox{\hyperlink{test__trace__file_8cpp_a5e1b80e8551bf5d0081e1828243dc423}{BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE}} (slice\+\_\+file, test\+\_\+fixture)
+\item 
+\mbox{\hyperlink{test__trace__file_8cpp_a243805af9dcac3c05356447dcec150b2}{BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE}} (slice\+\_\+file\+\_\+find\+\_\+test, test\+\_\+fixture)
+\item 
+void \mbox{\hyperlink{test__trace__file_8cpp_ac49ab2cf53f615a1a84cdef0579d6fb8}{verify\+\_\+directory\+\_\+contents}} (const bfs\+::path \&tempdir, std\+::set$<$ bfs\+::path $>$ expected\+\_\+files)
+\item 
+\mbox{\hyperlink{test__trace__file_8cpp_a66729e2b0f8ef9a605dab627b7e99dc1}{BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE}} (slice\+\_\+dir\+\_\+cleanup\+\_\+height\+\_\+less\+\_\+than\+\_\+width, test\+\_\+fixture)
+\item 
+\mbox{\hyperlink{test__trace__file_8cpp_a87483942b91385d216d42689d0af1535}{BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE}} (slice\+\_\+dir\+\_\+compress, test\+\_\+fixture)
+\item 
+\mbox{\hyperlink{test__trace__file_8cpp_ae06d4153674bd514a96d7a5e6f743f16}{BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE}} (slice\+\_\+dir\+\_\+compress\+\_\+and\+\_\+delete, test\+\_\+fixture)
+\item 
+\mbox{\hyperlink{test__trace__file_8cpp_a7e05034a45e2e97de2fbda6dcfb72665}{BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE}} (store\+\_\+provider\+\_\+write\+\_\+read\+\_\+v1, test\+\_\+fixture)
+\item 
+\mbox{\hyperlink{test__trace__file_8cpp_ae1fc559fc23557e8b64249fea4ea8e3d}{BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE}} (store\+\_\+provider\+\_\+write\+\_\+read\+\_\+v2, test\+\_\+fixture)
+\item 
+\mbox{\hyperlink{test__trace__file_8cpp_aa817ae36507430bf33f82a441984be8b}{BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE}} (test\+\_\+get\+\_\+block\+\_\+v1, test\+\_\+fixture)
+\item 
+\mbox{\hyperlink{test__trace__file_8cpp_a9bc9670edbc9fdddae69bfebe25a6fa8}{BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE}} (test\+\_\+get\+\_\+block\+\_\+v2, test\+\_\+fixture)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{test__trace__file_8cpp_a6b2a3852db8bb19ab6909bac01859985}\index{test\_trace\_file.cpp@{test\_trace\_file.cpp}!BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}}
+\index{BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}!test\_trace\_file.cpp@{test\_trace\_file.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_TEST\_MODULE}{BOOST\_TEST\_MODULE}}
+{\footnotesize\ttfamily \label{test__trace__file_8cpp_a6b2a3852db8bb19ab6909bac01859985} 
+\#define BOOST\+\_\+\+TEST\+\_\+\+MODULE~trace\+\_\+trace\+\_\+file}
+
+
+
+Definition at line \mbox{\hyperlink{test__trace__file_8cpp_source_l00001}{1}} of file \mbox{\hyperlink{test__trace__file_8cpp_source}{test\+\_\+trace\+\_\+file.\+cpp}}.
+
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{test__trace__file_8cpp_a198834d0a121ab5b82820ffa8361e521}\index{test\_trace\_file.cpp@{test\_trace\_file.cpp}!open\_state@{open\_state}}
+\index{open\_state@{open\_state}!test\_trace\_file.cpp@{test\_trace\_file.cpp}}
+\doxysubsubsection{\texorpdfstring{open\_state}{open\_state}}
+{\footnotesize\ttfamily \label{test__trace__file_8cpp_a198834d0a121ab5b82820ffa8361e521} 
+using \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a532effe653319aa639caa41b48709ae0}{open\+\_\+state}} = \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a532effe653319aa639caa41b48709ae0}{slice\+\_\+directory\+::open\+\_\+state}}}
+
+
+
+Definition at line \mbox{\hyperlink{test__trace__file_8cpp_source_l00012}{12}} of file \mbox{\hyperlink{test__trace__file_8cpp_source}{test\+\_\+trace\+\_\+file.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{test__trace__file_8cpp_a66729e2b0f8ef9a605dab627b7e99dc1}\index{test\_trace\_file.cpp@{test\_trace\_file.cpp}!BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}}
+\index{BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}!test\_trace\_file.cpp@{test\_trace\_file.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_FIXTURE\_TEST\_CASE()}{BOOST\_FIXTURE\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/13]}}
+{\footnotesize\ttfamily \label{test__trace__file_8cpp_a66729e2b0f8ef9a605dab627b7e99dc1} 
+BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{slice\+\_\+dir\+\_\+cleanup\+\_\+height\+\_\+less\+\_\+than\+\_\+width}]{}{, }\item[{test\+\_\+fixture}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__trace__file_8cpp_source_l00608}{608}} of file \mbox{\hyperlink{test__trace__file_8cpp_source}{test\+\_\+trace\+\_\+file.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00609\ \ \ \ \{}
+\DoxyCodeLine{00610\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1temp__directory}{fc::temp\_directory}}\ tempdir;}
+\DoxyCodeLine{00611\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{catch__reporter__console_8cpp_a2474a5474cbff19523a51eb1de01cda4}{width}}\ =\ 10;}
+\DoxyCodeLine{00612\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ min\_saved\_blocks\ =\ 5;}
+\DoxyCodeLine{00613\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory}{slice\_directory}}\ sd(tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}(),\ \mbox{\hyperlink{catch__reporter__console_8cpp_a2474a5474cbff19523a51eb1de01cda4}{width}},\ std::optional<uint32\_t>(min\_saved\_blocks),\ std::optional<uint32\_t>(),\ 0);}
+\DoxyCodeLine{00614\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1cfile}{fc::cfile}}\ file;}
+\DoxyCodeLine{00615\ }
+\DoxyCodeLine{00616\ \ \ \ \ \ \ \textcolor{comment}{//\ verify\ it\ cleans\ up\ when\ there\ is\ just\ an\ index\ file,\ just\ a\ trace\ file,\ or\ when\ both\ are\ there}}
+\DoxyCodeLine{00617\ \ \ \ \ \ \ \textcolor{comment}{//\ verify\ it\ cleans\ up\ all\ slices\ that\ need\ to\ be\ cleaned}}
+\DoxyCodeLine{00618\ \ \ \ \ \ \ std::set<bfs::path>\ \mbox{\hyperlink{namespaceapprove_ac74141eb5bed2ad90470ab44a35d0a4f}{files}};}
+\DoxyCodeLine{00619\ \ \ \ \ \ \ BOOST\_REQUIRE(!sd.find\_or\_create\_index\_slice(0,\ open\_state::read,\ file));}
+\DoxyCodeLine{00620\ \ \ \ \ \ \ \mbox{\hyperlink{namespaceapprove_ac74141eb5bed2ad90470ab44a35d0a4f}{files}}.insert(file.get\_file\_path().filename());}
+\DoxyCodeLine{00621\ \ \ \ \ \ \ \mbox{\hyperlink{test__trace__file_8cpp_ac49ab2cf53f615a1a84cdef0579d6fb8}{verify\_directory\_contents}}(tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}(),\ files);}
+\DoxyCodeLine{00622\ \ \ \ \ \ \ BOOST\_REQUIRE(!sd.find\_or\_create\_trace\_slice(0,\ open\_state::read,\ file));}
+\DoxyCodeLine{00623\ \ \ \ \ \ \ \mbox{\hyperlink{namespaceapprove_ac74141eb5bed2ad90470ab44a35d0a4f}{files}}.insert(file.get\_file\_path().filename());}
+\DoxyCodeLine{00624\ \ \ \ \ \ \ BOOST\_REQUIRE(!sd.find\_or\_create\_index\_slice(1,\ open\_state::read,\ file));}
+\DoxyCodeLine{00625\ \ \ \ \ \ \ \mbox{\hyperlink{namespaceapprove_ac74141eb5bed2ad90470ab44a35d0a4f}{files}}.insert(file.get\_file\_path().filename());}
+\DoxyCodeLine{00626\ \ \ \ \ \ \ BOOST\_REQUIRE(!sd.find\_or\_create\_trace\_slice(2,\ open\_state::read,\ file));}
+\DoxyCodeLine{00627\ \ \ \ \ \ \ \mbox{\hyperlink{namespaceapprove_ac74141eb5bed2ad90470ab44a35d0a4f}{files}}.insert(file.get\_file\_path().filename());}
+\DoxyCodeLine{00628\ \ \ \ \ \ \ BOOST\_REQUIRE(!sd.find\_or\_create\_index\_slice(3,\ open\_state::read,\ file));}
+\DoxyCodeLine{00629\ \ \ \ \ \ \ \mbox{\hyperlink{namespaceapprove_ac74141eb5bed2ad90470ab44a35d0a4f}{files}}.insert(file.get\_file\_path().filename());}
+\DoxyCodeLine{00630\ \ \ \ \ \ \ BOOST\_REQUIRE(!sd.find\_or\_create\_index\_slice(4,\ open\_state::read,\ file));}
+\DoxyCodeLine{00631\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ index4\ =\ file.get\_file\_path().filename();}
+\DoxyCodeLine{00632\ \ \ \ \ \ \ \mbox{\hyperlink{namespaceapprove_ac74141eb5bed2ad90470ab44a35d0a4f}{files}}.insert(index4);}
+\DoxyCodeLine{00633\ \ \ \ \ \ \ BOOST\_REQUIRE(!sd.find\_or\_create\_trace\_slice(4,\ open\_state::read,\ file));}
+\DoxyCodeLine{00634\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ trace4\ =\ file.get\_file\_path().filename();}
+\DoxyCodeLine{00635\ \ \ \ \ \ \ \mbox{\hyperlink{namespaceapprove_ac74141eb5bed2ad90470ab44a35d0a4f}{files}}.insert(trace4);}
+\DoxyCodeLine{00636\ \ \ \ \ \ \ BOOST\_REQUIRE(!sd.find\_or\_create\_index\_slice(5,\ open\_state::read,\ file));}
+\DoxyCodeLine{00637\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ index5\ =\ file.get\_file\_path().filename();}
+\DoxyCodeLine{00638\ \ \ \ \ \ \ \mbox{\hyperlink{namespaceapprove_ac74141eb5bed2ad90470ab44a35d0a4f}{files}}.insert(index5);}
+\DoxyCodeLine{00639\ \ \ \ \ \ \ BOOST\_REQUIRE(!sd.find\_or\_create\_trace\_slice(6,\ open\_state::read,\ file));}
+\DoxyCodeLine{00640\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ trace6\ =\ file.get\_file\_path().filename();}
+\DoxyCodeLine{00641\ \ \ \ \ \ \ \mbox{\hyperlink{namespaceapprove_ac74141eb5bed2ad90470ab44a35d0a4f}{files}}.insert(trace6);}
+\DoxyCodeLine{00642\ \ \ \ \ \ \ \mbox{\hyperlink{test__trace__file_8cpp_ac49ab2cf53f615a1a84cdef0579d6fb8}{verify\_directory\_contents}}(tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}(),\ files);}
+\DoxyCodeLine{00643\ }
+\DoxyCodeLine{00644\ \ \ \ \ \ \ \textcolor{comment}{//\ verify\ that\ the\ current\_slice\ and\ the\ previous\ are\ maintained\ as\ long\ as\ lib\ -\/\ min\_saved\_blocks\ is\ part\ of\ previous\ slice}}
+\DoxyCodeLine{00645\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ current\_slice\ =\ 6;}
+\DoxyCodeLine{00646\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ lib\ =\ current\_slice\ *\ \mbox{\hyperlink{catch__reporter__console_8cpp_a2474a5474cbff19523a51eb1de01cda4}{width}};}
+\DoxyCodeLine{00647\ \ \ \ \ \ \ sd.run\_maintenance\_tasks(lib,\ \{\});}
+\DoxyCodeLine{00648\ \ \ \ \ \ \ std::set<bfs::path>\ files2;}
+\DoxyCodeLine{00649\ \ \ \ \ \ \ files2.insert(index5);}
+\DoxyCodeLine{00650\ \ \ \ \ \ \ files2.insert(trace6);}
+\DoxyCodeLine{00651\ \ \ \ \ \ \ \mbox{\hyperlink{test__trace__file_8cpp_ac49ab2cf53f615a1a84cdef0579d6fb8}{verify\_directory\_contents}}(tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}(),\ files2);}
+\DoxyCodeLine{00652\ }
+\DoxyCodeLine{00653\ \ \ \ \ \ \ \textcolor{comment}{//\ saved\ blocks\ still\ in\ previous\ slice}}
+\DoxyCodeLine{00654\ \ \ \ \ \ \ lib\ +=\ min\_saved\_blocks\ -\/\ 1;\ \ \textcolor{comment}{//\ current\_slice\ *\ width\ +\ min\_saved\_blocks\ -\/\ 1}}
+\DoxyCodeLine{00655\ \ \ \ \ \ \ sd.run\_maintenance\_tasks(lib,\ \{\});}
+\DoxyCodeLine{00656\ \ \ \ \ \ \ \mbox{\hyperlink{test__trace__file_8cpp_ac49ab2cf53f615a1a84cdef0579d6fb8}{verify\_directory\_contents}}(tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}(),\ files2);}
+\DoxyCodeLine{00657\ }
+\DoxyCodeLine{00658\ \ \ \ \ \ \ \textcolor{comment}{//\ now\ all\ saved\ blocks\ in\ current\ slice}}
+\DoxyCodeLine{00659\ \ \ \ \ \ \ lib\ +=\ 1;\ \textcolor{comment}{//\ current\_slice\ *\ width\ +\ min\_saved\_blocks}}
+\DoxyCodeLine{00660\ \ \ \ \ \ \ sd.run\_maintenance\_tasks(lib,\ \{\});}
+\DoxyCodeLine{00661\ \ \ \ \ \ \ std::set<bfs::path>\ files3;}
+\DoxyCodeLine{00662\ \ \ \ \ \ \ files3.insert(trace6);}
+\DoxyCodeLine{00663\ \ \ \ \ \ \ \mbox{\hyperlink{test__trace__file_8cpp_ac49ab2cf53f615a1a84cdef0579d6fb8}{verify\_directory\_contents}}(tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}(),\ files3);}
+\DoxyCodeLine{00664\ }
+\DoxyCodeLine{00665\ \ \ \ \ \ \ \textcolor{comment}{//\ moving\ lib\ into\ next\ slice,\ so\ 1\ saved\ blocks\ still\ in\ 6th\ slice}}
+\DoxyCodeLine{00666\ \ \ \ \ \ \ lib\ +=\ \mbox{\hyperlink{catch__reporter__console_8cpp_a2474a5474cbff19523a51eb1de01cda4}{width}}\ -\/\ 1;}
+\DoxyCodeLine{00667\ \ \ \ \ \ \ sd.run\_maintenance\_tasks(lib,\ \{\});}
+\DoxyCodeLine{00668\ \ \ \ \ \ \ \mbox{\hyperlink{test__trace__file_8cpp_ac49ab2cf53f615a1a84cdef0579d6fb8}{verify\_directory\_contents}}(tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}(),\ files3);}
+\DoxyCodeLine{00669\ }
+\DoxyCodeLine{00670\ \ \ \ \ \ \ \textcolor{comment}{//\ moved\ last\ saved\ block\ out\ of\ 6th\ slice,\ so\ 6th\ slice\ is\ cleaned\ up}}
+\DoxyCodeLine{00671\ \ \ \ \ \ \ lib\ +=\ 1;}
+\DoxyCodeLine{00672\ \ \ \ \ \ \ sd.run\_maintenance\_tasks(lib,\ \{\});}
+\DoxyCodeLine{00673\ \ \ \ \ \ \ \mbox{\hyperlink{test__trace__file_8cpp_ac49ab2cf53f615a1a84cdef0579d6fb8}{verify\_directory\_contents}}(tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}(),\ std::set<bfs::path>());}
+\DoxyCodeLine{00674\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__trace__file_8cpp_a66729e2b0f8ef9a605dab627b7e99dc1_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__trace__file_8cpp_a87483942b91385d216d42689d0af1535}\index{test\_trace\_file.cpp@{test\_trace\_file.cpp}!BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}}
+\index{BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}!test\_trace\_file.cpp@{test\_trace\_file.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_FIXTURE\_TEST\_CASE()}{BOOST\_FIXTURE\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/13]}}
+{\footnotesize\ttfamily \label{test__trace__file_8cpp_a87483942b91385d216d42689d0af1535} 
+BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{slice\+\_\+dir\+\_\+compress}]{}{, }\item[{test\+\_\+fixture}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__trace__file_8cpp_source_l00676}{676}} of file \mbox{\hyperlink{test__trace__file_8cpp_source}{test\+\_\+trace\+\_\+file.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00677\ \ \ \ \{}
+\DoxyCodeLine{00678\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1temp__directory}{fc::temp\_directory}}\ tempdir;}
+\DoxyCodeLine{00679\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{catch__reporter__console_8cpp_a2474a5474cbff19523a51eb1de01cda4}{width}}\ =\ 10;}
+\DoxyCodeLine{00680\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ min\_uncompressed\_blocks\ =\ 5;}
+\DoxyCodeLine{00681\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory}{slice\_directory}}\ sd(tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}(),\ \mbox{\hyperlink{catch__reporter__console_8cpp_a2474a5474cbff19523a51eb1de01cda4}{width}},\ std::optional<uint32\_t>(),\ std::optional<uint32\_t>(min\_uncompressed\_blocks),\ 8);}
+\DoxyCodeLine{00682\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1cfile}{fc::cfile}}\ file;}
+\DoxyCodeLine{00683\ }
+\DoxyCodeLine{00684\ \ \ \ \ \ \ \textcolor{keyword}{using\ }file\_vector\_t\ =\ std::vector<std::tuple<bfs::path,\ bfs::path,\ bfs::path>>;}
+\DoxyCodeLine{00685\ \ \ \ \ \ \ file\_vector\_t\ file\_paths;}
+\DoxyCodeLine{00686\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ 7\ ;\ i++)\ \{}
+\DoxyCodeLine{00687\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE(!sd.find\_or\_create\_index\_slice(i,\ open\_state::read,\ file));}
+\DoxyCodeLine{00688\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ index\_name\ =\ file.get\_file\_path().filename();}
+\DoxyCodeLine{00689\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE(create\_non\_empty\_trace\_slice(sd,\ i,\ file));}
+\DoxyCodeLine{00690\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ trace\_name\ =\ file.get\_file\_path().filename();}
+\DoxyCodeLine{00691\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ compressed\_trace\_name\ =\ trace\_name;}
+\DoxyCodeLine{00692\ \ \ \ \ \ \ \ \ \ compressed\_trace\_name.replace\_extension(\textcolor{stringliteral}{"{}.clog"{}});}
+\DoxyCodeLine{00693\ \ \ \ \ \ \ \ \ \ file\_paths.emplace\_back(index\_name,\ trace\_name,\ compressed\_trace\_name);}
+\DoxyCodeLine{00694\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00695\ }
+\DoxyCodeLine{00696\ \ \ \ \ \ \ \textcolor{comment}{//\ initial\ set\ is\ only\ indices\ and\ uncompressed\ traces}}
+\DoxyCodeLine{00697\ \ \ \ \ \ \ std::set<bfs::path>\ \mbox{\hyperlink{namespaceapprove_ac74141eb5bed2ad90470ab44a35d0a4f}{files}};}
+\DoxyCodeLine{00698\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ e:\ file\_paths)\ \{}
+\DoxyCodeLine{00699\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceapprove_ac74141eb5bed2ad90470ab44a35d0a4f}{files}}.insert(std::get<0>(e));}
+\DoxyCodeLine{00700\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceapprove_ac74141eb5bed2ad90470ab44a35d0a4f}{files}}.insert(std::get<1>(e));}
+\DoxyCodeLine{00701\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00702\ \ \ \ \ \ \ \mbox{\hyperlink{test__trace__file_8cpp_ac49ab2cf53f615a1a84cdef0579d6fb8}{verify\_directory\_contents}}(tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}(),\ files);}
+\DoxyCodeLine{00703\ }
+\DoxyCodeLine{00704\ \ \ \ \ \ \ \textcolor{comment}{//\ verify\ no\ change\ up\ to\ the\ last\ block\ before\ a\ slice\ becomes\ compressible}}
+\DoxyCodeLine{00705\ \ \ \ \ \ \ sd.run\_maintenance\_tasks(14,\ \{\});}
+\DoxyCodeLine{00706\ \ \ \ \ \ \ \mbox{\hyperlink{test__trace__file_8cpp_ac49ab2cf53f615a1a84cdef0579d6fb8}{verify\_directory\_contents}}(tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}(),\ files);}
+\DoxyCodeLine{00707\ }
+\DoxyCodeLine{00708\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (std::size\_t\ reps\ =\ 0;\ reps\ <\ file\_paths.size();\ reps++)\ \{}
+\DoxyCodeLine{00709\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ \ leading\ edge,}}
+\DoxyCodeLine{00710\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ \ compresses\ one\ slice}}
+\DoxyCodeLine{00711\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceapprove_ac74141eb5bed2ad90470ab44a35d0a4f}{files}}.erase(std::get<1>(file\_paths.at(reps)));}
+\DoxyCodeLine{00712\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceapprove_ac74141eb5bed2ad90470ab44a35d0a4f}{files}}.insert(std::get<2>(file\_paths.at(reps)));}
+\DoxyCodeLine{00713\ }
+\DoxyCodeLine{00714\ \ \ \ \ \ \ \ \ \ sd.run\_maintenance\_tasks(15\ +\ (reps\ *\ \mbox{\hyperlink{catch__reporter__console_8cpp_a2474a5474cbff19523a51eb1de01cda4}{width}}),\ \{\});}
+\DoxyCodeLine{00715\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{test__trace__file_8cpp_ac49ab2cf53f615a1a84cdef0579d6fb8}{verify\_directory\_contents}}(tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}(),\ files);}
+\DoxyCodeLine{00716\ }
+\DoxyCodeLine{00717\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ trailing\ edge,\ no\ change}}
+\DoxyCodeLine{00718\ \ \ \ \ \ \ \ \ \ sd.run\_maintenance\_tasks(24\ +\ (reps\ *\ \mbox{\hyperlink{catch__reporter__console_8cpp_a2474a5474cbff19523a51eb1de01cda4}{width}}),\ \{\});}
+\DoxyCodeLine{00719\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{test__trace__file_8cpp_ac49ab2cf53f615a1a84cdef0579d6fb8}{verify\_directory\_contents}}(tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}(),\ files);}
+\DoxyCodeLine{00720\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00721\ }
+\DoxyCodeLine{00722\ \ \ \ \ \ \ \textcolor{comment}{//\ make\ sure\ the\ test\ is\ correct\ and\ and\ no\ uncompressed\ files\ remain}}
+\DoxyCodeLine{00723\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ e:\ file\_paths)\ \{}
+\DoxyCodeLine{00724\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(\mbox{\hyperlink{namespaceapprove_ac74141eb5bed2ad90470ab44a35d0a4f}{files}}.count(std::get<0>(e)),\ 1);}
+\DoxyCodeLine{00725\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(\mbox{\hyperlink{namespaceapprove_ac74141eb5bed2ad90470ab44a35d0a4f}{files}}.count(std::get<1>(e)),\ 0);}
+\DoxyCodeLine{00726\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(\mbox{\hyperlink{namespaceapprove_ac74141eb5bed2ad90470ab44a35d0a4f}{files}}.count(std::get<2>(e)),\ 1);}
+\DoxyCodeLine{00727\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00728\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__trace__file_8cpp_a87483942b91385d216d42689d0af1535_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__trace__file_8cpp_ae06d4153674bd514a96d7a5e6f743f16}\index{test\_trace\_file.cpp@{test\_trace\_file.cpp}!BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}}
+\index{BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}!test\_trace\_file.cpp@{test\_trace\_file.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_FIXTURE\_TEST\_CASE()}{BOOST\_FIXTURE\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [3/13]}}
+{\footnotesize\ttfamily \label{test__trace__file_8cpp_ae06d4153674bd514a96d7a5e6f743f16} 
+BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{slice\+\_\+dir\+\_\+compress\+\_\+and\+\_\+delete}]{}{, }\item[{test\+\_\+fixture}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__trace__file_8cpp_source_l00730}{730}} of file \mbox{\hyperlink{test__trace__file_8cpp_source}{test\+\_\+trace\+\_\+file.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00731\ \ \ \ \{}
+\DoxyCodeLine{00732\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1temp__directory}{fc::temp\_directory}}\ tempdir;}
+\DoxyCodeLine{00733\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{catch__reporter__console_8cpp_a2474a5474cbff19523a51eb1de01cda4}{width}}\ =\ 10;}
+\DoxyCodeLine{00734\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ min\_uncompressed\_blocks\ =\ 5;}
+\DoxyCodeLine{00735\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ min\_saved\_blocks\ =\ min\_uncompressed\_blocks\ +\ \mbox{\hyperlink{catch__reporter__console_8cpp_a2474a5474cbff19523a51eb1de01cda4}{width}};}
+\DoxyCodeLine{00736\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory}{slice\_directory}}\ sd(tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}(),\ \mbox{\hyperlink{catch__reporter__console_8cpp_a2474a5474cbff19523a51eb1de01cda4}{width}},\ std::optional<uint32\_t>(min\_saved\_blocks),\ std::optional<uint32\_t>(min\_uncompressed\_blocks),\ 8);}
+\DoxyCodeLine{00737\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1cfile}{fc::cfile}}\ file;}
+\DoxyCodeLine{00738\ }
+\DoxyCodeLine{00739\ \ \ \ \ \ \ \textcolor{keyword}{using\ }file\_vector\_t\ =\ std::vector<std::tuple<bfs::path,\ bfs::path,\ bfs::path>>;}
+\DoxyCodeLine{00740\ \ \ \ \ \ \ file\_vector\_t\ file\_paths;}
+\DoxyCodeLine{00741\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ 7\ ;\ i++)\ \{}
+\DoxyCodeLine{00742\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE(!sd.find\_or\_create\_index\_slice(i,\ open\_state::read,\ file));}
+\DoxyCodeLine{00743\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ index\_name\ =\ file.get\_file\_path().filename();}
+\DoxyCodeLine{00744\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE(create\_non\_empty\_trace\_slice(sd,\ i,\ file));}
+\DoxyCodeLine{00745\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ trace\_name\ =\ file.get\_file\_path().filename();}
+\DoxyCodeLine{00746\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ compressed\_trace\_name\ =\ trace\_name;}
+\DoxyCodeLine{00747\ \ \ \ \ \ \ \ \ \ compressed\_trace\_name.replace\_extension(\textcolor{stringliteral}{"{}.clog"{}});}
+\DoxyCodeLine{00748\ \ \ \ \ \ \ \ \ \ file\_paths.emplace\_back(index\_name,\ trace\_name,\ compressed\_trace\_name);}
+\DoxyCodeLine{00749\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00750\ }
+\DoxyCodeLine{00751\ \ \ \ \ \ \ \textcolor{comment}{//\ initial\ set\ is\ only\ indices\ and\ uncompressed\ traces}}
+\DoxyCodeLine{00752\ \ \ \ \ \ \ std::set<bfs::path>\ \mbox{\hyperlink{namespaceapprove_ac74141eb5bed2ad90470ab44a35d0a4f}{files}};}
+\DoxyCodeLine{00753\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ e:\ file\_paths)\ \{}
+\DoxyCodeLine{00754\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceapprove_ac74141eb5bed2ad90470ab44a35d0a4f}{files}}.insert(std::get<0>(e));}
+\DoxyCodeLine{00755\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceapprove_ac74141eb5bed2ad90470ab44a35d0a4f}{files}}.insert(std::get<1>(e));}
+\DoxyCodeLine{00756\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00757\ \ \ \ \ \ \ \mbox{\hyperlink{test__trace__file_8cpp_ac49ab2cf53f615a1a84cdef0579d6fb8}{verify\_directory\_contents}}(tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}(),\ files);}
+\DoxyCodeLine{00758\ }
+\DoxyCodeLine{00759\ \ \ \ \ \ \ \textcolor{comment}{//\ verify\ no\ change\ up\ to\ the\ last\ block\ before\ a\ slice\ becomes\ compressible}}
+\DoxyCodeLine{00760\ \ \ \ \ \ \ sd.run\_maintenance\_tasks(14,\ \{\});}
+\DoxyCodeLine{00761\ \ \ \ \ \ \ \mbox{\hyperlink{test__trace__file_8cpp_ac49ab2cf53f615a1a84cdef0579d6fb8}{verify\_directory\_contents}}(tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}(),\ files);}
+\DoxyCodeLine{00762\ }
+\DoxyCodeLine{00763\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (std::size\_t\ reps\ =\ 0;\ reps\ <\ file\_paths.size()\ +\ 1;\ reps++)\ \{}
+\DoxyCodeLine{00764\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ \ leading\ edge,}}
+\DoxyCodeLine{00765\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ \ compresses\ one\ slice\ IF\ its\ not\ past\ the\ end\ of\ our\ test,}}
+\DoxyCodeLine{00766\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (reps\ <\ file\_paths.size())\ \{}
+\DoxyCodeLine{00767\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceapprove_ac74141eb5bed2ad90470ab44a35d0a4f}{files}}.erase(std::get<1>(file\_paths.at(reps)));}
+\DoxyCodeLine{00768\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceapprove_ac74141eb5bed2ad90470ab44a35d0a4f}{files}}.insert(std::get<2>(file\_paths.at(reps)));}
+\DoxyCodeLine{00769\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00770\ }
+\DoxyCodeLine{00771\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ removes\ one\ IF\ its\ not\ the\ first}}
+\DoxyCodeLine{00772\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (reps\ >\ 0)\ \{}
+\DoxyCodeLine{00773\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceapprove_ac74141eb5bed2ad90470ab44a35d0a4f}{files}}.erase(std::get<0>(file\_paths.at(reps-\/1)));}
+\DoxyCodeLine{00774\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceapprove_ac74141eb5bed2ad90470ab44a35d0a4f}{files}}.erase(std::get<2>(file\_paths.at(reps-\/1)));}
+\DoxyCodeLine{00775\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00776\ \ \ \ \ \ \ \ \ \ sd.run\_maintenance\_tasks(15\ +\ (reps\ *\ \mbox{\hyperlink{catch__reporter__console_8cpp_a2474a5474cbff19523a51eb1de01cda4}{width}}),\ \{\});}
+\DoxyCodeLine{00777\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{test__trace__file_8cpp_ac49ab2cf53f615a1a84cdef0579d6fb8}{verify\_directory\_contents}}(tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}(),\ files);}
+\DoxyCodeLine{00778\ }
+\DoxyCodeLine{00779\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ trailing\ edge,\ no\ change}}
+\DoxyCodeLine{00780\ \ \ \ \ \ \ \ \ \ sd.run\_maintenance\_tasks(24\ +\ (reps\ *\ \mbox{\hyperlink{catch__reporter__console_8cpp_a2474a5474cbff19523a51eb1de01cda4}{width}}),\ \{\});}
+\DoxyCodeLine{00781\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{test__trace__file_8cpp_ac49ab2cf53f615a1a84cdef0579d6fb8}{verify\_directory\_contents}}(tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}(),\ files);}
+\DoxyCodeLine{00782\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00783\ }
+\DoxyCodeLine{00784\ \ \ \ \ \ \ \textcolor{comment}{//\ make\ sure\ the\ test\ is\ correct\ and\ ran\ through\ the\ permutations}}
+\DoxyCodeLine{00785\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(\mbox{\hyperlink{namespaceapprove_ac74141eb5bed2ad90470ab44a35d0a4f}{files}}.size(),\ 0);}
+\DoxyCodeLine{00786\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__trace__file_8cpp_ae06d4153674bd514a96d7a5e6f743f16_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__trace__file_8cpp_a5e1b80e8551bf5d0081e1828243dc423}\index{test\_trace\_file.cpp@{test\_trace\_file.cpp}!BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}}
+\index{BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}!test\_trace\_file.cpp@{test\_trace\_file.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_FIXTURE\_TEST\_CASE()}{BOOST\_FIXTURE\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [4/13]}}
+{\footnotesize\ttfamily \label{test__trace__file_8cpp_a5e1b80e8551bf5d0081e1828243dc423} 
+BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{slice\+\_\+file}]{}{, }\item[{test\+\_\+fixture}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__trace__file_8cpp_source_l00407}{407}} of file \mbox{\hyperlink{test__trace__file_8cpp_source}{test\+\_\+trace\+\_\+file.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00408\ \ \ \ \{}
+\DoxyCodeLine{00409\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1temp__directory}{fc::temp\_directory}}\ tempdir;}
+\DoxyCodeLine{00410\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory}{slice\_directory}}\ sd(tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}(),\ 100,\ std::optional<uint32\_t>(),\ std::optional<uint32\_t>(),\ 0);}
+\DoxyCodeLine{00411\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1cfile}{fc::cfile}}\ slice;}
+\DoxyCodeLine{00412\ }
+\DoxyCodeLine{00413\ \ \ \ \ \ \ \textcolor{comment}{//\ create\ trace\ slices}}
+\DoxyCodeLine{00414\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (uint\ i\ =\ 0;\ i\ <\ 9;\ ++i)\ \{}
+\DoxyCodeLine{00415\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ found\ =\ sd.find\_or\_create\_trace\_slice(i,\ open\_state::write,\ slice);}
+\DoxyCodeLine{00416\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE(!found);}
+\DoxyCodeLine{00417\ \ \ \ \ \ \ \ \ \ bfs::path\ fp\ =\ slice.\mbox{\hyperlink{classfc_1_1cfile_aba9b5dcf06d12cc653b8eb4224351ff7}{get\_file\_path}}();}
+\DoxyCodeLine{00418\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(fp.parent\_path().generic\_string(),\ tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}().\mbox{\hyperlink{classfc_1_1path_ab1eae2062df4ea01435348ec52fb3784}{generic\_string}}());}
+\DoxyCodeLine{00419\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::string\ expected\_filename\ =\ \textcolor{stringliteral}{"{}trace\_0000000"{}}\ +\ std::to\_string(i)\ +\ \textcolor{stringliteral}{"{}00-\/0000000"{}}\ +\ std::to\_string(i+1)\ +\ \textcolor{stringliteral}{"{}00.log"{}};}
+\DoxyCodeLine{00420\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(fp.filename().generic\_string(),\ expected\_filename);}
+\DoxyCodeLine{00421\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE(slice.\mbox{\hyperlink{classfc_1_1cfile_ae5cdb4f43248d08842f7420b48534863}{is\_open}}());}
+\DoxyCodeLine{00422\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(bfs::file\_size(fp),\ 0);}
+\DoxyCodeLine{00423\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(slice.\mbox{\hyperlink{classfc_1_1cfile_abc92fc8d64550b772a69ca1b63f75bfb}{tellp}}(),\ 0);}
+\DoxyCodeLine{00424\ \ \ \ \ \ \ \ \ \ slice.\mbox{\hyperlink{classfc_1_1cfile_a25b3bbb8ed2f690b750a197380153985}{close}}();}
+\DoxyCodeLine{00425\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00426\ }
+\DoxyCodeLine{00427\ \ \ \ \ \ \ \textcolor{comment}{//\ create\ trace\ index\ slices}}
+\DoxyCodeLine{00428\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (uint\ i\ =\ 0;\ i\ <\ 9;\ ++i)\ \{}
+\DoxyCodeLine{00429\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ found\ =\ sd.find\_or\_create\_index\_slice(i,\ open\_state::write,\ slice);}
+\DoxyCodeLine{00430\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE(!found);}
+\DoxyCodeLine{00431\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1path}{fc::path}}\ fp\ =\ slice.\mbox{\hyperlink{classfc_1_1cfile_aba9b5dcf06d12cc653b8eb4224351ff7}{get\_file\_path}}();}
+\DoxyCodeLine{00432\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(fp.\mbox{\hyperlink{classfc_1_1path_a10985bab813b9197980458e4345d0f36}{parent\_path}}().\mbox{\hyperlink{classfc_1_1path_ab1eae2062df4ea01435348ec52fb3784}{generic\_string}}(),\ tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}().\mbox{\hyperlink{classfc_1_1path_ab1eae2062df4ea01435348ec52fb3784}{generic\_string}}());}
+\DoxyCodeLine{00433\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::string\ expected\_filename\ =\ \textcolor{stringliteral}{"{}trace\_index\_0000000"{}}\ +\ std::to\_string(i)\ +\ \textcolor{stringliteral}{"{}00-\/0000000"{}}\ +\ std::to\_string(i+1)\ +\ \textcolor{stringliteral}{"{}00.log"{}};}
+\DoxyCodeLine{00434\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(fp.\mbox{\hyperlink{classfc_1_1path_a1e6beb6e05c3f6d6f699c1c448c4b1d6}{filename}}().\mbox{\hyperlink{classfc_1_1path_ab1eae2062df4ea01435348ec52fb3784}{generic\_string}}(),\ expected\_filename);}
+\DoxyCodeLine{00435\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE(slice.\mbox{\hyperlink{classfc_1_1cfile_ae5cdb4f43248d08842f7420b48534863}{is\_open}}());}
+\DoxyCodeLine{00436\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1trace__api_1_1slice__directory_1_1index__header}{slice\_directory::index\_header}}\ h;}
+\DoxyCodeLine{00437\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ data\ =\ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(h);}
+\DoxyCodeLine{00438\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(bfs::file\_size(fp),\ data.size());}
+\DoxyCodeLine{00439\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(slice.\mbox{\hyperlink{classfc_1_1cfile_abc92fc8d64550b772a69ca1b63f75bfb}{tellp}}(),\ data.size());}
+\DoxyCodeLine{00440\ \ \ \ \ \ \ \ \ \ slice.\mbox{\hyperlink{classfc_1_1cfile_a25b3bbb8ed2f690b750a197380153985}{close}}();}
+\DoxyCodeLine{00441\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00442\ }
+\DoxyCodeLine{00443\ \ \ \ \ \ \ \textcolor{comment}{//\ reopen\ trace\ slice\ for\ append}}
+\DoxyCodeLine{00444\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ found\ =\ sd.find\_or\_create\_trace\_slice(0,\ open\_state::write,\ slice);}
+\DoxyCodeLine{00445\ \ \ \ \ \ \ BOOST\_REQUIRE(found);}
+\DoxyCodeLine{00446\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1path}{fc::path}}\ fp\ =\ slice.\mbox{\hyperlink{classfc_1_1cfile_aba9b5dcf06d12cc653b8eb4224351ff7}{get\_file\_path}}();}
+\DoxyCodeLine{00447\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(fp.\mbox{\hyperlink{classfc_1_1path_a10985bab813b9197980458e4345d0f36}{parent\_path}}().\mbox{\hyperlink{classfc_1_1path_ab1eae2062df4ea01435348ec52fb3784}{generic\_string}}(),\ tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}().\mbox{\hyperlink{classfc_1_1path_ab1eae2062df4ea01435348ec52fb3784}{generic\_string}}());}
+\DoxyCodeLine{00448\ \ \ \ \ \ \ std::string\ expected\_filename\ =\ \textcolor{stringliteral}{"{}trace\_0000000000-\/0000000100.log"{}};}
+\DoxyCodeLine{00449\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(fp.\mbox{\hyperlink{classfc_1_1path_a1e6beb6e05c3f6d6f699c1c448c4b1d6}{filename}}().\mbox{\hyperlink{classfc_1_1path_ab1eae2062df4ea01435348ec52fb3784}{generic\_string}}(),\ expected\_filename);}
+\DoxyCodeLine{00450\ \ \ \ \ \ \ BOOST\_REQUIRE(slice.\mbox{\hyperlink{classfc_1_1cfile_ae5cdb4f43248d08842f7420b48534863}{is\_open}}());}
+\DoxyCodeLine{00451\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(bfs::file\_size(fp),\ 0);}
+\DoxyCodeLine{00452\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(slice.\mbox{\hyperlink{classfc_1_1cfile_abc92fc8d64550b772a69ca1b63f75bfb}{tellp}}(),\ 0);}
+\DoxyCodeLine{00453\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ offset\ =\ append\_store(bt\_v1,\ slice);}
+\DoxyCodeLine{00454\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(offset,\ 0);}
+\DoxyCodeLine{00455\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ data\ =\ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(bt\_v1);}
+\DoxyCodeLine{00456\ \ \ \ \ \ \ BOOST\_REQUIRE(slice.\mbox{\hyperlink{classfc_1_1cfile_abc92fc8d64550b772a69ca1b63f75bfb}{tellp}}()\ >\ 0);}
+\DoxyCodeLine{00457\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(data.size(),\ slice.\mbox{\hyperlink{classfc_1_1cfile_abc92fc8d64550b772a69ca1b63f75bfb}{tellp}}());}
+\DoxyCodeLine{00458\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(bfs::file\_size(fp),\ slice.\mbox{\hyperlink{classfc_1_1cfile_abc92fc8d64550b772a69ca1b63f75bfb}{tellp}}());}
+\DoxyCodeLine{00459\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ trace\_file\_size\ =\ bfs::file\_size(fp);}
+\DoxyCodeLine{00460\ \ \ \ \ \ \ slice.\mbox{\hyperlink{classfc_1_1cfile_a25b3bbb8ed2f690b750a197380153985}{close}}();}
+\DoxyCodeLine{00461\ }
+\DoxyCodeLine{00462\ \ \ \ \ \ \ \textcolor{comment}{//\ open\ same\ file\ for\ read}}
+\DoxyCodeLine{00463\ \ \ \ \ \ \ found\ =\ sd.find\_or\_create\_trace\_slice(0,\ open\_state::read,\ slice);}
+\DoxyCodeLine{00464\ \ \ \ \ \ \ BOOST\_REQUIRE(found);}
+\DoxyCodeLine{00465\ \ \ \ \ \ \ fp\ =\ slice.\mbox{\hyperlink{classfc_1_1cfile_aba9b5dcf06d12cc653b8eb4224351ff7}{get\_file\_path}}();}
+\DoxyCodeLine{00466\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(fp.\mbox{\hyperlink{classfc_1_1path_a1e6beb6e05c3f6d6f699c1c448c4b1d6}{filename}}().\mbox{\hyperlink{classfc_1_1path_ab1eae2062df4ea01435348ec52fb3784}{generic\_string}}(),\ expected\_filename);}
+\DoxyCodeLine{00467\ \ \ \ \ \ \ BOOST\_REQUIRE(slice.\mbox{\hyperlink{classfc_1_1cfile_ae5cdb4f43248d08842f7420b48534863}{is\_open}}());}
+\DoxyCodeLine{00468\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(bfs::file\_size(fp),\ trace\_file\_size);}
+\DoxyCodeLine{00469\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(slice.\mbox{\hyperlink{classfc_1_1cfile_abc92fc8d64550b772a69ca1b63f75bfb}{tellp}}(),\ 0);}
+\DoxyCodeLine{00470\ \ \ \ \ \ \ slice.\mbox{\hyperlink{classfc_1_1cfile_a25b3bbb8ed2f690b750a197380153985}{close}}();}
+\DoxyCodeLine{00471\ }
+\DoxyCodeLine{00472\ \ \ \ \ \ \ \textcolor{comment}{//\ open\ same\ file\ for\ append\ again}}
+\DoxyCodeLine{00473\ \ \ \ \ \ \ found\ =\ sd.find\_or\_create\_trace\_slice(0,\ open\_state::write,\ slice);}
+\DoxyCodeLine{00474\ \ \ \ \ \ \ BOOST\_REQUIRE(found);}
+\DoxyCodeLine{00475\ \ \ \ \ \ \ fp\ =\ slice.\mbox{\hyperlink{classfc_1_1cfile_aba9b5dcf06d12cc653b8eb4224351ff7}{get\_file\_path}}();}
+\DoxyCodeLine{00476\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(fp.\mbox{\hyperlink{classfc_1_1path_a1e6beb6e05c3f6d6f699c1c448c4b1d6}{filename}}().\mbox{\hyperlink{classfc_1_1path_ab1eae2062df4ea01435348ec52fb3784}{generic\_string}}(),\ expected\_filename);}
+\DoxyCodeLine{00477\ \ \ \ \ \ \ BOOST\_REQUIRE(slice.\mbox{\hyperlink{classfc_1_1cfile_ae5cdb4f43248d08842f7420b48534863}{is\_open}}());}
+\DoxyCodeLine{00478\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(bfs::file\_size(fp),\ trace\_file\_size);}
+\DoxyCodeLine{00479\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(slice.\mbox{\hyperlink{classfc_1_1cfile_abc92fc8d64550b772a69ca1b63f75bfb}{tellp}}(),\ trace\_file\_size);}
+\DoxyCodeLine{00480\ \ \ \ \ \ \ slice.\mbox{\hyperlink{classfc_1_1cfile_a25b3bbb8ed2f690b750a197380153985}{close}}();}
+\DoxyCodeLine{00481\ }
+\DoxyCodeLine{00482\ \ \ \ \ \ \ \textcolor{comment}{//\ reopen\ trace\ index\ slice\ for\ append}}
+\DoxyCodeLine{00483\ \ \ \ \ \ \ found\ =\ sd.find\_or\_create\_index\_slice(1,\ open\_state::write,\ slice);}
+\DoxyCodeLine{00484\ \ \ \ \ \ \ BOOST\_REQUIRE(found);}
+\DoxyCodeLine{00485\ \ \ \ \ \ \ fp\ =\ slice.\mbox{\hyperlink{classfc_1_1cfile_aba9b5dcf06d12cc653b8eb4224351ff7}{get\_file\_path}}();}
+\DoxyCodeLine{00486\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(fp.\mbox{\hyperlink{classfc_1_1path_a10985bab813b9197980458e4345d0f36}{parent\_path}}().\mbox{\hyperlink{classfc_1_1path_ab1eae2062df4ea01435348ec52fb3784}{generic\_string}}(),\ tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}().\mbox{\hyperlink{classfc_1_1path_ab1eae2062df4ea01435348ec52fb3784}{generic\_string}}());}
+\DoxyCodeLine{00487\ \ \ \ \ \ \ expected\_filename\ =\ \textcolor{stringliteral}{"{}trace\_index\_0000000100-\/0000000200.log"{}};}
+\DoxyCodeLine{00488\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(fp.\mbox{\hyperlink{classfc_1_1path_a1e6beb6e05c3f6d6f699c1c448c4b1d6}{filename}}().\mbox{\hyperlink{classfc_1_1path_ab1eae2062df4ea01435348ec52fb3784}{generic\_string}}(),\ expected\_filename);}
+\DoxyCodeLine{00489\ \ \ \ \ \ \ BOOST\_REQUIRE(slice.\mbox{\hyperlink{classfc_1_1cfile_ae5cdb4f43248d08842f7420b48534863}{is\_open}}());}
+\DoxyCodeLine{00490\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1trace__api_1_1slice__directory_1_1index__header}{slice\_directory::index\_header}}\ h;}
+\DoxyCodeLine{00491\ \ \ \ \ \ \ data\ =\ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(h);}
+\DoxyCodeLine{00492\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{namespacechainbase_a3553db3334a3279bf83b5951ab9be322}{header\_size}}\ =\ data.size();}
+\DoxyCodeLine{00493\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(bfs::file\_size(fp),\ header\_size);}
+\DoxyCodeLine{00494\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(slice.\mbox{\hyperlink{classfc_1_1cfile_abc92fc8d64550b772a69ca1b63f75bfb}{tellp}}(),\ header\_size);}
+\DoxyCodeLine{00495\ \ \ \ \ \ \ offset\ =\ append\_store(be1,\ slice);}
+\DoxyCodeLine{00496\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(offset,\ header\_size);}
+\DoxyCodeLine{00497\ \ \ \ \ \ \ data\ =\ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(be1);}
+\DoxyCodeLine{00498\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ be1\_size\ =\ data.size();}
+\DoxyCodeLine{00499\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(header\_size\ +\ be1\_size,\ slice.\mbox{\hyperlink{classfc_1_1cfile_abc92fc8d64550b772a69ca1b63f75bfb}{tellp}}());}
+\DoxyCodeLine{00500\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(bfs::file\_size(fp),\ slice.\mbox{\hyperlink{classfc_1_1cfile_abc92fc8d64550b772a69ca1b63f75bfb}{tellp}}());}
+\DoxyCodeLine{00501\ \ \ \ \ \ \ slice.\mbox{\hyperlink{classfc_1_1cfile_a25b3bbb8ed2f690b750a197380153985}{close}}();}
+\DoxyCodeLine{00502\ }
+\DoxyCodeLine{00503\ \ \ \ \ \ \ found\ =\ sd.find\_or\_create\_index\_slice(1,\ open\_state::read,\ slice);}
+\DoxyCodeLine{00504\ \ \ \ \ \ \ BOOST\_REQUIRE(found);}
+\DoxyCodeLine{00505\ \ \ \ \ \ \ fp\ =\ slice.\mbox{\hyperlink{classfc_1_1cfile_aba9b5dcf06d12cc653b8eb4224351ff7}{get\_file\_path}}();}
+\DoxyCodeLine{00506\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(fp.\mbox{\hyperlink{classfc_1_1path_a1e6beb6e05c3f6d6f699c1c448c4b1d6}{filename}}().\mbox{\hyperlink{classfc_1_1path_ab1eae2062df4ea01435348ec52fb3784}{generic\_string}}(),\ expected\_filename);}
+\DoxyCodeLine{00507\ \ \ \ \ \ \ BOOST\_REQUIRE(slice.\mbox{\hyperlink{classfc_1_1cfile_ae5cdb4f43248d08842f7420b48534863}{is\_open}}());}
+\DoxyCodeLine{00508\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(bfs::file\_size(fp),\ header\_size\ +\ be1\_size);}
+\DoxyCodeLine{00509\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(slice.\mbox{\hyperlink{classfc_1_1cfile_abc92fc8d64550b772a69ca1b63f75bfb}{tellp}}(),\ header\_size);}
+\DoxyCodeLine{00510\ \ \ \ \ \ \ slice.\mbox{\hyperlink{classfc_1_1cfile_a25b3bbb8ed2f690b750a197380153985}{close}}();}
+\DoxyCodeLine{00511\ }
+\DoxyCodeLine{00512\ \ \ \ \ \ \ found\ =\ sd.find\_or\_create\_index\_slice(1,\ open\_state::write,\ slice);}
+\DoxyCodeLine{00513\ \ \ \ \ \ \ BOOST\_REQUIRE(found);}
+\DoxyCodeLine{00514\ \ \ \ \ \ \ fp\ =\ slice.\mbox{\hyperlink{classfc_1_1cfile_aba9b5dcf06d12cc653b8eb4224351ff7}{get\_file\_path}}();}
+\DoxyCodeLine{00515\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(fp.\mbox{\hyperlink{classfc_1_1path_a1e6beb6e05c3f6d6f699c1c448c4b1d6}{filename}}().\mbox{\hyperlink{classfc_1_1path_ab1eae2062df4ea01435348ec52fb3784}{generic\_string}}(),\ expected\_filename);}
+\DoxyCodeLine{00516\ \ \ \ \ \ \ BOOST\_REQUIRE(slice.\mbox{\hyperlink{classfc_1_1cfile_ae5cdb4f43248d08842f7420b48534863}{is\_open}}());}
+\DoxyCodeLine{00517\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(bfs::file\_size(fp),\ header\_size\ +\ be1\_size);}
+\DoxyCodeLine{00518\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(slice.\mbox{\hyperlink{classfc_1_1cfile_abc92fc8d64550b772a69ca1b63f75bfb}{tellp}}(),\ header\_size\ +\ be1\_size);}
+\DoxyCodeLine{00519\ \ \ \ \ \ \ offset\ =\ append\_store(le1,\ slice);}
+\DoxyCodeLine{00520\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(offset,\ header\_size\ +\ be1\_size);}
+\DoxyCodeLine{00521\ \ \ \ \ \ \ data\ =\ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(le1);}
+\DoxyCodeLine{00522\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ le1\_size\ =\ data.size();}
+\DoxyCodeLine{00523\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(header\_size\ +\ be1\_size\ +\ le1\_size,\ slice.\mbox{\hyperlink{classfc_1_1cfile_abc92fc8d64550b772a69ca1b63f75bfb}{tellp}}());}
+\DoxyCodeLine{00524\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(bfs::file\_size(fp),\ slice.\mbox{\hyperlink{classfc_1_1cfile_abc92fc8d64550b772a69ca1b63f75bfb}{tellp}}());}
+\DoxyCodeLine{00525\ \ \ \ \ \ \ slice.\mbox{\hyperlink{classfc_1_1cfile_a25b3bbb8ed2f690b750a197380153985}{close}}();}
+\DoxyCodeLine{00526\ }
+\DoxyCodeLine{00527\ \ \ \ \ \ \ found\ =\ sd.find\_or\_create\_index\_slice(1,\ open\_state::read,\ slice);}
+\DoxyCodeLine{00528\ \ \ \ \ \ \ BOOST\_REQUIRE(found);}
+\DoxyCodeLine{00529\ \ \ \ \ \ \ fp\ =\ slice.\mbox{\hyperlink{classfc_1_1cfile_aba9b5dcf06d12cc653b8eb4224351ff7}{get\_file\_path}}();}
+\DoxyCodeLine{00530\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(fp.\mbox{\hyperlink{classfc_1_1path_a1e6beb6e05c3f6d6f699c1c448c4b1d6}{filename}}().\mbox{\hyperlink{classfc_1_1path_ab1eae2062df4ea01435348ec52fb3784}{generic\_string}}(),\ expected\_filename);}
+\DoxyCodeLine{00531\ \ \ \ \ \ \ BOOST\_REQUIRE(slice.\mbox{\hyperlink{classfc_1_1cfile_ae5cdb4f43248d08842f7420b48534863}{is\_open}}());}
+\DoxyCodeLine{00532\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(bfs::file\_size(fp),\ header\_size\ +\ be1\_size\ +\ le1\_size);}
+\DoxyCodeLine{00533\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(slice.\mbox{\hyperlink{classfc_1_1cfile_abc92fc8d64550b772a69ca1b63f75bfb}{tellp}}(),\ header\_size);}
+\DoxyCodeLine{00534\ \ \ \ \ \ \ slice.\mbox{\hyperlink{classfc_1_1cfile_a25b3bbb8ed2f690b750a197380153985}{close}}();}
+\DoxyCodeLine{00535\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__trace__file_8cpp_a5e1b80e8551bf5d0081e1828243dc423_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__trace__file_8cpp_a243805af9dcac3c05356447dcec150b2}\index{test\_trace\_file.cpp@{test\_trace\_file.cpp}!BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}}
+\index{BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}!test\_trace\_file.cpp@{test\_trace\_file.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_FIXTURE\_TEST\_CASE()}{BOOST\_FIXTURE\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [5/13]}}
+{\footnotesize\ttfamily \label{test__trace__file_8cpp_a243805af9dcac3c05356447dcec150b2} 
+BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{slice\+\_\+file\+\_\+find\+\_\+test}]{}{, }\item[{test\+\_\+fixture}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__trace__file_8cpp_source_l00537}{537}} of file \mbox{\hyperlink{test__trace__file_8cpp_source}{test\+\_\+trace\+\_\+file.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00538\ \ \ \ \{}
+\DoxyCodeLine{00539\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1temp__directory}{fc::temp\_directory}}\ tempdir;}
+\DoxyCodeLine{00540\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory}{slice\_directory}}\ sd(tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}(),\ 100,\ std::optional<uint32\_t>(),\ std::optional<uint32\_t>(),\ 0);}
+\DoxyCodeLine{00541\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1cfile}{fc::cfile}}\ slice;}
+\DoxyCodeLine{00542\ }
+\DoxyCodeLine{00543\ \ \ \ \ \ \ \textcolor{comment}{//\ create\ trace\ slice}}
+\DoxyCodeLine{00544\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ found\ =\ sd.find\_or\_create\_trace\_slice(1,\ open\_state::write,\ slice);}
+\DoxyCodeLine{00545\ \ \ \ \ \ \ BOOST\_REQUIRE(!found);}
+\DoxyCodeLine{00546\ \ \ \ \ \ \ bfs::path\ fp\ =\ slice.\mbox{\hyperlink{classfc_1_1cfile_aba9b5dcf06d12cc653b8eb4224351ff7}{get\_file\_path}}();}
+\DoxyCodeLine{00547\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(fp.parent\_path().generic\_string(),\ tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}().\mbox{\hyperlink{classfc_1_1path_ab1eae2062df4ea01435348ec52fb3784}{generic\_string}}());}
+\DoxyCodeLine{00548\ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::string\ expected\_filename\ =\ \textcolor{stringliteral}{"{}trace\_0000000100-\/0000000200.log"{}};}
+\DoxyCodeLine{00549\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(fp.filename().generic\_string(),\ expected\_filename);}
+\DoxyCodeLine{00550\ \ \ \ \ \ \ BOOST\_REQUIRE(slice.\mbox{\hyperlink{classfc_1_1cfile_ae5cdb4f43248d08842f7420b48534863}{is\_open}}());}
+\DoxyCodeLine{00551\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(bfs::file\_size(fp),\ 0);}
+\DoxyCodeLine{00552\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(slice.\mbox{\hyperlink{classfc_1_1cfile_abc92fc8d64550b772a69ca1b63f75bfb}{tellp}}(),\ 0);}
+\DoxyCodeLine{00553\ \ \ \ \ \ \ slice.\mbox{\hyperlink{classfc_1_1cfile_a25b3bbb8ed2f690b750a197380153985}{close}}();}
+\DoxyCodeLine{00554\ }
+\DoxyCodeLine{00555\ \ \ \ \ \ \ \textcolor{comment}{//\ find\ trace\ slice\ (and\ open)}}
+\DoxyCodeLine{00556\ \ \ \ \ \ \ found\ =\ sd.find\_trace\_slice(1,\ open\_state::write,\ slice);}
+\DoxyCodeLine{00557\ \ \ \ \ \ \ BOOST\_REQUIRE(found);}
+\DoxyCodeLine{00558\ \ \ \ \ \ \ fp\ =\ slice.\mbox{\hyperlink{classfc_1_1cfile_aba9b5dcf06d12cc653b8eb4224351ff7}{get\_file\_path}}();}
+\DoxyCodeLine{00559\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(fp.parent\_path().generic\_string(),\ tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}().\mbox{\hyperlink{classfc_1_1path_ab1eae2062df4ea01435348ec52fb3784}{generic\_string}}());}
+\DoxyCodeLine{00560\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(fp.filename().generic\_string(),\ expected\_filename);}
+\DoxyCodeLine{00561\ \ \ \ \ \ \ BOOST\_REQUIRE(slice.\mbox{\hyperlink{classfc_1_1cfile_ae5cdb4f43248d08842f7420b48534863}{is\_open}}());}
+\DoxyCodeLine{00562\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(bfs::file\_size(fp),\ 0);}
+\DoxyCodeLine{00563\ \ \ \ \ \ \ slice.\mbox{\hyperlink{classfc_1_1cfile_a25b3bbb8ed2f690b750a197380153985}{close}}();}
+\DoxyCodeLine{00564\ }
+\DoxyCodeLine{00565\ \ \ \ \ \ \ \textcolor{comment}{//\ find\ trace\ slice\ (and\ don't\ open)}}
+\DoxyCodeLine{00566\ \ \ \ \ \ \ found\ =\ sd.find\_trace\_slice(1,\ open\_state::write,\ slice,\ \textcolor{keyword}{false});}
+\DoxyCodeLine{00567\ \ \ \ \ \ \ BOOST\_REQUIRE(found);}
+\DoxyCodeLine{00568\ \ \ \ \ \ \ fp\ =\ slice.\mbox{\hyperlink{classfc_1_1cfile_aba9b5dcf06d12cc653b8eb4224351ff7}{get\_file\_path}}();}
+\DoxyCodeLine{00569\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(fp.parent\_path().generic\_string(),\ tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}().\mbox{\hyperlink{classfc_1_1path_ab1eae2062df4ea01435348ec52fb3784}{generic\_string}}());}
+\DoxyCodeLine{00570\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(fp.filename().generic\_string(),\ expected\_filename);}
+\DoxyCodeLine{00571\ \ \ \ \ \ \ BOOST\_REQUIRE(!slice.\mbox{\hyperlink{classfc_1_1cfile_ae5cdb4f43248d08842f7420b48534863}{is\_open}}());}
+\DoxyCodeLine{00572\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(bfs::file\_size(fp),\ 0);}
+\DoxyCodeLine{00573\ \ \ \ \ \ \ slice.\mbox{\hyperlink{classfc_1_1cfile_a25b3bbb8ed2f690b750a197380153985}{close}}();}
+\DoxyCodeLine{00574\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__trace__file_8cpp_a243805af9dcac3c05356447dcec150b2_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__trace__file_8cpp_ab71d7ab106f333fc4a26cbd547f5acc9}\index{test\_trace\_file.cpp@{test\_trace\_file.cpp}!BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}}
+\index{BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}!test\_trace\_file.cpp@{test\_trace\_file.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_FIXTURE\_TEST\_CASE()}{BOOST\_FIXTURE\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [6/13]}}
+{\footnotesize\ttfamily \label{test__trace__file_8cpp_ab71d7ab106f333fc4a26cbd547f5acc9} 
+BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{slice\+\_\+number}]{}{, }\item[{test\+\_\+fixture}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__trace__file_8cpp_source_l00394}{394}} of file \mbox{\hyperlink{test__trace__file_8cpp_source}{test\+\_\+trace\+\_\+file.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00395\ \ \ \ \{}
+\DoxyCodeLine{00396\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1temp__directory}{fc::temp\_directory}}\ tempdir;}
+\DoxyCodeLine{00397\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory}{slice\_directory}}\ sd(tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}(),\ 100,\ std::optional<uint32\_t>(),\ std::optional<uint32\_t>(),\ 0);}
+\DoxyCodeLine{00398\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(sd.slice\_number(99),\ 0);}
+\DoxyCodeLine{00399\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(sd.slice\_number(100),\ 1);}
+\DoxyCodeLine{00400\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(sd.slice\_number(1599),\ 15);}
+\DoxyCodeLine{00401\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory}{slice\_directory}}\ sd2(tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}(),\ 0x10,\ std::optional<uint32\_t>(),\ std::optional<uint32\_t>(),\ 0);}
+\DoxyCodeLine{00402\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(sd2.slice\_number(0xf),\ 0);}
+\DoxyCodeLine{00403\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(sd2.slice\_number(0x100),\ 0x10);}
+\DoxyCodeLine{00404\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(sd2.slice\_number(0x233),\ 0x23);}
+\DoxyCodeLine{00405\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__trace__file_8cpp_ab71d7ab106f333fc4a26cbd547f5acc9_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__trace__file_8cpp_a7e05034a45e2e97de2fbda6dcfb72665}\index{test\_trace\_file.cpp@{test\_trace\_file.cpp}!BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}}
+\index{BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}!test\_trace\_file.cpp@{test\_trace\_file.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_FIXTURE\_TEST\_CASE()}{BOOST\_FIXTURE\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [7/13]}}
+{\footnotesize\ttfamily \label{test__trace__file_8cpp_a7e05034a45e2e97de2fbda6dcfb72665} 
+BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{store\+\_\+provider\+\_\+write\+\_\+read\+\_\+v1}]{}{, }\item[{test\+\_\+fixture}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__trace__file_8cpp_source_l00788}{788}} of file \mbox{\hyperlink{test__trace__file_8cpp_source}{test\+\_\+trace\+\_\+file.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00789\ \ \ \ \{}
+\DoxyCodeLine{00790\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1temp__directory}{fc::temp\_directory}}\ tempdir;}
+\DoxyCodeLine{00791\ \ \ \ \ \ \ test\_store\_provider\ \mbox{\hyperlink{namespace_xbyak_1_1util_a9589ac8435a111d7f6b850217829e34c}{sp}}(tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}(),\ 100);}
+\DoxyCodeLine{00792\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_a9589ac8435a111d7f6b850217829e34c}{sp}}.append(bt\_v1);}
+\DoxyCodeLine{00793\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_a9589ac8435a111d7f6b850217829e34c}{sp}}.append\_lib(54);}
+\DoxyCodeLine{00794\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_a9589ac8435a111d7f6b850217829e34c}{sp}}.append(bt2\_v1);}
+\DoxyCodeLine{00795\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ bt\_bn\ =\ bt\_v1.number;}
+\DoxyCodeLine{00796\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ found\_block\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00797\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ lib\_seen\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00798\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ first\_offset\ =\ \mbox{\hyperlink{namespace_xbyak_1_1util_a9589ac8435a111d7f6b850217829e34c}{sp}}.scan\_metadata\_log\_from(9,\ 0,\ [\&](\textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1trace__api_a7a6a31e37b6c94cbd85b0f2019e2ff3c}{metadata\_log\_entry}}\&\ e)\ -\/>\ \textcolor{keywordtype}{bool}\ \{}
+\DoxyCodeLine{00799\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (std::holds\_alternative<block\_entry\_v0>(e))\ \{}
+\DoxyCodeLine{00800\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ block\ =\ std::get<block\_entry\_v0>(e);}
+\DoxyCodeLine{00801\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (block.number\ ==\ bt\_bn)\ \{}
+\DoxyCodeLine{00802\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE(!found\_block);}
+\DoxyCodeLine{00803\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ found\_block\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00804\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00805\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (std::holds\_alternative<lib\_entry\_v0>(e))\ \{}
+\DoxyCodeLine{00806\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ best\_lib\ =\ std::get<lib\_entry\_v0>(e);}
+\DoxyCodeLine{00807\ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE(!lib\_seen);}
+\DoxyCodeLine{00808\ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(best\_lib.lib,\ 54);}
+\DoxyCodeLine{00809\ \ \ \ \ \ \ \ \ \ \ \ \ lib\_seen\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00810\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00811\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00812\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00813\ \ \ \ \ \ \ \},\ []()\ \{\});}
+\DoxyCodeLine{00814\ \ \ \ \ \ \ BOOST\_REQUIRE(found\_block);}
+\DoxyCodeLine{00815\ \ \ \ \ \ \ BOOST\_REQUIRE(lib\_seen);}
+\DoxyCodeLine{00816\ }
+\DoxyCodeLine{00817\ \ \ \ \ \ \ std::vector<uint32\_t>\ block\_nums;}
+\DoxyCodeLine{00818\ \ \ \ \ \ \ std::vector<uint64\_t>\ block\_offsets;}
+\DoxyCodeLine{00819\ \ \ \ \ \ \ lib\_seen\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00820\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ offset\ =\ \mbox{\hyperlink{namespace_xbyak_1_1util_a9589ac8435a111d7f6b850217829e34c}{sp}}.scan\_metadata\_log\_from(9,\ 0,\ [\&](\textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1trace__api_a7a6a31e37b6c94cbd85b0f2019e2ff3c}{metadata\_log\_entry}}\&\ e)\ -\/>\ \textcolor{keywordtype}{bool}\ \{}
+\DoxyCodeLine{00821\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (std::holds\_alternative<block\_entry\_v0>(e))\ \{}
+\DoxyCodeLine{00822\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ block\ =\ std::get<block\_entry\_v0>(e);}
+\DoxyCodeLine{00823\ \ \ \ \ \ \ \ \ \ \ \ \ block\_nums.push\_back(block.number);}
+\DoxyCodeLine{00824\ \ \ \ \ \ \ \ \ \ \ \ \ block\_offsets.push\_back(block.offset);}
+\DoxyCodeLine{00825\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (std::holds\_alternative<lib\_entry\_v0>(e))\ \{}
+\DoxyCodeLine{00826\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ best\_lib\ =\ std::get<lib\_entry\_v0>(e);}
+\DoxyCodeLine{00827\ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE(!lib\_seen);}
+\DoxyCodeLine{00828\ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(best\_lib.lib,\ 54);}
+\DoxyCodeLine{00829\ \ \ \ \ \ \ \ \ \ \ \ \ lib\_seen\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00830\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00831\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00832\ \ \ \ \ \ \ \},\ []()\ \{\});}
+\DoxyCodeLine{00833\ \ \ \ \ \ \ BOOST\_REQUIRE(lib\_seen);}
+\DoxyCodeLine{00834\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(block\_nums.size(),\ 2);}
+\DoxyCodeLine{00835\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(block\_nums[0],\ bt\_v1.number);}
+\DoxyCodeLine{00836\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(block\_nums[1],\ bt2\_v1.number);}
+\DoxyCodeLine{00837\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(block\_offsets.size(),\ 2);}
+\DoxyCodeLine{00838\ \ \ \ \ \ \ BOOST\_REQUIRE(block\_offsets[0]\ <\ block\_offsets[1]);}
+\DoxyCodeLine{00839\ \ \ \ \ \ \ BOOST\_REQUIRE(first\_offset\ <\ offset);}
+\DoxyCodeLine{00840\ }
+\DoxyCodeLine{00841\ \ \ \ \ \ \ std::optional<data\_log\_entry>\ bt\_data\ =\ \mbox{\hyperlink{namespace_xbyak_1_1util_a9589ac8435a111d7f6b850217829e34c}{sp}}.read\_data\_log(block\_nums[0],\ block\_offsets[0]);}
+\DoxyCodeLine{00842\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(std::get<block\_trace\_v1>(*bt\_data),\ bt\_v1);}
+\DoxyCodeLine{00843\ }
+\DoxyCodeLine{00844\ \ \ \ \ \ \ bt\_data\ =\ \mbox{\hyperlink{namespace_xbyak_1_1util_a9589ac8435a111d7f6b850217829e34c}{sp}}.read\_data\_log(block\_nums[1],\ block\_offsets[1]);}
+\DoxyCodeLine{00845\ \ \ \ \ \ \ BOOST\_REQUIRE(bt\_data);}
+\DoxyCodeLine{00846\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ =\ std::variant<block\_trace\_v0,\ block\_trace\_v1,\ block\_trace\_v2>(*bt\_data);}
+\DoxyCodeLine{00847\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(std::get<block\_trace\_v1>(v),\ bt2\_v1);}
+\DoxyCodeLine{00848\ }
+\DoxyCodeLine{00849\ \ \ \ \ \ \ block\_nums.clear();}
+\DoxyCodeLine{00850\ \ \ \ \ \ \ block\_offsets.clear();}
+\DoxyCodeLine{00851\ \ \ \ \ \ \ lib\_seen\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00852\ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ counter\ =\ 0;}
+\DoxyCodeLine{00853\ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00854\ \ \ \ \ \ \ \ \ \ offset\ =\ \mbox{\hyperlink{namespace_xbyak_1_1util_a9589ac8435a111d7f6b850217829e34c}{sp}}.scan\_metadata\_log\_from(9,\ 0,\ [\&](\textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1trace__api_a7a6a31e37b6c94cbd85b0f2019e2ff3c}{metadata\_log\_entry}}\&\ e)\ -\/>\ \textcolor{keywordtype}{bool}\ \{}
+\DoxyCodeLine{00855\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (std::holds\_alternative<block\_entry\_v0>(e))\ \{}
+\DoxyCodeLine{00856\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ block\ =\ std::get<block\_entry\_v0>(e);}
+\DoxyCodeLine{00857\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ block\_nums.push\_back(block.number);}
+\DoxyCodeLine{00858\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ block\_offsets.push\_back(block.offset);}
+\DoxyCodeLine{00859\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (std::holds\_alternative<lib\_entry\_v0>(e))\ \{}
+\DoxyCodeLine{00860\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ best\_lib\ =\ std::get<lib\_entry\_v0>(e);}
+\DoxyCodeLine{00861\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE(!lib\_seen);}
+\DoxyCodeLine{00862\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(best\_lib.lib,\ 54);}
+\DoxyCodeLine{00863\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lib\_seen\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00864\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00865\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00866\ \ \ \ \ \ \ \ \ \ \},\ [\&counter]()\ \{}
+\DoxyCodeLine{00867\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ ++counter\ ==\ 3\ )\ \{}
+\DoxyCodeLine{00868\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1yield__exception}{yield\_exception}}(\textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{00869\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00870\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00871\ \ \ \ \ \ \ \ \ \ BOOST\_FAIL(\textcolor{stringliteral}{"{}Should\ not\ have\ completed\ scan"{}});}
+\DoxyCodeLine{00872\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1yield__exception}{yield\_exception}}\&\ ex)\ \{}
+\DoxyCodeLine{00873\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00874\ \ \ \ \ \ \ BOOST\_REQUIRE(lib\_seen);}
+\DoxyCodeLine{00875\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(block\_nums.size(),\ 1);}
+\DoxyCodeLine{00876\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(block\_nums[0],\ bt\_v1.number);}
+\DoxyCodeLine{00877\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(block\_offsets.size(),\ 1);}
+\DoxyCodeLine{00878\ \ \ \ \ \ \ BOOST\_REQUIRE(first\_offset\ <\ offset);}
+\DoxyCodeLine{00879\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__trace__file_8cpp_a7e05034a45e2e97de2fbda6dcfb72665_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__trace__file_8cpp_ae1fc559fc23557e8b64249fea4ea8e3d}\index{test\_trace\_file.cpp@{test\_trace\_file.cpp}!BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}}
+\index{BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}!test\_trace\_file.cpp@{test\_trace\_file.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_FIXTURE\_TEST\_CASE()}{BOOST\_FIXTURE\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [8/13]}}
+{\footnotesize\ttfamily \label{test__trace__file_8cpp_ae1fc559fc23557e8b64249fea4ea8e3d} 
+BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{store\+\_\+provider\+\_\+write\+\_\+read\+\_\+v2}]{}{, }\item[{test\+\_\+fixture}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__trace__file_8cpp_source_l00881}{881}} of file \mbox{\hyperlink{test__trace__file_8cpp_source}{test\+\_\+trace\+\_\+file.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00882\ \ \ \ \{}
+\DoxyCodeLine{00883\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1temp__directory}{fc::temp\_directory}}\ tempdir;}
+\DoxyCodeLine{00884\ \ \ \ \ \ \ test\_store\_provider\ \mbox{\hyperlink{namespace_xbyak_1_1util_a9589ac8435a111d7f6b850217829e34c}{sp}}(tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}(),\ 100);}
+\DoxyCodeLine{00885\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_a9589ac8435a111d7f6b850217829e34c}{sp}}.append(block\_trace1\_v2);}
+\DoxyCodeLine{00886\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_a9589ac8435a111d7f6b850217829e34c}{sp}}.append\_lib(54);}
+\DoxyCodeLine{00887\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_a9589ac8435a111d7f6b850217829e34c}{sp}}.append(block\_trace2\_v2);}
+\DoxyCodeLine{00888\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ bt\_bn\ =\ block\_trace1\_v2.number;}
+\DoxyCodeLine{00889\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ found\_block\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00890\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ lib\_seen\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00891\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ first\_offset\ =\ \mbox{\hyperlink{namespace_xbyak_1_1util_a9589ac8435a111d7f6b850217829e34c}{sp}}.scan\_metadata\_log\_from(9,\ 0,\ [\&](\textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1trace__api_a7a6a31e37b6c94cbd85b0f2019e2ff3c}{metadata\_log\_entry}}\&\ e)\ -\/>\ \textcolor{keywordtype}{bool}\ \{}
+\DoxyCodeLine{00892\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (std::holds\_alternative<block\_entry\_v0>(e))\ \{}
+\DoxyCodeLine{00893\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ block\ =\ std::get<block\_entry\_v0>(e);}
+\DoxyCodeLine{00894\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (block.number\ ==\ bt\_bn)\ \{}
+\DoxyCodeLine{00895\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE(!found\_block);}
+\DoxyCodeLine{00896\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ found\_block\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00897\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00898\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (std::holds\_alternative<lib\_entry\_v0>(e))\ \{}
+\DoxyCodeLine{00899\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ best\_lib\ =\ std::get<lib\_entry\_v0>(e);}
+\DoxyCodeLine{00900\ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE(!lib\_seen);}
+\DoxyCodeLine{00901\ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(best\_lib.lib,\ 54);}
+\DoxyCodeLine{00902\ \ \ \ \ \ \ \ \ \ \ \ \ lib\_seen\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00903\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00904\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00905\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00906\ \ \ \ \ \ \ \},\ []()\ \{\});}
+\DoxyCodeLine{00907\ \ \ \ \ \ \ BOOST\_REQUIRE(found\_block);}
+\DoxyCodeLine{00908\ \ \ \ \ \ \ BOOST\_REQUIRE(lib\_seen);}
+\DoxyCodeLine{00909\ }
+\DoxyCodeLine{00910\ \ \ \ \ \ \ std::vector<uint32\_t>\ block\_nums;}
+\DoxyCodeLine{00911\ \ \ \ \ \ \ std::vector<uint64\_t>\ block\_offsets;}
+\DoxyCodeLine{00912\ \ \ \ \ \ \ lib\_seen\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00913\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ offset\ =\ \mbox{\hyperlink{namespace_xbyak_1_1util_a9589ac8435a111d7f6b850217829e34c}{sp}}.scan\_metadata\_log\_from(9,\ 0,\ [\&](\textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1trace__api_a7a6a31e37b6c94cbd85b0f2019e2ff3c}{metadata\_log\_entry}}\&\ e)\ -\/>\ \textcolor{keywordtype}{bool}\ \{}
+\DoxyCodeLine{00914\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (std::holds\_alternative<block\_entry\_v0>(e))\ \{}
+\DoxyCodeLine{00915\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ block\ =\ std::get<block\_entry\_v0>(e);}
+\DoxyCodeLine{00916\ \ \ \ \ \ \ \ \ \ \ \ \ block\_nums.push\_back(block.number);}
+\DoxyCodeLine{00917\ \ \ \ \ \ \ \ \ \ \ \ \ block\_offsets.push\_back(block.offset);}
+\DoxyCodeLine{00918\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (std::holds\_alternative<lib\_entry\_v0>(e))\ \{}
+\DoxyCodeLine{00919\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ best\_lib\ =\ std::get<lib\_entry\_v0>(e);}
+\DoxyCodeLine{00920\ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE(!lib\_seen);}
+\DoxyCodeLine{00921\ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(best\_lib.lib,\ 54);}
+\DoxyCodeLine{00922\ \ \ \ \ \ \ \ \ \ \ \ \ lib\_seen\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00923\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00924\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00925\ \ \ \ \ \ \ \},\ []()\ \{\});}
+\DoxyCodeLine{00926\ \ \ \ \ \ \ BOOST\_REQUIRE(lib\_seen);}
+\DoxyCodeLine{00927\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(block\_nums.size(),\ 2);}
+\DoxyCodeLine{00928\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(block\_nums[0],\ block\_trace1\_v2.number);}
+\DoxyCodeLine{00929\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(block\_nums[1],\ block\_trace2\_v2.number);}
+\DoxyCodeLine{00930\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(block\_offsets.size(),\ 2);}
+\DoxyCodeLine{00931\ \ \ \ \ \ \ BOOST\_REQUIRE(block\_offsets[0]\ <\ block\_offsets[1]);}
+\DoxyCodeLine{00932\ \ \ \ \ \ \ BOOST\_REQUIRE(first\_offset\ <\ offset);}
+\DoxyCodeLine{00933\ }
+\DoxyCodeLine{00934\ \ \ \ \ \ \ std::optional<data\_log\_entry>\ bt\_data\ =\ \mbox{\hyperlink{namespace_xbyak_1_1util_a9589ac8435a111d7f6b850217829e34c}{sp}}.read\_data\_log(block\_nums[0],\ block\_offsets[0]);}
+\DoxyCodeLine{00935\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(std::get<block\_trace\_v2>(*bt\_data),\ block\_trace1\_v2);}
+\DoxyCodeLine{00936\ }
+\DoxyCodeLine{00937\ \ \ \ \ \ \ bt\_data\ =\ \mbox{\hyperlink{namespace_xbyak_1_1util_a9589ac8435a111d7f6b850217829e34c}{sp}}.read\_data\_log(block\_nums[1],\ block\_offsets[1]);}
+\DoxyCodeLine{00938\ \ \ \ \ \ \ BOOST\_REQUIRE(bt\_data);}
+\DoxyCodeLine{00939\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ =\ \mbox{\hyperlink{namespacesysio_1_1trace__api_a98bdcc53a9d9aa6aff851a743516c3b9}{data\_log\_entry}}(*bt\_data);}
+\DoxyCodeLine{00940\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(std::get<block\_trace\_v2>(v),\ block\_trace2\_v2);}
+\DoxyCodeLine{00941\ }
+\DoxyCodeLine{00942\ \ \ \ \ \ \ block\_nums.clear();}
+\DoxyCodeLine{00943\ \ \ \ \ \ \ block\_offsets.clear();}
+\DoxyCodeLine{00944\ \ \ \ \ \ \ lib\_seen\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00945\ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ counter\ =\ 0;}
+\DoxyCodeLine{00946\ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00947\ \ \ \ \ \ \ \ \ \ offset\ =\ \mbox{\hyperlink{namespace_xbyak_1_1util_a9589ac8435a111d7f6b850217829e34c}{sp}}.scan\_metadata\_log\_from(9,\ 0,\ [\&](\textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1trace__api_a7a6a31e37b6c94cbd85b0f2019e2ff3c}{metadata\_log\_entry}}\&\ e)\ -\/>\ \textcolor{keywordtype}{bool}\ \{}
+\DoxyCodeLine{00948\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (std::holds\_alternative<block\_entry\_v0>(e))\ \{}
+\DoxyCodeLine{00949\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ block\ =\ std::get<block\_entry\_v0>(e);}
+\DoxyCodeLine{00950\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ block\_nums.push\_back(block.number);}
+\DoxyCodeLine{00951\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ block\_offsets.push\_back(block.offset);}
+\DoxyCodeLine{00952\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (std::holds\_alternative<lib\_entry\_v0>(e))\ \{}
+\DoxyCodeLine{00953\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ best\_lib\ =\ std::get<lib\_entry\_v0>(e);}
+\DoxyCodeLine{00954\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE(!lib\_seen);}
+\DoxyCodeLine{00955\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(best\_lib.lib,\ 54);}
+\DoxyCodeLine{00956\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lib\_seen\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00957\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00958\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00959\ \ \ \ \ \ \ \ \ \ \},\ [\&counter]()\ \{}
+\DoxyCodeLine{00960\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ ++counter\ ==\ 3\ )\ \{}
+\DoxyCodeLine{00961\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1yield__exception}{yield\_exception}}(\textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{00962\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00963\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00964\ \ \ \ \ \ \ \ \ \ BOOST\_FAIL(\textcolor{stringliteral}{"{}Should\ not\ have\ completed\ scan"{}});}
+\DoxyCodeLine{00965\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1yield__exception}{yield\_exception}}\&\ ex)\ \{}
+\DoxyCodeLine{00966\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00967\ \ \ \ \ \ \ BOOST\_REQUIRE(lib\_seen);}
+\DoxyCodeLine{00968\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(block\_nums.size(),\ 1);}
+\DoxyCodeLine{00969\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(block\_nums[0],\ block\_trace1\_v2.number);}
+\DoxyCodeLine{00970\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(block\_offsets.size(),\ 1);}
+\DoxyCodeLine{00971\ \ \ \ \ \ \ BOOST\_REQUIRE(first\_offset\ <\ offset);}
+\DoxyCodeLine{00972\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__trace__file_8cpp_ae1fc559fc23557e8b64249fea4ea8e3d_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__trace__file_8cpp_aa817ae36507430bf33f82a441984be8b}\index{test\_trace\_file.cpp@{test\_trace\_file.cpp}!BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}}
+\index{BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}!test\_trace\_file.cpp@{test\_trace\_file.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_FIXTURE\_TEST\_CASE()}{BOOST\_FIXTURE\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [9/13]}}
+{\footnotesize\ttfamily \label{test__trace__file_8cpp_aa817ae36507430bf33f82a441984be8b} 
+BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{test\+\_\+get\+\_\+block\+\_\+v1}]{}{, }\item[{test\+\_\+fixture}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__trace__file_8cpp_source_l00974}{974}} of file \mbox{\hyperlink{test__trace__file_8cpp_source}{test\+\_\+trace\+\_\+file.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00975\ \ \ \ \{}
+\DoxyCodeLine{00976\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1temp__directory}{fc::temp\_directory}}\ tempdir;}
+\DoxyCodeLine{00977\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1trace__api_1_1store__provider}{store\_provider}}\ \mbox{\hyperlink{namespace_xbyak_1_1util_a9589ac8435a111d7f6b850217829e34c}{sp}}(tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}(),\ 100,\ std::optional<uint32\_t>(),\ std::optional<uint32\_t>(),\ 0);}
+\DoxyCodeLine{00978\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_a9589ac8435a111d7f6b850217829e34c}{sp}}.append(bt\_v1);}
+\DoxyCodeLine{00979\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_a9589ac8435a111d7f6b850217829e34c}{sp}}.append\_lib(1);}
+\DoxyCodeLine{00980\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_a9589ac8435a111d7f6b850217829e34c}{sp}}.append(bt2\_v1);}
+\DoxyCodeLine{00981\ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ =\ 0;}
+\DoxyCodeLine{00982\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1trace__api_a4fe812fd823fbfebfe869a30ef75a248}{get\_block\_t}}\ block1\ =\ \mbox{\hyperlink{namespace_xbyak_1_1util_a9589ac8435a111d7f6b850217829e34c}{sp}}.get\_block(1,\ [\&\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}]()\ \{}
+\DoxyCodeLine{00983\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (++\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ >=\ 3)\ \{}
+\DoxyCodeLine{00984\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1yield__exception}{yield\_exception}}(\textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{00985\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00986\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00987\ \ \ \ \ \ \ BOOST\_REQUIRE(block1);}
+\DoxyCodeLine{00988\ \ \ \ \ \ \ BOOST\_REQUIRE(std::get<1>(*block1));}
+\DoxyCodeLine{00989\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ block1\_bt\ =\ std::get<0>(*block1);}
+\DoxyCodeLine{00990\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(std::get<block\_trace\_v1>(block1\_bt),\ bt\_v1);}
+\DoxyCodeLine{00991\ }
+\DoxyCodeLine{00992\ \ \ \ \ \ \ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ =\ 0;}
+\DoxyCodeLine{00993\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1trace__api_a4fe812fd823fbfebfe869a30ef75a248}{get\_block\_t}}\ block2\ =\ \mbox{\hyperlink{namespace_xbyak_1_1util_a9589ac8435a111d7f6b850217829e34c}{sp}}.get\_block(5,\ [\&\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}]()\ \{}
+\DoxyCodeLine{00994\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (++\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ >=\ 4)\ \{}
+\DoxyCodeLine{00995\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1yield__exception}{yield\_exception}}(\textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{00996\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00997\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00998\ \ \ \ \ \ \ BOOST\_REQUIRE(block2);}
+\DoxyCodeLine{00999\ \ \ \ \ \ \ BOOST\_REQUIRE(!std::get<1>(*block2));}
+\DoxyCodeLine{01000\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ block2\_bt\ =\ std::get<0>(*block2);}
+\DoxyCodeLine{01001\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(std::get<block\_trace\_v1>(block2\_bt),\ bt2\_v1);}
+\DoxyCodeLine{01002\ }
+\DoxyCodeLine{01003\ \ \ \ \ \ \ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ =\ 0;}
+\DoxyCodeLine{01004\ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{01005\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_a9589ac8435a111d7f6b850217829e34c}{sp}}.get\_block(5,[\&\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}]()\ \{}
+\DoxyCodeLine{01006\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (++\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ >=\ 3)\ \{}
+\DoxyCodeLine{01007\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1yield__exception}{yield\_exception}}(\textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{01008\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01009\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{01010\ \ \ \ \ \ \ \ \ \ BOOST\_FAIL(\textcolor{stringliteral}{"{}Should\ not\ have\ completed\ scan"{}});}
+\DoxyCodeLine{01011\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1yield__exception}{yield\_exception}}\&\ ex)\ \{}
+\DoxyCodeLine{01012\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01013\ }
+\DoxyCodeLine{01014\ \ \ \ \ \ \ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ =\ 0;}
+\DoxyCodeLine{01015\ \ \ \ \ \ \ block2\ =\ \mbox{\hyperlink{namespace_xbyak_1_1util_a9589ac8435a111d7f6b850217829e34c}{sp}}.get\_block(2,[\&\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}]()\ \{}
+\DoxyCodeLine{01016\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (++\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ >=\ 4)\ \{}
+\DoxyCodeLine{01017\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1yield__exception}{yield\_exception}}(\textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{01018\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01019\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{01020\ \ \ \ \ \ \ BOOST\_REQUIRE(!block2);}
+\DoxyCodeLine{01021\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__trace__file_8cpp_aa817ae36507430bf33f82a441984be8b_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__trace__file_8cpp_a9bc9670edbc9fdddae69bfebe25a6fa8}\index{test\_trace\_file.cpp@{test\_trace\_file.cpp}!BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}}
+\index{BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}!test\_trace\_file.cpp@{test\_trace\_file.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_FIXTURE\_TEST\_CASE()}{BOOST\_FIXTURE\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [10/13]}}
+{\footnotesize\ttfamily \label{test__trace__file_8cpp_a9bc9670edbc9fdddae69bfebe25a6fa8} 
+BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{test\+\_\+get\+\_\+block\+\_\+v2}]{}{, }\item[{test\+\_\+fixture}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__trace__file_8cpp_source_l01023}{1023}} of file \mbox{\hyperlink{test__trace__file_8cpp_source}{test\+\_\+trace\+\_\+file.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01024\ \ \ \ \{}
+\DoxyCodeLine{01025\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1temp__directory}{fc::temp\_directory}}\ tempdir;}
+\DoxyCodeLine{01026\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1trace__api_1_1store__provider}{store\_provider}}\ \mbox{\hyperlink{namespace_xbyak_1_1util_a9589ac8435a111d7f6b850217829e34c}{sp}}(tempdir.\mbox{\hyperlink{classfc_1_1temp__file__base_a7ef88f2ed75bf87d276a80ce9283c55e}{path}}(),\ 100,\ std::optional<uint32\_t>(),\ std::optional<uint32\_t>(),\ 0);}
+\DoxyCodeLine{01027\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_a9589ac8435a111d7f6b850217829e34c}{sp}}.append(block\_trace1\_v2);}
+\DoxyCodeLine{01028\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_a9589ac8435a111d7f6b850217829e34c}{sp}}.append\_lib(1);}
+\DoxyCodeLine{01029\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_a9589ac8435a111d7f6b850217829e34c}{sp}}.append(block\_trace2\_v2);}
+\DoxyCodeLine{01030\ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ =\ 0;}
+\DoxyCodeLine{01031\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1trace__api_a4fe812fd823fbfebfe869a30ef75a248}{get\_block\_t}}\ block1\ =\ \mbox{\hyperlink{namespace_xbyak_1_1util_a9589ac8435a111d7f6b850217829e34c}{sp}}.get\_block(1,\ [\&\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}]()\ \{}
+\DoxyCodeLine{01032\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (++\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ >=\ 3)\ \{}
+\DoxyCodeLine{01033\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1yield__exception}{yield\_exception}}(\textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{01034\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01035\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{01036\ \ \ \ \ \ \ BOOST\_REQUIRE(block1);}
+\DoxyCodeLine{01037\ \ \ \ \ \ \ BOOST\_REQUIRE(std::get<1>(*block1));}
+\DoxyCodeLine{01038\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ block1\_bt\ =\ std::get<0>(*block1);}
+\DoxyCodeLine{01039\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(std::get<block\_trace\_v2>(block1\_bt),\ block\_trace1\_v2);}
+\DoxyCodeLine{01040\ }
+\DoxyCodeLine{01041\ \ \ \ \ \ \ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ =\ 0;}
+\DoxyCodeLine{01042\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1trace__api_a4fe812fd823fbfebfe869a30ef75a248}{get\_block\_t}}\ block2\ =\ \mbox{\hyperlink{namespace_xbyak_1_1util_a9589ac8435a111d7f6b850217829e34c}{sp}}.get\_block(5,\ [\&\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}]()\ \{}
+\DoxyCodeLine{01043\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (++\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ >=\ 4)\ \{}
+\DoxyCodeLine{01044\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1yield__exception}{yield\_exception}}(\textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{01045\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01046\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{01047\ \ \ \ \ \ \ BOOST\_REQUIRE(block2);}
+\DoxyCodeLine{01048\ \ \ \ \ \ \ BOOST\_REQUIRE(!std::get<1>(*block2));}
+\DoxyCodeLine{01049\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ block2\_bt\ =\ std::get<0>(*block2);}
+\DoxyCodeLine{01050\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(std::get<block\_trace\_v2>(block2\_bt),\ block\_trace2\_v2);}
+\DoxyCodeLine{01051\ }
+\DoxyCodeLine{01052\ \ \ \ \ \ \ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ =\ 0;}
+\DoxyCodeLine{01053\ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{01054\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_a9589ac8435a111d7f6b850217829e34c}{sp}}.get\_block(5,[\&\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}]()\ \{}
+\DoxyCodeLine{01055\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (++\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ >=\ 3)\ \{}
+\DoxyCodeLine{01056\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1yield__exception}{yield\_exception}}(\textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{01057\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01058\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{01059\ \ \ \ \ \ \ \ \ \ BOOST\_FAIL(\textcolor{stringliteral}{"{}Should\ not\ have\ completed\ scan"{}});}
+\DoxyCodeLine{01060\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1yield__exception}{yield\_exception}}\&\ ex)\ \{}
+\DoxyCodeLine{01061\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01062\ }
+\DoxyCodeLine{01063\ \ \ \ \ \ \ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ =\ 0;}
+\DoxyCodeLine{01064\ \ \ \ \ \ \ block2\ =\ \mbox{\hyperlink{namespace_xbyak_1_1util_a9589ac8435a111d7f6b850217829e34c}{sp}}.get\_block(2,[\&\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}]()\ \{}
+\DoxyCodeLine{01065\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (++\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ >=\ 4)\ \{}
+\DoxyCodeLine{01066\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1yield__exception}{yield\_exception}}(\textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{01067\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01068\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{01069\ \ \ \ \ \ \ BOOST\_REQUIRE(!block2);}
+\DoxyCodeLine{01070\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__trace__file_8cpp_a9bc9670edbc9fdddae69bfebe25a6fa8_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__trace__file_8cpp_a27bd099dbfda309095d62e3e2ab8cafa}\index{test\_trace\_file.cpp@{test\_trace\_file.cpp}!BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}}
+\index{BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}!test\_trace\_file.cpp@{test\_trace\_file.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_FIXTURE\_TEST\_CASE()}{BOOST\_FIXTURE\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [11/13]}}
+{\footnotesize\ttfamily \label{test__trace__file_8cpp_a27bd099dbfda309095d62e3e2ab8cafa} 
+BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{write\+\_\+data\+\_\+multi\+\_\+trace\+\_\+version}]{}{, }\item[{test\+\_\+fixture}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__trace__file_8cpp_source_l00322}{322}} of file \mbox{\hyperlink{test__trace__file_8cpp_source}{test\+\_\+trace\+\_\+file.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00323\ \ \ \ \{}
+\DoxyCodeLine{00324\ \ \ \ \ \ \ vslice\ vs;}
+\DoxyCodeLine{00325\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ offset\ =\ append\_store(bt\_v0,\ vs\ );}
+\DoxyCodeLine{00326\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(offset,0);}
+\DoxyCodeLine{00327\ }
+\DoxyCodeLine{00328\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ offset2\ =\ append\_store(bt\_v1,\ vs\ );}
+\DoxyCodeLine{00329\ \ \ \ \ \ \ BOOST\_REQUIRE(offset\ <\ offset2);}
+\DoxyCodeLine{00330\ }
+\DoxyCodeLine{00331\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ offset3\ =\ append\_store(block\_trace1\_v2,\ vs\ );}
+\DoxyCodeLine{00332\ \ \ \ \ \ \ BOOST\_REQUIRE(offset2\ <\ offset3);}
+\DoxyCodeLine{00333\ }
+\DoxyCodeLine{00334\ \ \ \ \ \ \ vs.\_pos\ =\ offset;}
+\DoxyCodeLine{00335\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ bt\_returned\ =\ extract\_store<block\_trace\_v0>(\ vs\ );}
+\DoxyCodeLine{00336\ \ \ \ \ \ \ BOOST\_REQUIRE(bt\_returned\ ==\ bt\_v0);}
+\DoxyCodeLine{00337\ }
+\DoxyCodeLine{00338\ \ \ \ \ \ \ vs.\_pos\ =\ offset2;}
+\DoxyCodeLine{00339\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ bt\_returned2\ =\ extract\_store<block\_trace\_v1>(\ vs\ );}
+\DoxyCodeLine{00340\ \ \ \ \ \ \ BOOST\_REQUIRE(bt\_returned2\ ==\ bt\_v1);}
+\DoxyCodeLine{00341\ }
+\DoxyCodeLine{00342\ \ \ \ \ \ \ vs.\_pos\ =\ offset3;}
+\DoxyCodeLine{00343\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ bt\_returned3\ =\ extract\_store<block\_trace\_v2>(\ vs\ );}
+\DoxyCodeLine{00344\ \ \ \ \ \ \ BOOST\_REQUIRE(bt\_returned3\ ==\ block\_trace1\_v2);}
+\DoxyCodeLine{00345\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{test__trace__file_8cpp_a9dad05b7acee8b1c0b7a8f345f13efed}\index{test\_trace\_file.cpp@{test\_trace\_file.cpp}!BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}}
+\index{BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}!test\_trace\_file.cpp@{test\_trace\_file.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_FIXTURE\_TEST\_CASE()}{BOOST\_FIXTURE\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [12/13]}}
+{\footnotesize\ttfamily \label{test__trace__file_8cpp_a9dad05b7acee8b1c0b7a8f345f13efed} 
+BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{write\+\_\+data\+\_\+trace}]{}{, }\item[{test\+\_\+fixture}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__trace__file_8cpp_source_l00304}{304}} of file \mbox{\hyperlink{test__trace__file_8cpp_source}{test\+\_\+trace\+\_\+file.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00305\ \ \ \ \{}
+\DoxyCodeLine{00306\ \ \ \ \ \ \ vslice\ vs;}
+\DoxyCodeLine{00307\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ offset\ =\ append\_store(bt\_v1,\ vs\ );}
+\DoxyCodeLine{00308\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(offset,0);}
+\DoxyCodeLine{00309\ }
+\DoxyCodeLine{00310\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ offset2\ =\ append\_store(bt2\_v1,\ vs\ );}
+\DoxyCodeLine{00311\ \ \ \ \ \ \ BOOST\_REQUIRE(offset\ <\ offset2);}
+\DoxyCodeLine{00312\ }
+\DoxyCodeLine{00313\ \ \ \ \ \ \ vs.\_pos\ =\ offset;}
+\DoxyCodeLine{00314\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ bt\_returned\ =\ extract\_store<block\_trace\_v1>(\ vs\ );}
+\DoxyCodeLine{00315\ \ \ \ \ \ \ BOOST\_REQUIRE(bt\_returned\ ==\ bt\_v1);}
+\DoxyCodeLine{00316\ }
+\DoxyCodeLine{00317\ \ \ \ \ \ \ vs.\_pos\ =\ offset2;}
+\DoxyCodeLine{00318\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ bt\_returned2\ =\ extract\_store<block\_trace\_v1>(\ vs\ );}
+\DoxyCodeLine{00319\ \ \ \ \ \ \ BOOST\_REQUIRE(bt\_returned2\ ==\ bt2\_v1);}
+\DoxyCodeLine{00320\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{test__trace__file_8cpp_a002dd15999bbf46e61258b144662d871}\index{test\_trace\_file.cpp@{test\_trace\_file.cpp}!BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}}
+\index{BOOST\_FIXTURE\_TEST\_CASE@{BOOST\_FIXTURE\_TEST\_CASE}!test\_trace\_file.cpp@{test\_trace\_file.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_FIXTURE\_TEST\_CASE()}{BOOST\_FIXTURE\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [13/13]}}
+{\footnotesize\ttfamily \label{test__trace__file_8cpp_a002dd15999bbf46e61258b144662d871} 
+BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{write\+\_\+metadata\+\_\+trace}]{}{, }\item[{test\+\_\+fixture}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__trace__file_8cpp_source_l00347}{347}} of file \mbox{\hyperlink{test__trace__file_8cpp_source}{test\+\_\+trace\+\_\+file.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00348\ \ \ \ \{}
+\DoxyCodeLine{00349\ \ \ \ \ \ \ vslice\ vs;}
+\DoxyCodeLine{00350\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ offset\ =\ append\_store(\ be1,\ vs\ );}
+\DoxyCodeLine{00351\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ next\_offset\ =\ vs.\_pos;}
+\DoxyCodeLine{00352\ \ \ \ \ \ \ BOOST\_REQUIRE(offset\ <\ next\_offset);}
+\DoxyCodeLine{00353\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ offset2\ =\ append\_store(\ le1,\ vs\ );}
+\DoxyCodeLine{00354\ \ \ \ \ \ \ BOOST\_REQUIRE(next\_offset\ <=\ offset2);}
+\DoxyCodeLine{00355\ \ \ \ \ \ \ BOOST\_REQUIRE(offset2\ <\ vs.\_pos);}
+\DoxyCodeLine{00356\ \ \ \ \ \ \ next\_offset\ =\ vs.\_pos;}
+\DoxyCodeLine{00357\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ offset3\ =\ append\_store(\ be2,\ vs\ );}
+\DoxyCodeLine{00358\ \ \ \ \ \ \ BOOST\_REQUIRE(next\_offset\ <=\ offset3);}
+\DoxyCodeLine{00359\ \ \ \ \ \ \ BOOST\_REQUIRE(offset3\ <\ vs.\_pos);}
+\DoxyCodeLine{00360\ \ \ \ \ \ \ next\_offset\ =\ vs.\_pos;}
+\DoxyCodeLine{00361\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ offset4\ =\ append\_store(\ le2,\ vs\ );}
+\DoxyCodeLine{00362\ \ \ \ \ \ \ BOOST\_REQUIRE(next\_offset\ <=\ offset4);}
+\DoxyCodeLine{00363\ \ \ \ \ \ \ BOOST\_REQUIRE(offset4\ <\ vs.\_pos);}
+\DoxyCodeLine{00364\ }
+\DoxyCodeLine{00365\ \ \ \ \ \ \ vs.\_pos\ =\ offset;}
+\DoxyCodeLine{00366\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ be\_returned1\ =\ extract\_store<metadata\_log\_entry>(\ vs\ );}
+\DoxyCodeLine{00367\ \ \ \ \ \ \ BOOST\_REQUIRE(std::holds\_alternative<block\_entry\_v0>(be\_returned1));}
+\DoxyCodeLine{00368\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ real\_be\_returned1\ =\ std::get<block\_entry\_v0>(be\_returned1);}
+\DoxyCodeLine{00369\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ real\_be1\ =\ std::get<block\_entry\_v0>(be1);}
+\DoxyCodeLine{00370\ \ \ \ \ \ \ BOOST\_REQUIRE(real\_be\_returned1\ ==\ real\_be1);}
+\DoxyCodeLine{00371\ }
+\DoxyCodeLine{00372\ \ \ \ \ \ \ vs.\_pos\ =\ offset2;}
+\DoxyCodeLine{00373\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ le\_returned1\ =\ extract\_store<metadata\_log\_entry>(\ vs\ );}
+\DoxyCodeLine{00374\ \ \ \ \ \ \ BOOST\_REQUIRE(std::holds\_alternative<lib\_entry\_v0>(le\_returned1));}
+\DoxyCodeLine{00375\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ real\_le\_returned1\ =\ std::get<lib\_entry\_v0>(le\_returned1);}
+\DoxyCodeLine{00376\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ real\_le1\ =\ std::get<lib\_entry\_v0>(le1);}
+\DoxyCodeLine{00377\ \ \ \ \ \ \ BOOST\_REQUIRE(real\_le\_returned1\ ==\ real\_le1);}
+\DoxyCodeLine{00378\ }
+\DoxyCodeLine{00379\ \ \ \ \ \ \ vs.\_pos\ =\ offset3;}
+\DoxyCodeLine{00380\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ be\_returned2\ =\ extract\_store<metadata\_log\_entry>(\ vs\ );}
+\DoxyCodeLine{00381\ \ \ \ \ \ \ BOOST\_REQUIRE(std::holds\_alternative<block\_entry\_v0>(be\_returned2));}
+\DoxyCodeLine{00382\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ real\_be\_returned2\ =\ std::get<block\_entry\_v0>(be\_returned2);}
+\DoxyCodeLine{00383\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ real\_be2\ =\ std::get<block\_entry\_v0>(be2);}
+\DoxyCodeLine{00384\ \ \ \ \ \ \ BOOST\_REQUIRE(real\_be\_returned2\ ==\ real\_be2);}
+\DoxyCodeLine{00385\ }
+\DoxyCodeLine{00386\ \ \ \ \ \ \ vs.\_pos\ =\ offset4;}
+\DoxyCodeLine{00387\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ le\_returned2\ =\ extract\_store<metadata\_log\_entry>(\ vs\ );}
+\DoxyCodeLine{00388\ \ \ \ \ \ \ BOOST\_REQUIRE(std::holds\_alternative<lib\_entry\_v0>(le\_returned2));}
+\DoxyCodeLine{00389\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ real\_le\_returned2\ =\ std::get<lib\_entry\_v0>(le\_returned2);}
+\DoxyCodeLine{00390\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ real\_le2\ =\ std::get<lib\_entry\_v0>(le2);}
+\DoxyCodeLine{00391\ \ \ \ \ \ \ BOOST\_REQUIRE(real\_le\_returned2\ ==\ real\_le2);}
+\DoxyCodeLine{00392\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{test__trace__file_8cpp_ac49ab2cf53f615a1a84cdef0579d6fb8}\index{test\_trace\_file.cpp@{test\_trace\_file.cpp}!verify\_directory\_contents@{verify\_directory\_contents}}
+\index{verify\_directory\_contents@{verify\_directory\_contents}!test\_trace\_file.cpp@{test\_trace\_file.cpp}}
+\doxysubsubsection{\texorpdfstring{verify\_directory\_contents()}{verify\_directory\_contents()}}
+{\footnotesize\ttfamily \label{test__trace__file_8cpp_ac49ab2cf53f615a1a84cdef0579d6fb8} 
+void verify\+\_\+directory\+\_\+contents (\begin{DoxyParamCaption}\item[{const bfs\+::path \&}]{tempdir}{, }\item[{std\+::set$<$ bfs\+::path $>$}]{expected\+\_\+files}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__trace__file_8cpp_source_l00576}{576}} of file \mbox{\hyperlink{test__trace__file_8cpp_source}{test\+\_\+trace\+\_\+file.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00576\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00577\ \ \ \ \ \ \ std::set<bfs::path>\ unexpected\_files;}
+\DoxyCodeLine{00578\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (bfs::directory\_iterator\ itr(tempdir);\ itr\ !=\ \mbox{\hyperlink{classfc_1_1directory__iterator}{directory\_iterator}}();\ ++itr)\ \{}
+\DoxyCodeLine{00579\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespaceembed_clara_a1e1bd594f85f58f5dca6c41c0ac720fb}{filename}}\ =\ itr-\/>path().filename();}
+\DoxyCodeLine{00580\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (expected\_files.erase(filename)\ <\ 1)\ \{}
+\DoxyCodeLine{00581\ \ \ \ \ \ \ \ \ \ \ \ \ unexpected\_files.insert(filename);}
+\DoxyCodeLine{00582\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00583\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00584\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (expected\_files.size()\ +\ unexpected\_files.size()\ ==\ 0)}
+\DoxyCodeLine{00585\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00586\ }
+\DoxyCodeLine{00587\ \ \ \ \ \ \ std::string\ msg;}
+\DoxyCodeLine{00588\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (expected\_files.size())\ \{}
+\DoxyCodeLine{00589\ \ \ \ \ \ \ \ \ \ msg\ +=\ \textcolor{stringliteral}{"{}\ Expected\ the\ following\ files\ to\ be\ present,\ but\ were\ not:"{}};}
+\DoxyCodeLine{00590\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00591\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ comma\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00592\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\ file\ :\ expected\_files)\ \{}
+\DoxyCodeLine{00593\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (comma)}
+\DoxyCodeLine{00594\ \ \ \ \ \ \ \ \ \ \ \ \ msg\ +=\ \textcolor{stringliteral}{"{},"{}};}
+\DoxyCodeLine{00595\ \ \ \ \ \ \ \ \ \ msg\ +=\ \textcolor{stringliteral}{"{}\ "{}}\ +\ file.generic\_string();}
+\DoxyCodeLine{00596\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00597\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (unexpected\_files.size())\ \{}
+\DoxyCodeLine{00598\ \ \ \ \ \ \ \ \ \ msg\ +=\ \textcolor{stringliteral}{"{}\ Did\ not\ expect\ the\ following\ files\ to\ be\ present,\ but\ they\ were:"{}};}
+\DoxyCodeLine{00599\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00600\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\ file\ :\ expected\_files)\ \{}
+\DoxyCodeLine{00601\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (comma)}
+\DoxyCodeLine{00602\ \ \ \ \ \ \ \ \ \ \ \ \ msg\ +=\ \textcolor{stringliteral}{"{},"{}};}
+\DoxyCodeLine{00603\ \ \ \ \ \ \ \ \ \ msg\ +=\ \textcolor{stringliteral}{"{}\ "{}}\ +\ file.generic\_string();}
+\DoxyCodeLine{00604\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00605\ \ \ \ \ \ \ BOOST\_FAIL(msg);}
+\DoxyCodeLine{00606\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__trace__file_8cpp_ac49ab2cf53f615a1a84cdef0579d6fb8_icgraph}
+\end{center}
+\end{figure}

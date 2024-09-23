@@ -1,0 +1,74 @@
+\doxysection{testing\+::internal\+::Scoped\+Premature\+Exit\+File Class Reference}
+\hypertarget{classtesting_1_1internal_1_1_scoped_premature_exit_file}{}\label{classtesting_1_1internal_1_1_scoped_premature_exit_file}\index{testing::internal::ScopedPrematureExitFile@{testing::internal::ScopedPrematureExitFile}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_scoped_premature_exit_file_ae520883b8a6984a864ce675acedff4a2}{Scoped\+Premature\+Exit\+File}} (const char \texorpdfstring{$\ast$}{*}premature\+\_\+exit\+\_\+filepath)
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_scoped_premature_exit_file_afa2ddc9bc1c2a90fd0dd82bb11fddc79}{\texorpdfstring{$\sim$}{\string~}\+Scoped\+Premature\+Exit\+File}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{gtest_8cc_source_l04255}{4255}} of file \mbox{\hyperlink{gtest_8cc_source}{gtest.\+cc}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_scoped_premature_exit_file_ae520883b8a6984a864ce675acedff4a2}\index{testing::internal::ScopedPrematureExitFile@{testing::internal::ScopedPrematureExitFile}!ScopedPrematureExitFile@{ScopedPrematureExitFile}}
+\index{ScopedPrematureExitFile@{ScopedPrematureExitFile}!testing::internal::ScopedPrematureExitFile@{testing::internal::ScopedPrematureExitFile}}
+\doxysubsubsection{\texorpdfstring{ScopedPrematureExitFile()}{ScopedPrematureExitFile()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_scoped_premature_exit_file_ae520883b8a6984a864ce675acedff4a2} 
+testing\+::internal\+::\+Scoped\+Premature\+Exit\+File\+::\+Scoped\+Premature\+Exit\+File (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{premature\+\_\+exit\+\_\+filepath}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8cc_source_l04257}{4257}} of file \mbox{\hyperlink{gtest_8cc_source}{gtest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{04258\ \ \ \ \ \ \ :\ premature\_exit\_filepath\_(premature\_exit\_filepath\ ?}
+\DoxyCodeLine{04259\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ premature\_exit\_filepath\ :\ \textcolor{stringliteral}{"{}"{}})\ \{}
+\DoxyCodeLine{04260\ \ \ \ \ \textcolor{comment}{//\ If\ a\ path\ to\ the\ premature-\/exit\ file\ is\ specified...}}
+\DoxyCodeLine{04261\ \ \ \ \ \textcolor{keywordflow}{if}\ (!premature\_exit\_filepath\_.empty())\ \{}
+\DoxyCodeLine{04262\ \ \ \ \ \ \ \textcolor{comment}{//\ create\ the\ file\ with\ a\ single\ "{}0"{}\ character\ in\ it.\ \ I/O}}
+\DoxyCodeLine{04263\ \ \ \ \ \ \ \textcolor{comment}{//\ errors\ are\ ignored\ as\ there's\ nothing\ better\ we\ can\ do\ and\ we}}
+\DoxyCodeLine{04264\ \ \ \ \ \ \ \textcolor{comment}{//\ don't\ want\ to\ fail\ the\ test\ because\ of\ this.}}
+\DoxyCodeLine{04265\ \ \ \ \ \ \ FILE*\ pfile\ =\ \mbox{\hyperlink{namespacetesting_1_1internal_1_1posix_affa05d06d3e3b1ce975935cb0eac4fa7}{posix::FOpen}}(premature\_exit\_filepath,\ \textcolor{stringliteral}{"{}w"{}});}
+\DoxyCodeLine{04266\ \ \ \ \ \ \ fwrite(\textcolor{stringliteral}{"{}0"{}},\ 1,\ 1,\ pfile);}
+\DoxyCodeLine{04267\ \ \ \ \ \ \ fclose(pfile);}
+\DoxyCodeLine{04268\ \ \ \ \ \}}
+\DoxyCodeLine{04269\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1internal_1_1_scoped_premature_exit_file_afa2ddc9bc1c2a90fd0dd82bb11fddc79}\index{testing::internal::ScopedPrematureExitFile@{testing::internal::ScopedPrematureExitFile}!````~ScopedPrematureExitFile@{\texorpdfstring{$\sim$}{\string~}ScopedPrematureExitFile}}
+\index{````~ScopedPrematureExitFile@{\texorpdfstring{$\sim$}{\string~}ScopedPrematureExitFile}!testing::internal::ScopedPrematureExitFile@{testing::internal::ScopedPrematureExitFile}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}ScopedPrematureExitFile()}{\string~ScopedPrematureExitFile()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_scoped_premature_exit_file_afa2ddc9bc1c2a90fd0dd82bb11fddc79} 
+testing\+::internal\+::\+Scoped\+Premature\+Exit\+File\+::\texorpdfstring{$\sim$}{\string~}\+Scoped\+Premature\+Exit\+File (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8cc_source_l04271}{4271}} of file \mbox{\hyperlink{gtest_8cc_source}{gtest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{04271\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{04272\ \ \ \ \ \textcolor{keywordflow}{if}\ (!premature\_exit\_filepath\_.empty())\ \{}
+\DoxyCodeLine{04273\ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_a8d528fc0ff05e174212746909dc026a3}{retval}}\ =\ \mbox{\hyperlink{namespacefc_a0db76f35dc060918029b16de918b1e84}{remove}}(premature\_exit\_filepath\_.c\_str());}
+\DoxyCodeLine{04274\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (retval)\ \{}
+\DoxyCodeLine{04275\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_a8ef4cb4c465db8c15464aecc6d9510ef}{GTEST\_LOG\_}}(ERROR)\ <<\ \textcolor{stringliteral}{"{}Failed\ to\ remove\ premature\ exit\ filepath\ \(\backslash\)"{}"{}}}
+\DoxyCodeLine{04276\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ premature\_exit\_filepath\_\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)"{}\ with\ error\ "{}}}
+\DoxyCodeLine{04277\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_a8d528fc0ff05e174212746909dc026a3}{retval}};}
+\DoxyCodeLine{04278\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{04279\ \ \ \ \ \}}
+\DoxyCodeLine{04280\ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/src/\mbox{\hyperlink{gtest_8cc}{gtest.\+cc}}\end{DoxyCompactItemize}

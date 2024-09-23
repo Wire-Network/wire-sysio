@@ -1,0 +1,18 @@
+<map id="fc::crypto::r1::private_key::sign_compact" name="fc::crypto::r1::private_key::sign_compact">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,83,148,124"/>
+<area shape="rect" id="Node000002" href="$classfc_1_1array.html#a1735af1b0ae9cae989c1372b426d6b29" title=" " alt="" coords="249,8,358,34"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="113,80,152,60,195,42,233,31,235,36,197,47,154,65,115,85"/>
+<area shape="rect" id="Node000003" href="$namespacefc.html#a150ca4cd9c0318ca45dc0dc7df5d58b9" title=" " alt="" coords="266,57,341,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="148,90,250,75,251,81,149,96"/>
+<area shape="rect" id="Node000007" href="$classfc_1_1ecc_1_1detail_1_1public__key__impl.html#a9b79e279e77c8ec1227e3bcb596cf74a" title=" " alt="" coords="196,108,411,163"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="149,111,181,115,180,121,148,116"/>
+<area shape="rect" id="Node000008" href="$yubihsm__pkcs11_8c.html#ae785d5badbf1f08b491af31f32a135a1" title=" " alt="" coords="268,188,339,214"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="107,122,149,149,197,173,253,190,252,195,195,178,146,153,105,126"/>
+<area shape="rect" id="Node000004" href="$namespacefc_1_1raw.html#a3a18d8161aa5b4f4f02b6fcfdff5e5d1" title=" " alt="" coords="478,29,576,55"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="341,63,463,47,463,53,342,68"/>
+<area shape="rect" id="Node000005" href="$classfc_1_1sha256_1_1encoder.html#a4d8b8181e912194cf98a56164671adf8" title=" " alt="" coords="459,79,595,120"/>
+<area shape="poly" id="edge5_Node000003_Node000005" title=" " alt="" coords="342,72,444,86,443,91,341,78"/>
+<area shape="poly" id="edge4_Node000004_Node000004" title=" " alt="" coords="498,30,492,21,495,11,508,5,527,3,548,5,559,12,557,16,547,10,527,8,509,10,499,15,497,20,502,28"/>
+<area shape="rect" id="Node000006" href="$classfc_1_1sha256.html#ab897537f6c524085b28049be51ed370d" title=" " alt="" coords="643,87,759,112"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="596,97,627,97,627,102,596,102"/>
+</map>

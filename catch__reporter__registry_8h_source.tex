@@ -1,0 +1,43 @@
+\doxysection{catch\+\_\+reporter\+\_\+registry.\+h}
+\hypertarget{catch__reporter__registry_8h_source}{}\label{catch__reporter__registry_8h_source}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_reporter\_registry.h@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_reporter\_registry.h}}
+\mbox{\hyperlink{catch__reporter__registry_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{catch__reporter__registry_8h_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__registry_8h_source_l00002}00002\ \textcolor{comment}{\ *\ \ Created\ by\ Phil\ on\ 29/10/2010.}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__registry_8h_source_l00003}00003\ \textcolor{comment}{\ *\ \ Copyright\ 2010\ Two\ Blue\ Cubes\ Ltd.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__registry_8h_source_l00004}00004\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__registry_8h_source_l00005}00005\ \textcolor{comment}{\ *\ \ Distributed\ under\ the\ Boost\ Software\ License,\ Version\ 1.0.\ (See\ accompanying}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__registry_8h_source_l00006}00006\ \textcolor{comment}{\ *\ \ file\ LICENSE\_1\_0.txt\ or\ copy\ at\ http://www.boost.org/LICENSE\_1\_0.txt)}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__registry_8h_source_l00007}00007\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__registry_8h_source_l00008}00008\ \textcolor{preprocessor}{\#ifndef\ TWOBLUECUBES\_CATCH\_REPORTER\_REGISTRY\_H\_INCLUDED}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__registry_8h_source_l00009}00009\ \textcolor{preprocessor}{\#define\ TWOBLUECUBES\_CATCH\_REPORTER\_REGISTRY\_H\_INCLUDED}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__registry_8h_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__registry_8h_source_l00011}00011\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__interfaces__reporter_8h}{catch\_interfaces\_reporter.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__registry_8h_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__registry_8h_source_l00013}00013\ \textcolor{preprocessor}{\#include\ <map>}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__registry_8h_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__registry_8h_source_l00015}00015\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__reporter__registry_8h_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__registry_8h_source_l00017}\mbox{\hyperlink{class_catch_1_1_reporter_registry}{00017}}\ \ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_catch_1_1_reporter_registry}{ReporterRegistry}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{struct_catch_1_1_i_reporter_registry}{IReporterRegistry}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__reporter__registry_8h_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__registry_8h_source_l00019}00019\ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{catch__reporter__registry_8h_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__registry_8h_source_l00021}\mbox{\hyperlink{class_catch_1_1_reporter_registry_a304ad1cbe7fd354c6186fc547fce4bd2}{00021}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_reporter_registry_a304ad1cbe7fd354c6186fc547fce4bd2}{\string~ReporterRegistry}}()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{catch__reporter__registry_8h_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__registry_8h_source_l00023}00023\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_catch_a1f5555abfc248b3dca63e0c46e55002d}{IStreamingReporterPtr}}\ \mbox{\hyperlink{class_catch_1_1_reporter_registry_a821af9a4750d1e63afd26cd1f5e3c302}{create}}(\ std::string\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ \mbox{\hyperlink{namespace_catch_a961f6f5f07e265684c220a8ae014d7d6}{IConfigPtr}}\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{classconfig}{config}}\ )\ \textcolor{keyword}{const\ override};}
+\DoxyCodeLine{\Hypertarget{catch__reporter__registry_8h_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__registry_8h_source_l00025}00025\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_reporter_registry_a519d4826fd30b3866318bceeaab18f7b}{registerReporter}}(\ std::string\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ \mbox{\hyperlink{namespace_catch_a67fa7f4bc02f3bbcd6f6669b921d5cf3}{IReporterFactoryPtr}}\ \textcolor{keyword}{const}\&\ factory\ );}
+\DoxyCodeLine{\Hypertarget{catch__reporter__registry_8h_source_l00026}00026\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_reporter_registry_a4512ced2f08d6080521a19b1764903c5}{registerListener}}(\ \mbox{\hyperlink{namespace_catch_a67fa7f4bc02f3bbcd6f6669b921d5cf3}{IReporterFactoryPtr}}\ \textcolor{keyword}{const}\&\ factory\ );}
+\DoxyCodeLine{\Hypertarget{catch__reporter__registry_8h_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__registry_8h_source_l00028}00028\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_i_reporter_registry_a29a909d3b5285692826124d992717f2c}{FactoryMap}}\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{class_catch_1_1_reporter_registry_a97a4cc859d73ea07fbcdb47cfef611d8}{getFactories}}()\ \textcolor{keyword}{const\ override};}
+\DoxyCodeLine{\Hypertarget{catch__reporter__registry_8h_source_l00029}00029\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_i_reporter_registry_a7ca2e70d2b1e76cdcb1dd9017e84a17f}{Listeners}}\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{class_catch_1_1_reporter_registry_a28607d81c9bd99e81ae9ac108aa68718}{getListeners}}()\ \textcolor{keyword}{const\ override};}
+\DoxyCodeLine{\Hypertarget{catch__reporter__registry_8h_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__registry_8h_source_l00031}00031\ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{catch__reporter__registry_8h_source_l00032}00032\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_i_reporter_registry_a29a909d3b5285692826124d992717f2c}{FactoryMap}}\ m\_factories;}
+\DoxyCodeLine{\Hypertarget{catch__reporter__registry_8h_source_l00033}00033\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_i_reporter_registry_a7ca2e70d2b1e76cdcb1dd9017e84a17f}{Listeners}}\ m\_listeners;}
+\DoxyCodeLine{\Hypertarget{catch__reporter__registry_8h_source_l00034}00034\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{catch__reporter__registry_8h_source_l00035}00035\ \}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__registry_8h_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__registry_8h_source_l00037}00037\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ TWOBLUECUBES\_CATCH\_REPORTER\_REGISTRY\_H\_INCLUDED}}
+
+\end{DoxyCode}

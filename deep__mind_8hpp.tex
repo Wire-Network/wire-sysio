@@ -1,0 +1,65 @@
+\doxysection{libraries/chain/include/sysio/chain/deep\+\_\+mind.hpp File Reference}
+\hypertarget{deep__mind_8hpp}{}\label{deep__mind_8hpp}\index{libraries/chain/include/sysio/chain/deep\_mind.hpp@{libraries/chain/include/sysio/chain/deep\_mind.hpp}}
+{\ttfamily \#include $<$fc/log/logger.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/types.\+hpp$>$}\newline
+Include dependency graph for deep\+\_\+mind.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{deep__mind_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{deep__mind_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1ram__trace}{sysio\+::chain\+::ram\+\_\+trace}}
+\item 
+class \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler}{sysio\+::chain\+::deep\+\_\+mind\+\_\+handler}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1deep__mind__handler_1_1deep__mind__config}{sysio\+::chain\+::deep\+\_\+mind\+\_\+handler\+::deep\+\_\+mind\+\_\+config}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain}{sysio\+::chain}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain_1_1resource__limits}{sysio\+::chain\+::resource\+\_\+limits}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{deep__mind_8hpp_aaaa2f1dbd522de03ccbaa73f01db5f50}{RAM\+\_\+\+EVENT\+\_\+\+ID}}(FORMAT, ...)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{deep__mind_8hpp_aaaa2f1dbd522de03ccbaa73f01db5f50}\index{deep\_mind.hpp@{deep\_mind.hpp}!RAM\_EVENT\_ID@{RAM\_EVENT\_ID}}
+\index{RAM\_EVENT\_ID@{RAM\_EVENT\_ID}!deep\_mind.hpp@{deep\_mind.hpp}}
+\doxysubsubsection{\texorpdfstring{RAM\_EVENT\_ID}{RAM\_EVENT\_ID}}
+{\footnotesize\ttfamily \label{deep__mind_8hpp_aaaa2f1dbd522de03ccbaa73f01db5f50} 
+\#define RAM\+\_\+\+EVENT\+\_\+\+ID(\begin{DoxyParamCaption}\item[{}]{FORMAT}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \mbox{\hyperlink{namespacefc_acd5129981ae93fce3154d3fed6f6acbc}{fc::format\_string}}(\ FORMAT,\ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}()\_\_VA\_ARGS\_\_\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{deep__mind_8hpp_source_l00027}{27}} of file \mbox{\hyperlink{deep__mind_8hpp_source}{deep\+\_\+mind.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00027\ \textcolor{preprocessor}{\#define\ RAM\_EVENT\_ID(\ FORMAT,\ ...\ )\ \(\backslash\)}}
+\DoxyCodeLine{00028\ \textcolor{preprocessor}{\ \ \ fc::format\_string(\ FORMAT,\ fc::mutable\_variant\_object()\_\_VA\_ARGS\_\_\ )}}
+
+\end{DoxyCode}

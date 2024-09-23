@@ -1,0 +1,294 @@
+\doxysection{sha3.\+cpp}
+\hypertarget{sha3_8cpp_source}{}\label{sha3_8cpp_source}\index{libraries/fc/src/crypto/sha3.cpp@{libraries/fc/src/crypto/sha3.cpp}}
+\mbox{\hyperlink{sha3_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{hex_8hpp}{fc/crypto/hex.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{hmac_8hpp}{fc/crypto/hmac.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{fwd__impl_8hpp}{fc/fwd\_impl.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <openssl/sha.h>}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <string.h>}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <cmath>}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{sha3_8hpp}{fc/crypto/sha3.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{fc_2include_2fc_2variant_8hpp}{fc/variant.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{exception_8hpp}{fc/exception/exception.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{__digest__common_8hpp}{\_digest\_common.hpp}}"{}}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00012}00012\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00013}00013\ \{}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00015}\mbox{\hyperlink{structfc_1_1overloaded}{00015}}\ \textcolor{keyword}{template}\ <\textcolor{keyword}{class}...\ Ts>\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structfc_1_1overloaded}{overloaded}}\ :\ Ts...\ \{\ \textcolor{keyword}{using\ }Ts::operator()...;\ \};}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00016}\mbox{\hyperlink{namespacefc_aafb65031f9e063dd3b0b5217e96cde6e}{00016}}\ \textcolor{keyword}{template}\ <\textcolor{keyword}{class}...\ Ts>\ \mbox{\hyperlink{namespacefc_aafb65031f9e063dd3b0b5217e96cde6e}{overloaded}}(Ts...)\ -\/>\ \mbox{\hyperlink{structfc_1_1overloaded}{overloaded}}<Ts...>;}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00018}00018\ \textcolor{preprocessor}{\#if\ defined(\_\_BYTE\_ORDER\_\_)}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00019}00019\ \textcolor{preprocessor}{\#if\ defined(\_\_ORDER\_LITTLE\_ENDIAN\_\_)}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00020}00020\ \textcolor{keyword}{inline}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{bool}\ is\_little\_endian\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00021}00021\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00022}00022\ \textcolor{keyword}{inline}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{bool}\ is\_little\_endian\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00023}00023\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00024}00024\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00025}00025\ \textcolor{preprocessor}{\#error\ "{}sha3\ implementation\ needs\ \_\_BYTE\_ORDER\_\_\ and\ \_\_ORDER\_LITTLE/BIG\_ENDIAN\_\_\ defined"{}}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00026}00026\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00028}00028\ \textcolor{preprocessor}{\#if\ defined(\_\_builtin\_rotateleft64)}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00029}00029\ \mbox{\hyperlink{namespacefc_a29e4073676ce58527d300f75b017791d}{\_\_attribute\_\_}}\ ((always\_inline))}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00030}00030\ \textcolor{keyword}{inline}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ rotl64(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ x,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{namespacefc_ab199a7c94624123911206db59ebe45da}{y}})\ \{\ \textcolor{keywordflow}{return}\ \_\_builtin\_rotateleft64(x,\ \mbox{\hyperlink{namespacefc_ab199a7c94624123911206db59ebe45da}{y}});\ \}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00031}00031\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00032}00032\ \textcolor{comment}{//\ gcc\ should\ recognize\ this\ better\ than\ clang}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00033}\mbox{\hyperlink{namespacefc_a29e4073676ce58527d300f75b017791d}{00033}}\ \mbox{\hyperlink{namespacefc_a29e4073676ce58527d300f75b017791d}{\_\_attribute\_\_}}\ ((always\_inline))}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00034}\mbox{\hyperlink{namespacefc_ab199a7c94624123911206db59ebe45da}{00034}}\ inline\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ rotl64(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ x,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{namespacefc_ab199a7c94624123911206db59ebe45da}{y}})\ \{\ \textcolor{keywordflow}{return}\ (x\ <<\ \mbox{\hyperlink{namespacefc_ab199a7c94624123911206db59ebe45da}{y}})\ |\ (x\ >>\ (64-\/\mbox{\hyperlink{namespacefc_ab199a7c94624123911206db59ebe45da}{y}}));\ \}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00035}00035\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00036}00036\ \textcolor{comment}{/*\ This\ implementation\ is\ an\ amalgam\ from\ tiny\_sha3\ (https://github.com/mjosaarinen/tiny\_sha3)\ and}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00037}00037\ \textcolor{comment}{\ *\ SHA3UIF\ (https://github.com/brainhub/SHA3UIF)\ and\ documentation.}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00038}00038\ \textcolor{comment}{\ *\ This\ implementation\ is\ quite\ slow\ comparative\ to\ openssl\ 1.1.1.\ Once\ we\ require\ a\ version\ greater}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00039}00039\ \textcolor{comment}{\ *\ than\ or\ equal\ to\ 1.1.1,\ we\ should\ replace\ with\ their\ primitives.}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00040}00040\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00041}\mbox{\hyperlink{structfc_1_1sha3__impl}{00041}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structfc_1_1sha3__impl}{sha3\_impl}}\ \{}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00042}\mbox{\hyperlink{structfc_1_1sha3__impl_ac08f960db7a7fff55d3238aa247d8cd4}{00042}}\ \ \ \ \ \mbox{\hyperlink{structfc_1_1sha3__impl_ac08f960db7a7fff55d3238aa247d8cd4}{sha3\_impl}}()\ \{\ \mbox{\hyperlink{structfc_1_1sha3__impl_a2121cb9f91ded54866b6ad70ca0dec02}{init}}();\ \}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00044}\mbox{\hyperlink{structfc_1_1sha3__impl_a440e87fd375fc68e9297482bea425840}{00044}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \mbox{\hyperlink{structfc_1_1sha3__impl_a440e87fd375fc68e9297482bea425840}{number\_of\_rounds}}\ =\ 24;}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00045}\mbox{\hyperlink{structfc_1_1sha3__impl_ac881a901d427d93e2ca1d8a82b4a895e}{00045}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \mbox{\hyperlink{structfc_1_1sha3__impl_ac881a901d427d93e2ca1d8a82b4a895e}{number\_of\_words}}\ =\ 25;}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00046}\mbox{\hyperlink{structfc_1_1sha3__impl_ac56c3d814fca89442796743d04886c44}{00046}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \mbox{\hyperlink{structfc_1_1sha3__impl_ac56c3d814fca89442796743d04886c44}{digest\_size}}\ =\ 32;}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00047}\mbox{\hyperlink{structfc_1_1sha3__impl_a5b5aae5bdf0a5a087ace8ab9823d647f}{00047}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{structfc_1_1sha3__impl_a5b5aae5bdf0a5a087ace8ab9823d647f}{round\_constants}}[\mbox{\hyperlink{structfc_1_1sha3__impl_a440e87fd375fc68e9297482bea425840}{number\_of\_rounds}}]\ =\ \{}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a8da5373e041921aa34c2b6172ac3babc}{UINT64\_C}}(0x0000000000000001),\ \mbox{\hyperlink{stdint_8h_a8da5373e041921aa34c2b6172ac3babc}{UINT64\_C}}(0x0000000000008082),\ \mbox{\hyperlink{stdint_8h_a8da5373e041921aa34c2b6172ac3babc}{UINT64\_C}}(0x800000000000808a),\ \mbox{\hyperlink{stdint_8h_a8da5373e041921aa34c2b6172ac3babc}{UINT64\_C}}(0x8000000080008000),}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a8da5373e041921aa34c2b6172ac3babc}{UINT64\_C}}(0x000000000000808b),\ \mbox{\hyperlink{stdint_8h_a8da5373e041921aa34c2b6172ac3babc}{UINT64\_C}}(0x0000000080000001),\ \mbox{\hyperlink{stdint_8h_a8da5373e041921aa34c2b6172ac3babc}{UINT64\_C}}(0x8000000080008081),\ \mbox{\hyperlink{stdint_8h_a8da5373e041921aa34c2b6172ac3babc}{UINT64\_C}}(0x8000000000008009),}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00050}00050\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a8da5373e041921aa34c2b6172ac3babc}{UINT64\_C}}(0x000000000000008a),\ \mbox{\hyperlink{stdint_8h_a8da5373e041921aa34c2b6172ac3babc}{UINT64\_C}}(0x0000000000000088),\ \mbox{\hyperlink{stdint_8h_a8da5373e041921aa34c2b6172ac3babc}{UINT64\_C}}(0x0000000080008009),\ \mbox{\hyperlink{stdint_8h_a8da5373e041921aa34c2b6172ac3babc}{UINT64\_C}}(0x000000008000000a),}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00051}00051\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a8da5373e041921aa34c2b6172ac3babc}{UINT64\_C}}(0x000000008000808b),\ \mbox{\hyperlink{stdint_8h_a8da5373e041921aa34c2b6172ac3babc}{UINT64\_C}}(0x800000000000008b),\ \mbox{\hyperlink{stdint_8h_a8da5373e041921aa34c2b6172ac3babc}{UINT64\_C}}(0x8000000000008089),\ \mbox{\hyperlink{stdint_8h_a8da5373e041921aa34c2b6172ac3babc}{UINT64\_C}}(0x8000000000008003),}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a8da5373e041921aa34c2b6172ac3babc}{UINT64\_C}}(0x8000000000008002),\ \mbox{\hyperlink{stdint_8h_a8da5373e041921aa34c2b6172ac3babc}{UINT64\_C}}(0x8000000000000080),\ \mbox{\hyperlink{stdint_8h_a8da5373e041921aa34c2b6172ac3babc}{UINT64\_C}}(0x000000000000800a),\ \mbox{\hyperlink{stdint_8h_a8da5373e041921aa34c2b6172ac3babc}{UINT64\_C}}(0x800000008000000a),}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a8da5373e041921aa34c2b6172ac3babc}{UINT64\_C}}(0x8000000080008081),\ \mbox{\hyperlink{stdint_8h_a8da5373e041921aa34c2b6172ac3babc}{UINT64\_C}}(0x8000000000008080),\ \mbox{\hyperlink{stdint_8h_a8da5373e041921aa34c2b6172ac3babc}{UINT64\_C}}(0x0000000080000001),\ \mbox{\hyperlink{stdint_8h_a8da5373e041921aa34c2b6172ac3babc}{UINT64\_C}}(0x8000000080008008)\};}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00054}\mbox{\hyperlink{structfc_1_1sha3__impl_afa23d4ef27d3c1ffb90fc34260fc5c6f}{00054}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \mbox{\hyperlink{structfc_1_1sha3__impl_afa23d4ef27d3c1ffb90fc34260fc5c6f}{rot\_constants}}[\mbox{\hyperlink{structfc_1_1sha3__impl_a440e87fd375fc68e9297482bea425840}{number\_of\_rounds}}]\ =\ \{1,\ 3,\ 6,\ 10,\ 15,\ 21,\ 28,\ 36,\ 45,\ 55,\ 2,\ 14,\ 27,\ 41,\ 56,\ 8,\ 25,\ 43,\ 62,\ 18,\ 39,\ 61,\ 20,\ 44\};}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00055}\mbox{\hyperlink{structfc_1_1sha3__impl_a95043d7fa8359a0aec2665d7d0266158}{00055}}\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \mbox{\hyperlink{structfc_1_1sha3__impl_a95043d7fa8359a0aec2665d7d0266158}{pi\_lanes}}[\mbox{\hyperlink{structfc_1_1sha3__impl_a440e87fd375fc68e9297482bea425840}{number\_of\_rounds}}]\ =\ \{10,\ 7,\ 11,\ 17,\ 18,\ 3,\ 5,\ 16,\ 8,\ 21,\ 24,\ 4,\ 15,\ 23,\ 19,\ 13,\ 12,\ 2,\ 20,\ 14,\ 22,\ 9,\ 6,\ 1\};}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00057}\mbox{\hyperlink{structfc_1_1sha3__impl_a8dece650a01efc07e33696756ad9fdde}{00057}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structfc_1_1sha3__impl_a8dece650a01efc07e33696756ad9fdde}{update\_step}}()}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00058}00058\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00059}00059\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ bc[5];}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00061}00061\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keyword}{constexpr}\ (!is\_little\_endian)}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00062}00062\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *v;}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00064}00064\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ convert\ the\ buffer\ to\ little\ endian}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00065}00065\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (std::size\_t\ i;\ i\ <\ \mbox{\hyperlink{structfc_1_1sha3__impl_ac881a901d427d93e2ca1d8a82b4a895e}{number\_of\_words}};\ i++)}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00066}00066\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00067}00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ v\ =\ \textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *\textcolor{keyword}{>}(\mbox{\hyperlink{structfc_1_1sha3__impl_ac7fbd364b810404c438fcfa3c00272ed}{words}}\ +\ i);}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1sha3__impl_ac7fbd364b810404c438fcfa3c00272ed}{words}}[i]\ =\ ((\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})v[0])\ |\ (((\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})v[1])\ <<\ 8)\ |}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (((\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})v[2])\ <<\ 16)\ |\ (((\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})v[3])\ <<\ 24)\ |}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (((\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})v[4])\ <<\ 32)\ |\ (((\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})v[5])\ <<\ 40)\ |}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00071}00071\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (((\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})v[6])\ <<\ 48)\ |\ (((\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})v[7])\ <<\ 56);}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00073}00073\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00074}00074\ }
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00075}00075\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#pragma\ clang\ loop\ vectorize(enable)\ interleave(enable)}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00076}00076\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (std::size\_t\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{structfc_1_1sha3__impl_a440e87fd375fc68e9297482bea425840}{number\_of\_rounds}};\ i++)}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00077}00077\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00078}00078\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ theta}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00079}00079\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \#pragma\ clang\ loop\ vectorize(enable)\ interleave(enable)}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00080}00080\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (std::size\_t\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ =\ 0;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ <\ 5;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}++)}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00081}00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ bc[\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}]\ =\ \mbox{\hyperlink{structfc_1_1sha3__impl_ac7fbd364b810404c438fcfa3c00272ed}{words}}[\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}]\ \string^\ \mbox{\hyperlink{structfc_1_1sha3__impl_ac7fbd364b810404c438fcfa3c00272ed}{words}}[\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ +\ 5]\ \string^\ \mbox{\hyperlink{structfc_1_1sha3__impl_ac7fbd364b810404c438fcfa3c00272ed}{words}}[\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ +\ 10]\ \string^\ \mbox{\hyperlink{structfc_1_1sha3__impl_ac7fbd364b810404c438fcfa3c00272ed}{words}}[\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ +\ 15]\ \string^\ \mbox{\hyperlink{structfc_1_1sha3__impl_ac7fbd364b810404c438fcfa3c00272ed}{words}}[\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ +\ 20];}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00083}00083\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ t;}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00084}00084\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \#pragma\ clang\ loop\ vectorize(enable)\ interleave(enable)}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00085}00085\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (std::size\_t\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ =\ 0;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ <\ 5;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}++)}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00086}00086\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00087}00087\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ t\ =\ bc[(\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ +\ 4)\ \%\ 5]\ \string^\ rotl64(bc[(\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ +\ 1)\ \%\ 5],\ 1);}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00088}00088\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \#pragma\ clang\ loop\ vectorize(enable)\ interleave(enable)}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00089}00089\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (std::size\_t\ k\ =\ 0;\ k\ <\ \mbox{\hyperlink{structfc_1_1sha3__impl_ac881a901d427d93e2ca1d8a82b4a895e}{number\_of\_words}};\ k\ +=\ 5)}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00090}00090\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1sha3__impl_ac7fbd364b810404c438fcfa3c00272ed}{words}}[k\ +\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}]\ \string^=\ t;}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00091}00091\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00092}00092\ }
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00093}00093\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ rho\ pi}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00094}00094\ \ \ \ \ \ \ \ \ \ \ \ \ t\ =\ \mbox{\hyperlink{structfc_1_1sha3__impl_ac7fbd364b810404c438fcfa3c00272ed}{words}}[1];}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00095}00095\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \#pragma\ clang\ loop\ vectorize(enable)\ interleave(enable)}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00096}00096\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (std::size\_t\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ =\ 0;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ <\ \mbox{\hyperlink{structfc_1_1sha3__impl_a440e87fd375fc68e9297482bea425840}{number\_of\_rounds}};\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}++)}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00097}00097\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00098}00098\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ \mbox{\hyperlink{structfc_1_1sha3__impl_a95043d7fa8359a0aec2665d7d0266158}{pi\_lanes}}[\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}];}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00099}00099\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ bc[0]\ =\ \mbox{\hyperlink{structfc_1_1sha3__impl_ac7fbd364b810404c438fcfa3c00272ed}{words}}[\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}];}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00100}00100\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1sha3__impl_ac7fbd364b810404c438fcfa3c00272ed}{words}}[\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}]\ =\ rotl64(t,\ \mbox{\hyperlink{structfc_1_1sha3__impl_afa23d4ef27d3c1ffb90fc34260fc5c6f}{rot\_constants}}[\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}]);}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00101}00101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ t\ =\ bc[0];}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00102}00102\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00103}00103\ }
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00104}00104\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ chi}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00105}00105\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \#pragma\ clang\ loop\ vectorize(enable)\ interleave(enable)}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00106}00106\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (std::size\_t\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ =\ 0;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ <\ \mbox{\hyperlink{structfc_1_1sha3__impl_ac881a901d427d93e2ca1d8a82b4a895e}{number\_of\_words}};\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ +=\ 5)}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00107}00107\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00108}00108\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \#pragma\ clang\ loop\ vectorize(enable)\ interleave(enable)}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00109}00109\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (std::size\_t\ k\ =\ 0;\ k\ <\ 5;\ k++)}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00110}00110\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ bc[k]\ =\ \mbox{\hyperlink{structfc_1_1sha3__impl_ac7fbd364b810404c438fcfa3c00272ed}{words}}[k\ +\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}];}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00111}00111\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \#pragma\ clang\ loop\ vectorize(enable)\ interleave(enable)}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00112}00112\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (std::size\_t\ k\ =\ 0;\ k\ <\ 5;\ k++)}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00113}00113\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1sha3__impl_ac7fbd364b810404c438fcfa3c00272ed}{words}}[k\ +\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}]\ \string^=\ (\string~bc[(k\ +\ 1)\ \%\ 5])\ \&\ bc[(k\ +\ 2)\ \%\ 5];}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00114}00114\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00115}00115\ }
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00116}00116\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ iota}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00117}00117\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1sha3__impl_ac7fbd364b810404c438fcfa3c00272ed}{words}}[0]\ \string^=\ \mbox{\hyperlink{structfc_1_1sha3__impl_a5b5aae5bdf0a5a087ace8ab9823d647f}{round\_constants}}[i];}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00118}00118\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00119}00119\ }
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00120}00120\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keyword}{constexpr}\ (!is\_little\_endian)}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00121}00121\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00122}00122\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *v;}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00123}00123\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ tmp;}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00124}00124\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ convert\ back\ to\ big\ endian}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00125}00125\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (std::size\_t\ i\ =\ 0;\ i\ <\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{structfc_1_1sha3__impl_ac7fbd364b810404c438fcfa3c00272ed}{words}});\ i++)}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00126}00126\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00127}00127\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ v\ =\ (\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *)(\mbox{\hyperlink{structfc_1_1sha3__impl_ac7fbd364b810404c438fcfa3c00272ed}{words}}\ +\ i);}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00128}00128\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ tmp\ =\ \mbox{\hyperlink{structfc_1_1sha3__impl_ac7fbd364b810404c438fcfa3c00272ed}{words}}[i];}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00129}00129\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ v[0]\ =\ tmp\ \&\ 0xFF;}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00130}00130\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ v[1]\ =\ (tmp\ >>\ 8)\ \&\ 0xFF;}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00131}00131\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ v[2]\ =\ (tmp\ >>\ 16)\ \&\ 0xFF;}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00132}00132\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ v[3]\ =\ (tmp\ >>\ 24)\ \&\ 0xFF;}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00133}00133\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ v[4]\ =\ (tmp\ >>\ 32)\ \&\ 0xFF;}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00134}00134\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ v[5]\ =\ (tmp\ >>\ 40)\ \&\ 0xFF;}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00135}00135\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ v[6]\ =\ (tmp\ >>\ 48)\ \&\ 0xFF;}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00136}00136\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ v[7]\ =\ (tmp\ >>\ 56)\ \&\ 0xFF;}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00137}00137\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00138}00138\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00139}00139\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00140}00140\ }
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00141}\mbox{\hyperlink{structfc_1_1sha3__impl_a2121cb9f91ded54866b6ad70ca0dec02}{00141}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structfc_1_1sha3__impl_a2121cb9f91ded54866b6ad70ca0dec02}{init}}()\ \{}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00142}00142\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}((\textcolor{keywordtype}{char}\ *)\textcolor{keyword}{this},\ 0,\ \textcolor{keyword}{sizeof}(*\textcolor{keyword}{this}));}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00143}00143\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1sha3__impl_a7dd6d55e7e955db0fb6aaf58bb29b5a8}{size}}\ =\ 136;}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00144}00144\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00145}00145\ }
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00146}\mbox{\hyperlink{structfc_1_1sha3__impl_ad57da91dc1fd13afe3ee1a8ab1f2bb75}{00146}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structfc_1_1sha3__impl_ad57da91dc1fd13afe3ee1a8ab1f2bb75}{update}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}*\ data,\ std::size\_t\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})\ \{}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00147}00147\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ =\ \mbox{\hyperlink{structfc_1_1sha3__impl_a5aa1fe643bbf2f49d1a7397c4bdc5693}{point}};}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00148}00148\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (std::size\_t\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}};\ i++)}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00149}00149\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00150}00150\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}}[\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}++]\ \string^=\ data[i];}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00151}00151\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ >=\ \mbox{\hyperlink{structfc_1_1sha3__impl_a7dd6d55e7e955db0fb6aaf58bb29b5a8}{size}})}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00152}00152\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00153}00153\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1sha3__impl_a8dece650a01efc07e33696756ad9fdde}{update\_step}}();}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00154}00154\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00155}00155\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00156}00156\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00157}00157\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structpoint}{point}}\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}};}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00158}00158\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00159}00159\ }
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00160}\mbox{\hyperlink{structfc_1_1sha3__impl_a1cb647f5fcf28b63c2c89c486b102b46}{00160}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structfc_1_1sha3__impl_a1cb647f5fcf28b63c2c89c486b102b46}{finalize}}(\textcolor{keywordtype}{char}*\ buffer)\ \{}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00161}00161\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}}[\mbox{\hyperlink{structfc_1_1sha3__impl_a5aa1fe643bbf2f49d1a7397c4bdc5693}{point}}]\ \string^=\ \mbox{\hyperlink{structfc_1_1sha3__impl_a4118a5af0908c6b5f9ce1a03de0fc34e}{keccak}}\ ?\ 0x01\ :\ 0x06;}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00162}00162\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}}[\mbox{\hyperlink{structfc_1_1sha3__impl_a7dd6d55e7e955db0fb6aaf58bb29b5a8}{size}}-\/1]\ \string^=\ 0x80;}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00163}00163\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1sha3__impl_a8dece650a01efc07e33696756ad9fdde}{update\_step}}();}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00164}00164\ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(buffer,\ (\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*)\mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}},\ \mbox{\hyperlink{structfc_1_1sha3__impl_ac56c3d814fca89442796743d04886c44}{digest\_size}});}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00165}00165\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00166}00166\ }
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00167}00167\ \ \ \ \ \textcolor{keyword}{union\ }\{}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00168}\mbox{\hyperlink{structfc_1_1sha3__impl_a1f0e59a54a8e3bf8f0d4573680b2ee85}{00168}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}}[\mbox{\hyperlink{structfc_1_1sha3__impl_ac881a901d427d93e2ca1d8a82b4a895e}{number\_of\_words}}*8];}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00169}\mbox{\hyperlink{structfc_1_1sha3__impl_ac7fbd364b810404c438fcfa3c00272ed}{00169}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{structfc_1_1sha3__impl_ac7fbd364b810404c438fcfa3c00272ed}{words}}[\mbox{\hyperlink{structfc_1_1sha3__impl_ac881a901d427d93e2ca1d8a82b4a895e}{number\_of\_words}}*5];\ \textcolor{comment}{//\ this\ is\ greater\ than\ 25,\ because\ in\ the\ theta\ portion\ we\ need\ a\ wide\ berth}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00170}00170\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00171}\mbox{\hyperlink{structfc_1_1sha3__impl_a4118a5af0908c6b5f9ce1a03de0fc34e}{00171}}\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{structfc_1_1sha3__impl_a4118a5af0908c6b5f9ce1a03de0fc34e}{keccak}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00172}\mbox{\hyperlink{structfc_1_1sha3__impl_a5aa1fe643bbf2f49d1a7397c4bdc5693}{00172}}\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{structfc_1_1sha3__impl_a5aa1fe643bbf2f49d1a7397c4bdc5693}{point}};}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00173}\mbox{\hyperlink{structfc_1_1sha3__impl_a7dd6d55e7e955db0fb6aaf58bb29b5a8}{00173}}\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{structfc_1_1sha3__impl_a7dd6d55e7e955db0fb6aaf58bb29b5a8}{size}};}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00174}00174\ \};}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00175}00175\ }
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00176}\mbox{\hyperlink{classfc_1_1sha3_ab83fb4c2c4c1739ca108baeef30bae6c}{00176}}\ \mbox{\hyperlink{classfc_1_1sha3_ab83fb4c2c4c1739ca108baeef30bae6c}{sha3::sha3}}()}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00177}00177\ \{}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00178}00178\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(\mbox{\hyperlink{classfc_1_1sha3_ad590e9c94055d7cd7e71c07f97131157}{\_hash}},\ 0,\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{classfc_1_1sha3_ad590e9c94055d7cd7e71c07f97131157}{\_hash}}));}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00179}00179\ \}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00180}\mbox{\hyperlink{classfc_1_1sha3_a4a46e9346c845d9b1938cff8d63d9b00}{00180}}\ \mbox{\hyperlink{classfc_1_1sha3_ab83fb4c2c4c1739ca108baeef30bae6c}{sha3::sha3}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *data,\ \textcolor{keywordtype}{size\_t}\ size)}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00181}00181\ \{}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00182}00182\ \ \ \ \ \textcolor{keywordflow}{if}\ (size\ !=\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{classfc_1_1sha3_ad590e9c94055d7cd7e71c07f97131157}{\_hash}}))}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00183}00183\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\mbox{\hyperlink{classfc_1_1exception}{exception}},\ \textcolor{stringliteral}{"{}sha3:\ size\ mismatch"{}});}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00184}00184\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(\mbox{\hyperlink{classfc_1_1sha3_ad590e9c94055d7cd7e71c07f97131157}{\_hash}},\ data,\ size);}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00185}00185\ \}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00186}\mbox{\hyperlink{classfc_1_1sha3_ac56b3a2ed48dad6378bad1d072122472}{00186}}\ \mbox{\hyperlink{classfc_1_1sha3_ab83fb4c2c4c1739ca108baeef30bae6c}{sha3::sha3}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\ \&hex\_str)}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00187}00187\ \{}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00188}00188\ \ \ \ \ \textcolor{keyword}{auto}\ bytes\_written\ =\ \mbox{\hyperlink{namespacefc_a6a0fb5b79914774be4ab66462362b292}{fc::from\_hex}}(hex\_str,\ (\textcolor{keywordtype}{char}\ *)\mbox{\hyperlink{classfc_1_1sha3_ad590e9c94055d7cd7e71c07f97131157}{\_hash}},\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{classfc_1_1sha3_ad590e9c94055d7cd7e71c07f97131157}{\_hash}}));}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00189}00189\ \ \ \ \ \textcolor{keywordflow}{if}\ (bytes\_written\ <\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{classfc_1_1sha3_ad590e9c94055d7cd7e71c07f97131157}{\_hash}}))}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00190}00190\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}((\textcolor{keywordtype}{char}\ *)\mbox{\hyperlink{classfc_1_1sha3_ad590e9c94055d7cd7e71c07f97131157}{\_hash}}\ +\ bytes\_written,\ 0,\ (\textcolor{keyword}{sizeof}(\mbox{\hyperlink{classfc_1_1sha3_ad590e9c94055d7cd7e71c07f97131157}{\_hash}})\ -\/\ bytes\_written));}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00191}00191\ \}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00192}00192\ }
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00193}\mbox{\hyperlink{classfc_1_1sha3_a7a1230e3d747a88da042331db9d50d6f}{00193}}\ \textcolor{keywordtype}{string}\ \mbox{\hyperlink{classfc_1_1sha3_a7a1230e3d747a88da042331db9d50d6f}{sha3::str}}()\textcolor{keyword}{\ const}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00194}00194\ \textcolor{keyword}{}\{}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00195}00195\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacefc_aab567c89004d329f560014d9943afcd6}{fc::to\_hex}}((\textcolor{keywordtype}{char}\ *)\mbox{\hyperlink{classfc_1_1sha3_ad590e9c94055d7cd7e71c07f97131157}{\_hash}},\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{classfc_1_1sha3_ad590e9c94055d7cd7e71c07f97131157}{\_hash}}));}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00196}00196\ \}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00197}\mbox{\hyperlink{classfc_1_1sha3_aaff35475d2ae1fa2401c052246ca6d36}{00197}}\ sha3::operator\ \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ str();\ \}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00198}00198\ }
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00199}\mbox{\hyperlink{classfc_1_1sha3_a44258f46ed71886fde86785da18a4e3b}{00199}}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{classfc_1_1sha3_a44258f46ed71886fde86785da18a4e3b}{sha3::data}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ (\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *)\&\mbox{\hyperlink{classfc_1_1sha3_ad590e9c94055d7cd7e71c07f97131157}{\_hash}}[0];\ \}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00200}\mbox{\hyperlink{classfc_1_1sha3_a2ab75c3f97e52ae7b953be3aba46fb28}{00200}}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{classfc_1_1sha3_a44258f46ed71886fde86785da18a4e3b}{sha3::data}}()\ \{\ \textcolor{keywordflow}{return}\ (\textcolor{keywordtype}{char}\ *)\&\mbox{\hyperlink{classfc_1_1sha3_ad590e9c94055d7cd7e71c07f97131157}{\_hash}}[0];\ \}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00201}00201\ }
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00202}\mbox{\hyperlink{structfc_1_1sha3_1_1encoder_1_1impl}{00202}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structfc_1_1sha3_1_1encoder_1_1impl}{sha3::encoder::impl}}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00203}00203\ \{}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00204}\mbox{\hyperlink{structfc_1_1sha3_1_1encoder_1_1impl_af209ba1b5ac4f4be81eb46d187f26ded}{00204}}\ \ \ \ \ \mbox{\hyperlink{structfc_1_1sha3__impl}{sha3\_impl}}\ \mbox{\hyperlink{structfc_1_1sha3_1_1encoder_1_1impl_af209ba1b5ac4f4be81eb46d187f26ded}{ctx}};}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00205}00205\ \};}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00206}00206\ }
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00207}\mbox{\hyperlink{classfc_1_1sha3_1_1encoder_af4dd6ad263e5b152642bb3fd81c729a0}{00207}}\ \mbox{\hyperlink{classfc_1_1sha3_1_1encoder_af4dd6ad263e5b152642bb3fd81c729a0}{sha3::encoder::\string~encoder}}()\ \{\}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00208}\mbox{\hyperlink{classfc_1_1sha3_1_1encoder_a34d08f4c49a15fdd54d28a04194d454b}{00208}}\ \mbox{\hyperlink{classfc_1_1sha3_1_1encoder_a34d08f4c49a15fdd54d28a04194d454b}{sha3::encoder::encoder}}()}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00209}00209\ \{}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00210}00210\ \ \ \ \ reset();}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00211}00211\ \}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00212}00212\ }
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00213}\mbox{\hyperlink{classfc_1_1sha3_1_1encoder_a661125220328a46ba8bb35614098225b}{00213}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1sha3_1_1encoder_a661125220328a46ba8bb35614098225b}{sha3::encoder::write}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *d,\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ dlen)}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00214}00214\ \{}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00215}00215\ \ \ \ \ my-\/>ctx.update((\textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}*)\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}},\ dlen);}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00216}00216\ \}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00217}\mbox{\hyperlink{classfc_1_1sha3_1_1encoder_a1a67af4cb5c1e75dd87d6fb2fcad2c63}{00217}}\ \mbox{\hyperlink{classfc_1_1sha3}{sha3}}\ \mbox{\hyperlink{classfc_1_1sha3_1_1encoder_a1a67af4cb5c1e75dd87d6fb2fcad2c63}{sha3::encoder::result}}(\textcolor{keywordtype}{bool}\ is\_nist)}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00218}00218\ \{}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00219}00219\ \ \ \ \ \mbox{\hyperlink{classfc_1_1sha3}{sha3}}\ h;}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00220}00220\ \ \ \ \ my-\/>ctx.keccak\ =\ !is\_nist;}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00221}00221\ \ \ \ \ my-\/>ctx.finalize((\textcolor{keywordtype}{char}*)h.\mbox{\hyperlink{classfc_1_1sha3_a44258f46ed71886fde86785da18a4e3b}{data}}());}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00222}00222\ \ \ \ \ \textcolor{keywordflow}{return}\ h;}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00223}00223\ \}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00224}\mbox{\hyperlink{classfc_1_1sha3_1_1encoder_a5627bd1be639c92eb736dd099972e0c8}{00224}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1sha3_1_1encoder_a5627bd1be639c92eb736dd099972e0c8}{sha3::encoder::reset}}()}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00225}00225\ \{}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00226}00226\ \ \ \ \ my-\/>ctx.init();}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00227}00227\ \}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00228}00228\ }
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00229}\mbox{\hyperlink{classfc_1_1sha3_a3928d4ed66f0eb9ddb6c14aa29ce6ad0}{00229}}\ \mbox{\hyperlink{classfc_1_1sha3}{sha3}}\ \mbox{\hyperlink{classfc_1_1sha3_a1bc3d3865ea7bb52cb37ad872fd92af3}{operator<<}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha3}{sha3}}\ \&h1,\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ i)}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00230}00230\ \{}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00231}00231\ \ \ \ \ \mbox{\hyperlink{classfc_1_1sha3}{sha3}}\ result;}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00232}00232\ \ \ \ \ fc::detail::shift\_l(h1.\mbox{\hyperlink{classfc_1_1sha3_a44258f46ed71886fde86785da18a4e3b}{data}}(),\ result.data(),\ result.data\_size(),\ i);}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00233}00233\ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00234}00234\ \}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00235}\mbox{\hyperlink{classfc_1_1sha3_a9963ffda5b523dd10919ef3e41bfdfb2}{00235}}\ \mbox{\hyperlink{classfc_1_1sha3}{sha3}}\ \mbox{\hyperlink{classfc_1_1sha3_a5c4ec6766a74d8f7ae1ef3b62026d0cf}{operator>>}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha3}{sha3}}\ \&h1,\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ i)}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00236}00236\ \{}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00237}00237\ \ \ \ \ \mbox{\hyperlink{classfc_1_1sha3}{sha3}}\ result;}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00238}00238\ \ \ \ \ fc::detail::shift\_r(h1.\mbox{\hyperlink{classfc_1_1sha3_a44258f46ed71886fde86785da18a4e3b}{data}}(),\ result.data(),\ result.data\_size(),\ i);}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00239}00239\ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00240}00240\ \}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00241}\mbox{\hyperlink{classfc_1_1sha3_ae00883ce4174f8fbd869ca34e82721fc}{00241}}\ \mbox{\hyperlink{classfc_1_1sha3}{sha3}}\ \mbox{\hyperlink{classfc_1_1sha3_ae00883ce4174f8fbd869ca34e82721fc}{operator\string^}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha3}{sha3}}\ \&h1,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha3}{sha3}}\ \&h2)}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00242}00242\ \{}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00243}00243\ \ \ \ \ \mbox{\hyperlink{classfc_1_1sha3}{sha3}}\ result;}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00244}00244\ \ \ \ \ result.\_hash[0]\ =\ h1.\mbox{\hyperlink{classfc_1_1sha3_ad590e9c94055d7cd7e71c07f97131157}{\_hash}}[0]\ \string^\ h2.\mbox{\hyperlink{classfc_1_1sha3_ad590e9c94055d7cd7e71c07f97131157}{\_hash}}[0];}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00245}00245\ \ \ \ \ result.\_hash[1]\ =\ h1.\mbox{\hyperlink{classfc_1_1sha3_ad590e9c94055d7cd7e71c07f97131157}{\_hash}}[1]\ \string^\ h2.\mbox{\hyperlink{classfc_1_1sha3_ad590e9c94055d7cd7e71c07f97131157}{\_hash}}[1];}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00246}00246\ \ \ \ \ result.\_hash[2]\ =\ h1.\mbox{\hyperlink{classfc_1_1sha3_ad590e9c94055d7cd7e71c07f97131157}{\_hash}}[2]\ \string^\ h2.\mbox{\hyperlink{classfc_1_1sha3_ad590e9c94055d7cd7e71c07f97131157}{\_hash}}[2];}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00247}00247\ \ \ \ \ result.\_hash[3]\ =\ h1.\mbox{\hyperlink{classfc_1_1sha3_ad590e9c94055d7cd7e71c07f97131157}{\_hash}}[3]\ \string^\ h2.\mbox{\hyperlink{classfc_1_1sha3_ad590e9c94055d7cd7e71c07f97131157}{\_hash}}[3];}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00248}00248\ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00249}00249\ \}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00250}\mbox{\hyperlink{classfc_1_1sha3_a5b8e807bf2b7b0dff0c578c59545e4dc}{00250}}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classfc_1_1sha3_a5b8e807bf2b7b0dff0c578c59545e4dc}{operator>=}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha3}{sha3}}\ \&h1,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha3}{sha3}}\ \&h2)}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00251}00251\ \{}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00252}00252\ \ \ \ \ \textcolor{keywordflow}{return}\ memcmp(h1.\mbox{\hyperlink{classfc_1_1sha3_ad590e9c94055d7cd7e71c07f97131157}{\_hash}},\ h2.\mbox{\hyperlink{classfc_1_1sha3_ad590e9c94055d7cd7e71c07f97131157}{\_hash}},\ \textcolor{keyword}{sizeof}(h1.\mbox{\hyperlink{classfc_1_1sha3_ad590e9c94055d7cd7e71c07f97131157}{\_hash}}))\ >=\ 0;}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00253}00253\ \}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00254}\mbox{\hyperlink{classfc_1_1sha3_a8e56da3d03cf7773e09246423e6db42a}{00254}}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classfc_1_1sha3_a8e56da3d03cf7773e09246423e6db42a}{operator>}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha3}{sha3}}\ \&h1,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha3}{sha3}}\ \&h2)}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00255}00255\ \{}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00256}00256\ \ \ \ \ \textcolor{keywordflow}{return}\ memcmp(h1.\mbox{\hyperlink{classfc_1_1sha3_ad590e9c94055d7cd7e71c07f97131157}{\_hash}},\ h2.\mbox{\hyperlink{classfc_1_1sha3_ad590e9c94055d7cd7e71c07f97131157}{\_hash}},\ \textcolor{keyword}{sizeof}(h1.\mbox{\hyperlink{classfc_1_1sha3_ad590e9c94055d7cd7e71c07f97131157}{\_hash}}))\ >\ 0;}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00257}00257\ \}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00258}\mbox{\hyperlink{classfc_1_1sha3_ab4e4e7b980832171ad1a2474611f51bf}{00258}}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classfc_1_1sha3_ab4e4e7b980832171ad1a2474611f51bf}{operator<}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha3}{sha3}}\ \&h1,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha3}{sha3}}\ \&h2)}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00259}00259\ \{}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00260}00260\ \ \ \ \ \textcolor{keywordflow}{return}\ memcmp(h1.\mbox{\hyperlink{classfc_1_1sha3_ad590e9c94055d7cd7e71c07f97131157}{\_hash}},\ h2.\mbox{\hyperlink{classfc_1_1sha3_ad590e9c94055d7cd7e71c07f97131157}{\_hash}},\ \textcolor{keyword}{sizeof}(h1.\mbox{\hyperlink{classfc_1_1sha3_ad590e9c94055d7cd7e71c07f97131157}{\_hash}}))\ <\ 0;}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00261}00261\ \}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00262}\mbox{\hyperlink{classfc_1_1sha3_a12a4620167e9d9404eaacdf6036846a5}{00262}}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classfc_1_1sha3_a12a4620167e9d9404eaacdf6036846a5}{operator!=}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha3}{sha3}}\ \&h1,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha3}{sha3}}\ \&h2)}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00263}00263\ \{}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00264}00264\ \ \ \ \ \textcolor{keywordflow}{return}\ !(h1\ ==\ h2);}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00265}00265\ \}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00266}\mbox{\hyperlink{classfc_1_1sha3_ac1c38d30b126ac61dc6a0372144669d8}{00266}}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classfc_1_1sha3_ac1c38d30b126ac61dc6a0372144669d8}{operator==}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha3}{sha3}}\ \&h1,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha3}{sha3}}\ \&h2)}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00267}00267\ \{}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00268}00268\ \ \ \ \ \textcolor{comment}{//\ idea\ to\ not\ use\ memcmp,\ from:}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00269}00269\ \ \ \ \ \textcolor{comment}{//\ \ \ https://lemire.me/blog/2018/08/22/avoid-\/lexicographical-\/comparisons-\/when-\/testing-\/for-\/string-\/equality/}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00270}00270\ \ \ \ \ \textcolor{keywordflow}{return}\ h1.\mbox{\hyperlink{classfc_1_1sha3_ad590e9c94055d7cd7e71c07f97131157}{\_hash}}[0]\ ==\ h2.\mbox{\hyperlink{classfc_1_1sha3_ad590e9c94055d7cd7e71c07f97131157}{\_hash}}[0]\ \&\&}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00271}00271\ \ \ \ \ \ \ \ \ \ \ \ \ \ h1.\mbox{\hyperlink{classfc_1_1sha3_ad590e9c94055d7cd7e71c07f97131157}{\_hash}}[1]\ ==\ h2.\mbox{\hyperlink{classfc_1_1sha3_ad590e9c94055d7cd7e71c07f97131157}{\_hash}}[1]\ \&\&}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00272}00272\ \ \ \ \ \ \ \ \ \ \ \ \ \ h1.\mbox{\hyperlink{classfc_1_1sha3_ad590e9c94055d7cd7e71c07f97131157}{\_hash}}[2]\ ==\ h2.\mbox{\hyperlink{classfc_1_1sha3_ad590e9c94055d7cd7e71c07f97131157}{\_hash}}[2]\ \&\&}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00273}00273\ \ \ \ \ \ \ \ \ \ \ \ \ \ h1.\mbox{\hyperlink{classfc_1_1sha3_ad590e9c94055d7cd7e71c07f97131157}{\_hash}}[3]\ ==\ h2.\mbox{\hyperlink{classfc_1_1sha3_ad590e9c94055d7cd7e71c07f97131157}{\_hash}}[3];}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00274}00274\ \}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00275}00275\ }
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00276}\mbox{\hyperlink{namespacefc_a5f62fccc1399512d7759b29e48fd7382}{00276}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefc_adea61f2343de94d0fbcb920a32332ad9}{to\_variant}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha3}{sha3}}\ \&bi,\ \mbox{\hyperlink{classfc_1_1variant}{variant}}\ \&v)}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00277}00277\ \{}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00278}00278\ \ \ \ \ v\ =\ std::vector<char>((\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *)\&bi,\ ((\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *)\&bi)\ +\ \textcolor{keyword}{sizeof}(bi));}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00279}00279\ \}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00280}\mbox{\hyperlink{namespacefc_a80e6742c3dafa4cf10ff1f716e62380d}{00280}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefc_accef08adf4ee05c36ccc550d8101b08f}{from\_variant}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1variant}{variant}}\ \&v,\ \mbox{\hyperlink{classfc_1_1sha3}{sha3}}\ \&bi)}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00281}00281\ \{}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00282}00282\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ \&ve\ =\ v.as<std::vector<char>>();}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00283}00283\ \ \ \ \ \textcolor{keywordflow}{if}\ (ve.size())}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00284}00284\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(\&bi,\ ve.\mbox{\hyperlink{classfc_1_1sha3_a44258f46ed71886fde86785da18a4e3b}{data}}(),\ \mbox{\hyperlink{namespacefc_aa3ea11c18de71ec23b19c3cc571fb8ff}{fc::min<size\_t>}}(ve.size(),\ \textcolor{keyword}{sizeof}(bi)));}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00285}00285\ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00286}00286\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(\&bi,\ \textcolor{keywordtype}{char}(0),\ \textcolor{keyword}{sizeof}(bi));}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00287}00287\ \}}
+\DoxyCodeLine{\Hypertarget{sha3_8cpp_source_l00288}00288\ \}\ \textcolor{comment}{//\ namespace\ fc}}
+
+\end{DoxyCode}

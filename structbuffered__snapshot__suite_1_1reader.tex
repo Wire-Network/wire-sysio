@@ -1,0 +1,111 @@
+\doxysection{buffered\+\_\+snapshot\+\_\+suite\+::reader Struct Reference}
+\hypertarget{structbuffered__snapshot__suite_1_1reader}{}\label{structbuffered__snapshot__suite_1_1reader}\index{buffered\_snapshot\_suite::reader@{buffered\_snapshot\_suite::reader}}
+
+
+{\ttfamily \#include $<$snapshot\+\_\+suites.\+hpp$>$}
+
+
+
+Inheritance diagram for buffered\+\_\+snapshot\+\_\+suite\+::reader\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=203pt]{structbuffered__snapshot__suite_1_1reader__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for buffered\+\_\+snapshot\+\_\+suite\+::reader\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=203pt]{structbuffered__snapshot__suite_1_1reader__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structbuffered__snapshot__suite_1_1reader_a842d930e870b50b6c8ccc36f7c6dd686}{reader}} (const std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{structbuffered__snapshot__suite_a08329904fa207a6a36a5ef30fb683b17}{read\+\_\+storage\+\_\+t}} $>$ \&\mbox{\hyperlink{structbuffered__snapshot__suite_1_1reader_a125efcc07faf3c159b9588ba5a792ff8}{storage}})
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classsysio_1_1chain_1_1istream__snapshot__reader}{sysio\+::chain\+::istream\+\_\+snapshot\+\_\+reader}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classsysio_1_1chain_1_1istream__snapshot__reader_a73f5fbd3730b70715b1873db2375f3f6}{istream\+\_\+snapshot\+\_\+reader}} (std\+::istream \&snapshot)
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1istream__snapshot__reader_a9fc0f95f59a1f10b6b3f73867df394a4}{validate}} () const override
+\item 
+bool \mbox{\hyperlink{classsysio_1_1chain_1_1istream__snapshot__reader_aef95b6a7a122138847ea5fd447f0dc32}{has\+\_\+section}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&section\+\_\+name) override
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1istream__snapshot__reader_a42529cf39edab20774a69b17f61e17cf}{set\+\_\+section}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&section\+\_\+name) override
+\item 
+bool \mbox{\hyperlink{classsysio_1_1chain_1_1istream__snapshot__reader_a8d66a77da41ec8840399e9123093f371}{read\+\_\+row}} (\mbox{\hyperlink{structsysio_1_1chain_1_1detail_1_1abstract__snapshot__row__reader}{detail\+::abstract\+\_\+snapshot\+\_\+row\+\_\+reader}} \&row\+\_\+reader) override
+\item 
+bool \mbox{\hyperlink{classsysio_1_1chain_1_1istream__snapshot__reader_a131614d7b6a7339619ddaea7f385f1ed}{empty}} () override
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1istream__snapshot__reader_a1b91638fb76534c9a87cc03442eb5c0e}{clear\+\_\+section}} () override
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1istream__snapshot__reader_ac4190ed75bc064754c787f5fa9faf595}{return\+\_\+to\+\_\+header}} () override
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classsysio_1_1chain_1_1snapshot__reader}{sysio\+::chain\+::snapshot\+\_\+reader}}}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename F $>$ }\\void \mbox{\hyperlink{classsysio_1_1chain_1_1snapshot__reader_ab72cf60edc3de08fd2bf10b10ae72261}{read\+\_\+section}} (const std\+::string \&section\+\_\+name, F \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename F $>$ }\\void \mbox{\hyperlink{classsysio_1_1chain_1_1snapshot__reader_a328258773a7f5852fb70fd9f96617776}{read\+\_\+section}} (F \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\bool \mbox{\hyperlink{classsysio_1_1chain_1_1snapshot__reader_a14583acf5c7c41d9f2d1b27dd55c4875}{has\+\_\+section}} (const std\+::string \&suffix=std\+::string())
+\item 
+virtual \mbox{\hyperlink{classsysio_1_1chain_1_1snapshot__reader_a0d68be7e8d00f8d6e4615586e2a66564}{\texorpdfstring{$\sim$}{\string~}snapshot\+\_\+reader}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{structbuffered__snapshot__suite_a08329904fa207a6a36a5ef30fb683b17}{read\+\_\+storage\+\_\+t}} $>$ \mbox{\hyperlink{structbuffered__snapshot__suite_1_1reader_a125efcc07faf3c159b9588ba5a792ff8}{storage}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Protected Member Functions inherited from \mbox{\hyperlink{classsysio_1_1chain_1_1snapshot__reader}{sysio\+::chain\+::snapshot\+\_\+reader}}}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{snapshot__suites_8hpp_source_l00075}{75}} of file \mbox{\hyperlink{snapshot__suites_8hpp_source}{snapshot\+\_\+suites.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structbuffered__snapshot__suite_1_1reader_a842d930e870b50b6c8ccc36f7c6dd686}\index{buffered\_snapshot\_suite::reader@{buffered\_snapshot\_suite::reader}!reader@{reader}}
+\index{reader@{reader}!buffered\_snapshot\_suite::reader@{buffered\_snapshot\_suite::reader}}
+\doxysubsubsection{\texorpdfstring{reader()}{reader()}}
+{\footnotesize\ttfamily \label{structbuffered__snapshot__suite_1_1reader_a842d930e870b50b6c8ccc36f7c6dd686} 
+buffered\+\_\+snapshot\+\_\+suite\+::reader\+::reader (\begin{DoxyParamCaption}\item[{const std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{structbuffered__snapshot__suite_a08329904fa207a6a36a5ef30fb683b17}{read\+\_\+storage\+\_\+t}} $>$ \&}]{storage}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{snapshot__suites_8hpp_source_l00076}{76}} of file \mbox{\hyperlink{snapshot__suites_8hpp_source}{snapshot\+\_\+suites.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ :\mbox{\hyperlink{structbuffered__snapshot__suite_a4ad526f377995a81c6fa57cb0cbbf6c4}{reader\_t}}(*\mbox{\hyperlink{structbuffered__snapshot__suite_1_1reader_a125efcc07faf3c159b9588ba5a792ff8}{storage}})}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ ,\mbox{\hyperlink{structbuffered__snapshot__suite_1_1reader_a125efcc07faf3c159b9588ba5a792ff8}{storage}}(\mbox{\hyperlink{structbuffered__snapshot__suite_1_1reader_a125efcc07faf3c159b9588ba5a792ff8}{storage}})}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structbuffered__snapshot__suite_1_1reader_a125efcc07faf3c159b9588ba5a792ff8}\index{buffered\_snapshot\_suite::reader@{buffered\_snapshot\_suite::reader}!storage@{storage}}
+\index{storage@{storage}!buffered\_snapshot\_suite::reader@{buffered\_snapshot\_suite::reader}}
+\doxysubsubsection{\texorpdfstring{storage}{storage}}
+{\footnotesize\ttfamily \label{structbuffered__snapshot__suite_1_1reader_a125efcc07faf3c159b9588ba5a792ff8} 
+std\+::shared\+\_\+ptr$<$\mbox{\hyperlink{structbuffered__snapshot__suite_a08329904fa207a6a36a5ef30fb683b17}{read\+\_\+storage\+\_\+t}}$>$ buffered\+\_\+snapshot\+\_\+suite\+::reader\+::storage}
+
+
+
+Definition at line \mbox{\hyperlink{snapshot__suites_8hpp_source_l00081}{81}} of file \mbox{\hyperlink{snapshot__suites_8hpp_source}{snapshot\+\_\+suites.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/testing/include/sysio/testing/\mbox{\hyperlink{snapshot__suites_8hpp}{snapshot\+\_\+suites.\+hpp}}\end{DoxyCompactItemize}

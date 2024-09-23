@@ -1,0 +1,260 @@
+\doxysection{libraries/fc/libraries/ff/depends/ate-\/pairing/include/cybozu/inttype.hpp File Reference}
+\hypertarget{ate-pairing_2include_2cybozu_2inttype_8hpp}{}\label{ate-pairing_2include_2cybozu_2inttype_8hpp}\index{libraries/fc/libraries/ff/depends/ate-\/pairing/include/cybozu/inttype.hpp@{libraries/fc/libraries/ff/depends/ate-\/pairing/include/cybozu/inttype.hpp}}
+
+
+int type definition and macros Copyright (C) 2008 Cybozu Labs, Inc., all rights reserved.  
+
+
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include $<$unistd.\+h$>$}\newline
+Include dependency graph for inttype.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=237pt]{ate-pairing_2include_2cybozu_2inttype_8hpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacecybozu}{cybozu}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{ate-pairing_2include_2cybozu_2inttype_8hpp_a7a8b009e99b75a1b25f4c38503b7ee62}{CYBOZU\+\_\+\+ALIGN}}(x)
+\item 
+\#define \mbox{\hyperlink{ate-pairing_2include_2cybozu_2inttype_8hpp_adcdb3faec91b3b6fc7d6ec6042b3a305}{CYBOZU\+\_\+\+FORCE\+\_\+\+INLINE}}~\+\_\+\+\_\+attribute\+\_\+\+\_\+((always\+\_\+inline))
+\item 
+\#define \mbox{\hyperlink{ate-pairing_2include_2cybozu_2inttype_8hpp_ada57abbe34b2b6df7713c87602d58ac1}{CYBOZU\+\_\+\+ALLOCA\+\_\+}}(x)
+\item 
+\#define \mbox{\hyperlink{ate-pairing_2include_2cybozu_2inttype_8hpp_a9590a04f10a3cc6e777de8bef7ae030c}{CYBOZU\+\_\+\+NUM\+\_\+\+OF\+\_\+\+ARRAY}}(x)
+\item 
+\#define \mbox{\hyperlink{ate-pairing_2include_2cybozu_2inttype_8hpp_a6ff8eedb77b726a888b05c967e5d270e}{CYBOZU\+\_\+\+SNPRINTF}}(x,  \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}, ...)
+\item 
+\#define \mbox{\hyperlink{ate-pairing_2include_2cybozu_2inttype_8hpp_a6e8c965fda263156ba402d9551b0485b}{CYBOZU\+\_\+\+CPP\+\_\+\+VERSION\+\_\+\+CPP03}}~0
+\item 
+\#define \mbox{\hyperlink{ate-pairing_2include_2cybozu_2inttype_8hpp_aa807dce4c171a94a787374dc859197dd}{CYBOZU\+\_\+\+CPP\+\_\+\+VERSION\+\_\+\+TR1}}~1
+\item 
+\#define \mbox{\hyperlink{ate-pairing_2include_2cybozu_2inttype_8hpp_a7e393045f353f1af7d1c875a391de81d}{CYBOZU\+\_\+\+CPP\+\_\+\+VERSION\+\_\+\+CPP11}}~2
+\item 
+\#define \mbox{\hyperlink{ate-pairing_2include_2cybozu_2inttype_8hpp_ab28a8f9b585142cd1b3dbb873793340c}{CYBOZU\+\_\+\+CPP\+\_\+\+VERSION}}~\mbox{\hyperlink{ate-pairing_2include_2cybozu_2inttype_8hpp_a6e8c965fda263156ba402d9551b0485b}{CYBOZU\+\_\+\+CPP\+\_\+\+VERSION\+\_\+\+CPP03}}
+\item 
+\#define \mbox{\hyperlink{ate-pairing_2include_2cybozu_2inttype_8hpp_a7410ce0bb8601765676018efe712360a}{CYBOZU\+\_\+\+NAMESPACE\+\_\+\+STD}}~std
+\item 
+\#define \mbox{\hyperlink{ate-pairing_2include_2cybozu_2inttype_8hpp_a4b137e9bb3490b8f0157281f9b8647b0}{CYBOZU\+\_\+\+NAMESPACE\+\_\+\+TR1\+\_\+\+BEGIN}}
+\item 
+\#define \mbox{\hyperlink{ate-pairing_2include_2cybozu_2inttype_8hpp_a11a2045c1dc1b5ae30b76ee24bf7ff76}{CYBOZU\+\_\+\+NAMESPACE\+\_\+\+TR1\+\_\+\+END}}
+\item 
+\#define \mbox{\hyperlink{ate-pairing_2include_2cybozu_2inttype_8hpp_a66ce9a5702fda83c4e384f6706c9778d}{CYBOZU\+\_\+\+OS\+\_\+\+BIT}}~32
+\item 
+\#define \mbox{\hyperlink{ate-pairing_2include_2cybozu_2inttype_8hpp_af25a3440c644e1e4b8a856824c9472dd}{CYBOZU\+\_\+\+ENDIAN\+\_\+\+UNKNOWN}}~0
+\item 
+\#define \mbox{\hyperlink{ate-pairing_2include_2cybozu_2inttype_8hpp_a43fa25921317799841ec0f1b3e9ac425}{CYBOZU\+\_\+\+ENDIAN\+\_\+\+LITTLE}}~1
+\item 
+\#define \mbox{\hyperlink{ate-pairing_2include_2cybozu_2inttype_8hpp_a33b49301a837bcfdce1f629f0e067c6c}{CYBOZU\+\_\+\+ENDIAN\+\_\+\+BIG}}~2
+\item 
+\#define \mbox{\hyperlink{ate-pairing_2include_2cybozu_2inttype_8hpp_ad070c94713f729d5fa45d2e1db1673cf}{CYBOZU\+\_\+\+ENDIAN}}~\mbox{\hyperlink{ate-pairing_2include_2cybozu_2inttype_8hpp_af25a3440c644e1e4b8a856824c9472dd}{CYBOZU\+\_\+\+ENDIAN\+\_\+\+UNKNOWN}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{namespacecybozu_abde6423ec5ae02c2dde02c810458fbdf}{cybozu\+::disable\+\_\+warning\+\_\+unused\+\_\+variable}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&)
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{struct_s}{S}} $>$ }\\\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{namespacecybozu_ac5c1b9f2563e9274b9de051be14ddd40}{cybozu\+::cast}} (const \mbox{\hyperlink{struct_s}{S}} \texorpdfstring{$\ast$}{*}ptr)
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{struct_s}{S}} $>$ }\\\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{namespacecybozu_ab589c2eec4f5bfb9bda76892dc652625}{cybozu\+::cast}} (\mbox{\hyperlink{struct_s}{S}} \texorpdfstring{$\ast$}{*}ptr)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{ate-pairing_2include_2cybozu_2inttype_8hpp_a7a8b009e99b75a1b25f4c38503b7ee62}\index{inttype.hpp@{inttype.hpp}!CYBOZU\_ALIGN@{CYBOZU\_ALIGN}}
+\index{CYBOZU\_ALIGN@{CYBOZU\_ALIGN}!inttype.hpp@{inttype.hpp}}
+\doxysubsubsection{\texorpdfstring{CYBOZU\_ALIGN}{CYBOZU\_ALIGN}}
+{\footnotesize\ttfamily \label{ate-pairing_2include_2cybozu_2inttype_8hpp_a7a8b009e99b75a1b25f4c38503b7ee62} 
+\#define CYBOZU\+\_\+\+ALIGN(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\_\_attribute\_\_((aligned(x)))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{ate-pairing_2include_2cybozu_2inttype_8hpp_source_l00039}{39}} of file \mbox{\hyperlink{ate-pairing_2include_2cybozu_2inttype_8hpp_source}{inttype.\+hpp}}.
+
+\Hypertarget{ate-pairing_2include_2cybozu_2inttype_8hpp_ada57abbe34b2b6df7713c87602d58ac1}\index{inttype.hpp@{inttype.hpp}!CYBOZU\_ALLOCA\_@{CYBOZU\_ALLOCA\_}}
+\index{CYBOZU\_ALLOCA\_@{CYBOZU\_ALLOCA\_}!inttype.hpp@{inttype.hpp}}
+\doxysubsubsection{\texorpdfstring{CYBOZU\_ALLOCA\_}{CYBOZU\_ALLOCA\_}}
+{\footnotesize\ttfamily \label{ate-pairing_2include_2cybozu_2inttype_8hpp_ada57abbe34b2b6df7713c87602d58ac1} 
+\#define CYBOZU\+\_\+\+ALLOCA\+\_\+(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\_\_builtin\_alloca(x)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{ate-pairing_2include_2cybozu_2inttype_8hpp_source_l00054}{54}} of file \mbox{\hyperlink{ate-pairing_2include_2cybozu_2inttype_8hpp_source}{inttype.\+hpp}}.
+
+\Hypertarget{ate-pairing_2include_2cybozu_2inttype_8hpp_ab28a8f9b585142cd1b3dbb873793340c}\index{inttype.hpp@{inttype.hpp}!CYBOZU\_CPP\_VERSION@{CYBOZU\_CPP\_VERSION}}
+\index{CYBOZU\_CPP\_VERSION@{CYBOZU\_CPP\_VERSION}!inttype.hpp@{inttype.hpp}}
+\doxysubsubsection{\texorpdfstring{CYBOZU\_CPP\_VERSION}{CYBOZU\_CPP\_VERSION}}
+{\footnotesize\ttfamily \label{ate-pairing_2include_2cybozu_2inttype_8hpp_ab28a8f9b585142cd1b3dbb873793340c} 
+\#define CYBOZU\+\_\+\+CPP\+\_\+\+VERSION~\mbox{\hyperlink{ate-pairing_2include_2cybozu_2inttype_8hpp_a6e8c965fda263156ba402d9551b0485b}{CYBOZU\+\_\+\+CPP\+\_\+\+VERSION\+\_\+\+CPP03}}}
+
+
+
+Definition at line \mbox{\hyperlink{ate-pairing_2include_2cybozu_2inttype_8hpp_source_l00081}{81}} of file \mbox{\hyperlink{ate-pairing_2include_2cybozu_2inttype_8hpp_source}{inttype.\+hpp}}.
+
+\Hypertarget{ate-pairing_2include_2cybozu_2inttype_8hpp_a6e8c965fda263156ba402d9551b0485b}\index{inttype.hpp@{inttype.hpp}!CYBOZU\_CPP\_VERSION\_CPP03@{CYBOZU\_CPP\_VERSION\_CPP03}}
+\index{CYBOZU\_CPP\_VERSION\_CPP03@{CYBOZU\_CPP\_VERSION\_CPP03}!inttype.hpp@{inttype.hpp}}
+\doxysubsubsection{\texorpdfstring{CYBOZU\_CPP\_VERSION\_CPP03}{CYBOZU\_CPP\_VERSION\_CPP03}}
+{\footnotesize\ttfamily \label{ate-pairing_2include_2cybozu_2inttype_8hpp_a6e8c965fda263156ba402d9551b0485b} 
+\#define CYBOZU\+\_\+\+CPP\+\_\+\+VERSION\+\_\+\+CPP03~0}
+
+
+
+Definition at line \mbox{\hyperlink{ate-pairing_2include_2cybozu_2inttype_8hpp_source_l00068}{68}} of file \mbox{\hyperlink{ate-pairing_2include_2cybozu_2inttype_8hpp_source}{inttype.\+hpp}}.
+
+\Hypertarget{ate-pairing_2include_2cybozu_2inttype_8hpp_a7e393045f353f1af7d1c875a391de81d}\index{inttype.hpp@{inttype.hpp}!CYBOZU\_CPP\_VERSION\_CPP11@{CYBOZU\_CPP\_VERSION\_CPP11}}
+\index{CYBOZU\_CPP\_VERSION\_CPP11@{CYBOZU\_CPP\_VERSION\_CPP11}!inttype.hpp@{inttype.hpp}}
+\doxysubsubsection{\texorpdfstring{CYBOZU\_CPP\_VERSION\_CPP11}{CYBOZU\_CPP\_VERSION\_CPP11}}
+{\footnotesize\ttfamily \label{ate-pairing_2include_2cybozu_2inttype_8hpp_a7e393045f353f1af7d1c875a391de81d} 
+\#define CYBOZU\+\_\+\+CPP\+\_\+\+VERSION\+\_\+\+CPP11~2}
+
+
+
+Definition at line \mbox{\hyperlink{ate-pairing_2include_2cybozu_2inttype_8hpp_source_l00070}{70}} of file \mbox{\hyperlink{ate-pairing_2include_2cybozu_2inttype_8hpp_source}{inttype.\+hpp}}.
+
+\Hypertarget{ate-pairing_2include_2cybozu_2inttype_8hpp_aa807dce4c171a94a787374dc859197dd}\index{inttype.hpp@{inttype.hpp}!CYBOZU\_CPP\_VERSION\_TR1@{CYBOZU\_CPP\_VERSION\_TR1}}
+\index{CYBOZU\_CPP\_VERSION\_TR1@{CYBOZU\_CPP\_VERSION\_TR1}!inttype.hpp@{inttype.hpp}}
+\doxysubsubsection{\texorpdfstring{CYBOZU\_CPP\_VERSION\_TR1}{CYBOZU\_CPP\_VERSION\_TR1}}
+{\footnotesize\ttfamily \label{ate-pairing_2include_2cybozu_2inttype_8hpp_aa807dce4c171a94a787374dc859197dd} 
+\#define CYBOZU\+\_\+\+CPP\+\_\+\+VERSION\+\_\+\+TR1~1}
+
+
+
+Definition at line \mbox{\hyperlink{ate-pairing_2include_2cybozu_2inttype_8hpp_source_l00069}{69}} of file \mbox{\hyperlink{ate-pairing_2include_2cybozu_2inttype_8hpp_source}{inttype.\+hpp}}.
+
+\Hypertarget{ate-pairing_2include_2cybozu_2inttype_8hpp_ad070c94713f729d5fa45d2e1db1673cf}\index{inttype.hpp@{inttype.hpp}!CYBOZU\_ENDIAN@{CYBOZU\_ENDIAN}}
+\index{CYBOZU\_ENDIAN@{CYBOZU\_ENDIAN}!inttype.hpp@{inttype.hpp}}
+\doxysubsubsection{\texorpdfstring{CYBOZU\_ENDIAN}{CYBOZU\_ENDIAN}}
+{\footnotesize\ttfamily \label{ate-pairing_2include_2cybozu_2inttype_8hpp_ad070c94713f729d5fa45d2e1db1673cf} 
+\#define CYBOZU\+\_\+\+ENDIAN~\mbox{\hyperlink{ate-pairing_2include_2cybozu_2inttype_8hpp_af25a3440c644e1e4b8a856824c9472dd}{CYBOZU\+\_\+\+ENDIAN\+\_\+\+UNKNOWN}}}
+
+
+
+Definition at line \mbox{\hyperlink{ate-pairing_2include_2cybozu_2inttype_8hpp_source_l00110}{110}} of file \mbox{\hyperlink{ate-pairing_2include_2cybozu_2inttype_8hpp_source}{inttype.\+hpp}}.
+
+\Hypertarget{ate-pairing_2include_2cybozu_2inttype_8hpp_a33b49301a837bcfdce1f629f0e067c6c}\index{inttype.hpp@{inttype.hpp}!CYBOZU\_ENDIAN\_BIG@{CYBOZU\_ENDIAN\_BIG}}
+\index{CYBOZU\_ENDIAN\_BIG@{CYBOZU\_ENDIAN\_BIG}!inttype.hpp@{inttype.hpp}}
+\doxysubsubsection{\texorpdfstring{CYBOZU\_ENDIAN\_BIG}{CYBOZU\_ENDIAN\_BIG}}
+{\footnotesize\ttfamily \label{ate-pairing_2include_2cybozu_2inttype_8hpp_a33b49301a837bcfdce1f629f0e067c6c} 
+\#define CYBOZU\+\_\+\+ENDIAN\+\_\+\+BIG~2}
+
+
+
+Definition at line \mbox{\hyperlink{ate-pairing_2include_2cybozu_2inttype_8hpp_source_l00106}{106}} of file \mbox{\hyperlink{ate-pairing_2include_2cybozu_2inttype_8hpp_source}{inttype.\+hpp}}.
+
+\Hypertarget{ate-pairing_2include_2cybozu_2inttype_8hpp_a43fa25921317799841ec0f1b3e9ac425}\index{inttype.hpp@{inttype.hpp}!CYBOZU\_ENDIAN\_LITTLE@{CYBOZU\_ENDIAN\_LITTLE}}
+\index{CYBOZU\_ENDIAN\_LITTLE@{CYBOZU\_ENDIAN\_LITTLE}!inttype.hpp@{inttype.hpp}}
+\doxysubsubsection{\texorpdfstring{CYBOZU\_ENDIAN\_LITTLE}{CYBOZU\_ENDIAN\_LITTLE}}
+{\footnotesize\ttfamily \label{ate-pairing_2include_2cybozu_2inttype_8hpp_a43fa25921317799841ec0f1b3e9ac425} 
+\#define CYBOZU\+\_\+\+ENDIAN\+\_\+\+LITTLE~1}
+
+
+
+Definition at line \mbox{\hyperlink{ate-pairing_2include_2cybozu_2inttype_8hpp_source_l00105}{105}} of file \mbox{\hyperlink{ate-pairing_2include_2cybozu_2inttype_8hpp_source}{inttype.\+hpp}}.
+
+\Hypertarget{ate-pairing_2include_2cybozu_2inttype_8hpp_af25a3440c644e1e4b8a856824c9472dd}\index{inttype.hpp@{inttype.hpp}!CYBOZU\_ENDIAN\_UNKNOWN@{CYBOZU\_ENDIAN\_UNKNOWN}}
+\index{CYBOZU\_ENDIAN\_UNKNOWN@{CYBOZU\_ENDIAN\_UNKNOWN}!inttype.hpp@{inttype.hpp}}
+\doxysubsubsection{\texorpdfstring{CYBOZU\_ENDIAN\_UNKNOWN}{CYBOZU\_ENDIAN\_UNKNOWN}}
+{\footnotesize\ttfamily \label{ate-pairing_2include_2cybozu_2inttype_8hpp_af25a3440c644e1e4b8a856824c9472dd} 
+\#define CYBOZU\+\_\+\+ENDIAN\+\_\+\+UNKNOWN~0}
+
+
+
+Definition at line \mbox{\hyperlink{ate-pairing_2include_2cybozu_2inttype_8hpp_source_l00104}{104}} of file \mbox{\hyperlink{ate-pairing_2include_2cybozu_2inttype_8hpp_source}{inttype.\+hpp}}.
+
+\Hypertarget{ate-pairing_2include_2cybozu_2inttype_8hpp_adcdb3faec91b3b6fc7d6ec6042b3a305}\index{inttype.hpp@{inttype.hpp}!CYBOZU\_FORCE\_INLINE@{CYBOZU\_FORCE\_INLINE}}
+\index{CYBOZU\_FORCE\_INLINE@{CYBOZU\_FORCE\_INLINE}!inttype.hpp@{inttype.hpp}}
+\doxysubsubsection{\texorpdfstring{CYBOZU\_FORCE\_INLINE}{CYBOZU\_FORCE\_INLINE}}
+{\footnotesize\ttfamily \label{ate-pairing_2include_2cybozu_2inttype_8hpp_adcdb3faec91b3b6fc7d6ec6042b3a305} 
+\#define CYBOZU\+\_\+\+FORCE\+\_\+\+INLINE~\+\_\+\+\_\+attribute\+\_\+\+\_\+((always\+\_\+inline))}
+
+
+
+Definition at line \mbox{\hyperlink{ate-pairing_2include_2cybozu_2inttype_8hpp_source_l00046}{46}} of file \mbox{\hyperlink{ate-pairing_2include_2cybozu_2inttype_8hpp_source}{inttype.\+hpp}}.
+
+\Hypertarget{ate-pairing_2include_2cybozu_2inttype_8hpp_a7410ce0bb8601765676018efe712360a}\index{inttype.hpp@{inttype.hpp}!CYBOZU\_NAMESPACE\_STD@{CYBOZU\_NAMESPACE\_STD}}
+\index{CYBOZU\_NAMESPACE\_STD@{CYBOZU\_NAMESPACE\_STD}!inttype.hpp@{inttype.hpp}}
+\doxysubsubsection{\texorpdfstring{CYBOZU\_NAMESPACE\_STD}{CYBOZU\_NAMESPACE\_STD}}
+{\footnotesize\ttfamily \label{ate-pairing_2include_2cybozu_2inttype_8hpp_a7410ce0bb8601765676018efe712360a} 
+\#define CYBOZU\+\_\+\+NAMESPACE\+\_\+\+STD~std}
+
+
+
+Definition at line \mbox{\hyperlink{ate-pairing_2include_2cybozu_2inttype_8hpp_source_l00089}{89}} of file \mbox{\hyperlink{ate-pairing_2include_2cybozu_2inttype_8hpp_source}{inttype.\+hpp}}.
+
+\Hypertarget{ate-pairing_2include_2cybozu_2inttype_8hpp_a4b137e9bb3490b8f0157281f9b8647b0}\index{inttype.hpp@{inttype.hpp}!CYBOZU\_NAMESPACE\_TR1\_BEGIN@{CYBOZU\_NAMESPACE\_TR1\_BEGIN}}
+\index{CYBOZU\_NAMESPACE\_TR1\_BEGIN@{CYBOZU\_NAMESPACE\_TR1\_BEGIN}!inttype.hpp@{inttype.hpp}}
+\doxysubsubsection{\texorpdfstring{CYBOZU\_NAMESPACE\_TR1\_BEGIN}{CYBOZU\_NAMESPACE\_TR1\_BEGIN}}
+{\footnotesize\ttfamily \label{ate-pairing_2include_2cybozu_2inttype_8hpp_a4b137e9bb3490b8f0157281f9b8647b0} 
+\#define CYBOZU\+\_\+\+NAMESPACE\+\_\+\+TR1\+\_\+\+BEGIN}
+
+
+
+Definition at line \mbox{\hyperlink{ate-pairing_2include_2cybozu_2inttype_8hpp_source_l00090}{90}} of file \mbox{\hyperlink{ate-pairing_2include_2cybozu_2inttype_8hpp_source}{inttype.\+hpp}}.
+
+\Hypertarget{ate-pairing_2include_2cybozu_2inttype_8hpp_a11a2045c1dc1b5ae30b76ee24bf7ff76}\index{inttype.hpp@{inttype.hpp}!CYBOZU\_NAMESPACE\_TR1\_END@{CYBOZU\_NAMESPACE\_TR1\_END}}
+\index{CYBOZU\_NAMESPACE\_TR1\_END@{CYBOZU\_NAMESPACE\_TR1\_END}!inttype.hpp@{inttype.hpp}}
+\doxysubsubsection{\texorpdfstring{CYBOZU\_NAMESPACE\_TR1\_END}{CYBOZU\_NAMESPACE\_TR1\_END}}
+{\footnotesize\ttfamily \label{ate-pairing_2include_2cybozu_2inttype_8hpp_a11a2045c1dc1b5ae30b76ee24bf7ff76} 
+\#define CYBOZU\+\_\+\+NAMESPACE\+\_\+\+TR1\+\_\+\+END}
+
+
+
+Definition at line \mbox{\hyperlink{ate-pairing_2include_2cybozu_2inttype_8hpp_source_l00091}{91}} of file \mbox{\hyperlink{ate-pairing_2include_2cybozu_2inttype_8hpp_source}{inttype.\+hpp}}.
+
+\Hypertarget{ate-pairing_2include_2cybozu_2inttype_8hpp_a9590a04f10a3cc6e777de8bef7ae030c}\index{inttype.hpp@{inttype.hpp}!CYBOZU\_NUM\_OF\_ARRAY@{CYBOZU\_NUM\_OF\_ARRAY}}
+\index{CYBOZU\_NUM\_OF\_ARRAY@{CYBOZU\_NUM\_OF\_ARRAY}!inttype.hpp@{inttype.hpp}}
+\doxysubsubsection{\texorpdfstring{CYBOZU\_NUM\_OF\_ARRAY}{CYBOZU\_NUM\_OF\_ARRAY}}
+{\footnotesize\ttfamily \label{ate-pairing_2include_2cybozu_2inttype_8hpp_a9590a04f10a3cc6e777de8bef7ae030c} 
+\#define CYBOZU\+\_\+\+NUM\+\_\+\+OF\+\_\+\+ARRAY(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(\textcolor{keyword}{sizeof}(x)\ /\ \textcolor{keyword}{sizeof}(*x))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{ate-pairing_2include_2cybozu_2inttype_8hpp_source_l00058}{58}} of file \mbox{\hyperlink{ate-pairing_2include_2cybozu_2inttype_8hpp_source}{inttype.\+hpp}}.
+
+\Hypertarget{ate-pairing_2include_2cybozu_2inttype_8hpp_a66ce9a5702fda83c4e384f6706c9778d}\index{inttype.hpp@{inttype.hpp}!CYBOZU\_OS\_BIT@{CYBOZU\_OS\_BIT}}
+\index{CYBOZU\_OS\_BIT@{CYBOZU\_OS\_BIT}!inttype.hpp@{inttype.hpp}}
+\doxysubsubsection{\texorpdfstring{CYBOZU\_OS\_BIT}{CYBOZU\_OS\_BIT}}
+{\footnotesize\ttfamily \label{ate-pairing_2include_2cybozu_2inttype_8hpp_a66ce9a5702fda83c4e384f6706c9778d} 
+\#define CYBOZU\+\_\+\+OS\+\_\+\+BIT~32}
+
+
+
+Definition at line \mbox{\hyperlink{ate-pairing_2include_2cybozu_2inttype_8hpp_source_l00098}{98}} of file \mbox{\hyperlink{ate-pairing_2include_2cybozu_2inttype_8hpp_source}{inttype.\+hpp}}.
+
+\Hypertarget{ate-pairing_2include_2cybozu_2inttype_8hpp_a6ff8eedb77b726a888b05c967e5d270e}\index{inttype.hpp@{inttype.hpp}!CYBOZU\_SNPRINTF@{CYBOZU\_SNPRINTF}}
+\index{CYBOZU\_SNPRINTF@{CYBOZU\_SNPRINTF}!inttype.hpp@{inttype.hpp}}
+\doxysubsubsection{\texorpdfstring{CYBOZU\_SNPRINTF}{CYBOZU\_SNPRINTF}}
+{\footnotesize\ttfamily \label{ate-pairing_2include_2cybozu_2inttype_8hpp_a6ff8eedb77b726a888b05c967e5d270e} 
+\#define CYBOZU\+\_\+\+SNPRINTF(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(void)snprintf(x,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ \_\_VA\_ARGS\_\_)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{ate-pairing_2include_2cybozu_2inttype_8hpp_source_l00064}{64}} of file \mbox{\hyperlink{ate-pairing_2include_2cybozu_2inttype_8hpp_source}{inttype.\+hpp}}.
+

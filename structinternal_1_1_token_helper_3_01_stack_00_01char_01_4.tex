@@ -1,0 +1,64 @@
+\doxysection{internal\+::Token\+Helper\texorpdfstring{$<$}{<} Stack, char \texorpdfstring{$>$}{>} Struct Template Reference}
+\hypertarget{structinternal_1_1_token_helper_3_01_stack_00_01char_01_4}{}\label{structinternal_1_1_token_helper_3_01_stack_00_01char_01_4}\index{internal::TokenHelper$<$ Stack, char $>$@{internal::TokenHelper$<$ Stack, char $>$}}
+
+
+{\ttfamily \#include $<$schema.\+h$>$}
+
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static RAPIDJSON\+\_\+\+FORCEINLINE void \mbox{\hyperlink{structinternal_1_1_token_helper_3_01_stack_00_01char_01_4_a5d635eb7590e098c3340c9e5dcc72ae3}{Append\+Index\+Token}} (\mbox{\hyperlink{classinternal_1_1_stack}{Stack}} \&document\+Stack, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} index)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{classinternal_1_1_stack}{Stack}}$>$\newline
+struct internal\+::\+Token\+Helper$<$ Stack, char $>$}
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l01457}{1457}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structinternal_1_1_token_helper_3_01_stack_00_01char_01_4_a5d635eb7590e098c3340c9e5dcc72ae3}\index{internal::TokenHelper$<$ Stack, char $>$@{internal::TokenHelper$<$ Stack, char $>$}!AppendIndexToken@{AppendIndexToken}}
+\index{AppendIndexToken@{AppendIndexToken}!internal::TokenHelper$<$ Stack, char $>$@{internal::TokenHelper$<$ Stack, char $>$}}
+\doxysubsubsection{\texorpdfstring{AppendIndexToken()}{AppendIndexToken()}}
+{\footnotesize\ttfamily \label{structinternal_1_1_token_helper_3_01_stack_00_01char_01_4_a5d635eb7590e098c3340c9e5dcc72ae3} 
+template$<$typename \mbox{\hyperlink{classinternal_1_1_stack}{Stack}} $>$ \\
+static RAPIDJSON\+\_\+\+FORCEINLINE void \mbox{\hyperlink{structinternal_1_1_token_helper}{internal\+::\+Token\+Helper}}$<$ \mbox{\hyperlink{classinternal_1_1_stack}{Stack}}, char $>$\+::\+Append\+Index\+Token (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classinternal_1_1_stack}{Stack}} \&}]{document\+Stack}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{index}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{schema_8h_source_l01458}{1458}} of file \mbox{\hyperlink{schema_8h_source}{schema.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01458\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01459\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{sizeof}(\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}})\ ==\ 4)\ \{}
+\DoxyCodeLine{01460\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ *buffer\ =\ documentStack.template\ Push<char>(1\ +\ 10);\ \textcolor{comment}{//\ '/'\ +\ uint}}
+\DoxyCodeLine{01461\ \ \ \ \ \ \ \ \ \ \ \ \ *buffer++\ =\ \textcolor{charliteral}{'/'};}
+\DoxyCodeLine{01462\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ end\ =\ \mbox{\hyperlink{namespaceinternal_a90e3cb218b557548f361e99dc718b4b1}{internal::u32toa}}(index,\ buffer);}
+\DoxyCodeLine{01463\ \ \ \ \ \ \ \ \ \ \ \ \ \ documentStack.template\ Pop<char>(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(10\ -\/\ (end\ -\/\ buffer)));}
+\DoxyCodeLine{01464\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01465\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{01466\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ *buffer\ =\ documentStack.template\ Push<char>(1\ +\ 20);\ \textcolor{comment}{//\ '/'\ +\ uint64}}
+\DoxyCodeLine{01467\ \ \ \ \ \ \ \ \ \ \ \ \ *buffer++\ =\ \textcolor{charliteral}{'/'};}
+\DoxyCodeLine{01468\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ end\ =\ \mbox{\hyperlink{namespaceinternal_a489150922c0320e4290b455bf3c6e36c}{internal::u64toa}}(index,\ buffer);}
+\DoxyCodeLine{01469\ \ \ \ \ \ \ \ \ \ \ \ \ documentStack.template\ Pop<char>(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(20\ -\/\ (end\ -\/\ buffer)));}
+\DoxyCodeLine{01470\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01471\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structinternal_1_1_token_helper_3_01_stack_00_01char_01_4_a5d635eb7590e098c3340c9e5dcc72ae3_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/\mbox{\hyperlink{schema_8h}{schema.\+h}}\end{DoxyCompactItemize}

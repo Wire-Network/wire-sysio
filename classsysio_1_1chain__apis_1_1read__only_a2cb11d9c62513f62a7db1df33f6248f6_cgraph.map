@@ -1,0 +1,14 @@
+<map id="sysio::chain_apis::read_only::get_info" name="sysio::chain_apis::read_only::get_info">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,104,137,145"/>
+<area shape="rect" id="Node000002" href="$namespaceappbase.html#a99374dc23934f008a09f2f79be9eae40" title=" " alt="" coords="211,13,310,38"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="98,101,138,75,183,49,198,42,201,47,186,53,140,79,101,106"/>
+<area shape="rect" id="Node000004" href="$classappbase_1_1application.html#ab53fa2d323d053e4e57adc832a9969bb" title="Get full version string; same as version_string() unless set differently." alt="" coords="190,63,330,103"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="137,107,175,99,176,104,138,113"/>
+<area shape="rect" id="Node000005" href="$namespacesysio_1_1chain__apis.html#a7df01d6a5fd1809e162d989a02998ba2" title=" " alt="" coords="185,152,336,177"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="138,136,182,145,181,150,137,141"/>
+<area shape="rect" id="Node000006" href="$classappbase_1_1application.html#a780543c4d0330fe88b912a3fa914f953" title="Get version string; generated from git describe if available." alt="" coords="190,201,330,242"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="107,143,186,187,196,192,193,197,183,192,104,147"/>
+<area shape="rect" id="Node000003" href="$classappbase_1_1application.html#ac874b2659b400fe254f1ae4260d06ecf" title=" " alt="" coords="384,5,524,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="310,23,369,23,369,28,310,28"/>
+<area shape="poly" id="edge5_Node000005_Node000005" title=" " alt="" coords="228,153,222,143,226,133,239,127,260,125,283,127,295,134,293,139,282,133,260,130,240,132,230,137,228,142,233,150"/>
+</map>

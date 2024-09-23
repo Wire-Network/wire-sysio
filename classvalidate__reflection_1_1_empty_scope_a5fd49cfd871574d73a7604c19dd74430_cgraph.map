@@ -1,0 +1,11 @@
+<map id="validate_reflection.EmptyScope.find_scope_start" name="validate_reflection.EmptyScope.find_scope_start">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,104,174,145"/>
+<area shape="rect" id="Node000002" href="$class_catch_1_1clara_1_1_text_flow_1_1_column.html#a8d5fa87d9f25f27e6948965c62b53867" title=" " alt="" coords="228,5,381,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="129,101,221,57,235,50,237,55,223,61,132,106"/>
+<area shape="rect" id="Node000003" href="$class_catch_1_1clara_1_1_text_flow_1_1_column_1_1iterator.html#ac356587d1b50dc1413bc45fd4d87ad0c" title=" " alt="" coords="222,71,387,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="174,109,206,104,206,109,174,114"/>
+<area shape="rect" id="Node000004" href="$classclara_1_1_text_flow_1_1_column.html#a30a0c51aad3043639a850856867b202d" title=" " alt="" coords="223,136,386,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="174,134,208,139,207,145,174,140"/>
+<area shape="rect" id="Node000005" href="$classclara_1_1_text_flow_1_1_column_1_1iterator.html#a526eb2c4a55e6eb1563d5f3e253017b1" title=" " alt="" coords="223,201,386,242"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="133,143,223,186,238,193,236,197,221,191,131,148"/>
+</map>

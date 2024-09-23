@@ -1,0 +1,15 @@
+<map id="bn::EcT::operator*=" name="bn::EcT::operator*=">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,29,139,55"/>
+<area shape="rect" id="Node000002" href="$classbn_1_1_ec_t.html#af902e7017a845933a033b420f6e4c6fb" title=" " alt="" coords="187,29,281,55"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="139,40,171,40,171,45,139,45"/>
+<area shape="rect" id="Node000003" href="$namespacebn_1_1ecop.html#a621a324cd1f6acd0c2214f715cab4615" title=" " alt="" coords="329,29,470,55"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="281,40,314,40,314,45,281,45"/>
+<area shape="rect" id="Node000004" href="$namespacebn_1_1ecop.html#a4a6928bb915f1eef461635202d2e4c30" title=" " alt="" coords="704,5,811,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="452,26,518,14,607,10,689,11,689,16,607,15,519,19,452,31"/>
+<area shape="rect" id="Node000005" href="$namespacebn_1_1ecop.html#abcaa67b67f6c2af1201769cd15cbbed9" title=" " alt="" coords="518,29,640,55"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="471,40,503,40,503,45,471,45"/>
+<area shape="rect" id="Node000006" href="$namespacebn_1_1ecop.html#a0e64ca6d01c24fb266f1986ebce3a07d" title=" " alt="" coords="688,55,827,80"/>
+<area shape="poly" id="edge7_Node000003_Node000006" title=" " alt="" coords="452,53,519,65,597,70,672,69,672,74,597,75,518,70,452,58"/>
+<area shape="poly" id="edge5_Node000005_Node000004" title=" " alt="" coords="640,31,688,25,689,30,641,37"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="641,48,673,53,672,58,640,53"/>
+</map>

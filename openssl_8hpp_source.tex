@@ -1,0 +1,62 @@
+\doxysection{openssl.\+hpp}
+\hypertarget{openssl_8hpp_source}{}\label{openssl_8hpp_source}\index{libraries/fc/include/fc/crypto/openssl.hpp@{libraries/fc/include/fc/crypto/openssl.hpp}}
+\mbox{\hyperlink{openssl_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{openssl_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{openssl_8hpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <openssl/ec.h>}}
+\DoxyCodeLine{\Hypertarget{openssl_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <openssl/crypto.h>}}
+\DoxyCodeLine{\Hypertarget{openssl_8hpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <openssl/evp.h>}}
+\DoxyCodeLine{\Hypertarget{openssl_8hpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <openssl/conf.h>}}
+\DoxyCodeLine{\Hypertarget{openssl_8hpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <openssl/err.h>}}
+\DoxyCodeLine{\Hypertarget{openssl_8hpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <openssl/ecdsa.h>}}
+\DoxyCodeLine{\Hypertarget{openssl_8hpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <openssl/ecdh.h>}}
+\DoxyCodeLine{\Hypertarget{openssl_8hpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ <openssl/sha.h>}}
+\DoxyCodeLine{\Hypertarget{openssl_8hpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <openssl/obj\_mac.h>}}
+\DoxyCodeLine{\Hypertarget{openssl_8hpp_source_l00011}00011\ \textcolor{preprocessor}{\#include\ <openssl/bn.h>}}
+\DoxyCodeLine{\Hypertarget{openssl_8hpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{openssl_8hpp_source_l00017}00017\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}\ }
+\DoxyCodeLine{\Hypertarget{openssl_8hpp_source_l00018}00018\ \{}
+\DoxyCodeLine{\Hypertarget{openssl_8hpp_source_l00019}00019\ \ \ \textcolor{keyword}{class\ }path;}
+\DoxyCodeLine{\Hypertarget{openssl_8hpp_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{openssl_8hpp_source_l00021}00021\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ ssl\_type>}
+\DoxyCodeLine{\Hypertarget{openssl_8hpp_source_l00022}\mbox{\hyperlink{structfc_1_1ssl__wrapper}{00022}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structfc_1_1ssl__wrapper}{ssl\_wrapper}}}
+\DoxyCodeLine{\Hypertarget{openssl_8hpp_source_l00023}00023\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{openssl_8hpp_source_l00024}\mbox{\hyperlink{structfc_1_1ssl__wrapper_aa4d9c90bf8249d05161c0970985ac932}{00024}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1ssl__wrapper_aa4d9c90bf8249d05161c0970985ac932}{ssl\_wrapper}}(ssl\_type*\ \mbox{\hyperlink{structfc_1_1ssl__wrapper_af517281239c6c54085bc526c8a2b425c}{obj}}):\mbox{\hyperlink{structfc_1_1ssl__wrapper_af517281239c6c54085bc526c8a2b425c}{obj}}(\mbox{\hyperlink{structfc_1_1ssl__wrapper_af517281239c6c54085bc526c8a2b425c}{obj}})\ \{\}}
+\DoxyCodeLine{\Hypertarget{openssl_8hpp_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{openssl_8hpp_source_l00026}\mbox{\hyperlink{structfc_1_1ssl__wrapper_acdf3448c036a48686cd098d52be8b982}{00026}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{operator}\ ssl\_type*()\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structfc_1_1ssl__wrapper_af517281239c6c54085bc526c8a2b425c}{obj}};\ \}}
+\DoxyCodeLine{\Hypertarget{openssl_8hpp_source_l00027}\mbox{\hyperlink{structfc_1_1ssl__wrapper_a5fbccf113824c9904bb1cb86e57eac2a}{00027}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{operator}\ \textcolor{keyword}{const}\ ssl\_type*()\ \textcolor{keyword}{const}\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structfc_1_1ssl__wrapper_af517281239c6c54085bc526c8a2b425c}{obj}};\ \}}
+\DoxyCodeLine{\Hypertarget{openssl_8hpp_source_l00028}\mbox{\hyperlink{structfc_1_1ssl__wrapper_a9418e18dac19c2984b371ce86f36a118}{00028}}\ \ \ \ \ \ \ \ \ ssl\_type*\ \mbox{\hyperlink{structfc_1_1ssl__wrapper_a9418e18dac19c2984b371ce86f36a118}{operator-\/>}}()\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structfc_1_1ssl__wrapper_af517281239c6c54085bc526c8a2b425c}{obj}};\ \}}
+\DoxyCodeLine{\Hypertarget{openssl_8hpp_source_l00029}\mbox{\hyperlink{structfc_1_1ssl__wrapper_a165367c9f7f384a88c2259ac63ed5c87}{00029}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ ssl\_type*\ \mbox{\hyperlink{structfc_1_1ssl__wrapper_a165367c9f7f384a88c2259ac63ed5c87}{operator-\/>}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structfc_1_1ssl__wrapper_af517281239c6c54085bc526c8a2b425c}{obj}};\ \}}
+\DoxyCodeLine{\Hypertarget{openssl_8hpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{openssl_8hpp_source_l00031}\mbox{\hyperlink{structfc_1_1ssl__wrapper_af517281239c6c54085bc526c8a2b425c}{00031}}\ \ \ \ \ \ \ \ \ ssl\_type*\ \mbox{\hyperlink{structfc_1_1ssl__wrapper_af517281239c6c54085bc526c8a2b425c}{obj}};}
+\DoxyCodeLine{\Hypertarget{openssl_8hpp_source_l00032}00032\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{openssl_8hpp_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{openssl_8hpp_source_l00034}\mbox{\hyperlink{openssl_8hpp_a7ff07a79931053a908fa84977a272350}{00034}}\ \textcolor{preprocessor}{\ \ \ \ \#define\ SSL\_TYPE(name,\ ssl\_type,\ free\_func)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{openssl_8hpp_source_l00035}00035\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ struct\ name\ \ :\ public\ ssl\_wrapper<ssl\_type>\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{openssl_8hpp_source_l00036}00036\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{openssl_8hpp_source_l00037}00037\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ name(ssl\_type*\ obj=nullptr)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{openssl_8hpp_source_l00038}00038\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ ssl\_wrapper(obj)\ \{\}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{openssl_8hpp_source_l00039}00039\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \string~name()\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{openssl_8hpp_source_l00040}00040\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{openssl_8hpp_source_l00041}00041\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if(\ obj\ !=\ nullptr\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{openssl_8hpp_source_l00042}00042\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ free\_func(obj);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{openssl_8hpp_source_l00043}00043\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{openssl_8hpp_source_l00044}00044\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \};}}
+\DoxyCodeLine{\Hypertarget{openssl_8hpp_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{openssl_8hpp_source_l00046}00046\ \ \ \ \ \mbox{\hyperlink{openssl_8hpp_a7ff07a79931053a908fa84977a272350}{SSL\_TYPE}}(ec\_group,\ \ \ \ \ \ \ EC\_GROUP,\ \ \ \ \ \ \ EC\_GROUP\_free)}
+\DoxyCodeLine{\Hypertarget{openssl_8hpp_source_l00047}00047\ \ \ \ \ \mbox{\hyperlink{openssl_8hpp_a7ff07a79931053a908fa84977a272350}{SSL\_TYPE}}(ec\_point,\ \ \ \ \ \ \ EC\_POINT,\ \ \ \ \ \ \ EC\_POINT\_free)}
+\DoxyCodeLine{\Hypertarget{openssl_8hpp_source_l00048}00048\ \ \ \ \ \mbox{\hyperlink{openssl_8hpp_a7ff07a79931053a908fa84977a272350}{SSL\_TYPE}}(ecdsa\_sig,\ \ \ \ \ \ ECDSA\_SIG,\ \ \ \ \ \ ECDSA\_SIG\_free)}
+\DoxyCodeLine{\Hypertarget{openssl_8hpp_source_l00049}00049\ \ \ \ \ \mbox{\hyperlink{openssl_8hpp_a7ff07a79931053a908fa84977a272350}{SSL\_TYPE}}(bn\_ctx,\ \ \ \ \ \ \ \ \ BN\_CTX,\ \ \ \ \ \ \ \ \ BN\_CTX\_free)}
+\DoxyCodeLine{\Hypertarget{openssl_8hpp_source_l00050}00050\ \ \ \ \ \mbox{\hyperlink{openssl_8hpp_a7ff07a79931053a908fa84977a272350}{SSL\_TYPE}}(evp\_cipher\_ctx,\ EVP\_CIPHER\_CTX,\ EVP\_CIPHER\_CTX\_free\ )}
+\DoxyCodeLine{\Hypertarget{openssl_8hpp_source_l00051}00051\ \ \ \ \ \mbox{\hyperlink{openssl_8hpp_a7ff07a79931053a908fa84977a272350}{SSL\_TYPE}}(ec\_key,\ \ \ \ \ \ \ \ \ EC\_KEY,\ \ \ \ \ \ \ \ \ EC\_KEY\_free)}
+\DoxyCodeLine{\Hypertarget{openssl_8hpp_source_l00052}00052\ }
+\DoxyCodeLine{\Hypertarget{openssl_8hpp_source_l00053}00053\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{openssl_8hpp_source_l00054}\mbox{\hyperlink{structfc_1_1ssl__bignum}{00054}}\ \ \ \ \ struct\ \mbox{\hyperlink{structfc_1_1ssl__bignum}{ssl\_bignum}}\ :\ public\ \mbox{\hyperlink{structfc_1_1ssl__wrapper}{ssl\_wrapper}}<\mbox{\hyperlink{include_2fc_2crypto_2bigint_8hpp_a62125ea4e1d748a4a9c1aed9766f451a}{BIGNUM}}>}
+\DoxyCodeLine{\Hypertarget{openssl_8hpp_source_l00055}00055\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{openssl_8hpp_source_l00056}\mbox{\hyperlink{structfc_1_1ssl__bignum_a776b62e0ae1d0d0392ec6090847f416c}{00056}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1ssl__bignum_a776b62e0ae1d0d0392ec6090847f416c}{ssl\_bignum}}()\ :\ \mbox{\hyperlink{structfc_1_1ssl__wrapper}{ssl\_wrapper}}(BN\_new())\ \{\}}
+\DoxyCodeLine{\Hypertarget{openssl_8hpp_source_l00057}\mbox{\hyperlink{structfc_1_1ssl__bignum_a13121bae3e0de75e7c268fbe3c6924d3}{00057}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1ssl__bignum_a13121bae3e0de75e7c268fbe3c6924d3}{\string~ssl\_bignum}}()\ \{\ BN\_free(obj);\ \}}
+\DoxyCodeLine{\Hypertarget{openssl_8hpp_source_l00058}00058\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{openssl_8hpp_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{openssl_8hpp_source_l00060}00060\ \}\ \textcolor{comment}{//\ namespace\ fc}}
+
+\end{DoxyCode}

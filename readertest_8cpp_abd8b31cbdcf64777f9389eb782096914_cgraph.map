@@ -1,0 +1,9 @@
+<map id="TEST" name="TEST">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,61,31"/>
+<area shape="rect" id="Node000002" href="$readertest_8cpp.html#aecbde81eaceef1ab965fbccc9c6a2cc1" title=" " alt="" coords="109,5,189,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="61,16,93,16,93,21,61,21"/>
+<area shape="rect" id="Node000003" href="$class_generic_reader.html#a937bf90919f50e1c370b312cee5833e8" title="Get the ParseErrorCode of last parsing." alt="" coords="237,5,467,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="189,16,221,16,221,21,189,21"/>
+<area shape="rect" id="Node000004" href="$struct_parse_result.html#a2aae3c2f42b31cc2409ee1e03bc4852e" title="Get the error code." alt="" coords="515,5,648,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="467,16,500,16,500,21,467,21"/>
+</map>

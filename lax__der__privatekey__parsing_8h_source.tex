@@ -1,0 +1,68 @@
+\doxysection{lax\+\_\+der\+\_\+privatekey\+\_\+parsing.\+h}
+\hypertarget{lax__der__privatekey__parsing_8h_source}{}\label{lax__der__privatekey__parsing_8h_source}\index{libraries/fc/secp256k1/secp256k1/contrib/lax\_der\_privatekey\_parsing.h@{libraries/fc/secp256k1/secp256k1/contrib/lax\_der\_privatekey\_parsing.h}}
+\mbox{\hyperlink{lax__der__privatekey__parsing_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00001}00001\ \textcolor{comment}{/***********************************************************************}}
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2014,\ 2015\ Pieter\ Wuille\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00003}00003\ \textcolor{comment}{\ *\ Distributed\ under\ the\ MIT\ software\ license,\ see\ the\ accompanying\ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00004}00004\ \textcolor{comment}{\ *\ file\ COPYING\ or\ https://www.opensource.org/licenses/mit-\/license.php.*}}
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00005}00005\ \textcolor{comment}{\ ***********************************************************************/}}
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00007}00007\ \textcolor{comment}{/****}}
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00008}00008\ \textcolor{comment}{\ *\ Please\ do\ not\ link\ this\ file\ directly.\ It\ is\ not\ part\ of\ the\ libsecp256k1}}
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00009}00009\ \textcolor{comment}{\ *\ project\ and\ does\ not\ promise\ any\ stability\ in\ its\ API,\ functionality\ or}}
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00010}00010\ \textcolor{comment}{\ *\ presence.\ Projects\ which\ use\ this\ code\ should\ instead\ copy\ this\ header}}
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00011}00011\ \textcolor{comment}{\ *\ and\ its\ accompanying\ .c\ file\ directly\ into\ their\ codebase.}}
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00012}00012\ \textcolor{comment}{\ ****/}}
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00014}00014\ \textcolor{comment}{/*\ This\ file\ contains\ code\ snippets\ that\ parse\ DER\ private\ keys\ with}}
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00015}00015\ \textcolor{comment}{\ *\ various\ errors\ and\ violations.\ \ This\ is\ not\ a\ part\ of\ the\ library}}
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00016}00016\ \textcolor{comment}{\ *\ itself,\ because\ the\ allowed\ violations\ are\ chosen\ arbitrarily\ and}}
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00017}00017\ \textcolor{comment}{\ *\ do\ not\ follow\ or\ establish\ any\ standard.}}
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00018}00018\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00019}00019\ \textcolor{comment}{\ *\ It\ also\ contains\ code\ to\ serialize\ private\ keys\ in\ a\ compatible}}
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00020}00020\ \textcolor{comment}{\ *\ manner.}}
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00021}00021\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00022}00022\ \textcolor{comment}{\ *\ These\ functions\ are\ meant\ for\ compatibility\ with\ applications}}
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00023}00023\ \textcolor{comment}{\ *\ that\ require\ BER\ encoded\ keys.\ When\ working\ with\ secp256k1-\/specific}}
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00024}00024\ \textcolor{comment}{\ *\ code,\ the\ simple\ 32-\/byte\ private\ keys\ normally\ used\ by\ the}}
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00025}00025\ \textcolor{comment}{\ *\ library\ are\ sufficient.}}
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00026}00026\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00028}00028\ \textcolor{preprocessor}{\#ifndef\ SECP256K1\_CONTRIB\_BER\_PRIVATEKEY\_H}}
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00029}00029\ \textcolor{preprocessor}{\#define\ SECP256K1\_CONTRIB\_BER\_PRIVATEKEY\_H}}
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00031}00031\ \textcolor{comment}{/*\ \#include\ secp256k1.h\ only\ when\ it\ hasn't\ been\ included\ yet.}}
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00032}00032\ \textcolor{comment}{\ \ \ This\ enables\ this\ file\ to\ be\ \#included\ directly\ in\ other\ project}}
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00033}00033\ \textcolor{comment}{\ \ \ files\ (such\ as\ tests.c)\ without\ the\ need\ to\ set\ an\ explicit\ -\/I\ flag,}}
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00034}00034\ \textcolor{comment}{\ \ \ which\ would\ be\ necessary\ to\ locate\ secp256k1.h.\ */}}
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00035}00035\ \textcolor{preprocessor}{\#ifndef\ SECP256K1\_H}}
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00036}00036\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{secp256k1_8h}{secp256k1.h}}>}}
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00037}00037\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00039}00039\ \textcolor{preprocessor}{\#ifdef\ \_\_cplusplus}}
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00040}00040\ \textcolor{keyword}{extern}\ \textcolor{stringliteral}{"{}C"{}}\ \{}
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00041}00041\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00063}00063\ \mbox{\hyperlink{secp256k1_8h_aebd5ca8fbfcbb0ba0754a46115143c2c}{SECP256K1\_WARN\_UNUSED\_RESULT}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{lax__der__privatekey__parsing_8h_ab0172ae6ae0adcf65b3d94960ece8e31}{ec\_privkey\_export\_der}}(}
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00064}00064\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__context__struct}{secp256k1\_context}}*\ ctx,}
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00065}00065\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *privkey,}
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00066}00066\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ *privkeylen,}
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00067}00067\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *seckey,}
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00068}00068\ \ \ \ \ \textcolor{keywordtype}{int}\ compressed}
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00069}00069\ )\ \mbox{\hyperlink{secp256k1_8h_a03c194d8fa91b9b66758b36c91e0b5cb}{SECP256K1\_ARG\_NONNULL}}(1)\ \mbox{\hyperlink{secp256k1_8h_a03c194d8fa91b9b66758b36c91e0b5cb}{SECP256K1\_ARG\_NONNULL}}(2)\ \mbox{\hyperlink{secp256k1_8h_a03c194d8fa91b9b66758b36c91e0b5cb}{SECP256K1\_ARG\_NONNULL}}(3)\ \mbox{\hyperlink{secp256k1_8h_a03c194d8fa91b9b66758b36c91e0b5cb}{SECP256K1\_ARG\_NONNULL}}(4);}
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00085}00085\ \mbox{\hyperlink{secp256k1_8h_aebd5ca8fbfcbb0ba0754a46115143c2c}{SECP256K1\_WARN\_UNUSED\_RESULT}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{lax__der__privatekey__parsing_8h_a73106d5c4a234faa276659a29efe11d3}{ec\_privkey\_import\_der}}(}
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00086}00086\ \ \ \ \ const\ \mbox{\hyperlink{structsecp256k1__context__struct}{secp256k1\_context}}*\ ctx,}
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00087}00087\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *seckey,}
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00088}00088\ \ \ \ \ const\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *privkey,}
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00089}00089\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ privkeylen}
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00090}00090\ )\ \mbox{\hyperlink{secp256k1_8h_a03c194d8fa91b9b66758b36c91e0b5cb}{SECP256K1\_ARG\_NONNULL}}(1)\ \mbox{\hyperlink{secp256k1_8h_a03c194d8fa91b9b66758b36c91e0b5cb}{SECP256K1\_ARG\_NONNULL}}(2)\ \mbox{\hyperlink{secp256k1_8h_a03c194d8fa91b9b66758b36c91e0b5cb}{SECP256K1\_ARG\_NONNULL}}(3);}
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00091}00091\ }
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00092}00092\ \textcolor{preprocessor}{\#ifdef\ \_\_cplusplus}}
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00093}00093\ \}}
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00094}00094\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00095}00095\ }
+\DoxyCodeLine{\Hypertarget{lax__der__privatekey__parsing_8h_source_l00096}00096\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{/*\ SECP256K1\_CONTRIB\_BER\_PRIVATEKEY\_H\ */}\textcolor{preprocessor}{}}
+
+\end{DoxyCode}

@@ -1,0 +1,135 @@
+\doxysection{fc\+::gelf\+\_\+appender\+::impl Class Reference}
+\hypertarget{classfc_1_1gelf__appender_1_1impl}{}\label{classfc_1_1gelf__appender_1_1impl}\index{fc::gelf\_appender::impl@{fc::gelf\_appender::impl}}
+
+
+Collaboration diagram for fc\+::gelf\+\_\+appender\+::impl\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=289pt]{classfc_1_1gelf__appender_1_1impl__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1gelf__appender_1_1impl_aa279d25319b99bb8bccf92cd186c0db0}{impl}} (const \mbox{\hyperlink{classfc_1_1variant}{variant}} \&c)
+\item 
+\mbox{\hyperlink{classfc_1_1gelf__appender_1_1impl_a97852f27131d3a3623abd6cc820a34a5}{\texorpdfstring{$\sim$}{\string~}impl}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structfc_1_1gelf__appender_1_1config}{config}} \mbox{\hyperlink{classfc_1_1gelf__appender_1_1impl_a7683f0beb1017eb880d31371cf782a12}{cfg}}
+\item 
+std\+::optional$<$ boost\+::asio\+::ip\+::udp\+::endpoint $>$ \mbox{\hyperlink{classfc_1_1gelf__appender_1_1impl_a00dcdf19ddba1b784797e0c466963aa7}{gelf\+\_\+endpoint}}
+\item 
+\mbox{\hyperlink{classfc_1_1udp__socket}{udp\+\_\+socket}} \mbox{\hyperlink{classfc_1_1gelf__appender_1_1impl_a5dab5ac04f505ecd7b9970df45111ef6}{gelf\+\_\+socket}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{gelf__appender_8cpp_source_l00042}{42}} of file \mbox{\hyperlink{gelf__appender_8cpp_source}{gelf\+\_\+appender.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1gelf__appender_1_1impl_aa279d25319b99bb8bccf92cd186c0db0}\index{fc::gelf\_appender::impl@{fc::gelf\_appender::impl}!impl@{impl}}
+\index{impl@{impl}!fc::gelf\_appender::impl@{fc::gelf\_appender::impl}}
+\doxysubsubsection{\texorpdfstring{impl()}{impl()}}
+{\footnotesize\ttfamily \label{classfc_1_1gelf__appender_1_1impl_aa279d25319b99bb8bccf92cd186c0db0} 
+fc\+::gelf\+\_\+appender\+::impl\+::impl (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1variant}{variant}} \&}]{c}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gelf__appender_8cpp_source_l00049}{49}} of file \mbox{\hyperlink{gelf__appender_8cpp_source}{gelf\+\_\+appender.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00050\ \ \ \ \ \{}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ mutable\_variant\_object\ mvo;}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_accef08adf4ee05c36ccc550d8101b08f}{from\_variant}}(c,\ mvo);}
+\DoxyCodeLine{00053\ }
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1gelf__appender_1_1impl_a7683f0beb1017eb880d31371cf782a12}{cfg}}.\mbox{\hyperlink{structfc_1_1gelf__appender_1_1config_a05092e63c79b6a42d6afe28be8f8b494}{endpoint}}\ =\ mvo[\textcolor{stringliteral}{"{}endpoint"{}}].as<std::string>();}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ mvo.erase(\textcolor{stringliteral}{"{}endpoint"{}});}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1gelf__appender_1_1impl_a7683f0beb1017eb880d31371cf782a12}{cfg}}.\mbox{\hyperlink{structfc_1_1gelf__appender_1_1config_a74fb5bd5d3e044746fe5840a711722bd}{host}}\ =\ mvo[\textcolor{stringliteral}{"{}host"{}}].as<std::string>();}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ mvo.erase(\textcolor{stringliteral}{"{}host"{}});}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1gelf__appender_1_1impl_a7683f0beb1017eb880d31371cf782a12}{cfg}}.\mbox{\hyperlink{structfc_1_1gelf__appender_1_1config_a044c2e8c1d386806035bd935937b3b09}{user\_fields}}\ =\ mvo;}
+\DoxyCodeLine{00059\ }
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\&\&\ field\_name\ :\ config::reserved\_field\_names)\ \{}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classfc_1_1gelf__appender_1_1impl_a7683f0beb1017eb880d31371cf782a12}{cfg}}.\mbox{\hyperlink{structfc_1_1gelf__appender_1_1config_a044c2e8c1d386806035bd935937b3b09}{user\_fields}}.\mbox{\hyperlink{classfc_1_1variant__object_ae4ed31b7cb6bc6e1d2873f9121049589}{contains}}(\mbox{\hyperlink{namespacesysio_1_1chain_a62baa6e9f84be96de185679e6bae98b9}{field\_name}}.c\_str()))\ \{}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(invalid\_arg\_exception,\ \textcolor{stringliteral}{"{}Field\ name\ '\$\{field\_name\}'\ is\ reserved"{}},}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}field\_name"{}},\ field\_name));}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\&\&\ \mbox{\hyperlink{hello__driver_8cpp_a0b6f424d9a532680c6b2ca5c119c938b}{field}}\ :\ \mbox{\hyperlink{classfc_1_1gelf__appender_1_1impl_a7683f0beb1017eb880d31371cf782a12}{cfg}}.\mbox{\hyperlink{structfc_1_1gelf__appender_1_1config_a044c2e8c1d386806035bd935937b3b09}{user\_fields}})\ \{}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!std::regex\_match(\mbox{\hyperlink{hello__driver_8cpp_a0b6f424d9a532680c6b2ca5c119c938b}{field}}.key(),\ config::user\_field\_name\_pattern))\ \{}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(invalid\_arg\_exception,\ \textcolor{stringliteral}{"{}Field\ name\ '\$\{field\_name\}\ must\ begin\ with\ an\ underscore\ and\ contain\ only\ letters,\ numbers,\ underscores,\ dashes,\ and\ dots."{}},}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}field\_name"{}},\ \mbox{\hyperlink{hello__driver_8cpp_a0b6f424d9a532680c6b2ca5c119c938b}{field}}.key()));}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00072\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1gelf__appender_1_1impl_aa279d25319b99bb8bccf92cd186c0db0_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1gelf__appender_1_1impl_a97852f27131d3a3623abd6cc820a34a5}\index{fc::gelf\_appender::impl@{fc::gelf\_appender::impl}!````~impl@{\texorpdfstring{$\sim$}{\string~}impl}}
+\index{````~impl@{\texorpdfstring{$\sim$}{\string~}impl}!fc::gelf\_appender::impl@{fc::gelf\_appender::impl}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}impl()}{\string~impl()}}
+{\footnotesize\ttfamily \label{classfc_1_1gelf__appender_1_1impl_a97852f27131d3a3623abd6cc820a34a5} 
+fc\+::gelf\+\_\+appender\+::impl\+::\texorpdfstring{$\sim$}{\string~}impl (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gelf__appender_8cpp_source_l00074}{74}} of file \mbox{\hyperlink{gelf__appender_8cpp_source}{gelf\+\_\+appender.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00075\ \ \ \ \ \{}
+\DoxyCodeLine{00076\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classfc_1_1gelf__appender_1_1impl_a7683f0beb1017eb880d31371cf782a12}\index{fc::gelf\_appender::impl@{fc::gelf\_appender::impl}!cfg@{cfg}}
+\index{cfg@{cfg}!fc::gelf\_appender::impl@{fc::gelf\_appender::impl}}
+\doxysubsubsection{\texorpdfstring{cfg}{cfg}}
+{\footnotesize\ttfamily \label{classfc_1_1gelf__appender_1_1impl_a7683f0beb1017eb880d31371cf782a12} 
+\mbox{\hyperlink{structfc_1_1gelf__appender_1_1config}{config}} fc\+::gelf\+\_\+appender\+::impl\+::cfg}
+
+
+
+Definition at line \mbox{\hyperlink{gelf__appender_8cpp_source_l00045}{45}} of file \mbox{\hyperlink{gelf__appender_8cpp_source}{gelf\+\_\+appender.\+cpp}}.
+
+\Hypertarget{classfc_1_1gelf__appender_1_1impl_a00dcdf19ddba1b784797e0c466963aa7}\index{fc::gelf\_appender::impl@{fc::gelf\_appender::impl}!gelf\_endpoint@{gelf\_endpoint}}
+\index{gelf\_endpoint@{gelf\_endpoint}!fc::gelf\_appender::impl@{fc::gelf\_appender::impl}}
+\doxysubsubsection{\texorpdfstring{gelf\_endpoint}{gelf\_endpoint}}
+{\footnotesize\ttfamily \label{classfc_1_1gelf__appender_1_1impl_a00dcdf19ddba1b784797e0c466963aa7} 
+std\+::optional$<$boost\+::asio\+::ip\+::udp\+::endpoint$>$ fc\+::gelf\+\_\+appender\+::impl\+::gelf\+\_\+endpoint}
+
+
+
+Definition at line \mbox{\hyperlink{gelf__appender_8cpp_source_l00046}{46}} of file \mbox{\hyperlink{gelf__appender_8cpp_source}{gelf\+\_\+appender.\+cpp}}.
+
+\Hypertarget{classfc_1_1gelf__appender_1_1impl_a5dab5ac04f505ecd7b9970df45111ef6}\index{fc::gelf\_appender::impl@{fc::gelf\_appender::impl}!gelf\_socket@{gelf\_socket}}
+\index{gelf\_socket@{gelf\_socket}!fc::gelf\_appender::impl@{fc::gelf\_appender::impl}}
+\doxysubsubsection{\texorpdfstring{gelf\_socket}{gelf\_socket}}
+{\footnotesize\ttfamily \label{classfc_1_1gelf__appender_1_1impl_a5dab5ac04f505ecd7b9970df45111ef6} 
+\mbox{\hyperlink{classfc_1_1udp__socket}{udp\+\_\+socket}} fc\+::gelf\+\_\+appender\+::impl\+::gelf\+\_\+socket}
+
+
+
+Definition at line \mbox{\hyperlink{gelf__appender_8cpp_source_l00047}{47}} of file \mbox{\hyperlink{gelf__appender_8cpp_source}{gelf\+\_\+appender.\+cpp}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/src/log/\mbox{\hyperlink{gelf__appender_8cpp}{gelf\+\_\+appender.\+cpp}}\end{DoxyCompactItemize}

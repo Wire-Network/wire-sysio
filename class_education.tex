@@ -1,0 +1,103 @@
+\doxysection{Education Class Reference}
+\hypertarget{class_education}{}\label{class_education}\index{Education@{Education}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_education_abf86a8d07c552c8b50cd4abc1610023e}{Education}} (const std\+::string \&school, double GPA)
+\item 
+\mbox{\hyperlink{class_education_a46232aa9676c4f52fb8e81f79b8f93c8}{Education}} (const \mbox{\hyperlink{class_education}{Education}} \&rhs)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{class_writer}{Writer}} $>$ }\\void \mbox{\hyperlink{class_education_aa7dbbb0273bdaeca29d8bab01b365bbb}{Serialize}} (\mbox{\hyperlink{class_writer}{Writer}} \&writer) const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{serialize_8cpp_source_l00045}{45}} of file \mbox{\hyperlink{serialize_8cpp_source}{serialize.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_education_abf86a8d07c552c8b50cd4abc1610023e}\index{Education@{Education}!Education@{Education}}
+\index{Education@{Education}!Education@{Education}}
+\doxysubsubsection{\texorpdfstring{Education()}{Education()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_education_abf86a8d07c552c8b50cd4abc1610023e} 
+Education\+::\+Education (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{school}{, }\item[{double}]{GPA}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{serialize_8cpp_source_l00047}{47}} of file \mbox{\hyperlink{serialize_8cpp_source}{serialize.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00047\ :\ school\_(school),\ GPA\_(GPA)\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{class_education_a46232aa9676c4f52fb8e81f79b8f93c8}\index{Education@{Education}!Education@{Education}}
+\index{Education@{Education}!Education@{Education}}
+\doxysubsubsection{\texorpdfstring{Education()}{Education()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_education_a46232aa9676c4f52fb8e81f79b8f93c8} 
+Education\+::\+Education (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_education}{Education}} \&}]{rhs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{serialize_8cpp_source_l00048}{48}} of file \mbox{\hyperlink{serialize_8cpp_source}{serialize.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00048\ :\ school\_(rhs.school\_),\ GPA\_(rhs.GPA\_)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_education_aa7dbbb0273bdaeca29d8bab01b365bbb}\index{Education@{Education}!Serialize@{Serialize}}
+\index{Serialize@{Serialize}!Education@{Education}}
+\doxysubsubsection{\texorpdfstring{Serialize()}{Serialize()}}
+{\footnotesize\ttfamily \label{class_education_aa7dbbb0273bdaeca29d8bab01b365bbb} 
+template$<$typename \mbox{\hyperlink{class_writer}{Writer}} $>$ \\
+void Education\+::\+Serialize (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_writer}{Writer}} \&}]{writer}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{serialize_8cpp_source_l00051}{51}} of file \mbox{\hyperlink{serialize_8cpp_source}{serialize.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ writer.\mbox{\hyperlink{class_writer_aec3200b2fc80ec87d1c37f775256b2e1}{StartObject}}();}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ writer.\mbox{\hyperlink{class_writer_a8b4dc44f471403a83c9959575796ceab}{String}}(\textcolor{stringliteral}{"{}school"{}});}
+\DoxyCodeLine{00055\ \textcolor{preprocessor}{\#if\ RAPIDJSON\_HAS\_STDSTRING}}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ writer.\mbox{\hyperlink{class_writer_a8b4dc44f471403a83c9959575796ceab}{String}}(school\_);}
+\DoxyCodeLine{00057\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ writer.\mbox{\hyperlink{class_writer_a8b4dc44f471403a83c9959575796ceab}{String}}(school\_.c\_str(),\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\textcolor{keyword}{>}(school\_.length()));}
+\DoxyCodeLine{00059\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00060\ }
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ writer.\mbox{\hyperlink{class_writer_a8b4dc44f471403a83c9959575796ceab}{String}}(\textcolor{stringliteral}{"{}GPA"{}});}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ writer.\mbox{\hyperlink{class_writer_a22a43e8a7193105deec6b808736f7a1a}{Double}}(GPA\_);}
+\DoxyCodeLine{00063\ }
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ writer.\mbox{\hyperlink{class_writer_a0771a565261564c27676b7300b11f2b5}{EndObject}}();}
+\DoxyCodeLine{00065\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_education_aa7dbbb0273bdaeca29d8bab01b365bbb_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=326pt]{class_education_aa7dbbb0273bdaeca29d8bab01b365bbb_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/example/serialize/\mbox{\hyperlink{serialize_8cpp}{serialize.\+cpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,80 @@
+\doxysection{sysiosystem\+::authority Struct Reference}
+\hypertarget{structsysiosystem_1_1authority}{}\label{structsysiosystem_1_1authority}\index{sysiosystem::authority@{sysiosystem::authority}}
+
+
+{\ttfamily \#include $<$native.\+hpp$>$}
+
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1authority_ace4d2084520d0ab726b0e8f728facf80}{threshold}} = 0
+\item 
+std\+::vector$<$ \mbox{\hyperlink{structsysiosystem_1_1key__weight}{key\+\_\+weight}} $>$ \mbox{\hyperlink{structsysiosystem_1_1authority_aa671b776013437972813e2b8b798f8bb}{keys}}
+\item 
+std\+::vector$<$ \mbox{\hyperlink{structsysiosystem_1_1permission__level__weight}{permission\+\_\+level\+\_\+weight}} $>$ \mbox{\hyperlink{structsysiosystem_1_1authority_af155cee60798ad60746821ea3d135048}{accounts}}
+\item 
+std\+::vector$<$ \mbox{\hyperlink{structsysiosystem_1_1wait__weight}{wait\+\_\+weight}} $>$ \mbox{\hyperlink{structsysiosystem_1_1authority_a597aee03c39cd09c8275d37ee179917f}{waits}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Blockchain authority.
+
+An authority is defined by\+:
+\begin{DoxyItemize}
+\item a vector of key\+\_\+weights (a \doxylink{structsysiosystem_1_1key__weight}{key\+\_\+weight} is a public key plus a weight),
+\item a vector of permission\+\_\+level\+\_\+weights, (a permission\+\_\+level is an account name plus a permission name)
+\item a vector of wait\+\_\+weights (a \doxylink{structsysiosystem_1_1wait__weight}{wait\+\_\+weight} is defined by a number of seconds to wait and a weight)
+\item a threshold value 
+\end{DoxyItemize}
+
+Definition at line \mbox{\hyperlink{native_8hpp_source_l00071}{71}} of file \mbox{\hyperlink{native_8hpp_source}{native.\+hpp}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysiosystem_1_1authority_af155cee60798ad60746821ea3d135048}\index{sysiosystem::authority@{sysiosystem::authority}!accounts@{accounts}}
+\index{accounts@{accounts}!sysiosystem::authority@{sysiosystem::authority}}
+\doxysubsubsection{\texorpdfstring{accounts}{accounts}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1authority_af155cee60798ad60746821ea3d135048} 
+std\+::vector$<$\mbox{\hyperlink{structsysiosystem_1_1permission__level__weight}{permission\+\_\+level\+\_\+weight}}$>$ sysiosystem\+::authority\+::accounts}
+
+
+
+Definition at line \mbox{\hyperlink{native_8hpp_source_l00074}{74}} of file \mbox{\hyperlink{native_8hpp_source}{native.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1authority_aa671b776013437972813e2b8b798f8bb}\index{sysiosystem::authority@{sysiosystem::authority}!keys@{keys}}
+\index{keys@{keys}!sysiosystem::authority@{sysiosystem::authority}}
+\doxysubsubsection{\texorpdfstring{keys}{keys}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1authority_aa671b776013437972813e2b8b798f8bb} 
+std\+::vector$<$\mbox{\hyperlink{structsysiosystem_1_1key__weight}{key\+\_\+weight}}$>$ sysiosystem\+::authority\+::keys}
+
+
+
+Definition at line \mbox{\hyperlink{native_8hpp_source_l00073}{73}} of file \mbox{\hyperlink{native_8hpp_source}{native.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1authority_ace4d2084520d0ab726b0e8f728facf80}\index{sysiosystem::authority@{sysiosystem::authority}!threshold@{threshold}}
+\index{threshold@{threshold}!sysiosystem::authority@{sysiosystem::authority}}
+\doxysubsubsection{\texorpdfstring{threshold}{threshold}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1authority_ace4d2084520d0ab726b0e8f728facf80} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysiosystem\+::authority\+::threshold = 0}
+
+
+
+Definition at line \mbox{\hyperlink{native_8hpp_source_l00072}{72}} of file \mbox{\hyperlink{native_8hpp_source}{native.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1authority_a597aee03c39cd09c8275d37ee179917f}\index{sysiosystem::authority@{sysiosystem::authority}!waits@{waits}}
+\index{waits@{waits}!sysiosystem::authority@{sysiosystem::authority}}
+\doxysubsubsection{\texorpdfstring{waits}{waits}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1authority_a597aee03c39cd09c8275d37ee179917f} 
+std\+::vector$<$\mbox{\hyperlink{structsysiosystem_1_1wait__weight}{wait\+\_\+weight}}$>$ sysiosystem\+::authority\+::waits}
+
+
+
+Definition at line \mbox{\hyperlink{native_8hpp_source_l00075}{75}} of file \mbox{\hyperlink{native_8hpp_source}{native.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/svetlasyrimis/\+Desktop/wire-\/network/\+WN-\/org/wire-\/system-\/contracts/contracts/sysio.\+system/include/sysio.\+system/\mbox{\hyperlink{native_8hpp}{native.\+hpp}}\end{DoxyCompactItemize}

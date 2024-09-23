@@ -1,0 +1,758 @@
+\doxysection{libraries/wasm-\/jit/\+Source/\+Third\+Party/xxhash/xxhash.h File Reference}
+\hypertarget{xxhash_8h}{}\label{xxhash_8h}\index{libraries/wasm-\/jit/Source/ThirdParty/xxhash/xxhash.h@{libraries/wasm-\/jit/Source/ThirdParty/xxhash/xxhash.h}}
+{\ttfamily \#include $<$stddef.\+h$>$}\newline
+Include dependency graph for xxhash.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=212pt]{xxhash_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{xxhash_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_x_x_h32__canonical__t}{XXH32\+\_\+canonical\+\_\+t}}
+\item 
+struct \mbox{\hyperlink{struct_x_x_h64__canonical__t}{XXH64\+\_\+canonical\+\_\+t}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{xxhash_8h_a5832897ed49938aefa629a76034b36b1}{XXH\+\_\+\+PUBLIC\+\_\+\+API}}~/\texorpdfstring{$\ast$}{*} do nothing \texorpdfstring{$\ast$}{*}/
+\item 
+\#define \mbox{\hyperlink{xxhash_8h_a8a2b7aee9a2ac8bfad126165c4369fab}{XXH\+\_\+\+VERSION\+\_\+\+MAJOR}}~0
+\item 
+\#define \mbox{\hyperlink{xxhash_8h_a0087600ba3cbfdbb78b83e13d54a1849}{XXH\+\_\+\+VERSION\+\_\+\+MINOR}}~6
+\item 
+\#define \mbox{\hyperlink{xxhash_8h_a67fe7f51710d15efa3aeeefbb446f434}{XXH\+\_\+\+VERSION\+\_\+\+RELEASE}}~2
+\item 
+\#define \mbox{\hyperlink{xxhash_8h_acc66393fff091acefc0e2a00ec5462c4}{XXH\+\_\+\+VERSION\+\_\+\+NUMBER}}~(\mbox{\hyperlink{xxhash_8h_a8a2b7aee9a2ac8bfad126165c4369fab}{XXH\+\_\+\+VERSION\+\_\+\+MAJOR}} \texorpdfstring{$\ast$}{*}100\texorpdfstring{$\ast$}{*}100 + \mbox{\hyperlink{xxhash_8h_a0087600ba3cbfdbb78b83e13d54a1849}{XXH\+\_\+\+VERSION\+\_\+\+MINOR}} \texorpdfstring{$\ast$}{*}100 + \mbox{\hyperlink{xxhash_8h_a67fe7f51710d15efa3aeeefbb446f434}{XXH\+\_\+\+VERSION\+\_\+\+RELEASE}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef unsigned int \mbox{\hyperlink{xxhash_8h_ab96bf7612b1f829b593220ab7acdc7a6}{XXH32\+\_\+hash\+\_\+t}}
+\item 
+typedef struct XXH32\+\_\+state\+\_\+s \mbox{\hyperlink{xxhash_8h_a0048f07d4a3051c20598464f007aa6c5}{XXH32\+\_\+state\+\_\+t}}
+\item 
+typedef unsigned long long \mbox{\hyperlink{xxhash_8h_a3d2b19e87ac87eb107372946fce59b26}{XXH64\+\_\+hash\+\_\+t}}
+\item 
+typedef struct XXH64\+\_\+state\+\_\+s \mbox{\hyperlink{xxhash_8h_a0702bdbc80b0cf9e94f2379f7d839b8c}{XXH64\+\_\+state\+\_\+t}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{xxhash_8h_a5020905455674b8c83c1dbc73f0d3534}{XXH\+\_\+errorcode}} \{ \mbox{\hyperlink{xxhash_8h_a5020905455674b8c83c1dbc73f0d3534abd20b092d624344e301b0cadd29d5bd6}{XXH\+\_\+\+OK}} =0
+, \mbox{\hyperlink{xxhash_8h_a5020905455674b8c83c1dbc73f0d3534a462a18276729783125c7116cf102667f}{XXH\+\_\+\+ERROR}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{xxhash_8h_a5832897ed49938aefa629a76034b36b1}{XXH\+\_\+\+PUBLIC\+\_\+\+API}} unsigned \mbox{\hyperlink{xxhash_8h_af435229c36fbbc6a23a5f187752a6fe4}{XXH\+\_\+version\+Number}} (void)
+\item 
+\mbox{\hyperlink{xxhash_8h_a5832897ed49938aefa629a76034b36b1}{XXH\+\_\+\+PUBLIC\+\_\+\+API}} \mbox{\hyperlink{xxhash_8h_ab96bf7612b1f829b593220ab7acdc7a6}{XXH32\+\_\+hash\+\_\+t}} \mbox{\hyperlink{xxhash_8h_aa47a1811043509306fe9b8744ab5eee6}{XXH32}} (const void \texorpdfstring{$\ast$}{*}input, size\+\_\+t length, unsigned int seed)
+\item 
+\mbox{\hyperlink{xxhash_8h_a5832897ed49938aefa629a76034b36b1}{XXH\+\_\+\+PUBLIC\+\_\+\+API}} \mbox{\hyperlink{xxhash_8h_a0048f07d4a3051c20598464f007aa6c5}{XXH32\+\_\+state\+\_\+t}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{xxhash_8h_a51931b4d4f02a6d818aaa6a258e8c076}{XXH32\+\_\+create\+State}} (void)
+\item 
+\mbox{\hyperlink{xxhash_8h_a5832897ed49938aefa629a76034b36b1}{XXH\+\_\+\+PUBLIC\+\_\+\+API}} \mbox{\hyperlink{xxhash_8h_a5020905455674b8c83c1dbc73f0d3534}{XXH\+\_\+errorcode}} \mbox{\hyperlink{xxhash_8h_aab2c0ec5dbb1b738d3f58aa3fc640243}{XXH32\+\_\+free\+State}} (\mbox{\hyperlink{xxhash_8h_a0048f07d4a3051c20598464f007aa6c5}{XXH32\+\_\+state\+\_\+t}} \texorpdfstring{$\ast$}{*}state\+Ptr)
+\item 
+\mbox{\hyperlink{xxhash_8h_a5832897ed49938aefa629a76034b36b1}{XXH\+\_\+\+PUBLIC\+\_\+\+API}} void \mbox{\hyperlink{xxhash_8h_a9354b1d57d79b128917ba28c1ca8230e}{XXH32\+\_\+copy\+State}} (\mbox{\hyperlink{xxhash_8h_a0048f07d4a3051c20598464f007aa6c5}{XXH32\+\_\+state\+\_\+t}} \texorpdfstring{$\ast$}{*}dst\+\_\+state, const \mbox{\hyperlink{xxhash_8h_a0048f07d4a3051c20598464f007aa6c5}{XXH32\+\_\+state\+\_\+t}} \texorpdfstring{$\ast$}{*}src\+\_\+state)
+\item 
+\mbox{\hyperlink{xxhash_8h_a5832897ed49938aefa629a76034b36b1}{XXH\+\_\+\+PUBLIC\+\_\+\+API}} \mbox{\hyperlink{xxhash_8h_a5020905455674b8c83c1dbc73f0d3534}{XXH\+\_\+errorcode}} \mbox{\hyperlink{xxhash_8h_a5ad2de72b93cb6396ee595484c0ced14}{XXH32\+\_\+reset}} (\mbox{\hyperlink{xxhash_8h_a0048f07d4a3051c20598464f007aa6c5}{XXH32\+\_\+state\+\_\+t}} \texorpdfstring{$\ast$}{*}state\+Ptr, unsigned int seed)
+\item 
+\mbox{\hyperlink{xxhash_8h_a5832897ed49938aefa629a76034b36b1}{XXH\+\_\+\+PUBLIC\+\_\+\+API}} \mbox{\hyperlink{xxhash_8h_a5020905455674b8c83c1dbc73f0d3534}{XXH\+\_\+errorcode}} \mbox{\hyperlink{xxhash_8h_aacc2e89656b7b7184279c2d621594afa}{XXH32\+\_\+update}} (\mbox{\hyperlink{xxhash_8h_a0048f07d4a3051c20598464f007aa6c5}{XXH32\+\_\+state\+\_\+t}} \texorpdfstring{$\ast$}{*}state\+Ptr, const void \texorpdfstring{$\ast$}{*}input, size\+\_\+t length)
+\item 
+\mbox{\hyperlink{xxhash_8h_a5832897ed49938aefa629a76034b36b1}{XXH\+\_\+\+PUBLIC\+\_\+\+API}} \mbox{\hyperlink{xxhash_8h_ab96bf7612b1f829b593220ab7acdc7a6}{XXH32\+\_\+hash\+\_\+t}} \mbox{\hyperlink{xxhash_8h_a2d5f5298193818366420a8f25e3ee46e}{XXH32\+\_\+digest}} (const \mbox{\hyperlink{xxhash_8h_a0048f07d4a3051c20598464f007aa6c5}{XXH32\+\_\+state\+\_\+t}} \texorpdfstring{$\ast$}{*}state\+Ptr)
+\item 
+\mbox{\hyperlink{xxhash_8h_a5832897ed49938aefa629a76034b36b1}{XXH\+\_\+\+PUBLIC\+\_\+\+API}} void \mbox{\hyperlink{xxhash_8h_ade47204bc3908fdc401a68e9c295e233}{XXH32\+\_\+canonical\+From\+Hash}} (\mbox{\hyperlink{struct_x_x_h32__canonical__t}{XXH32\+\_\+canonical\+\_\+t}} \texorpdfstring{$\ast$}{*}dst, \mbox{\hyperlink{xxhash_8h_ab96bf7612b1f829b593220ab7acdc7a6}{XXH32\+\_\+hash\+\_\+t}} hash)
+\item 
+\mbox{\hyperlink{xxhash_8h_a5832897ed49938aefa629a76034b36b1}{XXH\+\_\+\+PUBLIC\+\_\+\+API}} \mbox{\hyperlink{xxhash_8h_ab96bf7612b1f829b593220ab7acdc7a6}{XXH32\+\_\+hash\+\_\+t}} \mbox{\hyperlink{xxhash_8h_a206cac74a0c149b244d3532186a4930f}{XXH32\+\_\+hash\+From\+Canonical}} (const \mbox{\hyperlink{struct_x_x_h32__canonical__t}{XXH32\+\_\+canonical\+\_\+t}} \texorpdfstring{$\ast$}{*}src)
+\item 
+\mbox{\hyperlink{xxhash_8h_a5832897ed49938aefa629a76034b36b1}{XXH\+\_\+\+PUBLIC\+\_\+\+API}} \mbox{\hyperlink{xxhash_8h_a3d2b19e87ac87eb107372946fce59b26}{XXH64\+\_\+hash\+\_\+t}} \mbox{\hyperlink{xxhash_8h_a6a12044a8880150d2c95b80df0043676}{XXH64}} (const void \texorpdfstring{$\ast$}{*}input, size\+\_\+t length, unsigned long long seed)
+\item 
+\mbox{\hyperlink{xxhash_8h_a5832897ed49938aefa629a76034b36b1}{XXH\+\_\+\+PUBLIC\+\_\+\+API}} \mbox{\hyperlink{xxhash_8h_a0702bdbc80b0cf9e94f2379f7d839b8c}{XXH64\+\_\+state\+\_\+t}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{xxhash_8h_a79efe920b4f18004110a6e9bcc0385e0}{XXH64\+\_\+create\+State}} (void)
+\item 
+\mbox{\hyperlink{xxhash_8h_a5832897ed49938aefa629a76034b36b1}{XXH\+\_\+\+PUBLIC\+\_\+\+API}} \mbox{\hyperlink{xxhash_8h_a5020905455674b8c83c1dbc73f0d3534}{XXH\+\_\+errorcode}} \mbox{\hyperlink{xxhash_8h_ae490ef51db9c960da09189c2774cf82e}{XXH64\+\_\+free\+State}} (\mbox{\hyperlink{xxhash_8h_a0702bdbc80b0cf9e94f2379f7d839b8c}{XXH64\+\_\+state\+\_\+t}} \texorpdfstring{$\ast$}{*}state\+Ptr)
+\item 
+\mbox{\hyperlink{xxhash_8h_a5832897ed49938aefa629a76034b36b1}{XXH\+\_\+\+PUBLIC\+\_\+\+API}} void \mbox{\hyperlink{xxhash_8h_a465a40feffb31fbbece3385ca3c52eb6}{XXH64\+\_\+copy\+State}} (\mbox{\hyperlink{xxhash_8h_a0702bdbc80b0cf9e94f2379f7d839b8c}{XXH64\+\_\+state\+\_\+t}} \texorpdfstring{$\ast$}{*}dst\+\_\+state, const \mbox{\hyperlink{xxhash_8h_a0702bdbc80b0cf9e94f2379f7d839b8c}{XXH64\+\_\+state\+\_\+t}} \texorpdfstring{$\ast$}{*}src\+\_\+state)
+\item 
+\mbox{\hyperlink{xxhash_8h_a5832897ed49938aefa629a76034b36b1}{XXH\+\_\+\+PUBLIC\+\_\+\+API}} \mbox{\hyperlink{xxhash_8h_a5020905455674b8c83c1dbc73f0d3534}{XXH\+\_\+errorcode}} \mbox{\hyperlink{xxhash_8h_a81c80f1f143238a37ebc39a100ade6d5}{XXH64\+\_\+reset}} (\mbox{\hyperlink{xxhash_8h_a0702bdbc80b0cf9e94f2379f7d839b8c}{XXH64\+\_\+state\+\_\+t}} \texorpdfstring{$\ast$}{*}state\+Ptr, unsigned long long seed)
+\item 
+\mbox{\hyperlink{xxhash_8h_a5832897ed49938aefa629a76034b36b1}{XXH\+\_\+\+PUBLIC\+\_\+\+API}} \mbox{\hyperlink{xxhash_8h_a5020905455674b8c83c1dbc73f0d3534}{XXH\+\_\+errorcode}} \mbox{\hyperlink{xxhash_8h_a5419c59c26a757d705b0f0bf68a175bf}{XXH64\+\_\+update}} (\mbox{\hyperlink{xxhash_8h_a0702bdbc80b0cf9e94f2379f7d839b8c}{XXH64\+\_\+state\+\_\+t}} \texorpdfstring{$\ast$}{*}state\+Ptr, const void \texorpdfstring{$\ast$}{*}input, size\+\_\+t length)
+\item 
+\mbox{\hyperlink{xxhash_8h_a5832897ed49938aefa629a76034b36b1}{XXH\+\_\+\+PUBLIC\+\_\+\+API}} \mbox{\hyperlink{xxhash_8h_a3d2b19e87ac87eb107372946fce59b26}{XXH64\+\_\+hash\+\_\+t}} \mbox{\hyperlink{xxhash_8h_aa58640d3d99cceed8544a957bc63867a}{XXH64\+\_\+digest}} (const \mbox{\hyperlink{xxhash_8h_a0702bdbc80b0cf9e94f2379f7d839b8c}{XXH64\+\_\+state\+\_\+t}} \texorpdfstring{$\ast$}{*}state\+Ptr)
+\item 
+\mbox{\hyperlink{xxhash_8h_a5832897ed49938aefa629a76034b36b1}{XXH\+\_\+\+PUBLIC\+\_\+\+API}} void \mbox{\hyperlink{xxhash_8h_aecb9c0887b2cc4f4444cfa439e6c2c6b}{XXH64\+\_\+canonical\+From\+Hash}} (\mbox{\hyperlink{struct_x_x_h64__canonical__t}{XXH64\+\_\+canonical\+\_\+t}} \texorpdfstring{$\ast$}{*}dst, \mbox{\hyperlink{xxhash_8h_a3d2b19e87ac87eb107372946fce59b26}{XXH64\+\_\+hash\+\_\+t}} hash)
+\item 
+\mbox{\hyperlink{xxhash_8h_a5832897ed49938aefa629a76034b36b1}{XXH\+\_\+\+PUBLIC\+\_\+\+API}} \mbox{\hyperlink{xxhash_8h_a3d2b19e87ac87eb107372946fce59b26}{XXH64\+\_\+hash\+\_\+t}} \mbox{\hyperlink{xxhash_8h_add7f64d0c0590f222747e7f703cfd3b0}{XXH64\+\_\+hash\+From\+Canonical}} (const \mbox{\hyperlink{struct_x_x_h64__canonical__t}{XXH64\+\_\+canonical\+\_\+t}} \texorpdfstring{$\ast$}{*}src)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{xxhash_8h_a5832897ed49938aefa629a76034b36b1}\index{xxhash.h@{xxhash.h}!XXH\_PUBLIC\_API@{XXH\_PUBLIC\_API}}
+\index{XXH\_PUBLIC\_API@{XXH\_PUBLIC\_API}!xxhash.h@{xxhash.h}}
+\doxysubsubsection{\texorpdfstring{XXH\_PUBLIC\_API}{XXH\_PUBLIC\_API}}
+{\footnotesize\ttfamily \label{xxhash_8h_a5832897ed49938aefa629a76034b36b1} 
+\#define XXH\+\_\+\+PUBLIC\+\_\+\+API~/\texorpdfstring{$\ast$}{*} do nothing \texorpdfstring{$\ast$}{*}/}
+
+XXH\+\_\+\+PRIVATE\+\_\+\+API This is useful to include xxhash functions in {\ttfamily static} mode in order to inline them, and remove their symbol from the public list. Methodology \+: \#define XXH\+\_\+\+PRIVATE\+\_\+\+API \#include "{}xxhash.\+h"{} {\ttfamily \doxylink{xxhash_8c}{xxhash.\+c}} is automatically included. It\textquotesingle{}s not useful to compile and link it as a separate module. 
+
+Definition at line \mbox{\hyperlink{xxhash_8h_source_l00108}{108}} of file \mbox{\hyperlink{xxhash_8h_source}{xxhash.\+h}}.
+
+\Hypertarget{xxhash_8h_a8a2b7aee9a2ac8bfad126165c4369fab}\index{xxhash.h@{xxhash.h}!XXH\_VERSION\_MAJOR@{XXH\_VERSION\_MAJOR}}
+\index{XXH\_VERSION\_MAJOR@{XXH\_VERSION\_MAJOR}!xxhash.h@{xxhash.h}}
+\doxysubsubsection{\texorpdfstring{XXH\_VERSION\_MAJOR}{XXH\_VERSION\_MAJOR}}
+{\footnotesize\ttfamily \label{xxhash_8h_a8a2b7aee9a2ac8bfad126165c4369fab} 
+\#define XXH\+\_\+\+VERSION\+\_\+\+MAJOR~0}
+
+XXH\+\_\+\+NAMESPACE, aka Namespace Emulation \+:
+
+If you want to include {\itshape and expose} xx\+Hash functions from within your own library, but also want to avoid symbol collisions with other libraries which may also include xx\+Hash,
+
+you can use XXH\+\_\+\+NAMESPACE, to automatically prefix any public symbol from xxhash library with the value of XXH\+\_\+\+NAMESPACE (therefore, avoid NULL and numeric values).
+
+Note that no change is required within the calling program as long as it includes {\ttfamily \doxylink{xxhash_8h}{xxhash.\+h}} \+: regular symbol name will be automatically translated by this header. 
+
+Definition at line \mbox{\hyperlink{xxhash_8h_source_l00150}{150}} of file \mbox{\hyperlink{xxhash_8h_source}{xxhash.\+h}}.
+
+\Hypertarget{xxhash_8h_a0087600ba3cbfdbb78b83e13d54a1849}\index{xxhash.h@{xxhash.h}!XXH\_VERSION\_MINOR@{XXH\_VERSION\_MINOR}}
+\index{XXH\_VERSION\_MINOR@{XXH\_VERSION\_MINOR}!xxhash.h@{xxhash.h}}
+\doxysubsubsection{\texorpdfstring{XXH\_VERSION\_MINOR}{XXH\_VERSION\_MINOR}}
+{\footnotesize\ttfamily \label{xxhash_8h_a0087600ba3cbfdbb78b83e13d54a1849} 
+\#define XXH\+\_\+\+VERSION\+\_\+\+MINOR~6}
+
+
+
+Definition at line \mbox{\hyperlink{xxhash_8h_source_l00151}{151}} of file \mbox{\hyperlink{xxhash_8h_source}{xxhash.\+h}}.
+
+\Hypertarget{xxhash_8h_acc66393fff091acefc0e2a00ec5462c4}\index{xxhash.h@{xxhash.h}!XXH\_VERSION\_NUMBER@{XXH\_VERSION\_NUMBER}}
+\index{XXH\_VERSION\_NUMBER@{XXH\_VERSION\_NUMBER}!xxhash.h@{xxhash.h}}
+\doxysubsubsection{\texorpdfstring{XXH\_VERSION\_NUMBER}{XXH\_VERSION\_NUMBER}}
+{\footnotesize\ttfamily \label{xxhash_8h_acc66393fff091acefc0e2a00ec5462c4} 
+\#define XXH\+\_\+\+VERSION\+\_\+\+NUMBER~(\mbox{\hyperlink{xxhash_8h_a8a2b7aee9a2ac8bfad126165c4369fab}{XXH\+\_\+\+VERSION\+\_\+\+MAJOR}} \texorpdfstring{$\ast$}{*}100\texorpdfstring{$\ast$}{*}100 + \mbox{\hyperlink{xxhash_8h_a0087600ba3cbfdbb78b83e13d54a1849}{XXH\+\_\+\+VERSION\+\_\+\+MINOR}} \texorpdfstring{$\ast$}{*}100 + \mbox{\hyperlink{xxhash_8h_a67fe7f51710d15efa3aeeefbb446f434}{XXH\+\_\+\+VERSION\+\_\+\+RELEASE}})}
+
+
+
+Definition at line \mbox{\hyperlink{xxhash_8h_source_l00153}{153}} of file \mbox{\hyperlink{xxhash_8h_source}{xxhash.\+h}}.
+
+\Hypertarget{xxhash_8h_a67fe7f51710d15efa3aeeefbb446f434}\index{xxhash.h@{xxhash.h}!XXH\_VERSION\_RELEASE@{XXH\_VERSION\_RELEASE}}
+\index{XXH\_VERSION\_RELEASE@{XXH\_VERSION\_RELEASE}!xxhash.h@{xxhash.h}}
+\doxysubsubsection{\texorpdfstring{XXH\_VERSION\_RELEASE}{XXH\_VERSION\_RELEASE}}
+{\footnotesize\ttfamily \label{xxhash_8h_a67fe7f51710d15efa3aeeefbb446f434} 
+\#define XXH\+\_\+\+VERSION\+\_\+\+RELEASE~2}
+
+
+
+Definition at line \mbox{\hyperlink{xxhash_8h_source_l00152}{152}} of file \mbox{\hyperlink{xxhash_8h_source}{xxhash.\+h}}.
+
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{xxhash_8h_ab96bf7612b1f829b593220ab7acdc7a6}\index{xxhash.h@{xxhash.h}!XXH32\_hash\_t@{XXH32\_hash\_t}}
+\index{XXH32\_hash\_t@{XXH32\_hash\_t}!xxhash.h@{xxhash.h}}
+\doxysubsubsection{\texorpdfstring{XXH32\_hash\_t}{XXH32\_hash\_t}}
+{\footnotesize\ttfamily \label{xxhash_8h_ab96bf7612b1f829b593220ab7acdc7a6} 
+typedef unsigned int \mbox{\hyperlink{xxhash_8h_ab96bf7612b1f829b593220ab7acdc7a6}{XXH32\+\_\+hash\+\_\+t}}}
+
+
+
+Definition at line \mbox{\hyperlink{xxhash_8h_source_l00160}{160}} of file \mbox{\hyperlink{xxhash_8h_source}{xxhash.\+h}}.
+
+\Hypertarget{xxhash_8h_a0048f07d4a3051c20598464f007aa6c5}\index{xxhash.h@{xxhash.h}!XXH32\_state\_t@{XXH32\_state\_t}}
+\index{XXH32\_state\_t@{XXH32\_state\_t}!xxhash.h@{xxhash.h}}
+\doxysubsubsection{\texorpdfstring{XXH32\_state\_t}{XXH32\_state\_t}}
+{\footnotesize\ttfamily \label{xxhash_8h_a0048f07d4a3051c20598464f007aa6c5} 
+typedef struct XXH32\+\_\+state\+\_\+s \mbox{\hyperlink{xxhash_8h_a0048f07d4a3051c20598464f007aa6c5}{XXH32\+\_\+state\+\_\+t}}}
+
+
+
+Definition at line \mbox{\hyperlink{xxhash_8h_source_l00170}{170}} of file \mbox{\hyperlink{xxhash_8h_source}{xxhash.\+h}}.
+
+\Hypertarget{xxhash_8h_a3d2b19e87ac87eb107372946fce59b26}\index{xxhash.h@{xxhash.h}!XXH64\_hash\_t@{XXH64\_hash\_t}}
+\index{XXH64\_hash\_t@{XXH64\_hash\_t}!xxhash.h@{xxhash.h}}
+\doxysubsubsection{\texorpdfstring{XXH64\_hash\_t}{XXH64\_hash\_t}}
+{\footnotesize\ttfamily \label{xxhash_8h_a3d2b19e87ac87eb107372946fce59b26} 
+typedef unsigned long long \mbox{\hyperlink{xxhash_8h_a3d2b19e87ac87eb107372946fce59b26}{XXH64\+\_\+hash\+\_\+t}}}
+
+
+
+Definition at line \mbox{\hyperlink{xxhash_8h_source_l00218}{218}} of file \mbox{\hyperlink{xxhash_8h_source}{xxhash.\+h}}.
+
+\Hypertarget{xxhash_8h_a0702bdbc80b0cf9e94f2379f7d839b8c}\index{xxhash.h@{xxhash.h}!XXH64\_state\_t@{XXH64\_state\_t}}
+\index{XXH64\_state\_t@{XXH64\_state\_t}!xxhash.h@{xxhash.h}}
+\doxysubsubsection{\texorpdfstring{XXH64\_state\_t}{XXH64\_state\_t}}
+{\footnotesize\ttfamily \label{xxhash_8h_a0702bdbc80b0cf9e94f2379f7d839b8c} 
+typedef struct XXH64\+\_\+state\+\_\+s \mbox{\hyperlink{xxhash_8h_a0702bdbc80b0cf9e94f2379f7d839b8c}{XXH64\+\_\+state\+\_\+t}}}
+
+
+
+Definition at line \mbox{\hyperlink{xxhash_8h_source_l00228}{228}} of file \mbox{\hyperlink{xxhash_8h_source}{xxhash.\+h}}.
+
+
+
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{xxhash_8h_a5020905455674b8c83c1dbc73f0d3534}\index{xxhash.h@{xxhash.h}!XXH\_errorcode@{XXH\_errorcode}}
+\index{XXH\_errorcode@{XXH\_errorcode}!xxhash.h@{xxhash.h}}
+\doxysubsubsection{\texorpdfstring{XXH\_errorcode}{XXH\_errorcode}}
+{\footnotesize\ttfamily \label{xxhash_8h_a5020905455674b8c83c1dbc73f0d3534} 
+enum \mbox{\hyperlink{xxhash_8h_a5020905455674b8c83c1dbc73f0d3534}{XXH\+\_\+errorcode}}}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{XXH\_OK@{XXH\_OK}!xxhash.h@{xxhash.h}}\index{xxhash.h@{xxhash.h}!XXH\_OK@{XXH\_OK}}}\Hypertarget{xxhash_8h_a5020905455674b8c83c1dbc73f0d3534abd20b092d624344e301b0cadd29d5bd6}\label{xxhash_8h_a5020905455674b8c83c1dbc73f0d3534} 
+XXH\+\_\+\+OK&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{XXH\_ERROR@{XXH\_ERROR}!xxhash.h@{xxhash.h}}\index{xxhash.h@{xxhash.h}!XXH\_ERROR@{XXH\_ERROR}}}\Hypertarget{xxhash_8h_a5020905455674b8c83c1dbc73f0d3534a462a18276729783125c7116cf102667f}\label{xxhash_8h_a5020905455674b8c83c1dbc73f0d3534} 
+XXH\+\_\+\+ERROR&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{xxhash_8h_source_l00079}{79}} of file \mbox{\hyperlink{xxhash_8h_source}{xxhash.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00079\ \{\ \mbox{\hyperlink{xxhash_8h_a5020905455674b8c83c1dbc73f0d3534abd20b092d624344e301b0cadd29d5bd6}{XXH\_OK}}=0,\ \mbox{\hyperlink{xxhash_8h_a5020905455674b8c83c1dbc73f0d3534a462a18276729783125c7116cf102667f}{XXH\_ERROR}}\ \}\ \mbox{\hyperlink{xxhash_8h_a5020905455674b8c83c1dbc73f0d3534}{XXH\_errorcode}};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{xxhash_8h_aa47a1811043509306fe9b8744ab5eee6}\index{xxhash.h@{xxhash.h}!XXH32@{XXH32}}
+\index{XXH32@{XXH32}!xxhash.h@{xxhash.h}}
+\doxysubsubsection{\texorpdfstring{XXH32()}{XXH32()}}
+{\footnotesize\ttfamily \label{xxhash_8h_aa47a1811043509306fe9b8744ab5eee6} 
+\mbox{\hyperlink{xxhash_8h_a5832897ed49938aefa629a76034b36b1}{XXH\+\_\+\+PUBLIC\+\_\+\+API}} \mbox{\hyperlink{xxhash_8h_ab96bf7612b1f829b593220ab7acdc7a6}{XXH32\+\_\+hash\+\_\+t}} XXH32 (\begin{DoxyParamCaption}\item[{const void \texorpdfstring{$\ast$}{*}}]{input}{, }\item[{size\+\_\+t}]{length}{, }\item[{unsigned int}]{seed}{}\end{DoxyParamCaption})}
+
+\doxylink{xxhash_8h_aa47a1811043509306fe9b8744ab5eee6}{XXH32()} \+: Calculate the 32-\/bits hash of sequence "{}length"{} bytes stored at memory address "{}input"{}. The memory between input \& input+length must be valid (allocated and read-\/accessible). "{}seed"{} can be used to alter the result predictably. Speed on Core 2 Duo @ 3 GHz (single thread, SMHasher benchmark) \+: 5.\+4 GB/s 
+
+Definition at line \mbox{\hyperlink{xxhash_8c_source_l00320}{320}} of file \mbox{\hyperlink{xxhash_8c_source}{xxhash.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00321\ \{}
+\DoxyCodeLine{00322\ \textcolor{preprocessor}{\#if\ 0}}
+\DoxyCodeLine{00323\ \ \ \ \ \textcolor{comment}{/*\ Simple\ version,\ good\ for\ code\ maintenance,\ but\ unfortunately\ slow\ for\ small\ inputs\ */}}
+\DoxyCodeLine{00324\ \ \ \ \ \mbox{\hyperlink{xxhash_8h_a0048f07d4a3051c20598464f007aa6c5}{XXH32\_state\_t}}\ \mbox{\hyperlink{structstate}{state}};}
+\DoxyCodeLine{00325\ \ \ \ \ \mbox{\hyperlink{xxhash_8c_a5ad2de72b93cb6396ee595484c0ced14}{XXH32\_reset}}(\&\mbox{\hyperlink{structstate}{state}},\ seed);}
+\DoxyCodeLine{00326\ \ \ \ \ \mbox{\hyperlink{xxhash_8c_af4920be3d369f2520d096214d5199a46}{XXH32\_update}}(\&\mbox{\hyperlink{structstate}{state}},\ input,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}});}
+\DoxyCodeLine{00327\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{xxhash_8c_a07c35eafb66c0557575801b79e624b80}{XXH32\_digest}}(\&\mbox{\hyperlink{structstate}{state}});}
+\DoxyCodeLine{00328\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00329\ \ \ \ \ \mbox{\hyperlink{xxhash_8c_a235e518684d715cbb04353c997ad81e9}{XXH\_endianess}}\ endian\_detected\ =\ (\mbox{\hyperlink{xxhash_8c_a235e518684d715cbb04353c997ad81e9}{XXH\_endianess}})\mbox{\hyperlink{xxhash_8c_a408fac02658eb4a81f7a1877f1ca3b3f}{XXH\_CPU\_LITTLE\_ENDIAN}};}
+\DoxyCodeLine{00330\ }
+\DoxyCodeLine{00331\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{xxhash_8c_aee35763869a969d5576e70dac1c08b8d}{XXH\_FORCE\_ALIGN\_CHECK}})\ \{}
+\DoxyCodeLine{00332\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((((\textcolor{keywordtype}{size\_t})input)\ \&\ 3)\ ==\ 0)\ \{\ \ \ \textcolor{comment}{/*\ Input\ is\ 4-\/bytes\ aligned,\ leverage\ the\ speed\ benefit\ */}}
+\DoxyCodeLine{00333\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((endian\_detected==\mbox{\hyperlink{xxhash_8c_a235e518684d715cbb04353c997ad81e9ab42c8f08d82d02dee14a685dc4c39539}{XXH\_littleEndian}})\ ||\ \mbox{\hyperlink{xxhash_8c_afd620e67e55f7db0b0d700af3edff885}{XXH\_FORCE\_NATIVE\_FORMAT}})}
+\DoxyCodeLine{00334\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{xxhash_8c_a1d3c47f4e6e43e96b545c3f139977b32}{XXH32\_endian\_align}}(input,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ seed,\ \mbox{\hyperlink{xxhash_8c_a235e518684d715cbb04353c997ad81e9ab42c8f08d82d02dee14a685dc4c39539}{XXH\_littleEndian}},\ \mbox{\hyperlink{xxhash_8c_adec56fccd4f83e34902b6b09ecccfff5a41340c9f33fe739cef7a1c56dc617194}{XXH\_aligned}});}
+\DoxyCodeLine{00335\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00336\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{xxhash_8c_a1d3c47f4e6e43e96b545c3f139977b32}{XXH32\_endian\_align}}(input,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ seed,\ \mbox{\hyperlink{xxhash_8c_a235e518684d715cbb04353c997ad81e9ae38c7420bad548564395edb8cb4b6b60}{XXH\_bigEndian}},\ \mbox{\hyperlink{xxhash_8c_adec56fccd4f83e34902b6b09ecccfff5a41340c9f33fe739cef7a1c56dc617194}{XXH\_aligned}});}
+\DoxyCodeLine{00337\ \ \ \ \ \}\ \ \ \}}
+\DoxyCodeLine{00338\ }
+\DoxyCodeLine{00339\ \ \ \ \ \textcolor{keywordflow}{if}\ ((endian\_detected==\mbox{\hyperlink{xxhash_8c_a235e518684d715cbb04353c997ad81e9ab42c8f08d82d02dee14a685dc4c39539}{XXH\_littleEndian}})\ ||\ \mbox{\hyperlink{xxhash_8c_afd620e67e55f7db0b0d700af3edff885}{XXH\_FORCE\_NATIVE\_FORMAT}})}
+\DoxyCodeLine{00340\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{xxhash_8c_a1d3c47f4e6e43e96b545c3f139977b32}{XXH32\_endian\_align}}(input,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ seed,\ \mbox{\hyperlink{xxhash_8c_a235e518684d715cbb04353c997ad81e9ab42c8f08d82d02dee14a685dc4c39539}{XXH\_littleEndian}},\ \mbox{\hyperlink{xxhash_8c_adec56fccd4f83e34902b6b09ecccfff5ab082c14fd7eef12bcb1dfda2e813586f}{XXH\_unaligned}});}
+\DoxyCodeLine{00341\ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00342\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{xxhash_8c_a1d3c47f4e6e43e96b545c3f139977b32}{XXH32\_endian\_align}}(input,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ seed,\ \mbox{\hyperlink{xxhash_8c_a235e518684d715cbb04353c997ad81e9ae38c7420bad548564395edb8cb4b6b60}{XXH\_bigEndian}},\ \mbox{\hyperlink{xxhash_8c_adec56fccd4f83e34902b6b09ecccfff5ab082c14fd7eef12bcb1dfda2e813586f}{XXH\_unaligned}});}
+\DoxyCodeLine{00343\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00344\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{xxhash_8h_aa47a1811043509306fe9b8744ab5eee6_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{xxhash_8h_ade47204bc3908fdc401a68e9c295e233}\index{xxhash.h@{xxhash.h}!XXH32\_canonicalFromHash@{XXH32\_canonicalFromHash}}
+\index{XXH32\_canonicalFromHash@{XXH32\_canonicalFromHash}!xxhash.h@{xxhash.h}}
+\doxysubsubsection{\texorpdfstring{XXH32\_canonicalFromHash()}{XXH32\_canonicalFromHash()}}
+{\footnotesize\ttfamily \label{xxhash_8h_ade47204bc3908fdc401a68e9c295e233} 
+\mbox{\hyperlink{xxhash_8h_a5832897ed49938aefa629a76034b36b1}{XXH\+\_\+\+PUBLIC\+\_\+\+API}} void XXH32\+\_\+canonical\+From\+Hash (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_x_x_h32__canonical__t}{XXH32\+\_\+canonical\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{dst}{, }\item[{\mbox{\hyperlink{xxhash_8h_ab96bf7612b1f829b593220ab7acdc7a6}{XXH32\+\_\+hash\+\_\+t}}}]{hash}{}\end{DoxyParamCaption})}
+
+Default XXH result types are basic unsigned 32 and 64 bits. The canonical representation follows human-\/readable write convention, aka big-\/endian (large digits first). These functions allow transformation of hash result into and from its canonical format. This way, hash values can be written into a file or buffer, and remain comparable across different systems and programs. 
+
+Definition at line \mbox{\hyperlink{xxhash_8c_source_l00503}{503}} of file \mbox{\hyperlink{xxhash_8c_source}{xxhash.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00504\ \{}
+\DoxyCodeLine{00505\ \ \ \ \ \mbox{\hyperlink{xxhash_8c_a3bc33577f47cf99f8b35a52d87c642c4}{XXH\_STATIC\_ASSERT}}(\textcolor{keyword}{sizeof}(\mbox{\hyperlink{struct_x_x_h32__canonical__t}{XXH32\_canonical\_t}})\ ==\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{xxhash_8h_ab96bf7612b1f829b593220ab7acdc7a6}{XXH32\_hash\_t}}));}
+\DoxyCodeLine{00506\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{xxhash_8c_a408fac02658eb4a81f7a1877f1ca3b3f}{XXH\_CPU\_LITTLE\_ENDIAN}})\ hash\ =\ XXH\_swap32(hash);}
+\DoxyCodeLine{00507\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(dst,\ \&hash,\ \textcolor{keyword}{sizeof}(*dst));}
+\DoxyCodeLine{00508\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=309pt]{xxhash_8h_ade47204bc3908fdc401a68e9c295e233_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{xxhash_8h_a9354b1d57d79b128917ba28c1ca8230e}\index{xxhash.h@{xxhash.h}!XXH32\_copyState@{XXH32\_copyState}}
+\index{XXH32\_copyState@{XXH32\_copyState}!xxhash.h@{xxhash.h}}
+\doxysubsubsection{\texorpdfstring{XXH32\_copyState()}{XXH32\_copyState()}}
+{\footnotesize\ttfamily \label{xxhash_8h_a9354b1d57d79b128917ba28c1ca8230e} 
+\mbox{\hyperlink{xxhash_8h_a5832897ed49938aefa629a76034b36b1}{XXH\+\_\+\+PUBLIC\+\_\+\+API}} void XXH32\+\_\+copy\+State (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{xxhash_8h_a0048f07d4a3051c20598464f007aa6c5}{XXH32\+\_\+state\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{dst\+\_\+state}{, }\item[{const \mbox{\hyperlink{xxhash_8h_a0048f07d4a3051c20598464f007aa6c5}{XXH32\+\_\+state\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{src\+\_\+state}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{xxhash_8c_source_l00360}{360}} of file \mbox{\hyperlink{xxhash_8c_source}{xxhash.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00361\ \{}
+\DoxyCodeLine{00362\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(dstState,\ srcState,\ \textcolor{keyword}{sizeof}(*dstState));}
+\DoxyCodeLine{00363\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=267pt]{xxhash_8h_a9354b1d57d79b128917ba28c1ca8230e_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{xxhash_8h_a51931b4d4f02a6d818aaa6a258e8c076}\index{xxhash.h@{xxhash.h}!XXH32\_createState@{XXH32\_createState}}
+\index{XXH32\_createState@{XXH32\_createState}!xxhash.h@{xxhash.h}}
+\doxysubsubsection{\texorpdfstring{XXH32\_createState()}{XXH32\_createState()}}
+{\footnotesize\ttfamily \label{xxhash_8h_a51931b4d4f02a6d818aaa6a258e8c076} 
+\mbox{\hyperlink{xxhash_8h_a5832897ed49938aefa629a76034b36b1}{XXH\+\_\+\+PUBLIC\+\_\+\+API}} \mbox{\hyperlink{xxhash_8h_a0048f07d4a3051c20598464f007aa6c5}{XXH32\+\_\+state\+\_\+t}} \texorpdfstring{$\ast$}{*} XXH32\+\_\+create\+State (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{xxhash_8c_source_l00350}{350}} of file \mbox{\hyperlink{xxhash_8c_source}{xxhash.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00351\ \{}
+\DoxyCodeLine{00352\ \ \ \ \ \textcolor{keywordflow}{return}\ (\mbox{\hyperlink{xxhash_8h_a0048f07d4a3051c20598464f007aa6c5}{XXH32\_state\_t}}*)XXH\_malloc(\textcolor{keyword}{sizeof}(\mbox{\hyperlink{xxhash_8h_a0048f07d4a3051c20598464f007aa6c5}{XXH32\_state\_t}}));}
+\DoxyCodeLine{00353\ \}}
+
+\end{DoxyCode}
+\Hypertarget{xxhash_8h_a2d5f5298193818366420a8f25e3ee46e}\index{xxhash.h@{xxhash.h}!XXH32\_digest@{XXH32\_digest}}
+\index{XXH32\_digest@{XXH32\_digest}!xxhash.h@{xxhash.h}}
+\doxysubsubsection{\texorpdfstring{XXH32\_digest()}{XXH32\_digest()}}
+{\footnotesize\ttfamily \label{xxhash_8h_a2d5f5298193818366420a8f25e3ee46e} 
+\mbox{\hyperlink{xxhash_8h_a5832897ed49938aefa629a76034b36b1}{XXH\+\_\+\+PUBLIC\+\_\+\+API}} \mbox{\hyperlink{xxhash_8h_ab96bf7612b1f829b593220ab7acdc7a6}{XXH32\+\_\+hash\+\_\+t}} XXH32\+\_\+digest (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{xxhash_8h_a0048f07d4a3051c20598464f007aa6c5}{XXH32\+\_\+state\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{state\+Ptr}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{xxhash_8c_source_l00484}{484}} of file \mbox{\hyperlink{xxhash_8c_source}{xxhash.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00485\ \{}
+\DoxyCodeLine{00486\ \ \ \ \ \mbox{\hyperlink{xxhash_8c_a235e518684d715cbb04353c997ad81e9}{XXH\_endianess}}\ endian\_detected\ =\ (\mbox{\hyperlink{xxhash_8c_a235e518684d715cbb04353c997ad81e9}{XXH\_endianess}})\mbox{\hyperlink{xxhash_8c_a408fac02658eb4a81f7a1877f1ca3b3f}{XXH\_CPU\_LITTLE\_ENDIAN}};}
+\DoxyCodeLine{00487\ }
+\DoxyCodeLine{00488\ \ \ \ \ \textcolor{keywordflow}{if}\ ((endian\_detected==\mbox{\hyperlink{xxhash_8c_a235e518684d715cbb04353c997ad81e9ab42c8f08d82d02dee14a685dc4c39539}{XXH\_littleEndian}})\ ||\ \mbox{\hyperlink{xxhash_8c_afd620e67e55f7db0b0d700af3edff885}{XXH\_FORCE\_NATIVE\_FORMAT}})}
+\DoxyCodeLine{00489\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{xxhash_8c_a16a98ec2b456c390c8b19c8a6844fd0c}{XXH32\_digest\_endian}}(state\_in,\ \mbox{\hyperlink{xxhash_8c_a235e518684d715cbb04353c997ad81e9ab42c8f08d82d02dee14a685dc4c39539}{XXH\_littleEndian}});}
+\DoxyCodeLine{00490\ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00491\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{xxhash_8c_a16a98ec2b456c390c8b19c8a6844fd0c}{XXH32\_digest\_endian}}(state\_in,\ \mbox{\hyperlink{xxhash_8c_a235e518684d715cbb04353c997ad81e9ae38c7420bad548564395edb8cb4b6b60}{XXH\_bigEndian}});}
+\DoxyCodeLine{00492\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{xxhash_8h_a2d5f5298193818366420a8f25e3ee46e_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=243pt]{xxhash_8h_a2d5f5298193818366420a8f25e3ee46e_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{xxhash_8h_aab2c0ec5dbb1b738d3f58aa3fc640243}\index{xxhash.h@{xxhash.h}!XXH32\_freeState@{XXH32\_freeState}}
+\index{XXH32\_freeState@{XXH32\_freeState}!xxhash.h@{xxhash.h}}
+\doxysubsubsection{\texorpdfstring{XXH32\_freeState()}{XXH32\_freeState()}}
+{\footnotesize\ttfamily \label{xxhash_8h_aab2c0ec5dbb1b738d3f58aa3fc640243} 
+\mbox{\hyperlink{xxhash_8h_a5832897ed49938aefa629a76034b36b1}{XXH\+\_\+\+PUBLIC\+\_\+\+API}} \mbox{\hyperlink{xxhash_8h_a5020905455674b8c83c1dbc73f0d3534}{XXH\+\_\+errorcode}} XXH32\+\_\+free\+State (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{xxhash_8h_a0048f07d4a3051c20598464f007aa6c5}{XXH32\+\_\+state\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{state\+Ptr}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{xxhash_8c_source_l00354}{354}} of file \mbox{\hyperlink{xxhash_8c_source}{xxhash.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00355\ \{}
+\DoxyCodeLine{00356\ \ \ \ \ XXH\_free(statePtr);}
+\DoxyCodeLine{00357\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{xxhash_8h_a5020905455674b8c83c1dbc73f0d3534abd20b092d624344e301b0cadd29d5bd6}{XXH\_OK}};}
+\DoxyCodeLine{00358\ \}}
+
+\end{DoxyCode}
+\Hypertarget{xxhash_8h_a206cac74a0c149b244d3532186a4930f}\index{xxhash.h@{xxhash.h}!XXH32\_hashFromCanonical@{XXH32\_hashFromCanonical}}
+\index{XXH32\_hashFromCanonical@{XXH32\_hashFromCanonical}!xxhash.h@{xxhash.h}}
+\doxysubsubsection{\texorpdfstring{XXH32\_hashFromCanonical()}{XXH32\_hashFromCanonical()}}
+{\footnotesize\ttfamily \label{xxhash_8h_a206cac74a0c149b244d3532186a4930f} 
+\mbox{\hyperlink{xxhash_8h_a5832897ed49938aefa629a76034b36b1}{XXH\+\_\+\+PUBLIC\+\_\+\+API}} \mbox{\hyperlink{xxhash_8h_ab96bf7612b1f829b593220ab7acdc7a6}{XXH32\+\_\+hash\+\_\+t}} XXH32\+\_\+hash\+From\+Canonical (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct_x_x_h32__canonical__t}{XXH32\+\_\+canonical\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{src}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{xxhash_8c_source_l00510}{510}} of file \mbox{\hyperlink{xxhash_8c_source}{xxhash.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00511\ \{}
+\DoxyCodeLine{00512\ \ \ \ \ \textcolor{keywordflow}{return}\ XXH\_readBE32(src);}
+\DoxyCodeLine{00513\ \}}
+
+\end{DoxyCode}
+\Hypertarget{xxhash_8h_a5ad2de72b93cb6396ee595484c0ced14}\index{xxhash.h@{xxhash.h}!XXH32\_reset@{XXH32\_reset}}
+\index{XXH32\_reset@{XXH32\_reset}!xxhash.h@{xxhash.h}}
+\doxysubsubsection{\texorpdfstring{XXH32\_reset()}{XXH32\_reset()}}
+{\footnotesize\ttfamily \label{xxhash_8h_a5ad2de72b93cb6396ee595484c0ced14} 
+\mbox{\hyperlink{xxhash_8h_a5832897ed49938aefa629a76034b36b1}{XXH\+\_\+\+PUBLIC\+\_\+\+API}} \mbox{\hyperlink{xxhash_8h_a5020905455674b8c83c1dbc73f0d3534}{XXH\+\_\+errorcode}} XXH32\+\_\+reset (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{xxhash_8h_a0048f07d4a3051c20598464f007aa6c5}{XXH32\+\_\+state\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{state\+Ptr}{, }\item[{unsigned int}]{seed}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{xxhash_8c_source_l00365}{365}} of file \mbox{\hyperlink{xxhash_8c_source}{xxhash.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00366\ \{}
+\DoxyCodeLine{00367\ \ \ \ \ \mbox{\hyperlink{xxhash_8h_a0048f07d4a3051c20598464f007aa6c5}{XXH32\_state\_t}}\ \mbox{\hyperlink{structstate}{state}};\ \ \ \textcolor{comment}{/*\ using\ a\ local\ state\ to\ memcpy()\ in\ order\ to\ avoid\ strict-\/aliasing\ warnings\ */}}
+\DoxyCodeLine{00368\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(\&\mbox{\hyperlink{structstate}{state}},\ 0,\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{structstate}{state}})-\/4);\ \ \ \textcolor{comment}{/*\ do\ not\ write\ into\ reserved,\ for\ future\ removal\ */}}
+\DoxyCodeLine{00369\ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.v1\ =\ seed\ +\ PRIME32\_1\ +\ PRIME32\_2;}
+\DoxyCodeLine{00370\ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.v2\ =\ seed\ +\ PRIME32\_2;}
+\DoxyCodeLine{00371\ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.v3\ =\ seed\ +\ 0;}
+\DoxyCodeLine{00372\ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.v4\ =\ seed\ -\/\ PRIME32\_1;}
+\DoxyCodeLine{00373\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(statePtr,\ \&\mbox{\hyperlink{structstate}{state}},\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{structstate}{state}}));}
+\DoxyCodeLine{00374\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{xxhash_8h_a5020905455674b8c83c1dbc73f0d3534abd20b092d624344e301b0cadd29d5bd6}{XXH\_OK}};}
+\DoxyCodeLine{00375\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=244pt]{xxhash_8h_a5ad2de72b93cb6396ee595484c0ced14_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=238pt]{xxhash_8h_a5ad2de72b93cb6396ee595484c0ced14_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{xxhash_8h_aacc2e89656b7b7184279c2d621594afa}\index{xxhash.h@{xxhash.h}!XXH32\_update@{XXH32\_update}}
+\index{XXH32\_update@{XXH32\_update}!xxhash.h@{xxhash.h}}
+\doxysubsubsection{\texorpdfstring{XXH32\_update()}{XXH32\_update()}}
+{\footnotesize\ttfamily \label{xxhash_8h_aacc2e89656b7b7184279c2d621594afa} 
+\mbox{\hyperlink{xxhash_8h_a5832897ed49938aefa629a76034b36b1}{XXH\+\_\+\+PUBLIC\+\_\+\+API}} \mbox{\hyperlink{xxhash_8h_a5020905455674b8c83c1dbc73f0d3534}{XXH\+\_\+errorcode}} XXH32\+\_\+update (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{xxhash_8h_a0048f07d4a3051c20598464f007aa6c5}{XXH32\+\_\+state\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{state\+Ptr}{, }\item[{const void \texorpdfstring{$\ast$}{*}}]{input}{, }\item[{size\+\_\+t}]{length}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{xxhash_8c_source_l00436}{436}} of file \mbox{\hyperlink{xxhash_8c_source}{xxhash.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00437\ \{}
+\DoxyCodeLine{00438\ \ \ \ \ \mbox{\hyperlink{xxhash_8c_a235e518684d715cbb04353c997ad81e9}{XXH\_endianess}}\ endian\_detected\ =\ (\mbox{\hyperlink{xxhash_8c_a235e518684d715cbb04353c997ad81e9}{XXH\_endianess}})\mbox{\hyperlink{xxhash_8c_a408fac02658eb4a81f7a1877f1ca3b3f}{XXH\_CPU\_LITTLE\_ENDIAN}};}
+\DoxyCodeLine{00439\ }
+\DoxyCodeLine{00440\ \ \ \ \ \textcolor{keywordflow}{if}\ ((endian\_detected==\mbox{\hyperlink{xxhash_8c_a235e518684d715cbb04353c997ad81e9ab42c8f08d82d02dee14a685dc4c39539}{XXH\_littleEndian}})\ ||\ \mbox{\hyperlink{xxhash_8c_afd620e67e55f7db0b0d700af3edff885}{XXH\_FORCE\_NATIVE\_FORMAT}})}
+\DoxyCodeLine{00441\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{xxhash_8c_a8e569def58c46e5da4bb0a78d418289c}{XXH32\_update\_endian}}(state\_in,\ input,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ \mbox{\hyperlink{xxhash_8c_a235e518684d715cbb04353c997ad81e9ab42c8f08d82d02dee14a685dc4c39539}{XXH\_littleEndian}});}
+\DoxyCodeLine{00442\ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00443\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{xxhash_8c_a8e569def58c46e5da4bb0a78d418289c}{XXH32\_update\_endian}}(state\_in,\ input,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ \mbox{\hyperlink{xxhash_8c_a235e518684d715cbb04353c997ad81e9ae38c7420bad548564395edb8cb4b6b60}{XXH\_bigEndian}});}
+\DoxyCodeLine{00444\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{xxhash_8h_aacc2e89656b7b7184279c2d621594afa_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=246pt]{xxhash_8h_aacc2e89656b7b7184279c2d621594afa_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{xxhash_8h_a6a12044a8880150d2c95b80df0043676}\index{xxhash.h@{xxhash.h}!XXH64@{XXH64}}
+\index{XXH64@{XXH64}!xxhash.h@{xxhash.h}}
+\doxysubsubsection{\texorpdfstring{XXH64()}{XXH64()}}
+{\footnotesize\ttfamily \label{xxhash_8h_a6a12044a8880150d2c95b80df0043676} 
+\mbox{\hyperlink{xxhash_8h_a5832897ed49938aefa629a76034b36b1}{XXH\+\_\+\+PUBLIC\+\_\+\+API}} \mbox{\hyperlink{xxhash_8h_a3d2b19e87ac87eb107372946fce59b26}{XXH64\+\_\+hash\+\_\+t}} XXH64 (\begin{DoxyParamCaption}\item[{const void \texorpdfstring{$\ast$}{*}}]{input}{, }\item[{size\+\_\+t}]{length}{, }\item[{unsigned long long}]{seed}{}\end{DoxyParamCaption})}
+
+\doxylink{xxhash_8h_a6a12044a8880150d2c95b80df0043676}{XXH64()} \+: Calculate the 64-\/bits hash of sequence of length "{}len"{} stored at memory address "{}input"{}. "{}seed"{} can be used to alter the result predictably. This function runs faster on 64-\/bits systems, but slower on 32-\/bits systems (see benchmark). 
+
+Definition at line \mbox{\hyperlink{xxhash_8c_source_l00692}{692}} of file \mbox{\hyperlink{xxhash_8c_source}{xxhash.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00693\ \{}
+\DoxyCodeLine{00694\ \textcolor{preprocessor}{\#if\ 0}}
+\DoxyCodeLine{00695\ \ \ \ \ \textcolor{comment}{/*\ Simple\ version,\ good\ for\ code\ maintenance,\ but\ unfortunately\ slow\ for\ small\ inputs\ */}}
+\DoxyCodeLine{00696\ \ \ \ \ \mbox{\hyperlink{xxhash_8h_a0702bdbc80b0cf9e94f2379f7d839b8c}{XXH64\_state\_t}}\ \mbox{\hyperlink{structstate}{state}};}
+\DoxyCodeLine{00697\ \ \ \ \ \mbox{\hyperlink{xxhash_8c_a81c80f1f143238a37ebc39a100ade6d5}{XXH64\_reset}}(\&\mbox{\hyperlink{structstate}{state}},\ seed);}
+\DoxyCodeLine{00698\ \ \ \ \ \mbox{\hyperlink{xxhash_8c_a2dc0796681564cdf8a73f86b3758db73}{XXH64\_update}}(\&\mbox{\hyperlink{structstate}{state}},\ input,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}});}
+\DoxyCodeLine{00699\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{xxhash_8c_ae06c95901716c1a8a81de540713eca77}{XXH64\_digest}}(\&\mbox{\hyperlink{structstate}{state}});}
+\DoxyCodeLine{00700\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00701\ \ \ \ \ \mbox{\hyperlink{xxhash_8c_a235e518684d715cbb04353c997ad81e9}{XXH\_endianess}}\ endian\_detected\ =\ (\mbox{\hyperlink{xxhash_8c_a235e518684d715cbb04353c997ad81e9}{XXH\_endianess}})\mbox{\hyperlink{xxhash_8c_a408fac02658eb4a81f7a1877f1ca3b3f}{XXH\_CPU\_LITTLE\_ENDIAN}};}
+\DoxyCodeLine{00702\ }
+\DoxyCodeLine{00703\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{xxhash_8c_aee35763869a969d5576e70dac1c08b8d}{XXH\_FORCE\_ALIGN\_CHECK}})\ \{}
+\DoxyCodeLine{00704\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((((\textcolor{keywordtype}{size\_t})input)\ \&\ 7)==0)\ \{\ \ \textcolor{comment}{/*\ Input\ is\ aligned,\ let's\ leverage\ the\ speed\ advantage\ */}}
+\DoxyCodeLine{00705\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((endian\_detected==\mbox{\hyperlink{xxhash_8c_a235e518684d715cbb04353c997ad81e9ab42c8f08d82d02dee14a685dc4c39539}{XXH\_littleEndian}})\ ||\ \mbox{\hyperlink{xxhash_8c_afd620e67e55f7db0b0d700af3edff885}{XXH\_FORCE\_NATIVE\_FORMAT}})}
+\DoxyCodeLine{00706\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{xxhash_8c_aeb3bb0bc6e47d06cc5692ca45f45507e}{XXH64\_endian\_align}}(input,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ seed,\ \mbox{\hyperlink{xxhash_8c_a235e518684d715cbb04353c997ad81e9ab42c8f08d82d02dee14a685dc4c39539}{XXH\_littleEndian}},\ \mbox{\hyperlink{xxhash_8c_adec56fccd4f83e34902b6b09ecccfff5a41340c9f33fe739cef7a1c56dc617194}{XXH\_aligned}});}
+\DoxyCodeLine{00707\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00708\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{xxhash_8c_aeb3bb0bc6e47d06cc5692ca45f45507e}{XXH64\_endian\_align}}(input,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ seed,\ \mbox{\hyperlink{xxhash_8c_a235e518684d715cbb04353c997ad81e9ae38c7420bad548564395edb8cb4b6b60}{XXH\_bigEndian}},\ \mbox{\hyperlink{xxhash_8c_adec56fccd4f83e34902b6b09ecccfff5a41340c9f33fe739cef7a1c56dc617194}{XXH\_aligned}});}
+\DoxyCodeLine{00709\ \ \ \ \ \}\ \ \ \}}
+\DoxyCodeLine{00710\ }
+\DoxyCodeLine{00711\ \ \ \ \ \textcolor{keywordflow}{if}\ ((endian\_detected==\mbox{\hyperlink{xxhash_8c_a235e518684d715cbb04353c997ad81e9ab42c8f08d82d02dee14a685dc4c39539}{XXH\_littleEndian}})\ ||\ \mbox{\hyperlink{xxhash_8c_afd620e67e55f7db0b0d700af3edff885}{XXH\_FORCE\_NATIVE\_FORMAT}})}
+\DoxyCodeLine{00712\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{xxhash_8c_aeb3bb0bc6e47d06cc5692ca45f45507e}{XXH64\_endian\_align}}(input,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ seed,\ \mbox{\hyperlink{xxhash_8c_a235e518684d715cbb04353c997ad81e9ab42c8f08d82d02dee14a685dc4c39539}{XXH\_littleEndian}},\ \mbox{\hyperlink{xxhash_8c_adec56fccd4f83e34902b6b09ecccfff5ab082c14fd7eef12bcb1dfda2e813586f}{XXH\_unaligned}});}
+\DoxyCodeLine{00713\ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00714\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{xxhash_8c_aeb3bb0bc6e47d06cc5692ca45f45507e}{XXH64\_endian\_align}}(input,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ seed,\ \mbox{\hyperlink{xxhash_8c_a235e518684d715cbb04353c997ad81e9ae38c7420bad548564395edb8cb4b6b60}{XXH\_bigEndian}},\ \mbox{\hyperlink{xxhash_8c_adec56fccd4f83e34902b6b09ecccfff5ab082c14fd7eef12bcb1dfda2e813586f}{XXH\_unaligned}});}
+\DoxyCodeLine{00715\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00716\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{xxhash_8h_a6a12044a8880150d2c95b80df0043676_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{xxhash_8h_aecb9c0887b2cc4f4444cfa439e6c2c6b}\index{xxhash.h@{xxhash.h}!XXH64\_canonicalFromHash@{XXH64\_canonicalFromHash}}
+\index{XXH64\_canonicalFromHash@{XXH64\_canonicalFromHash}!xxhash.h@{xxhash.h}}
+\doxysubsubsection{\texorpdfstring{XXH64\_canonicalFromHash()}{XXH64\_canonicalFromHash()}}
+{\footnotesize\ttfamily \label{xxhash_8h_aecb9c0887b2cc4f4444cfa439e6c2c6b} 
+\mbox{\hyperlink{xxhash_8h_a5832897ed49938aefa629a76034b36b1}{XXH\+\_\+\+PUBLIC\+\_\+\+API}} void XXH64\+\_\+canonical\+From\+Hash (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_x_x_h64__canonical__t}{XXH64\+\_\+canonical\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{dst}{, }\item[{\mbox{\hyperlink{xxhash_8h_a3d2b19e87ac87eb107372946fce59b26}{XXH64\+\_\+hash\+\_\+t}}}]{hash}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{xxhash_8c_source_l00876}{876}} of file \mbox{\hyperlink{xxhash_8c_source}{xxhash.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00877\ \{}
+\DoxyCodeLine{00878\ \ \ \ \ \mbox{\hyperlink{xxhash_8c_a3bc33577f47cf99f8b35a52d87c642c4}{XXH\_STATIC\_ASSERT}}(\textcolor{keyword}{sizeof}(\mbox{\hyperlink{struct_x_x_h64__canonical__t}{XXH64\_canonical\_t}})\ ==\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{xxhash_8h_a3d2b19e87ac87eb107372946fce59b26}{XXH64\_hash\_t}}));}
+\DoxyCodeLine{00879\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{xxhash_8c_a408fac02658eb4a81f7a1877f1ca3b3f}{XXH\_CPU\_LITTLE\_ENDIAN}})\ hash\ =\ XXH\_swap64(hash);}
+\DoxyCodeLine{00880\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(dst,\ \&hash,\ \textcolor{keyword}{sizeof}(*dst));}
+\DoxyCodeLine{00881\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=309pt]{xxhash_8h_aecb9c0887b2cc4f4444cfa439e6c2c6b_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{xxhash_8h_a465a40feffb31fbbece3385ca3c52eb6}\index{xxhash.h@{xxhash.h}!XXH64\_copyState@{XXH64\_copyState}}
+\index{XXH64\_copyState@{XXH64\_copyState}!xxhash.h@{xxhash.h}}
+\doxysubsubsection{\texorpdfstring{XXH64\_copyState()}{XXH64\_copyState()}}
+{\footnotesize\ttfamily \label{xxhash_8h_a465a40feffb31fbbece3385ca3c52eb6} 
+\mbox{\hyperlink{xxhash_8h_a5832897ed49938aefa629a76034b36b1}{XXH\+\_\+\+PUBLIC\+\_\+\+API}} void XXH64\+\_\+copy\+State (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{xxhash_8h_a0702bdbc80b0cf9e94f2379f7d839b8c}{XXH64\+\_\+state\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{dst\+\_\+state}{, }\item[{const \mbox{\hyperlink{xxhash_8h_a0702bdbc80b0cf9e94f2379f7d839b8c}{XXH64\+\_\+state\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{src\+\_\+state}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{xxhash_8c_source_l00730}{730}} of file \mbox{\hyperlink{xxhash_8c_source}{xxhash.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00731\ \{}
+\DoxyCodeLine{00732\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(dstState,\ srcState,\ \textcolor{keyword}{sizeof}(*dstState));}
+\DoxyCodeLine{00733\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=267pt]{xxhash_8h_a465a40feffb31fbbece3385ca3c52eb6_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{xxhash_8h_a79efe920b4f18004110a6e9bcc0385e0}\index{xxhash.h@{xxhash.h}!XXH64\_createState@{XXH64\_createState}}
+\index{XXH64\_createState@{XXH64\_createState}!xxhash.h@{xxhash.h}}
+\doxysubsubsection{\texorpdfstring{XXH64\_createState()}{XXH64\_createState()}}
+{\footnotesize\ttfamily \label{xxhash_8h_a79efe920b4f18004110a6e9bcc0385e0} 
+\mbox{\hyperlink{xxhash_8h_a5832897ed49938aefa629a76034b36b1}{XXH\+\_\+\+PUBLIC\+\_\+\+API}} \mbox{\hyperlink{xxhash_8h_a0702bdbc80b0cf9e94f2379f7d839b8c}{XXH64\+\_\+state\+\_\+t}} \texorpdfstring{$\ast$}{*} XXH64\+\_\+create\+State (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{xxhash_8c_source_l00720}{720}} of file \mbox{\hyperlink{xxhash_8c_source}{xxhash.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00721\ \{}
+\DoxyCodeLine{00722\ \ \ \ \ \textcolor{keywordflow}{return}\ (\mbox{\hyperlink{xxhash_8h_a0702bdbc80b0cf9e94f2379f7d839b8c}{XXH64\_state\_t}}*)XXH\_malloc(\textcolor{keyword}{sizeof}(\mbox{\hyperlink{xxhash_8h_a0702bdbc80b0cf9e94f2379f7d839b8c}{XXH64\_state\_t}}));}
+\DoxyCodeLine{00723\ \}}
+
+\end{DoxyCode}
+\Hypertarget{xxhash_8h_aa58640d3d99cceed8544a957bc63867a}\index{xxhash.h@{xxhash.h}!XXH64\_digest@{XXH64\_digest}}
+\index{XXH64\_digest@{XXH64\_digest}!xxhash.h@{xxhash.h}}
+\doxysubsubsection{\texorpdfstring{XXH64\_digest()}{XXH64\_digest()}}
+{\footnotesize\ttfamily \label{xxhash_8h_aa58640d3d99cceed8544a957bc63867a} 
+\mbox{\hyperlink{xxhash_8h_a5832897ed49938aefa629a76034b36b1}{XXH\+\_\+\+PUBLIC\+\_\+\+API}} \mbox{\hyperlink{xxhash_8h_a3d2b19e87ac87eb107372946fce59b26}{XXH64\+\_\+hash\+\_\+t}} XXH64\+\_\+digest (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{xxhash_8h_a0702bdbc80b0cf9e94f2379f7d839b8c}{XXH64\+\_\+state\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{state\+Ptr}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{xxhash_8c_source_l00863}{863}} of file \mbox{\hyperlink{xxhash_8c_source}{xxhash.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00864\ \{}
+\DoxyCodeLine{00865\ \ \ \ \ \mbox{\hyperlink{xxhash_8c_a235e518684d715cbb04353c997ad81e9}{XXH\_endianess}}\ endian\_detected\ =\ (\mbox{\hyperlink{xxhash_8c_a235e518684d715cbb04353c997ad81e9}{XXH\_endianess}})\mbox{\hyperlink{xxhash_8c_a408fac02658eb4a81f7a1877f1ca3b3f}{XXH\_CPU\_LITTLE\_ENDIAN}};}
+\DoxyCodeLine{00866\ }
+\DoxyCodeLine{00867\ \ \ \ \ \textcolor{keywordflow}{if}\ ((endian\_detected==\mbox{\hyperlink{xxhash_8c_a235e518684d715cbb04353c997ad81e9ab42c8f08d82d02dee14a685dc4c39539}{XXH\_littleEndian}})\ ||\ \mbox{\hyperlink{xxhash_8c_afd620e67e55f7db0b0d700af3edff885}{XXH\_FORCE\_NATIVE\_FORMAT}})}
+\DoxyCodeLine{00868\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{xxhash_8c_a8ddadac4d794ff35082596dcea2885e0}{XXH64\_digest\_endian}}(state\_in,\ \mbox{\hyperlink{xxhash_8c_a235e518684d715cbb04353c997ad81e9ab42c8f08d82d02dee14a685dc4c39539}{XXH\_littleEndian}});}
+\DoxyCodeLine{00869\ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00870\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{xxhash_8c_a8ddadac4d794ff35082596dcea2885e0}{XXH64\_digest\_endian}}(state\_in,\ \mbox{\hyperlink{xxhash_8c_a235e518684d715cbb04353c997ad81e9ae38c7420bad548564395edb8cb4b6b60}{XXH\_bigEndian}});}
+\DoxyCodeLine{00871\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{xxhash_8h_aa58640d3d99cceed8544a957bc63867a_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=243pt]{xxhash_8h_aa58640d3d99cceed8544a957bc63867a_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{xxhash_8h_ae490ef51db9c960da09189c2774cf82e}\index{xxhash.h@{xxhash.h}!XXH64\_freeState@{XXH64\_freeState}}
+\index{XXH64\_freeState@{XXH64\_freeState}!xxhash.h@{xxhash.h}}
+\doxysubsubsection{\texorpdfstring{XXH64\_freeState()}{XXH64\_freeState()}}
+{\footnotesize\ttfamily \label{xxhash_8h_ae490ef51db9c960da09189c2774cf82e} 
+\mbox{\hyperlink{xxhash_8h_a5832897ed49938aefa629a76034b36b1}{XXH\+\_\+\+PUBLIC\+\_\+\+API}} \mbox{\hyperlink{xxhash_8h_a5020905455674b8c83c1dbc73f0d3534}{XXH\+\_\+errorcode}} XXH64\+\_\+free\+State (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{xxhash_8h_a0702bdbc80b0cf9e94f2379f7d839b8c}{XXH64\+\_\+state\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{state\+Ptr}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{xxhash_8c_source_l00724}{724}} of file \mbox{\hyperlink{xxhash_8c_source}{xxhash.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00725\ \{}
+\DoxyCodeLine{00726\ \ \ \ \ XXH\_free(statePtr);}
+\DoxyCodeLine{00727\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{xxhash_8h_a5020905455674b8c83c1dbc73f0d3534abd20b092d624344e301b0cadd29d5bd6}{XXH\_OK}};}
+\DoxyCodeLine{00728\ \}}
+
+\end{DoxyCode}
+\Hypertarget{xxhash_8h_add7f64d0c0590f222747e7f703cfd3b0}\index{xxhash.h@{xxhash.h}!XXH64\_hashFromCanonical@{XXH64\_hashFromCanonical}}
+\index{XXH64\_hashFromCanonical@{XXH64\_hashFromCanonical}!xxhash.h@{xxhash.h}}
+\doxysubsubsection{\texorpdfstring{XXH64\_hashFromCanonical()}{XXH64\_hashFromCanonical()}}
+{\footnotesize\ttfamily \label{xxhash_8h_add7f64d0c0590f222747e7f703cfd3b0} 
+\mbox{\hyperlink{xxhash_8h_a5832897ed49938aefa629a76034b36b1}{XXH\+\_\+\+PUBLIC\+\_\+\+API}} \mbox{\hyperlink{xxhash_8h_a3d2b19e87ac87eb107372946fce59b26}{XXH64\+\_\+hash\+\_\+t}} XXH64\+\_\+hash\+From\+Canonical (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct_x_x_h64__canonical__t}{XXH64\+\_\+canonical\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{src}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{xxhash_8c_source_l00883}{883}} of file \mbox{\hyperlink{xxhash_8c_source}{xxhash.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00884\ \{}
+\DoxyCodeLine{00885\ \ \ \ \ \textcolor{keywordflow}{return}\ XXH\_readBE64(src);}
+\DoxyCodeLine{00886\ \}}
+
+\end{DoxyCode}
+\Hypertarget{xxhash_8h_a81c80f1f143238a37ebc39a100ade6d5}\index{xxhash.h@{xxhash.h}!XXH64\_reset@{XXH64\_reset}}
+\index{XXH64\_reset@{XXH64\_reset}!xxhash.h@{xxhash.h}}
+\doxysubsubsection{\texorpdfstring{XXH64\_reset()}{XXH64\_reset()}}
+{\footnotesize\ttfamily \label{xxhash_8h_a81c80f1f143238a37ebc39a100ade6d5} 
+\mbox{\hyperlink{xxhash_8h_a5832897ed49938aefa629a76034b36b1}{XXH\+\_\+\+PUBLIC\+\_\+\+API}} \mbox{\hyperlink{xxhash_8h_a5020905455674b8c83c1dbc73f0d3534}{XXH\+\_\+errorcode}} XXH64\+\_\+reset (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{xxhash_8h_a0702bdbc80b0cf9e94f2379f7d839b8c}{XXH64\+\_\+state\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{state\+Ptr}{, }\item[{unsigned long long}]{seed}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{xxhash_8c_source_l00735}{735}} of file \mbox{\hyperlink{xxhash_8c_source}{xxhash.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00736\ \{}
+\DoxyCodeLine{00737\ \ \ \ \ \mbox{\hyperlink{xxhash_8h_a0702bdbc80b0cf9e94f2379f7d839b8c}{XXH64\_state\_t}}\ \mbox{\hyperlink{structstate}{state}};\ \ \ \textcolor{comment}{/*\ using\ a\ local\ state\ to\ memcpy()\ in\ order\ to\ avoid\ strict-\/aliasing\ warnings\ */}}
+\DoxyCodeLine{00738\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(\&\mbox{\hyperlink{structstate}{state}},\ 0,\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{structstate}{state}})-\/8);\ \ \ \textcolor{comment}{/*\ do\ not\ write\ into\ reserved,\ for\ future\ removal\ */}}
+\DoxyCodeLine{00739\ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.v1\ =\ seed\ +\ PRIME64\_1\ +\ PRIME64\_2;}
+\DoxyCodeLine{00740\ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.v2\ =\ seed\ +\ PRIME64\_2;}
+\DoxyCodeLine{00741\ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.v3\ =\ seed\ +\ 0;}
+\DoxyCodeLine{00742\ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.v4\ =\ seed\ -\/\ PRIME64\_1;}
+\DoxyCodeLine{00743\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(statePtr,\ \&\mbox{\hyperlink{structstate}{state}},\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{structstate}{state}}));}
+\DoxyCodeLine{00744\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{xxhash_8h_a5020905455674b8c83c1dbc73f0d3534abd20b092d624344e301b0cadd29d5bd6}{XXH\_OK}};}
+\DoxyCodeLine{00745\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=244pt]{xxhash_8h_a81c80f1f143238a37ebc39a100ade6d5_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=238pt]{xxhash_8h_a81c80f1f143238a37ebc39a100ade6d5_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{xxhash_8h_a5419c59c26a757d705b0f0bf68a175bf}\index{xxhash.h@{xxhash.h}!XXH64\_update@{XXH64\_update}}
+\index{XXH64\_update@{XXH64\_update}!xxhash.h@{xxhash.h}}
+\doxysubsubsection{\texorpdfstring{XXH64\_update()}{XXH64\_update()}}
+{\footnotesize\ttfamily \label{xxhash_8h_a5419c59c26a757d705b0f0bf68a175bf} 
+\mbox{\hyperlink{xxhash_8h_a5832897ed49938aefa629a76034b36b1}{XXH\+\_\+\+PUBLIC\+\_\+\+API}} \mbox{\hyperlink{xxhash_8h_a5020905455674b8c83c1dbc73f0d3534}{XXH\+\_\+errorcode}} XXH64\+\_\+update (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{xxhash_8h_a0702bdbc80b0cf9e94f2379f7d839b8c}{XXH64\+\_\+state\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{state\+Ptr}{, }\item[{const void \texorpdfstring{$\ast$}{*}}]{input}{, }\item[{size\+\_\+t}]{length}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{xxhash_8c_source_l00802}{802}} of file \mbox{\hyperlink{xxhash_8c_source}{xxhash.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00803\ \{}
+\DoxyCodeLine{00804\ \ \ \ \ \mbox{\hyperlink{xxhash_8c_a235e518684d715cbb04353c997ad81e9}{XXH\_endianess}}\ endian\_detected\ =\ (\mbox{\hyperlink{xxhash_8c_a235e518684d715cbb04353c997ad81e9}{XXH\_endianess}})\mbox{\hyperlink{xxhash_8c_a408fac02658eb4a81f7a1877f1ca3b3f}{XXH\_CPU\_LITTLE\_ENDIAN}};}
+\DoxyCodeLine{00805\ }
+\DoxyCodeLine{00806\ \ \ \ \ \textcolor{keywordflow}{if}\ ((endian\_detected==\mbox{\hyperlink{xxhash_8c_a235e518684d715cbb04353c997ad81e9ab42c8f08d82d02dee14a685dc4c39539}{XXH\_littleEndian}})\ ||\ \mbox{\hyperlink{xxhash_8c_afd620e67e55f7db0b0d700af3edff885}{XXH\_FORCE\_NATIVE\_FORMAT}})}
+\DoxyCodeLine{00807\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{xxhash_8c_ae5327de24f8264766f2dbf5b8f0a8497}{XXH64\_update\_endian}}(state\_in,\ input,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ \mbox{\hyperlink{xxhash_8c_a235e518684d715cbb04353c997ad81e9ab42c8f08d82d02dee14a685dc4c39539}{XXH\_littleEndian}});}
+\DoxyCodeLine{00808\ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00809\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{xxhash_8c_ae5327de24f8264766f2dbf5b8f0a8497}{XXH64\_update\_endian}}(state\_in,\ input,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ \mbox{\hyperlink{xxhash_8c_a235e518684d715cbb04353c997ad81e9ae38c7420bad548564395edb8cb4b6b60}{XXH\_bigEndian}});}
+\DoxyCodeLine{00810\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{xxhash_8h_a5419c59c26a757d705b0f0bf68a175bf_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=246pt]{xxhash_8h_a5419c59c26a757d705b0f0bf68a175bf_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{xxhash_8h_af435229c36fbbc6a23a5f187752a6fe4}\index{xxhash.h@{xxhash.h}!XXH\_versionNumber@{XXH\_versionNumber}}
+\index{XXH\_versionNumber@{XXH\_versionNumber}!xxhash.h@{xxhash.h}}
+\doxysubsubsection{\texorpdfstring{XXH\_versionNumber()}{XXH\_versionNumber()}}
+{\footnotesize\ttfamily \label{xxhash_8h_af435229c36fbbc6a23a5f187752a6fe4} 
+\mbox{\hyperlink{xxhash_8h_a5832897ed49938aefa629a76034b36b1}{XXH\+\_\+\+PUBLIC\+\_\+\+API}} unsigned XXH\+\_\+version\+Number (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{xxhash_8c_source_l00243}{243}} of file \mbox{\hyperlink{xxhash_8c_source}{xxhash.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00243\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{xxhash_8h_acc66393fff091acefc0e2a00ec5462c4}{XXH\_VERSION\_NUMBER}};\ \}}
+
+\end{DoxyCode}

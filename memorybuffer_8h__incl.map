@@ -1,0 +1,26 @@
+<map id="libraries/fc/include/fc/crypto/webauthn_json/include/rapidjson/memorybuffer.h" name="libraries/fc/include/fc/crypto/webauthn_json/include/rapidjson/memorybuffer.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="19,5,235,61"/>
+<area shape="rect" id="Node000002" href="$stream_8h.html" title=" " alt="" coords="31,109,103,135"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="111,63,87,97,82,94,106,60"/>
+<area shape="rect" id="Node000008" href="$stack_8h.html" title=" " alt="" coords="184,109,294,135"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="164,59,213,97,210,101,160,63"/>
+<area shape="rect" id="Node000003" href="$rapidjson_8h.html" title="common definitions and configuration" alt="" coords="85,256,169,282"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="51,137,33,152,17,169,9,188,9,198,12,207,24,221,38,233,72,251,69,256,35,238,20,225,8,210,3,199,3,187,13,166,29,148,47,133"/>
+<area shape="rect" id="Node000007" href="$encodings_8h.html" title=" " alt="" coords="22,183,113,208"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="70,135,70,167,65,167,65,135"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="14,330,73,356"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="115,285,71,322,67,318,111,281"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="97,330,157,356"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="130,282,130,314,125,314,125,282"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="182,330,246,356"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="144,280,189,318,186,322,140,285"/>
+<area shape="poly" id="edge7_Node000007_Node000003" title=" " alt="" coords="79,207,109,243,105,246,75,210"/>
+<area shape="rect" id="Node000009" href="$allocators_8h.html" title=" " alt="" coords="137,183,237,208"/>
+<area shape="poly" id="edge9_Node000008_Node000009" title=" " alt="" coords="233,136,207,172,203,168,228,133"/>
+<area shape="rect" id="Node000010" href="$swap_8h.html" title=" " alt="" coords="261,183,324,208"/>
+<area shape="poly" id="edge11_Node000008_Node000010" title=" " alt="" coords="250,133,276,168,272,172,246,136"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="348,183,413,208"/>
+<area shape="poly" id="edge13_Node000008_Node000011" title=" " alt="" coords="264,133,344,173,342,178,262,138"/>
+<area shape="poly" id="edge10_Node000009_Node000003" title=" " alt="" coords="179,210,149,246,145,243,175,207"/>
+<area shape="poly" id="edge12_Node000010_Node000003" title=" " alt="" coords="266,211,170,252,168,247,263,206"/>
+</map>

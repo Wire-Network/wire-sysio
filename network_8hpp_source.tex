@@ -1,0 +1,92 @@
+\doxysection{network.\+hpp}
+\hypertarget{network_8hpp_source}{}\label{network_8hpp_source}\index{libraries/fc/vendor/websocketpp/websocketpp/common/network.hpp@{libraries/fc/vendor/websocketpp/websocketpp/common/network.hpp}}
+\mbox{\hyperlink{network_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2014,\ Peter\ Thorson.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00004}00004\ \textcolor{comment}{\ *\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00005}00005\ \textcolor{comment}{\ *\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are\ met:}}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00006}00006\ \textcolor{comment}{\ *\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00007}00007\ \textcolor{comment}{\ *\ \ \ \ \ \ \ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00008}00008\ \textcolor{comment}{\ *\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00009}00009\ \textcolor{comment}{\ *\ \ \ \ \ \ \ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer\ in\ the}}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00010}00010\ \textcolor{comment}{\ *\ \ \ \ \ \ \ documentation\ and/or\ other\ materials\ provided\ with\ the\ distribution.}}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00011}00011\ \textcolor{comment}{\ *\ \ \ \ \ *\ Neither\ the\ name\ of\ the\ WebSocket++\ Project\ nor\ the}}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00012}00012\ \textcolor{comment}{\ *\ \ \ \ \ \ \ names\ of\ its\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products}}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00013}00013\ \textcolor{comment}{\ *\ \ \ \ \ \ \ derived\ from\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00014}00014\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00015}00015\ \textcolor{comment}{\ *\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS\ "{}AS\ IS"{}}}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00016}00016\ \textcolor{comment}{\ *\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ THE}}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00017}00017\ \textcolor{comment}{\ *\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR\ A\ PARTICULAR\ PURPOSE}}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00018}00018\ \textcolor{comment}{\ *\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ PETER\ THORSON\ BE\ LIABLE\ FOR\ ANY}}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00019}00019\ \textcolor{comment}{\ *\ DIRECT,\ INDIRECT,\ INCIDENTAL,\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES}}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00020}00020\ \textcolor{comment}{\ *\ (INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;}}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00021}00021\ \textcolor{comment}{\ *\ LOSS\ OF\ USE,\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND}}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00022}00022\ \textcolor{comment}{\ *\ ON\ ANY\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00023}00023\ \textcolor{comment}{\ *\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE\ OF\ THIS}}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00024}00024\ \textcolor{comment}{\ *\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00025}00025\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00026}00026\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00028}00028\ \textcolor{preprocessor}{\#ifndef\ WEBSOCKETPP\_COMMON\_NETWORK\_HPP}}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00029}00029\ \textcolor{preprocessor}{\#define\ WEBSOCKETPP\_COMMON\_NETWORK\_HPP}}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00031}00031\ \textcolor{comment}{//\ For\ ntohs\ and\ htons}}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00032}00032\ \textcolor{preprocessor}{\#if\ defined(\_WIN32)}}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00033}00033\ \textcolor{preprocessor}{\ \ \ \ \#include\ <winsock2.h>}}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00034}00034\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00035}00035\ \ \ \ \ \textcolor{comment}{//\#include\ <arpa/inet.h>}}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00036}00036\ \textcolor{preprocessor}{\ \ \ \ \#include\ <netinet/in.h>}}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00037}00037\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00039}00039\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{stdint_8hpp}{websocketpp/common/stdint.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00041}00041\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacewebsocketpp}{websocketpp}}\ \{}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00042}00042\ \textcolor{keyword}{namespace\ }lib\ \{}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00043}\mbox{\hyperlink{namespacewebsocketpp_1_1lib_1_1net}{00043}}\ \textcolor{keyword}{namespace\ }net\ \{}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00045}\mbox{\hyperlink{namespacewebsocketpp_1_1lib_1_1net_a321373761665b77eaf5d78ff5e535941}{00045}}\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacewebsocketpp_1_1lib_1_1net_a321373761665b77eaf5d78ff5e535941}{is\_little\_endian}}()\ \{}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00046}00046\ \ \ \ \ \textcolor{keywordtype}{short}\ \textcolor{keywordtype}{int}\ val\ =\ 0x1;}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00047}00047\ \ \ \ \ \textcolor{keywordtype}{char}\ *ptr\ =\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{char}\ *\textcolor{keyword}{>}(\&val);}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00048}00048\ \ \ \ \ \textcolor{keywordflow}{return}\ (ptr[0]\ ==\ 1);}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00049}00049\ \}}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00051}\mbox{\hyperlink{network_8hpp_a9b9b272ba46c18c861eb8792bba29ab6}{00051}}\ \textcolor{preprocessor}{\#define\ TYP\_INIT\ 0}}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00052}\mbox{\hyperlink{network_8hpp_a936f22510637d64998aac686f9748a4d}{00052}}\ \textcolor{preprocessor}{\#define\ TYP\_SMLE\ 1}}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00053}\mbox{\hyperlink{network_8hpp_a1636e6653469718780dbfe0fa77e9aba}{00053}}\ \textcolor{preprocessor}{\#define\ TYP\_BIGE\ 2}}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00054}00054\ }
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00066}\mbox{\hyperlink{namespacewebsocketpp_1_1lib_1_1net_ab3e62ef8d23c6e35b1d726fa1fa1c537}{00066}}\ \textcolor{keyword}{inline}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{namespacewebsocketpp_1_1lib_1_1net_ab3e62ef8d23c6e35b1d726fa1fa1c537}{\_htonll}}(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ src)\ \{}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00067}00067\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ typ\ =\ \mbox{\hyperlink{network_8hpp_a9b9b272ba46c18c861eb8792bba29ab6}{TYP\_INIT}};}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00068}00068\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ c;}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00069}00069\ \ \ \ \ \textcolor{keyword}{union\ }\{}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00070}00070\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ ull;}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00071}00071\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ c[8];}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00072}00072\ \ \ \ \ \}\ x;}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00073}00073\ \ \ \ \ \textcolor{keywordflow}{if}\ (typ\ ==\ \mbox{\hyperlink{network_8hpp_a9b9b272ba46c18c861eb8792bba29ab6}{TYP\_INIT}})\ \{}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00074}00074\ \ \ \ \ \ \ \ \ x.ull\ =\ 0x01;}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00075}00075\ \ \ \ \ \ \ \ \ typ\ =\ (x.c[7]\ ==\ 0x01ULL)\ ?\ \mbox{\hyperlink{network_8hpp_a1636e6653469718780dbfe0fa77e9aba}{TYP\_BIGE}}\ :\ \mbox{\hyperlink{network_8hpp_a936f22510637d64998aac686f9748a4d}{TYP\_SMLE}};}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00076}00076\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00077}00077\ \ \ \ \ \textcolor{keywordflow}{if}\ (typ\ ==\ \mbox{\hyperlink{network_8hpp_a1636e6653469718780dbfe0fa77e9aba}{TYP\_BIGE}})}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00078}00078\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ src;}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00079}00079\ \ \ \ \ x.ull\ =\ src;}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00080}00080\ \ \ \ \ c\ =\ x.c[0];\ x.c[0]\ =\ x.c[7];\ x.c[7]\ =\ c;}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00081}00081\ \ \ \ \ c\ =\ x.c[1];\ x.c[1]\ =\ x.c[6];\ x.c[6]\ =\ c;}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00082}00082\ \ \ \ \ c\ =\ x.c[2];\ x.c[2]\ =\ x.c[5];\ x.c[5]\ =\ c;}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00083}00083\ \ \ \ \ c\ =\ x.c[3];\ x.c[3]\ =\ x.c[4];\ x.c[4]\ =\ c;}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00084}00084\ \ \ \ \ \textcolor{keywordflow}{return}\ x.ull;}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00085}00085\ \}}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00086}00086\ }
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00088}00088\ }
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00098}\mbox{\hyperlink{namespacewebsocketpp_1_1lib_1_1net_ae2011914840da1dcbcac7266213a8709}{00098}}\ \textcolor{keyword}{inline}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{namespacewebsocketpp_1_1lib_1_1net_ae2011914840da1dcbcac7266213a8709}{\_ntohll}}(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ src)\ \{}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00099}00099\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacewebsocketpp_1_1lib_1_1net_ab3e62ef8d23c6e35b1d726fa1fa1c537}{\_htonll}}(src);}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00100}00100\ \}}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00101}00101\ }
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00102}00102\ \}\ \textcolor{comment}{//\ net}}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00103}00103\ \}\ \textcolor{comment}{//\ lib}}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00104}00104\ \}\ \textcolor{comment}{//\ websocketpp}}
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00105}00105\ }
+\DoxyCodeLine{\Hypertarget{network_8hpp_source_l00106}00106\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ WEBSOCKETPP\_COMMON\_NETWORK\_HPP}}
+
+\end{DoxyCode}

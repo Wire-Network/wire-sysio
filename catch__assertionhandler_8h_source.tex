@@ -1,0 +1,94 @@
+\doxysection{catch\+\_\+assertionhandler.\+h}
+\hypertarget{catch__assertionhandler_8h_source}{}\label{catch__assertionhandler_8h_source}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_assertionhandler.h@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_assertionhandler.h}}
+\mbox{\hyperlink{catch__assertionhandler_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00002}00002\ \textcolor{comment}{\ *\ \ Created\ by\ Phil\ on\ 8/8/2017.}}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00003}00003\ \textcolor{comment}{\ *\ \ Copyright\ 2017\ Two\ Blue\ Cubes\ Ltd.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00004}00004\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00005}00005\ \textcolor{comment}{\ *\ \ Distributed\ under\ the\ Boost\ Software\ License,\ Version\ 1.0.\ (See\ accompanying}}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00006}00006\ \textcolor{comment}{\ *\ \ file\ LICENSE\_1\_0.txt\ or\ copy\ at\ http://www.boost.org/LICENSE\_1\_0.txt)}}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00007}00007\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00008}00008\ \textcolor{preprocessor}{\#ifndef\ TWOBLUECUBES\_CATCH\_ASSERTIONHANDLER\_H\_INCLUDED}}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00009}00009\ \textcolor{preprocessor}{\#define\ TWOBLUECUBES\_CATCH\_ASSERTIONHANDLER\_H\_INCLUDED}}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00011}00011\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__assertioninfo_8h}{catch\_assertioninfo.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00012}00012\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__decomposer_8h}{catch\_decomposer.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00013}00013\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__interfaces__capture_8h}{catch\_interfaces\_capture.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00015}00015\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00017}00017\ \ \ \ \ \textcolor{keyword}{struct\ }TestFailureException\{\};}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00018}00018\ \ \ \ \ \textcolor{keyword}{struct\ }AssertionResultData;}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00019}00019\ \ \ \ \ \textcolor{keyword}{struct\ }IResultCapture;}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00020}00020\ \ \ \ \ \textcolor{keyword}{class\ }RunContext;}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00022}00022\ \ \ \ \ \textcolor{keyword}{class\ }LazyExpression\ \{}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00023}\mbox{\hyperlink{class_catch_1_1_lazy_expression_aff20a67b8485fd4382191e638360c907}{00023}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{friend}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_catch_1_1_assertion_handler}{AssertionHandler}};}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00024}\mbox{\hyperlink{class_catch_1_1_lazy_expression_aaebeae6c9db91b5c4f066e2681a8fd04}{00024}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{friend}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_catch_1_1_assertion_stats}{AssertionStats}};}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00025}\mbox{\hyperlink{class_catch_1_1_lazy_expression_a8ddee68e111eb70d3e0ab0ae81087022}{00025}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{friend}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_catch_1_1_run_context}{RunContext}};}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00027}00027\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_i_transient_expression}{ITransientExpression}}\ \textcolor{keyword}{const}*\ m\_transientExpression\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00028}00028\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ m\_isNegated;}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00029}00029\ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00030}00030\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_lazy_expression_a47186c2487bd4bf871e870ba8048553a}{LazyExpression}}(\ \textcolor{keywordtype}{bool}\ isNegated\ );}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00031}00031\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_lazy_expression_a47186c2487bd4bf871e870ba8048553a}{LazyExpression}}(\ \mbox{\hyperlink{class_catch_1_1_lazy_expression}{LazyExpression}}\ \textcolor{keyword}{const}\&\ other\ );}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00032}\mbox{\hyperlink{class_catch_1_1_lazy_expression_a1b080e25fdfdecbc3e475d0e96cf0fd4}{00032}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_lazy_expression}{LazyExpression}}\&\ \mbox{\hyperlink{class_catch_1_1_lazy_expression_a1b080e25fdfdecbc3e475d0e96cf0fd4}{operator\ =\ }}(\ \mbox{\hyperlink{class_catch_1_1_lazy_expression}{LazyExpression}}\ \textcolor{keyword}{const}\&\ )\ =\ \textcolor{keyword}{delete};}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00034}00034\ \ \ \ \ \ \ \ \ \textcolor{keyword}{explicit}\ \textcolor{keyword}{operator}\ bool()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00036}00036\ \ \ \ \ \ \ \ \ \textcolor{keyword}{friend}\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{class_catch_1_1_lazy_expression_aa01086581cab2fcd2d4580b8fa787dfc}{operator\ <<\ }}(\ std::ostream\&\ os,\ \mbox{\hyperlink{class_catch_1_1_lazy_expression}{LazyExpression}}\ \textcolor{keyword}{const}\&\ lazyExpr\ )\ -\/>\ std::ostream\&;}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00037}00037\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00039}00039\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_catch_1_1_assertion_reaction}{AssertionReaction}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00040}\mbox{\hyperlink{struct_catch_1_1_assertion_reaction_adcf30fb90ff20d9789df78d424652497}{00040}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_catch_1_1_assertion_reaction_adcf30fb90ff20d9789df78d424652497}{shouldDebugBreak}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00041}\mbox{\hyperlink{struct_catch_1_1_assertion_reaction_a82c8d95a2c1b6a331bde66982a8e090f}{00041}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_catch_1_1_assertion_reaction_a82c8d95a2c1b6a331bde66982a8e090f}{shouldThrow}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00042}00042\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00044}00044\ \ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_catch_1_1_assertion_handler}{AssertionHandler}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00045}00045\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_assertion_info}{AssertionInfo}}\ m\_assertionInfo;}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00046}00046\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_assertion_reaction}{AssertionReaction}}\ m\_reaction;}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00047}00047\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ m\_completed\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00048}00048\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_i_result_capture}{IResultCapture}}\&\ m\_resultCapture;}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00050}00050\ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00051}00051\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_assertion_handler_a32efbb1b56b71d758d4c2094bac1f1a9}{AssertionHandler}}}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \ \ \ (\ \ \ \mbox{\hyperlink{class_catch_1_1_string_ref}{StringRef}}\ \textcolor{keyword}{const}\&\ macroName,}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_source_line_info}{SourceLineInfo}}\ \textcolor{keyword}{const}\&\ lineInfo,}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_string_ref}{StringRef}}\ capturedExpression,}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_result_disposition_a3396cad6e2259af326b3aae93e23e9d8}{ResultDisposition::Flags}}\ resultDisposition\ );}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00056}\mbox{\hyperlink{class_catch_1_1_assertion_handler_a1e839d810f6ac0fa6d127fe8350175ed}{00056}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_assertion_handler_a1e839d810f6ac0fa6d127fe8350175ed}{\string~AssertionHandler}}()\ \{}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ !m\_completed\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_resultCapture.\mbox{\hyperlink{struct_catch_1_1_i_result_capture_a89b89372eb09cc44f8dcad363de6157d}{handleIncomplete}}(\ m\_assertionInfo\ );}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00059}00059\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00060}00060\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00062}00062\ }
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00063}00063\ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00064}\mbox{\hyperlink{class_catch_1_1_assertion_handler_a2ef387e567bad90ec6e4b5bf5c367388}{00064}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_assertion_handler_a2ef387e567bad90ec6e4b5bf5c367388}{handleExpr}}(\ \mbox{\hyperlink{class_catch_1_1_expr_lhs}{ExprLhs<T>}}\ \textcolor{keyword}{const}\&\ expr\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00065}00065\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_assertion_handler_a2ef387e567bad90ec6e4b5bf5c367388}{handleExpr}}(\ expr.\mbox{\hyperlink{class_catch_1_1_expr_lhs_ab68bd6d5d3ae21b7fba9010150fba95d}{makeUnaryExpr}}()\ );}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00066}00066\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00067}00067\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_assertion_handler_a2ef387e567bad90ec6e4b5bf5c367388}{handleExpr}}(\ \mbox{\hyperlink{struct_catch_1_1_i_transient_expression}{ITransientExpression}}\ \textcolor{keyword}{const}\&\ expr\ );}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00069}00069\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_assertion_handler_abdb4c180ed83ec2858b2fb87712c516d}{handleMessage}}(\mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef}{ResultWas::OfType}}\ resultType,\ \mbox{\hyperlink{class_catch_1_1_string_ref}{StringRef}}\ \textcolor{keyword}{const}\&\ message);}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00071}00071\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_assertion_handler_ab6caf765764a4064e90fce829eec201d}{handleExceptionThrownAsExpected}}();}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00072}00072\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_assertion_handler_a7764d0adb6ed5eeb10964f6abc02fab1}{handleUnexpectedExceptionNotThrown}}();}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00073}00073\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_assertion_handler_a51e4936e3af43b74690cedae6d2e297a}{handleExceptionNotThrownAsExpected}}();}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00074}00074\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_assertion_handler_a67a194d5518f307c4a16faa03a7f7442}{handleThrowingCallSkipped}}();}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00075}00075\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_assertion_handler_aa2504dad6a91f3645e5f52c932c11270}{handleUnexpectedInflightException}}();}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00076}00076\ }
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00077}00077\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_assertion_handler_a878a9eb828d8a1863c8dcb6575f6f40e}{complete}}();}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00078}00078\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_assertion_handler_a6756bd5395c0ddd28764a9fb4612d5e4}{setCompleted}}();}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00080}00080\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ query}}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00081}00081\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{class_catch_1_1_assertion_handler_a193bb3999494c46457f3059184c6b251}{allowThrows}}()\ const\ -\/>\ \textcolor{keywordtype}{bool};}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00082}00082\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00083}00083\ }
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00084}00084\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespace_catch_aea6f8ff3b3838829d4a61694e4bc41ca}{handleExceptionMatchExpr}}(\ \mbox{\hyperlink{class_catch_1_1_assertion_handler}{AssertionHandler}}\&\ handler,\ \mbox{\hyperlink{namespacestd}{std}}::\textcolor{keywordtype}{string}\ const\&\ str,\ \mbox{\hyperlink{class_catch_1_1_string_ref}{StringRef}}\ const\&\ matcherString\ );}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00085}00085\ }
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00086}00086\ \}\ \textcolor{comment}{//\ namespace\ Catch}}
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00087}00087\ }
+\DoxyCodeLine{\Hypertarget{catch__assertionhandler_8h_source_l00088}00088\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ TWOBLUECUBES\_CATCH\_ASSERTIONHANDLER\_H\_INCLUDED}}
+
+\end{DoxyCode}

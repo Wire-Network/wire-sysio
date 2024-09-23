@@ -1,0 +1,80 @@
+\doxysection{testing\+::internal\+::Begin\+End\+Distance\+Is\+Matcher\texorpdfstring{$<$}{<} Distance\+Matcher \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classtesting_1_1internal_1_1_begin_end_distance_is_matcher}{}\label{classtesting_1_1internal_1_1_begin_end_distance_is_matcher}\index{testing::internal::BeginEndDistanceIsMatcher$<$ DistanceMatcher $>$@{testing::internal::BeginEndDistanceIsMatcher$<$ DistanceMatcher $>$}}
+
+
+{\ttfamily \#include $<$gmock-\/matchers.\+h$>$}
+
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classtesting_1_1internal_1_1_begin_end_distance_is_matcher_1_1_impl}{Impl}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_begin_end_distance_is_matcher_aaf0d34d922d89820346e80a21cbf8d24}{Begin\+End\+Distance\+Is\+Matcher}} (const Distance\+Matcher \&distance\+\_\+matcher)
+\item 
+{\footnotesize template$<$typename Container $>$ }\\\mbox{\hyperlink{classtesting_1_1internal_1_1_begin_end_distance_is_matcher_af4d79ed63bce73e5cecd6f542aeb57ce}{operator Matcher$<$ Container $>$}} () const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Distance\+Matcher$>$\newline
+class testing\+::internal\+::\+Begin\+End\+Distance\+Is\+Matcher$<$ Distance\+Matcher $>$}
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l02747}{2747}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_begin_end_distance_is_matcher_aaf0d34d922d89820346e80a21cbf8d24}\index{testing::internal::BeginEndDistanceIsMatcher$<$ DistanceMatcher $>$@{testing::internal::BeginEndDistanceIsMatcher$<$ DistanceMatcher $>$}!BeginEndDistanceIsMatcher@{BeginEndDistanceIsMatcher}}
+\index{BeginEndDistanceIsMatcher@{BeginEndDistanceIsMatcher}!testing::internal::BeginEndDistanceIsMatcher$<$ DistanceMatcher $>$@{testing::internal::BeginEndDistanceIsMatcher$<$ DistanceMatcher $>$}}
+\doxysubsubsection{\texorpdfstring{BeginEndDistanceIsMatcher()}{BeginEndDistanceIsMatcher()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_begin_end_distance_is_matcher_aaf0d34d922d89820346e80a21cbf8d24} 
+template$<$typename Distance\+Matcher $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_begin_end_distance_is_matcher}{testing\+::internal\+::\+Begin\+End\+Distance\+Is\+Matcher}}$<$ Distance\+Matcher $>$\+::\+Begin\+End\+Distance\+Is\+Matcher (\begin{DoxyParamCaption}\item[{const Distance\+Matcher \&}]{distance\+\_\+matcher}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l02749}{2749}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02750\ \ \ \ \ \ \ :\ distance\_matcher\_(distance\_matcher)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_begin_end_distance_is_matcher_af4d79ed63bce73e5cecd6f542aeb57ce}\index{testing::internal::BeginEndDistanceIsMatcher$<$ DistanceMatcher $>$@{testing::internal::BeginEndDistanceIsMatcher$<$ DistanceMatcher $>$}!operator Matcher$<$ Container $>$@{operator Matcher$<$ Container $>$}}
+\index{operator Matcher$<$ Container $>$@{operator Matcher$<$ Container $>$}!testing::internal::BeginEndDistanceIsMatcher$<$ DistanceMatcher $>$@{testing::internal::BeginEndDistanceIsMatcher$<$ DistanceMatcher $>$}}
+\doxysubsubsection{\texorpdfstring{operator Matcher$<$ Container $>$()}{operator Matcher< Container >()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_begin_end_distance_is_matcher_af4d79ed63bce73e5cecd6f542aeb57ce} 
+template$<$typename Distance\+Matcher $>$ \\
+template$<$typename Container $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_begin_end_distance_is_matcher}{testing\+::internal\+::\+Begin\+End\+Distance\+Is\+Matcher}}$<$ Distance\+Matcher $>$\+::operator \mbox{\hyperlink{classtesting_1_1_matcher}{Matcher}}$<$ Container $>$ (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l02753}{2753}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02753\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02754\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetesting_aca6c4c4fdf7fb7257ea4fc76971cb82c}{MakeMatcher}}(\textcolor{keyword}{new}\ Impl<Container>(distance\_matcher\_));}
+\DoxyCodeLine{02755\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_begin_end_distance_is_matcher_af4d79ed63bce73e5cecd6f542aeb57ce_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/include/gmock/\mbox{\hyperlink{gmock-matchers_8h}{gmock-\/matchers.\+h}}\end{DoxyCompactItemize}

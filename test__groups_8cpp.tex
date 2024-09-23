@@ -1,0 +1,291 @@
+\doxysection{libraries/fc/libraries/ff/libff/algebra/curves/tests/test\+\_\+groups.cpp File Reference}
+\hypertarget{test__groups_8cpp}{}\label{test__groups_8cpp}\index{libraries/fc/libraries/ff/libff/algebra/curves/tests/test\_groups.cpp@{libraries/fc/libraries/ff/libff/algebra/curves/tests/test\_groups.cpp}}
+{\ttfamily \#include $<$libff/algebra/curves/edwards/edwards\+\_\+pp.\+hpp$>$}\newline
+{\ttfamily \#include $<$libff/algebra/curves/mnt/mnt4/mnt4\+\_\+pp.\+hpp$>$}\newline
+{\ttfamily \#include $<$libff/algebra/curves/mnt/mnt6/mnt6\+\_\+pp.\+hpp$>$}\newline
+{\ttfamily \#include $<$libff/common/profiling.\+hpp$>$}\newline
+{\ttfamily \#include $<$sstream$>$}\newline
+{\ttfamily \#include $<$libff/algebra/curves/alt\+\_\+bn128/alt\+\_\+bn128\+\_\+pp.\+hpp$>$}\newline
+Include dependency graph for test\+\_\+groups.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__groups_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename GroupT $>$ }\\void \mbox{\hyperlink{test__groups_8cpp_ad204a02058200cb6f317eb662786d1bd}{test\+\_\+mixed\+\_\+add}} ()
+\item 
+{\footnotesize template$<$typename GroupT $>$ }\\void \mbox{\hyperlink{test__groups_8cpp_aa01b175b118028ca4cc45ebc3c3c3c54}{test\+\_\+group}} ()
+\item 
+{\footnotesize template$<$typename GroupT $>$ }\\void \mbox{\hyperlink{test__groups_8cpp_abeba2d7d6d6ef16a9cf51e5902c79f56}{test\+\_\+mul\+\_\+by\+\_\+q}} ()
+\item 
+{\footnotesize template$<$typename GroupT $>$ }\\void \mbox{\hyperlink{test__groups_8cpp_ab61a72783a261b9357f27d76c97e9e87}{test\+\_\+output}} ()
+\item 
+int \mbox{\hyperlink{test__groups_8cpp_a840291bc02cba5474a4cb46a9b9566fe}{main}} (void)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{test__groups_8cpp_a840291bc02cba5474a4cb46a9b9566fe}\index{test\_groups.cpp@{test\_groups.cpp}!main@{main}}
+\index{main@{main}!test\_groups.cpp@{test\_groups.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{test__groups_8cpp_a840291bc02cba5474a4cb46a9b9566fe} 
+int main (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__groups_8cpp_source_l00140}{140}} of file \mbox{\hyperlink{test__groups_8cpp_source}{test\+\_\+groups.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00141\ \{}
+\DoxyCodeLine{00142\ \ \ \ \ \mbox{\hyperlink{classlibff_1_1edwards__pp_a32abdda668a29bbc32de1ac0fbe977e1}{edwards\_pp::init\_public\_params}}();}
+\DoxyCodeLine{00143\ \ \ \ \ \mbox{\hyperlink{test__groups_8cpp_aa01b175b118028ca4cc45ebc3c3c3c54}{test\_group<G1<edwards\_pp>}}\ >();}
+\DoxyCodeLine{00144\ \ \ \ \ \mbox{\hyperlink{test__groups_8cpp_ab61a72783a261b9357f27d76c97e9e87}{test\_output<G1<edwards\_pp>}}\ >();}
+\DoxyCodeLine{00145\ \ \ \ \ \mbox{\hyperlink{test__groups_8cpp_aa01b175b118028ca4cc45ebc3c3c3c54}{test\_group<G2<edwards\_pp>}}\ >();}
+\DoxyCodeLine{00146\ \ \ \ \ \mbox{\hyperlink{test__groups_8cpp_ab61a72783a261b9357f27d76c97e9e87}{test\_output<G2<edwards\_pp>}}\ >();}
+\DoxyCodeLine{00147\ \ \ \ \ \mbox{\hyperlink{test__groups_8cpp_abeba2d7d6d6ef16a9cf51e5902c79f56}{test\_mul\_by\_q<G2<edwards\_pp>}}\ >();}
+\DoxyCodeLine{00148\ }
+\DoxyCodeLine{00149\ \ \ \ \ \mbox{\hyperlink{classlibff_1_1mnt4__pp_ac29b037b6aaf60603967653177f57f47}{mnt4\_pp::init\_public\_params}}();}
+\DoxyCodeLine{00150\ \ \ \ \ \mbox{\hyperlink{test__groups_8cpp_aa01b175b118028ca4cc45ebc3c3c3c54}{test\_group<G1<mnt4\_pp>}}\ >();}
+\DoxyCodeLine{00151\ \ \ \ \ \mbox{\hyperlink{test__groups_8cpp_ab61a72783a261b9357f27d76c97e9e87}{test\_output<G1<mnt4\_pp>}}\ >();}
+\DoxyCodeLine{00152\ \ \ \ \ \mbox{\hyperlink{test__groups_8cpp_aa01b175b118028ca4cc45ebc3c3c3c54}{test\_group<G2<mnt4\_pp>}}\ >();}
+\DoxyCodeLine{00153\ \ \ \ \ \mbox{\hyperlink{test__groups_8cpp_ab61a72783a261b9357f27d76c97e9e87}{test\_output<G2<mnt4\_pp>}}\ >();}
+\DoxyCodeLine{00154\ \ \ \ \ \mbox{\hyperlink{test__groups_8cpp_abeba2d7d6d6ef16a9cf51e5902c79f56}{test\_mul\_by\_q<G2<mnt4\_pp>}}\ >();}
+\DoxyCodeLine{00155\ }
+\DoxyCodeLine{00156\ \ \ \ \ \mbox{\hyperlink{classlibff_1_1mnt6__pp_ac101aa5559dbece66f5730200d8e34ee}{mnt6\_pp::init\_public\_params}}();}
+\DoxyCodeLine{00157\ \ \ \ \ \mbox{\hyperlink{test__groups_8cpp_aa01b175b118028ca4cc45ebc3c3c3c54}{test\_group<G1<mnt6\_pp>}}\ >();}
+\DoxyCodeLine{00158\ \ \ \ \ \mbox{\hyperlink{test__groups_8cpp_ab61a72783a261b9357f27d76c97e9e87}{test\_output<G1<mnt6\_pp>}}\ >();}
+\DoxyCodeLine{00159\ \ \ \ \ \mbox{\hyperlink{test__groups_8cpp_aa01b175b118028ca4cc45ebc3c3c3c54}{test\_group<G2<mnt6\_pp>}}\ >();}
+\DoxyCodeLine{00160\ \ \ \ \ \mbox{\hyperlink{test__groups_8cpp_ab61a72783a261b9357f27d76c97e9e87}{test\_output<G2<mnt6\_pp>}}\ >();}
+\DoxyCodeLine{00161\ \ \ \ \ \mbox{\hyperlink{test__groups_8cpp_abeba2d7d6d6ef16a9cf51e5902c79f56}{test\_mul\_by\_q<G2<mnt6\_pp>}}\ >();}
+\DoxyCodeLine{00162\ }
+\DoxyCodeLine{00163\ \ \ \ \ \mbox{\hyperlink{classlibff_1_1alt__bn128__pp_a64615d83a91bbc15fab3030a2203f4f4}{alt\_bn128\_pp::init\_public\_params}}();}
+\DoxyCodeLine{00164\ \ \ \ \ \mbox{\hyperlink{test__groups_8cpp_aa01b175b118028ca4cc45ebc3c3c3c54}{test\_group<G1<alt\_bn128\_pp>}}\ >();}
+\DoxyCodeLine{00165\ \ \ \ \ \mbox{\hyperlink{test__groups_8cpp_ab61a72783a261b9357f27d76c97e9e87}{test\_output<G1<alt\_bn128\_pp>}}\ >();}
+\DoxyCodeLine{00166\ \ \ \ \ \mbox{\hyperlink{test__groups_8cpp_aa01b175b118028ca4cc45ebc3c3c3c54}{test\_group<G2<alt\_bn128\_pp>}}\ >();}
+\DoxyCodeLine{00167\ \ \ \ \ \mbox{\hyperlink{test__groups_8cpp_ab61a72783a261b9357f27d76c97e9e87}{test\_output<G2<alt\_bn128\_pp>}}\ >();}
+\DoxyCodeLine{00168\ \ \ \ \ \mbox{\hyperlink{test__groups_8cpp_abeba2d7d6d6ef16a9cf51e5902c79f56}{test\_mul\_by\_q<G2<alt\_bn128\_pp>}}\ >();}
+\DoxyCodeLine{00169\ }
+\DoxyCodeLine{00170\ \textcolor{preprocessor}{\#ifdef\ CURVE\_BN128\ \ \ \ \ \ \ }\textcolor{comment}{//\ BN128\ has\ fancy\ dependencies\ so\ it\ may\ be\ disabled}}
+\DoxyCodeLine{00171\ \ \ \ \ \mbox{\hyperlink{classlibff_1_1bn128__pp_ae44372429d5c8f7d85e87d6ddeb10a19}{bn128\_pp::init\_public\_params}}();}
+\DoxyCodeLine{00172\ \ \ \ \ \mbox{\hyperlink{test__groups_8cpp_aa01b175b118028ca4cc45ebc3c3c3c54}{test\_group<G1<bn128\_pp>}}\ >();}
+\DoxyCodeLine{00173\ \ \ \ \ \mbox{\hyperlink{test__groups_8cpp_ab61a72783a261b9357f27d76c97e9e87}{test\_output<G1<bn128\_pp>}}\ >();}
+\DoxyCodeLine{00174\ \ \ \ \ \mbox{\hyperlink{test__groups_8cpp_aa01b175b118028ca4cc45ebc3c3c3c54}{test\_group<G2<bn128\_pp>}}\ >();}
+\DoxyCodeLine{00175\ \ \ \ \ \mbox{\hyperlink{test__groups_8cpp_ab61a72783a261b9357f27d76c97e9e87}{test\_output<G2<bn128\_pp>}}\ >();}
+\DoxyCodeLine{00176\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00177\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__groups_8cpp_a840291bc02cba5474a4cb46a9b9566fe_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__groups_8cpp_aa01b175b118028ca4cc45ebc3c3c3c54}\index{test\_groups.cpp@{test\_groups.cpp}!test\_group@{test\_group}}
+\index{test\_group@{test\_group}!test\_groups.cpp@{test\_groups.cpp}}
+\doxysubsubsection{\texorpdfstring{test\_group()}{test\_group()}}
+{\footnotesize\ttfamily \label{test__groups_8cpp_aa01b175b118028ca4cc45ebc3c3c3c54} 
+template$<$typename GroupT $>$ \\
+void test\+\_\+group (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__groups_8cpp_source_l00058}{58}} of file \mbox{\hyperlink{test__groups_8cpp_source}{test\+\_\+groups.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00059\ \{}
+\DoxyCodeLine{00060\ \ \ \ \ \mbox{\hyperlink{classlibff_1_1bigint}{bigint<1>}}\ rand1\ =\ \mbox{\hyperlink{classlibff_1_1bigint}{bigint<1>}}(\textcolor{stringliteral}{"{}76749407"{}});}
+\DoxyCodeLine{00061\ \ \ \ \ \mbox{\hyperlink{classlibff_1_1bigint}{bigint<1>}}\ rand2\ =\ \mbox{\hyperlink{classlibff_1_1bigint}{bigint<1>}}(\textcolor{stringliteral}{"{}44410867"{}});}
+\DoxyCodeLine{00062\ \ \ \ \ \mbox{\hyperlink{classlibff_1_1bigint}{bigint<1>}}\ randsum\ =\ \mbox{\hyperlink{classlibff_1_1bigint}{bigint<1>}}(\textcolor{stringliteral}{"{}121160274"{}});}
+\DoxyCodeLine{00063\ }
+\DoxyCodeLine{00064\ \ \ \ \ GroupT\ zero\ =\ GroupT::zero();}
+\DoxyCodeLine{00065\ \ \ \ \ assert(zero\ ==\ zero);}
+\DoxyCodeLine{00066\ \ \ \ \ GroupT\ \mbox{\hyperlink{030-_asn-_require-_check_8cpp_a94c3399fbf75a3c798e148d5238ad242}{one}}\ =\ GroupT::one();}
+\DoxyCodeLine{00067\ \ \ \ \ assert(\mbox{\hyperlink{030-_asn-_require-_check_8cpp_a94c3399fbf75a3c798e148d5238ad242}{one}}\ ==\ \mbox{\hyperlink{030-_asn-_require-_check_8cpp_a94c3399fbf75a3c798e148d5238ad242}{one}});}
+\DoxyCodeLine{00068\ \ \ \ \ GroupT\ two\ =\ \mbox{\hyperlink{classlibff_1_1bigint}{bigint<1>}}(2l)\ *\ GroupT::one();}
+\DoxyCodeLine{00069\ \ \ \ \ assert(two\ ==\ two);}
+\DoxyCodeLine{00070\ \ \ \ \ GroupT\ five\ =\ \mbox{\hyperlink{classlibff_1_1bigint}{bigint<1>}}(5l)\ *\ GroupT::one();}
+\DoxyCodeLine{00071\ }
+\DoxyCodeLine{00072\ \ \ \ \ GroupT\ three\ =\ \mbox{\hyperlink{classlibff_1_1bigint}{bigint<1>}}(3l)\ *\ GroupT::one();}
+\DoxyCodeLine{00073\ \ \ \ \ GroupT\ four\ =\ \mbox{\hyperlink{classlibff_1_1bigint}{bigint<1>}}(4l)\ *\ GroupT::one();}
+\DoxyCodeLine{00074\ }
+\DoxyCodeLine{00075\ \ \ \ \ assert(two+five\ ==\ three+four);}
+\DoxyCodeLine{00076\ }
+\DoxyCodeLine{00077\ \ \ \ \ GroupT\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ =\ GroupT::random\_element();}
+\DoxyCodeLine{00078\ \ \ \ \ GroupT\ b\ =\ GroupT::random\_element();}
+\DoxyCodeLine{00079\ }
+\DoxyCodeLine{00080\ \ \ \ \ assert(\mbox{\hyperlink{030-_asn-_require-_check_8cpp_a94c3399fbf75a3c798e148d5238ad242}{one}}\ !=\ zero);}
+\DoxyCodeLine{00081\ \ \ \ \ assert(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ !=\ zero);}
+\DoxyCodeLine{00082\ \ \ \ \ assert(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ !=\ \mbox{\hyperlink{030-_asn-_require-_check_8cpp_a94c3399fbf75a3c798e148d5238ad242}{one}});}
+\DoxyCodeLine{00083\ }
+\DoxyCodeLine{00084\ \ \ \ \ assert(b\ !=\ zero);}
+\DoxyCodeLine{00085\ \ \ \ \ assert(b\ !=\ \mbox{\hyperlink{030-_asn-_require-_check_8cpp_a94c3399fbf75a3c798e148d5238ad242}{one}});}
+\DoxyCodeLine{00086\ }
+\DoxyCodeLine{00087\ \ \ \ \ assert(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.dbl()\ ==\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ +\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{00088\ \ \ \ \ assert(b.dbl()\ ==\ b\ +\ b);}
+\DoxyCodeLine{00089\ \ \ \ \ assert(\mbox{\hyperlink{030-_asn-_require-_check_8cpp_a94c3399fbf75a3c798e148d5238ad242}{one}}.add(two)\ ==\ three);}
+\DoxyCodeLine{00090\ \ \ \ \ assert(two.add(\mbox{\hyperlink{030-_asn-_require-_check_8cpp_a94c3399fbf75a3c798e148d5238ad242}{one}})\ ==\ three);}
+\DoxyCodeLine{00091\ \ \ \ \ assert(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ +\ b\ ==\ b\ +\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{00092\ \ \ \ \ assert(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ -\/\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ ==\ zero);}
+\DoxyCodeLine{00093\ \ \ \ \ assert(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ -\/\ b\ ==\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ +\ (-\/b));}
+\DoxyCodeLine{00094\ \ \ \ \ assert(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ -\/\ b\ ==\ (-\/b)\ +\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{00095\ }
+\DoxyCodeLine{00096\ \ \ \ \ \textcolor{comment}{//\ handle\ special\ cases}}
+\DoxyCodeLine{00097\ \ \ \ \ assert(zero\ +\ (-\/\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})\ ==\ -\/\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{00098\ \ \ \ \ assert(zero\ -\/\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ ==\ -\/\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{00099\ \ \ \ \ assert(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ -\/\ zero\ ==\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{00100\ \ \ \ \ assert(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ +\ zero\ ==\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{00101\ \ \ \ \ assert(zero\ +\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ ==\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{00102\ }
+\DoxyCodeLine{00103\ \ \ \ \ assert((\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ +\ b).dbl()\ ==\ (\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ +\ b)\ +\ (b\ +\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}));}
+\DoxyCodeLine{00104\ \ \ \ \ assert(\mbox{\hyperlink{classlibff_1_1bigint}{bigint<1>}}(\textcolor{stringliteral}{"{}2"{}})\ *\ (\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ +\ b)\ ==\ (\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ +\ b)\ +\ (b\ +\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}));}
+\DoxyCodeLine{00105\ }
+\DoxyCodeLine{00106\ \ \ \ \ assert((rand1\ *\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})\ +\ (rand2\ *\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})\ ==\ (randsum\ *\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}));}
+\DoxyCodeLine{00107\ }
+\DoxyCodeLine{00108\ \ \ \ \ assert(GroupT::order()\ *\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ ==\ zero);}
+\DoxyCodeLine{00109\ \ \ \ \ assert(GroupT::order()\ *\ \mbox{\hyperlink{030-_asn-_require-_check_8cpp_a94c3399fbf75a3c798e148d5238ad242}{one}}\ ==\ zero);}
+\DoxyCodeLine{00110\ \ \ \ \ assert((GroupT::order()\ *\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})\ -\/\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ !=\ zero);}
+\DoxyCodeLine{00111\ \ \ \ \ assert((GroupT::order()\ *\ \mbox{\hyperlink{030-_asn-_require-_check_8cpp_a94c3399fbf75a3c798e148d5238ad242}{one}})\ -\/\ \mbox{\hyperlink{030-_asn-_require-_check_8cpp_a94c3399fbf75a3c798e148d5238ad242}{one}}\ !=\ zero);}
+\DoxyCodeLine{00112\ }
+\DoxyCodeLine{00113\ \ \ \ \ \mbox{\hyperlink{test__groups_8cpp_ad204a02058200cb6f317eb662786d1bd}{test\_mixed\_add<GroupT>}}();}
+\DoxyCodeLine{00114\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=263pt]{test__groups_8cpp_aa01b175b118028ca4cc45ebc3c3c3c54_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=215pt]{test__groups_8cpp_aa01b175b118028ca4cc45ebc3c3c3c54_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__groups_8cpp_ad204a02058200cb6f317eb662786d1bd}\index{test\_groups.cpp@{test\_groups.cpp}!test\_mixed\_add@{test\_mixed\_add}}
+\index{test\_mixed\_add@{test\_mixed\_add}!test\_groups.cpp@{test\_groups.cpp}}
+\doxysubsubsection{\texorpdfstring{test\_mixed\_add()}{test\_mixed\_add()}}
+{\footnotesize\ttfamily \label{test__groups_8cpp_ad204a02058200cb6f317eb662786d1bd} 
+template$<$typename GroupT $>$ \\
+void test\+\_\+mixed\+\_\+add (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__groups_8cpp_source_l00022}{22}} of file \mbox{\hyperlink{test__groups_8cpp_source}{test\+\_\+groups.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00023\ \{}
+\DoxyCodeLine{00024\ \ \ \ \ GroupT\ base,\ el,\ result;}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \ \ \ \ base\ =\ GroupT::zero();}
+\DoxyCodeLine{00027\ \ \ \ \ el\ =\ GroupT::zero();}
+\DoxyCodeLine{00028\ \ \ \ \ el.to\_special();}
+\DoxyCodeLine{00029\ \ \ \ \ result\ =\ base.mixed\_add(el);}
+\DoxyCodeLine{00030\ \ \ \ \ assert(result\ ==\ base\ +\ el);}
+\DoxyCodeLine{00031\ }
+\DoxyCodeLine{00032\ \ \ \ \ base\ =\ GroupT::zero();}
+\DoxyCodeLine{00033\ \ \ \ \ el\ =\ GroupT::random\_element();}
+\DoxyCodeLine{00034\ \ \ \ \ el.to\_special();}
+\DoxyCodeLine{00035\ \ \ \ \ result\ =\ base.mixed\_add(el);}
+\DoxyCodeLine{00036\ \ \ \ \ assert(result\ ==\ base\ +\ el);}
+\DoxyCodeLine{00037\ }
+\DoxyCodeLine{00038\ \ \ \ \ base\ =\ GroupT::random\_element();}
+\DoxyCodeLine{00039\ \ \ \ \ el\ =\ GroupT::zero();}
+\DoxyCodeLine{00040\ \ \ \ \ el.to\_special();}
+\DoxyCodeLine{00041\ \ \ \ \ result\ =\ base.mixed\_add(el);}
+\DoxyCodeLine{00042\ \ \ \ \ assert(result\ ==\ base\ +\ el);}
+\DoxyCodeLine{00043\ }
+\DoxyCodeLine{00044\ \ \ \ \ base\ =\ GroupT::random\_element();}
+\DoxyCodeLine{00045\ \ \ \ \ el\ =\ GroupT::random\_element();}
+\DoxyCodeLine{00046\ \ \ \ \ el.to\_special();}
+\DoxyCodeLine{00047\ \ \ \ \ result\ =\ base.mixed\_add(el);}
+\DoxyCodeLine{00048\ \ \ \ \ assert(result\ ==\ base\ +\ el);}
+\DoxyCodeLine{00049\ }
+\DoxyCodeLine{00050\ \ \ \ \ base\ =\ GroupT::random\_element();}
+\DoxyCodeLine{00051\ \ \ \ \ el\ =\ base;}
+\DoxyCodeLine{00052\ \ \ \ \ el.to\_special();}
+\DoxyCodeLine{00053\ \ \ \ \ result\ =\ base.mixed\_add(el);}
+\DoxyCodeLine{00054\ \ \ \ \ assert(result\ ==\ base.dbl());}
+\DoxyCodeLine{00055\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=336pt]{test__groups_8cpp_ad204a02058200cb6f317eb662786d1bd_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__groups_8cpp_abeba2d7d6d6ef16a9cf51e5902c79f56}\index{test\_groups.cpp@{test\_groups.cpp}!test\_mul\_by\_q@{test\_mul\_by\_q}}
+\index{test\_mul\_by\_q@{test\_mul\_by\_q}!test\_groups.cpp@{test\_groups.cpp}}
+\doxysubsubsection{\texorpdfstring{test\_mul\_by\_q()}{test\_mul\_by\_q()}}
+{\footnotesize\ttfamily \label{test__groups_8cpp_abeba2d7d6d6ef16a9cf51e5902c79f56} 
+template$<$typename GroupT $>$ \\
+void test\+\_\+mul\+\_\+by\+\_\+q (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__groups_8cpp_source_l00117}{117}} of file \mbox{\hyperlink{test__groups_8cpp_source}{test\+\_\+groups.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00118\ \{}
+\DoxyCodeLine{00119\ \ \ \ \ GroupT\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ =\ GroupT::random\_element();}
+\DoxyCodeLine{00120\ \ \ \ \ assert((GroupT::base\_field\_char()*\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})\ ==\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.mul\_by\_q());}
+\DoxyCodeLine{00121\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=233pt]{test__groups_8cpp_abeba2d7d6d6ef16a9cf51e5902c79f56_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__groups_8cpp_ab61a72783a261b9357f27d76c97e9e87}\index{test\_groups.cpp@{test\_groups.cpp}!test\_output@{test\_output}}
+\index{test\_output@{test\_output}!test\_groups.cpp@{test\_groups.cpp}}
+\doxysubsubsection{\texorpdfstring{test\_output()}{test\_output()}}
+{\footnotesize\ttfamily \label{test__groups_8cpp_ab61a72783a261b9357f27d76c97e9e87} 
+template$<$typename GroupT $>$ \\
+void test\+\_\+output (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__groups_8cpp_source_l00124}{124}} of file \mbox{\hyperlink{test__groups_8cpp_source}{test\+\_\+groups.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00125\ \{}
+\DoxyCodeLine{00126\ \ \ \ \ GroupT\ g\ =\ GroupT::zero();}
+\DoxyCodeLine{00127\ }
+\DoxyCodeLine{00128\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ 1000;\ ++i)}
+\DoxyCodeLine{00129\ \ \ \ \ \{}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ std::stringstream\ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}};}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}\ <<\ g;}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ GroupT\ gg;}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}\ >>\ gg;}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ assert(g\ ==\ gg);}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ use\ a\ random\ point\ in\ next\ iteration\ */}}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ g\ =\ GroupT::random\_element();}
+\DoxyCodeLine{00137\ \ \ \ \ \}}
+\DoxyCodeLine{00138\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=218pt]{test__groups_8cpp_ab61a72783a261b9357f27d76c97e9e87_icgraph}
+\end{center}
+\end{figure}

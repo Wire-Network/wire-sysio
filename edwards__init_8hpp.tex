@@ -1,0 +1,67 @@
+\doxysection{libraries/fc/libraries/ff/libff/algebra/curves/edwards/edwards\+\_\+init.hpp File Reference}
+\hypertarget{edwards__init_8hpp}{}\label{edwards__init_8hpp}\index{libraries/fc/libraries/ff/libff/algebra/curves/edwards/edwards\_init.hpp@{libraries/fc/libraries/ff/libff/algebra/curves/edwards/edwards\_init.hpp}}
+{\ttfamily \#include $<$libff/algebra/curves/public\+\_\+params.\+hpp$>$}\newline
+{\ttfamily \#include $<$libff/algebra/fields/fp.\+hpp$>$}\newline
+{\ttfamily \#include $<$libff/algebra/fields/fp3.\+hpp$>$}\newline
+{\ttfamily \#include $<$libff/algebra/fields/fp6\+\_\+2over3.\+hpp$>$}\newline
+Include dependency graph for edwards\+\_\+init.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{edwards__init_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{edwards__init_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacelibff}{libff}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}}$<$ \mbox{\hyperlink{namespacelibff_a8df5c538be332b4efad18438cd34d19c}{edwards\+\_\+r\+\_\+limbs}}, \mbox{\hyperlink{namespacelibff_a16c137bfd4732dc6af18d98dc37ac296}{edwards\+\_\+modulus\+\_\+r}} $>$ \mbox{\hyperlink{namespacelibff_ab8734750fbf545572c63fa96171f7caf}{libff\+::edwards\+\_\+\+Fr}}
+\item 
+typedef \mbox{\hyperlink{classlibff_1_1_fp__model}{Fp\+\_\+model}}$<$ \mbox{\hyperlink{namespacelibff_a332f23a93483ea22a9f9a4cdd04128a9}{edwards\+\_\+q\+\_\+limbs}}, \mbox{\hyperlink{namespacelibff_a60d3b231447e1f2b9f48dceddb748c0a}{edwards\+\_\+modulus\+\_\+q}} $>$ \mbox{\hyperlink{namespacelibff_a2653629483aeb0df51eec08cb6635343}{libff\+::edwards\+\_\+\+Fq}}
+\item 
+typedef \mbox{\hyperlink{classlibff_1_1_fp3__model}{Fp3\+\_\+model}}$<$ \mbox{\hyperlink{namespacelibff_a332f23a93483ea22a9f9a4cdd04128a9}{edwards\+\_\+q\+\_\+limbs}}, \mbox{\hyperlink{namespacelibff_a60d3b231447e1f2b9f48dceddb748c0a}{edwards\+\_\+modulus\+\_\+q}} $>$ \mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{libff\+::edwards\+\_\+\+Fq3}}
+\item 
+typedef \mbox{\hyperlink{classlibff_1_1_fp6__2over3__model}{Fp6\+\_\+2over3\+\_\+model}}$<$ \mbox{\hyperlink{namespacelibff_a332f23a93483ea22a9f9a4cdd04128a9}{edwards\+\_\+q\+\_\+limbs}}, \mbox{\hyperlink{namespacelibff_a60d3b231447e1f2b9f48dceddb748c0a}{edwards\+\_\+modulus\+\_\+q}} $>$ \mbox{\hyperlink{namespacelibff_a94775cf76b7e294e46c8e6b8f9c3de87}{libff\+::edwards\+\_\+\+Fq6}}
+\item 
+typedef \mbox{\hyperlink{namespacelibff_a94775cf76b7e294e46c8e6b8f9c3de87}{edwards\+\_\+\+Fq6}} \mbox{\hyperlink{namespacelibff_aed4ac2e5b330c64e83968be0a29791e4}{libff\+::edwards\+\_\+\+GT}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{namespacelibff_a0e91814e1b60e75813ae9dc499316893}{libff\+::init\+\_\+edwards\+\_\+params}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+const mp\+\_\+size\+\_\+t \mbox{\hyperlink{namespacelibff_a8472d2ffd3999efbcf12163df00c6ee9}{libff\+::edwards\+\_\+r\+\_\+bitcount}} = 181
+\item 
+const mp\+\_\+size\+\_\+t \mbox{\hyperlink{namespacelibff_af5d56c91f409916a05851f965767e3ea}{libff\+::edwards\+\_\+q\+\_\+bitcount}} = 183
+\item 
+const mp\+\_\+size\+\_\+t \mbox{\hyperlink{namespacelibff_a8df5c538be332b4efad18438cd34d19c}{libff\+::edwards\+\_\+r\+\_\+limbs}} = (\mbox{\hyperlink{namespacelibff_a8472d2ffd3999efbcf12163df00c6ee9}{edwards\+\_\+r\+\_\+bitcount}}+GMP\+\_\+\+NUMB\+\_\+\+BITS-\/1)/GMP\+\_\+\+NUMB\+\_\+\+BITS
+\item 
+const mp\+\_\+size\+\_\+t \mbox{\hyperlink{namespacelibff_a332f23a93483ea22a9f9a4cdd04128a9}{libff\+::edwards\+\_\+q\+\_\+limbs}} = (\mbox{\hyperlink{namespacelibff_af5d56c91f409916a05851f965767e3ea}{edwards\+\_\+q\+\_\+bitcount}}+GMP\+\_\+\+NUMB\+\_\+\+BITS-\/1)/GMP\+\_\+\+NUMB\+\_\+\+BITS
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\begin{DoxyAuthor}{Author}
+This file is part of libff, developed by SCIPR Lab and contributors (see AUTHORS). 
+\end{DoxyAuthor}
+\begin{DoxyCopyright}{Copyright}
+MIT license (see LICENSE file) 
+\end{DoxyCopyright}
+
+
+Definition in file \mbox{\hyperlink{edwards__init_8hpp_source}{edwards\+\_\+init.\+hpp}}.
+

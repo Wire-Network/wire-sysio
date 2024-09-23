@@ -1,0 +1,331 @@
+\doxysection{sysio\+::chain\+::impl\+::generate\+\_\+path\+\_\+string\+\_\+visitor Struct Reference}
+\hypertarget{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor}{}\label{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor}\index{sysio::chain::impl::generate\_path\_string\_visitor@{sysio::chain::impl::generate\_path\_string\_visitor}}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_add7aec73584e90d2c7f9f78d3aa4fb9a}{result\+\_\+type}} = void
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_aa69bf442d8bf923df43e2fb35d198669}{generate\+\_\+path\+\_\+string\+\_\+visitor}} (bool \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_ad5e0f158efd6af8f9b6fc8d08a749898}{shorten\+\_\+names}}, bool \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_a117dff351e8fc184c85e3fff9603c92a}{track\+\_\+only}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_aebf9a8e566ea9e9e9e775f38e28bfd49}{add\+\_\+dot}} ()
+\item 
+void \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_a068f09591b36b1a586bf30203b633e55}{operator()}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1empty__path__item}{empty\+\_\+path\+\_\+item}} \&item)
+\item 
+void \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_a49af5d30e8bdb60b69b10e914c476e8b}{operator()}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1array__index__path__item}{array\+\_\+index\+\_\+path\+\_\+item}} \&item)
+\item 
+void \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_a2b23abdc72c573c6fbcc77514f596bf3}{operator()}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1field__path__item}{field\+\_\+path\+\_\+item}} \&item)
+\item 
+void \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_a69955563fcac58d77e5e047d2deacf23}{operator()}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1variant__path__item}{variant\+\_\+path\+\_\+item}} \&item)
+\item 
+void \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_a8e113e1fe451746fcbb026451d7e2c7f}{operator()}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1empty__path__root}{empty\+\_\+path\+\_\+root}} \&item)
+\item 
+void \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_ae485ec9d4ef91ae6437b9bfdbb40cbd0}{operator()}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1array__type__path__root}{array\+\_\+type\+\_\+path\+\_\+root}} \&item)
+\item 
+void \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_a8fbcb1c23060cc0c2482dbb1b622eea6}{operator()}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1struct__type__path__root}{struct\+\_\+type\+\_\+path\+\_\+root}} \&item)
+\item 
+void \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_a04d659f71ca96085c733f8e913f78a72}{operator()}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1variant__type__path__root}{variant\+\_\+type\+\_\+path\+\_\+root}} \&item)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::stringstream \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_a12259d54870b4ccae1bf9b1523c696c1}{s}}
+\item 
+bool \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_ad5e0f158efd6af8f9b6fc8d08a749898}{shorten\+\_\+names}} = false
+\item 
+bool \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_a117dff351e8fc184c85e3fff9603c92a}{track\+\_\+only}} = false
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1impl_a99395f0f04c810e6c8d3b51e3d1aacd0}{path\+\_\+item}} \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_a70bb1b485733b0b598180f29e6a39a15}{last\+\_\+path\+\_\+item}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{abi__serializer_8cpp_source_l00737}{737}} of file \mbox{\hyperlink{abi__serializer_8cpp_source}{abi\+\_\+serializer.\+cpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_add7aec73584e90d2c7f9f78d3aa4fb9a}\index{sysio::chain::impl::generate\_path\_string\_visitor@{sysio::chain::impl::generate\_path\_string\_visitor}!result\_type@{result\_type}}
+\index{result\_type@{result\_type}!sysio::chain::impl::generate\_path\_string\_visitor@{sysio::chain::impl::generate\_path\_string\_visitor}}
+\doxysubsubsection{\texorpdfstring{result\_type}{result\_type}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_add7aec73584e90d2c7f9f78d3aa4fb9a} 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_add7aec73584e90d2c7f9f78d3aa4fb9a}{sysio\+::chain\+::impl\+::generate\+\_\+path\+\_\+string\+\_\+visitor\+::result\+\_\+type}} = void}
+
+
+
+Definition at line \mbox{\hyperlink{abi__serializer_8cpp_source_l00738}{738}} of file \mbox{\hyperlink{abi__serializer_8cpp_source}{abi\+\_\+serializer.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_aa69bf442d8bf923df43e2fb35d198669}\index{sysio::chain::impl::generate\_path\_string\_visitor@{sysio::chain::impl::generate\_path\_string\_visitor}!generate\_path\_string\_visitor@{generate\_path\_string\_visitor}}
+\index{generate\_path\_string\_visitor@{generate\_path\_string\_visitor}!sysio::chain::impl::generate\_path\_string\_visitor@{sysio::chain::impl::generate\_path\_string\_visitor}}
+\doxysubsubsection{\texorpdfstring{generate\_path\_string\_visitor()}{generate\_path\_string\_visitor()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_aa69bf442d8bf923df43e2fb35d198669} 
+sysio\+::chain\+::impl\+::generate\+\_\+path\+\_\+string\+\_\+visitor\+::generate\+\_\+path\+\_\+string\+\_\+visitor (\begin{DoxyParamCaption}\item[{bool}]{shorten\+\_\+names}{, }\item[{bool}]{track\+\_\+only}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{abi__serializer_8cpp_source_l00740}{740}} of file \mbox{\hyperlink{abi__serializer_8cpp_source}{abi\+\_\+serializer.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00741\ \ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_ad5e0f158efd6af8f9b6fc8d08a749898}{shorten\_names}}(\mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_ad5e0f158efd6af8f9b6fc8d08a749898}{shorten\_names}}),\ \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_a117dff351e8fc184c85e3fff9603c92a}{track\_only}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_a117dff351e8fc184c85e3fff9603c92a}{track\_only}}\ )}
+\DoxyCodeLine{00742\ \ \ \ \ \ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_aebf9a8e566ea9e9e9e775f38e28bfd49}\index{sysio::chain::impl::generate\_path\_string\_visitor@{sysio::chain::impl::generate\_path\_string\_visitor}!add\_dot@{add\_dot}}
+\index{add\_dot@{add\_dot}!sysio::chain::impl::generate\_path\_string\_visitor@{sysio::chain::impl::generate\_path\_string\_visitor}}
+\doxysubsubsection{\texorpdfstring{add\_dot()}{add\_dot()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_aebf9a8e566ea9e9e9e775f38e28bfd49} 
+void sysio\+::chain\+::impl\+::generate\+\_\+path\+\_\+string\+\_\+visitor\+::add\+\_\+dot (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{abi__serializer_8cpp_source_l00749}{749}} of file \mbox{\hyperlink{abi__serializer_8cpp_source}{abi\+\_\+serializer.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00749\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00750\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_a12259d54870b4ccae1bf9b1523c696c1}{s}}\ <<\ \textcolor{stringliteral}{"{}."{}};}
+\DoxyCodeLine{00751\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_a49af5d30e8bdb60b69b10e914c476e8b}\index{sysio::chain::impl::generate\_path\_string\_visitor@{sysio::chain::impl::generate\_path\_string\_visitor}!operator()@{operator()}}
+\index{operator()@{operator()}!sysio::chain::impl::generate\_path\_string\_visitor@{sysio::chain::impl::generate\_path\_string\_visitor}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}\hspace{0.1cm}{\footnotesize\ttfamily [1/8]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_a49af5d30e8bdb60b69b10e914c476e8b} 
+void sysio\+::chain\+::impl\+::generate\+\_\+path\+\_\+string\+\_\+visitor\+::operator() (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1array__index__path__item}{array\+\_\+index\+\_\+path\+\_\+item}} \&}]{item}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{abi__serializer_8cpp_source_l00756}{756}} of file \mbox{\hyperlink{abi__serializer_8cpp_source}{abi\+\_\+serializer.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00756\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00757\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_a117dff351e8fc184c85e3fff9603c92a}{track\_only}}\ )\ \{}
+\DoxyCodeLine{00758\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_a70bb1b485733b0b598180f29e6a39a15}{last\_path\_item}}\ =\ item;}
+\DoxyCodeLine{00759\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00760\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00761\ }
+\DoxyCodeLine{00762\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_a12259d54870b4ccae1bf9b1523c696c1}{s}}\ <<\ \textcolor{stringliteral}{"{}["{}}\ <<\ item.array\_index\ <<\ \textcolor{stringliteral}{"{}]"{}};}
+\DoxyCodeLine{00763\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_ae485ec9d4ef91ae6437b9bfdbb40cbd0}\index{sysio::chain::impl::generate\_path\_string\_visitor@{sysio::chain::impl::generate\_path\_string\_visitor}!operator()@{operator()}}
+\index{operator()@{operator()}!sysio::chain::impl::generate\_path\_string\_visitor@{sysio::chain::impl::generate\_path\_string\_visitor}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}\hspace{0.1cm}{\footnotesize\ttfamily [2/8]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_ae485ec9d4ef91ae6437b9bfdbb40cbd0} 
+void sysio\+::chain\+::impl\+::generate\+\_\+path\+\_\+string\+\_\+visitor\+::operator() (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1array__type__path__root}{array\+\_\+type\+\_\+path\+\_\+root}} \&}]{item}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{abi__serializer_8cpp_source_l00790}{790}} of file \mbox{\hyperlink{abi__serializer_8cpp_source}{abi\+\_\+serializer.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00790\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00791\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_a12259d54870b4ccae1bf9b1523c696c1}{s}}\ <<\ \textcolor{stringliteral}{"{}ARRAY"{}};}
+\DoxyCodeLine{00792\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_a068f09591b36b1a586bf30203b633e55}\index{sysio::chain::impl::generate\_path\_string\_visitor@{sysio::chain::impl::generate\_path\_string\_visitor}!operator()@{operator()}}
+\index{operator()@{operator()}!sysio::chain::impl::generate\_path\_string\_visitor@{sysio::chain::impl::generate\_path\_string\_visitor}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}\hspace{0.1cm}{\footnotesize\ttfamily [3/8]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_a068f09591b36b1a586bf30203b633e55} 
+void sysio\+::chain\+::impl\+::generate\+\_\+path\+\_\+string\+\_\+visitor\+::operator() (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1empty__path__item}{empty\+\_\+path\+\_\+item}} \&}]{item}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{abi__serializer_8cpp_source_l00753}{753}} of file \mbox{\hyperlink{abi__serializer_8cpp_source}{abi\+\_\+serializer.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00753\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00754\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_a8e113e1fe451746fcbb026451d7e2c7f}\index{sysio::chain::impl::generate\_path\_string\_visitor@{sysio::chain::impl::generate\_path\_string\_visitor}!operator()@{operator()}}
+\index{operator()@{operator()}!sysio::chain::impl::generate\_path\_string\_visitor@{sysio::chain::impl::generate\_path\_string\_visitor}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}\hspace{0.1cm}{\footnotesize\ttfamily [4/8]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_a8e113e1fe451746fcbb026451d7e2c7f} 
+void sysio\+::chain\+::impl\+::generate\+\_\+path\+\_\+string\+\_\+visitor\+::operator() (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1empty__path__root}{empty\+\_\+path\+\_\+root}} \&}]{item}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{abi__serializer_8cpp_source_l00787}{787}} of file \mbox{\hyperlink{abi__serializer_8cpp_source}{abi\+\_\+serializer.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00787\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00788\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_a2b23abdc72c573c6fbcc77514f596bf3}\index{sysio::chain::impl::generate\_path\_string\_visitor@{sysio::chain::impl::generate\_path\_string\_visitor}!operator()@{operator()}}
+\index{operator()@{operator()}!sysio::chain::impl::generate\_path\_string\_visitor@{sysio::chain::impl::generate\_path\_string\_visitor}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}\hspace{0.1cm}{\footnotesize\ttfamily [5/8]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_a2b23abdc72c573c6fbcc77514f596bf3} 
+void sysio\+::chain\+::impl\+::generate\+\_\+path\+\_\+string\+\_\+visitor\+::operator() (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1field__path__item}{field\+\_\+path\+\_\+item}} \&}]{item}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{abi__serializer_8cpp_source_l00765}{765}} of file \mbox{\hyperlink{abi__serializer_8cpp_source}{abi\+\_\+serializer.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00765\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00766\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_a117dff351e8fc184c85e3fff9603c92a}{track\_only}}\ )\ \{}
+\DoxyCodeLine{00767\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_a70bb1b485733b0b598180f29e6a39a15}{last\_path\_item}}\ =\ item;}
+\DoxyCodeLine{00768\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00769\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00770\ }
+\DoxyCodeLine{00771\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}\ =\ item.parent\_struct\_itr-\/>second.fields.at(item.field\_ordinal).name;}
+\DoxyCodeLine{00772\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1impl_a0ff60b42e045adb210fcfb9e00f7a3af}{output\_name}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_a12259d54870b4ccae1bf9b1523c696c1}{s}},\ str,\ \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_ad5e0f158efd6af8f9b6fc8d08a749898}{shorten\_names}}\ );}
+\DoxyCodeLine{00773\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_a2b23abdc72c573c6fbcc77514f596bf3_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_a8fbcb1c23060cc0c2482dbb1b622eea6}\index{sysio::chain::impl::generate\_path\_string\_visitor@{sysio::chain::impl::generate\_path\_string\_visitor}!operator()@{operator()}}
+\index{operator()@{operator()}!sysio::chain::impl::generate\_path\_string\_visitor@{sysio::chain::impl::generate\_path\_string\_visitor}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}\hspace{0.1cm}{\footnotesize\ttfamily [6/8]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_a8fbcb1c23060cc0c2482dbb1b622eea6} 
+void sysio\+::chain\+::impl\+::generate\+\_\+path\+\_\+string\+\_\+visitor\+::operator() (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1struct__type__path__root}{struct\+\_\+type\+\_\+path\+\_\+root}} \&}]{item}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{abi__serializer_8cpp_source_l00794}{794}} of file \mbox{\hyperlink{abi__serializer_8cpp_source}{abi\+\_\+serializer.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00794\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00795\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}\ =\ item.struct\_itr-\/>first;}
+\DoxyCodeLine{00796\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1impl_a0ff60b42e045adb210fcfb9e00f7a3af}{output\_name}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_a12259d54870b4ccae1bf9b1523c696c1}{s}},\ str,\ \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_ad5e0f158efd6af8f9b6fc8d08a749898}{shorten\_names}}\ );}
+\DoxyCodeLine{00797\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_a8fbcb1c23060cc0c2482dbb1b622eea6_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_a69955563fcac58d77e5e047d2deacf23}\index{sysio::chain::impl::generate\_path\_string\_visitor@{sysio::chain::impl::generate\_path\_string\_visitor}!operator()@{operator()}}
+\index{operator()@{operator()}!sysio::chain::impl::generate\_path\_string\_visitor@{sysio::chain::impl::generate\_path\_string\_visitor}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}\hspace{0.1cm}{\footnotesize\ttfamily [7/8]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_a69955563fcac58d77e5e047d2deacf23} 
+void sysio\+::chain\+::impl\+::generate\+\_\+path\+\_\+string\+\_\+visitor\+::operator() (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1variant__path__item}{variant\+\_\+path\+\_\+item}} \&}]{item}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{abi__serializer_8cpp_source_l00775}{775}} of file \mbox{\hyperlink{abi__serializer_8cpp_source}{abi\+\_\+serializer.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00775\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00776\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_a117dff351e8fc184c85e3fff9603c92a}{track\_only}}\ )\ \{}
+\DoxyCodeLine{00777\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_a70bb1b485733b0b598180f29e6a39a15}{last\_path\_item}}\ =\ item;}
+\DoxyCodeLine{00778\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00779\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00780\ }
+\DoxyCodeLine{00781\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_a12259d54870b4ccae1bf9b1523c696c1}{s}}\ <<\ \textcolor{stringliteral}{"{}<variant("{}}\ <<\ item.variant\_ordinal\ <<\ \textcolor{stringliteral}{"{})="{}};}
+\DoxyCodeLine{00782\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}\ =\ item.variant\_itr-\/>second.types.at(item.variant\_ordinal);}
+\DoxyCodeLine{00783\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1impl_a0ff60b42e045adb210fcfb9e00f7a3af}{output\_name}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_a12259d54870b4ccae1bf9b1523c696c1}{s}},\ str,\ \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_ad5e0f158efd6af8f9b6fc8d08a749898}{shorten\_names}}\ );}
+\DoxyCodeLine{00784\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_a12259d54870b4ccae1bf9b1523c696c1}{s}}\ <<\ \textcolor{stringliteral}{"{}>"{}};}
+\DoxyCodeLine{00785\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_a69955563fcac58d77e5e047d2deacf23_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_a04d659f71ca96085c733f8e913f78a72}\index{sysio::chain::impl::generate\_path\_string\_visitor@{sysio::chain::impl::generate\_path\_string\_visitor}!operator()@{operator()}}
+\index{operator()@{operator()}!sysio::chain::impl::generate\_path\_string\_visitor@{sysio::chain::impl::generate\_path\_string\_visitor}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}\hspace{0.1cm}{\footnotesize\ttfamily [8/8]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_a04d659f71ca96085c733f8e913f78a72} 
+void sysio\+::chain\+::impl\+::generate\+\_\+path\+\_\+string\+\_\+visitor\+::operator() (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1variant__type__path__root}{variant\+\_\+type\+\_\+path\+\_\+root}} \&}]{item}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{abi__serializer_8cpp_source_l00799}{799}} of file \mbox{\hyperlink{abi__serializer_8cpp_source}{abi\+\_\+serializer.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00799\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00800\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}\ =\ item.variant\_itr-\/>first;}
+\DoxyCodeLine{00801\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1impl_a0ff60b42e045adb210fcfb9e00f7a3af}{output\_name}}(\ \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_a12259d54870b4ccae1bf9b1523c696c1}{s}},\ str,\ \mbox{\hyperlink{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_ad5e0f158efd6af8f9b6fc8d08a749898}{shorten\_names}}\ );}
+\DoxyCodeLine{00802\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_a04d659f71ca96085c733f8e913f78a72_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_a70bb1b485733b0b598180f29e6a39a15}\index{sysio::chain::impl::generate\_path\_string\_visitor@{sysio::chain::impl::generate\_path\_string\_visitor}!last\_path\_item@{last\_path\_item}}
+\index{last\_path\_item@{last\_path\_item}!sysio::chain::impl::generate\_path\_string\_visitor@{sysio::chain::impl::generate\_path\_string\_visitor}}
+\doxysubsubsection{\texorpdfstring{last\_path\_item}{last\_path\_item}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_a70bb1b485733b0b598180f29e6a39a15} 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1impl_a99395f0f04c810e6c8d3b51e3d1aacd0}{path\+\_\+item}} sysio\+::chain\+::impl\+::generate\+\_\+path\+\_\+string\+\_\+visitor\+::last\+\_\+path\+\_\+item}
+
+
+
+Definition at line \mbox{\hyperlink{abi__serializer_8cpp_source_l00747}{747}} of file \mbox{\hyperlink{abi__serializer_8cpp_source}{abi\+\_\+serializer.\+cpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_a12259d54870b4ccae1bf9b1523c696c1}\index{sysio::chain::impl::generate\_path\_string\_visitor@{sysio::chain::impl::generate\_path\_string\_visitor}!s@{s}}
+\index{s@{s}!sysio::chain::impl::generate\_path\_string\_visitor@{sysio::chain::impl::generate\_path\_string\_visitor}}
+\doxysubsubsection{\texorpdfstring{s}{s}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_a12259d54870b4ccae1bf9b1523c696c1} 
+std\+::stringstream sysio\+::chain\+::impl\+::generate\+\_\+path\+\_\+string\+\_\+visitor\+::s}
+
+
+
+Definition at line \mbox{\hyperlink{abi__serializer_8cpp_source_l00744}{744}} of file \mbox{\hyperlink{abi__serializer_8cpp_source}{abi\+\_\+serializer.\+cpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_ad5e0f158efd6af8f9b6fc8d08a749898}\index{sysio::chain::impl::generate\_path\_string\_visitor@{sysio::chain::impl::generate\_path\_string\_visitor}!shorten\_names@{shorten\_names}}
+\index{shorten\_names@{shorten\_names}!sysio::chain::impl::generate\_path\_string\_visitor@{sysio::chain::impl::generate\_path\_string\_visitor}}
+\doxysubsubsection{\texorpdfstring{shorten\_names}{shorten\_names}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_ad5e0f158efd6af8f9b6fc8d08a749898} 
+bool sysio\+::chain\+::impl\+::generate\+\_\+path\+\_\+string\+\_\+visitor\+::shorten\+\_\+names = false}
+
+
+
+Definition at line \mbox{\hyperlink{abi__serializer_8cpp_source_l00745}{745}} of file \mbox{\hyperlink{abi__serializer_8cpp_source}{abi\+\_\+serializer.\+cpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_a117dff351e8fc184c85e3fff9603c92a}\index{sysio::chain::impl::generate\_path\_string\_visitor@{sysio::chain::impl::generate\_path\_string\_visitor}!track\_only@{track\_only}}
+\index{track\_only@{track\_only}!sysio::chain::impl::generate\_path\_string\_visitor@{sysio::chain::impl::generate\_path\_string\_visitor}}
+\doxysubsubsection{\texorpdfstring{track\_only}{track\_only}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1impl_1_1generate__path__string__visitor_a117dff351e8fc184c85e3fff9603c92a} 
+bool sysio\+::chain\+::impl\+::generate\+\_\+path\+\_\+string\+\_\+visitor\+::track\+\_\+only = false}
+
+
+
+Definition at line \mbox{\hyperlink{abi__serializer_8cpp_source_l00746}{746}} of file \mbox{\hyperlink{abi__serializer_8cpp_source}{abi\+\_\+serializer.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/\mbox{\hyperlink{abi__serializer_8cpp}{abi\+\_\+serializer.\+cpp}}\end{DoxyCompactItemize}

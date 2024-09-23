@@ -1,0 +1,86 @@
+\doxysection{sysio\+::chain\+\_\+apis\+::read\+\_\+write\+::send\+\_\+transaction2\+\_\+params Struct Reference}
+\hypertarget{structsysio_1_1chain__apis_1_1read__write_1_1send__transaction2__params}{}\label{structsysio_1_1chain__apis_1_1read__write_1_1send__transaction2__params}\index{sysio::chain\_apis::read\_write::send\_transaction2\_params@{sysio::chain\_apis::read\_write::send\_transaction2\_params}}
+
+
+{\ttfamily \#include $<$chain\+\_\+plugin.\+hpp$>$}
+
+
+
+Collaboration diagram for sysio\+::chain\+\_\+apis\+::read\+\_\+write\+::send\+\_\+transaction2\+\_\+params\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=227pt]{structsysio_1_1chain__apis_1_1read__write_1_1send__transaction2__params__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__write_1_1send__transaction2__params_a4e0ce7f3510a160c51ab0968d64e9f14}{return\+\_\+failure\+\_\+trace}} = true
+\item 
+bool \mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__write_1_1send__transaction2__params_a79e588f1aff7f521adb56c6327a5fb9d}{retry\+\_\+trx}} = false
+\begin{DoxyCompactList}\small\item\em request transaction retry on validated transaction \end{DoxyCompactList}\item 
+std\+::optional$<$ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} $>$ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__write_1_1send__transaction2__params_a8f0e198ae0bb682cc4537e1dfbf3bccc}{retry\+\_\+trx\+\_\+num\+\_\+blocks}} \{\}
+\begin{DoxyCompactList}\small\item\em if retry\+\_\+trx, report trace at specified blocks from executed or lib if not specified \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__write_1_1send__transaction2__params_a5043f60c5f26b851a9f5e5f7ae8992b2}{transaction}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{chain__plugin_8hpp_source_l00682}{682}} of file \mbox{\hyperlink{chain__plugin_8hpp_source}{chain\+\_\+plugin.\+hpp}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1chain__apis_1_1read__write_1_1send__transaction2__params_a79e588f1aff7f521adb56c6327a5fb9d}\index{sysio::chain\_apis::read\_write::send\_transaction2\_params@{sysio::chain\_apis::read\_write::send\_transaction2\_params}!retry\_trx@{retry\_trx}}
+\index{retry\_trx@{retry\_trx}!sysio::chain\_apis::read\_write::send\_transaction2\_params@{sysio::chain\_apis::read\_write::send\_transaction2\_params}}
+\doxysubsubsection{\texorpdfstring{retry\_trx}{retry\_trx}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain__apis_1_1read__write_1_1send__transaction2__params_a79e588f1aff7f521adb56c6327a5fb9d} 
+bool sysio\+::chain\+\_\+apis\+::read\+\_\+write\+::send\+\_\+transaction2\+\_\+params\+::retry\+\_\+trx = false}
+
+
+
+Definition at line \mbox{\hyperlink{chain__plugin_8hpp_source_l00684}{684}} of file \mbox{\hyperlink{chain__plugin_8hpp_source}{chain\+\_\+plugin.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain__apis_1_1read__write_1_1send__transaction2__params_a8f0e198ae0bb682cc4537e1dfbf3bccc}\index{sysio::chain\_apis::read\_write::send\_transaction2\_params@{sysio::chain\_apis::read\_write::send\_transaction2\_params}!retry\_trx\_num\_blocks@{retry\_trx\_num\_blocks}}
+\index{retry\_trx\_num\_blocks@{retry\_trx\_num\_blocks}!sysio::chain\_apis::read\_write::send\_transaction2\_params@{sysio::chain\_apis::read\_write::send\_transaction2\_params}}
+\doxysubsubsection{\texorpdfstring{retry\_trx\_num\_blocks}{retry\_trx\_num\_blocks}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain__apis_1_1read__write_1_1send__transaction2__params_a8f0e198ae0bb682cc4537e1dfbf3bccc} 
+std\+::optional$<$\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}}$>$ sysio\+::chain\+\_\+apis\+::read\+\_\+write\+::send\+\_\+transaction2\+\_\+params\+::retry\+\_\+trx\+\_\+num\+\_\+blocks \{\}}
+
+
+
+Definition at line \mbox{\hyperlink{chain__plugin_8hpp_source_l00685}{685}} of file \mbox{\hyperlink{chain__plugin_8hpp_source}{chain\+\_\+plugin.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00685\ \{\};\ }
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain__apis_1_1read__write_1_1send__transaction2__params_a4e0ce7f3510a160c51ab0968d64e9f14}\index{sysio::chain\_apis::read\_write::send\_transaction2\_params@{sysio::chain\_apis::read\_write::send\_transaction2\_params}!return\_failure\_trace@{return\_failure\_trace}}
+\index{return\_failure\_trace@{return\_failure\_trace}!sysio::chain\_apis::read\_write::send\_transaction2\_params@{sysio::chain\_apis::read\_write::send\_transaction2\_params}}
+\doxysubsubsection{\texorpdfstring{return\_failure\_trace}{return\_failure\_trace}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain__apis_1_1read__write_1_1send__transaction2__params_a4e0ce7f3510a160c51ab0968d64e9f14} 
+bool sysio\+::chain\+\_\+apis\+::read\+\_\+write\+::send\+\_\+transaction2\+\_\+params\+::return\+\_\+failure\+\_\+trace = true}
+
+
+
+Definition at line \mbox{\hyperlink{chain__plugin_8hpp_source_l00683}{683}} of file \mbox{\hyperlink{chain__plugin_8hpp_source}{chain\+\_\+plugin.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain__apis_1_1read__write_1_1send__transaction2__params_a5043f60c5f26b851a9f5e5f7ae8992b2}\index{sysio::chain\_apis::read\_write::send\_transaction2\_params@{sysio::chain\_apis::read\_write::send\_transaction2\_params}!transaction@{transaction}}
+\index{transaction@{transaction}!sysio::chain\_apis::read\_write::send\_transaction2\_params@{sysio::chain\_apis::read\_write::send\_transaction2\_params}}
+\doxysubsubsection{\texorpdfstring{transaction}{transaction}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain__apis_1_1read__write_1_1send__transaction2__params_a5043f60c5f26b851a9f5e5f7ae8992b2} 
+\mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} sysio\+::chain\+\_\+apis\+::read\+\_\+write\+::send\+\_\+transaction2\+\_\+params\+::transaction}
+
+
+
+Definition at line \mbox{\hyperlink{chain__plugin_8hpp_source_l00686}{686}} of file \mbox{\hyperlink{chain__plugin_8hpp_source}{chain\+\_\+plugin.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+plugins/chain\+\_\+plugin/include/sysio/chain\+\_\+plugin/\mbox{\hyperlink{chain__plugin_8hpp}{chain\+\_\+plugin.\+hpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,53 @@
+\doxysection{libraries/sys-\/vm/external/\+Catch2/include/internal/catch\+\_\+string\+\_\+manip.cpp File Reference}
+\hypertarget{catch__string__manip_8cpp}{}\label{catch__string__manip_8cpp}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_string\_manip.cpp@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_string\_manip.cpp}}
+{\ttfamily \#include "{}catch\+\_\+string\+\_\+manip.\+h"{}}\newline
+{\ttfamily \#include "{}catch\+\_\+stringref.\+h"{}}\newline
+{\ttfamily \#include $<$algorithm$>$}\newline
+{\ttfamily \#include $<$ostream$>$}\newline
+{\ttfamily \#include $<$cstring$>$}\newline
+{\ttfamily \#include $<$cctype$>$}\newline
+{\ttfamily \#include $<$vector$>$}\newline
+Include dependency graph for catch\+\_\+string\+\_\+manip.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{catch__string__manip_8cpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=226pt]{catch__string__manip_8cpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespace_catch}{Catch}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{namespace_catch_a695f62327be0676e046291eeaae15110}{Catch\+::starts\+With}} (std\+::string const \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, std\+::string const \&prefix)
+\item 
+bool \mbox{\hyperlink{namespace_catch_acad23751846ac23d0f379e34f5adebb1}{Catch\+::starts\+With}} (std\+::string const \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, char prefix)
+\item 
+bool \mbox{\hyperlink{namespace_catch_ada025504f627feaf9ac68ca391515dff}{Catch\+::ends\+With}} (std\+::string const \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, std\+::string const \&suffix)
+\item 
+bool \mbox{\hyperlink{namespace_catch_afd801a3e33fd7a8b91ded0d02747a93f}{Catch\+::ends\+With}} (std\+::string const \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, char suffix)
+\item 
+bool \mbox{\hyperlink{namespace_catch_aa52974b0e426e7e2fbd725a900e9c36e}{Catch\+::contains}} (std\+::string const \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, std\+::string const \&infix)
+\item 
+void \mbox{\hyperlink{namespace_catch_a0760dbe87d090a55a35414db57d272c4}{Catch\+::to\+Lower\+In\+Place}} (std\+::string \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\item 
+std\+::string \mbox{\hyperlink{namespace_catch_ac036a17412d318598ffda8e1fe7a1177}{Catch\+::to\+Lower}} (std\+::string const \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\item 
+std\+::string \mbox{\hyperlink{namespace_catch_a084108b47f37d8bfd5db51c50c7451b3}{Catch\+::trim}} (std\+::string const \&str)
+\item 
+bool \mbox{\hyperlink{namespace_catch_afe4e6770da547e43e9e4eeaa05f946ea}{Catch\+::replace\+In\+Place}} (std\+::string \&str, std\+::string const \&replace\+This, std\+::string const \&with\+This)
+\item 
+std\+::vector$<$ \mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} $>$ \mbox{\hyperlink{namespace_catch_a678e3c779388970bb3ec5802245f93d7}{Catch\+::split\+String\+Ref}} (\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} str, char delimiter)
+\item 
+std\+::ostream \& \mbox{\hyperlink{namespace_catch_a27d46b1ac4a1956660e4e9361c4835b8}{Catch\+::operator$<$$<$}} (std\+::ostream \&os, \mbox{\hyperlink{struct_catch_1_1pluralise}{pluralise}} const \&pluraliser)
+\end{DoxyCompactItemize}

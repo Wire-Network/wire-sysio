@@ -1,0 +1,208 @@
+\doxysection{sysio\+::vm\+::jit\+\_\+allocator Class Reference}
+\hypertarget{classsysio_1_1vm_1_1jit__allocator}{}\label{classsysio_1_1vm_1_1jit__allocator}\index{sysio::vm::jit\_allocator@{sysio::vm::jit\_allocator}}
+
+
+{\ttfamily \#include $<$allocator.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classsysio_1_1vm_1_1jit__allocator_a6a8f74933109f1f2331ea038482f9b41}{alloc}} (std\+::size\+\_\+t size)
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1jit__allocator_a602363acba307fbc4e06fb7bab007f82}{free}} (void \texorpdfstring{$\ast$}{*}ptr) noexcept
+\item 
+void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classsysio_1_1vm_1_1jit__allocator_a6a8f74933109f1f2331ea038482f9b41}{alloc}} (std\+::size\+\_\+t size)
+\item 
+void \mbox{\hyperlink{classsysio_1_1vm_1_1jit__allocator_a602363acba307fbc4e06fb7bab007f82}{free}} (void \texorpdfstring{$\ast$}{*}ptr) noexcept
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static \mbox{\hyperlink{classsysio_1_1vm_1_1jit__allocator}{jit\+\_\+allocator}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1jit__allocator_a3f0facc0b61e7eac38b41c15db4c4f00}{instance}} ()
+\item 
+static \mbox{\hyperlink{classsysio_1_1vm_1_1jit__allocator}{jit\+\_\+allocator}} \& \mbox{\hyperlink{classsysio_1_1vm_1_1jit__allocator_a3f0facc0b61e7eac38b41c15db4c4f00}{instance}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{vm_2allocator_8hpp_source_l00126}{126}} of file \mbox{\hyperlink{vm_2allocator_8hpp_source}{allocator.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1vm_1_1jit__allocator_a6a8f74933109f1f2331ea038482f9b41}\index{sysio::vm::jit\_allocator@{sysio::vm::jit\_allocator}!alloc@{alloc}}
+\index{alloc@{alloc}!sysio::vm::jit\_allocator@{sysio::vm::jit\_allocator}}
+\doxysubsubsection{\texorpdfstring{alloc()}{alloc()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1jit__allocator_a6a8f74933109f1f2331ea038482f9b41} 
+void \texorpdfstring{$\ast$}{*} sysio\+::vm\+::jit\+\_\+allocator\+::alloc (\begin{DoxyParamCaption}\item[{std\+::size\+\_\+t}]{size}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2allocator_8hpp_source_l00130}{130}} of file \mbox{\hyperlink{sysio_2vm_2allocator_8hpp_source}{allocator.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ std::lock\_guard\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}\{\_mutex\};}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ size\ =\ round\_to\_page(size);}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ best\ =\ free\_blocks\_by\_size.lower\_bound(size);}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(best\ ==\ free\_blocks\_by\_size.end())\ \{}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \ \ \ \ best\ =\ allocate\_segment(size);}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (best-\/>first\ >\ size)\ \{}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \ \ \ \ best\ =\ split\_block(best,\ size);}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \ transfer\_node(free\_blocks,\ allocated\_blocks,\ best-\/>second);}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \ best\ =\ transfer\_node(free\_blocks\_by\_size,\ allocated\_blocks\_by\_size,\ *best);}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ best-\/>second;}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1jit__allocator_a6a8f74933109f1f2331ea038482f9b41}\index{sysio::vm::jit\_allocator@{sysio::vm::jit\_allocator}!alloc@{alloc}}
+\index{alloc@{alloc}!sysio::vm::jit\_allocator@{sysio::vm::jit\_allocator}}
+\doxysubsubsection{\texorpdfstring{alloc()}{alloc()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1jit__allocator_a6a8f74933109f1f2331ea038482f9b41} 
+void \texorpdfstring{$\ast$}{*} sysio\+::vm\+::jit\+\_\+allocator\+::alloc (\begin{DoxyParamCaption}\item[{std\+::size\+\_\+t}]{size}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2allocator_8hpp_source_l00130}{130}} of file \mbox{\hyperlink{vm_2allocator_8hpp_source}{allocator.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ std::lock\_guard\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}\{\_mutex\};}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ size\ =\ round\_to\_page(size);}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ best\ =\ free\_blocks\_by\_size.lower\_bound(size);}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(best\ ==\ free\_blocks\_by\_size.end())\ \{}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \ \ \ \ best\ =\ allocate\_segment(size);}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (best-\/>first\ >\ size)\ \{}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \ \ \ \ best\ =\ split\_block(best,\ size);}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \ transfer\_node(free\_blocks,\ allocated\_blocks,\ best-\/>second);}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \ best\ =\ transfer\_node(free\_blocks\_by\_size,\ allocated\_blocks\_by\_size,\ *best);}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ best-\/>second;}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1jit__allocator_a602363acba307fbc4e06fb7bab007f82}\index{sysio::vm::jit\_allocator@{sysio::vm::jit\_allocator}!free@{free}}
+\index{free@{free}!sysio::vm::jit\_allocator@{sysio::vm::jit\_allocator}}
+\doxysubsubsection{\texorpdfstring{free()}{free()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1jit__allocator_a602363acba307fbc4e06fb7bab007f82} 
+void sysio\+::vm\+::jit\+\_\+allocator\+::free (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{ptr}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2allocator_8hpp_source_l00145}{145}} of file \mbox{\hyperlink{sysio_2vm_2allocator_8hpp_source}{allocator.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \ std::lock\_guard\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}\{\_mutex\};}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ pos\ =\ transfer\_node(allocated\_blocks,\ free\_blocks,\ ptr);}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \ transfer\_node(allocated\_blocks\_by\_size,\ free\_blocks\_by\_size,\ \{pos-\/>second,\ pos-\/>first\});}
+\DoxyCodeLine{00149\ }
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ merge\ the\ freed\ block\ with\ adjacent\ free\ blocks}}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(pos\ !=\ free\_blocks.begin())\ \{}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ prev\ =\ pos;}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \ \ \ \ -\/-\/prev;}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \ \ \ \ pos\ =\ maybe\_consolidate\_blocks(prev,\ pos);}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}}\ =\ pos;}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \ ++\mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}};}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (next\ !=\ free\_blocks.end())\ \{}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \ \ \ \ maybe\_consolidate\_blocks(pos,\ next);}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=339pt]{classsysio_1_1vm_1_1jit__allocator_a602363acba307fbc4e06fb7bab007f82_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1jit__allocator_a602363acba307fbc4e06fb7bab007f82}\index{sysio::vm::jit\_allocator@{sysio::vm::jit\_allocator}!free@{free}}
+\index{free@{free}!sysio::vm::jit\_allocator@{sysio::vm::jit\_allocator}}
+\doxysubsubsection{\texorpdfstring{free()}{free()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1jit__allocator_a602363acba307fbc4e06fb7bab007f82} 
+void sysio\+::vm\+::jit\+\_\+allocator\+::free (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{ptr}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2allocator_8hpp_source_l00145}{145}} of file \mbox{\hyperlink{vm_2allocator_8hpp_source}{allocator.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \ std::lock\_guard\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}\{\_mutex\};}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ pos\ =\ transfer\_node(allocated\_blocks,\ free\_blocks,\ ptr);}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \ transfer\_node(allocated\_blocks\_by\_size,\ free\_blocks\_by\_size,\ \{pos-\/>second,\ pos-\/>first\});}
+\DoxyCodeLine{00149\ }
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ merge\ the\ freed\ block\ with\ adjacent\ free\ blocks}}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(pos\ !=\ free\_blocks.begin())\ \{}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ prev\ =\ pos;}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \ \ \ \ -\/-\/prev;}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \ \ \ \ pos\ =\ maybe\_consolidate\_blocks(prev,\ pos);}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}}\ =\ pos;}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \ ++\mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}};}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (next\ !=\ free\_blocks.end())\ \{}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \ \ \ \ maybe\_consolidate\_blocks(pos,\ next);}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1vm_1_1jit__allocator_a3f0facc0b61e7eac38b41c15db4c4f00}\index{sysio::vm::jit\_allocator@{sysio::vm::jit\_allocator}!instance@{instance}}
+\index{instance@{instance}!sysio::vm::jit\_allocator@{sysio::vm::jit\_allocator}}
+\doxysubsubsection{\texorpdfstring{instance()}{instance()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1jit__allocator_a3f0facc0b61e7eac38b41c15db4c4f00} 
+static \mbox{\hyperlink{classsysio_1_1vm_1_1jit__allocator}{jit\+\_\+allocator}} \& sysio\+::vm\+::jit\+\_\+allocator\+::instance (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2allocator_8hpp_source_l00162}{162}} of file \mbox{\hyperlink{sysio_2vm_2allocator_8hpp_source}{allocator.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ jit\_allocator\ the\_jit\_allocator;}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ the\_jit\_allocator;}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1vm_1_1jit__allocator_a3f0facc0b61e7eac38b41c15db4c4f00_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1jit__allocator_a3f0facc0b61e7eac38b41c15db4c4f00}\index{sysio::vm::jit\_allocator@{sysio::vm::jit\_allocator}!instance@{instance}}
+\index{instance@{instance}!sysio::vm::jit\_allocator@{sysio::vm::jit\_allocator}}
+\doxysubsubsection{\texorpdfstring{instance()}{instance()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1jit__allocator_a3f0facc0b61e7eac38b41c15db4c4f00} 
+static \mbox{\hyperlink{classsysio_1_1vm_1_1jit__allocator}{jit\+\_\+allocator}} \& sysio\+::vm\+::jit\+\_\+allocator\+::instance (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2allocator_8hpp_source_l00162}{162}} of file \mbox{\hyperlink{vm_2allocator_8hpp_source}{allocator.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ jit\_allocator\ the\_jit\_allocator;}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ the\_jit\_allocator;}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/include/sysio/sysio/vm/\mbox{\hyperlink{sysio_2vm_2allocator_8hpp}{allocator.\+hpp}}\item 
+libraries/sys-\/vm/include/sysio/vm/\mbox{\hyperlink{vm_2allocator_8hpp}{allocator.\+hpp}}\end{DoxyCompactItemize}

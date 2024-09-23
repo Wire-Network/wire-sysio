@@ -1,0 +1,87 @@
+\doxysection{softfloat\+\_\+types.\+h}
+\hypertarget{softfloat_2source_2include_2softfloat__types_8h_source}{}\label{softfloat_2source_2include_2softfloat__types_8h_source}\index{libraries/softfloat/source/include/softfloat\_types.h@{libraries/softfloat/source/include/softfloat\_types.h}}
+\mbox{\hyperlink{softfloat_2source_2include_2softfloat__types_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00001}00001\ }
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00002}00002\ \textcolor{comment}{/*============================================================================}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00003}00003\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00004}00004\ \textcolor{comment}{This\ C\ header\ file\ is\ part\ of\ the\ SoftFloat\ IEEE\ Floating-\/Point\ Arithmetic}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00005}00005\ \textcolor{comment}{Package,\ Release\ 3e,\ by\ John\ R.\ Hauser.}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00006}00006\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00007}00007\ \textcolor{comment}{Copyright\ 2011,\ 2012,\ 2013,\ 2014,\ 2015,\ 2017\ The\ Regents\ of\ the\ University\ of}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00008}00008\ \textcolor{comment}{California.\ \ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00009}00009\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00010}00010\ \textcolor{comment}{Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00011}00011\ \textcolor{comment}{modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are\ met:}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00012}00012\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00013}00013\ \textcolor{comment}{\ 1.\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright\ notice,}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00014}00014\ \textcolor{comment}{\ \ \ \ this\ list\ of\ conditions,\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00015}00015\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00016}00016\ \textcolor{comment}{\ 2.\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above\ copyright\ notice,}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00017}00017\ \textcolor{comment}{\ \ \ \ this\ list\ of\ conditions,\ and\ the\ following\ disclaimer\ in\ the\ documentation}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00018}00018\ \textcolor{comment}{\ \ \ \ and/or\ other\ materials\ provided\ with\ the\ distribution.}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00019}00019\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00020}00020\ \textcolor{comment}{\ 3.\ Neither\ the\ name\ of\ the\ University\ nor\ the\ names\ of\ its\ contributors\ may}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00021}00021\ \textcolor{comment}{\ \ \ \ be\ used\ to\ endorse\ or\ promote\ products\ derived\ from\ this\ software\ without}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00022}00022\ \textcolor{comment}{\ \ \ \ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00023}00023\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00024}00024\ \textcolor{comment}{THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ REGENTS\ AND\ CONTRIBUTORS\ "{}AS\ IS"{},\ AND\ ANY}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00025}00025\ \textcolor{comment}{EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ THE\ IMPLIED}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00026}00026\ \textcolor{comment}{WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR\ A\ PARTICULAR\ PURPOSE,\ ARE}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00027}00027\ \textcolor{comment}{DISCLAIMED.\ \ IN\ NO\ EVENT\ SHALL\ THE\ REGENTS\ OR\ CONTRIBUTORS\ BE\ LIABLE\ FOR\ ANY}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00028}00028\ \textcolor{comment}{DIRECT,\ INDIRECT,\ INCIDENTAL,\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00029}00029\ \textcolor{comment}{(INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00030}00030\ \textcolor{comment}{LOSS\ OF\ USE,\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00031}00031\ \textcolor{comment}{ON\ ANY\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00032}00032\ \textcolor{comment}{(INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE\ OF\ THIS}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00033}00033\ \textcolor{comment}{SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00034}00034\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00035}00035\ \textcolor{comment}{=============================================================================*/}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00037}00037\ \textcolor{preprocessor}{\#ifndef\ softfloat\_types\_h}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00038}00038\ \textcolor{preprocessor}{\#define\ softfloat\_types\_h\ 1}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00040}00040\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{stdint_8h}{stdint.h}}>}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00042}00042\ \textcolor{comment}{/*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00043}00043\ \textcolor{comment}{|\ Types\ used\ to\ pass\ 16-\/bit,\ 32-\/bit,\ 64-\/bit,\ and\ 128-\/bit\ floating-\/point}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00044}00044\ \textcolor{comment}{|\ arguments\ and\ results\ to/from\ functions.\ \ These\ types\ must\ be\ exactly}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00045}00045\ \textcolor{comment}{|\ 16\ bits,\ 32\ bits,\ 64\ bits,\ and\ 128\ bits\ in\ size,\ respectively.\ \ Where\ a}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00046}00046\ \textcolor{comment}{|\ platform\ has\ "{}native"{}\ support\ for\ IEEE-\/Standard\ floating-\/point\ formats,}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00047}00047\ \textcolor{comment}{|\ the\ types\ below\ may,\ if\ desired,\ be\ defined\ as\ aliases\ for\ the\ native\ types}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00048}00048\ \textcolor{comment}{|\ (typically\ 'float'\ and\ 'double',\ and\ possibly\ 'long\ double').}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00049}00049\ \textcolor{comment}{*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*/}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00050}\mbox{\hyperlink{structfloat16__t_af4449b76c5734827c0a3a04f89ef9597}{00050}}\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{\ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ \mbox{\hyperlink{structfloat16__t_af4449b76c5734827c0a3a04f89ef9597}{v}};\ \}\ \mbox{\hyperlink{structfloat16__t}{float16\_t}};}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00051}\mbox{\hyperlink{structfloat32__t_a2f545fc2325b5e603191faca9ebde4b0}{00051}}\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{structfloat32__t_a2f545fc2325b5e603191faca9ebde4b0}{v}};\ \}\ \mbox{\hyperlink{structfloat32__t}{float32\_t}};}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00052}\mbox{\hyperlink{structfloat64__t_aa159a2b9284da76c25cb09ef68627628}{00052}}\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{structfloat64__t_aa159a2b9284da76c25cb09ef68627628}{v}};\ \}\ \mbox{\hyperlink{structfloat64__t}{float64\_t}};}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00053}\mbox{\hyperlink{structfloat128__t_aa8716185299a33f00f9d02adea7906c2}{00053}}\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ v[2];\ \}\ \mbox{\hyperlink{structfloat128__t}{float128\_t}};}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00054}00054\ }
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00055}00055\ \textcolor{comment}{/*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00056}00056\ \textcolor{comment}{|\ The\ format\ of\ an\ 80-\/bit\ extended\ floating-\/point\ number\ in\ memory.\ \ This}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00057}00057\ \textcolor{comment}{|\ structure\ must\ contain\ a\ 16-\/bit\ field\ named\ 'signExp'\ and\ a\ 64-\/bit\ field}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00058}00058\ \textcolor{comment}{|\ named\ 'signif'.}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00059}00059\ \textcolor{comment}{*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*/}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00060}00060\ \textcolor{preprocessor}{\#ifdef\ LITTLEENDIAN}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00061}00061\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structext_float80_m}{extFloat80M}}\ \{\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{structext_float80_m_ac0c736880d01d0abd0a818e658755b3b}{signif}};\ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ \mbox{\hyperlink{structext_float80_m_afcc87c4645279344c5365a291766afe2}{signExp}};\ \};}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00062}00062\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00063}\mbox{\hyperlink{structext_float80_m_afcc87c4645279344c5365a291766afe2}{00063}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structext_float80_m}{extFloat80M}}\ \{\ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ \mbox{\hyperlink{structext_float80_m_afcc87c4645279344c5365a291766afe2}{signExp}};\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{structext_float80_m_ac0c736880d01d0abd0a818e658755b3b}{signif}};\ \};}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00064}00064\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00066}00066\ \textcolor{comment}{/*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00067}00067\ \textcolor{comment}{|\ The\ type\ used\ to\ pass\ 80-\/bit\ extended\ floating-\/point\ arguments\ and}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00068}00068\ \textcolor{comment}{|\ results\ to/from\ functions.\ \ This\ type\ must\ have\ size\ identical\ to}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00069}00069\ \textcolor{comment}{|\ 'struct\ extFloat80M'.\ \ Type\ 'extFloat80\_t'\ can\ be\ defined\ as\ an\ alias\ for}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00070}00070\ \textcolor{comment}{|\ 'struct\ extFloat80M'.\ \ Alternatively,\ if\ a\ platform\ has\ "{}native"{}\ support}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00071}00071\ \textcolor{comment}{|\ for\ IEEE-\/Standard\ 80-\/bit\ extended\ floating-\/point,\ it\ may\ be\ possible,}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00072}00072\ \textcolor{comment}{|\ if\ desired,\ to\ define\ 'extFloat80\_t'\ as\ an\ alias\ for\ the\ native\ type}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00073}00073\ \textcolor{comment}{|\ (presumably\ either\ 'long\ double'\ or\ a\ nonstandard\ compiler-\/intrinsic\ type).}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00074}00074\ \textcolor{comment}{|\ In\ that\ case,\ the\ 'signif'\ and\ 'signExp'\ fields\ of\ 'struct\ extFloat80M'}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00075}00075\ \textcolor{comment}{|\ must\ align\ exactly\ with\ the\ locations\ in\ memory\ of\ the\ sign,\ exponent,\ and}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00076}00076\ \textcolor{comment}{|\ significand\ of\ the\ native\ type.}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00077}00077\ \textcolor{comment}{*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*/}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00078}\mbox{\hyperlink{softfloat_2source_2include_2softfloat__types_8h_ae6c67a307cbc8664adc4f1966a3e71f6}{00078}}\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structext_float80_m}{extFloat80M}}\ \mbox{\hyperlink{structext_float80_m}{extFloat80\_t}};}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00080}00080\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{softfloat_2source_2include_2softfloat__types_8h_source_l00081}00081\ }
+
+\end{DoxyCode}

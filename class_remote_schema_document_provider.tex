@@ -1,0 +1,161 @@
+\doxysection{Remote\+Schema\+Document\+Provider\texorpdfstring{$<$}{<} Schema\+Document\+Type \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{class_remote_schema_document_provider}{}\label{class_remote_schema_document_provider}\index{RemoteSchemaDocumentProvider$<$ SchemaDocumentType $>$@{RemoteSchemaDocumentProvider$<$ SchemaDocumentType $>$}}
+
+
+Inheritance diagram for Remote\+Schema\+Document\+Provider\texorpdfstring{$<$}{<} Schema\+Document\+Type \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=248pt]{class_remote_schema_document_provider__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Remote\+Schema\+Document\+Provider\texorpdfstring{$<$}{<} Schema\+Document\+Type \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=248pt]{class_remote_schema_document_provider__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_remote_schema_document_provider_ab1881e7a19c67977bd7050fa9eb347d6}{Remote\+Schema\+Document\+Provider}} ()
+\item 
+\mbox{\hyperlink{class_remote_schema_document_provider_a07cbbfd23249c434950372adc2dc6c04}{\texorpdfstring{$\sim$}{\string~}\+Remote\+Schema\+Document\+Provider}} ()
+\item 
+virtual const Schema\+Document\+Type \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_remote_schema_document_provider_a4a314b22053aef8c28ffecbf910f868b}{Get\+Remote\+Document}} (const char \texorpdfstring{$\ast$}{*}uri, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} length)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{class_i_generic_remote_schema_document_provider}{IGeneric\+Remote\+Schema\+Document\+Provider$<$ Schema\+Document $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{class_i_generic_remote_schema_document_provider_a8465954888b127a2ef966ed01c3692bb}{\texorpdfstring{$\sim$}{\string~}\+IGeneric\+Remote\+Schema\+Document\+Provider}} ()
+\item 
+virtual const \mbox{\hyperlink{fwd_8h_a05c97278ec100471e77a4d678957701b}{Schema\+Document}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_i_generic_remote_schema_document_provider_af348980f793d9777abb9b7b6afcbfd93}{Get\+Remote\+Document}} (const \mbox{\hyperlink{class_i_generic_remote_schema_document_provider_a4c9d9e4f9cc09bbc6af93f3cf5eed55e}{Ch}} \texorpdfstring{$\ast$}{*}uri, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} length)=0
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Public Types inherited from \mbox{\hyperlink{class_i_generic_remote_schema_document_provider}{IGeneric\+Remote\+Schema\+Document\+Provider$<$ Schema\+Document $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{class_generic_schema_document_a6b332c3539416c99a72b1e6866f8f9c4}{Schema\+Document\+::\+Ch}} \mbox{\hyperlink{class_i_generic_remote_schema_document_provider_a4c9d9e4f9cc09bbc6af93f3cf5eed55e}{Ch}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Schema\+Document\+Type = Schema\+Document$>$\newline
+class Remote\+Schema\+Document\+Provider$<$ Schema\+Document\+Type $>$}
+
+
+Definition at line \mbox{\hyperlink{unittest_2schematest_8cpp_source_l01702}{1702}} of file \mbox{\hyperlink{unittest_2schematest_8cpp_source}{schematest.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_remote_schema_document_provider_ab1881e7a19c67977bd7050fa9eb347d6}\index{RemoteSchemaDocumentProvider$<$ SchemaDocumentType $>$@{RemoteSchemaDocumentProvider$<$ SchemaDocumentType $>$}!RemoteSchemaDocumentProvider@{RemoteSchemaDocumentProvider}}
+\index{RemoteSchemaDocumentProvider@{RemoteSchemaDocumentProvider}!RemoteSchemaDocumentProvider$<$ SchemaDocumentType $>$@{RemoteSchemaDocumentProvider$<$ SchemaDocumentType $>$}}
+\doxysubsubsection{\texorpdfstring{RemoteSchemaDocumentProvider()}{RemoteSchemaDocumentProvider()}}
+{\footnotesize\ttfamily \label{class_remote_schema_document_provider_ab1881e7a19c67977bd7050fa9eb347d6} 
+template$<$typename Schema\+Document\+Type  = Schema\+Document$>$ \\
+\mbox{\hyperlink{class_remote_schema_document_provider}{Remote\+Schema\+Document\+Provider}}$<$ Schema\+Document\+Type $>$\mbox{\hyperlink{class_remote_schema_document_provider}{\+::\+Remote\+Schema\+Document\+Provider}} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{unittest_2schematest_8cpp_source_l01704}{1704}} of file \mbox{\hyperlink{unittest_2schematest_8cpp_source}{schematest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01704\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ }
+\DoxyCodeLine{01705\ \ \ \ \ \ \ \ \ documentAllocator\_(documentBuffer\_,\ \textcolor{keyword}{sizeof}(documentBuffer\_)),\ }
+\DoxyCodeLine{01706\ \ \ \ \ \ \ \ \ schemaAllocator\_(schemaBuffer\_,\ \textcolor{keyword}{sizeof}(schemaBuffer\_))\ }
+\DoxyCodeLine{01707\ \ \ \ \ \{}
+\DoxyCodeLine{01708\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ filenames[kCount]\ =\ \{}
+\DoxyCodeLine{01709\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}jsonschema/remotes/integer.json"{}},}
+\DoxyCodeLine{01710\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}jsonschema/remotes/subSchemas.json"{}},}
+\DoxyCodeLine{01711\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}jsonschema/remotes/folder/folderInteger.json"{}},}
+\DoxyCodeLine{01712\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}draft-\/04/schema"{}}}
+\DoxyCodeLine{01713\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{01714\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ uris[kCount]\ =\ \{}
+\DoxyCodeLine{01715\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}http://localhost:1234/integer.json"{}},}
+\DoxyCodeLine{01716\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}http://localhost:1234/subSchemas.json"{}},}
+\DoxyCodeLine{01717\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}http://localhost:1234/folder/folderInteger.json"{}},}
+\DoxyCodeLine{01718\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}http://json-\/schema.org/draft-\/04/schema"{}}}
+\DoxyCodeLine{01719\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{01720\ }
+\DoxyCodeLine{01721\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ kCount;\ i++)\ \{}
+\DoxyCodeLine{01722\ \ \ \ \ \ \ \ \ \ \ \ \ sd\_[i]\ =\ 0;}
+\DoxyCodeLine{01723\ }
+\DoxyCodeLine{01724\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ jsonBuffer[8192];}
+\DoxyCodeLine{01725\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_memory_pool_allocator}{MemoryPoolAllocator<>}}\ jsonAllocator(jsonBuffer,\ \textcolor{keyword}{sizeof}(jsonBuffer));}
+\DoxyCodeLine{01726\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}*\ json\ =\ ReadFile(filenames[i],\ jsonAllocator);}
+\DoxyCodeLine{01727\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!json)\ \{}
+\DoxyCodeLine{01728\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}json\ remote\ file\ \%s\ not\ found"{}},\ filenames[i]);}
+\DoxyCodeLine{01729\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_adc16b5b0a740c39084ea5c9e960e3063}{ADD\_FAILURE}}();}
+\DoxyCodeLine{01730\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01731\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{01732\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ stackBuffer[4096];}
+\DoxyCodeLine{01733\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_memory_pool_allocator}{MemoryPoolAllocator<>}}\ stackAllocator(stackBuffer,\ \textcolor{keyword}{sizeof}(stackBuffer));}
+\DoxyCodeLine{01734\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ DocumentType\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}(\&documentAllocator\_,\ 1024,\ \&stackAllocator);}
+\DoxyCodeLine{01735\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.Parse(json);}
+\DoxyCodeLine{01736\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sd\_[i]\ =\ \textcolor{keyword}{new}\ SchemaDocumentType(d,\ uris[i],\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\textcolor{keyword}{>}(strlen(uris[i])),\ 0,\ \&schemaAllocator\_);}
+\DoxyCodeLine{01737\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_memory_pool_allocator_a6b180eb150451b4df8b70d827cd1191c}{MemoryPoolAllocator<>::Free}}(json);}
+\DoxyCodeLine{01738\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01739\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{01740\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_remote_schema_document_provider_ab1881e7a19c67977bd7050fa9eb347d6_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_remote_schema_document_provider_a07cbbfd23249c434950372adc2dc6c04}\index{RemoteSchemaDocumentProvider$<$ SchemaDocumentType $>$@{RemoteSchemaDocumentProvider$<$ SchemaDocumentType $>$}!````~RemoteSchemaDocumentProvider@{\texorpdfstring{$\sim$}{\string~}RemoteSchemaDocumentProvider}}
+\index{````~RemoteSchemaDocumentProvider@{\texorpdfstring{$\sim$}{\string~}RemoteSchemaDocumentProvider}!RemoteSchemaDocumentProvider$<$ SchemaDocumentType $>$@{RemoteSchemaDocumentProvider$<$ SchemaDocumentType $>$}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}RemoteSchemaDocumentProvider()}{\string~RemoteSchemaDocumentProvider()}}
+{\footnotesize\ttfamily \label{class_remote_schema_document_provider_a07cbbfd23249c434950372adc2dc6c04} 
+template$<$typename Schema\+Document\+Type  = Schema\+Document$>$ \\
+\mbox{\hyperlink{class_remote_schema_document_provider}{Remote\+Schema\+Document\+Provider}}$<$ Schema\+Document\+Type $>$\+::\texorpdfstring{$\sim$}{\string~}\mbox{\hyperlink{class_remote_schema_document_provider}{Remote\+Schema\+Document\+Provider}} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{unittest_2schematest_8cpp_source_l01742}{1742}} of file \mbox{\hyperlink{unittest_2schematest_8cpp_source}{schematest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01742\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01743\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ kCount;\ i++)}
+\DoxyCodeLine{01744\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{delete}\ sd\_[i];}
+\DoxyCodeLine{01745\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_remote_schema_document_provider_a4a314b22053aef8c28ffecbf910f868b}\index{RemoteSchemaDocumentProvider$<$ SchemaDocumentType $>$@{RemoteSchemaDocumentProvider$<$ SchemaDocumentType $>$}!GetRemoteDocument@{GetRemoteDocument}}
+\index{GetRemoteDocument@{GetRemoteDocument}!RemoteSchemaDocumentProvider$<$ SchemaDocumentType $>$@{RemoteSchemaDocumentProvider$<$ SchemaDocumentType $>$}}
+\doxysubsubsection{\texorpdfstring{GetRemoteDocument()}{GetRemoteDocument()}}
+{\footnotesize\ttfamily \label{class_remote_schema_document_provider_a4a314b22053aef8c28ffecbf910f868b} 
+template$<$typename Schema\+Document\+Type  = Schema\+Document$>$ \\
+virtual const Schema\+Document\+Type \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_remote_schema_document_provider}{Remote\+Schema\+Document\+Provider}}$<$ Schema\+Document\+Type $>$\+::\+Get\+Remote\+Document (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{uri}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{length}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{unittest_2schematest_8cpp_source_l01747}{1747}} of file \mbox{\hyperlink{unittest_2schematest_8cpp_source}{schematest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01747\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01748\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ kCount;\ i++)}
+\DoxyCodeLine{01749\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{typename}\ SchemaDocumentType::URIType(uri,\ length)\ ==\ sd\_[i]-\/>GetURI())}
+\DoxyCodeLine{01750\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ sd\_[i];}
+\DoxyCodeLine{01751\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{01752\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/test/unittest/\mbox{\hyperlink{unittest_2schematest_8cpp}{schematest.\+cpp}}\end{DoxyCompactItemize}

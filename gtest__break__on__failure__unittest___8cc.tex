@@ -1,0 +1,61 @@
+\doxysection{libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/test/gtest\+\_\+break\+\_\+on\+\_\+failure\+\_\+unittest\+\_\+.cc File Reference}
+\hypertarget{gtest__break__on__failure__unittest___8cc}{}\label{gtest__break__on__failure__unittest___8cc}\index{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/test/gtest\_break\_on\_failure\_unittest\_.cc@{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/test/gtest\_break\_on\_failure\_unittest\_.cc}}
+{\ttfamily \#include "{}gtest/gtest.\+h"{}}\newline
+Include dependency graph for gtest\+\_\+break\+\_\+on\+\_\+failure\+\_\+unittest\+\_\+.\+cc\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{gtest__break__on__failure__unittest___8cc__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{gtest__break__on__failure__unittest___8cc_a3c04138a5bfe5d72780bb7e82a18e627}{main}} (int argc, char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{gtest__break__on__failure__unittest___8cc_a3c04138a5bfe5d72780bb7e82a18e627}\index{gtest\_break\_on\_failure\_unittest\_.cc@{gtest\_break\_on\_failure\_unittest\_.cc}!main@{main}}
+\index{main@{main}!gtest\_break\_on\_failure\_unittest\_.cc@{gtest\_break\_on\_failure\_unittest\_.cc}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{gtest__break__on__failure__unittest___8cc_a3c04138a5bfe5d72780bb7e82a18e627} 
+int main (\begin{DoxyParamCaption}\item[{int}]{argc}{, }\item[{char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{argv}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest__break__on__failure__unittest___8cc_source_l00066}{66}} of file \mbox{\hyperlink{gtest__break__on__failure__unittest___8cc_source}{gtest\+\_\+break\+\_\+on\+\_\+failure\+\_\+unittest\+\_\+.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00067\ \textcolor{preprocessor}{\#if\ GTEST\_OS\_WINDOWS}}
+\DoxyCodeLine{00068\ \ \ \textcolor{comment}{//\ Suppresses\ display\ of\ the\ Windows\ error\ dialog\ upon\ encountering}}
+\DoxyCodeLine{00069\ \ \ \textcolor{comment}{//\ a\ general\ protection\ fault\ (segment\ violation).}}
+\DoxyCodeLine{00070\ \ \ SetErrorMode(SEM\_NOGPFAULTERRORBOX\ |\ SEM\_FAILCRITICALERRORS);}
+\DoxyCodeLine{00071\ }
+\DoxyCodeLine{00072\ \textcolor{preprocessor}{\#\ if\ GTEST\_HAS\_SEH\ \&\&\ !GTEST\_OS\_WINDOWS\_MOBILE}}
+\DoxyCodeLine{00073\ }
+\DoxyCodeLine{00074\ \ \ \textcolor{comment}{//\ The\ default\ unhandled\ exception\ filter\ does\ not\ always\ exit}}
+\DoxyCodeLine{00075\ \ \ \textcolor{comment}{//\ with\ the\ exception\ code\ as\ exit\ code\ -\/\ for\ example\ it\ exits\ with}}
+\DoxyCodeLine{00076\ \ \ \textcolor{comment}{//\ 0\ for\ EXCEPTION\_ACCESS\_VIOLATION\ and\ 1\ for\ EXCEPTION\_BREAKPOINT}}
+\DoxyCodeLine{00077\ \ \ \textcolor{comment}{//\ if\ the\ application\ is\ compiled\ in\ debug\ mode.\ Thus\ we\ use\ our\ own}}
+\DoxyCodeLine{00078\ \ \ \textcolor{comment}{//\ filter\ which\ always\ exits\ with\ the\ exception\ code\ for\ unhandled}}
+\DoxyCodeLine{00079\ \ \ \textcolor{comment}{//\ exceptions.}}
+\DoxyCodeLine{00080\ \ \ SetUnhandledExceptionFilter(ExitWithExceptionCode);}
+\DoxyCodeLine{00081\ }
+\DoxyCodeLine{00082\ \textcolor{preprocessor}{\#\ endif}}
+\DoxyCodeLine{00083\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_OS\_WINDOWS}}
+\DoxyCodeLine{00084\ \ \ \mbox{\hyperlink{namespacetesting_afd726ae08c9bd16dc52f78c822d9946b}{testing::InitGoogleTest}}(\&argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}});}
+\DoxyCodeLine{00085\ }
+\DoxyCodeLine{00086\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{gtest_8h_a853a3792807489591d3d4a2f2ff9359f}{RUN\_ALL\_TESTS}}();}
+\DoxyCodeLine{00087\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{gtest__break__on__failure__unittest___8cc_a3c04138a5bfe5d72780bb7e82a18e627_cgraph}
+\end{center}
+\end{figure}

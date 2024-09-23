@@ -1,0 +1,74 @@
+\doxysection{sysio\+::chain\+::index\+\_\+set\texorpdfstring{$<$}{<} Index \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classsysio_1_1chain_1_1index__set_3_01_index_01_4}{}\label{classsysio_1_1chain_1_1index__set_3_01_index_01_4}\index{sysio::chain::index\_set$<$ Index $>$@{sysio::chain::index\_set$<$ Index $>$}}
+
+
+{\ttfamily \#include $<$database\+\_\+utils.\+hpp$>$}
+
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static void \mbox{\hyperlink{classsysio_1_1chain_1_1index__set_3_01_index_01_4_a9343bd54a796aed207082c067c3bb5a0}{add\+\_\+indices}} (\mbox{\hyperlink{classchainbase_1_1database}{chainbase\+::database}} \&db)
+\item 
+{\footnotesize template$<$typename F $>$ }\\static void \mbox{\hyperlink{classsysio_1_1chain_1_1index__set_3_01_index_01_4_ab283feec3a7053708a42eb06b30fcbfb}{walk\+\_\+indices}} (F function)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Index$>$\newline
+class sysio\+::chain\+::index\+\_\+set$<$ Index $>$}
+
+
+Definition at line \mbox{\hyperlink{database__utils_8hpp_source_l00056}{56}} of file \mbox{\hyperlink{database__utils_8hpp_source}{database\+\_\+utils.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1chain_1_1index__set_3_01_index_01_4_a9343bd54a796aed207082c067c3bb5a0}\index{sysio::chain::index\_set$<$ Index $>$@{sysio::chain::index\_set$<$ Index $>$}!add\_indices@{add\_indices}}
+\index{add\_indices@{add\_indices}!sysio::chain::index\_set$<$ Index $>$@{sysio::chain::index\_set$<$ Index $>$}}
+\doxysubsubsection{\texorpdfstring{add\_indices()}{add\_indices()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1index__set_3_01_index_01_4_a9343bd54a796aed207082c067c3bb5a0} 
+template$<$typename Index $>$ \\
+static void \mbox{\hyperlink{classsysio_1_1chain_1_1index__set}{sysio\+::chain\+::index\+\_\+set}}$<$ Index $>$\+::add\+\_\+indices (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classchainbase_1_1database}{chainbase\+::database}} \&}]{db}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{database__utils_8hpp_source_l00058}{58}} of file \mbox{\hyperlink{database__utils_8hpp_source}{database\+\_\+utils.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ db.\mbox{\hyperlink{classchainbase_1_1database_a43a85f8b7d728b69dbf7a9d69c9ebc1c}{add\_index}}<Index>();}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1index__set_3_01_index_01_4_a9343bd54a796aed207082c067c3bb5a0_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1index__set_3_01_index_01_4_ab283feec3a7053708a42eb06b30fcbfb}\index{sysio::chain::index\_set$<$ Index $>$@{sysio::chain::index\_set$<$ Index $>$}!walk\_indices@{walk\_indices}}
+\index{walk\_indices@{walk\_indices}!sysio::chain::index\_set$<$ Index $>$@{sysio::chain::index\_set$<$ Index $>$}}
+\doxysubsubsection{\texorpdfstring{walk\_indices()}{walk\_indices()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1index__set_3_01_index_01_4_ab283feec3a7053708a42eb06b30fcbfb} 
+template$<$typename Index $>$ \\
+template$<$typename F $>$ \\
+static void \mbox{\hyperlink{classsysio_1_1chain_1_1index__set}{sysio\+::chain\+::index\+\_\+set}}$<$ Index $>$\+::walk\+\_\+indices (\begin{DoxyParamCaption}\item[{F}]{function}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{database__utils_8hpp_source_l00063}{63}} of file \mbox{\hyperlink{database__utils_8hpp_source}{database\+\_\+utils.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ function(\ index\_utils<Index>()\ );}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{database__utils_8hpp}{database\+\_\+utils.\+hpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,9 @@
+<map id="BOOST_AUTO_TEST_CASE" name="BOOST_AUTO_TEST_CASE">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,20,202,46"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1processor_1_1hybi13.html#aee995e6a4a29a800ce3b031885814ed1" title="Initializes extensions based on the Sec&#45;WebSocket&#45;Extensions header." alt="" coords="250,13,448,54"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="202,30,234,30,234,36,202,36"/>
+<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1processor_1_1hybi13.html#a2bba499a185aa0219c2389532a332393" title="Extension negotiation helper function." alt="" coords="496,5,694,61"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="449,30,480,30,480,36,449,36"/>
+<area shape="rect" id="Node000004" href="$structmie_1_1_vuint_t.html#a1be409ac9e110dc4b60234ce37cbf0c8" title=" " alt="" coords="742,20,861,46"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="695,30,726,30,726,36,695,36"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="Catch::rngSeed" name="Catch::rngSeed">
+<area shape="rect" id="Node000001" title=" " alt="" coords="235,60,347,86"/>
+<area shape="rect" id="Node000002" href="$class_catch_1_1_generators_1_1_random_floating_generator.html#abce275ce88f7c3465addd7a98b6c408d" title=" " alt="" coords="5,5,187,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="219,61,187,54,188,49,220,56"/>
+<area shape="rect" id="Node000003" href="$class_catch_1_1_generators_1_1_random_integer_generator.html#a886d16c899ad70781b83a0e8f9d2cf96" title=" " alt="" coords="8,85,184,141"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="220,90,185,98,183,93,219,85"/>
+</map>

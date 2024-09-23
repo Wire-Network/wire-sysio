@@ -1,0 +1,79 @@
+\doxysection{libraries/fc/vendor/websocketpp/test/utility/error.cpp File Reference}
+\hypertarget{error_8cpp}{}\label{error_8cpp}\index{libraries/fc/vendor/websocketpp/test/utility/error.cpp@{libraries/fc/vendor/websocketpp/test/utility/error.cpp}}
+{\ttfamily \#include $<$boost/test/unit\+\_\+test.\+hpp$>$}\newline
+{\ttfamily \#include $<$websocketpp/error.\+hpp$>$}\newline
+Include dependency graph for error.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{error_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{error_8cpp_a6b2a3852db8bb19ab6909bac01859985}{BOOST\+\_\+\+TEST\+\_\+\+MODULE}}~error
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{error_8cpp_a1e877f3c5b3112d62902a23e6c054c38}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (constructing\+\_\+exceptions)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{error_8cpp_a6b2a3852db8bb19ab6909bac01859985}\index{error.cpp@{error.cpp}!BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}}
+\index{BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}!error.cpp@{error.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_TEST\_MODULE}{BOOST\_TEST\_MODULE}}
+{\footnotesize\ttfamily \label{error_8cpp_a6b2a3852db8bb19ab6909bac01859985} 
+\#define BOOST\+\_\+\+TEST\+\_\+\+MODULE~error}
+
+
+
+Definition at line \mbox{\hyperlink{error_8cpp_source_l00028}{28}} of file \mbox{\hyperlink{error_8cpp_source}{error.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{error_8cpp_a1e877f3c5b3112d62902a23e6c054c38}\index{error.cpp@{error.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!error.cpp@{error.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}}
+{\footnotesize\ttfamily \label{error_8cpp_a1e877f3c5b3112d62902a23e6c054c38} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{constructing\+\_\+exceptions}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{error_8cpp_source_l00033}{33}} of file \mbox{\hyperlink{error_8cpp_source}{error.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00034\ \ \ \ \ websocketpp::lib::error\_code\ test\_ec\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a3344622df8c36e8ae03c59164e7b5e89}{websocketpp::error::make\_error\_code}}(\mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68daee5b74d2be31ca48e104578d6c2b7425}{websocketpp::error::test}});}
+\DoxyCodeLine{00035\ \ \ \ \ websocketpp::lib::error\_code\ general\_ec\ =\ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a3344622df8c36e8ae03c59164e7b5e89}{websocketpp::error::make\_error\_code}}(\mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da0cd3808919f43e5fbeee42fbcb808d66}{websocketpp::error::general}});}
+\DoxyCodeLine{00036\ }
+\DoxyCodeLine{00037\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1exception}{websocketpp::exception}}\ b(\textcolor{stringliteral}{"{}foo"{}});}
+\DoxyCodeLine{00038\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1exception}{websocketpp::exception}}\ c(\textcolor{stringliteral}{"{}foo"{}},test\_ec);}
+\DoxyCodeLine{00039\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1exception}{websocketpp::exception}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}(\textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{00040\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1exception}{websocketpp::exception}}\ e(\textcolor{stringliteral}{"{}"{}},test\_ec);}
+\DoxyCodeLine{00041\ }
+\DoxyCodeLine{00042\ \ \ \ \ BOOST\_CHECK\_EQUAL(b.what(),\textcolor{stringliteral}{"{}foo"{}});}
+\DoxyCodeLine{00043\ \ \ \ \ BOOST\_CHECK\_EQUAL(b.code(),general\_ec);}
+\DoxyCodeLine{00044\ }
+\DoxyCodeLine{00045\ \ \ \ \ BOOST\_CHECK\_EQUAL(c.what(),\textcolor{stringliteral}{"{}foo"{}});}
+\DoxyCodeLine{00046\ \ \ \ \ BOOST\_CHECK\_EQUAL(c.code(),test\_ec);}
+\DoxyCodeLine{00047\ }
+\DoxyCodeLine{00048\ \ \ \ \ BOOST\_CHECK\_EQUAL(\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.what(),\textcolor{stringliteral}{"{}Generic\ error"{}});}
+\DoxyCodeLine{00049\ \ \ \ \ BOOST\_CHECK\_EQUAL(\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.code(),general\_ec);}
+\DoxyCodeLine{00050\ }
+\DoxyCodeLine{00051\ \ \ \ \ BOOST\_CHECK\_EQUAL(e.what(),\textcolor{stringliteral}{"{}Test\ Error"{}});}
+\DoxyCodeLine{00052\ \ \ \ \ BOOST\_CHECK\_EQUAL(e.code(),test\_ec);}
+\DoxyCodeLine{00053\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{error_8cpp_a1e877f3c5b3112d62902a23e6c054c38_cgraph}
+\end{center}
+\end{figure}

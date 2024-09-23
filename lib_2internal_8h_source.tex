@@ -1,0 +1,88 @@
+\doxysection{internal.\+h}
+\hypertarget{lib_2internal_8h_source}{}\label{lib_2internal_8h_source}\index{libraries/yubihsm/lib/internal.h@{libraries/yubihsm/lib/internal.h}}
+\mbox{\hyperlink{lib_2internal_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ 2015-\/2018\ Yubico\ AB}}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00004}00004\ \textcolor{comment}{\ *\ Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00005}00005\ \textcolor{comment}{\ *\ you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00006}00006\ \textcolor{comment}{\ *\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00008}00008\ \textcolor{comment}{\ *\ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00009}00009\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00010}00010\ \textcolor{comment}{\ *\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00011}00011\ \textcolor{comment}{\ *\ distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00012}00012\ \textcolor{comment}{\ *\ WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00013}00013\ \textcolor{comment}{\ *\ See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00014}00014\ \textcolor{comment}{\ *\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00015}00015\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00017}00017\ \textcolor{preprocessor}{\#ifndef\ YUBIHSM\_INTERNAL\_H}}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00018}00018\ \textcolor{preprocessor}{\#define\ YUBIHSM\_INTERNAL\_H}}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00020}00020\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{scp_8h}{scp.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00022}00022\ \textcolor{preprocessor}{\#include\ <stdlib.h>}}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00023}00023\ \textcolor{preprocessor}{\#include\ <stdbool.h>}}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00025}\mbox{\hyperlink{structyh__session}{00025}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structyh__session}{yh\_session}}\ \{}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00026}\mbox{\hyperlink{structyh__session_a481fb0215d72e52bb619d6c934078167}{00026}}\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structyh__connector}{yh\_connector}}\ *\mbox{\hyperlink{structyh__session_a481fb0215d72e52bb619d6c934078167}{parent}};}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00027}\mbox{\hyperlink{structyh__session_a6c208ce524e1f71bde33103fd883db5a}{00027}}\ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ \mbox{\hyperlink{structyh__session_a6c208ce524e1f71bde33103fd883db5a}{authkey\_id}};}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00028}\mbox{\hyperlink{structyh__session_a2bcf5cb8c6bfb10b2300ed5f3a4f6e7b}{00028}}\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{structyh__session_a2bcf5cb8c6bfb10b2300ed5f3a4f6e7b}{recreate}};}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00029}\mbox{\hyperlink{structyh__session_a2cce834e130b57e28a660ede08039e02}{00029}}\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \mbox{\hyperlink{structyh__session_a2cce834e130b57e28a660ede08039e02}{key\_enc}}[\mbox{\hyperlink{scp_8h_a25905234f13446437b28c85d0504216d}{SCP\_KEY\_LEN}}];}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00030}\mbox{\hyperlink{structyh__session_a88795cd7a6018303e3cea5cc3bdf02cf}{00030}}\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \mbox{\hyperlink{structyh__session_a88795cd7a6018303e3cea5cc3bdf02cf}{key\_mac}}[\mbox{\hyperlink{scp_8h_a25905234f13446437b28c85d0504216d}{SCP\_KEY\_LEN}}];}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00031}\mbox{\hyperlink{structyh__session_a5582d82fd5b88d1e26738437268fb285}{00031}}\ \ \ \mbox{\hyperlink{struct_scp__ctx}{Scp\_ctx}}\ \mbox{\hyperlink{structyh__session_a5582d82fd5b88d1e26738437268fb285}{s}};}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00032}\mbox{\hyperlink{structyh__session_a92d2141eb31c70c19d90519c6446c12d}{00032}}\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \mbox{\hyperlink{structcontext}{context}}[\mbox{\hyperlink{scp_8h_a2a7a1f4b618c112a923cf452cdb1f506}{SCP\_CONTEXT\_LEN}}];}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00033}00033\ \};}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00035}\mbox{\hyperlink{lib_2internal_8h_af0b8c5ac57556b935ae71249ec6cc388}{00035}}\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structstate}{state}}\ \mbox{\hyperlink{structstate}{yh\_backend}};}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00037}\mbox{\hyperlink{structyh__connector}{00037}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structyh__connector}{yh\_connector}}\ \{}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00038}\mbox{\hyperlink{structyh__connector_a4439ef6b985bb0b589ec26225001590f}{00038}}\ \ \ \textcolor{keywordtype}{void}\ *\mbox{\hyperlink{structyh__connector_a4439ef6b985bb0b589ec26225001590f}{backend}};}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00039}\mbox{\hyperlink{structyh__connector_a88057cfd7ee5af648c3aa315bbff7f8e}{00039}}\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structbackend__functions}{backend\_functions}}\ *\mbox{\hyperlink{structyh__connector_a88057cfd7ee5af648c3aa315bbff7f8e}{bf}};}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00040}\mbox{\hyperlink{structyh__connector_aafc44285171a0cb9b662fed6230a0648}{00040}}\ \ \ \mbox{\hyperlink{structstate}{yh\_backend}}\ *\mbox{\hyperlink{structyh__connector_aafc44285171a0cb9b662fed6230a0648}{connection}};}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00041}\mbox{\hyperlink{structyh__connector_a2792579df6afd474132f1a2bf07ca008}{00041}}\ \ \ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{structyh__connector_a2792579df6afd474132f1a2bf07ca008}{status\_url}};}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00042}\mbox{\hyperlink{structyh__connector_a4944b12d75b1a314ed65ab16f4561967}{00042}}\ \ \ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{structyh__connector_a4944b12d75b1a314ed65ab16f4561967}{api\_url}};}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00043}\mbox{\hyperlink{structyh__connector_a5528332cb62657dbe6fc7e795738872a}{00043}}\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{structyh__connector_a5528332cb62657dbe6fc7e795738872a}{has\_device}};}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00044}\mbox{\hyperlink{structyh__connector_af9b0901bc659e7e0c22d76e350bc7269}{00044}}\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \mbox{\hyperlink{structyh__connector_af9b0901bc659e7e0c22d76e350bc7269}{version\_major}};}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00045}\mbox{\hyperlink{structyh__connector_ab53147f120dfdfa7f19882b8631401ce}{00045}}\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \mbox{\hyperlink{structyh__connector_ab53147f120dfdfa7f19882b8631401ce}{version\_minor}};}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00046}\mbox{\hyperlink{structyh__connector_a888c95a32a81c6c6e62f336214e965fa}{00046}}\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \mbox{\hyperlink{structyh__connector_a888c95a32a81c6c6e62f336214e965fa}{version\_patch}};}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00047}\mbox{\hyperlink{structyh__connector_a72b90da1f0e2f5b24ba1d2ce503754ff}{00047}}\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \mbox{\hyperlink{structyh__connector_a72b90da1f0e2f5b24ba1d2ce503754ff}{address}}[32];}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00048}\mbox{\hyperlink{structyh__connector_a754d38913e8c786c397158a41a6bd8eb}{00048}}\ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{structyh__connector_a754d38913e8c786c397158a41a6bd8eb}{port}};}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00049}\mbox{\hyperlink{structyh__connector_aa2d3ae75568ceaeaf9196046fff0a7ab}{00049}}\ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{structyh__connector_aa2d3ae75568ceaeaf9196046fff0a7ab}{pid}};}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00050}00050\ \};}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00052}00052\ \textcolor{preprocessor}{\#ifndef\ \_\_WIN32}}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00053}\mbox{\hyperlink{lib_2internal_8h_aa1c48ca7b894657e01905d3074b38b8c}{00053}}\ \textcolor{preprocessor}{\#define\ YH\_INTERNAL\ \_\_attribute\_\_((visibility("{}hidden"{})))}}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00054}00054\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00055}00055\ \textcolor{preprocessor}{\#define\ YH\_INTERNAL}}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00056}00056\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00058}00058\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{lib_2internal_8h_aa1c48ca7b894657e01905d3074b38b8c}{YH\_INTERNAL}}\ \mbox{\hyperlink{lib_2internal_8h_ab6791ffb401264facac44a8380c7eed4}{dump\_hex}}(FILE\ *file,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *ptr,\ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}});}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00059}00059\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{lib_2internal_8h_aa1c48ca7b894657e01905d3074b38b8c}{YH\_INTERNAL}}\ \mbox{\hyperlink{lib_2internal_8h_afcc4c2f4445fb1ad48fd52af8df2cf02}{dump\_msg}}(FILE\ *file,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{union___msg}{Msg}}\ *msg);}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00060}00060\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{lib_2internal_8h_aa1c48ca7b894657e01905d3074b38b8c}{YH\_INTERNAL}}\ \mbox{\hyperlink{lib_2internal_8h_a49b565ef91ab66af53803f6e387e85e0}{dump\_response}}(FILE\ *file,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{union___msg}{Msg}}\ *msg);}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00062}00062\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{lib_2internal_8h_aa1c48ca7b894657e01905d3074b38b8c}{YH\_INTERNAL}}\ \mbox{\hyperlink{lib_2internal_8h_aa29fabe514d9930d1bbc4cadf5758497}{parse\_status\_data}}(\textcolor{keywordtype}{char}\ *data,\ \mbox{\hyperlink{structyh__connector}{yh\_connector}}\ *connector);}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00063}00063\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{lib_2internal_8h_aa1c48ca7b894657e01905d3074b38b8c}{YH\_INTERNAL}}\ \mbox{\hyperlink{lib_2internal_8h_a8d799abe67a90b2664d589b02092fc53}{parse\_usb\_url}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{programs_2clio_2main_8cpp_aa03c1ef4c41f36b048cf58d5aade7653}{url}},\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a1149ca4bd0659030412db8e77bebdf88}{serial}});}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00065}\mbox{\hyperlink{structbackend__functions}{00065}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structbackend__functions}{backend\_functions}}\ \{}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00066}\mbox{\hyperlink{structbackend__functions_a03c30bcb44f976314d67a350a2a99cac}{00066}}\ \ \ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366}{yh\_rc}}\ (*\mbox{\hyperlink{structbackend__functions_a03c30bcb44f976314d67a350a2a99cac}{backend\_init}})(\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ verbosity,\ FILE\ *output);}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00067}\mbox{\hyperlink{structbackend__functions_acb0b044bf4469ddb3dd72d328d4eb42a}{00067}}\ \ \ \mbox{\hyperlink{structstate}{yh\_backend}}\ *(*backend\_create)(void);}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00068}\mbox{\hyperlink{structbackend__functions_af35c8e28b31a803b1e9490ddfa99829d}{00068}}\ \ \ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366}{yh\_rc}}\ (*\mbox{\hyperlink{structbackend__functions_af35c8e28b31a803b1e9490ddfa99829d}{backend\_connect}})(\mbox{\hyperlink{structyh__connector}{yh\_connector}}\ *connector,\ \textcolor{keywordtype}{int}\ timeout);}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00069}\mbox{\hyperlink{structbackend__functions_a468ea679f6da120b5268455b786bff06}{00069}}\ \ \ void\ (*\mbox{\hyperlink{structbackend__functions_a468ea679f6da120b5268455b786bff06}{backend\_disconnect}})(\mbox{\hyperlink{structstate}{yh\_backend}}\ *connection);}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00070}\mbox{\hyperlink{structbackend__functions_a4dad210af1fab02bdb7719679725a84d}{00070}}\ \ \ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366}{yh\_rc}}\ (*\mbox{\hyperlink{structbackend__functions_a4dad210af1fab02bdb7719679725a84d}{backend\_send\_msg}})(\mbox{\hyperlink{structstate}{yh\_backend}}\ *connection,\ \mbox{\hyperlink{union___msg}{Msg}}\ *msg,\ \mbox{\hyperlink{union___msg}{Msg}}\ *response);}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00071}\mbox{\hyperlink{structbackend__functions_ae80d1fa885b4446fe751c54b749a04ae}{00071}}\ \ \ void\ (*\mbox{\hyperlink{structbackend__functions_ae80d1fa885b4446fe751c54b749a04ae}{backend\_cleanup}})(void);}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00072}\mbox{\hyperlink{structbackend__functions_abbec50b32eb89bc1f481ed99585e3968}{00072}}\ \ \ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366}{yh\_rc}}\ (*\mbox{\hyperlink{structbackend__functions_abbec50b32eb89bc1f481ed99585e3968}{backend\_option}})(\mbox{\hyperlink{structstate}{yh\_backend}}\ *connection,\ \mbox{\hyperlink{yubihsm_8h_a59400bce0478b88e048d5e62b2b0b015}{yh\_connector\_option}}\ opt,}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00073}00073\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{void}\ *val);}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00074}\mbox{\hyperlink{structbackend__functions_a43145be40370fc6e1547a6e1c869d77b}{00074}}\ \ \ void\ (*\mbox{\hyperlink{structbackend__functions_a43145be40370fc6e1547a6e1c869d77b}{backend\_set\_verbosity}})(\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ verbosity,\ FILE\ *output);}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00075}00075\ \};}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00076}00076\ }
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00077}00077\ \textcolor{preprocessor}{\#ifdef\ STATIC}}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00078}00078\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structbackend__functions}{backend\_functions}}\ \mbox{\hyperlink{lib_2internal_8h_aa1c48ca7b894657e01905d3074b38b8c}{YH\_INTERNAL}}\ *usb\_backend\_functions(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00079}00079\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structbackend__functions}{backend\_functions}}\ \mbox{\hyperlink{lib_2internal_8h_aa1c48ca7b894657e01905d3074b38b8c}{YH\_INTERNAL}}\ *http\_backend\_functions(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00080}00080\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00081}00081\ }
+\DoxyCodeLine{\Hypertarget{lib_2internal_8h_source_l00082}00082\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

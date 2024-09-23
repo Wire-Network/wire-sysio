@@ -1,0 +1,91 @@
+\doxysection{primitive\+Types.\+h}
+\hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source}{}\label{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source}\index{libraries/sys-\/vm/external/softfloat/source/include/primitiveTypes.h@{libraries/sys-\/vm/external/softfloat/source/include/primitiveTypes.h}}
+\mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00001}00001\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00002}00002\ \textcolor{comment}{/*============================================================================}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00003}00003\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00004}00004\ \textcolor{comment}{This\ C\ header\ file\ is\ part\ of\ the\ SoftFloat\ IEEE\ Floating-\/Point\ Arithmetic}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00005}00005\ \textcolor{comment}{Package,\ Release\ 3e,\ by\ John\ R.\ Hauser.}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00006}00006\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00007}00007\ \textcolor{comment}{Copyright\ 2011,\ 2012,\ 2013,\ 2014\ The\ Regents\ of\ the\ University\ of\ California.}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00008}00008\ \textcolor{comment}{All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00009}00009\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00010}00010\ \textcolor{comment}{Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00011}00011\ \textcolor{comment}{modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are\ met:}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00012}00012\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00013}00013\ \textcolor{comment}{\ 1.\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright\ notice,}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00014}00014\ \textcolor{comment}{\ \ \ \ this\ list\ of\ conditions,\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00015}00015\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00016}00016\ \textcolor{comment}{\ 2.\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above\ copyright\ notice,}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00017}00017\ \textcolor{comment}{\ \ \ \ this\ list\ of\ conditions,\ and\ the\ following\ disclaimer\ in\ the\ documentation}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00018}00018\ \textcolor{comment}{\ \ \ \ and/or\ other\ materials\ provided\ with\ the\ distribution.}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00019}00019\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00020}00020\ \textcolor{comment}{\ 3.\ Neither\ the\ name\ of\ the\ University\ nor\ the\ names\ of\ its\ contributors\ may}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00021}00021\ \textcolor{comment}{\ \ \ \ be\ used\ to\ endorse\ or\ promote\ products\ derived\ from\ this\ software\ without}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00022}00022\ \textcolor{comment}{\ \ \ \ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00023}00023\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00024}00024\ \textcolor{comment}{THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ REGENTS\ AND\ CONTRIBUTORS\ "{}AS\ IS"{},\ AND\ ANY}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00025}00025\ \textcolor{comment}{EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ THE\ IMPLIED}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00026}00026\ \textcolor{comment}{WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR\ A\ PARTICULAR\ PURPOSE,\ ARE}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00027}00027\ \textcolor{comment}{DISCLAIMED.\ \ IN\ NO\ EVENT\ SHALL\ THE\ REGENTS\ OR\ CONTRIBUTORS\ BE\ LIABLE\ FOR\ ANY}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00028}00028\ \textcolor{comment}{DIRECT,\ INDIRECT,\ INCIDENTAL,\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00029}00029\ \textcolor{comment}{(INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00030}00030\ \textcolor{comment}{LOSS\ OF\ USE,\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00031}00031\ \textcolor{comment}{ON\ ANY\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00032}00032\ \textcolor{comment}{(INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE\ OF\ THIS}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00033}00033\ \textcolor{comment}{SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00034}00034\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00035}00035\ \textcolor{comment}{=============================================================================*/}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00037}00037\ \textcolor{preprocessor}{\#ifndef\ primitiveTypes\_h}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00038}00038\ \textcolor{preprocessor}{\#define\ primitiveTypes\_h\ 1}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00040}00040\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{stdint_8h}{stdint.h}}>}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00042}00042\ \textcolor{preprocessor}{\#ifdef\ SOFTFLOAT\_FAST\_INT64}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00044}00044\ \textcolor{preprocessor}{\#ifdef\ LITTLEENDIAN}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00045}00045\ \textcolor{keyword}{struct\ }uint128\ \{\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ v0,\ v64;\ \};}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00046}00046\ \textcolor{keyword}{struct\ }uint64\_extra\ \{\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ extra,\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};\ \};}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00047}00047\ \textcolor{keyword}{struct\ }uint128\_extra\ \{\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ extra;\ \textcolor{keyword}{struct\ }uint128\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};\ \};}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00048}00048\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00049}00049\ \textcolor{keyword}{struct\ }uint128\ \{\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ v64,\ v0;\ \};}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00050}00050\ \textcolor{keyword}{struct\ }uint64\_extra\ \{\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}},\ extra;\ \};}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00051}00051\ \textcolor{keyword}{struct\ }uint128\_extra\ \{\ \textcolor{keyword}{struct\ }uint128\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ extra;\ \};}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00052}00052\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00054}00054\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00056}00056\ \textcolor{comment}{/*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00057}00057\ \textcolor{comment}{|\ These\ macros\ are\ used\ to\ isolate\ the\ differences\ in\ word\ order\ between\ big-\/}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00058}00058\ \textcolor{comment}{|\ endian\ and\ little-\/endian\ platforms.}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00059}00059\ \textcolor{comment}{*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*/}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00060}00060\ \textcolor{preprocessor}{\#ifdef\ LITTLEENDIAN}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00061}00061\ \textcolor{preprocessor}{\#define\ wordIncr\ 1}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00062}00062\ \textcolor{preprocessor}{\#define\ indexWord(\ total,\ n\ )\ (n)}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00063}00063\ \textcolor{preprocessor}{\#define\ indexWordHi(\ total\ )\ ((total)\ -\/\ 1)}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00064}00064\ \textcolor{preprocessor}{\#define\ indexWordLo(\ total\ )\ 0}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00065}00065\ \textcolor{preprocessor}{\#define\ indexMultiword(\ total,\ m,\ n\ )\ (n)}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00066}00066\ \textcolor{preprocessor}{\#define\ indexMultiwordHi(\ total,\ n\ )\ ((total)\ -\/\ (n))}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00067}00067\ \textcolor{preprocessor}{\#define\ indexMultiwordLo(\ total,\ n\ )\ 0}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00068}00068\ \textcolor{preprocessor}{\#define\ indexMultiwordHiBut(\ total,\ n\ )\ (n)}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00069}00069\ \textcolor{preprocessor}{\#define\ indexMultiwordLoBut(\ total,\ n\ )\ 0}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00070}00070\ \textcolor{preprocessor}{\#define\ INIT\_UINTM4(\ v3,\ v2,\ v1,\ v0\ )\ \{\ v0,\ v1,\ v2,\ v3\ \}}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00071}00071\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00072}\mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_a22ffd10aefa829eef57da03cff970e45}{00072}}\ \textcolor{preprocessor}{\#define\ wordIncr\ -\/1}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00073}\mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_a49446dd1193996f92b1e5bb62eaa4689}{00073}}\ \textcolor{preprocessor}{\#define\ indexWord(\ total,\ n\ )\ ((total)\ -\/\ 1\ -\/\ (n))}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00074}\mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_aa3af452dd34ad7a607f4ad31c234fda7}{00074}}\ \textcolor{preprocessor}{\#define\ indexWordHi(\ total\ )\ 0}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00075}\mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_a28a8ad1b8455a20d428c59cf01e36a66}{00075}}\ \textcolor{preprocessor}{\#define\ indexWordLo(\ total\ )\ ((total)\ -\/\ 1)}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00076}\mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_aa11a9f124d46ec4c88f5645933b1196a}{00076}}\ \textcolor{preprocessor}{\#define\ indexMultiword(\ total,\ m,\ n\ )\ ((total)\ -\/\ 1\ -\/\ (m))}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00077}\mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_a016e8ca813d61983f044bcb6a01ff4b3}{00077}}\ \textcolor{preprocessor}{\#define\ indexMultiwordHi(\ total,\ n\ )\ 0}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00078}\mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_a17ea7f28b4e451b784902493243eb93b}{00078}}\ \textcolor{preprocessor}{\#define\ indexMultiwordLo(\ total,\ n\ )\ ((total)\ -\/\ (n))}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00079}\mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_a59d38bc3ebe0b9d0a0668dc8cd3de21b}{00079}}\ \textcolor{preprocessor}{\#define\ indexMultiwordHiBut(\ total,\ n\ )\ 0}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00080}\mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_ae57dd9d99c575c28faf52b9db48c6a8b}{00080}}\ \textcolor{preprocessor}{\#define\ indexMultiwordLoBut(\ total,\ n\ )\ (n)}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00081}\mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_a0acb3f74d0e1902d53267d7b60e2aa38}{00081}}\ \textcolor{preprocessor}{\#define\ INIT\_UINTM4(\ v3,\ v2,\ v1,\ v0\ )\ \{\ v3,\ v2,\ v1,\ v0\ \}}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00082}00082\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00083}00083\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00084}00084\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2include_2primitive_types_8h_source_l00085}00085\ }
+
+\end{DoxyCode}

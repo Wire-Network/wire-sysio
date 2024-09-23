@@ -1,0 +1,51 @@
+\doxysection{namespace1 Namespace Reference}
+\hypertarget{namespacenamespace1}{}\label{namespacenamespace1}\index{namespace1@{namespace1}}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classnamespace1_1_1_my_type_in_name_space1}{My\+Type\+In\+Name\+Space1}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+std\+::ostream \& \mbox{\hyperlink{namespacenamespace1_a469f00dab6318267fb48fab73226ca95}{operator$<$$<$}} (std\+::ostream \&os, const \mbox{\hyperlink{classnamespace1_1_1_my_type_in_name_space1}{My\+Type\+In\+Name\+Space1}} \&val)
+\item 
+std\+::ostream \& \mbox{\hyperlink{namespacenamespace1_a9be9cab39b3a33a012040d70e1c86949}{operator$<$$<$}} (std\+::ostream \&os, const \mbox{\hyperlink{classnamespace1_1_1_my_type_in_name_space1}{My\+Type\+In\+Name\+Space1}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacenamespace1_a469f00dab6318267fb48fab73226ca95}\index{namespace1@{namespace1}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!namespace1@{namespace1}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{namespacenamespace1_a469f00dab6318267fb48fab73226ca95} 
+std\+::ostream \& namespace1\+::operator$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{os}{, }\item[{const \mbox{\hyperlink{classnamespace1_1_1_my_type_in_name_space1}{My\+Type\+In\+Name\+Space1}} \&}]{val}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest__unittest_8cc_source_l05244}{5244}} of file \mbox{\hyperlink{gtest__unittest_8cc_source}{gtest\+\_\+unittest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{05245\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{05246\ \ \ \textcolor{keywordflow}{return}\ os\ <<\ val.x();}
+\DoxyCodeLine{05247\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacenamespace1_a9be9cab39b3a33a012040d70e1c86949}\index{namespace1@{namespace1}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!namespace1@{namespace1}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{namespacenamespace1_a9be9cab39b3a33a012040d70e1c86949} 
+std\+::ostream \& namespace1\+::operator$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{os}{, }\item[{const \mbox{\hyperlink{classnamespace1_1_1_my_type_in_name_space1}{My\+Type\+In\+Name\+Space1}} \texorpdfstring{$\ast$}{*}}]{pointer}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest__unittest_8cc_source_l05248}{5248}} of file \mbox{\hyperlink{gtest__unittest_8cc_source}{gtest\+\_\+unittest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{05249\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{05250\ \ \ \textcolor{keywordflow}{return}\ os\ <<\ \textcolor{stringliteral}{"{}("{}}\ <<\ \mbox{\hyperlink{pointer_8h_aae1f8d263916ad71bd415381591549c0}{pointer}}-\/>x()\ <<\ \textcolor{stringliteral}{"{})"{}};}
+\DoxyCodeLine{05251\ \}}
+
+\end{DoxyCode}

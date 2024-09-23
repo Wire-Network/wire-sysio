@@ -1,0 +1,10 @@
+<map id="sysio::trace_api::store_provider::scan_metadata_log_from" name="sysio::trace_api::store_provider::scan_metadata_log_from">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,48,177,103"/>
+<area shape="rect" id="Node000002" href="$namespacefc.html#aae3e907b120751591ca6919ac66c384b" title=" " alt="" coords="270,5,358,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="176,51,254,31,256,36,178,56"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1trace__api_1_1slice__directory.html#aa8fdc6fcd3d18c76b517d65b6ea56bef" title=" " alt="" coords="225,55,404,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="177,73,209,73,209,78,177,78"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1trace__api_1_1slice__directory.html#a47a30741cf28932df1556209da63b227" title=" " alt="" coords="452,84,615,125"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="178,97,225,105,334,111,437,109,437,115,334,117,224,110,177,102"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="405,85,437,89,436,94,404,90"/>
+</map>

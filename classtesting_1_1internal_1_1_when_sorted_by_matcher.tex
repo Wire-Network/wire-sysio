@@ -1,0 +1,80 @@
+\doxysection{testing\+::internal\+::When\+Sorted\+By\+Matcher\texorpdfstring{$<$}{<} Comparator, Container\+Matcher \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classtesting_1_1internal_1_1_when_sorted_by_matcher}{}\label{classtesting_1_1internal_1_1_when_sorted_by_matcher}\index{testing::internal::WhenSortedByMatcher$<$ Comparator, ContainerMatcher $>$@{testing::internal::WhenSortedByMatcher$<$ Comparator, ContainerMatcher $>$}}
+
+
+{\ttfamily \#include $<$gmock-\/matchers.\+h$>$}
+
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classtesting_1_1internal_1_1_when_sorted_by_matcher_1_1_impl}{Impl}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_when_sorted_by_matcher_a5c5e625b3f0be9f7380f5be744f61b1c}{When\+Sorted\+By\+Matcher}} (const Comparator \&comparator, const Container\+Matcher \&matcher)
+\item 
+{\footnotesize template$<$typename Lhs\+Container $>$ }\\\mbox{\hyperlink{classtesting_1_1internal_1_1_when_sorted_by_matcher_ae76285fee36055ffde63492102d3c67f}{operator Matcher$<$ Lhs\+Container $>$}} () const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Comparator, typename Container\+Matcher$>$\newline
+class testing\+::internal\+::\+When\+Sorted\+By\+Matcher$<$ Comparator, Container\+Matcher $>$}
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l02908}{2908}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_when_sorted_by_matcher_a5c5e625b3f0be9f7380f5be744f61b1c}\index{testing::internal::WhenSortedByMatcher$<$ Comparator, ContainerMatcher $>$@{testing::internal::WhenSortedByMatcher$<$ Comparator, ContainerMatcher $>$}!WhenSortedByMatcher@{WhenSortedByMatcher}}
+\index{WhenSortedByMatcher@{WhenSortedByMatcher}!testing::internal::WhenSortedByMatcher$<$ Comparator, ContainerMatcher $>$@{testing::internal::WhenSortedByMatcher$<$ Comparator, ContainerMatcher $>$}}
+\doxysubsubsection{\texorpdfstring{WhenSortedByMatcher()}{WhenSortedByMatcher()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_when_sorted_by_matcher_a5c5e625b3f0be9f7380f5be744f61b1c} 
+template$<$typename Comparator , typename Container\+Matcher $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_when_sorted_by_matcher}{testing\+::internal\+::\+When\+Sorted\+By\+Matcher}}$<$ Comparator, Container\+Matcher $>$\+::\+When\+Sorted\+By\+Matcher (\begin{DoxyParamCaption}\item[{const Comparator \&}]{comparator}{, }\item[{const Container\+Matcher \&}]{matcher}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l02910}{2910}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02912\ \ \ \ \ \ \ :\ comparator\_(comparator),\ matcher\_(matcher)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_when_sorted_by_matcher_ae76285fee36055ffde63492102d3c67f}\index{testing::internal::WhenSortedByMatcher$<$ Comparator, ContainerMatcher $>$@{testing::internal::WhenSortedByMatcher$<$ Comparator, ContainerMatcher $>$}!operator Matcher$<$ LhsContainer $>$@{operator Matcher$<$ LhsContainer $>$}}
+\index{operator Matcher$<$ LhsContainer $>$@{operator Matcher$<$ LhsContainer $>$}!testing::internal::WhenSortedByMatcher$<$ Comparator, ContainerMatcher $>$@{testing::internal::WhenSortedByMatcher$<$ Comparator, ContainerMatcher $>$}}
+\doxysubsubsection{\texorpdfstring{operator Matcher$<$ LhsContainer $>$()}{operator Matcher< LhsContainer >()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_when_sorted_by_matcher_ae76285fee36055ffde63492102d3c67f} 
+template$<$typename Comparator , typename Container\+Matcher $>$ \\
+template$<$typename Lhs\+Container $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_when_sorted_by_matcher}{testing\+::internal\+::\+When\+Sorted\+By\+Matcher}}$<$ Comparator, Container\+Matcher $>$\+::operator \mbox{\hyperlink{classtesting_1_1_matcher}{Matcher}}$<$ Lhs\+Container $>$ (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l02915}{2915}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02915\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02916\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetesting_aca6c4c4fdf7fb7257ea4fc76971cb82c}{MakeMatcher}}(\textcolor{keyword}{new}\ Impl<LhsContainer>(comparator\_,\ matcher\_));}
+\DoxyCodeLine{02917\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_when_sorted_by_matcher_ae76285fee36055ffde63492102d3c67f_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/include/gmock/\mbox{\hyperlink{gmock-matchers_8h}{gmock-\/matchers.\+h}}\end{DoxyCompactItemize}

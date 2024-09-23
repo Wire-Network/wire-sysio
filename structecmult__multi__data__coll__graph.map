@@ -1,0 +1,9 @@
+<map id="ecmult_multi_data" name="ecmult_multi_data">
+<area shape="rect" id="Node000001" title=" " alt="" coords="29,198,156,223"/>
+<area shape="rect" id="Node000002" href="$structsecp256k1__scalar.html" title=" " alt="" coords="5,109,132,135"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="78,149,92,197,87,198,73,150"/>
+<area shape="rect" id="Node000003" href="$structsecp256k1__ge.html" title=" " alt="" coords="156,109,261,135"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="182,146,110,199,107,195,179,142"/>
+<area shape="rect" id="Node000004" href="$structsecp256k1__fe.html" title=" " alt="" coords="157,5,260,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="211,47,211,109,206,109,206,47"/>
+</map>

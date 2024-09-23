@@ -1,0 +1,16 @@
+\doxysection{varint.\+cpp}
+\hypertarget{varint_8cpp_source}{}\label{varint_8cpp_source}\index{libraries/fc/src/io/varint.cpp@{libraries/fc/src/io/varint.cpp}}
+\mbox{\hyperlink{varint_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{varint_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{varint_8hpp}{fc/io/varint.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{varint_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{fc_2include_2fc_2variant_8hpp}{fc/variant.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{varint_8cpp_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{varint_8cpp_source_l00004}00004\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}}
+\DoxyCodeLine{\Hypertarget{varint_8cpp_source_l00005}00005\ \{}
+\DoxyCodeLine{\Hypertarget{varint_8cpp_source_l00006}\mbox{\hyperlink{namespacefc_aec2092daf9694789ff5cf8ab45d6e456}{00006}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefc_adea61f2343de94d0fbcb920a32332ad9}{to\_variant}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structfc_1_1signed__int}{signed\_int}}\&\ var,\ \ \mbox{\hyperlink{classfc_1_1variant}{variant}}\&\ vo\ )\ \{\ vo\ =\ var.\mbox{\hyperlink{structfc_1_1signed__int_a594de3c9df8e11911cce18eb8ae15d08}{value}};\ \}}
+\DoxyCodeLine{\Hypertarget{varint_8cpp_source_l00007}\mbox{\hyperlink{namespacefc_aa2d8b09f66dffd1d21e17a8ab3c23a8b}{00007}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefc_accef08adf4ee05c36ccc550d8101b08f}{from\_variant}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1variant}{variant}}\&\ var,\ \ \mbox{\hyperlink{structfc_1_1signed__int}{signed\_int}}\&\ vo\ )\ \{\ vo.\mbox{\hyperlink{structfc_1_1signed__int_a594de3c9df8e11911cce18eb8ae15d08}{value}}\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}}\textcolor{keyword}{>}(var.\mbox{\hyperlink{classfc_1_1variant_ab5d7877d2c19dbd6ac9eac7a1205dbeb}{as\_int64}}());\ \}}
+\DoxyCodeLine{\Hypertarget{varint_8cpp_source_l00008}\mbox{\hyperlink{namespacefc_ac888b5890131278da23a6525b993c85b}{00008}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefc_adea61f2343de94d0fbcb920a32332ad9}{to\_variant}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structfc_1_1unsigned__int}{unsigned\_int}}\&\ var,\ \mbox{\hyperlink{classfc_1_1variant}{variant}}\&\ vo\ )\ \ \{\ vo\ =\ var.\mbox{\hyperlink{structfc_1_1unsigned__int_ac54ac972d3e38a5852616aaee955ff3f}{value}};\ \}}
+\DoxyCodeLine{\Hypertarget{varint_8cpp_source_l00009}\mbox{\hyperlink{namespacefc_a244a3398e2002f2f7bf256cccc9acde4}{00009}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefc_accef08adf4ee05c36ccc550d8101b08f}{from\_variant}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1variant}{variant}}\&\ var,\ \ \mbox{\hyperlink{structfc_1_1unsigned__int}{unsigned\_int}}\&\ vo\ )\ \ \{\ vo.\mbox{\hyperlink{structfc_1_1unsigned__int_ac54ac972d3e38a5852616aaee955ff3f}{value}}\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\textcolor{keyword}{>}(var.\mbox{\hyperlink{classfc_1_1variant_a483bb1f23d9b71ae03e9ca03136ee453}{as\_uint64}}());\ \}}
+\DoxyCodeLine{\Hypertarget{varint_8cpp_source_l00010}00010\ \}}
+
+\end{DoxyCode}

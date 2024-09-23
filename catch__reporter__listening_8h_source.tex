@@ -1,0 +1,63 @@
+\doxysection{catch\+\_\+reporter\+\_\+listening.\+h}
+\hypertarget{catch__reporter__listening_8h_source}{}\label{catch__reporter__listening_8h_source}\index{libraries/sys-\/vm/external/Catch2/include/reporters/catch\_reporter\_listening.h@{libraries/sys-\/vm/external/Catch2/include/reporters/catch\_reporter\_listening.h}}
+\mbox{\hyperlink{catch__reporter__listening_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8h_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8h_source_l00002}00002\ \textcolor{comment}{\ *\ \ Created\ by\ Martin\ on\ 19/07/2017.}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8h_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8h_source_l00004}00004\ \textcolor{comment}{\ *\ \ Distributed\ under\ the\ Boost\ Software\ License,\ Version\ 1.0.\ (See\ accompanying}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8h_source_l00005}00005\ \textcolor{comment}{\ *\ \ file\ LICENSE\_1\_0.txt\ or\ copy\ at\ http://www.boost.org/LICENSE\_1\_0.txt)}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8h_source_l00006}00006\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8h_source_l00007}00007\ \textcolor{preprocessor}{\#ifndef\ TWOBLUECUBES\_CATCH\_MULTI\_REPORTER\_H\_INCLUDED}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8h_source_l00008}00008\ \textcolor{preprocessor}{\#define\ TWOBLUECUBES\_CATCH\_MULTI\_REPORTER\_H\_INCLUDED}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8h_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8h_source_l00010}00010\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__interfaces__reporter_8h}{../internal/catch\_interfaces\_reporter.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8h_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8h_source_l00012}00012\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8h_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8h_source_l00014}\mbox{\hyperlink{class_catch_1_1_listening_reporter}{00014}}\ \ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_catch_1_1_listening_reporter}{ListeningReporter}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{struct_catch_1_1_i_streaming_reporter}{IStreamingReporter}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8h_source_l00015}00015\ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ }Reporters\ =\ std::vector<IStreamingReporterPtr>;}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8h_source_l00016}00016\ \ \ \ \ \ \ \ \ Reporters\ m\_listeners;}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8h_source_l00017}00017\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_catch_a1f5555abfc248b3dca63e0c46e55002d}{IStreamingReporterPtr}}\ m\_reporter\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8h_source_l00018}00018\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_reporter_preferences}{ReporterPreferences}}\ m\_preferences;}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8h_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8h_source_l00020}00020\ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8h_source_l00021}00021\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_listening_reporter_aa8ea7fd773d44d45aea0925d67169325}{ListeningReporter}}();}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8h_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8h_source_l00023}00023\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_listening_reporter_af0651069faf2a2f8442a7f456cb648e3}{addListener}}(\ \mbox{\hyperlink{namespace_catch_a1f5555abfc248b3dca63e0c46e55002d}{IStreamingReporterPtr}}\&\&\ listener\ );}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8h_source_l00024}00024\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_listening_reporter_a133cee99cffbaa1bb4b82e4c8df757ce}{addReporter}}(\ \mbox{\hyperlink{namespace_catch_a1f5555abfc248b3dca63e0c46e55002d}{IStreamingReporterPtr}}\&\&\ reporter\ );}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8h_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8h_source_l00026}00026\ \ \ \ \ \textcolor{keyword}{public}:\ \textcolor{comment}{//\ IStreamingReporter}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8h_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8h_source_l00028}00028\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_reporter_preferences}{ReporterPreferences}}\ \mbox{\hyperlink{class_catch_1_1_listening_reporter_aba18a06b704eca4aec42eb8869f8a92c}{getPreferences}}()\ \textcolor{keyword}{const\ override};}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8h_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8h_source_l00030}00030\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_listening_reporter_a9f2dd7fd9ad465474d0991de5e8a8022}{noMatchingTestCases}}(\ std::string\ \textcolor{keyword}{const}\&\ spec\ )\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8h_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8h_source_l00032}00032\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ std::set<Verbosity>\ \mbox{\hyperlink{class_catch_1_1_listening_reporter_ada5661109a24e986b70ed4a7e6d78d46}{getSupportedVerbosities}}();}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8h_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8h_source_l00034}00034\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_listening_reporter_a5f0115018b42c6424fcd887c04545920}{benchmarkStarting}}(\ \mbox{\hyperlink{struct_catch_1_1_benchmark_info}{BenchmarkInfo}}\ \textcolor{keyword}{const}\&\ benchmarkInfo\ )\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8h_source_l00035}00035\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_listening_reporter_af344f128ba1d336b35036eacba3bf516}{benchmarkEnded}}(\ \mbox{\hyperlink{struct_catch_1_1_benchmark_stats}{BenchmarkStats}}\ \textcolor{keyword}{const}\&\ benchmarkStats\ )\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8h_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8h_source_l00037}00037\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_listening_reporter_a5681779111a3f8c0827000d04f7de199}{testRunStarting}}(\ \mbox{\hyperlink{struct_catch_1_1_test_run_info}{TestRunInfo}}\ \textcolor{keyword}{const}\&\ testRunInfo\ )\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8h_source_l00038}00038\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_listening_reporter_a3d2ffe4c24a7877657bc3e5e0e9ae7d2}{testGroupStarting}}(\ \mbox{\hyperlink{struct_catch_1_1_group_info}{GroupInfo}}\ \textcolor{keyword}{const}\&\ groupInfo\ )\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8h_source_l00039}00039\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_listening_reporter_a41a88ece54222d8a5fd629e58ed2b676}{testCaseStarting}}(\ \mbox{\hyperlink{struct_catch_1_1_test_case_info}{TestCaseInfo}}\ \textcolor{keyword}{const}\&\ testInfo\ )\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8h_source_l00040}00040\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_listening_reporter_af1df5628b89d61db63b4d9d4d5bd3bf2}{sectionStarting}}(\ \mbox{\hyperlink{struct_catch_1_1_section_info}{SectionInfo}}\ \textcolor{keyword}{const}\&\ sectionInfo\ )\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8h_source_l00041}00041\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_listening_reporter_ac54f461297eca221a06425ed5edc2129}{assertionStarting}}(\ \mbox{\hyperlink{struct_catch_1_1_assertion_info}{AssertionInfo}}\ \textcolor{keyword}{const}\&\ assertionInfo\ )\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8h_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8h_source_l00043}00043\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ The\ return\ value\ indicates\ if\ the\ messages\ buffer\ should\ be\ cleared:}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8h_source_l00044}00044\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_catch_1_1_listening_reporter_a2c47aa9e99eba2ba5fe60c76d81b3660}{assertionEnded}}(\ \mbox{\hyperlink{struct_catch_1_1_assertion_stats}{AssertionStats}}\ \textcolor{keyword}{const}\&\ assertionStats\ )\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8h_source_l00045}00045\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_listening_reporter_a6e85b5d61a9e5c894288086e52449c2e}{sectionEnded}}(\ \mbox{\hyperlink{struct_catch_1_1_section_stats}{SectionStats}}\ \textcolor{keyword}{const}\&\ sectionStats\ )\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8h_source_l00046}00046\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_listening_reporter_a81969997dee722a6eed64a81dda6a9d1}{testCaseEnded}}(\ \mbox{\hyperlink{struct_catch_1_1_test_case_stats}{TestCaseStats}}\ \textcolor{keyword}{const}\&\ testCaseStats\ )\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8h_source_l00047}00047\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_listening_reporter_a8bb6e2d75f76be7c4b2012e9b8659d57}{testGroupEnded}}(\ \mbox{\hyperlink{struct_catch_1_1_test_group_stats}{TestGroupStats}}\ \textcolor{keyword}{const}\&\ testGroupStats\ )\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8h_source_l00048}00048\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_listening_reporter_ae07e52e85111d49886059403c02b9347}{testRunEnded}}(\ \mbox{\hyperlink{struct_catch_1_1_test_run_stats}{TestRunStats}}\ \textcolor{keyword}{const}\&\ testRunStats\ )\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8h_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8h_source_l00050}00050\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_listening_reporter_a61c6d70973c7bc21414007c9c7497241}{skipTest}}(\ \mbox{\hyperlink{struct_catch_1_1_test_case_info}{TestCaseInfo}}\ \textcolor{keyword}{const}\&\ testInfo\ )\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8h_source_l00051}00051\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_catch_1_1_listening_reporter_a7e162ceca38f3fa2416b323cc4eb03ab}{isMulti}}()\ \textcolor{keyword}{const\ override};}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8h_source_l00052}00052\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8h_source_l00053}00053\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8h_source_l00054}00054\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8h_source_l00055}00055\ \}\ \textcolor{comment}{//\ end\ namespace\ Catch}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8h_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8h_source_l00057}00057\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ TWOBLUECUBES\_CATCH\_MULTI\_REPORTER\_H\_INCLUDED}}
+
+\end{DoxyCode}

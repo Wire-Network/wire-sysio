@@ -1,0 +1,36 @@
+<map id="sysio::chain::legacy::snapshot_block_header_state_v2" name="sysio::chain::legacy::snapshot_block_header_state_v2">
+<area shape="rect" id="Node000001" title=" " alt="" coords="1088,406,1255,462"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1legacy_1_1producer__schedule__type.html" title=" " alt="" coords="363,388,533,429"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="549,410,1088,428,1088,434,549,415"/>
+<area shape="rect" id="Node000016" href="$structsysio_1_1chain_1_1legacy_1_1snapshot__block__header__state__v2_1_1schedule__info.html" title=" " alt="" coords="706,321,873,376"/>
+<area shape="poly" id="edge18_Node000016_Node000002" title=" " alt="" coords="548,389,706,361,707,366,548,394"/>
+<area shape="rect" id="Node000003" href="$classfc_1_1vector.html" title=" " alt="" coords="5,388,202,429"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="217,406,362,406,362,411,217,411"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1chain_1_1incremental__merkle__impl.html" title=" " alt="" coords="695,463,884,504"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="900,467,1064,446,1088,443,1088,448,1065,452,900,473"/>
+<area shape="rect" id="Node000005" href="$classfc_1_1vector.html" title=" " alt="" coords="386,463,510,504"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="525,481,695,481,695,486,525,486"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="713,528,866,569"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="882,549,972,541,1019,531,1063,517,1107,491,1142,460,1146,464,1110,495,1065,521,1020,537,972,546,882,554"/>
+<area shape="rect" id="Node000007" href="$classfc_1_1crypto_1_1public__key.html" title=" " alt="" coords="716,593,863,619"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="878,608,923,606,971,600,1019,588,1063,568,1093,545,1118,517,1154,461,1159,464,1123,521,1097,549,1066,573,1020,593,972,605,923,612,878,614"/>
+<area shape="rect" id="Node000008" href="$classfc_1_1vector.html" title=" " alt="" coords="720,642,859,668"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="875,665,921,666,970,661,1019,650,1063,628,1083,612,1101,592,1130,547,1149,501,1161,461,1167,463,1154,502,1135,549,1106,595,1087,616,1066,633,1020,655,971,667,921,671,875,670"/>
+<area shape="rect" id="Node000009" href="$classfc_1_1sha256.html" title=" " alt="" coords="62,270,145,296"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="160,279,290,278,469,280,676,288,885,306,978,314,1017,323,1066,342,1110,371,1146,404,1143,408,1107,375,1063,347,1016,328,977,320,884,311,675,294,469,285,290,283,161,285"/>
+<area shape="rect" id="Node000011" href="$structsysio_1_1chain_1_1block__header.html" title=" " alt="" coords="383,143,513,184"/>
+<area shape="poly" id="edge13_Node000011_Node000009" title=" " alt="" coords="160,272,246,251,293,235,337,215,349,206,361,196,388,182,391,187,364,200,353,210,340,220,295,240,247,256,161,277"/>
+<area shape="poly" id="edge17_Node000016_Node000009" title=" " alt="" coords="160,290,226,299,489,327,706,342,706,347,488,332,225,305,160,295"/>
+<area shape="rect" id="Node000010" href="$structsysio_1_1chain_1_1signed__block__header.html" title=" " alt="" coords="721,203,858,244"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="874,216,920,218,970,225,1020,239,1066,262,1101,294,1129,332,1150,371,1164,405,1159,407,1145,373,1124,335,1097,297,1063,267,1018,244,969,230,920,223,874,221"/>
+<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="529,175,721,209,720,214,528,180"/>
+<area shape="rect" id="Node000012" href="$classsysio_1_1chain_1_1block__timestamp.html" title=" " alt="" coords="12,5,195,76"/>
+<area shape="poly" id="edge11_Node000011_Node000012" title=" " alt="" coords="210,64,275,83,340,106,411,140,408,145,338,111,273,88,209,69"/>
+<area shape="rect" id="Node000013" href="$structsysio_1_1chain_1_1name.html" title="Immutable except for fc::from_variant." alt="" coords="38,100,169,126"/>
+<area shape="poly" id="edge12_Node000011_Node000013" title=" " alt="" coords="185,120,339,142,383,149,382,154,338,147,184,125"/>
+<area shape="rect" id="Node000014" href="$classfc_1_1vector.html" title=" " alt="" coords="5,150,202,190"/>
+<area shape="poly" id="edge14_Node000011_Node000014" title=" " alt="" coords="217,165,382,162,382,167,218,170"/>
+<area shape="rect" id="Node000015" href="$classfc_1_1crypto_1_1signature.html" title=" " alt="" coords="379,210,516,236"/>
+<area shape="poly" id="edge15_Node000010_Node000015" title=" " alt="" coords="532,221,721,221,721,226,532,226"/>
+<area shape="poly" id="edge16_Node000001_Node000016" title=" " alt="" coords="889,359,975,374,1065,394,1095,403,1094,408,1064,399,974,379,888,364"/>
+</map>

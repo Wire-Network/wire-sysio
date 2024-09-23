@@ -1,0 +1,74 @@
+\doxysection{libraries/fc/include/fc/crypto/webauthn\+\_\+json/example/serialize/serialize.cpp File Reference}
+\hypertarget{serialize_8cpp}{}\label{serialize_8cpp}\index{libraries/fc/include/fc/crypto/webauthn\_json/example/serialize/serialize.cpp@{libraries/fc/include/fc/crypto/webauthn\_json/example/serialize/serialize.cpp}}
+{\ttfamily \#include "{}rapidjson/prettywriter.\+h"{}}\newline
+{\ttfamily \#include $<$cstdio$>$}\newline
+{\ttfamily \#include $<$string$>$}\newline
+{\ttfamily \#include $<$vector$>$}\newline
+Include dependency graph for serialize.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{serialize_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{class_person}{Person}}
+\item 
+class \mbox{\hyperlink{class_education}{Education}}
+\item 
+class \mbox{\hyperlink{class_dependent}{Dependent}}
+\item 
+class \mbox{\hyperlink{class_employee}{Employee}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{serialize_8cpp_a81ce304348a420752ee080480d2b3095}{main}} (int, char \texorpdfstring{$\ast$}{*}\mbox{[}$\,$\mbox{]})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{serialize_8cpp_a81ce304348a420752ee080480d2b3095}\index{serialize.cpp@{serialize.cpp}!main@{main}}
+\index{main@{main}!serialize.cpp@{serialize.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{serialize_8cpp_a81ce304348a420752ee080480d2b3095} 
+int main (\begin{DoxyParamCaption}\item[{int}]{}{, }\item[{char \texorpdfstring{$\ast$}{*}}]{}{\mbox{[}$\,$\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{serialize_8cpp_source_l00153}{153}} of file \mbox{\hyperlink{serialize_8cpp_source}{serialize.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00154\ \ \ \ \ std::vector<Employee>\ employees;}
+\DoxyCodeLine{00155\ }
+\DoxyCodeLine{00156\ \ \ \ \ employees.push\_back(\mbox{\hyperlink{class_employee}{Employee}}(\textcolor{stringliteral}{"{}Milo\ YIP"{}},\ 34,\ \textcolor{keyword}{true}));}
+\DoxyCodeLine{00157\ \ \ \ \ employees.back().AddDependent(\mbox{\hyperlink{class_dependent}{Dependent}}(\textcolor{stringliteral}{"{}Lua\ YIP"{}},\ 3,\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_education}{Education}}(\textcolor{stringliteral}{"{}Happy\ Kindergarten"{}},\ 3.5)));}
+\DoxyCodeLine{00158\ \ \ \ \ employees.back().AddDependent(\mbox{\hyperlink{class_dependent}{Dependent}}(\textcolor{stringliteral}{"{}Mio\ YIP"{}},\ 1));}
+\DoxyCodeLine{00159\ }
+\DoxyCodeLine{00160\ \ \ \ \ employees.push\_back(\mbox{\hyperlink{class_employee}{Employee}}(\textcolor{stringliteral}{"{}Percy\ TSE"{}},\ 30,\ \textcolor{keyword}{false}));}
+\DoxyCodeLine{00161\ }
+\DoxyCodeLine{00162\ \ \ \ \ \mbox{\hyperlink{class_generic_string_buffer}{StringBuffer}}\ sb;}
+\DoxyCodeLine{00163\ \ \ \ \ \mbox{\hyperlink{class_pretty_writer}{PrettyWriter<StringBuffer>}}\ writer(sb);}
+\DoxyCodeLine{00164\ }
+\DoxyCodeLine{00165\ \ \ \ \ writer.StartArray();}
+\DoxyCodeLine{00166\ \ \ \ \ \textcolor{keywordflow}{for}\ (std::vector<Employee>::const\_iterator\ employeeItr\ =\ employees.begin();\ employeeItr\ !=\ employees.end();\ ++employeeItr)}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \ \ employeeItr-\/>Serialize(writer);}
+\DoxyCodeLine{00168\ \ \ \ \ writer.EndArray();}
+\DoxyCodeLine{00169\ }
+\DoxyCodeLine{00170\ \ \ \ \ puts(sb.\mbox{\hyperlink{class_generic_string_buffer_a42079865bab1deb930c6cff7d491c719}{GetString}}());}
+\DoxyCodeLine{00171\ }
+\DoxyCodeLine{00172\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00173\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{serialize_8cpp_a81ce304348a420752ee080480d2b3095_cgraph}
+\end{center}
+\end{figure}

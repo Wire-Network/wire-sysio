@@ -1,0 +1,9 @@
+var namespaceboost_1_1asio =
+[
+    [ "async_result< boost::fibers::asio::detail::yield_handler< T > >", "classboost_1_1asio_1_1async__result_3_01boost_1_1fibers_1_1asio_1_1detail_1_1yield__handler_3_01_t_01_4_01_4.html", "classboost_1_1asio_1_1async__result_3_01boost_1_1fibers_1_1asio_1_1detail_1_1yield__handler_3_01_t_01_4_01_4" ],
+    [ "async_result< boost::fibers::asio::detail::yield_handler< void > >", "classboost_1_1asio_1_1async__result_3_01boost_1_1fibers_1_1asio_1_1detail_1_1yield__handler_3_01void_01_4_01_4.html", "classboost_1_1asio_1_1async__result_3_01boost_1_1fibers_1_1asio_1_1detail_1_1yield__handler_3_01void_01_4_01_4" ],
+    [ "handler_type< fibers::asio::yield_t, ReturnType() >", "structboost_1_1asio_1_1handler__type_3_01fibers_1_1asio_1_1yield__t_00_01_return_type_07_08_01_4.html", "structboost_1_1asio_1_1handler__type_3_01fibers_1_1asio_1_1yield__t_00_01_return_type_07_08_01_4" ],
+    [ "handler_type< fibers::asio::yield_t, ReturnType(Arg1) >", "structboost_1_1asio_1_1handler__type_3_01fibers_1_1asio_1_1yield__t_00_01_return_type_07_arg1_08_01_4.html", "structboost_1_1asio_1_1handler__type_3_01fibers_1_1asio_1_1yield__t_00_01_return_type_07_arg1_08_01_4" ],
+    [ "handler_type< fibers::asio::yield_t, ReturnType(boost::system::error_code) >", "structboost_1_1asio_1_1handler__type_3_01fibers_1_1asio_1_1yield__t_00_01_return_type_07boost_1_1system_1_1error__code_08_01_4.html", "structboost_1_1asio_1_1handler__type_3_01fibers_1_1asio_1_1yield__t_00_01_return_type_07boost_1_1system_1_1error__code_08_01_4" ],
+    [ "handler_type< fibers::asio::yield_t, ReturnType(boost::system::error_code, Arg2) >", "structboost_1_1asio_1_1handler__type_3_01fibers_1_1asio_1_1yield__t_00_01_return_type_07boost_1_dec09fad67bd9ca4754be75bf1feab34.html", "structboost_1_1asio_1_1handler__type_3_01fibers_1_1asio_1_1yield__t_00_01_return_type_07boost_1_dec09fad67bd9ca4754be75bf1feab34" ]
+];

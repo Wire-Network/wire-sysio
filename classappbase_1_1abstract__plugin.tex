@@ -1,0 +1,194 @@
+\doxysection{appbase\+::abstract\+\_\+plugin Class Reference}
+\hypertarget{classappbase_1_1abstract__plugin}{}\label{classappbase_1_1abstract__plugin}\index{appbase::abstract\_plugin@{appbase::abstract\_plugin}}
+
+
+{\ttfamily \#include $<$plugin.\+hpp$>$}
+
+
+
+Inheritance diagram for appbase\+::abstract\+\_\+plugin\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{classappbase_1_1abstract__plugin__inherit__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408}{state}} \{ \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408ac712ce3482a78b8bf87080aefd77cf7d}{registered}}
+, \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408a9ae208bba76e9c0eab1cac52953f947b}{initialized}}
+, \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408a808ebbf475942017567644697eca3224}{started}}
+, \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408a320c2eebb5306f385aebfca07336d29e}{stopped}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4643a2618ac94aa2ef56e59fe363f828}{\texorpdfstring{$\sim$}{\string~}abstract\+\_\+plugin}} ()
+\item 
+virtual \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408}{state}} \mbox{\hyperlink{classappbase_1_1abstract__plugin_a8a035293a88d04abf64883c45ac466a5}{get\+\_\+state}} () const =0
+\item 
+virtual const std\+::string \& \mbox{\hyperlink{classappbase_1_1abstract__plugin_a5b77f67ec26f81a9fc24213bce4fcbf5}{name}} () const =0
+\item 
+virtual void \mbox{\hyperlink{classappbase_1_1abstract__plugin_a274a3c7462de3c699a8eb23741ed7655}{set\+\_\+program\+\_\+options}} (options\+\_\+description \&\mbox{\hyperlink{xbyak__mnemonic_8h_a4229a9b84f8b8673326f12bd41acd27c}{cli}}, options\+\_\+description \&cfg)=0
+\item 
+virtual void \mbox{\hyperlink{classappbase_1_1abstract__plugin_a7d8521f978f28ee7689ae336afd64a34}{initialize}} (const variables\+\_\+map \&options)=0
+\item 
+virtual void \mbox{\hyperlink{classappbase_1_1abstract__plugin_a3baa35cd2c37e965677d45d7aa3c4503}{handle\+\_\+sighup}} ()=0
+\item 
+virtual void \mbox{\hyperlink{classappbase_1_1abstract__plugin_addfbf314be55e7a774db7c65c08e58f7}{startup}} ()=0
+\item 
+virtual void \mbox{\hyperlink{classappbase_1_1abstract__plugin_ad615b1c385c4cb047e8adbe2e5a13322}{shutdown}} ()=0
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{plugin_8hpp_source_l00028}{28}} of file \mbox{\hyperlink{plugin_8hpp_source}{plugin.\+hpp}}.
+
+
+
+\doxysubsection{Member Enumeration Documentation}
+\Hypertarget{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408}\index{appbase::abstract\_plugin@{appbase::abstract\_plugin}!state@{state}}
+\index{state@{state}!appbase::abstract\_plugin@{appbase::abstract\_plugin}}
+\doxysubsubsection{\texorpdfstring{state}{state}}
+{\footnotesize\ttfamily \label{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408} 
+enum \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408}{appbase\+::abstract\+\_\+plugin\+::state}}}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{registered@{registered}!appbase::abstract\_plugin@{appbase::abstract\_plugin}}\index{appbase::abstract\_plugin@{appbase::abstract\_plugin}!registered@{registered}}}\Hypertarget{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408ac712ce3482a78b8bf87080aefd77cf7d}\label{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408} 
+registered&the plugin is constructed but doesn\textquotesingle{}t do anything \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{initialized@{initialized}!appbase::abstract\_plugin@{appbase::abstract\_plugin}}\index{appbase::abstract\_plugin@{appbase::abstract\_plugin}!initialized@{initialized}}}\Hypertarget{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408a9ae208bba76e9c0eab1cac52953f947b}\label{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408} 
+initialized&the plugin has initialized any state required but is idle \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{started@{started}!appbase::abstract\_plugin@{appbase::abstract\_plugin}}\index{appbase::abstract\_plugin@{appbase::abstract\_plugin}!started@{started}}}\Hypertarget{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408a808ebbf475942017567644697eca3224}\label{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408} 
+started&the plugin is actively running \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{stopped@{stopped}!appbase::abstract\_plugin@{appbase::abstract\_plugin}}\index{appbase::abstract\_plugin@{appbase::abstract\_plugin}!stopped@{stopped}}}\Hypertarget{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408a320c2eebb5306f385aebfca07336d29e}\label{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408} 
+stopped&the plugin is no longer running \\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{plugin_8hpp_source_l00030}{30}} of file \mbox{\hyperlink{plugin_8hpp_source}{plugin.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408ac712ce3482a78b8bf87080aefd77cf7d}{registered}},\ }
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408a9ae208bba76e9c0eab1cac52953f947b}{initialized}},\ }
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408a808ebbf475942017567644697eca3224}{started}},\ }
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408a320c2eebb5306f385aebfca07336d29e}{stopped}}\ }
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classappbase_1_1abstract__plugin_a4643a2618ac94aa2ef56e59fe363f828}\index{appbase::abstract\_plugin@{appbase::abstract\_plugin}!````~abstract\_plugin@{\texorpdfstring{$\sim$}{\string~}abstract\_plugin}}
+\index{````~abstract\_plugin@{\texorpdfstring{$\sim$}{\string~}abstract\_plugin}!appbase::abstract\_plugin@{appbase::abstract\_plugin}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}abstract\_plugin()}{\string~abstract\_plugin()}}
+{\footnotesize\ttfamily \label{classappbase_1_1abstract__plugin_a4643a2618ac94aa2ef56e59fe363f828} 
+virtual appbase\+::abstract\+\_\+plugin\+::\texorpdfstring{$\sim$}{\string~}abstract\+\_\+plugin (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{plugin_8hpp_source_l00037}{37}} of file \mbox{\hyperlink{plugin_8hpp_source}{plugin.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00037\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classappbase_1_1abstract__plugin_a8a035293a88d04abf64883c45ac466a5}\index{appbase::abstract\_plugin@{appbase::abstract\_plugin}!get\_state@{get\_state}}
+\index{get\_state@{get\_state}!appbase::abstract\_plugin@{appbase::abstract\_plugin}}
+\doxysubsubsection{\texorpdfstring{get\_state()}{get\_state()}}
+{\footnotesize\ttfamily \label{classappbase_1_1abstract__plugin_a8a035293a88d04abf64883c45ac466a5} 
+virtual \mbox{\hyperlink{classappbase_1_1abstract__plugin_a4a997c146c27d5baf538a6c987c86408}{state}} appbase\+::abstract\+\_\+plugin\+::get\+\_\+state (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{classappbase_1_1plugin_a857288c2424b57a898c0579d25dacbb0}{appbase\+::plugin$<$ Impl $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a857288c2424b57a898c0579d25dacbb0}{appbase\+::plugin$<$ chain\+\_\+api\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a857288c2424b57a898c0579d25dacbb0}{appbase\+::plugin$<$ chain\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a857288c2424b57a898c0579d25dacbb0}{appbase\+::plugin$<$ db\+\_\+size\+\_\+api\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a857288c2424b57a898c0579d25dacbb0}{appbase\+::plugin$<$ http\+\_\+client\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a857288c2424b57a898c0579d25dacbb0}{appbase\+::plugin$<$ http\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a857288c2424b57a898c0579d25dacbb0}{appbase\+::plugin$<$ login\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a857288c2424b57a898c0579d25dacbb0}{appbase\+::plugin$<$ net\+\_\+api\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a857288c2424b57a898c0579d25dacbb0}{appbase\+::plugin$<$ net\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a857288c2424b57a898c0579d25dacbb0}{appbase\+::plugin$<$ producer\+\_\+api\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a857288c2424b57a898c0579d25dacbb0}{appbase\+::plugin$<$ producer\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a857288c2424b57a898c0579d25dacbb0}{appbase\+::plugin$<$ resource\+\_\+monitor\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a857288c2424b57a898c0579d25dacbb0}{appbase\+::plugin$<$ state\+\_\+history\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a857288c2424b57a898c0579d25dacbb0}{appbase\+::plugin$<$ sub\+\_\+chain\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a857288c2424b57a898c0579d25dacbb0}{appbase\+::plugin$<$ template\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a857288c2424b57a898c0579d25dacbb0}{appbase\+::plugin$<$ test\+\_\+control\+\_\+api\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a857288c2424b57a898c0579d25dacbb0}{appbase\+::plugin$<$ test\+\_\+control\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a857288c2424b57a898c0579d25dacbb0}{appbase\+::plugin$<$ trace\+\_\+api\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a857288c2424b57a898c0579d25dacbb0}{appbase\+::plugin$<$ trace\+\_\+api\+\_\+rpc\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a857288c2424b57a898c0579d25dacbb0}{appbase\+::plugin$<$ txn\+\_\+test\+\_\+gen\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a857288c2424b57a898c0579d25dacbb0}{appbase\+::plugin$<$ wallet\+\_\+api\+\_\+plugin $>$}}, and \mbox{\hyperlink{classappbase_1_1plugin_a857288c2424b57a898c0579d25dacbb0}{appbase\+::plugin$<$ wallet\+\_\+plugin $>$}}.
+
+\Hypertarget{classappbase_1_1abstract__plugin_a3baa35cd2c37e965677d45d7aa3c4503}\index{appbase::abstract\_plugin@{appbase::abstract\_plugin}!handle\_sighup@{handle\_sighup}}
+\index{handle\_sighup@{handle\_sighup}!appbase::abstract\_plugin@{appbase::abstract\_plugin}}
+\doxysubsubsection{\texorpdfstring{handle\_sighup()}{handle\_sighup()}}
+{\footnotesize\ttfamily \label{classappbase_1_1abstract__plugin_a3baa35cd2c37e965677d45d7aa3c4503} 
+virtual void appbase\+::abstract\+\_\+plugin\+::handle\+\_\+sighup (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{classappbase_1_1plugin_ab314bd778e71a91de584cd9b8a999867}{appbase\+::plugin$<$ Impl $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_ab314bd778e71a91de584cd9b8a999867}{appbase\+::plugin$<$ chain\+\_\+api\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_ab314bd778e71a91de584cd9b8a999867}{appbase\+::plugin$<$ chain\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_ab314bd778e71a91de584cd9b8a999867}{appbase\+::plugin$<$ db\+\_\+size\+\_\+api\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_ab314bd778e71a91de584cd9b8a999867}{appbase\+::plugin$<$ http\+\_\+client\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_ab314bd778e71a91de584cd9b8a999867}{appbase\+::plugin$<$ http\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_ab314bd778e71a91de584cd9b8a999867}{appbase\+::plugin$<$ login\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_ab314bd778e71a91de584cd9b8a999867}{appbase\+::plugin$<$ net\+\_\+api\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_ab314bd778e71a91de584cd9b8a999867}{appbase\+::plugin$<$ net\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_ab314bd778e71a91de584cd9b8a999867}{appbase\+::plugin$<$ producer\+\_\+api\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_ab314bd778e71a91de584cd9b8a999867}{appbase\+::plugin$<$ producer\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_ab314bd778e71a91de584cd9b8a999867}{appbase\+::plugin$<$ resource\+\_\+monitor\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_ab314bd778e71a91de584cd9b8a999867}{appbase\+::plugin$<$ state\+\_\+history\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_ab314bd778e71a91de584cd9b8a999867}{appbase\+::plugin$<$ sub\+\_\+chain\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_ab314bd778e71a91de584cd9b8a999867}{appbase\+::plugin$<$ template\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_ab314bd778e71a91de584cd9b8a999867}{appbase\+::plugin$<$ test\+\_\+control\+\_\+api\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_ab314bd778e71a91de584cd9b8a999867}{appbase\+::plugin$<$ test\+\_\+control\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_ab314bd778e71a91de584cd9b8a999867}{appbase\+::plugin$<$ trace\+\_\+api\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_ab314bd778e71a91de584cd9b8a999867}{appbase\+::plugin$<$ trace\+\_\+api\+\_\+rpc\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_ab314bd778e71a91de584cd9b8a999867}{appbase\+::plugin$<$ txn\+\_\+test\+\_\+gen\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_ab314bd778e71a91de584cd9b8a999867}{appbase\+::plugin$<$ wallet\+\_\+api\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_ab314bd778e71a91de584cd9b8a999867}{appbase\+::plugin$<$ wallet\+\_\+plugin $>$}}, \mbox{\hyperlink{classsysio_1_1chain__plugin_af289b36dc5f753a772617ff3603090df}{sysio\+::chain\+\_\+plugin}}, \mbox{\hyperlink{classsysio_1_1http__plugin_af06f52d9b86dc41618f6392a4c0640a5}{sysio\+::http\+\_\+plugin}}, \mbox{\hyperlink{classsysio_1_1net__plugin_a961ce31b4538d04eac61b299bc970621}{sysio\+::net\+\_\+plugin}}, \mbox{\hyperlink{classsysio_1_1producer__plugin_a9c78e75e5222bbb493a5c1fb0919a9e2}{sysio\+::producer\+\_\+plugin}}, \mbox{\hyperlink{classsysio_1_1trace__api__plugin_aca24a14fa319b5bed80374e065c4302f}{sysio\+::trace\+\_\+api\+\_\+plugin}}, and \mbox{\hyperlink{classsysio_1_1trace__api__rpc__plugin_ae61f78d2d9607ca4ad43e998e8d6600e}{sysio\+::trace\+\_\+api\+\_\+rpc\+\_\+plugin}}.
+
+\Hypertarget{classappbase_1_1abstract__plugin_a7d8521f978f28ee7689ae336afd64a34}\index{appbase::abstract\_plugin@{appbase::abstract\_plugin}!initialize@{initialize}}
+\index{initialize@{initialize}!appbase::abstract\_plugin@{appbase::abstract\_plugin}}
+\doxysubsubsection{\texorpdfstring{initialize()}{initialize()}}
+{\footnotesize\ttfamily \label{classappbase_1_1abstract__plugin_a7d8521f978f28ee7689ae336afd64a34} 
+virtual void appbase\+::abstract\+\_\+plugin\+::initialize (\begin{DoxyParamCaption}\item[{const variables\+\_\+map \&}]{options}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{classappbase_1_1plugin_ac28755a82831d41e5d0ef0ce56b10fa9}{appbase\+::plugin$<$ Impl $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_ac28755a82831d41e5d0ef0ce56b10fa9}{appbase\+::plugin$<$ chain\+\_\+api\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_ac28755a82831d41e5d0ef0ce56b10fa9}{appbase\+::plugin$<$ chain\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_ac28755a82831d41e5d0ef0ce56b10fa9}{appbase\+::plugin$<$ db\+\_\+size\+\_\+api\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_ac28755a82831d41e5d0ef0ce56b10fa9}{appbase\+::plugin$<$ http\+\_\+client\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_ac28755a82831d41e5d0ef0ce56b10fa9}{appbase\+::plugin$<$ http\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_ac28755a82831d41e5d0ef0ce56b10fa9}{appbase\+::plugin$<$ login\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_ac28755a82831d41e5d0ef0ce56b10fa9}{appbase\+::plugin$<$ net\+\_\+api\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_ac28755a82831d41e5d0ef0ce56b10fa9}{appbase\+::plugin$<$ net\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_ac28755a82831d41e5d0ef0ce56b10fa9}{appbase\+::plugin$<$ producer\+\_\+api\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_ac28755a82831d41e5d0ef0ce56b10fa9}{appbase\+::plugin$<$ producer\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_ac28755a82831d41e5d0ef0ce56b10fa9}{appbase\+::plugin$<$ resource\+\_\+monitor\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_ac28755a82831d41e5d0ef0ce56b10fa9}{appbase\+::plugin$<$ state\+\_\+history\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_ac28755a82831d41e5d0ef0ce56b10fa9}{appbase\+::plugin$<$ sub\+\_\+chain\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_ac28755a82831d41e5d0ef0ce56b10fa9}{appbase\+::plugin$<$ template\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_ac28755a82831d41e5d0ef0ce56b10fa9}{appbase\+::plugin$<$ test\+\_\+control\+\_\+api\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_ac28755a82831d41e5d0ef0ce56b10fa9}{appbase\+::plugin$<$ test\+\_\+control\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_ac28755a82831d41e5d0ef0ce56b10fa9}{appbase\+::plugin$<$ trace\+\_\+api\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_ac28755a82831d41e5d0ef0ce56b10fa9}{appbase\+::plugin$<$ trace\+\_\+api\+\_\+rpc\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_ac28755a82831d41e5d0ef0ce56b10fa9}{appbase\+::plugin$<$ txn\+\_\+test\+\_\+gen\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_ac28755a82831d41e5d0ef0ce56b10fa9}{appbase\+::plugin$<$ wallet\+\_\+api\+\_\+plugin $>$}}, and \mbox{\hyperlink{classappbase_1_1plugin_ac28755a82831d41e5d0ef0ce56b10fa9}{appbase\+::plugin$<$ wallet\+\_\+plugin $>$}}.
+
+\Hypertarget{classappbase_1_1abstract__plugin_a5b77f67ec26f81a9fc24213bce4fcbf5}\index{appbase::abstract\_plugin@{appbase::abstract\_plugin}!name@{name}}
+\index{name@{name}!appbase::abstract\_plugin@{appbase::abstract\_plugin}}
+\doxysubsubsection{\texorpdfstring{name()}{name()}}
+{\footnotesize\ttfamily \label{classappbase_1_1abstract__plugin_a5b77f67ec26f81a9fc24213bce4fcbf5} 
+virtual const std\+::string \& appbase\+::abstract\+\_\+plugin\+::name (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{classappbase_1_1plugin_a274f072d2f7f37d43ae74e01edd0ba62}{appbase\+::plugin$<$ Impl $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a274f072d2f7f37d43ae74e01edd0ba62}{appbase\+::plugin$<$ chain\+\_\+api\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a274f072d2f7f37d43ae74e01edd0ba62}{appbase\+::plugin$<$ chain\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a274f072d2f7f37d43ae74e01edd0ba62}{appbase\+::plugin$<$ db\+\_\+size\+\_\+api\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a274f072d2f7f37d43ae74e01edd0ba62}{appbase\+::plugin$<$ http\+\_\+client\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a274f072d2f7f37d43ae74e01edd0ba62}{appbase\+::plugin$<$ http\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a274f072d2f7f37d43ae74e01edd0ba62}{appbase\+::plugin$<$ login\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a274f072d2f7f37d43ae74e01edd0ba62}{appbase\+::plugin$<$ net\+\_\+api\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a274f072d2f7f37d43ae74e01edd0ba62}{appbase\+::plugin$<$ net\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a274f072d2f7f37d43ae74e01edd0ba62}{appbase\+::plugin$<$ producer\+\_\+api\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a274f072d2f7f37d43ae74e01edd0ba62}{appbase\+::plugin$<$ producer\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a274f072d2f7f37d43ae74e01edd0ba62}{appbase\+::plugin$<$ resource\+\_\+monitor\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a274f072d2f7f37d43ae74e01edd0ba62}{appbase\+::plugin$<$ state\+\_\+history\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a274f072d2f7f37d43ae74e01edd0ba62}{appbase\+::plugin$<$ sub\+\_\+chain\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a274f072d2f7f37d43ae74e01edd0ba62}{appbase\+::plugin$<$ template\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a274f072d2f7f37d43ae74e01edd0ba62}{appbase\+::plugin$<$ test\+\_\+control\+\_\+api\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a274f072d2f7f37d43ae74e01edd0ba62}{appbase\+::plugin$<$ test\+\_\+control\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a274f072d2f7f37d43ae74e01edd0ba62}{appbase\+::plugin$<$ trace\+\_\+api\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a274f072d2f7f37d43ae74e01edd0ba62}{appbase\+::plugin$<$ trace\+\_\+api\+\_\+rpc\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a274f072d2f7f37d43ae74e01edd0ba62}{appbase\+::plugin$<$ txn\+\_\+test\+\_\+gen\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a274f072d2f7f37d43ae74e01edd0ba62}{appbase\+::plugin$<$ wallet\+\_\+api\+\_\+plugin $>$}}, and \mbox{\hyperlink{classappbase_1_1plugin_a274f072d2f7f37d43ae74e01edd0ba62}{appbase\+::plugin$<$ wallet\+\_\+plugin $>$}}.
+
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classappbase_1_1abstract__plugin_a5b77f67ec26f81a9fc24213bce4fcbf5_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classappbase_1_1abstract__plugin_a274a3c7462de3c699a8eb23741ed7655}\index{appbase::abstract\_plugin@{appbase::abstract\_plugin}!set\_program\_options@{set\_program\_options}}
+\index{set\_program\_options@{set\_program\_options}!appbase::abstract\_plugin@{appbase::abstract\_plugin}}
+\doxysubsubsection{\texorpdfstring{set\_program\_options()}{set\_program\_options()}}
+{\footnotesize\ttfamily \label{classappbase_1_1abstract__plugin_a274a3c7462de3c699a8eb23741ed7655} 
+virtual void appbase\+::abstract\+\_\+plugin\+::set\+\_\+program\+\_\+options (\begin{DoxyParamCaption}\item[{options\+\_\+description \&}]{cli}{, }\item[{options\+\_\+description \&}]{cfg}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{classchain__plugin_a23f5f088e302e535ccf74747ec7993d4}{chain\+\_\+plugin}}, \mbox{\hyperlink{classnet__plugin_aec9a119cdf9e78dda3108afb6a5d6c2e}{net\+\_\+plugin}}, \mbox{\hyperlink{classsysio_1_1chain__api__plugin_a8679612f56738a75a17560008ab90e5c}{sysio\+::chain\+\_\+api\+\_\+plugin}}, \mbox{\hyperlink{classsysio_1_1chain__plugin_aabb3367fd38e616cedca00bac72ecb28}{sysio\+::chain\+\_\+plugin}}, \mbox{\hyperlink{classsysio_1_1db__size__api__plugin_adefe1ec66ad0a5c2dfcf5e43799aa884}{sysio\+::db\+\_\+size\+\_\+api\+\_\+plugin}}, \mbox{\hyperlink{classsysio_1_1http__client__plugin_abb0ae20718a87fef0af9411e77fbd3d1}{sysio\+::http\+\_\+client\+\_\+plugin}}, \mbox{\hyperlink{classsysio_1_1http__plugin_a4be137b6ad169ee4e2b745a50ba1a874}{sysio\+::http\+\_\+plugin}}, \mbox{\hyperlink{classsysio_1_1login__plugin_a8375881090226b8c6574ff8a3af13d00}{sysio\+::login\+\_\+plugin}}, \mbox{\hyperlink{classsysio_1_1net__api__plugin_ac1638107ca3068c43ca0a6e1891fbe86}{sysio\+::net\+\_\+api\+\_\+plugin}}, \mbox{\hyperlink{classsysio_1_1net__plugin_af7122c7ff5ec0d5a62f900e75f2ab152}{sysio\+::net\+\_\+plugin}}, \mbox{\hyperlink{classsysio_1_1producer__api__plugin_a0efb7e1ff9c817bc6b54293beeeb6107}{sysio\+::producer\+\_\+api\+\_\+plugin}}, \mbox{\hyperlink{classsysio_1_1resource__monitor__plugin_a6d82af2b00041a1f160d7268c1b454b7}{sysio\+::resource\+\_\+monitor\+\_\+plugin}}, \mbox{\hyperlink{classsysio_1_1state__history__plugin_a475b7467d5410fc8c53e6ad38503fbda}{sysio\+::state\+\_\+history\+\_\+plugin}}, \mbox{\hyperlink{classsysio_1_1sub__chain__plugin_a6e2741ccffb9b3d1c62642e8d01469c2}{sysio\+::sub\+\_\+chain\+\_\+plugin}}, \mbox{\hyperlink{classsysio_1_1template__plugin_a766d3fa7bbfeefeaa3bdc7bfba4303c0}{sysio\+::template\+\_\+plugin}}, \mbox{\hyperlink{classsysio_1_1test__control__api__plugin_a92572099f7148b13406d6ba3182b7b26}{sysio\+::test\+\_\+control\+\_\+api\+\_\+plugin}}, \mbox{\hyperlink{classsysio_1_1test__control__plugin_a8102347593e0e79afed0dd9bb4a90e1d}{sysio\+::test\+\_\+control\+\_\+plugin}}, \mbox{\hyperlink{classsysio_1_1trace__api__plugin_a5a0e7ac1e000477c233406a4dc391083}{sysio\+::trace\+\_\+api\+\_\+plugin}}, \mbox{\hyperlink{classsysio_1_1trace__api__rpc__plugin_aae10da86f4c9735f2965db3792b1a405}{sysio\+::trace\+\_\+api\+\_\+rpc\+\_\+plugin}}, \mbox{\hyperlink{classsysio_1_1wallet__api__plugin_a52cde60ae7e78ff95ddfd5d16c47755f}{sysio\+::wallet\+\_\+api\+\_\+plugin}}, and \mbox{\hyperlink{classsysio_1_1wallet__plugin_adc6cd595f7bb05c09188e27769ff935a}{sysio\+::wallet\+\_\+plugin}}.
+
+\Hypertarget{classappbase_1_1abstract__plugin_ad615b1c385c4cb047e8adbe2e5a13322}\index{appbase::abstract\_plugin@{appbase::abstract\_plugin}!shutdown@{shutdown}}
+\index{shutdown@{shutdown}!appbase::abstract\_plugin@{appbase::abstract\_plugin}}
+\doxysubsubsection{\texorpdfstring{shutdown()}{shutdown()}}
+{\footnotesize\ttfamily \label{classappbase_1_1abstract__plugin_ad615b1c385c4cb047e8adbe2e5a13322} 
+virtual void appbase\+::abstract\+\_\+plugin\+::shutdown (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{classappbase_1_1plugin_a21e5be5587fca41fbc91367d449b8f27}{appbase\+::plugin$<$ Impl $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a21e5be5587fca41fbc91367d449b8f27}{appbase\+::plugin$<$ chain\+\_\+api\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a21e5be5587fca41fbc91367d449b8f27}{appbase\+::plugin$<$ chain\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a21e5be5587fca41fbc91367d449b8f27}{appbase\+::plugin$<$ db\+\_\+size\+\_\+api\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a21e5be5587fca41fbc91367d449b8f27}{appbase\+::plugin$<$ http\+\_\+client\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a21e5be5587fca41fbc91367d449b8f27}{appbase\+::plugin$<$ http\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a21e5be5587fca41fbc91367d449b8f27}{appbase\+::plugin$<$ login\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a21e5be5587fca41fbc91367d449b8f27}{appbase\+::plugin$<$ net\+\_\+api\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a21e5be5587fca41fbc91367d449b8f27}{appbase\+::plugin$<$ net\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a21e5be5587fca41fbc91367d449b8f27}{appbase\+::plugin$<$ producer\+\_\+api\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a21e5be5587fca41fbc91367d449b8f27}{appbase\+::plugin$<$ producer\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a21e5be5587fca41fbc91367d449b8f27}{appbase\+::plugin$<$ resource\+\_\+monitor\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a21e5be5587fca41fbc91367d449b8f27}{appbase\+::plugin$<$ state\+\_\+history\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a21e5be5587fca41fbc91367d449b8f27}{appbase\+::plugin$<$ sub\+\_\+chain\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a21e5be5587fca41fbc91367d449b8f27}{appbase\+::plugin$<$ template\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a21e5be5587fca41fbc91367d449b8f27}{appbase\+::plugin$<$ test\+\_\+control\+\_\+api\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a21e5be5587fca41fbc91367d449b8f27}{appbase\+::plugin$<$ test\+\_\+control\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a21e5be5587fca41fbc91367d449b8f27}{appbase\+::plugin$<$ trace\+\_\+api\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a21e5be5587fca41fbc91367d449b8f27}{appbase\+::plugin$<$ trace\+\_\+api\+\_\+rpc\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a21e5be5587fca41fbc91367d449b8f27}{appbase\+::plugin$<$ txn\+\_\+test\+\_\+gen\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a21e5be5587fca41fbc91367d449b8f27}{appbase\+::plugin$<$ wallet\+\_\+api\+\_\+plugin $>$}}, and \mbox{\hyperlink{classappbase_1_1plugin_a21e5be5587fca41fbc91367d449b8f27}{appbase\+::plugin$<$ wallet\+\_\+plugin $>$}}.
+
+\Hypertarget{classappbase_1_1abstract__plugin_addfbf314be55e7a774db7c65c08e58f7}\index{appbase::abstract\_plugin@{appbase::abstract\_plugin}!startup@{startup}}
+\index{startup@{startup}!appbase::abstract\_plugin@{appbase::abstract\_plugin}}
+\doxysubsubsection{\texorpdfstring{startup()}{startup()}}
+{\footnotesize\ttfamily \label{classappbase_1_1abstract__plugin_addfbf314be55e7a774db7c65c08e58f7} 
+virtual void appbase\+::abstract\+\_\+plugin\+::startup (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{classappbase_1_1plugin_a10e4e1c582bfadf67f510df76d87abfd}{appbase\+::plugin$<$ Impl $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a10e4e1c582bfadf67f510df76d87abfd}{appbase\+::plugin$<$ chain\+\_\+api\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a10e4e1c582bfadf67f510df76d87abfd}{appbase\+::plugin$<$ chain\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a10e4e1c582bfadf67f510df76d87abfd}{appbase\+::plugin$<$ db\+\_\+size\+\_\+api\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a10e4e1c582bfadf67f510df76d87abfd}{appbase\+::plugin$<$ http\+\_\+client\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a10e4e1c582bfadf67f510df76d87abfd}{appbase\+::plugin$<$ http\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a10e4e1c582bfadf67f510df76d87abfd}{appbase\+::plugin$<$ login\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a10e4e1c582bfadf67f510df76d87abfd}{appbase\+::plugin$<$ net\+\_\+api\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a10e4e1c582bfadf67f510df76d87abfd}{appbase\+::plugin$<$ net\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a10e4e1c582bfadf67f510df76d87abfd}{appbase\+::plugin$<$ producer\+\_\+api\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a10e4e1c582bfadf67f510df76d87abfd}{appbase\+::plugin$<$ producer\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a10e4e1c582bfadf67f510df76d87abfd}{appbase\+::plugin$<$ resource\+\_\+monitor\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a10e4e1c582bfadf67f510df76d87abfd}{appbase\+::plugin$<$ state\+\_\+history\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a10e4e1c582bfadf67f510df76d87abfd}{appbase\+::plugin$<$ sub\+\_\+chain\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a10e4e1c582bfadf67f510df76d87abfd}{appbase\+::plugin$<$ template\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a10e4e1c582bfadf67f510df76d87abfd}{appbase\+::plugin$<$ test\+\_\+control\+\_\+api\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a10e4e1c582bfadf67f510df76d87abfd}{appbase\+::plugin$<$ test\+\_\+control\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a10e4e1c582bfadf67f510df76d87abfd}{appbase\+::plugin$<$ trace\+\_\+api\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a10e4e1c582bfadf67f510df76d87abfd}{appbase\+::plugin$<$ trace\+\_\+api\+\_\+rpc\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a10e4e1c582bfadf67f510df76d87abfd}{appbase\+::plugin$<$ txn\+\_\+test\+\_\+gen\+\_\+plugin $>$}}, \mbox{\hyperlink{classappbase_1_1plugin_a10e4e1c582bfadf67f510df76d87abfd}{appbase\+::plugin$<$ wallet\+\_\+api\+\_\+plugin $>$}}, and \mbox{\hyperlink{classappbase_1_1plugin_a10e4e1c582bfadf67f510df76d87abfd}{appbase\+::plugin$<$ wallet\+\_\+plugin $>$}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/appbase/include/appbase/\mbox{\hyperlink{plugin_8hpp}{plugin.\+hpp}}\end{DoxyCompactItemize}

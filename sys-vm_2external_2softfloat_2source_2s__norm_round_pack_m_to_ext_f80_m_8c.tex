@@ -1,0 +1,77 @@
+\doxysection{libraries/sys-\/vm/external/softfloat/source/s\+\_\+norm\+Round\+Pack\+MTo\+Ext\+F80M.c File Reference}
+\hypertarget{sys-vm_2external_2softfloat_2source_2s__norm_round_pack_m_to_ext_f80_m_8c}{}\label{sys-vm_2external_2softfloat_2source_2s__norm_round_pack_m_to_ext_f80_m_8c}\index{libraries/sys-\/vm/external/softfloat/source/s\_normRoundPackMToExtF80M.c@{libraries/sys-\/vm/external/softfloat/source/s\_normRoundPackMToExtF80M.c}}
+{\ttfamily \#include $<$stdbool.\+h$>$}\newline
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include "{}platform.\+h"{}}\newline
+{\ttfamily \#include "{}internals.\+h"{}}\newline
+Include dependency graph for s\+\_\+norm\+Round\+Pack\+MTo\+Ext\+F80\+M.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sys-vm_2external_2softfloat_2source_2s__norm_round_pack_m_to_ext_f80_m_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2s__norm_round_pack_m_to_ext_f80_m_8c_a9ce3e6e080f54b6f43c5da22e5a53144}{softfloat\+\_\+norm\+Round\+Pack\+MTo\+Ext\+F80M}} (bool sign, \mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\+\_\+t}} exp, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*}ext\+Sig\+Ptr, \mbox{\hyperlink{stdint_8h_ad0fca8b15c218d2c687f8c373a71d228}{uint\+\_\+fast8\+\_\+t}} rounding\+Precision, struct \mbox{\hyperlink{structext_float80_m}{ext\+Float80M}} \texorpdfstring{$\ast$}{*}z\+SPtr)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{sys-vm_2external_2softfloat_2source_2s__norm_round_pack_m_to_ext_f80_m_8c_a9ce3e6e080f54b6f43c5da22e5a53144}\index{s\_normRoundPackMToExtF80M.c@{s\_normRoundPackMToExtF80M.c}!softfloat\_normRoundPackMToExtF80M@{softfloat\_normRoundPackMToExtF80M}}
+\index{softfloat\_normRoundPackMToExtF80M@{softfloat\_normRoundPackMToExtF80M}!s\_normRoundPackMToExtF80M.c@{s\_normRoundPackMToExtF80M.c}}
+\doxysubsubsection{\texorpdfstring{softfloat\_normRoundPackMToExtF80M()}{softfloat\_normRoundPackMToExtF80M()}}
+{\footnotesize\ttfamily \label{sys-vm_2external_2softfloat_2source_2s__norm_round_pack_m_to_ext_f80_m_8c_a9ce3e6e080f54b6f43c5da22e5a53144} 
+void softfloat\+\_\+norm\+Round\+Pack\+MTo\+Ext\+F80M (\begin{DoxyParamCaption}\item[{bool}]{sign}{, }\item[{\mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\+\_\+t}}}]{exp}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{ext\+Sig\+Ptr}{, }\item[{\mbox{\hyperlink{stdint_8h_ad0fca8b15c218d2c687f8c373a71d228}{uint\+\_\+fast8\+\_\+t}}}]{rounding\+Precision}{, }\item[{struct \mbox{\hyperlink{structext_float80_m}{ext\+Float80M}} \texorpdfstring{$\ast$}{*}}]{z\+SPtr}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2s__norm_round_pack_m_to_ext_f80_m_8c_source_l00043}{43}} of file \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2s__norm_round_pack_m_to_ext_f80_m_8c_source}{s\+\_\+norm\+Round\+Pack\+MTo\+Ext\+F80\+M.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00050\ \{}
+\DoxyCodeLine{00051\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a9b7386d4af0e20ee32296d9a158c9f3a}{int\_fast16\_t}}\ shiftDist;}
+\DoxyCodeLine{00052\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ wordSig;}
+\DoxyCodeLine{00053\ }
+\DoxyCodeLine{00054\ \ \ \ \ shiftDist\ =\ 0;}
+\DoxyCodeLine{00055\ \ \ \ \ wordSig\ =\ extSigPtr[\mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a49446dd1193996f92b1e5bb62eaa4689}{indexWord}}(\ 3,\ 2\ )];}
+\DoxyCodeLine{00056\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ !\ wordSig\ )\ \{}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ shiftDist\ =\ 32;}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ wordSig\ =\ extSigPtr[\mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a49446dd1193996f92b1e5bb62eaa4689}{indexWord}}(\ 3,\ 1\ )];}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ !\ wordSig\ )\ \{}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \ \ \ \ shiftDist\ =\ 64;}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \ \ \ \ wordSig\ =\ extSigPtr[\mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a49446dd1193996f92b1e5bb62eaa4689}{indexWord}}(\ 3,\ 0\ )];}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ !\ wordSig\ )\ \{}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ zSPtr-\/>\mbox{\hyperlink{structext_float80_m_afcc87c4645279344c5365a291766afe2}{signExp}}\ =\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a5e62ae06b6c2a91feb5b6e8175082250}{packToExtF80UI64}}(\ sign,\ 0\ );}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ zSPtr-\/>\mbox{\hyperlink{structext_float80_m_ac0c736880d01d0abd0a818e658755b3b}{signif}}\ =\ 0;}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00068\ \ \ \ \ \}}
+\DoxyCodeLine{00069\ \ \ \ \ shiftDist\ +=\ \mbox{\hyperlink{softfloat_2source_2s__count_leading_zeros32_8c_a20e06c2785548bfc8a5351e7e241e351}{softfloat\_countLeadingZeros32}}(\ wordSig\ );}
+\DoxyCodeLine{00070\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ shiftDist\ )\ \{}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ exp\ -\/=\ shiftDist;}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{softfloat_2source_2include_2primitives_8h_ad5cc3e39683a66eb557d7f3975f0d019}{softfloat\_shiftLeft96M}}(\ extSigPtr,\ shiftDist,\ extSigPtr\ );}
+\DoxyCodeLine{00073\ \ \ \ \ \}}
+\DoxyCodeLine{00074\ \ \ \ \ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a870565ba8a64842c8cebb11450758b34}{softfloat\_roundPackMToExtF80M}}(}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ sign,\ exp,\ extSigPtr,\ roundingPrecision,\ zSPtr\ );}
+\DoxyCodeLine{00076\ }
+\DoxyCodeLine{00077\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sys-vm_2external_2softfloat_2source_2s__norm_round_pack_m_to_ext_f80_m_8c_a9ce3e6e080f54b6f43c5da22e5a53144_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sys-vm_2external_2softfloat_2source_2s__norm_round_pack_m_to_ext_f80_m_8c_a9ce3e6e080f54b6f43c5da22e5a53144_icgraph}
+\end{center}
+\end{figure}

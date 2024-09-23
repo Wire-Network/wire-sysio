@@ -1,0 +1,12 @@
+<map id="sysio::producer_plugin::sign_compact" name="sysio::producer_plugin::sign_compact">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,51,157,92"/>
+<area shape="rect" id="Node000002" href="$namespacefc.html#a150ca4cd9c0318ca45dc0dc7df5d58b9" title=" " alt="" coords="205,59,280,84"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="157,69,189,69,189,74,157,74"/>
+<area shape="rect" id="Node000003" href="$namespacefc_1_1raw.html#a3a18d8161aa5b4f4f02b6fcfdff5e5d1" title=" " alt="" coords="348,29,445,55"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="280,62,332,52,333,57,281,67"/>
+<area shape="rect" id="Node000004" href="$classfc_1_1sha256_1_1encoder.html#a4d8b8181e912194cf98a56164671adf8" title=" " alt="" coords="328,79,464,120"/>
+<area shape="poly" id="edge4_Node000002_Node000004" title=" " alt="" coords="281,76,313,82,312,87,280,81"/>
+<area shape="poly" id="edge3_Node000003_Node000003" title=" " alt="" coords="370,30,365,21,368,11,379,5,396,3,415,5,425,12,422,16,413,10,396,8,380,10,372,15,370,20,374,28"/>
+<area shape="rect" id="Node000005" href="$classfc_1_1sha256.html#ab897537f6c524085b28049be51ed370d" title=" " alt="" coords="512,87,628,112"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="465,97,496,97,496,102,465,102"/>
+</map>

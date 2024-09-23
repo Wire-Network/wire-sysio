@@ -1,0 +1,112 @@
+\doxysection{buyrex\+\_\+subcommand Struct Reference}
+\hypertarget{structbuyrex__subcommand}{}\label{structbuyrex__subcommand}\index{buyrex\_subcommand@{buyrex\_subcommand}}
+
+
+Collaboration diagram for buyrex\+\_\+subcommand\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=189pt]{structbuyrex__subcommand__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structbuyrex__subcommand_aa87f0055fbcc4f2b0335dd0c69326b63}{buyrex\+\_\+subcommand}} (\mbox{\hyperlink{class_c_l_i_1_1_app}{CLI\+::\+App}} \texorpdfstring{$\ast$}{*}action\+Root)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structbuyrex__subcommand_ae8f98dd501bab4e6d117853351d75341}{from\+\_\+str}}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structbuyrex__subcommand_ac66eed05f50429d3c8283ad83c96f0df}{amount\+\_\+str}}
+\item 
+const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \mbox{\hyperlink{structbuyrex__subcommand_a8759976e9223cf55bc7e3a2a77b5fe48}{act\+\_\+name}} \{ "{}buyrex"{}\+\_\+n \}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01852}{1852}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structbuyrex__subcommand_aa87f0055fbcc4f2b0335dd0c69326b63}\index{buyrex\_subcommand@{buyrex\_subcommand}!buyrex\_subcommand@{buyrex\_subcommand}}
+\index{buyrex\_subcommand@{buyrex\_subcommand}!buyrex\_subcommand@{buyrex\_subcommand}}
+\doxysubsubsection{\texorpdfstring{buyrex\_subcommand()}{buyrex\_subcommand()}}
+{\footnotesize\ttfamily \label{structbuyrex__subcommand_aa87f0055fbcc4f2b0335dd0c69326b63} 
+buyrex\+\_\+subcommand\+::buyrex\+\_\+subcommand (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_c_l_i_1_1_app}{CLI\+::\+App}} \texorpdfstring{$\ast$}{*}}]{action\+Root}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01857}{1857}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01857\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01858\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ buyrex\ =\ actionRoot-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_a8b461d2233ec4121259011b5ed24b336}{add\_subcommand}}(\textcolor{stringliteral}{"{}buyrex"{}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}Buy\ REX\ using\ tokens\ in\ owner's\ REX\ fund"{}}));}
+\DoxyCodeLine{01859\ \ \ \ \ \ \ buyrex-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_a8c812d42c7720ecb5cd0aec41b5aa941}{add\_option}}(\textcolor{stringliteral}{"{}from"{}},\ \ \ \mbox{\hyperlink{structbuyrex__subcommand_ae8f98dd501bab4e6d117853351d75341}{from\_str}},\ \ \ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}Account\ buying\ REX\ tokens"{}}))-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a}{required}}();}
+\DoxyCodeLine{01860\ \ \ \ \ \ \ buyrex-\/>add\_option(\textcolor{stringliteral}{"{}amount"{}},\ \mbox{\hyperlink{structbuyrex__subcommand_ac66eed05f50429d3c8283ad83c96f0df}{amount\_str}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}Amount\ to\ be\ taken\ from\ REX\ fund\ and\ used\ in\ buying\ REX"{}}))-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a}{required}}();}
+\DoxyCodeLine{01861\ \ \ \ \ \ \ \mbox{\hyperlink{programs_2clio_2main_8cpp_aa5d53f41b83b5323c73622fbbb15e9cd}{add\_standard\_transaction\_options}}(buyrex,\ \textcolor{stringliteral}{"{}from@active"{}});}
+\DoxyCodeLine{01862\ \ \ \ \ \ \ buyrex-\/>callback([\textcolor{keyword}{this}]\ \{}
+\DoxyCodeLine{01863\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}\ act\_payload\ =\ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}()}
+\DoxyCodeLine{01864\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}from"{}},\ \ \ \mbox{\hyperlink{structbuyrex__subcommand_ae8f98dd501bab4e6d117853351d75341}{from\_str}})}
+\DoxyCodeLine{01865\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}amount"{}},\ \mbox{\hyperlink{structbuyrex__subcommand_ac66eed05f50429d3c8283ad83c96f0df}{amount\_str}});}
+\DoxyCodeLine{01866\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ accountPermissions\ =\ \mbox{\hyperlink{programs_2clio_2main_8cpp_a2b91ca5dbe7cc4ab287d0e44c3037552}{get\_account\_permissions}}(\mbox{\hyperlink{programs_2clio_2main_8cpp_ad552924cb151dcd5b60c73856d1ff706}{tx\_permission}},\ \{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(\mbox{\hyperlink{structbuyrex__subcommand_ae8f98dd501bab4e6d117853351d75341}{from\_str}}),\ config::active\_name\});}
+\DoxyCodeLine{01867\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{programs_2clio_2main_8cpp_aaf784434864a29e4835be7465173d1ab}{send\_actions}}(\{\mbox{\hyperlink{programs_2clio_2main_8cpp_a067e20df5f65333b0c3cf5840bc37dea}{create\_action}}(accountPermissions,\ config::system\_account\_name,\ \mbox{\hyperlink{structbuyrex__subcommand_a8759976e9223cf55bc7e3a2a77b5fe48}{act\_name}},\ act\_payload)\});}
+\DoxyCodeLine{01868\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{01869\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structbuyrex__subcommand_aa87f0055fbcc4f2b0335dd0c69326b63_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structbuyrex__subcommand_a8759976e9223cf55bc7e3a2a77b5fe48}\index{buyrex\_subcommand@{buyrex\_subcommand}!act\_name@{act\_name}}
+\index{act\_name@{act\_name}!buyrex\_subcommand@{buyrex\_subcommand}}
+\doxysubsubsection{\texorpdfstring{act\_name}{act\_name}}
+{\footnotesize\ttfamily \label{structbuyrex__subcommand_a8759976e9223cf55bc7e3a2a77b5fe48} 
+const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} buyrex\+\_\+subcommand\+::act\+\_\+name \{ "{}buyrex"{}\+\_\+n \}}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01855}{1855}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01855\ \{\ \textcolor{stringliteral}{"{}buyrex"{}}\_n\ \};}
+
+\end{DoxyCode}
+\Hypertarget{structbuyrex__subcommand_ac66eed05f50429d3c8283ad83c96f0df}\index{buyrex\_subcommand@{buyrex\_subcommand}!amount\_str@{amount\_str}}
+\index{amount\_str@{amount\_str}!buyrex\_subcommand@{buyrex\_subcommand}}
+\doxysubsubsection{\texorpdfstring{amount\_str}{amount\_str}}
+{\footnotesize\ttfamily \label{structbuyrex__subcommand_ac66eed05f50429d3c8283ad83c96f0df} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} buyrex\+\_\+subcommand\+::amount\+\_\+str}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01854}{1854}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{structbuyrex__subcommand_ae8f98dd501bab4e6d117853351d75341}\index{buyrex\_subcommand@{buyrex\_subcommand}!from\_str@{from\_str}}
+\index{from\_str@{from\_str}!buyrex\_subcommand@{buyrex\_subcommand}}
+\doxysubsubsection{\texorpdfstring{from\_str}{from\_str}}
+{\footnotesize\ttfamily \label{structbuyrex__subcommand_ae8f98dd501bab4e6d117853351d75341} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} buyrex\+\_\+subcommand\+::from\+\_\+str}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01853}{1853}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+programs/clio/\mbox{\hyperlink{programs_2clio_2main_8cpp}{main.\+cpp}}\end{DoxyCompactItemize}

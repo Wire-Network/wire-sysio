@@ -1,0 +1,91 @@
+\doxysection{catch\+\_\+capture\+\_\+matchers.\+h}
+\hypertarget{catch__capture__matchers_8h_source}{}\label{catch__capture__matchers_8h_source}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_capture\_matchers.h@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_capture\_matchers.h}}
+\mbox{\hyperlink{catch__capture__matchers_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00002}00002\ \textcolor{comment}{\ *\ \ Created\ by\ Phil\ on\ 9/8/2017}}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00003}00003\ \textcolor{comment}{\ *\ \ Copyright\ 2017\ Two\ Blue\ Cubes\ Ltd.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00004}00004\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00005}00005\ \textcolor{comment}{\ *\ \ Distributed\ under\ the\ Boost\ Software\ License,\ Version\ 1.0.\ (See\ accompanying}}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00006}00006\ \textcolor{comment}{\ *\ \ file\ LICENSE\_1\_0.txt\ or\ copy\ at\ http://www.boost.org/LICENSE\_1\_0.txt)}}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00007}00007\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00008}00008\ \textcolor{preprocessor}{\#ifndef\ TWOBLUECUBES\_CATCH\_CAPTURE\_MATCHERS\_HPP\_INCLUDED}}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00009}00009\ \textcolor{preprocessor}{\#define\ TWOBLUECUBES\_CATCH\_CAPTURE\_MATCHERS\_HPP\_INCLUDED}}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00011}00011\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__capture_8hpp}{catch\_capture.hpp}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00012}00012\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__matchers_8h}{catch\_matchers.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00013}00013\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__matchers__floating_8h}{catch\_matchers\_floating.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00014}00014\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__matchers__generic_8hpp}{catch\_matchers\_generic.hpp}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00015}00015\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__matchers__string_8h}{catch\_matchers\_string.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00016}00016\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__matchers__vector_8h}{catch\_matchers\_vector.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00017}00017\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__stringref_8h}{catch\_stringref.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00019}00019\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00021}00021\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ ArgT,\ \textcolor{keyword}{typename}\ MatcherT>}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00022}00022\ \ \ \ \ \textcolor{keyword}{class\ }MatchExpr\ :\ \textcolor{keyword}{public}\ ITransientExpression\ \{}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00023}00023\ \ \ \ \ \ \ \ \ ArgT\ \textcolor{keyword}{const}\&\ m\_arg;}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00024}00024\ \ \ \ \ \ \ \ \ MatcherT\ m\_matcher;}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00025}00025\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{document_8h_aa6b9fd9f6aa49405a574c362ba9af6b5}{StringRef}}\ m\_matcherString;}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00026}00026\ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00027}\mbox{\hyperlink{class_catch_1_1_match_expr_ae55ee9bf46c8676c65e9df291a98c345}{00027}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_match_expr_ae55ee9bf46c8676c65e9df291a98c345}{MatchExpr}}(\ ArgT\ \textcolor{keyword}{const}\&\ arg,\ MatcherT\ \textcolor{keyword}{const}\&\ matcher,\ \mbox{\hyperlink{class_catch_1_1_string_ref}{StringRef}}\ \textcolor{keyword}{const}\&\ matcherString\ )}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00028}00028\ \ \ \ \ \ \ \ \ :\ \ \ \mbox{\hyperlink{struct_catch_1_1_i_transient_expression}{ITransientExpression}}\{\ true,\ matcher.match(\ arg\ )\ \},}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00029}00029\ \ \ \ \ \ \ \ \ \ \ \ \ m\_arg(\ arg\ ),}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00030}00030\ \ \ \ \ \ \ \ \ \ \ \ \ m\_matcher(\ matcher\ ),}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00031}00031\ \ \ \ \ \ \ \ \ \ \ \ \ m\_matcherString(\ matcherString\ )}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00032}00032\ \ \ \ \ \ \ \ \ \{\}}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00034}\mbox{\hyperlink{class_catch_1_1_match_expr_ad3e41adb597750b2219bb37e51185629}{00034}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_match_expr_ad3e41adb597750b2219bb37e51185629}{streamReconstructedExpression}}(\ std::ostream\ \&os\ )\textcolor{keyword}{\ const\ override\ }\{}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00035}00035\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ matcherAsString\ =\ m\_matcher.toString();}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00036}00036\ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{Catch::Detail::stringify}}(\ m\_arg\ )\ <<\ \textcolor{charliteral}{'\ '};}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00037}00037\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ matcherAsString\ ==\ \mbox{\hyperlink{namespace_catch_1_1_detail_a466775f4eec29ffef29ab334cd885136}{Detail::unprintableString}}\ )}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00038}00038\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ m\_matcherString;}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00039}00039\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00040}00040\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ matcherAsString;}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00041}00041\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00042}00042\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00044}00044\ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespace_catch_ac6c625d0cf5104ed11caf31d5105d46a}{StringMatcher}}\ =\ Matchers::Impl::MatcherBase<std::string>;}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00046}00046\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespace_catch_aea6f8ff3b3838829d4a61694e4bc41ca}{handleExceptionMatchExpr}}(\ AssertionHandler\&\ handler,\ \mbox{\hyperlink{namespace_catch_ac6c625d0cf5104ed11caf31d5105d46a}{StringMatcher}}\ \textcolor{keyword}{const}\&\ matcher,\ \mbox{\hyperlink{document_8h_aa6b9fd9f6aa49405a574c362ba9af6b5}{StringRef}}\ \textcolor{keyword}{const}\&\ matcherString\ \ );}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00048}00048\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ ArgT,\ \textcolor{keyword}{typename}\ MatcherT>}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00049}\mbox{\hyperlink{namespace_catch_a23a9a9a6dfef7ecd5e0eaf553fc52de6}{00049}}\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespace_catch_a23a9a9a6dfef7ecd5e0eaf553fc52de6}{makeMatchExpr}}(\ ArgT\ \textcolor{keyword}{const}\&\ arg,\ MatcherT\ \textcolor{keyword}{const}\&\ matcher,\ \mbox{\hyperlink{class_catch_1_1_string_ref}{StringRef}}\ \textcolor{keyword}{const}\&\ matcherString\ \ )\ -\/>\ \mbox{\hyperlink{class_catch_1_1_match_expr}{MatchExpr<ArgT,\ MatcherT>}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00050}00050\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_catch_1_1_match_expr}{MatchExpr<ArgT,\ MatcherT>}}(\ arg,\ matcher,\ matcherString\ );}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00051}00051\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00052}00052\ }
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00053}00053\ \}\ \textcolor{comment}{//\ namespace\ Catch}}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00054}00054\ }
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00057}\mbox{\hyperlink{catch__capture__matchers_8h_a877690adc04f1fbfe944df6bebe6f8b5}{00057}}\ \textcolor{preprocessor}{\#define\ INTERNAL\_CHECK\_THAT(\ macroName,\ matcher,\ resultDisposition,\ arg\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00058}00058\ \textcolor{preprocessor}{\ \ \ \ do\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00059}00059\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ Catch::AssertionHandler\ catchAssertionHandler(\ macroName\#\#\_catch\_sr,\ CATCH\_INTERNAL\_LINEINFO,\ CATCH\_INTERNAL\_STRINGIFY(arg)\ "{},\ "{}\ CATCH\_INTERNAL\_STRINGIFY(matcher),\ resultDisposition\ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00060}00060\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ INTERNAL\_CATCH\_TRY\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00061}00061\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ catchAssertionHandler.handleExpr(\ Catch::makeMatchExpr(\ arg,\ matcher,\ \#matcher\#\#\_catch\_sr\ )\ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00062}00062\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \}\ INTERNAL\_CATCH\_CATCH(\ catchAssertionHandler\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00063}00063\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ INTERNAL\_CATCH\_REACT(\ catchAssertionHandler\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00064}00064\ \textcolor{preprocessor}{\ \ \ \ \}\ while(\ false\ )}}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00068}\mbox{\hyperlink{catch__capture__matchers_8h_ace8fc7b74db8a1b2916554ad64e5b036}{00068}}\ \textcolor{preprocessor}{\#define\ INTERNAL\_CATCH\_THROWS\_MATCHES(\ macroName,\ exceptionType,\ resultDisposition,\ matcher,\ ...\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00069}00069\ \textcolor{preprocessor}{\ \ \ \ do\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00070}00070\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ Catch::AssertionHandler\ catchAssertionHandler(\ macroName\#\#\_catch\_sr,\ CATCH\_INTERNAL\_LINEINFO,\ CATCH\_INTERNAL\_STRINGIFY(\_\_VA\_ARGS\_\_)\ "{},\ "{}\ CATCH\_INTERNAL\_STRINGIFY(exceptionType)\ "{},\ "{}\ CATCH\_INTERNAL\_STRINGIFY(matcher),\ resultDisposition\ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00071}00071\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ if(\ catchAssertionHandler.allowThrows()\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00072}00072\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ try\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00073}00073\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ static\_cast<void>(\_\_VA\_ARGS\_\_\ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00074}00074\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ catchAssertionHandler.handleUnexpectedExceptionNotThrown();\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00075}00075\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00076}00076\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ catch(\ exceptionType\ const\&\ ex\ )\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00077}00077\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ catchAssertionHandler.handleExpr(\ Catch::makeMatchExpr(\ ex,\ matcher,\ \#matcher\#\#\_catch\_sr\ )\ );\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00078}00078\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00079}00079\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ catch(\ ...\ )\ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00080}00080\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ catchAssertionHandler.handleUnexpectedInflightException();\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00081}00081\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00082}00082\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ else\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00083}00083\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ catchAssertionHandler.handleThrowingCallSkipped();\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00084}00084\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ INTERNAL\_CATCH\_REACT(\ catchAssertionHandler\ )\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00085}00085\ \textcolor{preprocessor}{\ \ \ \ \}\ while(\ false\ )}}
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00086}00086\ }
+\DoxyCodeLine{\Hypertarget{catch__capture__matchers_8h_source_l00087}00087\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ TWOBLUECUBES\_CATCH\_CAPTURE\_MATCHERS\_HPP\_INCLUDED}}
+
+\end{DoxyCode}

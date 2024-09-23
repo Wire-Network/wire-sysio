@@ -1,0 +1,306 @@
+\doxysection{libraries/yubihsm/lib/internal.h File Reference}
+\hypertarget{lib_2internal_8h}{}\label{lib_2internal_8h}\index{libraries/yubihsm/lib/internal.h@{libraries/yubihsm/lib/internal.h}}
+{\ttfamily \#include "{}scp.\+h"{}}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$stdbool.\+h$>$}\newline
+Include dependency graph for internal.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=283pt]{lib_2internal_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{lib_2internal_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structyh__session}{yh\+\_\+session}}
+\item 
+struct \mbox{\hyperlink{structyh__connector}{yh\+\_\+connector}}
+\item 
+struct \mbox{\hyperlink{structbackend__functions}{backend\+\_\+functions}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{lib_2internal_8h_aa1c48ca7b894657e01905d3074b38b8c}{YH\+\_\+\+INTERNAL}}~\+\_\+\+\_\+attribute\+\_\+\+\_\+((visibility("{}hidden"{})))
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef struct \mbox{\hyperlink{structstate}{state}} \mbox{\hyperlink{lib_2internal_8h_af0b8c5ac57556b935ae71249ec6cc388}{yh\+\_\+backend}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{aes_8h_a3f74f478154eb204fc614b5e9fcde0d1}{YH\+\_\+\+INTERNAL}} \mbox{\hyperlink{lib_2internal_8h_ab6791ffb401264facac44a8380c7eed4}{dump\+\_\+hex}} (FILE \texorpdfstring{$\ast$}{*}file, const \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}ptr, \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})
+\item 
+void \mbox{\hyperlink{aes_8h_a3f74f478154eb204fc614b5e9fcde0d1}{YH\+\_\+\+INTERNAL}} \mbox{\hyperlink{lib_2internal_8h_afcc4c2f4445fb1ad48fd52af8df2cf02}{dump\+\_\+msg}} (FILE \texorpdfstring{$\ast$}{*}file, const \mbox{\hyperlink{scp_8h_a2026a4fe4ea2811a4929044067ea1718}{Msg}} \texorpdfstring{$\ast$}{*}msg)
+\item 
+void \mbox{\hyperlink{aes_8h_a3f74f478154eb204fc614b5e9fcde0d1}{YH\+\_\+\+INTERNAL}} \mbox{\hyperlink{lib_2internal_8h_a49b565ef91ab66af53803f6e387e85e0}{dump\+\_\+response}} (FILE \texorpdfstring{$\ast$}{*}file, const \mbox{\hyperlink{scp_8h_a2026a4fe4ea2811a4929044067ea1718}{Msg}} \texorpdfstring{$\ast$}{*}msg)
+\item 
+void \mbox{\hyperlink{aes_8h_a3f74f478154eb204fc614b5e9fcde0d1}{YH\+\_\+\+INTERNAL}} \mbox{\hyperlink{lib_2internal_8h_aa29fabe514d9930d1bbc4cadf5758497}{parse\+\_\+status\+\_\+data}} (char \texorpdfstring{$\ast$}{*}data, \mbox{\hyperlink{structyh__connector}{yh\+\_\+connector}} \texorpdfstring{$\ast$}{*}connector)
+\item 
+bool \mbox{\hyperlink{aes_8h_a3f74f478154eb204fc614b5e9fcde0d1}{YH\+\_\+\+INTERNAL}} \mbox{\hyperlink{lib_2internal_8h_a8d799abe67a90b2664d589b02092fc53}{parse\+\_\+usb\+\_\+url}} (const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{programs_2clio_2main_8cpp_aa03c1ef4c41f36b048cf58d5aade7653}{url}}, unsigned long \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a1149ca4bd0659030412db8e77bebdf88}{serial}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{lib_2internal_8h_aa1c48ca7b894657e01905d3074b38b8c}\index{internal.h@{internal.h}!YH\_INTERNAL@{YH\_INTERNAL}}
+\index{YH\_INTERNAL@{YH\_INTERNAL}!internal.h@{internal.h}}
+\doxysubsubsection{\texorpdfstring{YH\_INTERNAL}{YH\_INTERNAL}}
+{\footnotesize\ttfamily \label{lib_2internal_8h_aa1c48ca7b894657e01905d3074b38b8c} 
+\#define YH\+\_\+\+INTERNAL~\+\_\+\+\_\+attribute\+\_\+\+\_\+((visibility("{}hidden"{})))}
+
+
+
+Definition at line \mbox{\hyperlink{lib_2internal_8h_source_l00053}{53}} of file \mbox{\hyperlink{lib_2internal_8h_source}{internal.\+h}}.
+
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{lib_2internal_8h_af0b8c5ac57556b935ae71249ec6cc388}\index{internal.h@{internal.h}!yh\_backend@{yh\_backend}}
+\index{yh\_backend@{yh\_backend}!internal.h@{internal.h}}
+\doxysubsubsection{\texorpdfstring{yh\_backend}{yh\_backend}}
+{\footnotesize\ttfamily \label{lib_2internal_8h_af0b8c5ac57556b935ae71249ec6cc388} 
+typedef struct \mbox{\hyperlink{structstate}{state}} \mbox{\hyperlink{lib_2internal_8h_af0b8c5ac57556b935ae71249ec6cc388}{yh\+\_\+backend}}}
+
+
+
+Definition at line \mbox{\hyperlink{lib_2internal_8h_source_l00035}{35}} of file \mbox{\hyperlink{lib_2internal_8h_source}{internal.\+h}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{lib_2internal_8h_ab6791ffb401264facac44a8380c7eed4}\index{internal.h@{internal.h}!dump\_hex@{dump\_hex}}
+\index{dump\_hex@{dump\_hex}!internal.h@{internal.h}}
+\doxysubsubsection{\texorpdfstring{dump\_hex()}{dump\_hex()}}
+{\footnotesize\ttfamily \label{lib_2internal_8h_ab6791ffb401264facac44a8380c7eed4} 
+void \mbox{\hyperlink{aes_8h_a3f74f478154eb204fc614b5e9fcde0d1}{YH\+\_\+\+INTERNAL}} dump\+\_\+hex (\begin{DoxyParamCaption}\item[{FILE \texorpdfstring{$\ast$}{*}}]{file}{, }\item[{const \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{ptr}{, }\item[{\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}}}]{len}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{lib__util_8c_source_l00033}{33}} of file \mbox{\hyperlink{lib__util_8c_source}{lib\+\_\+util.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00034\ }
+\DoxyCodeLine{00035\ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ i;}
+\DoxyCodeLine{00036\ }
+\DoxyCodeLine{00037\ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}};\ i++)\ \{}
+\DoxyCodeLine{00038\ \ \ \ \ \textcolor{keywordflow}{if}\ (i\ \&\&\ !(i\ \%\ 8))\ \{}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ fprintf(file,\ \textcolor{stringliteral}{"{}\ "{}});}
+\DoxyCodeLine{00040\ \ \ \ \ \}}
+\DoxyCodeLine{00041\ \ \ \ \ fprintf(file,\ \textcolor{stringliteral}{"{}\%02x"{}},\ ptr[i]);}
+\DoxyCodeLine{00042\ \ \ \}}
+\DoxyCodeLine{00043\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=262pt]{lib_2internal_8h_ab6791ffb401264facac44a8380c7eed4_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{lib_2internal_8h_afcc4c2f4445fb1ad48fd52af8df2cf02}\index{internal.h@{internal.h}!dump\_msg@{dump\_msg}}
+\index{dump\_msg@{dump\_msg}!internal.h@{internal.h}}
+\doxysubsubsection{\texorpdfstring{dump\_msg()}{dump\_msg()}}
+{\footnotesize\ttfamily \label{lib_2internal_8h_afcc4c2f4445fb1ad48fd52af8df2cf02} 
+void \mbox{\hyperlink{aes_8h_a3f74f478154eb204fc614b5e9fcde0d1}{YH\+\_\+\+INTERNAL}} dump\+\_\+msg (\begin{DoxyParamCaption}\item[{FILE \texorpdfstring{$\ast$}{*}}]{file}{, }\item[{const \mbox{\hyperlink{scp_8h_a2026a4fe4ea2811a4929044067ea1718}{Msg}} \texorpdfstring{$\ast$}{*}}]{msg}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{lib__util_8c_source_l00045}{45}} of file \mbox{\hyperlink{lib__util_8c_source}{lib\+\_\+util.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00046\ }
+\DoxyCodeLine{00047\ \ \ fprintf(file,\ \textcolor{stringliteral}{"{}SEND\ >>\ (03\ +\ \%04d)\ \%02x\ \%04x\ "{}},\ msg-\/>\mbox{\hyperlink{union___msg_a6b67958147999d1199c922c26763d7f0}{st}}.len,\ msg-\/>\mbox{\hyperlink{union___msg_a6b67958147999d1199c922c26763d7f0}{st}}.cmd,}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \ msg-\/>\mbox{\hyperlink{union___msg_a6b67958147999d1199c922c26763d7f0}{st}}.len);}
+\DoxyCodeLine{00049\ }
+\DoxyCodeLine{00050\ \ \ \mbox{\hyperlink{lib__util_8c_aee9b575511df24bbb5b165e68179bfa0}{dump\_hex}}(file,\ msg-\/>\mbox{\hyperlink{union___msg_a6b67958147999d1199c922c26763d7f0}{st}}.data,\ msg-\/>\mbox{\hyperlink{union___msg_a6b67958147999d1199c922c26763d7f0}{st}}.len);}
+\DoxyCodeLine{00051\ }
+\DoxyCodeLine{00052\ \ \ fprintf(file,\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{00053\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=241pt]{lib_2internal_8h_afcc4c2f4445fb1ad48fd52af8df2cf02_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{lib_2internal_8h_a49b565ef91ab66af53803f6e387e85e0}\index{internal.h@{internal.h}!dump\_response@{dump\_response}}
+\index{dump\_response@{dump\_response}!internal.h@{internal.h}}
+\doxysubsubsection{\texorpdfstring{dump\_response()}{dump\_response()}}
+{\footnotesize\ttfamily \label{lib_2internal_8h_a49b565ef91ab66af53803f6e387e85e0} 
+void \mbox{\hyperlink{aes_8h_a3f74f478154eb204fc614b5e9fcde0d1}{YH\+\_\+\+INTERNAL}} dump\+\_\+response (\begin{DoxyParamCaption}\item[{FILE \texorpdfstring{$\ast$}{*}}]{file}{, }\item[{const \mbox{\hyperlink{scp_8h_a2026a4fe4ea2811a4929044067ea1718}{Msg}} \texorpdfstring{$\ast$}{*}}]{msg}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{lib__util_8c_source_l00055}{55}} of file \mbox{\hyperlink{lib__util_8c_source}{lib\+\_\+util.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00056\ }
+\DoxyCodeLine{00057\ \ \ fprintf(file,\ \textcolor{stringliteral}{"{}RECV\ <<\ (03\ +\ \%04d)\ \%02x\ \%04x\ "{}},\ msg-\/>\mbox{\hyperlink{union___msg_a6b67958147999d1199c922c26763d7f0}{st}}.len,\ msg-\/>\mbox{\hyperlink{union___msg_a6b67958147999d1199c922c26763d7f0}{st}}.cmd,}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \ msg-\/>\mbox{\hyperlink{union___msg_a6b67958147999d1199c922c26763d7f0}{st}}.len);}
+\DoxyCodeLine{00059\ }
+\DoxyCodeLine{00060\ \ \ \mbox{\hyperlink{lib__util_8c_aee9b575511df24bbb5b165e68179bfa0}{dump\_hex}}(file,\ msg-\/>\mbox{\hyperlink{union___msg_a6b67958147999d1199c922c26763d7f0}{st}}.data,\ msg-\/>\mbox{\hyperlink{union___msg_a6b67958147999d1199c922c26763d7f0}{st}}.len);}
+\DoxyCodeLine{00061\ }
+\DoxyCodeLine{00062\ \ \ fprintf(file,\ \textcolor{stringliteral}{"{}\ \(\backslash\)n"{}});}
+\DoxyCodeLine{00063\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=262pt]{lib_2internal_8h_a49b565ef91ab66af53803f6e387e85e0_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{lib_2internal_8h_aa29fabe514d9930d1bbc4cadf5758497}\index{internal.h@{internal.h}!parse\_status\_data@{parse\_status\_data}}
+\index{parse\_status\_data@{parse\_status\_data}!internal.h@{internal.h}}
+\doxysubsubsection{\texorpdfstring{parse\_status\_data()}{parse\_status\_data()}}
+{\footnotesize\ttfamily \label{lib_2internal_8h_aa29fabe514d9930d1bbc4cadf5758497} 
+void \mbox{\hyperlink{aes_8h_a3f74f478154eb204fc614b5e9fcde0d1}{YH\+\_\+\+INTERNAL}} parse\+\_\+status\+\_\+data (\begin{DoxyParamCaption}\item[{char \texorpdfstring{$\ast$}{*}}]{data}{, }\item[{\mbox{\hyperlink{structyh__connector}{yh\+\_\+connector}} \texorpdfstring{$\ast$}{*}}]{connector}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{lib__util_8c_source_l00065}{65}} of file \mbox{\hyperlink{lib__util_8c_source}{lib\+\_\+util.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00066\ }
+\DoxyCodeLine{00067\ \ \ \textcolor{keywordtype}{char}\ *saveptr\ =\ NULL;}
+\DoxyCodeLine{00068\ \ \ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}\ =\ NULL;}
+\DoxyCodeLine{00069\ }
+\DoxyCodeLine{00070\ \ \ \textcolor{keywordflow}{while}\ ((str\ =\ strtok\_r(str\ ?\ NULL\ :\ data,\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}},\ \&saveptr)))\ \{}
+\DoxyCodeLine{00071\ \ \ \ \ \textcolor{keywordflow}{if}\ (strncmp(str,\ \mbox{\hyperlink{lib__util_8c_a6eb7b89af94c6b62b4df98a7471b9265}{STATUS\_STR}},\ strlen(\mbox{\hyperlink{lib__util_8c_a6eb7b89af94c6b62b4df98a7471b9265}{STATUS\_STR}}))\ ==\ 0)\ \{}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (strcmp(str\ +\ strlen(\mbox{\hyperlink{lib__util_8c_a6eb7b89af94c6b62b4df98a7471b9265}{STATUS\_STR}}),\ \textcolor{stringliteral}{"{}OK"{}})\ ==\ 0)\ \{}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ connector-\/>\mbox{\hyperlink{structyh__connector_a5528332cb62657dbe6fc7e795738872a}{has\_device}}\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ connector-\/>\mbox{\hyperlink{structyh__connector_a5528332cb62657dbe6fc7e795738872a}{has\_device}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00077\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (strncmp(str,\ \mbox{\hyperlink{lib__util_8c_acfc1668731750cb1ee8974b8a7c133ef}{VERSION\_STR}},\ strlen(\mbox{\hyperlink{lib__util_8c_acfc1668731750cb1ee8974b8a7c133ef}{VERSION\_STR}}))\ ==\ 0)\ \{}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ v\_maj\ =\ 0;}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ v\_min\ =\ 0;}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ v\_pat\ =\ 0;}
+\DoxyCodeLine{00081\ }
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}\ =\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}\ +\ strlen(\mbox{\hyperlink{lib__util_8c_acfc1668731750cb1ee8974b8a7c133ef}{VERSION\_STR}});}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (sscanf(str,\ \textcolor{stringliteral}{"{}\%lu.\%lu.\%lu"{}},\ \&v\_maj,\ \&v\_min,\ \&v\_pat)\ ==\ 0)\ \{}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a2e3ed21e5ffba18d940d164aaec64a2a}{DBG\_ERR}}(\textcolor{stringliteral}{"{}Unable\ to\ parse\ version\ string"{}});}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00087\ }
+\DoxyCodeLine{00088\ \ \ \ \ \ \ connector-\/>\mbox{\hyperlink{structyh__connector_af9b0901bc659e7e0c22d76e350bc7269}{version\_major}}\ =\ v\_maj;}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ connector-\/>\mbox{\hyperlink{structyh__connector_ab53147f120dfdfa7f19882b8631401ce}{version\_minor}}\ =\ v\_min;}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ connector-\/>\mbox{\hyperlink{structyh__connector_a888c95a32a81c6c6e62f336214e965fa}{version\_patch}}\ =\ v\_pat;}
+\DoxyCodeLine{00091\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (strncmp(str,\ \mbox{\hyperlink{lib__util_8c_a554ac61ee838b64249c11f699105c81d}{PID\_STR}},\ strlen(\mbox{\hyperlink{lib__util_8c_a554ac61ee838b64249c11f699105c81d}{PID\_STR}}))\ ==\ 0)\ \{}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ *endptr;}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ pid;}
+\DoxyCodeLine{00094\ }
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}\ =\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}\ +\ strlen(\mbox{\hyperlink{lib__util_8c_a554ac61ee838b64249c11f699105c81d}{PID\_STR}});}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ errno\ =\ 0;}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ pid\ =\ strtoul(str,\ \&endptr,\ 0);}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((errno\ ==\ ERANGE\ \&\&\ pid\ ==\ ULONG\_MAX)\ ||\ (errno\ !=\ 0\ \&\&\ pid\ ==\ 0))\ \{}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00101\ }
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (endptr\ ==\ str\ ||\ pid\ ==\ 0)\ \{}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00105\ }
+\DoxyCodeLine{00106\ \ \ \ \ \ \ connector-\/>\mbox{\hyperlink{structyh__connector_aa2d3ae75568ceaeaf9196046fff0a7ab}{pid}}\ =\ pid;}
+\DoxyCodeLine{00107\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (strncmp(str,\ \mbox{\hyperlink{lib__util_8c_af7a4720d20739b2f97ebd287f9ab17c3}{ADDRESS\_STR}},\ strlen(\mbox{\hyperlink{lib__util_8c_af7a4720d20739b2f97ebd287f9ab17c3}{ADDRESS\_STR}}))\ ==\ 0)\ \{}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ strncpy((\textcolor{keywordtype}{char}\ *)\ connector-\/>\mbox{\hyperlink{structyh__connector_a72b90da1f0e2f5b24ba1d2ce503754ff}{address}},\ str\ +\ strlen(\mbox{\hyperlink{lib__util_8c_af7a4720d20739b2f97ebd287f9ab17c3}{ADDRESS\_STR}}),}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{sizeof}(connector-\/>\mbox{\hyperlink{structyh__connector_a72b90da1f0e2f5b24ba1d2ce503754ff}{address}})\ -\/\ 1);}
+\DoxyCodeLine{00110\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (strncmp(str,\ \mbox{\hyperlink{lib__util_8c_a41d23fa74c77453e61601bbcc33d531b}{PORT\_STR}},\ strlen(\mbox{\hyperlink{lib__util_8c_a41d23fa74c77453e61601bbcc33d531b}{PORT\_STR}}))\ ==\ 0)\ \{}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ *endptr;}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ port;}
+\DoxyCodeLine{00113\ }
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}\ =\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}\ +\ strlen(\mbox{\hyperlink{lib__util_8c_a41d23fa74c77453e61601bbcc33d531b}{PORT\_STR}});}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ errno\ =\ 0;}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ port\ =\ strtoul(str,\ \&endptr,\ 0);}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((errno\ ==\ ERANGE\ \&\&\ port\ ==\ ULONG\_MAX)\ ||\ (errno\ !=\ 0\ \&\&\ port\ ==\ 0))\ \{}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00120\ }
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (endptr\ ==\ str\ ||\ port\ ==\ 0)\ \{}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00124\ }
+\DoxyCodeLine{00125\ \ \ \ \ \ \ connector-\/>\mbox{\hyperlink{structyh__connector_a754d38913e8c786c397158a41a6bd8eb}{port}}\ =\ port;}
+\DoxyCodeLine{00126\ \ \ \ \ \}}
+\DoxyCodeLine{00127\ \ \ \}}
+\DoxyCodeLine{00128\ }
+\DoxyCodeLine{00129\ \ \ \mbox{\hyperlink{debug__lib_8h_a8c4742440a149ad8bcb5d58ae76c5ed3}{DBG\_INFO}}(\textcolor{stringliteral}{"{}response\ from\ connector"{}});}
+\DoxyCodeLine{00130\ \ \ \mbox{\hyperlink{debug__lib_8h_a8c4742440a149ad8bcb5d58ae76c5ed3}{DBG\_INFO}}(\textcolor{stringliteral}{"{}has\ device:\ \%s"{}},\ connector-\/>\mbox{\hyperlink{structyh__connector_a5528332cb62657dbe6fc7e795738872a}{has\_device}}\ ==\ \textcolor{keyword}{true}\ ?\ \textcolor{stringliteral}{"{}yes"{}}\ :\ \textcolor{stringliteral}{"{}no"{}});}
+\DoxyCodeLine{00131\ \ \ \mbox{\hyperlink{debug__lib_8h_a8c4742440a149ad8bcb5d58ae76c5ed3}{DBG\_INFO}}(\textcolor{stringliteral}{"{}version:\ \%d.\%d.\%d"{}},\ connector-\/>\mbox{\hyperlink{structyh__connector_af9b0901bc659e7e0c22d76e350bc7269}{version\_major}},}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \ \ connector-\/>\mbox{\hyperlink{structyh__connector_ab53147f120dfdfa7f19882b8631401ce}{version\_minor}},\ connector-\/>\mbox{\hyperlink{structyh__connector_a888c95a32a81c6c6e62f336214e965fa}{version\_patch}});}
+\DoxyCodeLine{00133\ \ \ \mbox{\hyperlink{debug__lib_8h_a8c4742440a149ad8bcb5d58ae76c5ed3}{DBG\_INFO}}(\textcolor{stringliteral}{"{}pid:\ \%u"{}},\ connector-\/>\mbox{\hyperlink{structyh__connector_aa2d3ae75568ceaeaf9196046fff0a7ab}{pid}});}
+\DoxyCodeLine{00134\ \ \ \mbox{\hyperlink{debug__lib_8h_a8c4742440a149ad8bcb5d58ae76c5ed3}{DBG\_INFO}}(\textcolor{stringliteral}{"{}address:\ \%s"{}},\ connector-\/>\mbox{\hyperlink{structyh__connector_a72b90da1f0e2f5b24ba1d2ce503754ff}{address}});}
+\DoxyCodeLine{00135\ \ \ \mbox{\hyperlink{debug__lib_8h_a8c4742440a149ad8bcb5d58ae76c5ed3}{DBG\_INFO}}(\textcolor{stringliteral}{"{}port:\ \%u"{}},\ connector-\/>\mbox{\hyperlink{structyh__connector_a754d38913e8c786c397158a41a6bd8eb}{port}});}
+\DoxyCodeLine{00136\ }
+\DoxyCodeLine{00137\ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00138\ \}}
+
+\end{DoxyCode}
+\Hypertarget{lib_2internal_8h_a8d799abe67a90b2664d589b02092fc53}\index{internal.h@{internal.h}!parse\_usb\_url@{parse\_usb\_url}}
+\index{parse\_usb\_url@{parse\_usb\_url}!internal.h@{internal.h}}
+\doxysubsubsection{\texorpdfstring{parse\_usb\_url()}{parse\_usb\_url()}}
+{\footnotesize\ttfamily \label{lib_2internal_8h_a8d799abe67a90b2664d589b02092fc53} 
+bool \mbox{\hyperlink{aes_8h_a3f74f478154eb204fc614b5e9fcde0d1}{YH\+\_\+\+INTERNAL}} parse\+\_\+usb\+\_\+url (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{url}{, }\item[{unsigned long \texorpdfstring{$\ast$}{*}}]{serial}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{lib__util_8c_source_l00140}{140}} of file \mbox{\hyperlink{lib__util_8c_source}{lib\+\_\+util.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00141\ \ \ \textcolor{keywordflow}{if}\ (strncmp(\mbox{\hyperlink{programs_2clio_2main_8cpp_aa03c1ef4c41f36b048cf58d5aade7653}{url}},\ \mbox{\hyperlink{yubihsm_8h_a4c5f4e9bfa0e29ea9b0d951c9c928c90}{YH\_USB\_URL\_SCHEME}},\ strlen(\mbox{\hyperlink{yubihsm_8h_a4c5f4e9bfa0e29ea9b0d951c9c928c90}{YH\_USB\_URL\_SCHEME}}))\ ==\ 0)\ \{}
+\DoxyCodeLine{00142\ \ \ \ \ \mbox{\hyperlink{programs_2clio_2main_8cpp_aa03c1ef4c41f36b048cf58d5aade7653}{url}}\ +=\ strlen(\mbox{\hyperlink{yubihsm_8h_a4c5f4e9bfa0e29ea9b0d951c9c928c90}{YH\_USB\_URL\_SCHEME}});}
+\DoxyCodeLine{00143\ \ \ \ \ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{namespacefc_a79771837fffd80fcc4bc658ee2fc4b2b}{copy}}\ =\ strdup(\mbox{\hyperlink{programs_2clio_2main_8cpp_aa03c1ef4c41f36b048cf58d5aade7653}{url}});}
+\DoxyCodeLine{00144\ \ \ \ \ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}\ =\ NULL;}
+\DoxyCodeLine{00145\ \ \ \ \ \textcolor{keywordtype}{char}\ *saveptr\ =\ NULL;}
+\DoxyCodeLine{00146\ }
+\DoxyCodeLine{00147\ \ \ \ \ \textcolor{comment}{//\ if\ we\ don't\ find\ a\ serial\ we\ still\ want\ to\ return\ serial\ 0}}
+\DoxyCodeLine{00148\ \ \ \ \ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a1149ca4bd0659030412db8e77bebdf88}{serial}}\ =\ 0;}
+\DoxyCodeLine{00149\ }
+\DoxyCodeLine{00150\ \ \ \ \ \textcolor{keywordflow}{while}\ ((str\ =\ strtok\_r(str\ ?\ NULL\ :\ copy,\ \textcolor{stringliteral}{"{}\&"{}},\ \&saveptr)))\ \{}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (strncmp(str,\ \textcolor{stringliteral}{"{}serial="{}},\ strlen(\textcolor{stringliteral}{"{}serial="{}}))\ ==\ 0)\ \{}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ *endptr;}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}\ +=\ strlen(\textcolor{stringliteral}{"{}serial="{}});}
+\DoxyCodeLine{00154\ }
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ errno\ =\ 0;}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a1149ca4bd0659030412db8e77bebdf88}{serial}}\ =\ strtoul(str,\ \&endptr,\ 0);}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((errno\ ==\ ERANGE\ \&\&\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a1149ca4bd0659030412db8e77bebdf88}{serial}}\ ==\ ULONG\_MAX)\ ||\ endptr\ ==\ str\ ||}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ \ \ \ \ (errno\ !=\ 0\ \&\&\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a1149ca4bd0659030412db8e77bebdf88}{serial}}\ ==\ 0))\ \{}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \ \ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a1149ca4bd0659030412db8e77bebdf88}{serial}}\ =\ 0;}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a8c4742440a149ad8bcb5d58ae76c5ed3}{DBG\_INFO}}(\textcolor{stringliteral}{"{}Failed\ to\ parse\ serial\ argument:\ '\%s'."{}},\ str);}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a8c4742440a149ad8bcb5d58ae76c5ed3}{DBG\_INFO}}(\textcolor{stringliteral}{"{}Unknown\ USB\ option\ '\%s'."{}},\ str);}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00165\ \ \ \ \ \}}
+\DoxyCodeLine{00166\ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a8c4742440a149ad8bcb5d58ae76c5ed3}{DBG\_INFO}}(\textcolor{stringliteral}{"{}USB\ url\ parsed\ with\ serial\ \%lu."{}},\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a1149ca4bd0659030412db8e77bebdf88}{serial}});}
+\DoxyCodeLine{00167\ \ \ \ \ free(copy);}
+\DoxyCodeLine{00168\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00169\ \ \ \}}
+\DoxyCodeLine{00170\ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00171\ \}}
+
+\end{DoxyCode}

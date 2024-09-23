@@ -1,0 +1,88 @@
+\doxysection{vote\+\_\+producer\+\_\+proxy\+\_\+subcommand Struct Reference}
+\hypertarget{structvote__producer__proxy__subcommand}{}\label{structvote__producer__proxy__subcommand}\index{vote\_producer\_proxy\_subcommand@{vote\_producer\_proxy\_subcommand}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structvote__producer__proxy__subcommand_aa7e9f190f70f0452fdd02b40d6b3fe16}{vote\+\_\+producer\+\_\+proxy\+\_\+subcommand}} (\mbox{\hyperlink{class_c_l_i_1_1_app}{CLI\+::\+App}} \texorpdfstring{$\ast$}{*}action\+Root)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structvote__producer__proxy__subcommand_a837bc6917049a6c31ba3635b05544253}{voter\+\_\+str}}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structvote__producer__proxy__subcommand_a2f24355eb159e4d2ee8f1514c1b02b50}{proxy\+\_\+str}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01233}{1233}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structvote__producer__proxy__subcommand_aa7e9f190f70f0452fdd02b40d6b3fe16}\index{vote\_producer\_proxy\_subcommand@{vote\_producer\_proxy\_subcommand}!vote\_producer\_proxy\_subcommand@{vote\_producer\_proxy\_subcommand}}
+\index{vote\_producer\_proxy\_subcommand@{vote\_producer\_proxy\_subcommand}!vote\_producer\_proxy\_subcommand@{vote\_producer\_proxy\_subcommand}}
+\doxysubsubsection{\texorpdfstring{vote\_producer\_proxy\_subcommand()}{vote\_producer\_proxy\_subcommand()}}
+{\footnotesize\ttfamily \label{structvote__producer__proxy__subcommand_aa7e9f190f70f0452fdd02b40d6b3fe16} 
+vote\+\_\+producer\+\_\+proxy\+\_\+subcommand\+::vote\+\_\+producer\+\_\+proxy\+\_\+subcommand (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_c_l_i_1_1_app}{CLI\+::\+App}} \texorpdfstring{$\ast$}{*}}]{action\+Root}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01237}{1237}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01237\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01238\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ vote\_proxy\ =\ actionRoot-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_a8b461d2233ec4121259011b5ed24b336}{add\_subcommand}}(\textcolor{stringliteral}{"{}proxy"{}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}Vote\ your\ stake\ through\ a\ proxy"{}}));}
+\DoxyCodeLine{01239\ \ \ \ \ \ \ vote\_proxy-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_a8c812d42c7720ecb5cd0aec41b5aa941}{add\_option}}(\textcolor{stringliteral}{"{}voter"{}},\ \mbox{\hyperlink{structvote__producer__proxy__subcommand_a837bc6917049a6c31ba3635b05544253}{voter\_str}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}The\ voting\ account"{}}))-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a}{required}}();}
+\DoxyCodeLine{01240\ \ \ \ \ \ \ vote\_proxy-\/>add\_option(\textcolor{stringliteral}{"{}proxy"{}},\ \mbox{\hyperlink{structvote__producer__proxy__subcommand_a2f24355eb159e4d2ee8f1514c1b02b50}{proxy\_str}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}The\ proxy\ account"{}}))-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a}{required}}();}
+\DoxyCodeLine{01241\ \ \ \ \ \ \ \mbox{\hyperlink{programs_2clio_2main_8cpp_aa5d53f41b83b5323c73622fbbb15e9cd}{add\_standard\_transaction\_options}}(vote\_proxy,\ \textcolor{stringliteral}{"{}voter@active"{}});}
+\DoxyCodeLine{01242\ }
+\DoxyCodeLine{01243\ \ \ \ \ \ \ vote\_proxy-\/>callback([\textcolor{keyword}{this}]\ \{}
+\DoxyCodeLine{01244\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}\ act\_payload\ =\ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}()}
+\DoxyCodeLine{01245\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}voter"{}},\ \mbox{\hyperlink{structvote__producer__proxy__subcommand_a837bc6917049a6c31ba3635b05544253}{voter\_str}})}
+\DoxyCodeLine{01246\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}proxy"{}},\ \mbox{\hyperlink{structvote__producer__proxy__subcommand_a2f24355eb159e4d2ee8f1514c1b02b50}{proxy\_str}})}
+\DoxyCodeLine{01247\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}producers"{}},\ std::vector<account\_name>\{\});}
+\DoxyCodeLine{01248\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ accountPermissions\ =\ \mbox{\hyperlink{programs_2clio_2main_8cpp_a2b91ca5dbe7cc4ab287d0e44c3037552}{get\_account\_permissions}}(\mbox{\hyperlink{programs_2clio_2main_8cpp_ad552924cb151dcd5b60c73856d1ff706}{tx\_permission}},\ \{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(\mbox{\hyperlink{structvote__producer__proxy__subcommand_a837bc6917049a6c31ba3635b05544253}{voter\_str}}),\ config::active\_name\});}
+\DoxyCodeLine{01249\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{programs_2clio_2main_8cpp_aaf784434864a29e4835be7465173d1ab}{send\_actions}}(\{\mbox{\hyperlink{programs_2clio_2main_8cpp_a067e20df5f65333b0c3cf5840bc37dea}{create\_action}}(accountPermissions,\ config::system\_account\_name,\ \textcolor{stringliteral}{"{}voteproducer"{}}\_n,\ act\_payload)\});}
+\DoxyCodeLine{01250\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{01251\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structvote__producer__proxy__subcommand_aa7e9f190f70f0452fdd02b40d6b3fe16_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structvote__producer__proxy__subcommand_a2f24355eb159e4d2ee8f1514c1b02b50}\index{vote\_producer\_proxy\_subcommand@{vote\_producer\_proxy\_subcommand}!proxy\_str@{proxy\_str}}
+\index{proxy\_str@{proxy\_str}!vote\_producer\_proxy\_subcommand@{vote\_producer\_proxy\_subcommand}}
+\doxysubsubsection{\texorpdfstring{proxy\_str}{proxy\_str}}
+{\footnotesize\ttfamily \label{structvote__producer__proxy__subcommand_a2f24355eb159e4d2ee8f1514c1b02b50} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} vote\+\_\+producer\+\_\+proxy\+\_\+subcommand\+::proxy\+\_\+str}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01235}{1235}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{structvote__producer__proxy__subcommand_a837bc6917049a6c31ba3635b05544253}\index{vote\_producer\_proxy\_subcommand@{vote\_producer\_proxy\_subcommand}!voter\_str@{voter\_str}}
+\index{voter\_str@{voter\_str}!vote\_producer\_proxy\_subcommand@{vote\_producer\_proxy\_subcommand}}
+\doxysubsubsection{\texorpdfstring{voter\_str}{voter\_str}}
+{\footnotesize\ttfamily \label{structvote__producer__proxy__subcommand_a837bc6917049a6c31ba3635b05544253} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} vote\+\_\+producer\+\_\+proxy\+\_\+subcommand\+::voter\+\_\+str}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01234}{1234}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+programs/clio/\mbox{\hyperlink{programs_2clio_2main_8cpp}{main.\+cpp}}\end{DoxyCompactItemize}

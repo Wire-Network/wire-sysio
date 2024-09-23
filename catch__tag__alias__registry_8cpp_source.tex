@@ -1,0 +1,64 @@
+\doxysection{catch\+\_\+tag\+\_\+alias\+\_\+registry.\+cpp}
+\hypertarget{catch__tag__alias__registry_8cpp_source}{}\label{catch__tag__alias__registry_8cpp_source}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_tag\_alias\_registry.cpp@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_tag\_alias\_registry.cpp}}
+\mbox{\hyperlink{catch__tag__alias__registry_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__registry_8cpp_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__registry_8cpp_source_l00002}00002\ \textcolor{comment}{\ *\ \ Created\ by\ Phil\ on\ 27/6/2014.}}
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__registry_8cpp_source_l00003}00003\ \textcolor{comment}{\ *\ \ Copyright\ 2014\ Two\ Blue\ Cubes\ Ltd.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__registry_8cpp_source_l00004}00004\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__registry_8cpp_source_l00005}00005\ \textcolor{comment}{\ *\ \ Distributed\ under\ the\ Boost\ Software\ License,\ Version\ 1.0.\ (See\ accompanying}}
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__registry_8cpp_source_l00006}00006\ \textcolor{comment}{\ *\ \ file\ LICENSE\_1\_0.txt\ or\ copy\ at\ http://www.boost.org/LICENSE\_1\_0.txt)}}
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__registry_8cpp_source_l00007}00007\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__registry_8cpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__registry_8cpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__tag__alias__registry_8h}{catch\_tag\_alias\_registry.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__registry_8cpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__console__colour_8h}{catch\_console\_colour.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__registry_8cpp_source_l00011}00011\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__enforce_8h}{catch\_enforce.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__registry_8cpp_source_l00012}00012\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__interfaces__registry__hub_8h}{catch\_interfaces\_registry\_hub.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__registry_8cpp_source_l00013}00013\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__string__manip_8h}{catch\_string\_manip.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__registry_8cpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__registry_8cpp_source_l00015}00015\ \textcolor{preprocessor}{\#include\ <sstream>}}
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__registry_8cpp_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__registry_8cpp_source_l00017}00017\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__registry_8cpp_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__registry_8cpp_source_l00019}\mbox{\hyperlink{class_catch_1_1_tag_alias_registry_ac3a595bfb73ffa66908f3f8bf7c92eed}{00019}}\ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_tag_alias_registry_ac3a595bfb73ffa66908f3f8bf7c92eed}{TagAliasRegistry::\string~TagAliasRegistry}}()\ \{\}}
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__registry_8cpp_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__registry_8cpp_source_l00021}\mbox{\hyperlink{class_catch_1_1_tag_alias_registry_a3ac6e1870e096e6010072da60c23f89f}{00021}}\ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_tag_alias}{TagAlias}}\ \textcolor{keyword}{const}*\ \mbox{\hyperlink{class_catch_1_1_tag_alias_registry_a3ac6e1870e096e6010072da60c23f89f}{TagAliasRegistry::find}}(\ std::string\ \textcolor{keyword}{const}\&\ alias\ )\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__registry_8cpp_source_l00022}00022\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ it\ =\ m\_registry.find(\ alias\ );}
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__registry_8cpp_source_l00023}00023\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ it\ !=\ m\_registry.end()\ )}
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__registry_8cpp_source_l00024}00024\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \&(it-\/>second);}
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__registry_8cpp_source_l00025}00025\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__registry_8cpp_source_l00026}00026\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__registry_8cpp_source_l00027}00027\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__registry_8cpp_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__registry_8cpp_source_l00029}\mbox{\hyperlink{class_catch_1_1_tag_alias_registry_a721693fa58ec30ec94079368eb388802}{00029}}\ \ \ \ \ std::string\ \mbox{\hyperlink{class_catch_1_1_tag_alias_registry_a721693fa58ec30ec94079368eb388802}{TagAliasRegistry::expandAliases}}(\ std::string\ \textcolor{keyword}{const}\&\ unexpandedTestSpec\ )\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__registry_8cpp_source_l00030}00030\ \ \ \ \ \ \ \ \ std::string\ expandedTestSpec\ =\ unexpandedTestSpec;}
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__registry_8cpp_source_l00031}00031\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\ \textcolor{keyword}{const}\&\ registryKvp\ :\ m\_registry\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__registry_8cpp_source_l00032}00032\ \ \ \ \ \ \ \ \ \ \ \ \ std::size\_t\ pos\ =\ expandedTestSpec.find(\ registryKvp.first\ );}
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__registry_8cpp_source_l00033}00033\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ pos\ !=\ std::string::npos\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__registry_8cpp_source_l00034}00034\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ expandedTestSpec\ =\ \ expandedTestSpec.substr(\ 0,\ pos\ )\ +}
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__registry_8cpp_source_l00035}00035\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ registryKvp.second.tag\ +}
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__registry_8cpp_source_l00036}00036\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ expandedTestSpec.substr(\ pos\ +\ registryKvp.first.size()\ );}
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__registry_8cpp_source_l00037}00037\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__registry_8cpp_source_l00038}00038\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__registry_8cpp_source_l00039}00039\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ expandedTestSpec;}
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__registry_8cpp_source_l00040}00040\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__registry_8cpp_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__registry_8cpp_source_l00042}\mbox{\hyperlink{class_catch_1_1_tag_alias_registry_a37ae1fda30de783f563492c3c60ab414}{00042}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_tag_alias_registry_a37ae1fda30de783f563492c3c60ab414}{TagAliasRegistry::add}}(\ std::string\ \textcolor{keyword}{const}\&\ alias,\ std::string\ \textcolor{keyword}{const}\&\ tag,\ \mbox{\hyperlink{struct_catch_1_1_source_line_info}{SourceLineInfo}}\ \textcolor{keyword}{const}\&\ lineInfo\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__registry_8cpp_source_l00043}00043\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{catch__enforce_8h_aa4c5f453d4352f75712de56e5892849f}{CATCH\_ENFORCE}}(\ \mbox{\hyperlink{namespace_catch_a695f62327be0676e046291eeaae15110}{startsWith}}(alias,\ \textcolor{stringliteral}{"{}[@"{}})\ \&\&\ \mbox{\hyperlink{namespace_catch_ada025504f627feaf9ac68ca391515dff}{endsWith}}(alias,\ \textcolor{charliteral}{']'}),}
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__registry_8cpp_source_l00044}00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}error:\ tag\ alias,\ '"{}}\ <<\ alias\ <<\ \textcolor{stringliteral}{"{}'\ is\ not\ of\ the\ form\ [@alias\ name].\(\backslash\)n"{}}\ <<\ lineInfo\ );}
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__registry_8cpp_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__registry_8cpp_source_l00046}00046\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{catch__enforce_8h_aa4c5f453d4352f75712de56e5892849f}{CATCH\_ENFORCE}}(\ m\_registry.insert(std::make\_pair(alias,\ \mbox{\hyperlink{struct_catch_1_1_tag_alias}{TagAlias}}(tag,\ lineInfo))).second,}
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__registry_8cpp_source_l00047}00047\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}error:\ tag\ alias,\ '"{}}\ <<\ alias\ <<\ \textcolor{stringliteral}{"{}'\ already\ registered.\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__registry_8cpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\(\backslash\)tFirst\ seen\ at:\ "{}}\ <<\ \mbox{\hyperlink{class_catch_1_1_tag_alias_registry_a3ac6e1870e096e6010072da60c23f89f}{find}}(alias)-\/>lineInfo\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__registry_8cpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\(\backslash\)tRedefined\ at:\ "{}}\ <<\ lineInfo\ );}
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__registry_8cpp_source_l00050}00050\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__registry_8cpp_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__registry_8cpp_source_l00052}\mbox{\hyperlink{struct_catch_1_1_i_tag_alias_registry_a016aab63b05a91530ec1d20b918ae2ee}{00052}}\ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_i_tag_alias_registry_a016aab63b05a91530ec1d20b918ae2ee}{ITagAliasRegistry::\string~ITagAliasRegistry}}()\ \{\}}
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__registry_8cpp_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__registry_8cpp_source_l00054}\mbox{\hyperlink{struct_catch_1_1_i_tag_alias_registry_a7c4bf6e2fc52de95fb2596ba19b3bf76}{00054}}\ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_i_tag_alias_registry}{ITagAliasRegistry}}\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{struct_catch_1_1_i_tag_alias_registry_a7c4bf6e2fc52de95fb2596ba19b3bf76}{ITagAliasRegistry::get}}()\ \{}
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__registry_8cpp_source_l00055}00055\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_catch_a5d328566cb8da87b48f1fac3f319ac7a}{getRegistryHub}}().\mbox{\hyperlink{struct_catch_1_1_i_registry_hub_a3fb24564dba3f679dfa58792f1e21708}{getTagAliasRegistry}}();}
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__registry_8cpp_source_l00056}00056\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__registry_8cpp_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{catch__tag__alias__registry_8cpp_source_l00058}00058\ \}\ \textcolor{comment}{//\ end\ namespace\ Catch}}
+
+\end{DoxyCode}

@@ -1,0 +1,213 @@
+\doxysection{test\+\_\+trx\+\_\+full.\+cpp}
+\hypertarget{test__trx__full_8cpp_source}{}\label{test__trx__full_8cpp_source}\index{plugins/producer\_plugin/test/test\_trx\_full.cpp@{plugins/producer\_plugin/test/test\_trx\_full.cpp}}
+\mbox{\hyperlink{test__trx__full_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00001}\mbox{\hyperlink{test__trx__full_8cpp_a6b2a3852db8bb19ab6909bac01859985}{00001}}\ \textcolor{preprocessor}{\#define\ BOOST\_TEST\_MODULE\ full\_producer\_trxs}}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <boost/test/included/unit\_test.hpp>}}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{producer__plugin_8hpp}{sysio/producer\_plugin/producer\_plugin.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{tester_8hpp}{sysio/testing/tester.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{genesis__state_8hpp}{sysio/chain/genesis\_state.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{thread__utils_8hpp}{sysio/chain/thread\_utils.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{transaction__metadata_8hpp}{sysio/chain/transaction\_metadata.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00011}00011\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2trace_8hpp}{sysio/chain/trace.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00012}00012\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{name_8hpp}{sysio/chain/name.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00014}00014\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{application_8hpp}{appbase/application.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00016}00016\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio_1_1test_1_1detail}{sysio::test::detail}}\ \{}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00017}00017\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacesysio_1_1chain_1_1literals}{sysio::chain::literals}};}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00018}\mbox{\hyperlink{structsysio_1_1test_1_1detail_1_1testit}{00018}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structsysio_1_1test_1_1detail_1_1testit}{testit}}\ \{}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00019}00019\ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1test_1_1detail_1_1testit_a9cd859908b0e521823c24ca14f696a7f}{id}};}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00021}\mbox{\hyperlink{structsysio_1_1test_1_1detail_1_1testit_ae559e900838ff7999d66223e60235f4f}{00021}}\ \ \ \ \mbox{\hyperlink{structsysio_1_1test_1_1detail_1_1testit_ae559e900838ff7999d66223e60235f4f}{testit}}(\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \textcolor{keywordtype}{id}\ =\ 0\ )}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00022}00022\ \ \ \ \ \ \ \ \ \ :\mbox{\hyperlink{structsysio_1_1test_1_1detail_1_1testit_a9cd859908b0e521823c24ca14f696a7f}{id}}(\mbox{\hyperlink{structsysio_1_1test_1_1detail_1_1testit_a9cd859908b0e521823c24ca14f696a7f}{id}})\{\}}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00024}\mbox{\hyperlink{structsysio_1_1test_1_1detail_1_1testit_a790539efea626e849081d90265226cb3}{00024}}\ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{account\_name}}\ \mbox{\hyperlink{structsysio_1_1test_1_1detail_1_1testit_a790539efea626e849081d90265226cb3}{get\_account}}()\ \{}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00025}00025\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ chain::config::system\_account\_name;}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00026}00026\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00028}\mbox{\hyperlink{structsysio_1_1test_1_1detail_1_1testit_af3c65bbc7ea004365dc3ef693d56b14a}{00028}}\ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{namespacesysio_1_1chain_a7a1685bcc352cda9e45f055932069428}{action\_name}}\ \mbox{\hyperlink{structsysio_1_1test_1_1detail_1_1testit_af3c65bbc7ea004365dc3ef693d56b14a}{get\_name}}()\ \{}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00029}00029\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}testit"{}}\_n;}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00030}00030\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00031}00031\ \};}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00032}00032\ \}}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00033}00033\ \mbox{\hyperlink{reflect_8hpp_a2ace850e636b1ca0b18fe3177e413d99}{FC\_REFLECT}}(\ \mbox{\hyperlink{structsysio_1_1test_1_1detail_1_1testit}{sysio::test::detail::testit}},\ (\textcolor{keywordtype}{id})\ )}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00035}00035\ \textcolor{keyword}{namespace\ }\{}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00037}00037\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}};}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00038}00038\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacesysio_1_1chain}{sysio::chain}};}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00039}00039\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacesysio_1_1test_1_1detail}{sysio::test::detail}};}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00041}00041\ \textcolor{keyword}{auto}\ make\_unique\_trx(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1chain__id__type}{chain\_id\_type}}\&\ chain\_id\ )\ \{}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00043}00043\ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ nextid\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00044}00044\ \ \ \ ++nextid;}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00046}00046\ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{account\_name}}\ creator\ =\ config::system\_account\_name;}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00048}00048\ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1signed__transaction}{signed\_transaction}}\ trx;}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00049}00049\ \ \ \ \textcolor{comment}{//\ if\ a\ transaction\ expires\ after\ it\ was\ aborted\ then\ it\ will\ not\ be\ included\ in\ a\ block}}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00050}00050\ \ \ \ trx.\mbox{\hyperlink{structsysio_1_1chain_1_1transaction__header_ad1ed2586e8ace769fdb9a54d09a752ce}{expiration}}\ =\ \mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{fc::time\_point::now}}()\ +\ \mbox{\hyperlink{namespacefc_a9623b8cae3f48bbed6aa1fc2afe9b174}{fc::seconds}}(\ nextid\ \%\ 20\ ==\ 0\ ?\ 0\ :\ 60\ );\ \textcolor{comment}{//\ fail\ some\ transactions\ via\ expired}}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00051}00051\ \ \ \ \textcolor{keywordflow}{if}(\ nextid\ \%\ 15\ ==\ 0\ )\ \{\ \textcolor{comment}{//\ fail\ some\ for\ invalid\ unlinkauth}}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00052}00052\ \ \ \ \ \ \ trx.\mbox{\hyperlink{structsysio_1_1chain_1_1transaction_a407fcf1868b81bb30b85f80d388bbac2}{actions}}.emplace\_back(\ \mbox{\hyperlink{classfc_1_1vector}{vector<permission\_level>}}\{\{creator,\ config::active\_name\}\},}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1unlinkauth}{unlinkauth}}\{\}\ );}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00054}00054\ \ \ \ \ \ \ trx.\mbox{\hyperlink{structsysio_1_1chain_1_1transaction_a407fcf1868b81bb30b85f80d388bbac2}{actions}}.emplace\_back(\ \mbox{\hyperlink{classfc_1_1vector}{vector<permission\_level>}}\{\{creator,\ config::active\_name\}\},}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1test_1_1detail_1_1testit}{testit}}\{nextid\}\ );}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00056}00056\ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00057}00057\ \ \ \ \ \ \ trx.\mbox{\hyperlink{structsysio_1_1chain_1_1transaction_a407fcf1868b81bb30b85f80d388bbac2}{actions}}.emplace\_back(\ \mbox{\hyperlink{classfc_1_1vector}{vector<permission\_level>}}\{\{creator,\ config::active\_name\}\},}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1test_1_1detail_1_1testit}{testit}}\{\ nextid\ \%\ 7\ ==\ 0\ ?\ 0\ :\ nextid\}\ );\ \textcolor{comment}{//\ fail\ some\ for\ duplicates}}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00059}00059\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00060}00060\ \ \ \ \textcolor{keywordflow}{if}(\ nextid\ \%\ 13\ ==\ 0\ )\ \{\ \textcolor{comment}{//\ fail\ some\ for\ invalid\ signature}}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00061}00061\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ bad\_priv\_key\ =\ \mbox{\hyperlink{classfc_1_1crypto_1_1private__key_a89f09f5b110de0d285808f12fa8d0af2}{private\_key\_type::regenerate<fc::ecc::private\_key\_shim>}}(\mbox{\hyperlink{classfc_1_1sha256_a474784de7d6213b855abd7e952df5e36}{fc::sha256::hash}}(std::string(\textcolor{stringliteral}{"{}kevin"{}})));}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00062}00062\ \ \ \ \ \ \ trx.\mbox{\hyperlink{structsysio_1_1chain_1_1signed__transaction_a9cf1962f11e84392dbf74aae5d7550a6}{sign}}(\ bad\_priv\_key,\ chain\_id\ );}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00063}00063\ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00064}00064\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ priv\_key\ =\ \mbox{\hyperlink{classfc_1_1crypto_1_1private__key_a89f09f5b110de0d285808f12fa8d0af2}{private\_key\_type::regenerate<fc::ecc::private\_key\_shim>}}(\mbox{\hyperlink{classfc_1_1sha256_a474784de7d6213b855abd7e952df5e36}{fc::sha256::hash}}(std::string(\textcolor{stringliteral}{"{}nathan"{}})));}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00065}00065\ \ \ \ \ \ \ trx.\mbox{\hyperlink{structsysio_1_1chain_1_1signed__transaction_a9cf1962f11e84392dbf74aae5d7550a6}{sign}}(\ priv\_key,\ chain\_id\ );}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00066}00066\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00067}00067\ }
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00068}00068\ \ \ \ \textcolor{keywordflow}{return}\ std::make\_shared<packed\_transaction>(\ std::move(trx)\ );}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00069}00069\ \}}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00071}00071\ \textcolor{comment}{//\ verify\ all\ trxs\ are\ in\ blocks\ only\ once}}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00072}00072\ \textcolor{keywordtype}{bool}\ verify\_equal(\ \textcolor{keyword}{const}\ std::deque<packed\_transaction\_ptr>\&\ trxs,\ \textcolor{keyword}{const}\ std::deque<block\_state\_ptr>\&\ all\_blocks)\ \{}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00073}00073\ \ \ \ std::set<transaction\_id\_type>\ trxs\_ids;\ \textcolor{comment}{//\ trx\ can\ appear\ more\ than\ once\ if\ they\ were\ aborted}}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00074}00074\ \ \ \ std::set<transaction\_id\_type>\ blk\_trxs\_ids;}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00075}00075\ }
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00076}00076\ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ trx\ :\ trxs\ )\ \{}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00077}00077\ \ \ \ \ \ \ trxs\_ids.emplace(\ trx-\/>\mbox{\hyperlink{structsysio_1_1chain_1_1transaction_aef240445de0470ccc990493a1bb3afec}{id}}()\ );}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00078}00078\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00079}00079\ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ bs\ :\ all\_blocks\ )\ \{}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00080}00080\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ trx\_receipt\ :\ bs-\/>block-\/>transactions\ )\ \{}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00081}00081\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ trx\ =\ std::get<packed\_transaction>(\ trx\_receipt.trx\ ).get\_transaction();}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00082}00082\ \ \ \ \ \ \ \ \ \ blk\_trxs\_ids.emplace(\ trx.\mbox{\hyperlink{structsysio_1_1chain_1_1transaction_aef240445de0470ccc990493a1bb3afec}{id}}()\ );}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00083}00083\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00084}00084\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00085}00085\ \ \ \ BOOST\_CHECK\_EQUAL(\ trxs\_ids.size(),\ blk\_trxs\_ids.size()\ );}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00086}00086\ }
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00087}00087\ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ trx\ :\ trxs\ )\ \{}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00088}00088\ \ \ \ \ \ \ BOOST\_CHECK(\ blk\_trxs\_ids.count(\ trx-\/>\mbox{\hyperlink{structsysio_1_1chain_1_1transaction_aef240445de0470ccc990493a1bb3afec}{id}}()\ )\ ==\ 1\ );}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00089}00089\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00090}00090\ }
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00091}00091\ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00092}00092\ \}}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00093}00093\ }
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00094}00094\ }
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00095}00095\ \}}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00096}00096\ }
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00097}00097\ BOOST\_AUTO\_TEST\_SUITE(ordered\_trxs\_full)}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00098}00098\ }
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00099}00099\ \textcolor{comment}{//\ Integration\ test\ of\ producer\_plugin}}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00100}00100\ \textcolor{comment}{//\ Test\ verifies\ that\ transactions\ are\ processed,\ reported\ to\ caller,\ and\ not\ lost}}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00101}00101\ \textcolor{comment}{//\ even\ when\ blocks\ are\ aborted\ and\ some\ transactions\ fail.}}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00102}\mbox{\hyperlink{test__trx__full_8cpp_afdace07785a80c02d7fbb1d13154c2c4}{00102}}\ \mbox{\hyperlink{test__trx__full_8cpp_afdace07785a80c02d7fbb1d13154c2c4}{BOOST\_AUTO\_TEST\_CASE}}(producer)\ \{}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00103}00103\ \ \ \ boost::filesystem::path\ temp\ =\ boost::filesystem::temp\_directory\_path()\ /\ boost::filesystem::unique\_path();}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00104}00104\ }
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00105}00105\ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00106}00106\ \ \ \ \ \ \ std::promise<std::tuple<producer\_plugin*,\ chain\_plugin*>>\ plugin\_promise;}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00107}00107\ \ \ \ \ \ \ std::future<std::tuple<producer\_plugin*,\ chain\_plugin*>>\ plugin\_fut\ =\ plugin\_promise.get\_future();}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00108}00108\ \ \ \ \ \ \ std::thread\ app\_thread(\ [\&]()\ \{}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00109}00109\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1logger_a4e12ef2e794551d593e497b4b90601ab}{fc::logger::get}}(\mbox{\hyperlink{logger_8hpp_a8c7a288fea519c7e895518f8dff4888f}{DEFAULT\_LOGGER}}).\mbox{\hyperlink{classfc_1_1logger_a4c22e498cec41efb806fda9733662650}{set\_log\_level}}(\mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4a30d2de77e71beb8d09d530cac04efa25}{fc::log\_level::debug}});}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00110}00110\ \ \ \ \ \ \ \ \ \ std::vector<const\ char*>\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}\ =}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00111}00111\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\textcolor{stringliteral}{"{}test"{}},\ \textcolor{stringliteral}{"{}-\/-\/data-\/dir"{}},\ temp.c\_str(),\ \textcolor{stringliteral}{"{}-\/-\/config-\/dir"{}},\ temp.c\_str(),}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00112}00112\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}-\/p"{}},\ \textcolor{stringliteral}{"{}sysio"{}},\ \textcolor{stringliteral}{"{}-\/e"{}},\ \textcolor{stringliteral}{"{}-\/-\/max-\/transaction-\/time"{}},\ \textcolor{stringliteral}{"{}475"{}},\ \textcolor{stringliteral}{"{}-\/-\/disable-\/subjective-\/billing=true"{}}\ \};}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00113}00113\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{appbase::app}}().\mbox{\hyperlink{classappbase_1_1application_a29ed51314f78ebe6795930a4ca910fd6}{initialize}}<\mbox{\hyperlink{classchain__plugin}{chain\_plugin}},\ \mbox{\hyperlink{classsysio_1_1producer__plugin}{producer\_plugin}}>(\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}.size(),\ (\textcolor{keywordtype}{char}**)\ \&\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[0]\ );}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00114}00114\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{appbase::app}}().\mbox{\hyperlink{classappbase_1_1application_a3b77bd811744da79c9d8ba0d078e7668}{startup}}();}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00115}00115\ \ \ \ \ \ \ \ \ \ plugin\_promise.set\_value(}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00116}00116\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{appbase::app}}().\mbox{\hyperlink{classappbase_1_1application_a1d2c585f90007be342c9c64ee9cc0f7c}{find\_plugin}}<\mbox{\hyperlink{classsysio_1_1producer__plugin}{producer\_plugin}}>(),\ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{appbase::app}}().\mbox{\hyperlink{classappbase_1_1application_a1d2c585f90007be342c9c64ee9cc0f7c}{find\_plugin}}<\mbox{\hyperlink{classchain__plugin}{chain\_plugin}}>()\}\ );}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00117}00117\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{appbase::app}}().\mbox{\hyperlink{classappbase_1_1application_a39286b0b034b97f6940568a00f44edaf}{exec}}();}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00118}00118\ \ \ \ \ \ \ \}\ );}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00119}00119\ }
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00120}00120\ \ \ \ \ \ \ \textcolor{keyword}{auto}[prod\_plug,\ chain\_plug]\ =\ plugin\_fut.get();}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00121}00121\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ chain\_id\ =\ chain\_plug-\/>get\_chain\_id();}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00122}00122\ }
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00123}00123\ \ \ \ \ \ \ std::deque<block\_state\_ptr>\ all\_blocks;}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00124}00124\ \ \ \ \ \ \ std::promise<void>\ empty\_blocks\_promise;}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00125}00125\ \ \ \ \ \ \ std::future<void>\ empty\_blocks\_fut\ =\ empty\_blocks\_promise.get\_future();}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00126}00126\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ ab\ =\ chain\_plug-\/>chain().accepted\_block.connect(\ [\&](\textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\_state\_ptr}}\&\ bsp)\ \{}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00127}00127\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ num\_empty\ =\ std::numeric\_limits<int>::max();}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00128}00128\ \ \ \ \ \ \ \ \ \ all\_blocks.push\_back(\ bsp\ );}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00129}00129\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ bsp-\/>block-\/>transactions.empty()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00130}00130\ \ \ \ \ \ \ \ \ \ \ \ \ -\/-\/num\_empty;}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00131}00131\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ num\_empty\ ==\ 0\ )\ empty\_blocks\_promise.set\_value();}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00132}00132\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{\ \textcolor{comment}{//\ we\ want\ a\ few\ empty\ blocks\ after\ we\ have\ some\ non-\/empty\ blocks}}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00133}00133\ \ \ \ \ \ \ \ \ \ \ \ \ num\_empty\ =\ 10;}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00134}00134\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00135}00135\ \ \ \ \ \ \ \}\ );}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00136}00136\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ bs\ =\ chain\_plug-\/>chain().block\_start.connect(\ [\&](\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{namespacebn}{bn}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00137}00137\ \ \ \ \ \ \ \}\ );}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00138}00138\ }
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00139}00139\ \ \ \ \ \ \ std::deque<packed\_transaction\_ptr>\ trxs;}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00140}00140\ \ \ \ \ \ \ std::atomic<size\_t>\ next\_calls\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00141}00141\ \ \ \ \ \ \ std::atomic<size\_t>\ num\_posts\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00142}00142\ \ \ \ \ \ \ std::atomic<size\_t>\ trace\_with\_except\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00143}00143\ \ \ \ \ \ \ std::atomic<bool>\ trx\_match\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00144}00144\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ num\_pushes\ =\ 4242;}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00145}00145\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keywordtype}{size\_t}\ i\ =\ 1;\ i\ <=\ num\_pushes;\ ++i\ )\ \{}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00146}00146\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ ptrx\ =\ make\_unique\_trx(\ chain\_id\ );}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00147}00147\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a3da1571bad6ca6c94df9a3660b2115ee}{dlog}}(\ \textcolor{stringliteral}{"{}posting\ \$\{id\}"{}},\ (\textcolor{stringliteral}{"{}id"{}},\ ptrx-\/>id())\ );}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00148}00148\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_a77aff91b861010fd61a616c59b310dcc}{post}}(\ \mbox{\hyperlink{structappbase_1_1priority_ae0c72abae2c2ba770667fcf90e40d654}{priority::low}},\ [ptrx,\ \&next\_calls,\ \&num\_posts,\ \&trace\_with\_except,\ \&trx\_match,\ \&trxs]()\ \{}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00149}00149\ \ \ \ \ \ \ \ \ \ \ \ \ ++num\_posts;}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00150}00150\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ return\_failure\_traces\ =\ \textcolor{keyword}{false};\ \textcolor{comment}{//\ 2.2.x+\ =\ num\_posts\ \%\ 2\ ==\ 0;}}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00151}00151\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_a87887b19b1f639ca551645813bb380de}{get\_method}}<\mbox{\hyperlink{structappbase_1_1method__decl}{plugin\_interface::incoming::methods::transaction\_async}}>()(ptrx,}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00152}00152\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{false},\ \textcolor{comment}{//\ persist\_until\_expiried}}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00153}00153\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{false},\ \textcolor{comment}{//\ read\_only}}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00154}00154\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{false},\ \textcolor{comment}{//\ return\_failure\_traces}}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00155}00155\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [ptrx,\ \&next\_calls,\ \&trace\_with\_except,\ \&trx\_match,\ \&trxs,\ return\_failure\_traces]}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00156}00156\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{keyword}{const}\ std::variant<fc::exception\_ptr,\ transaction\_trace\_ptr>\&\ result)\ \{}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00157}00157\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !std::holds\_alternative<fc::exception\_ptr>(\ result\ )\ \&\&\ !std::get<chain::transaction\_trace\_ptr>(\ result\ )-\/>except\ )\ \{}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00158}00158\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ std::get<chain::transaction\_trace\_ptr>(\ result\ )-\/>\textcolor{keywordtype}{id}\ ==\ ptrx-\/>id()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00159}00159\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ trxs.push\_back(\ ptrx\ );}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00160}00160\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00161}00161\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}}(\ \textcolor{stringliteral}{"{}trace\ not\ for\ trx\ \$\{id\}:\ \$\{t\}"{}},}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00162}00162\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}id"{}},\ ptrx-\/>id())(\textcolor{stringliteral}{"{}t"{}},\ \mbox{\hyperlink{classfc_1_1json_ae6c022ab581a9552ae2c97ff5d73aaf8}{fc::json::to\_pretty\_string}}(*std::get<chain::transaction\_trace\_ptr>(result)))\ );}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00163}00163\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ trx\_match\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00164}00164\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00165}00165\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(\ !return\_failure\_traces\ \&\&\ !std::holds\_alternative<fc::exception\_ptr>(\ result\ )\ \&\&\ std::get<chain::transaction\_trace\_ptr>(\ result\ )-\/>except\ )\ \{}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00166}00166\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}}(\ \textcolor{stringliteral}{"{}trace\ with\ except\ \$\{e\}"{}},}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00167}00167\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}e"{}},\ \mbox{\hyperlink{classfc_1_1json_ae6c022ab581a9552ae2c97ff5d73aaf8}{fc::json::to\_pretty\_string}}(\ *std::get<chain::transaction\_trace\_ptr>(\ result\ )\ ))\ );}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00168}00168\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++trace\_with\_except;}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00169}00169\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00170}00170\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++next\_calls;}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00171}00171\ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00172}00172\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00173}00173\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ i\ \%\ (num\_pushes/3)\ ==\ 0\ )\ \{}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00174}00174\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ need\ to\ sleep\ or\ a\ fast\ machine\ might\ put\ all\ trxs\ in\ one\ block}}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00175}00175\ \ \ \ \ \ \ \ \ \ \ \ \ usleep(\ config::block\_interval\_us\ /\ 2\ );}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00176}00176\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00177}00177\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ i\ \%\ 200\ ==\ 0\ )\ \{}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00178}00178\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ get\_integrity\_hash\ aborts\ block\ and\ places\ aborted\ trxs\ into\ unapplied\_transaction\_queue}}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00179}00179\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ verifying\ that\ aborting\ block\ does\ not\ lose\ transactions}}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00180}00180\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_a77aff91b861010fd61a616c59b310dcc}{post}}(\mbox{\hyperlink{structappbase_1_1priority_adab9a6659f361fc6ca6c855788b05df0}{priority::high}},\ []()\{}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00181}00181\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().\mbox{\hyperlink{classappbase_1_1application_a1d2c585f90007be342c9c64ee9cc0f7c}{find\_plugin}}<\mbox{\hyperlink{classsysio_1_1producer__plugin}{producer\_plugin}}>()-\/>get\_integrity\_hash();}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00182}00182\ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00183}00183\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00184}00184\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00185}00185\ }
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00186}00186\ \ \ \ \ \ \ empty\_blocks\_fut.wait\_for(std::chrono::seconds(15));}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00187}00187\ }
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00188}00188\ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ trace\_with\_except,\ 0\ );\ \textcolor{comment}{//\ should\ not\ have\ any\ traces\ with\ except\ in\ it}}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00189}00189\ \ \ \ \ \ \ BOOST\_CHECK(\ all\_blocks.size()\ >\ 3\ );\ \textcolor{comment}{//\ should\ have\ a\ few\ blocks\ otherwise\ test\ is\ running\ too\ fast}}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00190}00190\ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ num\_pushes,\ num\_posts\ );}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00191}00191\ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ num\_pushes,\ next\_calls\ );}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00192}00192\ \ \ \ \ \ \ BOOST\_CHECK(\ trx\_match.load()\ );}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00193}00193\ }
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00194}00194\ \ \ \ \ \ \ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{appbase::app}}().\mbox{\hyperlink{classappbase_1_1application_a81aa58d3f94570b7976145039155fc46}{quit}}();}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00195}00195\ \ \ \ \ \ \ app\_thread.join();}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00196}00196\ }
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00197}00197\ \ \ \ \ \ \ BOOST\_REQUIRE(\ verify\_equal(trxs,\ all\_blocks\ )\ );}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00198}00198\ }
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00199}00199\ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\ ...\ )\ \{}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00200}00200\ \ \ \ \ \ \ bfs::remove\_all(\ temp\ );}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00201}00201\ \ \ \ \ \ \ \textcolor{keywordflow}{throw};}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00202}00202\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00203}00203\ \ \ \ bfs::remove\_all(\ temp\ );}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00204}00204\ \}}
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00205}00205\ }
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00206}00206\ }
+\DoxyCodeLine{\Hypertarget{test__trx__full_8cpp_source_l00207}00207\ BOOST\_AUTO\_TEST\_SUITE\_END()}
+
+\end{DoxyCode}

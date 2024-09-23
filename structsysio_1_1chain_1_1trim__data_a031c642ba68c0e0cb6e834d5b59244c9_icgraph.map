@@ -1,0 +1,15 @@
+<map id="sysio::chain::trim_data::block_pos" name="sysio::chain::trim_data::block_pos">
+<area shape="rect" id="Node000001" title=" " alt="" coords="493,48,615,89"/>
+<area shape="rect" id="Node000002" href="$programs_2sysio-blocklog_2main_8cpp.html#a37fad1474c0a90433ca0152870e1da72" title=" " alt="" coords="124,5,213,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="478,52,445,46,319,31,213,23,214,18,320,25,446,41,479,47"/>
+<area shape="rect" id="Node000004" href="$programs_2sysio-blocklog_2main_8cpp.html#a3cfbe737c1a84d19629ae9ffc5bc40a2" title=" " alt="" coords="300,56,427,82"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="478,72,427,72,427,66,478,66"/>
+<area shape="rect" id="Node000005" href="$classsysio_1_1chain_1_1block__log.html#a00f24c3412cd6231b93394e2bbcea904" title=" " alt="" coords="282,106,445,146"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="479,94,434,108,433,103,477,89"/>
+<area shape="rect" id="Node000003" href="$programs_2sysio-blocklog_2main_8cpp.html#a3c04138a5bfe5d72780bb7e82a18e627" title=" " alt="" coords="5,56,55,82"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="118,39,56,62,54,57,116,34"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="285,72,55,72,55,66,285,66"/>
+<area shape="rect" id="Node000006" href="$programs_2sysio-blocklog_2main_8cpp.html#ace4e6c78c84c1c16b0486d5833afd9f2" title=" " alt="" coords="103,109,234,135"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="267,127,234,126,234,121,267,122"/>
+<area shape="poly" id="edge7_Node000006_Node000003" title=" " alt="" coords="118,106,54,81,56,76,119,101"/>
+</map>

@@ -1,0 +1,65 @@
+\doxysection{libraries/softfloat/source/f16\+\_\+le.c File Reference}
+\hypertarget{softfloat_2source_2f16__le_8c}{}\label{softfloat_2source_2f16__le_8c}\index{libraries/softfloat/source/f16\_le.c@{libraries/softfloat/source/f16\_le.c}}
+{\ttfamily \#include $<$stdbool.\+h$>$}\newline
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include "{}platform.\+h"{}}\newline
+{\ttfamily \#include "{}internals.\+h"{}}\newline
+{\ttfamily \#include "{}softfloat.\+h"{}}\newline
+Include dependency graph for f16\+\_\+le.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{softfloat_2source_2f16__le_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{softfloat_2source_2f16__le_8c_a6b6d6e608b198359e5f463ca3a3b5d89}{f16\+\_\+le}} (\mbox{\hyperlink{structfloat16__t}{float16\+\_\+t}} \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, \mbox{\hyperlink{structfloat16__t}{float16\+\_\+t}} b)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{softfloat_2source_2f16__le_8c_a6b6d6e608b198359e5f463ca3a3b5d89}\index{f16\_le.c@{f16\_le.c}!f16\_le@{f16\_le}}
+\index{f16\_le@{f16\_le}!f16\_le.c@{f16\_le.c}}
+\doxysubsubsection{\texorpdfstring{f16\_le()}{f16\_le()}}
+{\footnotesize\ttfamily \label{softfloat_2source_2f16__le_8c_a6b6d6e608b198359e5f463ca3a3b5d89} 
+bool f16\+\_\+le (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structfloat16__t}{float16\+\_\+t}}}]{a}{, }\item[{\mbox{\hyperlink{structfloat16__t}{float16\+\_\+t}}}]{b}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2f16__le_8c_source_l00043}{43}} of file \mbox{\hyperlink{softfloat_2source_2f16__le_8c_source}{f16\+\_\+le.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00044\ \{}
+\DoxyCodeLine{00045\ \ \ \ \ \textcolor{keyword}{union\ }\mbox{\hyperlink{unionui16__f16}{ui16\_f16}}\ uA;}
+\DoxyCodeLine{00046\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a6ed085329b153773ff76afa0702cf897}{uint\_fast16\_t}}\ uiA;}
+\DoxyCodeLine{00047\ \ \ \ \ \textcolor{keyword}{union\ }\mbox{\hyperlink{unionui16__f16}{ui16\_f16}}\ uB;}
+\DoxyCodeLine{00048\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a6ed085329b153773ff76afa0702cf897}{uint\_fast16\_t}}\ uiB;}
+\DoxyCodeLine{00049\ \ \ \ \ \textcolor{keywordtype}{bool}\ signA,\ signB;}
+\DoxyCodeLine{00050\ }
+\DoxyCodeLine{00051\ \ \ \ \ uA.\mbox{\hyperlink{unionui16__f16_ab323bc7bebcf8d648c2e9135482fde81}{f}}\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}};}
+\DoxyCodeLine{00052\ \ \ \ \ uiA\ =\ uA.ui;}
+\DoxyCodeLine{00053\ \ \ \ \ uB.f\ =\ b;}
+\DoxyCodeLine{00054\ \ \ \ \ uiB\ =\ uB.ui;}
+\DoxyCodeLine{00055\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a04fd9cc6c846c09355329b8f7a5af495}{isNaNF16UI}}(\ uiA\ )\ ||\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a04fd9cc6c846c09355329b8f7a5af495}{isNaNF16UI}}(\ uiB\ )\ )\ \{}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2softfloat__raise_flags_8c_ac16bbf09eca0fe8ff91301d82c5a667f}{softfloat\_raiseFlags}}(\ \mbox{\hyperlink{softfloat_2source_2include_2softfloat_8h_a56a0f36da7f9eaaf54bd05cc2bf49173a191f069090c3d33752fb728272d9a4a9}{softfloat\_flag\_invalid}}\ );}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00058\ \ \ \ \ \}}
+\DoxyCodeLine{00059\ \ \ \ \ signA\ =\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a436bcbe96380e4dab48591350a95c45b}{signF16UI}}(\ uiA\ );}
+\DoxyCodeLine{00060\ \ \ \ \ signB\ =\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a436bcbe96380e4dab48591350a95c45b}{signF16UI}}(\ uiB\ );}
+\DoxyCodeLine{00061\ \ \ \ \ \textcolor{keywordflow}{return}}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ (signA\ !=\ signB)\ ?\ signA\ ||\ !\ (\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}})\ ((uiA\ |\ uiB)<<1)}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ :\ (uiA\ ==\ uiB)\ ||\ (signA\ \string^\ (uiA\ <\ uiB));}
+\DoxyCodeLine{00064\ }
+\DoxyCodeLine{00065\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=260pt]{softfloat_2source_2f16__le_8c_a6b6d6e608b198359e5f463ca3a3b5d89_cgraph}
+\end{center}
+\end{figure}

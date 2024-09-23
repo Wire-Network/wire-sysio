@@ -1,0 +1,539 @@
+\doxysection{libraries/fc/vendor/websocketpp/test/processors/hybi00.cpp File Reference}
+\hypertarget{hybi00_8cpp}{}\label{hybi00_8cpp}\index{libraries/fc/vendor/websocketpp/test/processors/hybi00.cpp@{libraries/fc/vendor/websocketpp/test/processors/hybi00.cpp}}
+{\ttfamily \#include $<$boost/test/unit\+\_\+test.\+hpp$>$}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$string$>$}\newline
+{\ttfamily \#include $<$websocketpp/processors/hybi00.\+hpp$>$}\newline
+{\ttfamily \#include $<$websocketpp/http/request.\+hpp$>$}\newline
+{\ttfamily \#include $<$websocketpp/http/response.\+hpp$>$}\newline
+{\ttfamily \#include $<$websocketpp/message\+\_\+buffer/message.\+hpp$>$}\newline
+{\ttfamily \#include $<$websocketpp/message\+\_\+buffer/alloc.\+hpp$>$}\newline
+Include dependency graph for hybi00.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{hybi00_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structstub__config}{stub\+\_\+config}}
+\item 
+struct \mbox{\hyperlink{structprocessor__setup}{processor\+\_\+setup}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{hybi00_8cpp_a6b2a3852db8bb19ab6909bac01859985}{BOOST\+\_\+\+TEST\+\_\+\+MODULE}}~hybi\+\_\+00\+\_\+processor
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef stub\+\_\+config\+::message\+\_\+type\+::ptr \mbox{\hyperlink{hybi00_8cpp_aec8abd64b90ff44cfce8b98e3b08c8eb}{message\+\_\+ptr}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{hybi00_8cpp_aa574a21bd8b369edb379ed3e0a61bb46}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (exact\+\_\+match)
+\item 
+\mbox{\hyperlink{hybi00_8cpp_a53fa7013c0af5d6b8940a4376f25c68f}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (non\+\_\+get\+\_\+method)
+\item 
+\mbox{\hyperlink{hybi00_8cpp_a2e752fe3c8bae5df4a39fe47147bf160}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (old\+\_\+http\+\_\+version)
+\item 
+\mbox{\hyperlink{hybi00_8cpp_a6120ca4893d23496721f4053cfe93393}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (missing\+\_\+handshake\+\_\+key1)
+\item 
+\mbox{\hyperlink{hybi00_8cpp_a0b1c24a03b0c2ee04587f83e786e0cfd}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (missing\+\_\+handshake\+\_\+key2)
+\item 
+\mbox{\hyperlink{hybi00_8cpp_a28ab49690cd74a3b00567ad9b87ef437}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (bad\+\_\+host)
+\item 
+\mbox{\hyperlink{hybi00_8cpp_a78b1f99d01e714be5a1f69517cbd995e}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (extract\+\_\+subprotocols)
+\item 
+\mbox{\hyperlink{hybi00_8cpp_abb0b7aa704fbeecbfd602779c7a8c6b8}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (prepare\+\_\+data\+\_\+frame\+\_\+null)
+\item 
+\mbox{\hyperlink{hybi00_8cpp_ae8fa75d088192976938f98253c21555f}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (prepare\+\_\+data\+\_\+frame)
+\item 
+\mbox{\hyperlink{hybi00_8cpp_a8cdbc3eb69a64e731dba0d49c6aca46f}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (empty\+\_\+consume)
+\item 
+\mbox{\hyperlink{hybi00_8cpp_adb5f73d2a8ef976a1d75779e82be4e0d}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (empty\+\_\+frame)
+\item 
+\mbox{\hyperlink{hybi00_8cpp_ad28fc3426bdff30fdf98e846ac594e41}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (short\+\_\+frame)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{hybi00_8cpp_a6b2a3852db8bb19ab6909bac01859985}\index{hybi00.cpp@{hybi00.cpp}!BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}}
+\index{BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}!hybi00.cpp@{hybi00.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_TEST\_MODULE}{BOOST\_TEST\_MODULE}}
+{\footnotesize\ttfamily \label{hybi00_8cpp_a6b2a3852db8bb19ab6909bac01859985} 
+\#define BOOST\+\_\+\+TEST\+\_\+\+MODULE~hybi\+\_\+00\+\_\+processor}
+
+
+
+Definition at line \mbox{\hyperlink{hybi00_8cpp_source_l00028}{28}} of file \mbox{\hyperlink{hybi00_8cpp_source}{hybi00.\+cpp}}.
+
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{hybi00_8cpp_aec8abd64b90ff44cfce8b98e3b08c8eb}\index{hybi00.cpp@{hybi00.cpp}!message\_ptr@{message\_ptr}}
+\index{message\_ptr@{message\_ptr}!hybi00.cpp@{hybi00.cpp}}
+\doxysubsubsection{\texorpdfstring{message\_ptr}{message\_ptr}}
+{\footnotesize\ttfamily \label{hybi00_8cpp_aec8abd64b90ff44cfce8b98e3b08c8eb} 
+typedef stub\+\_\+config\+::message\+\_\+type\+::ptr \mbox{\hyperlink{debug__client_8cpp_a08398c4d31a4dc3e42d1b9a9ef64c6ad}{message\+\_\+ptr}}}
+
+
+
+Definition at line \mbox{\hyperlink{hybi00_8cpp_source_l00064}{64}} of file \mbox{\hyperlink{hybi00_8cpp_source}{hybi00.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{hybi00_8cpp_a28ab49690cd74a3b00567ad9b87ef437}\index{hybi00.cpp@{hybi00.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!hybi00.cpp@{hybi00.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/12]}}
+{\footnotesize\ttfamily \label{hybi00_8cpp_a28ab49690cd74a3b00567ad9b87ef437} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{bad\+\_\+host}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{hybi00_8cpp_source_l00150}{150}} of file \mbox{\hyperlink{hybi00_8cpp_source}{hybi00.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00151\ \ \ \ \ \mbox{\hyperlink{structprocessor__setup}{processor\_setup}}\ env(\textcolor{keyword}{true});}
+\DoxyCodeLine{00152\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_aae370ea5ac83a8ece7712cb39fc23f5b}{websocketpp::uri\_ptr}}\ u;}
+\DoxyCodeLine{00153\ }
+\DoxyCodeLine{00154\ \ \ \ \ std::string\ handshake\ =\ \textcolor{stringliteral}{"{}GET\ /\ HTTP/1.1\(\backslash\)r\(\backslash\)nHost:\ www.example.com:70000\(\backslash\)r\(\backslash\)nConnection:\ upgrade\(\backslash\)r\(\backslash\)nUpgrade:\ websocket\(\backslash\)r\(\backslash\)nOrigin:\ http://example.com\(\backslash\)r\(\backslash\)nSec-\/WebSocket-\/Key1:\ 3e6b263\ \ 4\ 17\ 80\(\backslash\)r\(\backslash\)nSec-\/WebSocket-\/Key2:\ 17\ \ 9\ G`ZD9\ \ \ 2\ 2b\ 7X\ 3\ /r90\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)n"{}};}
+\DoxyCodeLine{00155\ }
+\DoxyCodeLine{00156\ \ \ \ \ env.req.consume(handshake.c\_str(),handshake.size());}
+\DoxyCodeLine{00157\ \ \ \ \ env.req.replace\_header(\textcolor{stringliteral}{"{}Sec-\/WebSocket-\/Key3"{}},\textcolor{stringliteral}{"{}janelle!"{}});}
+\DoxyCodeLine{00158\ }
+\DoxyCodeLine{00159\ \ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespacewebsocketpp_1_1processor_a9ff3159b48cf4be2e7cb79c81b155d53}{websocketpp::processor::is\_websocket\_handshake}}(env.req));}
+\DoxyCodeLine{00160\ \ \ \ \ BOOST\_CHECK\_EQUAL(\mbox{\hyperlink{namespacewebsocketpp_1_1processor_a1a0e5e7b10b24ff5ab836dc543826934}{websocketpp::processor::get\_websocket\_version}}(env.req),\ env.p.get\_version());}
+\DoxyCodeLine{00161\ \ \ \ \ BOOST\_CHECK(\ !env.p.validate\_handshake(env.req)\ );}
+\DoxyCodeLine{00162\ }
+\DoxyCodeLine{00163\ \ \ \ \ BOOST\_CHECK(\ !env.p.get\_uri(env.req)-\/>get\_valid()\ );}
+\DoxyCodeLine{00164\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{hybi00_8cpp_a28ab49690cd74a3b00567ad9b87ef437_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{hybi00_8cpp_a8cdbc3eb69a64e731dba0d49c6aca46f}\index{hybi00.cpp@{hybi00.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!hybi00.cpp@{hybi00.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/12]}}
+{\footnotesize\ttfamily \label{hybi00_8cpp_a8cdbc3eb69a64e731dba0d49c6aca46f} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{empty\+\_\+consume}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{hybi00_8cpp_source_l00236}{236}} of file \mbox{\hyperlink{hybi00_8cpp_source}{hybi00.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00237\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ frame[2]\ =\ \{0x00,0x00\};}
+\DoxyCodeLine{00238\ }
+\DoxyCodeLine{00239\ \ \ \ \ \mbox{\hyperlink{structprocessor__setup}{processor\_setup}}\ env(\textcolor{keyword}{true});}
+\DoxyCodeLine{00240\ }
+\DoxyCodeLine{00241\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ env.p.consume(frame,0,env.ec);}
+\DoxyCodeLine{00242\ }
+\DoxyCodeLine{00243\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}},\ 0);}
+\DoxyCodeLine{00244\ \ \ \ \ BOOST\_CHECK(\ !env.ec\ );}
+\DoxyCodeLine{00245\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.p.ready(),\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{00246\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{hybi00_8cpp_a8cdbc3eb69a64e731dba0d49c6aca46f_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{hybi00_8cpp_adb5f73d2a8ef976a1d75779e82be4e0d}\index{hybi00.cpp@{hybi00.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!hybi00.cpp@{hybi00.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [3/12]}}
+{\footnotesize\ttfamily \label{hybi00_8cpp_adb5f73d2a8ef976a1d75779e82be4e0d} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{empty\+\_\+frame}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{hybi00_8cpp_source_l00248}{248}} of file \mbox{\hyperlink{hybi00_8cpp_source}{hybi00.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00248\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00249\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ frame[2]\ =\ \{0x00,\ 0xff\};}
+\DoxyCodeLine{00250\ }
+\DoxyCodeLine{00251\ \ \ \ \ \mbox{\hyperlink{structprocessor__setup}{processor\_setup}}\ env(\textcolor{keyword}{true});}
+\DoxyCodeLine{00252\ }
+\DoxyCodeLine{00253\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ env.p.consume(frame,2,env.ec);}
+\DoxyCodeLine{00254\ }
+\DoxyCodeLine{00255\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}},\ 2);}
+\DoxyCodeLine{00256\ \ \ \ \ BOOST\_CHECK(\ !env.ec\ );}
+\DoxyCodeLine{00257\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.p.ready(),\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{00258\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.p.get\_message()-\/>get\_payload(),\ \textcolor{stringliteral}{"{}"{}}\ );}
+\DoxyCodeLine{00259\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.p.ready(),\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{00260\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{hybi00_8cpp_adb5f73d2a8ef976a1d75779e82be4e0d_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{hybi00_8cpp_aa574a21bd8b369edb379ed3e0a61bb46}\index{hybi00.cpp@{hybi00.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!hybi00.cpp@{hybi00.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [4/12]}}
+{\footnotesize\ttfamily \label{hybi00_8cpp_aa574a21bd8b369edb379ed3e0a61bb46} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{exact\+\_\+match}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{hybi00_8cpp_source_l00066}{66}} of file \mbox{\hyperlink{hybi00_8cpp_source}{hybi00.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00067\ \ \ \ \ \mbox{\hyperlink{structprocessor__setup}{processor\_setup}}\ env(\textcolor{keyword}{true});}
+\DoxyCodeLine{00068\ }
+\DoxyCodeLine{00069\ \ \ \ \ std::string\ handshake\ =\ \textcolor{stringliteral}{"{}GET\ /\ HTTP/1.1\(\backslash\)r\(\backslash\)nHost:\ www.example.com\(\backslash\)r\(\backslash\)nConnection:\ upgrade\(\backslash\)r\(\backslash\)nUpgrade:\ websocket\(\backslash\)r\(\backslash\)nOrigin:\ http://example.com\(\backslash\)r\(\backslash\)nSec-\/WebSocket-\/Key1:\ 3e6b263\ \ 4\ 17\ 80\(\backslash\)r\(\backslash\)nSec-\/WebSocket-\/Key2:\ 17\ \ 9\ G`ZD9\ \ \ 2\ 2b\ 7X\ 3\ /r90\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)n"{}};}
+\DoxyCodeLine{00070\ }
+\DoxyCodeLine{00071\ \ \ \ \ env.req.consume(handshake.c\_str(),handshake.size());}
+\DoxyCodeLine{00072\ \ \ \ \ env.req.replace\_header(\textcolor{stringliteral}{"{}Sec-\/WebSocket-\/Key3"{}},\textcolor{stringliteral}{"{}WjN\}|M(6"{}});}
+\DoxyCodeLine{00073\ }
+\DoxyCodeLine{00074\ \ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespacewebsocketpp_1_1processor_a9ff3159b48cf4be2e7cb79c81b155d53}{websocketpp::processor::is\_websocket\_handshake}}(env.req));}
+\DoxyCodeLine{00075\ \ \ \ \ BOOST\_CHECK\_EQUAL(\mbox{\hyperlink{namespacewebsocketpp_1_1processor_a1a0e5e7b10b24ff5ab836dc543826934}{websocketpp::processor::get\_websocket\_version}}(env.req),\ env.p.get\_version());}
+\DoxyCodeLine{00076\ \ \ \ \ env.ec\ =\ env.p.validate\_handshake(env.req);}
+\DoxyCodeLine{00077\ \ \ \ \ BOOST\_CHECK(!env.ec);}
+\DoxyCodeLine{00078\ }
+\DoxyCodeLine{00079\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_aae370ea5ac83a8ece7712cb39fc23f5b}{websocketpp::uri\_ptr}}\ u;}
+\DoxyCodeLine{00080\ }
+\DoxyCodeLine{00081\ \ \ \ \ BOOST\_CHECK\_NO\_THROW(\ u\ =\ env.p.get\_uri(env.req)\ );}
+\DoxyCodeLine{00082\ }
+\DoxyCodeLine{00083\ \ \ \ \ BOOST\_CHECK\_EQUAL(u-\/>get\_secure(),\ \textcolor{keyword}{false});}
+\DoxyCodeLine{00084\ \ \ \ \ BOOST\_CHECK\_EQUAL(u-\/>get\_host(),\ \textcolor{stringliteral}{"{}www.example.com"{}});}
+\DoxyCodeLine{00085\ \ \ \ \ BOOST\_CHECK\_EQUAL(u-\/>get\_resource(),\ \textcolor{stringliteral}{"{}/"{}});}
+\DoxyCodeLine{00086\ \ \ \ \ BOOST\_CHECK\_EQUAL(u-\/>get\_port(),\ websocketpp::uri\_default\_port);}
+\DoxyCodeLine{00087\ }
+\DoxyCodeLine{00088\ \ \ \ \ env.p.process\_handshake(env.req,\textcolor{stringliteral}{"{}"{}},env.res);}
+\DoxyCodeLine{00089\ }
+\DoxyCodeLine{00090\ \ \ \ \ BOOST\_CHECK\_EQUAL(env.res.get\_header(\textcolor{stringliteral}{"{}Connection"{}}),\ \textcolor{stringliteral}{"{}Upgrade"{}});}
+\DoxyCodeLine{00091\ \ \ \ \ BOOST\_CHECK\_EQUAL(env.res.get\_header(\textcolor{stringliteral}{"{}Upgrade"{}}),\ \textcolor{stringliteral}{"{}WebSocket"{}});}
+\DoxyCodeLine{00092\ \ \ \ \ BOOST\_CHECK\_EQUAL(env.res.get\_header(\textcolor{stringliteral}{"{}Sec-\/WebSocket-\/Origin"{}}),\ \textcolor{stringliteral}{"{}http://example.com"{}});}
+\DoxyCodeLine{00093\ }
+\DoxyCodeLine{00094\ \ \ \ \ BOOST\_CHECK\_EQUAL(env.res.get\_header(\textcolor{stringliteral}{"{}Sec-\/WebSocket-\/Location"{}}),\ \textcolor{stringliteral}{"{}ws://www.example.com/"{}});}
+\DoxyCodeLine{00095\ \ \ \ \ BOOST\_CHECK\_EQUAL(env.res.get\_header(\textcolor{stringliteral}{"{}Sec-\/WebSocket-\/Key3"{}}),\ \textcolor{stringliteral}{"{}n`9eBk9z\$R8pOtVb"{}});}
+\DoxyCodeLine{00096\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{hybi00_8cpp_aa574a21bd8b369edb379ed3e0a61bb46_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{hybi00_8cpp_a78b1f99d01e714be5a1f69517cbd995e}\index{hybi00.cpp@{hybi00.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!hybi00.cpp@{hybi00.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [5/12]}}
+{\footnotesize\ttfamily \label{hybi00_8cpp_a78b1f99d01e714be5a1f69517cbd995e} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{extract\+\_\+subprotocols}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{hybi00_8cpp_source_l00166}{166}} of file \mbox{\hyperlink{hybi00_8cpp_source}{hybi00.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00167\ \ \ \ \ \mbox{\hyperlink{structprocessor__setup}{processor\_setup}}\ env(\textcolor{keyword}{true});}
+\DoxyCodeLine{00168\ }
+\DoxyCodeLine{00169\ \ \ \ \ std::vector<std::string>\ \mbox{\hyperlink{xbyak__mnemonic_8h_a6c0b7a19420e945dd6d8010a082bc397}{subps}};}
+\DoxyCodeLine{00170\ }
+\DoxyCodeLine{00171\ \ \ \ \ BOOST\_CHECK(\ !env.p.extract\_subprotocols(env.req,\mbox{\hyperlink{xbyak__mnemonic_8h_a6c0b7a19420e945dd6d8010a082bc397}{subps}})\ );}
+\DoxyCodeLine{00172\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{xbyak__mnemonic_8h_a6c0b7a19420e945dd6d8010a082bc397}{subps}}.size(),\ 0\ );}
+\DoxyCodeLine{00173\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{hybi00_8cpp_a78b1f99d01e714be5a1f69517cbd995e_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{hybi00_8cpp_a6120ca4893d23496721f4053cfe93393}\index{hybi00.cpp@{hybi00.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!hybi00.cpp@{hybi00.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [6/12]}}
+{\footnotesize\ttfamily \label{hybi00_8cpp_a6120ca4893d23496721f4053cfe93393} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{missing\+\_\+handshake\+\_\+key1}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{hybi00_8cpp_source_l00124}{124}} of file \mbox{\hyperlink{hybi00_8cpp_source}{hybi00.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00125\ \ \ \ \ \mbox{\hyperlink{structprocessor__setup}{processor\_setup}}\ env(\textcolor{keyword}{true});}
+\DoxyCodeLine{00126\ }
+\DoxyCodeLine{00127\ \ \ \ \ std::string\ handshake\ =\ \textcolor{stringliteral}{"{}GET\ /\ HTTP/1.1\(\backslash\)r\(\backslash\)nHost:\ www.example.com\(\backslash\)r\(\backslash\)nConnection:\ upgrade\(\backslash\)r\(\backslash\)nUpgrade:\ websocket\(\backslash\)r\(\backslash\)nSec-\/WebSocket-\/Key1:\ 3e6b263\ \ 4\ 17\ 80\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)n"{}};}
+\DoxyCodeLine{00128\ }
+\DoxyCodeLine{00129\ \ \ \ \ env.req.consume(handshake.c\_str(),handshake.size());}
+\DoxyCodeLine{00130\ \ \ \ \ env.req.replace\_header(\textcolor{stringliteral}{"{}Sec-\/WebSocket-\/Key3"{}},\textcolor{stringliteral}{"{}janelle!"{}});}
+\DoxyCodeLine{00131\ }
+\DoxyCodeLine{00132\ \ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespacewebsocketpp_1_1processor_a9ff3159b48cf4be2e7cb79c81b155d53}{websocketpp::processor::is\_websocket\_handshake}}(env.req));}
+\DoxyCodeLine{00133\ \ \ \ \ BOOST\_CHECK\_EQUAL(\mbox{\hyperlink{namespacewebsocketpp_1_1processor_a1a0e5e7b10b24ff5ab836dc543826934}{websocketpp::processor::get\_websocket\_version}}(env.req),\ env.p.get\_version());}
+\DoxyCodeLine{00134\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.p.validate\_handshake(env.req),\ \mbox{\hyperlink{namespacewebsocketpp_1_1processor_1_1error_ae6510ada6a25dcd7af258b6e374e3ca5a06199459b5805bf545a7a8b265933d2d}{websocketpp::processor::error::missing\_required\_header}}\ );}
+\DoxyCodeLine{00135\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{hybi00_8cpp_a6120ca4893d23496721f4053cfe93393_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{hybi00_8cpp_a0b1c24a03b0c2ee04587f83e786e0cfd}\index{hybi00.cpp@{hybi00.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!hybi00.cpp@{hybi00.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [7/12]}}
+{\footnotesize\ttfamily \label{hybi00_8cpp_a0b1c24a03b0c2ee04587f83e786e0cfd} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{missing\+\_\+handshake\+\_\+key2}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{hybi00_8cpp_source_l00137}{137}} of file \mbox{\hyperlink{hybi00_8cpp_source}{hybi00.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00138\ \ \ \ \ \mbox{\hyperlink{structprocessor__setup}{processor\_setup}}\ env(\textcolor{keyword}{true});}
+\DoxyCodeLine{00139\ }
+\DoxyCodeLine{00140\ \ \ \ \ std::string\ handshake\ =\ \textcolor{stringliteral}{"{}GET\ /\ HTTP/1.1\(\backslash\)r\(\backslash\)nHost:\ www.example.com\(\backslash\)r\(\backslash\)nConnection:\ upgrade\(\backslash\)r\(\backslash\)nUpgrade:\ websocket\(\backslash\)r\(\backslash\)nSec-\/WebSocket-\/Key2:\ 17\ \ 9\ G`ZD9\ \ \ 2\ 2b\ 7X\ 3\ /r90\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)n"{}};}
+\DoxyCodeLine{00141\ }
+\DoxyCodeLine{00142\ \ \ \ \ env.req.consume(handshake.c\_str(),handshake.size());}
+\DoxyCodeLine{00143\ \ \ \ \ env.req.replace\_header(\textcolor{stringliteral}{"{}Sec-\/WebSocket-\/Key3"{}},\textcolor{stringliteral}{"{}janelle!"{}});}
+\DoxyCodeLine{00144\ }
+\DoxyCodeLine{00145\ \ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespacewebsocketpp_1_1processor_a9ff3159b48cf4be2e7cb79c81b155d53}{websocketpp::processor::is\_websocket\_handshake}}(env.req));}
+\DoxyCodeLine{00146\ \ \ \ \ BOOST\_CHECK\_EQUAL(\mbox{\hyperlink{namespacewebsocketpp_1_1processor_a1a0e5e7b10b24ff5ab836dc543826934}{websocketpp::processor::get\_websocket\_version}}(env.req),\ env.p.get\_version());}
+\DoxyCodeLine{00147\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.p.validate\_handshake(env.req),\ \mbox{\hyperlink{namespacewebsocketpp_1_1processor_1_1error_ae6510ada6a25dcd7af258b6e374e3ca5a06199459b5805bf545a7a8b265933d2d}{websocketpp::processor::error::missing\_required\_header}}\ );}
+\DoxyCodeLine{00148\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{hybi00_8cpp_a0b1c24a03b0c2ee04587f83e786e0cfd_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{hybi00_8cpp_a53fa7013c0af5d6b8940a4376f25c68f}\index{hybi00.cpp@{hybi00.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!hybi00.cpp@{hybi00.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [8/12]}}
+{\footnotesize\ttfamily \label{hybi00_8cpp_a53fa7013c0af5d6b8940a4376f25c68f} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{non\+\_\+get\+\_\+method}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{hybi00_8cpp_source_l00098}{98}} of file \mbox{\hyperlink{hybi00_8cpp_source}{hybi00.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00099\ \ \ \ \ \mbox{\hyperlink{structprocessor__setup}{processor\_setup}}\ env(\textcolor{keyword}{true});}
+\DoxyCodeLine{00100\ }
+\DoxyCodeLine{00101\ \ \ \ \ std::string\ handshake\ =\ \textcolor{stringliteral}{"{}POST\ /\ HTTP/1.1\(\backslash\)r\(\backslash\)nHost:\ www.example.com\(\backslash\)r\(\backslash\)nConnection:\ upgrade\(\backslash\)r\(\backslash\)nUpgrade:\ websocket\(\backslash\)r\(\backslash\)nSec-\/WebSocket-\/Key1:\ 3e6b263\ \ 4\ 17\ 80\(\backslash\)r\(\backslash\)nSec-\/WebSocket-\/Key2:\ 17\ \ 9\ G`ZD9\ \ \ 2\ 2b\ 7X\ 3\ /r90\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)n"{}};}
+\DoxyCodeLine{00102\ }
+\DoxyCodeLine{00103\ \ \ \ \ env.req.consume(handshake.c\_str(),handshake.size());}
+\DoxyCodeLine{00104\ \ \ \ \ env.req.replace\_header(\textcolor{stringliteral}{"{}Sec-\/WebSocket-\/Key3"{}},\textcolor{stringliteral}{"{}janelle!"{}});}
+\DoxyCodeLine{00105\ }
+\DoxyCodeLine{00106\ \ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespacewebsocketpp_1_1processor_a9ff3159b48cf4be2e7cb79c81b155d53}{websocketpp::processor::is\_websocket\_handshake}}(env.req));}
+\DoxyCodeLine{00107\ \ \ \ \ BOOST\_CHECK\_EQUAL(\mbox{\hyperlink{namespacewebsocketpp_1_1processor_a1a0e5e7b10b24ff5ab836dc543826934}{websocketpp::processor::get\_websocket\_version}}(env.req),\ env.p.get\_version());}
+\DoxyCodeLine{00108\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.p.validate\_handshake(env.req),\ \mbox{\hyperlink{namespacewebsocketpp_1_1processor_1_1error_ae6510ada6a25dcd7af258b6e374e3ca5a2490b8f8de563854741a3475c2eaee40}{websocketpp::processor::error::invalid\_http\_method}}\ );}
+\DoxyCodeLine{00109\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{hybi00_8cpp_a53fa7013c0af5d6b8940a4376f25c68f_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{hybi00_8cpp_a2e752fe3c8bae5df4a39fe47147bf160}\index{hybi00.cpp@{hybi00.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!hybi00.cpp@{hybi00.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [9/12]}}
+{\footnotesize\ttfamily \label{hybi00_8cpp_a2e752fe3c8bae5df4a39fe47147bf160} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{old\+\_\+http\+\_\+version}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{hybi00_8cpp_source_l00111}{111}} of file \mbox{\hyperlink{hybi00_8cpp_source}{hybi00.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00112\ \ \ \ \ \mbox{\hyperlink{structprocessor__setup}{processor\_setup}}\ env(\textcolor{keyword}{true});}
+\DoxyCodeLine{00113\ }
+\DoxyCodeLine{00114\ \ \ \ \ std::string\ handshake\ =\ \textcolor{stringliteral}{"{}GET\ /\ HTTP/1.0\(\backslash\)r\(\backslash\)nHost:\ www.example.com\(\backslash\)r\(\backslash\)nConnection:\ upgrade\(\backslash\)r\(\backslash\)nUpgrade:\ websocket\(\backslash\)r\(\backslash\)nSec-\/WebSocket-\/Key1:\ 3e6b263\ \ 4\ 17\ 80\(\backslash\)r\(\backslash\)nSec-\/WebSocket-\/Key2:\ 17\ \ 9\ G`ZD9\ \ \ 2\ 2b\ 7X\ 3\ /r90\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)n"{}};}
+\DoxyCodeLine{00115\ }
+\DoxyCodeLine{00116\ \ \ \ \ env.req.consume(handshake.c\_str(),handshake.size());}
+\DoxyCodeLine{00117\ \ \ \ \ env.req.replace\_header(\textcolor{stringliteral}{"{}Sec-\/WebSocket-\/Key3"{}},\textcolor{stringliteral}{"{}janelle!"{}});}
+\DoxyCodeLine{00118\ }
+\DoxyCodeLine{00119\ \ \ \ \ BOOST\_CHECK(\mbox{\hyperlink{namespacewebsocketpp_1_1processor_a9ff3159b48cf4be2e7cb79c81b155d53}{websocketpp::processor::is\_websocket\_handshake}}(env.req));}
+\DoxyCodeLine{00120\ \ \ \ \ BOOST\_CHECK\_EQUAL(\mbox{\hyperlink{namespacewebsocketpp_1_1processor_a1a0e5e7b10b24ff5ab836dc543826934}{websocketpp::processor::get\_websocket\_version}}(env.req),\ env.p.get\_version());}
+\DoxyCodeLine{00121\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.p.validate\_handshake(env.req),\ \mbox{\hyperlink{namespacewebsocketpp_1_1processor_1_1error_ae6510ada6a25dcd7af258b6e374e3ca5ac1a30a2007cfa754da78a486e2a22103}{websocketpp::processor::error::invalid\_http\_version}}\ );}
+\DoxyCodeLine{00122\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{hybi00_8cpp_a2e752fe3c8bae5df4a39fe47147bf160_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{hybi00_8cpp_ae8fa75d088192976938f98253c21555f}\index{hybi00.cpp@{hybi00.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!hybi00.cpp@{hybi00.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [10/12]}}
+{\footnotesize\ttfamily \label{hybi00_8cpp_ae8fa75d088192976938f98253c21555f} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{prepare\+\_\+data\+\_\+frame}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{hybi00_8cpp_source_l00216}{216}} of file \mbox{\hyperlink{hybi00_8cpp_source}{hybi00.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00217\ \ \ \ \ \mbox{\hyperlink{structprocessor__setup}{processor\_setup}}\ env(\textcolor{keyword}{true});}
+\DoxyCodeLine{00218\ }
+\DoxyCodeLine{00219\ \ \ \ \ \mbox{\hyperlink{debug__client_8cpp_a08398c4d31a4dc3e42d1b9a9ef64c6ad}{message\_ptr}}\ in\ =\ env.msg\_manager-\/>get\_message();}
+\DoxyCodeLine{00220\ \ \ \ \ \mbox{\hyperlink{debug__client_8cpp_a08398c4d31a4dc3e42d1b9a9ef64c6ad}{message\_ptr}}\ out\ =\ env.msg\_manager-\/>get\_message();}
+\DoxyCodeLine{00221\ }
+\DoxyCodeLine{00222\ \ \ \ \ in-\/>set\_opcode(\mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea6b65f28626b19b2eef447744c564e727}{websocketpp::frame::opcode::text}});}
+\DoxyCodeLine{00223\ \ \ \ \ in-\/>set\_payload(\textcolor{stringliteral}{"{}foo"{}});}
+\DoxyCodeLine{00224\ }
+\DoxyCodeLine{00225\ \ \ \ \ env.ec\ =\ env.p.prepare\_data\_frame(in,out);}
+\DoxyCodeLine{00226\ }
+\DoxyCodeLine{00227\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ raw\_header[1]\ =\ \{0x00\};}
+\DoxyCodeLine{00228\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ raw\_payload[4]\ =\ \{0x66,0x6f,0x6f,0xff\};}
+\DoxyCodeLine{00229\ }
+\DoxyCodeLine{00230\ \ \ \ \ BOOST\_CHECK(\ !env.ec\ );}
+\DoxyCodeLine{00231\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ out-\/>get\_header(),\ std::string(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(raw\_header),1)\ );}
+\DoxyCodeLine{00232\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ out-\/>get\_payload(),\ std::string(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(raw\_payload),4)\ );}
+\DoxyCodeLine{00233\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{hybi00_8cpp_ae8fa75d088192976938f98253c21555f_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{hybi00_8cpp_abb0b7aa704fbeecbfd602779c7a8c6b8}\index{hybi00.cpp@{hybi00.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!hybi00.cpp@{hybi00.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [11/12]}}
+{\footnotesize\ttfamily \label{hybi00_8cpp_abb0b7aa704fbeecbfd602779c7a8c6b8} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{prepare\+\_\+data\+\_\+frame\+\_\+null}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{hybi00_8cpp_source_l00175}{175}} of file \mbox{\hyperlink{hybi00_8cpp_source}{hybi00.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00176\ \ \ \ \ \mbox{\hyperlink{structprocessor__setup}{processor\_setup}}\ env(\textcolor{keyword}{true});}
+\DoxyCodeLine{00177\ }
+\DoxyCodeLine{00178\ \ \ \ \ \mbox{\hyperlink{debug__client_8cpp_a08398c4d31a4dc3e42d1b9a9ef64c6ad}{message\_ptr}}\ in\ =\ env.msg\_manager-\/>get\_message();}
+\DoxyCodeLine{00179\ \ \ \ \ \mbox{\hyperlink{debug__client_8cpp_a08398c4d31a4dc3e42d1b9a9ef64c6ad}{message\_ptr}}\ out\ =\ env.msg\_manager-\/>get\_message();}
+\DoxyCodeLine{00180\ \ \ \ \ \mbox{\hyperlink{debug__client_8cpp_a08398c4d31a4dc3e42d1b9a9ef64c6ad}{message\_ptr}}\ invalid;}
+\DoxyCodeLine{00181\ }
+\DoxyCodeLine{00182\ }
+\DoxyCodeLine{00183\ \ \ \ \ \textcolor{comment}{//\ empty\ pointers\ arguements\ should\ return\ sane\ error}}
+\DoxyCodeLine{00184\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.p.prepare\_data\_frame(invalid,invalid),\ \mbox{\hyperlink{namespacewebsocketpp_1_1processor_1_1error_ae6510ada6a25dcd7af258b6e374e3ca5ad78ff630d081b41ce9027d4f361df5da}{websocketpp::processor::error::invalid\_arguments}}\ );}
+\DoxyCodeLine{00185\ }
+\DoxyCodeLine{00186\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.p.prepare\_data\_frame(in,invalid),\ \mbox{\hyperlink{namespacewebsocketpp_1_1processor_1_1error_ae6510ada6a25dcd7af258b6e374e3ca5ad78ff630d081b41ce9027d4f361df5da}{websocketpp::processor::error::invalid\_arguments}}\ );}
+\DoxyCodeLine{00187\ }
+\DoxyCodeLine{00188\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.p.prepare\_data\_frame(invalid,out),\ \mbox{\hyperlink{namespacewebsocketpp_1_1processor_1_1error_ae6510ada6a25dcd7af258b6e374e3ca5ad78ff630d081b41ce9027d4f361df5da}{websocketpp::processor::error::invalid\_arguments}}\ );}
+\DoxyCodeLine{00189\ }
+\DoxyCodeLine{00190\ \ \ \ \ \textcolor{comment}{//\ test\ valid\ opcodes}}
+\DoxyCodeLine{00191\ \ \ \ \ \textcolor{comment}{//\ text\ (1)\ should\ be\ the\ only\ valid\ opcode}}
+\DoxyCodeLine{00192\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ 0xF;\ i++)\ \{}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \ \ in-\/>set\_opcode(\mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5e}{websocketpp::frame::opcode::value}}(i));}
+\DoxyCodeLine{00194\ }
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ env.ec\ =\ env.p.prepare\_data\_frame(in,out);}
+\DoxyCodeLine{00196\ }
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (i\ !=\ 1)\ \{}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.ec,\ \mbox{\hyperlink{namespacewebsocketpp_1_1processor_1_1error_ae6510ada6a25dcd7af258b6e374e3ca5a68515957c61c729f4cce0e60ec90ddbc}{websocketpp::processor::error::invalid\_opcode}}\ );}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_CHECK\_NE(\ env.ec,\ \mbox{\hyperlink{namespacewebsocketpp_1_1processor_1_1error_ae6510ada6a25dcd7af258b6e374e3ca5a68515957c61c729f4cce0e60ec90ddbc}{websocketpp::processor::error::invalid\_opcode}}\ );}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00202\ \ \ \ \ \}}
+\DoxyCodeLine{00203\ }
+\DoxyCodeLine{00204\ \ \ \ \ \textcolor{comment}{/*}}
+\DoxyCodeLine{00205\ \textcolor{comment}{\ \ \ \ \ *\ TODO:\ tests\ for\ invalid\ UTF8}}
+\DoxyCodeLine{00206\ \textcolor{comment}{\ \ \ \ char\ buf[2]\ =\ \{0x00,\ 0x00\};}}
+\DoxyCodeLine{00207\ \textcolor{comment}{}}
+\DoxyCodeLine{00208\ \textcolor{comment}{\ \ \ \ in-\/>set\_opcode(websocketpp::frame::opcode::text);}}
+\DoxyCodeLine{00209\ \textcolor{comment}{\ \ \ \ in-\/>set\_payload("{}foo"{});}}
+\DoxyCodeLine{00210\ \textcolor{comment}{}}
+\DoxyCodeLine{00211\ \textcolor{comment}{\ \ \ \ env.ec\ =\ env.p.prepare\_data\_frame(in,out);}}
+\DoxyCodeLine{00212\ \textcolor{comment}{\ \ \ \ BOOST\_CHECK\_EQUAL(\ env.ec,\ websocketpp::processor::error::invalid\_payload\ );}}
+\DoxyCodeLine{00213\ \textcolor{comment}{\ \ \ \ */}}
+\DoxyCodeLine{00214\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{hybi00_8cpp_abb0b7aa704fbeecbfd602779c7a8c6b8_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{hybi00_8cpp_ad28fc3426bdff30fdf98e846ac594e41}\index{hybi00.cpp@{hybi00.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!hybi00.cpp@{hybi00.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [12/12]}}
+{\footnotesize\ttfamily \label{hybi00_8cpp_ad28fc3426bdff30fdf98e846ac594e41} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{short\+\_\+frame}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{hybi00_8cpp_source_l00262}{262}} of file \mbox{\hyperlink{hybi00_8cpp_source}{hybi00.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00262\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00263\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ frame[5]\ =\ \{0x00,\ 0x66,\ 0x6f,\ 0x6f,\ 0xff\};}
+\DoxyCodeLine{00264\ }
+\DoxyCodeLine{00265\ \ \ \ \ \mbox{\hyperlink{structprocessor__setup}{processor\_setup}}\ env(\textcolor{keyword}{true});}
+\DoxyCodeLine{00266\ }
+\DoxyCodeLine{00267\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ env.p.consume(frame,5,env.ec);}
+\DoxyCodeLine{00268\ }
+\DoxyCodeLine{00269\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}},\ 5);}
+\DoxyCodeLine{00270\ \ \ \ \ BOOST\_CHECK(\ !env.ec\ );}
+\DoxyCodeLine{00271\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.p.ready(),\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{00272\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.p.get\_message()-\/>get\_payload(),\ \textcolor{stringliteral}{"{}foo"{}}\ );}
+\DoxyCodeLine{00273\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ env.p.ready(),\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{00274\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{hybi00_8cpp_ad28fc3426bdff30fdf98e846ac594e41_cgraph}
+\end{center}
+\end{figure}

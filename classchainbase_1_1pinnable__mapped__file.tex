@@ -1,0 +1,369 @@
+\doxysection{chainbase\+::pinnable\+\_\+mapped\+\_\+file Class Reference}
+\hypertarget{classchainbase_1_1pinnable__mapped__file}{}\label{classchainbase_1_1pinnable__mapped__file}\index{chainbase::pinnable\_mapped\_file@{chainbase::pinnable\_mapped\_file}}
+
+
+{\ttfamily \#include $<$pinnable\+\_\+mapped\+\_\+file.\+hpp$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a7fe6684b11f441d2e971fe65166d7d5f}{map\+\_\+mode}} \{ \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a7fe6684b11f441d2e971fe65166d7d5fa65d636fa5a7029aaa40f1d93a52748b7}{mapped}}
+, \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a7fe6684b11f441d2e971fe65166d7d5fa79d37d9e763679dc5f43e08613760d27}{heap}}
+, \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a7fe6684b11f441d2e971fe65166d7d5fae7ae9465d4fba7a1863b28855ec055e8}{locked}}
+ \}
+\item 
+typedef bip\+::managed\+\_\+mapped\+\_\+file\+::segment\+\_\+manager \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a550aa643b3bd7335e48afd94f1089d2b}{segment\+\_\+manager}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_af3f5524555ffab24ef09cba1fea5908d}{pinnable\+\_\+mapped\+\_\+file}} (const bfs\+::path \&dir, bool writable, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} shared\+\_\+file\+\_\+size, bool allow\+\_\+dirty, \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a7fe6684b11f441d2e971fe65166d7d5f}{map\+\_\+mode}} mode)
+\item 
+\mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_acca214bb376d395b00705556f9c02f58}{pinnable\+\_\+mapped\+\_\+file}} (\mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file}{pinnable\+\_\+mapped\+\_\+file}} \&\&o)
+\item 
+\mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file}{pinnable\+\_\+mapped\+\_\+file}} \& \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a66e9bfcddcf4ac57b613d07120d7fa8d}{operator=}} (\mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file}{pinnable\+\_\+mapped\+\_\+file}} \&\&)
+\item 
+\mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a79e420dc6073d929ce68a9ef2ae75553}{pinnable\+\_\+mapped\+\_\+file}} (const \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file}{pinnable\+\_\+mapped\+\_\+file}} \&)=delete
+\item 
+\mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file}{pinnable\+\_\+mapped\+\_\+file}} \& \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a71286aaf0728de4c44cfe909684c9579}{operator=}} (const \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file}{pinnable\+\_\+mapped\+\_\+file}} \&)=delete
+\item 
+\mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_afaa394bb719ec7f967b5479dfe98870b}{\texorpdfstring{$\sim$}{\string~}pinnable\+\_\+mapped\+\_\+file}} ()
+\item 
+\mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a550aa643b3bd7335e48afd94f1089d2b}{segment\+\_\+manager}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a29dccb9bf52ef5c409fc1316fc99325a}{get\+\_\+segment\+\_\+manager}} () const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{pinnable__mapped__file_8hpp_source_l00040}{40}} of file \mbox{\hyperlink{pinnable__mapped__file_8hpp_source}{pinnable\+\_\+mapped\+\_\+file.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classchainbase_1_1pinnable__mapped__file_a550aa643b3bd7335e48afd94f1089d2b}\index{chainbase::pinnable\_mapped\_file@{chainbase::pinnable\_mapped\_file}!segment\_manager@{segment\_manager}}
+\index{segment\_manager@{segment\_manager}!chainbase::pinnable\_mapped\_file@{chainbase::pinnable\_mapped\_file}}
+\doxysubsubsection{\texorpdfstring{segment\_manager}{segment\_manager}}
+{\footnotesize\ttfamily \label{classchainbase_1_1pinnable__mapped__file_a550aa643b3bd7335e48afd94f1089d2b} 
+bip\+::managed\+\_\+mapped\+\_\+file\+::segment\+\_\+manager \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a550aa643b3bd7335e48afd94f1089d2b}{chainbase\+::pinnable\+\_\+mapped\+\_\+file\+::segment\+\_\+manager}}}
+
+
+
+Definition at line \mbox{\hyperlink{pinnable__mapped__file_8hpp_source_l00042}{42}} of file \mbox{\hyperlink{pinnable__mapped__file_8hpp_source}{pinnable\+\_\+mapped\+\_\+file.\+hpp}}.
+
+
+
+\doxysubsection{Member Enumeration Documentation}
+\Hypertarget{classchainbase_1_1pinnable__mapped__file_a7fe6684b11f441d2e971fe65166d7d5f}\index{chainbase::pinnable\_mapped\_file@{chainbase::pinnable\_mapped\_file}!map\_mode@{map\_mode}}
+\index{map\_mode@{map\_mode}!chainbase::pinnable\_mapped\_file@{chainbase::pinnable\_mapped\_file}}
+\doxysubsubsection{\texorpdfstring{map\_mode}{map\_mode}}
+{\footnotesize\ttfamily \label{classchainbase_1_1pinnable__mapped__file_a7fe6684b11f441d2e971fe65166d7d5f} 
+enum \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a7fe6684b11f441d2e971fe65166d7d5f}{chainbase\+::pinnable\+\_\+mapped\+\_\+file\+::map\+\_\+mode}}}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{mapped@{mapped}!chainbase::pinnable\_mapped\_file@{chainbase::pinnable\_mapped\_file}}\index{chainbase::pinnable\_mapped\_file@{chainbase::pinnable\_mapped\_file}!mapped@{mapped}}}\Hypertarget{classchainbase_1_1pinnable__mapped__file_a7fe6684b11f441d2e971fe65166d7d5fa65d636fa5a7029aaa40f1d93a52748b7}\label{classchainbase_1_1pinnable__mapped__file_a7fe6684b11f441d2e971fe65166d7d5f} 
+mapped&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{heap@{heap}!chainbase::pinnable\_mapped\_file@{chainbase::pinnable\_mapped\_file}}\index{chainbase::pinnable\_mapped\_file@{chainbase::pinnable\_mapped\_file}!heap@{heap}}}\Hypertarget{classchainbase_1_1pinnable__mapped__file_a7fe6684b11f441d2e971fe65166d7d5fa79d37d9e763679dc5f43e08613760d27}\label{classchainbase_1_1pinnable__mapped__file_a7fe6684b11f441d2e971fe65166d7d5f} 
+heap&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{locked@{locked}!chainbase::pinnable\_mapped\_file@{chainbase::pinnable\_mapped\_file}}\index{chainbase::pinnable\_mapped\_file@{chainbase::pinnable\_mapped\_file}!locked@{locked}}}\Hypertarget{classchainbase_1_1pinnable__mapped__file_a7fe6684b11f441d2e971fe65166d7d5fae7ae9465d4fba7a1863b28855ec055e8}\label{classchainbase_1_1pinnable__mapped__file_a7fe6684b11f441d2e971fe65166d7d5f} 
+locked&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{pinnable__mapped__file_8hpp_source_l00044}{44}} of file \mbox{\hyperlink{pinnable__mapped__file_8hpp_source}{pinnable\+\_\+mapped\+\_\+file.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a7fe6684b11f441d2e971fe65166d7d5fa65d636fa5a7029aaa40f1d93a52748b7}{mapped}},}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a7fe6684b11f441d2e971fe65166d7d5fa79d37d9e763679dc5f43e08613760d27}{heap}},}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a7fe6684b11f441d2e971fe65166d7d5fae7ae9465d4fba7a1863b28855ec055e8}{locked}}}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classchainbase_1_1pinnable__mapped__file_af3f5524555ffab24ef09cba1fea5908d}\index{chainbase::pinnable\_mapped\_file@{chainbase::pinnable\_mapped\_file}!pinnable\_mapped\_file@{pinnable\_mapped\_file}}
+\index{pinnable\_mapped\_file@{pinnable\_mapped\_file}!chainbase::pinnable\_mapped\_file@{chainbase::pinnable\_mapped\_file}}
+\doxysubsubsection{\texorpdfstring{pinnable\_mapped\_file()}{pinnable\_mapped\_file()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{classchainbase_1_1pinnable__mapped__file_af3f5524555ffab24ef09cba1fea5908d} 
+chainbase\+::pinnable\+\_\+mapped\+\_\+file\+::pinnable\+\_\+mapped\+\_\+file (\begin{DoxyParamCaption}\item[{const bfs\+::path \&}]{dir}{, }\item[{bool}]{writable}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{shared\+\_\+file\+\_\+size}{, }\item[{bool}]{allow\+\_\+dirty}{, }\item[{\mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a7fe6684b11f441d2e971fe65166d7d5f}{map\+\_\+mode}}}]{mode}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pinnable__mapped__file_8cpp_source_l00053}{53}} of file \mbox{\hyperlink{pinnable__mapped__file_8cpp_source}{pinnable\+\_\+mapped\+\_\+file.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :}
+\DoxyCodeLine{00054\ \ \ \ \_data\_file\_path(bfs::absolute(dir/\textcolor{stringliteral}{"{}shared\_memory.bin"{}})),}
+\DoxyCodeLine{00055\ \ \ \ \_database\_name(dir.filename().string()),}
+\DoxyCodeLine{00056\ \ \ \ \_writable(writable)}
+\DoxyCodeLine{00057\ \{}
+\DoxyCodeLine{00058\ \ \ \ \textcolor{keywordflow}{if}(shared\_file\_size\ \%\ \_db\_size\_multiple\_requirement)\ \{}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ std::string\ what\_str(\textcolor{stringliteral}{"{}Database\ must\ be\ mulitple\ of\ "{}}\ +\ std::to\_string(\_db\_size\_multiple\_requirement)\ +\ \textcolor{stringliteral}{"{}\ bytes"{}});}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ BOOST\_THROW\_EXCEPTION(std::system\_error(\mbox{\hyperlink{namespacechainbase_a0e543f894d75318b5f34a661e9b6b7c8}{make\_error\_code}}(\mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3a879ce3cfde213e7781b0af14bc8f5882}{db\_error\_code::bad\_size}}),\ what\_str));}
+\DoxyCodeLine{00061\ \ \ \ \}}
+\DoxyCodeLine{00062\ \textcolor{preprocessor}{\#ifdef\ \_WIN32}}
+\DoxyCodeLine{00063\ \ \ \ \textcolor{keywordflow}{if}(mode\ !=\ \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a7fe6684b11f441d2e971fe65166d7d5fa65d636fa5a7029aaa40f1d93a52748b7}{mapped}})}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ BOOST\_THROW\_EXCEPTION(std::system\_error(\mbox{\hyperlink{namespacechainbase_a0e543f894d75318b5f34a661e9b6b7c8}{make\_error\_code}}(\mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3ad93329bc939212e26c7aa54ff55b9738}{db\_error\_code::unsupported\_win32\_mode}})));}
+\DoxyCodeLine{00065\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00066\ \ \ \ \textcolor{keywordflow}{if}(!\_writable\ \&\&\ !bfs::exists(\_data\_file\_path))\{}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ std::string\ what\_str(\textcolor{stringliteral}{"{}database\ file\ not\ found\ at\ "{}}\ +\ \_data\_file\_path.string());}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ BOOST\_THROW\_EXCEPTION(std::system\_error(\mbox{\hyperlink{namespacechainbase_a0e543f894d75318b5f34a661e9b6b7c8}{make\_error\_code}}(\mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3a38fedd2f0ecf76dcc0d1757f8d45ab41}{db\_error\_code::not\_found}}),\ what\_str));}
+\DoxyCodeLine{00069\ \ \ \ \}}
+\DoxyCodeLine{00070\ }
+\DoxyCodeLine{00071\ \ \ \ bfs::create\_directories(dir);}
+\DoxyCodeLine{00072\ }
+\DoxyCodeLine{00073\ \ \ \ \textcolor{keywordflow}{if}(bfs::exists(\_data\_file\_path))\ \{}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ header[\mbox{\hyperlink{namespacechainbase_a3553db3334a3279bf83b5951ab9be322}{header\_size}}];}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ std::ifstream\ hs(\_data\_file\_path.generic\_string(),\ std::ifstream::binary);}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ hs.read(header,\ \mbox{\hyperlink{namespacechainbase_a3553db3334a3279bf83b5951ab9be322}{header\_size}});}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(hs.fail())}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ BOOST\_THROW\_EXCEPTION(std::system\_error(\mbox{\hyperlink{namespacechainbase_a0e543f894d75318b5f34a661e9b6b7c8}{make\_error\_code}}(\mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3a337ee0b30f7db83f8837cbb7fb17e4c2}{db\_error\_code::bad\_header}})));}
+\DoxyCodeLine{00079\ }
+\DoxyCodeLine{00080\ \ \ \ \ \ \ db\_header*\ dbheader\ =\ \textcolor{keyword}{reinterpret\_cast<}db\_header*\textcolor{keyword}{>}(header);}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(dbheader-\/>id\ !=\ \mbox{\hyperlink{namespacechainbase_a390fbf5c3ed14d5389ea5ee4f92eb1b6}{header\_id}})\ \{}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ std::string\ what\_str(\textcolor{stringliteral}{"{}\(\backslash\)"{}"{}}\ +\ \_database\_name\ +\ \textcolor{stringliteral}{"{}\(\backslash\)"{}\ database\ format\ not\ compatible\ with\ this\ version\ of\ chainbase."{}});}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ BOOST\_THROW\_EXCEPTION(std::system\_error(\mbox{\hyperlink{namespacechainbase_a0e543f894d75318b5f34a661e9b6b7c8}{make\_error\_code}}(\mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3a6bfa63b7b57c5c68e76f9f172d60146d}{db\_error\_code::incorrect\_db\_version}}),\ what\_str));}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!allow\_dirty\ \&\&\ dbheader-\/>dirty)\ \{}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \ std::string\ what\_str(\textcolor{stringliteral}{"{}\(\backslash\)"{}"{}}\ +\ \_database\_name\ +\ \textcolor{stringliteral}{"{}\(\backslash\)"{}\ database\ dirty\ flag\ set"{}});}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \ BOOST\_THROW\_EXCEPTION(std::system\_error(\mbox{\hyperlink{namespacechainbase_a0e543f894d75318b5f34a661e9b6b7c8}{make\_error\_code}}(\mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3a8251c5ee6c4498d42adb2b1a0aa286af}{db\_error\_code::dirty}})));}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(dbheader-\/>dbenviron\ !=\ \mbox{\hyperlink{environment_8hpp_a962d8de627af2d0ded4f7f8ec45bd6b1}{environment}}())\ \{}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}CHAINBASE:\ \(\backslash\)"{}"{}}\ <<\ \_database\_name\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)"{}\ database\ was\ created\ with\ a\ chainbase\ from\ a\ different\ environment"{}}\ <<\ std::endl;}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}Current\ compiler\ environment:"{}}\ <<\ std::endl;}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ std::cerr\ <<\ \mbox{\hyperlink{environment_8hpp_a962d8de627af2d0ded4f7f8ec45bd6b1}{environment}}();}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}DB\ created\ with\ compiler\ environment:"{}}\ <<\ std::endl;}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ std::cerr\ <<\ dbheader-\/>dbenviron;}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ BOOST\_THROW\_EXCEPTION(std::system\_error(\mbox{\hyperlink{namespacechainbase_a0e543f894d75318b5f34a661e9b6b7c8}{make\_error\_code}}(\mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3a5930c2c995a1d73d95f81298c603a1f6}{db\_error\_code::incompatible}})));}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00097\ \ \ \ \}}
+\DoxyCodeLine{00098\ }
+\DoxyCodeLine{00099\ \ \ \ \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a550aa643b3bd7335e48afd94f1089d2b}{segment\_manager}}*\ file\_mapped\_segment\_manager\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00100\ \ \ \ \textcolor{keywordflow}{if}(!bfs::exists(\_data\_file\_path))\ \{}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ std::ofstream\ ofs(\_data\_file\_path.generic\_string(),\ std::ofstream::trunc);}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \textcolor{comment}{//win32\ impl\ of\ bfs::resize\_file()\ doesn't\ like\ the\ file\ being\ open}}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ ofs.close();}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ bfs::resize\_file(\_data\_file\_path,\ shared\_file\_size);}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \_file\_mapping\ =\ bip::file\_mapping(\_data\_file\_path.generic\_string().c\_str(),\ bip::read\_write);}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \_file\_mapped\_region\ =\ bip::mapped\_region(\_file\_mapping,\ bip::read\_write);}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ file\_mapped\_segment\_manager\ =\ \textcolor{keyword}{new}\ ((\textcolor{keywordtype}{char}*)\_file\_mapped\_region.get\_address()+\mbox{\hyperlink{namespacechainbase_a3553db3334a3279bf83b5951ab9be322}{header\_size}})\ \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a550aa643b3bd7335e48afd94f1089d2b}{segment\_manager}}(shared\_file\_size-\/\mbox{\hyperlink{namespacechainbase_a3553db3334a3279bf83b5951ab9be322}{header\_size}});}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \textcolor{keyword}{new}\ (\_file\_mapped\_region.get\_address())\ db\_header;}
+\DoxyCodeLine{00109\ \ \ \ \}}
+\DoxyCodeLine{00110\ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(\_writable)\ \{}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ existing\_file\_size\ =\ bfs::file\_size(\_data\_file\_path);}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ grow\ =\ 0;}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(shared\_file\_size\ >\ existing\_file\_size)\ \{}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \ \ \ \ grow\ =\ shared\_file\_size\ -\/\ existing\_file\_size;}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \ \ \ bfs::resize\_file(\_data\_file\_path,\ shared\_file\_size);}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(shared\_file\_size\ <\ existing\_file\_size)\ \{}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}CHAINBASE:\ \(\backslash\)"{}"{}}\ <<\ \_database\_name\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)"{}\ requested\ size\ of\ "{}}\ <<\ shared\_file\_size\ <<\ \textcolor{stringliteral}{"{}\ is\ less\ than\ "{}}}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}existing\ size\ of\ "{}}\ <<\ existing\_file\_size\ <<\ \textcolor{stringliteral}{"{}.\ This\ database\ will\ not\ be\ shrunk\ and\ will\ "{}}}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}remain\ at\ "{}}\ <<\ existing\_file\_size\ <<\ std::endl;}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \ \_file\_mapping\ =\ bip::file\_mapping(\_data\_file\_path.generic\_string().c\_str(),\ bip::read\_write);}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \ \_file\_mapped\_region\ =\ bip::mapped\_region(\_file\_mapping,\ bip::read\_write);}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \ file\_mapped\_segment\_manager\ =\ \textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a550aa643b3bd7335e48afd94f1089d2b}{segment\_manager}}*\textcolor{keyword}{>}((\textcolor{keywordtype}{char}*)\_file\_mapped\_region.get\_address()+\mbox{\hyperlink{namespacechainbase_a3553db3334a3279bf83b5951ab9be322}{header\_size}});}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(grow)}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \ \ \ file\_mapped\_segment\_manager-\/>grow(grow);}
+\DoxyCodeLine{00127\ \ \ \ \}}
+\DoxyCodeLine{00128\ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \_file\_mapping\ =\ bip::file\_mapping(\_data\_file\_path.generic\_string().c\_str(),\ bip::read\_only);}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \_file\_mapped\_region\ =\ bip::mapped\_region(\_file\_mapping,\ bip::read\_only);}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ file\_mapped\_segment\_manager\ =\ \textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a550aa643b3bd7335e48afd94f1089d2b}{segment\_manager}}*\textcolor{keyword}{>}((\textcolor{keywordtype}{char}*)\_file\_mapped\_region.get\_address()+\mbox{\hyperlink{namespacechainbase_a3553db3334a3279bf83b5951ab9be322}{header\_size}});}
+\DoxyCodeLine{00132\ \ \ \ \}}
+\DoxyCodeLine{00133\ }
+\DoxyCodeLine{00134\ \ \ \ \textcolor{keywordflow}{if}(\_writable)\ \{}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \textcolor{comment}{//remove\ meta\ file\ created\ in\ earlier\ versions}}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ boost::system::error\_code\ ec;}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ bfs::remove(bfs::absolute(dir/\textcolor{stringliteral}{"{}shared\_memory.meta"{}}),\ ec);}
+\DoxyCodeLine{00138\ }
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \_mapped\_file\_lock\ =\ bip::file\_lock(\_data\_file\_path.generic\_string().c\_str());}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!\_mapped\_file\_lock.try\_lock())}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \ BOOST\_THROW\_EXCEPTION(std::system\_error(\mbox{\hyperlink{namespacechainbase_a0e543f894d75318b5f34a661e9b6b7c8}{make\_error\_code}}(\mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3ad55e98bcfae349c5f8896278142b755c}{db\_error\_code::no\_access}})));}
+\DoxyCodeLine{00142\ }
+\DoxyCodeLine{00143\ \ \ \ \ \ \ set\_mapped\_file\_db\_dirty(\textcolor{keyword}{true});}
+\DoxyCodeLine{00144\ \ \ \ \}}
+\DoxyCodeLine{00145\ }
+\DoxyCodeLine{00146\ \ \ \ \textcolor{keywordflow}{if}(mode\ ==\ \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a7fe6684b11f441d2e971fe65166d7d5fa65d636fa5a7029aaa40f1d93a52748b7}{mapped}})\ \{}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \_segment\_manager\ =\ file\_mapped\_segment\_manager;}
+\DoxyCodeLine{00148\ \ \ \ \}}
+\DoxyCodeLine{00149\ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ boost::asio::io\_service\ sig\_ios;}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ boost::asio::signal\_set\ sig\_set(sig\_ios,\ SIGINT,\ SIGTERM);}
+\DoxyCodeLine{00152\ \textcolor{preprocessor}{\#ifdef\ SIGPIPE}}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ sig\_set.add(SIGPIPE);}
+\DoxyCodeLine{00154\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ sig\_set.async\_wait([](\textcolor{keyword}{const}\ boost::system::error\_code\&,\ \textcolor{keywordtype}{int})\ \{}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \ BOOST\_THROW\_EXCEPTION(std::system\_error(\mbox{\hyperlink{namespacechainbase_a0e543f894d75318b5f34a661e9b6b7c8}{make\_error\_code}}(\mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3ac065ca1b36da471ff7499ebeed558fb6}{db\_error\_code::aborted}})));}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00158\ }
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \ setup\_non\_file\_mapping();}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \ load\_database\_file(sig\_ios);}
+\DoxyCodeLine{00162\ }
+\DoxyCodeLine{00163\ \textcolor{preprocessor}{\#ifndef\ \_WIN32}}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(mode\ ==\ \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a7fe6684b11f441d2e971fe65166d7d5fae7ae9465d4fba7a1863b28855ec055e8}{locked}})\ \{}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(mlock(\_non\_file\_mapped\_mapping,\ \_non\_file\_mapped\_mapping\_size))\ \{}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ what\_str(\textcolor{stringliteral}{"{}Failed\ to\ mlock\ database\ \(\backslash\)"{}"{}}\ +\ \_database\_name\ +\ \textcolor{stringliteral}{"{}\(\backslash\)"{}"{}});}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_THROW\_EXCEPTION(std::system\_error(\mbox{\hyperlink{namespacechainbase_a0e543f894d75318b5f34a661e9b6b7c8}{make\_error\_code}}(\mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3a4672b7d7aeb6cc7e8c973ef5e0fbc698}{db\_error\_code::no\_mlock}}),\ what\_str));}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}CHAINBASE:\ Database\ \(\backslash\)"{}"{}}\ <<\ \_database\_name\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)"{}\ has\ been\ successfully\ locked\ in\ memory"{}}\ <<\ std::endl;}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00171\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00172\ }
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ \ \_file\_mapped\_region\ =\ bip::mapped\_region();}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \textcolor{keywordflow}{catch}(...)\ \{}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\_writable)}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \ \ \ \ set\_mapped\_file\_db\_dirty(\textcolor{keyword}{false});}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw};}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00180\ }
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \_segment\_manager\ =\ \textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a550aa643b3bd7335e48afd94f1089d2b}{segment\_manager}}*\textcolor{keyword}{>}((\textcolor{keywordtype}{char}*)\_non\_file\_mapped\_mapping+\mbox{\hyperlink{namespacechainbase_a3553db3334a3279bf83b5951ab9be322}{header\_size}});}
+\DoxyCodeLine{00182\ \ \ \ \}}
+\DoxyCodeLine{00183\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classchainbase_1_1pinnable__mapped__file_af3f5524555ffab24ef09cba1fea5908d_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classchainbase_1_1pinnable__mapped__file_acca214bb376d395b00705556f9c02f58}\index{chainbase::pinnable\_mapped\_file@{chainbase::pinnable\_mapped\_file}!pinnable\_mapped\_file@{pinnable\_mapped\_file}}
+\index{pinnable\_mapped\_file@{pinnable\_mapped\_file}!chainbase::pinnable\_mapped\_file@{chainbase::pinnable\_mapped\_file}}
+\doxysubsubsection{\texorpdfstring{pinnable\_mapped\_file()}{pinnable\_mapped\_file()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{classchainbase_1_1pinnable__mapped__file_acca214bb376d395b00705556f9c02f58} 
+chainbase\+::pinnable\+\_\+mapped\+\_\+file\+::pinnable\+\_\+mapped\+\_\+file (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file}{pinnable\+\_\+mapped\+\_\+file}} \&\&}]{o}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pinnable__mapped__file_8cpp_source_l00284}{284}} of file \mbox{\hyperlink{pinnable__mapped__file_8cpp_source}{pinnable\+\_\+mapped\+\_\+file.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00284\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :}
+\DoxyCodeLine{00285\ \ \ \ \_mapped\_file\_lock(std::move(o.\_mapped\_file\_lock)),}
+\DoxyCodeLine{00286\ \ \ \ \_data\_file\_path(std::move(o.\_data\_file\_path)),}
+\DoxyCodeLine{00287\ \ \ \ \_database\_name(std::move(o.\_database\_name)),}
+\DoxyCodeLine{00288\ \ \ \ \_file\_mapped\_region(std::move(o.\_file\_mapped\_region))}
+\DoxyCodeLine{00289\ \{}
+\DoxyCodeLine{00290\ \ \ \ \_segment\_manager\ =\ o.\_segment\_manager;}
+\DoxyCodeLine{00291\ \ \ \ \_writable\ =\ o.\_writable;}
+\DoxyCodeLine{00292\ \ \ \ \_non\_file\_mapped\_mapping\ =\ o.\_non\_file\_mapped\_mapping;}
+\DoxyCodeLine{00293\ \ \ \ o.\_non\_file\_mapped\_mapping\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00294\ \ \ \ o.\_writable\ =\ \textcolor{keyword}{false};\ \textcolor{comment}{//prevent\ dtor\ from\ doing\ anything\ interesting}}
+\DoxyCodeLine{00295\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classchainbase_1_1pinnable__mapped__file_a79e420dc6073d929ce68a9ef2ae75553}\index{chainbase::pinnable\_mapped\_file@{chainbase::pinnable\_mapped\_file}!pinnable\_mapped\_file@{pinnable\_mapped\_file}}
+\index{pinnable\_mapped\_file@{pinnable\_mapped\_file}!chainbase::pinnable\_mapped\_file@{chainbase::pinnable\_mapped\_file}}
+\doxysubsubsection{\texorpdfstring{pinnable\_mapped\_file()}{pinnable\_mapped\_file()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{classchainbase_1_1pinnable__mapped__file_a79e420dc6073d929ce68a9ef2ae75553} 
+chainbase\+::pinnable\+\_\+mapped\+\_\+file\+::pinnable\+\_\+mapped\+\_\+file (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file}{pinnable\+\_\+mapped\+\_\+file}} \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [delete]}}
+
+\Hypertarget{classchainbase_1_1pinnable__mapped__file_afaa394bb719ec7f967b5479dfe98870b}\index{chainbase::pinnable\_mapped\_file@{chainbase::pinnable\_mapped\_file}!````~pinnable\_mapped\_file@{\texorpdfstring{$\sim$}{\string~}pinnable\_mapped\_file}}
+\index{````~pinnable\_mapped\_file@{\texorpdfstring{$\sim$}{\string~}pinnable\_mapped\_file}!chainbase::pinnable\_mapped\_file@{chainbase::pinnable\_mapped\_file}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}pinnable\_mapped\_file()}{\string~pinnable\_mapped\_file()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1pinnable__mapped__file_afaa394bb719ec7f967b5479dfe98870b} 
+chainbase\+::pinnable\+\_\+mapped\+\_\+file\+::\texorpdfstring{$\sim$}{\string~}pinnable\+\_\+mapped\+\_\+file (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pinnable__mapped__file_8cpp_source_l00310}{310}} of file \mbox{\hyperlink{pinnable__mapped__file_8cpp_source}{pinnable\+\_\+mapped\+\_\+file.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00310\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00311\ \ \ \ \textcolor{keywordflow}{if}(\_writable)\ \{}
+\DoxyCodeLine{00312\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\_non\_file\_mapped\_mapping)\ \{\ \textcolor{comment}{//in\ heap\ or\ locked\ mode}}
+\DoxyCodeLine{00313\ \ \ \ \ \ \ \ \ \ \_file\_mapped\_region\ =\ bip::mapped\_region(\_file\_mapping,\ bip::read\_write);}
+\DoxyCodeLine{00314\ \ \ \ \ \ \ \ \ \ save\_database\_file();}
+\DoxyCodeLine{00315\ \textcolor{preprocessor}{\#ifndef\ \_WIN32}}
+\DoxyCodeLine{00316\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(munmap(\_non\_file\_mapped\_mapping,\ \_non\_file\_mapped\_mapping\_size))}
+\DoxyCodeLine{00317\ \ \ \ \ \ \ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}CHAINBASE:\ ERROR:\ unmapping\ failed:\ "{}}\ <<\ strerror(errno)\ <<\ std::endl;}
+\DoxyCodeLine{00318\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00319\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00320\ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00321\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\_file\_mapped\_region.flush(0,\ 0,\ \textcolor{keyword}{false})\ ==\ \textcolor{keyword}{false})}
+\DoxyCodeLine{00322\ \ \ \ \ \ \ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}CHAINBASE:\ ERROR:\ syncing\ buffers\ failed"{}}\ <<\ std::endl;}
+\DoxyCodeLine{00323\ \ \ \ \ \ \ set\_mapped\_file\_db\_dirty(\textcolor{keyword}{false});}
+\DoxyCodeLine{00324\ \ \ \ \}}
+\DoxyCodeLine{00325\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classchainbase_1_1pinnable__mapped__file_a29dccb9bf52ef5c409fc1316fc99325a}\index{chainbase::pinnable\_mapped\_file@{chainbase::pinnable\_mapped\_file}!get\_segment\_manager@{get\_segment\_manager}}
+\index{get\_segment\_manager@{get\_segment\_manager}!chainbase::pinnable\_mapped\_file@{chainbase::pinnable\_mapped\_file}}
+\doxysubsubsection{\texorpdfstring{get\_segment\_manager()}{get\_segment\_manager()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1pinnable__mapped__file_a29dccb9bf52ef5c409fc1316fc99325a} 
+\mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a550aa643b3bd7335e48afd94f1089d2b}{segment\+\_\+manager}} \texorpdfstring{$\ast$}{*} chainbase\+::pinnable\+\_\+mapped\+\_\+file\+::get\+\_\+segment\+\_\+manager (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{pinnable__mapped__file_8hpp_source_l00057}{57}} of file \mbox{\hyperlink{pinnable__mapped__file_8hpp_source}{pinnable\+\_\+mapped\+\_\+file.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00057\ \{\ \textcolor{keywordflow}{return}\ \_segment\_manager;\}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classchainbase_1_1pinnable__mapped__file_a29dccb9bf52ef5c409fc1316fc99325a_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classchainbase_1_1pinnable__mapped__file_a71286aaf0728de4c44cfe909684c9579}\index{chainbase::pinnable\_mapped\_file@{chainbase::pinnable\_mapped\_file}!operator=@{operator=}}
+\index{operator=@{operator=}!chainbase::pinnable\_mapped\_file@{chainbase::pinnable\_mapped\_file}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classchainbase_1_1pinnable__mapped__file_a71286aaf0728de4c44cfe909684c9579} 
+\mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file}{pinnable\+\_\+mapped\+\_\+file}} \& chainbase\+::pinnable\+\_\+mapped\+\_\+file\+::operator= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file}{pinnable\+\_\+mapped\+\_\+file}} \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [delete]}}
+
+\Hypertarget{classchainbase_1_1pinnable__mapped__file_a66e9bfcddcf4ac57b613d07120d7fa8d}\index{chainbase::pinnable\_mapped\_file@{chainbase::pinnable\_mapped\_file}!operator=@{operator=}}
+\index{operator=@{operator=}!chainbase::pinnable\_mapped\_file@{chainbase::pinnable\_mapped\_file}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classchainbase_1_1pinnable__mapped__file_a66e9bfcddcf4ac57b613d07120d7fa8d} 
+\mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file}{pinnable\+\_\+mapped\+\_\+file}} \& chainbase\+::pinnable\+\_\+mapped\+\_\+file\+::operator= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file}{pinnable\+\_\+mapped\+\_\+file}} \&\&}]{o}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{pinnable__mapped__file_8cpp_source_l00297}{297}} of file \mbox{\hyperlink{pinnable__mapped__file_8cpp_source}{pinnable\+\_\+mapped\+\_\+file.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00297\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00298\ \ \ \ \_mapped\_file\_lock\ =\ std::move(o.\_mapped\_file\_lock);}
+\DoxyCodeLine{00299\ \ \ \ \_data\_file\_path\ =\ std::move(o.\_data\_file\_path);}
+\DoxyCodeLine{00300\ \ \ \ \_database\_name\ =\ std::move(o.\_database\_name);}
+\DoxyCodeLine{00301\ \ \ \ \_file\_mapped\_region\ =\ std::move(o.\_file\_mapped\_region);}
+\DoxyCodeLine{00302\ \ \ \ \_non\_file\_mapped\_mapping\ =\ o.\_non\_file\_mapped\_mapping;}
+\DoxyCodeLine{00303\ \ \ \ o.\_non\_file\_mapped\_mapping\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00304\ \ \ \ \_segment\_manager\ =\ o.\_segment\_manager;}
+\DoxyCodeLine{00305\ \ \ \ \_writable\ =\ o.\_writable;}
+\DoxyCodeLine{00306\ \ \ \ o.\_writable\ =\ \textcolor{keyword}{false};\ \textcolor{comment}{//prevent\ dtor\ from\ doing\ anything\ interesting}}
+\DoxyCodeLine{00307\ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00308\ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chainbase/include/chainbase/\mbox{\hyperlink{pinnable__mapped__file_8hpp}{pinnable\+\_\+mapped\+\_\+file.\+hpp}}\item 
+libraries/chainbase/src/\mbox{\hyperlink{pinnable__mapped__file_8cpp}{pinnable\+\_\+mapped\+\_\+file.\+cpp}}\end{DoxyCompactItemize}

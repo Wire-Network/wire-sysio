@@ -1,0 +1,123 @@
+\chapter{tostring}
+\hypertarget{md_libraries_2sys-vm_2external_2_catch2_2docs_2tostring}{}\label{md_libraries_2sys-vm_2external_2_catch2_2docs_2tostring}\index{tostring@{tostring}}
+\label{_top}%
+ \doxysection*{String conversions}
+
+{\bfseries{Contents}}~\newline
+ operator \texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<} overload for std\+::ostream~\newline
+ Catch\+::String\+Maker specialisation~\newline
+ Catch\+::is\+\_\+range specialisation~\newline
+ Exceptions~\newline
+ Enums~\newline
+
+
+\doxylink{namespace_catch}{Catch} needs to be able to convert types you use in assertions and logging expressions into strings (for logging and reporting purposes). Most built-\/in or std types are supported out of the box but there are two ways that you can tell \doxylink{namespace_catch}{Catch} how to convert your own types (or other, third-\/party types) into strings.
+
+\doxysubsection*{operator \texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<} overload for std\+::ostream}
+
+This is the standard way of providing string conversions in C++ -\/ and the chances are you may already provide this for your own purposes. If you\textquotesingle{}re not familiar with this idiom it involves writing a free function of the form\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{std::ostream\&\ \mbox{\hyperlink{database__utils_8hpp_a9c651062fd345156256e69573165086c}{operator\ <<\ }}(\ std::ostream\&\ os,\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ )\ \{}
+\DoxyCodeLine{\ \ \ \ os\ <<\ convertMyTypeToString(\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ );}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}};}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+(where {\ttfamily T} is your type and {\ttfamily convert\+My\+Type\+To\+String} is where you\textquotesingle{}ll write whatever code is necessary to make your type printable -\/ it doesn\textquotesingle{}t have to be in another function).
+
+You should put this function in the same namespace as your type, or the global namespace, and have it declared before including \doxylink{namespace_catch}{Catch}\textquotesingle{}s header.
+
+\doxysubsection*{\doxylink{struct_catch_1_1_string_maker}{Catch\+::\+String\+Maker} specialisation}
+
+If you don\textquotesingle{}t want to provide an {\ttfamily operator \texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<}} overload, or you want to convert your type differently for testing purposes, you can provide a specialization for {\ttfamily \doxylink{struct_catch_1_1_string_maker}{Catch\+::\+String\+Maker}\texorpdfstring{$<$}{<}T\texorpdfstring{$>$}{>}}\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}}\ \{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{template}<>}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{struct\ }StringMaker<\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}>\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ std::string\ \mbox{\hyperlink{struct_catch_1_1_string_maker_a98ebf81ba6ef3cfd72b23316e291d3d0}{convert}}(\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ )\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ convertMyTypeToString(\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ );}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\ \ \ \ \};}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection*{\doxylink{struct_catch_1_1is__range}{Catch\+::is\+\_\+range} specialisation}
+
+As a fallback, \doxylink{namespace_catch}{Catch} attempts to detect if the type can be iterated ({\ttfamily begin(\+T)} and {\ttfamily end(\+T)} are valid) and if it can be, it is stringified as a range. For certain types this can lead to infinite recursion, so it can be disabled by specializing {\ttfamily \doxylink{struct_catch_1_1is__range}{Catch\+::is\+\_\+range}} like so\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}}\ \{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{template}<>}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{struct\ }is\_range<\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}>\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_catch_1_1is__range_a2f0c5f1463ca92ac6c8b0eb07696e86a}{value}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\ \ \ \ \};}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection*{Exceptions}
+
+By default all exceptions deriving from {\ttfamily std\+::exception} will be translated to strings by calling the {\ttfamily what()} method. For exception types that do not derive from {\ttfamily std\+::exception} -\/ or if {\ttfamily what()} does not return a suitable string -\/ use {\ttfamily CATCH\+\_\+\+TRANSLATE\+\_\+\+EXCEPTION}. This defines a function that takes your exception type, by reference, and returns a string. It can appear anywhere in the code -\/ it doesn\textquotesingle{}t have to be in the same translation unit. For example\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{include_2catch_8hpp_a094602ff56422c96e501eaaef1ef8c12}{CATCH\_TRANSLATE\_EXCEPTION}}(\ \mbox{\hyperlink{class_my_type}{MyType}}\&\ ex\ )\ \{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{return}\ ex.message();}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection*{Enums}
+
+Enums that already have a {\ttfamily \texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<}} overload for {\ttfamily std\+::ostream} will convert to strings as expected. If you only need to convert enums to strings for test reporting purposes you can provide a {\ttfamily String\+Maker} specialisations as any other type. However, as a convenience, \doxylink{namespace_catch}{Catch} provides the {\ttfamily REGISTER\+\_\+\+ENUM} helper macro that will generate the {\ttfamily String\+Maker} specialiation for you with minimal code. Simply provide it the (qualified) enum name, followed by all the enum values, and you\textquotesingle{}re done!
+
+E.\+g.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{enum\ class}\ Fruits\ \{\ Banana,\ Apple,\ Mango\ \};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\mbox{\hyperlink{catch__tostring_8h_a3063d7b316c984044916079ab8b7dad6}{CATCH\_REGISTER\_ENUM}}(\ Fruits,\ Fruits::Banana,\ Fruits::Apple,\ Fruits::Mango\ )}
+\DoxyCodeLine{}
+\DoxyCodeLine{\mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}()\ \{}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ Fruits::Mango\ ==\ Fruits::Apple\ );}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+... or if the enum is in a namespace\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_bikeshed}{Bikeshed}}\ \{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{enum\ class}\ \mbox{\hyperlink{namespace_bikeshed_a5e3ea5a66d530e5f53c18879fc97e402}{Colours}}\ \{\ \mbox{\hyperlink{namespace_bikeshed_a5e3ea5a66d530e5f53c18879fc97e402aee38e4d5dd68c4e440825018d549cb47}{Red}},\ \mbox{\hyperlink{namespace_bikeshed_a5e3ea5a66d530e5f53c18879fc97e402ad382816a3cbeed082c9e216e7392eed1}{Green}},\ \mbox{\hyperlink{namespace_bikeshed_a5e3ea5a66d530e5f53c18879fc97e402a9594eec95be70e7b1710f730fdda33d9}{Blue}}\ \};}
+\DoxyCodeLine{\}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ Important!:\ This\ macro\ must\ appear\ at\ top\ level\ scope\ -\/\ not\ inside\ a\ namespace}}
+\DoxyCodeLine{\textcolor{comment}{//\ You\ can\ fully\ qualify\ the\ names,\ or\ use\ a\ using\ if\ you\ prefer}}
+\DoxyCodeLine{\mbox{\hyperlink{catch__tostring_8h_a3063d7b316c984044916079ab8b7dad6}{CATCH\_REGISTER\_ENUM}}(\ \mbox{\hyperlink{namespace_bikeshed_a5e3ea5a66d530e5f53c18879fc97e402}{Bikeshed::Colours}},}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{namespace_bikeshed_a5e3ea5a66d530e5f53c18879fc97e402aee38e4d5dd68c4e440825018d549cb47}{Bikeshed::Colours::Red}},}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{namespace_bikeshed_a5e3ea5a66d530e5f53c18879fc97e402ad382816a3cbeed082c9e216e7392eed1}{Bikeshed::Colours::Green}},}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{namespace_bikeshed_a5e3ea5a66d530e5f53c18879fc97e402a9594eec95be70e7b1710f730fdda33d9}{Bikeshed::Colours::Blue}}\ )}
+\DoxyCodeLine{}
+\DoxyCodeLine{\mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}()\ \{}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{namespace_bikeshed_a5e3ea5a66d530e5f53c18879fc97e402aee38e4d5dd68c4e440825018d549cb47}{Bikeshed::Colours::Red}}\ ==\ \mbox{\hyperlink{namespace_bikeshed_a5e3ea5a66d530e5f53c18879fc97e402a9594eec95be70e7b1710f730fdda33d9}{Bikeshed::Colours::Blue}}\ );}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+\DoxyHorRuler{0}
+
+
+\href{Readme.md\#top}{\texttt{ Home}} 

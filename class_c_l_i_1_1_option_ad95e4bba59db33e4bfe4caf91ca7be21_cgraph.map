@@ -1,0 +1,20 @@
+<map id="CLI::Option::matching_name" name="CLI::Option::matching_name">
+<area shape="rect" id="Node000001" title="If options share any of the same names, find it." alt="" coords="5,81,194,107"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_option.html#a481001137137be0d6a4e5998866d604a" title="Requires &quot;&#45;&#45;&quot; to be removed from string." alt="" coords="242,40,373,81"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="183,78,226,71,227,76,184,83"/>
+<area shape="rect" id="Node000008" href="$class_c_l_i_1_1_option.html#acfa639ba77f034615c7e66028da1fc3b" title="Requires &quot;&#45;&quot; to be removed from string." alt="" coords="242,106,373,146"/>
+<area shape="poly" id="edge9_Node000001_Node000008" title=" " alt="" coords="188,105,227,111,226,116,187,110"/>
+<area shape="rect" id="Node000003" href="$namespace_c_l_i_1_1detail.html#a356b9c9cc904af2b0a918fd55e86cd9c" title="Check if a string is a member of a list of strings and optionally ignore case or ignore underscores." alt="" coords="421,81,585,107"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="374,69,409,75,408,81,373,75"/>
+<area shape="rect" id="Node000004" href="$namespace_c_l_i.html#a0c52326d2681814c22aa1a93ce43375e" title="Helper function to allow ignore_case to be passed to IsMember or Transform." alt="" coords="651,5,772,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="540,78,659,34,661,39,542,83"/>
+<area shape="rect" id="Node000005" href="$namespace_c_l_i_1_1detail.html#ae83709ec148057ec53df4383645727e9" title="Return a lower case version of a string." alt="" coords="838,43,976,68"/>
+<area shape="poly" id="edge8_Node000003_Node000005" title=" " alt="" coords="585,84,822,61,822,66,586,89"/>
+<area shape="rect" id="Node000006" href="$namespace_c_l_i.html#a111b6f05d21b9b84e7ba933ade79884c" title="Helper function to allow ignore_underscore to be passed to IsMember or Transform." alt="" coords="633,107,790,132"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="586,102,618,105,618,111,585,107"/>
+<area shape="rect" id="Node000007" href="$namespace_c_l_i_1_1detail.html#a5359a7a0e33366a12e15523b100f591a" title="remove underscores from a string" alt="" coords="841,114,973,154"/>
+<area shape="poly" id="edge7_Node000003_Node000007" title=" " alt="" coords="531,105,578,126,634,142,683,148,733,150,825,144,826,149,733,155,682,154,633,147,576,131,529,110"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="773,27,823,37,822,42,772,32"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="790,123,826,125,825,131,790,128"/>
+<area shape="poly" id="edge10_Node000008_Node000003" title=" " alt="" coords="373,113,405,107,406,113,374,118"/>
+</map>

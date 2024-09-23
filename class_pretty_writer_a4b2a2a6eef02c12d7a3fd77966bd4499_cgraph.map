@@ -1,0 +1,6 @@
+<map id="PrettyWriter::Key" name="PrettyWriter::Key">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,29,127,55"/>
+<area shape="poly" id="edge1_Node000001_Node000001" title=" " alt="" coords="38,30,33,21,36,11,47,5,66,3,86,5,96,12,94,16,84,10,66,8,49,10,40,15,38,20,43,28"/>
+<area shape="rect" id="Node000002" href="$namespaceinternal.html#a86326fb0c9d7c7ea8edd7deedbb2b26e" title="Custom strlen() which works on different character types." alt="" coords="175,29,284,55"/>
+<area shape="poly" id="edge2_Node000001_Node000002" title=" " alt="" coords="127,40,159,40,159,45,127,45"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="sysio::net_plugin_impl::get_authentication_key" name="sysio::net_plugin_impl::get_authentication_key">
+<area shape="rect" id="Node000001" title="Retrieve public key used to authenticate with peers." alt="" coords="194,5,357,46"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1connection.html#aec8d94a6b6483822c52f08624e8dc9e7" title=" " alt="" coords="5,5,146,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="178,28,146,28,146,23,178,23"/>
+</map>

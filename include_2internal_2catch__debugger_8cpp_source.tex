@@ -1,0 +1,129 @@
+\doxysection{catch\+\_\+debugger.\+cpp}
+\hypertarget{include_2internal_2catch__debugger_8cpp_source}{}\label{include_2internal_2catch__debugger_8cpp_source}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_debugger.cpp@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_debugger.cpp}}
+\mbox{\hyperlink{include_2internal_2catch__debugger_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00002}00002\ \textcolor{comment}{\ *\ \ Created\ by\ Phil\ on\ 27/12/2010.}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00003}00003\ \textcolor{comment}{\ *\ \ Copyright\ 2010\ Two\ Blue\ Cubes\ Ltd.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00004}00004\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00005}00005\ \textcolor{comment}{\ *\ \ Distributed\ under\ the\ Boost\ Software\ License,\ Version\ 1.0.\ (See\ accompanying}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00006}00006\ \textcolor{comment}{\ *\ \ file\ LICENSE\_1\_0.txt\ or\ copy\ at\ http://www.boost.org/LICENSE\_1\_0.txt)}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00008}00008\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__debugger_8h}{catch\_debugger.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00011}00011\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__errno__guard_8h}{catch\_errno\_guard.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00012}00012\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__stream_8h}{catch\_stream.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00013}00013\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__platform_8h}{catch\_platform.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00015}00015\ \textcolor{preprocessor}{\#ifdef\ CATCH\_PLATFORM\_MAC}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00017}00017\ \textcolor{preprocessor}{\#\ \ include\ <assert.h>}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00018}00018\ \textcolor{preprocessor}{\#\ \ include\ <stdbool.h>}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00019}00019\ \textcolor{preprocessor}{\#\ \ include\ <sys/types.h>}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00020}00020\ \textcolor{preprocessor}{\#\ \ include\ <unistd.h>}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00021}00021\ \textcolor{preprocessor}{\#\ \ include\ <cstddef>}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00022}00022\ \textcolor{preprocessor}{\#\ \ include\ <ostream>}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00024}00024\ \textcolor{preprocessor}{\#ifdef\ \_\_apple\_build\_version\_\_}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00025}00025\ \ \ \ \ \textcolor{comment}{//\ These\ headers\ will\ only\ compile\ with\ AppleClang\ (XCode)}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00026}00026\ \ \ \ \ \textcolor{comment}{//\ For\ other\ compilers\ (Clang,\ GCC,\ ...\ )\ we\ need\ to\ exclude\ them}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00027}00027\ \textcolor{preprocessor}{\#\ \ include\ <sys/sysctl.h>}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00028}00028\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00030}00030\ \ \ \ \ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}}\ \{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00031}00031\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#ifdef\ \_\_apple\_build\_version\_\_}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00032}00032\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ The\ following\ function\ is\ taken\ directly\ from\ the\ following\ technical\ note:}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00033}00033\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ https://developer.apple.com/library/archive/qa/qa1361/\_index.html}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00035}00035\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Returns\ true\ if\ the\ current\ process\ is\ being\ debugged\ (either}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00036}00036\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ running\ under\ the\ debugger\ or\ has\ a\ debugger\ attached\ post\ facto).}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00037}00037\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespace_catch_ab079497368fb1df25af39ad494d2a241}{isDebuggerActive}}()\{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00038}00038\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ mib[4];}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00039}00039\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{struct\ }kinfo\_proc\ \ \ info;}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00040}00040\ \ \ \ \ \ \ \ \ \ \ \ \ std::size\_t\ \ \ \ \ \ \ \ \ size;}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00042}00042\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Initialize\ the\ flags\ so\ that,\ if\ sysctl\ fails\ for\ some\ bizarre}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00043}00043\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ reason,\ we\ get\ a\ predictable\ result.}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00045}00045\ \ \ \ \ \ \ \ \ \ \ \ \ info.kp\_proc.p\_flag\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00047}00047\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Initialize\ mib,\ which\ tells\ sysctl\ the\ info\ we\ want,\ in\ this\ case}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ we're\ looking\ for\ information\ about\ a\ specific\ process\ ID.}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00050}00050\ \ \ \ \ \ \ \ \ \ \ \ \ mib[0]\ =\ CTL\_KERN;}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00051}00051\ \ \ \ \ \ \ \ \ \ \ \ \ mib[1]\ =\ KERN\_PROC;}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \ \ \ mib[2]\ =\ KERN\_PROC\_PID;}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \ \ \ mib[3]\ =\ getpid();}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00054}00054\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Call\ sysctl.}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \ \ \ size\ =\ \textcolor{keyword}{sizeof}(info);}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ sysctl(mib,\ \textcolor{keyword}{sizeof}(mib)\ /\ \textcolor{keyword}{sizeof}(*mib),\ \&info,\ \&size,\ \textcolor{keyword}{nullptr},\ 0)\ !=\ 0\ )\ \{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00059}00059\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_catch_a54c1ce08041448d684ae8edc14162cd2}{Catch::cerr}}()\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n**\ Call\ to\ sysctl\ failed\ -\/\ unable\ to\ determine\ if\ debugger\ is\ active\ **\(\backslash\)n"{}}\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00061}00061\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00062}00062\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ We're\ being\ debugged\ if\ the\ P\_TRACED\ flag\ is\ set.}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00065}00065\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (\ (info.kp\_proc.p\_flag\ \&\ P\_TRACED)\ !=\ 0\ );}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00066}00066\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00067}00067\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#else}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00068}00068\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespace_catch_ab079497368fb1df25af39ad494d2a241}{isDebuggerActive}}()\ \{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ We\ need\ to\ find\ another\ way\ to\ determine\ this\ for\ non-\/appleclang\ compilers\ on\ macOS}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00071}00071\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00072}00072\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#endif}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00073}00073\ \ \ \ \ \}\ \textcolor{comment}{//\ namespace\ Catch}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00074}00074\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00075}00075\ \textcolor{preprocessor}{\#elif\ defined(CATCH\_PLATFORM\_LINUX)}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00076}00076\ \textcolor{preprocessor}{\ \ \ \ \#include\ <fstream>}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00077}00077\ \textcolor{preprocessor}{\ \ \ \ \#include\ <string>}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00079}00079\ \ \ \ \ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}}\{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00080}00080\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ The\ standard\ POSIX\ way\ of\ detecting\ a\ debugger\ is\ to\ attempt\ to}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00081}00081\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ ptrace()\ the\ process,\ but\ this\ needs\ to\ be\ done\ from\ a\ child\ and\ not}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00082}00082\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ this\ process\ itself\ to\ still\ allow\ attaching\ to\ this\ process\ later}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00083}00083\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ if\ wanted,\ so\ is\ rather\ heavy.\ Under\ Linux\ we\ have\ the\ PID\ of\ the}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00084}00084\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ "{}debugger"{}\ (which\ doesn't\ need\ to\ be\ gdb,\ of\ course,\ it\ could\ also}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00085}00085\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ be\ strace,\ for\ example)\ in\ /proc/\$PID/status,\ so\ just\ get\ it\ from}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00086}00086\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ there\ instead.}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00087}00087\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespace_catch_ab079497368fb1df25af39ad494d2a241}{isDebuggerActive}}()\{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00088}00088\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Libstdc++\ has\ a\ bug,\ where\ std::ifstream\ sets\ errno\ to\ 0}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00089}00089\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ This\ way\ our\ users\ can\ properly\ assert\ over\ errno\ values}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00090}00090\ \ \ \ \ \ \ \ \ \ \ \ \ ErrnoGuard\ guard;}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00091}00091\ \ \ \ \ \ \ \ \ \ \ \ \ std::ifstream\ in(\textcolor{stringliteral}{"{}/proc/self/status"{}});}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00092}00092\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ std::string\ line;\ std::getline(in,\ line);\ )\ \{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00093}00093\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ PREFIX\_LEN\ =\ 11;}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00094}00094\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}.compare(0,\ PREFIX\_LEN,\ \textcolor{stringliteral}{"{}TracerPid:\(\backslash\)t"{}})\ ==\ 0\ )\ \{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00095}00095\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ We're\ traced\ if\ the\ PID\ is\ not\ 0\ and\ no\ other\ PID\ starts}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00096}00096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ with\ 0\ digit,\ so\ it's\ enough\ to\ check\ for\ just\ a\ single}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00097}00097\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ character.}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00098}00098\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}.length()\ >\ PREFIX\_LEN\ \&\&\ \mbox{\hyperlink{namespacevalidate__reflection_a54d4e98ade8417b88a7e3859a693630a}{line}}[PREFIX\_LEN]\ !=\ \textcolor{charliteral}{'0'};}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00099}00099\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00100}00100\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00101}00101\ }
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00102}00102\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00103}00103\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00104}00104\ \ \ \ \ \}\ \textcolor{comment}{//\ namespace\ Catch}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00105}00105\ \textcolor{preprocessor}{\#elif\ defined(\_MSC\_VER)}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00106}00106\ \ \ \ \ \textcolor{keyword}{extern}\ \textcolor{stringliteral}{"{}C"{}}\ \_\_declspec(dllimport)\ \textcolor{keywordtype}{int}\ \_\_stdcall\ IsDebuggerPresent();}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00107}00107\ \ \ \ \ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}}\ \{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00108}00108\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespace_catch_ab079497368fb1df25af39ad494d2a241}{isDebuggerActive}}()\ \{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00109}00109\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ IsDebuggerPresent()\ !=\ 0;}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00110}00110\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00111}00111\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00112}00112\ \textcolor{preprocessor}{\#elif\ defined(\_\_MINGW32\_\_)}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00113}00113\ \ \ \ \ \textcolor{keyword}{extern}\ \textcolor{stringliteral}{"{}C"{}}\ \_\_declspec(dllimport)\ \textcolor{keywordtype}{int}\ \_\_stdcall\ IsDebuggerPresent();}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00114}00114\ \ \ \ \ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}}\ \{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00115}00115\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespace_catch_ab079497368fb1df25af39ad494d2a241}{isDebuggerActive}}()\ \{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00116}00116\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ IsDebuggerPresent()\ !=\ 0;}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00117}00117\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00118}00118\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00119}00119\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00120}00120\ \ \ \ \ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}}\ \{}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00121}\mbox{\hyperlink{namespace_catch_ab079497368fb1df25af39ad494d2a241}{00121}}\ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespace_catch_ab079497368fb1df25af39ad494d2a241}{isDebuggerActive}}()\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};\ \}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00122}00122\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{include_2internal_2catch__debugger_8cpp_source_l00123}00123\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ Platform}}
+
+\end{DoxyCode}

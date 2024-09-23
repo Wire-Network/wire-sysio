@@ -1,0 +1,7 @@
+<map id="sysio::chain::wasm_injections::wasm_binary_injection::wasm_binary_injection" name="sysio::chain::wasm_injections::wasm_binary_injection::wasm_binary_injection">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,174,76"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1wasm__injections_1_1injector__utils.html#aa54efb47489b00e59912f16fc18de8e8" title=" " alt="" coords="222,13,356,68"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="174,38,206,38,206,43,174,43"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1chain_1_1wasm__injections_1_1injector__utils.html#a1029b064f8e46e53de4313e390850fbd" title=" " alt="" coords="404,13,558,68"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="357,38,388,38,388,43,357,43"/>
+</map>

@@ -1,0 +1,372 @@
+\doxysection{libff\+::edwards\+\_\+pp Class Reference}
+\hypertarget{classlibff_1_1edwards__pp}{}\label{classlibff_1_1edwards__pp}\index{libff::edwards\_pp@{libff::edwards\_pp}}
+
+
+{\ttfamily \#include $<$edwards\+\_\+pp.\+hpp$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{namespacelibff_ab8734750fbf545572c63fa96171f7caf}{edwards\+\_\+\+Fr}} \mbox{\hyperlink{classlibff_1_1edwards__pp_a4b3cbf504c7e600cac5ad679bf8e5f2c}{Fp\+\_\+type}}
+\item 
+typedef \mbox{\hyperlink{classlibff_1_1edwards___g1}{edwards\+\_\+\+G1}} \mbox{\hyperlink{classlibff_1_1edwards__pp_ab821e32d201b00f14f74e87b7e6ef78d}{G1\+\_\+type}}
+\item 
+typedef \mbox{\hyperlink{classlibff_1_1edwards___g2}{edwards\+\_\+\+G2}} \mbox{\hyperlink{classlibff_1_1edwards__pp_a25dd1742c7b76eabbb7d8b22755a0069}{G2\+\_\+type}}
+\item 
+typedef \mbox{\hyperlink{namespacelibff_a4668ba8c54218548bac9c3b0da19564e}{edwards\+\_\+\+G1\+\_\+precomp}} \mbox{\hyperlink{classlibff_1_1edwards__pp_a651b95bedde5dedd8cb47ce16054bbb2}{G1\+\_\+precomp\+\_\+type}}
+\item 
+typedef \mbox{\hyperlink{namespacelibff_a594453bfc131198bab02308d75bc407f}{edwards\+\_\+\+G2\+\_\+precomp}} \mbox{\hyperlink{classlibff_1_1edwards__pp_aeda9a7ef19d24caed961d9a99cda7fa8}{G2\+\_\+precomp\+\_\+type}}
+\item 
+typedef \mbox{\hyperlink{namespacelibff_a2653629483aeb0df51eec08cb6635343}{edwards\+\_\+\+Fq}} \mbox{\hyperlink{classlibff_1_1edwards__pp_ad8b3c9424345e3b2f75fb7eebba3b083}{Fq\+\_\+type}}
+\item 
+typedef \mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\+\_\+\+Fq3}} \mbox{\hyperlink{classlibff_1_1edwards__pp_a1327fe4cd4d9a8cbfb29631ad18069f9}{Fqe\+\_\+type}}
+\item 
+typedef \mbox{\hyperlink{namespacelibff_a94775cf76b7e294e46c8e6b8f9c3de87}{edwards\+\_\+\+Fq6}} \mbox{\hyperlink{classlibff_1_1edwards__pp_ad0ccc868aabe3d0ac9ba47c8ae0efd1b}{Fqk\+\_\+type}}
+\item 
+typedef \mbox{\hyperlink{namespacelibff_aed4ac2e5b330c64e83968be0a29791e4}{edwards\+\_\+\+GT}} \mbox{\hyperlink{classlibff_1_1edwards__pp_acff3fae115534d9134b6866c299d46bb}{GT\+\_\+type}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static void \mbox{\hyperlink{classlibff_1_1edwards__pp_a32abdda668a29bbc32de1ac0fbe977e1}{init\+\_\+public\+\_\+params}} ()
+\item 
+static \mbox{\hyperlink{namespacelibff_aed4ac2e5b330c64e83968be0a29791e4}{edwards\+\_\+\+GT}} \mbox{\hyperlink{classlibff_1_1edwards__pp_ac85feaa100b797417e0e55f62a75fe53}{final\+\_\+exponentiation}} (const \mbox{\hyperlink{namespacelibff_a94775cf76b7e294e46c8e6b8f9c3de87}{edwards\+\_\+\+Fq6}} \&elt)
+\item 
+static \mbox{\hyperlink{namespacelibff_a4668ba8c54218548bac9c3b0da19564e}{edwards\+\_\+\+G1\+\_\+precomp}} \mbox{\hyperlink{classlibff_1_1edwards__pp_a8fb44fa699fef17a1fb06b2ae5462b04}{precompute\+\_\+\+G1}} (const \mbox{\hyperlink{classlibff_1_1edwards___g1}{edwards\+\_\+\+G1}} \&\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}})
+\item 
+static \mbox{\hyperlink{namespacelibff_a594453bfc131198bab02308d75bc407f}{edwards\+\_\+\+G2\+\_\+precomp}} \mbox{\hyperlink{classlibff_1_1edwards__pp_a397dd3b37df326c8a679edf0005869bc}{precompute\+\_\+\+G2}} (const \mbox{\hyperlink{classlibff_1_1edwards___g2}{edwards\+\_\+\+G2}} \&Q)
+\item 
+static \mbox{\hyperlink{namespacelibff_a94775cf76b7e294e46c8e6b8f9c3de87}{edwards\+\_\+\+Fq6}} \mbox{\hyperlink{classlibff_1_1edwards__pp_a1fa10cc0e19d116a0e20de356674685b}{miller\+\_\+loop}} (const \mbox{\hyperlink{namespacelibff_a4668ba8c54218548bac9c3b0da19564e}{edwards\+\_\+\+G1\+\_\+precomp}} \&prec\+\_\+P, const \mbox{\hyperlink{namespacelibff_a594453bfc131198bab02308d75bc407f}{edwards\+\_\+\+G2\+\_\+precomp}} \&prec\+\_\+Q)
+\item 
+static \mbox{\hyperlink{namespacelibff_a94775cf76b7e294e46c8e6b8f9c3de87}{edwards\+\_\+\+Fq6}} \mbox{\hyperlink{classlibff_1_1edwards__pp_accc267f404ac7696073d0eb219b5769b}{double\+\_\+miller\+\_\+loop}} (const \mbox{\hyperlink{namespacelibff_a4668ba8c54218548bac9c3b0da19564e}{edwards\+\_\+\+G1\+\_\+precomp}} \&prec\+\_\+\+P1, const \mbox{\hyperlink{namespacelibff_a594453bfc131198bab02308d75bc407f}{edwards\+\_\+\+G2\+\_\+precomp}} \&prec\+\_\+\+Q1, const \mbox{\hyperlink{namespacelibff_a4668ba8c54218548bac9c3b0da19564e}{edwards\+\_\+\+G1\+\_\+precomp}} \&prec\+\_\+\+P2, const \mbox{\hyperlink{namespacelibff_a594453bfc131198bab02308d75bc407f}{edwards\+\_\+\+G2\+\_\+precomp}} \&prec\+\_\+\+Q2)
+\item 
+static \mbox{\hyperlink{namespacelibff_a94775cf76b7e294e46c8e6b8f9c3de87}{edwards\+\_\+\+Fq6}} \mbox{\hyperlink{classlibff_1_1edwards__pp_ad5edc8cc23f7a4482f20dc82bd39d32b}{pairing}} (const \mbox{\hyperlink{classlibff_1_1edwards___g1}{edwards\+\_\+\+G1}} \&\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}}, const \mbox{\hyperlink{classlibff_1_1edwards___g2}{edwards\+\_\+\+G2}} \&Q)
+\item 
+static \mbox{\hyperlink{namespacelibff_a94775cf76b7e294e46c8e6b8f9c3de87}{edwards\+\_\+\+Fq6}} \mbox{\hyperlink{classlibff_1_1edwards__pp_a2fbbd269921f0854413b184720ff31bb}{reduced\+\_\+pairing}} (const \mbox{\hyperlink{classlibff_1_1edwards___g1}{edwards\+\_\+\+G1}} \&\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}}, const \mbox{\hyperlink{classlibff_1_1edwards___g2}{edwards\+\_\+\+G2}} \&Q)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static const bool \mbox{\hyperlink{classlibff_1_1edwards__pp_ab0c804e5edc9f12facf4b037ba6b754b}{has\+\_\+affine\+\_\+pairing}} = false
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{edwards__pp_8hpp_source_l00018}{18}} of file \mbox{\hyperlink{edwards__pp_8hpp_source}{edwards\+\_\+pp.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classlibff_1_1edwards__pp_a4b3cbf504c7e600cac5ad679bf8e5f2c}\index{libff::edwards\_pp@{libff::edwards\_pp}!Fp\_type@{Fp\_type}}
+\index{Fp\_type@{Fp\_type}!libff::edwards\_pp@{libff::edwards\_pp}}
+\doxysubsubsection{\texorpdfstring{Fp\_type}{Fp\_type}}
+{\footnotesize\ttfamily \label{classlibff_1_1edwards__pp_a4b3cbf504c7e600cac5ad679bf8e5f2c} 
+\mbox{\hyperlink{namespacelibff_ab8734750fbf545572c63fa96171f7caf}{edwards\+\_\+\+Fr}} \mbox{\hyperlink{classlibff_1_1edwards__pp_a4b3cbf504c7e600cac5ad679bf8e5f2c}{libff\+::edwards\+\_\+pp\+::\+Fp\+\_\+type}}}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__pp_8hpp_source_l00020}{20}} of file \mbox{\hyperlink{edwards__pp_8hpp_source}{edwards\+\_\+pp.\+hpp}}.
+
+\Hypertarget{classlibff_1_1edwards__pp_ad8b3c9424345e3b2f75fb7eebba3b083}\index{libff::edwards\_pp@{libff::edwards\_pp}!Fq\_type@{Fq\_type}}
+\index{Fq\_type@{Fq\_type}!libff::edwards\_pp@{libff::edwards\_pp}}
+\doxysubsubsection{\texorpdfstring{Fq\_type}{Fq\_type}}
+{\footnotesize\ttfamily \label{classlibff_1_1edwards__pp_ad8b3c9424345e3b2f75fb7eebba3b083} 
+\mbox{\hyperlink{namespacelibff_a2653629483aeb0df51eec08cb6635343}{edwards\+\_\+\+Fq}} \mbox{\hyperlink{classlibff_1_1edwards__pp_ad8b3c9424345e3b2f75fb7eebba3b083}{libff\+::edwards\+\_\+pp\+::\+Fq\+\_\+type}}}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__pp_8hpp_source_l00025}{25}} of file \mbox{\hyperlink{edwards__pp_8hpp_source}{edwards\+\_\+pp.\+hpp}}.
+
+\Hypertarget{classlibff_1_1edwards__pp_a1327fe4cd4d9a8cbfb29631ad18069f9}\index{libff::edwards\_pp@{libff::edwards\_pp}!Fqe\_type@{Fqe\_type}}
+\index{Fqe\_type@{Fqe\_type}!libff::edwards\_pp@{libff::edwards\_pp}}
+\doxysubsubsection{\texorpdfstring{Fqe\_type}{Fqe\_type}}
+{\footnotesize\ttfamily \label{classlibff_1_1edwards__pp_a1327fe4cd4d9a8cbfb29631ad18069f9} 
+\mbox{\hyperlink{namespacelibff_a0ea2375c146f3fb95f89773f78339667}{edwards\+\_\+\+Fq3}} \mbox{\hyperlink{classlibff_1_1edwards__pp_a1327fe4cd4d9a8cbfb29631ad18069f9}{libff\+::edwards\+\_\+pp\+::\+Fqe\+\_\+type}}}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__pp_8hpp_source_l00026}{26}} of file \mbox{\hyperlink{edwards__pp_8hpp_source}{edwards\+\_\+pp.\+hpp}}.
+
+\Hypertarget{classlibff_1_1edwards__pp_ad0ccc868aabe3d0ac9ba47c8ae0efd1b}\index{libff::edwards\_pp@{libff::edwards\_pp}!Fqk\_type@{Fqk\_type}}
+\index{Fqk\_type@{Fqk\_type}!libff::edwards\_pp@{libff::edwards\_pp}}
+\doxysubsubsection{\texorpdfstring{Fqk\_type}{Fqk\_type}}
+{\footnotesize\ttfamily \label{classlibff_1_1edwards__pp_ad0ccc868aabe3d0ac9ba47c8ae0efd1b} 
+\mbox{\hyperlink{namespacelibff_a94775cf76b7e294e46c8e6b8f9c3de87}{edwards\+\_\+\+Fq6}} \mbox{\hyperlink{classlibff_1_1edwards__pp_ad0ccc868aabe3d0ac9ba47c8ae0efd1b}{libff\+::edwards\+\_\+pp\+::\+Fqk\+\_\+type}}}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__pp_8hpp_source_l00027}{27}} of file \mbox{\hyperlink{edwards__pp_8hpp_source}{edwards\+\_\+pp.\+hpp}}.
+
+\Hypertarget{classlibff_1_1edwards__pp_a651b95bedde5dedd8cb47ce16054bbb2}\index{libff::edwards\_pp@{libff::edwards\_pp}!G1\_precomp\_type@{G1\_precomp\_type}}
+\index{G1\_precomp\_type@{G1\_precomp\_type}!libff::edwards\_pp@{libff::edwards\_pp}}
+\doxysubsubsection{\texorpdfstring{G1\_precomp\_type}{G1\_precomp\_type}}
+{\footnotesize\ttfamily \label{classlibff_1_1edwards__pp_a651b95bedde5dedd8cb47ce16054bbb2} 
+\mbox{\hyperlink{namespacelibff_a4668ba8c54218548bac9c3b0da19564e}{edwards\+\_\+\+G1\+\_\+precomp}} \mbox{\hyperlink{classlibff_1_1edwards__pp_a651b95bedde5dedd8cb47ce16054bbb2}{libff\+::edwards\+\_\+pp\+::\+G1\+\_\+precomp\+\_\+type}}}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__pp_8hpp_source_l00023}{23}} of file \mbox{\hyperlink{edwards__pp_8hpp_source}{edwards\+\_\+pp.\+hpp}}.
+
+\Hypertarget{classlibff_1_1edwards__pp_ab821e32d201b00f14f74e87b7e6ef78d}\index{libff::edwards\_pp@{libff::edwards\_pp}!G1\_type@{G1\_type}}
+\index{G1\_type@{G1\_type}!libff::edwards\_pp@{libff::edwards\_pp}}
+\doxysubsubsection{\texorpdfstring{G1\_type}{G1\_type}}
+{\footnotesize\ttfamily \label{classlibff_1_1edwards__pp_ab821e32d201b00f14f74e87b7e6ef78d} 
+\mbox{\hyperlink{classlibff_1_1edwards___g1}{edwards\+\_\+\+G1}} \mbox{\hyperlink{classlibff_1_1edwards__pp_ab821e32d201b00f14f74e87b7e6ef78d}{libff\+::edwards\+\_\+pp\+::\+G1\+\_\+type}}}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__pp_8hpp_source_l00021}{21}} of file \mbox{\hyperlink{edwards__pp_8hpp_source}{edwards\+\_\+pp.\+hpp}}.
+
+\Hypertarget{classlibff_1_1edwards__pp_aeda9a7ef19d24caed961d9a99cda7fa8}\index{libff::edwards\_pp@{libff::edwards\_pp}!G2\_precomp\_type@{G2\_precomp\_type}}
+\index{G2\_precomp\_type@{G2\_precomp\_type}!libff::edwards\_pp@{libff::edwards\_pp}}
+\doxysubsubsection{\texorpdfstring{G2\_precomp\_type}{G2\_precomp\_type}}
+{\footnotesize\ttfamily \label{classlibff_1_1edwards__pp_aeda9a7ef19d24caed961d9a99cda7fa8} 
+\mbox{\hyperlink{namespacelibff_a594453bfc131198bab02308d75bc407f}{edwards\+\_\+\+G2\+\_\+precomp}} \mbox{\hyperlink{classlibff_1_1edwards__pp_aeda9a7ef19d24caed961d9a99cda7fa8}{libff\+::edwards\+\_\+pp\+::\+G2\+\_\+precomp\+\_\+type}}}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__pp_8hpp_source_l00024}{24}} of file \mbox{\hyperlink{edwards__pp_8hpp_source}{edwards\+\_\+pp.\+hpp}}.
+
+\Hypertarget{classlibff_1_1edwards__pp_a25dd1742c7b76eabbb7d8b22755a0069}\index{libff::edwards\_pp@{libff::edwards\_pp}!G2\_type@{G2\_type}}
+\index{G2\_type@{G2\_type}!libff::edwards\_pp@{libff::edwards\_pp}}
+\doxysubsubsection{\texorpdfstring{G2\_type}{G2\_type}}
+{\footnotesize\ttfamily \label{classlibff_1_1edwards__pp_a25dd1742c7b76eabbb7d8b22755a0069} 
+\mbox{\hyperlink{classlibff_1_1edwards___g2}{edwards\+\_\+\+G2}} \mbox{\hyperlink{classlibff_1_1edwards__pp_a25dd1742c7b76eabbb7d8b22755a0069}{libff\+::edwards\+\_\+pp\+::\+G2\+\_\+type}}}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__pp_8hpp_source_l00022}{22}} of file \mbox{\hyperlink{edwards__pp_8hpp_source}{edwards\+\_\+pp.\+hpp}}.
+
+\Hypertarget{classlibff_1_1edwards__pp_acff3fae115534d9134b6866c299d46bb}\index{libff::edwards\_pp@{libff::edwards\_pp}!GT\_type@{GT\_type}}
+\index{GT\_type@{GT\_type}!libff::edwards\_pp@{libff::edwards\_pp}}
+\doxysubsubsection{\texorpdfstring{GT\_type}{GT\_type}}
+{\footnotesize\ttfamily \label{classlibff_1_1edwards__pp_acff3fae115534d9134b6866c299d46bb} 
+\mbox{\hyperlink{namespacelibff_aed4ac2e5b330c64e83968be0a29791e4}{edwards\+\_\+\+GT}} \mbox{\hyperlink{classlibff_1_1edwards__pp_acff3fae115534d9134b6866c299d46bb}{libff\+::edwards\+\_\+pp\+::\+GT\+\_\+type}}}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__pp_8hpp_source_l00028}{28}} of file \mbox{\hyperlink{edwards__pp_8hpp_source}{edwards\+\_\+pp.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classlibff_1_1edwards__pp_accc267f404ac7696073d0eb219b5769b}\index{libff::edwards\_pp@{libff::edwards\_pp}!double\_miller\_loop@{double\_miller\_loop}}
+\index{double\_miller\_loop@{double\_miller\_loop}!libff::edwards\_pp@{libff::edwards\_pp}}
+\doxysubsubsection{\texorpdfstring{double\_miller\_loop()}{double\_miller\_loop()}}
+{\footnotesize\ttfamily \label{classlibff_1_1edwards__pp_accc267f404ac7696073d0eb219b5769b} 
+\mbox{\hyperlink{namespacelibff_a94775cf76b7e294e46c8e6b8f9c3de87}{edwards\+\_\+\+Fq6}} libff\+::edwards\+\_\+pp\+::double\+\_\+miller\+\_\+loop (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacelibff_a4668ba8c54218548bac9c3b0da19564e}{edwards\+\_\+\+G1\+\_\+precomp}} \&}]{prec\+\_\+\+P1}{, }\item[{const \mbox{\hyperlink{namespacelibff_a594453bfc131198bab02308d75bc407f}{edwards\+\_\+\+G2\+\_\+precomp}} \&}]{prec\+\_\+\+Q1}{, }\item[{const \mbox{\hyperlink{namespacelibff_a4668ba8c54218548bac9c3b0da19564e}{edwards\+\_\+\+G1\+\_\+precomp}} \&}]{prec\+\_\+\+P2}{, }\item[{const \mbox{\hyperlink{namespacelibff_a594453bfc131198bab02308d75bc407f}{edwards\+\_\+\+G2\+\_\+precomp}} \&}]{prec\+\_\+\+Q2}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__pp_8cpp_source_l00038}{38}} of file \mbox{\hyperlink{edwards__pp_8cpp_source}{edwards\+\_\+pp.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00042\ \{}
+\DoxyCodeLine{00043\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacelibff_a871736f4388a0c5d0b84e6b6d2c57e2b}{edwards\_double\_miller\_loop}}(prec\_P1,\ prec\_Q1,\ prec\_P2,\ prec\_Q2);}
+\DoxyCodeLine{00044\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classlibff_1_1edwards__pp_accc267f404ac7696073d0eb219b5769b_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classlibff_1_1edwards__pp_ac85feaa100b797417e0e55f62a75fe53}\index{libff::edwards\_pp@{libff::edwards\_pp}!final\_exponentiation@{final\_exponentiation}}
+\index{final\_exponentiation@{final\_exponentiation}!libff::edwards\_pp@{libff::edwards\_pp}}
+\doxysubsubsection{\texorpdfstring{final\_exponentiation()}{final\_exponentiation()}}
+{\footnotesize\ttfamily \label{classlibff_1_1edwards__pp_ac85feaa100b797417e0e55f62a75fe53} 
+\mbox{\hyperlink{namespacelibff_aed4ac2e5b330c64e83968be0a29791e4}{edwards\+\_\+\+GT}} libff\+::edwards\+\_\+pp\+::final\+\_\+exponentiation (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacelibff_a94775cf76b7e294e46c8e6b8f9c3de87}{edwards\+\_\+\+Fq6}} \&}]{elt}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__pp_8cpp_source_l00017}{17}} of file \mbox{\hyperlink{edwards__pp_8cpp_source}{edwards\+\_\+pp.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00018\ \{}
+\DoxyCodeLine{00019\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacelibff_a85284345b22dbc9f312fa9ff3422879c}{edwards\_final\_exponentiation}}(elt);}
+\DoxyCodeLine{00020\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classlibff_1_1edwards__pp_ac85feaa100b797417e0e55f62a75fe53_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classlibff_1_1edwards__pp_a32abdda668a29bbc32de1ac0fbe977e1}\index{libff::edwards\_pp@{libff::edwards\_pp}!init\_public\_params@{init\_public\_params}}
+\index{init\_public\_params@{init\_public\_params}!libff::edwards\_pp@{libff::edwards\_pp}}
+\doxysubsubsection{\texorpdfstring{init\_public\_params()}{init\_public\_params()}}
+{\footnotesize\ttfamily \label{classlibff_1_1edwards__pp_a32abdda668a29bbc32de1ac0fbe977e1} 
+void libff\+::edwards\+\_\+pp\+::init\+\_\+public\+\_\+params (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__pp_8cpp_source_l00012}{12}} of file \mbox{\hyperlink{edwards__pp_8cpp_source}{edwards\+\_\+pp.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00013\ \{}
+\DoxyCodeLine{00014\ \ \ \ \ \mbox{\hyperlink{namespacelibff_a0e91814e1b60e75813ae9dc499316893}{init\_edwards\_params}}();}
+\DoxyCodeLine{00015\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classlibff_1_1edwards__pp_a32abdda668a29bbc32de1ac0fbe977e1_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=250pt]{classlibff_1_1edwards__pp_a32abdda668a29bbc32de1ac0fbe977e1_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classlibff_1_1edwards__pp_a1fa10cc0e19d116a0e20de356674685b}\index{libff::edwards\_pp@{libff::edwards\_pp}!miller\_loop@{miller\_loop}}
+\index{miller\_loop@{miller\_loop}!libff::edwards\_pp@{libff::edwards\_pp}}
+\doxysubsubsection{\texorpdfstring{miller\_loop()}{miller\_loop()}}
+{\footnotesize\ttfamily \label{classlibff_1_1edwards__pp_a1fa10cc0e19d116a0e20de356674685b} 
+\mbox{\hyperlink{namespacelibff_a94775cf76b7e294e46c8e6b8f9c3de87}{edwards\+\_\+\+Fq6}} libff\+::edwards\+\_\+pp\+::miller\+\_\+loop (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacelibff_a4668ba8c54218548bac9c3b0da19564e}{edwards\+\_\+\+G1\+\_\+precomp}} \&}]{prec\+\_\+P}{, }\item[{const \mbox{\hyperlink{namespacelibff_a594453bfc131198bab02308d75bc407f}{edwards\+\_\+\+G2\+\_\+precomp}} \&}]{prec\+\_\+Q}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__pp_8cpp_source_l00032}{32}} of file \mbox{\hyperlink{edwards__pp_8cpp_source}{edwards\+\_\+pp.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00034\ \{}
+\DoxyCodeLine{00035\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacelibff_a4b1f136e47bf3d30af588778c84dd064}{edwards\_miller\_loop}}(prec\_P,\ prec\_Q);}
+\DoxyCodeLine{00036\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classlibff_1_1edwards__pp_a1fa10cc0e19d116a0e20de356674685b_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classlibff_1_1edwards__pp_ad5edc8cc23f7a4482f20dc82bd39d32b}\index{libff::edwards\_pp@{libff::edwards\_pp}!pairing@{pairing}}
+\index{pairing@{pairing}!libff::edwards\_pp@{libff::edwards\_pp}}
+\doxysubsubsection{\texorpdfstring{pairing()}{pairing()}}
+{\footnotesize\ttfamily \label{classlibff_1_1edwards__pp_ad5edc8cc23f7a4482f20dc82bd39d32b} 
+\mbox{\hyperlink{namespacelibff_a94775cf76b7e294e46c8e6b8f9c3de87}{edwards\+\_\+\+Fq6}} libff\+::edwards\+\_\+pp\+::pairing (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classlibff_1_1edwards___g1}{edwards\+\_\+\+G1}} \&}]{P}{, }\item[{const \mbox{\hyperlink{classlibff_1_1edwards___g2}{edwards\+\_\+\+G2}} \&}]{Q}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__pp_8cpp_source_l00046}{46}} of file \mbox{\hyperlink{edwards__pp_8cpp_source}{edwards\+\_\+pp.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00048\ \{}
+\DoxyCodeLine{00049\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacelibff_a8c17e4985eaee6405f4ec75c9e49580f}{edwards\_pairing}}(\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}},\ Q);}
+\DoxyCodeLine{00050\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classlibff_1_1edwards__pp_ad5edc8cc23f7a4482f20dc82bd39d32b_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classlibff_1_1edwards__pp_a8fb44fa699fef17a1fb06b2ae5462b04}\index{libff::edwards\_pp@{libff::edwards\_pp}!precompute\_G1@{precompute\_G1}}
+\index{precompute\_G1@{precompute\_G1}!libff::edwards\_pp@{libff::edwards\_pp}}
+\doxysubsubsection{\texorpdfstring{precompute\_G1()}{precompute\_G1()}}
+{\footnotesize\ttfamily \label{classlibff_1_1edwards__pp_a8fb44fa699fef17a1fb06b2ae5462b04} 
+\mbox{\hyperlink{namespacelibff_a4668ba8c54218548bac9c3b0da19564e}{edwards\+\_\+\+G1\+\_\+precomp}} libff\+::edwards\+\_\+pp\+::precompute\+\_\+\+G1 (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classlibff_1_1edwards___g1}{edwards\+\_\+\+G1}} \&}]{P}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__pp_8cpp_source_l00022}{22}} of file \mbox{\hyperlink{edwards__pp_8cpp_source}{edwards\+\_\+pp.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00023\ \{}
+\DoxyCodeLine{00024\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacelibff_a565f7d8220d055a87eec02c2e994d2f4}{edwards\_precompute\_G1}}(\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}});}
+\DoxyCodeLine{00025\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classlibff_1_1edwards__pp_a8fb44fa699fef17a1fb06b2ae5462b04_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classlibff_1_1edwards__pp_a397dd3b37df326c8a679edf0005869bc}\index{libff::edwards\_pp@{libff::edwards\_pp}!precompute\_G2@{precompute\_G2}}
+\index{precompute\_G2@{precompute\_G2}!libff::edwards\_pp@{libff::edwards\_pp}}
+\doxysubsubsection{\texorpdfstring{precompute\_G2()}{precompute\_G2()}}
+{\footnotesize\ttfamily \label{classlibff_1_1edwards__pp_a397dd3b37df326c8a679edf0005869bc} 
+\mbox{\hyperlink{namespacelibff_a594453bfc131198bab02308d75bc407f}{edwards\+\_\+\+G2\+\_\+precomp}} libff\+::edwards\+\_\+pp\+::precompute\+\_\+\+G2 (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classlibff_1_1edwards___g2}{edwards\+\_\+\+G2}} \&}]{Q}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__pp_8cpp_source_l00027}{27}} of file \mbox{\hyperlink{edwards__pp_8cpp_source}{edwards\+\_\+pp.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00028\ \{}
+\DoxyCodeLine{00029\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacelibff_ae01f87b36128cd2a51ed19f9a6201e74}{edwards\_precompute\_G2}}(Q);}
+\DoxyCodeLine{00030\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classlibff_1_1edwards__pp_a397dd3b37df326c8a679edf0005869bc_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classlibff_1_1edwards__pp_a2fbbd269921f0854413b184720ff31bb}\index{libff::edwards\_pp@{libff::edwards\_pp}!reduced\_pairing@{reduced\_pairing}}
+\index{reduced\_pairing@{reduced\_pairing}!libff::edwards\_pp@{libff::edwards\_pp}}
+\doxysubsubsection{\texorpdfstring{reduced\_pairing()}{reduced\_pairing()}}
+{\footnotesize\ttfamily \label{classlibff_1_1edwards__pp_a2fbbd269921f0854413b184720ff31bb} 
+\mbox{\hyperlink{namespacelibff_a94775cf76b7e294e46c8e6b8f9c3de87}{edwards\+\_\+\+Fq6}} libff\+::edwards\+\_\+pp\+::reduced\+\_\+pairing (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classlibff_1_1edwards___g1}{edwards\+\_\+\+G1}} \&}]{P}{, }\item[{const \mbox{\hyperlink{classlibff_1_1edwards___g2}{edwards\+\_\+\+G2}} \&}]{Q}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__pp_8cpp_source_l00052}{52}} of file \mbox{\hyperlink{edwards__pp_8cpp_source}{edwards\+\_\+pp.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00054\ \{}
+\DoxyCodeLine{00055\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacelibff_abc470ab32b6db3ec5b31fdccb691dcdd}{edwards\_reduced\_pairing}}(\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}},\ Q);}
+\DoxyCodeLine{00056\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classlibff_1_1edwards__pp_a2fbbd269921f0854413b184720ff31bb_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classlibff_1_1edwards__pp_ab0c804e5edc9f12facf4b037ba6b754b}\index{libff::edwards\_pp@{libff::edwards\_pp}!has\_affine\_pairing@{has\_affine\_pairing}}
+\index{has\_affine\_pairing@{has\_affine\_pairing}!libff::edwards\_pp@{libff::edwards\_pp}}
+\doxysubsubsection{\texorpdfstring{has\_affine\_pairing}{has\_affine\_pairing}}
+{\footnotesize\ttfamily \label{classlibff_1_1edwards__pp_ab0c804e5edc9f12facf4b037ba6b754b} 
+const bool libff\+::edwards\+\_\+pp\+::has\+\_\+affine\+\_\+pairing = false\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{edwards__pp_8hpp_source_l00030}{30}} of file \mbox{\hyperlink{edwards__pp_8hpp_source}{edwards\+\_\+pp.\+hpp}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/libraries/ff/libff/algebra/curves/edwards/\mbox{\hyperlink{edwards__pp_8hpp}{edwards\+\_\+pp.\+hpp}}\item 
+libraries/fc/libraries/ff/libff/algebra/curves/edwards/\mbox{\hyperlink{edwards__pp_8cpp}{edwards\+\_\+pp.\+cpp}}\end{DoxyCompactItemize}

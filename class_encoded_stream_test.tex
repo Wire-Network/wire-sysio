@@ -1,0 +1,601 @@
+\doxysection{Encoded\+Stream\+Test Class Reference}
+\hypertarget{class_encoded_stream_test}{}\label{class_encoded_stream_test}\index{EncodedStreamTest@{EncodedStreamTest}}
+
+
+Inheritance diagram for Encoded\+Stream\+Test\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=185pt]{class_encoded_stream_test__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Encoded\+Stream\+Test\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=210pt]{class_encoded_stream_test__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_encoded_stream_test_a4fb1db529dc40d4c22c7fd7e6a7e1a9b}{Encoded\+Stream\+Test}} ()
+\item 
+virtual \mbox{\hyperlink{class_encoded_stream_test_a6e1548cdd4fb0011d694d06b9622d52d}{\texorpdfstring{$\sim$}{\string~}\+Encoded\+Stream\+Test}} ()
+\item 
+virtual void \mbox{\hyperlink{class_encoded_stream_test_a6391699c63484acc7a12e3b32634e2f7}{Set\+Up}} ()
+\item 
+virtual void \mbox{\hyperlink{class_encoded_stream_test_a443e88ebf2abd3b18393c0e0e7c13ad0}{Tear\+Down}} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classtesting_1_1_test}{testing\+::\+Test}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{classtesting_1_1_test_a2b0a62f1e667bbe8d8cb18d785bfa991}{\texorpdfstring{$\sim$}{\string~}\+Test}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename File\+Encoding , typename Memory\+Encoding $>$ }\\void \mbox{\hyperlink{class_encoded_stream_test_ad9c567df62408555b30f49bdbb606fc3}{Test\+Encoded\+Input\+Stream}} (const char \texorpdfstring{$\ast$}{*}filename)
+\item 
+void \mbox{\hyperlink{class_encoded_stream_test_a981d5de5d0aefd288c4a97d9dc6590f7}{Test\+Auto\+UTFInput\+Stream}} (const char \texorpdfstring{$\ast$}{*}filename, bool expect\+Has\+BOM)
+\item 
+{\footnotesize template$<$typename File\+Encoding , typename Memory\+Encoding $>$ }\\void \mbox{\hyperlink{class_encoded_stream_test_a43892c37663f564147577e286d60937a}{Test\+Encoded\+Output\+Stream}} (const char \texorpdfstring{$\ast$}{*}expected\+Filename, bool put\+BOM)
+\item 
+void \mbox{\hyperlink{class_encoded_stream_test_a246bc170b7a10468b5da7eb7dfeba46c}{Test\+Auto\+UTFOutput\+Stream}} (\mbox{\hyperlink{encodings_8h_ac9448aedf514a5bb509bae73a9ce4e58}{UTFType}} type, bool put\+BOM, const char \texorpdfstring{$\ast$}{*}expected\+Filename)
+\item 
+bool \mbox{\hyperlink{class_encoded_stream_test_a0d45e4d5f8a44d23903dc6a0dee7eaa5}{Compare\+File}} (const char \texorpdfstring{$\ast$}{*}filename, const char \texorpdfstring{$\ast$}{*}expected\+Filename)
+\item 
+bool \mbox{\hyperlink{class_encoded_stream_test_a1db7e5969dec8780a8e641876befc272}{Compare\+Buffer\+File}} (const char \texorpdfstring{$\ast$}{*}actual\+Buffer, size\+\_\+t actual\+Length, const char \texorpdfstring{$\ast$}{*}expected\+Filename)
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Member Functions inherited from \mbox{\hyperlink{classtesting_1_1_test}{testing\+::\+Test}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1_test_a99f2bbfac6c95612322b0f10e607ebe5}{Test}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static FILE \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_encoded_stream_test_a63ccacf7cafb587e0f1537fc39b6064e}{Open}} (const char \texorpdfstring{$\ast$}{*}filename)
+\item 
+static char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_encoded_stream_test_ad5dd00dbc8a9590e139b0f7727abb05a}{Read\+File}} (const char \texorpdfstring{$\ast$}{*}filename, bool append\+Path, size\+\_\+t \texorpdfstring{$\ast$}{*}out\+Length)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_encoded_stream_test_a9993d0eb182be2cbd055982f91308d92}{json\+\_\+}}
+\item 
+size\+\_\+t \mbox{\hyperlink{class_encoded_stream_test_aef69c9f1ff714588697ac92712d75fe8}{length\+\_\+}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Public Types inherited from \mbox{\hyperlink{classtesting_1_1_test}{testing\+::\+Test}}}
+\begin{DoxyCompactItemize}
+\item 
+typedef internal\+::\+Set\+Up\+Test\+Case\+Func \mbox{\hyperlink{classtesting_1_1_test_a36171f8ba2144d4b490bf2e8730532ca}{Set\+Up\+Test\+Case\+Func}}
+\item 
+typedef internal\+::\+Tear\+Down\+Test\+Case\+Func \mbox{\hyperlink{classtesting_1_1_test_aa28aa27f32f86d8575435b36c4088d81}{Tear\+Down\+Test\+Case\+Func}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Static Public Member Functions inherited from \mbox{\hyperlink{classtesting_1_1_test}{testing\+::\+Test}}}
+\begin{DoxyCompactItemize}
+\item 
+static void \mbox{\hyperlink{classtesting_1_1_test_a5ccbac42fee8c5b00b0bfe89b6c49d79}{Set\+Up\+Test\+Case}} ()
+\item 
+static void \mbox{\hyperlink{classtesting_1_1_test_af374706cbaf0ffc460f4fd04e7c150f1}{Tear\+Down\+Test\+Case}} ()
+\item 
+static bool \mbox{\hyperlink{classtesting_1_1_test_a5e83604628ef542af888d631566ff60c}{Has\+Fatal\+Failure}} ()
+\item 
+static bool \mbox{\hyperlink{classtesting_1_1_test_a8c00e8cc6fe10616b480bd54d2a426cb}{Has\+Nonfatal\+Failure}} ()
+\item 
+static bool \mbox{\hyperlink{classtesting_1_1_test_a7a00be7dd0a6bfdc8d47a1b784623613}{Has\+Failure}} ()
+\item 
+static void \mbox{\hyperlink{classtesting_1_1_test_a1559ce1c83f56993b582650c091535a7}{Record\+Property}} (const std\+::string \&key, const std\+::string \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+static void \mbox{\hyperlink{classtesting_1_1_test_a373da47b491b1e64e355d22d6ec99b5b}{Record\+Property}} (const std\+::string \&key, int \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{encodedstreamtest_8cpp_source_l00025}{25}} of file \mbox{\hyperlink{encodedstreamtest_8cpp_source}{encodedstreamtest.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_encoded_stream_test_a4fb1db529dc40d4c22c7fd7e6a7e1a9b}\index{EncodedStreamTest@{EncodedStreamTest}!EncodedStreamTest@{EncodedStreamTest}}
+\index{EncodedStreamTest@{EncodedStreamTest}!EncodedStreamTest@{EncodedStreamTest}}
+\doxysubsubsection{\texorpdfstring{EncodedStreamTest()}{EncodedStreamTest()}}
+{\footnotesize\ttfamily \label{class_encoded_stream_test_a4fb1db529dc40d4c22c7fd7e6a7e1a9b} 
+Encoded\+Stream\+Test\+::\+Encoded\+Stream\+Test (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{encodedstreamtest_8cpp_source_l00027}{27}} of file \mbox{\hyperlink{encodedstreamtest_8cpp_source}{encodedstreamtest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00027\ :\ \mbox{\hyperlink{class_encoded_stream_test_a9993d0eb182be2cbd055982f91308d92}{json\_}}(),\ \mbox{\hyperlink{class_encoded_stream_test_aef69c9f1ff714588697ac92712d75fe8}{length\_}}()\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{class_encoded_stream_test_a6e1548cdd4fb0011d694d06b9622d52d}\index{EncodedStreamTest@{EncodedStreamTest}!````~EncodedStreamTest@{\texorpdfstring{$\sim$}{\string~}EncodedStreamTest}}
+\index{````~EncodedStreamTest@{\texorpdfstring{$\sim$}{\string~}EncodedStreamTest}!EncodedStreamTest@{EncodedStreamTest}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}EncodedStreamTest()}{\string~EncodedStreamTest()}}
+{\footnotesize\ttfamily \label{class_encoded_stream_test_a6e1548cdd4fb0011d694d06b9622d52d} 
+Encoded\+Stream\+Test\+::\texorpdfstring{$\sim$}{\string~}\+Encoded\+Stream\+Test (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{encodedstreamtest_8cpp_source_l00252}{252}} of file \mbox{\hyperlink{encodedstreamtest_8cpp_source}{encodedstreamtest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00252\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_encoded_stream_test_a1db7e5969dec8780a8e641876befc272}\index{EncodedStreamTest@{EncodedStreamTest}!CompareBufferFile@{CompareBufferFile}}
+\index{CompareBufferFile@{CompareBufferFile}!EncodedStreamTest@{EncodedStreamTest}}
+\doxysubsubsection{\texorpdfstring{CompareBufferFile()}{CompareBufferFile()}}
+{\footnotesize\ttfamily \label{class_encoded_stream_test_a1db7e5969dec8780a8e641876befc272} 
+bool Encoded\+Stream\+Test\+::\+Compare\+Buffer\+File (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{actual\+Buffer}{, }\item[{size\+\_\+t}]{actual\+Length}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{expected\+Filename}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{encodedstreamtest_8cpp_source_l00240}{240}} of file \mbox{\hyperlink{encodedstreamtest_8cpp_source}{encodedstreamtest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00241\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ expectedLength;}
+\DoxyCodeLine{00242\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}*\ expectedBuffer\ =\ \mbox{\hyperlink{class_encoded_stream_test_ad5dd00dbc8a9590e139b0f7727abb05a}{ReadFile}}(expectedFilename,\ \textcolor{keyword}{true},\ \&expectedLength);}
+\DoxyCodeLine{00243\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ (expectedLength\ ==\ actualLength)\ \&\&\ memcmp(expectedBuffer,\ actualBuffer,\ actualLength)\ ==\ 0;}
+\DoxyCodeLine{00244\ \ \ \ \ \ \ \ \ free(expectedBuffer);}
+\DoxyCodeLine{00245\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00246\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_encoded_stream_test_a1db7e5969dec8780a8e641876befc272_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_encoded_stream_test_a1db7e5969dec8780a8e641876befc272_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_encoded_stream_test_a0d45e4d5f8a44d23903dc6a0dee7eaa5}\index{EncodedStreamTest@{EncodedStreamTest}!CompareFile@{CompareFile}}
+\index{CompareFile@{CompareFile}!EncodedStreamTest@{EncodedStreamTest}}
+\doxysubsubsection{\texorpdfstring{CompareFile()}{CompareFile()}}
+{\footnotesize\ttfamily \label{class_encoded_stream_test_a0d45e4d5f8a44d23903dc6a0dee7eaa5} 
+bool Encoded\+Stream\+Test\+::\+Compare\+File (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{filename}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{expected\+Filename}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{encodedstreamtest_8cpp_source_l00230}{230}} of file \mbox{\hyperlink{encodedstreamtest_8cpp_source}{encodedstreamtest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00230\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00231\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ actualLength,\ expectedLength;}
+\DoxyCodeLine{00232\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}*\ actualBuffer\ =\ \mbox{\hyperlink{class_encoded_stream_test_ad5dd00dbc8a9590e139b0f7727abb05a}{ReadFile}}(filename,\ \textcolor{keyword}{false},\ \&actualLength);}
+\DoxyCodeLine{00233\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}*\ expectedBuffer\ =\ \mbox{\hyperlink{class_encoded_stream_test_ad5dd00dbc8a9590e139b0f7727abb05a}{ReadFile}}(expectedFilename,\ \textcolor{keyword}{true},\ \&expectedLength);}
+\DoxyCodeLine{00234\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ (expectedLength\ ==\ actualLength)\ \&\&\ memcmp(expectedBuffer,\ actualBuffer,\ actualLength)\ ==\ 0;}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \ \ free(actualBuffer);}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ free(expectedBuffer);}
+\DoxyCodeLine{00237\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00238\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_encoded_stream_test_a0d45e4d5f8a44d23903dc6a0dee7eaa5_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_encoded_stream_test_a0d45e4d5f8a44d23903dc6a0dee7eaa5_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_encoded_stream_test_a63ccacf7cafb587e0f1537fc39b6064e}\index{EncodedStreamTest@{EncodedStreamTest}!Open@{Open}}
+\index{Open@{Open}!EncodedStreamTest@{EncodedStreamTest}}
+\doxysubsubsection{\texorpdfstring{Open()}{Open()}}
+{\footnotesize\ttfamily \label{class_encoded_stream_test_a63ccacf7cafb587e0f1537fc39b6064e} 
+static FILE \texorpdfstring{$\ast$}{*} Encoded\+Stream\+Test\+::\+Open (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{filename}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}, {\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{encodedstreamtest_8cpp_source_l00044}{44}} of file \mbox{\hyperlink{encodedstreamtest_8cpp_source}{encodedstreamtest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *paths[]\ =\ \{}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}encodings"{}},}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}bin/encodings"{}},}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}../bin/encodings"{}},}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}../../bin/encodings"{}},}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}../../../bin/encodings"{}}}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ buffer[1024];}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ \textcolor{keyword}{sizeof}(paths)\ /\ \textcolor{keyword}{sizeof}(paths[0]);\ i++)\ \{}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \ \ \ sprintf(buffer,\ \textcolor{stringliteral}{"{}\%s/\%s"{}},\ paths[i],\ filename);}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \ \ \ FILE\ *fp\ =\ fopen(buffer,\ \textcolor{stringliteral}{"{}rb"{}});}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (fp)}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ fp;}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00060\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_encoded_stream_test_a63ccacf7cafb587e0f1537fc39b6064e_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_encoded_stream_test_ad5dd00dbc8a9590e139b0f7727abb05a}\index{EncodedStreamTest@{EncodedStreamTest}!ReadFile@{ReadFile}}
+\index{ReadFile@{ReadFile}!EncodedStreamTest@{EncodedStreamTest}}
+\doxysubsubsection{\texorpdfstring{ReadFile()}{ReadFile()}}
+{\footnotesize\ttfamily \label{class_encoded_stream_test_ad5dd00dbc8a9590e139b0f7727abb05a} 
+static char \texorpdfstring{$\ast$}{*} Encoded\+Stream\+Test\+::\+Read\+File (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{filename}{, }\item[{bool}]{append\+Path}{, }\item[{size\+\_\+t \texorpdfstring{$\ast$}{*}}]{out\+Length}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}, {\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{encodedstreamtest_8cpp_source_l00062}{62}} of file \mbox{\hyperlink{encodedstreamtest_8cpp_source}{encodedstreamtest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ FILE\ *fp\ =\ appendPath\ ?\ \mbox{\hyperlink{class_encoded_stream_test_a63ccacf7cafb587e0f1537fc39b6064e}{Open}}(filename)\ :\ fopen(\mbox{\hyperlink{namespaceembed_clara_a1e1bd594f85f58f5dca6c41c0ac720fb}{filename}},\ \textcolor{stringliteral}{"{}rb"{}});}
+\DoxyCodeLine{00064\ }
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!fp)\ \{}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ \ \ *outLength\ =\ 0;}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00069\ }
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ fseek(fp,\ 0,\ SEEK\_END);}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ *outLength\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(ftell(fp));}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ fseek(fp,\ 0,\ SEEK\_SET);}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}*\ buffer\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(malloc(*outLength\ +\ 1));}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ readLength\ =\ fread(buffer,\ 1,\ *outLength,\ fp);}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ buffer[readLength]\ =\ \textcolor{charliteral}{'\(\backslash\)0'};}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ fclose(fp);}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ buffer;}
+\DoxyCodeLine{00078\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_encoded_stream_test_ad5dd00dbc8a9590e139b0f7727abb05a_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_encoded_stream_test_ad5dd00dbc8a9590e139b0f7727abb05a_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_encoded_stream_test_a6391699c63484acc7a12e3b32634e2f7}\index{EncodedStreamTest@{EncodedStreamTest}!SetUp@{SetUp}}
+\index{SetUp@{SetUp}!EncodedStreamTest@{EncodedStreamTest}}
+\doxysubsubsection{\texorpdfstring{SetUp()}{SetUp()}}
+{\footnotesize\ttfamily \label{class_encoded_stream_test_a6391699c63484acc7a12e3b32634e2f7} 
+virtual void Encoded\+Stream\+Test\+::\+Set\+Up (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classtesting_1_1_test_a190315150c303ddf801313fd1a777733}{testing\+::\+Test}}.
+
+
+
+Definition at line \mbox{\hyperlink{encodedstreamtest_8cpp_source_l00030}{30}} of file \mbox{\hyperlink{encodedstreamtest_8cpp_source}{encodedstreamtest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_encoded_stream_test_a9993d0eb182be2cbd055982f91308d92}{json\_}}\ =\ \mbox{\hyperlink{class_encoded_stream_test_ad5dd00dbc8a9590e139b0f7727abb05a}{ReadFile}}(\textcolor{stringliteral}{"{}utf8.json"{}},\ \textcolor{keyword}{true},\ \&\mbox{\hyperlink{class_encoded_stream_test_aef69c9f1ff714588697ac92712d75fe8}{length\_}});}
+\DoxyCodeLine{00032\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_encoded_stream_test_a6391699c63484acc7a12e3b32634e2f7_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_encoded_stream_test_a443e88ebf2abd3b18393c0e0e7c13ad0}\index{EncodedStreamTest@{EncodedStreamTest}!TearDown@{TearDown}}
+\index{TearDown@{TearDown}!EncodedStreamTest@{EncodedStreamTest}}
+\doxysubsubsection{\texorpdfstring{TearDown()}{TearDown()}}
+{\footnotesize\ttfamily \label{class_encoded_stream_test_a443e88ebf2abd3b18393c0e0e7c13ad0} 
+virtual void Encoded\+Stream\+Test\+::\+Tear\+Down (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classtesting_1_1_test_a5f0ab439802cbe0ef7552f1a9f791923}{testing\+::\+Test}}.
+
+
+
+Definition at line \mbox{\hyperlink{encodedstreamtest_8cpp_source_l00034}{34}} of file \mbox{\hyperlink{encodedstreamtest_8cpp_source}{encodedstreamtest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ free(\mbox{\hyperlink{class_encoded_stream_test_a9993d0eb182be2cbd055982f91308d92}{json\_}});}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_encoded_stream_test_a9993d0eb182be2cbd055982f91308d92}{json\_}}\ =\ 0;}
+\DoxyCodeLine{00037\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_encoded_stream_test_a981d5de5d0aefd288c4a97d9dc6590f7}\index{EncodedStreamTest@{EncodedStreamTest}!TestAutoUTFInputStream@{TestAutoUTFInputStream}}
+\index{TestAutoUTFInputStream@{TestAutoUTFInputStream}!EncodedStreamTest@{EncodedStreamTest}}
+\doxysubsubsection{\texorpdfstring{TestAutoUTFInputStream()}{TestAutoUTFInputStream()}}
+{\footnotesize\ttfamily \label{class_encoded_stream_test_a981d5de5d0aefd288c4a97d9dc6590f7} 
+void Encoded\+Stream\+Test\+::\+Test\+Auto\+UTFInput\+Stream (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{filename}{, }\item[{bool}]{expect\+Has\+BOM}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{encodedstreamtest_8cpp_source_l00121}{121}} of file \mbox{\hyperlink{encodedstreamtest_8cpp_source}{encodedstreamtest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Test\ FileReadStream}}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ buffer[16];}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \ \ \ \ FILE\ *fp\ =\ \mbox{\hyperlink{class_encoded_stream_test_a63ccacf7cafb587e0f1537fc39b6064e}{Open}}(filename);}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(fp\ !=\ 0);}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_file_read_stream}{FileReadStream}}\ \mbox{\hyperlink{namespace_xbyak_1_1util_a15900ed04e2e3994c89596ee26c4462b}{fs}}(fp,\ buffer,\ \textcolor{keyword}{sizeof}(buffer));}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_auto_u_t_f_input_stream}{AutoUTFInputStream<unsigned,\ FileReadStream>}}\ eis(fs);}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(expectHasBOM,\ eis.HasBOM());}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_generic_string_stream}{StringStream}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}(\mbox{\hyperlink{class_encoded_stream_test_a9993d0eb182be2cbd055982f91308d92}{json\_}});}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (eis.Peek()\ !=\ \textcolor{charliteral}{'\(\backslash\)0'})\ \{}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ expected,\ actual;}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{struct_u_t_f8}{UTF8<>::Decode}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ \&expected));}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{struct_auto_u_t_f}{AutoUTF<unsigned>::Decode}}(eis,\ \&actual));}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(expected,\ actual);}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\textcolor{charliteral}{'\(\backslash\)0'},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.Peek());}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \ \ \ \ fclose(fp);}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00140\ }
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Test\ MemoryStream}}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ size;}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}*\ data\ =\ \mbox{\hyperlink{class_encoded_stream_test_ad5dd00dbc8a9590e139b0f7727abb05a}{ReadFile}}(filename,\ \textcolor{keyword}{true},\ \&size);}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_memory_stream}{MemoryStream}}\ ms(data,\ size);}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_auto_u_t_f_input_stream}{AutoUTFInputStream<unsigned,\ MemoryStream>}}\ eis(ms);}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(expectHasBOM,\ eis.HasBOM());}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_generic_string_stream}{StringStream}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}(\mbox{\hyperlink{class_encoded_stream_test_a9993d0eb182be2cbd055982f91308d92}{json\_}});}
+\DoxyCodeLine{00149\ }
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (eis.Peek()\ !=\ \textcolor{charliteral}{'\(\backslash\)0'})\ \{}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ expected,\ actual;}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{struct_u_t_f8}{UTF8<>::Decode}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ \&expected));}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{struct_auto_u_t_f}{AutoUTF<unsigned>::Decode}}(eis,\ \&actual));}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(expected,\ actual);}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\textcolor{charliteral}{'\(\backslash\)0'},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.Peek());}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \ \ \ \ free(data);}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(size,\ eis.Tell());}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00160\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_encoded_stream_test_a981d5de5d0aefd288c4a97d9dc6590f7_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_encoded_stream_test_a246bc170b7a10468b5da7eb7dfeba46c}\index{EncodedStreamTest@{EncodedStreamTest}!TestAutoUTFOutputStream@{TestAutoUTFOutputStream}}
+\index{TestAutoUTFOutputStream@{TestAutoUTFOutputStream}!EncodedStreamTest@{EncodedStreamTest}}
+\doxysubsubsection{\texorpdfstring{TestAutoUTFOutputStream()}{TestAutoUTFOutputStream()}}
+{\footnotesize\ttfamily \label{class_encoded_stream_test_a246bc170b7a10468b5da7eb7dfeba46c} 
+void Encoded\+Stream\+Test\+::\+Test\+Auto\+UTFOutput\+Stream (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{encodings_8h_ac9448aedf514a5bb509bae73a9ce4e58}{UTFType}}}]{type}{, }\item[{bool}]{put\+BOM}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{expected\+Filename}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{encodedstreamtest_8cpp_source_l00196}{196}} of file \mbox{\hyperlink{encodedstreamtest_8cpp_source}{encodedstreamtest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Test\ FileWriteStream}}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{namespaceembed_clara_a1e1bd594f85f58f5dca6c41c0ac720fb}{filename}}[L\_tmpnam];}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \ \ \ \ FILE*\ fp\ =\ \mbox{\hyperlink{unittest_8h_acb6251ae9b44050f1fcabf8d3c2e792b}{TempFile}}(filename);}
+\DoxyCodeLine{00201\ }
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ buffer[16];}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_file_write_stream}{FileWriteStream}}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}(fp,\ buffer,\ \textcolor{keyword}{sizeof}(buffer));}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_auto_u_t_f_output_stream}{AutoUTFOutputStream<unsigned,\ FileWriteStream>}}\ eos(os,\ type,\ putBOM);}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_generic_string_stream}{StringStream}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}(\mbox{\hyperlink{class_encoded_stream_test_a9993d0eb182be2cbd055982f91308d92}{json\_}});}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.Peek()\ !=\ \textcolor{charliteral}{'\(\backslash\)0'})\ \{}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a72ffd6653260a2dedcc4b55e39e10973a4e09c20e9a85794807a130e8283e8769}{success}}\ =\ \mbox{\hyperlink{struct_transcoder}{Transcoder<UTF8<>}},\ \mbox{\hyperlink{struct_auto_u_t_f}{AutoUTF<unsigned>}}\ >::Transcode(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ eos);}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(success);}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \ \ \ \ \ \ eos.Flush();}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \ \ \ \ \ \ fclose(fp);}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{class_encoded_stream_test_a0d45e4d5f8a44d23903dc6a0dee7eaa5}{CompareFile}}(filename,\ expectedFilename));}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a0db76f35dc060918029b16de918b1e84}{remove}}(filename);}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00215\ }
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Test\ MemoryBuffer}}
+\DoxyCodeLine{00217\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00218\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_generic_memory_buffer}{MemoryBuffer}}\ mb;}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_auto_u_t_f_output_stream}{AutoUTFOutputStream<unsigned,\ MemoryBuffer>}}\ eos(mb,\ type,\ putBOM);}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_generic_string_stream}{StringStream}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}(\mbox{\hyperlink{class_encoded_stream_test_a9993d0eb182be2cbd055982f91308d92}{json\_}});}
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.Peek()\ !=\ \textcolor{charliteral}{'\(\backslash\)0'})\ \{}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a72ffd6653260a2dedcc4b55e39e10973a4e09c20e9a85794807a130e8283e8769}{success}}\ =\ \mbox{\hyperlink{struct_transcoder}{Transcoder<UTF8<>}},\ \mbox{\hyperlink{struct_auto_u_t_f}{AutoUTF<unsigned>}}\ >::Transcode(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ eos);}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(success);}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \ \ \ \ \ \ eos.Flush();}
+\DoxyCodeLine{00226\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{class_encoded_stream_test_a1db7e5969dec8780a8e641876befc272}{CompareBufferFile}}(mb.\mbox{\hyperlink{struct_generic_memory_buffer_a65217e77ae6d4c249c16360c24854411}{GetBuffer}}(),\ mb.\mbox{\hyperlink{struct_generic_memory_buffer_aaab1f18d03109ab01213d3e3d8368ff9}{GetSize}}(),\ expectedFilename));}
+\DoxyCodeLine{00227\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00228\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_encoded_stream_test_a246bc170b7a10468b5da7eb7dfeba46c_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_encoded_stream_test_ad9c567df62408555b30f49bdbb606fc3}\index{EncodedStreamTest@{EncodedStreamTest}!TestEncodedInputStream@{TestEncodedInputStream}}
+\index{TestEncodedInputStream@{TestEncodedInputStream}!EncodedStreamTest@{EncodedStreamTest}}
+\doxysubsubsection{\texorpdfstring{TestEncodedInputStream()}{TestEncodedInputStream()}}
+{\footnotesize\ttfamily \label{class_encoded_stream_test_ad9c567df62408555b30f49bdbb606fc3} 
+template$<$typename File\+Encoding , typename Memory\+Encoding $>$ \\
+void Encoded\+Stream\+Test\+::\+Test\+Encoded\+Input\+Stream (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{filename}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{encodedstreamtest_8cpp_source_l00081}{81}} of file \mbox{\hyperlink{encodedstreamtest_8cpp_source}{encodedstreamtest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Test\ FileReadStream}}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ buffer[16];}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \ \ \ \ FILE\ *fp\ =\ \mbox{\hyperlink{class_encoded_stream_test_a63ccacf7cafb587e0f1537fc39b6064e}{Open}}(filename);}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ae9244bfbda562e8b798789b001993fa5}{ASSERT\_TRUE}}(fp\ !=\ 0);}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_file_read_stream}{FileReadStream}}\ \mbox{\hyperlink{namespace_xbyak_1_1util_a15900ed04e2e3994c89596ee26c4462b}{fs}}(fp,\ buffer,\ \textcolor{keyword}{sizeof}(buffer));}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_encoded_input_stream}{EncodedInputStream<FileEncoding,\ FileReadStream>}}\ eis(fs);}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_generic_string_stream}{StringStream}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}(\mbox{\hyperlink{class_encoded_stream_test_a9993d0eb182be2cbd055982f91308d92}{json\_}});}
+\DoxyCodeLine{00090\ }
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (eis.Peek()\ !=\ \textcolor{charliteral}{'\(\backslash\)0'})\ \{}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ expected,\ actual;}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{struct_u_t_f8}{UTF8<>::Decode}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ \&expected));}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(MemoryEncoding::Decode(eis,\ \&actual));}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(expected,\ actual);}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\textcolor{charliteral}{'\(\backslash\)0'},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.Peek());}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \ \ \ fclose(fp);}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00100\ }
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Test\ MemoryStream}}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ size;}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}*\ data\ =\ \mbox{\hyperlink{class_encoded_stream_test_ad5dd00dbc8a9590e139b0f7727abb05a}{ReadFile}}(filename,\ \textcolor{keyword}{true},\ \&size);}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_memory_stream}{MemoryStream}}\ ms(data,\ size);}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_encoded_input_stream}{EncodedInputStream<FileEncoding,\ MemoryStream>}}\ eis(ms);}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_generic_string_stream}{StringStream}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}(\mbox{\hyperlink{class_encoded_stream_test_a9993d0eb182be2cbd055982f91308d92}{json\_}});}
+\DoxyCodeLine{00108\ }
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (eis.Peek()\ !=\ \textcolor{charliteral}{'\(\backslash\)0'})\ \{}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ expected,\ actual;}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{struct_u_t_f8}{UTF8<>::Decode}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ \&expected));}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(MemoryEncoding::Decode(eis,\ \&actual));}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(expected,\ actual);}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(\textcolor{charliteral}{'\(\backslash\)0'},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.Peek());}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \ \ \ free(data);}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(size,\ eis.Tell());}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00119\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_encoded_stream_test_ad9c567df62408555b30f49bdbb606fc3_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_encoded_stream_test_a43892c37663f564147577e286d60937a}\index{EncodedStreamTest@{EncodedStreamTest}!TestEncodedOutputStream@{TestEncodedOutputStream}}
+\index{TestEncodedOutputStream@{TestEncodedOutputStream}!EncodedStreamTest@{EncodedStreamTest}}
+\doxysubsubsection{\texorpdfstring{TestEncodedOutputStream()}{TestEncodedOutputStream()}}
+{\footnotesize\ttfamily \label{class_encoded_stream_test_a43892c37663f564147577e286d60937a} 
+template$<$typename File\+Encoding , typename Memory\+Encoding $>$ \\
+void Encoded\+Stream\+Test\+::\+Test\+Encoded\+Output\+Stream (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{expected\+Filename}{, }\item[{bool}]{put\+BOM}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{encodedstreamtest_8cpp_source_l00163}{163}} of file \mbox{\hyperlink{encodedstreamtest_8cpp_source}{encodedstreamtest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Test\ FileWriteStream}}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{namespaceembed_clara_a1e1bd594f85f58f5dca6c41c0ac720fb}{filename}}[L\_tmpnam];}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \ \ \ \ \ \ FILE*\ fp\ =\ \mbox{\hyperlink{unittest_8h_acb6251ae9b44050f1fcabf8d3c2e792b}{TempFile}}(filename);}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ buffer[16];}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_file_write_stream}{FileWriteStream}}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}}(fp,\ buffer,\ \textcolor{keyword}{sizeof}(buffer));}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_encoded_output_stream}{EncodedOutputStream<FileEncoding,\ FileWriteStream>}}\ eos(os,\ putBOM);}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_generic_string_stream}{StringStream}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}(\mbox{\hyperlink{class_encoded_stream_test_a9993d0eb182be2cbd055982f91308d92}{json\_}});}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.Peek()\ !=\ \textcolor{charliteral}{'\(\backslash\)0'})\ \{}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a72ffd6653260a2dedcc4b55e39e10973a4e09c20e9a85794807a130e8283e8769}{success}}\ =\ \mbox{\hyperlink{struct_transcoder}{Transcoder<UTF8<>}},\ MemoryEncoding>::Transcode(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ eos);}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(success);}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \ \ \ \ eos.Flush();}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \ \ \ \ fclose(fp);}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{class_encoded_stream_test_a0d45e4d5f8a44d23903dc6a0dee7eaa5}{CompareFile}}(filename,\ expectedFilename));}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a0db76f35dc060918029b16de918b1e84}{remove}}(filename);}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00181\ }
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Test\ MemoryBuffer}}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_generic_memory_buffer}{MemoryBuffer}}\ mb;}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_encoded_output_stream}{EncodedOutputStream<FileEncoding,\ MemoryBuffer>}}\ eos(mb,\ putBOM);}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_generic_string_stream}{StringStream}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}(\mbox{\hyperlink{class_encoded_stream_test_a9993d0eb182be2cbd055982f91308d92}{json\_}});}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.Peek()\ !=\ \textcolor{charliteral}{'\(\backslash\)0'})\ \{}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a72ffd6653260a2dedcc4b55e39e10973a4e09c20e9a85794807a130e8283e8769}{success}}\ =\ \mbox{\hyperlink{struct_transcoder}{Transcoder<UTF8<>}},\ MemoryEncoding>::Transcode(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ eos);}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(success);}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ \ \ \ \ eos.Flush();}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{class_encoded_stream_test_a1db7e5969dec8780a8e641876befc272}{CompareBufferFile}}(mb.\mbox{\hyperlink{struct_generic_memory_buffer_a65217e77ae6d4c249c16360c24854411}{GetBuffer}}(),\ mb.\mbox{\hyperlink{struct_generic_memory_buffer_aaab1f18d03109ab01213d3e3d8368ff9}{GetSize}}(),\ expectedFilename));}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00194\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_encoded_stream_test_a43892c37663f564147577e286d60937a_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{class_encoded_stream_test_a9993d0eb182be2cbd055982f91308d92}\index{EncodedStreamTest@{EncodedStreamTest}!json\_@{json\_}}
+\index{json\_@{json\_}!EncodedStreamTest@{EncodedStreamTest}}
+\doxysubsubsection{\texorpdfstring{json\_}{json\_}}
+{\footnotesize\ttfamily \label{class_encoded_stream_test_a9993d0eb182be2cbd055982f91308d92} 
+char\texorpdfstring{$\ast$}{*} Encoded\+Stream\+Test\+::json\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{encodedstreamtest_8cpp_source_l00248}{248}} of file \mbox{\hyperlink{encodedstreamtest_8cpp_source}{encodedstreamtest.\+cpp}}.
+
+\Hypertarget{class_encoded_stream_test_aef69c9f1ff714588697ac92712d75fe8}\index{EncodedStreamTest@{EncodedStreamTest}!length\_@{length\_}}
+\index{length\_@{length\_}!EncodedStreamTest@{EncodedStreamTest}}
+\doxysubsubsection{\texorpdfstring{length\_}{length\_}}
+{\footnotesize\ttfamily \label{class_encoded_stream_test_aef69c9f1ff714588697ac92712d75fe8} 
+size\+\_\+t Encoded\+Stream\+Test\+::length\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{encodedstreamtest_8cpp_source_l00249}{249}} of file \mbox{\hyperlink{encodedstreamtest_8cpp_source}{encodedstreamtest.\+cpp}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/test/unittest/\mbox{\hyperlink{encodedstreamtest_8cpp}{encodedstreamtest.\+cpp}}\end{DoxyCompactItemize}

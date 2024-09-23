@@ -1,0 +1,91 @@
+\doxysection{libraries/fc/libraries/ff/depends/xbyak/xbyak/xbyak\+\_\+util.h File Reference}
+\hypertarget{xbyak__util_8h}{}\label{xbyak__util_8h}\index{libraries/fc/libraries/ff/depends/xbyak/xbyak/xbyak\_util.h@{libraries/fc/libraries/ff/depends/xbyak/xbyak/xbyak\_util.h}}
+{\ttfamily \#include "{}xbyak.\+h"{}}\newline
+Include dependency graph for xbyak\+\_\+util.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{xbyak__util_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{xbyak__util_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{class_xbyak_1_1util_1_1_cpu}{Xbyak\+::util\+::\+Cpu}}
+\item 
+class \mbox{\hyperlink{class_xbyak_1_1util_1_1_clock}{Xbyak\+::util\+::\+Clock}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespace_xbyak}{Xbyak}}
+\item 
+namespace \mbox{\hyperlink{namespace_xbyak_1_1util}{Xbyak\+::util}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{xbyak__util_8h_a9ce725228f93c94c413ddd8589b7ba44}{\+\_\+\+\_\+\+GNUC\+\_\+\+PREREQ}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a5bd4e4c943762926c8f653b6224cced2}{major}},  \mbox{\hyperlink{yubihsm__pkcs11_8c_ae2f416b0a34b7beb4ed3873d791ac393}{minor}})
+\item 
+\#define \mbox{\hyperlink{xbyak__util_8h_a3fd0b711754fa0e66084b87a92c96162}{\+\_\+\+\_\+cpuid}}(eax\+In,  \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},  b,  c,  d)
+\item 
+\#define \mbox{\hyperlink{xbyak__util_8h_a4cfa19ed076a6db2303c1921725245b3}{\+\_\+\+\_\+cpuid\+\_\+count}}(eax\+In,  ecx\+In,  \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},  b,  c,  d)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{xbyak__util_8h_a3fd0b711754fa0e66084b87a92c96162}\index{xbyak\_util.h@{xbyak\_util.h}!\_\_cpuid@{\_\_cpuid}}
+\index{\_\_cpuid@{\_\_cpuid}!xbyak\_util.h@{xbyak\_util.h}}
+\doxysubsubsection{\texorpdfstring{\_\_cpuid}{\_\_cpuid}}
+{\footnotesize\ttfamily \label{xbyak__util_8h_a3fd0b711754fa0e66084b87a92c96162} 
+\#define \+\_\+\+\_\+cpuid(\begin{DoxyParamCaption}\item[{}]{eax\+In}{, }\item[{}]{\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}}{, }\item[{}]{b}{, }\item[{}]{c}{, }\item[{}]{d}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\_\_asm\_\_\ \_\_volatile\_\_(\textcolor{stringliteral}{"{}cpuid\(\backslash\)n"{}}\ :\ \textcolor{stringliteral}{"{}=a"{}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}),\ \textcolor{stringliteral}{"{}=b"{}}(b),\ \textcolor{stringliteral}{"{}=c"{}}(c),\ \textcolor{stringliteral}{"{}=d"{}}(d)\ :\ \textcolor{stringliteral}{"{}0"{}}(eaxIn))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00045}{45}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{xbyak__util_8h_a4cfa19ed076a6db2303c1921725245b3}\index{xbyak\_util.h@{xbyak\_util.h}!\_\_cpuid\_count@{\_\_cpuid\_count}}
+\index{\_\_cpuid\_count@{\_\_cpuid\_count}!xbyak\_util.h@{xbyak\_util.h}}
+\doxysubsubsection{\texorpdfstring{\_\_cpuid\_count}{\_\_cpuid\_count}}
+{\footnotesize\ttfamily \label{xbyak__util_8h_a4cfa19ed076a6db2303c1921725245b3} 
+\#define \+\_\+\+\_\+cpuid\+\_\+count(\begin{DoxyParamCaption}\item[{}]{eax\+In}{, }\item[{}]{ecx\+In}{, }\item[{}]{\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}}{, }\item[{}]{b}{, }\item[{}]{c}{, }\item[{}]{d}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\_\_asm\_\_\ \_\_volatile\_\_(\textcolor{stringliteral}{"{}cpuid\(\backslash\)n"{}}\ :\ \textcolor{stringliteral}{"{}=a"{}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}),\ \textcolor{stringliteral}{"{}=b"{}}(b),\ \textcolor{stringliteral}{"{}=c"{}}(c),\ \textcolor{stringliteral}{"{}=d"{}}(d)\ :\ \textcolor{stringliteral}{"{}0"{}}(eaxIn),\ \textcolor{stringliteral}{"{}2"{}}(ecxIn))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00046}{46}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+
+\Hypertarget{xbyak__util_8h_a9ce725228f93c94c413ddd8589b7ba44}\index{xbyak\_util.h@{xbyak\_util.h}!\_\_GNUC\_PREREQ@{\_\_GNUC\_PREREQ}}
+\index{\_\_GNUC\_PREREQ@{\_\_GNUC\_PREREQ}!xbyak\_util.h@{xbyak\_util.h}}
+\doxysubsubsection{\texorpdfstring{\_\_GNUC\_PREREQ}{\_\_GNUC\_PREREQ}}
+{\footnotesize\ttfamily \label{xbyak__util_8h_a9ce725228f93c94c413ddd8589b7ba44} 
+\#define \+\_\+\+\_\+\+GNUC\+\_\+\+PREREQ(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{yubihsm__pkcs11_8c_a5bd4e4c943762926c8f653b6224cced2}{major}}}{, }\item[{}]{\mbox{\hyperlink{yubihsm__pkcs11_8c_ae2f416b0a34b7beb4ed3873d791ac393}{minor}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((((\_\_GNUC\_\_)\ <<\ 16)\ +\ (\_\_GNUC\_MINOR\_\_))\ >=\ (((\mbox{\hyperlink{yubihsm__pkcs11_8c_a5bd4e4c943762926c8f653b6224cced2}{major}})\ <<\ 16)\ +\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_ae2f416b0a34b7beb4ed3873d791ac393}{minor}})))}
+
+\end{DoxyCode}
+utility class and functions for \doxylink{namespace_xbyak}{Xbyak} \doxylink{class_xbyak_1_1util_1_1_clock}{Xbyak\+::util\+::\+Clock} ; rdtsc timer \doxylink{class_xbyak_1_1util_1_1_cpu}{Xbyak\+::util\+::\+Cpu} ; detect CPU \begin{DoxyNote}{Note}
+this header is UNDER CONSTRUCTION! 
+\end{DoxyNote}
+
+
+Definition at line \mbox{\hyperlink{xbyak__util_8h_source_l00036}{36}} of file \mbox{\hyperlink{xbyak__util_8h_source}{xbyak\+\_\+util.\+h}}.
+

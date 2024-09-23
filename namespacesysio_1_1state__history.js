@@ -1,0 +1,26 @@
+var namespacesysio_1_1state__history =
+[
+    [ "augmented_transaction_trace", "structsysio_1_1state__history_1_1augmented__transaction__trace.html", "structsysio_1_1state__history_1_1augmented__transaction__trace" ],
+    [ "big_vector_wrapper", "structsysio_1_1state__history_1_1big__vector__wrapper.html", "structsysio_1_1state__history_1_1big__vector__wrapper" ],
+    [ "block_position", "structsysio_1_1state__history_1_1block__position.html", "structsysio_1_1state__history_1_1block__position" ],
+    [ "get_blocks_ack_request_v0", "structsysio_1_1state__history_1_1get__blocks__ack__request__v0.html", "structsysio_1_1state__history_1_1get__blocks__ack__request__v0" ],
+    [ "get_blocks_request_v0", "structsysio_1_1state__history_1_1get__blocks__request__v0.html", "structsysio_1_1state__history_1_1get__blocks__request__v0" ],
+    [ "get_blocks_result_v0", "structsysio_1_1state__history_1_1get__blocks__result__v0.html", "structsysio_1_1state__history_1_1get__blocks__result__v0" ],
+    [ "get_status_request_v0", "structsysio_1_1state__history_1_1get__status__request__v0.html", null ],
+    [ "get_status_result_v0", "structsysio_1_1state__history_1_1get__status__result__v0.html", "structsysio_1_1state__history_1_1get__status__result__v0" ],
+    [ "partial_transaction", "structsysio_1_1state__history_1_1partial__transaction.html", "structsysio_1_1state__history_1_1partial__transaction" ],
+    [ "table_delta", "structsysio_1_1state__history_1_1table__delta.html", "structsysio_1_1state__history_1_1table__delta" ],
+    [ "trace_converter", "structsysio_1_1state__history_1_1trace__converter.html", "structsysio_1_1state__history_1_1trace__converter" ],
+    [ "state_request", "namespacesysio_1_1state__history.html#a0e788deef6248a86a8620bdbf4dea020", null ],
+    [ "state_result", "namespacesysio_1_1state__history.html#a7c0ebdf566e085620947b3981fb324ec", null ],
+    [ "create_deltas", "namespacesysio_1_1state__history.html#a4672b7cf25419ada24cf1366ef85687d", null ],
+    [ "include_delta", "namespacesysio_1_1state__history.html#a58921fbf0e9665770c7b3a695d2df8cd", null ],
+    [ "include_delta", "namespacesysio_1_1state__history.html#a0a3e79f324afc8a501a9778d80cec968", null ],
+    [ "include_delta", "namespacesysio_1_1state__history.html#ad7e684e78494225a5ea390d4a2cb88db", null ],
+    [ "include_delta", "namespacesysio_1_1state__history.html#ab398df574c5103e7fd21debde64ec0ee", null ],
+    [ "include_delta", "namespacesysio_1_1state__history.html#ab354d08ce3577c51e35780853ec6b25f", null ],
+    [ "include_delta", "namespacesysio_1_1state__history.html#a9aa62de9d68ebae6a40816a55b928e07", null ],
+    [ "include_delta", "namespacesysio_1_1state__history.html#a7297e6b09d82cabc24f7231b09fdf14a", null ],
+    [ "zlib_compress_bytes", "namespacesysio_1_1state__history.html#a56d6b703f34519b5d085529ebd120d29", null ],
+    [ "zlib_decompress", "namespacesysio_1_1state__history.html#a81fbdf52169b3b2295f3911729f09142", null ]
+];

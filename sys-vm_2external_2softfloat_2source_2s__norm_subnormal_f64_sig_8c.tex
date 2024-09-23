@@ -1,0 +1,51 @@
+\doxysection{libraries/sys-\/vm/external/softfloat/source/s\+\_\+norm\+Subnormal\+F64\+Sig.c File Reference}
+\hypertarget{sys-vm_2external_2softfloat_2source_2s__norm_subnormal_f64_sig_8c}{}\label{sys-vm_2external_2softfloat_2source_2s__norm_subnormal_f64_sig_8c}\index{libraries/sys-\/vm/external/softfloat/source/s\_normSubnormalF64Sig.c@{libraries/sys-\/vm/external/softfloat/source/s\_normSubnormalF64Sig.c}}
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include "{}platform.\+h"{}}\newline
+{\ttfamily \#include "{}internals.\+h"{}}\newline
+Include dependency graph for s\+\_\+norm\+Subnormal\+F64\+Sig.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=317pt]{sys-vm_2external_2softfloat_2source_2s__norm_subnormal_f64_sig_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structexp16__sig64}{exp16\+\_\+sig64}} \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2s__norm_subnormal_f64_sig_8c_a151e8a7aabebba3ba95d2bf8ff517c2d}{softfloat\+\_\+norm\+Subnormal\+F64\+Sig}} (\mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\+\_\+fast64\+\_\+t}} sig)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{sys-vm_2external_2softfloat_2source_2s__norm_subnormal_f64_sig_8c_a151e8a7aabebba3ba95d2bf8ff517c2d}\index{s\_normSubnormalF64Sig.c@{s\_normSubnormalF64Sig.c}!softfloat\_normSubnormalF64Sig@{softfloat\_normSubnormalF64Sig}}
+\index{softfloat\_normSubnormalF64Sig@{softfloat\_normSubnormalF64Sig}!s\_normSubnormalF64Sig.c@{s\_normSubnormalF64Sig.c}}
+\doxysubsubsection{\texorpdfstring{softfloat\_normSubnormalF64Sig()}{softfloat\_normSubnormalF64Sig()}}
+{\footnotesize\ttfamily \label{sys-vm_2external_2softfloat_2source_2s__norm_subnormal_f64_sig_8c_a151e8a7aabebba3ba95d2bf8ff517c2d} 
+struct \mbox{\hyperlink{structexp16__sig64}{exp16\+\_\+sig64}} softfloat\+\_\+norm\+Subnormal\+F64\+Sig (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\+\_\+fast64\+\_\+t}}}]{sig}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2s__norm_subnormal_f64_sig_8c_source_l00041}{41}} of file \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2s__norm_subnormal_f64_sig_8c_source}{s\+\_\+norm\+Subnormal\+F64\+Sig.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00042\ \{}
+\DoxyCodeLine{00043\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a880ed9ceb8621521452c81d03bd08cfb}{int\_fast8\_t}}\ shiftDist;}
+\DoxyCodeLine{00044\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structexp16__sig64}{exp16\_sig64}}\ z;}
+\DoxyCodeLine{00045\ }
+\DoxyCodeLine{00046\ \ \ \ \ shiftDist\ =\ \mbox{\hyperlink{softfloat_2source_2s__count_leading_zeros64_8c_aa7f029cdc05ad078461581da52b91bef}{softfloat\_countLeadingZeros64}}(\ \mbox{\hyperlink{structexp16__sig64_a59a60a64a00e660886848ca28885ceb6}{sig}}\ )\ -\/\ 11;}
+\DoxyCodeLine{00047\ \ \ \ \ z.\mbox{\hyperlink{structexp16__sig64_a360cf73eb845fb2b8d796db7545df847}{exp}}\ =\ 1\ -\/\ shiftDist;}
+\DoxyCodeLine{00048\ \ \ \ \ z.sig\ =\ \mbox{\hyperlink{structexp16__sig64_a59a60a64a00e660886848ca28885ceb6}{sig}}<<shiftDist;}
+\DoxyCodeLine{00049\ \ \ \ \ \textcolor{keywordflow}{return}\ z;}
+\DoxyCodeLine{00050\ }
+\DoxyCodeLine{00051\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sys-vm_2external_2softfloat_2source_2s__norm_subnormal_f64_sig_8c_a151e8a7aabebba3ba95d2bf8ff517c2d_icgraph}
+\end{center}
+\end{figure}

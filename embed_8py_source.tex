@@ -1,0 +1,69 @@
+\doxysection{embed.\+py}
+\hypertarget{embed_8py_source}{}\label{embed_8py_source}\index{libraries/sys-\/vm/external/Catch2/scripts/embed.py@{libraries/sys-\/vm/external/Catch2/scripts/embed.py}}
+\mbox{\hyperlink{embed_8py}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00001}\mbox{\hyperlink{namespaceembed}{00001}}\ \textcolor{keyword}{import}\ re}
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00003}\mbox{\hyperlink{namespaceembed_ae47fa02e124d8500d854e38046a8d4d0}{00003}}\ preprocessorRe\ =\ re.compile(\ \textcolor{stringliteral}{r'\(\backslash\)s*\#.*'}\ )}
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00005}\mbox{\hyperlink{namespaceembed_a504c36de95577617c8b1198edaf7b8e2}{00005}}\ fdefineRe\ =\ re.compile(\ \textcolor{stringliteral}{r'\(\backslash\)s*\#\(\backslash\)s*define\(\backslash\)s*(\(\backslash\)S*)\(\backslash\)s*\(\backslash\)('}\ )\ \textcolor{comment}{\#\ \#defines\ that\ take\ arguments}}
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00006}\mbox{\hyperlink{namespaceembed_a0e0fa843ea2a051d147070aa54d25606}{00006}}\ defineRe\ =\ re.compile(\ \textcolor{stringliteral}{r'\(\backslash\)s*\#\(\backslash\)s*define\(\backslash\)s*(\(\backslash\)S*)(\(\backslash\)s+)(.*)'}\ )\ \textcolor{comment}{\#\ all\ \#defines}}
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00007}\mbox{\hyperlink{namespaceembed_a719fe07b9731f30c39802c09bbdfcb52}{00007}}\ undefRe\ =\ re.compile(\ \textcolor{stringliteral}{r'\(\backslash\)s*\#\(\backslash\)s*undef\(\backslash\)s*(\(\backslash\)S*)'}\ )\ \textcolor{comment}{\#\ all\ \#undefs}}
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00009}\mbox{\hyperlink{namespaceembed_acc8320b2686a857e34d8243b673dbb93}{00009}}\ ifdefCommonRe\ =\ re.compile(\ \textcolor{stringliteral}{r'\(\backslash\)s*\#\(\backslash\)s*if'}\ )\ \textcolor{comment}{\#\ all\ \#ifdefs}}
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00010}\mbox{\hyperlink{namespaceembed_aa9c523618a64a8f63c460a2b002676a6}{00010}}\ ifdefRe\ =\ re.compile(\ \textcolor{stringliteral}{r'\(\backslash\)s*\#\(\backslash\)s*ifdef\(\backslash\)s*(\(\backslash\)S*)'}\ )}
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00011}\mbox{\hyperlink{namespaceembed_ab815f1c6a78d1af065377f9f71775590}{00011}}\ ifndefRe\ =\ re.compile(\ \textcolor{stringliteral}{r'\(\backslash\)s*\#\(\backslash\)s*ifndef\(\backslash\)s*(\(\backslash\)S*)'}\ )}
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00012}\mbox{\hyperlink{namespaceembed_aec189287a89734d848da57b90fa4e335}{00012}}\ endifRe\ =\ re.compile(\ \textcolor{stringliteral}{r'\(\backslash\)s*\#\(\backslash\)s*endif\(\backslash\)s*//\(\backslash\)s*(.*)'}\ )}
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00013}\mbox{\hyperlink{namespaceembed_a5641662fa730f5ea2e589a93b5507a76}{00013}}\ elseRe\ =\ re.compile(\ \textcolor{stringliteral}{r'\(\backslash\)s*\#\(\backslash\)s*else'}\ )}
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00014}\mbox{\hyperlink{namespaceembed_afafad34cd83c5e97738f7a7a250a176b}{00014}}\ ifRe\ =\ re.compile(\ \textcolor{stringliteral}{r'\(\backslash\)s*\#\(\backslash\)s*if\(\backslash\)s+(.*)'}\ )}
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00016}\mbox{\hyperlink{namespaceembed_a5289bbc70ac1095f96d8d771027457cb}{00016}}\ nsRe\ =\ re.compile(\ \textcolor{stringliteral}{r'(.*?\(\backslash\)s*\(\backslash\)s*namespace\(\backslash\)s+)(\(\backslash\)w+)(\(\backslash\)s*\{?)(.*)'}\ )}
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00017}\mbox{\hyperlink{namespaceembed_a139dbd592fbfed252eb9c33c32df1a87}{00017}}\ nsCloseRe\ =\ re.compile(\ \textcolor{stringliteral}{r'(.*\(\backslash\)s*\})(\(\backslash\)s*\(\backslash\)/\(\backslash\)/\(\backslash\)s*namespace\(\backslash\)s+)(\(\backslash\)w+)(\(\backslash\)s*)(.*)'}\ )}
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00020}\mbox{\hyperlink{classembed_1_1_line_mapper}{00020}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classembed_1_1_line_mapper}{LineMapper}}:}
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00021}\mbox{\hyperlink{classembed_1_1_line_mapper_a3fba8e81ff9595adb47b65d5e0fc9f9b}{00021}}\ \ \ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classembed_1_1_line_mapper_a3fba8e81ff9595adb47b65d5e0fc9f9b}{\_\_init\_\_}}(\ self,\ idMap,\ outerNamespace\ ):}
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00022}\mbox{\hyperlink{classembed_1_1_line_mapper_ae46b69ab0d09db7a5f01eb3cafef7d91}{00022}}\ \ \ \ \ \ \ \ \ self.\mbox{\hyperlink{classembed_1_1_line_mapper_ae46b69ab0d09db7a5f01eb3cafef7d91}{idMap}}\ =\ idMap}
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00023}\mbox{\hyperlink{classembed_1_1_line_mapper_a35067db26fdbee959d637f350830f43b}{00023}}\ \ \ \ \ \ \ \ \ self.\mbox{\hyperlink{classembed_1_1_line_mapper_a35067db26fdbee959d637f350830f43b}{outerNamespace}}\ =\ outerNamespace}
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00025}00025\ \ \ \ \ \textcolor{comment}{\#\ TBD:}}
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00026}00026\ \ \ \ \ \textcolor{comment}{\#\ \ \#if,\ \#ifdef,\ comments\ after\ \#else}}
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00027}\mbox{\hyperlink{classembed_1_1_line_mapper_a98d45d187f555e8a42ffdf703f8e0dd2}{00027}}\ \ \ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classembed_1_1_line_mapper_a98d45d187f555e8a42ffdf703f8e0dd2}{mapLine}}(\ self,\ lineNo,\ line\ ):}
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00028}00028\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ idFrom,\ idTo\ \textcolor{keywordflow}{in}\ self.\mbox{\hyperlink{classembed_1_1_line_mapper_ae46b69ab0d09db7a5f01eb3cafef7d91}{idMap}}.items():}
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00029}00029\ \ \ \ \ \ \ \ \ \ \ \ \ r\ =\ re.compile(\textcolor{stringliteral}{"{}(.*)"{}}\ +\ idFrom\ +\ \textcolor{stringliteral}{"{}(.*)"{}})}
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00031}00031\ \ \ \ \ \ \ \ \ \ \ \ \ m\ =\ r.match(\ line\ )}
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00032}00032\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ m:}
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00033}00033\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ line\ =\ m.group(1)\ +\ idTo\ +\ m.group(2)\ +\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00035}00035\ \ \ \ \ \ \ \ \ m\ =\ nsCloseRe.match(\ line\ )}
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00036}00036\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ m:}
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00037}00037\ \ \ \ \ \ \ \ \ \ \ \ \ originalNs\ =\ m.group(3)}
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00038}00038\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ print("{}[\{0\}]\ originalNs:\ '\{1\}'\ -\/\ closing"{}.format(lineNo,\ originalNs))}}
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00039}00039\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ print(\ "{}\ \ "{}\ +\ line\ )}}
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00040}00040\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ print(\ "{}\ \ 1:[\{0\}]\(\backslash\)n\ \ 2:[\{1\}]\(\backslash\)n\ \ 3:[\{2\}]\(\backslash\)n\ \ 4:[\{3\}]\(\backslash\)n\ \ 5:[\{4\}]"{}.format(\ m.group(1),\ m.group(2),\ m.group(3),\ m.group(4),\ m.group(5)\ )\ )}}
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00041}00041\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ originalNs\ \textcolor{keywordflow}{in}\ self.\mbox{\hyperlink{classembed_1_1_line_mapper_a35067db26fdbee959d637f350830f43b}{outerNamespace}}:}
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00042}00042\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ outerNs,\ innerNs\ =\ self.\mbox{\hyperlink{classembed_1_1_line_mapper_a35067db26fdbee959d637f350830f43b}{outerNamespace}}[originalNs]}
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00043}00043\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}\{0\}\}\}\{1\}\{2\}::\{3\}\{4\}\{5\}\(\backslash\)n"{}}.\mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}(\ m.group(1),\ m.group(2),\ outerNs,\ innerNs,\ m.group(4),\ m.group(5))}
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00044}00044\ \ \ \ \ \ \ \ \ m\ =\ nsRe.match(\ line\ )}
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00045}00045\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ m:}
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00046}00046\ \ \ \ \ \ \ \ \ \ \ \ \ originalNs\ =\ m.group(2)}
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00047}00047\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ print("{}[\{0\}]\ originalNs:\ '\{1\}'"{}.format(lineNo,\ originalNs))}}
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ print(\ "{}\ \ "{}\ +\ line\ )}}
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00049}00049\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ print(\ "{}\ \ 1:[\{0\}]\(\backslash\)n\ \ 2:[\{1\}]\(\backslash\)n\ \ 3:[\{2\}]\(\backslash\)n\ \ 4:[\{3\}]"{}.format(\ m.group(1),\ m.group(2),\ m.group(3),\ m.group(4)\ )\ )}}
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00050}00050\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ originalNs\ \textcolor{keywordflow}{in}\ self.\mbox{\hyperlink{classembed_1_1_line_mapper_a35067db26fdbee959d637f350830f43b}{outerNamespace}}:}
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00051}00051\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ outerNs,\ innerNs\ =\ self.\mbox{\hyperlink{classembed_1_1_line_mapper_a35067db26fdbee959d637f350830f43b}{outerNamespace}}[originalNs]}
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}\{0\}\{1\}\ \{\{\ namespace\ \{2\}\{3\}\{4\}\(\backslash\)n"{}}.\mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}(\ m.group(1),\ outerNs,\ innerNs,\ m.group(3),\ m.group(4)\ )}
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00054}00054\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ line}
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00056}\mbox{\hyperlink{classembed_1_1_line_mapper_aeae9d4f7f233aad47a354235a96bcbfb}{00056}}\ \ \ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classembed_1_1_line_mapper_aeae9d4f7f233aad47a354235a96bcbfb}{mapFile}}(self,\ filenameIn,\ filenameOut\ ):}
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00057}00057\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\ \textcolor{stringliteral}{"{}Embedding:\(\backslash\)n\ \ \{0\}\(\backslash\)nas:\(\backslash\)n\ \ \{1\}"{}}.\mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}(\ filenameIn,\ filenameOut\ )\ )}
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00058}00058\ \ \ \ \ \ \ \ \ \textcolor{keyword}{with}\ open(\ filenameIn,\ \textcolor{stringliteral}{'r'}\ )\ \textcolor{keyword}{as}\ f,\ open(\ filenameOut,\ \textcolor{stringliteral}{'w'}\ )\ \textcolor{keyword}{as}\ outf:}
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00059}00059\ \ \ \ \ \ \ \ \ \ \ \ \ lineNo\ =\ 1}
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ line\ \textcolor{keywordflow}{in}\ f:}
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00061}00061\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ outf.write(\ self.\mbox{\hyperlink{classembed_1_1_line_mapper_a98d45d187f555e8a42ffdf703f8e0dd2}{mapLine}}(\ lineNo,\ line\ )\ )}
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00062}00062\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lineNo\ =\ lineNo\ +\ 1}
+\DoxyCodeLine{\Hypertarget{embed_8py_source_l00063}00063\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\ \textcolor{stringliteral}{"{}Written\ \{0\}\ lines"{}}.\mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}(\ lineNo\ )\ )}
+
+\end{DoxyCode}

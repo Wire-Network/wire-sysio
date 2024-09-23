@@ -1,0 +1,274 @@
+\doxysection{gmock\+\_\+test\+\_\+utils Namespace Reference}
+\hypertarget{namespacegmock__test__utils}{}\label{namespacegmock__test__utils}\index{gmock\_test\_utils@{gmock\_test\_utils}}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacegmock__test__utils_ae6b4256fed63c744d722ecdf0f217529}{Get\+Source\+Dir}} ()
+\item 
+\mbox{\hyperlink{namespacegmock__test__utils_a3965eb0947849f247899f6edff7051f7}{Get\+Test\+Executable\+Path}} (executable\+\_\+name)
+\item 
+\mbox{\hyperlink{namespacegmock__test__utils_ac27ecc41752ab1bb57ffabb2817dbef6}{Get\+Exit\+Status}} (exit\+\_\+code)
+\item 
+\mbox{\hyperlink{namespacegmock__test__utils_ab436e920b5feb62a33936b0d839702e7}{Main}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+str \mbox{\hyperlink{namespacegmock__test__utils_abbe2149e5683815a55e981fa8dde28cd}{SCRIPT\+\_\+\+DIR}} = os.\+path.\+dirname(\+\_\+\+\_\+file\+\_\+\+\_\+) or \textquotesingle{}.\textquotesingle{}
+\item 
+\mbox{\hyperlink{namespacegmock__test__utils_af6d94170502149e7f99cfa73ddc13c00}{gtest\+\_\+tests\+\_\+util\+\_\+dir}} = os.\+path.\+join(\mbox{\hyperlink{namespacegmock__test__utils_abbe2149e5683815a55e981fa8dde28cd}{SCRIPT\+\_\+\+DIR}}, \textquotesingle{}../../googletest/test\textquotesingle{})
+\item 
+\mbox{\hyperlink{namespacegmock__test__utils_ae7ee9324ba489b3cbd99c5e26006eba9}{GTEST\+\_\+\+TESTS\+\_\+\+UTIL\+\_\+\+DIR}} = \mbox{\hyperlink{namespacegmock__test__utils_af6d94170502149e7f99cfa73ddc13c00}{gtest\+\_\+tests\+\_\+util\+\_\+dir}}
+\item 
+\mbox{\hyperlink{namespacegmock__test__utils_a31a0e33565ec805d314cb0a4eb8317e6}{Subprocess}} = \mbox{\hyperlink{classgtest__test__utils_1_1_subprocess}{gtest\+\_\+test\+\_\+utils.\+Subprocess}}
+\item 
+\mbox{\hyperlink{namespacegmock__test__utils_a959c5af591e4d49b6d35745205b64509}{Test\+Case}} = gtest\+\_\+test\+\_\+utils.\+Test\+Case
+\item 
+\mbox{\hyperlink{namespacegmock__test__utils_a6f0938b5e8839ebc847b52a38f4d35e3}{environ}} = gtest\+\_\+test\+\_\+utils.\+environ
+\item 
+\mbox{\hyperlink{namespacegmock__test__utils_ab0c69f8ce649fdd5a17f99deedf3eb29}{Set\+Env\+Var}} = gtest\+\_\+test\+\_\+utils.\+Set\+Env\+Var
+\item 
+\mbox{\hyperlink{namespacegmock__test__utils_a9392c288e6da3024d65ec0bddc0d86c3}{PREMATURE\+\_\+\+EXIT\+\_\+\+FILE\+\_\+\+ENV\+\_\+\+VAR}} = gtest\+\_\+test\+\_\+utils.\+PREMATURE\+\_\+\+EXIT\+\_\+\+FILE\+\_\+\+ENV\+\_\+\+VAR
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\begin{DoxyVerb}Unit test utilities for Google C++ Mocking Framework.\end{DoxyVerb}
+ 
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacegmock__test__utils_ac27ecc41752ab1bb57ffabb2817dbef6}\index{gmock\_test\_utils@{gmock\_test\_utils}!GetExitStatus@{GetExitStatus}}
+\index{GetExitStatus@{GetExitStatus}!gmock\_test\_utils@{gmock\_test\_utils}}
+\doxysubsubsection{\texorpdfstring{GetExitStatus()}{GetExitStatus()}}
+{\footnotesize\ttfamily \label{namespacegmock__test__utils_ac27ecc41752ab1bb57ffabb2817dbef6} 
+gmock\+\_\+test\+\_\+utils.\+Get\+Exit\+Status (\begin{DoxyParamCaption}\item[{}]{exit\+\_\+code}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Returns the argument to exit(), or -1 if exit() wasn't called.
+
+Args:
+  exit_code: the result value of os.system(command).
+\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{gmock__test__utils_8py_source_l00074}{74}} of file \mbox{\hyperlink{gmock__test__utils_8py_source}{gmock\+\_\+test\+\_\+utils.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00074\ \textcolor{keyword}{def\ }GetExitStatus(exit\_code):}
+\DoxyCodeLine{00075\ \ \ \textcolor{stringliteral}{"{}"{}"{}Returns\ the\ argument\ to\ exit(),\ or\ -\/1\ if\ exit()\ wasn't\ called.}}
+\DoxyCodeLine{00076\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00077\ \textcolor{stringliteral}{\ \ Args:}}
+\DoxyCodeLine{00078\ \textcolor{stringliteral}{\ \ \ \ exit\_code:\ the\ result\ value\ of\ os.system(command).}}
+\DoxyCodeLine{00079\ \textcolor{stringliteral}{\ \ "{}"{}"{}}}
+\DoxyCodeLine{00080\ }
+\DoxyCodeLine{00081\ \ \ \textcolor{keywordflow}{if}\ os.name\ ==\ \textcolor{stringliteral}{'nt'}:}
+\DoxyCodeLine{00082\ \ \ \ \ \textcolor{comment}{\#\ On\ Windows,\ os.WEXITSTATUS()\ doesn't\ work\ and\ os.system()\ returns}}
+\DoxyCodeLine{00083\ \ \ \ \ \textcolor{comment}{\#\ the\ argument\ to\ exit()\ directly.}}
+\DoxyCodeLine{00084\ \ \ \ \ \textcolor{keywordflow}{return}\ exit\_code}
+\DoxyCodeLine{00085\ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{00086\ \ \ \ \ \textcolor{comment}{\#\ On\ Unix,\ os.WEXITSTATUS()\ must\ be\ used\ to\ extract\ the\ exit\ status}}
+\DoxyCodeLine{00087\ \ \ \ \ \textcolor{comment}{\#\ from\ the\ result\ of\ os.system().}}
+\DoxyCodeLine{00088\ \ \ \ \ \textcolor{keywordflow}{if}\ os.WIFEXITED(exit\_code):}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ os.WEXITSTATUS(exit\_code)}
+\DoxyCodeLine{00090\ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ -\/1}
+\DoxyCodeLine{00092\ }
+\DoxyCodeLine{00093\ }
+\DoxyCodeLine{00094\ \textcolor{comment}{\#\ Suppresses\ the\ "{}Invalid\ const\ name"{}\ lint\ complaint}}
+\DoxyCodeLine{00095\ \textcolor{comment}{\#\ pylint:\ disable-\/msg=C6409}}
+\DoxyCodeLine{00096\ }
+\DoxyCodeLine{00097\ \textcolor{comment}{\#\ Exposes\ utilities\ from\ gtest\_test\_utils.}}
+
+\end{DoxyCode}
+\Hypertarget{namespacegmock__test__utils_ae6b4256fed63c744d722ecdf0f217529}\index{gmock\_test\_utils@{gmock\_test\_utils}!GetSourceDir@{GetSourceDir}}
+\index{GetSourceDir@{GetSourceDir}!gmock\_test\_utils@{gmock\_test\_utils}}
+\doxysubsubsection{\texorpdfstring{GetSourceDir()}{GetSourceDir()}}
+{\footnotesize\ttfamily \label{namespacegmock__test__utils_ae6b4256fed63c744d722ecdf0f217529} 
+gmock\+\_\+test\+\_\+utils.\+Get\+Source\+Dir (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Returns the absolute path of the directory where the .py files are.\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{gmock__test__utils_8py_source_l00052}{52}} of file \mbox{\hyperlink{gmock__test__utils_8py_source}{gmock\+\_\+test\+\_\+utils.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00052\ \textcolor{keyword}{def\ }GetSourceDir():}
+\DoxyCodeLine{00053\ \ \ \textcolor{stringliteral}{"{}"{}"{}Returns\ the\ absolute\ path\ of\ the\ directory\ where\ the\ .py\ files\ are."{}"{}"{}}}
+\DoxyCodeLine{00054\ }
+\DoxyCodeLine{00055\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacegtest__test__utils_a421b9a63583bf21c794957a3face367b}{gtest\_test\_utils.GetSourceDir}}()}
+\DoxyCodeLine{00056\ }
+\DoxyCodeLine{00057\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacegmock__test__utils_ae6b4256fed63c744d722ecdf0f217529_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacegmock__test__utils_a3965eb0947849f247899f6edff7051f7}\index{gmock\_test\_utils@{gmock\_test\_utils}!GetTestExecutablePath@{GetTestExecutablePath}}
+\index{GetTestExecutablePath@{GetTestExecutablePath}!gmock\_test\_utils@{gmock\_test\_utils}}
+\doxysubsubsection{\texorpdfstring{GetTestExecutablePath()}{GetTestExecutablePath()}}
+{\footnotesize\ttfamily \label{namespacegmock__test__utils_a3965eb0947849f247899f6edff7051f7} 
+gmock\+\_\+test\+\_\+utils.\+Get\+Test\+Executable\+Path (\begin{DoxyParamCaption}\item[{}]{executable\+\_\+name}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Returns the absolute path of the test binary given its name.
+
+The function will print a message and abort the program if the resulting file
+doesn't exist.
+
+Args:
+  executable_name: name of the test binary that the test script runs.
+
+Returns:
+  The absolute path of the test binary.
+\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{gmock__test__utils_8py_source_l00058}{58}} of file \mbox{\hyperlink{gmock__test__utils_8py_source}{gmock\+\_\+test\+\_\+utils.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00058\ \textcolor{keyword}{def\ }GetTestExecutablePath(executable\_name):}
+\DoxyCodeLine{00059\ \ \ \textcolor{stringliteral}{"{}"{}"{}Returns\ the\ absolute\ path\ of\ the\ test\ binary\ given\ its\ name.}}
+\DoxyCodeLine{00060\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00061\ \textcolor{stringliteral}{\ \ The\ function\ will\ print\ a\ message\ and\ abort\ the\ program\ if\ the\ resulting\ file}}
+\DoxyCodeLine{00062\ \textcolor{stringliteral}{\ \ doesn't\ exist.}}
+\DoxyCodeLine{00063\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00064\ \textcolor{stringliteral}{\ \ Args:}}
+\DoxyCodeLine{00065\ \textcolor{stringliteral}{\ \ \ \ executable\_name:\ name\ of\ the\ test\ binary\ that\ the\ test\ script\ runs.}}
+\DoxyCodeLine{00066\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00067\ \textcolor{stringliteral}{\ \ Returns:}}
+\DoxyCodeLine{00068\ \textcolor{stringliteral}{\ \ \ \ The\ absolute\ path\ of\ the\ test\ binary.}}
+\DoxyCodeLine{00069\ \textcolor{stringliteral}{\ \ "{}"{}"{}}}
+\DoxyCodeLine{00070\ }
+\DoxyCodeLine{00071\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacegtest__test__utils_a239f43ff0e44144cb5a1e14f3453c273}{gtest\_test\_utils.GetTestExecutablePath}}(executable\_name)}
+\DoxyCodeLine{00072\ }
+\DoxyCodeLine{00073\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacegmock__test__utils_a3965eb0947849f247899f6edff7051f7_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacegmock__test__utils_ab436e920b5feb62a33936b0d839702e7}\index{gmock\_test\_utils@{gmock\_test\_utils}!Main@{Main}}
+\index{Main@{Main}!gmock\_test\_utils@{gmock\_test\_utils}}
+\doxysubsubsection{\texorpdfstring{Main()}{Main()}}
+{\footnotesize\ttfamily \label{namespacegmock__test__utils_ab436e920b5feb62a33936b0d839702e7} 
+gmock\+\_\+test\+\_\+utils.\+Main (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Runs the unit test.\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{gmock__test__utils_8py_source_l00107}{107}} of file \mbox{\hyperlink{gmock__test__utils_8py_source}{gmock\+\_\+test\+\_\+utils.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00107\ \textcolor{keyword}{def\ }Main():}
+\DoxyCodeLine{00108\ \ \ \textcolor{stringliteral}{"{}"{}"{}Runs\ the\ unit\ test."{}"{}"{}}}
+\DoxyCodeLine{00109\ }
+\DoxyCodeLine{00110\ \ \ \mbox{\hyperlink{namespacegtest__test__utils_affb42cd189bf8fb9618e5b7178fd34fd}{gtest\_test\_utils.Main}}()}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacegmock__test__utils_ab436e920b5feb62a33936b0d839702e7_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacegmock__test__utils_ab436e920b5feb62a33936b0d839702e7_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{namespacegmock__test__utils_a6f0938b5e8839ebc847b52a38f4d35e3}\index{gmock\_test\_utils@{gmock\_test\_utils}!environ@{environ}}
+\index{environ@{environ}!gmock\_test\_utils@{gmock\_test\_utils}}
+\doxysubsubsection{\texorpdfstring{environ}{environ}}
+{\footnotesize\ttfamily \label{namespacegmock__test__utils_a6f0938b5e8839ebc847b52a38f4d35e3} 
+gmock\+\_\+test\+\_\+utils.\+environ = gtest\+\_\+test\+\_\+utils.\+environ}
+
+
+
+Definition at line \mbox{\hyperlink{gmock__test__utils_8py_source_l00100}{100}} of file \mbox{\hyperlink{gmock__test__utils_8py_source}{gmock\+\_\+test\+\_\+utils.\+py}}.
+
+\Hypertarget{namespacegmock__test__utils_ae7ee9324ba489b3cbd99c5e26006eba9}\index{gmock\_test\_utils@{gmock\_test\_utils}!GTEST\_TESTS\_UTIL\_DIR@{GTEST\_TESTS\_UTIL\_DIR}}
+\index{GTEST\_TESTS\_UTIL\_DIR@{GTEST\_TESTS\_UTIL\_DIR}!gmock\_test\_utils@{gmock\_test\_utils}}
+\doxysubsubsection{\texorpdfstring{GTEST\_TESTS\_UTIL\_DIR}{GTEST\_TESTS\_UTIL\_DIR}}
+{\footnotesize\ttfamily \label{namespacegmock__test__utils_ae7ee9324ba489b3cbd99c5e26006eba9} 
+gmock\+\_\+test\+\_\+utils.\+GTEST\+\_\+\+TESTS\+\_\+\+UTIL\+\_\+\+DIR = \mbox{\hyperlink{namespacegmock__test__utils_af6d94170502149e7f99cfa73ddc13c00}{gtest\+\_\+tests\+\_\+util\+\_\+dir}}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock__test__utils_8py_source_l00043}{43}} of file \mbox{\hyperlink{gmock__test__utils_8py_source}{gmock\+\_\+test\+\_\+utils.\+py}}.
+
+\Hypertarget{namespacegmock__test__utils_af6d94170502149e7f99cfa73ddc13c00}\index{gmock\_test\_utils@{gmock\_test\_utils}!gtest\_tests\_util\_dir@{gtest\_tests\_util\_dir}}
+\index{gtest\_tests\_util\_dir@{gtest\_tests\_util\_dir}!gmock\_test\_utils@{gmock\_test\_utils}}
+\doxysubsubsection{\texorpdfstring{gtest\_tests\_util\_dir}{gtest\_tests\_util\_dir}}
+{\footnotesize\ttfamily \label{namespacegmock__test__utils_af6d94170502149e7f99cfa73ddc13c00} 
+gmock\+\_\+test\+\_\+utils.\+gtest\+\_\+tests\+\_\+util\+\_\+dir = os.\+path.\+join(\mbox{\hyperlink{namespacegmock__test__utils_abbe2149e5683815a55e981fa8dde28cd}{SCRIPT\+\_\+\+DIR}}, \textquotesingle{}../../googletest/test\textquotesingle{})}
+
+
+
+Definition at line \mbox{\hyperlink{gmock__test__utils_8py_source_l00041}{41}} of file \mbox{\hyperlink{gmock__test__utils_8py_source}{gmock\+\_\+test\+\_\+utils.\+py}}.
+
+\Hypertarget{namespacegmock__test__utils_a9392c288e6da3024d65ec0bddc0d86c3}\index{gmock\_test\_utils@{gmock\_test\_utils}!PREMATURE\_EXIT\_FILE\_ENV\_VAR@{PREMATURE\_EXIT\_FILE\_ENV\_VAR}}
+\index{PREMATURE\_EXIT\_FILE\_ENV\_VAR@{PREMATURE\_EXIT\_FILE\_ENV\_VAR}!gmock\_test\_utils@{gmock\_test\_utils}}
+\doxysubsubsection{\texorpdfstring{PREMATURE\_EXIT\_FILE\_ENV\_VAR}{PREMATURE\_EXIT\_FILE\_ENV\_VAR}}
+{\footnotesize\ttfamily \label{namespacegmock__test__utils_a9392c288e6da3024d65ec0bddc0d86c3} 
+gmock\+\_\+test\+\_\+utils.\+PREMATURE\+\_\+\+EXIT\+\_\+\+FILE\+\_\+\+ENV\+\_\+\+VAR = gtest\+\_\+test\+\_\+utils.\+PREMATURE\+\_\+\+EXIT\+\_\+\+FILE\+\_\+\+ENV\+\_\+\+VAR}
+
+
+
+Definition at line \mbox{\hyperlink{gmock__test__utils_8py_source_l00102}{102}} of file \mbox{\hyperlink{gmock__test__utils_8py_source}{gmock\+\_\+test\+\_\+utils.\+py}}.
+
+\Hypertarget{namespacegmock__test__utils_abbe2149e5683815a55e981fa8dde28cd}\index{gmock\_test\_utils@{gmock\_test\_utils}!SCRIPT\_DIR@{SCRIPT\_DIR}}
+\index{SCRIPT\_DIR@{SCRIPT\_DIR}!gmock\_test\_utils@{gmock\_test\_utils}}
+\doxysubsubsection{\texorpdfstring{SCRIPT\_DIR}{SCRIPT\_DIR}}
+{\footnotesize\ttfamily \label{namespacegmock__test__utils_abbe2149e5683815a55e981fa8dde28cd} 
+str gmock\+\_\+test\+\_\+utils.\+SCRIPT\+\_\+\+DIR = os.\+path.\+dirname(\+\_\+\+\_\+file\+\_\+\+\_\+) or \textquotesingle{}.\textquotesingle{}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock__test__utils_8py_source_l00038}{38}} of file \mbox{\hyperlink{gmock__test__utils_8py_source}{gmock\+\_\+test\+\_\+utils.\+py}}.
+
+\Hypertarget{namespacegmock__test__utils_ab0c69f8ce649fdd5a17f99deedf3eb29}\index{gmock\_test\_utils@{gmock\_test\_utils}!SetEnvVar@{SetEnvVar}}
+\index{SetEnvVar@{SetEnvVar}!gmock\_test\_utils@{gmock\_test\_utils}}
+\doxysubsubsection{\texorpdfstring{SetEnvVar}{SetEnvVar}}
+{\footnotesize\ttfamily \label{namespacegmock__test__utils_ab0c69f8ce649fdd5a17f99deedf3eb29} 
+gmock\+\_\+test\+\_\+utils.\+Set\+Env\+Var = gtest\+\_\+test\+\_\+utils.\+Set\+Env\+Var}
+
+
+
+Definition at line \mbox{\hyperlink{gmock__test__utils_8py_source_l00101}{101}} of file \mbox{\hyperlink{gmock__test__utils_8py_source}{gmock\+\_\+test\+\_\+utils.\+py}}.
+
+\Hypertarget{namespacegmock__test__utils_a31a0e33565ec805d314cb0a4eb8317e6}\index{gmock\_test\_utils@{gmock\_test\_utils}!Subprocess@{Subprocess}}
+\index{Subprocess@{Subprocess}!gmock\_test\_utils@{gmock\_test\_utils}}
+\doxysubsubsection{\texorpdfstring{Subprocess}{Subprocess}}
+{\footnotesize\ttfamily \label{namespacegmock__test__utils_a31a0e33565ec805d314cb0a4eb8317e6} 
+gmock\+\_\+test\+\_\+utils.\+Subprocess = \mbox{\hyperlink{classgtest__test__utils_1_1_subprocess}{gtest\+\_\+test\+\_\+utils.\+Subprocess}}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock__test__utils_8py_source_l00098}{98}} of file \mbox{\hyperlink{gmock__test__utils_8py_source}{gmock\+\_\+test\+\_\+utils.\+py}}.
+
+\Hypertarget{namespacegmock__test__utils_a959c5af591e4d49b6d35745205b64509}\index{gmock\_test\_utils@{gmock\_test\_utils}!TestCase@{TestCase}}
+\index{TestCase@{TestCase}!gmock\_test\_utils@{gmock\_test\_utils}}
+\doxysubsubsection{\texorpdfstring{TestCase}{TestCase}}
+{\footnotesize\ttfamily \label{namespacegmock__test__utils_a959c5af591e4d49b6d35745205b64509} 
+gmock\+\_\+test\+\_\+utils.\+Test\+Case = gtest\+\_\+test\+\_\+utils.\+Test\+Case}
+
+
+
+Definition at line \mbox{\hyperlink{gmock__test__utils_8py_source_l00099}{99}} of file \mbox{\hyperlink{gmock__test__utils_8py_source}{gmock\+\_\+test\+\_\+utils.\+py}}.
+

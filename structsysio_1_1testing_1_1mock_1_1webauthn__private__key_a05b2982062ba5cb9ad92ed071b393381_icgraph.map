@@ -1,0 +1,17 @@
+<map id="sysio::testing::mock::webauthn_private_key::regenerate" name="sysio::testing::mock::webauthn_private_key::regenerate">
+<area shape="rect" id="Node000001" title=" " alt="" coords="847,40,1006,95"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1testing_1_1base__tester.html#a3a623b3d041afc92349d7f3ddb14b316" title=" " alt="" coords="637,47,799,88"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="831,70,799,70,799,65,831,65"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1testing_1_1base__tester.html#aeb7467abe9ed7ec1925f7ae8697de70d" title=" " alt="" coords="433,47,589,88"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="622,70,590,70,590,65,622,65"/>
+<area shape="rect" id="Node000004" href="$test__account__query__db_8cpp.html#a10d06a785bc9a3eea4d80f8e3a4920e0" title=" " alt="" coords="189,5,385,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="418,50,348,34,349,29,419,44"/>
+<area shape="rect" id="Node000005" href="$test__account__query__db_8cpp.html#a7ffaecdb62bd10d3bad5c6c4ac8fe8c7" title=" " alt="" coords="189,55,385,80"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="418,70,386,70,386,65,418,65"/>
+<area shape="rect" id="Node000006" href="$classsysio_1_1testing_1_1base__tester.html#a29f109c3c5e8cb67d85cf136db829a9c" title=" " alt="" coords="207,104,367,145"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="419,94,368,107,367,102,418,89"/>
+<area shape="rect" id="Node000007" href="$classsysio_1_1testing_1_1base__tester.html#a4bc45ee8335f6a9c99bfb044b07f7719" title=" " alt="" coords="5,71,141,112"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="191,113,141,105,142,99,192,107"/>
+<area shape="rect" id="Node000008" href="$classsysio_1_1testing_1_1base__tester.html#a934fa5023a748e09f2396f0e15717024" title=" " alt="" coords="5,136,141,177"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="192,142,142,149,141,144,191,136"/>
+</map>

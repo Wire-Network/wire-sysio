@@ -1,0 +1,5 @@
+<map id="fc::message_buffer::create_peek_datastream" name="fc::message_buffer::create_peek_datastream">
+<area shape="rect" id="Node000001" title=" " alt="" coords="213,5,385,46"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1connection.html#a27f41e41ebd6b4570bc19a31b4bb1fef" title="Process the next message from the pending message buffer." alt="" coords="5,5,165,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="197,28,165,28,165,23,197,23"/>
+</map>

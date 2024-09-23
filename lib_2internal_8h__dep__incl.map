@@ -1,0 +1,17 @@
+<map id="libraries/yubihsm/lib/internal.h" name="libraries/yubihsm/lib/internal.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="485,5,622,46"/>
+<area shape="rect" id="Node000002" href="$lib__util_8c.html" title=" " alt="" coords="5,94,142,135"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="470,42,322,66,154,97,142,99,141,94,153,91,322,60,469,37"/>
+<area shape="rect" id="Node000003" href="$yubihsm_8c.html" title=" " alt="" coords="165,94,302,135"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="471,52,303,97,301,92,469,47"/>
+<area shape="rect" id="Node000004" href="$yubihsm__curl_8c.html" title=" " alt="" coords="325,94,462,135"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="505,56,431,96,428,91,503,51"/>
+<area shape="rect" id="Node000005" href="$yubihsm__libusb_8c.html" title=" " alt="" coords="485,94,622,135"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="556,62,556,94,551,94,551,62"/>
+<area shape="rect" id="Node000006" href="$yubihsm__usb_8c.html" title=" " alt="" coords="645,94,782,135"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="604,51,679,91,676,96,602,56"/>
+<area shape="rect" id="Node000007" href="$yubihsm__winhttp_8c.html" title=" " alt="" coords="805,94,942,135"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="638,47,806,92,804,97,636,52"/>
+<area shape="rect" id="Node000008" href="$yubihsm__winusb_8c.html" title=" " alt="" coords="965,94,1102,135"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="638,37,785,60,954,91,966,94,965,99,953,97,785,66,637,42"/>
+</map>

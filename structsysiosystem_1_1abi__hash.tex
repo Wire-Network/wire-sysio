@@ -1,0 +1,84 @@
+\doxysection{sysiosystem\+::abi\+\_\+hash Struct Reference}
+\hypertarget{structsysiosystem_1_1abi__hash}{}\label{structsysiosystem_1_1abi__hash}\index{sysiosystem::abi\_hash@{sysiosystem::abi\_hash}}
+
+
+{\ttfamily \#include $<$native.\+hpp$>$}
+
+
+
+Collaboration diagram for sysiosystem\+::abi\+\_\+hash\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=274pt]{structsysiosystem_1_1abi__hash__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1abi__hash_a99d7ba0f277bdf0d14cf9b9a7e65dca3}{primary\+\_\+key}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \mbox{\hyperlink{structsysiosystem_1_1abi__hash_a56619a5899d3d2884f6a3e5cf9790bfe}{owner}}
+\item 
+checksum256 \mbox{\hyperlink{structsysiosystem_1_1abi__hash_a2aa5baaff3dde38c6011f4381bbceb26}{hash}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\doxylink{structsysiosystem_1_1abi__hash}{abi\+\_\+hash} is the structure underlying the abihash table and consists of\+:
+\begin{DoxyItemize}
+\item {\ttfamily owner}\+: the account owner of the contract\textquotesingle{}s abi
+\item {\ttfamily hash}\+: is the sha256 hash of the abi/binary 
+\end{DoxyItemize}
+
+Definition at line \mbox{\hyperlink{native_8hpp_source_l00114}{114}} of file \mbox{\hyperlink{native_8hpp_source}{native.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysiosystem_1_1abi__hash_a99d7ba0f277bdf0d14cf9b9a7e65dca3}\index{sysiosystem::abi\_hash@{sysiosystem::abi\_hash}!primary\_key@{primary\_key}}
+\index{primary\_key@{primary\_key}!sysiosystem::abi\_hash@{sysiosystem::abi\_hash}}
+\doxysubsubsection{\texorpdfstring{primary\_key()}{primary\_key()}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1abi__hash_a99d7ba0f277bdf0d14cf9b9a7e65dca3} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} sysiosystem\+::abi\+\_\+hash\+::primary\+\_\+key (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{native_8hpp_source_l00117}{117}} of file \mbox{\hyperlink{native_8hpp_source}{native.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00117\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysiosystem_1_1abi__hash_a56619a5899d3d2884f6a3e5cf9790bfe}{owner}}.value;\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysiosystem_1_1abi__hash_a2aa5baaff3dde38c6011f4381bbceb26}\index{sysiosystem::abi\_hash@{sysiosystem::abi\_hash}!hash@{hash}}
+\index{hash@{hash}!sysiosystem::abi\_hash@{sysiosystem::abi\_hash}}
+\doxysubsubsection{\texorpdfstring{hash}{hash}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1abi__hash_a2aa5baaff3dde38c6011f4381bbceb26} 
+checksum256 sysiosystem\+::abi\+\_\+hash\+::hash}
+
+
+
+Definition at line \mbox{\hyperlink{native_8hpp_source_l00116}{116}} of file \mbox{\hyperlink{native_8hpp_source}{native.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1abi__hash_a56619a5899d3d2884f6a3e5cf9790bfe}\index{sysiosystem::abi\_hash@{sysiosystem::abi\_hash}!owner@{owner}}
+\index{owner@{owner}!sysiosystem::abi\_hash@{sysiosystem::abi\_hash}}
+\doxysubsubsection{\texorpdfstring{owner}{owner}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1abi__hash_a56619a5899d3d2884f6a3e5cf9790bfe} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} sysiosystem\+::abi\+\_\+hash\+::owner}
+
+
+
+Definition at line \mbox{\hyperlink{native_8hpp_source_l00115}{115}} of file \mbox{\hyperlink{native_8hpp_source}{native.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/svetlasyrimis/\+Desktop/wire-\/network/\+WN-\/org/wire-\/system-\/contracts/contracts/sysio.\+system/include/sysio.\+system/\mbox{\hyperlink{native_8hpp}{native.\+hpp}}\end{DoxyCompactItemize}

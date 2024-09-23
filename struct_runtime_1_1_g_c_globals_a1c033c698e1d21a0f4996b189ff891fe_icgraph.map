@@ -1,0 +1,9 @@
+<map id="Runtime::GCGlobals::get" name="Runtime::GCGlobals::get">
+<area shape="rect" id="Node000001" title=" " alt="" coords="232,78,400,104"/>
+<area shape="rect" id="Node000002" href="$namespace_runtime.html#a99e85ba1e74372d2f08a062072d4db26" title=" " alt="" coords="5,5,184,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="254,76,165,49,167,44,256,71"/>
+<area shape="rect" id="Node000003" href="$struct_runtime_1_1_g_c_object.html#ad61fa15a80d09b18aa1e8f80b1338467" title=" " alt="" coords="22,71,167,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="216,94,167,94,167,88,216,88"/>
+<area shape="rect" id="Node000004" href="$struct_runtime_1_1_g_c_object.html#a87fe6580879c9e158d151219dfe6999e" title=" " alt="" coords="22,136,167,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="256,111,167,138,165,133,254,106"/>
+</map>

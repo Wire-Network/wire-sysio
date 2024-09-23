@@ -1,0 +1,9 @@
+<map id="Catch::Capturer::Capturer" name="Catch::Capturer::Capturer">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,178,56"/>
+<area shape="rect" id="Node000002" href="$class_catch_1_1_string_ref.html#ae084d72cb2952cee61a63ef36611d0ad" title=" " alt="" coords="232,5,383,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="178,31,216,26,216,31,179,36"/>
+<area shape="rect" id="Node000003" href="$class_catch_1_1_string_ref.html#a248568b467cf6599320903ae613c8eee" title=" " alt="" coords="226,55,389,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="179,50,210,54,209,59,178,56"/>
+<area shape="rect" id="Node000004" href="$document_8h.html#aa6b9fd9f6aa49405a574c362ba9af6b5" title="Mark a character pointer as constant string." alt="" coords="437,55,513,80"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="389,65,421,65,421,70,389,70"/>
+</map>

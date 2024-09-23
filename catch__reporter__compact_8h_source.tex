@@ -1,0 +1,47 @@
+\doxysection{catch\+\_\+reporter\+\_\+compact.\+h}
+\hypertarget{catch__reporter__compact_8h_source}{}\label{catch__reporter__compact_8h_source}\index{libraries/sys-\/vm/external/Catch2/include/reporters/catch\_reporter\_compact.h@{libraries/sys-\/vm/external/Catch2/include/reporters/catch\_reporter\_compact.h}}
+\mbox{\hyperlink{catch__reporter__compact_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{catch__reporter__compact_8h_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__compact_8h_source_l00002}00002\ \textcolor{comment}{\ *\ \ Created\ by\ Martin\ Moene\ on\ 2013-\/12-\/05.}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__compact_8h_source_l00003}00003\ \textcolor{comment}{\ *\ \ Copyright\ 2012\ Martin\ Moene.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__compact_8h_source_l00004}00004\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__compact_8h_source_l00005}00005\ \textcolor{comment}{\ *\ \ Distributed\ under\ the\ Boost\ Software\ License,\ Version\ 1.0.\ (See\ accompanying}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__compact_8h_source_l00006}00006\ \textcolor{comment}{\ *\ \ file\ LICENSE\_1\_0.txt\ or\ copy\ at\ http://www.boost.org/LICENSE\_1\_0.txt)}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__compact_8h_source_l00007}00007\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__compact_8h_source_l00008}00008\ \textcolor{preprocessor}{\#ifndef\ TWOBLUECUBES\_CATCH\_REPORTER\_COMPACT\_H\_INCLUDED}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__compact_8h_source_l00009}00009\ \textcolor{preprocessor}{\#define\ TWOBLUECUBES\_CATCH\_REPORTER\_COMPACT\_H\_INCLUDED}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__compact_8h_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__compact_8h_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__compact_8h_source_l00012}00012\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__reporter__bases_8hpp}{catch\_reporter\_bases.hpp}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__compact_8h_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__compact_8h_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__compact_8h_source_l00015}00015\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__reporter__compact_8h_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__compact_8h_source_l00017}\mbox{\hyperlink{struct_catch_1_1_compact_reporter}{00017}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_catch_1_1_compact_reporter}{CompactReporter}}\ :\ \mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base}{StreamingReporterBase}}<CompactReporter>\ \{}
+\DoxyCodeLine{\Hypertarget{catch__reporter__compact_8h_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__compact_8h_source_l00019}00019\ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{struct_catch_1_1_streaming_reporter_base_aa92dc1c46e7ec51639bedac214dba74a}{StreamingReporterBase::StreamingReporterBase}};}
+\DoxyCodeLine{\Hypertarget{catch__reporter__compact_8h_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__compact_8h_source_l00021}00021\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_compact_reporter_a8f2d143ac7e3a04f607554e363f4fed8}{\string~CompactReporter}}()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{catch__reporter__compact_8h_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__compact_8h_source_l00023}00023\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ std::string\ \mbox{\hyperlink{struct_catch_1_1_compact_reporter_a0e5f36504094ad1306e1a6cf148681c1}{getDescription}}();}
+\DoxyCodeLine{\Hypertarget{catch__reporter__compact_8h_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__compact_8h_source_l00025}00025\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_reporter_preferences}{ReporterPreferences}}\ \mbox{\hyperlink{struct_catch_1_1_compact_reporter_a8b07aa14b5f505993379808f42b0f25a}{getPreferences}}()\ \textcolor{keyword}{const\ override};}
+\DoxyCodeLine{\Hypertarget{catch__reporter__compact_8h_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__compact_8h_source_l00027}00027\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_catch_1_1_compact_reporter_a09320273bd7540b02443887306db30b8}{noMatchingTestCases}}(std::string\ \textcolor{keyword}{const}\&\ spec)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{catch__reporter__compact_8h_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__compact_8h_source_l00029}00029\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_catch_1_1_compact_reporter_a21024f34ea5465118a6432cf75f618ee}{assertionStarting}}(\mbox{\hyperlink{struct_catch_1_1_assertion_info}{AssertionInfo}}\ \textcolor{keyword}{const}\&)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{catch__reporter__compact_8h_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__compact_8h_source_l00031}00031\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_catch_1_1_compact_reporter_af47435648ace91a6482b18b0fda87f01}{assertionEnded}}(\mbox{\hyperlink{struct_catch_1_1_assertion_stats}{AssertionStats}}\ \textcolor{keyword}{const}\&\ \_assertionStats)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{catch__reporter__compact_8h_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__compact_8h_source_l00033}00033\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_catch_1_1_compact_reporter_a7e19f270f40f428470eb89a826fb07a1}{sectionEnded}}(\mbox{\hyperlink{struct_catch_1_1_section_stats}{SectionStats}}\ \textcolor{keyword}{const}\&\ \_sectionStats)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{catch__reporter__compact_8h_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__compact_8h_source_l00035}00035\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_catch_1_1_compact_reporter_abf31540bf74013cb7736f28291712d53}{testRunEnded}}(\mbox{\hyperlink{struct_catch_1_1_test_run_stats}{TestRunStats}}\ \textcolor{keyword}{const}\&\ \_testRunStats)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{catch__reporter__compact_8h_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__compact_8h_source_l00037}00037\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{catch__reporter__compact_8h_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__compact_8h_source_l00039}00039\ \}\ \textcolor{comment}{//\ end\ namespace\ Catch}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__compact_8h_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__compact_8h_source_l00041}00041\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ TWOBLUECUBES\_CATCH\_REPORTER\_COMPACT\_H\_INCLUDED}}
+
+\end{DoxyCode}

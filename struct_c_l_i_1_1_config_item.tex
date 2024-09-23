@@ -1,0 +1,130 @@
+\doxysection{CLI\+::Config\+Item Struct Reference}
+\hypertarget{struct_c_l_i_1_1_config_item}{}\label{struct_c_l_i_1_1_config_item}\index{CLI::ConfigItem@{CLI::ConfigItem}}
+
+
+Holds values to load into Options.  
+
+
+
+
+{\ttfamily \#include $<$CLI11.\+hpp$>$}
+
+
+
+Collaboration diagram for CLI\+::Config\+Item\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=166pt]{struct_c_l_i_1_1_config_item__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+std\+::string \mbox{\hyperlink{struct_c_l_i_1_1_config_item_af76892225a187445bced0d220ae9e52b}{fullname}} () const
+\begin{DoxyCompactList}\small\item\em The list of parents and name joined by "{}."{}. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::vector$<$ std\+::string $>$ \mbox{\hyperlink{struct_c_l_i_1_1_config_item_ae6e0262b6c756e5e662b608613927ccc}{parents}} \{\}
+\begin{DoxyCompactList}\small\item\em This is the list of parents. \end{DoxyCompactList}\item 
+std\+::string \mbox{\hyperlink{struct_c_l_i_1_1_config_item_aaf499b8c32cef0f5c8d7271fa0d10b93}{name}} \{\}
+\begin{DoxyCompactList}\small\item\em This is the name. \end{DoxyCompactList}\item 
+std\+::vector$<$ std\+::string $>$ \mbox{\hyperlink{struct_c_l_i_1_1_config_item_a201384703e6509d14bc28de3ef2a2cbc}{inputs}} \{\}
+\begin{DoxyCompactList}\small\item\em Listing of inputs. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l01963}{1963}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_c_l_i_1_1_config_item_af76892225a187445bced0d220ae9e52b}\index{CLI::ConfigItem@{CLI::ConfigItem}!fullname@{fullname}}
+\index{fullname@{fullname}!CLI::ConfigItem@{CLI::ConfigItem}}
+\doxysubsubsection{\texorpdfstring{fullname()}{fullname()}}
+{\footnotesize\ttfamily \label{struct_c_l_i_1_1_config_item_af76892225a187445bced0d220ae9e52b} 
+std\+::string CLI\+::\+Config\+Item\+::fullname (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l01974}{1974}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01974\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01975\ \ \ \ \ \ \ \ \ std::vector<std::string>\ tmp\ =\ \mbox{\hyperlink{struct_c_l_i_1_1_config_item_ae6e0262b6c756e5e662b608613927ccc}{parents}};}
+\DoxyCodeLine{01976\ \ \ \ \ \ \ \ \ tmp.emplace\_back(\mbox{\hyperlink{struct_c_l_i_1_1_config_item_aaf499b8c32cef0f5c8d7271fa0d10b93}{name}});}
+\DoxyCodeLine{01977\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ab351f13ec104e2cba19ec6baf4a552f6}{detail::join}}(tmp,\ \textcolor{stringliteral}{"{}."{}});}
+\DoxyCodeLine{01978\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=327pt]{struct_c_l_i_1_1_config_item_af76892225a187445bced0d220ae9e52b_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_c_l_i_1_1_config_item_af76892225a187445bced0d220ae9e52b_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_c_l_i_1_1_config_item_a201384703e6509d14bc28de3ef2a2cbc}\index{CLI::ConfigItem@{CLI::ConfigItem}!inputs@{inputs}}
+\index{inputs@{inputs}!CLI::ConfigItem@{CLI::ConfigItem}}
+\doxysubsubsection{\texorpdfstring{inputs}{inputs}}
+{\footnotesize\ttfamily \label{struct_c_l_i_1_1_config_item_a201384703e6509d14bc28de3ef2a2cbc} 
+std\+::vector$<$std\+::string$>$ CLI\+::\+Config\+Item\+::inputs \{\}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l01971}{1971}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01971\ \{\};}
+
+\end{DoxyCode}
+\Hypertarget{struct_c_l_i_1_1_config_item_aaf499b8c32cef0f5c8d7271fa0d10b93}\index{CLI::ConfigItem@{CLI::ConfigItem}!name@{name}}
+\index{name@{name}!CLI::ConfigItem@{CLI::ConfigItem}}
+\doxysubsubsection{\texorpdfstring{name}{name}}
+{\footnotesize\ttfamily \label{struct_c_l_i_1_1_config_item_aaf499b8c32cef0f5c8d7271fa0d10b93} 
+std\+::string CLI\+::\+Config\+Item\+::name \{\}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l01968}{1968}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01968\ \{\};}
+
+\end{DoxyCode}
+\Hypertarget{struct_c_l_i_1_1_config_item_ae6e0262b6c756e5e662b608613927ccc}\index{CLI::ConfigItem@{CLI::ConfigItem}!parents@{parents}}
+\index{parents@{parents}!CLI::ConfigItem@{CLI::ConfigItem}}
+\doxysubsubsection{\texorpdfstring{parents}{parents}}
+{\footnotesize\ttfamily \label{struct_c_l_i_1_1_config_item_ae6e0262b6c756e5e662b608613927ccc} 
+std\+::vector$<$std\+::string$>$ CLI\+::\+Config\+Item\+::parents \{\}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l01965}{1965}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01965\ \{\};}
+
+\end{DoxyCode}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+programs/clio/\mbox{\hyperlink{_c_l_i11_8hpp}{CLI11.\+hpp}}\end{DoxyCompactItemize}

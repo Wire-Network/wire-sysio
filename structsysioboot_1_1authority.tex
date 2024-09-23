@@ -1,0 +1,80 @@
+\doxysection{sysioboot\+::authority Struct Reference}
+\hypertarget{structsysioboot_1_1authority}{}\label{structsysioboot_1_1authority}\index{sysioboot::authority@{sysioboot::authority}}
+
+
+{\ttfamily \#include $<$sysio.\+boot.\+hpp$>$}
+
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysioboot_1_1authority_ad60d34de50e2c00abe2f6894dede3eeb}{threshold}} = 0
+\item 
+std\+::vector$<$ \mbox{\hyperlink{structsysioboot_1_1key__weight}{key\+\_\+weight}} $>$ \mbox{\hyperlink{structsysioboot_1_1authority_ab5b51f2b2abb8633f8de0cc7b3f923a5}{keys}}
+\item 
+std\+::vector$<$ \mbox{\hyperlink{structsysioboot_1_1permission__level__weight}{permission\+\_\+level\+\_\+weight}} $>$ \mbox{\hyperlink{structsysioboot_1_1authority_af4e455f05f06515007c6b606bf23011f}{accounts}}
+\item 
+std\+::vector$<$ \mbox{\hyperlink{structsysioboot_1_1wait__weight}{wait\+\_\+weight}} $>$ \mbox{\hyperlink{structsysioboot_1_1authority_a657cce7bf6259e1028d9659983a64136}{waits}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Blockchain authority.
+
+An authority is defined by\+:
+\begin{DoxyItemize}
+\item a vector of key\+\_\+weights (a \doxylink{structsysioboot_1_1key__weight}{key\+\_\+weight} is a public key plus a weight),
+\item a vector of permission\+\_\+level\+\_\+weights, (a permission\+\_\+level is an account name plus a permission name)
+\item a vector of wait\+\_\+weights (a \doxylink{structsysioboot_1_1wait__weight}{wait\+\_\+weight} is defined by a number of seconds to wait and a weight)
+\item a threshold value 
+\end{DoxyItemize}
+
+Definition at line \mbox{\hyperlink{sysio_8boot_8hpp_source_l00067}{67}} of file \mbox{\hyperlink{sysio_8boot_8hpp_source}{sysio.\+boot.\+hpp}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysioboot_1_1authority_af4e455f05f06515007c6b606bf23011f}\index{sysioboot::authority@{sysioboot::authority}!accounts@{accounts}}
+\index{accounts@{accounts}!sysioboot::authority@{sysioboot::authority}}
+\doxysubsubsection{\texorpdfstring{accounts}{accounts}}
+{\footnotesize\ttfamily \label{structsysioboot_1_1authority_af4e455f05f06515007c6b606bf23011f} 
+std\+::vector$<$\mbox{\hyperlink{structsysioboot_1_1permission__level__weight}{permission\+\_\+level\+\_\+weight}}$>$ sysioboot\+::authority\+::accounts}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8boot_8hpp_source_l00070}{70}} of file \mbox{\hyperlink{sysio_8boot_8hpp_source}{sysio.\+boot.\+hpp}}.
+
+\Hypertarget{structsysioboot_1_1authority_ab5b51f2b2abb8633f8de0cc7b3f923a5}\index{sysioboot::authority@{sysioboot::authority}!keys@{keys}}
+\index{keys@{keys}!sysioboot::authority@{sysioboot::authority}}
+\doxysubsubsection{\texorpdfstring{keys}{keys}}
+{\footnotesize\ttfamily \label{structsysioboot_1_1authority_ab5b51f2b2abb8633f8de0cc7b3f923a5} 
+std\+::vector$<$\mbox{\hyperlink{structsysioboot_1_1key__weight}{key\+\_\+weight}}$>$ sysioboot\+::authority\+::keys}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8boot_8hpp_source_l00069}{69}} of file \mbox{\hyperlink{sysio_8boot_8hpp_source}{sysio.\+boot.\+hpp}}.
+
+\Hypertarget{structsysioboot_1_1authority_ad60d34de50e2c00abe2f6894dede3eeb}\index{sysioboot::authority@{sysioboot::authority}!threshold@{threshold}}
+\index{threshold@{threshold}!sysioboot::authority@{sysioboot::authority}}
+\doxysubsubsection{\texorpdfstring{threshold}{threshold}}
+{\footnotesize\ttfamily \label{structsysioboot_1_1authority_ad60d34de50e2c00abe2f6894dede3eeb} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysioboot\+::authority\+::threshold = 0}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8boot_8hpp_source_l00068}{68}} of file \mbox{\hyperlink{sysio_8boot_8hpp_source}{sysio.\+boot.\+hpp}}.
+
+\Hypertarget{structsysioboot_1_1authority_a657cce7bf6259e1028d9659983a64136}\index{sysioboot::authority@{sysioboot::authority}!waits@{waits}}
+\index{waits@{waits}!sysioboot::authority@{sysioboot::authority}}
+\doxysubsubsection{\texorpdfstring{waits}{waits}}
+{\footnotesize\ttfamily \label{structsysioboot_1_1authority_a657cce7bf6259e1028d9659983a64136} 
+std\+::vector$<$\mbox{\hyperlink{structsysioboot_1_1wait__weight}{wait\+\_\+weight}}$>$ sysioboot\+::authority\+::waits}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8boot_8hpp_source_l00071}{71}} of file \mbox{\hyperlink{sysio_8boot_8hpp_source}{sysio.\+boot.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/svetlasyrimis/\+Desktop/wire-\/network/\+WN-\/org/wire-\/system-\/contracts/contracts/sysio.\+boot/include/sysio.\+boot/\mbox{\hyperlink{sysio_8boot_8hpp}{sysio.\+boot.\+hpp}}\end{DoxyCompactItemize}

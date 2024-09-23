@@ -1,0 +1,120 @@
+\doxysection{fc\+::detail\+::callback\+\_\+functor\texorpdfstring{$<$}{<} Signature \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classfc_1_1detail_1_1callback__functor}{}\label{classfc_1_1detail_1_1callback__functor}\index{fc::detail::callback\_functor$<$ Signature $>$@{fc::detail::callback\_functor$<$ Signature $>$}}
+
+
+{\ttfamily \#include $<$api\+\_\+connection.\+hpp$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef std\+::function$<$ Signature $>$\+::result\+\_\+type \mbox{\hyperlink{classfc_1_1detail_1_1callback__functor_addd11b366d5960167430c3c662bb82e9}{result\+\_\+type}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1detail_1_1callback__functor_a09d6a1f18c31718fb4300dd3efbe6cc1}{callback\+\_\+functor}} (std\+::weak\+\_\+ptr$<$ \mbox{\hyperlink{classfc_1_1api__connection}{fc\+::api\+\_\+connection}} $>$ con, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{code__cache_8cpp_aa0efefe21f4700d78692edc823e763be}{id}})
+\item 
+{\footnotesize template$<$typename... Args$>$ }\\\mbox{\hyperlink{classfc_1_1detail_1_1callback__functor_addd11b366d5960167430c3c662bb82e9}{result\+\_\+type}} \mbox{\hyperlink{classfc_1_1detail_1_1callback__functor_ad5b8e454d89e73b403deddca38dd48b8}{operator()}} (Args... args) const
+\item 
+\mbox{\hyperlink{classfc_1_1detail_1_1callback__functor_a612e06b1d7ad5f3e9be1c7e93bf7fff8}{callback\+\_\+functor}} (std\+::weak\+\_\+ptr$<$ \mbox{\hyperlink{classfc_1_1binary__api__connection}{fc\+::binary\+\_\+api\+\_\+connection}} $>$ con, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{code__cache_8cpp_aa0efefe21f4700d78692edc823e763be}{id}})
+\item 
+{\footnotesize template$<$typename... Args$>$ }\\\mbox{\hyperlink{classfc_1_1detail_1_1callback__functor_addd11b366d5960167430c3c662bb82e9}{result\+\_\+type}} \mbox{\hyperlink{classfc_1_1detail_1_1callback__functor_a7030192763b93bc9635702da777aa46d}{operator()}} (Args... args) const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Signature$>$\newline
+class fc\+::detail\+::callback\+\_\+functor$<$ Signature $>$}
+
+
+Definition at line \mbox{\hyperlink{binary__api__connection_8hpp_source_l00017}{17}} of file \mbox{\hyperlink{binary__api__connection_8hpp_source}{binary\+\_\+api\+\_\+connection.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classfc_1_1detail_1_1callback__functor_addd11b366d5960167430c3c662bb82e9}\index{fc::detail::callback\_functor$<$ Signature $>$@{fc::detail::callback\_functor$<$ Signature $>$}!result\_type@{result\_type}}
+\index{result\_type@{result\_type}!fc::detail::callback\_functor$<$ Signature $>$@{fc::detail::callback\_functor$<$ Signature $>$}}
+\doxysubsubsection{\texorpdfstring{result\_type}{result\_type}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1callback__functor_addd11b366d5960167430c3c662bb82e9} 
+template$<$typename Signature $>$ \\
+typedef std\+::function$<$ Signature $>$\+::result\+\_\+type \mbox{\hyperlink{classfc_1_1detail_1_1callback__functor}{fc\+::detail\+::callback\+\_\+functor}}$<$ Signature $>$\+::result\+\_\+type}
+
+
+
+Definition at line \mbox{\hyperlink{api__connection_8hpp_source_l00019}{19}} of file \mbox{\hyperlink{api__connection_8hpp_source}{api\+\_\+connection.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1detail_1_1callback__functor_a09d6a1f18c31718fb4300dd3efbe6cc1}\index{fc::detail::callback\_functor$<$ Signature $>$@{fc::detail::callback\_functor$<$ Signature $>$}!callback\_functor@{callback\_functor}}
+\index{callback\_functor@{callback\_functor}!fc::detail::callback\_functor$<$ Signature $>$@{fc::detail::callback\_functor$<$ Signature $>$}}
+\doxysubsubsection{\texorpdfstring{callback\_functor()}{callback\_functor()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1callback__functor_a09d6a1f18c31718fb4300dd3efbe6cc1} 
+template$<$typename Signature $>$ \\
+\mbox{\hyperlink{classfc_1_1detail_1_1callback__functor}{fc\+::detail\+::callback\+\_\+functor}}$<$ Signature $>$\+::callback\+\_\+functor (\begin{DoxyParamCaption}\item[{std\+::weak\+\_\+ptr$<$ \mbox{\hyperlink{classfc_1_1api__connection}{fc\+::api\+\_\+connection}} $>$}]{con}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{id}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{api__connection_8hpp_source_l00021}{21}} of file \mbox{\hyperlink{api__connection_8hpp_source}{api\+\_\+connection.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \ \ \ \ :\_callback\_id(\textcolor{keywordtype}{id}),\_api\_connection(con)\{\}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1detail_1_1callback__functor_a612e06b1d7ad5f3e9be1c7e93bf7fff8}\index{fc::detail::callback\_functor$<$ Signature $>$@{fc::detail::callback\_functor$<$ Signature $>$}!callback\_functor@{callback\_functor}}
+\index{callback\_functor@{callback\_functor}!fc::detail::callback\_functor$<$ Signature $>$@{fc::detail::callback\_functor$<$ Signature $>$}}
+\doxysubsubsection{\texorpdfstring{callback\_functor()}{callback\_functor()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1callback__functor_a612e06b1d7ad5f3e9be1c7e93bf7fff8} 
+template$<$typename Signature $>$ \\
+\mbox{\hyperlink{classfc_1_1detail_1_1callback__functor}{fc\+::detail\+::callback\+\_\+functor}}$<$ Signature $>$\+::callback\+\_\+functor (\begin{DoxyParamCaption}\item[{std\+::weak\+\_\+ptr$<$ \mbox{\hyperlink{classfc_1_1binary__api__connection}{fc\+::binary\+\_\+api\+\_\+connection}} $>$}]{con}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{id}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{binary__api__connection_8hpp_source_l00022}{22}} of file \mbox{\hyperlink{binary__api__connection_8hpp_source}{binary\+\_\+api\+\_\+connection.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \ \ \ \ :\_callback\_id(\textcolor{keywordtype}{id}),\_binary\_api\_connection(con)\{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1detail_1_1callback__functor_ad5b8e454d89e73b403deddca38dd48b8}\index{fc::detail::callback\_functor$<$ Signature $>$@{fc::detail::callback\_functor$<$ Signature $>$}!operator()@{operator()}}
+\index{operator()@{operator()}!fc::detail::callback\_functor$<$ Signature $>$@{fc::detail::callback\_functor$<$ Signature $>$}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1callback__functor_ad5b8e454d89e73b403deddca38dd48b8} 
+template$<$typename Signature $>$ \\
+template$<$typename... Args$>$ \\
+\mbox{\hyperlink{classfc_1_1detail_1_1callback__functor}{callback\+\_\+functor}}$<$ Signature $>$\mbox{\hyperlink{classfc_1_1detail_1_1callback__functor_addd11b366d5960167430c3c662bb82e9}{\+::result\+\_\+type}} \mbox{\hyperlink{classfc_1_1detail_1_1callback__functor}{fc\+::detail\+::callback\+\_\+functor}}$<$ Signature $>$\+::operator() (\begin{DoxyParamCaption}\item[{Args...}]{args}{}\end{DoxyParamCaption}) const}
+
+TODO-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\texorpdfstring{$>$}{>}\texorpdfstring{$>$}{>}\texorpdfstring{$>$}{>} pack args...
+
+Definition at line \mbox{\hyperlink{api__connection_8hpp_source_l00482}{482}} of file \mbox{\hyperlink{api__connection_8hpp_source}{api\+\_\+connection.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00483\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00484\ \ \ \ \ \ \ \ \ \ std::shared\_ptr<\ fc::api\_connection\ >\ locked\ =\ \_api\_connection.lock();}
+\DoxyCodeLine{00485\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ TODO:\ \ make\ new\ exception\ type\ for\ this\ instead\ of\ recycling\ eof\_exception}}
+\DoxyCodeLine{00486\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !locked\ )}
+\DoxyCodeLine{00487\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ fc::eof\_exception();}
+\DoxyCodeLine{00488\ \ \ \ \ \ \ \ \ \ locked-\/>send\_callback(\ \_callback\_id,\ \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{fc::variants}}\{\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}...\ \}\ ).\textcolor{keyword}{template}\ as<\ result\_type\ >();}
+\DoxyCodeLine{00489\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1detail_1_1callback__functor_a7030192763b93bc9635702da777aa46d}\index{fc::detail::callback\_functor$<$ Signature $>$@{fc::detail::callback\_functor$<$ Signature $>$}!operator()@{operator()}}
+\index{operator()@{operator()}!fc::detail::callback\_functor$<$ Signature $>$@{fc::detail::callback\_functor$<$ Signature $>$}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1callback__functor_a7030192763b93bc9635702da777aa46d} 
+template$<$typename Signature $>$ \\
+template$<$typename... Args$>$ \\
+\mbox{\hyperlink{classfc_1_1detail_1_1callback__functor_addd11b366d5960167430c3c662bb82e9}{result\+\_\+type}} \mbox{\hyperlink{classfc_1_1detail_1_1callback__functor}{fc\+::detail\+::callback\+\_\+functor}}$<$ Signature $>$\+::operator() (\begin{DoxyParamCaption}\item[{Args...}]{args}{}\end{DoxyParamCaption}) const}
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/rpc/\mbox{\hyperlink{api__connection_8hpp}{api\+\_\+connection.\+hpp}}\item 
+libraries/fc/include/fc/rpc/\mbox{\hyperlink{binary__api__connection_8hpp}{binary\+\_\+api\+\_\+connection.\+hpp}}\end{DoxyCompactItemize}

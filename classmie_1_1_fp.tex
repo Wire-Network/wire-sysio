@@ -1,0 +1,1353 @@
+\doxysection{mie\+::Fp Class Reference}
+\hypertarget{classmie_1_1_fp}{}\label{classmie_1_1_fp}\index{mie::Fp@{mie::Fp}}
+
+
+{\ttfamily \#include $<$zm2.\+h$>$}
+
+
+
+Inheritance diagram for mie\+::Fp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classmie_1_1_fp__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for mie\+::Fp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classmie_1_1_fp__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structmie_1_1_fp_1_1_dbl}{Dbl}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \{ \mbox{\hyperlink{classmie_1_1_fp_a7f7bd1ab1f6bb723e42dd7c83be3e2c3a22268e7961142f7fb9e3bc2db0a6cf30}{N}} = 32 / sizeof(Unit)
+ \}
+\item 
+typedef \mbox{\hyperlink{namespacemie_a56ce7f54476ac398f450a858f9b741c4}{mie\+::\+Unit}} \mbox{\hyperlink{classmie_1_1_fp_a258222c4e4569e2ee13d54a14974df64}{value\+\_\+type}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classmie_1_1_fp_a109a598bd5f77439db37c3981d212c06}{Fp}} ()
+\item 
+\mbox{\hyperlink{zm_8h_af05b4159bde6d4782da7bf7d42626e92}{MIE\+\_\+\+FORCE\+\_\+\+INLINE}} \mbox{\hyperlink{classmie_1_1_fp_a1d69d805cfb7f46e7d85c095f62fbec5}{Fp}} (int x)
+\item 
+\mbox{\hyperlink{zm_8h_af05b4159bde6d4782da7bf7d42626e92}{MIE\+\_\+\+FORCE\+\_\+\+INLINE}} \mbox{\hyperlink{classmie_1_1_fp_a685f5ef4c5b0eb19c6f8d867f7e78a34}{Fp}} (const std\+::string \&str)
+\item 
+\mbox{\hyperlink{zm_8h_af05b4159bde6d4782da7bf7d42626e92}{MIE\+\_\+\+FORCE\+\_\+\+INLINE}} \mbox{\hyperlink{classmie_1_1_fp_a3839701591acc55bba17a0ba11b478b8}{Fp}} (const \mbox{\hyperlink{namespacemie_a56ce7f54476ac398f450a858f9b741c4}{mie\+::\+Unit}} \texorpdfstring{$\ast$}{*}x)
+\item 
+\mbox{\hyperlink{classmie_1_1_fp_ae12665901631afe6d44416e95a9704f6}{Fp}} (const \mbox{\hyperlink{namespacemie_ac62ddfee233ba71d08dc91a1924d4b74}{mie\+::\+Vuint}} \&rhs)
+\item 
+void \mbox{\hyperlink{classmie_1_1_fp_a6628ef61b5c45eb211ab1f905225311b}{set}} (int x)
+\item 
+void \mbox{\hyperlink{classmie_1_1_fp_a218fa8f3e3415cb76bbfe392b388a67e}{set}} (const std\+::string \&str)
+\item 
+void \mbox{\hyperlink{classmie_1_1_fp_a390b88394fa05af3f6d8d15b0a050e05}{set}} (const \mbox{\hyperlink{namespacemie_ac62ddfee233ba71d08dc91a1924d4b74}{mie\+::\+Vuint}} \&x)
+\item 
+\mbox{\hyperlink{zm_8h_af05b4159bde6d4782da7bf7d42626e92}{MIE\+\_\+\+FORCE\+\_\+\+INLINE}} bool \mbox{\hyperlink{classmie_1_1_fp_aad61a39ac267933278ea88ae87aa3357}{is\+Zero}} () const
+\item 
+\mbox{\hyperlink{zm_8h_af05b4159bde6d4782da7bf7d42626e92}{MIE\+\_\+\+FORCE\+\_\+\+INLINE}} void \mbox{\hyperlink{classmie_1_1_fp_ac6f43b9a65ec8da4053f5979a158264a}{clear}} ()
+\item 
+\mbox{\hyperlink{namespacemie_a56ce7f54476ac398f450a858f9b741c4}{Unit}} \mbox{\hyperlink{classmie_1_1_fp_ab4af5d90ae91e2092dce680eaed0269a}{get\+Low}} () const
+\item 
+bool \mbox{\hyperlink{classmie_1_1_fp_a630e366ace3944d970010f4304a26901}{is\+Odd}} () const
+\item 
+\mbox{\hyperlink{namespacemie_ac62ddfee233ba71d08dc91a1924d4b74}{mie\+::\+Vuint}} \mbox{\hyperlink{classmie_1_1_fp_afadd6b45245c0f9b25040f2b750d4b12}{get}} () const
+\item 
+void \mbox{\hyperlink{classmie_1_1_fp_af2f3c85caac8802fc4f6a5e7b512cc9f}{inverse}} ()
+\item 
+std\+::string \mbox{\hyperlink{classmie_1_1_fp_ae620c25931497b291fe0b8c51919798f}{to\+String}} (int base=10) const
+\item 
+\mbox{\hyperlink{zm_8h_af05b4159bde6d4782da7bf7d42626e92}{MIE\+\_\+\+FORCE\+\_\+\+INLINE}} const \mbox{\hyperlink{namespacemie_a56ce7f54476ac398f450a858f9b741c4}{Unit}} \& \mbox{\hyperlink{classmie_1_1_fp_a52593ff39722fecb54705417de7d0b32}{operator\mbox{[}$\,$\mbox{]}}} (size\+\_\+t i) const
+\item 
+\mbox{\hyperlink{zm_8h_af05b4159bde6d4782da7bf7d42626e92}{MIE\+\_\+\+FORCE\+\_\+\+INLINE}} \mbox{\hyperlink{namespacemie_a56ce7f54476ac398f450a858f9b741c4}{Unit}} \& \mbox{\hyperlink{classmie_1_1_fp_a65b86b9881638a4e6961116e61065a28}{operator\mbox{[}$\,$\mbox{]}}} (size\+\_\+t i)
+\item 
+\mbox{\hyperlink{zm_8h_af05b4159bde6d4782da7bf7d42626e92}{MIE\+\_\+\+FORCE\+\_\+\+INLINE}} size\+\_\+t \mbox{\hyperlink{classmie_1_1_fp_a130b5873d9b8c7af71af90985a160eee}{size}} () const
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{structmie_1_1local_1_1addsubmul}{mie\+::local\+::addsubmul$<$ Fp, local\+::comparable$<$ Fp, local\+::has\+Negative$<$ Fp, local\+::inversible$<$ Fp $>$ $>$ $>$ $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zm_8h_af05b4159bde6d4782da7bf7d42626e92}{MIE\+\_\+\+FORCE\+\_\+\+INLINE}} \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \& \mbox{\hyperlink{structmie_1_1local_1_1addsubmul_a6f817e02ab3105e991a4ab288c096fb6}{operator+=}} (const \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}} \&rhs)
+\item 
+\mbox{\hyperlink{zm_8h_af05b4159bde6d4782da7bf7d42626e92}{MIE\+\_\+\+FORCE\+\_\+\+INLINE}} \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \& \mbox{\hyperlink{structmie_1_1local_1_1addsubmul_af219f9b915b48d2f9a7226d7ce8b6d24}{operator-\/=}} (const \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&rhs)
+\item 
+\mbox{\hyperlink{zm_8h_af05b4159bde6d4782da7bf7d42626e92}{MIE\+\_\+\+FORCE\+\_\+\+INLINE}} \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \& \mbox{\hyperlink{structmie_1_1local_1_1addsubmul_a6d3f62d296d2dcd9669f82f56ef46a1e}{operator\texorpdfstring{$\ast$}{*}=}} (const \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&rhs)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{structmie_1_1local_1_1has_negative}{mie\+::local\+::has\+Negative$<$ Fp, local\+::inversible$<$ Fp $>$ $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zm_8h_af05b4159bde6d4782da7bf7d42626e92}{MIE\+\_\+\+FORCE\+\_\+\+INLINE}} \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \mbox{\hyperlink{structmie_1_1local_1_1has_negative_ab2eb1086d288b5cca82e284fa8456585}{operator-\/}} () const
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{structmie_1_1local_1_1inversible}{mie\+::local\+::inversible$<$ Fp $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zm_8h_af05b4159bde6d4782da7bf7d42626e92}{MIE\+\_\+\+FORCE\+\_\+\+INLINE}} void \mbox{\hyperlink{structmie_1_1local_1_1inversible_a75f40a35b60bbafb92bba3fbee35f9c0}{inverse}} ()
+\item 
+\mbox{\hyperlink{zm_8h_af05b4159bde6d4782da7bf7d42626e92}{MIE\+\_\+\+FORCE\+\_\+\+INLINE}} \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \& \mbox{\hyperlink{structmie_1_1local_1_1inversible_a9e5a7f82c000505aec1f83d57caca1f1}{operator/=}} (const \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&x)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static int \mbox{\hyperlink{classmie_1_1_fp_a60507d0eccc7b92fd75cf5571b093024}{compare}} (const \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&x, const \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&y)
+\item 
+static void \mbox{\hyperlink{classmie_1_1_fp_a8548c2278d027af9c2f9e595d4b3ed1d}{\+\_\+3z\+\_\+add\+\_\+2xC}} (\mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&z, const \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&x)
+\item 
+static void \mbox{\hyperlink{classmie_1_1_fp_af04601338af15eac90bccdd8251b8409}{\+\_\+2z\+\_\+add\+\_\+3x}} (\mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&z, const \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&x)
+\item 
+static void \mbox{\hyperlink{classmie_1_1_fp_aac336f47095012762df0024e00667aa1}{from\+Mont}} (\mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&y, const \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&x)
+\item 
+static void \mbox{\hyperlink{classmie_1_1_fp_ad3c87c54159382d12cb398d7e17001ab}{to\+Mont}} (\mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&y, const \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&x)
+\item 
+static void \mbox{\hyperlink{classmie_1_1_fp_a3ec640185d307358357c22c7feed35f3}{inv}} (\mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&out, const \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&x)
+\item 
+static void \mbox{\hyperlink{classmie_1_1_fp_a8a3c0a35bba7670695e7f26fb8875d38}{div\+By2}} (\mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&z, const \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&x)
+\item 
+static void \mbox{\hyperlink{classmie_1_1_fp_ada114da3863f48f78a2aa54f8bbd9f4f}{div\+By4}} (\mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&z, const \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&x)
+\item 
+static void \mbox{\hyperlink{classmie_1_1_fp_aea64eb6c5ce0eed799d9cf4f926ee5fb}{fast\+\_\+modp}} (\mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&z)
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\static \mbox{\hyperlink{zm_8h_af05b4159bde6d4782da7bf7d42626e92}{MIE\+\_\+\+FORCE\+\_\+\+INLINE}} void \mbox{\hyperlink{classmie_1_1_fp_aeb0819f69c38adb875b4ff9c497deddd}{set\+Direct}} (\mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&out, const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&in)
+\item 
+static void \mbox{\hyperlink{classmie_1_1_fp_af8679fcab0ee97ee5e8f201e396f6c78}{set\+Modulo}} (const \mbox{\hyperlink{namespacemie_ac62ddfee233ba71d08dc91a1924d4b74}{mie\+::\+Vuint}} \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}, int mode, bool use\+Mulx=true, bool defined\+BN\+\_\+\+SUPPORT\+\_\+\+SNARK=false)
+\item 
+static const \mbox{\hyperlink{namespacemie_ac62ddfee233ba71d08dc91a1924d4b74}{mie\+::\+Vuint}} \& \mbox{\hyperlink{classmie_1_1_fp_a749bdc2ed22e4a12149f3f78594dbc51}{get\+Modulo}} ()
+\item 
+static const \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \& \mbox{\hyperlink{classmie_1_1_fp_a81cd2b01d0666cb37decd9e0abfb3039}{get\+DirectP}} (int n)
+\item 
+static const \mbox{\hyperlink{namespacemie_ac62ddfee233ba71d08dc91a1924d4b74}{mie\+::\+Vuint}} \& \mbox{\hyperlink{classmie_1_1_fp_acb965ba27f87e43de77bf2cd99f74676}{get\+MontgomeryR}} ()
+\item 
+static void \mbox{\hyperlink{classmie_1_1_fp_af9c80c57f34c9fb31ba4c6e862b5b017}{square}} (\mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&out, const \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&x)
+\item 
+static bool \mbox{\hyperlink{classmie_1_1_fp_af10b1564ad19477315ee9fe8d77b9345}{square\+Root}} (\mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&y, const \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&x)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static void(\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classmie_1_1_fp_a019d564ec54c8f4da6e302924f41b0b9}{add}} )(\mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&out, const \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&x, const \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&y)
+\item 
+static void(\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classmie_1_1_fp_a16401a650d5f3fd8c2112b1a3e3f59ea}{add\+NC}} )(\mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&out, const \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&x, const \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&y) = \&Fp\+\_\+add\+NC\+\_\+C
+\item 
+static void(\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classmie_1_1_fp_ade824375254153bbf7b11cbff2b42cca}{sub\+NC}} )(\mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&out, const \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&x, const \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&y) = \&Fp\+\_\+sub\+NC\+\_\+C
+\item 
+static void(\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classmie_1_1_fp_ae19df313e92faa969ea61d5892f33ef0}{shr1}} )(\mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&out, const \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&x)
+\item 
+static void(\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classmie_1_1_fp_a21ddccaee63e3b70b204b856f525dec1}{shr2}} )(\mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&out, const \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&x)
+\item 
+static void(\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classmie_1_1_fp_adb73ebf449a2d203705a735ae46766d9}{sub}} )(\mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&out, const \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&x, const \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&y)
+\item 
+static void(\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classmie_1_1_fp_ac78a5c242d66b0689e0860ffd3e1e1b9}{neg}} )(\mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&out, const \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&x) = \&Fp\+\_\+negC
+\item 
+static void(\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classmie_1_1_fp_a384d6e30672b87376ced2fb392d0f486}{mul}} )(\mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&out, const \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&x, const \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&y)
+\item 
+static int(\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classmie_1_1_fp_a39c03a6b5ab1bfeddbde09e0b85e0baf}{pre\+Inv}} )(\mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}, const \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&x)
+\item 
+static \mbox{\hyperlink{classmie_1_1_fp}{mie\+::\+Fp}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classmie_1_1_fp_a6efaf9f46b3d09c40e7540d44d5a10fc}{half\+Tbl\+\_\+}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+std\+::ostream \& \mbox{\hyperlink{classmie_1_1_fp_a9928f8039f1a54a64ab137101ecdb5a7}{operator$<$$<$}} (std\+::ostream \&os, const \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&x)
+\item 
+std\+::istream \& \mbox{\hyperlink{classmie_1_1_fp_a7bbff18a912513a0084fdb80df70bc90}{operator$>$$>$}} (std\+::istream \&is, \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&x)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{zm2_8h_source_l00015}{15}} of file \mbox{\hyperlink{zm2_8h_source}{zm2.\+h}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classmie_1_1_fp_a258222c4e4569e2ee13d54a14974df64}\index{mie::Fp@{mie::Fp}!value\_type@{value\_type}}
+\index{value\_type@{value\_type}!mie::Fp@{mie::Fp}}
+\doxysubsubsection{\texorpdfstring{value\_type}{value\_type}}
+{\footnotesize\ttfamily \label{classmie_1_1_fp_a258222c4e4569e2ee13d54a14974df64} 
+\mbox{\hyperlink{namespacemie_a56ce7f54476ac398f450a858f9b741c4}{mie\+::\+Unit}} \mbox{\hyperlink{classmie_1_1_fp_a258222c4e4569e2ee13d54a14974df64}{mie\+::\+Fp\+::value\+\_\+type}}}
+
+
+
+Definition at line \mbox{\hyperlink{zm2_8h_source_l00020}{20}} of file \mbox{\hyperlink{zm2_8h_source}{zm2.\+h}}.
+
+
+
+\doxysubsection{Member Enumeration Documentation}
+\Hypertarget{classmie_1_1_fp_a7f7bd1ab1f6bb723e42dd7c83be3e2c3}\doxysubsubsection{\texorpdfstring{anonymous enum}{anonymous enum}}
+{\footnotesize\ttfamily \label{classmie_1_1_fp_a7f7bd1ab1f6bb723e42dd7c83be3e2c3} 
+anonymous enum}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{N@{N}!mie::Fp@{mie::Fp}}\index{mie::Fp@{mie::Fp}!N@{N}}}\Hypertarget{classmie_1_1_fp_a7f7bd1ab1f6bb723e42dd7c83be3e2c3a22268e7961142f7fb9e3bc2db0a6cf30}\label{classmie_1_1_fp_a7f7bd1ab1f6bb723e42dd7c83be3e2c3} 
+N&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{zm2_8h_source_l00025}{25}} of file \mbox{\hyperlink{zm2_8h_source}{zm2.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classmie_1_1_fp_a7f7bd1ab1f6bb723e42dd7c83be3e2c3a22268e7961142f7fb9e3bc2db0a6cf30}{N}}\ =\ 32\ /\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{namespacemie_a56ce7f54476ac398f450a858f9b741c4}{Unit}})}
+\DoxyCodeLine{00027\ \ \ \ \ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classmie_1_1_fp_a109a598bd5f77439db37c3981d212c06}\index{mie::Fp@{mie::Fp}!Fp@{Fp}}
+\index{Fp@{Fp}!mie::Fp@{mie::Fp}}
+\doxysubsubsection{\texorpdfstring{Fp()}{Fp()}\hspace{0.1cm}{\footnotesize\ttfamily [1/5]}}
+{\footnotesize\ttfamily \label{classmie_1_1_fp_a109a598bd5f77439db37c3981d212c06} 
+mie\+::\+Fp\+::\+Fp (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zm2_8h_source_l00028}{28}} of file \mbox{\hyperlink{zm2_8h_source}{zm2.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00029\ \ \ \ \ \{}
+\DoxyCodeLine{00030\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classmie_1_1_fp_a1d69d805cfb7f46e7d85c095f62fbec5}\index{mie::Fp@{mie::Fp}!Fp@{Fp}}
+\index{Fp@{Fp}!mie::Fp@{mie::Fp}}
+\doxysubsubsection{\texorpdfstring{Fp()}{Fp()}\hspace{0.1cm}{\footnotesize\ttfamily [2/5]}}
+{\footnotesize\ttfamily \label{classmie_1_1_fp_a1d69d805cfb7f46e7d85c095f62fbec5} 
+\mbox{\hyperlink{zm_8h_af05b4159bde6d4782da7bf7d42626e92}{MIE\+\_\+\+FORCE\+\_\+\+INLINE}} mie\+::\+Fp\+::\+Fp (\begin{DoxyParamCaption}\item[{int}]{x}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zm2_8h_source_l00031}{31}} of file \mbox{\hyperlink{zm2_8h_source}{zm2.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00032\ \ \ \ \ \{}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a893468abdce45d586a5b659094a25e6c}{set}}(x);}
+\DoxyCodeLine{00034\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classmie_1_1_fp_a685f5ef4c5b0eb19c6f8d867f7e78a34}\index{mie::Fp@{mie::Fp}!Fp@{Fp}}
+\index{Fp@{Fp}!mie::Fp@{mie::Fp}}
+\doxysubsubsection{\texorpdfstring{Fp()}{Fp()}\hspace{0.1cm}{\footnotesize\ttfamily [3/5]}}
+{\footnotesize\ttfamily \label{classmie_1_1_fp_a685f5ef4c5b0eb19c6f8d867f7e78a34} 
+\mbox{\hyperlink{zm_8h_af05b4159bde6d4782da7bf7d42626e92}{MIE\+\_\+\+FORCE\+\_\+\+INLINE}} mie\+::\+Fp\+::\+Fp (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{str}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{zm2_8h_source_l00035}{35}} of file \mbox{\hyperlink{zm2_8h_source}{zm2.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00036\ \ \ \ \ \{}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a893468abdce45d586a5b659094a25e6c}{set}}(str);}
+\DoxyCodeLine{00038\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classmie_1_1_fp_a3839701591acc55bba17a0ba11b478b8}\index{mie::Fp@{mie::Fp}!Fp@{Fp}}
+\index{Fp@{Fp}!mie::Fp@{mie::Fp}}
+\doxysubsubsection{\texorpdfstring{Fp()}{Fp()}\hspace{0.1cm}{\footnotesize\ttfamily [4/5]}}
+{\footnotesize\ttfamily \label{classmie_1_1_fp_a3839701591acc55bba17a0ba11b478b8} 
+\mbox{\hyperlink{zm_8h_af05b4159bde6d4782da7bf7d42626e92}{MIE\+\_\+\+FORCE\+\_\+\+INLINE}} mie\+::\+Fp\+::\+Fp (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacemie_a56ce7f54476ac398f450a858f9b741c4}{mie\+::\+Unit}} \texorpdfstring{$\ast$}{*}}]{x}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{zm2_8h_source_l00039}{39}} of file \mbox{\hyperlink{zm2_8h_source}{zm2.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00040\ \ \ \ \ \{}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ std::copy(x,\ x\ +\ \mbox{\hyperlink{classmie_1_1_fp_a7f7bd1ab1f6bb723e42dd7c83be3e2c3a22268e7961142f7fb9e3bc2db0a6cf30}{N}},\ v\_);}
+\DoxyCodeLine{00042\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classmie_1_1_fp_ae12665901631afe6d44416e95a9704f6}\index{mie::Fp@{mie::Fp}!Fp@{Fp}}
+\index{Fp@{Fp}!mie::Fp@{mie::Fp}}
+\doxysubsubsection{\texorpdfstring{Fp()}{Fp()}\hspace{0.1cm}{\footnotesize\ttfamily [5/5]}}
+{\footnotesize\ttfamily \label{classmie_1_1_fp_ae12665901631afe6d44416e95a9704f6} 
+mie\+::\+Fp\+::\+Fp (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacemie_ac62ddfee233ba71d08dc91a1924d4b74}{mie\+::\+Vuint}} \&}]{rhs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zm2_8h_source_l00043}{43}} of file \mbox{\hyperlink{zm2_8h_source}{zm2.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00044\ \ \ \ \ \{}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a893468abdce45d586a5b659094a25e6c}{set}}(rhs);}
+\DoxyCodeLine{00046\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classmie_1_1_fp_af04601338af15eac90bccdd8251b8409}\index{mie::Fp@{mie::Fp}!\_2z\_add\_3x@{\_2z\_add\_3x}}
+\index{\_2z\_add\_3x@{\_2z\_add\_3x}!mie::Fp@{mie::Fp}}
+\doxysubsubsection{\texorpdfstring{\_2z\_add\_3x()}{\_2z\_add\_3x()}}
+{\footnotesize\ttfamily \label{classmie_1_1_fp_af04601338af15eac90bccdd8251b8409} 
+static void mie\+::\+Fp\+::\+\_\+2z\+\_\+add\+\_\+3x (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&}]{z}{, }\item[{const \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&}]{x}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{zm2_8h_source_l00108}{108}} of file \mbox{\hyperlink{zm2_8h_source}{zm2.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00109\ \ \ \ \ \{}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classmie_1_1_fp_a16401a650d5f3fd8c2112b1a3e3f59ea}{addNC}}(z,\ x,\ z);}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classmie_1_1_fp_a16401a650d5f3fd8c2112b1a3e3f59ea}{addNC}}(z,\ z,\ z);}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classmie_1_1_fp_a16401a650d5f3fd8c2112b1a3e3f59ea}{addNC}}(z,\ z,\ x);}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classmie_1_1_fp_aea64eb6c5ce0eed799d9cf4f926ee5fb}{fast\_modp}}(z);}
+\DoxyCodeLine{00114\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classmie_1_1_fp_af04601338af15eac90bccdd8251b8409_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classmie_1_1_fp_af04601338af15eac90bccdd8251b8409_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classmie_1_1_fp_a8548c2278d027af9c2f9e595d4b3ed1d}\index{mie::Fp@{mie::Fp}!\_3z\_add\_2xC@{\_3z\_add\_2xC}}
+\index{\_3z\_add\_2xC@{\_3z\_add\_2xC}!mie::Fp@{mie::Fp}}
+\doxysubsubsection{\texorpdfstring{\_3z\_add\_2xC()}{\_3z\_add\_2xC()}}
+{\footnotesize\ttfamily \label{classmie_1_1_fp_a8548c2278d027af9c2f9e595d4b3ed1d} 
+static void mie\+::\+Fp\+::\+\_\+3z\+\_\+add\+\_\+2xC (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&}]{z}{, }\item[{const \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&}]{x}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{zm2_8h_source_l00098}{98}} of file \mbox{\hyperlink{zm2_8h_source}{zm2.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00099\ \ \ \ \ \{}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classmie_1_1_fp_a16401a650d5f3fd8c2112b1a3e3f59ea}{addNC}}(z,\ z,\ x);}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classmie_1_1_fp_a16401a650d5f3fd8c2112b1a3e3f59ea}{addNC}}(z,\ z,\ z);}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classmie_1_1_fp_a16401a650d5f3fd8c2112b1a3e3f59ea}{addNC}}(z,\ z,\ x);}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classmie_1_1_fp_aea64eb6c5ce0eed799d9cf4f926ee5fb}{fast\_modp}}(z);}
+\DoxyCodeLine{00104\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classmie_1_1_fp_a8548c2278d027af9c2f9e595d4b3ed1d_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classmie_1_1_fp_a8548c2278d027af9c2f9e595d4b3ed1d_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classmie_1_1_fp_ac6f43b9a65ec8da4053f5979a158264a}\index{mie::Fp@{mie::Fp}!clear@{clear}}
+\index{clear@{clear}!mie::Fp@{mie::Fp}}
+\doxysubsubsection{\texorpdfstring{clear()}{clear()}}
+{\footnotesize\ttfamily \label{classmie_1_1_fp_ac6f43b9a65ec8da4053f5979a158264a} 
+\mbox{\hyperlink{zm_8h_af05b4159bde6d4782da7bf7d42626e92}{MIE\+\_\+\+FORCE\+\_\+\+INLINE}} void mie\+::\+Fp\+::clear (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zm2_8h_source_l00135}{135}} of file \mbox{\hyperlink{zm2_8h_source}{zm2.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00136\ \ \ \ \ \{}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ std::fill(v\_,\ v\_\ +\ \mbox{\hyperlink{classmie_1_1_fp_a7f7bd1ab1f6bb723e42dd7c83be3e2c3a22268e7961142f7fb9e3bc2db0a6cf30}{N}},\ 0);}
+\DoxyCodeLine{00138\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=343pt]{classmie_1_1_fp_ac6f43b9a65ec8da4053f5979a158264a_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classmie_1_1_fp_a60507d0eccc7b92fd75cf5571b093024}\index{mie::Fp@{mie::Fp}!compare@{compare}}
+\index{compare@{compare}!mie::Fp@{mie::Fp}}
+\doxysubsubsection{\texorpdfstring{compare()}{compare()}}
+{\footnotesize\ttfamily \label{classmie_1_1_fp_a60507d0eccc7b92fd75cf5571b093024} 
+static int mie\+::\+Fp\+::compare (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&}]{x}{, }\item[{const \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&}]{y}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{zm2_8h_source_l00079}{79}} of file \mbox{\hyperlink{zm2_8h_source}{zm2.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00080\ \ \ \ \ \{}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structmie_1_1local_1_1_primitive_function_a75174d0934fa9f2abfae890e58c791b7}{mie::local::PrimitiveFunction::compare}}(\&x[0],\ \mbox{\hyperlink{classmie_1_1_fp_a7f7bd1ab1f6bb723e42dd7c83be3e2c3a22268e7961142f7fb9e3bc2db0a6cf30}{N}},\ \&y[0],\ \mbox{\hyperlink{classmie_1_1_fp_a7f7bd1ab1f6bb723e42dd7c83be3e2c3a22268e7961142f7fb9e3bc2db0a6cf30}{N}});}
+\DoxyCodeLine{00082\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=348pt]{classmie_1_1_fp_a60507d0eccc7b92fd75cf5571b093024_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classmie_1_1_fp_a8a3c0a35bba7670695e7f26fb8875d38}\index{mie::Fp@{mie::Fp}!divBy2@{divBy2}}
+\index{divBy2@{divBy2}!mie::Fp@{mie::Fp}}
+\doxysubsubsection{\texorpdfstring{divBy2()}{divBy2()}}
+{\footnotesize\ttfamily \label{classmie_1_1_fp_a8a3c0a35bba7670695e7f26fb8875d38} 
+static void mie\+::\+Fp\+::div\+By2 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&}]{z}{, }\item[{const \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&}]{x}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{zm2_8h_source_l00216}{216}} of file \mbox{\hyperlink{zm2_8h_source}{zm2.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00217\ \ \ \ \ \{}
+\DoxyCodeLine{00218\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ i\ =\ x[0]\ \&\ 0x1;}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classmie_1_1_fp_ae19df313e92faa969ea61d5892f33ef0}{shr1}}(z,\ x);}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classmie_1_1_fp_a16401a650d5f3fd8c2112b1a3e3f59ea}{addNC}}(z,\ z,\ \mbox{\hyperlink{classmie_1_1_fp_a6efaf9f46b3d09c40e7540d44d5a10fc}{halfTbl\_}}[i]);}
+\DoxyCodeLine{00221\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classmie_1_1_fp_a8a3c0a35bba7670695e7f26fb8875d38_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classmie_1_1_fp_ada114da3863f48f78a2aa54f8bbd9f4f}\index{mie::Fp@{mie::Fp}!divBy4@{divBy4}}
+\index{divBy4@{divBy4}!mie::Fp@{mie::Fp}}
+\doxysubsubsection{\texorpdfstring{divBy4()}{divBy4()}}
+{\footnotesize\ttfamily \label{classmie_1_1_fp_ada114da3863f48f78a2aa54f8bbd9f4f} 
+static void mie\+::\+Fp\+::div\+By4 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&}]{z}{, }\item[{const \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&}]{x}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{zm2_8h_source_l00223}{223}} of file \mbox{\hyperlink{zm2_8h_source}{zm2.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00224\ \ \ \ \ \{}
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ i\ =\ x[0]\ \&\ 0x3;}
+\DoxyCodeLine{00226\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classmie_1_1_fp_a21ddccaee63e3b70b204b856f525dec1}{shr2}}(z,\ x);}
+\DoxyCodeLine{00227\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classmie_1_1_fp_a16401a650d5f3fd8c2112b1a3e3f59ea}{addNC}}(z,\ z,\ quarterTbl\_[i]);}
+\DoxyCodeLine{00228\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classmie_1_1_fp_ada114da3863f48f78a2aa54f8bbd9f4f_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classmie_1_1_fp_aea64eb6c5ce0eed799d9cf4f926ee5fb}\index{mie::Fp@{mie::Fp}!fast\_modp@{fast\_modp}}
+\index{fast\_modp@{fast\_modp}!mie::Fp@{mie::Fp}}
+\doxysubsubsection{\texorpdfstring{fast\_modp()}{fast\_modp()}}
+{\footnotesize\ttfamily \label{classmie_1_1_fp_aea64eb6c5ce0eed799d9cf4f926ee5fb} 
+static void mie\+::\+Fp\+::fast\+\_\+modp (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&}]{z}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{zm2_8h_source_l00231}{231}} of file \mbox{\hyperlink{zm2_8h_source}{zm2.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00232\ \ \ \ \ \{}
+\DoxyCodeLine{00233\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ t\ =\ z.v\_[3]\ >>\ 61;}
+\DoxyCodeLine{00234\ \ \ \ \ \ \ \ \ z\ -\/=\ \mbox{\hyperlink{classmie_1_1_fp_a81cd2b01d0666cb37decd9e0abfb3039}{getDirectP}}((\textcolor{keywordtype}{int})t);}
+\DoxyCodeLine{00235\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=318pt]{classmie_1_1_fp_aea64eb6c5ce0eed799d9cf4f926ee5fb_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classmie_1_1_fp_aea64eb6c5ce0eed799d9cf4f926ee5fb_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classmie_1_1_fp_aac336f47095012762df0024e00667aa1}\index{mie::Fp@{mie::Fp}!fromMont@{fromMont}}
+\index{fromMont@{fromMont}!mie::Fp@{mie::Fp}}
+\doxysubsubsection{\texorpdfstring{fromMont()}{fromMont()}}
+{\footnotesize\ttfamily \label{classmie_1_1_fp_aac336f47095012762df0024e00667aa1} 
+static void mie\+::\+Fp\+::from\+Mont (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&}]{y}{, }\item[{const \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&}]{x}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{zm2_8h_source_l00139}{139}} of file \mbox{\hyperlink{zm2_8h_source}{zm2.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00140\ \ \ \ \ \{}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classmie_1_1_fp_a384d6e30672b87376ced2fb392d0f486}{mul}}(y,\ x,\ one\_);}
+\DoxyCodeLine{00142\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classmie_1_1_fp_aac336f47095012762df0024e00667aa1_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classmie_1_1_fp_afadd6b45245c0f9b25040f2b750d4b12}\index{mie::Fp@{mie::Fp}!get@{get}}
+\index{get@{get}!mie::Fp@{mie::Fp}}
+\doxysubsubsection{\texorpdfstring{get()}{get()}}
+{\footnotesize\ttfamily \label{classmie_1_1_fp_afadd6b45245c0f9b25040f2b750d4b12} 
+\mbox{\hyperlink{namespacemie_ac62ddfee233ba71d08dc91a1924d4b74}{mie\+::\+Vuint}} mie\+::\+Fp\+::get (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zm2_8h_source_l00158}{158}} of file \mbox{\hyperlink{zm2_8h_source}{zm2.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00159\ \ \ \ \ \{}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_fp}{Fp}}\ t;}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classmie_1_1_fp_aac336f47095012762df0024e00667aa1}{fromMont}}(t,\ *\textcolor{keyword}{this});}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structmie_1_1_vuint_t}{mie::Vuint}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}(t.v\_,\ \mbox{\hyperlink{classmie_1_1_fp_a7f7bd1ab1f6bb723e42dd7c83be3e2c3a22268e7961142f7fb9e3bc2db0a6cf30}{N}});}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00164\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=281pt]{classmie_1_1_fp_afadd6b45245c0f9b25040f2b750d4b12_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classmie_1_1_fp_afadd6b45245c0f9b25040f2b750d4b12_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classmie_1_1_fp_a81cd2b01d0666cb37decd9e0abfb3039}\index{mie::Fp@{mie::Fp}!getDirectP@{getDirectP}}
+\index{getDirectP@{getDirectP}!mie::Fp@{mie::Fp}}
+\doxysubsubsection{\texorpdfstring{getDirectP()}{getDirectP()}}
+{\footnotesize\ttfamily \label{classmie_1_1_fp_a81cd2b01d0666cb37decd9e0abfb3039} 
+const \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \& Fp\+::get\+DirectP (\begin{DoxyParamCaption}\item[{int}]{n}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{zm2_8cpp_source_l00126}{126}} of file \mbox{\hyperlink{zm2_8cpp_source}{zm2.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00127\ \{}
+\DoxyCodeLine{00128\ \ \ \ \ assert(0\ <=\ n\ \&\&\ (\textcolor{keywordtype}{size\_t})n\ <\ \mbox{\hyperlink{zm2_8cpp_a769a8ad8dea2e2515b328441b445d721}{pTblSize}});}
+\DoxyCodeLine{00129\ \ \ \ \ \textcolor{keywordflow}{return}\ s\_pTbl[n];}
+\DoxyCodeLine{00130\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classmie_1_1_fp_a81cd2b01d0666cb37decd9e0abfb3039_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classmie_1_1_fp_ab4af5d90ae91e2092dce680eaed0269a}\index{mie::Fp@{mie::Fp}!getLow@{getLow}}
+\index{getLow@{getLow}!mie::Fp@{mie::Fp}}
+\doxysubsubsection{\texorpdfstring{getLow()}{getLow()}}
+{\footnotesize\ttfamily \label{classmie_1_1_fp_ab4af5d90ae91e2092dce680eaed0269a} 
+\mbox{\hyperlink{namespacemie_a56ce7f54476ac398f450a858f9b741c4}{Unit}} mie\+::\+Fp\+::get\+Low (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zm2_8h_source_l00148}{148}} of file \mbox{\hyperlink{zm2_8h_source}{zm2.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00149\ \ \ \ \ \{}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_fp}{Fp}}\ t;}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classmie_1_1_fp_aac336f47095012762df0024e00667aa1}{fromMont}}(t,\ *\textcolor{keyword}{this});}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ t.v\_[0];}
+\DoxyCodeLine{00153\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=299pt]{classmie_1_1_fp_ab4af5d90ae91e2092dce680eaed0269a_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=283pt]{classmie_1_1_fp_ab4af5d90ae91e2092dce680eaed0269a_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classmie_1_1_fp_a749bdc2ed22e4a12149f3f78594dbc51}\index{mie::Fp@{mie::Fp}!getModulo@{getModulo}}
+\index{getModulo@{getModulo}!mie::Fp@{mie::Fp}}
+\doxysubsubsection{\texorpdfstring{getModulo()}{getModulo()}}
+{\footnotesize\ttfamily \label{classmie_1_1_fp_a749bdc2ed22e4a12149f3f78594dbc51} 
+static const \mbox{\hyperlink{namespacemie_ac62ddfee233ba71d08dc91a1924d4b74}{mie\+::\+Vuint}} \& mie\+::\+Fp\+::get\+Modulo (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{zm2_8h_source_l00262}{262}} of file \mbox{\hyperlink{zm2_8h_source}{zm2.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00262\ \{\ \textcolor{keywordflow}{return}\ p\_;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classmie_1_1_fp_a749bdc2ed22e4a12149f3f78594dbc51_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classmie_1_1_fp_acb965ba27f87e43de77bf2cd99f74676}\index{mie::Fp@{mie::Fp}!getMontgomeryR@{getMontgomeryR}}
+\index{getMontgomeryR@{getMontgomeryR}!mie::Fp@{mie::Fp}}
+\doxysubsubsection{\texorpdfstring{getMontgomeryR()}{getMontgomeryR()}}
+{\footnotesize\ttfamily \label{classmie_1_1_fp_acb965ba27f87e43de77bf2cd99f74676} 
+static const \mbox{\hyperlink{namespacemie_ac62ddfee233ba71d08dc91a1924d4b74}{mie\+::\+Vuint}} \& mie\+::\+Fp\+::get\+MontgomeryR (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{zm2_8h_source_l00264}{264}} of file \mbox{\hyperlink{zm2_8h_source}{zm2.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00264\ \{\ \textcolor{keywordflow}{return}\ montgomeryR\_;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classmie_1_1_fp_acb965ba27f87e43de77bf2cd99f74676_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classmie_1_1_fp_a3ec640185d307358357c22c7feed35f3}\index{mie::Fp@{mie::Fp}!inv@{inv}}
+\index{inv@{inv}!mie::Fp@{mie::Fp}}
+\doxysubsubsection{\texorpdfstring{inv()}{inv()}}
+{\footnotesize\ttfamily \label{classmie_1_1_fp_a3ec640185d307358357c22c7feed35f3} 
+static void mie\+::\+Fp\+::inv (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&}]{out}{, }\item[{const \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&}]{x}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{zm2_8h_source_l00165}{165}} of file \mbox{\hyperlink{zm2_8h_source}{zm2.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00166\ \ \ \ \ \{}
+\DoxyCodeLine{00167\ \textcolor{preprocessor}{\#ifdef\ MIE\_USE\_X64ASM}}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_fp}{Fp}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ k\ =\ \mbox{\hyperlink{classmie_1_1_fp_a39c03a6b5ab1bfeddbde09e0b85e0baf}{preInv}}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ x);}
+\DoxyCodeLine{00170\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_fp}{Fp}}\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}(\&p\_[0]);}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_fp}{Fp}}\ u,\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}},\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ u\ =\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}};}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ =\ x;}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.\mbox{\hyperlink{structmie_1_1_vuint_t_a37838a763e8b608a0aeba236ec1313a7}{clear}}();}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.clear();\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}[0]\ =\ 1;\ \textcolor{comment}{//\ s\ is\ real\ 1}}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ k\ =\ 0;}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (!\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.isZero())\ \{}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((u[0]\ \&\ 1)\ ==\ 0)\ \{}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classmie_1_1_fp_ae19df313e92faa969ea61d5892f33ef0}{shr1}}(u,\ u);}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classmie_1_1_fp_a16401a650d5f3fd8c2112b1a3e3f59ea}{addNC}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ ((v[0]\ \&\ 1)\ ==\ 0)\ \{}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classmie_1_1_fp_ae19df313e92faa969ea61d5892f33ef0}{shr1}}(v,\ v);}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classmie_1_1_fp_a16401a650d5f3fd8c2112b1a3e3f59ea}{addNC}}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}});}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (v\ >=\ u)\ \{}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classmie_1_1_fp_ade824375254153bbf7b11cbff2b42cca}{subNC}}(v,\ v,\ u);}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classmie_1_1_fp_a16401a650d5f3fd8c2112b1a3e3f59ea}{addNC}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}});}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classmie_1_1_fp_ae19df313e92faa969ea61d5892f33ef0}{shr1}}(v,\ v);}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classmie_1_1_fp_a16401a650d5f3fd8c2112b1a3e3f59ea}{addNC}}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}});}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classmie_1_1_fp_ade824375254153bbf7b11cbff2b42cca}{subNC}}(u,\ u,\ v);}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classmie_1_1_fp_a16401a650d5f3fd8c2112b1a3e3f59ea}{addNC}}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classmie_1_1_fp_ae19df313e92faa969ea61d5892f33ef0}{shr1}}(u,\ u);}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classmie_1_1_fp_a16401a650d5f3fd8c2112b1a3e3f59ea}{addNC}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \ \ \ \ k++;}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ >=\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})\ \{}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classmie_1_1_fp_ade824375254153bbf7b11cbff2b42cca}{subNC}}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}});}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \ \ assert(!\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.\mbox{\hyperlink{structmie_1_1_vuint_t_a5ebbc4896607410c747186c4f55d6b1b}{isZero}}());}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classmie_1_1_fp_ade824375254153bbf7b11cbff2b42cca}{subNC}}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}});}
+\DoxyCodeLine{00203\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*}}
+\DoxyCodeLine{00205\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ xr\ =\ 2\string^k}}
+\DoxyCodeLine{00206\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ R\ =\ 2\string^256}}
+\DoxyCodeLine{00207\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ get\ r2\string^(-\/k)R\string^2\ =\ r\ 2\string^(512\ -\/\ k)}}
+\DoxyCodeLine{00208\ \textcolor{comment}{\ \ \ \ \ \ \ \ */}}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classmie_1_1_fp_a384d6e30672b87376ced2fb392d0f486}{mul}}(out,\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ invTbl\_[k]);}
+\DoxyCodeLine{00210\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=282pt]{classmie_1_1_fp_a3ec640185d307358357c22c7feed35f3_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classmie_1_1_fp_a3ec640185d307358357c22c7feed35f3_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classmie_1_1_fp_af2f3c85caac8802fc4f6a5e7b512cc9f}\index{mie::Fp@{mie::Fp}!inverse@{inverse}}
+\index{inverse@{inverse}!mie::Fp@{mie::Fp}}
+\doxysubsubsection{\texorpdfstring{inverse()}{inverse()}}
+{\footnotesize\ttfamily \label{classmie_1_1_fp_af2f3c85caac8802fc4f6a5e7b512cc9f} 
+void mie\+::\+Fp\+::inverse (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zm2_8h_source_l00211}{211}} of file \mbox{\hyperlink{zm2_8h_source}{zm2.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00212\ \ \ \ \ \{}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classmie_1_1_fp_a3ec640185d307358357c22c7feed35f3}{inv}}(*\textcolor{keyword}{this},\ *\textcolor{keyword}{this});}
+\DoxyCodeLine{00214\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classmie_1_1_fp_af2f3c85caac8802fc4f6a5e7b512cc9f_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classmie_1_1_fp_a630e366ace3944d970010f4304a26901}\index{mie::Fp@{mie::Fp}!isOdd@{isOdd}}
+\index{isOdd@{isOdd}!mie::Fp@{mie::Fp}}
+\doxysubsubsection{\texorpdfstring{isOdd()}{isOdd()}}
+{\footnotesize\ttfamily \label{classmie_1_1_fp_a630e366ace3944d970010f4304a26901} 
+bool mie\+::\+Fp\+::is\+Odd (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zm2_8h_source_l00154}{154}} of file \mbox{\hyperlink{zm2_8h_source}{zm2.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00155\ \ \ \ \ \{}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (\mbox{\hyperlink{classmie_1_1_fp_ab4af5d90ae91e2092dce680eaed0269a}{getLow}}()\ \&\ 1)\ !=\ 0;}
+\DoxyCodeLine{00157\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classmie_1_1_fp_a630e366ace3944d970010f4304a26901_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classmie_1_1_fp_aad61a39ac267933278ea88ae87aa3357}\index{mie::Fp@{mie::Fp}!isZero@{isZero}}
+\index{isZero@{isZero}!mie::Fp@{mie::Fp}}
+\doxysubsubsection{\texorpdfstring{isZero()}{isZero()}}
+{\footnotesize\ttfamily \label{classmie_1_1_fp_aad61a39ac267933278ea88ae87aa3357} 
+\mbox{\hyperlink{zm_8h_af05b4159bde6d4782da7bf7d42626e92}{MIE\+\_\+\+FORCE\+\_\+\+INLINE}} bool mie\+::\+Fp\+::is\+Zero (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zm2_8h_source_l00127}{127}} of file \mbox{\hyperlink{zm2_8h_source}{zm2.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00128\ \ \ \ \ \{}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacemie_a56ce7f54476ac398f450a858f9b741c4}{Unit}}\ t\ =\ 0;}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{classmie_1_1_fp_a7f7bd1ab1f6bb723e42dd7c83be3e2c3a22268e7961142f7fb9e3bc2db0a6cf30}{N}};\ i++)\ \{}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \ \ \ t\ |=\ v\_[i];}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ t\ ==\ 0;}
+\DoxyCodeLine{00134\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classmie_1_1_fp_aad61a39ac267933278ea88ae87aa3357_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classmie_1_1_fp_a65b86b9881638a4e6961116e61065a28}\index{mie::Fp@{mie::Fp}!operator\mbox{[}\mbox{]}@{operator[]}}
+\index{operator\mbox{[}\mbox{]}@{operator[]}!mie::Fp@{mie::Fp}}
+\doxysubsubsection{\texorpdfstring{operator[]()}{operator[]()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classmie_1_1_fp_a65b86b9881638a4e6961116e61065a28} 
+\mbox{\hyperlink{zm_8h_af05b4159bde6d4782da7bf7d42626e92}{MIE\+\_\+\+FORCE\+\_\+\+INLINE}} \mbox{\hyperlink{namespacemie_a56ce7f54476ac398f450a858f9b741c4}{Unit}} \& mie\+::\+Fp\+::operator\mbox{[}$\,$\mbox{]} (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{i}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zm2_8h_source_l00252}{252}} of file \mbox{\hyperlink{zm2_8h_source}{zm2.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00252\ \{\ \textcolor{keywordflow}{return}\ v\_[i];\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classmie_1_1_fp_a52593ff39722fecb54705417de7d0b32}\index{mie::Fp@{mie::Fp}!operator\mbox{[}\mbox{]}@{operator[]}}
+\index{operator\mbox{[}\mbox{]}@{operator[]}!mie::Fp@{mie::Fp}}
+\doxysubsubsection{\texorpdfstring{operator[]()}{operator[]()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classmie_1_1_fp_a52593ff39722fecb54705417de7d0b32} 
+\mbox{\hyperlink{zm_8h_af05b4159bde6d4782da7bf7d42626e92}{MIE\+\_\+\+FORCE\+\_\+\+INLINE}} const \mbox{\hyperlink{namespacemie_a56ce7f54476ac398f450a858f9b741c4}{Unit}} \& mie\+::\+Fp\+::operator\mbox{[}$\,$\mbox{]} (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{i}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zm2_8h_source_l00251}{251}} of file \mbox{\hyperlink{zm2_8h_source}{zm2.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00251\ \{\ \textcolor{keywordflow}{return}\ v\_[i];\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classmie_1_1_fp_a390b88394fa05af3f6d8d15b0a050e05}\index{mie::Fp@{mie::Fp}!set@{set}}
+\index{set@{set}!mie::Fp@{mie::Fp}}
+\doxysubsubsection{\texorpdfstring{set()}{set()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{classmie_1_1_fp_a390b88394fa05af3f6d8d15b0a050e05} 
+void mie\+::\+Fp\+::set (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacemie_ac62ddfee233ba71d08dc91a1924d4b74}{mie\+::\+Vuint}} \&}]{x}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zm2_8h_source_l00070}{70}} of file \mbox{\hyperlink{zm2_8h_source}{zm2.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00071\ \ \ \ \ \{}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ assert(x\ <\ \mbox{\hyperlink{classmie_1_1_fp_a749bdc2ed22e4a12149f3f78594dbc51}{getModulo}}());}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structmie_1_1_vuint_t}{mie::Vuint}}\ \mbox{\hyperlink{namespacefc_ab199a7c94624123911206db59ebe45da}{y}}(x);}
+\DoxyCodeLine{00074\ \textcolor{comment}{//\ \ \ \ \ \ count++;std::cout\ <<\ "{}count="{}\ <<\ count\ <<\ "{},\ x="{}\ <<\ x\ <<\ std::endl;}}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_ab199a7c94624123911206db59ebe45da}{y}}\ *=\ \mbox{\hyperlink{classmie_1_1_fp_acb965ba27f87e43de77bf2cd99f74676}{getMontgomeryR}}();}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_ab199a7c94624123911206db59ebe45da}{y}}\ \%=\ \mbox{\hyperlink{classmie_1_1_fp_a749bdc2ed22e4a12149f3f78594dbc51}{getModulo}}();}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classmie_1_1_fp_aeb0819f69c38adb875b4ff9c497deddd}{setDirect}}(*\textcolor{keyword}{this},\ y);}
+\DoxyCodeLine{00078\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=315pt]{classmie_1_1_fp_a390b88394fa05af3f6d8d15b0a050e05_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classmie_1_1_fp_a218fa8f3e3415cb76bbfe392b388a67e}\index{mie::Fp@{mie::Fp}!set@{set}}
+\index{set@{set}!mie::Fp@{mie::Fp}}
+\doxysubsubsection{\texorpdfstring{set()}{set()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{classmie_1_1_fp_a218fa8f3e3415cb76bbfe392b388a67e} 
+void mie\+::\+Fp\+::set (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{str}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zm2_8h_source_l00066}{66}} of file \mbox{\hyperlink{zm2_8h_source}{zm2.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00067\ \ \ \ \ \{}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a893468abdce45d586a5b659094a25e6c}{set}}(\mbox{\hyperlink{structmie_1_1_vuint_t}{mie::Vuint}}(str));}
+\DoxyCodeLine{00069\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classmie_1_1_fp_a6628ef61b5c45eb211ab1f905225311b}\index{mie::Fp@{mie::Fp}!set@{set}}
+\index{set@{set}!mie::Fp@{mie::Fp}}
+\doxysubsubsection{\texorpdfstring{set()}{set()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{classmie_1_1_fp_a6628ef61b5c45eb211ab1f905225311b} 
+void mie\+::\+Fp\+::set (\begin{DoxyParamCaption}\item[{int}]{x}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zm2_8h_source_l00047}{47}} of file \mbox{\hyperlink{zm2_8h_source}{zm2.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00048\ \ \ \ \ \{}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (x\ ==\ 0)\ \{}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classmie_1_1_fp_ac6f43b9a65ec8da4053f5979a158264a}{clear}}();}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (x\ ==\ 1)\ \{}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structmie_1_1_vuint_t}{mie::Vuint}}\&\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ =\ \mbox{\hyperlink{classmie_1_1_fp_acb965ba27f87e43de77bf2cd99f74676}{getMontgomeryR}}();}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \ assert(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.\mbox{\hyperlink{structmie_1_1_vuint_t_a1be409ac9e110dc4b60234ce37cbf0c8}{size}}()\ ==\ \mbox{\hyperlink{classmie_1_1_fp_a7f7bd1ab1f6bb723e42dd7c83be3e2c3a22268e7961142f7fb9e3bc2db0a6cf30}{N}});}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \ \ \ std::copy(\&\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}[0],\ \&\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}[0]\ +\ \mbox{\hyperlink{classmie_1_1_fp_a7f7bd1ab1f6bb723e42dd7c83be3e2c3a22268e7961142f7fb9e3bc2db0a6cf30}{N}},\ v\_);}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (x\ >\ 0)\ \{}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ \ \ \ v\_[0]\ =\ x;}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ \ \ \ std::fill(v\_\ +\ 1,\ v\_\ +\ \mbox{\hyperlink{classmie_1_1_fp_a7f7bd1ab1f6bb723e42dd7c83be3e2c3a22268e7961142f7fb9e3bc2db0a6cf30}{N}},\ 0);}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classmie_1_1_fp_a384d6e30672b87376ced2fb392d0f486}{mul}}(*\textcolor{keyword}{this},\ *\textcolor{keyword}{this},\ montgomeryR2\_);}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \ \ \ \ v\_[0]\ =\ -\/x;}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \ \ \ \ std::fill(v\_\ +\ 1,\ v\_\ +\ \mbox{\hyperlink{classmie_1_1_fp_a7f7bd1ab1f6bb723e42dd7c83be3e2c3a22268e7961142f7fb9e3bc2db0a6cf30}{N}},\ 0);}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classmie_1_1_fp_a384d6e30672b87376ced2fb392d0f486}{mul}}(*\textcolor{keyword}{this},\ *\textcolor{keyword}{this},\ montgomeryR2\_);}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classmie_1_1_fp_ac78a5c242d66b0689e0860ffd3e1e1b9}{neg}}(*\textcolor{keyword}{this},\ *\textcolor{keyword}{this});}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00065\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=315pt]{classmie_1_1_fp_a6628ef61b5c45eb211ab1f905225311b_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=231pt]{classmie_1_1_fp_a6628ef61b5c45eb211ab1f905225311b_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classmie_1_1_fp_aeb0819f69c38adb875b4ff9c497deddd}\index{mie::Fp@{mie::Fp}!setDirect@{setDirect}}
+\index{setDirect@{setDirect}!mie::Fp@{mie::Fp}}
+\doxysubsubsection{\texorpdfstring{setDirect()}{setDirect()}}
+{\footnotesize\ttfamily \label{classmie_1_1_fp_aeb0819f69c38adb875b4ff9c497deddd} 
+template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+static \mbox{\hyperlink{zm_8h_af05b4159bde6d4782da7bf7d42626e92}{MIE\+\_\+\+FORCE\+\_\+\+INLINE}} void mie\+::\+Fp\+::set\+Direct (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&}]{out}{, }\item[{const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{in}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{zm2_8h_source_l00238}{238}} of file \mbox{\hyperlink{zm2_8h_source}{zm2.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00239\ \ \ \ \ \{}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ n\ =\ in.size();}
+\DoxyCodeLine{00241\ \textcolor{comment}{//\ \ \ \ \ \ assert(n\ <=\ N);}}
+\DoxyCodeLine{00242\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (n\ <\ \mbox{\hyperlink{classmie_1_1_fp_a7f7bd1ab1f6bb723e42dd7c83be3e2c3a22268e7961142f7fb9e3bc2db0a6cf30}{N}})\ \{}
+\DoxyCodeLine{00243\ \ \ \ \ \ \ \ \ \ \ \ \ std::copy(\&in[0],\ \&in[0]\ +\ n,\ out.v\_);}
+\DoxyCodeLine{00244\ \ \ \ \ \ \ \ \ \ \ \ \ std::fill(out.v\_\ +\ n,\ out.v\_\ +\ \mbox{\hyperlink{classmie_1_1_fp_a7f7bd1ab1f6bb723e42dd7c83be3e2c3a22268e7961142f7fb9e3bc2db0a6cf30}{N}},\ 0);}
+\DoxyCodeLine{00245\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00246\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ ignore\ in[i]\ for\ i\ >=\ N}}
+\DoxyCodeLine{00247\ \ \ \ \ \ \ \ \ \ \ \ \ std::copy(\&in[0],\ \&in[0]\ +\ \mbox{\hyperlink{classmie_1_1_fp_a7f7bd1ab1f6bb723e42dd7c83be3e2c3a22268e7961142f7fb9e3bc2db0a6cf30}{N}},\ out.v\_);}
+\DoxyCodeLine{00248\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00249\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classmie_1_1_fp_aeb0819f69c38adb875b4ff9c497deddd_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classmie_1_1_fp_af8679fcab0ee97ee5e8f201e396f6c78}\index{mie::Fp@{mie::Fp}!setModulo@{setModulo}}
+\index{setModulo@{setModulo}!mie::Fp@{mie::Fp}}
+\doxysubsubsection{\texorpdfstring{setModulo()}{setModulo()}}
+{\footnotesize\ttfamily \label{classmie_1_1_fp_af8679fcab0ee97ee5e8f201e396f6c78} 
+void Fp\+::set\+Modulo (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacemie_ac62ddfee233ba71d08dc91a1924d4b74}{mie\+::\+Vuint}} \&}]{p}{, }\item[{int}]{mode}{, }\item[{bool}]{use\+Mulx}{ = {\ttfamily true}, }\item[{bool}]{defined\+BN\+\_\+\+SUPPORT\+\_\+\+SNARK}{ = {\ttfamily false}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{zm2_8cpp_source_l03592}{3592}} of file \mbox{\hyperlink{zm2_8cpp_source}{zm2.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03593\ \{}
+\DoxyCodeLine{03594\ \textcolor{preprocessor}{\#ifdef\ DEBUG\_COUNT}}
+\DoxyCodeLine{03595\ \ \ \ \ puts(\textcolor{stringliteral}{"{}DEBUG\_COUNT\ mode\ on!!!"{}});}
+\DoxyCodeLine{03596\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{03597\ \textcolor{preprocessor}{\#ifdef\ BN\_SUPPORT\_SNARK}}
+\DoxyCodeLine{03598\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ scipr\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{03599\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{03600\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ scipr\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{03601\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{03602\ \ \ \ \ \textcolor{keywordflow}{if}\ (scipr\ !=\ definedBN\_SUPPORT\_SNARK)\ \{}
+\DoxyCodeLine{03603\ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}use\ -\/DBN\_SUPPORT\_SNARK\ for\ all\ sources\(\backslash\)n"{}});}
+\DoxyCodeLine{03604\ \ \ \ \ \ \ \ \ exit(1);}
+\DoxyCodeLine{03605\ \ \ \ \ \}}
+\DoxyCodeLine{03606\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{lib_8h_a02fd73d861ef2e4aabb38c0c9ff82947}{init}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{03607\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{lib_8h_a02fd73d861ef2e4aabb38c0c9ff82947}{init}})\ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{03608\ \ \ \ \ \mbox{\hyperlink{lib_8h_a02fd73d861ef2e4aabb38c0c9ff82947}{init}}\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{03609\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.\mbox{\hyperlink{structmie_1_1_vuint_t_a1be409ac9e110dc4b60234ce37cbf0c8}{size}}()\ !=\ \mbox{\hyperlink{classmie_1_1_fp_a7f7bd1ab1f6bb723e42dd7c83be3e2c3a22268e7961142f7fb9e3bc2db0a6cf30}{Fp::N}})\ \{}
+\DoxyCodeLine{03610\ \ \ \ \ \ \ \ \ mie::local::errExit(\textcolor{stringliteral}{"{}not\ support\ p\ for\ Fp::setModulo"{}});}
+\DoxyCodeLine{03611\ \ \ \ \ \}}
+\DoxyCodeLine{03612\ \ \ \ \ p\_\ =\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}};}
+\DoxyCodeLine{03613\ }
+\DoxyCodeLine{03614\ \ \ \ \ \textcolor{comment}{//\ Fp\_mul}}
+\DoxyCodeLine{03615\ \ \ \ \ \{}
+\DoxyCodeLine{03616\ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classmie_1_1_zm_z}{mie::ZmZ<Vuint,\ MontgomeryTest>}}\ ZN;}
+\DoxyCodeLine{03617\ \ \ \ \ \ \ \ \ ZN::setModulo(\mbox{\hyperlink{namespacemie_ac62ddfee233ba71d08dc91a1924d4b74}{Vuint}}(1)\ <<\ (\textcolor{keyword}{sizeof}(\mbox{\hyperlink{namespacemie_a56ce7f54476ac398f450a858f9b741c4}{Unit}})\ *\ 8));}
+\DoxyCodeLine{03618\ \ \ \ \ \ \ \ \ ZN\ t(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}});}
+\DoxyCodeLine{03619\ \ \ \ \ \ \ \ \ t\ =\ -\/t;}
+\DoxyCodeLine{03620\ \ \ \ \ \ \ \ \ t.inverse();}
+\DoxyCodeLine{03621\ \ \ \ \ \ \ \ \ pp\_mont\ =\ t[0];}
+\DoxyCodeLine{03622\ \ \ \ \ \ \ \ \ pN\ =\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ <<\ 256;}
+\DoxyCodeLine{03623\ \ \ \ \ \ \ \ \ p\_add1\_div4\_\ =\ (\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ +\ 1)\ /\ 4;}
+\DoxyCodeLine{03624\ \ \ \ \ \}}
+\DoxyCodeLine{03625\ }
+\DoxyCodeLine{03626\ \ \ \ \ \textcolor{comment}{//\ we\ can't\ use\ Fp\ before\ setting\ Fp\_mul*\ variables!!!}}
+\DoxyCodeLine{03627\ \ \ \ \ montgomeryR\_\ =\ (\mbox{\hyperlink{namespacemie_ac62ddfee233ba71d08dc91a1924d4b74}{Vuint}}(1)\ <<\ 256)\ \%\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}};}
+\DoxyCodeLine{03628\ \ \ \ \ \{}
+\DoxyCodeLine{03629\ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classmie_1_1_zm_z}{mie::ZmZ<mie::Vuint,\ MontgomeryDummy>}}\ Z;}
+\DoxyCodeLine{03630\ \ \ \ \ \ \ \ \ Z::setModulo(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}});}
+\DoxyCodeLine{03631\ \ \ \ \ \ \ \ \ Z\ t(montgomeryR\_);}
+\DoxyCodeLine{03632\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classmie_1_1_fp_aeb0819f69c38adb875b4ff9c497deddd}{Fp::setDirect}}(montgomeryR2\_,\ t\ *\ t);}
+\DoxyCodeLine{03633\ \ \ \ \ \}}
+\DoxyCodeLine{03634\ \ \ \ \ one\_.\mbox{\hyperlink{classmie_1_1_fp_ac6f43b9a65ec8da4053f5979a158264a}{clear}}();}
+\DoxyCodeLine{03635\ \ \ \ \ one\_[0]\ =\ 1;}
+\DoxyCodeLine{03636\ }
+\DoxyCodeLine{03637\ \ \ \ \ \mbox{\hyperlink{classmie_1_1_zm_z_a2619580172130a9f7a085ff64bc1083f}{Fp\_emu::setModulo}}(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}});}
+\DoxyCodeLine{03638\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{03639\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ setup\ code\ and\ data\ area}}
+\DoxyCodeLine{03640\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ PageSize\ =\ 4096;}
+\DoxyCodeLine{03641\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ codeSize\ =\ PageSize\ *\ 9;}
+\DoxyCodeLine{03642\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ dataSize\ =\ PageSize\ *\ 1;}
+\DoxyCodeLine{03643\ }
+\DoxyCodeLine{03644\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ std::vector<Xbyak::uint8>\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}};}
+\DoxyCodeLine{03645\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}.resize(codeSize\ +\ dataSize\ +\ PageSize);}
+\DoxyCodeLine{03646\ \ \ \ \ \ \ \ \ Xbyak::uint8\ *\textcolor{keyword}{const}\ codeAddr\ =\ \mbox{\hyperlink{class_xbyak_1_1_code_array_ab8a548e2f4d28828fce62b0ab79e7551}{Xbyak::CodeArray::getAlignedAddress}}(\&\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}[0],\ PageSize);}
+\DoxyCodeLine{03647\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_code_array_aeabe84fe014e9d4f4065608ec3c29e5a}{Xbyak::CodeArray::protect}}(codeAddr,\ codeSize,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{03648\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zm2_8cpp_ae0884ca1c1e1b37157c56ad20d6e53c0}{s\_data}}\ =\ \mbox{\hyperlink{namespace_xbyak_ad60ea5f6215534109ed45a19f413a6f0}{Xbyak::CastTo<Data*>}}(codeAddr\ +\ codeSize);}
+\DoxyCodeLine{03649\ }
+\DoxyCodeLine{03650\ \textcolor{comment}{//\ \ \ \ \ \ printf("{}codeAddr=\%p,\ dataAddr=\%p\(\backslash\)n"{},\ codeAddr,\ s\_data);}}
+\DoxyCodeLine{03651\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((\textcolor{keywordtype}{size\_t})codeAddr\ \&\ 0xffffffff00000000ULL\ ||\ (\textcolor{keywordtype}{size\_t})\mbox{\hyperlink{zm2_8cpp_ae0884ca1c1e1b37157c56ad20d6e53c0}{s\_data}}\ \&\ 0xffffffff00000000ULL)\ \{}
+\DoxyCodeLine{03652\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ printf("{}\(\backslash\)naddress\ of\ code\ and\ data\ is\ over\ 4GB!!!\(\backslash\)n"{});}}
+\DoxyCodeLine{03653\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{03654\ }
+\DoxyCodeLine{03655\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ setup\ data}}
+\DoxyCodeLine{03656\ \ \ \ \ \ \ \ \ s\_pTbl\ =\ \mbox{\hyperlink{zm2_8cpp_ae0884ca1c1e1b37157c56ad20d6e53c0}{s\_data}}-\/>\mbox{\hyperlink{struct_data_abe36db8494d1aeb7e46d7179a937902c}{pTbl}};}
+\DoxyCodeLine{03657\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classmie_1_1_fp_a6efaf9f46b3d09c40e7540d44d5a10fc}{Fp::halfTbl\_}}\ =\ \mbox{\hyperlink{zm2_8cpp_ae0884ca1c1e1b37157c56ad20d6e53c0}{s\_data}}-\/>\mbox{\hyperlink{struct_data_a593c2efcb5a6369905b88c7882742203}{halfTbl}};}
+\DoxyCodeLine{03658\ \ \ \ \ \ \ \ \ Fp::quarterTbl\_\ =\ \mbox{\hyperlink{zm2_8cpp_ae0884ca1c1e1b37157c56ad20d6e53c0}{s\_data}}-\/>\mbox{\hyperlink{struct_data_aaa2d25238a18960d8b2cd028735214ff}{quarterTbl}};}
+\DoxyCodeLine{03659\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structmie_1_1_fp_1_1_dbl_ac0285227d608295eb314f1449c342eac}{bn::FpDbl::pNTbl\_}}\ =\ \mbox{\hyperlink{zm2_8cpp_ae0884ca1c1e1b37157c56ad20d6e53c0}{s\_data}}-\/>\mbox{\hyperlink{struct_data_abede0db8834cbb2c6184f86a9047f82c}{pNTbl}};}
+\DoxyCodeLine{03660\ }
+\DoxyCodeLine{03661\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{zm2_8cpp_a769a8ad8dea2e2515b328441b445d721}{pTblSize}};\ i++)\ \{}
+\DoxyCodeLine{03662\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classmie_1_1_fp_aeb0819f69c38adb875b4ff9c497deddd}{Fp::setDirect}}(s\_pTbl[i],\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ *\ \textcolor{keywordtype}{int}(i));}
+\DoxyCodeLine{03663\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{03664\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*}}
+\DoxyCodeLine{03665\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ for\ option1}}
+\DoxyCodeLine{03666\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ lower\ 192-\/bits\ of\ pNTbl\_[1]\ =\ 0}}
+\DoxyCodeLine{03667\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ lower\ 192-\/bits\ of\ pNTbl\_[2]\ =\ 0}}
+\DoxyCodeLine{03668\ \textcolor{comment}{\ \ \ \ \ \ \ \ */}}
+\DoxyCodeLine{03669\ \ \ \ \ \ \ \ \ Fp::Dbl::pNTbl\_[0].\mbox{\hyperlink{structmie_1_1_fp_1_1_dbl_a3f5c0f2e94bc7b5f0e6c1027e59ac290}{setDirect}}(pN);}
+\DoxyCodeLine{03670\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ h\ =\ 1;\ h\ <\ \mbox{\hyperlink{zm2_8cpp_a6a4f69bc304806a40038f2104160a296}{pNtblSize}};\ ++h)\ \{}
+\DoxyCodeLine{03671\ \ \ \ \ \ \ \ \ \ \ \ \ Fp::Dbl::pNTbl\_[h].setDirect(pN\ >>\ h);}
+\DoxyCodeLine{03672\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{03673\ \ \ \ \ \ \ \ \ setTablesForDiv(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}});}
+\DoxyCodeLine{03674\ }
+\DoxyCodeLine{03675\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ setup\ code}}
+\DoxyCodeLine{03676\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ PairingCode\ code(codeSize,\ codeAddr);}
+\DoxyCodeLine{03677\ \ \ \ \ \ \ \ \ code.init(p\_,\ mode,\ useMulx);}
+\DoxyCodeLine{03678\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{03679\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_fp}{Fp}}\ t(2);}
+\DoxyCodeLine{03680\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ 512;\ i++)\ \{}
+\DoxyCodeLine{03681\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ invTbl\_[511\ -\/\ i]\ =\ t;}
+\DoxyCodeLine{03682\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ t\ +=\ t;}
+\DoxyCodeLine{03683\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{03684\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{03685\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{03686\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (std::exception\&\ e)\ \{}
+\DoxyCodeLine{03687\ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}setModulo\ ERR:\%s\(\backslash\)n"{}},\ e.what());}
+\DoxyCodeLine{03688\ \ \ \ \ \}}
+\DoxyCodeLine{03689\ \ \ \ \ ::exit(1);}
+\DoxyCodeLine{03690\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classmie_1_1_fp_af8679fcab0ee97ee5e8f201e396f6c78_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classmie_1_1_fp_af8679fcab0ee97ee5e8f201e396f6c78_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classmie_1_1_fp_a130b5873d9b8c7af71af90985a160eee}\index{mie::Fp@{mie::Fp}!size@{size}}
+\index{size@{size}!mie::Fp@{mie::Fp}}
+\doxysubsubsection{\texorpdfstring{size()}{size()}}
+{\footnotesize\ttfamily \label{classmie_1_1_fp_a130b5873d9b8c7af71af90985a160eee} 
+\mbox{\hyperlink{zm_8h_af05b4159bde6d4782da7bf7d42626e92}{MIE\+\_\+\+FORCE\+\_\+\+INLINE}} size\+\_\+t mie\+::\+Fp\+::size (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zm2_8h_source_l00253}{253}} of file \mbox{\hyperlink{zm2_8h_source}{zm2.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00253\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classmie_1_1_fp_a7f7bd1ab1f6bb723e42dd7c83be3e2c3a22268e7961142f7fb9e3bc2db0a6cf30}{N}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classmie_1_1_fp_af9c80c57f34c9fb31ba4c6e862b5b017}\index{mie::Fp@{mie::Fp}!square@{square}}
+\index{square@{square}!mie::Fp@{mie::Fp}}
+\doxysubsubsection{\texorpdfstring{square()}{square()}}
+{\footnotesize\ttfamily \label{classmie_1_1_fp_af9c80c57f34c9fb31ba4c6e862b5b017} 
+static void mie\+::\+Fp\+::square (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&}]{out}{, }\item[{const \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&}]{x}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{zm2_8h_source_l00282}{282}} of file \mbox{\hyperlink{zm2_8h_source}{zm2.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00282\ \{\ \mbox{\hyperlink{classmie_1_1_fp_a384d6e30672b87376ced2fb392d0f486}{mul}}(out,\ x,\ x);\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classmie_1_1_fp_af9c80c57f34c9fb31ba4c6e862b5b017_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classmie_1_1_fp_af10b1564ad19477315ee9fe8d77b9345}\index{mie::Fp@{mie::Fp}!squareRoot@{squareRoot}}
+\index{squareRoot@{squareRoot}!mie::Fp@{mie::Fp}}
+\doxysubsubsection{\texorpdfstring{squareRoot()}{squareRoot()}}
+{\footnotesize\ttfamily \label{classmie_1_1_fp_af10b1564ad19477315ee9fe8d77b9345} 
+static bool mie\+::\+Fp\+::square\+Root (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&}]{y}{, }\item[{const \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&}]{x}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{zm2_8h_source_l00297}{297}} of file \mbox{\hyperlink{zm2_8h_source}{zm2.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00298\ \ \ \ \ \{}
+\DoxyCodeLine{00299\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_fp}{Fp}}\ t;}
+\DoxyCodeLine{00300\ \ \ \ \ \ \ \ \ t\ =\ \mbox{\hyperlink{namespacemie_a595f193249b72c666b84e42439a60817}{mie::power}}(x,\ p\_add1\_div4\_);}
+\DoxyCodeLine{00301\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (t\ *\ t\ !=\ x)\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00302\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_ab199a7c94624123911206db59ebe45da}{y}}\ =\ t;}
+\DoxyCodeLine{00303\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00304\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=285pt]{classmie_1_1_fp_af10b1564ad19477315ee9fe8d77b9345_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classmie_1_1_fp_af10b1564ad19477315ee9fe8d77b9345_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classmie_1_1_fp_ad3c87c54159382d12cb398d7e17001ab}\index{mie::Fp@{mie::Fp}!toMont@{toMont}}
+\index{toMont@{toMont}!mie::Fp@{mie::Fp}}
+\doxysubsubsection{\texorpdfstring{toMont()}{toMont()}}
+{\footnotesize\ttfamily \label{classmie_1_1_fp_ad3c87c54159382d12cb398d7e17001ab} 
+static void mie\+::\+Fp\+::to\+Mont (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&}]{y}{, }\item[{const \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&}]{x}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{zm2_8h_source_l00143}{143}} of file \mbox{\hyperlink{zm2_8h_source}{zm2.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00144\ \ \ \ \ \{}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classmie_1_1_fp_a384d6e30672b87376ced2fb392d0f486}{mul}}(y,\ x,\ montgomeryR2\_);}
+\DoxyCodeLine{00146\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classmie_1_1_fp_ae620c25931497b291fe0b8c51919798f}\index{mie::Fp@{mie::Fp}!toString@{toString}}
+\index{toString@{toString}!mie::Fp@{mie::Fp}}
+\doxysubsubsection{\texorpdfstring{toString()}{toString()}}
+{\footnotesize\ttfamily \label{classmie_1_1_fp_ae620c25931497b291fe0b8c51919798f} 
+std\+::string mie\+::\+Fp\+::to\+String (\begin{DoxyParamCaption}\item[{int}]{base}{ = {\ttfamily 10}}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zm2_8h_source_l00250}{250}} of file \mbox{\hyperlink{zm2_8h_source}{zm2.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00250\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classmie_1_1_fp_afadd6b45245c0f9b25040f2b750d4b12}{get}}().\mbox{\hyperlink{structmie_1_1_vuint_t_a9f034a3e28c28830b6526c3c1f8e6e59}{toString}}(base);\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classmie_1_1_fp_ae620c25931497b291fe0b8c51919798f_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classmie_1_1_fp_ae620c25931497b291fe0b8c51919798f_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{classmie_1_1_fp_a9928f8039f1a54a64ab137101ecdb5a7}\index{mie::Fp@{mie::Fp}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!mie::Fp@{mie::Fp}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$}{operator<<}}
+{\footnotesize\ttfamily \label{classmie_1_1_fp_a9928f8039f1a54a64ab137101ecdb5a7} 
+std\+::ostream \& operator$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{os}{, }\item[{const \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&}]{x}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{zm2_8h_source_l00116}{116}} of file \mbox{\hyperlink{zm2_8h_source}{zm2.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00117\ \ \ \ \ \{}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ os\ <<\ x.\mbox{\hyperlink{class_fp_a98e98bf5f1cddca8a66434fdbaa46c0f}{toString}}(os.flags()\ \&\ std::ios\_base::hex\ ?\ 16\ :\ 10);}
+\DoxyCodeLine{00119\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classmie_1_1_fp_a7bbff18a912513a0084fdb80df70bc90}\index{mie::Fp@{mie::Fp}!operator$>$$>$@{operator$>$$>$}}
+\index{operator$>$$>$@{operator$>$$>$}!mie::Fp@{mie::Fp}}
+\doxysubsubsection{\texorpdfstring{operator$>$$>$}{operator>>}}
+{\footnotesize\ttfamily \label{classmie_1_1_fp_a7bbff18a912513a0084fdb80df70bc90} 
+std\+::istream \& operator$>$$>$ (\begin{DoxyParamCaption}\item[{std\+::istream \&}]{is}{, }\item[{\mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&}]{x}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{zm2_8h_source_l00120}{120}} of file \mbox{\hyperlink{zm2_8h_source}{zm2.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00121\ \ \ \ \ \{}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ std::string\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}};}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacemie_1_1local_a847047e2eed379879763d334f64e2811}{mie::local::getDigits}}(is,\ str);}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ x.\mbox{\hyperlink{class_fp_a522be8bd638d64c580830d9e752d24df}{set}}(str);}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ is;}
+\DoxyCodeLine{00126\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classmie_1_1_fp_a019d564ec54c8f4da6e302924f41b0b9}\index{mie::Fp@{mie::Fp}!add@{add}}
+\index{add@{add}!mie::Fp@{mie::Fp}}
+\doxysubsubsection{\texorpdfstring{add}{add}}
+{\footnotesize\ttfamily \label{classmie_1_1_fp_a019d564ec54c8f4da6e302924f41b0b9} 
+void(\texorpdfstring{$\ast$}{*} mie\+::\+Fp\+::add) (\mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&out, const \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&x, const \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&y)\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{zm2_8h_source_l00083}{83}} of file \mbox{\hyperlink{zm2_8h_source}{zm2.\+h}}.
+
+\Hypertarget{classmie_1_1_fp_a16401a650d5f3fd8c2112b1a3e3f59ea}\index{mie::Fp@{mie::Fp}!addNC@{addNC}}
+\index{addNC@{addNC}!mie::Fp@{mie::Fp}}
+\doxysubsubsection{\texorpdfstring{addNC}{addNC}}
+{\footnotesize\ttfamily \label{classmie_1_1_fp_a16401a650d5f3fd8c2112b1a3e3f59ea} 
+void(\texorpdfstring{$\ast$}{*} Fp\+::add\+NC)(\mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&out, const \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&x, const \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&y) = \&Fp\+\_\+add\+NC\+\_\+C\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{zm2_8h_source_l00086}{86}} of file \mbox{\hyperlink{zm2_8h_source}{zm2.\+h}}.
+
+\Hypertarget{classmie_1_1_fp_a6efaf9f46b3d09c40e7540d44d5a10fc}\index{mie::Fp@{mie::Fp}!halfTbl\_@{halfTbl\_}}
+\index{halfTbl\_@{halfTbl\_}!mie::Fp@{mie::Fp}}
+\doxysubsubsection{\texorpdfstring{halfTbl\_}{halfTbl\_}}
+{\footnotesize\ttfamily \label{classmie_1_1_fp_a6efaf9f46b3d09c40e7540d44d5a10fc} 
+\mbox{\hyperlink{classmie_1_1_fp}{Fp}} \texorpdfstring{$\ast$}{*} Fp\+::half\+Tbl\+\_\+\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{zm2_8h_source_l00270}{270}} of file \mbox{\hyperlink{zm2_8h_source}{zm2.\+h}}.
+
+\Hypertarget{classmie_1_1_fp_a384d6e30672b87376ced2fb392d0f486}\index{mie::Fp@{mie::Fp}!mul@{mul}}
+\index{mul@{mul}!mie::Fp@{mie::Fp}}
+\doxysubsubsection{\texorpdfstring{mul}{mul}}
+{\footnotesize\ttfamily \label{classmie_1_1_fp_a384d6e30672b87376ced2fb392d0f486} 
+void(\texorpdfstring{$\ast$}{*} mie\+::\+Fp\+::mul) (\mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&out, const \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&x, const \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&y)\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{zm2_8h_source_l00093}{93}} of file \mbox{\hyperlink{zm2_8h_source}{zm2.\+h}}.
+
+\Hypertarget{classmie_1_1_fp_ac78a5c242d66b0689e0860ffd3e1e1b9}\index{mie::Fp@{mie::Fp}!neg@{neg}}
+\index{neg@{neg}!mie::Fp@{mie::Fp}}
+\doxysubsubsection{\texorpdfstring{neg}{neg}}
+{\footnotesize\ttfamily \label{classmie_1_1_fp_ac78a5c242d66b0689e0860ffd3e1e1b9} 
+void(\texorpdfstring{$\ast$}{*} Fp\+::neg)(\mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&out, const \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&x) = \&Fp\+\_\+negC\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{zm2_8h_source_l00092}{92}} of file \mbox{\hyperlink{zm2_8h_source}{zm2.\+h}}.
+
+\Hypertarget{classmie_1_1_fp_a39c03a6b5ab1bfeddbde09e0b85e0baf}\index{mie::Fp@{mie::Fp}!preInv@{preInv}}
+\index{preInv@{preInv}!mie::Fp@{mie::Fp}}
+\doxysubsubsection{\texorpdfstring{preInv}{preInv}}
+{\footnotesize\ttfamily \label{classmie_1_1_fp_a39c03a6b5ab1bfeddbde09e0b85e0baf} 
+int(\texorpdfstring{$\ast$}{*} Fp\+::pre\+Inv)(\mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}, const \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&x)=0\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{zm2_8h_source_l00094}{94}} of file \mbox{\hyperlink{zm2_8h_source}{zm2.\+h}}.
+
+\Hypertarget{classmie_1_1_fp_ae19df313e92faa969ea61d5892f33ef0}\index{mie::Fp@{mie::Fp}!shr1@{shr1}}
+\index{shr1@{shr1}!mie::Fp@{mie::Fp}}
+\doxysubsubsection{\texorpdfstring{shr1}{shr1}}
+{\footnotesize\ttfamily \label{classmie_1_1_fp_ae19df313e92faa969ea61d5892f33ef0} 
+void(\texorpdfstring{$\ast$}{*} Fp\+::shr1)(\mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&out, const \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&x)=0\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{zm2_8h_source_l00088}{88}} of file \mbox{\hyperlink{zm2_8h_source}{zm2.\+h}}.
+
+\Hypertarget{classmie_1_1_fp_a21ddccaee63e3b70b204b856f525dec1}\index{mie::Fp@{mie::Fp}!shr2@{shr2}}
+\index{shr2@{shr2}!mie::Fp@{mie::Fp}}
+\doxysubsubsection{\texorpdfstring{shr2}{shr2}}
+{\footnotesize\ttfamily \label{classmie_1_1_fp_a21ddccaee63e3b70b204b856f525dec1} 
+void(\texorpdfstring{$\ast$}{*} Fp\+::shr2)(\mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&out, const \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&x)=0\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{zm2_8h_source_l00089}{89}} of file \mbox{\hyperlink{zm2_8h_source}{zm2.\+h}}.
+
+\Hypertarget{classmie_1_1_fp_adb73ebf449a2d203705a735ae46766d9}\index{mie::Fp@{mie::Fp}!sub@{sub}}
+\index{sub@{sub}!mie::Fp@{mie::Fp}}
+\doxysubsubsection{\texorpdfstring{sub}{sub}}
+{\footnotesize\ttfamily \label{classmie_1_1_fp_adb73ebf449a2d203705a735ae46766d9} 
+void(\texorpdfstring{$\ast$}{*} mie\+::\+Fp\+::sub) (\mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&out, const \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&x, const \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&y)\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{zm2_8h_source_l00091}{91}} of file \mbox{\hyperlink{zm2_8h_source}{zm2.\+h}}.
+
+\Hypertarget{classmie_1_1_fp_ade824375254153bbf7b11cbff2b42cca}\index{mie::Fp@{mie::Fp}!subNC@{subNC}}
+\index{subNC@{subNC}!mie::Fp@{mie::Fp}}
+\doxysubsubsection{\texorpdfstring{subNC}{subNC}}
+{\footnotesize\ttfamily \label{classmie_1_1_fp_ade824375254153bbf7b11cbff2b42cca} 
+void(\texorpdfstring{$\ast$}{*} Fp\+::sub\+NC)(\mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&out, const \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&x, const \mbox{\hyperlink{classmie_1_1_fp}{Fp}} \&y) = \&Fp\+\_\+sub\+NC\+\_\+C\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{zm2_8h_source_l00087}{87}} of file \mbox{\hyperlink{zm2_8h_source}{zm2.\+h}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/libraries/ff/depends/ate-\/pairing/include/\mbox{\hyperlink{zm2_8h}{zm2.\+h}}\item 
+libraries/fc/libraries/ff/depends/ate-\/pairing/src/\mbox{\hyperlink{zm2_8cpp}{zm2.\+cpp}}\end{DoxyCompactItemize}

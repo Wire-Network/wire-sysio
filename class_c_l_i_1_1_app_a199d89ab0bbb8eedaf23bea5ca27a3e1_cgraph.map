@@ -1,0 +1,19 @@
+<map id="CLI::App::add_option_function" name="CLI::App::add_option_function">
+<area shape="rect" id="Node000001" title="Add option for a callback of a specific type." alt="" coords="5,134,150,174"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_app.html#a8c812d42c7720ecb5cd0aec41b5aa941" title=" " alt="" coords="206,5,350,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="94,132,137,86,165,61,196,40,206,35,208,40,199,44,169,65,141,89,98,135"/>
+<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_option.html#a66d22991355232198a3da4b395847eba" title="Set the number of expected arguments." alt="" coords="203,55,352,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="114,131,197,90,215,83,217,88,199,95,117,136"/>
+<area shape="rect" id="Node000004" href="$namespace_c_l_i_1_1detail.html#a9e56362b2b589534c179de55f6444ed8" title="Conversion for tuples." alt="" coords="215,104,341,145"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="150,141,199,134,200,139,151,146"/>
+<area shape="rect" id="Node000006" href="$namespace_c_l_i_1_1detail.html#a0505c3528178408b76390be64bd452d4" title="Print name for enumeration types." alt="" coords="201,169,354,195"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="151,162,186,167,185,172,150,167"/>
+<area shape="rect" id="Node000007" href="$class_c_l_i_1_1_option.html#a1fcb3c625eeca46ef953732a71403027" title="Set a custom option typestring." alt="" coords="198,219,358,244"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="123,173,199,205,216,211,214,216,197,210,121,177"/>
+<area shape="rect" id="Node000009" href="$class_c_l_i_1_1_option.html#a8914e4810b213c5e23359d61a70c5ac1" title="Set a custom option size." alt="" coords="202,268,354,294"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="99,173,143,214,199,255,209,260,207,264,196,259,139,218,96,177"/>
+<area shape="rect" id="Node000005" href="$namespace_c_l_i_1_1detail.html#ab51a37d8073a381cabf33bff8e4bce00" title=" " alt="" coords="436,104,554,145"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="341,122,421,122,421,128,341,128"/>
+<area shape="rect" id="Node000008" href="$class_c_l_i_1_1_option.html#ad4ff97f7911d552972c10771bcf488d7" title="Set the type function to run when displayed on this option." alt="" coords="406,219,584,244"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="358,229,390,229,390,234,358,234"/>
+</map>

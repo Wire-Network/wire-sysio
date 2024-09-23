@@ -1,0 +1,52 @@
+\doxysection{catch\+\_\+common.\+cpp}
+\hypertarget{catch__common_8cpp_source}{}\label{catch__common_8cpp_source}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_common.cpp@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_common.cpp}}
+\mbox{\hyperlink{catch__common_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{catch__common_8cpp_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{catch__common_8cpp_source_l00002}00002\ \textcolor{comment}{\ *\ \ Created\ by\ Phil\ on\ 27/11/2013.}}
+\DoxyCodeLine{\Hypertarget{catch__common_8cpp_source_l00003}00003\ \textcolor{comment}{\ *\ \ Copyright\ 2013\ Two\ Blue\ Cubes\ Ltd.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{catch__common_8cpp_source_l00004}00004\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{catch__common_8cpp_source_l00005}00005\ \textcolor{comment}{\ *\ \ Distributed\ under\ the\ Boost\ Software\ License,\ Version\ 1.0.\ (See\ accompanying}}
+\DoxyCodeLine{\Hypertarget{catch__common_8cpp_source_l00006}00006\ \textcolor{comment}{\ *\ \ file\ LICENSE\_1\_0.txt\ or\ copy\ at\ http://www.boost.org/LICENSE\_1\_0.txt)}}
+\DoxyCodeLine{\Hypertarget{catch__common_8cpp_source_l00007}00007\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{catch__common_8cpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{catch__common_8cpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__common_8h}{catch\_common.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__common_8cpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__context_8h}{catch\_context.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__common_8cpp_source_l00011}00011\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__interfaces__config_8h}{catch\_interfaces\_config.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__common_8cpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{catch__common_8cpp_source_l00013}00013\ \textcolor{preprocessor}{\#include\ <cstring>}}
+\DoxyCodeLine{\Hypertarget{catch__common_8cpp_source_l00014}00014\ \textcolor{preprocessor}{\#include\ <ostream>}}
+\DoxyCodeLine{\Hypertarget{catch__common_8cpp_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{catch__common_8cpp_source_l00016}00016\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__common_8cpp_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{catch__common_8cpp_source_l00018}\mbox{\hyperlink{struct_catch_1_1_source_line_info_a10a5b5b7dff82971879c2eb8d83f9b3b}{00018}}\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_catch_1_1_source_line_info_a10a5b5b7dff82971879c2eb8d83f9b3b}{SourceLineInfo::empty}}()\ const\ noexcept\ \{}
+\DoxyCodeLine{\Hypertarget{catch__common_8cpp_source_l00019}00019\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ file[0]\ ==\ \textcolor{charliteral}{'\(\backslash\)0'};}
+\DoxyCodeLine{\Hypertarget{catch__common_8cpp_source_l00020}00020\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__common_8cpp_source_l00021}\mbox{\hyperlink{struct_catch_1_1_source_line_info_af07e4fdeddf8409b91e4f842f6264cf8}{00021}}\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_catch_1_1_source_line_info_af07e4fdeddf8409b91e4f842f6264cf8}{SourceLineInfo::operator\ ==\ }}(\ \mbox{\hyperlink{struct_catch_1_1_source_line_info}{SourceLineInfo}}\ \textcolor{keyword}{const}\&\ other\ )\ \textcolor{keyword}{const}\ \textcolor{keyword}{noexcept}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__common_8cpp_source_l00022}00022\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ line\ ==\ other.line\ \&\&\ (file\ ==\ other.file\ ||\ std::strcmp(file,\ other.file)\ ==\ 0);}
+\DoxyCodeLine{\Hypertarget{catch__common_8cpp_source_l00023}00023\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__common_8cpp_source_l00024}\mbox{\hyperlink{struct_catch_1_1_source_line_info_af77415416919d2d6030b4be085b92f7a}{00024}}\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_catch_1_1_source_line_info_af77415416919d2d6030b4be085b92f7a}{SourceLineInfo::operator\ <\ }}(\ \mbox{\hyperlink{struct_catch_1_1_source_line_info}{SourceLineInfo}}\ \textcolor{keyword}{const}\&\ other\ )\ \textcolor{keyword}{const}\ \textcolor{keyword}{noexcept}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__common_8cpp_source_l00025}00025\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ We\ can\ assume\ that\ the\ same\ file\ will\ usually\ have\ the\ same\ pointer.}}
+\DoxyCodeLine{\Hypertarget{catch__common_8cpp_source_l00026}00026\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Thus,\ if\ the\ pointers\ are\ the\ same,\ there\ is\ no\ point\ in\ calling\ the\ strcmp}}
+\DoxyCodeLine{\Hypertarget{catch__common_8cpp_source_l00027}00027\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ line\ <\ other.line\ ||\ (\ line\ ==\ other.line\ \&\&\ file\ !=\ other.file\ \&\&\ (std::strcmp(file,\ other.file)\ <\ 0));}
+\DoxyCodeLine{\Hypertarget{catch__common_8cpp_source_l00028}00028\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__common_8cpp_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{catch__common_8cpp_source_l00030}\mbox{\hyperlink{namespace_catch_a8c8ea1f66bc1cdc3e1254ed7fa57c06d}{00030}}\ \ \ \ \ std::ostream\&\ \mbox{\hyperlink{namespace_catch_abf821d46e662c8d93d80a98d79a10314}{operator\ <<\ }}(\ std::ostream\&\ os,\ \mbox{\hyperlink{struct_catch_1_1_source_line_info}{SourceLineInfo}}\ \textcolor{keyword}{const}\&\ info\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__common_8cpp_source_l00031}00031\ \textcolor{preprocessor}{\#ifndef\ \_\_GNUG\_\_}}
+\DoxyCodeLine{\Hypertarget{catch__common_8cpp_source_l00032}00032\ \ \ \ \ \ \ \ \ os\ <<\ info.file\ <<\ \textcolor{charliteral}{'('}\ <<\ info.line\ <<\ \textcolor{charliteral}{')'};}
+\DoxyCodeLine{\Hypertarget{catch__common_8cpp_source_l00033}00033\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{catch__common_8cpp_source_l00034}00034\ \ \ \ \ \ \ \ \ os\ <<\ info.file\ <<\ \textcolor{charliteral}{':'}\ <<\ info.line;}
+\DoxyCodeLine{\Hypertarget{catch__common_8cpp_source_l00035}00035\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{catch__common_8cpp_source_l00036}00036\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}};}
+\DoxyCodeLine{\Hypertarget{catch__common_8cpp_source_l00037}00037\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__common_8cpp_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{catch__common_8cpp_source_l00039}\mbox{\hyperlink{struct_catch_1_1_stream_end_stop_a4a518f0342a381074821d5bda2651401}{00039}}\ \ \ \ \ std::string\ \mbox{\hyperlink{struct_catch_1_1_stream_end_stop_a4a518f0342a381074821d5bda2651401}{StreamEndStop::operator+}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{catch__common_8cpp_source_l00040}00040\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::string();}
+\DoxyCodeLine{\Hypertarget{catch__common_8cpp_source_l00041}00041\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__common_8cpp_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{catch__common_8cpp_source_l00043}00043\ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_non_copyable_a4b492dd5753f9952350fb64dc6cb9fe2}{NonCopyable::NonCopyable}}()\ =\ \textcolor{keywordflow}{default};}
+\DoxyCodeLine{\Hypertarget{catch__common_8cpp_source_l00044}00044\ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_non_copyable_a01c810b6a334f415babd9c9c4af62027}{NonCopyable::\string~NonCopyable}}()\ =\ \textcolor{keywordflow}{default};}
+\DoxyCodeLine{\Hypertarget{catch__common_8cpp_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{catch__common_8cpp_source_l00046}00046\ \}}
+
+\end{DoxyCode}

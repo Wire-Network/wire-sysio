@@ -1,0 +1,14 @@
+<map id="Catch::TestCaseTracking::TrackerContext::completedCycle" name="Catch::TestCaseTracking::TrackerContext::completedCycle">
+<area shape="rect" id="Node000001" title=" " alt="" coords="416,71,637,111"/>
+<area shape="rect" id="Node000002" href="$struct_catch_1_1_generators_1_1_generator_tracker.html#a3842dbd70ae3fc1c3b97fe3ebb3fdd1f" title=" " alt="" coords="196,5,368,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="432,69,360,49,361,44,434,64"/>
+<area shape="rect" id="Node000003" href="$class_catch_1_1_test_case_tracking_1_1_section_tracker.html#a30bdd2cd2f15dd29bb4f14ddc029b332" title=" " alt="" coords="197,71,367,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="400,94,368,94,368,88,400,88"/>
+<area shape="rect" id="Node000006" href="$_part_tracker_8tests_8cpp.html#ab48fa5fd72ef236fd0c727ecddcf3880" title=" " alt="" coords="27,136,126,161"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="417,117,368,126,238,140,127,148,127,143,237,135,368,120,416,112"/>
+<area shape="rect" id="Node000004" href="$class_catch_1_1_run_context.html#a50c4bd4b7be11450476e6b092a928bcd" title=" " alt="" coords="5,5,148,46"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="200,68,142,49,144,44,202,63"/>
+<area shape="rect" id="Node000005" href="$class_catch_1_1_run_context.html#ac717139177c23d02a78d548daed757ea" title=" " alt="" coords="5,71,148,111"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="181,94,148,94,148,88,181,88"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="193,118,126,137,125,132,192,113"/>
+</map>

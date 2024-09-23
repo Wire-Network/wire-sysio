@@ -1,0 +1,121 @@
+\doxysection{libraries/sys-\/vm/tests/max\+\_\+table\+\_\+elements\+\_\+tests.cpp File Reference}
+\hypertarget{max__table__elements__tests_8cpp}{}\label{max__table__elements__tests_8cpp}\index{libraries/sys-\/vm/tests/max\_table\_elements\_tests.cpp@{libraries/sys-\/vm/tests/max\_table\_elements\_tests.cpp}}
+{\ttfamily \#include $<$sysio/vm/backend.\+hpp$>$}\newline
+{\ttfamily \#include "{}utils.\+hpp"{}}\newline
+{\ttfamily \#include $<$catch2/catch.\+hpp$>$}\newline
+Include dependency graph for max\+\_\+table\+\_\+elements\+\_\+tests.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{max__table__elements__tests_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{max__table__elements__tests_8cpp_a419533c9b521fa5d3332f39604de93bf}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Test max\+\_\+table\+\_\+elements default"{}, "{}\mbox{[}max\+\_\+table\+\_\+elements\+\_\+test\mbox{]}"{})
+\item 
+\mbox{\hyperlink{max__table__elements__tests_8cpp_ac9bfd7b88e9ce8fdf29c16c61897e028}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Test max\+\_\+table\+\_\+elements static"{}, "{}\mbox{[}max\+\_\+table\+\_\+elements\+\_\+test\mbox{]}"{})
+\item 
+\mbox{\hyperlink{max__table__elements__tests_8cpp_aa78f2de13295707a86294270c664d31b}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Test max\+\_\+table\+\_\+elements unlimited"{}, "{}\mbox{[}max\+\_\+table\+\_\+elements\+\_\+test\mbox{]}"{})
+\item 
+\mbox{\hyperlink{max__table__elements__tests_8cpp_a6bdd3414604fa49054a2d5fc5eb6aab0}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Test max\+\_\+table\+\_\+elements dynamic"{}, "{}\mbox{[}max\+\_\+table\+\_\+elements\+\_\+test\mbox{]}"{})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+wasm\+\_\+allocator \mbox{\hyperlink{max__table__elements__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{max__table__elements__tests_8cpp_a419533c9b521fa5d3332f39604de93bf}\index{max\_table\_elements\_tests.cpp@{max\_table\_elements\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!max\_table\_elements\_tests.cpp@{max\_table\_elements\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{max__table__elements__tests_8cpp_a419533c9b521fa5d3332f39604de93bf} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Test max\+\_\+table\+\_\+elements default"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}max\+\_\+table\+\_\+elements\+\_\+test\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{max__table__elements__tests_8cpp_source_l00043}{43}} of file \mbox{\hyperlink{max__table__elements__tests_8cpp_source}{max\+\_\+table\+\_\+elements\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00044\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType>}};}
+\DoxyCodeLine{00045\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend1024(\_1024\_elements\_wasm,\ \&\mbox{\hyperlink{max__table__elements__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00046\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend1025(\_1025\_elements\_wasm,\ \&\mbox{\hyperlink{max__table__elements__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00047\ \}}
+
+\end{DoxyCode}
+\Hypertarget{max__table__elements__tests_8cpp_a6bdd3414604fa49054a2d5fc5eb6aab0}\index{max\_table\_elements\_tests.cpp@{max\_table\_elements\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!max\_table\_elements\_tests.cpp@{max\_table\_elements\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{max__table__elements__tests_8cpp_a6bdd3414604fa49054a2d5fc5eb6aab0} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Test max\+\_\+table\+\_\+elements dynamic"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}max\+\_\+table\+\_\+elements\+\_\+test\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{max__table__elements__tests_8cpp_source_l00061}{61}} of file \mbox{\hyperlink{max__table__elements__tests_8cpp_source}{max\+\_\+table\+\_\+elements\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00062\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ dynamic\_options>}};}
+\DoxyCodeLine{00063\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend1024(\_1024\_elements\_wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\{1024\});}
+\DoxyCodeLine{00064\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(\_1025\_elements\_wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\{1024\}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{00065\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend1025(\_1025\_elements\_wasm,\ \textcolor{keyword}{nullptr},\ dynamic\_options\{1025\});}
+\DoxyCodeLine{00066\ \}}
+
+\end{DoxyCode}
+\Hypertarget{max__table__elements__tests_8cpp_ac9bfd7b88e9ce8fdf29c16c61897e028}\index{max\_table\_elements\_tests.cpp@{max\_table\_elements\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!max\_table\_elements\_tests.cpp@{max\_table\_elements\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{max__table__elements__tests_8cpp_ac9bfd7b88e9ce8fdf29c16c61897e028} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Test max\+\_\+table\+\_\+elements static"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}max\+\_\+table\+\_\+elements\+\_\+test\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{max__table__elements__tests_8cpp_source_l00049}{49}} of file \mbox{\hyperlink{max__table__elements__tests_8cpp_source}{max\+\_\+table\+\_\+elements\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00050\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ static\_options>}};}
+\DoxyCodeLine{00051\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend}}(\_1024\_elements\_wasm,\ \&\mbox{\hyperlink{max__table__elements__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00052\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a1fb6439098d2a12bb69188034e03baf2}{CHECK\_THROWS\_AS}}(\mbox{\hyperlink{hello__driver_8cpp_aef5c57098207e50ce5d3d3c5c0d2da0b}{backend\_t}}(\_1025\_elements\_wasm,\ \&\mbox{\hyperlink{max__table__elements__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}),\ wasm\_parse\_exception);}
+\DoxyCodeLine{00053\ \}}
+
+\end{DoxyCode}
+\Hypertarget{max__table__elements__tests_8cpp_aa78f2de13295707a86294270c664d31b}\index{max\_table\_elements\_tests.cpp@{max\_table\_elements\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!max\_table\_elements\_tests.cpp@{max\_table\_elements\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{max__table__elements__tests_8cpp_aa78f2de13295707a86294270c664d31b} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Test max\+\_\+table\+\_\+elements unlimited"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}max\+\_\+table\+\_\+elements\+\_\+test\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{max__table__elements__tests_8cpp_source_l00055}{55}} of file \mbox{\hyperlink{max__table__elements__tests_8cpp_source}{max\+\_\+table\+\_\+elements\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00056\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<std::nullptr\_t,\ TestType,\ empty\_options>}};}
+\DoxyCodeLine{00057\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend1024(\_1024\_elements\_wasm,\ \&\mbox{\hyperlink{max__table__elements__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00058\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ backend1025(\_1025\_elements\_wasm,\ \&\mbox{\hyperlink{max__table__elements__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00059\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{max__table__elements__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}\index{max\_table\_elements\_tests.cpp@{max\_table\_elements\_tests.cpp}!wa@{wa}}
+\index{wa@{wa}!max\_table\_elements\_tests.cpp@{max\_table\_elements\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{wa}{wa}}
+{\footnotesize\ttfamily \label{max__table__elements__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89} 
+wasm\+\_\+allocator wa\hspace{0.3cm}{\ttfamily [extern]}}
+
+
+
+Definition at line \mbox{\hyperlink{libraries_2sys-vm_2tests_2main_8cpp_source_l00010}{10}} of file \mbox{\hyperlink{libraries_2sys-vm_2tests_2main_8cpp_source}{main.\+cpp}}.
+

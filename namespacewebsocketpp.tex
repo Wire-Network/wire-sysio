@@ -1,0 +1,446 @@
+\doxysection{websocketpp Namespace Reference}
+\hypertarget{namespacewebsocketpp}{}\label{namespacewebsocketpp}\index{websocketpp@{websocketpp}}
+
+
+Namespace for the Web\+Socket++ project.  
+
+
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacewebsocketpp_1_1close}{close}}
+\begin{DoxyCompactList}\small\item\em \doxylink{struct_a}{A} package of types and methods for manipulating Web\+Socket close codes. \end{DoxyCompactList}\item 
+namespace \mbox{\hyperlink{namespacewebsocketpp_1_1concurrency}{concurrency}}
+\begin{DoxyCompactList}\small\item\em Concurrency handling support. \end{DoxyCompactList}\item 
+namespace \mbox{\hyperlink{namespacewebsocketpp_1_1config}{config}}
+\item 
+namespace \mbox{\hyperlink{namespacewebsocketpp_1_1error}{error}}
+\begin{DoxyCompactList}\small\item\em Library level error codes. \end{DoxyCompactList}\item 
+namespace \mbox{\hyperlink{namespacewebsocketpp_1_1extensions}{extensions}}
+\item 
+namespace \mbox{\hyperlink{namespacewebsocketpp_1_1frame}{frame}}
+\begin{DoxyCompactList}\small\item\em \doxylink{struct_data}{Data} structures and utility functions for manipulating Web\+Socket frames. \end{DoxyCompactList}\item 
+namespace \mbox{\hyperlink{namespacewebsocketpp_1_1http}{http}}
+\begin{DoxyCompactList}\small\item\em HTTP handling support. \end{DoxyCompactList}\item 
+namespace \mbox{\hyperlink{namespacewebsocketpp_1_1lib}{lib}}
+\item 
+namespace \mbox{\hyperlink{namespacewebsocketpp_1_1log}{log}}
+\item 
+namespace \mbox{\hyperlink{namespacewebsocketpp_1_1md5}{md5}}
+\begin{DoxyCompactList}\small\item\em Provides MD5 hashing functionality. \end{DoxyCompactList}\item 
+namespace \mbox{\hyperlink{namespacewebsocketpp_1_1message__buffer}{message\+\_\+buffer}}
+\item 
+namespace \mbox{\hyperlink{namespacewebsocketpp_1_1processor}{processor}}
+\begin{DoxyCompactList}\small\item\em Processors encapsulate the protocol rules specific to each Web\+Socket version. \end{DoxyCompactList}\item 
+namespace \mbox{\hyperlink{namespacewebsocketpp_1_1random}{random}}
+\begin{DoxyCompactList}\small\item\em \doxylink{class_random}{Random} number generation policies. \end{DoxyCompactList}\item 
+namespace \mbox{\hyperlink{namespacewebsocketpp_1_1session}{session}}
+\item 
+namespace \mbox{\hyperlink{namespacewebsocketpp_1_1sha1}{sha1}}
+\item 
+namespace \mbox{\hyperlink{namespacewebsocketpp_1_1transport}{transport}}
+\begin{DoxyCompactList}\small\item\em Transport policies provide network connectivity and timers. \end{DoxyCompactList}\item 
+namespace \mbox{\hyperlink{namespacewebsocketpp_1_1utf8__validator}{utf8\+\_\+validator}}
+\item 
+namespace \mbox{\hyperlink{namespacewebsocketpp_1_1utility}{utility}}
+\begin{DoxyCompactList}\small\item\em Generic non-\/websocket specific utility functions and data structures. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classwebsocketpp_1_1client}{client}}
+\begin{DoxyCompactList}\small\item\em Client endpoint role based on the given config. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{classwebsocketpp_1_1connection}{connection}}
+\begin{DoxyCompactList}\small\item\em Represents an individual Web\+Socket connection. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{classwebsocketpp_1_1connection__base}{connection\+\_\+base}}
+\begin{DoxyCompactList}\small\item\em Stub for user supplied base class. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{classwebsocketpp_1_1endpoint}{endpoint}}
+\begin{DoxyCompactList}\small\item\em Creates and manages connections associated with a Web\+Socket endpoint. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{classwebsocketpp_1_1endpoint__base}{endpoint\+\_\+base}}
+\begin{DoxyCompactList}\small\item\em Stub for user supplied base class. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{classwebsocketpp_1_1exception}{exception}}
+\item 
+class \mbox{\hyperlink{classwebsocketpp_1_1server}{server}}
+\begin{DoxyCompactList}\small\item\em Server endpoint role based on the given config. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{classwebsocketpp_1_1uri}{uri}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef lib\+::weak\+\_\+ptr$<$ void $>$ \mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}}
+\begin{DoxyCompactList}\small\item\em \doxylink{struct_a}{A} handle to uniquely identify a connection. \end{DoxyCompactList}\item 
+typedef lib\+::function$<$ void(\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}})$>$ \mbox{\hyperlink{namespacewebsocketpp_a53c8b4ae59cf13b5f883b119bbd14d72}{open\+\_\+handler}}
+\begin{DoxyCompactList}\small\item\em The type and function signature of an open handler. \end{DoxyCompactList}\item 
+typedef lib\+::function$<$ void(\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}})$>$ \mbox{\hyperlink{namespacewebsocketpp_a27acb39e01cbca06ccc4e4e8eb8f877d}{close\+\_\+handler}}
+\begin{DoxyCompactList}\small\item\em The type and function signature of a close handler. \end{DoxyCompactList}\item 
+typedef lib\+::function$<$ void(\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}})$>$ \mbox{\hyperlink{namespacewebsocketpp_a5bb2e61cfe649b2e012f1a2c5693a4d5}{fail\+\_\+handler}}
+\begin{DoxyCompactList}\small\item\em The type and function signature of a fail handler. \end{DoxyCompactList}\item 
+typedef lib\+::function$<$ void(\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}})$>$ \mbox{\hyperlink{namespacewebsocketpp_a55f6947df7673a9de3c44b6bd5d4a82a}{interrupt\+\_\+handler}}
+\begin{DoxyCompactList}\small\item\em The type and function signature of an interrupt handler. \end{DoxyCompactList}\item 
+typedef lib\+::function$<$ bool(\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}}, std\+::string)$>$ \mbox{\hyperlink{namespacewebsocketpp_a9dcaaa7370865f1bcacb55ae715793ef}{ping\+\_\+handler}}
+\begin{DoxyCompactList}\small\item\em The type and function signature of a ping handler. \end{DoxyCompactList}\item 
+typedef lib\+::function$<$ void(\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}}, std\+::string)$>$ \mbox{\hyperlink{namespacewebsocketpp_a1798d54e6d98a481cf870091af84bc1f}{pong\+\_\+handler}}
+\begin{DoxyCompactList}\small\item\em The type and function signature of a pong handler. \end{DoxyCompactList}\item 
+typedef lib\+::function$<$ void(\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}}, std\+::string)$>$ \mbox{\hyperlink{namespacewebsocketpp_a2c5925a111b9e553efebea35d5ea155f}{pong\+\_\+timeout\+\_\+handler}}
+\begin{DoxyCompactList}\small\item\em The type and function signature of a pong timeout handler. \end{DoxyCompactList}\item 
+typedef lib\+::function$<$ bool(\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}})$>$ \mbox{\hyperlink{namespacewebsocketpp_ae28f3fed86a59b1998746694f3d4edbd}{validate\+\_\+handler}}
+\begin{DoxyCompactList}\small\item\em The type and function signature of a validate handler. \end{DoxyCompactList}\item 
+typedef lib\+::function$<$ void(\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}})$>$ \mbox{\hyperlink{namespacewebsocketpp_a37bc4d5b3b21d3bb494d8a23236315d2}{http\+\_\+handler}}
+\begin{DoxyCompactList}\small\item\em The type and function signature of a http handler. \end{DoxyCompactList}\item 
+typedef lib\+::function$<$ void(lib\+::error\+\_\+code const \&ec, size\+\_\+t bytes\+\_\+transferred)$>$ \mbox{\hyperlink{namespacewebsocketpp_a6fb3f66d640c365795dcc01a7f87c900}{read\+\_\+handler}}
+\item 
+typedef lib\+::function$<$ void(lib\+::error\+\_\+code const \&ec)$>$ \mbox{\hyperlink{namespacewebsocketpp_aeb8dee2a5b6c4f1cac6755b206581216}{write\+\_\+frame\+\_\+handler}}
+\item 
+typedef std\+::pair$<$ lib\+::error\+\_\+code, std\+::string $>$ \mbox{\hyperlink{namespacewebsocketpp_abecf95d53c9387716b157daae84441f3}{err\+\_\+str\+\_\+pair}}
+\begin{DoxyCompactList}\small\item\em Combination error code / string type for returning two values. \end{DoxyCompactList}\item 
+typedef lib\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classwebsocketpp_1_1uri}{uri}} $>$ \mbox{\hyperlink{namespacewebsocketpp_aae370ea5ac83a8ece7712cb39fc23f5b}{uri\+\_\+ptr}}
+\begin{DoxyCompactList}\small\item\em Pointer to a URI. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+std\+::string \mbox{\hyperlink{namespacewebsocketpp_aff36d40583424a2c879df02219133af8}{base64\+\_\+encode}} (unsigned char const \texorpdfstring{$\ast$}{*}input, size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})
+\begin{DoxyCompactList}\small\item\em Encode a char buffer into a base64 string. \end{DoxyCompactList}\item 
+std\+::string \mbox{\hyperlink{namespacewebsocketpp_a3a167489f63491475d0069204edf71da}{base64\+\_\+encode}} (std\+::string const \&input)
+\begin{DoxyCompactList}\small\item\em Encode a string into a base64 string. \end{DoxyCompactList}\item 
+std\+::string \mbox{\hyperlink{namespacewebsocketpp_a1467174a88a2f4037c45dbeb9d57c481}{base64\+\_\+decode}} (std\+::string const \&input)
+\begin{DoxyCompactList}\small\item\em Decode a base64 encoded string into a string of raw bytes. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{namespacewebsocketpp_a27acb39e01cbca06ccc4e4e8eb8f877d}\index{websocketpp@{websocketpp}!close\_handler@{close\_handler}}
+\index{close\_handler@{close\_handler}!websocketpp@{websocketpp}}
+\doxysubsubsection{\texorpdfstring{close\_handler}{close\_handler}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_a27acb39e01cbca06ccc4e4e8eb8f877d} 
+typedef lib\+::function$<$void(\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}})$>$ \mbox{\hyperlink{namespacewebsocketpp_a27acb39e01cbca06ccc4e4e8eb8f877d}{websocketpp\+::close\+\_\+handler}}}
+
+The close handler is called once for every successfully established connection after it is no longer capable of sending or receiving new messages
+
+The close handler will be called exactly once for every connection for which the open handler was called. 
+
+Definition at line \mbox{\hyperlink{connection_8hpp_source_l00069}{69}} of file \mbox{\hyperlink{connection_8hpp_source}{connection.\+hpp}}.
+
+\Hypertarget{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}\index{websocketpp@{websocketpp}!connection\_hdl@{connection\_hdl}}
+\index{connection\_hdl@{connection\_hdl}!websocketpp@{websocketpp}}
+\doxysubsubsection{\texorpdfstring{connection\_hdl}{connection\_hdl}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d} 
+typedef lib\+::weak\+\_\+ptr$<$void$>$ \mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{websocketpp\+::connection\+\_\+hdl}}}
+
+This type uniquely identifies a connection. It is implemented as a weak pointer to the connection in question. This provides uniqueness across multiple endpoints and ensures that IDs never conflict or run out.
+
+It is safe to make copies of this handle, store those copies in containers, and use them from other threads.
+
+This handle can be upgraded to a full shared\+\_\+ptr using {\ttfamily \doxylink{classwebsocketpp_1_1endpoint_a0fe4457427d4124abe7ca022ba7afbb4}{endpoint\+::get\+\_\+con\+\_\+from\+\_\+hdl()}} from within a handler fired by the connection that owns the handler. 
+
+Definition at line \mbox{\hyperlink{connection__hdl_8hpp_source_l00048}{48}} of file \mbox{\hyperlink{connection__hdl_8hpp_source}{connection\+\_\+hdl.\+hpp}}.
+
+\Hypertarget{namespacewebsocketpp_abecf95d53c9387716b157daae84441f3}\index{websocketpp@{websocketpp}!err\_str\_pair@{err\_str\_pair}}
+\index{err\_str\_pair@{err\_str\_pair}!websocketpp@{websocketpp}}
+\doxysubsubsection{\texorpdfstring{err\_str\_pair}{err\_str\_pair}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_abecf95d53c9387716b157daae84441f3} 
+typedef std\+::pair$<$lib\+::error\+\_\+code,std\+::string$>$ \mbox{\hyperlink{namespacewebsocketpp_abecf95d53c9387716b157daae84441f3}{websocketpp\+::err\+\_\+str\+\_\+pair}}}
+
+
+
+Definition at line \mbox{\hyperlink{error_8hpp_source_l00041}{41}} of file \mbox{\hyperlink{error_8hpp_source}{error.\+hpp}}.
+
+\Hypertarget{namespacewebsocketpp_a5bb2e61cfe649b2e012f1a2c5693a4d5}\index{websocketpp@{websocketpp}!fail\_handler@{fail\_handler}}
+\index{fail\_handler@{fail\_handler}!websocketpp@{websocketpp}}
+\doxysubsubsection{\texorpdfstring{fail\_handler}{fail\_handler}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_a5bb2e61cfe649b2e012f1a2c5693a4d5} 
+typedef lib\+::function$<$void(\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}})$>$ \mbox{\hyperlink{namespacewebsocketpp_a5bb2e61cfe649b2e012f1a2c5693a4d5}{websocketpp\+::fail\+\_\+handler}}}
+
+The fail handler is called once for every unsuccessful Web\+Socket connection attempt. Either the fail handler or the open handler will be called for each Web\+Socket connection attempt. HTTP Connections that did not attempt to upgrade the connection to the Web\+Socket protocol will trigger the http handler instead of fail/open. 
+
+Definition at line \mbox{\hyperlink{connection_8hpp_source_l00079}{79}} of file \mbox{\hyperlink{connection_8hpp_source}{connection.\+hpp}}.
+
+\Hypertarget{namespacewebsocketpp_a37bc4d5b3b21d3bb494d8a23236315d2}\index{websocketpp@{websocketpp}!http\_handler@{http\_handler}}
+\index{http\_handler@{http\_handler}!websocketpp@{websocketpp}}
+\doxysubsubsection{\texorpdfstring{http\_handler}{http\_handler}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_a37bc4d5b3b21d3bb494d8a23236315d2} 
+typedef lib\+::function$<$void(\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}})$>$ \mbox{\hyperlink{namespacewebsocketpp_a37bc4d5b3b21d3bb494d8a23236315d2}{websocketpp\+::http\+\_\+handler}}}
+
+The http handler is called when an HTTP connection is made that does not attempt to upgrade the connection to the Web\+Socket protocol. This allows Web\+Socket++ servers to respond to these requests with regular HTTP responses.
+
+This can be used to deliver error pages \& dashboards and to deliver static files such as the base HTML \& Java\+Script for an otherwise single page Web\+Socket application.
+
+Note\+: Web\+Socket++ is designed to be a high performance Web\+Socket server. It is not tuned to provide a full featured, high performance, HTTP web server solution. The HTTP handler is appropriate only for low volume HTTP traffic. If you expect to serve high volumes of HTTP traffic a dedicated HTTP web server is strongly recommended.
+
+The default HTTP handler will return a 426 Upgrade Required error. Custom handlers may override the response status code to deliver any type of response. 
+
+Definition at line \mbox{\hyperlink{connection_8hpp_source_l00151}{151}} of file \mbox{\hyperlink{connection_8hpp_source}{connection.\+hpp}}.
+
+\Hypertarget{namespacewebsocketpp_a55f6947df7673a9de3c44b6bd5d4a82a}\index{websocketpp@{websocketpp}!interrupt\_handler@{interrupt\_handler}}
+\index{interrupt\_handler@{interrupt\_handler}!websocketpp@{websocketpp}}
+\doxysubsubsection{\texorpdfstring{interrupt\_handler}{interrupt\_handler}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_a55f6947df7673a9de3c44b6bd5d4a82a} 
+typedef lib\+::function$<$void(\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}})$>$ \mbox{\hyperlink{namespacewebsocketpp_a55f6947df7673a9de3c44b6bd5d4a82a}{websocketpp\+::interrupt\+\_\+handler}}}
+
+The interrupt handler is called when a connection receives an interrupt request from the application. Interrupts allow the application to trigger a handler to be run in the absense of a Web\+Socket level handler trigger (like a new message).
+
+This is typically used by another application thread to schedule some tasks that can only be run from within the handler chain for thread safety reasons. 
+
+Definition at line \mbox{\hyperlink{connection_8hpp_source_l00091}{91}} of file \mbox{\hyperlink{connection_8hpp_source}{connection.\+hpp}}.
+
+\Hypertarget{namespacewebsocketpp_a53c8b4ae59cf13b5f883b119bbd14d72}\index{websocketpp@{websocketpp}!open\_handler@{open\_handler}}
+\index{open\_handler@{open\_handler}!websocketpp@{websocketpp}}
+\doxysubsubsection{\texorpdfstring{open\_handler}{open\_handler}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_a53c8b4ae59cf13b5f883b119bbd14d72} 
+typedef lib\+::function$<$void(\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}})$>$ \mbox{\hyperlink{namespacewebsocketpp_a53c8b4ae59cf13b5f883b119bbd14d72}{websocketpp\+::open\+\_\+handler}}}
+
+The open handler is called once for every successful Web\+Socket connection attempt. Either the fail handler or the open handler will be called for each Web\+Socket connection attempt. HTTP Connections that did not attempt to upgrade the connection to the Web\+Socket protocol will trigger the http handler instead of fail/open. 
+
+Definition at line \mbox{\hyperlink{connection_8hpp_source_l00059}{59}} of file \mbox{\hyperlink{connection_8hpp_source}{connection.\+hpp}}.
+
+\Hypertarget{namespacewebsocketpp_a9dcaaa7370865f1bcacb55ae715793ef}\index{websocketpp@{websocketpp}!ping\_handler@{ping\_handler}}
+\index{ping\_handler@{ping\_handler}!websocketpp@{websocketpp}}
+\doxysubsubsection{\texorpdfstring{ping\_handler}{ping\_handler}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_a9dcaaa7370865f1bcacb55ae715793ef} 
+typedef lib\+::function$<$bool(\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}},std\+::string)$>$ \mbox{\hyperlink{namespacewebsocketpp_a9dcaaa7370865f1bcacb55ae715793ef}{websocketpp\+::ping\+\_\+handler}}}
+
+The ping handler is called when the connection receives a Web\+Socket ping control frame. The string argument contains the ping payload. The payload is a binary string up to 126 bytes in length. The ping handler returns a bool, true if a pong response should be sent, false if the pong response should be suppressed. 
+
+Definition at line \mbox{\hyperlink{connection_8hpp_source_l00101}{101}} of file \mbox{\hyperlink{connection_8hpp_source}{connection.\+hpp}}.
+
+\Hypertarget{namespacewebsocketpp_a1798d54e6d98a481cf870091af84bc1f}\index{websocketpp@{websocketpp}!pong\_handler@{pong\_handler}}
+\index{pong\_handler@{pong\_handler}!websocketpp@{websocketpp}}
+\doxysubsubsection{\texorpdfstring{pong\_handler}{pong\_handler}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_a1798d54e6d98a481cf870091af84bc1f} 
+typedef lib\+::function$<$void(\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}},std\+::string)$>$ \mbox{\hyperlink{namespacewebsocketpp_a1798d54e6d98a481cf870091af84bc1f}{websocketpp\+::pong\+\_\+handler}}}
+
+The pong handler is called when the connection receives a Web\+Socket pong control frame. The string argument contains the pong payload. The payload is a binary string up to 126 bytes in length. 
+
+Definition at line \mbox{\hyperlink{connection_8hpp_source_l00109}{109}} of file \mbox{\hyperlink{connection_8hpp_source}{connection.\+hpp}}.
+
+\Hypertarget{namespacewebsocketpp_a2c5925a111b9e553efebea35d5ea155f}\index{websocketpp@{websocketpp}!pong\_timeout\_handler@{pong\_timeout\_handler}}
+\index{pong\_timeout\_handler@{pong\_timeout\_handler}!websocketpp@{websocketpp}}
+\doxysubsubsection{\texorpdfstring{pong\_timeout\_handler}{pong\_timeout\_handler}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_a2c5925a111b9e553efebea35d5ea155f} 
+typedef lib\+::function$<$void(\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}},std\+::string)$>$ \mbox{\hyperlink{namespacewebsocketpp_a2c5925a111b9e553efebea35d5ea155f}{websocketpp\+::pong\+\_\+timeout\+\_\+handler}}}
+
+The pong timeout handler is called when a ping goes unanswered by a pong for longer than the locally specified timeout period. 
+
+Definition at line \mbox{\hyperlink{connection_8hpp_source_l00116}{116}} of file \mbox{\hyperlink{connection_8hpp_source}{connection.\+hpp}}.
+
+\Hypertarget{namespacewebsocketpp_a6fb3f66d640c365795dcc01a7f87c900}\index{websocketpp@{websocketpp}!read\_handler@{read\_handler}}
+\index{read\_handler@{read\_handler}!websocketpp@{websocketpp}}
+\doxysubsubsection{\texorpdfstring{read\_handler}{read\_handler}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_a6fb3f66d640c365795dcc01a7f87c900} 
+typedef lib\+::function$<$void(lib\+::error\+\_\+code const \& ec, size\+\_\+t bytes\+\_\+transferred)$>$ \mbox{\hyperlink{namespacewebsocketpp_a6fb3f66d640c365795dcc01a7f87c900}{websocketpp\+::read\+\_\+handler}}}
+
+
+
+Definition at line \mbox{\hyperlink{connection_8hpp_source_l00154}{154}} of file \mbox{\hyperlink{connection_8hpp_source}{connection.\+hpp}}.
+
+\Hypertarget{namespacewebsocketpp_aae370ea5ac83a8ece7712cb39fc23f5b}\index{websocketpp@{websocketpp}!uri\_ptr@{uri\_ptr}}
+\index{uri\_ptr@{uri\_ptr}!websocketpp@{websocketpp}}
+\doxysubsubsection{\texorpdfstring{uri\_ptr}{uri\_ptr}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_aae370ea5ac83a8ece7712cb39fc23f5b} 
+typedef lib\+::shared\+\_\+ptr$<$\mbox{\hyperlink{classwebsocketpp_1_1uri}{uri}}$>$ \mbox{\hyperlink{namespacewebsocketpp_aae370ea5ac83a8ece7712cb39fc23f5b}{websocketpp\+::uri\+\_\+ptr}}}
+
+
+
+Definition at line \mbox{\hyperlink{uri_8hpp_source_l00351}{351}} of file \mbox{\hyperlink{uri_8hpp_source}{uri.\+hpp}}.
+
+\Hypertarget{namespacewebsocketpp_ae28f3fed86a59b1998746694f3d4edbd}\index{websocketpp@{websocketpp}!validate\_handler@{validate\_handler}}
+\index{validate\_handler@{validate\_handler}!websocketpp@{websocketpp}}
+\doxysubsubsection{\texorpdfstring{validate\_handler}{validate\_handler}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_ae28f3fed86a59b1998746694f3d4edbd} 
+typedef lib\+::function$<$bool(\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\+\_\+hdl}})$>$ \mbox{\hyperlink{namespacewebsocketpp_ae28f3fed86a59b1998746694f3d4edbd}{websocketpp\+::validate\+\_\+handler}}}
+
+The validate handler is called after a Web\+Socket handshake has been received and processed but before it has been accepted. This gives the application a chance to implement connection details specific policies for accepting connections and the ability to negotiate extensions and subprotocols.
+
+The validate handler return value indicates whether or not the connection should be accepted. Additional methods may be called during the function to set response headers, set HTTP return/error codes, etc. 
+
+Definition at line \mbox{\hyperlink{connection_8hpp_source_l00129}{129}} of file \mbox{\hyperlink{connection_8hpp_source}{connection.\+hpp}}.
+
+\Hypertarget{namespacewebsocketpp_aeb8dee2a5b6c4f1cac6755b206581216}\index{websocketpp@{websocketpp}!write\_frame\_handler@{write\_frame\_handler}}
+\index{write\_frame\_handler@{write\_frame\_handler}!websocketpp@{websocketpp}}
+\doxysubsubsection{\texorpdfstring{write\_frame\_handler}{write\_frame\_handler}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_aeb8dee2a5b6c4f1cac6755b206581216} 
+typedef lib\+::function$<$void(lib\+::error\+\_\+code const \& ec)$>$ \mbox{\hyperlink{namespacewebsocketpp_aeb8dee2a5b6c4f1cac6755b206581216}{websocketpp\+::write\+\_\+frame\+\_\+handler}}}
+
+
+
+Definition at line \mbox{\hyperlink{connection_8hpp_source_l00155}{155}} of file \mbox{\hyperlink{connection_8hpp_source}{connection.\+hpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacewebsocketpp_a1467174a88a2f4037c45dbeb9d57c481}\index{websocketpp@{websocketpp}!base64\_decode@{base64\_decode}}
+\index{base64\_decode@{base64\_decode}!websocketpp@{websocketpp}}
+\doxysubsubsection{\texorpdfstring{base64\_decode()}{base64\_decode()}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_a1467174a88a2f4037c45dbeb9d57c481} 
+std\+::string websocketpp\+::base64\+\_\+decode (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{input}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+\begin{DoxyParams}{Parameters}
+{\em input} & The base64 encoded input data \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\doxylink{struct_a}{A} string representing the decoded raw bytes 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{vendor_2websocketpp_2websocketpp_2base64_2base64_8hpp_source_l00131}{131}} of file \mbox{\hyperlink{vendor_2websocketpp_2websocketpp_2base64_2base64_8hpp_source}{base64.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00132\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_af352138fec1245efdaee143f770c01ef}{in\_len}}\ =\ input.size();}
+\DoxyCodeLine{00133\ \ \ \ \ \textcolor{keywordtype}{int}\ i\ =\ 0;}
+\DoxyCodeLine{00134\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ =\ 0;}
+\DoxyCodeLine{00135\ \ \ \ \ \textcolor{keywordtype}{int}\ in\_\ =\ 0;}
+\DoxyCodeLine{00136\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ char\_array\_4[4],\ char\_array\_3[3];}
+\DoxyCodeLine{00137\ \ \ \ \ std::string\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00138\ }
+\DoxyCodeLine{00139\ \ \ \ \ \textcolor{keywordflow}{while}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_af352138fec1245efdaee143f770c01ef}{in\_len}}-\/-\/\ \&\&\ (\ input[in\_]\ !=\ \textcolor{charliteral}{'='})\ \&\&\ is\_base64(input[in\_]))\ \{}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ char\_array\_4[i++]\ =\ input[in\_];\ in\_++;}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (i\ ==4)\ \{}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <4;\ i++)\ \{}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ char\_array\_4[i]\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\textcolor{keyword}{>}(base64\_chars.find(char\_array\_4[i]));}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00145\ }
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \ \ \ \ char\_array\_3[0]\ =\ (char\_array\_4[0]\ <<\ 2)\ +\ ((char\_array\_4[1]\ \&\ 0x30)\ >>\ 4);}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \ \ \ \ char\_array\_3[1]\ =\ ((char\_array\_4[1]\ \&\ 0xf)\ <<\ 4)\ +\ ((char\_array\_4[2]\ \&\ 0x3c)\ >>\ 2);}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \ \ \ \ char\_array\_3[2]\ =\ ((char\_array\_4[2]\ \&\ 0x3)\ <<\ 6)\ +\ char\_array\_4[3];}
+\DoxyCodeLine{00149\ }
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ (i\ <\ 3);\ i++)\ \{}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ +=\ char\_array\_3[i];}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \ \ \ \ i\ =\ 0;}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00155\ \ \ \ \ \}}
+\DoxyCodeLine{00156\ }
+\DoxyCodeLine{00157\ \ \ \ \ \textcolor{keywordflow}{if}\ (i)\ \{}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ =\ i;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ <4;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}++)}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \ \ \ \ char\_array\_4[\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}]\ =\ 0;}
+\DoxyCodeLine{00160\ }
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ =\ 0;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ <4;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}++)}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \ \ \ \ \ \ char\_array\_4[\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}]\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\textcolor{keyword}{>}(base64\_chars.find(char\_array\_4[\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}]));}
+\DoxyCodeLine{00163\ }
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ char\_array\_3[0]\ =\ (char\_array\_4[0]\ <<\ 2)\ +\ ((char\_array\_4[1]\ \&\ 0x30)\ >>\ 4);}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ char\_array\_3[1]\ =\ ((char\_array\_4[1]\ \&\ 0xf)\ <<\ 4)\ +\ ((char\_array\_4[2]\ \&\ 0x3c)\ >>\ 2);}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ char\_array\_3[2]\ =\ ((char\_array\_4[2]\ \&\ 0x3)\ <<\ 6)\ +\ char\_array\_4[3];}
+\DoxyCodeLine{00167\ }
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ =\ 0;\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ <\ i\ -\/\ 1);\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}++)\ \{}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ +=\ \textcolor{keyword}{static\_cast<}std::string::value\_type\textcolor{keyword}{>}(char\_array\_3[\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}]);}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00171\ \ \ \ \ \}}
+\DoxyCodeLine{00172\ }
+\DoxyCodeLine{00173\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00174\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacewebsocketpp_a3a167489f63491475d0069204edf71da}\index{websocketpp@{websocketpp}!base64\_encode@{base64\_encode}}
+\index{base64\_encode@{base64\_encode}!websocketpp@{websocketpp}}
+\doxysubsubsection{\texorpdfstring{base64\_encode()}{base64\_encode()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_a3a167489f63491475d0069204edf71da} 
+std\+::string websocketpp\+::base64\+\_\+encode (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{input}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+\begin{DoxyParams}{Parameters}
+{\em input} & The input data \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\doxylink{struct_a}{A} base64 encoded string representing input 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{vendor_2websocketpp_2websocketpp_2base64_2base64_8hpp_source_l00119}{119}} of file \mbox{\hyperlink{vendor_2websocketpp_2websocketpp_2base64_2base64_8hpp_source}{base64.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00120\ \ \ \ \ \textcolor{keywordflow}{return}\ base64\_encode(}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *\textcolor{keyword}{>}(input.data()),}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ input.size()}
+\DoxyCodeLine{00123\ \ \ \ \ );}
+\DoxyCodeLine{00124\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=339pt]{namespacewebsocketpp_a3a167489f63491475d0069204edf71da_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacewebsocketpp_aff36d40583424a2c879df02219133af8}\index{websocketpp@{websocketpp}!base64\_encode@{base64\_encode}}
+\index{base64\_encode@{base64\_encode}!websocketpp@{websocketpp}}
+\doxysubsubsection{\texorpdfstring{base64\_encode()}{base64\_encode()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_aff36d40583424a2c879df02219133af8} 
+std\+::string websocketpp\+::base64\+\_\+encode (\begin{DoxyParamCaption}\item[{unsigned char const \texorpdfstring{$\ast$}{*}}]{input}{, }\item[{size\+\_\+t}]{len}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+\begin{DoxyParams}{Parameters}
+{\em input} & The input data \\
+\hline
+{\em len} & The length of input in bytes \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\doxylink{struct_a}{A} base64 encoded string representing input 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{vendor_2websocketpp_2websocketpp_2base64_2base64_8hpp_source_l00066}{66}} of file \mbox{\hyperlink{vendor_2websocketpp_2websocketpp_2base64_2base64_8hpp_source}{base64.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00067\ \ \ \ \ std::string\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00068\ \ \ \ \ \textcolor{keywordtype}{int}\ i\ =\ 0;}
+\DoxyCodeLine{00069\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ =\ 0;}
+\DoxyCodeLine{00070\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ char\_array\_3[3];}
+\DoxyCodeLine{00071\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ char\_array\_4[4];}
+\DoxyCodeLine{00072\ }
+\DoxyCodeLine{00073\ \ \ \ \ \textcolor{keywordflow}{while}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}-\/-\/)\ \{}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ char\_array\_3[i++]\ =\ *(input++);}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (i\ ==\ 3)\ \{}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ char\_array\_4[0]\ =\ (char\_array\_3[0]\ \&\ 0xfc)\ >>\ 2;}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ \ \ \ char\_array\_4[1]\ =\ ((char\_array\_3[0]\ \&\ 0x03)\ <<\ 4)\ +}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((char\_array\_3[1]\ \&\ 0xf0)\ >>\ 4);}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ \ \ \ char\_array\_4[2]\ =\ ((char\_array\_3[1]\ \&\ 0x0f)\ <<\ 2)\ +}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((char\_array\_3[2]\ \&\ 0xc0)\ >>\ 6);}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \ \ \ char\_array\_4[3]\ =\ char\_array\_3[2]\ \&\ 0x3f;}
+\DoxyCodeLine{00082\ }
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(i\ =\ 0;\ (i\ <4)\ ;\ i++)\ \{}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ +=\ base64\_chars[char\_array\_4[i]];}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \ \ \ \ i\ =\ 0;}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00088\ \ \ \ \ \}}
+\DoxyCodeLine{00089\ }
+\DoxyCodeLine{00090\ \ \ \ \ \textcolor{keywordflow}{if}\ (i)\ \{}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ =\ i;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ <\ 3;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}++)\ \{}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ \ \ \ char\_array\_3[\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}]\ =\ \textcolor{charliteral}{'\(\backslash\)0'};}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00094\ }
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ char\_array\_4[0]\ =\ (char\_array\_3[0]\ \&\ 0xfc)\ >>\ 2;}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ char\_array\_4[1]\ =\ ((char\_array\_3[0]\ \&\ 0x03)\ <<\ 4)\ +}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((char\_array\_3[1]\ \&\ 0xf0)\ >>\ 4);}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ char\_array\_4[2]\ =\ ((char\_array\_3[1]\ \&\ 0x0f)\ <<\ 2)\ +}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((char\_array\_3[2]\ \&\ 0xc0)\ >>\ 6);}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ char\_array\_4[3]\ =\ char\_array\_3[2]\ \&\ 0x3f;}
+\DoxyCodeLine{00101\ }
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ =\ 0;\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ <\ i\ +\ 1);\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}++)\ \{}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ +=\ base64\_chars[char\_array\_4[\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}]];}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00105\ }
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}((i++\ <\ 3))\ \{}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ +=\ \textcolor{charliteral}{'='};}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00109\ \ \ \ \ \}}
+\DoxyCodeLine{00110\ }
+\DoxyCodeLine{00111\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00112\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacewebsocketpp_aff36d40583424a2c879df02219133af8_icgraph}
+\end{center}
+\end{figure}

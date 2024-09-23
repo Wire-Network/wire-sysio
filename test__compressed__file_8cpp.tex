@@ -1,0 +1,269 @@
+\doxysection{plugins/trace\+\_\+api\+\_\+plugin/test/test\+\_\+compressed\+\_\+file.cpp File Reference}
+\hypertarget{test__compressed__file_8cpp}{}\label{test__compressed__file_8cpp}\index{plugins/trace\_api\_plugin/test/test\_compressed\_file.cpp@{plugins/trace\_api\_plugin/test/test\_compressed\_file.cpp}}
+{\ttfamily \#include $<$boost/test/included/unit\+\_\+test.\+hpp$>$}\newline
+{\ttfamily \#include $<$list$>$}\newline
+{\ttfamily \#include $<$boost/filesystem.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/filesystem/fstream.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/trace\+\_\+api/compressed\+\_\+file.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/trace\+\_\+api/test\+\_\+common.\+hpp$>$}\newline
+Include dependency graph for test\+\_\+compressed\+\_\+file.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__compressed__file_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structtemp__file__fixture}{temp\+\_\+file\+\_\+fixture}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacestd}{std}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{test__compressed__file_8cpp_a6b2a3852db8bb19ab6909bac01859985}{BOOST\+\_\+\+TEST\+\_\+\+MODULE}}~trace\+\_\+compressed\+\_\+file
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef std\+::tuple$<$ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}, std\+::array$<$ char, 6733 $>$ $>$ \mbox{\hyperlink{test__compressed__file_8cpp_a125431c6ff2e9bd8730218aa9bd96682}{test\+\_\+types}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , size\+\_\+t S$>$ }\\std\+::ostream \& \mbox{\hyperlink{namespacestd_a1e05ee53dd61c7e8a09ac2ec6dd412dd}{std\+::operator$<$$<$}} (std\+::ostream \&os, const std\+::array$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{struct_s}{S}} $>$ \&\mbox{\hyperlink{classfc_1_1array}{array}})
+\item 
+\mbox{\hyperlink{test__compressed__file_8cpp_a301db0a2ad709d6c263695037e35891f}{BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE\+\_\+\+TEMPLATE}} (random\+\_\+access\+\_\+test, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{test__compressed__file_8cpp_a125431c6ff2e9bd8730218aa9bd96682}{test\+\_\+types}}, \mbox{\hyperlink{structtemp__file__fixture}{temp\+\_\+file\+\_\+fixture}})
+\item 
+\mbox{\hyperlink{test__compressed__file_8cpp_a2a1901a9a2719c53c96671081d704c31}{BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE\+\_\+\+TEMPLATE}} (sequential\+\_\+access, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{test__compressed__file_8cpp_a125431c6ff2e9bd8730218aa9bd96682}{test\+\_\+types}}, \mbox{\hyperlink{structtemp__file__fixture}{temp\+\_\+file\+\_\+fixture}})
+\item 
+\mbox{\hyperlink{test__compressed__file_8cpp_ad1e3276e39f2f11b38f97aa392c248a0}{BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE\+\_\+\+TEMPLATE}} (blob\+\_\+access, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{test__compressed__file_8cpp_a125431c6ff2e9bd8730218aa9bd96682}{test\+\_\+types}}, \mbox{\hyperlink{structtemp__file__fixture}{temp\+\_\+file\+\_\+fixture}})
+\item 
+\mbox{\hyperlink{test__compressed__file_8cpp_a432a527c16241fed7b4238c8c443c04a}{BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE\+\_\+\+TEMPLATE}} (blob\+\_\+access\+\_\+no\+\_\+seek\+\_\+points, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{test__compressed__file_8cpp_a125431c6ff2e9bd8730218aa9bd96682}{test\+\_\+types}}, \mbox{\hyperlink{structtemp__file__fixture}{temp\+\_\+file\+\_\+fixture}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{test__compressed__file_8cpp_a6b2a3852db8bb19ab6909bac01859985}\index{test\_compressed\_file.cpp@{test\_compressed\_file.cpp}!BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}}
+\index{BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}!test\_compressed\_file.cpp@{test\_compressed\_file.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_TEST\_MODULE}{BOOST\_TEST\_MODULE}}
+{\footnotesize\ttfamily \label{test__compressed__file_8cpp_a6b2a3852db8bb19ab6909bac01859985} 
+\#define BOOST\+\_\+\+TEST\+\_\+\+MODULE~trace\+\_\+compressed\+\_\+file}
+
+
+
+Definition at line \mbox{\hyperlink{test__compressed__file_8cpp_source_l00001}{1}} of file \mbox{\hyperlink{test__compressed__file_8cpp_source}{test\+\_\+compressed\+\_\+file.\+cpp}}.
+
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{test__compressed__file_8cpp_a125431c6ff2e9bd8730218aa9bd96682}\index{test\_compressed\_file.cpp@{test\_compressed\_file.cpp}!test\_types@{test\_types}}
+\index{test\_types@{test\_types}!test\_compressed\_file.cpp@{test\_compressed\_file.cpp}}
+\doxysubsubsection{\texorpdfstring{test\_types}{test\_types}}
+{\footnotesize\ttfamily \label{test__compressed__file_8cpp_a125431c6ff2e9bd8730218aa9bd96682} 
+typedef std\+::tuple$<$\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}, std\+::array$<$char, 6733$>$ $>$ \mbox{\hyperlink{test__compressed__file_8cpp_a125431c6ff2e9bd8730218aa9bd96682}{test\+\_\+types}}}
+
+
+
+Definition at line \mbox{\hyperlink{test__compressed__file_8cpp_source_l00046}{46}} of file \mbox{\hyperlink{test__compressed__file_8cpp_source}{test\+\_\+compressed\+\_\+file.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{test__compressed__file_8cpp_ad1e3276e39f2f11b38f97aa392c248a0}\index{test\_compressed\_file.cpp@{test\_compressed\_file.cpp}!BOOST\_FIXTURE\_TEST\_CASE\_TEMPLATE@{BOOST\_FIXTURE\_TEST\_CASE\_TEMPLATE}}
+\index{BOOST\_FIXTURE\_TEST\_CASE\_TEMPLATE@{BOOST\_FIXTURE\_TEST\_CASE\_TEMPLATE}!test\_compressed\_file.cpp@{test\_compressed\_file.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_FIXTURE\_TEST\_CASE\_TEMPLATE()}{BOOST\_FIXTURE\_TEST\_CASE\_TEMPLATE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{test__compressed__file_8cpp_ad1e3276e39f2f11b38f97aa392c248a0} 
+BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE\+\_\+\+TEMPLATE (\begin{DoxyParamCaption}\item[{blob\+\_\+access}]{}{, }\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}}]{}{, }\item[{\mbox{\hyperlink{test__compressed__file_8cpp_a125431c6ff2e9bd8730218aa9bd96682}{test\+\_\+types}}}]{}{, }\item[{\mbox{\hyperlink{structtemp__file__fixture}{temp\+\_\+file\+\_\+fixture}}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__compressed__file_8cpp_source_l00156}{156}} of file \mbox{\hyperlink{test__compressed__file_8cpp_source}{test\+\_\+compressed\+\_\+file.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00157\ \ \ \ \textcolor{comment}{//\ generate\ a\ large\ dataset\ where\ ever\ 8\ bytes\ is\ the\ offset\ to\ that\ 8\ bytes\ of\ data}}
+\DoxyCodeLine{00158\ \ \ \ \textcolor{keyword}{auto}\ data\ =\ std::vector<T>(128);}
+\DoxyCodeLine{00159\ \ \ \ std::generate(data.begin(),\ data.end(),\ []()\ \{}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ return\ make\_random<T>();}
+\DoxyCodeLine{00161\ \ \ \ \});}
+\DoxyCodeLine{00162\ }
+\DoxyCodeLine{00163\ \ \ \ \textcolor{keyword}{auto}\ uncompressed\_filename\ =\ create\_temp\_file(data.data(),\ data.size()\ *\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}));}
+\DoxyCodeLine{00164\ \ \ \ \textcolor{keyword}{auto}\ compressed\_filename\ =\ create\_temp\_file(\textcolor{keyword}{nullptr},\ 0);}
+\DoxyCodeLine{00165\ }
+\DoxyCodeLine{00166\ \ \ \ BOOST\_TEST(\mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file_ab13021e139e2ee1be1e38e84499810e2}{compressed\_file::process}}(uncompressed\_filename,\ compressed\_filename,\ 512));}
+\DoxyCodeLine{00167\ }
+\DoxyCodeLine{00168\ \ \ \ \textcolor{comment}{//\ test\ that\ you\ can\ read\ all\ of\ the\ offsets\ from\ the\ compressed\ form\ through\ the\ end\ of\ the\ file}}
+\DoxyCodeLine{00169\ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ data.size();\ i++)\ \{}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ actual\_data\ =\ std::vector<T>(128);}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ compf\ =\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file}{compressed\_file}}(compressed\_filename);}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ compf.open();}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ compf.seek(i\ *\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}));}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ compf.read(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(actual\_data.data()),\ (actual\_data.size()\ -\/\ i)\ *\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}));}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ compf.close();}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL\_COLLECTIONS(data.begin()\ +\ i,\ data.end(),\ actual\_data.begin(),\ actual\_data.end()\ -\/\ i);}
+\DoxyCodeLine{00177\ \ \ \ \}}
+\DoxyCodeLine{00178\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__compressed__file_8cpp_ad1e3276e39f2f11b38f97aa392c248a0_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__compressed__file_8cpp_a432a527c16241fed7b4238c8c443c04a}\index{test\_compressed\_file.cpp@{test\_compressed\_file.cpp}!BOOST\_FIXTURE\_TEST\_CASE\_TEMPLATE@{BOOST\_FIXTURE\_TEST\_CASE\_TEMPLATE}}
+\index{BOOST\_FIXTURE\_TEST\_CASE\_TEMPLATE@{BOOST\_FIXTURE\_TEST\_CASE\_TEMPLATE}!test\_compressed\_file.cpp@{test\_compressed\_file.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_FIXTURE\_TEST\_CASE\_TEMPLATE()}{BOOST\_FIXTURE\_TEST\_CASE\_TEMPLATE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{test__compressed__file_8cpp_a432a527c16241fed7b4238c8c443c04a} 
+BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE\+\_\+\+TEMPLATE (\begin{DoxyParamCaption}\item[{blob\+\_\+access\+\_\+no\+\_\+seek\+\_\+points}]{}{, }\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}}]{}{, }\item[{\mbox{\hyperlink{test__compressed__file_8cpp_a125431c6ff2e9bd8730218aa9bd96682}{test\+\_\+types}}}]{}{, }\item[{\mbox{\hyperlink{structtemp__file__fixture}{temp\+\_\+file\+\_\+fixture}}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__compressed__file_8cpp_source_l00180}{180}} of file \mbox{\hyperlink{test__compressed__file_8cpp_source}{test\+\_\+compressed\+\_\+file.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00181\ \ \ \ \textcolor{comment}{//\ generate\ a\ large\ dataset\ where\ ever\ 8\ bytes\ is\ the\ offset\ to\ that\ 8\ bytes\ of\ data}}
+\DoxyCodeLine{00182\ \ \ \ \textcolor{keyword}{auto}\ data\ =\ std::vector<T>(32);}
+\DoxyCodeLine{00183\ \ \ \ std::generate(data.begin(),\ data.end(),\ []()\ \{}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ return\ make\_random<T>();}
+\DoxyCodeLine{00185\ \ \ \ \});}
+\DoxyCodeLine{00186\ }
+\DoxyCodeLine{00187\ \ \ \ \textcolor{keyword}{auto}\ uncompressed\_size\ =\ data.size()\ *\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}});}
+\DoxyCodeLine{00188\ \ \ \ \textcolor{keyword}{auto}\ uncompressed\_filename\ =\ create\_temp\_file(data.data(),\ uncompressed\_size);}
+\DoxyCodeLine{00189\ \ \ \ \textcolor{keyword}{auto}\ compressed\_filename\ =\ create\_temp\_file(\textcolor{keyword}{nullptr},\ 0);}
+\DoxyCodeLine{00190\ }
+\DoxyCodeLine{00191\ \ \ \ \textcolor{comment}{//\ set\ a\ stride\ of\ the\ whole\ file\ which\ should\ result\ in\ no\ seek\ points}}
+\DoxyCodeLine{00192\ \ \ \ BOOST\_TEST(\mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file_ab13021e139e2ee1be1e38e84499810e2}{compressed\_file::process}}(uncompressed\_filename,\ compressed\_filename,\ uncompressed\_size));}
+\DoxyCodeLine{00193\ }
+\DoxyCodeLine{00194\ \ \ \ \textcolor{comment}{//\ verify\ that\ no\ seek\ points\ were\ created}}
+\DoxyCodeLine{00195\ \ \ \ \mbox{\hyperlink{classfc_1_1cfile}{fc::cfile}}\ compressed;}
+\DoxyCodeLine{00196\ \ \ \ compressed.\mbox{\hyperlink{classfc_1_1cfile_ac4a0191d7846c07a907d3c7eb35e848d}{set\_file\_path}}(compressed\_filename);}
+\DoxyCodeLine{00197\ \ \ \ compressed.\mbox{\hyperlink{classfc_1_1cfile_a9e01adaeee108420312ed271133a2d7d}{open}}(\textcolor{stringliteral}{"{}r"{}});}
+\DoxyCodeLine{00198\ \ \ \ compressed.\mbox{\hyperlink{classfc_1_1cfile_a6eb4fe4530480f13c6cf773a7f1e3847}{seek}}(\mbox{\hyperlink{namespacefc_aae3e907b120751591ca6919ac66c384b}{fc::file\_size}}(compressed\_filename)\ -\/\ 2);}
+\DoxyCodeLine{00199\ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ expected\_seek\_point\_count\ =\ 0;}
+\DoxyCodeLine{00200\ \ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ actual\_seek\_point\_count\ =\ std::numeric\_limits<uint16\_t>::max();}
+\DoxyCodeLine{00201\ \ \ \ compressed.\mbox{\hyperlink{classfc_1_1cfile_a247250a28d17544a57dfafe07012d27b}{read}}(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(\&actual\_seek\_point\_count),\ 2);}
+\DoxyCodeLine{00202\ \ \ \ BOOST\_REQUIRE\_EQUAL(expected\_seek\_point\_count,\ actual\_seek\_point\_count);}
+\DoxyCodeLine{00203\ }
+\DoxyCodeLine{00204\ \ \ \ \textcolor{comment}{//\ test\ that\ you\ can\ read\ all\ of\ the\ offsets\ from\ the\ compressed\ form\ through\ the\ end\ of\ the\ file}}
+\DoxyCodeLine{00205\ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ data.size();\ i++)\ \{}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ actual\_data\ =\ std::vector<T>(32);}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ compf\ =\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file}{compressed\_file}}(compressed\_filename);}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ compf.open();}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ compf.seek(i\ *\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}));}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ compf.read(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(actual\_data.data()),\ (actual\_data.size()\ -\/\ i)\ *\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}));}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ compf.close();}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL\_COLLECTIONS(data.begin()\ +\ i,\ data.end(),\ actual\_data.begin(),\ actual\_data.end()\ -\/\ i);}
+\DoxyCodeLine{00213\ \ \ \ \}}
+\DoxyCodeLine{00214\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__compressed__file_8cpp_a432a527c16241fed7b4238c8c443c04a_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__compressed__file_8cpp_a301db0a2ad709d6c263695037e35891f}\index{test\_compressed\_file.cpp@{test\_compressed\_file.cpp}!BOOST\_FIXTURE\_TEST\_CASE\_TEMPLATE@{BOOST\_FIXTURE\_TEST\_CASE\_TEMPLATE}}
+\index{BOOST\_FIXTURE\_TEST\_CASE\_TEMPLATE@{BOOST\_FIXTURE\_TEST\_CASE\_TEMPLATE}!test\_compressed\_file.cpp@{test\_compressed\_file.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_FIXTURE\_TEST\_CASE\_TEMPLATE()}{BOOST\_FIXTURE\_TEST\_CASE\_TEMPLATE()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{test__compressed__file_8cpp_a301db0a2ad709d6c263695037e35891f} 
+BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE\+\_\+\+TEMPLATE (\begin{DoxyParamCaption}\item[{random\+\_\+access\+\_\+test}]{}{, }\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}}]{}{, }\item[{\mbox{\hyperlink{test__compressed__file_8cpp_a125431c6ff2e9bd8730218aa9bd96682}{test\+\_\+types}}}]{}{, }\item[{\mbox{\hyperlink{structtemp__file__fixture}{temp\+\_\+file\+\_\+fixture}}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__compressed__file_8cpp_source_l00104}{104}} of file \mbox{\hyperlink{test__compressed__file_8cpp_source}{test\+\_\+compressed\+\_\+file.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00105\ \ \ \ \textcolor{comment}{//\ generate\ a\ large\ dataset\ where\ ever\ 8\ bytes\ is\ the\ offset\ to\ that\ 8\ bytes\ of\ data}}
+\DoxyCodeLine{00106\ \ \ \ \textcolor{keyword}{auto}\ data\ =\ std::vector<T>(128);}
+\DoxyCodeLine{00107\ \ \ \ std::generate(data.begin(),\ data.end(),\ [offset=0ULL]()\ \textcolor{keyword}{mutable}\ \{}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ auto\ result\ =\ offset;}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ offset+=sizeof(T);}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ return\ convert\_to<T>(result);}
+\DoxyCodeLine{00111\ \ \ \ \});}
+\DoxyCodeLine{00112\ }
+\DoxyCodeLine{00113\ \ \ \ \textcolor{keyword}{auto}\ uncompressed\_filename\ =\ create\_temp\_file(data.data(),\ data.size()\ *\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}));}
+\DoxyCodeLine{00114\ \ \ \ \textcolor{keyword}{auto}\ compressed\_filename\ =\ create\_temp\_file(\textcolor{keyword}{nullptr},\ 0);}
+\DoxyCodeLine{00115\ }
+\DoxyCodeLine{00116\ \ \ \ BOOST\_TEST(\mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file_ab13021e139e2ee1be1e38e84499810e2}{compressed\_file::process}}(uncompressed\_filename,\ compressed\_filename,\ 512));}
+\DoxyCodeLine{00117\ }
+\DoxyCodeLine{00118\ \ \ \ \textcolor{comment}{//\ test\ that\ you\ can\ read\ all\ of\ the\ offsets\ from\ the\ compressed\ form\ by\ opening\ and\ seeking\ to\ them}}
+\DoxyCodeLine{00119\ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ data.size();\ i++)\ \{}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ entry\ =\ data.at(i);}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ compf\ =\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file}{compressed\_file}}(compressed\_filename);}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ compf.open();}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}};}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ compf.seek((\textcolor{keywordtype}{long})i\ *\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}));}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ compf.read(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(\&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}),\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}));}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ BOOST\_TEST(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ ==\ entry);}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ compf.close();}
+\DoxyCodeLine{00128\ \ \ \ \}}
+\DoxyCodeLine{00129\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__compressed__file_8cpp_a301db0a2ad709d6c263695037e35891f_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__compressed__file_8cpp_a2a1901a9a2719c53c96671081d704c31}\index{test\_compressed\_file.cpp@{test\_compressed\_file.cpp}!BOOST\_FIXTURE\_TEST\_CASE\_TEMPLATE@{BOOST\_FIXTURE\_TEST\_CASE\_TEMPLATE}}
+\index{BOOST\_FIXTURE\_TEST\_CASE\_TEMPLATE@{BOOST\_FIXTURE\_TEST\_CASE\_TEMPLATE}!test\_compressed\_file.cpp@{test\_compressed\_file.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_FIXTURE\_TEST\_CASE\_TEMPLATE()}{BOOST\_FIXTURE\_TEST\_CASE\_TEMPLATE()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{test__compressed__file_8cpp_a2a1901a9a2719c53c96671081d704c31} 
+BOOST\+\_\+\+FIXTURE\+\_\+\+TEST\+\_\+\+CASE\+\_\+\+TEMPLATE (\begin{DoxyParamCaption}\item[{sequential\+\_\+access}]{}{, }\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}}]{}{, }\item[{\mbox{\hyperlink{test__compressed__file_8cpp_a125431c6ff2e9bd8730218aa9bd96682}{test\+\_\+types}}}]{}{, }\item[{\mbox{\hyperlink{structtemp__file__fixture}{temp\+\_\+file\+\_\+fixture}}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__compressed__file_8cpp_source_l00131}{131}} of file \mbox{\hyperlink{test__compressed__file_8cpp_source}{test\+\_\+compressed\+\_\+file.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00132\ \ \ \ \textcolor{comment}{//\ generate\ a\ large\ dataset\ where\ ever\ 8\ bytes\ is\ the\ offset\ to\ that\ 8\ bytes\ of\ data}}
+\DoxyCodeLine{00133\ \ \ \ \textcolor{keyword}{auto}\ data\ =\ std::vector<T>(128);}
+\DoxyCodeLine{00134\ \ \ \ std::generate(data.begin(),\ data.end(),\ [offset=0ULL]()\ \textcolor{keyword}{mutable}\ \{}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ auto\ result\ =\ offset;}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ offset+=sizeof(T);}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ return\ convert\_to<T>(result);}
+\DoxyCodeLine{00138\ \ \ \ \});}
+\DoxyCodeLine{00139\ }
+\DoxyCodeLine{00140\ \ \ \ \textcolor{keyword}{auto}\ uncompressed\_filename\ =\ create\_temp\_file(data.data(),\ data.size()\ *\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}));}
+\DoxyCodeLine{00141\ \ \ \ \textcolor{keyword}{auto}\ compressed\_filename\ =\ create\_temp\_file(\textcolor{keyword}{nullptr},\ 0);}
+\DoxyCodeLine{00142\ }
+\DoxyCodeLine{00143\ \ \ \ BOOST\_TEST(\mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file_ab13021e139e2ee1be1e38e84499810e2}{compressed\_file::process}}(uncompressed\_filename,\ compressed\_filename,\ 512));}
+\DoxyCodeLine{00144\ }
+\DoxyCodeLine{00145\ \ \ \ \textcolor{comment}{//\ test\ that\ you\ can\ read\ all\ of\ the\ offsets\ from\ the\ compressed\ form\ sequentially}}
+\DoxyCodeLine{00146\ \ \ \ \textcolor{keyword}{auto}\ compf\ =\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file}{compressed\_file}}(compressed\_filename);}
+\DoxyCodeLine{00147\ \ \ \ compf.open();}
+\DoxyCodeLine{00148\ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ entry\ :\ data\ )\ \{}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}};}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ compf.read(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(\&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}),\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}));}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ BOOST\_TEST(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ ==\ entry);}
+\DoxyCodeLine{00152\ \ \ \ \}}
+\DoxyCodeLine{00153\ \ \ \ compf.close();}
+\DoxyCodeLine{00154\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__compressed__file_8cpp_a2a1901a9a2719c53c96671081d704c31_cgraph}
+\end{center}
+\end{figure}

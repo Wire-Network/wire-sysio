@@ -1,0 +1,109 @@
+\doxysection{bidname\+\_\+info\+\_\+subcommand Struct Reference}
+\hypertarget{structbidname__info__subcommand}{}\label{structbidname__info__subcommand}\index{bidname\_info\_subcommand@{bidname\_info\_subcommand}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structbidname__info__subcommand_a573adc6b3decc158bbf05cab12c81c31}{bidname\+\_\+info\+\_\+subcommand}} (\mbox{\hyperlink{class_c_l_i_1_1_app}{CLI\+::\+App}} \texorpdfstring{$\ast$}{*}action\+Root)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{structbidname__info__subcommand_a653298b10714cbec6ec790e01433145c}{print\+\_\+json}} = false
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structbidname__info__subcommand_a4d79634a27dc689aeedb8c1553772f4e}{newname}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01611}{1611}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structbidname__info__subcommand_a573adc6b3decc158bbf05cab12c81c31}\index{bidname\_info\_subcommand@{bidname\_info\_subcommand}!bidname\_info\_subcommand@{bidname\_info\_subcommand}}
+\index{bidname\_info\_subcommand@{bidname\_info\_subcommand}!bidname\_info\_subcommand@{bidname\_info\_subcommand}}
+\doxysubsubsection{\texorpdfstring{bidname\_info\_subcommand()}{bidname\_info\_subcommand()}}
+{\footnotesize\ttfamily \label{structbidname__info__subcommand_a573adc6b3decc158bbf05cab12c81c31} 
+bidname\+\_\+info\+\_\+subcommand\+::bidname\+\_\+info\+\_\+subcommand (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_c_l_i_1_1_app}{CLI\+::\+App}} \texorpdfstring{$\ast$}{*}}]{action\+Root}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01614}{1614}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01614\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01615\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ list\_producers\ =\ actionRoot-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_a8b461d2233ec4121259011b5ed24b336}{add\_subcommand}}(\textcolor{stringliteral}{"{}bidnameinfo"{}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}Get\ bidname\ info"{}}));}
+\DoxyCodeLine{01616\ \ \ \ \ \ \ list\_producers-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_a5fef22317a182fa5db1d7b1af4c89c68}{add\_flag}}(\textcolor{stringliteral}{"{}-\/-\/json,-\/j"{}},\ \mbox{\hyperlink{structbidname__info__subcommand_a653298b10714cbec6ec790e01433145c}{print\_json}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}Output\ in\ JSON\ format"{}}));}
+\DoxyCodeLine{01617\ \ \ \ \ \ \ list\_producers-\/>add\_option(\textcolor{stringliteral}{"{}newname"{}},\ \mbox{\hyperlink{structbidname__info__subcommand_a4d79634a27dc689aeedb8c1553772f4e}{newname}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}The\ bidding\ name"{}}))-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a}{required}}();}
+\DoxyCodeLine{01618\ \ \ \ \ \ \ list\_producers-\/>callback([\textcolor{keyword}{this}]\ \{}
+\DoxyCodeLine{01619\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ rawResult\ =\ \mbox{\hyperlink{programs_2clio_2main_8cpp_af931af8e9f099860a2670931f8d3ad2c}{call}}(\mbox{\hyperlink{namespacesysio_1_1client_1_1http_a74c28475d2f7d2cb4c99cb361c2279a0}{get\_table\_func}},\ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}(\textcolor{stringliteral}{"{}json"{}},\ \textcolor{keyword}{true})}
+\DoxyCodeLine{01620\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}code"{}},\ \textcolor{stringliteral}{"{}sysio"{}})(\textcolor{stringliteral}{"{}scope"{}},\ \textcolor{stringliteral}{"{}sysio"{}})(\textcolor{stringliteral}{"{}table"{}},\ \textcolor{stringliteral}{"{}namebids"{}})}
+\DoxyCodeLine{01621\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}lower\_bound"{}},\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(\mbox{\hyperlink{structbidname__info__subcommand_a4d79634a27dc689aeedb8c1553772f4e}{newname}}).to\_uint64\_t())}
+\DoxyCodeLine{01622\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}upper\_bound"{}},\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(\mbox{\hyperlink{structbidname__info__subcommand_a4d79634a27dc689aeedb8c1553772f4e}{newname}}).to\_uint64\_t()\ +\ 1)}
+\DoxyCodeLine{01623\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Less\ than\ ideal\ upper\_bound\ usage\ preserved\ so\ clio\ can\ still\ work\ with\ old\ buggy\ nodeop\ versions}}
+\DoxyCodeLine{01624\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Change\ to\ newname.value\ when\ clio\ no\ longer\ needs\ to\ support\ nodeop\ versions\ older\ than\ 1.5.0}}
+\DoxyCodeLine{01625\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}limit"{}},\ 1));}
+\DoxyCodeLine{01626\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ \mbox{\hyperlink{structbidname__info__subcommand_a653298b10714cbec6ec790e01433145c}{print\_json}}\ )\ \{}
+\DoxyCodeLine{01627\ \ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ \mbox{\hyperlink{classfc_1_1json_ae6c022ab581a9552ae2c97ff5d73aaf8}{fc::json::to\_pretty\_string}}(rawResult)\ <<\ std::endl;}
+\DoxyCodeLine{01628\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{01629\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01630\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ result\ =\ rawResult.as<\mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1get__table__rows__result}{sysio::chain\_apis::read\_only::get\_table\_rows\_result}}>();}
+\DoxyCodeLine{01631\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Condition\ in\ if\ statement\ below\ can\ simply\ be\ res.rows.empty()\ when\ clio\ no\ longer\ needs\ to\ support\ nodeop\ versions\ older\ than\ 1.5.0}}
+\DoxyCodeLine{01632\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ result.rows.empty()\ ||\ result.rows[0].get\_object()[\textcolor{stringliteral}{"{}newname"{}}].as\_string()\ !=\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}(\mbox{\hyperlink{structbidname__info__subcommand_a4d79634a27dc689aeedb8c1553772f4e}{newname}}).\mbox{\hyperlink{namespacefc_a4e07b3870aa72f8c38bdd5f78044dad1}{to\_string}}()\ )\ \{}
+\DoxyCodeLine{01633\ \ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}No\ bidname\ record\ found"{}}\ <<\ std::endl;}
+\DoxyCodeLine{01634\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{01635\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01636\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ row\ =\ result.rows[0];}
+\DoxyCodeLine{01637\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ time\ =\ row[\textcolor{stringliteral}{"{}last\_bid\_time"{}}].as\_string();}
+\DoxyCodeLine{01638\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{01639\ \ \ \ \ \ \ \ \ \ \ \ \ \ time\ =\ (\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}})\mbox{\hyperlink{classfc_1_1time__point}{fc::time\_point}}(\mbox{\hyperlink{classfc_1_1microseconds}{fc::microseconds}}(\mbox{\hyperlink{namespacefc_ab20c9acf886f89fabeb8a0d9ebc9abb8}{to\_uint64}}(time)));}
+\DoxyCodeLine{01640\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (fc::parse\_error\_exception\&)\ \{}
+\DoxyCodeLine{01641\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01642\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ bid\ =\ row[\textcolor{stringliteral}{"{}high\_bid"{}}].as\_int64();}
+\DoxyCodeLine{01643\ \ \ \ \ \ \ \ \ \ std::cout\ <<\ std::left\ <<\ std::setw(18)\ <<\ \textcolor{stringliteral}{"{}bidname:"{}}\ <<\ std::right\ <<\ std::setw(24)\ <<\ row[\textcolor{stringliteral}{"{}newname"{}}].as\_string()\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}}
+\DoxyCodeLine{01644\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ std::left\ <<\ std::setw(18)\ <<\ \textcolor{stringliteral}{"{}highest\ bidder:"{}}\ <<\ std::right\ <<\ std::setw(24)\ <<\ row[\textcolor{stringliteral}{"{}high\_bidder"{}}].as\_string()\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}}
+\DoxyCodeLine{01645\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ std::left\ <<\ std::setw(18)\ <<\ \textcolor{stringliteral}{"{}highest\ bid:"{}}\ <<\ std::right\ <<\ std::setw(24)\ <<\ (bid\ >\ 0\ ?\ bid\ :\ -\/bid)\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}}
+\DoxyCodeLine{01646\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ std::left\ <<\ std::setw(18)\ <<\ \textcolor{stringliteral}{"{}last\ bid\ time:"{}}\ <<\ std::right\ <<\ std::setw(24)\ <<\ time\ <<\ std::endl;}
+\DoxyCodeLine{01647\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (bid\ <\ 0)\ std::cout\ <<\ \textcolor{stringliteral}{"{}This\ auction\ has\ already\ closed"{}}\ <<\ std::endl;}
+\DoxyCodeLine{01648\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{01649\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structbidname__info__subcommand_a573adc6b3decc158bbf05cab12c81c31_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structbidname__info__subcommand_a4d79634a27dc689aeedb8c1553772f4e}\index{bidname\_info\_subcommand@{bidname\_info\_subcommand}!newname@{newname}}
+\index{newname@{newname}!bidname\_info\_subcommand@{bidname\_info\_subcommand}}
+\doxysubsubsection{\texorpdfstring{newname}{newname}}
+{\footnotesize\ttfamily \label{structbidname__info__subcommand_a4d79634a27dc689aeedb8c1553772f4e} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} bidname\+\_\+info\+\_\+subcommand\+::newname}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01613}{1613}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{structbidname__info__subcommand_a653298b10714cbec6ec790e01433145c}\index{bidname\_info\_subcommand@{bidname\_info\_subcommand}!print\_json@{print\_json}}
+\index{print\_json@{print\_json}!bidname\_info\_subcommand@{bidname\_info\_subcommand}}
+\doxysubsubsection{\texorpdfstring{print\_json}{print\_json}}
+{\footnotesize\ttfamily \label{structbidname__info__subcommand_a653298b10714cbec6ec790e01433145c} 
+bool bidname\+\_\+info\+\_\+subcommand\+::print\+\_\+json = false}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01612}{1612}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+programs/clio/\mbox{\hyperlink{programs_2clio_2main_8cpp}{main.\+cpp}}\end{DoxyCompactItemize}

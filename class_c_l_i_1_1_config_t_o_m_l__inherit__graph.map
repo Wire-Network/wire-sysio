@@ -1,0 +1,7 @@
+<map id="CLI::ConfigTOML" name="CLI::ConfigTOML">
+<area shape="rect" id="Node000001" title="ConfigTOML generates a TOML compliant output." alt="" coords="5,153,130,178"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_config_base.html" title="This converter works with INI/TOML files; to write proper TOML files use ConfigTOML." alt="" coords="29,79,106,105"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="70,120,70,152,65,152,65,120"/>
+<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_config.html" title="This class provides a converter for configuration files." alt="" coords="23,5,112,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="70,46,70,79,65,79,65,46"/>
+</map>

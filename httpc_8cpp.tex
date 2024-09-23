@@ -1,0 +1,58 @@
+\doxysection{programs/clio/httpc.cpp File Reference}
+\hypertarget{httpc_8cpp}{}\label{httpc_8cpp}\index{programs/clio/httpc.cpp@{programs/clio/httpc.cpp}}
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$istream$>$}\newline
+{\ttfamily \#include $<$ostream$>$}\newline
+{\ttfamily \#include $<$string$>$}\newline
+{\ttfamily \#include $<$regex$>$}\newline
+{\ttfamily \#include $<$boost/algorithm/string.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/asio.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/asio/ssl.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/variant.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/io/json.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/network/platform\+\_\+root\+\_\+ca.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/exceptions.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/http\+\_\+plugin/http\+\_\+plugin.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain\+\_\+plugin/chain\+\_\+plugin.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/asio/ssl/rfc2818\+\_\+verification.\+hpp$>$}\newline
+{\ttfamily \#include "{}httpc.\+hpp"{}}\newline
+Include dependency graph for httpc.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{httpc_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classsysio_1_1client_1_1http_1_1detail_1_1http__context__impl}{sysio\+::client\+::http\+::detail\+::http\+\_\+context\+\_\+impl}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1client}{sysio\+::client}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1client_1_1http}{sysio\+::client\+::http}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1client_1_1http_1_1detail}{sysio\+::client\+::http\+::detail}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacesysio_1_1client_1_1http_a4cb0cf6309fe359235a03d3964524b22}{http\+\_\+context}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a787b918b0b4400f958bc44011a2bd226}{sysio\+::client\+::http\+::create\+\_\+http\+\_\+context}} ()
+\item 
+void \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a4d32eca0ecac32376ce5478f3d8f9f98}{sysio\+::client\+::http\+::do\+\_\+connect}} (tcp\+::socket \&sock, const \mbox{\hyperlink{structsysio_1_1client_1_1http_1_1resolved__url}{resolved\+\_\+url}} \&\mbox{\hyperlink{classfc_1_1url}{url}})
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\std\+::string \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a162de4256c3fbe69ad6a62bc40b444b2}{sysio\+::client\+::http\+::do\+\_\+txrx}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&socket, boost\+::asio\+::streambuf \&request\+\_\+buff, unsigned int \&status\+\_\+code)
+\item 
+\mbox{\hyperlink{structsysio_1_1client_1_1http_1_1parsed__url}{parsed\+\_\+url}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_aa22792d25e080a60a880b433d1ef8933}{sysio\+::client\+::http\+::parse\+\_\+url}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&server\+\_\+url)
+\item 
+\mbox{\hyperlink{structsysio_1_1client_1_1http_1_1resolved__url}{resolved\+\_\+url}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_af9d5ab19d85cb83ea8b32e8ccea594b1}{sysio\+::client\+::http\+::resolve\+\_\+url}} (const \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a4cb0cf6309fe359235a03d3964524b22}{http\+\_\+context}} \&\mbox{\hyperlink{structcontext}{context}}, const \mbox{\hyperlink{structsysio_1_1client_1_1http_1_1parsed__url}{parsed\+\_\+url}} \&\mbox{\hyperlink{classfc_1_1url}{url}})
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_ad1b87692ec6218b59d58a092106040f9}{sysio\+::client\+::http\+::format\+\_\+host\+\_\+header}} (const \mbox{\hyperlink{structsysio_1_1client_1_1http_1_1resolved__url}{resolved\+\_\+url}} \&\mbox{\hyperlink{classfc_1_1url}{url}})
+\item 
+\mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a1f247437c0bb15fa7286d76c8139d41c}{sysio\+::client\+::http\+::do\+\_\+http\+\_\+call}} (const \mbox{\hyperlink{structsysio_1_1client_1_1http_1_1connection__param}{connection\+\_\+param}} \&cp, const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&postdata, bool \mbox{\hyperlink{programs_2clio_2main_8cpp_a6b5337ce19efcf252e2018f54d37f435}{print\+\_\+request}}, bool \mbox{\hyperlink{programs_2clio_2main_8cpp_ad75d20d7df265e3aca3c2003476caa61}{print\+\_\+response}})
+\end{DoxyCompactItemize}

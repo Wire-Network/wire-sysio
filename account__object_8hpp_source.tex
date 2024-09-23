@@ -1,0 +1,116 @@
+\doxysection{account\+\_\+object.\+hpp}
+\hypertarget{account__object_8hpp_source}{}\label{account__object_8hpp_source}\index{libraries/chain/include/sysio/chain/account\_object.hpp@{libraries/chain/include/sysio/chain/account\_object.hpp}}
+\mbox{\hyperlink{account__object_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{database__utils_8hpp}{sysio/chain/database\_utils.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{authority_8hpp}{sysio/chain/authority.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{code__object_8hpp}{sysio/chain/code\_object.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{block__timestamp_8hpp}{sysio/chain/block\_timestamp.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{abi__def_8hpp}{sysio/chain/abi\_def.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{multi__index__includes_8hpp}{multi\_index\_includes.hpp}}"{}}}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00010}00010\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{\ \textcolor{keyword}{namespace\ }chain\ \{}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00012}\mbox{\hyperlink{classsysio_1_1chain_1_1account__object}{00012}}\ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1chain_1_1account__object}{account\_object}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{structchainbase_1_1object}{chainbase::object}}<account\_object\_type,\ account\_object>\ \{}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00013}00013\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2types_8hpp_a4f726ee00eb9bbf2574c06492926cf73}{OBJECT\_CTOR}}(\mbox{\hyperlink{classsysio_1_1chain_1_1account__object}{account\_object}},(abi))}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00015}00015\ \ \ \ \ \ \ \mbox{\hyperlink{classchainbase_1_1oid}{id\_type}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ id;}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00016}00016\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{account\_name}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}};\ \textcolor{comment}{//<\ name\ should\ not\ be\ changed\ within\ a\ chainbase\ modifier\ lambda}}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00017}00017\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{block\_timestamp\_type}}\ creation\_date;}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00018}00018\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1shared__blob}{shared\_blob}}\ \ \ \ \ \ \ \ \ \ abi;}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00020}00020\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ set\_abi(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1abi__def}{sysio::chain::abi\_def}}\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00021}00021\ \ \ \ \ \ \ \ \ \ abi.\mbox{\hyperlink{classchainbase_1_1shared__cow__string_a6158f8f10a5b21ac57a3fb3bc9d213f2}{resize\_and\_fill}}(\ \mbox{\hyperlink{namespacefc_1_1raw_a64937a5adc8041247f7007882224e225}{fc::raw::pack\_size}}(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ ),\ [\&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}](\textcolor{keywordtype}{char}*\ data,\ std::size\_t\ size)\ \{}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00022}00022\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1datastream}{fc::datastream<char*>}}\ ds(\ data,\ size\ );}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00023}00023\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(\ ds,\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ );}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00024}00024\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00025}00025\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00027}00027\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1abi__def}{sysio::chain::abi\_def}}\ get\_abi()\textcolor{keyword}{const\ }\{}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00028}00028\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1abi__def}{sysio::chain::abi\_def}}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}};}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00029}00029\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ abi.size()\ !=\ 0,\ abi\_not\_found\_exception,\ \textcolor{stringliteral}{"{}No\ ABI\ set\ on\ account\ \$\{n\}"{}},\ (\textcolor{stringliteral}{"{}n"{}},\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}})\ );}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00031}00031\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1datastream}{fc::datastream<const\ char*>}}\ ds(\ abi.data(),\ abi.size()\ );}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00032}00032\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a0b442d98ceb22dd5a6ae84745e43ffab}{fc::raw::unpack}}(\ ds,\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ );}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00033}00033\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}};}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00034}00034\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00035}00035\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00036}\mbox{\hyperlink{namespacesysio_1_1chain_ae686587f28ec59c4aa3a819e1040c6ac}{00036}}\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classchainbase_1_1oid}{account\_id\_type}}\ =\ \mbox{\hyperlink{structchainbase_1_1object_a7c6a0efb95ee67d538a976cfa5be9df9}{account\_object::id\_type}};}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00038}00038\ \ \ \ \textcolor{keyword}{struct\ }by\_name;}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00039}\mbox{\hyperlink{namespacesysio_1_1chain_a1736163b16f1771314cd01a1208621c7}{00039}}\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacesysio_1_1chain_a1736163b16f1771314cd01a1208621c7}{account\_index}}\ =\ \mbox{\hyperlink{namespacechainbase_aba1e047495dcaa4e0d32ff25b8705f1f}{chainbase::shared\_multi\_index\_container}}<}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00040}00040\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1account__object}{account\_object}},}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00041}00041\ \ \ \ \ \ \ indexed\_by<}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00042}00042\ \ \ \ \ \ \ \ \ \ ordered\_unique<tag<by\_id>,\ member<account\_object,\ account\_object::id\_type,\ \&account\_object::id>>,}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00043}00043\ \ \ \ \ \ \ \ \ \ ordered\_unique<tag<by\_name>,\ member<account\_object,\ account\_name,\ \&account\_object::name>>}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00044}00044\ \ \ \ \ \ \ >}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00045}00045\ \ \ \ >;}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00047}\mbox{\hyperlink{classsysio_1_1chain_1_1account__metadata__object}{00047}}\ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1chain_1_1account__metadata__object}{account\_metadata\_object}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{structchainbase_1_1object}{chainbase::object}}<account\_metadata\_object\_type,\ account\_metadata\_object>}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00048}00048\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00049}00049\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2types_8hpp_a4f726ee00eb9bbf2574c06492926cf73}{OBJECT\_CTOR}}(\mbox{\hyperlink{classsysio_1_1chain_1_1account__metadata__object}{account\_metadata\_object}});}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00051}00051\ \ \ \ \ \ \ \textcolor{keyword}{enum\ class}\ flags\_fields\ :\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \{}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00052}00052\ \ \ \ \ \ \ \ \ \ privileged\ =\ 1}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00053}00053\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00054}00054\ }
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00055}00055\ \ \ \ \ \ \ \mbox{\hyperlink{classchainbase_1_1oid}{id\_type}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ id;}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00056}00056\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{account\_name}}\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}};\ \textcolor{comment}{//<\ name\ should\ not\ be\ changed\ within\ a\ chainbase\ modifier\ lambda}}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00057}00057\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ recv\_sequence\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00058}00058\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ auth\_sequence\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00059}00059\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ code\_sequence\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00060}00060\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ abi\_sequence\ \ =\ 0;}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00061}00061\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1sha256}{digest\_type}}\ \ \ \ \ \ \ \ \ \ \ code\_hash;}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00062}00062\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1time__point}{time\_point}}\ \ \ \ \ \ \ \ \ \ \ \ last\_code\_update;}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00063}00063\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ flags\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00064}00064\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1wasm__interface_a9053d9e65167e5f241f1f3f27b175f9c}{vm\_type}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00065}00065\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ vm\_version\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00067}00067\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ is\_privileged()\textcolor{keyword}{const\ }\{\ \textcolor{keywordflow}{return}\ has\_field(\ flags,\ flags\_fields::privileged\ );\ \}}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00069}00069\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ set\_privileged(\ \textcolor{keywordtype}{bool}\ privileged\ )\ \ \{}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00070}00070\ \ \ \ \ \ \ \ \ \ flags\ =\ set\_field(\ flags,\ flags\_fields::privileged,\ privileged\ );}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00071}00071\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00072}00072\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00073}00073\ }
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00074}00074\ \ \ \ \textcolor{keyword}{struct\ }by\_name;}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00075}\mbox{\hyperlink{namespacesysio_1_1chain_aeced8cdafcddda68b18c6c579dea0cc1}{00075}}\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacesysio_1_1chain_aeced8cdafcddda68b18c6c579dea0cc1}{account\_metadata\_index}}\ =\ \mbox{\hyperlink{namespacechainbase_aba1e047495dcaa4e0d32ff25b8705f1f}{chainbase::shared\_multi\_index\_container}}<}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00076}00076\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1account__metadata__object}{account\_metadata\_object}},}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00077}00077\ \ \ \ \ \ \ indexed\_by<}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00078}00078\ \ \ \ \ \ \ \ \ \ ordered\_unique<tag<by\_id>,\ member<account\_metadata\_object,\ account\_metadata\_object::id\_type,\ \&account\_metadata\_object::id>>,}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00079}00079\ \ \ \ \ \ \ \ \ \ ordered\_unique<tag<by\_name>,\ member<account\_metadata\_object,\ account\_name,\ \&account\_metadata\_object::name>>}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00080}00080\ \ \ \ \ \ \ >}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00081}00081\ \ \ \ >;}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00083}\mbox{\hyperlink{classsysio_1_1chain_1_1account__ram__correction__object}{00083}}\ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1chain_1_1account__ram__correction__object}{account\_ram\_correction\_object}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{structchainbase_1_1object}{chainbase::object}}<account\_ram\_correction\_object\_type,\ account\_ram\_correction\_object>}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00084}00084\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00085}00085\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2types_8hpp_a4f726ee00eb9bbf2574c06492926cf73}{OBJECT\_CTOR}}(\mbox{\hyperlink{classsysio_1_1chain_1_1account__ram__correction__object}{account\_ram\_correction\_object}});}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00086}00086\ }
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00087}00087\ \ \ \ \ \ \ \mbox{\hyperlink{classchainbase_1_1oid}{id\_type}}\ \ \ \ \ \ id;}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00088}00088\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{account\_name}}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}};\ \textcolor{comment}{//<\ name\ should\ not\ be\ changed\ within\ a\ chainbase\ modifier\ lambda}}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00089}00089\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \ \ \ \ ram\_correction\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00090}00090\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00091}00091\ }
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00092}00092\ \ \ \ \textcolor{keyword}{struct\ }by\_name;}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00093}\mbox{\hyperlink{namespacesysio_1_1chain_a4c900d23edfaeb9e6e25aa3a21e0ab4b}{00093}}\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacesysio_1_1chain_a4c900d23edfaeb9e6e25aa3a21e0ab4b}{account\_ram\_correction\_index}}\ =\ \mbox{\hyperlink{namespacechainbase_aba1e047495dcaa4e0d32ff25b8705f1f}{chainbase::shared\_multi\_index\_container}}<}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00094}00094\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1account__ram__correction__object}{account\_ram\_correction\_object}},}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00095}00095\ \ \ \ \ \ \ indexed\_by<}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00096}00096\ \ \ \ \ \ \ \ \ \ ordered\_unique<tag<by\_id>,\ member<account\_ram\_correction\_object,\ account\_ram\_correction\_object::id\_type,\ \&account\_ram\_correction\_object::id>>,}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00097}00097\ \ \ \ \ \ \ \ \ \ ordered\_unique<tag<by\_name>,\ member<account\_ram\_correction\_object,\ account\_name,\ \&account\_ram\_correction\_object::name>>}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00098}00098\ \ \ \ \ \ \ >}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00099}00099\ \ \ \ >;}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00100}00100\ }
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00101}00101\ \}\ \}\ \textcolor{comment}{//\ sysio::chain}}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00102}00102\ }
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00103}00103\ \mbox{\hyperlink{chainbase_8hpp_a789572f90cbf8d6a0c1909c170298a1a}{CHAINBASE\_SET\_INDEX\_TYPE}}(\mbox{\hyperlink{classsysio_1_1chain_1_1account__object}{sysio::chain::account\_object}},\ \mbox{\hyperlink{namespacesysio_1_1chain_a1736163b16f1771314cd01a1208621c7}{sysio::chain::account\_index}})}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00104}00104\ \mbox{\hyperlink{chainbase_8hpp_a789572f90cbf8d6a0c1909c170298a1a}{CHAINBASE\_SET\_INDEX\_TYPE}}(\mbox{\hyperlink{classsysio_1_1chain_1_1account__metadata__object}{sysio::chain::account\_metadata\_object}},\ \mbox{\hyperlink{namespacesysio_1_1chain_aeced8cdafcddda68b18c6c579dea0cc1}{sysio::chain::account\_metadata\_index}})}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00105}00105\ \mbox{\hyperlink{chainbase_8hpp_a789572f90cbf8d6a0c1909c170298a1a}{CHAINBASE\_SET\_INDEX\_TYPE}}(\mbox{\hyperlink{classsysio_1_1chain_1_1account__ram__correction__object}{sysio::chain::account\_ram\_correction\_object}},\ \mbox{\hyperlink{namespacesysio_1_1chain_a4c900d23edfaeb9e6e25aa3a21e0ab4b}{sysio::chain::account\_ram\_correction\_index}})}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00106}00106\ }
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00107}00107\ \mbox{\hyperlink{reflect_8hpp_a2ace850e636b1ca0b18fe3177e413d99}{FC\_REFLECT}}(\mbox{\hyperlink{classsysio_1_1chain_1_1account__object}{sysio::chain::account\_object}},\ (\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})(creation\_date)(abi))}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00108}00108\ \mbox{\hyperlink{reflect_8hpp_a2ace850e636b1ca0b18fe3177e413d99}{FC\_REFLECT}}(\mbox{\hyperlink{classsysio_1_1chain_1_1account__metadata__object}{sysio::chain::account\_metadata\_object}},\ (\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})(recv\_sequence)(auth\_sequence)(code\_sequence)(abi\_sequence)}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00109}00109\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (code\_hash)(last\_code\_update)(\mbox{\hyperlink{yubihsm__pkcs11_8c_ae0ed371842ace71a7886a6134ecbcb62}{flags}})(vm\_type)(vm\_version))}
+\DoxyCodeLine{\Hypertarget{account__object_8hpp_source_l00110}00110\ \mbox{\hyperlink{reflect_8hpp_a2ace850e636b1ca0b18fe3177e413d99}{FC\_REFLECT}}(\mbox{\hyperlink{classsysio_1_1chain_1_1account__ram__correction__object}{sysio::chain::account\_ram\_correction\_object}},\ (\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})(ram\_correction))}
+
+\end{DoxyCode}

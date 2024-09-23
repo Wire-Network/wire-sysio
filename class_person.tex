@@ -1,0 +1,150 @@
+\doxysection{Person Class Reference}
+\hypertarget{class_person}{}\label{class_person}\index{Person@{Person}}
+
+
+Inheritance diagram for Person\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=220pt]{class_person__inherit__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_person_a5e10221f201605ad323d5518e5436bd3}{Person}} (const std\+::string \&\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}, unsigned age)
+\item 
+\mbox{\hyperlink{class_person_a3379ad4403098272609da06570c6df1a}{Person}} (const \mbox{\hyperlink{class_person}{Person}} \&rhs)
+\item 
+virtual \mbox{\hyperlink{class_person_a700ffd693321c5fe6880262acf43d4da}{\texorpdfstring{$\sim$}{\string~}\+Person}} ()
+\item 
+\mbox{\hyperlink{class_person}{Person}} \& \mbox{\hyperlink{class_person_a045de2557ddbba75164088f90cb701d5}{operator=}} (const \mbox{\hyperlink{class_person}{Person}} \&rhs)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{class_writer}{Writer}} $>$ }\\void \mbox{\hyperlink{class_person_a2365a4a101fa1f89b6e74f7c40a21b69}{Serialize}} (\mbox{\hyperlink{class_writer}{Writer}} \&writer) const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{serialize_8cpp_source_l00011}{11}} of file \mbox{\hyperlink{serialize_8cpp_source}{serialize.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_person_a5e10221f201605ad323d5518e5436bd3}\index{Person@{Person}!Person@{Person}}
+\index{Person@{Person}!Person@{Person}}
+\doxysubsubsection{\texorpdfstring{Person()}{Person()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_person_a5e10221f201605ad323d5518e5436bd3} 
+Person\+::\+Person (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{name}{, }\item[{unsigned}]{age}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{serialize_8cpp_source_l00013}{13}} of file \mbox{\hyperlink{serialize_8cpp_source}{serialize.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00013\ :\ name\_(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}),\ age\_(age)\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{class_person_a3379ad4403098272609da06570c6df1a}\index{Person@{Person}!Person@{Person}}
+\index{Person@{Person}!Person@{Person}}
+\doxysubsubsection{\texorpdfstring{Person()}{Person()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_person_a3379ad4403098272609da06570c6df1a} 
+Person\+::\+Person (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_person}{Person}} \&}]{rhs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{serialize_8cpp_source_l00014}{14}} of file \mbox{\hyperlink{serialize_8cpp_source}{serialize.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00014\ :\ name\_(rhs.name\_),\ age\_(rhs.age\_)\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{class_person_a700ffd693321c5fe6880262acf43d4da}\index{Person@{Person}!````~Person@{\texorpdfstring{$\sim$}{\string~}Person}}
+\index{````~Person@{\texorpdfstring{$\sim$}{\string~}Person}!Person@{Person}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}Person()}{\string~Person()}}
+{\footnotesize\ttfamily \label{class_person_a700ffd693321c5fe6880262acf43d4da} 
+Person\+::\texorpdfstring{$\sim$}{\string~}\+Person (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{serialize_8cpp_source_l00042}{42}} of file \mbox{\hyperlink{serialize_8cpp_source}{serialize.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00043\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_person_a045de2557ddbba75164088f90cb701d5}\index{Person@{Person}!operator=@{operator=}}
+\index{operator=@{operator=}!Person@{Person}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}}
+{\footnotesize\ttfamily \label{class_person_a045de2557ddbba75164088f90cb701d5} 
+\mbox{\hyperlink{class_person}{Person}} \& Person\+::operator= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_person}{Person}} \&}]{rhs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{serialize_8cpp_source_l00017}{17}} of file \mbox{\hyperlink{serialize_8cpp_source}{serialize.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00017\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ name\_\ =\ rhs.name\_;}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ age\_\ =\ rhs.age\_;}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00021\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_person_a2365a4a101fa1f89b6e74f7c40a21b69}\index{Person@{Person}!Serialize@{Serialize}}
+\index{Serialize@{Serialize}!Person@{Person}}
+\doxysubsubsection{\texorpdfstring{Serialize()}{Serialize()}}
+{\footnotesize\ttfamily \label{class_person_a2365a4a101fa1f89b6e74f7c40a21b69} 
+template$<$typename \mbox{\hyperlink{class_writer}{Writer}} $>$ \\
+void Person\+::\+Serialize (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_writer}{Writer}} \&}]{writer}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{serialize_8cpp_source_l00025}{25}} of file \mbox{\hyperlink{serialize_8cpp_source}{serialize.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ This\ base\ class\ just\ write\ out\ name-\/value\ pairs,\ without\ wrapping\ within\ an\ object.}}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ writer.\mbox{\hyperlink{class_writer_a8b4dc44f471403a83c9959575796ceab}{String}}(\textcolor{stringliteral}{"{}name"{}});}
+\DoxyCodeLine{00028\ \textcolor{preprocessor}{\#if\ RAPIDJSON\_HAS\_STDSTRING}}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ writer.\mbox{\hyperlink{class_writer_a8b4dc44f471403a83c9959575796ceab}{String}}(name\_);}
+\DoxyCodeLine{00030\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ writer.\mbox{\hyperlink{class_writer_a8b4dc44f471403a83c9959575796ceab}{String}}(name\_.c\_str(),\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\textcolor{keyword}{>}(name\_.length()));\ \textcolor{comment}{//\ Supplying\ length\ of\ string\ is\ faster.}}
+\DoxyCodeLine{00032\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ writer.\mbox{\hyperlink{class_writer_a8b4dc44f471403a83c9959575796ceab}{String}}(\textcolor{stringliteral}{"{}age"{}});}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ writer.\mbox{\hyperlink{class_writer_a5fb0c3228f89f6f9bef15f3e6e6f1739}{Uint}}(age\_);}
+\DoxyCodeLine{00035\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_person_a2365a4a101fa1f89b6e74f7c40a21b69_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=313pt]{class_person_a2365a4a101fa1f89b6e74f7c40a21b69_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/example/serialize/\mbox{\hyperlink{serialize_8cpp}{serialize.\+cpp}}\end{DoxyCompactItemize}

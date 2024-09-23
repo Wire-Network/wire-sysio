@@ -1,0 +1,16 @@
+<map id="sysio::chain::eosvmoc::compile_monitor_session::read_message_from_nodeop" name="sysio::chain::eosvmoc::compile_monitor_session::read_message_from_nodeop">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,110,202,166"/>
+<area shape="poly" id="edge8_Node000001_Node000001" title=" " alt="" coords="58,109,58,99,67,91,82,85,104,83,128,86,143,93,141,97,127,91,103,88,83,90,69,95,63,101,63,110"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor__session.html#a5668769ab53ab845ee86b8b7bf306108" title=" " alt="" coords="250,76,426,132"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="202,121,234,116,235,122,202,126"/>
+<area shape="rect" id="Node000004" href="$namespacesysio_1_1chain_1_1eosvmoc.html#aa65c4d6c02a0823262c6627a86cc74bc" title=" " alt="" coords="755,129,925,170"/>
+<area shape="poly" id="edge9_Node000001_Node000004" title=" " alt="" coords="202,140,250,142,515,146,739,147,739,153,515,152,250,147,202,145"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1chain_1_1eosvmoc_1_1compile__monitor__session.html#a9fec2170c236225684760958be2b5345" title=" " alt="" coords="474,76,705,132"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="427,102,458,102,458,107,427,107"/>
+<area shape="rect" id="Node000005" href="$namespacesysio_1_1chain_1_1eosvmoc.html#a8715d32fd2e6a4a668578ca0d946b58b" title=" " alt="" coords="753,29,927,70"/>
+<area shape="poly" id="edge7_Node000002_Node000005" title=" " alt="" coords="423,73,474,62,542,53,611,47,738,44,738,50,611,53,542,58,474,67,424,78"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="706,123,740,129,739,134,705,128"/>
+<area shape="poly" id="edge5_Node000003_Node000005" title=" " alt="" coords="705,76,737,69,739,74,706,82"/>
+<area shape="poly" id="edge4_Node000004_Node000004" title=" " alt="" coords="793,129,791,119,798,110,815,105,840,103,867,105,883,111,881,116,866,110,840,108,816,110,801,115,796,121,798,128"/>
+<area shape="poly" id="edge6_Node000005_Node000005" title=" " alt="" coords="793,29,791,19,798,10,815,5,840,3,867,5,883,11,881,16,866,10,840,8,816,10,801,15,796,21,798,28"/>
+</map>

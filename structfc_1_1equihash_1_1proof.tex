@@ -1,0 +1,154 @@
+\doxysection{fc\+::equihash\+::proof Struct Reference}
+\hypertarget{structfc_1_1equihash_1_1proof}{}\label{structfc_1_1equihash_1_1proof}\index{fc::equihash::proof@{fc::equihash::proof}}
+
+
+{\ttfamily \#include $<$equihash.\+hpp$>$}
+
+
+
+Collaboration diagram for fc\+::equihash\+::proof\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=177pt]{structfc_1_1equihash_1_1proof__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{structfc_1_1equihash_1_1proof_a8daeca324fe1aea4c22e22a8299e2f81}{is\+\_\+valid}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static \mbox{\hyperlink{structfc_1_1equihash_1_1proof}{proof}} \mbox{\hyperlink{structfc_1_1equihash_1_1proof_aa53a9449b0f48ad101ded88ab416b240}{hash}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structfc_1_1equihash_1_1proof_a57d885177434e8e515a6a8da6879ff87}{n}}, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structfc_1_1equihash_1_1proof_a60beca9abc2d09c8824fbc2e69c9550a}{k}}, \mbox{\hyperlink{classfc_1_1sha256}{sha256}} \mbox{\hyperlink{structfc_1_1equihash_1_1proof_aa59e4c2a6282ec844270c9ef13403ec5}{seed}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structfc_1_1equihash_1_1proof_a57d885177434e8e515a6a8da6879ff87}{n}}
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structfc_1_1equihash_1_1proof_a60beca9abc2d09c8824fbc2e69c9550a}{k}}
+\item 
+\mbox{\hyperlink{classfc_1_1sha256}{sha256}} \mbox{\hyperlink{structfc_1_1equihash_1_1proof_aa59e4c2a6282ec844270c9ef13403ec5}{seed}}
+\item 
+std\+::vector$<$ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} $>$ \mbox{\hyperlink{structfc_1_1equihash_1_1proof_a8321147962f1a92de2e1ea494f2cda28}{inputs}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{equihash_8hpp_source_l00007}{7}} of file \mbox{\hyperlink{equihash_8hpp_source}{equihash.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structfc_1_1equihash_1_1proof_aa53a9449b0f48ad101ded88ab416b240}\index{fc::equihash::proof@{fc::equihash::proof}!hash@{hash}}
+\index{hash@{hash}!fc::equihash::proof@{fc::equihash::proof}}
+\doxysubsubsection{\texorpdfstring{hash()}{hash()}}
+{\footnotesize\ttfamily \label{structfc_1_1equihash_1_1proof_aa53a9449b0f48ad101ded88ab416b240} 
+\mbox{\hyperlink{structfc_1_1equihash_1_1proof}{proof}} fc\+::equihash\+::proof\+::hash (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{n}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{k}{, }\item[{\mbox{\hyperlink{classfc_1_1sha256}{sha256}}}]{seed}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{equihash_8cpp_source_l00033}{33}} of file \mbox{\hyperlink{equihash_8cpp_source}{equihash.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00034\ \ \ \ \{}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ hash\ =\ \_POW::Equihash(\ \mbox{\hyperlink{structfc_1_1equihash_1_1proof_a57d885177434e8e515a6a8da6879ff87}{n}},\ \mbox{\hyperlink{structfc_1_1equihash_1_1proof_a60beca9abc2d09c8824fbc2e69c9550a}{k}},\ \mbox{\hyperlink{namespacefc_1_1equihash_aa8a67c1db57b7ca94f4fad558d83fd4d}{sha\_to\_seed}}(\ \mbox{\hyperlink{structfc_1_1equihash_1_1proof_aa59e4c2a6282ec844270c9ef13403ec5}{seed}}\ )\ );}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ result\ =\ hash.FindProof(\ \mbox{\hyperlink{equihash_8cpp_ad49a40ebab16b2c8752a5b20bf11a8db}{EQUIHASH\_NONCE}}\ );}
+\DoxyCodeLine{00037\ }
+\DoxyCodeLine{00038\ \ \ \ \ \ \ proof\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}};}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.n\ =\ \mbox{\hyperlink{structfc_1_1equihash_1_1proof_a57d885177434e8e515a6a8da6879ff87}{n}};}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.k\ =\ \mbox{\hyperlink{structfc_1_1equihash_1_1proof_a60beca9abc2d09c8824fbc2e69c9550a}{k}};}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.seed\ =\ \mbox{\hyperlink{structfc_1_1equihash_1_1proof_aa59e4c2a6282ec844270c9ef13403ec5}{seed}};}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.inputs\ =\ result.inputs;}
+\DoxyCodeLine{00043\ }
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}};}
+\DoxyCodeLine{00045\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=344pt]{structfc_1_1equihash_1_1proof_aa53a9449b0f48ad101ded88ab416b240_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structfc_1_1equihash_1_1proof_a8daeca324fe1aea4c22e22a8299e2f81}\index{fc::equihash::proof@{fc::equihash::proof}!is\_valid@{is\_valid}}
+\index{is\_valid@{is\_valid}!fc::equihash::proof@{fc::equihash::proof}}
+\doxysubsubsection{\texorpdfstring{is\_valid()}{is\_valid()}}
+{\footnotesize\ttfamily \label{structfc_1_1equihash_1_1proof_a8daeca324fe1aea4c22e22a8299e2f81} 
+bool fc\+::equihash\+::proof\+::is\+\_\+valid (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{equihash_8cpp_source_l00026}{26}} of file \mbox{\hyperlink{equihash_8cpp_source}{equihash.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00027\ \ \ \ \{}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \_POW::Proof\ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68daee5b74d2be31ca48e104578d6c2b7425}{test}}(\ \mbox{\hyperlink{structfc_1_1equihash_1_1proof_a57d885177434e8e515a6a8da6879ff87}{n}},\ \mbox{\hyperlink{structfc_1_1equihash_1_1proof_a60beca9abc2d09c8824fbc2e69c9550a}{k}},\ \mbox{\hyperlink{namespacefc_1_1equihash_aa8a67c1db57b7ca94f4fad558d83fd4d}{sha\_to\_seed}}(\ \mbox{\hyperlink{structfc_1_1equihash_1_1proof_aa59e4c2a6282ec844270c9ef13403ec5}{seed}}\ ),\ \mbox{\hyperlink{equihash_8cpp_ad49a40ebab16b2c8752a5b20bf11a8db}{EQUIHASH\_NONCE}},\ \mbox{\hyperlink{structfc_1_1equihash_1_1proof_a8321147962f1a92de2e1ea494f2cda28}{inputs}}\ );}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68daee5b74d2be31ca48e104578d6c2b7425}{test}}.Test();}
+\DoxyCodeLine{00030\ }
+\DoxyCodeLine{00031\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=344pt]{structfc_1_1equihash_1_1proof_a8daeca324fe1aea4c22e22a8299e2f81_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structfc_1_1equihash_1_1proof_a8321147962f1a92de2e1ea494f2cda28}\index{fc::equihash::proof@{fc::equihash::proof}!inputs@{inputs}}
+\index{inputs@{inputs}!fc::equihash::proof@{fc::equihash::proof}}
+\doxysubsubsection{\texorpdfstring{inputs}{inputs}}
+{\footnotesize\ttfamily \label{structfc_1_1equihash_1_1proof_a8321147962f1a92de2e1ea494f2cda28} 
+std\+::vector$<$ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} $>$ fc\+::equihash\+::proof\+::inputs}
+
+
+
+Definition at line \mbox{\hyperlink{equihash_8hpp_source_l00012}{12}} of file \mbox{\hyperlink{equihash_8hpp_source}{equihash.\+hpp}}.
+
+\Hypertarget{structfc_1_1equihash_1_1proof_a60beca9abc2d09c8824fbc2e69c9550a}\index{fc::equihash::proof@{fc::equihash::proof}!k@{k}}
+\index{k@{k}!fc::equihash::proof@{fc::equihash::proof}}
+\doxysubsubsection{\texorpdfstring{k}{k}}
+{\footnotesize\ttfamily \label{structfc_1_1equihash_1_1proof_a60beca9abc2d09c8824fbc2e69c9550a} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} fc\+::equihash\+::proof\+::k}
+
+
+
+Definition at line \mbox{\hyperlink{equihash_8hpp_source_l00010}{10}} of file \mbox{\hyperlink{equihash_8hpp_source}{equihash.\+hpp}}.
+
+\Hypertarget{structfc_1_1equihash_1_1proof_a57d885177434e8e515a6a8da6879ff87}\index{fc::equihash::proof@{fc::equihash::proof}!n@{n}}
+\index{n@{n}!fc::equihash::proof@{fc::equihash::proof}}
+\doxysubsubsection{\texorpdfstring{n}{n}}
+{\footnotesize\ttfamily \label{structfc_1_1equihash_1_1proof_a57d885177434e8e515a6a8da6879ff87} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} fc\+::equihash\+::proof\+::n}
+
+
+
+Definition at line \mbox{\hyperlink{equihash_8hpp_source_l00009}{9}} of file \mbox{\hyperlink{equihash_8hpp_source}{equihash.\+hpp}}.
+
+\Hypertarget{structfc_1_1equihash_1_1proof_aa59e4c2a6282ec844270c9ef13403ec5}\index{fc::equihash::proof@{fc::equihash::proof}!seed@{seed}}
+\index{seed@{seed}!fc::equihash::proof@{fc::equihash::proof}}
+\doxysubsubsection{\texorpdfstring{seed}{seed}}
+{\footnotesize\ttfamily \label{structfc_1_1equihash_1_1proof_aa59e4c2a6282ec844270c9ef13403ec5} 
+\mbox{\hyperlink{classfc_1_1sha256}{sha256}} fc\+::equihash\+::proof\+::seed}
+
+
+
+Definition at line \mbox{\hyperlink{equihash_8hpp_source_l00011}{11}} of file \mbox{\hyperlink{equihash_8hpp_source}{equihash.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/\mbox{\hyperlink{equihash_8hpp}{equihash.\+hpp}}\item 
+libraries/fc/src/crypto/\mbox{\hyperlink{equihash_8cpp}{equihash.\+cpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,247 @@
+\doxysection{websocketpp\+::log\+::stub Class Reference}
+\hypertarget{classwebsocketpp_1_1log_1_1stub}{}\label{classwebsocketpp_1_1log_1_1stub}\index{websocketpp::log::stub@{websocketpp::log::stub}}
+
+
+Stub logger that ignores all input.  
+
+
+
+
+{\ttfamily \#include $<$stub.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classwebsocketpp_1_1log_1_1stub_ae28cf7e38cfb64008c4b5b3e90621ad9}{stub}} (\mbox{\hyperlink{structwebsocketpp_1_1log_1_1channel__type__hint_a4c2533ba2359d8269a9c4b1ead19a080}{channel\+\_\+type\+\_\+hint\+::value}})
+\begin{DoxyCompactList}\small\item\em Construct the logger. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classwebsocketpp_1_1log_1_1stub_a45e96ad7f1a562c446645961d8d24784}{stub}} (\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}}, \mbox{\hyperlink{structwebsocketpp_1_1log_1_1channel__type__hint_a4c2533ba2359d8269a9c4b1ead19a080}{channel\+\_\+type\+\_\+hint\+::value}})
+\begin{DoxyCompactList}\small\item\em Construct the logger. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{cpp11_8hpp_a3dc3ece336a6149d2fe208a9daf66043}{\+\_\+\+WEBSOCKETPP\+\_\+\+CONSTEXPR\+\_\+\+TOKEN\+\_\+}} \mbox{\hyperlink{classwebsocketpp_1_1log_1_1stub_aa6ca247e5b1ba83c2c73858c6bf11a01}{stub}} ()
+\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1log_1_1stub_acdaf1728646e2477cf7243b13f71e18d}{set\+\_\+channels}} (\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}})
+\begin{DoxyCompactList}\small\item\em Dynamically enable the given list of channels. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1log_1_1stub_af4bea37fd436439b0ab19238b2c47d15}{clear\+\_\+channels}} (\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}})
+\begin{DoxyCompactList}\small\item\em Dynamically disable the given list of channels. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1log_1_1stub_ae14dd42a83305f2dd9c03fc5018c88ee}{write}} (\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}}, std\+::string const \&)
+\begin{DoxyCompactList}\small\item\em Write a string message to the given channel. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classwebsocketpp_1_1log_1_1stub_a6c6844e088cfc64d9945348a52a86c73}{write}} (\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}}, char const \texorpdfstring{$\ast$}{*})
+\begin{DoxyCompactList}\small\item\em Write a cstring message to the given channel. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{cpp11_8hpp_a3dc3ece336a6149d2fe208a9daf66043}{\+\_\+\+WEBSOCKETPP\+\_\+\+CONSTEXPR\+\_\+\+TOKEN\+\_\+}} bool \mbox{\hyperlink{classwebsocketpp_1_1log_1_1stub_a50ba8bfb0b2af7c494820a728eff0857}{static\+\_\+test}} (\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}}) const
+\begin{DoxyCompactList}\small\item\em \doxylink{class_test}{Test} whether a channel is statically enabled. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classwebsocketpp_1_1log_1_1stub_ada729613ea1f62a71f47a4736978b096}{dynamic\+\_\+test}} (\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}})
+\begin{DoxyCompactList}\small\item\em \doxylink{class_test}{Test} whether a channel is dynamically enabled. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{stub_8hpp_source_l00041}{41}} of file \mbox{\hyperlink{stub_8hpp_source}{stub.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classwebsocketpp_1_1log_1_1stub_ae28cf7e38cfb64008c4b5b3e90621ad9}\index{websocketpp::log::stub@{websocketpp::log::stub}!stub@{stub}}
+\index{stub@{stub}!websocketpp::log::stub@{websocketpp::log::stub}}
+\doxysubsubsection{\texorpdfstring{stub()}{stub()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1log_1_1stub_ae28cf7e38cfb64008c4b5b3e90621ad9} 
+websocketpp\+::log\+::stub\+::stub (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structwebsocketpp_1_1log_1_1channel__type__hint_a4c2533ba2359d8269a9c4b1ead19a080}{channel\+\_\+type\+\_\+hint\+::value}}}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+\begin{DoxyParams}{Parameters}
+{\em hint} & \doxylink{struct_a}{A} channel type specific hint for how to construct the logger \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{stub_8hpp_source_l00047}{47}} of file \mbox{\hyperlink{stub_8hpp_source}{stub.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00047\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1log_1_1stub_a45e96ad7f1a562c446645961d8d24784}\index{websocketpp::log::stub@{websocketpp::log::stub}!stub@{stub}}
+\index{stub@{stub}!websocketpp::log::stub@{websocketpp::log::stub}}
+\doxysubsubsection{\texorpdfstring{stub()}{stub()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1log_1_1stub_a45e96ad7f1a562c446645961d8d24784} 
+websocketpp\+::log\+::stub\+::stub (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}}}]{}{, }\item[{\mbox{\hyperlink{structwebsocketpp_1_1log_1_1channel__type__hint_a4c2533ba2359d8269a9c4b1ead19a080}{channel\+\_\+type\+\_\+hint\+::value}}}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+\begin{DoxyParams}{Parameters}
+{\em default\+\_\+channels} & \doxylink{struct_a}{A} set of channels to statically enable \\
+\hline
+{\em hint} & \doxylink{struct_a}{A} channel type specific hint for how to construct the logger \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{stub_8hpp_source_l00054}{54}} of file \mbox{\hyperlink{stub_8hpp_source}{stub.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00054\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1log_1_1stub_aa6ca247e5b1ba83c2c73858c6bf11a01}\index{websocketpp::log::stub@{websocketpp::log::stub}!stub@{stub}}
+\index{stub@{stub}!websocketpp::log::stub@{websocketpp::log::stub}}
+\doxysubsubsection{\texorpdfstring{stub()}{stub()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1log_1_1stub_aa6ca247e5b1ba83c2c73858c6bf11a01} 
+\mbox{\hyperlink{cpp11_8hpp_a3dc3ece336a6149d2fe208a9daf66043}{\+\_\+\+WEBSOCKETPP\+\_\+\+CONSTEXPR\+\_\+\+TOKEN\+\_\+}} websocketpp\+::log\+::stub\+::stub (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{stub_8hpp_source_l00055}{55}} of file \mbox{\hyperlink{stub_8hpp_source}{stub.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00055\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classwebsocketpp_1_1log_1_1stub_af4bea37fd436439b0ab19238b2c47d15}\index{websocketpp::log::stub@{websocketpp::log::stub}!clear\_channels@{clear\_channels}}
+\index{clear\_channels@{clear\_channels}!websocketpp::log::stub@{websocketpp::log::stub}}
+\doxysubsubsection{\texorpdfstring{clear\_channels()}{clear\_channels()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1log_1_1stub_af4bea37fd436439b0ab19238b2c47d15} 
+void websocketpp\+::log\+::stub\+::clear\+\_\+channels (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}}}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+All operations on the stub logger are no-\/ops and all arguments are ignored
+
+
+\begin{DoxyParams}{Parameters}
+{\em channels} & The package of channels to disable \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{stub_8hpp_source_l00073}{73}} of file \mbox{\hyperlink{stub_8hpp_source}{stub.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00073\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1log_1_1stub_ada729613ea1f62a71f47a4736978b096}\index{websocketpp::log::stub@{websocketpp::log::stub}!dynamic\_test@{dynamic\_test}}
+\index{dynamic\_test@{dynamic\_test}!websocketpp::log::stub@{websocketpp::log::stub}}
+\doxysubsubsection{\texorpdfstring{dynamic\_test()}{dynamic\_test()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1log_1_1stub_ada729613ea1f62a71f47a4736978b096} 
+bool websocketpp\+::log\+::stub\+::dynamic\+\_\+test (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}}}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+The stub logger has no channels so all arguments are ignored and {\ttfamily dynamic\+\_\+test} always returns false.
+
+
+\begin{DoxyParams}{Parameters}
+{\em channel} & The package of channels to test \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{stub_8hpp_source_l00111}{111}} of file \mbox{\hyperlink{stub_8hpp_source}{stub.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00113\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1log_1_1stub_acdaf1728646e2477cf7243b13f71e18d}\index{websocketpp::log::stub@{websocketpp::log::stub}!set\_channels@{set\_channels}}
+\index{set\_channels@{set\_channels}!websocketpp::log::stub@{websocketpp::log::stub}}
+\doxysubsubsection{\texorpdfstring{set\_channels()}{set\_channels()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1log_1_1stub_acdaf1728646e2477cf7243b13f71e18d} 
+void websocketpp\+::log\+::stub\+::set\+\_\+channels (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}}}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+All operations on the stub logger are no-\/ops and all arguments are ignored
+
+
+\begin{DoxyParams}{Parameters}
+{\em channels} & The package of channels to enable \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{stub_8hpp_source_l00064}{64}} of file \mbox{\hyperlink{stub_8hpp_source}{stub.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00064\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1log_1_1stub_a50ba8bfb0b2af7c494820a728eff0857}\index{websocketpp::log::stub@{websocketpp::log::stub}!static\_test@{static\_test}}
+\index{static\_test@{static\_test}!websocketpp::log::stub@{websocketpp::log::stub}}
+\doxysubsubsection{\texorpdfstring{static\_test()}{static\_test()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1log_1_1stub_a50ba8bfb0b2af7c494820a728eff0857} 
+\mbox{\hyperlink{cpp11_8hpp_a3dc3ece336a6149d2fe208a9daf66043}{\+\_\+\+WEBSOCKETPP\+\_\+\+CONSTEXPR\+\_\+\+TOKEN\+\_\+}} bool websocketpp\+::log\+::stub\+::static\+\_\+test (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}}}]{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+The stub logger has no channels so all arguments are ignored and {\ttfamily static\+\_\+test} always returns false.
+
+
+\begin{DoxyParams}{Parameters}
+{\em channel} & The package of channels to test \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{stub_8hpp_source_l00100}{100}} of file \mbox{\hyperlink{stub_8hpp_source}{stub.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00102\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1log_1_1stub_a6c6844e088cfc64d9945348a52a86c73}\index{websocketpp::log::stub@{websocketpp::log::stub}!write@{write}}
+\index{write@{write}!websocketpp::log::stub@{websocketpp::log::stub}}
+\doxysubsubsection{\texorpdfstring{write()}{write()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1log_1_1stub_a6c6844e088cfc64d9945348a52a86c73} 
+void websocketpp\+::log\+::stub\+::write (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}}}]{}{, }\item[{char const \texorpdfstring{$\ast$}{*}}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Writing on the stub logger is a no-\/op and all arguments are ignored
+
+
+\begin{DoxyParams}{Parameters}
+{\em channel} & The channel to write to \\
+\hline
+{\em msg} & The message to write \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{stub_8hpp_source_l00091}{91}} of file \mbox{\hyperlink{stub_8hpp_source}{stub.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00091\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1log_1_1stub_ae14dd42a83305f2dd9c03fc5018c88ee}\index{websocketpp::log::stub@{websocketpp::log::stub}!write@{write}}
+\index{write@{write}!websocketpp::log::stub@{websocketpp::log::stub}}
+\doxysubsubsection{\texorpdfstring{write()}{write()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1log_1_1stub_ae14dd42a83305f2dd9c03fc5018c88ee} 
+void websocketpp\+::log\+::stub\+::write (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1log_a12d4d17939f102db8c9183d400a41960}{level}}}]{}{, }\item[{std\+::string const \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Writing on the stub logger is a no-\/op and all arguments are ignored
+
+
+\begin{DoxyParams}{Parameters}
+{\em channel} & The channel to write to \\
+\hline
+{\em msg} & The message to write \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{stub_8hpp_source_l00082}{82}} of file \mbox{\hyperlink{stub_8hpp_source}{stub.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00082\ \{\}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/vendor/websocketpp/websocketpp/logger/\mbox{\hyperlink{stub_8hpp}{stub.\+hpp}}\end{DoxyCompactItemize}

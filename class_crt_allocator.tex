@@ -1,0 +1,123 @@
+\doxysection{Crt\+Allocator Class Reference}
+\hypertarget{class_crt_allocator}{}\label{class_crt_allocator}\index{CrtAllocator@{CrtAllocator}}
+
+
+C-\/runtime library allocator.  
+
+
+
+
+{\ttfamily \#include $<$allocators.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_crt_allocator_ae9b348831bee2b1b52b736c2d3921bad}{Malloc}} (size\+\_\+t size)
+\item 
+void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_crt_allocator_a54b9a20354ba249613d332a7b445575d}{Realloc}} (void \texorpdfstring{$\ast$}{*}original\+Ptr, size\+\_\+t original\+Size, size\+\_\+t new\+Size)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static void \mbox{\hyperlink{class_crt_allocator_a5043907058d906dcb1291e9491560373}{Free}} (void \texorpdfstring{$\ast$}{*}ptr)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static const bool \mbox{\hyperlink{class_crt_allocator_ac7df8398c529290f0cd5950d9492f524}{k\+Need\+Free}} = true
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+This class is just wrapper for standard C library memory routines. \begin{DoxyNote}{Note}
+implements Allocator concept 
+\end{DoxyNote}
+
+
+Definition at line \mbox{\hyperlink{allocators_8h_source_l00075}{75}} of file \mbox{\hyperlink{allocators_8h_source}{allocators.\+h}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_crt_allocator_a5043907058d906dcb1291e9491560373}\index{CrtAllocator@{CrtAllocator}!Free@{Free}}
+\index{Free@{Free}!CrtAllocator@{CrtAllocator}}
+\doxysubsubsection{\texorpdfstring{Free()}{Free()}}
+{\footnotesize\ttfamily \label{class_crt_allocator_a5043907058d906dcb1291e9491560373} 
+static void Crt\+Allocator\+::\+Free (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{ptr}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{allocators_8h_source_l00092}{92}} of file \mbox{\hyperlink{allocators_8h_source}{allocators.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00092\ \{\ std::free(ptr);\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=251pt]{class_crt_allocator_a5043907058d906dcb1291e9491560373_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_crt_allocator_ae9b348831bee2b1b52b736c2d3921bad}\index{CrtAllocator@{CrtAllocator}!Malloc@{Malloc}}
+\index{Malloc@{Malloc}!CrtAllocator@{CrtAllocator}}
+\doxysubsubsection{\texorpdfstring{Malloc()}{Malloc()}}
+{\footnotesize\ttfamily \label{class_crt_allocator_ae9b348831bee2b1b52b736c2d3921bad} 
+void \texorpdfstring{$\ast$}{*} Crt\+Allocator\+::\+Malloc (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{size}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{allocators_8h_source_l00078}{78}} of file \mbox{\hyperlink{allocators_8h_source}{allocators.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ }
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (size)\ \textcolor{comment}{//\ \ behavior\ of\ malloc(0)\ is\ implementation\ defined.}}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::malloc(size);}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ NULL;\ \textcolor{comment}{//\ standardize\ to\ returning\ NULL.}}
+\DoxyCodeLine{00083\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_crt_allocator_a54b9a20354ba249613d332a7b445575d}\index{CrtAllocator@{CrtAllocator}!Realloc@{Realloc}}
+\index{Realloc@{Realloc}!CrtAllocator@{CrtAllocator}}
+\doxysubsubsection{\texorpdfstring{Realloc()}{Realloc()}}
+{\footnotesize\ttfamily \label{class_crt_allocator_a54b9a20354ba249613d332a7b445575d} 
+void \texorpdfstring{$\ast$}{*} Crt\+Allocator\+::\+Realloc (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{original\+Ptr}{, }\item[{size\+\_\+t}]{original\+Size}{, }\item[{size\+\_\+t}]{new\+Size}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{allocators_8h_source_l00084}{84}} of file \mbox{\hyperlink{allocators_8h_source}{allocators.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ (void)originalSize;}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (newSize\ ==\ 0)\ \{}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \ \ \ \ std::free(originalPtr);}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ NULL;}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::realloc(originalPtr,\ newSize);}
+\DoxyCodeLine{00091\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{class_crt_allocator_ac7df8398c529290f0cd5950d9492f524}\index{CrtAllocator@{CrtAllocator}!kNeedFree@{kNeedFree}}
+\index{kNeedFree@{kNeedFree}!CrtAllocator@{CrtAllocator}}
+\doxysubsubsection{\texorpdfstring{kNeedFree}{kNeedFree}}
+{\footnotesize\ttfamily \label{class_crt_allocator_ac7df8398c529290f0cd5950d9492f524} 
+const bool Crt\+Allocator\+::k\+Need\+Free = true\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{allocators_8h_source_l00077}{77}} of file \mbox{\hyperlink{allocators_8h_source}{allocators.\+h}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/\mbox{\hyperlink{allocators_8h}{allocators.\+h}}\end{DoxyCompactItemize}

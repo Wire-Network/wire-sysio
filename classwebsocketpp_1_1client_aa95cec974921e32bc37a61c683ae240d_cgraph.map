@@ -1,0 +1,9 @@
+<map id="websocketpp::client::get_connection" name="websocketpp::client::get_connection">
+<area shape="rect" id="Node000001" title="Get a new connection." alt="" coords="5,39,143,79"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1endpoint.html#abfbee4cb244700560ef80594a913cd95" title=" " alt="" coords="191,5,346,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="142,45,175,39,176,44,143,50"/>
+<area shape="rect" id="Node000003" href="$namespacewebsocketpp_1_1error.html#a3344622df8c36e8ae03c59164e7b5e89" title=" " alt="" coords="202,71,334,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="143,68,187,75,187,80,142,73"/>
+<area shape="rect" id="Node000004" href="$namespacewebsocketpp_1_1error.html#ac1acac2bfb24bbd2b1791db80993b0c2" title=" " alt="" coords="394,71,526,111"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="335,88,379,88,379,94,335,94"/>
+</map>

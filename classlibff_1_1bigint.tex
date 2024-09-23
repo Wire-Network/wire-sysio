@@ -1,0 +1,260 @@
+\doxysection{libff\+::bigint\texorpdfstring{$<$}{<} n \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classlibff_1_1bigint}{}\label{classlibff_1_1bigint}\index{libff::bigint$<$ n $>$@{libff::bigint$<$ n $>$}}
+
+
+{\ttfamily \#include $<$bigint.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classlibff_1_1bigint_a2edda0f0e76c54c5bb5595c1f4e34d6a}{bigint}} ()=default
+\item 
+\mbox{\hyperlink{classlibff_1_1bigint_a8fd5557937b12e5dbb238a3f616c77b6}{bigint}} (const unsigned long x)
+\item 
+\mbox{\hyperlink{classlibff_1_1bigint_a981cdb3f1e4d1c7fe78c1a4f1e4680ff}{bigint}} (const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\begin{DoxyCompactList}\small\item\em Initalize from a small integer. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classlibff_1_1bigint_abe8801e34fdad21ad9efd29b70c90c9f}{bigint}} (const mpz\+\_\+t \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}})
+\begin{DoxyCompactList}\small\item\em Initialize from a string containing an integer in decimal notation. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classlibff_1_1bigint_a90bae21944d3c153f0ac8f65e7e76eec}{print}} () const
+\begin{DoxyCompactList}\small\item\em Initialize from MPZ element. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classlibff_1_1bigint_a9eefc3e5b3271483eef7a12b6d13b7cc}{print\+\_\+hex}} () const
+\item 
+bool \mbox{\hyperlink{classlibff_1_1bigint_ab5e49be6d68bf02d73c82d31608dea80}{operator==}} (const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \&other) const
+\item 
+bool \mbox{\hyperlink{classlibff_1_1bigint_af454bc8a11e92d16f8aeb19f3386e7ad}{operator!=}} (const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \&other) const
+\item 
+void \mbox{\hyperlink{classlibff_1_1bigint_a2409a4fbd780686d4b6606cf1fc30991}{clear}} ()
+\item 
+bool \mbox{\hyperlink{classlibff_1_1bigint_a3f8c750d52017c9302aed504995df216}{is\+\_\+zero}} () const
+\item 
+size\+\_\+t \mbox{\hyperlink{classlibff_1_1bigint_abdbea6b608ff15910d83bbaf8bd5a688}{max\+\_\+bits}} () const
+\item 
+size\+\_\+t \mbox{\hyperlink{classlibff_1_1bigint_a0a68b96fc1b43adc3d2e88b93280ca32}{num\+\_\+bits}} () const
+\begin{DoxyCompactList}\small\item\em Returns the number of bits representable by this bigint type. \end{DoxyCompactList}\item 
+unsigned long \mbox{\hyperlink{classlibff_1_1bigint_aca1a51ef06b5c9c9180f38ddaa34c8ca}{as\+\_\+ulong}} () const
+\begin{DoxyCompactList}\small\item\em Returns the number of bits in this specific bigint value, i.\+e., position of the most-\/significant 1. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classlibff_1_1bigint_afb66a476d1948d9dd870333b3564ac68}{to\+\_\+mpz}} (mpz\+\_\+t \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}) const
+\begin{DoxyCompactList}\small\item\em Return the last limb of the integer. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classlibff_1_1bigint_ab54f219b74b0482c0cc0a02252ae2a84}{test\+\_\+bit}} (const std\+::size\+\_\+t bitno) const
+\item 
+\mbox{\hyperlink{classlibff_1_1bigint}{bigint}} \& \mbox{\hyperlink{classlibff_1_1bigint_aa17fa5feaa1c60d107d02bcd08f91794}{randomize}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+mp\+\_\+limb\+\_\+t \mbox{\hyperlink{classlibff_1_1bigint_a37b866542ed2f61c4a382e5162a2b1f3}{data}} \mbox{[}n\mbox{]} = \{0\}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static const mp\+\_\+size\+\_\+t \mbox{\hyperlink{classlibff_1_1bigint_a8d5b45dcdbdf7c9db2fdd2fdd29ee367}{N}} = n
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+std\+::ostream \& \mbox{\hyperlink{classlibff_1_1bigint_a602ac167215ffbcd257402079fa75996}{operator$<$$<$}} (std\+::ostream \&out, const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \&b)
+\item 
+std\+::istream \& \mbox{\hyperlink{classlibff_1_1bigint_a02c1e08dcd673c6dc61bd7059efff8b3}{operator$>$$>$}} (std\+::istream \&in, \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \&b)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$mp\+\_\+size\+\_\+t n$>$\newline
+class libff\+::bigint$<$ n $>$}
+Wrapper class around GMP\textquotesingle{}s MPZ long integers. It supports arithmetic operations, serialization and randomization. \doxylink{namespace_serialization}{Serialization} is fragile, see \doxylink{fc_2libraries_2ff_2libff_2common_2serialization_8hpp}{common/serialization.\+hpp}. 
+
+Definition at line \mbox{\hyperlink{libraries_2ff_2libff_2algebra_2fields_2bigint_8hpp_source_l00031}{31}} of file \mbox{\hyperlink{libraries_2ff_2libff_2algebra_2fields_2bigint_8hpp_source}{bigint.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classlibff_1_1bigint_a2edda0f0e76c54c5bb5595c1f4e34d6a}\index{libff::bigint$<$ n $>$@{libff::bigint$<$ n $>$}!bigint@{bigint}}
+\index{bigint@{bigint}!libff::bigint$<$ n $>$@{libff::bigint$<$ n $>$}}
+\doxysubsubsection{\texorpdfstring{bigint()}{bigint()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{classlibff_1_1bigint_a2edda0f0e76c54c5bb5595c1f4e34d6a} 
+template$<$mp\+\_\+size\+\_\+t n$>$ \\
+\mbox{\hyperlink{classlibff_1_1bigint}{libff\+::bigint}}$<$ n $>$\+::bigint (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [default]}}
+
+\Hypertarget{classlibff_1_1bigint_a8fd5557937b12e5dbb238a3f616c77b6}\index{libff::bigint$<$ n $>$@{libff::bigint$<$ n $>$}!bigint@{bigint}}
+\index{bigint@{bigint}!libff::bigint$<$ n $>$@{libff::bigint$<$ n $>$}}
+\doxysubsubsection{\texorpdfstring{bigint()}{bigint()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{classlibff_1_1bigint_a8fd5557937b12e5dbb238a3f616c77b6} 
+template$<$mp\+\_\+size\+\_\+t n$>$ \\
+\mbox{\hyperlink{classlibff_1_1bigint}{libff\+::bigint}}$<$ n $>$\+::bigint (\begin{DoxyParamCaption}\item[{const unsigned long}]{x}{}\end{DoxyParamCaption})}
+
+\Hypertarget{classlibff_1_1bigint_a981cdb3f1e4d1c7fe78c1a4f1e4680ff}\index{libff::bigint$<$ n $>$@{libff::bigint$<$ n $>$}!bigint@{bigint}}
+\index{bigint@{bigint}!libff::bigint$<$ n $>$@{libff::bigint$<$ n $>$}}
+\doxysubsubsection{\texorpdfstring{bigint()}{bigint()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{classlibff_1_1bigint_a981cdb3f1e4d1c7fe78c1a4f1e4680ff} 
+template$<$mp\+\_\+size\+\_\+t n$>$ \\
+\mbox{\hyperlink{classlibff_1_1bigint}{libff\+::bigint}}$<$ n $>$\+::bigint (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{s}{}\end{DoxyParamCaption})}
+
+\Hypertarget{classlibff_1_1bigint_abe8801e34fdad21ad9efd29b70c90c9f}\index{libff::bigint$<$ n $>$@{libff::bigint$<$ n $>$}!bigint@{bigint}}
+\index{bigint@{bigint}!libff::bigint$<$ n $>$@{libff::bigint$<$ n $>$}}
+\doxysubsubsection{\texorpdfstring{bigint()}{bigint()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{classlibff_1_1bigint_abe8801e34fdad21ad9efd29b70c90c9f} 
+template$<$mp\+\_\+size\+\_\+t n$>$ \\
+\mbox{\hyperlink{classlibff_1_1bigint}{libff\+::bigint}}$<$ n $>$\+::bigint (\begin{DoxyParamCaption}\item[{const mpz\+\_\+t}]{r}{}\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classlibff_1_1bigint_aca1a51ef06b5c9c9180f38ddaa34c8ca}\index{libff::bigint$<$ n $>$@{libff::bigint$<$ n $>$}!as\_ulong@{as\_ulong}}
+\index{as\_ulong@{as\_ulong}!libff::bigint$<$ n $>$@{libff::bigint$<$ n $>$}}
+\doxysubsubsection{\texorpdfstring{as\_ulong()}{as\_ulong()}}
+{\footnotesize\ttfamily \label{classlibff_1_1bigint_aca1a51ef06b5c9c9180f38ddaa34c8ca} 
+template$<$mp\+\_\+size\+\_\+t n$>$ \\
+unsigned long \mbox{\hyperlink{classlibff_1_1bigint}{libff\+::bigint}}$<$ n $>$\+::as\+\_\+ulong (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+\Hypertarget{classlibff_1_1bigint_a2409a4fbd780686d4b6606cf1fc30991}\index{libff::bigint$<$ n $>$@{libff::bigint$<$ n $>$}!clear@{clear}}
+\index{clear@{clear}!libff::bigint$<$ n $>$@{libff::bigint$<$ n $>$}}
+\doxysubsubsection{\texorpdfstring{clear()}{clear()}}
+{\footnotesize\ttfamily \label{classlibff_1_1bigint_a2409a4fbd780686d4b6606cf1fc30991} 
+template$<$mp\+\_\+size\+\_\+t n$>$ \\
+void \mbox{\hyperlink{classlibff_1_1bigint}{libff\+::bigint}}$<$ n $>$\+::clear (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{classlibff_1_1bigint_a3f8c750d52017c9302aed504995df216}\index{libff::bigint$<$ n $>$@{libff::bigint$<$ n $>$}!is\_zero@{is\_zero}}
+\index{is\_zero@{is\_zero}!libff::bigint$<$ n $>$@{libff::bigint$<$ n $>$}}
+\doxysubsubsection{\texorpdfstring{is\_zero()}{is\_zero()}}
+{\footnotesize\ttfamily \label{classlibff_1_1bigint_a3f8c750d52017c9302aed504995df216} 
+template$<$mp\+\_\+size\+\_\+t n$>$ \\
+bool \mbox{\hyperlink{classlibff_1_1bigint}{libff\+::bigint}}$<$ n $>$\+::is\+\_\+zero (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+\Hypertarget{classlibff_1_1bigint_abdbea6b608ff15910d83bbaf8bd5a688}\index{libff::bigint$<$ n $>$@{libff::bigint$<$ n $>$}!max\_bits@{max\_bits}}
+\index{max\_bits@{max\_bits}!libff::bigint$<$ n $>$@{libff::bigint$<$ n $>$}}
+\doxysubsubsection{\texorpdfstring{max\_bits()}{max\_bits()}}
+{\footnotesize\ttfamily \label{classlibff_1_1bigint_abdbea6b608ff15910d83bbaf8bd5a688} 
+template$<$mp\+\_\+size\+\_\+t n$>$ \\
+size\+\_\+t \mbox{\hyperlink{classlibff_1_1bigint}{libff\+::bigint}}$<$ n $>$\+::max\+\_\+bits (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{libraries_2ff_2libff_2algebra_2fields_2bigint_8hpp_source_l00048}{48}} of file \mbox{\hyperlink{libraries_2ff_2libff_2algebra_2fields_2bigint_8hpp_source}{bigint.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00048\ \{\ \textcolor{keywordflow}{return}\ n\ *\ GMP\_NUMB\_BITS;\ \}\ }
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classlibff_1_1bigint_abdbea6b608ff15910d83bbaf8bd5a688_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classlibff_1_1bigint_a0a68b96fc1b43adc3d2e88b93280ca32}\index{libff::bigint$<$ n $>$@{libff::bigint$<$ n $>$}!num\_bits@{num\_bits}}
+\index{num\_bits@{num\_bits}!libff::bigint$<$ n $>$@{libff::bigint$<$ n $>$}}
+\doxysubsubsection{\texorpdfstring{num\_bits()}{num\_bits()}}
+{\footnotesize\ttfamily \label{classlibff_1_1bigint_a0a68b96fc1b43adc3d2e88b93280ca32} 
+template$<$mp\+\_\+size\+\_\+t n$>$ \\
+size\+\_\+t \mbox{\hyperlink{classlibff_1_1bigint}{libff\+::bigint}}$<$ n $>$\+::num\+\_\+bits (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+\Hypertarget{classlibff_1_1bigint_af454bc8a11e92d16f8aeb19f3386e7ad}\index{libff::bigint$<$ n $>$@{libff::bigint$<$ n $>$}!operator"!=@{operator"!=}}
+\index{operator"!=@{operator"!=}!libff::bigint$<$ n $>$@{libff::bigint$<$ n $>$}}
+\doxysubsubsection{\texorpdfstring{operator"!=()}{operator!=()}}
+{\footnotesize\ttfamily \label{classlibff_1_1bigint_af454bc8a11e92d16f8aeb19f3386e7ad} 
+template$<$mp\+\_\+size\+\_\+t n$>$ \\
+bool \mbox{\hyperlink{classlibff_1_1bigint}{libff\+::bigint}}$<$ n $>$\+::operator!= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \&}]{other}{}\end{DoxyParamCaption}) const}
+
+\Hypertarget{classlibff_1_1bigint_ab5e49be6d68bf02d73c82d31608dea80}\index{libff::bigint$<$ n $>$@{libff::bigint$<$ n $>$}!operator==@{operator==}}
+\index{operator==@{operator==}!libff::bigint$<$ n $>$@{libff::bigint$<$ n $>$}}
+\doxysubsubsection{\texorpdfstring{operator==()}{operator==()}}
+{\footnotesize\ttfamily \label{classlibff_1_1bigint_ab5e49be6d68bf02d73c82d31608dea80} 
+template$<$mp\+\_\+size\+\_\+t n$>$ \\
+bool \mbox{\hyperlink{classlibff_1_1bigint}{libff\+::bigint}}$<$ n $>$\+::operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \&}]{other}{}\end{DoxyParamCaption}) const}
+
+\Hypertarget{classlibff_1_1bigint_a90bae21944d3c153f0ac8f65e7e76eec}\index{libff::bigint$<$ n $>$@{libff::bigint$<$ n $>$}!print@{print}}
+\index{print@{print}!libff::bigint$<$ n $>$@{libff::bigint$<$ n $>$}}
+\doxysubsubsection{\texorpdfstring{print()}{print()}}
+{\footnotesize\ttfamily \label{classlibff_1_1bigint_a90bae21944d3c153f0ac8f65e7e76eec} 
+template$<$mp\+\_\+size\+\_\+t n$>$ \\
+void \mbox{\hyperlink{classlibff_1_1bigint}{libff\+::bigint}}$<$ n $>$\+::print (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+\Hypertarget{classlibff_1_1bigint_a9eefc3e5b3271483eef7a12b6d13b7cc}\index{libff::bigint$<$ n $>$@{libff::bigint$<$ n $>$}!print\_hex@{print\_hex}}
+\index{print\_hex@{print\_hex}!libff::bigint$<$ n $>$@{libff::bigint$<$ n $>$}}
+\doxysubsubsection{\texorpdfstring{print\_hex()}{print\_hex()}}
+{\footnotesize\ttfamily \label{classlibff_1_1bigint_a9eefc3e5b3271483eef7a12b6d13b7cc} 
+template$<$mp\+\_\+size\+\_\+t n$>$ \\
+void \mbox{\hyperlink{classlibff_1_1bigint}{libff\+::bigint}}$<$ n $>$\+::print\+\_\+hex (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+\Hypertarget{classlibff_1_1bigint_aa17fa5feaa1c60d107d02bcd08f91794}\index{libff::bigint$<$ n $>$@{libff::bigint$<$ n $>$}!randomize@{randomize}}
+\index{randomize@{randomize}!libff::bigint$<$ n $>$@{libff::bigint$<$ n $>$}}
+\doxysubsubsection{\texorpdfstring{randomize()}{randomize()}}
+{\footnotesize\ttfamily \label{classlibff_1_1bigint_aa17fa5feaa1c60d107d02bcd08f91794} 
+template$<$mp\+\_\+size\+\_\+t n$>$ \\
+\mbox{\hyperlink{classlibff_1_1bigint}{bigint}} \& \mbox{\hyperlink{classlibff_1_1bigint}{libff\+::bigint}}$<$ n $>$\+::randomize (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{classlibff_1_1bigint_ab54f219b74b0482c0cc0a02252ae2a84}\index{libff::bigint$<$ n $>$@{libff::bigint$<$ n $>$}!test\_bit@{test\_bit}}
+\index{test\_bit@{test\_bit}!libff::bigint$<$ n $>$@{libff::bigint$<$ n $>$}}
+\doxysubsubsection{\texorpdfstring{test\_bit()}{test\_bit()}}
+{\footnotesize\ttfamily \label{classlibff_1_1bigint_ab54f219b74b0482c0cc0a02252ae2a84} 
+template$<$mp\+\_\+size\+\_\+t n$>$ \\
+bool \mbox{\hyperlink{classlibff_1_1bigint}{libff\+::bigint}}$<$ n $>$\+::test\+\_\+bit (\begin{DoxyParamCaption}\item[{const std\+::size\+\_\+t}]{bitno}{}\end{DoxyParamCaption}) const}
+
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classlibff_1_1bigint_ab54f219b74b0482c0cc0a02252ae2a84_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classlibff_1_1bigint_afb66a476d1948d9dd870333b3564ac68}\index{libff::bigint$<$ n $>$@{libff::bigint$<$ n $>$}!to\_mpz@{to\_mpz}}
+\index{to\_mpz@{to\_mpz}!libff::bigint$<$ n $>$@{libff::bigint$<$ n $>$}}
+\doxysubsubsection{\texorpdfstring{to\_mpz()}{to\_mpz()}}
+{\footnotesize\ttfamily \label{classlibff_1_1bigint_afb66a476d1948d9dd870333b3564ac68} 
+template$<$mp\+\_\+size\+\_\+t n$>$ \\
+void \mbox{\hyperlink{classlibff_1_1bigint}{libff\+::bigint}}$<$ n $>$\+::to\+\_\+mpz (\begin{DoxyParamCaption}\item[{mpz\+\_\+t}]{r}{}\end{DoxyParamCaption}) const}
+
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{classlibff_1_1bigint_a602ac167215ffbcd257402079fa75996}\index{libff::bigint$<$ n $>$@{libff::bigint$<$ n $>$}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!libff::bigint$<$ n $>$@{libff::bigint$<$ n $>$}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$}{operator<<}}
+{\footnotesize\ttfamily \label{classlibff_1_1bigint_a602ac167215ffbcd257402079fa75996} 
+template$<$mp\+\_\+size\+\_\+t n$>$ \\
+std\+::ostream \& operator$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{out}{, }\item[{const \mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \&}]{b}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+\Hypertarget{classlibff_1_1bigint_a02c1e08dcd673c6dc61bd7059efff8b3}\index{libff::bigint$<$ n $>$@{libff::bigint$<$ n $>$}!operator$>$$>$@{operator$>$$>$}}
+\index{operator$>$$>$@{operator$>$$>$}!libff::bigint$<$ n $>$@{libff::bigint$<$ n $>$}}
+\doxysubsubsection{\texorpdfstring{operator$>$$>$}{operator>>}}
+{\footnotesize\ttfamily \label{classlibff_1_1bigint_a02c1e08dcd673c6dc61bd7059efff8b3} 
+template$<$mp\+\_\+size\+\_\+t n$>$ \\
+std\+::istream \& operator$>$$>$ (\begin{DoxyParamCaption}\item[{std\+::istream \&}]{in}{, }\item[{\mbox{\hyperlink{classlibff_1_1bigint}{bigint}}$<$ n $>$ \&}]{b}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classlibff_1_1bigint_a37b866542ed2f61c4a382e5162a2b1f3}\index{libff::bigint$<$ n $>$@{libff::bigint$<$ n $>$}!data@{data}}
+\index{data@{data}!libff::bigint$<$ n $>$@{libff::bigint$<$ n $>$}}
+\doxysubsubsection{\texorpdfstring{data}{data}}
+{\footnotesize\ttfamily \label{classlibff_1_1bigint_a37b866542ed2f61c4a382e5162a2b1f3} 
+template$<$mp\+\_\+size\+\_\+t n$>$ \\
+mp\+\_\+limb\+\_\+t \mbox{\hyperlink{classlibff_1_1bigint}{libff\+::bigint}}$<$ n $>$\+::data\mbox{[}n\mbox{]} = \{0\}}
+
+
+
+Definition at line \mbox{\hyperlink{libraries_2ff_2libff_2algebra_2fields_2bigint_8hpp_source_l00035}{35}} of file \mbox{\hyperlink{libraries_2ff_2libff_2algebra_2fields_2bigint_8hpp_source}{bigint.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00035\ \{0\};}
+
+\end{DoxyCode}
+\Hypertarget{classlibff_1_1bigint_a8d5b45dcdbdf7c9db2fdd2fdd29ee367}\index{libff::bigint$<$ n $>$@{libff::bigint$<$ n $>$}!N@{N}}
+\index{N@{N}!libff::bigint$<$ n $>$@{libff::bigint$<$ n $>$}}
+\doxysubsubsection{\texorpdfstring{N}{N}}
+{\footnotesize\ttfamily \label{classlibff_1_1bigint_a8d5b45dcdbdf7c9db2fdd2fdd29ee367} 
+template$<$mp\+\_\+size\+\_\+t n$>$ \\
+const mp\+\_\+size\+\_\+t \mbox{\hyperlink{classlibff_1_1bigint}{libff\+::bigint}}$<$ n $>$\+::N = n\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{libraries_2ff_2libff_2algebra_2fields_2bigint_8hpp_source_l00033}{33}} of file \mbox{\hyperlink{libraries_2ff_2libff_2algebra_2fields_2bigint_8hpp_source}{bigint.\+hpp}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/libraries/ff/libff/algebra/fields/\mbox{\hyperlink{libraries_2ff_2libff_2algebra_2fields_2bigint_8hpp}{bigint.\+hpp}}\end{DoxyCompactItemize}

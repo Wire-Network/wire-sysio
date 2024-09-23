@@ -1,0 +1,20 @@
+<map id="Catch::Generators::GeneratorTracker" name="Catch::Generators::GeneratorTracker">
+<area shape="rect" id="Node000001" title=" " alt="" coords="946,100,1082,141"/>
+<area shape="rect" id="Node000002" href="$class_catch_1_1_test_case_tracking_1_1_tracker_base.html" title=" " alt="" coords="726,59,897,99"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="913,97,946,104,945,109,911,102"/>
+<area shape="rect" id="Node000003" href="$struct_catch_1_1_test_case_tracking_1_1_i_tracker.html" title=" " alt="" coords="382,5,552,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="568,23,635,28,703,38,762,56,760,61,702,43,634,33,567,28"/>
+<area shape="poly" id="edge8_Node000002_Node000003" title=" " alt="" coords="546,48,577,55,653,67,726,73,725,78,652,72,576,61,545,53"/>
+<area shape="rect" id="Node000004" href="$struct_catch_1_1_test_case_tracking_1_1_name_and_location.html" title=" " alt="" coords="382,77,552,118"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="568,101,634,102,702,98,726,95,727,100,703,103,634,107,568,106"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="183,62,236,88"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="252,76,382,88,382,93,251,81"/>
+<area shape="rect" id="Node000006" href="$struct_catch_1_1_source_line_info.html" title=" " alt="" coords="134,112,285,137"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="300,112,381,104,382,109,301,118"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="5,112,62,137"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="77,122,133,122,133,127,77,127"/>
+<area shape="rect" id="Node000008" href="$class_catch_1_1_test_case_tracking_1_1_tracker_context.html" title=" " alt="" coords="382,143,552,183"/>
+<area shape="poly" id="edge7_Node000002_Node000008" title=" " alt="" coords="567,152,634,141,701,122,725,109,751,97,753,102,728,113,703,127,635,146,568,157"/>
+<area shape="rect" id="Node000009" href="$struct_catch_1_1_i_generator_tracker.html" title=" " alt="" coords="727,124,896,149"/>
+<area shape="poly" id="edge9_Node000001_Node000009" title=" " alt="" coords="911,126,946,123,946,128,912,131"/>
+</map>

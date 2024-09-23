@@ -1,0 +1,127 @@
+\doxysection{type\+\_\+converter64 Struct Reference}
+\hypertarget{structtype__converter64}{}\label{structtype__converter64}\index{type\_converter64@{type\_converter64}}
+
+
+{\ttfamily \#include $<$utils.\+hpp$>$}
+
+
+
+Collaboration diagram for type\+\_\+converter64\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=171pt]{structtype__converter64__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structtype__converter64_a10bd90d5ffd63822cb5b5a2b786fcda2}{type\+\_\+converter64}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} n)
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structtype__converter64_aaa4850e1ded0c201c71c46c5da34b0dd}{to\+\_\+ui}} () const
+\item 
+double \mbox{\hyperlink{structtype__converter64_a5514d3932eeedbf81c56df3ec05fd1a6}{to\+\_\+f}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\begin{tabbing}
+xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=\kill
+union \{\\
+\>\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}} \mbox{\hyperlink{structtype__converter64_a817f89e6475165e49e1b6031073444ca}{ui}}\\
+\>double \mbox{\hyperlink{structtype__converter64_a4a2a3a5d12ab2cde9b750b2fdc61cbde}{f}}\\
+\} \mbox{\hyperlink{structtype__converter64_a85efbf6b8e923ea925748d463116f02d}{\_data}}\\
+
+\end{tabbing}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_source_l00023}{23}} of file \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_source}{utils.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structtype__converter64_a10bd90d5ffd63822cb5b5a2b786fcda2}\index{type\_converter64@{type\_converter64}!type\_converter64@{type\_converter64}}
+\index{type\_converter64@{type\_converter64}!type\_converter64@{type\_converter64}}
+\doxysubsubsection{\texorpdfstring{type\_converter64()}{type\_converter64()}}
+{\footnotesize\ttfamily \label{structtype__converter64_a10bd90d5ffd63822cb5b5a2b786fcda2} 
+type\+\_\+converter64\+::type\+\_\+converter64 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{n}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_source_l00028}{28}} of file \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_source}{utils.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00028\ \{\ \mbox{\hyperlink{structtype__converter64_a85efbf6b8e923ea925748d463116f02d}{\_data}}.ui\ =\ n;\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structtype__converter64_a5514d3932eeedbf81c56df3ec05fd1a6}\index{type\_converter64@{type\_converter64}!to\_f@{to\_f}}
+\index{to\_f@{to\_f}!type\_converter64@{type\_converter64}}
+\doxysubsubsection{\texorpdfstring{to\_f()}{to\_f()}}
+{\footnotesize\ttfamily \label{structtype__converter64_a5514d3932eeedbf81c56df3ec05fd1a6} 
+double type\+\_\+converter64\+::to\+\_\+f (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_source_l00030}{30}} of file \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_source}{utils.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00030\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structtype__converter64_a85efbf6b8e923ea925748d463116f02d}{\_data}}.f;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structtype__converter64_aaa4850e1ded0c201c71c46c5da34b0dd}\index{type\_converter64@{type\_converter64}!to\_ui@{to\_ui}}
+\index{to\_ui@{to\_ui}!type\_converter64@{type\_converter64}}
+\doxysubsubsection{\texorpdfstring{to\_ui()}{to\_ui()}}
+{\footnotesize\ttfamily \label{structtype__converter64_aaa4850e1ded0c201c71c46c5da34b0dd} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} type\+\_\+converter64\+::to\+\_\+ui (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_source_l00029}{29}} of file \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_source}{utils.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00029\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structtype__converter64_a85efbf6b8e923ea925748d463116f02d}{\_data}}.ui;\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structtype__converter64_a85efbf6b8e923ea925748d463116f02d}\index{type\_converter64@{type\_converter64}!\_data@{\_data}}
+\index{\_data@{\_data}!type\_converter64@{type\_converter64}}
+\doxysubsubsection{\texorpdfstring{[union]}{[union]}}
+{\footnotesize\ttfamily \label{structtype__converter64_a85efbf6b8e923ea925748d463116f02d} 
+union  \{ ... \}  type\+\_\+converter64\+::\+\_\+data}
+
+\Hypertarget{structtype__converter64_a4a2a3a5d12ab2cde9b750b2fdc61cbde}\index{type\_converter64@{type\_converter64}!f@{f}}
+\index{f@{f}!type\_converter64@{type\_converter64}}
+\doxysubsubsection{\texorpdfstring{f}{f}}
+{\footnotesize\ttfamily \label{structtype__converter64_a4a2a3a5d12ab2cde9b750b2fdc61cbde} 
+double type\+\_\+converter64\+::f}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_source_l00026}{26}} of file \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_source}{utils.\+hpp}}.
+
+\Hypertarget{structtype__converter64_a817f89e6475165e49e1b6031073444ca}\index{type\_converter64@{type\_converter64}!ui@{ui}}
+\index{ui@{ui}!type\_converter64@{type\_converter64}}
+\doxysubsubsection{\texorpdfstring{ui}{ui}}
+{\footnotesize\ttfamily \label{structtype__converter64_a817f89e6475165e49e1b6031073444ca} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} type\+\_\+converter64\+::ui}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_source_l00025}{25}} of file \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_source}{utils.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/tests/\mbox{\hyperlink{sys-vm_2tests_2utils_8hpp}{utils.\+hpp}}\end{DoxyCompactItemize}

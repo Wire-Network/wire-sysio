@@ -1,0 +1,15 @@
+<map id="sysio::chain::transaction::sig_digest" name="sysio::chain::transaction::sig_digest">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,56,169,97"/>
+<area shape="rect" id="Node000002" href="$classfc_1_1sha256.html#a474784de7d6213b855abd7e952df5e36" title=" " alt="" coords="217,64,335,89"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="169,74,201,74,201,79,169,79"/>
+<area shape="rect" id="Node000003" href="$classfc_1_1sha256_1_1encoder.html#a4d8b8181e912194cf98a56164671adf8" title=" " alt="" coords="383,5,519,46"/>
+<area shape="poly" id="edge7_Node000001_Node000003" title=" " alt="" coords="169,57,216,48,368,30,368,35,217,54,170,62"/>
+<area shape="rect" id="Node000006" href="$namespacefc_1_1raw.html#a3a18d8161aa5b4f4f02b6fcfdff5e5d1" title=" " alt="" coords="227,137,324,162"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="142,95,227,128,225,133,140,100"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="322,60,367,47,368,52,324,65"/>
+<area shape="rect" id="Node000005" href="$classfc_1_1sha256_1_1encoder.html#a4a246dfb33e3eb78ba167446bee92e30" title=" " alt="" coords="383,71,519,111"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="336,79,368,81,367,87,335,84"/>
+<area shape="rect" id="Node000004" href="$classfc_1_1sha256.html#ab897537f6c524085b28049be51ed370d" title=" " alt="" coords="567,13,683,38"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="520,23,551,23,551,28,520,28"/>
+<area shape="poly" id="edge6_Node000006_Node000006" title=" " alt="" coords="246,138,240,128,244,119,256,112,276,110,297,113,308,119,306,124,295,118,276,115,258,117,248,122,246,128,251,135"/>
+</map>

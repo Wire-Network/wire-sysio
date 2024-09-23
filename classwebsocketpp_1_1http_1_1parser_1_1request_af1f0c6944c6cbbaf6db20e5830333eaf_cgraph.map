@@ -1,0 +1,5 @@
+<map id="websocketpp::http::parser::request::set_method" name="websocketpp::http::parser::request::set_method">
+<area shape="rect" id="Node000001" title="Set the HTTP method. Must be a valid HTTP token." alt="" coords="5,5,142,61"/>
+<area shape="rect" id="Node000002" href="$namespacewebsocketpp_1_1http.html#a45a9b60b72b68de7b32fb75d89ad4c04" title="Is the character a non&#45;token." alt="" coords="190,13,326,54"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="142,30,174,30,174,36,142,36"/>
+</map>

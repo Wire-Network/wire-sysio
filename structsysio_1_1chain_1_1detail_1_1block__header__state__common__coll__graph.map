@@ -1,0 +1,15 @@
+<map id="sysio::chain::detail::block_header_state_common" name="sysio::chain::detail::block_header_state_common">
+<area shape="rect" id="Node000001" title=" " alt="" coords="714,96,856,152"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1producer__authority__schedule.html" title=" " alt="" coords="341,5,490,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="506,35,596,52,691,78,730,94,728,98,689,83,595,58,505,40"/>
+<area shape="rect" id="Node000003" href="$classfc_1_1vector.html" title=" " alt="" coords="5,5,185,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="200,23,340,23,340,28,200,28"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1chain_1_1incremental__merkle__impl.html" title=" " alt="" coords="321,71,510,111"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="526,98,690,112,714,115,713,120,690,118,525,103"/>
+<area shape="rect" id="Node000005" href="$classfc_1_1vector.html" title=" " alt="" coords="33,71,157,111"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="172,88,320,88,320,94,172,94"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="339,141,492,182"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="507,170,596,173,643,170,689,163,728,150,730,155,691,168,644,175,596,178,507,175"/>
+<area shape="rect" id="Node000007" href="$classfc_1_1vector.html" title=" " alt="" coords="346,206,485,232"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="500,221,593,216,642,207,689,193,724,174,754,151,757,155,727,179,691,198,643,212,594,221,501,226"/>
+</map>

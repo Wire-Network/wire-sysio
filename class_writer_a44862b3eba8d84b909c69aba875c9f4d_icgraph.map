@@ -1,0 +1,15 @@
+<map id="Writer::WriteNull" name="Writer::WriteNull">
+<area shape="rect" id="Node000001" title=" " alt="" coords="365,56,481,82"/>
+<area shape="rect" id="Node000002" href="$class_pretty_writer.html#aa144f2d0f0c3c69248cdbe957349528c" title=" " alt="" coords="196,19,317,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="349,55,316,48,318,42,350,50"/>
+<area shape="rect" id="Node000004" href="$class_writer.html#af700ed03c8810d48a4aaa3c5baeaf26c" title=" " alt="" coords="213,80,300,106"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="350,82,300,89,299,84,349,77"/>
+<area shape="rect" id="Node000003" href="$prettywritertest_8cpp.html#abe0376325cacaa63085d1252790e25d7" title=" " alt="" coords="49,5,104,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="180,29,104,23,105,18,180,23"/>
+<area shape="rect" id="Node000005" href="$simplewriter_8cpp.html#ae66f6b31b5ad750f1fe042a706a4e3d4" title=" " alt="" coords="52,55,101,80"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="197,87,101,74,102,68,198,82"/>
+<area shape="rect" id="Node000006" href="$class_dependent.html#a37eb0e3477bdb26a66a2a2f3e03c85be" title=" " alt="" coords="5,104,148,130"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="198,103,149,110,148,105,197,98"/>
+<area shape="rect" id="Node000007" href="$writertest_8cpp.html#aefbf298bdddf79d3d300633fa449c104" title=" " alt="" coords="49,153,104,179"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="215,115,149,145,105,160,104,155,147,140,213,110"/>
+</map>

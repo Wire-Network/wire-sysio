@@ -1,0 +1,193 @@
+\doxysection{libraries/fc/secp256k1/secp256k1/contrib/lax\+\_\+der\+\_\+privatekey\+\_\+parsing.c File Reference}
+\hypertarget{lax__der__privatekey__parsing_8c}{}\label{lax__der__privatekey__parsing_8c}\index{libraries/fc/secp256k1/secp256k1/contrib/lax\_der\_privatekey\_parsing.c@{libraries/fc/secp256k1/secp256k1/contrib/lax\_der\_privatekey\_parsing.c}}
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include "{}lax\+\_\+der\+\_\+privatekey\+\_\+parsing.\+h"{}}\newline
+Include dependency graph for lax\+\_\+der\+\_\+privatekey\+\_\+parsing.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=244pt]{lax__der__privatekey__parsing_8c__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=210pt]{lax__der__privatekey__parsing_8c__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{lax__der__privatekey__parsing_8c_ab807c294559193bc65b53f14ca677db6}{ec\+\_\+privkey\+\_\+import\+\_\+der}} (const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}ctx, unsigned char \texorpdfstring{$\ast$}{*}out32, const unsigned char \texorpdfstring{$\ast$}{*}privkey, size\+\_\+t privkeylen)
+\item 
+int \mbox{\hyperlink{lax__der__privatekey__parsing_8c_a9ff2773bdc052e3af4def4afb183c95c}{ec\+\_\+privkey\+\_\+export\+\_\+der}} (const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}ctx, unsigned char \texorpdfstring{$\ast$}{*}privkey, size\+\_\+t \texorpdfstring{$\ast$}{*}privkeylen, const unsigned char \texorpdfstring{$\ast$}{*}key32, int compressed)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{lax__der__privatekey__parsing_8c_a9ff2773bdc052e3af4def4afb183c95c}\index{lax\_der\_privatekey\_parsing.c@{lax\_der\_privatekey\_parsing.c}!ec\_privkey\_export\_der@{ec\_privkey\_export\_der}}
+\index{ec\_privkey\_export\_der@{ec\_privkey\_export\_der}!lax\_der\_privatekey\_parsing.c@{lax\_der\_privatekey\_parsing.c}}
+\doxysubsubsection{\texorpdfstring{ec\_privkey\_export\_der()}{ec\_privkey\_export\_der()}}
+{\footnotesize\ttfamily \label{lax__der__privatekey__parsing_8c_a9ff2773bdc052e3af4def4afb183c95c} 
+int ec\+\_\+privkey\+\_\+export\+\_\+der (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}}]{ctx}{, }\item[{unsigned char \texorpdfstring{$\ast$}{*}}]{privkey}{, }\item[{size\+\_\+t \texorpdfstring{$\ast$}{*}}]{privkeylen}{, }\item[{const unsigned char \texorpdfstring{$\ast$}{*}}]{seckey}{, }\item[{int}]{compressed}{}\end{DoxyParamCaption})}
+
+Export a private key in DER format.
+
+Returns\+: 1 if the private key was valid. Args\+: ctx\+: pointer to a context object, initialized for signing (cannot be NULL) Out\+: privkey\+: pointer to an array for storing the private key in BER. Should have space for 279 bytes, and cannot be NULL. privkeylen\+: Pointer to an int where the length of the private key in privkey will be stored. In\+: seckey\+: pointer to a 32-\/byte secret key to export. compressed\+: 1 if the key should be exported in compressed format, 0 otherwise
+
+This function is purely meant for compatibility with applications that require BER encoded keys. When working with secp256k1-\/specific code, the simple 32-\/byte private keys are sufficient.
+
+Note that this function does not guarantee correct DER output. It is guaranteed to be parsable by secp256k1\+\_\+ec\+\_\+privkey\+\_\+import\+\_\+der 
+
+Definition at line \mbox{\hyperlink{lax__der__privatekey__parsing_8c_source_l00055}{55}} of file \mbox{\hyperlink{lax__der__privatekey__parsing_8c_source}{lax\+\_\+der\+\_\+privatekey\+\_\+parsing.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00056\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__pubkey}{secp256k1\_pubkey}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}};}
+\DoxyCodeLine{00057\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ pubkeylen\ =\ 0;}
+\DoxyCodeLine{00058\ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{secp256k1_8h_a7438071aa8a6dc4697abe4f4659f2161}{secp256k1\_ec\_pubkey\_create}}(ctx,\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}},\ key32))\ \{}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ *privkeylen\ =\ 0;}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00061\ \ \ \ \ \}}
+\DoxyCodeLine{00062\ \ \ \ \ \textcolor{keywordflow}{if}\ (compressed)\ \{}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ begin[]\ =\ \{}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \ \ \ 0x30,0x81,0xD3,0x02,0x01,0x01,0x04,0x20}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ middle[]\ =\ \{}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \ \ \ 0xA0,0x81,0x85,0x30,0x81,0x82,0x02,0x01,0x01,0x30,0x2C,0x06,0x07,0x2A,0x86,0x48,}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \ \ \ 0xCE,0x3D,0x01,0x01,0x02,0x21,0x00,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ 0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \ \ \ 0xFF,0xFF,0xFE,0xFF,0xFF,0xFC,0x2F,0x30,0x06,0x04,0x01,0x00,0x04,0x01,0x07,0x04,}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \ \ \ 0x21,0x02,0x79,0xBE,0x66,0x7E,0xF9,0xDC,0xBB,0xAC,0x55,0xA0,0x62,0x95,0xCE,0x87,}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ \ \ \ 0x0B,0x07,0x02,0x9B,0xFC,0xDB,0x2D,0xCE,0x28,0xD9,0x59,0xF2,0x81,0x5B,0x16,0xF8,}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \ \ \ 0x17,0x98,0x02,0x21,0x00,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \ \ \ 0xFF,0xFF,0xFF,0xFF,0xFE,0xBA,0xAE,0xDC,0xE6,0xAF,0x48,0xA0,0x3B,0xBF,0xD2,0x5E,}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \ \ \ 0x8C,0xD0,0x36,0x41,0x41,0x02,0x01,0x01,0xA1,0x24,0x03,0x22,0x00}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *ptr\ =\ privkey;}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(ptr,\ begin,\ \textcolor{keyword}{sizeof}(begin));\ ptr\ +=\ \textcolor{keyword}{sizeof}(begin);}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(ptr,\ key32,\ 32);\ ptr\ +=\ 32;}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(ptr,\ middle,\ \textcolor{keyword}{sizeof}(middle));\ ptr\ +=\ \textcolor{keyword}{sizeof}(middle);}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ pubkeylen\ =\ 33;}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{secp256k1_8h_a34977bf00322e510e881160c421836d7}{secp256k1\_ec\_pubkey\_serialize}}(ctx,\ ptr,\ \&pubkeylen,\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}},\ \mbox{\hyperlink{secp256k1_8h_a7b8f642c65e8b5c81fa4421b7c42ab57}{SECP256K1\_EC\_COMPRESSED}});}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ ptr\ +=\ pubkeylen;}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ *privkeylen\ =\ ptr\ -\/\ privkey;}
+\DoxyCodeLine{00085\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ begin[]\ =\ \{}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \ \ \ \ 0x30,0x82,0x01,0x13,0x02,0x01,0x01,0x04,0x20}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ middle[]\ =\ \{}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ \ \ \ 0xA0,0x81,0xA5,0x30,0x81,0xA2,0x02,0x01,0x01,0x30,0x2C,0x06,0x07,0x2A,0x86,0x48,}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ \ \ 0xCE,0x3D,0x01,0x01,0x02,0x21,0x00,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ \ \ \ 0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \ \ 0xFF,0xFF,0xFE,0xFF,0xFF,0xFC,0x2F,0x30,0x06,0x04,0x01,0x00,0x04,0x01,0x07,0x04,}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \ \ \ 0x41,0x04,0x79,0xBE,0x66,0x7E,0xF9,0xDC,0xBB,0xAC,0x55,0xA0,0x62,0x95,0xCE,0x87,}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \ \ \ 0x0B,0x07,0x02,0x9B,0xFC,0xDB,0x2D,0xCE,0x28,0xD9,0x59,0xF2,0x81,0x5B,0x16,0xF8,}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \ \ \ 0x17,0x98,0x48,0x3A,0xDA,0x77,0x26,0xA3,0xC4,0x65,0x5D,0xA4,0xFB,0xFC,0x0E,0x11,}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \ \ \ 0x08,0xA8,0xFD,0x17,0xB4,0x48,0xA6,0x85,0x54,0x19,0x9C,0x47,0xD0,0x8F,0xFB,0x10,}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \ \ \ 0xD4,0xB8,0x02,0x21,0x00,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ \ \ \ 0xFF,0xFF,0xFF,0xFF,0xFE,0xBA,0xAE,0xDC,0xE6,0xAF,0x48,0xA0,0x3B,0xBF,0xD2,0x5E,}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ \ \ \ 0x8C,0xD0,0x36,0x41,0x41,0x02,0x01,0x01,0xA1,0x44,0x03,0x42,0x00}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *ptr\ =\ privkey;}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(ptr,\ begin,\ \textcolor{keyword}{sizeof}(begin));\ ptr\ +=\ \textcolor{keyword}{sizeof}(begin);}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(ptr,\ key32,\ 32);\ ptr\ +=\ 32;}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(ptr,\ middle,\ \textcolor{keyword}{sizeof}(middle));\ ptr\ +=\ \textcolor{keyword}{sizeof}(middle);}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ pubkeylen\ =\ 65;}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{secp256k1_8h_a34977bf00322e510e881160c421836d7}{secp256k1\_ec\_pubkey\_serialize}}(ctx,\ ptr,\ \&pubkeylen,\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}},\ \mbox{\hyperlink{secp256k1_8h_ab8e25dc58843e83926f95795f9e8a6e2}{SECP256K1\_EC\_UNCOMPRESSED}});}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ ptr\ +=\ pubkeylen;}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ *privkeylen\ =\ ptr\ -\/\ privkey;}
+\DoxyCodeLine{00110\ \ \ \ \ \}}
+\DoxyCodeLine{00111\ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{00112\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{lax__der__privatekey__parsing_8c_a9ff2773bdc052e3af4def4afb183c95c_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{lax__der__privatekey__parsing_8c_a9ff2773bdc052e3af4def4afb183c95c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{lax__der__privatekey__parsing_8c_ab807c294559193bc65b53f14ca677db6}\index{lax\_der\_privatekey\_parsing.c@{lax\_der\_privatekey\_parsing.c}!ec\_privkey\_import\_der@{ec\_privkey\_import\_der}}
+\index{ec\_privkey\_import\_der@{ec\_privkey\_import\_der}!lax\_der\_privatekey\_parsing.c@{lax\_der\_privatekey\_parsing.c}}
+\doxysubsubsection{\texorpdfstring{ec\_privkey\_import\_der()}{ec\_privkey\_import\_der()}}
+{\footnotesize\ttfamily \label{lax__der__privatekey__parsing_8c_ab807c294559193bc65b53f14ca677db6} 
+int ec\+\_\+privkey\+\_\+import\+\_\+der (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}}]{ctx}{, }\item[{unsigned char \texorpdfstring{$\ast$}{*}}]{seckey}{, }\item[{const unsigned char \texorpdfstring{$\ast$}{*}}]{privkey}{, }\item[{size\+\_\+t}]{privkeylen}{}\end{DoxyParamCaption})}
+
+Import a private key in DER format. Returns\+: 1 if a private key was extracted. Args\+: ctx\+: pointer to a context object (cannot be NULL). Out\+: seckey\+: pointer to a 32-\/byte array for storing the private key. (cannot be NULL). In\+: privkey\+: pointer to a private key in DER format (cannot be NULL). privkeylen\+: length of the DER private key pointed to be privkey.
+
+This function will accept more than just strict DER, and even allow some BER violations. The public key stored inside the DER-\/encoded private key is not verified for correctness, nor are the curve parameters. Use this function only if you know in advance it is supposed to contain a secp256k1 private key. 
+
+Definition at line \mbox{\hyperlink{lax__der__privatekey__parsing_8c_source_l00011}{11}} of file \mbox{\hyperlink{lax__der__privatekey__parsing_8c_source}{lax\+\_\+der\+\_\+privatekey\+\_\+parsing.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00011\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00012\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *end\ =\ privkey\ +\ privkeylen;}
+\DoxyCodeLine{00013\ \ \ \ \ \textcolor{keywordtype}{int}\ lenb\ =\ 0;}
+\DoxyCodeLine{00014\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ =\ 0;}
+\DoxyCodeLine{00015\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(out32,\ 0,\ 32);}
+\DoxyCodeLine{00016\ \ \ \ \ \textcolor{comment}{/*\ sequence\ header\ */}}
+\DoxyCodeLine{00017\ \ \ \ \ \textcolor{keywordflow}{if}\ (end\ <\ privkey+1\ ||\ *privkey\ !=\ 0x30)\ \{}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00019\ \ \ \ \ \}}
+\DoxyCodeLine{00020\ \ \ \ \ privkey++;}
+\DoxyCodeLine{00021\ \ \ \ \ \textcolor{comment}{/*\ sequence\ length\ constructor\ */}}
+\DoxyCodeLine{00022\ \ \ \ \ \textcolor{keywordflow}{if}\ (end\ <\ privkey+1\ ||\ !(*privkey\ \&\ 0x80))\ \{}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00024\ \ \ \ \ \}}
+\DoxyCodeLine{00025\ \ \ \ \ lenb\ =\ *privkey\ \&\ \string~0x80;\ privkey++;}
+\DoxyCodeLine{00026\ \ \ \ \ \textcolor{keywordflow}{if}\ (lenb\ <\ 1\ ||\ lenb\ >\ 2)\ \{}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00028\ \ \ \ \ \}}
+\DoxyCodeLine{00029\ \ \ \ \ \textcolor{keywordflow}{if}\ (end\ <\ privkey+lenb)\ \{}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00031\ \ \ \ \ \}}
+\DoxyCodeLine{00032\ \ \ \ \ \textcolor{comment}{/*\ sequence\ length\ */}}
+\DoxyCodeLine{00033\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ =\ privkey[lenb-\/1]\ |\ (lenb\ >\ 1\ ?\ privkey[lenb-\/2]\ <<\ 8\ :\ 0);}
+\DoxyCodeLine{00034\ \ \ \ \ privkey\ +=\ lenb;}
+\DoxyCodeLine{00035\ \ \ \ \ \textcolor{keywordflow}{if}\ (end\ <\ privkey+\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})\ \{}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00037\ \ \ \ \ \}}
+\DoxyCodeLine{00038\ \ \ \ \ \textcolor{comment}{/*\ sequence\ element\ 0:\ version\ number\ (=1)\ */}}
+\DoxyCodeLine{00039\ \ \ \ \ \textcolor{keywordflow}{if}\ (end\ <\ privkey+3\ ||\ privkey[0]\ !=\ 0x02\ ||\ privkey[1]\ !=\ 0x01\ ||\ privkey[2]\ !=\ 0x01)\ \{}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00041\ \ \ \ \ \}}
+\DoxyCodeLine{00042\ \ \ \ \ privkey\ +=\ 3;}
+\DoxyCodeLine{00043\ \ \ \ \ \textcolor{comment}{/*\ sequence\ element\ 1:\ octet\ string,\ up\ to\ 32\ bytes\ */}}
+\DoxyCodeLine{00044\ \ \ \ \ \textcolor{keywordflow}{if}\ (end\ <\ privkey+2\ ||\ privkey[0]\ !=\ 0x04\ ||\ privkey[1]\ >\ 0x20\ ||\ end\ <\ privkey+2+privkey[1])\ \{}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00046\ \ \ \ \ \}}
+\DoxyCodeLine{00047\ \ \ \ \ \textcolor{keywordflow}{if}\ (privkey[1])\ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(out32\ +\ 32\ -\/\ privkey[1],\ privkey\ +\ 2,\ privkey[1]);}
+\DoxyCodeLine{00048\ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{secp256k1_8h_a366f922fc0c787351e82ff8e3a95f652}{secp256k1\_ec\_seckey\_verify}}(ctx,\ out32))\ \{}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(out32,\ 0,\ 32);}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00051\ \ \ \ \ \}}
+\DoxyCodeLine{00052\ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{00053\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=346pt]{lax__der__privatekey__parsing_8c_ab807c294559193bc65b53f14ca677db6_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{lax__der__privatekey__parsing_8c_ab807c294559193bc65b53f14ca677db6_icgraph}
+\end{center}
+\end{figure}

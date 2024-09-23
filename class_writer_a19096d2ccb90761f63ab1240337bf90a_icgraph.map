@@ -1,0 +1,9 @@
+<map id="Writer::Key" name="Writer::Key">
+<area shape="rect" id="Node000001" title=" " alt="" coords="109,55,195,80"/>
+<area shape="rect" id="Node000002" href="$simplewriter_8cpp.html#ae66f6b31b5ad750f1fe042a706a4e3d4" title=" " alt="" coords="8,5,58,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="104,51,57,31,59,26,106,46"/>
+<area shape="rect" id="Node000003" href="$writertest_8cpp.html#a80be7fa365cb784245eed8653bd20717" title=" " alt="" coords="5,55,61,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="93,70,61,70,61,65,93,65"/>
+<area shape="rect" id="Node000004" href="$writertest_8cpp.html#a83e9c781f01842bc1ce45cfb02c6724f" title=" " alt="" coords="5,104,61,130"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="106,89,62,108,60,103,104,84"/>
+</map>

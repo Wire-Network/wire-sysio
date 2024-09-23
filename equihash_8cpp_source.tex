@@ -1,0 +1,53 @@
+\doxysection{equihash.\+cpp}
+\hypertarget{equihash_8cpp_source}{}\label{equihash_8cpp_source}\index{libraries/fc/src/crypto/equihash.cpp@{libraries/fc/src/crypto/equihash.cpp}}
+\mbox{\hyperlink{equihash_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{equihash_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <equihash/pow.hpp>}}
+\DoxyCodeLine{\Hypertarget{equihash_8cpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{equihash_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{equihash_8hpp}{fc/crypto/equihash.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{equihash_8cpp_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{equihash_8cpp_source_l00005}\mbox{\hyperlink{equihash_8cpp_ad49a40ebab16b2c8752a5b20bf11a8db}{00005}}\ \textcolor{preprocessor}{\#define\ EQUIHASH\_NONCE\ 2}}
+\DoxyCodeLine{\Hypertarget{equihash_8cpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{equihash_8cpp_source_l00007}00007\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}\ \{\ \textcolor{keyword}{namespace\ }equihash\ \{}
+\DoxyCodeLine{\Hypertarget{equihash_8cpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{equihash_8cpp_source_l00009}\mbox{\hyperlink{namespacefc_1_1equihash_aa8a67c1db57b7ca94f4fad558d83fd4d}{00009}}\ \ \ \ \_POW::Seed\ \mbox{\hyperlink{namespacefc_1_1equihash_aa8a67c1db57b7ca94f4fad558d83fd4d}{sha\_to\_seed}}(\ \mbox{\hyperlink{classfc_1_1sha256}{sha256}}\ seed\ )}
+\DoxyCodeLine{\Hypertarget{equihash_8cpp_source_l00010}00010\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{equihash_8cpp_source_l00011}00011\ \ \ \ \ \ \ \_POW::Seed\ new\_seed;}
+\DoxyCodeLine{\Hypertarget{equihash_8cpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{equihash_8cpp_source_l00013}00013\ \ \ \ \ \ \ \textcolor{comment}{//\ Seed\ is\ 128\ bits.\ Half\ of\ sha256\ to\ create\ seed.\ Should\ still\ have\ enough\ randomness}}
+\DoxyCodeLine{\Hypertarget{equihash_8cpp_source_l00014}00014\ \ \ \ \ \ \ new\_seed.v[0]\ =\ \ (\textcolor{keywordtype}{unsigned}\ int)\ \ seed.\mbox{\hyperlink{classfc_1_1sha256_ac933820516182c134a6473227db0e7da}{\_hash}}[0];}
+\DoxyCodeLine{\Hypertarget{equihash_8cpp_source_l00015}00015\ \ \ \ \ \ \ new\_seed.v[0]\ \string^=\ (\textcolor{keywordtype}{unsigned}\ int)\ \ seed.\mbox{\hyperlink{classfc_1_1sha256_ac933820516182c134a6473227db0e7da}{\_hash}}[2];}
+\DoxyCodeLine{\Hypertarget{equihash_8cpp_source_l00016}00016\ \ \ \ \ \ \ new\_seed.v[1]\ =\ \ (\textcolor{keywordtype}{unsigned}\ int)(\ seed.\mbox{\hyperlink{classfc_1_1sha256_ac933820516182c134a6473227db0e7da}{\_hash}}[0]\ >>\ 32\ );}
+\DoxyCodeLine{\Hypertarget{equihash_8cpp_source_l00017}00017\ \ \ \ \ \ \ new\_seed.v[1]\ \string^=\ (\textcolor{keywordtype}{unsigned}\ int)(\ seed.\mbox{\hyperlink{classfc_1_1sha256_ac933820516182c134a6473227db0e7da}{\_hash}}[2]\ >>\ 32\ );}
+\DoxyCodeLine{\Hypertarget{equihash_8cpp_source_l00018}00018\ \ \ \ \ \ \ new\_seed.v[2]\ =\ \ (\textcolor{keywordtype}{unsigned}\ int)\ \ seed.\mbox{\hyperlink{classfc_1_1sha256_ac933820516182c134a6473227db0e7da}{\_hash}}[1];}
+\DoxyCodeLine{\Hypertarget{equihash_8cpp_source_l00019}00019\ \ \ \ \ \ \ new\_seed.v[2]\ \string^=\ (\textcolor{keywordtype}{unsigned}\ int)\ \ seed.\mbox{\hyperlink{classfc_1_1sha256_ac933820516182c134a6473227db0e7da}{\_hash}}[3];}
+\DoxyCodeLine{\Hypertarget{equihash_8cpp_source_l00020}00020\ \ \ \ \ \ \ new\_seed.v[3]\ =\ \ (\textcolor{keywordtype}{unsigned}\ int)(\ seed.\mbox{\hyperlink{classfc_1_1sha256_ac933820516182c134a6473227db0e7da}{\_hash}}[1]\ >>\ 32\ );}
+\DoxyCodeLine{\Hypertarget{equihash_8cpp_source_l00021}00021\ \ \ \ \ \ \ new\_seed.v[3]\ \string^=\ (\textcolor{keywordtype}{unsigned}\ int)(\ seed.\mbox{\hyperlink{classfc_1_1sha256_ac933820516182c134a6473227db0e7da}{\_hash}}[3]\ >>\ 32\ );}
+\DoxyCodeLine{\Hypertarget{equihash_8cpp_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{equihash_8cpp_source_l00023}00023\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ new\_seed;}
+\DoxyCodeLine{\Hypertarget{equihash_8cpp_source_l00024}00024\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{equihash_8cpp_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{equihash_8cpp_source_l00026}\mbox{\hyperlink{structfc_1_1equihash_1_1proof_a8daeca324fe1aea4c22e22a8299e2f81}{00026}}\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{structfc_1_1equihash_1_1proof_a8daeca324fe1aea4c22e22a8299e2f81}{proof::is\_valid}}()\textcolor{keyword}{\ const}}
+\DoxyCodeLine{\Hypertarget{equihash_8cpp_source_l00027}00027\ \textcolor{keyword}{\ \ \ }\{}
+\DoxyCodeLine{\Hypertarget{equihash_8cpp_source_l00028}00028\ \ \ \ \ \ \ \_POW::Proof\ test(\ \mbox{\hyperlink{structfc_1_1equihash_1_1proof_a57d885177434e8e515a6a8da6879ff87}{n}},\ \mbox{\hyperlink{structfc_1_1equihash_1_1proof_a60beca9abc2d09c8824fbc2e69c9550a}{k}},\ \mbox{\hyperlink{namespacefc_1_1equihash_aa8a67c1db57b7ca94f4fad558d83fd4d}{sha\_to\_seed}}(\ \mbox{\hyperlink{structfc_1_1equihash_1_1proof_aa59e4c2a6282ec844270c9ef13403ec5}{seed}}\ ),\ \mbox{\hyperlink{equihash_8cpp_ad49a40ebab16b2c8752a5b20bf11a8db}{EQUIHASH\_NONCE}},\ \mbox{\hyperlink{structfc_1_1equihash_1_1proof_a8321147962f1a92de2e1ea494f2cda28}{inputs}}\ );}
+\DoxyCodeLine{\Hypertarget{equihash_8cpp_source_l00029}00029\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ test.Test();}
+\DoxyCodeLine{\Hypertarget{equihash_8cpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{equihash_8cpp_source_l00031}00031\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{equihash_8cpp_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{equihash_8cpp_source_l00033}\mbox{\hyperlink{structfc_1_1equihash_1_1proof_aa53a9449b0f48ad101ded88ab416b240}{00033}}\ \ \ \ \mbox{\hyperlink{structfc_1_1equihash_1_1proof}{proof}}\ \mbox{\hyperlink{structfc_1_1equihash_1_1proof_aa53a9449b0f48ad101ded88ab416b240}{proof::hash}}(\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ n,\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ k,\ \mbox{\hyperlink{classfc_1_1sha256}{sha256}}\ seed\ )}
+\DoxyCodeLine{\Hypertarget{equihash_8cpp_source_l00034}00034\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{equihash_8cpp_source_l00035}00035\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ hash\ =\ \_POW::Equihash(\ \mbox{\hyperlink{structfc_1_1equihash_1_1proof_a57d885177434e8e515a6a8da6879ff87}{n}},\ \mbox{\hyperlink{structfc_1_1equihash_1_1proof_a60beca9abc2d09c8824fbc2e69c9550a}{k}},\ \mbox{\hyperlink{namespacefc_1_1equihash_aa8a67c1db57b7ca94f4fad558d83fd4d}{sha\_to\_seed}}(\ \mbox{\hyperlink{structfc_1_1equihash_1_1proof_aa59e4c2a6282ec844270c9ef13403ec5}{seed}}\ )\ );}
+\DoxyCodeLine{\Hypertarget{equihash_8cpp_source_l00036}00036\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ result\ =\ hash.FindProof(\ \mbox{\hyperlink{equihash_8cpp_ad49a40ebab16b2c8752a5b20bf11a8db}{EQUIHASH\_NONCE}}\ );}
+\DoxyCodeLine{\Hypertarget{equihash_8cpp_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{equihash_8cpp_source_l00038}00038\ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1equihash_1_1proof}{proof}}\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}};}
+\DoxyCodeLine{\Hypertarget{equihash_8cpp_source_l00039}00039\ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.n\ =\ \mbox{\hyperlink{structfc_1_1equihash_1_1proof_a57d885177434e8e515a6a8da6879ff87}{n}};}
+\DoxyCodeLine{\Hypertarget{equihash_8cpp_source_l00040}00040\ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.k\ =\ \mbox{\hyperlink{structfc_1_1equihash_1_1proof_a60beca9abc2d09c8824fbc2e69c9550a}{k}};}
+\DoxyCodeLine{\Hypertarget{equihash_8cpp_source_l00041}00041\ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.seed\ =\ \mbox{\hyperlink{structfc_1_1equihash_1_1proof_aa59e4c2a6282ec844270c9ef13403ec5}{seed}};}
+\DoxyCodeLine{\Hypertarget{equihash_8cpp_source_l00042}00042\ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.inputs\ =\ result.inputs;}
+\DoxyCodeLine{\Hypertarget{equihash_8cpp_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{equihash_8cpp_source_l00044}00044\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}};}
+\DoxyCodeLine{\Hypertarget{equihash_8cpp_source_l00045}00045\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{equihash_8cpp_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{equihash_8cpp_source_l00047}00047\ \}\ \}\ \textcolor{comment}{//\ fc::equihash}}
+
+\end{DoxyCode}

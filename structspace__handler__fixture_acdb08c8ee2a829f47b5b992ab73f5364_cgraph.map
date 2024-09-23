@@ -1,0 +1,14 @@
+<map id="space_handler_fixture::space_monitor_loop" name="space_handler_fixture::space_monitor_loop">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,71,154,111"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1resource__monitor_1_1file__space__handler.html#a6faa30d2db31020b3db4886a554e147a" title=" " alt="" coords="202,63,362,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="154,88,186,88,186,94,154,94"/>
+<area shape="poly" id="edge6_Node000002_Node000002" title=" " alt="" coords="242,63,242,53,250,44,263,38,282,37,303,39,316,46,314,51,302,44,282,42,264,44,253,48,247,55,247,63"/>
+<area shape="rect" id="Node000003" href="$namespaceappbase.html#a99374dc23934f008a09f2f79be9eae40" title=" " alt="" coords="440,13,540,38"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="361,63,431,41,433,46,363,68"/>
+<area shape="rect" id="Node000005" href="$classsysio_1_1resource__monitor_1_1file__space__handler.html#a3571fc8484a45f62857dcbe29d73aa28" title=" " alt="" coords="410,63,570,119"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="362,88,394,88,394,94,362,94"/>
+<area shape="rect" id="Node000006" href="$classappbase_1_1application.html#a81aa58d3f94570b7976145039155fc46" title=" " alt="" coords="420,143,560,183"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="363,116,416,135,414,140,361,121"/>
+<area shape="rect" id="Node000004" href="$classappbase_1_1application.html#ac874b2659b400fe254f1ae4260d06ecf" title=" " alt="" coords="618,5,759,46"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="540,23,603,23,603,28,540,28"/>
+</map>

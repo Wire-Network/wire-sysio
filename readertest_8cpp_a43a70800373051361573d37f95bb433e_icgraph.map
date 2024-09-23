@@ -1,0 +1,7 @@
+<map id="TestMultipleRoot" name="TestMultipleRoot">
+<area shape="rect" id="Node000001" title=" " alt="" coords="109,31,228,56"/>
+<area shape="rect" id="Node000002" href="$readertest_8cpp.html#a5b7ceca8eb13509ac2015a74c90b004a" title=" " alt="" coords="5,5,61,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="93,32,61,26,62,21,94,27"/>
+<area shape="rect" id="Node000003" href="$readertest_8cpp.html#a190231ffaeee049afcbe613dbbc5751b" title=" " alt="" coords="5,55,61,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="94,60,62,65,61,60,93,54"/>
+</map>

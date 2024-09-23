@@ -1,0 +1,28 @@
+var classlibff_1_1_fp4__model =
+[
+    [ "my_Fp", "classlibff_1_1_fp4__model.html#a18d199e5813b6f122458f1374ce03b31", null ],
+    [ "my_Fp2", "classlibff_1_1_fp4__model.html#ad770a8adb060f498c862b9c26bb9187f", null ],
+    [ "my_Fpe", "classlibff_1_1_fp4__model.html#a3f0d152abc739e2cdf2d2fa4ffa1436e", null ],
+    [ "Fp4_model", "classlibff_1_1_fp4__model.html#ab65c0dcc2db3bfe840d7aef579449034", null ],
+    [ "Fp4_model", "classlibff_1_1_fp4__model.html#a79b3b73cffc5797630d08cdbc0ecd47c", null ],
+    [ "clear", "classlibff_1_1_fp4__model.html#a02b090b4a981514d516893a6ea561c76", null ],
+    [ "cyclotomic_exp", "classlibff_1_1_fp4__model.html#a16676b132c566209d48f25d441b7e955", null ],
+    [ "cyclotomic_squared", "classlibff_1_1_fp4__model.html#a6ecaf839d3e9a88021b4eee697bf8150", null ],
+    [ "Frobenius_map", "classlibff_1_1_fp4__model.html#ad6a890391f8383a6e9cc22568eba4e4e", null ],
+    [ "inverse", "classlibff_1_1_fp4__model.html#a1029f19b2685255b66ba161ac1ea2f66", null ],
+    [ "is_zero", "classlibff_1_1_fp4__model.html#af050dae3171a7a6d65edcd66a4c7099e", null ],
+    [ "mul_by_023", "classlibff_1_1_fp4__model.html#a00b7b43017490aeedc8fc5830044736c", null ],
+    [ "operator!=", "classlibff_1_1_fp4__model.html#a55a6cae9c3b7fcc74b200aeffba89dc3", null ],
+    [ "operator*", "classlibff_1_1_fp4__model.html#a0a3d96ef36903a0ab4cf7b90a417c0af", null ],
+    [ "operator+", "classlibff_1_1_fp4__model.html#a48f1365e7bbc3562ec36d1cd21fccd98", null ],
+    [ "operator-", "classlibff_1_1_fp4__model.html#a884bf001e3aeb6946b5a2bfc2539ef10", null ],
+    [ "operator-", "classlibff_1_1_fp4__model.html#a3b1f4d5b9c4583db5057b93713f18d86", null ],
+    [ "operator==", "classlibff_1_1_fp4__model.html#ab0ded6b5c634d77b76084ccf18f9d217", null ],
+    [ "print", "classlibff_1_1_fp4__model.html#a8eab2fa24d673a805e34a9221dd290ca", null ],
+    [ "squared", "classlibff_1_1_fp4__model.html#a3d82beb9bbc2d7d1024bbc85bdec0910", null ],
+    [ "unitary_inverse", "classlibff_1_1_fp4__model.html#a335c41665992b07991b7197d83839163", null ],
+    [ "operator", "classlibff_1_1_fp4__model.html#a0f44173a395e96663df895a18fad243b", null ],
+    [ "operator>>", "classlibff_1_1_fp4__model.html#a86cc766fcb912e21f90f0e5fb23e7b0b", null ],
+    [ "c0", "classlibff_1_1_fp4__model.html#a70b7759c13597b2656c80bf4ed25b5ed", null ],
+    [ "c1", "classlibff_1_1_fp4__model.html#ae4042a5c50eaf131d5f5d5a395dd0c18", null ]
+];

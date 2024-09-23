@@ -1,0 +1,7 @@
+<map id="websocketpp::transport::asio::connection::handle_async_write" name="websocketpp::transport::asio::connection::handle_async_write">
+<area shape="rect" id="Node000001" title="Async write callback." alt="" coords="256,31,426,87"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1transport_1_1asio_1_1connection.html#a9c17ab9142868c2dd2ff74c478173bb3" title="Initiate a potentially asyncronous write of the given buffer." alt="" coords="5,5,208,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="240,47,208,43,209,37,241,42"/>
+<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1transport_1_1asio_1_1connection.html#a9f62627d2a0fd05278a0fb1d8761911b" title="Initiate a potentially asyncronous write of the given buffers." alt="" coords="5,71,208,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="241,75,209,80,208,74,240,70"/>
+</map>

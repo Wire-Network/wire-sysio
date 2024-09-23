@@ -1,0 +1,91 @@
+\doxysection{sha1.\+hpp}
+\hypertarget{include_2fc_2crypto_2sha1_8hpp_source}{}\label{include_2fc_2crypto_2sha1_8hpp_source}\index{libraries/fc/include/fc/crypto/sha1.hpp@{libraries/fc/include/fc/crypto/sha1.hpp}}
+\mbox{\hyperlink{include_2fc_2crypto_2sha1_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{fwd_8hpp}{fc/fwd.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{string_8hpp}{fc/string.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00005}00005\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}\{}
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00007}\mbox{\hyperlink{classfc_1_1sha1}{00007}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classfc_1_1sha1}{sha1}}\ }
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00008}00008\ \{}
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00009}00009\ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00010}00010\ \ \ \ \ \mbox{\hyperlink{classfc_1_1sha1_abeafa42dce486001a3d483ac01a59a15}{sha1}}();}
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00011}00011\ \ \ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classfc_1_1sha1_abeafa42dce486001a3d483ac01a59a15}{sha1}}(\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\&\ hex\_str\ );}
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00013}00013\ \ \ \ \ \textcolor{keywordtype}{string}\ \mbox{\hyperlink{classfc_1_1sha1_ad4958485fe7f4888c5305f5608692e81}{str}}()\textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00014}00014\ \ \ \ \ \textcolor{keyword}{operator}\ \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}}()\textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00016}00016\ \ \ \ \ \textcolor{keywordtype}{char}*\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1sha1_ad42682578a1b910dfffc9ab11c672a5c}{data}}();}
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00017}00017\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{classfc_1_1sha1_ad42682578a1b910dfffc9ab11c672a5c}{data}}()\textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00018}\mbox{\hyperlink{classfc_1_1sha1_aa8c80cda8f5b1e058032f57a9ccbde2e}{00018}}\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classfc_1_1sha1_aa8c80cda8f5b1e058032f57a9ccbde2e}{data\_size}}()\textcolor{keyword}{const\ }\{\ \textcolor{keywordflow}{return}\ 20;\ \}}
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00020}00020\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classfc_1_1sha1}{sha1}}\ \mbox{\hyperlink{classfc_1_1sha1_ae2b17c52fe5c1bb6a91325decc3b8f7c}{hash}}(\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ d,\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ dlen\ );}
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00021}00021\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classfc_1_1sha1}{sha1}}\ \mbox{\hyperlink{classfc_1_1sha1_ae2b17c52fe5c1bb6a91325decc3b8f7c}{hash}}(\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\&\ );}
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00023}00023\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00024}\mbox{\hyperlink{classfc_1_1sha1_a8be36f5b5ea215d0a66915c0253cf4ae}{00024}}\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classfc_1_1sha1}{sha1}}\ \mbox{\hyperlink{classfc_1_1sha1_a8be36f5b5ea215d0a66915c0253cf4ae}{hash}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ t\ )\ }
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00025}00025\ \ \ \ \ \{\ }
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00026}00026\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1sha1_1_1encoder}{sha1::encoder}}\ e;\ }
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00027}00027\ \ \ \ \ \ \ e\ <<\ t;\ }
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00028}00028\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ e.\mbox{\hyperlink{classfc_1_1sha1_1_1encoder_ad17eb3cf6315b803ba7d73edd704d44c}{result}}();\ }
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00029}00029\ \ \ \ \ \}\ }
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00031}\mbox{\hyperlink{classfc_1_1sha1_1_1encoder}{00031}}\ \ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classfc_1_1sha1_1_1encoder}{encoder}}\ }
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00032}00032\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00033}00033\ \ \ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00034}00034\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1sha1_1_1encoder_a674eb9f77fe5435b983d74042680a3f9}{encoder}}();}
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00035}00035\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1sha1_1_1encoder_a9076de37b929f03d6c13d68ee0e79d39}{\string~encoder}}();}
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00037}00037\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1sha1_1_1encoder_a3fe2406bfa6f78ce37482c742a697601}{write}}(\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}},\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ dlen\ );}
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00038}\mbox{\hyperlink{classfc_1_1sha1_1_1encoder_a6f1fc5ccfa1c4f484f0bf2edeaa027b2}{00038}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1sha1_1_1encoder_a6f1fc5ccfa1c4f484f0bf2edeaa027b2}{put}}(\ \textcolor{keywordtype}{char}\ c\ )\ \{\ \mbox{\hyperlink{classfc_1_1sha1_1_1encoder_a3fe2406bfa6f78ce37482c742a697601}{write}}(\ \&c,\ 1\ );\ \}}
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00039}00039\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1sha1_1_1encoder_a22e2c6649fae5316337ccd1836779aaf}{reset}}();}
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00040}00040\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1sha1}{sha1}}\ \mbox{\hyperlink{classfc_1_1sha1_1_1encoder_ad17eb3cf6315b803ba7d73edd704d44c}{result}}();}
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00042}00042\ \ \ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00043}00043\ \ \ \ \ \ \ \ \ \textcolor{keyword}{struct\ \ \ \ \ \ }impl;}
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00044}00044\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1fwd}{fc::fwd<impl,96>}}\ my;}
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00045}00045\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00047}00047\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00048}\mbox{\hyperlink{classfc_1_1sha1_a64787adc118072e208c6d55e60dcc2f5}{00048}}\ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{friend}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ \mbox{\hyperlink{classfc_1_1sha1_a64787adc118072e208c6d55e60dcc2f5}{operator<<}}(\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ ds,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha1}{sha1}}\&\ ep\ )\ \{}
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00049}00049\ \ \ \ \ \ \ ds.write(\ ep.\mbox{\hyperlink{classfc_1_1sha1_ad42682578a1b910dfffc9ab11c672a5c}{data}}(),\ \textcolor{keyword}{sizeof}(ep)\ );}
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00050}00050\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ds;}
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00051}00051\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00052}00052\ }
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00053}00053\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00054}\mbox{\hyperlink{classfc_1_1sha1_a2fad438aad48a6e655c8bb6a61258749}{00054}}\ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{friend}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ \mbox{\hyperlink{classfc_1_1sha1_a2fad438aad48a6e655c8bb6a61258749}{operator>>}}(\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ ds,\ \mbox{\hyperlink{classfc_1_1sha1}{sha1}}\&\ ep\ )\ \{}
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00055}00055\ \ \ \ \ \ \ ds.read(\ ep.\mbox{\hyperlink{classfc_1_1sha1_ad42682578a1b910dfffc9ab11c672a5c}{data}}(),\ \textcolor{keyword}{sizeof}(ep)\ );}
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00056}00056\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ds;}
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00057}00057\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00058}00058\ \ \ \ \ \textcolor{keyword}{friend}\ \mbox{\hyperlink{classfc_1_1sha1}{sha1}}\ \mbox{\hyperlink{classfc_1_1sha1_a64787adc118072e208c6d55e60dcc2f5}{operator\ <<\ }}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha1}{sha1}}\&\ h1,\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ i\ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00059}00059\ \ \ \ \ \textcolor{keyword}{friend}\ \textcolor{keywordtype}{bool}\ \ \ \mbox{\hyperlink{classfc_1_1sha1_a6fd867d656b30cba0f59d8add436aa1a}{operator\ ==\ }}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha1}{sha1}}\&\ h1,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha1}{sha1}}\&\ h2\ );}
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00060}00060\ \ \ \ \ \textcolor{keyword}{friend}\ \textcolor{keywordtype}{bool}\ \ \ \mbox{\hyperlink{classfc_1_1sha1_ae8f29de32bb50a15b7d68b60d1b4f4f7}{operator\ !=\ }}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha1}{sha1}}\&\ h1,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha1}{sha1}}\&\ h2\ );}
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00061}00061\ \ \ \ \ \textcolor{keyword}{friend}\ \mbox{\hyperlink{classfc_1_1sha1}{sha1}}\ \mbox{\hyperlink{classfc_1_1sha1_a469c70d7922485f27bb811490ad334c6}{operator\ \string^\ \ }}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha1}{sha1}}\&\ h1,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha1}{sha1}}\&\ h2\ );}
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00062}00062\ \ \ \ \ \textcolor{keyword}{friend}\ \textcolor{keywordtype}{bool}\ \ \ \mbox{\hyperlink{classfc_1_1sha1_ab3447989e7212b65729eab352397eb55}{operator\ >=\ }}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha1}{sha1}}\&\ h1,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha1}{sha1}}\&\ h2\ );}
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00063}00063\ \ \ \ \ \textcolor{keyword}{friend}\ \textcolor{keywordtype}{bool}\ \ \ \mbox{\hyperlink{classfc_1_1sha1_a678374e9b6c8bf5549fde635f45ca8da}{operator\ >\ \ }}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha1}{sha1}}\&\ h1,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha1}{sha1}}\&\ h2\ );\ }
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00064}00064\ \ \ \ \ \textcolor{keyword}{friend}\ \textcolor{keywordtype}{bool}\ \ \ \mbox{\hyperlink{classfc_1_1sha1_a6c29b9daf163c2bc1541ffdbcce454f5}{operator\ <\ \ }}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha1}{sha1}}\&\ h1,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha1}{sha1}}\&\ h2\ );\ }
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00065}00065\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00066}\mbox{\hyperlink{classfc_1_1sha1_a1ee203495960ef64095b49a08ce5fa5a}{00066}}\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{classfc_1_1sha1_a1ee203495960ef64095b49a08ce5fa5a}{\_hash}}[5];\ }
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00067}00067\ \};}
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00069}00069\ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classfc_1_1variant}{variant}};}
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00070}00070\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefc_adea61f2343de94d0fbcb920a32332ad9}{to\_variant}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha1}{sha1}}\&\ bi,\ \mbox{\hyperlink{classfc_1_1variant}{variant}}\&\ v\ );}
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00071}00071\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefc_accef08adf4ee05c36ccc550d8101b08f}{from\_variant}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1variant}{variant}}\&\ v,\ \mbox{\hyperlink{classfc_1_1sha1}{sha1}}\&\ bi\ );}
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00073}00073\ \}\ \textcolor{comment}{//\ namespace\ fc}}
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00074}00074\ }
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00075}00075\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacestd}{std}}}
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00076}00076\ \{}
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00077}00077\ \ \ \ \ \textcolor{keyword}{template}<>}
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00078}\mbox{\hyperlink{structstd_1_1hash_3_01fc_1_1sha1_01_4}{00078}}\ \ \ \ \ \textcolor{keyword}{struct\ }hash<\mbox{\hyperlink{namespacefc}{fc}}::sha1>}
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00079}00079\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00080}\mbox{\hyperlink{structstd_1_1hash_3_01fc_1_1sha1_01_4_a0418ebf62d6c052f83dc517cbb0dfeba}{00080}}\ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{structstd_1_1hash_3_01fc_1_1sha1_01_4_a0418ebf62d6c052f83dc517cbb0dfeba}{operator()}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha1}{fc::sha1}}\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ )\textcolor{keyword}{const}}
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00081}00081\ \textcolor{keyword}{\ \ \ \ \ \ \ }\{}
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00082}00082\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \ *((\textcolor{keywordtype}{size\_t}*)\&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00083}00083\ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00084}00084\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{include_2fc_2crypto_2sha1_8hpp_source_l00085}00085\ \}}
+
+\end{DoxyCode}

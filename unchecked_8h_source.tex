@@ -1,0 +1,240 @@
+\doxysection{unchecked.\+h}
+\hypertarget{unchecked_8h_source}{}\label{unchecked_8h_source}\index{libraries/fc/src/utf8/unchecked.h@{libraries/fc/src/utf8/unchecked.h}}
+\mbox{\hyperlink{unchecked_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00001}00001\ \textcolor{comment}{//\ Copyright\ 2006\ Nemanja\ Trifunovic}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00003}00003\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00004}00004\ \textcolor{comment}{Permission\ is\ hereby\ granted,\ free\ of\ charge,\ to\ any\ person\ or\ organization}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00005}00005\ \textcolor{comment}{obtaining\ a\ copy\ of\ the\ software\ and\ accompanying\ documentation\ covered\ by}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00006}00006\ \textcolor{comment}{this\ license\ (the\ "{}Software"{})\ to\ use,\ reproduce,\ display,\ distribute,}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00007}00007\ \textcolor{comment}{execute,\ and\ transmit\ the\ Software,\ and\ to\ prepare\ derivative\ works\ of\ the}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00008}00008\ \textcolor{comment}{Software,\ and\ to\ permit\ third-\/parties\ to\ whom\ the\ Software\ is\ furnished\ to}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00009}00009\ \textcolor{comment}{do\ so,\ all\ subject\ to\ the\ following:}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00010}00010\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00011}00011\ \textcolor{comment}{The\ copyright\ notices\ in\ the\ Software\ and\ this\ entire\ statement,\ including}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00012}00012\ \textcolor{comment}{the\ above\ license\ grant,\ this\ restriction\ and\ the\ following\ disclaimer,}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00013}00013\ \textcolor{comment}{must\ be\ included\ in\ all\ copies\ of\ the\ Software,\ in\ whole\ or\ in\ part,\ and}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00014}00014\ \textcolor{comment}{all\ derivative\ works\ of\ the\ Software,\ unless\ such\ copies\ or\ derivative}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00015}00015\ \textcolor{comment}{works\ are\ solely\ in\ the\ form\ of\ machine-\/executable\ object\ code\ generated\ by}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00016}00016\ \textcolor{comment}{a\ source\ language\ processor.}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00017}00017\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00018}00018\ \textcolor{comment}{THE\ SOFTWARE\ IS\ PROVIDED\ "{}AS\ IS"{},\ WITHOUT\ WARRANTY\ OF\ ANY\ KIND,\ EXPRESS\ OR}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00019}00019\ \textcolor{comment}{IMPLIED,\ INCLUDING\ BUT\ NOT\ LIMITED\ TO\ THE\ WARRANTIES\ OF\ MERCHANTABILITY,}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00020}00020\ \textcolor{comment}{FITNESS\ FOR\ A\ PARTICULAR\ PURPOSE,\ TITLE\ AND\ NON-\/INFRINGEMENT.\ IN\ NO\ EVENT}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00021}00021\ \textcolor{comment}{SHALL\ THE\ COPYRIGHT\ HOLDERS\ OR\ ANYONE\ DISTRIBUTING\ THE\ SOFTWARE\ BE\ LIABLE}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00022}00022\ \textcolor{comment}{FOR\ ANY\ DAMAGES\ OR\ OTHER\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ TORT\ OR\ OTHERWISE,}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00023}00023\ \textcolor{comment}{ARISING\ FROM,\ OUT\ OF\ OR\ IN\ CONNECTION\ WITH\ THE\ SOFTWARE\ OR\ THE\ USE\ OR\ OTHER}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00024}00024\ \textcolor{comment}{DEALINGS\ IN\ THE\ SOFTWARE.}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00025}00025\ \textcolor{comment}{*/}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00028}00028\ \textcolor{preprocessor}{\#ifndef\ UTF8\_FOR\_CPP\_UNCHECKED\_H\_2675DCD0\_9480\_4c0c\_B92A\_CC14C027B731}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00029}00029\ \textcolor{preprocessor}{\#define\ UTF8\_FOR\_CPP\_UNCHECKED\_H\_2675DCD0\_9480\_4c0c\_B92A\_CC14C027B731}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00031}00031\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{core_8h}{core.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00033}00033\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceutf8}{utf8}}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00034}00034\ \{}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00035}\mbox{\hyperlink{namespaceutf8_1_1unchecked}{00035}}\ \ \ \ \ \textcolor{keyword}{namespace\ }unchecked\ }
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00036}00036\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00037}00037\ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ octet\_iterator>}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00038}\mbox{\hyperlink{namespaceutf8_1_1unchecked_acab3a56b1772ed871f36757883d63788}{00038}}\ \ \ \ \ \ \ \ \ octet\_iterator\ \mbox{\hyperlink{namespaceutf8_1_1unchecked_acab3a56b1772ed871f36757883d63788}{append}}(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ cp,\ octet\_iterator\ result)}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00039}00039\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00040}00040\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (cp\ <\ 0x80)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ one\ octet}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00041}00041\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *(result++)\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\textcolor{keyword}{>}(cp);\ \ }
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00042}00042\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (cp\ <\ 0x800)\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ two\ octets}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00043}00043\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *(result++)\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\textcolor{keyword}{>}((cp\ >>\ 6)\ \ \ \ \ \ \ \ \ \ |\ 0xc0);}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00044}00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *(result++)\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\textcolor{keyword}{>}((cp\ \&\ 0x3f)\ \ \ \ \ \ \ \ |\ 0x80);}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00045}00045\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00046}00046\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (cp\ <\ 0x10000)\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ three\ octets}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00047}00047\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *(result++)\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\textcolor{keyword}{>}((cp\ >>\ 12)\ \ \ \ \ \ \ \ \ |\ 0xe0);}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *(result++)\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\textcolor{keyword}{>}(((cp\ >>\ 6)\ \&\ 0x3f)\ |\ 0x80);}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00049}00049\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *(result++)\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\textcolor{keyword}{>}((cp\ \&\ 0x3f)\ \ \ \ \ \ \ \ |\ 0x80);}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00050}00050\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00051}00051\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ four\ octets}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *(result++)\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\textcolor{keyword}{>}((cp\ >>\ 18)\ \ \ \ \ \ \ \ \ |\ 0xf0);}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *(result++)\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\textcolor{keyword}{>}(((cp\ >>\ 12)\ \&\ 0x3f)|\ 0x80);}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *(result++)\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\textcolor{keyword}{>}(((cp\ >>\ 6)\ \&\ 0x3f)\ |\ 0x80);}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *(result++)\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\textcolor{keyword}{>}((cp\ \&\ 0x3f)\ \ \ \ \ \ \ \ |\ 0x80);}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00058}00058\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00060}00060\ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ octet\_iterator>}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00061}\mbox{\hyperlink{namespaceutf8_1_1unchecked_ac5932c0cbb2498a111d53d26fd82f260}{00061}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{namespaceutf8_1_1unchecked_ac5932c0cbb2498a111d53d26fd82f260}{next}}(octet\_iterator\&\ it)}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00062}00062\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ cp\ =\ \mbox{\hyperlink{namespaceutf8_1_1internal_adf6e0469e279b9562aa461b4c3c1e7e4}{utf8::internal::mask8}}(*it);}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00064}00064\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typename}\ std::iterator\_traits<octet\_iterator>::difference\_type\ length\ =\ \mbox{\hyperlink{namespaceutf8_1_1internal_adb347cc81d32ebb0fd22d849f7bff5ea}{utf8::internal::sequence\_length}}(it);}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00065}00065\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (length)\ \{}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00066}00066\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ 1:}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00067}00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ 2:}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ it++;}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ cp\ =\ ((cp\ <<\ 6)\ \&\ 0x7ff)\ +\ ((*it)\ \&\ 0x3f);}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00071}00071\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ 3:}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00073}00073\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++it;\ }
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00074}00074\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ cp\ =\ ((cp\ <<\ 12)\ \&\ 0xffff)\ +\ ((\mbox{\hyperlink{namespaceutf8_1_1internal_adf6e0469e279b9562aa461b4c3c1e7e4}{utf8::internal::mask8}}(*it)\ <<\ 6)\ \&\ 0xfff);}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00075}00075\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++it;}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ cp\ +=\ (*it)\ \&\ 0x3f;}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00078}00078\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ 4:}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++it;}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00080}00080\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ cp\ =\ ((cp\ <<\ 18)\ \&\ 0x1fffff)\ +\ ((\mbox{\hyperlink{namespaceutf8_1_1internal_adf6e0469e279b9562aa461b4c3c1e7e4}{utf8::internal::mask8}}(*it)\ <<\ 12)\ \&\ 0x3ffff);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00081}00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++it;}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00082}00082\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ cp\ +=\ (\mbox{\hyperlink{namespaceutf8_1_1internal_adf6e0469e279b9562aa461b4c3c1e7e4}{utf8::internal::mask8}}(*it)\ <<\ 6)\ \&\ 0xfff;}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00083}00083\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++it;}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00084}00084\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ cp\ +=\ (*it)\ \&\ 0x3f;\ }
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00085}00085\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00086}00086\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00087}00087\ \ \ \ \ \ \ \ \ \ \ \ \ ++it;}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00088}00088\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ cp;\ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00089}00089\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00090}00090\ }
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00091}00091\ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ octet\_iterator>}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00092}\mbox{\hyperlink{namespaceutf8_1_1unchecked_aaf5ddbe24f8dbb83390e2d33d75b9ea1}{00092}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{namespaceutf8_1_1unchecked_aaf5ddbe24f8dbb83390e2d33d75b9ea1}{peek\_next}}(octet\_iterator\ it)}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00093}00093\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00094}00094\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespaceutf8_1_1unchecked_ac5932c0cbb2498a111d53d26fd82f260}{utf8::unchecked::next}}(it);\ \ \ \ }
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00095}00095\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00096}00096\ }
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00097}00097\ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ octet\_iterator>}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00098}\mbox{\hyperlink{namespaceutf8_1_1unchecked_ad2c0e4b9693713ac18ee543e214b3ef9}{00098}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{namespaceutf8_1_1unchecked_ad2c0e4b9693713ac18ee543e214b3ef9}{prior}}(octet\_iterator\&\ it)}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00099}00099\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00100}00100\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (\mbox{\hyperlink{namespaceutf8_1_1internal_ab4820484159ba613b4901476ceb24516}{utf8::internal::is\_trail}}(*(-\/-\/it)))\ ;}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00101}00101\ \ \ \ \ \ \ \ \ \ \ \ \ octet\_iterator\ temp\ =\ it;}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00102}00102\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespaceutf8_1_1unchecked_ac5932c0cbb2498a111d53d26fd82f260}{utf8::unchecked::next}}(temp);}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00103}00103\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00104}00104\ }
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00105}00105\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Deprecated\ in\ versions\ that\ include\ prior,\ but\ only\ for\ the\ sake\ of\ consistency\ (see\ utf8::previous)}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00106}00106\ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ octet\_iterator>}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00107}\mbox{\hyperlink{namespaceutf8_1_1unchecked_a454cdd8f6b6771bd0425be1ccd94f788}{00107}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{inline}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{namespaceutf8_1_1unchecked_a454cdd8f6b6771bd0425be1ccd94f788}{previous}}(octet\_iterator\&\ it)}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00108}00108\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00109}00109\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespaceutf8_1_1unchecked_ad2c0e4b9693713ac18ee543e214b3ef9}{utf8::unchecked::prior}}(it);}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00110}00110\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00111}00111\ }
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00112}00112\ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ octet\_iterator,\ \textcolor{keyword}{typename}\ distance\_type>}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00113}\mbox{\hyperlink{namespaceutf8_1_1unchecked_a66ea3b93a81a8f961e7a1700d13efc57}{00113}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespaceutf8_1_1unchecked_a66ea3b93a81a8f961e7a1700d13efc57}{advance}}\ (octet\_iterator\&\ it,\ distance\_type\ n)}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00114}00114\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00115}00115\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (distance\_type\ i\ =\ 0;\ i\ <\ n;\ ++i)}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00116}00116\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceutf8_1_1unchecked_ac5932c0cbb2498a111d53d26fd82f260}{utf8::unchecked::next}}(it);}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00117}00117\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00118}00118\ }
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00119}00119\ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ octet\_iterator>}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00120}00120\ \ \ \ \ \ \ \ \ \textcolor{keyword}{typename}\ std::iterator\_traits<octet\_iterator>::difference\_type}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00121}\mbox{\hyperlink{namespaceutf8_1_1unchecked_a033fb7223533ef6d9c92ae7c38f57138}{00121}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceutf8_1_1unchecked_a033fb7223533ef6d9c92ae7c38f57138}{distance}}\ (octet\_iterator\ first,\ octet\_iterator\ last)}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00122}00122\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00123}00123\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typename}\ std::iterator\_traits<octet\_iterator>::difference\_type\ dist;}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00124}00124\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (dist\ =\ 0;\ first\ <\ last;\ ++dist)\ }
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00125}00125\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceutf8_1_1unchecked_ac5932c0cbb2498a111d53d26fd82f260}{utf8::unchecked::next}}(first);}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00126}00126\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ dist;}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00127}00127\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00128}00128\ }
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00129}00129\ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ u16bit\_iterator,\ \textcolor{keyword}{typename}\ octet\_iterator>}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00130}\mbox{\hyperlink{namespaceutf8_1_1unchecked_adfbd29a875d0aafeeaae511dc1aa5d77}{00130}}\ \ \ \ \ \ \ \ \ octet\_iterator\ \mbox{\hyperlink{namespaceutf8_1_1unchecked_adfbd29a875d0aafeeaae511dc1aa5d77}{utf16to8}}\ (u16bit\_iterator\ start,\ u16bit\_iterator\ end,\ octet\_iterator\ result)}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00131}00131\ \ \ \ \ \ \ \ \ \{\ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00132}00132\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (start\ !=\ end)\ \{}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00133}00133\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ cp\ =\ \mbox{\hyperlink{namespaceutf8_1_1internal_ab1e3c2fe2296ac185993a183d1bd0678}{utf8::internal::mask16}}(*start++);}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00134}00134\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Take\ care\ of\ surrogate\ pairs\ first}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00135}00135\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespaceutf8_1_1internal_a1a4095fb207096e04f94f21eb23d2723}{utf8::internal::is\_lead\_surrogate}}(cp))\ \{}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00136}00136\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ trail\_surrogate\ =\ \mbox{\hyperlink{namespaceutf8_1_1internal_ab1e3c2fe2296ac185993a183d1bd0678}{utf8::internal::mask16}}(*start++);}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00137}00137\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ cp\ =\ (cp\ <<\ 10)\ +\ trail\_surrogate\ +\ \mbox{\hyperlink{namespaceutf8_1_1internal_a31ff17e602e8e7e15db5ebfb5e93a3fb}{internal::SURROGATE\_OFFSET}};}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00138}00138\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00139}00139\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ result\ =\ \mbox{\hyperlink{namespaceutf8_1_1unchecked_acab3a56b1772ed871f36757883d63788}{utf8::unchecked::append}}(cp,\ result);}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00140}00140\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00141}00141\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00142}00142\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00143}00143\ }
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00144}00144\ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ u16bit\_iterator,\ \textcolor{keyword}{typename}\ octet\_iterator>}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00145}\mbox{\hyperlink{namespaceutf8_1_1unchecked_ae323b9faa6a47cb8d0aeaea44c1787eb}{00145}}\ \ \ \ \ \ \ \ \ u16bit\_iterator\ \mbox{\hyperlink{namespaceutf8_1_1unchecked_ae323b9faa6a47cb8d0aeaea44c1787eb}{utf8to16}}\ (octet\_iterator\ start,\ octet\_iterator\ end,\ u16bit\_iterator\ result)}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00146}00146\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00147}00147\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (start\ <\ end)\ \{}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00148}00148\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ cp\ =\ \mbox{\hyperlink{namespaceutf8_1_1unchecked_ac5932c0cbb2498a111d53d26fd82f260}{utf8::unchecked::next}}(start);}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00149}00149\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (cp\ >\ 0xffff)\ \{\ \textcolor{comment}{//make\ a\ surrogate\ pair}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00150}00150\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *result++\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\textcolor{keyword}{>}((cp\ >>\ 10)\ \ \ +\ \mbox{\hyperlink{namespaceutf8_1_1internal_a47b04bad75525ea9b01ff095c70fa081}{internal::LEAD\_OFFSET}});}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00151}00151\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *result++\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\textcolor{keyword}{>}((cp\ \&\ 0x3ff)\ +\ \mbox{\hyperlink{namespaceutf8_1_1internal_a836088cf3e5e29ac9a89b2ffbd91623e}{internal::TRAIL\_SURROGATE\_MIN}});}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00152}00152\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00153}00153\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00154}00154\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *result++\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\textcolor{keyword}{>}(cp);}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00155}00155\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00156}00156\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00157}00157\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00158}00158\ }
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00159}00159\ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ octet\_iterator,\ \textcolor{keyword}{typename}\ u32bit\_iterator>}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00160}\mbox{\hyperlink{namespaceutf8_1_1unchecked_af4edb29ad18a1f389ac968a93629e9fb}{00160}}\ \ \ \ \ \ \ \ \ octet\_iterator\ \mbox{\hyperlink{namespaceutf8_1_1unchecked_af4edb29ad18a1f389ac968a93629e9fb}{utf32to8}}\ (u32bit\_iterator\ start,\ u32bit\_iterator\ end,\ octet\_iterator\ result)}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00161}00161\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00162}00162\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (start\ !=\ end)}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00163}00163\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ result\ =\ \mbox{\hyperlink{namespaceutf8_1_1unchecked_acab3a56b1772ed871f36757883d63788}{utf8::unchecked::append}}(*(start++),\ result);}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00164}00164\ }
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00165}00165\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00166}00166\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00167}00167\ }
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00168}00168\ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ octet\_iterator,\ \textcolor{keyword}{typename}\ u32bit\_iterator>}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00169}\mbox{\hyperlink{namespaceutf8_1_1unchecked_aa4b554922a06a7487118982ff41da590}{00169}}\ \ \ \ \ \ \ \ \ u32bit\_iterator\ \mbox{\hyperlink{namespaceutf8_1_1unchecked_aa4b554922a06a7487118982ff41da590}{utf8to32}}\ (octet\_iterator\ start,\ octet\_iterator\ end,\ u32bit\_iterator\ result)}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00170}00170\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00171}00171\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (start\ <\ end)}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00172}00172\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (*result++)\ =\ \mbox{\hyperlink{namespaceutf8_1_1unchecked_ac5932c0cbb2498a111d53d26fd82f260}{utf8::unchecked::next}}(start);}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00173}00173\ }
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00174}00174\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00175}00175\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00176}00176\ }
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00177}00177\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ The\ iterator\ class}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00178}00178\ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ octet\_iterator>}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00179}\mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator}{00179}}\ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator}{iterator}}\ \{}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00180}00180\ \ \ \ \ \ \ \ \ \ \ \ \ octet\_iterator\ it;}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00181}00181\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00182}\mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator_a224be2233b03592c9129d2f2e7a2b9ba}{00182}}\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator_a224be2233b03592c9129d2f2e7a2b9ba}{iterator\_category}}\ =\ std::bidirectional\_iterator\_tag;}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00183}\mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator_a98412635ce8a3f01e3886a089a75d5e1}{00183}}\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator_a98412635ce8a3f01e3886a089a75d5e1}{value\_type}}\ =\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}};}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00184}\mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator_aed4a56cd661b373aeffe452549c5999d}{00184}}\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator_aed4a56cd661b373aeffe452549c5999d}{difference\_type}}\ =\ std::ptrdiff\_t;}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00185}\mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator_a718a6e16b252278924edfabad21bbcf5}{00185}}\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator_a718a6e16b252278924edfabad21bbcf5}{pointer}}\ =\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}*;}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00186}\mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator_a8c918c564efdb3ca2d50254736e3ec52}{00186}}\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator_a8c918c564efdb3ca2d50254736e3ec52}{reference}}\ =\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\&;}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00187}00187\ }
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00188}\mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator_a6564ecea96a82b87daca60a153ee1a6f}{00188}}\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator_a6564ecea96a82b87daca60a153ee1a6f}{iterator}}\ ()\ \{\}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00189}\mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator_a0f93d81989f2eb1038c0550431b9653b}{00189}}\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator_a0f93d81989f2eb1038c0550431b9653b}{iterator}}\ (\textcolor{keyword}{const}\ octet\_iterator\&\ octet\_it):\ it(octet\_it)\ \{\}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00190}00190\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ the\ default\ "{}big\ three"{}\ are\ OK}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00191}\mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator_a475cd482cf1ff3aeb8d858d580a2e27a}{00191}}\ \ \ \ \ \ \ \ \ \ \ \ \ octet\_iterator\ \mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator_a475cd482cf1ff3aeb8d858d580a2e27a}{base}}\ ()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ it;\ \}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00192}\mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator_a150ab57c3546d067d49214af4d317e97}{00192}}\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator_a150ab57c3546d067d49214af4d317e97}{operator\ *\ }}()\textcolor{keyword}{\ const}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00193}00193\ \textcolor{keyword}{\ \ \ \ \ \ \ \ \ \ \ \ }\{}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00194}00194\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ octet\_iterator\ temp\ =\ it;}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00195}00195\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespaceutf8_1_1unchecked_ac5932c0cbb2498a111d53d26fd82f260}{utf8::unchecked::next}}(temp);}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00196}00196\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00197}\mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator_aa2bb05a12c371c1cb105a66607159059}{00197}}\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator_aa2bb05a12c371c1cb105a66607159059}{operator\ ==\ }}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator}{iterator}}\&\ rhs)\textcolor{keyword}{\ const\ }}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00198}00198\ \textcolor{keyword}{\ \ \ \ \ \ \ \ \ \ \ \ }\{\ }
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00199}00199\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (it\ ==\ rhs.it);}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00200}00200\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00201}\mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator_a28c371e85ff2ef99fe33eb3ce9182f05}{00201}}\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator_a28c371e85ff2ef99fe33eb3ce9182f05}{operator\ !=\ }}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator}{iterator}}\&\ rhs)\textcolor{keyword}{\ const}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00202}00202\ \textcolor{keyword}{\ \ \ \ \ \ \ \ \ \ \ \ }\{}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00203}00203\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !(\mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator_aa2bb05a12c371c1cb105a66607159059}{operator\ ==\ }}(rhs));}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00204}00204\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00205}\mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator_a7743751d8f5c14aedf22aaaa6d3e6198}{00205}}\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator}{iterator}}\&\ \mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator_a7743751d8f5c14aedf22aaaa6d3e6198}{operator\ ++\ }}()\ }
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00206}00206\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00207}00207\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ::std::advance(it,\ \mbox{\hyperlink{namespaceutf8_1_1internal_adb347cc81d32ebb0fd22d849f7bff5ea}{utf8::internal::sequence\_length}}(it));}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00208}00208\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00209}00209\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00210}\mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator_ae1cadaddd5c1db5518def5af491a1ff1}{00210}}\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator}{iterator}}\ \mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator_a7743751d8f5c14aedf22aaaa6d3e6198}{operator\ ++\ }}(\textcolor{keywordtype}{int})}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00211}00211\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00212}00212\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator}{iterator}}\ temp\ =\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00213}00213\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ::std::advance(it,\ \mbox{\hyperlink{namespaceutf8_1_1internal_adb347cc81d32ebb0fd22d849f7bff5ea}{utf8::internal::sequence\_length}}(it));}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00214}00214\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ temp;}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00215}00215\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \ }
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00216}\mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator_a4de90515d79c3c55fe172e6e1d5c07cd}{00216}}\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator}{iterator}}\&\ \mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator_a4de90515d79c3c55fe172e6e1d5c07cd}{operator\ -\/-\/\ }}()}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00217}00217\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00218}00218\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceutf8_1_1unchecked_ad2c0e4b9693713ac18ee543e214b3ef9}{utf8::unchecked::prior}}(it);}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00219}00219\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00220}00220\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00221}\mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator_a85597f5ae4bd175edb6dc2fc9ceb2f34}{00221}}\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator}{iterator}}\ \mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator_a4de90515d79c3c55fe172e6e1d5c07cd}{operator\ -\/-\/\ }}(\textcolor{keywordtype}{int})}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00222}00222\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00223}00223\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classutf8_1_1unchecked_1_1iterator}{iterator}}\ temp\ =\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00224}00224\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceutf8_1_1unchecked_ad2c0e4b9693713ac18ee543e214b3ef9}{utf8::unchecked::prior}}(it);}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00225}00225\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ temp;}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00226}00226\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00227}00227\ \ \ \ \ \ \ \ \ \ \ \};\ \textcolor{comment}{//\ class\ iterator}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00228}00228\ }
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00229}00229\ \ \ \ \ \}\ \textcolor{comment}{//\ namespace\ utf8::unchecked}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00230}00230\ \}\ \textcolor{comment}{//\ namespace\ utf8\ }}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00231}00231\ }
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00232}00232\ }
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00233}00233\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ header\ guard}}
+\DoxyCodeLine{\Hypertarget{unchecked_8h_source_l00234}00234\ }
+
+\end{DoxyCode}

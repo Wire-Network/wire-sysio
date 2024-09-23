@@ -1,0 +1,27 @@
+<map id="main" name="main">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,112,55,138"/>
+<area shape="rect" id="Node000002" href="$struct_parse_result.html#a2aae3c2f42b31cc2409ee1e03bc4852e" title="Get the error code." alt="" coords="129,5,262,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="37,110,62,75,81,56,101,40,113,34,116,38,104,44,84,60,67,78,41,113"/>
+<area shape="rect" id="Node000003" href="$group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga28835eb93d2c3c07bbea13515eb31415" title="Maps error code of parsing into error message." alt="" coords="132,55,259,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="54,111,102,90,125,83,127,88,104,95,56,116"/>
+<area shape="rect" id="Node000004" href="$class_filter_key_reader.html#a3758ff0e4ecbc870564ca30ad01ddae3" title=" " alt="" coords="106,104,284,145"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="55,122,91,122,91,128,55,128"/>
+<area shape="rect" id="Node000005" href="$struct_parse_result.html#afbe762766ac21b2aae266105f1dfa643" title="Get the error offset, if IsError(), 0 otherwise." alt="" coords="127,169,264,195"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="56,134,104,154,127,162,125,167,102,159,54,139"/>
+<area shape="rect" id="Node000006" href="$class_generic_document.html#ac30b4e8887974060b695be20c3ceb02c" title="Populate this document by a generator which produces SAX events." alt="" coords="103,219,288,244"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="41,137,67,171,84,190,104,205,112,210,110,214,101,210,81,194,62,175,37,140"/>
+<area shape="rect" id="Node000007" href="$classinternal_1_1_stack.html#ac484468a2791bd3e9ba609bd1600ab48" title=" " alt="" coords="336,193,497,219"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="288,218,321,214,321,220,288,224"/>
+<area shape="rect" id="Node000008" href="$class_generic_value.html#ad7502bbfcd0c14f7ece07243d56e2b90" title="Assignment with move semantics." alt="" coords="336,243,497,268"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="288,239,321,242,320,248,288,244"/>
+<area shape="rect" id="Node000009" href="$class_generic_value.html#abb8ea2dfbe74ff4ee7dac6be31317f81" title="Assignment without calling destructor." alt="" coords="554,217,728,243"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="497,244,538,239,539,244,498,249"/>
+<area shape="rect" id="Node000010" href="$class_generic_value.html#a213ba89ef5ef961a5e655bd8c78ac9f4" title="Destructor." alt="" coords="545,267,737,292"/>
+<area shape="poly" id="edge9_Node000008_Node000010" title=" " alt="" coords="498,261,530,265,530,270,497,267"/>
+<area shape="rect" id="Node000011" href="$class_generic_value.html#a40f567bae6fabbb07822ebac5fe00bfc" title=" " alt="" coords="795,194,977,234"/>
+<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="696,263,736,253,795,237,797,242,737,258,697,269"/>
+<area shape="rect" id="Node000012" href="$class_generic_value.html#a8c39af1a639eae1b59db66e2cbb537c9" title=" " alt="" coords="795,259,976,300"/>
+<area shape="poly" id="edge11_Node000010_Node000012" title=" " alt="" coords="737,277,779,277,779,282,737,282"/>
+<area shape="rect" id="Node000013" href="$class_generic_value.html#af182f2ccbcd962d2a28f92407622e9a9" title=" " alt="" coords="785,324,987,350"/>
+<area shape="poly" id="edge12_Node000010_Node000013" title=" " alt="" coords="700,290,814,317,812,323,698,296"/>
+</map>

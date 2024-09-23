@@ -1,0 +1,42 @@
+\doxysection{websocket\+\_\+api.\+hpp}
+\hypertarget{websocket__api_8hpp_source}{}\label{websocket__api_8hpp_source}\index{libraries/fc/include/fc/rpc/websocket\_api.hpp@{libraries/fc/include/fc/rpc/websocket\_api.hpp}}
+\mbox{\hyperlink{websocket__api_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{websocket__api_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{websocket__api_8hpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{api__connection_8hpp}{fc/rpc/api\_connection.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{websocket__api_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <fc/rpc/state.hpp>}}
+\DoxyCodeLine{\Hypertarget{websocket__api_8hpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <fc/network/http/websocket.hpp>}}
+\DoxyCodeLine{\Hypertarget{websocket__api_8hpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{json_8hpp}{fc/io/json.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{websocket__api_8hpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{fc_2include_2fc_2reflect_2variant_8hpp}{fc/reflect/variant.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{websocket__api_8hpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{websocket__api_8hpp_source_l00008}00008\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}\ \{\ \textcolor{keyword}{namespace\ }rpc\ \{}
+\DoxyCodeLine{\Hypertarget{websocket__api_8hpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{websocket__api_8hpp_source_l00010}\mbox{\hyperlink{classfc_1_1rpc_1_1websocket__api__connection}{00010}}\ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classfc_1_1rpc_1_1websocket__api__connection}{websocket\_api\_connection}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classfc_1_1api__connection}{api\_connection}}}
+\DoxyCodeLine{\Hypertarget{websocket__api_8hpp_source_l00011}00011\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{websocket__api_8hpp_source_l00012}00012\ \ \ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{websocket__api_8hpp_source_l00013}00013\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1rpc_1_1websocket__api__connection_abe1996df25102b53d14348ef2336f6be}{websocket\_api\_connection}}(\ fc::http::websocket\_connection\&\ c\ );}
+\DoxyCodeLine{\Hypertarget{websocket__api_8hpp_source_l00014}00014\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1rpc_1_1websocket__api__connection_ae49664656f2e78180174992eb4b17fcc}{\string~websocket\_api\_connection}}();}
+\DoxyCodeLine{\Hypertarget{websocket__api_8hpp_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{websocket__api_8hpp_source_l00016}00016\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classfc_1_1variant}{variant}}\ \mbox{\hyperlink{classfc_1_1rpc_1_1websocket__api__connection_a30eb8e7cdee7c2ca0049f565f100ab14}{send\_call}}(}
+\DoxyCodeLine{\Hypertarget{websocket__api_8hpp_source_l00017}00017\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a18e9e0bd9c0a52896425ae1172bc4e2b}{api\_id\_type}}\ api\_id,}
+\DoxyCodeLine{\Hypertarget{websocket__api_8hpp_source_l00018}00018\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ method\_name,}
+\DoxyCodeLine{\Hypertarget{websocket__api_8hpp_source_l00019}00019\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}\ args\ =\ \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}()\ )\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{websocket__api_8hpp_source_l00020}00020\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classfc_1_1variant}{variant}}\ \mbox{\hyperlink{classfc_1_1rpc_1_1websocket__api__connection_a7c420430971d7e9af1b3e11b043de1c8}{send\_callback}}(}
+\DoxyCodeLine{\Hypertarget{websocket__api_8hpp_source_l00021}00021\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ callback\_id,}
+\DoxyCodeLine{\Hypertarget{websocket__api_8hpp_source_l00022}00022\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}\ args\ =\ \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}()\ )\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{websocket__api_8hpp_source_l00023}00023\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1rpc_1_1websocket__api__connection_adc639d508ff7b2442badd783c19b469b}{send\_notice}}(}
+\DoxyCodeLine{\Hypertarget{websocket__api_8hpp_source_l00024}00024\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ callback\_id,}
+\DoxyCodeLine{\Hypertarget{websocket__api_8hpp_source_l00025}00025\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}\ args\ =\ \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}()\ )\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{websocket__api_8hpp_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{websocket__api_8hpp_source_l00027}00027\ \ \ \ \ \ \ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{\Hypertarget{websocket__api_8hpp_source_l00028}00028\ \ \ \ \ \ \ \ \ \ std::string\ \mbox{\hyperlink{classfc_1_1rpc_1_1websocket__api__connection_a1fce181c4cd79f53a796311293201518}{on\_message}}(}
+\DoxyCodeLine{\Hypertarget{websocket__api_8hpp_source_l00029}00029\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::string\&\ message,}
+\DoxyCodeLine{\Hypertarget{websocket__api_8hpp_source_l00030}00030\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ send\_message\ =\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{\Hypertarget{websocket__api_8hpp_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{websocket__api_8hpp_source_l00032}\mbox{\hyperlink{classfc_1_1rpc_1_1websocket__api__connection_a5d37db5ef4fe802d87e4f6ee99c2798a}{00032}}\ \ \ \ \ \ \ \ \ \ fc::http::websocket\_connection\&\ \ \mbox{\hyperlink{classfc_1_1rpc_1_1websocket__api__connection_a5d37db5ef4fe802d87e4f6ee99c2798a}{\_connection}};}
+\DoxyCodeLine{\Hypertarget{websocket__api_8hpp_source_l00033}\mbox{\hyperlink{classfc_1_1rpc_1_1websocket__api__connection_a05bbf1dfec628036d64033dd230af9b5}{00033}}\ \ \ \ \ \ \ \ \ \ fc::rpc::state\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1rpc_1_1websocket__api__connection_a05bbf1dfec628036d64033dd230af9b5}{\_rpc\_state}};}
+\DoxyCodeLine{\Hypertarget{websocket__api_8hpp_source_l00034}00034\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{websocket__api_8hpp_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{websocket__api_8hpp_source_l00036}00036\ \}\ \}\ \textcolor{comment}{//\ namespace\ fc::rpc}}
+
+\end{DoxyCode}

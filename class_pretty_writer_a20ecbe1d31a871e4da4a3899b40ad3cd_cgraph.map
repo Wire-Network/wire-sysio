@@ -1,0 +1,27 @@
+<map id="PrettyWriter::Key" name="PrettyWriter::Key">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,104,127,130"/>
+<area shape="rect" id="Node000002" href="$class_pretty_writer.html#ae544ccfe35dd7e80ed694873062409f6" title=" " alt="" coords="175,104,307,130"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="127,114,159,114,159,120,127,120"/>
+<area shape="rect" id="Node000003" href="$class_writer.html#adc1cadbabc309d31f19cf7463251d879" title=" " alt="" coords="380,55,498,80"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="295,101,369,82,370,87,296,106"/>
+<area shape="rect" id="Node000006" href="$class_pretty_writer.html#a09709ffa3b545e007631ecfd35029843" title=" " alt="" coords="355,104,522,130"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="307,114,339,114,339,120,307,120"/>
+<area shape="rect" id="Node000010" href="$class_writer.html#acda4412ef5f4cac6e89f9544e4b10f70" title=" " alt="" coords="375,177,502,203"/>
+<area shape="poly" id="edge9_Node000002_Node000010" title=" " alt="" coords="279,128,389,169,387,174,277,133"/>
+<area shape="rect" id="Node000004" href="$classinternal_1_1_stack.html#a2b8bda380e33838a99e3c73ff9785f03" title=" " alt="" coords="589,5,741,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="498,52,587,32,588,38,499,57"/>
+<area shape="rect" id="Node000005" href="$class_writer.html#a8ca4e364c546b2eb526caa68dde011d2" title="Flush the output stream." alt="" coords="617,55,713,80"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="498,65,601,65,601,70,498,70"/>
+<area shape="rect" id="Node000007" href="$class_pretty_writer.html#a6f244ecc94fd5b134d424033b1574b7e" title=" " alt="" coords="583,104,747,130"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="523,114,567,114,567,120,523,120"/>
+<area shape="rect" id="Node000008" href="$classinternal_1_1_stack.html#ac484468a2791bd3e9ba609bd1600ab48" title=" " alt="" coords="808,80,968,106"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="747,105,792,100,792,106,748,111"/>
+<area shape="rect" id="Node000009" href="$filewritestream_8h.html#a5c9b0f0e6249be2acf7f3505c295c132" title="Implement specialized version of PutN() with memset() for better performance." alt="" coords="862,129,914,155"/>
+<area shape="poly" id="edge8_Node000007_Node000009" title=" " alt="" coords="748,124,847,135,846,140,747,129"/>
+<area shape="rect" id="Node000011" href="$stream_8h.html#aa817b00a466bb84d96c5de1616436c95" title="Reserve n characters for writing to a stream." alt="" coords="620,153,710,179"/>
+<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="503,181,604,170,604,175,503,186"/>
+<area shape="rect" id="Node000012" href="$stream_8h.html#ad57ba7f2912c5509924b69dec7db4396" title="Write character to a stream, presuming buffer is reserved." alt="" coords="623,203,707,228"/>
+<area shape="poly" id="edge11_Node000010_Node000012" title=" " alt="" coords="503,195,608,207,608,212,503,200"/>
+<area shape="rect" id="Node000013" href="$class_writer.html#a94140803bba7863a1b39c936bbe6d262" title=" " alt="" coords="570,252,760,293"/>
+<area shape="poly" id="edge12_Node000010_Node000013" title=" " alt="" coords="475,201,571,238,588,244,586,249,569,243,473,206"/>
+</map>

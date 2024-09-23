@@ -1,0 +1,16 @@
+<map id="sysio::vm::machine_code_writer::emit_prologue" name="sysio::vm::machine_code_writer::emit_prologue">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,92,190,133"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1vm_1_1growable__allocator.html#a5fc8b2ef9ef1ef157d18ec40cf9310ee" title=" " alt="" coords="262,5,400,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="154,89,259,49,261,54,156,94"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1vm_1_1machine__code__writer.html#ae982131aa8566244c45f448cece2a097" title=" " alt="" coords="473,131,636,171"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="190,100,303,96,365,99,425,106,490,123,488,128,425,111,364,104,303,102,190,106"/>
+<area shape="rect" id="Node000006" href="$structsysio_1_1vm_1_1module.html#a67b6373270a1985597a83e5427091e9a" title=" " alt="" coords="238,120,425,161"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="191,121,222,125,222,130,190,126"/>
+<area shape="rect" id="Node000007" href="$classsysio_1_1vm_1_1machine__code__writer.html#aaf62e76004a871e34ebd97590142e28e" title=" " alt="" coords="264,184,399,240"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="148,131,252,176,250,180,146,136"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1vm_1_1growable__allocator.html#a864b318420afb03072753423044548b8" title=" " alt="" coords="478,5,631,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="401,23,463,23,463,28,401,28"/>
+<area shape="rect" id="Node000005" href="$yubihsm__pkcs11_8c.html#ae785d5badbf1f08b491af31f32a135a1" title=" " alt="" coords="684,138,756,164"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="637,148,669,148,669,154,637,154"/>
+<area shape="poly" id="edge7_Node000007_Node000004" title=" " alt="" coords="399,191,463,173,464,179,400,196"/>
+</map>

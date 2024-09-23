@@ -1,0 +1,88 @@
+\doxysection{test\+\_\+cypher\+\_\+suites.\+cpp}
+\hypertarget{test__cypher__suites_8cpp_source}{}\label{test__cypher__suites_8cpp_source}\index{libraries/fc/test/crypto/test\_cypher\_suites.cpp@{libraries/fc/test/crypto/test\_cypher\_suites.cpp}}
+\mbox{\hyperlink{test__cypher__suites_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00001}\mbox{\hyperlink{test__cypher__suites_8cpp_a6b2a3852db8bb19ab6909bac01859985}{00001}}\ \textcolor{preprocessor}{\#define\ BOOST\_TEST\_MODULE\ cypher\_suites}}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <boost/test/included/unit\_test.hpp>}}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{public__key_8hpp}{fc/crypto/public\_key.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{private__key_8hpp}{fc/crypto/private\_key.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{signature_8hpp}{fc/crypto/signature.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{utility_8hpp}{fc/utility.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00009}00009\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacefc_1_1crypto}{fc::crypto}};}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00010}00010\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacefc}{fc}};}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00012}00012\ BOOST\_AUTO\_TEST\_SUITE(cypher\_suites)}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00013}\mbox{\hyperlink{test__cypher__suites_8cpp_a9e15eb6189f5292cc7ed00e716e29c1b}{00013}}\ \mbox{\hyperlink{test__cypher__suites_8cpp_a9e15eb6189f5292cc7ed00e716e29c1b}{BOOST\_AUTO\_TEST\_CASE}}(test\_k1)\ \mbox{\hyperlink{hello__driver_8cpp_abe4cc9788f52e49485473dc699537388}{try}}\ \{}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00014}00014\ \ \ \ \textcolor{keyword}{auto}\ private\_key\_string\ =\ std::string(\textcolor{stringliteral}{"{}5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3"{}});}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00015}00015\ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{import__ed_8c_a73cc1032b1965fda54c1a0fc7d4a2f3a}{expected\_public\_key}}\ =\ std::string(\textcolor{stringliteral}{"{}SYS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV"{}});}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00016}00016\ \ \ \ \textcolor{keyword}{auto}\ test\_private\_key\ =\ \mbox{\hyperlink{classfc_1_1private__key}{private\_key}}(private\_key\_string);}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00017}00017\ \ \ \ \textcolor{keyword}{auto}\ test\_public\_key\ =\ test\_private\_key.get\_public\_key();}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00019}00019\ \ \ \ BOOST\_CHECK\_EQUAL(private\_key\_string,\ test\_private\_key.to\_string());}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00020}00020\ \ \ \ BOOST\_CHECK\_EQUAL(\mbox{\hyperlink{import__ed_8c_a73cc1032b1965fda54c1a0fc7d4a2f3a}{expected\_public\_key}},\ test\_public\_key.to\_string());}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00021}\mbox{\hyperlink{test__cypher__suites_8cpp_ae70bfa24f5a3bc0917382b3c17fc033c}{00021}}\ \}\ \mbox{\hyperlink{test__cypher__suites_8cpp_ae70bfa24f5a3bc0917382b3c17fc033c}{FC\_LOG\_AND\_RETHROW}}();}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00023}\mbox{\hyperlink{test__cypher__suites_8cpp_a199ed90f0721c7685307f0947c786ac5}{00023}}\ \mbox{\hyperlink{test__cypher__suites_8cpp_a9e15eb6189f5292cc7ed00e716e29c1b}{BOOST\_AUTO\_TEST\_CASE}}(test\_r1)\ \textcolor{keyword}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00024}00024\ \ \ \ \textcolor{keyword}{auto}\ private\_key\_string\ =\ std::string(\textcolor{stringliteral}{"{}PVT\_R1\_iyQmnyPEGvFd8uffnk152WC2WryBjgTrg22fXQryuGL9mU6qW"{}});}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00025}00025\ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{import__ed_8c_a73cc1032b1965fda54c1a0fc7d4a2f3a}{expected\_public\_key}}\ =\ std::string(\textcolor{stringliteral}{"{}PUB\_R1\_6EPHFSKVYHBjQgxVGQPrwCxTg7BbZ69H9i4gztN9deKTEXYne4"{}});}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00026}00026\ \ \ \ \textcolor{keyword}{auto}\ test\_private\_key\ =\ \mbox{\hyperlink{classfc_1_1private__key}{private\_key}}(private\_key\_string);}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00027}00027\ \ \ \ \textcolor{keyword}{auto}\ test\_public\_key\ =\ test\_private\_key.get\_public\_key();}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00029}00029\ \ \ \ BOOST\_CHECK\_EQUAL(private\_key\_string,\ test\_private\_key.to\_string());}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00030}00030\ \ \ \ BOOST\_CHECK\_EQUAL(\mbox{\hyperlink{import__ed_8c_a73cc1032b1965fda54c1a0fc7d4a2f3a}{expected\_public\_key}},\ test\_public\_key.to\_string());}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00031}00031\ \}\ \mbox{\hyperlink{test__cypher__suites_8cpp_ae70bfa24f5a3bc0917382b3c17fc033c}{FC\_LOG\_AND\_RETHROW}}();}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00033}\mbox{\hyperlink{test__cypher__suites_8cpp_a807e52b54a96557af33c639030c0dfbd}{00033}}\ \mbox{\hyperlink{test__cypher__suites_8cpp_a9e15eb6189f5292cc7ed00e716e29c1b}{BOOST\_AUTO\_TEST\_CASE}}(test\_k1\_recovery)\ \textcolor{keyword}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00034}00034\ \ \ \ \textcolor{keyword}{auto}\ payload\ =\ \textcolor{stringliteral}{"{}Test\ Cases"{}};}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00035}00035\ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacefc_a150ca4cd9c0318ca45dc0dc7df5d58b9}{digest}}\ =\ \mbox{\hyperlink{classfc_1_1sha256_a474784de7d6213b855abd7e952df5e36}{sha256::hash}}(payload,\ \mbox{\hyperlink{namespacefc_a3ef687c18276fdf95a78c568b0b27a32}{const\_strlen}}(payload));}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00036}00036\ \ \ \ \textcolor{keyword}{auto}\ key\ =\ \mbox{\hyperlink{classfc_1_1crypto_1_1private__key_a54177eb6dda9421bb6e9661478f29807}{private\_key::generate<ecc::private\_key\_shim>}}();}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00037}00037\ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3037ff69dd24c6e34aee6fdd45269f13}{pub}}\ =\ key.get\_public\_key();}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00038}00038\ \ \ \ \textcolor{keyword}{auto}\ sig\ =\ key.sign(\mbox{\hyperlink{namespacefc_a150ca4cd9c0318ca45dc0dc7df5d58b9}{digest}});}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00040}00040\ \ \ \ \textcolor{keyword}{auto}\ recovered\_pub\ =\ \mbox{\hyperlink{classfc_1_1public__key}{public\_key}}(sig,\ \mbox{\hyperlink{namespacefc_a150ca4cd9c0318ca45dc0dc7df5d58b9}{digest}});}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00041}00041\ \ \ \ std::cout\ <<\ recovered\_pub\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00043}00043\ \ \ \ BOOST\_CHECK\_EQUAL(recovered\_pub.to\_string(),\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3037ff69dd24c6e34aee6fdd45269f13}{pub}}.to\_string());}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00044}00044\ \}\ \mbox{\hyperlink{test__cypher__suites_8cpp_ae70bfa24f5a3bc0917382b3c17fc033c}{FC\_LOG\_AND\_RETHROW}}();}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00046}\mbox{\hyperlink{test__cypher__suites_8cpp_a65874e2b9af8f224f9d4aa4d90bce0c6}{00046}}\ \mbox{\hyperlink{test__cypher__suites_8cpp_a9e15eb6189f5292cc7ed00e716e29c1b}{BOOST\_AUTO\_TEST\_CASE}}(test\_r1\_recovery)\ \textcolor{keyword}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00047}00047\ \ \ \ \textcolor{keyword}{auto}\ payload\ =\ \textcolor{stringliteral}{"{}Test\ Cases"{}};}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00048}00048\ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacefc_a150ca4cd9c0318ca45dc0dc7df5d58b9}{digest}}\ =\ \mbox{\hyperlink{classfc_1_1sha256_a474784de7d6213b855abd7e952df5e36}{sha256::hash}}(payload,\ \mbox{\hyperlink{namespacefc_a3ef687c18276fdf95a78c568b0b27a32}{const\_strlen}}(payload));}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00049}00049\ \ \ \ \textcolor{keyword}{auto}\ key\ =\ \mbox{\hyperlink{classfc_1_1crypto_1_1private__key_a54177eb6dda9421bb6e9661478f29807}{private\_key::generate<r1::private\_key\_shim>}}();}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00050}00050\ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3037ff69dd24c6e34aee6fdd45269f13}{pub}}\ =\ key.get\_public\_key();}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00051}00051\ \ \ \ \textcolor{keyword}{auto}\ sig\ =\ key.sign(\mbox{\hyperlink{namespacefc_a150ca4cd9c0318ca45dc0dc7df5d58b9}{digest}});}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00052}00052\ }
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00053}00053\ \ \ \ \textcolor{keyword}{auto}\ recovered\_pub\ =\ \mbox{\hyperlink{classfc_1_1public__key}{public\_key}}(sig,\ \mbox{\hyperlink{namespacefc_a150ca4cd9c0318ca45dc0dc7df5d58b9}{digest}});}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00054}00054\ \ \ \ std::cout\ <<\ recovered\_pub\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00056}00056\ \ \ \ BOOST\_CHECK\_EQUAL(recovered\_pub.to\_string(),\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3037ff69dd24c6e34aee6fdd45269f13}{pub}}.to\_string());}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00057}00057\ \}\ \mbox{\hyperlink{test__cypher__suites_8cpp_ae70bfa24f5a3bc0917382b3c17fc033c}{FC\_LOG\_AND\_RETHROW}}();}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00059}\mbox{\hyperlink{test__cypher__suites_8cpp_ad22411ad7e58806a1120142a05a8ed02}{00059}}\ \mbox{\hyperlink{test__cypher__suites_8cpp_a9e15eb6189f5292cc7ed00e716e29c1b}{BOOST\_AUTO\_TEST\_CASE}}(test\_k1\_recyle)\ \textcolor{keyword}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00060}00060\ \ \ \ \textcolor{keyword}{auto}\ key\ =\ \mbox{\hyperlink{classfc_1_1crypto_1_1private__key_a54177eb6dda9421bb6e9661478f29807}{private\_key::generate<ecc::private\_key\_shim>}}();}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00061}00061\ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3037ff69dd24c6e34aee6fdd45269f13}{pub}}\ =\ key.get\_public\_key();}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00062}00062\ \ \ \ \textcolor{keyword}{auto}\ pub\_str\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3037ff69dd24c6e34aee6fdd45269f13}{pub}}.to\_string();}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00063}00063\ \ \ \ \textcolor{keyword}{auto}\ recycled\_pub\ =\ \mbox{\hyperlink{classfc_1_1public__key}{public\_key}}(pub\_str);}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00065}00065\ \ \ \ std::cout\ <<\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3037ff69dd24c6e34aee6fdd45269f13}{pub}}\ <<\ \textcolor{stringliteral}{"{}\ -\/>\ "{}}\ <<\ recycled\_pub\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00067}00067\ \ \ \ BOOST\_CHECK\_EQUAL(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3037ff69dd24c6e34aee6fdd45269f13}{pub}}.to\_string(),\ recycled\_pub.to\_string());}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00068}00068\ \}\ \mbox{\hyperlink{test__cypher__suites_8cpp_ae70bfa24f5a3bc0917382b3c17fc033c}{FC\_LOG\_AND\_RETHROW}}();}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00069}00069\ }
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00070}\mbox{\hyperlink{test__cypher__suites_8cpp_aad66c55a24e66bf9a851ba05a4db0909}{00070}}\ \mbox{\hyperlink{test__cypher__suites_8cpp_a9e15eb6189f5292cc7ed00e716e29c1b}{BOOST\_AUTO\_TEST\_CASE}}(test\_r1\_recyle)\ \textcolor{keyword}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00071}00071\ \ \ \ \textcolor{keyword}{auto}\ key\ =\ \mbox{\hyperlink{classfc_1_1crypto_1_1private__key_a54177eb6dda9421bb6e9661478f29807}{private\_key::generate<r1::private\_key\_shim>}}();}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00072}00072\ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3037ff69dd24c6e34aee6fdd45269f13}{pub}}\ =\ key.get\_public\_key();}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00073}00073\ \ \ \ \textcolor{keyword}{auto}\ pub\_str\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3037ff69dd24c6e34aee6fdd45269f13}{pub}}.to\_string();}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00074}00074\ \ \ \ \textcolor{keyword}{auto}\ recycled\_pub\ =\ \mbox{\hyperlink{classfc_1_1public__key}{public\_key}}(pub\_str);}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00075}00075\ }
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00076}00076\ \ \ \ std::cout\ <<\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3037ff69dd24c6e34aee6fdd45269f13}{pub}}\ <<\ \textcolor{stringliteral}{"{}\ -\/>\ "{}}\ <<\ recycled\_pub\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00077}00077\ }
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00078}00078\ \ \ \ BOOST\_CHECK\_EQUAL(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3037ff69dd24c6e34aee6fdd45269f13}{pub}}.to\_string(),\ recycled\_pub.to\_string());}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00079}00079\ \}\ \mbox{\hyperlink{test__cypher__suites_8cpp_ae70bfa24f5a3bc0917382b3c17fc033c}{FC\_LOG\_AND\_RETHROW}}();}
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00080}00080\ }
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00081}00081\ }
+\DoxyCodeLine{\Hypertarget{test__cypher__suites_8cpp_source_l00082}00082\ BOOST\_AUTO\_TEST\_SUITE\_END()}
+
+\end{DoxyCode}

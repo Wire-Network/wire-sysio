@@ -1,0 +1,323 @@
+\doxysection{Numbers\+As\+Strings\+Handler Struct Reference}
+\hypertarget{struct_numbers_as_strings_handler}{}\label{struct_numbers_as_strings_handler}\index{NumbersAsStringsHandler@{NumbersAsStringsHandler}}
+
+
+Collaboration diagram for Numbers\+As\+Strings\+Handler\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=212pt]{struct_numbers_as_strings_handler__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{struct_numbers_as_strings_handler_abc67332704aecdcf790a175495b4e1e9}{Null}} ()
+\item 
+bool \mbox{\hyperlink{struct_numbers_as_strings_handler_a7f7f6f590df33f5dd9edf190b540c168}{Bool}} (bool)
+\item 
+bool \mbox{\hyperlink{struct_numbers_as_strings_handler_a6fc24b36f8dc4b3d3ea6a4c749346adf}{Int}} (int)
+\item 
+bool \mbox{\hyperlink{struct_numbers_as_strings_handler_a569e35ff2e7b916e6b1a15841d46c4ab}{Uint}} (unsigned)
+\item 
+bool \mbox{\hyperlink{struct_numbers_as_strings_handler_a61b9b0439a0f8e1223da05375917e3f1}{Int64}} (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}})
+\item 
+bool \mbox{\hyperlink{struct_numbers_as_strings_handler_a26ddde617205e2b14d35c931aef6f473}{Uint64}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}})
+\item 
+bool \mbox{\hyperlink{struct_numbers_as_strings_handler_a79accf729fb1908ffcf1f319a1b03cbf}{Double}} (double)
+\item 
+bool \mbox{\hyperlink{struct_numbers_as_strings_handler_aa91a356419ff152adf31bba8a6da01e9}{Raw\+Number}} (const char \texorpdfstring{$\ast$}{*}str, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}} length, bool)
+\item 
+bool \mbox{\hyperlink{struct_numbers_as_strings_handler_a6698e744b13545580d45c40faff80756}{String}} (const char \texorpdfstring{$\ast$}{*}, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}, bool)
+\item 
+bool \mbox{\hyperlink{struct_numbers_as_strings_handler_a55febf6fc0b6b6ab3ee45d67e26a09a4}{Start\+Object}} ()
+\item 
+bool \mbox{\hyperlink{struct_numbers_as_strings_handler_adeef028191097d2cb435b4c5803e4b1d}{Key}} (const char \texorpdfstring{$\ast$}{*}, \mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}, bool)
+\item 
+bool \mbox{\hyperlink{struct_numbers_as_strings_handler_a7b7e36388ceace04238c04183c5595b0}{End\+Object}} (\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}})
+\item 
+bool \mbox{\hyperlink{struct_numbers_as_strings_handler_af4ca432f065da6c1a7320249e0698f3a}{Start\+Array}} ()
+\item 
+bool \mbox{\hyperlink{struct_numbers_as_strings_handler_ae2c4419992239392c2181a5f668e65fa}{End\+Array}} (\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}})
+\item 
+\mbox{\hyperlink{struct_numbers_as_strings_handler_a9db94313e085cf0daf928fd1af4f0e80}{Numbers\+As\+Strings\+Handler}} (const char \texorpdfstring{$\ast$}{*}expected)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{struct_numbers_as_strings_handler_a81885665a346dd1a1092a537f8bf7651}{expected\+\_\+}}
+\item 
+size\+\_\+t \mbox{\hyperlink{struct_numbers_as_strings_handler_a95c64eb9ecdfabd262da4eec1cafccdb}{expected\+\_\+len\+\_\+}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01879}{1879}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{struct_numbers_as_strings_handler_a9db94313e085cf0daf928fd1af4f0e80}\index{NumbersAsStringsHandler@{NumbersAsStringsHandler}!NumbersAsStringsHandler@{NumbersAsStringsHandler}}
+\index{NumbersAsStringsHandler@{NumbersAsStringsHandler}!NumbersAsStringsHandler@{NumbersAsStringsHandler}}
+\doxysubsubsection{\texorpdfstring{NumbersAsStringsHandler()}{NumbersAsStringsHandler()}}
+{\footnotesize\ttfamily \label{struct_numbers_as_strings_handler_a9db94313e085cf0daf928fd1af4f0e80} 
+Numbers\+As\+Strings\+Handler\+::\+Numbers\+As\+Strings\+Handler (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{expected}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01901}{1901}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01902\ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{struct_numbers_as_strings_handler_a81885665a346dd1a1092a537f8bf7651}{expected\_}}(expected)}
+\DoxyCodeLine{01903\ \ \ \ \ \ \ \ \ ,\ \mbox{\hyperlink{struct_numbers_as_strings_handler_a95c64eb9ecdfabd262da4eec1cafccdb}{expected\_len\_}}(strlen(expected))\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_numbers_as_strings_handler_a7f7f6f590df33f5dd9edf190b540c168}\index{NumbersAsStringsHandler@{NumbersAsStringsHandler}!Bool@{Bool}}
+\index{Bool@{Bool}!NumbersAsStringsHandler@{NumbersAsStringsHandler}}
+\doxysubsubsection{\texorpdfstring{Bool()}{Bool()}}
+{\footnotesize\ttfamily \label{struct_numbers_as_strings_handler_a7f7f6f590df33f5dd9edf190b540c168} 
+bool Numbers\+As\+Strings\+Handler\+::\+Bool (\begin{DoxyParamCaption}\item[{bool}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01881}{1881}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01881\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_numbers_as_strings_handler_a79accf729fb1908ffcf1f319a1b03cbf}\index{NumbersAsStringsHandler@{NumbersAsStringsHandler}!Double@{Double}}
+\index{Double@{Double}!NumbersAsStringsHandler@{NumbersAsStringsHandler}}
+\doxysubsubsection{\texorpdfstring{Double()}{Double()}}
+{\footnotesize\ttfamily \label{struct_numbers_as_strings_handler_a79accf729fb1908ffcf1f319a1b03cbf} 
+bool Numbers\+As\+Strings\+Handler\+::\+Double (\begin{DoxyParamCaption}\item[{double}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01886}{1886}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01886\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_numbers_as_strings_handler_ae2c4419992239392c2181a5f668e65fa}\index{NumbersAsStringsHandler@{NumbersAsStringsHandler}!EndArray@{EndArray}}
+\index{EndArray@{EndArray}!NumbersAsStringsHandler@{NumbersAsStringsHandler}}
+\doxysubsubsection{\texorpdfstring{EndArray()}{EndArray()}}
+{\footnotesize\ttfamily \label{struct_numbers_as_strings_handler_ae2c4419992239392c2181a5f668e65fa} 
+bool Numbers\+As\+Strings\+Handler\+::\+End\+Array (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01899}{1899}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01899\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_numbers_as_strings_handler_a7b7e36388ceace04238c04183c5595b0}\index{NumbersAsStringsHandler@{NumbersAsStringsHandler}!EndObject@{EndObject}}
+\index{EndObject@{EndObject}!NumbersAsStringsHandler@{NumbersAsStringsHandler}}
+\doxysubsubsection{\texorpdfstring{EndObject()}{EndObject()}}
+{\footnotesize\ttfamily \label{struct_numbers_as_strings_handler_a7b7e36388ceace04238c04183c5595b0} 
+bool Numbers\+As\+Strings\+Handler\+::\+End\+Object (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01897}{1897}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01897\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_numbers_as_strings_handler_a6fc24b36f8dc4b3d3ea6a4c749346adf}\index{NumbersAsStringsHandler@{NumbersAsStringsHandler}!Int@{Int}}
+\index{Int@{Int}!NumbersAsStringsHandler@{NumbersAsStringsHandler}}
+\doxysubsubsection{\texorpdfstring{Int()}{Int()}}
+{\footnotesize\ttfamily \label{struct_numbers_as_strings_handler_a6fc24b36f8dc4b3d3ea6a4c749346adf} 
+bool Numbers\+As\+Strings\+Handler\+::\+Int (\begin{DoxyParamCaption}\item[{int}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01882}{1882}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01882\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_numbers_as_strings_handler_a61b9b0439a0f8e1223da05375917e3f1}\index{NumbersAsStringsHandler@{NumbersAsStringsHandler}!Int64@{Int64}}
+\index{Int64@{Int64}!NumbersAsStringsHandler@{NumbersAsStringsHandler}}
+\doxysubsubsection{\texorpdfstring{Int64()}{Int64()}}
+{\footnotesize\ttfamily \label{struct_numbers_as_strings_handler_a61b9b0439a0f8e1223da05375917e3f1} 
+bool Numbers\+As\+Strings\+Handler\+::\+Int64 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01884}{1884}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01884\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_numbers_as_strings_handler_adeef028191097d2cb435b4c5803e4b1d}\index{NumbersAsStringsHandler@{NumbersAsStringsHandler}!Key@{Key}}
+\index{Key@{Key}!NumbersAsStringsHandler@{NumbersAsStringsHandler}}
+\doxysubsubsection{\texorpdfstring{Key()}{Key()}}
+{\footnotesize\ttfamily \label{struct_numbers_as_strings_handler_adeef028191097d2cb435b4c5803e4b1d} 
+bool Numbers\+As\+Strings\+Handler\+::\+Key (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{}{, }\item[{bool}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01896}{1896}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01896\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_numbers_as_strings_handler_abc67332704aecdcf790a175495b4e1e9}\index{NumbersAsStringsHandler@{NumbersAsStringsHandler}!Null@{Null}}
+\index{Null@{Null}!NumbersAsStringsHandler@{NumbersAsStringsHandler}}
+\doxysubsubsection{\texorpdfstring{Null()}{Null()}}
+{\footnotesize\ttfamily \label{struct_numbers_as_strings_handler_abc67332704aecdcf790a175495b4e1e9} 
+bool Numbers\+As\+Strings\+Handler\+::\+Null (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01880}{1880}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01880\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_numbers_as_strings_handler_aa91a356419ff152adf31bba8a6da01e9}\index{NumbersAsStringsHandler@{NumbersAsStringsHandler}!RawNumber@{RawNumber}}
+\index{RawNumber@{RawNumber}!NumbersAsStringsHandler@{NumbersAsStringsHandler}}
+\doxysubsubsection{\texorpdfstring{RawNumber()}{RawNumber()}}
+{\footnotesize\ttfamily \label{struct_numbers_as_strings_handler_aa91a356419ff152adf31bba8a6da01e9} 
+bool Numbers\+As\+Strings\+Handler\+::\+Raw\+Number (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{str}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{length}{, }\item[{bool}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01888}{1888}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01888\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01889\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(str\ !=\ 0);}
+\DoxyCodeLine{01890\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{struct_numbers_as_strings_handler_a95c64eb9ecdfabd262da4eec1cafccdb}{expected\_len\_}}\ ==\ length);}
+\DoxyCodeLine{01891\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(strncmp(str,\ \mbox{\hyperlink{struct_numbers_as_strings_handler_a81885665a346dd1a1092a537f8bf7651}{expected\_}},\ length)\ ==\ 0);}
+\DoxyCodeLine{01892\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{01893\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_numbers_as_strings_handler_af4ca432f065da6c1a7320249e0698f3a}\index{NumbersAsStringsHandler@{NumbersAsStringsHandler}!StartArray@{StartArray}}
+\index{StartArray@{StartArray}!NumbersAsStringsHandler@{NumbersAsStringsHandler}}
+\doxysubsubsection{\texorpdfstring{StartArray()}{StartArray()}}
+{\footnotesize\ttfamily \label{struct_numbers_as_strings_handler_af4ca432f065da6c1a7320249e0698f3a} 
+bool Numbers\+As\+Strings\+Handler\+::\+Start\+Array (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01898}{1898}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01898\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_numbers_as_strings_handler_a55febf6fc0b6b6ab3ee45d67e26a09a4}\index{NumbersAsStringsHandler@{NumbersAsStringsHandler}!StartObject@{StartObject}}
+\index{StartObject@{StartObject}!NumbersAsStringsHandler@{NumbersAsStringsHandler}}
+\doxysubsubsection{\texorpdfstring{StartObject()}{StartObject()}}
+{\footnotesize\ttfamily \label{struct_numbers_as_strings_handler_a55febf6fc0b6b6ab3ee45d67e26a09a4} 
+bool Numbers\+As\+Strings\+Handler\+::\+Start\+Object (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01895}{1895}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01895\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_numbers_as_strings_handler_a6698e744b13545580d45c40faff80756}\index{NumbersAsStringsHandler@{NumbersAsStringsHandler}!String@{String}}
+\index{String@{String}!NumbersAsStringsHandler@{NumbersAsStringsHandler}}
+\doxysubsubsection{\texorpdfstring{String()}{String()}}
+{\footnotesize\ttfamily \label{struct_numbers_as_strings_handler_a6698e744b13545580d45c40faff80756} 
+bool Numbers\+As\+Strings\+Handler\+::\+String (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{}{, }\item[{\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{Size\+Type}}}]{}{, }\item[{bool}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01894}{1894}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01894\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_numbers_as_strings_handler_a569e35ff2e7b916e6b1a15841d46c4ab}\index{NumbersAsStringsHandler@{NumbersAsStringsHandler}!Uint@{Uint}}
+\index{Uint@{Uint}!NumbersAsStringsHandler@{NumbersAsStringsHandler}}
+\doxysubsubsection{\texorpdfstring{Uint()}{Uint()}}
+{\footnotesize\ttfamily \label{struct_numbers_as_strings_handler_a569e35ff2e7b916e6b1a15841d46c4ab} 
+bool Numbers\+As\+Strings\+Handler\+::\+Uint (\begin{DoxyParamCaption}\item[{unsigned}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01883}{1883}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01883\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_numbers_as_strings_handler_a26ddde617205e2b14d35c931aef6f473}\index{NumbersAsStringsHandler@{NumbersAsStringsHandler}!Uint64@{Uint64}}
+\index{Uint64@{Uint64}!NumbersAsStringsHandler@{NumbersAsStringsHandler}}
+\doxysubsubsection{\texorpdfstring{Uint64()}{Uint64()}}
+{\footnotesize\ttfamily \label{struct_numbers_as_strings_handler_a26ddde617205e2b14d35c931aef6f473} 
+bool Numbers\+As\+Strings\+Handler\+::\+Uint64 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01885}{1885}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01885\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_numbers_as_strings_handler_a81885665a346dd1a1092a537f8bf7651}\index{NumbersAsStringsHandler@{NumbersAsStringsHandler}!expected\_@{expected\_}}
+\index{expected\_@{expected\_}!NumbersAsStringsHandler@{NumbersAsStringsHandler}}
+\doxysubsubsection{\texorpdfstring{expected\_}{expected\_}}
+{\footnotesize\ttfamily \label{struct_numbers_as_strings_handler_a81885665a346dd1a1092a537f8bf7651} 
+const char\texorpdfstring{$\ast$}{*} Numbers\+As\+Strings\+Handler\+::expected\+\_\+}
+
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01905}{1905}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+\Hypertarget{struct_numbers_as_strings_handler_a95c64eb9ecdfabd262da4eec1cafccdb}\index{NumbersAsStringsHandler@{NumbersAsStringsHandler}!expected\_len\_@{expected\_len\_}}
+\index{expected\_len\_@{expected\_len\_}!NumbersAsStringsHandler@{NumbersAsStringsHandler}}
+\doxysubsubsection{\texorpdfstring{expected\_len\_}{expected\_len\_}}
+{\footnotesize\ttfamily \label{struct_numbers_as_strings_handler_a95c64eb9ecdfabd262da4eec1cafccdb} 
+size\+\_\+t Numbers\+As\+Strings\+Handler\+::expected\+\_\+len\+\_\+}
+
+
+
+Definition at line \mbox{\hyperlink{readertest_8cpp_source_l01906}{1906}} of file \mbox{\hyperlink{readertest_8cpp_source}{readertest.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/test/unittest/\mbox{\hyperlink{readertest_8cpp}{readertest.\+cpp}}\end{DoxyCompactItemize}

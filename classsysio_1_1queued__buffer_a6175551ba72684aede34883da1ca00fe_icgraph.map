@@ -1,0 +1,11 @@
+<map id="sysio::queued_buffer::write_queue_size" name="sysio::queued_buffer::write_queue_size">
+<area shape="rect" id="Node000001" title=" " alt="" coords="372,71,514,111"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1connection.html#a088db9bdbe7600d3af19c9272359b7fe" title=" " alt="" coords="189,5,320,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="367,68,314,49,316,44,369,63"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1connection.html#ae85a6909e1a531d6c27c0d22f12e61c9" title=" " alt="" coords="189,71,320,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="356,94,321,94,321,88,356,88"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1connection.html#a5b1658474d4667bfca0ee4e1e2c605a8" title=" " alt="" coords="185,136,324,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="369,119,316,138,314,133,367,114"/>
+<area shape="rect" id="Node000005" href="$classsysio_1_1connection.html#a4267b7b591fb8051841cf1d11228e0e1" title=" " alt="" coords="5,136,137,177"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="169,159,137,159,137,154,169,154"/>
+</map>

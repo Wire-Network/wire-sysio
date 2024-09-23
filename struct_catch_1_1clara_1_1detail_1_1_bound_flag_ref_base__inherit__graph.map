@@ -1,0 +1,11 @@
+<map id="Catch::clara::detail::BoundFlagRefBase" name="Catch::clara::detail::BoundFlagRefBase">
+<area shape="rect" id="Node000001" title=" " alt="" coords="104,183,247,223"/>
+<area shape="rect" id="Node000004" href="$struct_catch_1_1clara_1_1detail_1_1_bound_flag_lambda.html" title=" " alt="" coords="5,271,173,312"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="147,236,110,273,107,269,143,233"/>
+<area shape="rect" id="Node000005" href="$struct_catch_1_1clara_1_1detail_1_1_bound_flag_ref.html" title=" " alt="" coords="197,271,328,312"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="208,233,245,269,241,273,204,236"/>
+<area shape="rect" id="Node000002" href="$struct_catch_1_1clara_1_1detail_1_1_bound_ref.html" title=" " alt="" coords="110,94,241,135"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="178,150,178,182,173,182,173,150"/>
+<area shape="rect" id="Node000003" href="$struct_catch_1_1clara_1_1detail_1_1_non_copyable.html" title=" " alt="" coords="110,5,241,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="178,62,178,94,173,94,173,62"/>
+</map>

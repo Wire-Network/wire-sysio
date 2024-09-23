@@ -1,0 +1,339 @@
+\doxysection{fc\+::process Class Reference}
+\hypertarget{classfc_1_1process}{}\label{classfc_1_1process}\index{fc::process@{fc::process}}
+
+
+start and manage an local process  
+
+
+
+
+{\ttfamily \#include $<$process.\+hpp$>$}
+
+
+
+Inheritance diagram for fc\+::process\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=147pt]{classfc_1_1process__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for fc\+::process\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=147pt]{classfc_1_1process__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classfc_1_1process_1_1impl}{impl}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1process_a1db88690c9d0e5317377b7acbc0970c3}{process}} ()
+\item 
+\mbox{\hyperlink{classfc_1_1process_a5dffa9190200ad347a2edaa2d75d9e82}{\texorpdfstring{$\sim$}{\string~}process}} ()
+\item 
+virtual \mbox{\hyperlink{classfc_1_1iprocess}{iprocess}} \& \mbox{\hyperlink{classfc_1_1process_aa663b2fe8d58228224d0c1a954554a46}{exec}} (const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&exe, std\+::vector$<$ std\+::string $>$ args, const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&work\+\_\+dir=\mbox{\hyperlink{classfc_1_1path}{fc\+::path}}(), int opts=\mbox{\hyperlink{classfc_1_1iprocess_a5c8a22e5daa2e344574cf9b98ebbc7c0a765323ccde44d093fafdfd35af17519f}{open\+\_\+all}})
+\item 
+virtual int \mbox{\hyperlink{classfc_1_1process_a58711b1b058e41f8139a971d3cc9b0a4}{result}} (const \mbox{\hyperlink{classfc_1_1microseconds}{microseconds}} \&timeout=\mbox{\hyperlink{classfc_1_1microseconds_afc3eb0bfd792c7b1cda062e559e30c2e}{microseconds\+::maximum}}())
+\item 
+virtual void \mbox{\hyperlink{classfc_1_1process_a159c67b1fcff5dffb6678d15090ab335}{kill}} ()
+\item 
+virtual \mbox{\hyperlink{namespacefc_a95f13893819c9b7254bd8dc1f906c497}{fc\+::buffered\+\_\+ostream\+\_\+ptr}} \mbox{\hyperlink{classfc_1_1process_a87f8951f9911b85a30947ad641ae959a}{in\+\_\+stream}} ()
+\begin{DoxyCompactList}\small\item\em returns a stream that writes to the process\textquotesingle{} stdin \end{DoxyCompactList}\item 
+virtual \mbox{\hyperlink{namespacefc_a1de1d095ba3c29dc0ced564bc8f45123}{fc\+::buffered\+\_\+istream\+\_\+ptr}} \mbox{\hyperlink{classfc_1_1process_a9cda12fc9cb8b8f8181af7603395c384}{out\+\_\+stream}} ()
+\begin{DoxyCompactList}\small\item\em returns a stream that reads from the process\textquotesingle{} stdout \end{DoxyCompactList}\item 
+virtual \mbox{\hyperlink{namespacefc_a1de1d095ba3c29dc0ced564bc8f45123}{fc\+::buffered\+\_\+istream\+\_\+ptr}} \mbox{\hyperlink{classfc_1_1process_ae2939ac9bd82790db5f386b13b365549}{err\+\_\+stream}} ()
+\begin{DoxyCompactList}\small\item\em returns a stream that reads from the process\textquotesingle{} stderr \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classfc_1_1iprocess}{fc\+::iprocess}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{classfc_1_1iprocess_a4635e0cfff93eac7e9f1a9c7ac6cbce5}{\texorpdfstring{$\sim$}{\string~}iprocess}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Public Types inherited from \mbox{\hyperlink{classfc_1_1iprocess}{fc\+::iprocess}}}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{classfc_1_1iprocess_a5c8a22e5daa2e344574cf9b98ebbc7c0}{exec\+\_\+opts}} \{ \newline
+\mbox{\hyperlink{classfc_1_1iprocess_a5c8a22e5daa2e344574cf9b98ebbc7c0ad076e53f7735973b8fa84b1963cb4e77}{open\+\_\+none}} = 0
+, \mbox{\hyperlink{classfc_1_1iprocess_a5c8a22e5daa2e344574cf9b98ebbc7c0a1ae4c54b9b2b285e1ab8b3562d14200c}{open\+\_\+stdin}} = 0x01
+, \mbox{\hyperlink{classfc_1_1iprocess_a5c8a22e5daa2e344574cf9b98ebbc7c0a7b8800fa43953d78083d86327a0a604e}{open\+\_\+stdout}} = 0x02
+, \mbox{\hyperlink{classfc_1_1iprocess_a5c8a22e5daa2e344574cf9b98ebbc7c0aad069fbbfabfc66f12f66a6270baa92d}{open\+\_\+stderr}} = 0x04
+, \newline
+\mbox{\hyperlink{classfc_1_1iprocess_a5c8a22e5daa2e344574cf9b98ebbc7c0a765323ccde44d093fafdfd35af17519f}{open\+\_\+all}} = open\+\_\+stdin\texorpdfstring{$\vert$}{|}open\+\_\+stdout\texorpdfstring{$\vert$}{|}open\+\_\+stderr
+, \mbox{\hyperlink{classfc_1_1iprocess_a5c8a22e5daa2e344574cf9b98ebbc7c0ac57cedf7ffea9ae46e072a5ff3deae1a}{suppress\+\_\+console}} = 0x08
+ \}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\begin{DoxyNote}{Note}
+this class implements reference semantics. 
+\end{DoxyNote}
+
+
+Definition at line \mbox{\hyperlink{process_8hpp_source_l00012}{12}} of file \mbox{\hyperlink{process_8hpp_source}{process.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1process_a1db88690c9d0e5317377b7acbc0970c3}\index{fc::process@{fc::process}!process@{process}}
+\index{process@{process}!fc::process@{fc::process}}
+\doxysubsubsection{\texorpdfstring{process()}{process()}}
+{\footnotesize\ttfamily \label{classfc_1_1process_a1db88690c9d0e5317377b7acbc0970c3} 
+fc\+::process\+::process (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{process_8cpp_source_l00071}{71}} of file \mbox{\hyperlink{process_8cpp_source}{process.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00072\ :my(\ \textcolor{keyword}{new}\ process::impl()\ )\{\}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1process_a5dffa9190200ad347a2edaa2d75d9e82}\index{fc::process@{fc::process}!````~process@{\texorpdfstring{$\sim$}{\string~}process}}
+\index{````~process@{\texorpdfstring{$\sim$}{\string~}process}!fc::process@{fc::process}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}process()}{\string~process()}}
+{\footnotesize\ttfamily \label{classfc_1_1process_a5dffa9190200ad347a2edaa2d75d9e82} 
+fc\+::process\+::\texorpdfstring{$\sim$}{\string~}process (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{process_8cpp_source_l00073}{73}} of file \mbox{\hyperlink{process_8cpp_source}{process.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00073\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1process_ae2939ac9bd82790db5f386b13b365549}\index{fc::process@{fc::process}!err\_stream@{err\_stream}}
+\index{err\_stream@{err\_stream}!fc::process@{fc::process}}
+\doxysubsubsection{\texorpdfstring{err\_stream()}{err\_stream()}}
+{\footnotesize\ttfamily \label{classfc_1_1process_ae2939ac9bd82790db5f386b13b365549} 
+\mbox{\hyperlink{namespacefc_a1de1d095ba3c29dc0ced564bc8f45123}{fc\+::buffered\+\_\+istream\+\_\+ptr}} fc\+::process\+::err\+\_\+stream (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classfc_1_1iprocess_a4a4c3a21dd58acae5cb1dca26bae0a4f}{fc\+::iprocess}}.
+
+
+
+Definition at line \mbox{\hyperlink{process_8cpp_source_l00181}{181}} of file \mbox{\hyperlink{process_8cpp_source}{process.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00182\ \ \ \textcolor{keywordflow}{return}\ my-\/>\_err;}
+\DoxyCodeLine{00183\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1process_aa663b2fe8d58228224d0c1a954554a46}\index{fc::process@{fc::process}!exec@{exec}}
+\index{exec@{exec}!fc::process@{fc::process}}
+\doxysubsubsection{\texorpdfstring{exec()}{exec()}}
+{\footnotesize\ttfamily \label{classfc_1_1process_aa663b2fe8d58228224d0c1a954554a46} 
+\mbox{\hyperlink{classfc_1_1iprocess}{iprocess}} \& fc\+::process\+::exec (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&}]{exe}{, }\item[{std\+::vector$<$ std\+::string $>$}]{args}{, }\item[{const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&}]{work\+\_\+dir}{ = {\ttfamily \mbox{\hyperlink{classfc_1_1path}{fc\+::path}}()}, }\item[{int}]{opts}{ = {\ttfamily \mbox{\hyperlink{classfc_1_1iprocess_a5c8a22e5daa2e344574cf9b98ebbc7c0a765323ccde44d093fafdfd35af17519f}{open\+\_\+all}}}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+\begin{DoxyReturn}{Returns}
+\texorpdfstring{$\ast$}{*}this 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{classfc_1_1iprocess_a7aae40c5a0120f75745caa14a77cc350}{fc\+::iprocess}}.
+
+
+
+Definition at line \mbox{\hyperlink{process_8cpp_source_l00075}{75}} of file \mbox{\hyperlink{process_8cpp_source}{process.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00078\ \{}
+\DoxyCodeLine{00079\ }
+\DoxyCodeLine{00080\ \ \ my-\/>pctx.work\_dir\ =\ work\_dir.\mbox{\hyperlink{classfc_1_1path_aaf0107e4a41f9977032b2a604161cf85}{string}}();}
+\DoxyCodeLine{00081\ \ \ my-\/>pctx.suppress\_console\ =\ (opt\ \&\ \mbox{\hyperlink{classfc_1_1iprocess_a5c8a22e5daa2e344574cf9b98ebbc7c0ac57cedf7ffea9ae46e072a5ff3deae1a}{suppress\_console}})\ !=\ 0;}
+\DoxyCodeLine{00082\ \ \ \ \ }
+\DoxyCodeLine{00083\ \ \ \textcolor{keywordflow}{if}(\ opt\&\mbox{\hyperlink{classfc_1_1iprocess_a5c8a22e5daa2e344574cf9b98ebbc7c0a7b8800fa43953d78083d86327a0a604e}{open\_stdout}})}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ my-\/>pctx.streams[boost::process::stdout\_id]\ =\ bp::behavior::async\_pipe();}
+\DoxyCodeLine{00085\ \ \ \textcolor{keywordflow}{else}\ }
+\DoxyCodeLine{00086\ \ \ \ \ \ \ my-\/>pctx.streams[boost::process::stdout\_id]\ =\ bp::behavior::null();}
+\DoxyCodeLine{00087\ }
+\DoxyCodeLine{00088\ }
+\DoxyCodeLine{00089\ \ \ \textcolor{keywordflow}{if}(\ opt\&\ \mbox{\hyperlink{classfc_1_1iprocess_a5c8a22e5daa2e344574cf9b98ebbc7c0aad069fbbfabfc66f12f66a6270baa92d}{open\_stderr}}\ )}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ my-\/>pctx.streams[boost::process::stderr\_id]\ =\ bp::behavior::async\_pipe();}
+\DoxyCodeLine{00091\ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ my-\/>pctx.streams[boost::process::stderr\_id]\ =\ bp::behavior::null();}
+\DoxyCodeLine{00093\ }
+\DoxyCodeLine{00094\ \ \ \textcolor{keywordflow}{if}(\ opt\&\ \mbox{\hyperlink{classfc_1_1iprocess_a5c8a22e5daa2e344574cf9b98ebbc7c0a1ae4c54b9b2b285e1ab8b3562d14200c}{open\_stdin}}\ )}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ my-\/>pctx.streams[boost::process::stdin\_id]\ \ =\ bp::behavior::async\_pipe();}
+\DoxyCodeLine{00096\ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ my-\/>pctx.streams[boost::process::stdin\_id]\ \ =\ bp::behavior::close();}
+\DoxyCodeLine{00098\ }
+\DoxyCodeLine{00099\ \ \ \textcolor{comment}{/*}}
+\DoxyCodeLine{00100\ \textcolor{comment}{\ \ std::vector<std::string>\ a;}}
+\DoxyCodeLine{00101\ \textcolor{comment}{\ \ a.reserve(size\_t(args.size()));}}
+\DoxyCodeLine{00102\ \textcolor{comment}{\ \ for(\ uint32\_t\ i\ =\ 0;\ i\ <\ args.size();\ ++i\ )\ \{}}
+\DoxyCodeLine{00103\ \textcolor{comment}{\ \ \ \ a.push\_back(\ fc::move(args[i])\ );\ }}
+\DoxyCodeLine{00104\ \textcolor{comment}{\ \ \}}}
+\DoxyCodeLine{00105\ \textcolor{comment}{\ \ */}}
+\DoxyCodeLine{00106\ \ \ my-\/>child.reset(\ \textcolor{keyword}{new}\ bp::child(\ bp::create\_child(\ exe.\mbox{\hyperlink{classfc_1_1path_aaf0107e4a41f9977032b2a604161cf85}{string}}(),\ fc::move(args),\ my-\/>pctx\ )\ )\ );}
+\DoxyCodeLine{00107\ }
+\DoxyCodeLine{00108\ \ \ \textcolor{keywordflow}{if}(\ opt\ \&\ \mbox{\hyperlink{classfc_1_1iprocess_a5c8a22e5daa2e344574cf9b98ebbc7c0a7b8800fa43953d78083d86327a0a604e}{open\_stdout}}\ )\ \{}
+\DoxyCodeLine{00109\ \ \ \ \ \ bp::handle\ outh\ =\ my-\/>child-\/>get\_handle(\ bp::stdout\_id\ );}
+\DoxyCodeLine{00110\ \ \ \ \ \ my-\/>\_outp.reset(\ \textcolor{keyword}{new}\ bp::pipe(\ fc::asio::default\_io\_service(),\ outh.release()\ )\ );}
+\DoxyCodeLine{00111\ \ \ \}}
+\DoxyCodeLine{00112\ \ \ \textcolor{keywordflow}{if}(\ opt\ \&\ \mbox{\hyperlink{classfc_1_1iprocess_a5c8a22e5daa2e344574cf9b98ebbc7c0aad069fbbfabfc66f12f66a6270baa92d}{open\_stderr}}\ )\ \{}
+\DoxyCodeLine{00113\ \ \ \ \ \ bp::handle\ errh\ =\ my-\/>child-\/>get\_handle(\ bp::stderr\_id\ );}
+\DoxyCodeLine{00114\ \ \ \ \ \ my-\/>\_errp.reset(\ \textcolor{keyword}{new}\ bp::pipe(\ fc::asio::default\_io\_service(),\ errh.release()\ )\ );}
+\DoxyCodeLine{00115\ \ \ \}}
+\DoxyCodeLine{00116\ \ \ \textcolor{keywordflow}{if}(\ opt\ \&\ \mbox{\hyperlink{classfc_1_1iprocess_a5c8a22e5daa2e344574cf9b98ebbc7c0a1ae4c54b9b2b285e1ab8b3562d14200c}{open\_stdin}}\ )\ \{}
+\DoxyCodeLine{00117\ \ \ \ \ \ bp::handle\ inh\ \ =\ my-\/>child-\/>get\_handle(\ bp::stdin\_id\ );}
+\DoxyCodeLine{00118\ \ \ \ \ \ my-\/>\_inp.reset(\ \ \textcolor{keyword}{new}\ bp::pipe(\ fc::asio::default\_io\_service(),\ inh.release()\ \ )\ );}
+\DoxyCodeLine{00119\ \ \ \}}
+\DoxyCodeLine{00120\ }
+\DoxyCodeLine{00121\ }
+\DoxyCodeLine{00122\ \ \ promise<int>::ptr\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}(\textcolor{keyword}{new}\ promise<int>(\textcolor{stringliteral}{"{}process"{}}));}
+\DoxyCodeLine{00123\ \ \ my-\/>stat.async\_wait(\ \ my-\/>child-\/>get\_id(),\ [=](\ \textcolor{keyword}{const}\ boost::system::error\_code\&\ ec,\ \textcolor{keywordtype}{int}\ exit\_code\ )}
+\DoxyCodeLine{00124\ \ \ \ \ \{}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \textcolor{comment}{//slog(\ "{}process::result\ \%d"{},\ exit\_code\ );}}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ if(\ !ec\ )\ \{}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \ \ \#ifdef\ BOOST\_POSIX\_API}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \ \ if(\ WIFEXITED(exit\_code)\ )\ p-\/>set\_value(\ \ WEXITSTATUS(exit\_code)\ );}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \ else}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \ \ \ \ p-\/>set\_exception(\ }
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fc::exception\_ptr(\ new\ fc::exception(\ }
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ FC\_LOG\_MESSAGE(\ error,\ \textcolor{stringliteral}{"{}process\ exited\ with:\ \$\{message\}\ "{}},\ }
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}message"{}},\ strsignal(WTERMSIG(exit\_code)))\ )\ )\ )\ );}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \ \ \#else}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ \ p-\/>set\_value(exit\_code);}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \ \ \#endif}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \ \ p-\/>set\_exception(\ }
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fc::exception\_ptr(\ new\ fc::exception(\ }
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ FC\_LOG\_MESSAGE(\ error,\ \textcolor{stringliteral}{"{}process\ exited\ with:\ \$\{message\}\ "{}},\ }
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}message"{}},\ boost::system::system\_error(ec).what()))\ )\ )\ );}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00147\ \ \ \ \ \});}
+\DoxyCodeLine{00148\ \ \ \textcolor{keywordflow}{if}(\ opt\ \&\ \mbox{\hyperlink{classfc_1_1iprocess_a5c8a22e5daa2e344574cf9b98ebbc7c0a1ae4c54b9b2b285e1ab8b3562d14200c}{open\_stdin}}\ )}
+\DoxyCodeLine{00149\ \ \ \ \ my-\/>\_in\ \ \ \ \ =\ std::make\_shared<buffered\_ostream>(std::make\_shared<fc::asio::ostream<bp::pipe>>(my-\/>\_inp));}
+\DoxyCodeLine{00150\ \ \ \textcolor{keywordflow}{if}(\ opt\ \&\ \mbox{\hyperlink{classfc_1_1iprocess_a5c8a22e5daa2e344574cf9b98ebbc7c0a7b8800fa43953d78083d86327a0a604e}{open\_stdout}}\ )}
+\DoxyCodeLine{00151\ \ \ \ \ my-\/>\_out\ \ \ \ =\ std::make\_shared<buffered\_istream>(std::make\_shared<fc::asio::istream<bp::pipe>>(my-\/>\_outp));}
+\DoxyCodeLine{00152\ \ \ \textcolor{keywordflow}{if}(\ opt\ \&\ \mbox{\hyperlink{classfc_1_1iprocess_a5c8a22e5daa2e344574cf9b98ebbc7c0aad069fbbfabfc66f12f66a6270baa92d}{open\_stderr}}\ )}
+\DoxyCodeLine{00153\ \ \ \ \ my-\/>\_err\ \ \ \ =\ std::make\_shared<buffered\_istream>(std::make\_shared<fc::asio::istream<bp::pipe>>(my-\/>\_errp));}
+\DoxyCodeLine{00154\ \ \ my-\/>\_exited\ =\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}};}
+\DoxyCodeLine{00155\ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00156\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=287pt]{classfc_1_1process_aa663b2fe8d58228224d0c1a954554a46_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1process_a87f8951f9911b85a30947ad641ae959a}\index{fc::process@{fc::process}!in\_stream@{in\_stream}}
+\index{in\_stream@{in\_stream}!fc::process@{fc::process}}
+\doxysubsubsection{\texorpdfstring{in\_stream()}{in\_stream()}}
+{\footnotesize\ttfamily \label{classfc_1_1process_a87f8951f9911b85a30947ad641ae959a} 
+\mbox{\hyperlink{namespacefc_a95f13893819c9b7254bd8dc1f906c497}{fc\+::buffered\+\_\+ostream\+\_\+ptr}} fc\+::process\+::in\+\_\+stream (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classfc_1_1iprocess_a89bdbe5f0ec7a46dcdd1a24121f4e876}{fc\+::iprocess}}.
+
+
+
+Definition at line \mbox{\hyperlink{process_8cpp_source_l00168}{168}} of file \mbox{\hyperlink{process_8cpp_source}{process.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00169\ \ \ \textcolor{keywordflow}{return}\ my-\/>\_in;}
+\DoxyCodeLine{00170\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1process_a159c67b1fcff5dffb6678d15090ab335}\index{fc::process@{fc::process}!kill@{kill}}
+\index{kill@{kill}!fc::process@{fc::process}}
+\doxysubsubsection{\texorpdfstring{kill()}{kill()}}
+{\footnotesize\ttfamily \label{classfc_1_1process_a159c67b1fcff5dffb6678d15090ab335} 
+void fc\+::process\+::kill (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+Forcefully kills the process. 
+
+Implements \mbox{\hyperlink{classfc_1_1iprocess_ab8f2c418018f1722ae821334bfd6c0f8}{fc\+::iprocess}}.
+
+
+
+Definition at line \mbox{\hyperlink{process_8cpp_source_l00161}{161}} of file \mbox{\hyperlink{process_8cpp_source}{process.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00162\ \ \ my-\/>child-\/>terminate();}
+\DoxyCodeLine{00163\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1process_a9cda12fc9cb8b8f8181af7603395c384}\index{fc::process@{fc::process}!out\_stream@{out\_stream}}
+\index{out\_stream@{out\_stream}!fc::process@{fc::process}}
+\doxysubsubsection{\texorpdfstring{out\_stream()}{out\_stream()}}
+{\footnotesize\ttfamily \label{classfc_1_1process_a9cda12fc9cb8b8f8181af7603395c384} 
+\mbox{\hyperlink{namespacefc_a1de1d095ba3c29dc0ced564bc8f45123}{fc\+::buffered\+\_\+istream\+\_\+ptr}} fc\+::process\+::out\+\_\+stream (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classfc_1_1iprocess_a44d94c426ed7402470f6ad0a969e1a7e}{fc\+::iprocess}}.
+
+
+
+Definition at line \mbox{\hyperlink{process_8cpp_source_l00175}{175}} of file \mbox{\hyperlink{process_8cpp_source}{process.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00176\ \ \ \textcolor{keywordflow}{return}\ my-\/>\_out;}
+\DoxyCodeLine{00177\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1process_a58711b1b058e41f8139a971d3cc9b0a4}\index{fc::process@{fc::process}!result@{result}}
+\index{result@{result}!fc::process@{fc::process}}
+\doxysubsubsection{\texorpdfstring{result()}{result()}}
+{\footnotesize\ttfamily \label{classfc_1_1process_a58711b1b058e41f8139a971d3cc9b0a4} 
+int fc\+::process\+::result (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1microseconds}{microseconds}} \&}]{timeout}{ = {\ttfamily \mbox{\hyperlink{classfc_1_1microseconds_afc3eb0bfd792c7b1cda062e559e30c2e}{microseconds\+::maximum}}()}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+\begin{DoxyReturn}{Returns}
+blocks until the process exits 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{classfc_1_1iprocess_abe1c8fb231fe682868561a1193361ce9}{fc\+::iprocess}}.
+
+
+
+Definition at line \mbox{\hyperlink{process_8cpp_source_l00185}{185}} of file \mbox{\hyperlink{process_8cpp_source}{process.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00186\ \{}
+\DoxyCodeLine{00187\ \ \ \ \ \textcolor{keywordflow}{return}\ my-\/>\_exited.wait(timeout);}
+\DoxyCodeLine{00188\ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/interprocess/\mbox{\hyperlink{process_8hpp}{process.\+hpp}}\item 
+libraries/fc/src/interprocess/\mbox{\hyperlink{process_8cpp}{process.\+cpp}}\end{DoxyCompactItemize}

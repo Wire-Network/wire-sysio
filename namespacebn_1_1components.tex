@@ -1,0 +1,271 @@
+\doxysection{bn\+::components Namespace Reference}
+\hypertarget{namespacebn_1_1components}{}\label{namespacebn_1_1components}\index{bn::components@{bn::components}}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{namespacebn_1_1components_af7e078139e69b4cb42eb6a547dc748c6}{precompute\+G2}} (std\+::vector$<$ \mbox{\hyperlink{namespacebn_a011312b1273d2b6f5d88762678205814}{Fp6}} $>$ \&coeff, \mbox{\hyperlink{namespacebn_afe11bd65aac84b50b31d9984d059be92}{Fp2}} Q\mbox{[}3\mbox{]}, const \mbox{\hyperlink{namespacebn_afe11bd65aac84b50b31d9984d059be92}{Fp2}} inQ\mbox{[}3\mbox{]})
+\item 
+void \mbox{\hyperlink{namespacebn_1_1components_a6ffa9f1e05f963b0af227759acee63b0}{miller\+Loop}} (\mbox{\hyperlink{namespacebn_abd6ddb9ecff5d59c093581706e088644}{Fp12}} \&\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}, const std\+::vector$<$ \mbox{\hyperlink{namespacebn_a011312b1273d2b6f5d88762678205814}{Fp6}} $>$ \&Qcoeff, const \mbox{\hyperlink{namespacebn_a790c0215583382a829e202ecb0c844b9}{Fp}} precP\mbox{[}2\mbox{]})
+\item 
+void \mbox{\hyperlink{namespacebn_1_1components_a530c629f42e45f300a15d012c5979ed1}{miller\+Loop2}} (\mbox{\hyperlink{namespacebn_abd6ddb9ecff5d59c093581706e088644}{Fp12}} \&\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}, const std\+::vector$<$ \mbox{\hyperlink{namespacebn_a011312b1273d2b6f5d88762678205814}{Fp6}} $>$ \&Q1coeff, const \mbox{\hyperlink{namespacebn_a790c0215583382a829e202ecb0c844b9}{Fp}} prec\+P1\mbox{[}2\mbox{]}, const std\+::vector$<$ \mbox{\hyperlink{namespacebn_a011312b1273d2b6f5d88762678205814}{Fp6}} $>$ \&Q2coeff, const \mbox{\hyperlink{namespacebn_a790c0215583382a829e202ecb0c844b9}{Fp}} prec\+P2\mbox{[}2\mbox{]})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacebn_1_1components_a6ffa9f1e05f963b0af227759acee63b0}\index{bn::components@{bn::components}!millerLoop@{millerLoop}}
+\index{millerLoop@{millerLoop}!bn::components@{bn::components}}
+\doxysubsubsection{\texorpdfstring{millerLoop()}{millerLoop()}}
+{\footnotesize\ttfamily \label{namespacebn_1_1components_a6ffa9f1e05f963b0af227759acee63b0} 
+void bn\+::components\+::miller\+Loop (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacebn_abd6ddb9ecff5d59c093581706e088644}{Fp12}} \&}]{f}{, }\item[{const std\+::vector$<$ \mbox{\hyperlink{namespacebn_a011312b1273d2b6f5d88762678205814}{Fp6}} $>$ \&}]{Qcoeff}{, }\item[{const \mbox{\hyperlink{namespacebn_a790c0215583382a829e202ecb0c844b9}{Fp}}}]{precP}{\mbox{[}2\mbox{]}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn_8h_source_l03060}{3060}} of file \mbox{\hyperlink{bn_8h_source}{bn.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03061\ \{}
+\DoxyCodeLine{03062\ \ \ \ \ assert(Param::siTbl[1]\ ==\ 1);}
+\DoxyCodeLine{03063\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ idx\ =\ 0;}
+\DoxyCodeLine{03064\ }
+\DoxyCodeLine{03065\ \ \ \ \ \mbox{\hyperlink{structbn_1_1_fp6_t}{Fp6}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ =\ Qcoeff[idx];}
+\DoxyCodeLine{03066\ \ \ \ \ Fp6::mulFp6\_24\_Fp\_01(d,\ precP);}
+\DoxyCodeLine{03067\ \ \ \ \ idx++;}
+\DoxyCodeLine{03068\ }
+\DoxyCodeLine{03069\ \ \ \ \ \mbox{\hyperlink{structbn_1_1_fp6_t}{Fp6}}\ e\ =\ Qcoeff[idx];}
+\DoxyCodeLine{03070\ \ \ \ \ Fp6::mulFp6\_24\_Fp\_01(e,\ precP);}
+\DoxyCodeLine{03071\ \ \ \ \ Fp12::Dbl::mul\_Fp2\_024\_Fp2\_024(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}},\ d,\ e);}
+\DoxyCodeLine{03072\ }
+\DoxyCodeLine{03073\ \ \ \ \ idx++;}
+\DoxyCodeLine{03074\ \ \ \ \ \mbox{\hyperlink{structbn_1_1_fp6_t}{bn::Fp6}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}};}
+\DoxyCodeLine{03075\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 2;\ i\ <\ Param::siTbl.size();\ i++)\ \{}
+\DoxyCodeLine{03076\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}\ =\ Qcoeff[idx];}
+\DoxyCodeLine{03077\ \ \ \ \ \ \ \ \ idx++;}
+\DoxyCodeLine{03078\ \ \ \ \ \ \ \ \ Fp12::square(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}});}
+\DoxyCodeLine{03079\ \ \ \ \ \ \ \ \ Fp6::mulFp6\_24\_Fp\_01(\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}},\ precP);}
+\DoxyCodeLine{03080\ }
+\DoxyCodeLine{03081\ \ \ \ \ \ \ \ \ Fp12::Dbl::mul\_Fp2\_024(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}});}
+\DoxyCodeLine{03082\ }
+\DoxyCodeLine{03083\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (Param::siTbl[i])\ \{}
+\DoxyCodeLine{03084\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}\ =\ Qcoeff[idx];}
+\DoxyCodeLine{03085\ \ \ \ \ \ \ \ \ \ \ \ \ idx++;}
+\DoxyCodeLine{03086\ \ \ \ \ \ \ \ \ \ \ \ \ Fp6::mulFp6\_24\_Fp\_01(\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}},\ precP);}
+\DoxyCodeLine{03087\ \ \ \ \ \ \ \ \ \ \ \ \ Fp12::Dbl::mul\_Fp2\_024(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}});}
+\DoxyCodeLine{03088\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{03089\ \ \ \ \ \}}
+\DoxyCodeLine{03090\ }
+\DoxyCodeLine{03091\ \textcolor{preprocessor}{\#ifndef\ BN\_SUPPORT\_SNARK}}
+\DoxyCodeLine{03092\ \ \ \ \ \textcolor{comment}{//\ @memo\ z\ <\ 0}}
+\DoxyCodeLine{03093\ \ \ \ \ Fp6::neg(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}.b\_,\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}.b\_);}
+\DoxyCodeLine{03094\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{03095\ \ \ \ \ \mbox{\hyperlink{class_fp12}{Fp12}}\ ft;}
+\DoxyCodeLine{03096\ }
+\DoxyCodeLine{03097\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ =\ Qcoeff[idx];}
+\DoxyCodeLine{03098\ \ \ \ \ Fp6::mulFp6\_24\_Fp\_01(d,\ precP);}
+\DoxyCodeLine{03099\ \ \ \ \ idx++;}
+\DoxyCodeLine{03100\ }
+\DoxyCodeLine{03101\ \ \ \ \ e\ =\ Qcoeff[idx];}
+\DoxyCodeLine{03102\ \ \ \ \ Fp6::mulFp6\_24\_Fp\_01(e,\ precP);}
+\DoxyCodeLine{03103\ }
+\DoxyCodeLine{03104\ \ \ \ \ Fp12::Dbl::mul\_Fp2\_024\_Fp2\_024(ft,\ d,\ e);}
+\DoxyCodeLine{03105\ \ \ \ \ \mbox{\hyperlink{class_fp12_a120decc9bc6a64401de37f6cf2b3337e}{Fp12::mul}}(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}},\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}},\ ft);}
+\DoxyCodeLine{03106\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacebn_1_1components_a6ffa9f1e05f963b0af227759acee63b0_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacebn_1_1components_a6ffa9f1e05f963b0af227759acee63b0_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacebn_1_1components_a530c629f42e45f300a15d012c5979ed1}\index{bn::components@{bn::components}!millerLoop2@{millerLoop2}}
+\index{millerLoop2@{millerLoop2}!bn::components@{bn::components}}
+\doxysubsubsection{\texorpdfstring{millerLoop2()}{millerLoop2()}}
+{\footnotesize\ttfamily \label{namespacebn_1_1components_a530c629f42e45f300a15d012c5979ed1} 
+void bn\+::components\+::miller\+Loop2 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacebn_abd6ddb9ecff5d59c093581706e088644}{Fp12}} \&}]{f}{, }\item[{const std\+::vector$<$ \mbox{\hyperlink{namespacebn_a011312b1273d2b6f5d88762678205814}{Fp6}} $>$ \&}]{Q1coeff}{, }\item[{const \mbox{\hyperlink{namespacebn_a790c0215583382a829e202ecb0c844b9}{Fp}}}]{prec\+P1}{\mbox{[}2\mbox{]}, }\item[{const std\+::vector$<$ \mbox{\hyperlink{namespacebn_a011312b1273d2b6f5d88762678205814}{Fp6}} $>$ \&}]{Q2coeff}{, }\item[{const \mbox{\hyperlink{namespacebn_a790c0215583382a829e202ecb0c844b9}{Fp}}}]{prec\+P2}{\mbox{[}2\mbox{]}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn_8h_source_l03108}{3108}} of file \mbox{\hyperlink{bn_8h_source}{bn.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03110\ \{}
+\DoxyCodeLine{03111\ \ \ \ \ assert(Param::siTbl[1]\ ==\ 1);}
+\DoxyCodeLine{03112\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ idx\ =\ 0;}
+\DoxyCodeLine{03113\ }
+\DoxyCodeLine{03114\ \ \ \ \ \mbox{\hyperlink{structbn_1_1_fp6_t}{Fp6}}\ \mbox{\hyperlink{dtoa_8c_a1fe17aa2ff1722c937379044a27da68a}{d1}}\ =\ Q1coeff[idx];}
+\DoxyCodeLine{03115\ \ \ \ \ Fp6::mulFp6\_24\_Fp\_01(\mbox{\hyperlink{dtoa_8c_a1fe17aa2ff1722c937379044a27da68a}{d1}},\ precP1);}
+\DoxyCodeLine{03116\ \ \ \ \ \mbox{\hyperlink{structbn_1_1_fp6_t}{Fp6}}\ d2\ =\ Q2coeff[idx];}
+\DoxyCodeLine{03117\ \ \ \ \ Fp6::mulFp6\_24\_Fp\_01(d2,\ precP2);}
+\DoxyCodeLine{03118\ \ \ \ \ idx++;}
+\DoxyCodeLine{03119\ }
+\DoxyCodeLine{03120\ \ \ \ \ \mbox{\hyperlink{structbn_1_1_fp12_t}{Fp12}}\ f1;}
+\DoxyCodeLine{03121\ \ \ \ \ \mbox{\hyperlink{structbn_1_1_fp6_t}{Fp6}}\ e1\ =\ Q1coeff[idx];}
+\DoxyCodeLine{03122\ \ \ \ \ Fp6::mulFp6\_24\_Fp\_01(e1,\ precP1);}
+\DoxyCodeLine{03123\ \ \ \ \ Fp12::Dbl::mul\_Fp2\_024\_Fp2\_024(f1,\ \mbox{\hyperlink{dtoa_8c_a1fe17aa2ff1722c937379044a27da68a}{d1}},\ e1);}
+\DoxyCodeLine{03124\ }
+\DoxyCodeLine{03125\ \ \ \ \ \mbox{\hyperlink{structbn_1_1_fp12_t}{Fp12}}\ f2;}
+\DoxyCodeLine{03126\ \ \ \ \ \mbox{\hyperlink{structbn_1_1_fp6_t}{Fp6}}\ e2\ =\ Q2coeff[idx];}
+\DoxyCodeLine{03127\ \ \ \ \ Fp6::mulFp6\_24\_Fp\_01(e2,\ precP2);}
+\DoxyCodeLine{03128\ \ \ \ \ Fp12::Dbl::mul\_Fp2\_024\_Fp2\_024(f2,\ d2,\ e2);}
+\DoxyCodeLine{03129\ \ \ \ \ \mbox{\hyperlink{class_fp12_a120decc9bc6a64401de37f6cf2b3337e}{Fp12::mul}}(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}},\ f1,\ f2);}
+\DoxyCodeLine{03130\ }
+\DoxyCodeLine{03131\ \ \ \ \ idx++;}
+\DoxyCodeLine{03132\ \ \ \ \ \mbox{\hyperlink{structbn_1_1_fp6_t}{bn::Fp6}}\ l1,\ l2;}
+\DoxyCodeLine{03133\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 2;\ i\ <\ Param::siTbl.size();\ i++)\ \{}
+\DoxyCodeLine{03134\ \ \ \ \ \ \ \ \ l1\ =\ Q1coeff[idx];}
+\DoxyCodeLine{03135\ \ \ \ \ \ \ \ \ l2\ =\ Q2coeff[idx];}
+\DoxyCodeLine{03136\ \ \ \ \ \ \ \ \ idx++;}
+\DoxyCodeLine{03137\ \ \ \ \ \ \ \ \ Fp12::square(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}});}
+\DoxyCodeLine{03138\ }
+\DoxyCodeLine{03139\ \ \ \ \ \ \ \ \ Fp6::mulFp6\_24\_Fp\_01(l1,\ precP1);}
+\DoxyCodeLine{03140\ \ \ \ \ \ \ \ \ Fp6::mulFp6\_24\_Fp\_01(l2,\ precP2);}
+\DoxyCodeLine{03141\ }
+\DoxyCodeLine{03142\ \ \ \ \ \ \ \ \ Fp12::Dbl::mul\_Fp2\_024\_Fp2\_024(f1,\ l1,\ l2);}
+\DoxyCodeLine{03143\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_fp12_a120decc9bc6a64401de37f6cf2b3337e}{Fp12::mul}}(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}},\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}},\ f1);}
+\DoxyCodeLine{03144\ }
+\DoxyCodeLine{03145\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (Param::siTbl[i])\ \{}
+\DoxyCodeLine{03146\ \ \ \ \ \ \ \ \ \ \ \ \ l1\ =\ Q1coeff[idx];}
+\DoxyCodeLine{03147\ \ \ \ \ \ \ \ \ \ \ \ \ l2\ =\ Q2coeff[idx];}
+\DoxyCodeLine{03148\ \ \ \ \ \ \ \ \ \ \ \ \ idx++;}
+\DoxyCodeLine{03149\ \ \ \ \ \ \ \ \ \ \ \ \ Fp6::mulFp6\_24\_Fp\_01(l1,\ precP1);}
+\DoxyCodeLine{03150\ \ \ \ \ \ \ \ \ \ \ \ \ Fp6::mulFp6\_24\_Fp\_01(l2,\ precP2);}
+\DoxyCodeLine{03151\ \ \ \ \ \ \ \ \ \ \ \ \ Fp12::Dbl::mul\_Fp2\_024\_Fp2\_024(f1,\ l1,\ l2);}
+\DoxyCodeLine{03152\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_fp12_a120decc9bc6a64401de37f6cf2b3337e}{Fp12::mul}}(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}},\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}},\ f1);}
+\DoxyCodeLine{03153\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{03154\ \ \ \ \ \}}
+\DoxyCodeLine{03155\ }
+\DoxyCodeLine{03156\ \textcolor{preprocessor}{\#ifndef\ BN\_SUPPORT\_SNARK}}
+\DoxyCodeLine{03157\ \ \ \ \ \textcolor{comment}{//\ @memo\ z\ <\ 0}}
+\DoxyCodeLine{03158\ \ \ \ \ Fp6::neg(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}.b\_,\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}.b\_);}
+\DoxyCodeLine{03159\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{03160\ }
+\DoxyCodeLine{03161\ \ \ \ \ \mbox{\hyperlink{dtoa_8c_a1fe17aa2ff1722c937379044a27da68a}{d1}}\ =\ Q1coeff[idx];}
+\DoxyCodeLine{03162\ \ \ \ \ Fp6::mulFp6\_24\_Fp\_01(\mbox{\hyperlink{dtoa_8c_a1fe17aa2ff1722c937379044a27da68a}{d1}},\ precP1);}
+\DoxyCodeLine{03163\ }
+\DoxyCodeLine{03164\ \ \ \ \ d2\ =\ Q2coeff[idx];}
+\DoxyCodeLine{03165\ \ \ \ \ Fp6::mulFp6\_24\_Fp\_01(d2,\ precP2);}
+\DoxyCodeLine{03166\ \ \ \ \ idx++;}
+\DoxyCodeLine{03167\ }
+\DoxyCodeLine{03168\ \ \ \ \ e1\ =\ Q1coeff[idx];}
+\DoxyCodeLine{03169\ \ \ \ \ Fp6::mulFp6\_24\_Fp\_01(e1,\ precP1);}
+\DoxyCodeLine{03170\ }
+\DoxyCodeLine{03171\ \ \ \ \ e2\ =\ Q2coeff[idx];}
+\DoxyCodeLine{03172\ \ \ \ \ Fp6::mulFp6\_24\_Fp\_01(e2,\ precP2);}
+\DoxyCodeLine{03173\ }
+\DoxyCodeLine{03174\ \ \ \ \ Fp12::Dbl::mul\_Fp2\_024\_Fp2\_024(f1,\ \mbox{\hyperlink{dtoa_8c_a1fe17aa2ff1722c937379044a27da68a}{d1}},\ e1);}
+\DoxyCodeLine{03175\ \ \ \ \ Fp12::Dbl::mul\_Fp2\_024\_Fp2\_024(f2,\ d2,\ e2);}
+\DoxyCodeLine{03176\ \ \ \ \ \mbox{\hyperlink{class_fp12_a120decc9bc6a64401de37f6cf2b3337e}{Fp12::mul}}(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}},\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}},\ f1);}
+\DoxyCodeLine{03177\ \ \ \ \ \mbox{\hyperlink{class_fp12_a120decc9bc6a64401de37f6cf2b3337e}{Fp12::mul}}(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}},\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}},\ f2);}
+\DoxyCodeLine{03178\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacebn_1_1components_a530c629f42e45f300a15d012c5979ed1_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacebn_1_1components_a530c629f42e45f300a15d012c5979ed1_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacebn_1_1components_af7e078139e69b4cb42eb6a547dc748c6}\index{bn::components@{bn::components}!precomputeG2@{precomputeG2}}
+\index{precomputeG2@{precomputeG2}!bn::components@{bn::components}}
+\doxysubsubsection{\texorpdfstring{precomputeG2()}{precomputeG2()}}
+{\footnotesize\ttfamily \label{namespacebn_1_1components_af7e078139e69b4cb42eb6a547dc748c6} 
+void bn\+::components\+::precompute\+G2 (\begin{DoxyParamCaption}\item[{std\+::vector$<$ \mbox{\hyperlink{namespacebn_a011312b1273d2b6f5d88762678205814}{Fp6}} $>$ \&}]{coeff}{, }\item[{\mbox{\hyperlink{namespacebn_afe11bd65aac84b50b31d9984d059be92}{Fp2}}}]{Q}{\mbox{[}3\mbox{]}, }\item[{const \mbox{\hyperlink{namespacebn_afe11bd65aac84b50b31d9984d059be92}{Fp2}}}]{inQ}{\mbox{[}3\mbox{]}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn_8h_source_l02997}{2997}} of file \mbox{\hyperlink{bn_8h_source}{bn.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02998\ \{}
+\DoxyCodeLine{02999\ \ \ \ \ coeff.clear();}
+\DoxyCodeLine{03000\ \ \ \ \ \mbox{\hyperlink{namespacebn_1_1ecop_a699ba608398adde415b5ec415d4bf100}{bn::ecop::NormalizeJac}}(Q,\ inQ);}
+\DoxyCodeLine{03001\ }
+\DoxyCodeLine{03002\ \ \ \ \ \mbox{\hyperlink{structbn_1_1_fp2_t}{Fp2}}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}[3];}
+\DoxyCodeLine{03003\ \ \ \ \ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}[0]\ =\ Q[0];}
+\DoxyCodeLine{03004\ \ \ \ \ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}[1]\ =\ Q[1];}
+\DoxyCodeLine{03005\ \ \ \ \ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}[2]\ =\ \mbox{\hyperlink{structbn_1_1_fp2_t}{Fp2}}(1);}
+\DoxyCodeLine{03006\ \ \ \ \ \mbox{\hyperlink{structbn_1_1_fp2_t}{Fp2}}\ Qneg[2];}
+\DoxyCodeLine{03007\ \ \ \ \ \textcolor{keywordflow}{if}\ (Param::useNAF)\ \{}
+\DoxyCodeLine{03008\ \ \ \ \ \ \ \ \ Qneg[0]\ =\ Q[0];}
+\DoxyCodeLine{03009\ \ \ \ \ \ \ \ \ Fp2::neg(Qneg[1],\ Q[1]);}
+\DoxyCodeLine{03010\ \ \ \ \ \}}
+\DoxyCodeLine{03011\ }
+\DoxyCodeLine{03012\ \ \ \ \ \mbox{\hyperlink{structbn_1_1_fp6_t}{Fp6}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}};}
+\DoxyCodeLine{03013\ \ \ \ \ Fp6::pointDblLineEvalWithoutP(d,\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}});}
+\DoxyCodeLine{03014\ \ \ \ \ coeff.push\_back(d);}
+\DoxyCodeLine{03015\ }
+\DoxyCodeLine{03016\ \ \ \ \ \mbox{\hyperlink{structbn_1_1_fp6_t}{Fp6}}\ e;}
+\DoxyCodeLine{03017\ \ \ \ \ assert(Param::siTbl[1]\ ==\ 1);}
+\DoxyCodeLine{03018\ \ \ \ \ Fp6::pointAddLineEvalWithoutP(e,\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}},\ Q);}
+\DoxyCodeLine{03019\ \ \ \ \ coeff.push\_back(e);}
+\DoxyCodeLine{03020\ }
+\DoxyCodeLine{03021\ \ \ \ \ \mbox{\hyperlink{structbn_1_1_fp6_t}{bn::Fp6}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}};}
+\DoxyCodeLine{03022\ \ \ \ \ \textcolor{comment}{//\ 844kclk}}
+\DoxyCodeLine{03023\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 2;\ i\ <\ Param::siTbl.size();\ i++)\ \{}
+\DoxyCodeLine{03024\ \ \ \ \ \ \ \ \ Fp6::pointDblLineEvalWithoutP(\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}},\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}});}
+\DoxyCodeLine{03025\ \ \ \ \ \ \ \ \ coeff.push\_back(\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}});}
+\DoxyCodeLine{03026\ }
+\DoxyCodeLine{03027\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (Param::siTbl[i]\ >\ 0)\ \{}
+\DoxyCodeLine{03028\ \ \ \ \ \ \ \ \ \ \ \ \ Fp6::pointAddLineEvalWithoutP(\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}},\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}},\ Q);}
+\DoxyCodeLine{03029\ \ \ \ \ \ \ \ \ \ \ \ \ coeff.push\_back(\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}});}
+\DoxyCodeLine{03030\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{03031\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (Param::siTbl[i]\ <\ 0)\ \{}
+\DoxyCodeLine{03032\ \ \ \ \ \ \ \ \ \ \ \ \ Fp6::pointAddLineEvalWithoutP(\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}},\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}},\ Qneg);}
+\DoxyCodeLine{03033\ \ \ \ \ \ \ \ \ \ \ \ \ coeff.push\_back(\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}});}
+\DoxyCodeLine{03034\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{03035\ \ \ \ \ \}}
+\DoxyCodeLine{03036\ }
+\DoxyCodeLine{03037\ \ \ \ \ \textcolor{comment}{//\ addition\ step}}
+\DoxyCodeLine{03038\ \ \ \ \ \mbox{\hyperlink{class_fp2}{Fp2}}\ Q1[2];}
+\DoxyCodeLine{03039\ \ \ \ \ \mbox{\hyperlink{namespacebn_1_1ecop_aecdd2b15dc57403600d49afb5bc6ac57}{bn::ecop::FrobEndOnTwist\_1}}(Q1,\ Q);}
+\DoxyCodeLine{03040\ \ \ \ \ \mbox{\hyperlink{class_fp2}{Fp2}}\ Q2[2];}
+\DoxyCodeLine{03041\ \textcolor{preprocessor}{\#ifdef\ BN\_SUPPORT\_SNARK}}
+\DoxyCodeLine{03042\ \ \ \ \ \mbox{\hyperlink{namespacebn_1_1ecop_a5de8f9e367f80bcfab0d2c5294613666}{bn::ecop::FrobEndOnTwist\_2}}(Q2,\ Q);}
+\DoxyCodeLine{03043\ \ \ \ \ Fp2::neg(Q2[1],\ Q2[1]);}
+\DoxyCodeLine{03044\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{03045\ \ \ \ \ \textcolor{comment}{//\ @memo\ z\ <\ 0}}
+\DoxyCodeLine{03046\ \ \ \ \ ecop::FrobEndOnTwist\_8(Q2,\ Q);}
+\DoxyCodeLine{03047\ \ \ \ \ Fp2::neg(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}[1],\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}[1]);}
+\DoxyCodeLine{03048\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{03049\ }
+\DoxyCodeLine{03050\ \ \ \ \ Fp6::pointAddLineEvalWithoutP(d,\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}},\ Q1);}
+\DoxyCodeLine{03051\ \ \ \ \ coeff.push\_back(d);}
+\DoxyCodeLine{03052\ }
+\DoxyCodeLine{03053\ \ \ \ \ Fp6::pointAddLineEvalWithoutP(e,\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}},\ Q2);}
+\DoxyCodeLine{03054\ \ \ \ \ coeff.push\_back(e);}
+\DoxyCodeLine{03055\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacebn_1_1components_af7e078139e69b4cb42eb6a547dc748c6_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacebn_1_1components_af7e078139e69b4cb42eb6a547dc748c6_icgraph}
+\end{center}
+\end{figure}

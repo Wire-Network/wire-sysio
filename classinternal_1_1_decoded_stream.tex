@@ -1,0 +1,88 @@
+\doxysection{internal\+::Decoded\+Stream\texorpdfstring{$<$}{<} Source\+Stream, Encoding \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classinternal_1_1_decoded_stream}{}\label{classinternal_1_1_decoded_stream}\index{internal::DecodedStream$<$ SourceStream, Encoding $>$@{internal::DecodedStream$<$ SourceStream, Encoding $>$}}
+
+
+{\ttfamily \#include $<$regex.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classinternal_1_1_decoded_stream_a45cf40c4e515be8aaa8cd020eaa67595}{Decoded\+Stream}} (Source\+Stream \&ss)
+\item 
+unsigned \mbox{\hyperlink{classinternal_1_1_decoded_stream_ac78f2cbc03ae0d79a0fcfe6d56589d70}{Peek}} ()
+\item 
+unsigned \mbox{\hyperlink{classinternal_1_1_decoded_stream_a62b45969ce169bef1da0600490329857}{Take}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Source\+Stream, typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}}$>$\newline
+class internal\+::\+Decoded\+Stream$<$ Source\+Stream, Encoding $>$}
+
+
+Definition at line \mbox{\hyperlink{regex_8h_source_l00051}{51}} of file \mbox{\hyperlink{regex_8h_source}{regex.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classinternal_1_1_decoded_stream_a45cf40c4e515be8aaa8cd020eaa67595}\index{internal::DecodedStream$<$ SourceStream, Encoding $>$@{internal::DecodedStream$<$ SourceStream, Encoding $>$}!DecodedStream@{DecodedStream}}
+\index{DecodedStream@{DecodedStream}!internal::DecodedStream$<$ SourceStream, Encoding $>$@{internal::DecodedStream$<$ SourceStream, Encoding $>$}}
+\doxysubsubsection{\texorpdfstring{DecodedStream()}{DecodedStream()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_decoded_stream_a45cf40c4e515be8aaa8cd020eaa67595} 
+template$<$typename Source\+Stream , typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$ \\
+\mbox{\hyperlink{classinternal_1_1_decoded_stream}{internal\+::\+Decoded\+Stream}}$<$ Source\+Stream, \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$\+::\+Decoded\+Stream (\begin{DoxyParamCaption}\item[{Source\+Stream \&}]{ss}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{regex_8h_source_l00053}{53}} of file \mbox{\hyperlink{regex_8h_source}{regex.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00053\ :\ ss\_(ss),\ codepoint\_()\ \{\ Decode();\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classinternal_1_1_decoded_stream_ac78f2cbc03ae0d79a0fcfe6d56589d70}\index{internal::DecodedStream$<$ SourceStream, Encoding $>$@{internal::DecodedStream$<$ SourceStream, Encoding $>$}!Peek@{Peek}}
+\index{Peek@{Peek}!internal::DecodedStream$<$ SourceStream, Encoding $>$@{internal::DecodedStream$<$ SourceStream, Encoding $>$}}
+\doxysubsubsection{\texorpdfstring{Peek()}{Peek()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_decoded_stream_ac78f2cbc03ae0d79a0fcfe6d56589d70} 
+template$<$typename Source\+Stream , typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$ \\
+unsigned \mbox{\hyperlink{classinternal_1_1_decoded_stream}{internal\+::\+Decoded\+Stream}}$<$ Source\+Stream, \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$\+::\+Peek (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{regex_8h_source_l00054}{54}} of file \mbox{\hyperlink{regex_8h_source}{regex.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00054\ \{\ \textcolor{keywordflow}{return}\ codepoint\_;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classinternal_1_1_decoded_stream_a62b45969ce169bef1da0600490329857}\index{internal::DecodedStream$<$ SourceStream, Encoding $>$@{internal::DecodedStream$<$ SourceStream, Encoding $>$}!Take@{Take}}
+\index{Take@{Take}!internal::DecodedStream$<$ SourceStream, Encoding $>$@{internal::DecodedStream$<$ SourceStream, Encoding $>$}}
+\doxysubsubsection{\texorpdfstring{Take()}{Take()}}
+{\footnotesize\ttfamily \label{classinternal_1_1_decoded_stream_a62b45969ce169bef1da0600490329857} 
+template$<$typename Source\+Stream , typename \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$ \\
+unsigned \mbox{\hyperlink{classinternal_1_1_decoded_stream}{internal\+::\+Decoded\+Stream}}$<$ Source\+Stream, \mbox{\hyperlink{classrapidjson_1_1_encoding}{Encoding}} $>$\+::\+Take (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{regex_8h_source_l00055}{55}} of file \mbox{\hyperlink{regex_8h_source}{regex.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ c\ =\ codepoint\_;}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (c)\ \textcolor{comment}{//\ No\ further\ decoding\ when\ '\(\backslash\)0'}}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \ \ \ Decode();}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ c;}
+\DoxyCodeLine{00060\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/internal/\mbox{\hyperlink{regex_8h}{regex.\+h}}\end{DoxyCompactItemize}

@@ -1,0 +1,114 @@
+\doxysection{sysio\+::trace\+\_\+api\+::configuration\+\_\+utils Namespace Reference}
+\hypertarget{namespacesysio_1_1trace__api_1_1configuration__utils}{}\label{namespacesysio_1_1trace__api_1_1configuration__utils}\index{sysio::trace\_api::configuration\_utils@{sysio::trace\_api::configuration\_utils}}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1abi__def}{chain\+::abi\+\_\+def}} \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1configuration__utils_af66eb1c8879c8d045ad82f33233aed66}{abi\+\_\+def\+\_\+from\+\_\+file}} (const std\+::string \&file\+\_\+name, const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&data\+\_\+dir)
+\item 
+std\+::pair$<$ std\+::string, std\+::string $>$ \mbox{\hyperlink{namespacesysio_1_1trace__api_1_1configuration__utils_a1d240ad24c2e4abfb7daa4fa19ac36bf}{parse\+\_\+kv\+\_\+pairs}} (const std\+::string \&input)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacesysio_1_1trace__api_1_1configuration__utils_af66eb1c8879c8d045ad82f33233aed66}\index{sysio::trace\_api::configuration\_utils@{sysio::trace\_api::configuration\_utils}!abi\_def\_from\_file@{abi\_def\_from\_file}}
+\index{abi\_def\_from\_file@{abi\_def\_from\_file}!sysio::trace\_api::configuration\_utils@{sysio::trace\_api::configuration\_utils}}
+\doxysubsubsection{\texorpdfstring{abi\_def\_from\_file()}{abi\_def\_from\_file()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1trace__api_1_1configuration__utils_af66eb1c8879c8d045ad82f33233aed66} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1abi__def}{chain\+::abi\+\_\+def}} sysio\+::trace\+\_\+api\+::configuration\+\_\+utils\+::abi\+\_\+def\+\_\+from\+\_\+file (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{file\+\_\+name}{, }\item[{const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&}]{data\+\_\+dir}{}\end{DoxyParamCaption})}
+
+Given a path (absolute or relative) to a file that contains a JSON-\/encoded ABI, return the parsed ABI
+
+
+\begin{DoxyParams}{Parameters}
+{\em file\+\_\+name} & -\/ a path to the ABI \\
+\hline
+{\em data\+\_\+dir} & -\/ the base path for relative file\+\_\+name values \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the ABI implied 
+\end{DoxyReturn}
+
+\begin{DoxyExceptions}{Exceptions}
+{\em json\+\_\+parse\+\_\+exception} & if the JSON is malformed \\
+\hline
+\end{DoxyExceptions}
+
+
+Definition at line \mbox{\hyperlink{configuration__utils_8cpp_source_l00010}{10}} of file \mbox{\hyperlink{configuration__utils_8cpp_source}{configuration\+\_\+utils.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00011\ \ \ \ \{}
+\DoxyCodeLine{00012\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}\ abi\_variant;}
+\DoxyCodeLine{00013\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ abi\_path\ =\ \mbox{\hyperlink{classfc_1_1path}{fc::path}}(file\_name);}
+\DoxyCodeLine{00014\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (abi\_path.is\_relative())\ \{}
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \ \ \ abi\_path\ =\ data\_dir\ /\ abi\_path;}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\mbox{\hyperlink{namespacefc_a3fcf0d920aea28014aacae50a51d8485}{fc::exists}}(abi\_path)\ \&\&\ !\mbox{\hyperlink{namespacefc_ab123bfeadf918cc293ecad88bca7c499}{fc::is\_directory}}(abi\_path),\ chain::plugin\_config\_exception,\ \textcolor{stringliteral}{"{}\$\{path\}\ does\ not\ exist\ or\ is\ not\ a\ file"{}},\ (\textcolor{stringliteral}{"{}path"{}},\ abi\_path.generic\_string()));}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \ abi\_variant\ =\ \mbox{\hyperlink{classfc_1_1json_a0b324722ac4eb4541d50ddaeed2dcb65}{fc::json::from\_file}}(abi\_path);}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \}\ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a43bd817895cb757183fcecafc6ae7dc1}{SYS\_RETHROW\_EXCEPTIONS}}(chain::json\_parse\_exception,\ \textcolor{stringliteral}{"{}Fail\ to\ parse\ JSON\ from\ file:\ \$\{file\}"{}},\ (\textcolor{stringliteral}{"{}file"{}},\ abi\_path.generic\_string()));}
+\DoxyCodeLine{00022\ }
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1abi__def}{chain::abi\_def}}\ result;}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_accef08adf4ee05c36ccc550d8101b08f}{fc::from\_variant}}(abi\_variant,\ result);}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00026\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1trace__api_1_1configuration__utils_af66eb1c8879c8d045ad82f33233aed66_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1trace__api_1_1configuration__utils_af66eb1c8879c8d045ad82f33233aed66_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacesysio_1_1trace__api_1_1configuration__utils_a1d240ad24c2e4abfb7daa4fa19ac36bf}\index{sysio::trace\_api::configuration\_utils@{sysio::trace\_api::configuration\_utils}!parse\_kv\_pairs@{parse\_kv\_pairs}}
+\index{parse\_kv\_pairs@{parse\_kv\_pairs}!sysio::trace\_api::configuration\_utils@{sysio::trace\_api::configuration\_utils}}
+\doxysubsubsection{\texorpdfstring{parse\_kv\_pairs()}{parse\_kv\_pairs()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1trace__api_1_1configuration__utils_a1d240ad24c2e4abfb7daa4fa19ac36bf} 
+std\+::pair$<$ std\+::string, std\+::string $>$ sysio\+::trace\+\_\+api\+::configuration\+\_\+utils\+::parse\+\_\+kv\+\_\+pairs (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{input}{}\end{DoxyParamCaption})}
+
+Given a string in the form $<$key$>$=
+
+where key cannot contain an {\ttfamily =} character and value can contain anything return a pair of the two independent strings
+
+
+\begin{DoxyParams}{Parameters}
+{\em input} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{configuration__utils_8cpp_source_l00028}{28}} of file \mbox{\hyperlink{configuration__utils_8cpp_source}{configuration\+\_\+utils.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(!input.empty(),\ chain::plugin\_config\_exception,\ \textcolor{stringliteral}{"{}Key-\/Value\ Pair\ is\ Empty"{}});}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ delim\ =\ input.find(\textcolor{stringliteral}{"{}="{}});}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(delim\ !=\ std::string::npos,\ chain::plugin\_config\_exception,\ \textcolor{stringliteral}{"{}Missing\ \(\backslash\)"{}=\(\backslash\)"{}"{}});}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(delim\ !=\ 0,\ chain::plugin\_config\_exception,\ \textcolor{stringliteral}{"{}Missing\ Key"{}});}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(delim\ +\ 1\ !=\ input.size(),\ chain::plugin\_config\_exception,\ \textcolor{stringliteral}{"{}Missing\ Value"{}});}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::make\_pair(input.substr(0,\ delim),\ input.substr(delim\ +\ 1));}
+\DoxyCodeLine{00035\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1trace__api_1_1configuration__utils_a1d240ad24c2e4abfb7daa4fa19ac36bf_icgraph}
+\end{center}
+\end{figure}

@@ -1,0 +1,11 @@
+<map id="sysio::net_plugin::handle_sighup" name="sysio::net_plugin::handle_sighup">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,23,133,64"/>
+<area shape="rect" id="Node000002" href="$namespacesysio.html#ad66b67a8dd0a897a0a5b89f954fd3ade" title=" " alt="" coords="181,5,315,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="133,32,165,27,166,32,133,37"/>
+<area shape="rect" id="Node000003" href="$classfc_1_1logger.html#a2214632598874a4e52a5500a6346515e" title=" " alt="" coords="187,55,309,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="133,49,172,55,171,60,133,55"/>
+<area shape="rect" id="Node000004" href="$classfc_1_1logger.html#ad8267d78496b4a3241148afd11fa2e03" title=" " alt="" coords="378,25,494,51"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="309,55,363,47,364,52,310,61"/>
+<area shape="rect" id="Node000005" href="$structfc_1_1log__config.html#ad7c05723f767652011149945ae0308e1" title=" " alt="" coords="363,75,509,116"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="310,74,348,80,347,85,309,79"/>
+</map>

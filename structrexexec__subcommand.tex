@@ -1,0 +1,112 @@
+\doxysection{rexexec\+\_\+subcommand Struct Reference}
+\hypertarget{structrexexec__subcommand}{}\label{structrexexec__subcommand}\index{rexexec\_subcommand@{rexexec\_subcommand}}
+
+
+Collaboration diagram for rexexec\+\_\+subcommand\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=194pt]{structrexexec__subcommand__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structrexexec__subcommand_ae01c272a46ec790ca302c0c9a3c0da2b}{rexexec\+\_\+subcommand}} (\mbox{\hyperlink{class_c_l_i_1_1_app}{CLI\+::\+App}} \texorpdfstring{$\ast$}{*}action\+Root)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structrexexec__subcommand_ac83b06f61a6a4e944758c11c26bf882c}{user\+\_\+str}}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structrexexec__subcommand_af860061fa2fce2cf30558d38c501261e}{max\+\_\+str}}
+\item 
+const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \mbox{\hyperlink{structrexexec__subcommand_ab13d5e6e45216c3b2a29120a39c9c9d3}{act\+\_\+name}} \{ "{}rexexec"{}\+\_\+n \}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l02175}{2175}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structrexexec__subcommand_ae01c272a46ec790ca302c0c9a3c0da2b}\index{rexexec\_subcommand@{rexexec\_subcommand}!rexexec\_subcommand@{rexexec\_subcommand}}
+\index{rexexec\_subcommand@{rexexec\_subcommand}!rexexec\_subcommand@{rexexec\_subcommand}}
+\doxysubsubsection{\texorpdfstring{rexexec\_subcommand()}{rexexec\_subcommand()}}
+{\footnotesize\ttfamily \label{structrexexec__subcommand_ae01c272a46ec790ca302c0c9a3c0da2b} 
+rexexec\+\_\+subcommand\+::rexexec\+\_\+subcommand (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_c_l_i_1_1_app}{CLI\+::\+App}} \texorpdfstring{$\ast$}{*}}]{action\+Root}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l02180}{2180}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02180\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02181\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ rexexec\ =\ actionRoot-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_a8b461d2233ec4121259011b5ed24b336}{add\_subcommand}}(\textcolor{stringliteral}{"{}rexexec"{}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}Perform\ REX\ maintenance\ by\ processing\ expired\ loans\ and\ unfilled\ sell\ orders"{}}));}
+\DoxyCodeLine{02182\ \ \ \ \ \ \ rexexec-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_a8c812d42c7720ecb5cd0aec41b5aa941}{add\_option}}(\textcolor{stringliteral}{"{}user"{}},\ \mbox{\hyperlink{structrexexec__subcommand_ac83b06f61a6a4e944758c11c26bf882c}{user\_str}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}User\ executing\ the\ action"{}}))-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a}{required}}();}
+\DoxyCodeLine{02183\ \ \ \ \ \ \ rexexec-\/>add\_option(\textcolor{stringliteral}{"{}max"{}},\ \ \mbox{\hyperlink{structrexexec__subcommand_af860061fa2fce2cf30558d38c501261e}{max\_str}},\ \ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}Maximum\ number\ of\ CPU\ loans,\ Network\ loans,\ and\ sell\ orders\ to\ be\ processed"{}}))-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a}{required}}();}
+\DoxyCodeLine{02184\ \ \ \ \ \ \ \mbox{\hyperlink{programs_2clio_2main_8cpp_aa5d53f41b83b5323c73622fbbb15e9cd}{add\_standard\_transaction\_options}}(rexexec,\ \textcolor{stringliteral}{"{}user@active"{}});}
+\DoxyCodeLine{02185\ \ \ \ \ \ \ rexexec-\/>callback([\textcolor{keyword}{this}]\ \{}
+\DoxyCodeLine{02186\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}\ act\_payload\ =\ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}()}
+\DoxyCodeLine{02187\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}user"{}},\ \mbox{\hyperlink{structrexexec__subcommand_ac83b06f61a6a4e944758c11c26bf882c}{user\_str}})}
+\DoxyCodeLine{02188\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}max"{}},\ \ \mbox{\hyperlink{structrexexec__subcommand_af860061fa2fce2cf30558d38c501261e}{max\_str}});}
+\DoxyCodeLine{02189\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ accountPermissions\ =\ \mbox{\hyperlink{programs_2clio_2main_8cpp_a2b91ca5dbe7cc4ab287d0e44c3037552}{get\_account\_permissions}}(\mbox{\hyperlink{programs_2clio_2main_8cpp_ad552924cb151dcd5b60c73856d1ff706}{tx\_permission}},\ \{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(\mbox{\hyperlink{structrexexec__subcommand_ac83b06f61a6a4e944758c11c26bf882c}{user\_str}}),\ config::active\_name\});}
+\DoxyCodeLine{02190\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{programs_2clio_2main_8cpp_aaf784434864a29e4835be7465173d1ab}{send\_actions}}(\{\mbox{\hyperlink{programs_2clio_2main_8cpp_a067e20df5f65333b0c3cf5840bc37dea}{create\_action}}(accountPermissions,\ config::system\_account\_name,\ \mbox{\hyperlink{structrexexec__subcommand_ab13d5e6e45216c3b2a29120a39c9c9d3}{act\_name}},\ act\_payload)\});}
+\DoxyCodeLine{02191\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{02192\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structrexexec__subcommand_ae01c272a46ec790ca302c0c9a3c0da2b_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structrexexec__subcommand_ab13d5e6e45216c3b2a29120a39c9c9d3}\index{rexexec\_subcommand@{rexexec\_subcommand}!act\_name@{act\_name}}
+\index{act\_name@{act\_name}!rexexec\_subcommand@{rexexec\_subcommand}}
+\doxysubsubsection{\texorpdfstring{act\_name}{act\_name}}
+{\footnotesize\ttfamily \label{structrexexec__subcommand_ab13d5e6e45216c3b2a29120a39c9c9d3} 
+const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} rexexec\+\_\+subcommand\+::act\+\_\+name \{ "{}rexexec"{}\+\_\+n \}}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l02178}{2178}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02178\ \{\ \textcolor{stringliteral}{"{}rexexec"{}}\_n\ \};}
+
+\end{DoxyCode}
+\Hypertarget{structrexexec__subcommand_af860061fa2fce2cf30558d38c501261e}\index{rexexec\_subcommand@{rexexec\_subcommand}!max\_str@{max\_str}}
+\index{max\_str@{max\_str}!rexexec\_subcommand@{rexexec\_subcommand}}
+\doxysubsubsection{\texorpdfstring{max\_str}{max\_str}}
+{\footnotesize\ttfamily \label{structrexexec__subcommand_af860061fa2fce2cf30558d38c501261e} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} rexexec\+\_\+subcommand\+::max\+\_\+str}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l02177}{2177}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{structrexexec__subcommand_ac83b06f61a6a4e944758c11c26bf882c}\index{rexexec\_subcommand@{rexexec\_subcommand}!user\_str@{user\_str}}
+\index{user\_str@{user\_str}!rexexec\_subcommand@{rexexec\_subcommand}}
+\doxysubsubsection{\texorpdfstring{user\_str}{user\_str}}
+{\footnotesize\ttfamily \label{structrexexec__subcommand_ac83b06f61a6a4e944758c11c26bf882c} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} rexexec\+\_\+subcommand\+::user\+\_\+str}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l02176}{2176}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+programs/clio/\mbox{\hyperlink{programs_2clio_2main_8cpp}{main.\+cpp}}\end{DoxyCompactItemize}

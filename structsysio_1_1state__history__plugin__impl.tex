@@ -1,0 +1,637 @@
+\doxysection{sysio\+::state\+\_\+history\+\_\+plugin\+\_\+impl Struct Reference}
+\hypertarget{structsysio_1_1state__history__plugin__impl}{}\label{structsysio_1_1state__history__plugin__impl}\index{sysio::state\_history\_plugin\_impl@{sysio::state\_history\_plugin\_impl}}
+
+
+Inheritance diagram for sysio\+::state\+\_\+history\+\_\+plugin\+\_\+impl\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=207pt]{structsysio_1_1state__history__plugin__impl__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for sysio\+::state\+\_\+history\+\_\+plugin\+\_\+impl\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1state__history__plugin__impl__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_1_1session}{session}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_a56d753369a9efd6baba579e7c78bc215}{get\+\_\+log\+\_\+entry}} (\mbox{\hyperlink{classsysio_1_1state__history__log}{state\+\_\+history\+\_\+log}} \&log, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} block\+\_\+num, std\+::optional$<$ \mbox{\hyperlink{namespacesysio_1_1chain_ac6f5a1f1e061f000983f5d5f3ac25dfa}{bytes}} $>$ \&result)
+\item 
+void \mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_a7ef3e3d06885019c0534ea6ce523a53b}{get\+\_\+block}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} block\+\_\+num, const \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\+\_\+state\+\_\+ptr}} \&\mbox{\hyperlink{structsysio_1_1chain_1_1block__state}{block\+\_\+state}}, std\+::optional$<$ \mbox{\hyperlink{namespacesysio_1_1chain_ac6f5a1f1e061f000983f5d5f3ac25dfa}{bytes}} $>$ \&result)
+\item 
+std\+::optional$<$ \mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{chain\+::block\+\_\+id\+\_\+type}} $>$ \mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_ace95f06f4285cacae5b90fd9d1d37d9b}{get\+\_\+block\+\_\+id}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} block\+\_\+num)
+\item 
+void \mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_aa07f08c970ed998ace29eefae07b34a8}{listen}} ()
+\item 
+void \mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_a56b6db862623604c7dda3a358ab3d6f6}{do\+\_\+accept}} ()
+\item 
+void \mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_a7b2032a96cd68192060f52a0e3706509}{on\+\_\+applied\+\_\+transaction}} (const \mbox{\hyperlink{namespacesysio_1_1chain_a4ee2867a6bec961c7a78b203cfd76be9}{transaction\+\_\+trace\+\_\+ptr}} \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}, const \mbox{\hyperlink{namespacesysio_1_1chain_a7041c0316bd294d0866609ab3e0cc7a7}{packed\+\_\+transaction\+\_\+ptr}} \&t)
+\item 
+void \mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_aaa0729b45ec2388fbc2b5feefde76292}{on\+\_\+accepted\+\_\+block}} (const \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\+\_\+state\+\_\+ptr}} \&\mbox{\hyperlink{structsysio_1_1chain_1_1block__state}{block\+\_\+state}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_a5fe584dc482c6efb24bfee245a422aad}{on\+\_\+block\+\_\+start}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} block\+\_\+num)
+\item 
+void \mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_a6283b64f4a4f7575b66117434c188893}{clear\+\_\+caches}} ()
+\item 
+void \mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_a2074796cb93f0dda90a98f2d5ef143ee}{store\+\_\+traces}} (const \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\+\_\+state\+\_\+ptr}} \&\mbox{\hyperlink{structsysio_1_1chain_1_1block__state}{block\+\_\+state}})
+\item 
+void \mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_abada9ce88fb6a33aa4ac4c9d4726bf67}{store\+\_\+chain\+\_\+state}} (const \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\+\_\+state\+\_\+ptr}} \&\mbox{\hyperlink{structsysio_1_1chain_1_1block__state}{block\+\_\+state}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classsysio_1_1chain__plugin}{chain\+\_\+plugin}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_a654fe8a01daf92d5ae666b0188517279}{chain\+\_\+plug}} = nullptr
+\item 
+std\+::optional$<$ \mbox{\hyperlink{classsysio_1_1state__history__log}{state\+\_\+history\+\_\+log}} $>$ \mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_a0b55dd4e7ba346185889034127a928a7}{trace\+\_\+log}}
+\item 
+std\+::optional$<$ \mbox{\hyperlink{classsysio_1_1state__history__log}{state\+\_\+history\+\_\+log}} $>$ \mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_ab0e254998fcee36e133e5877460fad60}{chain\+\_\+state\+\_\+log}}
+\item 
+bool \mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_aa15bf609ad3717258b4efeedb797b7d6}{trace\+\_\+debug\+\_\+mode}} = false
+\item 
+bool \mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_ae6d60f7f7d51ac9bdb5e371dc65fc689}{stopping}} = false
+\item 
+std\+::optional$<$ scoped\+\_\+connection $>$ \mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_aa276ab215f0a9cb920083343a0bbc02f}{applied\+\_\+transaction\+\_\+connection}}
+\item 
+std\+::optional$<$ scoped\+\_\+connection $>$ \mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_ab775b914c7586cd47b366f7bbb7007f9}{block\+\_\+start\+\_\+connection}}
+\item 
+std\+::optional$<$ scoped\+\_\+connection $>$ \mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_a20d4a6d1a901fe6aa14a2e13554a8834}{accepted\+\_\+block\+\_\+connection}}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_a85a9831f498ad989b757699d91c64e0b}{endpoint\+\_\+address}} = "{}0.\+0.\+0.\+0"{}
+\item 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_a675dbf4b298fdea99a1622ca781f474a}{endpoint\+\_\+port}} = 8080
+\item 
+std\+::unique\+\_\+ptr$<$ tcp\+::acceptor $>$ \mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_a083a559f89920f6549db0cfa2ff19ea4}{acceptor}}
+\item 
+\mbox{\hyperlink{structsysio_1_1state__history_1_1trace__converter}{state\+\_\+history\+::trace\+\_\+converter}} \mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_a3ee433db4de5dff30dae5963e7312618}{trace\+\_\+converter}}
+\item 
+std\+::map$<$ \mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_1_1session}{session}} \texorpdfstring{$\ast$}{*}, std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_1_1session}{session}} $>$ $>$ \mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_a0b718f0ae6e2f9daa4d578a70ca1d6cf}{sessions}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{state__history__plugin_8cpp_source_l00043}{43}} of file \mbox{\hyperlink{state__history__plugin_8cpp_source}{state\+\_\+history\+\_\+plugin.\+cpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1state__history__plugin__impl_a6283b64f4a4f7575b66117434c188893}\index{sysio::state\_history\_plugin\_impl@{sysio::state\_history\_plugin\_impl}!clear\_caches@{clear\_caches}}
+\index{clear\_caches@{clear\_caches}!sysio::state\_history\_plugin\_impl@{sysio::state\_history\_plugin\_impl}}
+\doxysubsubsection{\texorpdfstring{clear\_caches()}{clear\_caches()}}
+{\footnotesize\ttfamily \label{structsysio_1_1state__history__plugin__impl_a6283b64f4a4f7575b66117434c188893} 
+void sysio\+::state\+\_\+history\+\_\+plugin\+\_\+impl\+::clear\+\_\+caches (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{state__history__plugin_8cpp_source_l00387}{387}} of file \mbox{\hyperlink{state__history__plugin_8cpp_source}{state\+\_\+history\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00387\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00388\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_a3ee433db4de5dff30dae5963e7312618}{trace\_converter}}.\mbox{\hyperlink{structsysio_1_1state__history_1_1trace__converter_ad0809adfb2d44c4587a46763d02efdaf}{cached\_traces}}.clear();}
+\DoxyCodeLine{00389\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_a3ee433db4de5dff30dae5963e7312618}{trace\_converter}}.\mbox{\hyperlink{structsysio_1_1state__history_1_1trace__converter_a86c4c2c779102104f43943f1278f58dc}{onblock\_trace}}.reset();}
+\DoxyCodeLine{00390\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1state__history__plugin__impl_a6283b64f4a4f7575b66117434c188893_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1state__history__plugin__impl_a56b6db862623604c7dda3a358ab3d6f6}\index{sysio::state\_history\_plugin\_impl@{sysio::state\_history\_plugin\_impl}!do\_accept@{do\_accept}}
+\index{do\_accept@{do\_accept}!sysio::state\_history\_plugin\_impl@{sysio::state\_history\_plugin\_impl}}
+\doxysubsubsection{\texorpdfstring{do\_accept()}{do\_accept()}}
+{\footnotesize\ttfamily \label{structsysio_1_1state__history__plugin__impl_a56b6db862623604c7dda3a358ab3d6f6} 
+void sysio\+::state\+\_\+history\+\_\+plugin\+\_\+impl\+::do\+\_\+accept (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{state__history__plugin_8cpp_source_l00335}{335}} of file \mbox{\hyperlink{state__history__plugin_8cpp_source}{state\+\_\+history\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00335\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00336\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ socket\ =\ std::make\_shared<tcp::socket>(\mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().get\_io\_service());}
+\DoxyCodeLine{00337\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_a083a559f89920f6549db0cfa2ff19ea4}{acceptor}}-\/>async\_accept(*socket,\ [\mbox{\hyperlink{namespacesysio_a5c18cd9d34b8c5d3af8e2de75577673fa1f42b089b0bc1105b38f19140a65cc2a}{self}}\ =\ shared\_from\_this(),\ socket,\ \textcolor{keyword}{this}](\textcolor{keyword}{const}\ boost::system::error\_code\&\ ec)\ \{}
+\DoxyCodeLine{00338\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_ae6d60f7f7d51ac9bdb5e371dc65fc689}{stopping}})}
+\DoxyCodeLine{00339\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00340\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ec)\ \{}
+\DoxyCodeLine{00341\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ec\ ==\ boost::system::errc::too\_many\_files\_open)}
+\DoxyCodeLine{00342\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_a39cc68aac0c6e19efdcf077c000b87a7}{catch\_and\_log}}([\&]\ \{\ \mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_a56b6db862623604c7dda3a358ab3d6f6}{do\_accept}}();\ \});}
+\DoxyCodeLine{00343\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00344\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00345\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_a39cc68aac0c6e19efdcf077c000b87a7}{catch\_and\_log}}([\&]\ \{}
+\DoxyCodeLine{00346\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ \ \ \ \ \ \ \ \ \ \ \ =\ std::make\_shared<session>(\mbox{\hyperlink{namespacesysio_a5c18cd9d34b8c5d3af8e2de75577673fa1f42b089b0bc1105b38f19140a65cc2a}{self}});}
+\DoxyCodeLine{00347\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_a0b718f0ae6e2f9daa4d578a70ca1d6cf}{sessions}}[\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.get()]\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{00348\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}-\/>start(std::move(*socket));}
+\DoxyCodeLine{00349\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00350\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_a39cc68aac0c6e19efdcf077c000b87a7}{catch\_and\_log}}([\&]\ \{\ \mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_a56b6db862623604c7dda3a358ab3d6f6}{do\_accept}}();\ \});}
+\DoxyCodeLine{00351\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00352\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1state__history__plugin__impl_a56b6db862623604c7dda3a358ab3d6f6_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=339pt]{structsysio_1_1state__history__plugin__impl_a56b6db862623604c7dda3a358ab3d6f6_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1state__history__plugin__impl_a7ef3e3d06885019c0534ea6ce523a53b}\index{sysio::state\_history\_plugin\_impl@{sysio::state\_history\_plugin\_impl}!get\_block@{get\_block}}
+\index{get\_block@{get\_block}!sysio::state\_history\_plugin\_impl@{sysio::state\_history\_plugin\_impl}}
+\doxysubsubsection{\texorpdfstring{get\_block()}{get\_block()}}
+{\footnotesize\ttfamily \label{structsysio_1_1state__history__plugin__impl_a7ef3e3d06885019c0534ea6ce523a53b} 
+void sysio\+::state\+\_\+history\+\_\+plugin\+\_\+impl\+::get\+\_\+block (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{block\+\_\+num}{, }\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\+\_\+state\+\_\+ptr}} \&}]{block\+\_\+state}{, }\item[{std\+::optional$<$ \mbox{\hyperlink{namespacesysio_1_1chain_ac6f5a1f1e061f000983f5d5f3ac25dfa}{bytes}} $>$ \&}]{result}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{state__history__plugin_8cpp_source_l00074}{74}} of file \mbox{\hyperlink{state__history__plugin_8cpp_source}{state\+\_\+history\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_aa10ee348c57604b615bc8570f6685102}{chain::signed\_block\_ptr}}\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}};}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ block\_state\ \&\&\ block\_num\ ==\ block\_state-\/>block\_num\ )\ \{}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ block\_state-\/>block;}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ \mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_a654fe8a01daf92d5ae666b0188517279}{chain\_plug}}-\/>\mbox{\hyperlink{classsysio_1_1chain__plugin_a14a5e77b31ecf267c8062267d03440ae}{chain}}().\mbox{\hyperlink{classsysio_1_1chain_1_1controller_a1379e43325b7e517a058bddce15571eb}{fetch\_block\_by\_number}}(\ block\_num\ );}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \ result\ =\ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(*\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}});}
+\DoxyCodeLine{00087\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1state__history__plugin__impl_a7ef3e3d06885019c0534ea6ce523a53b_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1state__history__plugin__impl_ace95f06f4285cacae5b90fd9d1d37d9b}\index{sysio::state\_history\_plugin\_impl@{sysio::state\_history\_plugin\_impl}!get\_block\_id@{get\_block\_id}}
+\index{get\_block\_id@{get\_block\_id}!sysio::state\_history\_plugin\_impl@{sysio::state\_history\_plugin\_impl}}
+\doxysubsubsection{\texorpdfstring{get\_block\_id()}{get\_block\_id()}}
+{\footnotesize\ttfamily \label{structsysio_1_1state__history__plugin__impl_ace95f06f4285cacae5b90fd9d1d37d9b} 
+std\+::optional$<$ \mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{chain\+::block\+\_\+id\+\_\+type}} $>$ sysio\+::state\+\_\+history\+\_\+plugin\+\_\+impl\+::get\+\_\+block\+\_\+id (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{block\+\_\+num}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{state__history__plugin_8cpp_source_l00089}{89}} of file \mbox{\hyperlink{state__history__plugin_8cpp_source}{state\+\_\+history\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_a0b55dd4e7ba346185889034127a928a7}{trace\_log}}\ \&\&\ block\_num\ >=\ \mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_a0b55dd4e7ba346185889034127a928a7}{trace\_log}}-\/>begin\_block()\ \&\&\ block\_num\ <\ trace\_log-\/>end\_block())}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_a0b55dd4e7ba346185889034127a928a7}{trace\_log}}-\/>get\_block\_id(block\_num);}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_ab0e254998fcee36e133e5877460fad60}{chain\_state\_log}}\ \&\&\ block\_num\ >=\ \mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_ab0e254998fcee36e133e5877460fad60}{chain\_state\_log}}-\/>begin\_block()\ \&\&\ block\_num\ <\ chain\_state\_log-\/>end\_block())}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_ab0e254998fcee36e133e5877460fad60}{chain\_state\_log}}-\/>get\_block\_id(block\_num);}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_a654fe8a01daf92d5ae666b0188517279}{chain\_plug}}-\/>\mbox{\hyperlink{classsysio_1_1chain__plugin_a14a5e77b31ecf267c8062267d03440ae}{chain}}().\mbox{\hyperlink{classsysio_1_1chain_1_1controller_a9a55edb4766f1f3302ede12e329b1ea6}{get\_block\_id\_for\_num}}(block\_num);}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{\}}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{\};}
+\DoxyCodeLine{00098\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1state__history__plugin__impl_ace95f06f4285cacae5b90fd9d1d37d9b_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1state__history__plugin__impl_a56d753369a9efd6baba579e7c78bc215}\index{sysio::state\_history\_plugin\_impl@{sysio::state\_history\_plugin\_impl}!get\_log\_entry@{get\_log\_entry}}
+\index{get\_log\_entry@{get\_log\_entry}!sysio::state\_history\_plugin\_impl@{sysio::state\_history\_plugin\_impl}}
+\doxysubsubsection{\texorpdfstring{get\_log\_entry()}{get\_log\_entry()}}
+{\footnotesize\ttfamily \label{structsysio_1_1state__history__plugin__impl_a56d753369a9efd6baba579e7c78bc215} 
+void sysio\+::state\+\_\+history\+\_\+plugin\+\_\+impl\+::get\+\_\+log\+\_\+entry (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classsysio_1_1state__history__log}{state\+\_\+history\+\_\+log}} \&}]{log}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{block\+\_\+num}{, }\item[{std\+::optional$<$ \mbox{\hyperlink{namespacesysio_1_1chain_ac6f5a1f1e061f000983f5d5f3ac25dfa}{bytes}} $>$ \&}]{result}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{state__history__plugin_8cpp_source_l00057}{57}} of file \mbox{\hyperlink{state__history__plugin_8cpp_source}{state\+\_\+history\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (block\_num\ <\ log.begin\_block()\ ||\ block\_num\ >=\ log.end\_block())}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ state\_history\_log\_header\ header;}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ stream\ =\ log.get\_entry(block\_num,\ header);}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \textcolor{comment}{//\ Compressed\ deltas\ now\ exceeds\ 4GB\ on\ one\ of\ the\ public\ chains.\ This\ length\ prefix}}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \textcolor{comment}{//\ was\ intended\ to\ support\ adding\ additional\ fields\ in\ the\ future\ after\ the}}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \textcolor{comment}{//\ packed\ deltas\ or\ packed\ traces.\ For\ now\ we're\ going\ to\ ignore\ on\ read.}}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ stream.read((\textcolor{keywordtype}{char}*)\&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}));}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ s2\ =\ header.payload\_size\ -\/\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_ac6f5a1f1e061f000983f5d5f3ac25dfa}{bytes}}\ \ \ \ compressed(s2);}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (s2)}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ stream.read(compressed.data(),\ s2);}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ result\ =\ \mbox{\hyperlink{namespacesysio_1_1state__history_a81fbdf52169b3b2295f3911729f09142}{state\_history::zlib\_decompress}}(compressed);}
+\DoxyCodeLine{00072\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1state__history__plugin__impl_a56d753369a9efd6baba579e7c78bc215_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1state__history__plugin__impl_aa07f08c970ed998ace29eefae07b34a8}\index{sysio::state\_history\_plugin\_impl@{sysio::state\_history\_plugin\_impl}!listen@{listen}}
+\index{listen@{listen}!sysio::state\_history\_plugin\_impl@{sysio::state\_history\_plugin\_impl}}
+\doxysubsubsection{\texorpdfstring{listen()}{listen()}}
+{\footnotesize\ttfamily \label{structsysio_1_1state__history__plugin__impl_aa07f08c970ed998ace29eefae07b34a8} 
+void sysio\+::state\+\_\+history\+\_\+plugin\+\_\+impl\+::listen (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{state__history__plugin_8cpp_source_l00311}{311}} of file \mbox{\hyperlink{state__history__plugin_8cpp_source}{state\+\_\+history\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00311\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00312\ \ \ \ \ \ \ boost::system::error\_code\ ec;}
+\DoxyCodeLine{00313\ }
+\DoxyCodeLine{00314\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ address\ \ =\ boost::asio::ip::make\_address(\mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_a85a9831f498ad989b757699d91c64e0b}{endpoint\_address}});}
+\DoxyCodeLine{00315\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ endpoint\ =\ tcp::endpoint\{address,\ \mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_a675dbf4b298fdea99a1622ca781f474a}{endpoint\_port}}\};}
+\DoxyCodeLine{00316\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_a083a559f89920f6549db0cfa2ff19ea4}{acceptor}}\ \ \ \ \ \ =\ std::make\_unique<tcp::acceptor>(\mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}}().get\_io\_service());}
+\DoxyCodeLine{00317\ }
+\DoxyCodeLine{00318\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{integration_8cpp_a52bf86a8ad8e1f4b06a5071f23327e5a}{check\_ec}}\ =\ [\&](\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ what)\ \{}
+\DoxyCodeLine{00319\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!ec)}
+\DoxyCodeLine{00320\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00321\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}}(\textcolor{stringliteral}{"{}\$\{w\}:\ \$\{m\}"{}},\ (\textcolor{stringliteral}{"{}w"{}},\ what)(\textcolor{stringliteral}{"{}m"{}},\ ec.message()));}
+\DoxyCodeLine{00322\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\textcolor{keyword}{false},\ plugin\_exception,\ \textcolor{stringliteral}{"{}unable\ to\ open\ listen\ socket"{}});}
+\DoxyCodeLine{00323\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00324\ }
+\DoxyCodeLine{00325\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_a083a559f89920f6549db0cfa2ff19ea4}{acceptor}}-\/>open(endpoint.protocol(),\ ec);}
+\DoxyCodeLine{00326\ \ \ \ \ \ \ \mbox{\hyperlink{integration_8cpp_a52bf86a8ad8e1f4b06a5071f23327e5a}{check\_ec}}(\textcolor{stringliteral}{"{}open"{}});}
+\DoxyCodeLine{00327\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_a083a559f89920f6549db0cfa2ff19ea4}{acceptor}}-\/>set\_option(boost::asio::socket\_base::reuse\_address(\textcolor{keyword}{true}));}
+\DoxyCodeLine{00328\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_a083a559f89920f6549db0cfa2ff19ea4}{acceptor}}-\/>bind(endpoint,\ ec);}
+\DoxyCodeLine{00329\ \ \ \ \ \ \ \mbox{\hyperlink{integration_8cpp_a52bf86a8ad8e1f4b06a5071f23327e5a}{check\_ec}}(\textcolor{stringliteral}{"{}bind"{}});}
+\DoxyCodeLine{00330\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_a083a559f89920f6549db0cfa2ff19ea4}{acceptor}}-\/>listen(boost::asio::socket\_base::max\_listen\_connections,\ ec);}
+\DoxyCodeLine{00331\ \ \ \ \ \ \ \mbox{\hyperlink{integration_8cpp_a52bf86a8ad8e1f4b06a5071f23327e5a}{check\_ec}}(\textcolor{stringliteral}{"{}listen"{}});}
+\DoxyCodeLine{00332\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_a56b6db862623604c7dda3a358ab3d6f6}{do\_accept}}();}
+\DoxyCodeLine{00333\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1state__history__plugin__impl_aa07f08c970ed998ace29eefae07b34a8_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1state__history__plugin__impl_aaa0729b45ec2388fbc2b5feefde76292}\index{sysio::state\_history\_plugin\_impl@{sysio::state\_history\_plugin\_impl}!on\_accepted\_block@{on\_accepted\_block}}
+\index{on\_accepted\_block@{on\_accepted\_block}!sysio::state\_history\_plugin\_impl@{sysio::state\_history\_plugin\_impl}}
+\doxysubsubsection{\texorpdfstring{on\_accepted\_block()}{on\_accepted\_block()}}
+{\footnotesize\ttfamily \label{structsysio_1_1state__history__plugin__impl_aaa0729b45ec2388fbc2b5feefde76292} 
+void sysio\+::state\+\_\+history\+\_\+plugin\+\_\+impl\+::on\+\_\+accepted\+\_\+block (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\+\_\+state\+\_\+ptr}} \&}]{block\+\_\+state}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{state__history__plugin_8cpp_source_l00359}{359}} of file \mbox{\hyperlink{state__history__plugin_8cpp_source}{state\+\_\+history\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00359\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00360\ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00361\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_a2074796cb93f0dda90a98f2d5ef143ee}{store\_traces}}(block\_state);}
+\DoxyCodeLine{00362\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_abada9ce88fb6a33aa4ac4c9d4726bf67}{store\_chain\_state}}(block\_state);}
+\DoxyCodeLine{00363\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1exception}{fc::exception}}\&\ e)\ \{}
+\DoxyCodeLine{00364\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}}(\textcolor{stringliteral}{"{}fc::exception:\ \$\{details\}"{}},\ (\textcolor{stringliteral}{"{}details"{}},\ e.\mbox{\hyperlink{classfc_1_1exception_a7611ea8fbe25dde56649b685c2298a37}{to\_detail\_string}}()));}
+\DoxyCodeLine{00365\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Both\ app().quit()\ and\ exception\ throwing\ are\ required.\ Without\ app().quit(),}}
+\DoxyCodeLine{00366\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ the\ exception\ would\ be\ caught\ and\ drop\ before\ reaching\ main().\ The\ exception\ is}}
+\DoxyCodeLine{00367\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ to\ ensure\ the\ block\ won't\ be\ commited.}}
+\DoxyCodeLine{00368\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{appbase::app}}().\mbox{\hyperlink{classappbase_1_1application_a81aa58d3f94570b7976145039155fc46}{quit}}();}
+\DoxyCodeLine{00369\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a1bfa656552ea0534b2c91ee0fe33f850}{SYS\_THROW}}(}
+\DoxyCodeLine{00370\ \ \ \ \ \ \ \ \ \ \ \ \ \ chain::state\_history\_write\_exception,}
+\DoxyCodeLine{00371\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}State\ history\ encountered\ an\ Error\ which\ it\ cannot\ recover\ from.\ \ Please\ resolve\ the\ error\ and\ relaunch\ "{}}}
+\DoxyCodeLine{00372\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}the\ process"{}});}
+\DoxyCodeLine{00373\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00374\ }
+\DoxyCodeLine{00375\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ :\ \mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_a0b718f0ae6e2f9daa4d578a70ca1d6cf}{sessions}})\ \{}
+\DoxyCodeLine{00376\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.second;}
+\DoxyCodeLine{00377\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})\ \{}
+\DoxyCodeLine{00378\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}-\/>current\_request\ \&\&\ block\_state-\/>block\_num\ <\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}-\/>current\_request-\/>start\_block\_num)}
+\DoxyCodeLine{00379\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}-\/>current\_request-\/>start\_block\_num\ =\ block\_state-\/>block\_num;}
+\DoxyCodeLine{00380\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}-\/>send\_update(block\_state);}
+\DoxyCodeLine{00381\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00382\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00383\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1state__history__plugin__impl_aaa0729b45ec2388fbc2b5feefde76292_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1state__history__plugin__impl_a7b2032a96cd68192060f52a0e3706509}\index{sysio::state\_history\_plugin\_impl@{sysio::state\_history\_plugin\_impl}!on\_applied\_transaction@{on\_applied\_transaction}}
+\index{on\_applied\_transaction@{on\_applied\_transaction}!sysio::state\_history\_plugin\_impl@{sysio::state\_history\_plugin\_impl}}
+\doxysubsubsection{\texorpdfstring{on\_applied\_transaction()}{on\_applied\_transaction()}}
+{\footnotesize\ttfamily \label{structsysio_1_1state__history__plugin__impl_a7b2032a96cd68192060f52a0e3706509} 
+void sysio\+::state\+\_\+history\+\_\+plugin\+\_\+impl\+::on\+\_\+applied\+\_\+transaction (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_a4ee2867a6bec961c7a78b203cfd76be9}{transaction\+\_\+trace\+\_\+ptr}} \&}]{p}{, }\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_a7041c0316bd294d0866609ab3e0cc7a7}{packed\+\_\+transaction\+\_\+ptr}} \&}]{t}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{state__history__plugin_8cpp_source_l00354}{354}} of file \mbox{\hyperlink{state__history__plugin_8cpp_source}{state\+\_\+history\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00354\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00355\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_a0b55dd4e7ba346185889034127a928a7}{trace\_log}})}
+\DoxyCodeLine{00356\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_a3ee433db4de5dff30dae5963e7312618}{trace\_converter}}.\mbox{\hyperlink{structsysio_1_1state__history_1_1trace__converter_ab4ca84fdc2d30675408e6e9f4d4c18c8}{add\_transaction}}(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\ t);}
+\DoxyCodeLine{00357\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1state__history__plugin__impl_a7b2032a96cd68192060f52a0e3706509_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1state__history__plugin__impl_a5fe584dc482c6efb24bfee245a422aad}\index{sysio::state\_history\_plugin\_impl@{sysio::state\_history\_plugin\_impl}!on\_block\_start@{on\_block\_start}}
+\index{on\_block\_start@{on\_block\_start}!sysio::state\_history\_plugin\_impl@{sysio::state\_history\_plugin\_impl}}
+\doxysubsubsection{\texorpdfstring{on\_block\_start()}{on\_block\_start()}}
+{\footnotesize\ttfamily \label{structsysio_1_1state__history__plugin__impl_a5fe584dc482c6efb24bfee245a422aad} 
+void sysio\+::state\+\_\+history\+\_\+plugin\+\_\+impl\+::on\+\_\+block\+\_\+start (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{block\+\_\+num}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{state__history__plugin_8cpp_source_l00385}{385}} of file \mbox{\hyperlink{state__history__plugin_8cpp_source}{state\+\_\+history\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00385\ \{\ \mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_a6283b64f4a4f7575b66117434c188893}{clear\_caches}}();\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1state__history__plugin__impl_a5fe584dc482c6efb24bfee245a422aad_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1state__history__plugin__impl_abada9ce88fb6a33aa4ac4c9d4726bf67}\index{sysio::state\_history\_plugin\_impl@{sysio::state\_history\_plugin\_impl}!store\_chain\_state@{store\_chain\_state}}
+\index{store\_chain\_state@{store\_chain\_state}!sysio::state\_history\_plugin\_impl@{sysio::state\_history\_plugin\_impl}}
+\doxysubsubsection{\texorpdfstring{store\_chain\_state()}{store\_chain\_state()}}
+{\footnotesize\ttfamily \label{structsysio_1_1state__history__plugin__impl_abada9ce88fb6a33aa4ac4c9d4726bf67} 
+void sysio\+::state\+\_\+history\+\_\+plugin\+\_\+impl\+::store\+\_\+chain\+\_\+state (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\+\_\+state\+\_\+ptr}} \&}]{block\+\_\+state}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{state__history__plugin_8cpp_source_l00411}{411}} of file \mbox{\hyperlink{state__history__plugin_8cpp_source}{state\+\_\+history\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00411\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00412\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_ab0e254998fcee36e133e5877460fad60}{chain\_state\_log}})}
+\DoxyCodeLine{00413\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00414\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ fresh\ =\ \mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_ab0e254998fcee36e133e5877460fad60}{chain\_state\_log}}-\/>begin\_block()\ ==\ \mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_ab0e254998fcee36e133e5877460fad60}{chain\_state\_log}}-\/>end\_block();}
+\DoxyCodeLine{00415\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (fresh)}
+\DoxyCodeLine{00416\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\textcolor{stringliteral}{"{}Placing\ initial\ state\ in\ block\ \$\{n\}"{}},\ (\textcolor{stringliteral}{"{}n"{}},\ block\_state-\/>block-\/>block\_num()));}
+\DoxyCodeLine{00417\ }
+\DoxyCodeLine{00418\ \ \ \ \ \ \ std::vector<table\_delta>\ deltas\ \ \ \ \ =\ \mbox{\hyperlink{namespacesysio_1_1state__history_a4672b7cf25419ada24cf1366ef85687d}{state\_history::create\_deltas}}(\mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_a654fe8a01daf92d5ae666b0188517279}{chain\_plug}}-\/>\mbox{\hyperlink{classsysio_1_1chain__plugin_a14a5e77b31ecf267c8062267d03440ae}{chain}}().\mbox{\hyperlink{classsysio_1_1chain_1_1controller_a0c79d00dae8c0d90efc18f4d091b2391}{db}}(),\ fresh);}
+\DoxyCodeLine{00419\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ deltas\_bin\ =\ \mbox{\hyperlink{namespacesysio_1_1state__history_a56d6b703f34519b5d085529ebd120d29}{state\_history::zlib\_compress\_bytes}}(\mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(deltas));}
+\DoxyCodeLine{00420\ \ \ \ \ \ \ state\_history\_log\_header\ header\{.magic\ \ \ \ \ \ \ \ =\ \mbox{\hyperlink{namespacesysio_adcbaf3936df79b161164e2cd54530f9c}{ship\_magic}}(ship\_current\_version,\ 0),}
+\DoxyCodeLine{00421\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .block\_id\ \ \ \ \ =\ block\_state-\/>id,}
+\DoxyCodeLine{00422\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .payload\_size\ =\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})\ +\ deltas\_bin.size()\};}
+\DoxyCodeLine{00423\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_ab0e254998fcee36e133e5877460fad60}{chain\_state\_log}}-\/>write\_entry(header,\ block\_state-\/>block-\/>previous,\ [\&](\textcolor{keyword}{auto}\&\ stream)\ \{}
+\DoxyCodeLine{00424\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Compressed\ deltas\ now\ exceeds\ 4GB\ on\ one\ of\ the\ public\ chains.\ This\ length\ prefix}}
+\DoxyCodeLine{00425\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ was\ intended\ to\ support\ adding\ additional\ fields\ in\ the\ future\ after\ the}}
+\DoxyCodeLine{00426\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ packed\ deltas.\ For\ now\ we're\ going\ to\ ignore\ on\ read.\ The\ 0\ is\ an\ attempt\ to\ signal}}
+\DoxyCodeLine{00427\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ old\ versions\ that\ something's\ not\ quite\ right.}}
+\DoxyCodeLine{00428\ \ \ \ \ \ \ \ \ \ uint32\_t\ s\ =\ (uint32\_t)deltas\_bin.size();}
+\DoxyCodeLine{00429\ \ \ \ \ \ \ \ \ \ if\ (s\ !=\ deltas\_bin.size())}
+\DoxyCodeLine{00430\ \ \ \ \ \ \ \ \ \ \ \ \ s\ =\ 0;}
+\DoxyCodeLine{00431\ \ \ \ \ \ \ \ \ \ stream.write((char*)\&s,\ sizeof(s));}
+\DoxyCodeLine{00432\ \ \ \ \ \ \ \ \ \ if\ (!deltas\_bin.empty())}
+\DoxyCodeLine{00433\ \ \ \ \ \ \ \ \ \ \ \ \ stream.write(deltas\_bin.data(),\ deltas\_bin.size());}
+\DoxyCodeLine{00434\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00435\ \ \ \ \}\ \textcolor{comment}{//\ store\_chain\_state}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1state__history__plugin__impl_abada9ce88fb6a33aa4ac4c9d4726bf67_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1state__history__plugin__impl_abada9ce88fb6a33aa4ac4c9d4726bf67_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1state__history__plugin__impl_a2074796cb93f0dda90a98f2d5ef143ee}\index{sysio::state\_history\_plugin\_impl@{sysio::state\_history\_plugin\_impl}!store\_traces@{store\_traces}}
+\index{store\_traces@{store\_traces}!sysio::state\_history\_plugin\_impl@{sysio::state\_history\_plugin\_impl}}
+\doxysubsubsection{\texorpdfstring{store\_traces()}{store\_traces()}}
+{\footnotesize\ttfamily \label{structsysio_1_1state__history__plugin__impl_a2074796cb93f0dda90a98f2d5ef143ee} 
+void sysio\+::state\+\_\+history\+\_\+plugin\+\_\+impl\+::store\+\_\+traces (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{block\+\_\+state\+\_\+ptr}} \&}]{block\+\_\+state}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{state__history__plugin_8cpp_source_l00392}{392}} of file \mbox{\hyperlink{state__history__plugin_8cpp_source}{state\+\_\+history\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00392\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00393\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_a0b55dd4e7ba346185889034127a928a7}{trace\_log}})}
+\DoxyCodeLine{00394\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00395\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ traces\_bin\ =\ \mbox{\hyperlink{namespacesysio_1_1state__history_a56d6b703f34519b5d085529ebd120d29}{state\_history::zlib\_compress\_bytes}}(}
+\DoxyCodeLine{00396\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_a3ee433db4de5dff30dae5963e7312618}{trace\_converter}}.\mbox{\hyperlink{structsysio_1_1state__history_1_1trace__converter_a62e0192e6d6919f2171f46b7335eafa5}{pack}}(\mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_a654fe8a01daf92d5ae666b0188517279}{chain\_plug}}-\/>\mbox{\hyperlink{classsysio_1_1chain__plugin_a14a5e77b31ecf267c8062267d03440ae}{chain}}().\mbox{\hyperlink{classsysio_1_1chain_1_1controller_a0c79d00dae8c0d90efc18f4d091b2391}{db}}(),\ \mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_aa15bf609ad3717258b4efeedb797b7d6}{trace\_debug\_mode}},\ block\_state));}
+\DoxyCodeLine{00397\ }
+\DoxyCodeLine{00398\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(traces\_bin.size()\ ==\ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})traces\_bin.size(),\ plugin\_exception,\ \textcolor{stringliteral}{"{}traces\ is\ too\ big"{}});}
+\DoxyCodeLine{00399\ }
+\DoxyCodeLine{00400\ \ \ \ \ \ \ state\_history\_log\_header\ header\{.magic\ \ \ \ \ \ \ \ =\ \mbox{\hyperlink{namespacesysio_adcbaf3936df79b161164e2cd54530f9c}{ship\_magic}}(ship\_current\_version,\ 0),}
+\DoxyCodeLine{00401\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .block\_id\ \ \ \ \ =\ block\_state-\/>id,}
+\DoxyCodeLine{00402\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .payload\_size\ =\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})\ +\ traces\_bin.size()\};}
+\DoxyCodeLine{00403\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_a0b55dd4e7ba346185889034127a928a7}{trace\_log}}-\/>write\_entry(header,\ block\_state-\/>block-\/>previous,\ [\&](\textcolor{keyword}{auto}\&\ stream)\ \{}
+\DoxyCodeLine{00404\ \ \ \ \ \ \ \ \ \ uint32\_t\ s\ =\ (uint32\_t)traces\_bin.size();}
+\DoxyCodeLine{00405\ \ \ \ \ \ \ \ \ \ stream.write((char*)\&s,\ sizeof(s));}
+\DoxyCodeLine{00406\ \ \ \ \ \ \ \ \ \ if\ (!traces\_bin.empty())}
+\DoxyCodeLine{00407\ \ \ \ \ \ \ \ \ \ \ \ \ stream.write(traces\_bin.data(),\ traces\_bin.size());}
+\DoxyCodeLine{00408\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00409\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1state__history__plugin__impl_a2074796cb93f0dda90a98f2d5ef143ee_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1state__history__plugin__impl_a2074796cb93f0dda90a98f2d5ef143ee_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1state__history__plugin__impl_a20d4a6d1a901fe6aa14a2e13554a8834}\index{sysio::state\_history\_plugin\_impl@{sysio::state\_history\_plugin\_impl}!accepted\_block\_connection@{accepted\_block\_connection}}
+\index{accepted\_block\_connection@{accepted\_block\_connection}!sysio::state\_history\_plugin\_impl@{sysio::state\_history\_plugin\_impl}}
+\doxysubsubsection{\texorpdfstring{accepted\_block\_connection}{accepted\_block\_connection}}
+{\footnotesize\ttfamily \label{structsysio_1_1state__history__plugin__impl_a20d4a6d1a901fe6aa14a2e13554a8834} 
+std\+::optional$<$scoped\+\_\+connection$>$ sysio\+::state\+\_\+history\+\_\+plugin\+\_\+impl\+::accepted\+\_\+block\+\_\+connection}
+
+
+
+Definition at line \mbox{\hyperlink{state__history__plugin_8cpp_source_l00051}{51}} of file \mbox{\hyperlink{state__history__plugin_8cpp_source}{state\+\_\+history\+\_\+plugin.\+cpp}}.
+
+\Hypertarget{structsysio_1_1state__history__plugin__impl_a083a559f89920f6549db0cfa2ff19ea4}\index{sysio::state\_history\_plugin\_impl@{sysio::state\_history\_plugin\_impl}!acceptor@{acceptor}}
+\index{acceptor@{acceptor}!sysio::state\_history\_plugin\_impl@{sysio::state\_history\_plugin\_impl}}
+\doxysubsubsection{\texorpdfstring{acceptor}{acceptor}}
+{\footnotesize\ttfamily \label{structsysio_1_1state__history__plugin__impl_a083a559f89920f6549db0cfa2ff19ea4} 
+std\+::unique\+\_\+ptr$<$tcp\+::acceptor$>$ sysio\+::state\+\_\+history\+\_\+plugin\+\_\+impl\+::acceptor}
+
+
+
+Definition at line \mbox{\hyperlink{state__history__plugin_8cpp_source_l00054}{54}} of file \mbox{\hyperlink{state__history__plugin_8cpp_source}{state\+\_\+history\+\_\+plugin.\+cpp}}.
+
+\Hypertarget{structsysio_1_1state__history__plugin__impl_aa276ab215f0a9cb920083343a0bbc02f}\index{sysio::state\_history\_plugin\_impl@{sysio::state\_history\_plugin\_impl}!applied\_transaction\_connection@{applied\_transaction\_connection}}
+\index{applied\_transaction\_connection@{applied\_transaction\_connection}!sysio::state\_history\_plugin\_impl@{sysio::state\_history\_plugin\_impl}}
+\doxysubsubsection{\texorpdfstring{applied\_transaction\_connection}{applied\_transaction\_connection}}
+{\footnotesize\ttfamily \label{structsysio_1_1state__history__plugin__impl_aa276ab215f0a9cb920083343a0bbc02f} 
+std\+::optional$<$scoped\+\_\+connection$>$ sysio\+::state\+\_\+history\+\_\+plugin\+\_\+impl\+::applied\+\_\+transaction\+\_\+connection}
+
+
+
+Definition at line \mbox{\hyperlink{state__history__plugin_8cpp_source_l00049}{49}} of file \mbox{\hyperlink{state__history__plugin_8cpp_source}{state\+\_\+history\+\_\+plugin.\+cpp}}.
+
+\Hypertarget{structsysio_1_1state__history__plugin__impl_ab775b914c7586cd47b366f7bbb7007f9}\index{sysio::state\_history\_plugin\_impl@{sysio::state\_history\_plugin\_impl}!block\_start\_connection@{block\_start\_connection}}
+\index{block\_start\_connection@{block\_start\_connection}!sysio::state\_history\_plugin\_impl@{sysio::state\_history\_plugin\_impl}}
+\doxysubsubsection{\texorpdfstring{block\_start\_connection}{block\_start\_connection}}
+{\footnotesize\ttfamily \label{structsysio_1_1state__history__plugin__impl_ab775b914c7586cd47b366f7bbb7007f9} 
+std\+::optional$<$scoped\+\_\+connection$>$ sysio\+::state\+\_\+history\+\_\+plugin\+\_\+impl\+::block\+\_\+start\+\_\+connection}
+
+
+
+Definition at line \mbox{\hyperlink{state__history__plugin_8cpp_source_l00050}{50}} of file \mbox{\hyperlink{state__history__plugin_8cpp_source}{state\+\_\+history\+\_\+plugin.\+cpp}}.
+
+\Hypertarget{structsysio_1_1state__history__plugin__impl_a654fe8a01daf92d5ae666b0188517279}\index{sysio::state\_history\_plugin\_impl@{sysio::state\_history\_plugin\_impl}!chain\_plug@{chain\_plug}}
+\index{chain\_plug@{chain\_plug}!sysio::state\_history\_plugin\_impl@{sysio::state\_history\_plugin\_impl}}
+\doxysubsubsection{\texorpdfstring{chain\_plug}{chain\_plug}}
+{\footnotesize\ttfamily \label{structsysio_1_1state__history__plugin__impl_a654fe8a01daf92d5ae666b0188517279} 
+\mbox{\hyperlink{classsysio_1_1chain__plugin}{chain\+\_\+plugin}}\texorpdfstring{$\ast$}{*} sysio\+::state\+\_\+history\+\_\+plugin\+\_\+impl\+::chain\+\_\+plug = nullptr}
+
+
+
+Definition at line \mbox{\hyperlink{state__history__plugin_8cpp_source_l00044}{44}} of file \mbox{\hyperlink{state__history__plugin_8cpp_source}{state\+\_\+history\+\_\+plugin.\+cpp}}.
+
+\Hypertarget{structsysio_1_1state__history__plugin__impl_ab0e254998fcee36e133e5877460fad60}\index{sysio::state\_history\_plugin\_impl@{sysio::state\_history\_plugin\_impl}!chain\_state\_log@{chain\_state\_log}}
+\index{chain\_state\_log@{chain\_state\_log}!sysio::state\_history\_plugin\_impl@{sysio::state\_history\_plugin\_impl}}
+\doxysubsubsection{\texorpdfstring{chain\_state\_log}{chain\_state\_log}}
+{\footnotesize\ttfamily \label{structsysio_1_1state__history__plugin__impl_ab0e254998fcee36e133e5877460fad60} 
+std\+::optional$<$\mbox{\hyperlink{classsysio_1_1state__history__log}{state\+\_\+history\+\_\+log}}$>$ sysio\+::state\+\_\+history\+\_\+plugin\+\_\+impl\+::chain\+\_\+state\+\_\+log}
+
+
+
+Definition at line \mbox{\hyperlink{state__history__plugin_8cpp_source_l00046}{46}} of file \mbox{\hyperlink{state__history__plugin_8cpp_source}{state\+\_\+history\+\_\+plugin.\+cpp}}.
+
+\Hypertarget{structsysio_1_1state__history__plugin__impl_a85a9831f498ad989b757699d91c64e0b}\index{sysio::state\_history\_plugin\_impl@{sysio::state\_history\_plugin\_impl}!endpoint\_address@{endpoint\_address}}
+\index{endpoint\_address@{endpoint\_address}!sysio::state\_history\_plugin\_impl@{sysio::state\_history\_plugin\_impl}}
+\doxysubsubsection{\texorpdfstring{endpoint\_address}{endpoint\_address}}
+{\footnotesize\ttfamily \label{structsysio_1_1state__history__plugin__impl_a85a9831f498ad989b757699d91c64e0b} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::state\+\_\+history\+\_\+plugin\+\_\+impl\+::endpoint\+\_\+address = "{}0.\+0.\+0.\+0"{}}
+
+
+
+Definition at line \mbox{\hyperlink{state__history__plugin_8cpp_source_l00052}{52}} of file \mbox{\hyperlink{state__history__plugin_8cpp_source}{state\+\_\+history\+\_\+plugin.\+cpp}}.
+
+\Hypertarget{structsysio_1_1state__history__plugin__impl_a675dbf4b298fdea99a1622ca781f474a}\index{sysio::state\_history\_plugin\_impl@{sysio::state\_history\_plugin\_impl}!endpoint\_port@{endpoint\_port}}
+\index{endpoint\_port@{endpoint\_port}!sysio::state\_history\_plugin\_impl@{sysio::state\_history\_plugin\_impl}}
+\doxysubsubsection{\texorpdfstring{endpoint\_port}{endpoint\_port}}
+{\footnotesize\ttfamily \label{structsysio_1_1state__history__plugin__impl_a675dbf4b298fdea99a1622ca781f474a} 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} sysio\+::state\+\_\+history\+\_\+plugin\+\_\+impl\+::endpoint\+\_\+port = 8080}
+
+
+
+Definition at line \mbox{\hyperlink{state__history__plugin_8cpp_source_l00053}{53}} of file \mbox{\hyperlink{state__history__plugin_8cpp_source}{state\+\_\+history\+\_\+plugin.\+cpp}}.
+
+\Hypertarget{structsysio_1_1state__history__plugin__impl_a0b718f0ae6e2f9daa4d578a70ca1d6cf}\index{sysio::state\_history\_plugin\_impl@{sysio::state\_history\_plugin\_impl}!sessions@{sessions}}
+\index{sessions@{sessions}!sysio::state\_history\_plugin\_impl@{sysio::state\_history\_plugin\_impl}}
+\doxysubsubsection{\texorpdfstring{sessions}{sessions}}
+{\footnotesize\ttfamily \label{structsysio_1_1state__history__plugin__impl_a0b718f0ae6e2f9daa4d578a70ca1d6cf} 
+std\+::map$<$\mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_1_1session}{session}}\texorpdfstring{$\ast$}{*}, std\+::shared\+\_\+ptr$<$\mbox{\hyperlink{structsysio_1_1state__history__plugin__impl_1_1session}{session}}$>$ $>$ sysio\+::state\+\_\+history\+\_\+plugin\+\_\+impl\+::sessions}
+
+
+
+Definition at line \mbox{\hyperlink{state__history__plugin_8cpp_source_l00309}{309}} of file \mbox{\hyperlink{state__history__plugin_8cpp_source}{state\+\_\+history\+\_\+plugin.\+cpp}}.
+
+\Hypertarget{structsysio_1_1state__history__plugin__impl_ae6d60f7f7d51ac9bdb5e371dc65fc689}\index{sysio::state\_history\_plugin\_impl@{sysio::state\_history\_plugin\_impl}!stopping@{stopping}}
+\index{stopping@{stopping}!sysio::state\_history\_plugin\_impl@{sysio::state\_history\_plugin\_impl}}
+\doxysubsubsection{\texorpdfstring{stopping}{stopping}}
+{\footnotesize\ttfamily \label{structsysio_1_1state__history__plugin__impl_ae6d60f7f7d51ac9bdb5e371dc65fc689} 
+bool sysio\+::state\+\_\+history\+\_\+plugin\+\_\+impl\+::stopping = false}
+
+
+
+Definition at line \mbox{\hyperlink{state__history__plugin_8cpp_source_l00048}{48}} of file \mbox{\hyperlink{state__history__plugin_8cpp_source}{state\+\_\+history\+\_\+plugin.\+cpp}}.
+
+\Hypertarget{structsysio_1_1state__history__plugin__impl_a3ee433db4de5dff30dae5963e7312618}\index{sysio::state\_history\_plugin\_impl@{sysio::state\_history\_plugin\_impl}!trace\_converter@{trace\_converter}}
+\index{trace\_converter@{trace\_converter}!sysio::state\_history\_plugin\_impl@{sysio::state\_history\_plugin\_impl}}
+\doxysubsubsection{\texorpdfstring{trace\_converter}{trace\_converter}}
+{\footnotesize\ttfamily \label{structsysio_1_1state__history__plugin__impl_a3ee433db4de5dff30dae5963e7312618} 
+\mbox{\hyperlink{structsysio_1_1state__history_1_1trace__converter}{state\+\_\+history\+::trace\+\_\+converter}} sysio\+::state\+\_\+history\+\_\+plugin\+\_\+impl\+::trace\+\_\+converter}
+
+
+
+Definition at line \mbox{\hyperlink{state__history__plugin_8cpp_source_l00055}{55}} of file \mbox{\hyperlink{state__history__plugin_8cpp_source}{state\+\_\+history\+\_\+plugin.\+cpp}}.
+
+\Hypertarget{structsysio_1_1state__history__plugin__impl_aa15bf609ad3717258b4efeedb797b7d6}\index{sysio::state\_history\_plugin\_impl@{sysio::state\_history\_plugin\_impl}!trace\_debug\_mode@{trace\_debug\_mode}}
+\index{trace\_debug\_mode@{trace\_debug\_mode}!sysio::state\_history\_plugin\_impl@{sysio::state\_history\_plugin\_impl}}
+\doxysubsubsection{\texorpdfstring{trace\_debug\_mode}{trace\_debug\_mode}}
+{\footnotesize\ttfamily \label{structsysio_1_1state__history__plugin__impl_aa15bf609ad3717258b4efeedb797b7d6} 
+bool sysio\+::state\+\_\+history\+\_\+plugin\+\_\+impl\+::trace\+\_\+debug\+\_\+mode = false}
+
+
+
+Definition at line \mbox{\hyperlink{state__history__plugin_8cpp_source_l00047}{47}} of file \mbox{\hyperlink{state__history__plugin_8cpp_source}{state\+\_\+history\+\_\+plugin.\+cpp}}.
+
+\Hypertarget{structsysio_1_1state__history__plugin__impl_a0b55dd4e7ba346185889034127a928a7}\index{sysio::state\_history\_plugin\_impl@{sysio::state\_history\_plugin\_impl}!trace\_log@{trace\_log}}
+\index{trace\_log@{trace\_log}!sysio::state\_history\_plugin\_impl@{sysio::state\_history\_plugin\_impl}}
+\doxysubsubsection{\texorpdfstring{trace\_log}{trace\_log}}
+{\footnotesize\ttfamily \label{structsysio_1_1state__history__plugin__impl_a0b55dd4e7ba346185889034127a928a7} 
+std\+::optional$<$\mbox{\hyperlink{classsysio_1_1state__history__log}{state\+\_\+history\+\_\+log}}$>$ sysio\+::state\+\_\+history\+\_\+plugin\+\_\+impl\+::trace\+\_\+log}
+
+
+
+Definition at line \mbox{\hyperlink{state__history__plugin_8cpp_source_l00045}{45}} of file \mbox{\hyperlink{state__history__plugin_8cpp_source}{state\+\_\+history\+\_\+plugin.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+plugins/state\+\_\+history\+\_\+plugin/\mbox{\hyperlink{state__history__plugin_8cpp}{state\+\_\+history\+\_\+plugin.\+cpp}}\end{DoxyCompactItemize}

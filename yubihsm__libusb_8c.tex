@@ -1,0 +1,305 @@
+\doxysection{libraries/yubihsm/lib/yubihsm\+\_\+libusb.c File Reference}
+\hypertarget{yubihsm__libusb_8c}{}\label{yubihsm__libusb_8c}\index{libraries/yubihsm/lib/yubihsm\_libusb.c@{libraries/yubihsm/lib/yubihsm\_libusb.c}}
+{\ttfamily \#include $<$libusb.\+h$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include "{}yubihsm.\+h"{}}\newline
+{\ttfamily \#include "{}internal.\+h"{}}\newline
+{\ttfamily \#include "{}yubihsm\+\_\+usb.\+h"{}}\newline
+{\ttfamily \#include "{}debug\+\_\+lib.\+h"{}}\newline
+Include dependency graph for yubihsm\+\_\+libusb.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{yubihsm__libusb_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structstate}{state}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{yubihsm__libusb_8c_a7ae85ad3f1d05331c3c7ccdc3443dbe4}{usb\+\_\+set\+\_\+serial}} (\mbox{\hyperlink{lib_2internal_8h_af0b8c5ac57556b935ae71249ec6cc388}{yh\+\_\+backend}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{structstate}{state}}, unsigned long \mbox{\hyperlink{yubihsm__pkcs11_8c_a1149ca4bd0659030412db8e77bebdf88}{serial}})
+\item 
+void \mbox{\hyperlink{yubihsm__libusb_8c_a71df5e0ff7b712f398eacfc6fcf878f0}{usb\+\_\+close}} (\mbox{\hyperlink{lib_2internal_8h_af0b8c5ac57556b935ae71249ec6cc388}{yh\+\_\+backend}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{structstate}{state}})
+\item 
+void \mbox{\hyperlink{yubihsm__libusb_8c_a5c7d1af3985bcf7fd85536f9d109e837}{usb\+\_\+destroy}} (\mbox{\hyperlink{lib_2internal_8h_af0b8c5ac57556b935ae71249ec6cc388}{yh\+\_\+backend}} \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\mbox{\hyperlink{structstate}{state}})
+\item 
+\mbox{\hyperlink{lib_2internal_8h_af0b8c5ac57556b935ae71249ec6cc388}{yh\+\_\+backend}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{yubihsm__libusb_8c_a7d85725309ab01a6ec82ee958806102b}{backend\+\_\+create}} (void)
+\item 
+bool \mbox{\hyperlink{yubihsm__libusb_8c_ab7b5c16cf1c8af0f6ce8b8623b612689}{usb\+\_\+open\+\_\+device}} (\mbox{\hyperlink{lib_2internal_8h_af0b8c5ac57556b935ae71249ec6cc388}{yh\+\_\+backend}} \texorpdfstring{$\ast$}{*}backend)
+\item 
+int \mbox{\hyperlink{yubihsm__libusb_8c_ad588c46d8af37c48a320beae5d18617a}{usb\+\_\+write}} (\mbox{\hyperlink{lib_2internal_8h_af0b8c5ac57556b935ae71249ec6cc388}{yh\+\_\+backend}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{structstate}{state}}, unsigned char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}, long unsigned \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})
+\item 
+int \mbox{\hyperlink{yubihsm__libusb_8c_aad6d76bcc3da33d136d79c56f22fe4c5}{usb\+\_\+read}} (\mbox{\hyperlink{lib_2internal_8h_af0b8c5ac57556b935ae71249ec6cc388}{yh\+\_\+backend}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{structstate}{state}}, unsigned char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}, unsigned long \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{yubihsm__libusb_8c_a7d85725309ab01a6ec82ee958806102b}\index{yubihsm\_libusb.c@{yubihsm\_libusb.c}!backend\_create@{backend\_create}}
+\index{backend\_create@{backend\_create}!yubihsm\_libusb.c@{yubihsm\_libusb.c}}
+\doxysubsubsection{\texorpdfstring{backend\_create()}{backend\_create()}}
+{\footnotesize\ttfamily \label{yubihsm__libusb_8c_a7d85725309ab01a6ec82ee958806102b} 
+\mbox{\hyperlink{lib_2internal_8h_af0b8c5ac57556b935ae71249ec6cc388}{yh\+\_\+backend}} \texorpdfstring{$\ast$}{*} backend\+\_\+create (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__libusb_8c_source_l00060}{60}} of file \mbox{\hyperlink{yubihsm__libusb_8c_source}{yubihsm\+\_\+libusb.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00061\ \ \ \mbox{\hyperlink{structstate}{yh\_backend}}\ *backend\ =\ calloc(1,\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{structstate}{yh\_backend}}));}
+\DoxyCodeLine{00062\ \ \ \textcolor{keywordflow}{if}\ (backend)\ \{}
+\DoxyCodeLine{00063\ \ \ \ \ libusb\_init(\&backend-\/>\mbox{\hyperlink{structstate_ac3d57ba7e831efd41c7e449df6af1063}{ctx}});}
+\DoxyCodeLine{00064\ \ \ \}}
+\DoxyCodeLine{00065\ \ \ \textcolor{keywordflow}{return}\ backend;}
+\DoxyCodeLine{00066\ \}}
+
+\end{DoxyCode}
+\Hypertarget{yubihsm__libusb_8c_a71df5e0ff7b712f398eacfc6fcf878f0}\index{yubihsm\_libusb.c@{yubihsm\_libusb.c}!usb\_close@{usb\_close}}
+\index{usb\_close@{usb\_close}!yubihsm\_libusb.c@{yubihsm\_libusb.c}}
+\doxysubsubsection{\texorpdfstring{usb\_close()}{usb\_close()}}
+{\footnotesize\ttfamily \label{yubihsm__libusb_8c_a71df5e0ff7b712f398eacfc6fcf878f0} 
+void usb\+\_\+close (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{lib_2internal_8h_af0b8c5ac57556b935ae71249ec6cc388}{yh\+\_\+backend}} \texorpdfstring{$\ast$}{*}}]{state}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__libusb_8c_source_l00040}{40}} of file \mbox{\hyperlink{yubihsm__libusb_8c_source}{yubihsm\+\_\+libusb.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00041\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structstate}{state}}\ \&\&\ \mbox{\hyperlink{structstate}{state}}-\/>\mbox{\hyperlink{structstate_aec455a4152840a0c15f5380b80a16eba}{handle}})\ \{}
+\DoxyCodeLine{00042\ \ \ \ \ libusb\_release\_interface(\mbox{\hyperlink{structstate}{state}}-\/>\mbox{\hyperlink{structstate_aec455a4152840a0c15f5380b80a16eba}{handle}},\ 0);}
+\DoxyCodeLine{00043\ \ \ \ \ libusb\_close(\mbox{\hyperlink{structstate}{state}}-\/>\mbox{\hyperlink{structstate_aec455a4152840a0c15f5380b80a16eba}{handle}});}
+\DoxyCodeLine{00044\ \ \ \ \ \mbox{\hyperlink{structstate}{state}}-\/>\mbox{\hyperlink{structstate_aec455a4152840a0c15f5380b80a16eba}{handle}}\ =\ NULL;}
+\DoxyCodeLine{00045\ \ \ \}}
+\DoxyCodeLine{00046\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=268pt]{yubihsm__libusb_8c_a71df5e0ff7b712f398eacfc6fcf878f0_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{yubihsm__libusb_8c_a5c7d1af3985bcf7fd85536f9d109e837}\index{yubihsm\_libusb.c@{yubihsm\_libusb.c}!usb\_destroy@{usb\_destroy}}
+\index{usb\_destroy@{usb\_destroy}!yubihsm\_libusb.c@{yubihsm\_libusb.c}}
+\doxysubsubsection{\texorpdfstring{usb\_destroy()}{usb\_destroy()}}
+{\footnotesize\ttfamily \label{yubihsm__libusb_8c_a5c7d1af3985bcf7fd85536f9d109e837} 
+void usb\+\_\+destroy (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{lib_2internal_8h_af0b8c5ac57556b935ae71249ec6cc388}{yh\+\_\+backend}} \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{state}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__libusb_8c_source_l00048}{48}} of file \mbox{\hyperlink{yubihsm__libusb_8c_source}{yubihsm\+\_\+libusb.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00049\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structstate}{state}}\ \&\&\ *\mbox{\hyperlink{structstate}{state}})\ \{}
+\DoxyCodeLine{00050\ \ \ \ \ \mbox{\hyperlink{yubihsm__libusb_8c_a71df5e0ff7b712f398eacfc6fcf878f0}{usb\_close}}(*\mbox{\hyperlink{structstate}{state}});}
+\DoxyCodeLine{00051\ \ \ \ \ \textcolor{keywordflow}{if}\ ((*state)-\/>ctx)\ \{}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ libusb\_exit((*state)-\/>ctx);}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ (*state)-\/>ctx\ =\ NULL;}
+\DoxyCodeLine{00054\ \ \ \ \ \}}
+\DoxyCodeLine{00055\ \ \ \ \ free(*\mbox{\hyperlink{structstate}{state}});}
+\DoxyCodeLine{00056\ \ \ \ \ *\mbox{\hyperlink{structstate}{state}}\ =\ NULL;}
+\DoxyCodeLine{00057\ \ \ \}}
+\DoxyCodeLine{00058\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=246pt]{yubihsm__libusb_8c_a5c7d1af3985bcf7fd85536f9d109e837_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{yubihsm__libusb_8c_ab7b5c16cf1c8af0f6ce8b8623b612689}\index{yubihsm\_libusb.c@{yubihsm\_libusb.c}!usb\_open\_device@{usb\_open\_device}}
+\index{usb\_open\_device@{usb\_open\_device}!yubihsm\_libusb.c@{yubihsm\_libusb.c}}
+\doxysubsubsection{\texorpdfstring{usb\_open\_device()}{usb\_open\_device()}}
+{\footnotesize\ttfamily \label{yubihsm__libusb_8c_ab7b5c16cf1c8af0f6ce8b8623b612689} 
+bool usb\+\_\+open\+\_\+device (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{lib_2internal_8h_af0b8c5ac57556b935ae71249ec6cc388}{yh\+\_\+backend}} \texorpdfstring{$\ast$}{*}}]{backend}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__libusb_8c_source_l00068}{68}} of file \mbox{\hyperlink{yubihsm__libusb_8c_source}{yubihsm\+\_\+libusb.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00069\ \ \ libusb\_device\ **list;}
+\DoxyCodeLine{00070\ \ \ libusb\_device\_handle\ *h\ =\ NULL;}
+\DoxyCodeLine{00071\ \ \ ssize\_t\ cnt\ =\ libusb\_get\_device\_list(backend-\/>\mbox{\hyperlink{structstate_ac3d57ba7e831efd41c7e449df6af1063}{ctx}},\ \&list);}
+\DoxyCodeLine{00072\ }
+\DoxyCodeLine{00073\ \ \ \textcolor{keywordflow}{if}\ (backend-\/>\mbox{\hyperlink{structstate_aec455a4152840a0c15f5380b80a16eba}{handle}})\ \{}
+\DoxyCodeLine{00074\ \ \ \ \ \mbox{\hyperlink{yubihsm__libusb_8c_a71df5e0ff7b712f398eacfc6fcf878f0}{usb\_close}}(backend);}
+\DoxyCodeLine{00075\ \ \ \}}
+\DoxyCodeLine{00076\ }
+\DoxyCodeLine{00077\ \ \ \textcolor{keywordflow}{if}\ (cnt\ <\ 0)\ \{}
+\DoxyCodeLine{00078\ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a2e3ed21e5ffba18d940d164aaec64a2a}{DBG\_ERR}}(\textcolor{stringliteral}{"{}Failed\ to\ get\ device\ list:\ \%s"{}},\ libusb\_strerror(cnt));}
+\DoxyCodeLine{00079\ \ \ \ \ \textcolor{keywordflow}{return}\ NULL;}
+\DoxyCodeLine{00080\ \ \ \}}
+\DoxyCodeLine{00081\ }
+\DoxyCodeLine{00082\ \ \ \textcolor{keywordflow}{for}\ (ssize\_t\ i\ =\ 0;\ i\ <\ cnt;\ i++)\ \{}
+\DoxyCodeLine{00083\ \ \ \ \ \textcolor{keyword}{struct\ }libusb\_device\_descriptor\ desc;}
+\DoxyCodeLine{00084\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ libusb\_get\_device\_descriptor(list[i],\ \&desc);}
+\DoxyCodeLine{00085\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ !=\ 0)\ \{}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a8c4742440a149ad8bcb5d58ae76c5ed3}{DBG\_INFO}}(\textcolor{stringliteral}{"{}Failed\ to\ get\ descriptor\ for\ device\ \%zd:\ \%s"{}},\ i,}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ libusb\_strerror(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}));}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{00089\ \ \ \ \ \}}
+\DoxyCodeLine{00090\ \ \ \ \ \textcolor{keywordflow}{if}\ (desc.idVendor\ ==\ \mbox{\hyperlink{yubihsm_8h_aae8b43483bd9f96455feb8055eda5985}{YH\_VID}}\ \&\&\ desc.idProduct\ ==\ \mbox{\hyperlink{yubihsm_8h_a33d2946f7c95cc44ac153d0013b6b203}{YH\_PID}})\ \{}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ libusb\_open(list[i],\ \&h);}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ !=\ 0\ ||\ h\ ==\ NULL)\ \{}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a8c4742440a149ad8bcb5d58ae76c5ed3}{DBG\_INFO}}(\textcolor{stringliteral}{"{}Failed\ to\ open\ device\ for\ index\ \%zd:\ \%s"{}},\ i,}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ libusb\_strerror(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}));}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (backend-\/>\mbox{\hyperlink{structstate_a427c87eb42b2a735f1ac44b76aba1664}{serial}}\ !=\ 0)\ \{}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ data[16]\ =\ \{0\};}
+\DoxyCodeLine{00099\ }
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ libusb\_get\_string\_descriptor\_ascii(h,\ desc.iSerialNumber,\ data,}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{sizeof}(data));}
+\DoxyCodeLine{00102\ }
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ devSerial\ =\ strtoul((\textcolor{keywordtype}{char}\ *)\ data,\ NULL,\ 10);}
+\DoxyCodeLine{00104\ }
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (devSerial\ !=\ backend-\/>\mbox{\hyperlink{structstate_a427c87eb42b2a735f1ac44b76aba1664}{serial}})\ \{}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a8c4742440a149ad8bcb5d58ae76c5ed3}{DBG\_INFO}}(\textcolor{stringliteral}{"{}Device\ \%zd\ has\ serial\ \%lu,\ not\ matching\ searched\ \%lu"{}},\ i,}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ devSerial,\ backend-\/>\mbox{\hyperlink{structstate_a427c87eb42b2a735f1ac44b76aba1664}{serial}});}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ \mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}};}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00111\ }
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ libusb\_claim\_interface(h,\ 0);}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ !=\ 0)\ \{}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a2e3ed21e5ffba18d940d164aaec64a2a}{DBG\_ERR}}(\textcolor{stringliteral}{"{}Failed\ to\ claim\ interface:\ \%s\ of\ device\ \%zd"{}},}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ libusb\_strerror(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}),\ i);}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ \mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}};}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00118\ }
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00120\ \ \ \ \ \mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}}:}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ libusb\_close(h);}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ h\ =\ NULL;}
+\DoxyCodeLine{00123\ \ \ \ \ \}}
+\DoxyCodeLine{00124\ \ \ \}}
+\DoxyCodeLine{00125\ }
+\DoxyCodeLine{00126\ \ \ libusb\_free\_device\_list(list,\ 1);}
+\DoxyCodeLine{00127\ \ \ backend-\/>\mbox{\hyperlink{structstate_aec455a4152840a0c15f5380b80a16eba}{handle}}\ =\ h;}
+\DoxyCodeLine{00128\ \ \ \textcolor{keywordflow}{if}\ (h)\ \{}
+\DoxyCodeLine{00129\ \ \ \ \ \textcolor{comment}{//\ we\ set\ up\ a\ dummy\ read\ with\ a\ 1ms\ timeout\ here.\ The\ reason\ for\ doing\ this}}
+\DoxyCodeLine{00130\ \ \ \ \ \textcolor{comment}{//\ is\ that\ there\ might\ be\ data\ left\ in\ th\ e\ device\ buffers\ from\ earlier}}
+\DoxyCodeLine{00131\ \ \ \ \ \textcolor{comment}{//\ transactions,\ this\ should\ flush\ it.}}
+\DoxyCodeLine{00132\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}[\mbox{\hyperlink{yubihsm_8h_a706bd8e7adf0de85e6cfb0efc8981d3f}{YH\_MSG\_BUF\_SIZE}}];}
+\DoxyCodeLine{00133\ \ \ \ \ \textcolor{keywordtype}{int}\ transferred\ =\ 0;}
+\DoxyCodeLine{00134\ \ \ \ \ \textcolor{keywordflow}{if}\ (libusb\_bulk\_transfer(h,\ 0x81,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}),\ \&transferred,\ 1)\ ==\ 0)\ \{}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a8c4742440a149ad8bcb5d58ae76c5ed3}{DBG\_INFO}}(\textcolor{stringliteral}{"{}\%d\ bytes\ of\ stale\ data\ read\ from\ device"{}},\ transferred);}
+\DoxyCodeLine{00136\ \ \ \ \ \}}
+\DoxyCodeLine{00137\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00138\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00139\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00140\ \ \ \}}
+\DoxyCodeLine{00141\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=268pt]{yubihsm__libusb_8c_ab7b5c16cf1c8af0f6ce8b8623b612689_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{yubihsm__libusb_8c_aad6d76bcc3da33d136d79c56f22fe4c5}\index{yubihsm\_libusb.c@{yubihsm\_libusb.c}!usb\_read@{usb\_read}}
+\index{usb\_read@{usb\_read}!yubihsm\_libusb.c@{yubihsm\_libusb.c}}
+\doxysubsubsection{\texorpdfstring{usb\_read()}{usb\_read()}}
+{\footnotesize\ttfamily \label{yubihsm__libusb_8c_aad6d76bcc3da33d136d79c56f22fe4c5} 
+int usb\+\_\+read (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{lib_2internal_8h_af0b8c5ac57556b935ae71249ec6cc388}{yh\+\_\+backend}} \texorpdfstring{$\ast$}{*}}]{state}{, }\item[{unsigned char \texorpdfstring{$\ast$}{*}}]{buf}{, }\item[{unsigned long \texorpdfstring{$\ast$}{*}}]{len}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__libusb_8c_source_l00167}{167}} of file \mbox{\hyperlink{yubihsm__libusb_8c_source}{yubihsm\+\_\+libusb.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00168\ \ \ \textcolor{keywordtype}{int}\ transferred\ =\ 0;}
+\DoxyCodeLine{00169\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00170\ }
+\DoxyCodeLine{00171\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structstate}{state}}-\/>\mbox{\hyperlink{structstate_aec455a4152840a0c15f5380b80a16eba}{handle}}\ ==\ NULL)\ \{}
+\DoxyCodeLine{00172\ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a2e3ed21e5ffba18d940d164aaec64a2a}{DBG\_ERR}}(\textcolor{stringliteral}{"{}Handle\ is\ not\ connected"{}});}
+\DoxyCodeLine{00173\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00174\ \ \ \}}
+\DoxyCodeLine{00175\ }
+\DoxyCodeLine{00176\ \ \ \mbox{\hyperlink{debug__lib_8h_a8c4742440a149ad8bcb5d58ae76c5ed3}{DBG\_INFO}}(\textcolor{stringliteral}{"{}Doing\ usb\ read"{}});}
+\DoxyCodeLine{00177\ }
+\DoxyCodeLine{00178\ \ \ \textcolor{comment}{/*\ TODO:\ does\ this\ need\ to\ loop\ for\ all\ data?*/}}
+\DoxyCodeLine{00179\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ libusb\_bulk\_transfer(\mbox{\hyperlink{structstate}{state}}-\/>\mbox{\hyperlink{structstate_aec455a4152840a0c15f5380b80a16eba}{handle}},\ 0x81,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ \&transferred,\ 0);}
+\DoxyCodeLine{00180\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ !=\ 0)\ \{}
+\DoxyCodeLine{00181\ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a2e3ed21e5ffba18d940d164aaec64a2a}{DBG\_ERR}}(\textcolor{stringliteral}{"{}Failed\ usb\_read\ with\ ret:\ \%d"{}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}});}
+\DoxyCodeLine{00182\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00183\ \ \ \}}
+\DoxyCodeLine{00184\ \ \ \mbox{\hyperlink{debug__lib_8h_a8c4742440a149ad8bcb5d58ae76c5ed3}{DBG\_INFO}}(\textcolor{stringliteral}{"{}Read,\ transfer\ \%d"{}},\ transferred);}
+\DoxyCodeLine{00185\ \ \ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ =\ transferred;}
+\DoxyCodeLine{00186\ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{00187\ \}}
+
+\end{DoxyCode}
+\Hypertarget{yubihsm__libusb_8c_a7ae85ad3f1d05331c3c7ccdc3443dbe4}\index{yubihsm\_libusb.c@{yubihsm\_libusb.c}!usb\_set\_serial@{usb\_set\_serial}}
+\index{usb\_set\_serial@{usb\_set\_serial}!yubihsm\_libusb.c@{yubihsm\_libusb.c}}
+\doxysubsubsection{\texorpdfstring{usb\_set\_serial()}{usb\_set\_serial()}}
+{\footnotesize\ttfamily \label{yubihsm__libusb_8c_a7ae85ad3f1d05331c3c7ccdc3443dbe4} 
+void usb\+\_\+set\+\_\+serial (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{lib_2internal_8h_af0b8c5ac57556b935ae71249ec6cc388}{yh\+\_\+backend}} \texorpdfstring{$\ast$}{*}}]{state}{, }\item[{unsigned long}]{serial}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__libusb_8c_source_l00036}{36}} of file \mbox{\hyperlink{yubihsm__libusb_8c_source}{yubihsm\+\_\+libusb.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00037\ \ \ \mbox{\hyperlink{structstate}{state}}-\/>\mbox{\hyperlink{structstate_a427c87eb42b2a735f1ac44b76aba1664}{serial}}\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a1149ca4bd0659030412db8e77bebdf88}{serial}};}
+\DoxyCodeLine{00038\ \}}
+
+\end{DoxyCode}
+\Hypertarget{yubihsm__libusb_8c_ad588c46d8af37c48a320beae5d18617a}\index{yubihsm\_libusb.c@{yubihsm\_libusb.c}!usb\_write@{usb\_write}}
+\index{usb\_write@{usb\_write}!yubihsm\_libusb.c@{yubihsm\_libusb.c}}
+\doxysubsubsection{\texorpdfstring{usb\_write()}{usb\_write()}}
+{\footnotesize\ttfamily \label{yubihsm__libusb_8c_ad588c46d8af37c48a320beae5d18617a} 
+int usb\+\_\+write (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{lib_2internal_8h_af0b8c5ac57556b935ae71249ec6cc388}{yh\+\_\+backend}} \texorpdfstring{$\ast$}{*}}]{state}{, }\item[{unsigned char \texorpdfstring{$\ast$}{*}}]{buf}{, }\item[{long unsigned}]{len}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__libusb_8c_source_l00143}{143}} of file \mbox{\hyperlink{yubihsm__libusb_8c_source}{yubihsm\+\_\+libusb.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00144\ \ \ \textcolor{keywordtype}{int}\ transferred\ =\ 0;}
+\DoxyCodeLine{00145\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structstate}{state}}-\/>\mbox{\hyperlink{structstate_aec455a4152840a0c15f5380b80a16eba}{handle}}\ ==\ NULL)\ \{}
+\DoxyCodeLine{00146\ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a2e3ed21e5ffba18d940d164aaec64a2a}{DBG\_ERR}}(\textcolor{stringliteral}{"{}Handle\ is\ not\ connected"{}});}
+\DoxyCodeLine{00147\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00148\ \ \ \}}
+\DoxyCodeLine{00149\ \ \ \textcolor{comment}{/*\ TODO:\ does\ this\ need\ to\ loop\ and\ transmit\ several\ times?\ */}}
+\DoxyCodeLine{00150\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =}
+\DoxyCodeLine{00151\ \ \ \ \ libusb\_bulk\_transfer(\mbox{\hyperlink{structstate}{state}}-\/>\mbox{\hyperlink{structstate_aec455a4152840a0c15f5380b80a16eba}{handle}},\ 0x01,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ \&transferred,\ 0);}
+\DoxyCodeLine{00152\ \ \ \mbox{\hyperlink{debug__lib_8h_a8c4742440a149ad8bcb5d58ae76c5ed3}{DBG\_INFO}}(\textcolor{stringliteral}{"{}Write\ of\ \%lu\ \%d,\ err\ \%d"{}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ transferred,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}});}
+\DoxyCodeLine{00153\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ !=\ 0\ ||\ transferred\ !=\ (\textcolor{keywordtype}{int})\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})\ \{}
+\DoxyCodeLine{00154\ \ \ \ \ \mbox{\hyperlink{debug__lib_8h_a2e3ed21e5ffba18d940d164aaec64a2a}{DBG\_ERR}}(\textcolor{stringliteral}{"{}Transferred\ did\ not\ match\ len\ of\ write\ \%d-\/\%lu"{}},\ transferred,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}});}
+\DoxyCodeLine{00155\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00156\ \ \ \}}
+\DoxyCodeLine{00157\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ \%\ 64\ ==\ 0)\ \{}
+\DoxyCodeLine{00158\ \ \ \ \ \textcolor{comment}{/*\ this\ writes\ the\ ZLP\ */}}
+\DoxyCodeLine{00159\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ libusb\_bulk\_transfer(\mbox{\hyperlink{structstate}{state}}-\/>\mbox{\hyperlink{structstate_aec455a4152840a0c15f5380b80a16eba}{handle}},\ 0x01,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ 0,\ \&transferred,\ 0);}
+\DoxyCodeLine{00160\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ !=\ 0)\ \{}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00162\ \ \ \ \ \}}
+\DoxyCodeLine{00163\ \ \ \}}
+\DoxyCodeLine{00164\ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{00165\ \}}
+
+\end{DoxyCode}

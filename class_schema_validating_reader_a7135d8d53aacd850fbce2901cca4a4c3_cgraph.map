@@ -1,0 +1,13 @@
+<map id="SchemaValidatingReader::operator()" name="SchemaValidatingReader::operator()">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,136,173,177"/>
+<area shape="rect" id="Node000002" href="$class_generic_schema_validator.html#a21c0ad159e91398d222bab4d91d4c5dd" title="Gets the error object." alt="" coords="233,5,398,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="112,133,160,95,219,57,233,50,235,55,222,61,163,99,116,137"/>
+<area shape="rect" id="Node000003" href="$class_generic_schema_validator.html#ac10a88c4dc138bbdbe2afd041658a3b0" title="Gets the JSON pointer pointed to the invalid value." alt="" coords="221,71,410,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="161,133,227,114,229,119,162,138"/>
+<area shape="rect" id="Node000004" href="$class_generic_schema_validator.html#ab5980d72c786b81ab907526fdf4172f3" title="Gets the keyword of invalid schema." alt="" coords="222,136,409,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="173,154,206,154,206,159,173,159"/>
+<area shape="rect" id="Node000005" href="$class_generic_schema_validator.html#a5b8f2d5c466b2a362e2e4c3bcfbfc5a8" title="Gets the JSON pointer pointed to the invalid schema." alt="" coords="227,201,404,242"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="162,175,229,194,227,199,161,180"/>
+<area shape="rect" id="Node000006" href="$class_generic_schema_validator.html#a8ebda4da3d8b1fc41e57f15dd62e8f19" title="Checks whether the current state is valid." alt="" coords="233,267,398,307"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="116,175,163,213,222,251,235,258,233,263,219,256,160,218,112,179"/>
+</map>

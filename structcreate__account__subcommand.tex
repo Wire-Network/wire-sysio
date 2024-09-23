@@ -1,0 +1,253 @@
+\doxysection{create\+\_\+account\+\_\+subcommand Struct Reference}
+\hypertarget{structcreate__account__subcommand}{}\label{structcreate__account__subcommand}\index{create\_account\_subcommand@{create\_account\_subcommand}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structcreate__account__subcommand_a46440dab55b6a8b52d22e14901e48e9e}{create\+\_\+account\+\_\+subcommand}} (\mbox{\hyperlink{class_c_l_i_1_1_app}{CLI\+::\+App}} \texorpdfstring{$\ast$}{*}action\+Root, bool \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structcreate__account__subcommand_acd82575090eb1b5d659070d571a94922}{creator}}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structcreate__account__subcommand_a2931d43b8267e5ad68f643a4c709bd80}{account\+\_\+name}}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structcreate__account__subcommand_a8d8040474ab3df1e1a12749aa51d6e62}{owner\+\_\+key\+\_\+str}}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structcreate__account__subcommand_a6c52af2d2d842fad7c90c082d3cc5448}{active\+\_\+key\+\_\+str}}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structcreate__account__subcommand_a9e59b3888b96c6a72ca7b95ecf4eb719}{stake\+\_\+net}}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structcreate__account__subcommand_af8f3125d9fc57352192d2a52f4645138}{stake\+\_\+cpu}}
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structcreate__account__subcommand_a99bda83e2df6f8c7bd4a916b6fd9fb70}{buy\+\_\+ram\+\_\+bytes\+\_\+in\+\_\+kbytes}} = 0
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structcreate__account__subcommand_abf4e12d7c1b16f553651b703eec6da90}{buy\+\_\+ram\+\_\+bytes}} = 0
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structcreate__account__subcommand_aa364f99856ce6639a0b3b138c778878d}{buy\+\_\+ram\+\_\+eos}}
+\item 
+bool \mbox{\hyperlink{structcreate__account__subcommand_ad546b960f10a4b8e0377e2d77bbd8723}{transfer}} = false
+\item 
+bool \mbox{\hyperlink{structcreate__account__subcommand_a0bad497fbc642f32849ac56f69d93751}{simple}} = false
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01128}{1128}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structcreate__account__subcommand_a46440dab55b6a8b52d22e14901e48e9e}\index{create\_account\_subcommand@{create\_account\_subcommand}!create\_account\_subcommand@{create\_account\_subcommand}}
+\index{create\_account\_subcommand@{create\_account\_subcommand}!create\_account\_subcommand@{create\_account\_subcommand}}
+\doxysubsubsection{\texorpdfstring{create\_account\_subcommand()}{create\_account\_subcommand()}}
+{\footnotesize\ttfamily \label{structcreate__account__subcommand_a46440dab55b6a8b52d22e14901e48e9e} 
+create\+\_\+account\+\_\+subcommand\+::create\+\_\+account\+\_\+subcommand (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_c_l_i_1_1_app}{CLI\+::\+App}} \texorpdfstring{$\ast$}{*}}]{action\+Root}{, }\item[{bool}]{s}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01141}{1141}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01141\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{structcreate__account__subcommand_a0bad497fbc642f32849ac56f69d93751}{simple}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})\ \{}
+\DoxyCodeLine{01142\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ createAccount\ =\ actionRoot-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_a8b461d2233ec4121259011b5ed24b336}{add\_subcommand}}(}
+\DoxyCodeLine{01143\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{structcreate__account__subcommand_a0bad497fbc642f32849ac56f69d93751}{simple}}\ ?\ \textcolor{stringliteral}{"{}account"{}}\ :\ \textcolor{stringliteral}{"{}newaccount"{}}),}
+\DoxyCodeLine{01144\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{structcreate__account__subcommand_a0bad497fbc642f32849ac56f69d93751}{simple}}\ ?\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}Create\ a\ new\ account\ on\ the\ blockchain\ (assumes\ system\ contract\ does\ not\ restrict\ RAM\ usage)"{}})}
+\DoxyCodeLine{01145\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}Create\ a\ new\ account\ on\ the\ blockchain\ with\ initial\ resources"{}})\ )}
+\DoxyCodeLine{01146\ \ \ \ \ \ \ );}
+\DoxyCodeLine{01147\ \ \ \ \ \ \ createAccount-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_a8c812d42c7720ecb5cd0aec41b5aa941}{add\_option}}(\textcolor{stringliteral}{"{}creator"{}},\ \mbox{\hyperlink{structcreate__account__subcommand_acd82575090eb1b5d659070d571a94922}{creator}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}The\ name\ of\ the\ account\ creating\ the\ new\ account"{}}))-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a}{required}}();}
+\DoxyCodeLine{01148\ \ \ \ \ \ \ createAccount-\/>add\_option(\textcolor{stringliteral}{"{}name"{}},\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{account\_name}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}The\ name\ of\ the\ new\ account"{}}))-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a}{required}}();}
+\DoxyCodeLine{01149\ \ \ \ \ \ \ createAccount-\/>add\_option(\textcolor{stringliteral}{"{}OwnerKey"{}},\ \mbox{\hyperlink{structcreate__account__subcommand_a8d8040474ab3df1e1a12749aa51d6e62}{owner\_key\_str}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}The\ owner\ public\ key\ or\ permission\ level\ for\ the\ new\ account"{}}))-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a}{required}}();}
+\DoxyCodeLine{01150\ \ \ \ \ \ \ createAccount-\/>add\_option(\textcolor{stringliteral}{"{}ActiveKey"{}},\ \mbox{\hyperlink{structcreate__account__subcommand_a6c52af2d2d842fad7c90c082d3cc5448}{active\_key\_str}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}The\ active\ public\ key\ or\ permission\ level\ for\ the\ new\ account"{}}));}
+\DoxyCodeLine{01151\ }
+\DoxyCodeLine{01152\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{structcreate__account__subcommand_a0bad497fbc642f32849ac56f69d93751}{simple}})\ \{}
+\DoxyCodeLine{01153\ \ \ \ \ \ \ \ \ \ createAccount-\/>add\_option(\textcolor{stringliteral}{"{}-\/-\/stake-\/net"{}},\ \mbox{\hyperlink{structcreate__account__subcommand_a9e59b3888b96c6a72ca7b95ecf4eb719}{stake\_net}},}
+\DoxyCodeLine{01154\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}The\ amount\ of\ tokens\ delegated\ for\ net\ bandwidth"{}})))-\/>required();}
+\DoxyCodeLine{01155\ \ \ \ \ \ \ \ \ \ createAccount-\/>add\_option(\textcolor{stringliteral}{"{}-\/-\/stake-\/cpu"{}},\ \mbox{\hyperlink{structcreate__account__subcommand_af8f3125d9fc57352192d2a52f4645138}{stake\_cpu}},}
+\DoxyCodeLine{01156\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}The\ amount\ of\ tokens\ delegated\ for\ CPU\ bandwidth"{}})))-\/>required();}
+\DoxyCodeLine{01157\ \ \ \ \ \ \ \ \ \ createAccount-\/>add\_option(\textcolor{stringliteral}{"{}-\/-\/buy-\/ram-\/kbytes"{}},\ \mbox{\hyperlink{structcreate__account__subcommand_a99bda83e2df6f8c7bd4a916b6fd9fb70}{buy\_ram\_bytes\_in\_kbytes}},}
+\DoxyCodeLine{01158\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}The\ amount\ of\ RAM\ bytes\ to\ purchase\ for\ the\ new\ account\ in\ kibibytes\ (KiB)"{}})));}
+\DoxyCodeLine{01159\ \ \ \ \ \ \ \ \ \ createAccount-\/>add\_option(\textcolor{stringliteral}{"{}-\/-\/buy-\/ram-\/bytes"{}},\ \mbox{\hyperlink{structcreate__account__subcommand_abf4e12d7c1b16f553651b703eec6da90}{buy\_ram\_bytes}},}
+\DoxyCodeLine{01160\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}The\ amount\ of\ RAM\ bytes\ to\ purchase\ for\ the\ new\ account\ in\ bytes"{}})));}
+\DoxyCodeLine{01161\ \ \ \ \ \ \ \ \ \ createAccount-\/>add\_option(\textcolor{stringliteral}{"{}-\/-\/buy-\/ram"{}},\ \mbox{\hyperlink{structcreate__account__subcommand_aa364f99856ce6639a0b3b138c778878d}{buy\_ram\_eos}},}
+\DoxyCodeLine{01162\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}The\ amount\ of\ RAM\ bytes\ to\ purchase\ for\ the\ new\ account\ in\ tokens"{}})));}
+\DoxyCodeLine{01163\ \ \ \ \ \ \ \ \ \ createAccount-\/>add\_flag(\textcolor{stringliteral}{"{}-\/-\/transfer"{}},\ \mbox{\hyperlink{structcreate__account__subcommand_ad546b960f10a4b8e0377e2d77bbd8723}{transfer}},}
+\DoxyCodeLine{01164\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}Transfer\ voting\ power\ and\ right\ to\ unstake\ tokens\ to\ receiver"{}})));}
+\DoxyCodeLine{01165\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01166\ }
+\DoxyCodeLine{01167\ \ \ \ \ \ \ \mbox{\hyperlink{programs_2clio_2main_8cpp_aa5d53f41b83b5323c73622fbbb15e9cd}{add\_standard\_transaction\_options}}(createAccount,\ \textcolor{stringliteral}{"{}creator@active"{}});}
+\DoxyCodeLine{01168\ }
+\DoxyCodeLine{01169\ \ \ \ \ \ \ createAccount-\/>callback([\textcolor{keyword}{this}]\ \{}
+\DoxyCodeLine{01170\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{programs_2clio_2main_8cpp_a36bea3c5168520fa21bc5b688eed6c77}{auth\_type}}\ owner,\ active;}
+\DoxyCodeLine{01171\ }
+\DoxyCodeLine{01172\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{structcreate__account__subcommand_a8d8040474ab3df1e1a12749aa51d6e62}{owner\_key\_str}}.find(\textcolor{charliteral}{'@'})\ !=\ string::npos\ )\ \{}
+\DoxyCodeLine{01173\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{01174\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ owner\ =\ \mbox{\hyperlink{programs_2clio_2main_8cpp_a09a2d0e38df3c32478c47746f8625938}{to\_permission\_level}}(\mbox{\hyperlink{structcreate__account__subcommand_a8d8040474ab3df1e1a12749aa51d6e62}{owner\_key\_str}});}
+\DoxyCodeLine{01175\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a43bd817895cb757183fcecafc6ae7dc1}{SYS\_RETHROW\_EXCEPTIONS}}(\ explained\_exception,\ \textcolor{stringliteral}{"{}Invalid\ owner\ permission\ level:\ \$\{permission\}"{}},\ (\textcolor{stringliteral}{"{}permission"{}},\ \mbox{\hyperlink{structcreate__account__subcommand_a8d8040474ab3df1e1a12749aa51d6e62}{owner\_key\_str}})\ )}
+\DoxyCodeLine{01176\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{01177\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{01178\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ owner\ =\ \mbox{\hyperlink{namespacesysio_1_1chain_a0628a11f388cd2e43b1ccc1260a1042f}{public\_key\_type}}(\mbox{\hyperlink{structcreate__account__subcommand_a8d8040474ab3df1e1a12749aa51d6e62}{owner\_key\_str}});}
+\DoxyCodeLine{01179\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a43bd817895cb757183fcecafc6ae7dc1}{SYS\_RETHROW\_EXCEPTIONS}}(\ public\_key\_type\_exception,\ \textcolor{stringliteral}{"{}Invalid\ owner\ public\ key:\ \$\{public\_key\}"{}},\ (\textcolor{stringliteral}{"{}public\_key"{}},\ \mbox{\hyperlink{structcreate__account__subcommand_a8d8040474ab3df1e1a12749aa51d6e62}{owner\_key\_str}})\ );}
+\DoxyCodeLine{01180\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01181\ }
+\DoxyCodeLine{01182\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{structcreate__account__subcommand_a6c52af2d2d842fad7c90c082d3cc5448}{active\_key\_str}}.empty()\ )\ \{}
+\DoxyCodeLine{01183\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ active\ =\ owner;}
+\DoxyCodeLine{01184\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{structcreate__account__subcommand_a6c52af2d2d842fad7c90c082d3cc5448}{active\_key\_str}}.find(\textcolor{charliteral}{'@'})\ !=\ string::npos\ )\ \{}
+\DoxyCodeLine{01185\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{01186\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ active\ =\ \mbox{\hyperlink{programs_2clio_2main_8cpp_a09a2d0e38df3c32478c47746f8625938}{to\_permission\_level}}(\mbox{\hyperlink{structcreate__account__subcommand_a6c52af2d2d842fad7c90c082d3cc5448}{active\_key\_str}});}
+\DoxyCodeLine{01187\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a43bd817895cb757183fcecafc6ae7dc1}{SYS\_RETHROW\_EXCEPTIONS}}(\ explained\_exception,\ \textcolor{stringliteral}{"{}Invalid\ active\ permission\ level:\ \$\{permission\}"{}},\ (\textcolor{stringliteral}{"{}permission"{}},\ \mbox{\hyperlink{structcreate__account__subcommand_a6c52af2d2d842fad7c90c082d3cc5448}{active\_key\_str}})\ )}
+\DoxyCodeLine{01188\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{01189\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{01190\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ active\ =\ \mbox{\hyperlink{namespacesysio_1_1chain_a0628a11f388cd2e43b1ccc1260a1042f}{public\_key\_type}}(\mbox{\hyperlink{structcreate__account__subcommand_a6c52af2d2d842fad7c90c082d3cc5448}{active\_key\_str}});}
+\DoxyCodeLine{01191\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a43bd817895cb757183fcecafc6ae7dc1}{SYS\_RETHROW\_EXCEPTIONS}}(\ public\_key\_type\_exception,\ \textcolor{stringliteral}{"{}Invalid\ active\ public\ key:\ \$\{public\_key\}"{}},\ (\textcolor{stringliteral}{"{}public\_key"{}},\ \mbox{\hyperlink{structcreate__account__subcommand_a6c52af2d2d842fad7c90c082d3cc5448}{active\_key\_str}})\ );}
+\DoxyCodeLine{01192\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01193\ }
+\DoxyCodeLine{01194\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ create\ =\ \mbox{\hyperlink{programs_2clio_2main_8cpp_af788e353c03a17a6a964ea59ac699b39}{create\_newaccount}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(\mbox{\hyperlink{structcreate__account__subcommand_acd82575090eb1b5d659070d571a94922}{creator}}),\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(\mbox{\hyperlink{structsysio_1_1chain_1_1name}{account\_name}}),\ owner,\ active);}
+\DoxyCodeLine{01195\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{structcreate__account__subcommand_a0bad497fbc642f32849ac56f69d93751}{simple}})\ \{}
+\DoxyCodeLine{01196\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{programs_2clio_2main_8cpp_a105d61ef6bafc8f471dd8f59e08945e1}{SYSC\_ASSERT}}(\ \mbox{\hyperlink{structcreate__account__subcommand_aa364f99856ce6639a0b3b138c778878d}{buy\_ram\_eos}}.size()\ ||\ \mbox{\hyperlink{structcreate__account__subcommand_a99bda83e2df6f8c7bd4a916b6fd9fb70}{buy\_ram\_bytes\_in\_kbytes}}\ ||\ \mbox{\hyperlink{structcreate__account__subcommand_abf4e12d7c1b16f553651b703eec6da90}{buy\_ram\_bytes}},\ \textcolor{stringliteral}{"{}ERROR:\ One\ of\ -\/-\/buy-\/ram,\ -\/-\/buy-\/ram-\/kbytes\ or\ -\/-\/buy-\/ram-\/bytes\ should\ have\ non-\/zero\ value"{}}\ );}
+\DoxyCodeLine{01197\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{programs_2clio_2main_8cpp_a105d61ef6bafc8f471dd8f59e08945e1}{SYSC\_ASSERT}}(\ !\mbox{\hyperlink{structcreate__account__subcommand_a99bda83e2df6f8c7bd4a916b6fd9fb70}{buy\_ram\_bytes\_in\_kbytes}}\ ||\ !\mbox{\hyperlink{structcreate__account__subcommand_abf4e12d7c1b16f553651b703eec6da90}{buy\_ram\_bytes}},\ \textcolor{stringliteral}{"{}ERROR:\ -\/-\/buy-\/ram-\/kbytes\ and\ -\/-\/buy-\/ram-\/bytes\ cannot\ be\ set\ at\ the\ same\ time"{}}\ );}
+\DoxyCodeLine{01198\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1action}{action}}\ buyram\ =\ !\mbox{\hyperlink{structcreate__account__subcommand_aa364f99856ce6639a0b3b138c778878d}{buy\_ram\_eos}}.empty()\ ?\ \mbox{\hyperlink{programs_2clio_2main_8cpp_a9205975d40636a093c81061558e5c297}{create\_buyram}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(\mbox{\hyperlink{structcreate__account__subcommand_acd82575090eb1b5d659070d571a94922}{creator}}),\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(\mbox{\hyperlink{structsysio_1_1chain_1_1name}{account\_name}}),\ \mbox{\hyperlink{programs_2clio_2main_8cpp_a1eaaa88d636c18502c1997d48cdbebb1}{to\_asset}}(\mbox{\hyperlink{structcreate__account__subcommand_aa364f99856ce6639a0b3b138c778878d}{buy\_ram\_eos}}))}
+\DoxyCodeLine{01199\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{programs_2clio_2main_8cpp_afaa24f25f9a5686fd3686fb211af3c0e}{create\_buyrambytes}}(\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}(\mbox{\hyperlink{structcreate__account__subcommand_acd82575090eb1b5d659070d571a94922}{creator}}),\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}(\mbox{\hyperlink{structsysio_1_1chain_1_1name}{account\_name}}),\ (\mbox{\hyperlink{structcreate__account__subcommand_a99bda83e2df6f8c7bd4a916b6fd9fb70}{buy\_ram\_bytes\_in\_kbytes}})\ ?\ (\mbox{\hyperlink{structcreate__account__subcommand_a99bda83e2df6f8c7bd4a916b6fd9fb70}{buy\_ram\_bytes\_in\_kbytes}}\ *\ 1024)\ :\ \mbox{\hyperlink{structcreate__account__subcommand_abf4e12d7c1b16f553651b703eec6da90}{buy\_ram\_bytes}});}
+\DoxyCodeLine{01200\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ net\ =\ \mbox{\hyperlink{programs_2clio_2main_8cpp_a1eaaa88d636c18502c1997d48cdbebb1}{to\_asset}}(\mbox{\hyperlink{structcreate__account__subcommand_a9e59b3888b96c6a72ca7b95ecf4eb719}{stake\_net}});}
+\DoxyCodeLine{01201\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ cpu\ =\ \mbox{\hyperlink{programs_2clio_2main_8cpp_a1eaaa88d636c18502c1997d48cdbebb1}{to\_asset}}(\mbox{\hyperlink{structcreate__account__subcommand_af8f3125d9fc57352192d2a52f4645138}{stake\_cpu}});}
+\DoxyCodeLine{01202\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ net.get\_amount()\ !=\ 0\ ||\ cpu.get\_amount()\ !=\ 0\ )\ \{}
+\DoxyCodeLine{01203\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1action}{action}}\ delegate\ =\ \mbox{\hyperlink{programs_2clio_2main_8cpp_a354678f5230b1c0228a4bf3d656df078}{create\_delegate}}(\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(\mbox{\hyperlink{structcreate__account__subcommand_acd82575090eb1b5d659070d571a94922}{creator}}),\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(\mbox{\hyperlink{structsysio_1_1chain_1_1name}{account\_name}}),\ net,\ cpu,\ \mbox{\hyperlink{structcreate__account__subcommand_ad546b960f10a4b8e0377e2d77bbd8723}{transfer}});}
+\DoxyCodeLine{01204\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{programs_2clio_2main_8cpp_aaf784434864a29e4835be7465173d1ab}{send\_actions}}(\ \{\ create,\ buyram,\ delegate\ \}\ );}
+\DoxyCodeLine{01205\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{01206\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{programs_2clio_2main_8cpp_aaf784434864a29e4835be7465173d1ab}{send\_actions}}(\ \{\ create,\ buyram\ \}\ );}
+\DoxyCodeLine{01207\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01208\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{01209\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{programs_2clio_2main_8cpp_aaf784434864a29e4835be7465173d1ab}{send\_actions}}(\ \{\ create\ \}\ );}
+\DoxyCodeLine{01210\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01211\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{01212\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structcreate__account__subcommand_a46440dab55b6a8b52d22e14901e48e9e_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structcreate__account__subcommand_a2931d43b8267e5ad68f643a4c709bd80}\index{create\_account\_subcommand@{create\_account\_subcommand}!account\_name@{account\_name}}
+\index{account\_name@{account\_name}!create\_account\_subcommand@{create\_account\_subcommand}}
+\doxysubsubsection{\texorpdfstring{account\_name}{account\_name}}
+{\footnotesize\ttfamily \label{structcreate__account__subcommand_a2931d43b8267e5ad68f643a4c709bd80} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} create\+\_\+account\+\_\+subcommand\+::account\+\_\+name}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01130}{1130}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{structcreate__account__subcommand_a6c52af2d2d842fad7c90c082d3cc5448}\index{create\_account\_subcommand@{create\_account\_subcommand}!active\_key\_str@{active\_key\_str}}
+\index{active\_key\_str@{active\_key\_str}!create\_account\_subcommand@{create\_account\_subcommand}}
+\doxysubsubsection{\texorpdfstring{active\_key\_str}{active\_key\_str}}
+{\footnotesize\ttfamily \label{structcreate__account__subcommand_a6c52af2d2d842fad7c90c082d3cc5448} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} create\+\_\+account\+\_\+subcommand\+::active\+\_\+key\+\_\+str}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01132}{1132}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{structcreate__account__subcommand_abf4e12d7c1b16f553651b703eec6da90}\index{create\_account\_subcommand@{create\_account\_subcommand}!buy\_ram\_bytes@{buy\_ram\_bytes}}
+\index{buy\_ram\_bytes@{buy\_ram\_bytes}!create\_account\_subcommand@{create\_account\_subcommand}}
+\doxysubsubsection{\texorpdfstring{buy\_ram\_bytes}{buy\_ram\_bytes}}
+{\footnotesize\ttfamily \label{structcreate__account__subcommand_abf4e12d7c1b16f553651b703eec6da90} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} create\+\_\+account\+\_\+subcommand\+::buy\+\_\+ram\+\_\+bytes = 0}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01136}{1136}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{structcreate__account__subcommand_a99bda83e2df6f8c7bd4a916b6fd9fb70}\index{create\_account\_subcommand@{create\_account\_subcommand}!buy\_ram\_bytes\_in\_kbytes@{buy\_ram\_bytes\_in\_kbytes}}
+\index{buy\_ram\_bytes\_in\_kbytes@{buy\_ram\_bytes\_in\_kbytes}!create\_account\_subcommand@{create\_account\_subcommand}}
+\doxysubsubsection{\texorpdfstring{buy\_ram\_bytes\_in\_kbytes}{buy\_ram\_bytes\_in\_kbytes}}
+{\footnotesize\ttfamily \label{structcreate__account__subcommand_a99bda83e2df6f8c7bd4a916b6fd9fb70} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} create\+\_\+account\+\_\+subcommand\+::buy\+\_\+ram\+\_\+bytes\+\_\+in\+\_\+kbytes = 0}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01135}{1135}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{structcreate__account__subcommand_aa364f99856ce6639a0b3b138c778878d}\index{create\_account\_subcommand@{create\_account\_subcommand}!buy\_ram\_eos@{buy\_ram\_eos}}
+\index{buy\_ram\_eos@{buy\_ram\_eos}!create\_account\_subcommand@{create\_account\_subcommand}}
+\doxysubsubsection{\texorpdfstring{buy\_ram\_eos}{buy\_ram\_eos}}
+{\footnotesize\ttfamily \label{structcreate__account__subcommand_aa364f99856ce6639a0b3b138c778878d} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} create\+\_\+account\+\_\+subcommand\+::buy\+\_\+ram\+\_\+eos}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01137}{1137}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{structcreate__account__subcommand_acd82575090eb1b5d659070d571a94922}\index{create\_account\_subcommand@{create\_account\_subcommand}!creator@{creator}}
+\index{creator@{creator}!create\_account\_subcommand@{create\_account\_subcommand}}
+\doxysubsubsection{\texorpdfstring{creator}{creator}}
+{\footnotesize\ttfamily \label{structcreate__account__subcommand_acd82575090eb1b5d659070d571a94922} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} create\+\_\+account\+\_\+subcommand\+::creator}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01129}{1129}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{structcreate__account__subcommand_a8d8040474ab3df1e1a12749aa51d6e62}\index{create\_account\_subcommand@{create\_account\_subcommand}!owner\_key\_str@{owner\_key\_str}}
+\index{owner\_key\_str@{owner\_key\_str}!create\_account\_subcommand@{create\_account\_subcommand}}
+\doxysubsubsection{\texorpdfstring{owner\_key\_str}{owner\_key\_str}}
+{\footnotesize\ttfamily \label{structcreate__account__subcommand_a8d8040474ab3df1e1a12749aa51d6e62} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} create\+\_\+account\+\_\+subcommand\+::owner\+\_\+key\+\_\+str}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01131}{1131}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{structcreate__account__subcommand_a0bad497fbc642f32849ac56f69d93751}\index{create\_account\_subcommand@{create\_account\_subcommand}!simple@{simple}}
+\index{simple@{simple}!create\_account\_subcommand@{create\_account\_subcommand}}
+\doxysubsubsection{\texorpdfstring{simple}{simple}}
+{\footnotesize\ttfamily \label{structcreate__account__subcommand_a0bad497fbc642f32849ac56f69d93751} 
+bool create\+\_\+account\+\_\+subcommand\+::simple = false}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01139}{1139}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{structcreate__account__subcommand_af8f3125d9fc57352192d2a52f4645138}\index{create\_account\_subcommand@{create\_account\_subcommand}!stake\_cpu@{stake\_cpu}}
+\index{stake\_cpu@{stake\_cpu}!create\_account\_subcommand@{create\_account\_subcommand}}
+\doxysubsubsection{\texorpdfstring{stake\_cpu}{stake\_cpu}}
+{\footnotesize\ttfamily \label{structcreate__account__subcommand_af8f3125d9fc57352192d2a52f4645138} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} create\+\_\+account\+\_\+subcommand\+::stake\+\_\+cpu}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01134}{1134}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{structcreate__account__subcommand_a9e59b3888b96c6a72ca7b95ecf4eb719}\index{create\_account\_subcommand@{create\_account\_subcommand}!stake\_net@{stake\_net}}
+\index{stake\_net@{stake\_net}!create\_account\_subcommand@{create\_account\_subcommand}}
+\doxysubsubsection{\texorpdfstring{stake\_net}{stake\_net}}
+{\footnotesize\ttfamily \label{structcreate__account__subcommand_a9e59b3888b96c6a72ca7b95ecf4eb719} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} create\+\_\+account\+\_\+subcommand\+::stake\+\_\+net}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01133}{1133}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{structcreate__account__subcommand_ad546b960f10a4b8e0377e2d77bbd8723}\index{create\_account\_subcommand@{create\_account\_subcommand}!transfer@{transfer}}
+\index{transfer@{transfer}!create\_account\_subcommand@{create\_account\_subcommand}}
+\doxysubsubsection{\texorpdfstring{transfer}{transfer}}
+{\footnotesize\ttfamily \label{structcreate__account__subcommand_ad546b960f10a4b8e0377e2d77bbd8723} 
+bool create\+\_\+account\+\_\+subcommand\+::transfer = false}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01138}{1138}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+programs/clio/\mbox{\hyperlink{programs_2clio_2main_8cpp}{main.\+cpp}}\end{DoxyCompactItemize}

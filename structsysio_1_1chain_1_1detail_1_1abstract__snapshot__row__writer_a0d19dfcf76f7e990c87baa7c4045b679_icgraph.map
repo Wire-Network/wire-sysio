@@ -1,0 +1,7 @@
+<map id="sysio::chain::detail::abstract_snapshot_row_writer::write" name="sysio::chain::detail::abstract_snapshot_row_writer::write">
+<area shape="rect" id="Node000001" title=" " alt="" coords="238,41,402,97"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1chain_1_1integrity__hash__snapshot__writer.html#a831ed3472a6e10070a41f512da52b10e" title=" " alt="" coords="20,5,175,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="222,56,175,48,176,43,223,51"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1chain_1_1ostream__snapshot__writer.html#a43c9836b76e5cea6f8ad0dc88927bcc8" title=" " alt="" coords="5,85,190,126"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="223,88,190,93,190,88,222,82"/>
+</map>

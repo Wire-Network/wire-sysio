@@ -1,0 +1,83 @@
+\doxysection{libraries/builtins/int\+\_\+t.h File Reference}
+\hypertarget{int__t_8h}{}\label{int__t_8h}\index{libraries/builtins/int\_t.h@{libraries/builtins/int\_t.h}}
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include $<$limits.\+h$>$}\newline
+Include dependency graph for int\+\_\+t.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=196pt]{int__t_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=266pt]{int__t_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+union \mbox{\hyperlink{uniontwords}{twords}}
+\item 
+union \mbox{\hyperlink{unionutwords}{utwords}}
+\item 
+union \mbox{\hyperlink{unionudwords}{udwords}}
+\item 
+union \mbox{\hyperlink{uniondouble__bits}{double\+\_\+bits}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef \+\_\+\+\_\+int128 \mbox{\hyperlink{int__t_8h_a809ddb4bf175c5d5cb11a93120f171bd}{ti\+\_\+int}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\+\_\+\+\_\+int128 \mbox{\hyperlink{int__t_8h_a2d5320c270ab41e5bbbcf4ff2b941832}{\+\_\+\+\_\+clzti2}} (\+\_\+\+\_\+int128 \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{int__t_8h_a809ddb4bf175c5d5cb11a93120f171bd}\index{int\_t.h@{int\_t.h}!ti\_int@{ti\_int}}
+\index{ti\_int@{ti\_int}!int\_t.h@{int\_t.h}}
+\doxysubsubsection{\texorpdfstring{ti\_int}{ti\_int}}
+{\footnotesize\ttfamily \label{int__t_8h_a809ddb4bf175c5d5cb11a93120f171bd} 
+typedef \+\_\+\+\_\+int128 \mbox{\hyperlink{int__t_8h_a809ddb4bf175c5d5cb11a93120f171bd}{ti\+\_\+int}}}
+
+
+
+Definition at line \mbox{\hyperlink{int__t_8h_source_l00043}{43}} of file \mbox{\hyperlink{int__t_8h_source}{int\+\_\+t.\+h}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{int__t_8h_a2d5320c270ab41e5bbbcf4ff2b941832}\index{int\_t.h@{int\_t.h}!\_\_clzti2@{\_\_clzti2}}
+\index{\_\_clzti2@{\_\_clzti2}!int\_t.h@{int\_t.h}}
+\doxysubsubsection{\texorpdfstring{\_\_clzti2()}{\_\_clzti2()}}
+{\footnotesize\ttfamily \label{int__t_8h_a2d5320c270ab41e5bbbcf4ff2b941832} 
+\+\_\+\+\_\+int128 \+\_\+\+\_\+clzti2 (\begin{DoxyParamCaption}\item[{\+\_\+\+\_\+int128}]{a}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{int__t_8h_source_l00045}{45}} of file \mbox{\hyperlink{int__t_8h_source}{int\+\_\+t.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00046\ \{}
+\DoxyCodeLine{00047\ \ \ \ \ \mbox{\hyperlink{uniontwords}{twords}}\ x;}
+\DoxyCodeLine{00048\ \ \ \ \ x.\mbox{\hyperlink{uniontwords_a9a297115518dff0f0fb6e9f6dad0d8b2}{all}}\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}};}
+\DoxyCodeLine{00049\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}\ =\ -\/(x.\mbox{\hyperlink{uniontwords_a5c673b14dda68741aaf09aef164dd5de}{s}}.high\ ==\ 0);}
+\DoxyCodeLine{00050\ \ \ \ \ \textcolor{keywordflow}{return}\ \_\_builtin\_clzll((x.\mbox{\hyperlink{uniontwords_a5c673b14dda68741aaf09aef164dd5de}{s}}.high\ \&\ \string~\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})\ |\ (x.\mbox{\hyperlink{uniontwords_a5c673b14dda68741aaf09aef164dd5de}{s}}.low\ \&\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}))\ +}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ ((\mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}})\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}\ \&\ ((\mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}})(\textcolor{keyword}{sizeof}(\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}})\ *\ CHAR\_BIT)));}
+\DoxyCodeLine{00052\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{int__t_8h_a2d5320c270ab41e5bbbcf4ff2b941832_icgraph}
+\end{center}
+\end{figure}

@@ -1,0 +1,52 @@
+\doxysection{sysio\+::chain\+::webassembly\+::detail\+::is\+\_\+whitelisted\+\_\+legacy\+\_\+type\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>} Struct Template Reference}
+\hypertarget{structsysio_1_1chain_1_1webassembly_1_1detail_1_1is__whitelisted__legacy__type}{}\label{structsysio_1_1chain_1_1webassembly_1_1detail_1_1is__whitelisted__legacy__type}\index{sysio::chain::webassembly::detail::is\_whitelisted\_legacy\_type$<$ T $>$@{sysio::chain::webassembly::detail::is\_whitelisted\_legacy\_type$<$ T $>$}}
+
+
+{\ttfamily \#include $<$preconditions.\+hpp$>$}
+
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static constexpr bool \mbox{\hyperlink{structsysio_1_1chain_1_1webassembly_1_1detail_1_1is__whitelisted__legacy__type_aca0463316addacc7911b819ca990a14e}{value}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$\newline
+struct sysio\+::chain\+::webassembly\+::detail\+::is\+\_\+whitelisted\+\_\+legacy\+\_\+type$<$ T $>$}
+
+
+Definition at line \mbox{\hyperlink{preconditions_8hpp_source_l00030}{30}} of file \mbox{\hyperlink{preconditions_8hpp_source}{preconditions.\+hpp}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1chain_1_1webassembly_1_1detail_1_1is__whitelisted__legacy__type_aca0463316addacc7911b819ca990a14e}\index{sysio::chain::webassembly::detail::is\_whitelisted\_legacy\_type$<$ T $>$@{sysio::chain::webassembly::detail::is\_whitelisted\_legacy\_type$<$ T $>$}!value@{value}}
+\index{value@{value}!sysio::chain::webassembly::detail::is\_whitelisted\_legacy\_type$<$ T $>$@{sysio::chain::webassembly::detail::is\_whitelisted\_legacy\_type$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{value}{value}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1webassembly_1_1detail_1_1is__whitelisted__legacy__type_aca0463316addacc7911b819ca990a14e} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+bool \mbox{\hyperlink{structsysio_1_1chain_1_1webassembly_1_1detail_1_1is__whitelisted__legacy__type}{sysio\+::chain\+::webassembly\+::detail\+::is\+\_\+whitelisted\+\_\+legacy\+\_\+type}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::value\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=\ std::is\_same\_v<float128\_t,\ T>\ ||}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::is\_same\_v<null\_terminated\_ptr,\ T>\ ||}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::is\_same\_v<memcpy\_params,\ T>\ ||}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::is\_same\_v<memcmp\_params,\ T>\ ||}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::is\_same\_v<memset\_params,\ T>\ ||}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::is\_same\_v<decltype(is\_legacy\_ptr(std::declval<T>())),\ std::true\_type>\ ||}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::is\_same\_v<decltype(is\_legacy\_span(std::declval<T>())),\ std::true\_type>\ ||}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::is\_same\_v<name,\ T>\ ||}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::is\_arithmetic\_v<T>}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{preconditions_8hpp_source_l00031}{31}} of file \mbox{\hyperlink{preconditions_8hpp_source}{preconditions.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/webassembly/\mbox{\hyperlink{preconditions_8hpp}{preconditions.\+hpp}}\end{DoxyCompactItemize}

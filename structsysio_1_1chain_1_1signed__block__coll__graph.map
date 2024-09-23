@@ -1,0 +1,20 @@
+<map id="sysio::chain::signed_block" name="sysio::chain::signed_block">
+<area shape="rect" id="Node000001" title=" " alt="" coords="967,258,1105,298"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1signed__block__header.html" title=" " alt="" coords="684,200,822,241"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="838,235,968,262,966,267,837,240"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1chain_1_1block__header.html" title=" " alt="" coords="366,147,496,188"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="512,178,684,207,683,212,511,183"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1chain_1_1block__timestamp.html" title=" " alt="" coords="12,5,195,76"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="211,59,275,77,340,102,375,122,406,144,403,149,373,127,338,107,274,82,209,64"/>
+<area shape="rect" id="Node000005" href="$structsysio_1_1chain_1_1name.html" title="Immutable except for fc::from_variant." alt="" coords="38,100,169,126"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="185,117,260,126,339,139,367,146,365,151,338,145,259,131,184,122"/>
+<area shape="rect" id="Node000006" href="$classfc_1_1sha256.html" title=" " alt="" coords="62,176,145,202"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="160,189,244,190,338,184,366,180,366,185,339,190,245,195,160,194"/>
+<area shape="rect" id="Node000007" href="$classfc_1_1vector.html" title=" " alt="" coords="5,242,202,282"/>
+<area shape="poly" id="edge9_Node000001_Node000007" title=" " alt="" coords="217,261,967,274,967,279,217,267"/>
+<area shape="poly" id="edge6_Node000003_Node000007" title=" " alt="" coords="217,243,277,229,338,211,361,197,384,186,386,191,364,202,340,215,279,235,218,248"/>
+<area shape="rect" id="Node000008" href="$classfc_1_1crypto_1_1signature.html" title=" " alt="" coords="363,212,500,238"/>
+<area shape="poly" id="edge7_Node000002_Node000008" title=" " alt="" coords="515,221,684,219,684,224,515,226"/>
+<area shape="rect" id="Node000009" href="$classfc_1_1vector.html" title=" " alt="" coords="662,315,844,356"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="859,324,943,309,983,296,985,302,944,314,860,329"/>
+</map>

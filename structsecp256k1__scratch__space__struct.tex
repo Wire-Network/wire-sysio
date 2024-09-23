@@ -1,0 +1,82 @@
+\doxysection{secp256k1\+\_\+scratch\+\_\+space\+\_\+struct Struct Reference}
+\hypertarget{structsecp256k1__scratch__space__struct}{}\label{structsecp256k1__scratch__space__struct}\index{secp256k1\_scratch\_space\_struct@{secp256k1\_scratch\_space\_struct}}
+
+
+{\ttfamily \#include $<$scratch.\+h$>$}
+
+
+
+Collaboration diagram for secp256k1\+\_\+scratch\+\_\+space\+\_\+struct\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=212pt]{structsecp256k1__scratch__space__struct__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+unsigned char \mbox{\hyperlink{structsecp256k1__scratch__space__struct_a794b94d27e06cc8ece235e3baaa68240}{magic}} \mbox{[}8\mbox{]}
+\item 
+void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structsecp256k1__scratch__space__struct_a411d4fd1980301bb2e3a7d0f83eeba47}{data}}
+\item 
+size\+\_\+t \mbox{\hyperlink{structsecp256k1__scratch__space__struct_a1a7fd762172b1d5455223d4c33a596f9}{alloc\+\_\+size}}
+\item 
+size\+\_\+t \mbox{\hyperlink{structsecp256k1__scratch__space__struct_a1f2a8df08845fcbfea507f9b65142401}{max\+\_\+size}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{scratch_8h_source_l00012}{12}} of file \mbox{\hyperlink{scratch_8h_source}{scratch.\+h}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsecp256k1__scratch__space__struct_a1a7fd762172b1d5455223d4c33a596f9}\index{secp256k1\_scratch\_space\_struct@{secp256k1\_scratch\_space\_struct}!alloc\_size@{alloc\_size}}
+\index{alloc\_size@{alloc\_size}!secp256k1\_scratch\_space\_struct@{secp256k1\_scratch\_space\_struct}}
+\doxysubsubsection{\texorpdfstring{alloc\_size}{alloc\_size}}
+{\footnotesize\ttfamily \label{structsecp256k1__scratch__space__struct_a1a7fd762172b1d5455223d4c33a596f9} 
+size\+\_\+t secp256k1\+\_\+scratch\+\_\+space\+\_\+struct\+::alloc\+\_\+size}
+
+amount that has been allocated (i.\+e. {\ttfamily data + offset} is the next available pointer) ~\newline
+ 
+
+Definition at line \mbox{\hyperlink{scratch_8h_source_l00019}{19}} of file \mbox{\hyperlink{scratch_8h_source}{scratch.\+h}}.
+
+\Hypertarget{structsecp256k1__scratch__space__struct_a411d4fd1980301bb2e3a7d0f83eeba47}\index{secp256k1\_scratch\_space\_struct@{secp256k1\_scratch\_space\_struct}!data@{data}}
+\index{data@{data}!secp256k1\_scratch\_space\_struct@{secp256k1\_scratch\_space\_struct}}
+\doxysubsubsection{\texorpdfstring{data}{data}}
+{\footnotesize\ttfamily \label{structsecp256k1__scratch__space__struct_a411d4fd1980301bb2e3a7d0f83eeba47} 
+void\texorpdfstring{$\ast$}{*} secp256k1\+\_\+scratch\+\_\+space\+\_\+struct\+::data}
+
+actual allocated data 
+
+Definition at line \mbox{\hyperlink{scratch_8h_source_l00016}{16}} of file \mbox{\hyperlink{scratch_8h_source}{scratch.\+h}}.
+
+\Hypertarget{structsecp256k1__scratch__space__struct_a794b94d27e06cc8ece235e3baaa68240}\index{secp256k1\_scratch\_space\_struct@{secp256k1\_scratch\_space\_struct}!magic@{magic}}
+\index{magic@{magic}!secp256k1\_scratch\_space\_struct@{secp256k1\_scratch\_space\_struct}}
+\doxysubsubsection{\texorpdfstring{magic}{magic}}
+{\footnotesize\ttfamily \label{structsecp256k1__scratch__space__struct_a794b94d27e06cc8ece235e3baaa68240} 
+unsigned char secp256k1\+\_\+scratch\+\_\+space\+\_\+struct\+::magic\mbox{[}8\mbox{]}}
+
+guard against interpreting this object as other types 
+
+Definition at line \mbox{\hyperlink{scratch_8h_source_l00014}{14}} of file \mbox{\hyperlink{scratch_8h_source}{scratch.\+h}}.
+
+\Hypertarget{structsecp256k1__scratch__space__struct_a1f2a8df08845fcbfea507f9b65142401}\index{secp256k1\_scratch\_space\_struct@{secp256k1\_scratch\_space\_struct}!max\_size@{max\_size}}
+\index{max\_size@{max\_size}!secp256k1\_scratch\_space\_struct@{secp256k1\_scratch\_space\_struct}}
+\doxysubsubsection{\texorpdfstring{max\_size}{max\_size}}
+{\footnotesize\ttfamily \label{structsecp256k1__scratch__space__struct_a1f2a8df08845fcbfea507f9b65142401} 
+size\+\_\+t secp256k1\+\_\+scratch\+\_\+space\+\_\+struct\+::max\+\_\+size}
+
+maximum size available to allocate 
+
+Definition at line \mbox{\hyperlink{scratch_8h_source_l00021}{21}} of file \mbox{\hyperlink{scratch_8h_source}{scratch.\+h}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/secp256k1/secp256k1/src/\mbox{\hyperlink{scratch_8h}{scratch.\+h}}\end{DoxyCompactItemize}

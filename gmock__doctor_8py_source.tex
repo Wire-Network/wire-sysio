@@ -1,0 +1,646 @@
+\doxysection{gmock\+\_\+doctor.\+py}
+\hypertarget{gmock__doctor_8py_source}{}\label{gmock__doctor_8py_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googlemock/scripts/gmock\_doctor.py@{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googlemock/scripts/gmock\_doctor.py}}
+\mbox{\hyperlink{gmock__doctor_8py}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00001}\mbox{\hyperlink{namespacegmock__doctor}{00001}}\ \textcolor{comment}{\#!/usr/bin/env\ python}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00002}00002\ \textcolor{comment}{\#}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00003}00003\ \textcolor{comment}{\#\ Copyright\ 2008,\ Google\ Inc.}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00004}00004\ \textcolor{comment}{\#\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00005}00005\ \textcolor{comment}{\#}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00006}00006\ \textcolor{comment}{\#\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00007}00007\ \textcolor{comment}{\#\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00008}00008\ \textcolor{comment}{\#\ met:}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00009}00009\ \textcolor{comment}{\#}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00010}00010\ \textcolor{comment}{\#\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00011}00011\ \textcolor{comment}{\#\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00012}00012\ \textcolor{comment}{\#\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00013}00013\ \textcolor{comment}{\#\ copyright\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00014}00014\ \textcolor{comment}{\#\ in\ the\ documentation\ and/or\ other\ materials\ provided\ with\ the}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00015}00015\ \textcolor{comment}{\#\ distribution.}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00016}00016\ \textcolor{comment}{\#\ \ \ \ \ *\ Neither\ the\ name\ of\ Google\ Inc.\ nor\ the\ names\ of\ its}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00017}00017\ \textcolor{comment}{\#\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products\ derived\ from}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00018}00018\ \textcolor{comment}{\#\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00019}00019\ \textcolor{comment}{\#}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00020}00020\ \textcolor{comment}{\#\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00021}00021\ \textcolor{comment}{\#\ "{}AS\ IS"{}\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00022}00022\ \textcolor{comment}{\#\ LIMITED\ TO,\ THE\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00023}00023\ \textcolor{comment}{\#\ A\ PARTICULAR\ PURPOSE\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ THE\ COPYRIGHT}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00024}00024\ \textcolor{comment}{\#\ OWNER\ OR\ CONTRIBUTORS\ BE\ LIABLE\ FOR\ ANY\ DIRECT,\ INDIRECT,\ INCIDENTAL,}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00025}00025\ \textcolor{comment}{\#\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES\ (INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00026}00026\ \textcolor{comment}{\#\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;\ LOSS\ OF\ USE,}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00027}00027\ \textcolor{comment}{\#\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND\ ON\ ANY}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00028}00028\ \textcolor{comment}{\#\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00029}00029\ \textcolor{comment}{\#\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00030}00030\ \textcolor{comment}{\#\ OF\ THIS\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00032}00032\ \textcolor{stringliteral}{"{}"{}"{}Converts\ compiler's\ errors\ in\ code\ using\ Google\ Mock\ to\ plain\ English."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00034}00034\ \_\_author\_\_\ =\ \textcolor{stringliteral}{'wan@google.com\ (Zhanyong\ Wan)'}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00036}00036\ \textcolor{keyword}{import}\ re}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00037}00037\ \textcolor{keyword}{import}\ sys}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00039}\mbox{\hyperlink{namespacegmock__doctor_ab4e0eb0462b9ad647e7d4fa4410cc850}{00039}}\ \_VERSION\ =\ \textcolor{stringliteral}{'1.0.3'}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00041}\mbox{\hyperlink{namespacegmock__doctor_a0d618777e3731fa03b16f71a92ec88c1}{00041}}\ \_EMAIL\ =\ \textcolor{stringliteral}{'googlemock@googlegroups.com'}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00043}\mbox{\hyperlink{namespacegmock__doctor_ac704a49399e603fba5104e490f17fce3}{00043}}\ \_COMMON\_GMOCK\_SYMBOLS\ =\ [}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00044}00044\ \ \ \ \ \textcolor{comment}{\#\ Matchers}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00045}00045\ \ \ \ \ \textcolor{stringliteral}{'\_'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00046}00046\ \ \ \ \ \textcolor{stringliteral}{'A'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00047}00047\ \ \ \ \ \textcolor{stringliteral}{'AddressSatisfies'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00048}00048\ \ \ \ \ \textcolor{stringliteral}{'AllOf'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00049}00049\ \ \ \ \ \textcolor{stringliteral}{'An'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00050}00050\ \ \ \ \ \textcolor{stringliteral}{'AnyOf'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00051}00051\ \ \ \ \ \textcolor{stringliteral}{'ContainerEq'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00052}00052\ \ \ \ \ \textcolor{stringliteral}{'Contains'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00053}00053\ \ \ \ \ \textcolor{stringliteral}{'ContainsRegex'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00054}00054\ \ \ \ \ \textcolor{stringliteral}{'DoubleEq'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00055}00055\ \ \ \ \ \textcolor{stringliteral}{'ElementsAre'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00056}00056\ \ \ \ \ \textcolor{stringliteral}{'ElementsAreArray'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00057}00057\ \ \ \ \ \textcolor{stringliteral}{'EndsWith'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00058}00058\ \ \ \ \ \textcolor{stringliteral}{'Eq'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00059}00059\ \ \ \ \ \textcolor{stringliteral}{'Field'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00060}00060\ \ \ \ \ \textcolor{stringliteral}{'FloatEq'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00061}00061\ \ \ \ \ \textcolor{stringliteral}{'Ge'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00062}00062\ \ \ \ \ \textcolor{stringliteral}{'Gt'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00063}00063\ \ \ \ \ \textcolor{stringliteral}{'HasSubstr'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00064}00064\ \ \ \ \ \textcolor{stringliteral}{'IsInitializedProto'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00065}00065\ \ \ \ \ \textcolor{stringliteral}{'Le'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00066}00066\ \ \ \ \ \textcolor{stringliteral}{'Lt'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00067}00067\ \ \ \ \ \textcolor{stringliteral}{'MatcherCast'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00068}00068\ \ \ \ \ \textcolor{stringliteral}{'Matches'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00069}00069\ \ \ \ \ \textcolor{stringliteral}{'MatchesRegex'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00070}00070\ \ \ \ \ \textcolor{stringliteral}{'NanSensitiveDoubleEq'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00071}00071\ \ \ \ \ \textcolor{stringliteral}{'NanSensitiveFloatEq'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00072}00072\ \ \ \ \ \textcolor{stringliteral}{'Ne'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00073}00073\ \ \ \ \ \textcolor{stringliteral}{'Not'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00074}00074\ \ \ \ \ \textcolor{stringliteral}{'NotNull'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00075}00075\ \ \ \ \ \textcolor{stringliteral}{'Pointee'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00076}00076\ \ \ \ \ \textcolor{stringliteral}{'Property'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00077}00077\ \ \ \ \ \textcolor{stringliteral}{'Ref'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00078}00078\ \ \ \ \ \textcolor{stringliteral}{'ResultOf'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00079}00079\ \ \ \ \ \textcolor{stringliteral}{'SafeMatcherCast'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00080}00080\ \ \ \ \ \textcolor{stringliteral}{'StartsWith'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00081}00081\ \ \ \ \ \textcolor{stringliteral}{'StrCaseEq'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00082}00082\ \ \ \ \ \textcolor{stringliteral}{'StrCaseNe'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00083}00083\ \ \ \ \ \textcolor{stringliteral}{'StrEq'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00084}00084\ \ \ \ \ \textcolor{stringliteral}{'StrNe'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00085}00085\ \ \ \ \ \textcolor{stringliteral}{'Truly'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00086}00086\ \ \ \ \ \textcolor{stringliteral}{'TypedEq'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00087}00087\ \ \ \ \ \textcolor{stringliteral}{'Value'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00088}00088\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00089}00089\ \ \ \ \ \textcolor{comment}{\#\ Actions}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00090}00090\ \ \ \ \ \textcolor{stringliteral}{'Assign'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00091}00091\ \ \ \ \ \textcolor{stringliteral}{'ByRef'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00092}00092\ \ \ \ \ \textcolor{stringliteral}{'DeleteArg'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00093}00093\ \ \ \ \ \textcolor{stringliteral}{'DoAll'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00094}00094\ \ \ \ \ \textcolor{stringliteral}{'DoDefault'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00095}00095\ \ \ \ \ \textcolor{stringliteral}{'IgnoreResult'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00096}00096\ \ \ \ \ \textcolor{stringliteral}{'Invoke'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00097}00097\ \ \ \ \ \textcolor{stringliteral}{'InvokeArgument'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00098}00098\ \ \ \ \ \textcolor{stringliteral}{'InvokeWithoutArgs'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00099}00099\ \ \ \ \ \textcolor{stringliteral}{'Return'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00100}00100\ \ \ \ \ \textcolor{stringliteral}{'ReturnNew'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00101}00101\ \ \ \ \ \textcolor{stringliteral}{'ReturnNull'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00102}00102\ \ \ \ \ \textcolor{stringliteral}{'ReturnRef'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00103}00103\ \ \ \ \ \textcolor{stringliteral}{'SaveArg'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00104}00104\ \ \ \ \ \textcolor{stringliteral}{'SetArgReferee'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00105}00105\ \ \ \ \ \textcolor{stringliteral}{'SetArgPointee'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00106}00106\ \ \ \ \ \textcolor{stringliteral}{'SetArgumentPointee'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00107}00107\ \ \ \ \ \textcolor{stringliteral}{'SetArrayArgument'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00108}00108\ \ \ \ \ \textcolor{stringliteral}{'SetErrnoAndReturn'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00109}00109\ \ \ \ \ \textcolor{stringliteral}{'Throw'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00110}00110\ \ \ \ \ \textcolor{stringliteral}{'WithArg'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00111}00111\ \ \ \ \ \textcolor{stringliteral}{'WithArgs'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00112}00112\ \ \ \ \ \textcolor{stringliteral}{'WithoutArgs'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00113}00113\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00114}00114\ \ \ \ \ \textcolor{comment}{\#\ Cardinalities}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00115}00115\ \ \ \ \ \textcolor{stringliteral}{'AnyNumber'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00116}00116\ \ \ \ \ \textcolor{stringliteral}{'AtLeast'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00117}00117\ \ \ \ \ \textcolor{stringliteral}{'AtMost'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00118}00118\ \ \ \ \ \textcolor{stringliteral}{'Between'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00119}00119\ \ \ \ \ \textcolor{stringliteral}{'Exactly'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00120}00120\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00121}00121\ \ \ \ \ \textcolor{comment}{\#\ Sequences}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00122}00122\ \ \ \ \ \textcolor{stringliteral}{'InSequence'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00123}00123\ \ \ \ \ \textcolor{stringliteral}{'Sequence'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00124}00124\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00125}00125\ \ \ \ \ \textcolor{comment}{\#\ Misc}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00126}00126\ \ \ \ \ \textcolor{stringliteral}{'DefaultValue'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00127}00127\ \ \ \ \ \textcolor{stringliteral}{'Mock'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00128}00128\ \ \ \ \ ]}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00129}00129\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00130}00130\ \textcolor{comment}{\#\ Regex\ for\ matching\ source\ file\ path\ and\ line\ number\ in\ the\ compiler's\ errors.}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00131}\mbox{\hyperlink{namespacegmock__doctor_a0ee127f27caa5f988c477e6e9ea47373}{00131}}\ \_GCC\_FILE\_LINE\_RE\ =\ \textcolor{stringliteral}{r'(?P<file>.*):(?P<line>\(\backslash\)d+):(\(\backslash\)d+:)?\(\backslash\)s+'}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00132}\mbox{\hyperlink{namespacegmock__doctor_a6a622bfba6ba59dc6bcbbeb5f324baf1}{00132}}\ \_CLANG\_FILE\_LINE\_RE\ =\ \textcolor{stringliteral}{r'(?P<file>.*):(?P<line>\(\backslash\)d+):(?P<column>\(\backslash\)d+):\(\backslash\)s+'}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00133}\mbox{\hyperlink{namespacegmock__doctor_a54b24983d4a31b34337e0ef6fdf4fe91}{00133}}\ \_CLANG\_NON\_GMOCK\_FILE\_LINE\_RE\ =\ (}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00134}00134\ \ \ \ \ \textcolor{stringliteral}{r'(?P<file>.*[/\(\backslash\)\(\backslash\)\string^](?!gmock-\/)[\string^/\(\backslash\)\(\backslash\)]+):(?P<line>\(\backslash\)d+):(?P<column>\(\backslash\)d+):\(\backslash\)s+'})}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00135}00135\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00136}00136\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00137}\mbox{\hyperlink{namespacegmock__doctor_a9b603b6f6c415df5d7e439460742cc74}{00137}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacegmock__doctor_a9b603b6f6c415df5d7e439460742cc74}{\_FindAllMatches}}(regex,\ s):}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00138}00138\ \ \ \textcolor{stringliteral}{"{}"{}"{}Generates\ all\ matches\ of\ regex\ in\ string\ s."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00139}00139\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00140}00140\ \ \ r\ =\ re.compile(regex)}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00141}00141\ \ \ \textcolor{keywordflow}{return}\ r.finditer(s)}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00142}00142\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00143}00143\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00144}\mbox{\hyperlink{namespacegmock__doctor_a8f0f58a7a15703c3cb7884a5ab0d7e94}{00144}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacegmock__doctor_a8f0f58a7a15703c3cb7884a5ab0d7e94}{\_GenericDiagnoser}}(short\_name,\ long\_name,\ diagnoses,\ msg):}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00145}00145\ \ \ \textcolor{stringliteral}{"{}"{}"{}Diagnoses\ the\ given\ disease\ by\ pattern\ matching.}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00146}00146\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00147}00147\ \textcolor{stringliteral}{\ \ Can\ provide\ different\ diagnoses\ for\ different\ patterns.}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00148}00148\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00149}00149\ \textcolor{stringliteral}{\ \ Args:}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00150}00150\ \textcolor{stringliteral}{\ \ \ \ short\_name:\ Short\ name\ of\ the\ disease.}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00151}00151\ \textcolor{stringliteral}{\ \ \ \ long\_name:\ \ Long\ name\ of\ the\ disease.}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00152}00152\ \textcolor{stringliteral}{\ \ \ \ diagnoses:\ \ A\ list\ of\ pairs\ (regex,\ pattern\ for\ formatting\ the\ diagnosis}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00153}00153\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ for\ matching\ regex).}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00154}00154\ \textcolor{stringliteral}{\ \ \ \ msg:\ \ \ \ \ \ \ \ Compiler's\ error\ messages.}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00155}00155\ \textcolor{stringliteral}{\ \ Yields:}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00156}00156\ \textcolor{stringliteral}{\ \ \ \ Tuples\ of\ the\ form}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00157}00157\ \textcolor{stringliteral}{\ \ \ \ \ \ (short\ name\ of\ disease,\ long\ name\ of\ disease,\ diagnosis).}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00158}00158\ \textcolor{stringliteral}{\ \ "{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00159}00159\ \ \ \textcolor{keywordflow}{for}\ regex,\ diagnosis\ \textcolor{keywordflow}{in}\ diagnoses:}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00160}00160\ \ \ \ \ \textcolor{keywordflow}{if}\ re.search(regex,\ msg):}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00161}00161\ \ \ \ \ \ \ diagnosis\ =\ \textcolor{stringliteral}{'\%(file)s:\%(line)s:'}\ +\ diagnosis}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00162}00162\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ m\ \textcolor{keywordflow}{in}\ \mbox{\hyperlink{namespacegmock__doctor_a9b603b6f6c415df5d7e439460742cc74}{\_FindAllMatches}}(regex,\ msg):}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00163}00163\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{yield}\ (short\_name,\ long\_name,\ diagnosis\ \%\ m.groupdict())}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00164}00164\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00165}00165\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00166}\mbox{\hyperlink{namespacegmock__doctor_a318414e5137f3b36d544253413a85539}{00166}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacegmock__doctor_a318414e5137f3b36d544253413a85539}{\_NeedToReturnReferenceDiagnoser}}(msg):}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00167}00167\ \ \ \textcolor{stringliteral}{"{}"{}"{}Diagnoses\ the\ NRR\ disease,\ given\ the\ error\ messages\ by\ the\ compiler."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00168}00168\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00169}00169\ \ \ gcc\_regex\ =\ (\textcolor{stringliteral}{r'In\ member\ function\ \(\backslash\)'testing::internal::ReturnAction<R>.*\(\backslash\)n'}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00170}00170\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ +\ \_GCC\_FILE\_LINE\_RE\ +\ \textcolor{stringliteral}{r'instantiated\ from\ here\(\backslash\)n'}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00171}00171\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'.*gmock-\/actions\(\backslash\).h.*error:\ creating\ array\ with\ negative\ size'})}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00172}00172\ \ \ clang\_regex\ =\ (\textcolor{stringliteral}{r'error:.*array.*negative.*\(\backslash\)r?\(\backslash\)n'}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00173}00173\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'(.*\(\backslash\)n)*?'}\ +}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00174}00174\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_CLANG\_NON\_GMOCK\_FILE\_LINE\_RE\ +}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00175}00175\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'note:\ in\ instantiation\ of\ function\ template\ specialization\ '}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00176}00176\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'\(\backslash\)'testing::internal::ReturnAction<(?P<type>.*)>'}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00177}00177\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'::operator\ Action<.*>\(\backslash\)'\ requested\ here'})}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00178}00178\ \ \ clang11\_re\ =\ (\textcolor{stringliteral}{r'use\_ReturnRef\_instead\_of\_Return\_to\_return\_a\_reference.*'}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00179}00179\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'(.*\(\backslash\)n)*?'}\ +\ \_CLANG\_NON\_GMOCK\_FILE\_LINE\_RE)}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00180}00180\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00181}00181\ \ \ diagnosis\ =\ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00182}00182\ \textcolor{stringliteral}{You\ are\ using\ a\ Return()\ action\ in\ a\ function\ that\ returns\ a\ reference\ to}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00183}00183\ \textcolor{stringliteral}{\%(type)s.\ \ Please\ use\ ReturnRef()\ instead."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00184}00184\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacegmock__doctor_a8f0f58a7a15703c3cb7884a5ab0d7e94}{\_GenericDiagnoser}}(\textcolor{stringliteral}{'NRR'},\ \textcolor{stringliteral}{'Need\ to\ Return\ Reference'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00185}00185\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [(clang\_regex,\ diagnosis),}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00186}00186\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (clang11\_re,\ diagnosis\ \%\ \{\textcolor{stringliteral}{'type'}:\ \textcolor{stringliteral}{'a\ type'}\}),}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00187}00187\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (gcc\_regex,\ diagnosis\ \%\ \{\textcolor{stringliteral}{'type'}:\ \textcolor{stringliteral}{'a\ type'}\})],}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00188}00188\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ msg)}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00189}00189\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00190}00190\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00191}\mbox{\hyperlink{namespacegmock__doctor_af21e6056d13fcce7f25290f02239f4a7}{00191}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacegmock__doctor_af21e6056d13fcce7f25290f02239f4a7}{\_NeedToReturnSomethingDiagnoser}}(msg):}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00192}00192\ \ \ \textcolor{stringliteral}{"{}"{}"{}Diagnoses\ the\ NRS\ disease,\ given\ the\ error\ messages\ by\ the\ compiler."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00193}00193\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00194}00194\ \ \ gcc\_regex\ =\ (\_GCC\_FILE\_LINE\_RE\ +\ \textcolor{stringliteral}{r'(instantiated\ from\ here\(\backslash\)n.'}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00195}00195\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'*gmock.*actions\(\backslash\).h.*error:\ void\ value\ not\ ignored)'}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00196}00196\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'|(error:\ control\ reaches\ end\ of\ non-\/void\ function)'})}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00197}00197\ \ \ clang\_regex1\ =\ (\_CLANG\_FILE\_LINE\_RE\ +}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00198}00198\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'error:\ cannot\ initialize\ return\ object\ '}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00199}00199\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'of\ type\ \(\backslash\)'Result\(\backslash\)'\ \(\backslash\)(aka\ \(\backslash\)'(?P<return\_type>.*)\(\backslash\)'\(\backslash\))\ '}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00200}00200\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'with\ an\ rvalue\ of\ type\ \(\backslash\)'void\(\backslash\)''})}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00201}00201\ \ \ clang\_regex2\ =\ (\_CLANG\_FILE\_LINE\_RE\ +}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00202}00202\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'error:\ cannot\ initialize\ return\ object\ '}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00203}00203\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'of\ type\ \(\backslash\)'(?P<return\_type>.*)\(\backslash\)'\ '}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00204}00204\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'with\ an\ rvalue\ of\ type\ \(\backslash\)'void\(\backslash\)''})}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00205}00205\ \ \ diagnosis\ =\ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00206}00206\ \textcolor{stringliteral}{You\ are\ using\ an\ action\ that\ returns\ void,\ but\ it\ needs\ to\ return}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00207}00207\ \textcolor{stringliteral}{\%(return\_type)s.\ \ Please\ tell\ it\ *what*\ to\ return.\ \ Perhaps\ you\ can\ use}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00208}00208\ \textcolor{stringliteral}{the\ pattern\ DoAll(some\_action,\ Return(some\_value))?"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00209}00209\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacegmock__doctor_a8f0f58a7a15703c3cb7884a5ab0d7e94}{\_GenericDiagnoser}}(}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00210}00210\ \ \ \ \ \ \ \textcolor{stringliteral}{'NRS'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00211}00211\ \ \ \ \ \ \ \textcolor{stringliteral}{'Need\ to\ Return\ Something'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00212}00212\ \ \ \ \ \ \ [(gcc\_regex,\ diagnosis\ \%\ \{\textcolor{stringliteral}{'return\_type'}:\ \textcolor{stringliteral}{'*something*'}\}),}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00213}00213\ \ \ \ \ \ \ \ (clang\_regex1,\ diagnosis),}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00214}00214\ \ \ \ \ \ \ \ (clang\_regex2,\ diagnosis)],}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00215}00215\ \ \ \ \ \ \ msg)}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00216}00216\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00217}00217\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00218}\mbox{\hyperlink{namespacegmock__doctor_abfe338e6df7ab93a894ebf73fc30851c}{00218}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacegmock__doctor_abfe338e6df7ab93a894ebf73fc30851c}{\_NeedToReturnNothingDiagnoser}}(msg):}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00219}00219\ \ \ \textcolor{stringliteral}{"{}"{}"{}Diagnoses\ the\ NRN\ disease,\ given\ the\ error\ messages\ by\ the\ compiler."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00220}00220\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00221}00221\ \ \ gcc\_regex\ =\ (\_GCC\_FILE\_LINE\_RE\ +\ \textcolor{stringliteral}{r'instantiated\ from\ here\(\backslash\)n'}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00222}00222\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'.*gmock-\/actions\(\backslash\).h.*error:\ instantiation\ of\ '}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00223}00223\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'\(\backslash\)'testing::internal::ReturnAction<R>::Impl<F>::value\_\(\backslash\)'\ '}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00224}00224\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'as\ type\ \(\backslash\)'void\(\backslash\)''})}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00225}00225\ \ \ clang\_regex1\ =\ (\textcolor{stringliteral}{r'error:\ field\ has\ incomplete\ type\ '}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00226}00226\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'\(\backslash\)'Result\(\backslash\)'\ \(\backslash\)(aka\ \(\backslash\)'void\(\backslash\)'\(\backslash\))(\(\backslash\)r)?\(\backslash\)n'}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00227}00227\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'(.*\(\backslash\)n)*?'}\ +}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00228}00228\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_CLANG\_NON\_GMOCK\_FILE\_LINE\_RE\ +\ \textcolor{stringliteral}{r'note:\ in\ instantiation\ '}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00229}00229\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'of\ function\ template\ specialization\ '}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00230}00230\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'\(\backslash\)'testing::internal::ReturnAction<(?P<return\_type>.*)>'}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00231}00231\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'::operator\ Action<void\ \(\backslash\)(.*\(\backslash\))>\(\backslash\)'\ requested\ here'})}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00232}00232\ \ \ clang\_regex2\ =\ (\textcolor{stringliteral}{r'error:\ field\ has\ incomplete\ type\ '}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00233}00233\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'\(\backslash\)'Result\(\backslash\)'\ \(\backslash\)(aka\ \(\backslash\)'void\(\backslash\)'\(\backslash\))(\(\backslash\)r)?\(\backslash\)n'}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00234}00234\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'(.*\(\backslash\)n)*?'}\ +}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00235}00235\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_CLANG\_NON\_GMOCK\_FILE\_LINE\_RE\ +\ \textcolor{stringliteral}{r'note:\ in\ instantiation\ '}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00236}00236\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'of\ function\ template\ specialization\ '}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00237}00237\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'\(\backslash\)'testing::internal::DoBothAction<.*>'}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00238}00238\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'::operator\ Action<(?P<return\_type>.*)\ \(\backslash\)(.*\(\backslash\))>\(\backslash\)'\ '}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00239}00239\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'requested\ here'})}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00240}00240\ \ \ diagnosis\ =\ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00241}00241\ \textcolor{stringliteral}{You\ are\ using\ an\ action\ that\ returns\ \%(return\_type)s,\ but\ it\ needs\ to\ return}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00242}00242\ \textcolor{stringliteral}{void.\ \ Please\ use\ a\ void-\/returning\ action\ instead.}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00243}00243\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00244}00244\ \textcolor{stringliteral}{All\ actions\ but\ the\ last\ in\ DoAll(...)\ must\ return\ void.\ \ Perhaps\ you\ need}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00245}00245\ \textcolor{stringliteral}{to\ re-\/arrange\ the\ order\ of\ actions\ in\ a\ DoAll(),\ if\ you\ are\ using\ one?"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00246}00246\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacegmock__doctor_a8f0f58a7a15703c3cb7884a5ab0d7e94}{\_GenericDiagnoser}}(}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00247}00247\ \ \ \ \ \ \ \textcolor{stringliteral}{'NRN'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00248}00248\ \ \ \ \ \ \ \textcolor{stringliteral}{'Need\ to\ Return\ Nothing'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00249}00249\ \ \ \ \ \ \ [(gcc\_regex,\ diagnosis\ \%\ \{\textcolor{stringliteral}{'return\_type'}:\ \textcolor{stringliteral}{'*something*'}\}),}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00250}00250\ \ \ \ \ \ \ \ (clang\_regex1,\ diagnosis),}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00251}00251\ \ \ \ \ \ \ \ (clang\_regex2,\ diagnosis)],}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00252}00252\ \ \ \ \ \ \ msg)}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00253}00253\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00254}00254\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00255}\mbox{\hyperlink{namespacegmock__doctor_aa51ea2ce20a39ee6236cd75cfb50a45f}{00255}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacegmock__doctor_aa51ea2ce20a39ee6236cd75cfb50a45f}{\_IncompleteByReferenceArgumentDiagnoser}}(msg):}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00256}00256\ \ \ \textcolor{stringliteral}{"{}"{}"{}Diagnoses\ the\ IBRA\ disease,\ given\ the\ error\ messages\ by\ the\ compiler."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00257}00257\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00258}00258\ \ \ gcc\_regex\ =\ (\_GCC\_FILE\_LINE\_RE\ +\ \textcolor{stringliteral}{r'instantiated\ from\ here\(\backslash\)n'}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00259}00259\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'.*gtest-\/printers\(\backslash\).h.*error:\ invalid\ application\ of\ '}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00260}00260\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'\(\backslash\)'sizeof\(\backslash\)'\ to\ incomplete\ type\ \(\backslash\)'(?P<type>.*)\(\backslash\)''})}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00261}00261\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00262}00262\ \ \ clang\_regex\ =\ (\textcolor{stringliteral}{r'.*gtest-\/printers\(\backslash\).h.*error:\ invalid\ application\ of\ '}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00263}00263\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'\(\backslash\)'sizeof\(\backslash\)'\ to\ an\ incomplete\ type\ '}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00264}00264\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'\(\backslash\)'(?P<type>.*)(\ const)?\(\backslash\)'\(\backslash\)r?\(\backslash\)n'}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00265}00265\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'(.*\(\backslash\)n)*?'}\ +}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00266}00266\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_CLANG\_NON\_GMOCK\_FILE\_LINE\_RE\ +}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00267}00267\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'note:\ in\ instantiation\ of\ member\ function\ '}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00268}00268\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'\(\backslash\)'testing::internal2::TypeWithoutFormatter<.*>::'}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00269}00269\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'PrintValue\(\backslash\)'\ requested\ here'})}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00270}00270\ \ \ diagnosis\ =\ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00271}00271\ \textcolor{stringliteral}{In\ order\ to\ mock\ this\ function,\ Google\ Mock\ needs\ to\ see\ the\ definition}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00272}00272\ \textcolor{stringliteral}{of\ type\ "{}\%(type)s"{}\ -\/\ declaration\ alone\ is\ not\ enough.\ \ Either\ \#include}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00273}00273\ \textcolor{stringliteral}{the\ header\ that\ defines\ it,\ or\ change\ the\ argument\ to\ be\ passed}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00274}00274\ \textcolor{stringliteral}{by\ pointer."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00275}00275\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00276}00276\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacegmock__doctor_a8f0f58a7a15703c3cb7884a5ab0d7e94}{\_GenericDiagnoser}}(\textcolor{stringliteral}{'IBRA'},\ \textcolor{stringliteral}{'Incomplete\ By-\/Reference\ Argument\ Type'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00277}00277\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [(gcc\_regex,\ diagnosis),}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00278}00278\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (clang\_regex,\ diagnosis)],}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00279}00279\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ msg)}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00280}00280\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00281}00281\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00282}\mbox{\hyperlink{namespacegmock__doctor_a4c60b8d2153e815b3f5a9e17a2b7ed3f}{00282}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacegmock__doctor_a4c60b8d2153e815b3f5a9e17a2b7ed3f}{\_OverloadedFunctionMatcherDiagnoser}}(msg):}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00283}00283\ \ \ \textcolor{stringliteral}{"{}"{}"{}Diagnoses\ the\ OFM\ disease,\ given\ the\ error\ messages\ by\ the\ compiler."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00284}00284\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00285}00285\ \ \ gcc\_regex\ =\ (\_GCC\_FILE\_LINE\_RE\ +\ \textcolor{stringliteral}{r'error:\ no\ matching\ function\ for\ '}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00286}00286\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'call\ to\ \(\backslash\)'Truly\(\backslash\)(<unresolved\ overloaded\ function\ type>\(\backslash\))'})}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00287}00287\ \ \ clang\_regex\ =\ (\_CLANG\_FILE\_LINE\_RE\ +\ \textcolor{stringliteral}{r'error:\ no\ matching\ function\ for\ '}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00288}00288\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'call\ to\ \(\backslash\)'Truly'})}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00289}00289\ \ \ diagnosis\ =\ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00290}00290\ \textcolor{stringliteral}{The\ argument\ you\ gave\ to\ Truly()\ is\ an\ overloaded\ function.\ \ Please\ tell}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00291}00291\ \textcolor{stringliteral}{your\ compiler\ which\ overloaded\ version\ you\ want\ to\ use.}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00292}00292\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00293}00293\ \textcolor{stringliteral}{For\ example,\ if\ you\ want\ to\ use\ the\ version\ whose\ signature\ is}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00294}00294\ \textcolor{stringliteral}{\ \ bool\ Foo(int\ n);}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00295}00295\ \textcolor{stringliteral}{you\ should\ write}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00296}00296\ \textcolor{stringliteral}{\ \ Truly(static\_cast<bool\ (*)(int\ n)>(Foo))"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00297}00297\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacegmock__doctor_a8f0f58a7a15703c3cb7884a5ab0d7e94}{\_GenericDiagnoser}}(\textcolor{stringliteral}{'OFM'},\ \textcolor{stringliteral}{'Overloaded\ Function\ Matcher'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00298}00298\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [(gcc\_regex,\ diagnosis),}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00299}00299\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (clang\_regex,\ diagnosis)],}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00300}00300\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ msg)}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00301}00301\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00302}00302\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00303}\mbox{\hyperlink{namespacegmock__doctor_a5f4d253b280ab21b2c649bdb1ce8cc58}{00303}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacegmock__doctor_a5f4d253b280ab21b2c649bdb1ce8cc58}{\_OverloadedFunctionActionDiagnoser}}(msg):}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00304}00304\ \ \ \textcolor{stringliteral}{"{}"{}"{}Diagnoses\ the\ OFA\ disease,\ given\ the\ error\ messages\ by\ the\ compiler."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00305}00305\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00306}00306\ \ \ gcc\_regex\ =\ (\_GCC\_FILE\_LINE\_RE\ +\ \textcolor{stringliteral}{r'error:\ no\ matching\ function\ for\ call\ to\ '}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00307}00307\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'\(\backslash\)'Invoke\(\backslash\)(<unresolved\ overloaded\ function\ type>'})}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00308}00308\ \ \ clang\_regex\ =\ (\_CLANG\_FILE\_LINE\_RE\ +\ \textcolor{stringliteral}{r'error:\ no\ matching\ '}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00309}00309\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'function\ for\ call\ to\ \(\backslash\)'Invoke\(\backslash\)'\(\backslash\)r?\(\backslash\)n'}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00310}00310\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'(.*\(\backslash\)n)*?'}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00311}00311\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'.*\(\backslash\)bgmock-\/generated-\/actions\(\backslash\).h:\(\backslash\)d+:\(\backslash\)d+:\(\backslash\)s+'}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00312}00312\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'note:\ candidate\ template\ ignored:\(\backslash\)s+'}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00313}00313\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'couldn\(\backslash\)'t\ infer\ template\ argument\ \(\backslash\)'FunctionImpl\(\backslash\)''})}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00314}00314\ \ \ diagnosis\ =\ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00315}00315\ \textcolor{stringliteral}{Function\ you\ are\ passing\ to\ Invoke\ is\ overloaded.\ \ Please\ tell\ your\ compiler}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00316}00316\ \textcolor{stringliteral}{which\ overloaded\ version\ you\ want\ to\ use.}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00317}00317\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00318}00318\ \textcolor{stringliteral}{For\ example,\ if\ you\ want\ to\ use\ the\ version\ whose\ signature\ is}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00319}00319\ \textcolor{stringliteral}{\ \ bool\ MyFunction(int\ n,\ double\ x);}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00320}00320\ \textcolor{stringliteral}{you\ should\ write\ something\ like}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00321}00321\ \textcolor{stringliteral}{\ \ Invoke(static\_cast<bool\ (*)(int\ n,\ double\ x)>(MyFunction))"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00322}00322\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacegmock__doctor_a8f0f58a7a15703c3cb7884a5ab0d7e94}{\_GenericDiagnoser}}(\textcolor{stringliteral}{'OFA'},\ \textcolor{stringliteral}{'Overloaded\ Function\ Action'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00323}00323\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [(gcc\_regex,\ diagnosis),}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00324}00324\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (clang\_regex,\ diagnosis)],}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00325}00325\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ msg)}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00326}00326\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00327}00327\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00328}\mbox{\hyperlink{namespacegmock__doctor_aef440407054f259f8b189dd151e29de2}{00328}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacegmock__doctor_aef440407054f259f8b189dd151e29de2}{\_OverloadedMethodActionDiagnoser}}(msg):}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00329}00329\ \ \ \textcolor{stringliteral}{"{}"{}"{}Diagnoses\ the\ OMA\ disease,\ given\ the\ error\ messages\ by\ the\ compiler."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00330}00330\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00331}00331\ \ \ gcc\_regex\ =\ (\_GCC\_FILE\_LINE\_RE\ +\ \textcolor{stringliteral}{r'error:\ no\ matching\ function\ for\ '}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00332}00332\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'call\ to\ \(\backslash\)'Invoke\(\backslash\)(.+,\ <unresolved\ overloaded\ function\ '}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00333}00333\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'type>\(\backslash\))'})}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00334}00334\ \ \ clang\_regex\ =\ (\_CLANG\_FILE\_LINE\_RE\ +\ \textcolor{stringliteral}{r'error:\ no\ matching\ function\ '}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00335}00335\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'for\ call\ to\ \(\backslash\)'Invoke\(\backslash\)'\(\backslash\)r?\(\backslash\)n'}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00336}00336\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'(.*\(\backslash\)n)*?'}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00337}00337\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'.*\(\backslash\)bgmock-\/generated-\/actions\(\backslash\).h:\(\backslash\)d+:\(\backslash\)d+:\ '}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00338}00338\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'note:\ candidate\ function\ template\ not\ viable:\ '}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00339}00339\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'requires\ .*,\ but\ 2\ (arguments\ )?were\ provided'})}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00340}00340\ \ \ diagnosis\ =\ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00341}00341\ \textcolor{stringliteral}{The\ second\ argument\ you\ gave\ to\ Invoke()\ is\ an\ overloaded\ method.\ \ Please}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00342}00342\ \textcolor{stringliteral}{tell\ your\ compiler\ which\ overloaded\ version\ you\ want\ to\ use.}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00343}00343\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00344}00344\ \textcolor{stringliteral}{For\ example,\ if\ you\ want\ to\ use\ the\ version\ whose\ signature\ is}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00345}00345\ \textcolor{stringliteral}{\ \ class\ Foo\ \{}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00346}00346\ \textcolor{stringliteral}{\ \ \ \ ...}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00347}00347\ \textcolor{stringliteral}{\ \ \ \ bool\ Bar(int\ n,\ double\ x);}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00348}00348\ \textcolor{stringliteral}{\ \ \};}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00349}00349\ \textcolor{stringliteral}{you\ should\ write\ something\ like}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00350}00350\ \textcolor{stringliteral}{\ \ Invoke(foo,\ static\_cast<bool\ (Foo::*)(int\ n,\ double\ x)>(\&Foo::Bar))"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00351}00351\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacegmock__doctor_a8f0f58a7a15703c3cb7884a5ab0d7e94}{\_GenericDiagnoser}}(\textcolor{stringliteral}{'OMA'},\ \textcolor{stringliteral}{'Overloaded\ Method\ Action'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00352}00352\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [(gcc\_regex,\ diagnosis),}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00353}00353\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (clang\_regex,\ diagnosis)],}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00354}00354\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ msg)}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00355}00355\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00356}00356\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00357}\mbox{\hyperlink{namespacegmock__doctor_a4e3d89cec702f55d02891f0c0bf9c059}{00357}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacegmock__doctor_a4e3d89cec702f55d02891f0c0bf9c059}{\_MockObjectPointerDiagnoser}}(msg):}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00358}00358\ \ \ \textcolor{stringliteral}{"{}"{}"{}Diagnoses\ the\ MOP\ disease,\ given\ the\ error\ messages\ by\ the\ compiler."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00359}00359\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00360}00360\ \ \ gcc\_regex\ =\ (\_GCC\_FILE\_LINE\_RE\ +\ \textcolor{stringliteral}{r'error:\ request\ for\ member\ '}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00361}00361\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'\(\backslash\)'gmock\_(?P<method>.+)\(\backslash\)'\ in\ \(\backslash\)'(?P<mock\_object>.+)\(\backslash\)',\ '}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00362}00362\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'which\ is\ of\ non-\/class\ type\ \(\backslash\)'(.*::)*(?P<class\_name>.+)\(\backslash\)*\(\backslash\)''})}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00363}00363\ \ \ clang\_regex\ =\ (\_CLANG\_FILE\_LINE\_RE\ +\ \textcolor{stringliteral}{r'error:\ member\ reference\ type\ '}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00364}00364\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'\(\backslash\)'(?P<class\_name>.*?)\ *\(\backslash\)'\ is\ a\ pointer;\ '}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00365}00365\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'(did\ you\ mean|maybe\ you\ meant)\ to\ use\ \(\backslash\)'-\/>\(\backslash\)'\(\backslash\)?'})}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00366}00366\ \ \ diagnosis\ =\ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00367}00367\ \textcolor{stringliteral}{The\ first\ argument\ to\ ON\_CALL()\ and\ EXPECT\_CALL()\ must\ be\ a\ mock\ *object*,}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00368}00368\ \textcolor{stringliteral}{not\ a\ *pointer*\ to\ it.\ \ Please\ write\ '*(\%(mock\_object)s)'\ instead\ of}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00369}00369\ \textcolor{stringliteral}{'\%(mock\_object)s'\ as\ your\ first\ argument.}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00370}00370\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00371}00371\ \textcolor{stringliteral}{For\ example,\ given\ the\ mock\ class:}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00372}00372\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00373}00373\ \textcolor{stringliteral}{\ \ class\ \%(class\_name)s\ :\ public\ ...\ \{}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00374}00374\ \textcolor{stringliteral}{\ \ \ \ ...}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00375}00375\ \textcolor{stringliteral}{\ \ \ \ MOCK\_METHOD0(\%(method)s,\ ...);}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00376}00376\ \textcolor{stringliteral}{\ \ \};}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00377}00377\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00378}00378\ \textcolor{stringliteral}{and\ the\ following\ mock\ instance:}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00379}00379\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00380}00380\ \textcolor{stringliteral}{\ \ \%(class\_name)s*\ mock\_ptr\ =\ ...}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00381}00381\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00382}00382\ \textcolor{stringliteral}{you\ should\ use\ the\ EXPECT\_CALL\ like\ this:}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00383}00383\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00384}00384\ \textcolor{stringliteral}{\ \ EXPECT\_CALL(*mock\_ptr,\ \%(method)s(...));"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00385}00385\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00386}00386\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacegmock__doctor_a8f0f58a7a15703c3cb7884a5ab0d7e94}{\_GenericDiagnoser}}(}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00387}00387\ \ \ \ \ \ \ \textcolor{stringliteral}{'MOP'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00388}00388\ \ \ \ \ \ \ \textcolor{stringliteral}{'Mock\ Object\ Pointer'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00389}00389\ \ \ \ \ \ \ [(gcc\_regex,\ diagnosis),}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00390}00390\ \ \ \ \ \ \ \ (clang\_regex,\ diagnosis\ \%\ \{\textcolor{stringliteral}{'mock\_object'}:\ \textcolor{stringliteral}{'mock\_object'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00391}00391\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'method'}:\ \textcolor{stringliteral}{'method'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00392}00392\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'class\_name'}:\ \textcolor{stringliteral}{'\%(class\_name)s'}\})],}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00393}00393\ \ \ \ \ \ \ \ msg)}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00394}00394\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00395}00395\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00396}\mbox{\hyperlink{namespacegmock__doctor_a027b909d515156fe0752095ac94b9956}{00396}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacegmock__doctor_a027b909d515156fe0752095ac94b9956}{\_NeedToUseSymbolDiagnoser}}(msg):}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00397}00397\ \ \ \textcolor{stringliteral}{"{}"{}"{}Diagnoses\ the\ NUS\ disease,\ given\ the\ error\ messages\ by\ the\ compiler."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00398}00398\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00399}00399\ \ \ gcc\_regex\ =\ (\_GCC\_FILE\_LINE\_RE\ +\ \textcolor{stringliteral}{r'error:\ \(\backslash\)'(?P<symbol>.+)\(\backslash\)'\ '}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00400}00400\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'(was\ not\ declared\ in\ this\ scope|has\ not\ been\ declared)'})}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00401}00401\ \ \ clang\_regex\ =\ (\_CLANG\_FILE\_LINE\_RE\ +}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00402}00402\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'error:\ (use\ of\ undeclared\ identifier|unknown\ type\ name|'}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00403}00403\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'no\ template\ named)\ \(\backslash\)'(?P<symbol>[\string^\(\backslash\)']+)\(\backslash\)''})}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00404}00404\ \ \ diagnosis\ =\ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00405}00405\ \textcolor{stringliteral}{'\%(symbol)s'\ is\ defined\ by\ Google\ Mock\ in\ the\ testing\ namespace.}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00406}00406\ \textcolor{stringliteral}{Did\ you\ forget\ to\ write}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00407}00407\ \textcolor{stringliteral}{\ \ using\ testing::\%(symbol)s;}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00408}00408\ \textcolor{stringliteral}{?"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00409}00409\ \ \ \textcolor{keywordflow}{for}\ m\ \textcolor{keywordflow}{in}\ (list(\mbox{\hyperlink{namespacegmock__doctor_a9b603b6f6c415df5d7e439460742cc74}{\_FindAllMatches}}(gcc\_regex,\ msg))\ +}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00410}00410\ \ \ \ \ \ \ \ \ \ \ \ \ list(\mbox{\hyperlink{namespacegmock__doctor_a9b603b6f6c415df5d7e439460742cc74}{\_FindAllMatches}}(clang\_regex,\ msg))):}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00411}00411\ \ \ \ \ symbol\ =\ m.groupdict()[\textcolor{stringliteral}{'symbol'}]}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00412}00412\ \ \ \ \ \textcolor{keywordflow}{if}\ symbol\ \textcolor{keywordflow}{in}\ \_COMMON\_GMOCK\_SYMBOLS:}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00413}00413\ \ \ \ \ \ \ \textcolor{keywordflow}{yield}\ (\textcolor{stringliteral}{'NUS'},\ \textcolor{stringliteral}{'Need\ to\ Use\ Symbol'},\ diagnosis\ \%\ m.groupdict())}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00414}00414\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00415}00415\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00416}\mbox{\hyperlink{namespacegmock__doctor_ac6d76fd7dc849f454edd8049785afa85}{00416}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacegmock__doctor_ac6d76fd7dc849f454edd8049785afa85}{\_NeedToUseReturnNullDiagnoser}}(msg):}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00417}00417\ \ \ \textcolor{stringliteral}{"{}"{}"{}Diagnoses\ the\ NRNULL\ disease,\ given\ the\ error\ messages\ by\ the\ compiler."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00418}00418\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00419}00419\ \ \ gcc\_regex\ =\ (\textcolor{stringliteral}{'instantiated\ from\ \(\backslash\)'testing::internal::ReturnAction<R>'}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00420}00420\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'::operator\ testing::Action<Func>\(\backslash\)(\(\backslash\))\ const.*\(\backslash\)n'}\ +}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00421}00421\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_GCC\_FILE\_LINE\_RE\ +\ \textcolor{stringliteral}{r'instantiated\ from\ here\(\backslash\)n'}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00422}00422\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'.*error:\ no\ matching\ function\ for\ call\ to\ \(\backslash\)'ImplicitCast\_\(\backslash\)('}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00423}00423\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'(:?long\ )?int\&\(\backslash\))'})}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00424}00424\ \ \ clang\_regex\ =\ (\textcolor{stringliteral}{r'\(\backslash\)bgmock-\/actions.h:.*\ error:\ no\ matching\ function\ for\ '}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00425}00425\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'call\ to\ \(\backslash\)'ImplicitCast\_\(\backslash\)'\(\backslash\)r?\(\backslash\)n'}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00426}00426\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'(.*\(\backslash\)n)*?'}\ +}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00427}00427\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_CLANG\_NON\_GMOCK\_FILE\_LINE\_RE\ +\ \textcolor{stringliteral}{r'note:\ in\ instantiation\ '}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00428}00428\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'of\ function\ template\ specialization\ '}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00429}00429\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'\(\backslash\)'testing::internal::ReturnAction<(int|long)>::operator\ '}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00430}00430\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'Action<(?P<type>.*)\(\backslash\)(\(\backslash\))>\(\backslash\)'\ requested\ here'})}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00431}00431\ \ \ diagnosis\ =\ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00432}00432\ \textcolor{stringliteral}{You\ are\ probably\ calling\ Return(NULL)\ and\ the\ compiler\ isn't\ sure\ how\ to\ turn}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00433}00433\ \textcolor{stringliteral}{NULL\ into\ \%(type)s.\ Use\ ReturnNull()\ instead.}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00434}00434\ \textcolor{stringliteral}{Note:\ the\ line\ number\ may\ be\ off;\ please\ fix\ all\ instances\ of\ Return(NULL)."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00435}00435\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacegmock__doctor_a8f0f58a7a15703c3cb7884a5ab0d7e94}{\_GenericDiagnoser}}(}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00436}00436\ \ \ \ \ \ \ \textcolor{stringliteral}{'NRNULL'},\ \textcolor{stringliteral}{'Need\ to\ use\ ReturnNull'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00437}00437\ \ \ \ \ \ \ [(clang\_regex,\ diagnosis),}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00438}00438\ \ \ \ \ \ \ \ (gcc\_regex,\ diagnosis\ \%\ \{\textcolor{stringliteral}{'type'}:\ \textcolor{stringliteral}{'the\ right\ type'}\})],}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00439}00439\ \ \ \ \ \ \ msg)}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00440}00440\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00441}00441\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00442}\mbox{\hyperlink{namespacegmock__doctor_a3d3ae858175093d8617335de08dbc994}{00442}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacegmock__doctor_a3d3ae858175093d8617335de08dbc994}{\_TypeInTemplatedBaseDiagnoser}}(msg):}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00443}00443\ \ \ \textcolor{stringliteral}{"{}"{}"{}Diagnoses\ the\ TTB\ disease,\ given\ the\ error\ messages\ by\ the\ compiler."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00444}00444\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00445}00445\ \ \ \textcolor{comment}{\#\ This\ version\ works\ when\ the\ type\ is\ used\ as\ the\ mock\ function's\ return}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00446}00446\ \ \ \textcolor{comment}{\#\ type.}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00447}00447\ \ \ gcc\_4\_3\_1\_regex\_type\_in\_retval\ =\ (}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00448}00448\ \ \ \ \ \ \ \textcolor{stringliteral}{r'In\ member\ function\ \(\backslash\)'int\ .*\(\backslash\)n'}\ +\ \_GCC\_FILE\_LINE\_RE\ +}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00449}00449\ \ \ \ \ \ \ \textcolor{stringliteral}{r'error:\ a\ function\ call\ cannot\ appear\ in\ a\ constant-\/expression'})}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00450}00450\ \ \ gcc\_4\_4\_0\_regex\_type\_in\_retval\ =\ (}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00451}00451\ \ \ \ \ \ \ \textcolor{stringliteral}{r'error:\ a\ function\ call\ cannot\ appear\ in\ a\ constant-\/expression'}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00452}00452\ \ \ \ \ \ \ +\ \_GCC\_FILE\_LINE\_RE\ +\ \textcolor{stringliteral}{r'error:\ template\ argument\ 1\ is\ invalid\(\backslash\)n'})}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00453}00453\ \ \ \textcolor{comment}{\#\ This\ version\ works\ when\ the\ type\ is\ used\ as\ the\ mock\ function's\ sole}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00454}00454\ \ \ \textcolor{comment}{\#\ parameter\ type.}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00455}00455\ \ \ gcc\_regex\_type\_of\_sole\_param\ =\ (}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00456}00456\ \ \ \ \ \ \ \_GCC\_FILE\_LINE\_RE\ +}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00457}00457\ \ \ \ \ \ \ \textcolor{stringliteral}{r'error:\ \(\backslash\)'(?P<type>.+)\(\backslash\)'\ was\ not\ declared\ in\ this\ scope\(\backslash\)n'}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00458}00458\ \ \ \ \ \ \ \textcolor{stringliteral}{r'.*error:\ template\ argument\ 1\ is\ invalid\(\backslash\)n'})}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00459}00459\ \ \ \textcolor{comment}{\#\ This\ version\ works\ when\ the\ type\ is\ used\ as\ a\ parameter\ of\ a\ mock}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00460}00460\ \ \ \textcolor{comment}{\#\ function\ that\ has\ multiple\ parameters.}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00461}00461\ \ \ gcc\_regex\_type\_of\_a\_param\ =\ (}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00462}00462\ \ \ \ \ \ \ \textcolor{stringliteral}{r'error:\ expected\ \`{};\(\backslash\)'\ before\ \(\backslash\)'::\(\backslash\)'\ token\(\backslash\)n'}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00463}00463\ \ \ \ \ \ \ +\ \_GCC\_FILE\_LINE\_RE\ +}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00464}00464\ \ \ \ \ \ \ \textcolor{stringliteral}{r'error:\ \(\backslash\)'(?P<type>.+)\(\backslash\)'\ was\ not\ declared\ in\ this\ scope\(\backslash\)n'}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00465}00465\ \ \ \ \ \ \ \textcolor{stringliteral}{r'.*error:\ template\ argument\ 1\ is\ invalid\(\backslash\)n'}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00466}00466\ \ \ \ \ \ \ \textcolor{stringliteral}{r'.*error:\ \(\backslash\)'.+\(\backslash\)'\ was\ not\ declared\ in\ this\ scope'})}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00467}00467\ \ \ clang\_regex\_type\_of\_retval\_or\_sole\_param\ =\ (}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00468}00468\ \ \ \ \ \ \ \_CLANG\_FILE\_LINE\_RE\ +}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00469}00469\ \ \ \ \ \ \ \textcolor{stringliteral}{r'error:\ use\ of\ undeclared\ identifier\ \(\backslash\)'(?P<type>.*)\(\backslash\)'\(\backslash\)n'}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00470}00470\ \ \ \ \ \ \ \textcolor{stringliteral}{r'(.*\(\backslash\)n)*?'}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00471}00471\ \ \ \ \ \ \ \textcolor{stringliteral}{r'(?P=file):(?P=line):\(\backslash\)d+:\ error:\ '}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00472}00472\ \ \ \ \ \ \ \textcolor{stringliteral}{r'non-\/friend\ class\ member\ \(\backslash\)'Result\(\backslash\)'\ cannot\ have\ a\ qualified\ name'}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00473}00473\ \ \ \ \ \ \ )}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00474}00474\ \ \ clang\_regex\_type\_of\_a\_param\ =\ (}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00475}00475\ \ \ \ \ \ \ \_CLANG\_FILE\_LINE\_RE\ +}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00476}00476\ \ \ \ \ \ \ \textcolor{stringliteral}{r'error:\ C\(\backslash\)+\(\backslash\)+\ requires\ a\ type\ specifier\ for\ all\ declarations\(\backslash\)n'}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00477}00477\ \ \ \ \ \ \ \textcolor{stringliteral}{r'(.*\(\backslash\)n)*?'}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00478}00478\ \ \ \ \ \ \ \textcolor{stringliteral}{r'(?P=file):(?P=line):(?P=column):\ error:\ '}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00479}00479\ \ \ \ \ \ \ \textcolor{stringliteral}{r'C\(\backslash\)+\(\backslash\)+\ requires\ a\ type\ specifier\ for\ all\ declarations'}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00480}00480\ \ \ \ \ \ \ )}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00481}00481\ \ \ clang\_regex\_unknown\_type\ =\ (}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00482}00482\ \ \ \ \ \ \ \_CLANG\_FILE\_LINE\_RE\ +}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00483}00483\ \ \ \ \ \ \ \textcolor{stringliteral}{r'error:\ unknown\ type\ name\ \(\backslash\)'(?P<type>[\string^\(\backslash\)']+)\(\backslash\)''}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00484}00484\ \ \ \ \ \ \ )}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00485}00485\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00486}00486\ \ \ diagnosis\ =\ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00487}00487\ \textcolor{stringliteral}{In\ a\ mock\ class\ template,\ types\ or\ typedefs\ defined\ in\ the\ base\ class}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00488}00488\ \textcolor{stringliteral}{template\ are\ *not*\ automatically\ visible.\ \ This\ is\ how\ C++\ works.\ \ Before}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00489}00489\ \textcolor{stringliteral}{you\ can\ use\ a\ type\ or\ typedef\ named\ \%(type)s\ defined\ in\ base\ class\ Base<T>,\ you}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00490}00490\ \textcolor{stringliteral}{need\ to\ make\ it\ visible.\ \ One\ way\ to\ do\ it\ is:}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00491}00491\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00492}00492\ \textcolor{stringliteral}{\ \ typedef\ typename\ Base<T>::\%(type)s\ \%(type)s;"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00493}00493\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00494}00494\ \ \ \textcolor{keywordflow}{for}\ diag\ \textcolor{keywordflow}{in}\ \mbox{\hyperlink{namespacegmock__doctor_a8f0f58a7a15703c3cb7884a5ab0d7e94}{\_GenericDiagnoser}}(}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00495}00495\ \ \ \ \ \ \ \textcolor{stringliteral}{'TTB'},\ \textcolor{stringliteral}{'Type\ in\ Template\ Base'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00496}00496\ \ \ \ \ \ \ [(gcc\_4\_3\_1\_regex\_type\_in\_retval,\ diagnosis\ \%\ \{\textcolor{stringliteral}{'type'}:\ \textcolor{stringliteral}{'Foo'}\}),}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00497}00497\ \ \ \ \ \ \ \ (gcc\_4\_4\_0\_regex\_type\_in\_retval,\ diagnosis\ \%\ \{\textcolor{stringliteral}{'type'}:\ \textcolor{stringliteral}{'Foo'}\}),}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00498}00498\ \ \ \ \ \ \ \ (gcc\_regex\_type\_of\_sole\_param,\ diagnosis),}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00499}00499\ \ \ \ \ \ \ \ (gcc\_regex\_type\_of\_a\_param,\ diagnosis),}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00500}00500\ \ \ \ \ \ \ \ (clang\_regex\_type\_of\_retval\_or\_sole\_param,\ diagnosis),}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00501}00501\ \ \ \ \ \ \ \ (clang\_regex\_type\_of\_a\_param,\ diagnosis\ \%\ \{\textcolor{stringliteral}{'type'}:\ \textcolor{stringliteral}{'Foo'}\})],}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00502}00502\ \ \ \ \ \ \ msg):}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00503}00503\ \ \ \ \ \textcolor{keywordflow}{yield}\ diag}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00504}00504\ \ \ \textcolor{comment}{\#\ Avoid\ overlap\ with\ the\ NUS\ pattern.}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00505}00505\ \ \ \textcolor{keywordflow}{for}\ m\ \textcolor{keywordflow}{in}\ \mbox{\hyperlink{namespacegmock__doctor_a9b603b6f6c415df5d7e439460742cc74}{\_FindAllMatches}}(clang\_regex\_unknown\_type,\ msg):}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00506}00506\ \ \ \ \ type\_\ =\ m.groupdict()[\textcolor{stringliteral}{'type'}]}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00507}00507\ \ \ \ \ \textcolor{keywordflow}{if}\ type\_\ \textcolor{keywordflow}{not}\ \textcolor{keywordflow}{in}\ \_COMMON\_GMOCK\_SYMBOLS:}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00508}00508\ \ \ \ \ \ \ \textcolor{keywordflow}{yield}\ (\textcolor{stringliteral}{'TTB'},\ \textcolor{stringliteral}{'Type\ in\ Template\ Base'},\ diagnosis\ \%\ m.groupdict())}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00509}00509\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00510}00510\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00511}\mbox{\hyperlink{namespacegmock__doctor_a6d63df81946ff5bf99d9ad102b8a1bf3}{00511}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacegmock__doctor_a6d63df81946ff5bf99d9ad102b8a1bf3}{\_WrongMockMethodMacroDiagnoser}}(msg):}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00512}00512\ \ \ \textcolor{stringliteral}{"{}"{}"{}Diagnoses\ the\ WMM\ disease,\ given\ the\ error\ messages\ by\ the\ compiler."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00513}00513\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00514}00514\ \ \ gcc\_regex\ =\ (\_GCC\_FILE\_LINE\_RE\ +}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00515}00515\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'.*this\_method\_does\_not\_take\_(?P<wrong\_args>\(\backslash\)d+)\_argument.*\(\backslash\)n'}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00516}00516\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'.*\(\backslash\)n'}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00517}00517\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'.*candidates\ are.*FunctionMocker<[\string^>]+A(?P<args>\(\backslash\)d+)\(\backslash\))>'})}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00518}00518\ \ \ clang\_regex\ =\ (\_CLANG\_NON\_GMOCK\_FILE\_LINE\_RE\ +}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00519}00519\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'error:.*array.*negative.*r?\(\backslash\)n'}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00520}00520\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'(.*\(\backslash\)n)*?'}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00521}00521\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'(?P=file):(?P=line):(?P=column):\ error:\ too\ few\ arguments\ '}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00522}00522\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'to\ function\ call,\ expected\ (?P<args>\(\backslash\)d+),\ '}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00523}00523\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'have\ (?P<wrong\_args>\(\backslash\)d+)'})}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00524}00524\ \ \ clang11\_re\ =\ (\_CLANG\_NON\_GMOCK\_FILE\_LINE\_RE\ +}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00525}00525\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'.*this\_method\_does\_not\_take\_'}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00526}00526\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'(?P<wrong\_args>\(\backslash\)d+)\_argument.*'})}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00527}00527\ \ \ diagnosis\ =\ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00528}00528\ \textcolor{stringliteral}{You\ are\ using\ MOCK\_METHOD\%(wrong\_args)s\ to\ define\ a\ mock\ method\ that\ has}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00529}00529\ \textcolor{stringliteral}{\%(args)s\ arguments.\ Use\ MOCK\_METHOD\%(args)s\ (or\ MOCK\_CONST\_METHOD\%(args)s,}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00530}00530\ \textcolor{stringliteral}{MOCK\_METHOD\%(args)s\_T,\ MOCK\_CONST\_METHOD\%(args)s\_T\ as\ appropriate)\ instead."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00531}00531\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacegmock__doctor_a8f0f58a7a15703c3cb7884a5ab0d7e94}{\_GenericDiagnoser}}(\textcolor{stringliteral}{'WMM'},\ \textcolor{stringliteral}{'Wrong\ MOCK\_METHODn\ Macro'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00532}00532\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [(gcc\_regex,\ diagnosis),}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00533}00533\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (clang11\_re,\ diagnosis\ \%\ \{\textcolor{stringliteral}{'wrong\_args'}:\ \textcolor{stringliteral}{'m'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00534}00534\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'args'}:\ \textcolor{stringliteral}{'n'}\}),}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00535}00535\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (clang\_regex,\ diagnosis)],}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00536}00536\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ msg)}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00537}00537\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00538}00538\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00539}\mbox{\hyperlink{namespacegmock__doctor_af40f5986cb4753c3e519eef44b2522d0}{00539}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacegmock__doctor_af40f5986cb4753c3e519eef44b2522d0}{\_WrongParenPositionDiagnoser}}(msg):}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00540}00540\ \ \ \textcolor{stringliteral}{"{}"{}"{}Diagnoses\ the\ WPP\ disease,\ given\ the\ error\ messages\ by\ the\ compiler."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00541}00541\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00542}00542\ \ \ gcc\_regex\ =\ (\_GCC\_FILE\_LINE\_RE\ +}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00543}00543\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'error:.*testing::internal::MockSpec<.*\ has\ no\ member\ named\ \(\backslash\)''}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00544}00544\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'(?P<method>\(\backslash\)w+)\(\backslash\)''})}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00545}00545\ \ \ clang\_regex\ =\ (\_CLANG\_NON\_GMOCK\_FILE\_LINE\_RE\ +}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00546}00546\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'error:\ no\ member\ named\ \(\backslash\)'(?P<method>\(\backslash\)w+)\(\backslash\)'\ in\ '}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00547}00547\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{r'\(\backslash\)'testing::internal::MockSpec<.*>\(\backslash\)''})}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00548}00548\ \ \ diagnosis\ =\ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00549}00549\ \textcolor{stringliteral}{The\ closing\ parenthesis\ of\ ON\_CALL\ or\ EXPECT\_CALL\ should\ be\ *before*}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00550}00550\ \textcolor{stringliteral}{"{}.\%(method)s"{}.\ \ For\ example,\ you\ should\ write:}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00551}00551\ \textcolor{stringliteral}{\ \ EXPECT\_CALL(my\_mock,\ Foo(\_)).\%(method)s(...);}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00552}00552\ \textcolor{stringliteral}{instead\ of:}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00553}00553\ \textcolor{stringliteral}{\ \ EXPECT\_CALL(my\_mock,\ Foo(\_).\%(method)s(...));"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00554}00554\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacegmock__doctor_a8f0f58a7a15703c3cb7884a5ab0d7e94}{\_GenericDiagnoser}}(\textcolor{stringliteral}{'WPP'},\ \textcolor{stringliteral}{'Wrong\ Parenthesis\ Position'},}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00555}00555\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [(gcc\_regex,\ diagnosis),}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00556}00556\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (clang\_regex,\ diagnosis)],}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00557}00557\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ msg)}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00558}00558\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00559}00559\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00560}\mbox{\hyperlink{namespacegmock__doctor_ad8d4f979dbf1b3c8edb226d124571b4e}{00560}}\ \_DIAGNOSERS\ =\ [}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00561}00561\ \ \ \ \ \_IncompleteByReferenceArgumentDiagnoser,}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00562}00562\ \ \ \ \ \_MockObjectPointerDiagnoser,}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00563}00563\ \ \ \ \ \_NeedToReturnNothingDiagnoser,}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00564}00564\ \ \ \ \ \_NeedToReturnReferenceDiagnoser,}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00565}00565\ \ \ \ \ \_NeedToReturnSomethingDiagnoser,}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00566}00566\ \ \ \ \ \_NeedToUseReturnNullDiagnoser,}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00567}00567\ \ \ \ \ \_NeedToUseSymbolDiagnoser,}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00568}00568\ \ \ \ \ \_OverloadedFunctionActionDiagnoser,}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00569}00569\ \ \ \ \ \_OverloadedFunctionMatcherDiagnoser,}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00570}00570\ \ \ \ \ \_OverloadedMethodActionDiagnoser,}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00571}00571\ \ \ \ \ \_TypeInTemplatedBaseDiagnoser,}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00572}00572\ \ \ \ \ \_WrongMockMethodMacroDiagnoser,}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00573}00573\ \ \ \ \ \_WrongParenPositionDiagnoser,}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00574}00574\ \ \ \ \ ]}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00575}00575\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00576}00576\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00577}\mbox{\hyperlink{namespacegmock__doctor_aabf870deb293ec78b589b2dd2823e6ab}{00577}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacegmock__doctor_aabf870deb293ec78b589b2dd2823e6ab}{Diagnose}}(msg):}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00578}00578\ \ \ \textcolor{stringliteral}{"{}"{}"{}Generates\ all\ possible\ diagnoses\ given\ the\ compiler\ error\ message."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00579}00579\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00580}00580\ \ \ msg\ =\ re.sub(\textcolor{stringliteral}{r'\(\backslash\)x1b\(\backslash\)[[\string^m]*m'},\ \textcolor{stringliteral}{''},\ msg)\ \ \textcolor{comment}{\#\ Strips\ all\ color\ formatting.}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00581}00581\ \ \ \textcolor{comment}{\#\ Assuming\ the\ string\ is\ using\ the\ UTF-\/8\ encoding,\ replaces\ the\ left\ and}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00582}00582\ \ \ \textcolor{comment}{\#\ the\ right\ single\ quote\ characters\ with\ apostrophes.}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00583}00583\ \ \ msg\ =\ re.sub(\textcolor{stringliteral}{r'(\(\backslash\)xe2\(\backslash\)x80\(\backslash\)x98|\(\backslash\)xe2\(\backslash\)x80\(\backslash\)x99)'},\ \textcolor{stringliteral}{"{}'"{}},\ msg)}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00584}00584\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00585}00585\ \ \ diagnoses\ =\ []}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00586}00586\ \ \ \textcolor{keywordflow}{for}\ diagnoser\ \textcolor{keywordflow}{in}\ \_DIAGNOSERS:}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00587}00587\ \ \ \ \ \textcolor{keywordflow}{for}\ diag\ \textcolor{keywordflow}{in}\ diagnoser(msg):}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00588}00588\ \ \ \ \ \ \ diagnosis\ =\ \textcolor{stringliteral}{'[\%s\ -\/\ \%s]\(\backslash\)n\%s'}\ \%\ diag}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00589}00589\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keywordflow}{not}\ diagnosis\ \textcolor{keywordflow}{in}\ diagnoses:}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00590}00590\ \ \ \ \ \ \ \ \ diagnoses.append(diagnosis)}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00591}00591\ \ \ \textcolor{keywordflow}{return}\ diagnoses}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00592}00592\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00593}00593\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00594}\mbox{\hyperlink{namespacegmock__doctor_afbdc79a012ced22e32a9f3c60346a691}{00594}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacegmock__doctor_afbdc79a012ced22e32a9f3c60346a691}{main}}():}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00595}00595\ \ \ \textcolor{keywordflow}{print}\ (\textcolor{stringliteral}{'Google\ Mock\ Doctor\ v\%s\ -\/\ '}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00596}00596\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'diagnoses\ problems\ in\ code\ using\ Google\ Mock.'}\ \%\ \_VERSION)}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00597}00597\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00598}00598\ \ \ \textcolor{keywordflow}{if}\ sys.stdin.isatty():}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00599}00599\ \ \ \ \ \textcolor{keywordflow}{print}\ (\textcolor{stringliteral}{'Please\ copy\ and\ paste\ the\ compiler\ errors\ here.\ \ Press\ c-\/D\ when\ '}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00600}00600\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'you\ are\ done:'})}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00601}00601\ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00602}00602\ \ \ \ \ \textcolor{keywordflow}{print}\ (\textcolor{stringliteral}{'Waiting\ for\ compiler\ errors\ on\ stdin\ .\ .\ .'})}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00603}00603\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00604}00604\ \ \ msg\ =\ sys.stdin.read().strip()}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00605}00605\ \ \ diagnoses\ =\ \mbox{\hyperlink{namespacegmock__doctor_aabf870deb293ec78b589b2dd2823e6ab}{Diagnose}}(msg)}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00606}00606\ \ \ count\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}(diagnoses)}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00607}00607\ \ \ \textcolor{keywordflow}{if}\ \textcolor{keywordflow}{not}\ count:}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00608}00608\ \ \ \ \ \textcolor{keywordflow}{print}\ (\textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00609}00609\ \textcolor{stringliteral}{Your\ compiler\ complained:}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00610}00610\ \textcolor{stringliteral}{8<-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00611}00611\ \textcolor{stringliteral}{\%s}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00612}00612\ \textcolor{stringliteral}{-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/>8}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00613}00613\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00614}00614\ \textcolor{stringliteral}{Uh-\/oh,\ I'm\ not\ smart\ enough\ to\ figure\ out\ what\ the\ problem\ is.\ :-\/(}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00615}00615\ \textcolor{stringliteral}{However...}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00616}00616\ \textcolor{stringliteral}{If\ you\ send\ your\ source\ code\ and\ the\ compiler's\ error\ messages\ to}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00617}00617\ \textcolor{stringliteral}{\%s,\ you\ can\ be\ helped\ and\ I\ can\ get\ smarter\ -\/-\/}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00618}00618\ \textcolor{stringliteral}{win-\/win\ for\ us!"{}"{}"{}}\ \%\ (msg,\ \_EMAIL))}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00619}00619\ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00620}00620\ \ \ \ \ \textcolor{keywordflow}{print}\ (\textcolor{stringliteral}{'-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/'})}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00621}00621\ \ \ \ \ \textcolor{keywordflow}{print}\ (\textcolor{stringliteral}{'Your\ code\ appears\ to\ have\ the\ following'},)}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00622}00622\ \ \ \ \ \textcolor{keywordflow}{if}\ count\ >\ 1:}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00623}00623\ \ \ \ \ \ \ \textcolor{keywordflow}{print}\ (\textcolor{stringliteral}{'\%s\ diseases:'}\ \%\ (count,))}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00624}00624\ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00625}00625\ \ \ \ \ \ \ \textcolor{keywordflow}{print}\ (\textcolor{stringliteral}{'disease:'})}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00626}00626\ \ \ \ \ i\ =\ 0}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00627}00627\ \ \ \ \ \textcolor{keywordflow}{for}\ d\ \textcolor{keywordflow}{in}\ diagnoses:}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00628}00628\ \ \ \ \ \ \ i\ +=\ 1}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00629}00629\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ count\ >\ 1:}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00630}00630\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{print}\ (\textcolor{stringliteral}{'\(\backslash\)n\#\%s:'}\ \%\ (i,))}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00631}00631\ \ \ \ \ \ \ \textcolor{keywordflow}{print}\ (d)}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00632}00632\ \ \ \ \ \textcolor{keywordflow}{print}\ (\textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00633}00633\ \textcolor{stringliteral}{How\ did\ I\ do?\ \ If\ you\ think\ I'm\ wrong\ or\ unhelpful,\ please\ send\ your}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00634}00634\ \textcolor{stringliteral}{source\ code\ and\ the\ compiler's\ error\ messages\ to\ \%s.}}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00635}00635\ \textcolor{stringliteral}{Then\ you\ can\ be\ helped\ and\ I\ can\ get\ smarter\ -\/-\/\ I\ promise\ I\ won't\ be\ upset!"{}"{}"{}}\ \%}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00636}00636\ \ \ \ \ \ \ \ \ \ \ \ \_EMAIL)}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00637}00637\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00638}00638\ }
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00639}00639\ \textcolor{keywordflow}{if}\ \_\_name\_\_\ ==\ \textcolor{stringliteral}{'\_\_main\_\_'}:}
+\DoxyCodeLine{\Hypertarget{gmock__doctor_8py_source_l00640}00640\ \ \ \mbox{\hyperlink{namespacegmock__doctor_afbdc79a012ced22e32a9f3c60346a691}{main}}()}
+
+\end{DoxyCode}

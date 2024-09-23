@@ -1,0 +1,54 @@
+\doxysection{gtest\+\_\+xml\+\_\+outfile2\+\_\+test\+\_\+.\+cc}
+\hypertarget{gtest__xml__outfile2__test___8cc_source}{}\label{gtest__xml__outfile2__test___8cc_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/test/gtest\_xml\_outfile2\_test\_.cc@{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/test/gtest\_xml\_outfile2\_test\_.cc}}
+\mbox{\hyperlink{gtest__xml__outfile2__test___8cc}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{gtest__xml__outfile2__test___8cc_source_l00001}00001\ \textcolor{comment}{//\ Copyright\ 2008,\ Google\ Inc.}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__outfile2__test___8cc_source_l00002}00002\ \textcolor{comment}{//\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__outfile2__test___8cc_source_l00003}00003\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__outfile2__test___8cc_source_l00004}00004\ \textcolor{comment}{//\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__outfile2__test___8cc_source_l00005}00005\ \textcolor{comment}{//\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__outfile2__test___8cc_source_l00006}00006\ \textcolor{comment}{//\ met:}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__outfile2__test___8cc_source_l00007}00007\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__outfile2__test___8cc_source_l00008}00008\ \textcolor{comment}{//\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__outfile2__test___8cc_source_l00009}00009\ \textcolor{comment}{//\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__outfile2__test___8cc_source_l00010}00010\ \textcolor{comment}{//\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__outfile2__test___8cc_source_l00011}00011\ \textcolor{comment}{//\ copyright\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__outfile2__test___8cc_source_l00012}00012\ \textcolor{comment}{//\ in\ the\ documentation\ and/or\ other\ materials\ provided\ with\ the}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__outfile2__test___8cc_source_l00013}00013\ \textcolor{comment}{//\ distribution.}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__outfile2__test___8cc_source_l00014}00014\ \textcolor{comment}{//\ \ \ \ \ *\ Neither\ the\ name\ of\ Google\ Inc.\ nor\ the\ names\ of\ its}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__outfile2__test___8cc_source_l00015}00015\ \textcolor{comment}{//\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products\ derived\ from}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__outfile2__test___8cc_source_l00016}00016\ \textcolor{comment}{//\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__outfile2__test___8cc_source_l00017}00017\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__outfile2__test___8cc_source_l00018}00018\ \textcolor{comment}{//\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__outfile2__test___8cc_source_l00019}00019\ \textcolor{comment}{//\ "{}AS\ IS"{}\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__outfile2__test___8cc_source_l00020}00020\ \textcolor{comment}{//\ LIMITED\ TO,\ THE\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__outfile2__test___8cc_source_l00021}00021\ \textcolor{comment}{//\ A\ PARTICULAR\ PURPOSE\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ THE\ COPYRIGHT}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__outfile2__test___8cc_source_l00022}00022\ \textcolor{comment}{//\ OWNER\ OR\ CONTRIBUTORS\ BE\ LIABLE\ FOR\ ANY\ DIRECT,\ INDIRECT,\ INCIDENTAL,}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__outfile2__test___8cc_source_l00023}00023\ \textcolor{comment}{//\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES\ (INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__outfile2__test___8cc_source_l00024}00024\ \textcolor{comment}{//\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;\ LOSS\ OF\ USE,}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__outfile2__test___8cc_source_l00025}00025\ \textcolor{comment}{//\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND\ ON\ ANY}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__outfile2__test___8cc_source_l00026}00026\ \textcolor{comment}{//\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__outfile2__test___8cc_source_l00027}00027\ \textcolor{comment}{//\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__outfile2__test___8cc_source_l00028}00028\ \textcolor{comment}{//\ OF\ THIS\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__outfile2__test___8cc_source_l00029}00029\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__outfile2__test___8cc_source_l00030}00030\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__outfile2__test___8cc_source_l00031}00031\ \textcolor{comment}{//\ gtest\_xml\_outfile2\_test\_\ writes\ some\ xml\ via\ TestProperty\ used\ by}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__outfile2__test___8cc_source_l00032}00032\ \textcolor{comment}{//\ gtest\_xml\_outfiles\_test.py}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__outfile2__test___8cc_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{gtest__xml__outfile2__test___8cc_source_l00034}00034\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{gtest_8h}{gtest/gtest.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__outfile2__test___8cc_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{gtest__xml__outfile2__test___8cc_source_l00036}\mbox{\hyperlink{class_property_two}{00036}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_property_two}{PropertyTwo}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1_test}{testing::Test}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__xml__outfile2__test___8cc_source_l00037}00037\ \ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{\Hypertarget{gtest__xml__outfile2__test___8cc_source_l00038}\mbox{\hyperlink{class_property_two_aa3ab39cf4e6c751cb0788c575bf92ca2}{00038}}\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_property_two_aa3ab39cf4e6c751cb0788c575bf92ca2}{SetUp}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__xml__outfile2__test___8cc_source_l00039}00039\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1_test_a1559ce1c83f56993b582650c091535a7}{RecordProperty}}(\textcolor{stringliteral}{"{}SetUpProp"{}},\ 2);}
+\DoxyCodeLine{\Hypertarget{gtest__xml__outfile2__test___8cc_source_l00040}00040\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__outfile2__test___8cc_source_l00041}\mbox{\hyperlink{class_property_two_aa4ffb2b9dddeba69f0f9baf133f06ef2}{00041}}\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_property_two_aa4ffb2b9dddeba69f0f9baf133f06ef2}{TearDown}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__xml__outfile2__test___8cc_source_l00042}00042\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1_test_a1559ce1c83f56993b582650c091535a7}{RecordProperty}}(\textcolor{stringliteral}{"{}TearDownProp"{}},\ 2);}
+\DoxyCodeLine{\Hypertarget{gtest__xml__outfile2__test___8cc_source_l00043}00043\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__xml__outfile2__test___8cc_source_l00044}00044\ \};}
+\DoxyCodeLine{\Hypertarget{gtest__xml__outfile2__test___8cc_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{gtest__xml__outfile2__test___8cc_source_l00046}\mbox{\hyperlink{gtest__xml__outfile2__test___8cc_a40b5d77ad85226c30fc3aa4f1e4f7bb5}{00046}}\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(\mbox{\hyperlink{class_property_two}{PropertyTwo}},\ TestSomeProperties)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__xml__outfile2__test___8cc_source_l00047}00047\ \ \ RecordProperty(\textcolor{stringliteral}{"{}TestSomeProperty"{}},\ 2);}
+\DoxyCodeLine{\Hypertarget{gtest__xml__outfile2__test___8cc_source_l00048}00048\ \}}
+
+\end{DoxyCode}

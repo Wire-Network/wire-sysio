@@ -1,0 +1,72 @@
+\doxysection{ostreamwrapper.\+h}
+\hypertarget{ostreamwrapper_8h_source}{}\label{ostreamwrapper_8h_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/include/rapidjson/ostreamwrapper.h@{libraries/fc/include/fc/crypto/webauthn\_json/include/rapidjson/ostreamwrapper.h}}
+\mbox{\hyperlink{ostreamwrapper_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00001}00001\ \textcolor{comment}{//\ Tencent\ is\ pleased\ to\ support\ the\ open\ source\ community\ by\ making\ RapidJSON\ available.}}
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00002}00002\ \textcolor{comment}{//\ }}
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00003}00003\ \textcolor{comment}{//\ Copyright\ (C)\ 2015\ THL\ A29\ Limited,\ a\ Tencent\ company,\ and\ Milo\ Yip.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00004}00004\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00005}00005\ \textcolor{comment}{//\ Licensed\ under\ the\ MIT\ License\ (the\ "{}License"{});\ you\ may\ not\ use\ this\ file\ except}}
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00006}00006\ \textcolor{comment}{//\ in\ compliance\ with\ the\ License.\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00007}00007\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00008}00008\ \textcolor{comment}{//\ http://opensource.org/licenses/MIT}}
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00009}00009\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00010}00010\ \textcolor{comment}{//\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software\ distributed\ }}
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00011}00011\ \textcolor{comment}{//\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,\ WITHOUT\ WARRANTIES\ OR\ }}
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00012}00012\ \textcolor{comment}{//\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.\ See\ the\ License\ for\ the\ }}
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00013}00013\ \textcolor{comment}{//\ specific\ language\ governing\ permissions\ and\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00015}00015\ \textcolor{preprocessor}{\#ifndef\ RAPIDJSON\_OSTREAMWRAPPER\_H\_}}
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00016}00016\ \textcolor{preprocessor}{\#define\ RAPIDJSON\_OSTREAMWRAPPER\_H\_}}
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00018}00018\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{stream_8h}{stream.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00019}00019\ \textcolor{preprocessor}{\#include\ <iosfwd>}}
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00021}00021\ \textcolor{preprocessor}{\#ifdef\ \_\_clang\_\_}}
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00022}00022\ RAPIDJSON\_DIAG\_PUSH}
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00023}00023\ RAPIDJSON\_DIAG\_OFF(padded)}
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00024}00024\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00026}00026\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gad3806c8251fdc7da9618b7e922674ffc}{RAPIDJSON\_NAMESPACE\_BEGIN}}}
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00044}00044\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ StreamType>}
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00045}\mbox{\hyperlink{class_basic_o_stream_wrapper}{00045}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_basic_o_stream_wrapper}{BasicOStreamWrapper}}\ \{}
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00046}00046\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00047}\mbox{\hyperlink{class_basic_o_stream_wrapper_a63041dfdca56dceff6f00d0ceea33afd}{00047}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{typename}\ StreamType::char\_type\ \mbox{\hyperlink{class_basic_o_stream_wrapper_a63041dfdca56dceff6f00d0ceea33afd}{Ch}};}
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00048}\mbox{\hyperlink{class_basic_o_stream_wrapper_a067a516c13b7c9d4dacef598d32779ef}{00048}}\ \ \ \ \ \mbox{\hyperlink{class_basic_o_stream_wrapper_a067a516c13b7c9d4dacef598d32779ef}{BasicOStreamWrapper}}(StreamType\&\ stream)\ :\ stream\_(stream)\ \{\}}
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00050}\mbox{\hyperlink{class_basic_o_stream_wrapper_a7d3ba9d651fbe27fe05387f512154ea8}{00050}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_basic_o_stream_wrapper_a7d3ba9d651fbe27fe05387f512154ea8}{Put}}(\mbox{\hyperlink{class_basic_o_stream_wrapper_a63041dfdca56dceff6f00d0ceea33afd}{Ch}}\ c)\ \{}
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00051}00051\ \ \ \ \ \ \ \ \ stream\_.put(c);}
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00052}00052\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00054}\mbox{\hyperlink{class_basic_o_stream_wrapper_a1c48a8b7520b0ab6ca34e665b928b56d}{00054}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_basic_o_stream_wrapper_a1c48a8b7520b0ab6ca34e665b928b56d}{Flush}}()\ \{}
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00055}00055\ \ \ \ \ \ \ \ \ stream\_.flush();}
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00056}00056\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00058}00058\ \ \ \ \ \textcolor{comment}{//\ Not\ implemented}}
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00059}\mbox{\hyperlink{class_basic_o_stream_wrapper_a6dc18ded82487d41a2d123e21a9e050b}{00059}}\ \ \ \ \ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{class_basic_o_stream_wrapper_a6dc18ded82487d41a2d123e21a9e050b}{Peek}}()\textcolor{keyword}{\ const\ }\{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\textcolor{keyword}{false});\ \textcolor{keywordflow}{return}\ 0;\ \}}
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00060}\mbox{\hyperlink{class_basic_o_stream_wrapper_a54be63e8d24f4d82329b860a907f65fe}{00060}}\ \ \ \ \ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{class_basic_o_stream_wrapper_a54be63e8d24f4d82329b860a907f65fe}{Take}}()\ \{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\textcolor{keyword}{false});\ \textcolor{keywordflow}{return}\ 0;\ \}}
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00061}\mbox{\hyperlink{class_basic_o_stream_wrapper_a62f214649fbfb8380a69fe92b864a61b}{00061}}\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{class_basic_o_stream_wrapper_a62f214649fbfb8380a69fe92b864a61b}{Tell}}()\textcolor{keyword}{\ const\ }\{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\textcolor{keyword}{false});\ \textcolor{keywordflow}{return}\ 0;\ \}}
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00062}\mbox{\hyperlink{class_basic_o_stream_wrapper_a730569bd680f2f08ee71b891ebea101a}{00062}}\ \ \ \ \ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{class_basic_o_stream_wrapper_a730569bd680f2f08ee71b891ebea101a}{PutBegin}}()\ \{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\textcolor{keyword}{false});\ \textcolor{keywordflow}{return}\ 0;\ \}}
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00063}\mbox{\hyperlink{class_basic_o_stream_wrapper_a1da108e43a5a517c4484821fced1fca0}{00063}}\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{class_basic_o_stream_wrapper_a1da108e43a5a517c4484821fced1fca0}{PutEnd}}(\textcolor{keywordtype}{char}*)\ \{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\textcolor{keyword}{false});\ \textcolor{keywordflow}{return}\ 0;\ \}}
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00065}00065\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00066}00066\ \ \ \ \ \mbox{\hyperlink{class_basic_o_stream_wrapper_a067a516c13b7c9d4dacef598d32779ef}{BasicOStreamWrapper}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{class_basic_o_stream_wrapper}{BasicOStreamWrapper}}\&);}
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00067}00067\ \ \ \ \ \mbox{\hyperlink{class_basic_o_stream_wrapper}{BasicOStreamWrapper}}\&\ operator=(\textcolor{keyword}{const}\ \mbox{\hyperlink{class_basic_o_stream_wrapper}{BasicOStreamWrapper}}\&);}
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00069}00069\ \ \ \ \ StreamType\&\ stream\_;}
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00070}00070\ \};}
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00072}\mbox{\hyperlink{ostreamwrapper_8h_aa8f833ae8c21c308bc48717f056ac4b6}{00072}}\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{class_basic_o_stream_wrapper}{BasicOStreamWrapper<std::ostream>}}\ \mbox{\hyperlink{ostreamwrapper_8h_aa8f833ae8c21c308bc48717f056ac4b6}{OStreamWrapper}};}
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00073}\mbox{\hyperlink{ostreamwrapper_8h_a5784dd6d198cadc8a6c33d4690e3c99c}{00073}}\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{class_basic_o_stream_wrapper}{BasicOStreamWrapper<std::wostream>}}\ \mbox{\hyperlink{ostreamwrapper_8h_a5784dd6d198cadc8a6c33d4690e3c99c}{WOStreamWrapper}};}
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00074}00074\ }
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00075}00075\ \textcolor{preprocessor}{\#ifdef\ \_\_clang\_\_}}
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00076}00076\ RAPIDJSON\_DIAG\_POP}
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00077}00077\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00079}00079\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gaf18f052a98b9f5df5448d39484b743c1}{RAPIDJSON\_NAMESPACE\_END}}}
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00080}00080\ }
+\DoxyCodeLine{\Hypertarget{ostreamwrapper_8h_source_l00081}00081\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ RAPIDJSON\_OSTREAMWRAPPER\_H\_}}
+
+\end{DoxyCode}

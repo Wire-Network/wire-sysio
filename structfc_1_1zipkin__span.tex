@@ -1,0 +1,349 @@
+\doxysection{fc\+::zipkin\+\_\+span Struct Reference}
+\hypertarget{structfc_1_1zipkin__span}{}\label{structfc_1_1zipkin__span}\index{fc::zipkin\_span@{fc::zipkin\_span}}
+
+
+{\ttfamily \#include $<$zipkin.\+hpp$>$}
+
+
+
+Inheritance diagram for fc\+::zipkin\+\_\+span\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=163pt]{structfc_1_1zipkin__span__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for fc\+::zipkin\+\_\+span\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=331pt]{structfc_1_1zipkin__span__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structfc_1_1zipkin__span_1_1span__data}{span\+\_\+data}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1zipkin__span_1_1token}{token}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structfc_1_1zipkin__span_af2027d101bc566ffa50c6f2cd26a9ae2}{zipkin\+\_\+span}} (std\+::string \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} parent\+\_\+id=0)
+\item 
+\mbox{\hyperlink{structfc_1_1zipkin__span_a45eefc5bd1076ae87a629cac8a812836}{zipkin\+\_\+span}} (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{code__cache_8cpp_aa0efefe21f4700d78692edc823e763be}{id}}, std\+::string \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} parent\+\_\+id=0)
+\item 
+\mbox{\hyperlink{structfc_1_1zipkin__span_ada4ef13a09e1fe9b824bea29a458c971}{zipkin\+\_\+span}} (const \mbox{\hyperlink{structfc_1_1zipkin__span}{zipkin\+\_\+span}} \&)=delete
+\item 
+\mbox{\hyperlink{structfc_1_1zipkin__span}{zipkin\+\_\+span}} \& \mbox{\hyperlink{structfc_1_1zipkin__span_accd101de29cf4a57de07a4638bab0e15}{operator=}} (const \mbox{\hyperlink{structfc_1_1zipkin__span}{zipkin\+\_\+span}} \&)=delete
+\item 
+\mbox{\hyperlink{structfc_1_1zipkin__span}{zipkin\+\_\+span}} \& \mbox{\hyperlink{structfc_1_1zipkin__span_a16d91220ce80b4ff3b0daef4737bb7e6}{operator=}} (\mbox{\hyperlink{structfc_1_1zipkin__span}{zipkin\+\_\+span}} \&\&)=delete
+\item 
+\mbox{\hyperlink{structfc_1_1zipkin__span_a4918a3757250d97f1b3f0b51855783bd}{zipkin\+\_\+span}} (\mbox{\hyperlink{structfc_1_1zipkin__span}{zipkin\+\_\+span}} \&\&rhs) noexcept
+\item 
+\mbox{\hyperlink{structfc_1_1zipkin__span_ae3fef6e20268796fac93c736a3e51a57}{\texorpdfstring{$\sim$}{\string~}zipkin\+\_\+span}} ()
+\item 
+void \mbox{\hyperlink{structfc_1_1zipkin__span_ad54039ec426609667c4a8e3ee5a38489}{add\+\_\+tag}} (const std\+::string \&key, const std\+::string \&var)
+\item 
+void \mbox{\hyperlink{structfc_1_1zipkin__span_a5d609899b2de96ba8c9ae131971a141e}{add\+\_\+tag}} (const std\+::string \&key, const char \texorpdfstring{$\ast$}{*}var)
+\item 
+void \mbox{\hyperlink{structfc_1_1zipkin__span_a62a094a768f90e2936046205ed11613a}{add\+\_\+tag}} (const std\+::string \&key, bool v)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\std\+::enable\+\_\+if\+\_\+t$<$ std\+::is\+\_\+arithmetic\+\_\+v$<$ std\+::remove\+\_\+reference\+\_\+t$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ $>$, void $>$ \mbox{\hyperlink{structfc_1_1zipkin__span_ad16186a20092fe65c58a473d715ec6ab}{add\+\_\+tag}} (const std\+::string \&key, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\&var)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\std\+::enable\+\_\+if\+\_\+t$<$!std\+::is\+\_\+arithmetic\+\_\+v$<$ std\+::remove\+\_\+reference\+\_\+t$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ $>$, void $>$ \mbox{\hyperlink{structfc_1_1zipkin__span_a555fe0c21d9fdb8073bc3fb153f92cde}{add\+\_\+tag}} (const std\+::string \&key, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\&var)
+\item 
+\mbox{\hyperlink{structfc_1_1zipkin__span_1_1token}{token}} \mbox{\hyperlink{structfc_1_1zipkin__span_ab982c2f5aa6b04fbbbbafe23d5cbe2b5}{get\+\_\+token}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structfc_1_1zipkin__span_a1e1aa1cb977283138fa30280158384a7}{to\+\_\+id}} (const \mbox{\hyperlink{classfc_1_1sha256}{fc\+::sha256}} \&\mbox{\hyperlink{code__cache_8cpp_aa0efefe21f4700d78692edc823e763be}{id}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\static \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structfc_1_1zipkin__span_a8b1a316dff6439327b75649d3e4c0ad5}{to\+\_\+id}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\mbox{\hyperlink{code__cache_8cpp_aa0efefe21f4700d78692edc823e763be}{id}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structfc_1_1zipkin__span_1_1span__data}{span\+\_\+data}} \mbox{\hyperlink{structfc_1_1zipkin__span_a9e8a0a3042c5b85417025b182dce8d8d}{data}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{zipkin_8hpp_source_l00060}{60}} of file \mbox{\hyperlink{zipkin_8hpp_source}{zipkin.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structfc_1_1zipkin__span_af2027d101bc566ffa50c6f2cd26a9ae2}\index{fc::zipkin\_span@{fc::zipkin\_span}!zipkin\_span@{zipkin\_span}}
+\index{zipkin\_span@{zipkin\_span}!fc::zipkin\_span@{fc::zipkin\_span}}
+\doxysubsubsection{\texorpdfstring{zipkin\_span()}{zipkin\_span()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{structfc_1_1zipkin__span_af2027d101bc566ffa50c6f2cd26a9ae2} 
+fc\+::zipkin\+\_\+span\+::zipkin\+\_\+span (\begin{DoxyParamCaption}\item[{std\+::string}]{name}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{parent\+\_\+id}{ = {\ttfamily 0}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{zipkin_8hpp_source_l00061}{61}} of file \mbox{\hyperlink{zipkin_8hpp_source}{zipkin.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{structfc_1_1zipkin__span_a9e8a0a3042c5b85417025b182dce8d8d}{data}}(\ std::move(\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ ),\ parent\_id\ )\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{structfc_1_1zipkin__span_a45eefc5bd1076ae87a629cac8a812836}\index{fc::zipkin\_span@{fc::zipkin\_span}!zipkin\_span@{zipkin\_span}}
+\index{zipkin\_span@{zipkin\_span}!fc::zipkin\_span@{fc::zipkin\_span}}
+\doxysubsubsection{\texorpdfstring{zipkin\_span()}{zipkin\_span()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{structfc_1_1zipkin__span_a45eefc5bd1076ae87a629cac8a812836} 
+fc\+::zipkin\+\_\+span\+::zipkin\+\_\+span (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{id}{, }\item[{std\+::string}]{name}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{parent\+\_\+id}{ = {\ttfamily 0}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{zipkin_8hpp_source_l00064}{64}} of file \mbox{\hyperlink{zipkin_8hpp_source}{zipkin.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{structfc_1_1zipkin__span_a9e8a0a3042c5b85417025b182dce8d8d}{data}}(\ \textcolor{keywordtype}{id},\ std::move(\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ ),\ parent\_id\ )\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{structfc_1_1zipkin__span_ada4ef13a09e1fe9b824bea29a458c971}\index{fc::zipkin\_span@{fc::zipkin\_span}!zipkin\_span@{zipkin\_span}}
+\index{zipkin\_span@{zipkin\_span}!fc::zipkin\_span@{fc::zipkin\_span}}
+\doxysubsubsection{\texorpdfstring{zipkin\_span()}{zipkin\_span()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{structfc_1_1zipkin__span_ada4ef13a09e1fe9b824bea29a458c971} 
+fc\+::zipkin\+\_\+span\+::zipkin\+\_\+span (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structfc_1_1zipkin__span}{zipkin\+\_\+span}} \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [delete]}}
+
+\Hypertarget{structfc_1_1zipkin__span_a4918a3757250d97f1b3f0b51855783bd}\index{fc::zipkin\_span@{fc::zipkin\_span}!zipkin\_span@{zipkin\_span}}
+\index{zipkin\_span@{zipkin\_span}!fc::zipkin\_span@{fc::zipkin\_span}}
+\doxysubsubsection{\texorpdfstring{zipkin\_span()}{zipkin\_span()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{structfc_1_1zipkin__span_a4918a3757250d97f1b3f0b51855783bd} 
+fc\+::zipkin\+\_\+span\+::zipkin\+\_\+span (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structfc_1_1zipkin__span}{zipkin\+\_\+span}} \&\&}]{rhs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{zipkin_8hpp_source_l00071}{71}} of file \mbox{\hyperlink{zipkin_8hpp_source}{zipkin.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{structfc_1_1zipkin__span_a9e8a0a3042c5b85417025b182dce8d8d}{data}}(\ std::move(\ rhs.data\ )\ )\ \{}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ rhs.data.\mbox{\hyperlink{structfc_1_1zipkin__span_1_1span__data_a8f6cfdba8a16bfe950b45da04d7bf278}{id}}\ =\ 0;}
+\DoxyCodeLine{00074\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structfc_1_1zipkin__span_ae3fef6e20268796fac93c736a3e51a57}\index{fc::zipkin\_span@{fc::zipkin\_span}!````~zipkin\_span@{\texorpdfstring{$\sim$}{\string~}zipkin\_span}}
+\index{````~zipkin\_span@{\texorpdfstring{$\sim$}{\string~}zipkin\_span}!fc::zipkin\_span@{fc::zipkin\_span}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}zipkin\_span()}{\string~zipkin\_span()}}
+{\footnotesize\ttfamily \label{structfc_1_1zipkin__span_ae3fef6e20268796fac93c736a3e51a57} 
+fc\+::zipkin\+\_\+span\+::\texorpdfstring{$\sim$}{\string~}zipkin\+\_\+span (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zipkin_8cpp_source_l00197}{197}} of file \mbox{\hyperlink{zipkin_8cpp_source}{zipkin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00198\ \ \ \ \textcolor{keywordflow}{if}(\ data.id\ ==\ 0\ )}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00200\ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{classfc_1_1zipkin__config_a9556dacb1a00643aecbf33b1f1e889d0}{zipkin\_config::is\_enabled}}()\ )\ \{}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \ \ \ data.stop\ =\ \mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{time\_point::now}}();}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1zipkin__config_ae0348c29d052b3060150e3b379e8e9ce}{zipkin\_config::get\_zipkin}}().\mbox{\hyperlink{classfc_1_1zipkin_a0f15921f7cb4ccefe0684bf656dbe6e6}{log}}(\ std::move(\ data\ )\ );}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00205\ \ \ \ \}\ \textcolor{keywordflow}{catch}(\ ...\ )\ \{\}}
+\DoxyCodeLine{00206\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structfc_1_1zipkin__span_ae3fef6e20268796fac93c736a3e51a57_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structfc_1_1zipkin__span_a62a094a768f90e2936046205ed11613a}\index{fc::zipkin\_span@{fc::zipkin\_span}!add\_tag@{add\_tag}}
+\index{add\_tag@{add\_tag}!fc::zipkin\_span@{fc::zipkin\_span}}
+\doxysubsubsection{\texorpdfstring{add\_tag()}{add\_tag()}\hspace{0.1cm}{\footnotesize\ttfamily [1/5]}}
+{\footnotesize\ttfamily \label{structfc_1_1zipkin__span_a62a094a768f90e2936046205ed11613a} 
+void fc\+::zipkin\+\_\+span\+::add\+\_\+tag (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{key}{, }\item[{bool}]{v}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zipkin_8hpp_source_l00088}{88}} of file \mbox{\hyperlink{zipkin_8hpp_source}{zipkin.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \textcolor{comment}{//\ zipkin\ tags\ are\ required\ to\ be\ strings}}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ data.tags(\ key,\ v\ ?\ \textcolor{stringliteral}{"{}true"{}}\ :\ \textcolor{stringliteral}{"{}false"{}}\ );}
+\DoxyCodeLine{00091\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structfc_1_1zipkin__span_a5d609899b2de96ba8c9ae131971a141e}\index{fc::zipkin\_span@{fc::zipkin\_span}!add\_tag@{add\_tag}}
+\index{add\_tag@{add\_tag}!fc::zipkin\_span@{fc::zipkin\_span}}
+\doxysubsubsection{\texorpdfstring{add\_tag()}{add\_tag()}\hspace{0.1cm}{\footnotesize\ttfamily [2/5]}}
+{\footnotesize\ttfamily \label{structfc_1_1zipkin__span_a5d609899b2de96ba8c9ae131971a141e} 
+void fc\+::zipkin\+\_\+span\+::add\+\_\+tag (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{key}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{var}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zipkin_8hpp_source_l00083}{83}} of file \mbox{\hyperlink{zipkin_8hpp_source}{zipkin.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \textcolor{comment}{//\ zipkin\ tags\ are\ required\ to\ be\ strings}}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ data.tags(\ key,\ var\ );}
+\DoxyCodeLine{00086\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structfc_1_1zipkin__span_ad54039ec426609667c4a8e3ee5a38489}\index{fc::zipkin\_span@{fc::zipkin\_span}!add\_tag@{add\_tag}}
+\index{add\_tag@{add\_tag}!fc::zipkin\_span@{fc::zipkin\_span}}
+\doxysubsubsection{\texorpdfstring{add\_tag()}{add\_tag()}\hspace{0.1cm}{\footnotesize\ttfamily [3/5]}}
+{\footnotesize\ttfamily \label{structfc_1_1zipkin__span_ad54039ec426609667c4a8e3ee5a38489} 
+void fc\+::zipkin\+\_\+span\+::add\+\_\+tag (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{key}{, }\item[{const std\+::string \&}]{var}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zipkin_8hpp_source_l00078}{78}} of file \mbox{\hyperlink{zipkin_8hpp_source}{zipkin.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \textcolor{comment}{//\ zipkin\ tags\ are\ required\ to\ be\ strings}}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ data.tags(\ key,\ var\ );}
+\DoxyCodeLine{00081\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structfc_1_1zipkin__span_ad16186a20092fe65c58a473d715ec6ab}\index{fc::zipkin\_span@{fc::zipkin\_span}!add\_tag@{add\_tag}}
+\index{add\_tag@{add\_tag}!fc::zipkin\_span@{fc::zipkin\_span}}
+\doxysubsubsection{\texorpdfstring{add\_tag()}{add\_tag()}\hspace{0.1cm}{\footnotesize\ttfamily [4/5]}}
+{\footnotesize\ttfamily \label{structfc_1_1zipkin__span_ad16186a20092fe65c58a473d715ec6ab} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+std\+::enable\+\_\+if\+\_\+t$<$ std\+::is\+\_\+arithmetic\+\_\+v$<$ std\+::remove\+\_\+reference\+\_\+t$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ $>$, void $>$ fc\+::zipkin\+\_\+span\+::add\+\_\+tag (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{key}{, }\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\&}]{var}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zipkin_8hpp_source_l00095}{95}} of file \mbox{\hyperlink{zipkin_8hpp_source}{zipkin.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ data.tags(\ key,\ std::to\_string(\ std::forward<T>(\ var\ )\ )\ );}
+\DoxyCodeLine{00097\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structfc_1_1zipkin__span_a555fe0c21d9fdb8073bc3fb153f92cde}\index{fc::zipkin\_span@{fc::zipkin\_span}!add\_tag@{add\_tag}}
+\index{add\_tag@{add\_tag}!fc::zipkin\_span@{fc::zipkin\_span}}
+\doxysubsubsection{\texorpdfstring{add\_tag()}{add\_tag()}\hspace{0.1cm}{\footnotesize\ttfamily [5/5]}}
+{\footnotesize\ttfamily \label{structfc_1_1zipkin__span_a555fe0c21d9fdb8073bc3fb153f92cde} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+std\+::enable\+\_\+if\+\_\+t$<$!std\+::is\+\_\+arithmetic\+\_\+v$<$ std\+::remove\+\_\+reference\+\_\+t$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ $>$, void $>$ fc\+::zipkin\+\_\+span\+::add\+\_\+tag (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{key}{, }\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\&}]{var}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zipkin_8hpp_source_l00101}{101}} of file \mbox{\hyperlink{zipkin_8hpp_source}{zipkin.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ data.tags(\ key,\ (std::string)\ var\ );}
+\DoxyCodeLine{00103\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structfc_1_1zipkin__span_ab982c2f5aa6b04fbbbbafe23d5cbe2b5}\index{fc::zipkin\_span@{fc::zipkin\_span}!get\_token@{get\_token}}
+\index{get\_token@{get\_token}!fc::zipkin\_span@{fc::zipkin\_span}}
+\doxysubsubsection{\texorpdfstring{get\_token()}{get\_token()}}
+{\footnotesize\ttfamily \label{structfc_1_1zipkin__span_ab982c2f5aa6b04fbbbbafe23d5cbe2b5} 
+\mbox{\hyperlink{structfc_1_1zipkin__span_1_1token}{token}} fc\+::zipkin\+\_\+span\+::get\+\_\+token (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zipkin_8hpp_source_l00116}{116}} of file \mbox{\hyperlink{zipkin_8hpp_source}{zipkin.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00116\ \{\ \textcolor{keywordflow}{return}\ token\{data.id\};\ \};}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structfc_1_1zipkin__span_ab982c2f5aa6b04fbbbbafe23d5cbe2b5_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structfc_1_1zipkin__span_accd101de29cf4a57de07a4638bab0e15}\index{fc::zipkin\_span@{fc::zipkin\_span}!operator=@{operator=}}
+\index{operator=@{operator=}!fc::zipkin\_span@{fc::zipkin\_span}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structfc_1_1zipkin__span_accd101de29cf4a57de07a4638bab0e15} 
+\mbox{\hyperlink{structfc_1_1zipkin__span}{zipkin\+\_\+span}} \& fc\+::zipkin\+\_\+span\+::operator= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structfc_1_1zipkin__span}{zipkin\+\_\+span}} \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [delete]}}
+
+\Hypertarget{structfc_1_1zipkin__span_a16d91220ce80b4ff3b0daef4737bb7e6}\index{fc::zipkin\_span@{fc::zipkin\_span}!operator=@{operator=}}
+\index{operator=@{operator=}!fc::zipkin\_span@{fc::zipkin\_span}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structfc_1_1zipkin__span_a16d91220ce80b4ff3b0daef4737bb7e6} 
+\mbox{\hyperlink{structfc_1_1zipkin__span}{zipkin\+\_\+span}} \& fc\+::zipkin\+\_\+span\+::operator= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structfc_1_1zipkin__span}{zipkin\+\_\+span}} \&\&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [delete]}}
+
+\Hypertarget{structfc_1_1zipkin__span_a1e1aa1cb977283138fa30280158384a7}\index{fc::zipkin\_span@{fc::zipkin\_span}!to\_id@{to\_id}}
+\index{to\_id@{to\_id}!fc::zipkin\_span@{fc::zipkin\_span}}
+\doxysubsubsection{\texorpdfstring{to\_id()}{to\_id()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structfc_1_1zipkin__span_a1e1aa1cb977283138fa30280158384a7} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} fc\+::zipkin\+\_\+span\+::to\+\_\+id (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1sha256}{fc\+::sha256}} \&}]{id}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{zipkin_8cpp_source_l00192}{192}} of file \mbox{\hyperlink{zipkin_8cpp_source}{zipkin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00193\ \ \ \ \textcolor{comment}{//\ avoid\ 0\ since\ id\ of\ 0\ is\ used\ as\ a\ flag}}
+\DoxyCodeLine{00194\ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keywordtype}{id}.\_hash[3]\ ==\ 0\ ?\ 1\ :\ \textcolor{keywordtype}{id}.\_hash[3];}
+\DoxyCodeLine{00195\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structfc_1_1zipkin__span_a8b1a316dff6439327b75649d3e4c0ad5}\index{fc::zipkin\_span@{fc::zipkin\_span}!to\_id@{to\_id}}
+\index{to\_id@{to\_id}!fc::zipkin\_span@{fc::zipkin\_span}}
+\doxysubsubsection{\texorpdfstring{to\_id()}{to\_id()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structfc_1_1zipkin__span_a8b1a316dff6439327b75649d3e4c0ad5} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+static \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} fc\+::zipkin\+\_\+span\+::to\+\_\+id (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{id}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{zipkin_8hpp_source_l00121}{121}} of file \mbox{\hyperlink{zipkin_8hpp_source}{zipkin.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \textcolor{keyword}{static\_assert}(\ std::is\_same\_v<\textcolor{keyword}{decltype}(\ \textcolor{keywordtype}{id}.data()\ ),\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}*>,\ \textcolor{stringliteral}{"{}expected\ uint64\_t"{}}\ );}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keywordtype}{id}.data()[3];}
+\DoxyCodeLine{00124\ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structfc_1_1zipkin__span_a9e8a0a3042c5b85417025b182dce8d8d}\index{fc::zipkin\_span@{fc::zipkin\_span}!data@{data}}
+\index{data@{data}!fc::zipkin\_span@{fc::zipkin\_span}}
+\doxysubsubsection{\texorpdfstring{data}{data}}
+{\footnotesize\ttfamily \label{structfc_1_1zipkin__span_a9e8a0a3042c5b85417025b182dce8d8d} 
+\mbox{\hyperlink{structfc_1_1zipkin__span_1_1span__data}{span\+\_\+data}} fc\+::zipkin\+\_\+span\+::data}
+
+
+
+Definition at line \mbox{\hyperlink{zipkin_8hpp_source_l00149}{149}} of file \mbox{\hyperlink{zipkin_8hpp_source}{zipkin.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/log/\mbox{\hyperlink{zipkin_8hpp}{zipkin.\+hpp}}\item 
+libraries/fc/src/log/\mbox{\hyperlink{zipkin_8cpp}{zipkin.\+cpp}}\end{DoxyCompactItemize}

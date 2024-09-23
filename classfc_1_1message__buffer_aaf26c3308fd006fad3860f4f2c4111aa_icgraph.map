@@ -1,0 +1,12 @@
+<map id="fc::message_buffer::advance_read_ptr" name="fc::message_buffer::advance_read_ptr">
+<area shape="rect" id="Node000001" title=" " alt="" coords="494,47,627,88"/>
+<area shape="rect" id="Node000002" href="$test__message__buffer_8cpp.html#ac64fd5998672b472a05dead509a6e008" title="Test buffer growth and shrinking." alt="" coords="250,5,446,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="478,51,406,34,407,29,479,46"/>
+<area shape="rect" id="Node000003" href="$test__message__buffer_8cpp.html#a6687d4ea18cd8c8a2244e87202a36dfe" title=" " alt="" coords="250,55,446,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="478,70,446,70,446,65,478,65"/>
+<area shape="rect" id="Node000004" href="$classfc_1_1message__buffer.html#a535ef4f901ac8e5f9008524eafad9447" title=" " alt="" coords="281,128,414,169"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="492,96,404,130,402,125,490,91"/>
+<area shape="poly" id="edge5_Node000004_Node000004" title=" " alt="" coords="382,115,370,109,348,107,328,109,315,114,311,120,313,127,308,128,306,119,312,110,326,104,348,102,371,104,385,110"/>
+<area shape="rect" id="Node000005" href="$test__message__buffer_8cpp.html#ae9f66dfac041e0941e63b810d0cb5315" title="Test peek and read across multiple buffers." alt="" coords="5,136,202,162"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="266,152,202,152,202,146,266,146"/>
+</map>

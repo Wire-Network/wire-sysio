@@ -1,0 +1,694 @@
+\doxysection{Validate.\+cpp}
+\hypertarget{_validate_8cpp_source}{}\label{_validate_8cpp_source}\index{libraries/wasm-\/jit/Source/IR/Validate.cpp@{libraries/wasm-\/jit/Source/IR/Validate.cpp}}
+\mbox{\hyperlink{_validate_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_module_8h}{IR/Module.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_operators_8h}{IR/Operators.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_operator_printer_8h}{IR/OperatorPrinter.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_validate_8h}{IR/Validate.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_logging_8h}{Logging/Logging.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{_timing_8h}{Inline/Timing.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <set>}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00010}\mbox{\hyperlink{_validate_8cpp_a042e13d7e40b6a804e22e1089a8074ec}{00010}}\ \textcolor{preprocessor}{\#define\ ENABLE\_LOGGING\ 0}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00012}00012\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_i_r}{IR}}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00013}00013\ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00014}\mbox{\hyperlink{_validate_8cpp_a17a5193fad64ed76a99511b0bc1057e8}{00014}}\ \textcolor{preprocessor}{\ \ \ \ \#define\ VALIDATE\_UNLESS(reason,comparison)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00015}00015\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ if(comparison)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00016}00016\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00017}00017\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ throw\ ValidationException(reason\ \#comparison);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00018}00018\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \}}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00020}\mbox{\hyperlink{_validate_8cpp_af10283475485df0d3b511707d7e6a4d7}{00020}}\ \textcolor{preprocessor}{\ \ \ \ \#define\ VALIDATE\_INDEX(index,arraySize)\ VALIDATE\_UNLESS("{}invalid\ index:\ "{},index>=arraySize)}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00022}\mbox{\hyperlink{namespace_i_r_a8da3a77ff43cbfb1df55dd3adcb7fe7c}{00022}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespace_i_r_a8da3a77ff43cbfb1df55dd3adcb7fe7c}{validate}}(\mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}\ valueType)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00023}00023\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00024}00024\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(valueType\ ==\ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6a100b8cad7cf2a56f6df78f171f97a1ec}{ValueType::any}}\ ||\ valueType\ >\ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6a2ffe4e77325d9a7152f7086ea7aa5114}{ValueType::max}})}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00025}00025\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00026}00026\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{struct_i_r_1_1_validation_exception}{ValidationException}}(\textcolor{stringliteral}{"{}invalid\ value\ type\ ("{}}\ +\ std::to\_string((\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}})valueType)\ +\ \textcolor{stringliteral}{"{})"{}});}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00027}00027\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00028}00028\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00030}\mbox{\hyperlink{namespace_i_r_af44302d021871ae2dfe63cc6e6500cc6}{00030}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespace_i_r_a8da3a77ff43cbfb1df55dd3adcb7fe7c}{validate}}(\mbox{\hyperlink{namespace_i_r_ac56fb5355b338ad4a167c48ec539b90b}{ResultType}}\ returnType)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00031}00031\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00032}00032\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(returnType\ >\ \mbox{\hyperlink{namespace_i_r_ac56fb5355b338ad4a167c48ec539b90ba2ffe4e77325d9a7152f7086ea7aa5114}{ResultType::max}})}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00033}00033\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00034}00034\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{struct_i_r_1_1_validation_exception}{ValidationException}}(\textcolor{stringliteral}{"{}invalid\ return\ type\ ("{}}\ +\ std::to\_string((\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}})returnType)\ +\ \textcolor{stringliteral}{"{})"{}});}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00035}00035\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00036}00036\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00038}\mbox{\hyperlink{namespace_i_r_ac6127e0f21382baafe1db445afdd4688}{00038}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespace_i_r_a8da3a77ff43cbfb1df55dd3adcb7fe7c}{validate}}(\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908}{ObjectKind}}\ kind)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00039}00039\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00040}00040\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(kind\ >\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a2ffe4e77325d9a7152f7086ea7aa5114}{ObjectKind::max}})}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00041}00041\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00042}00042\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{struct_i_r_1_1_validation_exception}{ValidationException}}(\textcolor{stringliteral}{"{}invalid\ external\ kind\ ("{}}\ +\ std::to\_string((\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}})kind)\ +\ \textcolor{stringliteral}{"{})"{}});}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00043}00043\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00044}00044\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00046}\mbox{\hyperlink{namespace_i_r_a2b28479fa1c40c43174e6d7528a17b3e}{00046}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespace_i_r_a8da3a77ff43cbfb1df55dd3adcb7fe7c}{validate}}(\mbox{\hyperlink{struct_i_r_1_1_size_constraints}{SizeConstraints}}\ size,\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ maxMax)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00047}00047\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}}\ max\ =\ size.\mbox{\hyperlink{struct_i_r_1_1_size_constraints_adc8bdcc2a510a4ae1f54ba3c0938e8a4}{max}}\ ==\ \mbox{\hyperlink{stdint_8h_a30654b4b67d97c42ca3f9b6052dda916}{UINT64\_MAX}}\ ?\ maxMax\ :\ size.\mbox{\hyperlink{struct_i_r_1_1_size_constraints_adc8bdcc2a510a4ae1f54ba3c0938e8a4}{max}};}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_validate_8cpp_a17a5193fad64ed76a99511b0bc1057e8}{VALIDATE\_UNLESS}}(\textcolor{stringliteral}{"{}disjoint\ size\ bounds:\ "{}},size.\mbox{\hyperlink{struct_i_r_1_1_size_constraints_a1c14a08815ebd644f74f1cb4ba311616}{min}}>max);}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00050}00050\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_validate_8cpp_a17a5193fad64ed76a99511b0bc1057e8}{VALIDATE\_UNLESS}}(\textcolor{stringliteral}{"{}maximum\ size\ exceeds\ limit:\ "{}},max>maxMax);}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00051}00051\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00052}00052\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00053}\mbox{\hyperlink{namespace_i_r_ae07a98f1785486783fcaed60bd637617}{00053}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespace_i_r_a8da3a77ff43cbfb1df55dd3adcb7fe7c}{validate}}(\mbox{\hyperlink{namespace_i_r_a938516f231745a922740359bd3bdbc25}{TableElementType}}\ type)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00054}00054\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00055}00055\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(type\ !=\ \mbox{\hyperlink{namespace_i_r_a938516f231745a922740359bd3bdbc25a5f210d506ab948d170c2e576c1866707}{TableElementType::anyfunc}})\ \{\ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{struct_i_r_1_1_validation_exception}{ValidationException}}(\textcolor{stringliteral}{"{}invalid\ table\ element\ type\ ("{}}\ +\ std::to\_string((\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}})type)\ +\ \textcolor{stringliteral}{"{})"{}});\ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00056}00056\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00058}\mbox{\hyperlink{namespace_i_r_a3a9ed9aa86392d71a7278c8ef552ca07}{00058}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespace_i_r_a8da3a77ff43cbfb1df55dd3adcb7fe7c}{validate}}(\mbox{\hyperlink{struct_i_r_1_1_table_type}{TableType}}\ type)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00059}00059\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00060}00060\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_i_r_a8da3a77ff43cbfb1df55dd3adcb7fe7c}{validate}}(type.elementType);}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00061}00061\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_i_r_a8da3a77ff43cbfb1df55dd3adcb7fe7c}{validate}}(type.size,\mbox{\hyperlink{stdint_8h_ab5eb23180f7cc12b7d6c04a8ec067fdd}{UINT32\_MAX}});}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00062}00062\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(ENABLE\_THREADING\_PROTOTYPE)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00063}00063\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00064}00064\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_validate_8cpp_a17a5193fad64ed76a99511b0bc1057e8}{VALIDATE\_UNLESS}}(\textcolor{stringliteral}{"{}shared\ tables\ must\ have\ a\ maximum\ size:\ "{}},type.isShared\ \&\&\ type.size.max\ ==\ \mbox{\hyperlink{stdint_8h_a30654b4b67d97c42ca3f9b6052dda916}{UINT64\_MAX}});}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00065}00065\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00066}00066\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00067}00067\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00068}\mbox{\hyperlink{namespace_i_r_a3d573ccce4065b0861cf9a77d65ea722}{00068}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespace_i_r_a8da3a77ff43cbfb1df55dd3adcb7fe7c}{validate}}(\mbox{\hyperlink{struct_i_r_1_1_memory_type}{MemoryType}}\ type)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00069}00069\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00070}00070\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_i_r_a8da3a77ff43cbfb1df55dd3adcb7fe7c}{validate}}(type.size,\mbox{\hyperlink{namespace_i_r_a1ebd27752a0be411591778e29d9cdafda4c309120b5b0b221b81779a686c70e44}{IR::maxMemoryPages}});}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00071}00071\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(ENABLE\_THREADING\_PROTOTYPE)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00072}00072\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00073}00073\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_validate_8cpp_a17a5193fad64ed76a99511b0bc1057e8}{VALIDATE\_UNLESS}}(\textcolor{stringliteral}{"{}shared\ tables\ must\ have\ a\ maximum\ size:\ "{}},type.isShared\ \&\&\ type.size.max\ ==\ \mbox{\hyperlink{stdint_8h_a30654b4b67d97c42ca3f9b6052dda916}{UINT64\_MAX}});}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00074}00074\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00075}00075\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00076}00076\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00077}\mbox{\hyperlink{namespace_i_r_a6fadc0dcadf0e2230296c5590de59ca9}{00077}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespace_i_r_a8da3a77ff43cbfb1df55dd3adcb7fe7c}{validate}}(\mbox{\hyperlink{struct_i_r_1_1_global_type}{GlobalType}}\ type)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00078}00078\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00079}00079\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_i_r_a8da3a77ff43cbfb1df55dd3adcb7fe7c}{validate}}(type.valueType);}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00080}00080\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00081}00081\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00082}\mbox{\hyperlink{namespace_i_r_afb9145a4bfa58fedc2175b7a6cd09e11}{00082}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespace_i_r_afb9145a4bfa58fedc2175b7a6cd09e11}{validateImportKind}}(\mbox{\hyperlink{struct_i_r_1_1_object_type}{ObjectType}}\ importType,\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908}{ObjectKind}}\ expectedKind)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00083}00083\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00084}00084\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(importType.\mbox{\hyperlink{struct_i_r_1_1_object_type_a9ae9e2a420ea1c3c8df6496b778345bb}{kind}}\ !=\ expectedKind)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00085}00085\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00086}00086\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{struct_i_r_1_1_validation_exception}{ValidationException}}(\textcolor{stringliteral}{"{}incorrect\ kind"{}});}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00087}00087\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00088}00088\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00089}00089\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00090}00090\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ Type>}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00091}\mbox{\hyperlink{namespace_i_r_a676f46ec5bb239610dc364cacc50d779}{00091}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespace_i_r_a676f46ec5bb239610dc364cacc50d779}{validateType}}(\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}}\ expectedType,\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}}\ actualType,\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{structcontext}{context}})}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00092}00092\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00093}00093\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(expectedType\ !=\ actualType)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00094}00094\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00095}00095\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{struct_i_r_1_1_validation_exception}{ValidationException}}(}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00096}00096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::string(\textcolor{stringliteral}{"{}type\ mismatch:\ expected\ in\ "{}})\ +\ \mbox{\hyperlink{structcontext}{context}});}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00097}00097\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00098}00098\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00099}00099\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00100}\mbox{\hyperlink{namespace_i_r_a828976099fcb4837979d20b3584d76c0}{00100}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespace_i_r_a828976099fcb4837979d20b3584d76c0}{validateOperandType}}(\mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}\ expectedType,\mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}\ actualType,\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{structcontext}{context}})}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00101}00101\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00102}00102\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Handle\ polymorphic\ values\ popped\ off\ the\ operand\ stack\ after\ unconditional\ branches.}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00103}00103\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(expectedType\ !=\ actualType\ \&\&\ expectedType\ !=\ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6a100b8cad7cf2a56f6df78f171f97a1ec}{ValueType::any}}\ \&\&\ actualType\ !=\ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6a100b8cad7cf2a56f6df78f171f97a1ec}{ValueType::any}})}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00104}00104\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00105}00105\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{struct_i_r_1_1_validation_exception}{ValidationException}}(\ \textcolor{stringliteral}{"{}type\ mismatch"{}}\ );}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00106}00106\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00107}00107\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00108}00108\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00109}\mbox{\hyperlink{namespace_i_r_af69533e52a1b28c7325201f2365f6868}{00109}}\ \ \ \ \ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}\ \mbox{\hyperlink{namespace_i_r_af69533e52a1b28c7325201f2365f6868}{validateGlobalIndex}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_i_r_1_1_module}{Module}}\&\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}},\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ globalIndex,\textcolor{keywordtype}{bool}\ mustBeMutable,\textcolor{keywordtype}{bool}\ mustBeImmutable,\textcolor{keywordtype}{bool}\ mustBeImport,\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{structcontext}{context}})}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00110}00110\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00111}00111\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_validate_8cpp_af10283475485df0d3b511707d7e6a4d7}{VALIDATE\_INDEX}}(globalIndex,\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.globals.size());}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00112}00112\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_i_r_1_1_global_type}{GlobalType}}\&\ globalType\ =\ \textcolor{keyword}{module}.globals.getType(globalIndex);}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00113}00113\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(mustBeMutable\ \&\&\ !globalType.\mbox{\hyperlink{struct_i_r_1_1_global_type_a739a76fa5520dc533a173224e8082d92}{isMutable}})\ \{\ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{struct_i_r_1_1_validation_exception}{ValidationException}}(\textcolor{stringliteral}{"{}attempting\ to\ mutate\ immutable\ global"{}});\ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00114}00114\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(mustBeImport\ \&\&\ globalIndex\ >=\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.globals.imports.size())\ \{\ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{struct_i_r_1_1_validation_exception}{ValidationException}}(\textcolor{stringliteral}{"{}global\ variable\ initializer\ expression\ may\ only\ access\ imported\ globals"{}});\ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00115}00115\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(mustBeImmutable\ \&\&\ globalType.\mbox{\hyperlink{struct_i_r_1_1_global_type_a739a76fa5520dc533a173224e8082d92}{isMutable}})\ \{\ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{struct_i_r_1_1_validation_exception}{ValidationException}}(\textcolor{stringliteral}{"{}global\ variable\ initializer\ expression\ may\ only\ access\ immutable\ globals"{}});\ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00116}00116\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ globalType.\mbox{\hyperlink{struct_i_r_1_1_global_type_a43429332d5a181009b292328104c8604}{valueType}};}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00117}00117\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00118}00118\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00119}\mbox{\hyperlink{namespace_i_r_a7e5e03353622f6b7af0a5df82325bc47}{00119}}\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_i_r_1_1_function_type}{FunctionType}}*\ \mbox{\hyperlink{namespace_i_r_a7e5e03353622f6b7af0a5df82325bc47}{validateFunctionIndex}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_i_r_1_1_module}{Module}}\&\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}},\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ functionIndex)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00120}00120\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00121}00121\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_validate_8cpp_af10283475485df0d3b511707d7e6a4d7}{VALIDATE\_INDEX}}(functionIndex,\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.functions.size());}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00122}00122\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{module}.types[module.functions.getType(functionIndex).index];}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00123}00123\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00124}00124\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00125}\mbox{\hyperlink{namespace_i_r_adb28ed6d351d5f23fccfa9a3a7165db4}{00125}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespace_i_r_adb28ed6d351d5f23fccfa9a3a7165db4}{validateInitializer}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_i_r_1_1_module}{Module}}\&\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}},\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_i_r_1_1_initializer_expression}{InitializerExpression}}\&\ expression,\mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}\ expectedType,\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{structcontext}{context}})}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00126}00126\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00127}00127\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(expression.\mbox{\hyperlink{struct_i_r_1_1_initializer_expression_a66f8d262d27a9bd6536f0268974c7dd5}{type}})}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00128}00128\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00129}00129\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{struct_i_r_1_1_initializer_expression_a9a750d98a419b79ee4826a047051033aaaf09b572a2dfa9d0e811d458b51a5395}{InitializerExpression::Type::i32\_const}}:\ \mbox{\hyperlink{namespace_i_r_a676f46ec5bb239610dc364cacc50d779}{validateType}}(expectedType,\mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6af89edb52b075b8bd95989bd3d0a04c0a}{ValueType::i32}},\mbox{\hyperlink{structcontext}{context}});\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00130}00130\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{struct_i_r_1_1_initializer_expression_a9a750d98a419b79ee4826a047051033aa6559ffc871a107da7b00628ab165dd52}{InitializerExpression::Type::i64\_const}}:\ \mbox{\hyperlink{namespace_i_r_a676f46ec5bb239610dc364cacc50d779}{validateType}}(expectedType,\mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6add1d26230d15c93e8fbdba07b0299a44}{ValueType::i64}},\mbox{\hyperlink{structcontext}{context}});\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00131}00131\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{struct_i_r_1_1_initializer_expression_a9a750d98a419b79ee4826a047051033aad45bbc753854d55d3709abae9ff70544}{InitializerExpression::Type::f32\_const}}:\ \mbox{\hyperlink{namespace_i_r_a676f46ec5bb239610dc364cacc50d779}{validateType}}(expectedType,\mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6a512dc597be7ae761876315165dc8bd2e}{ValueType::f32}},\mbox{\hyperlink{structcontext}{context}});\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00132}00132\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{struct_i_r_1_1_initializer_expression_a9a750d98a419b79ee4826a047051033aa59fba2191173c583fef18016d997b43d}{InitializerExpression::Type::f64\_const}}:\ \mbox{\hyperlink{namespace_i_r_a676f46ec5bb239610dc364cacc50d779}{validateType}}(expectedType,\mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6a714b98e0a797e8f119f257a4ab802f86}{ValueType::f64}},\mbox{\hyperlink{structcontext}{context}});\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00133}00133\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{struct_i_r_1_1_initializer_expression_a9a750d98a419b79ee4826a047051033aaa3cb4bb86d6df102d0a7e937d7d5f43f}{InitializerExpression::Type::get\_global}}:}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00134}00134\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00135}00135\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}\ globalValueType\ =\ \mbox{\hyperlink{namespace_i_r_af69533e52a1b28c7325201f2365f6868}{validateGlobalIndex}}(\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}},expression.\mbox{\hyperlink{struct_i_r_1_1_initializer_expression_a00cd4a62f249390a3e6b504161d6cb16}{globalIndex}},\textcolor{keyword}{false},\textcolor{keyword}{true},\textcolor{keyword}{true},\textcolor{stringliteral}{"{}initializer\ expression\ global\ index"{}});}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00136}00136\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_i_r_a676f46ec5bb239610dc364cacc50d779}{validateType}}(expectedType,globalValueType,\mbox{\hyperlink{structcontext}{context}});}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00137}00137\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00138}00138\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00139}00139\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00140}00140\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{struct_i_r_1_1_validation_exception}{ValidationException}}(\textcolor{stringliteral}{"{}invalid\ initializer\ expression"{}});}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00141}00141\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00142}00142\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00143}00143\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00144}\mbox{\hyperlink{struct_i_r_1_1_function_validation_context}{00144}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_i_r_1_1_function_validation_context}{FunctionValidationContext}}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00145}00145\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00146}\mbox{\hyperlink{struct_i_r_1_1_function_validation_context_a902aa1ef8421f14a72df3ec7818e57fc}{00146}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_i_r_1_1_function_validation_context_a902aa1ef8421f14a72df3ec7818e57fc}{FunctionValidationContext}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_i_r_1_1_module}{Module}}\&\ inModule,\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_i_r_1_1_function_def}{FunctionDef}}\&\ inFunctionDef)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00147}00147\ \ \ \ \ \ \ \ \ :\ module(inModule),\ functionDef(inFunctionDef),\ functionType(inModule.types[inFunctionDef.type.index])}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00148}00148\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00149}00149\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Initialize\ the\ local\ types.}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00150}00150\ \ \ \ \ \ \ \ \ \ \ \ \ locals.reserve(functionType-\/>\mbox{\hyperlink{struct_i_r_1_1_function_type_a92e17c58f6cd40ee5392dba1bdc2e822}{parameters}}.size()\ +\ functionDef.\mbox{\hyperlink{struct_i_r_1_1_function_def_a34738d2b2fa494ebf86433b872fee943}{nonParameterLocalTypes}}.size());}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00151}00151\ \ \ \ \ \ \ \ \ \ \ \ \ locals\ =\ functionType-\/>\mbox{\hyperlink{struct_i_r_1_1_function_type_a92e17c58f6cd40ee5392dba1bdc2e822}{parameters}};}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00152}00152\ \ \ \ \ \ \ \ \ \ \ \ \ locals.insert(locals.end(),functionDef.\mbox{\hyperlink{struct_i_r_1_1_function_def_a34738d2b2fa494ebf86433b872fee943}{nonParameterLocalTypes}}.begin(),functionDef.\mbox{\hyperlink{struct_i_r_1_1_function_def_a34738d2b2fa494ebf86433b872fee943}{nonParameterLocalTypes}}.end());}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00153}00153\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00154}00154\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Push\ the\ function\ context\ onto\ the\ control\ stack.}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00155}00155\ \ \ \ \ \ \ \ \ \ \ \ \ pushControlStack(ControlContext::Type::function,functionType-\/>\mbox{\hyperlink{struct_i_r_1_1_function_type_a6f6a20ea31fb2218bcdba1bc4d6a1103}{ret}},functionType-\/>\mbox{\hyperlink{struct_i_r_1_1_function_type_a6f6a20ea31fb2218bcdba1bc4d6a1103}{ret}});}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00156}00156\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00157}00157\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00158}\mbox{\hyperlink{struct_i_r_1_1_function_validation_context_a6710de4db8be4f527ed3815ff21f139c}{00158}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ \mbox{\hyperlink{struct_i_r_1_1_function_validation_context_a6710de4db8be4f527ed3815ff21f139c}{getControlStackSize}}()\ \{\ \textcolor{keywordflow}{return}\ controlStack.size();\ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00159}00159\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00160}\mbox{\hyperlink{struct_i_r_1_1_function_validation_context_a52e339d50f0b217fa9319136d661e6a9}{00160}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_i_r_1_1_function_validation_context_a52e339d50f0b217fa9319136d661e6a9}{logOperator}}(\textcolor{keyword}{const}\ std::string\&\ operatorDescription)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00161}00161\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00162}00162\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{_l_l_v_m_emit_i_r_8cpp_a042e13d7e40b6a804e22e1089a8074ec}{ENABLE\_LOGGING}})}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00163}00163\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00164}00164\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ controlStackString;}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00165}00165\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ stackIndex\ =\ 0;stackIndex\ <\ controlStack.size();++stackIndex)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00166}00166\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00167}00167\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!controlStack[stackIndex].isReachable)\ \{\ controlStackString\ +=\ \textcolor{stringliteral}{"{}("{}};\ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00168}00168\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(controlStack[stackIndex].type)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00169}00169\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00170}00170\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ ControlContext::Type::function:\ controlStackString\ +=\ \textcolor{stringliteral}{"{}F"{}};\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00171}00171\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ ControlContext::Type::block:\ controlStackString\ +=\ \textcolor{stringliteral}{"{}B"{}};\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00172}00172\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ ControlContext::Type::ifThen:\ controlStackString\ +=\ \textcolor{stringliteral}{"{}T"{}};\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00173}00173\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ ControlContext::Type::ifElse:\ controlStackString\ +=\ \textcolor{stringliteral}{"{}E"{}};\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00174}00174\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ ControlContext::Type::loop:\ controlStackString\ +=\ \textcolor{stringliteral}{"{}L"{}};\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00175}00175\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:\ \mbox{\hyperlink{namespace_errors_a6959930ad6159fe3eb2e04ebf87c1b84}{Errors::unreachable}}();}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00176}00176\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00177}00177\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!controlStack[stackIndex].isReachable)\ \{\ controlStackString\ +=\ \textcolor{stringliteral}{"{})"{}};\ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00178}00178\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00179}00179\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00180}00180\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ stackString;}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00181}00181\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ stackBase\ =\ controlStack.size()\ ==\ 0\ ?\ 0\ :\ controlStack.back().outerStackSize;}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00182}00182\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ stackIndex\ =\ 0;stackIndex\ <\ stack.size();++stackIndex)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00183}00183\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00184}00184\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(stackIndex\ ==\ stackBase)\ \{\ stackString\ +=\ \textcolor{stringliteral}{"{}|\ "{}};\ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00185}00185\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ stackString\ +=\ \ \mbox{\hyperlink{namespace_i_r_a85d4203bbc1c989c8351490c711537f5}{asString}}(stack[stackIndex]);}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00186}00186\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ stackString\ +=\ \ \textcolor{stringliteral}{"{}\ "{}};}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00187}00187\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00188}00188\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(stack.size()\ ==\ stackBase)\ \{\ stackString\ +=\ \textcolor{stringliteral}{"{}|"{}};\ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00189}00189\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00190}00190\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{Log::printf}}(\mbox{\hyperlink{namespace_log_a1f055cc08a2ed074aa74f9d99c8a0901aad42f6697b035b7580e4fef93be20b4d}{Log::Category::debug}},\textcolor{stringliteral}{"{}\%-\/50s\ \%-\/50s\ \%-\/50s\(\backslash\)n"{}},controlStackString.c\_str(),operatorDescription.c\_str(),stackString.c\_str());}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00191}00191\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00192}00192\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00193}00193\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00194}00194\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Operation\ dispatch\ methods.}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00195}\mbox{\hyperlink{struct_i_r_1_1_function_validation_context_a09eab85a62fd4caa3787c5933ed5f153}{00195}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_i_r_1_1_function_validation_context_a09eab85a62fd4caa3787c5933ed5f153}{unknown}}(\mbox{\hyperlink{namespace_i_r_a59653fd60bb296de971e5f945c66933a}{Opcode}}\ opcode)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00196}00196\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00197}00197\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{struct_i_r_1_1_validation_exception}{ValidationException}}(\textcolor{stringliteral}{"{}Unknown\ opcode:\ "{}}\ +\ std::to\_string((\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}})opcode));}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00198}00198\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00199}\mbox{\hyperlink{struct_i_r_1_1_function_validation_context_af2b28b37632fb970fe55f6466a0644a0}{00199}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_i_r_1_1_function_validation_context_af2b28b37632fb970fe55f6466a0644a0}{block}}(\mbox{\hyperlink{struct_i_r_1_1_control_structure_imm}{ControlStructureImm}}\ imm)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00200}00200\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00201}00201\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_i_r_a8da3a77ff43cbfb1df55dd3adcb7fe7c}{validate}}(imm.\mbox{\hyperlink{struct_i_r_1_1_control_structure_imm_aeb701cf55047144f9cded296519cb742}{resultType}});}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00202}00202\ \ \ \ \ \ \ \ \ \ \ \ \ pushControlStack(ControlContext::Type::block,imm.\mbox{\hyperlink{struct_i_r_1_1_control_structure_imm_aeb701cf55047144f9cded296519cb742}{resultType}},imm.\mbox{\hyperlink{struct_i_r_1_1_control_structure_imm_aeb701cf55047144f9cded296519cb742}{resultType}});}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00203}00203\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00204}\mbox{\hyperlink{struct_i_r_1_1_function_validation_context_a88d787bccdccfe32da22ef15101a97ca}{00204}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_i_r_1_1_function_validation_context_a88d787bccdccfe32da22ef15101a97ca}{loop}}(\mbox{\hyperlink{struct_i_r_1_1_control_structure_imm}{ControlStructureImm}}\ imm)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00205}00205\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00206}00206\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_i_r_a8da3a77ff43cbfb1df55dd3adcb7fe7c}{validate}}(imm.\mbox{\hyperlink{struct_i_r_1_1_control_structure_imm_aeb701cf55047144f9cded296519cb742}{resultType}});}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00207}00207\ \ \ \ \ \ \ \ \ \ \ \ \ pushControlStack(ControlContext::Type::loop,\mbox{\hyperlink{namespace_i_r_ac56fb5355b338ad4a167c48ec539b90ba334c4a4c42fdb79d7ebc3e73b517e6f8}{ResultType::none}},imm.\mbox{\hyperlink{struct_i_r_1_1_control_structure_imm_aeb701cf55047144f9cded296519cb742}{resultType}});}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00208}00208\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00209}\mbox{\hyperlink{struct_i_r_1_1_function_validation_context_a6503bd245ab8d38424b8d6b33170277b}{00209}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_i_r_1_1_function_validation_context_a6503bd245ab8d38424b8d6b33170277b}{if\_}}(\mbox{\hyperlink{struct_i_r_1_1_control_structure_imm}{ControlStructureImm}}\ imm)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00210}00210\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00211}00211\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_i_r_a8da3a77ff43cbfb1df55dd3adcb7fe7c}{validate}}(imm.\mbox{\hyperlink{struct_i_r_1_1_control_structure_imm_aeb701cf55047144f9cded296519cb742}{resultType}});}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00212}00212\ \ \ \ \ \ \ \ \ \ \ \ \ popAndValidateOperand(\textcolor{stringliteral}{"{}if\ condition"{}},\mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6af89edb52b075b8bd95989bd3d0a04c0a}{ValueType::i32}});}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00213}00213\ \ \ \ \ \ \ \ \ \ \ \ \ pushControlStack(ControlContext::Type::ifThen,imm.\mbox{\hyperlink{struct_i_r_1_1_control_structure_imm_aeb701cf55047144f9cded296519cb742}{resultType}},imm.\mbox{\hyperlink{struct_i_r_1_1_control_structure_imm_aeb701cf55047144f9cded296519cb742}{resultType}});}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00214}00214\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00215}\mbox{\hyperlink{struct_i_r_1_1_function_validation_context_a46a12b147726a963a2946b4194d29ddc}{00215}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_i_r_1_1_function_validation_context_a46a12b147726a963a2946b4194d29ddc}{else\_}}(\mbox{\hyperlink{struct_i_r_1_1_no_imm}{NoImm}}\ imm)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00216}00216\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00217}00217\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ controlStack.size()\ ==\ 0\ )\ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{struct_i_r_1_1_validation_exception}{ValidationException}}(\ \textcolor{stringliteral}{"{}control\ stack\ empty"{}}\ );}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00218}00218\ \ \ \ \ \ \ \ \ \ \ \ \ popAndValidateResultType(\textcolor{stringliteral}{"{}if\ result"{}},controlStack.back().resultType);}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00219}00219\ \ \ \ \ \ \ \ \ \ \ \ \ popControlStack(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00220}00220\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00221}\mbox{\hyperlink{struct_i_r_1_1_function_validation_context_a79ba059cd5b4d99f333c0f551786aa4e}{00221}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_i_r_1_1_function_validation_context_a79ba059cd5b4d99f333c0f551786aa4e}{end}}(\mbox{\hyperlink{struct_i_r_1_1_no_imm}{NoImm}})}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00222}00222\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00223}00223\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ controlStack.size()\ ==\ 0\ )\ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{struct_i_r_1_1_validation_exception}{ValidationException}}(\ \textcolor{stringliteral}{"{}control\ stack\ empty"{}}\ );}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00224}00224\ \ \ \ \ \ \ \ \ \ \ \ \ popAndValidateResultType(\textcolor{stringliteral}{"{}end\ result"{}},controlStack.back().resultType);}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00225}00225\ \ \ \ \ \ \ \ \ \ \ \ \ popControlStack();}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00226}00226\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00227}00227\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00228}\mbox{\hyperlink{struct_i_r_1_1_function_validation_context_a7b93a1dd658786c312e6736963aa794a}{00228}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_i_r_1_1_function_validation_context_a7b93a1dd658786c312e6736963aa794a}{return\_}}(\mbox{\hyperlink{struct_i_r_1_1_no_imm}{NoImm}})}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00229}00229\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00230}00230\ \ \ \ \ \ \ \ \ \ \ \ \ popAndValidateResultType(\textcolor{stringliteral}{"{}ret"{}},functionType-\/>\mbox{\hyperlink{struct_i_r_1_1_function_type_a6f6a20ea31fb2218bcdba1bc4d6a1103}{ret}});}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00231}00231\ \ \ \ \ \ \ \ \ \ \ \ \ enterUnreachable();}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00232}00232\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00233}00233\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00234}\mbox{\hyperlink{struct_i_r_1_1_function_validation_context_abb64ed5c03f5194958f3036483952c61}{00234}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_i_r_1_1_function_validation_context_abb64ed5c03f5194958f3036483952c61}{br}}(\mbox{\hyperlink{struct_i_r_1_1_branch_imm}{BranchImm}}\ imm)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00235}00235\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00236}00236\ \ \ \ \ \ \ \ \ \ \ \ \ popAndValidateResultType(\textcolor{stringliteral}{"{}br\ argument"{}},getBranchTargetByDepth(imm.\mbox{\hyperlink{struct_i_r_1_1_branch_imm_a593815bfc84d3b4ba4f7bd74efe99e19}{targetDepth}}).branchArgumentType);}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00237}00237\ \ \ \ \ \ \ \ \ \ \ \ \ enterUnreachable();}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00238}00238\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00239}\mbox{\hyperlink{struct_i_r_1_1_function_validation_context_a8acd67cf9db8805f7d02f2c97824d5f4}{00239}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_i_r_1_1_function_validation_context_a8acd67cf9db8805f7d02f2c97824d5f4}{br\_table}}(\mbox{\hyperlink{struct_i_r_1_1_branch_table_imm}{BranchTableImm}}\ imm)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00240}00240\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00241}00241\ \ \ \ \ \ \ \ \ \ \ \ \ popAndValidateOperand(\textcolor{stringliteral}{"{}br\_table\ index"{}},\mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6af89edb52b075b8bd95989bd3d0a04c0a}{ValueType::i32}});}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00242}00242\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespace_i_r_ac56fb5355b338ad4a167c48ec539b90b}{ResultType}}\ defaultTargetArgumentType\ =\ getBranchTargetByDepth(imm.\mbox{\hyperlink{struct_i_r_1_1_branch_table_imm_a9d63b9dbb2610daabb09735384f7ab67}{defaultTargetDepth}}).branchArgumentType;}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00243}00243\ \ \ \ \ \ \ \ \ \ \ \ \ popAndValidateResultType(\textcolor{stringliteral}{"{}br\_table\ argument"{}},defaultTargetArgumentType);}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00244}00244\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00245}00245\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_errors_8h_a03bec6af3af0dd492e348b40cbe40a46}{WAVM\_ASSERT\_THROW}}(imm.\mbox{\hyperlink{struct_i_r_1_1_branch_table_imm_a997ecb7055eee01f77e205f495f0cb9c}{branchTableIndex}}\ <\ functionDef.\mbox{\hyperlink{struct_i_r_1_1_function_def_a937cbae37b04e6dd4686bea442c2099b}{branchTables}}.size());}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00246}00246\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::vector<U32>\&\ targetDepths\ =\ functionDef.\mbox{\hyperlink{struct_i_r_1_1_function_def_a937cbae37b04e6dd4686bea442c2099b}{branchTables}}[imm.\mbox{\hyperlink{struct_i_r_1_1_branch_table_imm_a997ecb7055eee01f77e205f495f0cb9c}{branchTableIndex}}];}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00247}00247\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ targetIndex\ =\ 0;targetIndex\ <\ targetDepths.size();++targetIndex)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00248}00248\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00249}00249\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespace_i_r_ac56fb5355b338ad4a167c48ec539b90b}{ResultType}}\ targetArgumentType\ =\ getBranchTargetByDepth(targetDepths[targetIndex]).branchArgumentType;}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00250}00250\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_validate_8cpp_a17a5193fad64ed76a99511b0bc1057e8}{VALIDATE\_UNLESS}}(\textcolor{stringliteral}{"{}br\_table\ target\ argument\ must\ match\ default\ target\ argument:\ "{}},targetArgumentType\ !=\ defaultTargetArgumentType);}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00251}00251\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00252}00252\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00253}00253\ \ \ \ \ \ \ \ \ \ \ \ \ enterUnreachable();}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00254}00254\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00255}\mbox{\hyperlink{struct_i_r_1_1_function_validation_context_a9f76f08ef41a1e8c656dcc72ac3e4319}{00255}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_i_r_1_1_function_validation_context_a9f76f08ef41a1e8c656dcc72ac3e4319}{br\_if}}(\mbox{\hyperlink{struct_i_r_1_1_branch_imm}{BranchImm}}\ imm)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00256}00256\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00257}00257\ \ \ \ \ \ \ \ \ \ \ \ \ popAndValidateOperand(\textcolor{stringliteral}{"{}br\_if\ condition"{}},\mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6af89edb52b075b8bd95989bd3d0a04c0a}{ValueType::i32}});}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00258}00258\ \ \ \ \ \ \ \ \ \ \ \ \ popAndValidateResultType(\textcolor{stringliteral}{"{}br\_if\ argument"{}},getBranchTargetByDepth(imm.\mbox{\hyperlink{struct_i_r_1_1_branch_imm_a593815bfc84d3b4ba4f7bd74efe99e19}{targetDepth}}).branchArgumentType);}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00259}00259\ \ \ \ \ \ \ \ \ \ \ \ \ pushOperand(getBranchTargetByDepth(imm.\mbox{\hyperlink{struct_i_r_1_1_branch_imm_a593815bfc84d3b4ba4f7bd74efe99e19}{targetDepth}}).branchArgumentType);}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00260}00260\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00261}00261\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00262}\mbox{\hyperlink{struct_i_r_1_1_function_validation_context_af53d5828bcc1a29b6c611e35dc877bde}{00262}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_i_r_1_1_function_validation_context_af53d5828bcc1a29b6c611e35dc877bde}{unreachable}}(\mbox{\hyperlink{struct_i_r_1_1_no_imm}{NoImm}})}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00263}00263\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00264}00264\ \ \ \ \ \ \ \ \ \ \ \ \ enterUnreachable();}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00265}00265\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00266}\mbox{\hyperlink{struct_i_r_1_1_function_validation_context_a7e9a1485378fe9fe4b76d4fb0b02ab64}{00266}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_i_r_1_1_function_validation_context_a7e9a1485378fe9fe4b76d4fb0b02ab64}{drop}}(\mbox{\hyperlink{struct_i_r_1_1_no_imm}{NoImm}})}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00267}00267\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00268}00268\ \ \ \ \ \ \ \ \ \ \ \ \ popOperand();}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00269}00269\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00270}00270\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00271}\mbox{\hyperlink{struct_i_r_1_1_function_validation_context_af51d1d3462d0b23cca85c40e3e934731}{00271}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_i_r_1_1_function_validation_context_af51d1d3462d0b23cca85c40e3e934731}{select}}(\mbox{\hyperlink{struct_i_r_1_1_no_imm}{NoImm}})}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00272}00272\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00273}00273\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}\ condition\ =\ popOperand();}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00274}00274\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}\ falseType\ =\ popOperand();}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00275}00275\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}\ trueType\ =\ popOperand();}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00276}00276\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_i_r_a828976099fcb4837979d20b3584d76c0}{validateOperandType}}(\mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6af89edb52b075b8bd95989bd3d0a04c0a}{ValueType::i32}},condition,\textcolor{stringliteral}{"{}select\ condition"{}});}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00277}00277\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_i_r_a828976099fcb4837979d20b3584d76c0}{validateOperandType}}(falseType,trueType,\textcolor{stringliteral}{"{}select\ operands"{}});}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00278}00278\ \ \ \ \ \ \ \ \ \ \ \ \ pushOperand(falseType);}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00279}00279\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00280}00280\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00281}\mbox{\hyperlink{struct_i_r_1_1_function_validation_context_a837a96fab4cd07474315cdf9d1ffd0bf}{00281}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_i_r_1_1_function_validation_context_a837a96fab4cd07474315cdf9d1ffd0bf}{get\_local}}(\mbox{\hyperlink{struct_i_r_1_1_get_or_set_variable_imm}{GetOrSetVariableImm<false>}}\ imm)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00282}00282\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00283}00283\ \ \ \ \ \ \ \ \ \ \ \ \ pushOperand(validateLocalIndex(imm.\mbox{\hyperlink{struct_i_r_1_1_get_or_set_variable_imm_a58f67a9226981e4cae7686ac9e65b11b}{variableIndex}}));}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00284}00284\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00285}\mbox{\hyperlink{struct_i_r_1_1_function_validation_context_a1a3f15cafb22963ef40e225735241fb0}{00285}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_i_r_1_1_function_validation_context_a1a3f15cafb22963ef40e225735241fb0}{set\_local}}(\mbox{\hyperlink{struct_i_r_1_1_get_or_set_variable_imm}{GetOrSetVariableImm<false>}}\ imm)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00286}00286\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00287}00287\ \ \ \ \ \ \ \ \ \ \ \ \ popAndValidateOperand(\textcolor{stringliteral}{"{}set\_local"{}},validateLocalIndex(imm.\mbox{\hyperlink{struct_i_r_1_1_get_or_set_variable_imm_a58f67a9226981e4cae7686ac9e65b11b}{variableIndex}}));}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00288}00288\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00289}\mbox{\hyperlink{struct_i_r_1_1_function_validation_context_aa139229648d493a8a48d0db2d0c0f37b}{00289}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_i_r_1_1_function_validation_context_aa139229648d493a8a48d0db2d0c0f37b}{tee\_local}}(\mbox{\hyperlink{struct_i_r_1_1_get_or_set_variable_imm}{GetOrSetVariableImm<false>}}\ imm)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00290}00290\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00291}00291\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}\ localType\ =\ validateLocalIndex(imm.\mbox{\hyperlink{struct_i_r_1_1_get_or_set_variable_imm_a58f67a9226981e4cae7686ac9e65b11b}{variableIndex}});}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00292}00292\ \ \ \ \ \ \ \ \ \ \ \ \ popAndValidateOperand(\textcolor{stringliteral}{"{}tee\_local"{}},localType);}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00293}00293\ \ \ \ \ \ \ \ \ \ \ \ \ pushOperand(localType);}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00294}00294\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00295}00295\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00296}\mbox{\hyperlink{struct_i_r_1_1_function_validation_context_aaf444985f7b9b181a31cddb884363aeb}{00296}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_i_r_1_1_function_validation_context_aaf444985f7b9b181a31cddb884363aeb}{get\_global}}(\mbox{\hyperlink{struct_i_r_1_1_get_or_set_variable_imm}{GetOrSetVariableImm<true>}}\ imm)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00297}00297\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00298}00298\ \ \ \ \ \ \ \ \ \ \ \ \ pushOperand(\mbox{\hyperlink{namespace_i_r_af69533e52a1b28c7325201f2365f6868}{validateGlobalIndex}}(module,imm.\mbox{\hyperlink{struct_i_r_1_1_get_or_set_variable_imm_a58f67a9226981e4cae7686ac9e65b11b}{variableIndex}},\textcolor{keyword}{false},\textcolor{keyword}{false},\textcolor{keyword}{false},\textcolor{stringliteral}{"{}get\_global"{}}));}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00299}00299\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00300}\mbox{\hyperlink{struct_i_r_1_1_function_validation_context_af5159b9d46f9185873ddb816c1309a94}{00300}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_i_r_1_1_function_validation_context_af5159b9d46f9185873ddb816c1309a94}{set\_global}}(\mbox{\hyperlink{struct_i_r_1_1_get_or_set_variable_imm}{GetOrSetVariableImm<true>}}\ imm)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00301}00301\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00302}00302\ \ \ \ \ \ \ \ \ \ \ \ \ popAndValidateOperand(\textcolor{stringliteral}{"{}set\_global"{}},\mbox{\hyperlink{namespace_i_r_af69533e52a1b28c7325201f2365f6868}{validateGlobalIndex}}(module,imm.\mbox{\hyperlink{struct_i_r_1_1_get_or_set_variable_imm_a58f67a9226981e4cae7686ac9e65b11b}{variableIndex}},\textcolor{keyword}{true},\textcolor{keyword}{false},\textcolor{keyword}{false},\textcolor{stringliteral}{"{}set\_global"{}}));}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00303}00303\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00304}00304\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00305}\mbox{\hyperlink{struct_i_r_1_1_function_validation_context_afd0a53f0e00a6b149af057a0619eaf84}{00305}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_i_r_1_1_function_validation_context_afd0a53f0e00a6b149af057a0619eaf84}{call}}(\mbox{\hyperlink{struct_i_r_1_1_call_imm}{CallImm}}\ imm)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00306}00306\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00307}00307\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_i_r_1_1_function_type}{FunctionType}}*\ calleeType\ =\ \mbox{\hyperlink{namespace_i_r_a7e5e03353622f6b7af0a5df82325bc47}{validateFunctionIndex}}(module,imm.\mbox{\hyperlink{struct_i_r_1_1_call_imm_a79c3a5c31c922ca02ec83673d7f2c9cb}{functionIndex}});}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00308}00308\ \ \ \ \ \ \ \ \ \ \ \ \ popAndValidateOperands(\textcolor{stringliteral}{"{}call\ arguments"{}},calleeType-\/>\mbox{\hyperlink{struct_i_r_1_1_function_type_a92e17c58f6cd40ee5392dba1bdc2e822}{parameters}}.data(),(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}})calleeType-\/>\mbox{\hyperlink{struct_i_r_1_1_function_type_a92e17c58f6cd40ee5392dba1bdc2e822}{parameters}}.size());}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00309}00309\ \ \ \ \ \ \ \ \ \ \ \ \ pushOperand(calleeType-\/>\mbox{\hyperlink{struct_i_r_1_1_function_type_a6f6a20ea31fb2218bcdba1bc4d6a1103}{ret}});}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00310}00310\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00311}\mbox{\hyperlink{struct_i_r_1_1_function_validation_context_ab09919891a9a0d7fb41212345cbb0d07}{00311}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_i_r_1_1_function_validation_context_ab09919891a9a0d7fb41212345cbb0d07}{call\_indirect}}(\mbox{\hyperlink{struct_i_r_1_1_call_indirect_imm}{CallIndirectImm}}\ imm)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00312}00312\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00313}00313\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_validate_8cpp_af10283475485df0d3b511707d7e6a4d7}{VALIDATE\_INDEX}}(imm.\mbox{\hyperlink{struct_i_r_1_1_call_indirect_imm_ad5e749796116ddbe5569617b53396415}{type}}.\mbox{\hyperlink{struct_i_r_1_1_indexed_function_type_ad76a69c366f186a0e17305099ea15aba}{index}},module.\mbox{\hyperlink{struct_i_r_1_1_module_a682c9e762448410a20c98ea062a50308}{types}}.size());}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00314}00314\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_validate_8cpp_a17a5193fad64ed76a99511b0bc1057e8}{VALIDATE\_UNLESS}}(\textcolor{stringliteral}{"{}call\_indirect\ is\ only\ valid\ if\ there\ is\ a\ default\ function\ table:\ "{}},module.\mbox{\hyperlink{struct_i_r_1_1_module_a3093728dba0995da777601adf56082d1}{tables}}.size()==0);}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00315}00315\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_i_r_1_1_function_type}{FunctionType}}*\ calleeType\ =\ \textcolor{keyword}{module}.types[imm.type.index];}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00316}00316\ \ \ \ \ \ \ \ \ \ \ \ \ popAndValidateOperand(\textcolor{stringliteral}{"{}call\_indirect\ function\ index"{}},\mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6af89edb52b075b8bd95989bd3d0a04c0a}{ValueType::i32}});}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00317}00317\ \ \ \ \ \ \ \ \ \ \ \ \ popAndValidateOperands(\textcolor{stringliteral}{"{}call\_indirect\ arguments"{}},calleeType-\/>\mbox{\hyperlink{struct_i_r_1_1_function_type_a92e17c58f6cd40ee5392dba1bdc2e822}{parameters}}.data(),(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}})calleeType-\/>\mbox{\hyperlink{struct_i_r_1_1_function_type_a92e17c58f6cd40ee5392dba1bdc2e822}{parameters}}.size());}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00318}00318\ \ \ \ \ \ \ \ \ \ \ \ \ pushOperand(calleeType-\/>\mbox{\hyperlink{struct_i_r_1_1_function_type_a6f6a20ea31fb2218bcdba1bc4d6a1103}{ret}});}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00319}00319\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00320}00320\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00321}\mbox{\hyperlink{struct_i_r_1_1_function_validation_context_ab0042a9d7dd66a7775fdb8e4721364d7}{00321}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_i_r_1_1_function_validation_context_ab0042a9d7dd66a7775fdb8e4721364d7}{validateImm}}(\mbox{\hyperlink{struct_i_r_1_1_no_imm}{NoImm}})\ \{\}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00322}00322\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00323}00323\ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ nativeType>}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00324}\mbox{\hyperlink{struct_i_r_1_1_function_validation_context_af5f7a3ccec6e41049cda5f3ad7fe996e}{00324}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_i_r_1_1_function_validation_context_af5f7a3ccec6e41049cda5f3ad7fe996e}{validateImm}}(\mbox{\hyperlink{struct_i_r_1_1_literal_imm}{LiteralImm<nativeType>}}\ imm)\ \{\}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00325}00325\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00326}00326\ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}<Uptr\ naturalAlignmentLog2>}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00327}\mbox{\hyperlink{struct_i_r_1_1_function_validation_context_aa3229cd643af2c20110ca7f3c2368430}{00327}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_i_r_1_1_function_validation_context_aa3229cd643af2c20110ca7f3c2368430}{validateImm}}(\mbox{\hyperlink{struct_i_r_1_1_load_or_store_imm}{LoadOrStoreImm<naturalAlignmentLog2>}}\ imm)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00328}00328\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00329}00329\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_validate_8cpp_a17a5193fad64ed76a99511b0bc1057e8}{VALIDATE\_UNLESS}}(\textcolor{stringliteral}{"{}load\ or\ store\ alignment\ greater\ than\ natural\ alignment:\ "{}},imm.\mbox{\hyperlink{struct_i_r_1_1_load_or_store_imm_a30107d37953b93bfe82f75d1974c42cb}{alignmentLog2}}>naturalAlignmentLog2);}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00330}00330\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_validate_8cpp_a17a5193fad64ed76a99511b0bc1057e8}{VALIDATE\_UNLESS}}(\textcolor{stringliteral}{"{}load\ or\ store\ in\ module\ without\ default\ memory:\ "{}},module.\mbox{\hyperlink{struct_i_r_1_1_module_a27e85034ab34b4db4321603722d3917c}{memories}}.size()==0);}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00331}00331\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00332}00332\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00333}\mbox{\hyperlink{struct_i_r_1_1_function_validation_context_adad89a645840cd841adfdd67aaa42584}{00333}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_i_r_1_1_function_validation_context_adad89a645840cd841adfdd67aaa42584}{validateImm}}(\mbox{\hyperlink{struct_i_r_1_1_memory_imm}{MemoryImm}})}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00334}00334\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00335}00335\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_validate_8cpp_a17a5193fad64ed76a99511b0bc1057e8}{VALIDATE\_UNLESS}}(\textcolor{stringliteral}{"{}current\_memory\ and\ grow\_memory\ are\ only\ valid\ if\ there\ is\ a\ default\ memory"{}},module.\mbox{\hyperlink{struct_i_r_1_1_module_a27e85034ab34b4db4321603722d3917c}{memories}}.size()\ ==\ 0);}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00336}00336\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00337}00337\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00338}00338\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#if\ ENABLE\_SIMD\_PROTOTYPE}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00339}00339\ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}<Uptr\ numLanes>}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00340}00340\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_i_r_1_1_function_validation_context_ab0042a9d7dd66a7775fdb8e4721364d7}{validateImm}}(LaneIndexImm<numLanes>\ imm)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00341}00341\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00342}00342\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_validate_8cpp_a17a5193fad64ed76a99511b0bc1057e8}{VALIDATE\_UNLESS}}(\textcolor{stringliteral}{"{}swizzle\ invalid\ lane\ index"{}},imm.laneIndex>=numLanes);}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00343}00343\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00344}00344\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00345}00345\ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}<Uptr\ numLanes>}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00346}00346\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_i_r_1_1_function_validation_context_ab0042a9d7dd66a7775fdb8e4721364d7}{validateImm}}(ShuffleImm<numLanes>\ imm)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00347}00347\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00348}00348\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ laneIndex\ =\ 0;laneIndex\ <\ numLanes;++laneIndex)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00349}00349\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00350}00350\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_validate_8cpp_a17a5193fad64ed76a99511b0bc1057e8}{VALIDATE\_UNLESS}}(\textcolor{stringliteral}{"{}shuffle\ invalid\ lane\ index"{}},imm.laneIndices[laneIndex]>=numLanes*2);}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00351}00351\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00352}00352\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00353}00353\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#endif}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00354}00354\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00355}00355\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#if\ ENABLE\_THREADING\_PROTOTYPE}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00356}00356\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_i_r_1_1_function_validation_context_ab0042a9d7dd66a7775fdb8e4721364d7}{validateImm}}(LaunchThreadImm)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00357}00357\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00358}00358\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_validate_8cpp_a17a5193fad64ed76a99511b0bc1057e8}{VALIDATE\_UNLESS}}(\textcolor{stringliteral}{"{}launch\_thread\ is\ only\ valid\ if\ there\ is\ a\ default\ table"{}},module.\mbox{\hyperlink{struct_i_r_1_1_module_a3093728dba0995da777601adf56082d1}{tables}}.size()\ ==\ 0);}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00359}00359\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00360}00360\ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}<Uptr\ naturalAlignmentLog2>}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00361}00361\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_i_r_1_1_function_validation_context_ab0042a9d7dd66a7775fdb8e4721364d7}{validateImm}}(AtomicLoadOrStoreImm<naturalAlignmentLog2>\ imm)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00362}00362\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00363}00363\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_validate_8cpp_a17a5193fad64ed76a99511b0bc1057e8}{VALIDATE\_UNLESS}}(\textcolor{stringliteral}{"{}atomic\ memory\ operator\ in\ module\ without\ default\ memory:\ "{}},module.\mbox{\hyperlink{struct_i_r_1_1_module_a27e85034ab34b4db4321603722d3917c}{memories}}.size()==0);}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00364}00364\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{namespace_i_r_a33a9d5fd60e1f0e25a86e2fea36ccf20afc01aaa0707bbfc9451fc43f0b61b0f8}{requireSharedFlagForAtomicOperators}})}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00365}00365\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00366}00366\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_validate_8cpp_a17a5193fad64ed76a99511b0bc1057e8}{VALIDATE\_UNLESS}}(\textcolor{stringliteral}{"{}atomic\ memory\ operators\ require\ a\ memory\ with\ the\ shared\ flag:\ "{}},!module.\mbox{\hyperlink{struct_i_r_1_1_module_a27e85034ab34b4db4321603722d3917c}{memories}}.getType(0).isShared);}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00367}00367\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00368}00368\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_validate_8cpp_a17a5193fad64ed76a99511b0bc1057e8}{VALIDATE\_UNLESS}}(\textcolor{stringliteral}{"{}atomic\ memory\ operators\ must\ have\ natural\ alignment:\ "{}},imm.alignmentLog2\ !=\ naturalAlignmentLog2);}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00369}00369\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00370}00370\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#endif}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00371}00371\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00372}\mbox{\hyperlink{_validate_8cpp_aec12c50abeddde83317edb3d75c2d437}{00372}}\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#define\ LOAD(resultTypeId)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00373}00373\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ popAndValidateOperand(operatorName,ValueType::i32);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00374}00374\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ pushOperand(ResultType::resultTypeId);}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00375}\mbox{\hyperlink{_validate_8cpp_a57b67fc5129dd91860d3a41ab67b60f3}{00375}}\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#define\ STORE(valueTypeId)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00376}00376\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ popAndValidateOperands(operatorName,ValueType::i32,ValueType::valueTypeId);}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00377}00377\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#define\ NULLARY(resultTypeId)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00378}00378\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ pushOperand(ResultType::resultTypeId);}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00379}00379\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#define\ BINARY(operandTypeId,resultTypeId)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00380}00380\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ popAndValidateOperands(operatorName,ValueType::operandTypeId,ValueType::operandTypeId);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00381}00381\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ pushOperand(ResultType::resultTypeId)}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00382}00382\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#define\ UNARY(operandTypeId,resultTypeId)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00383}00383\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ popAndValidateOperand(operatorName,ValueType::operandTypeId);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00384}00384\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ pushOperand(ResultType::resultTypeId)}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00385}00385\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00386}00386\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#if\ ENABLE\_SIMD\_PROTOTYPE}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00387}00387\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#define\ VECTORSELECT(vectorTypeId)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00388}00388\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ popAndValidateOperands(operatorName,ValueType::vectorTypeId,ValueType::vectorTypeId,ValueType::vectorTypeId);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00389}00389\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ pushOperand(ValueType::vectorTypeId);}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00390}00390\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#define\ REPLACELANE(scalarTypeId,vectorTypeId)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00391}00391\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ popAndValidateOperands(operatorName,ValueType::vectorTypeId,ValueType::scalarTypeId);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00392}00392\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ pushOperand(ValueType::vectorTypeId);}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00393}00393\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#endif}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00394}00394\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00395}00395\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#if\ ENABLE\_THREADING\_PROTOTYPE}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00396}00396\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#define\ LAUNCHTHREAD\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00397}00397\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ popAndValidateOperands(operatorName,ValueType::i32,ValueType::i32,ValueType::i32);}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00398}00398\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#define\ COMPAREEXCHANGE(valueTypeId)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00399}00399\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ popAndValidateOperands(operatorName,ValueType::i32,ValueType::valueTypeId,ValueType::valueTypeId);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00400}00400\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ pushOperand(ValueType::valueTypeId);}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00401}\mbox{\hyperlink{_validate_8cpp_ac0c08c48cd3d4766501beca3a09cfb15}{00401}}\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#define\ WAIT(valueTypeId)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00402}00402\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ popAndValidateOperands(operatorName,ValueType::i32,ValueType::valueTypeId,ValueType::f64);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00403}00403\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ pushOperand(ValueType::i32);}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00404}00404\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#define\ ATOMICRMW(valueTypeId)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00405}00405\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ popAndValidateOperands(operatorName,ValueType::i32,ValueType::valueTypeId);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00406}00406\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ pushOperand(ValueType::valueTypeId);}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00407}00407\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#endif}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00408}00408\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00409}00409\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \#define\ VALIDATE\_OP(opcode,name,nameString,Imm,validateOperands)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00410}00410\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ void\ name(Imm\ imm)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00411}00411\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00412}00412\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ const\ char*\ operatorName\ =\ nameString;\ SUPPRESS\_UNUSED(operatorName);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00413}00413\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ validateImm(imm);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00414}00414\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ validateOperands;\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00415}00415\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \}}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00416}00416\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_operators_8h_afc055c4c723278726afb8d279f6b022f}{ENUM\_NONCONTROL\_NONPARAMETRIC\_OPERATORS}}(\mbox{\hyperlink{_validate_8cpp_ac0c08c48cd3d4766501beca3a09cfb15}{VALIDATE\_OP}})}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00417}00417\ \ \ \ \ \ \ \ \ \textcolor{preprocessor}{\#undef\ VALIDATE\_OP}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00418}00418\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00419}00419\ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00420}00420\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00421}00421\ \ \ \ \ \ \ \ \ \textcolor{keyword}{struct\ }ControlContext}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00422}00422\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00423}00423\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{enum\ class}\ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}}\ :\ \mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00424}00424\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00425}00425\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ function,}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00426}00426\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ block,}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00427}00427\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ifWithoutElse,}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00428}00428\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ifThen,}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00429}00429\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ifElse,}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00430}00430\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ loop}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00431}00431\ \ \ \ \ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00432}00432\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00433}00433\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}}\ type;}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00434}00434\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ outerStackSize;}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00435}00435\ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00436}00436\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_i_r_ac56fb5355b338ad4a167c48ec539b90b}{ResultType}}\ branchArgumentType;}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00437}00437\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_i_r_ac56fb5355b338ad4a167c48ec539b90b}{ResultType}}\ resultType;}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00438}00438\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ isReachable;}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00439}00439\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00440}00440\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00441}00441\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ Module\&\ module;}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00442}00442\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ FunctionDef\&\ functionDef;}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00443}00443\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ FunctionType*\ functionType;}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00444}00444\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00445}00445\ \ \ \ \ \ \ \ \ std::vector<ValueType>\ locals;}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00446}00446\ \ \ \ \ \ \ \ \ std::vector<ControlContext>\ controlStack;}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00447}00447\ \ \ \ \ \ \ \ \ std::vector<ValueType>\ stack;}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00448}00448\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00449}00449\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ pushControlStack(ControlContext::Type\ type,\mbox{\hyperlink{namespace_i_r_ac56fb5355b338ad4a167c48ec539b90b}{ResultType}}\ branchArgumentType,\mbox{\hyperlink{namespace_i_r_ac56fb5355b338ad4a167c48ec539b90b}{ResultType}}\ resultType)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00450}00450\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00451}00451\ \ \ \ \ \ \ \ \ \ \ \ \ controlStack.push\_back(\{\mbox{\hyperlink{yubihsm_8h_a1d127017fb298b889f4ba24752d08b8e}{type}},\mbox{\hyperlink{namespacesysio_1_1vm_abc94c8e9af7289dc068a502c63ad98d4afac2a47adace059aff113283a03f6760}{stack}}.size(),branchArgumentType,resultType,\textcolor{keyword}{true}\});}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00452}00452\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00453}00453\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00454}00454\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ popControlStack(\textcolor{keywordtype}{bool}\ isElse\ =\ \textcolor{keyword}{false})}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00455}00455\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00456}00456\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !controlStack.size()\ )\ \textcolor{keywordflow}{throw}\ ValidationException(\ \textcolor{stringliteral}{"{}control\ stack\ empty"{}}\ );}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00457}00457\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_validate_8cpp_a17a5193fad64ed76a99511b0bc1057e8}{VALIDATE\_UNLESS}}(\textcolor{stringliteral}{"{}stack\ was\ not\ empty\ at\ end\ of\ control\ structure:\ "{}},\mbox{\hyperlink{namespacesysio_1_1vm_abc94c8e9af7289dc068a502c63ad98d4afac2a47adace059aff113283a03f6760}{stack}}.size()\ >\ controlStack.back().outerStackSize);}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00458}00458\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00459}00459\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(isElse\ \&\&\ controlStack.back().type\ ==\ ControlContext::Type::ifThen)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00460}00460\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00461}00461\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ controlStack.back().type\ =\ ControlContext::Type::ifElse;}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00462}00462\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ controlStack.back().isReachable\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00463}00463\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00464}00464\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00465}00465\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00466}00466\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_validate_8cpp_a17a5193fad64ed76a99511b0bc1057e8}{VALIDATE\_UNLESS}}(\textcolor{stringliteral}{"{}else\ only\ allowed\ in\ if\ context:\ "{}},isElse);}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00467}00467\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespace_i_r_ac56fb5355b338ad4a167c48ec539b90b}{ResultType}}\ resultType\ =\ controlStack.back().resultType;}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00468}00468\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(controlStack.back().type\ ==\ ControlContext::Type::ifThen\ \&\&\ resultType\ !=\ \mbox{\hyperlink{namespace_i_r_ac56fb5355b338ad4a167c48ec539b90ba334c4a4c42fdb79d7ebc3e73b517e6f8}{ResultType::none}})}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00469}00469\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00470}00470\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ ValidationException(\textcolor{stringliteral}{"{}else-\/less\ if\ may\ not\ yield\ a\ result"{}});}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00471}00471\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00472}00472\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ controlStack.pop\_back();}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00473}00473\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(controlStack.size())\ \{\ pushOperand(resultType);\ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00474}00474\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00475}00475\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00476}00476\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00477}00477\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ enterUnreachable()}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00478}00478\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00479}00479\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !controlStack.size()\ )\ \textcolor{keywordflow}{throw}\ ValidationException(\ \textcolor{stringliteral}{"{}invalid\ control\ stack\ depth"{}}\ );}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00480}00480\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1vm_abc94c8e9af7289dc068a502c63ad98d4afac2a47adace059aff113283a03f6760}{stack}}.resize(controlStack.back().outerStackSize);}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00481}00481\ \ \ \ \ \ \ \ \ \ \ \ \ controlStack.back().isReachable\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00482}00482\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00483}00483\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00484}00484\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ validateBranchDepth(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ depth)\textcolor{keyword}{\ const}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00485}00485\ \textcolor{keyword}{\ \ \ \ \ \ \ \ }\{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00486}00486\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_validate_8cpp_af10283475485df0d3b511707d7e6a4d7}{VALIDATE\_INDEX}}(depth,controlStack.size());}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00487}00487\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(depth\ >=\ controlStack.size())\ \{\ \textcolor{keywordflow}{throw}\ ValidationException(\textcolor{stringliteral}{"{}invalid\ branch\ depth"{}});\ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00488}00488\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00489}00489\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00490}00490\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ ControlContext\&\ getBranchTargetByDepth(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ depth)\textcolor{keyword}{\ const}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00491}00491\ \textcolor{keyword}{\ \ \ \ \ \ \ \ }\{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00492}00492\ \ \ \ \ \ \ \ \ \ \ \ \ validateBranchDepth(depth);}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00493}00493\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ controlStack[controlStack.size()\ -\/\ depth\ -\/\ 1];}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00494}00494\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00495}00495\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00496}00496\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}\ validateLocalIndex(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ localIndex)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00497}00497\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00498}00498\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_validate_8cpp_af10283475485df0d3b511707d7e6a4d7}{VALIDATE\_INDEX}}(localIndex,\mbox{\hyperlink{namespacesysio_1_1vm_abc94c8e9af7289dc068a502c63ad98d4a65004f81079422462f2162dcf38954f3}{locals}}.size());}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00499}00499\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacesysio_1_1vm_abc94c8e9af7289dc068a502c63ad98d4a65004f81079422462f2162dcf38954f3}{locals}}[localIndex];}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00500}00500\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00501}00501\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00502}00502\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}\ popOperand()}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00503}00503\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00504}00504\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(controlStack.empty())\ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00505}00505\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ ValidationException(\textcolor{stringliteral}{"{}control\ stack\ empty"{}});}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00506}00506\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00507}00507\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(\mbox{\hyperlink{namespacesysio_1_1vm_abc94c8e9af7289dc068a502c63ad98d4afac2a47adace059aff113283a03f6760}{stack}}.size()\ >\ controlStack.back().outerStackSize)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00508}00508\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00509}00509\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}\ result\ =\ \mbox{\hyperlink{namespacesysio_1_1vm_abc94c8e9af7289dc068a502c63ad98d4afac2a47adace059aff113283a03f6760}{stack}}.back();}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00510}00510\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1vm_abc94c8e9af7289dc068a502c63ad98d4afac2a47adace059aff113283a03f6760}{stack}}.pop\_back();}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00511}00511\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00512}00512\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00513}00513\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(controlStack.back().isReachable)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00514}00514\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00515}00515\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ ValidationException(\textcolor{stringliteral}{"{}invalid\ stack\ access"{}});}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00516}00516\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00517}00517\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00518}00518\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00519}00519\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6a100b8cad7cf2a56f6df78f171f97a1ec}{ValueType::any}};}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00520}00520\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00521}00521\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00522}00522\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00523}00523\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ popAndValidateOperands(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{structcontext}{context}},\textcolor{keyword}{const}\ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}*\ expectedTypes,\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6a0fc3cfbc27e91ea60a787de13dae3e3c}{num}})}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00524}00524\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00525}00525\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ operandIndexFromEnd\ =\ 0;operandIndexFromEnd\ <\ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6a0fc3cfbc27e91ea60a787de13dae3e3c}{num}};++operandIndexFromEnd)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00526}00526\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00527}00527\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ operandIndex\ =\ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6a0fc3cfbc27e91ea60a787de13dae3e3c}{num}}\ -\/\ operandIndexFromEnd\ -\/\ 1;}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00528}00528\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}\ actualType\ =\ popOperand();}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00529}00529\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_i_r_a828976099fcb4837979d20b3584d76c0}{validateOperandType}}(expectedTypes[operandIndex],actualType,\mbox{\hyperlink{structcontext}{context}});}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00530}00530\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00531}00531\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00532}00532\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00533}00533\ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}<Uptr\ num>}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00534}00534\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ popAndValidateOperands(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{structcontext}{context}},\textcolor{keyword}{const}\ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}\ (\&expectedTypes)[\mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6a0fc3cfbc27e91ea60a787de13dae3e3c}{num}}])\ \{\ popAndValidateOperands(\mbox{\hyperlink{structcontext}{context}},expectedTypes,\mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6a0fc3cfbc27e91ea60a787de13dae3e3c}{num}});\ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00535}00535\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00536}00536\ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}...\ OperandTypes>}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00537}00537\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ popAndValidateOperands(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{structcontext}{context}},OperandTypes...\ operands)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00538}00538\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00539}00539\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}\ operandTypes[]\ =\ \{operands...\};}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00540}00540\ \ \ \ \ \ \ \ \ \ \ \ \ popAndValidateOperands(\mbox{\hyperlink{structcontext}{context}},operandTypes);}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00541}00541\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00542}00542\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00543}00543\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ popAndValidateOperand(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{structcontext}{context}},\textcolor{keyword}{const}\ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}\ expectedType)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00544}00544\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00545}00545\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}\ actualType\ =\ popOperand();}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00546}00546\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_i_r_a828976099fcb4837979d20b3584d76c0}{validateOperandType}}(expectedType,actualType,\mbox{\hyperlink{structcontext}{context}});}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00547}00547\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00548}00548\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00549}00549\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ popAndValidateResultType(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{structcontext}{context}},\mbox{\hyperlink{namespace_i_r_ac56fb5355b338ad4a167c48ec539b90b}{ResultType}}\ expectedType)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00550}00550\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00551}00551\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(expectedType\ !=\ \mbox{\hyperlink{namespace_i_r_ac56fb5355b338ad4a167c48ec539b90ba334c4a4c42fdb79d7ebc3e73b517e6f8}{ResultType::none}})\ \{\ popAndValidateOperand(\mbox{\hyperlink{structcontext}{context}},\mbox{\hyperlink{namespace_i_r_ab4f5cbe34d0c872af1fc3333762e27eb}{asValueType}}(expectedType));\ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00552}00552\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00553}00553\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00554}00554\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ pushOperand(\mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6}{ValueType}}\ type)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00555}00555\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00556}\mbox{\hyperlink{namespace_i_r_a623d4533e80c60c6d4a5217635b7602f}{00556}}\ \ \ \ \ \ \ \ \ \ \ \ \ stack.push\_back(type);}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00557}00557\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00558}00558\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ pushOperand(\mbox{\hyperlink{namespace_i_r_ac56fb5355b338ad4a167c48ec539b90b}{ResultType}}\ type)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00559}00559\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00560}00560\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(type\ !=\ \mbox{\hyperlink{namespace_i_r_ac56fb5355b338ad4a167c48ec539b90ba334c4a4c42fdb79d7ebc3e73b517e6f8}{ResultType::none}})\ \{\ pushOperand(\mbox{\hyperlink{namespace_i_r_ab4f5cbe34d0c872af1fc3333762e27eb}{asValueType}}(type));\ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00561}00561\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00562}00562\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00563}00563\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00564}00564\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespace_i_r_a623d4533e80c60c6d4a5217635b7602f}{validateDefinitions}}(\textcolor{keyword}{const}\ Module\&\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}})}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00565}00565\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00566}00566\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_timing_1_1_timer}{Timing::Timer}}\ timer;}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00567}00567\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00568}00568\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ typeIndex\ =\ 0;typeIndex\ <\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.types.size();++typeIndex)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00569}00569\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00570}00570\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ FunctionType*\ functionType\ =\ \textcolor{keyword}{module}.types[typeIndex];}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00571}00571\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\ parameterType\ :\ functionType-\/>parameters)\ \{\ \mbox{\hyperlink{namespace_i_r_a8da3a77ff43cbfb1df55dd3adcb7fe7c}{validate}}(parameterType);\ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00572}00572\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_i_r_a8da3a77ff43cbfb1df55dd3adcb7fe7c}{validate}}(functionType-\/>ret);}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00573}00573\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00574}00574\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00575}00575\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\&\ functionImport\ :\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.functions.imports)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00576}00576\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00577}00577\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_validate_8cpp_af10283475485df0d3b511707d7e6a4d7}{VALIDATE\_INDEX}}(functionImport.type.index,\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.types.size());}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00578}00578\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00579}00579\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\&\ tableImport\ :\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.tables.imports)\ \{\ \mbox{\hyperlink{namespace_i_r_a8da3a77ff43cbfb1df55dd3adcb7fe7c}{validate}}(tableImport.type);\ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00580}00580\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\&\ memoryImport\ :\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.memories.imports)\ \{\ \mbox{\hyperlink{namespace_i_r_a8da3a77ff43cbfb1df55dd3adcb7fe7c}{validate}}(memoryImport.type);\ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00581}00581\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\&\ globalImport\ :\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.globals.imports)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00582}00582\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00583}00583\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_i_r_a8da3a77ff43cbfb1df55dd3adcb7fe7c}{validate}}(globalImport.type);}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00584}00584\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_validate_8cpp_a17a5193fad64ed76a99511b0bc1057e8}{VALIDATE\_UNLESS}}(\textcolor{stringliteral}{"{}mutable\ globals\ cannot\ be\ imported:\ "{}},globalImport.type.isMutable);}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00585}00585\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00586}00586\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00587}00587\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}}\ functionDefIndex\ =\ 0;functionDefIndex\ <\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.functions.defs.size();++functionDefIndex)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00588}00588\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00589}00589\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ FunctionDef\&\ functionDef\ =\ \textcolor{keyword}{module}.functions.defs[functionDefIndex];}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00590}00590\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_validate_8cpp_af10283475485df0d3b511707d7e6a4d7}{VALIDATE\_INDEX}}(functionDef.type.index,\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.types.size());}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00591}00591\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\ localType\ :\ functionDef.nonParameterLocalTypes)\ \{\ \mbox{\hyperlink{namespace_i_r_a8da3a77ff43cbfb1df55dd3adcb7fe7c}{validate}}(localType);\ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00592}00592\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00593}00593\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00594}00594\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\&\ globalDef\ :\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.globals.defs)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00595}00595\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00596}00596\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_i_r_a8da3a77ff43cbfb1df55dd3adcb7fe7c}{validate}}(globalDef.type);}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00597}00597\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_i_r_adb28ed6d351d5f23fccfa9a3a7165db4}{validateInitializer}}(\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}},globalDef.initializer,globalDef.type.valueType,\textcolor{stringliteral}{"{}global\ initializer\ expression"{}});}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00598}00598\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00599}00599\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00600}00600\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\&\ tableDef\ :\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.tables.defs)\ \{\ \mbox{\hyperlink{namespace_i_r_a8da3a77ff43cbfb1df55dd3adcb7fe7c}{validate}}(tableDef.type);\ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00601}00601\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_validate_8cpp_a17a5193fad64ed76a99511b0bc1057e8}{VALIDATE\_UNLESS}}(\textcolor{stringliteral}{"{}too\ many\ tables:\ "{}},\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.tables.size()>1);}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00602}00602\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00603}00603\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\&\ memoryDef\ :\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.memories.defs)\ \{\ \mbox{\hyperlink{namespace_i_r_a8da3a77ff43cbfb1df55dd3adcb7fe7c}{validate}}(memoryDef.type);\ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00604}00604\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_validate_8cpp_a17a5193fad64ed76a99511b0bc1057e8}{VALIDATE\_UNLESS}}(\textcolor{stringliteral}{"{}too\ many\ memories:\ "{}},\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.memories.size()>1);}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00605}00605\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00606}00606\ \ \ \ \ \ \ \ \ std::set<std::string>\ exportNameMap;}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00607}00607\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\&\ exportIt\ :\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.exports)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00608}00608\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00609}00609\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(exportIt.kind)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00610}00610\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00611}00611\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908ac1c425268e68385d1ab5074c17a94f14}{ObjectKind::function}}:}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00612}00612\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_validate_8cpp_af10283475485df0d3b511707d7e6a4d7}{VALIDATE\_INDEX}}(exportIt.index,\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.functions.size());}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00613}00613\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00614}00614\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908aaab9e1de16f38176f86d7a92ba337a8d}{ObjectKind::table}}:}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00615}00615\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_validate_8cpp_af10283475485df0d3b511707d7e6a4d7}{VALIDATE\_INDEX}}(exportIt.index,\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.tables.size());}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00616}00616\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00617}00617\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908acd69b4957f06cd818d7bf3d61980e291}{ObjectKind::memory}}:}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00618}00618\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_validate_8cpp_af10283475485df0d3b511707d7e6a4d7}{VALIDATE\_INDEX}}(exportIt.index,\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.memories.size());}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00619}00619\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00620}00620\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a9c70933aff6b2a6d08c687a6cbb6b765}{ObjectKind::global}}:}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00621}00621\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_i_r_af69533e52a1b28c7325201f2365f6868}{validateGlobalIndex}}(\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}},exportIt.index,\textcolor{keyword}{false},\textcolor{keyword}{true},\textcolor{keyword}{false},\textcolor{stringliteral}{"{}exported\ global\ index"{}});}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00622}00622\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00623}00623\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:\ \textcolor{keywordflow}{throw}\ ValidationException(\textcolor{stringliteral}{"{}unknown\ export\ kind"{}});}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00624}00624\ \ \ \ \ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00625}00625\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00626}00626\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_validate_8cpp_a17a5193fad64ed76a99511b0bc1057e8}{VALIDATE\_UNLESS}}(\textcolor{stringliteral}{"{}duplicate\ export:\ "{}},exportNameMap.count(exportIt.name));}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00627}00627\ \ \ \ \ \ \ \ \ \ \ \ \ exportNameMap.emplace(exportIt.name);}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00628}00628\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00629}00629\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00630}00630\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.startFunctionIndex\ !=\ \mbox{\hyperlink{stdint_8h_ab2355300ea19395357e62d780f4dd073}{UINTPTR\_MAX}})}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00631}00631\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00632}00632\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_validate_8cpp_af10283475485df0d3b511707d7e6a4d7}{VALIDATE\_INDEX}}(\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.startFunctionIndex,\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.functions.size());}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00633}00633\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ FunctionType*\ startFunctionType\ =\ \textcolor{keyword}{module}.types[module.functions.getType(module.startFunctionIndex).index];}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00634}00634\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_validate_8cpp_a17a5193fad64ed76a99511b0bc1057e8}{VALIDATE\_UNLESS}}(\textcolor{stringliteral}{"{}start\ function\ must\ not\ have\ any\ parameters\ or\ results:\ "{}},startFunctionType\ !=\ \mbox{\hyperlink{struct_i_r_1_1_function_type_a97cbdf384d97c3a5203a1310c9af0822}{FunctionType::get}}());}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00635}00635\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00636}00636\ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00637}00637\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\&\ dataSegment\ :\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.dataSegments)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00638}00638\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00639}00639\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_validate_8cpp_af10283475485df0d3b511707d7e6a4d7}{VALIDATE\_INDEX}}(dataSegment.memoryIndex,\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.memories.size());}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00640}00640\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_i_r_adb28ed6d351d5f23fccfa9a3a7165db4}{validateInitializer}}(\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}},dataSegment.baseOffset,\mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6af89edb52b075b8bd95989bd3d0a04c0a}{ValueType::i32}},\textcolor{stringliteral}{"{}data\ segment\ base\ initializer"{}});}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00641}00641\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00642}00642\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00643}00643\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\&\ tableSegment\ :\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.tableSegments)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00644}00644\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00645}\mbox{\hyperlink{struct_i_r_1_1_code_validation_stream_impl}{00645}}\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_validate_8cpp_af10283475485df0d3b511707d7e6a4d7}{VALIDATE\_INDEX}}(tableSegment.tableIndex,\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.tables.size());}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00646}00646\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_i_r_adb28ed6d351d5f23fccfa9a3a7165db4}{validateInitializer}}(\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}},tableSegment.baseOffset,\mbox{\hyperlink{namespace_i_r_aa1afcba889279fa935b76ba278be7fd6af89edb52b075b8bd95989bd3d0a04c0a}{ValueType::i32}},\textcolor{stringliteral}{"{}table\ segment\ base\ initializer"{}});}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00647}\mbox{\hyperlink{struct_i_r_1_1_code_validation_stream_impl_a9112fae819f30426fe96ce1df8267650}{00647}}\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{auto}\ functionIndex\ :\ tableSegment.indices)\ \{\ \mbox{\hyperlink{_validate_8cpp_af10283475485df0d3b511707d7e6a4d7}{VALIDATE\_INDEX}}(functionIndex,\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.functions.size());\ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00648}\mbox{\hyperlink{struct_i_r_1_1_code_validation_stream_impl_a87047f079918d733c4cbf4fea0b19a58}{00648}}\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00649}00649\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00650}\mbox{\hyperlink{struct_i_r_1_1_code_validation_stream_impl_a0f627e4ee225e87709cefa4f1fdc224c}{00650}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{Log::printf}}(\mbox{\hyperlink{namespace_log_a1f055cc08a2ed074aa74f9d99c8a0901aaa59d67c2123f094d0d6798ffe651c4d}{Log::Category::metrics}},\textcolor{stringliteral}{"{}Validated\ WebAssembly\ module\ definitions\ in\ \%.2fms\(\backslash\)n"{}},timer.\mbox{\hyperlink{struct_timing_1_1_timer_ae6ed9f702858e72d8a5b3df42b35537a}{getMilliseconds}}());}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00651}00651\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00652}00652\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00653}00653\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_i_r_1_1_code_validation_stream_impl}{CodeValidationStreamImpl}}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00654}00654\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00655}00655\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_i_r_1_1_function_validation_context}{FunctionValidationContext}}\ \mbox{\hyperlink{struct_i_r_1_1_code_validation_stream_impl_a9112fae819f30426fe96ce1df8267650}{functionContext}};}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00656}\mbox{\hyperlink{struct_i_r_1_1_code_validation_stream_a6ccf3c90dcc91490e552b3db8e31601b}{00656}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_i_r_1_1_operator_printer}{OperatorPrinter}}\ \mbox{\hyperlink{struct_i_r_1_1_code_validation_stream_impl_a87047f079918d733c4cbf4fea0b19a58}{operatorPrinter}};}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00657}00657\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00658}00658\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_i_r_1_1_code_validation_stream_impl_a0f627e4ee225e87709cefa4f1fdc224c}{CodeValidationStreamImpl}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_i_r_1_1_module}{Module}}\&\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}},\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_i_r_1_1_function_def}{FunctionDef}}\&\ functionDef)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00659}00659\ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{struct_i_r_1_1_code_validation_stream_impl_a9112fae819f30426fe96ce1df8267650}{functionContext}}(\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}},functionDef)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00660}00660\ \ \ \ \ \ \ \ \ ,\ \mbox{\hyperlink{struct_i_r_1_1_code_validation_stream_impl_a87047f079918d733c4cbf4fea0b19a58}{operatorPrinter}}(\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}},functionDef)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00661}\mbox{\hyperlink{struct_i_r_1_1_code_validation_stream_a8e53fdcd7efdddd5d459f8bebb5e954f}{00661}}\ \ \ \ \ \ \ \ \ \{\}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00662}00662\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00663}00663\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00664}00664\ \ \ \ \ \mbox{\hyperlink{struct_i_r_1_1_code_validation_stream_a6ccf3c90dcc91490e552b3db8e31601b}{CodeValidationStream::CodeValidationStream}}(\textcolor{keyword}{const}\ Module\&\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}},\textcolor{keyword}{const}\ FunctionDef\&\ functionDef)}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00665}00665\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00666}00666\ \ \ \ \ \ \ \ \ impl\ =\ \textcolor{keyword}{new}\ CodeValidationStreamImpl(\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}},functionDef);}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00667}\mbox{\hyperlink{struct_i_r_1_1_code_validation_stream_a7b3f5a99b18e33290b74a36a79004370}{00667}}\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00668}00668\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00669}00669\ \ \ \ \ \mbox{\hyperlink{struct_i_r_1_1_code_validation_stream_a8e53fdcd7efdddd5d459f8bebb5e954f}{CodeValidationStream::\string~CodeValidationStream}}()}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00670}00670\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00671}00671\ \ \ \ \ \ \ \ \ \textcolor{keyword}{delete}\ impl;}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00672}\mbox{\hyperlink{_validate_8cpp_a0d04d0b7b632d732f24972574f4bde51}{00672}}\ \ \ \ \ \ \ \ \ impl\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00673}00673\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00674}00674\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00675}00675\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{struct_i_r_1_1_code_validation_stream_a7b3f5a99b18e33290b74a36a79004370}{CodeValidationStream::finish}}()}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00676}00676\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00677}00677\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(impl-\/>\mbox{\hyperlink{struct_i_r_1_1_code_validation_stream_impl_a9112fae819f30426fe96ce1df8267650}{functionContext}}.\mbox{\hyperlink{struct_i_r_1_1_function_validation_context_a6710de4db8be4f527ed3815ff21f139c}{getControlStackSize}}())\ \{\ \textcolor{keywordflow}{throw}\ ValidationException(\textcolor{stringliteral}{"{}end\ of\ code\ reached\ before\ end\ of\ function"{}});\ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00678}00678\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00679}00679\ }
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00680}00680\ \textcolor{preprocessor}{\ \ \ \ \#define\ VISIT\_OPCODE(\_,name,nameString,Imm,...)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00681}00681\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ void\ CodeValidationStream::name(Imm\ imm)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00682}00682\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00683}00683\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ if(ENABLE\_LOGGING)\ \{\ impl-\/>functionContext.logOperator(impl-\/>operatorPrinter.name(imm));\ \}\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00684}00684\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ impl-\/>functionContext.name(imm);\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00685}00685\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \}}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00686}00686\ \ \ \ \ \mbox{\hyperlink{_operators_8h_a8b6ca1413466de9d4478329c481520a4}{ENUM\_OPERATORS}}(\mbox{\hyperlink{namespace_i_r_a59653fd60bb296de971e5f945c66933aa275346406ff338dd8adf063f9a066141}{VISIT\_OPCODE}})}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00687}00687\ \ \ \ \ \textcolor{preprocessor}{\#undef\ VISIT\_OPCODE}}
+\DoxyCodeLine{\Hypertarget{_validate_8cpp_source_l00688}00688\ \}}
+
+\end{DoxyCode}

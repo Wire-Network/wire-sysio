@@ -1,0 +1,368 @@
+\doxysection{sysio\+::vm\+::profile\+\_\+manager Struct Reference}
+\hypertarget{structsysio_1_1vm_1_1profile__manager}{}\label{structsysio_1_1vm_1_1profile__manager}\index{sysio::vm::profile\_manager@{sysio::vm::profile\_manager}}
+
+
+{\ttfamily \#include $<$profile.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1vm_1_1profile__manager_ae49d8946660c9e718db21ad92c99645e}{profile\+\_\+manager}} ()
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1profile__manager_a9a9d98246e875fc4625ebc77ffa6b7ad}{start}} (\mbox{\hyperlink{structsysio_1_1vm_1_1profile__data}{profile\+\_\+data}} \texorpdfstring{$\ast$}{*}data)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1profile__manager_a102313b029113734dcbc6ecf0f525e2f}{stop}} ()
+\item 
+\mbox{\hyperlink{structsysio_1_1vm_1_1profile__manager_a88969d1794505f28bcdf732ecaa7bdac}{\texorpdfstring{$\sim$}{\string~}profile\+\_\+manager}} ()
+\item 
+\mbox{\hyperlink{structsysio_1_1vm_1_1profile__manager_ae49d8946660c9e718db21ad92c99645e}{profile\+\_\+manager}} ()
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1profile__manager_a9a9d98246e875fc4625ebc77ffa6b7ad}{start}} (\mbox{\hyperlink{structsysio_1_1vm_1_1profile__data}{profile\+\_\+data}} \texorpdfstring{$\ast$}{*}data)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1profile__manager_a102313b029113734dcbc6ecf0f525e2f}{stop}} ()
+\item 
+\mbox{\hyperlink{structsysio_1_1vm_1_1profile__manager_a88969d1794505f28bcdf732ecaa7bdac}{\texorpdfstring{$\sim$}{\string~}profile\+\_\+manager}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static \mbox{\hyperlink{structsysio_1_1vm_1_1profile__manager}{profile\+\_\+manager}} \& \mbox{\hyperlink{structsysio_1_1vm_1_1profile__manager_a56c43b1e1c1409a595f12317c215b5ad}{instance}} ()
+\item 
+static \mbox{\hyperlink{structsysio_1_1vm_1_1profile__manager}{profile\+\_\+manager}} \& \mbox{\hyperlink{structsysio_1_1vm_1_1profile__manager_a56c43b1e1c1409a595f12317c215b5ad}{instance}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::mutex \mbox{\hyperlink{structsysio_1_1vm_1_1profile__manager_abf4f917bef48e98b5ec2a4791f705e24}{mutex}}
+\item 
+std\+::vector$<$ pthread\+\_\+t $>$ \mbox{\hyperlink{structsysio_1_1vm_1_1profile__manager_a38d31a4b8b9b49a3b8535621bf60a0e0}{threads\+\_\+to\+\_\+notify}}
+\item 
+std\+::thread \mbox{\hyperlink{structsysio_1_1vm_1_1profile__manager_a49f7e3b187d500b63d17fd290a27a877}{timer\+\_\+thread}}
+\item 
+bool \mbox{\hyperlink{structsysio_1_1vm_1_1profile__manager_a7c4362635becc25e7459532438b38c39}{done}} = false
+\item 
+std\+::condition\+\_\+variable \mbox{\hyperlink{structsysio_1_1vm_1_1profile__manager_a0b1d468ec835941e435bccd8c35de0e8}{timer\+\_\+cond}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{vm_2profile_8hpp_source_l00358}{358}} of file \mbox{\hyperlink{vm_2profile_8hpp_source}{profile.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structsysio_1_1vm_1_1profile__manager_ae49d8946660c9e718db21ad92c99645e}\index{sysio::vm::profile\_manager@{sysio::vm::profile\_manager}!profile\_manager@{profile\_manager}}
+\index{profile\_manager@{profile\_manager}!sysio::vm::profile\_manager@{sysio::vm::profile\_manager}}
+\doxysubsubsection{\texorpdfstring{profile\_manager()}{profile\_manager()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1profile__manager_ae49d8946660c9e718db21ad92c99645e} 
+sysio\+::vm\+::profile\+\_\+manager\+::profile\+\_\+manager (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2profile_8hpp_source_l00359}{359}} of file \mbox{\hyperlink{sysio_2vm_2profile_8hpp_source}{profile.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00359\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00360\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1vm_a069fc506d558bd9390d7989f7866fa0e}{register\_profile\_signal\_handler}}();}
+\DoxyCodeLine{00361\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1profile__manager_a49f7e3b187d500b63d17fd290a27a877}{timer\_thread}}\ =\ std::thread([\textcolor{keyword}{this}]\{}
+\DoxyCodeLine{00362\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ lock\ =\ std::unique\_lock(mutex);}
+\DoxyCodeLine{00363\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(!\mbox{\hyperlink{structsysio_1_1vm_1_1profile__manager_a0b1d468ec835941e435bccd8c35de0e8}{timer\_cond}}.wait\_for(lock,\ std::chrono::microseconds(\mbox{\hyperlink{namespacesysio_1_1vm_a9cf2e2dc1b1526584cae66e14d220244}{profile\_interval\_us}}),\ [\&]\{\ return\ done;\ \}))\ \{}
+\DoxyCodeLine{00364\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(pthread\_t\ notify\ :\ \mbox{\hyperlink{structsysio_1_1vm_1_1profile__manager_a38d31a4b8b9b49a3b8535621bf60a0e0}{threads\_to\_notify}})\ \{}
+\DoxyCodeLine{00365\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ pthread\_kill(notify,\ SIGPROF);}
+\DoxyCodeLine{00366\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00367\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00368\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00369\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1vm_1_1profile__manager_ae49d8946660c9e718db21ad92c99645e_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1vm_1_1profile__manager_a88969d1794505f28bcdf732ecaa7bdac}\index{sysio::vm::profile\_manager@{sysio::vm::profile\_manager}!````~profile\_manager@{\texorpdfstring{$\sim$}{\string~}profile\_manager}}
+\index{````~profile\_manager@{\texorpdfstring{$\sim$}{\string~}profile\_manager}!sysio::vm::profile\_manager@{sysio::vm::profile\_manager}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}profile\_manager()}{\string~profile\_manager()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1profile__manager_a88969d1794505f28bcdf732ecaa7bdac} 
+sysio\+::vm\+::profile\+\_\+manager\+::\texorpdfstring{$\sim$}{\string~}profile\+\_\+manager (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2profile_8hpp_source_l00381}{381}} of file \mbox{\hyperlink{sysio_2vm_2profile_8hpp_source}{profile.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00381\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00382\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00383\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ lock\ =\ std::scoped\_lock(mutex);}
+\DoxyCodeLine{00384\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1profile__manager_a7c4362635becc25e7459532438b38c39}{done}}\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00385\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00386\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1profile__manager_a0b1d468ec835941e435bccd8c35de0e8}{timer\_cond}}.notify\_one();}
+\DoxyCodeLine{00387\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1profile__manager_a49f7e3b187d500b63d17fd290a27a877}{timer\_thread}}.join();}
+\DoxyCodeLine{00388\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1vm_1_1profile__manager_ae49d8946660c9e718db21ad92c99645e}\index{sysio::vm::profile\_manager@{sysio::vm::profile\_manager}!profile\_manager@{profile\_manager}}
+\index{profile\_manager@{profile\_manager}!sysio::vm::profile\_manager@{sysio::vm::profile\_manager}}
+\doxysubsubsection{\texorpdfstring{profile\_manager()}{profile\_manager()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1profile__manager_ae49d8946660c9e718db21ad92c99645e} 
+sysio\+::vm\+::profile\+\_\+manager\+::profile\+\_\+manager (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2profile_8hpp_source_l00359}{359}} of file \mbox{\hyperlink{vm_2profile_8hpp_source}{profile.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00359\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00360\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1vm_a069fc506d558bd9390d7989f7866fa0e}{register\_profile\_signal\_handler}}();}
+\DoxyCodeLine{00361\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1profile__manager_a49f7e3b187d500b63d17fd290a27a877}{timer\_thread}}\ =\ std::thread([\textcolor{keyword}{this}]\{}
+\DoxyCodeLine{00362\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ lock\ =\ std::unique\_lock(mutex);}
+\DoxyCodeLine{00363\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(!\mbox{\hyperlink{structsysio_1_1vm_1_1profile__manager_a0b1d468ec835941e435bccd8c35de0e8}{timer\_cond}}.wait\_for(lock,\ std::chrono::microseconds(\mbox{\hyperlink{namespacesysio_1_1vm_a9cf2e2dc1b1526584cae66e14d220244}{profile\_interval\_us}}),\ [\&]\{\ return\ done;\ \}))\ \{}
+\DoxyCodeLine{00364\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(pthread\_t\ notify\ :\ \mbox{\hyperlink{structsysio_1_1vm_1_1profile__manager_a38d31a4b8b9b49a3b8535621bf60a0e0}{threads\_to\_notify}})\ \{}
+\DoxyCodeLine{00365\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ pthread\_kill(notify,\ SIGPROF);}
+\DoxyCodeLine{00366\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00367\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00368\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00369\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1vm_1_1profile__manager_ae49d8946660c9e718db21ad92c99645e_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1vm_1_1profile__manager_a88969d1794505f28bcdf732ecaa7bdac}\index{sysio::vm::profile\_manager@{sysio::vm::profile\_manager}!````~profile\_manager@{\texorpdfstring{$\sim$}{\string~}profile\_manager}}
+\index{````~profile\_manager@{\texorpdfstring{$\sim$}{\string~}profile\_manager}!sysio::vm::profile\_manager@{sysio::vm::profile\_manager}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}profile\_manager()}{\string~profile\_manager()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1profile__manager_a88969d1794505f28bcdf732ecaa7bdac} 
+sysio\+::vm\+::profile\+\_\+manager\+::\texorpdfstring{$\sim$}{\string~}profile\+\_\+manager (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2profile_8hpp_source_l00381}{381}} of file \mbox{\hyperlink{vm_2profile_8hpp_source}{profile.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00381\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00382\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00383\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ lock\ =\ std::scoped\_lock(mutex);}
+\DoxyCodeLine{00384\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1profile__manager_a7c4362635becc25e7459532438b38c39}{done}}\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00385\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00386\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1profile__manager_a0b1d468ec835941e435bccd8c35de0e8}{timer\_cond}}.notify\_one();}
+\DoxyCodeLine{00387\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1profile__manager_a49f7e3b187d500b63d17fd290a27a877}{timer\_thread}}.join();}
+\DoxyCodeLine{00388\ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1vm_1_1profile__manager_a56c43b1e1c1409a595f12317c215b5ad}\index{sysio::vm::profile\_manager@{sysio::vm::profile\_manager}!instance@{instance}}
+\index{instance@{instance}!sysio::vm::profile\_manager@{sysio::vm::profile\_manager}}
+\doxysubsubsection{\texorpdfstring{instance()}{instance()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1profile__manager_a56c43b1e1c1409a595f12317c215b5ad} 
+static \mbox{\hyperlink{structsysio_1_1vm_1_1profile__manager}{profile\+\_\+manager}} \& sysio\+::vm\+::profile\+\_\+manager\+::instance (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2profile_8hpp_source_l00389}{389}} of file \mbox{\hyperlink{sysio_2vm_2profile_8hpp_source}{profile.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00389\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00390\ \ \ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{structsysio_1_1vm_1_1profile__manager_ae49d8946660c9e718db21ad92c99645e}{profile\_manager}}\ result;}
+\DoxyCodeLine{00391\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00392\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=345pt]{structsysio_1_1vm_1_1profile__manager_a56c43b1e1c1409a595f12317c215b5ad_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1vm_1_1profile__manager_a56c43b1e1c1409a595f12317c215b5ad}\index{sysio::vm::profile\_manager@{sysio::vm::profile\_manager}!instance@{instance}}
+\index{instance@{instance}!sysio::vm::profile\_manager@{sysio::vm::profile\_manager}}
+\doxysubsubsection{\texorpdfstring{instance()}{instance()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1profile__manager_a56c43b1e1c1409a595f12317c215b5ad} 
+static \mbox{\hyperlink{structsysio_1_1vm_1_1profile__manager}{profile\+\_\+manager}} \& sysio\+::vm\+::profile\+\_\+manager\+::instance (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2profile_8hpp_source_l00389}{389}} of file \mbox{\hyperlink{vm_2profile_8hpp_source}{profile.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00389\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00390\ \ \ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{structsysio_1_1vm_1_1profile__manager_ae49d8946660c9e718db21ad92c99645e}{profile\_manager}}\ result;}
+\DoxyCodeLine{00391\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00392\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1vm_1_1profile__manager_a9a9d98246e875fc4625ebc77ffa6b7ad}\index{sysio::vm::profile\_manager@{sysio::vm::profile\_manager}!start@{start}}
+\index{start@{start}!sysio::vm::profile\_manager@{sysio::vm::profile\_manager}}
+\doxysubsubsection{\texorpdfstring{start()}{start()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1profile__manager_a9a9d98246e875fc4625ebc77ffa6b7ad} 
+void sysio\+::vm\+::profile\+\_\+manager\+::start (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1vm_1_1profile__data}{profile\+\_\+data}} \texorpdfstring{$\ast$}{*}}]{data}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2profile_8hpp_source_l00370}{370}} of file \mbox{\hyperlink{sysio_2vm_2profile_8hpp_source}{profile.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00370\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00371\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ lock\ =\ std::lock\_guard(mutex);}
+\DoxyCodeLine{00372\ }
+\DoxyCodeLine{00373\ \ \ \ \ \ \ per\_thread\_profile\_data\ =\ data;}
+\DoxyCodeLine{00374\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1profile__manager_a38d31a4b8b9b49a3b8535621bf60a0e0}{threads\_to\_notify}}.push\_back(pthread\_self());}
+\DoxyCodeLine{00375\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1vm_1_1profile__manager_a9a9d98246e875fc4625ebc77ffa6b7ad_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1vm_1_1profile__manager_a9a9d98246e875fc4625ebc77ffa6b7ad}\index{sysio::vm::profile\_manager@{sysio::vm::profile\_manager}!start@{start}}
+\index{start@{start}!sysio::vm::profile\_manager@{sysio::vm::profile\_manager}}
+\doxysubsubsection{\texorpdfstring{start()}{start()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1profile__manager_a9a9d98246e875fc4625ebc77ffa6b7ad} 
+void sysio\+::vm\+::profile\+\_\+manager\+::start (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1vm_1_1profile__data}{profile\+\_\+data}} \texorpdfstring{$\ast$}{*}}]{data}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2profile_8hpp_source_l00370}{370}} of file \mbox{\hyperlink{vm_2profile_8hpp_source}{profile.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00370\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00371\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ lock\ =\ std::lock\_guard(mutex);}
+\DoxyCodeLine{00372\ }
+\DoxyCodeLine{00373\ \ \ \ \ \ \ per\_thread\_profile\_data\ =\ data;}
+\DoxyCodeLine{00374\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1profile__manager_a38d31a4b8b9b49a3b8535621bf60a0e0}{threads\_to\_notify}}.push\_back(pthread\_self());}
+\DoxyCodeLine{00375\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1vm_1_1profile__manager_a9a9d98246e875fc4625ebc77ffa6b7ad_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1vm_1_1profile__manager_a102313b029113734dcbc6ecf0f525e2f}\index{sysio::vm::profile\_manager@{sysio::vm::profile\_manager}!stop@{stop}}
+\index{stop@{stop}!sysio::vm::profile\_manager@{sysio::vm::profile\_manager}}
+\doxysubsubsection{\texorpdfstring{stop()}{stop()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1profile__manager_a102313b029113734dcbc6ecf0f525e2f} 
+void sysio\+::vm\+::profile\+\_\+manager\+::stop (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2profile_8hpp_source_l00376}{376}} of file \mbox{\hyperlink{sysio_2vm_2profile_8hpp_source}{profile.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00376\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00377\ \ \ \ \ \ \ per\_thread\_profile\_data\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00378\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ lock\ =\ std::lock\_guard(mutex);}
+\DoxyCodeLine{00379\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1profile__manager_a38d31a4b8b9b49a3b8535621bf60a0e0}{threads\_to\_notify}}.erase(std::find(\mbox{\hyperlink{structsysio_1_1vm_1_1profile__manager_a38d31a4b8b9b49a3b8535621bf60a0e0}{threads\_to\_notify}}.begin(),\ \mbox{\hyperlink{structsysio_1_1vm_1_1profile__manager_a38d31a4b8b9b49a3b8535621bf60a0e0}{threads\_to\_notify}}.end(),\ pthread\_self()));}
+\DoxyCodeLine{00380\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=335pt]{structsysio_1_1vm_1_1profile__manager_a102313b029113734dcbc6ecf0f525e2f_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1vm_1_1profile__manager_a102313b029113734dcbc6ecf0f525e2f}\index{sysio::vm::profile\_manager@{sysio::vm::profile\_manager}!stop@{stop}}
+\index{stop@{stop}!sysio::vm::profile\_manager@{sysio::vm::profile\_manager}}
+\doxysubsubsection{\texorpdfstring{stop()}{stop()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1profile__manager_a102313b029113734dcbc6ecf0f525e2f} 
+void sysio\+::vm\+::profile\+\_\+manager\+::stop (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2profile_8hpp_source_l00376}{376}} of file \mbox{\hyperlink{vm_2profile_8hpp_source}{profile.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00376\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00377\ \ \ \ \ \ \ per\_thread\_profile\_data\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00378\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ lock\ =\ std::lock\_guard(mutex);}
+\DoxyCodeLine{00379\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1profile__manager_a38d31a4b8b9b49a3b8535621bf60a0e0}{threads\_to\_notify}}.erase(std::find(\mbox{\hyperlink{structsysio_1_1vm_1_1profile__manager_a38d31a4b8b9b49a3b8535621bf60a0e0}{threads\_to\_notify}}.begin(),\ \mbox{\hyperlink{structsysio_1_1vm_1_1profile__manager_a38d31a4b8b9b49a3b8535621bf60a0e0}{threads\_to\_notify}}.end(),\ pthread\_self()));}
+\DoxyCodeLine{00380\ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1vm_1_1profile__manager_a7c4362635becc25e7459532438b38c39}\index{sysio::vm::profile\_manager@{sysio::vm::profile\_manager}!done@{done}}
+\index{done@{done}!sysio::vm::profile\_manager@{sysio::vm::profile\_manager}}
+\doxysubsubsection{\texorpdfstring{done}{done}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1profile__manager_a7c4362635becc25e7459532438b38c39} 
+bool sysio\+::vm\+::profile\+\_\+manager\+::done = false}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2profile_8hpp_source_l00397}{397}} of file \mbox{\hyperlink{sysio_2vm_2profile_8hpp_source}{profile.\+hpp}}.
+
+\Hypertarget{structsysio_1_1vm_1_1profile__manager_abf4f917bef48e98b5ec2a4791f705e24}\index{sysio::vm::profile\_manager@{sysio::vm::profile\_manager}!mutex@{mutex}}
+\index{mutex@{mutex}!sysio::vm::profile\_manager@{sysio::vm::profile\_manager}}
+\doxysubsubsection{\texorpdfstring{mutex}{mutex}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1profile__manager_abf4f917bef48e98b5ec2a4791f705e24} 
+std\+::mutex sysio\+::vm\+::profile\+\_\+manager\+::mutex}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2profile_8hpp_source_l00393}{393}} of file \mbox{\hyperlink{sysio_2vm_2profile_8hpp_source}{profile.\+hpp}}.
+
+\Hypertarget{structsysio_1_1vm_1_1profile__manager_a38d31a4b8b9b49a3b8535621bf60a0e0}\index{sysio::vm::profile\_manager@{sysio::vm::profile\_manager}!threads\_to\_notify@{threads\_to\_notify}}
+\index{threads\_to\_notify@{threads\_to\_notify}!sysio::vm::profile\_manager@{sysio::vm::profile\_manager}}
+\doxysubsubsection{\texorpdfstring{threads\_to\_notify}{threads\_to\_notify}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1profile__manager_a38d31a4b8b9b49a3b8535621bf60a0e0} 
+std\+::vector$<$ pthread\+\_\+t $>$ sysio\+::vm\+::profile\+\_\+manager\+::threads\+\_\+to\+\_\+notify}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2profile_8hpp_source_l00394}{394}} of file \mbox{\hyperlink{sysio_2vm_2profile_8hpp_source}{profile.\+hpp}}.
+
+\Hypertarget{structsysio_1_1vm_1_1profile__manager_a0b1d468ec835941e435bccd8c35de0e8}\index{sysio::vm::profile\_manager@{sysio::vm::profile\_manager}!timer\_cond@{timer\_cond}}
+\index{timer\_cond@{timer\_cond}!sysio::vm::profile\_manager@{sysio::vm::profile\_manager}}
+\doxysubsubsection{\texorpdfstring{timer\_cond}{timer\_cond}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1profile__manager_a0b1d468ec835941e435bccd8c35de0e8} 
+std\+::condition\+\_\+variable sysio\+::vm\+::profile\+\_\+manager\+::timer\+\_\+cond}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2profile_8hpp_source_l00398}{398}} of file \mbox{\hyperlink{sysio_2vm_2profile_8hpp_source}{profile.\+hpp}}.
+
+\Hypertarget{structsysio_1_1vm_1_1profile__manager_a49f7e3b187d500b63d17fd290a27a877}\index{sysio::vm::profile\_manager@{sysio::vm::profile\_manager}!timer\_thread@{timer\_thread}}
+\index{timer\_thread@{timer\_thread}!sysio::vm::profile\_manager@{sysio::vm::profile\_manager}}
+\doxysubsubsection{\texorpdfstring{timer\_thread}{timer\_thread}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1profile__manager_a49f7e3b187d500b63d17fd290a27a877} 
+std\+::thread sysio\+::vm\+::profile\+\_\+manager\+::timer\+\_\+thread}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2profile_8hpp_source_l00396}{396}} of file \mbox{\hyperlink{sysio_2vm_2profile_8hpp_source}{profile.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/include/sysio/sysio/vm/\mbox{\hyperlink{sysio_2vm_2profile_8hpp}{profile.\+hpp}}\item 
+libraries/sys-\/vm/include/sysio/vm/\mbox{\hyperlink{vm_2profile_8hpp}{profile.\+hpp}}\end{DoxyCompactItemize}

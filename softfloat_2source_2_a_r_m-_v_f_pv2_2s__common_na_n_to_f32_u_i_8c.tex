@@ -1,0 +1,39 @@
+\doxysection{libraries/softfloat/source/\+ARM-\/\+VFPv2/s\+\_\+common\+Na\+NTo\+F32\+UI.c File Reference}
+\hypertarget{softfloat_2source_2_a_r_m-_v_f_pv2_2s__common_na_n_to_f32_u_i_8c}{}\label{softfloat_2source_2_a_r_m-_v_f_pv2_2s__common_na_n_to_f32_u_i_8c}\index{libraries/softfloat/source/ARM-\/VFPv2/s\_commonNaNToF32UI.c@{libraries/softfloat/source/ARM-\/VFPv2/s\_commonNaNToF32UI.c}}
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include "{}platform.\+h"{}}\newline
+{\ttfamily \#include "{}specialize.\+h"{}}\newline
+Include dependency graph for s\+\_\+common\+Na\+NTo\+F32\+UI.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{softfloat_2source_2_a_r_m-_v_f_pv2_2s__common_na_n_to_f32_u_i_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_a8f075c759c74e109e8184306c663809d}{uint\+\_\+fast32\+\_\+t}} \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2_2s__common_na_n_to_f32_u_i_8c_a50f227113a5dc7d4afef4799c4c529e2}{softfloat\+\_\+common\+Na\+NTo\+F32\+UI}} (const struct \mbox{\hyperlink{structcommon_na_n}{common\+NaN}} \texorpdfstring{$\ast$}{*}a\+Ptr)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{softfloat_2source_2_a_r_m-_v_f_pv2_2s__common_na_n_to_f32_u_i_8c_a50f227113a5dc7d4afef4799c4c529e2}\index{s\_commonNaNToF32UI.c@{s\_commonNaNToF32UI.c}!softfloat\_commonNaNToF32UI@{softfloat\_commonNaNToF32UI}}
+\index{softfloat\_commonNaNToF32UI@{softfloat\_commonNaNToF32UI}!s\_commonNaNToF32UI.c@{s\_commonNaNToF32UI.c}}
+\doxysubsubsection{\texorpdfstring{softfloat\_commonNaNToF32UI()}{softfloat\_commonNaNToF32UI()}}
+{\footnotesize\ttfamily \label{softfloat_2source_2_a_r_m-_v_f_pv2_2s__common_na_n_to_f32_u_i_8c_a50f227113a5dc7d4afef4799c4c529e2} 
+\mbox{\hyperlink{stdint_8h_a8f075c759c74e109e8184306c663809d}{uint\+\_\+fast32\+\_\+t}} softfloat\+\_\+common\+Na\+NTo\+F32\+UI (\begin{DoxyParamCaption}\item[{const struct \mbox{\hyperlink{structcommon_na_n}{common\+NaN}} \texorpdfstring{$\ast$}{*}}]{a\+Ptr}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2_2s__common_na_n_to_f32_u_i_8c_source_l00045}{45}} of file \mbox{\hyperlink{softfloat_2source_2_a_r_m-_v_f_pv2_2s__common_na_n_to_f32_u_i_8c_source}{s\+\_\+common\+Na\+NTo\+F32\+UI.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00046\ \{}
+\DoxyCodeLine{00047\ }
+\DoxyCodeLine{00048\ \ \ \ \ \textcolor{keywordflow}{return}\ (\mbox{\hyperlink{stdint_8h_a8f075c759c74e109e8184306c663809d}{uint\_fast32\_t}})\ aPtr-\/>\mbox{\hyperlink{structcommon_na_n_a32e90937a4ec3878d2620fbafd31a16f}{sign}}<<31\ |\ 0x7FC00000\ |\ aPtr-\/>\mbox{\hyperlink{structcommon_na_n_a05124b0293f6d395ce047744b12deff6}{v64}}>>41;}
+\DoxyCodeLine{00049\ }
+\DoxyCodeLine{00050\ \}}
+
+\end{DoxyCode}

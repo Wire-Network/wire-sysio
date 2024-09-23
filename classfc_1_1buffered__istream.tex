@@ -1,0 +1,236 @@
+\doxysection{fc\+::buffered\+\_\+istream Class Reference}
+\hypertarget{classfc_1_1buffered__istream}{}\label{classfc_1_1buffered__istream}\index{fc::buffered\_istream@{fc::buffered\_istream}}
+
+
+Reads data from an unbuffered stream and enables peek functionality.  
+
+
+
+
+{\ttfamily \#include $<$buffered\+\_\+iostream.\+hpp$>$}
+
+
+
+Inheritance diagram for fc\+::buffered\+\_\+istream\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=183pt]{classfc_1_1buffered__istream__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for fc\+::buffered\+\_\+istream\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=183pt]{classfc_1_1buffered__istream__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1buffered__istream_a2685f9f7e8514c848839b859d173dec6}{buffered\+\_\+istream}} (istream\+\_\+ptr is)
+\item 
+\mbox{\hyperlink{classfc_1_1buffered__istream_a6af022ec9841657f60d00089ddd2de90}{buffered\+\_\+istream}} (\mbox{\hyperlink{classfc_1_1buffered__istream}{buffered\+\_\+istream}} \&\&o)
+\item 
+\mbox{\hyperlink{classfc_1_1buffered__istream}{buffered\+\_\+istream}} \& \mbox{\hyperlink{classfc_1_1buffered__istream_aa312532164c62e95fc7ecb2927d15465}{operator=}} (\mbox{\hyperlink{classfc_1_1buffered__istream}{buffered\+\_\+istream}} \&\&i)
+\item 
+virtual \mbox{\hyperlink{classfc_1_1buffered__istream_a263ef4eed4e11c939cfa7d97333c83f5}{\texorpdfstring{$\sim$}{\string~}buffered\+\_\+istream}} ()
+\item 
+virtual std\+::size\+\_\+t \mbox{\hyperlink{classfc_1_1buffered__istream_aeadf77cad3bfaa31b52fe719f6b01fce}{readsome}} (char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}, std\+::size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})
+\item 
+virtual size\+\_\+t \mbox{\hyperlink{classfc_1_1buffered__istream_a462190e5205b4aaad1ad0108f31dd7d4}{readsome}} (const std\+::shared\+\_\+ptr$<$ char $>$ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}, size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}, size\+\_\+t offset)
+\item 
+virtual char \mbox{\hyperlink{classfc_1_1buffered__istream_a35c2540f97e42e3281457af50a7717b9}{peek}} () const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{buffered__iostream_8hpp_source_l00016}{16}} of file \mbox{\hyperlink{buffered__iostream_8hpp_source}{buffered\+\_\+iostream.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1buffered__istream_a2685f9f7e8514c848839b859d173dec6}\index{fc::buffered\_istream@{fc::buffered\_istream}!buffered\_istream@{buffered\_istream}}
+\index{buffered\_istream@{buffered\_istream}!fc::buffered\_istream@{fc::buffered\_istream}}
+\doxysubsubsection{\texorpdfstring{buffered\_istream()}{buffered\_istream()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1buffered__istream_a2685f9f7e8514c848839b859d173dec6} 
+fc\+::buffered\+\_\+istream\+::buffered\+\_\+istream (\begin{DoxyParamCaption}\item[{istream\+\_\+ptr}]{is}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{buffered__iostream_8cpp_source_l00032}{32}} of file \mbox{\hyperlink{buffered__iostream_8cpp_source}{buffered\+\_\+iostream.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00033\ \ \ \ \ :my(\ \textcolor{keyword}{new}\ detail::buffered\_istream\_impl(\ fc::move(is)\ )\ )}
+\DoxyCodeLine{00034\ \ \ \ \ \{}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ my-\/>\_istr\ !=\ \textcolor{keyword}{nullptr},\ \textcolor{stringliteral}{"{}\ this\ shouldn't\ be\ null"{}}\ );}
+\DoxyCodeLine{00036\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1buffered__istream_a6af022ec9841657f60d00089ddd2de90}\index{fc::buffered\_istream@{fc::buffered\_istream}!buffered\_istream@{buffered\_istream}}
+\index{buffered\_istream@{buffered\_istream}!fc::buffered\_istream@{fc::buffered\_istream}}
+\doxysubsubsection{\texorpdfstring{buffered\_istream()}{buffered\_istream()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1buffered__istream_a6af022ec9841657f60d00089ddd2de90} 
+fc\+::buffered\+\_\+istream\+::buffered\+\_\+istream (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1buffered__istream}{buffered\+\_\+istream}} \&\&}]{o}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{buffered__iostream_8cpp_source_l00038}{38}} of file \mbox{\hyperlink{buffered__iostream_8cpp_source}{buffered\+\_\+iostream.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00039\ \ \ \ \ :my(\ fc::move(o.my)\ )\{\}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1buffered__istream_a263ef4eed4e11c939cfa7d97333c83f5}\index{fc::buffered\_istream@{fc::buffered\_istream}!````~buffered\_istream@{\texorpdfstring{$\sim$}{\string~}buffered\_istream}}
+\index{````~buffered\_istream@{\texorpdfstring{$\sim$}{\string~}buffered\_istream}!fc::buffered\_istream@{fc::buffered\_istream}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}buffered\_istream()}{\string~buffered\_istream()}}
+{\footnotesize\ttfamily \label{classfc_1_1buffered__istream_a263ef4eed4e11c939cfa7d97333c83f5} 
+fc\+::buffered\+\_\+istream\+::\texorpdfstring{$\sim$}{\string~}buffered\+\_\+istream (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{buffered__iostream_8cpp_source_l00047}{47}} of file \mbox{\hyperlink{buffered__iostream_8cpp_source}{buffered\+\_\+iostream.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00047\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1buffered__istream_aa312532164c62e95fc7ecb2927d15465}\index{fc::buffered\_istream@{fc::buffered\_istream}!operator=@{operator=}}
+\index{operator=@{operator=}!fc::buffered\_istream@{fc::buffered\_istream}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}}
+{\footnotesize\ttfamily \label{classfc_1_1buffered__istream_aa312532164c62e95fc7ecb2927d15465} 
+\mbox{\hyperlink{classfc_1_1buffered__istream}{buffered\+\_\+istream}} \& fc\+::buffered\+\_\+istream\+::operator= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1buffered__istream}{buffered\+\_\+istream}} \&\&}]{i}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{buffered__iostream_8cpp_source_l00041}{41}} of file \mbox{\hyperlink{buffered__iostream_8cpp_source}{buffered\+\_\+iostream.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00042\ \ \ \ \ \{}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ my\ =\ fc::move(i.my);}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00045\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1buffered__istream_a35c2540f97e42e3281457af50a7717b9}\index{fc::buffered\_istream@{fc::buffered\_istream}!peek@{peek}}
+\index{peek@{peek}!fc::buffered\_istream@{fc::buffered\_istream}}
+\doxysubsubsection{\texorpdfstring{peek()}{peek()}}
+{\footnotesize\ttfamily \label{classfc_1_1buffered__istream_a35c2540f97e42e3281457af50a7717b9} 
+char fc\+::buffered\+\_\+istream\+::peek (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [virtual]}}
+
+This method may block until at least 1 character is available. 
+
+Definition at line \mbox{\hyperlink{buffered__iostream_8cpp_source_l00112}{112}} of file \mbox{\hyperlink{buffered__iostream_8cpp_source}{buffered\+\_\+iostream.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00113\ \ \ \ \ \{}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ my-\/>\_rdbuf.size()\ )}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ my-\/>\_rdbuf.sgetc();}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00118\ }
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ tmp[detail::minimum\_read\_size];}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ bytes\_read\ =\ my-\/>\_istr-\/>readsome(\ tmp,\ detail::minimum\_read\_size\ );}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ my-\/>\_rdbuf.sputn(\ tmp,\ bytes\_read\ );}
+\DoxyCodeLine{00122\ }
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ my-\/>\_rdbuf.size()\ )}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ my-\/>\_rdbuf.sgetc();}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ assert\_exception,\ }
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}at\ least\ one\ byte\ should\ be\ available,\ or\ eof\ should\ have\ been\ thrown"{}}\ );}
+\DoxyCodeLine{00129\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1buffered__istream_aeadf77cad3bfaa31b52fe719f6b01fce}\index{fc::buffered\_istream@{fc::buffered\_istream}!readsome@{readsome}}
+\index{readsome@{readsome}!fc::buffered\_istream@{fc::buffered\_istream}}
+\doxysubsubsection{\texorpdfstring{readsome()}{readsome()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1buffered__istream_aeadf77cad3bfaa31b52fe719f6b01fce} 
+virtual std\+::size\+\_\+t fc\+::buffered\+\_\+istream\+::readsome (\begin{DoxyParamCaption}\item[{char \texorpdfstring{$\ast$}{*}}]{buf}{, }\item[{std\+::size\+\_\+t}]{len}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+read at least 1 byte or throw, if no data is available this method should block cooperatively until data is available or fc\+::eof\+\_\+exception is thrown.
+
+\begin{DoxyPrecond}{Precondition}
+len \texorpdfstring{$>$}{>} 0 
+
+buf != nullptr 
+\end{DoxyPrecond}
+
+\begin{DoxyExceptions}{Exceptions}
+{\em fc\+::eof} & if at least 1 byte cannot be read \\
+\hline
+\end{DoxyExceptions}
+\Hypertarget{classfc_1_1buffered__istream_a462190e5205b4aaad1ad0108f31dd7d4}\index{fc::buffered\_istream@{fc::buffered\_istream}!readsome@{readsome}}
+\index{readsome@{readsome}!fc::buffered\_istream@{fc::buffered\_istream}}
+\doxysubsubsection{\texorpdfstring{readsome()}{readsome()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1buffered__istream_a462190e5205b4aaad1ad0108f31dd7d4} 
+size\+\_\+t fc\+::buffered\+\_\+istream\+::readsome (\begin{DoxyParamCaption}\item[{const std\+::shared\+\_\+ptr$<$ char $>$ \&}]{buf}{, }\item[{size\+\_\+t}]{len}{, }\item[{size\+\_\+t}]{offset}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{buffered__iostream_8cpp_source_l00075}{75}} of file \mbox{\hyperlink{buffered__iostream_8cpp_source}{buffered\+\_\+iostream.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00076\ \ \ \ \ \{}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ bytes\_from\_rdbuf\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(my-\/>\_rdbuf.sgetn(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}.get()\ +\ offset,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}));}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (bytes\_from\_rdbuf)}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ bytes\_from\_rdbuf;}
+\DoxyCodeLine{00080\ }
+\DoxyCodeLine{00081\ }
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ >\ detail::minimum\_read\_size\ )\ }
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ my-\/>\_istr-\/>readsome(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}.get()\ +\ offset,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}});}
+\DoxyCodeLine{00084\ }
+\DoxyCodeLine{00085\ \textcolor{preprocessor}{\#ifndef\ NDEBUG}}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ This\ code\ was\ written\ with\ the\ assumption\ that\ you'd\ only\ be\ making\ one\ call\ to\ readsome\ }}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ at\ a\ time\ so\ it\ reuses\ \_shared\_read\_buffer.\ \ If\ you\ really\ need\ to\ make\ concurrent\ calls\ to\ }}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ readsome(),\ you'll\ need\ to\ prevent\ reusing\ \_shared\_read\_buffer\ here}}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \textcolor{keyword}{struct\ }check\_buffer\_in\_use\ \{}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\&\ \_buffer\_in\_use;}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ check\_buffer\_in\_use(\textcolor{keywordtype}{bool}\&\ buffer\_in\_use)\ :\ \_buffer\_in\_use(buffer\_in\_use)\ \{\ assert(!\_buffer\_in\_use);\ \_buffer\_in\_use\ =\ \textcolor{keyword}{true};\ \}}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ \ \string~check\_buffer\_in\_use()\ \{\ assert(\_buffer\_in\_use);\ \_buffer\_in\_use\ =\ \textcolor{keyword}{false};\ \}}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \}\ buffer\_in\_use\_checker(my-\/>\_shared\_read\_buffer\_in\_use);}
+\DoxyCodeLine{00094\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00095\ }
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!my-\/>\_shared\_read\_buffer)}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \ my-\/>\_shared\_read\_buffer.reset(\textcolor{keyword}{new}\ \textcolor{keywordtype}{char}[detail::minimum\_read\_size],\ [](\textcolor{keywordtype}{char}*\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})\{\ \textcolor{keyword}{delete}[]\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}};\ \});}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ bytes\_read\ =\ my-\/>\_istr-\/>readsome(\ my-\/>\_shared\_read\_buffer,\ detail::minimum\_read\_size,\ 0\ );}
+\DoxyCodeLine{00099\ }
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ bytes\_to\_deliver\_immediately\ =\ std::min<size\_t>(bytes\_read,\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}});}
+\DoxyCodeLine{00101\ }
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}.get()\ +\ offset,\ my-\/>\_shared\_read\_buffer.get(),\ bytes\_to\_deliver\_immediately\ );}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ bytes\_read\ >\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ )}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \ \ \ my-\/>\_rdbuf.sputn(\ my-\/>\_shared\_read\_buffer.get()\ +\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ bytes\_read\ -\/\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ );}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00108\ }
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ bytes\_to\_deliver\_immediately;}
+\DoxyCodeLine{00110\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=273pt]{classfc_1_1buffered__istream_a462190e5205b4aaad1ad0108f31dd7d4_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/io/\mbox{\hyperlink{buffered__iostream_8hpp}{buffered\+\_\+iostream.\+hpp}}\item 
+libraries/fc/src/io/\mbox{\hyperlink{buffered__iostream_8cpp}{buffered\+\_\+iostream.\+cpp}}\end{DoxyCompactItemize}

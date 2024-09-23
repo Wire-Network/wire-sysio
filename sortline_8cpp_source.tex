@@ -1,0 +1,29 @@
+\doxysection{sortline.\+cpp}
+\hypertarget{sortline_8cpp_source}{}\label{sortline_8cpp_source}\index{libraries/fc/libraries/ff/depends/xbyak/gen/sortline.cpp@{libraries/fc/libraries/ff/depends/xbyak/gen/sortline.cpp}}
+\mbox{\hyperlink{sortline_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{sortline_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <iostream>}}
+\DoxyCodeLine{\Hypertarget{sortline_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <fstream>}}
+\DoxyCodeLine{\Hypertarget{sortline_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{\Hypertarget{sortline_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <set>}}
+\DoxyCodeLine{\Hypertarget{sortline_8cpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{sortline_8cpp_source_l00006}\mbox{\hyperlink{sortline_8cpp_a146b3b56e358a0e30ee6e00227e85767}{00006}}\ \textcolor{keyword}{typedef}\ std::set<std::string>\ \mbox{\hyperlink{sortline_8cpp_a146b3b56e358a0e30ee6e00227e85767}{StrSet}};}
+\DoxyCodeLine{\Hypertarget{sortline_8cpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{sortline_8cpp_source_l00008}\mbox{\hyperlink{sortline_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{00008}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{sortline_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}()}
+\DoxyCodeLine{\Hypertarget{sortline_8cpp_source_l00009}00009\ \{}
+\DoxyCodeLine{\Hypertarget{sortline_8cpp_source_l00010}00010\ \ \ \ \ \mbox{\hyperlink{sortline_8cpp_a146b3b56e358a0e30ee6e00227e85767}{StrSet}}\ ss;}
+\DoxyCodeLine{\Hypertarget{sortline_8cpp_source_l00011}00011\ \ \ \ \ std::string\ line;}
+\DoxyCodeLine{\Hypertarget{sortline_8cpp_source_l00012}00012\ \ \ \ \ \textcolor{keywordflow}{while}\ (std::getline(std::cin,\ line))\ \{}
+\DoxyCodeLine{\Hypertarget{sortline_8cpp_source_l00013}00013\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!line.empty()\ \&\&\ line[line.size()\ -\/\ 1]\ ==\ \textcolor{charliteral}{'\(\backslash\)n'})\ \{}
+\DoxyCodeLine{\Hypertarget{sortline_8cpp_source_l00014}00014\ \ \ \ \ \ \ \ \ \ \ \ \ line.resize(line.size()\ -\/\ 1);}
+\DoxyCodeLine{\Hypertarget{sortline_8cpp_source_l00015}00015\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sortline_8cpp_source_l00016}00016\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!line.empty())\ \{}
+\DoxyCodeLine{\Hypertarget{sortline_8cpp_source_l00017}00017\ \ \ \ \ \ \ \ \ \ \ \ \ ss.insert(line);}
+\DoxyCodeLine{\Hypertarget{sortline_8cpp_source_l00018}00018\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sortline_8cpp_source_l00019}00019\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sortline_8cpp_source_l00020}00020\ \ \ \ \ \textcolor{keywordflow}{for}\ (StrSet::const\_iterator\ i\ =\ ss.begin(),\ ie\ =\ ss.end();\ i\ !=\ ie;\ ++i)\ \{}
+\DoxyCodeLine{\Hypertarget{sortline_8cpp_source_l00021}00021\ \ \ \ \ \ \ \ \ std::cout\ <<\ *i\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{sortline_8cpp_source_l00022}00022\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sortline_8cpp_source_l00023}00023\ \}}
+
+\end{DoxyCode}

@@ -1,0 +1,8 @@
+<map id="yubihsm_pkcs11_context" name="yubihsm_pkcs11_context">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,198,175,223"/>
+<area shape="rect" id="Node000002" href="$struct_list.html" title=" " alt="" coords="69,109,111,135"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="93,150,93,197,87,197,87,150"/>
+<area shape="rect" id="Node000003" href="$struct_list_item.html" title=" " alt="" coords="56,5,124,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="93,47,93,109,87,109,87,47"/>
+<area shape="poly" id="edge3_Node000003_Node000003" title=" " alt="" coords="141,8,148,11,151,19,142,28,125,31,124,25,140,23,146,18,144,15,138,12"/>
+</map>

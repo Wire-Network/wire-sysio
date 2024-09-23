@@ -1,0 +1,131 @@
+\doxysection{Log Namespace Reference}
+\hypertarget{namespace_log}{}\label{namespace_log}\index{Log@{Log}}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum class \mbox{\hyperlink{namespace_log_a1f055cc08a2ed074aa74f9d99c8a0901}{Category}} \{ \mbox{\hyperlink{namespace_log_a1f055cc08a2ed074aa74f9d99c8a0901acb5e100e5a9a3e7f6d1fd97512215282}{error}}
+, \mbox{\hyperlink{namespace_log_a1f055cc08a2ed074aa74f9d99c8a0901aad42f6697b035b7580e4fef93be20b4d}{debug}}
+, \mbox{\hyperlink{namespace_log_a1f055cc08a2ed074aa74f9d99c8a0901aaa59d67c2123f094d0d6798ffe651c4d}{metrics}}
+, \mbox{\hyperlink{namespace_log_a1f055cc08a2ed074aa74f9d99c8a0901a0fc3cfbc27e91ea60a787de13dae3e3c}{num}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{_logging_8h_acc3b7214ce9c503bcca745b8f13063c1}{LOGGING\+\_\+\+API}} void \mbox{\hyperlink{namespace_log_a606363a3c198ebb5e5843cde96282a47}{set\+Category\+Enabled}} (\mbox{\hyperlink{namespace_log_a1f055cc08a2ed074aa74f9d99c8a0901}{Category}} category, bool enable)
+\item 
+\mbox{\hyperlink{_logging_8h_acc3b7214ce9c503bcca745b8f13063c1}{LOGGING\+\_\+\+API}} bool \mbox{\hyperlink{namespace_log_a2f2e440d94d04f480e2258096241f07f}{is\+Category\+Enabled}} (\mbox{\hyperlink{namespace_log_a1f055cc08a2ed074aa74f9d99c8a0901}{Category}} category)
+\item 
+\mbox{\hyperlink{_logging_8h_acc3b7214ce9c503bcca745b8f13063c1}{LOGGING\+\_\+\+API}} void \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}} (\mbox{\hyperlink{namespace_log_a1f055cc08a2ed074aa74f9d99c8a0901}{Category}} category, const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}},...)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{namespace_log_a1f055cc08a2ed074aa74f9d99c8a0901}\index{Log@{Log}!Category@{Category}}
+\index{Category@{Category}!Log@{Log}}
+\doxysubsubsection{\texorpdfstring{Category}{Category}}
+{\footnotesize\ttfamily \label{namespace_log_a1f055cc08a2ed074aa74f9d99c8a0901} 
+enum \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{namespace_log_a1f055cc08a2ed074aa74f9d99c8a0901}{Log\+::\+Category}}\hspace{0.3cm}{\ttfamily [strong]}}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{error@{error}!Log@{Log}}\index{Log@{Log}!error@{error}}}\Hypertarget{namespace_log_a1f055cc08a2ed074aa74f9d99c8a0901acb5e100e5a9a3e7f6d1fd97512215282}\label{namespace_log_a1f055cc08a2ed074aa74f9d99c8a0901} 
+error&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{debug@{debug}!Log@{Log}}\index{Log@{Log}!debug@{debug}}}\Hypertarget{namespace_log_a1f055cc08a2ed074aa74f9d99c8a0901aad42f6697b035b7580e4fef93be20b4d}\label{namespace_log_a1f055cc08a2ed074aa74f9d99c8a0901} 
+debug&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{metrics@{metrics}!Log@{Log}}\index{Log@{Log}!metrics@{metrics}}}\Hypertarget{namespace_log_a1f055cc08a2ed074aa74f9d99c8a0901aaa59d67c2123f094d0d6798ffe651c4d}\label{namespace_log_a1f055cc08a2ed074aa74f9d99c8a0901} 
+metrics&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{num@{num}!Log@{Log}}\index{Log@{Log}!num@{num}}}\Hypertarget{namespace_log_a1f055cc08a2ed074aa74f9d99c8a0901a0fc3cfbc27e91ea60a787de13dae3e3c}\label{namespace_log_a1f055cc08a2ed074aa74f9d99c8a0901} 
+num&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{_logging_8h_source_l00014}{14}} of file \mbox{\hyperlink{_logging_8h_source}{Logging.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00015\ \ \ \ \ \{}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \ \ error,}
+\DoxyCodeLine{00017\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{environment_8hpp_a398527b3e9e358c345c5047b16871957}{debug}},}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a1f055cc08a2ed074aa74f9d99c8a0901aaa59d67c2123f094d0d6798ffe651c4d}{metrics}},}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ num}
+\DoxyCodeLine{00020\ \ \ \ \ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespace_log_a2f2e440d94d04f480e2258096241f07f}\index{Log@{Log}!isCategoryEnabled@{isCategoryEnabled}}
+\index{isCategoryEnabled@{isCategoryEnabled}!Log@{Log}}
+\doxysubsubsection{\texorpdfstring{isCategoryEnabled()}{isCategoryEnabled()}}
+{\footnotesize\ttfamily \label{namespace_log_a2f2e440d94d04f480e2258096241f07f} 
+bool Log\+::is\+Category\+Enabled (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespace_log_a1f055cc08a2ed074aa74f9d99c8a0901}{Category}}}]{category}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_logging_8cpp_source_l00025}{25}} of file \mbox{\hyperlink{_logging_8cpp_source}{Logging.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00026\ \ \ \ \ \{}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_errors_8h_a03bec6af3af0dd492e348b40cbe40a46}{WAVM\_ASSERT\_THROW}}(category\ <\ Category::num);}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ categoryEnabled[(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}})category];}
+\DoxyCodeLine{00029\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespace_log_a83926634a3916d0927abca4aca58a60a}\index{Log@{Log}!printf@{printf}}
+\index{printf@{printf}!Log@{Log}}
+\doxysubsubsection{\texorpdfstring{printf()}{printf()}}
+{\footnotesize\ttfamily \label{namespace_log_a83926634a3916d0927abca4aca58a60a} 
+void Log\+::printf (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespace_log_a1f055cc08a2ed074aa74f9d99c8a0901}{Category}}}]{category}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{format}{, }\item[{}]{...}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_logging_8cpp_source_l00030}{30}} of file \mbox{\hyperlink{_logging_8cpp_source}{Logging.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00031\ \ \ \ \ \{}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(categoryEnabled[(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}})category])}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \ \ \ va\_list\ varArgs;}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \ \ \ va\_start(varArgs,\mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}});}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ \ \ \ vfprintf(stdout,\mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}},varArgs);}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ fflush(stdout);}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ va\_end(varArgs);}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00040\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespace_log_a83926634a3916d0927abca4aca58a60a_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespace_log_a606363a3c198ebb5e5843cde96282a47}\index{Log@{Log}!setCategoryEnabled@{setCategoryEnabled}}
+\index{setCategoryEnabled@{setCategoryEnabled}!Log@{Log}}
+\doxysubsubsection{\texorpdfstring{setCategoryEnabled()}{setCategoryEnabled()}}
+{\footnotesize\ttfamily \label{namespace_log_a606363a3c198ebb5e5843cde96282a47} 
+void Log\+::set\+Category\+Enabled (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespace_log_a1f055cc08a2ed074aa74f9d99c8a0901}{Category}}}]{category}{, }\item[{bool}]{enable}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_logging_8cpp_source_l00020}{20}} of file \mbox{\hyperlink{_logging_8cpp_source}{Logging.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00021\ \ \ \ \ \{}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_errors_8h_a03bec6af3af0dd492e348b40cbe40a46}{WAVM\_ASSERT\_THROW}}(category\ <\ Category::num);}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ categoryEnabled[(\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}})category]\ =\ enable;}
+\DoxyCodeLine{00024\ \ \ \ \ \}}
+
+\end{DoxyCode}

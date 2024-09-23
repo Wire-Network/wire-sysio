@@ -1,0 +1,11 @@
+<map id="sysio::login_plugin::finalize_login_request_params" name="sysio::login_plugin::finalize_login_request_params">
+<area shape="rect" id="Node000001" title=" " alt="" coords="180,258,334,313"/>
+<area shape="rect" id="Node000002" href="$classfc_1_1crypto_1_1public__key.html" title=" " alt="" coords="5,116,152,142"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="86,156,99,195,110,215,124,232,150,251,180,265,178,270,147,256,120,236,105,218,94,198,81,158"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1chain_1_1permission__level.html" title=" " alt="" coords="176,109,338,150"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="260,165,260,257,254,257,254,165"/>
+<area shape="rect" id="Node000004" href="$structsysio_1_1chain_1_1name.html" title="Immutable except for fc::from_variant." alt="" coords="192,5,323,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="260,47,260,109,254,109,254,47"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="362,116,416,142"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="381,157,360,196,331,235,304,259,301,255,327,232,356,193,376,155"/>
+</map>

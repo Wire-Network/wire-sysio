@@ -1,0 +1,130 @@
+\doxysection{sysio\+::chain\+::action\+\_\+base Struct Reference}
+\hypertarget{structsysio_1_1chain_1_1action__base}{}\label{structsysio_1_1chain_1_1action__base}\index{sysio::chain::action\_base@{sysio::chain::action\_base}}
+
+
+{\ttfamily \#include $<$action.\+hpp$>$}
+
+
+
+Inheritance diagram for sysio\+::chain\+::action\+\_\+base\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=207pt]{structsysio_1_1chain_1_1action__base__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for sysio\+::chain\+::action\+\_\+base\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=324pt]{structsysio_1_1chain_1_1action__base__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1action__base_a5af1455af337e3d28ebe384d0451b3cf}{action\+\_\+base}} ()=default
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1action__base_a8c10aa1f460e18f90743294f1cfbe177}{action\+\_\+base}} (\mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} acnt, \mbox{\hyperlink{namespacesysio_1_1chain_a7a1685bcc352cda9e45f055932069428}{action\+\_\+name}} act, const \mbox{\hyperlink{classfc_1_1vector}{vector}}$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1permission__level}{permission\+\_\+level}} $>$ \&auth)
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1action__base_a7370e64e707b6f36934dea2e7e2f4e12}{action\+\_\+base}} (\mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} acnt, \mbox{\hyperlink{namespacesysio_1_1chain_a7a1685bcc352cda9e45f055932069428}{action\+\_\+name}} act, \mbox{\hyperlink{classfc_1_1vector}{vector}}$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1permission__level}{permission\+\_\+level}} $>$ \&\&auth)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} \mbox{\hyperlink{structsysio_1_1chain_1_1action__base_a3598da3f8df67037e69dab758ce168be}{account}}
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_a7a1685bcc352cda9e45f055932069428}{action\+\_\+name}} \mbox{\hyperlink{structsysio_1_1chain_1_1action__base_a013fae07403bd6deffcade4fd5be095c}{name}}
+\item 
+\mbox{\hyperlink{classfc_1_1vector}{vector}}$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1permission__level}{permission\+\_\+level}} $>$ \mbox{\hyperlink{structsysio_1_1chain_1_1action__base_a40939533bca9e44d169ee7e25ebb1945}{authorization}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+An action is performed by an actor, aka an account. It may be created explicitly and authorized by signatures or might be generated implicitly by executing application code.
+
+This follows the design pattern of React Flux where actions are named and then dispatched to one or more action handlers (aka stores). In the context of sysio, every action is dispatched to the handler defined by account \textquotesingle{}scope\textquotesingle{} and function \textquotesingle{}name\textquotesingle{}, but the default handler may also forward the action to any number of additional handlers. Any application can write a handler for "{}scope\+::name"{} that will get executed if and only if this action is forwarded to that application.
+
+Each action may require the permission of specific actors. Actors can define any number of permission levels. The actors and their respective permission levels are declared on the action and validated independently of the executing application code. An application code will check to see if the required authorization were properly declared when it executes. 
+
+Definition at line \mbox{\hyperlink{action_8hpp_source_l00056}{56}} of file \mbox{\hyperlink{action_8hpp_source}{action.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structsysio_1_1chain_1_1action__base_a5af1455af337e3d28ebe384d0451b3cf}\index{sysio::chain::action\_base@{sysio::chain::action\_base}!action\_base@{action\_base}}
+\index{action\_base@{action\_base}!sysio::chain::action\_base@{sysio::chain::action\_base}}
+\doxysubsubsection{\texorpdfstring{action\_base()}{action\_base()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1action__base_a5af1455af337e3d28ebe384d0451b3cf} 
+sysio\+::chain\+::action\+\_\+base\+::action\+\_\+base (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [default]}}
+
+\Hypertarget{structsysio_1_1chain_1_1action__base_a8c10aa1f460e18f90743294f1cfbe177}\index{sysio::chain::action\_base@{sysio::chain::action\_base}!action\_base@{action\_base}}
+\index{action\_base@{action\_base}!sysio::chain::action\_base@{sysio::chain::action\_base}}
+\doxysubsubsection{\texorpdfstring{action\_base()}{action\_base()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1action__base_a8c10aa1f460e18f90743294f1cfbe177} 
+sysio\+::chain\+::action\+\_\+base\+::action\+\_\+base (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}}}]{acnt}{, }\item[{\mbox{\hyperlink{namespacesysio_1_1chain_a7a1685bcc352cda9e45f055932069428}{action\+\_\+name}}}]{act}{, }\item[{const \mbox{\hyperlink{classfc_1_1vector}{vector}}$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1permission__level}{permission\+\_\+level}} $>$ \&}]{auth}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{action_8hpp_source_l00063}{63}} of file \mbox{\hyperlink{action_8hpp_source}{action.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{structsysio_1_1chain_1_1action__base_a3598da3f8df67037e69dab758ce168be}{account}}(acnt),\ \mbox{\hyperlink{structsysio_1_1chain_1_1action__base_a013fae07403bd6deffcade4fd5be095c}{name}}(act),\ \mbox{\hyperlink{structsysio_1_1chain_1_1action__base_a40939533bca9e44d169ee7e25ebb1945}{authorization}}(auth)\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1action__base_a7370e64e707b6f36934dea2e7e2f4e12}\index{sysio::chain::action\_base@{sysio::chain::action\_base}!action\_base@{action\_base}}
+\index{action\_base@{action\_base}!sysio::chain::action\_base@{sysio::chain::action\_base}}
+\doxysubsubsection{\texorpdfstring{action\_base()}{action\_base()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1action__base_a7370e64e707b6f36934dea2e7e2f4e12} 
+sysio\+::chain\+::action\+\_\+base\+::action\+\_\+base (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}}}]{acnt}{, }\item[{\mbox{\hyperlink{namespacesysio_1_1chain_a7a1685bcc352cda9e45f055932069428}{action\+\_\+name}}}]{act}{, }\item[{\mbox{\hyperlink{classfc_1_1vector}{vector}}$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1permission__level}{permission\+\_\+level}} $>$ \&\&}]{auth}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{action_8hpp_source_l00065}{65}} of file \mbox{\hyperlink{action_8hpp_source}{action.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{structsysio_1_1chain_1_1action__base_a3598da3f8df67037e69dab758ce168be}{account}}(acnt),\ \mbox{\hyperlink{structsysio_1_1chain_1_1action__base_a013fae07403bd6deffcade4fd5be095c}{name}}(act),\ \mbox{\hyperlink{structsysio_1_1chain_1_1action__base_a40939533bca9e44d169ee7e25ebb1945}{authorization}}(std::move(auth))\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1chain_1_1action__base_a3598da3f8df67037e69dab758ce168be}\index{sysio::chain::action\_base@{sysio::chain::action\_base}!account@{account}}
+\index{account@{account}!sysio::chain::action\_base@{sysio::chain::action\_base}}
+\doxysubsubsection{\texorpdfstring{account}{account}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1action__base_a3598da3f8df67037e69dab758ce168be} 
+\mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} sysio\+::chain\+::action\+\_\+base\+::account}
+
+
+
+Definition at line \mbox{\hyperlink{action_8hpp_source_l00057}{57}} of file \mbox{\hyperlink{action_8hpp_source}{action.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1action__base_a40939533bca9e44d169ee7e25ebb1945}\index{sysio::chain::action\_base@{sysio::chain::action\_base}!authorization@{authorization}}
+\index{authorization@{authorization}!sysio::chain::action\_base@{sysio::chain::action\_base}}
+\doxysubsubsection{\texorpdfstring{authorization}{authorization}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1action__base_a40939533bca9e44d169ee7e25ebb1945} 
+\mbox{\hyperlink{classfc_1_1vector}{vector}}$<$\mbox{\hyperlink{structsysio_1_1chain_1_1permission__level}{permission\+\_\+level}}$>$ sysio\+::chain\+::action\+\_\+base\+::authorization}
+
+
+
+Definition at line \mbox{\hyperlink{action_8hpp_source_l00059}{59}} of file \mbox{\hyperlink{action_8hpp_source}{action.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1action__base_a013fae07403bd6deffcade4fd5be095c}\index{sysio::chain::action\_base@{sysio::chain::action\_base}!name@{name}}
+\index{name@{name}!sysio::chain::action\_base@{sysio::chain::action\_base}}
+\doxysubsubsection{\texorpdfstring{name}{name}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1action__base_a013fae07403bd6deffcade4fd5be095c} 
+\mbox{\hyperlink{namespacesysio_1_1chain_a7a1685bcc352cda9e45f055932069428}{action\+\_\+name}} sysio\+::chain\+::action\+\_\+base\+::name}
+
+
+
+Definition at line \mbox{\hyperlink{action_8hpp_source_l00058}{58}} of file \mbox{\hyperlink{action_8hpp_source}{action.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{action_8hpp}{action.\+hpp}}\end{DoxyCompactItemize}

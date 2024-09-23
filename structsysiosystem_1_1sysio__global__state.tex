@@ -1,0 +1,228 @@
+\doxysection{sysiosystem\+::sysio\+\_\+global\+\_\+state Struct Reference}
+\hypertarget{structsysiosystem_1_1sysio__global__state}{}\label{structsysiosystem_1_1sysio__global__state}\index{sysiosystem::sysio\_global\_state@{sysiosystem::sysio\_global\_state}}
+
+
+{\ttfamily \#include $<$sysio.\+system.\+hpp$>$}
+
+
+
+Inheritance diagram for sysiosystem\+::sysio\+\_\+global\+\_\+state\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=226pt]{structsysiosystem_1_1sysio__global__state__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for sysiosystem\+::sysio\+\_\+global\+\_\+state\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysiosystem_1_1sysio__global__state__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1sysio__global__state_a10ce64e61a12658d73355f79d9b90241}{free\+\_\+ram}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1sysio__global__state_a3e96ee5bf3f6da1a0c5d07620ad43e76}{max\+\_\+ram\+\_\+size}} = 64ll\texorpdfstring{$\ast$}{*}1024 \texorpdfstring{$\ast$}{*} 1024 \texorpdfstring{$\ast$}{*} 1024
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1sysio__global__state_a8c5f9cdc80707168acf0eaaa6f71561e}{total\+\_\+ram\+\_\+bytes\+\_\+reserved}} = 0
+\item 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1sysio__global__state_a58a493f1e79c4ac6039d90fa67acc8e2}{total\+\_\+ram\+\_\+stake}} = 0
+\item 
+\mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{block\+\_\+timestamp}} \mbox{\hyperlink{structsysiosystem_1_1sysio__global__state_aaa745851c2221bd24eae5fc4e383869b}{last\+\_\+producer\+\_\+schedule\+\_\+update}}
+\item 
+\mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} \mbox{\hyperlink{structsysiosystem_1_1sysio__global__state_acf59d7c9d51e5b13a28cba74e04fda40}{last\+\_\+pervote\+\_\+bucket\+\_\+fill}}
+\item 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1sysio__global__state_a15dc798972c47b28b02413ffec40676c}{pervote\+\_\+bucket}} = 0
+\item 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1sysio__global__state_a5c443152fb46132d2271101f103fb2dd}{perblock\+\_\+bucket}} = 0
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1sysio__global__state_a960a9ef2c91a04d7fdceb84e64ae8ec4}{total\+\_\+unpaid\+\_\+blocks}} = 0
+\item 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1sysio__global__state_a5ca05fbdd02c746526e65a1376d507e0}{total\+\_\+activated\+\_\+stake}} = 0
+\begin{DoxyCompactList}\small\item\em all blocks which have been produced but not paid \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} \mbox{\hyperlink{structsysiosystem_1_1sysio__global__state_a9103ca2911e1be3a551b03f6f8d19895}{thresh\+\_\+activated\+\_\+stake\+\_\+time}}
+\item 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1sysio__global__state_a8a896a7ee01bf8ba6be126b053470ffb}{last\+\_\+producer\+\_\+schedule\+\_\+size}} = 0
+\item 
+double \mbox{\hyperlink{structsysiosystem_1_1sysio__global__state_acb169bdf3bca4e6cabb0f5b8da2adc19}{total\+\_\+producer\+\_\+vote\+\_\+weight}} = 0
+\item 
+\mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{block\+\_\+timestamp}} \mbox{\hyperlink{structsysiosystem_1_1sysio__global__state_ac51fbd74c97dbfd5d15eca7e22e99897}{last\+\_\+name\+\_\+close}}
+\begin{DoxyCompactList}\small\item\em the sum of all producer votes \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00141}{141}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysiosystem_1_1sysio__global__state_a10ce64e61a12658d73355f79d9b90241}\index{sysiosystem::sysio\_global\_state@{sysiosystem::sysio\_global\_state}!free\_ram@{free\_ram}}
+\index{free\_ram@{free\_ram}!sysiosystem::sysio\_global\_state@{sysiosystem::sysio\_global\_state}}
+\doxysubsubsection{\texorpdfstring{free\_ram()}{free\_ram()}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1sysio__global__state_a10ce64e61a12658d73355f79d9b90241} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} sysiosystem\+::sysio\+\_\+global\+\_\+state\+::free\+\_\+ram (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00142}{142}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00142\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysiosystem_1_1sysio__global__state_a3e96ee5bf3f6da1a0c5d07620ad43e76}{max\_ram\_size}}\ -\/\ \mbox{\hyperlink{structsysiosystem_1_1sysio__global__state_a8c5f9cdc80707168acf0eaaa6f71561e}{total\_ram\_bytes\_reserved}};\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=344pt]{structsysiosystem_1_1sysio__global__state_a10ce64e61a12658d73355f79d9b90241_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysiosystem_1_1sysio__global__state_ac51fbd74c97dbfd5d15eca7e22e99897}\index{sysiosystem::sysio\_global\_state@{sysiosystem::sysio\_global\_state}!last\_name\_close@{last\_name\_close}}
+\index{last\_name\_close@{last\_name\_close}!sysiosystem::sysio\_global\_state@{sysiosystem::sysio\_global\_state}}
+\doxysubsubsection{\texorpdfstring{last\_name\_close}{last\_name\_close}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1sysio__global__state_ac51fbd74c97dbfd5d15eca7e22e99897} 
+\mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{block\+\_\+timestamp}} sysiosystem\+::sysio\+\_\+global\+\_\+state\+::last\+\_\+name\+\_\+close}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00157}{157}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1sysio__global__state_acf59d7c9d51e5b13a28cba74e04fda40}\index{sysiosystem::sysio\_global\_state@{sysiosystem::sysio\_global\_state}!last\_pervote\_bucket\_fill@{last\_pervote\_bucket\_fill}}
+\index{last\_pervote\_bucket\_fill@{last\_pervote\_bucket\_fill}!sysiosystem::sysio\_global\_state@{sysiosystem::sysio\_global\_state}}
+\doxysubsubsection{\texorpdfstring{last\_pervote\_bucket\_fill}{last\_pervote\_bucket\_fill}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1sysio__global__state_acf59d7c9d51e5b13a28cba74e04fda40} 
+\mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} sysiosystem\+::sysio\+\_\+global\+\_\+state\+::last\+\_\+pervote\+\_\+bucket\+\_\+fill}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00149}{149}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1sysio__global__state_a8a896a7ee01bf8ba6be126b053470ffb}\index{sysiosystem::sysio\_global\_state@{sysiosystem::sysio\_global\_state}!last\_producer\_schedule\_size@{last\_producer\_schedule\_size}}
+\index{last\_producer\_schedule\_size@{last\_producer\_schedule\_size}!sysiosystem::sysio\_global\_state@{sysiosystem::sysio\_global\_state}}
+\doxysubsubsection{\texorpdfstring{last\_producer\_schedule\_size}{last\_producer\_schedule\_size}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1sysio__global__state_a8a896a7ee01bf8ba6be126b053470ffb} 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} sysiosystem\+::sysio\+\_\+global\+\_\+state\+::last\+\_\+producer\+\_\+schedule\+\_\+size = 0}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00155}{155}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1sysio__global__state_aaa745851c2221bd24eae5fc4e383869b}\index{sysiosystem::sysio\_global\_state@{sysiosystem::sysio\_global\_state}!last\_producer\_schedule\_update@{last\_producer\_schedule\_update}}
+\index{last\_producer\_schedule\_update@{last\_producer\_schedule\_update}!sysiosystem::sysio\_global\_state@{sysiosystem::sysio\_global\_state}}
+\doxysubsubsection{\texorpdfstring{last\_producer\_schedule\_update}{last\_producer\_schedule\_update}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1sysio__global__state_aaa745851c2221bd24eae5fc4e383869b} 
+\mbox{\hyperlink{classsysio_1_1chain_1_1block__timestamp}{block\+\_\+timestamp}} sysiosystem\+::sysio\+\_\+global\+\_\+state\+::last\+\_\+producer\+\_\+schedule\+\_\+update}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00148}{148}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1sysio__global__state_a3e96ee5bf3f6da1a0c5d07620ad43e76}\index{sysiosystem::sysio\_global\_state@{sysiosystem::sysio\_global\_state}!max\_ram\_size@{max\_ram\_size}}
+\index{max\_ram\_size@{max\_ram\_size}!sysiosystem::sysio\_global\_state@{sysiosystem::sysio\_global\_state}}
+\doxysubsubsection{\texorpdfstring{max\_ram\_size}{max\_ram\_size}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1sysio__global__state_a3e96ee5bf3f6da1a0c5d07620ad43e76} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} sysiosystem\+::sysio\+\_\+global\+\_\+state\+::max\+\_\+ram\+\_\+size = 64ll\texorpdfstring{$\ast$}{*}1024 \texorpdfstring{$\ast$}{*} 1024 \texorpdfstring{$\ast$}{*} 1024}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00144}{144}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1sysio__global__state_a5c443152fb46132d2271101f103fb2dd}\index{sysiosystem::sysio\_global\_state@{sysiosystem::sysio\_global\_state}!perblock\_bucket@{perblock\_bucket}}
+\index{perblock\_bucket@{perblock\_bucket}!sysiosystem::sysio\_global\_state@{sysiosystem::sysio\_global\_state}}
+\doxysubsubsection{\texorpdfstring{perblock\_bucket}{perblock\_bucket}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1sysio__global__state_a5c443152fb46132d2271101f103fb2dd} 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} sysiosystem\+::sysio\+\_\+global\+\_\+state\+::perblock\+\_\+bucket = 0}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00151}{151}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1sysio__global__state_a15dc798972c47b28b02413ffec40676c}\index{sysiosystem::sysio\_global\_state@{sysiosystem::sysio\_global\_state}!pervote\_bucket@{pervote\_bucket}}
+\index{pervote\_bucket@{pervote\_bucket}!sysiosystem::sysio\_global\_state@{sysiosystem::sysio\_global\_state}}
+\doxysubsubsection{\texorpdfstring{pervote\_bucket}{pervote\_bucket}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1sysio__global__state_a15dc798972c47b28b02413ffec40676c} 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} sysiosystem\+::sysio\+\_\+global\+\_\+state\+::pervote\+\_\+bucket = 0}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00150}{150}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1sysio__global__state_a9103ca2911e1be3a551b03f6f8d19895}\index{sysiosystem::sysio\_global\_state@{sysiosystem::sysio\_global\_state}!thresh\_activated\_stake\_time@{thresh\_activated\_stake\_time}}
+\index{thresh\_activated\_stake\_time@{thresh\_activated\_stake\_time}!sysiosystem::sysio\_global\_state@{sysiosystem::sysio\_global\_state}}
+\doxysubsubsection{\texorpdfstring{thresh\_activated\_stake\_time}{thresh\_activated\_stake\_time}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1sysio__global__state_a9103ca2911e1be3a551b03f6f8d19895} 
+\mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} sysiosystem\+::sysio\+\_\+global\+\_\+state\+::thresh\+\_\+activated\+\_\+stake\+\_\+time}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00154}{154}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1sysio__global__state_a5ca05fbdd02c746526e65a1376d507e0}\index{sysiosystem::sysio\_global\_state@{sysiosystem::sysio\_global\_state}!total\_activated\_stake@{total\_activated\_stake}}
+\index{total\_activated\_stake@{total\_activated\_stake}!sysiosystem::sysio\_global\_state@{sysiosystem::sysio\_global\_state}}
+\doxysubsubsection{\texorpdfstring{total\_activated\_stake}{total\_activated\_stake}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1sysio__global__state_a5ca05fbdd02c746526e65a1376d507e0} 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} sysiosystem\+::sysio\+\_\+global\+\_\+state\+::total\+\_\+activated\+\_\+stake = 0}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00153}{153}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1sysio__global__state_acb169bdf3bca4e6cabb0f5b8da2adc19}\index{sysiosystem::sysio\_global\_state@{sysiosystem::sysio\_global\_state}!total\_producer\_vote\_weight@{total\_producer\_vote\_weight}}
+\index{total\_producer\_vote\_weight@{total\_producer\_vote\_weight}!sysiosystem::sysio\_global\_state@{sysiosystem::sysio\_global\_state}}
+\doxysubsubsection{\texorpdfstring{total\_producer\_vote\_weight}{total\_producer\_vote\_weight}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1sysio__global__state_acb169bdf3bca4e6cabb0f5b8da2adc19} 
+double sysiosystem\+::sysio\+\_\+global\+\_\+state\+::total\+\_\+producer\+\_\+vote\+\_\+weight = 0}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00156}{156}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1sysio__global__state_a8c5f9cdc80707168acf0eaaa6f71561e}\index{sysiosystem::sysio\_global\_state@{sysiosystem::sysio\_global\_state}!total\_ram\_bytes\_reserved@{total\_ram\_bytes\_reserved}}
+\index{total\_ram\_bytes\_reserved@{total\_ram\_bytes\_reserved}!sysiosystem::sysio\_global\_state@{sysiosystem::sysio\_global\_state}}
+\doxysubsubsection{\texorpdfstring{total\_ram\_bytes\_reserved}{total\_ram\_bytes\_reserved}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1sysio__global__state_a8c5f9cdc80707168acf0eaaa6f71561e} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} sysiosystem\+::sysio\+\_\+global\+\_\+state\+::total\+\_\+ram\+\_\+bytes\+\_\+reserved = 0}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00145}{145}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1sysio__global__state_a58a493f1e79c4ac6039d90fa67acc8e2}\index{sysiosystem::sysio\_global\_state@{sysiosystem::sysio\_global\_state}!total\_ram\_stake@{total\_ram\_stake}}
+\index{total\_ram\_stake@{total\_ram\_stake}!sysiosystem::sysio\_global\_state@{sysiosystem::sysio\_global\_state}}
+\doxysubsubsection{\texorpdfstring{total\_ram\_stake}{total\_ram\_stake}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1sysio__global__state_a58a493f1e79c4ac6039d90fa67acc8e2} 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} sysiosystem\+::sysio\+\_\+global\+\_\+state\+::total\+\_\+ram\+\_\+stake = 0}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00146}{146}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1sysio__global__state_a960a9ef2c91a04d7fdceb84e64ae8ec4}\index{sysiosystem::sysio\_global\_state@{sysiosystem::sysio\_global\_state}!total\_unpaid\_blocks@{total\_unpaid\_blocks}}
+\index{total\_unpaid\_blocks@{total\_unpaid\_blocks}!sysiosystem::sysio\_global\_state@{sysiosystem::sysio\_global\_state}}
+\doxysubsubsection{\texorpdfstring{total\_unpaid\_blocks}{total\_unpaid\_blocks}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1sysio__global__state_a960a9ef2c91a04d7fdceb84e64ae8ec4} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysiosystem\+::sysio\+\_\+global\+\_\+state\+::total\+\_\+unpaid\+\_\+blocks = 0}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00152}{152}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/svetlasyrimis/\+Desktop/wire-\/network/\+WN-\/org/wire-\/system-\/contracts/contracts/sysio.\+system/include/sysio.\+system/\mbox{\hyperlink{sysio_8system_8hpp}{sysio.\+system.\+hpp}}\end{DoxyCompactItemize}

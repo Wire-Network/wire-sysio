@@ -1,0 +1,171 @@
+\doxysection{Catch\+::Xml\+Writer\+::Scoped\+Element Class Reference}
+\hypertarget{class_catch_1_1_xml_writer_1_1_scoped_element}{}\label{class_catch_1_1_xml_writer_1_1_scoped_element}\index{Catch::XmlWriter::ScopedElement@{Catch::XmlWriter::ScopedElement}}
+
+
+{\ttfamily \#include $<$catch\+\_\+xmlwriter.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_catch_1_1_xml_writer_1_1_scoped_element_ada01a4093c2fac019891456d701d349f}{Scoped\+Element}} (\mbox{\hyperlink{class_catch_1_1_xml_writer}{Xml\+Writer}} \texorpdfstring{$\ast$}{*}writer)
+\item 
+\mbox{\hyperlink{class_catch_1_1_xml_writer_1_1_scoped_element_af5889da2d2736614969a5e02686cd54a}{Scoped\+Element}} (\mbox{\hyperlink{class_catch_1_1_xml_writer_1_1_scoped_element}{Scoped\+Element}} \&\&other) noexcept
+\item 
+\mbox{\hyperlink{class_catch_1_1_xml_writer_1_1_scoped_element}{Scoped\+Element}} \& \mbox{\hyperlink{class_catch_1_1_xml_writer_1_1_scoped_element_a3f38213b2de1e2e46130cd8d26d37ac7}{operator=}} (\mbox{\hyperlink{class_catch_1_1_xml_writer_1_1_scoped_element}{Scoped\+Element}} \&\&other) noexcept
+\item 
+\mbox{\hyperlink{class_catch_1_1_xml_writer_1_1_scoped_element_a2b5d2b7ba641383c79675d1867789d8b}{\texorpdfstring{$\sim$}{\string~}\+Scoped\+Element}} ()
+\item 
+\mbox{\hyperlink{class_catch_1_1_xml_writer_1_1_scoped_element}{Scoped\+Element}} \& \mbox{\hyperlink{class_catch_1_1_xml_writer_1_1_scoped_element_a189c87f530ce85304ce4e1075609d2f5}{write\+Text}} (std\+::string const \&text, bool indent=true)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{class_catch_1_1_xml_writer_1_1_scoped_element}{Scoped\+Element}} \& \mbox{\hyperlink{class_catch_1_1_xml_writer_1_1_scoped_element_a33b1fe4123c56d644abe8f4cab3edb45}{write\+Attribute}} (std\+::string const \&\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const \&attribute)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{catch__xmlwriter_8h_source_l00036}{36}} of file \mbox{\hyperlink{catch__xmlwriter_8h_source}{catch\+\_\+xmlwriter.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_catch_1_1_xml_writer_1_1_scoped_element_ada01a4093c2fac019891456d701d349f}\index{Catch::XmlWriter::ScopedElement@{Catch::XmlWriter::ScopedElement}!ScopedElement@{ScopedElement}}
+\index{ScopedElement@{ScopedElement}!Catch::XmlWriter::ScopedElement@{Catch::XmlWriter::ScopedElement}}
+\doxysubsubsection{\texorpdfstring{ScopedElement()}{ScopedElement()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_xml_writer_1_1_scoped_element_ada01a4093c2fac019891456d701d349f} 
+Catch\+::\+Xml\+Writer\+::\+Scoped\+Element\+::\+Scoped\+Element (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_catch_1_1_xml_writer}{Xml\+Writer}} \texorpdfstring{$\ast$}{*}}]{writer}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{include_2internal_2catch__xmlwriter_8cpp_source_l00160}{160}} of file \mbox{\hyperlink{include_2internal_2catch__xmlwriter_8cpp_source}{catch\+\_\+xmlwriter.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00161\ \ \ \ \ :\ \ \ m\_writer(\ writer\ )}
+\DoxyCodeLine{00162\ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_xml_writer_1_1_scoped_element_af5889da2d2736614969a5e02686cd54a}\index{Catch::XmlWriter::ScopedElement@{Catch::XmlWriter::ScopedElement}!ScopedElement@{ScopedElement}}
+\index{ScopedElement@{ScopedElement}!Catch::XmlWriter::ScopedElement@{Catch::XmlWriter::ScopedElement}}
+\doxysubsubsection{\texorpdfstring{ScopedElement()}{ScopedElement()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_xml_writer_1_1_scoped_element_af5889da2d2736614969a5e02686cd54a} 
+Catch\+::\+Xml\+Writer\+::\+Scoped\+Element\+::\+Scoped\+Element (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_catch_1_1_xml_writer_1_1_scoped_element}{Scoped\+Element}} \&\&}]{other}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{include_2internal_2catch__xmlwriter_8cpp_source_l00164}{164}} of file \mbox{\hyperlink{include_2internal_2catch__xmlwriter_8cpp_source}{catch\+\_\+xmlwriter.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00165\ \ \ \ \ :\ \ \ m\_writer(\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.m\_writer\ )\{}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.m\_writer\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00167\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_xml_writer_1_1_scoped_element_a2b5d2b7ba641383c79675d1867789d8b}\index{Catch::XmlWriter::ScopedElement@{Catch::XmlWriter::ScopedElement}!````~ScopedElement@{\texorpdfstring{$\sim$}{\string~}ScopedElement}}
+\index{````~ScopedElement@{\texorpdfstring{$\sim$}{\string~}ScopedElement}!Catch::XmlWriter::ScopedElement@{Catch::XmlWriter::ScopedElement}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}ScopedElement()}{\string~ScopedElement()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_xml_writer_1_1_scoped_element_a2b5d2b7ba641383c79675d1867789d8b} 
+Catch\+::\+Xml\+Writer\+::\+Scoped\+Element\+::\texorpdfstring{$\sim$}{\string~}\+Scoped\+Element (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{include_2internal_2catch__xmlwriter_8cpp_source_l00178}{178}} of file \mbox{\hyperlink{include_2internal_2catch__xmlwriter_8cpp_source}{catch\+\_\+xmlwriter.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ m\_writer\ )}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \ \ \ \ m\_writer-\/>\mbox{\hyperlink{class_catch_1_1_xml_writer_a8fcaa0821b6c2c1750c654af0b33c823}{endElement}}();}
+\DoxyCodeLine{00181\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_catch_1_1_xml_writer_1_1_scoped_element_a3f38213b2de1e2e46130cd8d26d37ac7}\index{Catch::XmlWriter::ScopedElement@{Catch::XmlWriter::ScopedElement}!operator=@{operator=}}
+\index{operator=@{operator=}!Catch::XmlWriter::ScopedElement@{Catch::XmlWriter::ScopedElement}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_xml_writer_1_1_scoped_element_a3f38213b2de1e2e46130cd8d26d37ac7} 
+\mbox{\hyperlink{class_catch_1_1_xml_writer_1_1_scoped_element}{Xml\+Writer\+::\+Scoped\+Element}} \& Catch\+::\+Xml\+Writer\+::\+Scoped\+Element\+::operator= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_catch_1_1_xml_writer_1_1_scoped_element}{Scoped\+Element}} \&\&}]{other}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{include_2internal_2catch__xmlwriter_8cpp_source_l00168}{168}} of file \mbox{\hyperlink{include_2internal_2catch__xmlwriter_8cpp_source}{catch\+\_\+xmlwriter.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ m\_writer\ )\ \{}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \ \ \ \ m\_writer-\/>\mbox{\hyperlink{class_catch_1_1_xml_writer_a8fcaa0821b6c2c1750c654af0b33c823}{endElement}}();}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ m\_writer\ =\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.m\_writer;}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.m\_writer\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00175\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_xml_writer_1_1_scoped_element_a33b1fe4123c56d644abe8f4cab3edb45}\index{Catch::XmlWriter::ScopedElement@{Catch::XmlWriter::ScopedElement}!writeAttribute@{writeAttribute}}
+\index{writeAttribute@{writeAttribute}!Catch::XmlWriter::ScopedElement@{Catch::XmlWriter::ScopedElement}}
+\doxysubsubsection{\texorpdfstring{writeAttribute()}{writeAttribute()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_xml_writer_1_1_scoped_element_a33b1fe4123c56d644abe8f4cab3edb45} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{class_catch_1_1_xml_writer_1_1_scoped_element}{Scoped\+Element}} \& Catch\+::\+Xml\+Writer\+::\+Scoped\+Element\+::write\+Attribute (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{name}{, }\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const \&}]{attribute}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__xmlwriter_8h_source_l00048}{48}} of file \mbox{\hyperlink{catch__xmlwriter_8h_source}{catch\+\_\+xmlwriter.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_writer-\/>\mbox{\hyperlink{class_catch_1_1_xml_writer_ad433310b59d30e0fedc7130dc11c563b}{writeAttribute}}(\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ attribute\ );}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_xml_writer_1_1_scoped_element_a33b1fe4123c56d644abe8f4cab3edb45_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_xml_writer_1_1_scoped_element_a33b1fe4123c56d644abe8f4cab3edb45_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_xml_writer_1_1_scoped_element_a189c87f530ce85304ce4e1075609d2f5}\index{Catch::XmlWriter::ScopedElement@{Catch::XmlWriter::ScopedElement}!writeText@{writeText}}
+\index{writeText@{writeText}!Catch::XmlWriter::ScopedElement@{Catch::XmlWriter::ScopedElement}}
+\doxysubsubsection{\texorpdfstring{writeText()}{writeText()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_xml_writer_1_1_scoped_element_a189c87f530ce85304ce4e1075609d2f5} 
+\mbox{\hyperlink{class_catch_1_1_xml_writer_1_1_scoped_element}{Xml\+Writer\+::\+Scoped\+Element}} \& Catch\+::\+Xml\+Writer\+::\+Scoped\+Element\+::write\+Text (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{text}{, }\item[{bool}]{indent}{ = {\ttfamily true}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{include_2internal_2catch__xmlwriter_8cpp_source_l00183}{183}} of file \mbox{\hyperlink{include_2internal_2catch__xmlwriter_8cpp_source}{catch\+\_\+xmlwriter.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ m\_writer-\/>\mbox{\hyperlink{class_catch_1_1_xml_writer_a4c49775bdf7b5bd870b34ab22af62a9c}{writeText}}(\ text,\ indent\ );}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00186\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_xml_writer_1_1_scoped_element_a189c87f530ce85304ce4e1075609d2f5_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__xmlwriter_8h}{catch\+\_\+xmlwriter.\+h}}\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{include_2internal_2catch__xmlwriter_8cpp}{catch\+\_\+xmlwriter.\+cpp}}\end{DoxyCompactItemize}

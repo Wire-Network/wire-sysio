@@ -1,0 +1,11 @@
+<map id="websocketpp::transport::asio::local_endpoint::listen" name="websocketpp::transport::asio::local_endpoint::listen">
+<area shape="rect" id="Node000001" title="Set up endpoint for listening manually." alt="" coords="5,41,163,97"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1transport_1_1asio_1_1local__endpoint.html#aeeaa782aa3ad6c49361d9665298f07c2" title="Set up endpoint for listening manually (exception free)" alt="" coords="211,41,368,97"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="163,66,195,66,195,72,163,72"/>
+<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1transport_1_1asio_1_1local__endpoint.html#a0934a87564bb423b4b0a83355b6a59b4" title="Retrieve a reference to the endpoint&#39;s io_service." alt="" coords="416,5,573,61"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="368,53,400,47,401,52,369,58"/>
+<area shape="rect" id="Node000004" href="$namespacewebsocketpp_1_1error.html#a3344622df8c36e8ae03c59164e7b5e89" title=" " alt="" coords="428,85,561,126"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="369,80,413,88,412,94,368,86"/>
+<area shape="rect" id="Node000005" href="$namespacewebsocketpp_1_1error.html#ac1acac2bfb24bbd2b1791db80993b0c2" title=" " alt="" coords="621,85,754,126"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="561,102,606,102,606,108,561,108"/>
+</map>

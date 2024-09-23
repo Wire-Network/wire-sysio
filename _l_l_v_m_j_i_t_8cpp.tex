@@ -1,0 +1,130 @@
+\doxysection{libraries/chain/webassembly/runtimes/sys-\/vm-\/oc/\+LLVMJIT.cpp File Reference}
+\hypertarget{_l_l_v_m_j_i_t_8cpp}{}\label{_l_l_v_m_j_i_t_8cpp}\index{libraries/chain/webassembly/runtimes/sys-\/vm-\/oc/LLVMJIT.cpp@{libraries/chain/webassembly/runtimes/sys-\/vm-\/oc/LLVMJIT.cpp}}
+{\ttfamily \#include "{}LLVMJIT.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+Execution\+Engine/\+Execution\+Engine.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+Execution\+Engine/\+RTDyld\+Memory\+Manager.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+Execution\+Engine/\+Orc/\+Compile\+Utils.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+Execution\+Engine/\+Orc/\+IRCompile\+Layer.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+Execution\+Engine/\+Orc/\+Lambda\+Resolver.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+Execution\+Engine/\+Orc/\+RTDyld\+Object\+Linking\+Layer.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+Execution\+Engine/\+Orc/\+Null\+Resolver.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+Execution\+Engine/\+Orc/\+Core.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+Analysis/\+Passes.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+IR/\+Data\+Layout.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+IR/\+Derived\+Types.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+IR/\+IRBuilder.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+IR/\+LLVMContext.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+IR/\+Legacy\+Pass\+Manager.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+IR/\+Module.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+IR/\+Intrinsics.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+IR/\+Verifier.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+IR/\+Value\+Handle.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+IR/\+Debug\+Loc.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+Object/\+Object\+File.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+Object/\+Symbol\+Size.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+Support/\+Debug.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+Support/\+Data\+Types.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+Support/\+File\+System.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+Support/\+Target\+Select.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+Support/\+Host.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+Support/\+Dynamic\+Library.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+Transforms/\+Scalar.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+IR/\+DIBuilder.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+Transforms/\+Inst\+Combine/\+Inst\+Combine.\+h"{}}\newline
+{\ttfamily \#include "{}llvm/\+Transforms/\+Utils.\+h"{}}\newline
+{\ttfamily \#include $<$memory$>$}\newline
+{\ttfamily \#include $<$fc/io/datastream.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/io/raw.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/reflect/typename.\+hpp$>$}\newline
+{\ttfamily \#include "{}llvm/\+Support/\+LEB128.\+h"{}}\newline
+Include dependency graph for LLVMJIT.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{_l_l_v_m_j_i_t_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_unit_memory_manager}{sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::\+Unit\+Memory\+Manager}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_1_1_j_i_t_module}{sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::\+JITModule}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain}{sysio\+::chain}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc}{sysio\+::chain\+::eosvmoc}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t}{sysio\+::chain\+::eosvmoc\+::\+LLVMJIT}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{_l_l_v_m_j_i_t_8cpp_a5c74e15987848b85dbb98a9da695ae26}{DUMP\+\_\+\+UNOPTIMIZED\+\_\+\+MODULE}}~0
+\item 
+\#define \mbox{\hyperlink{_l_l_v_m_j_i_t_8cpp_af2b23fa859365a0fcfe493e9ac40b6aa}{VERIFY\+\_\+\+MODULE}}~0
+\item 
+\#define \mbox{\hyperlink{_l_l_v_m_j_i_t_8cpp_a22b37db990db6936e315c47f946e07b8}{DUMP\+\_\+\+OPTIMIZED\+\_\+\+MODULE}}~0
+\item 
+\#define \mbox{\hyperlink{_l_l_v_m_j_i_t_8cpp_a5fa484a6e6f50b0e0c22852a3dfc2ec5}{PRINT\+\_\+\+DISASSEMBLY}}~0
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_ad380b9c76f5f65db2c744a9c46815c3b}{sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::print\+Module}} (const llvm\+::\+Module \texorpdfstring{$\ast$}{*}llvm\+Module, const char \texorpdfstring{$\ast$}{*}filename)
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1instantiated__code}{instantiated\+\_\+code}} \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a5bd12a2d92a270ecd02902006bc53f59}{sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::instantiate\+Module}} (const \mbox{\hyperlink{struct_i_r_1_1_module}{IR\+::\+Module}} \&module)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+llvm\+::\+Target\+Machine \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1_l_l_v_m_j_i_t_a60cb0d30b54b5e84e4fd23a6b2764dfa}{sysio\+::chain\+::eosvmoc\+::\+LLVMJIT\+::target\+Machine}} = nullptr
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{_l_l_v_m_j_i_t_8cpp_a22b37db990db6936e315c47f946e07b8}\index{LLVMJIT.cpp@{LLVMJIT.cpp}!DUMP\_OPTIMIZED\_MODULE@{DUMP\_OPTIMIZED\_MODULE}}
+\index{DUMP\_OPTIMIZED\_MODULE@{DUMP\_OPTIMIZED\_MODULE}!LLVMJIT.cpp@{LLVMJIT.cpp}}
+\doxysubsubsection{\texorpdfstring{DUMP\_OPTIMIZED\_MODULE}{DUMP\_OPTIMIZED\_MODULE}}
+{\footnotesize\ttfamily \label{_l_l_v_m_j_i_t_8cpp_a22b37db990db6936e315c47f946e07b8} 
+\#define DUMP\+\_\+\+OPTIMIZED\+\_\+\+MODULE~0}
+
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_j_i_t_8cpp_source_l00069}{69}} of file \mbox{\hyperlink{_l_l_v_m_j_i_t_8cpp_source}{LLVMJIT.\+cpp}}.
+
+\Hypertarget{_l_l_v_m_j_i_t_8cpp_a5c74e15987848b85dbb98a9da695ae26}\index{LLVMJIT.cpp@{LLVMJIT.cpp}!DUMP\_UNOPTIMIZED\_MODULE@{DUMP\_UNOPTIMIZED\_MODULE}}
+\index{DUMP\_UNOPTIMIZED\_MODULE@{DUMP\_UNOPTIMIZED\_MODULE}!LLVMJIT.cpp@{LLVMJIT.cpp}}
+\doxysubsubsection{\texorpdfstring{DUMP\_UNOPTIMIZED\_MODULE}{DUMP\_UNOPTIMIZED\_MODULE}}
+{\footnotesize\ttfamily \label{_l_l_v_m_j_i_t_8cpp_a5c74e15987848b85dbb98a9da695ae26} 
+\#define DUMP\+\_\+\+UNOPTIMIZED\+\_\+\+MODULE~0}
+
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_j_i_t_8cpp_source_l00067}{67}} of file \mbox{\hyperlink{_l_l_v_m_j_i_t_8cpp_source}{LLVMJIT.\+cpp}}.
+
+\Hypertarget{_l_l_v_m_j_i_t_8cpp_a5fa484a6e6f50b0e0c22852a3dfc2ec5}\index{LLVMJIT.cpp@{LLVMJIT.cpp}!PRINT\_DISASSEMBLY@{PRINT\_DISASSEMBLY}}
+\index{PRINT\_DISASSEMBLY@{PRINT\_DISASSEMBLY}!LLVMJIT.cpp@{LLVMJIT.cpp}}
+\doxysubsubsection{\texorpdfstring{PRINT\_DISASSEMBLY}{PRINT\_DISASSEMBLY}}
+{\footnotesize\ttfamily \label{_l_l_v_m_j_i_t_8cpp_a5fa484a6e6f50b0e0c22852a3dfc2ec5} 
+\#define PRINT\+\_\+\+DISASSEMBLY~0}
+
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_j_i_t_8cpp_source_l00070}{70}} of file \mbox{\hyperlink{_l_l_v_m_j_i_t_8cpp_source}{LLVMJIT.\+cpp}}.
+
+\Hypertarget{_l_l_v_m_j_i_t_8cpp_af2b23fa859365a0fcfe493e9ac40b6aa}\index{LLVMJIT.cpp@{LLVMJIT.cpp}!VERIFY\_MODULE@{VERIFY\_MODULE}}
+\index{VERIFY\_MODULE@{VERIFY\_MODULE}!LLVMJIT.cpp@{LLVMJIT.cpp}}
+\doxysubsubsection{\texorpdfstring{VERIFY\_MODULE}{VERIFY\_MODULE}}
+{\footnotesize\ttfamily \label{_l_l_v_m_j_i_t_8cpp_af2b23fa859365a0fcfe493e9ac40b6aa} 
+\#define VERIFY\+\_\+\+MODULE~0}
+
+
+
+Definition at line \mbox{\hyperlink{_l_l_v_m_j_i_t_8cpp_source_l00068}{68}} of file \mbox{\hyperlink{_l_l_v_m_j_i_t_8cpp_source}{LLVMJIT.\+cpp}}.
+

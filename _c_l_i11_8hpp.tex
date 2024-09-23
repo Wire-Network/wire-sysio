@@ -1,0 +1,716 @@
+\doxysection{programs/clio/\+CLI11.hpp File Reference}
+\hypertarget{_c_l_i11_8hpp}{}\label{_c_l_i11_8hpp}\index{programs/clio/CLI11.hpp@{programs/clio/CLI11.hpp}}
+{\ttfamily \#include $<$algorithm$>$}\newline
+{\ttfamily \#include $<$cmath$>$}\newline
+{\ttfamily \#include $<$cstdint$>$}\newline
+{\ttfamily \#include $<$exception$>$}\newline
+{\ttfamily \#include $<$fstream$>$}\newline
+{\ttfamily \#include $<$functional$>$}\newline
+{\ttfamily \#include $<$iomanip$>$}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$iterator$>$}\newline
+{\ttfamily \#include $<$limits$>$}\newline
+{\ttfamily \#include $<$locale$>$}\newline
+{\ttfamily \#include $<$map$>$}\newline
+{\ttfamily \#include $<$memory$>$}\newline
+{\ttfamily \#include $<$numeric$>$}\newline
+{\ttfamily \#include $<$set$>$}\newline
+{\ttfamily \#include $<$sstream$>$}\newline
+{\ttfamily \#include $<$stdexcept$>$}\newline
+{\ttfamily \#include $<$string$>$}\newline
+{\ttfamily \#include $<$tuple$>$}\newline
+{\ttfamily \#include $<$type\+\_\+traits$>$}\newline
+{\ttfamily \#include $<$utility$>$}\newline
+{\ttfamily \#include $<$vector$>$}\newline
+{\ttfamily \#include $<$sys/stat.\+h$>$}\newline
+{\ttfamily \#include $<$sys/types.\+h$>$}\newline
+Include dependency graph for CLI11.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{_c_l_i11_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=203pt]{_c_l_i11_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_error}{CLI\+::\+Error}}
+\begin{DoxyCompactList}\small\item\em All errors derive from this one. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_construction_error}{CLI\+::\+Construction\+Error}}
+\begin{DoxyCompactList}\small\item\em Construction errors (not in parsing) \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_incorrect_construction}{CLI\+::\+Incorrect\+Construction}}
+\begin{DoxyCompactList}\small\item\em Thrown when an option is set to conflicting values (non-\/vector and multi args, for example) \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_bad_name_string}{CLI\+::\+Bad\+Name\+String}}
+\begin{DoxyCompactList}\small\item\em Thrown on construction of a bad name. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_option_already_added}{CLI\+::\+Option\+Already\+Added}}
+\begin{DoxyCompactList}\small\item\em Thrown when an option already exists. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_parse_error}{CLI\+::\+Parse\+Error}}
+\begin{DoxyCompactList}\small\item\em Anything that can error in Parse. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_success}{CLI\+::\+Success}}
+\begin{DoxyCompactList}\small\item\em This is a successful completion on parsing, supposed to exit. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_call_for_help}{CLI\+::\+Call\+For\+Help}}
+\begin{DoxyCompactList}\small\item\em -\/h or --help on command line \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_call_for_all_help}{CLI\+::\+Call\+For\+All\+Help}}
+\begin{DoxyCompactList}\small\item\em Usually something like --help-\/all on command line. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_runtime_error}{CLI\+::\+Runtime\+Error}}
+\begin{DoxyCompactList}\small\item\em Does not output a diagnostic in CLI11\+\_\+\+PARSE, but allows to return from \doxylink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main()} with a specific error code. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_file_error}{CLI\+::\+File\+Error}}
+\begin{DoxyCompactList}\small\item\em Thrown when parsing an INI file and it is missing. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_conversion_error}{CLI\+::\+Conversion\+Error}}
+\begin{DoxyCompactList}\small\item\em Thrown when conversion call back fails, such as when an int fails to coerce to a string. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_validation_error}{CLI\+::\+Validation\+Error}}
+\begin{DoxyCompactList}\small\item\em Thrown when validation of results fails. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_required_error}{CLI\+::\+Required\+Error}}
+\begin{DoxyCompactList}\small\item\em Thrown when a required option is missing. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_argument_mismatch}{CLI\+::\+Argument\+Mismatch}}
+\begin{DoxyCompactList}\small\item\em Thrown when the wrong number of arguments has been received. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_requires_error}{CLI\+::\+Requires\+Error}}
+\begin{DoxyCompactList}\small\item\em Thrown when a requires option is missing. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_excludes_error}{CLI\+::\+Excludes\+Error}}
+\begin{DoxyCompactList}\small\item\em Thrown when an excludes option is present. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_extras_error}{CLI\+::\+Extras\+Error}}
+\begin{DoxyCompactList}\small\item\em Thrown when too many positionals or options are found. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_config_error}{CLI\+::\+Config\+Error}}
+\begin{DoxyCompactList}\small\item\em Thrown when extra values are found in an INI file. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_invalid_error}{CLI\+::\+Invalid\+Error}}
+\begin{DoxyCompactList}\small\item\em Thrown when validation fails before parsing. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_horrible_error}{CLI\+::\+Horrible\+Error}}
+\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_option_not_found}{CLI\+::\+Option\+Not\+Found}}
+\begin{DoxyCompactList}\small\item\em Thrown when counting a non-\/existent option. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_c_l_i_1_1make__void}{CLI\+::make\+\_\+void$<$ Ts $>$}}
+\begin{DoxyCompactList}\small\item\em \doxylink{struct_a}{A} copy of std\+::void\+\_\+t from C++17 (helper for C++11 and C++14) \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_c_l_i_1_1is__vector}{CLI\+::is\+\_\+vector$<$ T $>$}}
+\begin{DoxyCompactList}\small\item\em Check to see if something is a vector (fail check by default) \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_c_l_i_1_1is__vector_3_01std_1_1vector_3_01_t_00_01_a_01_4_01_4}{CLI\+::is\+\_\+vector$<$ std\+::vector$<$ T, A $>$ $>$}}
+\begin{DoxyCompactList}\small\item\em Check to see if something is a vector (true if actually a vector) \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_c_l_i_1_1is__vector_3_01const_01std_1_1vector_3_01_t_00_01_a_01_4_01_4}{CLI\+::is\+\_\+vector$<$ const std\+::vector$<$ T, A $>$ $>$}}
+\begin{DoxyCompactList}\small\item\em Check to see if something is a vector (true if actually a const vector) \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_c_l_i_1_1is__bool}{CLI\+::is\+\_\+bool$<$ T $>$}}
+\begin{DoxyCompactList}\small\item\em Check to see if something is bool (fail check by default) \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_c_l_i_1_1is__bool_3_01bool_01_4}{CLI\+::is\+\_\+bool$<$ bool $>$}}
+\begin{DoxyCompactList}\small\item\em Check to see if something is bool (true if actually a bool) \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_c_l_i_1_1is__shared__ptr}{CLI\+::is\+\_\+shared\+\_\+ptr$<$ T $>$}}
+\begin{DoxyCompactList}\small\item\em Check to see if something is a shared pointer. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_c_l_i_1_1is__shared__ptr_3_01std_1_1shared__ptr_3_01_t_01_4_01_4}{CLI\+::is\+\_\+shared\+\_\+ptr$<$ std\+::shared\+\_\+ptr$<$ T $>$ $>$}}
+\begin{DoxyCompactList}\small\item\em Check to see if something is a shared pointer (True if really a shared pointer) \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_c_l_i_1_1is__shared__ptr_3_01const_01std_1_1shared__ptr_3_01_t_01_4_01_4}{CLI\+::is\+\_\+shared\+\_\+ptr$<$ const std\+::shared\+\_\+ptr$<$ T $>$ $>$}}
+\begin{DoxyCompactList}\small\item\em Check to see if something is a shared pointer (True if really a shared pointer) \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_c_l_i_1_1is__copyable__ptr}{CLI\+::is\+\_\+copyable\+\_\+ptr$<$ T $>$}}
+\begin{DoxyCompactList}\small\item\em Check to see if something is copyable pointer. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_c_l_i_1_1_is_member_type}{CLI\+::\+Is\+Member\+Type$<$ T $>$}}
+\begin{DoxyCompactList}\small\item\em This can be specialized to override the type deduction for \doxylink{class_c_l_i_1_1_is_member}{Is\+Member}. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_c_l_i_1_1_is_member_type_3_01const_01char_01_5_01_4}{CLI\+::\+Is\+Member\+Type$<$ const char \texorpdfstring{$\ast$}{*} $>$}}
+\begin{DoxyCompactList}\small\item\em The main custom type needed here is const char \texorpdfstring{$\ast$}{*} should be a string. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1element__type}{CLI\+::detail\+::element\+\_\+type$<$ T, Enable $>$}}
+\begin{DoxyCompactList}\small\item\em not a pointer \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1element__type_3_01_t_00_01typename_01std_1_1enable__if_3_01is__copyablcf4068753293666f52fa2143458d7e20}{CLI\+::detail\+::element\+\_\+type$<$ T, typename std\+::enable\+\_\+if$<$ is\+\_\+copyable\+\_\+ptr$<$ T $>$\+::value $>$\+::type $>$}}
+\item 
+struct \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1element__value__type}{CLI\+::detail\+::element\+\_\+value\+\_\+type$<$ T $>$}}
+\item 
+struct \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1pair__adaptor}{CLI\+::detail\+::pair\+\_\+adaptor$<$ T, \+\_\+ $>$}}
+\begin{DoxyCompactList}\small\item\em Adaptor for set-\/like structure\+: This just wraps a normal container in a few utilities that do almost nothing. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1pair__adaptor_3_01_t_00_01conditional__t_3_01false_00_01void__t_3_01ty57376c4a6f008b828f6707df132586d8}{CLI\+::detail\+::pair\+\_\+adaptor$<$ T, conditional\+\_\+t$<$ false, void\+\_\+t$<$ typename T\+::value\+\_\+type\+::first\+\_\+type, typename T\+::value\+\_\+type\+::second\+\_\+type $>$, void $>$ $>$}}
+\item 
+class \mbox{\hyperlink{class_c_l_i_1_1detail_1_1is__direct__constructible}{CLI\+::detail\+::is\+\_\+direct\+\_\+constructible$<$ T, C $>$}}
+\item 
+class \mbox{\hyperlink{class_c_l_i_1_1detail_1_1is__ostreamable}{CLI\+::detail\+::is\+\_\+ostreamable$<$ T, S $>$}}
+\item 
+class \mbox{\hyperlink{class_c_l_i_1_1detail_1_1is__istreamable}{CLI\+::detail\+::is\+\_\+istreamable$<$ T, S $>$}}
+\begin{DoxyCompactList}\small\item\em Check for input streamability. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1detail_1_1is__tuple__like}{CLI\+::detail\+::is\+\_\+tuple\+\_\+like$<$ S $>$}}
+\item 
+struct \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1type__count}{CLI\+::detail\+::type\+\_\+count$<$ T, Enable $>$}}
+\begin{DoxyCompactList}\small\item\em This will only trigger for actual void type. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1type__count_3_01_t_00_01typename_01std_1_1enable__if_3_01is__tuple__lib482ac0ca1aad74b6674b0feae1048ce}{CLI\+::detail\+::type\+\_\+count$<$ T, typename std\+::enable\+\_\+if$<$ is\+\_\+tuple\+\_\+like$<$ T $>$\+::value $>$\+::type $>$}}
+\begin{DoxyCompactList}\small\item\em Set of overloads to get the type size of an object. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1type__count_3_01_t_00_01typename_01std_1_1enable__if_3_9is__vector_3_0aabd6e911136a08fa4cb8f1781520f17}{CLI\+::detail\+::type\+\_\+count$<$ T, typename std\+::enable\+\_\+if$<$!is\+\_\+vector$<$ T $>$\+::value \&\&!is\+\_\+tuple\+\_\+like$<$ T $>$\+::value \&\&!std\+::is\+\_\+void$<$ T $>$\+::value $>$\+::type $>$}}
+\begin{DoxyCompactList}\small\item\em Type size for regular object types that do not look like a tuple. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1type__count_3_01_t_00_01typename_01std_1_1enable__if_3_01is__vector_3_77a9b9ee83edfc354fc46974345ae336}{CLI\+::detail\+::type\+\_\+count$<$ T, typename std\+::enable\+\_\+if$<$ is\+\_\+vector$<$ T $>$\+::value $>$\+::type $>$}}
+\begin{DoxyCompactList}\small\item\em Type size of types that look like a vector. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1expected__count}{CLI\+::detail\+::expected\+\_\+count$<$ T, Enable $>$}}
+\begin{DoxyCompactList}\small\item\em This will only trigger for actual void type. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1expected__count_3_01_t_00_01typename_01std_1_1enable__if_3_9is__vector2807605b2b11124e2f33c3493734b7ce}{CLI\+::detail\+::expected\+\_\+count$<$ T, typename std\+::enable\+\_\+if$<$!is\+\_\+vector$<$ T $>$\+::value \&\&!std\+::is\+\_\+void$<$ T $>$\+::value $>$\+::type $>$}}
+\begin{DoxyCompactList}\small\item\em For most types the number of expected items is 1. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1expected__count_3_01_t_00_01typename_01std_1_1enable__if_3_01is__vecto2ce927b97a67c15be79b41f58cc84d9f}{CLI\+::detail\+::expected\+\_\+count$<$ T, typename std\+::enable\+\_\+if$<$ is\+\_\+vector$<$ T $>$\+::value $>$\+::type $>$}}
+\begin{DoxyCompactList}\small\item\em number of expected items in a vector \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1classify__object}{CLI\+::detail\+::classify\+\_\+object$<$ T, Enable $>$}}
+\begin{DoxyCompactList}\small\item\em some type that is not otherwise recognized \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1classify__object_3_01_t_00_01typename_01std_1_1enable__if_3_01std_1_1iffbb599657641462b4e4d006140224ab}{CLI\+::detail\+::classify\+\_\+object$<$ T, typename std\+::enable\+\_\+if$<$ std\+::is\+\_\+integral$<$ T $>$\+::value \&\&std\+::is\+\_\+signed$<$ T $>$\+::value \&\&!is\+\_\+bool$<$ T $>$\+::value \&\&!std\+::is\+\_\+enum$<$ T $>$\+::value $>$\+::type $>$}}
+\begin{DoxyCompactList}\small\item\em Set of overloads to classify an object according to type. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1classify__object_3_01_t_00_01typename_01std_1_1enable__if_3_01std_1_1i198218f5b2519ba2b95756e8ac17c482}{CLI\+::detail\+::classify\+\_\+object$<$ T, typename std\+::enable\+\_\+if$<$ std\+::is\+\_\+integral$<$ T $>$\+::value \&\&std\+::is\+\_\+unsigned$<$ T $>$\+::value \&\&!is\+\_\+bool$<$ T $>$\+::value $>$\+::type $>$}}
+\begin{DoxyCompactList}\small\item\em Unsigned integers. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1classify__object_3_01_t_00_01typename_01std_1_1enable__if_3_01is__bool1dde6223ac274a53411de2372c776e93}{CLI\+::detail\+::classify\+\_\+object$<$ T, typename std\+::enable\+\_\+if$<$ is\+\_\+bool$<$ T $>$\+::value $>$\+::type $>$}}
+\begin{DoxyCompactList}\small\item\em Boolean values. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1classify__object_3_01_t_00_01typename_01std_1_1enable__if_3_01std_1_1iafd5489e88712b72db8069a3d04de66b}{CLI\+::detail\+::classify\+\_\+object$<$ T, typename std\+::enable\+\_\+if$<$ std\+::is\+\_\+floating\+\_\+point$<$ T $>$\+::value $>$\+::type $>$}}
+\begin{DoxyCompactList}\small\item\em \doxylink{namespace_floats}{Floats}. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1classify__object_3_01_t_00_01typename_01std_1_1enable__if_3_9std_1_1is2aec2abd25ddffe2de8e7699a9b54e0c}{CLI\+::detail\+::classify\+\_\+object$<$ T, typename std\+::enable\+\_\+if$<$!std\+::is\+\_\+floating\+\_\+point$<$ T $>$\+::value \&\&!std\+::is\+\_\+integral$<$ T $>$\+::value \&\&std\+::is\+\_\+assignable$<$ T \&, std\+::string $>$\+::value \&\&!is\+\_\+vector$<$ T $>$\+::value $>$\+::type $>$}}
+\begin{DoxyCompactList}\small\item\em String and similar direct assignment. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1classify__object_3_01_t_00_01typename_01std_1_1enable__if_3_9std_1_1is429736ed7ec99761a26bea614c6dce44}{CLI\+::detail\+::classify\+\_\+object$<$ T, typename std\+::enable\+\_\+if$<$!std\+::is\+\_\+floating\+\_\+point$<$ T $>$\+::value \&\&!std\+::is\+\_\+integral$<$ T $>$\+::value \&\&!std\+::is\+\_\+assignable$<$ T \&, std\+::string $>$\+::value \&\&std\+::is\+\_\+constructible$<$ T, std\+::string $>$\+::value \&\&!is\+\_\+vector$<$ T $>$\+::value $>$\+::type $>$}}
+\begin{DoxyCompactList}\small\item\em String and similar constructible and copy assignment. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1classify__object_3_01_t_00_01typename_01std_1_1enable__if_3_01std_1_1ib25cef955d642a26cfa6da91f9a6fbe6}{CLI\+::detail\+::classify\+\_\+object$<$ T, typename std\+::enable\+\_\+if$<$ std\+::is\+\_\+enum$<$ T $>$\+::value $>$\+::type $>$}}
+\begin{DoxyCompactList}\small\item\em Enumerations. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1uncommon__type}{CLI\+::detail\+::uncommon\+\_\+type$<$ T $>$}}
+\item 
+struct \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1classify__object_3_01_t_00_01typename_01std_1_1enable__if_3_01uncommona5315872d362b6f99d1ff7b92bf4811d}{CLI\+::detail\+::classify\+\_\+object$<$ T, typename std\+::enable\+\_\+if$<$ uncommon\+\_\+type$<$ T $>$\+::value \&\&type\+\_\+count$<$ T $>$\+::value==1 \&\&is\+\_\+direct\+\_\+constructible$<$ T, double $>$\+::value \&\&is\+\_\+direct\+\_\+constructible$<$ T, int $>$\+::value $>$\+::type $>$}}
+\begin{DoxyCompactList}\small\item\em Assignable from double or int. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1classify__object_3_01_t_00_01typename_01std_1_1enable__if_3_01uncommon82a65f286d4e4d5fcdecd0733fad0bbf}{CLI\+::detail\+::classify\+\_\+object$<$ T, typename std\+::enable\+\_\+if$<$ uncommon\+\_\+type$<$ T $>$\+::value \&\&type\+\_\+count$<$ T $>$\+::value==1 \&\&!is\+\_\+direct\+\_\+constructible$<$ T, double $>$\+::value \&\&is\+\_\+direct\+\_\+constructible$<$ T, int $>$\+::value $>$\+::type $>$}}
+\begin{DoxyCompactList}\small\item\em Assignable from int. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1classify__object_3_01_t_00_01typename_01std_1_1enable__if_3_01uncommon9c99da11bed442438934fbae557cefda}{CLI\+::detail\+::classify\+\_\+object$<$ T, typename std\+::enable\+\_\+if$<$ uncommon\+\_\+type$<$ T $>$\+::value \&\&type\+\_\+count$<$ T $>$\+::value==1 \&\&is\+\_\+direct\+\_\+constructible$<$ T, double $>$\+::value \&\&!is\+\_\+direct\+\_\+constructible$<$ T, int $>$\+::value $>$\+::type $>$}}
+\begin{DoxyCompactList}\small\item\em Assignable from double. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1classify__object_3_01_t_00_01typename_01std_1_1enable__if_3_07type__co436517e7ba98bfc96d50e87cad9696c8}{CLI\+::detail\+::classify\+\_\+object$<$ T, typename std\+::enable\+\_\+if$<$(type\+\_\+count$<$ T $>$\+::value $>$=2 \&\&!is\+\_\+vector$<$ T $>$\+::value)\texorpdfstring{$\vert$}{|}\texorpdfstring{$\vert$}{|}(is\+\_\+tuple\+\_\+like$<$ T $>$\+::value \&\&uncommon\+\_\+type$<$ T $>$\+::value \&\&!is\+\_\+direct\+\_\+constructible$<$ T, double $>$\+::value \&\&!is\+\_\+direct\+\_\+constructible$<$ T, int $>$\+::value)$>$\+::type $>$}}
+\begin{DoxyCompactList}\small\item\em Tuple type. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1classify__object_3_01_t_00_01typename_01std_1_1enable__if_3_01is__vecta0329eee1aaf7de0c551104f760b26d2}{CLI\+::detail\+::classify\+\_\+object$<$ T, typename std\+::enable\+\_\+if$<$ is\+\_\+vector$<$ T $>$\+::value $>$\+::type $>$}}
+\begin{DoxyCompactList}\small\item\em Vector type. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_c_l_i_1_1_config_item}{CLI\+::\+Config\+Item}}
+\begin{DoxyCompactList}\small\item\em Holds values to load into Options. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_config}{CLI\+::\+Config}}
+\begin{DoxyCompactList}\small\item\em This class provides a converter for configuration files. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_config_base}{CLI\+::\+Config\+Base}}
+\begin{DoxyCompactList}\small\item\em This converter works with INI/\+TOML files; to write proper TOML files use \doxylink{class_c_l_i_1_1_config_t_o_m_l}{Config\+TOML}. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_config_t_o_m_l}{CLI\+::\+Config\+TOML}}
+\begin{DoxyCompactList}\small\item\em \doxylink{class_c_l_i_1_1_config_t_o_m_l}{Config\+TOML} generates a TOML compliant output. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_validator}{CLI\+::\+Validator}}
+\begin{DoxyCompactList}\small\item\em Some validators that are provided. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_custom_validator}{CLI\+::\+Custom\+Validator}}
+\begin{DoxyCompactList}\small\item\em Class wrapping some of the accessors of \doxylink{class_c_l_i_1_1_validator}{Validator}. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1detail_1_1_existing_file_validator}{CLI\+::detail\+::\+Existing\+File\+Validator}}
+\begin{DoxyCompactList}\small\item\em Check for an existing file (returns error message if check fails) \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1detail_1_1_existing_directory_validator}{CLI\+::detail\+::\+Existing\+Directory\+Validator}}
+\begin{DoxyCompactList}\small\item\em Check for an existing directory (returns error message if check fails) \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1detail_1_1_existing_path_validator}{CLI\+::detail\+::\+Existing\+Path\+Validator}}
+\begin{DoxyCompactList}\small\item\em Check for an existing path. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1detail_1_1_nonexistent_path_validator}{CLI\+::detail\+::\+Nonexistent\+Path\+Validator}}
+\begin{DoxyCompactList}\small\item\em Check for an non-\/existing path. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1detail_1_1_i_p_v4_validator}{CLI\+::detail\+::\+IPV4\+Validator}}
+\begin{DoxyCompactList}\small\item\em Validate the given string is a legal ipv4 address. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1detail_1_1_positive_number}{CLI\+::detail\+::\+Positive\+Number}}
+\begin{DoxyCompactList}\small\item\em Validate the argument is a number and greater than 0. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1detail_1_1_non_negative_number}{CLI\+::detail\+::\+Non\+Negative\+Number}}
+\begin{DoxyCompactList}\small\item\em Validate the argument is a number and greater than or equal to 0. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1detail_1_1_number}{CLI\+::detail\+::\+Number}}
+\begin{DoxyCompactList}\small\item\em Validate the argument is a number. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_range}{CLI\+::\+Range}}
+\begin{DoxyCompactList}\small\item\em Produce a range (factory). Min and max are inclusive. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_bound}{CLI\+::\+Bound}}
+\begin{DoxyCompactList}\small\item\em Produce a bounded range (factory). Min and max are inclusive. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1has__find}{CLI\+::detail\+::has\+\_\+find$<$ C, V $>$}}
+\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_is_member}{CLI\+::\+Is\+Member}}
+\begin{DoxyCompactList}\small\item\em Verify items are in a set. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_transformer}{CLI\+::\+Transformer}}
+\begin{DoxyCompactList}\small\item\em Translate named items to other or a value set. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_checked_transformer}{CLI\+::\+Checked\+Transformer}}
+\begin{DoxyCompactList}\small\item\em translate named items to other or a value set \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_as_number_with_unit}{CLI\+::\+As\+Number\+With\+Unit}}
+\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_as_size_value}{CLI\+::\+As\+Size\+Value}}
+\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_formatter_base}{CLI\+::\+Formatter\+Base}}
+\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_formatter_lambda}{CLI\+::\+Formatter\+Lambda}}
+\begin{DoxyCompactList}\small\item\em This is a specialty override for lambda functions. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_formatter}{CLI\+::\+Formatter}}
+\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_option_base}{CLI\+::\+Option\+Base$<$ CRTP $>$}}
+\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_option_defaults}{CLI\+::\+Option\+Defaults}}
+\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_option}{CLI\+::\+Option}}
+\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_app}{CLI\+::\+App}}
+\begin{DoxyCompactList}\small\item\em Creates a command line program, with very few defaults. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_option__group}{CLI\+::\+Option\+\_\+group}}
+\begin{DoxyCompactList}\small\item\em Extension of \doxylink{class_c_l_i_1_1_app}{App} to better manage groups of options. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1_app_friend}{CLI\+::detail\+::\+App\+Friend}}
+\begin{DoxyCompactList}\small\item\em This class is simply to allow tests access to \doxylink{class_c_l_i_1_1_app}{App}\textquotesingle{}s protected functions. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespace_c_l_i}{CLI}}
+\item 
+namespace \mbox{\hyperlink{namespace_c_l_i_1_1enums}{CLI\+::enums}}
+\item 
+namespace \mbox{\hyperlink{namespace_c_l_i_1_1detail}{CLI\+::detail}}
+\item 
+namespace \mbox{\hyperlink{namespace_c_l_i_1_1_failure_message}{CLI\+::\+Failure\+Message}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{_c_l_i11_8hpp_a1a2e30d6baa07959d9603aeb27e1bdb4}{CLI11\+\_\+\+VERSION\+\_\+\+MAJOR}}~1
+\item 
+\#define \mbox{\hyperlink{_c_l_i11_8hpp_ab6f9ac59f853b1948fdbcf1188750208}{CLI11\+\_\+\+VERSION\+\_\+\+MINOR}}~9
+\item 
+\#define \mbox{\hyperlink{_c_l_i11_8hpp_a7e997cfe2479493bde18e8f9ad4256f5}{CLI11\+\_\+\+VERSION\+\_\+\+PATCH}}~0
+\item 
+\#define \mbox{\hyperlink{_c_l_i11_8hpp_a1b8785b397aabcac7e4a07dafe066268}{CLI11\+\_\+\+VERSION}}~"{}1.\+9.\+0"{}
+\item 
+\#define \mbox{\hyperlink{_c_l_i11_8hpp_ab56dd908d351a84796414f79d57696d0}{CLI11\+\_\+\+DEPRECATED}}(reason)
+\item 
+\#define \mbox{\hyperlink{_c_l_i11_8hpp_aa5083d44020c499995d126efcdcf5b63}{CLI11\+\_\+\+ERROR\+\_\+\+DEF}}(parent,  \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})
+\item 
+\#define \mbox{\hyperlink{_c_l_i11_8hpp_a0da004ec8320e9f80f2eac076e1c4eef}{CLI11\+\_\+\+ERROR\+\_\+\+SIMPLE}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})
+\item 
+\#define \mbox{\hyperlink{_c_l_i11_8hpp_ae8938ad660eb0b84b667ea3ea54da42c}{CLI11\+\_\+\+PARSE}}(app,  argc,  \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$bool B, \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}  = void$>$ }\\using \mbox{\hyperlink{namespace_c_l_i_a4858f02cc3a0eeda7af44dd3e957b506}{CLI\+::enable\+\_\+if\+\_\+t}} = typename std\+::enable\+\_\+if$<$B, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$\+::type
+\item 
+{\footnotesize template$<$typename... Ts$>$ }\\using \mbox{\hyperlink{namespace_c_l_i_a202e774b5850d92a2b5650ad79b5d418}{CLI\+::void\+\_\+t}} = typename \mbox{\hyperlink{struct_c_l_i_1_1make__void}{make\+\_\+void}}$<$Ts...$>$\+::type
+\begin{DoxyCompactList}\small\item\em \doxylink{struct_a}{A} copy of std\+::void\+\_\+t from C++17 -\/ same reasoning as enable\+\_\+if\+\_\+t, it does not hurt to redefine. \end{DoxyCompactList}\item 
+{\footnotesize template$<$bool B, \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} F $>$ }\\using \mbox{\hyperlink{namespace_c_l_i_ac092ca4f58943edb3d71c563b3e7c953}{CLI\+::conditional\+\_\+t}} = typename std\+::conditional$<$B, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, F$>$\+::type
+\begin{DoxyCompactList}\small\item\em \doxylink{struct_a}{A} copy of std\+::conditional\+\_\+t from C++14 -\/ same reasoning as enable\+\_\+if\+\_\+t, it does not hurt to redefine. \end{DoxyCompactList}\item 
+using \mbox{\hyperlink{namespace_c_l_i_a15ab3d231d9eabe775a3cca1616acb84}{CLI\+::\+Config\+INI}} = \mbox{\hyperlink{class_c_l_i_1_1_config_base}{Config\+Base}}
+\begin{DoxyCompactList}\small\item\em the default \doxylink{class_c_l_i_1_1_config}{Config} is the INI file format \end{DoxyCompactList}\item 
+using \mbox{\hyperlink{namespace_c_l_i_af6f17295305147505ec3636151d35bbb}{CLI\+::results\+\_\+t}} = std\+::vector$<$std\+::string$>$
+\item 
+using \mbox{\hyperlink{namespace_c_l_i_aee5516e2fe4d7b0298d5491d73ccefe5}{CLI\+::callback\+\_\+t}} = std\+::function$<$bool(const \mbox{\hyperlink{namespace_c_l_i_af6f17295305147505ec3636151d35bbb}{results\+\_\+t}} \&)$>$
+\begin{DoxyCompactList}\small\item\em callback function definition \end{DoxyCompactList}\item 
+using \mbox{\hyperlink{namespace_c_l_i_afca10810a722704f401fe6c5bf57d52a}{CLI\+::\+Option\+\_\+p}} = std\+::unique\+\_\+ptr$<$\mbox{\hyperlink{class_c_l_i_1_1_option}{Option}}$>$
+\item 
+using \mbox{\hyperlink{namespace_c_l_i_a03ebc4aee21ceb9f5f33b6636e9af481}{CLI\+::\+App\+\_\+p}} = std\+::shared\+\_\+ptr$<$\mbox{\hyperlink{class_c_l_i_1_1_app}{App}}$>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum class \mbox{\hyperlink{namespace_c_l_i_a1d8108a219533f0b0361640a017f037e}{CLI\+::\+Exit\+Codes}} \{ \newline
+\mbox{\hyperlink{namespace_c_l_i_a1d8108a219533f0b0361640a017f037ea505a83f220c02df2f85c3810cd9ceb38}{CLI\+::\+Success}} = 0
+, \mbox{\hyperlink{namespace_c_l_i_a1d8108a219533f0b0361640a017f037ea903d95792f297008a1fd3fab8df69f79}{CLI\+::\+Incorrect\+Construction}} = 100
+, \mbox{\hyperlink{namespace_c_l_i_a1d8108a219533f0b0361640a017f037eab319e260db27232cb74e2a23124b7a2c}{CLI\+::\+Bad\+Name\+String}}
+, \mbox{\hyperlink{namespace_c_l_i_a1d8108a219533f0b0361640a017f037eade33f5f54db87abfb2926228f0867038}{CLI\+::\+Option\+Already\+Added}}
+, \newline
+\mbox{\hyperlink{namespace_c_l_i_a1d8108a219533f0b0361640a017f037ea06344c468073b2b66824779ffa5105cc}{CLI\+::\+File\+Error}}
+, \mbox{\hyperlink{namespace_c_l_i_a1d8108a219533f0b0361640a017f037ea33f8a28d3c790e00d94cc848895dfb51}{CLI\+::\+Conversion\+Error}}
+, \mbox{\hyperlink{namespace_c_l_i_a1d8108a219533f0b0361640a017f037ea8180c46099f957f51b2bc31f7f0f5c42}{CLI\+::\+Validation\+Error}}
+, \mbox{\hyperlink{namespace_c_l_i_a1d8108a219533f0b0361640a017f037ea9f418597ecc2a82cc220ea24b53505d3}{CLI\+::\+Required\+Error}}
+, \newline
+\mbox{\hyperlink{namespace_c_l_i_a1d8108a219533f0b0361640a017f037ea5a33e2f2a0eda1a6a9d8534c79459794}{CLI\+::\+Requires\+Error}}
+, \mbox{\hyperlink{namespace_c_l_i_a1d8108a219533f0b0361640a017f037ea180b6078f0a0618bbdbaeda656841923}{CLI\+::\+Excludes\+Error}}
+, \mbox{\hyperlink{namespace_c_l_i_a1d8108a219533f0b0361640a017f037ea12e25f67fcb619ec309d229ae4b9d75e}{CLI\+::\+Extras\+Error}}
+, \mbox{\hyperlink{namespace_c_l_i_a1d8108a219533f0b0361640a017f037ea1053efdc7a34708782767df3ed95cded}{CLI\+::\+Config\+Error}}
+, \newline
+\mbox{\hyperlink{namespace_c_l_i_a1d8108a219533f0b0361640a017f037eaf65e8093ec3083c0c4909e321df2ece7}{CLI\+::\+Invalid\+Error}}
+, \mbox{\hyperlink{namespace_c_l_i_a1d8108a219533f0b0361640a017f037eaaadcc078255a085fcac00639a9519392}{CLI\+::\+Horrible\+Error}}
+, \mbox{\hyperlink{namespace_c_l_i_a1d8108a219533f0b0361640a017f037eaa40b471f8a3c0ca91e719ea8101aa46d}{CLI\+::\+Option\+Not\+Found}}
+, \mbox{\hyperlink{namespace_c_l_i_a1d8108a219533f0b0361640a017f037ea347fac6a5a40acb21af1b8e7e81aab0e}{CLI\+::\+Argument\+Mismatch}}
+, \newline
+\mbox{\hyperlink{namespace_c_l_i_a1d8108a219533f0b0361640a017f037ea45b3e4c35409fb597ea598dc4b984b8c}{CLI\+::\+Base\+Class}} = 127
+ \}
+\item 
+enum class \mbox{\hyperlink{namespace_c_l_i_1_1detail_af27dda5da343e609526e3dacf435b1c6}{CLI\+::detail\+::enabler}} 
+\begin{DoxyCompactList}\small\item\em Simple empty scoped class. \end{DoxyCompactList}\item 
+enum class \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617}{CLI\+::detail\+::object\+\_\+category}} \+: int \{ \newline
+\mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a67866440443fe52e049084ded45fa067}{CLI\+::detail\+::integral\+\_\+value}} = 2
+, \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a5f3d33dda33d9eb1dc00f78e679fefc2}{CLI\+::detail\+::unsigned\+\_\+integral}} = 4
+, \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a3f49fe61d5812612c53377049e3c86d6}{CLI\+::detail\+::enumeration}} = 6
+, \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a3259d9003fa533e5f9dee2b6caf4f7c6}{CLI\+::detail\+::boolean\+\_\+value}} = 8
+, \newline
+\mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a387f7c620a256fdffcec74c1e7181a2a}{CLI\+::detail\+::floating\+\_\+point}} = 10
+, \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a9bf8b18f29e589bda0f99393c94386d9}{CLI\+::detail\+::number\+\_\+constructible}} = 12
+, \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617ae21a7c9d5e5e2c3f7eeab7a7dfee4f17}{CLI\+::detail\+::double\+\_\+constructible}} = 14
+, \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a08bc4ae3c4ab3f4ab40dec60533c6eb4}{CLI\+::detail\+::integer\+\_\+constructible}} = 16
+, \newline
+\mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617aef1af60ec3d746940c27b93942dcf17c}{CLI\+::detail\+::vector\+\_\+value}} = 30
+, \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a23d3f597a0bc0437261353430fa6b18d}{CLI\+::detail\+::tuple\+\_\+value}} = 35
+, \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a5f47754c90779d1e531f2b19a5fea24b}{CLI\+::detail\+::string\+\_\+assignable}} = 50
+, \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617ab325b9de30c3644e6ef7cfc9f81b2d8f}{CLI\+::detail\+::string\+\_\+constructible}} = 60
+, \newline
+\mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{CLI\+::detail\+::other}} = 200
+ \}
+\item 
+enum class \mbox{\hyperlink{namespace_c_l_i_1_1detail_a20a9a67e5f06ba0dc3f2ded2fed16f55}{CLI\+::detail\+::path\+\_\+type}} \{ \mbox{\hyperlink{namespace_c_l_i_1_1detail_a20a9a67e5f06ba0dc3f2ded2fed16f55a242a913c31fbda3e2dbc1db0d7645dcc}{CLI\+::detail\+::nonexistant}}
+, \mbox{\hyperlink{namespace_c_l_i_1_1detail_a20a9a67e5f06ba0dc3f2ded2fed16f55a8c7dd922ad47494fc02c388e12c00eac}{CLI\+::detail\+::file}}
+, \mbox{\hyperlink{namespace_c_l_i_1_1detail_a20a9a67e5f06ba0dc3f2ded2fed16f55a5f8f22b8cdbaeee8cf857673a9b6ba20}{CLI\+::detail\+::directory}}
+ \}
+\begin{DoxyCompactList}\small\item\em \doxylink{namespace_c_l_i}{CLI} enumeration of different file types. \end{DoxyCompactList}\item 
+enum class \mbox{\hyperlink{namespace_c_l_i_a97e7d97131e3889f32b721570eca119c}{CLI\+::\+App\+Format\+Mode}} \{ \mbox{\hyperlink{namespace_c_l_i_a97e7d97131e3889f32b721570eca119ca960b44c579bc2f6818d2daaf9e4c16f0}{CLI\+::\+Normal}}
+, \mbox{\hyperlink{namespace_c_l_i_a97e7d97131e3889f32b721570eca119cab1c94ca2fbc3e78fc30069c8d0f01680}{CLI\+::\+All}}
+, \mbox{\hyperlink{namespace_c_l_i_a97e7d97131e3889f32b721570eca119cae80155eceb940c89e2de63ad05868db2}{CLI\+::\+Sub}}
+ \}
+\item 
+enum class \mbox{\hyperlink{namespace_c_l_i_a991a3264d3459575fc7e83eb54d73d2b}{CLI\+::\+Multi\+Option\+Policy}} \+: char \{ \newline
+\mbox{\hyperlink{namespace_c_l_i_a991a3264d3459575fc7e83eb54d73d2ba8ce61dd2505effd96f937fa743b6491f}{CLI\+::\+Throw}}
+, \mbox{\hyperlink{namespace_c_l_i_a991a3264d3459575fc7e83eb54d73d2ba91a7975e6be6ac082721192c7eb98891}{CLI\+::\+Take\+Last}}
+, \mbox{\hyperlink{namespace_c_l_i_a991a3264d3459575fc7e83eb54d73d2ba59a97fc8d11b2b3f89acfe1c3ac891df}{CLI\+::\+Take\+First}}
+, \mbox{\hyperlink{namespace_c_l_i_a991a3264d3459575fc7e83eb54d73d2baa286d9991c6a547ae25a5f5216164b8f}{CLI\+::\+Join}}
+, \newline
+\mbox{\hyperlink{namespace_c_l_i_a991a3264d3459575fc7e83eb54d73d2ba571fa4972dd227b4097ab6a774ca1263}{CLI\+::\+Take\+All}}
+ \}
+\begin{DoxyCompactList}\small\item\em Enumeration of the multi\+Option Policy selection. \end{DoxyCompactList}\item 
+enum class \mbox{\hyperlink{namespace_c_l_i_1_1detail_aba10771e3ff645fe1305be4cae517573}{CLI\+::detail\+::\+Classifier}} \{ \newline
+\mbox{\hyperlink{namespace_c_l_i_1_1detail_aba10771e3ff645fe1305be4cae517573ab50339a10e1de285ac99d4c3990b8693}{CLI\+::detail\+::\+NONE}}
+, \mbox{\hyperlink{namespace_c_l_i_1_1detail_aba10771e3ff645fe1305be4cae517573a2b1681c49e27b242d19b93c5c3620cb6}{CLI\+::detail\+::\+POSITIONAL\+\_\+\+MARK}}
+, \mbox{\hyperlink{namespace_c_l_i_1_1detail_aba10771e3ff645fe1305be4cae517573aa35c2b02966b1563e5bf7b81b8b0cf77}{CLI\+::detail\+::\+SHORT}}
+, \mbox{\hyperlink{namespace_c_l_i_1_1detail_aba10771e3ff645fe1305be4cae517573ac1fabfea54ec6011e694f211f3ffebf3}{CLI\+::detail\+::\+LONG}}
+, \newline
+\mbox{\hyperlink{namespace_c_l_i_1_1detail_aba10771e3ff645fe1305be4cae517573ad273a0465c8fbfd111aae706cdf9ec20}{CLI\+::detail\+::\+WINDOWS}}
+, \mbox{\hyperlink{namespace_c_l_i_1_1detail_aba10771e3ff645fe1305be4cae517573ac4fb22412f02354dbe5574e37caf50a7}{CLI\+::detail\+::\+SUBCOMMAND}}
+, \mbox{\hyperlink{namespace_c_l_i_1_1detail_aba10771e3ff645fe1305be4cae517573ab447b0bfeb6e4502fb6a0c4223fb8d00}{CLI\+::detail\+::\+SUBCOMMAND\+\_\+\+TERMINATOR}}
+ \}
+\item 
+enum class \mbox{\hyperlink{namespace_c_l_i_a474d5665894fe9a318ddbdb9ebf194d4}{CLI\+::config\+\_\+extras\+\_\+mode}} \+: char \{ \mbox{\hyperlink{namespace_c_l_i_a474d5665894fe9a318ddbdb9ebf194d4acb5e100e5a9a3e7f6d1fd97512215282}{CLI\+::error}} = 0
+, \mbox{\hyperlink{namespace_c_l_i_a474d5665894fe9a318ddbdb9ebf194d4a567bc1d268f135496de3d5b946b691f3}{CLI\+::ignore}}
+, \mbox{\hyperlink{namespace_c_l_i_a474d5665894fe9a318ddbdb9ebf194d4ad7ba9bbfda42b9657f14ee37ef76150b}{CLI\+::capture}}
+ \}
+\begin{DoxyCompactList}\small\item\em enumeration of modes of how to deal with extras in config files \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename  = typename std\+::enable\+\_\+if$<$std\+::is\+\_\+enum$<$\+T$>$\+::value$>$\+::type$>$ }\\std\+::ostream \& \mbox{\hyperlink{namespace_c_l_i_1_1enums_a0d566286e31ca3fb0f2a97de03492e65}{CLI\+::enums\+::operator$<$$<$}} (std\+::ostream \&in, const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&item)
+\begin{DoxyCompactList}\small\item\em output streaming for enumerations \end{DoxyCompactList}\item 
+std\+::vector$<$ std\+::string $>$ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ac18d5005c4b8cfaabf73e46294eac82a}{CLI\+::detail\+::split}} (const std\+::string \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}, char delim)
+\begin{DoxyCompactList}\small\item\em Split a string by a delim. \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\std\+::string \mbox{\hyperlink{namespace_c_l_i_1_1detail_ab351f13ec104e2cba19ec6baf4a552f6}{CLI\+::detail\+::join}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&v, std\+::string delim="{},"{})
+\begin{DoxyCompactList}\small\item\em Simple function to join a string. \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename Callable , typename  = typename std\+::enable\+\_\+if$<$!std\+::is\+\_\+constructible$<$std\+::string, Callable$>$\+::value$>$\+::type$>$ }\\std\+::string \mbox{\hyperlink{namespace_c_l_i_1_1detail_a8597debec6c8bc164109538253ffc623}{CLI\+::detail\+::join}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&v, Callable func, std\+::string delim="{},"{})
+\begin{DoxyCompactList}\small\item\em Simple function to join a string from processed elements. \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\std\+::string \mbox{\hyperlink{namespace_c_l_i_1_1detail_af74b520ee1011d38fde77f907ddfea40}{CLI\+::detail\+::rjoin}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&v, std\+::string delim="{},"{})
+\begin{DoxyCompactList}\small\item\em Join a string in reverse order. \end{DoxyCompactList}\item 
+std\+::string \& \mbox{\hyperlink{namespace_c_l_i_1_1detail_aa06bf54cb3fb347d68d23d31384af42f}{CLI\+::detail\+::ltrim}} (std\+::string \&\mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}})
+\begin{DoxyCompactList}\small\item\em Trim whitespace from left of string. \end{DoxyCompactList}\item 
+std\+::string \& \mbox{\hyperlink{namespace_c_l_i_1_1detail_a64abd8fa0d1461f840198fb92e64ca44}{CLI\+::detail\+::ltrim}} (std\+::string \&\mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}, const std\+::string \&filter)
+\begin{DoxyCompactList}\small\item\em Trim anything from left of string. \end{DoxyCompactList}\item 
+std\+::string \& \mbox{\hyperlink{namespace_c_l_i_1_1detail_a32d84ce1a65de779e88fdf4aa3b54ea6}{CLI\+::detail\+::rtrim}} (std\+::string \&\mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}})
+\begin{DoxyCompactList}\small\item\em Trim whitespace from right of string. \end{DoxyCompactList}\item 
+std\+::string \& \mbox{\hyperlink{namespace_c_l_i_1_1detail_aec077653ff0ab1e6369072d9aeebdd93}{CLI\+::detail\+::rtrim}} (std\+::string \&\mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}, const std\+::string \&filter)
+\begin{DoxyCompactList}\small\item\em Trim anything from right of string. \end{DoxyCompactList}\item 
+std\+::string \& \mbox{\hyperlink{namespace_c_l_i_1_1detail_a621323632158048f6168deacc432b838}{CLI\+::detail\+::trim}} (std\+::string \&\mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}})
+\begin{DoxyCompactList}\small\item\em Trim whitespace from string. \end{DoxyCompactList}\item 
+std\+::string \& \mbox{\hyperlink{namespace_c_l_i_1_1detail_a0f03e175032897c99f1ae0e0f1cde27a}{CLI\+::detail\+::trim}} (std\+::string \&\mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}, const std\+::string filter)
+\begin{DoxyCompactList}\small\item\em Trim anything from string. \end{DoxyCompactList}\item 
+std\+::string \mbox{\hyperlink{namespace_c_l_i_1_1detail_a5c7b00a328b3b2da564794081646c251}{CLI\+::detail\+::trim\+\_\+copy}} (const std\+::string \&\mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}})
+\begin{DoxyCompactList}\small\item\em Make a copy of the string and then trim it. \end{DoxyCompactList}\item 
+std\+::string \& \mbox{\hyperlink{namespace_c_l_i_1_1detail_a00aa494e4005562328fae48564194d8f}{CLI\+::detail\+::remove\+\_\+quotes}} (std\+::string \&\mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}})
+\begin{DoxyCompactList}\small\item\em remove quotes at the front and back of a string either \textquotesingle{}"{}\textquotesingle{} or \textquotesingle{}\textbackslash{}\textquotesingle{}\textquotesingle{} \end{DoxyCompactList}\item 
+std\+::string \mbox{\hyperlink{namespace_c_l_i_1_1detail_a09bd3735d1104a453e5376a43140d5a8}{CLI\+::detail\+::trim\+\_\+copy}} (const std\+::string \&\mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}, const std\+::string \&filter)
+\begin{DoxyCompactList}\small\item\em Make a copy of the string and then trim it, any filter string can be used (any char in string is filtered) \end{DoxyCompactList}\item 
+std\+::ostream \& \mbox{\hyperlink{namespace_c_l_i_1_1detail_ab6563defa0065e45292b843a56cbb361}{CLI\+::detail\+::format\+\_\+help}} (std\+::ostream \&out, std\+::string \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}, std\+::string description, std\+::size\+\_\+t wid)
+\begin{DoxyCompactList}\small\item\em Print a two part "{}help"{} string. \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\bool \mbox{\hyperlink{namespace_c_l_i_1_1detail_a3a05d1129df69e88135e178137b1fd89}{CLI\+::detail\+::valid\+\_\+first\+\_\+char}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} c)
+\begin{DoxyCompactList}\small\item\em Verify the first character of an option. \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\bool \mbox{\hyperlink{namespace_c_l_i_1_1detail_a841371d5dbb0a52f453de4cc1d00cc51}{CLI\+::detail\+::valid\+\_\+later\+\_\+char}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} c)
+\begin{DoxyCompactList}\small\item\em Verify following characters of an option. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{namespace_c_l_i_1_1detail_a4274628d24f9e3fbc719284f1db263b8}{CLI\+::detail\+::valid\+\_\+name\+\_\+string}} (const std\+::string \&\mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}})
+\begin{DoxyCompactList}\small\item\em Verify an option name. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{namespace_c_l_i_1_1detail_ac89ce22647a9f697b800d9c47b9d956f}{CLI\+::detail\+::isalpha}} (const std\+::string \&\mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}})
+\begin{DoxyCompactList}\small\item\em Verify that str consists of letters only. \end{DoxyCompactList}\item 
+std\+::string \mbox{\hyperlink{namespace_c_l_i_1_1detail_ae83709ec148057ec53df4383645727e9}{CLI\+::detail\+::to\+\_\+lower}} (std\+::string \mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}})
+\begin{DoxyCompactList}\small\item\em Return a lower case version of a string. \end{DoxyCompactList}\item 
+std\+::string \mbox{\hyperlink{namespace_c_l_i_1_1detail_a5359a7a0e33366a12e15523b100f591a}{CLI\+::detail\+::remove\+\_\+underscore}} (std\+::string \mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}})
+\begin{DoxyCompactList}\small\item\em remove underscores from a string \end{DoxyCompactList}\item 
+std\+::string \mbox{\hyperlink{namespace_c_l_i_1_1detail_ab39b1977d7375250cc57d90723cf1554}{CLI\+::detail\+::find\+\_\+and\+\_\+replace}} (std\+::string \mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}, std\+::string from, std\+::string to)
+\begin{DoxyCompactList}\small\item\em Find and replace a substring with another substring. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{namespace_c_l_i_1_1detail_ae89da9fa11d234a8bf504d6ec85133cc}{CLI\+::detail\+::has\+\_\+default\+\_\+flag\+\_\+values}} (const std\+::string \&\mbox{\hyperlink{yubihsm__pkcs11_8c_ae0ed371842ace71a7886a6134ecbcb62}{flags}})
+\begin{DoxyCompactList}\small\item\em check if the flag definitions has possible false flags \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{namespace_c_l_i_1_1detail_a73b9afbe8a438ab30291d35f1f24c87c}{CLI\+::detail\+::remove\+\_\+default\+\_\+flag\+\_\+values}} (std\+::string \&\mbox{\hyperlink{yubihsm__pkcs11_8c_ae0ed371842ace71a7886a6134ecbcb62}{flags}})
+\item 
+std\+::ptrdiff\+\_\+t \mbox{\hyperlink{namespace_c_l_i_1_1detail_a356b9c9cc904af2b0a918fd55e86cd9c}{CLI\+::detail\+::find\+\_\+member}} (std\+::string \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}, const std\+::vector$<$ std\+::string $>$ names, bool \mbox{\hyperlink{namespace_c_l_i_a0c52326d2681814c22aa1a93ce43375e}{ignore\+\_\+case}}=false, bool \mbox{\hyperlink{namespace_c_l_i_a111b6f05d21b9b84e7ba933ade79884c}{ignore\+\_\+underscore}}=false)
+\begin{DoxyCompactList}\small\item\em Check if a string is a member of a list of strings and optionally ignore case or ignore underscores. \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename Callable $>$ }\\std\+::string \mbox{\hyperlink{namespace_c_l_i_1_1detail_a59fbb1952b19838d8377ab714dc33e4c}{CLI\+::detail\+::find\+\_\+and\+\_\+modify}} (std\+::string \mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}, std\+::string trigger, Callable modify)
+\item 
+\mbox{\hyperlink{namespace_c_l_i_1_1detail_ac2e7b280144bce779b3b0dfbc3cfe6fe}{CLI\+::detail\+::trim}} (\mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}})
+\item 
+\mbox{\hyperlink{namespace_c_l_i_1_1detail_aa249801c72ca4b9d138ef21ba1aa06b1}{CLI\+::detail\+::while}} (!str.\+empty())
+\item 
+std\+::string \mbox{\hyperlink{namespace_c_l_i_af96013656b9682279a1c0d7d06ad9efe}{CLI\+::fix\+\_\+newlines}} (const std\+::string \&leader, std\+::string input)
+\item 
+std\+::size\+\_\+t \mbox{\hyperlink{namespace_c_l_i_a39254b3e259b6857df2f6dc88a1e9f30}{CLI\+::escape\+\_\+detect}} (std\+::string \&str, std\+::size\+\_\+t offset)
+\item 
+std\+::string \& \mbox{\hyperlink{namespace_c_l_i_a2fa3653dcd92f3fac95e7bc6bc2f2aa6}{CLI\+::add\+\_\+quotes\+\_\+if\+\_\+needed}} (std\+::string \&str)
+\begin{DoxyCompactList}\small\item\em Add quotes if the string contains spaces. \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , \mbox{\hyperlink{namespace_c_l_i_a4858f02cc3a0eeda7af44dd3e957b506}{enable\+\_\+if\+\_\+t}}$<$ \mbox{\hyperlink{class_c_l_i_1_1detail_1_1is__istreamable}{is\+\_\+istreamable}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}}, \mbox{\hyperlink{namespace_c_l_i_1_1detail_af27dda5da343e609526e3dacf435b1c6}{detail\+::enabler}} $>$  = detail\+::dummy$>$ }\\bool \mbox{\hyperlink{namespace_c_l_i_1_1detail_a65d0ac7d1e313c85e8027b8e7a82d29a}{CLI\+::detail\+::from\+\_\+stream}} (const std\+::string \&istring, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&obj)
+\begin{DoxyCompactList}\small\item\em Templated operation to get a value from a stream. \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , \mbox{\hyperlink{namespace_c_l_i_a4858f02cc3a0eeda7af44dd3e957b506}{enable\+\_\+if\+\_\+t}}$<$ std\+::is\+\_\+constructible$<$ std\+::string, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}}, \mbox{\hyperlink{namespace_c_l_i_1_1detail_af27dda5da343e609526e3dacf435b1c6}{detail\+::enabler}} $>$  = detail\+::dummy$>$ }\\auto \mbox{\hyperlink{namespace_c_l_i_1_1detail_a0e94052d485636fc9f18c21009026577}{CLI\+::detail\+::to\+\_\+string}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}) -\/$>$ decltype(std\+::forward$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}))
+\begin{DoxyCompactList}\small\item\em Convert an object to a string (directly forward if this can become a string) \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , \mbox{\hyperlink{namespace_c_l_i_a4858f02cc3a0eeda7af44dd3e957b506}{enable\+\_\+if\+\_\+t}}$<$!std\+::is\+\_\+constructible$<$ std\+::string, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}} \&\&\mbox{\hyperlink{class_c_l_i_1_1detail_1_1is__ostreamable}{is\+\_\+ostreamable}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}}, \mbox{\hyperlink{namespace_c_l_i_1_1detail_af27dda5da343e609526e3dacf435b1c6}{detail\+::enabler}} $>$  = detail\+::dummy$>$ }\\std\+::string \mbox{\hyperlink{namespace_c_l_i_1_1detail_a9c070858740ce15aaecb1c5f04e21a09}{CLI\+::detail\+::to\+\_\+string}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\begin{DoxyCompactList}\small\item\em Convert an object to a string (streaming must be supported for that type) \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename T1 , typename T2 , typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , \mbox{\hyperlink{namespace_c_l_i_a4858f02cc3a0eeda7af44dd3e957b506}{enable\+\_\+if\+\_\+t}}$<$ std\+::is\+\_\+same$<$ T1, T2 $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}}, \mbox{\hyperlink{namespace_c_l_i_1_1detail_af27dda5da343e609526e3dacf435b1c6}{detail\+::enabler}} $>$  = detail\+::dummy$>$ }\\auto \mbox{\hyperlink{namespace_c_l_i_1_1detail_a1bcb244a7701fc68da3a863b58daf615}{CLI\+::detail\+::checked\+\_\+to\+\_\+string}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}) -\/$>$ decltype(\mbox{\hyperlink{namespace_c_l_i_1_1detail_a0e94052d485636fc9f18c21009026577}{to\+\_\+string}}(std\+::forward$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})))
+\begin{DoxyCompactList}\small\item\em special template overload \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename T1 , typename T2 , typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , \mbox{\hyperlink{namespace_c_l_i_a4858f02cc3a0eeda7af44dd3e957b506}{enable\+\_\+if\+\_\+t}}$<$!std\+::is\+\_\+same$<$ T1, T2 $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}}, \mbox{\hyperlink{namespace_c_l_i_1_1detail_af27dda5da343e609526e3dacf435b1c6}{detail\+::enabler}} $>$  = detail\+::dummy$>$ }\\std\+::string \mbox{\hyperlink{namespace_c_l_i_1_1detail_ae396058c9ea28259db0c05376bf9c1de}{CLI\+::detail\+::checked\+\_\+to\+\_\+string}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\&)
+\begin{DoxyCompactList}\small\item\em special template overload \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , \mbox{\hyperlink{namespace_c_l_i_a4858f02cc3a0eeda7af44dd3e957b506}{enable\+\_\+if\+\_\+t}}$<$ std\+::is\+\_\+arithmetic$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}}, \mbox{\hyperlink{namespace_c_l_i_1_1detail_af27dda5da343e609526e3dacf435b1c6}{detail\+::enabler}} $>$  = detail\+::dummy$>$ }\\std\+::string \mbox{\hyperlink{namespace_c_l_i_1_1detail_a9a74f119a795b25c40db74ffa21d3c2d}{CLI\+::detail\+::value\+\_\+string}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\begin{DoxyCompactList}\small\item\em get a string as a convertible value for arithmetic types \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , \mbox{\hyperlink{namespace_c_l_i_a4858f02cc3a0eeda7af44dd3e957b506}{enable\+\_\+if\+\_\+t}}$<$!std\+::is\+\_\+enum$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}} \&\&!std\+::is\+\_\+arithmetic$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}}, \mbox{\hyperlink{namespace_c_l_i_1_1detail_af27dda5da343e609526e3dacf435b1c6}{detail\+::enabler}} $>$  = detail\+::dummy$>$ }\\auto \mbox{\hyperlink{namespace_c_l_i_1_1detail_a130e048f492ea4619246e2f4cabaf4ac}{CLI\+::detail\+::value\+\_\+string}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}) -\/$>$ decltype(\mbox{\hyperlink{namespace_c_l_i_1_1detail_a0e94052d485636fc9f18c21009026577}{to\+\_\+string}}(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}))
+\begin{DoxyCompactList}\small\item\em for other types just use the regular to\+\_\+string function \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , \mbox{\hyperlink{namespace_c_l_i_a4858f02cc3a0eeda7af44dd3e957b506}{enable\+\_\+if\+\_\+t}}$<$ \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1classify__object}{classify\+\_\+object}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}}==\mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a67866440443fe52e049084ded45fa067}{object\+\_\+category\+::integral\+\_\+value}}\texorpdfstring{$\vert$}{|}\texorpdfstring{$\vert$}{|}\mbox{\hyperlink{struct_c_l_i_1_1detail_1_1classify__object}{classify\+\_\+object}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}}==\mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a08bc4ae3c4ab3f4ab40dec60533c6eb4}{object\+\_\+category\+::integer\+\_\+constructible}}, \mbox{\hyperlink{namespace_c_l_i_1_1detail_af27dda5da343e609526e3dacf435b1c6}{detail\+::enabler}} $>$  = detail\+::dummy$>$ }\\constexpr const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespace_c_l_i_1_1detail_a0505c3528178408b76390be64bd452d4}{CLI\+::detail\+::type\+\_\+name}} ()
+\begin{DoxyCompactList}\small\item\em Print name for enumeration types. \end{DoxyCompactList}\item 
+std\+::size\+\_\+t I std\+::enable\+\_\+if$<$ I==\mbox{\hyperlink{struct_c_l_i_1_1detail_1_1type__count}{type\+\_\+count}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}}, std\+::string $>$\+::type \mbox{\hyperlink{namespace_c_l_i_1_1detail_a397fce7245815670cac747d7b65a3067}{CLI\+::detail\+::tuple\+\_\+name}} ()
+\item 
+\mbox{\hyperlink{namespace_c_l_i_1_1detail_a917380ad4b65ab0637c74807bda4a353}{CLI\+::detail\+::if}} (str.\+back()==\textquotesingle{},\textquotesingle{}) str.\+pop\+\_\+back()
+\item 
+std\+::size\+\_\+t I inline typename bool \+::type \mbox{\hyperlink{namespace_c_l_i_1_1detail_ab51a37d8073a381cabf33bff8e4bce00}{CLI\+::detail\+::tuple\+\_\+conversion}} (const std\+::vector$<$ std\+::string $>$ \&, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&)
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{namespace_c_l_i_1_1detail_a86c1088c42947566ced93f199ff49ba3}{XC}} , \mbox{\hyperlink{namespace_c_l_i_a4858f02cc3a0eeda7af44dd3e957b506}{enable\+\_\+if\+\_\+t}}$<$ \mbox{\hyperlink{class_c_l_i_1_1detail_1_1is__tuple__like}{is\+\_\+tuple\+\_\+like}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}}, \mbox{\hyperlink{namespace_c_l_i_1_1detail_af27dda5da343e609526e3dacf435b1c6}{detail\+::enabler}} $>$  = detail\+::dummy$>$ }\\bool \mbox{\hyperlink{namespace_c_l_i_1_1detail_a9e56362b2b589534c179de55f6444ed8}{CLI\+::detail\+::lexical\+\_\+conversion}} (const std\+::vector$<$ std \+::string $>$ \&strings, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\mbox{\hyperlink{namespace_c_l_i_1_1detail_a203526b0d52558cb4bfdec88ea1a0d07}{output}})
+\begin{DoxyCompactList}\small\item\em Conversion for tuples. \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , \mbox{\hyperlink{namespace_c_l_i_a4858f02cc3a0eeda7af44dd3e957b506}{enable\+\_\+if\+\_\+t}}$<$ std\+::is\+\_\+integral$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}} \&\&std\+::is\+\_\+unsigned$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}}, \mbox{\hyperlink{namespace_c_l_i_1_1detail_af27dda5da343e609526e3dacf435b1c6}{detail\+::enabler}} $>$  = detail\+::dummy$>$ }\\void \mbox{\hyperlink{namespace_c_l_i_1_1detail_a4b43d9a545853bed3136ef59d68a2ac0}{CLI\+::detail\+::sum\+\_\+flag\+\_\+vector}} (const std\+::vector$<$ std\+::string $>$ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_ae0ed371842ace71a7886a6134ecbcb62}{flags}}, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\mbox{\hyperlink{namespace_c_l_i_1_1detail_a203526b0d52558cb4bfdec88ea1a0d07}{output}})
+\item 
+bool \mbox{\hyperlink{namespace_c_l_i_1_1detail_a1e6f215bcb727ff49f126ac3e1a13e40}{CLI\+::detail\+::split\+\_\+short}} (const std\+::string \&current, std\+::string \&\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}, std\+::string \&rest)
+\item 
+bool \mbox{\hyperlink{namespace_c_l_i_1_1detail_a0de15b0ba0d12c9170d15693477808ed}{CLI\+::detail\+::split\+\_\+long}} (const std\+::string \&current, std\+::string \&\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}, std\+::string \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+bool \mbox{\hyperlink{namespace_c_l_i_1_1detail_aadbd2b5b93afe2f10427dd6e32639b0c}{CLI\+::detail\+::split\+\_\+windows\+\_\+style}} (const std\+::string \&current, std\+::string \&\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}, std\+::string \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+std\+::vector$<$ std\+::string $>$ \mbox{\hyperlink{namespace_c_l_i_1_1detail_a001565020c65971162bae8cc2ba7d3e1}{CLI\+::detail\+::split\+\_\+names}} (std\+::string current)
+\item 
+std\+::vector$<$ std\+::pair$<$ std\+::string, std\+::string $>$ $>$ \mbox{\hyperlink{namespace_c_l_i_1_1detail_aef5e2e24cdf5eb20ac37c5fdabec8f62}{CLI\+::detail\+::get\+\_\+default\+\_\+flag\+\_\+values}} (const std\+::string \&\mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}})
+\begin{DoxyCompactList}\small\item\em extract default flag values either \{def\} or starting with a ! \end{DoxyCompactList}\item 
+std\+::tuple$<$ std\+::vector$<$ std\+::string $>$, std\+::vector$<$ std\+::string $>$, std\+::string $>$ \mbox{\hyperlink{namespace_c_l_i_1_1detail_a2f845e274b0701ae700150328804badf}{CLI\+::detail\+::get\+\_\+names}} (const std\+::vector$<$ std\+::string $>$ \&input)
+\begin{DoxyCompactList}\small\item\em Get a vector of short names, one of long names, and a single name. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{namespace_c_l_i_1_1detail_a20a9a67e5f06ba0dc3f2ded2fed16f55}{path\+\_\+type}} \mbox{\hyperlink{namespace_c_l_i_1_1detail_a197be0b62b4d4deef0f5cac600a6b759}{CLI\+::detail\+::check\+\_\+path}} (const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{namespace_c_l_i_1_1detail_a20a9a67e5f06ba0dc3f2ded2fed16f55a8c7dd922ad47494fc02c388e12c00eac}{file}}) noexcept
+\begin{DoxyCompactList}\small\item\em get the type of the path from a file name \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , \mbox{\hyperlink{namespace_c_l_i_a4858f02cc3a0eeda7af44dd3e957b506}{enable\+\_\+if\+\_\+t}}$<$ \mbox{\hyperlink{struct_c_l_i_1_1is__copyable__ptr}{is\+\_\+copyable\+\_\+ptr}}$<$ typename std\+::remove\+\_\+reference$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::type $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}}, \mbox{\hyperlink{namespace_c_l_i_1_1detail_af27dda5da343e609526e3dacf435b1c6}{detail\+::enabler}} $>$  = detail\+::dummy$>$ }\\auto \mbox{\hyperlink{namespace_c_l_i_1_1detail_a0c6cf48feae9d909d52e7b4c346cba29}{CLI\+::detail\+::smart\+\_\+deref}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}) -\/$>$ decltype(\texorpdfstring{$\ast$}{*}\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , \mbox{\hyperlink{namespace_c_l_i_a4858f02cc3a0eeda7af44dd3e957b506}{enable\+\_\+if\+\_\+t}}$<$!\mbox{\hyperlink{struct_c_l_i_1_1is__copyable__ptr}{is\+\_\+copyable\+\_\+ptr}}$<$ typename std\+::remove\+\_\+reference$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::type $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}}, \mbox{\hyperlink{namespace_c_l_i_1_1detail_af27dda5da343e609526e3dacf435b1c6}{detail\+::enabler}} $>$  = detail\+::dummy$>$ }\\std\+::remove\+\_\+reference$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::type \& \mbox{\hyperlink{namespace_c_l_i_1_1detail_a2251a4a057c21bee2577c1ee670a848d}{CLI\+::detail\+::smart\+\_\+deref}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\std\+::string \mbox{\hyperlink{namespace_c_l_i_1_1detail_a75f66945cfe53b556e4c311f9a88a155}{CLI\+::detail\+::generate\+\_\+set}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&set)
+\begin{DoxyCompactList}\small\item\em Generate a string representation of a set. \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\std\+::string \mbox{\hyperlink{namespace_c_l_i_1_1detail_a320e031a5eb12297a140d2d6fc73362a}{CLI\+::detail\+::generate\+\_\+map}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&map, bool key\+\_\+only=false)
+\begin{DoxyCompactList}\small\item\em Generate a string representation of a map. \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{struct_v}{V}} , \mbox{\hyperlink{namespace_c_l_i_a4858f02cc3a0eeda7af44dd3e957b506}{enable\+\_\+if\+\_\+t}}$<$!\mbox{\hyperlink{struct_c_l_i_1_1detail_1_1has__find}{has\+\_\+find}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{struct_v}{V}} $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}}, \mbox{\hyperlink{namespace_c_l_i_1_1detail_af27dda5da343e609526e3dacf435b1c6}{detail\+::enabler}} $>$  = detail\+::dummy$>$ }\\auto \mbox{\hyperlink{namespace_c_l_i_1_1detail_aa4b4a0a97c9b07110595765887647385}{CLI\+::detail\+::search}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&set, const \mbox{\hyperlink{struct_v}{V}} \&val) -\/$>$ std\+::pair$<$ bool, decltype(std\+::begin(\mbox{\hyperlink{namespace_c_l_i_1_1detail_a0c6cf48feae9d909d52e7b4c346cba29}{detail\+::smart\+\_\+deref}}(set)))$>$
+\begin{DoxyCompactList}\small\item\em \doxylink{struct_a}{A} search function. \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{struct_v}{V}} $>$ }\\auto \mbox{\hyperlink{namespace_c_l_i_1_1detail_abcb81a667288aa66a4576a06b9322092}{CLI\+::detail\+::search}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&set, const \mbox{\hyperlink{struct_v}{V}} \&val, const std\+::function$<$ \mbox{\hyperlink{struct_v}{V}}(\mbox{\hyperlink{struct_v}{V}})$>$ \&filter\+\_\+function) -\/$>$ std\+::pair$<$ bool, decltype(std\+::begin(\mbox{\hyperlink{namespace_c_l_i_1_1detail_a0c6cf48feae9d909d52e7b4c346cba29}{detail\+::smart\+\_\+deref}}(set)))$>$
+\begin{DoxyCompactList}\small\item\em \doxylink{struct_a}{A} search function with a filter function. \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\std\+::enable\+\_\+if$<$ std\+::is\+\_\+signed$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}}, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::type \mbox{\hyperlink{namespace_c_l_i_1_1detail_a569135c6e266940a5f914698b9deef66}{CLI\+::detail\+::overflow\+Check}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&b)
+\begin{DoxyCompactList}\small\item\em Do a check for overflow on signed numbers. \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\std\+::enable\+\_\+if$<$!std\+::is\+\_\+signed$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}}, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::type \mbox{\hyperlink{namespace_c_l_i_1_1detail_a5e6108f5b3abd0b0d42123cef8a0dac0}{CLI\+::detail\+::overflow\+Check}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&b)
+\begin{DoxyCompactList}\small\item\em Do a check for overflow on unsigned numbers. \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\std\+::enable\+\_\+if$<$ std\+::is\+\_\+integral$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}}, bool $>$\+::type \mbox{\hyperlink{namespace_c_l_i_1_1detail_a58ce723daebf6cd298565eb365d1b157}{CLI\+::detail\+::checked\+\_\+multiply}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} b)
+\begin{DoxyCompactList}\small\item\em Performs a \texorpdfstring{$\ast$}{*}= b; if it doesn\textquotesingle{}t cause integer overflow. Returns false otherwise. \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\std\+::enable\+\_\+if$<$ std\+::is\+\_\+floating\+\_\+point$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}}, bool $>$\+::type \mbox{\hyperlink{namespace_c_l_i_1_1detail_ab57caa0d0973cd0f50fa3ab21e4a7afc}{CLI\+::detail\+::checked\+\_\+multiply}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} b)
+\begin{DoxyCompactList}\small\item\em Performs a \texorpdfstring{$\ast$}{*}= b; if it doesn\textquotesingle{}t equal infinity. Returns false otherwise. \end{DoxyCompactList}\item 
+std\+::pair$<$ std\+::string, std\+::string $>$ \mbox{\hyperlink{namespace_c_l_i_1_1detail_a86c8be4c04334eea7717547ed6816533}{CLI\+::detail\+::split\+\_\+program\+\_\+name}} (std\+::string commandline)
+\item 
+std\+::string \mbox{\hyperlink{namespace_c_l_i_1_1_failure_message_ab2a36cd7fb3b91628be43f31647f3c38}{CLI\+::\+Failure\+Message\+::simple}} (const \mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \texorpdfstring{$\ast$}{*}app, const \mbox{\hyperlink{class_c_l_i_1_1_error}{Error}} \&e)
+\begin{DoxyCompactList}\small\item\em Printout a clean, simple message on error (the default in CLI11 1.\+5+) \end{DoxyCompactList}\item 
+std\+::string \mbox{\hyperlink{namespace_c_l_i_1_1_failure_message_aa7e418b32b7d6f28aee8c4e5ad0bbc95}{CLI\+::\+Failure\+Message\+::help}} (const \mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \texorpdfstring{$\ast$}{*}app, const \mbox{\hyperlink{class_c_l_i_1_1_error}{Error}} \&e)
+\begin{DoxyCompactList}\small\item\em Printout the full help string on error (if this fn is set, the old default for CLI11) \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{namespace_c_l_i_a495f418aefacfdfbe91642a18f60d77c}{CLI\+::\+Trigger\+On}} (\mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \texorpdfstring{$\ast$}{*}trigger\+\_\+app, \mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \texorpdfstring{$\ast$}{*}app\+\_\+to\+\_\+enable)
+\begin{DoxyCompactList}\small\item\em Helper function to enable one option group/subcommand when another is used. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{namespace_c_l_i_a5feaad2da28dd1b1adac0ebd8382af7d}{CLI\+::\+Trigger\+On}} (\mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \texorpdfstring{$\ast$}{*}trigger\+\_\+app, std\+::vector$<$ \mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \texorpdfstring{$\ast$}{*} $>$ apps\+\_\+to\+\_\+enable)
+\begin{DoxyCompactList}\small\item\em Helper function to enable one option group/subcommand when another is used. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{namespace_c_l_i_ae611995dabf1e7d4a2480f1952ef6ba7}{CLI\+::\+Trigger\+Off}} (\mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \texorpdfstring{$\ast$}{*}trigger\+\_\+app, \mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \texorpdfstring{$\ast$}{*}app\+\_\+to\+\_\+enable)
+\begin{DoxyCompactList}\small\item\em Helper function to disable one option group/subcommand when another is used. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{namespace_c_l_i_aeb752166e5a0486440b5902f7878ed72}{CLI\+::\+Trigger\+Off}} (\mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \texorpdfstring{$\ast$}{*}trigger\+\_\+app, std\+::vector$<$ \mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \texorpdfstring{$\ast$}{*} $>$ apps\+\_\+to\+\_\+enable)
+\begin{DoxyCompactList}\small\item\em Helper function to disable one option group/subcommand when another is used. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{namespace_c_l_i_a6cb6f8bfff8c49385fb24f6f23a23c21}{CLI\+::deprecate\+\_\+option}} (\mbox{\hyperlink{class_c_l_i_1_1_option}{Option}} \texorpdfstring{$\ast$}{*}opt, const std\+::string \&replacement="{}"{})
+\begin{DoxyCompactList}\small\item\em Helper function to mark an option as deprecated. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{namespace_c_l_i_ad6d89b5d1aba2ebdca5f94534d658cab}{CLI\+::deprecate\+\_\+option}} (\mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \texorpdfstring{$\ast$}{*}app, const std\+::string \&option\+\_\+name, const std\+::string \&replacement="{}"{})
+\begin{DoxyCompactList}\small\item\em Helper function to mark an option as deprecated. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{namespace_c_l_i_a5e83d92a6ec271c2439141feaede1136}{CLI\+::deprecate\+\_\+option}} (\mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \&app, const std\+::string \&option\+\_\+name, const std\+::string \&replacement="{}"{})
+\begin{DoxyCompactList}\small\item\em Helper function to mark an option as deprecated. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{namespace_c_l_i_a36cfe4a6a80bf143735c0b80960bc252}{CLI\+::retire\+\_\+option}} (\mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \texorpdfstring{$\ast$}{*}app, \mbox{\hyperlink{class_c_l_i_1_1_option}{Option}} \texorpdfstring{$\ast$}{*}opt)
+\begin{DoxyCompactList}\small\item\em Helper function to mark an option as retired. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{namespace_c_l_i_a52390f850f663cf38a27e134c1a39b61}{CLI\+::retire\+\_\+option}} (\mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \&app, \mbox{\hyperlink{class_c_l_i_1_1_option}{Option}} \texorpdfstring{$\ast$}{*}opt)
+\begin{DoxyCompactList}\small\item\em Helper function to mark an option as retired. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{namespace_c_l_i_ad9ac23b01e2ef840ec123f5a115302ab}{CLI\+::retire\+\_\+option}} (\mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \texorpdfstring{$\ast$}{*}app, const std\+::string \&option\+\_\+name)
+\begin{DoxyCompactList}\small\item\em Helper function to mark an option as retired. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{namespace_c_l_i_a77cd1a3639a91dea33a7d144ea476df6}{CLI\+::retire\+\_\+option}} (\mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \&app, const std\+::string \&option\+\_\+name)
+\begin{DoxyCompactList}\small\item\em Helper function to mark an option as retired. \end{DoxyCompactList}\item 
+std\+::string \mbox{\hyperlink{namespace_c_l_i_1_1detail_ac73a25f982318a475fa067b6561c43f5}{CLI\+::detail\+::convert\+\_\+arg\+\_\+for\+\_\+ini}} (const std\+::string \&arg)
+\item 
+std\+::string \mbox{\hyperlink{namespace_c_l_i_1_1detail_a42001edb494b249cbb3d10c74c60e404}{CLI\+::detail\+::ini\+\_\+join}} (const std\+::vector$<$ std\+::string $>$ \&args, char sep\+Char=\textquotesingle{},\textquotesingle{}, char array\+Start=\textquotesingle{}\mbox{[}\textquotesingle{}, char array\+End=\textquotesingle{}\mbox{]}\textquotesingle{})
+\begin{DoxyCompactList}\small\item\em Comma separated join, adds quotes if needed. \end{DoxyCompactList}\item 
+std\+::vector$<$ std\+::string $>$ \mbox{\hyperlink{namespace_c_l_i_1_1detail_aa6876cdd19b6e5807239b574a9ce0e3c}{CLI\+::detail\+::generate\+\_\+parents}} (const std\+::string \&section, std\+::string \&\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})
+\item 
+void \mbox{\hyperlink{namespace_c_l_i_1_1detail_a65e109bd9b97994ead2ca0173f56d617}{CLI\+::detail\+::check\+Parent\+Segments}} (std\+::vector$<$ \mbox{\hyperlink{struct_c_l_i_1_1_config_item}{Config\+Item}} $>$ \&\mbox{\hyperlink{namespace_c_l_i_1_1detail_a203526b0d52558cb4bfdec88ea1a0d07}{output}}, const std\+::string \&current\+Section)
+\begin{DoxyCompactList}\small\item\em assuming non default segments do a check on the close and open of the segments in a config\+Item structure \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+constexpr int \mbox{\hyperlink{namespace_c_l_i_1_1detail_a99abe3824b1f1bea457ad0ae635f5c51}{CLI\+::detail\+::expected\+\_\+max\+\_\+vector\+\_\+size}} \{1 $<$$<$ 29\}
+\item 
+auto \mbox{\hyperlink{namespace_c_l_i_1_1detail_a6af6943ab9deafdbb810cb31dd668eee}{CLI\+::detail\+::find\+\_\+ws}}
+\item 
+std\+::vector$<$ std\+::string $>$ \mbox{\hyperlink{namespace_c_l_i_1_1detail_a203526b0d52558cb4bfdec88ea1a0d07}{CLI\+::detail\+::output}}
+\item 
+bool \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad7ae2b2f00d10b638f2b1f0f377532c4}{CLI\+::detail\+::embedded\+Quote}} = false
+\item 
+char \mbox{\hyperlink{namespace_c_l_i_1_1detail_af1bc09410e08f138b17a8ac3a2458dd9}{CLI\+::detail\+::key\+Char}} = \textquotesingle{} \textquotesingle{}
+\item 
+constexpr \mbox{\hyperlink{namespace_c_l_i_1_1detail_af27dda5da343e609526e3dacf435b1c6}{enabler}} \mbox{\hyperlink{namespace_c_l_i_1_1detail_a01c35a876e2917ffdc1ee618e0c06619}{CLI\+::detail\+::dummy}} = \{\}
+\begin{DoxyCompactList}\small\item\em An instance to use in Enable\+If. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{hello__driver_8cpp_a9717e7bbecb906637e86cef6da3d83c2}{return}} \mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{CLI\+::detail\+::str}}
+\item 
+\mbox{\hyperlink{namespace_c_l_i_1_1detail_a86c1088c42947566ced93f199ff49ba3}{CLI\+::detail\+::\+XC}}
+\item 
+\mbox{\hyperlink{hello__driver_8cpp_a9717e7bbecb906637e86cef6da3d83c2}{return}} \mbox{\hyperlink{namespace_c_l_i_1_1detail_a8d528fc0ff05e174212746909dc026a3}{CLI\+::detail\+::retval}}
+\end{DoxyCompactItemize}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\using \mbox{\hyperlink{namespace_c_l_i_afac11216d7de35041e5d82a35be30481}{CLI\+::\+Transform\+Pairs}} = std\+::vector$<$std\+::pair$<$std\+::string, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$$>$
+\begin{DoxyCompactList}\small\item\em definition of the default transformation object \end{DoxyCompactList}\item 
+const \mbox{\hyperlink{class_c_l_i_1_1detail_1_1_existing_file_validator}{detail\+::\+Existing\+File\+Validator}} \mbox{\hyperlink{namespace_c_l_i_ab60cbe0bb76c7b2e00d63f48a573e322}{CLI\+::\+Existing\+File}}
+\begin{DoxyCompactList}\small\item\em Check for existing file (returns error message if check fails) \end{DoxyCompactList}\item 
+const \mbox{\hyperlink{class_c_l_i_1_1detail_1_1_existing_directory_validator}{detail\+::\+Existing\+Directory\+Validator}} \mbox{\hyperlink{namespace_c_l_i_a297aa1a5877b3f744ee8857960e0e025}{CLI\+::\+Existing\+Directory}}
+\begin{DoxyCompactList}\small\item\em Check for an existing directory (returns error message if check fails) \end{DoxyCompactList}\item 
+const \mbox{\hyperlink{class_c_l_i_1_1detail_1_1_existing_path_validator}{detail\+::\+Existing\+Path\+Validator}} \mbox{\hyperlink{namespace_c_l_i_ab0065d2e9866c49896ce3c682e8c7062}{CLI\+::\+Existing\+Path}}
+\begin{DoxyCompactList}\small\item\em Check for an existing path. \end{DoxyCompactList}\item 
+const \mbox{\hyperlink{class_c_l_i_1_1detail_1_1_nonexistent_path_validator}{detail\+::\+Nonexistent\+Path\+Validator}} \mbox{\hyperlink{namespace_c_l_i_a790f9bb552cf96ab9ca2d6c9749adba1}{CLI\+::\+Nonexistent\+Path}}
+\begin{DoxyCompactList}\small\item\em Check for an non-\/existing path. \end{DoxyCompactList}\item 
+const \mbox{\hyperlink{class_c_l_i_1_1detail_1_1_i_p_v4_validator}{detail\+::\+IPV4\+Validator}} \mbox{\hyperlink{namespace_c_l_i_a9cfed0354c4d5dd79f145fcbdcb4c155}{CLI\+::\+Valid\+IPV4}}
+\begin{DoxyCompactList}\small\item\em Check for an IP4 address. \end{DoxyCompactList}\item 
+const \mbox{\hyperlink{class_c_l_i_1_1detail_1_1_positive_number}{detail\+::\+Positive\+Number}} \mbox{\hyperlink{namespace_c_l_i_aef2ee22a4ae84639a9c1f31c9ef00514}{CLI\+::\+Positive\+Number}}
+\begin{DoxyCompactList}\small\item\em Check for a positive number. \end{DoxyCompactList}\item 
+const \mbox{\hyperlink{class_c_l_i_1_1detail_1_1_non_negative_number}{detail\+::\+Non\+Negative\+Number}} \mbox{\hyperlink{namespace_c_l_i_a64dd90027e481b48b0096721fc6829ec}{CLI\+::\+Non\+Negative\+Number}}
+\begin{DoxyCompactList}\small\item\em Check for a non-\/negative number. \end{DoxyCompactList}\item 
+const \mbox{\hyperlink{class_c_l_i_1_1detail_1_1_number}{detail\+::\+Number}} \mbox{\hyperlink{namespace_c_l_i_a713b5a1bbb98173dbc74edd4f295a582}{CLI\+::\+Number}}
+\begin{DoxyCompactList}\small\item\em Check for a number. \end{DoxyCompactList}\item 
+std\+::string \mbox{\hyperlink{namespace_c_l_i_a0c52326d2681814c22aa1a93ce43375e}{CLI\+::ignore\+\_\+case}} (std\+::string item)
+\begin{DoxyCompactList}\small\item\em Helper function to allow ignore\+\_\+case to be passed to \doxylink{class_c_l_i_1_1_is_member}{Is\+Member} or Transform. \end{DoxyCompactList}\item 
+std\+::string \mbox{\hyperlink{namespace_c_l_i_a111b6f05d21b9b84e7ba933ade79884c}{CLI\+::ignore\+\_\+underscore}} (std\+::string item)
+\begin{DoxyCompactList}\small\item\em Helper function to allow ignore\+\_\+underscore to be passed to \doxylink{class_c_l_i_1_1_is_member}{Is\+Member} or Transform. \end{DoxyCompactList}\item 
+std\+::string \mbox{\hyperlink{namespace_c_l_i_ac9f5612a3fa6d56e08bff5c307af10f1}{CLI\+::ignore\+\_\+space}} (std\+::string item)
+\begin{DoxyCompactList}\small\item\em Helper function to allow checks to ignore spaces to be passed to \doxylink{class_c_l_i_1_1_is_member}{Is\+Member} or Transform. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{_c_l_i11_8hpp_ab56dd908d351a84796414f79d57696d0}\index{CLI11.hpp@{CLI11.hpp}!CLI11\_DEPRECATED@{CLI11\_DEPRECATED}}
+\index{CLI11\_DEPRECATED@{CLI11\_DEPRECATED}!CLI11.hpp@{CLI11.hpp}}
+\doxysubsubsection{\texorpdfstring{CLI11\_DEPRECATED}{CLI11\_DEPRECATED}}
+{\footnotesize\ttfamily \label{_c_l_i11_8hpp_ab56dd908d351a84796414f79d57696d0} 
+\#define CLI11\+\_\+\+DEPRECATED(\begin{DoxyParamCaption}\item[{}]{reason}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\_\_attribute\_\_((deprecated(reason)))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l00109}{109}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+\Hypertarget{_c_l_i11_8hpp_aa5083d44020c499995d126efcdcf5b63}\index{CLI11.hpp@{CLI11.hpp}!CLI11\_ERROR\_DEF@{CLI11\_ERROR\_DEF}}
+\index{CLI11\_ERROR\_DEF@{CLI11\_ERROR\_DEF}!CLI11.hpp@{CLI11.hpp}}
+\doxysubsubsection{\texorpdfstring{CLI11\_ERROR\_DEF}{CLI11\_ERROR\_DEF}}
+{\footnotesize\ttfamily \label{_c_l_i11_8hpp_aa5083d44020c499995d126efcdcf5b63} 
+\#define CLI11\+\_\+\+ERROR\+\_\+\+DEF(\begin{DoxyParamCaption}\item[{}]{parent}{, }\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \textcolor{keyword}{protected}:\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ name(std::string\ ename,\ std::string\ msg,\ \textcolor{keywordtype}{int}\ exit\_code)\ :\ parent(\mbox{\hyperlink{namespacestd}{std}}::move(ename),\ \mbox{\hyperlink{namespacestd}{std}}::move(msg),\ exit\_code)\ \{\}\ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ name(std::string\ ename,\ std::string\ msg,\ ExitCodes\ exit\_code)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ :\ parent(std::move(ename),\ std::move(msg),\ exit\_code)\ \{\}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \textcolor{keyword}{public}:\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ name(std::string\ msg,\ ExitCodes\ exit\_code)\ :\ parent(\#\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ \mbox{\hyperlink{namespacestd}{std}}::move(msg),\ exit\_code)\ \{\}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ name(std::string\ msg,\ \textcolor{keywordtype}{int}\ exit\_code)\ :\ parent(\#\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ \mbox{\hyperlink{namespacestd}{std}}::move(msg),\ exit\_code)\ \{\}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l00523}{523}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00523\ \textcolor{preprocessor}{\#define\ CLI11\_ERROR\_DEF(parent,\ name)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00524\ \textcolor{preprocessor}{\ \ protected:\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00525\ \textcolor{preprocessor}{\ \ \ \ name(std::string\ ename,\ std::string\ msg,\ int\ exit\_code)\ :\ parent(std::move(ename),\ std::move(msg),\ exit\_code)\ \{\}\ \ \ \(\backslash\)}}
+\DoxyCodeLine{00526\ \textcolor{preprocessor}{\ \ \ \ name(std::string\ ename,\ std::string\ msg,\ ExitCodes\ exit\_code)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00527\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ :\ parent(std::move(ename),\ std::move(msg),\ exit\_code)\ \{\}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00528\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00529\ \textcolor{preprocessor}{\ \ public:\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00530\ \textcolor{preprocessor}{\ \ \ \ name(std::string\ msg,\ ExitCodes\ exit\_code)\ :\ parent(\#name,\ std::move(msg),\ exit\_code)\ \{\}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00531\ \textcolor{preprocessor}{\ \ \ \ name(std::string\ msg,\ int\ exit\_code)\ :\ parent(\#name,\ std::move(msg),\ exit\_code)\ \{\}}}
+
+\end{DoxyCode}
+\Hypertarget{_c_l_i11_8hpp_a0da004ec8320e9f80f2eac076e1c4eef}\index{CLI11.hpp@{CLI11.hpp}!CLI11\_ERROR\_SIMPLE@{CLI11\_ERROR\_SIMPLE}}
+\index{CLI11\_ERROR\_SIMPLE@{CLI11\_ERROR\_SIMPLE}!CLI11.hpp@{CLI11.hpp}}
+\doxysubsubsection{\texorpdfstring{CLI11\_ERROR\_SIMPLE}{CLI11\_ERROR\_SIMPLE}}
+{\footnotesize\ttfamily \label{_c_l_i11_8hpp_a0da004ec8320e9f80f2eac076e1c4eef} 
+\#define CLI11\+\_\+\+ERROR\+\_\+\+SIMPLE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(std::string\ msg)\ :\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(\#\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ msg,\ ExitCodes::\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})\ \{\}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l00534}{534}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00534\ \textcolor{preprocessor}{\#define\ CLI11\_ERROR\_SIMPLE(name)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00535\ \textcolor{preprocessor}{\ \ \ \ explicit\ name(std::string\ msg)\ :\ name(\#name,\ msg,\ ExitCodes::name)\ \{\}}}
+
+\end{DoxyCode}
+\Hypertarget{_c_l_i11_8hpp_ae8938ad660eb0b84b667ea3ea54da42c}\index{CLI11.hpp@{CLI11.hpp}!CLI11\_PARSE@{CLI11\_PARSE}}
+\index{CLI11\_PARSE@{CLI11\_PARSE}!CLI11.hpp@{CLI11.hpp}}
+\doxysubsubsection{\texorpdfstring{CLI11\_PARSE}{CLI11\_PARSE}}
+{\footnotesize\ttfamily \label{_c_l_i11_8hpp_ae8938ad660eb0b84b667ea3ea54da42c} 
+\#define CLI11\+\_\+\+PARSE(\begin{DoxyParamCaption}\item[{}]{app}{, }\item[{}]{argc}{, }\item[{}]{\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{try}\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ (app).parse((argc),\ (\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}));\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \textcolor{keywordflow}{catch}(\textcolor{keyword}{const}\ \mbox{\hyperlink{class_c_l_i_1_1_parse_error}{CLI::ParseError}}\ \&e)\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ return\ (app).exit(e);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l04583}{4583}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{04583\ \textcolor{preprocessor}{\#define\ CLI11\_PARSE(app,\ argc,\ argv)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{04584\ \textcolor{preprocessor}{\ \ \ \ try\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{04585\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ (app).parse((argc),\ (argv));\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{04586\ \textcolor{preprocessor}{\ \ \ \ \}\ catch(const\ CLI::ParseError\ \&e)\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{04587\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ return\ (app).exit(e);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{04588\ \textcolor{preprocessor}{\ \ \ \ \}}}
+
+\end{DoxyCode}
+\Hypertarget{_c_l_i11_8hpp_a1b8785b397aabcac7e4a07dafe066268}\index{CLI11.hpp@{CLI11.hpp}!CLI11\_VERSION@{CLI11\_VERSION}}
+\index{CLI11\_VERSION@{CLI11\_VERSION}!CLI11.hpp@{CLI11.hpp}}
+\doxysubsubsection{\texorpdfstring{CLI11\_VERSION}{CLI11\_VERSION}}
+{\footnotesize\ttfamily \label{_c_l_i11_8hpp_a1b8785b397aabcac7e4a07dafe066268} 
+\#define CLI11\+\_\+\+VERSION~"{}1.\+9.\+0"{}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l00071}{71}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+\Hypertarget{_c_l_i11_8hpp_a1a2e30d6baa07959d9603aeb27e1bdb4}\index{CLI11.hpp@{CLI11.hpp}!CLI11\_VERSION\_MAJOR@{CLI11\_VERSION\_MAJOR}}
+\index{CLI11\_VERSION\_MAJOR@{CLI11\_VERSION\_MAJOR}!CLI11.hpp@{CLI11.hpp}}
+\doxysubsubsection{\texorpdfstring{CLI11\_VERSION\_MAJOR}{CLI11\_VERSION\_MAJOR}}
+{\footnotesize\ttfamily \label{_c_l_i11_8hpp_a1a2e30d6baa07959d9603aeb27e1bdb4} 
+\#define CLI11\+\_\+\+VERSION\+\_\+\+MAJOR~1}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l00068}{68}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+\Hypertarget{_c_l_i11_8hpp_ab6f9ac59f853b1948fdbcf1188750208}\index{CLI11.hpp@{CLI11.hpp}!CLI11\_VERSION\_MINOR@{CLI11\_VERSION\_MINOR}}
+\index{CLI11\_VERSION\_MINOR@{CLI11\_VERSION\_MINOR}!CLI11.hpp@{CLI11.hpp}}
+\doxysubsubsection{\texorpdfstring{CLI11\_VERSION\_MINOR}{CLI11\_VERSION\_MINOR}}
+{\footnotesize\ttfamily \label{_c_l_i11_8hpp_ab6f9ac59f853b1948fdbcf1188750208} 
+\#define CLI11\+\_\+\+VERSION\+\_\+\+MINOR~9}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l00069}{69}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+\Hypertarget{_c_l_i11_8hpp_a7e997cfe2479493bde18e8f9ad4256f5}\index{CLI11.hpp@{CLI11.hpp}!CLI11\_VERSION\_PATCH@{CLI11\_VERSION\_PATCH}}
+\index{CLI11\_VERSION\_PATCH@{CLI11\_VERSION\_PATCH}!CLI11.hpp@{CLI11.hpp}}
+\doxysubsubsection{\texorpdfstring{CLI11\_VERSION\_PATCH}{CLI11\_VERSION\_PATCH}}
+{\footnotesize\ttfamily \label{_c_l_i11_8hpp_a7e997cfe2479493bde18e8f9ad4256f5} 
+\#define CLI11\+\_\+\+VERSION\+\_\+\+PATCH~0}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l00070}{70}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+

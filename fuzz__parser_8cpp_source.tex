@@ -1,0 +1,69 @@
+\doxysection{fuzz\+\_\+parser.\+cpp}
+\hypertarget{fuzz__parser_8cpp_source}{}\label{fuzz__parser_8cpp_source}\index{libraries/sys-\/vm/tests/fuzz/fuzz\_parser.cpp@{libraries/sys-\/vm/tests/fuzz/fuzz\_parser.cpp}}
+\mbox{\hyperlink{fuzz__parser_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <sysio/wasm\_backend/parser.hpp>}}
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <fstream>}}
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <iostream>}}
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <chrono>}}
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00006}00006\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}};}
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00007}00007\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacesysio_1_1wasm__backend}{sysio::wasm\_backend}};}
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00008}00008\ \textcolor{keyword}{using\ namespace\ }std::chrono;}
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00011}\mbox{\hyperlink{fuzz__parser_8cpp_ab6d9537f94c320b20d681495d7f93099}{00011}}\ std::vector<uint8\_t>\ \mbox{\hyperlink{fuzz__parser_8cpp_ab6d9537f94c320b20d681495d7f93099}{read\_wasm}}(\ \textcolor{keyword}{const}\ std::string\&\ fname\ )\ \{}
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00012}00012\ \ \ \ std::ifstream\ wasm\_file(fname,\ std::ios::binary);}
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00013}00013\ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ wasm\_file.is\_open(),\ \textcolor{stringliteral}{"{}wasm\ file\ cannot\ be\ found"{}}\ );}
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00014}00014\ \ \ \ wasm\_file.seekg(0,\ std::ios::end);}
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00015}00015\ \ \ \ std::vector<uint8\_t>\ wasm;\ }
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00016}00016\ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ =\ wasm\_file.tellg();}
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00017}00017\ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ >=\ 0,\ \textcolor{stringliteral}{"{}wasm\ file\ length\ is\ -\/1"{}}\ );}
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00018}00018\ \ \ \ wasm.resize(\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}});}
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00019}00019\ \ \ \ wasm\_file.seekg(0,\ std::ios::beg);}
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00020}00020\ \ \ \ wasm\_file.read((\textcolor{keywordtype}{char}*)wasm.data(),\ wasm.size());}
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00021}00021\ \ \ \ wasm\_file.close();}
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00022}00022\ \ \ \ \textcolor{keywordflow}{return}\ wasm;}
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00023}00023\ \}}
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00024}00024\ \textcolor{comment}{//extern\ "{}C"{}\ int\ LLVMFuzzerTestOneInput(\ const\ uint8\_t*\ data,\ size\_t\ size\ )\ \{}}
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00025}00025\ \textcolor{comment}{//\ \ \ binary\_parser\ bp;}}
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00026}00026\ \textcolor{comment}{//\ \ \ module\ mod;}}
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00027}00027\ \textcolor{comment}{//\ \ \ memory\_manager::set\_memory\_limits(\ 128*1024,\ 64*1024\ );}}
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00028}00028\ \textcolor{comment}{//\ \ \ wasm\_code\ test;}}
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00029}00029\ \textcolor{comment}{//\ \ \ test.resize(\ size\ );}}
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00030}00030\ \textcolor{comment}{//\ \ \ memcpy(\ (char*)test.data(),\ data,\ size\ );}}
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00031}00031\ \textcolor{comment}{//\ \ \ bp.parse\_module(\ test,\ mod\ );}}
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00032}00032\ \textcolor{comment}{//\}}}
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00034}\mbox{\hyperlink{fuzz__parser_8cpp_ac0f2228420376f4db7e1274f2b41667c}{00034}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}(\ \textcolor{keywordtype}{int}\ argc,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[]\ )\ \{}
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00035}00035\ \ \ \ high\_resolution\_clock::time\_point\ start;}
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00036}00036\ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00037}00037\ \ \ \ \ \ \ memory\_manager::set\_memory\_limits(\ 128*1024,\ 64*1024\ );}
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00038}00038\ \ \ \ \ \ \ binary\_parser\ bp;}
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00039}00039\ \ \ \ \ \ \ \textcolor{keyword}{module}\ mod;}
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00040}00040\ \ \ \ \ \ \ wasm\_code\ test\ =\ \mbox{\hyperlink{fuzz__parser_8cpp_ab6d9537f94c320b20d681495d7f93099}{read\_wasm}}(\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[1]);}
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00041}00041\ \ \ \ \ \ \ start\ =\ high\_resolution\_clock::now();}
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00042}00042\ \ \ \ \ \ \ bp.parse\_module(\ test,\ mod\ );}
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00043}00043\ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\mbox{\hyperlink{classfc_1_1exception}{fc::exception}}\&\ e)\ \{}
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00044}00044\ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}FAIL\ :\ "{}}\ <<\ e.\mbox{\hyperlink{classfc_1_1exception_ab1104818bf0d9b6a29f0dfe036cf97f6}{what}}()\ <<\textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00045}00045\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00046}00046\ \ \ \ \textcolor{keyword}{auto}\ stop\ \ =\ high\_resolution\_clock::now();}
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00047}00047\ \ \ \ \textcolor{keyword}{auto}\ duration\ =\ duration\_cast<microseconds>(stop\ -\/\ start);}
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00048}00048\ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}TIME\ :\ "{}}\ <<\ duration.count()\ <<\ \textcolor{stringliteral}{"{}us\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00050}00050\ \textcolor{preprocessor}{\#if\ 0}}
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00051}00051\ \ \ \ \textcolor{keywordflow}{catch}\ (\ wasm\_parse\_exception\&\ ex\ )\ \{}
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00052}00052\ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\ wasm\_interpreter\_exception\&\ ex\ )\ \{}
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00053}00053\ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\ wasm\_section\_length\_exception\&\ ex\ )\ \{}
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00054}00054\ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\ wasm\_bad\_alloc\&\ ex\ )\ \{}
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00055}00055\ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\ wasm\_double\_free\&\ ex\ )\ \{}
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00056}00056\ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\ wasm\_vector\_oob\_exception\&\ ex\ )\ \{}
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00057}00057\ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\ wasm\_memory\_exception\&\ ex\ )\ \{}
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00058}00058\ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\ wasm\_unsupported\_import\_exception\&\ ex\ )\ \{}
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00059}00059\ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\ wasm\_illegal\_opcode\_exception\&\ ex\ )\ \{}
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00060}00060\ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\ guarded\_ptr\_exception\&\ ex\ )\ \{}
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00061}00061\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00062}00062\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{fuzz__parser_8cpp_source_l00063}00063\ \}}
+
+\end{DoxyCode}

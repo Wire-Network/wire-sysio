@@ -1,0 +1,64 @@
+\doxysection{libraries/softfloat/source/s\+\_\+count\+Leading\+Zeros16.c File Reference}
+\hypertarget{softfloat_2source_2s__count_leading_zeros16_8c}{}\label{softfloat_2source_2s__count_leading_zeros16_8c}\index{libraries/softfloat/source/s\_countLeadingZeros16.c@{libraries/softfloat/source/s\_countLeadingZeros16.c}}
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include "{}platform.\+h"{}}\newline
+{\ttfamily \#include "{}primitives.\+h"{}}\newline
+Include dependency graph for s\+\_\+count\+Leading\+Zeros16.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=323pt]{softfloat_2source_2s__count_leading_zeros16_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{softfloat_2source_2s__count_leading_zeros16_8c_a945c3dfcb3e1a5a92be75fd284b165f4}{softfloat\+\_\+count\+Leading\+Zeros16}}~softfloat\+\_\+count\+Leading\+Zeros16
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_ad0fca8b15c218d2c687f8c373a71d228}{uint\+\_\+fast8\+\_\+t}} \mbox{\hyperlink{softfloat_2source_2s__count_leading_zeros16_8c_af896d194fc217a525edd1f8a6529f0e3}{softfloat\+\_\+count\+Leading\+Zeros16}} (\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{softfloat_2source_2s__count_leading_zeros16_8c_a945c3dfcb3e1a5a92be75fd284b165f4}\index{s\_countLeadingZeros16.c@{s\_countLeadingZeros16.c}!softfloat\_countLeadingZeros16@{softfloat\_countLeadingZeros16}}
+\index{softfloat\_countLeadingZeros16@{softfloat\_countLeadingZeros16}!s\_countLeadingZeros16.c@{s\_countLeadingZeros16.c}}
+\doxysubsubsection{\texorpdfstring{softfloat\_countLeadingZeros16}{softfloat\_countLeadingZeros16}}
+{\footnotesize\ttfamily \label{softfloat_2source_2s__count_leading_zeros16_8c_a945c3dfcb3e1a5a92be75fd284b165f4} 
+\#define softfloat\+\_\+count\+Leading\+Zeros16~softfloat\+\_\+count\+Leading\+Zeros16}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2s__count_leading_zeros16_8c_source_l00042}{42}} of file \mbox{\hyperlink{softfloat_2source_2s__count_leading_zeros16_8c_source}{s\+\_\+count\+Leading\+Zeros16.\+c}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{softfloat_2source_2s__count_leading_zeros16_8c_af896d194fc217a525edd1f8a6529f0e3}\index{s\_countLeadingZeros16.c@{s\_countLeadingZeros16.c}!softfloat\_countLeadingZeros16@{softfloat\_countLeadingZeros16}}
+\index{softfloat\_countLeadingZeros16@{softfloat\_countLeadingZeros16}!s\_countLeadingZeros16.c@{s\_countLeadingZeros16.c}}
+\doxysubsubsection{\texorpdfstring{softfloat\_countLeadingZeros16()}{softfloat\_countLeadingZeros16()}}
+{\footnotesize\ttfamily \label{softfloat_2source_2s__count_leading_zeros16_8c_af896d194fc217a525edd1f8a6529f0e3} 
+\mbox{\hyperlink{stdint_8h_ad0fca8b15c218d2c687f8c373a71d228}{uint\+\_\+fast8\+\_\+t}} softfloat\+\_\+count\+Leading\+Zeros16 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}}}]{a}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2s__count_leading_zeros16_8c_source_l00045}{45}} of file \mbox{\hyperlink{softfloat_2source_2s__count_leading_zeros16_8c_source}{s\+\_\+count\+Leading\+Zeros16.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00046\ \{}
+\DoxyCodeLine{00047\ \ \ \ \ \mbox{\hyperlink{stdint_8h_ad0fca8b15c218d2c687f8c373a71d228}{uint\_fast8\_t}}\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}};}
+\DoxyCodeLine{00048\ }
+\DoxyCodeLine{00049\ \ \ \ \ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ =\ 8;}
+\DoxyCodeLine{00050\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ 0x100\ <=\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ )\ \{}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ =\ 0;}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ >>=\ 8;}
+\DoxyCodeLine{00053\ \ \ \ \ \}}
+\DoxyCodeLine{00054\ \ \ \ \ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ +=\ \mbox{\hyperlink{softfloat_2source_2include_2primitives_8h_add449f9f89da661b2c0da7546f2e7481}{softfloat\_countLeadingZeros8}}[\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}];}
+\DoxyCodeLine{00055\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}};}
+\DoxyCodeLine{00056\ }
+\DoxyCodeLine{00057\ \}}
+
+\end{DoxyCode}

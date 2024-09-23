@@ -1,0 +1,11 @@
+<map id="websocketpp::config::debug_core" name="websocketpp::config::debug_core">
+<area shape="rect" id="Node000001" title="Client/Server debug config with iostream transport." alt="" coords="131,5,272,46"/>
+<area shape="rect" id="Node000002" href="$structdeflate__config.html" title=" " alt="" coords="5,102,108,127"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="157,56,78,103,75,99,155,52"/>
+<area shape="rect" id="Node000003" href="$structwebsocketpp_1_1config_1_1debug__asio.html" title="Client/Server debug config with asio transport and TLS disabled." alt="" coords="131,94,272,135"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="204,62,204,94,199,94,199,62"/>
+<area shape="rect" id="Node000005" href="$structwebsocketpp_1_1config_1_1debug__asio__tls.html" title="Client/Server debug config with asio transport and TLS enabled." alt="" coords="296,94,438,135"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="254,51,331,91,329,96,251,56"/>
+<area shape="rect" id="Node000004" href="$structdebug__custom.html" title=" " alt="" coords="149,183,255,208"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="204,150,204,182,199,182,199,150"/>
+</map>

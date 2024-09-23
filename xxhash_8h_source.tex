@@ -1,0 +1,269 @@
+\doxysection{xxhash.\+h}
+\hypertarget{xxhash_8h_source}{}\label{xxhash_8h_source}\index{libraries/wasm-\/jit/Source/ThirdParty/xxhash/xxhash.h@{libraries/wasm-\/jit/Source/ThirdParty/xxhash/xxhash.h}}
+\mbox{\hyperlink{xxhash_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00002}00002\ \textcolor{comment}{\ \ \ xxHash\ -\/\ Extremely\ Fast\ Hash\ algorithm}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00003}00003\ \textcolor{comment}{\ \ \ Header\ File}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00004}00004\ \textcolor{comment}{\ \ \ Copyright\ (C)\ 2012-\/2016,\ Yann\ Collet.}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00005}00005\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00006}00006\ \textcolor{comment}{\ \ \ BSD\ 2-\/Clause\ License\ (http://www.opensource.org/licenses/bsd-\/license.php)}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00007}00007\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00008}00008\ \textcolor{comment}{\ \ \ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00009}00009\ \textcolor{comment}{\ \ \ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00010}00010\ \textcolor{comment}{\ \ \ met:}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00011}00011\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00012}00012\ \textcolor{comment}{\ \ \ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00013}00013\ \textcolor{comment}{\ \ \ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00014}00014\ \textcolor{comment}{\ \ \ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00015}00015\ \textcolor{comment}{\ \ \ copyright\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00016}00016\ \textcolor{comment}{\ \ \ in\ the\ documentation\ and/or\ other\ materials\ provided\ with\ the}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00017}00017\ \textcolor{comment}{\ \ \ distribution.}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00018}00018\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00019}00019\ \textcolor{comment}{\ \ \ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00020}00020\ \textcolor{comment}{\ \ \ "{}AS\ IS"{}\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00021}00021\ \textcolor{comment}{\ \ \ LIMITED\ TO,\ THE\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00022}00022\ \textcolor{comment}{\ \ \ A\ PARTICULAR\ PURPOSE\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ THE\ COPYRIGHT}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00023}00023\ \textcolor{comment}{\ \ \ OWNER\ OR\ CONTRIBUTORS\ BE\ LIABLE\ FOR\ ANY\ DIRECT,\ INDIRECT,\ INCIDENTAL,}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00024}00024\ \textcolor{comment}{\ \ \ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES\ (INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00025}00025\ \textcolor{comment}{\ \ \ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;\ LOSS\ OF\ USE,}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00026}00026\ \textcolor{comment}{\ \ \ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND\ ON\ ANY}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00027}00027\ \textcolor{comment}{\ \ \ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00028}00028\ \textcolor{comment}{\ \ \ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00029}00029\ \textcolor{comment}{\ \ \ OF\ THIS\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00030}00030\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00031}00031\ \textcolor{comment}{\ \ \ You\ can\ contact\ the\ author\ at\ :}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00032}00032\ \textcolor{comment}{\ \ \ -\/\ xxHash\ source\ repository\ :\ https://github.com/Cyan4973/xxHash}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00033}00033\ \textcolor{comment}{*/}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00035}00035\ \textcolor{comment}{/*\ Notice\ extracted\ from\ xxHash\ homepage\ :}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00036}00036\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00037}00037\ \textcolor{comment}{xxHash\ is\ an\ extremely\ fast\ Hash\ algorithm,\ running\ at\ RAM\ speed\ limits.}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00038}00038\ \textcolor{comment}{It\ also\ successfully\ passes\ all\ tests\ from\ the\ SMHasher\ suite.}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00039}00039\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00040}00040\ \textcolor{comment}{Comparison\ (single\ thread,\ Windows\ Seven\ 32\ bits,\ using\ SMHasher\ on\ a\ Core\ 2\ Duo\ @3GHz)}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00041}00041\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00042}00042\ \textcolor{comment}{Name\ \ \ \ \ \ \ \ \ \ \ \ Speed\ \ \ \ \ \ \ Q.Score\ \ \ Author}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00043}00043\ \textcolor{comment}{xxHash\ \ \ \ \ \ \ \ \ \ 5.4\ GB/s\ \ \ \ \ 10}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00044}00044\ \textcolor{comment}{CrapWow\ \ \ \ \ \ \ \ \ 3.2\ GB/s\ \ \ \ \ \ 2\ \ \ \ \ \ \ Andrew}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00045}00045\ \textcolor{comment}{MumurHash\ 3a\ \ \ \ 2.7\ GB/s\ \ \ \ \ 10\ \ \ \ \ \ \ Austin\ Appleby}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00046}00046\ \textcolor{comment}{SpookyHash\ \ \ \ \ \ 2.0\ GB/s\ \ \ \ \ 10\ \ \ \ \ \ \ Bob\ Jenkins}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00047}00047\ \textcolor{comment}{SBox\ \ \ \ \ \ \ \ \ \ \ \ 1.4\ GB/s\ \ \ \ \ \ 9\ \ \ \ \ \ \ Bret\ Mulvey}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00048}00048\ \textcolor{comment}{Lookup3\ \ \ \ \ \ \ \ \ 1.2\ GB/s\ \ \ \ \ \ 9\ \ \ \ \ \ \ Bob\ Jenkins}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00049}00049\ \textcolor{comment}{SuperFastHash\ \ \ 1.2\ GB/s\ \ \ \ \ \ 1\ \ \ \ \ \ \ Paul\ Hsieh}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00050}00050\ \textcolor{comment}{CityHash64\ \ \ \ \ \ 1.05\ GB/s\ \ \ \ 10\ \ \ \ \ \ \ Pike\ \&\ Alakuijala}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00051}00051\ \textcolor{comment}{FNV\ \ \ \ \ \ \ \ \ \ \ \ \ 0.55\ GB/s\ \ \ \ \ 5\ \ \ \ \ \ \ Fowler,\ Noll,\ Vo}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00052}00052\ \textcolor{comment}{CRC32\ \ \ \ \ \ \ \ \ \ \ 0.43\ GB/s\ \ \ \ \ 9}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00053}00053\ \textcolor{comment}{MD5-\/32\ \ \ \ \ \ \ \ \ \ 0.33\ GB/s\ \ \ \ 10\ \ \ \ \ \ \ Ronald\ L.\ Rivest}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00054}00054\ \textcolor{comment}{SHA1-\/32\ \ \ \ \ \ \ \ \ 0.28\ GB/s\ \ \ \ 10}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00055}00055\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00056}00056\ \textcolor{comment}{Q.Score\ is\ a\ measure\ of\ quality\ of\ the\ hash\ function.}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00057}00057\ \textcolor{comment}{It\ depends\ on\ successfully\ passing\ SMHasher\ test\ set.}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00058}00058\ \textcolor{comment}{10\ is\ a\ perfect\ score.}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00059}00059\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00060}00060\ \textcolor{comment}{A\ 64-\/bits\ version,\ named\ XXH64,\ is\ available\ since\ r35.}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00061}00061\ \textcolor{comment}{It\ offers\ much\ better\ speed,\ but\ for\ 64-\/bits\ applications\ only.}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00062}00062\ \textcolor{comment}{Name\ \ \ \ \ Speed\ on\ 64\ bits\ \ \ \ Speed\ on\ 32\ bits}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00063}00063\ \textcolor{comment}{XXH64\ \ \ \ \ \ \ 13.8\ GB/s\ \ \ \ \ \ \ \ \ \ \ \ 1.9\ GB/s}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00064}00064\ \textcolor{comment}{XXH32\ \ \ \ \ \ \ \ 6.8\ GB/s\ \ \ \ \ \ \ \ \ \ \ \ 6.0\ GB/s}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00065}00065\ \textcolor{comment}{*/}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00067}00067\ \textcolor{preprocessor}{\#ifndef\ XXHASH\_H\_5627135585666179}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00068}00068\ \textcolor{preprocessor}{\#define\ XXHASH\_H\_5627135585666179\ 1}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00069}00069\ }
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00070}00070\ \textcolor{preprocessor}{\#if\ defined\ (\_\_cplusplus)}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00071}00071\ \textcolor{keyword}{extern}\ \textcolor{stringliteral}{"{}C"{}}\ \{}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00072}00072\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00073}00073\ }
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00074}00074\ }
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00075}00075\ \textcolor{comment}{/*\ ****************************}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00076}00076\ \textcolor{comment}{*\ \ Definitions}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00077}00077\ \textcolor{comment}{******************************/}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00078}00078\ \textcolor{preprocessor}{\#include\ <stddef.h>}\ \ \ \textcolor{comment}{/*\ size\_t\ */}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00079}\mbox{\hyperlink{xxhash_8h_a5020905455674b8c83c1dbc73f0d3534a462a18276729783125c7116cf102667f}{00079}}\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{enum}\ \{\ \mbox{\hyperlink{xxhash_8h_a5020905455674b8c83c1dbc73f0d3534abd20b092d624344e301b0cadd29d5bd6}{XXH\_OK}}=0,\ \mbox{\hyperlink{xxhash_8h_a5020905455674b8c83c1dbc73f0d3534a462a18276729783125c7116cf102667f}{XXH\_ERROR}}\ \}\ \mbox{\hyperlink{xxhash_8h_a5020905455674b8c83c1dbc73f0d3534}{XXH\_errorcode}};}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00080}00080\ }
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00081}00081\ }
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00082}00082\ \textcolor{comment}{/*\ ****************************}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00083}00083\ \textcolor{comment}{*\ \ API\ modifier}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00084}00084\ \textcolor{comment}{******************************/}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00094}00094\ \textcolor{preprocessor}{\#ifdef\ XXH\_PRIVATE\_API}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00095}00095\ \textcolor{preprocessor}{\#\ \ ifndef\ XXH\_STATIC\_LINKING\_ONLY}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00096}00096\ \textcolor{preprocessor}{\#\ \ \ \ define\ XXH\_STATIC\_LINKING\_ONLY}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00097}00097\ \textcolor{preprocessor}{\#\ \ endif}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00098}00098\ \textcolor{preprocessor}{\#\ \ if\ defined(\_\_GNUC\_\_)}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00099}00099\ \textcolor{preprocessor}{\#\ \ \ \ define\ XXH\_PUBLIC\_API\ static\ \_\_inline\ \_\_attribute\_\_((unused))}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00100}00100\ \textcolor{preprocessor}{\#\ \ elif\ defined\ (\_\_cplusplus)\ ||\ (defined\ (\_\_STDC\_VERSION\_\_)\ \&\&\ (\_\_STDC\_VERSION\_\_\ >=\ 199901L)\ }\textcolor{comment}{/*\ C99\ */}\textcolor{preprocessor}{)}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00101}00101\ \textcolor{preprocessor}{\#\ \ \ \ define\ XXH\_PUBLIC\_API\ static\ inline}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00102}00102\ \textcolor{preprocessor}{\#\ \ elif\ defined(\_MSC\_VER)}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00103}00103\ \textcolor{preprocessor}{\#\ \ \ \ define\ XXH\_PUBLIC\_API\ static\ \_\_inline}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00104}00104\ \textcolor{preprocessor}{\#\ \ else}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00105}00105\ \textcolor{preprocessor}{\#\ \ \ \ define\ XXH\_PUBLIC\_API\ static\ \ \ }\textcolor{comment}{/*\ this\ version\ may\ generate\ warnings\ for\ unused\ static\ functions;\ disable\ the\ relevant\ warning\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00106}00106\ \textcolor{preprocessor}{\#\ \ endif}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00107}00107\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00108}\mbox{\hyperlink{xxhash_8h_a5832897ed49938aefa629a76034b36b1}{00108}}\ \textcolor{preprocessor}{\#\ \ define\ XXH\_PUBLIC\_API\ \ \ }\textcolor{comment}{/*\ do\ nothing\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00109}00109\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{/*\ XXH\_PRIVATE\_API\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00110}00110\ }
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00122}00122\ \textcolor{preprocessor}{\#ifdef\ XXH\_NAMESPACE}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00123}00123\ \textcolor{preprocessor}{\#\ \ define\ XXH\_CAT(A,B)\ A\#\#B}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00124}00124\ \textcolor{preprocessor}{\#\ \ define\ XXH\_NAME2(A,B)\ XXH\_CAT(A,B)}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00125}00125\ \textcolor{preprocessor}{\#\ \ define\ XXH\_versionNumber\ XXH\_NAME2(XXH\_NAMESPACE,\ XXH\_versionNumber)}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00126}00126\ \textcolor{preprocessor}{\#\ \ define\ XXH32\ XXH\_NAME2(XXH\_NAMESPACE,\ XXH32)}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00127}00127\ \textcolor{preprocessor}{\#\ \ define\ XXH32\_createState\ XXH\_NAME2(XXH\_NAMESPACE,\ XXH32\_createState)}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00128}00128\ \textcolor{preprocessor}{\#\ \ define\ XXH32\_freeState\ XXH\_NAME2(XXH\_NAMESPACE,\ XXH32\_freeState)}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00129}00129\ \textcolor{preprocessor}{\#\ \ define\ XXH32\_reset\ XXH\_NAME2(XXH\_NAMESPACE,\ XXH32\_reset)}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00130}00130\ \textcolor{preprocessor}{\#\ \ define\ XXH32\_update\ XXH\_NAME2(XXH\_NAMESPACE,\ XXH32\_update)}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00131}00131\ \textcolor{preprocessor}{\#\ \ define\ XXH32\_digest\ XXH\_NAME2(XXH\_NAMESPACE,\ XXH32\_digest)}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00132}00132\ \textcolor{preprocessor}{\#\ \ define\ XXH32\_copyState\ XXH\_NAME2(XXH\_NAMESPACE,\ XXH32\_copyState)}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00133}00133\ \textcolor{preprocessor}{\#\ \ define\ XXH32\_canonicalFromHash\ XXH\_NAME2(XXH\_NAMESPACE,\ XXH32\_canonicalFromHash)}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00134}00134\ \textcolor{preprocessor}{\#\ \ define\ XXH32\_hashFromCanonical\ XXH\_NAME2(XXH\_NAMESPACE,\ XXH32\_hashFromCanonical)}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00135}00135\ \textcolor{preprocessor}{\#\ \ define\ XXH64\ XXH\_NAME2(XXH\_NAMESPACE,\ XXH64)}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00136}00136\ \textcolor{preprocessor}{\#\ \ define\ XXH64\_createState\ XXH\_NAME2(XXH\_NAMESPACE,\ XXH64\_createState)}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00137}00137\ \textcolor{preprocessor}{\#\ \ define\ XXH64\_freeState\ XXH\_NAME2(XXH\_NAMESPACE,\ XXH64\_freeState)}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00138}00138\ \textcolor{preprocessor}{\#\ \ define\ XXH64\_reset\ XXH\_NAME2(XXH\_NAMESPACE,\ XXH64\_reset)}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00139}00139\ \textcolor{preprocessor}{\#\ \ define\ XXH64\_update\ XXH\_NAME2(XXH\_NAMESPACE,\ XXH64\_update)}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00140}00140\ \textcolor{preprocessor}{\#\ \ define\ XXH64\_digest\ XXH\_NAME2(XXH\_NAMESPACE,\ XXH64\_digest)}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00141}00141\ \textcolor{preprocessor}{\#\ \ define\ XXH64\_copyState\ XXH\_NAME2(XXH\_NAMESPACE,\ XXH64\_copyState)}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00142}00142\ \textcolor{preprocessor}{\#\ \ define\ XXH64\_canonicalFromHash\ XXH\_NAME2(XXH\_NAMESPACE,\ XXH64\_canonicalFromHash)}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00143}00143\ \textcolor{preprocessor}{\#\ \ define\ XXH64\_hashFromCanonical\ XXH\_NAME2(XXH\_NAMESPACE,\ XXH64\_hashFromCanonical)}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00144}00144\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00145}00145\ }
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00146}00146\ }
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00147}00147\ \textcolor{comment}{/*\ *************************************}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00148}00148\ \textcolor{comment}{*\ \ Version}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00149}00149\ \textcolor{comment}{***************************************/}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00150}\mbox{\hyperlink{xxhash_8h_a8a2b7aee9a2ac8bfad126165c4369fab}{00150}}\ \textcolor{preprocessor}{\#define\ XXH\_VERSION\_MAJOR\ \ \ \ 0}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00151}\mbox{\hyperlink{xxhash_8h_a0087600ba3cbfdbb78b83e13d54a1849}{00151}}\ \textcolor{preprocessor}{\#define\ XXH\_VERSION\_MINOR\ \ \ \ 6}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00152}\mbox{\hyperlink{xxhash_8h_a67fe7f51710d15efa3aeeefbb446f434}{00152}}\ \textcolor{preprocessor}{\#define\ XXH\_VERSION\_RELEASE\ \ 2}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00153}\mbox{\hyperlink{xxhash_8h_acc66393fff091acefc0e2a00ec5462c4}{00153}}\ \textcolor{preprocessor}{\#define\ XXH\_VERSION\_NUMBER\ \ (XXH\_VERSION\_MAJOR\ *100*100\ +\ XXH\_VERSION\_MINOR\ *100\ +\ XXH\_VERSION\_RELEASE)}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00154}00154\ \mbox{\hyperlink{xxhash_8h_a5832897ed49938aefa629a76034b36b1}{XXH\_PUBLIC\_API}}\ \textcolor{keywordtype}{unsigned}\ \mbox{\hyperlink{xxhash_8h_af435229c36fbbc6a23a5f187752a6fe4}{XXH\_versionNumber}}\ (\textcolor{keywordtype}{void});}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00155}00155\ }
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00156}00156\ }
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00157}00157\ \textcolor{comment}{/*-\/**********************************************************************}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00158}00158\ \textcolor{comment}{*\ \ 32-\/bits\ hash}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00159}00159\ \textcolor{comment}{************************************************************************/}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00160}\mbox{\hyperlink{xxhash_8h_ab96bf7612b1f829b593220ab7acdc7a6}{00160}}\ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{xxhash_8h_ab96bf7612b1f829b593220ab7acdc7a6}{XXH32\_hash\_t}};}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00161}00161\ }
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00167}00167\ \mbox{\hyperlink{xxhash_8h_a5832897ed49938aefa629a76034b36b1}{XXH\_PUBLIC\_API}}\ \mbox{\hyperlink{xxhash_8h_ab96bf7612b1f829b593220ab7acdc7a6}{XXH32\_hash\_t}}\ \mbox{\hyperlink{xxhash_8h_aa47a1811043509306fe9b8744ab5eee6}{XXH32}}\ (\textcolor{keyword}{const}\ \textcolor{keywordtype}{void}*\ input,\ \textcolor{keywordtype}{size\_t}\ length,\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ seed);}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00168}00168\ }
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00169}00169\ \textcolor{comment}{/*======\ \ \ Streaming\ \ \ ======*/}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00170}\mbox{\hyperlink{xxhash_8h_a0048f07d4a3051c20598464f007aa6c5}{00170}}\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }XXH32\_state\_s\ \mbox{\hyperlink{xxhash_8h_a0048f07d4a3051c20598464f007aa6c5}{XXH32\_state\_t}};\ \ \ \textcolor{comment}{/*\ incomplete\ type\ */}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00171}00171\ \mbox{\hyperlink{xxhash_8h_a5832897ed49938aefa629a76034b36b1}{XXH\_PUBLIC\_API}}\ \mbox{\hyperlink{xxhash_8h_a0048f07d4a3051c20598464f007aa6c5}{XXH32\_state\_t}}*\ \mbox{\hyperlink{xxhash_8h_a51931b4d4f02a6d818aaa6a258e8c076}{XXH32\_createState}}(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00172}00172\ \mbox{\hyperlink{xxhash_8h_a5832897ed49938aefa629a76034b36b1}{XXH\_PUBLIC\_API}}\ \mbox{\hyperlink{xxhash_8h_a5020905455674b8c83c1dbc73f0d3534}{XXH\_errorcode}}\ \ \mbox{\hyperlink{xxhash_8h_aab2c0ec5dbb1b738d3f58aa3fc640243}{XXH32\_freeState}}(\mbox{\hyperlink{xxhash_8h_a0048f07d4a3051c20598464f007aa6c5}{XXH32\_state\_t}}*\ statePtr);}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00173}00173\ \mbox{\hyperlink{xxhash_8h_a5832897ed49938aefa629a76034b36b1}{XXH\_PUBLIC\_API}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{xxhash_8h_a9354b1d57d79b128917ba28c1ca8230e}{XXH32\_copyState}}(\mbox{\hyperlink{xxhash_8h_a0048f07d4a3051c20598464f007aa6c5}{XXH32\_state\_t}}*\ dst\_state,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{xxhash_8h_a0048f07d4a3051c20598464f007aa6c5}{XXH32\_state\_t}}*\ src\_state);}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00174}00174\ }
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00175}00175\ \mbox{\hyperlink{xxhash_8h_a5832897ed49938aefa629a76034b36b1}{XXH\_PUBLIC\_API}}\ \mbox{\hyperlink{xxhash_8h_a5020905455674b8c83c1dbc73f0d3534}{XXH\_errorcode}}\ \mbox{\hyperlink{xxhash_8h_a5ad2de72b93cb6396ee595484c0ced14}{XXH32\_reset}}\ \ (\mbox{\hyperlink{xxhash_8h_a0048f07d4a3051c20598464f007aa6c5}{XXH32\_state\_t}}*\ statePtr,\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ seed);}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00176}00176\ \mbox{\hyperlink{xxhash_8h_a5832897ed49938aefa629a76034b36b1}{XXH\_PUBLIC\_API}}\ \mbox{\hyperlink{xxhash_8h_a5020905455674b8c83c1dbc73f0d3534}{XXH\_errorcode}}\ \mbox{\hyperlink{xxhash_8h_aacc2e89656b7b7184279c2d621594afa}{XXH32\_update}}\ (\mbox{\hyperlink{xxhash_8h_a0048f07d4a3051c20598464f007aa6c5}{XXH32\_state\_t}}*\ statePtr,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{void}*\ input,\ \textcolor{keywordtype}{size\_t}\ length);}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00177}00177\ \mbox{\hyperlink{xxhash_8h_a5832897ed49938aefa629a76034b36b1}{XXH\_PUBLIC\_API}}\ \mbox{\hyperlink{xxhash_8h_ab96bf7612b1f829b593220ab7acdc7a6}{XXH32\_hash\_t}}\ \ \mbox{\hyperlink{xxhash_8h_a2d5f5298193818366420a8f25e3ee46e}{XXH32\_digest}}\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{xxhash_8h_a0048f07d4a3051c20598464f007aa6c5}{XXH32\_state\_t}}*\ statePtr);}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00178}00178\ }
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00179}00179\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00180}00180\ \textcolor{comment}{These\ functions\ generate\ the\ xxHash\ of\ an\ input\ provided\ in\ multiple\ segments.}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00181}00181\ \textcolor{comment}{Note\ that,\ for\ small\ input,\ they\ are\ slower\ than\ single-\/call\ functions,\ due\ to\ state\ management.}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00182}00182\ \textcolor{comment}{For\ small\ input,\ prefer\ \`{}XXH32()`\ and\ \`{}XXH64()`\ .}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00183}00183\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00184}00184\ \textcolor{comment}{XXH\ state\ must\ first\ be\ allocated,\ using\ XXH*\_createState()\ .}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00185}00185\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00186}00186\ \textcolor{comment}{Start\ a\ new\ hash\ by\ initializing\ state\ with\ a\ seed,\ using\ XXH*\_reset().}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00187}00187\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00188}00188\ \textcolor{comment}{Then,\ feed\ the\ hash\ state\ by\ calling\ XXH*\_update()\ as\ many\ times\ as\ necessary.}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00189}00189\ \textcolor{comment}{Obviously,\ input\ must\ be\ allocated\ and\ read\ accessible.}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00190}00190\ \textcolor{comment}{The\ function\ returns\ an\ error\ code,\ with\ 0\ meaning\ OK,\ and\ any\ other\ value\ meaning\ there\ is\ an\ error.}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00191}00191\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00192}00192\ \textcolor{comment}{Finally,\ a\ hash\ value\ can\ be\ produced\ anytime,\ by\ using\ XXH*\_digest().}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00193}00193\ \textcolor{comment}{This\ function\ returns\ the\ nn-\/bits\ hash\ as\ an\ int\ or\ long\ long.}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00194}00194\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00195}00195\ \textcolor{comment}{It's\ still\ possible\ to\ continue\ inserting\ input\ into\ the\ hash\ state\ after\ a\ digest,}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00196}00196\ \textcolor{comment}{and\ generate\ some\ new\ hashes\ later\ on,\ by\ calling\ again\ XXH*\_digest().}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00197}00197\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00198}00198\ \textcolor{comment}{When\ done,\ free\ XXH\ state\ space\ if\ it\ was\ allocated\ dynamically.}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00199}00199\ \textcolor{comment}{*/}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00200}00200\ }
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00201}00201\ \textcolor{comment}{/*======\ \ \ Canonical\ representation\ \ \ ======*/}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00202}00202\ }
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00203}\mbox{\hyperlink{struct_x_x_h32__canonical__t_a85a83578344a5dd1c7a6cc0472230f30}{00203}}\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ digest[4];\ \}\ \mbox{\hyperlink{struct_x_x_h32__canonical__t}{XXH32\_canonical\_t}};}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00204}00204\ \mbox{\hyperlink{xxhash_8h_a5832897ed49938aefa629a76034b36b1}{XXH\_PUBLIC\_API}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{xxhash_8h_ade47204bc3908fdc401a68e9c295e233}{XXH32\_canonicalFromHash}}(\mbox{\hyperlink{struct_x_x_h32__canonical__t}{XXH32\_canonical\_t}}*\ dst,\ \mbox{\hyperlink{xxhash_8h_ab96bf7612b1f829b593220ab7acdc7a6}{XXH32\_hash\_t}}\ hash);}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00205}00205\ \mbox{\hyperlink{xxhash_8h_a5832897ed49938aefa629a76034b36b1}{XXH\_PUBLIC\_API}}\ \mbox{\hyperlink{xxhash_8h_ab96bf7612b1f829b593220ab7acdc7a6}{XXH32\_hash\_t}}\ \mbox{\hyperlink{xxhash_8h_a206cac74a0c149b244d3532186a4930f}{XXH32\_hashFromCanonical}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_x_x_h32__canonical__t}{XXH32\_canonical\_t}}*\ src);}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00206}00206\ }
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00207}00207\ \textcolor{comment}{/*\ Default\ result\ type\ for\ XXH\ functions\ are\ primitive\ unsigned\ 32\ and\ 64\ bits.}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00208}00208\ \textcolor{comment}{*\ \ The\ canonical\ representation\ uses\ human-\/readable\ write\ convention,\ aka\ big-\/endian\ (large\ digits\ first).}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00209}00209\ \textcolor{comment}{*\ \ These\ functions\ allow\ transformation\ of\ hash\ result\ into\ and\ from\ its\ canonical\ format.}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00210}00210\ \textcolor{comment}{*\ \ This\ way,\ hash\ values\ can\ be\ written\ into\ a\ file\ /\ memory,\ and\ remain\ comparable\ on\ different\ systems\ and\ programs.}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00211}00211\ \textcolor{comment}{*/}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00212}00212\ }
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00213}00213\ }
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00214}00214\ \textcolor{preprocessor}{\#ifndef\ XXH\_NO\_LONG\_LONG}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00215}00215\ \textcolor{comment}{/*-\/**********************************************************************}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00216}00216\ \textcolor{comment}{*\ \ 64-\/bits\ hash}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00217}00217\ \textcolor{comment}{************************************************************************/}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00218}\mbox{\hyperlink{xxhash_8h_a3d2b19e87ac87eb107372946fce59b26}{00218}}\ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{xxhash_8h_a3d2b19e87ac87eb107372946fce59b26}{XXH64\_hash\_t}};}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00219}00219\ }
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00225}00225\ \mbox{\hyperlink{xxhash_8h_a5832897ed49938aefa629a76034b36b1}{XXH\_PUBLIC\_API}}\ \mbox{\hyperlink{xxhash_8h_a3d2b19e87ac87eb107372946fce59b26}{XXH64\_hash\_t}}\ \mbox{\hyperlink{xxhash_8h_a6a12044a8880150d2c95b80df0043676}{XXH64}}\ (\textcolor{keyword}{const}\ \textcolor{keywordtype}{void}*\ input,\ \textcolor{keywordtype}{size\_t}\ length,\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ \textcolor{keywordtype}{long}\ seed);}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00226}00226\ }
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00227}00227\ \textcolor{comment}{/*======\ \ \ Streaming\ \ \ ======*/}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00228}\mbox{\hyperlink{xxhash_8h_a0702bdbc80b0cf9e94f2379f7d839b8c}{00228}}\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }XXH64\_state\_s\ \mbox{\hyperlink{xxhash_8h_a0702bdbc80b0cf9e94f2379f7d839b8c}{XXH64\_state\_t}};\ \ \ \textcolor{comment}{/*\ incomplete\ type\ */}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00229}00229\ \mbox{\hyperlink{xxhash_8h_a5832897ed49938aefa629a76034b36b1}{XXH\_PUBLIC\_API}}\ \mbox{\hyperlink{xxhash_8h_a0702bdbc80b0cf9e94f2379f7d839b8c}{XXH64\_state\_t}}*\ \mbox{\hyperlink{xxhash_8h_a79efe920b4f18004110a6e9bcc0385e0}{XXH64\_createState}}(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00230}00230\ \mbox{\hyperlink{xxhash_8h_a5832897ed49938aefa629a76034b36b1}{XXH\_PUBLIC\_API}}\ \mbox{\hyperlink{xxhash_8h_a5020905455674b8c83c1dbc73f0d3534}{XXH\_errorcode}}\ \ \mbox{\hyperlink{xxhash_8h_ae490ef51db9c960da09189c2774cf82e}{XXH64\_freeState}}(\mbox{\hyperlink{xxhash_8h_a0702bdbc80b0cf9e94f2379f7d839b8c}{XXH64\_state\_t}}*\ statePtr);}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00231}00231\ \mbox{\hyperlink{xxhash_8h_a5832897ed49938aefa629a76034b36b1}{XXH\_PUBLIC\_API}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{xxhash_8h_a465a40feffb31fbbece3385ca3c52eb6}{XXH64\_copyState}}(\mbox{\hyperlink{xxhash_8h_a0702bdbc80b0cf9e94f2379f7d839b8c}{XXH64\_state\_t}}*\ dst\_state,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{xxhash_8h_a0702bdbc80b0cf9e94f2379f7d839b8c}{XXH64\_state\_t}}*\ src\_state);}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00232}00232\ }
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00233}00233\ \mbox{\hyperlink{xxhash_8h_a5832897ed49938aefa629a76034b36b1}{XXH\_PUBLIC\_API}}\ \mbox{\hyperlink{xxhash_8h_a5020905455674b8c83c1dbc73f0d3534}{XXH\_errorcode}}\ \mbox{\hyperlink{xxhash_8h_a81c80f1f143238a37ebc39a100ade6d5}{XXH64\_reset}}\ \ (\mbox{\hyperlink{xxhash_8h_a0702bdbc80b0cf9e94f2379f7d839b8c}{XXH64\_state\_t}}*\ statePtr,\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ \textcolor{keywordtype}{long}\ seed);}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00234}00234\ \mbox{\hyperlink{xxhash_8h_a5832897ed49938aefa629a76034b36b1}{XXH\_PUBLIC\_API}}\ \mbox{\hyperlink{xxhash_8h_a5020905455674b8c83c1dbc73f0d3534}{XXH\_errorcode}}\ \mbox{\hyperlink{xxhash_8h_a5419c59c26a757d705b0f0bf68a175bf}{XXH64\_update}}\ (\mbox{\hyperlink{xxhash_8h_a0702bdbc80b0cf9e94f2379f7d839b8c}{XXH64\_state\_t}}*\ statePtr,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{void}*\ input,\ \textcolor{keywordtype}{size\_t}\ length);}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00235}00235\ \mbox{\hyperlink{xxhash_8h_a5832897ed49938aefa629a76034b36b1}{XXH\_PUBLIC\_API}}\ \mbox{\hyperlink{xxhash_8h_a3d2b19e87ac87eb107372946fce59b26}{XXH64\_hash\_t}}\ \ \mbox{\hyperlink{xxhash_8h_aa58640d3d99cceed8544a957bc63867a}{XXH64\_digest}}\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{xxhash_8h_a0702bdbc80b0cf9e94f2379f7d839b8c}{XXH64\_state\_t}}*\ statePtr);}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00236}00236\ }
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00237}00237\ \textcolor{comment}{/*======\ \ \ Canonical\ representation\ \ \ ======*/}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00238}\mbox{\hyperlink{struct_x_x_h64__canonical__t_ad62f1c1b20213c45a6686e1e3446c703}{00238}}\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ digest[8];\ \}\ \mbox{\hyperlink{struct_x_x_h64__canonical__t}{XXH64\_canonical\_t}};}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00239}00239\ \mbox{\hyperlink{xxhash_8h_a5832897ed49938aefa629a76034b36b1}{XXH\_PUBLIC\_API}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{xxhash_8h_aecb9c0887b2cc4f4444cfa439e6c2c6b}{XXH64\_canonicalFromHash}}(\mbox{\hyperlink{struct_x_x_h64__canonical__t}{XXH64\_canonical\_t}}*\ dst,\ \mbox{\hyperlink{xxhash_8h_a3d2b19e87ac87eb107372946fce59b26}{XXH64\_hash\_t}}\ hash);}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00240}00240\ \mbox{\hyperlink{xxhash_8h_a5832897ed49938aefa629a76034b36b1}{XXH\_PUBLIC\_API}}\ \mbox{\hyperlink{xxhash_8h_a3d2b19e87ac87eb107372946fce59b26}{XXH64\_hash\_t}}\ \mbox{\hyperlink{xxhash_8h_add7f64d0c0590f222747e7f703cfd3b0}{XXH64\_hashFromCanonical}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_x_x_h64__canonical__t}{XXH64\_canonical\_t}}*\ src);}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00241}00241\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{/*\ XXH\_NO\_LONG\_LONG\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00242}00242\ }
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00243}00243\ }
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00244}00244\ \textcolor{preprocessor}{\#ifdef\ XXH\_STATIC\_LINKING\_ONLY}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00245}00245\ }
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00246}00246\ \textcolor{comment}{/*\ ================================================================================================}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00247}00247\ \textcolor{comment}{\ \ \ This\ section\ contains\ definitions\ which\ are\ not\ guaranteed\ to\ remain\ stable.}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00248}00248\ \textcolor{comment}{\ \ \ They\ may\ change\ in\ future\ versions,\ becoming\ incompatible\ with\ a\ different\ version\ of\ the\ library.}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00249}00249\ \textcolor{comment}{\ \ \ They\ shall\ only\ be\ used\ with\ static\ linking.}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00250}00250\ \textcolor{comment}{\ \ \ Never\ use\ these\ definitions\ in\ association\ with\ dynamic\ linking\ !}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00251}00251\ \textcolor{comment}{===================================================================================================\ */}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00252}00252\ }
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00253}00253\ \textcolor{comment}{/*\ These\ definitions\ are\ only\ meant\ to\ make\ possible}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00254}00254\ \textcolor{comment}{\ \ \ static\ allocation\ of\ XXH\ state,\ on\ stack\ or\ in\ a\ struct\ for\ example.}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00255}00255\ \textcolor{comment}{\ \ \ Never\ use\ members\ directly.\ */}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00256}00256\ }
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00257}00257\ \textcolor{keyword}{struct\ }XXH32\_state\_s\ \{}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00258}00258\ \ \ \ \textcolor{keywordtype}{unsigned}\ total\_len\_32;}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00259}00259\ \ \ \ \textcolor{keywordtype}{unsigned}\ large\_len;}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00260}00260\ \ \ \ \textcolor{keywordtype}{unsigned}\ v1;}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00261}00261\ \ \ \ \textcolor{keywordtype}{unsigned}\ v2;}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00262}00262\ \ \ \ \textcolor{keywordtype}{unsigned}\ v3;}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00263}00263\ \ \ \ \textcolor{keywordtype}{unsigned}\ v4;}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00264}00264\ \ \ \ \textcolor{keywordtype}{unsigned}\ mem32[4];\ \ \ \textcolor{comment}{/*\ buffer\ defined\ as\ U32\ for\ alignment\ */}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00265}00265\ \ \ \ \textcolor{keywordtype}{unsigned}\ memsize;}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00266}00266\ \ \ \ \textcolor{keywordtype}{unsigned}\ \mbox{\hyperlink{pkcs11_8h_a54b44b284e7b978df176ebf111fd52ae}{reserved}};\ \ \ \textcolor{comment}{/*\ never\ read\ nor\ write,\ will\ be\ removed\ in\ a\ future\ version\ */}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00267}00267\ \};\ \ \ \textcolor{comment}{/*\ typedef'd\ to\ XXH32\_state\_t\ */}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00268}00268\ }
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00269}00269\ \textcolor{preprocessor}{\#ifndef\ XXH\_NO\_LONG\_LONG\ \ \ }\textcolor{comment}{/*\ remove\ 64-\/bits\ support\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00270}00270\ \textcolor{keyword}{struct\ }XXH64\_state\_s\ \{}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00271}00271\ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ \textcolor{keywordtype}{long}\ total\_len;}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00272}00272\ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ \textcolor{keywordtype}{long}\ v1;}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00273}00273\ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ \textcolor{keywordtype}{long}\ v2;}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00274}00274\ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ \textcolor{keywordtype}{long}\ v3;}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00275}00275\ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ \textcolor{keywordtype}{long}\ v4;}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00276}00276\ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long}\ \textcolor{keywordtype}{long}\ mem64[4];\ \ \ \textcolor{comment}{/*\ buffer\ defined\ as\ U64\ for\ alignment\ */}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00277}00277\ \ \ \ \textcolor{keywordtype}{unsigned}\ memsize;}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00278}00278\ \ \ \ \textcolor{keywordtype}{unsigned}\ \mbox{\hyperlink{pkcs11_8h_a54b44b284e7b978df176ebf111fd52ae}{reserved}}[2];\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ never\ read\ nor\ write,\ will\ be\ removed\ in\ a\ future\ version\ */}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00279}00279\ \};\ \ \ \textcolor{comment}{/*\ typedef'd\ to\ XXH64\_state\_t\ */}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00280}00280\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00281}00281\ }
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00282}00282\ \textcolor{preprocessor}{\#ifdef\ XXH\_PRIVATE\_API}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00283}00283\ \textcolor{preprocessor}{\#\ \ include\ "{}\mbox{\hyperlink{xxhash_8c}{xxhash.c}}"{}}\ \ \ \textcolor{comment}{/*\ include\ xxhash\ function\ bodies\ as\ \`{}static`,\ for\ inlining\ */}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00284}00284\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00285}00285\ }
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00286}00286\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{/*\ XXH\_STATIC\_LINKING\_ONLY\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00287}00287\ }
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00288}00288\ }
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00289}00289\ \textcolor{preprocessor}{\#if\ defined\ (\_\_cplusplus)}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00290}00290\ \}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00291}00291\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00292}00292\ }
+\DoxyCodeLine{\Hypertarget{xxhash_8h_source_l00293}00293\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{/*\ XXHASH\_H\_5627135585666179\ */}\textcolor{preprocessor}{}}
+
+\end{DoxyCode}

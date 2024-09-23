@@ -1,0 +1,5 @@
+var structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__result =
+[
+    [ "account_result", "structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__result_1_1account__result.html", "structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__result_1_1account__result" ],
+    [ "accounts", "structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__result.html#a987652cb712f4f8ca9e2d29f6716c243", null ]
+];

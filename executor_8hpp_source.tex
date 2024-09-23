@@ -1,0 +1,49 @@
+\doxysection{executor.\+hpp}
+\hypertarget{executor_8hpp_source}{}\label{executor_8hpp_source}\index{libraries/chain/include/sysio/chain/webassembly/sys-\/vm-\/oc/executor.hpp@{libraries/chain/include/sysio/chain/webassembly/sys-\/vm-\/oc/executor.hpp}}
+\mbox{\hyperlink{executor_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{executor_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{executor_8hpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{executor_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{stack_8hpp}{sysio/chain/webassembly/sys-\/vm-\/oc/stack.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{executor_8hpp_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{executor_8hpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{stdint_8h}{stdint.h}}>}}
+\DoxyCodeLine{\Hypertarget{executor_8hpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <stddef.h>}}
+\DoxyCodeLine{\Hypertarget{executor_8hpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <exception>}}
+\DoxyCodeLine{\Hypertarget{executor_8hpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <setjmp.h>}}
+\DoxyCodeLine{\Hypertarget{executor_8hpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{executor_8hpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <list>}}
+\DoxyCodeLine{\Hypertarget{executor_8hpp_source_l00011}00011\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{\Hypertarget{executor_8hpp_source_l00012}00012\ \textcolor{preprocessor}{\#include\ <cstddef>}}
+\DoxyCodeLine{\Hypertarget{executor_8hpp_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{executor_8hpp_source_l00014}00014\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{\ \textcolor{keyword}{namespace\ }chain\ \{}
+\DoxyCodeLine{\Hypertarget{executor_8hpp_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{executor_8hpp_source_l00016}00016\ \textcolor{keyword}{class\ }apply\_context;}
+\DoxyCodeLine{\Hypertarget{executor_8hpp_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{executor_8hpp_source_l00018}00018\ \textcolor{keyword}{namespace\ }eosvmoc\ \{}
+\DoxyCodeLine{\Hypertarget{executor_8hpp_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{executor_8hpp_source_l00020}00020\ \textcolor{keyword}{class\ }code\_cache\_base;}
+\DoxyCodeLine{\Hypertarget{executor_8hpp_source_l00021}00021\ \textcolor{keyword}{class\ }\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908acd69b4957f06cd818d7bf3d61980e291}{memory}};}
+\DoxyCodeLine{\Hypertarget{executor_8hpp_source_l00022}00022\ \textcolor{keyword}{struct\ }code\_descriptor;}
+\DoxyCodeLine{\Hypertarget{executor_8hpp_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{executor_8hpp_source_l00024}\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1executor}{00024}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1executor}{executor}}\ \{}
+\DoxyCodeLine{\Hypertarget{executor_8hpp_source_l00025}00025\ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{executor_8hpp_source_l00026}00026\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1executor_a7775dd291ec388bee1237d0005238516}{executor}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1code__cache__base}{code\_cache\_base}}\&\ cc);}
+\DoxyCodeLine{\Hypertarget{executor_8hpp_source_l00027}00027\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1executor_a858180d7d233e64c6d6cd7664da632da}{\string~executor}}();}
+\DoxyCodeLine{\Hypertarget{executor_8hpp_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{executor_8hpp_source_l00029}00029\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1executor_a53e27b539f049d467aa2f64c5dccff93}{execute}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1code__descriptor}{code\_descriptor}}\&\ code,\ \mbox{\hyperlink{classsysio_1_1chain_1_1eosvmoc_1_1memory}{memory}}\&\ mem,\ \mbox{\hyperlink{classsysio_1_1chain_1_1apply__context}{apply\_context}}\&\ \mbox{\hyperlink{structcontext}{context}});}
+\DoxyCodeLine{\Hypertarget{executor_8hpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{executor_8hpp_source_l00031}00031\ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{executor_8hpp_source_l00032}00032\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}*\ code\_mapping;}
+\DoxyCodeLine{\Hypertarget{executor_8hpp_source_l00033}00033\ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ code\_mapping\_size;}
+\DoxyCodeLine{\Hypertarget{executor_8hpp_source_l00034}00034\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ mapping\_is\_executable;}
+\DoxyCodeLine{\Hypertarget{executor_8hpp_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{executor_8hpp_source_l00036}00036\ \ \ \ \ \ \ std::exception\_ptr\ executors\_exception\_ptr;}
+\DoxyCodeLine{\Hypertarget{executor_8hpp_source_l00037}00037\ \ \ \ \ \ \ sigjmp\_buf\ executors\_sigjmp\_buf;}
+\DoxyCodeLine{\Hypertarget{executor_8hpp_source_l00038}00038\ \ \ \ \ \ \ std::list<std::vector<std::byte>>\ executors\_bounce\_buffers;}
+\DoxyCodeLine{\Hypertarget{executor_8hpp_source_l00039}00039\ \ \ \ \ \ \ std::vector<std::byte>\ globals\_buffer;}
+\DoxyCodeLine{\Hypertarget{executor_8hpp_source_l00040}00040\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack}{execution\_stack}}\ stack;}
+\DoxyCodeLine{\Hypertarget{executor_8hpp_source_l00041}00041\ \};}
+\DoxyCodeLine{\Hypertarget{executor_8hpp_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{executor_8hpp_source_l00043}00043\ \}\}\}}
+
+\end{DoxyCode}

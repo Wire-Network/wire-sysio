@@ -1,0 +1,146 @@
+\doxysection{libraries/fc/libraries/ff/depends/ate-\/pairing/include/cybozu/benchmark.hpp File Reference}
+\hypertarget{benchmark_8hpp}{}\label{benchmark_8hpp}\index{libraries/fc/libraries/ff/depends/ate-\/pairing/include/cybozu/benchmark.hpp@{libraries/fc/libraries/ff/depends/ate-\/pairing/include/cybozu/benchmark.hpp}}
+
+
+measure exec time of function  
+
+
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$cybozu/time.\+hpp$>$}\newline
+Include dependency graph for benchmark.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=331pt]{benchmark_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=324pt]{benchmark_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classcybozu_1_1_cpu_clock}{cybozu\+::\+Cpu\+Clock}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacecybozu}{cybozu}}
+\item 
+namespace \mbox{\hyperlink{namespacecybozu_1_1bench}{cybozu\+::bench}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{benchmark_8hpp_a26afc45a0dc319c3b6e6236da80c75fc}{CYBOZU\+\_\+\+UNUSED}}
+\item 
+\#define \mbox{\hyperlink{benchmark_8hpp_a84ca1aaaab29e0968d6069ce8c6d2929}{CYBOZU\+\_\+\+BENCH}}(msg,  func, ...)
+\item 
+\#define \mbox{\hyperlink{benchmark_8hpp_ae71c1a162fdb1c832cebfc3649b52f5b}{CYBOZU\+\_\+\+BENCH\+\_\+C}}(msg,  \+\_\+N,  func, ...)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\begin{DoxyAuthor}{Author}
+MITSUNARI Shigeo 
+\end{DoxyAuthor}
+
+
+Definition in file \mbox{\hyperlink{benchmark_8hpp_source}{benchmark.\+hpp}}.
+
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{benchmark_8hpp_a84ca1aaaab29e0968d6069ce8c6d2929}\index{benchmark.hpp@{benchmark.hpp}!CYBOZU\_BENCH@{CYBOZU\_BENCH}}
+\index{CYBOZU\_BENCH@{CYBOZU\_BENCH}!benchmark.hpp@{benchmark.hpp}}
+\doxysubsubsection{\texorpdfstring{CYBOZU\_BENCH}{CYBOZU\_BENCH}}
+{\footnotesize\ttfamily \label{benchmark_8hpp_a84ca1aaaab29e0968d6069ce8c6d2929} 
+\#define CYBOZU\+\_\+\+BENCH(\begin{DoxyParamCaption}\item[{}]{msg}{, }\item[{}]{func}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ maxClk\ =\ \mbox{\hyperlink{classcybozu_1_1_cpu_clock_a968cb4502710906f906185b381ec0fb8}{cybozu::CpuClock::maxClk}};\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{classcybozu_1_1_cpu_clock}{cybozu::CpuClock}}\ clk;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ for\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{classcybozu_1_1_cpu_clock_a87c17b81605613b6a49d5e77b86f7ec4}{cybozu::CpuClock::loopN2}};\ i++)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ clk.\mbox{\hyperlink{classcybozu_1_1_cpu_clock_ae433b02824c0b180069de6fac28cd4a7}{begin}}();\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ for\ (\textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ =\ 0;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ <\ \mbox{\hyperlink{classcybozu_1_1_cpu_clock_a4deb211ea6e958f2d694343870ed42b5}{cybozu::CpuClock::loopN1}};\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}++)\ \{\ func(\_\_VA\_ARGS\_\_);\ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ clk.\mbox{\hyperlink{classcybozu_1_1_cpu_clock_afc54d499d1294d93b29e02f2a316414c}{end}}();\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ if\ (clk.\mbox{\hyperlink{classcybozu_1_1_cpu_clock_aace2abd7e821b450052db76488cd5965}{getClock}}()\ >\ maxClk)\ \textcolor{keywordflow}{break};\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ if\ (msg\ \&\&\ *msg)\ clk.\mbox{\hyperlink{classcybozu_1_1_cpu_clock_a8fcf697e02ac4df9eeaea7340604972e}{put}}(msg,\ \mbox{\hyperlink{classcybozu_1_1_cpu_clock_a4deb211ea6e958f2d694343870ed42b5}{cybozu::CpuClock::loopN1}});\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ cybozu::bench::g\_clk\ =\ clk;\ cybozu::bench::g\_loopNum\ =\ \mbox{\hyperlink{classcybozu_1_1_cpu_clock_a4deb211ea6e958f2d694343870ed42b5}{cybozu::CpuClock::loopN1}};\ \(\backslash\)}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{benchmark_8hpp_source_l00140}{140}} of file \mbox{\hyperlink{benchmark_8hpp_source}{benchmark.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00140\ \textcolor{preprocessor}{\#define\ CYBOZU\_BENCH(msg,\ func,\ ...)\ \(\backslash\)}}
+\DoxyCodeLine{00141\ \textcolor{preprocessor}{\{\ \(\backslash\)}}
+\DoxyCodeLine{00142\ \textcolor{preprocessor}{\ \ \ \ const\ uint64\_t\ maxClk\ =\ cybozu::CpuClock::maxClk;\ \(\backslash\)}}
+\DoxyCodeLine{00143\ \textcolor{preprocessor}{\ \ \ \ cybozu::CpuClock\ clk;\ \(\backslash\)}}
+\DoxyCodeLine{00144\ \textcolor{preprocessor}{\ \ \ \ for\ (int\ i\ =\ 0;\ i\ <\ cybozu::CpuClock::loopN2;\ i++)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00145\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ clk.begin();\ \(\backslash\)}}
+\DoxyCodeLine{00146\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ for\ (int\ j\ =\ 0;\ j\ <\ cybozu::CpuClock::loopN1;\ j++)\ \{\ func(\_\_VA\_ARGS\_\_);\ \}\ \(\backslash\)}}
+\DoxyCodeLine{00147\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ clk.end();\ \(\backslash\)}}
+\DoxyCodeLine{00148\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ if\ (clk.getClock()\ >\ maxClk)\ break;\ \(\backslash\)}}
+\DoxyCodeLine{00149\ \textcolor{preprocessor}{\ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00150\ \textcolor{preprocessor}{\ \ \ \ if\ (msg\ \&\&\ *msg)\ clk.put(msg,\ cybozu::CpuClock::loopN1);\ \(\backslash\)}}
+\DoxyCodeLine{00151\ \textcolor{preprocessor}{\ \ \ \ cybozu::bench::g\_clk\ =\ clk;\ cybozu::bench::g\_loopNum\ =\ cybozu::CpuClock::loopN1;\ \(\backslash\)}}
+\DoxyCodeLine{00152\ \textcolor{preprocessor}{\}}}
+
+\end{DoxyCode}
+\Hypertarget{benchmark_8hpp_ae71c1a162fdb1c832cebfc3649b52f5b}\index{benchmark.hpp@{benchmark.hpp}!CYBOZU\_BENCH\_C@{CYBOZU\_BENCH\_C}}
+\index{CYBOZU\_BENCH\_C@{CYBOZU\_BENCH\_C}!benchmark.hpp@{benchmark.hpp}}
+\doxysubsubsection{\texorpdfstring{CYBOZU\_BENCH\_C}{CYBOZU\_BENCH\_C}}
+{\footnotesize\ttfamily \label{benchmark_8hpp_ae71c1a162fdb1c832cebfc3649b52f5b} 
+\#define CYBOZU\+\_\+\+BENCH\+\_\+C(\begin{DoxyParamCaption}\item[{}]{msg}{, }\item[{}]{\+\_\+N}{, }\item[{}]{func}{, }\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{classcybozu_1_1_cpu_clock}{cybozu::CpuClock}}\ clk;\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ clk.\mbox{\hyperlink{classcybozu_1_1_cpu_clock_ae433b02824c0b180069de6fac28cd4a7}{begin}}();\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ for\ (\textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ =\ 0;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ <\ \_N;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}++)\ \{\ func(\_\_VA\_ARGS\_\_);\ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ clk.\mbox{\hyperlink{classcybozu_1_1_cpu_clock_afc54d499d1294d93b29e02f2a316414c}{end}}();\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ if\ (msg\ \&\&\ *msg)\ clk.\mbox{\hyperlink{classcybozu_1_1_cpu_clock_a8fcf697e02ac4df9eeaea7340604972e}{put}}(msg,\ \_N);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ cybozu::bench::g\_clk\ =\ clk;\ cybozu::bench::g\_loopNum\ =\ \_N;\ \(\backslash\)}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{benchmark_8hpp_source_l00159}{159}} of file \mbox{\hyperlink{benchmark_8hpp_source}{benchmark.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00159\ \textcolor{preprocessor}{\#define\ CYBOZU\_BENCH\_C(msg,\ \_N,\ func,\ ...)\ \(\backslash\)}}
+\DoxyCodeLine{00160\ \textcolor{preprocessor}{\{\ \(\backslash\)}}
+\DoxyCodeLine{00161\ \textcolor{preprocessor}{\ \ \ \ cybozu::CpuClock\ clk;\ \(\backslash\)}}
+\DoxyCodeLine{00162\ \textcolor{preprocessor}{\ \ \ \ clk.begin();\ \(\backslash\)}}
+\DoxyCodeLine{00163\ \textcolor{preprocessor}{\ \ \ \ for\ (int\ j\ =\ 0;\ j\ <\ \_N;\ j++)\ \{\ func(\_\_VA\_ARGS\_\_);\ \}\ \(\backslash\)}}
+\DoxyCodeLine{00164\ \textcolor{preprocessor}{\ \ \ \ clk.end();\ \(\backslash\)}}
+\DoxyCodeLine{00165\ \textcolor{preprocessor}{\ \ \ \ if\ (msg\ \&\&\ *msg)\ clk.put(msg,\ \_N);\ \(\backslash\)}}
+\DoxyCodeLine{00166\ \textcolor{preprocessor}{\ \ \ \ cybozu::bench::g\_clk\ =\ clk;\ cybozu::bench::g\_loopNum\ =\ \_N;\ \(\backslash\)}}
+\DoxyCodeLine{00167\ \textcolor{preprocessor}{\}}}
+
+\end{DoxyCode}
+\Hypertarget{benchmark_8hpp_a26afc45a0dc319c3b6e6236da80c75fc}\index{benchmark.hpp@{benchmark.hpp}!CYBOZU\_UNUSED@{CYBOZU\_UNUSED}}
+\index{CYBOZU\_UNUSED@{CYBOZU\_UNUSED}!benchmark.hpp@{benchmark.hpp}}
+\doxysubsubsection{\texorpdfstring{CYBOZU\_UNUSED}{CYBOZU\_UNUSED}}
+{\footnotesize\ttfamily \label{benchmark_8hpp_a26afc45a0dc319c3b6e6236da80c75fc} 
+\#define CYBOZU\+\_\+\+UNUSED}
+
+
+
+Definition at line \mbox{\hyperlink{benchmark_8hpp_source_l00130}{130}} of file \mbox{\hyperlink{benchmark_8hpp_source}{benchmark.\+hpp}}.
+

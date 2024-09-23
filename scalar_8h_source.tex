@@ -1,0 +1,79 @@
+\doxysection{scalar.\+h}
+\hypertarget{scalar_8h_source}{}\label{scalar_8h_source}\index{libraries/fc/secp256k1/secp256k1/src/scalar.h@{libraries/fc/secp256k1/secp256k1/src/scalar.h}}
+\mbox{\hyperlink{scalar_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00001}00001\ \textcolor{comment}{/***********************************************************************}}
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2014\ Pieter\ Wuille\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00003}00003\ \textcolor{comment}{\ *\ Distributed\ under\ the\ MIT\ software\ license,\ see\ the\ accompanying\ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00004}00004\ \textcolor{comment}{\ *\ file\ COPYING\ or\ https://www.opensource.org/licenses/mit-\/license.php.*}}
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00005}00005\ \textcolor{comment}{\ ***********************************************************************/}}
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00007}00007\ \textcolor{preprocessor}{\#ifndef\ SECP256K1\_SCALAR\_H}}
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00008}00008\ \textcolor{preprocessor}{\#define\ SECP256K1\_SCALAR\_H}}
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00010}00010\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h}{util.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00012}00012\ \textcolor{preprocessor}{\#if\ defined\ HAVE\_CONFIG\_H}}
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00013}00013\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{libsecp256k1-config_8h}{libsecp256k1-\/config.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00014}00014\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00016}00016\ \textcolor{preprocessor}{\#if\ defined(EXHAUSTIVE\_TEST\_ORDER)}}
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00017}00017\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{scalar__low_8h}{scalar\_low.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00018}00018\ \textcolor{preprocessor}{\#elif\ defined(SECP256K1\_WIDEMUL\_INT128)}}
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00019}00019\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{scalar__4x64_8h}{scalar\_4x64.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00020}00020\ \textcolor{preprocessor}{\#elif\ defined(SECP256K1\_WIDEMUL\_INT64)}}
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00021}00021\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{scalar__8x32_8h}{scalar\_8x32.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00022}00022\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00023}00023\ \textcolor{preprocessor}{\#error\ "{}Please\ select\ wide\ multiplication\ implementation"{}}}
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00024}00024\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00027}00027\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_scalar\_clear(\mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}});}
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00030}00030\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ secp256k1\_scalar\_get\_bits(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ offset,\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}});}
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00033}00033\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ secp256k1\_scalar\_get\_bits\_var(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ offset,\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}});}
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00040}00040\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_scalar\_set\_b32(\mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *bin,\ \textcolor{keywordtype}{int}\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a49aa97067a36875627e1380c3fb3833d}{overflow}});}
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00044}00044\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ secp256k1\_scalar\_set\_b32\_seckey(\mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *bin);}
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00047}00047\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_scalar\_set\_int(\mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ v);}
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00050}00050\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_scalar\_get\_b32(\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *bin,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}*\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00053}00053\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ secp256k1\_scalar\_add(\mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *b);}
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00054}00054\ }
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00056}00056\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_scalar\_cadd\_bit(\mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm_8h_a276ec4ea44aa77416c732159c90a37b9}{bit}},\ \textcolor{keywordtype}{int}\ flag);}
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00059}00059\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_scalar\_mul(\mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *b);}
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00063}00063\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ secp256k1\_scalar\_shr\_int(\mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \textcolor{keywordtype}{int}\ n);}
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00066}00066\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_scalar\_inverse(\mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00067}00067\ }
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00069}00069\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_scalar\_inverse\_var(\mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00072}00072\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_scalar\_negate(\mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00073}00073\ }
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00075}00075\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ secp256k1\_scalar\_is\_zero(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00076}00076\ }
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00078}00078\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ secp256k1\_scalar\_is\_one(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00081}00081\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ secp256k1\_scalar\_is\_even(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00084}00084\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ secp256k1\_scalar\_is\_high(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00085}00085\ }
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00088}00088\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ secp256k1\_scalar\_cond\_negate(\mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \textcolor{keywordtype}{int}\ flag);}
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00089}00089\ }
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00091}00091\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ secp256k1\_scalar\_eq(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *b);}
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00092}00092\ }
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00094}00094\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_scalar\_split\_128(\mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *r1,\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *r2,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *k);}
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00097}00097\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_scalar\_split\_lambda(\mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *r1,\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *r2,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *k);}
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00098}00098\ }
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00100}00100\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_scalar\_mul\_shift\_var(\mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *b,\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ shift);}
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00101}00101\ }
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00103}00103\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_scalar\_cmov(\mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ *\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \textcolor{keywordtype}{int}\ flag);}
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00104}00104\ }
+\DoxyCodeLine{\Hypertarget{scalar_8h_source_l00105}00105\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{/*\ SECP256K1\_SCALAR\_H\ */}\textcolor{preprocessor}{}}
+
+\end{DoxyCode}

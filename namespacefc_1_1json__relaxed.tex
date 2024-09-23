@@ -1,0 +1,990 @@
+\doxysection{fc\+::json\+\_\+relaxed Namespace Reference}
+\hypertarget{namespacefc_1_1json__relaxed}{}\label{namespacefc_1_1json__relaxed}\index{fc::json\_relaxed@{fc::json\_relaxed}}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structfc_1_1json__relaxed_1_1_char_value_table}{Char\+Value\+Table}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , bool strict$>$ }\\\mbox{\hyperlink{classfc_1_1variant}{variant}} \mbox{\hyperlink{namespacefc_1_1json__relaxed_a93f8ed4a8dfc1215a360508b01460758}{variant\+\_\+from\+\_\+stream}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&in, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} max\+\_\+depth)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\std\+::string \mbox{\hyperlink{namespacefc_1_1json__relaxed_ab8adad286397169b103cfc3174b08ac0}{token\+From\+Stream}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&in)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , bool strict, bool allow\+\_\+escape$>$ }\\std\+::string \mbox{\hyperlink{namespacefc_1_1json__relaxed_a060702680aabbfdda1ea3a9ebba4cb47}{quote\+String\+From\+Stream}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&in)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , bool strict$>$ }\\std\+::string \mbox{\hyperlink{namespacefc_1_1json__relaxed_a740e0f5fe18f8883bf3ddc221a088fb1}{string\+From\+Stream}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&in)
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} base$>$ }\\\mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \mbox{\hyperlink{namespacefc_1_1json__relaxed_ab9f74ca1d69a24b9426673da82b53b89}{parse\+Int}} (const std\+::string \&token, size\+\_\+t start)
+\item 
+{\footnotesize template$<$bool strict, \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} base$>$ }\\\mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \mbox{\hyperlink{namespacefc_1_1json__relaxed_a651f065bc345928a9d703a33779e3b36}{maybe\+Parse\+Int}} (const std\+::string \&token, size\+\_\+t start)
+\item 
+{\footnotesize template$<$bool strict$>$ }\\\mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \mbox{\hyperlink{namespacefc_1_1json__relaxed_a5dfa268437a1c87f9a3fccaca20f4f66}{parse\+Number\+Or\+Str}} (const std\+::string \&token)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , bool strict$>$ }\\\mbox{\hyperlink{classfc_1_1variant__object}{variant\+\_\+object}} \mbox{\hyperlink{namespacefc_1_1json__relaxed_a70b5ca49066241be221209bf30a1747b}{object\+From\+Stream}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&in, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} max\+\_\+depth)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , bool strict$>$ }\\\mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}} \mbox{\hyperlink{namespacefc_1_1json__relaxed_a088ff48c6ecf622230a5ce1c173d2812}{array\+From\+Stream}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&in, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} max\+\_\+depth)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , bool strict$>$ }\\\mbox{\hyperlink{classfc_1_1variant}{variant}} \mbox{\hyperlink{namespacefc_1_1json__relaxed_ad82c2c19cb73ba37be92ee358503d460}{number\+From\+Stream}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&in)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , bool strict$>$ }\\\mbox{\hyperlink{classfc_1_1variant}{variant}} \mbox{\hyperlink{namespacefc_1_1json__relaxed_a8d50031ff7024c06ab8f355b25501434}{word\+From\+Stream}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&in)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacefc_1_1json__relaxed_a088ff48c6ecf622230a5ce1c173d2812}\index{fc::json\_relaxed@{fc::json\_relaxed}!arrayFromStream@{arrayFromStream}}
+\index{arrayFromStream@{arrayFromStream}!fc::json\_relaxed@{fc::json\_relaxed}}
+\doxysubsubsection{\texorpdfstring{arrayFromStream()}{arrayFromStream()}}
+{\footnotesize\ttfamily \label{namespacefc_1_1json__relaxed_a088ff48c6ecf622230a5ce1c173d2812} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , bool strict$>$ \\
+\mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}} fc\+::json\+\_\+relaxed\+::array\+From\+Stream (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{in}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{max\+\_\+depth}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{json__relaxed_8hpp_source_l00624}{624}} of file \mbox{\hyperlink{json__relaxed_8hpp_source}{json\+\_\+relaxed.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00625\ \ \ \ \{}
+\DoxyCodeLine{00626\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}}\ ar;}
+\DoxyCodeLine{00627\ \ \ \ \ \ \ \textcolor{keywordflow}{try}}
+\DoxyCodeLine{00628\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00629\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ in.peek()\ !=\ \textcolor{charliteral}{'['}\ )}
+\DoxyCodeLine{00630\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}Expected\ '['"{}}\ );}
+\DoxyCodeLine{00631\ \ \ \ \ \ \ \ \ in.get();}
+\DoxyCodeLine{00632\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_aa2bf8a06a5740fdc38da162192bb1f5a}{skip\_white\_space}}(in);}
+\DoxyCodeLine{00633\ }
+\DoxyCodeLine{00634\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\ in.peek()\ !=\ \textcolor{charliteral}{']'}\ )}
+\DoxyCodeLine{00635\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00636\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ in.peek()\ ==\ \textcolor{charliteral}{','}\ )}
+\DoxyCodeLine{00637\ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00638\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ in.get();}
+\DoxyCodeLine{00639\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{00640\ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00641\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{namespacefc_aa2bf8a06a5740fdc38da162192bb1f5a}{skip\_white\_space}}(in)\ )\ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{00642\ \ \ \ \ \ \ \ \ \ \ \ ar.push\_back(\ json\_relaxed::variant\_from\_stream<T,\ strict>(in,\ max\_depth\ -\/\ 1)\ );}
+\DoxyCodeLine{00643\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_aa2bf8a06a5740fdc38da162192bb1f5a}{skip\_white\_space}}(in);}
+\DoxyCodeLine{00644\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00645\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ in.peek()\ !=\ \textcolor{charliteral}{']'}\ )}
+\DoxyCodeLine{00646\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}Expected\ ']'\ after\ parsing\ \$\{variant\}"{}},}
+\DoxyCodeLine{00647\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}variant"{}},\ ar)\ );}
+\DoxyCodeLine{00648\ }
+\DoxyCodeLine{00649\ \ \ \ \ \ \ \ \ in.get();}
+\DoxyCodeLine{00650\ \ \ \ \ \ \ \}\ \mbox{\hyperlink{exception_8hpp_af3731d6e3beb140d9e652adf7a18113b}{FC\_RETHROW\_EXCEPTIONS}}(\ warn,\ \textcolor{stringliteral}{"{}Attempting\ to\ parse\ array\ \$\{array\}"{}},}
+\DoxyCodeLine{00651\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}array"{}},\ ar\ )\ );}
+\DoxyCodeLine{00652\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ar;}
+\DoxyCodeLine{00653\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacefc_1_1json__relaxed_a088ff48c6ecf622230a5ce1c173d2812_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacefc_1_1json__relaxed_a088ff48c6ecf622230a5ce1c173d2812_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacefc_1_1json__relaxed_a651f065bc345928a9d703a33779e3b36}\index{fc::json\_relaxed@{fc::json\_relaxed}!maybeParseInt@{maybeParseInt}}
+\index{maybeParseInt@{maybeParseInt}!fc::json\_relaxed@{fc::json\_relaxed}}
+\doxysubsubsection{\texorpdfstring{maybeParseInt()}{maybeParseInt()}}
+{\footnotesize\ttfamily \label{namespacefc_1_1json__relaxed_a651f065bc345928a9d703a33779e3b36} 
+template$<$bool strict, \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} base$>$ \\
+\mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} fc\+::json\+\_\+relaxed\+::maybe\+Parse\+Int (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{token}{, }\item[{size\+\_\+t}]{start}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{json__relaxed_8hpp_source_l00338}{338}} of file \mbox{\hyperlink{json__relaxed_8hpp_source}{json\+\_\+relaxed.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00339\ \ \ \ \{}
+\DoxyCodeLine{00340\ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}}
+\DoxyCodeLine{00341\ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00342\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ parseInt<base>(\ token,\ start\ );}
+\DoxyCodeLine{00343\ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00344\ \ \ \ \ \ \ \ \textcolor{keywordflow}{catch}(\ \textcolor{keyword}{const}\ parse\_error\_exception\ \&e\ )}
+\DoxyCodeLine{00345\ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00346\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ strict\ )}
+\DoxyCodeLine{00347\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}(\ e\ );}
+\DoxyCodeLine{00348\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00349\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}(\ token\ );}
+\DoxyCodeLine{00350\ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00351\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacefc_1_1json__relaxed_a651f065bc345928a9d703a33779e3b36_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacefc_1_1json__relaxed_a651f065bc345928a9d703a33779e3b36_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacefc_1_1json__relaxed_ad82c2c19cb73ba37be92ee358503d460}\index{fc::json\_relaxed@{fc::json\_relaxed}!numberFromStream@{numberFromStream}}
+\index{numberFromStream@{numberFromStream}!fc::json\_relaxed@{fc::json\_relaxed}}
+\doxysubsubsection{\texorpdfstring{numberFromStream()}{numberFromStream()}}
+{\footnotesize\ttfamily \label{namespacefc_1_1json__relaxed_ad82c2c19cb73ba37be92ee358503d460} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , bool strict$>$ \\
+\mbox{\hyperlink{classfc_1_1variant}{variant}} fc\+::json\+\_\+relaxed\+::number\+From\+Stream (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{in}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{json__relaxed_8hpp_source_l00656}{656}} of file \mbox{\hyperlink{json__relaxed_8hpp_source}{json\+\_\+relaxed.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00657\ \ \ \ \{\ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00658\ \ \ \ \ \ \ \ std::string\ token\ =\ \mbox{\hyperlink{namespacefc_1_1json__relaxed_ab8adad286397169b103cfc3174b08ac0}{tokenFromStream}}(in);}
+\DoxyCodeLine{00659\ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{variant}}\ result\ =\ json\_relaxed::parseNumberOrStr<strict>(\ token\ );}
+\DoxyCodeLine{00660\ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ strict\ \&\&\ !(result.is\_int64()\ ||\ result.is\_uint64()\ ||\ result.is\_double())\ )}
+\DoxyCodeLine{00661\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}expected:\ number"{}}\ );}
+\DoxyCodeLine{00662\ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00663\ \ \ \ \}\ \mbox{\hyperlink{exception_8hpp_a094902280cad82ad6529ebbd12a697eb}{FC\_CAPTURE\_AND\_RETHROW}}()\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacefc_1_1json__relaxed_ad82c2c19cb73ba37be92ee358503d460_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacefc_1_1json__relaxed_ad82c2c19cb73ba37be92ee358503d460_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacefc_1_1json__relaxed_a70b5ca49066241be221209bf30a1747b}\index{fc::json\_relaxed@{fc::json\_relaxed}!objectFromStream@{objectFromStream}}
+\index{objectFromStream@{objectFromStream}!fc::json\_relaxed@{fc::json\_relaxed}}
+\doxysubsubsection{\texorpdfstring{objectFromStream()}{objectFromStream()}}
+{\footnotesize\ttfamily \label{namespacefc_1_1json__relaxed_a70b5ca49066241be221209bf30a1747b} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , bool strict$>$ \\
+\mbox{\hyperlink{classfc_1_1variant__object}{variant\+\_\+object}} fc\+::json\+\_\+relaxed\+::object\+From\+Stream (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{in}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{max\+\_\+depth}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{json__relaxed_8hpp_source_l00573}{573}} of file \mbox{\hyperlink{json__relaxed_8hpp_source}{json\+\_\+relaxed.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00574\ \ \ \ \{}
+\DoxyCodeLine{00575\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{mutable\_variant\_object}}\ obj;}
+\DoxyCodeLine{00576\ \ \ \ \ \ \ \textcolor{keywordflow}{try}}
+\DoxyCodeLine{00577\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00578\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ c\ =\ in.peek();}
+\DoxyCodeLine{00579\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ c\ !=\ \textcolor{charliteral}{'\{'}\ )}
+\DoxyCodeLine{00580\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,}
+\DoxyCodeLine{00581\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Expected\ '\{',\ but\ read\ '\$\{char\}'"{}},}
+\DoxyCodeLine{00582\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}char"{}},\textcolor{keywordtype}{string}(\&c,\ \&c\ +\ 1))\ );}
+\DoxyCodeLine{00583\ \ \ \ \ \ \ \ \ \ in.get();}
+\DoxyCodeLine{00584\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_aa2bf8a06a5740fdc38da162192bb1f5a}{skip\_white\_space}}(in);}
+\DoxyCodeLine{00585\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\ in.peek()\ !=\ \textcolor{charliteral}{'\}'}\ )}
+\DoxyCodeLine{00586\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00587\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ in.peek()\ ==\ \textcolor{charliteral}{','}\ )}
+\DoxyCodeLine{00588\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00589\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ in.get();}
+\DoxyCodeLine{00590\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{00591\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00592\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{namespacefc_aa2bf8a06a5740fdc38da162192bb1f5a}{skip\_white\_space}}(in)\ )\ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{00593\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ key\ =\ json\_relaxed::stringFromStream<T,\ strict>(\ in\ );}
+\DoxyCodeLine{00594\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_aa2bf8a06a5740fdc38da162192bb1f5a}{skip\_white\_space}}(in);}
+\DoxyCodeLine{00595\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ in.peek()\ !=\ \textcolor{charliteral}{':'}\ )}
+\DoxyCodeLine{00596\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00597\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}Expected\ ':'\ after\ key\ \(\backslash\)"{}\$\{key\}\(\backslash\)"{}"{}},}
+\DoxyCodeLine{00598\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}key"{}},\ key)\ );}
+\DoxyCodeLine{00599\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00600\ \ \ \ \ \ \ \ \ \ \ \ \ in.get();}
+\DoxyCodeLine{00601\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ val\ =\ json\_relaxed::variant\_from\_stream<T,\ strict>(\ in,\ max\_depth\ -\/\ 1\ );}
+\DoxyCodeLine{00602\ }
+\DoxyCodeLine{00603\ \ \ \ \ \ \ \ \ \ \ \ \ obj(std::move(key),std::move(val));}
+\DoxyCodeLine{00604\ \ \ \ \ \ \ \ \ \ \ \ \ skip\_white\_space(in);}
+\DoxyCodeLine{00605\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00606\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ in.peek()\ ==\ \textcolor{charliteral}{'\}'}\ )}
+\DoxyCodeLine{00607\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00608\ \ \ \ \ \ \ \ \ \ \ \ \ in.get();}
+\DoxyCodeLine{00609\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ obj;}
+\DoxyCodeLine{00610\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00611\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}Expected\ '\}'\ after\ \$\{variant\}"{}},\ (\textcolor{stringliteral}{"{}variant"{}},\ obj\ )\ );}
+\DoxyCodeLine{00612\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00613\ \ \ \ \ \ \ \textcolor{keywordflow}{catch}(\ \textcolor{keyword}{const}\ fc::eof\_exception\&\ e\ )}
+\DoxyCodeLine{00614\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00615\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}Unexpected\ EOF:\ \$\{e\}"{}},\ (\textcolor{stringliteral}{"{}e"{}},\ e.to\_detail\_string()\ )\ );}
+\DoxyCodeLine{00616\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00617\ \ \ \ \ \ \ \textcolor{keywordflow}{catch}(\ \textcolor{keyword}{const}\ std::ios\_base::failure\&\ e\ )}
+\DoxyCodeLine{00618\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00619\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}Unexpected\ EOF:\ \$\{e\}"{}},\ (\textcolor{stringliteral}{"{}e"{}},\ e.what()\ )\ );}
+\DoxyCodeLine{00620\ \ \ \ \ \ \ \}\ \mbox{\hyperlink{exception_8hpp_af3731d6e3beb140d9e652adf7a18113b}{FC\_RETHROW\_EXCEPTIONS}}(\ warn,\ \textcolor{stringliteral}{"{}Error\ parsing\ object"{}}\ );}
+\DoxyCodeLine{00621\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacefc_1_1json__relaxed_a70b5ca49066241be221209bf30a1747b_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacefc_1_1json__relaxed_a70b5ca49066241be221209bf30a1747b_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacefc_1_1json__relaxed_ab9f74ca1d69a24b9426673da82b53b89}\index{fc::json\_relaxed@{fc::json\_relaxed}!parseInt@{parseInt}}
+\index{parseInt@{parseInt}!fc::json\_relaxed@{fc::json\_relaxed}}
+\doxysubsubsection{\texorpdfstring{parseInt()}{parseInt()}}
+{\footnotesize\ttfamily \label{namespacefc_1_1json__relaxed_ab9f74ca1d69a24b9426673da82b53b89} 
+template$<$\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} base$>$ \\
+\mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} fc\+::json\+\_\+relaxed\+::parse\+Int (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{token}{, }\item[{size\+\_\+t}]{start}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{json__relaxed_8hpp_source_l00296}{296}} of file \mbox{\hyperlink{json__relaxed_8hpp_source}{json\+\_\+relaxed.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00297\ \ \ \ \{}
+\DoxyCodeLine{00298\ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structfc_1_1json__relaxed_1_1_char_value_table}{CharValueTable}}\ ctbl;}
+\DoxyCodeLine{00299\ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ INT64\_MAX\_PLUS\_ONE\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\textcolor{keyword}{>}(\mbox{\hyperlink{stdint_8h_ad0d744f05898e32d01f73f8af3cd2071}{INT64\_MAX}})\ +\ 1;}
+\DoxyCodeLine{00300\ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00301\ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ i\ =\ start,\ n\ =\ token.length();}
+\DoxyCodeLine{00302\ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ i\ >=\ n\ )}
+\DoxyCodeLine{00303\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}zero-\/length\ integer"{}}\ );}
+\DoxyCodeLine{00304\ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00305\ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ val\ =\ 0;}
+\DoxyCodeLine{00306\ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ maxb4mul\ =\ \mbox{\hyperlink{stdint_8h_a30654b4b67d97c42ca3f9b6052dda916}{UINT64\_MAX}}\ /\ base;}
+\DoxyCodeLine{00307\ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00308\ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\textcolor{keyword}{true})}
+\DoxyCodeLine{00309\ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00310\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ c\ =\ token[i];}
+\DoxyCodeLine{00311\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ vc\ =\ ctbl[c];}
+\DoxyCodeLine{00312\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ vc\ ==\ 0xFF\ )}
+\DoxyCodeLine{00313\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}illegal\ character\ \$\{c\}\ in\ integer\ of\ base\ \$\{b\}"{}},\ (\textcolor{stringliteral}{"{}c"{}},\ c)(\textcolor{stringliteral}{"{}b"{}},\ base)\ );}
+\DoxyCodeLine{00314\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ val\ >\ maxb4mul\ )}
+\DoxyCodeLine{00315\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}integer\ literal\ overflow"{}}\ );}
+\DoxyCodeLine{00316\ \ \ \ \ \ \ \ \ \ \ \ val\ *=\ base;}
+\DoxyCodeLine{00317\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ newval\ =\ val\ +\ vc;}
+\DoxyCodeLine{00318\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ newval\ <\ val\ )}
+\DoxyCodeLine{00319\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}integer\ literal\ overflow"{}}\ );}
+\DoxyCodeLine{00320\ \ \ \ \ \ \ \ \ \ \ \ val\ =\ newval;}
+\DoxyCodeLine{00321\ \ \ \ \ \ \ \ \ \ \ \ i++;}
+\DoxyCodeLine{00322\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ i\ >=\ n\ )}
+\DoxyCodeLine{00323\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00324\ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00325\ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ token[0]\ ==\ \textcolor{charliteral}{'-\/'}\ )}
+\DoxyCodeLine{00326\ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00327\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ val\ >\ INT64\_MAX\_PLUS\_ONE\ )}
+\DoxyCodeLine{00328\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}negative\ integer\ literal\ overflow"{}}\ );}
+\DoxyCodeLine{00329\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ special\ cased\ to\ avoid\ trying\ to\ compute\ -\/INT64\_MIN\ which\ is\ probably\ undefined\ or\ something}}
+\DoxyCodeLine{00330\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ val\ ==\ INT64\_MAX\_PLUS\_ONE\ )}
+\DoxyCodeLine{00331\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}(\ \mbox{\hyperlink{stdint_8h_ab21f12f372f67b8ff0aa3432336ede67}{INT64\_MIN}}\ );}
+\DoxyCodeLine{00332\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}(\ -\/\textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\textcolor{keyword}{>}(val)\ );}
+\DoxyCodeLine{00333\ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00334\ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}(\ val\ );}
+\DoxyCodeLine{00335\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacefc_1_1json__relaxed_ab9f74ca1d69a24b9426673da82b53b89_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacefc_1_1json__relaxed_a5dfa268437a1c87f9a3fccaca20f4f66}\index{fc::json\_relaxed@{fc::json\_relaxed}!parseNumberOrStr@{parseNumberOrStr}}
+\index{parseNumberOrStr@{parseNumberOrStr}!fc::json\_relaxed@{fc::json\_relaxed}}
+\doxysubsubsection{\texorpdfstring{parseNumberOrStr()}{parseNumberOrStr()}}
+{\footnotesize\ttfamily \label{namespacefc_1_1json__relaxed_a5dfa268437a1c87f9a3fccaca20f4f66} 
+template$<$bool strict$>$ \\
+\mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} fc\+::json\+\_\+relaxed\+::parse\+Number\+Or\+Str (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{token}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{json__relaxed_8hpp_source_l00354}{354}} of file \mbox{\hyperlink{json__relaxed_8hpp_source}{json\+\_\+relaxed.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00355\ \ \ \ \{\ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00356\ \ \ \ \ \ \ \ \textcolor{comment}{//ilog(\ (token)\ );\ }}
+\DoxyCodeLine{00357\ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ i\ =\ 0,\ n\ =\ token.length();}
+\DoxyCodeLine{00358\ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ n\ ==\ 0\ )}
+\DoxyCodeLine{00359\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}expected:\ non-\/empty\ token,\ got:\ empty\ token"{}}\ );}
+\DoxyCodeLine{00360\ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(\ token[0]\ )}
+\DoxyCodeLine{00361\ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00362\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'+'}:}
+\DoxyCodeLine{00363\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ strict\ )}
+\DoxyCodeLine{00364\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}unary\ +\ not\ supported\ in\ strict\ mode"{}}\ );}
+\DoxyCodeLine{00365\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i++;}
+\DoxyCodeLine{00366\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00367\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'-\/'}:}
+\DoxyCodeLine{00368\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i++;}
+\DoxyCodeLine{00369\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00370\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00371\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00372\ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00373\ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ c\ =\ token[i++];}
+\DoxyCodeLine{00374\ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(\ c\ )}
+\DoxyCodeLine{00375\ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00376\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'0'}:}
+\DoxyCodeLine{00377\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ i\ >=\ n\ )}
+\DoxyCodeLine{00378\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}(\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}(\ 0\ )\ );}
+\DoxyCodeLine{00379\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(\ token[i]\ )}
+\DoxyCodeLine{00380\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00381\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'b'}:}
+\DoxyCodeLine{00382\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'B'}:}
+\DoxyCodeLine{00383\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ strict\ )}
+\DoxyCodeLine{00384\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}binary\ numeric\ literals\ not\ supported\ in\ strict\ mode"{}}\ );}
+\DoxyCodeLine{00385\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i++;}
+\DoxyCodeLine{00386\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ i\ >=\ n\ )}
+\DoxyCodeLine{00387\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}empty\ binary\ numeric\ literal"{}}\ );}
+\DoxyCodeLine{00388\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ maybeParseInt<strict,\ 2>(\ token,\ i+1\ );}
+\DoxyCodeLine{00389\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'o'}:}
+\DoxyCodeLine{00390\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'O'}:}
+\DoxyCodeLine{00391\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ strict\ )}
+\DoxyCodeLine{00392\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}octal\ numeric\ literals\ not\ supported\ in\ strict\ mode"{}}\ );}
+\DoxyCodeLine{00393\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ maybeParseInt<strict,\ 8>(\ token,\ i+1\ );}
+\DoxyCodeLine{00394\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'x'}:}
+\DoxyCodeLine{00395\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'X'}:}
+\DoxyCodeLine{00396\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ strict\ )}
+\DoxyCodeLine{00397\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}hex\ numeric\ literals\ not\ supported\ in\ strict\ mode"{}}\ );}
+\DoxyCodeLine{00398\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ maybeParseInt<strict,\ 16>(\ token,\ i+1\ );}
+\DoxyCodeLine{00399\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'.'}:}
+\DoxyCodeLine{00400\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'e'}:}
+\DoxyCodeLine{00401\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'E'}:}
+\DoxyCodeLine{00402\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00403\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00404\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ since\ this\ is\ a\ lookahead,\ other\ cases\ will\ be\ treated\ later}}
+\DoxyCodeLine{00405\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ strict\ )}
+\DoxyCodeLine{00406\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}expected\ '.'|'e'|'E'\ parsing\ number,\ got\ '\$\{c\}'"{}},}
+\DoxyCodeLine{00407\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\ \textcolor{stringliteral}{"{}c"{}},\ c\ )\ );}
+\DoxyCodeLine{00408\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00409\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00410\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'1'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'2'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'3'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'4'}:}
+\DoxyCodeLine{00411\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'5'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'6'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'7'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'8'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'9'}:}
+\DoxyCodeLine{00412\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00413\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'a'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'b'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'c'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'d'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'e'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'f'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'g'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'h'}:}
+\DoxyCodeLine{00414\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'i'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'j'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'k'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'l'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'m'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'n'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'o'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'p'}:}
+\DoxyCodeLine{00415\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'q'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'r'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'s'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'t'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'u'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'v'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'w'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'x'}:}
+\DoxyCodeLine{00416\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'y'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'z'}:}
+\DoxyCodeLine{00417\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'A'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'B'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'C'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'D'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'E'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'F'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'G'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'H'}:}
+\DoxyCodeLine{00418\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'I'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'J'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'K'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'L'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'M'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'N'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'O'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'P'}:}
+\DoxyCodeLine{00419\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'Q'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'R'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'S'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'T'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'U'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'V'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'W'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'X'}:}
+\DoxyCodeLine{00420\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'Y'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'Z'}:}
+\DoxyCodeLine{00421\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\_'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'-\/'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'.'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'+'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'/'}:}
+\DoxyCodeLine{00422\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ strict\ )}
+\DoxyCodeLine{00423\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}illegal\ character\ '\$\{c\}'\ parsing\ number"{}},\ (\ \textcolor{stringliteral}{"{}c"{}},\ c\ )\ );}
+\DoxyCodeLine{00424\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}(\ token\ );}
+\DoxyCodeLine{00425\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00426\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}illegal\ character\ '\$\{c\}'\ in\ token"{}},\ (\ \textcolor{stringliteral}{"{}c"{}},\ c\ )\ );}
+\DoxyCodeLine{00427\ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00428\ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103aea2b2676c28c0db26d39331a336c6b92}{start}}\ =\ i-\/1;}
+\DoxyCodeLine{00429\ }
+\DoxyCodeLine{00430\ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ dot\_ok\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00431\ }
+\DoxyCodeLine{00432\ \ \ \ \ \ \ \ \textcolor{comment}{//\ int\ frac?\ exp?}}
+\DoxyCodeLine{00433\ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\textcolor{keyword}{true})}
+\DoxyCodeLine{00434\ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00435\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ i\ >=\ n\ )}
+\DoxyCodeLine{00436\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ parseInt<10>(\ token,\ start\ );}
+\DoxyCodeLine{00437\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ c\ =\ token[i++];}
+\DoxyCodeLine{00438\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//idump((c)(std::string()+c));}}
+\DoxyCodeLine{00439\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(\ c\ )}
+\DoxyCodeLine{00440\ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00441\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'0'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'1'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'2'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'3'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'4'}:}
+\DoxyCodeLine{00442\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'5'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'6'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'7'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'8'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'9'}:}
+\DoxyCodeLine{00443\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00444\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'.'}:}
+\DoxyCodeLine{00445\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}(token);}
+\DoxyCodeLine{00446\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ dot\_ok\ )}
+\DoxyCodeLine{00447\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00448\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ dot\_ok\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00449\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ i\ ==\ n\ )}
+\DoxyCodeLine{00450\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00451\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ strict\ )}
+\DoxyCodeLine{00452\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}number\ cannot\ end\ with\ '.'\ in\ strict\ mode"{}}\ );}
+\DoxyCodeLine{00453\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}(\ \mbox{\hyperlink{namespacefc_aafd3b0e6ae1093d8678f3973faf39a38}{fc::to\_double}}(token.c\_str())\ );}
+\DoxyCodeLine{00454\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00455\ }
+\DoxyCodeLine{00456\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//idump((i));}}
+\DoxyCodeLine{00457\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ c\ =\ token[i+1];}
+\DoxyCodeLine{00458\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//idump((c));}}
+\DoxyCodeLine{00459\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(\ c\ )}
+\DoxyCodeLine{00460\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00461\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'0'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'1'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'2'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'3'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'4'}:}
+\DoxyCodeLine{00462\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'5'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'6'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'7'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'8'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'9'}:}
+\DoxyCodeLine{00463\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00464\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'e'}:}
+\DoxyCodeLine{00465\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'E'}:}
+\DoxyCodeLine{00466\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ strict\ )}
+\DoxyCodeLine{00467\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}expected\ digit\ after\ '.'"{}}\ );}
+\DoxyCodeLine{00468\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00469\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'a'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'b'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'c'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'d'}:\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'f'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'g'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'h'}:}
+\DoxyCodeLine{00470\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'i'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'j'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'k'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'l'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'m'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'n'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'o'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'p'}:}
+\DoxyCodeLine{00471\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'q'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'r'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'s'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'t'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'u'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'v'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'w'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'x'}:}
+\DoxyCodeLine{00472\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'y'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'z'}:}
+\DoxyCodeLine{00473\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'A'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'B'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'C'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'D'}:\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'F'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'G'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'H'}:}
+\DoxyCodeLine{00474\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'I'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'J'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'K'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'L'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'M'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'N'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'O'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'P'}:}
+\DoxyCodeLine{00475\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'Q'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'R'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'S'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'T'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'U'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'V'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'W'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'X'}:}
+\DoxyCodeLine{00476\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'Y'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'Z'}:}
+\DoxyCodeLine{00477\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\_'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'-\/'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'.'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'+'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'/'}:}
+\DoxyCodeLine{00478\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ strict\ )}
+\DoxyCodeLine{00479\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}expected\ digit\ after\ '.'"{}}\ );}
+\DoxyCodeLine{00480\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}(\ token\ );}
+\DoxyCodeLine{00481\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00482\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}illegal\ character\ '\$\{c\}'\ in\ token"{}},\ (\ \textcolor{stringliteral}{"{}c"{}},\ c\ )(\textcolor{stringliteral}{"{}i"{}},\textcolor{keywordtype}{int}(c))\ );}
+\DoxyCodeLine{00483\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00484\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00485\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00486\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00487\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ strict\ )}
+\DoxyCodeLine{00488\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}illegal\ multiple\ .\ in\ number"{}}\ );}
+\DoxyCodeLine{00489\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}(\ token\ );}
+\DoxyCodeLine{00490\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00491\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00492\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'e'}:}
+\DoxyCodeLine{00493\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'E'}:}
+\DoxyCodeLine{00494\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ i\ ==\ n\ )}
+\DoxyCodeLine{00495\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00496\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ strict\ )}
+\DoxyCodeLine{00497\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}expected\ exponent\ after\ 'e'|'E'\ parsing\ number"{}}\ );}
+\DoxyCodeLine{00498\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}(\ token\ );}
+\DoxyCodeLine{00499\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00500\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ c\ =\ token[i++];}
+\DoxyCodeLine{00501\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(\ c\ )}
+\DoxyCodeLine{00502\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00503\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'+'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'-\/'}:}
+\DoxyCodeLine{00504\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ i\ ==\ n\ )}
+\DoxyCodeLine{00505\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00506\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ strict\ )}
+\DoxyCodeLine{00507\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}expected\ exponent"{}}\ );}
+\DoxyCodeLine{00508\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}(\ token\ );}
+\DoxyCodeLine{00509\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00510\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00511\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'0'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'1'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'2'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'3'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'4'}:}
+\DoxyCodeLine{00512\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'5'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'6'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'7'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'8'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'9'}:}
+\DoxyCodeLine{00513\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00514\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'a'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'b'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'c'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'d'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'e'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'f'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'g'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'h'}:}
+\DoxyCodeLine{00515\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'i'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'j'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'k'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'l'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'m'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'n'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'o'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'p'}:}
+\DoxyCodeLine{00516\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'q'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'r'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'s'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'t'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'u'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'v'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'w'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'x'}:}
+\DoxyCodeLine{00517\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'y'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'z'}:}
+\DoxyCodeLine{00518\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'A'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'B'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'C'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'D'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'E'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'F'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'G'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'H'}:}
+\DoxyCodeLine{00519\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'I'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'J'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'K'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'L'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'M'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'N'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'O'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'P'}:}
+\DoxyCodeLine{00520\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'Q'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'R'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'S'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'T'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'U'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'V'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'W'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'X'}:}
+\DoxyCodeLine{00521\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'Y'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'Z'}:}
+\DoxyCodeLine{00522\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\_'}:\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'.'}:\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'/'}:}
+\DoxyCodeLine{00523\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ strict\ )}
+\DoxyCodeLine{00524\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}illegal\ character\ '\$\{c\}'\ in\ number"{}},\ (\ \textcolor{stringliteral}{"{}c"{}},\ c\ )\ );}
+\DoxyCodeLine{00525\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}(\ token\ );}
+\DoxyCodeLine{00526\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00527\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}illegal\ character\ '\$\{c\}'\ in\ token"{}},\ (\ \textcolor{stringliteral}{"{}c"{}},\ c\ )\ );}
+\DoxyCodeLine{00528\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00529\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\ \textcolor{keyword}{true}\ )}
+\DoxyCodeLine{00530\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00531\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ i\ ==\ n\ )}
+\DoxyCodeLine{00532\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00533\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ c\ =\ token[i++];}
+\DoxyCodeLine{00534\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(\ c\ )}
+\DoxyCodeLine{00535\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00536\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'0'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'1'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'2'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'3'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'4'}:}
+\DoxyCodeLine{00537\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'5'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'6'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'7'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'8'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'9'}:}
+\DoxyCodeLine{00538\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00539\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'a'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'b'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'c'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'d'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'e'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'f'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'g'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'h'}:}
+\DoxyCodeLine{00540\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'i'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'j'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'k'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'l'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'m'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'n'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'o'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'p'}:}
+\DoxyCodeLine{00541\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'q'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'r'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'s'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'t'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'u'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'v'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'w'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'x'}:}
+\DoxyCodeLine{00542\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'y'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'z'}:}
+\DoxyCodeLine{00543\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'A'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'B'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'C'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'D'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'E'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'F'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'G'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'H'}:}
+\DoxyCodeLine{00544\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'I'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'J'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'K'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'L'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'M'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'N'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'O'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'P'}:}
+\DoxyCodeLine{00545\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'Q'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'R'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'S'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'T'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'U'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'V'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'W'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'X'}:}
+\DoxyCodeLine{00546\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'Y'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'Z'}:}
+\DoxyCodeLine{00547\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\_'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'-\/'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'.'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'+'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'/'}:}
+\DoxyCodeLine{00548\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ strict\ )}
+\DoxyCodeLine{00549\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}illegal\ character\ '\$\{c\}'\ in\ number"{}},\ (\ \textcolor{stringliteral}{"{}c"{}},\ c\ )\ );}
+\DoxyCodeLine{00550\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}(\ token\ );}
+\DoxyCodeLine{00551\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00552\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00553\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}(\ \mbox{\hyperlink{namespacefc_aafd3b0e6ae1093d8678f3973faf39a38}{fc::to\_double}}(token.c\_str())\ );}
+\DoxyCodeLine{00554\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'a'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'b'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'c'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'d'}:\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'f'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'g'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'h'}:}
+\DoxyCodeLine{00555\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'i'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'j'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'k'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'l'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'m'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'n'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'o'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'p'}:}
+\DoxyCodeLine{00556\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'q'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'r'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'s'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'t'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'u'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'v'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'w'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'x'}:}
+\DoxyCodeLine{00557\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'y'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'z'}:}
+\DoxyCodeLine{00558\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'A'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'B'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'C'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'D'}:\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'F'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'G'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'H'}:}
+\DoxyCodeLine{00559\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'I'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'J'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'K'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'L'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'M'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'N'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'O'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'P'}:}
+\DoxyCodeLine{00560\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'Q'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'R'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'S'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'T'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'U'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'V'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'W'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'X'}:}
+\DoxyCodeLine{00561\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'Y'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'Z'}:}
+\DoxyCodeLine{00562\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\_'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'-\/'}:\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'+'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'/'}:}
+\DoxyCodeLine{00563\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ strict\ )}
+\DoxyCodeLine{00564\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}illegal\ character\ '\$\{c\}'\ parsing\ number"{}},\ (\ \textcolor{stringliteral}{"{}c"{}},\ c\ )\ );}
+\DoxyCodeLine{00565\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}(\ token\ );}
+\DoxyCodeLine{00566\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00567\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}illegal\ character\ '\$\{c\}'\ in\ number"{}},\ (\ \textcolor{stringliteral}{"{}c"{}},\ c\ )\ );}
+\DoxyCodeLine{00568\ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00569\ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00570\ \ \ \ \}\ \mbox{\hyperlink{exception_8hpp_a094902280cad82ad6529ebbd12a697eb}{FC\_CAPTURE\_AND\_RETHROW}}(\ (token)\ )\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacefc_1_1json__relaxed_a5dfa268437a1c87f9a3fccaca20f4f66_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacefc_1_1json__relaxed_a5dfa268437a1c87f9a3fccaca20f4f66_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacefc_1_1json__relaxed_a060702680aabbfdda1ea3a9ebba4cb47}\index{fc::json\_relaxed@{fc::json\_relaxed}!quoteStringFromStream@{quoteStringFromStream}}
+\index{quoteStringFromStream@{quoteStringFromStream}!fc::json\_relaxed@{fc::json\_relaxed}}
+\doxysubsubsection{\texorpdfstring{quoteStringFromStream()}{quoteStringFromStream()}}
+{\footnotesize\ttfamily \label{namespacefc_1_1json__relaxed_a060702680aabbfdda1ea3a9ebba4cb47} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , bool strict, bool allow\+\_\+escape$>$ \\
+std\+::string fc\+::json\+\_\+relaxed\+::quote\+String\+From\+Stream (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{in}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{json__relaxed_8hpp_source_l00086}{86}} of file \mbox{\hyperlink{json__relaxed_8hpp_source}{json\+\_\+relaxed.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00087\ \ \ \ \{}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ std::stringstream\ token;}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ q\ =\ in.get();}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(\ q\ )}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)''}:}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ strict\ )}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}expected:\ '\(\backslash\)"{}'\ at\ beginning\ of\ string,\ got\ '\(\backslash\)''"{}}\ );}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ falls\ through}}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'"{}'}:}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ strict\ )}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}expected:\ '\(\backslash\)"{}'\ at\ beginning\ of\ string"{}}\ );}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}expected:\ '\(\backslash\)"{}'\ |\ '\(\backslash\)\(\backslash\)\(\backslash\)''\ at\ beginning\ of\ string"{}}\ );}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ in.peek()\ ==\ q\ )}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ in.get();}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ in.peek()\ !=\ q\ )}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::string();}
+\DoxyCodeLine{00111\ }
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ triple\ quote\ processing}}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ strict\ )}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}triple\ quote\ unsupported\ in\ strict\ mode"{}}\ );}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ in.get();}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\ \textcolor{keyword}{true}\ )}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ c\ =\ in.peek();}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ c\ ==\ q\ )}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ in.get();}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ c2\ =\ in.peek();}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ c2\ ==\ q\ )}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ in.get();}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ c3\ =\ in.peek();}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ c3\ ==\ q\ )}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ in.get();}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ token.str();}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ token\ <<\ q\ <<\ q;}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ token\ <<\ q;}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(\ c\ ==\ \textcolor{stringliteral}{'\(\backslash\)x04'}\ )}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}unexpected\ EOF\ in\ string\ '\$\{token\}'"{}},}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}token"{}},\ token.str()\ )\ );}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(\ allow\_escape\ \&\&\ (c\ ==\ \textcolor{charliteral}{'\(\backslash\)\(\backslash\)'})\ )}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ token\ <<\ \mbox{\hyperlink{namespacefc_a14df350f499648f14f6314a87800f3c5}{parseEscape}}(\ in\ );}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ in.get();}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ token\ <<\ c;}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\ \textcolor{keyword}{true}\ )}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ c\ =\ in.peek();}
+\DoxyCodeLine{00158\ }
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (c\ ==\ EOF)\ \{}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ eof\_exception,\ \textcolor{stringliteral}{"{}unexpected\ end\ of\ file"{}}\ );}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00162\ }
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ c\ ==\ q\ )}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ in.get();}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ token.str();}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(\ c\ ==\ \textcolor{stringliteral}{'\(\backslash\)x04'}\ )}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}unexpected\ EOF\ in\ string\ '\$\{token\}'"{}},}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}token"{}},\ token.str()\ )\ );}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(\ allow\_escape\ \&\&\ (c\ ==\ \textcolor{charliteral}{'\(\backslash\)\(\backslash\)'})\ )}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ token\ <<\ \mbox{\hyperlink{namespacefc_a14df350f499648f14f6314a87800f3c5}{parseEscape}}(\ in\ );}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(\ (c\ ==\ \textcolor{charliteral}{'\(\backslash\)r'})\ |\ (c\ ==\ \textcolor{charliteral}{'\(\backslash\)n'})\ )}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}unexpected\ EOL\ in\ string\ '\$\{token\}'"{}},}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}token"{}},\ token.str()\ )\ );}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ in.get();}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ token\ <<\ c;}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \ \}\ \mbox{\hyperlink{exception_8hpp_af3731d6e3beb140d9e652adf7a18113b}{FC\_RETHROW\_EXCEPTIONS}}(\ warn,\ \textcolor{stringliteral}{"{}while\ parsing\ token\ '\$\{token\}'"{}},}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}token"{}},\ token.str()\ )\ );}
+\DoxyCodeLine{00185\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=344pt]{namespacefc_1_1json__relaxed_a060702680aabbfdda1ea3a9ebba4cb47_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacefc_1_1json__relaxed_a060702680aabbfdda1ea3a9ebba4cb47_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacefc_1_1json__relaxed_a740e0f5fe18f8883bf3ddc221a088fb1}\index{fc::json\_relaxed@{fc::json\_relaxed}!stringFromStream@{stringFromStream}}
+\index{stringFromStream@{stringFromStream}!fc::json\_relaxed@{fc::json\_relaxed}}
+\doxysubsubsection{\texorpdfstring{stringFromStream()}{stringFromStream()}}
+{\footnotesize\ttfamily \label{namespacefc_1_1json__relaxed_a740e0f5fe18f8883bf3ddc221a088fb1} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , bool strict$>$ \\
+std\+::string fc\+::json\+\_\+relaxed\+::string\+From\+Stream (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{in}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{json__relaxed_8hpp_source_l00188}{188}} of file \mbox{\hyperlink{json__relaxed_8hpp_source}{json\+\_\+relaxed.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00189\ \ \ \ \{}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \textcolor{keywordflow}{try}}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ c\ =\ in.peek(),\ c2;}
+\DoxyCodeLine{00193\ }
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(\ c\ )}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)''}:}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ strict\ )}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}expected:\ '\(\backslash\)"{}'\ at\ beginning\ of\ string,\ got\ '\(\backslash\)''"{}}\ );}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ falls\ through}}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'"{}'}:}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ quoteStringFromStream<T,\ strict,\ true>(\ in\ );}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'r'}:}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ strict\ )}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}raw\ strings\ not\ supported\ in\ strict\ mode"{}}\ );}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'R'}:}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ in.get();}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ c2\ =\ in.peek();}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(\ c2\ )}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'"{}'}:}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)''}:}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ strict\ )}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}raw\ strings\ not\ supported\ in\ strict\ mode"{}}\ );}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ quoteStringFromStream<T,\ strict,\ false>(\ in\ );}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ strict\ )}
+\DoxyCodeLine{00217\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}unquoted\ strings\ not\ supported\ in\ strict\ mode"{}}\ );}
+\DoxyCodeLine{00218\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ c+\mbox{\hyperlink{namespacefc_1_1json__relaxed_ab8adad286397169b103cfc3174b08ac0}{tokenFromStream}}(\ in\ );}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'a'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'b'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'c'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'d'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'e'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'f'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'g'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'h'}:}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'i'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'j'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'k'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'l'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'m'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'n'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'o'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'p'}:}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'q'}:\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'s'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'t'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'u'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'v'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'w'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'x'}:}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'y'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'z'}:}
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'A'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'B'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'C'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'D'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'E'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'F'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'G'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'H'}:}
+\DoxyCodeLine{00226\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'I'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'J'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'K'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'L'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'M'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'N'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'O'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'P'}:}
+\DoxyCodeLine{00227\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'Q'}:\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'S'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'T'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'U'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'V'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'W'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'X'}:}
+\DoxyCodeLine{00228\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'Y'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'Z'}:}
+\DoxyCodeLine{00229\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'0'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'1'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'2'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'3'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'4'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'5'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'6'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'7'}:}
+\DoxyCodeLine{00230\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'8'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'9'}:}
+\DoxyCodeLine{00231\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\_'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'-\/'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'.'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'+'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'/'}:}
+\DoxyCodeLine{00232\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ strict\ )}
+\DoxyCodeLine{00233\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}unquoted\ strings\ not\ supported\ in\ strict\ mode"{}}\ );}
+\DoxyCodeLine{00234\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ tokenFromStream(\ in\ );}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ EOF:}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ eof\_exception,\ \textcolor{stringliteral}{"{}unexpected\ end\ of\ file"{}}\ );}
+\DoxyCodeLine{00237\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00238\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}expected:\ string"{}}\ );}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00240\ }
+\DoxyCodeLine{00241\ \ \ \ \ \ \ \ \}\ \mbox{\hyperlink{exception_8hpp_af3731d6e3beb140d9e652adf7a18113b}{FC\_RETHROW\_EXCEPTIONS}}(\ warn,\ \textcolor{stringliteral}{"{}while\ parsing\ string"{}}\ );}
+\DoxyCodeLine{00242\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacefc_1_1json__relaxed_a740e0f5fe18f8883bf3ddc221a088fb1_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacefc_1_1json__relaxed_a740e0f5fe18f8883bf3ddc221a088fb1_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacefc_1_1json__relaxed_ab8adad286397169b103cfc3174b08ac0}\index{fc::json\_relaxed@{fc::json\_relaxed}!tokenFromStream@{tokenFromStream}}
+\index{tokenFromStream@{tokenFromStream}!fc::json\_relaxed@{fc::json\_relaxed}}
+\doxysubsubsection{\texorpdfstring{tokenFromStream()}{tokenFromStream()}}
+{\footnotesize\ttfamily \label{namespacefc_1_1json__relaxed_ab8adad286397169b103cfc3174b08ac0} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+std\+::string fc\+::json\+\_\+relaxed\+::token\+From\+Stream (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{in}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{json__relaxed_8hpp_source_l00027}{27}} of file \mbox{\hyperlink{json__relaxed_8hpp_source}{json\+\_\+relaxed.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00028\ \ \ \ \{}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ std::stringstream\ token;}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \textcolor{keywordflow}{try}}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ c\ =\ in.peek();}
+\DoxyCodeLine{00033\ }
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\ \textcolor{keyword}{true}\ )}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(\ c\ =\ in.peek()\ )}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)\(\backslash\)'}:}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ token\ <<\ \mbox{\hyperlink{namespacefc_a14df350f499648f14f6314a87800f3c5}{parseEscape}}(\ in\ );}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)t'}:}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\ '}:}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{','}:}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{':'}:}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)0'}:}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)n'}:}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'\(\backslash\)x04'}:}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ in.get();}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ token.str();}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'a'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'b'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'c'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'d'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'e'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'f'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'g'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'h'}:}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'i'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'j'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'k'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'l'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'m'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'n'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'o'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'p'}:}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'q'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'r'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'s'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'t'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'u'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'v'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'w'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'x'}:}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'y'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'z'}:}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'A'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'B'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'C'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'D'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'E'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'F'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'G'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'H'}:}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'I'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'J'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'K'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'L'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'M'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'N'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'O'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'P'}:}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'Q'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'R'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'S'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'T'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'U'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'V'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'W'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'X'}:}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'Y'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'Z'}:}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'0'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'1'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'2'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'3'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'4'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'5'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'6'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'7'}:}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'8'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'9'}:}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\_'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'-\/'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'.'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'+'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'/'}:}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ token\ <<\ c;}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ in.get();}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ EOF:}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ eof\_exception,\ \textcolor{stringliteral}{"{}unexpected\ end\ of\ file"{}}\ );}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ token.str();}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ token.str();}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \textcolor{keywordflow}{catch}(\ \textcolor{keyword}{const}\ fc::eof\_exception\&\ eof\ )}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ token.str();}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \textcolor{keywordflow}{catch}\ (\textcolor{keyword}{const}\ std::ios\_base::failure\&)}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ token.str();}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00080\ }
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_af3731d6e3beb140d9e652adf7a18113b}{FC\_RETHROW\_EXCEPTIONS}}(\ warn,\ \textcolor{stringliteral}{"{}while\ parsing\ token\ '\$\{token\}'"{}},}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}token"{}},\ token.str()\ )\ );}
+\DoxyCodeLine{00083\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=341pt]{namespacefc_1_1json__relaxed_ab8adad286397169b103cfc3174b08ac0_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacefc_1_1json__relaxed_ab8adad286397169b103cfc3174b08ac0_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacefc_1_1json__relaxed_a93f8ed4a8dfc1215a360508b01460758}\index{fc::json\_relaxed@{fc::json\_relaxed}!variant\_from\_stream@{variant\_from\_stream}}
+\index{variant\_from\_stream@{variant\_from\_stream}!fc::json\_relaxed@{fc::json\_relaxed}}
+\doxysubsubsection{\texorpdfstring{variant\_from\_stream()}{variant\_from\_stream()}}
+{\footnotesize\ttfamily \label{namespacefc_1_1json__relaxed_a93f8ed4a8dfc1215a360508b01460758} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , bool strict$>$ \\
+\mbox{\hyperlink{classfc_1_1variant}{variant}} fc\+::json\+\_\+relaxed\+::variant\+\_\+from\+\_\+stream (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{in}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{max\+\_\+depth}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{json__relaxed_8hpp_source_l00697}{697}} of file \mbox{\hyperlink{json__relaxed_8hpp_source}{json\+\_\+relaxed.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00698\ \ \ \ \{}
+\DoxyCodeLine{00699\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_aa2bf8a06a5740fdc38da162192bb1f5a}{skip\_white\_space}}(in);}
+\DoxyCodeLine{00700\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{variant}}\ var;}
+\DoxyCodeLine{00701\ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\ \textcolor{keywordtype}{signed}\ \textcolor{keywordtype}{char}\ c\ =\ in.peek()\ )}
+\DoxyCodeLine{00702\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00703\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(\ c\ )}
+\DoxyCodeLine{00704\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00705\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\ '}:}
+\DoxyCodeLine{00706\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)t'}:}
+\DoxyCodeLine{00707\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)n'}:}
+\DoxyCodeLine{00708\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)r'}:}
+\DoxyCodeLine{00709\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ in.get();}
+\DoxyCodeLine{00710\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{00711\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'"{}'}:}
+\DoxyCodeLine{00712\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ json\_relaxed::stringFromStream<T,\ strict>(\ in\ );}
+\DoxyCodeLine{00713\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\{'}:}
+\DoxyCodeLine{00714\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ json\_relaxed::objectFromStream<T,\ strict>(\ in,\ max\_depth\ -\/\ 1\ );}
+\DoxyCodeLine{00715\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'['}:}
+\DoxyCodeLine{00716\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ json\_relaxed::arrayFromStream<T,\ strict>(\ in,\ max\_depth\ -\/\ 1\ );}
+\DoxyCodeLine{00717\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'-\/'}:}
+\DoxyCodeLine{00718\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'+'}:}
+\DoxyCodeLine{00719\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'.'}:}
+\DoxyCodeLine{00720\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'0'}:}
+\DoxyCodeLine{00721\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'1'}:}
+\DoxyCodeLine{00722\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'2'}:}
+\DoxyCodeLine{00723\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'3'}:}
+\DoxyCodeLine{00724\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'4'}:}
+\DoxyCodeLine{00725\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'5'}:}
+\DoxyCodeLine{00726\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'6'}:}
+\DoxyCodeLine{00727\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'7'}:}
+\DoxyCodeLine{00728\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'8'}:}
+\DoxyCodeLine{00729\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'9'}:}
+\DoxyCodeLine{00730\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ json\_relaxed::numberFromStream<T,\ strict>(\ in\ );}
+\DoxyCodeLine{00731\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ null,\ true,\ false,\ or\ 'warning'\ /\ string}}
+\DoxyCodeLine{00732\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'a'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'b'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'c'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'d'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'e'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'f'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'g'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'h'}:}
+\DoxyCodeLine{00733\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'i'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'j'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'k'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'l'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'m'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'n'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'o'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'p'}:}
+\DoxyCodeLine{00734\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'q'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'r'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'s'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'t'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'u'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'v'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'w'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'x'}:}
+\DoxyCodeLine{00735\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'y'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'z'}:}
+\DoxyCodeLine{00736\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'A'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'B'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'C'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'D'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'E'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'F'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'G'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'H'}:}
+\DoxyCodeLine{00737\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'I'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'J'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'K'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'L'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'M'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'N'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'O'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'P'}:}
+\DoxyCodeLine{00738\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'Q'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'R'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'S'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'T'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'U'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'V'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'W'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'X'}:}
+\DoxyCodeLine{00739\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'Y'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'Z'}:}
+\DoxyCodeLine{00740\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\_'}:\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'/'}:}
+\DoxyCodeLine{00741\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ json\_relaxed::wordFromStream<T,\ strict>(\ in\ );}
+\DoxyCodeLine{00742\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ 0x04:\ \textcolor{comment}{//\ \string^D\ end\ of\ transmission}}
+\DoxyCodeLine{00743\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ EOF:}
+\DoxyCodeLine{00744\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ eof\_exception,\ \textcolor{stringliteral}{"{}unexpected\ end\ of\ file"{}}\ );}
+\DoxyCodeLine{00745\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00746\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}Unexpected\ char\ '\$\{c\}'\ in\ \(\backslash\)"{}\$\{s\}\(\backslash\)"{}"{}},}
+\DoxyCodeLine{00747\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}c"{}},\ c)(\textcolor{stringliteral}{"{}s"{}},\ \mbox{\hyperlink{namespacefc_a233581b53962f2a0925100f06e89bfc1}{stringFromToken}}(in))\ );}
+\DoxyCodeLine{00748\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00749\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00750\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ variant();}
+\DoxyCodeLine{00751\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacefc_1_1json__relaxed_a93f8ed4a8dfc1215a360508b01460758_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacefc_1_1json__relaxed_a93f8ed4a8dfc1215a360508b01460758_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacefc_1_1json__relaxed_a8d50031ff7024c06ab8f355b25501434}\index{fc::json\_relaxed@{fc::json\_relaxed}!wordFromStream@{wordFromStream}}
+\index{wordFromStream@{wordFromStream}!fc::json\_relaxed@{fc::json\_relaxed}}
+\doxysubsubsection{\texorpdfstring{wordFromStream()}{wordFromStream()}}
+{\footnotesize\ttfamily \label{namespacefc_1_1json__relaxed_a8d50031ff7024c06ab8f355b25501434} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , bool strict$>$ \\
+\mbox{\hyperlink{classfc_1_1variant}{variant}} fc\+::json\+\_\+relaxed\+::word\+From\+Stream (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{in}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{json__relaxed_8hpp_source_l00666}{666}} of file \mbox{\hyperlink{json__relaxed_8hpp_source}{json\+\_\+relaxed.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00667\ \ \ \ \{}
+\DoxyCodeLine{00668\ \ \ \ \ \ \ \ std::string\ token\ =\ \mbox{\hyperlink{namespacefc_1_1json__relaxed_ab8adad286397169b103cfc3174b08ac0}{tokenFromStream}}(in);}
+\DoxyCodeLine{00669\ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00670\ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ token.length()\ >\ 0\ );}
+\DoxyCodeLine{00671\ }
+\DoxyCodeLine{00672\ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(\ token[0]\ )}
+\DoxyCodeLine{00673\ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00674\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'n'}:}
+\DoxyCodeLine{00675\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ token\ ==\ \textcolor{stringliteral}{"{}null"{}}\ )}
+\DoxyCodeLine{00676\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1variant}{variant}}();}
+\DoxyCodeLine{00677\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00678\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'t'}:}
+\DoxyCodeLine{00679\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ token\ ==\ \textcolor{stringliteral}{"{}true"{}}\ )}
+\DoxyCodeLine{00680\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1variant}{variant}}(\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{00681\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00682\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'f'}:}
+\DoxyCodeLine{00683\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ token\ ==\ \textcolor{stringliteral}{"{}false"{}}\ )}
+\DoxyCodeLine{00684\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1variant}{variant}}(\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{00685\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00686\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00687\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00688\ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00689\ }
+\DoxyCodeLine{00690\ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !strict\ )}
+\DoxyCodeLine{00691\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ token;}
+\DoxyCodeLine{00692\ }
+\DoxyCodeLine{00693\ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}expected:\ null|true|false"{}}\ );}
+\DoxyCodeLine{00694\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacefc_1_1json__relaxed_a8d50031ff7024c06ab8f355b25501434_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacefc_1_1json__relaxed_a8d50031ff7024c06ab8f355b25501434_icgraph}
+\end{center}
+\end{figure}

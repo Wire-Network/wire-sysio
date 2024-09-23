@@ -1,0 +1,99 @@
+\doxysection{My\+Allocator Struct Reference}
+\hypertarget{struct_my_allocator}{}\label{struct_my_allocator}\index{MyAllocator@{MyAllocator}}
+
+
+Inheritance diagram for My\+Allocator\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=168pt]{struct_my_allocator__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for My\+Allocator\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=168pt]{struct_my_allocator__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+Xbyak\+::uint8 \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{struct_my_allocator_a337d792819648b5c6720a0b2b0bc622c}{alloc}} (size\+\_\+t size)
+\item 
+void \mbox{\hyperlink{struct_my_allocator_aa7027489f3f1177073bdb97cb32fa13c}{free}} (Xbyak\+::uint8 \texorpdfstring{$\ast$}{*})
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{struct_xbyak_1_1_allocator}{Xbyak\+::\+Allocator}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{struct_xbyak_1_1_allocator_aa31445e1161668de5b8a87b08199a4b4}{\texorpdfstring{$\sim$}{\string~}\+Allocator}} ()
+\item 
+virtual bool \mbox{\hyperlink{struct_xbyak_1_1_allocator_a728cdd99f00af3b9c389bddd7c6572b2}{use\+Protect}} () const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{jmp_8cpp_source_l00343}{343}} of file \mbox{\hyperlink{jmp_8cpp_source}{jmp.\+cpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_my_allocator_a337d792819648b5c6720a0b2b0bc622c}\index{MyAllocator@{MyAllocator}!alloc@{alloc}}
+\index{alloc@{alloc}!MyAllocator@{MyAllocator}}
+\doxysubsubsection{\texorpdfstring{alloc()}{alloc()}}
+{\footnotesize\ttfamily \label{struct_my_allocator_a337d792819648b5c6720a0b2b0bc622c} 
+Xbyak\+::uint8 \texorpdfstring{$\ast$}{*} My\+Allocator\+::alloc (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{size}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{struct_xbyak_1_1_allocator_a4adbb9f0cbdf45d2e6481b61303e5865}{Xbyak\+::\+Allocator}}.
+
+
+
+Definition at line \mbox{\hyperlink{jmp_8cpp_source_l00344}{344}} of file \mbox{\hyperlink{jmp_8cpp_source}{jmp.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00345\ \ \ \ \ \{}
+\DoxyCodeLine{00346\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (size\ <\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{jmp_8cpp_adc879644fde18fc2e8fe3a74c024b373}{bufS}}))\ \{}
+\DoxyCodeLine{00347\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}test\ use\ bufS(\%d)\(\backslash\)n"{}},\ (\textcolor{keywordtype}{int})size);}
+\DoxyCodeLine{00348\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{jmp_8cpp_adc879644fde18fc2e8fe3a74c024b373}{bufS}};}
+\DoxyCodeLine{00349\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00350\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (size\ <\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{jmp_8cpp_a716c485540a9c0c9f83fc5bf68c62541}{bufL}}))\ \{}
+\DoxyCodeLine{00351\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}test\ use\ bufL(\%d)\(\backslash\)n"{}},\ (\textcolor{keywordtype}{int})size);}
+\DoxyCodeLine{00352\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{jmp_8cpp_a716c485540a9c0c9f83fc5bf68c62541}{bufL}};}
+\DoxyCodeLine{00353\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00354\ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}no\ memory\ \%d\(\backslash\)n"{}},\ (\textcolor{keywordtype}{int})size);}
+\DoxyCodeLine{00355\ \ \ \ \ \ \ \ \ exit(1);}
+\DoxyCodeLine{00356\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_my_allocator_aa7027489f3f1177073bdb97cb32fa13c}\index{MyAllocator@{MyAllocator}!free@{free}}
+\index{free@{free}!MyAllocator@{MyAllocator}}
+\doxysubsubsection{\texorpdfstring{free()}{free()}}
+{\footnotesize\ttfamily \label{struct_my_allocator_aa7027489f3f1177073bdb97cb32fa13c} 
+void My\+Allocator\+::free (\begin{DoxyParamCaption}\item[{Xbyak\+::uint8 \texorpdfstring{$\ast$}{*}}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{struct_xbyak_1_1_allocator_ae7ee203247d3eb99bbd177e98c8ffe20}{Xbyak\+::\+Allocator}}.
+
+
+
+Definition at line \mbox{\hyperlink{jmp_8cpp_source_l00357}{357}} of file \mbox{\hyperlink{jmp_8cpp_source}{jmp.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00358\ \ \ \ \ \{}
+\DoxyCodeLine{00359\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/libraries/ff/depends/xbyak/test/\mbox{\hyperlink{jmp_8cpp}{jmp.\+cpp}}\end{DoxyCompactItemize}

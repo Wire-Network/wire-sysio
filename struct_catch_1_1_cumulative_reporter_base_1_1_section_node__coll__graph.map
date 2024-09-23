@@ -1,0 +1,19 @@
+<map id="Catch::CumulativeReporterBase&lt; DerivedT &gt;::SectionNode" name="Catch::CumulativeReporterBase&lt; DerivedT &gt;::SectionNode">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,420,217,461"/>
+<area shape="rect" id="Node000002" href="$struct_catch_1_1_section_stats.html" title=" " alt="" coords="152,331,291,357"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="198,369,136,421,132,417,195,365"/>
+<area shape="rect" id="Node000003" href="$struct_catch_1_1_section_info.html" title=" " alt="" coords="99,228,230,253"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="175,267,193,306,212,329,208,333,189,309,171,270"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="43,124,96,150"/>
+<area shape="poly" id="edge9_Node000001_Node000004" title=" " alt="" coords="76,165,111,419,106,420,71,166"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="82,163,92,183,106,202,138,225,135,229,102,206,88,186,77,165"/>
+<area shape="rect" id="Node000005" href="$struct_catch_1_1_source_line_info.html" title=" " alt="" coords="123,124,275,150"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="192,165,171,228,166,226,187,164"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="227,5,283,31"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="245,46,207,125,202,122,240,44"/>
+<area shape="rect" id="Node000007" href="$struct_catch_1_1_counts.html" title=" " alt="" coords="258,176,364,202"/>
+<area shape="poly" id="edge7_Node000007_Node000006" title=" " alt="" coords="266,45,310,175,304,176,261,47"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="299,216,292,229,279,269,273,287,261,309,239,333,235,329,257,306,268,285,274,268,287,227,294,214"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="365,228,425,253"/>
+<area shape="poly" id="edge8_Node000002_Node000008" title=" " alt="" coords="368,265,298,310,251,333,248,328,295,305,365,260"/>
+</map>

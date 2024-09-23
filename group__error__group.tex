@@ -1,0 +1,58 @@
+\doxysection{Errors}
+\hypertarget{group__error__group}{}\label{group__error__group}\index{Errors@{Errors}}
+
+
+\doxylink{namespace_errors}{Errors} thrown by CLI11.  
+
+
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_error}{CLI\+::\+Error}}
+\begin{DoxyCompactList}\small\item\em All errors derive from this one. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_construction_error}{CLI\+::\+Construction\+Error}}
+\begin{DoxyCompactList}\small\item\em Construction errors (not in parsing) \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_incorrect_construction}{CLI\+::\+Incorrect\+Construction}}
+\begin{DoxyCompactList}\small\item\em Thrown when an option is set to conflicting values (non-\/vector and multi args, for example) \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_bad_name_string}{CLI\+::\+Bad\+Name\+String}}
+\begin{DoxyCompactList}\small\item\em Thrown on construction of a bad name. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_option_already_added}{CLI\+::\+Option\+Already\+Added}}
+\begin{DoxyCompactList}\small\item\em Thrown when an option already exists. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_parse_error}{CLI\+::\+Parse\+Error}}
+\begin{DoxyCompactList}\small\item\em Anything that can error in Parse. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_success}{CLI\+::\+Success}}
+\begin{DoxyCompactList}\small\item\em This is a successful completion on parsing, supposed to exit. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_call_for_help}{CLI\+::\+Call\+For\+Help}}
+\begin{DoxyCompactList}\small\item\em -\/h or --help on command line \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_call_for_all_help}{CLI\+::\+Call\+For\+All\+Help}}
+\begin{DoxyCompactList}\small\item\em Usually something like --help-\/all on command line. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_runtime_error}{CLI\+::\+Runtime\+Error}}
+\begin{DoxyCompactList}\small\item\em Does not output a diagnostic in CLI11\+\_\+\+PARSE, but allows to return from \doxylink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main()} with a specific error code. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_file_error}{CLI\+::\+File\+Error}}
+\begin{DoxyCompactList}\small\item\em Thrown when parsing an INI file and it is missing. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_conversion_error}{CLI\+::\+Conversion\+Error}}
+\begin{DoxyCompactList}\small\item\em Thrown when conversion call back fails, such as when an int fails to coerce to a string. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_validation_error}{CLI\+::\+Validation\+Error}}
+\begin{DoxyCompactList}\small\item\em Thrown when validation of results fails. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_required_error}{CLI\+::\+Required\+Error}}
+\begin{DoxyCompactList}\small\item\em Thrown when a required option is missing. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_argument_mismatch}{CLI\+::\+Argument\+Mismatch}}
+\begin{DoxyCompactList}\small\item\em Thrown when the wrong number of arguments has been received. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_requires_error}{CLI\+::\+Requires\+Error}}
+\begin{DoxyCompactList}\small\item\em Thrown when a requires option is missing. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_excludes_error}{CLI\+::\+Excludes\+Error}}
+\begin{DoxyCompactList}\small\item\em Thrown when an excludes option is present. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_extras_error}{CLI\+::\+Extras\+Error}}
+\begin{DoxyCompactList}\small\item\em Thrown when too many positionals or options are found. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_config_error}{CLI\+::\+Config\+Error}}
+\begin{DoxyCompactList}\small\item\em Thrown when extra values are found in an INI file. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_invalid_error}{CLI\+::\+Invalid\+Error}}
+\begin{DoxyCompactList}\small\item\em Thrown when validation fails before parsing. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_horrible_error}{CLI\+::\+Horrible\+Error}}
+\item 
+class \mbox{\hyperlink{class_c_l_i_1_1_option_not_found}{CLI\+::\+Option\+Not\+Found}}
+\begin{DoxyCompactList}\small\item\em Thrown when counting a non-\/existent option. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+These are the errors that can be thrown. Some of them, like \doxylink{class_c_l_i_1_1_success}{CLI\+::\+Success}, are not really errors. 

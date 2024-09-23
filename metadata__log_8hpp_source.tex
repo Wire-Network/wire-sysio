@@ -1,0 +1,33 @@
+\doxysection{metadata\+\_\+log.\+hpp}
+\hypertarget{metadata__log_8hpp_source}{}\label{metadata__log_8hpp_source}\index{plugins/trace\_api\_plugin/include/sysio/trace\_api/metadata\_log.hpp@{plugins/trace\_api\_plugin/include/sysio/trace\_api/metadata\_log.hpp}}
+\mbox{\hyperlink{metadata__log_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{metadata__log_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{metadata__log_8hpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{fc_2include_2fc_2variant_8hpp}{fc/variant.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{metadata__log_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{plugins_2trace__api__plugin_2include_2sysio_2trace__api_2trace_8hpp}{sysio/trace\_api/trace.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{metadata__log_8hpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{abi__def_8hpp}{sysio/chain/abi\_def.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{metadata__log_8hpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{protocol__feature__activation_8hpp}{sysio/chain/protocol\_feature\_activation.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{metadata__log_8hpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{metadata__log_8hpp_source_l00007}00007\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{\ \textcolor{keyword}{namespace\ }trace\_api\ \{}
+\DoxyCodeLine{\Hypertarget{metadata__log_8hpp_source_l00008}\mbox{\hyperlink{structsysio_1_1trace__api_1_1block__entry__v0}{00008}}\ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structsysio_1_1trace__api_1_1block__entry__v0}{block\_entry\_v0}}\ \{}
+\DoxyCodeLine{\Hypertarget{metadata__log_8hpp_source_l00009}\mbox{\hyperlink{structsysio_1_1trace__api_1_1block__entry__v0_a8d0250c6ed1d1149859d06ecad4ce368}{00009}}\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1sha256}{chain::block\_id\_type}}\ \ \ \mbox{\hyperlink{structsysio_1_1trace__api_1_1block__entry__v0_a8d0250c6ed1d1149859d06ecad4ce368}{id}};}
+\DoxyCodeLine{\Hypertarget{metadata__log_8hpp_source_l00010}\mbox{\hyperlink{structsysio_1_1trace__api_1_1block__entry__v0_a940dc0a0979ed188f92898d313f91055}{00010}}\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1trace__api_1_1block__entry__v0_a940dc0a0979ed188f92898d313f91055}{number}};}
+\DoxyCodeLine{\Hypertarget{metadata__log_8hpp_source_l00011}\mbox{\hyperlink{structsysio_1_1trace__api_1_1block__entry__v0_a81455d3425390b685d99f890dc9c72ba}{00011}}\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1trace__api_1_1block__entry__v0_a81455d3425390b685d99f890dc9c72ba}{offset}};}
+\DoxyCodeLine{\Hypertarget{metadata__log_8hpp_source_l00012}00012\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{metadata__log_8hpp_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{metadata__log_8hpp_source_l00014}\mbox{\hyperlink{structsysio_1_1trace__api_1_1lib__entry__v0}{00014}}\ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structsysio_1_1trace__api_1_1lib__entry__v0}{lib\_entry\_v0}}\ \{}
+\DoxyCodeLine{\Hypertarget{metadata__log_8hpp_source_l00015}\mbox{\hyperlink{structsysio_1_1trace__api_1_1lib__entry__v0_a6bfeba8a6dbbe54f0b903fe28243be47}{00015}}\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1trace__api_1_1lib__entry__v0_a6bfeba8a6dbbe54f0b903fe28243be47}{lib}};}
+\DoxyCodeLine{\Hypertarget{metadata__log_8hpp_source_l00016}00016\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{metadata__log_8hpp_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{metadata__log_8hpp_source_l00018}\mbox{\hyperlink{namespacesysio_1_1trace__api_a7a6a31e37b6c94cbd85b0f2019e2ff3c}{00018}}\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacesysio_1_1trace__api_a7a6a31e37b6c94cbd85b0f2019e2ff3c}{metadata\_log\_entry}}\ =\ std::variant<}
+\DoxyCodeLine{\Hypertarget{metadata__log_8hpp_source_l00019}00019\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1trace__api_1_1block__entry__v0}{block\_entry\_v0}},}
+\DoxyCodeLine{\Hypertarget{metadata__log_8hpp_source_l00020}00020\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1trace__api_1_1lib__entry__v0}{lib\_entry\_v0}},}
+\DoxyCodeLine{\Hypertarget{metadata__log_8hpp_source_l00021}00021\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1trace__api_1_1block__trxs__entry}{block\_trxs\_entry}}}
+\DoxyCodeLine{\Hypertarget{metadata__log_8hpp_source_l00022}00022\ \ \ \ >;}
+\DoxyCodeLine{\Hypertarget{metadata__log_8hpp_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{metadata__log_8hpp_source_l00024}00024\ \}\}}
+\DoxyCodeLine{\Hypertarget{metadata__log_8hpp_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{metadata__log_8hpp_source_l00026}\mbox{\hyperlink{metadata__log_8hpp_a01c22acd2e21fa3e8f427f6474523531}{00026}}\ \mbox{\hyperlink{reflect_8hpp_a2ace850e636b1ca0b18fe3177e413d99}{FC\_REFLECT}}(\mbox{\hyperlink{structsysio_1_1trace__api_1_1block__entry__v0}{sysio::trace\_api::block\_entry\_v0}},\ (\textcolor{keywordtype}{id})(number)(offset));}
+\DoxyCodeLine{\Hypertarget{metadata__log_8hpp_source_l00027}\mbox{\hyperlink{metadata__log_8hpp_a47f41d958378133aa94a292dd7179d12}{00027}}\ \mbox{\hyperlink{reflect_8hpp_a2ace850e636b1ca0b18fe3177e413d99}{FC\_REFLECT}}(\mbox{\hyperlink{structsysio_1_1trace__api_1_1lib__entry__v0}{sysio::trace\_api::lib\_entry\_v0}},\ (lib));}
+
+\end{DoxyCode}

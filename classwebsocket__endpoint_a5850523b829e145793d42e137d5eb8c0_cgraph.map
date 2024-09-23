@@ -1,0 +1,30 @@
+<map id="websocket_endpoint::connect" name="websocket_endpoint::connect">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,169,146,210"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1client.html#a818c30343180123bf1fee6dc21524bae" title="Begin the connection process for the given connection." alt="" coords="198,5,335,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="89,167,132,114,161,84,192,57,199,52,202,56,195,61,164,88,136,117,93,170"/>
+<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1client.html#aa95cec974921e32bc37a61c683ae240d" title="Get a new connection." alt="" coords="198,71,335,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="111,166,192,122,204,116,207,121,195,127,114,171"/>
+<area shape="rect" id="Node000007" href="$classconnection__metadata.html#ac297cf7710d8d510ef383b7395222ce5" title=" " alt="" coords="194,267,339,307"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="115,208,195,251,207,257,204,262,192,256,112,213"/>
+<area shape="rect" id="Node000010" href="$classconnection__metadata.html#a1c2e652001b8306207beafe17b1a52ed" title=" " alt="" coords="194,136,339,177"/>
+<area shape="poly" id="edge10_Node000001_Node000010" title=" " alt="" coords="145,175,178,169,179,174,146,180"/>
+<area shape="rect" id="Node000011" href="$classconnection__metadata.html#a78708ddd026fc4fbff883477c0ed01bf" title=" " alt="" coords="194,332,339,373"/>
+<area shape="poly" id="edge12_Node000001_Node000011" title=" " alt="" coords="93,209,136,261,164,291,195,317,202,322,199,326,192,321,161,295,132,265,89,212"/>
+<area shape="rect" id="Node000013" href="$classconnection__metadata.html#ab10d997bd75d9e98b235b7e97b84b85a" title=" " alt="" coords="194,201,339,242"/>
+<area shape="poly" id="edge14_Node000001_Node000013" title=" " alt="" coords="146,199,179,204,178,210,145,204"/>
+<area shape="rect" id="Node000004" href="$classwebsocketpp_1_1endpoint.html#abfbee4cb244700560ef80594a913cd95" title=" " alt="" coords="387,71,542,111"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="336,88,371,88,371,94,336,94"/>
+<area shape="rect" id="Node000005" href="$namespacewebsocketpp_1_1error.html#a3344622df8c36e8ae03c59164e7b5e89" title=" " alt="" coords="590,165,723,206"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="336,107,388,120,576,165,574,170,386,126,334,112"/>
+<area shape="rect" id="Node000006" href="$namespacewebsocketpp_1_1error.html#ac1acac2bfb24bbd2b1791db80993b0c2" title=" " alt="" coords="771,165,903,206"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="723,183,755,183,755,188,723,188"/>
+<area shape="rect" id="Node000008" href="$classwebsocketpp_1_1endpoint.html#a0fe4457427d4124abe7ca022ba7afbb4" title="Retrieves a connection_ptr from a connection_hdl (exception free)" alt="" coords="387,197,542,238"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="326,263,389,241,391,246,328,269"/>
+<area shape="rect" id="Node000009" href="$namespacewebsocketpp_1_1close_1_1status.html#a4bf4987c79165b134ed1207a567ce209" title="Return a human readable interpretation of a WebSocket close code." alt="" coords="396,267,533,307"/>
+<area shape="poly" id="edge9_Node000007_Node000009" title=" " alt="" coords="339,284,380,284,380,290,339,290"/>
+<area shape="poly" id="edge8_Node000008_Node000005" title=" " alt="" coords="542,202,575,197,575,202,543,207"/>
+<area shape="poly" id="edge11_Node000010_Node000008" title=" " alt="" coords="335,175,383,190,382,195,334,180"/>
+<area shape="rect" id="Node000012" href="$namespacewebsocketpp_1_1utility.html#a26e5a26395d95d2f6bf3a9edb8d06dd2" title="Convert std::string to ascii printed string of hex digits." alt="" coords="396,332,533,373"/>
+<area shape="poly" id="edge13_Node000011_Node000012" title=" " alt="" coords="339,350,380,350,380,355,339,355"/>
+<area shape="poly" id="edge15_Node000013_Node000008" title=" " alt="" coords="339,218,372,217,372,222,339,223"/>
+</map>

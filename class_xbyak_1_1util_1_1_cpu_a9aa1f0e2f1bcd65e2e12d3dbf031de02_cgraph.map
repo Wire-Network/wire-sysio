@@ -1,0 +1,11 @@
+<map id="Xbyak::util::Cpu::Cpu" name="Xbyak::util::Cpu::Cpu">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,55,153,80"/>
+<area shape="rect" id="Node000002" href="$class_xbyak_1_1util_1_1_cpu.html#a41083751693a1d7fa8b32553e60b6f39" title=" " alt="" coords="209,5,384,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="138,51,221,32,222,38,140,57"/>
+<area shape="rect" id="Node000003" href="$class_xbyak_1_1util_1_1_cpu.html#a4d5d2d122400e2d904b9664de2513e97" title=" " alt="" coords="201,55,392,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="153,65,185,65,185,70,153,70"/>
+<area shape="rect" id="Node000004" href="$class_xbyak_1_1util_1_1_cpu.html#aa19d832c685a8e87eb9c64006ceecb74" title=" " alt="" coords="201,104,392,130"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="140,78,222,97,221,103,138,84"/>
+<area shape="rect" id="Node000005" href="$namespace_xbyak_1_1util.html#a725c307c821a7e14594f383a190d3990" title=" " alt="" coords="440,104,552,130"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="392,114,424,114,424,120,392,120"/>
+</map>

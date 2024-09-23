@@ -1,0 +1,233 @@
+\doxysection{testing\+::Expectation\+Set Class Reference}
+\hypertarget{classtesting_1_1_expectation_set}{}\label{classtesting_1_1_expectation_set}\index{testing::ExpectationSet@{testing::ExpectationSet}}
+
+
+{\ttfamily \#include $<$gmock-\/spec-\/builders.\+h$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef Expectation\+::\+Set\+::const\+\_\+iterator \mbox{\hyperlink{classtesting_1_1_expectation_set_a133d96bcaa13be84583cf2718a1e6c69}{const\+\_\+iterator}}
+\item 
+typedef Expectation\+::\+Set\+::value\+\_\+type \mbox{\hyperlink{classtesting_1_1_expectation_set_a9adb0d5f35ad85c9d2ae7ffac28245e7}{value\+\_\+type}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1_expectation_set_a78cda231077b84b5c94d25a845a74374}{Expectation\+Set}} ()
+\item 
+\mbox{\hyperlink{classtesting_1_1_expectation_set_a2448d9668e5b1a5372c97f59f1039db6}{Expectation\+Set}} (\mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base}{internal\+::\+Expectation\+Base}} \&exp)
+\item 
+\mbox{\hyperlink{classtesting_1_1_expectation_set_a2ab7f20951509d1358782093f3b7a25b}{Expectation\+Set}} (const \mbox{\hyperlink{classtesting_1_1_expectation}{Expectation}} \&e)
+\item 
+bool \mbox{\hyperlink{classtesting_1_1_expectation_set_a0c628ffa2d255f56ca09fd739d5765db}{operator==}} (const \mbox{\hyperlink{classtesting_1_1_expectation_set}{Expectation\+Set}} \&rhs) const
+\item 
+bool \mbox{\hyperlink{classtesting_1_1_expectation_set_af7c2e68647817460c9e486cd446a9e3a}{operator!=}} (const \mbox{\hyperlink{classtesting_1_1_expectation_set}{Expectation\+Set}} \&rhs) const
+\item 
+\mbox{\hyperlink{classtesting_1_1_expectation_set}{Expectation\+Set}} \& \mbox{\hyperlink{classtesting_1_1_expectation_set_a591a08f708f4aa8b6f803c314c085b80}{operator+=}} (const \mbox{\hyperlink{classtesting_1_1_expectation}{Expectation}} \&e)
+\item 
+int \mbox{\hyperlink{classtesting_1_1_expectation_set_a0941a29f03582a20c5eeabb5bf095f49}{size}} () const
+\item 
+\mbox{\hyperlink{classtesting_1_1_expectation_set_a133d96bcaa13be84583cf2718a1e6c69}{const\+\_\+iterator}} \mbox{\hyperlink{classtesting_1_1_expectation_set_ad7b8b900ef3f3e35a5d93aecd452504c}{begin}} () const
+\item 
+\mbox{\hyperlink{classtesting_1_1_expectation_set_a133d96bcaa13be84583cf2718a1e6c69}{const\+\_\+iterator}} \mbox{\hyperlink{classtesting_1_1_expectation_set_aac2a004529006c827e4d3420c4d4187a}{end}} () const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00568}{568}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classtesting_1_1_expectation_set_a133d96bcaa13be84583cf2718a1e6c69}\index{testing::ExpectationSet@{testing::ExpectationSet}!const\_iterator@{const\_iterator}}
+\index{const\_iterator@{const\_iterator}!testing::ExpectationSet@{testing::ExpectationSet}}
+\doxysubsubsection{\texorpdfstring{const\_iterator}{const\_iterator}}
+{\footnotesize\ttfamily \label{classtesting_1_1_expectation_set_a133d96bcaa13be84583cf2718a1e6c69} 
+Expectation\+::\+Set\+::const\+\_\+iterator \mbox{\hyperlink{classtesting_1_1_expectation_set_a133d96bcaa13be84583cf2718a1e6c69}{testing\+::\+Expectation\+Set\+::const\+\_\+iterator}}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00571}{571}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+\Hypertarget{classtesting_1_1_expectation_set_a9adb0d5f35ad85c9d2ae7ffac28245e7}\index{testing::ExpectationSet@{testing::ExpectationSet}!value\_type@{value\_type}}
+\index{value\_type@{value\_type}!testing::ExpectationSet@{testing::ExpectationSet}}
+\doxysubsubsection{\texorpdfstring{value\_type}{value\_type}}
+{\footnotesize\ttfamily \label{classtesting_1_1_expectation_set_a9adb0d5f35ad85c9d2ae7ffac28245e7} 
+Expectation\+::\+Set\+::value\+\_\+type \mbox{\hyperlink{classtesting_1_1_expectation_set_a9adb0d5f35ad85c9d2ae7ffac28245e7}{testing\+::\+Expectation\+Set\+::value\+\_\+type}}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00574}{574}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1_expectation_set_a78cda231077b84b5c94d25a845a74374}\index{testing::ExpectationSet@{testing::ExpectationSet}!ExpectationSet@{ExpectationSet}}
+\index{ExpectationSet@{ExpectationSet}!testing::ExpectationSet@{testing::ExpectationSet}}
+\doxysubsubsection{\texorpdfstring{ExpectationSet()}{ExpectationSet()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{classtesting_1_1_expectation_set_a78cda231077b84b5c94d25a845a74374} 
+testing\+::\+Expectation\+Set\+::\+Expectation\+Set (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00577}{577}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00577\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1_expectation_set_a2448d9668e5b1a5372c97f59f1039db6}\index{testing::ExpectationSet@{testing::ExpectationSet}!ExpectationSet@{ExpectationSet}}
+\index{ExpectationSet@{ExpectationSet}!testing::ExpectationSet@{testing::ExpectationSet}}
+\doxysubsubsection{\texorpdfstring{ExpectationSet()}{ExpectationSet()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{classtesting_1_1_expectation_set_a2448d9668e5b1a5372c97f59f1039db6} 
+testing\+::\+Expectation\+Set\+::\+Expectation\+Set (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base}{internal\+::\+Expectation\+Base}} \&}]{exp}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00582}{582}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00582\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ \ \textcolor{comment}{//\ NOLINT}}
+\DoxyCodeLine{00583\ \ \ \ \ *\textcolor{keyword}{this}\ +=\ Expectation(exp);}
+\DoxyCodeLine{00584\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1_expectation_set_a2ab7f20951509d1358782093f3b7a25b}\index{testing::ExpectationSet@{testing::ExpectationSet}!ExpectationSet@{ExpectationSet}}
+\index{ExpectationSet@{ExpectationSet}!testing::ExpectationSet@{testing::ExpectationSet}}
+\doxysubsubsection{\texorpdfstring{ExpectationSet()}{ExpectationSet()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{classtesting_1_1_expectation_set_a2ab7f20951509d1358782093f3b7a25b} 
+testing\+::\+Expectation\+Set\+::\+Expectation\+Set (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classtesting_1_1_expectation}{Expectation}} \&}]{e}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00589}{589}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00589\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ \ \textcolor{comment}{//\ NOLINT}}
+\DoxyCodeLine{00590\ \ \ \ \ *\textcolor{keyword}{this}\ +=\ e;}
+\DoxyCodeLine{00591\ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1_expectation_set_ad7b8b900ef3f3e35a5d93aecd452504c}\index{testing::ExpectationSet@{testing::ExpectationSet}!begin@{begin}}
+\index{begin@{begin}!testing::ExpectationSet@{testing::ExpectationSet}}
+\doxysubsubsection{\texorpdfstring{begin()}{begin()}}
+{\footnotesize\ttfamily \label{classtesting_1_1_expectation_set_ad7b8b900ef3f3e35a5d93aecd452504c} 
+\mbox{\hyperlink{classtesting_1_1_expectation_set_a133d96bcaa13be84583cf2718a1e6c69}{const\+\_\+iterator}} testing\+::\+Expectation\+Set\+::begin (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00613}{613}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00613\ \{\ \textcolor{keywordflow}{return}\ expectations\_.begin();\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1_expectation_set_ad7b8b900ef3f3e35a5d93aecd452504c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1_expectation_set_aac2a004529006c827e4d3420c4d4187a}\index{testing::ExpectationSet@{testing::ExpectationSet}!end@{end}}
+\index{end@{end}!testing::ExpectationSet@{testing::ExpectationSet}}
+\doxysubsubsection{\texorpdfstring{end()}{end()}}
+{\footnotesize\ttfamily \label{classtesting_1_1_expectation_set_aac2a004529006c827e4d3420c4d4187a} 
+\mbox{\hyperlink{classtesting_1_1_expectation_set_a133d96bcaa13be84583cf2718a1e6c69}{const\+\_\+iterator}} testing\+::\+Expectation\+Set\+::end (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00614}{614}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00614\ \{\ \textcolor{keywordflow}{return}\ expectations\_.end();\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1_expectation_set_aac2a004529006c827e4d3420c4d4187a_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1_expectation_set_af7c2e68647817460c9e486cd446a9e3a}\index{testing::ExpectationSet@{testing::ExpectationSet}!operator"!=@{operator"!=}}
+\index{operator"!=@{operator"!=}!testing::ExpectationSet@{testing::ExpectationSet}}
+\doxysubsubsection{\texorpdfstring{operator"!=()}{operator!=()}}
+{\footnotesize\ttfamily \label{classtesting_1_1_expectation_set_af7c2e68647817460c9e486cd446a9e3a} 
+bool testing\+::\+Expectation\+Set\+::operator!= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classtesting_1_1_expectation_set}{Expectation\+Set}} \&}]{rhs}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00602}{602}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00602\ \{\ \textcolor{keywordflow}{return}\ !(*\textcolor{keyword}{this}\ ==\ rhs);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1_expectation_set_a591a08f708f4aa8b6f803c314c085b80}\index{testing::ExpectationSet@{testing::ExpectationSet}!operator+=@{operator+=}}
+\index{operator+=@{operator+=}!testing::ExpectationSet@{testing::ExpectationSet}}
+\doxysubsubsection{\texorpdfstring{operator+=()}{operator+=()}}
+{\footnotesize\ttfamily \label{classtesting_1_1_expectation_set_a591a08f708f4aa8b6f803c314c085b80} 
+\mbox{\hyperlink{classtesting_1_1_expectation_set}{Expectation\+Set}} \& testing\+::\+Expectation\+Set\+::operator+= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classtesting_1_1_expectation}{Expectation}} \&}]{e}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00606}{606}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00606\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00607\ \ \ \ \ expectations\_.insert(e);}
+\DoxyCodeLine{00608\ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00609\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1_expectation_set_a0c628ffa2d255f56ca09fd739d5765db}\index{testing::ExpectationSet@{testing::ExpectationSet}!operator==@{operator==}}
+\index{operator==@{operator==}!testing::ExpectationSet@{testing::ExpectationSet}}
+\doxysubsubsection{\texorpdfstring{operator==()}{operator==()}}
+{\footnotesize\ttfamily \label{classtesting_1_1_expectation_set_a0c628ffa2d255f56ca09fd739d5765db} 
+bool testing\+::\+Expectation\+Set\+::operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classtesting_1_1_expectation_set}{Expectation\+Set}} \&}]{rhs}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00598}{598}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00598\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00599\ \ \ \ \ \textcolor{keywordflow}{return}\ expectations\_\ ==\ rhs.expectations\_;}
+\DoxyCodeLine{00600\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1_expectation_set_a0941a29f03582a20c5eeabb5bf095f49}\index{testing::ExpectationSet@{testing::ExpectationSet}!size@{size}}
+\index{size@{size}!testing::ExpectationSet@{testing::ExpectationSet}}
+\doxysubsubsection{\texorpdfstring{size()}{size()}}
+{\footnotesize\ttfamily \label{classtesting_1_1_expectation_set_a0941a29f03582a20c5eeabb5bf095f49} 
+int testing\+::\+Expectation\+Set\+::size (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00611}{611}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00611\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(expectations\_.size());\ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/include/gmock/\mbox{\hyperlink{gmock-spec-builders_8h}{gmock-\/spec-\/builders.\+h}}\end{DoxyCompactItemize}

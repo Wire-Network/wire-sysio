@@ -1,0 +1,83 @@
+\doxysection{lax\+\_\+der\+\_\+parsing.\+h}
+\hypertarget{lax__der__parsing_8h_source}{}\label{lax__der__parsing_8h_source}\index{libraries/fc/secp256k1/secp256k1/contrib/lax\_der\_parsing.h@{libraries/fc/secp256k1/secp256k1/contrib/lax\_der\_parsing.h}}
+\mbox{\hyperlink{lax__der__parsing_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00001}00001\ \textcolor{comment}{/***********************************************************************}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2015\ Pieter\ Wuille\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00003}00003\ \textcolor{comment}{\ *\ Distributed\ under\ the\ MIT\ software\ license,\ see\ the\ accompanying\ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00004}00004\ \textcolor{comment}{\ *\ file\ COPYING\ or\ https://www.opensource.org/licenses/mit-\/license.php.*}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00005}00005\ \textcolor{comment}{\ ***********************************************************************/}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00007}00007\ \textcolor{comment}{/****}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00008}00008\ \textcolor{comment}{\ *\ Please\ do\ not\ link\ this\ file\ directly.\ It\ is\ not\ part\ of\ the\ libsecp256k1}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00009}00009\ \textcolor{comment}{\ *\ project\ and\ does\ not\ promise\ any\ stability\ in\ its\ API,\ functionality\ or}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00010}00010\ \textcolor{comment}{\ *\ presence.\ Projects\ which\ use\ this\ code\ should\ instead\ copy\ this\ header}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00011}00011\ \textcolor{comment}{\ *\ and\ its\ accompanying\ .c\ file\ directly\ into\ their\ codebase.}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00012}00012\ \textcolor{comment}{\ ****/}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00014}00014\ \textcolor{comment}{/*\ This\ file\ defines\ a\ function\ that\ parses\ DER\ with\ various\ errors\ and}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00015}00015\ \textcolor{comment}{\ *\ violations.\ This\ is\ not\ a\ part\ of\ the\ library\ itself,\ because\ the\ allowed}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00016}00016\ \textcolor{comment}{\ *\ violations\ are\ chosen\ arbitrarily\ and\ do\ not\ follow\ or\ establish\ any}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00017}00017\ \textcolor{comment}{\ *\ standard.}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00018}00018\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00019}00019\ \textcolor{comment}{\ *\ In\ many\ places\ it\ matters\ that\ different\ implementations\ do\ not\ only\ accept}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00020}00020\ \textcolor{comment}{\ *\ the\ same\ set\ of\ valid\ signatures,\ but\ also\ reject\ the\ same\ set\ of\ signatures.}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00021}00021\ \textcolor{comment}{\ *\ The\ only\ means\ to\ accomplish\ that\ is\ by\ strictly\ obeying\ a\ standard,\ and\ not}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00022}00022\ \textcolor{comment}{\ *\ accepting\ anything\ else.}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00023}00023\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00024}00024\ \textcolor{comment}{\ *\ Nonetheless,\ sometimes\ there\ is\ a\ need\ for\ compatibility\ with\ systems\ that}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00025}00025\ \textcolor{comment}{\ *\ use\ signatures\ which\ do\ not\ strictly\ obey\ DER.\ The\ snippet\ below\ shows\ how}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00026}00026\ \textcolor{comment}{\ *\ certain\ violations\ are\ easily\ supported.\ You\ may\ need\ to\ adapt\ it.}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00027}00027\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00028}00028\ \textcolor{comment}{\ *\ Do\ not\ use\ this\ for\ new\ systems.\ Use\ well-\/defined\ DER\ or\ compact\ signatures}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00029}00029\ \textcolor{comment}{\ *\ instead\ if\ you\ have\ the\ choice\ (see\ secp256k1\_ecdsa\_signature\_parse\_der\ and}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00030}00030\ \textcolor{comment}{\ *\ secp256k1\_ecdsa\_signature\_parse\_compact).}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00031}00031\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00032}00032\ \textcolor{comment}{\ *\ The\ supported\ violations\ are:}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00033}00033\ \textcolor{comment}{\ *\ -\/\ All\ numbers\ are\ parsed\ as\ nonnegative\ integers,\ even\ though\ X.609-\/0207}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00034}00034\ \textcolor{comment}{\ *\ \ \ section\ 8.3.3\ specifies\ that\ integers\ are\ always\ encoded\ as\ two's}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00035}00035\ \textcolor{comment}{\ *\ \ \ complement.}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00036}00036\ \textcolor{comment}{\ *\ -\/\ Integers\ can\ have\ length\ 0,\ even\ though\ section\ 8.3.1\ says\ they\ can't.}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00037}00037\ \textcolor{comment}{\ *\ -\/\ Integers\ with\ overly\ long\ padding\ are\ accepted,\ violation\ section}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00038}00038\ \textcolor{comment}{\ *\ \ \ 8.3.2.}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00039}00039\ \textcolor{comment}{\ *\ -\/\ 127-\/byte\ long\ length\ descriptors\ are\ accepted,\ even\ though\ section}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00040}00040\ \textcolor{comment}{\ *\ \ \ 8.1.3.5.c\ says\ that\ they\ are\ not.}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00041}00041\ \textcolor{comment}{\ *\ -\/\ Trailing\ garbage\ data\ inside\ or\ after\ the\ signature\ is\ ignored.}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00042}00042\ \textcolor{comment}{\ *\ -\/\ The\ length\ descriptor\ of\ the\ sequence\ is\ ignored.}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00043}00043\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00044}00044\ \textcolor{comment}{\ *\ Compared\ to\ for\ example\ OpenSSL,\ many\ violations\ are\ NOT\ supported:}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00045}00045\ \textcolor{comment}{\ *\ -\/\ Using\ overly\ long\ tag\ descriptors\ for\ the\ sequence\ or\ integers\ inside,}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00046}00046\ \textcolor{comment}{\ *\ \ \ violating\ section\ 8.1.2.2.}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00047}00047\ \textcolor{comment}{\ *\ -\/\ Encoding\ primitive\ integers\ as\ constructed\ values,\ violating\ section}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00048}00048\ \textcolor{comment}{\ *\ \ \ 8.3.1.}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00049}00049\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00051}00051\ \textcolor{preprocessor}{\#ifndef\ SECP256K1\_CONTRIB\_LAX\_DER\_PARSING\_H}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00052}00052\ \textcolor{preprocessor}{\#define\ SECP256K1\_CONTRIB\_LAX\_DER\_PARSING\_H}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00054}00054\ \textcolor{comment}{/*\ \#include\ secp256k1.h\ only\ when\ it\ hasn't\ been\ included\ yet.}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00055}00055\ \textcolor{comment}{\ \ \ This\ enables\ this\ file\ to\ be\ \#included\ directly\ in\ other\ project}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00056}00056\ \textcolor{comment}{\ \ \ files\ (such\ as\ tests.c)\ without\ the\ need\ to\ set\ an\ explicit\ -\/I\ flag,}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00057}00057\ \textcolor{comment}{\ \ \ which\ would\ be\ necessary\ to\ locate\ secp256k1.h.\ */}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00058}00058\ \textcolor{preprocessor}{\#ifndef\ SECP256K1\_H}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00059}00059\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{secp256k1_8h}{secp256k1.h}}>}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00060}00060\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00062}00062\ \textcolor{preprocessor}{\#ifdef\ \_\_cplusplus}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00063}00063\ \textcolor{keyword}{extern}\ \textcolor{stringliteral}{"{}C"{}}\ \{}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00064}00064\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00086}00086\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{lax__der__parsing_8h_a8c6e1225540c46bf7080cabde2c4e691}{ecdsa\_signature\_parse\_der\_lax}}(}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00087}00087\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__context__struct}{secp256k1\_context}}*\ ctx,}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00088}00088\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__ecdsa__signature}{secp256k1\_ecdsa\_signature}}*\ sig,}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00089}00089\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *input,}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00090}00090\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ inputlen}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00091}00091\ )\ \mbox{\hyperlink{secp256k1_8h_a03c194d8fa91b9b66758b36c91e0b5cb}{SECP256K1\_ARG\_NONNULL}}(1)\ \mbox{\hyperlink{secp256k1_8h_a03c194d8fa91b9b66758b36c91e0b5cb}{SECP256K1\_ARG\_NONNULL}}(2)\ \mbox{\hyperlink{secp256k1_8h_a03c194d8fa91b9b66758b36c91e0b5cb}{SECP256K1\_ARG\_NONNULL}}(3);}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00092}00092\ }
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00093}00093\ \textcolor{preprocessor}{\#ifdef\ \_\_cplusplus}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00094}00094\ \}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00095}00095\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00096}00096\ }
+\DoxyCodeLine{\Hypertarget{lax__der__parsing_8h_source_l00097}00097\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{/*\ SECP256K1\_CONTRIB\_LAX\_DER\_PARSING\_H\ */}\textcolor{preprocessor}{}}
+
+\end{DoxyCode}

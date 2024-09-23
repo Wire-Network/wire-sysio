@@ -1,0 +1,17 @@
+<map id="main" name="main">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,55,55,80"/>
+<area shape="rect" id="Node000002" href="$archivertest_8cpp.html#a1440a7779ac56f47a3f355ce4a8c7da0" title=" " alt="" coords="103,5,153,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="54,53,88,35,90,40,56,58"/>
+<area shape="rect" id="Node000004" href="$archivertest_8cpp.html#a0283886819c7c140a023582b7269e2d0" title=" " alt="" coords="103,55,153,80"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="55,65,88,65,88,70,55,70"/>
+<area shape="rect" id="Node000005" href="$archivertest_8cpp.html#a6d0455dd5c30adda100e95f0423c786e" title=" " alt="" coords="103,104,153,130"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="56,77,90,95,88,100,54,82"/>
+<area shape="rect" id="Node000003" href="$class_json_writer.html#a69d5a42b3c5a94f5f05bb48d2489b281" title="Obtains the serialized JSON string." alt="" coords="201,55,347,80"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="154,24,220,47,218,52,153,29"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="154,65,186,65,186,70,154,70"/>
+<area shape="poly" id="edge7_Node000005_Node000003" title=" " alt="" coords="152,106,200,89,217,83,219,88,202,94,154,111"/>
+<area shape="rect" id="Node000006" href="$class_canvas.html#a277e4e60f5ec3ea16efd7ce9e1fb654b" title=" " alt="" coords="207,104,341,130"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="154,114,192,114,192,120,154,120"/>
+<area shape="rect" id="Node000007" href="$class_canvas.html#acf5c8e6bbc490927df36e3c30583800e" title=" " alt="" coords="224,153,325,179"/>
+<area shape="poly" id="edge8_Node000005_Node000007" title=" " alt="" coords="154,123,202,140,219,145,217,150,200,145,152,128"/>
+</map>

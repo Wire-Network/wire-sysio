@@ -1,0 +1,135 @@
+\doxysection{sysio\+::chain\+::data\+\_\+entry\texorpdfstring{$<$}{<} T, Validator \texorpdfstring{$>$}{>} Struct Template Reference}
+\hypertarget{structsysio_1_1chain_1_1data__entry}{}\label{structsysio_1_1chain_1_1data__entry}\index{sysio::chain::data\_entry$<$ T, Validator $>$@{sysio::chain::data\_entry$<$ T, Validator $>$}}
+
+
+{\ttfamily \#include $<$chain\+\_\+config\+\_\+helper.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1data__entry_a2a51d87f3f7ce8d17a49566c95bf12a8}{data\+\_\+entry}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&c, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} entry\+\_\+id, Validator \mbox{\hyperlink{namespacesysio_1_1chain_aa56956ceeec88a964737228174aec6d6}{validate}})
+\item 
+{\footnotesize template$<$typename Y $>$ }\\\mbox{\hyperlink{structsysio_1_1chain_1_1data__entry_a57adadffb95362eaeb03a28cb5521046}{data\+\_\+entry}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1data__entry}{data\+\_\+entry}}$<$ Y, Validator $>$ \&another, typename std\+::enable\+\_\+if\+\_\+t$<$ std\+::is\+\_\+base\+\_\+of\+\_\+v$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Y $>$, \+\_\+dummy $>$=\+\_\+dummy\{\})
+\item 
+bool \mbox{\hyperlink{structsysio_1_1chain_1_1data__entry_a675c5833ea94280eefb9528831fb7075}{is\+\_\+allowed}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \& \mbox{\hyperlink{structsysio_1_1chain_1_1data__entry_a914f04590c9c824a907a9c934f88fea2}{config}}
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1data__entry_a9b21e6c5f1b771616c4987e14ef6888e}{id}}
+\item 
+Validator \mbox{\hyperlink{structsysio_1_1chain_1_1data__entry_a167e303e6759e47fe3644f7fe82b7b9d}{validator}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, typename Validator$>$\newline
+struct sysio\+::chain\+::data\+\_\+entry$<$ T, Validator $>$}
+helper class to serialize specific class entry 
+
+Definition at line \mbox{\hyperlink{chain__config__helper_8hpp_source_l00028}{28}} of file \mbox{\hyperlink{chain__config__helper_8hpp_source}{chain\+\_\+config\+\_\+helper.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structsysio_1_1chain_1_1data__entry_a2a51d87f3f7ce8d17a49566c95bf12a8}\index{sysio::chain::data\_entry$<$ T, Validator $>$@{sysio::chain::data\_entry$<$ T, Validator $>$}!data\_entry@{data\_entry}}
+\index{data\_entry@{data\_entry}!sysio::chain::data\_entry$<$ T, Validator $>$@{sysio::chain::data\_entry$<$ T, Validator $>$}}
+\doxysubsubsection{\texorpdfstring{data\_entry()}{data\_entry()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1data__entry_a2a51d87f3f7ce8d17a49566c95bf12a8} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename Validator $>$ \\
+\mbox{\hyperlink{structsysio_1_1chain_1_1data__entry}{sysio\+::chain\+::data\+\_\+entry}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Validator $>$\+::data\+\_\+entry (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{c}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{entry\+\_\+id}{, }\item[{Validator}]{validate}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{chain__config__helper_8hpp_source_l00036}{36}} of file \mbox{\hyperlink{chain__config__helper_8hpp_source}{chain\+\_\+config\+\_\+helper.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00037\ \ \ \ \ :\ \mbox{\hyperlink{structsysio_1_1chain_1_1data__entry_a914f04590c9c824a907a9c934f88fea2}{config}}(c),\ }
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1data__entry_a9b21e6c5f1b771616c4987e14ef6888e}{id}}(entry\_id),\ }
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1data__entry_a167e303e6759e47fe3644f7fe82b7b9d}{validator}}(\mbox{\hyperlink{namespacesysio_1_1chain_aa56956ceeec88a964737228174aec6d6}{validate}})\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1data__entry_a57adadffb95362eaeb03a28cb5521046}\index{sysio::chain::data\_entry$<$ T, Validator $>$@{sysio::chain::data\_entry$<$ T, Validator $>$}!data\_entry@{data\_entry}}
+\index{data\_entry@{data\_entry}!sysio::chain::data\_entry$<$ T, Validator $>$@{sysio::chain::data\_entry$<$ T, Validator $>$}}
+\doxysubsubsection{\texorpdfstring{data\_entry()}{data\_entry()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1data__entry_a57adadffb95362eaeb03a28cb5521046} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename Validator $>$ \\
+template$<$typename Y $>$ \\
+\mbox{\hyperlink{structsysio_1_1chain_1_1data__entry}{sysio\+::chain\+::data\+\_\+entry}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Validator $>$\+::data\+\_\+entry (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1data__entry}{data\+\_\+entry}}$<$ Y, Validator $>$ \&}]{another}{, }\item[{typename std\+::enable\+\_\+if\+\_\+t$<$ std\+::is\+\_\+base\+\_\+of\+\_\+v$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Y $>$, \+\_\+dummy $>$}]{}{ = {\ttfamily \+\_\+dummy\{\}}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{chain__config__helper_8hpp_source_l00041}{41}} of file \mbox{\hyperlink{chain__config__helper_8hpp_source}{chain\+\_\+config\+\_\+helper.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\})}
+\DoxyCodeLine{00043\ \ \ \ \ :\ \mbox{\hyperlink{structsysio_1_1chain_1_1data__entry_a2a51d87f3f7ce8d17a49566c95bf12a8}{data\_entry}}(another.\mbox{\hyperlink{classconfig}{config}},\ another.\mbox{\hyperlink{structsysio_1_1chain_1_1data__entry_a9b21e6c5f1b771616c4987e14ef6888e}{id}},\ another.\mbox{\hyperlink{structsysio_1_1chain_1_1data__entry_a167e303e6759e47fe3644f7fe82b7b9d}{validator}})}
+\DoxyCodeLine{00044\ \ \ \ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1chain_1_1data__entry_a675c5833ea94280eefb9528831fb7075}\index{sysio::chain::data\_entry$<$ T, Validator $>$@{sysio::chain::data\_entry$<$ T, Validator $>$}!is\_allowed@{is\_allowed}}
+\index{is\_allowed@{is\_allowed}!sysio::chain::data\_entry$<$ T, Validator $>$@{sysio::chain::data\_entry$<$ T, Validator $>$}}
+\doxysubsubsection{\texorpdfstring{is\_allowed()}{is\_allowed()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1data__entry_a675c5833ea94280eefb9528831fb7075} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename Validator $>$ \\
+bool \mbox{\hyperlink{structsysio_1_1chain_1_1data__entry}{sysio\+::chain\+::data\+\_\+entry}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Validator $>$\+::is\+\_\+allowed (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{chain__config__helper_8hpp_source_l00046}{46}} of file \mbox{\hyperlink{chain__config__helper_8hpp_source}{chain\+\_\+config\+\_\+helper.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1chain_1_1data__entry_a167e303e6759e47fe3644f7fe82b7b9d}{validator}}(\textcolor{keywordtype}{id});}
+\DoxyCodeLine{00048\ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1chain_1_1data__entry_a914f04590c9c824a907a9c934f88fea2}\index{sysio::chain::data\_entry$<$ T, Validator $>$@{sysio::chain::data\_entry$<$ T, Validator $>$}!config@{config}}
+\index{config@{config}!sysio::chain::data\_entry$<$ T, Validator $>$@{sysio::chain::data\_entry$<$ T, Validator $>$}}
+\doxysubsubsection{\texorpdfstring{config}{config}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1data__entry_a914f04590c9c824a907a9c934f88fea2} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename Validator $>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\& \mbox{\hyperlink{structsysio_1_1chain_1_1data__entry}{sysio\+::chain\+::data\+\_\+entry}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Validator $>$\mbox{\hyperlink{classconfig}{\+::config}}}
+
+
+
+Definition at line \mbox{\hyperlink{chain__config__helper_8hpp_source_l00033}{33}} of file \mbox{\hyperlink{chain__config__helper_8hpp_source}{chain\+\_\+config\+\_\+helper.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1data__entry_a9b21e6c5f1b771616c4987e14ef6888e}\index{sysio::chain::data\_entry$<$ T, Validator $>$@{sysio::chain::data\_entry$<$ T, Validator $>$}!id@{id}}
+\index{id@{id}!sysio::chain::data\_entry$<$ T, Validator $>$@{sysio::chain::data\_entry$<$ T, Validator $>$}}
+\doxysubsubsection{\texorpdfstring{id}{id}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1data__entry_a9b21e6c5f1b771616c4987e14ef6888e} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename Validator $>$ \\
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1data__entry}{sysio\+::chain\+::data\+\_\+entry}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Validator $>$\+::id}
+
+
+
+Definition at line \mbox{\hyperlink{chain__config__helper_8hpp_source_l00034}{34}} of file \mbox{\hyperlink{chain__config__helper_8hpp_source}{chain\+\_\+config\+\_\+helper.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1data__entry_a167e303e6759e47fe3644f7fe82b7b9d}\index{sysio::chain::data\_entry$<$ T, Validator $>$@{sysio::chain::data\_entry$<$ T, Validator $>$}!validator@{validator}}
+\index{validator@{validator}!sysio::chain::data\_entry$<$ T, Validator $>$@{sysio::chain::data\_entry$<$ T, Validator $>$}}
+\doxysubsubsection{\texorpdfstring{validator}{validator}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1data__entry_a167e303e6759e47fe3644f7fe82b7b9d} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename Validator $>$ \\
+Validator \mbox{\hyperlink{structsysio_1_1chain_1_1data__entry}{sysio\+::chain\+::data\+\_\+entry}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Validator $>$\+::validator}
+
+
+
+Definition at line \mbox{\hyperlink{chain__config__helper_8hpp_source_l00035}{35}} of file \mbox{\hyperlink{chain__config__helper_8hpp_source}{chain\+\_\+config\+\_\+helper.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{chain__config__helper_8hpp}{chain\+\_\+config\+\_\+helper.\+hpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,126 @@
+\doxysection{defcpuloan\+\_\+subcommand Struct Reference}
+\hypertarget{structdefcpuloan__subcommand}{}\label{structdefcpuloan__subcommand}\index{defcpuloan\_subcommand@{defcpuloan\_subcommand}}
+
+
+Collaboration diagram for defcpuloan\+\_\+subcommand\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=207pt]{structdefcpuloan__subcommand__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structdefcpuloan__subcommand_af3ca37158ea5b590376e1ecad6f6332f}{defcpuloan\+\_\+subcommand}} (\mbox{\hyperlink{class_c_l_i_1_1_app}{CLI\+::\+App}} \texorpdfstring{$\ast$}{*}action\+Root)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structdefcpuloan__subcommand_a4147ca469eb788a843183b4b891cced0}{from\+\_\+str}}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structdefcpuloan__subcommand_af4544062a88095cb94fc9ef8bec09498}{loan\+\_\+num\+\_\+str}}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structdefcpuloan__subcommand_acd8cfc0382cda74ec65946219364394f}{amount\+\_\+str}}
+\item 
+const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \mbox{\hyperlink{structdefcpuloan__subcommand_a82bd28a3b47e08ded0440d79b19d78fe}{act\+\_\+name}} \{ "{}defcpuloan"{}\+\_\+n \}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l02057}{2057}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structdefcpuloan__subcommand_af3ca37158ea5b590376e1ecad6f6332f}\index{defcpuloan\_subcommand@{defcpuloan\_subcommand}!defcpuloan\_subcommand@{defcpuloan\_subcommand}}
+\index{defcpuloan\_subcommand@{defcpuloan\_subcommand}!defcpuloan\_subcommand@{defcpuloan\_subcommand}}
+\doxysubsubsection{\texorpdfstring{defcpuloan\_subcommand()}{defcpuloan\_subcommand()}}
+{\footnotesize\ttfamily \label{structdefcpuloan__subcommand_af3ca37158ea5b590376e1ecad6f6332f} 
+defcpuloan\+\_\+subcommand\+::defcpuloan\+\_\+subcommand (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_c_l_i_1_1_app}{CLI\+::\+App}} \texorpdfstring{$\ast$}{*}}]{action\+Root}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l02063}{2063}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02064\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ defcpuloan\ =\ actionRoot-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_a8b461d2233ec4121259011b5ed24b336}{add\_subcommand}}(\textcolor{stringliteral}{"{}defundcpuloan"{}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}Withdraw\ from\ a\ CPU\ loan\ fund"{}}));}
+\DoxyCodeLine{02065\ \ \ \ \ \ \ defcpuloan-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_a8c812d42c7720ecb5cd0aec41b5aa941}{add\_option}}(\textcolor{stringliteral}{"{}from"{}},\ \ \ \ \ \mbox{\hyperlink{structdefcpuloan__subcommand_a4147ca469eb788a843183b4b891cced0}{from\_str}},\ \ \ \ \ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}Loan\ owner"{}}))-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a}{required}}();}
+\DoxyCodeLine{02066\ \ \ \ \ \ \ defcpuloan-\/>add\_option(\textcolor{stringliteral}{"{}loan\_num"{}},\ \mbox{\hyperlink{structdefcpuloan__subcommand_af4544062a88095cb94fc9ef8bec09498}{loan\_num\_str}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}Loan\ ID"{}}))-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a}{required}}();}
+\DoxyCodeLine{02067\ \ \ \ \ \ \ defcpuloan-\/>add\_option(\textcolor{stringliteral}{"{}amount"{}},\ \ \ \mbox{\hyperlink{structdefcpuloan__subcommand_acd8cfc0382cda74ec65946219364394f}{amount\_str}},\ \ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}Amount\ to\ be\ withdrawn"{}}))-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a}{required}}();}
+\DoxyCodeLine{02068\ \ \ \ \ \ \ \mbox{\hyperlink{programs_2clio_2main_8cpp_aa5d53f41b83b5323c73622fbbb15e9cd}{add\_standard\_transaction\_options}}(defcpuloan,\ \textcolor{stringliteral}{"{}from@active"{}});}
+\DoxyCodeLine{02069\ \ \ \ \ \ \ defcpuloan-\/>callback([\textcolor{keyword}{this}]\ \{}
+\DoxyCodeLine{02070\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}\ act\_payload\ =\ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}()}
+\DoxyCodeLine{02071\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}from"{}},\ \ \ \ \ \mbox{\hyperlink{structdefcpuloan__subcommand_a4147ca469eb788a843183b4b891cced0}{from\_str}})}
+\DoxyCodeLine{02072\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}loan\_num"{}},\ \mbox{\hyperlink{structdefcpuloan__subcommand_af4544062a88095cb94fc9ef8bec09498}{loan\_num\_str}})}
+\DoxyCodeLine{02073\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}amount"{}},\ \ \ \mbox{\hyperlink{structdefcpuloan__subcommand_acd8cfc0382cda74ec65946219364394f}{amount\_str}});}
+\DoxyCodeLine{02074\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ accountPermissions\ =\ \mbox{\hyperlink{programs_2clio_2main_8cpp_a2b91ca5dbe7cc4ab287d0e44c3037552}{get\_account\_permissions}}(\mbox{\hyperlink{programs_2clio_2main_8cpp_ad552924cb151dcd5b60c73856d1ff706}{tx\_permission}},\ \{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(\mbox{\hyperlink{structdefcpuloan__subcommand_a4147ca469eb788a843183b4b891cced0}{from\_str}}),\ config::active\_name\});}
+\DoxyCodeLine{02075\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{programs_2clio_2main_8cpp_aaf784434864a29e4835be7465173d1ab}{send\_actions}}(\{\mbox{\hyperlink{programs_2clio_2main_8cpp_a067e20df5f65333b0c3cf5840bc37dea}{create\_action}}(accountPermissions,\ config::system\_account\_name,\ \mbox{\hyperlink{structdefcpuloan__subcommand_a82bd28a3b47e08ded0440d79b19d78fe}{act\_name}},\ act\_payload)\});}
+\DoxyCodeLine{02076\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{02077\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structdefcpuloan__subcommand_af3ca37158ea5b590376e1ecad6f6332f_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structdefcpuloan__subcommand_a82bd28a3b47e08ded0440d79b19d78fe}\index{defcpuloan\_subcommand@{defcpuloan\_subcommand}!act\_name@{act\_name}}
+\index{act\_name@{act\_name}!defcpuloan\_subcommand@{defcpuloan\_subcommand}}
+\doxysubsubsection{\texorpdfstring{act\_name}{act\_name}}
+{\footnotesize\ttfamily \label{structdefcpuloan__subcommand_a82bd28a3b47e08ded0440d79b19d78fe} 
+const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} defcpuloan\+\_\+subcommand\+::act\+\_\+name \{ "{}defcpuloan"{}\+\_\+n \}}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l02061}{2061}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02061\ \{\ \textcolor{stringliteral}{"{}defcpuloan"{}}\_n\ \};}
+
+\end{DoxyCode}
+\Hypertarget{structdefcpuloan__subcommand_acd8cfc0382cda74ec65946219364394f}\index{defcpuloan\_subcommand@{defcpuloan\_subcommand}!amount\_str@{amount\_str}}
+\index{amount\_str@{amount\_str}!defcpuloan\_subcommand@{defcpuloan\_subcommand}}
+\doxysubsubsection{\texorpdfstring{amount\_str}{amount\_str}}
+{\footnotesize\ttfamily \label{structdefcpuloan__subcommand_acd8cfc0382cda74ec65946219364394f} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} defcpuloan\+\_\+subcommand\+::amount\+\_\+str}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l02060}{2060}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{structdefcpuloan__subcommand_a4147ca469eb788a843183b4b891cced0}\index{defcpuloan\_subcommand@{defcpuloan\_subcommand}!from\_str@{from\_str}}
+\index{from\_str@{from\_str}!defcpuloan\_subcommand@{defcpuloan\_subcommand}}
+\doxysubsubsection{\texorpdfstring{from\_str}{from\_str}}
+{\footnotesize\ttfamily \label{structdefcpuloan__subcommand_a4147ca469eb788a843183b4b891cced0} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} defcpuloan\+\_\+subcommand\+::from\+\_\+str}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l02058}{2058}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{structdefcpuloan__subcommand_af4544062a88095cb94fc9ef8bec09498}\index{defcpuloan\_subcommand@{defcpuloan\_subcommand}!loan\_num\_str@{loan\_num\_str}}
+\index{loan\_num\_str@{loan\_num\_str}!defcpuloan\_subcommand@{defcpuloan\_subcommand}}
+\doxysubsubsection{\texorpdfstring{loan\_num\_str}{loan\_num\_str}}
+{\footnotesize\ttfamily \label{structdefcpuloan__subcommand_af4544062a88095cb94fc9ef8bec09498} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} defcpuloan\+\_\+subcommand\+::loan\+\_\+num\+\_\+str}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l02059}{2059}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+programs/clio/\mbox{\hyperlink{programs_2clio_2main_8cpp}{main.\+cpp}}\end{DoxyCompactItemize}

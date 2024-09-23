@@ -1,0 +1,252 @@
+\chapter{Schema}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_8zh-cn}{}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_8zh-cn}\index{Schema@{Schema}}
+（本功能于 v1.\+1.\+0 发布）
+
+JSON \doxylink{class_schema}{Schema} 是描述 JSON 格式的一个标准草案。一个 schema 本身也是一个 JSON。使用 JSON \doxylink{class_schema}{Schema} 去校验 JSON，可以让你的代码安全地访问 DOM，而无须检查类型或键值是否存在等。这也能确保输出的 JSON 是符合指定的 schema。
+
+Rapid\+JSON 实现了一个 \href{http://json-schema.org/documentation.html}{\texttt{ JSON Schema Draft v4}} 的校验器。若你不熟悉 JSON Schema，可以参考 \href{http://spacetelescope.github.io/understanding-json-schema/}{\texttt{ Understanding JSON Schema}}。\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_8zh-cn_BasicUsage}{}\doxysection{\texorpdfstring{Basic Usage}{Basic Usage}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_8zh-cn_BasicUsage}
+首先，你要把 JSON \doxylink{class_schema}{Schema} 解析成 {\ttfamily Document}，再把它编译成一个 {\ttfamily Schema\+Document}。
+
+然后，利用该 {\ttfamily Schema\+Document} 创建一个 {\ttfamily Schema\+Validator}。它与 {\ttfamily \doxylink{class_writer}{Writer}} 相似，都是能够处理 SAX 事件的。因此，你可以用 {\ttfamily document.\+Accept(validator)} 去校验一个 JSON，然后再获取校验结果。
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{schema_8h}{rapidjson/schema.h}}"{}}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ ...}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_document}{Document}}\ sd;}
+\DoxyCodeLine{\textcolor{keywordflow}{if}\ (sd.\mbox{\hyperlink{class_generic_document_a901db1678f99a1b550003eed75bc380a}{Parse}}(schemaJson).\mbox{\hyperlink{class_generic_document_a510a0588db4eb372f5d81bc3646578fb}{HasParseError}}())\ \{}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ 此\ schema\ 不是合法的\ JSON}}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ ...\ \ \ \ \ \ \ }}
+\DoxyCodeLine{\}}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_schema_document}{SchemaDocument}}\ schema(sd);\ \textcolor{comment}{//\ 把一个\ Document\ 编译至\ SchemaDocument}}
+\DoxyCodeLine{\textcolor{comment}{//\ 之后不再需要\ sd}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_document}{Document}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}};}
+\DoxyCodeLine{\textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.Parse(inputJson).HasParseError())\ \{}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ 输入不是一个合法的\ JSON}}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ ...\ \ \ \ \ \ \ }}
+\DoxyCodeLine{\}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_schema_validator}{SchemaValidator}}\ validator(schema);}
+\DoxyCodeLine{\textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.Accept(validator))\ \{}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ 输入的\ JSON\ 不合乎\ schema}}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ 打印诊断信息}}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{class_generic_string_buffer}{StringBuffer}}\ sb;}
+\DoxyCodeLine{\ \ \ \ validator.GetInvalidSchemaPointer().StringifyUriFragment(sb);}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Invalid\ schema:\ \%s\(\backslash\)n"{}},\ sb.\mbox{\hyperlink{class_generic_string_buffer_a42079865bab1deb930c6cff7d491c719}{GetString}}());}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Invalid\ keyword:\ \%s\(\backslash\)n"{}},\ validator.GetInvalidSchemaKeyword());}
+\DoxyCodeLine{\ \ \ \ sb.\mbox{\hyperlink{class_generic_string_buffer_a42f15c959046d899cb74c3120a6995f9}{Clear}}();}
+\DoxyCodeLine{\ \ \ \ validator.GetInvalidDocumentPointer().StringifyUriFragment(sb);}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Invalid\ document:\ \%s\(\backslash\)n"{}},\ sb.\mbox{\hyperlink{class_generic_string_buffer_a42079865bab1deb930c6cff7d491c719}{GetString}}());}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+一些注意点：
+
+
+\begin{DoxyItemize}
+\item 一个 {\ttfamily Schema\+Docment} 能被多个 {\ttfamily Schema\+Validator} 引用。它不会被 {\ttfamily Schema\+Validator} 修改。
+\item 可以重复使用一个 {\ttfamily Schema\+Validator} 来校验多个文件。在校验其他文件前，须先调用 {\ttfamily validator.\+Reset()}。
+\end{DoxyItemize}\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_8zh-cn_ParsingSerialization}{}\doxysection{\texorpdfstring{在解析／生成时进行校验}{在解析／生成时进行校验}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_8zh-cn_ParsingSerialization}
+与大部分 JSON \doxylink{class_schema}{Schema} 校验器有所不同，\+Rapid\+JSON 提供了一个基于 SAX 的 schema 校验器实现。因此，你可以在输入流解析 JSON 的同时进行校验。若校验器遇到一个与 schema 不符的值，就会立即终止解析。这设计对于解析大型 JSON 文件时特别有用。\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_8zh-cn_DomParsing}{}\doxysubsection{\texorpdfstring{DOM 解析}{DOM 解析}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_8zh-cn_DomParsing}
+在使用 DOM 进行解析时，{\ttfamily Document} 除了接收 SAX 事件外，还需做一些准备及结束工作，因此，为了连接 {\ttfamily Reader}、{\ttfamily Schema\+Validator} 和 {\ttfamily Document} 要做多一点事情。{\ttfamily \doxylink{class_schema_validating_reader}{Schema\+Validating\+Reader}} 是一个辅助类去做那些工作。
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{filereadstream_8h}{rapidjson/filereadstream.h}}"{}}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ ...}}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_schema_document}{SchemaDocument}}\ schema(sd);\ \textcolor{comment}{//\ 把一个\ Document\ 编译至\ SchemaDocument}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ 使用\ reader\ 解析\ JSON}}
+\DoxyCodeLine{FILE*\ fp\ =\ fopen(\textcolor{stringliteral}{"{}big.json"{}},\ \textcolor{stringliteral}{"{}r"{}});}
+\DoxyCodeLine{\mbox{\hyperlink{class_file_read_stream}{FileReadStream}}\ is(fp,\ buffer,\ \textcolor{keyword}{sizeof}(buffer));}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ 用\ reader\ 解析\ JSON，校验它的\ SAX\ 事件，并存储至\ d}}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_document}{Document}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}};}
+\DoxyCodeLine{\mbox{\hyperlink{class_schema_validating_reader}{SchemaValidatingReader<kParseDefaultFlags,\ FileReadStream,\ UTF8<>}}\ >\ reader(is,\ schema);}
+\DoxyCodeLine{\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.Populate(reader);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keywordflow}{if}\ (!reader.GetParseResult())\ \{}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ 不是一个合法的\ JSON}}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ 当\ reader.GetParseResult().Code()\ ==\ kParseErrorTermination,}}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ 它可能是被以下原因中止：}}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ (1)\ 校验器发现\ JSON\ 不合乎\ schema；或}}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ (2)\ 输入流有\ I/O\ 错误。}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ 检查校验结果}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{if}\ (!reader.IsValid())\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{comment}{//\ 输入的\ JSON\ 不合乎\ schema}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{comment}{//\ 打印诊断信息}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_string_buffer}{StringBuffer}}\ sb;}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ reader.GetInvalidSchemaPointer().StringifyUriFragment(sb);}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Invalid\ schema:\ \%s\(\backslash\)n"{}},\ sb.\mbox{\hyperlink{class_generic_string_buffer_a42079865bab1deb930c6cff7d491c719}{GetString}}());}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Invalid\ keyword:\ \%s\(\backslash\)n"{}},\ reader.GetInvalidSchemaKeyword());}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ sb.\mbox{\hyperlink{class_generic_string_buffer_a42f15c959046d899cb74c3120a6995f9}{Clear}}();}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ reader.GetInvalidDocumentPointer().StringifyUriFragment(sb);}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Invalid\ document:\ \%s\(\backslash\)n"{}},\ sb.\mbox{\hyperlink{class_generic_string_buffer_a42079865bab1deb930c6cff7d491c719}{GetString}}());}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_8zh-cn_SaxParsing}{}\doxysubsection{\texorpdfstring{Parsing}{Parsing}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_8zh-cn_SaxParsing}
+使用 SAX 解析时，情况就简单得多。若只需要校验 JSON 而无需进一步处理，那么仅需要：
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{SchemaValidator\ validator(schema);}
+\DoxyCodeLine{Reader\ reader;}
+\DoxyCodeLine{if\ (!reader.Parse(stream,\ validator))\ \{}
+\DoxyCodeLine{\ \ \ \ if\ (!validator.IsValid())\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ //\ ...\ \ \ \ }
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+这种方式和 \href{example/schemavalidator/schemavalidator.cpp}{\texttt{ schemavalidator}} 例子完全相同。这带来的独特优势是，无论 JSON 多巨大，永远维持低内存用量（内存用量只与 \doxylink{class_schema}{Schema} 的复杂度相关）。
+
+若你需要进一步处理 SAX 事件，便可使用模板类 {\ttfamily \doxylink{class_generic_schema_validator}{Generic\+Schema\+Validator}} 去设置校验器的输出 {\ttfamily Handler}：
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{MyHandler\ handler;}
+\DoxyCodeLine{GenericSchemaValidator<SchemaDocument,\ MyHandler>\ validator(schema,\ handler);}
+\DoxyCodeLine{Reader\ reader;}
+\DoxyCodeLine{if\ (!reader.Parse(ss,\ validator))\ \{}
+\DoxyCodeLine{\ \ \ \ if\ (!validator.IsValid())\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ //\ ...\ \ \ \ }
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_8zh-cn_Serialization}{}\doxysubsection{\texorpdfstring{Serialization}{Serialization}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_8zh-cn_Serialization}
+我们也可以在生成（serialization）的时候进行校验。这能确保输出的 JSON 符合一个 JSON Schema。
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{StringBuffer\ sb;}
+\DoxyCodeLine{Writer<StringBuffer>\ writer(sb);}
+\DoxyCodeLine{GenericSchemaValidator<SchemaDocument,\ Writer<StringBuffer>\ >\ validator(s,\ writer);}
+\DoxyCodeLine{if\ (!d.Accept(validator))\ \{}
+\DoxyCodeLine{\ \ \ \ //\ Some\ problem\ during\ Accept(),\ it\ may\ be\ validation\ or\ encoding\ issues.}
+\DoxyCodeLine{\ \ \ \ if\ (!validator.IsValid())\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ //\ ...}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+当然，如果你的应用仅需要 SAX 风格的生成，那么只需要把 SAX 事件由原来发送到 {\ttfamily \doxylink{class_writer}{Writer}}，改为发送到 {\ttfamily Schema\+Validator}。\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_8zh-cn_RemoteSchema}{}\doxysection{\texorpdfstring{远程 Schema}{远程 Schema}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_8zh-cn_RemoteSchema}
+JSON \doxylink{class_schema}{Schema} 支持 \href{http://spacetelescope.github.io/understanding-json-schema/structuring.html}{\texttt{ {\ttfamily \$ref} 关键字}}，它是一个 \doxylink{pointer_8zh-cn_8md}{JSON pointer} 引用至一个本地（local）或远程（remote） schema。本地指针的首字符是 {\ttfamily \#}，而远程指针是一个相对或绝对 URI。例如：
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\{\ "{}\$ref"{}:\ "{}definitions.json\#/address"{}\ \}}
+
+\end{DoxyCode}
+
+
+由于 {\ttfamily Schema\+Document} 并不知道如何处理那些 URI，它需要使用者提供一个 {\ttfamily IRemote\+Schema\+Document\+Provider} 的实例去处理。
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{class\ MyRemoteSchemaDocumentProvider\ :\ public\ IRemoteSchemaDocumentProvider\ \{}
+\DoxyCodeLine{public:}
+\DoxyCodeLine{\ \ \ \ virtual\ const\ SchemaDocument*\ GetRemoteDocument(const\ char*\ uri,\ SizeType\ length)\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ //\ Resolve\ the\ uri\ and\ returns\ a\ pointer\ to\ that\ schema.}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{\};}
+\DoxyCodeLine{}
+\DoxyCodeLine{//\ ...}
+\DoxyCodeLine{}
+\DoxyCodeLine{MyRemoteSchemaDocumentProvider\ provider;}
+\DoxyCodeLine{SchemaDocument\ schema(sd,\ \&provider);}
+
+\end{DoxyCode}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_8zh-cn_Conformance}{}\doxysection{\texorpdfstring{Conformance}{Conformance}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_8zh-cn_Conformance}
+Rapid\+JSON 通过了 \href{https://github.com/json-schema/JSON-Schema-Test-Suite}{\texttt{ JSON Schema Test Suite}} (Json \doxylink{class_schema}{Schema} draft 4) 中 263 个测试的 262 个。
+
+没通过的测试是 {\ttfamily ref\+Remote.\+json} 中的 "{}change resolution scope"{} -\/ "{}changed scope ref invalid"{}。这是由于未实现 {\ttfamily id} schema 关键字及 URI 合并功能。
+
+除此以外，关于字符串类型的 {\ttfamily format} schema 关键字也会被忽略，因为标准中并没需求必须实现。\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_8zh-cn_RegEx}{}\doxysubsection{\texorpdfstring{正则表达式}{正则表达式}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_8zh-cn_RegEx}
+{\ttfamily pattern} 及 {\ttfamily pattern\+Properties} 这两个 schema 关键字使用了正则表达式去匹配所需的模式。
+
+Rapid\+JSON 实现了一个简单的 \doxylink{namespace_n_f_a}{NFA} 正则表达式引擎，并预设使用。它支持以下语法。
+
+\tabulinesep=1mm
+\begin{longtabu}spread 0pt [c]{*{2}{|X[-1]}|}
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 语法   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 描述    }\\\cline{1-2}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 语法   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 描述    }\\\cline{1-2}
+\endhead
+{\ttfamily ab}   &串联    \\\cline{1-2}
+{\ttfamily a\&\#124;b}   &交替    \\\cline{1-2}
+{\ttfamily a?}   &零或一次    \\\cline{1-2}
+{\ttfamily a\texorpdfstring{$\ast$}{*}}   &零或多次    \\\cline{1-2}
+{\ttfamily a+}   &一或多次    \\\cline{1-2}
+{\ttfamily a\{3\}}   &刚好 3 次    \\\cline{1-2}
+{\ttfamily a\{3,\}}   &至少 3 次    \\\cline{1-2}
+{\ttfamily a\{3,5\}}   &3 至 5 次    \\\cline{1-2}
+{\ttfamily (ab)}   &分组    \\\cline{1-2}
+{\ttfamily \texorpdfstring{$^\wedge$}{\string^}a}   &在开始处    \\\cline{1-2}
+{\ttfamily a\$}   &在结束处    \\\cline{1-2}
+{\ttfamily .}   &任何字符    \\\cline{1-2}
+{\ttfamily \mbox{[}abc\mbox{]}}   &字符组    \\\cline{1-2}
+{\ttfamily \mbox{[}a-\/c\mbox{]}}   &字符组范围    \\\cline{1-2}
+{\ttfamily \mbox{[}a-\/z0-\/9\+\_\+\mbox{]}}   &字符组组合    \\\cline{1-2}
+{\ttfamily \mbox{[}\texorpdfstring{$^\wedge$}{\string^}abc\mbox{]}}   &字符组取反    \\\cline{1-2}
+{\ttfamily \mbox{[}\texorpdfstring{$^\wedge$}{\string^}a-\/c\mbox{]}}   &字符组范围取反    \\\cline{1-2}
+{\ttfamily \mbox{[}\textbackslash{}b\mbox{]}}   &退格符 (U+0008)    \\\cline{1-2}
+{\ttfamily \textbackslash{}\&\#124;}, {\ttfamily \textbackslash{}\textbackslash{}}, ...   &转义字符    \\\cline{1-2}
+{\ttfamily \textbackslash{}f}   &馈页 (U+000C)    \\\cline{1-2}
+{\ttfamily \textbackslash{}n}   &馈行 (U+000A)    \\\cline{1-2}
+{\ttfamily \textbackslash{}r}   &回车 (U+000D)    \\\cline{1-2}
+{\ttfamily \textbackslash{}t}   &制表 (U+0009)    \\\cline{1-2}
+{\ttfamily \textbackslash{}v}   &垂直制表 (U+000B)   \\\cline{1-2}
+\end{longtabu}
+
+
+对于使用 C++11 编译器的使用者，也可使用 {\ttfamily std\+::regex}，只需定义 {\ttfamily RAPIDJSON\+\_\+\+SCHEMA\+\_\+\+USE\+\_\+\+INTERNALREGEX=0} 及 {\ttfamily RAPIDJSON\+\_\+\+SCHEMA\+\_\+\+USE\+\_\+\+STDREGEX=1}。若你的 schema 无需使用 {\ttfamily pattern} 或 {\ttfamily pattern\+Properties}，可以把两个宏都设为零，以禁用此功能，这样做可节省一些代码体积。\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_8zh-cn_Performance}{}\doxysection{\texorpdfstring{Performance}{Performance}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2schema_8zh-cn_Performance}
+大部分 C++ JSON 库都未支持 JSON Schema。因此我们尝试按照 \href{https://github.com/ebdrup/json-schema-benchmark}{\texttt{ json-\/schema-\/benchmark}} 去评估 Rapid\+JSON 的 JSON \doxylink{class_schema}{Schema} 校验器。该评测测试了 11 个运行在 node.\+js 上的 Java\+Script 库。
+
+该评测校验 \href{https://github.com/json-schema/JSON-Schema-Test-Suite}{\texttt{ JSON Schema Test Suite}} 中的测试，当中排除了一些测试套件及个别测试。我们在 \href{test/perftest/schematest.cpp}{\texttt{ {\ttfamily schematest.\+cpp}}} 实现了相同的评测。
+
+在 Mac\+Book Pro (2.\+8 GHz Intel Core i7) 上收集到以下结果。
+
+\tabulinesep=1mm
+\begin{longtabu}spread 0pt [c]{*{3}{|X[-1]}|}
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 校验器   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 相对速度   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 每秒执行的测试数目    }\\\cline{1-3}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 校验器   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 相对速度   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 每秒执行的测试数目    }\\\cline{1-3}
+\endhead
+Rapid\+JSON   &\PBS\centering 155\%   &\PBS\centering 30682    \\\cline{1-3}
+\href{https://github.com/epoberezkin/ajv}{\texttt{ {\ttfamily ajv}}}   &\PBS\centering 100\%   &\PBS\centering 19770 (± 1.\+31\%)    \\\cline{1-3}
+\href{https://github.com/mafintosh/is-my-json-valid}{\texttt{ {\ttfamily is-\/my-\/json-\/valid}}}   &\PBS\centering 70\%   &\PBS\centering 13835 (± 2.\+84\%)    \\\cline{1-3}
+\href{https://github.com/bugventure/jsen}{\texttt{ {\ttfamily jsen}}}   &\PBS\centering 57.\+7\%   &\PBS\centering 11411 (± 1.\+27\%)    \\\cline{1-3}
+\href{https://github.com/AlexeyGrishin/schemasaurus}{\texttt{ {\ttfamily schemasaurus}}}   &\PBS\centering 26\%   &\PBS\centering 5145 (± 1.\+62\%)    \\\cline{1-3}
+\href{https://github.com/playlyfe/themis}{\texttt{ {\ttfamily themis}}}   &\PBS\centering 19.\+9\%   &\PBS\centering 3935 (± 2.\+69\%)    \\\cline{1-3}
+\href{https://github.com/zaggino/z-schema}{\texttt{ {\ttfamily z-\/schema}}}   &\PBS\centering 7\%   &\PBS\centering 1388 (± 0.\+84\%)    \\\cline{1-3}
+\href{https://github.com/pandastrike/jsck\#readme}{\texttt{ {\ttfamily jsck}}}   &\PBS\centering 3.\+1\%   &\PBS\centering 606 (± 2.\+84\%)    \\\cline{1-3}
+\href{https://github.com/tdegrunt/jsonschema\#readme}{\texttt{ {\ttfamily jsonschema}}}   &\PBS\centering 0.\+9\%   &\PBS\centering 185 (± 1.\+01\%)    \\\cline{1-3}
+\href{https://github.com/Prestaul/skeemas\#readme}{\texttt{ {\ttfamily skeemas}}}   &\PBS\centering 0.\+8\%   &\PBS\centering 154 (± 0.\+79\%)    \\\cline{1-3}
+tv4   &\PBS\centering 0.\+5\%   &\PBS\centering 93 (± 0.\+94\%)    \\\cline{1-3}
+\href{https://github.com/natesilva/jayschema}{\texttt{ {\ttfamily jayschema}}}   &\PBS\centering 0.\+1\%   &\PBS\centering 21 (± 1.\+14\%)   \\\cline{1-3}
+\end{longtabu}
+
+
+换言之，\+Rapid\+JSON 比最快的 Java\+Script 库（ajv）快约 1.\+5x。比最慢的快 1400x。 

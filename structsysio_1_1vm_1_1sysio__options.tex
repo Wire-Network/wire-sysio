@@ -1,0 +1,277 @@
+\doxysection{sysio\+::vm\+::sysio\+\_\+options Struct Reference}
+\hypertarget{structsysio_1_1vm_1_1sysio__options}{}\label{structsysio_1_1vm_1_1sysio__options}\index{sysio::vm::sysio\_options@{sysio::vm::sysio\_options}}
+
+
+{\ttfamily \#include $<$options.\+hpp$>$}
+
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static constexpr std\+::uint32\+\_\+t \mbox{\hyperlink{structsysio_1_1vm_1_1sysio__options_a9e2673af192421526a8ba115101f2245}{max\+\_\+mutable\+\_\+global\+\_\+bytes}} = 1024
+\item 
+static constexpr std\+::uint32\+\_\+t \mbox{\hyperlink{structsysio_1_1vm_1_1sysio__options_a7ecf91e2b5c83b4e71e7ba061be4e856}{max\+\_\+table\+\_\+elements}} = 1024
+\item 
+static constexpr std\+::uint32\+\_\+t \mbox{\hyperlink{structsysio_1_1vm_1_1sysio__options_a4accceca67e2a747eb55b8aec7bd4b29}{max\+\_\+section\+\_\+elements}} = 8191
+\item 
+static constexpr std\+::uint32\+\_\+t \mbox{\hyperlink{structsysio_1_1vm_1_1sysio__options_a28c1f5fe0b63207058b09ffd0fbf6e07}{max\+\_\+function\+\_\+section\+\_\+elements}} = 1023
+\item 
+static constexpr std\+::uint32\+\_\+t \mbox{\hyperlink{structsysio_1_1vm_1_1sysio__options_affff517849d1416a4ba5953e0c7616ff}{max\+\_\+import\+\_\+section\+\_\+elements}} = 1023
+\item 
+static constexpr std\+::uint32\+\_\+t \mbox{\hyperlink{structsysio_1_1vm_1_1sysio__options_af08b34f4802c0d45ba187cf12e5fde87}{max\+\_\+element\+\_\+segment\+\_\+elements}} = 8191
+\item 
+static constexpr std\+::uint32\+\_\+t \mbox{\hyperlink{structsysio_1_1vm_1_1sysio__options_a9e4476585f33ad6eb730c135dd6c09ff}{max\+\_\+data\+\_\+segment\+\_\+bytes}} = 8191
+\item 
+static constexpr std\+::uint32\+\_\+t \mbox{\hyperlink{structsysio_1_1vm_1_1sysio__options_a7cc4b95c033488a5688751fbb46140f9}{max\+\_\+linear\+\_\+memory\+\_\+init}} = 64\texorpdfstring{$\ast$}{*}1024
+\item 
+static constexpr std\+::uint32\+\_\+t \mbox{\hyperlink{structsysio_1_1vm_1_1sysio__options_a9a7cb2f204591bc53edb77515b3075ea}{max\+\_\+func\+\_\+local\+\_\+bytes}} = 8192
+\item 
+static constexpr std\+::uint32\+\_\+t \mbox{\hyperlink{structsysio_1_1vm_1_1sysio__options_a81b3ea1865333bae298952666a340f58}{max\+\_\+local\+\_\+sets}} = 1023
+\item 
+static constexpr std\+::uint32\+\_\+t \mbox{\hyperlink{structsysio_1_1vm_1_1sysio__options_a9e91a1f2792e500b501d8ac3ed72d76b}{sysio\+\_\+max\+\_\+nested\+\_\+structures}} = 1023
+\item 
+static constexpr std\+::uint32\+\_\+t \mbox{\hyperlink{structsysio_1_1vm_1_1sysio__options_a6beb6bc5f24a81c2d0b88c8066514571}{max\+\_\+br\+\_\+table\+\_\+elements}} = 8191
+\item 
+static constexpr std\+::uint32\+\_\+t \mbox{\hyperlink{structsysio_1_1vm_1_1sysio__options_a6bf809597404ba620af93421f8aa8c0e}{max\+\_\+symbol\+\_\+bytes}} = 8191
+\item 
+static constexpr std\+::uint32\+\_\+t \mbox{\hyperlink{structsysio_1_1vm_1_1sysio__options_af22024171216a41ec4aaab046221054f}{max\+\_\+memory\+\_\+offset}} = (33\texorpdfstring{$\ast$}{*}1024\texorpdfstring{$\ast$}{*}1024 -\/ 1)
+\item 
+static constexpr std\+::uint32\+\_\+t \mbox{\hyperlink{structsysio_1_1vm_1_1sysio__options_a903899294681f93db369c6565eaa1408}{max\+\_\+pages}} = 528
+\item 
+static constexpr std\+::uint32\+\_\+t \mbox{\hyperlink{structsysio_1_1vm_1_1sysio__options_ad8070c68fe064509801643be001eb2f0}{max\+\_\+call\+\_\+depth}} = 251
+\item 
+static constexpr bool \mbox{\hyperlink{structsysio_1_1vm_1_1sysio__options_a1cf51f25559489e7352ffff7dff52152}{forbid\+\_\+export\+\_\+mutable\+\_\+globals}} = true
+\item 
+static constexpr bool \mbox{\hyperlink{structsysio_1_1vm_1_1sysio__options_a2e840df00b2dfd42e4344ec9fefa30ea}{allow\+\_\+code\+\_\+after\+\_\+function\+\_\+end}} = true
+\item 
+static constexpr bool \mbox{\hyperlink{structsysio_1_1vm_1_1sysio__options_ad5c51bfdba0f2afd44ca98125893a52c}{allow\+\_\+u32\+\_\+limits\+\_\+flags}} = true
+\item 
+static constexpr bool \mbox{\hyperlink{structsysio_1_1vm_1_1sysio__options_af3fb690c6d41fb2337172b5223e7e1bf}{allow\+\_\+invalid\+\_\+empty\+\_\+local\+\_\+set}} = true
+\item 
+static constexpr bool \mbox{\hyperlink{structsysio_1_1vm_1_1sysio__options_a92417f29908da5f8ee6c0f609fed2ded}{allow\+\_\+zero\+\_\+blocktype}} = true
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{vm_2options_8hpp_source_l00066}{66}} of file \mbox{\hyperlink{vm_2options_8hpp_source}{options.\+hpp}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1vm_1_1sysio__options_a2e840df00b2dfd42e4344ec9fefa30ea}\index{sysio::vm::sysio\_options@{sysio::vm::sysio\_options}!allow\_code\_after\_function\_end@{allow\_code\_after\_function\_end}}
+\index{allow\_code\_after\_function\_end@{allow\_code\_after\_function\_end}!sysio::vm::sysio\_options@{sysio::vm::sysio\_options}}
+\doxysubsubsection{\texorpdfstring{allow\_code\_after\_function\_end}{allow\_code\_after\_function\_end}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1sysio__options_a2e840df00b2dfd42e4344ec9fefa30ea} 
+static constexpr bool sysio\+::vm\+::sysio\+\_\+options\+::allow\+\_\+code\+\_\+after\+\_\+function\+\_\+end = true\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2options_8hpp_source_l00086}{86}} of file \mbox{\hyperlink{sysio_2vm_2options_8hpp_source}{options.\+hpp}}.
+
+\Hypertarget{structsysio_1_1vm_1_1sysio__options_af3fb690c6d41fb2337172b5223e7e1bf}\index{sysio::vm::sysio\_options@{sysio::vm::sysio\_options}!allow\_invalid\_empty\_local\_set@{allow\_invalid\_empty\_local\_set}}
+\index{allow\_invalid\_empty\_local\_set@{allow\_invalid\_empty\_local\_set}!sysio::vm::sysio\_options@{sysio::vm::sysio\_options}}
+\doxysubsubsection{\texorpdfstring{allow\_invalid\_empty\_local\_set}{allow\_invalid\_empty\_local\_set}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1sysio__options_af3fb690c6d41fb2337172b5223e7e1bf} 
+static constexpr bool sysio\+::vm\+::sysio\+\_\+options\+::allow\+\_\+invalid\+\_\+empty\+\_\+local\+\_\+set = true\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2options_8hpp_source_l00088}{88}} of file \mbox{\hyperlink{sysio_2vm_2options_8hpp_source}{options.\+hpp}}.
+
+\Hypertarget{structsysio_1_1vm_1_1sysio__options_ad5c51bfdba0f2afd44ca98125893a52c}\index{sysio::vm::sysio\_options@{sysio::vm::sysio\_options}!allow\_u32\_limits\_flags@{allow\_u32\_limits\_flags}}
+\index{allow\_u32\_limits\_flags@{allow\_u32\_limits\_flags}!sysio::vm::sysio\_options@{sysio::vm::sysio\_options}}
+\doxysubsubsection{\texorpdfstring{allow\_u32\_limits\_flags}{allow\_u32\_limits\_flags}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1sysio__options_ad5c51bfdba0f2afd44ca98125893a52c} 
+static constexpr bool sysio\+::vm\+::sysio\+\_\+options\+::allow\+\_\+u32\+\_\+limits\+\_\+flags = true\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2options_8hpp_source_l00087}{87}} of file \mbox{\hyperlink{sysio_2vm_2options_8hpp_source}{options.\+hpp}}.
+
+\Hypertarget{structsysio_1_1vm_1_1sysio__options_a92417f29908da5f8ee6c0f609fed2ded}\index{sysio::vm::sysio\_options@{sysio::vm::sysio\_options}!allow\_zero\_blocktype@{allow\_zero\_blocktype}}
+\index{allow\_zero\_blocktype@{allow\_zero\_blocktype}!sysio::vm::sysio\_options@{sysio::vm::sysio\_options}}
+\doxysubsubsection{\texorpdfstring{allow\_zero\_blocktype}{allow\_zero\_blocktype}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1sysio__options_a92417f29908da5f8ee6c0f609fed2ded} 
+static constexpr bool sysio\+::vm\+::sysio\+\_\+options\+::allow\+\_\+zero\+\_\+blocktype = true\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2options_8hpp_source_l00089}{89}} of file \mbox{\hyperlink{sysio_2vm_2options_8hpp_source}{options.\+hpp}}.
+
+\Hypertarget{structsysio_1_1vm_1_1sysio__options_a1cf51f25559489e7352ffff7dff52152}\index{sysio::vm::sysio\_options@{sysio::vm::sysio\_options}!forbid\_export\_mutable\_globals@{forbid\_export\_mutable\_globals}}
+\index{forbid\_export\_mutable\_globals@{forbid\_export\_mutable\_globals}!sysio::vm::sysio\_options@{sysio::vm::sysio\_options}}
+\doxysubsubsection{\texorpdfstring{forbid\_export\_mutable\_globals}{forbid\_export\_mutable\_globals}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1sysio__options_a1cf51f25559489e7352ffff7dff52152} 
+static constexpr bool sysio\+::vm\+::sysio\+\_\+options\+::forbid\+\_\+export\+\_\+mutable\+\_\+globals = true\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2options_8hpp_source_l00085}{85}} of file \mbox{\hyperlink{sysio_2vm_2options_8hpp_source}{options.\+hpp}}.
+
+\Hypertarget{structsysio_1_1vm_1_1sysio__options_a6beb6bc5f24a81c2d0b88c8066514571}\index{sysio::vm::sysio\_options@{sysio::vm::sysio\_options}!max\_br\_table\_elements@{max\_br\_table\_elements}}
+\index{max\_br\_table\_elements@{max\_br\_table\_elements}!sysio::vm::sysio\_options@{sysio::vm::sysio\_options}}
+\doxysubsubsection{\texorpdfstring{max\_br\_table\_elements}{max\_br\_table\_elements}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1sysio__options_a6beb6bc5f24a81c2d0b88c8066514571} 
+static constexpr std\+::uint32\+\_\+t sysio\+::vm\+::sysio\+\_\+options\+::max\+\_\+br\+\_\+table\+\_\+elements = 8191\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2options_8hpp_source_l00079}{79}} of file \mbox{\hyperlink{sysio_2vm_2options_8hpp_source}{options.\+hpp}}.
+
+\Hypertarget{structsysio_1_1vm_1_1sysio__options_ad8070c68fe064509801643be001eb2f0}\index{sysio::vm::sysio\_options@{sysio::vm::sysio\_options}!max\_call\_depth@{max\_call\_depth}}
+\index{max\_call\_depth@{max\_call\_depth}!sysio::vm::sysio\_options@{sysio::vm::sysio\_options}}
+\doxysubsubsection{\texorpdfstring{max\_call\_depth}{max\_call\_depth}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1sysio__options_ad8070c68fe064509801643be001eb2f0} 
+static constexpr std\+::uint32\+\_\+t sysio\+::vm\+::sysio\+\_\+options\+::max\+\_\+call\+\_\+depth = 251\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2options_8hpp_source_l00083}{83}} of file \mbox{\hyperlink{sysio_2vm_2options_8hpp_source}{options.\+hpp}}.
+
+\Hypertarget{structsysio_1_1vm_1_1sysio__options_a9e4476585f33ad6eb730c135dd6c09ff}\index{sysio::vm::sysio\_options@{sysio::vm::sysio\_options}!max\_data\_segment\_bytes@{max\_data\_segment\_bytes}}
+\index{max\_data\_segment\_bytes@{max\_data\_segment\_bytes}!sysio::vm::sysio\_options@{sysio::vm::sysio\_options}}
+\doxysubsubsection{\texorpdfstring{max\_data\_segment\_bytes}{max\_data\_segment\_bytes}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1sysio__options_a9e4476585f33ad6eb730c135dd6c09ff} 
+static constexpr std\+::uint32\+\_\+t sysio\+::vm\+::sysio\+\_\+options\+::max\+\_\+data\+\_\+segment\+\_\+bytes = 8191\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2options_8hpp_source_l00074}{74}} of file \mbox{\hyperlink{sysio_2vm_2options_8hpp_source}{options.\+hpp}}.
+
+\Hypertarget{structsysio_1_1vm_1_1sysio__options_af08b34f4802c0d45ba187cf12e5fde87}\index{sysio::vm::sysio\_options@{sysio::vm::sysio\_options}!max\_element\_segment\_elements@{max\_element\_segment\_elements}}
+\index{max\_element\_segment\_elements@{max\_element\_segment\_elements}!sysio::vm::sysio\_options@{sysio::vm::sysio\_options}}
+\doxysubsubsection{\texorpdfstring{max\_element\_segment\_elements}{max\_element\_segment\_elements}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1sysio__options_af08b34f4802c0d45ba187cf12e5fde87} 
+static constexpr std\+::uint32\+\_\+t sysio\+::vm\+::sysio\+\_\+options\+::max\+\_\+element\+\_\+segment\+\_\+elements = 8191\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2options_8hpp_source_l00073}{73}} of file \mbox{\hyperlink{sysio_2vm_2options_8hpp_source}{options.\+hpp}}.
+
+\Hypertarget{structsysio_1_1vm_1_1sysio__options_a9a7cb2f204591bc53edb77515b3075ea}\index{sysio::vm::sysio\_options@{sysio::vm::sysio\_options}!max\_func\_local\_bytes@{max\_func\_local\_bytes}}
+\index{max\_func\_local\_bytes@{max\_func\_local\_bytes}!sysio::vm::sysio\_options@{sysio::vm::sysio\_options}}
+\doxysubsubsection{\texorpdfstring{max\_func\_local\_bytes}{max\_func\_local\_bytes}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1sysio__options_a9a7cb2f204591bc53edb77515b3075ea} 
+static constexpr std\+::uint32\+\_\+t sysio\+::vm\+::sysio\+\_\+options\+::max\+\_\+func\+\_\+local\+\_\+bytes = 8192\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2options_8hpp_source_l00076}{76}} of file \mbox{\hyperlink{sysio_2vm_2options_8hpp_source}{options.\+hpp}}.
+
+\Hypertarget{structsysio_1_1vm_1_1sysio__options_a28c1f5fe0b63207058b09ffd0fbf6e07}\index{sysio::vm::sysio\_options@{sysio::vm::sysio\_options}!max\_function\_section\_elements@{max\_function\_section\_elements}}
+\index{max\_function\_section\_elements@{max\_function\_section\_elements}!sysio::vm::sysio\_options@{sysio::vm::sysio\_options}}
+\doxysubsubsection{\texorpdfstring{max\_function\_section\_elements}{max\_function\_section\_elements}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1sysio__options_a28c1f5fe0b63207058b09ffd0fbf6e07} 
+static constexpr std\+::uint32\+\_\+t sysio\+::vm\+::sysio\+\_\+options\+::max\+\_\+function\+\_\+section\+\_\+elements = 1023\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2options_8hpp_source_l00071}{71}} of file \mbox{\hyperlink{sysio_2vm_2options_8hpp_source}{options.\+hpp}}.
+
+\Hypertarget{structsysio_1_1vm_1_1sysio__options_affff517849d1416a4ba5953e0c7616ff}\index{sysio::vm::sysio\_options@{sysio::vm::sysio\_options}!max\_import\_section\_elements@{max\_import\_section\_elements}}
+\index{max\_import\_section\_elements@{max\_import\_section\_elements}!sysio::vm::sysio\_options@{sysio::vm::sysio\_options}}
+\doxysubsubsection{\texorpdfstring{max\_import\_section\_elements}{max\_import\_section\_elements}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1sysio__options_affff517849d1416a4ba5953e0c7616ff} 
+static constexpr std\+::uint32\+\_\+t sysio\+::vm\+::sysio\+\_\+options\+::max\+\_\+import\+\_\+section\+\_\+elements = 1023\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2options_8hpp_source_l00072}{72}} of file \mbox{\hyperlink{sysio_2vm_2options_8hpp_source}{options.\+hpp}}.
+
+\Hypertarget{structsysio_1_1vm_1_1sysio__options_a7cc4b95c033488a5688751fbb46140f9}\index{sysio::vm::sysio\_options@{sysio::vm::sysio\_options}!max\_linear\_memory\_init@{max\_linear\_memory\_init}}
+\index{max\_linear\_memory\_init@{max\_linear\_memory\_init}!sysio::vm::sysio\_options@{sysio::vm::sysio\_options}}
+\doxysubsubsection{\texorpdfstring{max\_linear\_memory\_init}{max\_linear\_memory\_init}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1sysio__options_a7cc4b95c033488a5688751fbb46140f9} 
+static constexpr std\+::uint32\+\_\+t sysio\+::vm\+::sysio\+\_\+options\+::max\+\_\+linear\+\_\+memory\+\_\+init = 64\texorpdfstring{$\ast$}{*}1024\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2options_8hpp_source_l00075}{75}} of file \mbox{\hyperlink{sysio_2vm_2options_8hpp_source}{options.\+hpp}}.
+
+\Hypertarget{structsysio_1_1vm_1_1sysio__options_a81b3ea1865333bae298952666a340f58}\index{sysio::vm::sysio\_options@{sysio::vm::sysio\_options}!max\_local\_sets@{max\_local\_sets}}
+\index{max\_local\_sets@{max\_local\_sets}!sysio::vm::sysio\_options@{sysio::vm::sysio\_options}}
+\doxysubsubsection{\texorpdfstring{max\_local\_sets}{max\_local\_sets}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1sysio__options_a81b3ea1865333bae298952666a340f58} 
+static constexpr std\+::uint32\+\_\+t sysio\+::vm\+::sysio\+\_\+options\+::max\+\_\+local\+\_\+sets = 1023\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2options_8hpp_source_l00077}{77}} of file \mbox{\hyperlink{sysio_2vm_2options_8hpp_source}{options.\+hpp}}.
+
+\Hypertarget{structsysio_1_1vm_1_1sysio__options_af22024171216a41ec4aaab046221054f}\index{sysio::vm::sysio\_options@{sysio::vm::sysio\_options}!max\_memory\_offset@{max\_memory\_offset}}
+\index{max\_memory\_offset@{max\_memory\_offset}!sysio::vm::sysio\_options@{sysio::vm::sysio\_options}}
+\doxysubsubsection{\texorpdfstring{max\_memory\_offset}{max\_memory\_offset}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1sysio__options_af22024171216a41ec4aaab046221054f} 
+static constexpr std\+::uint32\+\_\+t sysio\+::vm\+::sysio\+\_\+options\+::max\+\_\+memory\+\_\+offset = (33\texorpdfstring{$\ast$}{*}1024\texorpdfstring{$\ast$}{*}1024 -\/ 1)\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2options_8hpp_source_l00081}{81}} of file \mbox{\hyperlink{sysio_2vm_2options_8hpp_source}{options.\+hpp}}.
+
+\Hypertarget{structsysio_1_1vm_1_1sysio__options_a9e2673af192421526a8ba115101f2245}\index{sysio::vm::sysio\_options@{sysio::vm::sysio\_options}!max\_mutable\_global\_bytes@{max\_mutable\_global\_bytes}}
+\index{max\_mutable\_global\_bytes@{max\_mutable\_global\_bytes}!sysio::vm::sysio\_options@{sysio::vm::sysio\_options}}
+\doxysubsubsection{\texorpdfstring{max\_mutable\_global\_bytes}{max\_mutable\_global\_bytes}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1sysio__options_a9e2673af192421526a8ba115101f2245} 
+static constexpr std\+::uint32\+\_\+t sysio\+::vm\+::sysio\+\_\+options\+::max\+\_\+mutable\+\_\+global\+\_\+bytes = 1024\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2options_8hpp_source_l00067}{67}} of file \mbox{\hyperlink{sysio_2vm_2options_8hpp_source}{options.\+hpp}}.
+
+\Hypertarget{structsysio_1_1vm_1_1sysio__options_a903899294681f93db369c6565eaa1408}\index{sysio::vm::sysio\_options@{sysio::vm::sysio\_options}!max\_pages@{max\_pages}}
+\index{max\_pages@{max\_pages}!sysio::vm::sysio\_options@{sysio::vm::sysio\_options}}
+\doxysubsubsection{\texorpdfstring{max\_pages}{max\_pages}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1sysio__options_a903899294681f93db369c6565eaa1408} 
+static constexpr std\+::uint32\+\_\+t sysio\+::vm\+::sysio\+\_\+options\+::max\+\_\+pages = 528\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2options_8hpp_source_l00082}{82}} of file \mbox{\hyperlink{sysio_2vm_2options_8hpp_source}{options.\+hpp}}.
+
+\Hypertarget{structsysio_1_1vm_1_1sysio__options_a4accceca67e2a747eb55b8aec7bd4b29}\index{sysio::vm::sysio\_options@{sysio::vm::sysio\_options}!max\_section\_elements@{max\_section\_elements}}
+\index{max\_section\_elements@{max\_section\_elements}!sysio::vm::sysio\_options@{sysio::vm::sysio\_options}}
+\doxysubsubsection{\texorpdfstring{max\_section\_elements}{max\_section\_elements}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1sysio__options_a4accceca67e2a747eb55b8aec7bd4b29} 
+static constexpr std\+::uint32\+\_\+t sysio\+::vm\+::sysio\+\_\+options\+::max\+\_\+section\+\_\+elements = 8191\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2options_8hpp_source_l00070}{70}} of file \mbox{\hyperlink{sysio_2vm_2options_8hpp_source}{options.\+hpp}}.
+
+\Hypertarget{structsysio_1_1vm_1_1sysio__options_a6bf809597404ba620af93421f8aa8c0e}\index{sysio::vm::sysio\_options@{sysio::vm::sysio\_options}!max\_symbol\_bytes@{max\_symbol\_bytes}}
+\index{max\_symbol\_bytes@{max\_symbol\_bytes}!sysio::vm::sysio\_options@{sysio::vm::sysio\_options}}
+\doxysubsubsection{\texorpdfstring{max\_symbol\_bytes}{max\_symbol\_bytes}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1sysio__options_a6bf809597404ba620af93421f8aa8c0e} 
+static constexpr std\+::uint32\+\_\+t sysio\+::vm\+::sysio\+\_\+options\+::max\+\_\+symbol\+\_\+bytes = 8191\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2options_8hpp_source_l00080}{80}} of file \mbox{\hyperlink{sysio_2vm_2options_8hpp_source}{options.\+hpp}}.
+
+\Hypertarget{structsysio_1_1vm_1_1sysio__options_a7ecf91e2b5c83b4e71e7ba061be4e856}\index{sysio::vm::sysio\_options@{sysio::vm::sysio\_options}!max\_table\_elements@{max\_table\_elements}}
+\index{max\_table\_elements@{max\_table\_elements}!sysio::vm::sysio\_options@{sysio::vm::sysio\_options}}
+\doxysubsubsection{\texorpdfstring{max\_table\_elements}{max\_table\_elements}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1sysio__options_a7ecf91e2b5c83b4e71e7ba061be4e856} 
+static constexpr std\+::uint32\+\_\+t sysio\+::vm\+::sysio\+\_\+options\+::max\+\_\+table\+\_\+elements = 1024\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2options_8hpp_source_l00068}{68}} of file \mbox{\hyperlink{sysio_2vm_2options_8hpp_source}{options.\+hpp}}.
+
+\Hypertarget{structsysio_1_1vm_1_1sysio__options_a9e91a1f2792e500b501d8ac3ed72d76b}\index{sysio::vm::sysio\_options@{sysio::vm::sysio\_options}!sysio\_max\_nested\_structures@{sysio\_max\_nested\_structures}}
+\index{sysio\_max\_nested\_structures@{sysio\_max\_nested\_structures}!sysio::vm::sysio\_options@{sysio::vm::sysio\_options}}
+\doxysubsubsection{\texorpdfstring{sysio\_max\_nested\_structures}{sysio\_max\_nested\_structures}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1sysio__options_a9e91a1f2792e500b501d8ac3ed72d76b} 
+static constexpr std\+::uint32\+\_\+t sysio\+::vm\+::sysio\+\_\+options\+::sysio\+\_\+max\+\_\+nested\+\_\+structures = 1023\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2options_8hpp_source_l00078}{78}} of file \mbox{\hyperlink{sysio_2vm_2options_8hpp_source}{options.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/include/sysio/sysio/vm/\mbox{\hyperlink{sysio_2vm_2options_8hpp}{options.\+hpp}}\item 
+libraries/sys-\/vm/include/sysio/vm/\mbox{\hyperlink{vm_2options_8hpp}{options.\+hpp}}\end{DoxyCompactItemize}

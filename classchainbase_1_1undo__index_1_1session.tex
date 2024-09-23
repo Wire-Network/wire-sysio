@@ -1,0 +1,210 @@
+\doxysection{chainbase\+::undo\+\_\+index\texorpdfstring{$<$}{<} T, Allocator, Indices \texorpdfstring{$>$}{>}\+::session Class Reference}
+\hypertarget{classchainbase_1_1undo__index_1_1session}{}\label{classchainbase_1_1undo__index_1_1session}\index{chainbase::undo\_index$<$ T, Allocator, Indices $>$::session@{chainbase::undo\_index$<$ T, Allocator, Indices $>$::session}}
+
+
+{\ttfamily \#include $<$undo\+\_\+index.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classchainbase_1_1undo__index_1_1session_a977c581225a3a7a6e5b51695c402145e}{session}} (\mbox{\hyperlink{classchainbase_1_1undo__index}{undo\+\_\+index}} \&idx, bool enabled)
+\item 
+\mbox{\hyperlink{classchainbase_1_1undo__index_1_1session_a2b9aa01275dc8f71d0f0655e3b86d4d5}{session}} (\mbox{\hyperlink{classchainbase_1_1undo__index_1_1session}{session}} \&\&other)
+\item 
+\mbox{\hyperlink{classchainbase_1_1undo__index_1_1session}{session}} \& \mbox{\hyperlink{classchainbase_1_1undo__index_1_1session_ac72f2eac3f2fd9e5dabe3e1b8e5ea0d6}{operator=}} (\mbox{\hyperlink{classchainbase_1_1undo__index_1_1session}{session}} \&\&other)
+\item 
+\mbox{\hyperlink{classchainbase_1_1undo__index_1_1session_a29e9c3d5212eb778bcc046bf9d97ed33}{\texorpdfstring{$\sim$}{\string~}session}} ()
+\item 
+void \mbox{\hyperlink{classchainbase_1_1undo__index_1_1session_af66c62a53890d5a8f1d6be0541cda016}{push}} ()
+\item 
+void \mbox{\hyperlink{classchainbase_1_1undo__index_1_1session_a1c85a16308fe117c15246e3731f03994}{squash}} ()
+\item 
+void \mbox{\hyperlink{classchainbase_1_1undo__index_1_1session_a934cd54876931dbd9478b94ef3beeaee}{undo}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}, typename... Indices$>$\newline
+class chainbase\+::undo\+\_\+index$<$ T, Allocator, Indices $>$\+::session}
+
+
+Definition at line \mbox{\hyperlink{undo__index_8hpp_source_l00478}{478}} of file \mbox{\hyperlink{undo__index_8hpp_source}{undo\+\_\+index.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classchainbase_1_1undo__index_1_1session_a977c581225a3a7a6e5b51695c402145e}\index{chainbase::undo\_index$<$ T, Allocator, Indices $>$::session@{chainbase::undo\_index$<$ T, Allocator, Indices $>$::session}!session@{session}}
+\index{session@{session}!chainbase::undo\_index$<$ T, Allocator, Indices $>$::session@{chainbase::undo\_index$<$ T, Allocator, Indices $>$::session}}
+\doxysubsubsection{\texorpdfstring{session()}{session()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classchainbase_1_1undo__index_1_1session_a977c581225a3a7a6e5b51695c402145e} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} , typename... Indices$>$ \\
+\mbox{\hyperlink{classchainbase_1_1undo__index}{chainbase\+::undo\+\_\+index}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}, Indices $>$\+::session\+::session (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classchainbase_1_1undo__index}{undo\+\_\+index}} \&}]{idx}{, }\item[{bool}]{enabled}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{undo__index_8hpp_source_l00480}{480}} of file \mbox{\hyperlink{undo__index_8hpp_source}{undo\+\_\+index.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00481\ \ \ \ \ \ \ \ \ \ \ :\ \_index(idx),}
+\DoxyCodeLine{00482\ \ \ \ \ \ \ \ \ \ \ \ \ \_apply(enabled)\ \{}
+\DoxyCodeLine{00483\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(enabled)\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.add\_session();}
+\DoxyCodeLine{00484\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classchainbase_1_1undo__index_1_1session_a2b9aa01275dc8f71d0f0655e3b86d4d5}\index{chainbase::undo\_index$<$ T, Allocator, Indices $>$::session@{chainbase::undo\_index$<$ T, Allocator, Indices $>$::session}!session@{session}}
+\index{session@{session}!chainbase::undo\_index$<$ T, Allocator, Indices $>$::session@{chainbase::undo\_index$<$ T, Allocator, Indices $>$::session}}
+\doxysubsubsection{\texorpdfstring{session()}{session()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classchainbase_1_1undo__index_1_1session_a2b9aa01275dc8f71d0f0655e3b86d4d5} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} , typename... Indices$>$ \\
+\mbox{\hyperlink{classchainbase_1_1undo__index}{chainbase\+::undo\+\_\+index}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}, Indices $>$\+::session\+::session (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classchainbase_1_1undo__index_1_1session}{session}} \&\&}]{other}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{undo__index_8hpp_source_l00485}{485}} of file \mbox{\hyperlink{undo__index_8hpp_source}{undo\+\_\+index.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00486\ \ \ \ \ \ \ \ \ \ \ \ :\ \_index(\mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.\_index),}
+\DoxyCodeLine{00487\ \ \ \ \ \ \ \ \ \ \ \ \ \ \_apply(\mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.\_apply)}
+\DoxyCodeLine{00488\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00489\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.\_apply\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00490\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classchainbase_1_1undo__index_1_1session_a29e9c3d5212eb778bcc046bf9d97ed33}\index{chainbase::undo\_index$<$ T, Allocator, Indices $>$::session@{chainbase::undo\_index$<$ T, Allocator, Indices $>$::session}!````~session@{\texorpdfstring{$\sim$}{\string~}session}}
+\index{````~session@{\texorpdfstring{$\sim$}{\string~}session}!chainbase::undo\_index$<$ T, Allocator, Indices $>$::session@{chainbase::undo\_index$<$ T, Allocator, Indices $>$::session}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}session()}{\string~session()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1undo__index_1_1session_a29e9c3d5212eb778bcc046bf9d97ed33} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} , typename... Indices$>$ \\
+\mbox{\hyperlink{classchainbase_1_1undo__index}{chainbase\+::undo\+\_\+index}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}, Indices $>$\+::session\+::\texorpdfstring{$\sim$}{\string~}session (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{undo__index_8hpp_source_l00499}{499}} of file \mbox{\hyperlink{undo__index_8hpp_source}{undo\+\_\+index.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00499\ \{\ \textcolor{keywordflow}{if}(\_apply)\ \_index.\mbox{\hyperlink{classchainbase_1_1undo__index_a1fc8b29d6609e5553df787a22182852e}{undo}}();\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=348pt]{classchainbase_1_1undo__index_1_1session_a29e9c3d5212eb778bcc046bf9d97ed33_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classchainbase_1_1undo__index_1_1session_ac72f2eac3f2fd9e5dabe3e1b8e5ea0d6}\index{chainbase::undo\_index$<$ T, Allocator, Indices $>$::session@{chainbase::undo\_index$<$ T, Allocator, Indices $>$::session}!operator=@{operator=}}
+\index{operator=@{operator=}!chainbase::undo\_index$<$ T, Allocator, Indices $>$::session@{chainbase::undo\_index$<$ T, Allocator, Indices $>$::session}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1undo__index_1_1session_ac72f2eac3f2fd9e5dabe3e1b8e5ea0d6} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} , typename... Indices$>$ \\
+\mbox{\hyperlink{classchainbase_1_1undo__index_1_1session}{session}} \& \mbox{\hyperlink{classchainbase_1_1undo__index}{chainbase\+::undo\+\_\+index}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}, Indices $>$\+::session\+::operator= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classchainbase_1_1undo__index_1_1session}{session}} \&\&}]{other}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{undo__index_8hpp_source_l00491}{491}} of file \mbox{\hyperlink{undo__index_8hpp_source}{undo\+\_\+index.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00491\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00492\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\textcolor{keyword}{this}\ !=\ \&other)\ \{}
+\DoxyCodeLine{00493\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classchainbase_1_1undo__index_1_1session_a934cd54876931dbd9478b94ef3beeaee}{undo}}();}
+\DoxyCodeLine{00494\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_apply\ =\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.\_apply;}
+\DoxyCodeLine{00495\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.\_apply\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00496\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00497\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00498\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classchainbase_1_1undo__index_1_1session_ac72f2eac3f2fd9e5dabe3e1b8e5ea0d6_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classchainbase_1_1undo__index_1_1session_af66c62a53890d5a8f1d6be0541cda016}\index{chainbase::undo\_index$<$ T, Allocator, Indices $>$::session@{chainbase::undo\_index$<$ T, Allocator, Indices $>$::session}!push@{push}}
+\index{push@{push}!chainbase::undo\_index$<$ T, Allocator, Indices $>$::session@{chainbase::undo\_index$<$ T, Allocator, Indices $>$::session}}
+\doxysubsubsection{\texorpdfstring{push()}{push()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1undo__index_1_1session_af66c62a53890d5a8f1d6be0541cda016} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} , typename... Indices$>$ \\
+void \mbox{\hyperlink{classchainbase_1_1undo__index}{chainbase\+::undo\+\_\+index}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}, Indices $>$\+::session\+::push (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{undo__index_8hpp_source_l00500}{500}} of file \mbox{\hyperlink{undo__index_8hpp_source}{undo\+\_\+index.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00500\ \{\ \_apply\ =\ \textcolor{keyword}{false};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classchainbase_1_1undo__index_1_1session_a1c85a16308fe117c15246e3731f03994}\index{chainbase::undo\_index$<$ T, Allocator, Indices $>$::session@{chainbase::undo\_index$<$ T, Allocator, Indices $>$::session}!squash@{squash}}
+\index{squash@{squash}!chainbase::undo\_index$<$ T, Allocator, Indices $>$::session@{chainbase::undo\_index$<$ T, Allocator, Indices $>$::session}}
+\doxysubsubsection{\texorpdfstring{squash()}{squash()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1undo__index_1_1session_a1c85a16308fe117c15246e3731f03994} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} , typename... Indices$>$ \\
+void \mbox{\hyperlink{classchainbase_1_1undo__index}{chainbase\+::undo\+\_\+index}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}, Indices $>$\+::session\+::squash (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{undo__index_8hpp_source_l00501}{501}} of file \mbox{\hyperlink{undo__index_8hpp_source}{undo\+\_\+index.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00501\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00502\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ \_apply\ )\ \_index.\mbox{\hyperlink{classchainbase_1_1undo__index_a4122a979134c51f89494b1b1dcde85ae}{squash}}();}
+\DoxyCodeLine{00503\ \ \ \ \ \ \ \ \ \ \ \ \ \_apply\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00504\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classchainbase_1_1undo__index_1_1session_a1c85a16308fe117c15246e3731f03994_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classchainbase_1_1undo__index_1_1session_a934cd54876931dbd9478b94ef3beeaee}\index{chainbase::undo\_index$<$ T, Allocator, Indices $>$::session@{chainbase::undo\_index$<$ T, Allocator, Indices $>$::session}!undo@{undo}}
+\index{undo@{undo}!chainbase::undo\_index$<$ T, Allocator, Indices $>$::session@{chainbase::undo\_index$<$ T, Allocator, Indices $>$::session}}
+\doxysubsubsection{\texorpdfstring{undo()}{undo()}}
+{\footnotesize\ttfamily \label{classchainbase_1_1undo__index_1_1session_a934cd54876931dbd9478b94ef3beeaee} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} , typename... Indices$>$ \\
+void \mbox{\hyperlink{classchainbase_1_1undo__index}{chainbase\+::undo\+\_\+index}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}}, Indices $>$\+::session\+::undo (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{undo__index_8hpp_source_l00505}{505}} of file \mbox{\hyperlink{undo__index_8hpp_source}{undo\+\_\+index.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00505\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00506\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ \_apply\ )\ \_index.\mbox{\hyperlink{classchainbase_1_1undo__index_a1fc8b29d6609e5553df787a22182852e}{undo}}();}
+\DoxyCodeLine{00507\ \ \ \ \ \ \ \ \ \ \ \ \ \_apply\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00508\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=348pt]{classchainbase_1_1undo__index_1_1session_a934cd54876931dbd9478b94ef3beeaee_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=348pt]{classchainbase_1_1undo__index_1_1session_a934cd54876931dbd9478b94ef3beeaee_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chainbase/include/chainbase/\mbox{\hyperlink{undo__index_8hpp}{undo\+\_\+index.\+hpp}}\end{DoxyCompactItemize}

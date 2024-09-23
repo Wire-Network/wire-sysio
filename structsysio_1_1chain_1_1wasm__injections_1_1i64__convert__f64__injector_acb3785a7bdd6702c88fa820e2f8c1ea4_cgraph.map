@@ -1,0 +1,17 @@
+<map id="sysio::chain::wasm_injections::i64_convert_f64_injector::accept" name="sysio::chain::wasm_injections::i64_convert_f64_injector::accept">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,96,164,151"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1wasm__injections_1_1injector__utils.html#a0d64aed18f7e4000e625f7d069316b28" title=" " alt="" coords="212,56,346,111"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="163,105,196,98,197,103,164,110"/>
+<area shape="rect" id="Node000008" href="$namespacesysio_1_1chain_1_1wasm__injections.html#ac77e8c15fd91a11ed9b09160043fa17f" title=" " alt="" coords="212,136,346,191"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="164,137,197,144,196,149,163,142"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1chain_1_1wasm__injections_1_1injector__utils.html#afe8d7cdc3f5fc984126d03eabd7de22f" title=" " alt="" coords="402,16,544,71"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="346,67,387,58,388,64,347,72"/>
+<area shape="rect" id="Node000007" href="$structsysio_1_1chain_1_1wasm__injections_1_1injector__utils.html#a5b13b15469c686992fbbff91ce74b51c" title=" " alt="" coords="394,96,552,151"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="347,95,379,101,378,107,346,100"/>
+<area shape="rect" id="Node000004" href="$struct_i_r_1_1_function_type.html#a97cbdf384d97c3a5203a1310c9af0822" title=" " alt="" coords="600,31,748,56"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="544,41,585,41,585,46,544,46"/>
+<area shape="rect" id="Node000005" href="$namespace_i_r.html#a434479ddde7e14159d718ff19489492d" title=" " alt="" coords="796,5,987,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="748,32,780,28,781,34,748,38"/>
+<area shape="rect" id="Node000006" href="$struct_i_r_1_1_function_type_map.html#a162948d8f2279cf7b70e1ead7878ed7b" title=" " alt="" coords="805,55,978,80"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="748,49,790,54,789,59,748,54"/>
+</map>

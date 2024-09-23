@@ -1,0 +1,208 @@
+\chapter{Change Log}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2_c_h_a_n_g_e_l_o_g}{}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2_c_h_a_n_g_e_l_o_g}\index{Change Log@{Change Log}}
+All notable changes to this project will be documented in this file. This project adheres to \href{http://semver.org/}{\texttt{ Semantic Versioning}}.
+
+\doxysection*{\href{https://github.com/Tencent/rapidjson/compare/v1.1.0...HEAD}{\texttt{ Unreleased}}}
+
+\doxysection*{1.\+1.\+0 -\/ 2016-\/08-\/25}
+
+\doxysubsection*{Added}
+
+
+\begin{DoxyItemize}
+\item Add \doxylink{class_generic_document}{Generic\+Document} ctor overload to specify JSON type (\#369)
+\item Add FAQ (\#372, \#373, \#374, \#376)
+\item Add forward declaration header {\ttfamily \doxylink{fwd_8h}{fwd.\+h}}
+\item Add @\+Platform\+IO Library Registry manifest file (\#400)
+\item Implement assignment operator for Big\+Integer (\#404)
+\item Add comments support (\#443)
+\item Adding coapp definition (\#460)
+\item \doxylink{documenttest_8cpp}{documenttest.\+cpp}\+: EXPECT\+\_\+\+THROW when checking empty allocator (470)
+\item \doxylink{class_generic_document}{Generic\+Document}\+: add implicit conversion to \doxylink{struct_parse_result}{Parse\+Result} (\#480)
+\item Use \texorpdfstring{$<$}{<}wchar.\+h\texorpdfstring{$>$}{>} with C++ linkage on Windows ARM (\#485)
+\item Detect little endian for Microsoft ARM targets
+\item Check Nan/\+Inf when writing a double (\#510)
+\item Add JSON \doxylink{class_schema}{Schema} Implementation (\#522)
+\item Add iostream wrapper (\#530)
+\item Add Jsonx example for converting JSON into JSONx (a XML format) (\#531)
+\item Add optional unresolved\+Token\+Index parameter to Pointer\+::\+Get() (\#532)
+\item Add encoding validation option for Writer/\+Pretty\+Writer (\#534)
+\item Add \doxylink{class_writer_a58e3f94dc5af1432a8eace5ba427eca7}{Writer\+::\+Set\+Max\+Decimal\+Places()} (\#536)
+\item Support \{0, \} and \{0, m\} in Regex (\#539)
+\item Add Value\+::\+Get/\+Set\+Float(), Value\+::\+Is\+Loss\+Less\+Float/\+Double() (\#540)
+\item Add stream position check to reader unit tests (\#541)
+\item Add Templated accessors and range-\/based for (\#542)
+\item Add (Pretty)\doxylink{class_writer_ae0d1615104e4e88040b9640e6784008a}{Writer\+::\+Raw\+Value()} (\#543)
+\item Add Document\+::\+Parse(std\+::string), Document\+::\+Parse(const char\texorpdfstring{$\ast$}{*}, size\+\_\+t length) and related APIs. (\#553)
+\item Add move constructor for \doxylink{class_generic_schema_document}{Generic\+Schema\+Document} (\#554)
+\item Add VS2010 and VS2015 to App\+Veyor CI (\#555)
+\item Add parse-\/by-\/parts example (\#556, \#562)
+\item Support parse number as string (\#564, \#589)
+\item Add k\+Format\+Single\+Line\+Array for \doxylink{class_pretty_writer}{Pretty\+Writer} (\#577)
+\item Added optional support for trailing commas (\#584)
+\item Added filterkey and filterkeydom examples (\#615)
+\item Added npm docs (\#639)
+\item Allow options for writing and parsing Na\+N/\+Infinity (\#641)
+\item Add std\+::string overload to \doxylink{class_pretty_writer_a20ecbe1d31a871e4da4a3899b40ad3cd}{Pretty\+Writer\+::\+Key()} when RAPIDJSON\+\_\+\+HAS\+\_\+\+STDSTRING is defined (\#698)
+\end{DoxyItemize}
+
+\doxysubsection*{Fixed}
+
+
+\begin{DoxyItemize}
+\item Fix gcc/clang/vc warnings (\#350, \#394, \#397, \#444, \#447, \#473, \#515, \#582, \#589, \#595, \#667)
+\item Fix documentation (\#482, \#511, \#550, \#557, \#614, \#635, \#660)
+\item Fix emscripten alignment issue (\#535)
+\item Fix missing allocator to uses of Add\+Member in document (\#365)
+\item CMake will no longer complain that the minimum CMake version is not specified (\#501)
+\item Make it usable with old VC8 (VS2005) (\#383)
+\item Prohibit C++11 move from Document to Value (\#391)
+\item Try to fix incorrect 64-\/bit alignment (\#419)
+\item Check return of fwrite to avoid warn\+\_\+unused\+\_\+result build failures (\#421)
+\item Fix UB in \doxylink{class_generic_document_a7bc1827a7ab04de4789fe46237f0e921}{Generic\+Document\+::\+Parse\+Stream} (\#426)
+\item Keep Document value unchanged on parse error (\#439)
+\item Add missing return statement (\#450)
+\item Fix Document\+::\+Parse(const Ch\texorpdfstring{$\ast$}{*}) for transcoding (\#478)
+\item \doxylink{encodings_8h}{encodings.\+h}\+: fix typo in preprocessor condition (\#495)
+\item Custom Microsoft headers are necessary only for Visual Studio 2012 and lower (\#559)
+\item Fix memory leak for invalid regex (26e69ffde95ba4773ab06db6457b78f308716f4b)
+\item Fix a bug in schema minimum/maximum keywords for 64-\/bit integer (e7149d665941068ccf8c565e77495521331cf390)
+\item Fix a crash bug in regex (\#605)
+\item Fix schema "{}required"{} keyword cannot handle duplicated keys (\#609)
+\item Fix cmake CMP0054 warning (\#612)
+\item Added missing include guards in \doxylink{istreamwrapper_8h}{istreamwrapper.\+h} and \doxylink{ostreamwrapper_8h}{ostreamwrapper.\+h} (\#634)
+\item Fix undefined behaviour (\#646)
+\item Fix buffer overrun using PutN (\#673)
+\item Fix rapidjson\+::value\+::\+Get$<$std\+::string$>$() may returns wrong data (\#681)
+\item Add Flush() for all value types (\#689)
+\item Handle malloc() fail in Pool\+Allocator (\#691)
+\item Fix builds on x32 platform. \#703
+\end{DoxyItemize}
+
+\doxysubsection*{Changed}
+
+
+\begin{DoxyItemize}
+\item Clarify problematic JSON license (\#392)
+\item Move Travis to container based infrastructure (\#504, \#558)
+\item Make whitespace array more compact (\#513)
+\item Optimize \doxylink{class_writer_acda4412ef5f4cac6e89f9544e4b10f70}{Writer\+::\+Write\+String()} with SIMD (\#544)
+\item x86-\/64 48-\/bit pointer optimization for \doxylink{class_generic_value}{Generic\+Value} (\#546)
+\item Define RAPIDJSON\+\_\+\+HAS\+\_\+\+CXX11\+\_\+\+RVALUE\+\_\+\+REFS directly in clang (\#617)
+\item Make \doxylink{class_generic_schema_document}{Generic\+Schema\+Document} constructor explicit (\#674)
+\item Optimize Find\+Member when use std\+::string (\#690)
+\end{DoxyItemize}
+
+\doxysection*{\href{https://github.com/Tencent/rapidjson/compare/v1.0.1...v1.0.2}{\texttt{ 1.\+0.\+2}} -\/ 2015-\/05-\/14}
+
+\doxysubsection*{Added}
+
+
+\begin{DoxyItemize}
+\item Add Value\+::\+XXXMember(...) overloads for std\+::string (\#335)
+\end{DoxyItemize}
+
+\doxysubsection*{Fixed}
+
+
+\begin{DoxyItemize}
+\item Include \doxylink{rapidjson_8h}{rapidjson.\+h} for all internal/error headers.
+\item Parsing some numbers incorrectly in full-\/precision mode ({\ttfamily k\+Full\+Precision\+Parse\+Flag}) (\#342)
+\item Fix some numbers parsed incorrectly (\#336)
+\item Fix alignment of 64bit platforms (\#328)
+\item Fix \doxylink{class_memory_pool_allocator_a57bbc80e570db6110901b9a7e36dbda0}{Memory\+Pool\+Allocator\+::\+Clear()} to clear user-\/buffer (0691502573f1afd3341073dd24b12c3db20fbde4)
+\end{DoxyItemize}
+
+\doxysubsection*{Changed}
+
+
+\begin{DoxyItemize}
+\item CMake\+Lists for include as a thirdparty in projects (\#334, \#337)
+\item Change \doxylink{class_generic_document_a7bc1827a7ab04de4789fe46237f0e921}{Document\+::\+Parse\+Stream()} to use stack allocator for Reader (ffbe38614732af8e0b3abdc8b50071f386a4a685)
+\end{DoxyItemize}
+
+\doxysection*{\href{https://github.com/Tencent/rapidjson/compare/v1.0.0...v1.0.1}{\texttt{ 1.\+0.\+1}} -\/ 2015-\/04-\/25}
+
+\doxysubsection*{Added}
+
+
+\begin{DoxyItemize}
+\item Changelog following \href{https://github.com/olivierlacan/keep-a-changelog}{\texttt{ Keep a CHANGELOG}} suggestions.
+\end{DoxyItemize}
+
+\doxysubsection*{Fixed}
+
+
+\begin{DoxyItemize}
+\item Parsing of some numbers (e.\+g. "{}1e-\/00011111111111"{}) causing assertion (\#314).
+\item Visual C++ 32-\/bit compilation error in {\ttfamily \doxylink{diyfp_8h}{diyfp.\+h}} (\#317).
+\end{DoxyItemize}
+
+\doxysection*{\href{https://github.com/Tencent/rapidjson/compare/v1.0-beta...v1.0.0}{\texttt{ 1.\+0.\+0}} -\/ 2015-\/04-\/22}
+
+\doxysubsection*{Added}
+
+
+\begin{DoxyItemize}
+\item 100\% \href{https://coveralls.io/r/Tencent/rapidjson?branch=master}{\texttt{ Coverall}} coverage.
+\item Version macros (\#311)
+\end{DoxyItemize}
+
+\doxysubsection*{Fixed}
+
+
+\begin{DoxyItemize}
+\item \doxylink{struct_a}{A} bug in trimming long number sequence (4824f12efbf01af72b8cb6fc96fae7b097b73015).
+\item Double quote in unicode escape (\#288).
+\item Negative zero roundtrip (double only) (\#289).
+\item Standardize behavior of {\ttfamily \doxylink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy()}} and {\ttfamily malloc()} (0c5c1538dcfc7f160e5a4aa208ddf092c787be5a, \#305, 0e8bbe5e3ef375e7f052f556878be0bd79e9062d).
+\end{DoxyItemize}
+
+\doxysubsection*{Removed}
+
+
+\begin{DoxyItemize}
+\item Remove an invalid {\ttfamily \doxylink{class_generic_document_a13f68b1896a24eea4cdbc03a3916225f}{Document\+::\+Parse\+Insitu()}} API (e7f1c6dd08b522cfcf9aed58a333bd9a0c0ccbeb).
+\end{DoxyItemize}
+
+\doxysection*{1.\+0-\/beta -\/ 2015-\/04-\/8}
+
+\doxysubsection*{Added}
+
+
+\begin{DoxyItemize}
+\item RFC 7159 (\#101)
+\item Optional Iterative \doxylink{struct_parser}{Parser} (\#76)
+\item Deep-\/copy values (\#20)
+\item Error code and message (\#27)
+\item \doxylink{struct_a_s_c_i_i}{ASCII} Encoding (\#70)
+\item {\ttfamily k\+Parse\+Stop\+When\+Done\+Flag} (\#83)
+\item {\ttfamily k\+Parse\+Full\+Precision\+Flag} (881c91d696f06b7f302af6d04ec14dd08db66ceb)
+\item Add {\ttfamily Key()} to handler concept (\#134)
+\item C++11 compatibility and support (\#128)
+\item Optimized number-\/to-\/string and vice versa conversions (\#137, \#80)
+\item Short-\/\+String Optimization (\#131)
+\item Local stream optimization by traits (\#32)
+\item Travis \& Appveyor Continuous Integration, with Valgrind verification (\#24, \#242)
+\item Redo all documentation (English, Simplified Chinese)
+\end{DoxyItemize}
+
+\doxysubsection*{Changed}
+
+
+\begin{DoxyItemize}
+\item Copyright ownership transferred to THL A29 Limited (a Tencent company).
+\item Migrating from Premake to CMAKE (\#192)
+\item Resolve all warning reports
+\end{DoxyItemize}
+
+\doxysubsection*{Removed}
+
+
+\begin{DoxyItemize}
+\item Remove other JSON libraries for performance comparison (\#180)
+\end{DoxyItemize}
+
+\doxysection*{0.\+11 -\/ 2012-\/11-\/16}
+
+\doxysection*{0.\+1 -\/ 2011-\/11-\/18}

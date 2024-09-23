@@ -1,0 +1,54 @@
+\doxysection{libraries/fc/src/crypto/elliptic\+\_\+secp256k1.cpp File Reference}
+\hypertarget{elliptic__secp256k1_8cpp}{}\label{elliptic__secp256k1_8cpp}\index{libraries/fc/src/crypto/elliptic\_secp256k1.cpp@{libraries/fc/src/crypto/elliptic\_secp256k1.cpp}}
+{\ttfamily \#include $<$fc/crypto/elliptic.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/crypto/base58.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/crypto/hmac.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/crypto/openssl.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/crypto/sha512.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/fwd\+\_\+impl.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/exception/exception.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/log/logger.\+hpp$>$}\newline
+{\ttfamily \#include $<$secp256k1.\+h$>$}\newline
+{\ttfamily \#include $<$secp256k1\+\_\+recovery.\+h$>$}\newline
+{\ttfamily \#include $<$alloca.\+h$>$}\newline
+{\ttfamily \#include "{}\+\_\+elliptic\+\_\+impl\+\_\+priv.\+hpp"{}}\newline
+Include dependency graph for elliptic\+\_\+secp256k1.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{elliptic__secp256k1_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classfc_1_1ecc_1_1detail_1_1public__key__impl}{fc\+::ecc\+::detail\+::public\+\_\+key\+\_\+impl}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacefc}{fc}}
+\begin{DoxyCompactList}\small\item\em namespace \doxylink{namespacesysio_1_1chain}{sysio\+::chain} \end{DoxyCompactList}\item 
+namespace \mbox{\hyperlink{namespacefc_1_1ecc}{fc\+::ecc}}
+\item 
+namespace \mbox{\hyperlink{namespacefc_1_1ecc_1_1detail}{fc\+::ecc\+::detail}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacefc_1_1ecc_1_1detail_a977de2554ed3ebc5f128e486d161517d}{fc\+::ecc\+::detail\+::\+\_\+get\+\_\+context}} ()
+\item 
+void \mbox{\hyperlink{namespacefc_1_1ecc_1_1detail_a71a18cd0920a238991d70c5dd2868570}{fc\+::ecc\+::detail\+::\+\_\+init\+\_\+lib}} ()
+\item 
+\mbox{\hyperlink{namespacefc_1_1ecc_1_1detail_ad0a35e1b7223a56e37957a6caf59b40d}{chr37}} \mbox{\hyperlink{namespacefc_1_1ecc_1_1detail_a16acb379a6eab07fd47f36da4ca3f7a8}{fc\+::ecc\+::detail\+::\+\_\+derive\+\_\+message}} (const \mbox{\hyperlink{namespacefc_1_1ecc_a86376367df56783963d35795bebddce6}{public\+\_\+key\+\_\+data}} \&key, int i)
+\item 
+\mbox{\hyperlink{classfc_1_1sha256}{fc\+::sha256}} \mbox{\hyperlink{namespacefc_1_1ecc_1_1detail_ab7363d849635fb8ae78b79d30da3f81f}{fc\+::ecc\+::detail\+::\+\_\+left}} (const \mbox{\hyperlink{classfc_1_1sha512}{fc\+::sha512}} \&v)
+\item 
+\mbox{\hyperlink{classfc_1_1sha256}{fc\+::sha256}} \mbox{\hyperlink{namespacefc_1_1ecc_1_1detail_a87091140a69385a95d2c4adf833cc0c3}{fc\+::ecc\+::detail\+::\+\_\+right}} (const \mbox{\hyperlink{classfc_1_1sha512}{fc\+::sha512}} \&v)
+\item 
+const ec\+\_\+group \& \mbox{\hyperlink{namespacefc_1_1ecc_1_1detail_a0367eb3e2e8d3c9df370ec2d62e78d64}{fc\+::ecc\+::detail\+::get\+\_\+curve}} ()
+\item 
+const \mbox{\hyperlink{namespacefc_1_1ecc_aac05b92a409a08d0d6b06ce2d07eb54b}{private\+\_\+key\+\_\+secret}} \& \mbox{\hyperlink{namespacefc_1_1ecc_1_1detail_a5d3c23a148b0c76d429302dd5ea9392d}{fc\+::ecc\+::detail\+::get\+\_\+curve\+\_\+order}} ()
+\item 
+const \mbox{\hyperlink{namespacefc_1_1ecc_aac05b92a409a08d0d6b06ce2d07eb54b}{private\+\_\+key\+\_\+secret}} \& \mbox{\hyperlink{namespacefc_1_1ecc_1_1detail_ae9379c81933688e390e45efbe0a75d43}{fc\+::ecc\+::detail\+::get\+\_\+half\+\_\+curve\+\_\+order}} ()
+\end{DoxyCompactItemize}

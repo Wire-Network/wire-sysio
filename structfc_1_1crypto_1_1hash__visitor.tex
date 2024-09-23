@@ -1,0 +1,86 @@
+\doxysection{fc\+::crypto\+::hash\+\_\+visitor Struct Reference}
+\hypertarget{structfc_1_1crypto_1_1hash__visitor}{}\label{structfc_1_1crypto_1_1hash__visitor}\index{fc::crypto::hash\_visitor@{fc::crypto::hash\_visitor}}
+
+
+Inheritance diagram for fc\+::crypto\+::hash\+\_\+visitor\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=196pt]{structfc_1_1crypto_1_1hash__visitor__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for fc\+::crypto\+::hash\+\_\+visitor\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=196pt]{structfc_1_1crypto_1_1hash__visitor__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename Sig\+Type $>$ }\\size\+\_\+t \mbox{\hyperlink{structfc_1_1crypto_1_1hash__visitor_acf367fa827ab81bc2ef53bdb15c1085b}{operator()}} (const Sig\+Type \&sig) const
+\item 
+size\+\_\+t \mbox{\hyperlink{structfc_1_1crypto_1_1hash__visitor_aae14a3ad7bee5796babaf136b38fde13}{operator()}} (const \mbox{\hyperlink{classfc_1_1crypto_1_1webauthn_1_1signature}{webauthn\+::signature}} \&sig) const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{signature_8cpp_source_l00006}{6}} of file \mbox{\hyperlink{signature_8cpp_source}{signature.\+cpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structfc_1_1crypto_1_1hash__visitor_acf367fa827ab81bc2ef53bdb15c1085b}\index{fc::crypto::hash\_visitor@{fc::crypto::hash\_visitor}!operator()@{operator()}}
+\index{operator()@{operator()}!fc::crypto::hash\_visitor@{fc::crypto::hash\_visitor}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structfc_1_1crypto_1_1hash__visitor_acf367fa827ab81bc2ef53bdb15c1085b} 
+template$<$typename Sig\+Type $>$ \\
+size\+\_\+t fc\+::crypto\+::hash\+\_\+visitor\+::operator() (\begin{DoxyParamCaption}\item[{const Sig\+Type \&}]{sig}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{signature_8cpp_source_l00008}{8}} of file \mbox{\hyperlink{signature_8cpp_source}{signature.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00008\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00009\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_assert}(\textcolor{keyword}{sizeof}(sig.\_data.data)\ ==\ 65,\ \textcolor{stringliteral}{"{}sig\ size\ is\ expected\ to\ be\ 65"{}});}
+\DoxyCodeLine{00010\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//signatures\ are\ two\ bignums:\ r\ \&\ s.\ Just\ add\ up\ least\ significant\ digits\ of\ the\ two}}
+\DoxyCodeLine{00011\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *(\textcolor{keywordtype}{size\_t}*)\&sig.\_data.data[32-\/\textcolor{keyword}{sizeof}(\textcolor{keywordtype}{size\_t})]\ +\ *(\textcolor{keywordtype}{size\_t}*)\&sig.\_data.data[64-\/\textcolor{keyword}{sizeof}(\textcolor{keywordtype}{size\_t})];}
+\DoxyCodeLine{00012\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structfc_1_1crypto_1_1hash__visitor_aae14a3ad7bee5796babaf136b38fde13}\index{fc::crypto::hash\_visitor@{fc::crypto::hash\_visitor}!operator()@{operator()}}
+\index{operator()@{operator()}!fc::crypto::hash\_visitor@{fc::crypto::hash\_visitor}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structfc_1_1crypto_1_1hash__visitor_aae14a3ad7bee5796babaf136b38fde13} 
+size\+\_\+t fc\+::crypto\+::hash\+\_\+visitor\+::operator() (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1crypto_1_1webauthn_1_1signature}{webauthn\+::signature}} \&}]{sig}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{signature_8cpp_source_l00014}{14}} of file \mbox{\hyperlink{signature_8cpp_source}{signature.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00014\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ sig.get\_hash();}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=339pt]{structfc_1_1crypto_1_1hash__visitor_aae14a3ad7bee5796babaf136b38fde13_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/src/crypto/\mbox{\hyperlink{signature_8cpp}{signature.\+cpp}}\end{DoxyCompactItemize}

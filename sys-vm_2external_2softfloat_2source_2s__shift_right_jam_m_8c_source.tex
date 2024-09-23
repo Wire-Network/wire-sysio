@@ -1,0 +1,107 @@
+\doxysection{s\+\_\+shift\+Right\+Jam\+M.\+c}
+\hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source}{}\label{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source}\index{libraries/sys-\/vm/external/softfloat/source/s\_shiftRightJamM.c@{libraries/sys-\/vm/external/softfloat/source/s\_shiftRightJamM.c}}
+\mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00001}00001\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00002}00002\ \textcolor{comment}{/*============================================================================}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00003}00003\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00004}00004\ \textcolor{comment}{This\ C\ source\ file\ is\ part\ of\ the\ SoftFloat\ IEEE\ Floating-\/Point\ Arithmetic}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00005}00005\ \textcolor{comment}{Package,\ Release\ 3e,\ by\ John\ R.\ Hauser.}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00006}00006\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00007}00007\ \textcolor{comment}{Copyright\ 2011,\ 2012,\ 2013,\ 2014,\ 2015,\ 2016\ The\ Regents\ of\ the\ University\ of}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00008}00008\ \textcolor{comment}{California.\ \ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00009}00009\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00010}00010\ \textcolor{comment}{Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00011}00011\ \textcolor{comment}{modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are\ met:}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00012}00012\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00013}00013\ \textcolor{comment}{\ 1.\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright\ notice,}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00014}00014\ \textcolor{comment}{\ \ \ \ this\ list\ of\ conditions,\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00015}00015\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00016}00016\ \textcolor{comment}{\ 2.\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above\ copyright\ notice,}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00017}00017\ \textcolor{comment}{\ \ \ \ this\ list\ of\ conditions,\ and\ the\ following\ disclaimer\ in\ the\ documentation}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00018}00018\ \textcolor{comment}{\ \ \ \ and/or\ other\ materials\ provided\ with\ the\ distribution.}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00019}00019\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00020}00020\ \textcolor{comment}{\ 3.\ Neither\ the\ name\ of\ the\ University\ nor\ the\ names\ of\ its\ contributors\ may}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00021}00021\ \textcolor{comment}{\ \ \ \ be\ used\ to\ endorse\ or\ promote\ products\ derived\ from\ this\ software\ without}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00022}00022\ \textcolor{comment}{\ \ \ \ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00023}00023\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00024}00024\ \textcolor{comment}{THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ REGENTS\ AND\ CONTRIBUTORS\ "{}AS\ IS"{},\ AND\ ANY}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00025}00025\ \textcolor{comment}{EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ THE\ IMPLIED}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00026}00026\ \textcolor{comment}{WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR\ A\ PARTICULAR\ PURPOSE,\ ARE}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00027}00027\ \textcolor{comment}{DISCLAIMED.\ \ IN\ NO\ EVENT\ SHALL\ THE\ REGENTS\ OR\ CONTRIBUTORS\ BE\ LIABLE\ FOR\ ANY}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00028}00028\ \textcolor{comment}{DIRECT,\ INDIRECT,\ INCIDENTAL,\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00029}00029\ \textcolor{comment}{(INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00030}00030\ \textcolor{comment}{LOSS\ OF\ USE,\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00031}00031\ \textcolor{comment}{ON\ ANY\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00032}00032\ \textcolor{comment}{(INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE\ OF\ THIS}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00033}00033\ \textcolor{comment}{SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00034}00034\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00035}00035\ \textcolor{comment}{=============================================================================*/}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00037}00037\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{stdint_8h}{stdint.h}}>}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00038}00038\ \textcolor{preprocessor}{\#include\ "{}platform.h"{}}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00040}00040\ \textcolor{preprocessor}{\#ifndef\ softfloat\_shiftRightJamM}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00042}\mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_a5cdb345073d90893baea9ddf48d81c1d}{00042}}\ \textcolor{preprocessor}{\#define\ softfloat\_shiftRightJamM\ softfloat\_shiftRightJamM}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00043}00043\ \textcolor{preprocessor}{\#include\ "{}primitives.h"{}}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00045}00045\ \textcolor{keywordtype}{void}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00046}\mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_ad12ee7d1a395a079ff5e5ec00f159657}{00046}}\ \ \mbox{\hyperlink{softfloat_2source_2s__shift_right_jam_m_8c_a5cdb345073d90893baea9ddf48d81c1d}{softfloat\_shiftRightJamM}}(}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00047}00047\ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_ad0fca8b15c218d2c687f8c373a71d228}{uint\_fast8\_t}}\ size\_words,}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00048}00048\ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ *aPtr,}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00049}00049\ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ dist,}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00050}00050\ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ *zPtr}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00051}00051\ \ )}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00052}00052\ \{}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00053}00053\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ wordJam,\ wordDist,\ *ptr;}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00054}00054\ \ \ \ \ \mbox{\hyperlink{stdint_8h_ad0fca8b15c218d2c687f8c373a71d228}{uint\_fast8\_t}}\ i,\ innerDist;}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00056}00056\ \ \ \ \ wordJam\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00057}00057\ \ \ \ \ wordDist\ =\ dist>>5;}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00058}00058\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ wordDist\ )\ \{}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00059}00059\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ size\_words\ <\ wordDist\ )\ wordDist\ =\ size\_words;}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00060}00060\ \ \ \ \ \ \ \ \ ptr\ =\ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ *)\ (aPtr\ +\ \mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a17ea7f28b4e451b784902493243eb93b}{indexMultiwordLo}}(\ size\_words,\ wordDist\ ));}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00061}00061\ \ \ \ \ \ \ \ \ i\ =\ wordDist;}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00062}00062\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{do}\ \{}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \ \ \ wordJam\ =\ *ptr++;}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00064}00064\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ wordJam\ )\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00065}00065\ \ \ \ \ \ \ \ \ \ \ \ \ -\/-\/i;}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00066}00066\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{while}\ (\ i\ );}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00067}00067\ \ \ \ \ \ \ \ \ ptr\ =\ zPtr;}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00068}00068\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00069}00069\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ wordDist\ <\ size\_words\ )\ \{}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00070}00070\ \ \ \ \ \ \ \ \ aPtr\ +=\ \mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a59d38bc3ebe0b9d0a0668dc8cd3de21b}{indexMultiwordHiBut}}(\ size\_words,\ wordDist\ );}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00071}00071\ \ \ \ \ \ \ \ \ innerDist\ =\ dist\ \&\ 31;}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00072}00072\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ innerDist\ )\ \{}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00073}00073\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{softfloat_2source_2include_2primitives_8h_a727dd02ee5b20c7c5b5b858cb9839d42}{softfloat\_shortShiftRightJamM}}(}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00074}00074\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ size\_words\ -\/\ wordDist,}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00075}00075\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ aPtr,}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ innerDist,}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ zPtr\ +\ \mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_ae57dd9d99c575c28faf52b9db48c6a8b}{indexMultiwordLoBut}}(\ size\_words,\ wordDist\ )}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00078}00078\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ !\ wordDist\ )\ \textcolor{keywordflow}{goto}\ wordJam;}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00080}00080\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00081}00081\ \ \ \ \ \ \ \ \ \ \ \ \ aPtr\ +=\ \mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a28a8ad1b8455a20d428c59cf01e36a66}{indexWordLo}}(\ size\_words\ -\/\ wordDist\ );}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00082}00082\ \ \ \ \ \ \ \ \ \ \ \ \ ptr\ =\ zPtr\ +\ \mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a28a8ad1b8455a20d428c59cf01e36a66}{indexWordLo}}(\ size\_words\ );}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00083}00083\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\ i\ =\ size\_words\ -\/\ wordDist;\ i;\ -\/-\/i\ )\ \{}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00084}00084\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *ptr\ =\ *aPtr;}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00085}00085\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ aPtr\ +=\ \mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a22ffd10aefa829eef57da03cff970e45}{wordIncr}};}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00086}00086\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ptr\ +=\ \mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a22ffd10aefa829eef57da03cff970e45}{wordIncr}};}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00087}00087\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00088}00088\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00089}00089\ \ \ \ \ \ \ \ \ ptr\ =\ zPtr\ +\ \mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a016e8ca813d61983f044bcb6a01ff4b3}{indexMultiwordHi}}(\ size\_words,\ wordDist\ );}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00090}00090\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00091}00091\ \ \ \ \ \textcolor{keywordflow}{do}\ \{}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00092}00092\ \ \ \ \ \ \ \ \ *ptr++\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00093}00093\ \ \ \ \ \ \ \ \ -\/-\/wordDist;}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00094}00094\ \ \ \ \ \}\ \textcolor{keywordflow}{while}\ (\ wordDist\ );}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00095}00095\ \ wordJam:}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00096}00096\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ wordJam\ )\ zPtr[\mbox{\hyperlink{softfloat_2source_2include_2primitive_types_8h_a28a8ad1b8455a20d428c59cf01e36a66}{indexWordLo}}(\ size\_words\ )]\ |=\ 1;}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00097}00097\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00098}00098\ \}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00099}00099\ }
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00100}00100\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{sys-vm_2external_2softfloat_2source_2s__shift_right_jam_m_8c_source_l00101}00101\ }
+
+\end{DoxyCode}

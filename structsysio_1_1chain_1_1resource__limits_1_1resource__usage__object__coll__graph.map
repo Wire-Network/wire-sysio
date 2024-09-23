@@ -1,0 +1,7 @@
+<map id="sysio::chain::resource_limits::resource_usage_object" name="sysio::chain::resource_limits::resource_usage_object">
+<area shape="rect" id="Node000001" title=" " alt="" coords="252,49,411,104"/>
+<area shape="rect" id="Node000002" href="$structchainbase_1_1object.html" title=" " alt="" coords="5,5,165,76"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="181,52,251,62,251,68,180,57"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1chain_1_1name.html" title="Immutable except for fc::from_variant." alt="" coords="19,100,151,126"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="165,98,251,86,252,91,166,104"/>
+</map>

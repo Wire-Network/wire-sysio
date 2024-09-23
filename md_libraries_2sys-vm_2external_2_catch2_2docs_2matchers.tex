@@ -1,0 +1,152 @@
+\chapter{matchers}
+\hypertarget{md_libraries_2sys-vm_2external_2_catch2_2docs_2matchers}{}\label{md_libraries_2sys-vm_2external_2_catch2_2docs_2matchers}\index{matchers@{matchers}}
+\label{_top}%
+ \doxysection*{Matchers}
+
+Matchers are an alternative way to do assertions which are easily extensible and composable. This makes them well suited to use with more complex types (such as collections) or your own custom types. Matchers were first popularised by the \href{https://en.wikipedia.org/wiki/Hamcrest}{\texttt{ Hamcrest}} family of frameworks.
+
+\doxysubsection*{In use}
+
+Matchers are introduced with the {\ttfamily REQUIRE\+\_\+\+THAT} or {\ttfamily CHECK\+\_\+\+THAT} macros, which take two arguments. The first argument is the thing (object or value) under test. The second part is a match {\itshape expression}, which consists of either a single matcher or one or more matchers combined using {\ttfamily \&\&}, {\ttfamily \texorpdfstring{$\vert$}{|}\texorpdfstring{$\vert$}{|}} or {\ttfamily !} operators.
+
+For example, to assert that a string ends with a certain substring\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ ++}
+\DoxyCodeLine{\textcolor{keyword}{using\ }\mbox{\hyperlink{namespace_catch_1_1_matchers_a816ee41f265edf5fd94f55d2860c58bd}{Catch::Matchers::EndsWith}};\ \textcolor{comment}{//\ or\ Catch::EndsWith}}
+\DoxyCodeLine{std::string\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}\ =\ getStringFromSomewhere();}
+\DoxyCodeLine{\mbox{\hyperlink{include_2catch_8hpp_ac1354db6f3e9c1e0a8eda0eea7ff1f0a}{REQUIRE\_THAT}}(\ str,\ EndsWith(\ \textcolor{stringliteral}{"{}as\ a\ service"{}}\ )\ );\ }
+
+\end{DoxyCode}
+
+
+The matcher objects can take multiple arguments, allowing more fine tuning. The built-\/in string matchers, for example, take a second argument specifying whether the comparison is case sensitive or not\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ ++}
+\DoxyCodeLine{\mbox{\hyperlink{include_2catch_8hpp_ac1354db6f3e9c1e0a8eda0eea7ff1f0a}{REQUIRE\_THAT}}(\ str,\ EndsWith(\ \textcolor{stringliteral}{"{}as\ a\ service"{}},\ \mbox{\hyperlink{struct_catch_1_1_case_sensitive_aad49d3aee2d97066642fffa919685c6aaeabe15dea2b2d0ea0847e88a9b2a99eb}{Catch::CaseSensitive::No}}\ )\ );\ }
+
+\end{DoxyCode}
+
+
+And matchers can be combined\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ ++}
+\DoxyCodeLine{\mbox{\hyperlink{include_2catch_8hpp_ac1354db6f3e9c1e0a8eda0eea7ff1f0a}{REQUIRE\_THAT}}(\ str,\ }
+\DoxyCodeLine{\ \ \ \ EndsWith(\ \textcolor{stringliteral}{"{}as\ a\ service"{}}\ )\ ||\ }
+\DoxyCodeLine{\ \ \ \ (StartsWith(\ \textcolor{stringliteral}{"{}Big\ data"{}}\ )\ \&\&\ !Contains(\ \textcolor{stringliteral}{"{}web\ scale"{}}\ )\ )\ );\ }
+
+\end{DoxyCode}
+
+
+\doxysubsection*{Built in matchers}
+
+\doxylink{namespace_catch}{Catch} currently provides some matchers, they are in the {\ttfamily \doxylink{namespace_catch_1_1_matchers}{Catch\+::\+Matchers}} and {\ttfamily \doxylink{namespace_catch}{Catch}} namespaces.
+
+\doxysubsubsection*{String matchers}
+
+The string matchers are {\ttfamily Starts\+With}, {\ttfamily Ends\+With}, {\ttfamily Contains}, {\ttfamily Equals} and {\ttfamily Matches}. The first four match a literal (sub)string against a result, while {\ttfamily Matches} takes and matches an ECMAScript regex. Do note that {\ttfamily Matches} matches the string as a whole, meaning that "{}abc"{} will not match against "{}abcd"{}, but "{}abc.\texorpdfstring{$\ast$}{*}"{} will.
+
+Each of the provided {\ttfamily std\+::string} matchers also takes an optional second argument, that decides case sensitivity (by-\/default, they are case sensitive).
+
+\doxysubsubsection*{Vector matchers}
+
+The vector matchers are {\ttfamily Contains}, {\ttfamily Vector\+Contains} and {\ttfamily Equals}. {\ttfamily Vector\+Contains} looks for a single element in the matched vector, {\ttfamily Contains} looks for a set (vector) of elements inside the matched vector.
+
+\doxysubsubsection*{Floating point matchers}
+
+The floating point matchers are {\ttfamily Within\+ULP} and {\ttfamily Within\+Abs}. {\ttfamily Within\+Abs} accepts floating point numbers that are within a certain margin of target. {\ttfamily Within\+ULP} performs an \href{https://en.wikipedia.org/wiki/Unit_in_the_last_place}{\texttt{ ULP}}-\/based comparison of two floating point numbers and accepts them if they are less than certain number of ULPs apart.
+
+Do note that ULP-\/based checks only make sense when both compared numbers are of the same type and {\ttfamily Within\+ULP} will use type of its argument as the target type. This means that {\ttfamily Within\+ULP(1.\+f, 1)} will expect to compare {\ttfamily float}s, but {\ttfamily Within\+ULP(1., 1)} will expect to compare {\ttfamily double}s.
+
+\doxysubsubsection*{Generic matchers}
+
+\doxylink{namespace_catch}{Catch} also aims to provide a set of generic matchers. Currently this set contains only a matcher that takes arbitrary callable predicate and applies it onto the provided object.
+
+Because of type inference limitations, the argument type of the predicate has to be provided explicitly. Example\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{include_2catch_8hpp_ac1354db6f3e9c1e0a8eda0eea7ff1f0a}{REQUIRE\_THAT}}(\textcolor{stringliteral}{"{}Hello\ olleH"{}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ Predicate<std::string>(}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ []\ (std::string\ \textcolor{keyword}{const}\&\ str)\ -\/>\ \textcolor{keywordtype}{bool}\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}.front()\ ==\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}.back();\ \},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}First\ and\ last\ character\ should\ be\ equal"{}})}
+\DoxyCodeLine{);}
+
+\end{DoxyCode}
+
+
+The second argument is an optional description of the predicate, and is used only during reporting of the result.
+
+\doxysubsection*{Custom matchers}
+
+It\textquotesingle{}s easy to provide your own matchers to extend \doxylink{namespace_catch}{Catch} or just to work with your own types.
+
+You need to provide two things\+:
+\begin{DoxyEnumerate}
+\item \doxylink{struct_a}{A} matcher class, derived from {\ttfamily Catch\+::\+Matcher\+Base\texorpdfstring{$<$}{<}T\texorpdfstring{$>$}{>}} -\/ where {\ttfamily T} is the type being tested. The constructor takes and stores any arguments needed (e.\+g. something to compare against) and you must override two methods\+: {\ttfamily match()} and {\ttfamily describe()}.
+\item \doxylink{struct_a}{A} simple builder function. This is what is actually called from the test code and allows overloading.
+\end{DoxyEnumerate}
+
+Here\textquotesingle{}s an example for asserting that an integer falls within a given range (note that it is all inline for the sake of keeping the example short)\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ ++}
+\DoxyCodeLine{\textcolor{comment}{//\ The\ matcher\ class}}
+\DoxyCodeLine{\textcolor{keyword}{class\ }IntRange\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_matcher_base}{Catch::MatcherBase}}<int>\ \{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{int}\ m\_begin,\ m\_end;}
+\DoxyCodeLine{\textcolor{keyword}{public}:}
+\DoxyCodeLine{\ \ \ \ IntRange(\ \textcolor{keywordtype}{int}\ begin,\ \textcolor{keywordtype}{int}\ end\ )\ :\ m\_begin(\ begin\ ),\ m\_end(\ end\ )\ \{\}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ Performs\ the\ test\ for\ this\ matcher}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_matcher_method_ae0920ff9e817acf08e1bb0cbcb044e30}{match}}(\ \textcolor{keywordtype}{int}\ \textcolor{keyword}{const}\&\ i\ )\textcolor{keyword}{\ const\ override\ }\{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ i\ >=\ m\_begin\ \&\&\ i\ <=\ m\_end;}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ Produces\ a\ string\ describing\ what\ this\ matcher\ does.\ It\ should}}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ include\ any\ provided\ data\ (the\ begin/\ end\ in\ this\ case)\ and}}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ be\ written\ as\ if\ it\ were\ stating\ a\ fact\ (in\ the\ output\ it\ will\ be}}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ preceded\ by\ the\ value\ under\ test).}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{virtual}\ std::string\ \mbox{\hyperlink{class_catch_1_1_matchers_1_1_impl_1_1_matcher_untyped_base_a91d3a907dbfcbb596077df24f6e11fe2}{describe}}()\textcolor{keyword}{\ const\ override\ }\{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ std::ostringstream\ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}};}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}\ <<\ \textcolor{stringliteral}{"{}is\ between\ "{}}\ <<\ m\_begin\ <<\ \textcolor{stringliteral}{"{}\ and\ "{}}\ <<\ m\_end;}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}.str();}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{\};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ The\ builder\ function}}
+\DoxyCodeLine{\textcolor{keyword}{inline}\ IntRange\ IsBetween(\ \textcolor{keywordtype}{int}\ begin,\ \textcolor{keywordtype}{int}\ end\ )\ \{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{return}\ IntRange(\ begin,\ end\ );}
+\DoxyCodeLine{\}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ ...}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ Usage}}
+\DoxyCodeLine{\mbox{\hyperlink{include_2catch_8hpp_abd6e2aec703006b3da62cf7860c9808f}{TEST\_CASE}}(\textcolor{stringliteral}{"{}Integers\ are\ within\ a\ range"{}})}
+\DoxyCodeLine{\{}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a5b8c33c63e0804d4458e2c761370b75d}{CHECK\_THAT}}(\ 3,\ IsBetween(\ 1,\ 10\ )\ );}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a5b8c33c63e0804d4458e2c761370b75d}{CHECK\_THAT}}(\ 100,\ IsBetween(\ 1,\ 10\ )\ );}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+Running this test gives the following in the console\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{/**/TestFile.cpp:123:\ FAILED:}
+\DoxyCodeLine{\ \ CHECK\_THAT(\ 100,\ IsBetween(\ 1,\ 10\ )\ )}
+\DoxyCodeLine{with\ expansion:}
+\DoxyCodeLine{\ \ 100\ is\ between\ 1\ and\ 10}
+
+\end{DoxyCode}
+
+
+\DoxyHorRuler{0}
+
+
+\href{Readme.md\#top}{\texttt{ Home}} 

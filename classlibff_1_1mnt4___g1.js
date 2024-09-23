@@ -1,0 +1,28 @@
+var classlibff_1_1mnt4___g1 =
+[
+    [ "base_field", "classlibff_1_1mnt4___g1.html#ab1cf82c8c908545f782670a564d2afb1", null ],
+    [ "scalar_field", "classlibff_1_1mnt4___g1.html#a309cd133717610e5e216f7eecfc23808", null ],
+    [ "mnt4_G1", "classlibff_1_1mnt4___g1.html#ac6d290a5bbe492694c619bc03eb01115", null ],
+    [ "mnt4_G1", "classlibff_1_1mnt4___g1.html#af171dd2923428d455a37453c9d07b92c", null ],
+    [ "mnt4_G1", "classlibff_1_1mnt4___g1.html#a4a02915177503942531b130aef6e5d89", null ],
+    [ "add", "classlibff_1_1mnt4___g1.html#aba7f8f1f6b9ee481bef01cca29cecf71", null ],
+    [ "dbl", "classlibff_1_1mnt4___g1.html#aef88a26663e4b36589966affb856c3bc", null ],
+    [ "is_special", "classlibff_1_1mnt4___g1.html#abac58ae5c352f31b943fcf0448dacf81", null ],
+    [ "is_well_formed", "classlibff_1_1mnt4___g1.html#a880c4d726bc48ce31f5ec04c09b048bf", null ],
+    [ "is_zero", "classlibff_1_1mnt4___g1.html#a6ae9d4242ddcda8b0c2f263a19dcaedd", null ],
+    [ "mixed_add", "classlibff_1_1mnt4___g1.html#ac37c8b7ad91e161273a531eef4758304", null ],
+    [ "operator!=", "classlibff_1_1mnt4___g1.html#a6710db017355908e98a374b62e8ed067", null ],
+    [ "operator+", "classlibff_1_1mnt4___g1.html#a342d278681dcd0fe755ddfc35e7bad24", null ],
+    [ "operator-", "classlibff_1_1mnt4___g1.html#a39a4aa6d3c5dbc358f22f928d83e1047", null ],
+    [ "operator-", "classlibff_1_1mnt4___g1.html#a649c7267b4aa68415da47caff684b095", null ],
+    [ "operator==", "classlibff_1_1mnt4___g1.html#af57a20087f47a7f69a82f152cf7dd539", null ],
+    [ "print", "classlibff_1_1mnt4___g1.html#a3f73835b9934b5a22fbd17d2a06dfca3", null ],
+    [ "print_coordinates", "classlibff_1_1mnt4___g1.html#a78216ad6c0c24ac88fe52224cb9bc0d9", null ],
+    [ "to_affine_coordinates", "classlibff_1_1mnt4___g1.html#a5cc829848dea2823d616be4c1c6f45d1", null ],
+    [ "to_special", "classlibff_1_1mnt4___g1.html#adb32dda56133c6850d3fcec73fd0fd34", null ],
+    [ "operator<<", "classlibff_1_1mnt4___g1.html#acc2b7a2c9872c055127cc9aa04603456", null ],
+    [ "operator>>", "classlibff_1_1mnt4___g1.html#a32c79b31f5ade7d1180c5eeb5f849af2", null ],
+    [ "X", "classlibff_1_1mnt4___g1.html#a4a0bd5faa1f4f162ddad79572c3da217", null ],
+    [ "Y", "classlibff_1_1mnt4___g1.html#a7a7ecb1c46af2a7887fedfb136991cc3", null ],
+    [ "Z", "classlibff_1_1mnt4___g1.html#ad1e2119150cd843805d1b52a6af4e290", null ]
+];

@@ -1,0 +1,9 @@
+<map id="websocketpp::log::syslog::write" name="websocketpp::log::syslog::write">
+<area shape="rect" id="Node000001" title="Write a cstring message to the given channel." alt="" coords="5,63,175,103"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1log_1_1basic.html#a8f443b4ff286da803a114897a8f97105" title=" " alt="" coords="226,5,388,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="169,60,212,48,214,53,170,65"/>
+<area shape="rect" id="Node000003" href="$xbyak__mnemonic_8h.html#aa81aed607133209dade63a226818224d" title=" " alt="" coords="285,70,330,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="175,80,269,80,269,86,175,86"/>
+<area shape="rect" id="Node000004" href="$classwebsocketpp_1_1log_1_1syslog.html#ab43c642587ea5628c25407341b0e5b11" title="Construct the logger." alt="" coords="223,120,392,161"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="170,101,214,113,212,118,169,106"/>
+</map>

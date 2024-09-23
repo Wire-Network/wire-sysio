@@ -1,0 +1,270 @@
+\doxysection{libraries/yubihsm/examples/decrypt\+\_\+ec.c File Reference}
+\hypertarget{decrypt__ec_8c}{}\label{decrypt__ec_8c}\index{libraries/yubihsm/examples/decrypt\_ec.c@{libraries/yubihsm/examples/decrypt\_ec.c}}
+{\ttfamily \#include $<$assert.\+h$>$}\newline
+{\ttfamily \#include $<$stdbool.\+h$>$}\newline
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include $<$openssl/ec.\+h$>$}\newline
+{\ttfamily \#include $<$openssl/evp.\+h$>$}\newline
+{\ttfamily \#include "{}util.\+h"{}}\newline
+{\ttfamily \#include $<$yubihsm.\+h$>$}\newline
+Include dependency graph for decrypt\+\_\+ec.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{decrypt__ec_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{decrypt__ec_8c_a377ec96b1eb26c7b26b84bb5b0c9a928}{DEFAULT\+\_\+\+CONNECTOR\+\_\+\+URL}}~"{}http\+://127.\+0.\+0.\+1\+:12345"{}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{decrypt__ec_8c_a840291bc02cba5474a4cb46a9b9566fe}{main}} (void)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{decrypt__ec_8c_a870e61ded67e4529500d708a5f1af286}{key\+\_\+label}} = "{}label"{}
+\item 
+const \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{decrypt__ec_8c_abd7f8a696584d8ab4b9f4d1e1970be37}{password}} \mbox{[}$\,$\mbox{]} = "{}password"{}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{decrypt__ec_8c_a377ec96b1eb26c7b26b84bb5b0c9a928}\index{decrypt\_ec.c@{decrypt\_ec.c}!DEFAULT\_CONNECTOR\_URL@{DEFAULT\_CONNECTOR\_URL}}
+\index{DEFAULT\_CONNECTOR\_URL@{DEFAULT\_CONNECTOR\_URL}!decrypt\_ec.c@{decrypt\_ec.c}}
+\doxysubsubsection{\texorpdfstring{DEFAULT\_CONNECTOR\_URL}{DEFAULT\_CONNECTOR\_URL}}
+{\footnotesize\ttfamily \label{decrypt__ec_8c_a377ec96b1eb26c7b26b84bb5b0c9a928} 
+\#define DEFAULT\+\_\+\+CONNECTOR\+\_\+\+URL~"{}http\+://127.\+0.\+0.\+1\+:12345"{}}
+
+
+
+Definition at line \mbox{\hyperlink{decrypt__ec_8c_source_l00035}{35}} of file \mbox{\hyperlink{decrypt__ec_8c_source}{decrypt\+\_\+ec.\+c}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{decrypt__ec_8c_a840291bc02cba5474a4cb46a9b9566fe}\index{decrypt\_ec.c@{decrypt\_ec.c}!main@{main}}
+\index{main@{main}!decrypt\_ec.c@{decrypt\_ec.c}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{decrypt__ec_8c_a840291bc02cba5474a4cb46a9b9566fe} 
+int main (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{decrypt__ec_8c_source_l00041}{41}} of file \mbox{\hyperlink{decrypt__ec_8c_source}{decrypt\+\_\+ec.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00042\ \ \ \mbox{\hyperlink{structyh__connector}{yh\_connector}}\ *connector\ =\ NULL;}
+\DoxyCodeLine{00043\ \ \ \mbox{\hyperlink{structyh__session}{yh\_session}}\ *\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}}\ =\ NULL;}
+\DoxyCodeLine{00044\ \ \ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366}{yh\_rc}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a39fbc5bce29b178582419ae9d31ad252}{YHR\_GENERIC\_ERROR}};}
+\DoxyCodeLine{00045\ }
+\DoxyCodeLine{00046\ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ authkey\ =\ 1;}
+\DoxyCodeLine{00047\ }
+\DoxyCodeLine{00048\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *connector\_url;}
+\DoxyCodeLine{00049\ }
+\DoxyCodeLine{00050\ \ \ connector\_url\ =\ getenv(\textcolor{stringliteral}{"{}DEFAULT\_CONNECTOR\_URL"{}});}
+\DoxyCodeLine{00051\ \ \ \textcolor{keywordflow}{if}\ (connector\_url\ ==\ NULL)\ \{}
+\DoxyCodeLine{00052\ \ \ \ \ connector\_url\ =\ \mbox{\hyperlink{decrypt__ec_8c_a377ec96b1eb26c7b26b84bb5b0c9a928}{DEFAULT\_CONNECTOR\_URL}};}
+\DoxyCodeLine{00053\ \ \ \}}
+\DoxyCodeLine{00054\ }
+\DoxyCodeLine{00055\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a5392844a98c6220c69fe08d3dcf8f1bc}{yh\_init}}();}
+\DoxyCodeLine{00056\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{00057\ }
+\DoxyCodeLine{00058\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a9c700747902a722d6c1d2073277de294}{yh\_init\_connector}}(connector\_url,\ \&connector);}
+\DoxyCodeLine{00059\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{00060\ }
+\DoxyCodeLine{00061\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_aa19be6ac70a2a5d1cef8d7e6902fe05f}{yh\_connect}}(connector,\ 0);}
+\DoxyCodeLine{00062\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{00063\ }
+\DoxyCodeLine{00064\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a3be331dcf8907ff3569e4dc230e1c615}{yh\_create\_session\_derived}}(connector,\ authkey,\ password,}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{sizeof}(password),\ \textcolor{keyword}{false},\ \&\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}});}
+\DoxyCodeLine{00066\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{00067\ }
+\DoxyCodeLine{00068\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a77870209747d5ccd90f9da3aae2bdfa8}{yh\_authenticate\_session}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}});}
+\DoxyCodeLine{00069\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{00070\ }
+\DoxyCodeLine{00071\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ session\_id;}
+\DoxyCodeLine{00072\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_aeabf472faf1ba8d963b39866e04df6b0}{yh\_get\_session\_id}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}},\ \&session\_id);}
+\DoxyCodeLine{00073\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{00074\ }
+\DoxyCodeLine{00075\ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Successfully\ established\ session\ \%02d\(\backslash\)n"{}},\ session\_id);}
+\DoxyCodeLine{00076\ }
+\DoxyCodeLine{00077\ \ \ \mbox{\hyperlink{structyh__capabilities}{yh\_capabilities}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a08393519edfd7c59fb01fb8db97514b5}{capabilities}}\ =\ \{\{0\}\};}
+\DoxyCodeLine{00078\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_aab440e1cb671d9ba7a2e7d1243960e42}{yh\_string\_to\_capabilities}}(\textcolor{stringliteral}{"{}derive-\/ecdh"{}},\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a08393519edfd7c59fb01fb8db97514b5}{capabilities}});}
+\DoxyCodeLine{00079\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{00080\ }
+\DoxyCodeLine{00081\ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ domain\_five\ =\ 0;}
+\DoxyCodeLine{00082\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a96a4c751a281515d5610adb8fd779438}{yh\_string\_to\_domains}}(\textcolor{stringliteral}{"{}5"{}},\ \&domain\_five);}
+\DoxyCodeLine{00083\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{00084\ }
+\DoxyCodeLine{00085\ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_ada12860f8f9f5f3cac5b179ef352434c}{key\_id}}\ =\ 0;\ \textcolor{comment}{//\ ID\ 0\ lets\ the\ device\ generate\ an\ ID}}
+\DoxyCodeLine{00086\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a2db9bbd57a908c5c454fc6254f57dcff}{yh\_util\_generate\_ec\_key}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}},\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_ada12860f8f9f5f3cac5b179ef352434c}{key\_id}},\ \mbox{\hyperlink{decrypt__ec_8c_a870e61ded67e4529500d708a5f1af286}{key\_label}},\ domain\_five,}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a08393519edfd7c59fb01fb8db97514b5}{capabilities}},\ \mbox{\hyperlink{yubihsm_8h_a498937b5a72accbb0ef21bb1dcdd55caae4b191baf5c65f9234120080264d129b}{YH\_ALGO\_EC\_P256}});}
+\DoxyCodeLine{00088\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{00089\ }
+\DoxyCodeLine{00090\ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Generated\ key\ with\ ID\ \%04x\(\backslash\)n"{}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_ada12860f8f9f5f3cac5b179ef352434c}{key\_id}});}
+\DoxyCodeLine{00091\ }
+\DoxyCodeLine{00092\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ public\_key[512];}
+\DoxyCodeLine{00093\ \ \ \textcolor{keywordtype}{size\_t}\ public\_key\_len\ =\ \textcolor{keyword}{sizeof}(public\_key);}
+\DoxyCodeLine{00094\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =}
+\DoxyCodeLine{00095\ \ \ \ \ \mbox{\hyperlink{yubihsm_8c_aa7b8b42156c4bdaf41d8b9758a2fd73f}{yh\_util\_get\_public\_key}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_ada12860f8f9f5f3cac5b179ef352434c}{key\_id}},\ public\_key,\ \&public\_key\_len,\ NULL);}
+\DoxyCodeLine{00096\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{00097\ }
+\DoxyCodeLine{00098\ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Public\ key\ (\%zd\ bytes)\ is:"{}},\ public\_key\_len);}
+\DoxyCodeLine{00099\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ public\_key\_len;\ i++)\ \{}
+\DoxyCodeLine{00100\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\ \%02x"{}},\ public\_key[i]);}
+\DoxyCodeLine{00101\ \ \ \}}
+\DoxyCodeLine{00102\ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{00103\ }
+\DoxyCodeLine{00104\ \ \ EC\_KEY\ *eckey\ =\ EC\_KEY\_new();}
+\DoxyCodeLine{00105\ \ \ \textcolor{keywordtype}{int}\ nid\ =\ \mbox{\hyperlink{util_8c_a4e9f3e93eb6ebbc74d142d6a490de752}{algo2nid}}(\mbox{\hyperlink{yubihsm_8h_a498937b5a72accbb0ef21bb1dcdd55caae4b191baf5c65f9234120080264d129b}{YH\_ALGO\_EC\_P256}});}
+\DoxyCodeLine{00106\ \ \ EC\_POINT\ *\mbox{\hyperlink{structpoint}{point}};}
+\DoxyCodeLine{00107\ \ \ EC\_GROUP\ *\mbox{\hyperlink{namespaceupload_a9d33d66de17175dced88ffe95f079226}{group}}\ =\ EC\_GROUP\_new\_by\_curve\_name(nid);}
+\DoxyCodeLine{00108\ }
+\DoxyCodeLine{00109\ \ \ EC\_GROUP\_set\_asn1\_flag(group,\ nid);}
+\DoxyCodeLine{00110\ \ \ EC\_KEY\_set\_group(eckey,\ group);}
+\DoxyCodeLine{00111\ \ \ \mbox{\hyperlink{structpoint}{point}}\ =\ EC\_POINT\_new(group);}
+\DoxyCodeLine{00112\ }
+\DoxyCodeLine{00113\ \ \ memmove(public\_key\ +\ 1,\ public\_key,\ public\_key\_len);}
+\DoxyCodeLine{00114\ \ \ public\_key[0]\ =\ 0x04;\ \textcolor{comment}{//\ hack\ to\ make\ it\ a\ valid\ ec\ pubkey..}}
+\DoxyCodeLine{00115\ \ \ public\_key\_len++;}
+\DoxyCodeLine{00116\ }
+\DoxyCodeLine{00117\ \ \ EC\_POINT\_oct2point(group,\ \mbox{\hyperlink{structpoint}{point}},\ public\_key,\ public\_key\_len,\ NULL);}
+\DoxyCodeLine{00118\ }
+\DoxyCodeLine{00119\ \ \ EC\_KEY\_set\_public\_key(eckey,\ \mbox{\hyperlink{structpoint}{point}});}
+\DoxyCodeLine{00120\ }
+\DoxyCodeLine{00121\ \ \ \textcolor{comment}{//\ Create\ the\ context\ for\ parameter\ generation}}
+\DoxyCodeLine{00122\ \ \ EVP\_PKEY\_CTX\ *pctx\ =\ EVP\_PKEY\_CTX\_new\_id(EVP\_PKEY\_EC,\ NULL);}
+\DoxyCodeLine{00123\ \ \ assert(pctx\ !=\ NULL);}
+\DoxyCodeLine{00124\ }
+\DoxyCodeLine{00125\ \ \ \textcolor{comment}{//\ Initialise\ the\ parameter\ generation}}
+\DoxyCodeLine{00126\ \ \ assert(EVP\_PKEY\_paramgen\_init(pctx)\ ==\ 1);}
+\DoxyCodeLine{00127\ }
+\DoxyCodeLine{00128\ \ \ \textcolor{comment}{//\ We're\ going\ to\ use\ the\ ANSI\ X9.62\ Prime\ 256v1\ curve}}
+\DoxyCodeLine{00129\ \ \ assert(EVP\_PKEY\_CTX\_set\_ec\_paramgen\_curve\_nid(pctx,\ NID\_X9\_62\_prime256v1)\ ==}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ 1);}
+\DoxyCodeLine{00131\ }
+\DoxyCodeLine{00132\ \ \ \textcolor{comment}{//\ Create\ the\ parameter\ object\ params}}
+\DoxyCodeLine{00133\ \ \ EVP\_PKEY\ *\mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}}\ =\ NULL;}
+\DoxyCodeLine{00134\ \ \ assert(EVP\_PKEY\_paramgen(pctx,\ \&\mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}})\ ==\ 1);}
+\DoxyCodeLine{00135\ }
+\DoxyCodeLine{00136\ \ \ \textcolor{comment}{//\ Create\ the\ context\ for\ the\ key\ generation}}
+\DoxyCodeLine{00137\ \ \ EVP\_PKEY\_CTX\ *kctx\ =\ EVP\_PKEY\_CTX\_new(\mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}},\ NULL);}
+\DoxyCodeLine{00138\ \ \ assert(kctx\ !=\ NULL);}
+\DoxyCodeLine{00139\ }
+\DoxyCodeLine{00140\ \ \ \textcolor{comment}{//\ Generate\ the\ key}}
+\DoxyCodeLine{00141\ \ \ EVP\_PKEY\ *pkey\ =\ NULL;}
+\DoxyCodeLine{00142\ \ \ assert(EVP\_PKEY\_keygen\_init(kctx)\ ==\ 1);}
+\DoxyCodeLine{00143\ \ \ assert(EVP\_PKEY\_keygen(kctx,\ \&pkey)\ ==\ 1);}
+\DoxyCodeLine{00144\ }
+\DoxyCodeLine{00145\ \ \ \textcolor{comment}{//\ Get\ the\ peer's\ public\ key,\ and\ provide\ the\ peer\ with\ our\ public\ key}}
+\DoxyCodeLine{00146\ \ \ EVP\_PKEY\ *peerkey\ =\ EVP\_PKEY\_new();}
+\DoxyCodeLine{00147\ \ \ assert(peerkey\ !=\ NULL);}
+\DoxyCodeLine{00148\ \ \ assert(EVP\_PKEY\_set1\_EC\_KEY(peerkey,\ eckey)\ ==\ 1);}
+\DoxyCodeLine{00149\ }
+\DoxyCodeLine{00150\ \ \ \textcolor{comment}{//\ Create\ the\ context\ for\ the\ shared\ secret\ derivation}}
+\DoxyCodeLine{00151\ \ \ EVP\_PKEY\_CTX\ *ctx\ =\ EVP\_PKEY\_CTX\_new(pkey,\ NULL);}
+\DoxyCodeLine{00152\ \ \ assert(ctx\ !=\ NULL);}
+\DoxyCodeLine{00153\ }
+\DoxyCodeLine{00154\ \ \ \textcolor{comment}{//\ Initialise}}
+\DoxyCodeLine{00155\ \ \ assert(EVP\_PKEY\_derive\_init(ctx)\ ==\ 1);}
+\DoxyCodeLine{00156\ }
+\DoxyCodeLine{00157\ \ \ \textcolor{comment}{//\ Provide\ the\ peer\ public\ key}}
+\DoxyCodeLine{00158\ \ \ assert(EVP\_PKEY\_derive\_set\_peer(ctx,\ peerkey)\ ==\ 1);}
+\DoxyCodeLine{00159\ }
+\DoxyCodeLine{00160\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ secret[64];}
+\DoxyCodeLine{00161\ \ \ \textcolor{keywordtype}{size\_t}\ secret\_len\ =\ \textcolor{keyword}{sizeof}(secret\_len);}
+\DoxyCodeLine{00162\ }
+\DoxyCodeLine{00163\ \ \ \textcolor{comment}{//\ Determine\ buffer\ length\ for\ shared\ secret}}
+\DoxyCodeLine{00164\ \ \ assert(EVP\_PKEY\_derive(ctx,\ NULL,\ \&secret\_len));}
+\DoxyCodeLine{00165\ }
+\DoxyCodeLine{00166\ \ \ \textcolor{comment}{//\ Derive\ the\ shared\ secret}}
+\DoxyCodeLine{00167\ \ \ assert(EVP\_PKEY\_derive(ctx,\ secret,\ \&secret\_len)\ ==\ 1);}
+\DoxyCodeLine{00168\ }
+\DoxyCodeLine{00169\ \ \ EC\_KEY\ *eckey2\ =\ EVP\_PKEY\_get1\_EC\_KEY(pkey);}
+\DoxyCodeLine{00170\ \ \ \textcolor{keyword}{const}\ EC\_POINT\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a3037ff69dd24c6e34aee6fdd45269f13}{pub}}\ =\ EC\_KEY\_get0\_public\_key(eckey2);}
+\DoxyCodeLine{00171\ }
+\DoxyCodeLine{00172\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}}[128];}
+\DoxyCodeLine{00173\ \ \ \textcolor{keywordtype}{size\_t}\ pubkey\_len\ =\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}});}
+\DoxyCodeLine{00174\ }
+\DoxyCodeLine{00175\ \ \ pubkey\_len\ =\ EC\_POINT\_point2oct(group,\ pub,\ POINT\_CONVERSION\_UNCOMPRESSED,}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}},\ pubkey\_len,\ NULL);}
+\DoxyCodeLine{00177\ \ \ assert(pubkey\_len\ ==\ 65);}
+\DoxyCodeLine{00178\ }
+\DoxyCodeLine{00179\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ computed\_secret[128];}
+\DoxyCodeLine{00180\ \ \ \textcolor{keywordtype}{size\_t}\ computed\_secret\_len\ =\ \textcolor{keyword}{sizeof}(computed\_secret);}
+\DoxyCodeLine{00181\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a2900aee87732f9ec017bd1662bcef7e9}{yh\_util\_derive\_ecdh}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_ada12860f8f9f5f3cac5b179ef352434c}{key\_id}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}},\ pubkey\_len,}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ computed\_secret,\ \&computed\_secret\_len);}
+\DoxyCodeLine{00183\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{00184\ }
+\DoxyCodeLine{00185\ \ \ assert(computed\_secret\_len\ ==\ secret\_len);}
+\DoxyCodeLine{00186\ \ \ assert(memcmp(secret,\ computed\_secret,\ computed\_secret\_len)\ ==\ 0);}
+\DoxyCodeLine{00187\ }
+\DoxyCodeLine{00188\ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Secrets\ match\(\backslash\)n"{}});}
+\DoxyCodeLine{00189\ }
+\DoxyCodeLine{00190\ \ \ EVP\_PKEY\_CTX\_free(ctx);}
+\DoxyCodeLine{00191\ \ \ EVP\_PKEY\_free(peerkey);}
+\DoxyCodeLine{00192\ \ \ EVP\_PKEY\_free(pkey);}
+\DoxyCodeLine{00193\ \ \ EVP\_PKEY\_CTX\_free(kctx);}
+\DoxyCodeLine{00194\ \ \ EVP\_PKEY\_free(\mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}});}
+\DoxyCodeLine{00195\ \ \ EVP\_PKEY\_CTX\_free(pctx);}
+\DoxyCodeLine{00196\ \ \ EC\_POINT\_free(\mbox{\hyperlink{structpoint}{point}});}
+\DoxyCodeLine{00197\ \ \ EC\_KEY\_free(eckey);}
+\DoxyCodeLine{00198\ \ \ EC\_KEY\_free(eckey2);}
+\DoxyCodeLine{00199\ \ \ EC\_GROUP\_free(group);}
+\DoxyCodeLine{00200\ }
+\DoxyCodeLine{00201\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a61ab8dbab67b1cceb49cd306f8c3f4b1}{yh\_util\_close\_session}}(\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}});}
+\DoxyCodeLine{00202\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{00203\ }
+\DoxyCodeLine{00204\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a1a35f8ae5a739848408633a514e41b2d}{yh\_destroy\_session}}(\&\mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}});}
+\DoxyCodeLine{00205\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{00206\ }
+\DoxyCodeLine{00207\ \ \ \mbox{\hyperlink{yubihsm_8c_ab12d5a42d2219741bd3630b99ed1c7d2}{yh\_disconnect}}(connector);}
+\DoxyCodeLine{00208\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{00209\ }
+\DoxyCodeLine{00210\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ =\ \mbox{\hyperlink{yubihsm_8c_a36e3d9a07c6689e14a9339ca1ebb7259}{yh\_exit}}();}
+\DoxyCodeLine{00211\ \ \ assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a9c8d6a4a7a87f74f070e816dca1a547b}{yrc}}\ ==\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}});}
+\DoxyCodeLine{00212\ }
+\DoxyCodeLine{00213\ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00214\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{decrypt__ec_8c_a840291bc02cba5474a4cb46a9b9566fe_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{decrypt__ec_8c_a870e61ded67e4529500d708a5f1af286}\index{decrypt\_ec.c@{decrypt\_ec.c}!key\_label@{key\_label}}
+\index{key\_label@{key\_label}!decrypt\_ec.c@{decrypt\_ec.c}}
+\doxysubsubsection{\texorpdfstring{key\_label}{key\_label}}
+{\footnotesize\ttfamily \label{decrypt__ec_8c_a870e61ded67e4529500d708a5f1af286} 
+const char\texorpdfstring{$\ast$}{*} key\+\_\+label = "{}label"{}}
+
+
+
+Definition at line \mbox{\hyperlink{decrypt__ec_8c_source_l00038}{38}} of file \mbox{\hyperlink{decrypt__ec_8c_source}{decrypt\+\_\+ec.\+c}}.
+
+\Hypertarget{decrypt__ec_8c_abd7f8a696584d8ab4b9f4d1e1970be37}\index{decrypt\_ec.c@{decrypt\_ec.c}!password@{password}}
+\index{password@{password}!decrypt\_ec.c@{decrypt\_ec.c}}
+\doxysubsubsection{\texorpdfstring{password}{password}}
+{\footnotesize\ttfamily \label{decrypt__ec_8c_abd7f8a696584d8ab4b9f4d1e1970be37} 
+const \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} password\mbox{[}$\,$\mbox{]} = "{}password"{}}
+
+
+
+Definition at line \mbox{\hyperlink{decrypt__ec_8c_source_l00039}{39}} of file \mbox{\hyperlink{decrypt__ec_8c_source}{decrypt\+\_\+ec.\+c}}.
+

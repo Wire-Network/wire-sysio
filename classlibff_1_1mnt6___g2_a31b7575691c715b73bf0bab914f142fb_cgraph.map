@@ -1,0 +1,11 @@
+<map id="libff::mnt6_G2::batch_to_special_all_non_zeros" name="libff::mnt6_G2::batch_to_special_all_non_zeros">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,80,180,121"/>
+<area shape="rect" id="Node000002" href="$namespacelibff.html#aecf9947f6cf142476f71f413e69eec59" title=" " alt="" coords="250,5,372,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="136,78,227,40,245,34,246,39,229,45,138,83"/>
+<area shape="rect" id="Node000003" href="$classlibff_1_1mnt6___g2.html#a3a1ccecc56c50955dc4a05540100a57d" title=" " alt="" coords="229,55,393,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="180,85,213,80,214,85,181,90"/>
+<area shape="rect" id="Node000004" href="$classlibff_1_1_fp3__model.html#a7694c73c1ac55c3f9b00c8b51c7ffeff" title=" " alt="" coords="228,105,394,161"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="181,111,213,116,212,121,180,116"/>
+<area shape="rect" id="Node000005" href="$classlibff_1_1mnt6___g2.html#abd5266c0ec2ea99c067561300d0df226" title=" " alt="" coords="245,185,377,211"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="129,119,176,145,229,170,247,177,245,182,227,175,173,150,127,124"/>
+</map>

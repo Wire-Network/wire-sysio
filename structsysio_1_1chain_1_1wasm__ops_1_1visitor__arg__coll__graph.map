@@ -1,0 +1,24 @@
+<map id="sysio::chain::wasm_ops::visitor_arg" name="sysio::chain::wasm_ops::visitor_arg">
+<area shape="rect" id="Node000001" title=" " alt="" coords="667,333,801,374"/>
+<area shape="rect" id="Node000002" href="$struct_i_r_1_1_module.html" title=" " alt="" coords="419,191,504,217"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="502,222,697,330,694,335,499,227"/>
+<area shape="rect" id="Node000003" href="$struct_i_r_1_1_index_space.html" title=" " alt="" coords="24,5,201,61"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="216,54,287,77,357,110,412,150,451,189,447,193,408,154,354,114,285,82,215,59"/>
+<area shape="rect" id="Node000004" href="$struct_i_r_1_1_index_space.html" title=" " alt="" coords="21,85,204,126"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="220,124,356,160,431,188,429,193,355,165,218,129"/>
+<area shape="rect" id="Node000005" href="$struct_i_r_1_1_index_space.html" title=" " alt="" coords="5,150,220,191"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="236,180,419,197,418,202,235,185"/>
+<area shape="rect" id="Node000006" href="$struct_i_r_1_1_index_space.html" title=" " alt="" coords="15,216,210,256"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="224,224,355,212,418,206,419,211,356,217,225,229"/>
+<area shape="rect" id="Node000007" href="$struct_pointer_int_helper.html" title=" " alt="" coords="31,281,194,322"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="208,279,355,242,428,215,430,220,356,247,210,284"/>
+<area shape="rect" id="Node000008" href="$classsysio_1_1chain_1_1wasm__ops_1_1instruction__stream.html" title=" " alt="" coords="380,382,544,423"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="559,382,666,363,667,368,560,388"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="84,358,141,383"/>
+<area shape="poly" id="edge11_Node000001_Node000009" title=" " alt="" coords="156,365,244,360,568,351,667,350,667,355,568,356,244,365,156,370"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="156,372,379,392,379,398,156,377"/>
+<area shape="rect" id="Node000010" href="$struct_i_r_1_1_function_def.html" title=" " alt="" coords="405,447,519,473"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="520,439,543,432,593,418,642,400,697,372,700,377,644,405,595,423,545,437,522,444"/>
+<area shape="rect" id="Node000011" href="$struct_i_r_1_1_indexed_function_type.html" title=" " alt="" coords="29,447,196,473"/>
+<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="211,457,405,457,405,462,211,462"/>
+</map>

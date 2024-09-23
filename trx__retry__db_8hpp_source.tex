@@ -1,0 +1,46 @@
+\doxysection{trx\+\_\+retry\+\_\+db.\+hpp}
+\hypertarget{trx__retry__db_8hpp_source}{}\label{trx__retry__db_8hpp_source}\index{plugins/chain\_plugin/include/sysio/chain\_plugin/trx\_retry\_db.hpp@{plugins/chain\_plugin/include/sysio/chain\_plugin/trx\_retry\_db.hpp}}
+\mbox{\hyperlink{trx__retry__db_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8hpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{chain_2include_2sysio_2chain_2types_8hpp}{sysio/chain/types.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{block__state_8hpp}{sysio/chain/block\_state.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8hpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2trace_8hpp}{sysio/chain/trace.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8hpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8hpp_source_l00006}00006\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio_1_1chain__apis}{sysio::chain\_apis}}\ \{}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8hpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8hpp_source_l00008}00008\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8hpp_source_l00009}\mbox{\hyperlink{namespacesysio_1_1chain__apis_a7c0a9b3be43e3ab139d31d0d3bb98f5b}{00009}}\ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacesysio_1_1chain__apis_a7c0a9b3be43e3ab139d31d0d3bb98f5b}{next\_function}}\ =\ std::function<void(\textcolor{keyword}{const}\ std::variant<fc::exception\_ptr,\ T>\&)>;}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8hpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8hpp_source_l00019}\mbox{\hyperlink{classsysio_1_1chain__apis_1_1trx__retry__db}{00019}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1chain__apis_1_1trx__retry__db}{trx\_retry\_db}}\ \{}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8hpp_source_l00020}00020\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8hpp_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8hpp_source_l00030}00030\ \ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classsysio_1_1chain__apis_1_1trx__retry__db_a2cad85030655b7382ab4041a1a19706a}{trx\_retry\_db}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1chain_1_1controller}{chain::controller}}\&\ \mbox{\hyperlink{classsysio_1_1chain_1_1controller}{controller}},\ \textcolor{keywordtype}{size\_t}\ max\_mem\_usage\_size,}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8hpp_source_l00031}00031\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1microseconds}{fc::microseconds}}\ retry\_interval,\ \mbox{\hyperlink{classfc_1_1microseconds}{fc::microseconds}}\ max\_expiration\_time,}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8hpp_source_l00032}00032\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1microseconds}{fc::microseconds}}\ \mbox{\hyperlink{programs_2clio_2main_8cpp_a074511b7997537efa9b642dcddcced71}{abi\_serializer\_max\_time}}\ );}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8hpp_source_l00033}\mbox{\hyperlink{classsysio_1_1chain__apis_1_1trx__retry__db_a007266e0ec37f01641654aa7950ea916}{00033}}\ \ \ \ \mbox{\hyperlink{classsysio_1_1chain__apis_1_1trx__retry__db_a007266e0ec37f01641654aa7950ea916}{\string~trx\_retry\_db}}();}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8hpp_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8hpp_source_l00035}\mbox{\hyperlink{classsysio_1_1chain__apis_1_1trx__retry__db_a185ed23331e1d5f938fb249edd604887}{00035}}\ \ \ \ \mbox{\hyperlink{classsysio_1_1chain__apis_1_1trx__retry__db_a185ed23331e1d5f938fb249edd604887}{trx\_retry\_db}}(\mbox{\hyperlink{classsysio_1_1chain__apis_1_1trx__retry__db}{trx\_retry\_db}}\&\&)\ =\ \textcolor{keyword}{delete};}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8hpp_source_l00036}\mbox{\hyperlink{classsysio_1_1chain__apis_1_1trx__retry__db_a3f4b0b334749a53fb40f568155e7f418}{00036}}\ \ \ \ \mbox{\hyperlink{classsysio_1_1chain__apis_1_1trx__retry__db}{trx\_retry\_db}}\&\ \mbox{\hyperlink{classsysio_1_1chain__apis_1_1trx__retry__db_a3f4b0b334749a53fb40f568155e7f418}{operator=}}(\mbox{\hyperlink{classsysio_1_1chain__apis_1_1trx__retry__db}{trx\_retry\_db}}\&\&)\ =\ \textcolor{keyword}{delete};}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8hpp_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8hpp_source_l00041}00041\ \ \ \ \mbox{\hyperlink{classfc_1_1time__point__sec}{fc::time\_point\_sec}}\ \mbox{\hyperlink{classsysio_1_1chain__apis_1_1trx__retry__db_a660b3e800a99fdd86094eab55469dc8b}{get\_max\_expiration\_time}}()\textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8hpp_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8hpp_source_l00046}00046\ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classsysio_1_1chain__apis_1_1trx__retry__db_af46a9168d0df4be1252ba36df2a27ef2}{size}}()\textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8hpp_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8hpp_source_l00054}00054\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain__apis_1_1trx__retry__db_a963c0f454e3d7bf60e6afe32274c0f53}{track\_transaction}}(\ \mbox{\hyperlink{namespacesysio_1_1chain_a7041c0316bd294d0866609ab3e0cc7a7}{chain::packed\_transaction\_ptr}}\ ptrx,\ std::optional<uint16\_t>\ num\_blocks,\ \mbox{\hyperlink{namespacesysio_1_1chain__apis_a7c0a9b3be43e3ab139d31d0d3bb98f5b}{next\_function}}<std::unique\_ptr<fc::variant>>\ next\ );}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8hpp_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8hpp_source_l00060}00060\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain__apis_1_1trx__retry__db_a0e2be9e478ae0ec15310265367781ed6}{on\_applied\_transaction}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_a4ee2867a6bec961c7a78b203cfd76be9}{chain::transaction\_trace\_ptr}}\&\ trace,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_a7041c0316bd294d0866609ab3e0cc7a7}{chain::packed\_transaction\_ptr}}\&\ ptrx\ );}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8hpp_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8hpp_source_l00065}00065\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain__apis_1_1trx__retry__db_ac3d9bd5ac2085676e9f3ecf67d3ab8fc}{on\_block\_start}}(\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ block\_num\ );}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8hpp_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8hpp_source_l00070}00070\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain__apis_1_1trx__retry__db_aa7baf34c40190b65c61c87ae42c9f72e}{on\_accepted\_block}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{chain::block\_state\_ptr}}\&\ block\ );}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8hpp_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8hpp_source_l00075}00075\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain__apis_1_1trx__retry__db_a84150dab60a7a856372d038e43338c65}{on\_irreversible\_block}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{chain::block\_state\_ptr}}\&\ block\ );}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8hpp_source_l00076}00076\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8hpp_source_l00077}00077\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8hpp_source_l00078}00078\ \ \ \ std::unique\_ptr<struct\ trx\_retry\_db\_impl>\ \_impl;}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8hpp_source_l00079}00079\ \};}
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8hpp_source_l00080}00080\ }
+\DoxyCodeLine{\Hypertarget{trx__retry__db_8hpp_source_l00081}00081\ \}\ \textcolor{comment}{//\ namespace\ sysio::chain\_apis}}
+
+\end{DoxyCode}

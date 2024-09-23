@@ -1,0 +1,47 @@
+\doxysection{file\+\_\+mapping.\+cpp}
+\hypertarget{file__mapping_8cpp_source}{}\label{file__mapping_8cpp_source}\index{libraries/fc/src/interprocess/file\_mapping.cpp@{libraries/fc/src/interprocess/file\_mapping.cpp}}
+\mbox{\hyperlink{file__mapping_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{file__mapping_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{file__mapping_8hpp}{fc/interprocess/file\_mapping.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{file__mapping_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <boost/interprocess/file\_mapping.hpp>}}
+\DoxyCodeLine{\Hypertarget{file__mapping_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <boost/interprocess/mapped\_region.hpp>}}
+\DoxyCodeLine{\Hypertarget{file__mapping_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{fwd__impl_8hpp}{fc/fwd\_impl.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{file__mapping_8cpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{file__mapping_8cpp_source_l00006}00006\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}\ \{}
+\DoxyCodeLine{\Hypertarget{file__mapping_8cpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{file__mapping_8cpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{file__mapping_8cpp_source_l00009}\mbox{\hyperlink{classfc_1_1file__mapping_aed582b4a4f6434ab7f5685b898939121}{00009}}\ \ \ \mbox{\hyperlink{classfc_1_1file__mapping_aed582b4a4f6434ab7f5685b898939121}{file\_mapping::file\_mapping}}(\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ file,\ \mbox{\hyperlink{namespacefc_a3d8a2be677709cc41f09aa7925f2d55f}{mode\_t}}\ m\ )\ :}
+\DoxyCodeLine{\Hypertarget{file__mapping_8cpp_source_l00010}00010\ \ \ \ \ my(file,\ m\ ==\ \mbox{\hyperlink{namespacefc_a3d8a2be677709cc41f09aa7925f2d55fad6bcd1364809e1b881bb22334d14cd56}{read\_only}}\ ?\ \mbox{\hyperlink{namespaceboost}{boost}}::interprocess::\mbox{\hyperlink{namespacefc_a3d8a2be677709cc41f09aa7925f2d55fad6bcd1364809e1b881bb22334d14cd56}{read\_only}}\ :\ \mbox{\hyperlink{namespaceboost}{boost}}::interprocess::\mbox{\hyperlink{namespacefc_a3d8a2be677709cc41f09aa7925f2d55fa4eaf6936474fac52a87743f3de041c42}{read\_write}}\ )}
+\DoxyCodeLine{\Hypertarget{file__mapping_8cpp_source_l00011}00011\ \ \ \{\}}
+\DoxyCodeLine{\Hypertarget{file__mapping_8cpp_source_l00012}00012\ \ \ }
+\DoxyCodeLine{\Hypertarget{file__mapping_8cpp_source_l00013}\mbox{\hyperlink{classfc_1_1file__mapping_a1d32ebd4b5fefcccb7f6230a41669584}{00013}}\ \ \ \mbox{\hyperlink{classfc_1_1file__mapping_a1d32ebd4b5fefcccb7f6230a41669584}{file\_mapping::\string~file\_mapping}}()\ \{\}}
+\DoxyCodeLine{\Hypertarget{file__mapping_8cpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{file__mapping_8cpp_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{file__mapping_8cpp_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{file__mapping_8cpp_source_l00017}\mbox{\hyperlink{classfc_1_1mapped__region_a8f87bf8cb960123feef9b013a623715a}{00017}}\ \ \ \mbox{\hyperlink{classfc_1_1mapped__region_a8f87bf8cb960123feef9b013a623715a}{mapped\_region::mapped\_region}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1file__mapping}{file\_mapping}}\&\ fm,\ \mbox{\hyperlink{namespacefc_a3d8a2be677709cc41f09aa7925f2d55f}{mode\_t}}\ m,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ start,\ \textcolor{keywordtype}{size\_t}\ size\ )\ :}
+\DoxyCodeLine{\Hypertarget{file__mapping_8cpp_source_l00018}00018\ \ \ \ \ my(\ *fm.my,\ m\ ==\ \mbox{\hyperlink{namespacefc_a3d8a2be677709cc41f09aa7925f2d55fad6bcd1364809e1b881bb22334d14cd56}{read\_only}}\ ?\ \mbox{\hyperlink{namespaceboost}{boost}}::interprocess::\mbox{\hyperlink{namespacefc_a3d8a2be677709cc41f09aa7925f2d55fad6bcd1364809e1b881bb22334d14cd56}{read\_only}}\ :\ \mbox{\hyperlink{namespaceboost}{boost}}::interprocess::\mbox{\hyperlink{namespacefc_a3d8a2be677709cc41f09aa7925f2d55fa4eaf6936474fac52a87743f3de041c42}{read\_write}}\ \ ,start,\ size)\ }
+\DoxyCodeLine{\Hypertarget{file__mapping_8cpp_source_l00019}00019\ \ \ \{\}}
+\DoxyCodeLine{\Hypertarget{file__mapping_8cpp_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{file__mapping_8cpp_source_l00021}\mbox{\hyperlink{classfc_1_1mapped__region_ad43d7360fca04ea8b119fead81d3affc}{00021}}\ \ \ \mbox{\hyperlink{classfc_1_1mapped__region_a8f87bf8cb960123feef9b013a623715a}{mapped\_region::mapped\_region}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1file__mapping}{file\_mapping}}\&\ fm,\ \mbox{\hyperlink{namespacefc_a3d8a2be677709cc41f09aa7925f2d55f}{mode\_t}}\ m\ )\ :}
+\DoxyCodeLine{\Hypertarget{file__mapping_8cpp_source_l00022}00022\ \ \ \ \ my(\ *fm.my,\ m\ ==\ \mbox{\hyperlink{namespacefc_a3d8a2be677709cc41f09aa7925f2d55fad6bcd1364809e1b881bb22334d14cd56}{read\_only}}\ ?\ \mbox{\hyperlink{namespaceboost}{boost}}::interprocess::\mbox{\hyperlink{namespacefc_a3d8a2be677709cc41f09aa7925f2d55fad6bcd1364809e1b881bb22334d14cd56}{read\_only}}\ :\ \mbox{\hyperlink{namespaceboost}{boost}}::interprocess::\mbox{\hyperlink{namespacefc_a3d8a2be677709cc41f09aa7925f2d55fa4eaf6936474fac52a87743f3de041c42}{read\_write}})\ }
+\DoxyCodeLine{\Hypertarget{file__mapping_8cpp_source_l00023}00023\ \ \ \{\}}
+\DoxyCodeLine{\Hypertarget{file__mapping_8cpp_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{file__mapping_8cpp_source_l00025}\mbox{\hyperlink{classfc_1_1mapped__region_a279003a5dda2cec5510342756bfba272}{00025}}\ \ \ \mbox{\hyperlink{classfc_1_1mapped__region_a279003a5dda2cec5510342756bfba272}{mapped\_region::\string~mapped\_region}}()\{\}}
+\DoxyCodeLine{\Hypertarget{file__mapping_8cpp_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{file__mapping_8cpp_source_l00027}\mbox{\hyperlink{classfc_1_1mapped__region_ae4c454063de929a27170d91e8c332ac6}{00027}}\ \ \ \textcolor{keywordtype}{void}*\ \mbox{\hyperlink{classfc_1_1mapped__region_ae4c454063de929a27170d91e8c332ac6}{mapped\_region::get\_address}}()\textcolor{keyword}{\ const\ }}
+\DoxyCodeLine{\Hypertarget{file__mapping_8cpp_source_l00028}00028\ \textcolor{keyword}{\ \ }\{}
+\DoxyCodeLine{\Hypertarget{file__mapping_8cpp_source_l00029}00029\ \ \ \ \ \textcolor{keywordflow}{return}\ my-\/>get\_address();\ }
+\DoxyCodeLine{\Hypertarget{file__mapping_8cpp_source_l00030}00030\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{file__mapping_8cpp_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{file__mapping_8cpp_source_l00032}\mbox{\hyperlink{classfc_1_1mapped__region_a12ba94b8e57ff75abbf7cfd1ade01a84}{00032}}\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1mapped__region_a12ba94b8e57ff75abbf7cfd1ade01a84}{mapped\_region::flush}}()}
+\DoxyCodeLine{\Hypertarget{file__mapping_8cpp_source_l00033}00033\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{file__mapping_8cpp_source_l00034}00034\ \ \ \ \ my-\/>flush();\ }
+\DoxyCodeLine{\Hypertarget{file__mapping_8cpp_source_l00035}00035\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{file__mapping_8cpp_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{file__mapping_8cpp_source_l00037}\mbox{\hyperlink{classfc_1_1mapped__region_acecc565e9417b87b1ad8577b02b428cc}{00037}}\ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classfc_1_1mapped__region_acecc565e9417b87b1ad8577b02b428cc}{mapped\_region::get\_size}}()\textcolor{keyword}{\ const\ }}
+\DoxyCodeLine{\Hypertarget{file__mapping_8cpp_source_l00038}00038\ \textcolor{keyword}{\ \ }\{}
+\DoxyCodeLine{\Hypertarget{file__mapping_8cpp_source_l00039}00039\ \ \ \ \ \textcolor{keywordflow}{return}\ my-\/>get\_size();}
+\DoxyCodeLine{\Hypertarget{file__mapping_8cpp_source_l00040}00040\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{file__mapping_8cpp_source_l00041}00041\ \}}
+
+\end{DoxyCode}

@@ -1,0 +1,425 @@
+\doxysection{sysio\+::fixed\+\_\+bytes\texorpdfstring{$<$}{<} Size \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classsysio_1_1fixed__bytes}{}\label{classsysio_1_1fixed__bytes}\index{sysio::fixed\_bytes$<$ Size $>$@{sysio::fixed\_bytes$<$ Size $>$}}
+
+
+{\ttfamily \#include $<$fixed\+\_\+bytes.\+hpp$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a376f631fcb770bd4b2e8349a33e52f8a}{uint128\+\_\+t}} \mbox{\hyperlink{classsysio_1_1fixed__bytes_a7ca85de1657ab41f1406d684da982c87}{word\+\_\+t}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+constexpr \mbox{\hyperlink{classsysio_1_1fixed__bytes_a8c5d1c71b3b0557a911e7cd373dfb3ac}{fixed\+\_\+bytes}} ()
+\item 
+\mbox{\hyperlink{classsysio_1_1fixed__bytes_aebe0d2ada8807e0e2035dd04fdb988a8}{fixed\+\_\+bytes}} (const std\+::array$<$ \mbox{\hyperlink{classsysio_1_1fixed__bytes_a7ca85de1657ab41f1406d684da982c87}{word\+\_\+t}}, \mbox{\hyperlink{classsysio_1_1fixed__bytes_ac0e00da6877e9eb06189feb7d58f2465}{num\+\_\+words}}()$>$ \&arr)
+\item 
+{\footnotesize template$<$typename Word , size\+\_\+t Num\+Words, typename Enable  = typename std\+::enable\+\_\+if$<$std\+::is\+\_\+integral$<$\+Word$>$\+::value \&\&                                                             std\+::is\+\_\+unsigned$<$\+Word$>$\+::value \&\&                                                             !std\+::is\+\_\+same$<$\+Word, bool$>$\+::value \&\&                                                             std\+::less$<$size\+\_\+t$>$\{\}(sizeof(\+Word), sizeof(word\+\_\+t))$>$\+::type$>$ }\\\mbox{\hyperlink{classsysio_1_1fixed__bytes_a37791ddd82a554f237c2454299f306a7}{fixed\+\_\+bytes}} (const std\+::array$<$ Word, Num\+Words $>$ \&arr)
+\item 
+{\footnotesize template$<$typename Word , size\+\_\+t Num\+Words, typename Enable  = typename std\+::enable\+\_\+if$<$std\+::is\+\_\+integral$<$\+Word$>$\+::value \&\&                                                             std\+::is\+\_\+unsigned$<$\+Word$>$\+::value \&\&                                                             !std\+::is\+\_\+same$<$\+Word, bool$>$\+::value \&\&                                                             std\+::less$<$size\+\_\+t$>$\{\}(sizeof(\+Word), sizeof(word\+\_\+t))$>$\+::type$>$ }\\\mbox{\hyperlink{classsysio_1_1fixed__bytes_a2addaa5da0fe9ccbfbaece359b2a2928}{fixed\+\_\+bytes}} (const Word(\&arr)\mbox{[}Num\+Words\mbox{]})
+\item 
+const auto \& \mbox{\hyperlink{classsysio_1_1fixed__bytes_af2dac263ee619fb6fc7f6fb627441229}{get\+\_\+array}} () const
+\item 
+auto \mbox{\hyperlink{classsysio_1_1fixed__bytes_ac80cc6b881c32d57aed1ab56e2932592}{data}} ()
+\item 
+auto \mbox{\hyperlink{classsysio_1_1fixed__bytes_ae782872d63020d8f56b4d3b154ba43c4}{size}} () const
+\item 
+std\+::array$<$ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}}, Size $>$ \mbox{\hyperlink{classsysio_1_1fixed__bytes_acace65d24dd5689f49ba2dcb3198493a}{extract\+\_\+as\+\_\+byte\+\_\+array}} () const
+\item 
+void \mbox{\hyperlink{classsysio_1_1fixed__bytes_adc9f1e733fb2c60190ee9ba83667e3ec}{print}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static constexpr size\+\_\+t \mbox{\hyperlink{classsysio_1_1fixed__bytes_ac0e00da6877e9eb06189feb7d58f2465}{num\+\_\+words}} ()
+\item 
+static constexpr size\+\_\+t \mbox{\hyperlink{classsysio_1_1fixed__bytes_a40de8b9caf7258f0327df706d80ffe4e}{padded\+\_\+bytes}} ()
+\item 
+{\footnotesize template$<$typename First\+Word , typename... Rest$>$ }\\static \mbox{\hyperlink{classsysio_1_1fixed__bytes}{fixed\+\_\+bytes}}$<$ Size $>$ \mbox{\hyperlink{classsysio_1_1fixed__bytes_add81e8e61cc4870e192a3f174dd0f9b9}{make\+\_\+from\+\_\+word\+\_\+sequence}} (typename std\+::enable\+\_\+if$<$ std\+::is\+\_\+integral$<$ First\+Word $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}} \&\&std\+::is\+\_\+unsigned$<$ First\+Word $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}} \&\&!std\+::is\+\_\+same$<$ First\+Word, bool $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}} \&\&\mbox{\hyperlink{yubihsm__pkcs11_8c_af82555d15fc1c126f72a5c0566b5389a}{sizeof}}(First\+Word)$<$=\mbox{\hyperlink{yubihsm__pkcs11_8c_af82555d15fc1c126f72a5c0566b5389a}{sizeof}}(\mbox{\hyperlink{classsysio_1_1fixed__bytes_a7ca85de1657ab41f1406d684da982c87}{word\+\_\+t}}) \&\&all\+\_\+true$<$(std\+::is\+\_\+same$<$ First\+Word, Rest $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}})... $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}}, First\+Word $>$\+::type first\+\_\+word, Rest... rest)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$size\+\_\+t Size$>$\newline
+class sysio\+::fixed\+\_\+bytes$<$ Size $>$}
+Fixed size byte array sorted lexicographically
+
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em Size} & -\/ Size of the \doxylink{classsysio_1_1fixed__bytes}{fixed\+\_\+bytes} object \\
+\hline
+\end{DoxyTemplParams}
+
+
+Definition at line \mbox{\hyperlink{fixed__bytes_8hpp_source_l00057}{57}} of file \mbox{\hyperlink{fixed__bytes_8hpp_source}{fixed\+\_\+bytes.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classsysio_1_1fixed__bytes_a7ca85de1657ab41f1406d684da982c87}\index{sysio::fixed\_bytes$<$ Size $>$@{sysio::fixed\_bytes$<$ Size $>$}!word\_t@{word\_t}}
+\index{word\_t@{word\_t}!sysio::fixed\_bytes$<$ Size $>$@{sysio::fixed\_bytes$<$ Size $>$}}
+\doxysubsubsection{\texorpdfstring{word\_t}{word\_t}}
+{\footnotesize\ttfamily \label{classsysio_1_1fixed__bytes_a7ca85de1657ab41f1406d684da982c87} 
+template$<$size\+\_\+t Size$>$ \\
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a376f631fcb770bd4b2e8349a33e52f8a}{uint128\+\_\+t}} \mbox{\hyperlink{classsysio_1_1fixed__bytes}{sysio\+::fixed\+\_\+bytes}}$<$ Size $>$\+::word\+\_\+t}
+
+
+
+Definition at line \mbox{\hyperlink{fixed__bytes_8hpp_source_l00096}{96}} of file \mbox{\hyperlink{fixed__bytes_8hpp_source}{fixed\+\_\+bytes.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classsysio_1_1fixed__bytes_a8c5d1c71b3b0557a911e7cd373dfb3ac}\index{sysio::fixed\_bytes$<$ Size $>$@{sysio::fixed\_bytes$<$ Size $>$}!fixed\_bytes@{fixed\_bytes}}
+\index{fixed\_bytes@{fixed\_bytes}!sysio::fixed\_bytes$<$ Size $>$@{sysio::fixed\_bytes$<$ Size $>$}}
+\doxysubsubsection{\texorpdfstring{fixed\_bytes()}{fixed\_bytes()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{classsysio_1_1fixed__bytes_a8c5d1c71b3b0557a911e7cd373dfb3ac} 
+template$<$size\+\_\+t Size$>$ \\
+\mbox{\hyperlink{classsysio_1_1fixed__bytes}{sysio\+::fixed\+\_\+bytes}}$<$ Size $>$\+::fixed\+\_\+bytes (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+Default constructor to \doxylink{classsysio_1_1fixed__bytes}{fixed\+\_\+bytes} object which initializes all bytes to zero 
+
+Definition at line \mbox{\hyperlink{fixed__bytes_8hpp_source_l00113}{113}} of file \mbox{\hyperlink{fixed__bytes_8hpp_source}{fixed\+\_\+bytes.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00113\ :\ \_data()\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1fixed__bytes_aebe0d2ada8807e0e2035dd04fdb988a8}\index{sysio::fixed\_bytes$<$ Size $>$@{sysio::fixed\_bytes$<$ Size $>$}!fixed\_bytes@{fixed\_bytes}}
+\index{fixed\_bytes@{fixed\_bytes}!sysio::fixed\_bytes$<$ Size $>$@{sysio::fixed\_bytes$<$ Size $>$}}
+\doxysubsubsection{\texorpdfstring{fixed\_bytes()}{fixed\_bytes()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{classsysio_1_1fixed__bytes_aebe0d2ada8807e0e2035dd04fdb988a8} 
+template$<$size\+\_\+t Size$>$ \\
+\mbox{\hyperlink{classsysio_1_1fixed__bytes}{sysio\+::fixed\+\_\+bytes}}$<$ Size $>$\+::fixed\+\_\+bytes (\begin{DoxyParamCaption}\item[{const std\+::array$<$ \mbox{\hyperlink{classsysio_1_1fixed__bytes_a7ca85de1657ab41f1406d684da982c87}{word\+\_\+t}}, \mbox{\hyperlink{classsysio_1_1fixed__bytes_ac0e00da6877e9eb06189feb7d58f2465}{num\+\_\+words}}()$>$ \&}]{arr}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Constructor to \doxylink{classsysio_1_1fixed__bytes}{fixed\+\_\+bytes} object from std\+::array of \doxylink{classsysio_1_1fixed__bytes_ac0e00da6877e9eb06189feb7d58f2465}{num\+\_\+words()} word\+\_\+t types
+
+
+\begin{DoxyParams}{Parameters}
+{\em arr} & data \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{fixed__bytes_8hpp_source_l00120}{120}} of file \mbox{\hyperlink{fixed__bytes_8hpp_source}{fixed\+\_\+bytes.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \ \ \ std::copy(arr.begin(),\ arr.end(),\ \_data.begin());}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1fixed__bytes_a37791ddd82a554f237c2454299f306a7}\index{sysio::fixed\_bytes$<$ Size $>$@{sysio::fixed\_bytes$<$ Size $>$}!fixed\_bytes@{fixed\_bytes}}
+\index{fixed\_bytes@{fixed\_bytes}!sysio::fixed\_bytes$<$ Size $>$@{sysio::fixed\_bytes$<$ Size $>$}}
+\doxysubsubsection{\texorpdfstring{fixed\_bytes()}{fixed\_bytes()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{classsysio_1_1fixed__bytes_a37791ddd82a554f237c2454299f306a7} 
+template$<$size\+\_\+t Size$>$ \\
+template$<$typename Word , size\+\_\+t Num\+Words, typename Enable  = typename std\+::enable\+\_\+if$<$std\+::is\+\_\+integral$<$\+Word$>$\+::value \&\&                                                             std\+::is\+\_\+unsigned$<$\+Word$>$\+::value \&\&                                                             !std\+::is\+\_\+same$<$\+Word, bool$>$\+::value \&\&                                                             std\+::less$<$size\+\_\+t$>$\{\}(sizeof(\+Word), sizeof(word\+\_\+t))$>$\+::type$>$ \\
+\mbox{\hyperlink{classsysio_1_1fixed__bytes}{sysio\+::fixed\+\_\+bytes}}$<$ Size $>$\+::fixed\+\_\+bytes (\begin{DoxyParamCaption}\item[{const std\+::array$<$ Word, Num\+Words $>$ \&}]{arr}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Constructor to \doxylink{classsysio_1_1fixed__bytes}{fixed\+\_\+bytes} object from std\+::array of Word types smaller in size than word\+\_\+t
+
+
+\begin{DoxyParams}{Parameters}
+{\em arr} & -\/ Source data \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{fixed__bytes_8hpp_source_l00135}{135}} of file \mbox{\hyperlink{fixed__bytes_8hpp_source}{fixed\+\_\+bytes.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_assert}(\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{classsysio_1_1fixed__bytes_a7ca85de1657ab41f1406d684da982c87}{word\_t}})\ ==\ (\textcolor{keyword}{sizeof}(\mbox{\hyperlink{classsysio_1_1fixed__bytes_a7ca85de1657ab41f1406d684da982c87}{word\_t}})/\textcolor{keyword}{sizeof}(Word))\ *\ \textcolor{keyword}{sizeof}(Word),}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}size\ of\ the\ backing\ word\ size\ is\ not\ divisible\ by\ the\ size\ of\ the\ array\ element"{}}\ );}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_assert}(\ \textcolor{keyword}{sizeof}(Word)\ *\ NumWords\ <=\ Size,\ \textcolor{stringliteral}{"{}too\ many\ words\ supplied\ to\ fixed\_bytes\ constructor"{}}\ );}
+\DoxyCodeLine{00140\ }
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \ \ \ \ set\_from\_word\_sequence<Word,\ NumWords>(arr.data(),\ arr.data()\ +\ arr.size(),\ *\textcolor{keyword}{this});}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1fixed__bytes_a2addaa5da0fe9ccbfbaece359b2a2928}\index{sysio::fixed\_bytes$<$ Size $>$@{sysio::fixed\_bytes$<$ Size $>$}!fixed\_bytes@{fixed\_bytes}}
+\index{fixed\_bytes@{fixed\_bytes}!sysio::fixed\_bytes$<$ Size $>$@{sysio::fixed\_bytes$<$ Size $>$}}
+\doxysubsubsection{\texorpdfstring{fixed\_bytes()}{fixed\_bytes()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{classsysio_1_1fixed__bytes_a2addaa5da0fe9ccbfbaece359b2a2928} 
+template$<$size\+\_\+t Size$>$ \\
+template$<$typename Word , size\+\_\+t Num\+Words, typename Enable  = typename std\+::enable\+\_\+if$<$std\+::is\+\_\+integral$<$\+Word$>$\+::value \&\&                                                             std\+::is\+\_\+unsigned$<$\+Word$>$\+::value \&\&                                                             !std\+::is\+\_\+same$<$\+Word, bool$>$\+::value \&\&                                                             std\+::less$<$size\+\_\+t$>$\{\}(sizeof(\+Word), sizeof(word\+\_\+t))$>$\+::type$>$ \\
+\mbox{\hyperlink{classsysio_1_1fixed__bytes}{sysio\+::fixed\+\_\+bytes}}$<$ Size $>$\+::fixed\+\_\+bytes (\begin{DoxyParamCaption}\item[{const Word(\&)}]{arr}{\mbox{[}\+Num\+Words\mbox{]}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Constructor to \doxylink{classsysio_1_1fixed__bytes}{fixed\+\_\+bytes} object from fixed-\/sized C array of Word types smaller in size than word\+\_\+t
+
+
+\begin{DoxyParams}{Parameters}
+{\em arr} & -\/ Source data \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{fixed__bytes_8hpp_source_l00154}{154}} of file \mbox{\hyperlink{fixed__bytes_8hpp_source}{fixed\+\_\+bytes.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_assert}(\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{classsysio_1_1fixed__bytes_a7ca85de1657ab41f1406d684da982c87}{word\_t}})\ ==\ (\textcolor{keyword}{sizeof}(\mbox{\hyperlink{classsysio_1_1fixed__bytes_a7ca85de1657ab41f1406d684da982c87}{word\_t}})/\textcolor{keyword}{sizeof}(Word))\ *\ \textcolor{keyword}{sizeof}(Word),}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}size\ of\ the\ backing\ word\ size\ is\ not\ divisible\ by\ the\ size\ of\ the\ array\ element"{}}\ );}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_assert}(\ \textcolor{keyword}{sizeof}(Word)\ *\ NumWords\ <=\ Size,\ \textcolor{stringliteral}{"{}too\ many\ words\ supplied\ to\ fixed\_bytes\ constructor"{}}\ );}
+\DoxyCodeLine{00159\ }
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \ \ \ \ set\_from\_word\_sequence<Word,\ NumWords>(arr,\ arr\ +\ NumWords,\ *\textcolor{keyword}{this});}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1fixed__bytes_ac80cc6b881c32d57aed1ab56e2932592}\index{sysio::fixed\_bytes$<$ Size $>$@{sysio::fixed\_bytes$<$ Size $>$}!data@{data}}
+\index{data@{data}!sysio::fixed\_bytes$<$ Size $>$@{sysio::fixed\_bytes$<$ Size $>$}}
+\doxysubsubsection{\texorpdfstring{data()}{data()}}
+{\footnotesize\ttfamily \label{classsysio_1_1fixed__bytes_ac80cc6b881c32d57aed1ab56e2932592} 
+template$<$size\+\_\+t Size$>$ \\
+auto \mbox{\hyperlink{classsysio_1_1fixed__bytes}{sysio\+::fixed\+\_\+bytes}}$<$ Size $>$\+::data (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Get the underlying data of the contained std\+::array 
+
+Definition at line \mbox{\hyperlink{fixed__bytes_8hpp_source_l00200}{200}} of file \mbox{\hyperlink{fixed__bytes_8hpp_source}{fixed\+\_\+bytes.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00200\ \{\ \textcolor{keywordflow}{return}\ \_data.data();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1fixed__bytes_acace65d24dd5689f49ba2dcb3198493a}\index{sysio::fixed\_bytes$<$ Size $>$@{sysio::fixed\_bytes$<$ Size $>$}!extract\_as\_byte\_array@{extract\_as\_byte\_array}}
+\index{extract\_as\_byte\_array@{extract\_as\_byte\_array}!sysio::fixed\_bytes$<$ Size $>$@{sysio::fixed\_bytes$<$ Size $>$}}
+\doxysubsubsection{\texorpdfstring{extract\_as\_byte\_array()}{extract\_as\_byte\_array()}}
+{\footnotesize\ttfamily \label{classsysio_1_1fixed__bytes_acace65d24dd5689f49ba2dcb3198493a} 
+template$<$size\+\_\+t Size$>$ \\
+std\+::array$<$ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}}, Size $>$ \mbox{\hyperlink{classsysio_1_1fixed__bytes}{sysio\+::fixed\+\_\+bytes}}$<$ Size $>$\+::extract\+\_\+as\+\_\+byte\+\_\+array (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+Extract the contained data as an array of bytes
+
+\begin{DoxyReturn}{Returns}
+-\/ the extracted data as array of bytes 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{fixed__bytes_8hpp_source_l00222}{222}} of file \mbox{\hyperlink{fixed__bytes_8hpp_source}{fixed\+\_\+bytes.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \ \ \ \ \ \ std::array<uint8\_t,\ Size>\ arr;}
+\DoxyCodeLine{00224\ }
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ num\_sub\_words\ =\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{classsysio_1_1fixed__bytes_a7ca85de1657ab41f1406d684da982c87}{word\_t}});}
+\DoxyCodeLine{00226\ }
+\DoxyCodeLine{00227\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ arr\_itr\ \ =\ arr.begin();}
+\DoxyCodeLine{00228\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ data\_itr\ =\ \_data.begin();}
+\DoxyCodeLine{00229\ }
+\DoxyCodeLine{00230\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keywordtype}{size\_t}\ counter\ =\ \_data.size();\ counter\ >\ 0;\ -\/-\/counter,\ ++data\_itr\ )\ \{}
+\DoxyCodeLine{00231\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ sub\_words\_left\ =\ num\_sub\_words;}
+\DoxyCodeLine{00232\ }
+\DoxyCodeLine{00233\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ temp\_word\ =\ *data\_itr;}
+\DoxyCodeLine{00234\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ counter\ ==\ 1\ )\ \{\ \textcolor{comment}{//\ If\ last\ word\ in\ \_data\ array...}}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sub\_words\_left\ -\/=\ \mbox{\hyperlink{classsysio_1_1fixed__bytes_a40de8b9caf7258f0327df706d80ffe4e}{padded\_bytes}}();}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ temp\_word\ >>=\ 8*\mbox{\hyperlink{classsysio_1_1fixed__bytes_a40de8b9caf7258f0327df706d80ffe4e}{padded\_bytes}}();}
+\DoxyCodeLine{00237\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00238\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ ;\ sub\_words\_left\ >\ 0;\ -\/-\/sub\_words\_left\ )\ \{}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *(arr\_itr\ +\ sub\_words\_left\ -\/\ 1)\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\textcolor{keyword}{>}(temp\_word\ \&\ 0xFF);}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ temp\_word\ >>=\ 8;}
+\DoxyCodeLine{00241\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00242\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ arr\_itr\ +=\ num\_sub\_words;}
+\DoxyCodeLine{00243\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00244\ }
+\DoxyCodeLine{00245\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ arr;}
+\DoxyCodeLine{00246\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1fixed__bytes_acace65d24dd5689f49ba2dcb3198493a_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=333pt]{classsysio_1_1fixed__bytes_acace65d24dd5689f49ba2dcb3198493a_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1fixed__bytes_af2dac263ee619fb6fc7f6fb627441229}\index{sysio::fixed\_bytes$<$ Size $>$@{sysio::fixed\_bytes$<$ Size $>$}!get\_array@{get\_array}}
+\index{get\_array@{get\_array}!sysio::fixed\_bytes$<$ Size $>$@{sysio::fixed\_bytes$<$ Size $>$}}
+\doxysubsubsection{\texorpdfstring{get\_array()}{get\_array()}}
+{\footnotesize\ttfamily \label{classsysio_1_1fixed__bytes_af2dac263ee619fb6fc7f6fb627441229} 
+template$<$size\+\_\+t Size$>$ \\
+const auto \& \mbox{\hyperlink{classsysio_1_1fixed__bytes}{sysio\+::fixed\+\_\+bytes}}$<$ Size $>$\+::get\+\_\+array (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+Get the contained std\+::array 
+
+Definition at line \mbox{\hyperlink{fixed__bytes_8hpp_source_l00195}{195}} of file \mbox{\hyperlink{fixed__bytes_8hpp_source}{fixed\+\_\+bytes.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00195\ \{\ \textcolor{keywordflow}{return}\ \_data;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=341pt]{classsysio_1_1fixed__bytes_af2dac263ee619fb6fc7f6fb627441229_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1fixed__bytes_add81e8e61cc4870e192a3f174dd0f9b9}\index{sysio::fixed\_bytes$<$ Size $>$@{sysio::fixed\_bytes$<$ Size $>$}!make\_from\_word\_sequence@{make\_from\_word\_sequence}}
+\index{make\_from\_word\_sequence@{make\_from\_word\_sequence}!sysio::fixed\_bytes$<$ Size $>$@{sysio::fixed\_bytes$<$ Size $>$}}
+\doxysubsubsection{\texorpdfstring{make\_from\_word\_sequence()}{make\_from\_word\_sequence()}}
+{\footnotesize\ttfamily \label{classsysio_1_1fixed__bytes_add81e8e61cc4870e192a3f174dd0f9b9} 
+template$<$size\+\_\+t Size$>$ \\
+template$<$typename First\+Word , typename... Rest$>$ \\
+static \mbox{\hyperlink{classsysio_1_1fixed__bytes}{fixed\+\_\+bytes}}$<$ Size $>$ \mbox{\hyperlink{classsysio_1_1fixed__bytes}{sysio\+::fixed\+\_\+bytes}}$<$ Size $>$\+::make\+\_\+from\+\_\+word\+\_\+sequence (\begin{DoxyParamCaption}\item[{typename std\+::enable\+\_\+if$<$ std\+::is\+\_\+integral$<$ First\+Word $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}} \&\&std\+::is\+\_\+unsigned$<$ First\+Word $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}} \&\&!std\+::is\+\_\+same$<$ First\+Word, bool $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}} \&\&\mbox{\hyperlink{yubihsm__pkcs11_8c_af82555d15fc1c126f72a5c0566b5389a}{sizeof}}(First\+Word)$<$=\mbox{\hyperlink{yubihsm__pkcs11_8c_af82555d15fc1c126f72a5c0566b5389a}{sizeof}}(\mbox{\hyperlink{classsysio_1_1fixed__bytes_a7ca85de1657ab41f1406d684da982c87}{word\+\_\+t}}) \&\&all\+\_\+true$<$(std\+::is\+\_\+same$<$ First\+Word, Rest $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}})... $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}}, First\+Word $>$\+::type}]{first\+\_\+word}{, }\item[{Rest...}]{rest}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+Create a new \doxylink{classsysio_1_1fixed__bytes}{fixed\+\_\+bytes} object from a sequence of words
+
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em First\+Word} & -\/ The type of the first word in the sequence \\
+\hline
+{\em Rest} & -\/ The type of the remaining words in the sequence \\
+\hline
+\end{DoxyTemplParams}
+
+\begin{DoxyParams}{Parameters}
+{\em first\+\_\+word} & -\/ The first word in the sequence \\
+\hline
+{\em rest} & -\/ The remaining words in the sequence \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{fixed__bytes_8hpp_source_l00174}{174}} of file \mbox{\hyperlink{fixed__bytes_8hpp_source}{fixed\+\_\+bytes.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_assert}(\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{classsysio_1_1fixed__bytes_a7ca85de1657ab41f1406d684da982c87}{word\_t}})\ ==\ (\textcolor{keyword}{sizeof}(\mbox{\hyperlink{classsysio_1_1fixed__bytes_a7ca85de1657ab41f1406d684da982c87}{word\_t}})/\textcolor{keyword}{sizeof}(FirstWord))\ *\ \textcolor{keyword}{sizeof}(FirstWord),}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}size\ of\ the\ backing\ word\ size\ is\ not\ divisible\ by\ the\ size\ of\ the\ words\ supplied\ as\ arguments"{}}\ );}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_assert}(\ \textcolor{keyword}{sizeof}(FirstWord)\ *\ (1\ +\ \textcolor{keyword}{sizeof}...(Rest))\ <=\ Size,\ \textcolor{stringliteral}{"{}too\ many\ words\ supplied\ to\ make\_from\_word\_sequence"{}}\ );}
+\DoxyCodeLine{00185\ }
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1fixed__bytes_a8c5d1c71b3b0557a911e7cd373dfb3ac}{fixed\_bytes<Size>}}\ \mbox{\hyperlink{yubico__otp_8c_a9246c20bb98ad2b4c60313c053c70f08}{key}};}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \ \ \ \ \ \ std::array<FirstWord,\ 1+\textcolor{keyword}{sizeof}...(Rest)>\ arr\{\{\ first\_word,\ rest...\ \}\};}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \ \ \ \ \ \ set\_from\_word\_sequence<FirstWord,\ 1+\textcolor{keyword}{sizeof}...(Rest)>(arr.data(),\ arr.data()\ +\ arr.size(),\ key);}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubico__otp_8c_a9246c20bb98ad2b4c60313c053c70f08}{key}};}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1fixed__bytes_ac0e00da6877e9eb06189feb7d58f2465}\index{sysio::fixed\_bytes$<$ Size $>$@{sysio::fixed\_bytes$<$ Size $>$}!num\_words@{num\_words}}
+\index{num\_words@{num\_words}!sysio::fixed\_bytes$<$ Size $>$@{sysio::fixed\_bytes$<$ Size $>$}}
+\doxysubsubsection{\texorpdfstring{num\_words()}{num\_words()}}
+{\footnotesize\ttfamily \label{classsysio_1_1fixed__bytes_ac0e00da6877e9eb06189feb7d58f2465} 
+template$<$size\+\_\+t Size$>$ \\
+static constexpr size\+\_\+t \mbox{\hyperlink{classsysio_1_1fixed__bytes}{sysio\+::fixed\+\_\+bytes}}$<$ Size $>$\+::num\+\_\+words (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+Get number of words contained in this \doxylink{classsysio_1_1fixed__bytes}{fixed\+\_\+bytes} object. \doxylink{struct_a}{A} word is defined to be 16 bytes in size 
+
+Definition at line \mbox{\hyperlink{fixed__bytes_8hpp_source_l00102}{102}} of file \mbox{\hyperlink{fixed__bytes_8hpp_source}{fixed\+\_\+bytes.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00102\ \{\ \textcolor{keywordflow}{return}\ (Size\ +\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{classsysio_1_1fixed__bytes_a7ca85de1657ab41f1406d684da982c87}{word\_t}})\ -\/\ 1)\ /\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{classsysio_1_1fixed__bytes_a7ca85de1657ab41f1406d684da982c87}{word\_t}});\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1fixed__bytes_ac0e00da6877e9eb06189feb7d58f2465_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1fixed__bytes_a40de8b9caf7258f0327df706d80ffe4e}\index{sysio::fixed\_bytes$<$ Size $>$@{sysio::fixed\_bytes$<$ Size $>$}!padded\_bytes@{padded\_bytes}}
+\index{padded\_bytes@{padded\_bytes}!sysio::fixed\_bytes$<$ Size $>$@{sysio::fixed\_bytes$<$ Size $>$}}
+\doxysubsubsection{\texorpdfstring{padded\_bytes()}{padded\_bytes()}}
+{\footnotesize\ttfamily \label{classsysio_1_1fixed__bytes_a40de8b9caf7258f0327df706d80ffe4e} 
+template$<$size\+\_\+t Size$>$ \\
+static constexpr size\+\_\+t \mbox{\hyperlink{classsysio_1_1fixed__bytes}{sysio\+::fixed\+\_\+bytes}}$<$ Size $>$\+::padded\+\_\+bytes (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+Get number of padded bytes contained in this \doxylink{classsysio_1_1fixed__bytes}{fixed\+\_\+bytes} object. Padded bytes are the remaining bytes inside the \doxylink{classsysio_1_1fixed__bytes}{fixed\+\_\+bytes} object after all the words are allocated 
+
+Definition at line \mbox{\hyperlink{fixed__bytes_8hpp_source_l00108}{108}} of file \mbox{\hyperlink{fixed__bytes_8hpp_source}{fixed\+\_\+bytes.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00108\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1fixed__bytes_ac0e00da6877e9eb06189feb7d58f2465}{num\_words}}()\ *\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{classsysio_1_1fixed__bytes_a7ca85de1657ab41f1406d684da982c87}{word\_t}})\ -\/\ Size;\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=307pt]{classsysio_1_1fixed__bytes_a40de8b9caf7258f0327df706d80ffe4e_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1fixed__bytes_a40de8b9caf7258f0327df706d80ffe4e_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1fixed__bytes_adc9f1e733fb2c60190ee9ba83667e3ec}\index{sysio::fixed\_bytes$<$ Size $>$@{sysio::fixed\_bytes$<$ Size $>$}!print@{print}}
+\index{print@{print}!sysio::fixed\_bytes$<$ Size $>$@{sysio::fixed\_bytes$<$ Size $>$}}
+\doxysubsubsection{\texorpdfstring{print()}{print()}}
+{\footnotesize\ttfamily \label{classsysio_1_1fixed__bytes_adc9f1e733fb2c60190ee9ba83667e3ec} 
+template$<$size\+\_\+t Size$>$ \\
+void \mbox{\hyperlink{classsysio_1_1fixed__bytes}{sysio\+::fixed\+\_\+bytes}}$<$ Size $>$\+::print (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+Prints \doxylink{classsysio_1_1fixed__bytes}{fixed\+\_\+bytes} as a hexidecimal string
+
+
+\begin{DoxyParams}{Parameters}
+{\em val} & to be printed \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{fixed__bytes_8hpp_source_l00253}{253}} of file \mbox{\hyperlink{fixed__bytes_8hpp_source}{fixed\+\_\+bytes.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00253\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00254\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ arr\ =\ \mbox{\hyperlink{classsysio_1_1fixed__bytes_acace65d24dd5689f49ba2dcb3198493a}{extract\_as\_byte\_array}}();}
+\DoxyCodeLine{00255\ \ \ \ \ \ \ \ \ \ \ \ \ printhex(\textcolor{keyword}{static\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{void}*\textcolor{keyword}{>}(arr.data()),\ arr.size());}
+\DoxyCodeLine{00256\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1fixed__bytes_adc9f1e733fb2c60190ee9ba83667e3ec_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1fixed__bytes_ae782872d63020d8f56b4d3b154ba43c4}\index{sysio::fixed\_bytes$<$ Size $>$@{sysio::fixed\_bytes$<$ Size $>$}!size@{size}}
+\index{size@{size}!sysio::fixed\_bytes$<$ Size $>$@{sysio::fixed\_bytes$<$ Size $>$}}
+\doxysubsubsection{\texorpdfstring{size()}{size()}}
+{\footnotesize\ttfamily \label{classsysio_1_1fixed__bytes_ae782872d63020d8f56b4d3b154ba43c4} 
+template$<$size\+\_\+t Size$>$ \\
+auto \mbox{\hyperlink{classsysio_1_1fixed__bytes}{sysio\+::fixed\+\_\+bytes}}$<$ Size $>$\+::size (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+Get the size of the contained std\+::array 
+
+Definition at line \mbox{\hyperlink{fixed__bytes_8hpp_source_l00214}{214}} of file \mbox{\hyperlink{fixed__bytes_8hpp_source}{fixed\+\_\+bytes.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00214\ \{\ \textcolor{keywordflow}{return}\ \_data.size();\ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{fixed__bytes_8hpp}{fixed\+\_\+bytes.\+hpp}}\end{DoxyCompactItemize}

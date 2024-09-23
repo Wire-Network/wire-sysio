@@ -1,0 +1,14 @@
+<map id="libraries/fc/secp256k1/secp256k1/include/secp256k1_schnorrsig.h" name="libraries/fc/secp256k1/secp256k1/include/secp256k1_schnorrsig.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="406,5,607,61"/>
+<area shape="rect" id="Node000002" href="$schnorr_8c.html" title=" " alt="" coords="5,116,211,157"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="392,66,186,119,185,113,391,61"/>
+<area shape="rect" id="Node000003" href="$schnorrsig_2bench__impl_8h.html" title=" " alt="" coords="234,109,400,165"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="444,71,369,111,367,106,441,66"/>
+<area shape="rect" id="Node000004" href="$schnorrsig_2main__impl_8h.html" title=" " alt="" coords="425,109,588,165"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="509,77,509,108,504,108,504,77"/>
+<area shape="rect" id="Node000005" href="$schnorrsig_2tests__exhaustive__impl_8h.html" title=" " alt="" coords="450,213,680,268"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="570,69,588,87,602,108,609,135,606,164,597,190,586,213,581,211,592,188,601,163,604,136,598,110,584,90,566,73"/>
+<area shape="rect" id="Node000006" href="$schnorrsig_2tests__impl_8h.html" title=" " alt="" coords="662,109,826,165"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="585,65,681,106,679,111,583,70"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="532,177,552,211,547,213,528,180"/>
+</map>

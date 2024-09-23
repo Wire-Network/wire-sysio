@@ -1,0 +1,19 @@
+<map id="CLI::CheckedTransformer::CheckedTransformer" name="CLI::CheckedTransformer::CheckedTransformer">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,106,178,146"/>
+<area shape="rect" id="Node000002" href="$namespace_c_l_i_1_1detail.html#a320e031a5eb12297a140d2d6fc73362a" title="Generate a string representation of a map." alt="" coords="226,37,397,63"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="152,103,256,66,258,71,154,108"/>
+<area shape="rect" id="Node000003" href="$namespace_c_l_i_1_1detail.html#ab351f13ec104e2cba19ec6baf4a552f6" title="Simple function to join a string." alt="" coords="460,9,569,35"/>
+<area shape="poly" id="edge5_Node000001_Node000003" title=" " alt="" coords="110,103,158,60,190,38,225,22,281,9,340,3,396,4,445,8,445,14,395,9,340,9,282,14,227,27,193,43,162,64,113,107"/>
+<area shape="rect" id="Node000004" href="$namespace_c_l_i_1_1detail.html#a0c6cf48feae9d909d52e7b4c346cba29" title=" " alt="" coords="454,80,576,121"/>
+<area shape="poly" id="edge8_Node000001_Node000004" title=" " alt="" coords="178,118,438,103,438,108,178,124"/>
+<area shape="rect" id="Node000005" href="$namespace_c_l_i_1_1detail.html#a0e94052d485636fc9f18c21009026577" title="Convert an object to a string (directly forward if this can become a string)" alt="" coords="445,167,584,192"/>
+<area shape="poly" id="edge9_Node000001_Node000005" title=" " alt="" coords="137,145,180,161,226,174,278,181,331,185,430,184,430,189,331,190,278,187,225,179,178,166,135,150"/>
+<area shape="rect" id="Node000006" href="$namespace_c_l_i_1_1detail.html#aa4b4a0a97c9b07110595765887647385" title="A search function." alt="" coords="247,139,376,164"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="178,133,232,140,231,145,178,139"/>
+<area shape="rect" id="Node000007" href="$namespace_c_l_i_1_1detail.html#a9a74f119a795b25c40db74ffa21d3c2d" title="get a string as a convertible value for arithmetic types" alt="" coords="251,239,372,280"/>
+<area shape="poly" id="edge10_Node000001_Node000007" title=" " alt="" coords="120,145,169,181,227,219,248,230,245,234,224,223,166,185,117,149"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="397,36,445,29,445,34,398,41"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="367,61,439,79,438,84,365,66"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="335,61,481,156,479,160,332,66"/>
+<area shape="poly" id="edge7_Node000006_Node000004" title=" " alt="" coords="365,135,438,117,439,122,367,141"/>
+</map>

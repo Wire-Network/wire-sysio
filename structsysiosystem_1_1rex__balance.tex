@@ -1,0 +1,128 @@
+\doxysection{sysiosystem\+::rex\+\_\+balance Struct Reference}
+\hypertarget{structsysiosystem_1_1rex__balance}{}\label{structsysiosystem_1_1rex__balance}\index{sysiosystem::rex\_balance@{sysiosystem::rex\_balance}}
+
+
+{\ttfamily \#include $<$sysio.\+system.\+hpp$>$}
+
+
+
+Collaboration diagram for sysiosystem\+::rex\+\_\+balance\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=296pt]{structsysiosystem_1_1rex__balance__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1rex__balance_a1585fd6b09ab9b5b7cf916f667aef633}{primary\+\_\+key}} () const
+\begin{DoxyCompactList}\small\item\em REX daily maturity buckets. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1rex__balance_aa351df19b8ffe9e6b25c0ccb85d0a7ab}{version}} = 0
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \mbox{\hyperlink{structsysiosystem_1_1rex__balance_a3ec6cd0e1f4ed84a64e6b4a7020df10f}{owner}}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \mbox{\hyperlink{structsysiosystem_1_1rex__balance_a5a7a09b9b90dccaf58e2d1b3c395d951}{vote\+\_\+stake}}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} \mbox{\hyperlink{structsysiosystem_1_1rex__balance_a2ab40279699e574678043b5522e25538}{rex\+\_\+balance}}
+\item 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1rex__balance_aca6030b3b649529bcae44dc38ce152a6}{matured\+\_\+rex}} = 0
+\item 
+std\+::vector$<$ \mbox{\hyperlink{structsysiosystem_1_1pair__time__point__sec__int64}{pair\+\_\+time\+\_\+point\+\_\+sec\+\_\+int64}} $>$ \mbox{\hyperlink{structsysiosystem_1_1rex__balance_aa0bf5dc23ce7890e2b8d76c1f5ea7e7d}{rex\+\_\+maturities}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00477}{477}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysiosystem_1_1rex__balance_a1585fd6b09ab9b5b7cf916f667aef633}\index{sysiosystem::rex\_balance@{sysiosystem::rex\_balance}!primary\_key@{primary\_key}}
+\index{primary\_key@{primary\_key}!sysiosystem::rex\_balance@{sysiosystem::rex\_balance}}
+\doxysubsubsection{\texorpdfstring{primary\_key()}{primary\_key()}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1rex__balance_a1585fd6b09ab9b5b7cf916f667aef633} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} sysiosystem\+::rex\+\_\+balance\+::primary\+\_\+key (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00485}{485}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00485\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysiosystem_1_1rex__balance_a3ec6cd0e1f4ed84a64e6b4a7020df10f}{owner}}.value;\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysiosystem_1_1rex__balance_aca6030b3b649529bcae44dc38ce152a6}\index{sysiosystem::rex\_balance@{sysiosystem::rex\_balance}!matured\_rex@{matured\_rex}}
+\index{matured\_rex@{matured\_rex}!sysiosystem::rex\_balance@{sysiosystem::rex\_balance}}
+\doxysubsubsection{\texorpdfstring{matured\_rex}{matured\_rex}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1rex__balance_aca6030b3b649529bcae44dc38ce152a6} 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} sysiosystem\+::rex\+\_\+balance\+::matured\+\_\+rex = 0}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00482}{482}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1rex__balance_a3ec6cd0e1f4ed84a64e6b4a7020df10f}\index{sysiosystem::rex\_balance@{sysiosystem::rex\_balance}!owner@{owner}}
+\index{owner@{owner}!sysiosystem::rex\_balance@{sysiosystem::rex\_balance}}
+\doxysubsubsection{\texorpdfstring{owner}{owner}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1rex__balance_a3ec6cd0e1f4ed84a64e6b4a7020df10f} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} sysiosystem\+::rex\+\_\+balance\+::owner}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00479}{479}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1rex__balance_a2ab40279699e574678043b5522e25538}\index{sysiosystem::rex\_balance@{sysiosystem::rex\_balance}!rex\_balance@{rex\_balance}}
+\index{rex\_balance@{rex\_balance}!sysiosystem::rex\_balance@{sysiosystem::rex\_balance}}
+\doxysubsubsection{\texorpdfstring{rex\_balance}{rex\_balance}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1rex__balance_a2ab40279699e574678043b5522e25538} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} sysiosystem\+::rex\+\_\+balance\+::rex\+\_\+balance}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00481}{481}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1rex__balance_aa0bf5dc23ce7890e2b8d76c1f5ea7e7d}\index{sysiosystem::rex\_balance@{sysiosystem::rex\_balance}!rex\_maturities@{rex\_maturities}}
+\index{rex\_maturities@{rex\_maturities}!sysiosystem::rex\_balance@{sysiosystem::rex\_balance}}
+\doxysubsubsection{\texorpdfstring{rex\_maturities}{rex\_maturities}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1rex__balance_aa0bf5dc23ce7890e2b8d76c1f5ea7e7d} 
+std\+::vector$<$\mbox{\hyperlink{structsysiosystem_1_1pair__time__point__sec__int64}{pair\+\_\+time\+\_\+point\+\_\+sec\+\_\+int64}}$>$ sysiosystem\+::rex\+\_\+balance\+::rex\+\_\+maturities}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00483}{483}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1rex__balance_aa351df19b8ffe9e6b25c0ccb85d0a7ab}\index{sysiosystem::rex\_balance@{sysiosystem::rex\_balance}!version@{version}}
+\index{version@{version}!sysiosystem::rex\_balance@{sysiosystem::rex\_balance}}
+\doxysubsubsection{\texorpdfstring{version}{version}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1rex__balance_aa351df19b8ffe9e6b25c0ccb85d0a7ab} 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} sysiosystem\+::rex\+\_\+balance\+::version = 0}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00478}{478}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1rex__balance_a5a7a09b9b90dccaf58e2d1b3c395d951}\index{sysiosystem::rex\_balance@{sysiosystem::rex\_balance}!vote\_stake@{vote\_stake}}
+\index{vote\_stake@{vote\_stake}!sysiosystem::rex\_balance@{sysiosystem::rex\_balance}}
+\doxysubsubsection{\texorpdfstring{vote\_stake}{vote\_stake}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1rex__balance_a5a7a09b9b90dccaf58e2d1b3c395d951} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}} sysiosystem\+::rex\+\_\+balance\+::vote\+\_\+stake}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00480}{480}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/svetlasyrimis/\+Desktop/wire-\/network/\+WN-\/org/wire-\/system-\/contracts/contracts/sysio.\+system/include/sysio.\+system/\mbox{\hyperlink{sysio_8system_8hpp}{sysio.\+system.\+hpp}}\end{DoxyCompactItemize}

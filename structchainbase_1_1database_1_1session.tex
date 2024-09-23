@@ -1,0 +1,174 @@
+\doxysection{chainbase\+::database\+::session Struct Reference}
+\hypertarget{structchainbase_1_1database_1_1session}{}\label{structchainbase_1_1database_1_1session}\index{chainbase::database::session@{chainbase::database::session}}
+
+
+{\ttfamily \#include $<$chainbase.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structchainbase_1_1database_1_1session_a82419c657b111b8f5bd273d4a5987961}{session}} (\mbox{\hyperlink{structchainbase_1_1database_1_1session}{session}} \&\&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\item 
+\mbox{\hyperlink{structchainbase_1_1database_1_1session_ab304f8cab1d2e13584ba17e1d2a9b841}{session}} (vector$<$ std\+::unique\+\_\+ptr$<$ \mbox{\hyperlink{classchainbase_1_1abstract__session}{abstract\+\_\+session}} $>$ $>$ \&\&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\item 
+\mbox{\hyperlink{structchainbase_1_1database_1_1session_a8265a2192efe0d38156d974647d1d685}{\texorpdfstring{$\sim$}{\string~}session}} ()
+\item 
+void \mbox{\hyperlink{structchainbase_1_1database_1_1session_a68232e2d602da52b8c615b7fb1f0b6d0}{push}} ()
+\item 
+void \mbox{\hyperlink{structchainbase_1_1database_1_1session_a6f811596bebbe29cc1f39e367fbd9415}{squash}} ()
+\item 
+void \mbox{\hyperlink{structchainbase_1_1database_1_1session_ae11a9491ccaca0ef520460dc5b2f2bc2}{undo}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{structchainbase_1_1database_1_1session_a18fdb2eb327d986df9ddba68498b8cf9}{database}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00287}{287}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structchainbase_1_1database_1_1session_a82419c657b111b8f5bd273d4a5987961}\index{chainbase::database::session@{chainbase::database::session}!session@{session}}
+\index{session@{session}!chainbase::database::session@{chainbase::database::session}}
+\doxysubsubsection{\texorpdfstring{session()}{session()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structchainbase_1_1database_1_1session_a82419c657b111b8f5bd273d4a5987961} 
+chainbase\+::database\+::session\+::session (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structchainbase_1_1database_1_1session}{session}} \&\&}]{s}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00289}{289}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00289\ :\_index\_sessions(\ std::move(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.\_index\_sessions)\ )\{\}}
+
+\end{DoxyCode}
+\Hypertarget{structchainbase_1_1database_1_1session_ab304f8cab1d2e13584ba17e1d2a9b841}\index{chainbase::database::session@{chainbase::database::session}!session@{session}}
+\index{session@{session}!chainbase::database::session@{chainbase::database::session}}
+\doxysubsubsection{\texorpdfstring{session()}{session()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structchainbase_1_1database_1_1session_ab304f8cab1d2e13584ba17e1d2a9b841} 
+chainbase\+::database\+::session\+::session (\begin{DoxyParamCaption}\item[{vector$<$ std\+::unique\+\_\+ptr$<$ \mbox{\hyperlink{classchainbase_1_1abstract__session}{abstract\+\_\+session}} $>$ $>$ \&\&}]{s}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00290}{290}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00290\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\_index\_sessions(\ std::move(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})\ )}
+\DoxyCodeLine{00291\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00292\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structchainbase_1_1database_1_1session_a8265a2192efe0d38156d974647d1d685}\index{chainbase::database::session@{chainbase::database::session}!````~session@{\texorpdfstring{$\sim$}{\string~}session}}
+\index{````~session@{\texorpdfstring{$\sim$}{\string~}session}!chainbase::database::session@{chainbase::database::session}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}session()}{\string~session()}}
+{\footnotesize\ttfamily \label{structchainbase_1_1database_1_1session_a8265a2192efe0d38156d974647d1d685} 
+chainbase\+::database\+::session\+::\texorpdfstring{$\sim$}{\string~}session (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00294}{294}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00294\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00295\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structchainbase_1_1database_1_1session_ae11a9491ccaca0ef520460dc5b2f2bc2}{undo}}();}
+\DoxyCodeLine{00296\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=328pt]{structchainbase_1_1database_1_1session_a8265a2192efe0d38156d974647d1d685_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structchainbase_1_1database_1_1session_a68232e2d602da52b8c615b7fb1f0b6d0}\index{chainbase::database::session@{chainbase::database::session}!push@{push}}
+\index{push@{push}!chainbase::database::session@{chainbase::database::session}}
+\doxysubsubsection{\texorpdfstring{push()}{push()}}
+{\footnotesize\ttfamily \label{structchainbase_1_1database_1_1session_a68232e2d602da52b8c615b7fb1f0b6d0} 
+void chainbase\+::database\+::session\+::push (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00298}{298}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00299\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00300\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\&\ i\ :\ \_index\_sessions\ )\ i-\/>push();}
+\DoxyCodeLine{00301\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_index\_sessions.clear();}
+\DoxyCodeLine{00302\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structchainbase_1_1database_1_1session_a6f811596bebbe29cc1f39e367fbd9415}\index{chainbase::database::session@{chainbase::database::session}!squash@{squash}}
+\index{squash@{squash}!chainbase::database::session@{chainbase::database::session}}
+\doxysubsubsection{\texorpdfstring{squash()}{squash()}}
+{\footnotesize\ttfamily \label{structchainbase_1_1database_1_1session_a6f811596bebbe29cc1f39e367fbd9415} 
+void chainbase\+::database\+::session\+::squash (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00304}{304}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00305\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00306\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\&\ i\ :\ \_index\_sessions\ )\ i-\/>squash();}
+\DoxyCodeLine{00307\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_index\_sessions.clear();}
+\DoxyCodeLine{00308\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structchainbase_1_1database_1_1session_ae11a9491ccaca0ef520460dc5b2f2bc2}\index{chainbase::database::session@{chainbase::database::session}!undo@{undo}}
+\index{undo@{undo}!chainbase::database::session@{chainbase::database::session}}
+\doxysubsubsection{\texorpdfstring{undo()}{undo()}}
+{\footnotesize\ttfamily \label{structchainbase_1_1database_1_1session_ae11a9491ccaca0ef520460dc5b2f2bc2} 
+void chainbase\+::database\+::session\+::undo (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00310}{310}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00311\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00312\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\&\ i\ :\ \_index\_sessions\ )\ i-\/>undo();}
+\DoxyCodeLine{00313\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_index\_sessions.clear();}
+\DoxyCodeLine{00314\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=328pt]{structchainbase_1_1database_1_1session_ae11a9491ccaca0ef520460dc5b2f2bc2_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{structchainbase_1_1database_1_1session_a18fdb2eb327d986df9ddba68498b8cf9}\index{chainbase::database::session@{chainbase::database::session}!database@{database}}
+\index{database@{database}!chainbase::database::session@{chainbase::database::session}}
+\doxysubsubsection{\texorpdfstring{database}{database}}
+{\footnotesize\ttfamily \label{structchainbase_1_1database_1_1session_a18fdb2eb327d986df9ddba68498b8cf9} 
+friend \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classchainbase_1_1database}{database}}\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{chainbase_8hpp_source_l00317}{317}} of file \mbox{\hyperlink{chainbase_8hpp_source}{chainbase.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chainbase/include/chainbase/\mbox{\hyperlink{chainbase_8hpp}{chainbase.\+hpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,30 @@
+\doxysection{template\+\_\+plugin.\+hpp}
+\hypertarget{template__plugin_8hpp_source}{}\label{template__plugin_8hpp_source}\index{plugins/template\_plugin/include/sysio/template\_plugin/template\_plugin.hpp@{plugins/template\_plugin/include/sysio/template\_plugin/template\_plugin.hpp}}
+\mbox{\hyperlink{template__plugin_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{template__plugin_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{template__plugin_8hpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{application_8hpp}{appbase/application.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{template__plugin_8hpp_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{template__plugin_8hpp_source_l00004}00004\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{}
+\DoxyCodeLine{\Hypertarget{template__plugin_8hpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{template__plugin_8hpp_source_l00006}00006\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespaceappbase}{appbase}};}
+\DoxyCodeLine{\Hypertarget{template__plugin_8hpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{template__plugin_8hpp_source_l00011}\mbox{\hyperlink{classsysio_1_1template__plugin}{00011}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1template__plugin}{template\_plugin}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classappbase_1_1plugin}{appbase::plugin}}<template\_plugin>\ \{}
+\DoxyCodeLine{\Hypertarget{template__plugin_8hpp_source_l00012}00012\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{template__plugin_8hpp_source_l00013}00013\ \ \ \ \mbox{\hyperlink{classsysio_1_1template__plugin_a87b1c78a7825a57f5c4ef0b7c8a80c47}{template\_plugin}}();}
+\DoxyCodeLine{\Hypertarget{template__plugin_8hpp_source_l00014}00014\ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classsysio_1_1template__plugin_a3ee9ba1fd0383c0876249434698ea48d}{\string~template\_plugin}}();}
+\DoxyCodeLine{\Hypertarget{template__plugin_8hpp_source_l00015}00015\ \ }
+\DoxyCodeLine{\Hypertarget{template__plugin_8hpp_source_l00016}00016\ \ \ \ \mbox{\hyperlink{plugin_8hpp_ae81793dd38463b82491d75a9ccd209e1}{APPBASE\_PLUGIN\_REQUIRES}}()}
+\DoxyCodeLine{\Hypertarget{template__plugin_8hpp_source_l00017}00017\ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1template__plugin_a766d3fa7bbfeefeaa3bdc7bfba4303c0}{set\_program\_options}}(options\_description\&,\ options\_description\&\ cfg)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{template__plugin_8hpp_source_l00018}00018\ \ }
+\DoxyCodeLine{\Hypertarget{template__plugin_8hpp_source_l00019}00019\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1template__plugin_aef6c80e12b065be23cd760e6173d6d69}{plugin\_initialize}}(\textcolor{keyword}{const}\ variables\_map\&\ options);}
+\DoxyCodeLine{\Hypertarget{template__plugin_8hpp_source_l00020}00020\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1template__plugin_ae0e65d9b178560bd40a0936375677caa}{plugin\_startup}}();}
+\DoxyCodeLine{\Hypertarget{template__plugin_8hpp_source_l00021}00021\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1template__plugin_a35e18f6749b7a003d11c1779bbce30e6}{plugin\_shutdown}}();}
+\DoxyCodeLine{\Hypertarget{template__plugin_8hpp_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{template__plugin_8hpp_source_l00023}00023\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{template__plugin_8hpp_source_l00024}00024\ \ \ \ std::unique\_ptr<class\ template\_plugin\_impl>\ my;}
+\DoxyCodeLine{\Hypertarget{template__plugin_8hpp_source_l00025}00025\ \};}
+\DoxyCodeLine{\Hypertarget{template__plugin_8hpp_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{template__plugin_8hpp_source_l00027}00027\ \}}
+
+\end{DoxyCode}

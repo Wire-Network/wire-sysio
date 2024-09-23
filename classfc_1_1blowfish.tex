@@ -1,0 +1,443 @@
+\doxysection{fc\+::blowfish Class Reference}
+\hypertarget{classfc_1_1blowfish}{}\label{classfc_1_1blowfish}\index{fc::blowfish@{fc::blowfish}}
+
+
+{\ttfamily \#include $<$blowfish.\+hpp$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \{ \mbox{\hyperlink{classfc_1_1blowfish_adb5c19eb1f1da57986771336a3901deca25f9cb5035bb002b7bed493e9457476e}{ECB}} =0
+, \mbox{\hyperlink{classfc_1_1blowfish_adb5c19eb1f1da57986771336a3901deca66b16bd5692bf9565dda328081464223}{CBC}} =1
+, \mbox{\hyperlink{classfc_1_1blowfish_adb5c19eb1f1da57986771336a3901decaccd0444db460143da30fe402523b6eae}{CFB}} =2
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1blowfish_a7b3c1907164f8299c99b70717384f9bf}{blowfish}} ()
+\item 
+void \mbox{\hyperlink{classfc_1_1blowfish_a867a7f6185f1ed29a60136496aaea8ef}{start}} (unsigned char \texorpdfstring{$\ast$}{*}uc\+Key, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} n, const \mbox{\hyperlink{structfc_1_1sblock}{sblock}} \&ro\+Chain=\mbox{\hyperlink{structfc_1_1sblock}{sblock}}(0\+UL, 0\+UL))
+\item 
+void \mbox{\hyperlink{classfc_1_1blowfish_aeafb623506fb88c0efa401430613847e}{reset\+\_\+chain}} ()
+\item 
+void \mbox{\hyperlink{classfc_1_1blowfish_adb0d3d2c0327ce0ebfde779d33640448}{encrypt}} (unsigned char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} n, int i\+Mode=\mbox{\hyperlink{classfc_1_1blowfish_adb5c19eb1f1da57986771336a3901decaccd0444db460143da30fe402523b6eae}{CFB}})
+\item 
+void \mbox{\hyperlink{classfc_1_1blowfish_a8217a4d3497c7318bec0ea220a040f27}{decrypt}} (unsigned char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} n, int i\+Mode=\mbox{\hyperlink{classfc_1_1blowfish_adb5c19eb1f1da57986771336a3901decaccd0444db460143da30fe402523b6eae}{CFB}})
+\item 
+void \mbox{\hyperlink{classfc_1_1blowfish_aea929b3e9ff2884802075d71fe8ba9a7}{encrypt}} (const unsigned char \texorpdfstring{$\ast$}{*}in, unsigned char \texorpdfstring{$\ast$}{*}out, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} n, int i\+Mode=\mbox{\hyperlink{classfc_1_1blowfish_adb5c19eb1f1da57986771336a3901decaccd0444db460143da30fe402523b6eae}{CFB}})
+\item 
+void \mbox{\hyperlink{classfc_1_1blowfish_ad5bed2becdbef8c8bf3be018a9fe95f1}{decrypt}} (const unsigned char \texorpdfstring{$\ast$}{*}in, unsigned char \texorpdfstring{$\ast$}{*}out, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} n, int i\+Mode=\mbox{\hyperlink{classfc_1_1blowfish_adb5c19eb1f1da57986771336a3901decaccd0444db460143da30fe402523b6eae}{CFB}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{blowfish_8hpp_source_l00139}{139}} of file \mbox{\hyperlink{blowfish_8hpp_source}{blowfish.\+hpp}}.
+
+
+
+\doxysubsection{Member Enumeration Documentation}
+\Hypertarget{classfc_1_1blowfish_adb5c19eb1f1da57986771336a3901dec}\doxysubsubsection{\texorpdfstring{anonymous enum}{anonymous enum}}
+{\footnotesize\ttfamily \label{classfc_1_1blowfish_adb5c19eb1f1da57986771336a3901dec} 
+anonymous enum}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ECB@{ECB}!fc::blowfish@{fc::blowfish}}\index{fc::blowfish@{fc::blowfish}!ECB@{ECB}}}\Hypertarget{classfc_1_1blowfish_adb5c19eb1f1da57986771336a3901deca25f9cb5035bb002b7bed493e9457476e}\label{classfc_1_1blowfish_adb5c19eb1f1da57986771336a3901dec} 
+ECB&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{CBC@{CBC}!fc::blowfish@{fc::blowfish}}\index{fc::blowfish@{fc::blowfish}!CBC@{CBC}}}\Hypertarget{classfc_1_1blowfish_adb5c19eb1f1da57986771336a3901deca66b16bd5692bf9565dda328081464223}\label{classfc_1_1blowfish_adb5c19eb1f1da57986771336a3901dec} 
+CBC&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{CFB@{CFB}!fc::blowfish@{fc::blowfish}}\index{fc::blowfish@{fc::blowfish}!CFB@{CFB}}}\Hypertarget{classfc_1_1blowfish_adb5c19eb1f1da57986771336a3901decaccd0444db460143da30fe402523b6eae}\label{classfc_1_1blowfish_adb5c19eb1f1da57986771336a3901dec} 
+CFB&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{blowfish_8hpp_source_l00142}{142}} of file \mbox{\hyperlink{blowfish_8hpp_source}{blowfish.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00142\ \{\ \mbox{\hyperlink{classfc_1_1blowfish_adb5c19eb1f1da57986771336a3901deca25f9cb5035bb002b7bed493e9457476e}{ECB}}=0,\ \mbox{\hyperlink{classfc_1_1blowfish_adb5c19eb1f1da57986771336a3901deca66b16bd5692bf9565dda328081464223}{CBC}}=1,\ \mbox{\hyperlink{classfc_1_1blowfish_adb5c19eb1f1da57986771336a3901decaccd0444db460143da30fe402523b6eae}{CFB}}=2\ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1blowfish_a7b3c1907164f8299c99b70717384f9bf}\index{fc::blowfish@{fc::blowfish}!blowfish@{blowfish}}
+\index{blowfish@{blowfish}!fc::blowfish@{fc::blowfish}}
+\doxysubsubsection{\texorpdfstring{blowfish()}{blowfish()}}
+{\footnotesize\ttfamily \label{classfc_1_1blowfish_a7b3c1907164f8299c99b70717384f9bf} 
+fc\+::blowfish\+::blowfish (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{blowfish_8cpp_source_l00303}{303}} of file \mbox{\hyperlink{blowfish_8cpp_source}{blowfish.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00304\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1blowfish_ad5bed2becdbef8c8bf3be018a9fe95f1}\index{fc::blowfish@{fc::blowfish}!decrypt@{decrypt}}
+\index{decrypt@{decrypt}!fc::blowfish@{fc::blowfish}}
+\doxysubsubsection{\texorpdfstring{decrypt()}{decrypt()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1blowfish_ad5bed2becdbef8c8bf3be018a9fe95f1} 
+void fc\+::blowfish\+::decrypt (\begin{DoxyParamCaption}\item[{const unsigned char \texorpdfstring{$\ast$}{*}}]{in}{, }\item[{unsigned char \texorpdfstring{$\ast$}{*}}]{out}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{n}{, }\item[{int}]{i\+Mode}{ = {\ttfamily \mbox{\hyperlink{classfc_1_1blowfish_adb5c19eb1f1da57986771336a3901decaccd0444db460143da30fe402523b6eae}{CFB}}}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{blowfish_8cpp_source_l00581}{581}} of file \mbox{\hyperlink{blowfish_8cpp_source}{blowfish.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00582\ \{}
+\DoxyCodeLine{00583\ \ \ \ \ \textcolor{comment}{//Check\ the\ buffer's\ length\ -\/\ should\ be\ >\ 0\ and\ multiple\ of\ 8}}
+\DoxyCodeLine{00584\ \ \ \ \ \textcolor{keywordflow}{if}((n==0)||(n\%8!=0))}
+\DoxyCodeLine{00585\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ exception,\ \textcolor{stringliteral}{"{}invalid\ buffer\ length\ \$\{n\},\ not\ multiple\ of\ 8"{}},\ (\textcolor{stringliteral}{"{}n"{}},\ n)\ );\ }
+\DoxyCodeLine{00586\ \ \ \ \ sblock\ work;}
+\DoxyCodeLine{00587\ \ \ \ \ \textcolor{keywordflow}{if}(iMode\ ==\ \mbox{\hyperlink{classfc_1_1blowfish_adb5c19eb1f1da57986771336a3901deca66b16bd5692bf9565dda328081464223}{CBC}})\ \textcolor{comment}{//CBC\ mode,\ using\ the\ Chain}}
+\DoxyCodeLine{00588\ \ \ \ \ \{}
+\DoxyCodeLine{00589\ \ \ \ \ \ \ \ \ sblock\ crypt,\ chain(m\_oChain);}
+\DoxyCodeLine{00590\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(;\ n\ >=\ 8;\ n\ -\/=\ 8,\ in\ +=\ 8)}
+\DoxyCodeLine{00591\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00592\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a64f5f8b870a5ddc652f874ad6e1b1a3b}{BytesToBlock}}(in,\ work);}
+\DoxyCodeLine{00593\ \ \ \ \ \ \ \ \ \ \ \ \ crypt\ =\ work;}
+\DoxyCodeLine{00594\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1blowfish_a8217a4d3497c7318bec0ea220a040f27}{decrypt}}(work);}
+\DoxyCodeLine{00595\ \ \ \ \ \ \ \ \ \ \ \ \ work\ \string^=\ chain;}
+\DoxyCodeLine{00596\ \ \ \ \ \ \ \ \ \ \ \ \ chain\ =\ crypt;}
+\DoxyCodeLine{00597\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a080d6e51af1617431899e75b314a65c5}{BlockToBytes}}(work,\ out+=8);}
+\DoxyCodeLine{00598\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00599\ \ \ \ \ \}}
+\DoxyCodeLine{00600\ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(iMode\ ==\ \mbox{\hyperlink{classfc_1_1blowfish_adb5c19eb1f1da57986771336a3901decaccd0444db460143da30fe402523b6eae}{CFB}})\ \textcolor{comment}{//CFB\ mode,\ using\ the\ Chain,\ not\ using\ decrypt()}}
+\DoxyCodeLine{00601\ \ \ \ \ \{}
+\DoxyCodeLine{00602\ \ \ \ \ \ \ \ \ sblock\ crypt,\ chain(m\_oChain);}
+\DoxyCodeLine{00603\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(;\ n\ >=\ 8;\ n\ -\/=\ 8,\ in\ +=\ 8)}
+\DoxyCodeLine{00604\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00605\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a64f5f8b870a5ddc652f874ad6e1b1a3b}{BytesToBlock}}(in,\ work);}
+\DoxyCodeLine{00606\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1blowfish_adb0d3d2c0327ce0ebfde779d33640448}{encrypt}}(chain);}
+\DoxyCodeLine{00607\ \ \ \ \ \ \ \ \ \ \ \ \ crypt\ =\ work;}
+\DoxyCodeLine{00608\ \ \ \ \ \ \ \ \ \ \ \ \ work\ \string^=\ chain;}
+\DoxyCodeLine{00609\ \ \ \ \ \ \ \ \ \ \ \ \ chain\ =\ crypt;}
+\DoxyCodeLine{00610\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a080d6e51af1617431899e75b314a65c5}{BlockToBytes}}(work,\ out+=8);}
+\DoxyCodeLine{00611\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00612\ \ \ \ \ \}}
+\DoxyCodeLine{00613\ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{comment}{//ECB\ mode,\ not\ using\ the\ Chain}}
+\DoxyCodeLine{00614\ \ \ \ \ \{}
+\DoxyCodeLine{00615\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(;\ n\ >=\ 8;\ n\ -\/=\ 8,\ in\ +=\ 8)}
+\DoxyCodeLine{00616\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00617\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a64f5f8b870a5ddc652f874ad6e1b1a3b}{BytesToBlock}}(in,\ work);}
+\DoxyCodeLine{00618\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1blowfish_a8217a4d3497c7318bec0ea220a040f27}{decrypt}}(work);}
+\DoxyCodeLine{00619\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a080d6e51af1617431899e75b314a65c5}{BlockToBytes}}(work,\ out+=8);}
+\DoxyCodeLine{00620\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00621\ \ \ \ \ \}}
+\DoxyCodeLine{00622\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1blowfish_ad5bed2becdbef8c8bf3be018a9fe95f1_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1blowfish_a8217a4d3497c7318bec0ea220a040f27}\index{fc::blowfish@{fc::blowfish}!decrypt@{decrypt}}
+\index{decrypt@{decrypt}!fc::blowfish@{fc::blowfish}}
+\doxysubsubsection{\texorpdfstring{decrypt()}{decrypt()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1blowfish_a8217a4d3497c7318bec0ea220a040f27} 
+void fc\+::blowfish\+::decrypt (\begin{DoxyParamCaption}\item[{unsigned char \texorpdfstring{$\ast$}{*}}]{buf}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{n}{, }\item[{int}]{i\+Mode}{ = {\ttfamily \mbox{\hyperlink{classfc_1_1blowfish_adb5c19eb1f1da57986771336a3901decaccd0444db460143da30fe402523b6eae}{CFB}}}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{blowfish_8cpp_source_l00493}{493}} of file \mbox{\hyperlink{blowfish_8cpp_source}{blowfish.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00494\ \{}
+\DoxyCodeLine{00495\ \ \ \ \ \textcolor{comment}{//Check\ the\ buffer's\ length\ -\/\ should\ be\ >\ 0\ and\ multiple\ of\ 8}}
+\DoxyCodeLine{00496\ \ \ \ \ \textcolor{keywordflow}{if}((n==0)||(n\%8!=0))}
+\DoxyCodeLine{00497\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ exception,\ \textcolor{stringliteral}{"{}invalid\ buffer\ length\ \$\{n\},\ not\ multiple\ of\ 8"{}},\ (\textcolor{stringliteral}{"{}n"{}},\ n)\ );\ }
+\DoxyCodeLine{00498\ \ \ \ \ sblock\ work;}
+\DoxyCodeLine{00499\ \ \ \ \ \textcolor{keywordflow}{if}(iMode\ ==\ \mbox{\hyperlink{classfc_1_1blowfish_adb5c19eb1f1da57986771336a3901deca66b16bd5692bf9565dda328081464223}{CBC}})\ \textcolor{comment}{//CBC\ mode,\ using\ the\ Chain}}
+\DoxyCodeLine{00500\ \ \ \ \ \{}
+\DoxyCodeLine{00501\ \ \ \ \ \ \ \ \ sblock\ crypt,\ chain(m\_oChain);}
+\DoxyCodeLine{00502\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(;\ n\ >=\ 8;\ n\ -\/=\ 8)}
+\DoxyCodeLine{00503\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00504\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a64f5f8b870a5ddc652f874ad6e1b1a3b}{BytesToBlock}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ work);}
+\DoxyCodeLine{00505\ \ \ \ \ \ \ \ \ \ \ \ \ crypt\ =\ work;}
+\DoxyCodeLine{00506\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1blowfish_a8217a4d3497c7318bec0ea220a040f27}{decrypt}}(work);}
+\DoxyCodeLine{00507\ \ \ \ \ \ \ \ \ \ \ \ \ work\ \string^=\ chain;}
+\DoxyCodeLine{00508\ \ \ \ \ \ \ \ \ \ \ \ \ chain\ =\ crypt;}
+\DoxyCodeLine{00509\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a080d6e51af1617431899e75b314a65c5}{BlockToBytes}}(work,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}+=8);}
+\DoxyCodeLine{00510\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00511\ \ \ \ \ \}}
+\DoxyCodeLine{00512\ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(iMode\ ==\ \mbox{\hyperlink{classfc_1_1blowfish_adb5c19eb1f1da57986771336a3901decaccd0444db460143da30fe402523b6eae}{CFB}})\ \textcolor{comment}{//CFB\ mode,\ using\ the\ Chain,\ not\ using\ decrypt()}}
+\DoxyCodeLine{00513\ \ \ \ \ \{}
+\DoxyCodeLine{00514\ \ \ \ \ \ \ \ \ sblock\ crypt,\ chain(m\_oChain);}
+\DoxyCodeLine{00515\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(;\ n\ >=\ 8;\ n\ -\/=\ 8)}
+\DoxyCodeLine{00516\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00517\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a64f5f8b870a5ddc652f874ad6e1b1a3b}{BytesToBlock}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ work);}
+\DoxyCodeLine{00518\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1blowfish_adb0d3d2c0327ce0ebfde779d33640448}{encrypt}}(chain);}
+\DoxyCodeLine{00519\ \ \ \ \ \ \ \ \ \ \ \ \ crypt\ =\ work;}
+\DoxyCodeLine{00520\ \ \ \ \ \ \ \ \ \ \ \ \ work\ \string^=\ chain;}
+\DoxyCodeLine{00521\ \ \ \ \ \ \ \ \ \ \ \ \ chain\ =\ crypt;}
+\DoxyCodeLine{00522\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a080d6e51af1617431899e75b314a65c5}{BlockToBytes}}(work,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}+=8);}
+\DoxyCodeLine{00523\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00524\ \ \ \ \ \}}
+\DoxyCodeLine{00525\ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{comment}{//ECB\ mode,\ not\ using\ the\ Chain}}
+\DoxyCodeLine{00526\ \ \ \ \ \{}
+\DoxyCodeLine{00527\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(;\ n\ >=\ 8;\ n\ -\/=\ 8)}
+\DoxyCodeLine{00528\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00529\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a64f5f8b870a5ddc652f874ad6e1b1a3b}{BytesToBlock}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ work);}
+\DoxyCodeLine{00530\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1blowfish_a8217a4d3497c7318bec0ea220a040f27}{decrypt}}(work);}
+\DoxyCodeLine{00531\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a080d6e51af1617431899e75b314a65c5}{BlockToBytes}}(work,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}+=8);}
+\DoxyCodeLine{00532\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00533\ \ \ \ \ \}}
+\DoxyCodeLine{00534\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1blowfish_a8217a4d3497c7318bec0ea220a040f27_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=325pt]{classfc_1_1blowfish_a8217a4d3497c7318bec0ea220a040f27_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1blowfish_aea929b3e9ff2884802075d71fe8ba9a7}\index{fc::blowfish@{fc::blowfish}!encrypt@{encrypt}}
+\index{encrypt@{encrypt}!fc::blowfish@{fc::blowfish}}
+\doxysubsubsection{\texorpdfstring{encrypt()}{encrypt()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1blowfish_aea929b3e9ff2884802075d71fe8ba9a7} 
+void fc\+::blowfish\+::encrypt (\begin{DoxyParamCaption}\item[{const unsigned char \texorpdfstring{$\ast$}{*}}]{in}{, }\item[{unsigned char \texorpdfstring{$\ast$}{*}}]{out}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{n}{, }\item[{int}]{i\+Mode}{ = {\ttfamily \mbox{\hyperlink{classfc_1_1blowfish_adb5c19eb1f1da57986771336a3901decaccd0444db460143da30fe402523b6eae}{CFB}}}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{blowfish_8cpp_source_l00538}{538}} of file \mbox{\hyperlink{blowfish_8cpp_source}{blowfish.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00539\ \{}
+\DoxyCodeLine{00540\ \ \ \ \ \textcolor{comment}{//Check\ the\ buffer's\ length\ -\/\ should\ be\ >\ 0\ and\ multiple\ of\ 8}}
+\DoxyCodeLine{00541\ \ \ \ \ \textcolor{keywordflow}{if}((n==0)||(n\%8!=0))}
+\DoxyCodeLine{00542\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ exception,\ \textcolor{stringliteral}{"{}invalid\ buffer\ length\ \$\{n\},\ not\ multiple\ of\ 8"{}},\ (\textcolor{stringliteral}{"{}n"{}},\ n)\ );\ }
+\DoxyCodeLine{00543\ \ \ \ \ sblock\ work;}
+\DoxyCodeLine{00544\ \ \ \ \ \textcolor{keywordflow}{if}(iMode\ ==\ \mbox{\hyperlink{classfc_1_1blowfish_adb5c19eb1f1da57986771336a3901deca66b16bd5692bf9565dda328081464223}{CBC}})\ \textcolor{comment}{//CBC\ mode,\ using\ the\ Chain}}
+\DoxyCodeLine{00545\ \ \ \ \ \{}
+\DoxyCodeLine{00546\ \ \ \ \ \ \ \ \ sblock\ chain(m\_oChain);}
+\DoxyCodeLine{00547\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(;\ n\ >=\ 8;\ n\ -\/=\ 8,\ in\ +=\ 8)}
+\DoxyCodeLine{00548\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00549\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a64f5f8b870a5ddc652f874ad6e1b1a3b}{BytesToBlock}}(in,\ work);}
+\DoxyCodeLine{00550\ \ \ \ \ \ \ \ \ \ \ \ \ work\ \string^=\ chain;}
+\DoxyCodeLine{00551\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1blowfish_adb0d3d2c0327ce0ebfde779d33640448}{encrypt}}(work);}
+\DoxyCodeLine{00552\ \ \ \ \ \ \ \ \ \ \ \ \ chain\ =\ work;}
+\DoxyCodeLine{00553\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a080d6e51af1617431899e75b314a65c5}{BlockToBytes}}(work,\ out+=8);}
+\DoxyCodeLine{00554\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00555\ \ \ \ \ \}}
+\DoxyCodeLine{00556\ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(iMode\ ==\ \mbox{\hyperlink{classfc_1_1blowfish_adb5c19eb1f1da57986771336a3901decaccd0444db460143da30fe402523b6eae}{CFB}})\ \textcolor{comment}{//CFB\ mode,\ using\ the\ Chain}}
+\DoxyCodeLine{00557\ \ \ \ \ \{}
+\DoxyCodeLine{00558\ \ \ \ \ \ \ \ \ sblock\ chain(m\_oChain);}
+\DoxyCodeLine{00559\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(;\ n\ >=\ 8;\ n\ -\/=\ 8,\ in\ +=\ 8)}
+\DoxyCodeLine{00560\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00561\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1blowfish_adb0d3d2c0327ce0ebfde779d33640448}{encrypt}}(chain);}
+\DoxyCodeLine{00562\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a64f5f8b870a5ddc652f874ad6e1b1a3b}{BytesToBlock}}(in,\ work);}
+\DoxyCodeLine{00563\ \ \ \ \ \ \ \ \ \ \ \ \ work\ \string^=\ chain;}
+\DoxyCodeLine{00564\ \ \ \ \ \ \ \ \ \ \ \ \ chain\ =\ work;}
+\DoxyCodeLine{00565\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a080d6e51af1617431899e75b314a65c5}{BlockToBytes}}(work,\ out+=8);}
+\DoxyCodeLine{00566\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00567\ \ \ \ \ \}}
+\DoxyCodeLine{00568\ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{comment}{//ECB\ mode,\ not\ using\ the\ Chain}}
+\DoxyCodeLine{00569\ \ \ \ \ \{}
+\DoxyCodeLine{00570\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(;\ n\ >=\ 8;\ n\ -\/=\ 8,\ in\ +=\ 8)}
+\DoxyCodeLine{00571\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00572\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a64f5f8b870a5ddc652f874ad6e1b1a3b}{BytesToBlock}}(in,\ work);}
+\DoxyCodeLine{00573\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1blowfish_adb0d3d2c0327ce0ebfde779d33640448}{encrypt}}(work);}
+\DoxyCodeLine{00574\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a080d6e51af1617431899e75b314a65c5}{BlockToBytes}}(work,\ out+=8);}
+\DoxyCodeLine{00575\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00576\ \ \ \ \ \}}
+\DoxyCodeLine{00577\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1blowfish_aea929b3e9ff2884802075d71fe8ba9a7_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1blowfish_adb0d3d2c0327ce0ebfde779d33640448}\index{fc::blowfish@{fc::blowfish}!encrypt@{encrypt}}
+\index{encrypt@{encrypt}!fc::blowfish@{fc::blowfish}}
+\doxysubsubsection{\texorpdfstring{encrypt()}{encrypt()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1blowfish_adb0d3d2c0327ce0ebfde779d33640448} 
+void fc\+::blowfish\+::encrypt (\begin{DoxyParamCaption}\item[{unsigned char \texorpdfstring{$\ast$}{*}}]{buf}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{n}{, }\item[{int}]{i\+Mode}{ = {\ttfamily \mbox{\hyperlink{classfc_1_1blowfish_adb5c19eb1f1da57986771336a3901decaccd0444db460143da30fe402523b6eae}{CFB}}}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{blowfish_8cpp_source_l00450}{450}} of file \mbox{\hyperlink{blowfish_8cpp_source}{blowfish.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00451\ \{}
+\DoxyCodeLine{00452\ \ \ \ \ \textcolor{comment}{//Check\ the\ buffer's\ length\ -\/\ should\ be\ >\ 0\ and\ multiple\ of\ 8}}
+\DoxyCodeLine{00453\ \ \ \ \ \textcolor{keywordflow}{if}((n==0)||(n\%8!=0))}
+\DoxyCodeLine{00454\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ exception,\ \textcolor{stringliteral}{"{}invalid\ buffer\ length\ \$\{n\},\ not\ multiple\ of\ 8"{}},\ (\textcolor{stringliteral}{"{}n"{}},\ n)\ );\ }
+\DoxyCodeLine{00455\ \ \ \ \ sblock\ work;}
+\DoxyCodeLine{00456\ \ \ \ \ \textcolor{keywordflow}{if}(iMode\ ==\ \mbox{\hyperlink{classfc_1_1blowfish_adb5c19eb1f1da57986771336a3901deca66b16bd5692bf9565dda328081464223}{CBC}})\ \textcolor{comment}{//CBC\ mode,\ using\ the\ Chain}}
+\DoxyCodeLine{00457\ \ \ \ \ \{}
+\DoxyCodeLine{00458\ \ \ \ \ \ \ \ \ sblock\ chain(m\_oChain);}
+\DoxyCodeLine{00459\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(;\ n\ >=\ 8;\ n\ -\/=\ 8)}
+\DoxyCodeLine{00460\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00461\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a64f5f8b870a5ddc652f874ad6e1b1a3b}{BytesToBlock}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ work);}
+\DoxyCodeLine{00462\ \ \ \ \ \ \ \ \ \ \ \ \ work\ \string^=\ chain;}
+\DoxyCodeLine{00463\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1blowfish_adb0d3d2c0327ce0ebfde779d33640448}{encrypt}}(work);}
+\DoxyCodeLine{00464\ \ \ \ \ \ \ \ \ \ \ \ \ chain\ =\ work;}
+\DoxyCodeLine{00465\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a080d6e51af1617431899e75b314a65c5}{BlockToBytes}}(work,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}+=8);}
+\DoxyCodeLine{00466\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00467\ \ \ \ \ \}}
+\DoxyCodeLine{00468\ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(iMode\ ==\ \mbox{\hyperlink{classfc_1_1blowfish_adb5c19eb1f1da57986771336a3901decaccd0444db460143da30fe402523b6eae}{CFB}})\ \textcolor{comment}{//CFB\ mode,\ using\ the\ Chain}}
+\DoxyCodeLine{00469\ \ \ \ \ \{}
+\DoxyCodeLine{00470\ \ \ \ \ \ \ \ \ sblock\ chain(m\_oChain);}
+\DoxyCodeLine{00471\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(;\ n\ >=\ 8;\ n\ -\/=\ 8)}
+\DoxyCodeLine{00472\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00473\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1blowfish_adb0d3d2c0327ce0ebfde779d33640448}{encrypt}}(chain);}
+\DoxyCodeLine{00474\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a64f5f8b870a5ddc652f874ad6e1b1a3b}{BytesToBlock}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ work);}
+\DoxyCodeLine{00475\ \ \ \ \ \ \ \ \ \ \ \ \ work\ \string^=\ chain;}
+\DoxyCodeLine{00476\ \ \ \ \ \ \ \ \ \ \ \ \ chain\ =\ work;}
+\DoxyCodeLine{00477\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a080d6e51af1617431899e75b314a65c5}{BlockToBytes}}(work,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}+=8);}
+\DoxyCodeLine{00478\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00479\ \ \ \ \ \}}
+\DoxyCodeLine{00480\ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{comment}{//ECB\ mode,\ not\ using\ the\ Chain}}
+\DoxyCodeLine{00481\ \ \ \ \ \{}
+\DoxyCodeLine{00482\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(;\ n\ >=\ 8;\ n\ -\/=\ 8)}
+\DoxyCodeLine{00483\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00484\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a64f5f8b870a5ddc652f874ad6e1b1a3b}{BytesToBlock}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ work);}
+\DoxyCodeLine{00485\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1blowfish_adb0d3d2c0327ce0ebfde779d33640448}{encrypt}}(work);}
+\DoxyCodeLine{00486\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a080d6e51af1617431899e75b314a65c5}{BlockToBytes}}(work,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}+=8);}
+\DoxyCodeLine{00487\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00488\ \ \ \ \ \}}
+\DoxyCodeLine{00489\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1blowfish_adb0d3d2c0327ce0ebfde779d33640448_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1blowfish_adb0d3d2c0327ce0ebfde779d33640448_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1blowfish_aeafb623506fb88c0efa401430613847e}\index{fc::blowfish@{fc::blowfish}!reset\_chain@{reset\_chain}}
+\index{reset\_chain@{reset\_chain}!fc::blowfish@{fc::blowfish}}
+\doxysubsubsection{\texorpdfstring{reset\_chain()}{reset\_chain()}}
+{\footnotesize\ttfamily \label{classfc_1_1blowfish_aeafb623506fb88c0efa401430613847e} 
+void fc\+::blowfish\+::reset\+\_\+chain (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{blowfish_8hpp_source_l00149}{149}} of file \mbox{\hyperlink{blowfish_8hpp_source}{blowfish.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00149\ \{\ m\_oChain\ =\ m\_oChain0;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1blowfish_a867a7f6185f1ed29a60136496aaea8ef}\index{fc::blowfish@{fc::blowfish}!start@{start}}
+\index{start@{start}!fc::blowfish@{fc::blowfish}}
+\doxysubsubsection{\texorpdfstring{start()}{start()}}
+{\footnotesize\ttfamily \label{classfc_1_1blowfish_a867a7f6185f1ed29a60136496aaea8ef} 
+void fc\+::blowfish\+::start (\begin{DoxyParamCaption}\item[{unsigned char \texorpdfstring{$\ast$}{*}}]{uc\+Key}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{n}{, }\item[{const \mbox{\hyperlink{structfc_1_1sblock}{sblock}} \&}]{ro\+Chain}{ = {\ttfamily \mbox{\hyperlink{structfc_1_1sblock}{sblock}}(0UL,0UL)}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{blowfish_8cpp_source_l00306}{306}} of file \mbox{\hyperlink{blowfish_8cpp_source}{blowfish.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00307\ \{}
+\DoxyCodeLine{00308\ \ \ \ \ m\_oChain0\ =\ roChain;}
+\DoxyCodeLine{00309\ \ \ \ \ m\_oChain\ \ =\ roChain;}
+\DoxyCodeLine{00310\ }
+\DoxyCodeLine{00311\ \ \ \ \ \textcolor{keywordflow}{if}(keysize<1)}
+\DoxyCodeLine{00312\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ exception,\ \textcolor{stringliteral}{"{}invalid\ key\ length"{}}\ );}
+\DoxyCodeLine{00313\ \ \ \ \ \textcolor{comment}{//Check\ the\ Key\ -\/\ the\ key\ length\ should\ be\ between\ 1\ and\ 56\ bytes}}
+\DoxyCodeLine{00314\ \ \ \ \ \textcolor{keywordflow}{if}(keysize>56)}
+\DoxyCodeLine{00315\ \ \ \ \ \ \ \ \ keysize\ =\ 56;}
+\DoxyCodeLine{00316\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ aucLocalKey[56];}
+\DoxyCodeLine{00317\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ i,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}};}
+\DoxyCodeLine{00318\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(aucLocalKey,\ ucKey,\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(keysize));}
+\DoxyCodeLine{00319\ \ \ \ \ \textcolor{comment}{//Reflexive\ Initialization\ of\ the\ Blowfish.}}
+\DoxyCodeLine{00320\ \ \ \ \ \textcolor{comment}{//Generating\ the\ Subkeys\ from\ the\ Key\ flood\ P\ and\ S\ boxes\ with\ PI}}
+\DoxyCodeLine{00321\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(m\_auiP,\ scm\_auiInitP,\ \textcolor{keyword}{sizeof}\ m\_auiP);}
+\DoxyCodeLine{00322\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(m\_auiS,\ scm\_auiInitS,\ \textcolor{keyword}{sizeof}\ m\_auiS);}
+\DoxyCodeLine{00323\ \ \ \ \ \textcolor{comment}{//Load\ P\ boxes\ with\ key\ bytes}}
+\DoxyCodeLine{00324\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ aucLocalKey;}
+\DoxyCodeLine{00325\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ x=0;}
+\DoxyCodeLine{00326\ \ \ \ \ \textcolor{comment}{//Repeatedly\ cycle\ through\ the\ key\ bits\ until\ the\ entire\ P\ array\ has\ been\ XORed\ with\ key\ bits}}
+\DoxyCodeLine{00327\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ iCount\ =\ 0;}
+\DoxyCodeLine{00328\ \ \ \ \ \textcolor{keywordflow}{for}(i=0;\ i<18;\ i++)}
+\DoxyCodeLine{00329\ \ \ \ \ \{}
+\DoxyCodeLine{00330\ \ \ \ \ \ \ \ \ x=0;}
+\DoxyCodeLine{00331\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int}\ n=4;\ n-\/-\/;\ )}
+\DoxyCodeLine{00332\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00333\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//int\ iVal\ =\ (int)(*p);}}
+\DoxyCodeLine{00334\ \ \ \ \ \ \ \ \ \ \ \ \ x\ <<=\ 8;}
+\DoxyCodeLine{00335\ \ \ \ \ \ \ \ \ \ \ \ \ x\ |=\ *(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}++);}
+\DoxyCodeLine{00336\ \ \ \ \ \ \ \ \ \ \ \ \ iCount++;}
+\DoxyCodeLine{00337\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(iCount\ ==\ keysize)}
+\DoxyCodeLine{00338\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00339\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//All\ bytes\ used,\ so\ recycle\ bytes\ }}
+\DoxyCodeLine{00340\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ iCount\ =\ 0;}
+\DoxyCodeLine{00341\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ aucLocalKey;}
+\DoxyCodeLine{00342\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00343\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00344\ \ \ \ \ \ \ \ \ m\_auiP[i]\ \string^=\ x;}
+\DoxyCodeLine{00345\ \ \ \ \ \}}
+\DoxyCodeLine{00346\ \ \ \ \ \textcolor{comment}{//Reflect\ P\ and\ S\ boxes\ through\ the\ evolving\ Blowfish}}
+\DoxyCodeLine{00347\ \ \ \ \ sblock\ block(0UL,0UL);\ \textcolor{comment}{//all-\/zero\ block}}
+\DoxyCodeLine{00348\ \ \ \ \ \textcolor{keywordflow}{for}(i=0;\ i<18;\ )}
+\DoxyCodeLine{00349\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1blowfish_adb0d3d2c0327ce0ebfde779d33640448}{encrypt}}(block),\ m\_auiP[i++]\ =\ block.m\_uil,\ m\_auiP[i++]\ =\ block.m\_uir;}
+\DoxyCodeLine{00350\ \ \ \ \ \textcolor{keywordflow}{for}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}=0;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}<4;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}++)}
+\DoxyCodeLine{00351\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int}\ k=0;\ k<256;\ )}
+\DoxyCodeLine{00352\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1blowfish_adb0d3d2c0327ce0ebfde779d33640448}{encrypt}}(block),\ m\_auiS[\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}][k++]\ =\ block.m\_uil,\ m\_auiS[\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}][k++]\ =\ block.m\_uir;}
+\DoxyCodeLine{00353\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1blowfish_a867a7f6185f1ed29a60136496aaea8ef_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1blowfish_a867a7f6185f1ed29a60136496aaea8ef_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/\mbox{\hyperlink{blowfish_8hpp}{blowfish.\+hpp}}\item 
+libraries/fc/src/crypto/\mbox{\hyperlink{blowfish_8cpp}{blowfish.\+cpp}}\end{DoxyCompactItemize}

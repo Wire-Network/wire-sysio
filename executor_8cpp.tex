@@ -1,0 +1,109 @@
+\doxysection{libraries/chain/webassembly/runtimes/sys-\/vm-\/oc/executor.cpp File Reference}
+\hypertarget{executor_8cpp}{}\label{executor_8cpp}\index{libraries/chain/webassembly/runtimes/sys-\/vm-\/oc/executor.cpp@{libraries/chain/webassembly/runtimes/sys-\/vm-\/oc/executor.cpp}}
+{\ttfamily \#include $<$sysio/chain/webassembly/sys-\/vm-\/oc/executor.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/webassembly/sys-\/vm-\/oc/code\+\_\+cache.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/webassembly/sys-\/vm-\/oc/memory.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/webassembly/sys-\/vm-\/oc/intrinsic\+\_\+mapping.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/webassembly/sys-\/vm-\/oc/intrinsic.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/webassembly/sys-\/vm-\/oc/sys-\/vm-\/oc.\+h$>$}\newline
+{\ttfamily \#include $<$sysio/chain/wasm\+\_\+sysio\+\_\+constraints.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/apply\+\_\+context.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/transaction\+\_\+context.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/exceptions.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/types.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/global\+\_\+property\+\_\+object.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/scoped\+\_\+exit.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/hana/equal.\+hpp$>$}\newline
+{\ttfamily \#include $<$asm/prctl.\+h$>$}\newline
+{\ttfamily \#include $<$sys/prctl.\+h$>$}\newline
+{\ttfamily \#include $<$sys/syscall.\+h$>$}\newline
+{\ttfamily \#include $<$sys/mman.\+h$>$}\newline
+Include dependency graph for executor.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{executor_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1executor__signal__init}{sysio\+::chain\+::eosvmoc\+::executor\+\_\+signal\+\_\+init}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain}{sysio\+::chain}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc}{sysio\+::chain\+::eosvmoc}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{executor_8cpp_adca8cbb655092ee4c640cfa209667f3f}{DEFINE\+\_\+\+SYSVMOC\+\_\+\+TRAP\+\_\+\+INTRINSIC}}(module,  \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{executor_8cpp_ac1ca206f7fd4a694348df869fd793c9c}{arch\+\_\+prctl}} (int code, unsigned long \texorpdfstring{$\ast$}{*}addr)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a0a1f3c1b82134ed94ba01229ebdf1178}{sysio\+::chain\+::eosvmoc\+::\+DEFINE\+\_\+\+SYSVMOC\+\_\+\+TRAP\+\_\+\+INTRINSIC}} (eosvmoc\+\_\+internal, depth\+\_\+assert)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a88dbcfca63335363ca96b0b89d56b9f8}{sysio\+::chain\+::eosvmoc\+::\+DEFINE\+\_\+\+SYSVMOC\+\_\+\+TRAP\+\_\+\+INTRINSIC}} (eosvmoc\+\_\+internal, div0\+\_\+or\+\_\+overflow)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_ab0288f033f97917697ce6d552e5c16ce}{sysio\+::chain\+::eosvmoc\+::\+DEFINE\+\_\+\+SYSVMOC\+\_\+\+TRAP\+\_\+\+INTRINSIC}} (eosvmoc\+\_\+internal, indirect\+\_\+call\+\_\+mismatch)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_aae282311819cfc31daeea799b1c4f4fd}{sysio\+::chain\+::eosvmoc\+::\+DEFINE\+\_\+\+SYSVMOC\+\_\+\+TRAP\+\_\+\+INTRINSIC}} (eosvmoc\+\_\+internal, indirect\+\_\+call\+\_\+oob)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_ad3bdd157cf4b56315ac302d73cb9abed}{sysio\+::chain\+::eosvmoc\+::\+DEFINE\+\_\+\+SYSVMOC\+\_\+\+TRAP\+\_\+\+INTRINSIC}} (eosvmoc\+\_\+internal, unreachable)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{executor_8cpp_adca8cbb655092ee4c640cfa209667f3f}\index{executor.cpp@{executor.cpp}!DEFINE\_SYSVMOC\_TRAP\_INTRINSIC@{DEFINE\_SYSVMOC\_TRAP\_INTRINSIC}}
+\index{DEFINE\_SYSVMOC\_TRAP\_INTRINSIC@{DEFINE\_SYSVMOC\_TRAP\_INTRINSIC}!executor.cpp@{executor.cpp}}
+\doxysubsubsection{\texorpdfstring{DEFINE\_SYSVMOC\_TRAP\_INTRINSIC}{DEFINE\_SYSVMOC\_TRAP\_INTRINSIC}}
+{\footnotesize\ttfamily \label{executor_8cpp_adca8cbb655092ee4c640cfa209667f3f} 
+\#define DEFINE\+\_\+\+SYSVMOC\+\_\+\+TRAP\+\_\+\+INTRINSIC(\begin{DoxyParamCaption}\item[{}]{module}{, }\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}();\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{static}\ intrinsic\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\#\#Function\ \mbox{\hyperlink{sys-vm-oc_2sys-vm-oc_8hpp_adf95390531a85e18a528b50f2617554b}{SYSVMOC\_INTRINSIC\_INIT\_PRIORITY}}(\#module\ \textcolor{stringliteral}{"{}."{}}\ \#\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\mbox{\hyperlink{struct_i_r_1_1_function_type_a97cbdf384d97c3a5203a1310c9af0822}{IR::FunctionType::get}}(),(\textcolor{keywordtype}{void}*)\&\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ std::integral\_constant<std::size\_t,\ find\_intrinsic\_index(\#module\ \textcolor{stringliteral}{"{}."{}}\ \#\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})>\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{::value}}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}()}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{executor_8cpp_source_l00095}{95}} of file \mbox{\hyperlink{executor_8cpp_source}{executor.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00095\ \textcolor{preprocessor}{\#define\ DEFINE\_SYSVMOC\_TRAP\_INTRINSIC(module,name)\ \(\backslash\)}}
+\DoxyCodeLine{00096\ \textcolor{preprocessor}{\ \ \ \ void\ name();\ \(\backslash\)}}
+\DoxyCodeLine{00097\ \textcolor{preprocessor}{\ \ \ \ static\ intrinsic\ name\#\#Function\ SYSVMOC\_INTRINSIC\_INIT\_PRIORITY(\#module\ "{}."{}\ \#name,IR::FunctionType::get(),(void*)\&name,\ \(\backslash\)}}
+\DoxyCodeLine{00098\ \textcolor{preprocessor}{\ \ \ \ \ std::integral\_constant<std::size\_t,\ find\_intrinsic\_index(\#module\ "{}."{}\ \#name)>::value\ \(\backslash\)}}
+\DoxyCodeLine{00099\ \textcolor{preprocessor}{\ \ \ );\ \(\backslash\)}}
+\DoxyCodeLine{00100\ \textcolor{preprocessor}{\ \ \ \ void\ name()}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{executor_8cpp_ac1ca206f7fd4a694348df869fd793c9c}\index{executor.cpp@{executor.cpp}!arch\_prctl@{arch\_prctl}}
+\index{arch\_prctl@{arch\_prctl}!executor.cpp@{executor.cpp}}
+\doxysubsubsection{\texorpdfstring{arch\_prctl()}{arch\_prctl()}}
+{\footnotesize\ttfamily \label{executor_8cpp_ac1ca206f7fd4a694348df869fd793c9c} 
+int arch\+\_\+prctl (\begin{DoxyParamCaption}\item[{int}]{code}{, }\item[{unsigned long \texorpdfstring{$\ast$}{*}}]{addr}{}\end{DoxyParamCaption})}
+
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{executor_8cpp_ac1ca206f7fd4a694348df869fd793c9c_icgraph}
+\end{center}
+\end{figure}

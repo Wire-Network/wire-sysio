@@ -1,0 +1,43 @@
+\doxysection{libraries/softfloat/source/ext\+F80\+\_\+is\+Signaling\+NaN.c File Reference}
+\hypertarget{softfloat_2source_2ext_f80__is_signaling_na_n_8c}{}\label{softfloat_2source_2ext_f80__is_signaling_na_n_8c}\index{libraries/softfloat/source/extF80\_isSignalingNaN.c@{libraries/softfloat/source/extF80\_isSignalingNaN.c}}
+{\ttfamily \#include $<$stdbool.\+h$>$}\newline
+{\ttfamily \#include "{}platform.\+h"{}}\newline
+{\ttfamily \#include "{}internals.\+h"{}}\newline
+{\ttfamily \#include "{}specialize.\+h"{}}\newline
+{\ttfamily \#include "{}softfloat.\+h"{}}\newline
+Include dependency graph for ext\+F80\+\_\+is\+Signaling\+Na\+N.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{softfloat_2source_2ext_f80__is_signaling_na_n_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{softfloat_2source_2ext_f80__is_signaling_na_n_8c_a086f0977d0aba0a4bb5be2297f3358d0}{ext\+F80\+\_\+is\+Signaling\+NaN}} (\mbox{\hyperlink{softfloat_2source_2include_2softfloat__types_8h_ae6c67a307cbc8664adc4f1966a3e71f6}{ext\+Float80\+\_\+t}} \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{softfloat_2source_2ext_f80__is_signaling_na_n_8c_a086f0977d0aba0a4bb5be2297f3358d0}\index{extF80\_isSignalingNaN.c@{extF80\_isSignalingNaN.c}!extF80\_isSignalingNaN@{extF80\_isSignalingNaN}}
+\index{extF80\_isSignalingNaN@{extF80\_isSignalingNaN}!extF80\_isSignalingNaN.c@{extF80\_isSignalingNaN.c}}
+\doxysubsubsection{\texorpdfstring{extF80\_isSignalingNaN()}{extF80\_isSignalingNaN()}}
+{\footnotesize\ttfamily \label{softfloat_2source_2ext_f80__is_signaling_na_n_8c_a086f0977d0aba0a4bb5be2297f3358d0} 
+bool ext\+F80\+\_\+is\+Signaling\+NaN (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{softfloat_2source_2include_2softfloat__types_8h_ae6c67a307cbc8664adc4f1966a3e71f6}{ext\+Float80\+\_\+t}}}]{a}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{softfloat_2source_2ext_f80__is_signaling_na_n_8c_source_l00043}{43}} of file \mbox{\hyperlink{softfloat_2source_2ext_f80__is_signaling_na_n_8c_source}{ext\+F80\+\_\+is\+Signaling\+Na\+N.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00044\ \{}
+\DoxyCodeLine{00045\ \ \ \ \ \textcolor{keyword}{union\ }\{\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structext_float80_m}{extFloat80M}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};\ \mbox{\hyperlink{structext_float80_m}{extFloat80\_t}}\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}};\ \}\ uA;}
+\DoxyCodeLine{00046\ }
+\DoxyCodeLine{00047\ \ \ \ \ uA.f\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}};}
+\DoxyCodeLine{00048\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2specialize_8h_a472371a22c79d4419e301c26ebd347e3}{softfloat\_isSigNaNExtF80UI}}(\ uA.s.signExp,\ uA.s.signif\ );}
+\DoxyCodeLine{00049\ }
+\DoxyCodeLine{00050\ \}}
+
+\end{DoxyCode}

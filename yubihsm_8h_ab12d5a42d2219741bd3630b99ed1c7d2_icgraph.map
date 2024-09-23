@@ -1,0 +1,31 @@
+<map id="yh_disconnect" name="yh_disconnect">
+<area shape="rect" id="Node000001" title=" " alt="" coords="641,307,747,333"/>
+<area shape="rect" id="Node000002" href="$yubihsm__pkcs11_8c.html#a553b528011491713b85dc590221ea616" title=" " alt="" coords="415,192,589,218"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="670,297,635,264,592,233,564,221,566,216,595,228,639,260,673,294"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl.html#a5920ace754a2d851bdb11322372b849c" title=" " alt="" coords="411,242,593,283"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="633,305,572,286,574,281,635,300"/>
+<area shape="rect" id="Node000009" href="$attest_8c.html#a840291bc02cba5474a4cb46a9b9566fe" title=" " alt="" coords="478,307,527,333"/>
+<area shape="poly" id="edge10_Node000001_Node000009" title=" " alt="" coords="626,322,527,322,527,317,626,317"/>
+<area shape="rect" id="Node000010" href="$commands_8c.html#a9155cc4306ad97e58a03ead18637f33b" title=" " alt="" coords="442,406,562,431"/>
+<area shape="poly" id="edge11_Node000001_Node000010" title=" " alt="" coords="669,345,635,372,595,397,564,409,562,404,592,392,632,368,666,341"/>
+<area shape="rect" id="Node000013" href="$commands_8c.html#ac388fd67865728ed4f4267a8a13b248e" title=" " alt="" coords="434,356,571,382"/>
+<area shape="poly" id="edge15_Node000001_Node000013" title=" " alt="" coords="627,340,556,358,554,353,626,334"/>
+<area shape="rect" id="Node000004" href="$structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl.html#a6266bcd9001ddbb02101bea6088f299b" title=" " alt="" coords="208,5,358,61"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="411,234,409,232,394,212,386,192,383,153,381,114,374,95,361,75,349,63,352,59,365,71,379,93,386,113,388,153,391,191,399,210,413,229,414,230"/>
+<area shape="rect" id="Node000005" href="$structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl.html#a6412f92a0ad381f2370582372a5b6082" title=" " alt="" coords="204,109,363,165"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="417,237,410,233,394,221,384,210,361,186,335,168,338,163,365,182,388,206,398,217,412,228,420,233"/>
+<area shape="rect" id="Node000006" href="$structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl.html#a00ee0ac7ac4a819d0b8755bf4f442263" title=" " alt="" coords="5,143,156,198"/>
+<area shape="poly" id="edge8_Node000003_Node000006" title=" " alt="" coords="405,241,362,230,155,187,157,182,364,225,406,235"/>
+<area shape="rect" id="Node000007" href="$structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl.html#a8987016445813c0391f04894e9bdb002" title=" " alt="" coords="208,240,358,296"/>
+<area shape="poly" id="edge7_Node000003_Node000007" title=" " alt="" coords="396,268,359,269,359,263,395,262"/>
+<area shape="rect" id="Node000008" href="$structsysio_1_1wallet_1_1detail_1_1yubihsm__wallet__impl.html#af535b22a76cac37f33ef43715865648c" title=" " alt="" coords="204,320,362,376"/>
+<area shape="poly" id="edge9_Node000003_Node000008" title=" " alt="" coords="428,291,412,297,351,322,349,317,410,292,426,286"/>
+<area shape="poly" id="edge5_Node000005_Node000005" title=" " alt="" coords="315,97,303,90,283,88,266,90,254,95,249,101,249,109,243,109,244,99,251,90,264,85,283,83,305,85,318,92"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="189,155,157,161,156,155,188,150"/>
+<area shape="rect" id="Node000011" href="$src_2main_8c.html#a34a9e8c400dcf19e771e884636316060" title=" " alt="" coords="211,400,356,426"/>
+<area shape="poly" id="edge12_Node000010_Node000011" title=" " alt="" coords="426,419,356,418,356,412,427,414"/>
+<area shape="rect" id="Node000012" href="$src_2main_8c.html#a0ddf1224851353fc92bfbff6f499fa97" title=" " alt="" coords="56,426,105,451"/>
+<area shape="poly" id="edge14_Node000010_Node000012" title=" " alt="" coords="427,434,363,441,217,445,106,442,106,437,217,440,363,436,426,429"/>
+<area shape="poly" id="edge13_Node000011_Node000012" title=" " alt="" coords="196,427,106,438,105,433,195,421"/>
+<area shape="poly" id="edge16_Node000013_Node000011" title=" " alt="" coords="421,388,351,402,350,397,420,383"/>
+</map>

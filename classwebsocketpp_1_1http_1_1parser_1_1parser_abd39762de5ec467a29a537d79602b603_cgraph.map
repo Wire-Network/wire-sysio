@@ -1,0 +1,7 @@
+<map id="websocketpp::http::parser::parser::append_header" name="websocketpp::http::parser::parser::append_header">
+<area shape="rect" id="Node000001" title="Append a value to an existing HTTP header." alt="" coords="5,41,157,97"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1http_1_1parser_1_1parser.html#ae8a8f833c3fb01f1553a26e77f380367" title="Get the value of an HTTP header." alt="" coords="205,5,341,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="157,52,189,46,190,51,158,58"/>
+<area shape="rect" id="Node000003" href="$namespacewebsocketpp_1_1http.html#a45a9b60b72b68de7b32fb75d89ad4c04" title="Is the character a non&#45;token." alt="" coords="205,85,341,126"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="158,81,190,87,189,92,157,86"/>
+</map>

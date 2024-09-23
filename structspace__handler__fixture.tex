@@ -1,0 +1,390 @@
+\doxysection{space\+\_\+handler\+\_\+fixture Struct Reference}
+\hypertarget{structspace__handler__fixture}{}\label{structspace__handler__fixture}\index{space\_handler\_fixture@{space\_handler\_fixture}}
+
+
+Collaboration diagram for space\+\_\+handler\+\_\+fixture\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=208pt]{structspace__handler__fixture__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structspace__handler__fixture_1_1mock__space__provider}{mock\+\_\+space\+\_\+provider}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{structspace__handler__fixture_ac2e81ae9d83e0fc08dfdede83873dcae}{file\+\_\+space\+\_\+handler\+\_\+t}} = \mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler}{file\+\_\+space\+\_\+handler}}$<$\mbox{\hyperlink{structspace__handler__fixture_1_1mock__space__provider}{mock\+\_\+space\+\_\+provider}}$>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structspace__handler__fixture_a9cf4275b442b55ac01fb8cb7c3cdeb11}{space\+\_\+handler\+\_\+fixture}} ()
+\item 
+void \mbox{\hyperlink{structspace__handler__fixture_a6ca65640a8148ac9e60879dd2dc356e6}{add\+\_\+file\+\_\+system}} (const bfs\+::path \&path\+\_\+name)
+\item 
+void \mbox{\hyperlink{structspace__handler__fixture_a261e57182e180fe87777a52c6d657e0d}{set\+\_\+threshold}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} threshold, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} warning\+\_\+threshold)
+\item 
+void \mbox{\hyperlink{structspace__handler__fixture_a307c90555c5d6ece20697d3a3347e4e9}{set\+\_\+sleep\+\_\+time}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sleep\+\_\+time)
+\item 
+void \mbox{\hyperlink{structspace__handler__fixture_a4be39f2c915543cb5eba815e01201bbf}{set\+\_\+shutdown\+\_\+on\+\_\+exceeded}} (bool shutdown\+\_\+on\+\_\+exceeded)
+\item 
+bool \mbox{\hyperlink{structspace__handler__fixture_ae8dd009166a506ec3386360a5c8e2897}{is\+\_\+threshold\+\_\+exceeded}} ()
+\item 
+void \mbox{\hyperlink{structspace__handler__fixture_acdb08c8ee2a829f47b5b992ab73f5364}{space\+\_\+monitor\+\_\+loop}} ()
+\item 
+bool \mbox{\hyperlink{structspace__handler__fixture_a2f88ee3184e87f67f178e4c4074be6f3}{test\+\_\+loop\+\_\+common}} (int num\+\_\+loops, int interval)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+boost\+::asio\+::io\+\_\+context \mbox{\hyperlink{structspace__handler__fixture_a5395bcf563cb89b24de3e9da782d8505}{ctx}}
+\item 
+std\+::function$<$ bfs\+::space\+\_\+info(const bfs\+::path \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}, boost\+::system\+::error\+\_\+code \&ec)$>$ \mbox{\hyperlink{structspace__handler__fixture_a0247eddaeaccec1c4769d917cefcee1d}{mock\+\_\+get\+\_\+space}}
+\item 
+std\+::function$<$ int(const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{classfc_1_1path}{path}}, struct stat \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}})$>$ \mbox{\hyperlink{structspace__handler__fixture_aaed95bf56a9e058f61563a91ffc63110}{mock\+\_\+get\+\_\+stat}}
+\item 
+\mbox{\hyperlink{structspace__handler__fixture_ac2e81ae9d83e0fc08dfdede83873dcae}{file\+\_\+space\+\_\+handler\+\_\+t}} \mbox{\hyperlink{structspace__handler__fixture_ada3f693c49157e4cffa9ec4faaf60d69}{space\+\_\+handler}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{test__monitor__loop_8cpp_source_l00012}{12}} of file \mbox{\hyperlink{test__monitor__loop_8cpp_source}{test\+\_\+monitor\+\_\+loop.\+cpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{structspace__handler__fixture_ac2e81ae9d83e0fc08dfdede83873dcae}\index{space\_handler\_fixture@{space\_handler\_fixture}!file\_space\_handler\_t@{file\_space\_handler\_t}}
+\index{file\_space\_handler\_t@{file\_space\_handler\_t}!space\_handler\_fixture@{space\_handler\_fixture}}
+\doxysubsubsection{\texorpdfstring{file\_space\_handler\_t}{file\_space\_handler\_t}}
+{\footnotesize\ttfamily \label{structspace__handler__fixture_ac2e81ae9d83e0fc08dfdede83873dcae} 
+using \mbox{\hyperlink{structspace__handler__fixture_ac2e81ae9d83e0fc08dfdede83873dcae}{space\+\_\+handler\+\_\+fixture\+::file\+\_\+space\+\_\+handler\+\_\+t}} = \mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler}{file\+\_\+space\+\_\+handler}}$<$\mbox{\hyperlink{structspace__handler__fixture_1_1mock__space__provider}{mock\+\_\+space\+\_\+provider}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{test__monitor__loop_8cpp_source_l00031}{31}} of file \mbox{\hyperlink{test__monitor__loop_8cpp_source}{test\+\_\+monitor\+\_\+loop.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structspace__handler__fixture_a9cf4275b442b55ac01fb8cb7c3cdeb11}\index{space\_handler\_fixture@{space\_handler\_fixture}!space\_handler\_fixture@{space\_handler\_fixture}}
+\index{space\_handler\_fixture@{space\_handler\_fixture}!space\_handler\_fixture@{space\_handler\_fixture}}
+\doxysubsubsection{\texorpdfstring{space\_handler\_fixture()}{space\_handler\_fixture()}}
+{\footnotesize\ttfamily \label{structspace__handler__fixture_a9cf4275b442b55ac01fb8cb7c3cdeb11} 
+space\+\_\+handler\+\_\+fixture\+::space\+\_\+handler\+\_\+fixture (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{test__monitor__loop_8cpp_source_l00032}{32}} of file \mbox{\hyperlink{test__monitor__loop_8cpp_source}{test\+\_\+monitor\+\_\+loop.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00033\ \ \ \ :\ \mbox{\hyperlink{structspace__handler__fixture_ada3f693c49157e4cffa9ec4faaf60d69}{space\_handler}}(mock\_space\_provider(\ *\textcolor{keyword}{this}\ ),\ \mbox{\hyperlink{structspace__handler__fixture_a5395bcf563cb89b24de3e9da782d8505}{ctx}})}
+\DoxyCodeLine{00034\ \ \ \ \{}
+\DoxyCodeLine{00035\ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structspace__handler__fixture_a6ca65640a8148ac9e60879dd2dc356e6}\index{space\_handler\_fixture@{space\_handler\_fixture}!add\_file\_system@{add\_file\_system}}
+\index{add\_file\_system@{add\_file\_system}!space\_handler\_fixture@{space\_handler\_fixture}}
+\doxysubsubsection{\texorpdfstring{add\_file\_system()}{add\_file\_system()}}
+{\footnotesize\ttfamily \label{structspace__handler__fixture_a6ca65640a8148ac9e60879dd2dc356e6} 
+void space\+\_\+handler\+\_\+fixture\+::add\+\_\+file\+\_\+system (\begin{DoxyParamCaption}\item[{const bfs\+::path \&}]{path\+\_\+name}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{test__monitor__loop_8cpp_source_l00037}{37}} of file \mbox{\hyperlink{test__monitor__loop_8cpp_source}{test\+\_\+monitor\+\_\+loop.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \mbox{\hyperlink{structspace__handler__fixture_ada3f693c49157e4cffa9ec4faaf60d69}{space\_handler}}.\mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler_a6a5e01f3f35cab4c846640e060b91b63}{add\_file\_system}}(\ path\_name\ );}
+\DoxyCodeLine{00039\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=348pt]{structspace__handler__fixture_a6ca65640a8148ac9e60879dd2dc356e6_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=339pt]{structspace__handler__fixture_a6ca65640a8148ac9e60879dd2dc356e6_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structspace__handler__fixture_ae8dd009166a506ec3386360a5c8e2897}\index{space\_handler\_fixture@{space\_handler\_fixture}!is\_threshold\_exceeded@{is\_threshold\_exceeded}}
+\index{is\_threshold\_exceeded@{is\_threshold\_exceeded}!space\_handler\_fixture@{space\_handler\_fixture}}
+\doxysubsubsection{\texorpdfstring{is\_threshold\_exceeded()}{is\_threshold\_exceeded()}}
+{\footnotesize\ttfamily \label{structspace__handler__fixture_ae8dd009166a506ec3386360a5c8e2897} 
+bool space\+\_\+handler\+\_\+fixture\+::is\+\_\+threshold\+\_\+exceeded (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{test__monitor__loop_8cpp_source_l00053}{53}} of file \mbox{\hyperlink{test__monitor__loop_8cpp_source}{test\+\_\+monitor\+\_\+loop.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structspace__handler__fixture_ada3f693c49157e4cffa9ec4faaf60d69}{space\_handler}}.\mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler_a3571fc8484a45f62857dcbe29d73aa28}{is\_threshold\_exceeded}}();}
+\DoxyCodeLine{00055\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structspace__handler__fixture_ae8dd009166a506ec3386360a5c8e2897_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structspace__handler__fixture_a4be39f2c915543cb5eba815e01201bbf}\index{space\_handler\_fixture@{space\_handler\_fixture}!set\_shutdown\_on\_exceeded@{set\_shutdown\_on\_exceeded}}
+\index{set\_shutdown\_on\_exceeded@{set\_shutdown\_on\_exceeded}!space\_handler\_fixture@{space\_handler\_fixture}}
+\doxysubsubsection{\texorpdfstring{set\_shutdown\_on\_exceeded()}{set\_shutdown\_on\_exceeded()}}
+{\footnotesize\ttfamily \label{structspace__handler__fixture_a4be39f2c915543cb5eba815e01201bbf} 
+void space\+\_\+handler\+\_\+fixture\+::set\+\_\+shutdown\+\_\+on\+\_\+exceeded (\begin{DoxyParamCaption}\item[{bool}]{shutdown\+\_\+on\+\_\+exceeded}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{test__monitor__loop_8cpp_source_l00049}{49}} of file \mbox{\hyperlink{test__monitor__loop_8cpp_source}{test\+\_\+monitor\+\_\+loop.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \mbox{\hyperlink{structspace__handler__fixture_ada3f693c49157e4cffa9ec4faaf60d69}{space\_handler}}.\mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler_ac0f510cb0298b9cefe68102772fc5db7}{set\_shutdown\_on\_exceeded}}(shutdown\_on\_exceeded);}
+\DoxyCodeLine{00051\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structspace__handler__fixture_a4be39f2c915543cb5eba815e01201bbf_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structspace__handler__fixture_a4be39f2c915543cb5eba815e01201bbf_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structspace__handler__fixture_a307c90555c5d6ece20697d3a3347e4e9}\index{space\_handler\_fixture@{space\_handler\_fixture}!set\_sleep\_time@{set\_sleep\_time}}
+\index{set\_sleep\_time@{set\_sleep\_time}!space\_handler\_fixture@{space\_handler\_fixture}}
+\doxysubsubsection{\texorpdfstring{set\_sleep\_time()}{set\_sleep\_time()}}
+{\footnotesize\ttfamily \label{structspace__handler__fixture_a307c90555c5d6ece20697d3a3347e4e9} 
+void space\+\_\+handler\+\_\+fixture\+::set\+\_\+sleep\+\_\+time (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{sleep\+\_\+time}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{test__monitor__loop_8cpp_source_l00045}{45}} of file \mbox{\hyperlink{test__monitor__loop_8cpp_source}{test\+\_\+monitor\+\_\+loop.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \mbox{\hyperlink{structspace__handler__fixture_ada3f693c49157e4cffa9ec4faaf60d69}{space\_handler}}.\mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler_af1ad683111aac7f94733e3866db0149e}{set\_sleep\_time}}(\ sleep\_time\ );}
+\DoxyCodeLine{00047\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=348pt]{structspace__handler__fixture_a307c90555c5d6ece20697d3a3347e4e9_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=339pt]{structspace__handler__fixture_a307c90555c5d6ece20697d3a3347e4e9_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structspace__handler__fixture_a261e57182e180fe87777a52c6d657e0d}\index{space\_handler\_fixture@{space\_handler\_fixture}!set\_threshold@{set\_threshold}}
+\index{set\_threshold@{set\_threshold}!space\_handler\_fixture@{space\_handler\_fixture}}
+\doxysubsubsection{\texorpdfstring{set\_threshold()}{set\_threshold()}}
+{\footnotesize\ttfamily \label{structspace__handler__fixture_a261e57182e180fe87777a52c6d657e0d} 
+void space\+\_\+handler\+\_\+fixture\+::set\+\_\+threshold (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{threshold}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{warning\+\_\+threshold}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{test__monitor__loop_8cpp_source_l00041}{41}} of file \mbox{\hyperlink{test__monitor__loop_8cpp_source}{test\+\_\+monitor\+\_\+loop.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \mbox{\hyperlink{structspace__handler__fixture_ada3f693c49157e4cffa9ec4faaf60d69}{space\_handler}}.\mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler_a51eaff9443b1a88e06cbbd1344a78071}{set\_threshold}}(\ threshold,\ warning\_threshold\ );}
+\DoxyCodeLine{00043\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=348pt]{structspace__handler__fixture_a261e57182e180fe87777a52c6d657e0d_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=339pt]{structspace__handler__fixture_a261e57182e180fe87777a52c6d657e0d_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structspace__handler__fixture_acdb08c8ee2a829f47b5b992ab73f5364}\index{space\_handler\_fixture@{space\_handler\_fixture}!space\_monitor\_loop@{space\_monitor\_loop}}
+\index{space\_monitor\_loop@{space\_monitor\_loop}!space\_handler\_fixture@{space\_handler\_fixture}}
+\doxysubsubsection{\texorpdfstring{space\_monitor\_loop()}{space\_monitor\_loop()}}
+{\footnotesize\ttfamily \label{structspace__handler__fixture_acdb08c8ee2a829f47b5b992ab73f5364} 
+void space\+\_\+handler\+\_\+fixture\+::space\+\_\+monitor\+\_\+loop (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{test__monitor__loop_8cpp_source_l00057}{57}} of file \mbox{\hyperlink{test__monitor__loop_8cpp_source}{test\+\_\+monitor\+\_\+loop.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structspace__handler__fixture_ada3f693c49157e4cffa9ec4faaf60d69}{space\_handler}}.\mbox{\hyperlink{classsysio_1_1resource__monitor_1_1file__space__handler_a6faa30d2db31020b3db4886a554e147a}{space\_monitor\_loop}}();}
+\DoxyCodeLine{00059\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structspace__handler__fixture_acdb08c8ee2a829f47b5b992ab73f5364_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=339pt]{structspace__handler__fixture_acdb08c8ee2a829f47b5b992ab73f5364_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structspace__handler__fixture_a2f88ee3184e87f67f178e4c4074be6f3}\index{space\_handler\_fixture@{space\_handler\_fixture}!test\_loop\_common@{test\_loop\_common}}
+\index{test\_loop\_common@{test\_loop\_common}!space\_handler\_fixture@{space\_handler\_fixture}}
+\doxysubsubsection{\texorpdfstring{test\_loop\_common()}{test\_loop\_common()}}
+{\footnotesize\ttfamily \label{structspace__handler__fixture_a2f88ee3184e87f67f178e4c4074be6f3} 
+bool space\+\_\+handler\+\_\+fixture\+::test\+\_\+loop\+\_\+common (\begin{DoxyParamCaption}\item[{int}]{num\+\_\+loops}{, }\item[{int}]{interval}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{test__monitor__loop_8cpp_source_l00061}{61}} of file \mbox{\hyperlink{test__monitor__loop_8cpp_source}{test\+\_\+monitor\+\_\+loop.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00062\ \ \ \ \{}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \mbox{\hyperlink{structspace__handler__fixture_a0247eddaeaccec1c4769d917cefcee1d}{mock\_get\_space}}\ =\ [\ i\ =\ 0,\ num\_loops\ ](\ \textcolor{keyword}{const}\ bfs::path\&\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\ boost::system::error\_code\&\ ec)\ \textcolor{keyword}{mutable}\ -\/>\ bfs::space\_info\ \{}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ ec\ =\ boost::system::errc::make\_error\_code(errc::success);}
+\DoxyCodeLine{00065\ }
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ bfs::space\_info\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}};}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}}.capacity\ \ =\ 1000000;}
+\DoxyCodeLine{00068\ }
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ i\ <\ num\_loops\ +\ 1\ )\ \{\ \ \textcolor{comment}{//\ "{}+\ 1"{}\ for\ the\ get\_space\ in\ add\_file\_system}}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}}.available\ =\ 300000;}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}}.available\ =\ 100000;}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00074\ }
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ i++;}
+\DoxyCodeLine{00076\ }
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}};}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00079\ }
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \mbox{\hyperlink{structspace__handler__fixture_aaed95bf56a9e058f61563a91ffc63110}{mock\_get\_stat}}\ =\ [](\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{classfc_1_1path}{path}},\ \textcolor{keyword}{struct\ }stat\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}\ )\ -\/>\ \textcolor{keywordtype}{int}\ \{}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}-\/>st\_dev\ =\ 0;}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00084\ }
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \mbox{\hyperlink{structspace__handler__fixture_a261e57182e180fe87777a52c6d657e0d}{set\_threshold}}(80,\ 75);}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \mbox{\hyperlink{structspace__handler__fixture_a4be39f2c915543cb5eba815e01201bbf}{set\_shutdown\_on\_exceeded}}(\textcolor{keyword}{true});}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \mbox{\hyperlink{structspace__handler__fixture_a307c90555c5d6ece20697d3a3347e4e9}{set\_sleep\_time}}(interval);}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \mbox{\hyperlink{structspace__handler__fixture_a6ca65640a8148ac9e60879dd2dc356e6}{add\_file\_system}}(\textcolor{stringliteral}{"{}/test"{}});}
+\DoxyCodeLine{00089\ }
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103aea2b2676c28c0db26d39331a336c6b92}{start}}\ =\ std::chrono::system\_clock::now();}
+\DoxyCodeLine{00091\ }
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ monitor\_thread\ =\ std::thread(\ [\textcolor{keyword}{this}]\ \{}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structspace__handler__fixture_acdb08c8ee2a829f47b5b992ab73f5364}{space\_monitor\_loop}}();}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structspace__handler__fixture_a5395bcf563cb89b24de3e9da782d8505}{ctx}}.run();}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00096\ }
+\DoxyCodeLine{00097\ \ \ \ \ \ \ monitor\_thread.join();}
+\DoxyCodeLine{00098\ }
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ end\ =\ std::chrono::system\_clock::now();}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ std::chrono::duration<double>\ test\_duration\ =\ end\ -\/\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103aea2b2676c28c0db26d39331a336c6b92}{start}};}
+\DoxyCodeLine{00101\ }
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \textcolor{comment}{//\ For\ tests\ to\ be\ repeatable\ on\ any\ platforms\ under\ any\ loads,}}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \textcolor{comment}{//\ particularly\ for\ longer\ runs,}}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \textcolor{comment}{//\ we\ just\ make\ sure\ the\ test\ duration\ is\ longer\ than\ a\ margin}}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \textcolor{comment}{//\ of\ theroretical\ duration.\ }}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ finished\_in\_time\ =\ (test\_duration\ >=\ std::chrono::duration<double>((num\_loops\ -\/\ 1)\ *\ interval));}
+\DoxyCodeLine{00107\ }
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ finished\_in\_time;}
+\DoxyCodeLine{00109\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structspace__handler__fixture_a2f88ee3184e87f67f178e4c4074be6f3_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structspace__handler__fixture_a5395bcf563cb89b24de3e9da782d8505}\index{space\_handler\_fixture@{space\_handler\_fixture}!ctx@{ctx}}
+\index{ctx@{ctx}!space\_handler\_fixture@{space\_handler\_fixture}}
+\doxysubsubsection{\texorpdfstring{ctx}{ctx}}
+{\footnotesize\ttfamily \label{structspace__handler__fixture_a5395bcf563cb89b24de3e9da782d8505} 
+boost\+::asio\+::io\+\_\+context space\+\_\+handler\+\_\+fixture\+::ctx}
+
+
+
+Definition at line \mbox{\hyperlink{test__monitor__loop_8cpp_source_l00029}{29}} of file \mbox{\hyperlink{test__monitor__loop_8cpp_source}{test\+\_\+monitor\+\_\+loop.\+cpp}}.
+
+\Hypertarget{structspace__handler__fixture_a0247eddaeaccec1c4769d917cefcee1d}\index{space\_handler\_fixture@{space\_handler\_fixture}!mock\_get\_space@{mock\_get\_space}}
+\index{mock\_get\_space@{mock\_get\_space}!space\_handler\_fixture@{space\_handler\_fixture}}
+\doxysubsubsection{\texorpdfstring{mock\_get\_space}{mock\_get\_space}}
+{\footnotesize\ttfamily \label{structspace__handler__fixture_a0247eddaeaccec1c4769d917cefcee1d} 
+std\+::function$<$bfs\+::space\+\_\+info(const bfs\+::path\& \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}, boost\+::system\+::error\+\_\+code\& ec)$>$ space\+\_\+handler\+\_\+fixture\+::mock\+\_\+get\+\_\+space}
+
+
+
+Definition at line \mbox{\hyperlink{test__monitor__loop_8cpp_source_l00112}{112}} of file \mbox{\hyperlink{test__monitor__loop_8cpp_source}{test\+\_\+monitor\+\_\+loop.\+cpp}}.
+
+\Hypertarget{structspace__handler__fixture_aaed95bf56a9e058f61563a91ffc63110}\index{space\_handler\_fixture@{space\_handler\_fixture}!mock\_get\_stat@{mock\_get\_stat}}
+\index{mock\_get\_stat@{mock\_get\_stat}!space\_handler\_fixture@{space\_handler\_fixture}}
+\doxysubsubsection{\texorpdfstring{mock\_get\_stat}{mock\_get\_stat}}
+{\footnotesize\ttfamily \label{structspace__handler__fixture_aaed95bf56a9e058f61563a91ffc63110} 
+std\+::function$<$int(const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{classfc_1_1path}{path}}, struct stat \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}})$>$ space\+\_\+handler\+\_\+fixture\+::mock\+\_\+get\+\_\+stat}
+
+
+
+Definition at line \mbox{\hyperlink{test__monitor__loop_8cpp_source_l00113}{113}} of file \mbox{\hyperlink{test__monitor__loop_8cpp_source}{test\+\_\+monitor\+\_\+loop.\+cpp}}.
+
+\Hypertarget{structspace__handler__fixture_ada3f693c49157e4cffa9ec4faaf60d69}\index{space\_handler\_fixture@{space\_handler\_fixture}!space\_handler@{space\_handler}}
+\index{space\_handler@{space\_handler}!space\_handler\_fixture@{space\_handler\_fixture}}
+\doxysubsubsection{\texorpdfstring{space\_handler}{space\_handler}}
+{\footnotesize\ttfamily \label{structspace__handler__fixture_ada3f693c49157e4cffa9ec4faaf60d69} 
+\mbox{\hyperlink{structspace__handler__fixture_ac2e81ae9d83e0fc08dfdede83873dcae}{file\+\_\+space\+\_\+handler\+\_\+t}} space\+\_\+handler\+\_\+fixture\+::space\+\_\+handler}
+
+
+
+Definition at line \mbox{\hyperlink{test__monitor__loop_8cpp_source_l00115}{115}} of file \mbox{\hyperlink{test__monitor__loop_8cpp_source}{test\+\_\+monitor\+\_\+loop.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+plugins/resource\+\_\+monitor\+\_\+plugin/test/\mbox{\hyperlink{test__monitor__loop_8cpp}{test\+\_\+monitor\+\_\+loop.\+cpp}}\end{DoxyCompactItemize}

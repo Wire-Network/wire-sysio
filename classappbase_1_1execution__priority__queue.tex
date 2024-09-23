@@ -1,0 +1,173 @@
+\doxysection{appbase\+::execution\+\_\+priority\+\_\+queue Class Reference}
+\hypertarget{classappbase_1_1execution__priority__queue}{}\label{classappbase_1_1execution__priority__queue}\index{appbase::execution\_priority\_queue@{appbase::execution\_priority\_queue}}
+
+
+{\ttfamily \#include $<$execution\+\_\+priority\+\_\+queue.\+hpp$>$}
+
+
+
+Inheritance diagram for appbase\+::execution\+\_\+priority\+\_\+queue\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=192pt]{classappbase_1_1execution__priority__queue__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for appbase\+::execution\+\_\+priority\+\_\+queue\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=192pt]{classappbase_1_1execution__priority__queue__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classappbase_1_1execution__priority__queue_1_1executor}{executor}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename Function $>$ }\\void \mbox{\hyperlink{classappbase_1_1execution__priority__queue_a22eb8e2075d65127e8920e8c1089b630}{add}} (int \mbox{\hyperlink{structappbase_1_1priority}{priority}}, Function function)
+\item 
+void \mbox{\hyperlink{classappbase_1_1execution__priority__queue_a1b3288c1d48c688c48ce0d690f8c0456}{execute\+\_\+all}} ()
+\item 
+bool \mbox{\hyperlink{classappbase_1_1execution__priority__queue_a86081d87bce3735b5addeeb6d44dbcb2}{execute\+\_\+highest}} ()
+\item 
+size\+\_\+t \mbox{\hyperlink{classappbase_1_1execution__priority__queue_a6c0902d4e57d3b9a062621ca8a1b5764}{size}} ()
+\item 
+{\footnotesize template$<$typename Function $>$ }\\boost\+::asio\+::executor\+\_\+binder$<$ Function, \mbox{\hyperlink{classappbase_1_1execution__priority__queue_1_1executor}{executor}} $>$ \mbox{\hyperlink{classappbase_1_1execution__priority__queue_acfa0c68e913a02f179e52ed758451a69}{wrap}} (int \mbox{\hyperlink{structappbase_1_1priority}{priority}}, Function \&\&func)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{execution__priority__queue_8hpp_source_l00019}{19}} of file \mbox{\hyperlink{execution__priority__queue_8hpp_source}{execution\+\_\+priority\+\_\+queue.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classappbase_1_1execution__priority__queue_a22eb8e2075d65127e8920e8c1089b630}\index{appbase::execution\_priority\_queue@{appbase::execution\_priority\_queue}!add@{add}}
+\index{add@{add}!appbase::execution\_priority\_queue@{appbase::execution\_priority\_queue}}
+\doxysubsubsection{\texorpdfstring{add()}{add()}}
+{\footnotesize\ttfamily \label{classappbase_1_1execution__priority__queue_a22eb8e2075d65127e8920e8c1089b630} 
+template$<$typename Function $>$ \\
+void appbase\+::execution\+\_\+priority\+\_\+queue\+::add (\begin{DoxyParamCaption}\item[{int}]{priority}{, }\item[{Function}]{function}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{execution__priority__queue_8hpp_source_l00024}{24}} of file \mbox{\hyperlink{execution__priority__queue_8hpp_source}{execution\+\_\+priority\+\_\+queue.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00025\ \ \ \ \{}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ std::unique\_ptr<queued\_handler\_base>\ handler(\textcolor{keyword}{new}\ queued\_handler<Function>(priority,\ -\/-\/order\_,\ std::move(function)));}
+\DoxyCodeLine{00027\ }
+\DoxyCodeLine{00028\ \ \ \ \ \ \ handlers\_.push(std::move(handler));}
+\DoxyCodeLine{00029\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classappbase_1_1execution__priority__queue_a22eb8e2075d65127e8920e8c1089b630_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classappbase_1_1execution__priority__queue_a1b3288c1d48c688c48ce0d690f8c0456}\index{appbase::execution\_priority\_queue@{appbase::execution\_priority\_queue}!execute\_all@{execute\_all}}
+\index{execute\_all@{execute\_all}!appbase::execution\_priority\_queue@{appbase::execution\_priority\_queue}}
+\doxysubsubsection{\texorpdfstring{execute\_all()}{execute\_all()}}
+{\footnotesize\ttfamily \label{classappbase_1_1execution__priority__queue_a1b3288c1d48c688c48ce0d690f8c0456} 
+void appbase\+::execution\+\_\+priority\+\_\+queue\+::execute\+\_\+all (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{execution__priority__queue_8hpp_source_l00031}{31}} of file \mbox{\hyperlink{execution__priority__queue_8hpp_source}{execution\+\_\+priority\+\_\+queue.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00032\ \ \ \ \{}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (!handlers\_.empty())\ \{}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ handlers\_.top()-\/>execute();}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ handlers\_.pop();}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00037\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classappbase_1_1execution__priority__queue_a86081d87bce3735b5addeeb6d44dbcb2}\index{appbase::execution\_priority\_queue@{appbase::execution\_priority\_queue}!execute\_highest@{execute\_highest}}
+\index{execute\_highest@{execute\_highest}!appbase::execution\_priority\_queue@{appbase::execution\_priority\_queue}}
+\doxysubsubsection{\texorpdfstring{execute\_highest()}{execute\_highest()}}
+{\footnotesize\ttfamily \label{classappbase_1_1execution__priority__queue_a86081d87bce3735b5addeeb6d44dbcb2} 
+bool appbase\+::execution\+\_\+priority\+\_\+queue\+::execute\+\_\+highest (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{execution__priority__queue_8hpp_source_l00039}{39}} of file \mbox{\hyperlink{execution__priority__queue_8hpp_source}{execution\+\_\+priority\+\_\+queue.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00040\ \ \ \ \{}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !handlers\_.empty()\ )\ \{}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ handlers\_.top()-\/>execute();}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ handlers\_.pop();}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00045\ }
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !handlers\_.empty();}
+\DoxyCodeLine{00047\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classappbase_1_1execution__priority__queue_a86081d87bce3735b5addeeb6d44dbcb2_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classappbase_1_1execution__priority__queue_a6c0902d4e57d3b9a062621ca8a1b5764}\index{appbase::execution\_priority\_queue@{appbase::execution\_priority\_queue}!size@{size}}
+\index{size@{size}!appbase::execution\_priority\_queue@{appbase::execution\_priority\_queue}}
+\doxysubsubsection{\texorpdfstring{size()}{size()}}
+{\footnotesize\ttfamily \label{classappbase_1_1execution__priority__queue_a6c0902d4e57d3b9a062621ca8a1b5764} 
+size\+\_\+t appbase\+::execution\+\_\+priority\+\_\+queue\+::size (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{execution__priority__queue_8hpp_source_l00049}{49}} of file \mbox{\hyperlink{execution__priority__queue_8hpp_source}{execution\+\_\+priority\+\_\+queue.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00049\ \{\ \textcolor{keywordflow}{return}\ handlers\_.size();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classappbase_1_1execution__priority__queue_acfa0c68e913a02f179e52ed758451a69}\index{appbase::execution\_priority\_queue@{appbase::execution\_priority\_queue}!wrap@{wrap}}
+\index{wrap@{wrap}!appbase::execution\_priority\_queue@{appbase::execution\_priority\_queue}}
+\doxysubsubsection{\texorpdfstring{wrap()}{wrap()}}
+{\footnotesize\ttfamily \label{classappbase_1_1execution__priority__queue_acfa0c68e913a02f179e52ed758451a69} 
+template$<$typename Function $>$ \\
+boost\+::asio\+::executor\+\_\+binder$<$ Function, \mbox{\hyperlink{classappbase_1_1execution__priority__queue_1_1executor}{executor}} $>$ appbase\+::execution\+\_\+priority\+\_\+queue\+::wrap (\begin{DoxyParamCaption}\item[{int}]{priority}{, }\item[{Function \&\&}]{func}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{execution__priority__queue_8hpp_source_l00102}{102}} of file \mbox{\hyperlink{execution__priority__queue_8hpp_source}{execution\+\_\+priority\+\_\+queue.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00103\ \ \ \ \{}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ boost::asio::bind\_executor(\ executor(*\textcolor{keyword}{this},\ priority),\ std::forward<Function>(func)\ );}
+\DoxyCodeLine{00105\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classappbase_1_1execution__priority__queue_acfa0c68e913a02f179e52ed758451a69_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/appbase/include/appbase/\mbox{\hyperlink{execution__priority__queue_8hpp}{execution\+\_\+priority\+\_\+queue.\+hpp}}\end{DoxyCompactItemize}

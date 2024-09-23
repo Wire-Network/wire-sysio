@@ -1,0 +1,1043 @@
+\doxysection{rex.\+cpp}
+\hypertarget{rex_8cpp_source}{}\label{rex_8cpp_source}\index{/Users/svetlasyrimis/Desktop/wire-\/network/WN-\/org/wire-\/system-\/contracts/contracts/sysio.system/src/rex.cpp@{/Users/svetlasyrimis/Desktop/wire-\/network/WN-\/org/wire-\/system-\/contracts/contracts/sysio.system/src/rex.cpp}}
+\mbox{\hyperlink{rex_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{sysio_8system_8hpp}{sysio.system/sysio.system.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{sysio_8token_8hpp}{sysio.token/sysio.token.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{rex_8results_8hpp}{sysio.system/rex.results.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00005}00005\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysiosystem}{sysiosystem}}\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00007}00007\ \ \ \ \textcolor{keyword}{using\ }sysio::current\_time\_point;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00008}00008\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1token}{sysio::token}};}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00009}00009\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacefc_a9623b8cae3f48bbed6aa1fc2afe9b174}{sysio::seconds}};}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00011}\mbox{\hyperlink{classsysiosystem_1_1system__contract_a09c591ec4c299ca55bd73032426128d2}{00011}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_a09c591ec4c299ca55bd73032426128d2}{system\_contract::deposit}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\&\ owner,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\&\ amount\ )}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00012}00012\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00013}00013\ \ \ \ \ \ \ require\_auth(\ owner\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00015}00015\ \ \ \ \ \ \ check(\ amount.symbol\ ==\ core\_symbol(),\ \textcolor{stringliteral}{"{}must\ deposit\ core\ token"{}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00016}00016\ \ \ \ \ \ \ check(\ 0\ <\ amount.amount,\ \textcolor{stringliteral}{"{}must\ deposit\ a\ positive\ amount"{}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00017}00017\ \ \ \ \ \ \ \textcolor{comment}{//\ inline\ transfer\ from\ owner's\ token\ balance}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00018}00018\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00019}00019\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1token_a104313ae127b80733cf26925f5246379}{token::transfer\_action}}\ transfer\_act\{\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_a52f7532857765f2a19f0b55e9b8c29ea}{token\_account}},\ \{\ owner,\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_a73d78c07b50de02a172c31966637041e}{active\_permission}}\ \}\ \};}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00020}00020\ \ \ \ \ \ \ \ \ \ transfer\_act.send(\ owner,\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_acdbbc12d83ad3ac491c414637a733bc0}{rex\_account}},\ amount,\ \textcolor{stringliteral}{"{}deposit\ to\ REX\ fund"{}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00021}00021\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00022}00022\ \ \ \ \ \ \ transfer\_to\_fund(\ owner,\ amount\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00023}00023\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00025}\mbox{\hyperlink{classsysiosystem_1_1system__contract_ae484b84f8281fddd5d9dbcb8b2a4aa85}{00025}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_ae484b84f8281fddd5d9dbcb8b2a4aa85}{system\_contract::withdraw}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\&\ owner,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\&\ amount\ )}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00026}00026\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00027}00027\ \ \ \ \ \ \ require\_auth(\ owner\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00029}00029\ \ \ \ \ \ \ check(\ amount.symbol\ ==\ core\_symbol(),\ \textcolor{stringliteral}{"{}must\ withdraw\ core\ token"{}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00030}00030\ \ \ \ \ \ \ check(\ 0\ <\ amount.amount,\ \textcolor{stringliteral}{"{}must\ withdraw\ a\ positive\ amount"{}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00031}00031\ \ \ \ \ \ \ update\_rex\_account(\ owner,\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}(\ 0,\ core\_symbol()\ ),\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}(\ 0,\ core\_symbol()\ )\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00032}00032\ \ \ \ \ \ \ transfer\_from\_fund(\ owner,\ amount\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00033}00033\ \ \ \ \ \ \ \textcolor{comment}{//\ inline\ transfer\ to\ owner's\ token\ balance}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00034}00034\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00035}00035\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1token_a104313ae127b80733cf26925f5246379}{token::transfer\_action}}\ transfer\_act\{\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_a52f7532857765f2a19f0b55e9b8c29ea}{token\_account}},\ \{\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_acdbbc12d83ad3ac491c414637a733bc0}{rex\_account}},\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_a73d78c07b50de02a172c31966637041e}{active\_permission}}\ \}\ \};}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00036}00036\ \ \ \ \ \ \ \ \ \ transfer\_act.send(\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_acdbbc12d83ad3ac491c414637a733bc0}{rex\_account}},\ owner,\ amount,\ \textcolor{stringliteral}{"{}withdraw\ from\ REX\ fund"{}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00037}00037\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00038}00038\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00040}\mbox{\hyperlink{classsysiosystem_1_1system__contract_a9d36ca877a9a15e1c01923f11842a00b}{00040}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_a9d36ca877a9a15e1c01923f11842a00b}{system\_contract::buyrex}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\&\ from,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\&\ amount\ )}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00041}00041\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00042}00042\ \ \ \ \ \ \ require\_auth(\ from\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00044}00044\ \ \ \ \ \ \ check(\ amount.symbol\ ==\ core\_symbol(),\ \textcolor{stringliteral}{"{}asset\ must\ be\ core\ token"{}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00045}00045\ \ \ \ \ \ \ check(\ 0\ <\ amount.amount,\ \textcolor{stringliteral}{"{}must\ use\ positive\ amount"{}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00046}00046\ \ \ \ \ \ \ check\_voting\_requirement(\ from\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00047}00047\ \ \ \ \ \ \ transfer\_from\_fund(\ from,\ amount\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00048}00048\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\ rex\_received\ \ \ \ =\ add\_to\_rex\_pool(\ amount\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00049}00049\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\ delta\_rex\_stake\ =\ add\_to\_rex\_balance(\ from,\ amount,\ rex\_received\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00050}00050\ \ \ \ \ \ \ runrex(2);}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00051}00051\ \ \ \ \ \ \ update\_rex\_account(\ from,\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}(\ 0,\ core\_symbol()\ ),\ delta\_rex\_stake\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00052}00052\ \ \ \ \ \ \ \textcolor{comment}{//\ dummy\ action\ added\ so\ that\ amount\ of\ REX\ tokens\ purchased\ shows\ up\ in\ action\ trace}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00053}00053\ \ \ \ \ \ \ \mbox{\hyperlink{classrex__results_ad4414abfcdbc98787ff8195a62d6d848}{rex\_results::buyresult\_action}}\ buyrex\_act(\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_acdbbc12d83ad3ac491c414637a733bc0}{rex\_account}},\ std::vector<sysio::permission\_level>\{\ \}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00054}00054\ \ \ \ \ \ \ buyrex\_act.send(\ rex\_received\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00055}00055\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00057}\mbox{\hyperlink{classsysiosystem_1_1system__contract_a2812c3906343a7b3685f5c9e30e282c1}{00057}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_a2812c3906343a7b3685f5c9e30e282c1}{system\_contract::unstaketorex}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\&\ owner,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\&\ receiver,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\&\ from\_net,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\&\ from\_cpu\ )}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00058}00058\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00059}00059\ \ \ \ \ \ \ require\_auth(\ owner\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00061}00061\ \ \ \ \ \ \ check(\ from\_net.symbol\ ==\ core\_symbol()\ \&\&\ from\_cpu.symbol\ ==\ core\_symbol(),\ \textcolor{stringliteral}{"{}asset\ must\ be\ core\ token"{}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00062}00062\ \ \ \ \ \ \ check(\ (0\ <=\ from\_net.amount)\ \&\&\ (0\ <=\ from\_cpu.amount)\ \&\&\ (0\ <\ from\_net.amount\ ||\ 0\ <\ from\_cpu.amount),}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}must\ unstake\ a\ positive\ amount\ to\ buy\ rex"{}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00064}00064\ \ \ \ \ \ \ check\_voting\_requirement(\ owner\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00066}00066\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00067}00067\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysiosystem_a205c7938369bd90edc20122ae99826be}{del\_bandwidth\_table}}\ dbw\_table(\ get\_self(),\ owner.value\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ del\_itr\ =\ dbw\_table.require\_find(\ receiver.value,\ \textcolor{stringliteral}{"{}delegated\ bandwidth\ record\ does\ not\ exist"{}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00069}00069\ \ \ \ \ \ \ \ \ \ check(\ from\_net.amount\ <=\ del\_itr-\/>net\_weight.amount,\ \textcolor{stringliteral}{"{}amount\ exceeds\ tokens\ staked\ for\ net"{}});}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00070}00070\ \ \ \ \ \ \ \ \ \ check(\ from\_cpu.amount\ <=\ del\_itr-\/>cpu\_weight.amount,\ \textcolor{stringliteral}{"{}amount\ exceeds\ tokens\ staked\ for\ cpu"{}});}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00071}00071\ \ \ \ \ \ \ \ \ \ dbw\_table.modify(\ del\_itr,\ same\_payer,\ [\&](\ \mbox{\hyperlink{structsysiosystem_1_1delegated__bandwidth}{delegated\_bandwidth}}\&\ dbw\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \ \ \ dbw.\mbox{\hyperlink{structsysiosystem_1_1delegated__bandwidth_a40fa50c8d7269b43ddaf6a49b98dac59}{net\_weight}}.amount\ -\/=\ from\_net.amount;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00073}00073\ \ \ \ \ \ \ \ \ \ \ \ \ dbw.\mbox{\hyperlink{structsysiosystem_1_1delegated__bandwidth_a79d185f182bc719658afd8dba134b99b}{cpu\_weight}}.amount\ -\/=\ from\_cpu.amount;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00074}00074\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00075}00075\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ del\_itr-\/>is\_empty()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \ \ \ dbw\_table.erase(\ del\_itr\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00078}00078\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00080}00080\ \ \ \ \ \ \ update\_resource\_limits(\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(0),\ receiver,\ -\/from\_net.amount,\ -\/from\_cpu.amount\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00081}00081\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00082}00082\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\ payment\ =\ from\_net\ +\ from\_cpu;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00083}00083\ \ \ \ \ \ \ \textcolor{comment}{//\ inline\ transfer\ from\ stake\_account\ to\ rex\_account}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00084}00084\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00085}00085\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1token_a104313ae127b80733cf26925f5246379}{token::transfer\_action}}\ transfer\_act\{\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_a52f7532857765f2a19f0b55e9b8c29ea}{token\_account}},\ \{\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_a525a6755d63c4960add11c952b00548f}{stake\_account}},\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_a73d78c07b50de02a172c31966637041e}{active\_permission}}\ \}\ \};}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00086}00086\ \ \ \ \ \ \ \ \ \ transfer\_act.send(\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_a525a6755d63c4960add11c952b00548f}{stake\_account}},\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_acdbbc12d83ad3ac491c414637a733bc0}{rex\_account}},\ payment,\ \textcolor{stringliteral}{"{}buy\ REX\ with\ staked\ tokens"{}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00087}00087\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00088}00088\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\ rex\_received\ =\ add\_to\_rex\_pool(\ payment\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00089}00089\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ rex\_stake\_delta\ =\ add\_to\_rex\_balance(\ owner,\ payment,\ rex\_received\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00090}00090\ \ \ \ \ \ \ runrex(2);}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00091}00091\ \ \ \ \ \ \ update\_rex\_account(\ owner,\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}(\ 0,\ core\_symbol()\ ),\ rex\_stake\_delta\ -\/\ payment,\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00092}00092\ \ \ \ \ \ \ \textcolor{comment}{//\ dummy\ action\ added\ so\ that\ amount\ of\ REX\ tokens\ purchased\ shows\ up\ in\ action\ trace}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00093}00093\ \ \ \ \ \ \ \mbox{\hyperlink{classrex__results_ad4414abfcdbc98787ff8195a62d6d848}{rex\_results::buyresult\_action}}\ buyrex\_act(\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_acdbbc12d83ad3ac491c414637a733bc0}{rex\_account}},\ std::vector<sysio::permission\_level>\{\ \}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00094}00094\ \ \ \ \ \ \ buyrex\_act.send(\ rex\_received\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00095}00095\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00096}00096\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00097}\mbox{\hyperlink{classsysiosystem_1_1system__contract_a88581cd0c283dcfe488401c2a747612d}{00097}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_a88581cd0c283dcfe488401c2a747612d}{system\_contract::sellrex}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\&\ from,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\&\ rex\ )}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00098}00098\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00099}00099\ \ \ \ \ \ \ require\_auth(\ from\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00100}00100\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00101}00101\ \ \ \ \ \ \ runrex(2);}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00102}00102\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00103}00103\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ bitr\ =\ \_rexbalance.require\_find(\ from.value,\ \textcolor{stringliteral}{"{}user\ must\ first\ buyrex"{}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00104}00104\ \ \ \ \ \ \ check(\ rex.amount\ >\ 0\ \&\&\ rex.symbol\ ==\ bitr-\/>rex\_balance.symbol,}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00105}00105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}asset\ must\ be\ a\ positive\ amount\ of\ (REX,\ 4)"{}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00106}00106\ \ \ \ \ \ \ process\_rex\_maturities(\ bitr\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00107}00107\ \ \ \ \ \ \ check(\ rex.amount\ <=\ bitr-\/>matured\_rex,\ \textcolor{stringliteral}{"{}insufficient\ available\ rex"{}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00108}00108\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00109}00109\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ current\_order\ =\ fill\_rex\_order(\ bitr,\ rex\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00110}00110\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ current\_order.success\ \&\&\ current\_order.proceeds.amount\ ==\ 0\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00111}00111\ \ \ \ \ \ \ \ \ \ check(\ \textcolor{keyword}{false},\ \textcolor{stringliteral}{"{}proceeds\ are\ negligible"{}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00112}00112\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00113}00113\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\ pending\_sell\_order\ =\ update\_rex\_account(\ from,\ current\_order.proceeds,\ current\_order.stake\_change\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00114}00114\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ !current\_order.success\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00115}00115\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ from\ ==\ \textcolor{stringliteral}{"{}b1"{}}\_n\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00116}00116\ \ \ \ \ \ \ \ \ \ \ \ \ check(\ \textcolor{keyword}{false},\ \textcolor{stringliteral}{"{}b1\ sellrex\ orders\ should\ not\ be\ queued"{}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00117}00117\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00122}00122\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ oitr\ =\ \_rexorders.find(\ from.value\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00123}00123\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ oitr\ ==\ \_rexorders.end()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00124}00124\ \ \ \ \ \ \ \ \ \ \ \ \ oitr\ =\ \_rexorders.emplace(\ from,\ [\&](\ \textcolor{keyword}{auto}\&\ order\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00125}00125\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ order.owner\ \ \ \ \ \ \ \ \ =\ from;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00126}00126\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ order.rex\_requested\ =\ rex;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00127}00127\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ order.is\_open\ \ \ \ \ \ \ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00128}00128\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ order.proceeds\ \ \ \ \ \ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}(\ 0,\ core\_symbol()\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00129}00129\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ order.stake\_change\ \ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}(\ 0,\ core\_symbol()\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00130}00130\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ order.order\_time\ \ \ \ =\ current\_time\_point();}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00131}00131\ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00132}00132\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00133}00133\ \ \ \ \ \ \ \ \ \ \ \ \ \_rexorders.modify(\ oitr,\ same\_payer,\ [\&](\ \textcolor{keyword}{auto}\&\ order\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00134}00134\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ order.rex\_requested.amount\ +=\ rex.amount;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00135}00135\ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00136}00136\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00137}00137\ \ \ \ \ \ \ \ \ \ pending\_sell\_order.amount\ =\ oitr-\/>rex\_requested.amount;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00138}00138\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00139}00139\ \ \ \ \ \ \ check(\ pending\_sell\_order.amount\ <=\ bitr-\/>matured\_rex,\ \textcolor{stringliteral}{"{}insufficient\ funds\ for\ current\ and\ scheduled\ orders"{}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00140}00140\ \ \ \ \ \ \ \textcolor{comment}{//\ dummy\ action\ added\ so\ that\ sell\ order\ proceeds\ show\ up\ in\ action\ trace}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00141}00141\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ current\_order.success\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00142}00142\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classrex__results_a131d5bc79c6ec44898e7760f4e2ceeb2}{rex\_results::sellresult\_action}}\ sellrex\_act(\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_acdbbc12d83ad3ac491c414637a733bc0}{rex\_account}},\ std::vector<sysio::permission\_level>\{\ \}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00143}00143\ \ \ \ \ \ \ \ \ \ sellrex\_act.send(\ current\_order.proceeds\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00144}00144\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00145}00145\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00146}00146\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00147}\mbox{\hyperlink{classsysiosystem_1_1system__contract_a56e07c5e11c824a4a384eed9451768d0}{00147}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_a56e07c5e11c824a4a384eed9451768d0}{system\_contract::cnclrexorder}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\&\ owner\ )}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00148}00148\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00149}00149\ \ \ \ \ \ \ require\_auth(\ owner\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00150}00150\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00151}00151\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ \_rexorders.require\_find(\ owner.value,\ \textcolor{stringliteral}{"{}no\ sellrex\ order\ is\ scheduled"{}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00152}00152\ \ \ \ \ \ \ check(\ itr-\/>is\_open,\ \textcolor{stringliteral}{"{}sellrex\ order\ has\ been\ filled\ and\ cannot\ be\ canceled"{}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00153}00153\ \ \ \ \ \ \ \_rexorders.erase(\ itr\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00154}00154\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00155}00155\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00156}\mbox{\hyperlink{classsysiosystem_1_1system__contract_a522278aee59479ca1bed3c5e5e2f88b3}{00156}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_a522278aee59479ca1bed3c5e5e2f88b3}{system\_contract::rentcpu}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\&\ from,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\&\ receiver,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\&\ loan\_payment,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\&\ loan\_fund\ )}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00157}00157\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00158}00158\ \ \ \ \ \ \ require\_auth(\ from\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00159}00159\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00160}00160\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysiosystem_a2b6105db3f0018cb55e05ef0f062aab0}{rex\_cpu\_loan\_table}}\ cpu\_loans(\ get\_self(),\ get\_self().\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00161}00161\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ rented\_tokens\ =\ rent\_rex(\ cpu\_loans,\ from,\ receiver,\ loan\_payment,\ loan\_fund\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00162}00162\ \ \ \ \ \ \ update\_resource\_limits(\ from,\ receiver,\ 0,\ rented\_tokens\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00163}00163\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00164}00164\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00165}\mbox{\hyperlink{classsysiosystem_1_1system__contract_a2488bdc521ef504fce4799af6f1bce0b}{00165}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_a2488bdc521ef504fce4799af6f1bce0b}{system\_contract::rentnet}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\&\ from,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\&\ receiver,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\&\ loan\_payment,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\&\ loan\_fund\ )}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00166}00166\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00167}00167\ \ \ \ \ \ \ require\_auth(\ from\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00168}00168\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00169}00169\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysiosystem_ae19f143ed0d859ca1adee15b440e3826}{rex\_net\_loan\_table}}\ net\_loans(\ get\_self(),\ get\_self().\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00170}00170\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ rented\_tokens\ =\ rent\_rex(\ net\_loans,\ from,\ receiver,\ loan\_payment,\ loan\_fund\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00171}00171\ \ \ \ \ \ \ update\_resource\_limits(\ from,\ receiver,\ rented\_tokens,\ 0\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00172}00172\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00173}00173\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00174}\mbox{\hyperlink{classsysiosystem_1_1system__contract_a19a731b739f44531085a088658cf855c}{00174}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_a19a731b739f44531085a088658cf855c}{system\_contract::fundcpuloan}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\&\ from,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ loan\_num,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\&\ payment\ )}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00175}00175\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00176}00176\ \ \ \ \ \ \ require\_auth(\ from\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00177}00177\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00178}00178\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysiosystem_a2b6105db3f0018cb55e05ef0f062aab0}{rex\_cpu\_loan\_table}}\ cpu\_loans(\ get\_self(),\ get\_self().\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00179}00179\ \ \ \ \ \ \ fund\_rex\_loan(\ cpu\_loans,\ from,\ loan\_num,\ payment\ \ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00180}00180\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00181}00181\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00182}\mbox{\hyperlink{classsysiosystem_1_1system__contract_add7ee6266d55575750169b87422b9405}{00182}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_add7ee6266d55575750169b87422b9405}{system\_contract::fundnetloan}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\&\ from,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ loan\_num,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\&\ payment\ )}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00183}00183\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00184}00184\ \ \ \ \ \ \ require\_auth(\ from\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00185}00185\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00186}00186\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysiosystem_ae19f143ed0d859ca1adee15b440e3826}{rex\_net\_loan\_table}}\ net\_loans(\ get\_self(),\ get\_self().\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00187}00187\ \ \ \ \ \ \ fund\_rex\_loan(\ net\_loans,\ from,\ loan\_num,\ payment\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00188}00188\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00189}00189\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00190}\mbox{\hyperlink{classsysiosystem_1_1system__contract_ae6351368c3b2ce905d8c4835dd9c4b63}{00190}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_ae6351368c3b2ce905d8c4835dd9c4b63}{system\_contract::defcpuloan}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\&\ from,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ loan\_num,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\&\ amount\ )}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00191}00191\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00192}00192\ \ \ \ \ \ \ require\_auth(\ from\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00193}00193\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00194}00194\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysiosystem_a2b6105db3f0018cb55e05ef0f062aab0}{rex\_cpu\_loan\_table}}\ cpu\_loans(\ get\_self(),\ get\_self().\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00195}00195\ \ \ \ \ \ \ defund\_rex\_loan(\ cpu\_loans,\ from,\ loan\_num,\ amount\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00196}00196\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00197}00197\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00198}\mbox{\hyperlink{classsysiosystem_1_1system__contract_af99dc72fc36d42a026b8fd79ea91d985}{00198}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_af99dc72fc36d42a026b8fd79ea91d985}{system\_contract::defnetloan}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\&\ from,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ loan\_num,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\&\ amount\ )}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00199}00199\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00200}00200\ \ \ \ \ \ \ require\_auth(\ from\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00201}00201\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00202}00202\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysiosystem_ae19f143ed0d859ca1adee15b440e3826}{rex\_net\_loan\_table}}\ net\_loans(\ get\_self(),\ get\_self().\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00203}00203\ \ \ \ \ \ \ defund\_rex\_loan(\ net\_loans,\ from,\ loan\_num,\ amount\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00204}00204\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00205}00205\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00206}\mbox{\hyperlink{classsysiosystem_1_1system__contract_a7c64c4a168b7588494a46cc666637b83}{00206}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_a7c64c4a168b7588494a46cc666637b83}{system\_contract::updaterex}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\&\ owner\ )}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00207}00207\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00208}00208\ \ \ \ \ \ \ require\_auth(\ owner\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00209}00209\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00210}00210\ \ \ \ \ \ \ runrex(2);}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00211}00211\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00212}00212\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ \_rexbalance.require\_find(\ owner.value,\ \textcolor{stringliteral}{"{}account\ has\ no\ REX\ balance"{}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00213}00213\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\ init\_stake\ =\ itr-\/>vote\_stake;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00214}00214\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00215}00215\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ rexpool\_itr\ =\ \_rexpool.begin();}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00216}00216\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ total\_rex\ \ \ \ \ \ =\ rexpool\_itr-\/>total\_rex.amount;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00217}00217\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ total\_lendable\ =\ rexpool\_itr-\/>total\_lendable.amount;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00218}00218\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ \mbox{\hyperlink{structsysiosystem_1_1rex__balance}{rex\_balance}}\ \ \ \ =\ itr-\/>\mbox{\hyperlink{structsysiosystem_1_1rex__balance_a2ab40279699e574678043b5522e25538}{rex\_balance}}.amount;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00219}00219\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00220}00220\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\ current\_stake(\ 0,\ core\_symbol()\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00221}00221\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ total\_rex\ >\ 0\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00222}00222\ \ \ \ \ \ \ \ \ \ current\_stake.amount\ =\ (\ uint128\_t(\mbox{\hyperlink{structsysiosystem_1_1rex__balance}{rex\_balance}})\ *\ total\_lendable\ )\ /\ total\_rex;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00223}00223\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00224}00224\ \ \ \ \ \ \ \_rexbalance.modify(\ itr,\ same\_payer,\ [\&](\ \textcolor{keyword}{auto}\&\ rb\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00225}00225\ \ \ \ \ \ \ \ \ \ rb.vote\_stake\ =\ current\_stake;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00226}00226\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00227}00227\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00228}00228\ \ \ \ \ \ \ update\_rex\_account(\ owner,\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}(\ 0,\ core\_symbol()\ ),\ current\_stake\ -\/\ init\_stake,\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00229}00229\ \ \ \ \ \ \ process\_rex\_maturities(\ itr\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00230}00230\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00231}00231\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00232}\mbox{\hyperlink{classsysiosystem_1_1system__contract_a0e9b5f3180eb506b08de8046075414df}{00232}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_a0e9b5f3180eb506b08de8046075414df}{system\_contract::setrex}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\&\ balance\ )}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00233}00233\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00234}00234\ \ \ \ \ \ \ require\_auth(\ \textcolor{stringliteral}{"{}sysio"{}}\_n\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00235}00235\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00236}00236\ \ \ \ \ \ \ check(\ balance.amount\ >\ 0,\ \textcolor{stringliteral}{"{}balance\ must\ be\ set\ to\ have\ a\ positive\ amount"{}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00237}00237\ \ \ \ \ \ \ check(\ balance.symbol\ ==\ core\_symbol(),\ \textcolor{stringliteral}{"{}balance\ symbol\ must\ be\ core\ symbol"{}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00238}00238\ \ \ \ \ \ \ check(\ rex\_system\_initialized(),\ \textcolor{stringliteral}{"{}rex\ system\ is\ not\ initialized"{}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00239}00239\ \ \ \ \ \ \ \_rexpool.modify(\ \_rexpool.begin(),\ same\_payer,\ [\&](\ \textcolor{keyword}{auto}\&\ pool\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00240}00240\ \ \ \ \ \ \ \ \ \ pool.total\_rent\ =\ balance;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00241}00241\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00242}00242\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00243}00243\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00244}\mbox{\hyperlink{classsysiosystem_1_1system__contract_a927f2cc29bbbdac40652e5944ea65063}{00244}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_a927f2cc29bbbdac40652e5944ea65063}{system\_contract::rexexec}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\&\ user,\ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ max\ )}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00245}00245\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00246}00246\ \ \ \ \ \ \ require\_auth(\ user\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00247}00247\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00248}00248\ \ \ \ \ \ \ runrex(\ max\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00249}00249\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00250}00250\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00251}\mbox{\hyperlink{classsysiosystem_1_1system__contract_a79cbd1e72f30b1d06ced2e3225f857bf}{00251}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_a79cbd1e72f30b1d06ced2e3225f857bf}{system\_contract::consolidate}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\&\ owner\ )}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00252}00252\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00253}00253\ \ \ \ \ \ \ require\_auth(\ owner\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00254}00254\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00255}00255\ \ \ \ \ \ \ runrex(2);}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00256}00256\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00257}00257\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ bitr\ =\ \_rexbalance.require\_find(\ owner.value,\ \textcolor{stringliteral}{"{}account\ has\ no\ REX\ balance"{}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00258}00258\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\ rex\_in\_sell\_order\ =\ update\_rex\_account(\ owner,\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}(\ 0,\ core\_symbol()\ ),\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}(\ 0,\ core\_symbol()\ )\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00259}00259\ \ \ \ \ \ \ consolidate\_rex\_balance(\ bitr,\ rex\_in\_sell\_order\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00260}00260\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00261}00261\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00262}\mbox{\hyperlink{classsysiosystem_1_1system__contract_a079655f76d6b6e81339f3f82244fa601}{00262}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_a079655f76d6b6e81339f3f82244fa601}{system\_contract::mvtosavings}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\&\ owner,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\&\ rex\ )}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00263}00263\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00264}00264\ \ \ \ \ \ \ require\_auth(\ owner\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00265}00265\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00266}00266\ \ \ \ \ \ \ runrex(2);}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00267}00267\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00268}00268\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ bitr\ =\ \_rexbalance.require\_find(\ owner.value,\ \textcolor{stringliteral}{"{}account\ has\ no\ REX\ balance"{}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00269}00269\ \ \ \ \ \ \ check(\ rex.amount\ >\ 0\ \&\&\ rex.symbol\ ==\ bitr-\/>rex\_balance.symbol,\ \textcolor{stringliteral}{"{}asset\ must\ be\ a\ positive\ amount\ of\ (REX,\ 4)"{}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00270}00270\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\ \ \ rex\_in\_sell\_order\ =\ update\_rex\_account(\ owner,\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}(\ 0,\ core\_symbol()\ ),\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}(\ 0,\ core\_symbol()\ )\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00271}00271\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ rex\_in\_savings\ \ \ \ =\ read\_rex\_savings(\ bitr\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00272}00272\ \ \ \ \ \ \ check(\ rex.amount\ +\ rex\_in\_sell\_order.amount\ +\ rex\_in\_savings\ <=\ bitr-\/>\mbox{\hyperlink{structsysiosystem_1_1rex__balance}{rex\_balance}}.amount,}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00273}00273\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}insufficient\ REX\ balance"{}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00274}00274\ \ \ \ \ \ \ process\_rex\_maturities(\ bitr\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00275}00275\ \ \ \ \ \ \ \_rexbalance.modify(\ bitr,\ same\_payer,\ [\&](\ \textcolor{keyword}{auto}\&\ rb\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00276}00276\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ moved\_rex\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00277}00277\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (\ !rb.rex\_maturities.empty()\ \&\&\ moved\_rex\ <\ rex.amount)\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00278}00278\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ d\_rex\ =\ std::min(\ rex.amount\ -\/\ moved\_rex,\ rb.rex\_maturities.back().second\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00279}00279\ \ \ \ \ \ \ \ \ \ \ \ \ rb.rex\_maturities.back().second\ -\/=\ d\_rex;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00280}00280\ \ \ \ \ \ \ \ \ \ \ \ \ moved\_rex\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ +=\ d\_rex;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00281}00281\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ rb.rex\_maturities.back().second\ ==\ 0\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00282}00282\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ rb.rex\_maturities.pop\_back();}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00283}00283\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00284}00284\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00285}00285\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ moved\_rex\ <\ rex.amount\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00286}00286\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ d\_rex\ =\ rex.amount\ -\/\ moved\_rex;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00287}00287\ \ \ \ \ \ \ \ \ \ \ \ \ rb.matured\_rex\ \ \ \ -\/=\ d\_rex;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00288}00288\ \ \ \ \ \ \ \ \ \ \ \ \ moved\_rex\ \ \ \ \ \ \ \ \ +=\ d\_rex;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00289}00289\ \ \ \ \ \ \ \ \ \ \ \ \ check(\ rex\_in\_sell\_order.amount\ <=\ rb.matured\_rex,\ \textcolor{stringliteral}{"{}logic\ error\ in\ mvtosavings"{}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00290}00290\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00291}00291\ \ \ \ \ \ \ \ \ \ check(\ moved\_rex\ ==\ rex.amount,\ \textcolor{stringliteral}{"{}programmer\ error\ in\ mvtosavings"{}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00292}00292\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00293}00293\ \ \ \ \ \ \ put\_rex\_savings(\ bitr,\ rex\_in\_savings\ +\ rex.amount\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00294}00294\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00295}00295\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00296}\mbox{\hyperlink{classsysiosystem_1_1system__contract_a00f85c885feb63b93ecca6d31dbbc403}{00296}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_a00f85c885feb63b93ecca6d31dbbc403}{system\_contract::mvfrsavings}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\&\ owner,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\&\ rex\ )}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00297}00297\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00298}00298\ \ \ \ \ \ \ require\_auth(\ owner\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00299}00299\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00300}00300\ \ \ \ \ \ \ runrex(2);}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00301}00301\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00302}00302\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ bitr\ =\ \_rexbalance.require\_find(\ owner.value,\ \textcolor{stringliteral}{"{}account\ has\ no\ REX\ balance"{}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00303}00303\ \ \ \ \ \ \ check(\ rex.amount\ >\ 0\ \&\&\ rex.symbol\ ==\ bitr-\/>rex\_balance.symbol,\ \textcolor{stringliteral}{"{}asset\ must\ be\ a\ positive\ amount\ of\ (REX,\ 4)"{}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00304}00304\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ rex\_in\_savings\ =\ read\_rex\_savings(\ bitr\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00305}00305\ \ \ \ \ \ \ check(\ rex.amount\ <=\ rex\_in\_savings,\ \textcolor{stringliteral}{"{}insufficient\ REX\ in\ savings"{}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00306}00306\ \ \ \ \ \ \ process\_rex\_maturities(\ bitr\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00307}00307\ \ \ \ \ \ \ \_rexbalance.modify(\ bitr,\ same\_payer,\ [\&](\ \textcolor{keyword}{auto}\&\ rb\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00308}00308\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1time__point__sec}{time\_point\_sec}}\ maturity\ =\ get\_rex\_maturity();}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00309}00309\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ !rb.rex\_maturities.empty()\ \&\&\ rb.rex\_maturities.back().first\ ==\ maturity\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00310}00310\ \ \ \ \ \ \ \ \ \ \ \ \ rb.rex\_maturities.back().second\ +=\ rex.amount;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00311}00311\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00312}00312\ \ \ \ \ \ \ \ \ \ \ \ \ rb.rex\_maturities.emplace\_back(\ \mbox{\hyperlink{structsysiosystem_1_1pair__time__point__sec__int64}{pair\_time\_point\_sec\_int64}}\ \{\ maturity,\ rex.amount\ \}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00313}00313\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00314}00314\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00315}00315\ \ \ \ \ \ \ put\_rex\_savings(\ bitr,\ rex\_in\_savings\ -\/\ rex.amount\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00316}00316\ \ \ \ \ \ \ update\_rex\_account(\ owner,\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}(\ 0,\ core\_symbol()\ ),\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}(\ 0,\ core\_symbol()\ )\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00317}00317\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00318}00318\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00319}\mbox{\hyperlink{classsysiosystem_1_1system__contract_ab4f2d94418ed6a1fe42a467b9d72a17b}{00319}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_ab4f2d94418ed6a1fe42a467b9d72a17b}{system\_contract::closerex}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\&\ owner\ )}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00320}00320\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00321}00321\ \ \ \ \ \ \ require\_auth(\ owner\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00322}00322\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00323}00323\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ rex\_system\_initialized()\ )}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00324}00324\ \ \ \ \ \ \ \ \ \ runrex(2);}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00325}00325\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00326}00326\ \ \ \ \ \ \ update\_rex\_account(\ owner,\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}(\ 0,\ core\_symbol()\ ),\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}(\ 0,\ core\_symbol()\ )\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00327}00327\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00329}00329\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00330}00330\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysiosystem_a2b6105db3f0018cb55e05ef0f062aab0}{rex\_cpu\_loan\_table}}\ cpu\_loans(\ get\_self(),\ get\_self().\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00331}00331\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ cpu\_idx\ =\ cpu\_loans.get\_index<\textcolor{stringliteral}{"{}byowner"{}}\_n>();}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00332}00332\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ no\_outstanding\_cpu\_loans\ =\ (\ cpu\_idx.find(\ owner.value\ )\ ==\ cpu\_idx.end()\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00333}00333\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00334}00334\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysiosystem_ae19f143ed0d859ca1adee15b440e3826}{rex\_net\_loan\_table}}\ net\_loans(\ get\_self(),\ get\_self().\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00335}00335\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ net\_idx\ =\ net\_loans.get\_index<\textcolor{stringliteral}{"{}byowner"{}}\_n>();}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00336}00336\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ no\_outstanding\_net\_loans\ =\ (\ net\_idx.find(\ owner.value\ )\ ==\ net\_idx.end()\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00337}00337\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00338}00338\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ fund\_itr\ =\ \_rexfunds.find(\ owner.value\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00339}00339\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ no\_outstanding\_rex\_fund\ =\ (\ fund\_itr\ !=\ \_rexfunds.end()\ )\ \&\&\ (\ fund\_itr-\/>balance.amount\ ==\ 0\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00340}00340\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00341}00341\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ no\_outstanding\_cpu\_loans\ \&\&\ no\_outstanding\_net\_loans\ \&\&\ no\_outstanding\_rex\_fund\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00342}00342\ \ \ \ \ \ \ \ \ \ \ \ \ \_rexfunds.erase(\ fund\_itr\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00343}00343\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00344}00344\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00345}00345\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00347}00347\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00348}00348\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ rex\_itr\ =\ \_rexbalance.find(\ owner.value\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00349}00349\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ rex\_itr\ !=\ \_rexbalance.end()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00350}00350\ \ \ \ \ \ \ \ \ \ \ \ \ check(\ rex\_itr-\/>rex\_balance.amount\ ==\ 0,\ \textcolor{stringliteral}{"{}account\ has\ remaining\ REX\ balance,\ must\ sell\ first"{}});}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00351}00351\ \ \ \ \ \ \ \ \ \ \ \ \ \_rexbalance.erase(\ rex\_itr\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00352}00352\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00353}00353\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00354}00354\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00355}00355\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00364}00364\ \ \ \ \textcolor{keywordtype}{void}\ system\_contract::update\_resource\_limits(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\&\ from,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\&\ receiver,\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ delta\_net,\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ delta\_cpu\ )}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00365}00365\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00366}00366\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ delta\_cpu\ ==\ 0\ \&\&\ delta\_net\ ==\ 0\ )\ \{\ \textcolor{comment}{//\ nothing\ to\ update}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00367}00367\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00368}00368\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00369}00369\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00370}00370\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysiosystem_aeda3aa12065ee04f138f8538184b8e54}{user\_resources\_table}}\ totals\_tbl(\ get\_self(),\ receiver.value\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00371}00371\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ tot\_itr\ =\ totals\_tbl.find(\ receiver.value\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00372}00372\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ tot\_itr\ ==\ totals\_tbl.end()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00373}00373\ \ \ \ \ \ \ \ \ \ check(\ 0\ <=\ delta\_net\ \&\&\ 0\ <=\ delta\_cpu,\ \textcolor{stringliteral}{"{}logic\ error,\ should\ not\ occur"{}});}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00374}00374\ \ \ \ \ \ \ \ \ \ tot\_itr\ =\ totals\_tbl.emplace(\ from,\ [\&](\ \textcolor{keyword}{auto}\&\ tot\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00375}00375\ \ \ \ \ \ \ \ \ \ \ \ \ tot.owner\ \ \ \ \ \ =\ receiver;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00376}00376\ \ \ \ \ \ \ \ \ \ \ \ \ tot.net\_weight\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}(\ delta\_net,\ core\_symbol()\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00377}00377\ \ \ \ \ \ \ \ \ \ \ \ \ tot.cpu\_weight\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}(\ delta\_cpu,\ core\_symbol()\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00378}00378\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00379}00379\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00380}00380\ \ \ \ \ \ \ \ \ \ totals\_tbl.modify(\ tot\_itr,\ same\_payer,\ [\&](\ \textcolor{keyword}{auto}\&\ tot\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00381}00381\ \ \ \ \ \ \ \ \ \ \ \ \ tot.net\_weight.amount\ +=\ delta\_net;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00382}00382\ \ \ \ \ \ \ \ \ \ \ \ \ tot.cpu\_weight.amount\ +=\ delta\_cpu;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00383}00383\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00384}00384\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00385}00385\ \ \ \ \ \ \ check(\ 0\ <=\ tot\_itr-\/>net\_weight.amount,\ \textcolor{stringliteral}{"{}insufficient\ staked\ total\ net\ bandwidth"{}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00386}00386\ \ \ \ \ \ \ check(\ 0\ <=\ tot\_itr-\/>cpu\_weight.amount,\ \textcolor{stringliteral}{"{}insufficient\ staked\ total\ cpu\ bandwidth"{}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00387}00387\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00388}00388\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00389}00389\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ net\_managed\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00390}00390\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ cpu\_managed\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00391}00391\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00392}00392\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ voter\_itr\ =\ \_voters.find(\ receiver.value\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00393}00393\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ voter\_itr\ !=\ \_voters.end()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00394}00394\ \ \ \ \ \ \ \ \ \ \ \ \ net\_managed\ =\ has\_field(\ voter\_itr-\/>flags1,\ \mbox{\hyperlink{structsysiosystem_1_1voter__info_a327be7d8d01a553dfe29535d56828576a944559ad694d4c0fc4bf286864caf2a2}{voter\_info::flags1\_fields::net\_managed}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00395}00395\ \ \ \ \ \ \ \ \ \ \ \ \ cpu\_managed\ =\ has\_field(\ voter\_itr-\/>flags1,\ \mbox{\hyperlink{structsysiosystem_1_1voter__info_a327be7d8d01a553dfe29535d56828576ace319c6a1aa0ced6ea5a02270d863f4c}{voter\_info::flags1\_fields::cpu\_managed}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00396}00396\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00397}00397\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00398}00398\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !(net\_managed\ \&\&\ cpu\_managed)\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00399}00399\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ ram\_bytes\ =\ 0,\ net\ =\ 0,\ cpu\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00400}00400\ \ \ \ \ \ \ \ \ \ \ \ \ get\_resource\_limits(\ receiver,\ ram\_bytes,\ net,\ cpu\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00401}00401\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00402}00402\ \ \ \ \ \ \ \ \ \ \ \ \ set\_resource\_limits(\ receiver,}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00403}00403\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ram\_bytes,}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00404}00404\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ net\_managed\ ?\ net\ :\ tot\_itr-\/>net\_weight.amount,}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00405}00405\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ cpu\_managed\ ?\ cpu\ :\ tot\_itr-\/>cpu\_weight.amount\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00406}00406\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00407}00407\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00408}00408\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00409}00409\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ tot\_itr-\/>is\_empty()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00410}00410\ \ \ \ \ \ \ \ \ \ totals\_tbl.erase(\ tot\_itr\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00411}00411\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00412}00412\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00413}00413\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00421}00421\ \ \ \ \textcolor{keywordtype}{void}\ system\_contract::check\_voting\_requirement(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\&\ owner,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ error\_msg\ )\textcolor{keyword}{const}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00422}00422\ \textcolor{keyword}{\ \ \ }\{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00423}00423\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ vitr\ =\ \_voters.find(\ owner.value\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00424}00424\ \ \ \ \ \ \ check(\ vitr\ !=\ \_voters.end()\ \&\&\ (\ vitr-\/>proxy\ ||\ 21\ <=\ vitr-\/>producers.size()\ ),\ error\_msg\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00425}00425\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00426}00426\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00433}00433\ \ \ \ \textcolor{keywordtype}{bool}\ system\_contract::rex\_loans\_available()\textcolor{keyword}{const}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00434}00434\ \textcolor{keyword}{\ \ \ }\{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00435}00435\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ !rex\_available()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00436}00436\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00437}00437\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00438}00438\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ \_rexorders.begin()\ ==\ \_rexorders.end()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00439}00439\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \textcolor{comment}{//\ no\ outstanding\ sellrex\ orders}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00440}00440\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00441}00441\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ =\ \_rexorders.get\_index<\textcolor{stringliteral}{"{}bytime"{}}\_n>();}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00442}00442\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !\mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.begin()-\/>is\_open;\ \textcolor{comment}{//\ no\ outstanding\ unfilled\ sellrex\ orders}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00443}00443\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00444}00444\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00445}00445\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00446}00446\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00454}00454\ \ \ \ \textcolor{keywordtype}{void}\ system\_contract::add\_loan\_to\_rex\_pool(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\&\ payment,\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ rented\_tokens,\ \textcolor{keywordtype}{bool}\ new\_loan\ )}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00455}00455\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00456}00456\ \ \ \ \ \ \ add\_to\_rex\_return\_pool(\ payment\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00457}00457\ \ \ \ \ \ \ \_rexpool.modify(\ \_rexpool.begin(),\ same\_payer,\ [\&](\ \textcolor{keyword}{auto}\&\ rt\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00458}00458\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ add\ payment\ to\ total\_rent}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00459}00459\ \ \ \ \ \ \ \ \ \ rt.total\_rent.amount\ \ \ \ +=\ payment.amount;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00460}00460\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ move\ rented\_tokens\ from\ total\_unlent\ to\ total\_lent}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00461}00461\ \ \ \ \ \ \ \ \ \ rt.total\_unlent.amount\ \ -\/=\ rented\_tokens;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00462}00462\ \ \ \ \ \ \ \ \ \ rt.total\_lent.amount\ \ \ \ +=\ rented\_tokens;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00463}00463\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ increment\ loan\_num\ if\ a\ new\ loan\ is\ being\ created}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00464}00464\ \ \ \ \ \ \ \ \ \ if\ (\ new\_loan\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00465}00465\ \ \ \ \ \ \ \ \ \ \ \ \ rt.loan\_num++;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00466}00466\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00467}00467\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00468}00468\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00469}00469\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00475}00475\ \ \ \ \textcolor{keywordtype}{void}\ system\_contract::remove\_loan\_from\_rex\_pool(\ \textcolor{keyword}{const}\ rex\_loan\&\ loan\ )}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00476}00476\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00477}00477\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ pool\ =\ \_rexpool.begin();}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00478}00478\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ delta\_total\_rent\ =\ exchange\_state::get\_bancor\_output(\ pool-\/>total\_unlent.amount,}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00479}00479\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ pool-\/>total\_rent.amount,}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00480}00480\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ loan.total\_staked.amount\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00481}00481\ \ \ \ \ \ \ \_rexpool.modify(\ pool,\ same\_payer,\ [\&](\ \textcolor{keyword}{auto}\&\ rt\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00482}00482\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ deduct\ calculated\ delta\_total\_rent\ from\ total\_rent}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00483}00483\ \ \ \ \ \ \ \ \ \ rt.total\_rent.amount\ \ \ \ -\/=\ delta\_total\_rent;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00484}00484\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ move\ rented\ tokens\ from\ total\_lent\ to\ total\_unlent}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00485}00485\ \ \ \ \ \ \ \ \ \ rt.total\_unlent.amount\ \ +=\ loan.total\_staked.amount;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00486}00486\ \ \ \ \ \ \ \ \ \ rt.total\_lent.amount\ \ \ \ -\/=\ loan.total\_staked.amount;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00487}00487\ \ \ \ \ \ \ \ \ \ rt.total\_lendable.amount\ =\ rt.total\_unlent.amount\ +\ rt.total\_lent.amount;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00488}00488\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00489}00489\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00490}00490\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00494}00494\ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ Index,\ \textcolor{keyword}{typename}\ Iterator>}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00495}00495\ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ system\_contract::update\_renewed\_loan(\ Index\&\ idx,\ \textcolor{keyword}{const}\ Iterator\&\ itr,\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ rented\_tokens\ )}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00496}00496\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00497}00497\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ delta\_stake\ =\ rented\_tokens\ -\/\ itr-\/>total\_staked.amount;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00498}00498\ \ \ \ \ \ \ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.modify\ (\ itr,\ same\_payer,\ [\&](\ \textcolor{keyword}{auto}\&\ loan\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00499}00499\ \ \ \ \ \ \ \ \ \ loan.total\_staked.amount\ =\ rented\_tokens;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00500}00500\ \ \ \ \ \ \ \ \ \ loan.expiration\ \ \ \ \ \ \ \ \ +=\ \mbox{\hyperlink{namespacefc_adcb1bf49c2b6b33eacb5a84333b12a5c}{sysio::days}}(30);}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00501}00501\ \ \ \ \ \ \ \ \ \ loan.balance.amount\ \ \ \ \ -\/=\ loan.payment.amount;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00502}00502\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00503}00503\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ delta\_stake;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00504}00504\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00505}00505\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00511}00511\ \ \ \ \textcolor{keywordtype}{void}\ system\_contract::runrex(\ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ max\ )}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00512}00512\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00513}00513\ \ \ \ \ \ \ check(\ rex\_system\_initialized(),\ \textcolor{stringliteral}{"{}rex\ system\ not\ initialized\ yet"{}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00514}00514\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00515}00515\ \ \ \ \ \ \ update\_rex\_pool();}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00516}00516\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00517}00517\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ pool\ =\ \_rexpool.begin();}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00518}00518\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00519}00519\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ process\_expired\_loan\ =\ [\&](\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}},\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ itr\ )\ -\/>\ std::pair<bool,\ int64\_t>\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00521}00521\ \ \ \ \ \ \ \ \ \ remove\_loan\_from\_rex\_pool(\ *itr\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00522}00522\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \ \ \ delete\_loan\ \ \ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00523}00523\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ delta\_stake\ \ \ =\ 0;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00525}00525\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ rented\_tokens\ =\ exchange\_state::get\_bancor\_output(\ pool-\/>total\_rent.amount,}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00526}00526\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ pool-\/>total\_unlent.amount,}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00527}00527\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ itr-\/>payment.amount\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00529}00529\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ renew\_loan\ =\ itr-\/>payment\ <=\ itr-\/>balance\ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00530}00530\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\&\ itr-\/>payment.amount\ <\ rented\_tokens\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00531}00531\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\&\ rex\_loans\_available();\ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00532}00532\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ renew\_loan\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00534}00534\ \ \ \ \ \ \ \ \ \ \ \ \ add\_loan\_to\_rex\_pool(\ itr-\/>payment,\ rented\_tokens,\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00536}00536\ \ \ \ \ \ \ \ \ \ \ \ \ delta\_stake\ =\ update\_renewed\_loan(\ idx,\ itr,\ rented\_tokens\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00537}00537\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00538}00538\ \ \ \ \ \ \ \ \ \ \ \ \ delete\_loan\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00539}00539\ \ \ \ \ \ \ \ \ \ \ \ \ delta\_stake\ =\ -\/(\ itr-\/>total\_staked.amount\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00541}00541\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ itr-\/>balance.amount\ >\ 0\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00542}00542\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ transfer\_to\_fund(\ itr-\/>from,\ itr-\/>balance\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00543}00543\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00544}00544\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00545}00545\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00546}00546\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{\ delete\_loan,\ delta\_stake\ \};}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00547}00547\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00548}00548\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00550}00550\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ pool-\/>namebid\_proceeds.amount\ >\ 0\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00551}00551\ \ \ \ \ \ \ \ \ \ channel\_to\_rex(\ names\_account,\ pool-\/>namebid\_proceeds\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00552}00552\ \ \ \ \ \ \ \ \ \ \_rexpool.modify(\ pool,\ same\_payer,\ [\&](\ \textcolor{keyword}{auto}\&\ rt\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00553}00553\ \ \ \ \ \ \ \ \ \ \ \ \ rt.namebid\_proceeds.amount\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00554}00554\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00555}00555\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00556}00556\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00558}00558\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00559}00559\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysiosystem_a2b6105db3f0018cb55e05ef0f062aab0}{rex\_cpu\_loan\_table}}\ cpu\_loans(\ get\_self(),\ get\_self().\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00560}00560\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ cpu\_idx\ =\ cpu\_loans.get\_index<\textcolor{stringliteral}{"{}byexpr"{}}\_n>();}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00561}00561\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ i\ =\ 0;\ i\ <\ max;\ ++i\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00562}00562\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ cpu\_idx.begin();}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00563}00563\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ itr\ ==\ cpu\_idx.end()\ ||\ itr-\/>expiration\ >\ current\_time\_point()\ )\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00564}00564\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00565}00565\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ result\ =\ process\_expired\_loan(\ cpu\_idx,\ itr\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00566}00566\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ result.second\ !=\ 0\ )}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00567}00567\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ update\_resource\_limits(\ itr-\/>from,\ itr-\/>receiver,\ 0,\ result.second\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00568}00568\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00569}00569\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ result.first\ )}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00570}00570\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ cpu\_idx.erase(\ itr\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00571}00571\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00572}00572\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00573}00573\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00575}00575\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00576}00576\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysiosystem_ae19f143ed0d859ca1adee15b440e3826}{rex\_net\_loan\_table}}\ net\_loans(\ get\_self(),\ get\_self().\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00577}00577\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ net\_idx\ =\ net\_loans.get\_index<\textcolor{stringliteral}{"{}byexpr"{}}\_n>();}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00578}00578\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ i\ =\ 0;\ i\ <\ max;\ ++i\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00579}00579\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ net\_idx.begin();}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00580}00580\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ itr\ ==\ net\_idx.end()\ ||\ itr-\/>expiration\ >\ current\_time\_point()\ )\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00581}00581\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00582}00582\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ result\ =\ process\_expired\_loan(\ net\_idx,\ itr\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00583}00583\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ result.second\ !=\ 0\ )}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00584}00584\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ update\_resource\_limits(\ itr-\/>from,\ itr-\/>receiver,\ result.second,\ 0\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00585}00585\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00586}00586\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ result.first\ )}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00587}00587\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ net\_idx.erase(\ itr\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00588}00588\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00589}00589\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00590}00590\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00592}00592\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ \_rexorders.begin()\ !=\ \_rexorders.end()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00593}00593\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}\ \ =\ \_rexorders.get\_index<\textcolor{stringliteral}{"{}bytime"{}}\_n>();}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00594}00594\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ oitr\ =\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.begin();}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00595}00595\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ i\ =\ 0;\ i\ <\ max;\ ++i\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00596}00596\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ oitr\ ==\ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.end()\ ||\ !oitr-\/>is\_open\ )\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00597}00597\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}}\ =\ oitr;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00598}00598\ \ \ \ \ \ \ \ \ \ \ \ \ ++\mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}};}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00599}00599\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ bitr\ =\ \_rexbalance.find(\ oitr-\/>owner.value\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00600}00600\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ bitr\ !=\ \_rexbalance.end()\ )\ \{\ \textcolor{comment}{//\ should\ always\ be\ true}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00601}00601\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ result\ =\ fill\_rex\_order(\ bitr,\ oitr-\/>rex\_requested\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00602}00602\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ result.success\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00603}00603\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\ order\_owner\ =\ oitr-\/>owner;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00604}00604\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacehost__functions__tests__1_a8496a24b5236a2dc07bb4f2930d88342}{idx}}.modify(\ oitr,\ same\_payer,\ [\&](\ \textcolor{keyword}{auto}\&\ order\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00605}00605\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ order.proceeds.amount\ \ \ \ \ =\ result.proceeds.amount;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00606}00606\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ order.stake\_change.amount\ =\ result.stake\_change.amount;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00607}00607\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ order.close();}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00608}00608\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00610}00610\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classrex__results_a9cc818bbdd737994bf6c6c028cbadf88}{rex\_results::orderresult\_action}}\ order\_act(\ rex\_account,\ std::vector<sysio::permission\_level>\{\ \}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00611}00611\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ order\_act.send(\ order\_owner,\ result.proceeds\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00612}00612\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00613}00613\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00614}00614\ \ \ \ \ \ \ \ \ \ \ \ \ oitr\ =\ \mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}};}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00615}00615\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00616}00616\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00617}00617\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00618}00618\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00619}00619\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00623}00623\ \ \ \ \textcolor{keywordtype}{void}\ system\_contract::update\_rex\_pool()}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00624}00624\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00625}00625\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ get\_elapsed\_intervals\ =\ [\&](\ \textcolor{keyword}{const}\ time\_point\_sec\&\ t1,\ \textcolor{keyword}{const}\ time\_point\_sec\&\ t0\ )\ -\/>\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00626}00626\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (\ t1.sec\_since\_epoch()\ -\/\ t0.sec\_since\_epoch()\ )\ /\ rex\_return\_pool::dist\_interval;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00627}00627\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00628}00628\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00629}00629\ \ \ \ \ \ \ \textcolor{keyword}{const}\ time\_point\_sec\ ct\ \ \ \ \ \ \ \ \ \ \ \ \ =\ current\_time\_point();}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00630}00630\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \ \ \ \ \ \ cts\ \ \ \ \ \ \ \ \ \ \ \ =\ ct.sec\_since\_epoch();}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00631}00631\ \ \ \ \ \ \ \textcolor{keyword}{const}\ time\_point\_sec\ effective\_time\{cts\ -\/\ cts\ \%\ rex\_return\_pool::dist\_interval\};}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00632}00632\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00633}00633\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ ret\_pool\_elem\ \ \ \ =\ \_rexretpool.begin();}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00634}00634\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ ret\_buckets\_elem\ =\ \_rexretbuckets.begin();}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00635}00635\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00636}00636\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ ret\_pool\_elem\ ==\ \_rexretpool.end()\ ||\ effective\_time\ <=\ ret\_pool\_elem-\/>last\_dist\_time\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00637}00637\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00638}00638\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00639}00639\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00640}00640\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ \ current\_rate\ \ \ \ \ \ =\ ret\_pool\_elem-\/>current\_rate\_of\_increase;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00641}00641\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ elapsed\_intervals\ =\ get\_elapsed\_intervals(\ effective\_time,\ ret\_pool\_elem-\/>last\_dist\_time\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00642}00642\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ \ \ \ \ \ \ \ change\_estimate\ \ \ =\ current\_rate\ *\ elapsed\_intervals;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00643}00643\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00644}00644\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00645}00645\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ new\_return\_bucket\ =\ ret\_pool\_elem-\/>pending\_bucket\_time\ <=\ effective\_time;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00646}00646\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ \ \ \ \ \ \ \ new\_bucket\_rate\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00647}00647\ \ \ \ \ \ \ \ \ \ time\_point\_sec\ new\_bucket\_time\ =\ time\_point\_sec::min();}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00648}00648\ \ \ \ \ \ \ \ \ \ \_rexretpool.modify(\ ret\_pool\_elem,\ same\_payer,\ [\&](\ \textcolor{keyword}{auto}\&\ rp\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00649}00649\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ new\_return\_bucket\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00650}00650\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ remainder\ =\ rp.pending\_bucket\_proceeds\ \%\ rex\_return\_pool::total\_intervals;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00651}00651\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ new\_bucket\_rate\ \ \ =\ (\ rp.pending\_bucket\_proceeds\ -\/\ remainder\ )\ /\ rex\_return\_pool::total\_intervals;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00652}00652\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ new\_bucket\_time\ \ \ =\ rp.pending\_bucket\_time;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00653}00653\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ rp.current\_rate\_of\_increase\ +=\ new\_bucket\_rate;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00654}00654\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ change\_estimate\ \ \ \ \ \ \ \ \ \ \ \ \ +=\ remainder\ +\ new\_bucket\_rate\ *\ get\_elapsed\_intervals(\ effective\_time,\ rp.pending\_bucket\_time\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00655}00655\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ rp.pending\_bucket\_proceeds\ \ \ =\ 0;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00656}00656\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ rp.pending\_bucket\_time\ \ \ \ \ \ \ =\ time\_point\_sec::maximum();}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00657}00657\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ new\_bucket\_time\ <\ rp.oldest\_bucket\_time\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00658}00658\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ rp.oldest\_bucket\_time\ =\ new\_bucket\_time;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00659}00659\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00660}00660\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00661}00661\ \ \ \ \ \ \ \ \ \ \ \ \ rp.proceeds\ \ \ \ \ \ -\/=\ change\_estimate;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00662}00662\ \ \ \ \ \ \ \ \ \ \ \ \ rp.last\_dist\_time\ =\ effective\_time;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00663}00663\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00664}00664\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00665}00665\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ new\_return\_bucket\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00666}00666\ \ \ \ \ \ \ \ \ \ \ \ \ \_rexretbuckets.modify(\ ret\_buckets\_elem,\ same\_payer,\ [\&](\ \textcolor{keyword}{auto}\&\ rb\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00667}00667\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ iter\ =\ std::lower\_bound(rb.return\_buckets.begin(),\ rb.return\_buckets.end(),\ new\_bucket\_time,\ [](\textcolor{keyword}{const}\ pair\_time\_point\_sec\_int64\&\ bucket,\ time\_point\_sec\ first)\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00668}00668\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ return\ bucket.first\ <\ first;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00669}00669\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00670}00670\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((iter\ !=\ rb.return\_buckets.end())\ \&\&\ (iter-\/>first\ ==\ new\_bucket\_time))\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00671}00671\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ iter-\/>second\ =\ new\_bucket\_rate;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00672}00672\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00673}00673\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ rb.return\_buckets.insert(iter,\ pair\_time\_point\_sec\_int64\{new\_bucket\_time,\ new\_bucket\_rate\});}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00674}00674\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00675}00675\ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00676}00676\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00677}00677\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00678}00678\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00679}00679\ \ \ \ \ \ \ \textcolor{keyword}{const}\ time\_point\_sec\ time\_threshold\ =\ effective\_time\ -\/\ seconds(rex\_return\_pool::total\_intervals\ *\ rex\_return\_pool::dist\_interval);}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00680}00680\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ ret\_pool\_elem-\/>oldest\_bucket\_time\ <=\ time\_threshold\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00681}00681\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ expired\_rate\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00682}00682\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ surplus\ \ \ \ \ \ =\ 0;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00683}00683\ \ \ \ \ \ \ \ \ \ \_rexretbuckets.modify(\ ret\_buckets\_elem,\ same\_payer,\ [\&](\ \textcolor{keyword}{auto}\&\ rb\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00684}00684\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ return\_buckets\ =\ rb.return\_buckets;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00685}00685\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ iter\ =\ return\_buckets.begin();}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00686}00686\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (;\ iter\ !=\ return\_buckets.end()\ \&\&\ iter-\/>first\ <=\ time\_threshold;\ ++iter)\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00687}00687\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ overtime\ =\ get\_elapsed\_intervals(\ effective\_time,}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00688}00688\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ iter-\/>first\ +\ seconds(rex\_return\_pool::total\_intervals\ *\ rex\_return\_pool::dist\_interval)\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00689}00689\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ surplus\ \ \ \ \ \ +=\ iter-\/>second\ *\ overtime;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00690}00690\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ expired\_rate\ +=\ iter-\/>second;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00691}00691\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00692}00692\ \ \ \ \ \ \ \ \ \ \ \ \ return\_buckets.erase(return\_buckets.begin(),\ iter);}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00693}00693\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00694}00694\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00695}00695\ \ \ \ \ \ \ \ \ \ \_rexretpool.modify(\ ret\_pool\_elem,\ same\_payer,\ [\&](\ \textcolor{keyword}{auto}\&\ rp\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00696}00696\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ !ret\_buckets\_elem-\/>return\_buckets.empty()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00697}00697\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ rp.oldest\_bucket\_time\ =\ ret\_buckets\_elem-\/>return\_buckets.begin()-\/>first;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00698}00698\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00699}00699\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ rp.oldest\_bucket\_time\ =\ time\_point\_sec::min();}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00700}00700\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00701}00701\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ expired\_rate\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00702}00702\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ rp.current\_rate\_of\_increase\ -\/=\ expired\_rate;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00703}00703\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00704}00704\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ surplus\ >\ 0\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00705}00705\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ change\_estimate\ -\/=\ surplus;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00706}00706\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ rp.proceeds\ \ \ \ \ +=\ surplus;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00707}00707\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00708}00708\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00709}00709\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00710}00710\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00711}00711\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ change\_estimate\ >\ 0\ \&\&\ ret\_pool\_elem-\/>proceeds\ <\ 0\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00712}00712\ \ \ \ \ \ \ \ \ \ \_rexretpool.modify(\ ret\_pool\_elem,\ same\_payer,\ [\&](\ \textcolor{keyword}{auto}\&\ rp\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00713}00713\ \ \ \ \ \ \ \ \ \ \ \ \ change\_estimate\ +=\ rp.proceeds;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00714}00714\ \ \ \ \ \ \ \ \ \ \ \ \ rp.proceeds\ \ \ \ \ \ =\ 0;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00715}00715\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00716}00716\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00717}00717\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00718}00718\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ change\_estimate\ >\ 0\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00719}00719\ \ \ \ \ \ \ \ \ \ \_rexpool.modify(\ \_rexpool.begin(),\ same\_payer,\ [\&](\ \textcolor{keyword}{auto}\&\ pool\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00720}00720\ \ \ \ \ \ \ \ \ \ \ \ \ pool.total\_unlent.amount\ +=\ change\_estimate;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00721}00721\ \ \ \ \ \ \ \ \ \ \ \ \ pool.total\_lendable\ \ \ \ \ \ \ =\ pool.total\_unlent\ +\ pool.total\_lent;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00722}00722\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00723}00723\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00724}00724\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00725}00725\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00726}00726\ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00727}00727\ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ system\_contract::rent\_rex(\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ table,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\&\ from,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\&\ receiver,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\&\ payment,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\&\ fund\ )}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00728}00728\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00729}00729\ \ \ \ \ \ \ runrex(2);}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00730}00730\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00731}00731\ \ \ \ \ \ \ check(\ rex\_loans\_available(),\ \textcolor{stringliteral}{"{}rex\ loans\ are\ currently\ not\ available"{}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00732}00732\ \ \ \ \ \ \ check(\ payment.symbol\ ==\ core\_symbol()\ \&\&\ fund.symbol\ ==\ core\_symbol(),\ \textcolor{stringliteral}{"{}must\ use\ core\ token"{}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00733}00733\ \ \ \ \ \ \ check(\ 0\ <\ payment.amount\ \&\&\ 0\ <=\ fund.amount,\ \textcolor{stringliteral}{"{}must\ use\ positive\ asset\ amount"{}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00734}00734\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00735}00735\ \ \ \ \ \ \ transfer\_from\_fund(\ from,\ payment\ +\ fund\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00736}00736\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00737}00737\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ pool\ =\ \_rexpool.begin();\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00738}00738\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00739}00739\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ rented\_tokens\ =\ exchange\_state::get\_bancor\_output(\ pool-\/>total\_rent.amount,}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00740}00740\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ pool-\/>total\_unlent.amount,}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00741}00741\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ payment.amount\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00742}00742\ \ \ \ \ \ \ check(\ payment.amount\ <\ rented\_tokens,\ \textcolor{stringliteral}{"{}loan\ price\ does\ not\ favor\ renting"{}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00743}00743\ \ \ \ \ \ \ add\_loan\_to\_rex\_pool(\ payment,\ rented\_tokens,\ \textcolor{keyword}{true}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00744}00744\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00745}00745\ \ \ \ \ \ \ table.emplace(\ from,\ [\&](\ \textcolor{keyword}{auto}\&\ c\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00746}00746\ \ \ \ \ \ \ \ \ \ c.from\ \ \ \ \ \ \ \ \ =\ from;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00747}00747\ \ \ \ \ \ \ \ \ \ c.receiver\ \ \ \ \ =\ receiver;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00748}00748\ \ \ \ \ \ \ \ \ \ c.payment\ \ \ \ \ \ =\ payment;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00749}00749\ \ \ \ \ \ \ \ \ \ c.balance\ \ \ \ \ \ =\ fund;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00750}00750\ \ \ \ \ \ \ \ \ \ c.total\_staked\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}(\ rented\_tokens,\ core\_symbol()\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00751}00751\ \ \ \ \ \ \ \ \ \ c.expiration\ \ \ =\ current\_time\_point()\ +\ \mbox{\hyperlink{namespacefc_adcb1bf49c2b6b33eacb5a84333b12a5c}{sysio::days}}(30);}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00752}00752\ \ \ \ \ \ \ \ \ \ c.loan\_num\ \ \ \ \ =\ pool-\/>loan\_num;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00753}00753\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00754}00754\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00755}00755\ \ \ \ \ \ \ \mbox{\hyperlink{classrex__results_a55dcfa6ac376d5967deacaa562072738}{rex\_results::rentresult\_action}}\ rentresult\_act\{\ rex\_account,\ std::vector<sysio::permission\_level>\{\ \}\ \};}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00756}00756\ \ \ \ \ \ \ rentresult\_act.send(\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\{\ rented\_tokens,\ core\_symbol()\ \}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00757}00757\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ rented\_tokens;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00758}00758\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00759}00759\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00776}00776\ \ \ \ rex\_order\_outcome\ system\_contract::fill\_rex\_order(\ \textcolor{keyword}{const}\ rex\_balance\_table::const\_iterator\&\ bitr,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\&\ rex\ )}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00777}00777\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00778}00778\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ rexpool\_itr\ =\ \_rexpool.begin();}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00779}00779\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ S0\ =\ rexpool\_itr-\/>total\_lendable.amount;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00780}00780\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ R0\ =\ rexpool\_itr-\/>total\_rex.amount;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00781}00781\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ \ =\ (\mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a376f631fcb770bd4b2e8349a33e52f8a}{uint128\_t}}(rex.amount)\ *\ S0)\ /\ R0;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00782}00782\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ R1\ =\ R0\ -\/\ rex.amount;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00783}00783\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ S1\ =\ S0\ -\/\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}};}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00784}00784\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\ proceeds(\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\ core\_symbol()\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00785}00785\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\ stake\_change(\ 0,\ core\_symbol()\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00786}00786\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a72ffd6653260a2dedcc4b55e39e10973a4e09c20e9a85794807a130e8283e8769}{success}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00787}00787\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00788}00788\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ unlent\_lower\_bound\ =\ rexpool\_itr-\/>total\_lent.amount\ /\ 10;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00789}00789\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ available\_unlent\ \ \ =\ rexpool\_itr-\/>total\_unlent.amount\ -\/\ unlent\_lower\_bound;\ \textcolor{comment}{//\ available\_unlent\ <=\ 0\ is\ possible}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00790}00790\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ proceeds.amount\ <=\ available\_unlent\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00791}00791\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ init\_vote\_stake\_amount\ =\ bitr-\/>vote\_stake.amount;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00792}00792\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ current\_stake\_value\ \ \ \ =\ (\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a376f631fcb770bd4b2e8349a33e52f8a}{uint128\_t}}(bitr-\/>rex\_balance.amount)\ *\ S0\ )\ /\ R0;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00793}00793\ \ \ \ \ \ \ \ \ \ \_rexpool.modify(\ rexpool\_itr,\ same\_payer,\ [\&](\ \textcolor{keyword}{auto}\&\ rt\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00794}00794\ \ \ \ \ \ \ \ \ \ \ \ \ rt.total\_rex.amount\ \ \ \ \ \ =\ R1;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00795}00795\ \ \ \ \ \ \ \ \ \ \ \ \ rt.total\_lendable.amount\ =\ S1;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00796}00796\ \ \ \ \ \ \ \ \ \ \ \ \ rt.total\_unlent.amount\ \ \ =\ rt.total\_lendable.amount\ -\/\ rt.total\_lent.amount;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00797}00797\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00798}00798\ \ \ \ \ \ \ \ \ \ \_rexbalance.modify(\ bitr,\ same\_payer,\ [\&](\ \textcolor{keyword}{auto}\&\ rb\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00799}00799\ \ \ \ \ \ \ \ \ \ \ \ \ rb.vote\_stake.amount\ \ \ =\ current\_stake\_value\ -\/\ proceeds.amount;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00800}00800\ \ \ \ \ \ \ \ \ \ \ \ \ rb.rex\_balance.amount\ -\/=\ rex.amount;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00801}00801\ \ \ \ \ \ \ \ \ \ \ \ \ rb.matured\_rex\ \ \ \ \ \ \ \ -\/=\ rex.amount;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00802}00802\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00803}00803\ \ \ \ \ \ \ \ \ \ stake\_change.amount\ =\ bitr-\/>vote\_stake.amount\ -\/\ init\_vote\_stake\_amount;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00804}00804\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a72ffd6653260a2dedcc4b55e39e10973a4e09c20e9a85794807a130e8283e8769}{success}}\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00805}00805\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00806}00806\ \ \ \ \ \ \ \ \ \ proceeds.amount\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00807}00807\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00808}00808\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00809}00809\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1webassembly_a72ffd6653260a2dedcc4b55e39e10973a4e09c20e9a85794807a130e8283e8769}{success}},\ proceeds,\ stake\_change\ \};}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00810}00810\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00811}00811\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00812}00812\ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00813}00813\ \ \ \ \textcolor{keywordtype}{void}\ system\_contract::fund\_rex\_loan(\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ table,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\&\ from,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ loan\_num,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\&\ payment\ \ )}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00814}00814\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00815}00815\ \ \ \ \ \ \ check(\ payment.symbol\ ==\ core\_symbol(),\ \textcolor{stringliteral}{"{}must\ use\ core\ token"{}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00816}00816\ \ \ \ \ \ \ transfer\_from\_fund(\ from,\ payment\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00817}00817\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ table.require\_find(\ loan\_num,\ \textcolor{stringliteral}{"{}loan\ not\ found"{}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00818}00818\ \ \ \ \ \ \ check(\ itr-\/>from\ ==\ from,\ \textcolor{stringliteral}{"{}user\ must\ be\ loan\ creator"{}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00819}00819\ \ \ \ \ \ \ check(\ itr-\/>expiration\ >\ current\_time\_point(),\ \textcolor{stringliteral}{"{}loan\ has\ already\ expired"{}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00820}00820\ \ \ \ \ \ \ table.modify(\ itr,\ same\_payer,\ [\&](\ \textcolor{keyword}{auto}\&\ loan\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00821}00821\ \ \ \ \ \ \ \ \ \ loan.balance.amount\ +=\ payment.amount;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00822}00822\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00823}00823\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00824}00824\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00825}00825\ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00826}00826\ \ \ \ \textcolor{keywordtype}{void}\ system\_contract::defund\_rex\_loan(\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ table,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\&\ from,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ loan\_num,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\&\ amount\ \ )}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00827}00827\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00828}00828\ \ \ \ \ \ \ check(\ amount.symbol\ ==\ core\_symbol(),\ \textcolor{stringliteral}{"{}must\ use\ core\ token"{}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00829}00829\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ table.require\_find(\ loan\_num,\ \textcolor{stringliteral}{"{}loan\ not\ found"{}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00830}00830\ \ \ \ \ \ \ check(\ itr-\/>from\ ==\ from,\ \textcolor{stringliteral}{"{}user\ must\ be\ loan\ creator"{}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00831}00831\ \ \ \ \ \ \ check(\ itr-\/>expiration\ >\ current\_time\_point(),\ \textcolor{stringliteral}{"{}loan\ has\ already\ expired"{}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00832}00832\ \ \ \ \ \ \ check(\ itr-\/>balance\ >=\ amount,\ \textcolor{stringliteral}{"{}insufficent\ loan\ balance"{}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00833}00833\ \ \ \ \ \ \ table.modify(\ itr,\ same\_payer,\ [\&](\ \textcolor{keyword}{auto}\&\ loan\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00834}00834\ \ \ \ \ \ \ \ \ \ loan.balance.amount\ -\/=\ amount.amount;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00835}00835\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00836}00836\ \ \ \ \ \ \ transfer\_to\_fund(\ from,\ amount\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00837}00837\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00838}00838\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00847}00847\ \ \ \ \textcolor{keywordtype}{void}\ system\_contract::transfer\_from\_fund(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\&\ owner,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\&\ amount\ )}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00848}00848\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00849}00849\ \ \ \ \ \ \ check(\ 0\ <\ amount.amount\ \&\&\ amount.symbol\ ==\ core\_symbol(),\ \textcolor{stringliteral}{"{}must\ transfer\ positive\ amount\ from\ REX\ fund"{}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00850}00850\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ \_rexfunds.require\_find(\ owner.value,\ \textcolor{stringliteral}{"{}must\ deposit\ to\ REX\ fund\ first"{}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00851}00851\ \ \ \ \ \ \ check(\ amount\ <=\ itr-\/>balance,\ \textcolor{stringliteral}{"{}insufficient\ funds"{}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00852}00852\ \ \ \ \ \ \ \_rexfunds.modify(\ itr,\ same\_payer,\ [\&](\ \textcolor{keyword}{auto}\&\ fund\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00853}00853\ \ \ \ \ \ \ \ \ \ fund.balance.amount\ -\/=\ amount.amount;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00854}00854\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00855}00855\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00856}00856\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00863}00863\ \ \ \ \textcolor{keywordtype}{void}\ system\_contract::transfer\_to\_fund(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\&\ owner,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\&\ amount\ )}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00864}00864\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00865}00865\ \ \ \ \ \ \ check(\ 0\ <\ amount.amount\ \&\&\ amount.symbol\ ==\ core\_symbol(),\ \textcolor{stringliteral}{"{}must\ transfer\ positive\ amount\ to\ REX\ fund"{}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00866}00866\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ \_rexfunds.find(\ owner.value\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00867}00867\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ itr\ ==\ \_rexfunds.end()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00868}00868\ \ \ \ \ \ \ \ \ \ \_rexfunds.emplace(\ owner,\ [\&](\ \textcolor{keyword}{auto}\&\ fund\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00869}00869\ \ \ \ \ \ \ \ \ \ \ \ \ fund.owner\ \ \ =\ owner;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00870}00870\ \ \ \ \ \ \ \ \ \ \ \ \ fund.balance\ =\ amount;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00871}00871\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00872}00872\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00873}00873\ \ \ \ \ \ \ \ \ \ \_rexfunds.modify(\ itr,\ same\_payer,\ [\&](\ \textcolor{keyword}{auto}\&\ fund\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00874}00874\ \ \ \ \ \ \ \ \ \ \ \ \ fund.balance.amount\ +=\ amount.amount;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00875}00875\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00876}00876\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00877}00877\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00878}00878\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00894}00894\ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\ system\_contract::update\_rex\_account(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\&\ owner,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\&\ proceeds,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\&\ delta\_stake,\ \textcolor{keywordtype}{bool}\ force\_vote\_update\ )}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00895}00895\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00896}00896\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\ to\_fund(\ proceeds\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00897}00897\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\ to\_stake(\ delta\_stake\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00898}00898\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\ rex\_in\_sell\_order(\ 0,\ rex\_symbol\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00899}00899\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ \_rexorders.find(\ owner.value\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00900}00900\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ itr\ !=\ \_rexorders.end()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00901}00901\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ itr-\/>is\_open\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00902}00902\ \ \ \ \ \ \ \ \ \ \ \ \ rex\_in\_sell\_order.amount\ =\ itr-\/>rex\_requested.amount;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00903}00903\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00904}00904\ \ \ \ \ \ \ \ \ \ \ \ \ to\_fund.amount\ \ +=\ itr-\/>proceeds.amount;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00905}00905\ \ \ \ \ \ \ \ \ \ \ \ \ to\_stake.amount\ +=\ itr-\/>stake\_change.amount;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00906}00906\ \ \ \ \ \ \ \ \ \ \ \ \ \_rexorders.erase(\ itr\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00907}00907\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00908}00908\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00909}00909\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00910}00910\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ to\_fund.amount\ >\ 0\ )}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00911}00911\ \ \ \ \ \ \ \ \ \ transfer\_to\_fund(\ owner,\ to\_fund\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00912}00912\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ force\_vote\_update\ ||\ to\_stake.amount\ !=\ 0\ )}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00913}00913\ \ \ \ \ \ \ \ \ \ update\_voting\_power(\ owner,\ to\_stake\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00914}00914\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00915}00915\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ rex\_in\_sell\_order;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00916}00916\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00917}00917\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00925}00925\ \ \ \ \textcolor{keywordtype}{void}\ system\_contract::channel\_to\_rex(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\&\ from,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\&\ amount,\ \textcolor{keywordtype}{bool}\ required\ )}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00926}00926\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00927}00927\ \textcolor{preprocessor}{\#if\ CHANNEL\_RAM\_AND\_NAMEBID\_FEES\_TO\_REX}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00928}00928\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ rex\_available()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00929}00929\ \ \ \ \ \ \ \ \ \ add\_to\_rex\_return\_pool(\ amount\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00930}00930\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ inline\ transfer\ to\ rex\_account}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00931}00931\ \ \ \ \ \ \ \ \ \ token::transfer\_action\ transfer\_act\{\ token\_account,\ \{\ from,\ active\_permission\ \}\ \};}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00932}00932\ \ \ \ \ \ \ \ \ \ transfer\_act.send(\ from,\ rex\_account,\ amount,}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00933}00933\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::string(\textcolor{stringliteral}{"{}transfer\ from\ "{}})\ +\ from.to\_string()\ +\ \textcolor{stringliteral}{"{}\ to\ sysio.rex"{}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00934}00934\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00935}00935\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00936}00936\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00937}00937\ \ \ \ \ \ \ sysio::check(\ !required,\ \textcolor{stringliteral}{"{}can't\ channel\ fees\ to\ rex"{}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00938}00938\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00939}00939\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00945}00945\ \ \ \ \textcolor{keywordtype}{void}\ system\_contract::channel\_namebid\_to\_rex(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ highest\_bid\ )}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00946}00946\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00947}00947\ \textcolor{preprocessor}{\#if\ CHANNEL\_RAM\_AND\_NAMEBID\_FEES\_TO\_REX}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00948}00948\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ rex\_available()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00949}00949\ \ \ \ \ \ \ \ \ \ \_rexpool.modify(\ \_rexpool.begin(),\ same\_payer,\ [\&](\ \textcolor{keyword}{auto}\&\ rp\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00950}00950\ \ \ \ \ \ \ \ \ \ \ \ \ rp.namebid\_proceeds.amount\ +=\ highest\_bid;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00951}00951\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00952}00952\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00953}00953\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00954}00954\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00955}00955\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00962}00962\ \ \ \ time\_point\_sec\ system\_contract::get\_rex\_maturity()}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00963}00963\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00964}00964\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ num\_of\_maturity\_buckets\ =\ 5;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00965}00965\ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ now\ =\ current\_time\_point().sec\_since\_epoch();}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00966}00966\ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ \ \ =\ now\ \%\ seconds\_per\_day;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00967}00967\ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ time\_point\_sec\ rms\{\ now\ -\/\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ +\ num\_of\_maturity\_buckets\ *\ seconds\_per\_day\ \};}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00968}00968\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ rms;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00969}00969\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00970}00970\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00976}00976\ \ \ \ \textcolor{keywordtype}{void}\ system\_contract::process\_rex\_maturities(\ \textcolor{keyword}{const}\ rex\_balance\_table::const\_iterator\&\ bitr\ )}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00977}00977\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00978}00978\ \ \ \ \ \ \ \textcolor{keyword}{const}\ time\_point\_sec\ now\ =\ current\_time\_point();}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00979}00979\ \ \ \ \ \ \ \_rexbalance.modify(\ bitr,\ same\_payer,\ [\&](\ \textcolor{keyword}{auto}\&\ rb\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00980}00980\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (\ !rb.rex\_maturities.empty()\ \&\&\ rb.rex\_maturities.front().first\ <=\ now\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00981}00981\ \ \ \ \ \ \ \ \ \ \ \ \ rb.matured\_rex\ +=\ rb.rex\_maturities.front().second;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00982}00982\ \ \ \ \ \ \ \ \ \ \ \ \ rb.rex\_maturities.erase(rb.rex\_maturities.begin());}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00983}00983\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00984}00984\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00985}00985\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00986}00986\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00993}00993\ \ \ \ \textcolor{keywordtype}{void}\ system\_contract::consolidate\_rex\_balance(\ \textcolor{keyword}{const}\ rex\_balance\_table::const\_iterator\&\ bitr,}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00994}00994\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\&\ rex\_in\_sell\_order\ )}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00995}00995\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00996}00996\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ rex\_in\_savings\ =\ read\_rex\_savings(\ bitr\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00997}00997\ \ \ \ \ \ \ \_rexbalance.modify(\ bitr,\ same\_payer,\ [\&](\ \textcolor{keyword}{auto}\&\ rb\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00998}00998\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ total\ \ =\ rb.matured\_rex\ -\/\ rex\_in\_sell\_order.amount;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l00999}00999\ \ \ \ \ \ \ \ \ \ rb.matured\_rex\ =\ rex\_in\_sell\_order.amount;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01000}01000\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (\ !rb.rex\_maturities.empty()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01001}01001\ \ \ \ \ \ \ \ \ \ \ \ \ total\ +=\ rb.rex\_maturities.front().second;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01002}01002\ \ \ \ \ \ \ \ \ \ \ \ \ rb.rex\_maturities.erase(rb.rex\_maturities.begin());}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01003}01003\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01004}01004\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ total\ >\ 0\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01005}01005\ \ \ \ \ \ \ \ \ \ \ \ \ rb.rex\_maturities.emplace\_back(\ pair\_time\_point\_sec\_int64\{\ get\_rex\_maturity(),\ total\ \}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01006}01006\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01007}01007\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01008}01008\ \ \ \ \ \ \ put\_rex\_savings(\ bitr,\ rex\_in\_savings\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01009}01009\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01010}01010\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01018}01018\ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\ system\_contract::add\_to\_rex\_pool(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\&\ payment\ )}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01019}01019\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01028}01028\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ rex\_ratio\ =\ 10000;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01029}01029\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\ \ \ init\_total\_rent(\ 20'000'0000,\ core\_symbol()\ );\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01030}01030\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\ rex\_received(\ 0,\ rex\_symbol\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01031}01031\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ \_rexpool.begin();}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01032}01032\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ !rex\_system\_initialized()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01034}01034\ \ \ \ \ \ \ \ \ \ \_rexpool.emplace(\ get\_self(),\ [\&](\ \textcolor{keyword}{auto}\&\ rp\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01035}01035\ \ \ \ \ \ \ \ \ \ \ \ \ rex\_received.amount\ =\ payment.amount\ *\ rex\_ratio;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01036}01036\ \ \ \ \ \ \ \ \ \ \ \ \ rp.total\_lendable\ \ \ =\ payment;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01037}01037\ \ \ \ \ \ \ \ \ \ \ \ \ rp.total\_lent\ \ \ \ \ \ \ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}(\ 0,\ core\_symbol()\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01038}01038\ \ \ \ \ \ \ \ \ \ \ \ \ rp.total\_unlent\ \ \ \ \ =\ rp.total\_lendable\ -\/\ rp.total\_lent;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01039}01039\ \ \ \ \ \ \ \ \ \ \ \ \ rp.total\_rent\ \ \ \ \ \ \ =\ init\_total\_rent;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01040}01040\ \ \ \ \ \ \ \ \ \ \ \ \ rp.total\_rex\ \ \ \ \ \ \ \ =\ rex\_received;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01041}01041\ \ \ \ \ \ \ \ \ \ \ \ \ rp.namebid\_proceeds\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}(\ 0,\ core\_symbol()\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01042}01042\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01043}01043\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\ !rex\_available()\ )\ \{\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01044}01044\ \ \ \ \ \ \ \ \ \ \_rexpool.modify(\ itr,\ same\_payer,\ [\&](\ \textcolor{keyword}{auto}\&\ rp\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01045}01045\ \ \ \ \ \ \ \ \ \ \ \ \ rex\_received.amount\ \ \ \ \ \ =\ payment.amount\ *\ rex\_ratio;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01046}01046\ \ \ \ \ \ \ \ \ \ \ \ \ rp.total\_lendable.amount\ =\ payment.amount;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01047}01047\ \ \ \ \ \ \ \ \ \ \ \ \ rp.total\_lent.amount\ \ \ \ \ =\ 0;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01048}01048\ \ \ \ \ \ \ \ \ \ \ \ \ rp.total\_unlent.amount\ \ \ =\ rp.total\_lendable.amount\ -\/\ rp.total\_lent.amount;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01049}01049\ \ \ \ \ \ \ \ \ \ \ \ \ rp.total\_rent.amount\ \ \ \ \ =\ init\_total\_rent.amount;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01050}01050\ \ \ \ \ \ \ \ \ \ \ \ \ rp.total\_rex.amount\ \ \ \ \ \ =\ rex\_received.amount;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01051}01051\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01052}01052\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01054}01054\ \ \ \ \ \ \ \ \ \ check(\ itr-\/>total\_lendable.amount\ >\ 0,\ \textcolor{stringliteral}{"{}lendable\ REX\ pool\ is\ empty"{}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01055}01055\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ S0\ =\ itr-\/>total\_lendable.amount;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01056}01056\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ S1\ =\ S0\ +\ payment.amount;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01057}01057\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ R0\ =\ itr-\/>total\_rex.amount;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01058}01058\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ R1\ =\ (\mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a376f631fcb770bd4b2e8349a33e52f8a}{uint128\_t}}(S1)\ *\ R0)\ /\ S0;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01059}01059\ \ \ \ \ \ \ \ \ \ rex\_received.amount\ =\ R1\ -\/\ R0;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01060}01060\ \ \ \ \ \ \ \ \ \ \_rexpool.modify(\ itr,\ same\_payer,\ [\&](\ \textcolor{keyword}{auto}\&\ rp\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01061}01061\ \ \ \ \ \ \ \ \ \ \ \ \ rp.total\_lendable.amount\ =\ S1;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01062}01062\ \ \ \ \ \ \ \ \ \ \ \ \ rp.total\_rex.amount\ \ \ \ \ \ =\ R1;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01063}01063\ \ \ \ \ \ \ \ \ \ \ \ \ rp.total\_unlent.amount\ \ \ =\ rp.total\_lendable.amount\ -\/\ rp.total\_lent.amount;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01064}01064\ \ \ \ \ \ \ \ \ \ \ \ \ check(\ rp.total\_unlent.amount\ >=\ 0,\ \textcolor{stringliteral}{"{}programmer\ error,\ this\ should\ never\ go\ negative"{}}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01065}01065\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01066}01066\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01067}01067\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01068}01068\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ rex\_received;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01069}01069\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01070}01070\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01076}01076\ \ \ \ \textcolor{keywordtype}{void}\ system\_contract::add\_to\_rex\_return\_pool(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\&\ fee\ )}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01077}01077\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01078}01078\ \ \ \ \ \ \ update\_rex\_pool();}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01079}01079\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ fee.amount\ <=\ 0\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01080}01080\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01081}01081\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01082}01082\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01083}01083\ \ \ \ \ \ \ \textcolor{keyword}{const}\ time\_point\_sec\ ct\ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ current\_time\_point();}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01084}01084\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \ \ \ \ \ \ cts\ \ \ \ \ \ \ \ \ \ \ \ \ =\ ct.sec\_since\_epoch();}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01085}01085\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \ \ \ \ \ \ bucket\_interval\ =\ rex\_return\_pool::hours\_per\_bucket\ *\ seconds\_per\_hour;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01086}01086\ \ \ \ \ \ \ \textcolor{keyword}{const}\ time\_point\_sec\ effective\_time\{cts\ -\/\ cts\ \%\ bucket\_interval\ +\ bucket\_interval\};}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01087}01087\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ return\_pool\_elem\ =\ \_rexretpool.begin();}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01088}01088\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ return\_pool\_elem\ ==\ \_rexretpool.end()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01089}01089\ \ \ \ \ \ \ \ \ \ \_rexretpool.emplace(\ get\_self(),\ [\&](\ \textcolor{keyword}{auto}\&\ rp\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01090}01090\ \ \ \ \ \ \ \ \ \ \ \ \ rp.last\_dist\_time\ \ \ \ \ \ \ \ \ \ =\ effective\_time;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01091}01091\ \ \ \ \ \ \ \ \ \ \ \ \ rp.pending\_bucket\_proceeds\ =\ fee.amount;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01092}01092\ \ \ \ \ \ \ \ \ \ \ \ \ rp.pending\_bucket\_time\ \ \ \ \ =\ effective\_time;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01093}01093\ \ \ \ \ \ \ \ \ \ \ \ \ rp.proceeds\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ fee.amount;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01094}01094\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01095}01095\ \ \ \ \ \ \ \ \ \ \_rexretbuckets.emplace(\ get\_self(),\ [\&](\ \textcolor{keyword}{auto}\&\ rb\ )\ \{\ \}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01096}01096\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01097}01097\ \ \ \ \ \ \ \ \ \ \_rexretpool.modify(\ return\_pool\_elem,\ same\_payer,\ [\&](\ \textcolor{keyword}{auto}\&\ rp\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01098}01098\ \ \ \ \ \ \ \ \ \ \ \ \ rp.pending\_bucket\_proceeds\ +=\ fee.amount;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01099}01099\ \ \ \ \ \ \ \ \ \ \ \ \ rp.proceeds\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ +=\ fee.amount;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01100}01100\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ rp.pending\_bucket\_time\ ==\ time\_point\_sec::maximum()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01101}01101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ rp.pending\_bucket\_time\ =\ effective\_time;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01102}01102\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01103}01103\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01104}01104\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01105}01105\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01106}01106\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01116}01116\ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\ system\_contract::add\_to\_rex\_balance(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\&\ owner,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\&\ payment,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\&\ rex\_received\ )}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01117}01117\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01118}01118\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\ init\_rex\_stake(\ 0,\ core\_symbol()\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01119}01119\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\ current\_rex\_stake(\ 0,\ core\_symbol()\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01120}01120\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ bitr\ =\ \_rexbalance.find(\ owner.value\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01121}01121\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ bitr\ ==\ \_rexbalance.end()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01122}01122\ \ \ \ \ \ \ \ \ \ bitr\ =\ \_rexbalance.emplace(\ owner,\ [\&](\ \textcolor{keyword}{auto}\&\ rb\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01123}01123\ \ \ \ \ \ \ \ \ \ \ \ \ rb.owner\ \ \ \ \ \ \ =\ owner;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01124}01124\ \ \ \ \ \ \ \ \ \ \ \ \ rb.vote\_stake\ \ =\ payment;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01125}01125\ \ \ \ \ \ \ \ \ \ \ \ \ rb.rex\_balance\ =\ rex\_received;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01126}01126\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01127}01127\ \ \ \ \ \ \ \ \ \ current\_rex\_stake.amount\ =\ payment.amount;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01128}01128\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01129}01129\ \ \ \ \ \ \ \ \ \ init\_rex\_stake.amount\ =\ bitr-\/>vote\_stake.amount;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01130}01130\ \ \ \ \ \ \ \ \ \ \_rexbalance.modify(\ bitr,\ same\_payer,\ [\&](\ \textcolor{keyword}{auto}\&\ rb\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01131}01131\ \ \ \ \ \ \ \ \ \ \ \ \ rb.rex\_balance.amount\ +=\ rex\_received.amount;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01132}01132\ \ \ \ \ \ \ \ \ \ \ \ \ rb.vote\_stake.amount\ \ \ =\ (\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a376f631fcb770bd4b2e8349a33e52f8a}{uint128\_t}}(rb.rex\_balance.amount)\ *\ \_rexpool.begin()-\/>total\_lendable.amount\ )}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01133}01133\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ /\ \_rexpool.begin()-\/>total\_rex.amount;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01134}01134\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01135}01135\ \ \ \ \ \ \ \ \ \ current\_rex\_stake.amount\ =\ bitr-\/>vote\_stake.amount;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01136}01136\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01137}01137\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01138}01138\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ rex\_in\_savings\ =\ read\_rex\_savings(\ bitr\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01139}01139\ \ \ \ \ \ \ process\_rex\_maturities(\ bitr\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01140}01140\ \ \ \ \ \ \ \_rexbalance.modify(\ bitr,\ same\_payer,\ [\&](\ \textcolor{keyword}{auto}\&\ rb\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01141}01141\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ time\_point\_sec\ maturity\ =\ get\_rex\_maturity();}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01142}01142\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ !rb.rex\_maturities.empty()\ \&\&\ rb.rex\_maturities.back().first\ ==\ maturity\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01143}01143\ \ \ \ \ \ \ \ \ \ \ \ \ rb.rex\_maturities.back().second\ +=\ rex\_received.amount;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01144}01144\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01145}01145\ \ \ \ \ \ \ \ \ \ \ \ \ rb.rex\_maturities.emplace\_back(\ pair\_time\_point\_sec\_int64\ \{\ maturity,\ rex\_received.amount\ \}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01146}01146\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01147}01147\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01148}01148\ \ \ \ \ \ \ put\_rex\_savings(\ bitr,\ rex\_in\_savings\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01149}01149\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ current\_rex\_stake\ -\/\ init\_rex\_stake;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01150}01150\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01151}01151\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01163}01163\ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ system\_contract::read\_rex\_savings(\ \textcolor{keyword}{const}\ rex\_balance\_table::const\_iterator\&\ bitr\ )}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01164}01164\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01165}01165\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ rex\_in\_savings\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01166}01166\ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ time\_point\_sec\ end\_of\_days\ =\ time\_point\_sec::maximum();}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01167}01167\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ !bitr-\/>rex\_maturities.empty()\ \&\&\ bitr-\/>rex\_maturities.back().first\ ==\ end\_of\_days\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01168}01168\ \ \ \ \ \ \ \ \ \ \_rexbalance.modify(\ bitr,\ same\_payer,\ [\&](\ \textcolor{keyword}{auto}\&\ rb\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01169}01169\ \ \ \ \ \ \ \ \ \ \ \ \ rex\_in\_savings\ =\ rb.rex\_maturities.back().second;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01170}01170\ \ \ \ \ \ \ \ \ \ \ \ \ rb.rex\_maturities.pop\_back();}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01171}01171\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01172}01172\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01173}01173\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ rex\_in\_savings;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01174}01174\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01175}01175\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01182}01182\ \ \ \ \textcolor{keywordtype}{void}\ system\_contract::put\_rex\_savings(\ \textcolor{keyword}{const}\ rex\_balance\_table::const\_iterator\&\ bitr,\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ rex\ )}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01183}01183\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01184}01184\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ rex\ ==\ 0\ )\ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01185}01185\ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ time\_point\_sec\ end\_of\_days\ =\ time\_point\_sec::maximum();}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01186}01186\ \ \ \ \ \ \ \_rexbalance.modify(\ bitr,\ same\_payer,\ [\&](\ \textcolor{keyword}{auto}\&\ rb\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01187}01187\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ !rb.rex\_maturities.empty()\ \&\&\ rb.rex\_maturities.back().first\ ==\ end\_of\_days\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01188}01188\ \ \ \ \ \ \ \ \ \ \ \ \ rb.rex\_maturities.back().second\ +=\ rex;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01189}01189\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01190}01190\ \ \ \ \ \ \ \ \ \ \ \ \ rb.rex\_maturities.emplace\_back(\ pair\_time\_point\_sec\_int64\{\ end\_of\_days,\ rex\ \}\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01191}01191\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01192}01192\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01193}01193\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01194}01194\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01200}01200\ \ \ \ \textcolor{keywordtype}{void}\ system\_contract::update\_rex\_stake(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\&\ voter\ )}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01201}01201\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01202}01202\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ delta\_stake\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01203}01203\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ bitr\ =\ \_rexbalance.find(\ voter.value\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01204}01204\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ bitr\ !=\ \_rexbalance.end()\ \&\&\ rex\_available()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01205}01205\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\ init\_vote\_stake\ =\ bitr-\/>vote\_stake;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01206}01206\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1asset}{asset}}\ current\_vote\_stake(\ 0,\ core\_symbol()\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01207}01207\ \ \ \ \ \ \ \ \ \ current\_vote\_stake.amount\ =\ (\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a376f631fcb770bd4b2e8349a33e52f8a}{uint128\_t}}(bitr-\/>rex\_balance.amount)\ *\ \_rexpool.begin()-\/>total\_lendable.amount\ )}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01208}01208\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ /\ \_rexpool.begin()-\/>total\_rex.amount;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01209}01209\ \ \ \ \ \ \ \ \ \ \_rexbalance.modify(\ bitr,\ same\_payer,\ [\&](\ \textcolor{keyword}{auto}\&\ rb\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01210}01210\ \ \ \ \ \ \ \ \ \ \ \ \ rb.vote\_stake.amount\ =\ current\_vote\_stake.amount;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01211}01211\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01212}01212\ \ \ \ \ \ \ \ \ \ delta\_stake\ =\ current\_vote\_stake.amount\ -\/\ init\_vote\_stake.amount;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01213}01213\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01214}01214\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01215}01215\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ delta\_stake\ !=\ 0\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01216}01216\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ vitr\ =\ \_voters.find(\ voter.value\ );}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01217}01217\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ vitr\ !=\ \_voters.end()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01218}01218\ \ \ \ \ \ \ \ \ \ \ \ \ \_voters.modify(\ vitr,\ same\_payer,\ [\&](\ \textcolor{keyword}{auto}\&\ vinfo\ )\ \{}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01219}01219\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ vinfo.staked\ +=\ delta\_stake;}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01220}01220\ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01221}01221\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01222}01222\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01223}01223\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01224}01224\ }
+\DoxyCodeLine{\Hypertarget{rex_8cpp_source_l01225}01225\ \};\ }
+
+\end{DoxyCode}

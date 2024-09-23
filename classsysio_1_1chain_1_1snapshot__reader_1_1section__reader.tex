@@ -1,0 +1,161 @@
+\doxysection{sysio\+::chain\+::snapshot\+\_\+reader\+::section\+\_\+reader Class Reference}
+\hypertarget{classsysio_1_1chain_1_1snapshot__reader_1_1section__reader}{}\label{classsysio_1_1chain_1_1snapshot__reader_1_1section__reader}\index{sysio::chain::snapshot\_reader::section\_reader@{sysio::chain::snapshot\_reader::section\_reader}}
+
+
+{\ttfamily \#include $<$snapshot.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\auto \mbox{\hyperlink{classsysio_1_1chain_1_1snapshot__reader_1_1section__reader_a9d9757b9c1d12b53134e1fe617bcd396}{read\+\_\+row}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&out) -\/$>$ std\+::enable\+\_\+if\+\_\+t$<$ std\+::is\+\_\+same$<$ std\+::decay\+\_\+t$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$, typename \mbox{\hyperlink{structsysio_1_1chain_1_1detail_1_1snapshot__row__traits}{detail\+::snapshot\+\_\+row\+\_\+traits}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::snapshot\+\_\+type $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}}, bool $>$
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\auto \mbox{\hyperlink{classsysio_1_1chain_1_1snapshot__reader_1_1section__reader_a6ab32f9e4ea7bfff03620d7e1e01ec43}{read\+\_\+row}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&out, \mbox{\hyperlink{classchainbase_1_1database}{chainbase\+::database}} \&) -\/$>$ std\+::enable\+\_\+if\+\_\+t$<$ std\+::is\+\_\+same$<$ std\+::decay\+\_\+t$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$, typename \mbox{\hyperlink{structsysio_1_1chain_1_1detail_1_1snapshot__row__traits}{detail\+::snapshot\+\_\+row\+\_\+traits}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::snapshot\+\_\+type $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}}, bool $>$
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\auto \mbox{\hyperlink{classsysio_1_1chain_1_1snapshot__reader_1_1section__reader_a80c0f16fd74c0667af15b608eca4ae1d}{read\+\_\+row}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&out, \mbox{\hyperlink{classchainbase_1_1database}{chainbase\+::database}} \&db) -\/$>$ std\+::enable\+\_\+if\+\_\+t$<$!std\+::is\+\_\+same$<$ std\+::decay\+\_\+t$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$, typename \mbox{\hyperlink{structsysio_1_1chain_1_1detail_1_1snapshot__row__traits}{detail\+::snapshot\+\_\+row\+\_\+traits}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::snapshot\+\_\+type $>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}}, bool $>$
+\item 
+bool \mbox{\hyperlink{classsysio_1_1chain_1_1snapshot__reader_1_1section__reader_a61abacc2e7c566eac8ad1411edf66e05}{empty}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classsysio_1_1chain_1_1snapshot__reader_1_1section__reader_a1519e966f1ed3b421eb598a4b045c6c2}{snapshot\+\_\+reader}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{snapshot_8hpp_source_l00226}{226}} of file \mbox{\hyperlink{snapshot_8hpp_source}{snapshot.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1chain_1_1snapshot__reader_1_1section__reader_a61abacc2e7c566eac8ad1411edf66e05}\index{sysio::chain::snapshot\_reader::section\_reader@{sysio::chain::snapshot\_reader::section\_reader}!empty@{empty}}
+\index{empty@{empty}!sysio::chain::snapshot\_reader::section\_reader@{sysio::chain::snapshot\_reader::section\_reader}}
+\doxysubsubsection{\texorpdfstring{empty()}{empty()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1snapshot__reader_1_1section__reader_a61abacc2e7c566eac8ad1411edf66e05} 
+bool sysio\+::chain\+::snapshot\+\_\+reader\+::section\+\_\+reader\+::empty (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{snapshot_8hpp_source_l00248}{248}} of file \mbox{\hyperlink{snapshot_8hpp_source}{snapshot.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00248\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00249\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \_reader.\mbox{\hyperlink{classsysio_1_1chain_1_1snapshot__reader_aad8b2699aff63c854dfb9bea7f30e542}{empty}}();}
+\DoxyCodeLine{00250\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=348pt]{classsysio_1_1chain_1_1snapshot__reader_1_1section__reader_a61abacc2e7c566eac8ad1411edf66e05_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1snapshot__reader_1_1section__reader_a9d9757b9c1d12b53134e1fe617bcd396}\index{sysio::chain::snapshot\_reader::section\_reader@{sysio::chain::snapshot\_reader::section\_reader}!read\_row@{read\_row}}
+\index{read\_row@{read\_row}!sysio::chain::snapshot\_reader::section\_reader@{sysio::chain::snapshot\_reader::section\_reader}}
+\doxysubsubsection{\texorpdfstring{read\_row()}{read\_row()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1snapshot__reader_1_1section__reader_a9d9757b9c1d12b53134e1fe617bcd396} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+auto sysio\+::chain\+::snapshot\+\_\+reader\+::section\+\_\+reader\+::read\+\_\+row (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{out}{}\end{DoxyParamCaption}) -\/$>$ std\+::enable\+\_\+if\+\_\+t$<$std\+::is\+\_\+same$<$std\+::decay\+\_\+t$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$, typename \mbox{\hyperlink{structsysio_1_1chain_1_1detail_1_1snapshot__row__traits}{detail\+::snapshot\+\_\+row\+\_\+traits}}$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$\+::snapshot\+\_\+type$>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}},bool$>$ \hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{snapshot_8hpp_source_l00229}{229}} of file \mbox{\hyperlink{snapshot_8hpp_source}{snapshot.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00229\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00230\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ reader\ =\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1detail_a8b5dfe28805042524d57a8026700c394}{detail::make\_row\_reader}}(out);}
+\DoxyCodeLine{00231\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \_reader.\mbox{\hyperlink{classsysio_1_1chain_1_1snapshot__reader_ae29552ab0cebe263c9a3d790d9f54bd3}{read\_row}}(reader);}
+\DoxyCodeLine{00232\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=348pt]{classsysio_1_1chain_1_1snapshot__reader_1_1section__reader_a9d9757b9c1d12b53134e1fe617bcd396_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1snapshot__reader_1_1section__reader_a9d9757b9c1d12b53134e1fe617bcd396_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1snapshot__reader_1_1section__reader_a6ab32f9e4ea7bfff03620d7e1e01ec43}\index{sysio::chain::snapshot\_reader::section\_reader@{sysio::chain::snapshot\_reader::section\_reader}!read\_row@{read\_row}}
+\index{read\_row@{read\_row}!sysio::chain::snapshot\_reader::section\_reader@{sysio::chain::snapshot\_reader::section\_reader}}
+\doxysubsubsection{\texorpdfstring{read\_row()}{read\_row()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1snapshot__reader_1_1section__reader_a6ab32f9e4ea7bfff03620d7e1e01ec43} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+auto sysio\+::chain\+::snapshot\+\_\+reader\+::section\+\_\+reader\+::read\+\_\+row (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{out}{, }\item[{\mbox{\hyperlink{classchainbase_1_1database}{chainbase\+::database}} \&}]{}{}\end{DoxyParamCaption}) -\/$>$ std\+::enable\+\_\+if\+\_\+t$<$std\+::is\+\_\+same$<$std\+::decay\+\_\+t$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$, typename \mbox{\hyperlink{structsysio_1_1chain_1_1detail_1_1snapshot__row__traits}{detail\+::snapshot\+\_\+row\+\_\+traits}}$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$\+::snapshot\+\_\+type$>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}},bool$>$ \hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{snapshot_8hpp_source_l00235}{235}} of file \mbox{\hyperlink{snapshot_8hpp_source}{snapshot.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1chain_1_1snapshot__reader_1_1section__reader_a9d9757b9c1d12b53134e1fe617bcd396}{read\_row}}(out);}
+\DoxyCodeLine{00237\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1snapshot__reader_1_1section__reader_a6ab32f9e4ea7bfff03620d7e1e01ec43_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1snapshot__reader_1_1section__reader_a80c0f16fd74c0667af15b608eca4ae1d}\index{sysio::chain::snapshot\_reader::section\_reader@{sysio::chain::snapshot\_reader::section\_reader}!read\_row@{read\_row}}
+\index{read\_row@{read\_row}!sysio::chain::snapshot\_reader::section\_reader@{sysio::chain::snapshot\_reader::section\_reader}}
+\doxysubsubsection{\texorpdfstring{read\_row()}{read\_row()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1snapshot__reader_1_1section__reader_a80c0f16fd74c0667af15b608eca4ae1d} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+auto sysio\+::chain\+::snapshot\+\_\+reader\+::section\+\_\+reader\+::read\+\_\+row (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{out}{, }\item[{\mbox{\hyperlink{classchainbase_1_1database}{chainbase\+::database}} \&}]{db}{}\end{DoxyParamCaption}) -\/$>$ std\+::enable\+\_\+if\+\_\+t$<$!std\+::is\+\_\+same$<$std\+::decay\+\_\+t$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$, typename \mbox{\hyperlink{structsysio_1_1chain_1_1detail_1_1snapshot__row__traits}{detail\+::snapshot\+\_\+row\+\_\+traits}}$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$\+::snapshot\+\_\+type$>$\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{\+::value}},bool$>$ \hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{snapshot_8hpp_source_l00240}{240}} of file \mbox{\hyperlink{snapshot_8hpp_source}{snapshot.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00241\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ temp\ =\ \textcolor{keyword}{typename}\ \mbox{\hyperlink{structsysio_1_1chain_1_1detail_1_1snapshot__row__traits_a91049df4f40c05029323965dc2d4458b}{detail::snapshot\_row\_traits<T>::snapshot\_type}}();}
+\DoxyCodeLine{00242\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ reader\ =\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1detail_a8b5dfe28805042524d57a8026700c394}{detail::make\_row\_reader}}(temp);}
+\DoxyCodeLine{00243\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ result\ =\ \_reader.\mbox{\hyperlink{classsysio_1_1chain_1_1snapshot__reader_ae29552ab0cebe263c9a3d790d9f54bd3}{read\_row}}(reader);}
+\DoxyCodeLine{00244\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ detail::snapshot\_row\_traits<T>::from\_snapshot\_row(std::move(temp),\ out,\ db);}
+\DoxyCodeLine{00245\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{00246\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=348pt]{classsysio_1_1chain_1_1snapshot__reader_1_1section__reader_a80c0f16fd74c0667af15b608eca4ae1d_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{classsysio_1_1chain_1_1snapshot__reader_1_1section__reader_a1519e966f1ed3b421eb598a4b045c6c2}\index{sysio::chain::snapshot\_reader::section\_reader@{sysio::chain::snapshot\_reader::section\_reader}!snapshot\_reader@{snapshot\_reader}}
+\index{snapshot\_reader@{snapshot\_reader}!sysio::chain::snapshot\_reader::section\_reader@{sysio::chain::snapshot\_reader::section\_reader}}
+\doxysubsubsection{\texorpdfstring{snapshot\_reader}{snapshot\_reader}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1snapshot__reader_1_1section__reader_a1519e966f1ed3b421eb598a4b045c6c2} 
+friend \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classsysio_1_1chain_1_1snapshot__reader}{snapshot\+\_\+reader}}\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{snapshot_8hpp_source_l00253}{253}} of file \mbox{\hyperlink{snapshot_8hpp_source}{snapshot.\+hpp}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{snapshot_8hpp}{snapshot.\+hpp}}\end{DoxyCompactItemize}

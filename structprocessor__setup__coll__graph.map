@@ -1,0 +1,36 @@
+<map id="processor_setup" name="processor_setup">
+<area shape="rect" id="Node000001" title=" " alt="" coords="969,63,1087,88"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="780,5,863,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="878,31,980,60,978,65,877,36"/>
+<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1processor_1_1hybi00.html" title=" " alt="" coords="740,55,903,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="918,73,969,73,969,78,918,78"/>
+<area shape="rect" id="Node000004" href="$classwebsocketpp_1_1processor_1_1processor.html" title=" " alt="" coords="376,11,553,52"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="569,35,716,50,740,54,739,60,716,55,568,40"/>
+<area shape="rect" id="Node000006" href="$classwebsocketpp_1_1processor_1_1hybi13.html" title=" " alt="" coords="740,192,903,233"/>
+<area shape="poly" id="edge6_Node000006_Node000004" title=" " alt="" coords="569,49,662,69,717,85,738,103,762,131,808,190,803,194,758,134,734,107,715,90,660,74,568,54"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="69,93,126,119"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="140,95,375,47,376,52,142,100"/>
+<area shape="poly" id="edge8_Node000006_Node000005" title=" " alt="" coords="141,102,244,103,388,109,552,128,636,143,717,164,782,190,780,194,715,169,635,149,552,133,388,115,244,108,141,108"/>
+<area shape="rect" id="Node000008" href="$structwebsocketpp_1_1processor_1_1hybi13_1_1msg__metadata.html" title=" " alt="" coords="383,218,546,274"/>
+<area shape="poly" id="edge10_Node000008_Node000005" title=" " alt="" coords="141,120,390,215,388,220,139,125"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="865,182,1006,86,1009,91,868,186"/>
+<area shape="rect" id="Node000007" href="$structwebsocketpp_1_1frame_1_1basic__header.html" title="The constant size component of a WebSocket frame header." alt="" coords="395,154,534,194"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="550,181,740,201,740,207,549,186"/>
+<area shape="poly" id="edge9_Node000006_Node000008" title=" " alt="" coords="561,252,637,253,716,246,770,231,771,236,716,251,637,258,561,257"/>
+<area shape="rect" id="Node000009" href="$classwebsocketpp_1_1utf8__validator_1_1validator.html" title="Provides streaming UTF8 validation functionality." alt="" coords="5,226,190,266"/>
+<area shape="poly" id="edge11_Node000008_Node000009" title=" " alt="" coords="205,244,382,244,382,249,205,249"/>
+<area shape="rect" id="Node000010" href="$structwebsocketpp_1_1frame_1_1extended__header.html" title="The variable size component of a WebSocket frame header." alt="" coords="395,298,534,338"/>
+<area shape="poly" id="edge12_Node000006_Node000010" title=" " alt="" coords="549,309,631,297,715,273,756,254,791,231,794,236,758,258,717,278,632,302,550,315"/>
+<area shape="rect" id="Node000011" href="$structstate.html" title=" " alt="" coords="439,455,490,480"/>
+<area shape="poly" id="edge13_Node000006_Node000011" title=" " alt="" coords="505,463,551,457,606,446,663,426,714,395,751,357,779,312,799,268,812,233,817,234,804,270,784,315,755,360,718,399,665,430,608,451,552,463,505,468"/>
+<area shape="rect" id="Node000013" href="$structyh__connector.html" title=" " alt="" coords="772,500,871,526"/>
+<area shape="poly" id="edge17_Node000013_Node000011" title=" " alt="" coords="505,469,716,494,772,502,771,508,716,499,505,474"/>
+<area shape="rect" id="Node000012" title=" " alt="" coords="75,455,120,480"/>
+<area shape="poly" id="edge14_Node000011_Node000012" title=" " alt="" coords="136,465,439,465,439,470,136,470"/>
+<area shape="poly" id="edge15_Node000011_Node000013" title=" " alt="" coords="756,522,670,524,623,521,576,514,529,500,489,483,491,478,531,495,578,509,624,516,670,518,756,516"/>
+<area shape="rect" id="Node000014" title=" " alt="" coords="70,524,125,550"/>
+<area shape="poly" id="edge18_Node000011_Node000014" title=" " alt="" coords="139,526,438,469,439,475,140,532"/>
+<area shape="poly" id="edge16_Node000013_Node000014" title=" " alt="" coords="140,535,384,536,548,532,716,524,771,518,772,523,716,529,549,537,384,541,140,540"/>
+<area shape="rect" id="Node000015" href="$classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1disabled.html" title="Stub class for use when disabling permessage_deflate extension." alt="" coords="380,362,549,418"/>
+<area shape="poly" id="edge19_Node000006_Node000015" title=" " alt="" coords="563,377,640,358,679,344,715,326,743,305,768,280,805,232,809,235,772,283,746,309,717,330,681,349,642,363,565,382"/>
+</map>

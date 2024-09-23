@@ -1,0 +1,8 @@
+<map id="sysio::state_history::get_status_result_v0" name="sysio::state_history::get_status_result_v0">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,213,156,253"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1state__history_1_1block__position.html" title=" " alt="" coords="110,94,246,135"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="154,148,99,214,95,210,150,145"/>
+<area shape="rect" id="Node000003" href="$classfc_1_1sha256.html" title=" " alt="" coords="14,5,96,31"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="54,47,48,94,47,114,48,134,60,176,74,211,69,213,55,177,43,135,42,114,43,94,48,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="84,38,154,91,151,96,81,42"/>
+</map>

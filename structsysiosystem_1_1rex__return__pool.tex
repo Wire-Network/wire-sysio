@@ -1,0 +1,179 @@
+\doxysection{sysiosystem\+::rex\+\_\+return\+\_\+pool Struct Reference}
+\hypertarget{structsysiosystem_1_1rex__return__pool}{}\label{structsysiosystem_1_1rex__return__pool}\index{sysiosystem::rex\_return\_pool@{sysiosystem::rex\_return\_pool}}
+
+
+{\ttfamily \#include $<$sysio.\+system.\+hpp$>$}
+
+
+
+Collaboration diagram for sysiosystem\+::rex\+\_\+return\+\_\+pool\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=244pt]{structsysiosystem_1_1rex__return__pool__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1rex__return__pool_a0bee50804463750d4596f4ff86f11d77}{primary\+\_\+key}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1rex__return__pool_a5c4100b7c638a141f65e502eb81616bd}{version}} = 0
+\item 
+\mbox{\hyperlink{classfc_1_1time__point__sec}{time\+\_\+point\+\_\+sec}} \mbox{\hyperlink{structsysiosystem_1_1rex__return__pool_aaec5b850d93b34746e71c9bfc8eb142e}{last\+\_\+dist\+\_\+time}}
+\item 
+\mbox{\hyperlink{classfc_1_1time__point__sec}{time\+\_\+point\+\_\+sec}} \mbox{\hyperlink{structsysiosystem_1_1rex__return__pool_a72fb9868abe01322043cb6b4517df641}{pending\+\_\+bucket\+\_\+time}} = \mbox{\hyperlink{classfc_1_1time__point__sec_a5f4015291bfd08e3e6a5ddd84fa01035}{time\+\_\+point\+\_\+sec\+::maximum}}()
+\item 
+\mbox{\hyperlink{classfc_1_1time__point__sec}{time\+\_\+point\+\_\+sec}} \mbox{\hyperlink{structsysiosystem_1_1rex__return__pool_a337d0fcd0d16f0a275a153aac9eef61f}{oldest\+\_\+bucket\+\_\+time}} = \mbox{\hyperlink{classfc_1_1time__point__sec_a539f4b4286974c6a85e6ea0774ac1609}{time\+\_\+point\+\_\+sec\+::min}}()
+\item 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1rex__return__pool_aa35cbc8e36a0431a035e7031fa6abdb1}{pending\+\_\+bucket\+\_\+proceeds}} = 0
+\item 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1rex__return__pool_a7296b14e173864442eb2996d87299cfd}{current\+\_\+rate\+\_\+of\+\_\+increase}} = 0
+\item 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1rex__return__pool_abb18bad8df1105745836736c9fd862f6}{proceeds}} = 0
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static constexpr \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1rex__return__pool_a4222b910a712abeb613433ccd524270b}{total\+\_\+intervals}} = 30 \texorpdfstring{$\ast$}{*} 144
+\item 
+static constexpr \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1rex__return__pool_a8081d8737106209af9cd371fda96be5a}{dist\+\_\+interval}} = 10 \texorpdfstring{$\ast$}{*} 60
+\item 
+static constexpr \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{structsysiosystem_1_1rex__return__pool_ac0ddbd09eb107be4162d7b0b87ebab39}{hours\+\_\+per\+\_\+bucket}} = 12
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00419}{419}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysiosystem_1_1rex__return__pool_a0bee50804463750d4596f4ff86f11d77}\index{sysiosystem::rex\_return\_pool@{sysiosystem::rex\_return\_pool}!primary\_key@{primary\_key}}
+\index{primary\_key@{primary\_key}!sysiosystem::rex\_return\_pool@{sysiosystem::rex\_return\_pool}}
+\doxysubsubsection{\texorpdfstring{primary\_key()}{primary\_key()}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1rex__return__pool_a0bee50804463750d4596f4ff86f11d77} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} sysiosystem\+::rex\+\_\+return\+\_\+pool\+::primary\+\_\+key (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00433}{433}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00433\ \{\ \textcolor{keywordflow}{return}\ 0;\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysiosystem_1_1rex__return__pool_a7296b14e173864442eb2996d87299cfd}\index{sysiosystem::rex\_return\_pool@{sysiosystem::rex\_return\_pool}!current\_rate\_of\_increase@{current\_rate\_of\_increase}}
+\index{current\_rate\_of\_increase@{current\_rate\_of\_increase}!sysiosystem::rex\_return\_pool@{sysiosystem::rex\_return\_pool}}
+\doxysubsubsection{\texorpdfstring{current\_rate\_of\_increase}{current\_rate\_of\_increase}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1rex__return__pool_a7296b14e173864442eb2996d87299cfd} 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} sysiosystem\+::rex\+\_\+return\+\_\+pool\+::current\+\_\+rate\+\_\+of\+\_\+increase = 0}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00425}{425}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1rex__return__pool_a8081d8737106209af9cd371fda96be5a}\index{sysiosystem::rex\_return\_pool@{sysiosystem::rex\_return\_pool}!dist\_interval@{dist\_interval}}
+\index{dist\_interval@{dist\_interval}!sysiosystem::rex\_return\_pool@{sysiosystem::rex\_return\_pool}}
+\doxysubsubsection{\texorpdfstring{dist\_interval}{dist\_interval}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1rex__return__pool_a8081d8737106209af9cd371fda96be5a} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysiosystem\+::rex\+\_\+return\+\_\+pool\+::dist\+\_\+interval = 10 \texorpdfstring{$\ast$}{*} 60\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00429}{429}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1rex__return__pool_ac0ddbd09eb107be4162d7b0b87ebab39}\index{sysiosystem::rex\_return\_pool@{sysiosystem::rex\_return\_pool}!hours\_per\_bucket@{hours\_per\_bucket}}
+\index{hours\_per\_bucket@{hours\_per\_bucket}!sysiosystem::rex\_return\_pool@{sysiosystem::rex\_return\_pool}}
+\doxysubsubsection{\texorpdfstring{hours\_per\_bucket}{hours\_per\_bucket}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1rex__return__pool_ac0ddbd09eb107be4162d7b0b87ebab39} 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} sysiosystem\+::rex\+\_\+return\+\_\+pool\+::hours\+\_\+per\+\_\+bucket = 12\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00430}{430}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1rex__return__pool_aaec5b850d93b34746e71c9bfc8eb142e}\index{sysiosystem::rex\_return\_pool@{sysiosystem::rex\_return\_pool}!last\_dist\_time@{last\_dist\_time}}
+\index{last\_dist\_time@{last\_dist\_time}!sysiosystem::rex\_return\_pool@{sysiosystem::rex\_return\_pool}}
+\doxysubsubsection{\texorpdfstring{last\_dist\_time}{last\_dist\_time}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1rex__return__pool_aaec5b850d93b34746e71c9bfc8eb142e} 
+\mbox{\hyperlink{classfc_1_1time__point__sec}{time\+\_\+point\+\_\+sec}} sysiosystem\+::rex\+\_\+return\+\_\+pool\+::last\+\_\+dist\+\_\+time}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00421}{421}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1rex__return__pool_a337d0fcd0d16f0a275a153aac9eef61f}\index{sysiosystem::rex\_return\_pool@{sysiosystem::rex\_return\_pool}!oldest\_bucket\_time@{oldest\_bucket\_time}}
+\index{oldest\_bucket\_time@{oldest\_bucket\_time}!sysiosystem::rex\_return\_pool@{sysiosystem::rex\_return\_pool}}
+\doxysubsubsection{\texorpdfstring{oldest\_bucket\_time}{oldest\_bucket\_time}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1rex__return__pool_a337d0fcd0d16f0a275a153aac9eef61f} 
+\mbox{\hyperlink{classfc_1_1time__point__sec}{time\+\_\+point\+\_\+sec}} sysiosystem\+::rex\+\_\+return\+\_\+pool\+::oldest\+\_\+bucket\+\_\+time = \mbox{\hyperlink{classfc_1_1time__point__sec_a539f4b4286974c6a85e6ea0774ac1609}{time\+\_\+point\+\_\+sec\+::min}}()}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00423}{423}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1rex__return__pool_aa35cbc8e36a0431a035e7031fa6abdb1}\index{sysiosystem::rex\_return\_pool@{sysiosystem::rex\_return\_pool}!pending\_bucket\_proceeds@{pending\_bucket\_proceeds}}
+\index{pending\_bucket\_proceeds@{pending\_bucket\_proceeds}!sysiosystem::rex\_return\_pool@{sysiosystem::rex\_return\_pool}}
+\doxysubsubsection{\texorpdfstring{pending\_bucket\_proceeds}{pending\_bucket\_proceeds}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1rex__return__pool_aa35cbc8e36a0431a035e7031fa6abdb1} 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} sysiosystem\+::rex\+\_\+return\+\_\+pool\+::pending\+\_\+bucket\+\_\+proceeds = 0}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00424}{424}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1rex__return__pool_a72fb9868abe01322043cb6b4517df641}\index{sysiosystem::rex\_return\_pool@{sysiosystem::rex\_return\_pool}!pending\_bucket\_time@{pending\_bucket\_time}}
+\index{pending\_bucket\_time@{pending\_bucket\_time}!sysiosystem::rex\_return\_pool@{sysiosystem::rex\_return\_pool}}
+\doxysubsubsection{\texorpdfstring{pending\_bucket\_time}{pending\_bucket\_time}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1rex__return__pool_a72fb9868abe01322043cb6b4517df641} 
+\mbox{\hyperlink{classfc_1_1time__point__sec}{time\+\_\+point\+\_\+sec}} sysiosystem\+::rex\+\_\+return\+\_\+pool\+::pending\+\_\+bucket\+\_\+time = \mbox{\hyperlink{classfc_1_1time__point__sec_a5f4015291bfd08e3e6a5ddd84fa01035}{time\+\_\+point\+\_\+sec\+::maximum}}()}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00422}{422}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1rex__return__pool_abb18bad8df1105745836736c9fd862f6}\index{sysiosystem::rex\_return\_pool@{sysiosystem::rex\_return\_pool}!proceeds@{proceeds}}
+\index{proceeds@{proceeds}!sysiosystem::rex\_return\_pool@{sysiosystem::rex\_return\_pool}}
+\doxysubsubsection{\texorpdfstring{proceeds}{proceeds}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1rex__return__pool_abb18bad8df1105745836736c9fd862f6} 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} sysiosystem\+::rex\+\_\+return\+\_\+pool\+::proceeds = 0}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00426}{426}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1rex__return__pool_a4222b910a712abeb613433ccd524270b}\index{sysiosystem::rex\_return\_pool@{sysiosystem::rex\_return\_pool}!total\_intervals@{total\_intervals}}
+\index{total\_intervals@{total\_intervals}!sysiosystem::rex\_return\_pool@{sysiosystem::rex\_return\_pool}}
+\doxysubsubsection{\texorpdfstring{total\_intervals}{total\_intervals}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1rex__return__pool_a4222b910a712abeb613433ccd524270b} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysiosystem\+::rex\+\_\+return\+\_\+pool\+::total\+\_\+intervals = 30 \texorpdfstring{$\ast$}{*} 144\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00428}{428}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+\Hypertarget{structsysiosystem_1_1rex__return__pool_a5c4100b7c638a141f65e502eb81616bd}\index{sysiosystem::rex\_return\_pool@{sysiosystem::rex\_return\_pool}!version@{version}}
+\index{version@{version}!sysiosystem::rex\_return\_pool@{sysiosystem::rex\_return\_pool}}
+\doxysubsubsection{\texorpdfstring{version}{version}}
+{\footnotesize\ttfamily \label{structsysiosystem_1_1rex__return__pool_a5c4100b7c638a141f65e502eb81616bd} 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} sysiosystem\+::rex\+\_\+return\+\_\+pool\+::version = 0}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8hpp_source_l00420}{420}} of file \mbox{\hyperlink{sysio_8system_8hpp_source}{sysio.\+system.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/svetlasyrimis/\+Desktop/wire-\/network/\+WN-\/org/wire-\/system-\/contracts/contracts/sysio.\+system/include/sysio.\+system/\mbox{\hyperlink{sysio_8system_8hpp}{sysio.\+system.\+hpp}}\end{DoxyCompactItemize}

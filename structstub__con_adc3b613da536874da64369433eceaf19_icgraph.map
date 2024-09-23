@@ -1,0 +1,18 @@
+<map id="stub_con::get_shared" name="stub_con::get_shared">
+<area shape="rect" id="Node000001" title="Get a shared pointer to this component." alt="" coords="406,120,552,145"/>
+<area shape="rect" id="Node000002" href="$structstub__con.html#a3ada58523e3f8e28cf501dc97c16444f" title=" " alt="" coords="209,5,358,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="444,113,357,60,334,49,336,44,359,55,447,108"/>
+<area shape="rect" id="Node000003" href="$structstub__con.html#a122900a3be17dcbd6cc693ef8c025358" title=" " alt="" coords="212,70,354,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="410,118,337,99,338,94,411,112"/>
+<area shape="rect" id="Node000006" href="$structstub__con.html#a206b67c35da3da4fed8bfb2e2e783993" title=" " alt="" coords="214,120,352,145"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="390,135,353,135,353,130,390,130"/>
+<area shape="rect" id="Node000007" href="$structstub__con.html#a66c12a3d422977b7a278020b94d7611b" title=" " alt="" coords="228,169,338,194"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="411,152,338,171,337,166,410,147"/>
+<area shape="rect" id="Node000008" href="$structstub__con.html#a14e97604627969cec94295201745f893" title=" " alt="" coords="228,218,338,244"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="449,156,407,183,359,209,332,220,330,215,357,205,405,179,446,152"/>
+<area shape="rect" id="Node000004" href="$structstub__con.html#adce6bc3610b7465c5a3fca87ae02cda1" title=" " alt="" coords="8,5,158,46"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="221,68,156,49,157,44,222,63"/>
+<area shape="rect" id="Node000005" href="$structstub__con.html#a054f8943e3032fe19b3d9bf48bdf0039" title=" " alt="" coords="5,70,161,96"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="196,95,161,94,161,89,196,89"/>
+<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="176,71,212,72,212,77,176,77"/>
+</map>

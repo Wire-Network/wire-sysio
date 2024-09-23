@@ -1,0 +1,8 @@
+<map id="sysio::chain_apis::read_only::get_table_index_name" name="sysio::chain_apis::read_only::get_table_index_name">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,28,144,83"/>
+<area shape="rect" id="Node000002" href="$coverage-helper_8cpp.html#acf4803e8473417fc0a4ec061a7260106" title=" " alt="" coords="196,5,281,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="144,37,180,29,181,34,145,42"/>
+<area shape="rect" id="Node000003" href="$namespacefc.html#ab20c9acf886f89fabeb8a0d9ebc9abb8" title=" " alt="" coords="192,79,285,104"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="145,68,177,75,176,81,144,73"/>
+<area shape="poly" id="edge3_Node000003_Node000003" title=" " alt="" coords="210,80,205,70,208,60,220,54,238,52,258,55,269,61,266,66,257,60,238,57,221,59,212,64,210,69,215,77"/>
+</map>

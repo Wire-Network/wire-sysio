@@ -1,0 +1,7 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,5,141,46"/>
+<area shape="rect" id="Node000001" href="$classwebsocketpp_1_1transport_1_1asio_1_1connection.html" title="Asio based connection transport component." alt="" coords="189,5,372,46"/>
+<area shape="poly" id="edge281_Node000000_Node000001" title=" " alt="" coords="156,23,188,23,188,28,156,28"/>
+<area shape="rect" id="Node000002" href="$structmock__con.html" title=" " alt="" coords="420,13,501,38"/>
+<area shape="poly" id="edge282_Node000001_Node000002" title=" " alt="" coords="388,23,420,23,420,28,388,28"/>
+</map>

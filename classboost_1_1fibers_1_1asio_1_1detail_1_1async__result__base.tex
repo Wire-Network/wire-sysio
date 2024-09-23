@@ -1,0 +1,105 @@
+\doxysection{boost\+::fibers\+::asio\+::detail\+::async\+\_\+result\+\_\+base Class Reference}
+\hypertarget{classboost_1_1fibers_1_1asio_1_1detail_1_1async__result__base}{}\label{classboost_1_1fibers_1_1asio_1_1detail_1_1async__result__base}\index{boost::fibers::asio::detail::async\_result\_base@{boost::fibers::asio::detail::async\_result\_base}}
+
+
+{\ttfamily \#include $<$yield.\+hpp$>$}
+
+
+
+Inheritance diagram for boost\+::fibers\+::asio\+::detail\+::async\+\_\+result\+\_\+base\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classboost_1_1fibers_1_1asio_1_1detail_1_1async__result__base__inherit__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1detail_1_1async__result__base_ac21ded5289f9a56f6c5477d9a3684a3c}{async\+\_\+result\+\_\+base}} (\mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1detail_1_1yield__handler__base}{yield\+\_\+handler\+\_\+base}} \&h)
+\item 
+void \mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1detail_1_1async__result__base_a5aadf61dad90a784b5623db1bfb19f38}{get}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{detail_2yield_8hpp_source_l00176}{176}} of file \mbox{\hyperlink{detail_2yield_8hpp_source}{yield.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classboost_1_1fibers_1_1asio_1_1detail_1_1async__result__base_ac21ded5289f9a56f6c5477d9a3684a3c}\index{boost::fibers::asio::detail::async\_result\_base@{boost::fibers::asio::detail::async\_result\_base}!async\_result\_base@{async\_result\_base}}
+\index{async\_result\_base@{async\_result\_base}!boost::fibers::asio::detail::async\_result\_base@{boost::fibers::asio::detail::async\_result\_base}}
+\doxysubsubsection{\texorpdfstring{async\_result\_base()}{async\_result\_base()}}
+{\footnotesize\ttfamily \label{classboost_1_1fibers_1_1asio_1_1detail_1_1async__result__base_ac21ded5289f9a56f6c5477d9a3684a3c} 
+boost\+::fibers\+::asio\+::detail\+::async\+\_\+result\+\_\+base\+::async\+\_\+result\+\_\+base (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1detail_1_1yield__handler__base}{yield\+\_\+handler\+\_\+base}} \&}]{h}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{detail_2yield_8hpp_source_l00178}{178}} of file \mbox{\hyperlink{detail_2yield_8hpp_source}{yield.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Inject\ ptr\ to\ our\ yield\_completion\ instance\ into\ this}}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ yield\_handler<>.}}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ h.ycomp\_\ =\ \&\ this-\/>ycomp\_;}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ if\ yield\_t\ didn't\ bind\ an\ error\_code,\ make\ yield\_handler\_base's}}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ error\_code*\ point\ to\ an\ error\_code\ local\ to\ this\ object\ so}}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ yield\_handler\_base::operator()\ can\ unconditionally\ store\ through}}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ its\ error\_code*}}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ !\ h.yt\_.ec\_)\ \{}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \ \ \ \ \ \ h.yt\_.ec\_\ =\ \&\ ec\_;}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00189\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classboost_1_1fibers_1_1asio_1_1detail_1_1async__result__base_a5aadf61dad90a784b5623db1bfb19f38}\index{boost::fibers::asio::detail::async\_result\_base@{boost::fibers::asio::detail::async\_result\_base}!get@{get}}
+\index{get@{get}!boost::fibers::asio::detail::async\_result\_base@{boost::fibers::asio::detail::async\_result\_base}}
+\doxysubsubsection{\texorpdfstring{get()}{get()}}
+{\footnotesize\ttfamily \label{classboost_1_1fibers_1_1asio_1_1detail_1_1async__result__base_a5aadf61dad90a784b5623db1bfb19f38} 
+void boost\+::fibers\+::asio\+::detail\+::async\+\_\+result\+\_\+base\+::get (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{detail_2yield_8hpp_source_l00191}{191}} of file \mbox{\hyperlink{detail_2yield_8hpp_source}{yield.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Unless\ yield\_handler\_base::operator()\ has\ already\ been\ called,}}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ suspend\ the\ calling\ fiber\ until\ that\ call.}}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ ycomp\_.\mbox{\hyperlink{structboost_1_1fibers_1_1asio_1_1detail_1_1yield__completion_abe924cb1844f3bdbc6ea1fa1a52fb15d}{wait}}();}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ The\ only\ way\ our\ own\ ec\_\ member\ could\ have\ a\ non-\/default\ value\ is}}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ if\ our\ yield\_handler\ did\ not\ have\ a\ bound\ error\_code\ AND\ the}}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ completion\ callback\ passed\ a\ non-\/default\ error\_code.}}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ ec\_)\ \{}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_catch_a3cbceeab9252d1b752f66a2826e92548}{throw\_exception}}(\ boost::system::system\_error\{\ ec\_\ \}\ );}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00201\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classboost_1_1fibers_1_1asio_1_1detail_1_1async__result__base_a5aadf61dad90a784b5623db1bfb19f38_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=331pt]{classboost_1_1fibers_1_1asio_1_1detail_1_1async__result__base_a5aadf61dad90a784b5623db1bfb19f38_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/src/thread/asio/detail/\mbox{\hyperlink{detail_2yield_8hpp}{yield.\+hpp}}\end{DoxyCompactItemize}

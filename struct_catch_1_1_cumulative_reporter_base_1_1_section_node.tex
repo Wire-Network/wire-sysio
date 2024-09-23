@@ -1,0 +1,222 @@
+\doxysection{Catch\+::Cumulative\+Reporter\+Base\texorpdfstring{$<$}{<} DerivedT \texorpdfstring{$>$}{>}\+::Section\+Node Struct Reference}
+\hypertarget{struct_catch_1_1_cumulative_reporter_base_1_1_section_node}{}\label{struct_catch_1_1_cumulative_reporter_base_1_1_section_node}\index{Catch::CumulativeReporterBase$<$ DerivedT $>$::SectionNode@{Catch::CumulativeReporterBase$<$ DerivedT $>$::SectionNode}}
+
+
+{\ttfamily \#include $<$catch\+\_\+reporter\+\_\+bases.\+hpp$>$}
+
+
+
+Collaboration diagram for Catch\+::Cumulative\+Reporter\+Base\texorpdfstring{$<$}{<} DerivedT \texorpdfstring{$>$}{>}\+::Section\+Node\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_catch_1_1_cumulative_reporter_base_1_1_section_node__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_1_1_section_node_abb0850c7fa4c7c3066291aa985e18b32}{Child\+Sections}} = std\+::vector$<$std\+::shared\+\_\+ptr$<$\mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_1_1_section_node}{Section\+Node}}$>$$>$
+\item 
+using \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_1_1_section_node_a6fd69194ba88e51e2607ce5dc3228eb7}{Assertions}} = std\+::vector$<$\mbox{\hyperlink{struct_catch_1_1_assertion_stats}{Assertion\+Stats}}$>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_1_1_section_node_a0bc0bac562c208a96bbd0a8cf005267a}{Section\+Node}} (\mbox{\hyperlink{struct_catch_1_1_section_stats}{Section\+Stats}} const \&\+\_\+stats)
+\item 
+virtual \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_1_1_section_node_ac0400f62c9be6643440a0222aeae6b8b}{\texorpdfstring{$\sim$}{\string~}\+Section\+Node}} ()=default
+\item 
+bool \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_1_1_section_node_aa1815854677e740b744007734e661e2c}{operator==}} (\mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_1_1_section_node}{Section\+Node}} const \&other) const
+\item 
+bool \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_1_1_section_node_a3953746b0b81b2188aa6176a0430ef28}{operator==}} (std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_1_1_section_node}{Section\+Node}} $>$ const \&other) const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_catch_1_1_section_stats}{Section\+Stats}} \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_1_1_section_node_a0c9a4a4df637212238cdeb3f3234e37b}{stats}}
+\item 
+\mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_1_1_section_node_abb0850c7fa4c7c3066291aa985e18b32}{Child\+Sections}} \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_1_1_section_node_aac8db28786523ab89dba2095b4592979}{child\+Sections}}
+\item 
+\mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_1_1_section_node_a6fd69194ba88e51e2607ce5dc3228eb7}{Assertions}} \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_1_1_section_node_a179a16713ed47037fb8d76b6e89a3ff7}{assertions}}
+\item 
+std\+::string \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_1_1_section_node_a45117dd50c1b9827652b93ce6585d9f7}{std\+Out}}
+\item 
+std\+::string \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_1_1_section_node_af61bb005038fbeb28a58337763f8be7c}{std\+Err}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename DerivedT$>$\newline
+struct Catch\+::\+Cumulative\+Reporter\+Base$<$ Derived\+T $>$\+::\+Section\+Node}
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__bases_8hpp_source_l00111}{111}} of file \mbox{\hyperlink{catch__reporter__bases_8hpp_source}{catch\+\_\+reporter\+\_\+bases.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{struct_catch_1_1_cumulative_reporter_base_1_1_section_node_a6fd69194ba88e51e2607ce5dc3228eb7}\index{Catch::CumulativeReporterBase$<$ DerivedT $>$::SectionNode@{Catch::CumulativeReporterBase$<$ DerivedT $>$::SectionNode}!Assertions@{Assertions}}
+\index{Assertions@{Assertions}!Catch::CumulativeReporterBase$<$ DerivedT $>$::SectionNode@{Catch::CumulativeReporterBase$<$ DerivedT $>$::SectionNode}}
+\doxysubsubsection{\texorpdfstring{Assertions}{Assertions}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_cumulative_reporter_base_1_1_section_node_a6fd69194ba88e51e2607ce5dc3228eb7} 
+template$<$typename DerivedT $>$ \\
+using \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base}{Catch\+::\+Cumulative\+Reporter\+Base}}$<$ DerivedT $>$\+::\+Section\+Node\+::\+Assertions = std\+::vector$<$\mbox{\hyperlink{struct_catch_1_1_assertion_stats}{Assertion\+Stats}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__bases_8hpp_source_l00124}{124}} of file \mbox{\hyperlink{catch__reporter__bases_8hpp_source}{catch\+\_\+reporter\+\_\+bases.\+hpp}}.
+
+\Hypertarget{struct_catch_1_1_cumulative_reporter_base_1_1_section_node_abb0850c7fa4c7c3066291aa985e18b32}\index{Catch::CumulativeReporterBase$<$ DerivedT $>$::SectionNode@{Catch::CumulativeReporterBase$<$ DerivedT $>$::SectionNode}!ChildSections@{ChildSections}}
+\index{ChildSections@{ChildSections}!Catch::CumulativeReporterBase$<$ DerivedT $>$::SectionNode@{Catch::CumulativeReporterBase$<$ DerivedT $>$::SectionNode}}
+\doxysubsubsection{\texorpdfstring{ChildSections}{ChildSections}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_cumulative_reporter_base_1_1_section_node_abb0850c7fa4c7c3066291aa985e18b32} 
+template$<$typename DerivedT $>$ \\
+using \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base}{Catch\+::\+Cumulative\+Reporter\+Base}}$<$ DerivedT $>$\+::\+Section\+Node\+::\+Child\+Sections = std\+::vector$<$std\+::shared\+\_\+ptr$<$\mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_1_1_section_node}{Section\+Node}}$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__bases_8hpp_source_l00123}{123}} of file \mbox{\hyperlink{catch__reporter__bases_8hpp_source}{catch\+\_\+reporter\+\_\+bases.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{struct_catch_1_1_cumulative_reporter_base_1_1_section_node_a0bc0bac562c208a96bbd0a8cf005267a}\index{Catch::CumulativeReporterBase$<$ DerivedT $>$::SectionNode@{Catch::CumulativeReporterBase$<$ DerivedT $>$::SectionNode}!SectionNode@{SectionNode}}
+\index{SectionNode@{SectionNode}!Catch::CumulativeReporterBase$<$ DerivedT $>$::SectionNode@{Catch::CumulativeReporterBase$<$ DerivedT $>$::SectionNode}}
+\doxysubsubsection{\texorpdfstring{SectionNode()}{SectionNode()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_cumulative_reporter_base_1_1_section_node_a0bc0bac562c208a96bbd0a8cf005267a} 
+template$<$typename DerivedT $>$ \\
+\mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base}{Catch\+::\+Cumulative\+Reporter\+Base}}$<$ DerivedT $>$\+::\+Section\+Node\+::\+Section\+Node (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_section_stats}{Section\+Stats}} const \&}]{\+\_\+stats}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__bases_8hpp_source_l00112}{112}} of file \mbox{\hyperlink{catch__reporter__bases_8hpp_source}{catch\+\_\+reporter\+\_\+bases.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00112\ :\ \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_1_1_section_node_a0c9a4a4df637212238cdeb3f3234e37b}{stats}}(\_stats)\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{struct_catch_1_1_cumulative_reporter_base_1_1_section_node_ac0400f62c9be6643440a0222aeae6b8b}\index{Catch::CumulativeReporterBase$<$ DerivedT $>$::SectionNode@{Catch::CumulativeReporterBase$<$ DerivedT $>$::SectionNode}!````~SectionNode@{\texorpdfstring{$\sim$}{\string~}SectionNode}}
+\index{````~SectionNode@{\texorpdfstring{$\sim$}{\string~}SectionNode}!Catch::CumulativeReporterBase$<$ DerivedT $>$::SectionNode@{Catch::CumulativeReporterBase$<$ DerivedT $>$::SectionNode}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}SectionNode()}{\string~SectionNode()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_cumulative_reporter_base_1_1_section_node_ac0400f62c9be6643440a0222aeae6b8b} 
+template$<$typename DerivedT $>$ \\
+virtual \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base}{Catch\+::\+Cumulative\+Reporter\+Base}}$<$ DerivedT $>$\+::\+Section\+Node\+::\texorpdfstring{$\sim$}{\string~}\+Section\+Node (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}, {\ttfamily [default]}}
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_catch_1_1_cumulative_reporter_base_1_1_section_node_aa1815854677e740b744007734e661e2c}\index{Catch::CumulativeReporterBase$<$ DerivedT $>$::SectionNode@{Catch::CumulativeReporterBase$<$ DerivedT $>$::SectionNode}!operator==@{operator==}}
+\index{operator==@{operator==}!Catch::CumulativeReporterBase$<$ DerivedT $>$::SectionNode@{Catch::CumulativeReporterBase$<$ DerivedT $>$::SectionNode}}
+\doxysubsubsection{\texorpdfstring{operator==()}{operator==()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_cumulative_reporter_base_1_1_section_node_aa1815854677e740b744007734e661e2c} 
+template$<$typename DerivedT $>$ \\
+bool \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base}{Catch\+::\+Cumulative\+Reporter\+Base}}$<$ DerivedT $>$\+::\+Section\+Node\+::operator== (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_1_1_section_node}{Section\+Node}} const \&}]{other}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__bases_8hpp_source_l00115}{115}} of file \mbox{\hyperlink{catch__reporter__bases_8hpp_source}{catch\+\_\+reporter\+\_\+bases.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_1_1_section_node_a0c9a4a4df637212238cdeb3f3234e37b}{stats}}.\mbox{\hyperlink{struct_catch_1_1_section_stats_a524d0cd3b91acc6a4d0f24d6e50275bb}{sectionInfo}}.\mbox{\hyperlink{struct_catch_1_1_section_info_adbc83b8a3507c4acc8ee249e93465711}{lineInfo}}\ ==\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.stats.sectionInfo.lineInfo;}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_catch_1_1_cumulative_reporter_base_1_1_section_node_aa1815854677e740b744007734e661e2c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_catch_1_1_cumulative_reporter_base_1_1_section_node_a3953746b0b81b2188aa6176a0430ef28}\index{Catch::CumulativeReporterBase$<$ DerivedT $>$::SectionNode@{Catch::CumulativeReporterBase$<$ DerivedT $>$::SectionNode}!operator==@{operator==}}
+\index{operator==@{operator==}!Catch::CumulativeReporterBase$<$ DerivedT $>$::SectionNode@{Catch::CumulativeReporterBase$<$ DerivedT $>$::SectionNode}}
+\doxysubsubsection{\texorpdfstring{operator==()}{operator==()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_cumulative_reporter_base_1_1_section_node_a3953746b0b81b2188aa6176a0430ef28} 
+template$<$typename DerivedT $>$ \\
+bool \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base}{Catch\+::\+Cumulative\+Reporter\+Base}}$<$ DerivedT $>$\+::\+Section\+Node\+::operator== (\begin{DoxyParamCaption}\item[{std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_1_1_section_node}{Section\+Node}} $>$ const \&}]{other}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__bases_8hpp_source_l00118}{118}} of file \mbox{\hyperlink{catch__reporter__bases_8hpp_source}{catch\+\_\+reporter\+\_\+bases.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_1_1_section_node_aa1815854677e740b744007734e661e2c}{operator==}}(*other);}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_catch_1_1_cumulative_reporter_base_1_1_section_node_a3953746b0b81b2188aa6176a0430ef28_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_catch_1_1_cumulative_reporter_base_1_1_section_node_a179a16713ed47037fb8d76b6e89a3ff7}\index{Catch::CumulativeReporterBase$<$ DerivedT $>$::SectionNode@{Catch::CumulativeReporterBase$<$ DerivedT $>$::SectionNode}!assertions@{assertions}}
+\index{assertions@{assertions}!Catch::CumulativeReporterBase$<$ DerivedT $>$::SectionNode@{Catch::CumulativeReporterBase$<$ DerivedT $>$::SectionNode}}
+\doxysubsubsection{\texorpdfstring{assertions}{assertions}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_cumulative_reporter_base_1_1_section_node_a179a16713ed47037fb8d76b6e89a3ff7} 
+template$<$typename DerivedT $>$ \\
+\mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_1_1_section_node_a6fd69194ba88e51e2607ce5dc3228eb7}{Assertions}} \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base}{Catch\+::\+Cumulative\+Reporter\+Base}}$<$ DerivedT $>$\+::\+Section\+Node\+::assertions}
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__bases_8hpp_source_l00126}{126}} of file \mbox{\hyperlink{catch__reporter__bases_8hpp_source}{catch\+\_\+reporter\+\_\+bases.\+hpp}}.
+
+\Hypertarget{struct_catch_1_1_cumulative_reporter_base_1_1_section_node_aac8db28786523ab89dba2095b4592979}\index{Catch::CumulativeReporterBase$<$ DerivedT $>$::SectionNode@{Catch::CumulativeReporterBase$<$ DerivedT $>$::SectionNode}!childSections@{childSections}}
+\index{childSections@{childSections}!Catch::CumulativeReporterBase$<$ DerivedT $>$::SectionNode@{Catch::CumulativeReporterBase$<$ DerivedT $>$::SectionNode}}
+\doxysubsubsection{\texorpdfstring{childSections}{childSections}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_cumulative_reporter_base_1_1_section_node_aac8db28786523ab89dba2095b4592979} 
+template$<$typename DerivedT $>$ \\
+\mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base_1_1_section_node_abb0850c7fa4c7c3066291aa985e18b32}{Child\+Sections}} \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base}{Catch\+::\+Cumulative\+Reporter\+Base}}$<$ DerivedT $>$\+::\+Section\+Node\+::child\+Sections}
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__bases_8hpp_source_l00125}{125}} of file \mbox{\hyperlink{catch__reporter__bases_8hpp_source}{catch\+\_\+reporter\+\_\+bases.\+hpp}}.
+
+\Hypertarget{struct_catch_1_1_cumulative_reporter_base_1_1_section_node_a0c9a4a4df637212238cdeb3f3234e37b}\index{Catch::CumulativeReporterBase$<$ DerivedT $>$::SectionNode@{Catch::CumulativeReporterBase$<$ DerivedT $>$::SectionNode}!stats@{stats}}
+\index{stats@{stats}!Catch::CumulativeReporterBase$<$ DerivedT $>$::SectionNode@{Catch::CumulativeReporterBase$<$ DerivedT $>$::SectionNode}}
+\doxysubsubsection{\texorpdfstring{stats}{stats}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_cumulative_reporter_base_1_1_section_node_a0c9a4a4df637212238cdeb3f3234e37b} 
+template$<$typename DerivedT $>$ \\
+\mbox{\hyperlink{struct_catch_1_1_section_stats}{Section\+Stats}} \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base}{Catch\+::\+Cumulative\+Reporter\+Base}}$<$ DerivedT $>$\+::\+Section\+Node\+::stats}
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__bases_8hpp_source_l00122}{122}} of file \mbox{\hyperlink{catch__reporter__bases_8hpp_source}{catch\+\_\+reporter\+\_\+bases.\+hpp}}.
+
+\Hypertarget{struct_catch_1_1_cumulative_reporter_base_1_1_section_node_af61bb005038fbeb28a58337763f8be7c}\index{Catch::CumulativeReporterBase$<$ DerivedT $>$::SectionNode@{Catch::CumulativeReporterBase$<$ DerivedT $>$::SectionNode}!stdErr@{stdErr}}
+\index{stdErr@{stdErr}!Catch::CumulativeReporterBase$<$ DerivedT $>$::SectionNode@{Catch::CumulativeReporterBase$<$ DerivedT $>$::SectionNode}}
+\doxysubsubsection{\texorpdfstring{stdErr}{stdErr}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_cumulative_reporter_base_1_1_section_node_af61bb005038fbeb28a58337763f8be7c} 
+template$<$typename DerivedT $>$ \\
+std\+::string \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base}{Catch\+::\+Cumulative\+Reporter\+Base}}$<$ DerivedT $>$\+::\+Section\+Node\+::std\+Err}
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__bases_8hpp_source_l00128}{128}} of file \mbox{\hyperlink{catch__reporter__bases_8hpp_source}{catch\+\_\+reporter\+\_\+bases.\+hpp}}.
+
+\Hypertarget{struct_catch_1_1_cumulative_reporter_base_1_1_section_node_a45117dd50c1b9827652b93ce6585d9f7}\index{Catch::CumulativeReporterBase$<$ DerivedT $>$::SectionNode@{Catch::CumulativeReporterBase$<$ DerivedT $>$::SectionNode}!stdOut@{stdOut}}
+\index{stdOut@{stdOut}!Catch::CumulativeReporterBase$<$ DerivedT $>$::SectionNode@{Catch::CumulativeReporterBase$<$ DerivedT $>$::SectionNode}}
+\doxysubsubsection{\texorpdfstring{stdOut}{stdOut}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_cumulative_reporter_base_1_1_section_node_a45117dd50c1b9827652b93ce6585d9f7} 
+template$<$typename DerivedT $>$ \\
+std\+::string \mbox{\hyperlink{struct_catch_1_1_cumulative_reporter_base}{Catch\+::\+Cumulative\+Reporter\+Base}}$<$ DerivedT $>$\+::\+Section\+Node\+::std\+Out}
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__bases_8hpp_source_l00127}{127}} of file \mbox{\hyperlink{catch__reporter__bases_8hpp_source}{catch\+\_\+reporter\+\_\+bases.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/include/reporters/\mbox{\hyperlink{catch__reporter__bases_8hpp}{catch\+\_\+reporter\+\_\+bases.\+hpp}}\end{DoxyCompactItemize}

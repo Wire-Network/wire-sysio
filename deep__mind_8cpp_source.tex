@@ -1,0 +1,404 @@
+\doxysection{deep\+\_\+mind.\+cpp}
+\hypertarget{deep__mind_8cpp_source}{}\label{deep__mind_8cpp_source}\index{libraries/chain/deep\_mind.cpp@{libraries/chain/deep\_mind.cpp}}
+\mbox{\hyperlink{deep__mind_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{deep__mind_8hpp}{sysio/chain/deep\_mind.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{block__state_8hpp}{sysio/chain/block\_state.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{generated__transaction__object_8hpp}{sysio/chain/generated\_transaction\_object.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{contract__table__objects_8hpp}{sysio/chain/contract\_table\_objects.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{resource__limits__private_8hpp}{sysio/chain/resource\_limits\_private.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{permission__object_8hpp}{sysio/chain/permission\_object.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{global__property__object_8hpp}{sysio/chain/global\_property\_object.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{account__object_8hpp}{sysio/chain/account\_object.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{protocol__feature__manager_8hpp}{sysio/chain/protocol\_feature\_manager.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{hex_8hpp}{fc/crypto/hex.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00012}00012\ \textcolor{keyword}{namespace\ }\{}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00014}00014\ \ \ \ \textcolor{keywordtype}{void}\ set\_trace\_elapsed\_to\_zero(\mbox{\hyperlink{structsysio_1_1chain_1_1action__trace}{sysio::chain::action\_trace}}\&\ trace)\ \{}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00015}00015\ \ \ \ \ \ \ trace.\mbox{\hyperlink{structsysio_1_1chain_1_1action__trace_a2768873af7e824ea890790b416418a63}{elapsed}}\ =\ \mbox{\hyperlink{classfc_1_1microseconds}{fc::microseconds}}\{\};}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00016}00016\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00018}00018\ \ \ \ \textcolor{keywordtype}{void}\ set\_trace\_elapsed\_to\_zero(\mbox{\hyperlink{structsysio_1_1chain_1_1transaction__trace}{sysio::chain::transaction\_trace}}\&\ trace)\ \{}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00019}00019\ \ \ \ \ \ \ trace.\mbox{\hyperlink{structsysio_1_1chain_1_1transaction__trace_a217c19d97f4897cc8332ac10063c473f}{elapsed}}\ =\ \mbox{\hyperlink{classfc_1_1microseconds}{fc::microseconds}}\{\};}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00020}00020\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\&\ act\_trace\ :\ trace.\mbox{\hyperlink{structsysio_1_1chain_1_1transaction__trace_ab1bb67b82dbb145bcb27d8dcbff5d251}{action\_traces}})\ \{}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00021}00021\ \ \ \ \ \ \ \ \ \ set\_trace\_elapsed\_to\_zero(act\_trace);}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00022}00022\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00023}00023\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00025}00025\ \}}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00027}00027\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio_1_1chain}{sysio::chain}}\ \{}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00029}\mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a65bb14e922ee5ead3f33ca19ba84fa08}{00029}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a65bb14e922ee5ead3f33ca19ba84fa08}{deep\_mind\_handler::update\_config}}(\mbox{\hyperlink{structsysio_1_1chain_1_1deep__mind__handler_1_1deep__mind__config}{deep\_mind\_config}}\ \mbox{\hyperlink{classconfig}{config}})}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00030}00030\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00031}00031\ \ \ \ \ \ \ \_config\ =\ std::move(\mbox{\hyperlink{classconfig}{config}});}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00032}00032\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00034}\mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a992e2ea098b7b2288a3be6aa3eeb56e8}{00034}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a992e2ea098b7b2288a3be6aa3eeb56e8}{deep\_mind\_handler::update\_logger}}(\textcolor{keyword}{const}\ std::string\&\ \mbox{\hyperlink{namespacesysio_ad66b67a8dd0a897a0a5b89f954fd3ade}{logger\_name}})}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00035}00035\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00036}00036\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1logger_a2214632598874a4e52a5500a6346515e}{fc::logger::update}}(\ \mbox{\hyperlink{namespacesysio_ad66b67a8dd0a897a0a5b89f954fd3ade}{logger\_name}},\ \_logger\ );}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00037}00037\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00039}00039\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ prefix(\mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a78bf0c79493a90c71cb28aa761f44fd2}{deep\_mind\_handler::operation\_qualifier}}\ q)\ \{}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00040}00040\ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(q)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00041}00041\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00042}00042\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a78bf0c79493a90c71cb28aa761f44fd2a334c4a4c42fdb79d7ebc3e73b517e6f8}{deep\_mind\_handler::operation\_qualifier::none}}:\ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}"{}};}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00043}00043\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a78bf0c79493a90c71cb28aa761f44fd2a8f45a2644508b5282f57fe129f62d19a}{deep\_mind\_handler::operation\_qualifier::modify}}:\ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}MODIFY\_"{}};}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00044}00044\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a78bf0c79493a90c71cb28aa761f44fd2a21a361d96e3e13f5f109748c2a9d2434}{deep\_mind\_handler::operation\_qualifier::push}}:\ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}PUSH\_"{}};}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00045}00045\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00046}00046\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00048}\mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a2899afc0c347e454d3918b95c9df6d77}{00048}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a2899afc0c347e454d3918b95c9df6d77}{deep\_mind\_handler::on\_startup}}(\mbox{\hyperlink{classchainbase_1_1database}{chainbase::database}}\&\ db,\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ head\_block\_num)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00049}00049\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00050}00050\ \ \ \ \ \ \ \textcolor{comment}{//\ FIXME:\ We\ should\ probably\ feed\ that\ from\ CMake\ directly\ somehow\ ...}}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00051}00051\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}DEEP\_MIND\_VERSION\ wire\_sysio\ 13\ 0"{}});}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00052}00052\ }
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00053}00053\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}ABIDUMP\ START\ \$\{block\_num\}\ \$\{global\_sequence\_num\}"{}},}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00054}00054\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}block\_num"{}},\ head\_block\_num)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00055}00055\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}global\_sequence\_num"{}},\ db.\mbox{\hyperlink{classchainbase_1_1database_afcfe00f81a526c1376d4f51197dd3a9a}{get}}<\mbox{\hyperlink{classsysio_1_1chain_1_1dynamic__global__property__object}{dynamic\_global\_property\_object}}>().global\_action\_sequence)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00056}00056\ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00057}00057\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ idx\ =\ db.\mbox{\hyperlink{classchainbase_1_1database_a4d5297635dcf70be481d9b600da9bc13}{get\_index}}<\mbox{\hyperlink{namespacesysio_1_1chain_a1736163b16f1771314cd01a1208621c7}{account\_index}}>();}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00058}00058\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\&\ row\ :\ idx.indices())\ \{}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00059}00059\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (row.abi.size()\ !=\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}ABIDUMP\ ABI\ \$\{contract\}\ \$\{abi\}"{}},}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00061}00061\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}contract"{}},\ row.name)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00062}00062\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}abi"{}},\ row.abi)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00064}00064\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00065}00065\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00066}00066\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}ABIDUMP\ END"{}});}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00067}00067\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00069}\mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a8c5f1a77e4f1d4391532dcc823b9b8e2}{00069}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a8c5f1a77e4f1d4391532dcc823b9b8e2}{deep\_mind\_handler::on\_start\_block}}(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ block\_num)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00070}00070\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00071}00071\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}START\_BLOCK\ \$\{block\_num\}"{}},\ (\textcolor{stringliteral}{"{}block\_num"{}},\ block\_num));}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00072}00072\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00073}00073\ }
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00074}\mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a58e87646e6814d112d7913a5101bd6c4}{00074}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a58e87646e6814d112d7913a5101bd6c4}{deep\_mind\_handler::on\_accepted\_block}}(\textcolor{keyword}{const}\ std::shared\_ptr<block\_state>\&\ bsp)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00075}00075\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00076}00076\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ packed\_blk\ =\ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(*bsp);}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00077}00077\ }
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00078}00078\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}ACCEPTED\_BLOCK\ \$\{num\}\ \$\{blk\}"{}},}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00079}00079\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}num"{}},\ bsp-\/>block\_num)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00080}00080\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}blk"{}},\ \mbox{\hyperlink{namespacefc_aab567c89004d329f560014d9943afcd6}{fc::to\_hex}}(packed\_blk))}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00081}00081\ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00082}00082\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00083}00083\ }
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00084}\mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a76d1fe0ab283b95b71b0374e50a074fe}{00084}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a76d1fe0ab283b95b71b0374e50a074fe}{deep\_mind\_handler::on\_switch\_forks}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha256}{block\_id\_type}}\&\ old\_head,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha256}{block\_id\_type}}\&\ new\_head)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00085}00085\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00086}00086\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}SWITCH\_FORK\ \$\{from\_id\}\ \$\{to\_id\}"{}},}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00087}00087\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}from\_id"{}},\ old\_head)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00088}00088\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}to\_id"{}},\ new\_head)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00089}00089\ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00090}00090\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00091}00091\ }
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00092}\mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a66b4adf2043576b0824e49a191266e6a}{00092}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a66b4adf2043576b0824e49a191266e6a}{deep\_mind\_handler::on\_onerror}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1signed__transaction}{signed\_transaction}}\&\ etrx)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00093}00093\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00094}00094\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ packed\_trx\ =\ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(etrx);}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00095}00095\ }
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00096}00096\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}TRX\_OP\ CREATE\ onerror\ \$\{id\}\ \$\{trx\}"{}},}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00097}00097\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}id"{}},\ etrx.\mbox{\hyperlink{structsysio_1_1chain_1_1transaction_aef240445de0470ccc990493a1bb3afec}{id}}())}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00098}00098\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}trx"{}},\ \mbox{\hyperlink{namespacefc_aab567c89004d329f560014d9943afcd6}{fc::to\_hex}}(packed\_trx))}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00099}00099\ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00100}00100\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00101}00101\ }
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00102}\mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_ae52a137a99c78957f649905f587c9172}{00102}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_ae52a137a99c78957f649905f587c9172}{deep\_mind\_handler::on\_onblock}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1signed__transaction}{signed\_transaction}}\&\ trx)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00103}00103\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00104}00104\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ packed\_trx\ =\ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(trx);}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00105}00105\ }
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00106}00106\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}TRX\_OP\ CREATE\ onblock\ \$\{id\}\ \$\{trx\}"{}},}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00107}00107\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}id"{}},\ trx.\mbox{\hyperlink{structsysio_1_1chain_1_1transaction_aef240445de0470ccc990493a1bb3afec}{id}}())}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00108}00108\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}trx"{}},\ \mbox{\hyperlink{namespacefc_aab567c89004d329f560014d9943afcd6}{fc::to\_hex}}(packed\_trx))}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00109}00109\ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00110}00110\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00111}00111\ }
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00112}\mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a37eea3e55a641b8a916c353f557a58ae}{00112}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a37eea3e55a641b8a916c353f557a58ae}{deep\_mind\_handler::on\_start\_transaction}}()}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00113}00113\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00114}00114\ \ \ \ \ \ \ \_action\_id\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00115}00115\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00116}00116\ }
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00117}\mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a4d8195c2ed558e0b450a8499dadf0fd3}{00117}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a4d8195c2ed558e0b450a8499dadf0fd3}{deep\_mind\_handler::on\_end\_transaction}}()}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00118}00118\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00119}00119\ \ \ \ \ \ \ \_action\_id\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00120}00120\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00121}00121\ }
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00122}\mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_afe5ffbb0673d54aa20b08a109d1b09b5}{00122}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_afe5ffbb0673d54aa20b08a109d1b09b5}{deep\_mind\_handler::on\_applied\_transaction}}(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ block\_num,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_a4ee2867a6bec961c7a78b203cfd76be9}{transaction\_trace\_ptr}}\&\ trace)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00123}00123\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00124}00124\ \ \ \ \ \ \ std::vector<char>\ packed\_trace;}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00125}00125\ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00126}00126\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\_config.\mbox{\hyperlink{structsysio_1_1chain_1_1deep__mind__handler_1_1deep__mind__config_a5d360f0648ee6b27bac5dd10a98ee0dc}{zero\_elapsed}})\ \{}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00127}00127\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__trace}{transaction\_trace}}\ trace\_copy\ =\ *trace;}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00128}00128\ \ \ \ \ \ \ \ \ \ set\_trace\_elapsed\_to\_zero(trace\_copy);}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00129}00129\ \ \ \ \ \ \ \ \ \ packed\_trace\ =\ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(trace\_copy);}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00130}00130\ }
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00131}00131\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00132}00132\ \ \ \ \ \ \ \ \ \ packed\_trace\ =\ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(*trace);}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00133}00133\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00134}00134\ }
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00135}00135\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}APPLIED\_TRANSACTION\ \$\{block\}\ \$\{traces\}"{}},}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00136}00136\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}block"{}},\ block\_num)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00137}00137\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}traces"{}},\ \mbox{\hyperlink{namespacefc_aab567c89004d329f560014d9943afcd6}{fc::to\_hex}}(packed\_trace))}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00138}00138\ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00139}00139\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00140}00140\ }
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00141}\mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_ab52c3cb0a649f4a70f4e1b6717901e7e}{00141}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_ab52c3cb0a649f4a70f4e1b6717901e7e}{deep\_mind\_handler::on\_add\_ram\_correction}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1chain_1_1account__ram__correction__object}{account\_ram\_correction\_object}}\&\ rco,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ delta)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00142}00142\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00143}00143\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}RAM\_CORRECTION\_OP\ \$\{action\_id\}\ \$\{correction\_id\}\ \$\{event\_id\}\ \$\{payer\}\ \$\{delta\}"{}},}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00144}00144\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}action\_id"{}},\ \_action\_id)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00145}00145\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}correction\_id"{}},\ rco.id.\mbox{\hyperlink{classchainbase_1_1oid_a572c4ef080a7db37d93631ab0fbb123a}{\_id}})}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00146}00146\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}event\_id"{}},\ \_ram\_trace.\mbox{\hyperlink{structsysio_1_1chain_1_1ram__trace_a168f13047b195cd83845bdfe40f636d2}{event\_id}})}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00147}00147\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}payer"{}},\ rco.name)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00148}00148\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}delta"{}},\ delta)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00149}00149\ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00150}00150\ \ \ \ \ \ \ \_ram\_trace\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1ram__trace}{ram\_trace}}();}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00151}00151\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00152}00152\ }
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00153}\mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a2cc8d78603f10399c56441b7d36857ff}{00153}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a2cc8d78603f10399c56441b7d36857ff}{deep\_mind\_handler::on\_preactivate\_feature}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature}{protocol\_feature}}\&\ feature)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00154}00154\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00155}00155\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}FEATURE\_OP\ PRE\_ACTIVATE\ \$\{action\_id\}\ \$\{feature\_digest\}\ \$\{feature\}"{}},}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00156}00156\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}action\_id"{}},\ \_action\_id)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00157}00157\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}feature\_digest"{}},\ feature.feature\_digest)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00158}00158\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}feature"{}},\ feature.to\_variant())}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00159}00159\ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00160}00160\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00161}00161\ }
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00162}\mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a19066f9082b753020de72c7365a3e645}{00162}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a19066f9082b753020de72c7365a3e645}{deep\_mind\_handler::on\_activate\_feature}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1protocol__feature}{protocol\_feature}}\&\ feature)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00163}00163\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00164}00164\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}FEATURE\_OP\ ACTIVATE\ \$\{feature\_digest\}\ \$\{feature\}"{}},}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00165}00165\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}feature\_digest"{}},\ feature.feature\_digest)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00166}00166\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}feature"{}},\ feature.to\_variant())}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00167}00167\ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00168}00168\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00169}00169\ }
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00170}\mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_ae83a7be061d2f00f7caa103e8f8ec2dd}{00170}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_ae83a7be061d2f00f7caa103e8f8ec2dd}{deep\_mind\_handler::on\_input\_action}}()}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00171}00171\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00172}00172\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}CREATION\_OP\ ROOT\ \$\{action\_id\}"{}},}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00173}00173\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}action\_id"{}},\ \_action\_id)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00174}00174\ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00175}00175\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00176}\mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a40ba18f5c95f0a7f1951d62440cb8eee}{00176}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a40ba18f5c95f0a7f1951d62440cb8eee}{deep\_mind\_handler::on\_end\_action}}()}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00177}00177\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00178}00178\ \ \ \ \ \ \ ++\_action\_id;}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00179}00179\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00180}\mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a7f5a039386bd06d780a0c6f4b642b73c}{00180}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a7f5a039386bd06d780a0c6f4b642b73c}{deep\_mind\_handler::on\_require\_recipient}}()}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00181}00181\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00182}00182\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}CREATION\_OP\ NOTIFY\ \$\{action\_id\}"{}},}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00183}00183\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}action\_id"{}},\ \_action\_id)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00184}00184\ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00185}00185\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00186}\mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_acbad203a99f983d1a3c425ecf7835146}{00186}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_acbad203a99f983d1a3c425ecf7835146}{deep\_mind\_handler::on\_send\_inline}}()}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00187}00187\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00188}00188\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}CREATION\_OP\ INLINE\ \$\{action\_id\}"{}},}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00189}00189\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}action\_id"{}},\ \_action\_id)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00190}00190\ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00191}00191\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00192}\mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a5ba4f6cac45df2de3efba3fd5d62df48}{00192}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a5ba4f6cac45df2de3efba3fd5d62df48}{deep\_mind\_handler::on\_send\_context\_free\_inline}}()}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00193}00193\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00194}00194\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}CREATION\_OP\ CFA\_INLINE\ \$\{action\_id\}"{}},}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00195}00195\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}action\_id"{}},\ \_action\_id)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00196}00196\ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00197}00197\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00198}\mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a188b2591fe50c48f3f193a820c98aed6}{00198}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a188b2591fe50c48f3f193a820c98aed6}{deep\_mind\_handler::on\_cancel\_deferred}}(\mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a78bf0c79493a90c71cb28aa761f44fd2}{operation\_qualifier}}\ qual,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1chain_1_1generated__transaction__object}{generated\_transaction\_object}}\&\ gto)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00199}00199\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00200}00200\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}DTRX\_OP\ \$\{qual\}CANCEL\ \$\{action\_id\}\ \$\{sender\}\ \$\{sender\_id\}\ \$\{payer\}\ \$\{published\}\ \$\{delay\}\ \$\{expiration\}\ \$\{trx\_id\}\ \$\{trx\}"{}},}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00201}00201\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}qual"{}},\ prefix(qual))}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00202}00202\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}action\_id"{}},\ \_action\_id)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00203}00203\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}sender"{}},\ gto.sender)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00204}00204\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}sender\_id"{}},\ gto.sender\_id)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00205}00205\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}payer"{}},\ gto.payer)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00206}00206\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}published"{}},\ gto.published)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00207}00207\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}delay"{}},\ gto.delay\_until)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00208}00208\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}expiration"{}},\ gto.expiration)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00209}00209\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}trx\_id"{}},\ gto.trx\_id)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00210}00210\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}trx"{}},\ \mbox{\hyperlink{namespacefc_aab567c89004d329f560014d9943afcd6}{fc::to\_hex}}(gto.packed\_trx.\mbox{\hyperlink{classchainbase_1_1shared__cow__string_aa7b1bac206e0abc7e9ea9d642eb0b5b3}{data}}(),\ gto.packed\_trx.\mbox{\hyperlink{classchainbase_1_1shared__cow__string_a3b3c57c0d2ee027bb70beb283be2a0f2}{size}}()))}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00211}00211\ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00212}00212\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00213}\mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a952ca0e6d83fd569e03cb492db5f2c43}{00213}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a952ca0e6d83fd569e03cb492db5f2c43}{deep\_mind\_handler::on\_send\_deferred}}(\mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a78bf0c79493a90c71cb28aa761f44fd2}{operation\_qualifier}}\ qual,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1chain_1_1generated__transaction__object}{generated\_transaction\_object}}\&\ gto)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00214}00214\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00215}00215\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}DTRX\_OP\ \$\{qual\}CREATE\ \$\{action\_id\}\ \$\{sender\}\ \$\{sender\_id\}\ \$\{payer\}\ \$\{published\}\ \$\{delay\}\ \$\{expiration\}\ \$\{trx\_id\}\ \$\{trx\}"{}},}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00216}00216\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}qual"{}},\ prefix(qual))}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00217}00217\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}action\_id"{}},\ \_action\_id)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00218}00218\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}sender"{}},\ gto.sender)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00219}00219\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}sender\_id"{}},\ gto.sender\_id)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00220}00220\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}payer"{}},\ gto.payer)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00221}00221\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}published"{}},\ gto.published)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00222}00222\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}delay"{}},\ gto.delay\_until)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00223}00223\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}expiration"{}},\ gto.expiration)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00224}00224\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}trx\_id"{}},\ gto.trx\_id)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00225}00225\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}trx"{}},\ \mbox{\hyperlink{namespacefc_aab567c89004d329f560014d9943afcd6}{fc::to\_hex}}(gto.packed\_trx.\mbox{\hyperlink{classchainbase_1_1shared__cow__string_aa7b1bac206e0abc7e9ea9d642eb0b5b3}{data}}(),\ gto.packed\_trx.\mbox{\hyperlink{classchainbase_1_1shared__cow__string_a3b3c57c0d2ee027bb70beb283be2a0f2}{size}}()))}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00226}00226\ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00227}00227\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00228}\mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a40b9a2c20e4a3fddfea8411b9101e99d}{00228}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a40b9a2c20e4a3fddfea8411b9101e99d}{deep\_mind\_handler::on\_create\_deferred}}(\mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a78bf0c79493a90c71cb28aa761f44fd2}{operation\_qualifier}}\ qual,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1chain_1_1generated__transaction__object}{generated\_transaction\_object}}\&\ gto,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1packed__transaction}{packed\_transaction}}\&\ packed\_trx)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00229}00229\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00230}00230\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ packed\_signed\_trx\ =\ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(packed\_trx.\mbox{\hyperlink{structsysio_1_1chain_1_1packed__transaction_ac07b8dd1294ac4848244cb154256512b}{get\_signed\_transaction}}());}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00231}00231\ }
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00232}00232\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}DTRX\_OP\ \$\{qual\}CREATE\ \$\{action\_id\}\ \$\{sender\}\ \$\{sender\_id\}\ \$\{payer\}\ \$\{published\}\ \$\{delay\}\ \$\{expiration\}\ \$\{trx\_id\}\ \$\{trx\}"{}},}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00233}00233\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}qual"{}},\ prefix(qual))}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00234}00234\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}action\_id"{}},\ \_action\_id)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00235}00235\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}sender"{}},\ gto.sender)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00236}00236\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}sender\_id"{}},\ gto.sender\_id)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00237}00237\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}payer"{}},\ gto.payer)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00238}00238\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}published"{}},\ gto.published)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00239}00239\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}delay"{}},\ gto.delay\_until)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00240}00240\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}expiration"{}},\ gto.expiration)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00241}00241\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}trx\_id"{}},\ gto.trx\_id)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00242}00242\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}trx"{}},\ \mbox{\hyperlink{namespacefc_aab567c89004d329f560014d9943afcd6}{fc::to\_hex}}(packed\_signed\_trx.data(),\ packed\_signed\_trx.size()))}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00243}00243\ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00244}00244\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00245}\mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_aff92ebea4734e68cf7ddabd3d021c52c}{00245}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_aff92ebea4734e68cf7ddabd3d021c52c}{deep\_mind\_handler::on\_fail\_deferred}}()}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00246}00246\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00247}00247\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}DTRX\_OP\ FAILED\ \$\{action\_id\}"{}},}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00248}00248\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}action\_id"{}},\ \_action\_id)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00249}00249\ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00250}00250\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00251}\mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_ac6521f76f263b32eef6d88b0f0ad392f}{00251}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_ac6521f76f263b32eef6d88b0f0ad392f}{deep\_mind\_handler::on\_create\_table}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1chain_1_1table__id__object}{table\_id\_object}}\&\ tid)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00252}00252\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00253}00253\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}TBL\_OP\ INS\ \$\{action\_id\}\ \$\{code\}\ \$\{scope\}\ \$\{table\}\ \$\{payer\}"{}},}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00254}00254\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}action\_id"{}},\ \_action\_id)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00255}00255\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}code"{}},\ tid.code)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00256}00256\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}scope"{}},\ tid.scope)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00257}00257\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}table"{}},\ tid.table)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00258}00258\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}payer"{}},\ tid.payer)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00259}00259\ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00260}00260\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00261}\mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a84efdefe0df98208a328c1d558947333}{00261}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a84efdefe0df98208a328c1d558947333}{deep\_mind\_handler::on\_remove\_table}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1chain_1_1table__id__object}{table\_id\_object}}\&\ tid)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00262}00262\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00263}00263\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}TBL\_OP\ REM\ \$\{action\_id\}\ \$\{code\}\ \$\{scope\}\ \$\{table\}\ \$\{payer\}"{}},}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00264}00264\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}action\_id"{}},\ \_action\_id)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00265}00265\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}code"{}},\ tid.code)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00266}00266\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}scope"{}},\ tid.scope)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00267}00267\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}table"{}},\ tid.table)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00268}00268\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}payer"{}},\ tid.payer)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00269}00269\ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00270}00270\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00271}\mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a67ecfda86da0eb31c40716503e9e354e}{00271}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a67ecfda86da0eb31c40716503e9e354e}{deep\_mind\_handler::on\_db\_store\_i64}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1chain_1_1table__id__object}{table\_id\_object}}\&\ tid,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1key__value__object}{key\_value\_object}}\&\ kvo)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00272}00272\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00273}00273\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}DB\_OP\ INS\ \$\{action\_id\}\ \$\{payer\}\ \$\{table\_code\}\ \$\{scope\}\ \$\{table\_name\}\ \$\{primkey\}\ \$\{ndata\}"{}},}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00274}00274\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}action\_id"{}},\ \_action\_id)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00275}00275\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}payer"{}},\ kvo.\mbox{\hyperlink{structsysio_1_1chain_1_1key__value__object_a2baa983a9564c7cfde54872252502d4a}{payer}})}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00276}00276\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}table\_code"{}},\ tid.code)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00277}00277\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}scope"{}},\ tid.scope)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00278}00278\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}table\_name"{}},\ tid.table)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00279}00279\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}primkey"{}},\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}(kvo.\mbox{\hyperlink{structsysio_1_1chain_1_1key__value__object_ab7f76ae298fa584f39b99d491573fb08}{primary\_key}}))}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00280}00280\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}ndata"{}},\ \mbox{\hyperlink{namespacefc_aab567c89004d329f560014d9943afcd6}{fc::to\_hex}}(kvo.\mbox{\hyperlink{structsysio_1_1chain_1_1key__value__object_ab78a91101969265c3e5345d6db5941e3}{value}}.\mbox{\hyperlink{classchainbase_1_1shared__cow__string_aa7b1bac206e0abc7e9ea9d642eb0b5b3}{data}}(),\ kvo.\mbox{\hyperlink{structsysio_1_1chain_1_1key__value__object_ab78a91101969265c3e5345d6db5941e3}{value}}.\mbox{\hyperlink{classchainbase_1_1shared__cow__string_a3b3c57c0d2ee027bb70beb283be2a0f2}{size}}()))}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00281}00281\ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00282}00282\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00283}\mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a9556913335dd3112eb9597c0f093aed4}{00283}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a9556913335dd3112eb9597c0f093aed4}{deep\_mind\_handler::on\_db\_update\_i64}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1chain_1_1table__id__object}{table\_id\_object}}\&\ tid,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1key__value__object}{key\_value\_object}}\&\ kvo,\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{account\_name}}\ payer,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ buffer,\ std::size\_t\ buffer\_size)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00284}00284\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00285}00285\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}DB\_OP\ UPD\ \$\{action\_id\}\ \$\{opayer\}:\$\{npayer\}\ \$\{table\_code\}\ \$\{scope\}\ \$\{table\_name\}\ \$\{primkey\}\ \$\{odata\}:\$\{ndata\}"{}},}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00286}00286\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}action\_id"{}},\ \_action\_id)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00287}00287\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}opayer"{}},\ kvo.\mbox{\hyperlink{structsysio_1_1chain_1_1key__value__object_a2baa983a9564c7cfde54872252502d4a}{payer}})}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00288}00288\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}npayer"{}},\ payer)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00289}00289\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}table\_code"{}},\ tid.code)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00290}00290\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}scope"{}},\ tid.scope)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00291}00291\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}table\_name"{}},\ tid.table)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00292}00292\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}primkey"{}},\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}(kvo.\mbox{\hyperlink{structsysio_1_1chain_1_1key__value__object_ab7f76ae298fa584f39b99d491573fb08}{primary\_key}}))}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00293}00293\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}odata"{}},\ \mbox{\hyperlink{namespacefc_aab567c89004d329f560014d9943afcd6}{fc::to\_hex}}(kvo.\mbox{\hyperlink{structsysio_1_1chain_1_1key__value__object_ab78a91101969265c3e5345d6db5941e3}{value}}.\mbox{\hyperlink{classchainbase_1_1shared__cow__string_aa7b1bac206e0abc7e9ea9d642eb0b5b3}{data}}(),kvo.\mbox{\hyperlink{structsysio_1_1chain_1_1key__value__object_ab78a91101969265c3e5345d6db5941e3}{value}}.\mbox{\hyperlink{classchainbase_1_1shared__cow__string_a3b3c57c0d2ee027bb70beb283be2a0f2}{size}}()))}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00294}00294\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}ndata"{}},\ \mbox{\hyperlink{namespacefc_aab567c89004d329f560014d9943afcd6}{fc::to\_hex}}(buffer,\ buffer\_size))}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00295}00295\ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00296}00296\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00297}\mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a41f0d36ff43d5a49cc8f3daab1486cf7}{00297}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a41f0d36ff43d5a49cc8f3daab1486cf7}{deep\_mind\_handler::on\_db\_remove\_i64}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1chain_1_1table__id__object}{table\_id\_object}}\&\ tid,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1key__value__object}{key\_value\_object}}\&\ kvo)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00298}00298\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00299}00299\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}DB\_OP\ REM\ \$\{action\_id\}\ \$\{payer\}\ \$\{table\_code\}\ \$\{scope\}\ \$\{table\_name\}\ \$\{primkey\}\ \$\{odata\}"{}},}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00300}00300\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}action\_id"{}},\ \_action\_id)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00301}00301\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}payer"{}},\ kvo.\mbox{\hyperlink{structsysio_1_1chain_1_1key__value__object_a2baa983a9564c7cfde54872252502d4a}{payer}})}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00302}00302\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}table\_code"{}},\ tid.code)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00303}00303\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}scope"{}},\ tid.scope)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00304}00304\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}table\_name"{}},\ tid.table)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00305}00305\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}primkey"{}},\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}(kvo.\mbox{\hyperlink{structsysio_1_1chain_1_1key__value__object_ab7f76ae298fa584f39b99d491573fb08}{primary\_key}}))}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00306}00306\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}odata"{}},\ \mbox{\hyperlink{namespacefc_aab567c89004d329f560014d9943afcd6}{fc::to\_hex}}(kvo.\mbox{\hyperlink{structsysio_1_1chain_1_1key__value__object_ab78a91101969265c3e5345d6db5941e3}{value}}.\mbox{\hyperlink{classchainbase_1_1shared__cow__string_aa7b1bac206e0abc7e9ea9d642eb0b5b3}{data}}(),\ kvo.\mbox{\hyperlink{structsysio_1_1chain_1_1key__value__object_ab78a91101969265c3e5345d6db5941e3}{value}}.\mbox{\hyperlink{classchainbase_1_1shared__cow__string_a3b3c57c0d2ee027bb70beb283be2a0f2}{size}}()))}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00307}00307\ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00308}00308\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00309}\mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_af937b8a3add1750021eb59ebaf4ce920}{00309}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_af937b8a3add1750021eb59ebaf4ce920}{deep\_mind\_handler::on\_init\_resource\_limits}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__config__object}{resource\_limits::resource\_limits\_config\_object}}\&\ \mbox{\hyperlink{classconfig}{config}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__state__object}{resource\_limits::resource\_limits\_state\_object}}\&\ \mbox{\hyperlink{structstate}{state}})}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00310}00310\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00311}00311\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}RLIMIT\_OP\ CONFIG\ INS\ \$\{data\}"{}},}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00312}00312\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}data"{}},\ \mbox{\hyperlink{classconfig}{config}})}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00313}00313\ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00314}00314\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}RLIMIT\_OP\ STATE\ INS\ \$\{data\}"{}},}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00315}00315\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}data"{}},\ \mbox{\hyperlink{structstate}{state}})}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00316}00316\ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00317}00317\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00318}\mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a6229d7dbf649b7d843212646e84b03b5}{00318}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a6229d7dbf649b7d843212646e84b03b5}{deep\_mind\_handler::on\_update\_resource\_limits\_config}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__config__object}{resource\_limits::resource\_limits\_config\_object}}\&\ \mbox{\hyperlink{classconfig}{config}})}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00319}00319\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00320}00320\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}RLIMIT\_OP\ CONFIG\ UPD\ \$\{data\}"{}},}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00321}00321\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}data"{}},\ \mbox{\hyperlink{classconfig}{config}})}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00322}00322\ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00323}00323\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00324}\mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a4e3f1380a28e01e17fa2eb8c81f5bfc9}{00324}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a4e3f1380a28e01e17fa2eb8c81f5bfc9}{deep\_mind\_handler::on\_update\_resource\_limits\_state}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__state__object}{resource\_limits::resource\_limits\_state\_object}}\&\ \mbox{\hyperlink{structstate}{state}})}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00325}00325\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00326}00326\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}RLIMIT\_OP\ STATE\ UPD\ \$\{data\}"{}},}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00327}00327\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}data"{}},\ \mbox{\hyperlink{structstate}{state}})}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00328}00328\ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00329}00329\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00330}\mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a2869257ca6d9f943ccdfdf75628f62a7}{00330}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a2869257ca6d9f943ccdfdf75628f62a7}{deep\_mind\_handler::on\_newaccount\_resource\_limits}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1resource__limits__object}{resource\_limits::resource\_limits\_object}}\&\ limits,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1resource__usage__object}{resource\_limits::resource\_usage\_object}}\&\ usage)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00331}00331\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00332}00332\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}RLIMIT\_OP\ ACCOUNT\_LIMITS\ INS\ \$\{data\}"{}},}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00333}00333\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}data"{}},\ limits)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00334}00334\ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00335}00335\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}RLIMIT\_OP\ ACCOUNT\_USAGE\ INS\ \$\{data\}"{}},}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00336}00336\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}data"{}},\ usage)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00337}00337\ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00338}00338\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00339}\mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a85da2df1af87a5116d6a384cdd4be6b9}{00339}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a85da2df1af87a5116d6a384cdd4be6b9}{deep\_mind\_handler::on\_update\_account\_usage}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1resource__usage__object}{resource\_limits::resource\_usage\_object}}\&\ usage)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00340}00340\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00341}00341\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}RLIMIT\_OP\ ACCOUNT\_USAGE\ UPD\ \$\{data\}"{}},}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00342}00342\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}data"{}},\ usage)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00343}00343\ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00344}00344\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00345}\mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_ab7181993f2c17d4519857c9fd09a5bc3}{00345}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_ab7181993f2c17d4519857c9fd09a5bc3}{deep\_mind\_handler::on\_set\_account\_limits}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1resource__limits__object}{resource\_limits::resource\_limits\_object}}\&\ limits)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00346}00346\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00347}00347\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}RLIMIT\_OP\ ACCOUNT\_LIMITS\ UPD\ \$\{data\}"{}},}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00348}00348\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}data"{}},\ limits)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00349}00349\ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00350}00350\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00351}\mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_af17c45c11dd650242a9eb80c161322db}{00351}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_af17c45c11dd650242a9eb80c161322db}{deep\_mind\_handler::on\_ram\_trace}}(std::string\&\&\ event\_id,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ family,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ operation,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ legacy\_tag)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00352}00352\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00353}00353\ \ \ \ \ \ \ \_ram\_trace\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1ram__trace}{ram\_trace}}(std::move(event\_id),\ family,\ operation,\ legacy\_tag);}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00354}00354\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00355}\mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_aeeffed2d8ca9af3d83e75352304b8122}{00355}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_aeeffed2d8ca9af3d83e75352304b8122}{deep\_mind\_handler::on\_ram\_event}}(\mbox{\hyperlink{structsysio_1_1chain_1_1name}{account\_name}}\ account,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ new\_usage,\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ delta)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00356}00356\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00357}00357\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}RAM\_OP\ \$\{action\_id\}\ \$\{event\_id\}\ \$\{family\}\ \$\{operation\}\ \$\{legacy\_tag\}\ \$\{payer\}\ \$\{new\_usage\}\ \$\{delta\}"{}},}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00358}00358\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}action\_id"{}},\ \_action\_id)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00359}00359\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}event\_id"{}},\ \_ram\_trace.\mbox{\hyperlink{structsysio_1_1chain_1_1ram__trace_a168f13047b195cd83845bdfe40f636d2}{event\_id}})}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00360}00360\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}family"{}},\ \_ram\_trace.\mbox{\hyperlink{structsysio_1_1chain_1_1ram__trace_a49af7075f4385dcb98c9c9c36dc88dcc}{family}})}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00361}00361\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}operation"{}},\ \_ram\_trace.\mbox{\hyperlink{structsysio_1_1chain_1_1ram__trace_a50404f4b616df834542eed676913ec1c}{operation}})}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00362}00362\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}legacy\_tag"{}},\ \_ram\_trace.\mbox{\hyperlink{structsysio_1_1chain_1_1ram__trace_a08b18da6966d3cd2ef974bb8e1eaaefb}{legacy\_tag}})}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00363}00363\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}payer"{}},\ account)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00364}00364\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}new\_usage"{}},\ new\_usage)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00365}00365\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}delta"{}},\ delta)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00366}00366\ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00367}00367\ \ \ \ \ \ \ \_ram\_trace\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1ram__trace}{ram\_trace}}();}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00368}00368\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00369}00369\ }
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00370}\mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a9cfd94c9162ccbe0c791ef43ee19cd76}{00370}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a9cfd94c9162ccbe0c791ef43ee19cd76}{deep\_mind\_handler::on\_create\_permission}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1chain_1_1permission__object}{permission\_object}}\&\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00371}00371\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00372}00372\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}PERM\_OP\ INS\ \$\{action\_id\}\ \$\{permission\_id\}\ \$\{data\}"{}},}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00373}00373\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}action\_id"{}},\ \_action\_id)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00374}00374\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}permission\_id"{}},\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.id)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00375}00375\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}data"{}},\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00376}00376\ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00377}00377\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00378}\mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a19405a59ff824f3e6b8fab6d530d47ac}{00378}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_a19405a59ff824f3e6b8fab6d530d47ac}{deep\_mind\_handler::on\_modify\_permission}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1chain_1_1permission__object}{permission\_object}}\&\ old\_permission,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1chain_1_1permission__object}{permission\_object}}\&\ new\_permission)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00379}00379\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00380}00380\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}PERM\_OP\ UPD\ \$\{action\_id\}\ \$\{permission\_id\}\ \$\{data\}"{}},}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00381}00381\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}action\_id"{}},\ \_action\_id)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00382}00382\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}permission\_id"{}},\ new\_permission.id)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00383}00383\ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}data"{}},\ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}()}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00384}00384\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}old"{}},\ old\_permission)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00385}00385\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}new"{}},\ new\_permission)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00386}00386\ \ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00387}00387\ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00388}00388\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00389}\mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_ae93ff782f23642a922b65ae895c76255}{00389}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler_ae93ff782f23642a922b65ae895c76255}{deep\_mind\_handler::on\_remove\_permission}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classsysio_1_1chain_1_1permission__object}{permission\_object}}\&\ permission)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00390}00390\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00391}00391\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_af5adfcda7e0a01306256754a6511915d}{fc\_dlog}}(\_logger,\ \textcolor{stringliteral}{"{}PERM\_OP\ REM\ \$\{action\_id\}\ \$\{permission\_id\}\ \$\{data\}"{}},}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00392}00392\ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}action\_id"{}},\ \_action\_id)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00393}00393\ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}permission\_id"{}},\ permission.id)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00394}00394\ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}data"{}},\ permission)}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00395}00395\ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00396}00396\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00397}00397\ }
+\DoxyCodeLine{\Hypertarget{deep__mind_8cpp_source_l00398}00398\ \}}
+
+\end{DoxyCode}

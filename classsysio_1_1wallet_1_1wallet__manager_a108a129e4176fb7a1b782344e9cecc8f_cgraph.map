@@ -1,0 +1,9 @@
+<map id="sysio::wallet::wallet_manager::unlock" name="sysio::wallet::wallet_manager::unlock">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,142,46"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1wallet_1_1wallet__manager.html#aa2afccf9173458e34f4ce2aba878efb4" title=" " alt="" coords="190,5,326,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="142,23,174,23,174,28,142,28"/>
+<area shape="rect" id="Node000003" href="$namespacesysio_1_1wallet.html#aec99b3a63cebacb7d46a30201e7e806b" title=" " alt="" coords="374,5,503,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="327,23,358,23,358,28,327,28"/>
+<area shape="rect" id="Node000004" href="$structsysio_1_1chain_1_1name.html#ac074a360785947747ebec83c2cab287a" title=" " alt="" coords="551,5,683,46"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="504,23,536,23,536,28,504,28"/>
+</map>

@@ -1,0 +1,82 @@
+\chapter{test-\/fixtures}
+\hypertarget{md_libraries_2sys-vm_2external_2_catch2_2docs_2test-fixtures}{}\label{md_libraries_2sys-vm_2external_2_catch2_2docs_2test-fixtures}\index{test-\/fixtures@{test-\/fixtures}}
+\label{_top}%
+ \doxysection*{\doxylink{class_test}{Test} fixtures}
+
+Although \doxylink{namespace_catch}{Catch} allows you to group tests together as sections within a test case, it can still be convenient, sometimes, to group them using a more traditional test fixture. \doxylink{namespace_catch}{Catch} fully supports this too. You define the test fixture as a simple structure\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ ++}
+\DoxyCodeLine{\textcolor{keyword}{class\ }\mbox{\hyperlink{class_unique_tests_fixture}{UniqueTestsFixture}}\ \{}
+\DoxyCodeLine{\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ uniqueID;}
+\DoxyCodeLine{\ \ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{\ \ \ \mbox{\hyperlink{class_d_b_connection}{DBConnection}}\ \mbox{\hyperlink{class_unique_tests_fixture_af0b83657315f31035cc886b245dd9542}{conn}};}
+\DoxyCodeLine{\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\ \ \ \mbox{\hyperlink{class_unique_tests_fixture_a7769fdf9704ce07346805bcce2f4edd3}{UniqueTestsFixture}}()\ :\ \mbox{\hyperlink{class_unique_tests_fixture_af0b83657315f31035cc886b245dd9542}{conn}}(\mbox{\hyperlink{class_d_b_connection}{DBConnection}}::createConnection(\textcolor{stringliteral}{"{}myDB"{}}))\ \{}
+\DoxyCodeLine{\ \ \ \}}
+\DoxyCodeLine{\ \ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{class_unique_tests_fixture_a568a055498dd4bc33cb677cb5a4554ac}{getID}}()\ \{}
+\DoxyCodeLine{\ \ \ \ \ \textcolor{keywordflow}{return}\ ++uniqueID;}
+\DoxyCodeLine{\ \ \ \}}
+\DoxyCodeLine{\ \};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \textcolor{keywordtype}{int}\ UniqueTestsFixture::uniqueID\ =\ 0;}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \mbox{\hyperlink{include_2catch_8hpp_adf06142f54a9e271590fa0e270bc41d2}{TEST\_CASE\_METHOD}}(\mbox{\hyperlink{class_unique_tests_fixture}{UniqueTestsFixture}},\ \textcolor{stringliteral}{"{}Create\ Employee/No\ Name"{}},\ \textcolor{stringliteral}{"{}[create]"{}})\ \{}
+\DoxyCodeLine{\ \ \ \mbox{\hyperlink{include_2catch_8hpp_ae3c33faa1d31a2bb0811dac74b994e3e}{REQUIRE\_THROWS}}(conn.executeSQL(\textcolor{stringliteral}{"{}INSERT\ INTO\ employee\ (id,\ name)\ VALUES\ (?,\ ?)"{}},\ getID(),\ \textcolor{stringliteral}{"{}"{}}));}
+\DoxyCodeLine{\ \}}
+\DoxyCodeLine{\ \mbox{\hyperlink{include_2catch_8hpp_adf06142f54a9e271590fa0e270bc41d2}{TEST\_CASE\_METHOD}}(\mbox{\hyperlink{class_unique_tests_fixture}{UniqueTestsFixture}},\ \textcolor{stringliteral}{"{}Create\ Employee/Normal"{}},\ \textcolor{stringliteral}{"{}[create]"{}})\ \{}
+\DoxyCodeLine{\ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(conn.executeSQL(\textcolor{stringliteral}{"{}INSERT\ INTO\ employee\ (id,\ name)\ VALUES\ (?,\ ?)"{}},\ getID(),\ \textcolor{stringliteral}{"{}Joe\ Bloggs"{}}));}
+\DoxyCodeLine{\ \}}
+
+\end{DoxyCode}
+
+
+The two test cases here will create uniquely-\/named derived classes of \doxylink{class_unique_tests_fixture}{Unique\+Tests\+Fixture} and thus can access the {\ttfamily get\+ID()} protected method and {\ttfamily conn} member variables. This ensures that both the test cases are able to create a \doxylink{class_d_b_connection}{DBConnection} using the same method (DRY principle) and that any ID\textquotesingle{}s created are unique such that the order that tests are executed does not matter.
+
+Catch2 also provides {\ttfamily TEMPLATE\+\_\+\+TEST\+\_\+\+CASE\+\_\+\+METHOD} and {\ttfamily TEMPLATE\+\_\+\+PRODUCT\+\_\+\+TEST\+\_\+\+CASE\+\_\+\+METHOD} that can be used together with templated fixtures and templated template fixtures to perform tests for multiple different types. Unlike {\ttfamily TEST\+\_\+\+CASE\+\_\+\+METHOD}, {\ttfamily TEMPLATE\+\_\+\+TEST\+\_\+\+CASE\+\_\+\+METHOD} and {\ttfamily TEMPLATE\+\_\+\+PRODUCT\+\_\+\+TEST\+\_\+\+CASE\+\_\+\+METHOD} do require the tag specification to be non-\/empty, as it is followed by further macro arguments.
+
+Also note that, because of limitations of the C++ preprocessor, if you want to specify a type with multiple template parameters, you need to enclose it in parentheses, e.\+g. {\ttfamily std\+::map\texorpdfstring{$<$}{<}int, std\+::string\texorpdfstring{$>$}{>}} needs to be passed as {\ttfamily (std\+::map\texorpdfstring{$<$}{<}int, std\+::string\texorpdfstring{$>$}{>})}. In the case of {\ttfamily TEMPLATE\+\_\+\+PRODUCT\+\_\+\+TEST\+\_\+\+CASE\+\_\+\+METHOD}, if a member of the type list should consist of more than single type, it needs to be enclosed in another pair of parentheses, e.\+g. {\ttfamily (std\+::map, std\+::pair)} and {\ttfamily ((int, float), (char, double))}.
+
+Example\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{template}<\ \textcolor{keyword}{typename}\ T\ >}
+\DoxyCodeLine{\textcolor{keyword}{struct\ }Template\_Fixture\ \{}
+\DoxyCodeLine{\ \ \ \ Template\_Fixture():\ m\_a(1)\ \{\}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ m\_a;}
+\DoxyCodeLine{\};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\mbox{\hyperlink{include_2catch_8hpp_a5922ee8a997f9f6c5016b186f148b73b}{TEMPLATE\_TEST\_CASE\_METHOD}}(Template\_Fixture,\textcolor{stringliteral}{"{}A\ TEMPLATE\_TEST\_CASE\_METHOD\ based\ test\ run\ that\ succeeds"{}},\ \textcolor{stringliteral}{"{}[class][template]"{}},\ \textcolor{keywordtype}{int},\ \textcolor{keywordtype}{float},\ \textcolor{keywordtype}{double})\ \{}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ Template\_Fixture<TestType>::m\_a\ ==\ 1\ );}
+\DoxyCodeLine{\}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\textcolor{keyword}{struct\ }Template\_Template\_Fixture\ \{}
+\DoxyCodeLine{\ \ \ \ Template\_Template\_Fixture()\ \{\}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ m\_a;}
+\DoxyCodeLine{\};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\textcolor{keyword}{struct\ }Foo\_class\ \{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordtype}{size\_t}\ size()\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{\};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\mbox{\hyperlink{include_2catch_8hpp_a15aefc2b8f75059606bebf400a348870}{TEMPLATE\_PRODUCT\_TEST\_CASE\_METHOD}}(Template\_Template\_Fixture,\ \textcolor{stringliteral}{"{}A\ TEMPLATE\_PRODUCT\_TEST\_CASE\_METHOD\ based\ test\ succeeds"{}},\ \textcolor{stringliteral}{"{}[class][template]"{}},\ (Foo\_class,\ std::vector),\ \textcolor{keywordtype}{int})\ \{}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ Template\_Template\_Fixture<TestType>::m\_a.size()\ ==\ 0\ );}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+{\itshape While there is an upper limit on the number of types you can specify in single {\ttfamily TEMPLATE\+\_\+\+TEST\+\_\+\+CASE\+\_\+\+METHOD} or {\ttfamily TEMPLATE\+\_\+\+PRODUCT\+\_\+\+TEST\+\_\+\+CASE\+\_\+\+METHOD}, the limit is very high and should not be encountered in practice.}
+
+\DoxyHorRuler{0}
+
+
+\href{Readme.md\#top}{\texttt{ Home}} 

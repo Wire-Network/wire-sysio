@@ -1,0 +1,14 @@
+<map id="libraries/fc/secp256k1/secp256k1/src/util.h" name="libraries/fc/secp256k1/secp256k1/src/util.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="67,5,215,46"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,94,69,120"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="117,49,67,86,64,82,114,44"/>
+<area shape="rect" id="Node000003" href="$stdint_8h.html" title=" " alt="" coords="144,94,208,120"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="152,45,167,78,162,81,147,47"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="75,168,138,193"/>
+<area shape="poly" id="edge6_Node000001_Node000004" title=" " alt="" coords="139,47,115,153,110,152,134,46"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="232,94,292,120"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="172,44,233,83,230,88,170,49"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="166,122,130,158,127,155,162,118"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="162,168,229,193"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="182,119,191,152,186,153,176,121"/>
+</map>

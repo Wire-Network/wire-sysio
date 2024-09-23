@@ -1,0 +1,121 @@
+\doxysection{upload.\+Client\+Login\+Error Class Reference}
+\hypertarget{classupload_1_1_client_login_error}{}\label{classupload_1_1_client_login_error}\index{upload.ClientLoginError@{upload.ClientLoginError}}
+
+
+Inheritance diagram for upload.\+Client\+Login\+Error\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=197pt]{classupload_1_1_client_login_error__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for upload.\+Client\+Login\+Error\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=197pt]{classupload_1_1_client_login_error__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classupload_1_1_client_login_error_a38898e841a6c9ce790fbf42ae2a64194}{\+\_\+\+\_\+init\+\_\+\+\_\+}} (self, \mbox{\hyperlink{programs_2clio_2main_8cpp_aa03c1ef4c41f36b048cf58d5aade7653}{url}}, code, msg, \mbox{\hyperlink{programs_2clio_2main_8cpp_ada0dceaafe07cdbb1a3ac6762c0e4540}{headers}}, \mbox{\hyperlink{classupload_1_1_client_login_error_ac300a0b034b2bc64cedc51e09fb6d663}{args}})
+\item 
+\mbox{\hyperlink{classupload_1_1_client_login_error_a38898e841a6c9ce790fbf42ae2a64194}{\+\_\+\+\_\+init\+\_\+\+\_\+}} (self, \mbox{\hyperlink{programs_2clio_2main_8cpp_aa03c1ef4c41f36b048cf58d5aade7653}{url}}, code, msg, \mbox{\hyperlink{programs_2clio_2main_8cpp_ada0dceaafe07cdbb1a3ac6762c0e4540}{headers}}, \mbox{\hyperlink{classupload_1_1_client_login_error_ac300a0b034b2bc64cedc51e09fb6d663}{args}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classupload_1_1_client_login_error_ac300a0b034b2bc64cedc51e09fb6d663}{args}} = args
+\item 
+\mbox{\hyperlink{classupload_1_1_client_login_error_ae0555feb182d89d1e4d7944afbfe14e5}{reason}} = \mbox{\hyperlink{classupload_1_1_client_login_error_ac300a0b034b2bc64cedc51e09fb6d663}{args}}\mbox{[}"{}Error"{}\mbox{]}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\begin{DoxyVerb}Raised to indicate there was an error authenticating with ClientLogin.\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{googletest_2scripts_2upload_8py_source_l00115}{115}} of file \mbox{\hyperlink{googletest_2scripts_2upload_8py_source}{upload.\+py}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classupload_1_1_client_login_error_a38898e841a6c9ce790fbf42ae2a64194}\index{upload.ClientLoginError@{upload.ClientLoginError}!\_\_init\_\_@{\_\_init\_\_}}
+\index{\_\_init\_\_@{\_\_init\_\_}!upload.ClientLoginError@{upload.ClientLoginError}}
+\doxysubsubsection{\texorpdfstring{\_\_init\_\_()}{\_\_init\_\_()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classupload_1_1_client_login_error_a38898e841a6c9ce790fbf42ae2a64194} 
+upload.\+Client\+Login\+Error.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self}{, }\item[{}]{url}{, }\item[{}]{code}{, }\item[{}]{msg}{, }\item[{}]{headers}{, }\item[{}]{args}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{googlemock_2scripts_2upload_8py_source_l00118}{118}} of file \mbox{\hyperlink{googlemock_2scripts_2upload_8py_source}{upload.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00118\ \ \ \textcolor{keyword}{def\ }\_\_init\_\_(self,\ url,\ code,\ msg,\ headers,\ args):}
+\DoxyCodeLine{00119\ \ \ \ \ urllib2.HTTPError.\_\_init\_\_(self,\ url,\ code,\ msg,\ headers,\ \textcolor{keywordtype}{None})}
+\DoxyCodeLine{00120\ \ \ \ \ self.args\ =\ args}
+\DoxyCodeLine{00121\ \ \ \ \ self.reason\ =\ args[\textcolor{stringliteral}{"{}Error"{}}]}
+\DoxyCodeLine{00122\ }
+\DoxyCodeLine{00123\ }
+
+\end{DoxyCode}
+\Hypertarget{classupload_1_1_client_login_error_a38898e841a6c9ce790fbf42ae2a64194}\index{upload.ClientLoginError@{upload.ClientLoginError}!\_\_init\_\_@{\_\_init\_\_}}
+\index{\_\_init\_\_@{\_\_init\_\_}!upload.ClientLoginError@{upload.ClientLoginError}}
+\doxysubsubsection{\texorpdfstring{\_\_init\_\_()}{\_\_init\_\_()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classupload_1_1_client_login_error_a38898e841a6c9ce790fbf42ae2a64194} 
+upload.\+Client\+Login\+Error.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self}{, }\item[{}]{url}{, }\item[{}]{code}{, }\item[{}]{msg}{, }\item[{}]{headers}{, }\item[{}]{args}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{googletest_2scripts_2upload_8py_source_l00118}{118}} of file \mbox{\hyperlink{googletest_2scripts_2upload_8py_source}{upload.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00118\ \ \ \textcolor{keyword}{def\ }\_\_init\_\_(self,\ url,\ code,\ msg,\ headers,\ args):}
+\DoxyCodeLine{00119\ \ \ \ \ urllib2.HTTPError.\_\_init\_\_(self,\ url,\ code,\ msg,\ headers,\ \textcolor{keywordtype}{None})}
+\DoxyCodeLine{00120\ \ \ \ \ self.args\ =\ args}
+\DoxyCodeLine{00121\ \ \ \ \ self.reason\ =\ args[\textcolor{stringliteral}{"{}Error"{}}]}
+\DoxyCodeLine{00122\ }
+\DoxyCodeLine{00123\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=301pt]{classupload_1_1_client_login_error_a38898e841a6c9ce790fbf42ae2a64194_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classupload_1_1_client_login_error_ac300a0b034b2bc64cedc51e09fb6d663}\index{upload.ClientLoginError@{upload.ClientLoginError}!args@{args}}
+\index{args@{args}!upload.ClientLoginError@{upload.ClientLoginError}}
+\doxysubsubsection{\texorpdfstring{args}{args}}
+{\footnotesize\ttfamily \label{classupload_1_1_client_login_error_ac300a0b034b2bc64cedc51e09fb6d663} 
+upload.\+Client\+Login\+Error.\+args = args}
+
+
+
+Definition at line \mbox{\hyperlink{googlemock_2scripts_2upload_8py_source_l00120}{120}} of file \mbox{\hyperlink{googlemock_2scripts_2upload_8py_source}{upload.\+py}}.
+
+\Hypertarget{classupload_1_1_client_login_error_ae0555feb182d89d1e4d7944afbfe14e5}\index{upload.ClientLoginError@{upload.ClientLoginError}!reason@{reason}}
+\index{reason@{reason}!upload.ClientLoginError@{upload.ClientLoginError}}
+\doxysubsubsection{\texorpdfstring{reason}{reason}}
+{\footnotesize\ttfamily \label{classupload_1_1_client_login_error_ae0555feb182d89d1e4d7944afbfe14e5} 
+upload.\+Client\+Login\+Error.\+reason = \mbox{\hyperlink{classupload_1_1_client_login_error_ac300a0b034b2bc64cedc51e09fb6d663}{args}}\mbox{[}"{}Error"{}\mbox{]}}
+
+
+
+Definition at line \mbox{\hyperlink{googlemock_2scripts_2upload_8py_source_l00121}{121}} of file \mbox{\hyperlink{googlemock_2scripts_2upload_8py_source}{upload.\+py}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/scripts/\mbox{\hyperlink{googlemock_2scripts_2upload_8py}{upload.\+py}}\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/scripts/\mbox{\hyperlink{googletest_2scripts_2upload_8py}{upload.\+py}}\end{DoxyCompactItemize}

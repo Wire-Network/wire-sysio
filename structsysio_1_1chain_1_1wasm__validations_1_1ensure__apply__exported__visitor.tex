@@ -1,0 +1,65 @@
+\doxysection{sysio\+::chain\+::wasm\+\_\+validations\+::ensure\+\_\+apply\+\_\+exported\+\_\+visitor Struct Reference}
+\hypertarget{structsysio_1_1chain_1_1wasm__validations_1_1ensure__apply__exported__visitor}{}\label{structsysio_1_1chain_1_1wasm__validations_1_1ensure__apply__exported__visitor}\index{sysio::chain::wasm\_validations::ensure\_apply\_exported\_visitor@{sysio::chain::wasm\_validations::ensure\_apply\_exported\_visitor}}
+
+
+{\ttfamily \#include $<$wasm\+\_\+sysio\+\_\+validation.\+hpp$>$}
+
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static void \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__validations_1_1ensure__apply__exported__visitor_a4f95b1054ec6ea2230cb737ecb71e67e}{validate}} (const \mbox{\hyperlink{struct_i_r_1_1_module}{IR\+::\+Module}} \&m)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__validation_8hpp_source_l00042}{42}} of file \mbox{\hyperlink{wasm__sysio__validation_8hpp_source}{wasm\+\_\+sysio\+\_\+validation.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1chain_1_1wasm__validations_1_1ensure__apply__exported__visitor_a4f95b1054ec6ea2230cb737ecb71e67e}\index{sysio::chain::wasm\_validations::ensure\_apply\_exported\_visitor@{sysio::chain::wasm\_validations::ensure\_apply\_exported\_visitor}!validate@{validate}}
+\index{validate@{validate}!sysio::chain::wasm\_validations::ensure\_apply\_exported\_visitor@{sysio::chain::wasm\_validations::ensure\_apply\_exported\_visitor}}
+\doxysubsubsection{\texorpdfstring{validate()}{validate()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__validations_1_1ensure__apply__exported__visitor_a4f95b1054ec6ea2230cb737ecb71e67e} 
+void sysio\+::chain\+::wasm\+\_\+validations\+::ensure\+\_\+apply\+\_\+exported\+\_\+visitor\+::validate (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct_i_r_1_1_module}{IR\+::\+Module}} \&}]{m}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__validation_8cpp_source_l00076}{76}} of file \mbox{\hyperlink{wasm__sysio__validation_8cpp_source}{wasm\+\_\+sysio\+\_\+validation.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00077\ \ \ \ \textcolor{keywordtype}{bool}\ found\_it\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00078\ }
+\DoxyCodeLine{00079\ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ Export\&\ exprt\ :\ m.\mbox{\hyperlink{struct_i_r_1_1_module_afcc776ae7fc46f6202700f3540b500d9}{exports}})\ \{}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(exprt.kind\ !=\ ObjectKind::function)}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(exprt.name\ !=\ \textcolor{stringliteral}{"{}apply"{}})}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(m.\mbox{\hyperlink{struct_i_r_1_1_module_a682c9e762448410a20c98ea062a50308}{types}}[m.\mbox{\hyperlink{struct_i_r_1_1_module_a439e1f32fa3fa9bf47f58ac309bfc50a}{functions}}.getType(exprt.index).index]\ ==\ \mbox{\hyperlink{struct_i_r_1_1_function_type_a97cbdf384d97c3a5203a1310c9af0822}{FunctionType::get}}(ResultType::none,\ \{ValueType::i64,\ ValueType::i64,\ ValueType::i64\}))\ \{}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \ found\_it\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00088\ \ \ \ \}}
+\DoxyCodeLine{00089\ }
+\DoxyCodeLine{00090\ \ \ \ \textcolor{keywordflow}{if}(!found\_it)}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(wasm\_execution\_error,\ \textcolor{stringliteral}{"{}Smart\ contract's\ apply\ function\ not\ exported;\ non-\/existent;\ or\ wrong\ type"{}});}
+\DoxyCodeLine{00092\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1wasm__validations_1_1ensure__apply__exported__visitor_a4f95b1054ec6ea2230cb737ecb71e67e_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{wasm__sysio__validation_8hpp}{wasm\+\_\+sysio\+\_\+validation.\+hpp}}\item 
+libraries/chain/\mbox{\hyperlink{wasm__sysio__validation_8cpp}{wasm\+\_\+sysio\+\_\+validation.\+cpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,94 @@
+\doxysection{libraries/wasm-\/jit/\+Include/\+Inline/\+Errors.h File Reference}
+\hypertarget{_errors_8h}{}\label{_errors_8h}\index{libraries/wasm-\/jit/Include/Inline/Errors.h@{libraries/wasm-\/jit/Include/Inline/Errors.h}}
+{\ttfamily \#include $<$stdarg.\+h$>$}\newline
+{\ttfamily \#include $<$assert.\+h$>$}\newline
+{\ttfamily \#include $<$cstdio$>$}\newline
+{\ttfamily \#include $<$cstdlib$>$}\newline
+{\ttfamily \#include $<$stdexcept$>$}\newline
+Include dependency graph for Errors.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{_errors_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{_errors_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespace_errors}{Errors}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{_errors_8h_a36d7655d01d72167969992b17b772507}{error\+Unless}}(condition)
+\item 
+\#define \mbox{\hyperlink{_errors_8h_a03bec6af3af0dd492e348b40cbe40a46}{WAVM\+\_\+\+ASSERT\+\_\+\+THROW}}(cond)
+\item 
+\#define \mbox{\hyperlink{_errors_8h_ad57cbc2f5c193d8f4002ee66d63eb952}{WAVM\+\_\+\+ASSERT\+\_\+\+TERMINATE}}(cond)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{namespace_errors_a719a329951edb01e45afe1443dfa2a92}{Errors\+::fatalf}} (const char \texorpdfstring{$\ast$}{*}message\+Format,...)
+\item 
+void \mbox{\hyperlink{namespace_errors_aee5daf469584435300f91503f83b09fe}{Errors\+::fatal}} (const char \texorpdfstring{$\ast$}{*}message)
+\item 
+void \mbox{\hyperlink{namespace_errors_a6959930ad6159fe3eb2e04ebf87c1b84}{Errors\+::unreachable}} ()
+\item 
+void \mbox{\hyperlink{namespace_errors_ab0f273d47003dc29d0ec0b995228e689}{Errors\+::unimplemented}} (const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{structcontext}{context}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{_errors_8h_a36d7655d01d72167969992b17b772507}\index{Errors.h@{Errors.h}!errorUnless@{errorUnless}}
+\index{errorUnless@{errorUnless}!Errors.h@{Errors.h}}
+\doxysubsubsection{\texorpdfstring{errorUnless}{errorUnless}}
+{\footnotesize\ttfamily \label{_errors_8h_a36d7655d01d72167969992b17b772507} 
+\#define error\+Unless(\begin{DoxyParamCaption}\item[{}]{condition}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordflow}{if}(!(condition))\ \{\ \mbox{\hyperlink{namespace_errors_a719a329951edb01e45afe1443dfa2a92}{Errors::fatalf}}(\textcolor{stringliteral}{"{}errorUnless(\%s)\ failed\(\backslash\)n"{}},\#condition);\ \}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{_errors_8h_source_l00027}{27}} of file \mbox{\hyperlink{_errors_8h_source}{Errors.\+h}}.
+
+\Hypertarget{_errors_8h_ad57cbc2f5c193d8f4002ee66d63eb952}\index{Errors.h@{Errors.h}!WAVM\_ASSERT\_TERMINATE@{WAVM\_ASSERT\_TERMINATE}}
+\index{WAVM\_ASSERT\_TERMINATE@{WAVM\_ASSERT\_TERMINATE}!Errors.h@{Errors.h}}
+\doxysubsubsection{\texorpdfstring{WAVM\_ASSERT\_TERMINATE}{WAVM\_ASSERT\_TERMINATE}}
+{\footnotesize\ttfamily \label{_errors_8h_ad57cbc2f5c193d8f4002ee66d63eb952} 
+\#define WAVM\+\_\+\+ASSERT\+\_\+\+TERMINATE(\begin{DoxyParamCaption}\item[{}]{cond}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(\{\ \textcolor{keywordflow}{if}(\ !(cond)\ )\ \{\ fprintf(stderr,\ \textcolor{stringliteral}{"{}wavm\ assert\ in\ destructor:\ \%s"{}},\ \#cond);\ std::terminate();\ \}\ \})}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{_errors_8h_source_l00031}{31}} of file \mbox{\hyperlink{_errors_8h_source}{Errors.\+h}}.
+
+\Hypertarget{_errors_8h_a03bec6af3af0dd492e348b40cbe40a46}\index{Errors.h@{Errors.h}!WAVM\_ASSERT\_THROW@{WAVM\_ASSERT\_THROW}}
+\index{WAVM\_ASSERT\_THROW@{WAVM\_ASSERT\_THROW}!Errors.h@{Errors.h}}
+\doxysubsubsection{\texorpdfstring{WAVM\_ASSERT\_THROW}{WAVM\_ASSERT\_THROW}}
+{\footnotesize\ttfamily \label{_errors_8h_a03bec6af3af0dd492e348b40cbe40a46} 
+\#define WAVM\+\_\+\+ASSERT\+\_\+\+THROW(\begin{DoxyParamCaption}\item[{}]{cond}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(\{\ \textcolor{keywordflow}{if}(\ !(cond)\ )\ \textcolor{keywordflow}{throw}\ std::runtime\_error\{\textcolor{stringliteral}{"{}wavm\ assert:\ "{}}\ \#cond\};\ \})}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{_errors_8h_source_l00029}{29}} of file \mbox{\hyperlink{_errors_8h_source}{Errors.\+h}}.
+

@@ -1,0 +1,97 @@
+\doxysection{closerex\+\_\+subcommand Struct Reference}
+\hypertarget{structcloserex__subcommand}{}\label{structcloserex__subcommand}\index{closerex\_subcommand@{closerex\_subcommand}}
+
+
+Collaboration diagram for closerex\+\_\+subcommand\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=197pt]{structcloserex__subcommand__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structcloserex__subcommand_aab82e19b7105ffb1781489583287d8b9}{closerex\+\_\+subcommand}} (\mbox{\hyperlink{class_c_l_i_1_1_app}{CLI\+::\+App}} \texorpdfstring{$\ast$}{*}action\+Root)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structcloserex__subcommand_a05288f41dab65c709b78931bb95dddf8}{owner\+\_\+str}}
+\item 
+const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \mbox{\hyperlink{structcloserex__subcommand_a60896cff1bd344158eee415bd5c22f87}{act\+\_\+name}} \{ "{}closerex"{}\+\_\+n \}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l02195}{2195}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structcloserex__subcommand_aab82e19b7105ffb1781489583287d8b9}\index{closerex\_subcommand@{closerex\_subcommand}!closerex\_subcommand@{closerex\_subcommand}}
+\index{closerex\_subcommand@{closerex\_subcommand}!closerex\_subcommand@{closerex\_subcommand}}
+\doxysubsubsection{\texorpdfstring{closerex\_subcommand()}{closerex\_subcommand()}}
+{\footnotesize\ttfamily \label{structcloserex__subcommand_aab82e19b7105ffb1781489583287d8b9} 
+closerex\+\_\+subcommand\+::closerex\+\_\+subcommand (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_c_l_i_1_1_app}{CLI\+::\+App}} \texorpdfstring{$\ast$}{*}}]{action\+Root}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l02199}{2199}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02199\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02200\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ closerex\ =\ actionRoot-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_a8b461d2233ec4121259011b5ed24b336}{add\_subcommand}}(\textcolor{stringliteral}{"{}closerex"{}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}Delete\ unused\ REX-\/related\ user\ table\ entries"{}}));}
+\DoxyCodeLine{02201\ \ \ \ \ \ \ closerex-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_a8c812d42c7720ecb5cd0aec41b5aa941}{add\_option}}(\textcolor{stringliteral}{"{}owner"{}},\ \mbox{\hyperlink{structcloserex__subcommand_a05288f41dab65c709b78931bb95dddf8}{owner\_str}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}REX\ owner"{}}))-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a}{required}}();}
+\DoxyCodeLine{02202\ \ \ \ \ \ \ \mbox{\hyperlink{programs_2clio_2main_8cpp_aa5d53f41b83b5323c73622fbbb15e9cd}{add\_standard\_transaction\_options}}(closerex,\ \textcolor{stringliteral}{"{}owner@active"{}});}
+\DoxyCodeLine{02203\ \ \ \ \ \ \ closerex-\/>callback([\textcolor{keyword}{this}]\ \{}
+\DoxyCodeLine{02204\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}\ act\_payload\ =\ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}()(\textcolor{stringliteral}{"{}owner"{}},\ \mbox{\hyperlink{structcloserex__subcommand_a05288f41dab65c709b78931bb95dddf8}{owner\_str}});}
+\DoxyCodeLine{02205\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ accountPermissions\ =\ \mbox{\hyperlink{programs_2clio_2main_8cpp_a2b91ca5dbe7cc4ab287d0e44c3037552}{get\_account\_permissions}}(\mbox{\hyperlink{programs_2clio_2main_8cpp_ad552924cb151dcd5b60c73856d1ff706}{tx\_permission}},\ \{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(\mbox{\hyperlink{structcloserex__subcommand_a05288f41dab65c709b78931bb95dddf8}{owner\_str}}),\ config::active\_name\});}
+\DoxyCodeLine{02206\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{programs_2clio_2main_8cpp_aaf784434864a29e4835be7465173d1ab}{send\_actions}}(\{\mbox{\hyperlink{programs_2clio_2main_8cpp_a067e20df5f65333b0c3cf5840bc37dea}{create\_action}}(accountPermissions,\ config::system\_account\_name,\ \mbox{\hyperlink{structcloserex__subcommand_a60896cff1bd344158eee415bd5c22f87}{act\_name}},\ act\_payload)\});}
+\DoxyCodeLine{02207\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{02208\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structcloserex__subcommand_aab82e19b7105ffb1781489583287d8b9_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structcloserex__subcommand_a60896cff1bd344158eee415bd5c22f87}\index{closerex\_subcommand@{closerex\_subcommand}!act\_name@{act\_name}}
+\index{act\_name@{act\_name}!closerex\_subcommand@{closerex\_subcommand}}
+\doxysubsubsection{\texorpdfstring{act\_name}{act\_name}}
+{\footnotesize\ttfamily \label{structcloserex__subcommand_a60896cff1bd344158eee415bd5c22f87} 
+const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} closerex\+\_\+subcommand\+::act\+\_\+name \{ "{}closerex"{}\+\_\+n \}}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l02197}{2197}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02197\ \{\ \textcolor{stringliteral}{"{}closerex"{}}\_n\ \};}
+
+\end{DoxyCode}
+\Hypertarget{structcloserex__subcommand_a05288f41dab65c709b78931bb95dddf8}\index{closerex\_subcommand@{closerex\_subcommand}!owner\_str@{owner\_str}}
+\index{owner\_str@{owner\_str}!closerex\_subcommand@{closerex\_subcommand}}
+\doxysubsubsection{\texorpdfstring{owner\_str}{owner\_str}}
+{\footnotesize\ttfamily \label{structcloserex__subcommand_a05288f41dab65c709b78931bb95dddf8} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} closerex\+\_\+subcommand\+::owner\+\_\+str}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l02196}{2196}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+programs/clio/\mbox{\hyperlink{programs_2clio_2main_8cpp}{main.\+cpp}}\end{DoxyCompactItemize}

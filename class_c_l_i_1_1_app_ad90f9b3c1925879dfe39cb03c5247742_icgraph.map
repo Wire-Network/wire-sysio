@@ -1,0 +1,18 @@
+<map id="CLI::App::remaining" name="CLI::App::remaining">
+<area shape="rect" id="Node000001" title="This returns the missing options from the current subcommand." alt="" coords="520,78,658,104"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_app.html#a4d57bf638f00715cbf27dcf055580398" title="Throw an error if anything is left over and should not be." alt="" coords="336,5,471,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="535,75,463,49,464,44,537,70"/>
+<area shape="rect" id="Node000007" href="$class_c_l_i_1_1_app.html#a7e8e59098befcc1f10969b9e5c88e0f9" title=" " alt="" coords="336,71,471,111"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="505,94,471,94,471,88,505,88"/>
+<area shape="rect" id="Node000008" href="$class_c_l_i_1_1_app.html#a522317a152b4acbb8015eef22358d8fd" title="This returns the missing options in a form ready for processing by another command line program." alt="" coords="335,136,472,177"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="537,112,464,138,463,133,535,107"/>
+<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_app.html#a26a92886a7d7f10a9afbd39b6535f42b" title="Internal parse function." alt="" coords="167,13,287,38"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="321,28,287,28,287,23,321,23"/>
+<area shape="rect" id="Node000004" href="$class_c_l_i_1_1_app.html#a241ba75a6c98b36349ae2f71a9137291" title="Internal parse function." alt="" coords="167,102,287,128"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="347,56,336,61,254,104,252,99,334,57,345,51"/>
+<area shape="rect" id="Node000005" href="$class_c_l_i_1_1_app.html#a8ffb155a1153ee23d442c5bfed21225c" title="The real work is done here. Expects a reversed vector." alt="" coords="5,77,119,102"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="151,106,119,101,119,96,151,101"/>
+<area shape="rect" id="Node000006" href="$class_c_l_i_1_1_app.html#a878c1067ade7145aa11478d64f5173ed" title=" " alt="" coords="5,126,119,152"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="151,129,119,133,119,128,151,123"/>
+<area shape="poly" id="edge8_Node000008_Node000004" title=" " alt="" coords="319,139,284,131,285,126,320,134"/>
+</map>

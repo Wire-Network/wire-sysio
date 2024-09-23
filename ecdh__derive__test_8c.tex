@@ -1,0 +1,423 @@
+\doxysection{libraries/yubihsm/pkcs11/tests/ecdh\+\_\+derive\+\_\+test.c File Reference}
+\hypertarget{ecdh__derive__test_8c}{}\label{ecdh__derive__test_8c}\index{libraries/yubihsm/pkcs11/tests/ecdh\_derive\_test.c@{libraries/yubihsm/pkcs11/tests/ecdh\_derive\_test.c}}
+{\ttfamily \#include $<$assert.\+h$>$}\newline
+{\ttfamily \#include $<$dlfcn.\+h$>$}\newline
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include $<$stdbool.\+h$>$}\newline
+{\ttfamily \#include $<$openssl/ec.\+h$>$}\newline
+{\ttfamily \#include $<$openssl/x509.\+h$>$}\newline
+{\ttfamily \#include "{}../pkcs11.\+h"{}}\newline
+Include dependency graph for ecdh\+\_\+derive\+\_\+test.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{ecdh__derive__test_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{ecdh__derive__test_8c_a377ec96b1eb26c7b26b84bb5b0c9a928}{DEFAULT\+\_\+\+CONNECTOR\+\_\+\+URL}}~"{}http\+://127.\+0.\+0.\+1\+:12345"{}
+\item 
+\#define \mbox{\hyperlink{ecdh__derive__test_8c_aeca034f67218340ecb2261a22c2f3dcd}{BUFSIZE}}~1024
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{ecdh__derive__test_8c_a3c04138a5bfe5d72780bb7e82a18e627}{main}} (int argc, char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{pkcs11_8h_a51e605f881c86838bf12d70707b57b85}{CK\+\_\+\+BYTE}} \mbox{\hyperlink{ecdh__derive__test_8c_a7568b83e2ddff933e29da47e59857d64}{P224\+\_\+\+PARAMS}} \mbox{[}$\,$\mbox{]} = \{0x06, 0x05, 0x2b, 0x81, 0x04, 0x00, 0x21\}
+\item 
+\mbox{\hyperlink{pkcs11_8h_a51e605f881c86838bf12d70707b57b85}{CK\+\_\+\+BYTE}} \mbox{\hyperlink{ecdh__derive__test_8c_af59d1716c1197c33d89fbf970a987198}{P256\+\_\+\+PARAMS}} \mbox{[}$\,$\mbox{]}
+\item 
+\mbox{\hyperlink{pkcs11_8h_a51e605f881c86838bf12d70707b57b85}{CK\+\_\+\+BYTE}} \mbox{\hyperlink{ecdh__derive__test_8c_a05261f2d5e50655dbbcfd24dd2e1ee06}{P384\+\_\+\+PARAMS}} \mbox{[}$\,$\mbox{]} = \{0x06, 0x05, 0x2b, 0x81, 0x04, 0x00, 0x22\}
+\item 
+\mbox{\hyperlink{pkcs11_8h_a51e605f881c86838bf12d70707b57b85}{CK\+\_\+\+BYTE}} \mbox{\hyperlink{ecdh__derive__test_8c_a7e4dd62d7b81a660d16034dcb1b8b14c}{P521\+\_\+\+PARAMS}} \mbox{[}$\,$\mbox{]} = \{0x06, 0x05, 0x2b, 0x81, 0x04, 0x00, 0x23\}
+\item 
+\mbox{\hyperlink{pkcs11_8h_a59402612162ecdde06e0462060f0b0cd}{CK\+\_\+\+FUNCTION\+\_\+\+LIST\+\_\+\+PTR}} \mbox{\hyperlink{ecdh__derive__test_8c_ae257f08ea2453d2bdf88f8466c8abed3}{p11}}
+\item 
+CK\+\_\+\+SESSION\+\_\+\+HANDLE \mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}} = NULL
+\item 
+char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{ecdh__derive__test_8c_ad27dc75149722e8e7bc026edd1818491}{CURVES}} \mbox{[}$\,$\mbox{]} = \{"{}secp224r1"{}, "{}secp384r1"{}, "{}secp521r1"{}\}
+\item 
+\mbox{\hyperlink{pkcs11_8h_a51e605f881c86838bf12d70707b57b85}{CK\+\_\+\+BYTE}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{ecdh__derive__test_8c_ab9389a30a483faf61dd619bbb924ad30}{CURVE\+\_\+\+PARAMS}} \mbox{[}$\,$\mbox{]} = \{\mbox{\hyperlink{ecdh__derive__test_8c_a7568b83e2ddff933e29da47e59857d64}{P224\+\_\+\+PARAMS}}, \mbox{\hyperlink{ecdh__derive__test_8c_a05261f2d5e50655dbbcfd24dd2e1ee06}{P384\+\_\+\+PARAMS}}, \mbox{\hyperlink{ecdh__derive__test_8c_a7e4dd62d7b81a660d16034dcb1b8b14c}{P521\+\_\+\+PARAMS}}\}
+\item 
+int \mbox{\hyperlink{ecdh__derive__test_8c_a0f1da9119a68a9022394e9301b92cf7e}{CURVE\+\_\+\+COUNT}} = 3
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{ecdh__derive__test_8c_aeca034f67218340ecb2261a22c2f3dcd}\index{ecdh\_derive\_test.c@{ecdh\_derive\_test.c}!BUFSIZE@{BUFSIZE}}
+\index{BUFSIZE@{BUFSIZE}!ecdh\_derive\_test.c@{ecdh\_derive\_test.c}}
+\doxysubsubsection{\texorpdfstring{BUFSIZE}{BUFSIZE}}
+{\footnotesize\ttfamily \label{ecdh__derive__test_8c_aeca034f67218340ecb2261a22c2f3dcd} 
+\#define BUFSIZE~1024}
+
+
+
+Definition at line \mbox{\hyperlink{ecdh__derive__test_8c_source_l00036}{36}} of file \mbox{\hyperlink{ecdh__derive__test_8c_source}{ecdh\+\_\+derive\+\_\+test.\+c}}.
+
+\Hypertarget{ecdh__derive__test_8c_a377ec96b1eb26c7b26b84bb5b0c9a928}\index{ecdh\_derive\_test.c@{ecdh\_derive\_test.c}!DEFAULT\_CONNECTOR\_URL@{DEFAULT\_CONNECTOR\_URL}}
+\index{DEFAULT\_CONNECTOR\_URL@{DEFAULT\_CONNECTOR\_URL}!ecdh\_derive\_test.c@{ecdh\_derive\_test.c}}
+\doxysubsubsection{\texorpdfstring{DEFAULT\_CONNECTOR\_URL}{DEFAULT\_CONNECTOR\_URL}}
+{\footnotesize\ttfamily \label{ecdh__derive__test_8c_a377ec96b1eb26c7b26b84bb5b0c9a928} 
+\#define DEFAULT\+\_\+\+CONNECTOR\+\_\+\+URL~"{}http\+://127.\+0.\+0.\+1\+:12345"{}}
+
+
+
+Definition at line \mbox{\hyperlink{ecdh__derive__test_8c_source_l00033}{33}} of file \mbox{\hyperlink{ecdh__derive__test_8c_source}{ecdh\+\_\+derive\+\_\+test.\+c}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{ecdh__derive__test_8c_a3c04138a5bfe5d72780bb7e82a18e627}\index{ecdh\_derive\_test.c@{ecdh\_derive\_test.c}!main@{main}}
+\index{main@{main}!ecdh\_derive\_test.c@{ecdh\_derive\_test.c}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{ecdh__derive__test_8c_a3c04138a5bfe5d72780bb7e82a18e627} 
+int main (\begin{DoxyParamCaption}\item[{int}]{argc}{, }\item[{char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{argv}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{ecdh__derive__test_8c_source_l00845}{845}} of file \mbox{\hyperlink{ecdh__derive__test_8c_source}{ecdh\+\_\+derive\+\_\+test.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00845\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00846\ }
+\DoxyCodeLine{00847\ \ \ \textcolor{keywordflow}{if}\ (argc\ !=\ 2)\ \{}
+\DoxyCodeLine{00848\ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}usage:\ /path/to/yubihsm\_pkcs11/module\(\backslash\)n"{}});}
+\DoxyCodeLine{00849\ \ \ \ \ exit(EXIT\_FAILURE);}
+\DoxyCodeLine{00850\ \ \ \}}
+\DoxyCodeLine{00851\ }
+\DoxyCodeLine{00852\ \ \ get\_function\_list(\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}});}
+\DoxyCodeLine{00853\ \ \ open\_session();}
+\DoxyCodeLine{00854\ \ \ print\_session\_state();}
+\DoxyCodeLine{00855\ }
+\DoxyCodeLine{00856\ \ \ \textcolor{keywordtype}{int}\ exit\_status\ =\ EXIT\_SUCCESS;}
+\DoxyCodeLine{00857\ }
+\DoxyCodeLine{00858\ \ \ CK\_OBJECT\_HANDLE\ yh\_pubkey,\ yh\_privkey;}
+\DoxyCodeLine{00859\ }
+\DoxyCodeLine{00860\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{ecdh__derive__test_8c_a0f1da9119a68a9022394e9301b92cf7e}{CURVE\_COUNT}};\ i++)\ \{}
+\DoxyCodeLine{00861\ }
+\DoxyCodeLine{00862\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\(\backslash\)n///////\ Testing\ curve\ \%s\(\backslash\)n"{}},\ \mbox{\hyperlink{ecdh__derive__test_8c_ad27dc75149722e8e7bc026edd1818491}{CURVES}}[i]);}
+\DoxyCodeLine{00863\ }
+\DoxyCodeLine{00864\ \ \ \ \ generate\_keypair\_yh(\mbox{\hyperlink{ecdh__derive__test_8c_ab9389a30a483faf61dd619bbb924ad30}{CURVE\_PARAMS}}[i],\ \&yh\_pubkey,\ \&yh\_privkey);}
+\DoxyCodeLine{00865\ \ \ \ \ CK\_OBJECT\_HANDLE\ ecdh1,\ ecdh2,\ ecdh3;}
+\DoxyCodeLine{00866\ }
+\DoxyCodeLine{00867\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Testing\ the\ value\ of\ ECDH\ key\ derived\ by\ yubihsm-\/pkcs11...\ "{}});}
+\DoxyCodeLine{00868\ \ \ \ \ \textcolor{keywordflow}{if}\ (test\_ecdh\_value(\mbox{\hyperlink{ecdh__derive__test_8c_ad27dc75149722e8e7bc026edd1818491}{CURVES}}[i],\ yh\_privkey,\ yh\_pubkey,\ \&ecdh1))\ \{}
+\DoxyCodeLine{00869\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}OK!\(\backslash\)n"{}});}
+\DoxyCodeLine{00870\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00871\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}FAIL!\(\backslash\)n"{}});}
+\DoxyCodeLine{00872\ \ \ \ \ \ \ exit\_status\ =\ EXIT\_FAILURE;}
+\DoxyCodeLine{00873\ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ c\_clean;}
+\DoxyCodeLine{00874\ \ \ \ \ \}}
+\DoxyCodeLine{00875\ }
+\DoxyCodeLine{00876\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(}
+\DoxyCodeLine{00877\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Testing\ that\ 2\ ECDH\ keys\ derived\ from\ the\ same\ base\ keys\ are\ equal...\ "{}});}
+\DoxyCodeLine{00878\ \ \ \ \ \textcolor{keywordflow}{if}\ (test\_duplicate\_ecdh(\mbox{\hyperlink{ecdh__derive__test_8c_ad27dc75149722e8e7bc026edd1818491}{CURVES}}[i],\ yh\_privkey,\ \&ecdh2,\ \&ecdh3))\ \{}
+\DoxyCodeLine{00879\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}OK!\(\backslash\)n"{}});}
+\DoxyCodeLine{00880\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00881\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}FAIL!\(\backslash\)n"{}});}
+\DoxyCodeLine{00882\ \ \ \ \ \ \ exit\_status\ =\ EXIT\_FAILURE;}
+\DoxyCodeLine{00883\ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ c\_clean;}
+\DoxyCodeLine{00884\ \ \ \ \ \}}
+\DoxyCodeLine{00885\ }
+\DoxyCodeLine{00886\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Testing\ deriving\ ECDH\ keys\ with\ faulty\ parameters...\ "{}});}
+\DoxyCodeLine{00887\ \ \ \ \ \textcolor{keywordflow}{if}\ (test\_faulty\_ecdh(\mbox{\hyperlink{ecdh__derive__test_8c_ad27dc75149722e8e7bc026edd1818491}{CURVES}}[i],\ \textcolor{stringliteral}{"{}prime256v1"{}},\ \&yh\_privkey,\ \&ecdh1))\ \{}
+\DoxyCodeLine{00888\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}OK!\(\backslash\)n"{}});}
+\DoxyCodeLine{00889\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00890\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}FAIL!\(\backslash\)n"{}});}
+\DoxyCodeLine{00891\ \ \ \ \ \ \ exit\_status\ =\ EXIT\_FAILURE;}
+\DoxyCodeLine{00892\ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ c\_clean;}
+\DoxyCodeLine{00893\ \ \ \ \ \}}
+\DoxyCodeLine{00894\ }
+\DoxyCodeLine{00895\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Validating\ ECDH\ attributes...\ "{}});}
+\DoxyCodeLine{00896\ \ \ \ \ \textcolor{keywordflow}{if}\ (validate\_ecdh\_attributes(ecdh1,\ \textcolor{stringliteral}{"{}ecdh1"{}}))\ \{}
+\DoxyCodeLine{00897\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}OK!\(\backslash\)n"{}});}
+\DoxyCodeLine{00898\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00899\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}FAIL!\(\backslash\)n"{}});}
+\DoxyCodeLine{00900\ \ \ \ \ \ \ exit\_status\ =\ EXIT\_FAILURE;}
+\DoxyCodeLine{00901\ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ c\_clean;}
+\DoxyCodeLine{00902\ \ \ \ \ \}}
+\DoxyCodeLine{00903\ }
+\DoxyCodeLine{00904\ \ \ \ \ \textcolor{comment}{//\ -\/-\/-\/-\/-\/-\/-\/\ Start\ C\_FindObjects\ functions\ test}}
+\DoxyCodeLine{00905\ }
+\DoxyCodeLine{00906\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Finding\ ECDH\ keys:\ secret\ keys...\ "{}});}
+\DoxyCodeLine{00907\ \ \ \ \ \textcolor{keywordflow}{if}\ (find\_secret\_keys(\&ecdh1,\ \&ecdh2,\ \&ecdh3))\ \{}
+\DoxyCodeLine{00908\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}OK!\(\backslash\)n"{}});}
+\DoxyCodeLine{00909\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00910\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}FAIL!\(\backslash\)n"{}});}
+\DoxyCodeLine{00911\ \ \ \ \ \ \ exit\_status\ =\ EXIT\_FAILURE;}
+\DoxyCodeLine{00912\ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ c\_clean;}
+\DoxyCodeLine{00913\ \ \ \ \ \}}
+\DoxyCodeLine{00914\ }
+\DoxyCodeLine{00915\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Finding\ ECDH\ keys:\ public\ keys...\ "{}});}
+\DoxyCodeLine{00916\ \ \ \ \ \textcolor{keywordflow}{if}\ (find\_public\_keys(\&ecdh1,\ \&ecdh2,\ \&ecdh3))\ \{}
+\DoxyCodeLine{00917\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}OK!\(\backslash\)n"{}});}
+\DoxyCodeLine{00918\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00919\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}FAIL!\(\backslash\)n"{}});}
+\DoxyCodeLine{00920\ \ \ \ \ \ \ exit\_status\ =\ EXIT\_FAILURE;}
+\DoxyCodeLine{00921\ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ c\_clean;}
+\DoxyCodeLine{00922\ \ \ \ \ \}}
+\DoxyCodeLine{00923\ }
+\DoxyCodeLine{00924\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Finding\ ECDH\ keys:\ secret,\ extractable\ keys...\ "{}});}
+\DoxyCodeLine{00925\ \ \ \ \ \textcolor{keywordflow}{if}\ (find\_secret\_extractable\_keys(\&ecdh1,\ \&ecdh2,\ \&ecdh3,\ 3))\ \{}
+\DoxyCodeLine{00926\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}OK!\(\backslash\)n"{}});}
+\DoxyCodeLine{00927\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00928\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}FAIL!\(\backslash\)n"{}});}
+\DoxyCodeLine{00929\ \ \ \ \ \ \ exit\_status\ =\ EXIT\_FAILURE;}
+\DoxyCodeLine{00930\ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ c\_clean;}
+\DoxyCodeLine{00931\ \ \ \ \ \}}
+\DoxyCodeLine{00932\ }
+\DoxyCodeLine{00933\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Finding\ ECDH\ keys:\ secret,\ un-\/extractable\ keys...\ "{}});}
+\DoxyCodeLine{00934\ \ \ \ \ \textcolor{keywordflow}{if}\ (find\_secret\_unextractable\_keys(\&ecdh1,\ \&ecdh2,\ \&ecdh3))\ \{}
+\DoxyCodeLine{00935\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}OK!\(\backslash\)n"{}});}
+\DoxyCodeLine{00936\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00937\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}FAIL!\(\backslash\)n"{}});}
+\DoxyCodeLine{00938\ \ \ \ \ \ \ exit\_status\ =\ EXIT\_FAILURE;}
+\DoxyCodeLine{00939\ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ c\_clean;}
+\DoxyCodeLine{00940\ \ \ \ \ \}}
+\DoxyCodeLine{00941\ }
+\DoxyCodeLine{00942\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Finding\ ECDH\ keys:\ secret,\ extractable\ keys\ with\ wrong\ label...\ "{}});}
+\DoxyCodeLine{00943\ \ \ \ \ \textcolor{keywordflow}{if}\ (find\_secret\_extractable\_keys\_wrong\_label(\&ecdh1,\ \&ecdh2,\ \&ecdh3))\ \{}
+\DoxyCodeLine{00944\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}OK!\(\backslash\)n"{}});}
+\DoxyCodeLine{00945\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00946\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}FAIL!\(\backslash\)n"{}});}
+\DoxyCodeLine{00947\ \ \ \ \ \ \ exit\_status\ =\ EXIT\_FAILURE;}
+\DoxyCodeLine{00948\ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ c\_clean;}
+\DoxyCodeLine{00949\ \ \ \ \ \}}
+\DoxyCodeLine{00950\ }
+\DoxyCodeLine{00951\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Finding\ ECDH\ keys:\ secret\ key\ with\ specific\ ID...\ "{}});}
+\DoxyCodeLine{00952\ \ \ \ \ \textcolor{keywordflow}{if}\ (find\_secret\_key\_with\_id(\&ecdh1,\ \&ecdh2,\ \&ecdh3,\ \&yh\_privkey))\ \{}
+\DoxyCodeLine{00953\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}OK!\(\backslash\)n"{}});}
+\DoxyCodeLine{00954\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00955\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}FAIL!\(\backslash\)n"{}});}
+\DoxyCodeLine{00956\ \ \ \ \ \ \ exit\_status\ =\ EXIT\_FAILURE;}
+\DoxyCodeLine{00957\ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ c\_clean;}
+\DoxyCodeLine{00958\ \ \ \ \ \}}
+\DoxyCodeLine{00959\ }
+\DoxyCodeLine{00960\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Finding\ ECDH\ keys:\ secret\ key\ with\ right\ label...\ "{}});}
+\DoxyCodeLine{00961\ \ \ \ \ \textcolor{keywordflow}{if}\ (find\_secret\_key\_right\_label(\&ecdh1,\ \&ecdh2,\ \&ecdh3))\ \{}
+\DoxyCodeLine{00962\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}OK!\(\backslash\)n"{}});}
+\DoxyCodeLine{00963\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00964\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}FAIL!\(\backslash\)n"{}});}
+\DoxyCodeLine{00965\ \ \ \ \ \ \ exit\_status\ =\ EXIT\_FAILURE;}
+\DoxyCodeLine{00966\ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ c\_clean;}
+\DoxyCodeLine{00967\ \ \ \ \ \}}
+\DoxyCodeLine{00968\ }
+\DoxyCodeLine{00969\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Finding\ ECDH\ keys:\ public\ key\ with\ right\ label...\ "{}});}
+\DoxyCodeLine{00970\ \ \ \ \ \textcolor{keywordflow}{if}\ (find\_public\_key\_right\_label(\&ecdh1,\ \&ecdh2,\ \&ecdh3))\ \{}
+\DoxyCodeLine{00971\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}OK!\(\backslash\)n"{}});}
+\DoxyCodeLine{00972\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00973\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}FAIL!\(\backslash\)n"{}});}
+\DoxyCodeLine{00974\ \ \ \ \ \ \ exit\_status\ =\ EXIT\_FAILURE;}
+\DoxyCodeLine{00975\ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ c\_clean;}
+\DoxyCodeLine{00976\ \ \ \ \ \}}
+\DoxyCodeLine{00977\ }
+\DoxyCodeLine{00978\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Finding\ ECDH\ keys:\ use\ empty\ template...\ "{}});}
+\DoxyCodeLine{00979\ \ \ \ \ \textcolor{keywordflow}{if}\ (find\_empty\_template(\&ecdh1,\ \&ecdh2,\ \&ecdh3))\ \{}
+\DoxyCodeLine{00980\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}OK!\(\backslash\)n"{}});}
+\DoxyCodeLine{00981\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00982\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}FAIL!\(\backslash\)n"{}});}
+\DoxyCodeLine{00983\ \ \ \ \ \ \ exit\_status\ =\ EXIT\_FAILURE;}
+\DoxyCodeLine{00984\ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ c\_clean;}
+\DoxyCodeLine{00985\ \ \ \ \ \}}
+\DoxyCodeLine{00986\ }
+\DoxyCodeLine{00987\ \ \ \ \ \textcolor{comment}{//\ -\/-\/-\/-\/-\/-\/-\/\ End\ C\_FindObjects\ functions\ test}}
+\DoxyCodeLine{00988\ }
+\DoxyCodeLine{00989\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Destroying\ ECDH\ key\ 1...\ "{}});}
+\DoxyCodeLine{00990\ \ \ \ \ destroy\_object(ecdh1);}
+\DoxyCodeLine{00991\ \ \ \ \ \textcolor{keywordflow}{if}\ (find\_secret\_extractable\_keys(\&ecdh1,\ \&ecdh2,\ \&ecdh3,\ 2))\ \{}
+\DoxyCodeLine{00992\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}OK!\(\backslash\)n"{}});}
+\DoxyCodeLine{00993\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00994\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}FAIL!\(\backslash\)n"{}});}
+\DoxyCodeLine{00995\ \ \ \ \ \ \ exit\_status\ =\ EXIT\_FAILURE;}
+\DoxyCodeLine{00996\ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ c\_clean;}
+\DoxyCodeLine{00997\ \ \ \ \ \}}
+\DoxyCodeLine{00998\ }
+\DoxyCodeLine{00999\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Destroying\ ECDH\ key\ 2...\ "{}});}
+\DoxyCodeLine{01000\ \ \ \ \ destroy\_object(ecdh3);}
+\DoxyCodeLine{01001\ \ \ \ \ \textcolor{keywordflow}{if}\ (find\_secret\_extractable\_keys(\&ecdh1,\ \&ecdh2,\ \&ecdh3,\ 1))\ \{}
+\DoxyCodeLine{01002\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}OK!\(\backslash\)n"{}});}
+\DoxyCodeLine{01003\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{01004\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}FAIL!\(\backslash\)n"{}});}
+\DoxyCodeLine{01005\ \ \ \ \ \ \ exit\_status\ =\ EXIT\_FAILURE;}
+\DoxyCodeLine{01006\ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ c\_clean;}
+\DoxyCodeLine{01007\ \ \ \ \ \}}
+\DoxyCodeLine{01008\ }
+\DoxyCodeLine{01009\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Testing\ decryption...\ "{}});}
+\DoxyCodeLine{01010\ \ \ \ \ \textcolor{keywordflow}{if}\ (test\_decrypt(\&ecdh2))\ \{}
+\DoxyCodeLine{01011\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}OK!\(\backslash\)n"{}});}
+\DoxyCodeLine{01012\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{01013\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}FAIL!\(\backslash\)n"{}});}
+\DoxyCodeLine{01014\ \ \ \ \ \ \ exit\_status\ =\ EXIT\_FAILURE;}
+\DoxyCodeLine{01015\ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ c\_clean;}
+\DoxyCodeLine{01016\ \ \ \ \ \}}
+\DoxyCodeLine{01017\ }
+\DoxyCodeLine{01018\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Testing\ signing...\ "{}});}
+\DoxyCodeLine{01019\ \ \ \ \ \textcolor{keywordflow}{if}\ (test\_sign(\&ecdh2))\ \{}
+\DoxyCodeLine{01020\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}OK!\(\backslash\)n"{}});}
+\DoxyCodeLine{01021\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{01022\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}FAIL!\(\backslash\)n"{}});}
+\DoxyCodeLine{01023\ \ \ \ \ \ \ exit\_status\ =\ EXIT\_FAILURE;}
+\DoxyCodeLine{01024\ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ c\_clean;}
+\DoxyCodeLine{01025\ \ \ \ \ \}}
+\DoxyCodeLine{01026\ }
+\DoxyCodeLine{01027\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Destroying\ ECDH\ key\ 3...\ "{}});}
+\DoxyCodeLine{01028\ \ \ \ \ destroy\_object(ecdh2);}
+\DoxyCodeLine{01029\ \ \ \ \ \textcolor{keywordflow}{if}\ (find\_secret\_extractable\_keys(\&ecdh1,\ \&ecdh2,\ \&ecdh3,\ 0))\ \{}
+\DoxyCodeLine{01030\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}OK!\(\backslash\)n"{}});}
+\DoxyCodeLine{01031\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{01032\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}FAIL!\(\backslash\)n"{}});}
+\DoxyCodeLine{01033\ \ \ \ \ \ \ exit\_status\ =\ EXIT\_FAILURE;}
+\DoxyCodeLine{01034\ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ c\_clean;}
+\DoxyCodeLine{01035\ \ \ \ \ \}}
+\DoxyCodeLine{01036\ }
+\DoxyCodeLine{01037\ \ \ \ \ destroy\_object(yh\_privkey);}
+\DoxyCodeLine{01038\ \ \ \}}
+\DoxyCodeLine{01039\ }
+\DoxyCodeLine{01040\ c\_clean:}
+\DoxyCodeLine{01041\ \ \ \textcolor{keywordflow}{if}\ (exit\_status\ ==\ EXIT\_FAILURE)\ \{}
+\DoxyCodeLine{01042\ \ \ \ \ destroy\_object(yh\_privkey);}
+\DoxyCodeLine{01043\ \ \ \}}
+\DoxyCodeLine{01044\ \ \ close\_session();}
+\DoxyCodeLine{01045\ \ \ \textcolor{keywordflow}{return}\ (exit\_status);}
+\DoxyCodeLine{01046\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{ecdh__derive__test_8c_a0f1da9119a68a9022394e9301b92cf7e}\index{ecdh\_derive\_test.c@{ecdh\_derive\_test.c}!CURVE\_COUNT@{CURVE\_COUNT}}
+\index{CURVE\_COUNT@{CURVE\_COUNT}!ecdh\_derive\_test.c@{ecdh\_derive\_test.c}}
+\doxysubsubsection{\texorpdfstring{CURVE\_COUNT}{CURVE\_COUNT}}
+{\footnotesize\ttfamily \label{ecdh__derive__test_8c_a0f1da9119a68a9022394e9301b92cf7e} 
+int CURVE\+\_\+\+COUNT = 3}
+
+
+
+Definition at line \mbox{\hyperlink{ecdh__derive__test_8c_source_l00049}{49}} of file \mbox{\hyperlink{ecdh__derive__test_8c_source}{ecdh\+\_\+derive\+\_\+test.\+c}}.
+
+\Hypertarget{ecdh__derive__test_8c_ab9389a30a483faf61dd619bbb924ad30}\index{ecdh\_derive\_test.c@{ecdh\_derive\_test.c}!CURVE\_PARAMS@{CURVE\_PARAMS}}
+\index{CURVE\_PARAMS@{CURVE\_PARAMS}!ecdh\_derive\_test.c@{ecdh\_derive\_test.c}}
+\doxysubsubsection{\texorpdfstring{CURVE\_PARAMS}{CURVE\_PARAMS}}
+{\footnotesize\ttfamily \label{ecdh__derive__test_8c_ab9389a30a483faf61dd619bbb924ad30} 
+\mbox{\hyperlink{pkcs11_8h_a51e605f881c86838bf12d70707b57b85}{CK\+\_\+\+BYTE}}\texorpdfstring{$\ast$}{*} CURVE\+\_\+\+PARAMS\mbox{[}$\,$\mbox{]} = \{\mbox{\hyperlink{ecdh__derive__test_8c_a7568b83e2ddff933e29da47e59857d64}{P224\+\_\+\+PARAMS}}, \mbox{\hyperlink{ecdh__derive__test_8c_a05261f2d5e50655dbbcfd24dd2e1ee06}{P384\+\_\+\+PARAMS}}, \mbox{\hyperlink{ecdh__derive__test_8c_a7e4dd62d7b81a660d16034dcb1b8b14c}{P521\+\_\+\+PARAMS}}\}}
+
+
+
+Definition at line \mbox{\hyperlink{ecdh__derive__test_8c_source_l00048}{48}} of file \mbox{\hyperlink{ecdh__derive__test_8c_source}{ecdh\+\_\+derive\+\_\+test.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00048\ \{\mbox{\hyperlink{ecdh__derive__test_8c_a7568b83e2ddff933e29da47e59857d64}{P224\_PARAMS}},\ \mbox{\hyperlink{ecdh__derive__test_8c_a05261f2d5e50655dbbcfd24dd2e1ee06}{P384\_PARAMS}},\ \mbox{\hyperlink{ecdh__derive__test_8c_a7e4dd62d7b81a660d16034dcb1b8b14c}{P521\_PARAMS}}\};}
+
+\end{DoxyCode}
+\Hypertarget{ecdh__derive__test_8c_ad27dc75149722e8e7bc026edd1818491}\index{ecdh\_derive\_test.c@{ecdh\_derive\_test.c}!CURVES@{CURVES}}
+\index{CURVES@{CURVES}!ecdh\_derive\_test.c@{ecdh\_derive\_test.c}}
+\doxysubsubsection{\texorpdfstring{CURVES}{CURVES}}
+{\footnotesize\ttfamily \label{ecdh__derive__test_8c_ad27dc75149722e8e7bc026edd1818491} 
+char\texorpdfstring{$\ast$}{*} CURVES\mbox{[}$\,$\mbox{]} = \{"{}secp224r1"{}, "{}secp384r1"{}, "{}secp521r1"{}\}}
+
+
+
+Definition at line \mbox{\hyperlink{ecdh__derive__test_8c_source_l00047}{47}} of file \mbox{\hyperlink{ecdh__derive__test_8c_source}{ecdh\+\_\+derive\+\_\+test.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00047\ \{\textcolor{stringliteral}{"{}secp224r1"{}},\ \textcolor{stringliteral}{"{}secp384r1"{}},\ \textcolor{stringliteral}{"{}secp521r1"{}}\};}
+
+\end{DoxyCode}
+\Hypertarget{ecdh__derive__test_8c_ae257f08ea2453d2bdf88f8466c8abed3}\index{ecdh\_derive\_test.c@{ecdh\_derive\_test.c}!p11@{p11}}
+\index{p11@{p11}!ecdh\_derive\_test.c@{ecdh\_derive\_test.c}}
+\doxysubsubsection{\texorpdfstring{p11}{p11}}
+{\footnotesize\ttfamily \label{ecdh__derive__test_8c_ae257f08ea2453d2bdf88f8466c8abed3} 
+\mbox{\hyperlink{pkcs11_8h_a59402612162ecdde06e0462060f0b0cd}{CK\+\_\+\+FUNCTION\+\_\+\+LIST\+\_\+\+PTR}} p11}
+
+
+
+Definition at line \mbox{\hyperlink{ecdh__derive__test_8c_source_l00044}{44}} of file \mbox{\hyperlink{ecdh__derive__test_8c_source}{ecdh\+\_\+derive\+\_\+test.\+c}}.
+
+\Hypertarget{ecdh__derive__test_8c_a7568b83e2ddff933e29da47e59857d64}\index{ecdh\_derive\_test.c@{ecdh\_derive\_test.c}!P224\_PARAMS@{P224\_PARAMS}}
+\index{P224\_PARAMS@{P224\_PARAMS}!ecdh\_derive\_test.c@{ecdh\_derive\_test.c}}
+\doxysubsubsection{\texorpdfstring{P224\_PARAMS}{P224\_PARAMS}}
+{\footnotesize\ttfamily \label{ecdh__derive__test_8c_a7568b83e2ddff933e29da47e59857d64} 
+\mbox{\hyperlink{pkcs11_8h_a51e605f881c86838bf12d70707b57b85}{CK\+\_\+\+BYTE}} P224\+\_\+\+PARAMS\mbox{[}$\,$\mbox{]} = \{0x06, 0x05, 0x2b, 0x81, 0x04, 0x00, 0x21\}}
+
+
+
+Definition at line \mbox{\hyperlink{ecdh__derive__test_8c_source_l00038}{38}} of file \mbox{\hyperlink{ecdh__derive__test_8c_source}{ecdh\+\_\+derive\+\_\+test.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00038\ \{0x06,\ 0x05,\ 0x2b,\ 0x81,\ 0x04,\ 0x00,\ 0x21\};}
+
+\end{DoxyCode}
+\Hypertarget{ecdh__derive__test_8c_af59d1716c1197c33d89fbf970a987198}\index{ecdh\_derive\_test.c@{ecdh\_derive\_test.c}!P256\_PARAMS@{P256\_PARAMS}}
+\index{P256\_PARAMS@{P256\_PARAMS}!ecdh\_derive\_test.c@{ecdh\_derive\_test.c}}
+\doxysubsubsection{\texorpdfstring{P256\_PARAMS}{P256\_PARAMS}}
+{\footnotesize\ttfamily \label{ecdh__derive__test_8c_af59d1716c1197c33d89fbf970a987198} 
+\mbox{\hyperlink{pkcs11_8h_a51e605f881c86838bf12d70707b57b85}{CK\+\_\+\+BYTE}} P256\+\_\+\+PARAMS\mbox{[}$\,$\mbox{]}}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=\ \{0x06,\ 0x08,\ 0x2a,\ 0x86,\ 0x48,}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0xce,\ 0x3d,\ 0x03,\ 0x01,\ 0x07\}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{ecdh__derive__test_8c_source_l00039}{39}} of file \mbox{\hyperlink{ecdh__derive__test_8c_source}{ecdh\+\_\+derive\+\_\+test.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{0x06,\ 0x08,\ 0x2a,\ 0x86,\ 0x48,}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0xce,\ 0x3d,\ 0x03,\ 0x01,\ 0x07\};}
+
+\end{DoxyCode}
+\Hypertarget{ecdh__derive__test_8c_a05261f2d5e50655dbbcfd24dd2e1ee06}\index{ecdh\_derive\_test.c@{ecdh\_derive\_test.c}!P384\_PARAMS@{P384\_PARAMS}}
+\index{P384\_PARAMS@{P384\_PARAMS}!ecdh\_derive\_test.c@{ecdh\_derive\_test.c}}
+\doxysubsubsection{\texorpdfstring{P384\_PARAMS}{P384\_PARAMS}}
+{\footnotesize\ttfamily \label{ecdh__derive__test_8c_a05261f2d5e50655dbbcfd24dd2e1ee06} 
+\mbox{\hyperlink{pkcs11_8h_a51e605f881c86838bf12d70707b57b85}{CK\+\_\+\+BYTE}} P384\+\_\+\+PARAMS\mbox{[}$\,$\mbox{]} = \{0x06, 0x05, 0x2b, 0x81, 0x04, 0x00, 0x22\}}
+
+
+
+Definition at line \mbox{\hyperlink{ecdh__derive__test_8c_source_l00041}{41}} of file \mbox{\hyperlink{ecdh__derive__test_8c_source}{ecdh\+\_\+derive\+\_\+test.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00041\ \{0x06,\ 0x05,\ 0x2b,\ 0x81,\ 0x04,\ 0x00,\ 0x22\};}
+
+\end{DoxyCode}
+\Hypertarget{ecdh__derive__test_8c_a7e4dd62d7b81a660d16034dcb1b8b14c}\index{ecdh\_derive\_test.c@{ecdh\_derive\_test.c}!P521\_PARAMS@{P521\_PARAMS}}
+\index{P521\_PARAMS@{P521\_PARAMS}!ecdh\_derive\_test.c@{ecdh\_derive\_test.c}}
+\doxysubsubsection{\texorpdfstring{P521\_PARAMS}{P521\_PARAMS}}
+{\footnotesize\ttfamily \label{ecdh__derive__test_8c_a7e4dd62d7b81a660d16034dcb1b8b14c} 
+\mbox{\hyperlink{pkcs11_8h_a51e605f881c86838bf12d70707b57b85}{CK\+\_\+\+BYTE}} P521\+\_\+\+PARAMS\mbox{[}$\,$\mbox{]} = \{0x06, 0x05, 0x2b, 0x81, 0x04, 0x00, 0x23\}}
+
+
+
+Definition at line \mbox{\hyperlink{ecdh__derive__test_8c_source_l00042}{42}} of file \mbox{\hyperlink{ecdh__derive__test_8c_source}{ecdh\+\_\+derive\+\_\+test.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00042\ \{0x06,\ 0x05,\ 0x2b,\ 0x81,\ 0x04,\ 0x00,\ 0x23\};}
+
+\end{DoxyCode}
+\Hypertarget{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}\index{ecdh\_derive\_test.c@{ecdh\_derive\_test.c}!session@{session}}
+\index{session@{session}!ecdh\_derive\_test.c@{ecdh\_derive\_test.c}}
+\doxysubsubsection{\texorpdfstring{session}{session}}
+{\footnotesize\ttfamily \label{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f} 
+c\+\_\+gr\+\_\+out session = NULL}
+
+
+
+Definition at line \mbox{\hyperlink{ecdh__derive__test_8c_source_l00045}{45}} of file \mbox{\hyperlink{ecdh__derive__test_8c_source}{ecdh\+\_\+derive\+\_\+test.\+c}}.
+

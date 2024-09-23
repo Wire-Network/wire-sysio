@@ -1,0 +1,136 @@
+\doxysection{fc\+::detail\+::rate\+\_\+limited\+\_\+operation Class Reference}
+\hypertarget{classfc_1_1detail_1_1rate__limited__operation}{}\label{classfc_1_1detail_1_1rate__limited__operation}\index{fc::detail::rate\_limited\_operation@{fc::detail::rate\_limited\_operation}}
+
+
+Inheritance diagram for fc\+::detail\+::rate\+\_\+limited\+\_\+operation\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=336pt]{classfc_1_1detail_1_1rate__limited__operation__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for fc\+::detail\+::rate\+\_\+limited\+\_\+operation\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=207pt]{classfc_1_1detail_1_1rate__limited__operation__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_aa04333ce2124f5041df4d4c29edf6c43}{rate\+\_\+limited\+\_\+operation}} (size\+\_\+t \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ae8457a63170710103e077ec951c26564}{length}}, size\+\_\+t \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_a6ba877d2a0fdcb8b029af48feb07421f}{offset}}, promise$<$ size\+\_\+t $>$\+::ptr \&\&\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ac8b6e31c5908b626e58252fe8048f8b9}{completion\+\_\+promise}})
+\item 
+virtual void \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_a7090878b9387f70e1718021b5fc596cb}{perform\+\_\+operation}} ()=0
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+size\+\_\+t \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ae8457a63170710103e077ec951c26564}{length}}
+\item 
+size\+\_\+t \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_a6ba877d2a0fdcb8b029af48feb07421f}{offset}}
+\item 
+size\+\_\+t \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ae0ebd3357543b80e348bf68b75b796ad}{permitted\+\_\+length}}
+\item 
+promise$<$ size\+\_\+t $>$\+::ptr \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ac8b6e31c5908b626e58252fe8048f8b9}{completion\+\_\+promise}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00020}{20}} of file \mbox{\hyperlink{rate__limiting_8cpp_source}{rate\+\_\+limiting.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1detail_1_1rate__limited__operation_aa04333ce2124f5041df4d4c29edf6c43}\index{fc::detail::rate\_limited\_operation@{fc::detail::rate\_limited\_operation}!rate\_limited\_operation@{rate\_limited\_operation}}
+\index{rate\_limited\_operation@{rate\_limited\_operation}!fc::detail::rate\_limited\_operation@{fc::detail::rate\_limited\_operation}}
+\doxysubsubsection{\texorpdfstring{rate\_limited\_operation()}{rate\_limited\_operation()}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1rate__limited__operation_aa04333ce2124f5041df4d4c29edf6c43} 
+fc\+::detail\+::rate\+\_\+limited\+\_\+operation\+::rate\+\_\+limited\+\_\+operation (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{length}{, }\item[{size\+\_\+t}]{offset}{, }\item[{promise$<$ size\+\_\+t $>$\+::ptr \&\&}]{completion\+\_\+promise}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00028}{28}} of file \mbox{\hyperlink{rate__limiting_8cpp_source}{rate\+\_\+limiting.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ae8457a63170710103e077ec951c26564}{length}}(length),}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_a6ba877d2a0fdcb8b029af48feb07421f}{offset}}(\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_a6ba877d2a0fdcb8b029af48feb07421f}{offset}}),}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ae0ebd3357543b80e348bf68b75b796ad}{permitted\_length}}(0),}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ac8b6e31c5908b626e58252fe8048f8b9}{completion\_promise}}(\mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__operation_ac8b6e31c5908b626e58252fe8048f8b9}{completion\_promise}})}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1detail_1_1rate__limited__operation_a7090878b9387f70e1718021b5fc596cb}\index{fc::detail::rate\_limited\_operation@{fc::detail::rate\_limited\_operation}!perform\_operation@{perform\_operation}}
+\index{perform\_operation@{perform\_operation}!fc::detail::rate\_limited\_operation@{fc::detail::rate\_limited\_operation}}
+\doxysubsubsection{\texorpdfstring{perform\_operation()}{perform\_operation()}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1rate__limited__operation_a7090878b9387f70e1718021b5fc596cb} 
+virtual void fc\+::detail\+::rate\+\_\+limited\+\_\+operation\+::perform\+\_\+operation (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__read__operation_a2a3b725337858366df8ba839db3e4b4b}{fc\+::detail\+::rate\+\_\+limited\+\_\+tcp\+\_\+read\+\_\+operation}}, and \mbox{\hyperlink{classfc_1_1detail_1_1rate__limited__tcp__write__operation_a333fa348b1497124ff27733ab0d5e3d8}{fc\+::detail\+::rate\+\_\+limited\+\_\+tcp\+\_\+write\+\_\+operation}}.
+
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1detail_1_1rate__limited__operation_a7090878b9387f70e1718021b5fc596cb_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classfc_1_1detail_1_1rate__limited__operation_ac8b6e31c5908b626e58252fe8048f8b9}\index{fc::detail::rate\_limited\_operation@{fc::detail::rate\_limited\_operation}!completion\_promise@{completion\_promise}}
+\index{completion\_promise@{completion\_promise}!fc::detail::rate\_limited\_operation@{fc::detail::rate\_limited\_operation}}
+\doxysubsubsection{\texorpdfstring{completion\_promise}{completion\_promise}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1rate__limited__operation_ac8b6e31c5908b626e58252fe8048f8b9} 
+promise$<$size\+\_\+t$>$\+::ptr fc\+::detail\+::rate\+\_\+limited\+\_\+operation\+::completion\+\_\+promise}
+
+
+
+Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00026}{26}} of file \mbox{\hyperlink{rate__limiting_8cpp_source}{rate\+\_\+limiting.\+cpp}}.
+
+\Hypertarget{classfc_1_1detail_1_1rate__limited__operation_ae8457a63170710103e077ec951c26564}\index{fc::detail::rate\_limited\_operation@{fc::detail::rate\_limited\_operation}!length@{length}}
+\index{length@{length}!fc::detail::rate\_limited\_operation@{fc::detail::rate\_limited\_operation}}
+\doxysubsubsection{\texorpdfstring{length}{length}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1rate__limited__operation_ae8457a63170710103e077ec951c26564} 
+size\+\_\+t fc\+::detail\+::rate\+\_\+limited\+\_\+operation\+::length}
+
+
+
+Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00023}{23}} of file \mbox{\hyperlink{rate__limiting_8cpp_source}{rate\+\_\+limiting.\+cpp}}.
+
+\Hypertarget{classfc_1_1detail_1_1rate__limited__operation_a6ba877d2a0fdcb8b029af48feb07421f}\index{fc::detail::rate\_limited\_operation@{fc::detail::rate\_limited\_operation}!offset@{offset}}
+\index{offset@{offset}!fc::detail::rate\_limited\_operation@{fc::detail::rate\_limited\_operation}}
+\doxysubsubsection{\texorpdfstring{offset}{offset}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1rate__limited__operation_a6ba877d2a0fdcb8b029af48feb07421f} 
+size\+\_\+t fc\+::detail\+::rate\+\_\+limited\+\_\+operation\+::offset}
+
+
+
+Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00024}{24}} of file \mbox{\hyperlink{rate__limiting_8cpp_source}{rate\+\_\+limiting.\+cpp}}.
+
+\Hypertarget{classfc_1_1detail_1_1rate__limited__operation_ae0ebd3357543b80e348bf68b75b796ad}\index{fc::detail::rate\_limited\_operation@{fc::detail::rate\_limited\_operation}!permitted\_length@{permitted\_length}}
+\index{permitted\_length@{permitted\_length}!fc::detail::rate\_limited\_operation@{fc::detail::rate\_limited\_operation}}
+\doxysubsubsection{\texorpdfstring{permitted\_length}{permitted\_length}}
+{\footnotesize\ttfamily \label{classfc_1_1detail_1_1rate__limited__operation_ae0ebd3357543b80e348bf68b75b796ad} 
+size\+\_\+t fc\+::detail\+::rate\+\_\+limited\+\_\+operation\+::permitted\+\_\+length}
+
+
+
+Definition at line \mbox{\hyperlink{rate__limiting_8cpp_source_l00025}{25}} of file \mbox{\hyperlink{rate__limiting_8cpp_source}{rate\+\_\+limiting.\+cpp}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/src/network/\mbox{\hyperlink{rate__limiting_8cpp}{rate\+\_\+limiting.\+cpp}}\end{DoxyCompactItemize}

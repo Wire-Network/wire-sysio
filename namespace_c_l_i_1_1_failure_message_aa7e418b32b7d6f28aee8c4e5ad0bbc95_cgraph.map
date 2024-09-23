@@ -1,0 +1,5 @@
+<map id="CLI::FailureMessage::help" name="CLI::FailureMessage::help">
+<area shape="rect" id="Node000001" title="Printout the full help string on error (if this fn is set, the old default for CLI11)" alt="" coords="5,5,148,46"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_error.html#a725f16d721c2320ba75b4d6c99d2056a" title=" " alt="" coords="196,13,339,38"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="148,23,180,23,180,28,148,28"/>
+</map>

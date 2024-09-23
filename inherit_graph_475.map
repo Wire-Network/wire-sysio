@@ -1,0 +1,47 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" title=" " alt="" coords="506,5,671,31"/>
+<area shape="rect" id="Node000001" href="$class_test_listener.html" title=" " alt="" coords="736,189,829,215"/>
+<area shape="poly" id="edge316_Node000000_Node000001" title=" " alt="" coords="684,36,690,40,725,76,751,117,769,158,780,188,775,190,764,160,746,120,721,79,687,44,681,41"/>
+<area shape="rect" id="Node000005" href="$struct_catch_1_1_i_streaming_reporter.html" title=" " alt="" coords="5,373,183,399"/>
+<area shape="rect" id="Node000006" href="$struct_catch_1_1_cumulative_reporter_base.html" title=" " alt="" coords="246,39,426,80"/>
+<area shape="poly" id="edge317_Node000005_Node000006" title=" " alt="" coords="98,357,112,301,137,230,175,156,200,121,229,91,247,78,250,83,232,95,204,125,179,158,142,232,117,303,103,359"/>
+<area shape="rect" id="Node000008" href="$struct_catch_1_1_streaming_reporter_base.html" title=" " alt="" coords="244,104,428,145"/>
+<area shape="poly" id="edge319_Node000005_Node000008" title=" " alt="" coords="102,358,119,314,146,260,182,204,204,179,229,156,249,143,252,148,232,160,208,182,187,207,150,262,124,316,107,360"/>
+<area shape="rect" id="Node000010" href="$struct_catch_1_1_streaming_reporter_base.html" title=" " alt="" coords="247,170,425,210"/>
+<area shape="poly" id="edge321_Node000005_Node000010" title=" " alt="" coords="108,358,156,290,190,253,229,221,252,209,255,213,232,226,194,257,161,294,113,362"/>
+<area shape="rect" id="Node000012" href="$struct_catch_1_1_streaming_reporter_base.html" title=" " alt="" coords="249,235,422,276"/>
+<area shape="poly" id="edge323_Node000005_Node000012" title=" " alt="" coords="120,361,169,323,229,286,259,274,261,279,232,291,172,328,124,365"/>
+<area shape="rect" id="Node000014" href="$struct_catch_1_1_streaming_reporter_base.html" title=" " alt="" coords="249,300,422,341"/>
+<area shape="poly" id="edge325_Node000005_Node000014" title=" " alt="" coords="158,366,257,339,259,344,160,371"/>
+<area shape="rect" id="Node000016" href="$struct_catch_1_1_streaming_reporter_base.html" title=" " alt="" coords="245,366,426,406"/>
+<area shape="poly" id="edge327_Node000005_Node000016" title=" " alt="" coords="198,384,245,384,245,389,198,389"/>
+<area shape="rect" id="Node000004" href="$struct_catch_1_1_streaming_reporter_base.html" title=" " alt="" coords="231,431,441,472"/>
+<area shape="poly" id="edge329_Node000005_Node000004" title=" " alt="" coords="160,401,259,428,257,433,158,406"/>
+<area shape="rect" id="Node000018" href="$struct_catch_1_1_streaming_reporter_base.html" title=" " alt="" coords="249,496,422,537"/>
+<area shape="poly" id="edge333_Node000005_Node000018" title=" " alt="" coords="124,407,172,445,232,481,261,493,259,498,229,486,169,449,120,411"/>
+<area shape="rect" id="Node000020" href="$struct_catch_1_1_cumulative_reporter_base.html" title=" " alt="" coords="246,562,426,602"/>
+<area shape="poly" id="edge335_Node000005_Node000020" title=" " alt="" coords="113,411,161,479,194,515,232,547,255,559,252,564,229,551,190,519,156,482,108,414"/>
+<area shape="rect" id="Node000021" href="$class_catch_1_1_listening_reporter.html" title=" " alt="" coords="253,627,419,652"/>
+<area shape="poly" id="edge336_Node000005_Node000021" title=" " alt="" coords="106,413,123,457,149,511,186,566,208,591,232,612,254,624,251,628,229,616,204,595,181,569,145,514,118,459,101,415"/>
+<area shape="rect" id="Node000022" href="$struct_catch_1_1_streaming_reporter_base.html" title=" " alt="" coords="249,676,422,717"/>
+<area shape="poly" id="edge337_Node000005_Node000022" title=" " alt="" coords="104,414,118,467,143,534,181,603,205,635,232,663,250,675,247,679,229,667,201,638,176,606,138,536,113,468,99,415"/>
+<area shape="rect" id="Node000007" href="$class_catch_1_1_junit_reporter.html" title=" " alt="" coords="518,55,660,80"/>
+<area shape="poly" id="edge318_Node000006_Node000007" title=" " alt="" coords="442,60,517,63,517,68,442,66"/>
+<area shape="rect" id="Node000009" href="$struct_catch_1_1_automake_reporter.html" title=" " alt="" coords="502,112,675,138"/>
+<area shape="poly" id="edge320_Node000008_Node000009" title=" " alt="" coords="443,122,502,122,502,128,443,128"/>
+<area shape="rect" id="Node000011" href="$struct_catch_1_1_compact_reporter.html" title=" " alt="" coords="505,177,672,203"/>
+<area shape="poly" id="edge322_Node000010_Node000011" title=" " alt="" coords="441,188,505,188,505,193,441,193"/>
+<area shape="rect" id="Node000013" href="$struct_catch_1_1_console_reporter.html" title=" " alt="" coords="508,243,670,268"/>
+<area shape="poly" id="edge324_Node000012_Node000013" title=" " alt="" coords="438,253,507,253,507,258,438,258"/>
+<area shape="rect" id="Node000015" href="$struct_catch_1_1_t_a_p_reporter.html" title=" " alt="" coords="519,308,658,334"/>
+<area shape="poly" id="edge326_Node000014_Node000015" title=" " alt="" coords="438,318,519,318,519,324,438,324"/>
+<area shape="rect" id="Node000017" href="$struct_catch_1_1_team_city_reporter.html" title=" " alt="" coords="504,373,674,399"/>
+<area shape="poly" id="edge328_Node000016_Node000017" title=" " alt="" coords="442,384,503,384,503,389,442,389"/>
+<area shape="rect" id="Node000002" href="$struct_catch_1_1_test_event_listener_base.html" title=" " alt="" coords="489,431,688,456"/>
+<area shape="poly" id="edge330_Node000004_Node000002" title=" " alt="" coords="456,445,488,444,489,449,457,450"/>
+<area shape="poly" id="edge332_Node000002_Node000001" title=" " alt="" coords="669,422,687,409,708,387,725,361,752,306,768,253,776,215,782,216,773,255,757,308,730,364,712,390,690,414,672,426"/>
+<area shape="rect" id="Node000003" href="$struct_my_listener.html" title=" " alt="" coords="740,431,825,456"/>
+<area shape="poly" id="edge331_Node000002_Node000003" title=" " alt="" coords="704,441,740,441,740,446,704,446"/>
+<area shape="rect" id="Node000019" href="$class_catch_1_1_xml_reporter.html" title=" " alt="" coords="520,504,657,530"/>
+<area shape="poly" id="edge334_Node000018_Node000019" title=" " alt="" coords="438,514,519,514,519,520,438,520"/>
+</map>

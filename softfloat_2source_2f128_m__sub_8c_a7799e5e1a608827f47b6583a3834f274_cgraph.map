@@ -1,0 +1,31 @@
+<map id="f128M_sub" name="f128M_sub">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,135,91,160"/>
+<area shape="rect" id="Node000002" href="$sys-vm_2external_2softfloat_2source_2s__add_f128_m_8c.html#ae9683676598f790f2788f368879dd1f4" title=" " alt="" coords="139,135,275,160"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="91,145,123,145,123,150,91,150"/>
+<area shape="rect" id="Node000003" href="$sys-vm_2external_2softfloat_2source_2s__add_carry_m_8c.html#a809b9a8162426c1ca4462a60fa19f1be" title=" " alt="" coords="352,5,491,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="217,132,259,87,289,61,322,40,336,33,339,38,324,44,292,66,263,91,221,136"/>
+<area shape="rect" id="Node000004" href="$sys-vm_2external_2softfloat_2source_2s__add_compl_carry_m_8c.html#a8f81c1c9359722fcd15e3b53151e9099" title=" " alt="" coords="333,55,510,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="238,132,322,97,362,83,363,88,324,102,240,136"/>
+<area shape="rect" id="Node000005" href="$sys-vm_2external_2softfloat_2source_2s__invalid_f128_m_8c.html#a70d737f0849838fad9c8aa4ce4b8d629" title=" " alt="" coords="593,216,746,242"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="229,159,271,183,324,205,389,219,456,227,578,231,578,236,455,232,388,224,322,210,269,188,226,163"/>
+<area shape="rect" id="Node000007" href="$sys-vm_2external_2softfloat_2source_2s__norm_round_pack_m_to_f128_m_8c.html#a10d3b2f6d92806d8e7353b9688ecce82" title=" " alt="" coords="323,155,520,196"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="276,154,308,158,307,163,275,159"/>
+<area shape="rect" id="Node000008" href="$sys-vm_2external_2softfloat_2source_2s__round_pack_m_to_f128_m_8c.html#a98bd08f824cb039c0488ad93ca6b5d17" title=" " alt="" coords="568,163,771,188"/>
+<area shape="poly" id="edge10_Node000002_Node000008" title=" " alt="" coords="275,142,323,141,422,137,465,137,521,141,604,156,604,161,520,146,465,142,422,142,323,146,276,147"/>
+<area shape="rect" id="Node000010" href="$sys-vm_2external_2softfloat_2source_2s__try_propagate_na_n_f128_m_8c.html#abeccac6ac029cf15470d8b565f757bc4" title=" " alt="" coords="338,270,505,310"/>
+<area shape="poly" id="edge11_Node000002_Node000010" title=" " alt="" coords="222,159,265,203,293,227,324,249,346,261,343,266,322,254,290,231,261,206,218,163"/>
+<area shape="rect" id="Node000006" href="$softfloat_2source_28086-_s_s_e_2softfloat__raise_flags_8c.html#ac16bbf09eca0fe8ff91301d82c5a667f" title=" " alt="" coords="830,216,965,242"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="746,226,814,226,814,232,746,232"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="521,173,553,173,553,178,521,178"/>
+<area shape="poly" id="edge9_Node000008_Node000006" title=" " alt="" coords="728,186,825,209,824,214,727,192"/>
+<area shape="rect" id="Node000009" href="$sys-vm_2external_2softfloat_2source_2s__compare128_m_8c.html#a16a509bdb461e25d475f665cdd8e3c93" title=" " alt="" coords="819,163,976,188"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="771,173,803,173,803,178,771,178"/>
+<area shape="rect" id="Node000011" href="$sys-vm_2external_2softfloat_2source_2s__is_na_n_f128_m_8c.html#a4bf25f16220253df375ce35a1f49cddb" title=" " alt="" coords="821,315,974,340"/>
+<area shape="poly" id="edge12_Node000010_Node000011" title=" " alt="" coords="505,295,569,301,806,319,806,324,568,306,505,301"/>
+<area shape="rect" id="Node000012" href="$softfloat_2source_28086-_s_s_e_2s__propagate_na_n_f128_m_8c.html#a04b5d25277cae924dd506c491f0af1ec" title=" " alt="" coords="570,265,769,291"/>
+<area shape="poly" id="edge13_Node000010_Node000012" title=" " alt="" coords="505,283,554,281,555,286,505,289"/>
+<area shape="poly" id="edge16_Node000012_Node000006" title=" " alt="" coords="732,262,819,243,820,248,733,267"/>
+<area shape="poly" id="edge15_Node000012_Node000011" title=" " alt="" coords="733,289,820,308,819,313,732,294"/>
+<area shape="rect" id="Node000013" href="$softfloat_2source_28086-_s_s_e_2f128_m__is_signaling_na_n_8c.html#a641033e2d5605286e9cdd3e0bf651cb9" title=" " alt="" coords="820,265,974,291"/>
+<area shape="poly" id="edge14_Node000012_Node000013" title=" " alt="" coords="770,276,805,276,805,281,770,281"/>
+</map>

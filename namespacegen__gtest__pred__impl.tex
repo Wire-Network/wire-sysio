@@ -1,0 +1,1130 @@
+\doxysection{gen\+\_\+gtest\+\_\+pred\+\_\+impl Namespace Reference}
+\hypertarget{namespacegen__gtest__pred__impl}{}\label{namespacegen__gtest__pred__impl}\index{gen\_gtest\_pred\_impl@{gen\_gtest\_pred\_impl}}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacegen__gtest__pred__impl_a26a617172bc7412012c5a6e7574baaab}{Header\+Preamble}} (n)
+\item 
+\mbox{\hyperlink{namespacegen__gtest__pred__impl_aaa26f18fffb078c09bb5a2009b7e088a}{Arity}} (n)
+\item 
+\mbox{\hyperlink{namespacegen__gtest__pred__impl_a69f1f79fdb0720b4ebe3b30e2f19608a}{Title}} (word)
+\item 
+\mbox{\hyperlink{namespacegen__gtest__pred__impl_ae5bdeaf46789198017dd17875da8b2fe}{One\+To}} (n)
+\item 
+\mbox{\hyperlink{namespacegen__gtest__pred__impl_a620e5c968b63ea75d4c278eee04de8ad}{Iter}} (n, \mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}}, sep=\textquotesingle{}\textquotesingle{})
+\item 
+\mbox{\hyperlink{namespacegen__gtest__pred__impl_a59c2ac0f700b0bdcb36171e53004dd6c}{Implementation\+For\+Arity}} (n)
+\item 
+\mbox{\hyperlink{namespacegen__gtest__pred__impl_ae30b42a0decd3177dc0a76c9a4de3b9d}{Header\+Postamble}} ()
+\item 
+\mbox{\hyperlink{namespacegen__gtest__pred__impl_a335f5aafc7f7c967723f20da7bd752ba}{Generate\+File}} (path, content)
+\item 
+\mbox{\hyperlink{namespacegen__gtest__pred__impl_a07e481d5eb0906b378f4a82d48431558}{Generate\+Header}} (n)
+\item 
+\mbox{\hyperlink{namespacegen__gtest__pred__impl_a9e8ac01c257544c4d497ec7e01e9c971}{Unit\+Test\+Preamble}} ()
+\item 
+\mbox{\hyperlink{namespacegen__gtest__pred__impl_a73c83807b2eb6a42a647488730c71aea}{Tests\+For\+Arity}} (n)
+\item 
+\mbox{\hyperlink{namespacegen__gtest__pred__impl_a6766ef4e3c9e872a48a3815f8290db0e}{Unit\+Test\+Postamble}} ()
+\item 
+\mbox{\hyperlink{namespacegen__gtest__pred__impl_a6e715890b6a133ff193e9449e05e3625}{Generate\+Unit\+Test}} (n)
+\item 
+\mbox{\hyperlink{namespacegen__gtest__pred__impl_abc033bc5a5865ac655bf60afba95a270}{\+\_\+\+Main}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacegen__gtest__pred__impl_aed087c7fc787a064f0a9fd5f5f9f6487}{SCRIPT\+\_\+\+DIR}} = os.\+path.\+dirname(sys.\+argv\mbox{[}0\mbox{]})
+\item 
+\mbox{\hyperlink{namespacegen__gtest__pred__impl_ab96c63705e2cb7619876ba592dab4c8e}{HEADER}} = os.\+path.\+join(\mbox{\hyperlink{namespacegen__gtest__pred__impl_aed087c7fc787a064f0a9fd5f5f9f6487}{SCRIPT\+\_\+\+DIR}}, \textquotesingle{}../include/gtest/gtest\+\_\+pred\+\_\+impl.\+h\textquotesingle{})
+\item 
+\mbox{\hyperlink{namespacegen__gtest__pred__impl_a8c1cb8e87c4bd84edbb958f73b7df200}{UNIT\+\_\+\+TEST}} = os.\+path.\+join(\mbox{\hyperlink{namespacegen__gtest__pred__impl_aed087c7fc787a064f0a9fd5f5f9f6487}{SCRIPT\+\_\+\+DIR}}, \textquotesingle{}../test/gtest\+\_\+pred\+\_\+impl\+\_\+unittest.\+cc\textquotesingle{})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\begin{DoxyVerb}gen_gtest_pred_impl.py v0.1
+
+Generates the implementation of Google Test predicate assertions and
+accompanying tests.
+
+Usage:
+
+  gen_gtest_pred_impl.py MAX_ARITY
+
+where MAX_ARITY is a positive integer.
+
+The command generates the implementation of up-to MAX_ARITY-ary
+predicate assertions, and writes it to file gtest_pred_impl.h in the
+directory where the script is.  It also generates the accompanying
+unit test in file gtest_pred_impl_unittest.cc.
+\end{DoxyVerb}
+ 
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacegen__gtest__pred__impl_abc033bc5a5865ac655bf60afba95a270}\index{gen\_gtest\_pred\_impl@{gen\_gtest\_pred\_impl}!\_Main@{\_Main}}
+\index{\_Main@{\_Main}!gen\_gtest\_pred\_impl@{gen\_gtest\_pred\_impl}}
+\doxysubsubsection{\texorpdfstring{\_Main()}{\_Main()}}
+{\footnotesize\ttfamily \label{namespacegen__gtest__pred__impl_abc033bc5a5865ac655bf60afba95a270} 
+gen\+\_\+gtest\+\_\+pred\+\_\+impl.\+\_\+\+Main (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+\begin{DoxyVerb}The entry point of the script.  Generates the header file and its
+unit test.\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{gen__gtest__pred__impl_8py_source_l00715}{715}} of file \mbox{\hyperlink{gen__gtest__pred__impl_8py_source}{gen\+\_\+gtest\+\_\+pred\+\_\+impl.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00715\ \textcolor{keyword}{def\ }\_Main():}
+\DoxyCodeLine{00716\ \ \ \textcolor{stringliteral}{"{}"{}"{}The\ entry\ point\ of\ the\ script.\ \ Generates\ the\ header\ file\ and\ its}}
+\DoxyCodeLine{00717\ \textcolor{stringliteral}{\ \ unit\ test."{}"{}"{}}}
+\DoxyCodeLine{00718\ }
+\DoxyCodeLine{00719\ \ \ \textcolor{keywordflow}{if}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}(sys.argv)\ !=\ 2:}
+\DoxyCodeLine{00720\ \ \ \ \ \textcolor{keywordflow}{print}\ \_\_doc\_\_}
+\DoxyCodeLine{00721\ \ \ \ \ \textcolor{keywordflow}{print}\ \textcolor{stringliteral}{'Author:\ '}\ +\ \_\_author\_\_}
+\DoxyCodeLine{00722\ \ \ \ \ sys.exit(1)}
+\DoxyCodeLine{00723\ }
+\DoxyCodeLine{00724\ \ \ n\ =\ int(sys.argv[1])}
+\DoxyCodeLine{00725\ \ \ GenerateHeader(n)}
+\DoxyCodeLine{00726\ \ \ GenerateUnitTest(n)}
+\DoxyCodeLine{00727\ }
+\DoxyCodeLine{00728\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacegen__gtest__pred__impl_abc033bc5a5865ac655bf60afba95a270_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=215pt]{namespacegen__gtest__pred__impl_abc033bc5a5865ac655bf60afba95a270_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacegen__gtest__pred__impl_aaa26f18fffb078c09bb5a2009b7e088a}\index{gen\_gtest\_pred\_impl@{gen\_gtest\_pred\_impl}!Arity@{Arity}}
+\index{Arity@{Arity}!gen\_gtest\_pred\_impl@{gen\_gtest\_pred\_impl}}
+\doxysubsubsection{\texorpdfstring{Arity()}{Arity()}}
+{\footnotesize\ttfamily \label{namespacegen__gtest__pred__impl_aaa26f18fffb078c09bb5a2009b7e088a} 
+gen\+\_\+gtest\+\_\+pred\+\_\+impl.\+Arity (\begin{DoxyParamCaption}\item[{}]{n}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Returns the English name of the given arity.\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{gen__gtest__pred__impl_8py_source_l00163}{163}} of file \mbox{\hyperlink{gen__gtest__pred__impl_8py_source}{gen\+\_\+gtest\+\_\+pred\+\_\+impl.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00163\ \textcolor{keyword}{def\ }Arity(n):}
+\DoxyCodeLine{00164\ \ \ \textcolor{stringliteral}{"{}"{}"{}Returns\ the\ English\ name\ of\ the\ given\ arity."{}"{}"{}}}
+\DoxyCodeLine{00165\ }
+\DoxyCodeLine{00166\ \ \ \textcolor{keywordflow}{if}\ n\ <\ 0:}
+\DoxyCodeLine{00167\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keywordtype}{None}}
+\DoxyCodeLine{00168\ \ \ \textcolor{keywordflow}{elif}\ n\ <=\ 3:}
+\DoxyCodeLine{00169\ \ \ \ \ \textcolor{keywordflow}{return}\ [\textcolor{stringliteral}{'nullary'},\ \textcolor{stringliteral}{'unary'},\ \textcolor{stringliteral}{'binary'},\ \textcolor{stringliteral}{'ternary'}][n]}
+\DoxyCodeLine{00170\ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{00171\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{'\%s-\/ary'}\ \%\ n}
+\DoxyCodeLine{00172\ }
+\DoxyCodeLine{00173\ }
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacegen__gtest__pred__impl_aaa26f18fffb078c09bb5a2009b7e088a_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacegen__gtest__pred__impl_a335f5aafc7f7c967723f20da7bd752ba}\index{gen\_gtest\_pred\_impl@{gen\_gtest\_pred\_impl}!GenerateFile@{GenerateFile}}
+\index{GenerateFile@{GenerateFile}!gen\_gtest\_pred\_impl@{gen\_gtest\_pred\_impl}}
+\doxysubsubsection{\texorpdfstring{GenerateFile()}{GenerateFile()}}
+{\footnotesize\ttfamily \label{namespacegen__gtest__pred__impl_a335f5aafc7f7c967723f20da7bd752ba} 
+gen\+\_\+gtest\+\_\+pred\+\_\+impl.\+Generate\+File (\begin{DoxyParamCaption}\item[{}]{path}{, }\item[{}]{content}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Given a file path and a content string
+   overwrites it with the given content.
+\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{gen__gtest__pred__impl_8py_source_l00303}{303}} of file \mbox{\hyperlink{gen__gtest__pred__impl_8py_source}{gen\+\_\+gtest\+\_\+pred\+\_\+impl.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00303\ \textcolor{keyword}{def\ }GenerateFile(path,\ content):}
+\DoxyCodeLine{00304\ \ \ \textcolor{stringliteral}{"{}"{}"{}Given\ a\ file\ path\ and\ a\ content\ string}}
+\DoxyCodeLine{00305\ \textcolor{stringliteral}{\ \ \ \ \ overwrites\ it\ with\ the\ given\ content.}}
+\DoxyCodeLine{00306\ \textcolor{stringliteral}{\ \ "{}"{}"{}}}
+\DoxyCodeLine{00307\ \ \ \textcolor{keywordflow}{print}\ \textcolor{stringliteral}{'Updating\ file\ \%s\ .\ .\ .'}\ \%\ path}
+\DoxyCodeLine{00308\ \ \ f\ =\ file(path,\ \textcolor{stringliteral}{'w+'})}
+\DoxyCodeLine{00309\ \ \ \textcolor{keywordflow}{print}\ >>f,\ content,}
+\DoxyCodeLine{00310\ \ \ f.close()}
+\DoxyCodeLine{00311\ }
+\DoxyCodeLine{00312\ \ \ \textcolor{keywordflow}{print}\ \textcolor{stringliteral}{'File\ \%s\ has\ been\ updated.'}\ \%\ path}
+\DoxyCodeLine{00313\ }
+\DoxyCodeLine{00314\ }
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacegen__gtest__pred__impl_a335f5aafc7f7c967723f20da7bd752ba_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacegen__gtest__pred__impl_a07e481d5eb0906b378f4a82d48431558}\index{gen\_gtest\_pred\_impl@{gen\_gtest\_pred\_impl}!GenerateHeader@{GenerateHeader}}
+\index{GenerateHeader@{GenerateHeader}!gen\_gtest\_pred\_impl@{gen\_gtest\_pred\_impl}}
+\doxysubsubsection{\texorpdfstring{GenerateHeader()}{GenerateHeader()}}
+{\footnotesize\ttfamily \label{namespacegen__gtest__pred__impl_a07e481d5eb0906b378f4a82d48431558} 
+gen\+\_\+gtest\+\_\+pred\+\_\+impl.\+Generate\+Header (\begin{DoxyParamCaption}\item[{}]{n}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Given the maximum arity n, updates the header file that implements
+the predicate assertions.
+\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{gen__gtest__pred__impl_8py_source_l00315}{315}} of file \mbox{\hyperlink{gen__gtest__pred__impl_8py_source}{gen\+\_\+gtest\+\_\+pred\+\_\+impl.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00315\ \textcolor{keyword}{def\ }GenerateHeader(n):}
+\DoxyCodeLine{00316\ \ \ \textcolor{stringliteral}{"{}"{}"{}Given\ the\ maximum\ arity\ n,\ updates\ the\ header\ file\ that\ implements}}
+\DoxyCodeLine{00317\ \textcolor{stringliteral}{\ \ the\ predicate\ assertions.}}
+\DoxyCodeLine{00318\ \textcolor{stringliteral}{\ \ "{}"{}"{}}}
+\DoxyCodeLine{00319\ \ \ GenerateFile(HEADER,}
+\DoxyCodeLine{00320\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ HeaderPreamble(n)}
+\DoxyCodeLine{00321\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ +\ \textcolor{stringliteral}{''}.join([ImplementationForArity(i)\ \textcolor{keywordflow}{for}\ i\ \textcolor{keywordflow}{in}\ OneTo(n)])}
+\DoxyCodeLine{00322\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ +\ HeaderPostamble())}
+\DoxyCodeLine{00323\ }
+\DoxyCodeLine{00324\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacegen__gtest__pred__impl_a07e481d5eb0906b378f4a82d48431558_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacegen__gtest__pred__impl_a07e481d5eb0906b378f4a82d48431558_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacegen__gtest__pred__impl_a6e715890b6a133ff193e9449e05e3625}\index{gen\_gtest\_pred\_impl@{gen\_gtest\_pred\_impl}!GenerateUnitTest@{GenerateUnitTest}}
+\index{GenerateUnitTest@{GenerateUnitTest}!gen\_gtest\_pred\_impl@{gen\_gtest\_pred\_impl}}
+\doxysubsubsection{\texorpdfstring{GenerateUnitTest()}{GenerateUnitTest()}}
+{\footnotesize\ttfamily \label{namespacegen__gtest__pred__impl_a6e715890b6a133ff193e9449e05e3625} 
+gen\+\_\+gtest\+\_\+pred\+\_\+impl.\+Generate\+Unit\+Test (\begin{DoxyParamCaption}\item[{}]{n}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Returns the tests for up-to n-ary predicate assertions.\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{gen__gtest__pred__impl_8py_source_l00706}{706}} of file \mbox{\hyperlink{gen__gtest__pred__impl_8py_source}{gen\+\_\+gtest\+\_\+pred\+\_\+impl.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00706\ \textcolor{keyword}{def\ }GenerateUnitTest(n):}
+\DoxyCodeLine{00707\ \ \ \textcolor{stringliteral}{"{}"{}"{}Returns\ the\ tests\ for\ up-\/to\ n-\/ary\ predicate\ assertions."{}"{}"{}}}
+\DoxyCodeLine{00708\ }
+\DoxyCodeLine{00709\ \ \ GenerateFile(UNIT\_TEST,}
+\DoxyCodeLine{00710\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ UnitTestPreamble()}
+\DoxyCodeLine{00711\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ +\ \textcolor{stringliteral}{''}.join([TestsForArity(i)\ \textcolor{keywordflow}{for}\ i\ \textcolor{keywordflow}{in}\ OneTo(n)])}
+\DoxyCodeLine{00712\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ +\ UnitTestPostamble())}
+\DoxyCodeLine{00713\ }
+\DoxyCodeLine{00714\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacegen__gtest__pred__impl_a6e715890b6a133ff193e9449e05e3625_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacegen__gtest__pred__impl_a6e715890b6a133ff193e9449e05e3625_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacegen__gtest__pred__impl_ae30b42a0decd3177dc0a76c9a4de3b9d}\index{gen\_gtest\_pred\_impl@{gen\_gtest\_pred\_impl}!HeaderPostamble@{HeaderPostamble}}
+\index{HeaderPostamble@{HeaderPostamble}!gen\_gtest\_pred\_impl@{gen\_gtest\_pred\_impl}}
+\doxysubsubsection{\texorpdfstring{HeaderPostamble()}{HeaderPostamble()}}
+{\footnotesize\ttfamily \label{namespacegen__gtest__pred__impl_ae30b42a0decd3177dc0a76c9a4de3b9d} 
+gen\+\_\+gtest\+\_\+pred\+\_\+impl.\+Header\+Postamble (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Returns the postamble for the header file.\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{gen__gtest__pred__impl_8py_source_l00292}{292}} of file \mbox{\hyperlink{gen__gtest__pred__impl_8py_source}{gen\+\_\+gtest\+\_\+pred\+\_\+impl.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00292\ \textcolor{keyword}{def\ }HeaderPostamble():}
+\DoxyCodeLine{00293\ \ \ \textcolor{stringliteral}{"{}"{}"{}Returns\ the\ postamble\ for\ the\ header\ file."{}"{}"{}}}
+\DoxyCodeLine{00294\ }
+\DoxyCodeLine{00295\ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{00296\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00297\ \textcolor{stringliteral}{\}\ \ //\ namespace\ testing}}
+\DoxyCodeLine{00298\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00299\ \textcolor{stringliteral}{\#endif\ \ //\ GTEST\_INCLUDE\_GTEST\_GTEST\_PRED\_IMPL\_H\_}}
+\DoxyCodeLine{00300\ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{00301\ }
+\DoxyCodeLine{00302\ }
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacegen__gtest__pred__impl_ae30b42a0decd3177dc0a76c9a4de3b9d_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacegen__gtest__pred__impl_a26a617172bc7412012c5a6e7574baaab}\index{gen\_gtest\_pred\_impl@{gen\_gtest\_pred\_impl}!HeaderPreamble@{HeaderPreamble}}
+\index{HeaderPreamble@{HeaderPreamble}!gen\_gtest\_pred\_impl@{gen\_gtest\_pred\_impl}}
+\doxysubsubsection{\texorpdfstring{HeaderPreamble()}{HeaderPreamble()}}
+{\footnotesize\ttfamily \label{namespacegen__gtest__pred__impl_a26a617172bc7412012c5a6e7574baaab} 
+gen\+\_\+gtest\+\_\+pred\+\_\+impl.\+Header\+Preamble (\begin{DoxyParamCaption}\item[{}]{n}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Returns the preamble for the header file.
+
+Args:
+  n:  the maximum arity of the predicate macros to be generated.
+\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{gen__gtest__pred__impl_8py_source_l00065}{65}} of file \mbox{\hyperlink{gen__gtest__pred__impl_8py_source}{gen\+\_\+gtest\+\_\+pred\+\_\+impl.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00065\ \textcolor{keyword}{def\ }HeaderPreamble(n):}
+\DoxyCodeLine{00066\ \ \ \textcolor{stringliteral}{"{}"{}"{}Returns\ the\ preamble\ for\ the\ header\ file.}}
+\DoxyCodeLine{00067\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00068\ \textcolor{stringliteral}{\ \ Args:}}
+\DoxyCodeLine{00069\ \textcolor{stringliteral}{\ \ \ \ n:\ \ the\ maximum\ arity\ of\ the\ predicate\ macros\ to\ be\ generated.}}
+\DoxyCodeLine{00070\ \textcolor{stringliteral}{\ \ "{}"{}"{}}}
+\DoxyCodeLine{00071\ }
+\DoxyCodeLine{00072\ \ \ \textcolor{comment}{\#\ A\ map\ that\ defines\ the\ values\ used\ in\ the\ preamble\ template.}}
+\DoxyCodeLine{00073\ \ \ DEFS\ =\ \{}
+\DoxyCodeLine{00074\ \ \ \ \ \textcolor{stringliteral}{'today'}\ :\ time.strftime(\textcolor{stringliteral}{'\%m/\%d/\%Y'}),}
+\DoxyCodeLine{00075\ \ \ \ \ \textcolor{stringliteral}{'year'}\ :\ time.strftime(\textcolor{stringliteral}{'\%Y'}),}
+\DoxyCodeLine{00076\ \ \ \ \ \textcolor{stringliteral}{'command'}\ :\ \textcolor{stringliteral}{'\%s\ \%s'}\ \%\ (os.path.basename(sys.argv[0]),\ n),}
+\DoxyCodeLine{00077\ \ \ \ \ \textcolor{stringliteral}{'n'}\ :\ n}
+\DoxyCodeLine{00078\ \ \ \ \ \}}
+\DoxyCodeLine{00079\ }
+\DoxyCodeLine{00080\ \ \ \textcolor{keywordflow}{return}\ (}
+\DoxyCodeLine{00081\ \textcolor{stringliteral}{"{}"{}"{}//\ Copyright\ 2006,\ Google\ Inc.}}
+\DoxyCodeLine{00082\ \textcolor{stringliteral}{//\ All\ rights\ reserved.}}
+\DoxyCodeLine{00083\ \textcolor{stringliteral}{//}}
+\DoxyCodeLine{00084\ \textcolor{stringliteral}{//\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{00085\ \textcolor{stringliteral}{//\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are}}
+\DoxyCodeLine{00086\ \textcolor{stringliteral}{//\ met:}}
+\DoxyCodeLine{00087\ \textcolor{stringliteral}{//}}
+\DoxyCodeLine{00088\ \textcolor{stringliteral}{//\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{00089\ \textcolor{stringliteral}{//\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{00090\ \textcolor{stringliteral}{//\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above}}
+\DoxyCodeLine{00091\ \textcolor{stringliteral}{//\ copyright\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer}}
+\DoxyCodeLine{00092\ \textcolor{stringliteral}{//\ in\ the\ documentation\ and/or\ other\ materials\ provided\ with\ the}}
+\DoxyCodeLine{00093\ \textcolor{stringliteral}{//\ distribution.}}
+\DoxyCodeLine{00094\ \textcolor{stringliteral}{//\ \ \ \ \ *\ Neither\ the\ name\ of\ Google\ Inc.\ nor\ the\ names\ of\ its}}
+\DoxyCodeLine{00095\ \textcolor{stringliteral}{//\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products\ derived\ from}}
+\DoxyCodeLine{00096\ \textcolor{stringliteral}{//\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{00097\ \textcolor{stringliteral}{//}}
+\DoxyCodeLine{00098\ \textcolor{stringliteral}{//\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS}}
+\DoxyCodeLine{00099\ \textcolor{stringliteral}{//\ "{}AS\ IS"{}\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{00100\ \textcolor{stringliteral}{//\ LIMITED\ TO,\ THE\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR}}
+\DoxyCodeLine{00101\ \textcolor{stringliteral}{//\ A\ PARTICULAR\ PURPOSE\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ THE\ COPYRIGHT}}
+\DoxyCodeLine{00102\ \textcolor{stringliteral}{//\ OWNER\ OR\ CONTRIBUTORS\ BE\ LIABLE\ FOR\ ANY\ DIRECT,\ INDIRECT,\ INCIDENTAL,}}
+\DoxyCodeLine{00103\ \textcolor{stringliteral}{//\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES\ (INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{00104\ \textcolor{stringliteral}{//\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;\ LOSS\ OF\ USE,}}
+\DoxyCodeLine{00105\ \textcolor{stringliteral}{//\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND\ ON\ ANY}}
+\DoxyCodeLine{00106\ \textcolor{stringliteral}{//\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{00107\ \textcolor{stringliteral}{//\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE}}
+\DoxyCodeLine{00108\ \textcolor{stringliteral}{//\ OF\ THIS\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{00109\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00110\ \textcolor{stringliteral}{//\ This\ file\ is\ AUTOMATICALLY\ GENERATED\ on\ \%(today)s\ by\ command}}
+\DoxyCodeLine{00111\ \textcolor{stringliteral}{//\ '\%(command)s'.\ \ DO\ NOT\ EDIT\ BY\ HAND!}}
+\DoxyCodeLine{00112\ \textcolor{stringliteral}{//}}
+\DoxyCodeLine{00113\ \textcolor{stringliteral}{//\ Implements\ a\ family\ of\ generic\ predicate\ assertion\ macros.}}
+\DoxyCodeLine{00114\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00115\ \textcolor{stringliteral}{\#ifndef\ GTEST\_INCLUDE\_GTEST\_GTEST\_PRED\_IMPL\_H\_}}
+\DoxyCodeLine{00116\ \textcolor{stringliteral}{\#define\ GTEST\_INCLUDE\_GTEST\_GTEST\_PRED\_IMPL\_H\_}}
+\DoxyCodeLine{00117\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00118\ \textcolor{stringliteral}{\#include\ "{}gtest/gtest.h"{}}}
+\DoxyCodeLine{00119\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00120\ \textcolor{stringliteral}{namespace\ testing\ \{}}
+\DoxyCodeLine{00121\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00122\ \textcolor{stringliteral}{//\ This\ header\ implements\ a\ family\ of\ generic\ predicate\ assertion}}
+\DoxyCodeLine{00123\ \textcolor{stringliteral}{//\ macros:}}
+\DoxyCodeLine{00124\ \textcolor{stringliteral}{//}}
+\DoxyCodeLine{00125\ \textcolor{stringliteral}{//\ \ \ ASSERT\_PRED\_FORMAT1(pred\_format,\ v1)}}
+\DoxyCodeLine{00126\ \textcolor{stringliteral}{//\ \ \ ASSERT\_PRED\_FORMAT2(pred\_format,\ v1,\ v2)}}
+\DoxyCodeLine{00127\ \textcolor{stringliteral}{//\ \ \ ...}}
+\DoxyCodeLine{00128\ \textcolor{stringliteral}{//}}
+\DoxyCodeLine{00129\ \textcolor{stringliteral}{//\ where\ pred\_format\ is\ a\ function\ or\ functor\ that\ takes\ n\ (in\ the}}
+\DoxyCodeLine{00130\ \textcolor{stringliteral}{//\ case\ of\ ASSERT\_PRED\_FORMATn)\ values\ and\ their\ source\ expression}}
+\DoxyCodeLine{00131\ \textcolor{stringliteral}{//\ text,\ and\ returns\ a\ testing::AssertionResult.\ \ See\ the\ definition}}
+\DoxyCodeLine{00132\ \textcolor{stringliteral}{//\ of\ ASSERT\_EQ\ in\ gtest.h\ for\ an\ example.}}
+\DoxyCodeLine{00133\ \textcolor{stringliteral}{//}}
+\DoxyCodeLine{00134\ \textcolor{stringliteral}{//\ If\ you\ don't\ care\ about\ formatting,\ you\ can\ use\ the\ more}}
+\DoxyCodeLine{00135\ \textcolor{stringliteral}{//\ restrictive\ version:}}
+\DoxyCodeLine{00136\ \textcolor{stringliteral}{//}}
+\DoxyCodeLine{00137\ \textcolor{stringliteral}{//\ \ \ ASSERT\_PRED1(pred,\ v1)}}
+\DoxyCodeLine{00138\ \textcolor{stringliteral}{//\ \ \ ASSERT\_PRED2(pred,\ v1,\ v2)}}
+\DoxyCodeLine{00139\ \textcolor{stringliteral}{//\ \ \ ...}}
+\DoxyCodeLine{00140\ \textcolor{stringliteral}{//}}
+\DoxyCodeLine{00141\ \textcolor{stringliteral}{//\ where\ pred\ is\ an\ n-\/ary\ function\ or\ functor\ that\ returns\ bool,}}
+\DoxyCodeLine{00142\ \textcolor{stringliteral}{//\ and\ the\ values\ v1,\ v2,\ ...,\ must\ support\ the\ <<\ operator\ for}}
+\DoxyCodeLine{00143\ \textcolor{stringliteral}{//\ streaming\ to\ std::ostream.}}
+\DoxyCodeLine{00144\ \textcolor{stringliteral}{//}}
+\DoxyCodeLine{00145\ \textcolor{stringliteral}{//\ We\ also\ define\ the\ EXPECT\_*\ variations.}}
+\DoxyCodeLine{00146\ \textcolor{stringliteral}{//}}
+\DoxyCodeLine{00147\ \textcolor{stringliteral}{//\ For\ now\ we\ only\ support\ predicates\ whose\ arity\ is\ at\ most\ \%(n)s.}}
+\DoxyCodeLine{00148\ \textcolor{stringliteral}{//\ Please\ email\ googletestframework@googlegroups.com\ if\ you\ need}}
+\DoxyCodeLine{00149\ \textcolor{stringliteral}{//\ support\ for\ higher\ arities.}}
+\DoxyCodeLine{00150\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00151\ \textcolor{stringliteral}{//\ GTEST\_ASSERT\_\ is\ the\ basic\ statement\ to\ which\ all\ of\ the\ assertions}}
+\DoxyCodeLine{00152\ \textcolor{stringliteral}{//\ in\ this\ file\ reduce.\ \ Don't\ use\ this\ in\ your\ code.}}
+\DoxyCodeLine{00153\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00154\ \textcolor{stringliteral}{\#define\ GTEST\_ASSERT\_(expression,\ on\_failure)\ \(\backslash\)\(\backslash\)}}
+\DoxyCodeLine{00155\ \textcolor{stringliteral}{\ \ GTEST\_AMBIGUOUS\_ELSE\_BLOCKER\_\ \(\backslash\)\(\backslash\)}}
+\DoxyCodeLine{00156\ \textcolor{stringliteral}{\ \ if\ (const\ ::testing::AssertionResult\ gtest\_ar\ =\ (expression))\ \(\backslash\)\(\backslash\)}}
+\DoxyCodeLine{00157\ \textcolor{stringliteral}{\ \ \ \ ;\ \(\backslash\)\(\backslash\)}}
+\DoxyCodeLine{00158\ \textcolor{stringliteral}{\ \ else\ \(\backslash\)\(\backslash\)}}
+\DoxyCodeLine{00159\ \textcolor{stringliteral}{\ \ \ \ on\_failure(gtest\_ar.failure\_message())}}
+\DoxyCodeLine{00160\ \textcolor{stringliteral}{"{}"{}"{}}\ \%\ DEFS)}
+\DoxyCodeLine{00161\ }
+\DoxyCodeLine{00162\ }
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacegen__gtest__pred__impl_a26a617172bc7412012c5a6e7574baaab_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacegen__gtest__pred__impl_a59c2ac0f700b0bdcb36171e53004dd6c}\index{gen\_gtest\_pred\_impl@{gen\_gtest\_pred\_impl}!ImplementationForArity@{ImplementationForArity}}
+\index{ImplementationForArity@{ImplementationForArity}!gen\_gtest\_pred\_impl@{gen\_gtest\_pred\_impl}}
+\doxysubsubsection{\texorpdfstring{ImplementationForArity()}{ImplementationForArity()}}
+{\footnotesize\ttfamily \label{namespacegen__gtest__pred__impl_a59c2ac0f700b0bdcb36171e53004dd6c} 
+gen\+\_\+gtest\+\_\+pred\+\_\+impl.\+Implementation\+For\+Arity (\begin{DoxyParamCaption}\item[{}]{n}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Returns the implementation of n-ary predicate assertions.\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{gen__gtest__pred__impl_8py_source_l00204}{204}} of file \mbox{\hyperlink{gen__gtest__pred__impl_8py_source}{gen\+\_\+gtest\+\_\+pred\+\_\+impl.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00204\ \textcolor{keyword}{def\ }ImplementationForArity(n):}
+\DoxyCodeLine{00205\ \ \ \textcolor{stringliteral}{"{}"{}"{}Returns\ the\ implementation\ of\ n-\/ary\ predicate\ assertions."{}"{}"{}}}
+\DoxyCodeLine{00206\ }
+\DoxyCodeLine{00207\ \ \ \textcolor{comment}{\#\ A\ map\ the\ defines\ the\ values\ used\ in\ the\ implementation\ template.}}
+\DoxyCodeLine{00208\ \ \ DEFS\ =\ \{}
+\DoxyCodeLine{00209\ \ \ \ \ \textcolor{stringliteral}{'n'}\ :\ str(n),}
+\DoxyCodeLine{00210\ \ \ \ \ \textcolor{stringliteral}{'vs'}\ :\ Iter(n,\ \textcolor{stringliteral}{'v\%s'},\ sep=\textcolor{stringliteral}{',\ '}),}
+\DoxyCodeLine{00211\ \ \ \ \ \textcolor{stringliteral}{'vts'}\ :\ Iter(n,\ \textcolor{stringliteral}{'\#v\%s'},\ sep=\textcolor{stringliteral}{',\ '}),}
+\DoxyCodeLine{00212\ \ \ \ \ \textcolor{stringliteral}{'arity'}\ :\ Arity(n),}
+\DoxyCodeLine{00213\ \ \ \ \ \textcolor{stringliteral}{'Arity'}\ :\ Title(Arity(n))}
+\DoxyCodeLine{00214\ \ \ \ \ \}}
+\DoxyCodeLine{00215\ }
+\DoxyCodeLine{00216\ \ \ impl\ =\ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{00217\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00218\ \textcolor{stringliteral}{//\ Helper\ function\ for\ implementing\ \{EXPECT|ASSERT\}\_PRED\%(n)s.\ \ Don't\ use}}
+\DoxyCodeLine{00219\ \textcolor{stringliteral}{//\ this\ in\ your\ code.}}
+\DoxyCodeLine{00220\ \textcolor{stringliteral}{template\ <typename\ Pred"{}"{}"{}}\ \%\ DEFS}
+\DoxyCodeLine{00221\ }
+\DoxyCodeLine{00222\ \ \ impl\ +=\ Iter(n,\ \textcolor{stringliteral}{"{}"{}"{},}}
+\DoxyCodeLine{00223\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ typename\ T\%s"{}"{}"{}})}
+\DoxyCodeLine{00224\ }
+\DoxyCodeLine{00225\ \ \ impl\ +=\ \textcolor{stringliteral}{"{}"{}"{}>}}
+\DoxyCodeLine{00226\ \textcolor{stringliteral}{AssertionResult\ AssertPred\%(n)sHelper(const\ char*\ pred\_text"{}"{}"{}}\ \%\ DEFS}
+\DoxyCodeLine{00227\ }
+\DoxyCodeLine{00228\ \ \ impl\ +=\ Iter(n,\ \textcolor{stringliteral}{"{}"{}"{},}}
+\DoxyCodeLine{00229\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ const\ char*\ e\%s"{}"{}"{}})}
+\DoxyCodeLine{00230\ }
+\DoxyCodeLine{00231\ \ \ impl\ +=\ \textcolor{stringliteral}{"{}"{}"{},}}
+\DoxyCodeLine{00232\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Pred\ pred"{}"{}"{}}}
+\DoxyCodeLine{00233\ }
+\DoxyCodeLine{00234\ \ \ impl\ +=\ Iter(n,\ \textcolor{stringliteral}{"{}"{}"{},}}
+\DoxyCodeLine{00235\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ const\ T\%s\&\ v\%s"{}"{}"{}})}
+\DoxyCodeLine{00236\ }
+\DoxyCodeLine{00237\ \ \ impl\ +=\ \textcolor{stringliteral}{"{}"{}"{})\ \{}}
+\DoxyCodeLine{00238\ \textcolor{stringliteral}{\ \ if\ (pred(\%(vs)s))\ return\ AssertionSuccess();}}
+\DoxyCodeLine{00239\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00240\ \textcolor{stringliteral}{"{}"{}"{}}\ \%\ DEFS}
+\DoxyCodeLine{00241\ }
+\DoxyCodeLine{00242\ \ \ impl\ +=\ \textcolor{stringliteral}{'\ \ return\ AssertionFailure()\ <<\ pred\_text\ <<\ "{}("{}'}}
+\DoxyCodeLine{00243\ }
+\DoxyCodeLine{00244\ \ \ impl\ +=\ Iter(n,\ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{00245\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ e\%s"{}"{}"{}},\ sep=\textcolor{stringliteral}{'\ <<\ "{},\ "{}'})}
+\DoxyCodeLine{00246\ }
+\DoxyCodeLine{00247\ \ \ impl\ +=\ \textcolor{stringliteral}{'\ <<\ "{})\ evaluates\ to\ false,\ where"{}'}}
+\DoxyCodeLine{00248\ }
+\DoxyCodeLine{00249\ \ \ impl\ +=\ Iter(n,\ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{00250\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ "{}\(\backslash\)\(\backslash\)n"{}\ <<\ e\%s\ <<\ "{}\ evaluates\ to\ "{}\ <<\ v\%s"{}"{}"{}})}
+\DoxyCodeLine{00251\ }
+\DoxyCodeLine{00252\ \ \ impl\ +=\ \textcolor{stringliteral}{"{}"{}"{};}}
+\DoxyCodeLine{00253\ \textcolor{stringliteral}{\}}}
+\DoxyCodeLine{00254\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00255\ \textcolor{stringliteral}{//\ Internal\ macro\ for\ implementing\ \{EXPECT|ASSERT\}\_PRED\_FORMAT\%(n)s.}}
+\DoxyCodeLine{00256\ \textcolor{stringliteral}{//\ Don't\ use\ this\ in\ your\ code.}}
+\DoxyCodeLine{00257\ \textcolor{stringliteral}{\#define\ GTEST\_PRED\_FORMAT\%(n)s\_(pred\_format,\ \%(vs)s,\ on\_failure)\(\backslash\)\(\backslash\)}}
+\DoxyCodeLine{00258\ \textcolor{stringliteral}{\ \ GTEST\_ASSERT\_(pred\_format(\%(vts)s,\ \%(vs)s),\ \(\backslash\)\(\backslash\)}}
+\DoxyCodeLine{00259\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ on\_failure)}}
+\DoxyCodeLine{00260\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00261\ \textcolor{stringliteral}{//\ Internal\ macro\ for\ implementing\ \{EXPECT|ASSERT\}\_PRED\%(n)s.\ \ Don't\ use}}
+\DoxyCodeLine{00262\ \textcolor{stringliteral}{//\ this\ in\ your\ code.}}
+\DoxyCodeLine{00263\ \textcolor{stringliteral}{\#define\ GTEST\_PRED\%(n)s\_(pred,\ \%(vs)s,\ on\_failure)\(\backslash\)\(\backslash\)}}
+\DoxyCodeLine{00264\ \textcolor{stringliteral}{\ \ GTEST\_ASSERT\_(::testing::AssertPred\%(n)sHelper(\#pred"{}"{}"{}}\ \%\ DEFS}
+\DoxyCodeLine{00265\ }
+\DoxyCodeLine{00266\ \ \ impl\ +=\ Iter(n,\ \textcolor{stringliteral}{"{}"{}"{},\ \(\backslash\)\(\backslash\)}}
+\DoxyCodeLine{00267\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \#v\%s"{}"{}"{}})}
+\DoxyCodeLine{00268\ }
+\DoxyCodeLine{00269\ \ \ impl\ +=\ \textcolor{stringliteral}{"{}"{}"{},\ \(\backslash\)\(\backslash\)}}
+\DoxyCodeLine{00270\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ pred"{}"{}"{}}}
+\DoxyCodeLine{00271\ }
+\DoxyCodeLine{00272\ \ \ impl\ +=\ Iter(n,\ \textcolor{stringliteral}{"{}"{}"{},\ \(\backslash\)\(\backslash\)}}
+\DoxyCodeLine{00273\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ v\%s"{}"{}"{}})}
+\DoxyCodeLine{00274\ }
+\DoxyCodeLine{00275\ \ \ impl\ +=\ \textcolor{stringliteral}{"{}"{}"{}),\ on\_failure)}}
+\DoxyCodeLine{00276\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00277\ \textcolor{stringliteral}{//\ \%(Arity)s\ predicate\ assertion\ macros.}}
+\DoxyCodeLine{00278\ \textcolor{stringliteral}{\#define\ EXPECT\_PRED\_FORMAT\%(n)s(pred\_format,\ \%(vs)s)\ \(\backslash\)\(\backslash\)}}
+\DoxyCodeLine{00279\ \textcolor{stringliteral}{\ \ GTEST\_PRED\_FORMAT\%(n)s\_(pred\_format,\ \%(vs)s,\ GTEST\_NONFATAL\_FAILURE\_)}}
+\DoxyCodeLine{00280\ \textcolor{stringliteral}{\#define\ EXPECT\_PRED\%(n)s(pred,\ \%(vs)s)\ \(\backslash\)\(\backslash\)}}
+\DoxyCodeLine{00281\ \textcolor{stringliteral}{\ \ GTEST\_PRED\%(n)s\_(pred,\ \%(vs)s,\ GTEST\_NONFATAL\_FAILURE\_)}}
+\DoxyCodeLine{00282\ \textcolor{stringliteral}{\#define\ ASSERT\_PRED\_FORMAT\%(n)s(pred\_format,\ \%(vs)s)\ \(\backslash\)\(\backslash\)}}
+\DoxyCodeLine{00283\ \textcolor{stringliteral}{\ \ GTEST\_PRED\_FORMAT\%(n)s\_(pred\_format,\ \%(vs)s,\ GTEST\_FATAL\_FAILURE\_)}}
+\DoxyCodeLine{00284\ \textcolor{stringliteral}{\#define\ ASSERT\_PRED\%(n)s(pred,\ \%(vs)s)\ \(\backslash\)\(\backslash\)}}
+\DoxyCodeLine{00285\ \textcolor{stringliteral}{\ \ GTEST\_PRED\%(n)s\_(pred,\ \%(vs)s,\ GTEST\_FATAL\_FAILURE\_)}}
+\DoxyCodeLine{00286\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00287\ \textcolor{stringliteral}{"{}"{}"{}}\ \%\ DEFS}
+\DoxyCodeLine{00288\ }
+\DoxyCodeLine{00289\ \ \ \textcolor{keywordflow}{return}\ impl}
+\DoxyCodeLine{00290\ }
+\DoxyCodeLine{00291\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacegen__gtest__pred__impl_a59c2ac0f700b0bdcb36171e53004dd6c_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacegen__gtest__pred__impl_a59c2ac0f700b0bdcb36171e53004dd6c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacegen__gtest__pred__impl_a620e5c968b63ea75d4c278eee04de8ad}\index{gen\_gtest\_pred\_impl@{gen\_gtest\_pred\_impl}!Iter@{Iter}}
+\index{Iter@{Iter}!gen\_gtest\_pred\_impl@{gen\_gtest\_pred\_impl}}
+\doxysubsubsection{\texorpdfstring{Iter()}{Iter()}}
+{\footnotesize\ttfamily \label{namespacegen__gtest__pred__impl_a620e5c968b63ea75d4c278eee04de8ad} 
+gen\+\_\+gtest\+\_\+pred\+\_\+impl.\+Iter (\begin{DoxyParamCaption}\item[{}]{n}{, }\item[{}]{format}{, }\item[{}]{sep}{ = {\ttfamily \textquotesingle{}\textquotesingle{}}}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Given a positive integer n, a format string that contains 0 or
+more '%s' format specs, and optionally a separator string, returns
+the join of n strings, each formatted with the format string on an
+iterator ranged from 1 to n.
+
+Example:
+
+Iter(3, 'v%s', sep=', ') returns 'v1, v2, v3'.
+\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{gen__gtest__pred__impl_8py_source_l00188}{188}} of file \mbox{\hyperlink{gen__gtest__pred__impl_8py_source}{gen\+\_\+gtest\+\_\+pred\+\_\+impl.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00188\ \textcolor{keyword}{def\ }Iter(n,\ format,\ sep=''):}
+\DoxyCodeLine{00189\ \ \ \textcolor{stringliteral}{"{}"{}"{}Given\ a\ positive\ integer\ n,\ a\ format\ string\ that\ contains\ 0\ or}}
+\DoxyCodeLine{00190\ \textcolor{stringliteral}{\ \ more\ '\%s'\ format\ specs,\ and\ optionally\ a\ separator\ string,\ returns}}
+\DoxyCodeLine{00191\ \textcolor{stringliteral}{\ \ the\ join\ of\ n\ strings,\ each\ formatted\ with\ the\ format\ string\ on\ an}}
+\DoxyCodeLine{00192\ \textcolor{stringliteral}{\ \ iterator\ ranged\ from\ 1\ to\ n.}}
+\DoxyCodeLine{00193\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00194\ \textcolor{stringliteral}{\ \ Example:}}
+\DoxyCodeLine{00195\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00196\ \textcolor{stringliteral}{\ \ Iter(3,\ 'v\%s',\ sep=',\ ')\ returns\ 'v1,\ v2,\ v3'.}}
+\DoxyCodeLine{00197\ \textcolor{stringliteral}{\ \ "{}"{}"{}}}
+\DoxyCodeLine{00198\ }
+\DoxyCodeLine{00199\ \ \ \textcolor{comment}{\#\ How\ many\ '\%s'\ specs\ are\ in\ format?}}
+\DoxyCodeLine{00200\ \ \ spec\_count\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}(format.split(\textcolor{stringliteral}{'\%s'}))\ -\/\ 1}
+\DoxyCodeLine{00201\ \ \ \textcolor{keywordflow}{return}\ sep.join([format\ \%\ (spec\_count\ *\ (i,))\ \textcolor{keywordflow}{for}\ i\ \textcolor{keywordflow}{in}\ OneTo(n)])}
+\DoxyCodeLine{00202\ }
+\DoxyCodeLine{00203\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacegen__gtest__pred__impl_a620e5c968b63ea75d4c278eee04de8ad_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacegen__gtest__pred__impl_a620e5c968b63ea75d4c278eee04de8ad_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacegen__gtest__pred__impl_ae5bdeaf46789198017dd17875da8b2fe}\index{gen\_gtest\_pred\_impl@{gen\_gtest\_pred\_impl}!OneTo@{OneTo}}
+\index{OneTo@{OneTo}!gen\_gtest\_pred\_impl@{gen\_gtest\_pred\_impl}}
+\doxysubsubsection{\texorpdfstring{OneTo()}{OneTo()}}
+{\footnotesize\ttfamily \label{namespacegen__gtest__pred__impl_ae5bdeaf46789198017dd17875da8b2fe} 
+gen\+\_\+gtest\+\_\+pred\+\_\+impl.\+One\+To (\begin{DoxyParamCaption}\item[{}]{n}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Returns the list [1, 2, 3, ..., n].\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{gen__gtest__pred__impl_8py_source_l00182}{182}} of file \mbox{\hyperlink{gen__gtest__pred__impl_8py_source}{gen\+\_\+gtest\+\_\+pred\+\_\+impl.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00182\ \textcolor{keyword}{def\ }OneTo(n):}
+\DoxyCodeLine{00183\ \ \ \textcolor{stringliteral}{"{}"{}"{}Returns\ the\ list\ [1,\ 2,\ 3,\ ...,\ n]."{}"{}"{}}}
+\DoxyCodeLine{00184\ }
+\DoxyCodeLine{00185\ \ \ \textcolor{keywordflow}{return}\ range(1,\ n\ +\ 1)}
+\DoxyCodeLine{00186\ }
+\DoxyCodeLine{00187\ }
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacegen__gtest__pred__impl_ae5bdeaf46789198017dd17875da8b2fe_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacegen__gtest__pred__impl_a73c83807b2eb6a42a647488730c71aea}\index{gen\_gtest\_pred\_impl@{gen\_gtest\_pred\_impl}!TestsForArity@{TestsForArity}}
+\index{TestsForArity@{TestsForArity}!gen\_gtest\_pred\_impl@{gen\_gtest\_pred\_impl}}
+\doxysubsubsection{\texorpdfstring{TestsForArity()}{TestsForArity()}}
+{\footnotesize\ttfamily \label{namespacegen__gtest__pred__impl_a73c83807b2eb6a42a647488730c71aea} 
+gen\+\_\+gtest\+\_\+pred\+\_\+impl.\+Tests\+For\+Arity (\begin{DoxyParamCaption}\item[{}]{n}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Returns the tests for n-ary predicate assertions.\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{gen__gtest__pred__impl_8py_source_l00411}{411}} of file \mbox{\hyperlink{gen__gtest__pred__impl_8py_source}{gen\+\_\+gtest\+\_\+pred\+\_\+impl.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00411\ \textcolor{keyword}{def\ }TestsForArity(n):}
+\DoxyCodeLine{00412\ \ \ \textcolor{stringliteral}{"{}"{}"{}Returns\ the\ tests\ for\ n-\/ary\ predicate\ assertions."{}"{}"{}}}
+\DoxyCodeLine{00413\ }
+\DoxyCodeLine{00414\ \ \ \textcolor{comment}{\#\ A\ map\ that\ defines\ the\ values\ used\ in\ the\ template\ for\ the\ tests.}}
+\DoxyCodeLine{00415\ \ \ DEFS\ =\ \{}
+\DoxyCodeLine{00416\ \ \ \ \ \textcolor{stringliteral}{'n'}\ :\ n,}
+\DoxyCodeLine{00417\ \ \ \ \ \textcolor{stringliteral}{'es'}\ :\ Iter(n,\ \textcolor{stringliteral}{'e\%s'},\ sep=\textcolor{stringliteral}{',\ '}),}
+\DoxyCodeLine{00418\ \ \ \ \ \textcolor{stringliteral}{'vs'}\ :\ Iter(n,\ \textcolor{stringliteral}{'v\%s'},\ sep=\textcolor{stringliteral}{',\ '}),}
+\DoxyCodeLine{00419\ \ \ \ \ \textcolor{stringliteral}{'vts'}\ :\ Iter(n,\ \textcolor{stringliteral}{'\#v\%s'},\ sep=\textcolor{stringliteral}{',\ '}),}
+\DoxyCodeLine{00420\ \ \ \ \ \textcolor{stringliteral}{'tvs'}\ :\ Iter(n,\ \textcolor{stringliteral}{'T\%s\ v\%s'},\ sep=\textcolor{stringliteral}{',\ '}),}
+\DoxyCodeLine{00421\ \ \ \ \ \textcolor{stringliteral}{'int\_vs'}\ :\ Iter(n,\ \textcolor{stringliteral}{'int\ v\%s'},\ sep=\textcolor{stringliteral}{',\ '}),}
+\DoxyCodeLine{00422\ \ \ \ \ \textcolor{stringliteral}{'Bool\_vs'}\ :\ Iter(n,\ \textcolor{stringliteral}{'Bool\ v\%s'},\ sep=\textcolor{stringliteral}{',\ '}),}
+\DoxyCodeLine{00423\ \ \ \ \ \textcolor{stringliteral}{'types'}\ :\ Iter(n,\ \textcolor{stringliteral}{'typename\ T\%s'},\ sep=\textcolor{stringliteral}{',\ '}),}
+\DoxyCodeLine{00424\ \ \ \ \ \textcolor{stringliteral}{'v\_sum'}\ :\ Iter(n,\ \textcolor{stringliteral}{'v\%s'},\ sep=\textcolor{stringliteral}{'\ +\ '}),}
+\DoxyCodeLine{00425\ \ \ \ \ \textcolor{stringliteral}{'arity'}\ :\ Arity(n),}
+\DoxyCodeLine{00426\ \ \ \ \ \textcolor{stringliteral}{'Arity'}\ :\ Title(Arity(n)),}
+\DoxyCodeLine{00427\ \ \ \ \ \}}
+\DoxyCodeLine{00428\ }
+\DoxyCodeLine{00429\ \ \ tests\ =\ (}
+\DoxyCodeLine{00430\ \textcolor{stringliteral}{"{}"{}"{}//\ Sample\ functions/functors\ for\ testing\ \%(arity)s\ predicate\ assertions.}}
+\DoxyCodeLine{00431\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00432\ \textcolor{stringliteral}{//\ A\ \%(arity)s\ predicate\ function.}}
+\DoxyCodeLine{00433\ \textcolor{stringliteral}{template\ <\%(types)s>}}
+\DoxyCodeLine{00434\ \textcolor{stringliteral}{bool\ PredFunction\%(n)s(\%(tvs)s)\ \{}}
+\DoxyCodeLine{00435\ \textcolor{stringliteral}{\ \ return\ \%(v\_sum)s\ >\ 0;}}
+\DoxyCodeLine{00436\ \textcolor{stringliteral}{\}}}
+\DoxyCodeLine{00437\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00438\ \textcolor{stringliteral}{//\ The\ following\ two\ functions\ are\ needed\ to\ circumvent\ a\ bug\ in}}
+\DoxyCodeLine{00439\ \textcolor{stringliteral}{//\ gcc\ 2.95.3,\ which\ sometimes\ has\ problem\ with\ the\ above\ template}}
+\DoxyCodeLine{00440\ \textcolor{stringliteral}{//\ function.}}
+\DoxyCodeLine{00441\ \textcolor{stringliteral}{bool\ PredFunction\%(n)sInt(\%(int\_vs)s)\ \{}}
+\DoxyCodeLine{00442\ \textcolor{stringliteral}{\ \ return\ \%(v\_sum)s\ >\ 0;}}
+\DoxyCodeLine{00443\ \textcolor{stringliteral}{\}}}
+\DoxyCodeLine{00444\ \textcolor{stringliteral}{bool\ PredFunction\%(n)sBool(\%(Bool\_vs)s)\ \{}}
+\DoxyCodeLine{00445\ \textcolor{stringliteral}{\ \ return\ \%(v\_sum)s\ >\ 0;}}
+\DoxyCodeLine{00446\ \textcolor{stringliteral}{\}}}
+\DoxyCodeLine{00447\ \textcolor{stringliteral}{"{}"{}"{}}\ \%\ DEFS)}
+\DoxyCodeLine{00448\ }
+\DoxyCodeLine{00449\ \ \ tests\ +=\ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{00450\ \textcolor{stringliteral}{//\ A\ \%(arity)s\ predicate\ functor.}}
+\DoxyCodeLine{00451\ \textcolor{stringliteral}{struct\ PredFunctor\%(n)s\ \{}}
+\DoxyCodeLine{00452\ \textcolor{stringliteral}{\ \ template\ <\%(types)s>}}
+\DoxyCodeLine{00453\ \textcolor{stringliteral}{\ \ bool\ operator()("{}"{}"{}}\ \%\ DEFS}
+\DoxyCodeLine{00454\ }
+\DoxyCodeLine{00455\ \ \ tests\ +=\ Iter(n,\ \textcolor{stringliteral}{'const\ T\%s\&\ v\%s'},\ sep=\textcolor{stringliteral}{"{}"{}"{},}}
+\DoxyCodeLine{00456\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "{}"{}"{}})}
+\DoxyCodeLine{00457\ }
+\DoxyCodeLine{00458\ \ \ tests\ +=\ \textcolor{stringliteral}{"{}"{}"{})\ \{}}
+\DoxyCodeLine{00459\ \textcolor{stringliteral}{\ \ \ \ return\ \%(v\_sum)s\ >\ 0;}}
+\DoxyCodeLine{00460\ \textcolor{stringliteral}{\ \ \}}}
+\DoxyCodeLine{00461\ \textcolor{stringliteral}{\};}}
+\DoxyCodeLine{00462\ \textcolor{stringliteral}{"{}"{}"{}}\ \%\ DEFS}
+\DoxyCodeLine{00463\ }
+\DoxyCodeLine{00464\ \ \ tests\ +=\ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{00465\ \textcolor{stringliteral}{//\ A\ \%(arity)s\ predicate-\/formatter\ function.}}
+\DoxyCodeLine{00466\ \textcolor{stringliteral}{template\ <\%(types)s>}}
+\DoxyCodeLine{00467\ \textcolor{stringliteral}{testing::AssertionResult\ PredFormatFunction\%(n)s("{}"{}"{}}\ \%\ DEFS}
+\DoxyCodeLine{00468\ }
+\DoxyCodeLine{00469\ \ \ tests\ +=\ Iter(n,\ \textcolor{stringliteral}{'const\ char*\ e\%s'},\ sep=\textcolor{stringliteral}{"{}"{}"{},}}
+\DoxyCodeLine{00470\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "{}"{}"{}})}
+\DoxyCodeLine{00471\ }
+\DoxyCodeLine{00472\ \ \ tests\ +=\ Iter(n,\ \textcolor{stringliteral}{"{}"{}"{},}}
+\DoxyCodeLine{00473\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ const\ T\%s\&\ v\%s"{}"{}"{}})}
+\DoxyCodeLine{00474\ }
+\DoxyCodeLine{00475\ \ \ tests\ +=\ \textcolor{stringliteral}{"{}"{}"{})\ \{}}
+\DoxyCodeLine{00476\ \textcolor{stringliteral}{\ \ if\ (PredFunction\%(n)s(\%(vs)s))}}
+\DoxyCodeLine{00477\ \textcolor{stringliteral}{\ \ \ \ return\ testing::AssertionSuccess();}}
+\DoxyCodeLine{00478\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00479\ \textcolor{stringliteral}{\ \ return\ testing::AssertionFailure()}}
+\DoxyCodeLine{00480\ \textcolor{stringliteral}{\ \ \ \ \ \ <<\ "{}"{}"{}}\ \%\ DEFS}
+\DoxyCodeLine{00481\ }
+\DoxyCodeLine{00482\ \ \ tests\ +=\ Iter(n,\ \textcolor{stringliteral}{'e\%s'},\ sep=\textcolor{stringliteral}{'\ <<\ "{}\ +\ "{}\ <<\ '})}
+\DoxyCodeLine{00483\ }
+\DoxyCodeLine{00484\ \ \ tests\ +=\ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{00485\ \textcolor{stringliteral}{\ \ \ \ \ \ <<\ "{}\ is\ expected\ to\ be\ positive,\ but\ evaluates\ to\ "{}}}
+\DoxyCodeLine{00486\ \textcolor{stringliteral}{\ \ \ \ \ \ <<\ \%(v\_sum)s\ <<\ "{}."{};}}
+\DoxyCodeLine{00487\ \textcolor{stringliteral}{\}}}
+\DoxyCodeLine{00488\ \textcolor{stringliteral}{"{}"{}"{}}\ \%\ DEFS}
+\DoxyCodeLine{00489\ }
+\DoxyCodeLine{00490\ \ \ tests\ +=\ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{00491\ \textcolor{stringliteral}{//\ A\ \%(arity)s\ predicate-\/formatter\ functor.}}
+\DoxyCodeLine{00492\ \textcolor{stringliteral}{struct\ PredFormatFunctor\%(n)s\ \{}}
+\DoxyCodeLine{00493\ \textcolor{stringliteral}{\ \ template\ <\%(types)s>}}
+\DoxyCodeLine{00494\ \textcolor{stringliteral}{\ \ testing::AssertionResult\ operator()("{}"{}"{}}\ \%\ DEFS}
+\DoxyCodeLine{00495\ }
+\DoxyCodeLine{00496\ \ \ tests\ +=\ Iter(n,\ \textcolor{stringliteral}{'const\ char*\ e\%s'},\ sep=\textcolor{stringliteral}{"{}"{}"{},}}
+\DoxyCodeLine{00497\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "{}"{}"{}})}
+\DoxyCodeLine{00498\ }
+\DoxyCodeLine{00499\ \ \ tests\ +=\ Iter(n,\ \textcolor{stringliteral}{"{}"{}"{},}}
+\DoxyCodeLine{00500\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ const\ T\%s\&\ v\%s"{}"{}"{}})}
+\DoxyCodeLine{00501\ }
+\DoxyCodeLine{00502\ \ \ tests\ +=\ \textcolor{stringliteral}{"{}"{}"{})\ const\ \{}}
+\DoxyCodeLine{00503\ \textcolor{stringliteral}{\ \ \ \ return\ PredFormatFunction\%(n)s(\%(es)s,\ \%(vs)s);}}
+\DoxyCodeLine{00504\ \textcolor{stringliteral}{\ \ \}}}
+\DoxyCodeLine{00505\ \textcolor{stringliteral}{\};}}
+\DoxyCodeLine{00506\ \textcolor{stringliteral}{"{}"{}"{}}\ \%\ DEFS}
+\DoxyCodeLine{00507\ }
+\DoxyCodeLine{00508\ \ \ tests\ +=\ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{00509\ \textcolor{stringliteral}{//\ Tests\ for\ \{EXPECT|ASSERT\}\_PRED\_FORMAT\%(n)s.}}
+\DoxyCodeLine{00510\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00511\ \textcolor{stringliteral}{class\ Predicate\%(n)sTest\ :\ public\ testing::Test\ \{}}
+\DoxyCodeLine{00512\ \textcolor{stringliteral}{\ protected:}}
+\DoxyCodeLine{00513\ \textcolor{stringliteral}{\ \ virtual\ void\ SetUp()\ \{}}
+\DoxyCodeLine{00514\ \textcolor{stringliteral}{\ \ \ \ expected\_to\_finish\_\ =\ true;}}
+\DoxyCodeLine{00515\ \textcolor{stringliteral}{\ \ \ \ finished\_\ =\ false;"{}"{}"{}}\ \%\ DEFS}
+\DoxyCodeLine{00516\ }
+\DoxyCodeLine{00517\ \ \ tests\ +=\ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{00518\ \textcolor{stringliteral}{\ \ \ \ "{}"{}"{}}\ +\ Iter(n,\ \textcolor{stringliteral}{'n\%s\_\ =\ '})\ +\ \textcolor{stringliteral}{"{}"{}"{}0;}}
+\DoxyCodeLine{00519\ \textcolor{stringliteral}{\ \ \}}}
+\DoxyCodeLine{00520\ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{00521\ }
+\DoxyCodeLine{00522\ \ \ tests\ +=\ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{00523\ \textcolor{stringliteral}{\ \ virtual\ void\ TearDown()\ \{}}
+\DoxyCodeLine{00524\ \textcolor{stringliteral}{\ \ \ \ //\ Verifies\ that\ each\ of\ the\ predicate's\ arguments\ was\ evaluated}}
+\DoxyCodeLine{00525\ \textcolor{stringliteral}{\ \ \ \ //\ exactly\ once."{}"{}"{}}}
+\DoxyCodeLine{00526\ }
+\DoxyCodeLine{00527\ \ \ tests\ +=\ \textcolor{stringliteral}{''}.join([\textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{00528\ \textcolor{stringliteral}{\ \ \ \ EXPECT\_EQ(1,\ n\%s\_)\ <<}}
+\DoxyCodeLine{00529\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ "{}The\ predicate\ assertion\ didn't\ evaluate\ argument\ \%s\ "{}}}
+\DoxyCodeLine{00530\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ "{}exactly\ once."{};"{}"{}"{}}\ \%\ (i,\ i\ +\ 1)\ \textcolor{keywordflow}{for}\ i\ \textcolor{keywordflow}{in}\ OneTo(n)])}
+\DoxyCodeLine{00531\ }
+\DoxyCodeLine{00532\ \ \ tests\ +=\ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{00533\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00534\ \textcolor{stringliteral}{\ \ \ \ //\ Verifies\ that\ the\ control\ flow\ in\ the\ test\ function\ is\ expected.}}
+\DoxyCodeLine{00535\ \textcolor{stringliteral}{\ \ \ \ if\ (expected\_to\_finish\_\ \&\&\ !finished\_)\ \{}}
+\DoxyCodeLine{00536\ \textcolor{stringliteral}{\ \ \ \ \ \ FAIL()\ <<\ "{}The\ predicate\ assertion\ unexpactedly\ aborted\ the\ test."{};}}
+\DoxyCodeLine{00537\ \textcolor{stringliteral}{\ \ \ \ \}\ else\ if\ (!expected\_to\_finish\_\ \&\&\ finished\_)\ \{}}
+\DoxyCodeLine{00538\ \textcolor{stringliteral}{\ \ \ \ \ \ FAIL()\ <<\ "{}The\ failed\ predicate\ assertion\ didn't\ abort\ the\ test\ "{}}}
+\DoxyCodeLine{00539\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "{}as\ expected."{};}}
+\DoxyCodeLine{00540\ \textcolor{stringliteral}{\ \ \ \ \}}}
+\DoxyCodeLine{00541\ \textcolor{stringliteral}{\ \ \}}}
+\DoxyCodeLine{00542\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00543\ \textcolor{stringliteral}{\ \ //\ true\ iff\ the\ test\ function\ is\ expected\ to\ run\ to\ finish.}}
+\DoxyCodeLine{00544\ \textcolor{stringliteral}{\ \ static\ bool\ expected\_to\_finish\_;}}
+\DoxyCodeLine{00545\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00546\ \textcolor{stringliteral}{\ \ //\ true\ iff\ the\ test\ function\ did\ run\ to\ finish.}}
+\DoxyCodeLine{00547\ \textcolor{stringliteral}{\ \ static\ bool\ finished\_;}}
+\DoxyCodeLine{00548\ \textcolor{stringliteral}{"{}"{}"{}}\ \%\ DEFS}
+\DoxyCodeLine{00549\ }
+\DoxyCodeLine{00550\ \ \ tests\ +=\ Iter(n,\ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{00551\ \textcolor{stringliteral}{\ \ static\ int\ n\%s\_;"{}"{}"{}})}
+\DoxyCodeLine{00552\ }
+\DoxyCodeLine{00553\ \ \ tests\ +=\ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{00554\ \textcolor{stringliteral}{\};}}
+\DoxyCodeLine{00555\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00556\ \textcolor{stringliteral}{bool\ Predicate\%(n)sTest::expected\_to\_finish\_;}}
+\DoxyCodeLine{00557\ \textcolor{stringliteral}{bool\ Predicate\%(n)sTest::finished\_;}}
+\DoxyCodeLine{00558\ \textcolor{stringliteral}{"{}"{}"{}}\ \%\ DEFS}
+\DoxyCodeLine{00559\ }
+\DoxyCodeLine{00560\ \ \ tests\ +=\ Iter(n,\ \textcolor{stringliteral}{"{}"{}"{}int\ Predicate\%\%(n)sTest::n\%s\_;}}
+\DoxyCodeLine{00561\ \textcolor{stringliteral}{"{}"{}"{}})\ \%\ DEFS}
+\DoxyCodeLine{00562\ }
+\DoxyCodeLine{00563\ \ \ tests\ +=\ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{00564\ \textcolor{stringliteral}{typedef\ Predicate\%(n)sTest\ EXPECT\_PRED\_FORMAT\%(n)sTest;}}
+\DoxyCodeLine{00565\ \textcolor{stringliteral}{typedef\ Predicate\%(n)sTest\ ASSERT\_PRED\_FORMAT\%(n)sTest;}}
+\DoxyCodeLine{00566\ \textcolor{stringliteral}{typedef\ Predicate\%(n)sTest\ EXPECT\_PRED\%(n)sTest;}}
+\DoxyCodeLine{00567\ \textcolor{stringliteral}{typedef\ Predicate\%(n)sTest\ ASSERT\_PRED\%(n)sTest;}}
+\DoxyCodeLine{00568\ \textcolor{stringliteral}{"{}"{}"{}}\ \%\ DEFS}
+\DoxyCodeLine{00569\ }
+\DoxyCodeLine{00570\ \ \ \textcolor{keyword}{def\ }GenTest(use\_format,\ use\_assert,\ expect\_failure,}
+\DoxyCodeLine{00571\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ use\_functor,\ use\_user\_type):}
+\DoxyCodeLine{00572\ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Returns\ the\ test\ for\ a\ predicate\ assertion\ macro.}}
+\DoxyCodeLine{00573\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00574\ \textcolor{stringliteral}{\ \ \ \ Args:}}
+\DoxyCodeLine{00575\ \textcolor{stringliteral}{\ \ \ \ \ \ use\_format:\ \ \ \ \ true\ iff\ the\ assertion\ is\ a\ *\_PRED\_FORMAT*.}}
+\DoxyCodeLine{00576\ \textcolor{stringliteral}{\ \ \ \ \ \ use\_assert:\ \ \ \ \ true\ iff\ the\ assertion\ is\ a\ ASSERT\_*.}}
+\DoxyCodeLine{00577\ \textcolor{stringliteral}{\ \ \ \ \ \ expect\_failure:\ true\ iff\ the\ assertion\ is\ expected\ to\ fail.}}
+\DoxyCodeLine{00578\ \textcolor{stringliteral}{\ \ \ \ \ \ use\_functor:\ \ \ \ true\ iff\ the\ first\ argument\ of\ the\ assertion\ is}}
+\DoxyCodeLine{00579\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ a\ functor\ (as\ opposed\ to\ a\ function)}}
+\DoxyCodeLine{00580\ \textcolor{stringliteral}{\ \ \ \ \ \ use\_user\_type:\ \ true\ iff\ the\ predicate\ functor/function\ takes}}
+\DoxyCodeLine{00581\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ argument(s)\ of\ a\ user-\/defined\ type.}}
+\DoxyCodeLine{00582\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00583\ \textcolor{stringliteral}{\ \ \ \ Example:}}
+\DoxyCodeLine{00584\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00585\ \textcolor{stringliteral}{\ \ \ \ \ \ GenTest(1,\ 0,\ 0,\ 1,\ 0)\ returns\ a\ test\ that\ tests\ the\ behavior}}
+\DoxyCodeLine{00586\ \textcolor{stringliteral}{\ \ \ \ \ \ of\ a\ successful\ EXPECT\_PRED\_FORMATn()\ that\ takes\ a\ functor}}
+\DoxyCodeLine{00587\ \textcolor{stringliteral}{\ \ \ \ \ \ whose\ arguments\ have\ built-\/in\ types."{}"{}"{}}}
+\DoxyCodeLine{00588\ }
+\DoxyCodeLine{00589\ \ \ \ \ \textcolor{keywordflow}{if}\ use\_assert:}
+\DoxyCodeLine{00590\ \ \ \ \ \ \ assrt\ =\ \textcolor{stringliteral}{'ASSERT'}\ \ \textcolor{comment}{\#\ 'assert'\ is\ reserved,\ so\ we\ cannot\ use}}
+\DoxyCodeLine{00591\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ that\ identifier\ here.}}
+\DoxyCodeLine{00592\ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{00593\ \ \ \ \ \ \ assrt\ =\ \textcolor{stringliteral}{'EXPECT'}}
+\DoxyCodeLine{00594\ }
+\DoxyCodeLine{00595\ \ \ \ \ assertion\ =\ assrt\ +\ \textcolor{stringliteral}{'\_PRED'}}
+\DoxyCodeLine{00596\ }
+\DoxyCodeLine{00597\ \ \ \ \ \textcolor{keywordflow}{if}\ use\_format:}
+\DoxyCodeLine{00598\ \ \ \ \ \ \ pred\_format\ =\ \textcolor{stringliteral}{'PredFormat'}}
+\DoxyCodeLine{00599\ \ \ \ \ \ \ assertion\ +=\ \textcolor{stringliteral}{'\_FORMAT'}}
+\DoxyCodeLine{00600\ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{00601\ \ \ \ \ \ \ pred\_format\ =\ \textcolor{stringliteral}{'Pred'}}
+\DoxyCodeLine{00602\ }
+\DoxyCodeLine{00603\ \ \ \ \ assertion\ +=\ \textcolor{stringliteral}{'\%(n)s'}\ \%\ DEFS}
+\DoxyCodeLine{00604\ }
+\DoxyCodeLine{00605\ \ \ \ \ \textcolor{keywordflow}{if}\ use\_functor:}
+\DoxyCodeLine{00606\ \ \ \ \ \ \ pred\_format\_type\ =\ \textcolor{stringliteral}{'functor'}}
+\DoxyCodeLine{00607\ \ \ \ \ \ \ pred\_format\ +=\ \textcolor{stringliteral}{'Functor\%(n)s()'}}
+\DoxyCodeLine{00608\ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{00609\ \ \ \ \ \ \ pred\_format\_type\ =\ \textcolor{stringliteral}{'function'}}
+\DoxyCodeLine{00610\ \ \ \ \ \ \ pred\_format\ +=\ \textcolor{stringliteral}{'Function\%(n)s'}}
+\DoxyCodeLine{00611\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keywordflow}{not}\ use\_format:}
+\DoxyCodeLine{00612\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ use\_user\_type:}
+\DoxyCodeLine{00613\ \ \ \ \ \ \ \ \ \ \ pred\_format\ +=\ \textcolor{stringliteral}{'Bool'}}
+\DoxyCodeLine{00614\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{00615\ \ \ \ \ \ \ \ \ \ \ pred\_format\ +=\ \textcolor{stringliteral}{'Int'}}
+\DoxyCodeLine{00616\ }
+\DoxyCodeLine{00617\ \ \ \ \ test\_name\ =\ pred\_format\_type.title()}
+\DoxyCodeLine{00618\ }
+\DoxyCodeLine{00619\ \ \ \ \ \textcolor{keywordflow}{if}\ use\_user\_type:}
+\DoxyCodeLine{00620\ \ \ \ \ \ \ arg\_type\ =\ \textcolor{stringliteral}{'user-\/defined\ type\ (Bool)'}}
+\DoxyCodeLine{00621\ \ \ \ \ \ \ test\_name\ +=\ \textcolor{stringliteral}{'OnUserType'}}
+\DoxyCodeLine{00622\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ expect\_failure:}
+\DoxyCodeLine{00623\ \ \ \ \ \ \ \ \ arg\ =\ \textcolor{stringliteral}{'Bool(n\%s\_++)'}}
+\DoxyCodeLine{00624\ \ \ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{00625\ \ \ \ \ \ \ \ \ arg\ =\ \textcolor{stringliteral}{'Bool(++n\%s\_)'}}
+\DoxyCodeLine{00626\ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{00627\ \ \ \ \ \ \ arg\_type\ =\ \textcolor{stringliteral}{'built-\/in\ type\ (int)'}}
+\DoxyCodeLine{00628\ \ \ \ \ \ \ test\_name\ +=\ \textcolor{stringliteral}{'OnBuiltInType'}}
+\DoxyCodeLine{00629\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ expect\_failure:}
+\DoxyCodeLine{00630\ \ \ \ \ \ \ \ \ arg\ =\ \textcolor{stringliteral}{'n\%s\_++'}}
+\DoxyCodeLine{00631\ \ \ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{00632\ \ \ \ \ \ \ \ \ arg\ =\ \textcolor{stringliteral}{'++n\%s\_'}}
+\DoxyCodeLine{00633\ }
+\DoxyCodeLine{00634\ \ \ \ \ \textcolor{keywordflow}{if}\ expect\_failure:}
+\DoxyCodeLine{00635\ \ \ \ \ \ \ successful\_or\_failed\ =\ \textcolor{stringliteral}{'failed'}}
+\DoxyCodeLine{00636\ \ \ \ \ \ \ expected\_or\_not\ =\ \textcolor{stringliteral}{'expected.'}}
+\DoxyCodeLine{00637\ \ \ \ \ \ \ test\_name\ +=\ \ \textcolor{stringliteral}{'Failure'}}
+\DoxyCodeLine{00638\ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{00639\ \ \ \ \ \ \ successful\_or\_failed\ =\ \textcolor{stringliteral}{'successful'}}
+\DoxyCodeLine{00640\ \ \ \ \ \ \ expected\_or\_not\ =\ \textcolor{stringliteral}{'UNEXPECTED!'}}
+\DoxyCodeLine{00641\ \ \ \ \ \ \ test\_name\ +=\ \ \textcolor{stringliteral}{'Success'}}
+\DoxyCodeLine{00642\ }
+\DoxyCodeLine{00643\ \ \ \ \ \textcolor{comment}{\#\ A\ map\ that\ defines\ the\ values\ used\ in\ the\ test\ template.}}
+\DoxyCodeLine{00644\ \ \ \ \ defs\ =\ DEFS.copy()}
+\DoxyCodeLine{00645\ \ \ \ \ defs.update(\{}
+\DoxyCodeLine{00646\ \ \ \ \ \ \ \textcolor{stringliteral}{'assert'}\ :\ assrt,}
+\DoxyCodeLine{00647\ \ \ \ \ \ \ \textcolor{stringliteral}{'assertion'}\ :\ assertion,}
+\DoxyCodeLine{00648\ \ \ \ \ \ \ \textcolor{stringliteral}{'test\_name'}\ :\ test\_name,}
+\DoxyCodeLine{00649\ \ \ \ \ \ \ \textcolor{stringliteral}{'pf\_type'}\ :\ pred\_format\_type,}
+\DoxyCodeLine{00650\ \ \ \ \ \ \ \textcolor{stringliteral}{'pf'}\ :\ pred\_format,}
+\DoxyCodeLine{00651\ \ \ \ \ \ \ \textcolor{stringliteral}{'arg\_type'}\ :\ arg\_type,}
+\DoxyCodeLine{00652\ \ \ \ \ \ \ \textcolor{stringliteral}{'arg'}\ :\ arg,}
+\DoxyCodeLine{00653\ \ \ \ \ \ \ \textcolor{stringliteral}{'successful'}\ :\ successful\_or\_failed,}
+\DoxyCodeLine{00654\ \ \ \ \ \ \ \textcolor{stringliteral}{'expected'}\ :\ expected\_or\_not,}
+\DoxyCodeLine{00655\ \ \ \ \ \ \ \})}
+\DoxyCodeLine{00656\ }
+\DoxyCodeLine{00657\ \ \ \ \ test\ =\ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{00658\ \textcolor{stringliteral}{//\ Tests\ a\ \%(successful)s\ \%(assertion)s\ where\ the}}
+\DoxyCodeLine{00659\ \textcolor{stringliteral}{//\ predicate-\/formatter\ is\ a\ \%(pf\_type)s\ on\ a\ \%(arg\_type)s.}}
+\DoxyCodeLine{00660\ \textcolor{stringliteral}{TEST\_F(\%(assertion)sTest,\ \%(test\_name)s)\ \{"{}"{}"{}}\ \%\ defs}
+\DoxyCodeLine{00661\ }
+\DoxyCodeLine{00662\ \ \ \ \ indent\ =\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}(assertion)\ +\ 3)*\textcolor{stringliteral}{'\ '}}
+\DoxyCodeLine{00663\ \ \ \ \ extra\_indent\ =\ \textcolor{stringliteral}{''}}
+\DoxyCodeLine{00664\ }
+\DoxyCodeLine{00665\ \ \ \ \ \textcolor{keywordflow}{if}\ expect\_failure:}
+\DoxyCodeLine{00666\ \ \ \ \ \ \ extra\_indent\ =\ \textcolor{stringliteral}{'\ \ '}}
+\DoxyCodeLine{00667\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ use\_assert:}
+\DoxyCodeLine{00668\ \ \ \ \ \ \ \ \ test\ +=\ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{00669\ \textcolor{stringliteral}{\ \ expected\_to\_finish\_\ =\ false;}}
+\DoxyCodeLine{00670\ \textcolor{stringliteral}{\ \ EXPECT\_FATAL\_FAILURE(\{\ \ //\ NOLINT"{}"{}"{}}}
+\DoxyCodeLine{00671\ \ \ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{00672\ \ \ \ \ \ \ \ \ test\ +=\ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{00673\ \textcolor{stringliteral}{\ \ EXPECT\_NONFATAL\_FAILURE(\{\ \ //\ NOLINT"{}"{}"{}}}
+\DoxyCodeLine{00674\ }
+\DoxyCodeLine{00675\ \ \ \ \ test\ +=\ \textcolor{stringliteral}{'\(\backslash\)n'}\ +\ extra\_indent\ +\ \textcolor{stringliteral}{"{}"{}"{}\ \ \%(assertion)s(\%(pf)s"{}"{}"{}}\ \%\ defs}
+\DoxyCodeLine{00676\ }
+\DoxyCodeLine{00677\ \ \ \ \ test\ =\ test\ \%\ defs}
+\DoxyCodeLine{00678\ \ \ \ \ test\ +=\ Iter(n,\ \textcolor{stringliteral}{',\(\backslash\)n'}\ +\ indent\ +\ extra\_indent\ +\ \textcolor{stringliteral}{'\%(arg)s'}\ \%\ defs)}
+\DoxyCodeLine{00679\ \ \ \ \ test\ +=\ \textcolor{stringliteral}{');\(\backslash\)n'}\ +\ extra\_indent\ +\ \textcolor{stringliteral}{'\ \ finished\_\ =\ true;\(\backslash\)n'}}
+\DoxyCodeLine{00680\ }
+\DoxyCodeLine{00681\ \ \ \ \ \textcolor{keywordflow}{if}\ expect\_failure:}
+\DoxyCodeLine{00682\ \ \ \ \ \ \ test\ +=\ \textcolor{stringliteral}{'\ \ \},\ "{}"{});\(\backslash\)n'}}
+\DoxyCodeLine{00683\ }
+\DoxyCodeLine{00684\ \ \ \ \ test\ +=\ \textcolor{stringliteral}{'\}\(\backslash\)n'}}
+\DoxyCodeLine{00685\ \ \ \ \ \textcolor{keywordflow}{return}\ test}
+\DoxyCodeLine{00686\ }
+\DoxyCodeLine{00687\ \ \ \textcolor{comment}{\#\ Generates\ tests\ for\ all\ 2**6\ =\ 64\ combinations.}}
+\DoxyCodeLine{00688\ \ \ tests\ +=\ \textcolor{stringliteral}{''}.join([GenTest(use\_format,\ use\_assert,\ expect\_failure,}
+\DoxyCodeLine{00689\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ use\_functor,\ use\_user\_type)}
+\DoxyCodeLine{00690\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ use\_format\ \textcolor{keywordflow}{in}\ [0,\ 1]}
+\DoxyCodeLine{00691\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ use\_assert\ \textcolor{keywordflow}{in}\ [0,\ 1]}
+\DoxyCodeLine{00692\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ expect\_failure\ \textcolor{keywordflow}{in}\ [0,\ 1]}
+\DoxyCodeLine{00693\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ use\_functor\ \textcolor{keywordflow}{in}\ [0,\ 1]}
+\DoxyCodeLine{00694\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ use\_user\_type\ \textcolor{keywordflow}{in}\ [0,\ 1]}
+\DoxyCodeLine{00695\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ])}
+\DoxyCodeLine{00696\ }
+\DoxyCodeLine{00697\ \ \ \textcolor{keywordflow}{return}\ tests}
+\DoxyCodeLine{00698\ }
+\DoxyCodeLine{00699\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacegen__gtest__pred__impl_a73c83807b2eb6a42a647488730c71aea_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacegen__gtest__pred__impl_a73c83807b2eb6a42a647488730c71aea_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacegen__gtest__pred__impl_a69f1f79fdb0720b4ebe3b30e2f19608a}\index{gen\_gtest\_pred\_impl@{gen\_gtest\_pred\_impl}!Title@{Title}}
+\index{Title@{Title}!gen\_gtest\_pred\_impl@{gen\_gtest\_pred\_impl}}
+\doxysubsubsection{\texorpdfstring{Title()}{Title()}}
+{\footnotesize\ttfamily \label{namespacegen__gtest__pred__impl_a69f1f79fdb0720b4ebe3b30e2f19608a} 
+gen\+\_\+gtest\+\_\+pred\+\_\+impl.\+Title (\begin{DoxyParamCaption}\item[{}]{word}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Returns the given word in title case.  The difference between
+this and string's title() method is that Title('4-ary') is '4-ary'
+while '4-ary'.title() is '4-Ary'.\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{gen__gtest__pred__impl_8py_source_l00174}{174}} of file \mbox{\hyperlink{gen__gtest__pred__impl_8py_source}{gen\+\_\+gtest\+\_\+pred\+\_\+impl.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00174\ \textcolor{keyword}{def\ }Title(word):}
+\DoxyCodeLine{00175\ \ \ \textcolor{stringliteral}{"{}"{}"{}Returns\ the\ given\ word\ in\ title\ case.\ \ The\ difference\ between}}
+\DoxyCodeLine{00176\ \textcolor{stringliteral}{\ \ this\ and\ string's\ title()\ method\ is\ that\ Title('4-\/ary')\ is\ '4-\/ary'}}
+\DoxyCodeLine{00177\ \textcolor{stringliteral}{\ \ while\ '4-\/ary'.title()\ is\ '4-\/Ary'."{}"{}"{}}}
+\DoxyCodeLine{00178\ }
+\DoxyCodeLine{00179\ \ \ \textcolor{keywordflow}{return}\ word[0].upper()\ +\ word[1:]}
+\DoxyCodeLine{00180\ }
+\DoxyCodeLine{00181\ }
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacegen__gtest__pred__impl_a69f1f79fdb0720b4ebe3b30e2f19608a_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacegen__gtest__pred__impl_a6766ef4e3c9e872a48a3815f8290db0e}\index{gen\_gtest\_pred\_impl@{gen\_gtest\_pred\_impl}!UnitTestPostamble@{UnitTestPostamble}}
+\index{UnitTestPostamble@{UnitTestPostamble}!gen\_gtest\_pred\_impl@{gen\_gtest\_pred\_impl}}
+\doxysubsubsection{\texorpdfstring{UnitTestPostamble()}{UnitTestPostamble()}}
+{\footnotesize\ttfamily \label{namespacegen__gtest__pred__impl_a6766ef4e3c9e872a48a3815f8290db0e} 
+gen\+\_\+gtest\+\_\+pred\+\_\+impl.\+Unit\+Test\+Postamble (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Returns the postamble for the tests.\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{gen__gtest__pred__impl_8py_source_l00700}{700}} of file \mbox{\hyperlink{gen__gtest__pred__impl_8py_source}{gen\+\_\+gtest\+\_\+pred\+\_\+impl.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00700\ \textcolor{keyword}{def\ }UnitTestPostamble():}
+\DoxyCodeLine{00701\ \ \ \textcolor{stringliteral}{"{}"{}"{}Returns\ the\ postamble\ for\ the\ tests."{}"{}"{}}}
+\DoxyCodeLine{00702\ }
+\DoxyCodeLine{00703\ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{''}}
+\DoxyCodeLine{00704\ }
+\DoxyCodeLine{00705\ }
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacegen__gtest__pred__impl_a6766ef4e3c9e872a48a3815f8290db0e_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacegen__gtest__pred__impl_a9e8ac01c257544c4d497ec7e01e9c971}\index{gen\_gtest\_pred\_impl@{gen\_gtest\_pred\_impl}!UnitTestPreamble@{UnitTestPreamble}}
+\index{UnitTestPreamble@{UnitTestPreamble}!gen\_gtest\_pred\_impl@{gen\_gtest\_pred\_impl}}
+\doxysubsubsection{\texorpdfstring{UnitTestPreamble()}{UnitTestPreamble()}}
+{\footnotesize\ttfamily \label{namespacegen__gtest__pred__impl_a9e8ac01c257544c4d497ec7e01e9c971} 
+gen\+\_\+gtest\+\_\+pred\+\_\+impl.\+Unit\+Test\+Preamble (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Returns the preamble for the unit test file.\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{gen__gtest__pred__impl_8py_source_l00325}{325}} of file \mbox{\hyperlink{gen__gtest__pred__impl_8py_source}{gen\+\_\+gtest\+\_\+pred\+\_\+impl.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00325\ \textcolor{keyword}{def\ }UnitTestPreamble():}
+\DoxyCodeLine{00326\ \ \ \textcolor{stringliteral}{"{}"{}"{}Returns\ the\ preamble\ for\ the\ unit\ test\ file."{}"{}"{}}}
+\DoxyCodeLine{00327\ }
+\DoxyCodeLine{00328\ \ \ \textcolor{comment}{\#\ A\ map\ that\ defines\ the\ values\ used\ in\ the\ preamble\ template.}}
+\DoxyCodeLine{00329\ \ \ DEFS\ =\ \{}
+\DoxyCodeLine{00330\ \ \ \ \ \textcolor{stringliteral}{'today'}\ :\ time.strftime(\textcolor{stringliteral}{'\%m/\%d/\%Y'}),}
+\DoxyCodeLine{00331\ \ \ \ \ \textcolor{stringliteral}{'year'}\ :\ time.strftime(\textcolor{stringliteral}{'\%Y'}),}
+\DoxyCodeLine{00332\ \ \ \ \ \textcolor{stringliteral}{'command'}\ :\ \textcolor{stringliteral}{'\%s\ \%s'}\ \%\ (os.path.basename(sys.argv[0]),\ sys.argv[1]),}
+\DoxyCodeLine{00333\ \ \ \ \ \}}
+\DoxyCodeLine{00334\ }
+\DoxyCodeLine{00335\ \ \ \textcolor{keywordflow}{return}\ (}
+\DoxyCodeLine{00336\ \textcolor{stringliteral}{"{}"{}"{}//\ Copyright\ 2006,\ Google\ Inc.}}
+\DoxyCodeLine{00337\ \textcolor{stringliteral}{//\ All\ rights\ reserved.}}
+\DoxyCodeLine{00338\ \textcolor{stringliteral}{//}}
+\DoxyCodeLine{00339\ \textcolor{stringliteral}{//\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{00340\ \textcolor{stringliteral}{//\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are}}
+\DoxyCodeLine{00341\ \textcolor{stringliteral}{//\ met:}}
+\DoxyCodeLine{00342\ \textcolor{stringliteral}{//}}
+\DoxyCodeLine{00343\ \textcolor{stringliteral}{//\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{00344\ \textcolor{stringliteral}{//\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{00345\ \textcolor{stringliteral}{//\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above}}
+\DoxyCodeLine{00346\ \textcolor{stringliteral}{//\ copyright\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer}}
+\DoxyCodeLine{00347\ \textcolor{stringliteral}{//\ in\ the\ documentation\ and/or\ other\ materials\ provided\ with\ the}}
+\DoxyCodeLine{00348\ \textcolor{stringliteral}{//\ distribution.}}
+\DoxyCodeLine{00349\ \textcolor{stringliteral}{//\ \ \ \ \ *\ Neither\ the\ name\ of\ Google\ Inc.\ nor\ the\ names\ of\ its}}
+\DoxyCodeLine{00350\ \textcolor{stringliteral}{//\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products\ derived\ from}}
+\DoxyCodeLine{00351\ \textcolor{stringliteral}{//\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{00352\ \textcolor{stringliteral}{//}}
+\DoxyCodeLine{00353\ \textcolor{stringliteral}{//\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS}}
+\DoxyCodeLine{00354\ \textcolor{stringliteral}{//\ "{}AS\ IS"{}\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{00355\ \textcolor{stringliteral}{//\ LIMITED\ TO,\ THE\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR}}
+\DoxyCodeLine{00356\ \textcolor{stringliteral}{//\ A\ PARTICULAR\ PURPOSE\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ THE\ COPYRIGHT}}
+\DoxyCodeLine{00357\ \textcolor{stringliteral}{//\ OWNER\ OR\ CONTRIBUTORS\ BE\ LIABLE\ FOR\ ANY\ DIRECT,\ INDIRECT,\ INCIDENTAL,}}
+\DoxyCodeLine{00358\ \textcolor{stringliteral}{//\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES\ (INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{00359\ \textcolor{stringliteral}{//\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;\ LOSS\ OF\ USE,}}
+\DoxyCodeLine{00360\ \textcolor{stringliteral}{//\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND\ ON\ ANY}}
+\DoxyCodeLine{00361\ \textcolor{stringliteral}{//\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{00362\ \textcolor{stringliteral}{//\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE}}
+\DoxyCodeLine{00363\ \textcolor{stringliteral}{//\ OF\ THIS\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{00364\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00365\ \textcolor{stringliteral}{//\ This\ file\ is\ AUTOMATICALLY\ GENERATED\ on\ \%(today)s\ by\ command}}
+\DoxyCodeLine{00366\ \textcolor{stringliteral}{//\ '\%(command)s'.\ \ DO\ NOT\ EDIT\ BY\ HAND!}}
+\DoxyCodeLine{00367\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00368\ \textcolor{stringliteral}{//\ Regression\ test\ for\ gtest\_pred\_impl.h}}
+\DoxyCodeLine{00369\ \textcolor{stringliteral}{//}}
+\DoxyCodeLine{00370\ \textcolor{stringliteral}{//\ This\ file\ is\ generated\ by\ a\ script\ and\ quite\ long.\ \ If\ you\ intend\ to}}
+\DoxyCodeLine{00371\ \textcolor{stringliteral}{//\ learn\ how\ Google\ Test\ works\ by\ reading\ its\ unit\ tests,\ read}}
+\DoxyCodeLine{00372\ \textcolor{stringliteral}{//\ gtest\_unittest.cc\ instead.}}
+\DoxyCodeLine{00373\ \textcolor{stringliteral}{//}}
+\DoxyCodeLine{00374\ \textcolor{stringliteral}{//\ This\ is\ intended\ as\ a\ regression\ test\ for\ the\ Google\ Test\ predicate}}
+\DoxyCodeLine{00375\ \textcolor{stringliteral}{//\ assertions.\ \ We\ compile\ it\ as\ part\ of\ the\ gtest\_unittest\ target}}
+\DoxyCodeLine{00376\ \textcolor{stringliteral}{//\ only\ to\ keep\ the\ implementation\ tidy\ and\ compact,\ as\ it\ is\ quite}}
+\DoxyCodeLine{00377\ \textcolor{stringliteral}{//\ involved\ to\ set\ up\ the\ stage\ for\ testing\ Google\ Test\ using\ Google}}
+\DoxyCodeLine{00378\ \textcolor{stringliteral}{//\ Test\ itself.}}
+\DoxyCodeLine{00379\ \textcolor{stringliteral}{//}}
+\DoxyCodeLine{00380\ \textcolor{stringliteral}{//\ Currently,\ gtest\_unittest\ takes\ \string~11\ seconds\ to\ run\ in\ the\ testing}}
+\DoxyCodeLine{00381\ \textcolor{stringliteral}{//\ daemon.\ \ In\ the\ future,\ if\ it\ grows\ too\ large\ and\ needs\ much\ more}}
+\DoxyCodeLine{00382\ \textcolor{stringliteral}{//\ time\ to\ finish,\ we\ should\ consider\ separating\ this\ file\ into\ a}}
+\DoxyCodeLine{00383\ \textcolor{stringliteral}{//\ stand-\/alone\ regression\ test.}}
+\DoxyCodeLine{00384\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00385\ \textcolor{stringliteral}{\#include\ <iostream>}}
+\DoxyCodeLine{00386\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00387\ \textcolor{stringliteral}{\#include\ "{}gtest/gtest.h"{}}}
+\DoxyCodeLine{00388\ \textcolor{stringliteral}{\#include\ "{}gtest/gtest-\/spi.h"{}}}
+\DoxyCodeLine{00389\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00390\ \textcolor{stringliteral}{//\ A\ user-\/defined\ data\ type.}}
+\DoxyCodeLine{00391\ \textcolor{stringliteral}{struct\ Bool\ \{}}
+\DoxyCodeLine{00392\ \textcolor{stringliteral}{\ \ explicit\ Bool(int\ val)\ :\ value(val\ !=\ 0)\ \{\}}}
+\DoxyCodeLine{00393\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00394\ \textcolor{stringliteral}{\ \ bool\ operator>(int\ n)\ const\ \{\ return\ value\ >\ Bool(n).value;\ \}}}
+\DoxyCodeLine{00395\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00396\ \textcolor{stringliteral}{\ \ Bool\ operator+(const\ Bool\&\ rhs)\ const\ \{\ return\ Bool(value\ +\ rhs.value);\ \}}}
+\DoxyCodeLine{00397\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00398\ \textcolor{stringliteral}{\ \ bool\ operator==(const\ Bool\&\ rhs)\ const\ \{\ return\ value\ ==\ rhs.value;\ \}}}
+\DoxyCodeLine{00399\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00400\ \textcolor{stringliteral}{\ \ bool\ value;}}
+\DoxyCodeLine{00401\ \textcolor{stringliteral}{\};}}
+\DoxyCodeLine{00402\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00403\ \textcolor{stringliteral}{//\ Enables\ Bool\ to\ be\ used\ in\ assertions.}}
+\DoxyCodeLine{00404\ \textcolor{stringliteral}{std::ostream\&\ operator<<(std::ostream\&\ os,\ const\ Bool\&\ x)\ \{}}
+\DoxyCodeLine{00405\ \textcolor{stringliteral}{\ \ return\ os\ <<\ (x.value\ ?\ "{}true"{}\ :\ "{}false"{});}}
+\DoxyCodeLine{00406\ \textcolor{stringliteral}{\}}}
+\DoxyCodeLine{00407\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00408\ \textcolor{stringliteral}{"{}"{}"{}}\ \%\ DEFS)}
+\DoxyCodeLine{00409\ }
+\DoxyCodeLine{00410\ }
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacegen__gtest__pred__impl_a9e8ac01c257544c4d497ec7e01e9c971_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{namespacegen__gtest__pred__impl_ab96c63705e2cb7619876ba592dab4c8e}\index{gen\_gtest\_pred\_impl@{gen\_gtest\_pred\_impl}!HEADER@{HEADER}}
+\index{HEADER@{HEADER}!gen\_gtest\_pred\_impl@{gen\_gtest\_pred\_impl}}
+\doxysubsubsection{\texorpdfstring{HEADER}{HEADER}}
+{\footnotesize\ttfamily \label{namespacegen__gtest__pred__impl_ab96c63705e2cb7619876ba592dab4c8e} 
+gen\+\_\+gtest\+\_\+pred\+\_\+impl.\+HEADER = os.\+path.\+join(\mbox{\hyperlink{namespacegen__gtest__pred__impl_aed087c7fc787a064f0a9fd5f5f9f6487}{SCRIPT\+\_\+\+DIR}}, \textquotesingle{}../include/gtest/gtest\+\_\+pred\+\_\+impl.\+h\textquotesingle{})}
+
+
+
+Definition at line \mbox{\hyperlink{gen__gtest__pred__impl_8py_source_l00059}{59}} of file \mbox{\hyperlink{gen__gtest__pred__impl_8py_source}{gen\+\_\+gtest\+\_\+pred\+\_\+impl.\+py}}.
+
+\Hypertarget{namespacegen__gtest__pred__impl_aed087c7fc787a064f0a9fd5f5f9f6487}\index{gen\_gtest\_pred\_impl@{gen\_gtest\_pred\_impl}!SCRIPT\_DIR@{SCRIPT\_DIR}}
+\index{SCRIPT\_DIR@{SCRIPT\_DIR}!gen\_gtest\_pred\_impl@{gen\_gtest\_pred\_impl}}
+\doxysubsubsection{\texorpdfstring{SCRIPT\_DIR}{SCRIPT\_DIR}}
+{\footnotesize\ttfamily \label{namespacegen__gtest__pred__impl_aed087c7fc787a064f0a9fd5f5f9f6487} 
+gen\+\_\+gtest\+\_\+pred\+\_\+impl.\+SCRIPT\+\_\+\+DIR = os.\+path.\+dirname(sys.\+argv\mbox{[}0\mbox{]})}
+
+
+
+Definition at line \mbox{\hyperlink{gen__gtest__pred__impl_8py_source_l00056}{56}} of file \mbox{\hyperlink{gen__gtest__pred__impl_8py_source}{gen\+\_\+gtest\+\_\+pred\+\_\+impl.\+py}}.
+
+\Hypertarget{namespacegen__gtest__pred__impl_a8c1cb8e87c4bd84edbb958f73b7df200}\index{gen\_gtest\_pred\_impl@{gen\_gtest\_pred\_impl}!UNIT\_TEST@{UNIT\_TEST}}
+\index{UNIT\_TEST@{UNIT\_TEST}!gen\_gtest\_pred\_impl@{gen\_gtest\_pred\_impl}}
+\doxysubsubsection{\texorpdfstring{UNIT\_TEST}{UNIT\_TEST}}
+{\footnotesize\ttfamily \label{namespacegen__gtest__pred__impl_a8c1cb8e87c4bd84edbb958f73b7df200} 
+gen\+\_\+gtest\+\_\+pred\+\_\+impl.\+UNIT\+\_\+\+TEST = os.\+path.\+join(\mbox{\hyperlink{namespacegen__gtest__pred__impl_aed087c7fc787a064f0a9fd5f5f9f6487}{SCRIPT\+\_\+\+DIR}}, \textquotesingle{}../test/gtest\+\_\+pred\+\_\+impl\+\_\+unittest.\+cc\textquotesingle{})}
+
+
+
+Definition at line \mbox{\hyperlink{gen__gtest__pred__impl_8py_source_l00062}{62}} of file \mbox{\hyperlink{gen__gtest__pred__impl_8py_source}{gen\+\_\+gtest\+\_\+pred\+\_\+impl.\+py}}.
+

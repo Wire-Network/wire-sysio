@@ -1,0 +1,74 @@
+\doxysection{libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/samples/sample10\+\_\+unittest.cc File Reference}
+\hypertarget{sample10__unittest_8cc}{}\label{sample10__unittest_8cc}\index{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/samples/sample10\_unittest.cc@{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/samples/sample10\_unittest.cc}}
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include "{}gtest/gtest.\+h"{}}\newline
+Include dependency graph for sample10\+\_\+unittest.\+cc\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sample10__unittest_8cc__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{sample10__unittest_8cc_a3c04138a5bfe5d72780bb7e82a18e627}{main}} (int argc, char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{sample10__unittest_8cc_a3c04138a5bfe5d72780bb7e82a18e627}\index{sample10\_unittest.cc@{sample10\_unittest.cc}!main@{main}}
+\index{main@{main}!sample10\_unittest.cc@{sample10\_unittest.cc}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{sample10__unittest_8cc_a3c04138a5bfe5d72780bb7e82a18e627} 
+int main (\begin{DoxyParamCaption}\item[{int}]{argc}{, }\item[{char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{argv}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sample10__unittest_8cc_source_l00108}{108}} of file \mbox{\hyperlink{sample10__unittest_8cc_source}{sample10\+\_\+unittest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00109\ \ \ \mbox{\hyperlink{namespacetesting_afd726ae08c9bd16dc52f78c822d9946b}{InitGoogleTest}}(\&argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}});}
+\DoxyCodeLine{00110\ }
+\DoxyCodeLine{00111\ \ \ \textcolor{keywordtype}{bool}\ check\_for\_leaks\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00112\ \ \ \textcolor{keywordflow}{if}\ (argc\ >\ 1\ \&\&\ strcmp(\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[1],\ \textcolor{stringliteral}{"{}-\/-\/check\_for\_leaks"{}})\ ==\ 0\ )}
+\DoxyCodeLine{00113\ \ \ \ \ check\_for\_leaks\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00114\ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00115\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\%s\(\backslash\)n"{}},\ \textcolor{stringliteral}{"{}Run\ this\ program\ with\ -\/-\/check\_for\_leaks\ to\ enable\ "{}}}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}custom\ leak\ checking\ in\ the\ tests."{}});}
+\DoxyCodeLine{00117\ }
+\DoxyCodeLine{00118\ \ \ \textcolor{comment}{//\ If\ we\ are\ given\ the\ -\/-\/check\_for\_leaks\ command\ line\ flag,\ installs\ the}}
+\DoxyCodeLine{00119\ \ \ \textcolor{comment}{//\ leak\ checker.}}
+\DoxyCodeLine{00120\ \ \ \textcolor{keywordflow}{if}\ (check\_for\_leaks)\ \{}
+\DoxyCodeLine{00121\ \ \ \ \ TestEventListeners\&\ listeners\ =\ UnitTest::GetInstance()-\/>listeners();}
+\DoxyCodeLine{00122\ }
+\DoxyCodeLine{00123\ \ \ \ \ \textcolor{comment}{//\ Adds\ the\ leak\ checker\ to\ the\ end\ of\ the\ test\ event\ listener\ list,}}
+\DoxyCodeLine{00124\ \ \ \ \ \textcolor{comment}{//\ after\ the\ default\ text\ output\ printer\ and\ the\ default\ XML\ report}}
+\DoxyCodeLine{00125\ \ \ \ \ \textcolor{comment}{//\ generator.}}
+\DoxyCodeLine{00126\ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00127\ \ \ \ \ \textcolor{comment}{//\ The\ order\ is\ important\ -\/\ it\ ensures\ that\ failures\ generated\ in\ the}}
+\DoxyCodeLine{00128\ \ \ \ \ \textcolor{comment}{//\ leak\ checker's\ OnTestEnd()\ method\ are\ processed\ by\ the\ text\ and\ XML}}
+\DoxyCodeLine{00129\ \ \ \ \ \textcolor{comment}{//\ printers\ *before*\ their\ OnTestEnd()\ methods\ are\ called,\ such\ that}}
+\DoxyCodeLine{00130\ \ \ \ \ \textcolor{comment}{//\ they\ are\ attributed\ to\ the\ right\ test.\ Remember\ that\ a\ listener}}
+\DoxyCodeLine{00131\ \ \ \ \ \textcolor{comment}{//\ receives\ an\ OnXyzStart\ event\ *after*\ listeners\ preceding\ it\ in\ the}}
+\DoxyCodeLine{00132\ \ \ \ \ \textcolor{comment}{//\ list\ received\ that\ event,\ and\ receives\ an\ OnXyzEnd\ event\ *before*}}
+\DoxyCodeLine{00133\ \ \ \ \ \textcolor{comment}{//\ listeners\ preceding\ it.}}
+\DoxyCodeLine{00134\ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{00135\ \ \ \ \ \textcolor{comment}{//\ We\ don't\ need\ to\ worry\ about\ deleting\ the\ new\ listener\ later,\ as}}
+\DoxyCodeLine{00136\ \ \ \ \ \textcolor{comment}{//\ Google\ Test\ will\ do\ it.}}
+\DoxyCodeLine{00137\ \ \ \ \ listeners.Append(\textcolor{keyword}{new}\ LeakChecker);}
+\DoxyCodeLine{00138\ \ \ \}}
+\DoxyCodeLine{00139\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{gtest_8h_a853a3792807489591d3d4a2f2ff9359f}{RUN\_ALL\_TESTS}}();}
+\DoxyCodeLine{00140\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=252pt]{sample10__unittest_8cc_a3c04138a5bfe5d72780bb7e82a18e627_cgraph}
+\end{center}
+\end{figure}

@@ -1,0 +1,129 @@
+\doxysection{sysiobios\+::block\+\_\+header Struct Reference}
+\hypertarget{structsysiobios_1_1block__header}{}\label{structsysiobios_1_1block__header}\index{sysiobios::block\_header@{sysiobios::block\_header}}
+
+
+{\ttfamily \#include $<$sysio.\+bios.\+hpp$>$}
+
+
+
+Collaboration diagram for sysiobios\+::block\+\_\+header\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=304pt]{structsysiobios_1_1block__header__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysiobios_1_1block__header_a0070b401b8ad6da9b02097ce0f323853}{timestamp}}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \mbox{\hyperlink{structsysiobios_1_1block__header_a527f34a6ef2797d2c0358f599fdb875f}{producer}}
+\item 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{structsysiobios_1_1block__header_ada9ec0ab8738afb4f7db7c47a5c9374b}{confirmed}} = 0
+\item 
+checksum256 \mbox{\hyperlink{structsysiobios_1_1block__header_ab64f0af3df61e9013bd7e35b3503c7c3}{previous}}
+\item 
+checksum256 \mbox{\hyperlink{structsysiobios_1_1block__header_a55aa68079988b00a9e6e114408f7c7f1}{transaction\+\_\+mroot}}
+\item 
+checksum256 \mbox{\hyperlink{structsysiobios_1_1block__header_ae0aaf647e9885be839f26b976228c87d}{action\+\_\+mroot}}
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysiobios_1_1block__header_aef3c6f35be1d0de34c199528bd7dce87}{schedule\+\_\+version}} = 0
+\item 
+std\+::optional$<$ sysio\+::producer\+\_\+schedule $>$ \mbox{\hyperlink{structsysiobios_1_1block__header_ad29bdfb181cbb2aee4da5a5d75023f49}{new\+\_\+producers}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{sysio_8bios_8hpp_source_l00054}{54}} of file \mbox{\hyperlink{sysio_8bios_8hpp_source}{sysio.\+bios.\+hpp}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysiobios_1_1block__header_ae0aaf647e9885be839f26b976228c87d}\index{sysiobios::block\_header@{sysiobios::block\_header}!action\_mroot@{action\_mroot}}
+\index{action\_mroot@{action\_mroot}!sysiobios::block\_header@{sysiobios::block\_header}}
+\doxysubsubsection{\texorpdfstring{action\_mroot}{action\_mroot}}
+{\footnotesize\ttfamily \label{structsysiobios_1_1block__header_ae0aaf647e9885be839f26b976228c87d} 
+checksum256 sysiobios\+::block\+\_\+header\+::action\+\_\+mroot}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8bios_8hpp_source_l00060}{60}} of file \mbox{\hyperlink{sysio_8bios_8hpp_source}{sysio.\+bios.\+hpp}}.
+
+\Hypertarget{structsysiobios_1_1block__header_ada9ec0ab8738afb4f7db7c47a5c9374b}\index{sysiobios::block\_header@{sysiobios::block\_header}!confirmed@{confirmed}}
+\index{confirmed@{confirmed}!sysiobios::block\_header@{sysiobios::block\_header}}
+\doxysubsubsection{\texorpdfstring{confirmed}{confirmed}}
+{\footnotesize\ttfamily \label{structsysiobios_1_1block__header_ada9ec0ab8738afb4f7db7c47a5c9374b} 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} sysiobios\+::block\+\_\+header\+::confirmed = 0}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8bios_8hpp_source_l00057}{57}} of file \mbox{\hyperlink{sysio_8bios_8hpp_source}{sysio.\+bios.\+hpp}}.
+
+\Hypertarget{structsysiobios_1_1block__header_ad29bdfb181cbb2aee4da5a5d75023f49}\index{sysiobios::block\_header@{sysiobios::block\_header}!new\_producers@{new\_producers}}
+\index{new\_producers@{new\_producers}!sysiobios::block\_header@{sysiobios::block\_header}}
+\doxysubsubsection{\texorpdfstring{new\_producers}{new\_producers}}
+{\footnotesize\ttfamily \label{structsysiobios_1_1block__header_ad29bdfb181cbb2aee4da5a5d75023f49} 
+std\+::optional$<$sysio\+::producer\+\_\+schedule$>$ sysiobios\+::block\+\_\+header\+::new\+\_\+producers}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8bios_8hpp_source_l00062}{62}} of file \mbox{\hyperlink{sysio_8bios_8hpp_source}{sysio.\+bios.\+hpp}}.
+
+\Hypertarget{structsysiobios_1_1block__header_ab64f0af3df61e9013bd7e35b3503c7c3}\index{sysiobios::block\_header@{sysiobios::block\_header}!previous@{previous}}
+\index{previous@{previous}!sysiobios::block\_header@{sysiobios::block\_header}}
+\doxysubsubsection{\texorpdfstring{previous}{previous}}
+{\footnotesize\ttfamily \label{structsysiobios_1_1block__header_ab64f0af3df61e9013bd7e35b3503c7c3} 
+checksum256 sysiobios\+::block\+\_\+header\+::previous}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8bios_8hpp_source_l00058}{58}} of file \mbox{\hyperlink{sysio_8bios_8hpp_source}{sysio.\+bios.\+hpp}}.
+
+\Hypertarget{structsysiobios_1_1block__header_a527f34a6ef2797d2c0358f599fdb875f}\index{sysiobios::block\_header@{sysiobios::block\_header}!producer@{producer}}
+\index{producer@{producer}!sysiobios::block\_header@{sysiobios::block\_header}}
+\doxysubsubsection{\texorpdfstring{producer}{producer}}
+{\footnotesize\ttfamily \label{structsysiobios_1_1block__header_a527f34a6ef2797d2c0358f599fdb875f} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} sysiobios\+::block\+\_\+header\+::producer}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8bios_8hpp_source_l00056}{56}} of file \mbox{\hyperlink{sysio_8bios_8hpp_source}{sysio.\+bios.\+hpp}}.
+
+\Hypertarget{structsysiobios_1_1block__header_aef3c6f35be1d0de34c199528bd7dce87}\index{sysiobios::block\_header@{sysiobios::block\_header}!schedule\_version@{schedule\_version}}
+\index{schedule\_version@{schedule\_version}!sysiobios::block\_header@{sysiobios::block\_header}}
+\doxysubsubsection{\texorpdfstring{schedule\_version}{schedule\_version}}
+{\footnotesize\ttfamily \label{structsysiobios_1_1block__header_aef3c6f35be1d0de34c199528bd7dce87} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysiobios\+::block\+\_\+header\+::schedule\+\_\+version = 0}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8bios_8hpp_source_l00061}{61}} of file \mbox{\hyperlink{sysio_8bios_8hpp_source}{sysio.\+bios.\+hpp}}.
+
+\Hypertarget{structsysiobios_1_1block__header_a0070b401b8ad6da9b02097ce0f323853}\index{sysiobios::block\_header@{sysiobios::block\_header}!timestamp@{timestamp}}
+\index{timestamp@{timestamp}!sysiobios::block\_header@{sysiobios::block\_header}}
+\doxysubsubsection{\texorpdfstring{timestamp}{timestamp}}
+{\footnotesize\ttfamily \label{structsysiobios_1_1block__header_a0070b401b8ad6da9b02097ce0f323853} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysiobios\+::block\+\_\+header\+::timestamp}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8bios_8hpp_source_l00055}{55}} of file \mbox{\hyperlink{sysio_8bios_8hpp_source}{sysio.\+bios.\+hpp}}.
+
+\Hypertarget{structsysiobios_1_1block__header_a55aa68079988b00a9e6e114408f7c7f1}\index{sysiobios::block\_header@{sysiobios::block\_header}!transaction\_mroot@{transaction\_mroot}}
+\index{transaction\_mroot@{transaction\_mroot}!sysiobios::block\_header@{sysiobios::block\_header}}
+\doxysubsubsection{\texorpdfstring{transaction\_mroot}{transaction\_mroot}}
+{\footnotesize\ttfamily \label{structsysiobios_1_1block__header_a55aa68079988b00a9e6e114408f7c7f1} 
+checksum256 sysiobios\+::block\+\_\+header\+::transaction\+\_\+mroot}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_8bios_8hpp_source_l00059}{59}} of file \mbox{\hyperlink{sysio_8bios_8hpp_source}{sysio.\+bios.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/svetlasyrimis/\+Desktop/wire-\/network/\+WN-\/org/wire-\/system-\/contracts/contracts/sysio.\+bios/include/sysio.\+bios/\mbox{\hyperlink{sysio_8bios_8hpp}{sysio.\+bios.\+hpp}}\end{DoxyCompactItemize}

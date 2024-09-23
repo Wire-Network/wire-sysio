@@ -1,0 +1,17 @@
+<map id="plugins/producer_plugin/include/sysio/producer_plugin/producer_plugin.hpp" name="plugins/producer_plugin/include/sysio/producer_plugin/producer_plugin.hpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="423,5,606,61"/>
+<area shape="rect" id="Node000002" href="$chain__plugin_8cpp.html" title=" " alt="" coords="5,124,144,165"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="409,54,287,78,157,112,118,126,116,121,155,106,286,73,407,48"/>
+<area shape="rect" id="Node000003" href="$net__plugin_8cpp.html" title=" " alt="" coords="168,124,293,165"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="420,69,306,111,273,126,271,121,304,107,418,64"/>
+<area shape="rect" id="Node000004" href="$producer__api__plugin_8hpp.html" title=" " alt="" coords="317,109,512,180"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="481,74,448,111,444,107,477,71"/>
+<area shape="rect" id="Node000006" href="$producer__plugin_8cpp.html" title=" " alt="" coords="536,124,693,165"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="551,70,599,122,595,125,547,74"/>
+<area shape="rect" id="Node000007" href="$test__trx__full_8cpp.html" title=" " alt="" coords="717,124,874,165"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="600,64,746,121,744,126,598,69"/>
+<area shape="rect" id="Node000008" href="$programs_2nodeop_2main_8cpp.html" title=" " alt="" coords="899,132,1077,157"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="622,50,749,74,887,106,956,128,954,133,886,112,748,79,621,55"/>
+<area shape="rect" id="Node000005" href="$producer__api__plugin_8cpp.html" title=" " alt="" coords="344,228,485,283"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="417,195,417,227,412,227,412,195"/>
+</map>

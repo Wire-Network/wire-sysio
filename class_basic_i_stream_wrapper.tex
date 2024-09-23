@@ -1,0 +1,273 @@
+\doxysection{Basic\+IStream\+Wrapper\texorpdfstring{$<$}{<} Stream\+Type \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{class_basic_i_stream_wrapper}{}\label{class_basic_i_stream_wrapper}\index{BasicIStreamWrapper$<$ StreamType $>$@{BasicIStreamWrapper$<$ StreamType $>$}}
+
+
+Wrapper of {\ttfamily std\+::basic\+\_\+istream} into Rapid\+JSON\textquotesingle{}s Stream concept.  
+
+
+
+
+{\ttfamily \#include $<$istreamwrapper.\+h$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef Stream\+Type\+::char\+\_\+type \mbox{\hyperlink{class_basic_i_stream_wrapper_a76617dc2b11504f9a016c97486a51ca7}{Ch}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_basic_i_stream_wrapper_a3e9a2dd2b6b28243f8f2a911f67cdf56}{Basic\+IStream\+Wrapper}} (Stream\+Type \&stream)
+\begin{DoxyCompactList}\small\item\em Constructor. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_basic_i_stream_wrapper_a7a87c6702f1e98256de416ee101a460f}{Basic\+IStream\+Wrapper}} (Stream\+Type \&stream, char \texorpdfstring{$\ast$}{*}buffer, size\+\_\+t buffer\+Size)
+\begin{DoxyCompactList}\small\item\em Constructor. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_basic_i_stream_wrapper_a76617dc2b11504f9a016c97486a51ca7}{Ch}} \mbox{\hyperlink{class_basic_i_stream_wrapper_a0ad1488235b4786dd4f7a16e679dec88}{Peek}} () const
+\item 
+\mbox{\hyperlink{class_basic_i_stream_wrapper_a76617dc2b11504f9a016c97486a51ca7}{Ch}} \mbox{\hyperlink{class_basic_i_stream_wrapper_afb71f0329d0abbbc9b22ebeb5c1464d1}{Take}} ()
+\item 
+size\+\_\+t \mbox{\hyperlink{class_basic_i_stream_wrapper_ac212848265f937add49bd973de794e25}{Tell}} () const
+\item 
+void \mbox{\hyperlink{class_basic_i_stream_wrapper_afa71cb2f5b7668837d0a81e3bce55e69}{Put}} (\mbox{\hyperlink{class_basic_i_stream_wrapper_a76617dc2b11504f9a016c97486a51ca7}{Ch}})
+\item 
+void \mbox{\hyperlink{class_basic_i_stream_wrapper_a37d5e4cd8fdf3c83dad50737e95886a9}{Flush}} ()
+\item 
+\mbox{\hyperlink{class_basic_i_stream_wrapper_a76617dc2b11504f9a016c97486a51ca7}{Ch}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_basic_i_stream_wrapper_a10999721c014eea987d28a1ef9762351}{Put\+Begin}} ()
+\item 
+size\+\_\+t \mbox{\hyperlink{class_basic_i_stream_wrapper_ab2ead53490207a1cb0bdd674a03957f3}{Put\+End}} (\mbox{\hyperlink{class_basic_i_stream_wrapper_a76617dc2b11504f9a016c97486a51ca7}{Ch}} \texorpdfstring{$\ast$}{*})
+\item 
+const \mbox{\hyperlink{class_basic_i_stream_wrapper_a76617dc2b11504f9a016c97486a51ca7}{Ch}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_basic_i_stream_wrapper_a461ed82951afefd68ce9ba446031aa60}{Peek4}} () const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Stream\+Type$>$\newline
+class Basic\+IStream\+Wrapper$<$ Stream\+Type $>$}
+The classes can be wrapped including but not limited to\+:
+
+
+\begin{DoxyItemize}
+\item {\ttfamily std\+::istringstream} 
+\item {\ttfamily std\+::stringstream} 
+\item {\ttfamily std\+::wistringstream} 
+\item {\ttfamily std\+::wstringstream} 
+\item {\ttfamily std\+::ifstream} 
+\item {\ttfamily std\+::fstream} 
+\item {\ttfamily std\+::wifstream} 
+\item {\ttfamily std\+::wfstream} 
+\end{DoxyItemize}
+
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em Stream\+Type} & Class derived from {\ttfamily std\+::basic\+\_\+istream}. \\
+\hline
+\end{DoxyTemplParams}
+
+
+Definition at line \mbox{\hyperlink{istreamwrapper_8h_source_l00049}{49}} of file \mbox{\hyperlink{istreamwrapper_8h_source}{istreamwrapper.\+h}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{class_basic_i_stream_wrapper_a76617dc2b11504f9a016c97486a51ca7}\index{BasicIStreamWrapper$<$ StreamType $>$@{BasicIStreamWrapper$<$ StreamType $>$}!Ch@{Ch}}
+\index{Ch@{Ch}!BasicIStreamWrapper$<$ StreamType $>$@{BasicIStreamWrapper$<$ StreamType $>$}}
+\doxysubsubsection{\texorpdfstring{Ch}{Ch}}
+{\footnotesize\ttfamily \label{class_basic_i_stream_wrapper_a76617dc2b11504f9a016c97486a51ca7} 
+template$<$typename Stream\+Type $>$ \\
+Stream\+Type\+::char\+\_\+type \mbox{\hyperlink{class_basic_i_stream_wrapper}{Basic\+IStream\+Wrapper}}$<$ Stream\+Type $>$\+::\+Ch}
+
+
+
+Definition at line \mbox{\hyperlink{istreamwrapper_8h_source_l00051}{51}} of file \mbox{\hyperlink{istreamwrapper_8h_source}{istreamwrapper.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_basic_i_stream_wrapper_a3e9a2dd2b6b28243f8f2a911f67cdf56}\index{BasicIStreamWrapper$<$ StreamType $>$@{BasicIStreamWrapper$<$ StreamType $>$}!BasicIStreamWrapper@{BasicIStreamWrapper}}
+\index{BasicIStreamWrapper@{BasicIStreamWrapper}!BasicIStreamWrapper$<$ StreamType $>$@{BasicIStreamWrapper$<$ StreamType $>$}}
+\doxysubsubsection{\texorpdfstring{BasicIStreamWrapper()}{BasicIStreamWrapper()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_basic_i_stream_wrapper_a3e9a2dd2b6b28243f8f2a911f67cdf56} 
+template$<$typename Stream\+Type $>$ \\
+\mbox{\hyperlink{class_basic_i_stream_wrapper}{Basic\+IStream\+Wrapper}}$<$ Stream\+Type $>$\mbox{\hyperlink{class_basic_i_stream_wrapper}{\+::\+Basic\+IStream\+Wrapper}} (\begin{DoxyParamCaption}\item[{Stream\+Type \&}]{stream}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+\begin{DoxyParams}{Parameters}
+{\em stream} & stream opened for read. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{istreamwrapper_8h_source_l00057}{57}} of file \mbox{\hyperlink{istreamwrapper_8h_source}{istreamwrapper.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ stream\_(stream),\ buffer\_(peekBuffer\_),\ bufferSize\_(4),\ bufferLast\_(0),\ current\_(buffer\_),\ readCount\_(0),\ count\_(0),\ eof\_(\textcolor{keyword}{false})\ \{\ }
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ Read();}
+\DoxyCodeLine{00059\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_basic_i_stream_wrapper_a7a87c6702f1e98256de416ee101a460f}\index{BasicIStreamWrapper$<$ StreamType $>$@{BasicIStreamWrapper$<$ StreamType $>$}!BasicIStreamWrapper@{BasicIStreamWrapper}}
+\index{BasicIStreamWrapper@{BasicIStreamWrapper}!BasicIStreamWrapper$<$ StreamType $>$@{BasicIStreamWrapper$<$ StreamType $>$}}
+\doxysubsubsection{\texorpdfstring{BasicIStreamWrapper()}{BasicIStreamWrapper()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_basic_i_stream_wrapper_a7a87c6702f1e98256de416ee101a460f} 
+template$<$typename Stream\+Type $>$ \\
+\mbox{\hyperlink{class_basic_i_stream_wrapper}{Basic\+IStream\+Wrapper}}$<$ Stream\+Type $>$\mbox{\hyperlink{class_basic_i_stream_wrapper}{\+::\+Basic\+IStream\+Wrapper}} (\begin{DoxyParamCaption}\item[{Stream\+Type \&}]{stream}{, }\item[{char \texorpdfstring{$\ast$}{*}}]{buffer}{, }\item[{size\+\_\+t}]{buffer\+Size}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+\begin{DoxyParams}{Parameters}
+{\em stream} & stream opened for read. \\
+\hline
+{\em buffer} & user-\/supplied buffer. \\
+\hline
+{\em buffer\+Size} & size of buffer in bytes. Must \texorpdfstring{$>$}{>}=4 bytes. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{istreamwrapper_8h_source_l00067}{67}} of file \mbox{\hyperlink{istreamwrapper_8h_source}{istreamwrapper.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ stream\_(stream),\ buffer\_(buffer),\ bufferSize\_(bufferSize),\ bufferLast\_(0),\ current\_(buffer\_),\ readCount\_(0),\ count\_(0),\ eof\_(\textcolor{keyword}{false})\ \{\ }
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(bufferSize\ >=\ 4);}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ Read();}
+\DoxyCodeLine{00070\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_basic_i_stream_wrapper_a37d5e4cd8fdf3c83dad50737e95886a9}\index{BasicIStreamWrapper$<$ StreamType $>$@{BasicIStreamWrapper$<$ StreamType $>$}!Flush@{Flush}}
+\index{Flush@{Flush}!BasicIStreamWrapper$<$ StreamType $>$@{BasicIStreamWrapper$<$ StreamType $>$}}
+\doxysubsubsection{\texorpdfstring{Flush()}{Flush()}}
+{\footnotesize\ttfamily \label{class_basic_i_stream_wrapper_a37d5e4cd8fdf3c83dad50737e95886a9} 
+template$<$typename Stream\+Type $>$ \\
+void \mbox{\hyperlink{class_basic_i_stream_wrapper}{Basic\+IStream\+Wrapper}}$<$ Stream\+Type $>$\+::\+Flush (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{istreamwrapper_8h_source_l00078}{78}} of file \mbox{\hyperlink{istreamwrapper_8h_source}{istreamwrapper.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00078\ \{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\textcolor{keyword}{false});\ \}\ }
+
+\end{DoxyCode}
+\Hypertarget{class_basic_i_stream_wrapper_a0ad1488235b4786dd4f7a16e679dec88}\index{BasicIStreamWrapper$<$ StreamType $>$@{BasicIStreamWrapper$<$ StreamType $>$}!Peek@{Peek}}
+\index{Peek@{Peek}!BasicIStreamWrapper$<$ StreamType $>$@{BasicIStreamWrapper$<$ StreamType $>$}}
+\doxysubsubsection{\texorpdfstring{Peek()}{Peek()}}
+{\footnotesize\ttfamily \label{class_basic_i_stream_wrapper_a0ad1488235b4786dd4f7a16e679dec88} 
+template$<$typename Stream\+Type $>$ \\
+\mbox{\hyperlink{class_basic_i_stream_wrapper_a76617dc2b11504f9a016c97486a51ca7}{Ch}} \mbox{\hyperlink{class_basic_i_stream_wrapper}{Basic\+IStream\+Wrapper}}$<$ Stream\+Type $>$\+::\+Peek (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{istreamwrapper_8h_source_l00072}{72}} of file \mbox{\hyperlink{istreamwrapper_8h_source}{istreamwrapper.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00072\ \{\ \textcolor{keywordflow}{return}\ *current\_;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_basic_i_stream_wrapper_a461ed82951afefd68ce9ba446031aa60}\index{BasicIStreamWrapper$<$ StreamType $>$@{BasicIStreamWrapper$<$ StreamType $>$}!Peek4@{Peek4}}
+\index{Peek4@{Peek4}!BasicIStreamWrapper$<$ StreamType $>$@{BasicIStreamWrapper$<$ StreamType $>$}}
+\doxysubsubsection{\texorpdfstring{Peek4()}{Peek4()}}
+{\footnotesize\ttfamily \label{class_basic_i_stream_wrapper_a461ed82951afefd68ce9ba446031aa60} 
+template$<$typename Stream\+Type $>$ \\
+const \mbox{\hyperlink{class_basic_i_stream_wrapper_a76617dc2b11504f9a016c97486a51ca7}{Ch}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_basic_i_stream_wrapper}{Basic\+IStream\+Wrapper}}$<$ Stream\+Type $>$\+::\+Peek4 (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{istreamwrapper_8h_source_l00083}{83}} of file \mbox{\hyperlink{istreamwrapper_8h_source}{istreamwrapper.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (current\_\ +\ 4\ -\/\ !eof\_\ <=\ bufferLast\_)\ ?\ current\_\ :\ 0;}
+\DoxyCodeLine{00085\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_basic_i_stream_wrapper_afa71cb2f5b7668837d0a81e3bce55e69}\index{BasicIStreamWrapper$<$ StreamType $>$@{BasicIStreamWrapper$<$ StreamType $>$}!Put@{Put}}
+\index{Put@{Put}!BasicIStreamWrapper$<$ StreamType $>$@{BasicIStreamWrapper$<$ StreamType $>$}}
+\doxysubsubsection{\texorpdfstring{Put()}{Put()}}
+{\footnotesize\ttfamily \label{class_basic_i_stream_wrapper_afa71cb2f5b7668837d0a81e3bce55e69} 
+template$<$typename Stream\+Type $>$ \\
+void \mbox{\hyperlink{class_basic_i_stream_wrapper}{Basic\+IStream\+Wrapper}}$<$ Stream\+Type $>$\+::\+Put (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_basic_i_stream_wrapper_a76617dc2b11504f9a016c97486a51ca7}{Ch}}}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{istreamwrapper_8h_source_l00077}{77}} of file \mbox{\hyperlink{istreamwrapper_8h_source}{istreamwrapper.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00077\ \{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\textcolor{keyword}{false});\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_basic_i_stream_wrapper_a10999721c014eea987d28a1ef9762351}\index{BasicIStreamWrapper$<$ StreamType $>$@{BasicIStreamWrapper$<$ StreamType $>$}!PutBegin@{PutBegin}}
+\index{PutBegin@{PutBegin}!BasicIStreamWrapper$<$ StreamType $>$@{BasicIStreamWrapper$<$ StreamType $>$}}
+\doxysubsubsection{\texorpdfstring{PutBegin()}{PutBegin()}}
+{\footnotesize\ttfamily \label{class_basic_i_stream_wrapper_a10999721c014eea987d28a1ef9762351} 
+template$<$typename Stream\+Type $>$ \\
+\mbox{\hyperlink{class_basic_i_stream_wrapper_a76617dc2b11504f9a016c97486a51ca7}{Ch}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_basic_i_stream_wrapper}{Basic\+IStream\+Wrapper}}$<$ Stream\+Type $>$\+::\+Put\+Begin (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{istreamwrapper_8h_source_l00079}{79}} of file \mbox{\hyperlink{istreamwrapper_8h_source}{istreamwrapper.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00079\ \{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\textcolor{keyword}{false});\ \textcolor{keywordflow}{return}\ 0;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_basic_i_stream_wrapper_ab2ead53490207a1cb0bdd674a03957f3}\index{BasicIStreamWrapper$<$ StreamType $>$@{BasicIStreamWrapper$<$ StreamType $>$}!PutEnd@{PutEnd}}
+\index{PutEnd@{PutEnd}!BasicIStreamWrapper$<$ StreamType $>$@{BasicIStreamWrapper$<$ StreamType $>$}}
+\doxysubsubsection{\texorpdfstring{PutEnd()}{PutEnd()}}
+{\footnotesize\ttfamily \label{class_basic_i_stream_wrapper_ab2ead53490207a1cb0bdd674a03957f3} 
+template$<$typename Stream\+Type $>$ \\
+size\+\_\+t \mbox{\hyperlink{class_basic_i_stream_wrapper}{Basic\+IStream\+Wrapper}}$<$ Stream\+Type $>$\+::\+Put\+End (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_basic_i_stream_wrapper_a76617dc2b11504f9a016c97486a51ca7}{Ch}} \texorpdfstring{$\ast$}{*}}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{istreamwrapper_8h_source_l00080}{80}} of file \mbox{\hyperlink{istreamwrapper_8h_source}{istreamwrapper.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00080\ \{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\textcolor{keyword}{false});\ \textcolor{keywordflow}{return}\ 0;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_basic_i_stream_wrapper_afb71f0329d0abbbc9b22ebeb5c1464d1}\index{BasicIStreamWrapper$<$ StreamType $>$@{BasicIStreamWrapper$<$ StreamType $>$}!Take@{Take}}
+\index{Take@{Take}!BasicIStreamWrapper$<$ StreamType $>$@{BasicIStreamWrapper$<$ StreamType $>$}}
+\doxysubsubsection{\texorpdfstring{Take()}{Take()}}
+{\footnotesize\ttfamily \label{class_basic_i_stream_wrapper_afb71f0329d0abbbc9b22ebeb5c1464d1} 
+template$<$typename Stream\+Type $>$ \\
+\mbox{\hyperlink{class_basic_i_stream_wrapper_a76617dc2b11504f9a016c97486a51ca7}{Ch}} \mbox{\hyperlink{class_basic_i_stream_wrapper}{Basic\+IStream\+Wrapper}}$<$ Stream\+Type $>$\+::\+Take (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{istreamwrapper_8h_source_l00073}{73}} of file \mbox{\hyperlink{istreamwrapper_8h_source}{istreamwrapper.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00073\ \{\ \mbox{\hyperlink{class_basic_i_stream_wrapper_a76617dc2b11504f9a016c97486a51ca7}{Ch}}\ c\ =\ *current\_;\ Read();\ \textcolor{keywordflow}{return}\ c;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_basic_i_stream_wrapper_ac212848265f937add49bd973de794e25}\index{BasicIStreamWrapper$<$ StreamType $>$@{BasicIStreamWrapper$<$ StreamType $>$}!Tell@{Tell}}
+\index{Tell@{Tell}!BasicIStreamWrapper$<$ StreamType $>$@{BasicIStreamWrapper$<$ StreamType $>$}}
+\doxysubsubsection{\texorpdfstring{Tell()}{Tell()}}
+{\footnotesize\ttfamily \label{class_basic_i_stream_wrapper_ac212848265f937add49bd973de794e25} 
+template$<$typename Stream\+Type $>$ \\
+size\+\_\+t \mbox{\hyperlink{class_basic_i_stream_wrapper}{Basic\+IStream\+Wrapper}}$<$ Stream\+Type $>$\+::\+Tell (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{istreamwrapper_8h_source_l00074}{74}} of file \mbox{\hyperlink{istreamwrapper_8h_source}{istreamwrapper.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00074\ \{\ \textcolor{keywordflow}{return}\ count\_\ +\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(current\_\ -\/\ buffer\_);\ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/\mbox{\hyperlink{istreamwrapper_8h}{istreamwrapper.\+h}}\end{DoxyCompactItemize}

@@ -1,0 +1,9 @@
+<map id="Catch::IMutableRegistryHub::registerStartupException" name="Catch::IMutableRegistryHub::registerStartupException">
+<area shape="rect" id="Node000001" title=" " alt="" coords="254,55,441,96"/>
+<area shape="rect" id="Node000002" href="$struct_catch_1_1_auto_reg.html#a7eba02fb9d80b9896bf5a6517369af28" title=" " alt="" coords="18,5,193,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="243,54,162,34,164,29,244,48"/>
+<area shape="rect" id="Node000003" href="$struct_catch_1_1_registrar_for_tag_aliases.html#ae4e45830e4763bcd65d55d8db9167b69" title=" " alt="" coords="5,55,206,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="238,78,206,78,206,73,238,73"/>
+<area shape="rect" id="Node000004" href="$class_catch_1_1_session.html#a4564992e2b028770e38a1dcc6fff8b34" title=" " alt="" coords="22,120,189,146"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="244,103,164,122,162,117,243,97"/>
+</map>

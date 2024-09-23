@@ -1,0 +1,11 @@
+<map id="sysio::state_history_log::read_header" name="sysio::state_history_log::read_header">
+<area shape="rect" id="Node000001" title=" " alt="" coords="389,71,524,111"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1state__history__log.html#ad889160690ba1789472f6a4a29dee5d5" title=" " alt="" coords="197,37,332,78"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="373,79,332,72,333,67,374,74"/>
+<area shape="rect" id="Node000005" href="$classsysio_1_1state__history__log.html#a6d85c85a918a3a0a987ab3e25bb6b44c" title=" " alt="" coords="189,103,341,143"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="374,107,342,113,341,108,373,102"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1state__history__log.html#a59a8402aa5b18c7a78537acf11e0815d" title=" " alt="" coords="5,5,141,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="181,46,141,40,142,34,182,41"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1state__history__log.html#a8753293c4782af4d456ecfdc84808dff" title=" " alt="" coords="5,71,141,111"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="182,75,142,82,141,77,181,69"/>
+</map>

@@ -1,0 +1,29 @@
+<map id="libff::edwards_double_miller_loop" name="libff::edwards_double_miller_loop">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,195,150,236"/>
+<area shape="rect" id="Node000002" href="$namespacelibff.html#a2705662b679ab8c8121e4d4279275e89" title=" " alt="" coords="198,195,333,236"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="150,213,182,213,182,218,150,218"/>
+<area shape="rect" id="Node000003" href="$namespacelibff.html#a64168e59c1ced7a22a49f7d819c02794" title=" " alt="" coords="417,104,534,130"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="291,193,332,165,380,139,401,131,403,135,382,143,335,169,294,197"/>
+<area shape="rect" id="Node000008" href="$namespacelibff.html#ac68d4feb3f7413e9e7de86e06fe6ef1f" title=" " alt="" coords="416,154,535,179"/>
+<area shape="poly" id="edge7_Node000002_Node000008" title=" " alt="" coords="333,197,403,181,404,186,334,202"/>
+<area shape="rect" id="Node000010" href="$classlibff_1_1bigint.html#abdbea6b608ff15910d83bbaf8bd5a688" title=" " alt="" coords="404,203,547,229"/>
+<area shape="poly" id="edge13_Node000002_Node000010" title=" " alt="" coords="334,213,389,213,389,218,334,218"/>
+<area shape="rect" id="Node000011" href="$classlibff_1_1_fp6__2over3__model.html#a5fefcf6648c7cb68fc13042b3f1e74cb" title=" " alt="" coords="381,252,570,278"/>
+<area shape="poly" id="edge14_Node000002_Node000011" title=" " alt="" coords="334,229,404,246,403,251,333,234"/>
+<area shape="rect" id="Node000012" href="$classlibff_1_1bigint.html#ab54f219b74b0482c0cc0a02252ae2a84" title=" " alt="" coords="410,302,542,327"/>
+<area shape="poly" id="edge15_Node000002_Node000012" title=" " alt="" coords="294,234,335,262,382,288,397,294,395,299,380,293,332,267,291,239"/>
+<area shape="rect" id="Node000004" href="$namespacelibff.html#ae6b3bfb190fae875aec3e6174dddfb09" title=" " alt="" coords="618,104,782,130"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="535,114,603,114,603,120,535,120"/>
+<area shape="rect" id="Node000005" href="$namespacelibff.html#a81e225ed671a1a00f2dfe5753f89b6cf" title=" " alt="" coords="632,154,768,179"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="535,127,624,147,623,152,534,133"/>
+<area shape="rect" id="Node000006" href="$namespacelibff.html#a8337aad2e070cab4f7426f9194f4b0cc" title=" " alt="" coords="642,39,758,80"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="528,101,626,76,627,81,530,106"/>
+<area shape="rect" id="Node000007" href="$namespacelibff.html#af9fc78aab25c3773ef01a337a404e159" title=" " alt="" coords="830,204,947,230"/>
+<area shape="poly" id="edge6_Node000003_Node000007" title=" " alt="" coords="490,102,543,61,579,41,617,25,664,11,703,4,740,7,783,25,804,41,823,60,852,104,872,150,883,188,878,190,867,151,847,107,819,63,801,45,780,30,739,12,703,9,665,17,619,30,581,45,546,66,493,106"/>
+<area shape="poly" id="edge8_Node000008_Node000004" title=" " alt="" coords="535,151,622,131,624,137,536,156"/>
+<area shape="poly" id="edge9_Node000008_Node000005" title=" " alt="" coords="536,164,617,164,617,169,536,169"/>
+<area shape="poly" id="edge10_Node000008_Node000007" title=" " alt="" coords="536,175,619,189,814,209,814,215,618,194,536,181"/>
+<area shape="rect" id="Node000009" href="$namespacelibff.html#a7e7bb713ec5b021db2031e0adffa8cce" title=" " alt="" coords="626,255,774,281"/>
+<area shape="poly" id="edge11_Node000008_Node000009" title=" " alt="" coords="537,174,572,188,587,199,597,211,606,222,620,234,644,246,641,251,617,238,602,226,593,214,583,203,569,193,535,179"/>
+<area shape="poly" id="edge12_Node000009_Node000007" title=" " alt="" coords="750,252,823,232,824,237,751,257"/>
+</map>

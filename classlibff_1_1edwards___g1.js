@@ -1,0 +1,27 @@
+var classlibff_1_1edwards___g1 =
+[
+    [ "base_field", "classlibff_1_1edwards___g1.html#a8286f6a2da1ac632e4902ad938916110", null ],
+    [ "scalar_field", "classlibff_1_1edwards___g1.html#a6334777244540bb90768f2076b8dbf32", null ],
+    [ "edwards_G1", "classlibff_1_1edwards___g1.html#a5119b9fa125490d1054d327e0c801d9f", null ],
+    [ "edwards_G1", "classlibff_1_1edwards___g1.html#a163c9f4dadb4e5e8e09beed3daa347c1", null ],
+    [ "add", "classlibff_1_1edwards___g1.html#a00f284621beeeb7330fbe6020f5ed696", null ],
+    [ "dbl", "classlibff_1_1edwards___g1.html#af63e164cacda3ea51b888cd1a4bacf38", null ],
+    [ "is_special", "classlibff_1_1edwards___g1.html#abc260bb0bed7945c9e81363d68b31846", null ],
+    [ "is_well_formed", "classlibff_1_1edwards___g1.html#a518fac25663b07b553dae4a5c5871323", null ],
+    [ "is_zero", "classlibff_1_1edwards___g1.html#a7a304685597be1d6acdcfc4923cb5b33", null ],
+    [ "mixed_add", "classlibff_1_1edwards___g1.html#ad5b6d6c7f0fac7eea9371c8a8e348c41", null ],
+    [ "operator!=", "classlibff_1_1edwards___g1.html#aee81bd612c3450252e41b7ef3ddd0bb8", null ],
+    [ "operator+", "classlibff_1_1edwards___g1.html#a8bdf4bcaf204b33e4413b00463871257", null ],
+    [ "operator-", "classlibff_1_1edwards___g1.html#a3587166ca6637e275989d3dd38fc5383", null ],
+    [ "operator-", "classlibff_1_1edwards___g1.html#aafcd976db0cbc94b9e29c853d4ada1ee", null ],
+    [ "operator==", "classlibff_1_1edwards___g1.html#ad50b6caf654abf8d3ee72bfe7a3a34ae", null ],
+    [ "print", "classlibff_1_1edwards___g1.html#ad9f01c1ba639caf6bf96f42738656711", null ],
+    [ "print_coordinates", "classlibff_1_1edwards___g1.html#a27c12ebcfcb0a4fcc6cc1bc25079265c", null ],
+    [ "to_affine_coordinates", "classlibff_1_1edwards___g1.html#a50f825a4a01787eda3aa41cb270e97a8", null ],
+    [ "to_special", "classlibff_1_1edwards___g1.html#a157f1b381b69b5701595202c40764dd9", null ],
+    [ "operator<<", "classlibff_1_1edwards___g1.html#a46c1a5ea3d36ca3b4f9f0011e2bd6c94", null ],
+    [ "operator>>", "classlibff_1_1edwards___g1.html#a6fdc5890b5ae066465ca73a99473eb5f", null ],
+    [ "X", "classlibff_1_1edwards___g1.html#a579bf1617b25b04d3090f57a763374f6", null ],
+    [ "Y", "classlibff_1_1edwards___g1.html#a0d909ceec2fbf42e370306e9c33b19da", null ],
+    [ "Z", "classlibff_1_1edwards___g1.html#a1e5e103228428b951e2b46d51355b426", null ]
+];

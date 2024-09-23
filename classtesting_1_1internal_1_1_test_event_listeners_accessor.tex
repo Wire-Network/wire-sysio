@@ -1,0 +1,150 @@
+\doxysection{testing\+::internal\+::Test\+Event\+Listeners\+Accessor Class Reference}
+\hypertarget{classtesting_1_1internal_1_1_test_event_listeners_accessor}{}\label{classtesting_1_1internal_1_1_test_event_listeners_accessor}\index{testing::internal::TestEventListenersAccessor@{testing::internal::TestEventListenersAccessor}}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static \mbox{\hyperlink{classtesting_1_1_test_event_listener}{Test\+Event\+Listener}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classtesting_1_1internal_1_1_test_event_listeners_accessor_a5e354faa2e0314f62b10656656d94035}{Get\+Repeater}} (\mbox{\hyperlink{classtesting_1_1_test_event_listeners}{Test\+Event\+Listeners}} \texorpdfstring{$\ast$}{*}listeners)
+\item 
+static void \mbox{\hyperlink{classtesting_1_1internal_1_1_test_event_listeners_accessor_ac8886c7cea5a4ad39aed276d3f58da75}{Set\+Default\+Result\+Printer}} (\mbox{\hyperlink{classtesting_1_1_test_event_listeners}{Test\+Event\+Listeners}} \texorpdfstring{$\ast$}{*}listeners, \mbox{\hyperlink{classtesting_1_1_test_event_listener}{Test\+Event\+Listener}} \texorpdfstring{$\ast$}{*}listener)
+\item 
+static void \mbox{\hyperlink{classtesting_1_1internal_1_1_test_event_listeners_accessor_a8c04463b5ba5ee6d6da36e2171c7fff0}{Set\+Default\+Xml\+Generator}} (\mbox{\hyperlink{classtesting_1_1_test_event_listeners}{Test\+Event\+Listeners}} \texorpdfstring{$\ast$}{*}listeners, \mbox{\hyperlink{classtesting_1_1_test_event_listener}{Test\+Event\+Listener}} \texorpdfstring{$\ast$}{*}listener)
+\item 
+static bool \mbox{\hyperlink{classtesting_1_1internal_1_1_test_event_listeners_accessor_a4a7522557045cb55eb037dc61429d71c}{Event\+Forwarding\+Enabled}} (const \mbox{\hyperlink{classtesting_1_1_test_event_listeners}{Test\+Event\+Listeners}} \&listeners)
+\item 
+static void \mbox{\hyperlink{classtesting_1_1internal_1_1_test_event_listeners_accessor_abfc0a0f8163465f4f5d42436ec8c7cb3}{Suppress\+Event\+Forwarding}} (\mbox{\hyperlink{classtesting_1_1_test_event_listeners}{Test\+Event\+Listeners}} \texorpdfstring{$\ast$}{*}listeners)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{gtest__unittest_8cc_source_l00155}{155}} of file \mbox{\hyperlink{gtest__unittest_8cc_source}{gtest\+\_\+unittest.\+cc}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_test_event_listeners_accessor_a4a7522557045cb55eb037dc61429d71c}\index{testing::internal::TestEventListenersAccessor@{testing::internal::TestEventListenersAccessor}!EventForwardingEnabled@{EventForwardingEnabled}}
+\index{EventForwardingEnabled@{EventForwardingEnabled}!testing::internal::TestEventListenersAccessor@{testing::internal::TestEventListenersAccessor}}
+\doxysubsubsection{\texorpdfstring{EventForwardingEnabled()}{EventForwardingEnabled()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_test_event_listeners_accessor_a4a7522557045cb55eb037dc61429d71c} 
+static bool testing\+::internal\+::\+Test\+Event\+Listeners\+Accessor\+::\+Event\+Forwarding\+Enabled (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classtesting_1_1_test_event_listeners}{Test\+Event\+Listeners}} \&}]{listeners}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest__unittest_8cc_source_l00170}{170}} of file \mbox{\hyperlink{gtest__unittest_8cc_source}{gtest\+\_\+unittest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00171\ \ \ \ \ \textcolor{keywordflow}{return}\ listeners.EventForwardingEnabled();}
+\DoxyCodeLine{00172\ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=299pt]{classtesting_1_1internal_1_1_test_event_listeners_accessor_a4a7522557045cb55eb037dc61429d71c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_test_event_listeners_accessor_a5e354faa2e0314f62b10656656d94035}\index{testing::internal::TestEventListenersAccessor@{testing::internal::TestEventListenersAccessor}!GetRepeater@{GetRepeater}}
+\index{GetRepeater@{GetRepeater}!testing::internal::TestEventListenersAccessor@{testing::internal::TestEventListenersAccessor}}
+\doxysubsubsection{\texorpdfstring{GetRepeater()}{GetRepeater()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_test_event_listeners_accessor_a5e354faa2e0314f62b10656656d94035} 
+static \mbox{\hyperlink{classtesting_1_1_test_event_listener}{Test\+Event\+Listener}} \texorpdfstring{$\ast$}{*} testing\+::internal\+::\+Test\+Event\+Listeners\+Accessor\+::\+Get\+Repeater (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classtesting_1_1_test_event_listeners}{Test\+Event\+Listeners}} \texorpdfstring{$\ast$}{*}}]{listeners}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest__unittest_8cc_source_l00157}{157}} of file \mbox{\hyperlink{gtest__unittest_8cc_source}{gtest\+\_\+unittest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00158\ \ \ \ \ \textcolor{keywordflow}{return}\ listeners-\/>repeater();}
+\DoxyCodeLine{00159\ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=299pt]{classtesting_1_1internal_1_1_test_event_listeners_accessor_a5e354faa2e0314f62b10656656d94035_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_test_event_listeners_accessor_ac8886c7cea5a4ad39aed276d3f58da75}\index{testing::internal::TestEventListenersAccessor@{testing::internal::TestEventListenersAccessor}!SetDefaultResultPrinter@{SetDefaultResultPrinter}}
+\index{SetDefaultResultPrinter@{SetDefaultResultPrinter}!testing::internal::TestEventListenersAccessor@{testing::internal::TestEventListenersAccessor}}
+\doxysubsubsection{\texorpdfstring{SetDefaultResultPrinter()}{SetDefaultResultPrinter()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_test_event_listeners_accessor_ac8886c7cea5a4ad39aed276d3f58da75} 
+static void testing\+::internal\+::\+Test\+Event\+Listeners\+Accessor\+::\+Set\+Default\+Result\+Printer (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classtesting_1_1_test_event_listeners}{Test\+Event\+Listeners}} \texorpdfstring{$\ast$}{*}}]{listeners}{, }\item[{\mbox{\hyperlink{classtesting_1_1_test_event_listener}{Test\+Event\+Listener}} \texorpdfstring{$\ast$}{*}}]{listener}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest__unittest_8cc_source_l00161}{161}} of file \mbox{\hyperlink{gtest__unittest_8cc_source}{gtest\+\_\+unittest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00163\ \ \ \ \ listeners-\/>SetDefaultResultPrinter(listener);}
+\DoxyCodeLine{00164\ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=299pt]{classtesting_1_1internal_1_1_test_event_listeners_accessor_ac8886c7cea5a4ad39aed276d3f58da75_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_test_event_listeners_accessor_a8c04463b5ba5ee6d6da36e2171c7fff0}\index{testing::internal::TestEventListenersAccessor@{testing::internal::TestEventListenersAccessor}!SetDefaultXmlGenerator@{SetDefaultXmlGenerator}}
+\index{SetDefaultXmlGenerator@{SetDefaultXmlGenerator}!testing::internal::TestEventListenersAccessor@{testing::internal::TestEventListenersAccessor}}
+\doxysubsubsection{\texorpdfstring{SetDefaultXmlGenerator()}{SetDefaultXmlGenerator()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_test_event_listeners_accessor_a8c04463b5ba5ee6d6da36e2171c7fff0} 
+static void testing\+::internal\+::\+Test\+Event\+Listeners\+Accessor\+::\+Set\+Default\+Xml\+Generator (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classtesting_1_1_test_event_listeners}{Test\+Event\+Listeners}} \texorpdfstring{$\ast$}{*}}]{listeners}{, }\item[{\mbox{\hyperlink{classtesting_1_1_test_event_listener}{Test\+Event\+Listener}} \texorpdfstring{$\ast$}{*}}]{listener}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest__unittest_8cc_source_l00165}{165}} of file \mbox{\hyperlink{gtest__unittest_8cc_source}{gtest\+\_\+unittest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00167\ \ \ \ \ listeners-\/>SetDefaultXmlGenerator(listener);}
+\DoxyCodeLine{00168\ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=299pt]{classtesting_1_1internal_1_1_test_event_listeners_accessor_a8c04463b5ba5ee6d6da36e2171c7fff0_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_test_event_listeners_accessor_abfc0a0f8163465f4f5d42436ec8c7cb3}\index{testing::internal::TestEventListenersAccessor@{testing::internal::TestEventListenersAccessor}!SuppressEventForwarding@{SuppressEventForwarding}}
+\index{SuppressEventForwarding@{SuppressEventForwarding}!testing::internal::TestEventListenersAccessor@{testing::internal::TestEventListenersAccessor}}
+\doxysubsubsection{\texorpdfstring{SuppressEventForwarding()}{SuppressEventForwarding()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_test_event_listeners_accessor_abfc0a0f8163465f4f5d42436ec8c7cb3} 
+static void testing\+::internal\+::\+Test\+Event\+Listeners\+Accessor\+::\+Suppress\+Event\+Forwarding (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classtesting_1_1_test_event_listeners}{Test\+Event\+Listeners}} \texorpdfstring{$\ast$}{*}}]{listeners}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest__unittest_8cc_source_l00174}{174}} of file \mbox{\hyperlink{gtest__unittest_8cc_source}{gtest\+\_\+unittest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00175\ \ \ \ \ listeners-\/>SuppressEventForwarding();}
+\DoxyCodeLine{00176\ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=299pt]{classtesting_1_1internal_1_1_test_event_listeners_accessor_abfc0a0f8163465f4f5d42436ec8c7cb3_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/test/\mbox{\hyperlink{gtest__unittest_8cc}{gtest\+\_\+unittest.\+cc}}\end{DoxyCompactItemize}

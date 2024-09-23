@@ -1,0 +1,18 @@
+<map id="TEST" name="TEST">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,112,61,137"/>
+<area shape="rect" id="Node000002" href="$class_generic_string_buffer.html#ad324b8154be3354dda3aa4a0a7361499" title="Get the length of string in Ch in the string buffer." alt="" coords="123,5,258,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="45,109,72,83,107,57,117,51,120,56,110,61,76,87,49,113"/>
+<area shape="rect" id="Node000003" href="$class_generic_string_buffer.html#a725e862b9a78375f5363b0b61ad789f3" title="Get the size of string in bytes in the string buffer." alt="" coords="123,71,258,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="61,116,107,106,108,111,62,121"/>
+<area shape="rect" id="Node000004" href="$class_generic_string_buffer.html#a42079865bab1deb930c6cff7d491c719" title=" " alt="" coords="123,136,258,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="62,127,108,137,107,142,61,133"/>
+<area shape="rect" id="Node000007" href="$class_generic_string_buffer.html#a8be5c8fadccacdcf40e20220f38e0afa" title=" " alt="" coords="109,201,272,226"/>
+<area shape="poly" id="edge8_Node000001_Node000007" title=" " alt="" coords="48,135,75,161,110,186,123,192,121,197,107,191,72,165,44,139"/>
+<area shape="rect" id="Node000005" href="$class_generic_string_buffer.html#a0038e53ba03c271bc4cbbac403ec4de4" title=" " alt="" coords="320,120,486,145"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="258,146,304,141,305,146,258,151"/>
+<area shape="rect" id="Node000006" href="$class_generic_string_buffer.html#a80af78c43da93126a940a40d1889278a" title=" " alt="" coords="336,193,471,234"/>
+<area shape="poly" id="edge6_Node000004_Node000006" title=" " alt="" coords="259,172,321,189,320,194,257,177"/>
+<area shape="poly" id="edge5_Node000005_Node000005" title=" " alt="" coords="368,121,361,111,365,101,379,95,403,93,429,96,443,102,440,107,428,101,403,98,381,100,369,105,366,110,372,118"/>
+<area shape="poly" id="edge7_Node000006_Node000006" title=" " alt="" coords="363,193,361,183,367,174,382,169,403,167,426,169,440,175,438,180,425,174,403,172,383,174,371,179,366,184,368,192"/>
+<area shape="poly" id="edge9_Node000007_Node000006" title=" " alt="" coords="272,211,320,211,320,216,272,216"/>
+</map>

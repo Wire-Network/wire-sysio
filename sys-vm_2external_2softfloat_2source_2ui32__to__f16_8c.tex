@@ -1,0 +1,64 @@
+\doxysection{libraries/sys-\/vm/external/softfloat/source/ui32\+\_\+to\+\_\+f16.c File Reference}
+\hypertarget{sys-vm_2external_2softfloat_2source_2ui32__to__f16_8c}{}\label{sys-vm_2external_2softfloat_2source_2ui32__to__f16_8c}\index{libraries/sys-\/vm/external/softfloat/source/ui32\_to\_f16.c@{libraries/sys-\/vm/external/softfloat/source/ui32\_to\_f16.c}}
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include "{}platform.\+h"{}}\newline
+{\ttfamily \#include "{}internals.\+h"{}}\newline
+{\ttfamily \#include "{}softfloat.\+h"{}}\newline
+Include dependency graph for ui32\+\_\+to\+\_\+f16.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sys-vm_2external_2softfloat_2source_2ui32__to__f16_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structfloat16__t}{float16\+\_\+t}} \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2ui32__to__f16_8c_aa68d0f97edf8ab6ca5f12350efe975bc}{ui32\+\_\+to\+\_\+f16}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{sys-vm_2external_2softfloat_2source_2ui32__to__f16_8c_aa68d0f97edf8ab6ca5f12350efe975bc}\index{ui32\_to\_f16.c@{ui32\_to\_f16.c}!ui32\_to\_f16@{ui32\_to\_f16}}
+\index{ui32\_to\_f16@{ui32\_to\_f16}!ui32\_to\_f16.c@{ui32\_to\_f16.c}}
+\doxysubsubsection{\texorpdfstring{ui32\_to\_f16()}{ui32\_to\_f16()}}
+{\footnotesize\ttfamily \label{sys-vm_2external_2softfloat_2source_2ui32__to__f16_8c_aa68d0f97edf8ab6ca5f12350efe975bc} 
+\mbox{\hyperlink{structfloat16__t}{float16\+\_\+t}} ui32\+\_\+to\+\_\+f16 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{a}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2ui32__to__f16_8c_source_l00042}{42}} of file \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2ui32__to__f16_8c_source}{ui32\+\_\+to\+\_\+f16.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00043\ \{}
+\DoxyCodeLine{00044\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a880ed9ceb8621521452c81d03bd08cfb}{int\_fast8\_t}}\ shiftDist;}
+\DoxyCodeLine{00045\ \ \ \ \ \textcolor{keyword}{union\ }\mbox{\hyperlink{unionui16__f16}{ui16\_f16}}\ u;}
+\DoxyCodeLine{00046\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a6ed085329b153773ff76afa0702cf897}{uint\_fast16\_t}}\ sig;}
+\DoxyCodeLine{00047\ }
+\DoxyCodeLine{00048\ \ \ \ \ shiftDist\ =\ \mbox{\hyperlink{softfloat_2source_2s__count_leading_zeros32_8c_a20e06c2785548bfc8a5351e7e241e351}{softfloat\_countLeadingZeros32}}(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ )\ -\/\ 21;}
+\DoxyCodeLine{00049\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ 0\ <=\ shiftDist\ )\ \{}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ u.ui\ =}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ ?\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_aef53759f15608c79a740393f04f1866b}{packToF16UI}}(}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0,\ 0x18\ -\/\ shiftDist,\ (\mbox{\hyperlink{stdint_8h_a6ed085329b153773ff76afa0702cf897}{uint\_fast16\_t}})\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}<<shiftDist\ )}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ 0;}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ u.f;}
+\DoxyCodeLine{00055\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ shiftDist\ +=\ 4;}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ sig\ =}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \ \ \ (shiftDist\ <\ 0)}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ?\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}>>(-\/shiftDist)\ |\ ((\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})\ (\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}<<(shiftDist\ \&\ 31))\ !=\ 0)}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ (\mbox{\hyperlink{stdint_8h_a6ed085329b153773ff76afa0702cf897}{uint\_fast16\_t}})\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}<<shiftDist;}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a44c2c937de2fe95e72bd833d712b2a58}{softfloat\_roundPackToF16}}(\ 0,\ 0x1C\ -\/\ shiftDist,\ sig\ );}
+\DoxyCodeLine{00062\ \ \ \ \ \}}
+\DoxyCodeLine{00063\ }
+\DoxyCodeLine{00064\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sys-vm_2external_2softfloat_2source_2ui32__to__f16_8c_aa68d0f97edf8ab6ca5f12350efe975bc_cgraph}
+\end{center}
+\end{figure}

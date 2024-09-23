@@ -1,0 +1,48 @@
+\doxysection{blake2.\+hpp}
+\hypertarget{blake2_8hpp_source}{}\label{blake2_8hpp_source}\index{libraries/fc/include/fc/crypto/blake2.hpp@{libraries/fc/include/fc/crypto/blake2.hpp}}
+\mbox{\hyperlink{blake2_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{blake2_8hpp_source_l00001}00001\ \textcolor{comment}{//\ Snark\ -\/\ Wrapper\ for\ alt\_bn128\ add\ mul\ pair\ and\ modexp}}
+\DoxyCodeLine{\Hypertarget{blake2_8hpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{blake2_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{blake2_8hpp_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{blake2_8hpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <functional>}}
+\DoxyCodeLine{\Hypertarget{blake2_8hpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <cstdint>}}
+\DoxyCodeLine{\Hypertarget{blake2_8hpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <variant>}}
+\DoxyCodeLine{\Hypertarget{blake2_8hpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{\Hypertarget{blake2_8hpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{utility_8hpp}{fc/utility.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{blake2_8hpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{blake2_8hpp_source_l00011}00011\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}\ \{}
+\DoxyCodeLine{\Hypertarget{blake2_8hpp_source_l00012}00012\ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}}\ =\ std::vector<char>;}
+\DoxyCodeLine{\Hypertarget{blake2_8hpp_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{blake2_8hpp_source_l00014}\mbox{\hyperlink{namespacefc_acb26c721d16c6f6031600adee7d0b609}{00014}}\ \ \ \ \ \textcolor{keyword}{enum\ class}\ \mbox{\hyperlink{namespacefc_acb26c721d16c6f6031600adee7d0b609}{blake2b\_error}}\ :\ \mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}}\ \{}
+\DoxyCodeLine{\Hypertarget{blake2_8hpp_source_l00015}00015\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_acf2fac70bed3c7c7668279d9de619f72a432c768a921a9550970c31c8d332d59a}{input\_len\_error}}}
+\DoxyCodeLine{\Hypertarget{blake2_8hpp_source_l00016}00016\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{blake2_8hpp_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{blake2_8hpp_source_l00018}00018\ \ \ \ \ std::variant<blake2b\_error,\ bytes>\ \mbox{\hyperlink{namespacefc_a3bcfede4e3ebdbd08006e020492dc7ce}{blake2b}}(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \_rounds,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}}\&\ \_h,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}}\&\ \_m,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}}\&\ \_t0\_offset,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacefc_a3b175aad68bb918350714284aa76e775}{bytes}}\&\ \_t1\_offset,\ \textcolor{keywordtype}{bool}\ \_f,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacefc_a978f9e97f64eb2ce6cbe892d3cc93397}{yield\_function\_t}}\&\ yield);}
+\DoxyCodeLine{\Hypertarget{blake2_8hpp_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{blake2_8hpp_source_l00020}\mbox{\hyperlink{structfc_1_1blake2b__state}{00020}}\ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{\Hypertarget{blake2_8hpp_source_l00021}\mbox{\hyperlink{structfc_1_1blake2b__state_acb418ab8b03c554b95de2d9d4ae521f6}{00021}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ h[8]\ =\ \{0,0,0,0,0,0,0,0\};}
+\DoxyCodeLine{\Hypertarget{blake2_8hpp_source_l00022}\mbox{\hyperlink{structfc_1_1blake2b__state_a668ee5424490d329bcfacd63ff0987f3}{00022}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ t[2]\ =\ \{0,0\};}
+\DoxyCodeLine{\Hypertarget{blake2_8hpp_source_l00023}\mbox{\hyperlink{structfc_1_1blake2b__state_ac8d9f0517f5766492f865c04deb95a27}{00023}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}[1]\ =\ \{0\};}
+\DoxyCodeLine{\Hypertarget{blake2_8hpp_source_l00024}00024\ \ \ \ \ \}\ blake2b\_state;}
+\DoxyCodeLine{\Hypertarget{blake2_8hpp_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{blake2_8hpp_source_l00026}\mbox{\hyperlink{classfc_1_1blake2b__wrapper}{00026}}\ \ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classfc_1_1blake2b__wrapper}{blake2b\_wrapper}}\ \{}
+\DoxyCodeLine{\Hypertarget{blake2_8hpp_source_l00027}00027\ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{blake2_8hpp_source_l00028}\mbox{\hyperlink{classfc_1_1blake2b__wrapper_ab5ed83d43802fe97430dbf64defc5d9ead79d25776489a9abf71b324356028826}{00028}}\ \ \ \ \ \ \ \ \ \textcolor{keyword}{enum}\ \mbox{\hyperlink{classfc_1_1blake2b__wrapper_ab5ed83d43802fe97430dbf64defc5d9e}{blake2b\_constant}}\ \{\ \mbox{\hyperlink{classfc_1_1blake2b__wrapper_ab5ed83d43802fe97430dbf64defc5d9ead79d25776489a9abf71b324356028826}{BLAKE2B\_BLOCKBYTES}}\ =\ 128\ \};}
+\DoxyCodeLine{\Hypertarget{blake2_8hpp_source_l00029}00029\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1blake2b__wrapper_aa207b9c4cb00bfca265163a11a1fc9de}{blake2b\_compress}}(\mbox{\hyperlink{structfc_1_1blake2b__state}{blake2b\_state}}\ *\mbox{\hyperlink{struct_s}{S}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ block[\mbox{\hyperlink{classfc_1_1blake2b__wrapper_ab5ed83d43802fe97430dbf64defc5d9ead79d25776489a9abf71b324356028826}{BLAKE2B\_BLOCKBYTES}}],\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1optional__delegate}{yield\_function\_t}}\&\ yield\ );}
+\DoxyCodeLine{\Hypertarget{blake2_8hpp_source_l00030}00030\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{blake2_8hpp_source_l00031}00031\ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{blake2_8hpp_source_l00032}00032\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ m[16];}
+\DoxyCodeLine{\Hypertarget{blake2_8hpp_source_l00033}00033\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ v[16];}
+\DoxyCodeLine{\Hypertarget{blake2_8hpp_source_l00034}00034\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ i;}
+\DoxyCodeLine{\Hypertarget{blake2_8hpp_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{blake2_8hpp_source_l00036}00036\ \ \ \ \ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ G(\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ i,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\&\ b,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\&\ c,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\&\ d)\ \textcolor{keyword}{noexcept};}
+\DoxyCodeLine{\Hypertarget{blake2_8hpp_source_l00037}00037\ \ \ \ \ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ ROUND(\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}})\ \textcolor{keyword}{noexcept};}
+\DoxyCodeLine{\Hypertarget{blake2_8hpp_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{blake2_8hpp_source_l00039}00039\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ blake2b\_compress\_init(\mbox{\hyperlink{structfc_1_1blake2b__state}{blake2b\_state}}\ *\mbox{\hyperlink{struct_s}{S}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ block[\mbox{\hyperlink{classfc_1_1blake2b__wrapper_ab5ed83d43802fe97430dbf64defc5d9ead79d25776489a9abf71b324356028826}{BLAKE2B\_BLOCKBYTES}}],\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}});}
+\DoxyCodeLine{\Hypertarget{blake2_8hpp_source_l00040}00040\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ blake2b\_compress\_end(\mbox{\hyperlink{structfc_1_1blake2b__state}{blake2b\_state}}\ *\mbox{\hyperlink{struct_s}{S}});}
+\DoxyCodeLine{\Hypertarget{blake2_8hpp_source_l00041}00041\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{blake2_8hpp_source_l00042}00042\ \}}
+
+\end{DoxyCode}

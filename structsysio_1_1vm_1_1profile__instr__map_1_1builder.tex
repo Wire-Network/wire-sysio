@@ -1,0 +1,245 @@
+\doxysection{sysio\+::vm\+::profile\+\_\+instr\+\_\+map\+::builder Struct Reference}
+\hypertarget{structsysio_1_1vm_1_1profile__instr__map_1_1builder}{}\label{structsysio_1_1vm_1_1profile__instr__map_1_1builder}\index{sysio::vm::profile\_instr\_map::builder@{sysio::vm::profile\_instr\_map::builder}}
+
+
+{\ttfamily \#include $<$debug\+\_\+info.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a3fb7feea8948a463eb6ae89d3bfd4522}{on\+\_\+code\+\_\+start}} (const void \texorpdfstring{$\ast$}{*}compiled\+\_\+base, const void \texorpdfstring{$\ast$}{*}wasm\+\_\+code\+\_\+start)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a9f52fba311fd7ef5b9247c15863750af}{on\+\_\+function\+\_\+start}} (const void \texorpdfstring{$\ast$}{*}code\+\_\+addr, const void \texorpdfstring{$\ast$}{*}wasm\+\_\+addr)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a243335a21b7989b23faebd6a070aadce}{on\+\_\+instr\+\_\+start}} (const void \texorpdfstring{$\ast$}{*}code\+\_\+addr, const void \texorpdfstring{$\ast$}{*}wasm\+\_\+addr)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a1ad7a9a92953f32c206745fb0f3b115d}{on\+\_\+code\+\_\+end}} (const void \texorpdfstring{$\ast$}{*}code\+\_\+addr, const void \texorpdfstring{$\ast$}{*}wasm\+\_\+addr)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a3fb7feea8948a463eb6ae89d3bfd4522}{on\+\_\+code\+\_\+start}} (const void \texorpdfstring{$\ast$}{*}compiled\+\_\+base, const void \texorpdfstring{$\ast$}{*}wasm\+\_\+code\+\_\+start)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a9f52fba311fd7ef5b9247c15863750af}{on\+\_\+function\+\_\+start}} (const void \texorpdfstring{$\ast$}{*}code\+\_\+addr, const void \texorpdfstring{$\ast$}{*}wasm\+\_\+addr)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a243335a21b7989b23faebd6a070aadce}{on\+\_\+instr\+\_\+start}} (const void \texorpdfstring{$\ast$}{*}code\+\_\+addr, const void \texorpdfstring{$\ast$}{*}wasm\+\_\+addr)
+\item 
+void \mbox{\hyperlink{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a1ad7a9a92953f32c206745fb0f3b115d}{on\+\_\+code\+\_\+end}} (const void \texorpdfstring{$\ast$}{*}code\+\_\+addr, const void \texorpdfstring{$\ast$}{*}wasm\+\_\+addr)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+const void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a670341269f86b024e1b80a7ab6f47527}{code\+\_\+base}} = nullptr
+\item 
+const void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a8318bc2518c39a1935b2e89f375dcab2}{wasm\+\_\+base}} = nullptr
+\item 
+const void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a9993cb4b6cd13f69ba5a39bcf7590644}{code\+\_\+end}} = nullptr
+\item 
+std\+::vector$<$ addr\+\_\+entry $>$ \mbox{\hyperlink{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a79a6cec0b393378e883d1eebecd430bc}{data}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{vm_2debug__info_8hpp_source_l00030}{30}} of file \mbox{\hyperlink{vm_2debug__info_8hpp_source}{debug\+\_\+info.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a1ad7a9a92953f32c206745fb0f3b115d}\index{sysio::vm::profile\_instr\_map::builder@{sysio::vm::profile\_instr\_map::builder}!on\_code\_end@{on\_code\_end}}
+\index{on\_code\_end@{on\_code\_end}!sysio::vm::profile\_instr\_map::builder@{sysio::vm::profile\_instr\_map::builder}}
+\doxysubsubsection{\texorpdfstring{on\_code\_end()}{on\_code\_end()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a1ad7a9a92953f32c206745fb0f3b115d} 
+void sysio\+::vm\+::profile\+\_\+instr\+\_\+map\+::builder\+::on\+\_\+code\+\_\+end (\begin{DoxyParamCaption}\item[{const void \texorpdfstring{$\ast$}{*}}]{code\+\_\+addr}{, }\item[{const void \texorpdfstring{$\ast$}{*}}]{wasm\+\_\+addr}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2debug__info_8hpp_source_l00047}{47}} of file \mbox{\hyperlink{sysio_2vm_2debug__info_8hpp_source}{debug\+\_\+info.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a9993cb4b6cd13f69ba5a39bcf7590644}{code\_end}}\ =\ code\_addr;}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a1ad7a9a92953f32c206745fb0f3b115d}\index{sysio::vm::profile\_instr\_map::builder@{sysio::vm::profile\_instr\_map::builder}!on\_code\_end@{on\_code\_end}}
+\index{on\_code\_end@{on\_code\_end}!sysio::vm::profile\_instr\_map::builder@{sysio::vm::profile\_instr\_map::builder}}
+\doxysubsubsection{\texorpdfstring{on\_code\_end()}{on\_code\_end()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a1ad7a9a92953f32c206745fb0f3b115d} 
+void sysio\+::vm\+::profile\+\_\+instr\+\_\+map\+::builder\+::on\+\_\+code\+\_\+end (\begin{DoxyParamCaption}\item[{const void \texorpdfstring{$\ast$}{*}}]{code\+\_\+addr}{, }\item[{const void \texorpdfstring{$\ast$}{*}}]{wasm\+\_\+addr}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2debug__info_8hpp_source_l00047}{47}} of file \mbox{\hyperlink{vm_2debug__info_8hpp_source}{debug\+\_\+info.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a9993cb4b6cd13f69ba5a39bcf7590644}{code\_end}}\ =\ code\_addr;}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a3fb7feea8948a463eb6ae89d3bfd4522}\index{sysio::vm::profile\_instr\_map::builder@{sysio::vm::profile\_instr\_map::builder}!on\_code\_start@{on\_code\_start}}
+\index{on\_code\_start@{on\_code\_start}!sysio::vm::profile\_instr\_map::builder@{sysio::vm::profile\_instr\_map::builder}}
+\doxysubsubsection{\texorpdfstring{on\_code\_start()}{on\_code\_start()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a3fb7feea8948a463eb6ae89d3bfd4522} 
+void sysio\+::vm\+::profile\+\_\+instr\+\_\+map\+::builder\+::on\+\_\+code\+\_\+start (\begin{DoxyParamCaption}\item[{const void \texorpdfstring{$\ast$}{*}}]{compiled\+\_\+base}{, }\item[{const void \texorpdfstring{$\ast$}{*}}]{wasm\+\_\+code\+\_\+start}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2debug__info_8hpp_source_l00031}{31}} of file \mbox{\hyperlink{sysio_2vm_2debug__info_8hpp_source}{debug\+\_\+info.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a670341269f86b024e1b80a7ab6f47527}{code\_base}}\ =\ compiled\_base;}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a8318bc2518c39a1935b2e89f375dcab2}{wasm\_base}}\ =\ wasm\_code\_start;}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a3fb7feea8948a463eb6ae89d3bfd4522}\index{sysio::vm::profile\_instr\_map::builder@{sysio::vm::profile\_instr\_map::builder}!on\_code\_start@{on\_code\_start}}
+\index{on\_code\_start@{on\_code\_start}!sysio::vm::profile\_instr\_map::builder@{sysio::vm::profile\_instr\_map::builder}}
+\doxysubsubsection{\texorpdfstring{on\_code\_start()}{on\_code\_start()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a3fb7feea8948a463eb6ae89d3bfd4522} 
+void sysio\+::vm\+::profile\+\_\+instr\+\_\+map\+::builder\+::on\+\_\+code\+\_\+start (\begin{DoxyParamCaption}\item[{const void \texorpdfstring{$\ast$}{*}}]{compiled\+\_\+base}{, }\item[{const void \texorpdfstring{$\ast$}{*}}]{wasm\+\_\+code\+\_\+start}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2debug__info_8hpp_source_l00031}{31}} of file \mbox{\hyperlink{vm_2debug__info_8hpp_source}{debug\+\_\+info.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a670341269f86b024e1b80a7ab6f47527}{code\_base}}\ =\ compiled\_base;}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a8318bc2518c39a1935b2e89f375dcab2}{wasm\_base}}\ =\ wasm\_code\_start;}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a9f52fba311fd7ef5b9247c15863750af}\index{sysio::vm::profile\_instr\_map::builder@{sysio::vm::profile\_instr\_map::builder}!on\_function\_start@{on\_function\_start}}
+\index{on\_function\_start@{on\_function\_start}!sysio::vm::profile\_instr\_map::builder@{sysio::vm::profile\_instr\_map::builder}}
+\doxysubsubsection{\texorpdfstring{on\_function\_start()}{on\_function\_start()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a9f52fba311fd7ef5b9247c15863750af} 
+void sysio\+::vm\+::profile\+\_\+instr\+\_\+map\+::builder\+::on\+\_\+function\+\_\+start (\begin{DoxyParamCaption}\item[{const void \texorpdfstring{$\ast$}{*}}]{code\+\_\+addr}{, }\item[{const void \texorpdfstring{$\ast$}{*}}]{wasm\+\_\+addr}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2debug__info_8hpp_source_l00035}{35}} of file \mbox{\hyperlink{sysio_2vm_2debug__info_8hpp_source}{debug\+\_\+info.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ data.push\_back(\{}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}std::uint32\_t\textcolor{keyword}{>}(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(code\_addr)\ -\/\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(\mbox{\hyperlink{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a670341269f86b024e1b80a7ab6f47527}{code\_base}})),}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}std::uint32\_t\textcolor{keyword}{>}(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(wasm\_addr)\ -\/\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(\mbox{\hyperlink{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a8318bc2518c39a1935b2e89f375dcab2}{wasm\_base}}))}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a9f52fba311fd7ef5b9247c15863750af}\index{sysio::vm::profile\_instr\_map::builder@{sysio::vm::profile\_instr\_map::builder}!on\_function\_start@{on\_function\_start}}
+\index{on\_function\_start@{on\_function\_start}!sysio::vm::profile\_instr\_map::builder@{sysio::vm::profile\_instr\_map::builder}}
+\doxysubsubsection{\texorpdfstring{on\_function\_start()}{on\_function\_start()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a9f52fba311fd7ef5b9247c15863750af} 
+void sysio\+::vm\+::profile\+\_\+instr\+\_\+map\+::builder\+::on\+\_\+function\+\_\+start (\begin{DoxyParamCaption}\item[{const void \texorpdfstring{$\ast$}{*}}]{code\+\_\+addr}{, }\item[{const void \texorpdfstring{$\ast$}{*}}]{wasm\+\_\+addr}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2debug__info_8hpp_source_l00035}{35}} of file \mbox{\hyperlink{vm_2debug__info_8hpp_source}{debug\+\_\+info.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ data.push\_back(\{}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}std::uint32\_t\textcolor{keyword}{>}(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(code\_addr)\ -\/\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(\mbox{\hyperlink{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a670341269f86b024e1b80a7ab6f47527}{code\_base}})),}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}std::uint32\_t\textcolor{keyword}{>}(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(wasm\_addr)\ -\/\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(\mbox{\hyperlink{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a8318bc2518c39a1935b2e89f375dcab2}{wasm\_base}}))}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a243335a21b7989b23faebd6a070aadce}\index{sysio::vm::profile\_instr\_map::builder@{sysio::vm::profile\_instr\_map::builder}!on\_instr\_start@{on\_instr\_start}}
+\index{on\_instr\_start@{on\_instr\_start}!sysio::vm::profile\_instr\_map::builder@{sysio::vm::profile\_instr\_map::builder}}
+\doxysubsubsection{\texorpdfstring{on\_instr\_start()}{on\_instr\_start()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a243335a21b7989b23faebd6a070aadce} 
+void sysio\+::vm\+::profile\+\_\+instr\+\_\+map\+::builder\+::on\+\_\+instr\+\_\+start (\begin{DoxyParamCaption}\item[{const void \texorpdfstring{$\ast$}{*}}]{code\+\_\+addr}{, }\item[{const void \texorpdfstring{$\ast$}{*}}]{wasm\+\_\+addr}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2debug__info_8hpp_source_l00041}{41}} of file \mbox{\hyperlink{sysio_2vm_2debug__info_8hpp_source}{debug\+\_\+info.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ data.push\_back(\{}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}std::uint32\_t\textcolor{keyword}{>}(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(code\_addr)\ -\/\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(\mbox{\hyperlink{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a670341269f86b024e1b80a7ab6f47527}{code\_base}})),}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}std::uint32\_t\textcolor{keyword}{>}(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(wasm\_addr)\ -\/\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(\mbox{\hyperlink{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a8318bc2518c39a1935b2e89f375dcab2}{wasm\_base}}))}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a243335a21b7989b23faebd6a070aadce}\index{sysio::vm::profile\_instr\_map::builder@{sysio::vm::profile\_instr\_map::builder}!on\_instr\_start@{on\_instr\_start}}
+\index{on\_instr\_start@{on\_instr\_start}!sysio::vm::profile\_instr\_map::builder@{sysio::vm::profile\_instr\_map::builder}}
+\doxysubsubsection{\texorpdfstring{on\_instr\_start()}{on\_instr\_start()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a243335a21b7989b23faebd6a070aadce} 
+void sysio\+::vm\+::profile\+\_\+instr\+\_\+map\+::builder\+::on\+\_\+instr\+\_\+start (\begin{DoxyParamCaption}\item[{const void \texorpdfstring{$\ast$}{*}}]{code\+\_\+addr}{, }\item[{const void \texorpdfstring{$\ast$}{*}}]{wasm\+\_\+addr}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2debug__info_8hpp_source_l00041}{41}} of file \mbox{\hyperlink{vm_2debug__info_8hpp_source}{debug\+\_\+info.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ data.push\_back(\{}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}std::uint32\_t\textcolor{keyword}{>}(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(code\_addr)\ -\/\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(\mbox{\hyperlink{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a670341269f86b024e1b80a7ab6f47527}{code\_base}})),}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}std::uint32\_t\textcolor{keyword}{>}(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(wasm\_addr)\ -\/\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(\mbox{\hyperlink{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a8318bc2518c39a1935b2e89f375dcab2}{wasm\_base}}))}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a670341269f86b024e1b80a7ab6f47527}\index{sysio::vm::profile\_instr\_map::builder@{sysio::vm::profile\_instr\_map::builder}!code\_base@{code\_base}}
+\index{code\_base@{code\_base}!sysio::vm::profile\_instr\_map::builder@{sysio::vm::profile\_instr\_map::builder}}
+\doxysubsubsection{\texorpdfstring{code\_base}{code\_base}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a670341269f86b024e1b80a7ab6f47527} 
+const void \texorpdfstring{$\ast$}{*} sysio\+::vm\+::profile\+\_\+instr\+\_\+map\+::builder\+::code\+\_\+base = nullptr}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2debug__info_8hpp_source_l00051}{51}} of file \mbox{\hyperlink{sysio_2vm_2debug__info_8hpp_source}{debug\+\_\+info.\+hpp}}.
+
+\Hypertarget{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a9993cb4b6cd13f69ba5a39bcf7590644}\index{sysio::vm::profile\_instr\_map::builder@{sysio::vm::profile\_instr\_map::builder}!code\_end@{code\_end}}
+\index{code\_end@{code\_end}!sysio::vm::profile\_instr\_map::builder@{sysio::vm::profile\_instr\_map::builder}}
+\doxysubsubsection{\texorpdfstring{code\_end}{code\_end}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a9993cb4b6cd13f69ba5a39bcf7590644} 
+const void \texorpdfstring{$\ast$}{*} sysio\+::vm\+::profile\+\_\+instr\+\_\+map\+::builder\+::code\+\_\+end = nullptr}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2debug__info_8hpp_source_l00053}{53}} of file \mbox{\hyperlink{sysio_2vm_2debug__info_8hpp_source}{debug\+\_\+info.\+hpp}}.
+
+\Hypertarget{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a79a6cec0b393378e883d1eebecd430bc}\index{sysio::vm::profile\_instr\_map::builder@{sysio::vm::profile\_instr\_map::builder}!data@{data}}
+\index{data@{data}!sysio::vm::profile\_instr\_map::builder@{sysio::vm::profile\_instr\_map::builder}}
+\doxysubsubsection{\texorpdfstring{data}{data}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a79a6cec0b393378e883d1eebecd430bc} 
+std\+::vector$<$ addr\+\_\+entry $>$ sysio\+::vm\+::profile\+\_\+instr\+\_\+map\+::builder\+::data}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2debug__info_8hpp_source_l00054}{54}} of file \mbox{\hyperlink{sysio_2vm_2debug__info_8hpp_source}{debug\+\_\+info.\+hpp}}.
+
+\Hypertarget{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a8318bc2518c39a1935b2e89f375dcab2}\index{sysio::vm::profile\_instr\_map::builder@{sysio::vm::profile\_instr\_map::builder}!wasm\_base@{wasm\_base}}
+\index{wasm\_base@{wasm\_base}!sysio::vm::profile\_instr\_map::builder@{sysio::vm::profile\_instr\_map::builder}}
+\doxysubsubsection{\texorpdfstring{wasm\_base}{wasm\_base}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1profile__instr__map_1_1builder_a8318bc2518c39a1935b2e89f375dcab2} 
+const void \texorpdfstring{$\ast$}{*} sysio\+::vm\+::profile\+\_\+instr\+\_\+map\+::builder\+::wasm\+\_\+base = nullptr}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2debug__info_8hpp_source_l00052}{52}} of file \mbox{\hyperlink{sysio_2vm_2debug__info_8hpp_source}{debug\+\_\+info.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/include/sysio/sysio/vm/\mbox{\hyperlink{sysio_2vm_2debug__info_8hpp}{debug\+\_\+info.\+hpp}}\item 
+libraries/sys-\/vm/include/sysio/vm/\mbox{\hyperlink{vm_2debug__info_8hpp}{debug\+\_\+info.\+hpp}}\end{DoxyCompactItemize}

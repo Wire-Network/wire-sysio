@@ -1,0 +1,242 @@
+\doxysection{gtest\+\_\+repeat\+\_\+test.\+cc}
+\hypertarget{gtest__repeat__test_8cc_source}{}\label{gtest__repeat__test_8cc_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/test/gtest\_repeat\_test.cc@{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/test/gtest\_repeat\_test.cc}}
+\mbox{\hyperlink{gtest__repeat__test_8cc}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00001}00001\ \textcolor{comment}{//\ Copyright\ 2008,\ Google\ Inc.}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00002}00002\ \textcolor{comment}{//\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00003}00003\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00004}00004\ \textcolor{comment}{//\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00005}00005\ \textcolor{comment}{//\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00006}00006\ \textcolor{comment}{//\ met:}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00007}00007\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00008}00008\ \textcolor{comment}{//\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00009}00009\ \textcolor{comment}{//\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00010}00010\ \textcolor{comment}{//\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00011}00011\ \textcolor{comment}{//\ copyright\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00012}00012\ \textcolor{comment}{//\ in\ the\ documentation\ and/or\ other\ materials\ provided\ with\ the}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00013}00013\ \textcolor{comment}{//\ distribution.}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00014}00014\ \textcolor{comment}{//\ \ \ \ \ *\ Neither\ the\ name\ of\ Google\ Inc.\ nor\ the\ names\ of\ its}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00015}00015\ \textcolor{comment}{//\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products\ derived\ from}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00016}00016\ \textcolor{comment}{//\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00017}00017\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00018}00018\ \textcolor{comment}{//\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00019}00019\ \textcolor{comment}{//\ "{}AS\ IS"{}\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00020}00020\ \textcolor{comment}{//\ LIMITED\ TO,\ THE\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00021}00021\ \textcolor{comment}{//\ A\ PARTICULAR\ PURPOSE\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ THE\ COPYRIGHT}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00022}00022\ \textcolor{comment}{//\ OWNER\ OR\ CONTRIBUTORS\ BE\ LIABLE\ FOR\ ANY\ DIRECT,\ INDIRECT,\ INCIDENTAL,}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00023}00023\ \textcolor{comment}{//\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES\ (INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00024}00024\ \textcolor{comment}{//\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;\ LOSS\ OF\ USE,}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00025}00025\ \textcolor{comment}{//\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND\ ON\ ANY}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00026}00026\ \textcolor{comment}{//\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00027}00027\ \textcolor{comment}{//\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00028}00028\ \textcolor{comment}{//\ OF\ THIS\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00029}00029\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00030}00030\ \textcolor{comment}{//\ Author:\ wan@google.com\ (Zhanyong\ Wan)}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00032}00032\ \textcolor{comment}{//\ Tests\ the\ -\/-\/gtest\_repeat=number\ flag.}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00034}00034\ \textcolor{preprocessor}{\#include\ <stdlib.h>}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00035}00035\ \textcolor{preprocessor}{\#include\ <iostream>}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00036}00036\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{gtest_8h}{gtest/gtest.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00037}00037\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{gtest-internal-inl_8h}{src/gtest-\/internal-\/inl.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00039}00039\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetesting}{testing}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00041}00041\ \mbox{\hyperlink{gtest-port_8h_a9f74eee05f7ee5534139a622fe7da7dd}{GTEST\_DECLARE\_string\_}}(death\_test\_style);}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00042}00042\ \mbox{\hyperlink{gtest-port_8h_a9f74eee05f7ee5534139a622fe7da7dd}{GTEST\_DECLARE\_string\_}}(filter);}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00043}00043\ \mbox{\hyperlink{gtest-port_8h_aab2ee98cb616054b1d3a7dc71efe81fc}{GTEST\_DECLARE\_int32\_}}(repeat);}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00045}00045\ \}\ \ \textcolor{comment}{//\ namespace\ testing}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00047}00047\ \textcolor{keyword}{using\ }testing::GTEST\_FLAG(death\_test\_style);}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00048}00048\ \textcolor{keyword}{using\ }testing::GTEST\_FLAG(filter);}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00049}00049\ \textcolor{keyword}{using\ }testing::GTEST\_FLAG(repeat);}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00051}00051\ \textcolor{keyword}{namespace\ }\{}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00052}00052\ }
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00053}00053\ \textcolor{comment}{//\ We\ need\ this\ when\ we\ are\ testing\ Google\ Test\ itself\ and\ therefore}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00054}00054\ \textcolor{comment}{//\ cannot\ use\ Google\ Test\ assertions.}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00055}\mbox{\hyperlink{gtest__repeat__test_8cc_a7e5ba7c523079f679398b4c730184de3}{00055}}\ \textcolor{preprocessor}{\#define\ GTEST\_CHECK\_INT\_EQ\_(expected,\ actual)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00056}00056\ \textcolor{preprocessor}{\ \ do\ \{\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00057}00057\ \textcolor{preprocessor}{\ \ \ \ const\ int\ expected\_val\ =\ (expected);\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00058}00058\ \textcolor{preprocessor}{\ \ \ \ const\ int\ actual\_val\ =\ (actual);\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00059}00059\ \textcolor{preprocessor}{\ \ \ \ if\ (::testing::internal::IsTrue(expected\_val\ !=\ actual\_val))\ \{\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00060}00060\ \textcolor{preprocessor}{\ \ \ \ \ \ ::std::cout\ <<\ "{}Value\ of:\ "{}\ \#actual\ "{}\(\backslash\)n"{}\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00061}00061\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ "{}\ \ Actual:\ "{}\ <<\ actual\_val\ <<\ "{}\(\backslash\)n"{}\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00062}00062\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ "{}Expected:\ "{}\ \#expected\ "{}\(\backslash\)n"{}\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00063}00063\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ "{}Which\ is:\ "{}\ <<\ expected\_val\ <<\ "{}\(\backslash\)n"{};\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00064}00064\ \textcolor{preprocessor}{\ \ \ \ \ \ ::testing::internal::posix::Abort();\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00065}00065\ \textcolor{preprocessor}{\ \ \ \ \}\(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00066}00066\ \textcolor{preprocessor}{\ \ \}\ while\ (::testing::internal::AlwaysFalse())}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00067}00067\ }
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00069}00069\ \textcolor{comment}{//\ Used\ for\ verifying\ that\ global\ environment\ set-\/up\ and\ tear-\/down\ are}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00070}00070\ \textcolor{comment}{//\ inside\ the\ -\/-\/gtest\_repeat\ loop.}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00072}00072\ \textcolor{keywordtype}{int}\ g\_environment\_set\_up\_count\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00073}00073\ \textcolor{keywordtype}{int}\ g\_environment\_tear\_down\_count\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00074}00074\ }
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00075}00075\ \textcolor{keyword}{class\ }MyEnvironment\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1_environment}{testing::Environment}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00076}00076\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00077}00077\ \ \ MyEnvironment()\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00078}00078\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ SetUp()\ \{\ g\_environment\_set\_up\_count++;\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00079}00079\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ TearDown()\ \{\ g\_environment\_tear\_down\_count++;\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00080}00080\ \};}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00081}00081\ }
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00082}00082\ \textcolor{comment}{//\ A\ test\ that\ should\ fail.}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00083}00083\ }
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00084}00084\ \textcolor{keywordtype}{int}\ g\_should\_fail\_count\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00085}00085\ }
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00086}00086\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(FooTest,\ ShouldFail)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00087}00087\ \ \ g\_should\_fail\_count++;}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00088}00088\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0,\ 1)\ <<\ \textcolor{stringliteral}{"{}Expected\ failure."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00089}00089\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00090}00090\ }
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00091}00091\ \textcolor{comment}{//\ A\ test\ that\ should\ pass.}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00092}00092\ }
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00093}00093\ \textcolor{keywordtype}{int}\ g\_should\_pass\_count\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00094}00094\ }
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00095}00095\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(FooTest,\ ShouldPass)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00096}00096\ \ \ g\_should\_pass\_count++;}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00097}00097\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00098}00098\ }
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00099}00099\ \textcolor{comment}{//\ A\ test\ that\ contains\ a\ thread-\/safe\ death\ test\ and\ a\ fast\ death}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00100}00100\ \textcolor{comment}{//\ test.\ \ It\ should\ pass.}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00101}00101\ }
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00102}00102\ \textcolor{keywordtype}{int}\ g\_death\_test\_count\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00103}00103\ }
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00104}00104\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(BarDeathTest,\ ThreadSafeAndFast)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00105}00105\ \ \ g\_death\_test\_count++;}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00106}00106\ }
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00107}00107\ \ \ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(death\_test\_style)\ =\ \textcolor{stringliteral}{"{}threadsafe"{}};}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00108}00108\ \ \ \mbox{\hyperlink{gtest-death-test_8h_a8564de0e012dd0898949c513d1571f8b}{EXPECT\_DEATH\_IF\_SUPPORTED}}(\mbox{\hyperlink{namespacetesting_1_1internal_1_1posix_a69b8278c59359dd6a6f941b4643db9fb}{::testing::internal::posix::Abort}}(),\ \textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00109}00109\ }
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00110}00110\ \ \ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(death\_test\_style)\ =\ \textcolor{stringliteral}{"{}fast"{}};}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00111}00111\ \ \ \mbox{\hyperlink{gtest-death-test_8h_a8564de0e012dd0898949c513d1571f8b}{EXPECT\_DEATH\_IF\_SUPPORTED}}(\mbox{\hyperlink{namespacetesting_1_1internal_1_1posix_a69b8278c59359dd6a6f941b4643db9fb}{::testing::internal::posix::Abort}}(),\ \textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00112}00112\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00113}00113\ }
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00114}00114\ \textcolor{keywordtype}{int}\ g\_param\_test\_count\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00115}00115\ }
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00116}00116\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ kNumberOfParamTests\ =\ 10;}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00117}00117\ }
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00118}00118\ \textcolor{keyword}{class\ }MyParamTest\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1_test_with_param}{testing::TestWithParam}}<int>\ \{\};}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00119}00119\ }
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00120}00120\ \mbox{\hyperlink{gtest-param-test_8h_abd3bb216dafbffa36044a6030216ecda}{TEST\_P}}(MyParamTest,\ ShouldPass)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00121}00121\ \ \ \textcolor{comment}{//\ TODO(vladl@google.com):\ Make\ parameter\ value\ checking\ robust}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00122}00122\ \ \ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ WRT\ order\ of\ tests.}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00123}00123\ \ \ \mbox{\hyperlink{gtest__repeat__test_8cc_a7e5ba7c523079f679398b4c730184de3}{GTEST\_CHECK\_INT\_EQ\_}}(g\_param\_test\_count\ \%\ kNumberOfParamTests,\ GetParam());}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00124}00124\ \ \ g\_param\_test\_count++;}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00125}00125\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00126}00126\ \mbox{\hyperlink{gtest-param-test_8h_a9e411d086a08ba0cd14b73fb2f8d028f}{INSTANTIATE\_TEST\_CASE\_P}}(MyParamSequence,}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00127}00127\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ MyParamTest,}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00128}00128\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_a4f2c9978ad0c764f57e0cbd6f72cb540}{testing::Range}}(0,\ kNumberOfParamTests));}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00129}00129\ }
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00130}00130\ \textcolor{comment}{//\ Resets\ the\ count\ for\ each\ test.}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00131}00131\ \textcolor{keywordtype}{void}\ ResetCounts()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00132}00132\ \ \ g\_environment\_set\_up\_count\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00133}00133\ \ \ g\_environment\_tear\_down\_count\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00134}00134\ \ \ g\_should\_fail\_count\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00135}00135\ \ \ g\_should\_pass\_count\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00136}00136\ \ \ g\_death\_test\_count\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00137}00137\ \ \ g\_param\_test\_count\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00138}00138\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00139}00139\ }
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00140}00140\ \textcolor{comment}{//\ Checks\ that\ the\ count\ for\ each\ test\ is\ expected.}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00141}00141\ \textcolor{keywordtype}{void}\ CheckCounts(\textcolor{keywordtype}{int}\ expected)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00142}00142\ \ \ \mbox{\hyperlink{gtest__repeat__test_8cc_a7e5ba7c523079f679398b4c730184de3}{GTEST\_CHECK\_INT\_EQ\_}}(expected,\ g\_environment\_set\_up\_count);}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00143}00143\ \ \ \mbox{\hyperlink{gtest__repeat__test_8cc_a7e5ba7c523079f679398b4c730184de3}{GTEST\_CHECK\_INT\_EQ\_}}(expected,\ g\_environment\_tear\_down\_count);}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00144}00144\ \ \ \mbox{\hyperlink{gtest__repeat__test_8cc_a7e5ba7c523079f679398b4c730184de3}{GTEST\_CHECK\_INT\_EQ\_}}(expected,\ g\_should\_fail\_count);}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00145}00145\ \ \ \mbox{\hyperlink{gtest__repeat__test_8cc_a7e5ba7c523079f679398b4c730184de3}{GTEST\_CHECK\_INT\_EQ\_}}(expected,\ g\_should\_pass\_count);}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00146}00146\ \ \ \mbox{\hyperlink{gtest__repeat__test_8cc_a7e5ba7c523079f679398b4c730184de3}{GTEST\_CHECK\_INT\_EQ\_}}(expected,\ g\_death\_test\_count);}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00147}00147\ \ \ \mbox{\hyperlink{gtest__repeat__test_8cc_a7e5ba7c523079f679398b4c730184de3}{GTEST\_CHECK\_INT\_EQ\_}}(expected\ *\ kNumberOfParamTests,\ g\_param\_test\_count);}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00148}00148\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00149}00149\ }
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00150}00150\ \textcolor{comment}{//\ Tests\ the\ behavior\ of\ Google\ Test\ when\ -\/-\/gtest\_repeat\ is\ not\ specified.}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00151}00151\ \textcolor{keywordtype}{void}\ TestRepeatUnspecified()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00152}00152\ \ \ ResetCounts();}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00153}00153\ \ \ \mbox{\hyperlink{gtest__repeat__test_8cc_a7e5ba7c523079f679398b4c730184de3}{GTEST\_CHECK\_INT\_EQ\_}}(1,\ \mbox{\hyperlink{gtest_8h_a853a3792807489591d3d4a2f2ff9359f}{RUN\_ALL\_TESTS}}());}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00154}00154\ \ \ CheckCounts(1);}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00155}00155\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00156}00156\ }
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00157}00157\ \textcolor{comment}{//\ Tests\ the\ behavior\ of\ Google\ Test\ when\ -\/-\/gtest\_repeat\ has\ the\ given\ value.}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00158}00158\ \textcolor{keywordtype}{void}\ TestRepeat(\textcolor{keywordtype}{int}\ repeat)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00159}00159\ \ \ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(repeat)\ =\ repeat;}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00160}00160\ }
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00161}00161\ \ \ ResetCounts();}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00162}00162\ \ \ \mbox{\hyperlink{gtest__repeat__test_8cc_a7e5ba7c523079f679398b4c730184de3}{GTEST\_CHECK\_INT\_EQ\_}}(repeat\ >\ 0\ ?\ 1\ :\ 0,\ \mbox{\hyperlink{gtest_8h_a853a3792807489591d3d4a2f2ff9359f}{RUN\_ALL\_TESTS}}());}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00163}00163\ \ \ CheckCounts(repeat);}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00164}00164\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00165}00165\ }
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00166}00166\ \textcolor{comment}{//\ Tests\ using\ -\/-\/gtest\_repeat\ when\ -\/-\/gtest\_filter\ specifies\ an\ empty}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00167}00167\ \textcolor{comment}{//\ set\ of\ tests.}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00168}00168\ \textcolor{keywordtype}{void}\ TestRepeatWithEmptyFilter(\textcolor{keywordtype}{int}\ repeat)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00169}00169\ \ \ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(repeat)\ =\ repeat;}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00170}00170\ \ \ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(filter)\ =\ \textcolor{stringliteral}{"{}None"{}};}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00171}00171\ }
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00172}00172\ \ \ ResetCounts();}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00173}00173\ \ \ \mbox{\hyperlink{gtest__repeat__test_8cc_a7e5ba7c523079f679398b4c730184de3}{GTEST\_CHECK\_INT\_EQ\_}}(0,\ \mbox{\hyperlink{gtest_8h_a853a3792807489591d3d4a2f2ff9359f}{RUN\_ALL\_TESTS}}());}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00174}00174\ \ \ CheckCounts(0);}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00175}00175\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00176}00176\ }
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00177}00177\ \textcolor{comment}{//\ Tests\ using\ -\/-\/gtest\_repeat\ when\ -\/-\/gtest\_filter\ specifies\ a\ set\ of}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00178}00178\ \textcolor{comment}{//\ successful\ tests.}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00179}00179\ \textcolor{keywordtype}{void}\ TestRepeatWithFilterForSuccessfulTests(\textcolor{keywordtype}{int}\ repeat)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00180}00180\ \ \ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(repeat)\ =\ repeat;}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00181}00181\ \ \ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(filter)\ =\ \textcolor{stringliteral}{"{}*-\/*ShouldFail"{}};}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00182}00182\ }
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00183}00183\ \ \ ResetCounts();}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00184}00184\ \ \ \mbox{\hyperlink{gtest__repeat__test_8cc_a7e5ba7c523079f679398b4c730184de3}{GTEST\_CHECK\_INT\_EQ\_}}(0,\ \mbox{\hyperlink{gtest_8h_a853a3792807489591d3d4a2f2ff9359f}{RUN\_ALL\_TESTS}}());}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00185}00185\ \ \ \mbox{\hyperlink{gtest__repeat__test_8cc_a7e5ba7c523079f679398b4c730184de3}{GTEST\_CHECK\_INT\_EQ\_}}(repeat,\ g\_environment\_set\_up\_count);}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00186}00186\ \ \ \mbox{\hyperlink{gtest__repeat__test_8cc_a7e5ba7c523079f679398b4c730184de3}{GTEST\_CHECK\_INT\_EQ\_}}(repeat,\ g\_environment\_tear\_down\_count);}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00187}00187\ \ \ \mbox{\hyperlink{gtest__repeat__test_8cc_a7e5ba7c523079f679398b4c730184de3}{GTEST\_CHECK\_INT\_EQ\_}}(0,\ g\_should\_fail\_count);}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00188}00188\ \ \ \mbox{\hyperlink{gtest__repeat__test_8cc_a7e5ba7c523079f679398b4c730184de3}{GTEST\_CHECK\_INT\_EQ\_}}(repeat,\ g\_should\_pass\_count);}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00189}00189\ \ \ \mbox{\hyperlink{gtest__repeat__test_8cc_a7e5ba7c523079f679398b4c730184de3}{GTEST\_CHECK\_INT\_EQ\_}}(repeat,\ g\_death\_test\_count);}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00190}00190\ \ \ \mbox{\hyperlink{gtest__repeat__test_8cc_a7e5ba7c523079f679398b4c730184de3}{GTEST\_CHECK\_INT\_EQ\_}}(repeat\ *\ kNumberOfParamTests,\ g\_param\_test\_count);}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00191}00191\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00192}00192\ }
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00193}00193\ \textcolor{comment}{//\ Tests\ using\ -\/-\/gtest\_repeat\ when\ -\/-\/gtest\_filter\ specifies\ a\ set\ of}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00194}00194\ \textcolor{comment}{//\ failed\ tests.}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00195}00195\ \textcolor{keywordtype}{void}\ TestRepeatWithFilterForFailedTests(\textcolor{keywordtype}{int}\ repeat)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00196}00196\ \ \ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(repeat)\ =\ repeat;}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00197}00197\ \ \ \mbox{\hyperlink{gtest-port_8h_a828f4e34a1c4b510da50ec1563e3562a}{GTEST\_FLAG}}(filter)\ =\ \textcolor{stringliteral}{"{}*ShouldFail"{}};}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00198}00198\ }
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00199}00199\ \ \ ResetCounts();}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00200}00200\ \ \ \mbox{\hyperlink{gtest__repeat__test_8cc_a7e5ba7c523079f679398b4c730184de3}{GTEST\_CHECK\_INT\_EQ\_}}(1,\ \mbox{\hyperlink{gtest_8h_a853a3792807489591d3d4a2f2ff9359f}{RUN\_ALL\_TESTS}}());}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00201}00201\ \ \ \mbox{\hyperlink{gtest__repeat__test_8cc_a7e5ba7c523079f679398b4c730184de3}{GTEST\_CHECK\_INT\_EQ\_}}(repeat,\ g\_environment\_set\_up\_count);}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00202}00202\ \ \ \mbox{\hyperlink{gtest__repeat__test_8cc_a7e5ba7c523079f679398b4c730184de3}{GTEST\_CHECK\_INT\_EQ\_}}(repeat,\ g\_environment\_tear\_down\_count);}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00203}00203\ \ \ \mbox{\hyperlink{gtest__repeat__test_8cc_a7e5ba7c523079f679398b4c730184de3}{GTEST\_CHECK\_INT\_EQ\_}}(repeat,\ g\_should\_fail\_count);}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00204}00204\ \ \ \mbox{\hyperlink{gtest__repeat__test_8cc_a7e5ba7c523079f679398b4c730184de3}{GTEST\_CHECK\_INT\_EQ\_}}(0,\ g\_should\_pass\_count);}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00205}00205\ \ \ \mbox{\hyperlink{gtest__repeat__test_8cc_a7e5ba7c523079f679398b4c730184de3}{GTEST\_CHECK\_INT\_EQ\_}}(0,\ g\_death\_test\_count);}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00206}00206\ \ \ \mbox{\hyperlink{gtest__repeat__test_8cc_a7e5ba7c523079f679398b4c730184de3}{GTEST\_CHECK\_INT\_EQ\_}}(0,\ g\_param\_test\_count);}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00207}00207\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00208}00208\ }
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00209}00209\ \}\ \ \textcolor{comment}{//\ namespace}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00210}00210\ }
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00211}\mbox{\hyperlink{gtest__repeat__test_8cc_a3c04138a5bfe5d72780bb7e82a18e627}{00211}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}(\textcolor{keywordtype}{int}\ argc,\ \textcolor{keywordtype}{char}\ **\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}})\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00212}00212\ \ \ \mbox{\hyperlink{namespacetesting_afd726ae08c9bd16dc52f78c822d9946b}{testing::InitGoogleTest}}(\&argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}});}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00213}00213\ }
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00214}00214\ \ \ \mbox{\hyperlink{namespacetesting_a224caeebdb6586b728d204367fea1087}{testing::AddGlobalTestEnvironment}}(\textcolor{keyword}{new}\ MyEnvironment);}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00215}00215\ }
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00216}00216\ \ \ TestRepeatUnspecified();}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00217}00217\ \ \ TestRepeat(0);}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00218}00218\ \ \ TestRepeat(1);}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00219}00219\ \ \ TestRepeat(5);}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00220}00220\ }
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00221}00221\ \ \ TestRepeatWithEmptyFilter(2);}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00222}00222\ \ \ TestRepeatWithEmptyFilter(3);}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00223}00223\ }
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00224}00224\ \ \ TestRepeatWithFilterForSuccessfulTests(3);}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00225}00225\ }
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00226}00226\ \ \ TestRepeatWithFilterForFailedTests(4);}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00227}00227\ }
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00228}00228\ \ \ \textcolor{comment}{//\ It\ would\ be\ nice\ to\ verify\ that\ the\ tests\ indeed\ loop\ forever}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00229}00229\ \ \ \textcolor{comment}{//\ when\ GTEST\_FLAG(repeat)\ is\ negative,\ but\ this\ test\ will\ be\ quite}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00230}00230\ \ \ \textcolor{comment}{//\ complicated\ to\ write.\ \ Since\ this\ flag\ is\ for\ interactive}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00231}00231\ \ \ \textcolor{comment}{//\ debugging\ only\ and\ doesn't\ affect\ the\ normal\ test\ result,\ such\ a}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00232}00232\ \ \ \textcolor{comment}{//\ test\ would\ be\ an\ overkill.}}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00233}00233\ }
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00234}00234\ \ \ printf(\textcolor{stringliteral}{"{}PASS\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00235}00235\ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest__repeat__test_8cc_source_l00236}00236\ \}}
+
+\end{DoxyCode}

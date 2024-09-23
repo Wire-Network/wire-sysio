@@ -1,0 +1,15 @@
+<map id="fc::detail::average_rate_meter::update" name="fc::detail::average_rate_meter::update">
+<area shape="rect" id="Node000001" title=" " alt="" coords="451,104,588,145"/>
+<area shape="rect" id="Node000002" href="$classfc_1_1detail_1_1rate__limiting__group__impl.html#ac9c0f88e27254463a65975d5cc8484cd" title=" " alt="" coords="214,71,402,111"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="435,114,401,108,402,103,436,109"/>
+<area shape="rect" id="Node000005" href="$classfc_1_1detail_1_1rate__limiting__group__impl.html#aee2678c053a998c49ad7c671c77fe4dd" title=" " alt="" coords="213,136,403,177"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="436,140,404,145,403,139,435,134"/>
+<area shape="rect" id="Node000003" href="$classfc_1_1detail_1_1rate__limiting__group__impl.html#a8fe749da93ec7a60083d03c8a82a5091" title=" " alt="" coords="7,5,163,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="221,68,156,49,158,44,222,63"/>
+<area shape="rect" id="Node000004" href="$classfc_1_1detail_1_1rate__limiting__group__impl.html#a77951eaab9932d076e231fabdbfde61e" title=" " alt="" coords="7,71,163,111"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="199,94,164,94,164,88,199,88"/>
+<area shape="rect" id="Node000006" href="$classfc_1_1detail_1_1rate__limiting__group__impl.html#a50b7ec22b99f4ff67d71e44f2e2bdc88" title=" " alt="" coords="5,136,165,177"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="197,159,165,159,165,154,197,154"/>
+<area shape="rect" id="Node000007" href="$classfc_1_1detail_1_1rate__limiting__group__impl.html#ab6a53d6b835cb2d3ada56c834dc0bbe5" title=" " alt="" coords="5,201,165,242"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="222,184,158,203,156,198,221,179"/>
+</map>

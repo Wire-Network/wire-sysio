@@ -1,0 +1,729 @@
+\doxysection{gtest-\/param-\/util.h}
+\hypertarget{gtest-param-util_8h_source}{}\label{gtest-param-util_8h_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/include/gtest/internal/gtest-\/param-\/util.h@{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/include/gtest/internal/gtest-\/param-\/util.h}}
+\mbox{\hyperlink{gtest-param-util_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00001}00001\ \textcolor{comment}{//\ Copyright\ 2008\ Google\ Inc.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00002}00002\ \textcolor{comment}{//\ All\ Rights\ Reserved.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00003}00003\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00004}00004\ \textcolor{comment}{//\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00005}00005\ \textcolor{comment}{//\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00006}00006\ \textcolor{comment}{//\ met:}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00007}00007\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00008}00008\ \textcolor{comment}{//\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00009}00009\ \textcolor{comment}{//\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00010}00010\ \textcolor{comment}{//\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00011}00011\ \textcolor{comment}{//\ copyright\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00012}00012\ \textcolor{comment}{//\ in\ the\ documentation\ and/or\ other\ materials\ provided\ with\ the}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00013}00013\ \textcolor{comment}{//\ distribution.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00014}00014\ \textcolor{comment}{//\ \ \ \ \ *\ Neither\ the\ name\ of\ Google\ Inc.\ nor\ the\ names\ of\ its}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00015}00015\ \textcolor{comment}{//\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products\ derived\ from}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00016}00016\ \textcolor{comment}{//\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00017}00017\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00018}00018\ \textcolor{comment}{//\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00019}00019\ \textcolor{comment}{//\ "{}AS\ IS"{}\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00020}00020\ \textcolor{comment}{//\ LIMITED\ TO,\ THE\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00021}00021\ \textcolor{comment}{//\ A\ PARTICULAR\ PURPOSE\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ THE\ COPYRIGHT}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00022}00022\ \textcolor{comment}{//\ OWNER\ OR\ CONTRIBUTORS\ BE\ LIABLE\ FOR\ ANY\ DIRECT,\ INDIRECT,\ INCIDENTAL,}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00023}00023\ \textcolor{comment}{//\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES\ (INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00024}00024\ \textcolor{comment}{//\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;\ LOSS\ OF\ USE,}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00025}00025\ \textcolor{comment}{//\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND\ ON\ ANY}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00026}00026\ \textcolor{comment}{//\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00027}00027\ \textcolor{comment}{//\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00028}00028\ \textcolor{comment}{//\ OF\ THIS\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00029}00029\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00030}00030\ \textcolor{comment}{//\ Author:\ vladl@google.com\ (Vlad\ Losev)}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00032}00032\ \textcolor{comment}{//\ Type\ and\ function\ utilities\ for\ implementing\ parameterized\ tests.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00034}00034\ \textcolor{preprocessor}{\#ifndef\ GTEST\_INCLUDE\_GTEST\_INTERNAL\_GTEST\_PARAM\_UTIL\_H\_}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00035}00035\ \textcolor{preprocessor}{\#define\ GTEST\_INCLUDE\_GTEST\_INTERNAL\_GTEST\_PARAM\_UTIL\_H\_}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00037}00037\ \textcolor{preprocessor}{\#include\ <ctype.h>}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00039}00039\ \textcolor{preprocessor}{\#include\ <iterator>}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00040}00040\ \textcolor{preprocessor}{\#include\ <set>}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00041}00041\ \textcolor{preprocessor}{\#include\ <utility>}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00042}00042\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00044}00044\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{gtest-internal_8h}{gtest/internal/gtest-\/internal.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00045}00045\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{gtest-linked__ptr_8h}{gtest/internal/gtest-\/linked\_ptr.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00046}00046\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{gtest-port_8h}{gtest/internal/gtest-\/port.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00047}00047\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{gtest-printers_8h}{gtest/gtest-\/printers.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00049}00049\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetesting}{testing}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00051}00051\ \textcolor{comment}{//\ Input\ to\ a\ parameterized\ test\ name\ generator,\ describing\ a\ test\ parameter.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00052}00052\ \textcolor{comment}{//\ Consists\ of\ the\ parameter\ value\ and\ the\ integer\ parameter\ index.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00053}00053\ \textcolor{keyword}{template}\ <\textcolor{keyword}{class}\ ParamType>}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00054}\mbox{\hyperlink{structtesting_1_1_test_param_info}{00054}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structtesting_1_1_test_param_info}{TestParamInfo}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00055}\mbox{\hyperlink{structtesting_1_1_test_param_info_aa54199319bcad5a33c8538ecaecb6de5}{00055}}\ \ \ \mbox{\hyperlink{structtesting_1_1_test_param_info_aa54199319bcad5a33c8538ecaecb6de5}{TestParamInfo}}(\textcolor{keyword}{const}\ ParamType\&\ a\_param,\ \textcolor{keywordtype}{size\_t}\ an\_index)\ :}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00056}00056\ \ \ \ \ \mbox{\hyperlink{structtesting_1_1_test_param_info_a146d921039f9da8b1336f7cc6e8436c2}{param}}(a\_param),}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00057}00057\ \ \ \ \ index(an\_index)\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00058}\mbox{\hyperlink{structtesting_1_1_test_param_info_a146d921039f9da8b1336f7cc6e8436c2}{00058}}\ \ \ ParamType\ \mbox{\hyperlink{structtesting_1_1_test_param_info_a146d921039f9da8b1336f7cc6e8436c2}{param}};}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00059}\mbox{\hyperlink{structtesting_1_1_test_param_info_ad4d7bc02cbcc571eb3c1d2ec3ba5bb53}{00059}}\ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{structtesting_1_1_test_param_info_ad4d7bc02cbcc571eb3c1d2ec3ba5bb53}{index}};}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00060}00060\ \};}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00062}00062\ \textcolor{comment}{//\ A\ builtin\ parameterized\ test\ name\ generator\ which\ returns\ the\ result\ of}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00063}00063\ \textcolor{comment}{//\ testing::PrintToString.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00064}\mbox{\hyperlink{structtesting_1_1_print_to_string_param_name}{00064}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structtesting_1_1_print_to_string_param_name}{PrintToStringParamName}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00065}00065\ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{class}\ ParamType>}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00066}\mbox{\hyperlink{structtesting_1_1_print_to_string_param_name_a05b411cfb75dadb2c3c0355aee1dcf21}{00066}}\ \ \ std::string\ \mbox{\hyperlink{structtesting_1_1_print_to_string_param_name_a05b411cfb75dadb2c3c0355aee1dcf21}{operator()}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structtesting_1_1_test_param_info}{TestParamInfo<ParamType>}}\&\ info)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00067}00067\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetesting_aa5717bb1144edd1d262d310ba70c82ed}{PrintToString}}(info.param);}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00068}00068\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00069}00069\ \};}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00071}00071\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceinternal}{internal}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00073}00073\ \textcolor{comment}{//\ INTERNAL\ IMPLEMENTATION\ -\/\ DO\ NOT\ USE\ IN\ USER\ CODE.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00074}00074\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00075}00075\ \textcolor{comment}{//\ Outputs\ a\ message\ explaining\ invalid\ registration\ of\ different}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00076}00076\ \textcolor{comment}{//\ fixture\ class\ for\ the\ same\ test\ case.\ This\ may\ happen\ when}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00077}00077\ \textcolor{comment}{//\ TEST\_P\ macro\ is\ used\ to\ define\ two\ tests\ with\ the\ same\ name}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00078}00078\ \textcolor{comment}{//\ but\ in\ different\ namespaces.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00079}00079\ \mbox{\hyperlink{gtest-port_8h_aa73be6f0ba4a7456180a94904ce17790}{GTEST\_API\_}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacetesting_1_1internal_ab7e343160ee0aca7c8ae7c025a372453}{ReportInvalidTestCaseType}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ test\_case\_name,}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00080}00080\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ CodeLocation\ code\_location);}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00081}00081\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00082}00082\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}>\ \textcolor{keyword}{class\ }ParamGeneratorInterface;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00083}00083\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}>\ \textcolor{keyword}{class\ }ParamGenerator;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00084}00084\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00085}00085\ \textcolor{comment}{//\ Interface\ for\ iterating\ over\ elements\ provided\ by\ an\ implementation}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00086}00086\ \textcolor{comment}{//\ of\ ParamGeneratorInterface<T>.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00087}00087\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00088}\mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_interface}{00088}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_interface}{ParamIteratorInterface}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00089}00089\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00090}\mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_interface_adf6ba49e6b54a6e3b15dbd5733988bef}{00090}}\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_interface_adf6ba49e6b54a6e3b15dbd5733988bef}{\string~ParamIteratorInterface}}()\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00091}00091\ \ \ \textcolor{comment}{//\ A\ pointer\ to\ the\ base\ generator\ instance.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00092}00092\ \ \ \textcolor{comment}{//\ Used\ only\ for\ the\ purposes\ of\ iterator\ comparison}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00093}00093\ \ \ \textcolor{comment}{//\ to\ make\ sure\ that\ two\ iterators\ belong\ to\ the\ same\ generator.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00094}\mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_interface_a717c299a43b4db6c85b94b827276b8a1}{00094}}\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator_interface}{ParamGeneratorInterface<T>}}*\ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_interface_a717c299a43b4db6c85b94b827276b8a1}{BaseGenerator}}()\ \textcolor{keyword}{const}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00095}00095\ \ \ \textcolor{comment}{//\ Advances\ iterator\ to\ point\ to\ the\ next\ element}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00096}00096\ \ \ \textcolor{comment}{//\ provided\ by\ the\ generator.\ The\ caller\ is\ responsible}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00097}00097\ \ \ \textcolor{comment}{//\ for\ not\ calling\ Advance()\ on\ an\ iterator\ equal\ to}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00098}00098\ \ \ \textcolor{comment}{//\ BaseGenerator()-\/>End().}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00099}\mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_interface_a600dbd35fcb551463e379516a1abea48}{00099}}\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_interface_a600dbd35fcb551463e379516a1abea48}{Advance}}()\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00100}00100\ \ \ \textcolor{comment}{//\ Clones\ the\ iterator\ object.\ Used\ for\ implementing\ copy\ semantics}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00101}00101\ \ \ \textcolor{comment}{//\ of\ ParamIterator<T>.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00102}\mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_interface_a1a320971ce300a235669fa340b7dda3f}{00102}}\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_interface}{ParamIteratorInterface}}*\ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_interface_a1a320971ce300a235669fa340b7dda3f}{Clone}}()\ \textcolor{keyword}{const}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00103}00103\ \ \ \textcolor{comment}{//\ Dereferences\ the\ current\ iterator\ and\ provides\ (read-\/only)\ access}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00104}00104\ \ \ \textcolor{comment}{//\ to\ the\ pointed\ value.\ It\ is\ the\ caller's\ responsibility\ not\ to\ call}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00105}00105\ \ \ \textcolor{comment}{//\ Current()\ on\ an\ iterator\ equal\ to\ BaseGenerator()-\/>End().}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00106}00106\ \ \ \textcolor{comment}{//\ Used\ for\ implementing\ ParamGenerator<T>::operator*().}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00107}\mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_interface_a7a4cac3986c1c59a048f24f5c5e26bf4}{00107}}\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_interface_a7a4cac3986c1c59a048f24f5c5e26bf4}{Current}}()\ \textcolor{keyword}{const}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00108}00108\ \ \ \textcolor{comment}{//\ Determines\ whether\ the\ given\ iterator\ and\ other\ point\ to\ the\ same}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00109}00109\ \ \ \textcolor{comment}{//\ element\ in\ the\ sequence\ generated\ by\ the\ generator.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00110}00110\ \ \ \textcolor{comment}{//\ Used\ for\ implementing\ ParamGenerator<T>::operator==().}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00111}\mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_interface_a9d811697a752d46f7bd6a0082f9040a3}{00111}}\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_interface_a9d811697a752d46f7bd6a0082f9040a3}{Equals}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_interface}{ParamIteratorInterface}}\&\ other)\ \textcolor{keyword}{const}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00112}00112\ \};}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00113}00113\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00114}00114\ \textcolor{comment}{//\ Class\ iterating\ over\ elements\ provided\ by\ an\ implementation\ of}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00115}00115\ \textcolor{comment}{//\ ParamGeneratorInterface<T>.\ It\ wraps\ ParamIteratorInterface<T>}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00116}00116\ \textcolor{comment}{//\ and\ implements\ the\ const\ forward\ iterator\ concept.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00117}00117\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00118}\mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator}{00118}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator}{ParamIterator}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00119}00119\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00120}\mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_adfd6a4df207833c166180c77fbf6fa1a}{00120}}\ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_adfd6a4df207833c166180c77fbf6fa1a}{value\_type}};}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00121}\mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_ac25bc2d8d0440a416e141de5a371bf52}{00121}}\ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_ac25bc2d8d0440a416e141de5a371bf52}{reference}};}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00122}\mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_a6d92af85c475b23e82721cd44b5ac6a4}{00122}}\ \ \ \textcolor{keyword}{typedef}\ ptrdiff\_t\ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_a6d92af85c475b23e82721cd44b5ac6a4}{difference\_type}};}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00123}00123\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00124}00124\ \ \ \textcolor{comment}{//\ ParamIterator\ assumes\ ownership\ of\ the\ impl\_\ pointer.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00125}\mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_aa10585055ee055e304703a3004f24f33}{00125}}\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_aa10585055ee055e304703a3004f24f33}{ParamIterator}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator}{ParamIterator}}\&\ other)\ :\ impl\_(other.impl\_-\/>Clone())\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00126}\mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_acbb319ec83532708814b804886b19eda}{00126}}\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator}{ParamIterator}}\&\ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_acbb319ec83532708814b804886b19eda}{operator=}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator}{ParamIterator}}\&\ other)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00127}00127\ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{this}\ !=\ \&other)}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00128}00128\ \ \ \ \ \ \ impl\_.reset(other.impl\_-\/>Clone());}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00129}00129\ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00130}00130\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00131}00131\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00132}\mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_a741e81903a998cba4a2f8c505cb90d16}{00132}}\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_a741e81903a998cba4a2f8c505cb90d16}{operator*}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ *impl\_-\/>Current();\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00133}\mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_aa1475bc6c013340393f7530698fe4137}{00133}}\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_aa1475bc6c013340393f7530698fe4137}{operator-\/>}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ impl\_-\/>Current();\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00134}00134\ \ \ \textcolor{comment}{//\ Prefix\ version\ of\ operator++.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00135}\mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_a93d750e873c3df35f55665013202387e}{00135}}\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator}{ParamIterator}}\&\ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_a93d750e873c3df35f55665013202387e}{operator++}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00136}00136\ \ \ \ \ impl\_-\/>Advance();}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00137}00137\ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00138}00138\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00139}00139\ \ \ \textcolor{comment}{//\ Postfix\ version\ of\ operator++.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00140}\mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_af51e17827dd54977165937550c0fb030}{00140}}\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator}{ParamIterator}}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_af51e17827dd54977165937550c0fb030}{operator++}}(\textcolor{keywordtype}{int}\ \textcolor{comment}{/*unused*/})\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00141}00141\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_interface}{ParamIteratorInterface<T>}}*\ clone\ =\ impl\_-\/>Clone();}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00142}00142\ \ \ \ \ impl\_-\/>Advance();}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00143}00143\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_aa10585055ee055e304703a3004f24f33}{ParamIterator}}(clone);}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00144}00144\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00145}\mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_adc356b4789eb0c2a1b5b033c7874e5a6}{00145}}\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_adc356b4789eb0c2a1b5b033c7874e5a6}{operator==}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator}{ParamIterator}}\&\ other)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00146}00146\ \ \ \ \ \textcolor{keywordflow}{return}\ impl\_.get()\ ==\ other.impl\_.get()\ ||\ impl\_-\/>Equals(*other.impl\_);}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00147}00147\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00148}\mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_a7a6aee04e8e44b5c8294929951cfac2b}{00148}}\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_a7a6aee04e8e44b5c8294929951cfac2b}{operator!=}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator}{ParamIterator}}\&\ other)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00149}00149\ \ \ \ \ \textcolor{keywordflow}{return}\ !(*\textcolor{keyword}{this}\ ==\ other);}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00150}00150\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00151}00151\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00152}00152\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00153}00153\ \ \ \textcolor{keyword}{friend}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator}{ParamGenerator}}<\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}>;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00154}00154\ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_aa10585055ee055e304703a3004f24f33}{ParamIterator}}(\mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_interface}{ParamIteratorInterface<T>}}*\ impl)\ :\ impl\_(impl)\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00155}00155\ \ \ scoped\_ptr<ParamIteratorInterface<T>\ >\ impl\_;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00156}00156\ \};}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00157}00157\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00158}00158\ \textcolor{comment}{//\ ParamGeneratorInterface<T>\ is\ the\ binary\ interface\ to\ access\ generators}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00159}00159\ \textcolor{comment}{//\ defined\ in\ other\ translation\ units.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00160}00160\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00161}\mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator_interface}{00161}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator_interface}{ParamGeneratorInterface}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00162}00162\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00163}\mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator_interface_a10d665c1dcdb355df02452b4e33bf857}{00163}}\ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator_interface_a10d665c1dcdb355df02452b4e33bf857}{ParamType}};}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00164}00164\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00165}\mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator_interface_ac2767cb9ad2e292e291c4903323c6eff}{00165}}\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator_interface_ac2767cb9ad2e292e291c4903323c6eff}{\string~ParamGeneratorInterface}}()\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00166}00166\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00167}00167\ \ \ \textcolor{comment}{//\ Generator\ interface\ definition}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00168}\mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator_interface_adcb074da01e5fac94fcbbc3aee629978}{00168}}\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_interface}{ParamIteratorInterface<T>}}*\ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator_interface_adcb074da01e5fac94fcbbc3aee629978}{Begin}}()\ \textcolor{keyword}{const}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00169}\mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator_interface_a070e0a223d832886685522075d80304f}{00169}}\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_interface}{ParamIteratorInterface<T>}}*\ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator_interface_a070e0a223d832886685522075d80304f}{End}}()\ \textcolor{keyword}{const}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00170}00170\ \};}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00171}00171\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00172}00172\ \textcolor{comment}{//\ Wraps\ ParamGeneratorInterface<T>\ and\ provides\ general\ generator\ syntax}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00173}00173\ \textcolor{comment}{//\ compatible\ with\ the\ STL\ Container\ concept.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00174}00174\ \textcolor{comment}{//\ This\ class\ implements\ copy\ initialization\ semantics\ and\ the\ contained}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00175}00175\ \textcolor{comment}{//\ ParamGeneratorInterface<T>\ instance\ is\ shared\ among\ all\ copies}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00176}00176\ \textcolor{comment}{//\ of\ the\ original\ object.\ This\ is\ possible\ because\ that\ instance\ is\ immutable.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00177}00177\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00178}\mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator}{00178}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator}{ParamGenerator}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00179}00179\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00180}\mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator_a9ef0754cb27db32142d1b6af028c09d8}{00180}}\ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator}{ParamIterator<T>}}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator_a9ef0754cb27db32142d1b6af028c09d8}{iterator}};}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00181}00181\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00182}\mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator_a6b017d4d030927714d495ee95ae92fbc}{00182}}\ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator_a6b017d4d030927714d495ee95ae92fbc}{ParamGenerator}}(\mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator_interface}{ParamGeneratorInterface<T>}}*\ impl)\ :\ impl\_(impl)\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00183}\mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator_a5891d25c31919b3099489f8bbcd58b5e}{00183}}\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator_a5891d25c31919b3099489f8bbcd58b5e}{ParamGenerator}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator}{ParamGenerator}}\&\ other)\ :\ impl\_(other.impl\_)\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00184}00184\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00185}\mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator_afea19efc38617dca495a8027e24d4d32}{00185}}\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator}{ParamGenerator}}\&\ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator_afea19efc38617dca495a8027e24d4d32}{operator=}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator}{ParamGenerator}}\&\ other)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00186}00186\ \ \ \ \ impl\_\ =\ other.impl\_;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00187}00187\ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00188}00188\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00189}00189\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00190}\mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator_a14e735c8bd113556ae905a560cd2d607}{00190}}\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator}{iterator}}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator_a14e735c8bd113556ae905a560cd2d607}{begin}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator_a9ef0754cb27db32142d1b6af028c09d8}{iterator}}(impl\_-\/>Begin());\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00191}\mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator_aaf8f75df1099a07ff771a550b48f9fbe}{00191}}\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator}{iterator}}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator_aaf8f75df1099a07ff771a550b48f9fbe}{end}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator_a9ef0754cb27db32142d1b6af028c09d8}{iterator}}(impl\_-\/>End());\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00192}00192\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00193}00193\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00194}00194\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr}{linked\_ptr<const\ ParamGeneratorInterface<T>}}\ >\ impl\_;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00195}00195\ \};}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00196}00196\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00197}00197\ \textcolor{comment}{//\ Generates\ values\ from\ a\ range\ of\ two\ comparable\ values.\ Can\ be\ used\ to}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00198}00198\ \textcolor{comment}{//\ generate\ sequences\ of\ user-\/defined\ types\ that\ implement\ operator+()\ and}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00199}00199\ \textcolor{comment}{//\ operator<().}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00200}00200\ \textcolor{comment}{//\ This\ class\ is\ used\ in\ the\ Range()\ function.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00201}00201\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T,\ \textcolor{keyword}{typename}\ IncrementT>}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00202}\mbox{\hyperlink{classtesting_1_1internal_1_1_range_generator}{00202}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classtesting_1_1internal_1_1_range_generator}{RangeGenerator}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator_interface}{ParamGeneratorInterface}}<T>\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00203}00203\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00204}\mbox{\hyperlink{classtesting_1_1internal_1_1_range_generator_a5b3b83223b9cada3569bcee729e0fdf3}{00204}}\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_range_generator_a5b3b83223b9cada3569bcee729e0fdf3}{RangeGenerator}}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ begin,\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ end,\ IncrementT\ step)}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00205}00205\ \ \ \ \ \ \ :\ begin\_(begin),\ end\_(end),}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00206}00206\ \ \ \ \ \ \ \ \ step\_(step),\ end\_index\_(CalculateEndIndex(begin,\ end,\ step))\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00207}\mbox{\hyperlink{classtesting_1_1internal_1_1_range_generator_a680b80b06f471b5f93d8433609017021}{00207}}\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_range_generator_a680b80b06f471b5f93d8433609017021}{\string~RangeGenerator}}()\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00208}00208\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00209}\mbox{\hyperlink{classtesting_1_1internal_1_1_range_generator_a1c48d267ec70f5dd70330d7dd917ec1b}{00209}}\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_interface}{ParamIteratorInterface<T>}}*\ \mbox{\hyperlink{classtesting_1_1internal_1_1_range_generator_a1c48d267ec70f5dd70330d7dd917ec1b}{Begin}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00210}00210\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ Iterator(\textcolor{keyword}{this},\ begin\_,\ 0,\ step\_);}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00211}00211\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00212}\mbox{\hyperlink{classtesting_1_1internal_1_1_range_generator_a380ba126ac130ef94a31422ec6fbfe27}{00212}}\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_interface}{ParamIteratorInterface<T>}}*\ \mbox{\hyperlink{classtesting_1_1internal_1_1_range_generator_a380ba126ac130ef94a31422ec6fbfe27}{End}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00213}00213\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ Iterator(\textcolor{keyword}{this},\ end\_,\ end\_index\_,\ step\_);}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00214}00214\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00215}00215\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00216}00216\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00217}00217\ \ \ \textcolor{keyword}{class\ }Iterator\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_interface}{ParamIteratorInterface}}<T>\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00218}00218\ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00219}00219\ \ \ \ \ Iterator(\textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator_interface}{ParamGeneratorInterface<T>}}*\ base,\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\ \textcolor{keywordtype}{int}\ index,}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00220}00220\ \ \ \ \ \ \ \ \ \ \ \ \ \ IncrementT\ step)}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00221}00221\ \ \ \ \ \ \ \ \ :\ base\_(base),\ value\_(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}),\ index\_(index),\ step\_(step)\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00222}00222\ \ \ \ \ \textcolor{keyword}{virtual}\ \string~Iterator()\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00223}00223\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00224}00224\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keyword}{const}\ ParamGeneratorInterface<T>*\ BaseGenerator()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00225}00225\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ base\_;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00226}00226\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00227}00227\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ Advance()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00228}00228\ \ \ \ \ \ \ value\_\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\textcolor{keyword}{>}(value\_\ +\ step\_);}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00229}00229\ \ \ \ \ \ \ index\_++;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00230}00230\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00231}00231\ \ \ \ \ \textcolor{keyword}{virtual}\ ParamIteratorInterface<T>*\ Clone()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00232}00232\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ Iterator(*\textcolor{keyword}{this});}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00233}00233\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00234}00234\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ Current()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \&value\_;\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00235}00235\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{bool}\ Equals(\textcolor{keyword}{const}\ ParamIteratorInterface<T>\&\ other)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00236}00236\ \ \ \ \ \ \ \textcolor{comment}{//\ Having\ the\ same\ base\ generator\ guarantees\ that\ the\ other}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00237}00237\ \ \ \ \ \ \ \textcolor{comment}{//\ iterator\ is\ of\ the\ same\ type\ and\ we\ can\ downcast.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00238}00238\ \ \ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_ab54343f0a36dc4cb0ce8a478dd7847b8}{GTEST\_CHECK\_}}(BaseGenerator()\ ==\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.BaseGenerator())}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00239}00239\ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}The\ program\ attempted\ to\ compare\ iterators\ "{}}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00240}00240\ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}from\ different\ generators."{}}\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00241}00241\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ other\_index\ =}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00242}00242\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_af54f5cf4d9e03836ecc0316d090cb4ed}{CheckedDowncastToActualType<const\ Iterator>}}(\&other)-\/>index\_;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00243}00243\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ index\_\ ==\ other\_index;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00244}00244\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00245}00245\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00246}00246\ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00247}00247\ \ \ \ \ Iterator(\textcolor{keyword}{const}\ Iterator\&\ other)}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00248}00248\ \ \ \ \ \ \ \ \ :\ ParamIteratorInterface<\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}>(),}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00249}00249\ \ \ \ \ \ \ \ \ \ \ base\_(\mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.base\_),\ value\_(\mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.value\_),\ index\_(\mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.index\_),}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00250}00250\ \ \ \ \ \ \ \ \ \ \ step\_(\mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.step\_)\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00251}00251\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00252}00252\ \ \ \ \ \textcolor{comment}{//\ No\ implementation\ -\/\ assignment\ is\ unsupported.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00253}00253\ \ \ \ \ \textcolor{keywordtype}{void}\ operator=(\textcolor{keyword}{const}\ Iterator\&\ other);}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00254}00254\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00255}00255\ \ \ \ \ \textcolor{keyword}{const}\ ParamGeneratorInterface<T>*\ \textcolor{keyword}{const}\ base\_;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00256}00256\ \ \ \ \ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ value\_;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00257}00257\ \ \ \ \ \textcolor{keywordtype}{int}\ index\_;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00258}00258\ \ \ \ \ \textcolor{keyword}{const}\ IncrementT\ step\_;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00259}00259\ \ \ \};\ \ \textcolor{comment}{//\ class\ RangeGenerator::Iterator}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00260}00260\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00261}00261\ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ CalculateEndIndex(\textcolor{keyword}{const}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ begin,}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00262}00262\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ end,}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00263}00263\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ IncrementT\&\ step)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00264}00264\ \ \ \ \ \textcolor{keywordtype}{int}\ end\_index\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00265}00265\ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ i\ =\ begin;\ i\ <\ end;\ i\ =\ static\_cast<T>(i\ +\ step))}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00266}00266\ \ \ \ \ \ \ end\_index++;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00267}00267\ \ \ \ \ \textcolor{keywordflow}{return}\ end\_index;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00268}00268\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00269}00269\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00270}00270\ \ \ \textcolor{comment}{//\ No\ implementation\ -\/\ assignment\ is\ unsupported.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00271}00271\ \ \ \textcolor{keywordtype}{void}\ operator=(\textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_range_generator_a5b3b83223b9cada3569bcee729e0fdf3}{RangeGenerator}}\&\ other);}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00272}00272\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00273}00273\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ begin\_;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00274}00274\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ end\_;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00275}00275\ \ \ \textcolor{keyword}{const}\ IncrementT\ step\_;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00276}00276\ \ \ \textcolor{comment}{//\ The\ index\ for\ the\ end()\ iterator.\ All\ the\ elements\ in\ the\ generated}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00277}00277\ \ \ \textcolor{comment}{//\ sequence\ are\ indexed\ (0-\/based)\ to\ aid\ iterator\ comparison.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00278}00278\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ end\_index\_;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00279}00279\ \};\ \ \textcolor{comment}{//\ class\ RangeGenerator}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00280}00280\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00281}00281\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00282}00282\ \textcolor{comment}{//\ Generates\ values\ from\ a\ pair\ of\ STL-\/style\ iterators.\ Used\ in\ the}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00283}00283\ \textcolor{comment}{//\ ValuesIn()\ function.\ The\ elements\ are\ copied\ from\ the\ source\ range}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00284}00284\ \textcolor{comment}{//\ since\ the\ source\ can\ be\ located\ on\ the\ stack,\ and\ the\ generator}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00285}00285\ \textcolor{comment}{//\ is\ likely\ to\ persist\ beyond\ that\ stack\ frame.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00286}00286\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00287}\mbox{\hyperlink{classtesting_1_1internal_1_1_values_in_iterator_range_generator}{00287}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classtesting_1_1internal_1_1_values_in_iterator_range_generator}{ValuesInIteratorRangeGenerator}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator_interface}{ParamGeneratorInterface}}<T>\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00288}00288\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00289}00289\ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ ForwardIterator>}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00290}\mbox{\hyperlink{classtesting_1_1internal_1_1_values_in_iterator_range_generator_a8b30f6028bc5739bbd7c24b0f0e409f7}{00290}}\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_values_in_iterator_range_generator_a8b30f6028bc5739bbd7c24b0f0e409f7}{ValuesInIteratorRangeGenerator}}(ForwardIterator\ begin,\ ForwardIterator\ end)}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00291}00291\ \ \ \ \ \ \ :\ container\_(begin,\ end)\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00292}\mbox{\hyperlink{classtesting_1_1internal_1_1_values_in_iterator_range_generator_ab921d9574baa83a8d081f05aa2ebeaa4}{00292}}\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_values_in_iterator_range_generator_ab921d9574baa83a8d081f05aa2ebeaa4}{\string~ValuesInIteratorRangeGenerator}}()\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00293}00293\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00294}\mbox{\hyperlink{classtesting_1_1internal_1_1_values_in_iterator_range_generator_a24a931911c98f9171d97fb47366b8d94}{00294}}\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_interface}{ParamIteratorInterface<T>}}*\ \mbox{\hyperlink{classtesting_1_1internal_1_1_values_in_iterator_range_generator_a24a931911c98f9171d97fb47366b8d94}{Begin}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00295}00295\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ Iterator(\textcolor{keyword}{this},\ container\_.begin());}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00296}00296\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00297}\mbox{\hyperlink{classtesting_1_1internal_1_1_values_in_iterator_range_generator_a839582dbcdaffecbca16fcaef629d392}{00297}}\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_interface}{ParamIteratorInterface<T>}}*\ \mbox{\hyperlink{classtesting_1_1internal_1_1_values_in_iterator_range_generator_a839582dbcdaffecbca16fcaef629d392}{End}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00298}00298\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ Iterator(\textcolor{keyword}{this},\ container\_.end());}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00299}00299\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00300}00300\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00301}00301\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00302}00302\ \ \ \textcolor{keyword}{typedef}\ typename\ ::std::vector<T>\ ContainerType;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00303}00303\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00304}00304\ \ \ \textcolor{keyword}{class\ }Iterator\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_interface}{ParamIteratorInterface}}<T>\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00305}00305\ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00306}00306\ \ \ \ \ Iterator(\textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator_interface}{ParamGeneratorInterface<T>}}*\ base,}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00307}00307\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typename}\ ContainerType::const\_iterator\ iterator)}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00308}00308\ \ \ \ \ \ \ \ \ :\ base\_(base),\ iterator\_(iterator)\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00309}00309\ \ \ \ \ \textcolor{keyword}{virtual}\ \string~Iterator()\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00310}00310\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00311}00311\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keyword}{const}\ ParamGeneratorInterface<T>*\ BaseGenerator()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00312}00312\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ base\_;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00313}00313\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00314}00314\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ Advance()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00315}00315\ \ \ \ \ \ \ ++iterator\_;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00316}00316\ \ \ \ \ \ \ value\_.\mbox{\hyperlink{classtesting_1_1internal_1_1scoped__ptr_acac03266a43359801aff0de5c990bec0}{reset}}();}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00317}00317\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00318}00318\ \ \ \ \ \textcolor{keyword}{virtual}\ ParamIteratorInterface<T>*\ Clone()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00319}00319\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ Iterator(*\textcolor{keyword}{this});}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00320}00320\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00321}00321\ \ \ \ \ \textcolor{comment}{//\ We\ need\ to\ use\ cached\ value\ referenced\ by\ iterator\_\ because\ *iterator\_}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00322}00322\ \ \ \ \ \textcolor{comment}{//\ can\ return\ a\ temporary\ object\ (and\ of\ type\ other\ then\ T),\ so\ just}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00323}00323\ \ \ \ \ \textcolor{comment}{//\ having\ "{}return\ \&*iterator\_;"{}\ doesn't\ work.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00324}00324\ \ \ \ \ \textcolor{comment}{//\ value\_\ is\ updated\ here\ and\ not\ in\ Advance()\ because\ Advance()}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00325}00325\ \ \ \ \ \textcolor{comment}{//\ can\ advance\ iterator\_\ beyond\ the\ end\ of\ the\ range,\ and\ we\ cannot}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00326}00326\ \ \ \ \ \textcolor{comment}{//\ detect\ that\ fact.\ The\ client\ code,\ on\ the\ other\ hand,\ is}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00327}00327\ \ \ \ \ \textcolor{comment}{//\ responsible\ for\ not\ calling\ Current()\ on\ an\ out-\/of-\/range\ iterator.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00328}00328\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*\ Current()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00329}00329\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (value\_.\mbox{\hyperlink{classtesting_1_1internal_1_1scoped__ptr_a5a78280b6a59ff4b63aae444efc61e3f}{get}}()\ ==\ NULL)}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00330}00330\ \ \ \ \ \ \ \ \ value\_.\mbox{\hyperlink{classtesting_1_1internal_1_1scoped__ptr_acac03266a43359801aff0de5c990bec0}{reset}}(\textcolor{keyword}{new}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}(*iterator\_));}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00331}00331\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ value\_.\mbox{\hyperlink{classtesting_1_1internal_1_1scoped__ptr_a5a78280b6a59ff4b63aae444efc61e3f}{get}}();}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00332}00332\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00333}00333\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{bool}\ Equals(\textcolor{keyword}{const}\ ParamIteratorInterface<T>\&\ other)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00334}00334\ \ \ \ \ \ \ \textcolor{comment}{//\ Having\ the\ same\ base\ generator\ guarantees\ that\ the\ other}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00335}00335\ \ \ \ \ \ \ \textcolor{comment}{//\ iterator\ is\ of\ the\ same\ type\ and\ we\ can\ downcast.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00336}00336\ \ \ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_ab54343f0a36dc4cb0ce8a478dd7847b8}{GTEST\_CHECK\_}}(BaseGenerator()\ ==\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.BaseGenerator())}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00337}00337\ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}The\ program\ attempted\ to\ compare\ iterators\ "{}}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00338}00338\ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}from\ different\ generators."{}}\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00339}00339\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ iterator\_\ ==}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00340}00340\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_af54f5cf4d9e03836ecc0316d090cb4ed}{CheckedDowncastToActualType<const\ Iterator>}}(\&other)-\/>iterator\_;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00341}00341\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00342}00342\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00343}00343\ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00344}00344\ \ \ \ \ Iterator(\textcolor{keyword}{const}\ Iterator\&\ other)}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00345}00345\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ The\ explicit\ constructor\ call\ suppresses\ a\ false\ warning}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00346}00346\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ emitted\ by\ gcc\ when\ supplied\ with\ the\ -\/Wextra\ option.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00347}00347\ \ \ \ \ \ \ \ \ :\ ParamIteratorInterface<\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}>(),}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00348}00348\ \ \ \ \ \ \ \ \ \ \ base\_(\mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.base\_),}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00349}00349\ \ \ \ \ \ \ \ \ \ \ iterator\_(\mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.iterator\_)\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00350}00350\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00351}00351\ \ \ \ \ \textcolor{keyword}{const}\ ParamGeneratorInterface<T>*\ \textcolor{keyword}{const}\ base\_;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00352}00352\ \ \ \ \ \textcolor{keyword}{typename}\ ContainerType::const\_iterator\ iterator\_;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00353}00353\ \ \ \ \ \textcolor{comment}{//\ A\ cached\ value\ of\ *iterator\_.\ We\ keep\ it\ here\ to\ allow\ access\ by}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00354}00354\ \ \ \ \ \textcolor{comment}{//\ pointer\ in\ the\ wrapping\ iterator's\ operator-\/>().}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00355}00355\ \ \ \ \ \textcolor{comment}{//\ value\_\ needs\ to\ be\ mutable\ to\ be\ accessed\ in\ Current().}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00356}00356\ \ \ \ \ \textcolor{comment}{//\ Use\ of\ scoped\_ptr\ helps\ manage\ cached\ value's\ lifetime,}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00357}00357\ \ \ \ \ \textcolor{comment}{//\ which\ is\ bound\ by\ the\ lifespan\ of\ the\ iterator\ itself.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00358}00358\ \ \ \ \ \textcolor{keyword}{mutable}\ scoped\_ptr<const\ T>\ value\_;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00359}00359\ \ \ \};\ \ \textcolor{comment}{//\ class\ ValuesInIteratorRangeGenerator::Iterator}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00360}00360\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00361}00361\ \ \ \textcolor{comment}{//\ No\ implementation\ -\/\ assignment\ is\ unsupported.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00362}00362\ \ \ \textcolor{keywordtype}{void}\ operator=(\textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_values_in_iterator_range_generator_a8b30f6028bc5739bbd7c24b0f0e409f7}{ValuesInIteratorRangeGenerator}}\&\ other);}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00363}00363\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00364}00364\ \ \ \textcolor{keyword}{const}\ ContainerType\ container\_;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00365}00365\ \};\ \ \textcolor{comment}{//\ class\ ValuesInIteratorRangeGenerator}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00366}00366\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00367}00367\ \textcolor{comment}{//\ INTERNAL\ IMPLEMENTATION\ -\/\ DO\ NOT\ USE\ IN\ USER\ CODE.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00368}00368\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00369}00369\ \textcolor{comment}{//\ Default\ parameterized\ test\ name\ generator,\ returns\ a\ string\ containing\ the}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00370}00370\ \textcolor{comment}{//\ integer\ test\ parameter\ index.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00371}00371\ \textcolor{keyword}{template}\ <\textcolor{keyword}{class}\ ParamType>}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00372}\mbox{\hyperlink{namespacetesting_1_1internal_a954ec4a8a932dac7743e77e459ffefdc}{00372}}\ std::string\ \mbox{\hyperlink{namespacetesting_1_1internal_a954ec4a8a932dac7743e77e459ffefdc}{DefaultParamName}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structtesting_1_1_test_param_info}{TestParamInfo<ParamType>}}\&\ info)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00373}00373\ \ \ \mbox{\hyperlink{classtesting_1_1_message}{Message}}\ name\_stream;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00374}00374\ \ \ name\_stream\ <<\ info.index;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00375}00375\ \ \ \textcolor{keywordflow}{return}\ name\_stream.\mbox{\hyperlink{classtesting_1_1_message_a2cdc4df62bdcc9df37651a1cf527704e}{GetString}}();}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00376}00376\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00377}00377\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00378}00378\ \textcolor{comment}{//\ INTERNAL\ IMPLEMENTATION\ -\/\ DO\ NOT\ USE\ IN\ USER\ CODE.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00379}00379\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00380}00380\ \textcolor{comment}{//\ Parameterized\ test\ name\ overload\ helpers,\ which\ help\ the}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00381}00381\ \textcolor{comment}{//\ INSTANTIATE\_TEST\_CASE\_P\ macro\ choose\ between\ the\ default\ parameterized}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00382}00382\ \textcolor{comment}{//\ test\ name\ generator\ and\ user\ param\ name\ generator.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00383}00383\ \textcolor{keyword}{template}\ <\textcolor{keyword}{class}\ ParamType,\ \textcolor{keyword}{class}\ ParamNameGenFunctor>}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00384}\mbox{\hyperlink{namespacetesting_1_1internal_abc0f0626877188afba6ad122d502f088}{00384}}\ ParamNameGenFunctor\ \mbox{\hyperlink{namespacetesting_1_1internal_aee6012d048a5aca8070ddccb0a3b5d80}{GetParamNameGen}}(ParamNameGenFunctor\ func)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00385}00385\ \ \ \textcolor{keywordflow}{return}\ func;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00386}00386\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00387}00387\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00388}00388\ \textcolor{keyword}{template}\ <\textcolor{keyword}{class}\ ParamType>}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00389}\mbox{\hyperlink{structtesting_1_1internal_1_1_param_name_gen_func}{00389}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structtesting_1_1internal_1_1_param_name_gen_func}{ParamNameGenFunc}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00390}\mbox{\hyperlink{structtesting_1_1internal_1_1_param_name_gen_func_a0421cb49ac0e7f1dfc4426d67b50ea79}{00390}}\ \ \ \textcolor{keyword}{typedef}\ std::string\ \mbox{\hyperlink{structtesting_1_1internal_1_1_param_name_gen_func_a0421cb49ac0e7f1dfc4426d67b50ea79}{Type}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structtesting_1_1_test_param_info}{TestParamInfo<ParamType>}}\&);}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00391}00391\ \};}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00392}00392\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00393}00393\ \textcolor{keyword}{template}\ <\textcolor{keyword}{class}\ ParamType>}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00394}\mbox{\hyperlink{namespacetesting_1_1internal_aee6012d048a5aca8070ddccb0a3b5d80}{00394}}\ \textcolor{keyword}{typename}\ \mbox{\hyperlink{structtesting_1_1internal_1_1_param_name_gen_func}{ParamNameGenFunc<ParamType>::Type}}\ *\mbox{\hyperlink{namespacetesting_1_1internal_aee6012d048a5aca8070ddccb0a3b5d80}{GetParamNameGen}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00395}00395\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetesting_1_1internal_a954ec4a8a932dac7743e77e459ffefdc}{DefaultParamName}};}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00396}00396\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00397}00397\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00398}00398\ \textcolor{comment}{//\ INTERNAL\ IMPLEMENTATION\ -\/\ DO\ NOT\ USE\ IN\ USER\ CODE.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00399}00399\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00400}00400\ \textcolor{comment}{//\ Stores\ a\ parameter\ value\ and\ later\ creates\ tests\ parameterized\ with\ that}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00401}00401\ \textcolor{comment}{//\ value.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00402}00402\ \textcolor{keyword}{template}\ <\textcolor{keyword}{class}\ TestClass>}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00403}\mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_factory}{00403}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_factory}{ParameterizedTestFactory}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_test_factory_base}{TestFactoryBase}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00404}00404\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00405}\mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_factory_aff6401438add04dfbf790e0b87cdf46c}{00405}}\ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{typename}\ TestClass::ParamType\ \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_factory_aff6401438add04dfbf790e0b87cdf46c}{ParamType}};}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00406}\mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_factory_a82d78356cd402224255edec760a048fb}{00406}}\ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_factory_a82d78356cd402224255edec760a048fb}{ParameterizedTestFactory}}(\mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_factory_aff6401438add04dfbf790e0b87cdf46c}{ParamType}}\ \mbox{\hyperlink{pkcs11_8h_ac6915c589f2292bf68f6817727a784ab}{parameter}})\ :}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00407}00407\ \ \ \ \ \ \ parameter\_(\mbox{\hyperlink{pkcs11_8h_ac6915c589f2292bf68f6817727a784ab}{parameter}})\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00408}\mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_factory_a00ec507aa9915f8c57c6fd1f0cc43df8}{00408}}\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classtesting_1_1_test}{Test}}*\ \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_factory_a00ec507aa9915f8c57c6fd1f0cc43df8}{CreateTest}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00409}00409\ \ \ \ \ TestClass::SetParam(\&parameter\_);}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00410}00410\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{struct_test_class}{TestClass}}();}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00411}00411\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00412}00412\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00413}00413\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00414}00414\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_factory_aff6401438add04dfbf790e0b87cdf46c}{ParamType}}\ parameter\_;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00415}00415\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00416}00416\ \ \ \mbox{\hyperlink{gtest-port_8h_aed8c1888c32b588b0681e88b95031e29}{GTEST\_DISALLOW\_COPY\_AND\_ASSIGN\_}}(\mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_factory}{ParameterizedTestFactory}});}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00417}00417\ \};}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00418}00418\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00419}00419\ \textcolor{comment}{//\ INTERNAL\ IMPLEMENTATION\ -\/\ DO\ NOT\ USE\ IN\ USER\ CODE.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00420}00420\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00421}00421\ \textcolor{comment}{//\ TestMetaFactoryBase\ is\ a\ base\ class\ for\ meta-\/factories\ that\ create}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00422}00422\ \textcolor{comment}{//\ test\ factories\ for\ passing\ into\ MakeAndRegisterTestInfo\ function.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00423}00423\ \textcolor{keyword}{template}\ <\textcolor{keyword}{class}\ ParamType>}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00424}\mbox{\hyperlink{classtesting_1_1internal_1_1_test_meta_factory_base}{00424}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classtesting_1_1internal_1_1_test_meta_factory_base}{TestMetaFactoryBase}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00425}00425\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00426}\mbox{\hyperlink{classtesting_1_1internal_1_1_test_meta_factory_base_aad80adf04686f7dfcf952e44afc02767}{00426}}\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_test_meta_factory_base_aad80adf04686f7dfcf952e44afc02767}{\string~TestMetaFactoryBase}}()\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00427}00427\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00428}\mbox{\hyperlink{classtesting_1_1internal_1_1_test_meta_factory_base_afc7c9ec623d7045a4b3e3c45e171ae78}{00428}}\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_test_factory_base}{TestFactoryBase}}*\ \mbox{\hyperlink{classtesting_1_1internal_1_1_test_meta_factory_base_afc7c9ec623d7045a4b3e3c45e171ae78}{CreateTestFactory}}(ParamType\ \mbox{\hyperlink{pkcs11_8h_ac6915c589f2292bf68f6817727a784ab}{parameter}})\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00429}00429\ \};}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00430}00430\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00431}00431\ \textcolor{comment}{//\ INTERNAL\ IMPLEMENTATION\ -\/\ DO\ NOT\ USE\ IN\ USER\ CODE.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00432}00432\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00433}00433\ \textcolor{comment}{//\ TestMetaFactory\ creates\ test\ factories\ for\ passing\ into}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00434}00434\ \textcolor{comment}{//\ MakeAndRegisterTestInfo\ function.\ Since\ MakeAndRegisterTestInfo\ receives}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00435}00435\ \textcolor{comment}{//\ ownership\ of\ test\ factory\ pointer,\ same\ factory\ object\ cannot\ be\ passed}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00436}00436\ \textcolor{comment}{//\ into\ that\ method\ twice.\ But\ ParameterizedTestCaseInfo\ is\ going\ to\ call}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00437}00437\ \textcolor{comment}{//\ it\ for\ each\ Test/Parameter\ value\ combination.\ Thus\ it\ needs\ meta\ factory}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00438}00438\ \textcolor{comment}{//\ creator\ class.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00439}00439\ \textcolor{keyword}{template}\ <\textcolor{keyword}{class}\ TestCase>}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00440}\mbox{\hyperlink{classtesting_1_1internal_1_1_test_meta_factory}{00440}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classtesting_1_1internal_1_1_test_meta_factory}{TestMetaFactory}}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00441}00441\ \ \ \ \ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_test_meta_factory_base}{TestMetaFactoryBase}}<typename\ TestCase::ParamType>\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00442}00442\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00443}\mbox{\hyperlink{classtesting_1_1internal_1_1_test_meta_factory_a886da70ca0c6327c3f1d7e61e4ece5d9}{00443}}\ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{typename}\ TestCase::ParamType\ \mbox{\hyperlink{classtesting_1_1internal_1_1_test_meta_factory_a886da70ca0c6327c3f1d7e61e4ece5d9}{ParamType}};}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00444}00444\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00445}\mbox{\hyperlink{classtesting_1_1internal_1_1_test_meta_factory_a3eadbf9867b702bcba130a3113a77b71}{00445}}\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_test_meta_factory_a3eadbf9867b702bcba130a3113a77b71}{TestMetaFactory}}()\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00446}00446\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00447}\mbox{\hyperlink{classtesting_1_1internal_1_1_test_meta_factory_a0292873f456558d16cd13a0aa4b3fc7c}{00447}}\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_test_factory_base}{TestFactoryBase}}*\ \mbox{\hyperlink{classtesting_1_1internal_1_1_test_meta_factory_a0292873f456558d16cd13a0aa4b3fc7c}{CreateTestFactory}}(\mbox{\hyperlink{classtesting_1_1internal_1_1_test_meta_factory_a886da70ca0c6327c3f1d7e61e4ece5d9}{ParamType}}\ \mbox{\hyperlink{pkcs11_8h_ac6915c589f2292bf68f6817727a784ab}{parameter}})\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00448}00448\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_factory}{ParameterizedTestFactory<TestCase>}}(\mbox{\hyperlink{pkcs11_8h_ac6915c589f2292bf68f6817727a784ab}{parameter}});}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00449}00449\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00450}00450\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00451}00451\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00452}00452\ \ \ \mbox{\hyperlink{gtest-port_8h_aed8c1888c32b588b0681e88b95031e29}{GTEST\_DISALLOW\_COPY\_AND\_ASSIGN\_}}(\mbox{\hyperlink{classtesting_1_1internal_1_1_test_meta_factory}{TestMetaFactory}});}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00453}00453\ \};}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00454}00454\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00455}00455\ \textcolor{comment}{//\ INTERNAL\ IMPLEMENTATION\ -\/\ DO\ NOT\ USE\ IN\ USER\ CODE.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00456}00456\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00457}00457\ \textcolor{comment}{//\ ParameterizedTestCaseInfoBase\ is\ a\ generic\ interface}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00458}00458\ \textcolor{comment}{//\ to\ ParameterizedTestCaseInfo\ classes.\ ParameterizedTestCaseInfoBase}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00459}00459\ \textcolor{comment}{//\ accumulates\ test\ information\ provided\ by\ TEST\_P\ macro\ invocations}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00460}00460\ \textcolor{comment}{//\ and\ generators\ provided\ by\ INSTANTIATE\_TEST\_CASE\_P\ macro\ invocations}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00461}00461\ \textcolor{comment}{//\ and\ uses\ that\ information\ to\ register\ all\ resulting\ test\ instances}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00462}00462\ \textcolor{comment}{//\ in\ RegisterTests\ method.\ The\ ParameterizeTestCaseRegistry\ class\ holds}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00463}00463\ \textcolor{comment}{//\ a\ collection\ of\ pointers\ to\ the\ ParameterizedTestCaseInfo\ objects}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00464}00464\ \textcolor{comment}{//\ and\ calls\ RegisterTests()\ on\ each\ of\ them\ when\ asked.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00465}\mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_base}{00465}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_base}{ParameterizedTestCaseInfoBase}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00466}00466\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00467}\mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_base_affae85e908f0901a8f0f1f9576843e35}{00467}}\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_base_affae85e908f0901a8f0f1f9576843e35}{\string~ParameterizedTestCaseInfoBase}}()\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00468}00468\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00469}00469\ \ \ \textcolor{comment}{//\ Base\ part\ of\ test\ case\ name\ for\ display\ purposes.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00470}\mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_base_a4ac04cf62eae09017f6b1350037c5d7f}{00470}}\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keyword}{const}\ std::string\&\ \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_base_a4ac04cf62eae09017f6b1350037c5d7f}{GetTestCaseName}}()\ \textcolor{keyword}{const}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00471}00471\ \ \ \textcolor{comment}{//\ Test\ case\ id\ to\ verify\ identity.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00472}\mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_base_a932b4a9185a72d5bdfa5fd84fc06cbca}{00472}}\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{namespacetesting_1_1internal_ab1114197d3c657d8b7f8e0c5caa12d00}{TypeId}}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_base_a932b4a9185a72d5bdfa5fd84fc06cbca}{GetTestCaseTypeId}}()\ \textcolor{keyword}{const}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00473}00473\ \ \ \textcolor{comment}{//\ UnitTest\ class\ invokes\ this\ method\ to\ register\ tests\ in\ this}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00474}00474\ \ \ \textcolor{comment}{//\ test\ case\ right\ before\ running\ them\ in\ RUN\_ALL\_TESTS\ macro.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00475}00475\ \ \ \textcolor{comment}{//\ This\ method\ should\ not\ be\ called\ more\ then\ once\ on\ any\ single}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00476}00476\ \ \ \textcolor{comment}{//\ instance\ of\ a\ ParameterizedTestCaseInfoBase\ derived\ class.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00477}\mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_base_a92baca6c64c822c2e7043217f7903ef2}{00477}}\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_base_a92baca6c64c822c2e7043217f7903ef2}{RegisterTests}}()\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00478}00478\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00479}00479\ \ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00480}\mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_base_a48d0d6c661d0d5b6b404f1add3704aaf}{00480}}\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_base_a48d0d6c661d0d5b6b404f1add3704aaf}{ParameterizedTestCaseInfoBase}}()\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00481}00481\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00482}00482\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00483}00483\ \ \ \mbox{\hyperlink{gtest-port_8h_aed8c1888c32b588b0681e88b95031e29}{GTEST\_DISALLOW\_COPY\_AND\_ASSIGN\_}}(\mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_base}{ParameterizedTestCaseInfoBase}});}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00484}00484\ \};}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00485}00485\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00486}00486\ \textcolor{comment}{//\ INTERNAL\ IMPLEMENTATION\ -\/\ DO\ NOT\ USE\ IN\ USER\ CODE.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00487}00487\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00488}00488\ \textcolor{comment}{//\ ParameterizedTestCaseInfo\ accumulates\ tests\ obtained\ from\ TEST\_P}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00489}00489\ \textcolor{comment}{//\ macro\ invocations\ for\ a\ particular\ test\ case\ and\ generators}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00490}00490\ \textcolor{comment}{//\ obtained\ from\ INSTANTIATE\_TEST\_CASE\_P\ macro\ invocations\ for\ that}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00491}00491\ \textcolor{comment}{//\ test\ case.\ It\ registers\ tests\ with\ all\ values\ generated\ by\ all}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00492}00492\ \textcolor{comment}{//\ generators\ when\ asked.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00493}00493\ \textcolor{keyword}{template}\ <\textcolor{keyword}{class}\ TestCase>}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00494}\mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info}{00494}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info}{ParameterizedTestCaseInfo}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_base}{ParameterizedTestCaseInfoBase}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00495}00495\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00496}00496\ \ \ \textcolor{comment}{//\ ParamType\ and\ GeneratorCreationFunc\ are\ private\ types\ but\ are\ required}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00497}00497\ \ \ \textcolor{comment}{//\ for\ declarations\ of\ public\ methods\ AddTestPattern()\ and}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00498}00498\ \ \ \textcolor{comment}{//\ AddTestCaseInstantiation().}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00499}\mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_a76f4dbc1c6d695c4beeedd2acfe8455f}{00499}}\ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{typename}\ TestCase::ParamType\ \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_a76f4dbc1c6d695c4beeedd2acfe8455f}{ParamType}};}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00500}00500\ \ \ \textcolor{comment}{//\ A\ function\ that\ returns\ an\ instance\ of\ appropriate\ generator\ type.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00501}\mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_a2f6a423f7ae8c7ac24b468538693aa26}{00501}}\ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_a2f6a423f7ae8c7ac24b468538693aa26}{ParamGenerator<ParamType>}}(GeneratorCreationFunc)();}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00502}\mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_a69934b21930d71c0b99d10a36ad08306}{00502}}\ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{typename}\ \mbox{\hyperlink{structtesting_1_1internal_1_1_param_name_gen_func}{ParamNameGenFunc<ParamType>::Type}}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_a69934b21930d71c0b99d10a36ad08306}{ParamNameGeneratorFunc}};}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00503}00503\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00504}\mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_a6d19f368428260bd5c6e608b4d3fc6af}{00504}}\ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_a6d19f368428260bd5c6e608b4d3fc6af}{ParameterizedTestCaseInfo}}(}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00505}00505\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ \mbox{\hyperlink{structtesting_1_1internal_1_1_code_location}{CodeLocation}}\ code\_location)}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00506}00506\ \ \ \ \ \ \ :\ test\_case\_name\_(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}),\ code\_location\_(code\_location)\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00507}00507\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00508}00508\ \ \ \textcolor{comment}{//\ Test\ case\ base\ name\ for\ display\ purposes.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00509}\mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_a95de02dac8135a6f1b6599a1f79c09c0}{00509}}\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keyword}{const}\ std::string\&\ \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_a95de02dac8135a6f1b6599a1f79c09c0}{GetTestCaseName}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ test\_case\_name\_;\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00510}00510\ \ \ \textcolor{comment}{//\ Test\ case\ id\ to\ verify\ identity.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00511}\mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_a16ed77e95a6042c722d0029744acfc33}{00511}}\ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{namespacetesting_1_1internal_ab1114197d3c657d8b7f8e0c5caa12d00}{TypeId}}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_a16ed77e95a6042c722d0029744acfc33}{GetTestCaseTypeId}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetesting_1_1internal_a6b108e56fdc68ea937ffb3759fb55ab0}{GetTypeId<TestCase>}}();\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00512}00512\ \ \ \textcolor{comment}{//\ TEST\_P\ macro\ uses\ AddTestPattern()\ to\ record\ information}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00513}00513\ \ \ \textcolor{comment}{//\ about\ a\ single\ test\ in\ a\ LocalTestInfo\ structure.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00514}00514\ \ \ \textcolor{comment}{//\ test\_case\_name\ is\ the\ base\ name\ of\ the\ test\ case\ (without\ invocation}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00515}00515\ \ \ \textcolor{comment}{//\ prefix).\ test\_base\_name\ is\ the\ name\ of\ an\ individual\ test\ without}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00516}00516\ \ \ \textcolor{comment}{//\ parameter\ index.\ For\ the\ test\ SequenceA/FooTest.DoBar/1\ FooTest\ is}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00517}00517\ \ \ \textcolor{comment}{//\ test\ case\ base\ name\ and\ DoBar\ is\ test\ base\ name.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00518}\mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_a3e557c888ec5e23b138c2ff254db15e5}{00518}}\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_a3e557c888ec5e23b138c2ff254db15e5}{AddTestPattern}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ test\_case\_name,}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00519}00519\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ test\_base\_name,}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00520}00520\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_test_meta_factory_base}{TestMetaFactoryBase<ParamType>}}*\ meta\_factory)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00521}00521\ \ \ \ \ tests\_.push\_back(\mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr}{linked\_ptr<TestInfo>}}(\textcolor{keyword}{new}\ TestInfo(test\_case\_name,}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00522}00522\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ test\_base\_name,}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00523}00523\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ meta\_factory)));}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00524}00524\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00525}00525\ \ \ \textcolor{comment}{//\ INSTANTIATE\_TEST\_CASE\_P\ macro\ uses\ AddGenerator()\ to\ record\ information}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00526}00526\ \ \ \textcolor{comment}{//\ about\ a\ generator.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00527}\mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_adefded091e3f20ac3a758029caea3eab}{00527}}\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_adefded091e3f20ac3a758029caea3eab}{AddTestCaseInstantiation}}(\textcolor{keyword}{const}\ std::string\&\ instantiation\_name,}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00528}00528\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ GeneratorCreationFunc*\ func,}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00529}00529\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_a69934b21930d71c0b99d10a36ad08306}{ParamNameGeneratorFunc}}*\ name\_func,}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00530}00530\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ file,\ \textcolor{keywordtype}{int}\ line)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00531}00531\ \ \ \ \ instantiations\_.push\_back(}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00532}00532\ \ \ \ \ \ \ \ \ InstantiationInfo(instantiation\_name,\ func,\ name\_func,\ file,\ line));}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00533}00533\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;\ \ \textcolor{comment}{//\ Return\ value\ used\ only\ to\ run\ this\ method\ in\ namespace\ scope.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00534}00534\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00535}00535\ \ \ \textcolor{comment}{//\ UnitTest\ class\ invokes\ this\ method\ to\ register\ tests\ in\ this\ test\ case}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00536}00536\ \ \ \textcolor{comment}{//\ test\ cases\ right\ before\ running\ tests\ in\ RUN\_ALL\_TESTS\ macro.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00537}00537\ \ \ \textcolor{comment}{//\ This\ method\ should\ not\ be\ called\ more\ then\ once\ on\ any\ single}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00538}00538\ \ \ \textcolor{comment}{//\ instance\ of\ a\ ParameterizedTestCaseInfoBase\ derived\ class.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00539}00539\ \ \ \textcolor{comment}{//\ UnitTest\ has\ a\ guard\ to\ prevent\ from\ calling\ this\ method\ more\ then\ once.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00540}\mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_a7e118820b3074ce70c0440e2e49a50a1}{00540}}\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_a7e118820b3074ce70c0440e2e49a50a1}{RegisterTests}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00541}00541\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{typename}\ TestInfoContainer::iterator\ test\_it\ =\ tests\_.begin();}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00542}00542\ \ \ \ \ \ \ \ \ \ test\_it\ !=\ tests\_.end();\ ++test\_it)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00543}00543\ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr}{linked\_ptr<TestInfo>}}\ test\_info\ =\ *test\_it;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00544}00544\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{typename}\ InstantiationContainer::iterator\ gen\_it\ =}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00545}00545\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ instantiations\_.begin();\ gen\_it\ !=\ instantiations\_.end();}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00546}00546\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++gen\_it)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00547}00547\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::string\&\ instantiation\_name\ =\ gen\_it-\/>name;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00548}00548\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator}{ParamGenerator<ParamType>}}\ generator((*gen\_it-\/>generator)());}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00549}00549\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_a69934b21930d71c0b99d10a36ad08306}{ParamNameGeneratorFunc}}*\ name\_func\ =\ gen\_it-\/>name\_func;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00550}00550\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ file\ =\ gen\_it-\/>file;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00551}00551\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ line\ =\ gen\_it-\/>line;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00552}00552\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00553}00553\ \ \ \ \ \ \ \ \ std::string\ test\_case\_name;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00554}00554\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ !instantiation\_name.empty()\ )}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00555}00555\ \ \ \ \ \ \ \ \ \ \ test\_case\_name\ =\ instantiation\_name\ +\ \textcolor{stringliteral}{"{}/"{}};}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00556}00556\ \ \ \ \ \ \ \ \ test\_case\_name\ +=\ test\_info-\/>test\_case\_base\_name;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00557}00557\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00558}00558\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ i\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00559}00559\ \ \ \ \ \ \ \ \ std::set<std::string>\ test\_param\_names;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00560}00560\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{typename}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator}{ParamGenerator<ParamType>::iterator}}\ param\_it\ =}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00561}00561\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ generator.\mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator_a14e735c8bd113556ae905a560cd2d607}{begin}}();}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00562}00562\ \ \ \ \ \ \ \ \ \ \ \ \ \ param\_it\ !=\ generator.\mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator_aaf8f75df1099a07ff771a550b48f9fbe}{end}}();\ ++param\_it,\ ++i)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00563}00563\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1_message}{Message}}\ test\_name\_stream;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00564}00564\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00565}00565\ \ \ \ \ \ \ \ \ \ \ std::string\ param\_name\ =\ name\_func(}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00566}00566\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structtesting_1_1_test_param_info}{TestParamInfo<ParamType>}}(*param\_it,\ i));}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00567}00567\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00568}00568\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_ab54343f0a36dc4cb0ce8a478dd7847b8}{GTEST\_CHECK\_}}(IsValidParamName(param\_name))}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00569}00569\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}Parameterized\ test\ name\ '"{}}\ <<\ param\_name}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00570}00570\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}'\ is\ invalid,\ in\ "{}}\ <<\ file}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00571}00571\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\ line\ "{}}\ <<\ line\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00572}00572\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00573}00573\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_ab54343f0a36dc4cb0ce8a478dd7847b8}{GTEST\_CHECK\_}}(test\_param\_names.count(param\_name)\ ==\ 0)}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00574}00574\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}Duplicate\ parameterized\ test\ name\ '"{}}\ <<\ param\_name}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00575}00575\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}',\ in\ "{}}\ <<\ file\ <<\ \textcolor{stringliteral}{"{}\ line\ "{}}\ <<\ line\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00576}00576\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00577}00577\ \ \ \ \ \ \ \ \ \ \ test\_param\_names.insert(param\_name);}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00578}00578\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00579}00579\ \ \ \ \ \ \ \ \ \ \ test\_name\_stream\ <<\ test\_info-\/>test\_base\_name\ <<\ \textcolor{stringliteral}{"{}/"{}}\ <<\ param\_name;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00580}00580\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a7f2e4e46c969fcae9d801d93a3e932fd}{MakeAndRegisterTestInfo}}(}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00581}00581\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ test\_case\_name.c\_str(),}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00582}00582\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ test\_name\_stream.\mbox{\hyperlink{classtesting_1_1_message_a2cdc4df62bdcc9df37651a1cf527704e}{GetString}}().c\_str(),}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00583}00583\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ NULL,\ \ \textcolor{comment}{//\ No\ type\ parameter.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00584}00584\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ PrintToString(*param\_it).c\_str(),}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00585}00585\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ code\_location\_,}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00586}00586\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_a16ed77e95a6042c722d0029744acfc33}{GetTestCaseTypeId}}(),}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00587}00587\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ TestCase::SetUpTestCase,}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00588}00588\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ TestCase::TearDownTestCase,}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00589}00589\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ test\_info-\/>test\_meta\_factory-\/>CreateTestFactory(*param\_it));}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00590}00590\ \ \ \ \ \ \ \ \ \}\ \ \textcolor{comment}{//\ for\ param\_it}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00591}00591\ \ \ \ \ \ \ \}\ \ \textcolor{comment}{//\ for\ gen\_it}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00592}00592\ \ \ \ \ \}\ \ \textcolor{comment}{//\ for\ test\_it}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00593}00593\ \ \ \}\ \ \textcolor{comment}{//\ RegisterTests}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00594}00594\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00595}00595\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00596}00596\ \ \ \textcolor{comment}{//\ LocalTestInfo\ structure\ keeps\ information\ about\ a\ single\ test\ registered}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00597}00597\ \ \ \textcolor{comment}{//\ with\ TEST\_P\ macro.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00598}00598\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{classtesting_1_1_test_info}{TestInfo}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00599}00599\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1_test_info}{TestInfo}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ a\_test\_case\_base\_name,}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00600}00600\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ a\_test\_base\_name,}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00601}00601\ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_test_meta_factory_base}{TestMetaFactoryBase<ParamType>}}*\ a\_test\_meta\_factory)\ :}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00602}00602\ \ \ \ \ \ \ \ \ test\_case\_base\_name(a\_test\_case\_base\_name),}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00603}00603\ \ \ \ \ \ \ \ \ test\_base\_name(a\_test\_base\_name),}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00604}00604\ \ \ \ \ \ \ \ \ test\_meta\_factory(a\_test\_meta\_factory)\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00605}00605\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00606}00606\ \ \ \ \ \textcolor{keyword}{const}\ std::string\ test\_case\_base\_name;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00607}00607\ \ \ \ \ \textcolor{keyword}{const}\ std::string\ test\_base\_name;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00608}00608\ \ \ \ \ \textcolor{keyword}{const}\ scoped\_ptr<TestMetaFactoryBase<ParamType>\ >\ test\_meta\_factory;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00609}00609\ \ \ \};}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00610}00610\ \ \ typedef\ ::std::vector<linked\_ptr<TestInfo>\ >\ TestInfoContainer;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00611}00611\ \ \ \textcolor{comment}{//\ Records\ data\ received\ from\ INSTANTIATE\_TEST\_CASE\_P\ macros:}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00612}00612\ \ \ \textcolor{comment}{//\ \ <Instantiation\ name,\ Sequence\ generator\ creation\ function,}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00613}00613\ \ \ \textcolor{comment}{//\ \ \ \ \ Name\ generator\ function,\ Source\ file,\ Source\ line>}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00614}00614\ \ \ \textcolor{keyword}{struct\ }InstantiationInfo\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00615}00615\ \ \ \ \ \ \ InstantiationInfo(\textcolor{keyword}{const}\ std::string\ \&name\_in,}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00616}00616\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ GeneratorCreationFunc*\ generator\_in,}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00617}00617\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_a69934b21930d71c0b99d10a36ad08306}{ParamNameGeneratorFunc}}*\ name\_func\_in,}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00618}00618\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ file\_in,}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00619}00619\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ line\_in)}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00620}00620\ \ \ \ \ \ \ \ \ \ \ :\ name(name\_in),}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00621}00621\ \ \ \ \ \ \ \ \ \ \ \ \ generator(generator\_in),}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00622}00622\ \ \ \ \ \ \ \ \ \ \ \ \ name\_func(name\_func\_in),}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00623}00623\ \ \ \ \ \ \ \ \ \ \ \ \ file(file\_in),}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00624}00624\ \ \ \ \ \ \ \ \ \ \ \ \ line(line\_in)\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00625}00625\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00626}00626\ \ \ \ \ \ \ std::string\ name;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00627}00627\ \ \ \ \ \ \ GeneratorCreationFunc*\ generator;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00628}00628\ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_a69934b21930d71c0b99d10a36ad08306}{ParamNameGeneratorFunc}}*\ name\_func;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00629}00629\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ file;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00630}00630\ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ line;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00631}00631\ \ \ \};}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00632}00632\ \ \ typedef\ ::std::vector<InstantiationInfo>\ InstantiationContainer;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00633}00633\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00634}00634\ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{bool}\ IsValidParamName(\textcolor{keyword}{const}\ std::string\&\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00635}00635\ \ \ \ \ \textcolor{comment}{//\ Check\ for\ empty\ string}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00636}00636\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}.empty())}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00637}00637\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00638}00638\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00639}00639\ \ \ \ \ \textcolor{comment}{//\ Check\ for\ invalid\ characters}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00640}00640\ \ \ \ \ \textcolor{keywordflow}{for}\ (std::string::size\_type\ index\ =\ 0;\ index\ <\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}.size();\ ++index)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00641}00641\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!isalnum(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}[index])\ \&\&\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}[index]\ !=\ \textcolor{charliteral}{'\_'})}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00642}00642\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00643}00643\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00644}00644\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00645}00645\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00646}00646\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00647}00647\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00648}00648\ \ \ \textcolor{keyword}{const}\ std::string\ test\_case\_name\_;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00649}00649\ \ \ CodeLocation\ code\_location\_;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00650}00650\ \ \ TestInfoContainer\ tests\_;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00651}00651\ \ \ InstantiationContainer\ instantiations\_;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00652}00652\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00653}00653\ \ \ \mbox{\hyperlink{gtest-port_8h_aed8c1888c32b588b0681e88b95031e29}{GTEST\_DISALLOW\_COPY\_AND\_ASSIGN\_}}(\mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info_a6d19f368428260bd5c6e608b4d3fc6af}{ParameterizedTestCaseInfo}});}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00654}00654\ \};\ \ \textcolor{comment}{//\ class\ ParameterizedTestCaseInfo}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00655}00655\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00656}00656\ \textcolor{comment}{//\ INTERNAL\ IMPLEMENTATION\ -\/\ DO\ NOT\ USE\ IN\ USER\ CODE.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00657}00657\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00658}00658\ \textcolor{comment}{//\ ParameterizedTestCaseRegistry\ contains\ a\ map\ of\ ParameterizedTestCaseInfoBase}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00659}00659\ \textcolor{comment}{//\ classes\ accessed\ by\ test\ case\ names.\ TEST\_P\ and\ INSTANTIATE\_TEST\_CASE\_P}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00660}00660\ \textcolor{comment}{//\ macros\ use\ it\ to\ locate\ their\ corresponding\ ParameterizedTestCaseInfo}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00661}00661\ \textcolor{comment}{//\ descriptors.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00662}\mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_registry}{00662}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_registry}{ParameterizedTestCaseRegistry}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00663}00663\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00664}\mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_registry_aacafaaf78ca09bbd9f5eed93ae2b6225}{00664}}\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_registry_aacafaaf78ca09bbd9f5eed93ae2b6225}{ParameterizedTestCaseRegistry}}()\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00665}\mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_registry_a695c86db8545a3745873190b91a13c9f}{00665}}\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_registry_a695c86db8545a3745873190b91a13c9f}{\string~ParameterizedTestCaseRegistry}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00666}00666\ \ \ \ \ \textcolor{keywordflow}{for}\ (TestCaseInfoContainer::iterator\ it\ =\ test\_case\_infos\_.begin();}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00667}00667\ \ \ \ \ \ \ \ \ \ it\ !=\ test\_case\_infos\_.end();\ ++it)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00668}00668\ \ \ \ \ \ \ \textcolor{keyword}{delete}\ *it;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00669}00669\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00670}00670\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00671}00671\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00672}00672\ \ \ \textcolor{comment}{//\ Looks\ up\ or\ creates\ and\ returns\ a\ structure\ containing\ information\ about}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00673}00673\ \ \ \textcolor{comment}{//\ tests\ and\ instantiations\ of\ a\ particular\ test\ case.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00674}00674\ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{class}\ TestCase>}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00675}\mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_registry_ad99e02e78695fba40e348e513abb6066}{00675}}\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info}{ParameterizedTestCaseInfo<TestCase>}}*\ \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_registry_ad99e02e78695fba40e348e513abb6066}{GetTestCasePatternHolder}}(}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00676}00676\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ test\_case\_name,}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00677}00677\ \ \ \ \ \ \ \mbox{\hyperlink{structtesting_1_1internal_1_1_code_location}{CodeLocation}}\ code\_location)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00678}00678\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info}{ParameterizedTestCaseInfo<TestCase>}}*\ typed\_test\_info\ =\ NULL;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00679}00679\ \ \ \ \ \textcolor{keywordflow}{for}\ (TestCaseInfoContainer::iterator\ it\ =\ test\_case\_infos\_.begin();}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00680}00680\ \ \ \ \ \ \ \ \ \ it\ !=\ test\_case\_infos\_.end();\ ++it)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00681}00681\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((*it)-\/>GetTestCaseName()\ ==\ test\_case\_name)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00682}00682\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((*it)-\/>GetTestCaseTypeId()\ !=\ GetTypeId<TestCase>())\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00683}00683\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Complain\ about\ incorrect\ usage\ of\ Google\ Test\ facilities}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00684}00684\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ and\ terminate\ the\ program\ since\ we\ cannot\ guaranty\ correct}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00685}00685\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ test\ case\ setup\ and\ tear-\/down\ in\ this\ case.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00686}00686\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_ab7e343160ee0aca7c8ae7c025a372453}{ReportInvalidTestCaseType}}(test\_case\_name,\ code\_location);}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00687}00687\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_1_1posix_a69b8278c59359dd6a6f941b4643db9fb}{posix::Abort}}();}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00688}00688\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00689}00689\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ At\ this\ point\ we\ are\ sure\ that\ the\ object\ we\ found\ is\ of\ the\ same}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00690}00690\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ type\ we\ are\ looking\ for,\ so\ we\ downcast\ it\ to\ that\ type}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00691}00691\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ without\ further\ checks.}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00692}00692\ \ \ \ \ \ \ \ \ \ \ typed\_test\_info\ =\ \mbox{\hyperlink{namespacetesting_1_1internal_af54f5cf4d9e03836ecc0316d090cb4ed}{CheckedDowncastToActualType}}<}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00693}00693\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info}{ParameterizedTestCaseInfo<TestCase>}}\ >(*it);}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00694}00694\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00695}00695\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00696}00696\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00697}00697\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00698}00698\ \ \ \ \ \textcolor{keywordflow}{if}\ (typed\_test\_info\ ==\ NULL)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00699}00699\ \ \ \ \ \ \ typed\_test\_info\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_info}{ParameterizedTestCaseInfo<TestCase>}}(}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00700}00700\ \ \ \ \ \ \ \ \ \ \ test\_case\_name,\ code\_location);}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00701}00701\ \ \ \ \ \ \ test\_case\_infos\_.push\_back(typed\_test\_info);}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00702}00702\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00703}00703\ \ \ \ \ \textcolor{keywordflow}{return}\ typed\_test\_info;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00704}00704\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00705}\mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_registry_ad5b63c8fe94f3d51d039a76c001c9223}{00705}}\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_registry_ad5b63c8fe94f3d51d039a76c001c9223}{RegisterTests}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00706}00706\ \ \ \ \ \textcolor{keywordflow}{for}\ (TestCaseInfoContainer::iterator\ it\ =\ test\_case\_infos\_.begin();}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00707}00707\ \ \ \ \ \ \ \ \ \ it\ !=\ test\_case\_infos\_.end();\ ++it)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00708}00708\ \ \ \ \ \ \ (*it)-\/>RegisterTests();}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00709}00709\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00710}00710\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00711}00711\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00712}00712\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00713}00713\ \ \ typedef\ ::std::vector<ParameterizedTestCaseInfoBase*>\ TestCaseInfoContainer;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00714}00714\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00715}00715\ \ \ TestCaseInfoContainer\ test\_case\_infos\_;}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00716}00716\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00717}00717\ \ \ \mbox{\hyperlink{gtest-port_8h_aed8c1888c32b588b0681e88b95031e29}{GTEST\_DISALLOW\_COPY\_AND\_ASSIGN\_}}(\mbox{\hyperlink{classtesting_1_1internal_1_1_parameterized_test_case_registry}{ParameterizedTestCaseRegistry}});}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00718}00718\ \};}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00719}00719\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00720}00720\ \}\ \ \textcolor{comment}{//\ namespace\ internal}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00721}00721\ \}\ \ \textcolor{comment}{//\ namespace\ testing}}
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00722}00722\ }
+\DoxyCodeLine{\Hypertarget{gtest-param-util_8h_source_l00723}00723\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_INCLUDE\_GTEST\_INTERNAL\_GTEST\_PARAM\_UTIL\_H\_}}
+
+\end{DoxyCode}

@@ -1,0 +1,47 @@
+\doxysection{fixdfti.\+c}
+\hypertarget{fixdfti_8c_source}{}\label{fixdfti_8c_source}\index{libraries/builtins/fixdfti.c@{libraries/builtins/fixdfti.c}}
+\mbox{\hyperlink{fixdfti_8c}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{fixdfti_8c_source_l00001}00001\ \textcolor{comment}{/*\ ===-\/-\/\ fixdfti.c\ -\/\ Implement\ \_\_fixdfti\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/===}}
+\DoxyCodeLine{\Hypertarget{fixdfti_8c_source_l00002}00002\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{fixdfti_8c_source_l00003}00003\ \textcolor{comment}{\ *\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ The\ LLVM\ Compiler\ Infrastructure}}
+\DoxyCodeLine{\Hypertarget{fixdfti_8c_source_l00004}00004\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{fixdfti_8c_source_l00005}00005\ \textcolor{comment}{\ *\ This\ file\ is\ dual\ licensed\ under\ the\ MIT\ and\ the\ University\ of\ Illinois\ Open}}
+\DoxyCodeLine{\Hypertarget{fixdfti_8c_source_l00006}00006\ \textcolor{comment}{\ *\ Source\ Licenses.\ See\ LICENSE.TXT\ for\ details.}}
+\DoxyCodeLine{\Hypertarget{fixdfti_8c_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{fixdfti_8c_source_l00008}00008\ \textcolor{comment}{\ *\ ===-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/===}}
+\DoxyCodeLine{\Hypertarget{fixdfti_8c_source_l00009}00009\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{fixdfti_8c_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{fixdfti_8c_source_l00011}00011\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{fp64_8h}{fp64.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{fixdfti_8c_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{fixdfti_8c_source_l00013}\mbox{\hyperlink{fixdfti_8c_a583840f728bfa568f594359ceb01984e}{00013}}\ \textcolor{keyword}{typedef}\ \_\_int128\ \mbox{\hyperlink{fixdfti_8c_a583840f728bfa568f594359ceb01984e}{fixint\_t}};}
+\DoxyCodeLine{\Hypertarget{fixdfti_8c_source_l00014}\mbox{\hyperlink{fixdfti_8c_ad0ea193a7825da74a10a34a5083ebc96}{00014}}\ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{unsigned}\ \_\_int128\ \mbox{\hyperlink{fixdfti_8c_ad0ea193a7825da74a10a34a5083ebc96}{fixuint\_t}};}
+\DoxyCodeLine{\Hypertarget{fixdfti_8c_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{fixdfti_8c_source_l00016}\mbox{\hyperlink{compiler__builtins_8hpp_a001a035d5d32b9ef07ba99f7eb73d96a}{00016}}\ \mbox{\hyperlink{fixdfti_8c_a583840f728bfa568f594359ceb01984e}{fixint\_t}}\ \mbox{\hyperlink{fixdfti_8c_aaf5b4eaf859a0d81926bfd93468a9862}{\_\_\_fixdfti}}(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})\ \{}
+\DoxyCodeLine{\Hypertarget{fixdfti_8c_source_l00017}00017\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{fixdfti_8c_a583840f728bfa568f594359ceb01984e}{fixint\_t}}\ fixint\_max\ =\ (\mbox{\hyperlink{fixdfti_8c_a583840f728bfa568f594359ceb01984e}{fixint\_t}})((\string~(\mbox{\hyperlink{fixdfti_8c_ad0ea193a7825da74a10a34a5083ebc96}{fixuint\_t}})0)\ /\ 2);}
+\DoxyCodeLine{\Hypertarget{fixdfti_8c_source_l00018}00018\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{fixdfti_8c_a583840f728bfa568f594359ceb01984e}{fixint\_t}}\ fixint\_min\ =\ -\/fixint\_max\ -\/\ 1;}
+\DoxyCodeLine{\Hypertarget{fixdfti_8c_source_l00019}00019\ \ \ \ \ \textcolor{comment}{//\ Break\ a\ into\ sign,\ exponent,\ significand}}
+\DoxyCodeLine{\Hypertarget{fixdfti_8c_source_l00020}00020\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{fixunstfti_8c_a77567b82b597749858d42ee163339696}{rep\_t}}\ aRep\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}};}
+\DoxyCodeLine{\Hypertarget{fixdfti_8c_source_l00021}00021\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{fixunstfti_8c_a77567b82b597749858d42ee163339696}{rep\_t}}\ aAbs\ =\ aRep\ \&\ \mbox{\hyperlink{fp128_8h_ab5203388c0b3fa56667e16d1bbd1e7a7}{absMask}};}
+\DoxyCodeLine{\Hypertarget{fixdfti_8c_source_l00022}00022\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{fixdfti_8c_a583840f728bfa568f594359ceb01984e}{fixint\_t}}\ sign\ =\ aRep\ \&\ \mbox{\hyperlink{fp128_8h_a24a207bac48041c7a290ab7b276a3b8b}{signBit}}\ ?\ -\/1\ :\ 1;}
+\DoxyCodeLine{\Hypertarget{fixdfti_8c_source_l00023}00023\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ exponent\ =\ (aAbs\ >>\ \mbox{\hyperlink{fp128_8h_a726ad4aea754fb8a716f9e9071d908e6}{significandBits}})\ -\/\ \mbox{\hyperlink{fp128_8h_a27dcfb4c2f9f888ad75b26c2cc4e0ace}{exponentBias}};}
+\DoxyCodeLine{\Hypertarget{fixdfti_8c_source_l00024}00024\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{fixunstfti_8c_a77567b82b597749858d42ee163339696}{rep\_t}}\ significand\ =\ (aAbs\ \&\ \mbox{\hyperlink{fp128_8h_a83ac658944510a105f99f0d48a3ccc0d}{significandMask}})\ |\ \mbox{\hyperlink{fp128_8h_a0ad3d8cdc9ca3d2f03786e592d7c01af}{implicitBit}};}
+\DoxyCodeLine{\Hypertarget{fixdfti_8c_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{fixdfti_8c_source_l00026}00026\ \ \ \ \ \textcolor{comment}{//\ If\ exponent\ is\ negative,\ the\ result\ is\ zero.}}
+\DoxyCodeLine{\Hypertarget{fixdfti_8c_source_l00027}00027\ \ \ \ \ \textcolor{keywordflow}{if}\ (exponent\ <\ 0)}
+\DoxyCodeLine{\Hypertarget{fixdfti_8c_source_l00028}00028\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{fixdfti_8c_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{fixdfti_8c_source_l00030}00030\ \ \ \ \ \textcolor{comment}{//\ If\ the\ value\ is\ too\ large\ for\ the\ integer\ type,\ saturate.}}
+\DoxyCodeLine{\Hypertarget{fixdfti_8c_source_l00031}00031\ \ \ \ \ \textcolor{keywordflow}{if}\ ((\textcolor{keywordtype}{unsigned})exponent\ >=\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{fixdfti_8c_a583840f728bfa568f594359ceb01984e}{fixint\_t}})\ *\ CHAR\_BIT)}
+\DoxyCodeLine{\Hypertarget{fixdfti_8c_source_l00032}00032\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ sign\ ==\ 1\ ?\ fixint\_max\ :\ fixint\_min;}
+\DoxyCodeLine{\Hypertarget{fixdfti_8c_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{fixdfti_8c_source_l00034}00034\ \ \ \ \ \textcolor{comment}{//\ If\ 0\ <=\ exponent\ <\ significandBits,\ right\ shift\ to\ get\ the\ result.}}
+\DoxyCodeLine{\Hypertarget{fixdfti_8c_source_l00035}00035\ \ \ \ \ \textcolor{comment}{//\ Otherwise,\ shift\ left.}}
+\DoxyCodeLine{\Hypertarget{fixdfti_8c_source_l00036}00036\ \ \ \ \ \textcolor{keywordflow}{if}\ (exponent\ <\ \mbox{\hyperlink{fp128_8h_a726ad4aea754fb8a716f9e9071d908e6}{significandBits}})}
+\DoxyCodeLine{\Hypertarget{fixdfti_8c_source_l00037}00037\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ sign\ *\ (significand\ >>\ (\mbox{\hyperlink{fp128_8h_a726ad4aea754fb8a716f9e9071d908e6}{significandBits}}\ -\/\ exponent));}
+\DoxyCodeLine{\Hypertarget{fixdfti_8c_source_l00038}00038\ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{fixdfti_8c_source_l00039}00039\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ sign\ *\ ((\mbox{\hyperlink{fixdfti_8c_a583840f728bfa568f594359ceb01984e}{fixint\_t}})significand\ <<\ (exponent\ -\/\ \mbox{\hyperlink{fp128_8h_a726ad4aea754fb8a716f9e9071d908e6}{significandBits}}));}
+\DoxyCodeLine{\Hypertarget{fixdfti_8c_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{fixdfti_8c_source_l00041}00041\ \}}
+
+\end{DoxyCode}

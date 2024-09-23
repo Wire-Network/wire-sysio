@@ -1,0 +1,87 @@
+\doxysection{sha1.\+cpp}
+\hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source}{}\label{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source}\index{libraries/fc/vendor/websocketpp/test/utility/sha1.cpp@{libraries/fc/vendor/websocketpp/test/utility/sha1.cpp}}
+\mbox{\hyperlink{vendor_2websocketpp_2test_2utility_2sha1_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2011,\ Peter\ Thorson.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00004}00004\ \textcolor{comment}{\ *\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00005}00005\ \textcolor{comment}{\ *\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are\ met:}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00006}00006\ \textcolor{comment}{\ *\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00007}00007\ \textcolor{comment}{\ *\ \ \ \ \ \ \ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00008}00008\ \textcolor{comment}{\ *\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00009}00009\ \textcolor{comment}{\ *\ \ \ \ \ \ \ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer\ in\ the}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00010}00010\ \textcolor{comment}{\ *\ \ \ \ \ \ \ documentation\ and/or\ other\ materials\ provided\ with\ the\ distribution.}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00011}00011\ \textcolor{comment}{\ *\ \ \ \ \ *\ Neither\ the\ name\ of\ the\ WebSocket++\ Project\ nor\ the}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00012}00012\ \textcolor{comment}{\ *\ \ \ \ \ \ \ names\ of\ its\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00013}00013\ \textcolor{comment}{\ *\ \ \ \ \ \ \ derived\ from\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00014}00014\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00015}00015\ \textcolor{comment}{\ *\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS\ "{}AS\ IS"{}}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00016}00016\ \textcolor{comment}{\ *\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ THE}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00017}00017\ \textcolor{comment}{\ *\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR\ A\ PARTICULAR\ PURPOSE}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00018}00018\ \textcolor{comment}{\ *\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ PETER\ THORSON\ BE\ LIABLE\ FOR\ ANY}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00019}00019\ \textcolor{comment}{\ *\ DIRECT,\ INDIRECT,\ INCIDENTAL,\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00020}00020\ \textcolor{comment}{\ *\ (INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00021}00021\ \textcolor{comment}{\ *\ LOSS\ OF\ USE,\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00022}00022\ \textcolor{comment}{\ *\ ON\ ANY\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00023}00023\ \textcolor{comment}{\ *\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE\ OF\ THIS}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00024}00024\ \textcolor{comment}{\ *\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00025}00025\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00026}00026\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00027}00027\ \textcolor{comment}{//\#define\ BOOST\_TEST\_DYN\_LINK}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00028}\mbox{\hyperlink{vendor_2websocketpp_2test_2utility_2sha1_8cpp_a6b2a3852db8bb19ab6909bac01859985}{00028}}\ \textcolor{preprocessor}{\#define\ BOOST\_TEST\_MODULE\ sha1}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00029}00029\ \textcolor{preprocessor}{\#include\ <boost/test/unit\_test.hpp>}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00031}00031\ \textcolor{preprocessor}{\#include\ <iostream>}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00032}00032\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00034}00034\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{vendor_2websocketpp_2websocketpp_2sha1_2sha1_8hpp}{websocketpp/sha1/sha1.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00035}00035\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{utilities_8hpp}{websocketpp/utilities.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00037}00037\ BOOST\_AUTO\_TEST\_SUITE\ (\ sha1\ )}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00039}\mbox{\hyperlink{vendor_2websocketpp_2test_2utility_2sha1_8cpp_acc1942645bdf69bea0447343cd0557bc}{00039}}\ \mbox{\hyperlink{vendor_2websocketpp_2test_2utility_2sha1_8cpp_acc1942645bdf69bea0447343cd0557bc}{BOOST\_AUTO\_TEST\_CASE}}(\ sha1\_test\_a\ )\ \{}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00040}00040\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ hash[20];}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00041}00041\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ reference[20]\ =\ \{0xa9,\ 0x99,\ 0x3e,\ 0x36,\ 0x47,}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00042}00042\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x06,\ 0x81,\ 0x6a,\ 0xba,\ 0x3e,}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00043}00043\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x25,\ 0x71,\ 0x78,\ 0x50,\ 0xc2,}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00044}00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x6c,\ 0x9c,\ 0xd0,\ 0xd8,\ 0x9d\};}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00046}00046\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1sha1_ad75335df7a69d69b3fb8fef3f4594812}{websocketpp::sha1::calc}}(\textcolor{stringliteral}{"{}abc"{}},3,hash);}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00048}00048\ \ \ \ \ BOOST\_CHECK\_EQUAL\_COLLECTIONS(hash,\ hash+20,\ reference,\ reference+20);}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00049}00049\ \}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00051}\mbox{\hyperlink{vendor_2websocketpp_2test_2utility_2sha1_8cpp_ac7c6e297a2903e7ba2c9082e9ebb4afc}{00051}}\ \mbox{\hyperlink{vendor_2websocketpp_2test_2utility_2sha1_8cpp_acc1942645bdf69bea0447343cd0557bc}{BOOST\_AUTO\_TEST\_CASE}}(\ sha1\_test\_b\ )\ \{}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00052}00052\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ hash[20];}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00053}00053\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ reference[20]\ =\ \{0x84,\ 0x98,\ 0x3e,\ 0x44,\ 0x1c,}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x3b,\ 0xd2,\ 0x6e,\ 0xba,\ 0xae,}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x4a,\ 0xa1,\ 0xf9,\ 0x51,\ 0x29,}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0xe5,\ 0xe5,\ 0x46,\ 0x70,\ 0xf1\};}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00058}00058\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1sha1_ad75335df7a69d69b3fb8fef3f4594812}{websocketpp::sha1::calc}}(}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00059}00059\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq"{}},56,hash);}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00061}00061\ \ \ \ \ BOOST\_CHECK\_EQUAL\_COLLECTIONS(hash,\ hash+20,\ reference,\ reference+20);}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00062}00062\ \}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00064}\mbox{\hyperlink{vendor_2websocketpp_2test_2utility_2sha1_8cpp_a001a8b9cfa45ffd5e2fa9eb09d1f53e3}{00064}}\ \mbox{\hyperlink{vendor_2websocketpp_2test_2utility_2sha1_8cpp_acc1942645bdf69bea0447343cd0557bc}{BOOST\_AUTO\_TEST\_CASE}}(\ sha1\_test\_c\ )\ \{}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00065}00065\ \ \ \ \ std::string\ input;}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00066}00066\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ hash[20];}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00067}00067\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ reference[20]\ =\ \{0x34,\ 0xaa,\ 0x97,\ 0x3c,\ 0xd4,}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0xc4,\ 0xda,\ 0xa4,\ 0xf6,\ 0x1e,}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0xeb,\ 0x2b,\ 0xdb,\ 0xad,\ 0x27,}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x31,\ 0x65,\ 0x34,\ 0x01,\ 0x6f\};}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00072}00072\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ 1000000;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00073}00073\ \ \ \ \ \ \ \ \ input\ +=\ \textcolor{charliteral}{'a'};}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00074}00074\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00075}00075\ }
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00076}00076\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1sha1_ad75335df7a69d69b3fb8fef3f4594812}{websocketpp::sha1::calc}}(input.c\_str(),input.size(),hash);}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00077}00077\ }
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00078}00078\ \ \ \ \ BOOST\_CHECK\_EQUAL\_COLLECTIONS(hash,\ hash+20,\ reference,\ reference+20);}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00079}00079\ \}}
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00080}00080\ }
+\DoxyCodeLine{\Hypertarget{vendor_2websocketpp_2test_2utility_2sha1_8cpp_source_l00081}00081\ BOOST\_AUTO\_TEST\_SUITE\_END()}
+
+\end{DoxyCode}

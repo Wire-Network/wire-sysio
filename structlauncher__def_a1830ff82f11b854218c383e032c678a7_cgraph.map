@@ -1,0 +1,25 @@
+<map id="launcher_def::make_star" name="launcher_def::make_star">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,108,170,133"/>
+<area shape="rect" id="Node000002" href="$structlauncher__def.html#aa2490bf4908ce8f8ee2faaacd2372f2c" title=" " alt="" coords="442,44,570,85"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="151,105,217,93,427,68,427,74,218,98,152,110"/>
+<area shape="rect" id="Node000004" href="$structlauncher__def.html#aba752218c7d0336259dd373e3ea801a2" title=" " alt="" coords="218,108,380,133"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="170,118,202,118,202,123,170,123"/>
+<area shape="rect" id="Node000005" href="$structlauncher__def.html#af994e3a4da3e0768833b3779707cf2e8" title=" " alt="" coords="428,184,584,209"/>
+<area shape="poly" id="edge11_Node000001_Node000005" title=" " alt="" coords="156,131,218,143,413,178,412,183,217,149,155,137"/>
+<area shape="rect" id="Node000007" href="$structlauncher__def.html#a938ddf2e57d2b843911ff88678100ea1" title=" " alt="" coords="661,121,818,147"/>
+<area shape="poly" id="edge15_Node000001_Node000007" title=" " alt="" coords="111,105,192,65,248,43,311,23,380,8,450,3,519,9,553,18,586,30,603,43,612,58,620,73,634,88,680,113,677,117,631,92,616,76,607,60,599,47,583,35,551,23,518,14,450,8,380,14,313,28,250,48,194,70,113,110"/>
+<area shape="rect" id="Node000008" href="$structlauncher__def.html#ad2a447983792ae923564a0e314d48cf5" title=" " alt="" coords="221,209,376,235"/>
+<area shape="poly" id="edge12_Node000001_Node000008" title=" " alt="" coords="113,132,219,188,248,200,246,205,217,192,110,136"/>
+<area shape="rect" id="Node000003" href="$classproducer__names.html#a9569f75b271757118cd2e463590f7e8d" title=" " alt="" coords="632,52,847,77"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="570,62,617,62,617,67,570,67"/>
+<area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="348,105,426,83,428,88,350,110"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="337,132,455,175,453,180,335,137"/>
+<area shape="poly" id="edge10_Node000004_Node000007" title=" " alt="" coords="381,120,645,128,645,134,380,126"/>
+<area shape="poly" id="edge7_Node000005_Node000005" title=" " alt="" coords="472,185,465,175,469,165,483,159,506,157,532,160,545,167,542,171,530,165,506,162,484,164,473,169,470,175,476,182"/>
+<area shape="rect" id="Node000006" href="$structlauncher__def.html#ac0e3968f40fee377535b9b5b0a063f47" title=" " alt="" coords="895,184,1067,209"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="585,194,879,194,879,199,585,199"/>
+<area shape="poly" id="edge8_Node000005_Node000007" title=" " alt="" coords="556,181,673,149,675,154,558,186"/>
+<area shape="poly" id="edge9_Node000007_Node000006" title=" " alt="" coords="793,145,914,177,913,182,791,150"/>
+<area shape="poly" id="edge14_Node000008_Node000005" title=" " alt="" coords="377,210,412,205,413,211,377,215"/>
+<area shape="poly" id="edge13_Node000008_Node000006" title=" " alt="" coords="377,221,584,219,879,202,879,208,584,225,377,226"/>
+</map>

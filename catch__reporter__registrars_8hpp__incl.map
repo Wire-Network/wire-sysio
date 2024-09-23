@@ -1,0 +1,20 @@
+<map id="libraries/sys&#45;vm/external/Catch2/include/internal/catch_reporter_registrars.hpp" name="libraries/sys&#45;vm/external/Catch2/include/internal/catch_reporter_registrars.hpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="319,5,513,61"/>
+<area shape="rect" id="Node000002" href="$catch__interfaces__registry__hub_8h.html" title=" " alt="" coords="332,109,500,150"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="419,62,419,94,414,94,414,62"/>
+<area shape="rect" id="Node000003" href="$catch__common_8h.html" title=" " alt="" coords="257,198,378,223"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="393,152,346,190,343,185,390,148"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="390,271,443,297"/>
+<area shape="poly" id="edge8_Node000002_Node000007" title=" " alt="" coords="419,150,419,256,414,256,414,150"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="454,198,522,223"/>
+<area shape="poly" id="edge9_Node000002_Node000009" title=" " alt="" coords="436,148,469,184,465,188,432,152"/>
+<area shape="rect" id="Node000004" href="$catch__compiler__capabilities_8h.html" title=" " alt="" coords="5,271,198,297"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="282,226,154,269,152,263,280,221"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="221,271,280,297"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="308,225,274,262,271,258,305,222"/>
+<area shape="poly" id="edge6_Node000003_Node000007" title=" " alt="" coords="336,222,389,260,386,264,333,226"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="305,271,365,297"/>
+<area shape="poly" id="edge7_Node000003_Node000008" title=" " alt="" coords="323,223,331,256,326,257,318,224"/>
+<area shape="rect" id="Node000005" href="$catch__platform_8h.html" title=" " alt="" coords="42,345,161,371"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="104,297,104,329,99,329,99,297"/>
+</map>

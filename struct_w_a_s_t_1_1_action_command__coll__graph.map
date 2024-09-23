@@ -1,0 +1,9 @@
+<map id="WAST::ActionCommand" name="WAST::ActionCommand">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,258,168,283"/>
+<area shape="rect" id="Node000002" href="$struct_w_a_s_t_1_1_command.html" title=" " alt="" coords="24,183,149,208"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="89,224,89,257,84,257,84,224"/>
+<area shape="rect" id="Node000003" href="$struct_w_a_s_t_1_1_text_file_locus.html" title=" " alt="" coords="13,94,160,120"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="89,135,89,182,84,182,84,135"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="60,5,113,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="89,47,89,94,84,94,84,47"/>
+</map>

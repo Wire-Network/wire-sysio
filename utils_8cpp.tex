@@ -1,0 +1,59 @@
+\doxysection{libraries/fc/libraries/ff/libff/common/utils.cpp File Reference}
+\hypertarget{utils_8cpp}{}\label{utils_8cpp}\index{libraries/fc/libraries/ff/libff/common/utils.cpp@{libraries/fc/libraries/ff/libff/common/utils.cpp}}
+{\ttfamily \#include $<$algorithm$>$}\newline
+{\ttfamily \#include $<$cassert$>$}\newline
+{\ttfamily \#include $<$cstdarg$>$}\newline
+{\ttfamily \#include $<$cstdint$>$}\newline
+{\ttfamily \#include $<$libff/common/utils.\+hpp$>$}\newline
+Include dependency graph for utils.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{utils_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacelibff}{libff}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+size\+\_\+t \mbox{\hyperlink{namespacelibff_a66321d6122496a1c917e5c1712133244}{libff\+::get\+\_\+power\+\_\+of\+\_\+two}} (size\+\_\+t n)
+\item 
+size\+\_\+t \mbox{\hyperlink{namespacelibff_a7afad10ffee58e885a8377a69aa37e3f}{libff\+::log2}} (size\+\_\+t n)
+\begin{DoxyCompactList}\small\item\em returns ceil(log2(n)), so 1ul\texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<}log2(n) is the smallest power of 2, that is not less than n \end{DoxyCompactList}\item 
+size\+\_\+t \mbox{\hyperlink{namespacelibff_adae19a9e52ef2610bca7c75758878c9a}{libff\+::to\+\_\+twos\+\_\+complement}} (int i, size\+\_\+t w)
+\item 
+int \mbox{\hyperlink{namespacelibff_ae72300e9869c3d754f7089bfc5b126a9}{libff\+::from\+\_\+twos\+\_\+complement}} (size\+\_\+t i, size\+\_\+t w)
+\item 
+size\+\_\+t \mbox{\hyperlink{namespacelibff_a3cfe8798393d5ff53eadcea8403e5f5c}{libff\+::bitreverse}} (size\+\_\+t n, const size\+\_\+t \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}})
+\item 
+\mbox{\hyperlink{namespacelibff_a696ce545f08b1dfc65e1cf261eed148c}{bit\+\_\+vector}} \mbox{\hyperlink{namespacelibff_adaa8c41c123a0086e707bfdf17a8ded5}{libff\+::int\+\_\+list\+\_\+to\+\_\+bits}} (const std\+::initializer\+\_\+list$<$ unsigned long $>$ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}, const size\+\_\+t wordsize)
+\item 
+long long \mbox{\hyperlink{namespacelibff_afc9ea110e0de37d57286c4f1e0424425}{libff\+::div\+\_\+ceil}} (long long x, long long y)
+\item 
+bool \mbox{\hyperlink{namespacelibff_a91495578c17649f0bb3bc532c59dda94}{libff\+::is\+\_\+little\+\_\+endian}} ()
+\item 
+std\+::string \mbox{\hyperlink{namespacelibff_abc98dc0e6da05efad228d6a29f3ec506}{libff\+::\+FORMAT}} (const std\+::string \&prefix, const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm-shell_8h_ae425c09a4c40409de33790765339cb97}{format}},...)
+\item 
+void \mbox{\hyperlink{namespacelibff_afa6e1452b5974a94a8dddd9a2a5039cc}{libff\+::serialize\+\_\+bit\+\_\+vector}} (std\+::ostream \&out, const \mbox{\hyperlink{namespacelibff_a696ce545f08b1dfc65e1cf261eed148c}{bit\+\_\+vector}} \&v)
+\item 
+void \mbox{\hyperlink{namespacelibff_a2f2e93960c0519b73a33b20eec2880f2}{libff\+::deserialize\+\_\+bit\+\_\+vector}} (std\+::istream \&in, \mbox{\hyperlink{namespacelibff_a696ce545f08b1dfc65e1cf261eed148c}{bit\+\_\+vector}} \&v)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Implementation of misc math and serialization utility functions
+
+\begin{DoxyAuthor}{Author}
+This file is part of libff, developed by SCIPR Lab and contributors (see AUTHORS). 
+\end{DoxyAuthor}
+\begin{DoxyCopyright}{Copyright}
+MIT license (see LICENSE file) 
+\end{DoxyCopyright}
+
+
+Definition in file \mbox{\hyperlink{utils_8cpp_source}{utils.\+cpp}}.
+

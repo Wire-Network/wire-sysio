@@ -1,0 +1,226 @@
+\doxysection{cybozu\+::test Namespace Reference}
+\hypertarget{namespacecybozu_1_1test}{}\label{namespacecybozu_1_1test}\index{cybozu::test@{cybozu::test}}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classcybozu_1_1test_1_1_auto_run}{Auto\+Run}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{namespacecybozu_1_1test_aea14f09ded7f8a0f840c5cb6e3a0a417}{test}} (bool \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}, const std\+::string \&msg, const std\+::string \&param, const char \texorpdfstring{$\ast$}{*}file, int line)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{union_u}{U}} $>$ }\\bool \mbox{\hyperlink{namespacecybozu_1_1test_a282fede0a619c22d30a4bee3e33d90bc}{is\+Equal}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&lhs, const \mbox{\hyperlink{union_u}{U}} \&rhs)
+\item 
+bool \mbox{\hyperlink{namespacecybozu_1_1test_a6d357202b26c157c0a1c119fb456ea66}{is\+Equal}} (size\+\_\+t lhs, int rhs)
+\item 
+bool \mbox{\hyperlink{namespacecybozu_1_1test_a6ed827ec3427d5a352b77d88f1740b4f}{is\+Equal}} (int lhs, size\+\_\+t rhs)
+\item 
+bool \mbox{\hyperlink{namespacecybozu_1_1test_aa03830a68d851357ad0c0c51bac5ce25}{is\+Equal}} (const char \texorpdfstring{$\ast$}{*}lhs, const char \texorpdfstring{$\ast$}{*}rhs)
+\item 
+bool \mbox{\hyperlink{namespacecybozu_1_1test_a42818c084db26c2526589e9e7b050287}{is\+Equal}} (char \texorpdfstring{$\ast$}{*}lhs, const char \texorpdfstring{$\ast$}{*}rhs)
+\item 
+bool \mbox{\hyperlink{namespacecybozu_1_1test_a6fb548da7d681e154f40c71ff7b5ab2e}{is\+Equal}} (const char \texorpdfstring{$\ast$}{*}lhs, char \texorpdfstring{$\ast$}{*}rhs)
+\item 
+bool \mbox{\hyperlink{namespacecybozu_1_1test_a71c9f6a4187eae924c86b95f9092086e}{is\+Equal}} (char \texorpdfstring{$\ast$}{*}lhs, char \texorpdfstring{$\ast$}{*}rhs)
+\item 
+bool \mbox{\hyperlink{namespacecybozu_1_1test_ab05c765e80de3e5e521733bce4350e15}{is\+Equal}} (float lhs, float rhs)
+\item 
+bool \mbox{\hyperlink{namespacecybozu_1_1test_a43bfb4921f5ee7c1186438e7924f1f50}{is\+Equal}} (double lhs, double rhs)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacecybozu_1_1test_a71c9f6a4187eae924c86b95f9092086e}\index{cybozu::test@{cybozu::test}!isEqual@{isEqual}}
+\index{isEqual@{isEqual}!cybozu::test@{cybozu::test}}
+\doxysubsubsection{\texorpdfstring{isEqual()}{isEqual()}\hspace{0.1cm}{\footnotesize\ttfamily [1/9]}}
+{\footnotesize\ttfamily \label{namespacecybozu_1_1test_a71c9f6a4187eae924c86b95f9092086e} 
+bool cybozu\+::test\+::is\+Equal (\begin{DoxyParamCaption}\item[{char \texorpdfstring{$\ast$}{*}}]{lhs}{, }\item[{char \texorpdfstring{$\ast$}{*}}]{rhs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{ate-pairing_2include_2cybozu_2test_8hpp_source_l00152}{152}} of file \mbox{\hyperlink{ate-pairing_2include_2cybozu_2test_8hpp_source}{test.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00153\ \{}
+\DoxyCodeLine{00154\ \ \ \ \ \textcolor{keywordflow}{return}\ strcmp(lhs,\ rhs)\ ==\ 0;}
+\DoxyCodeLine{00155\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacecybozu_1_1test_a42818c084db26c2526589e9e7b050287}\index{cybozu::test@{cybozu::test}!isEqual@{isEqual}}
+\index{isEqual@{isEqual}!cybozu::test@{cybozu::test}}
+\doxysubsubsection{\texorpdfstring{isEqual()}{isEqual()}\hspace{0.1cm}{\footnotesize\ttfamily [2/9]}}
+{\footnotesize\ttfamily \label{namespacecybozu_1_1test_a42818c084db26c2526589e9e7b050287} 
+bool cybozu\+::test\+::is\+Equal (\begin{DoxyParamCaption}\item[{char \texorpdfstring{$\ast$}{*}}]{lhs}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{rhs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{ate-pairing_2include_2cybozu_2test_8hpp_source_l00144}{144}} of file \mbox{\hyperlink{ate-pairing_2include_2cybozu_2test_8hpp_source}{test.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00145\ \{}
+\DoxyCodeLine{00146\ \ \ \ \ \textcolor{keywordflow}{return}\ strcmp(lhs,\ rhs)\ ==\ 0;}
+\DoxyCodeLine{00147\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacecybozu_1_1test_a6fb548da7d681e154f40c71ff7b5ab2e}\index{cybozu::test@{cybozu::test}!isEqual@{isEqual}}
+\index{isEqual@{isEqual}!cybozu::test@{cybozu::test}}
+\doxysubsubsection{\texorpdfstring{isEqual()}{isEqual()}\hspace{0.1cm}{\footnotesize\ttfamily [3/9]}}
+{\footnotesize\ttfamily \label{namespacecybozu_1_1test_a6fb548da7d681e154f40c71ff7b5ab2e} 
+bool cybozu\+::test\+::is\+Equal (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{lhs}{, }\item[{char \texorpdfstring{$\ast$}{*}}]{rhs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{ate-pairing_2include_2cybozu_2test_8hpp_source_l00148}{148}} of file \mbox{\hyperlink{ate-pairing_2include_2cybozu_2test_8hpp_source}{test.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00149\ \{}
+\DoxyCodeLine{00150\ \ \ \ \ \textcolor{keywordflow}{return}\ strcmp(lhs,\ rhs)\ ==\ 0;}
+\DoxyCodeLine{00151\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacecybozu_1_1test_aa03830a68d851357ad0c0c51bac5ce25}\index{cybozu::test@{cybozu::test}!isEqual@{isEqual}}
+\index{isEqual@{isEqual}!cybozu::test@{cybozu::test}}
+\doxysubsubsection{\texorpdfstring{isEqual()}{isEqual()}\hspace{0.1cm}{\footnotesize\ttfamily [4/9]}}
+{\footnotesize\ttfamily \label{namespacecybozu_1_1test_aa03830a68d851357ad0c0c51bac5ce25} 
+bool cybozu\+::test\+::is\+Equal (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{lhs}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{rhs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{ate-pairing_2include_2cybozu_2test_8hpp_source_l00140}{140}} of file \mbox{\hyperlink{ate-pairing_2include_2cybozu_2test_8hpp_source}{test.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00141\ \{}
+\DoxyCodeLine{00142\ \ \ \ \ \textcolor{keywordflow}{return}\ strcmp(lhs,\ rhs)\ ==\ 0;}
+\DoxyCodeLine{00143\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacecybozu_1_1test_a282fede0a619c22d30a4bee3e33d90bc}\index{cybozu::test@{cybozu::test}!isEqual@{isEqual}}
+\index{isEqual@{isEqual}!cybozu::test@{cybozu::test}}
+\doxysubsubsection{\texorpdfstring{isEqual()}{isEqual()}\hspace{0.1cm}{\footnotesize\ttfamily [5/9]}}
+{\footnotesize\ttfamily \label{namespacecybozu_1_1test_a282fede0a619c22d30a4bee3e33d90bc} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{union_u}{U}} $>$ \\
+bool cybozu\+::test\+::is\+Equal (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{lhs}{, }\item[{const \mbox{\hyperlink{union_u}{U}} \&}]{rhs}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{ate-pairing_2include_2cybozu_2test_8hpp_source_l00126}{126}} of file \mbox{\hyperlink{ate-pairing_2include_2cybozu_2test_8hpp_source}{test.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00127\ \{}
+\DoxyCodeLine{00128\ \ \ \ \ \textcolor{keywordflow}{return}\ lhs\ ==\ rhs;}
+\DoxyCodeLine{00129\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacecybozu_1_1test_a43bfb4921f5ee7c1186438e7924f1f50}\index{cybozu::test@{cybozu::test}!isEqual@{isEqual}}
+\index{isEqual@{isEqual}!cybozu::test@{cybozu::test}}
+\doxysubsubsection{\texorpdfstring{isEqual()}{isEqual()}\hspace{0.1cm}{\footnotesize\ttfamily [6/9]}}
+{\footnotesize\ttfamily \label{namespacecybozu_1_1test_a43bfb4921f5ee7c1186438e7924f1f50} 
+bool cybozu\+::test\+::is\+Equal (\begin{DoxyParamCaption}\item[{double}]{lhs}{, }\item[{double}]{rhs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{ate-pairing_2include_2cybozu_2test_8hpp_source_l00168}{168}} of file \mbox{\hyperlink{ate-pairing_2include_2cybozu_2test_8hpp_source}{test.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00169\ \{}
+\DoxyCodeLine{00170\ \ \ \ \ \textcolor{keyword}{union\ }di\ \{}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}};}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ i;}
+\DoxyCodeLine{00173\ \ \ \ \ \}\ ldi,\ rdi;}
+\DoxyCodeLine{00174\ \ \ \ \ ldi.d\ =\ lhs;}
+\DoxyCodeLine{00175\ \ \ \ \ rdi.d\ =\ rhs;}
+\DoxyCodeLine{00176\ \ \ \ \ \textcolor{keywordflow}{return}\ ldi.i\ ==\ rdi.i;}
+\DoxyCodeLine{00177\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacecybozu_1_1test_ab05c765e80de3e5e521733bce4350e15}\index{cybozu::test@{cybozu::test}!isEqual@{isEqual}}
+\index{isEqual@{isEqual}!cybozu::test@{cybozu::test}}
+\doxysubsubsection{\texorpdfstring{isEqual()}{isEqual()}\hspace{0.1cm}{\footnotesize\ttfamily [7/9]}}
+{\footnotesize\ttfamily \label{namespacecybozu_1_1test_ab05c765e80de3e5e521733bce4350e15} 
+bool cybozu\+::test\+::is\+Equal (\begin{DoxyParamCaption}\item[{float}]{lhs}{, }\item[{float}]{rhs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{ate-pairing_2include_2cybozu_2test_8hpp_source_l00157}{157}} of file \mbox{\hyperlink{ate-pairing_2include_2cybozu_2test_8hpp_source}{test.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00158\ \{}
+\DoxyCodeLine{00159\ \ \ \ \ \textcolor{keyword}{union\ }fi\ \{}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}};}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ i;}
+\DoxyCodeLine{00162\ \ \ \ \ \}\ lfi,\ rfi;}
+\DoxyCodeLine{00163\ \ \ \ \ lfi.f\ =\ lhs;}
+\DoxyCodeLine{00164\ \ \ \ \ rfi.f\ =\ rhs;}
+\DoxyCodeLine{00165\ \ \ \ \ \textcolor{keywordflow}{return}\ lfi.i\ ==\ rfi.i;}
+\DoxyCodeLine{00166\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacecybozu_1_1test_a6ed827ec3427d5a352b77d88f1740b4f}\index{cybozu::test@{cybozu::test}!isEqual@{isEqual}}
+\index{isEqual@{isEqual}!cybozu::test@{cybozu::test}}
+\doxysubsubsection{\texorpdfstring{isEqual()}{isEqual()}\hspace{0.1cm}{\footnotesize\ttfamily [8/9]}}
+{\footnotesize\ttfamily \label{namespacecybozu_1_1test_a6ed827ec3427d5a352b77d88f1740b4f} 
+bool cybozu\+::test\+::is\+Equal (\begin{DoxyParamCaption}\item[{int}]{lhs}{, }\item[{size\+\_\+t}]{rhs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{ate-pairing_2include_2cybozu_2test_8hpp_source_l00136}{136}} of file \mbox{\hyperlink{ate-pairing_2include_2cybozu_2test_8hpp_source}{test.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00137\ \{}
+\DoxyCodeLine{00138\ \ \ \ \ \textcolor{keywordflow}{return}\ size\_t(lhs)\ ==\ rhs;}
+\DoxyCodeLine{00139\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacecybozu_1_1test_a6d357202b26c157c0a1c119fb456ea66}\index{cybozu::test@{cybozu::test}!isEqual@{isEqual}}
+\index{isEqual@{isEqual}!cybozu::test@{cybozu::test}}
+\doxysubsubsection{\texorpdfstring{isEqual()}{isEqual()}\hspace{0.1cm}{\footnotesize\ttfamily [9/9]}}
+{\footnotesize\ttfamily \label{namespacecybozu_1_1test_a6d357202b26c157c0a1c119fb456ea66} 
+bool cybozu\+::test\+::is\+Equal (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{lhs}{, }\item[{int}]{rhs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{ate-pairing_2include_2cybozu_2test_8hpp_source_l00132}{132}} of file \mbox{\hyperlink{ate-pairing_2include_2cybozu_2test_8hpp_source}{test.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00133\ \{}
+\DoxyCodeLine{00134\ \ \ \ \ \textcolor{keywordflow}{return}\ lhs\ ==\ size\_t(rhs);}
+\DoxyCodeLine{00135\ \}}
+
+\end{DoxyCode}
+\Hypertarget{namespacecybozu_1_1test_aea14f09ded7f8a0f840c5cb6e3a0a417}\index{cybozu::test@{cybozu::test}!test@{test}}
+\index{test@{test}!cybozu::test@{cybozu::test}}
+\doxysubsubsection{\texorpdfstring{test()}{test()}}
+{\footnotesize\ttfamily \label{namespacecybozu_1_1test_aea14f09ded7f8a0f840c5cb6e3a0a417} 
+void cybozu\+::test\+::test (\begin{DoxyParamCaption}\item[{bool}]{ret}{, }\item[{const std\+::string \&}]{msg}{, }\item[{const std\+::string \&}]{param}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{file}{, }\item[{int}]{line}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{ate-pairing_2include_2cybozu_2test_8hpp_source_l00117}{117}} of file \mbox{\hyperlink{ate-pairing_2include_2cybozu_2test_8hpp_source}{test.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00118\ \{}
+\DoxyCodeLine{00119\ \ \ \ \ autoRun.\mbox{\hyperlink{classcybozu_1_1test_1_1_auto_run_ace4237a002b2a2849a4bce661cfc0e56}{set}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}});}
+\DoxyCodeLine{00120\ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}})\ \{}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ printf(\textcolor{stringliteral}{"{}\%s(\%d):ctest:\%s(\%s);\(\backslash\)n"{}},\ file,\ line,\ msg.c\_str(),\ param.c\_str());}
+\DoxyCodeLine{00122\ \ \ \ \ \}}
+\DoxyCodeLine{00123\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=342pt]{namespacecybozu_1_1test_aea14f09ded7f8a0f840c5cb6e3a0a417_cgraph}
+\end{center}
+\end{figure}

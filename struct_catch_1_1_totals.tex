@@ -1,0 +1,191 @@
+\doxysection{Catch\+::Totals Struct Reference}
+\hypertarget{struct_catch_1_1_totals}{}\label{struct_catch_1_1_totals}\index{Catch::Totals@{Catch::Totals}}
+
+
+{\ttfamily \#include $<$catch\+\_\+totals.\+h$>$}
+
+
+
+Collaboration diagram for Catch\+::Totals\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=171pt]{struct_catch_1_1_totals__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_catch_1_1_totals}{Totals}} \mbox{\hyperlink{struct_catch_1_1_totals_a9279ed39139cb7e7b291918a6d08290e}{operator-\/}} (\mbox{\hyperlink{struct_catch_1_1_totals}{Totals}} const \&other) const
+\item 
+\mbox{\hyperlink{struct_catch_1_1_totals}{Totals}} \& \mbox{\hyperlink{struct_catch_1_1_totals_aa809975b6055917ecb1b1ae7c25149a8}{operator+=}} (\mbox{\hyperlink{struct_catch_1_1_totals}{Totals}} const \&other)
+\item 
+\mbox{\hyperlink{struct_catch_1_1_totals}{Totals}} \mbox{\hyperlink{struct_catch_1_1_totals_a1a94a654f5f3786b75695e081fc9bca2}{delta}} (\mbox{\hyperlink{struct_catch_1_1_totals}{Totals}} const \&prev\+Totals) const
+\item 
+\mbox{\hyperlink{struct_catch_1_1_totals}{Totals}} \mbox{\hyperlink{struct_catch_1_1_totals_a9279ed39139cb7e7b291918a6d08290e}{operator-\/}} (\mbox{\hyperlink{struct_catch_1_1_totals}{Totals}} const \&other) const
+\item 
+\mbox{\hyperlink{struct_catch_1_1_totals}{Totals}} \& \mbox{\hyperlink{struct_catch_1_1_totals_aa809975b6055917ecb1b1ae7c25149a8}{operator+=}} (\mbox{\hyperlink{struct_catch_1_1_totals}{Totals}} const \&other)
+\item 
+\mbox{\hyperlink{struct_catch_1_1_totals}{Totals}} \mbox{\hyperlink{struct_catch_1_1_totals_a1a94a654f5f3786b75695e081fc9bca2}{delta}} (\mbox{\hyperlink{struct_catch_1_1_totals}{Totals}} const \&prev\+Totals) const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{struct_catch_1_1_totals_a6ea14c7de7ea735a14f172a26e08a239}{error}} = 0
+\item 
+\mbox{\hyperlink{struct_catch_1_1_counts}{Counts}} \mbox{\hyperlink{struct_catch_1_1_totals_a885ded66df752147b30c3d45aa602ec9}{assertions}}
+\item 
+\mbox{\hyperlink{struct_catch_1_1_counts}{Counts}} \mbox{\hyperlink{struct_catch_1_1_totals_adb195fe477aedee2ecea88c888f16506}{test\+Cases}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source_l02466}{2466}} of file \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source}{catch.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_catch_1_1_totals_a1a94a654f5f3786b75695e081fc9bca2}\index{Catch::Totals@{Catch::Totals}!delta@{delta}}
+\index{delta@{delta}!Catch::Totals@{Catch::Totals}}
+\doxysubsubsection{\texorpdfstring{delta()}{delta()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_totals_a1a94a654f5f3786b75695e081fc9bca2} 
+\mbox{\hyperlink{struct_catch_1_1_totals}{Totals}} Catch\+::\+Totals\+::delta (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_totals}{Totals}} const \&}]{prev\+Totals}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{catch__totals_8cpp_source_l00050}{50}} of file \mbox{\hyperlink{catch__totals_8cpp_source}{catch\+\_\+totals.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ Totals\ \mbox{\hyperlink{jmp_8cpp_aca9876635a5afd01576dae38f10dc723}{diff}}\ =\ *\textcolor{keyword}{this}\ -\/\ prevTotals;}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{jmp_8cpp_aca9876635a5afd01576dae38f10dc723}{diff}}.assertions.failed\ >\ 0\ )}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \ ++\mbox{\hyperlink{jmp_8cpp_aca9876635a5afd01576dae38f10dc723}{diff}}.testCases.failed;}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{jmp_8cpp_aca9876635a5afd01576dae38f10dc723}{diff}}.assertions.failedButOk\ >\ 0\ )}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \ \ \ ++\mbox{\hyperlink{jmp_8cpp_aca9876635a5afd01576dae38f10dc723}{diff}}.testCases.failedButOk;}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ \ \ \ ++\mbox{\hyperlink{jmp_8cpp_aca9876635a5afd01576dae38f10dc723}{diff}}.testCases.passed;}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{jmp_8cpp_aca9876635a5afd01576dae38f10dc723}{diff}};}
+\DoxyCodeLine{00059\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=247pt]{struct_catch_1_1_totals_a1a94a654f5f3786b75695e081fc9bca2_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=324pt]{struct_catch_1_1_totals_a1a94a654f5f3786b75695e081fc9bca2_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_catch_1_1_totals_a1a94a654f5f3786b75695e081fc9bca2}\index{Catch::Totals@{Catch::Totals}!delta@{delta}}
+\index{delta@{delta}!Catch::Totals@{Catch::Totals}}
+\doxysubsubsection{\texorpdfstring{delta()}{delta()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_totals_a1a94a654f5f3786b75695e081fc9bca2} 
+\mbox{\hyperlink{struct_catch_1_1_totals}{Totals}} Catch\+::\+Totals\+::delta (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_totals}{Totals}} const \&}]{prev\+Totals}{}\end{DoxyParamCaption}) const}
+
+\Hypertarget{struct_catch_1_1_totals_aa809975b6055917ecb1b1ae7c25149a8}\index{Catch::Totals@{Catch::Totals}!operator+=@{operator+=}}
+\index{operator+=@{operator+=}!Catch::Totals@{Catch::Totals}}
+\doxysubsubsection{\texorpdfstring{operator+=()}{operator+=()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_totals_aa809975b6055917ecb1b1ae7c25149a8} 
+\mbox{\hyperlink{struct_catch_1_1_totals}{Totals}} \& Catch\+::\+Totals\+::operator+= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_totals}{Totals}} const \&}]{other}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__totals_8cpp_source_l00044}{44}} of file \mbox{\hyperlink{catch__totals_8cpp_source}{catch\+\_\+totals.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_totals_a885ded66df752147b30c3d45aa602ec9}{assertions}}\ +=\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.assertions;}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_totals_adb195fe477aedee2ecea88c888f16506}{testCases}}\ +=\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.testCases;}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00048\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{struct_catch_1_1_totals_aa809975b6055917ecb1b1ae7c25149a8}\index{Catch::Totals@{Catch::Totals}!operator+=@{operator+=}}
+\index{operator+=@{operator+=}!Catch::Totals@{Catch::Totals}}
+\doxysubsubsection{\texorpdfstring{operator+=()}{operator+=()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_totals_aa809975b6055917ecb1b1ae7c25149a8} 
+\mbox{\hyperlink{struct_catch_1_1_totals}{Totals}} \& Catch\+::\+Totals\+::operator+= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_totals}{Totals}} const \&}]{other}{}\end{DoxyParamCaption})}
+
+\Hypertarget{struct_catch_1_1_totals_a9279ed39139cb7e7b291918a6d08290e}\index{Catch::Totals@{Catch::Totals}!operator-\/@{operator-\/}}
+\index{operator-\/@{operator-\/}!Catch::Totals@{Catch::Totals}}
+\doxysubsubsection{\texorpdfstring{operator-\/()}{operator-()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_totals_a9279ed39139cb7e7b291918a6d08290e} 
+\mbox{\hyperlink{struct_catch_1_1_totals}{Totals}} Catch\+::\+Totals\+::operator-\/ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_totals}{Totals}} const \&}]{other}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{catch__totals_8cpp_source_l00037}{37}} of file \mbox{\hyperlink{catch__totals_8cpp_source}{catch\+\_\+totals.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ Totals\ \mbox{\hyperlink{jmp_8cpp_aca9876635a5afd01576dae38f10dc723}{diff}};}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{jmp_8cpp_aca9876635a5afd01576dae38f10dc723}{diff}}.assertions\ =\ \mbox{\hyperlink{struct_catch_1_1_totals_a885ded66df752147b30c3d45aa602ec9}{assertions}}\ -\/\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.assertions;}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{jmp_8cpp_aca9876635a5afd01576dae38f10dc723}{diff}}.testCases\ =\ \mbox{\hyperlink{struct_catch_1_1_totals_adb195fe477aedee2ecea88c888f16506}{testCases}}\ -\/\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.testCases;}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{jmp_8cpp_aca9876635a5afd01576dae38f10dc723}{diff}};}
+\DoxyCodeLine{00042\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=264pt]{struct_catch_1_1_totals_a9279ed39139cb7e7b291918a6d08290e_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_catch_1_1_totals_a9279ed39139cb7e7b291918a6d08290e}\index{Catch::Totals@{Catch::Totals}!operator-\/@{operator-\/}}
+\index{operator-\/@{operator-\/}!Catch::Totals@{Catch::Totals}}
+\doxysubsubsection{\texorpdfstring{operator-\/()}{operator-()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_totals_a9279ed39139cb7e7b291918a6d08290e} 
+\mbox{\hyperlink{struct_catch_1_1_totals}{Totals}} Catch\+::\+Totals\+::operator-\/ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_catch_1_1_totals}{Totals}} const \&}]{other}{}\end{DoxyParamCaption}) const}
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_catch_1_1_totals_a885ded66df752147b30c3d45aa602ec9}\index{Catch::Totals@{Catch::Totals}!assertions@{assertions}}
+\index{assertions@{assertions}!Catch::Totals@{Catch::Totals}}
+\doxysubsubsection{\texorpdfstring{assertions}{assertions}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_totals_a885ded66df752147b30c3d45aa602ec9} 
+\mbox{\hyperlink{struct_catch_1_1_counts}{Counts}} Catch\+::\+Totals\+::assertions}
+
+
+
+Definition at line \mbox{\hyperlink{catch__totals_8h_source_l00036}{36}} of file \mbox{\hyperlink{catch__totals_8h_source}{catch\+\_\+totals.\+h}}.
+
+\Hypertarget{struct_catch_1_1_totals_a6ea14c7de7ea735a14f172a26e08a239}\index{Catch::Totals@{Catch::Totals}!error@{error}}
+\index{error@{error}!Catch::Totals@{Catch::Totals}}
+\doxysubsubsection{\texorpdfstring{error}{error}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_totals_a6ea14c7de7ea735a14f172a26e08a239} 
+int Catch\+::\+Totals\+::error = 0}
+
+
+
+Definition at line \mbox{\hyperlink{catch__totals_8h_source_l00035}{35}} of file \mbox{\hyperlink{catch__totals_8h_source}{catch\+\_\+totals.\+h}}.
+
+\Hypertarget{struct_catch_1_1_totals_adb195fe477aedee2ecea88c888f16506}\index{Catch::Totals@{Catch::Totals}!testCases@{testCases}}
+\index{testCases@{testCases}!Catch::Totals@{Catch::Totals}}
+\doxysubsubsection{\texorpdfstring{testCases}{testCases}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_totals_adb195fe477aedee2ecea88c888f16506} 
+\mbox{\hyperlink{struct_catch_1_1_counts}{Counts}} Catch\+::\+Totals\+::test\+Cases}
+
+
+
+Definition at line \mbox{\hyperlink{catch__totals_8h_source_l00037}{37}} of file \mbox{\hyperlink{catch__totals_8h_source}{catch\+\_\+totals.\+h}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__totals_8h}{catch\+\_\+totals.\+h}}\item 
+libraries/sys-\/vm/external/\+Catch2/single\+\_\+include/catch2/\mbox{\hyperlink{single__include_2catch2_2catch_8hpp}{catch.\+hpp}}\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__totals_8cpp}{catch\+\_\+totals.\+cpp}}\end{DoxyCompactItemize}

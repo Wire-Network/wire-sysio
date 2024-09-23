@@ -1,0 +1,190 @@
+\doxysection{plugins/net\+\_\+api\+\_\+plugin/net\+\_\+api\+\_\+plugin.cpp File Reference}
+\hypertarget{net__api__plugin_8cpp}{}\label{net__api__plugin_8cpp}\index{plugins/net\_api\_plugin/net\_api\_plugin.cpp@{plugins/net\_api\_plugin/net\_api\_plugin.cpp}}
+{\ttfamily \#include $<$sysio/net\+\_\+api\+\_\+plugin/net\+\_\+api\+\_\+plugin.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/exceptions.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/transaction.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/variant.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/io/json.\+hpp$>$}\newline
+{\ttfamily \#include $<$chrono$>$}\newline
+Include dependency graph for net\+\_\+api\+\_\+plugin.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{net__api__plugin_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1detail_1_1net__api__plugin__empty}{sysio\+::detail\+::net\+\_\+api\+\_\+plugin\+\_\+empty}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1detail}{sysio\+::detail}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{net__api__plugin_8cpp_afb00f07822ae80766057c9439f2d8118}{CALL\+\_\+\+WITH\+\_\+400}}(api\+\_\+name,  api\+\_\+handle,  call\+\_\+name,  INVOKE,  http\+\_\+response\+\_\+code)
+\item 
+\#define \mbox{\hyperlink{net__api__plugin_8cpp_afab796843c5c67526de271f4207fcd37}{INVOKE\+\_\+\+R\+\_\+R}}(api\+\_\+handle,  call\+\_\+name,  in\+\_\+param)
+\item 
+\#define \mbox{\hyperlink{net__api__plugin_8cpp_a57be4224a1ade2bd8b3923d6a344d98b}{INVOKE\+\_\+\+R\+\_\+V}}(api\+\_\+handle,  call\+\_\+name)
+\item 
+\#define \mbox{\hyperlink{net__api__plugin_8cpp_a4dc31462f24aaa120af888e8e9358800}{INVOKE\+\_\+\+V\+\_\+R}}(api\+\_\+handle,  call\+\_\+name,  in\+\_\+param)
+\item 
+\#define \mbox{\hyperlink{net__api__plugin_8cpp_a54f8b56aff9e470dbebbddd544256b8f}{INVOKE\+\_\+\+V\+\_\+V}}(api\+\_\+handle,  call\+\_\+name)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{net__api__plugin_8cpp_a91df21b3a378f5cc9e2b6f8493a43b18}{FC\+\_\+\+REFLECT}} (\mbox{\hyperlink{structsysio_1_1detail_1_1net__api__plugin__empty}{sysio\+::detail\+::net\+\_\+api\+\_\+plugin\+\_\+empty}},)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{net__api__plugin_8cpp_afb00f07822ae80766057c9439f2d8118}\index{net\_api\_plugin.cpp@{net\_api\_plugin.cpp}!CALL\_WITH\_400@{CALL\_WITH\_400}}
+\index{CALL\_WITH\_400@{CALL\_WITH\_400}!net\_api\_plugin.cpp@{net\_api\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{CALL\_WITH\_400}{CALL\_WITH\_400}}
+{\footnotesize\ttfamily \label{net__api__plugin_8cpp_afb00f07822ae80766057c9439f2d8118} 
+\#define CALL\+\_\+\+WITH\+\_\+400(\begin{DoxyParamCaption}\item[{}]{api\+\_\+name}{, }\item[{}]{api\+\_\+handle}{, }\item[{}]{call\+\_\+name}{, }\item[{}]{INVOKE}{, }\item[{}]{http\+\_\+response\+\_\+code}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\{std::string(\textcolor{stringliteral}{"{}/v1/"{}}\ \#api\_name\ \textcolor{stringliteral}{"{}/"{}}\ \#call\_name),\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ [\&api\_handle](string,\ \textcolor{keywordtype}{string}\ body,\ url\_response\_callback\ cb)\ \textcolor{keyword}{mutable}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ INVOKE\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ cb(http\_response\_code,\ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}(result));\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ http\_plugin::handle\_exception(\#api\_name,\ \#call\_name,\ body,\ cb);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \}\}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{net__api__plugin_8cpp_source_l00022}{22}} of file \mbox{\hyperlink{net__api__plugin_8cpp_source}{net\+\_\+api\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#define\ CALL\_WITH\_400(api\_name,\ api\_handle,\ call\_name,\ INVOKE,\ http\_response\_code)\ \(\backslash\)}}
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\{std::string("{}/v1/"{}\ \#api\_name\ "{}/"{}\ \#call\_name),\ \(\backslash\)}}
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\ \ \ [\&api\_handle](string,\ string\ body,\ url\_response\_callback\ cb)\ mutable\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00025\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ try\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00026\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ INVOKE\ \(\backslash\)}}
+\DoxyCodeLine{00027\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ cb(http\_response\_code,\ fc::variant(result));\ \(\backslash\)}}
+\DoxyCodeLine{00028\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \}\ catch\ (...)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00029\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ http\_plugin::handle\_exception(\#api\_name,\ \#call\_name,\ body,\ cb);\ \(\backslash\)}}
+\DoxyCodeLine{00030\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00031\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \}\}}}
+
+\end{DoxyCode}
+\Hypertarget{net__api__plugin_8cpp_afab796843c5c67526de271f4207fcd37}\index{net\_api\_plugin.cpp@{net\_api\_plugin.cpp}!INVOKE\_R\_R@{INVOKE\_R\_R}}
+\index{INVOKE\_R\_R@{INVOKE\_R\_R}!net\_api\_plugin.cpp@{net\_api\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{INVOKE\_R\_R}{INVOKE\_R\_R}}
+{\footnotesize\ttfamily \label{net__api__plugin_8cpp_afab796843c5c67526de271f4207fcd37} 
+\#define INVOKE\+\_\+\+R\+\_\+R(\begin{DoxyParamCaption}\item[{}]{api\+\_\+handle}{, }\item[{}]{call\+\_\+name}{, }\item[{}]{in\+\_\+param}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}}\ =\ parse\_params<in\_param,\ http\_params\_types::params\_required>(body);\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}\ result(\ api\_handle.call\_name(\ std::move(\mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}})\ )\ );}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{net__api__plugin_8cpp_source_l00033}{33}} of file \mbox{\hyperlink{net__api__plugin_8cpp_source}{net\+\_\+api\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00033\ \textcolor{preprocessor}{\#define\ INVOKE\_R\_R(api\_handle,\ call\_name,\ in\_param)\ \(\backslash\)}}
+\DoxyCodeLine{00034\ \textcolor{preprocessor}{\ \ \ \ \ auto\ params\ =\ parse\_params<in\_param,\ http\_params\_types::params\_required>(body);\(\backslash\)}}
+\DoxyCodeLine{00035\ \textcolor{preprocessor}{\ \ \ \ \ fc::variant\ result(\ api\_handle.call\_name(\ std::move(params)\ )\ );}}
+
+\end{DoxyCode}
+\Hypertarget{net__api__plugin_8cpp_a57be4224a1ade2bd8b3923d6a344d98b}\index{net\_api\_plugin.cpp@{net\_api\_plugin.cpp}!INVOKE\_R\_V@{INVOKE\_R\_V}}
+\index{INVOKE\_R\_V@{INVOKE\_R\_V}!net\_api\_plugin.cpp@{net\_api\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{INVOKE\_R\_V}{INVOKE\_R\_V}}
+{\footnotesize\ttfamily \label{net__api__plugin_8cpp_a57be4224a1ade2bd8b3923d6a344d98b} 
+\#define INVOKE\+\_\+\+R\+\_\+V(\begin{DoxyParamCaption}\item[{}]{api\+\_\+handle}{, }\item[{}]{call\+\_\+name}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ body\ =\ parse\_params<std::string,\ http\_params\_types::no\_params>(body);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \textcolor{keyword}{auto}\ result\ =\ api\_handle.call\_name();}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{net__api__plugin_8cpp_source_l00037}{37}} of file \mbox{\hyperlink{net__api__plugin_8cpp_source}{net\+\_\+api\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00037\ \textcolor{preprocessor}{\#define\ INVOKE\_R\_V(api\_handle,\ call\_name)\ \(\backslash\)}}
+\DoxyCodeLine{00038\ \textcolor{preprocessor}{\ \ \ \ \ body\ =\ parse\_params<std::string,\ http\_params\_types::no\_params>(body);\ \(\backslash\)}}
+\DoxyCodeLine{00039\ \textcolor{preprocessor}{\ \ \ \ \ auto\ result\ =\ api\_handle.call\_name();}}
+
+\end{DoxyCode}
+\Hypertarget{net__api__plugin_8cpp_a4dc31462f24aaa120af888e8e9358800}\index{net\_api\_plugin.cpp@{net\_api\_plugin.cpp}!INVOKE\_V\_R@{INVOKE\_V\_R}}
+\index{INVOKE\_V\_R@{INVOKE\_V\_R}!net\_api\_plugin.cpp@{net\_api\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{INVOKE\_V\_R}{INVOKE\_V\_R}}
+{\footnotesize\ttfamily \label{net__api__plugin_8cpp_a4dc31462f24aaa120af888e8e9358800} 
+\#define INVOKE\+\_\+\+V\+\_\+R(\begin{DoxyParamCaption}\item[{}]{api\+\_\+handle}{, }\item[{}]{call\+\_\+name}{, }\item[{}]{in\+\_\+param}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}}\ =\ parse\_params<in\_param,\ http\_params\_types::params\_required>(body);\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ api\_handle.call\_name(\ std::move(\mbox{\hyperlink{test__account__query__db_8cpp_aedc91aab307c8fb7ad822c3e16a6dd73}{params}})\ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \mbox{\hyperlink{structsysio_1_1detail_1_1net__api__plugin__empty}{sysio::detail::net\_api\_plugin\_empty}}\ result;}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{net__api__plugin_8cpp_source_l00041}{41}} of file \mbox{\hyperlink{net__api__plugin_8cpp_source}{net\+\_\+api\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00041\ \textcolor{preprocessor}{\#define\ INVOKE\_V\_R(api\_handle,\ call\_name,\ in\_param)\ \(\backslash\)}}
+\DoxyCodeLine{00042\ \textcolor{preprocessor}{\ \ \ \ \ auto\ params\ =\ parse\_params<in\_param,\ http\_params\_types::params\_required>(body);\(\backslash\)}}
+\DoxyCodeLine{00043\ \textcolor{preprocessor}{\ \ \ \ \ api\_handle.call\_name(\ std::move(params)\ );\ \(\backslash\)}}
+\DoxyCodeLine{00044\ \textcolor{preprocessor}{\ \ \ \ \ sysio::detail::net\_api\_plugin\_empty\ result;}}
+
+\end{DoxyCode}
+\Hypertarget{net__api__plugin_8cpp_a54f8b56aff9e470dbebbddd544256b8f}\index{net\_api\_plugin.cpp@{net\_api\_plugin.cpp}!INVOKE\_V\_V@{INVOKE\_V\_V}}
+\index{INVOKE\_V\_V@{INVOKE\_V\_V}!net\_api\_plugin.cpp@{net\_api\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{INVOKE\_V\_V}{INVOKE\_V\_V}}
+{\footnotesize\ttfamily \label{net__api__plugin_8cpp_a54f8b56aff9e470dbebbddd544256b8f} 
+\#define INVOKE\+\_\+\+V\+\_\+V(\begin{DoxyParamCaption}\item[{}]{api\+\_\+handle}{, }\item[{}]{call\+\_\+name}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ body\ =\ parse\_params<std::string,\ http\_params\_types::no\_params\_required>(body);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ api\_handle.call\_name();\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \mbox{\hyperlink{structsysio_1_1detail_1_1net__api__plugin__empty}{sysio::detail::net\_api\_plugin\_empty}}\ result;}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{net__api__plugin_8cpp_source_l00046}{46}} of file \mbox{\hyperlink{net__api__plugin_8cpp_source}{net\+\_\+api\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00046\ \textcolor{preprocessor}{\#define\ INVOKE\_V\_V(api\_handle,\ call\_name)\ \(\backslash\)}}
+\DoxyCodeLine{00047\ \textcolor{preprocessor}{\ \ \ \ \ body\ =\ parse\_params<std::string,\ http\_params\_types::no\_params\_required>(body);\ \(\backslash\)}}
+\DoxyCodeLine{00048\ \textcolor{preprocessor}{\ \ \ \ \ api\_handle.call\_name();\ \(\backslash\)}}
+\DoxyCodeLine{00049\ \textcolor{preprocessor}{\ \ \ \ \ sysio::detail::net\_api\_plugin\_empty\ result;}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{net__api__plugin_8cpp_a91df21b3a378f5cc9e2b6f8493a43b18}\index{net\_api\_plugin.cpp@{net\_api\_plugin.cpp}!FC\_REFLECT@{FC\_REFLECT}}
+\index{FC\_REFLECT@{FC\_REFLECT}!net\_api\_plugin.cpp@{net\_api\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{FC\_REFLECT()}{FC\_REFLECT()}}
+{\footnotesize\ttfamily \label{net__api__plugin_8cpp_a91df21b3a378f5cc9e2b6f8493a43b18} 
+FC\+\_\+\+REFLECT (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1detail_1_1net__api__plugin__empty}{sysio\+::detail\+::net\+\_\+api\+\_\+plugin\+\_\+empty}}}]{}{}\end{DoxyParamCaption})}
+

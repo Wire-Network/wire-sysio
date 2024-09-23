@@ -1,0 +1,1184 @@
+\doxysection{sysio\+::chain\+::resource\+\_\+limits\+::resource\+\_\+limits\+\_\+manager Class Reference}
+\hypertarget{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager}{}\label{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager}\index{sysio::chain::resource\_limits::resource\_limits\_manager@{sysio::chain::resource\_limits::resource\_limits\_manager}}
+
+
+{\ttfamily \#include $<$resource\+\_\+limits.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_afc604267f64ffe0552e2c4b66db623a5}{resource\+\_\+limits\+\_\+manager}} (\mbox{\hyperlink{classchainbase_1_1database}{chainbase\+::database}} \&db, std\+::function$<$ \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler}{deep\+\_\+mind\+\_\+handler}} \texorpdfstring{$\ast$}{*}()$>$ get\+\_\+deep\+\_\+mind\+\_\+logger)
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_acc5c0d662f97873d93dadbf8b6451978}{add\+\_\+indices}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a1b9d0326965430166923c2241a3a6a45}{initialize\+\_\+database}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a7160417d30f5ef3a91467fefebf65dc6}{add\+\_\+to\+\_\+snapshot}} (const \mbox{\hyperlink{namespacesysio_1_1chain_a80afaa06d96e661a0f93e0ba4b09c8dc}{snapshot\+\_\+writer\+\_\+ptr}} \&snapshot) const
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a32baa74135a1423302de3a849dc8b40c}{read\+\_\+from\+\_\+snapshot}} (const \mbox{\hyperlink{namespacesysio_1_1chain_aaa27dacddc54cea475602788c8e7a02c}{snapshot\+\_\+reader\+\_\+ptr}} \&snapshot)
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a30cd4db6f08948e05aba424431ec0605}{initialize\+\_\+account}} (const \mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} \&account)
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a4396d0acb70ebbd8054b13ff4c564e20}{set\+\_\+block\+\_\+parameters}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1elastic__limit__parameters}{elastic\+\_\+limit\+\_\+parameters}} \&cpu\+\_\+limit\+\_\+parameters, const \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1elastic__limit__parameters}{elastic\+\_\+limit\+\_\+parameters}} \&net\+\_\+limit\+\_\+parameters)
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_aaa7345adbf341592a81c087c50655597}{update\+\_\+account\+\_\+usage}} (const flat\+\_\+set$<$ \mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} $>$ \&accounts, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} ordinal)
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_ae6e413bd0a6e43b36deff7aacdd0bfd6}{add\+\_\+transaction\+\_\+usage}} (const flat\+\_\+set$<$ \mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} $>$ \&accounts, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} cpu\+\_\+usage, \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} net\+\_\+usage, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} ordinal)
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a7fea1de6a3806590de0bda86e53c7995}{add\+\_\+pending\+\_\+ram\+\_\+usage}} (const \mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} account, \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} ram\+\_\+delta)
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_af72734af83f353fae77fbf837776db10}{verify\+\_\+account\+\_\+ram\+\_\+usage}} (const \mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} accunt) const
+\item 
+bool \mbox{\hyperlink{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a3455e73574b3df18ee52bfc075a3a208}{set\+\_\+account\+\_\+limits}} (const \mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} \&account, \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} ram\+\_\+bytes, \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} net\+\_\+weight, \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} cpu\+\_\+weight)
+\begin{DoxyCompactList}\small\item\em set\+\_\+account\+\_\+limits returns true if new ram\+\_\+bytes limit is more restrictive than the previously set one \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a140981c195e4e0c5788f0aa6383c2697}{get\+\_\+account\+\_\+limits}} (const \mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} \&account, \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \&ram\+\_\+bytes, \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \&net\+\_\+weight, \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \&cpu\+\_\+weight) const
+\item 
+bool \mbox{\hyperlink{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a0c71ab0bbfd401a4886d11f4756d5fc1}{is\+\_\+unlimited\+\_\+cpu}} (const \mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} \&account) const
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a983919d376e5757bceee573e52b3c571}{process\+\_\+account\+\_\+limit\+\_\+updates}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a5ebf5f04366d7120f58430d9ba4f8c7a}{process\+\_\+block\+\_\+usage}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} block\+\_\+num)
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a1fcebec58c85ac219bba44a3139a22d5}{get\+\_\+total\+\_\+cpu\+\_\+weight}} () const
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_af9c0bd8105ce922baaa87a06560bb1ad}{get\+\_\+total\+\_\+net\+\_\+weight}} () const
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a11a6138d48057c1992128575ec0d2c99}{get\+\_\+virtual\+\_\+block\+\_\+cpu\+\_\+limit}} () const
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_af1cdd5c700248d54dc20be704662534d}{get\+\_\+virtual\+\_\+block\+\_\+net\+\_\+limit}} () const
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a59c1ce742daefcf8e370e844ed49f955}{get\+\_\+block\+\_\+cpu\+\_\+limit}} () const
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a2a7986ffd86acb7135b07d3b35d767fd}{get\+\_\+block\+\_\+net\+\_\+limit}} () const
+\item 
+std\+::pair$<$ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}, bool $>$ \mbox{\hyperlink{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a43b17296f9507b5d046c5bf57568d8b2}{get\+\_\+account\+\_\+cpu\+\_\+limit}} (const \mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} \&\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} greylist\+\_\+limit=config\+::maximum\+\_\+elastic\+\_\+resource\+\_\+multiplier) const
+\item 
+std\+::pair$<$ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}, bool $>$ \mbox{\hyperlink{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a6ee64e0876365e3c6e2aeec83591a9ef}{get\+\_\+account\+\_\+net\+\_\+limit}} (const \mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} \&\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} greylist\+\_\+limit=config\+::maximum\+\_\+elastic\+\_\+resource\+\_\+multiplier) const
+\item 
+std\+::pair$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1account__resource__limit}{account\+\_\+resource\+\_\+limit}}, bool $>$ \mbox{\hyperlink{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a2dc85a639cfd3a5e0238142d3ed3c53f}{get\+\_\+account\+\_\+cpu\+\_\+limit\+\_\+ex}} (const \mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} \&\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} greylist\+\_\+limit=config\+::maximum\+\_\+elastic\+\_\+resource\+\_\+multiplier) const
+\item 
+std\+::pair$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1account__resource__limit}{account\+\_\+resource\+\_\+limit}}, bool $>$ \mbox{\hyperlink{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_afa522b2321b49a3f55beba024129e000}{get\+\_\+account\+\_\+net\+\_\+limit\+\_\+ex}} (const \mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} \&\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} greylist\+\_\+limit=config\+::maximum\+\_\+elastic\+\_\+resource\+\_\+multiplier) const
+\item 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \mbox{\hyperlink{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_ae7d1b3c435910424a1142b052a8774be}{get\+\_\+account\+\_\+ram\+\_\+usage}} (const \mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} \&\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}) const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{resource__limits_8hpp_source_l00061}{61}} of file \mbox{\hyperlink{resource__limits_8hpp_source}{resource\+\_\+limits.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_afc604267f64ffe0552e2c4b66db623a5}\index{sysio::chain::resource\_limits::resource\_limits\_manager@{sysio::chain::resource\_limits::resource\_limits\_manager}!resource\_limits\_manager@{resource\_limits\_manager}}
+\index{resource\_limits\_manager@{resource\_limits\_manager}!sysio::chain::resource\_limits::resource\_limits\_manager@{sysio::chain::resource\_limits::resource\_limits\_manager}}
+\doxysubsubsection{\texorpdfstring{resource\_limits\_manager()}{resource\_limits\_manager()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_afc604267f64ffe0552e2c4b66db623a5} 
+sysio\+::chain\+::resource\+\_\+limits\+::resource\+\_\+limits\+\_\+manager\+::resource\+\_\+limits\+\_\+manager (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classchainbase_1_1database}{chainbase\+::database}} \&}]{db}{, }\item[{std\+::function$<$ \mbox{\hyperlink{classsysio_1_1chain_1_1deep__mind__handler}{deep\+\_\+mind\+\_\+handler}} \texorpdfstring{$\ast$}{*}()$>$}]{get\+\_\+deep\+\_\+mind\+\_\+logger}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{resource__limits_8hpp_source_l00064}{64}} of file \mbox{\hyperlink{resource__limits_8hpp_source}{resource\+\_\+limits.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ :\_db(db),\_get\_deep\_mind\_logger(get\_deep\_mind\_logger)}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_acc5c0d662f97873d93dadbf8b6451978}\index{sysio::chain::resource\_limits::resource\_limits\_manager@{sysio::chain::resource\_limits::resource\_limits\_manager}!add\_indices@{add\_indices}}
+\index{add\_indices@{add\_indices}!sysio::chain::resource\_limits::resource\_limits\_manager@{sysio::chain::resource\_limits::resource\_limits\_manager}}
+\doxysubsubsection{\texorpdfstring{add\_indices()}{add\_indices()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_acc5c0d662f97873d93dadbf8b6451978} 
+void sysio\+::chain\+::resource\+\_\+limits\+::resource\+\_\+limits\+\_\+manager\+::add\+\_\+indices (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{resource__limits_8cpp_source_l00051}{51}} of file \mbox{\hyperlink{resource__limits_8cpp_source}{resource\+\_\+limits.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00052\ \ \ \ resource\_index\_set::add\_indices(\_db);}
+\DoxyCodeLine{00053\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=347pt]{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_acc5c0d662f97873d93dadbf8b6451978_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a7fea1de6a3806590de0bda86e53c7995}\index{sysio::chain::resource\_limits::resource\_limits\_manager@{sysio::chain::resource\_limits::resource\_limits\_manager}!add\_pending\_ram\_usage@{add\_pending\_ram\_usage}}
+\index{add\_pending\_ram\_usage@{add\_pending\_ram\_usage}!sysio::chain::resource\_limits::resource\_limits\_manager@{sysio::chain::resource\_limits::resource\_limits\_manager}}
+\doxysubsubsection{\texorpdfstring{add\_pending\_ram\_usage()}{add\_pending\_ram\_usage()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a7fea1de6a3806590de0bda86e53c7995} 
+void sysio\+::chain\+::resource\+\_\+limits\+::resource\+\_\+limits\+\_\+manager\+::add\+\_\+pending\+\_\+ram\+\_\+usage (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}}}]{account}{, }\item[{\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}}]{ram\+\_\+delta}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{resource__limits_8cpp_source_l00206}{206}} of file \mbox{\hyperlink{resource__limits_8cpp_source}{resource\+\_\+limits.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00207\ \ \ \ \textcolor{keywordflow}{if}\ (ram\_delta\ ==\ 0)\ \{}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00209\ \ \ \ \}}
+\DoxyCodeLine{00210\ }
+\DoxyCodeLine{00211\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ usage\ \ =\ \_db.\mbox{\hyperlink{classchainbase_1_1database_afcfe00f81a526c1376d4f51197dd3a9a}{get}}<resource\_usage\_object,by\_owner>(\ account\ );}
+\DoxyCodeLine{00212\ }
+\DoxyCodeLine{00213\ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ ram\_delta\ <=\ 0\ ||\ UINT64\_MAX\ -\/\ usage.ram\_usage\ >=\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})ram\_delta,\ \mbox{\hyperlink{namespacesysio_1_1chain_a5dfe17906469eaf079c180c1afb4ad94}{transaction\_exception}},}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Ram\ usage\ delta\ would\ overflow\ UINT64\_MAX"{}});}
+\DoxyCodeLine{00215\ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(ram\_delta\ >=\ 0\ ||\ usage.ram\_usage\ >=\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})(-\/ram\_delta),\ \mbox{\hyperlink{namespacesysio_1_1chain_a5dfe17906469eaf079c180c1afb4ad94}{transaction\_exception}},}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Ram\ usage\ delta\ would\ underflow\ UINT64\_MAX"{}});}
+\DoxyCodeLine{00217\ }
+\DoxyCodeLine{00218\ \ \ \ \_db.\mbox{\hyperlink{classchainbase_1_1database_a9ebc006075e8fc2e84357a0e068b58d4}{modify}}(\ usage,\ [\&](\ \textcolor{keyword}{auto}\&\ u\ )\ \{}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ u.ram\_usage\ +=\ ram\_delta;}
+\DoxyCodeLine{00220\ }
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{auto}\ dm\_logger\ =\ \_get\_deep\_mind\_logger())\ \{}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \ \ \ dm\_logger-\/>on\_ram\_event(account,\ u.ram\_usage,\ ram\_delta);}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00224\ \ \ \ \});}
+\DoxyCodeLine{00225\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a7fea1de6a3806590de0bda86e53c7995_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a7fea1de6a3806590de0bda86e53c7995_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a7160417d30f5ef3a91467fefebf65dc6}\index{sysio::chain::resource\_limits::resource\_limits\_manager@{sysio::chain::resource\_limits::resource\_limits\_manager}!add\_to\_snapshot@{add\_to\_snapshot}}
+\index{add\_to\_snapshot@{add\_to\_snapshot}!sysio::chain::resource\_limits::resource\_limits\_manager@{sysio::chain::resource\_limits::resource\_limits\_manager}}
+\doxysubsubsection{\texorpdfstring{add\_to\_snapshot()}{add\_to\_snapshot()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a7160417d30f5ef3a91467fefebf65dc6} 
+void sysio\+::chain\+::resource\+\_\+limits\+::resource\+\_\+limits\+\_\+manager\+::add\+\_\+to\+\_\+snapshot (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_a80afaa06d96e661a0f93e0ba4b09c8dc}{snapshot\+\_\+writer\+\_\+ptr}} \&}]{snapshot}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{resource__limits_8cpp_source_l00073}{73}} of file \mbox{\hyperlink{resource__limits_8cpp_source}{resource\+\_\+limits.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00074\ \ \ \ resource\_index\_set::walk\_indices([\textcolor{keyword}{this},\ \&snapshot](\ \textcolor{keyword}{auto}\ utils\ )\{}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ snapshot-\/>write\_section<\textcolor{keyword}{typename}\ \textcolor{keyword}{decltype}(utils)::index\_t::value\_type>([\textcolor{keyword}{this}](\ \textcolor{keyword}{auto}\&\ section\ )\{}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{decltype}(utils)::walk(\_db,\ [\textcolor{keyword}{this},\ \&section](\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ \&row\ )\ \{}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ \ \ \ section.add\_row(row,\ \_db);}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00080\ \ \ \ \});}
+\DoxyCodeLine{00081\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a7160417d30f5ef3a91467fefebf65dc6_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_ae6e413bd0a6e43b36deff7aacdd0bfd6}\index{sysio::chain::resource\_limits::resource\_limits\_manager@{sysio::chain::resource\_limits::resource\_limits\_manager}!add\_transaction\_usage@{add\_transaction\_usage}}
+\index{add\_transaction\_usage@{add\_transaction\_usage}!sysio::chain::resource\_limits::resource\_limits\_manager@{sysio::chain::resource\_limits::resource\_limits\_manager}}
+\doxysubsubsection{\texorpdfstring{add\_transaction\_usage()}{add\_transaction\_usage()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_ae6e413bd0a6e43b36deff7aacdd0bfd6} 
+void sysio\+::chain\+::resource\+\_\+limits\+::resource\+\_\+limits\+\_\+manager\+::add\+\_\+transaction\+\_\+usage (\begin{DoxyParamCaption}\item[{const flat\+\_\+set$<$ \mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} $>$ \&}]{accounts}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{cpu\+\_\+usage}{, }\item[{\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}}}]{net\+\_\+usage}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{ordinal}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{resource__limits_8cpp_source_l00136}{136}} of file \mbox{\hyperlink{resource__limits_8cpp_source}{resource\+\_\+limits.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00137\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{structstate}{state}}\ =\ \_db.\mbox{\hyperlink{classchainbase_1_1database_afcfe00f81a526c1376d4f51197dd3a9a}{get}}<resource\_limits\_state\_object>();}
+\DoxyCodeLine{00138\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{classconfig}{config}}\ =\ \_db.\mbox{\hyperlink{classchainbase_1_1database_afcfe00f81a526c1376d4f51197dd3a9a}{get}}<resource\_limits\_config\_object>();}
+\DoxyCodeLine{00139\ }
+\DoxyCodeLine{00140\ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ :\ accounts\ )\ \{}
+\DoxyCodeLine{00141\ }
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ usage\ =\ \_db.\mbox{\hyperlink{classchainbase_1_1database_afcfe00f81a526c1376d4f51197dd3a9a}{get}}<resource\_usage\_object,by\_owner>(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ );}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ unused;}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ net\_weight;}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ cpu\_weight;}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a140981c195e4e0c5788f0aa6383c2697}{get\_account\_limits}}(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ unused,\ net\_weight,\ cpu\_weight\ );}
+\DoxyCodeLine{00147\ }
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \_db.\mbox{\hyperlink{classchainbase_1_1database_a9ebc006075e8fc2e84357a0e068b58d4}{modify}}(\ usage,\ [\&](\ \textcolor{keyword}{auto}\&\ bu\ )\{}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \ \ bu.net\_usage.add(\ net\_usage,\ time\_slot,\ \mbox{\hyperlink{classconfig}{config}}.account\_net\_usage\_average\_window\ );}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \ \ bu.cpu\_usage.add(\ cpu\_usage,\ time\_slot,\ \mbox{\hyperlink{classconfig}{config}}.account\_cpu\_usage\_average\_window\ );}
+\DoxyCodeLine{00151\ }
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{auto}\ dm\_logger\ =\ \_get\_deep\_mind\_logger())\ \{}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \ \ \ \ dm\_logger-\/>on\_update\_account\_usage(bu);}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00156\ }
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ cpu\_weight\ >=\ 0\ \&\&\ \mbox{\hyperlink{structstate}{state}}.total\_cpu\_weight\ >\ 0\ )\ \{}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_a896515137d9a7844105786ee3a6b1d47}{uint128\_t}}\ window\_size\ =\ \mbox{\hyperlink{classconfig}{config}}.account\_cpu\_usage\_average\_window;}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ virtual\_network\_capacity\_in\_window\ =\ (\mbox{\hyperlink{namespacesysio_1_1chain_a896515137d9a7844105786ee3a6b1d47}{uint128\_t}})\mbox{\hyperlink{structstate}{state}}.virtual\_cpu\_limit\ *\ window\_size;}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ cpu\_used\_in\_window\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ ((\mbox{\hyperlink{namespacesysio_1_1chain_a896515137d9a7844105786ee3a6b1d47}{uint128\_t}})usage.cpu\_usage.value\_ex\ *\ window\_size)\ /\ (\mbox{\hyperlink{namespacesysio_1_1chain_a896515137d9a7844105786ee3a6b1d47}{uint128\_t}})config::rate\_limiting\_precision;}
+\DoxyCodeLine{00161\ }
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_a896515137d9a7844105786ee3a6b1d47}{uint128\_t}}\ user\_weight\ \ \ \ \ =\ (\mbox{\hyperlink{namespacesysio_1_1chain_a896515137d9a7844105786ee3a6b1d47}{uint128\_t}})cpu\_weight;}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_a896515137d9a7844105786ee3a6b1d47}{uint128\_t}}\ all\_user\_weight\ =\ \mbox{\hyperlink{structstate}{state}}.total\_cpu\_weight;}
+\DoxyCodeLine{00164\ }
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ max\_user\_use\_in\_window\ =\ (virtual\_network\_capacity\_in\_window\ *\ user\_weight)\ /\ all\_user\_weight;}
+\DoxyCodeLine{00166\ }
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ cpu\_used\_in\_window\ <=\ max\_user\_use\_in\_window,}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ tx\_cpu\_usage\_exceeded,}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}authorizing\ account\ '\$\{n\}'\ has\ insufficient\ cpu\ resources\ for\ this\ transaction"{}},}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}n"{}},\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}))}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}cpu\_used\_in\_window"{}},cpu\_used\_in\_window)}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}max\_user\_use\_in\_window"{}},max\_user\_use\_in\_window)\ );}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00174\ }
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ net\_weight\ >=\ 0\ \&\&\ \mbox{\hyperlink{structstate}{state}}.total\_net\_weight\ >\ 0)\ \{}
+\DoxyCodeLine{00176\ }
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_a896515137d9a7844105786ee3a6b1d47}{uint128\_t}}\ window\_size\ =\ \mbox{\hyperlink{classconfig}{config}}.account\_net\_usage\_average\_window;}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ virtual\_network\_capacity\_in\_window\ =\ (\mbox{\hyperlink{namespacesysio_1_1chain_a896515137d9a7844105786ee3a6b1d47}{uint128\_t}})\mbox{\hyperlink{structstate}{state}}.virtual\_net\_limit\ *\ window\_size;}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ net\_used\_in\_window\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ ((\mbox{\hyperlink{namespacesysio_1_1chain_a896515137d9a7844105786ee3a6b1d47}{uint128\_t}})usage.net\_usage.value\_ex\ *\ window\_size)\ /\ (\mbox{\hyperlink{namespacesysio_1_1chain_a896515137d9a7844105786ee3a6b1d47}{uint128\_t}})config::rate\_limiting\_precision;}
+\DoxyCodeLine{00180\ }
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_a896515137d9a7844105786ee3a6b1d47}{uint128\_t}}\ user\_weight\ \ \ \ \ =\ (\mbox{\hyperlink{namespacesysio_1_1chain_a896515137d9a7844105786ee3a6b1d47}{uint128\_t}})net\_weight;}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_a896515137d9a7844105786ee3a6b1d47}{uint128\_t}}\ all\_user\_weight\ =\ \mbox{\hyperlink{structstate}{state}}.total\_net\_weight;}
+\DoxyCodeLine{00183\ }
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ max\_user\_use\_in\_window\ =\ (virtual\_network\_capacity\_in\_window\ *\ user\_weight)\ /\ all\_user\_weight;}
+\DoxyCodeLine{00185\ }
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ net\_used\_in\_window\ <=\ max\_user\_use\_in\_window,}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ tx\_net\_usage\_exceeded,}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}authorizing\ account\ '\$\{n\}'\ has\ insufficient\ net\ resources\ for\ this\ transaction"{}},}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}n"{}},\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}))}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}net\_used\_in\_window"{}},net\_used\_in\_window)}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}max\_user\_use\_in\_window"{}},max\_user\_use\_in\_window)\ );}
+\DoxyCodeLine{00192\ }
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00194\ \ \ \ \}}
+\DoxyCodeLine{00195\ }
+\DoxyCodeLine{00196\ \ \ \ \textcolor{comment}{//\ account\ for\ this\ transaction\ in\ the\ block\ and\ do\ not\ exceed\ those\ limits\ either}}
+\DoxyCodeLine{00197\ \ \ \ \_db.\mbox{\hyperlink{classchainbase_1_1database_a9ebc006075e8fc2e84357a0e068b58d4}{modify}}(\mbox{\hyperlink{structstate}{state}},\ [\&](resource\_limits\_state\_object\&\ rls)\{}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ rls.pending\_cpu\_usage\ +=\ cpu\_usage;}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ rls.pending\_net\_usage\ +=\ net\_usage;}
+\DoxyCodeLine{00200\ \ \ \ \});}
+\DoxyCodeLine{00201\ }
+\DoxyCodeLine{00202\ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ \mbox{\hyperlink{structstate}{state}}.pending\_cpu\_usage\ <=\ \mbox{\hyperlink{classconfig}{config}}.cpu\_limit\_parameters.max,\ block\_resource\_exhausted,\ \textcolor{stringliteral}{"{}Block\ has\ insufficient\ cpu\ resources"{}}\ );}
+\DoxyCodeLine{00203\ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ \mbox{\hyperlink{structstate}{state}}.pending\_net\_usage\ <=\ \mbox{\hyperlink{classconfig}{config}}.net\_limit\_parameters.max,\ block\_resource\_exhausted,\ \textcolor{stringliteral}{"{}Block\ has\ insufficient\ net\ resources"{}}\ );}
+\DoxyCodeLine{00204\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_ae6e413bd0a6e43b36deff7aacdd0bfd6_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_ae6e413bd0a6e43b36deff7aacdd0bfd6_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a43b17296f9507b5d046c5bf57568d8b2}\index{sysio::chain::resource\_limits::resource\_limits\_manager@{sysio::chain::resource\_limits::resource\_limits\_manager}!get\_account\_cpu\_limit@{get\_account\_cpu\_limit}}
+\index{get\_account\_cpu\_limit@{get\_account\_cpu\_limit}!sysio::chain::resource\_limits::resource\_limits\_manager@{sysio::chain::resource\_limits::resource\_limits\_manager}}
+\doxysubsubsection{\texorpdfstring{get\_account\_cpu\_limit()}{get\_account\_cpu\_limit()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a43b17296f9507b5d046c5bf57568d8b2} 
+std\+::pair$<$ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}, bool $>$ sysio\+::chain\+::resource\+\_\+limits\+::resource\+\_\+limits\+\_\+manager\+::get\+\_\+account\+\_\+cpu\+\_\+limit (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} \&}]{name}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{greylist\+\_\+limit}{ = {\ttfamily config\+:\+:maximum\+\_\+elastic\+\_\+resource\+\_\+multiplier}}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{resource__limits_8cpp_source_l00416}{416}} of file \mbox{\hyperlink{resource__limits_8cpp_source}{resource\+\_\+limits.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00416\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00417\ \ \ \ \textcolor{keyword}{auto}\ [arl,\ greylisted]\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a2dc85a639cfd3a5e0238142d3ed3c53f}{get\_account\_cpu\_limit\_ex}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ greylist\_limit);}
+\DoxyCodeLine{00418\ \ \ \ \textcolor{keywordflow}{return}\ \{arl.available,\ greylisted\};}
+\DoxyCodeLine{00419\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a43b17296f9507b5d046c5bf57568d8b2_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a2dc85a639cfd3a5e0238142d3ed3c53f}\index{sysio::chain::resource\_limits::resource\_limits\_manager@{sysio::chain::resource\_limits::resource\_limits\_manager}!get\_account\_cpu\_limit\_ex@{get\_account\_cpu\_limit\_ex}}
+\index{get\_account\_cpu\_limit\_ex@{get\_account\_cpu\_limit\_ex}!sysio::chain::resource\_limits::resource\_limits\_manager@{sysio::chain::resource\_limits::resource\_limits\_manager}}
+\doxysubsubsection{\texorpdfstring{get\_account\_cpu\_limit\_ex()}{get\_account\_cpu\_limit\_ex()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a2dc85a639cfd3a5e0238142d3ed3c53f} 
+std\+::pair$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1account__resource__limit}{account\+\_\+resource\+\_\+limit}}, bool $>$ sysio\+::chain\+::resource\+\_\+limits\+::resource\+\_\+limits\+\_\+manager\+::get\+\_\+account\+\_\+cpu\+\_\+limit\+\_\+ex (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} \&}]{name}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{greylist\+\_\+limit}{ = {\ttfamily config\+:\+:maximum\+\_\+elastic\+\_\+resource\+\_\+multiplier}}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{resource__limits_8cpp_source_l00421}{421}} of file \mbox{\hyperlink{resource__limits_8cpp_source}{resource\+\_\+limits.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00421\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00422\ }
+\DoxyCodeLine{00423\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{structstate}{state}}\ =\ \_db.\mbox{\hyperlink{classchainbase_1_1database_afcfe00f81a526c1376d4f51197dd3a9a}{get}}<resource\_limits\_state\_object>();}
+\DoxyCodeLine{00424\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ usage\ =\ \_db.\mbox{\hyperlink{classchainbase_1_1database_afcfe00f81a526c1376d4f51197dd3a9a}{get}}<resource\_usage\_object,\ by\_owner>(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}});}
+\DoxyCodeLine{00425\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{classconfig}{config}}\ =\ \_db.\mbox{\hyperlink{classchainbase_1_1database_afcfe00f81a526c1376d4f51197dd3a9a}{get}}<resource\_limits\_config\_object>();}
+\DoxyCodeLine{00426\ }
+\DoxyCodeLine{00427\ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ cpu\_weight,\ x,\ \mbox{\hyperlink{namespacefc_ab199a7c94624123911206db59ebe45da}{y}};}
+\DoxyCodeLine{00428\ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a140981c195e4e0c5788f0aa6383c2697}{get\_account\_limits}}(\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ x,\ \mbox{\hyperlink{namespacefc_ab199a7c94624123911206db59ebe45da}{y}},\ cpu\_weight\ );}
+\DoxyCodeLine{00429\ }
+\DoxyCodeLine{00430\ \ \ \ \textcolor{keywordflow}{if}(\ cpu\_weight\ <\ 0\ ||\ \mbox{\hyperlink{structstate}{state}}.total\_cpu\_weight\ ==\ 0\ )\ \{}
+\DoxyCodeLine{00431\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{\{\ -\/1,\ -\/1,\ -\/1\ \},\ \textcolor{keyword}{false}\};}
+\DoxyCodeLine{00432\ \ \ \ \}}
+\DoxyCodeLine{00433\ }
+\DoxyCodeLine{00434\ \ \ \ account\_resource\_limit\ arl;}
+\DoxyCodeLine{00435\ }
+\DoxyCodeLine{00436\ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_a896515137d9a7844105786ee3a6b1d47}{uint128\_t}}\ window\_size\ =\ \mbox{\hyperlink{classconfig}{config}}.account\_cpu\_usage\_average\_window;}
+\DoxyCodeLine{00437\ }
+\DoxyCodeLine{00438\ \ \ \ \textcolor{keywordtype}{bool}\ greylisted\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00439\ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_a896515137d9a7844105786ee3a6b1d47}{uint128\_t}}\ virtual\_cpu\_capacity\_in\_window\ =\ window\_size;}
+\DoxyCodeLine{00440\ \ \ \ \textcolor{keywordflow}{if}(\ greylist\_limit\ <\ config::maximum\_elastic\_resource\_multiplier\ )\ \{}
+\DoxyCodeLine{00441\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ greylisted\_virtual\_cpu\_limit\ =\ \mbox{\hyperlink{classconfig}{config}}.cpu\_limit\_parameters.max\ *\ greylist\_limit;}
+\DoxyCodeLine{00442\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ greylisted\_virtual\_cpu\_limit\ <\ \mbox{\hyperlink{structstate}{state}}.virtual\_cpu\_limit\ )\ \{}
+\DoxyCodeLine{00443\ \ \ \ \ \ \ \ \ \ virtual\_cpu\_capacity\_in\_window\ *=\ greylisted\_virtual\_cpu\_limit;}
+\DoxyCodeLine{00444\ \ \ \ \ \ \ \ \ \ greylisted\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00445\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00446\ \ \ \ \ \ \ \ \ \ virtual\_cpu\_capacity\_in\_window\ *=\ \mbox{\hyperlink{structstate}{state}}.virtual\_cpu\_limit;}
+\DoxyCodeLine{00447\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00448\ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00449\ \ \ \ \ \ \ virtual\_cpu\_capacity\_in\_window\ *=\ \mbox{\hyperlink{structstate}{state}}.virtual\_cpu\_limit;}
+\DoxyCodeLine{00450\ \ \ \ \}}
+\DoxyCodeLine{00451\ }
+\DoxyCodeLine{00452\ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_a896515137d9a7844105786ee3a6b1d47}{uint128\_t}}\ user\_weight\ \ \ \ \ =\ (\mbox{\hyperlink{namespacesysio_1_1chain_a896515137d9a7844105786ee3a6b1d47}{uint128\_t}})cpu\_weight;}
+\DoxyCodeLine{00453\ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_a896515137d9a7844105786ee3a6b1d47}{uint128\_t}}\ all\_user\_weight\ =\ (\mbox{\hyperlink{namespacesysio_1_1chain_a896515137d9a7844105786ee3a6b1d47}{uint128\_t}})\mbox{\hyperlink{structstate}{state}}.total\_cpu\_weight;}
+\DoxyCodeLine{00454\ }
+\DoxyCodeLine{00455\ \ \ \ \textcolor{keyword}{auto}\ max\_user\_use\_in\_window\ =\ (virtual\_cpu\_capacity\_in\_window\ *\ user\_weight)\ /\ all\_user\_weight;}
+\DoxyCodeLine{00456\ \ \ \ \textcolor{keyword}{auto}\ cpu\_used\_in\_window\ \ =\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1resource__limits_1_1impl_a27299c32ef2c573ed173bd68edd2cd21}{impl::integer\_divide\_ceil}}((\mbox{\hyperlink{namespacesysio_1_1chain_a896515137d9a7844105786ee3a6b1d47}{uint128\_t}})usage.cpu\_usage.value\_ex\ *\ window\_size,\ (\mbox{\hyperlink{namespacesysio_1_1chain_a896515137d9a7844105786ee3a6b1d47}{uint128\_t}})config::rate\_limiting\_precision);}
+\DoxyCodeLine{00457\ }
+\DoxyCodeLine{00458\ \ \ \ \textcolor{keywordflow}{if}(\ max\_user\_use\_in\_window\ <=\ cpu\_used\_in\_window\ )}
+\DoxyCodeLine{00459\ \ \ \ \ \ \ arl.available\ =\ 0;}
+\DoxyCodeLine{00460\ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00461\ \ \ \ \ \ \ arl.available\ =\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1resource__limits_1_1impl_ad13603146ccf93edbdb851067320dd6e}{impl::downgrade\_cast<int64\_t>}}(max\_user\_use\_in\_window\ -\/\ cpu\_used\_in\_window);}
+\DoxyCodeLine{00462\ }
+\DoxyCodeLine{00463\ \ \ \ arl.used\ =\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1resource__limits_1_1impl_ad13603146ccf93edbdb851067320dd6e}{impl::downgrade\_cast<int64\_t>}}(cpu\_used\_in\_window);}
+\DoxyCodeLine{00464\ \ \ \ arl.max\ =\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1resource__limits_1_1impl_ad13603146ccf93edbdb851067320dd6e}{impl::downgrade\_cast<int64\_t>}}(max\_user\_use\_in\_window);}
+\DoxyCodeLine{00465\ \ \ \ \textcolor{keywordflow}{return}\ \{arl,\ greylisted\};}
+\DoxyCodeLine{00466\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a2dc85a639cfd3a5e0238142d3ed3c53f_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a2dc85a639cfd3a5e0238142d3ed3c53f_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a140981c195e4e0c5788f0aa6383c2697}\index{sysio::chain::resource\_limits::resource\_limits\_manager@{sysio::chain::resource\_limits::resource\_limits\_manager}!get\_account\_limits@{get\_account\_limits}}
+\index{get\_account\_limits@{get\_account\_limits}!sysio::chain::resource\_limits::resource\_limits\_manager@{sysio::chain::resource\_limits::resource\_limits\_manager}}
+\doxysubsubsection{\texorpdfstring{get\_account\_limits()}{get\_account\_limits()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a140981c195e4e0c5788f0aa6383c2697} 
+void sysio\+::chain\+::resource\+\_\+limits\+::resource\+\_\+limits\+\_\+manager\+::get\+\_\+account\+\_\+limits (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} \&}]{account}{, }\item[{\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \&}]{ram\+\_\+bytes}{, }\item[{\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \&}]{net\+\_\+weight}{, }\item[{\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \&}]{cpu\+\_\+weight}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{resource__limits_8cpp_source_l00298}{298}} of file \mbox{\hyperlink{resource__limits_8cpp_source}{resource\+\_\+limits.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00298\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00299\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}*\ pending\_buo\ =\ \_db.\mbox{\hyperlink{classchainbase_1_1database_aa5a2ca0da0092693ac49b36b7ec6817a}{find}}<resource\_limits\_object,by\_owner>(\ boost::make\_tuple(\textcolor{keyword}{true},\ account)\ );}
+\DoxyCodeLine{00300\ \ \ \ \textcolor{keywordflow}{if}\ (pending\_buo)\ \{}
+\DoxyCodeLine{00301\ \ \ \ \ \ \ ram\_bytes\ \ =\ pending\_buo-\/>ram\_bytes;}
+\DoxyCodeLine{00302\ \ \ \ \ \ \ net\_weight\ =\ pending\_buo-\/>net\_weight;}
+\DoxyCodeLine{00303\ \ \ \ \ \ \ cpu\_weight\ =\ pending\_buo-\/>cpu\_weight;}
+\DoxyCodeLine{00304\ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00305\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ buo\ =\ \_db.\mbox{\hyperlink{classchainbase_1_1database_afcfe00f81a526c1376d4f51197dd3a9a}{get}}<resource\_limits\_object,by\_owner>(\ boost::make\_tuple(\ \textcolor{keyword}{false},\ account\ )\ );}
+\DoxyCodeLine{00306\ \ \ \ \ \ \ ram\_bytes\ \ =\ buo.ram\_bytes;}
+\DoxyCodeLine{00307\ \ \ \ \ \ \ net\_weight\ =\ buo.net\_weight;}
+\DoxyCodeLine{00308\ \ \ \ \ \ \ cpu\_weight\ =\ buo.cpu\_weight;}
+\DoxyCodeLine{00309\ \ \ \ \}}
+\DoxyCodeLine{00310\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a140981c195e4e0c5788f0aa6383c2697_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a140981c195e4e0c5788f0aa6383c2697_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a6ee64e0876365e3c6e2aeec83591a9ef}\index{sysio::chain::resource\_limits::resource\_limits\_manager@{sysio::chain::resource\_limits::resource\_limits\_manager}!get\_account\_net\_limit@{get\_account\_net\_limit}}
+\index{get\_account\_net\_limit@{get\_account\_net\_limit}!sysio::chain::resource\_limits::resource\_limits\_manager@{sysio::chain::resource\_limits::resource\_limits\_manager}}
+\doxysubsubsection{\texorpdfstring{get\_account\_net\_limit()}{get\_account\_net\_limit()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a6ee64e0876365e3c6e2aeec83591a9ef} 
+std\+::pair$<$ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}, bool $>$ sysio\+::chain\+::resource\+\_\+limits\+::resource\+\_\+limits\+\_\+manager\+::get\+\_\+account\+\_\+net\+\_\+limit (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} \&}]{name}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{greylist\+\_\+limit}{ = {\ttfamily config\+:\+:maximum\+\_\+elastic\+\_\+resource\+\_\+multiplier}}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{resource__limits_8cpp_source_l00468}{468}} of file \mbox{\hyperlink{resource__limits_8cpp_source}{resource\+\_\+limits.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00468\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00469\ \ \ \ \textcolor{keyword}{auto}\ [arl,\ greylisted]\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_afa522b2321b49a3f55beba024129e000}{get\_account\_net\_limit\_ex}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ greylist\_limit);}
+\DoxyCodeLine{00470\ \ \ \ \textcolor{keywordflow}{return}\ \{arl.available,\ greylisted\};}
+\DoxyCodeLine{00471\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a6ee64e0876365e3c6e2aeec83591a9ef_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_afa522b2321b49a3f55beba024129e000}\index{sysio::chain::resource\_limits::resource\_limits\_manager@{sysio::chain::resource\_limits::resource\_limits\_manager}!get\_account\_net\_limit\_ex@{get\_account\_net\_limit\_ex}}
+\index{get\_account\_net\_limit\_ex@{get\_account\_net\_limit\_ex}!sysio::chain::resource\_limits::resource\_limits\_manager@{sysio::chain::resource\_limits::resource\_limits\_manager}}
+\doxysubsubsection{\texorpdfstring{get\_account\_net\_limit\_ex()}{get\_account\_net\_limit\_ex()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_afa522b2321b49a3f55beba024129e000} 
+std\+::pair$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1account__resource__limit}{account\+\_\+resource\+\_\+limit}}, bool $>$ sysio\+::chain\+::resource\+\_\+limits\+::resource\+\_\+limits\+\_\+manager\+::get\+\_\+account\+\_\+net\+\_\+limit\+\_\+ex (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} \&}]{name}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{greylist\+\_\+limit}{ = {\ttfamily config\+:\+:maximum\+\_\+elastic\+\_\+resource\+\_\+multiplier}}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{resource__limits_8cpp_source_l00473}{473}} of file \mbox{\hyperlink{resource__limits_8cpp_source}{resource\+\_\+limits.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00473\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00474\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{classconfig}{config}}\ =\ \_db.\mbox{\hyperlink{classchainbase_1_1database_afcfe00f81a526c1376d4f51197dd3a9a}{get}}<resource\_limits\_config\_object>();}
+\DoxyCodeLine{00475\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{structstate}{state}}\ \ =\ \_db.\mbox{\hyperlink{classchainbase_1_1database_afcfe00f81a526c1376d4f51197dd3a9a}{get}}<resource\_limits\_state\_object>();}
+\DoxyCodeLine{00476\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ usage\ \ =\ \_db.\mbox{\hyperlink{classchainbase_1_1database_afcfe00f81a526c1376d4f51197dd3a9a}{get}}<resource\_usage\_object,\ by\_owner>(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}});}
+\DoxyCodeLine{00477\ }
+\DoxyCodeLine{00478\ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ net\_weight,\ x,\ \mbox{\hyperlink{namespacefc_ab199a7c94624123911206db59ebe45da}{y}};}
+\DoxyCodeLine{00479\ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a140981c195e4e0c5788f0aa6383c2697}{get\_account\_limits}}(\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ x,\ net\_weight,\ \mbox{\hyperlink{namespacefc_ab199a7c94624123911206db59ebe45da}{y}}\ );}
+\DoxyCodeLine{00480\ }
+\DoxyCodeLine{00481\ \ \ \ \textcolor{keywordflow}{if}(\ net\_weight\ <\ 0\ ||\ \mbox{\hyperlink{structstate}{state}}.total\_net\_weight\ ==\ 0)\ \{}
+\DoxyCodeLine{00482\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{\{\ -\/1,\ -\/1,\ -\/1\ \},\ \textcolor{keyword}{false}\};}
+\DoxyCodeLine{00483\ \ \ \ \}}
+\DoxyCodeLine{00484\ }
+\DoxyCodeLine{00485\ \ \ \ account\_resource\_limit\ arl;}
+\DoxyCodeLine{00486\ }
+\DoxyCodeLine{00487\ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_a896515137d9a7844105786ee3a6b1d47}{uint128\_t}}\ window\_size\ =\ \mbox{\hyperlink{classconfig}{config}}.account\_net\_usage\_average\_window;}
+\DoxyCodeLine{00488\ }
+\DoxyCodeLine{00489\ \ \ \ \textcolor{keywordtype}{bool}\ greylisted\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00490\ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_a896515137d9a7844105786ee3a6b1d47}{uint128\_t}}\ virtual\_network\_capacity\_in\_window\ =\ window\_size;}
+\DoxyCodeLine{00491\ \ \ \ \textcolor{keywordflow}{if}(\ greylist\_limit\ <\ config::maximum\_elastic\_resource\_multiplier\ )\ \{}
+\DoxyCodeLine{00492\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ greylisted\_virtual\_net\_limit\ =\ \mbox{\hyperlink{classconfig}{config}}.net\_limit\_parameters.max\ *\ greylist\_limit;}
+\DoxyCodeLine{00493\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ greylisted\_virtual\_net\_limit\ <\ \mbox{\hyperlink{structstate}{state}}.virtual\_net\_limit\ )\ \{}
+\DoxyCodeLine{00494\ \ \ \ \ \ \ \ \ \ virtual\_network\_capacity\_in\_window\ *=\ greylisted\_virtual\_net\_limit;}
+\DoxyCodeLine{00495\ \ \ \ \ \ \ \ \ \ greylisted\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00496\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00497\ \ \ \ \ \ \ \ \ \ virtual\_network\_capacity\_in\_window\ *=\ \mbox{\hyperlink{structstate}{state}}.virtual\_net\_limit;}
+\DoxyCodeLine{00498\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00499\ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00500\ \ \ \ \ \ \ virtual\_network\_capacity\_in\_window\ *=\ \mbox{\hyperlink{structstate}{state}}.virtual\_net\_limit;}
+\DoxyCodeLine{00501\ \ \ \ \}}
+\DoxyCodeLine{00502\ }
+\DoxyCodeLine{00503\ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_a896515137d9a7844105786ee3a6b1d47}{uint128\_t}}\ user\_weight\ \ \ \ \ =\ (\mbox{\hyperlink{namespacesysio_1_1chain_a896515137d9a7844105786ee3a6b1d47}{uint128\_t}})net\_weight;}
+\DoxyCodeLine{00504\ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_a896515137d9a7844105786ee3a6b1d47}{uint128\_t}}\ all\_user\_weight\ =\ (\mbox{\hyperlink{namespacesysio_1_1chain_a896515137d9a7844105786ee3a6b1d47}{uint128\_t}})\mbox{\hyperlink{structstate}{state}}.total\_net\_weight;}
+\DoxyCodeLine{00505\ }
+\DoxyCodeLine{00506\ \ \ \ \textcolor{keyword}{auto}\ max\_user\_use\_in\_window\ =\ (virtual\_network\_capacity\_in\_window\ *\ user\_weight)\ /\ all\_user\_weight;}
+\DoxyCodeLine{00507\ \ \ \ \textcolor{keyword}{auto}\ net\_used\_in\_window\ \ =\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1resource__limits_1_1impl_a27299c32ef2c573ed173bd68edd2cd21}{impl::integer\_divide\_ceil}}((\mbox{\hyperlink{namespacesysio_1_1chain_a896515137d9a7844105786ee3a6b1d47}{uint128\_t}})usage.net\_usage.value\_ex\ *\ window\_size,\ (\mbox{\hyperlink{namespacesysio_1_1chain_a896515137d9a7844105786ee3a6b1d47}{uint128\_t}})config::rate\_limiting\_precision);}
+\DoxyCodeLine{00508\ }
+\DoxyCodeLine{00509\ \ \ \ \textcolor{keywordflow}{if}(\ max\_user\_use\_in\_window\ <=\ net\_used\_in\_window\ )}
+\DoxyCodeLine{00510\ \ \ \ \ \ \ arl.available\ =\ 0;}
+\DoxyCodeLine{00511\ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00512\ \ \ \ \ \ \ arl.available\ =\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1resource__limits_1_1impl_ad13603146ccf93edbdb851067320dd6e}{impl::downgrade\_cast<int64\_t>}}(max\_user\_use\_in\_window\ -\/\ net\_used\_in\_window);}
+\DoxyCodeLine{00513\ }
+\DoxyCodeLine{00514\ \ \ \ arl.used\ =\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1resource__limits_1_1impl_ad13603146ccf93edbdb851067320dd6e}{impl::downgrade\_cast<int64\_t>}}(net\_used\_in\_window);}
+\DoxyCodeLine{00515\ \ \ \ arl.max\ =\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1resource__limits_1_1impl_ad13603146ccf93edbdb851067320dd6e}{impl::downgrade\_cast<int64\_t>}}(max\_user\_use\_in\_window);}
+\DoxyCodeLine{00516\ \ \ \ \textcolor{keywordflow}{return}\ \{arl,\ greylisted\};}
+\DoxyCodeLine{00517\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_afa522b2321b49a3f55beba024129e000_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_afa522b2321b49a3f55beba024129e000_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_ae7d1b3c435910424a1142b052a8774be}\index{sysio::chain::resource\_limits::resource\_limits\_manager@{sysio::chain::resource\_limits::resource\_limits\_manager}!get\_account\_ram\_usage@{get\_account\_ram\_usage}}
+\index{get\_account\_ram\_usage@{get\_account\_ram\_usage}!sysio::chain::resource\_limits::resource\_limits\_manager@{sysio::chain::resource\_limits::resource\_limits\_manager}}
+\doxysubsubsection{\texorpdfstring{get\_account\_ram\_usage()}{get\_account\_ram\_usage()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_ae7d1b3c435910424a1142b052a8774be} 
+\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} sysio\+::chain\+::resource\+\_\+limits\+::resource\+\_\+limits\+\_\+manager\+::get\+\_\+account\+\_\+ram\+\_\+usage (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} \&}]{name}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{resource__limits_8cpp_source_l00239}{239}} of file \mbox{\hyperlink{resource__limits_8cpp_source}{resource\+\_\+limits.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00240\ \ \ \ \textcolor{keywordflow}{return}\ \_db.\mbox{\hyperlink{classchainbase_1_1database_afcfe00f81a526c1376d4f51197dd3a9a}{get}}<resource\_usage\_object,by\_owner>(\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ ).ram\_usage;}
+\DoxyCodeLine{00241\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_ae7d1b3c435910424a1142b052a8774be_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_ae7d1b3c435910424a1142b052a8774be_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a59c1ce742daefcf8e370e844ed49f955}\index{sysio::chain::resource\_limits::resource\_limits\_manager@{sysio::chain::resource\_limits::resource\_limits\_manager}!get\_block\_cpu\_limit@{get\_block\_cpu\_limit}}
+\index{get\_block\_cpu\_limit@{get\_block\_cpu\_limit}!sysio::chain::resource\_limits::resource\_limits\_manager@{sysio::chain::resource\_limits::resource\_limits\_manager}}
+\doxysubsubsection{\texorpdfstring{get\_block\_cpu\_limit()}{get\_block\_cpu\_limit()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a59c1ce742daefcf8e370e844ed49f955} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} sysio\+::chain\+::resource\+\_\+limits\+::resource\+\_\+limits\+\_\+manager\+::get\+\_\+block\+\_\+cpu\+\_\+limit (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{resource__limits_8cpp_source_l00404}{404}} of file \mbox{\hyperlink{resource__limits_8cpp_source}{resource\+\_\+limits.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00404\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00405\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{structstate}{state}}\ =\ \_db.\mbox{\hyperlink{classchainbase_1_1database_afcfe00f81a526c1376d4f51197dd3a9a}{get}}<resource\_limits\_state\_object>();}
+\DoxyCodeLine{00406\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{classconfig}{config}}\ =\ \_db.\mbox{\hyperlink{classchainbase_1_1database_afcfe00f81a526c1376d4f51197dd3a9a}{get}}<resource\_limits\_config\_object>();}
+\DoxyCodeLine{00407\ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classconfig}{config}}.cpu\_limit\_parameters.max\ -\/\ \mbox{\hyperlink{structstate}{state}}.pending\_cpu\_usage;}
+\DoxyCodeLine{00408\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a59c1ce742daefcf8e370e844ed49f955_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a59c1ce742daefcf8e370e844ed49f955_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a2a7986ffd86acb7135b07d3b35d767fd}\index{sysio::chain::resource\_limits::resource\_limits\_manager@{sysio::chain::resource\_limits::resource\_limits\_manager}!get\_block\_net\_limit@{get\_block\_net\_limit}}
+\index{get\_block\_net\_limit@{get\_block\_net\_limit}!sysio::chain::resource\_limits::resource\_limits\_manager@{sysio::chain::resource\_limits::resource\_limits\_manager}}
+\doxysubsubsection{\texorpdfstring{get\_block\_net\_limit()}{get\_block\_net\_limit()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a2a7986ffd86acb7135b07d3b35d767fd} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} sysio\+::chain\+::resource\+\_\+limits\+::resource\+\_\+limits\+\_\+manager\+::get\+\_\+block\+\_\+net\+\_\+limit (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{resource__limits_8cpp_source_l00410}{410}} of file \mbox{\hyperlink{resource__limits_8cpp_source}{resource\+\_\+limits.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00410\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00411\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{structstate}{state}}\ =\ \_db.\mbox{\hyperlink{classchainbase_1_1database_afcfe00f81a526c1376d4f51197dd3a9a}{get}}<resource\_limits\_state\_object>();}
+\DoxyCodeLine{00412\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{classconfig}{config}}\ =\ \_db.\mbox{\hyperlink{classchainbase_1_1database_afcfe00f81a526c1376d4f51197dd3a9a}{get}}<resource\_limits\_config\_object>();}
+\DoxyCodeLine{00413\ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classconfig}{config}}.net\_limit\_parameters.max\ -\/\ \mbox{\hyperlink{structstate}{state}}.pending\_net\_usage;}
+\DoxyCodeLine{00414\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a2a7986ffd86acb7135b07d3b35d767fd_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a1fcebec58c85ac219bba44a3139a22d5}\index{sysio::chain::resource\_limits::resource\_limits\_manager@{sysio::chain::resource\_limits::resource\_limits\_manager}!get\_total\_cpu\_weight@{get\_total\_cpu\_weight}}
+\index{get\_total\_cpu\_weight@{get\_total\_cpu\_weight}!sysio::chain::resource\_limits::resource\_limits\_manager@{sysio::chain::resource\_limits::resource\_limits\_manager}}
+\doxysubsubsection{\texorpdfstring{get\_total\_cpu\_weight()}{get\_total\_cpu\_weight()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a1fcebec58c85ac219bba44a3139a22d5} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} sysio\+::chain\+::resource\+\_\+limits\+::resource\+\_\+limits\+\_\+manager\+::get\+\_\+total\+\_\+cpu\+\_\+weight (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{resource__limits_8cpp_source_l00384}{384}} of file \mbox{\hyperlink{resource__limits_8cpp_source}{resource\+\_\+limits.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00384\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00385\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{structstate}{state}}\ =\ \_db.\mbox{\hyperlink{classchainbase_1_1database_afcfe00f81a526c1376d4f51197dd3a9a}{get}}<resource\_limits\_state\_object>();}
+\DoxyCodeLine{00386\ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structstate}{state}}.total\_cpu\_weight;}
+\DoxyCodeLine{00387\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a1fcebec58c85ac219bba44a3139a22d5_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_af9c0bd8105ce922baaa87a06560bb1ad}\index{sysio::chain::resource\_limits::resource\_limits\_manager@{sysio::chain::resource\_limits::resource\_limits\_manager}!get\_total\_net\_weight@{get\_total\_net\_weight}}
+\index{get\_total\_net\_weight@{get\_total\_net\_weight}!sysio::chain::resource\_limits::resource\_limits\_manager@{sysio::chain::resource\_limits::resource\_limits\_manager}}
+\doxysubsubsection{\texorpdfstring{get\_total\_net\_weight()}{get\_total\_net\_weight()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_af9c0bd8105ce922baaa87a06560bb1ad} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} sysio\+::chain\+::resource\+\_\+limits\+::resource\+\_\+limits\+\_\+manager\+::get\+\_\+total\+\_\+net\+\_\+weight (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{resource__limits_8cpp_source_l00389}{389}} of file \mbox{\hyperlink{resource__limits_8cpp_source}{resource\+\_\+limits.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00389\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00390\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{structstate}{state}}\ =\ \_db.\mbox{\hyperlink{classchainbase_1_1database_afcfe00f81a526c1376d4f51197dd3a9a}{get}}<resource\_limits\_state\_object>();}
+\DoxyCodeLine{00391\ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structstate}{state}}.total\_net\_weight;}
+\DoxyCodeLine{00392\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_af9c0bd8105ce922baaa87a06560bb1ad_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a11a6138d48057c1992128575ec0d2c99}\index{sysio::chain::resource\_limits::resource\_limits\_manager@{sysio::chain::resource\_limits::resource\_limits\_manager}!get\_virtual\_block\_cpu\_limit@{get\_virtual\_block\_cpu\_limit}}
+\index{get\_virtual\_block\_cpu\_limit@{get\_virtual\_block\_cpu\_limit}!sysio::chain::resource\_limits::resource\_limits\_manager@{sysio::chain::resource\_limits::resource\_limits\_manager}}
+\doxysubsubsection{\texorpdfstring{get\_virtual\_block\_cpu\_limit()}{get\_virtual\_block\_cpu\_limit()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a11a6138d48057c1992128575ec0d2c99} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} sysio\+::chain\+::resource\+\_\+limits\+::resource\+\_\+limits\+\_\+manager\+::get\+\_\+virtual\+\_\+block\+\_\+cpu\+\_\+limit (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{resource__limits_8cpp_source_l00394}{394}} of file \mbox{\hyperlink{resource__limits_8cpp_source}{resource\+\_\+limits.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00394\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00395\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{structstate}{state}}\ =\ \_db.\mbox{\hyperlink{classchainbase_1_1database_afcfe00f81a526c1376d4f51197dd3a9a}{get}}<resource\_limits\_state\_object>();}
+\DoxyCodeLine{00396\ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structstate}{state}}.virtual\_cpu\_limit;}
+\DoxyCodeLine{00397\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a11a6138d48057c1992128575ec0d2c99_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_af1cdd5c700248d54dc20be704662534d}\index{sysio::chain::resource\_limits::resource\_limits\_manager@{sysio::chain::resource\_limits::resource\_limits\_manager}!get\_virtual\_block\_net\_limit@{get\_virtual\_block\_net\_limit}}
+\index{get\_virtual\_block\_net\_limit@{get\_virtual\_block\_net\_limit}!sysio::chain::resource\_limits::resource\_limits\_manager@{sysio::chain::resource\_limits::resource\_limits\_manager}}
+\doxysubsubsection{\texorpdfstring{get\_virtual\_block\_net\_limit()}{get\_virtual\_block\_net\_limit()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_af1cdd5c700248d54dc20be704662534d} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} sysio\+::chain\+::resource\+\_\+limits\+::resource\+\_\+limits\+\_\+manager\+::get\+\_\+virtual\+\_\+block\+\_\+net\+\_\+limit (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{resource__limits_8cpp_source_l00399}{399}} of file \mbox{\hyperlink{resource__limits_8cpp_source}{resource\+\_\+limits.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00399\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00400\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{structstate}{state}}\ =\ \_db.\mbox{\hyperlink{classchainbase_1_1database_afcfe00f81a526c1376d4f51197dd3a9a}{get}}<resource\_limits\_state\_object>();}
+\DoxyCodeLine{00401\ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structstate}{state}}.virtual\_net\_limit;}
+\DoxyCodeLine{00402\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_af1cdd5c700248d54dc20be704662534d_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a30cd4db6f08948e05aba424431ec0605}\index{sysio::chain::resource\_limits::resource\_limits\_manager@{sysio::chain::resource\_limits::resource\_limits\_manager}!initialize\_account@{initialize\_account}}
+\index{initialize\_account@{initialize\_account}!sysio::chain::resource\_limits::resource\_limits\_manager@{sysio::chain::resource\_limits::resource\_limits\_manager}}
+\doxysubsubsection{\texorpdfstring{initialize\_account()}{initialize\_account()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a30cd4db6f08948e05aba424431ec0605} 
+void sysio\+::chain\+::resource\+\_\+limits\+::resource\+\_\+limits\+\_\+manager\+::initialize\+\_\+account (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} \&}]{account}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{resource__limits_8cpp_source_l00096}{96}} of file \mbox{\hyperlink{resource__limits_8cpp_source}{resource\+\_\+limits.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00097\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ limits\ =\ \_db.\mbox{\hyperlink{classchainbase_1_1database_adc8f336b33d7013d1b0400399b16c5a7}{create}}<resource\_limits\_object>([\&](\ resource\_limits\_object\&\ \mbox{\hyperlink{namespace_xbyak_1_1util_ab5af29f4e1d45ee51da87d37853590ef}{bl}}\ )\ \{}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_ab5af29f4e1d45ee51da87d37853590ef}{bl}}.owner\ =\ account;}
+\DoxyCodeLine{00099\ \ \ \ \});}
+\DoxyCodeLine{00100\ }
+\DoxyCodeLine{00101\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ usage\ =\ \_db.\mbox{\hyperlink{classchainbase_1_1database_adc8f336b33d7013d1b0400399b16c5a7}{create}}<resource\_usage\_object>([\&](\ resource\_usage\_object\&\ bu\ )\ \{}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ bu.owner\ =\ account;}
+\DoxyCodeLine{00103\ \ \ \ \});}
+\DoxyCodeLine{00104\ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{auto}\ dm\_logger\ =\ \_get\_deep\_mind\_logger())\ \{}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ dm\_logger-\/>on\_newaccount\_resource\_limits(limits,\ usage);}
+\DoxyCodeLine{00106\ \ \ \ \}}
+\DoxyCodeLine{00107\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a30cd4db6f08948e05aba424431ec0605_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a30cd4db6f08948e05aba424431ec0605_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a1b9d0326965430166923c2241a3a6a45}\index{sysio::chain::resource\_limits::resource\_limits\_manager@{sysio::chain::resource\_limits::resource\_limits\_manager}!initialize\_database@{initialize\_database}}
+\index{initialize\_database@{initialize\_database}!sysio::chain::resource\_limits::resource\_limits\_manager@{sysio::chain::resource\_limits::resource\_limits\_manager}}
+\doxysubsubsection{\texorpdfstring{initialize\_database()}{initialize\_database()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a1b9d0326965430166923c2241a3a6a45} 
+void sysio\+::chain\+::resource\+\_\+limits\+::resource\+\_\+limits\+\_\+manager\+::initialize\+\_\+database (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{resource__limits_8cpp_source_l00055}{55}} of file \mbox{\hyperlink{resource__limits_8cpp_source}{resource\+\_\+limits.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00056\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{classconfig}{config}}\ =\ \_db.\mbox{\hyperlink{classchainbase_1_1database_adc8f336b33d7013d1b0400399b16c5a7}{create}}<resource\_limits\_config\_object>([](resource\_limits\_config\_object\&\ \mbox{\hyperlink{classconfig}{config}})\{}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \textcolor{comment}{//\ see\ default\ settings\ in\ the\ declaration}}
+\DoxyCodeLine{00058\ \ \ \ \});}
+\DoxyCodeLine{00059\ }
+\DoxyCodeLine{00060\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{structstate}{state}}\ =\ \_db.\mbox{\hyperlink{classchainbase_1_1database_adc8f336b33d7013d1b0400399b16c5a7}{create}}<resource\_limits\_state\_object>([\&\mbox{\hyperlink{classconfig}{config}}](resource\_limits\_state\_object\&\ \mbox{\hyperlink{structstate}{state}})\{}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \textcolor{comment}{//\ see\ default\ settings\ in\ the\ declaration}}
+\DoxyCodeLine{00062\ }
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \textcolor{comment}{//\ start\ the\ chain\ off\ in\ a\ way\ that\ it\ is\ "{}congested"{}\ aka\ slow-\/start}}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.virtual\_cpu\_limit\ =\ \mbox{\hyperlink{classconfig}{config}}.cpu\_limit\_parameters.max;}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.virtual\_net\_limit\ =\ \mbox{\hyperlink{classconfig}{config}}.net\_limit\_parameters.max;}
+\DoxyCodeLine{00066\ \ \ \ \});}
+\DoxyCodeLine{00067\ }
+\DoxyCodeLine{00068\ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{auto}\ dm\_logger\ =\ \_get\_deep\_mind\_logger())\ \{}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ dm\_logger-\/>on\_init\_resource\_limits(\mbox{\hyperlink{classconfig}{config}},\ \mbox{\hyperlink{structstate}{state}});}
+\DoxyCodeLine{00070\ \ \ \ \}}
+\DoxyCodeLine{00071\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a1b9d0326965430166923c2241a3a6a45_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a1b9d0326965430166923c2241a3a6a45_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a0c71ab0bbfd401a4886d11f4756d5fc1}\index{sysio::chain::resource\_limits::resource\_limits\_manager@{sysio::chain::resource\_limits::resource\_limits\_manager}!is\_unlimited\_cpu@{is\_unlimited\_cpu}}
+\index{is\_unlimited\_cpu@{is\_unlimited\_cpu}!sysio::chain::resource\_limits::resource\_limits\_manager@{sysio::chain::resource\_limits::resource\_limits\_manager}}
+\doxysubsubsection{\texorpdfstring{is\_unlimited\_cpu()}{is\_unlimited\_cpu()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a0c71ab0bbfd401a4886d11f4756d5fc1} 
+bool sysio\+::chain\+::resource\+\_\+limits\+::resource\+\_\+limits\+\_\+manager\+::is\+\_\+unlimited\+\_\+cpu (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} \&}]{account}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{resource__limits_8cpp_source_l00312}{312}} of file \mbox{\hyperlink{resource__limits_8cpp_source}{resource\+\_\+limits.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00312\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00313\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}*\ buo\ =\ \_db.\mbox{\hyperlink{classchainbase_1_1database_aa5a2ca0da0092693ac49b36b7ec6817a}{find}}<resource\_limits\_object,by\_owner>(\ boost::make\_tuple(\textcolor{keyword}{false},\ account)\ );}
+\DoxyCodeLine{00314\ \ \ \ \textcolor{keywordflow}{if}\ (buo)\ \{}
+\DoxyCodeLine{00315\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ buo-\/>cpu\_weight\ ==\ -\/1;}
+\DoxyCodeLine{00316\ \ \ \ \}}
+\DoxyCodeLine{00317\ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00318\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a0c71ab0bbfd401a4886d11f4756d5fc1_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a983919d376e5757bceee573e52b3c571}\index{sysio::chain::resource\_limits::resource\_limits\_manager@{sysio::chain::resource\_limits::resource\_limits\_manager}!process\_account\_limit\_updates@{process\_account\_limit\_updates}}
+\index{process\_account\_limit\_updates@{process\_account\_limit\_updates}!sysio::chain::resource\_limits::resource\_limits\_manager@{sysio::chain::resource\_limits::resource\_limits\_manager}}
+\doxysubsubsection{\texorpdfstring{process\_account\_limit\_updates()}{process\_account\_limit\_updates()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a983919d376e5757bceee573e52b3c571} 
+void sysio\+::chain\+::resource\+\_\+limits\+::resource\+\_\+limits\+\_\+manager\+::process\+\_\+account\+\_\+limit\+\_\+updates (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{resource__limits_8cpp_source_l00320}{320}} of file \mbox{\hyperlink{resource__limits_8cpp_source}{resource\+\_\+limits.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00320\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00321\ \ \ \ \textcolor{keyword}{auto}\&\ multi\_index\ =\ \_db.\mbox{\hyperlink{classchainbase_1_1database_afaea057692a8bbbf3f506b64c60308b6}{get\_mutable\_index}}<\mbox{\hyperlink{namespacesysio_1_1chain_1_1resource__limits_a46a650001834ee5948b425f2e83cf948}{resource\_limits\_index}}>();}
+\DoxyCodeLine{00322\ \ \ \ \textcolor{keyword}{auto}\&\ by\_owner\_index\ =\ multi\_index.indices().get<by\_owner>();}
+\DoxyCodeLine{00323\ }
+\DoxyCodeLine{00324\ \ \ \ \textcolor{comment}{//\ convenience\ local\ lambda\ to\ reduce\ clutter}}
+\DoxyCodeLine{00325\ \ \ \ \textcolor{keyword}{auto}\ update\_state\_and\_value\ =\ [](\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \&total,\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ pending\_value,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ debug\_which)\ -\/>\ \textcolor{keywordtype}{void}\ \{}
+\DoxyCodeLine{00326\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ >\ 0)\ \{}
+\DoxyCodeLine{00327\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(total\ >=\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\textcolor{keyword}{>}(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}),\ rate\_limiting\_state\_inconsistent,\ \textcolor{stringliteral}{"{}underflow\ when\ reverting\ old\ value\ to\ \$\{which\}"{}},\ (\textcolor{stringliteral}{"{}which"{}},\ debug\_which));}
+\DoxyCodeLine{00328\ \ \ \ \ \ \ \ \ \ total\ -\/=\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}};}
+\DoxyCodeLine{00329\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00330\ }
+\DoxyCodeLine{00331\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (pending\_value\ >\ 0)\ \{}
+\DoxyCodeLine{00332\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\mbox{\hyperlink{stdint_8h_a30654b4b67d97c42ca3f9b6052dda916}{UINT64\_MAX}}\ -\/\ total\ >=\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\textcolor{keyword}{>}(pending\_value),\ rate\_limiting\_state\_inconsistent,\ \textcolor{stringliteral}{"{}overflow\ when\ applying\ new\ value\ to\ \$\{which\}"{}},\ (\textcolor{stringliteral}{"{}which"{}},\ debug\_which));}
+\DoxyCodeLine{00333\ \ \ \ \ \ \ \ \ \ total\ +=\ pending\_value;}
+\DoxyCodeLine{00334\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00335\ }
+\DoxyCodeLine{00336\ \ \ \ \ \ \ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ =\ pending\_value;}
+\DoxyCodeLine{00337\ \ \ \ \};}
+\DoxyCodeLine{00338\ }
+\DoxyCodeLine{00339\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{structstate}{state}}\ =\ \_db.\mbox{\hyperlink{classchainbase_1_1database_afcfe00f81a526c1376d4f51197dd3a9a}{get}}<resource\_limits\_state\_object>();}
+\DoxyCodeLine{00340\ \ \ \ \_db.\mbox{\hyperlink{classchainbase_1_1database_a9ebc006075e8fc2e84357a0e068b58d4}{modify}}(\mbox{\hyperlink{structstate}{state}},\ [\&](resource\_limits\_state\_object\&\ rso)\{}
+\DoxyCodeLine{00341\ \ \ \ \ \ \ \textcolor{keywordflow}{while}(!by\_owner\_index.empty())\ \{}
+\DoxyCodeLine{00342\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ itr\ =\ by\_owner\_index.lower\_bound(boost::make\_tuple(\textcolor{keyword}{true}));}
+\DoxyCodeLine{00343\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (itr\ ==\ by\_owner\_index.end()\ ||\ itr-\/>pending!=\ \textcolor{keyword}{true})\ \{}
+\DoxyCodeLine{00344\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00345\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00346\ }
+\DoxyCodeLine{00347\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ actual\_entry\ =\ \_db.\mbox{\hyperlink{classchainbase_1_1database_afcfe00f81a526c1376d4f51197dd3a9a}{get}}<resource\_limits\_object,\ by\_owner>(boost::make\_tuple(\textcolor{keyword}{false},\ itr-\/>owner));}
+\DoxyCodeLine{00348\ \ \ \ \ \ \ \ \ \ \_db.\mbox{\hyperlink{classchainbase_1_1database_a9ebc006075e8fc2e84357a0e068b58d4}{modify}}(actual\_entry,\ [\&](resource\_limits\_object\&\ rlo)\{}
+\DoxyCodeLine{00349\ \ \ \ \ \ \ \ \ \ \ \ \ update\_state\_and\_value(rso.total\_ram\_bytes,\ \ rlo.ram\_bytes,\ \ itr-\/>ram\_bytes,\ \textcolor{stringliteral}{"{}ram\_bytes"{}});}
+\DoxyCodeLine{00350\ \ \ \ \ \ \ \ \ \ \ \ \ update\_state\_and\_value(rso.total\_cpu\_weight,\ rlo.cpu\_weight,\ itr-\/>cpu\_weight,\ \textcolor{stringliteral}{"{}cpu\_weight"{}});}
+\DoxyCodeLine{00351\ \ \ \ \ \ \ \ \ \ \ \ \ update\_state\_and\_value(rso.total\_net\_weight,\ rlo.net\_weight,\ itr-\/>net\_weight,\ \textcolor{stringliteral}{"{}net\_weight"{}});}
+\DoxyCodeLine{00352\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00353\ }
+\DoxyCodeLine{00354\ \ \ \ \ \ \ \ \ \ multi\_index.remove(*itr);}
+\DoxyCodeLine{00355\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00356\ }
+\DoxyCodeLine{00357\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{auto}\ dm\_logger\ =\ \_get\_deep\_mind\_logger())\ \{}
+\DoxyCodeLine{00358\ \ \ \ \ \ \ \ \ \ dm\_logger-\/>on\_update\_resource\_limits\_state(\mbox{\hyperlink{structstate}{state}});}
+\DoxyCodeLine{00359\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00360\ \ \ \ \});}
+\DoxyCodeLine{00361\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a983919d376e5757bceee573e52b3c571_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a983919d376e5757bceee573e52b3c571_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a5ebf5f04366d7120f58430d9ba4f8c7a}\index{sysio::chain::resource\_limits::resource\_limits\_manager@{sysio::chain::resource\_limits::resource\_limits\_manager}!process\_block\_usage@{process\_block\_usage}}
+\index{process\_block\_usage@{process\_block\_usage}!sysio::chain::resource\_limits::resource\_limits\_manager@{sysio::chain::resource\_limits::resource\_limits\_manager}}
+\doxysubsubsection{\texorpdfstring{process\_block\_usage()}{process\_block\_usage()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a5ebf5f04366d7120f58430d9ba4f8c7a} 
+void sysio\+::chain\+::resource\+\_\+limits\+::resource\+\_\+limits\+\_\+manager\+::process\+\_\+block\+\_\+usage (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{block\+\_\+num}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{resource__limits_8cpp_source_l00363}{363}} of file \mbox{\hyperlink{resource__limits_8cpp_source}{resource\+\_\+limits.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00363\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00364\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ =\ \_db.\mbox{\hyperlink{classchainbase_1_1database_afcfe00f81a526c1376d4f51197dd3a9a}{get}}<resource\_limits\_state\_object>();}
+\DoxyCodeLine{00365\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{classconfig}{config}}\ =\ \_db.\mbox{\hyperlink{classchainbase_1_1database_afcfe00f81a526c1376d4f51197dd3a9a}{get}}<resource\_limits\_config\_object>();}
+\DoxyCodeLine{00366\ \ \ \ \_db.\mbox{\hyperlink{classchainbase_1_1database_a9ebc006075e8fc2e84357a0e068b58d4}{modify}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ [\&](resource\_limits\_state\_object\&\ \mbox{\hyperlink{structstate}{state}})\{}
+\DoxyCodeLine{00367\ \ \ \ \ \ \ \textcolor{comment}{//\ apply\ pending\ usage,\ update\ virtual\ limits\ and\ reset\ the\ pending}}
+\DoxyCodeLine{00368\ }
+\DoxyCodeLine{00369\ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.average\_block\_cpu\_usage.add(\mbox{\hyperlink{structstate}{state}}.pending\_cpu\_usage,\ block\_num,\ \mbox{\hyperlink{classconfig}{config}}.cpu\_limit\_parameters.periods);}
+\DoxyCodeLine{00370\ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.update\_virtual\_cpu\_limit(\mbox{\hyperlink{classconfig}{config}});}
+\DoxyCodeLine{00371\ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.pending\_cpu\_usage\ =\ 0;}
+\DoxyCodeLine{00372\ }
+\DoxyCodeLine{00373\ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.average\_block\_net\_usage.add(\mbox{\hyperlink{structstate}{state}}.pending\_net\_usage,\ block\_num,\ \mbox{\hyperlink{classconfig}{config}}.net\_limit\_parameters.periods);}
+\DoxyCodeLine{00374\ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.update\_virtual\_net\_limit(\mbox{\hyperlink{classconfig}{config}});}
+\DoxyCodeLine{00375\ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}.pending\_net\_usage\ =\ 0;}
+\DoxyCodeLine{00376\ }
+\DoxyCodeLine{00377\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{auto}\ dm\_logger\ =\ \_get\_deep\_mind\_logger())\ \{}
+\DoxyCodeLine{00378\ \ \ \ \ \ \ \ \ \ dm\_logger-\/>on\_update\_resource\_limits\_state(\mbox{\hyperlink{structstate}{state}});}
+\DoxyCodeLine{00379\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00380\ \ \ \ \});}
+\DoxyCodeLine{00381\ }
+\DoxyCodeLine{00382\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a5ebf5f04366d7120f58430d9ba4f8c7a_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a5ebf5f04366d7120f58430d9ba4f8c7a_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a32baa74135a1423302de3a849dc8b40c}\index{sysio::chain::resource\_limits::resource\_limits\_manager@{sysio::chain::resource\_limits::resource\_limits\_manager}!read\_from\_snapshot@{read\_from\_snapshot}}
+\index{read\_from\_snapshot@{read\_from\_snapshot}!sysio::chain::resource\_limits::resource\_limits\_manager@{sysio::chain::resource\_limits::resource\_limits\_manager}}
+\doxysubsubsection{\texorpdfstring{read\_from\_snapshot()}{read\_from\_snapshot()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a32baa74135a1423302de3a849dc8b40c} 
+void sysio\+::chain\+::resource\+\_\+limits\+::resource\+\_\+limits\+\_\+manager\+::read\+\_\+from\+\_\+snapshot (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_aaa27dacddc54cea475602788c8e7a02c}{snapshot\+\_\+reader\+\_\+ptr}} \&}]{snapshot}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{resource__limits_8cpp_source_l00083}{83}} of file \mbox{\hyperlink{resource__limits_8cpp_source}{resource\+\_\+limits.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00084\ \ \ \ resource\_index\_set::walk\_indices([\textcolor{keyword}{this},\ \&snapshot](\ \textcolor{keyword}{auto}\ utils\ )\{}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ snapshot-\/>read\_section<\textcolor{keyword}{typename}\ \textcolor{keyword}{decltype}(utils)::index\_t::value\_type>([\textcolor{keyword}{this}](\ \textcolor{keyword}{auto}\&\ section\ )\ \{}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ more\ =\ !section.empty();}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(more)\ \{}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{decltype}(utils)::create(\_db,\ [\textcolor{keyword}{this},\ \&section,\ \&more](\ \textcolor{keyword}{auto}\ \&row\ )\ \{}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ more\ =\ section.read\_row(row,\ \_db);}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00093\ \ \ \ \});}
+\DoxyCodeLine{00094\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a32baa74135a1423302de3a849dc8b40c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a3455e73574b3df18ee52bfc075a3a208}\index{sysio::chain::resource\_limits::resource\_limits\_manager@{sysio::chain::resource\_limits::resource\_limits\_manager}!set\_account\_limits@{set\_account\_limits}}
+\index{set\_account\_limits@{set\_account\_limits}!sysio::chain::resource\_limits::resource\_limits\_manager@{sysio::chain::resource\_limits::resource\_limits\_manager}}
+\doxysubsubsection{\texorpdfstring{set\_account\_limits()}{set\_account\_limits()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a3455e73574b3df18ee52bfc075a3a208} 
+bool sysio\+::chain\+::resource\+\_\+limits\+::resource\+\_\+limits\+\_\+manager\+::set\+\_\+account\+\_\+limits (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} \&}]{account}{, }\item[{\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}}]{ram\+\_\+bytes}{, }\item[{\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}}]{net\+\_\+weight}{, }\item[{\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}}}]{cpu\+\_\+weight}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{resource__limits_8cpp_source_l00244}{244}} of file \mbox{\hyperlink{resource__limits_8cpp_source}{resource\+\_\+limits.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00244\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00245\ \ \ \ \textcolor{comment}{//const\ auto\&\ usage\ =\ \_db.get<resource\_usage\_object,by\_owner>(\ account\ );}}
+\DoxyCodeLine{00246\ \ \ \ \textcolor{comment}{/*}}
+\DoxyCodeLine{00247\ \textcolor{comment}{\ \ \ \ *\ Since\ we\ need\ to\ delay\ these\ until\ the\ next\ resource\ limiting\ boundary,\ these\ are\ created\ in\ a\ "{}pending"{}}}
+\DoxyCodeLine{00248\ \textcolor{comment}{\ \ \ \ *\ state\ or\ adjusted\ in\ an\ existing\ "{}pending"{}\ state.\ \ The\ chain\ controller\ will\ collapse\ "{}pending"{}\ state\ into}}
+\DoxyCodeLine{00249\ \textcolor{comment}{\ \ \ \ *\ the\ actual\ state\ at\ the\ next\ appropriate\ boundary.}}
+\DoxyCodeLine{00250\ \textcolor{comment}{\ \ \ \ */}}
+\DoxyCodeLine{00251\ \ \ \ \textcolor{keyword}{auto}\ find\_or\_create\_pending\_limits\ =\ [\&]()\ -\/>\ \textcolor{keyword}{const}\ resource\_limits\_object\&\ \{}
+\DoxyCodeLine{00252\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}*\ pending\_limits\ =\ \_db.\mbox{\hyperlink{classchainbase_1_1database_aa5a2ca0da0092693ac49b36b7ec6817a}{find}}<resource\_limits\_object,\ by\_owner>(\ boost::make\_tuple(\textcolor{keyword}{true},\ account)\ );}
+\DoxyCodeLine{00253\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (pending\_limits\ ==\ \textcolor{keyword}{nullptr})\ \{}
+\DoxyCodeLine{00254\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ limits\ =\ \_db.\mbox{\hyperlink{classchainbase_1_1database_afcfe00f81a526c1376d4f51197dd3a9a}{get}}<resource\_limits\_object,\ by\_owner>(\ boost::make\_tuple(\textcolor{keyword}{false},\ account));}
+\DoxyCodeLine{00255\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \_db.\mbox{\hyperlink{classchainbase_1_1database_adc8f336b33d7013d1b0400399b16c5a7}{create}}<resource\_limits\_object>([\&](resource\_limits\_object\&\ pending\_limits)\{}
+\DoxyCodeLine{00256\ \ \ \ \ \ \ \ \ \ \ \ \ pending\_limits.owner\ =\ limits.owner;}
+\DoxyCodeLine{00257\ \ \ \ \ \ \ \ \ \ \ \ \ pending\_limits.ram\_bytes\ =\ limits.ram\_bytes;}
+\DoxyCodeLine{00258\ \ \ \ \ \ \ \ \ \ \ \ \ pending\_limits.net\_weight\ =\ limits.net\_weight;}
+\DoxyCodeLine{00259\ \ \ \ \ \ \ \ \ \ \ \ \ pending\_limits.cpu\_weight\ =\ limits.cpu\_weight;}
+\DoxyCodeLine{00260\ \ \ \ \ \ \ \ \ \ \ \ \ pending\_limits.pending\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00261\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00262\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00263\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *pending\_limits;}
+\DoxyCodeLine{00264\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00265\ \ \ \ \};}
+\DoxyCodeLine{00266\ }
+\DoxyCodeLine{00267\ \ \ \ \textcolor{comment}{//\ update\ the\ users\ weights\ directly}}
+\DoxyCodeLine{00268\ \ \ \ \textcolor{keyword}{auto}\&\ limits\ =\ find\_or\_create\_pending\_limits();}
+\DoxyCodeLine{00269\ }
+\DoxyCodeLine{00270\ \ \ \ \textcolor{keywordtype}{bool}\ decreased\_limit\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00271\ }
+\DoxyCodeLine{00272\ \ \ \ \textcolor{keywordflow}{if}(\ ram\_bytes\ >=\ 0\ )\ \{}
+\DoxyCodeLine{00273\ }
+\DoxyCodeLine{00274\ \ \ \ \ \ \ decreased\_limit\ =\ (\ (limits.ram\_bytes\ <\ 0)\ ||\ (ram\_bytes\ <\ limits.ram\_bytes)\ );}
+\DoxyCodeLine{00275\ }
+\DoxyCodeLine{00276\ \ \ \ \ \ \ \textcolor{comment}{/*}}
+\DoxyCodeLine{00277\ \textcolor{comment}{\ \ \ \ \ \ if(\ limits.ram\_bytes\ <\ 0\ )\ \{}}
+\DoxyCodeLine{00278\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ SYS\_ASSERT(ram\_bytes\ >=\ usage.ram\_usage,\ wasm\_execution\_error,\ "{}converting\ unlimited\ account\ would\ result\ in\ overcommitment\ [commit=\$\{c\},\ desired\ limit=\$\{l\}]"{},\ ("{}c"{},\ usage.ram\_usage)("{}l"{},\ ram\_bytes));}}
+\DoxyCodeLine{00279\ \textcolor{comment}{\ \ \ \ \ \ \}\ else\ \{}}
+\DoxyCodeLine{00280\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ SYS\_ASSERT(ram\_bytes\ >=\ usage.ram\_usage,\ wasm\_execution\_error,\ "{}attempting\ to\ release\ committed\ ram\ resources\ [commit=\$\{c\},\ desired\ limit=\$\{l\}]"{},\ ("{}c"{},\ usage.ram\_usage)("{}l"{},\ ram\_bytes));}}
+\DoxyCodeLine{00281\ \textcolor{comment}{\ \ \ \ \ \ \}}}
+\DoxyCodeLine{00282\ \textcolor{comment}{\ \ \ \ \ \ */}}
+\DoxyCodeLine{00283\ \ \ \ \}}
+\DoxyCodeLine{00284\ }
+\DoxyCodeLine{00285\ \ \ \ \_db.\mbox{\hyperlink{classchainbase_1_1database_a9ebc006075e8fc2e84357a0e068b58d4}{modify}}(\ limits,\ [\&](\ resource\_limits\_object\&\ pending\_limits\ )\{}
+\DoxyCodeLine{00286\ \ \ \ \ \ \ pending\_limits.ram\_bytes\ =\ ram\_bytes;}
+\DoxyCodeLine{00287\ \ \ \ \ \ \ pending\_limits.net\_weight\ =\ net\_weight;}
+\DoxyCodeLine{00288\ \ \ \ \ \ \ pending\_limits.cpu\_weight\ =\ cpu\_weight;}
+\DoxyCodeLine{00289\ }
+\DoxyCodeLine{00290\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{auto}\ dm\_logger\ =\ \_get\_deep\_mind\_logger())\ \{}
+\DoxyCodeLine{00291\ \ \ \ \ \ \ \ \ \ dm\_logger-\/>on\_set\_account\_limits(pending\_limits);}
+\DoxyCodeLine{00292\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00293\ \ \ \ \});}
+\DoxyCodeLine{00294\ }
+\DoxyCodeLine{00295\ \ \ \ \textcolor{keywordflow}{return}\ decreased\_limit;}
+\DoxyCodeLine{00296\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a3455e73574b3df18ee52bfc075a3a208_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a4396d0acb70ebbd8054b13ff4c564e20}\index{sysio::chain::resource\_limits::resource\_limits\_manager@{sysio::chain::resource\_limits::resource\_limits\_manager}!set\_block\_parameters@{set\_block\_parameters}}
+\index{set\_block\_parameters@{set\_block\_parameters}!sysio::chain::resource\_limits::resource\_limits\_manager@{sysio::chain::resource\_limits::resource\_limits\_manager}}
+\doxysubsubsection{\texorpdfstring{set\_block\_parameters()}{set\_block\_parameters()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a4396d0acb70ebbd8054b13ff4c564e20} 
+void sysio\+::chain\+::resource\+\_\+limits\+::resource\+\_\+limits\+\_\+manager\+::set\+\_\+block\+\_\+parameters (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1elastic__limit__parameters}{elastic\+\_\+limit\+\_\+parameters}} \&}]{cpu\+\_\+limit\+\_\+parameters}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1resource__limits_1_1elastic__limit__parameters}{elastic\+\_\+limit\+\_\+parameters}} \&}]{net\+\_\+limit\+\_\+parameters}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{resource__limits_8cpp_source_l00109}{109}} of file \mbox{\hyperlink{resource__limits_8cpp_source}{resource\+\_\+limits.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00110\ \ \ \ cpu\_limit\_parameters.validate();}
+\DoxyCodeLine{00111\ \ \ \ net\_limit\_parameters.validate();}
+\DoxyCodeLine{00112\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{classconfig}{config}}\ =\ \_db.\mbox{\hyperlink{classchainbase_1_1database_afcfe00f81a526c1376d4f51197dd3a9a}{get}}<resource\_limits\_config\_object>();}
+\DoxyCodeLine{00113\ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{classconfig}{config}}.cpu\_limit\_parameters\ ==\ cpu\_limit\_parameters\ \&\&\ \mbox{\hyperlink{classconfig}{config}}.net\_limit\_parameters\ ==\ net\_limit\_parameters\ )}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00115\ \ \ \ \_db.\mbox{\hyperlink{classchainbase_1_1database_a9ebc006075e8fc2e84357a0e068b58d4}{modify}}(\mbox{\hyperlink{classconfig}{config}},\ [\&](resource\_limits\_config\_object\&\ c)\{}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ c.cpu\_limit\_parameters\ =\ cpu\_limit\_parameters;}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ c.net\_limit\_parameters\ =\ net\_limit\_parameters;}
+\DoxyCodeLine{00118\ }
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{auto}\ dm\_logger\ =\ \_get\_deep\_mind\_logger())\ \{}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ dm\_logger-\/>on\_update\_resource\_limits\_config(c);}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00122\ \ \ \ \});}
+\DoxyCodeLine{00123\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a4396d0acb70ebbd8054b13ff4c564e20_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a4396d0acb70ebbd8054b13ff4c564e20_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_aaa7345adbf341592a81c087c50655597}\index{sysio::chain::resource\_limits::resource\_limits\_manager@{sysio::chain::resource\_limits::resource\_limits\_manager}!update\_account\_usage@{update\_account\_usage}}
+\index{update\_account\_usage@{update\_account\_usage}!sysio::chain::resource\_limits::resource\_limits\_manager@{sysio::chain::resource\_limits::resource\_limits\_manager}}
+\doxysubsubsection{\texorpdfstring{update\_account\_usage()}{update\_account\_usage()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_aaa7345adbf341592a81c087c50655597} 
+void sysio\+::chain\+::resource\+\_\+limits\+::resource\+\_\+limits\+\_\+manager\+::update\+\_\+account\+\_\+usage (\begin{DoxyParamCaption}\item[{const flat\+\_\+set$<$ \mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} $>$ \&}]{accounts}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{ordinal}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{resource__limits_8cpp_source_l00125}{125}} of file \mbox{\hyperlink{resource__limits_8cpp_source}{resource\+\_\+limits.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00126\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{classconfig}{config}}\ =\ \_db.\mbox{\hyperlink{classchainbase_1_1database_afcfe00f81a526c1376d4f51197dd3a9a}{get}}<resource\_limits\_config\_object>();}
+\DoxyCodeLine{00127\ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ :\ accounts\ )\ \{}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ usage\ =\ \_db.\mbox{\hyperlink{classchainbase_1_1database_afcfe00f81a526c1376d4f51197dd3a9a}{get}}<resource\_usage\_object,by\_owner>(\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ );}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \_db.\mbox{\hyperlink{classchainbase_1_1database_a9ebc006075e8fc2e84357a0e068b58d4}{modify}}(\ usage,\ [\&](\ \textcolor{keyword}{auto}\&\ bu\ )\{}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \ bu.net\_usage.add(\ 0,\ time\_slot,\ \mbox{\hyperlink{classconfig}{config}}.account\_net\_usage\_average\_window\ );}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \ bu.cpu\_usage.add(\ 0,\ time\_slot,\ \mbox{\hyperlink{classconfig}{config}}.account\_cpu\_usage\_average\_window\ );}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00133\ \ \ \ \}}
+\DoxyCodeLine{00134\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_aaa7345adbf341592a81c087c50655597_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_aaa7345adbf341592a81c087c50655597_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_af72734af83f353fae77fbf837776db10}\index{sysio::chain::resource\_limits::resource\_limits\_manager@{sysio::chain::resource\_limits::resource\_limits\_manager}!verify\_account\_ram\_usage@{verify\_account\_ram\_usage}}
+\index{verify\_account\_ram\_usage@{verify\_account\_ram\_usage}!sysio::chain::resource\_limits::resource\_limits\_manager@{sysio::chain::resource\_limits::resource\_limits\_manager}}
+\doxysubsubsection{\texorpdfstring{verify\_account\_ram\_usage()}{verify\_account\_ram\_usage()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_af72734af83f353fae77fbf837776db10} 
+void sysio\+::chain\+::resource\+\_\+limits\+::resource\+\_\+limits\+\_\+manager\+::verify\+\_\+account\+\_\+ram\+\_\+usage (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}}}]{accunt}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{resource__limits_8cpp_source_l00227}{227}} of file \mbox{\hyperlink{resource__limits_8cpp_source}{resource\+\_\+limits.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00227\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00228\ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ ram\_bytes;\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ net\_weight;\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ cpu\_weight;}
+\DoxyCodeLine{00229\ \ \ \ \mbox{\hyperlink{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_a140981c195e4e0c5788f0aa6383c2697}{get\_account\_limits}}(\ account,\ ram\_bytes,\ net\_weight,\ cpu\_weight\ );}
+\DoxyCodeLine{00230\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ usage\ \ =\ \_db.\mbox{\hyperlink{classchainbase_1_1database_afcfe00f81a526c1376d4f51197dd3a9a}{get}}<resource\_usage\_object,by\_owner>(\ account\ );}
+\DoxyCodeLine{00231\ }
+\DoxyCodeLine{00232\ \ \ \ \textcolor{keywordflow}{if}(\ ram\_bytes\ >=\ 0\ )\ \{}
+\DoxyCodeLine{00233\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ usage.ram\_usage\ <=\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\textcolor{keyword}{>}(ram\_bytes),\ ram\_usage\_exceeded,}
+\DoxyCodeLine{00234\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}account\ \$\{account\}\ has\ insufficient\ ram;\ needs\ \$\{needs\}\ bytes\ has\ \$\{available\}\ bytes"{}},}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}account"{}},\ account)(\textcolor{stringliteral}{"{}needs"{}},usage.ram\_usage)(\textcolor{stringliteral}{"{}available"{}},ram\_bytes)\ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00236\ \ \ \ \}}
+\DoxyCodeLine{00237\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_af72734af83f353fae77fbf837776db10_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1resource__limits_1_1resource__limits__manager_af72734af83f353fae77fbf837776db10_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{resource__limits_8hpp}{resource\+\_\+limits.\+hpp}}\item 
+libraries/chain/\mbox{\hyperlink{resource__limits_8cpp}{resource\+\_\+limits.\+cpp}}\end{DoxyCompactItemize}

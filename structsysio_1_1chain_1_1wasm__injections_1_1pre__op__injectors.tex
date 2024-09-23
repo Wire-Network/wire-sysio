@@ -1,0 +1,738 @@
+\doxysection{sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors Struct Reference}
+\hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors}{}\label{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors}\index{sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}}
+
+
+{\ttfamily \#include $<$wasm\+\_\+sysio\+\_\+injection.\+hpp$>$}
+
+
+
+Inheritance diagram for sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=193pt]{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=193pt]{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_ab108c42446eacd9a4a56aee10aca7b21}{f32\+\_\+add\+\_\+t}} = wasm\+\_\+ops\+::f32\+\_\+add $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f32__binop__injector}{f32\+\_\+binop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a36d8a57b6e32409bfb66f27abae59fd0}{wasm\+\_\+ops\+::f32\+\_\+add\+\_\+code}}$>$$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_aba4c6d048b95f626ae3a6d0d5876c601}{f32\+\_\+sub\+\_\+t}} = wasm\+\_\+ops\+::f32\+\_\+sub $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f32__binop__injector}{f32\+\_\+binop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a7db243b76e442bfdd691b0cdc9fb84db}{wasm\+\_\+ops\+::f32\+\_\+sub\+\_\+code}}$>$$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a1bbe69052b9a1f2793b958716c5537f5}{f32\+\_\+div\+\_\+t}} = wasm\+\_\+ops\+::f32\+\_\+div $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f32__binop__injector}{f32\+\_\+binop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a145f15f0f36eedcc258ba228cbd96223}{wasm\+\_\+ops\+::f32\+\_\+div\+\_\+code}}$>$$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a792cc4ea17c57a903b763c3b1be07ea7}{f32\+\_\+mul\+\_\+t}} = wasm\+\_\+ops\+::f32\+\_\+mul $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f32__binop__injector}{f32\+\_\+binop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a346ce7f6ac871213bd5fed7c94dba6d3}{wasm\+\_\+ops\+::f32\+\_\+mul\+\_\+code}}$>$$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_aadf20e52c7e632752670648a02dbedd8}{f32\+\_\+min\+\_\+t}} = wasm\+\_\+ops\+::f32\+\_\+min $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f32__binop__injector}{f32\+\_\+binop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2af32f4e12e4d4325fefc3fb8f4e41b924}{wasm\+\_\+ops\+::f32\+\_\+min\+\_\+code}}$>$$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a050f33cee2ee573768183ea0fb7f7dde}{f32\+\_\+max\+\_\+t}} = wasm\+\_\+ops\+::f32\+\_\+max $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f32__binop__injector}{f32\+\_\+binop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2afd075e9dd5333303329b10d4a3fc4ad8}{wasm\+\_\+ops\+::f32\+\_\+max\+\_\+code}}$>$$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a225d4fc27a10ce942bec2ac5079a9257}{f32\+\_\+copysign\+\_\+t}} = wasm\+\_\+ops\+::f32\+\_\+copysign $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f32__binop__injector}{f32\+\_\+binop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2aa54b9b7cfb141e39dfd1f92627d2f303}{wasm\+\_\+ops\+::f32\+\_\+copysign\+\_\+code}}$>$$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a0c82711717703802aec3e239025c2931}{f32\+\_\+abs\+\_\+t}} = wasm\+\_\+ops\+::f32\+\_\+abs $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f32__unop__injector}{f32\+\_\+unop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a2c7ab35c301ffce31e84dca081ca2e98}{wasm\+\_\+ops\+::f32\+\_\+abs\+\_\+code}}$>$$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a100da1288a551c007d9e7d2b3b15dd4d}{f32\+\_\+neg\+\_\+t}} = wasm\+\_\+ops\+::f32\+\_\+neg $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f32__unop__injector}{f32\+\_\+unop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a58043ab2fd65198211758e65f69c8900}{wasm\+\_\+ops\+::f32\+\_\+neg\+\_\+code}}$>$$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a1e2ec7b0472950954df0e847c2ef876f}{f32\+\_\+sqrt\+\_\+t}} = wasm\+\_\+ops\+::f32\+\_\+sqrt $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f32__unop__injector}{f32\+\_\+unop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a85da4ccc298e31bd99fbc9e09d6e5fcc}{wasm\+\_\+ops\+::f32\+\_\+sqrt\+\_\+code}}$>$$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a419964e7b35f621d03b8f2e1c5a902d6}{f32\+\_\+floor\+\_\+t}} = wasm\+\_\+ops\+::f32\+\_\+floor $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f32__unop__injector}{f32\+\_\+unop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a57010399e615d37ed8e2de58f724493f}{wasm\+\_\+ops\+::f32\+\_\+floor\+\_\+code}}$>$$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a9da3fb06b3179d0dde98c0f2fe28dfc5}{f32\+\_\+ceil\+\_\+t}} = wasm\+\_\+ops\+::f32\+\_\+ceil $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f32__unop__injector}{f32\+\_\+unop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a6814632b862e6f42c8751da2671a23a4}{wasm\+\_\+ops\+::f32\+\_\+ceil\+\_\+code}}$>$$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a725b33881f2c93ab30f58a02b9975209}{f32\+\_\+trunc\+\_\+t}} = wasm\+\_\+ops\+::f32\+\_\+trunc $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f32__unop__injector}{f32\+\_\+unop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a480c2ea082dce458745a8625f9d07f39}{wasm\+\_\+ops\+::f32\+\_\+trunc\+\_\+code}}$>$$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a049f5418d3ccee5fd677ed66f97d38e3}{f32\+\_\+nearest\+\_\+t}} = wasm\+\_\+ops\+::f32\+\_\+nearest $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f32__unop__injector}{f32\+\_\+unop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a81cb2b46381952bfe0d2d1b76558c84b}{wasm\+\_\+ops\+::f32\+\_\+nearest\+\_\+code}}$>$$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_ad36c2ea0be176a6b0de3183249812f9d}{f32\+\_\+eq\+\_\+t}} = wasm\+\_\+ops\+::f32\+\_\+eq $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f32__relop__injector}{f32\+\_\+relop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a1755202368e0ccf9321cd33617b1373a}{wasm\+\_\+ops\+::f32\+\_\+eq\+\_\+code}}$>$$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_afab0efb0341d355695eca887a9a08807}{f32\+\_\+ne\+\_\+t}} = wasm\+\_\+ops\+::f32\+\_\+ne $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f32__relop__injector}{f32\+\_\+relop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a57f63d14ccf1cb1e2d066b3fc6ab8aaa}{wasm\+\_\+ops\+::f32\+\_\+ne\+\_\+code}}$>$$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a9e71d81ba34048871efc5ee91c9b1485}{f32\+\_\+lt\+\_\+t}} = wasm\+\_\+ops\+::f32\+\_\+lt $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f32__relop__injector}{f32\+\_\+relop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a7e169432cfca88910bc390640596d13a}{wasm\+\_\+ops\+::f32\+\_\+lt\+\_\+code}}$>$$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a000e1425228cd6ea5e74388855353215}{f32\+\_\+le\+\_\+t}} = wasm\+\_\+ops\+::f32\+\_\+le $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f32__relop__injector}{f32\+\_\+relop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2aae9ccff65a2e5883a17005ff6e77b050}{wasm\+\_\+ops\+::f32\+\_\+le\+\_\+code}}$>$$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_ac014512a2c22b56377506586330006c8}{f32\+\_\+gt\+\_\+t}} = wasm\+\_\+ops\+::f32\+\_\+gt $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f32__relop__injector}{f32\+\_\+relop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a48f2eeab19372d33d75a0f5791add447}{wasm\+\_\+ops\+::f32\+\_\+gt\+\_\+code}}$>$$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a22ba619d4bb2e550882980a0ad038f63}{f32\+\_\+ge\+\_\+t}} = wasm\+\_\+ops\+::f32\+\_\+ge $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f32__relop__injector}{f32\+\_\+relop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a6a03e1be5800fd54b1b002145ca6156c}{wasm\+\_\+ops\+::f32\+\_\+ge\+\_\+code}}$>$$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_ab594f7a8129fd65d5b2c5c7c0047e483}{f64\+\_\+add\+\_\+t}} = wasm\+\_\+ops\+::f64\+\_\+add $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f64__binop__injector}{f64\+\_\+binop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ac90fb4ee2864982176f75fcbd2065af6}{wasm\+\_\+ops\+::f64\+\_\+add\+\_\+code}}$>$$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a762b9f6247858cacca0d964a9a05aaf6}{f64\+\_\+sub\+\_\+t}} = wasm\+\_\+ops\+::f64\+\_\+sub $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f64__binop__injector}{f64\+\_\+binop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a2175aeb1a7dcd62d78e59c4568024b8c}{wasm\+\_\+ops\+::f64\+\_\+sub\+\_\+code}}$>$$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a775d010e5584d71b8a7a8c957e6817c3}{f64\+\_\+div\+\_\+t}} = wasm\+\_\+ops\+::f64\+\_\+div $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f64__binop__injector}{f64\+\_\+binop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ae3a86c7e76e2711cccedbf59d0869041}{wasm\+\_\+ops\+::f64\+\_\+div\+\_\+code}}$>$$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a38a96221113ecbb0b762df582bb9699c}{f64\+\_\+mul\+\_\+t}} = wasm\+\_\+ops\+::f64\+\_\+mul $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f64__binop__injector}{f64\+\_\+binop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a015dac69744823da739e2ae325f2f18e}{wasm\+\_\+ops\+::f64\+\_\+mul\+\_\+code}}$>$$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_aa4e705d1499c0026d31935f106e2d2f2}{f64\+\_\+min\+\_\+t}} = wasm\+\_\+ops\+::f64\+\_\+min $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f64__binop__injector}{f64\+\_\+binop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2abddd4861de225cfa70a3a483a2ff217e}{wasm\+\_\+ops\+::f64\+\_\+min\+\_\+code}}$>$$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_aacbdca2aae00c44ff40df7d254171595}{f64\+\_\+max\+\_\+t}} = wasm\+\_\+ops\+::f64\+\_\+max $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f64__binop__injector}{f64\+\_\+binop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a7adbe48197d0721ebc1e20bedfd24ed8}{wasm\+\_\+ops\+::f64\+\_\+max\+\_\+code}}$>$$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a9a2b36bc840e071fe566303695de0017}{f64\+\_\+copysign\+\_\+t}} = wasm\+\_\+ops\+::f64\+\_\+copysign $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f64__binop__injector}{f64\+\_\+binop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ada89fecbc938ab79cdf8b5cc277915eb}{wasm\+\_\+ops\+::f64\+\_\+copysign\+\_\+code}}$>$$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_acf43b521c3637f8d57a202ee5bc41e4a}{f64\+\_\+abs\+\_\+t}} = wasm\+\_\+ops\+::f64\+\_\+abs $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f64__unop__injector}{f64\+\_\+unop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a17ad1701f5470ca4b67efca4dccdcc99}{wasm\+\_\+ops\+::f64\+\_\+abs\+\_\+code}}$>$$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a53d5a66d61bd455c0d0b3736839bab7b}{f64\+\_\+neg\+\_\+t}} = wasm\+\_\+ops\+::f64\+\_\+neg $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f64__unop__injector}{f64\+\_\+unop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2afc6003b06a46d398e624f92cb6c531f0}{wasm\+\_\+ops\+::f64\+\_\+neg\+\_\+code}}$>$$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_af2b56e37af6a61ac145cf0f0896e5762}{f64\+\_\+sqrt\+\_\+t}} = wasm\+\_\+ops\+::f64\+\_\+sqrt $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f64__unop__injector}{f64\+\_\+unop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ae09ca188b551a0d5b07ab0786e4b59b9}{wasm\+\_\+ops\+::f64\+\_\+sqrt\+\_\+code}}$>$$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_ab5c1ca2c44d0ebe0145e8c38571e065d}{f64\+\_\+floor\+\_\+t}} = wasm\+\_\+ops\+::f64\+\_\+floor $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f64__unop__injector}{f64\+\_\+unop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a00e0d3e5805624370dab6c4e06fa2e87}{wasm\+\_\+ops\+::f64\+\_\+floor\+\_\+code}}$>$$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_acfc6d0cec80b38bc04164db0602e7ea6}{f64\+\_\+ceil\+\_\+t}} = wasm\+\_\+ops\+::f64\+\_\+ceil $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f64__unop__injector}{f64\+\_\+unop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a5db143e4c2992501305fe7047d666908}{wasm\+\_\+ops\+::f64\+\_\+ceil\+\_\+code}}$>$$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a3abe9f30db8c1d7c1a8656c3fd40dcd2}{f64\+\_\+trunc\+\_\+t}} = wasm\+\_\+ops\+::f64\+\_\+trunc $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f64__unop__injector}{f64\+\_\+unop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2aabf90e63f13f55f23374b5a6c7ee7a85}{wasm\+\_\+ops\+::f64\+\_\+trunc\+\_\+code}}$>$$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a9201d0342699cb1510723fc1f3b24863}{f64\+\_\+nearest\+\_\+t}} = wasm\+\_\+ops\+::f64\+\_\+nearest $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f64__unop__injector}{f64\+\_\+unop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a9c9d6cc68686641f7867578528f709fd}{wasm\+\_\+ops\+::f64\+\_\+nearest\+\_\+code}}$>$$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_af2c869fcaf13efa37d1e0ae0008df9d7}{f64\+\_\+eq\+\_\+t}} = wasm\+\_\+ops\+::f64\+\_\+eq $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f64__relop__injector}{f64\+\_\+relop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2aa27d3025e48045f47c84e367ea400d1f}{wasm\+\_\+ops\+::f64\+\_\+eq\+\_\+code}}$>$$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a37b1280d8e0656ddfb17fa67cca398bc}{f64\+\_\+ne\+\_\+t}} = wasm\+\_\+ops\+::f64\+\_\+ne $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f64__relop__injector}{f64\+\_\+relop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ab482bff312f7a1f0d238ea6595d91f79}{wasm\+\_\+ops\+::f64\+\_\+ne\+\_\+code}}$>$$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_ad798a54202060d724dcec00a33c84b3a}{f64\+\_\+lt\+\_\+t}} = wasm\+\_\+ops\+::f64\+\_\+lt $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f64__relop__injector}{f64\+\_\+relop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ac043932cbb6c0bebddaebf843c7497ad}{wasm\+\_\+ops\+::f64\+\_\+lt\+\_\+code}}$>$$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a13938a3e54bc5732567340370a54a90a}{f64\+\_\+le\+\_\+t}} = wasm\+\_\+ops\+::f64\+\_\+le $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f64__relop__injector}{f64\+\_\+relop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a85043e9ce5f70a3d4e40b2e4c16ec3f4}{wasm\+\_\+ops\+::f64\+\_\+le\+\_\+code}}$>$$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_ad50be232e02a519cde508f42c6c3471e}{f64\+\_\+gt\+\_\+t}} = wasm\+\_\+ops\+::f64\+\_\+gt $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f64__relop__injector}{f64\+\_\+relop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a7ed90365c9a80d360ae4db1497bac015}{wasm\+\_\+ops\+::f64\+\_\+gt\+\_\+code}}$>$$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a797709c9960b56620cacbbd6632e8014}{f64\+\_\+ge\+\_\+t}} = wasm\+\_\+ops\+::f64\+\_\+ge $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f64__relop__injector}{f64\+\_\+relop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a1bbeaffa9fa9073c52ec9e985f2192ac}{wasm\+\_\+ops\+::f64\+\_\+ge\+\_\+code}}$>$$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_aa79148ffd46b2d49f2118fba723e8ddf}{f64\+\_\+promote\+\_\+f32\+\_\+t}} = wasm\+\_\+ops\+::f64\+\_\+promote\+\_\+f32 $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f32__promote__injector}{f32\+\_\+promote\+\_\+injector}}$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_ae4fa7c30e8c4e582d629a76ce6269f7b}{f32\+\_\+demote\+\_\+f64\+\_\+t}} = wasm\+\_\+ops\+::f32\+\_\+demote\+\_\+f64 $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f64__demote__injector}{f64\+\_\+demote\+\_\+injector}}$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a5df4304e9a0416815c26fa0d8c04b53c}{i32\+\_\+trunc\+\_\+s\+\_\+f32\+\_\+t}} = wasm\+\_\+ops\+::i32\+\_\+trunc\+\_\+s\+\_\+f32 $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f32__trunc__i32__injector}{f32\+\_\+trunc\+\_\+i32\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2aba26bc6e3960c56289fb96fc73792338}{wasm\+\_\+ops\+::i32\+\_\+trunc\+\_\+s\+\_\+f32\+\_\+code}}$>$$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_ac2922c7067416796219006cdf751d1c5}{i32\+\_\+trunc\+\_\+u\+\_\+f32\+\_\+t}} = wasm\+\_\+ops\+::i32\+\_\+trunc\+\_\+u\+\_\+f32 $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f32__trunc__i32__injector}{f32\+\_\+trunc\+\_\+i32\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ae10d1e8d76f4259c753e43f43848e6af}{wasm\+\_\+ops\+::i32\+\_\+trunc\+\_\+u\+\_\+f32\+\_\+code}}$>$$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a268ade8a1f059fbc60c7fa369cc6da23}{i32\+\_\+trunc\+\_\+s\+\_\+f64\+\_\+t}} = wasm\+\_\+ops\+::i32\+\_\+trunc\+\_\+s\+\_\+f64 $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f64__trunc__i32__injector}{f64\+\_\+trunc\+\_\+i32\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a85948ac850d8543f4905a37c157d7bce}{wasm\+\_\+ops\+::i32\+\_\+trunc\+\_\+s\+\_\+f64\+\_\+code}}$>$$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a34522d3c7e0ef7e938ed6d1ba813a494}{i32\+\_\+trunc\+\_\+u\+\_\+f64\+\_\+t}} = wasm\+\_\+ops\+::i32\+\_\+trunc\+\_\+u\+\_\+f64 $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f64__trunc__i32__injector}{f64\+\_\+trunc\+\_\+i32\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a2898dba6ca29d65f88998c84ad48a6a3}{wasm\+\_\+ops\+::i32\+\_\+trunc\+\_\+u\+\_\+f64\+\_\+code}}$>$$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_ae0686cbc394c24852983d31e2bea668b}{i64\+\_\+trunc\+\_\+s\+\_\+f32\+\_\+t}} = wasm\+\_\+ops\+::i64\+\_\+trunc\+\_\+s\+\_\+f32 $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f32__trunc__i64__injector}{f32\+\_\+trunc\+\_\+i64\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ad58616186657ec8202889ca0a1a92831}{wasm\+\_\+ops\+::i64\+\_\+trunc\+\_\+s\+\_\+f32\+\_\+code}}$>$$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a32f50d9ca9d07b56b21068b40dad27c0}{i64\+\_\+trunc\+\_\+u\+\_\+f32\+\_\+t}} = wasm\+\_\+ops\+::i64\+\_\+trunc\+\_\+u\+\_\+f32 $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f32__trunc__i64__injector}{f32\+\_\+trunc\+\_\+i64\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a873422f377066ad8aa806262ce0e7710}{wasm\+\_\+ops\+::i64\+\_\+trunc\+\_\+u\+\_\+f32\+\_\+code}}$>$$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_af1d0886c199c5908bc991f6ae515db6a}{i64\+\_\+trunc\+\_\+s\+\_\+f64\+\_\+t}} = wasm\+\_\+ops\+::i64\+\_\+trunc\+\_\+s\+\_\+f64 $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f64__trunc__i64__injector}{f64\+\_\+trunc\+\_\+i64\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a911864e636a6dadbb852ff8ab6f86ccd}{wasm\+\_\+ops\+::i64\+\_\+trunc\+\_\+s\+\_\+f64\+\_\+code}}$>$$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_aa75fbe6745917d1bcbd7e981e4def6db}{i64\+\_\+trunc\+\_\+u\+\_\+f64\+\_\+t}} = wasm\+\_\+ops\+::i64\+\_\+trunc\+\_\+u\+\_\+f64 $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f64__trunc__i64__injector}{f64\+\_\+trunc\+\_\+i64\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a913ea6ed0f4325e7a2c6422a0e5773b9}{wasm\+\_\+ops\+::i64\+\_\+trunc\+\_\+u\+\_\+f64\+\_\+code}}$>$$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a2d1ef99378ea8518da6e5f591f519a9f}{f32\+\_\+convert\+\_\+s\+\_\+i32}} = wasm\+\_\+ops\+::f32\+\_\+convert\+\_\+s\+\_\+i32 $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1i32__convert__f32__injector}{i32\+\_\+convert\+\_\+f32\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ad96b8a40656d543fd7987729aad89c0a}{wasm\+\_\+ops\+::f32\+\_\+convert\+\_\+s\+\_\+i32\+\_\+code}}$>$$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a74e80e78bce3f0709c2306ac2651790f}{f32\+\_\+convert\+\_\+s\+\_\+i64}} = wasm\+\_\+ops\+::f32\+\_\+convert\+\_\+s\+\_\+i64 $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1i64__convert__f32__injector}{i64\+\_\+convert\+\_\+f32\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ac175b84f2f10b7ff4bc8a3360b383c21}{wasm\+\_\+ops\+::f32\+\_\+convert\+\_\+s\+\_\+i64\+\_\+code}}$>$$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_ad2aedd4d599cd962b032db26aadc910d}{f32\+\_\+convert\+\_\+u\+\_\+i32}} = wasm\+\_\+ops\+::f32\+\_\+convert\+\_\+u\+\_\+i32 $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1i32__convert__f32__injector}{i32\+\_\+convert\+\_\+f32\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ac9b50b6940b6948c8b1412ba6f018d46}{wasm\+\_\+ops\+::f32\+\_\+convert\+\_\+u\+\_\+i32\+\_\+code}}$>$$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_ade5815339c53665ed62801a9c6dfb9dd}{f32\+\_\+convert\+\_\+u\+\_\+i64}} = wasm\+\_\+ops\+::f32\+\_\+convert\+\_\+u\+\_\+i64 $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1i64__convert__f32__injector}{i64\+\_\+convert\+\_\+f32\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a3739e53d655412234cb77b79904ec158}{wasm\+\_\+ops\+::f32\+\_\+convert\+\_\+u\+\_\+i64\+\_\+code}}$>$$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a8cb46d3189a5da07a122ad3f4931b14e}{f64\+\_\+convert\+\_\+s\+\_\+i32}} = wasm\+\_\+ops\+::f64\+\_\+convert\+\_\+s\+\_\+i32 $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1i32__convert__f64__injector}{i32\+\_\+convert\+\_\+f64\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a7bb00604a28e8e8010cece3cd5886adc}{wasm\+\_\+ops\+::f64\+\_\+convert\+\_\+s\+\_\+i32\+\_\+code}}$>$$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a12d10afc60f54839bea066c1ff5cae36}{f64\+\_\+convert\+\_\+s\+\_\+i64}} = wasm\+\_\+ops\+::f64\+\_\+convert\+\_\+s\+\_\+i64 $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1i64__convert__f64__injector}{i64\+\_\+convert\+\_\+f64\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a84423fc735bd22561d9ed03608364c3e}{wasm\+\_\+ops\+::f64\+\_\+convert\+\_\+s\+\_\+i64\+\_\+code}}$>$$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_ad93cbc2253e82871328d36a9999fb542}{f64\+\_\+convert\+\_\+u\+\_\+i32}} = wasm\+\_\+ops\+::f64\+\_\+convert\+\_\+u\+\_\+i32 $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1i32__convert__f64__injector}{i32\+\_\+convert\+\_\+f64\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a373a2f3bb01b4b1ac6ca907c85a81971}{wasm\+\_\+ops\+::f64\+\_\+convert\+\_\+u\+\_\+i32\+\_\+code}}$>$$>$
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_ad0e026113e57e8852fcef08e1e029894}{f64\+\_\+convert\+\_\+u\+\_\+i64}} = wasm\+\_\+ops\+::f64\+\_\+convert\+\_\+u\+\_\+i64 $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1i64__convert__f64__injector}{i64\+\_\+convert\+\_\+f64\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ae9b8e51ba6388f7437d56844b01c8811}{wasm\+\_\+ops\+::f64\+\_\+convert\+\_\+u\+\_\+i64\+\_\+code}}$>$$>$
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00506}{506}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a0c82711717703802aec3e239025c2931}\index{sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}!f32\_abs\_t@{f32\_abs\_t}}
+\index{f32\_abs\_t@{f32\_abs\_t}!sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}}
+\doxysubsubsection{\texorpdfstring{f32\_abs\_t}{f32\_abs\_t}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a0c82711717703802aec3e239025c2931} 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a0c82711717703802aec3e239025c2931}{sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors\+::f32\+\_\+abs\+\_\+t}} = wasm\+\_\+ops\+::f32\+\_\+abs $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f32__unop__injector}{f32\+\_\+unop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a2c7ab35c301ffce31e84dca081ca2e98}{wasm\+\_\+ops\+::f32\+\_\+abs\+\_\+code}}$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00516}{516}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_ab108c42446eacd9a4a56aee10aca7b21}\index{sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}!f32\_add\_t@{f32\_add\_t}}
+\index{f32\_add\_t@{f32\_add\_t}!sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}}
+\doxysubsubsection{\texorpdfstring{f32\_add\_t}{f32\_add\_t}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_ab108c42446eacd9a4a56aee10aca7b21} 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_ab108c42446eacd9a4a56aee10aca7b21}{sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors\+::f32\+\_\+add\+\_\+t}} = wasm\+\_\+ops\+::f32\+\_\+add $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f32__binop__injector}{f32\+\_\+binop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a36d8a57b6e32409bfb66f27abae59fd0}{wasm\+\_\+ops\+::f32\+\_\+add\+\_\+code}}$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00508}{508}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a9da3fb06b3179d0dde98c0f2fe28dfc5}\index{sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}!f32\_ceil\_t@{f32\_ceil\_t}}
+\index{f32\_ceil\_t@{f32\_ceil\_t}!sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}}
+\doxysubsubsection{\texorpdfstring{f32\_ceil\_t}{f32\_ceil\_t}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a9da3fb06b3179d0dde98c0f2fe28dfc5} 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a9da3fb06b3179d0dde98c0f2fe28dfc5}{sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors\+::f32\+\_\+ceil\+\_\+t}} = wasm\+\_\+ops\+::f32\+\_\+ceil $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f32__unop__injector}{f32\+\_\+unop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a6814632b862e6f42c8751da2671a23a4}{wasm\+\_\+ops\+::f32\+\_\+ceil\+\_\+code}}$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00520}{520}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a2d1ef99378ea8518da6e5f591f519a9f}\index{sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}!f32\_convert\_s\_i32@{f32\_convert\_s\_i32}}
+\index{f32\_convert\_s\_i32@{f32\_convert\_s\_i32}!sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}}
+\doxysubsubsection{\texorpdfstring{f32\_convert\_s\_i32}{f32\_convert\_s\_i32}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a2d1ef99378ea8518da6e5f591f519a9f} 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a2d1ef99378ea8518da6e5f591f519a9f}{sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors\+::f32\+\_\+convert\+\_\+s\+\_\+i32}} = wasm\+\_\+ops\+::f32\+\_\+convert\+\_\+s\+\_\+i32 $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1i32__convert__f32__injector}{i32\+\_\+convert\+\_\+f32\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ad96b8a40656d543fd7987729aad89c0a}{wasm\+\_\+ops\+::f32\+\_\+convert\+\_\+s\+\_\+i32\+\_\+code}}$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00569}{569}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a74e80e78bce3f0709c2306ac2651790f}\index{sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}!f32\_convert\_s\_i64@{f32\_convert\_s\_i64}}
+\index{f32\_convert\_s\_i64@{f32\_convert\_s\_i64}!sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}}
+\doxysubsubsection{\texorpdfstring{f32\_convert\_s\_i64}{f32\_convert\_s\_i64}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a74e80e78bce3f0709c2306ac2651790f} 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a74e80e78bce3f0709c2306ac2651790f}{sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors\+::f32\+\_\+convert\+\_\+s\+\_\+i64}} = wasm\+\_\+ops\+::f32\+\_\+convert\+\_\+s\+\_\+i64 $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1i64__convert__f32__injector}{i64\+\_\+convert\+\_\+f32\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ac175b84f2f10b7ff4bc8a3360b383c21}{wasm\+\_\+ops\+::f32\+\_\+convert\+\_\+s\+\_\+i64\+\_\+code}}$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00570}{570}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_ad2aedd4d599cd962b032db26aadc910d}\index{sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}!f32\_convert\_u\_i32@{f32\_convert\_u\_i32}}
+\index{f32\_convert\_u\_i32@{f32\_convert\_u\_i32}!sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}}
+\doxysubsubsection{\texorpdfstring{f32\_convert\_u\_i32}{f32\_convert\_u\_i32}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_ad2aedd4d599cd962b032db26aadc910d} 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_ad2aedd4d599cd962b032db26aadc910d}{sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors\+::f32\+\_\+convert\+\_\+u\+\_\+i32}} = wasm\+\_\+ops\+::f32\+\_\+convert\+\_\+u\+\_\+i32 $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1i32__convert__f32__injector}{i32\+\_\+convert\+\_\+f32\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ac9b50b6940b6948c8b1412ba6f018d46}{wasm\+\_\+ops\+::f32\+\_\+convert\+\_\+u\+\_\+i32\+\_\+code}}$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00571}{571}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_ade5815339c53665ed62801a9c6dfb9dd}\index{sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}!f32\_convert\_u\_i64@{f32\_convert\_u\_i64}}
+\index{f32\_convert\_u\_i64@{f32\_convert\_u\_i64}!sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}}
+\doxysubsubsection{\texorpdfstring{f32\_convert\_u\_i64}{f32\_convert\_u\_i64}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_ade5815339c53665ed62801a9c6dfb9dd} 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_ade5815339c53665ed62801a9c6dfb9dd}{sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors\+::f32\+\_\+convert\+\_\+u\+\_\+i64}} = wasm\+\_\+ops\+::f32\+\_\+convert\+\_\+u\+\_\+i64 $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1i64__convert__f32__injector}{i64\+\_\+convert\+\_\+f32\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a3739e53d655412234cb77b79904ec158}{wasm\+\_\+ops\+::f32\+\_\+convert\+\_\+u\+\_\+i64\+\_\+code}}$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00572}{572}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a225d4fc27a10ce942bec2ac5079a9257}\index{sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}!f32\_copysign\_t@{f32\_copysign\_t}}
+\index{f32\_copysign\_t@{f32\_copysign\_t}!sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}}
+\doxysubsubsection{\texorpdfstring{f32\_copysign\_t}{f32\_copysign\_t}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a225d4fc27a10ce942bec2ac5079a9257} 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a225d4fc27a10ce942bec2ac5079a9257}{sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors\+::f32\+\_\+copysign\+\_\+t}} = wasm\+\_\+ops\+::f32\+\_\+copysign $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f32__binop__injector}{f32\+\_\+binop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2aa54b9b7cfb141e39dfd1f92627d2f303}{wasm\+\_\+ops\+::f32\+\_\+copysign\+\_\+code}}$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00514}{514}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_ae4fa7c30e8c4e582d629a76ce6269f7b}\index{sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}!f32\_demote\_f64\_t@{f32\_demote\_f64\_t}}
+\index{f32\_demote\_f64\_t@{f32\_demote\_f64\_t}!sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}}
+\doxysubsubsection{\texorpdfstring{f32\_demote\_f64\_t}{f32\_demote\_f64\_t}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_ae4fa7c30e8c4e582d629a76ce6269f7b} 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_ae4fa7c30e8c4e582d629a76ce6269f7b}{sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors\+::f32\+\_\+demote\+\_\+f64\+\_\+t}} = wasm\+\_\+ops\+::f32\+\_\+demote\+\_\+f64 $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f64__demote__injector}{f64\+\_\+demote\+\_\+injector}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00557}{557}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a1bbe69052b9a1f2793b958716c5537f5}\index{sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}!f32\_div\_t@{f32\_div\_t}}
+\index{f32\_div\_t@{f32\_div\_t}!sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}}
+\doxysubsubsection{\texorpdfstring{f32\_div\_t}{f32\_div\_t}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a1bbe69052b9a1f2793b958716c5537f5} 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a1bbe69052b9a1f2793b958716c5537f5}{sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors\+::f32\+\_\+div\+\_\+t}} = wasm\+\_\+ops\+::f32\+\_\+div $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f32__binop__injector}{f32\+\_\+binop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a145f15f0f36eedcc258ba228cbd96223}{wasm\+\_\+ops\+::f32\+\_\+div\+\_\+code}}$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00510}{510}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_ad36c2ea0be176a6b0de3183249812f9d}\index{sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}!f32\_eq\_t@{f32\_eq\_t}}
+\index{f32\_eq\_t@{f32\_eq\_t}!sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}}
+\doxysubsubsection{\texorpdfstring{f32\_eq\_t}{f32\_eq\_t}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_ad36c2ea0be176a6b0de3183249812f9d} 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_ad36c2ea0be176a6b0de3183249812f9d}{sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors\+::f32\+\_\+eq\+\_\+t}} = wasm\+\_\+ops\+::f32\+\_\+eq $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f32__relop__injector}{f32\+\_\+relop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a1755202368e0ccf9321cd33617b1373a}{wasm\+\_\+ops\+::f32\+\_\+eq\+\_\+code}}$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00524}{524}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a419964e7b35f621d03b8f2e1c5a902d6}\index{sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}!f32\_floor\_t@{f32\_floor\_t}}
+\index{f32\_floor\_t@{f32\_floor\_t}!sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}}
+\doxysubsubsection{\texorpdfstring{f32\_floor\_t}{f32\_floor\_t}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a419964e7b35f621d03b8f2e1c5a902d6} 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a419964e7b35f621d03b8f2e1c5a902d6}{sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors\+::f32\+\_\+floor\+\_\+t}} = wasm\+\_\+ops\+::f32\+\_\+floor $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f32__unop__injector}{f32\+\_\+unop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a57010399e615d37ed8e2de58f724493f}{wasm\+\_\+ops\+::f32\+\_\+floor\+\_\+code}}$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00519}{519}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a22ba619d4bb2e550882980a0ad038f63}\index{sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}!f32\_ge\_t@{f32\_ge\_t}}
+\index{f32\_ge\_t@{f32\_ge\_t}!sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}}
+\doxysubsubsection{\texorpdfstring{f32\_ge\_t}{f32\_ge\_t}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a22ba619d4bb2e550882980a0ad038f63} 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a22ba619d4bb2e550882980a0ad038f63}{sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors\+::f32\+\_\+ge\+\_\+t}} = wasm\+\_\+ops\+::f32\+\_\+ge $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f32__relop__injector}{f32\+\_\+relop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a6a03e1be5800fd54b1b002145ca6156c}{wasm\+\_\+ops\+::f32\+\_\+ge\+\_\+code}}$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00529}{529}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_ac014512a2c22b56377506586330006c8}\index{sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}!f32\_gt\_t@{f32\_gt\_t}}
+\index{f32\_gt\_t@{f32\_gt\_t}!sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}}
+\doxysubsubsection{\texorpdfstring{f32\_gt\_t}{f32\_gt\_t}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_ac014512a2c22b56377506586330006c8} 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_ac014512a2c22b56377506586330006c8}{sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors\+::f32\+\_\+gt\+\_\+t}} = wasm\+\_\+ops\+::f32\+\_\+gt $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f32__relop__injector}{f32\+\_\+relop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a48f2eeab19372d33d75a0f5791add447}{wasm\+\_\+ops\+::f32\+\_\+gt\+\_\+code}}$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00528}{528}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a000e1425228cd6ea5e74388855353215}\index{sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}!f32\_le\_t@{f32\_le\_t}}
+\index{f32\_le\_t@{f32\_le\_t}!sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}}
+\doxysubsubsection{\texorpdfstring{f32\_le\_t}{f32\_le\_t}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a000e1425228cd6ea5e74388855353215} 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a000e1425228cd6ea5e74388855353215}{sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors\+::f32\+\_\+le\+\_\+t}} = wasm\+\_\+ops\+::f32\+\_\+le $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f32__relop__injector}{f32\+\_\+relop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2aae9ccff65a2e5883a17005ff6e77b050}{wasm\+\_\+ops\+::f32\+\_\+le\+\_\+code}}$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00527}{527}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a9e71d81ba34048871efc5ee91c9b1485}\index{sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}!f32\_lt\_t@{f32\_lt\_t}}
+\index{f32\_lt\_t@{f32\_lt\_t}!sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}}
+\doxysubsubsection{\texorpdfstring{f32\_lt\_t}{f32\_lt\_t}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a9e71d81ba34048871efc5ee91c9b1485} 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a9e71d81ba34048871efc5ee91c9b1485}{sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors\+::f32\+\_\+lt\+\_\+t}} = wasm\+\_\+ops\+::f32\+\_\+lt $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f32__relop__injector}{f32\+\_\+relop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a7e169432cfca88910bc390640596d13a}{wasm\+\_\+ops\+::f32\+\_\+lt\+\_\+code}}$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00526}{526}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a050f33cee2ee573768183ea0fb7f7dde}\index{sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}!f32\_max\_t@{f32\_max\_t}}
+\index{f32\_max\_t@{f32\_max\_t}!sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}}
+\doxysubsubsection{\texorpdfstring{f32\_max\_t}{f32\_max\_t}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a050f33cee2ee573768183ea0fb7f7dde} 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a050f33cee2ee573768183ea0fb7f7dde}{sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors\+::f32\+\_\+max\+\_\+t}} = wasm\+\_\+ops\+::f32\+\_\+max $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f32__binop__injector}{f32\+\_\+binop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2afd075e9dd5333303329b10d4a3fc4ad8}{wasm\+\_\+ops\+::f32\+\_\+max\+\_\+code}}$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00513}{513}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_aadf20e52c7e632752670648a02dbedd8}\index{sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}!f32\_min\_t@{f32\_min\_t}}
+\index{f32\_min\_t@{f32\_min\_t}!sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}}
+\doxysubsubsection{\texorpdfstring{f32\_min\_t}{f32\_min\_t}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_aadf20e52c7e632752670648a02dbedd8} 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_aadf20e52c7e632752670648a02dbedd8}{sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors\+::f32\+\_\+min\+\_\+t}} = wasm\+\_\+ops\+::f32\+\_\+min $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f32__binop__injector}{f32\+\_\+binop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2af32f4e12e4d4325fefc3fb8f4e41b924}{wasm\+\_\+ops\+::f32\+\_\+min\+\_\+code}}$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00512}{512}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a792cc4ea17c57a903b763c3b1be07ea7}\index{sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}!f32\_mul\_t@{f32\_mul\_t}}
+\index{f32\_mul\_t@{f32\_mul\_t}!sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}}
+\doxysubsubsection{\texorpdfstring{f32\_mul\_t}{f32\_mul\_t}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a792cc4ea17c57a903b763c3b1be07ea7} 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a792cc4ea17c57a903b763c3b1be07ea7}{sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors\+::f32\+\_\+mul\+\_\+t}} = wasm\+\_\+ops\+::f32\+\_\+mul $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f32__binop__injector}{f32\+\_\+binop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a346ce7f6ac871213bd5fed7c94dba6d3}{wasm\+\_\+ops\+::f32\+\_\+mul\+\_\+code}}$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00511}{511}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_afab0efb0341d355695eca887a9a08807}\index{sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}!f32\_ne\_t@{f32\_ne\_t}}
+\index{f32\_ne\_t@{f32\_ne\_t}!sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}}
+\doxysubsubsection{\texorpdfstring{f32\_ne\_t}{f32\_ne\_t}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_afab0efb0341d355695eca887a9a08807} 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_afab0efb0341d355695eca887a9a08807}{sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors\+::f32\+\_\+ne\+\_\+t}} = wasm\+\_\+ops\+::f32\+\_\+ne $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f32__relop__injector}{f32\+\_\+relop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a57f63d14ccf1cb1e2d066b3fc6ab8aaa}{wasm\+\_\+ops\+::f32\+\_\+ne\+\_\+code}}$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00525}{525}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a049f5418d3ccee5fd677ed66f97d38e3}\index{sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}!f32\_nearest\_t@{f32\_nearest\_t}}
+\index{f32\_nearest\_t@{f32\_nearest\_t}!sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}}
+\doxysubsubsection{\texorpdfstring{f32\_nearest\_t}{f32\_nearest\_t}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a049f5418d3ccee5fd677ed66f97d38e3} 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a049f5418d3ccee5fd677ed66f97d38e3}{sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors\+::f32\+\_\+nearest\+\_\+t}} = wasm\+\_\+ops\+::f32\+\_\+nearest $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f32__unop__injector}{f32\+\_\+unop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a81cb2b46381952bfe0d2d1b76558c84b}{wasm\+\_\+ops\+::f32\+\_\+nearest\+\_\+code}}$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00522}{522}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a100da1288a551c007d9e7d2b3b15dd4d}\index{sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}!f32\_neg\_t@{f32\_neg\_t}}
+\index{f32\_neg\_t@{f32\_neg\_t}!sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}}
+\doxysubsubsection{\texorpdfstring{f32\_neg\_t}{f32\_neg\_t}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a100da1288a551c007d9e7d2b3b15dd4d} 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a100da1288a551c007d9e7d2b3b15dd4d}{sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors\+::f32\+\_\+neg\+\_\+t}} = wasm\+\_\+ops\+::f32\+\_\+neg $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f32__unop__injector}{f32\+\_\+unop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a58043ab2fd65198211758e65f69c8900}{wasm\+\_\+ops\+::f32\+\_\+neg\+\_\+code}}$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00517}{517}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a1e2ec7b0472950954df0e847c2ef876f}\index{sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}!f32\_sqrt\_t@{f32\_sqrt\_t}}
+\index{f32\_sqrt\_t@{f32\_sqrt\_t}!sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}}
+\doxysubsubsection{\texorpdfstring{f32\_sqrt\_t}{f32\_sqrt\_t}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a1e2ec7b0472950954df0e847c2ef876f} 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a1e2ec7b0472950954df0e847c2ef876f}{sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors\+::f32\+\_\+sqrt\+\_\+t}} = wasm\+\_\+ops\+::f32\+\_\+sqrt $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f32__unop__injector}{f32\+\_\+unop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a85da4ccc298e31bd99fbc9e09d6e5fcc}{wasm\+\_\+ops\+::f32\+\_\+sqrt\+\_\+code}}$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00518}{518}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_aba4c6d048b95f626ae3a6d0d5876c601}\index{sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}!f32\_sub\_t@{f32\_sub\_t}}
+\index{f32\_sub\_t@{f32\_sub\_t}!sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}}
+\doxysubsubsection{\texorpdfstring{f32\_sub\_t}{f32\_sub\_t}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_aba4c6d048b95f626ae3a6d0d5876c601} 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_aba4c6d048b95f626ae3a6d0d5876c601}{sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors\+::f32\+\_\+sub\+\_\+t}} = wasm\+\_\+ops\+::f32\+\_\+sub $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f32__binop__injector}{f32\+\_\+binop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a7db243b76e442bfdd691b0cdc9fb84db}{wasm\+\_\+ops\+::f32\+\_\+sub\+\_\+code}}$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00509}{509}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a725b33881f2c93ab30f58a02b9975209}\index{sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}!f32\_trunc\_t@{f32\_trunc\_t}}
+\index{f32\_trunc\_t@{f32\_trunc\_t}!sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}}
+\doxysubsubsection{\texorpdfstring{f32\_trunc\_t}{f32\_trunc\_t}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a725b33881f2c93ab30f58a02b9975209} 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a725b33881f2c93ab30f58a02b9975209}{sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors\+::f32\+\_\+trunc\+\_\+t}} = wasm\+\_\+ops\+::f32\+\_\+trunc $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f32__unop__injector}{f32\+\_\+unop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a480c2ea082dce458745a8625f9d07f39}{wasm\+\_\+ops\+::f32\+\_\+trunc\+\_\+code}}$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00521}{521}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_acf43b521c3637f8d57a202ee5bc41e4a}\index{sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}!f64\_abs\_t@{f64\_abs\_t}}
+\index{f64\_abs\_t@{f64\_abs\_t}!sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}}
+\doxysubsubsection{\texorpdfstring{f64\_abs\_t}{f64\_abs\_t}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_acf43b521c3637f8d57a202ee5bc41e4a} 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_acf43b521c3637f8d57a202ee5bc41e4a}{sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors\+::f64\+\_\+abs\+\_\+t}} = wasm\+\_\+ops\+::f64\+\_\+abs $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f64__unop__injector}{f64\+\_\+unop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a17ad1701f5470ca4b67efca4dccdcc99}{wasm\+\_\+ops\+::f64\+\_\+abs\+\_\+code}}$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00540}{540}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_ab594f7a8129fd65d5b2c5c7c0047e483}\index{sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}!f64\_add\_t@{f64\_add\_t}}
+\index{f64\_add\_t@{f64\_add\_t}!sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}}
+\doxysubsubsection{\texorpdfstring{f64\_add\_t}{f64\_add\_t}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_ab594f7a8129fd65d5b2c5c7c0047e483} 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_ab594f7a8129fd65d5b2c5c7c0047e483}{sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors\+::f64\+\_\+add\+\_\+t}} = wasm\+\_\+ops\+::f64\+\_\+add $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f64__binop__injector}{f64\+\_\+binop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ac90fb4ee2864982176f75fcbd2065af6}{wasm\+\_\+ops\+::f64\+\_\+add\+\_\+code}}$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00532}{532}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_acfc6d0cec80b38bc04164db0602e7ea6}\index{sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}!f64\_ceil\_t@{f64\_ceil\_t}}
+\index{f64\_ceil\_t@{f64\_ceil\_t}!sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}}
+\doxysubsubsection{\texorpdfstring{f64\_ceil\_t}{f64\_ceil\_t}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_acfc6d0cec80b38bc04164db0602e7ea6} 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_acfc6d0cec80b38bc04164db0602e7ea6}{sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors\+::f64\+\_\+ceil\+\_\+t}} = wasm\+\_\+ops\+::f64\+\_\+ceil $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f64__unop__injector}{f64\+\_\+unop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a5db143e4c2992501305fe7047d666908}{wasm\+\_\+ops\+::f64\+\_\+ceil\+\_\+code}}$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00544}{544}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a8cb46d3189a5da07a122ad3f4931b14e}\index{sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}!f64\_convert\_s\_i32@{f64\_convert\_s\_i32}}
+\index{f64\_convert\_s\_i32@{f64\_convert\_s\_i32}!sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}}
+\doxysubsubsection{\texorpdfstring{f64\_convert\_s\_i32}{f64\_convert\_s\_i32}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a8cb46d3189a5da07a122ad3f4931b14e} 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a8cb46d3189a5da07a122ad3f4931b14e}{sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors\+::f64\+\_\+convert\+\_\+s\+\_\+i32}} = wasm\+\_\+ops\+::f64\+\_\+convert\+\_\+s\+\_\+i32 $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1i32__convert__f64__injector}{i32\+\_\+convert\+\_\+f64\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a7bb00604a28e8e8010cece3cd5886adc}{wasm\+\_\+ops\+::f64\+\_\+convert\+\_\+s\+\_\+i32\+\_\+code}}$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00573}{573}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a12d10afc60f54839bea066c1ff5cae36}\index{sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}!f64\_convert\_s\_i64@{f64\_convert\_s\_i64}}
+\index{f64\_convert\_s\_i64@{f64\_convert\_s\_i64}!sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}}
+\doxysubsubsection{\texorpdfstring{f64\_convert\_s\_i64}{f64\_convert\_s\_i64}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a12d10afc60f54839bea066c1ff5cae36} 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a12d10afc60f54839bea066c1ff5cae36}{sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors\+::f64\+\_\+convert\+\_\+s\+\_\+i64}} = wasm\+\_\+ops\+::f64\+\_\+convert\+\_\+s\+\_\+i64 $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1i64__convert__f64__injector}{i64\+\_\+convert\+\_\+f64\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a84423fc735bd22561d9ed03608364c3e}{wasm\+\_\+ops\+::f64\+\_\+convert\+\_\+s\+\_\+i64\+\_\+code}}$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00574}{574}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_ad93cbc2253e82871328d36a9999fb542}\index{sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}!f64\_convert\_u\_i32@{f64\_convert\_u\_i32}}
+\index{f64\_convert\_u\_i32@{f64\_convert\_u\_i32}!sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}}
+\doxysubsubsection{\texorpdfstring{f64\_convert\_u\_i32}{f64\_convert\_u\_i32}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_ad93cbc2253e82871328d36a9999fb542} 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_ad93cbc2253e82871328d36a9999fb542}{sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors\+::f64\+\_\+convert\+\_\+u\+\_\+i32}} = wasm\+\_\+ops\+::f64\+\_\+convert\+\_\+u\+\_\+i32 $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1i32__convert__f64__injector}{i32\+\_\+convert\+\_\+f64\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a373a2f3bb01b4b1ac6ca907c85a81971}{wasm\+\_\+ops\+::f64\+\_\+convert\+\_\+u\+\_\+i32\+\_\+code}}$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00575}{575}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_ad0e026113e57e8852fcef08e1e029894}\index{sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}!f64\_convert\_u\_i64@{f64\_convert\_u\_i64}}
+\index{f64\_convert\_u\_i64@{f64\_convert\_u\_i64}!sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}}
+\doxysubsubsection{\texorpdfstring{f64\_convert\_u\_i64}{f64\_convert\_u\_i64}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_ad0e026113e57e8852fcef08e1e029894} 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_ad0e026113e57e8852fcef08e1e029894}{sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors\+::f64\+\_\+convert\+\_\+u\+\_\+i64}} = wasm\+\_\+ops\+::f64\+\_\+convert\+\_\+u\+\_\+i64 $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1i64__convert__f64__injector}{i64\+\_\+convert\+\_\+f64\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ae9b8e51ba6388f7437d56844b01c8811}{wasm\+\_\+ops\+::f64\+\_\+convert\+\_\+u\+\_\+i64\+\_\+code}}$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00576}{576}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a9a2b36bc840e071fe566303695de0017}\index{sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}!f64\_copysign\_t@{f64\_copysign\_t}}
+\index{f64\_copysign\_t@{f64\_copysign\_t}!sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}}
+\doxysubsubsection{\texorpdfstring{f64\_copysign\_t}{f64\_copysign\_t}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a9a2b36bc840e071fe566303695de0017} 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a9a2b36bc840e071fe566303695de0017}{sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors\+::f64\+\_\+copysign\+\_\+t}} = wasm\+\_\+ops\+::f64\+\_\+copysign $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f64__binop__injector}{f64\+\_\+binop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ada89fecbc938ab79cdf8b5cc277915eb}{wasm\+\_\+ops\+::f64\+\_\+copysign\+\_\+code}}$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00538}{538}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a775d010e5584d71b8a7a8c957e6817c3}\index{sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}!f64\_div\_t@{f64\_div\_t}}
+\index{f64\_div\_t@{f64\_div\_t}!sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}}
+\doxysubsubsection{\texorpdfstring{f64\_div\_t}{f64\_div\_t}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a775d010e5584d71b8a7a8c957e6817c3} 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a775d010e5584d71b8a7a8c957e6817c3}{sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors\+::f64\+\_\+div\+\_\+t}} = wasm\+\_\+ops\+::f64\+\_\+div $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f64__binop__injector}{f64\+\_\+binop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ae3a86c7e76e2711cccedbf59d0869041}{wasm\+\_\+ops\+::f64\+\_\+div\+\_\+code}}$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00534}{534}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_af2c869fcaf13efa37d1e0ae0008df9d7}\index{sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}!f64\_eq\_t@{f64\_eq\_t}}
+\index{f64\_eq\_t@{f64\_eq\_t}!sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}}
+\doxysubsubsection{\texorpdfstring{f64\_eq\_t}{f64\_eq\_t}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_af2c869fcaf13efa37d1e0ae0008df9d7} 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_af2c869fcaf13efa37d1e0ae0008df9d7}{sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors\+::f64\+\_\+eq\+\_\+t}} = wasm\+\_\+ops\+::f64\+\_\+eq $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f64__relop__injector}{f64\+\_\+relop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2aa27d3025e48045f47c84e367ea400d1f}{wasm\+\_\+ops\+::f64\+\_\+eq\+\_\+code}}$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00548}{548}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_ab5c1ca2c44d0ebe0145e8c38571e065d}\index{sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}!f64\_floor\_t@{f64\_floor\_t}}
+\index{f64\_floor\_t@{f64\_floor\_t}!sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}}
+\doxysubsubsection{\texorpdfstring{f64\_floor\_t}{f64\_floor\_t}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_ab5c1ca2c44d0ebe0145e8c38571e065d} 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_ab5c1ca2c44d0ebe0145e8c38571e065d}{sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors\+::f64\+\_\+floor\+\_\+t}} = wasm\+\_\+ops\+::f64\+\_\+floor $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f64__unop__injector}{f64\+\_\+unop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a00e0d3e5805624370dab6c4e06fa2e87}{wasm\+\_\+ops\+::f64\+\_\+floor\+\_\+code}}$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00543}{543}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a797709c9960b56620cacbbd6632e8014}\index{sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}!f64\_ge\_t@{f64\_ge\_t}}
+\index{f64\_ge\_t@{f64\_ge\_t}!sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}}
+\doxysubsubsection{\texorpdfstring{f64\_ge\_t}{f64\_ge\_t}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a797709c9960b56620cacbbd6632e8014} 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a797709c9960b56620cacbbd6632e8014}{sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors\+::f64\+\_\+ge\+\_\+t}} = wasm\+\_\+ops\+::f64\+\_\+ge $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f64__relop__injector}{f64\+\_\+relop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a1bbeaffa9fa9073c52ec9e985f2192ac}{wasm\+\_\+ops\+::f64\+\_\+ge\+\_\+code}}$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00553}{553}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_ad50be232e02a519cde508f42c6c3471e}\index{sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}!f64\_gt\_t@{f64\_gt\_t}}
+\index{f64\_gt\_t@{f64\_gt\_t}!sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}}
+\doxysubsubsection{\texorpdfstring{f64\_gt\_t}{f64\_gt\_t}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_ad50be232e02a519cde508f42c6c3471e} 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_ad50be232e02a519cde508f42c6c3471e}{sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors\+::f64\+\_\+gt\+\_\+t}} = wasm\+\_\+ops\+::f64\+\_\+gt $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f64__relop__injector}{f64\+\_\+relop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a7ed90365c9a80d360ae4db1497bac015}{wasm\+\_\+ops\+::f64\+\_\+gt\+\_\+code}}$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00552}{552}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a13938a3e54bc5732567340370a54a90a}\index{sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}!f64\_le\_t@{f64\_le\_t}}
+\index{f64\_le\_t@{f64\_le\_t}!sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}}
+\doxysubsubsection{\texorpdfstring{f64\_le\_t}{f64\_le\_t}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a13938a3e54bc5732567340370a54a90a} 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a13938a3e54bc5732567340370a54a90a}{sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors\+::f64\+\_\+le\+\_\+t}} = wasm\+\_\+ops\+::f64\+\_\+le $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f64__relop__injector}{f64\+\_\+relop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a85043e9ce5f70a3d4e40b2e4c16ec3f4}{wasm\+\_\+ops\+::f64\+\_\+le\+\_\+code}}$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00551}{551}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_ad798a54202060d724dcec00a33c84b3a}\index{sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}!f64\_lt\_t@{f64\_lt\_t}}
+\index{f64\_lt\_t@{f64\_lt\_t}!sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}}
+\doxysubsubsection{\texorpdfstring{f64\_lt\_t}{f64\_lt\_t}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_ad798a54202060d724dcec00a33c84b3a} 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_ad798a54202060d724dcec00a33c84b3a}{sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors\+::f64\+\_\+lt\+\_\+t}} = wasm\+\_\+ops\+::f64\+\_\+lt $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f64__relop__injector}{f64\+\_\+relop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ac043932cbb6c0bebddaebf843c7497ad}{wasm\+\_\+ops\+::f64\+\_\+lt\+\_\+code}}$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00550}{550}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_aacbdca2aae00c44ff40df7d254171595}\index{sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}!f64\_max\_t@{f64\_max\_t}}
+\index{f64\_max\_t@{f64\_max\_t}!sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}}
+\doxysubsubsection{\texorpdfstring{f64\_max\_t}{f64\_max\_t}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_aacbdca2aae00c44ff40df7d254171595} 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_aacbdca2aae00c44ff40df7d254171595}{sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors\+::f64\+\_\+max\+\_\+t}} = wasm\+\_\+ops\+::f64\+\_\+max $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f64__binop__injector}{f64\+\_\+binop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a7adbe48197d0721ebc1e20bedfd24ed8}{wasm\+\_\+ops\+::f64\+\_\+max\+\_\+code}}$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00537}{537}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_aa4e705d1499c0026d31935f106e2d2f2}\index{sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}!f64\_min\_t@{f64\_min\_t}}
+\index{f64\_min\_t@{f64\_min\_t}!sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}}
+\doxysubsubsection{\texorpdfstring{f64\_min\_t}{f64\_min\_t}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_aa4e705d1499c0026d31935f106e2d2f2} 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_aa4e705d1499c0026d31935f106e2d2f2}{sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors\+::f64\+\_\+min\+\_\+t}} = wasm\+\_\+ops\+::f64\+\_\+min $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f64__binop__injector}{f64\+\_\+binop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2abddd4861de225cfa70a3a483a2ff217e}{wasm\+\_\+ops\+::f64\+\_\+min\+\_\+code}}$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00536}{536}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a38a96221113ecbb0b762df582bb9699c}\index{sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}!f64\_mul\_t@{f64\_mul\_t}}
+\index{f64\_mul\_t@{f64\_mul\_t}!sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}}
+\doxysubsubsection{\texorpdfstring{f64\_mul\_t}{f64\_mul\_t}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a38a96221113ecbb0b762df582bb9699c} 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a38a96221113ecbb0b762df582bb9699c}{sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors\+::f64\+\_\+mul\+\_\+t}} = wasm\+\_\+ops\+::f64\+\_\+mul $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f64__binop__injector}{f64\+\_\+binop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a015dac69744823da739e2ae325f2f18e}{wasm\+\_\+ops\+::f64\+\_\+mul\+\_\+code}}$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00535}{535}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a37b1280d8e0656ddfb17fa67cca398bc}\index{sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}!f64\_ne\_t@{f64\_ne\_t}}
+\index{f64\_ne\_t@{f64\_ne\_t}!sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}}
+\doxysubsubsection{\texorpdfstring{f64\_ne\_t}{f64\_ne\_t}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a37b1280d8e0656ddfb17fa67cca398bc} 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a37b1280d8e0656ddfb17fa67cca398bc}{sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors\+::f64\+\_\+ne\+\_\+t}} = wasm\+\_\+ops\+::f64\+\_\+ne $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f64__relop__injector}{f64\+\_\+relop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ab482bff312f7a1f0d238ea6595d91f79}{wasm\+\_\+ops\+::f64\+\_\+ne\+\_\+code}}$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00549}{549}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a9201d0342699cb1510723fc1f3b24863}\index{sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}!f64\_nearest\_t@{f64\_nearest\_t}}
+\index{f64\_nearest\_t@{f64\_nearest\_t}!sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}}
+\doxysubsubsection{\texorpdfstring{f64\_nearest\_t}{f64\_nearest\_t}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a9201d0342699cb1510723fc1f3b24863} 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a9201d0342699cb1510723fc1f3b24863}{sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors\+::f64\+\_\+nearest\+\_\+t}} = wasm\+\_\+ops\+::f64\+\_\+nearest $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f64__unop__injector}{f64\+\_\+unop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a9c9d6cc68686641f7867578528f709fd}{wasm\+\_\+ops\+::f64\+\_\+nearest\+\_\+code}}$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00546}{546}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a53d5a66d61bd455c0d0b3736839bab7b}\index{sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}!f64\_neg\_t@{f64\_neg\_t}}
+\index{f64\_neg\_t@{f64\_neg\_t}!sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}}
+\doxysubsubsection{\texorpdfstring{f64\_neg\_t}{f64\_neg\_t}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a53d5a66d61bd455c0d0b3736839bab7b} 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a53d5a66d61bd455c0d0b3736839bab7b}{sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors\+::f64\+\_\+neg\+\_\+t}} = wasm\+\_\+ops\+::f64\+\_\+neg $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f64__unop__injector}{f64\+\_\+unop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2afc6003b06a46d398e624f92cb6c531f0}{wasm\+\_\+ops\+::f64\+\_\+neg\+\_\+code}}$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00541}{541}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_aa79148ffd46b2d49f2118fba723e8ddf}\index{sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}!f64\_promote\_f32\_t@{f64\_promote\_f32\_t}}
+\index{f64\_promote\_f32\_t@{f64\_promote\_f32\_t}!sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}}
+\doxysubsubsection{\texorpdfstring{f64\_promote\_f32\_t}{f64\_promote\_f32\_t}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_aa79148ffd46b2d49f2118fba723e8ddf} 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_aa79148ffd46b2d49f2118fba723e8ddf}{sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors\+::f64\+\_\+promote\+\_\+f32\+\_\+t}} = wasm\+\_\+ops\+::f64\+\_\+promote\+\_\+f32 $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f32__promote__injector}{f32\+\_\+promote\+\_\+injector}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00556}{556}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_af2b56e37af6a61ac145cf0f0896e5762}\index{sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}!f64\_sqrt\_t@{f64\_sqrt\_t}}
+\index{f64\_sqrt\_t@{f64\_sqrt\_t}!sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}}
+\doxysubsubsection{\texorpdfstring{f64\_sqrt\_t}{f64\_sqrt\_t}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_af2b56e37af6a61ac145cf0f0896e5762} 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_af2b56e37af6a61ac145cf0f0896e5762}{sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors\+::f64\+\_\+sqrt\+\_\+t}} = wasm\+\_\+ops\+::f64\+\_\+sqrt $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f64__unop__injector}{f64\+\_\+unop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ae09ca188b551a0d5b07ab0786e4b59b9}{wasm\+\_\+ops\+::f64\+\_\+sqrt\+\_\+code}}$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00542}{542}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a762b9f6247858cacca0d964a9a05aaf6}\index{sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}!f64\_sub\_t@{f64\_sub\_t}}
+\index{f64\_sub\_t@{f64\_sub\_t}!sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}}
+\doxysubsubsection{\texorpdfstring{f64\_sub\_t}{f64\_sub\_t}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a762b9f6247858cacca0d964a9a05aaf6} 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a762b9f6247858cacca0d964a9a05aaf6}{sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors\+::f64\+\_\+sub\+\_\+t}} = wasm\+\_\+ops\+::f64\+\_\+sub $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f64__binop__injector}{f64\+\_\+binop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a2175aeb1a7dcd62d78e59c4568024b8c}{wasm\+\_\+ops\+::f64\+\_\+sub\+\_\+code}}$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00533}{533}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a3abe9f30db8c1d7c1a8656c3fd40dcd2}\index{sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}!f64\_trunc\_t@{f64\_trunc\_t}}
+\index{f64\_trunc\_t@{f64\_trunc\_t}!sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}}
+\doxysubsubsection{\texorpdfstring{f64\_trunc\_t}{f64\_trunc\_t}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a3abe9f30db8c1d7c1a8656c3fd40dcd2} 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a3abe9f30db8c1d7c1a8656c3fd40dcd2}{sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors\+::f64\+\_\+trunc\+\_\+t}} = wasm\+\_\+ops\+::f64\+\_\+trunc $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f64__unop__injector}{f64\+\_\+unop\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2aabf90e63f13f55f23374b5a6c7ee7a85}{wasm\+\_\+ops\+::f64\+\_\+trunc\+\_\+code}}$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00545}{545}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a5df4304e9a0416815c26fa0d8c04b53c}\index{sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}!i32\_trunc\_s\_f32\_t@{i32\_trunc\_s\_f32\_t}}
+\index{i32\_trunc\_s\_f32\_t@{i32\_trunc\_s\_f32\_t}!sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}}
+\doxysubsubsection{\texorpdfstring{i32\_trunc\_s\_f32\_t}{i32\_trunc\_s\_f32\_t}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a5df4304e9a0416815c26fa0d8c04b53c} 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a5df4304e9a0416815c26fa0d8c04b53c}{sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors\+::i32\+\_\+trunc\+\_\+s\+\_\+f32\+\_\+t}} = wasm\+\_\+ops\+::i32\+\_\+trunc\+\_\+s\+\_\+f32 $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f32__trunc__i32__injector}{f32\+\_\+trunc\+\_\+i32\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2aba26bc6e3960c56289fb96fc73792338}{wasm\+\_\+ops\+::i32\+\_\+trunc\+\_\+s\+\_\+f32\+\_\+code}}$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00560}{560}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a268ade8a1f059fbc60c7fa369cc6da23}\index{sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}!i32\_trunc\_s\_f64\_t@{i32\_trunc\_s\_f64\_t}}
+\index{i32\_trunc\_s\_f64\_t@{i32\_trunc\_s\_f64\_t}!sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}}
+\doxysubsubsection{\texorpdfstring{i32\_trunc\_s\_f64\_t}{i32\_trunc\_s\_f64\_t}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a268ade8a1f059fbc60c7fa369cc6da23} 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a268ade8a1f059fbc60c7fa369cc6da23}{sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors\+::i32\+\_\+trunc\+\_\+s\+\_\+f64\+\_\+t}} = wasm\+\_\+ops\+::i32\+\_\+trunc\+\_\+s\+\_\+f64 $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f64__trunc__i32__injector}{f64\+\_\+trunc\+\_\+i32\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a85948ac850d8543f4905a37c157d7bce}{wasm\+\_\+ops\+::i32\+\_\+trunc\+\_\+s\+\_\+f64\+\_\+code}}$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00562}{562}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_ac2922c7067416796219006cdf751d1c5}\index{sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}!i32\_trunc\_u\_f32\_t@{i32\_trunc\_u\_f32\_t}}
+\index{i32\_trunc\_u\_f32\_t@{i32\_trunc\_u\_f32\_t}!sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}}
+\doxysubsubsection{\texorpdfstring{i32\_trunc\_u\_f32\_t}{i32\_trunc\_u\_f32\_t}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_ac2922c7067416796219006cdf751d1c5} 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_ac2922c7067416796219006cdf751d1c5}{sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors\+::i32\+\_\+trunc\+\_\+u\+\_\+f32\+\_\+t}} = wasm\+\_\+ops\+::i32\+\_\+trunc\+\_\+u\+\_\+f32 $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f32__trunc__i32__injector}{f32\+\_\+trunc\+\_\+i32\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ae10d1e8d76f4259c753e43f43848e6af}{wasm\+\_\+ops\+::i32\+\_\+trunc\+\_\+u\+\_\+f32\+\_\+code}}$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00561}{561}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a34522d3c7e0ef7e938ed6d1ba813a494}\index{sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}!i32\_trunc\_u\_f64\_t@{i32\_trunc\_u\_f64\_t}}
+\index{i32\_trunc\_u\_f64\_t@{i32\_trunc\_u\_f64\_t}!sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}}
+\doxysubsubsection{\texorpdfstring{i32\_trunc\_u\_f64\_t}{i32\_trunc\_u\_f64\_t}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a34522d3c7e0ef7e938ed6d1ba813a494} 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a34522d3c7e0ef7e938ed6d1ba813a494}{sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors\+::i32\+\_\+trunc\+\_\+u\+\_\+f64\+\_\+t}} = wasm\+\_\+ops\+::i32\+\_\+trunc\+\_\+u\+\_\+f64 $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f64__trunc__i32__injector}{f64\+\_\+trunc\+\_\+i32\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a2898dba6ca29d65f88998c84ad48a6a3}{wasm\+\_\+ops\+::i32\+\_\+trunc\+\_\+u\+\_\+f64\+\_\+code}}$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00563}{563}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_ae0686cbc394c24852983d31e2bea668b}\index{sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}!i64\_trunc\_s\_f32\_t@{i64\_trunc\_s\_f32\_t}}
+\index{i64\_trunc\_s\_f32\_t@{i64\_trunc\_s\_f32\_t}!sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}}
+\doxysubsubsection{\texorpdfstring{i64\_trunc\_s\_f32\_t}{i64\_trunc\_s\_f32\_t}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_ae0686cbc394c24852983d31e2bea668b} 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_ae0686cbc394c24852983d31e2bea668b}{sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors\+::i64\+\_\+trunc\+\_\+s\+\_\+f32\+\_\+t}} = wasm\+\_\+ops\+::i64\+\_\+trunc\+\_\+s\+\_\+f32 $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f32__trunc__i64__injector}{f32\+\_\+trunc\+\_\+i64\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2ad58616186657ec8202889ca0a1a92831}{wasm\+\_\+ops\+::i64\+\_\+trunc\+\_\+s\+\_\+f32\+\_\+code}}$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00564}{564}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_af1d0886c199c5908bc991f6ae515db6a}\index{sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}!i64\_trunc\_s\_f64\_t@{i64\_trunc\_s\_f64\_t}}
+\index{i64\_trunc\_s\_f64\_t@{i64\_trunc\_s\_f64\_t}!sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}}
+\doxysubsubsection{\texorpdfstring{i64\_trunc\_s\_f64\_t}{i64\_trunc\_s\_f64\_t}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_af1d0886c199c5908bc991f6ae515db6a} 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_af1d0886c199c5908bc991f6ae515db6a}{sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors\+::i64\+\_\+trunc\+\_\+s\+\_\+f64\+\_\+t}} = wasm\+\_\+ops\+::i64\+\_\+trunc\+\_\+s\+\_\+f64 $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f64__trunc__i64__injector}{f64\+\_\+trunc\+\_\+i64\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a911864e636a6dadbb852ff8ab6f86ccd}{wasm\+\_\+ops\+::i64\+\_\+trunc\+\_\+s\+\_\+f64\+\_\+code}}$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00566}{566}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a32f50d9ca9d07b56b21068b40dad27c0}\index{sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}!i64\_trunc\_u\_f32\_t@{i64\_trunc\_u\_f32\_t}}
+\index{i64\_trunc\_u\_f32\_t@{i64\_trunc\_u\_f32\_t}!sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}}
+\doxysubsubsection{\texorpdfstring{i64\_trunc\_u\_f32\_t}{i64\_trunc\_u\_f32\_t}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a32f50d9ca9d07b56b21068b40dad27c0} 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_a32f50d9ca9d07b56b21068b40dad27c0}{sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors\+::i64\+\_\+trunc\+\_\+u\+\_\+f32\+\_\+t}} = wasm\+\_\+ops\+::i64\+\_\+trunc\+\_\+u\+\_\+f32 $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f32__trunc__i64__injector}{f32\+\_\+trunc\+\_\+i64\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a873422f377066ad8aa806262ce0e7710}{wasm\+\_\+ops\+::i64\+\_\+trunc\+\_\+u\+\_\+f32\+\_\+code}}$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00565}{565}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_aa75fbe6745917d1bcbd7e981e4def6db}\index{sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}!i64\_trunc\_u\_f64\_t@{i64\_trunc\_u\_f64\_t}}
+\index{i64\_trunc\_u\_f64\_t@{i64\_trunc\_u\_f64\_t}!sysio::chain::wasm\_injections::pre\_op\_injectors@{sysio::chain::wasm\_injections::pre\_op\_injectors}}
+\doxysubsubsection{\texorpdfstring{i64\_trunc\_u\_f64\_t}{i64\_trunc\_u\_f64\_t}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_aa75fbe6745917d1bcbd7e981e4def6db} 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1pre__op__injectors_aa75fbe6745917d1bcbd7e981e4def6db}{sysio\+::chain\+::wasm\+\_\+injections\+::pre\+\_\+op\+\_\+injectors\+::i64\+\_\+trunc\+\_\+u\+\_\+f64\+\_\+t}} = wasm\+\_\+ops\+::i64\+\_\+trunc\+\_\+u\+\_\+f64 $<$\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1f64__trunc__i64__injector}{f64\+\_\+trunc\+\_\+i64\+\_\+injector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_1_1wasm__ops_ac9669410f041945b88a76c6543a461f2a913ea6ed0f4325e7a2c6422a0e5773b9}{wasm\+\_\+ops\+::i64\+\_\+trunc\+\_\+u\+\_\+f64\+\_\+code}}$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00567}{567}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{wasm__sysio__injection_8hpp}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}\end{DoxyCompactItemize}

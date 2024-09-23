@@ -1,0 +1,1144 @@
+\doxysection{testing\+::internal\+::Expectation\+Base Class Reference}
+\hypertarget{classtesting_1_1internal_1_1_expectation_base}{}\label{classtesting_1_1internal_1_1_expectation_base}\index{testing::internal::ExpectationBase@{testing::internal::ExpectationBase}}
+
+
+{\ttfamily \#include $<$gmock-\/spec-\/builders.\+h$>$}
+
+
+
+Inheritance diagram for testing\+::internal\+::Expectation\+Base\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=198pt]{classtesting_1_1internal_1_1_expectation_base__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for testing\+::internal\+::Expectation\+Base\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_expectation_base__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a7ba2da3ba34dfca22d2202934405e676}{Expectation\+Base}} (const char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a4e6c2bf337d2213652dbe630be7fdcc7}{file}}, int \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a6a44d831449d31e0e46d0070625b452c}{line}}, const std\+::string \&\mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a30c6f21bc67833c1f313b2148603b22b}{source\+\_\+text}})
+\item 
+virtual \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_aff36dabbd1bd194d93a3b2d3c9d3ebbf}{\texorpdfstring{$\sim$}{\string~}\+Expectation\+Base}} ()
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a4e6c2bf337d2213652dbe630be7fdcc7}{file}} () const
+\item 
+int \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a6a44d831449d31e0e46d0070625b452c}{line}} () const
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a30c6f21bc67833c1f313b2148603b22b}{source\+\_\+text}} () const
+\item 
+const \mbox{\hyperlink{classtesting_1_1_cardinality}{Cardinality}} \& \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_add89b0324797a421a1df77898528cbb7}{cardinality}} () const
+\item 
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a666e7f8fb2412e78f090244e6bfd4493}{Describe\+Location\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}os) const
+\item 
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a2beebed3ade29077bcf294b449bb8b9d}{Describe\+Call\+Count\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}os) const \mbox{\hyperlink{gtest-port_8h_a149f693bd59fa1bc937af54c0cdcb32f}{GTEST\+\_\+\+EXCLUSIVE\+\_\+\+LOCK\+\_\+\+REQUIRED\+\_\+}}(g\+\_\+gmock\+\_\+mutex)
+\item 
+virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a5ce4f648c7b112d27b798711d1e3ff5b}{Maybe\+Describe\+Extra\+Matcher\+To}} (\+::std\+::ostream \texorpdfstring{$\ast$}{*}os)=0
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a450f34b979ec5814c91d4eab6b78cfc2}{Clause}} \{ \newline
+\mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a450f34b979ec5814c91d4eab6b78cfc2ae25b940c0878d057628e3509830d84e9}{k\+None}}
+, \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a450f34b979ec5814c91d4eab6b78cfc2a2a83fca10989c55ad16aafd2851ca139}{k\+With}}
+, \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a450f34b979ec5814c91d4eab6b78cfc2a8080d1291dd355e3ad9478f8c8b79689}{k\+Times}}
+, \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a450f34b979ec5814c91d4eab6b78cfc2ac9e8abdc7de4697d2174c560e7a0a595}{k\+In\+Sequence}}
+, \newline
+\mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a450f34b979ec5814c91d4eab6b78cfc2a7988a8564321947266de0e74148ae4ec}{k\+After}}
+, \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a450f34b979ec5814c91d4eab6b78cfc2a571cc6a896cd99aa3532f6ab51a51b7a}{k\+Will\+Once}}
+, \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a450f34b979ec5814c91d4eab6b78cfc2a4b568d2f88f5141c4c61bc53757791d1}{k\+Will\+Repeatedly}}
+, \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a450f34b979ec5814c91d4eab6b78cfc2a816336e701d7be1ca9e07998d41ba5af}{k\+Retires\+On\+Saturation}}
+ \}
+\item 
+typedef std\+::vector$<$ const void \texorpdfstring{$\ast$}{*} $>$ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a975e8a9e651a4c83cc806afc1e20a721}{Untyped\+Actions}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{classtesting_1_1_expectation}{Expectation}} \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a678f6fc24742ab0236ebc9a8128e7bfe}{Get\+Handle}} ()=0
+\item 
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_aa631b79fb3442c16142f662a059d62c7}{Assert\+Spec\+Property}} (bool property, const std\+::string \&failure\+\_\+message) const
+\item 
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_af261dd0d844ab9db2328c37845c736c4}{Expect\+Spec\+Property}} (bool property, const std\+::string \&failure\+\_\+message) const
+\item 
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a3d1d08542b32239d9b5738e3e32e2217}{Specify\+Cardinality}} (const \mbox{\hyperlink{classtesting_1_1_cardinality}{Cardinality}} \&\mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_add89b0324797a421a1df77898528cbb7}{cardinality}})
+\item 
+bool \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a8c3715b0c44d29eb53148036d9366940}{cardinality\+\_\+specified}} () const
+\item 
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a6d416ffd4546ae84de79afb67ad05ada}{set\+\_\+cardinality}} (const \mbox{\hyperlink{classtesting_1_1_cardinality}{Cardinality}} \&a\+\_\+cardinality)
+\item 
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_afb623801e8de31fcd7b352e200649f7d}{Retire\+All\+Pre\+Requisites}} () \mbox{\hyperlink{gtest-port_8h_a149f693bd59fa1bc937af54c0cdcb32f}{GTEST\+\_\+\+EXCLUSIVE\+\_\+\+LOCK\+\_\+\+REQUIRED\+\_\+}}(g\+\_\+gmock\+\_\+mutex)
+\item 
+bool \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_afe539dbc5b29d9635403767a4708c476}{is\+\_\+retired}} () const \mbox{\hyperlink{gtest-port_8h_a149f693bd59fa1bc937af54c0cdcb32f}{GTEST\+\_\+\+EXCLUSIVE\+\_\+\+LOCK\+\_\+\+REQUIRED\+\_\+}}(g\+\_\+gmock\+\_\+mutex)
+\item 
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a0aeeb4c1e66c2f2aa0853c267ad3e781}{Retire}} () \mbox{\hyperlink{gtest-port_8h_a149f693bd59fa1bc937af54c0cdcb32f}{GTEST\+\_\+\+EXCLUSIVE\+\_\+\+LOCK\+\_\+\+REQUIRED\+\_\+}}(g\+\_\+gmock\+\_\+mutex)
+\item 
+bool \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_ae629adc2dd9aee0ac62e50314f1a6449}{Is\+Satisfied}} () const \mbox{\hyperlink{gtest-port_8h_a149f693bd59fa1bc937af54c0cdcb32f}{GTEST\+\_\+\+EXCLUSIVE\+\_\+\+LOCK\+\_\+\+REQUIRED\+\_\+}}(g\+\_\+gmock\+\_\+mutex)
+\item 
+bool \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_ad3e4340cedefdc24fce1478a8d6cab93}{Is\+Saturated}} () const \mbox{\hyperlink{gtest-port_8h_a149f693bd59fa1bc937af54c0cdcb32f}{GTEST\+\_\+\+EXCLUSIVE\+\_\+\+LOCK\+\_\+\+REQUIRED\+\_\+}}(g\+\_\+gmock\+\_\+mutex)
+\item 
+bool \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a080dab35ecc6c57096f50758a0e8123d}{Is\+Over\+Saturated}} () const \mbox{\hyperlink{gtest-port_8h_a149f693bd59fa1bc937af54c0cdcb32f}{GTEST\+\_\+\+EXCLUSIVE\+\_\+\+LOCK\+\_\+\+REQUIRED\+\_\+}}(g\+\_\+gmock\+\_\+mutex)
+\item 
+bool \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a82ba68cdd71a8b5aff5a5be24c23a637}{All\+Prerequisites\+Are\+Satisfied}} () const \mbox{\hyperlink{gtest-port_8h_a149f693bd59fa1bc937af54c0cdcb32f}{GTEST\+\_\+\+EXCLUSIVE\+\_\+\+LOCK\+\_\+\+REQUIRED\+\_\+}}(g\+\_\+gmock\+\_\+mutex)
+\item 
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a9eb518c079f950a59c67e8012d3371c0}{Find\+Unsatisfied\+Prerequisites}} (\mbox{\hyperlink{classtesting_1_1_expectation_set}{Expectation\+Set}} \texorpdfstring{$\ast$}{*}result) const \mbox{\hyperlink{gtest-port_8h_a149f693bd59fa1bc937af54c0cdcb32f}{GTEST\+\_\+\+EXCLUSIVE\+\_\+\+LOCK\+\_\+\+REQUIRED\+\_\+}}(g\+\_\+gmock\+\_\+mutex)
+\item 
+int \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_aacc0399271907194ac1627439f65047a}{call\+\_\+count}} () const \mbox{\hyperlink{gtest-port_8h_a149f693bd59fa1bc937af54c0cdcb32f}{GTEST\+\_\+\+EXCLUSIVE\+\_\+\+LOCK\+\_\+\+REQUIRED\+\_\+}}(g\+\_\+gmock\+\_\+mutex)
+\item 
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_aef1766c39ad6478f9041e0f5c5000532}{Increment\+Call\+Count}} () \mbox{\hyperlink{gtest-port_8h_a149f693bd59fa1bc937af54c0cdcb32f}{GTEST\+\_\+\+EXCLUSIVE\+\_\+\+LOCK\+\_\+\+REQUIRED\+\_\+}}(g\+\_\+gmock\+\_\+mutex)
+\item 
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_aaeb143b6f8676e9a6fb9b17678344f03}{Check\+Action\+Count\+If\+Not\+Done}} () const \mbox{\hyperlink{gtest-port_8h_a69abff5a4efdd07bd5faebe3dd318d06}{GTEST\+\_\+\+LOCK\+\_\+\+EXCLUDED\+\_\+}}(\mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a364f5473591d08d0ac03595c9050c13e}{mutex\+\_\+}})
+\item 
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a05bbd7fea6ea3c740ea095ea7462bc07}{Untyped\+Times}} (const \mbox{\hyperlink{classtesting_1_1_cardinality}{Cardinality}} \&a\+\_\+cardinality)
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a9a28e2f508571a0d68d9f964f3634022}{GTEST\+\_\+\+DISALLOW\+\_\+\+ASSIGN\+\_\+}} (\mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base}{Expectation\+Base}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_afabf690537298bbb84e9b443f62d7e97}{file\+\_\+}}
+\item 
+int \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_ab8143119e4b686ff1bb6c985924da57a}{line\+\_\+}}
+\item 
+const std\+::string \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a11ca157b7e8879b9f3b0ad1524eee5a4}{source\+\_\+text\+\_\+}}
+\item 
+bool \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_ad2ca7220ed1a395bd850ff06c500a402}{cardinality\+\_\+specified\+\_\+}}
+\item 
+\mbox{\hyperlink{classtesting_1_1_cardinality}{Cardinality}} \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_ad0aedcc01c0c9a998952a2b2f486595c}{cardinality\+\_\+}}
+\item 
+\mbox{\hyperlink{classtesting_1_1_expectation_set}{Expectation\+Set}} \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a186eff0fdcacc8c1e1a2becdec11d3cd}{immediate\+\_\+prerequisites\+\_\+}}
+\item 
+int \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_aea95d46f7583566e3f7a081b0668ad4c}{call\+\_\+count\+\_\+}}
+\item 
+bool \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a0afd852f5d7863effc3d304dac6a44cf}{retired\+\_\+}}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a975e8a9e651a4c83cc806afc1e20a721}{Untyped\+Actions}} \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a9558ff6b8b1b7e3a99fac1f93d1826da}{untyped\+\_\+actions\+\_\+}}
+\item 
+bool \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a34f599ac7ae4f1fb7567e0d4c9fadcba}{extra\+\_\+matcher\+\_\+specified\+\_\+}}
+\item 
+bool \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_abecd382b79252ffc0779d51e058b681c}{repeated\+\_\+action\+\_\+specified\+\_\+}}
+\item 
+bool \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a74802f3bedf4ab023b30ee6bb275a4d8}{retires\+\_\+on\+\_\+saturation\+\_\+}}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a450f34b979ec5814c91d4eab6b78cfc2}{Clause}} \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a584f296e53b4cc002ddf5e65e44d72d9}{last\+\_\+clause\+\_\+}}
+\item 
+bool \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a19933e346f6493005437bdd6812c7a29}{action\+\_\+count\+\_\+checked\+\_\+}}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_mutex}{Mutex}} \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a364f5473591d08d0ac03595c9050c13e}{mutex\+\_\+}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a86fa3dccdc465d897ee321b74e4ce915}{\+::testing\+::\+Expectation}}
+\item 
+\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a3e5598b244ec7673d0a494477d71e559}{Untyped\+Function\+Mocker\+Base}}
+\item 
+\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_aeaf43a487a21c0ac1135b094a1561056}{\+::testing\+::\+Sequence}}
+\item 
+\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a83859ffda7f75bb8b447063eb53cb8b8}{\+::testing\+::internal\+::\+Expectation\+Tester}}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{structtesting_1_1internal_1_1_function}{Function}} $>$ }\\\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a4f17de55396a8ef740d5ad2b1380a851}{Typed\+Expectation}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00695}{695}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_expectation_base_a975e8a9e651a4c83cc806afc1e20a721}\index{testing::internal::ExpectationBase@{testing::internal::ExpectationBase}!UntypedActions@{UntypedActions}}
+\index{UntypedActions@{UntypedActions}!testing::internal::ExpectationBase@{testing::internal::ExpectationBase}}
+\doxysubsubsection{\texorpdfstring{UntypedActions}{UntypedActions}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_expectation_base_a975e8a9e651a4c83cc806afc1e20a721} 
+std\+::vector$<$const void\texorpdfstring{$\ast$}{*}$>$ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a975e8a9e651a4c83cc806afc1e20a721}{testing\+::internal\+::\+Expectation\+Base\+::\+Untyped\+Actions}}\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00739}{739}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+
+\doxysubsection{Member Enumeration Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_expectation_base_a450f34b979ec5814c91d4eab6b78cfc2}\index{testing::internal::ExpectationBase@{testing::internal::ExpectationBase}!Clause@{Clause}}
+\index{Clause@{Clause}!testing::internal::ExpectationBase@{testing::internal::ExpectationBase}}
+\doxysubsubsection{\texorpdfstring{Clause}{Clause}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_expectation_base_a450f34b979ec5814c91d4eab6b78cfc2} 
+enum \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a450f34b979ec5814c91d4eab6b78cfc2}{testing\+::internal\+::\+Expectation\+Base\+::\+Clause}}\hspace{0.3cm}{\ttfamily [protected]}}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kNone@{kNone}!testing::internal::ExpectationBase@{testing::internal::ExpectationBase}}\index{testing::internal::ExpectationBase@{testing::internal::ExpectationBase}!kNone@{kNone}}}\Hypertarget{classtesting_1_1internal_1_1_expectation_base_a450f34b979ec5814c91d4eab6b78cfc2ae25b940c0878d057628e3509830d84e9}\label{classtesting_1_1internal_1_1_expectation_base_a450f34b979ec5814c91d4eab6b78cfc2} 
+k\+None&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kWith@{kWith}!testing::internal::ExpectationBase@{testing::internal::ExpectationBase}}\index{testing::internal::ExpectationBase@{testing::internal::ExpectationBase}!kWith@{kWith}}}\Hypertarget{classtesting_1_1internal_1_1_expectation_base_a450f34b979ec5814c91d4eab6b78cfc2a2a83fca10989c55ad16aafd2851ca139}\label{classtesting_1_1internal_1_1_expectation_base_a450f34b979ec5814c91d4eab6b78cfc2} 
+k\+With&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kTimes@{kTimes}!testing::internal::ExpectationBase@{testing::internal::ExpectationBase}}\index{testing::internal::ExpectationBase@{testing::internal::ExpectationBase}!kTimes@{kTimes}}}\Hypertarget{classtesting_1_1internal_1_1_expectation_base_a450f34b979ec5814c91d4eab6b78cfc2a8080d1291dd355e3ad9478f8c8b79689}\label{classtesting_1_1internal_1_1_expectation_base_a450f34b979ec5814c91d4eab6b78cfc2} 
+k\+Times&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kInSequence@{kInSequence}!testing::internal::ExpectationBase@{testing::internal::ExpectationBase}}\index{testing::internal::ExpectationBase@{testing::internal::ExpectationBase}!kInSequence@{kInSequence}}}\Hypertarget{classtesting_1_1internal_1_1_expectation_base_a450f34b979ec5814c91d4eab6b78cfc2ac9e8abdc7de4697d2174c560e7a0a595}\label{classtesting_1_1internal_1_1_expectation_base_a450f34b979ec5814c91d4eab6b78cfc2} 
+k\+In\+Sequence&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kAfter@{kAfter}!testing::internal::ExpectationBase@{testing::internal::ExpectationBase}}\index{testing::internal::ExpectationBase@{testing::internal::ExpectationBase}!kAfter@{kAfter}}}\Hypertarget{classtesting_1_1internal_1_1_expectation_base_a450f34b979ec5814c91d4eab6b78cfc2a7988a8564321947266de0e74148ae4ec}\label{classtesting_1_1internal_1_1_expectation_base_a450f34b979ec5814c91d4eab6b78cfc2} 
+k\+After&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kWillOnce@{kWillOnce}!testing::internal::ExpectationBase@{testing::internal::ExpectationBase}}\index{testing::internal::ExpectationBase@{testing::internal::ExpectationBase}!kWillOnce@{kWillOnce}}}\Hypertarget{classtesting_1_1internal_1_1_expectation_base_a450f34b979ec5814c91d4eab6b78cfc2a571cc6a896cd99aa3532f6ab51a51b7a}\label{classtesting_1_1internal_1_1_expectation_base_a450f34b979ec5814c91d4eab6b78cfc2} 
+k\+Will\+Once&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kWillRepeatedly@{kWillRepeatedly}!testing::internal::ExpectationBase@{testing::internal::ExpectationBase}}\index{testing::internal::ExpectationBase@{testing::internal::ExpectationBase}!kWillRepeatedly@{kWillRepeatedly}}}\Hypertarget{classtesting_1_1internal_1_1_expectation_base_a450f34b979ec5814c91d4eab6b78cfc2a4b568d2f88f5141c4c61bc53757791d1}\label{classtesting_1_1internal_1_1_expectation_base_a450f34b979ec5814c91d4eab6b78cfc2} 
+k\+Will\+Repeatedly&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{kRetiresOnSaturation@{kRetiresOnSaturation}!testing::internal::ExpectationBase@{testing::internal::ExpectationBase}}\index{testing::internal::ExpectationBase@{testing::internal::ExpectationBase}!kRetiresOnSaturation@{kRetiresOnSaturation}}}\Hypertarget{classtesting_1_1internal_1_1_expectation_base_a450f34b979ec5814c91d4eab6b78cfc2a816336e701d7be1ca9e07998d41ba5af}\label{classtesting_1_1internal_1_1_expectation_base_a450f34b979ec5814c91d4eab6b78cfc2} 
+k\+Retires\+On\+Saturation&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00727}{727}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00727\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00728\ \ \ \ \ \textcolor{comment}{//\ Don't\ change\ the\ order\ of\ the\ enum\ members!}}
+\DoxyCodeLine{00729\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a450f34b979ec5814c91d4eab6b78cfc2ae25b940c0878d057628e3509830d84e9}{kNone}},}
+\DoxyCodeLine{00730\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a450f34b979ec5814c91d4eab6b78cfc2a2a83fca10989c55ad16aafd2851ca139}{kWith}},}
+\DoxyCodeLine{00731\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a450f34b979ec5814c91d4eab6b78cfc2a8080d1291dd355e3ad9478f8c8b79689}{kTimes}},}
+\DoxyCodeLine{00732\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a450f34b979ec5814c91d4eab6b78cfc2ac9e8abdc7de4697d2174c560e7a0a595}{kInSequence}},}
+\DoxyCodeLine{00733\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a450f34b979ec5814c91d4eab6b78cfc2a7988a8564321947266de0e74148ae4ec}{kAfter}},}
+\DoxyCodeLine{00734\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a450f34b979ec5814c91d4eab6b78cfc2a571cc6a896cd99aa3532f6ab51a51b7a}{kWillOnce}},}
+\DoxyCodeLine{00735\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a450f34b979ec5814c91d4eab6b78cfc2a4b568d2f88f5141c4c61bc53757791d1}{kWillRepeatedly}},}
+\DoxyCodeLine{00736\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a450f34b979ec5814c91d4eab6b78cfc2a816336e701d7be1ca9e07998d41ba5af}{kRetiresOnSaturation}}}
+\DoxyCodeLine{00737\ \ \ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_expectation_base_a7ba2da3ba34dfca22d2202934405e676}\index{testing::internal::ExpectationBase@{testing::internal::ExpectationBase}!ExpectationBase@{ExpectationBase}}
+\index{ExpectationBase@{ExpectationBase}!testing::internal::ExpectationBase@{testing::internal::ExpectationBase}}
+\doxysubsubsection{\texorpdfstring{ExpectationBase()}{ExpectationBase()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_expectation_base_a7ba2da3ba34dfca22d2202934405e676} 
+testing\+::internal\+::\+Expectation\+Base\+::\+Expectation\+Base (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{file}{, }\item[{int}]{line}{, }\item[{const std\+::string \&}]{source\+\_\+text}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8cc_source_l00078}{78}} of file \mbox{\hyperlink{gmock-spec-builders_8cc_source}{gmock-\/spec-\/builders.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00080\ \ \ \ \ :\ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_afabf690537298bbb84e9b443f62d7e97}{file\_}}(a\_file),}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_ab8143119e4b686ff1bb6c985924da57a}{line\_}}(a\_line),}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a11ca157b7e8879b9f3b0ad1524eee5a4}{source\_text\_}}(a\_source\_text),}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_ad2ca7220ed1a395bd850ff06c500a402}{cardinality\_specified\_}}(\textcolor{keyword}{false}),}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_ad0aedcc01c0c9a998952a2b2f486595c}{cardinality\_}}(\mbox{\hyperlink{namespacetesting_aa9b1b32ba9e8d3db8ac0af0fc8785c8d}{Exactly}}(1)),}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_aea95d46f7583566e3f7a081b0668ad4c}{call\_count\_}}(0),}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a0afd852f5d7863effc3d304dac6a44cf}{retired\_}}(\textcolor{keyword}{false}),}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a34f599ac7ae4f1fb7567e0d4c9fadcba}{extra\_matcher\_specified\_}}(\textcolor{keyword}{false}),}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_abecd382b79252ffc0779d51e058b681c}{repeated\_action\_specified\_}}(\textcolor{keyword}{false}),}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a74802f3bedf4ab023b30ee6bb275a4d8}{retires\_on\_saturation\_}}(\textcolor{keyword}{false}),}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a584f296e53b4cc002ddf5e65e44d72d9}{last\_clause\_}}(\mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a450f34b979ec5814c91d4eab6b78cfc2ae25b940c0878d057628e3509830d84e9}{kNone}}),}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a19933e346f6493005437bdd6812c7a29}{action\_count\_checked\_}}(\textcolor{keyword}{false})\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1internal_1_1_expectation_base_aff36dabbd1bd194d93a3b2d3c9d3ebbf}\index{testing::internal::ExpectationBase@{testing::internal::ExpectationBase}!````~ExpectationBase@{\texorpdfstring{$\sim$}{\string~}ExpectationBase}}
+\index{````~ExpectationBase@{\texorpdfstring{$\sim$}{\string~}ExpectationBase}!testing::internal::ExpectationBase@{testing::internal::ExpectationBase}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}ExpectationBase()}{\string~ExpectationBase()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_expectation_base_aff36dabbd1bd194d93a3b2d3c9d3ebbf} 
+testing\+::internal\+::\+Expectation\+Base\+::\texorpdfstring{$\sim$}{\string~}\+Expectation\+Base (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8cc_source_l00094}{94}} of file \mbox{\hyperlink{gmock-spec-builders_8cc_source}{gmock-\/spec-\/builders.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00094\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_expectation_base_a82ba68cdd71a8b5aff5a5be24c23a637}\index{testing::internal::ExpectationBase@{testing::internal::ExpectationBase}!AllPrerequisitesAreSatisfied@{AllPrerequisitesAreSatisfied}}
+\index{AllPrerequisitesAreSatisfied@{AllPrerequisitesAreSatisfied}!testing::internal::ExpectationBase@{testing::internal::ExpectationBase}}
+\doxysubsubsection{\texorpdfstring{AllPrerequisitesAreSatisfied()}{AllPrerequisitesAreSatisfied()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_expectation_base_a82ba68cdd71a8b5aff5a5be24c23a637} 
+bool testing\+::internal\+::\+Expectation\+Base\+::\+All\+Prerequisites\+Are\+Satisfied (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8cc_source_l00131}{131}} of file \mbox{\hyperlink{gmock-spec-builders_8cc_source}{gmock-\/spec-\/builders.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00133\ \ \ g\_gmock\_mutex.AssertHeld();}
+\DoxyCodeLine{00134\ \ \ ::std::vector<const\ ExpectationBase*>\ expectations(1,\ \textcolor{keyword}{this});}
+\DoxyCodeLine{00135\ \ \ \textcolor{keywordflow}{while}\ (!expectations.empty())\ \{}
+\DoxyCodeLine{00136\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a7ba2da3ba34dfca22d2202934405e676}{ExpectationBase}}*\ exp\ =\ expectations.back();}
+\DoxyCodeLine{00137\ \ \ \ \ expectations.pop\_back();}
+\DoxyCodeLine{00138\ }
+\DoxyCodeLine{00139\ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{classtesting_1_1_expectation_set_a133d96bcaa13be84583cf2718a1e6c69}{ExpectationSet::const\_iterator}}\ it\ =}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \ \ \ \ \ exp-\/>immediate\_prerequisites\_.begin();}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \ it\ !=\ exp-\/>immediate\_prerequisites\_.end();\ ++it)\ \{}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a7ba2da3ba34dfca22d2202934405e676}{ExpectationBase}}*\ \mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}}\ =\ it-\/>expectation\_base().get();}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}}-\/>IsSatisfied())\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ expectations.push\_back(next);}
+\DoxyCodeLine{00145\ \ \ \ \ \}}
+\DoxyCodeLine{00146\ \ \ \}}
+\DoxyCodeLine{00147\ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00148\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_expectation_base_a82ba68cdd71a8b5aff5a5be24c23a637_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_expectation_base_aa631b79fb3442c16142f662a059d62c7}\index{testing::internal::ExpectationBase@{testing::internal::ExpectationBase}!AssertSpecProperty@{AssertSpecProperty}}
+\index{AssertSpecProperty@{AssertSpecProperty}!testing::internal::ExpectationBase@{testing::internal::ExpectationBase}}
+\doxysubsubsection{\texorpdfstring{AssertSpecProperty()}{AssertSpecProperty()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_expectation_base_aa631b79fb3442c16142f662a059d62c7} 
+void testing\+::internal\+::\+Expectation\+Base\+::\+Assert\+Spec\+Property (\begin{DoxyParamCaption}\item[{bool}]{property}{, }\item[{const std\+::string \&}]{failure\+\_\+message}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00746}{746}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00747\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00748\ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a7a259643b7f2d23ce2b757728df42c99}{Assert}}(property,\ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_afabf690537298bbb84e9b443f62d7e97}{file\_}},\ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_ab8143119e4b686ff1bb6c985924da57a}{line\_}},\ failure\_message);}
+\DoxyCodeLine{00749\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_expectation_base_aa631b79fb3442c16142f662a059d62c7_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_expectation_base_aacc0399271907194ac1627439f65047a}\index{testing::internal::ExpectationBase@{testing::internal::ExpectationBase}!call\_count@{call\_count}}
+\index{call\_count@{call\_count}!testing::internal::ExpectationBase@{testing::internal::ExpectationBase}}
+\doxysubsubsection{\texorpdfstring{call\_count()}{call\_count()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_expectation_base_aacc0399271907194ac1627439f65047a} 
+int testing\+::internal\+::\+Expectation\+Base\+::call\+\_\+count (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00822}{822}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00823\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00824\ \ \ \ \ g\_gmock\_mutex.AssertHeld();}
+\DoxyCodeLine{00825\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_aea95d46f7583566e3f7a081b0668ad4c}{call\_count\_}};}
+\DoxyCodeLine{00826\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1internal_1_1_expectation_base_add89b0324797a421a1df77898528cbb7}\index{testing::internal::ExpectationBase@{testing::internal::ExpectationBase}!cardinality@{cardinality}}
+\index{cardinality@{cardinality}!testing::internal::ExpectationBase@{testing::internal::ExpectationBase}}
+\doxysubsubsection{\texorpdfstring{cardinality()}{cardinality()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_expectation_base_add89b0324797a421a1df77898528cbb7} 
+const \mbox{\hyperlink{classtesting_1_1_cardinality}{Cardinality}} \& testing\+::internal\+::\+Expectation\+Base\+::cardinality (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00707}{707}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00707\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_ad0aedcc01c0c9a998952a2b2f486595c}{cardinality\_}};\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_expectation_base_add89b0324797a421a1df77898528cbb7_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_expectation_base_a8c3715b0c44d29eb53148036d9366940}\index{testing::internal::ExpectationBase@{testing::internal::ExpectationBase}!cardinality\_specified@{cardinality\_specified}}
+\index{cardinality\_specified@{cardinality\_specified}!testing::internal::ExpectationBase@{testing::internal::ExpectationBase}}
+\doxysubsubsection{\texorpdfstring{cardinality\_specified()}{cardinality\_specified()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_expectation_base_a8c3715b0c44d29eb53148036d9366940} 
+bool testing\+::internal\+::\+Expectation\+Base\+::cardinality\+\_\+specified (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00763}{763}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00763\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_ad2ca7220ed1a395bd850ff06c500a402}{cardinality\_specified\_}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1internal_1_1_expectation_base_aaeb143b6f8676e9a6fb9b17678344f03}\index{testing::internal::ExpectationBase@{testing::internal::ExpectationBase}!CheckActionCountIfNotDone@{CheckActionCountIfNotDone}}
+\index{CheckActionCountIfNotDone@{CheckActionCountIfNotDone}!testing::internal::ExpectationBase@{testing::internal::ExpectationBase}}
+\doxysubsubsection{\texorpdfstring{CheckActionCountIfNotDone()}{CheckActionCountIfNotDone()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_expectation_base_aaeb143b6f8676e9a6fb9b17678344f03} 
+void testing\+::internal\+::\+Expectation\+Base\+::\+Check\+Action\+Count\+If\+Not\+Done (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8cc_source_l00205}{205}} of file \mbox{\hyperlink{gmock-spec-builders_8cc_source}{gmock-\/spec-\/builders.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00207\ \ \ \textcolor{keywordtype}{bool}\ should\_check\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00208\ \ \ \{}
+\DoxyCodeLine{00209\ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a08b187c6cc4e28400aadf9a32fccc8de}{MutexLock}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}(\&\mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a364f5473591d08d0ac03595c9050c13e}{mutex\_}});}
+\DoxyCodeLine{00210\ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a19933e346f6493005437bdd6812c7a29}{action\_count\_checked\_}})\ \{}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a19933e346f6493005437bdd6812c7a29}{action\_count\_checked\_}}\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ should\_check\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00213\ \ \ \ \ \}}
+\DoxyCodeLine{00214\ \ \ \}}
+\DoxyCodeLine{00215\ }
+\DoxyCodeLine{00216\ \ \ \textcolor{keywordflow}{if}\ (should\_check)\ \{}
+\DoxyCodeLine{00217\ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_ad2ca7220ed1a395bd850ff06c500a402}{cardinality\_specified\_}})\ \{}
+\DoxyCodeLine{00218\ \ \ \ \ \ \ \textcolor{comment}{//\ The\ cardinality\ was\ inferred\ -\/\ no\ need\ to\ check\ the\ action}}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \textcolor{comment}{//\ count\ against\ it.}}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00221\ \ \ \ \ \}}
+\DoxyCodeLine{00222\ }
+\DoxyCodeLine{00223\ \ \ \ \ \textcolor{comment}{//\ The\ cardinality\ was\ explicitly\ specified.}}
+\DoxyCodeLine{00224\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ action\_count\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(\mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a9558ff6b8b1b7e3a99fac1f93d1826da}{untyped\_actions\_}}.size());}
+\DoxyCodeLine{00225\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ upper\_bound\ =\ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_add89b0324797a421a1df77898528cbb7}{cardinality}}().\mbox{\hyperlink{classtesting_1_1_cardinality_acb42e3683f99b986f3ac538b5eefbc31}{ConservativeUpperBound}}();}
+\DoxyCodeLine{00226\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ lower\_bound\ =\ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_add89b0324797a421a1df77898528cbb7}{cardinality}}().\mbox{\hyperlink{classtesting_1_1_cardinality_ac1785ee5c466c2524f36b9ffb5f46c79}{ConservativeLowerBound}}();}
+\DoxyCodeLine{00227\ \ \ \ \ \textcolor{keywordtype}{bool}\ too\_many;\ \ \textcolor{comment}{//\ True\ if\ there\ are\ too\ many\ actions,\ or\ false}}
+\DoxyCodeLine{00228\ \ \ \ \ \textcolor{comment}{//\ if\ there\ are\ too\ few.}}
+\DoxyCodeLine{00229\ \ \ \ \ \textcolor{keywordflow}{if}\ (action\_count\ >\ upper\_bound\ ||}
+\DoxyCodeLine{00230\ \ \ \ \ \ \ \ \ (action\_count\ ==\ upper\_bound\ \&\&\ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_abecd382b79252ffc0779d51e058b681c}{repeated\_action\_specified\_}}))\ \{}
+\DoxyCodeLine{00231\ \ \ \ \ \ \ too\_many\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00232\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (0\ <\ action\_count\ \&\&\ action\_count\ <\ lower\_bound\ \&\&}
+\DoxyCodeLine{00233\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ !\mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_abecd382b79252ffc0779d51e058b681c}{repeated\_action\_specified\_}})\ \{}
+\DoxyCodeLine{00234\ \ \ \ \ \ \ too\_many\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00235\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00237\ \ \ \ \ \}}
+\DoxyCodeLine{00238\ }
+\DoxyCodeLine{00239\ \ \ \ \ ::std::stringstream\ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}};}
+\DoxyCodeLine{00240\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a666e7f8fb2412e78f090244e6bfd4493}{DescribeLocationTo}}(\&ss);}
+\DoxyCodeLine{00241\ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}\ <<\ \textcolor{stringliteral}{"{}Too\ "{}}\ <<\ (too\_many\ ?\ \textcolor{stringliteral}{"{}many"{}}\ :\ \textcolor{stringliteral}{"{}few"{}})}
+\DoxyCodeLine{00242\ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\ actions\ specified\ in\ "{}}\ <<\ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a30c6f21bc67833c1f313b2148603b22b}{source\_text}}()\ <<\ \textcolor{stringliteral}{"{}...\(\backslash\)n"{}}}
+\DoxyCodeLine{00243\ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}Expected\ to\ be\ "{}};}
+\DoxyCodeLine{00244\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_add89b0324797a421a1df77898528cbb7}{cardinality}}().\mbox{\hyperlink{classtesting_1_1_cardinality_a2955f4b65022c422f56e79b767c4fa71}{DescribeTo}}(\&ss);}
+\DoxyCodeLine{00245\ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}\ <<\ \textcolor{stringliteral}{"{},\ but\ has\ "{}}\ <<\ (too\_many\ ?\ \textcolor{stringliteral}{"{}"{}}\ :\ \textcolor{stringliteral}{"{}only\ "{}})}
+\DoxyCodeLine{00246\ \ \ \ \ \ \ \ <<\ action\_count\ <<\ \textcolor{stringliteral}{"{}\ WillOnce()"{}}}
+\DoxyCodeLine{00247\ \ \ \ \ \ \ \ <<\ (action\_count\ ==\ 1\ ?\ \textcolor{stringliteral}{"{}"{}}\ :\ \textcolor{stringliteral}{"{}s"{}});}
+\DoxyCodeLine{00248\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_abecd382b79252ffc0779d51e058b681c}{repeated\_action\_specified\_}})\ \{}
+\DoxyCodeLine{00249\ \ \ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}\ <<\ \textcolor{stringliteral}{"{}\ and\ a\ WillRepeatedly()"{}};}
+\DoxyCodeLine{00250\ \ \ \ \ \}}
+\DoxyCodeLine{00251\ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}\ <<\ \textcolor{stringliteral}{"{}."{}};}
+\DoxyCodeLine{00252\ \ \ \ \ \mbox{\hyperlink{namespace_log}{Log}}(\mbox{\hyperlink{namespacetesting_1_1internal_a203d1a8a2147a53d12bbdae40d443914a5beeeab1b0a3caabd0afb43356c1a271}{kWarning}},\ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}.str(),\ -\/1);\ \ \textcolor{comment}{//\ -\/1\ means\ "{}don't\ print\ stack\ trace"{}.}}
+\DoxyCodeLine{00253\ \ \ \}}
+\DoxyCodeLine{00254\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_expectation_base_aaeb143b6f8676e9a6fb9b17678344f03_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_expectation_base_a2beebed3ade29077bcf294b449bb8b9d}\index{testing::internal::ExpectationBase@{testing::internal::ExpectationBase}!DescribeCallCountTo@{DescribeCallCountTo}}
+\index{DescribeCallCountTo@{DescribeCallCountTo}!testing::internal::ExpectationBase@{testing::internal::ExpectationBase}}
+\doxysubsubsection{\texorpdfstring{DescribeCallCountTo()}{DescribeCallCountTo()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_expectation_base_a2beebed3ade29077bcf294b449bb8b9d} 
+void testing\+::internal\+::\+Expectation\+Base\+::\+Describe\+Call\+Count\+To (\begin{DoxyParamCaption}\item[{\+::std\+::ostream \texorpdfstring{$\ast$}{*}}]{os}{}\end{DoxyParamCaption}) const}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8cc_source_l00182}{182}} of file \mbox{\hyperlink{gmock-spec-builders_8cc_source}{gmock-\/spec-\/builders.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00184\ \ \ g\_gmock\_mutex.AssertHeld();}
+\DoxyCodeLine{00185\ }
+\DoxyCodeLine{00186\ \ \ \textcolor{comment}{//\ Describes\ how\ many\ times\ the\ function\ is\ expected\ to\ be\ called.}}
+\DoxyCodeLine{00187\ \ \ *os\ <<\ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ \ \ Expected:\ to\ be\ "{}};}
+\DoxyCodeLine{00188\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_add89b0324797a421a1df77898528cbb7}{cardinality}}().\mbox{\hyperlink{classtesting_1_1_cardinality_a2955f4b65022c422f56e79b767c4fa71}{DescribeTo}}(os);}
+\DoxyCodeLine{00189\ \ \ *os\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n\ \ \ \ \ \ \ \ \ \ \ Actual:\ "{}};}
+\DoxyCodeLine{00190\ \ \ \mbox{\hyperlink{classtesting_1_1_cardinality_a7cbea339e2f3072a98367e087aa296e8}{Cardinality::DescribeActualCallCountTo}}(\mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_aacc0399271907194ac1627439f65047a}{call\_count}}(),\ os);}
+\DoxyCodeLine{00191\ }
+\DoxyCodeLine{00192\ \ \ \textcolor{comment}{//\ Describes\ the\ state\ of\ the\ expectation\ (e.g.\ is\ it\ satisfied?}}
+\DoxyCodeLine{00193\ \ \ \textcolor{comment}{//\ is\ it\ active?).}}
+\DoxyCodeLine{00194\ \ \ *os\ <<\ \textcolor{stringliteral}{"{}\ -\/\ "{}}\ <<\ (\mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a080dab35ecc6c57096f50758a0e8123d}{IsOverSaturated}}()\ ?\ \textcolor{stringliteral}{"{}over-\/saturated"{}}\ :}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_ad3e4340cedefdc24fce1478a8d6cab93}{IsSaturated}}()\ ?\ \textcolor{stringliteral}{"{}saturated"{}}\ :}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_ae629adc2dd9aee0ac62e50314f1a6449}{IsSatisfied}}()\ ?\ \textcolor{stringliteral}{"{}satisfied"{}}\ :\ \textcolor{stringliteral}{"{}unsatisfied"{}})}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\ and\ "{}}}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ <<\ (\mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_afe539dbc5b29d9635403767a4708c476}{is\_retired}}()\ ?\ \textcolor{stringliteral}{"{}retired"{}}\ :\ \textcolor{stringliteral}{"{}active"{}});}
+\DoxyCodeLine{00199\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_expectation_base_a2beebed3ade29077bcf294b449bb8b9d_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_expectation_base_a666e7f8fb2412e78f090244e6bfd4493}\index{testing::internal::ExpectationBase@{testing::internal::ExpectationBase}!DescribeLocationTo@{DescribeLocationTo}}
+\index{DescribeLocationTo@{DescribeLocationTo}!testing::internal::ExpectationBase@{testing::internal::ExpectationBase}}
+\doxysubsubsection{\texorpdfstring{DescribeLocationTo()}{DescribeLocationTo()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_expectation_base_a666e7f8fb2412e78f090244e6bfd4493} 
+void testing\+::internal\+::\+Expectation\+Base\+::\+Describe\+Location\+To (\begin{DoxyParamCaption}\item[{\+::std\+::ostream \texorpdfstring{$\ast$}{*}}]{os}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00710}{710}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00710\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00711\ \ \ \ \ *os\ <<\ \mbox{\hyperlink{namespacetesting_1_1internal_a31b7c3abed4a7c395f42c61e993989f4}{FormatFileLocation}}(\mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a4e6c2bf337d2213652dbe630be7fdcc7}{file}}(),\ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a6a44d831449d31e0e46d0070625b452c}{line}}())\ <<\ \textcolor{stringliteral}{"{}\ "{}};}
+\DoxyCodeLine{00712\ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_expectation_base_a666e7f8fb2412e78f090244e6bfd4493_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_expectation_base_af261dd0d844ab9db2328c37845c736c4}\index{testing::internal::ExpectationBase@{testing::internal::ExpectationBase}!ExpectSpecProperty@{ExpectSpecProperty}}
+\index{ExpectSpecProperty@{ExpectSpecProperty}!testing::internal::ExpectationBase@{testing::internal::ExpectationBase}}
+\doxysubsubsection{\texorpdfstring{ExpectSpecProperty()}{ExpectSpecProperty()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_expectation_base_af261dd0d844ab9db2328c37845c736c4} 
+void testing\+::internal\+::\+Expectation\+Base\+::\+Expect\+Spec\+Property (\begin{DoxyParamCaption}\item[{bool}]{property}{, }\item[{const std\+::string \&}]{failure\+\_\+message}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00752}{752}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00753\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00754\ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_ad93379317e10862a77b9fb90aa96e083}{Expect}}(property,\ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_afabf690537298bbb84e9b443f62d7e97}{file\_}},\ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_ab8143119e4b686ff1bb6c985924da57a}{line\_}},\ failure\_message);}
+\DoxyCodeLine{00755\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_expectation_base_af261dd0d844ab9db2328c37845c736c4_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_expectation_base_af261dd0d844ab9db2328c37845c736c4_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_expectation_base_a4e6c2bf337d2213652dbe630be7fdcc7}\index{testing::internal::ExpectationBase@{testing::internal::ExpectationBase}!file@{file}}
+\index{file@{file}!testing::internal::ExpectationBase@{testing::internal::ExpectationBase}}
+\doxysubsubsection{\texorpdfstring{file()}{file()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_expectation_base_a4e6c2bf337d2213652dbe630be7fdcc7} 
+const char \texorpdfstring{$\ast$}{*} testing\+::internal\+::\+Expectation\+Base\+::file (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00703}{703}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00703\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_afabf690537298bbb84e9b443f62d7e97}{file\_}};\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_expectation_base_a4e6c2bf337d2213652dbe630be7fdcc7_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_expectation_base_a9eb518c079f950a59c67e8012d3371c0}\index{testing::internal::ExpectationBase@{testing::internal::ExpectationBase}!FindUnsatisfiedPrerequisites@{FindUnsatisfiedPrerequisites}}
+\index{FindUnsatisfiedPrerequisites@{FindUnsatisfiedPrerequisites}!testing::internal::ExpectationBase@{testing::internal::ExpectationBase}}
+\doxysubsubsection{\texorpdfstring{FindUnsatisfiedPrerequisites()}{FindUnsatisfiedPrerequisites()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_expectation_base_a9eb518c079f950a59c67e8012d3371c0} 
+void testing\+::internal\+::\+Expectation\+Base\+::\+Find\+Unsatisfied\+Prerequisites (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classtesting_1_1_expectation_set}{Expectation\+Set}} \texorpdfstring{$\ast$}{*}}]{result}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8cc_source_l00151}{151}} of file \mbox{\hyperlink{gmock-spec-builders_8cc_source}{gmock-\/spec-\/builders.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00153\ \ \ g\_gmock\_mutex.AssertHeld();}
+\DoxyCodeLine{00154\ \ \ ::std::vector<const\ ExpectationBase*>\ expectations(1,\ \textcolor{keyword}{this});}
+\DoxyCodeLine{00155\ \ \ \textcolor{keywordflow}{while}\ (!expectations.empty())\ \{}
+\DoxyCodeLine{00156\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a7ba2da3ba34dfca22d2202934405e676}{ExpectationBase}}*\ exp\ =\ expectations.back();}
+\DoxyCodeLine{00157\ \ \ \ \ expectations.pop\_back();}
+\DoxyCodeLine{00158\ }
+\DoxyCodeLine{00159\ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{classtesting_1_1_expectation_set_a133d96bcaa13be84583cf2718a1e6c69}{ExpectationSet::const\_iterator}}\ it\ =}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \ \ \ \ \ exp-\/>immediate\_prerequisites\_.begin();}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \ it\ !=\ exp-\/>immediate\_prerequisites\_.end();\ ++it)\ \{}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a7ba2da3ba34dfca22d2202934405e676}{ExpectationBase}}*\ \mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}}\ =\ it-\/>expectation\_base().get();}
+\DoxyCodeLine{00163\ }
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}}-\/>IsSatisfied())\ \{}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ *it\ is\ satisfied\ and\ has\ a\ call\ count\ of\ 0,\ some\ of\ its}}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ pre-\/requisites\ may\ not\ be\ satisfied\ yet.}}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}}-\/>call\_count\_\ ==\ 0)\ \{}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \ \ expectations.push\_back(next);}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Now\ that\ we\ know\ next\ is\ unsatisfied,\ we\ are\ not\ so\ interested}}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ in\ whether\ its\ pre-\/requisites\ are\ satisfied.\ \ Therefore\ we}}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ don't\ iterate\ into\ it\ here.}}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ *result\ +=\ *it;}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00176\ \ \ \ \ \}}
+\DoxyCodeLine{00177\ \ \ \}}
+\DoxyCodeLine{00178\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_expectation_base_a9eb518c079f950a59c67e8012d3371c0_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_expectation_base_a678f6fc24742ab0236ebc9a8128e7bfe}\index{testing::internal::ExpectationBase@{testing::internal::ExpectationBase}!GetHandle@{GetHandle}}
+\index{GetHandle@{GetHandle}!testing::internal::ExpectationBase@{testing::internal::ExpectationBase}}
+\doxysubsubsection{\texorpdfstring{GetHandle()}{GetHandle()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_expectation_base_a678f6fc24742ab0236ebc9a8128e7bfe} 
+virtual \mbox{\hyperlink{classtesting_1_1_expectation}{Expectation}} testing\+::internal\+::\+Expectation\+Base\+::\+Get\+Handle (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [pure virtual]}}
+
+\Hypertarget{classtesting_1_1internal_1_1_expectation_base_a9a28e2f508571a0d68d9f964f3634022}\index{testing::internal::ExpectationBase@{testing::internal::ExpectationBase}!GTEST\_DISALLOW\_ASSIGN\_@{GTEST\_DISALLOW\_ASSIGN\_}}
+\index{GTEST\_DISALLOW\_ASSIGN\_@{GTEST\_DISALLOW\_ASSIGN\_}!testing::internal::ExpectationBase@{testing::internal::ExpectationBase}}
+\doxysubsubsection{\texorpdfstring{GTEST\_DISALLOW\_ASSIGN\_()}{GTEST\_DISALLOW\_ASSIGN\_()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_expectation_base_a9a28e2f508571a0d68d9f964f3634022} 
+testing\+::internal\+::\+Expectation\+Base\+::\+GTEST\+\_\+\+DISALLOW\+\_\+\+ASSIGN\+\_\+ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base}{Expectation\+Base}}}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+\Hypertarget{classtesting_1_1internal_1_1_expectation_base_aef1766c39ad6478f9041e0f5c5000532}\index{testing::internal::ExpectationBase@{testing::internal::ExpectationBase}!IncrementCallCount@{IncrementCallCount}}
+\index{IncrementCallCount@{IncrementCallCount}!testing::internal::ExpectationBase@{testing::internal::ExpectationBase}}
+\doxysubsubsection{\texorpdfstring{IncrementCallCount()}{IncrementCallCount()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_expectation_base_aef1766c39ad6478f9041e0f5c5000532} 
+void testing\+::internal\+::\+Expectation\+Base\+::\+Increment\+Call\+Count (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00829}{829}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00830\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00831\ \ \ \ \ g\_gmock\_mutex.AssertHeld();}
+\DoxyCodeLine{00832\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_aea95d46f7583566e3f7a081b0668ad4c}{call\_count\_}}++;}
+\DoxyCodeLine{00833\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1internal_1_1_expectation_base_afe539dbc5b29d9635403767a4708c476}\index{testing::internal::ExpectationBase@{testing::internal::ExpectationBase}!is\_retired@{is\_retired}}
+\index{is\_retired@{is\_retired}!testing::internal::ExpectationBase@{testing::internal::ExpectationBase}}
+\doxysubsubsection{\texorpdfstring{is\_retired()}{is\_retired()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_expectation_base_afe539dbc5b29d9635403767a4708c476} 
+bool testing\+::internal\+::\+Expectation\+Base\+::is\+\_\+retired (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00779}{779}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00780\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00781\ \ \ \ \ g\_gmock\_mutex.AssertHeld();}
+\DoxyCodeLine{00782\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a0afd852f5d7863effc3d304dac6a44cf}{retired\_}};}
+\DoxyCodeLine{00783\ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_expectation_base_afe539dbc5b29d9635403767a4708c476_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_expectation_base_a080dab35ecc6c57096f50758a0e8123d}\index{testing::internal::ExpectationBase@{testing::internal::ExpectationBase}!IsOverSaturated@{IsOverSaturated}}
+\index{IsOverSaturated@{IsOverSaturated}!testing::internal::ExpectationBase@{testing::internal::ExpectationBase}}
+\doxysubsubsection{\texorpdfstring{IsOverSaturated()}{IsOverSaturated()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_expectation_base_a080dab35ecc6c57096f50758a0e8123d} 
+bool testing\+::internal\+::\+Expectation\+Base\+::\+Is\+Over\+Saturated (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00807}{807}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00808\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00809\ \ \ \ \ g\_gmock\_mutex.AssertHeld();}
+\DoxyCodeLine{00810\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_add89b0324797a421a1df77898528cbb7}{cardinality}}().\mbox{\hyperlink{classtesting_1_1_cardinality_a9b6a55179f6dcc8fadec26e6d93f3e88}{IsOverSaturatedByCallCount}}(\mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_aea95d46f7583566e3f7a081b0668ad4c}{call\_count\_}});}
+\DoxyCodeLine{00811\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1internal_1_1_expectation_base_ae629adc2dd9aee0ac62e50314f1a6449}\index{testing::internal::ExpectationBase@{testing::internal::ExpectationBase}!IsSatisfied@{IsSatisfied}}
+\index{IsSatisfied@{IsSatisfied}!testing::internal::ExpectationBase@{testing::internal::ExpectationBase}}
+\doxysubsubsection{\texorpdfstring{IsSatisfied()}{IsSatisfied()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_expectation_base_ae629adc2dd9aee0ac62e50314f1a6449} 
+bool testing\+::internal\+::\+Expectation\+Base\+::\+Is\+Satisfied (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00793}{793}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00794\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00795\ \ \ \ \ g\_gmock\_mutex.AssertHeld();}
+\DoxyCodeLine{00796\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_add89b0324797a421a1df77898528cbb7}{cardinality}}().\mbox{\hyperlink{classtesting_1_1_cardinality_a6c5e2bd2887ff06e20e6fcc4255a0c1c}{IsSatisfiedByCallCount}}(\mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_aea95d46f7583566e3f7a081b0668ad4c}{call\_count\_}});}
+\DoxyCodeLine{00797\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1internal_1_1_expectation_base_ad3e4340cedefdc24fce1478a8d6cab93}\index{testing::internal::ExpectationBase@{testing::internal::ExpectationBase}!IsSaturated@{IsSaturated}}
+\index{IsSaturated@{IsSaturated}!testing::internal::ExpectationBase@{testing::internal::ExpectationBase}}
+\doxysubsubsection{\texorpdfstring{IsSaturated()}{IsSaturated()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_expectation_base_ad3e4340cedefdc24fce1478a8d6cab93} 
+bool testing\+::internal\+::\+Expectation\+Base\+::\+Is\+Saturated (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00800}{800}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00801\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00802\ \ \ \ \ g\_gmock\_mutex.AssertHeld();}
+\DoxyCodeLine{00803\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_add89b0324797a421a1df77898528cbb7}{cardinality}}().\mbox{\hyperlink{classtesting_1_1_cardinality_a57128ba46931e24a2b39af177e3346f8}{IsSaturatedByCallCount}}(\mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_aea95d46f7583566e3f7a081b0668ad4c}{call\_count\_}});}
+\DoxyCodeLine{00804\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1internal_1_1_expectation_base_a6a44d831449d31e0e46d0070625b452c}\index{testing::internal::ExpectationBase@{testing::internal::ExpectationBase}!line@{line}}
+\index{line@{line}!testing::internal::ExpectationBase@{testing::internal::ExpectationBase}}
+\doxysubsubsection{\texorpdfstring{line()}{line()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_expectation_base_a6a44d831449d31e0e46d0070625b452c} 
+int testing\+::internal\+::\+Expectation\+Base\+::line (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00704}{704}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00704\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_ab8143119e4b686ff1bb6c985924da57a}{line\_}};\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_expectation_base_a6a44d831449d31e0e46d0070625b452c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_expectation_base_a5ce4f648c7b112d27b798711d1e3ff5b}\index{testing::internal::ExpectationBase@{testing::internal::ExpectationBase}!MaybeDescribeExtraMatcherTo@{MaybeDescribeExtraMatcherTo}}
+\index{MaybeDescribeExtraMatcherTo@{MaybeDescribeExtraMatcherTo}!testing::internal::ExpectationBase@{testing::internal::ExpectationBase}}
+\doxysubsubsection{\texorpdfstring{MaybeDescribeExtraMatcherTo()}{MaybeDescribeExtraMatcherTo()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_expectation_base_a5ce4f648c7b112d27b798711d1e3ff5b} 
+virtual void testing\+::internal\+::\+Expectation\+Base\+::\+Maybe\+Describe\+Extra\+Matcher\+To (\begin{DoxyParamCaption}\item[{\+::std\+::ostream \texorpdfstring{$\ast$}{*}}]{os}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{classtesting_1_1internal_1_1_typed_expectation_ab019251041a408dc5a5d8ae216be53f4}{testing\+::internal\+::\+Typed\+Expectation$<$ F $>$}}.
+
+\Hypertarget{classtesting_1_1internal_1_1_expectation_base_a0aeeb4c1e66c2f2aa0853c267ad3e781}\index{testing::internal::ExpectationBase@{testing::internal::ExpectationBase}!Retire@{Retire}}
+\index{Retire@{Retire}!testing::internal::ExpectationBase@{testing::internal::ExpectationBase}}
+\doxysubsubsection{\texorpdfstring{Retire()}{Retire()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_expectation_base_a0aeeb4c1e66c2f2aa0853c267ad3e781} 
+void testing\+::internal\+::\+Expectation\+Base\+::\+Retire (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00786}{786}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00787\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00788\ \ \ \ \ g\_gmock\_mutex.AssertHeld();}
+\DoxyCodeLine{00789\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a0afd852f5d7863effc3d304dac6a44cf}{retired\_}}\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00790\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1internal_1_1_expectation_base_afb623801e8de31fcd7b352e200649f7d}\index{testing::internal::ExpectationBase@{testing::internal::ExpectationBase}!RetireAllPreRequisites@{RetireAllPreRequisites}}
+\index{RetireAllPreRequisites@{RetireAllPreRequisites}!testing::internal::ExpectationBase@{testing::internal::ExpectationBase}}
+\doxysubsubsection{\texorpdfstring{RetireAllPreRequisites()}{RetireAllPreRequisites()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_expectation_base_afb623801e8de31fcd7b352e200649f7d} 
+void testing\+::internal\+::\+Expectation\+Base\+::\+Retire\+All\+Pre\+Requisites (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8cc_source_l00104}{104}} of file \mbox{\hyperlink{gmock-spec-builders_8cc_source}{gmock-\/spec-\/builders.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00106\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_afe539dbc5b29d9635403767a4708c476}{is\_retired}}())\ \{}
+\DoxyCodeLine{00107\ \ \ \ \ \textcolor{comment}{//\ We\ can\ take\ this\ short-\/cut\ as\ we\ never\ retire\ an\ expectation}}
+\DoxyCodeLine{00108\ \ \ \ \ \textcolor{comment}{//\ until\ we\ have\ retired\ all\ its\ pre-\/requisites.}}
+\DoxyCodeLine{00109\ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00110\ \ \ \}}
+\DoxyCodeLine{00111\ }
+\DoxyCodeLine{00112\ \ \ ::std::vector<ExpectationBase*>\ expectations(1,\ \textcolor{keyword}{this});}
+\DoxyCodeLine{00113\ \ \ \textcolor{keywordflow}{while}\ (!expectations.empty())\ \{}
+\DoxyCodeLine{00114\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a7ba2da3ba34dfca22d2202934405e676}{ExpectationBase}}*\ exp\ =\ expectations.back();}
+\DoxyCodeLine{00115\ \ \ \ \ expectations.pop\_back();}
+\DoxyCodeLine{00116\ }
+\DoxyCodeLine{00117\ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{classtesting_1_1_expectation_set_a133d96bcaa13be84583cf2718a1e6c69}{ExpectationSet::const\_iterator}}\ it\ =}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ \ exp-\/>immediate\_prerequisites\_.begin();}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ it\ !=\ exp-\/>immediate\_prerequisites\_.end();\ ++it)\ \{}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a7ba2da3ba34dfca22d2202934405e676}{ExpectationBase}}*\ \mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}}\ =\ it-\/>expectation\_base().get();}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}}-\/>is\_retired())\ \{}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacecpp_1_1ast_a25b104cfd21fb8487a07063b6ce62062}{next}}-\/>Retire();}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ expectations.push\_back(next);}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00125\ \ \ \ \ \}}
+\DoxyCodeLine{00126\ \ \ \}}
+\DoxyCodeLine{00127\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_expectation_base_afb623801e8de31fcd7b352e200649f7d_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_expectation_base_a6d416ffd4546ae84de79afb67ad05ada}\index{testing::internal::ExpectationBase@{testing::internal::ExpectationBase}!set\_cardinality@{set\_cardinality}}
+\index{set\_cardinality@{set\_cardinality}!testing::internal::ExpectationBase@{testing::internal::ExpectationBase}}
+\doxysubsubsection{\texorpdfstring{set\_cardinality()}{set\_cardinality()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_expectation_base_a6d416ffd4546ae84de79afb67ad05ada} 
+void testing\+::internal\+::\+Expectation\+Base\+::set\+\_\+cardinality (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classtesting_1_1_cardinality}{Cardinality}} \&}]{a\+\_\+cardinality}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00766}{766}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00766\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00767\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_ad0aedcc01c0c9a998952a2b2f486595c}{cardinality\_}}\ =\ a\_cardinality;}
+\DoxyCodeLine{00768\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1internal_1_1_expectation_base_a30c6f21bc67833c1f313b2148603b22b}\index{testing::internal::ExpectationBase@{testing::internal::ExpectationBase}!source\_text@{source\_text}}
+\index{source\_text@{source\_text}!testing::internal::ExpectationBase@{testing::internal::ExpectationBase}}
+\doxysubsubsection{\texorpdfstring{source\_text()}{source\_text()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_expectation_base_a30c6f21bc67833c1f313b2148603b22b} 
+const char \texorpdfstring{$\ast$}{*} testing\+::internal\+::\+Expectation\+Base\+::source\+\_\+text (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00705}{705}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00705\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a11ca157b7e8879b9f3b0ad1524eee5a4}{source\_text\_}}.c\_str();\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_expectation_base_a30c6f21bc67833c1f313b2148603b22b_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_expectation_base_a3d1d08542b32239d9b5738e3e32e2217}\index{testing::internal::ExpectationBase@{testing::internal::ExpectationBase}!SpecifyCardinality@{SpecifyCardinality}}
+\index{SpecifyCardinality@{SpecifyCardinality}!testing::internal::ExpectationBase@{testing::internal::ExpectationBase}}
+\doxysubsubsection{\texorpdfstring{SpecifyCardinality()}{SpecifyCardinality()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_expectation_base_a3d1d08542b32239d9b5738e3e32e2217} 
+void testing\+::internal\+::\+Expectation\+Base\+::\+Specify\+Cardinality (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classtesting_1_1_cardinality}{Cardinality}} \&}]{cardinality}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8cc_source_l00098}{98}} of file \mbox{\hyperlink{gmock-spec-builders_8cc_source}{gmock-\/spec-\/builders.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00099\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_ad2ca7220ed1a395bd850ff06c500a402}{cardinality\_specified\_}}\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00100\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_ad0aedcc01c0c9a998952a2b2f486595c}{cardinality\_}}\ =\ a\_cardinality;}
+\DoxyCodeLine{00101\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_expectation_base_a3d1d08542b32239d9b5738e3e32e2217_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_expectation_base_a05bbd7fea6ea3c740ea095ea7462bc07}\index{testing::internal::ExpectationBase@{testing::internal::ExpectationBase}!UntypedTimes@{UntypedTimes}}
+\index{UntypedTimes@{UntypedTimes}!testing::internal::ExpectationBase@{testing::internal::ExpectationBase}}
+\doxysubsubsection{\texorpdfstring{UntypedTimes()}{UntypedTimes()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_expectation_base_a05bbd7fea6ea3c740ea095ea7462bc07} 
+void testing\+::internal\+::\+Expectation\+Base\+::\+Untyped\+Times (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classtesting_1_1_cardinality}{Cardinality}} \&}]{a\+\_\+cardinality}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8cc_source_l00257}{257}} of file \mbox{\hyperlink{gmock-spec-builders_8cc_source}{gmock-\/spec-\/builders.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00257\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00258\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a584f296e53b4cc002ddf5e65e44d72d9}{last\_clause\_}}\ ==\ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a450f34b979ec5814c91d4eab6b78cfc2a8080d1291dd355e3ad9478f8c8b79689}{kTimes}})\ \{}
+\DoxyCodeLine{00259\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_af261dd0d844ab9db2328c37845c736c4}{ExpectSpecProperty}}(\textcolor{keyword}{false},}
+\DoxyCodeLine{00260\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}.Times()\ cannot\ appear\ "{}}}
+\DoxyCodeLine{00261\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}more\ than\ once\ in\ an\ EXPECT\_CALL()."{}});}
+\DoxyCodeLine{00262\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00263\ \ \ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_af261dd0d844ab9db2328c37845c736c4}{ExpectSpecProperty}}(\mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a584f296e53b4cc002ddf5e65e44d72d9}{last\_clause\_}}\ <\ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a450f34b979ec5814c91d4eab6b78cfc2a8080d1291dd355e3ad9478f8c8b79689}{kTimes}},}
+\DoxyCodeLine{00264\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}.Times()\ cannot\ appear\ after\ "{}}}
+\DoxyCodeLine{00265\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}.InSequence(),\ .WillOnce(),\ .WillRepeatedly(),\ "{}}}
+\DoxyCodeLine{00266\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}or\ .RetiresOnSaturation()."{}});}
+\DoxyCodeLine{00267\ \ \ \}}
+\DoxyCodeLine{00268\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a584f296e53b4cc002ddf5e65e44d72d9}{last\_clause\_}}\ =\ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a450f34b979ec5814c91d4eab6b78cfc2a8080d1291dd355e3ad9478f8c8b79689}{kTimes}};}
+\DoxyCodeLine{00269\ }
+\DoxyCodeLine{00270\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a3d1d08542b32239d9b5738e3e32e2217}{SpecifyCardinality}}(a\_cardinality);}
+\DoxyCodeLine{00271\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_expectation_base_a05bbd7fea6ea3c740ea095ea7462bc07_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_expectation_base_a86fa3dccdc465d897ee321b74e4ce915}\index{testing::internal::ExpectationBase@{testing::internal::ExpectationBase}!::testing::Expectation@{::testing::Expectation}}
+\index{::testing::Expectation@{::testing::Expectation}!testing::internal::ExpectationBase@{testing::internal::ExpectationBase}}
+\doxysubsubsection{\texorpdfstring{::testing::Expectation}{::testing::Expectation}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_expectation_base_a86fa3dccdc465d897ee321b74e4ce915} 
+friend \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classtesting_1_1_expectation}{\+::testing\+::\+Expectation}}\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00724}{724}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+\Hypertarget{classtesting_1_1internal_1_1_expectation_base_a83859ffda7f75bb8b447063eb53cb8b8}\index{testing::internal::ExpectationBase@{testing::internal::ExpectationBase}!::testing::internal::ExpectationTester@{::testing::internal::ExpectationTester}}
+\index{::testing::internal::ExpectationTester@{::testing::internal::ExpectationTester}!testing::internal::ExpectationBase@{testing::internal::ExpectationBase}}
+\doxysubsubsection{\texorpdfstring{::testing::internal::ExpectationTester}{::testing::internal::ExpectationTester}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_expectation_base_a83859ffda7f75bb8b447063eb53cb8b8} 
+friend \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_tester}{\+::testing\+::internal\+::\+Expectation\+Tester}}\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00843}{843}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+\Hypertarget{classtesting_1_1internal_1_1_expectation_base_aeaf43a487a21c0ac1135b094a1561056}\index{testing::internal::ExpectationBase@{testing::internal::ExpectationBase}!::testing::Sequence@{::testing::Sequence}}
+\index{::testing::Sequence@{::testing::Sequence}!testing::internal::ExpectationBase@{testing::internal::ExpectationBase}}
+\doxysubsubsection{\texorpdfstring{::testing::Sequence}{::testing::Sequence}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_expectation_base_aeaf43a487a21c0ac1135b094a1561056} 
+friend \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classtesting_1_1_sequence}{\+::testing\+::\+Sequence}}\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00842}{842}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+\Hypertarget{classtesting_1_1internal_1_1_expectation_base_a4f17de55396a8ef740d5ad2b1380a851}\index{testing::internal::ExpectationBase@{testing::internal::ExpectationBase}!TypedExpectation@{TypedExpectation}}
+\index{TypedExpectation@{TypedExpectation}!testing::internal::ExpectationBase@{testing::internal::ExpectationBase}}
+\doxysubsubsection{\texorpdfstring{TypedExpectation}{TypedExpectation}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_expectation_base_a4f17de55396a8ef740d5ad2b1380a851} 
+template$<$typename \mbox{\hyperlink{structtesting_1_1internal_1_1_function}{Function}} $>$ \\
+friend \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classtesting_1_1internal_1_1_typed_expectation}{Typed\+Expectation}}\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00846}{846}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+\Hypertarget{classtesting_1_1internal_1_1_expectation_base_a3e5598b244ec7673d0a494477d71e559}\index{testing::internal::ExpectationBase@{testing::internal::ExpectationBase}!UntypedFunctionMockerBase@{UntypedFunctionMockerBase}}
+\index{UntypedFunctionMockerBase@{UntypedFunctionMockerBase}!testing::internal::ExpectationBase@{testing::internal::ExpectationBase}}
+\doxysubsubsection{\texorpdfstring{UntypedFunctionMockerBase}{UntypedFunctionMockerBase}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_expectation_base_a3e5598b244ec7673d0a494477d71e559} 
+friend \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classtesting_1_1internal_1_1_untyped_function_mocker_base}{Untyped\+Function\+Mocker\+Base}}\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00725}{725}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_expectation_base_a19933e346f6493005437bdd6812c7a29}\index{testing::internal::ExpectationBase@{testing::internal::ExpectationBase}!action\_count\_checked\_@{action\_count\_checked\_}}
+\index{action\_count\_checked\_@{action\_count\_checked\_}!testing::internal::ExpectationBase@{testing::internal::ExpectationBase}}
+\doxysubsubsection{\texorpdfstring{action\_count\_checked\_}{action\_count\_checked\_}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_expectation_base_a19933e346f6493005437bdd6812c7a29} 
+bool testing\+::internal\+::\+Expectation\+Base\+::action\+\_\+count\+\_\+checked\+\_\+\hspace{0.3cm}{\ttfamily [mutable]}, {\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00876}{876}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+\Hypertarget{classtesting_1_1internal_1_1_expectation_base_aea95d46f7583566e3f7a081b0668ad4c}\index{testing::internal::ExpectationBase@{testing::internal::ExpectationBase}!call\_count\_@{call\_count\_}}
+\index{call\_count\_@{call\_count\_}!testing::internal::ExpectationBase@{testing::internal::ExpectationBase}}
+\doxysubsubsection{\texorpdfstring{call\_count\_}{call\_count\_}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_expectation_base_aea95d46f7583566e3f7a081b0668ad4c} 
+int testing\+::internal\+::\+Expectation\+Base\+::call\+\_\+count\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00869}{869}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+\Hypertarget{classtesting_1_1internal_1_1_expectation_base_ad0aedcc01c0c9a998952a2b2f486595c}\index{testing::internal::ExpectationBase@{testing::internal::ExpectationBase}!cardinality\_@{cardinality\_}}
+\index{cardinality\_@{cardinality\_}!testing::internal::ExpectationBase@{testing::internal::ExpectationBase}}
+\doxysubsubsection{\texorpdfstring{cardinality\_}{cardinality\_}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_expectation_base_ad0aedcc01c0c9a998952a2b2f486595c} 
+\mbox{\hyperlink{classtesting_1_1_cardinality}{Cardinality}} testing\+::internal\+::\+Expectation\+Base\+::cardinality\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00858}{858}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+\Hypertarget{classtesting_1_1internal_1_1_expectation_base_ad2ca7220ed1a395bd850ff06c500a402}\index{testing::internal::ExpectationBase@{testing::internal::ExpectationBase}!cardinality\_specified\_@{cardinality\_specified\_}}
+\index{cardinality\_specified\_@{cardinality\_specified\_}!testing::internal::ExpectationBase@{testing::internal::ExpectationBase}}
+\doxysubsubsection{\texorpdfstring{cardinality\_specified\_}{cardinality\_specified\_}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_expectation_base_ad2ca7220ed1a395bd850ff06c500a402} 
+bool testing\+::internal\+::\+Expectation\+Base\+::cardinality\+\_\+specified\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00857}{857}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+\Hypertarget{classtesting_1_1internal_1_1_expectation_base_a34f599ac7ae4f1fb7567e0d4c9fadcba}\index{testing::internal::ExpectationBase@{testing::internal::ExpectationBase}!extra\_matcher\_specified\_@{extra\_matcher\_specified\_}}
+\index{extra\_matcher\_specified\_@{extra\_matcher\_specified\_}!testing::internal::ExpectationBase@{testing::internal::ExpectationBase}}
+\doxysubsubsection{\texorpdfstring{extra\_matcher\_specified\_}{extra\_matcher\_specified\_}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_expectation_base_a34f599ac7ae4f1fb7567e0d4c9fadcba} 
+bool testing\+::internal\+::\+Expectation\+Base\+::extra\+\_\+matcher\+\_\+specified\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00872}{872}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+\Hypertarget{classtesting_1_1internal_1_1_expectation_base_afabf690537298bbb84e9b443f62d7e97}\index{testing::internal::ExpectationBase@{testing::internal::ExpectationBase}!file\_@{file\_}}
+\index{file\_@{file\_}!testing::internal::ExpectationBase@{testing::internal::ExpectationBase}}
+\doxysubsubsection{\texorpdfstring{file\_}{file\_}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_expectation_base_afabf690537298bbb84e9b443f62d7e97} 
+const char\texorpdfstring{$\ast$}{*} testing\+::internal\+::\+Expectation\+Base\+::file\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00853}{853}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+\Hypertarget{classtesting_1_1internal_1_1_expectation_base_a186eff0fdcacc8c1e1a2becdec11d3cd}\index{testing::internal::ExpectationBase@{testing::internal::ExpectationBase}!immediate\_prerequisites\_@{immediate\_prerequisites\_}}
+\index{immediate\_prerequisites\_@{immediate\_prerequisites\_}!testing::internal::ExpectationBase@{testing::internal::ExpectationBase}}
+\doxysubsubsection{\texorpdfstring{immediate\_prerequisites\_}{immediate\_prerequisites\_}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_expectation_base_a186eff0fdcacc8c1e1a2becdec11d3cd} 
+\mbox{\hyperlink{classtesting_1_1_expectation_set}{Expectation\+Set}} testing\+::internal\+::\+Expectation\+Base\+::immediate\+\_\+prerequisites\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00865}{865}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+\Hypertarget{classtesting_1_1internal_1_1_expectation_base_a584f296e53b4cc002ddf5e65e44d72d9}\index{testing::internal::ExpectationBase@{testing::internal::ExpectationBase}!last\_clause\_@{last\_clause\_}}
+\index{last\_clause\_@{last\_clause\_}!testing::internal::ExpectationBase@{testing::internal::ExpectationBase}}
+\doxysubsubsection{\texorpdfstring{last\_clause\_}{last\_clause\_}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_expectation_base_a584f296e53b4cc002ddf5e65e44d72d9} 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a450f34b979ec5814c91d4eab6b78cfc2}{Clause}} testing\+::internal\+::\+Expectation\+Base\+::last\+\_\+clause\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00875}{875}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+\Hypertarget{classtesting_1_1internal_1_1_expectation_base_ab8143119e4b686ff1bb6c985924da57a}\index{testing::internal::ExpectationBase@{testing::internal::ExpectationBase}!line\_@{line\_}}
+\index{line\_@{line\_}!testing::internal::ExpectationBase@{testing::internal::ExpectationBase}}
+\doxysubsubsection{\texorpdfstring{line\_}{line\_}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_expectation_base_ab8143119e4b686ff1bb6c985924da57a} 
+int testing\+::internal\+::\+Expectation\+Base\+::line\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00854}{854}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+\Hypertarget{classtesting_1_1internal_1_1_expectation_base_a364f5473591d08d0ac03595c9050c13e}\index{testing::internal::ExpectationBase@{testing::internal::ExpectationBase}!mutex\_@{mutex\_}}
+\index{mutex\_@{mutex\_}!testing::internal::ExpectationBase@{testing::internal::ExpectationBase}}
+\doxysubsubsection{\texorpdfstring{mutex\_}{mutex\_}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_expectation_base_a364f5473591d08d0ac03595c9050c13e} 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_mutex}{Mutex}} testing\+::internal\+::\+Expectation\+Base\+::mutex\+\_\+\hspace{0.3cm}{\ttfamily [mutable]}, {\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00877}{877}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+\Hypertarget{classtesting_1_1internal_1_1_expectation_base_abecd382b79252ffc0779d51e058b681c}\index{testing::internal::ExpectationBase@{testing::internal::ExpectationBase}!repeated\_action\_specified\_@{repeated\_action\_specified\_}}
+\index{repeated\_action\_specified\_@{repeated\_action\_specified\_}!testing::internal::ExpectationBase@{testing::internal::ExpectationBase}}
+\doxysubsubsection{\texorpdfstring{repeated\_action\_specified\_}{repeated\_action\_specified\_}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_expectation_base_abecd382b79252ffc0779d51e058b681c} 
+bool testing\+::internal\+::\+Expectation\+Base\+::repeated\+\_\+action\+\_\+specified\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00873}{873}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+\Hypertarget{classtesting_1_1internal_1_1_expectation_base_a0afd852f5d7863effc3d304dac6a44cf}\index{testing::internal::ExpectationBase@{testing::internal::ExpectationBase}!retired\_@{retired\_}}
+\index{retired\_@{retired\_}!testing::internal::ExpectationBase@{testing::internal::ExpectationBase}}
+\doxysubsubsection{\texorpdfstring{retired\_}{retired\_}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_expectation_base_a0afd852f5d7863effc3d304dac6a44cf} 
+bool testing\+::internal\+::\+Expectation\+Base\+::retired\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00870}{870}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+\Hypertarget{classtesting_1_1internal_1_1_expectation_base_a74802f3bedf4ab023b30ee6bb275a4d8}\index{testing::internal::ExpectationBase@{testing::internal::ExpectationBase}!retires\_on\_saturation\_@{retires\_on\_saturation\_}}
+\index{retires\_on\_saturation\_@{retires\_on\_saturation\_}!testing::internal::ExpectationBase@{testing::internal::ExpectationBase}}
+\doxysubsubsection{\texorpdfstring{retires\_on\_saturation\_}{retires\_on\_saturation\_}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_expectation_base_a74802f3bedf4ab023b30ee6bb275a4d8} 
+bool testing\+::internal\+::\+Expectation\+Base\+::retires\+\_\+on\+\_\+saturation\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00874}{874}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+\Hypertarget{classtesting_1_1internal_1_1_expectation_base_a11ca157b7e8879b9f3b0ad1524eee5a4}\index{testing::internal::ExpectationBase@{testing::internal::ExpectationBase}!source\_text\_@{source\_text\_}}
+\index{source\_text\_@{source\_text\_}!testing::internal::ExpectationBase@{testing::internal::ExpectationBase}}
+\doxysubsubsection{\texorpdfstring{source\_text\_}{source\_text\_}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_expectation_base_a11ca157b7e8879b9f3b0ad1524eee5a4} 
+const std\+::string testing\+::internal\+::\+Expectation\+Base\+::source\+\_\+text\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00855}{855}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+\Hypertarget{classtesting_1_1internal_1_1_expectation_base_a9558ff6b8b1b7e3a99fac1f93d1826da}\index{testing::internal::ExpectationBase@{testing::internal::ExpectationBase}!untyped\_actions\_@{untyped\_actions\_}}
+\index{untyped\_actions\_@{untyped\_actions\_}!testing::internal::ExpectationBase@{testing::internal::ExpectationBase}}
+\doxysubsubsection{\texorpdfstring{untyped\_actions\_}{untyped\_actions\_}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_expectation_base_a9558ff6b8b1b7e3a99fac1f93d1826da} 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_expectation_base_a975e8a9e651a4c83cc806afc1e20a721}{Untyped\+Actions}} testing\+::internal\+::\+Expectation\+Base\+::untyped\+\_\+actions\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-spec-builders_8h_source_l00871}{871}} of file \mbox{\hyperlink{gmock-spec-builders_8h_source}{gmock-\/spec-\/builders.\+h}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/include/gmock/\mbox{\hyperlink{gmock-spec-builders_8h}{gmock-\/spec-\/builders.\+h}}\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/src/\mbox{\hyperlink{gmock-spec-builders_8cc}{gmock-\/spec-\/builders.\+cc}}\end{DoxyCompactItemize}

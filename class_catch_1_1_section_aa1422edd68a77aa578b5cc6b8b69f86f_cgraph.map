@@ -1,0 +1,24 @@
+<map id="Catch::Section::~Section" name="Catch::Section::~Section">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,152,174,177"/>
+<area shape="rect" id="Node000002" href="$class_catch_1_1_timer.html#a065e37e3c9eb16bd4dcf41971d8deedc" title=" " alt="" coords="230,5,400,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="102,149,151,104,185,78,220,55,230,51,232,55,223,60,188,83,155,108,106,153"/>
+<area shape="rect" id="Node000006" href="$namespace_catch.html#af718eeab870712f292ed8dc6ee3f6488" title=" " alt="" coords="232,94,398,120"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="142,148,246,122,248,127,144,153"/>
+<area shape="rect" id="Node000009" href="$struct_catch_1_1_i_result_capture.html#a4e152bc43dc0933684e31fa67a58195d" title=" " alt="" coords="239,144,392,185"/>
+<area shape="poly" id="edge9_Node000001_Node000009" title=" " alt="" coords="174,162,224,162,224,167,174,167"/>
+<area shape="rect" id="Node000010" href="$struct_catch_1_1_i_result_capture.html#afcc71eef8ca821ae132cced4a2be6988" title=" " alt="" coords="239,209,392,250"/>
+<area shape="poly" id="edge10_Node000001_Node000010" title=" " alt="" coords="137,175,229,202,227,207,136,180"/>
+<area shape="rect" id="Node000011" href="$namespace_catch.html#a4b5a2b34a00e65b753185bbc6a4962be" title=" " alt="" coords="222,274,409,300"/>
+<area shape="poly" id="edge11_Node000001_Node000011" title=" " alt="" coords="107,176,156,217,188,240,223,259,239,266,237,271,220,264,185,244,153,221,103,180"/>
+<area shape="rect" id="Node000003" href="$class_catch_1_1_timer.html#a545de17a61a6fee1dbe3de5b0723e5fa" title=" " alt="" coords="458,5,628,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="401,23,442,23,442,28,401,28"/>
+<area shape="rect" id="Node000004" href="$class_catch_1_1_timer.html#a57be5d17ca868a2d6fb1eea84de665cf" title=" " alt="" coords="677,5,847,46"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="628,23,662,23,662,28,628,28"/>
+<area shape="rect" id="Node000005" href="$namespace_catch.html#a98d058468488c486a9cb5c8463f3ba29" title=" " alt="" coords="896,5,1101,46"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="848,23,880,23,880,28,848,28"/>
+<area shape="poly" id="edge8_Node000006_Node000006" title=" " alt="" coords="278,95,270,86,275,76,290,70,315,68,343,70,357,77,355,82,341,75,315,73,291,75,279,80,276,85,282,92"/>
+<area shape="rect" id="Node000007" href="$namespace_catch.html#a228a625318bb6183842e394eeba17d50" title=" " alt="" coords="457,94,628,120"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="399,104,441,104,441,110,399,110"/>
+<area shape="rect" id="Node000008" href="$namespace_catch.html#a710841d4732b86c06f816bd4822bd425" title=" " alt="" coords="676,87,848,127"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="628,104,661,104,661,110,628,110"/>
+</map>

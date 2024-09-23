@@ -1,0 +1,143 @@
+\doxysection{testing\+::internal\+::Range\+Generator\texorpdfstring{$<$}{<} T, IncrementT \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classtesting_1_1internal_1_1_range_generator}{}\label{classtesting_1_1internal_1_1_range_generator}\index{testing::internal::RangeGenerator$<$ T, IncrementT $>$@{testing::internal::RangeGenerator$<$ T, IncrementT $>$}}
+
+
+{\ttfamily \#include $<$gtest-\/param-\/util.\+h$>$}
+
+
+
+Inheritance diagram for testing\+::internal\+::Range\+Generator\texorpdfstring{$<$}{<} T, IncrementT \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=245pt]{classtesting_1_1internal_1_1_range_generator__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for testing\+::internal\+::Range\+Generator\texorpdfstring{$<$}{<} T, IncrementT \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=245pt]{classtesting_1_1internal_1_1_range_generator__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_range_generator_a5b3b83223b9cada3569bcee729e0fdf3}{Range\+Generator}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} begin, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} end, IncrementT step)
+\item 
+virtual \mbox{\hyperlink{classtesting_1_1internal_1_1_range_generator_a680b80b06f471b5f93d8433609017021}{\texorpdfstring{$\sim$}{\string~}\+Range\+Generator}} ()
+\item 
+virtual \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_interface}{Param\+Iterator\+Interface}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classtesting_1_1internal_1_1_range_generator_a1c48d267ec70f5dd70330d7dd917ec1b}{Begin}} () const
+\item 
+virtual \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_interface}{Param\+Iterator\+Interface}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classtesting_1_1internal_1_1_range_generator_a380ba126ac130ef94a31422ec6fbfe27}{End}} () const
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator_interface}{testing\+::internal\+::\+Param\+Generator\+Interface$<$ T $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator_interface_ac2767cb9ad2e292e291c4903323c6eff}{\texorpdfstring{$\sim$}{\string~}\+Param\+Generator\+Interface}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Public Types inherited from \mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator_interface}{testing\+::internal\+::\+Param\+Generator\+Interface$<$ T $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator_interface_a10d665c1dcdb355df02452b4e33bf857}{Param\+Type}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, typename IncrementT$>$\newline
+class testing\+::internal\+::\+Range\+Generator$<$ T, Increment\+T $>$}
+
+
+Definition at line \mbox{\hyperlink{gtest-param-util_8h_source_l00202}{202}} of file \mbox{\hyperlink{gtest-param-util_8h_source}{gtest-\/param-\/util.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_range_generator_a5b3b83223b9cada3569bcee729e0fdf3}\index{testing::internal::RangeGenerator$<$ T, IncrementT $>$@{testing::internal::RangeGenerator$<$ T, IncrementT $>$}!RangeGenerator@{RangeGenerator}}
+\index{RangeGenerator@{RangeGenerator}!testing::internal::RangeGenerator$<$ T, IncrementT $>$@{testing::internal::RangeGenerator$<$ T, IncrementT $>$}}
+\doxysubsubsection{\texorpdfstring{RangeGenerator()}{RangeGenerator()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_range_generator_a5b3b83223b9cada3569bcee729e0fdf3} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename IncrementT $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_range_generator}{testing\+::internal\+::\+Range\+Generator}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, IncrementT $>$\+::\+Range\+Generator (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}}]{begin}{, }\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}}]{end}{, }\item[{IncrementT}]{step}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-param-util_8h_source_l00204}{204}} of file \mbox{\hyperlink{gtest-param-util_8h_source}{gtest-\/param-\/util.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ :\ begin\_(begin),\ end\_(end),}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ step\_(step),\ end\_index\_(CalculateEndIndex(begin,\ end,\ step))\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1internal_1_1_range_generator_a680b80b06f471b5f93d8433609017021}\index{testing::internal::RangeGenerator$<$ T, IncrementT $>$@{testing::internal::RangeGenerator$<$ T, IncrementT $>$}!````~RangeGenerator@{\texorpdfstring{$\sim$}{\string~}RangeGenerator}}
+\index{````~RangeGenerator@{\texorpdfstring{$\sim$}{\string~}RangeGenerator}!testing::internal::RangeGenerator$<$ T, IncrementT $>$@{testing::internal::RangeGenerator$<$ T, IncrementT $>$}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}RangeGenerator()}{\string~RangeGenerator()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_range_generator_a680b80b06f471b5f93d8433609017021} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename IncrementT $>$ \\
+virtual \mbox{\hyperlink{classtesting_1_1internal_1_1_range_generator}{testing\+::internal\+::\+Range\+Generator}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, IncrementT $>$\+::\texorpdfstring{$\sim$}{\string~}\mbox{\hyperlink{classtesting_1_1internal_1_1_range_generator}{Range\+Generator}} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-param-util_8h_source_l00207}{207}} of file \mbox{\hyperlink{gtest-param-util_8h_source}{gtest-\/param-\/util.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00207\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_range_generator_a1c48d267ec70f5dd70330d7dd917ec1b}\index{testing::internal::RangeGenerator$<$ T, IncrementT $>$@{testing::internal::RangeGenerator$<$ T, IncrementT $>$}!Begin@{Begin}}
+\index{Begin@{Begin}!testing::internal::RangeGenerator$<$ T, IncrementT $>$@{testing::internal::RangeGenerator$<$ T, IncrementT $>$}}
+\doxysubsubsection{\texorpdfstring{Begin()}{Begin()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_range_generator_a1c48d267ec70f5dd70330d7dd917ec1b} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename IncrementT $>$ \\
+virtual \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_interface}{Param\+Iterator\+Interface}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classtesting_1_1internal_1_1_range_generator}{testing\+::internal\+::\+Range\+Generator}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, IncrementT $>$\+::\+Begin (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator_interface_adcb074da01e5fac94fcbbc3aee629978}{testing\+::internal\+::\+Param\+Generator\+Interface$<$ T $>$}}.
+
+
+
+Definition at line \mbox{\hyperlink{gtest-param-util_8h_source_l00209}{209}} of file \mbox{\hyperlink{gtest-param-util_8h_source}{gtest-\/param-\/util.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00210\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ Iterator(\textcolor{keyword}{this},\ begin\_,\ 0,\ step\_);}
+\DoxyCodeLine{00211\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1internal_1_1_range_generator_a380ba126ac130ef94a31422ec6fbfe27}\index{testing::internal::RangeGenerator$<$ T, IncrementT $>$@{testing::internal::RangeGenerator$<$ T, IncrementT $>$}!End@{End}}
+\index{End@{End}!testing::internal::RangeGenerator$<$ T, IncrementT $>$@{testing::internal::RangeGenerator$<$ T, IncrementT $>$}}
+\doxysubsubsection{\texorpdfstring{End()}{End()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_range_generator_a380ba126ac130ef94a31422ec6fbfe27} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename IncrementT $>$ \\
+virtual \mbox{\hyperlink{classtesting_1_1internal_1_1_param_iterator_interface}{Param\+Iterator\+Interface}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classtesting_1_1internal_1_1_range_generator}{testing\+::internal\+::\+Range\+Generator}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, IncrementT $>$\+::\+End (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classtesting_1_1internal_1_1_param_generator_interface_a070e0a223d832886685522075d80304f}{testing\+::internal\+::\+Param\+Generator\+Interface$<$ T $>$}}.
+
+
+
+Definition at line \mbox{\hyperlink{gtest-param-util_8h_source_l00212}{212}} of file \mbox{\hyperlink{gtest-param-util_8h_source}{gtest-\/param-\/util.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00213\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ Iterator(\textcolor{keyword}{this},\ end\_,\ end\_index\_,\ step\_);}
+\DoxyCodeLine{00214\ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/include/gtest/internal/\mbox{\hyperlink{gtest-param-util_8h}{gtest-\/param-\/util.\+h}}\end{DoxyCompactItemize}

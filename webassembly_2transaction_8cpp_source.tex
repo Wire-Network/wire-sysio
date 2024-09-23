@@ -1,0 +1,41 @@
+\doxysection{transaction.\+cpp}
+\hypertarget{webassembly_2transaction_8cpp_source}{}\label{webassembly_2transaction_8cpp_source}\index{libraries/chain/webassembly/transaction.cpp@{libraries/chain/webassembly/transaction.cpp}}
+\mbox{\hyperlink{webassembly_2transaction_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{webassembly_2transaction_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{interface_8hpp}{sysio/chain/webassembly/interface.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{webassembly_2transaction_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{global__property__object_8hpp}{sysio/chain/global\_property\_object.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{webassembly_2transaction_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{apply__context_8hpp}{sysio/chain/apply\_context.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{webassembly_2transaction_8cpp_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{webassembly_2transaction_8cpp_source_l00005}00005\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{\ \textcolor{keyword}{namespace\ }chain\ \{\ \textcolor{keyword}{namespace\ }webassembly\ \{}
+\DoxyCodeLine{\Hypertarget{webassembly_2transaction_8cpp_source_l00006}\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_aeb73f05e01bd556897cdd10727daae45}{00006}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_aeb73f05e01bd556897cdd10727daae45}{interface::send\_inline}}(\ \mbox{\hyperlink{structsysio_1_1vm_1_1argument__proxy}{legacy\_span<const\ char>}}\ data\ )\ \{}
+\DoxyCodeLine{\Hypertarget{webassembly_2transaction_8cpp_source_l00007}00007\ \ \ \ \ \ \ \textcolor{comment}{//TODO:\ Why\ is\ this\ limit\ even\ needed?\ And\ why\ is\ it\ not\ consistently\ checked\ on\ actions\ in\ input\ or\ deferred\ transactions}}
+\DoxyCodeLine{\Hypertarget{webassembly_2transaction_8cpp_source_l00008}00008\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ data.size()\ <\ \mbox{\hyperlink{structcontext}{context}}.control.get\_global\_properties().configuration.max\_inline\_action\_size,\ inline\_action\_too\_big,}
+\DoxyCodeLine{\Hypertarget{webassembly_2transaction_8cpp_source_l00009}00009\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}inline\ action\ too\ big"{}}\ );}
+\DoxyCodeLine{\Hypertarget{webassembly_2transaction_8cpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{webassembly_2transaction_8cpp_source_l00011}00011\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1action}{action}}\ act;}
+\DoxyCodeLine{\Hypertarget{webassembly_2transaction_8cpp_source_l00012}00012\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a0b442d98ceb22dd5a6ae84745e43ffab}{fc::raw::unpack<action>}}(data.data(),\ data.size(),\ act);}
+\DoxyCodeLine{\Hypertarget{webassembly_2transaction_8cpp_source_l00013}00013\ \ \ \ \ \ \ \mbox{\hyperlink{structcontext}{context}}.execute\_inline(std::move(act));}
+\DoxyCodeLine{\Hypertarget{webassembly_2transaction_8cpp_source_l00014}00014\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{webassembly_2transaction_8cpp_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{webassembly_2transaction_8cpp_source_l00016}\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_a02df59eb2b550e40592024226ff066af}{00016}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_a02df59eb2b550e40592024226ff066af}{interface::send\_context\_free\_inline}}(\ \mbox{\hyperlink{structsysio_1_1vm_1_1argument__proxy}{legacy\_span<const\ char>}}\ data\ )\ \{}
+\DoxyCodeLine{\Hypertarget{webassembly_2transaction_8cpp_source_l00017}00017\ \ \ \ \ \ \ \textcolor{comment}{//TODO:\ Why\ is\ this\ limit\ even\ needed?\ And\ why\ is\ it\ not\ consistently\ checked\ on\ actions\ in\ input\ or\ deferred\ transactions}}
+\DoxyCodeLine{\Hypertarget{webassembly_2transaction_8cpp_source_l00018}00018\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ data.size()\ <\ \mbox{\hyperlink{structcontext}{context}}.control.get\_global\_properties().configuration.max\_inline\_action\_size,\ inline\_action\_too\_big,}
+\DoxyCodeLine{\Hypertarget{webassembly_2transaction_8cpp_source_l00019}00019\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}inline\ action\ too\ big"{}}\ );}
+\DoxyCodeLine{\Hypertarget{webassembly_2transaction_8cpp_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{webassembly_2transaction_8cpp_source_l00021}00021\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1action}{action}}\ act;}
+\DoxyCodeLine{\Hypertarget{webassembly_2transaction_8cpp_source_l00022}00022\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a0b442d98ceb22dd5a6ae84745e43ffab}{fc::raw::unpack<action>}}(data.data(),\ data.size(),\ act);}
+\DoxyCodeLine{\Hypertarget{webassembly_2transaction_8cpp_source_l00023}00023\ \ \ \ \ \ \ \mbox{\hyperlink{structcontext}{context}}.execute\_context\_free\_inline(std::move(act));}
+\DoxyCodeLine{\Hypertarget{webassembly_2transaction_8cpp_source_l00024}00024\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{webassembly_2transaction_8cpp_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{webassembly_2transaction_8cpp_source_l00026}\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_a8b28256fcdf3cfec4deeb0441b966ebf}{00026}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_a8b28256fcdf3cfec4deeb0441b966ebf}{interface::send\_deferred}}(\ \mbox{\hyperlink{structsysio_1_1vm_1_1argument__proxy}{legacy\_ptr<const\ uint128\_t>}}\ sender\_id,\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{account\_name}}\ payer,\ \mbox{\hyperlink{structsysio_1_1vm_1_1argument__proxy}{legacy\_span<const\ char>}}\ data,\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ replace\_existing)\ \{}
+\DoxyCodeLine{\Hypertarget{webassembly_2transaction_8cpp_source_l00027}00027\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1transaction}{transaction}}\ trx;}
+\DoxyCodeLine{\Hypertarget{webassembly_2transaction_8cpp_source_l00028}00028\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a0b442d98ceb22dd5a6ae84745e43ffab}{fc::raw::unpack<transaction>}}(data.data(),\ data.size(),\ trx);}
+\DoxyCodeLine{\Hypertarget{webassembly_2transaction_8cpp_source_l00029}00029\ \ \ \ \ \ \ \mbox{\hyperlink{structcontext}{context}}.schedule\_deferred\_transaction(*sender\_id,\ payer,\ std::move(trx),\ replace\_existing);}
+\DoxyCodeLine{\Hypertarget{webassembly_2transaction_8cpp_source_l00030}00030\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{webassembly_2transaction_8cpp_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{webassembly_2transaction_8cpp_source_l00032}\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_a53d2c538a04177c8326f9670ff048acf}{00032}}\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface_a53d2c538a04177c8326f9670ff048acf}{interface::cancel\_deferred}}(\ \mbox{\hyperlink{structsysio_1_1vm_1_1argument__proxy}{legacy\_ptr<const\ uint128\_t>}}\ val\ )\ \{}
+\DoxyCodeLine{\Hypertarget{webassembly_2transaction_8cpp_source_l00033}00033\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structcontext}{context}}.cancel\_deferred\_transaction(\ *val\ );}
+\DoxyCodeLine{\Hypertarget{webassembly_2transaction_8cpp_source_l00034}00034\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{webassembly_2transaction_8cpp_source_l00035}00035\ \}\}\}\ \textcolor{comment}{//\ ns\ sysio::chain::webassembly}}
+
+\end{DoxyCode}

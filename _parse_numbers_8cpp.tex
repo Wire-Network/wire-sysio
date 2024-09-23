@@ -1,0 +1,377 @@
+\doxysection{libraries/wasm-\/jit/\+Source/\+WAST/\+Parse\+Numbers.cpp File Reference}
+\hypertarget{_parse_numbers_8cpp}{}\label{_parse_numbers_8cpp}\index{libraries/wasm-\/jit/Source/WAST/ParseNumbers.cpp@{libraries/wasm-\/jit/Source/WAST/ParseNumbers.cpp}}
+{\ttfamily \#include "{}Inline/\+Basic\+Types.\+h"{}}\newline
+{\ttfamily \#include "{}Inline/\+Floats.\+h"{}}\newline
+{\ttfamily \#include "{}WAST.\+h"{}}\newline
+{\ttfamily \#include "{}Lexer.\+h"{}}\newline
+{\ttfamily \#include "{}Parse.\+h"{}}\newline
+{\ttfamily \#include $<$climits$>$}\newline
+{\ttfamily \#include $<$cerrno$>$}\newline
+{\ttfamily \#include $<$limits$>$}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include "{}../\+Third\+Party/dtoa.\+c"{}}\newline
+Include dependency graph for Parse\+Numbers.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{_parse_numbers_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespace_w_a_s_t}{WAST}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{_parse_numbers_8cpp_ad85b272ab98e5f45b8784957590dea9d}{IEEE\+\_\+8087}}
+\item 
+\#define \mbox{\hyperlink{_parse_numbers_8cpp_ac643ca2978fa2cdbf23735ce564bbfd5}{NO\+\_\+\+INFNAN\+\_\+\+CHECK}}
+\item 
+\#define \mbox{\hyperlink{_parse_numbers_8cpp_a20d704fe51ff7001184f5bec5e2f7f8d}{strtod}}~parse\+Non\+Special\+F64
+\item 
+\#define \mbox{\hyperlink{_parse_numbers_8cpp_a83ce04ec4679df87effdf9fcecd8048f}{dtoa}}~print\+Non\+Special\+F64
+\item 
+\#define \mbox{\hyperlink{_parse_numbers_8cpp_a459e268fc98c742d2983c7c23bda1cc2}{Long}}~int
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename Float $>$ }\\Float \mbox{\hyperlink{_parse_numbers_8cpp_af58a4ed2c3406b791ad8df78d8d9429e}{parse\+NaN}} (const char \texorpdfstring{$\ast$}{*}\&next\+Char, \mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&\mbox{\hyperlink{structstate}{state}})
+\item 
+{\footnotesize template$<$typename Float $>$ }\\Float \mbox{\hyperlink{_parse_numbers_8cpp_a9dcfe1739f65f985fb6a5f8fdc6d586a}{parse\+Infinity}} (const char \texorpdfstring{$\ast$}{*}next\+Char)
+\item 
+{\footnotesize template$<$typename Float $>$ }\\Float \mbox{\hyperlink{_parse_numbers_8cpp_a39b02b99a6006e265e1a0c1868fa2726}{parse\+Float}} (const char \texorpdfstring{$\ast$}{*}\&next\+Char, \mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&\mbox{\hyperlink{structstate}{state}})
+\item 
+{\footnotesize template$<$typename Unsigned\+Int $>$ }\\bool \mbox{\hyperlink{_parse_numbers_8cpp_af87f5b92805387a61b56acbb2b7d46b7}{try\+Parse\+Int}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&\mbox{\hyperlink{structstate}{state}}, Unsigned\+Int \&out\+Unsigned\+Int, \mbox{\hyperlink{_basic_types_8h_a416b74ff5b1dc365af5713a3f48fb8b9}{I64}} min\+Signed\+Value, \mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}} max\+Unsigned\+Value)
+\item 
+{\footnotesize template$<$typename Float $>$ }\\bool \mbox{\hyperlink{_parse_numbers_8cpp_abd5f32c35fd7b1107c20345aa1f6b2bd}{try\+Parse\+Float}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&\mbox{\hyperlink{structstate}{state}}, Float \&out\+Float)
+\item 
+bool \mbox{\hyperlink{namespace_w_a_s_t_a0fb1b690639911ade0de451575d32309}{WAST\+::try\+Parse\+I32}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&\mbox{\hyperlink{structstate}{state}}, \mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}} \&out\+I32)
+\item 
+bool \mbox{\hyperlink{namespace_w_a_s_t_a8f980380d965a6fceff6ff5c61dc6974}{WAST\+::try\+Parse\+I64}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&\mbox{\hyperlink{structstate}{state}}, \mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}} \&out\+I64)
+\item 
+\mbox{\hyperlink{_basic_types_8h_aa63ef7b996d5487ce35a5a66601f3e73}{U8}} \mbox{\hyperlink{namespace_w_a_s_t_ad29b64fadb8a9ec5fe54a9a147fcf618}{WAST\+::parse\+I8}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&\mbox{\hyperlink{structstate}{state}})
+\item 
+\mbox{\hyperlink{_basic_types_8h_a696390429f2f3b644bde8d0322a24124}{U32}} \mbox{\hyperlink{namespace_w_a_s_t_aa08a40e9ae2c8cb30939574c65bb9eb7}{WAST\+::parse\+I32}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&\mbox{\hyperlink{structstate}{state}})
+\item 
+\mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}} \mbox{\hyperlink{namespace_w_a_s_t_acc415079db29202983e4d49cabc59ab3}{WAST\+::parse\+I64}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&\mbox{\hyperlink{structstate}{state}})
+\item 
+\mbox{\hyperlink{_basic_types_8h_a841d3674577a1e86afdc2f4845f46c4b}{F32}} \mbox{\hyperlink{namespace_w_a_s_t_a2951f7730d860b16cf24168f13ec7d01}{WAST\+::parse\+F32}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&\mbox{\hyperlink{structstate}{state}})
+\item 
+\mbox{\hyperlink{_basic_types_8h_adc9896ee12db3bb116fc63b3464c72c7}{F64}} \mbox{\hyperlink{namespace_w_a_s_t_a40af95ba4f3fbebd5324a913f89d1aff}{WAST\+::parse\+F64}} (\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&\mbox{\hyperlink{structstate}{state}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{_parse_numbers_8cpp_a83ce04ec4679df87effdf9fcecd8048f}\index{ParseNumbers.cpp@{ParseNumbers.cpp}!dtoa@{dtoa}}
+\index{dtoa@{dtoa}!ParseNumbers.cpp@{ParseNumbers.cpp}}
+\doxysubsubsection{\texorpdfstring{dtoa}{dtoa}}
+{\footnotesize\ttfamily \label{_parse_numbers_8cpp_a83ce04ec4679df87effdf9fcecd8048f} 
+\#define dtoa~print\+Non\+Special\+F64}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_numbers_8cpp_source_l00020}{20}} of file \mbox{\hyperlink{_parse_numbers_8cpp_source}{Parse\+Numbers.\+cpp}}.
+
+\Hypertarget{_parse_numbers_8cpp_ad85b272ab98e5f45b8784957590dea9d}\index{ParseNumbers.cpp@{ParseNumbers.cpp}!IEEE\_8087@{IEEE\_8087}}
+\index{IEEE\_8087@{IEEE\_8087}!ParseNumbers.cpp@{ParseNumbers.cpp}}
+\doxysubsubsection{\texorpdfstring{IEEE\_8087}{IEEE\_8087}}
+{\footnotesize\ttfamily \label{_parse_numbers_8cpp_ad85b272ab98e5f45b8784957590dea9d} 
+\#define IEEE\+\_\+8087}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_numbers_8cpp_source_l00017}{17}} of file \mbox{\hyperlink{_parse_numbers_8cpp_source}{Parse\+Numbers.\+cpp}}.
+
+\Hypertarget{_parse_numbers_8cpp_a459e268fc98c742d2983c7c23bda1cc2}\index{ParseNumbers.cpp@{ParseNumbers.cpp}!Long@{Long}}
+\index{Long@{Long}!ParseNumbers.cpp@{ParseNumbers.cpp}}
+\doxysubsubsection{\texorpdfstring{Long}{Long}}
+{\footnotesize\ttfamily \label{_parse_numbers_8cpp_a459e268fc98c742d2983c7c23bda1cc2} 
+\#define Long~int}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_numbers_8cpp_source_l00033}{33}} of file \mbox{\hyperlink{_parse_numbers_8cpp_source}{Parse\+Numbers.\+cpp}}.
+
+\Hypertarget{_parse_numbers_8cpp_ac643ca2978fa2cdbf23735ce564bbfd5}\index{ParseNumbers.cpp@{ParseNumbers.cpp}!NO\_INFNAN\_CHECK@{NO\_INFNAN\_CHECK}}
+\index{NO\_INFNAN\_CHECK@{NO\_INFNAN\_CHECK}!ParseNumbers.cpp@{ParseNumbers.cpp}}
+\doxysubsubsection{\texorpdfstring{NO\_INFNAN\_CHECK}{NO\_INFNAN\_CHECK}}
+{\footnotesize\ttfamily \label{_parse_numbers_8cpp_ac643ca2978fa2cdbf23735ce564bbfd5} 
+\#define NO\+\_\+\+INFNAN\+\_\+\+CHECK}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_numbers_8cpp_source_l00018}{18}} of file \mbox{\hyperlink{_parse_numbers_8cpp_source}{Parse\+Numbers.\+cpp}}.
+
+\Hypertarget{_parse_numbers_8cpp_a20d704fe51ff7001184f5bec5e2f7f8d}\index{ParseNumbers.cpp@{ParseNumbers.cpp}!strtod@{strtod}}
+\index{strtod@{strtod}!ParseNumbers.cpp@{ParseNumbers.cpp}}
+\doxysubsubsection{\texorpdfstring{strtod}{strtod}}
+{\footnotesize\ttfamily \label{_parse_numbers_8cpp_a20d704fe51ff7001184f5bec5e2f7f8d} 
+\#define strtod~parse\+Non\+Special\+F64}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_numbers_8cpp_source_l00019}{19}} of file \mbox{\hyperlink{_parse_numbers_8cpp_source}{Parse\+Numbers.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{_parse_numbers_8cpp_a39b02b99a6006e265e1a0c1868fa2726}\index{ParseNumbers.cpp@{ParseNumbers.cpp}!parseFloat@{parseFloat}}
+\index{parseFloat@{parseFloat}!ParseNumbers.cpp@{ParseNumbers.cpp}}
+\doxysubsubsection{\texorpdfstring{parseFloat()}{parseFloat()}}
+{\footnotesize\ttfamily \label{_parse_numbers_8cpp_a39b02b99a6006e265e1a0c1868fa2726} 
+template$<$typename Float $>$ \\
+Float parse\+Float (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}\&}]{next\+Char}{, }\item[{\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&}]{state}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_numbers_8cpp_source_l00165}{165}} of file \mbox{\hyperlink{_parse_numbers_8cpp_source}{Parse\+Numbers.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00166\ \{}
+\DoxyCodeLine{00167\ \ \ \ \ \textcolor{comment}{//\ Scan\ the\ token's\ characters\ for\ underscores,\ and\ make\ a\ copy\ of\ it\ without\ the\ underscores\ for\ strtod.}}
+\DoxyCodeLine{00168\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ firstChar\ =\ nextChar;}
+\DoxyCodeLine{00169\ \ \ \ \ std::string\ noUnderscoreString;}
+\DoxyCodeLine{00170\ \ \ \ \ \textcolor{keywordtype}{bool}\ hasUnderscores\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00171\ \ \ \ \ \textcolor{keywordflow}{while}(\textcolor{keyword}{true})}
+\DoxyCodeLine{00172\ \ \ \ \ \{}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Determine\ whether\ the\ next\ character\ is\ still\ part\ of\ the\ number.}}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ isNumericChar\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}(*nextChar)}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'0'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'1'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'2'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'3'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'4'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'5'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'6'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'7'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'8'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'9'}:}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'a'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'b'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'c'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'d'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'e'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'f'}:}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'A'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'B'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'C'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'D'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'E'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'F'}:}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'+'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'-\/'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'x'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'X'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'.'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'p'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'P'}:\ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\_'}:}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ \ \ \ \ isNumericChar\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!isNumericChar)\ \{\ \textcolor{keywordflow}{break};\ \}}
+\DoxyCodeLine{00185\ }
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(*nextChar\ ==\ \textcolor{charliteral}{'\_'}\ \&\&\ !hasUnderscores)}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ this\ is\ the\ first\ underscore\ encountered,\ copy\ the\ preceding\ characters\ of\ the\ number\ to\ a\ std::string.}}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ \ \ \ \ noUnderscoreString\ =\ std::string(firstChar,nextChar);}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ \ \ \ \ hasUnderscores\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(*nextChar\ !=\ \textcolor{charliteral}{'\_'}\ \&\&\ hasUnderscores)}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ an\ underscore\ has\ previously\ been\ encountered,\ copy\ non-\/underscore\ characters\ to\ that\ string.}}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ \ \ \ \ noUnderscoreString\ +=\ *nextChar;}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00197\ }
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ ++nextChar;}
+\DoxyCodeLine{00199\ \ \ \ \ \};}
+\DoxyCodeLine{00200\ }
+\DoxyCodeLine{00201\ \ \ \ \ \textcolor{comment}{//\ Pass\ the\ underscore-\/free\ string\ to\ parseNonSpecialF64\ instead\ of\ the\ original\ input\ string.}}
+\DoxyCodeLine{00202\ \ \ \ \ \textcolor{keywordflow}{if}(hasUnderscores)\ \{\ firstChar\ =\ noUnderscoreString.c\_str();\ \}}
+\DoxyCodeLine{00203\ }
+\DoxyCodeLine{00204\ \ \ \ \ \textcolor{comment}{//\ Use\ David\ Gay's\ strtod\ to\ parse\ a\ floating\ point\ number.}}
+\DoxyCodeLine{00205\ \ \ \ \ \textcolor{keywordtype}{char}*\ endChar\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00206\ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_adc9896ee12db3bb116fc63b3464c72c7}{F64}}\ \mbox{\hyperlink{namespace_native_types_acc49687873d8ecf0740b2d8ec4e19ca4}{f64}}\ =\ parseNonSpecialF64(firstChar,\&endChar);}
+\DoxyCodeLine{00207\ \ \ \ \ \textcolor{keywordflow}{if}(endChar\ ==\ firstChar)}
+\DoxyCodeLine{00208\ \ \ \ \ \{}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_errors_a719a329951edb01e45afe1443dfa2a92}{Errors::fatalf}}(\textcolor{stringliteral}{"{}strtod\ failed\ to\ parse\ number\ accepted\ by\ lexer"{}});}
+\DoxyCodeLine{00210\ \ \ \ \ \}}
+\DoxyCodeLine{00211\ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{namespacetesting_1_1internal_a02e1981f5ff70609e6ac06e006ff519a}{Float}}(f64)\ <\ std::numeric\_limits<Float>::lowest()\ ||\ \mbox{\hyperlink{namespacetesting_1_1internal_a02e1981f5ff70609e6ac06e006ff519a}{Float}}(f64)\ >\ std::numeric\_limits<Float>::max())}
+\DoxyCodeLine{00212\ \ \ \ \ \{}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_af36d14f42c697d5272a592bf7349d06d}{parseErrorf}}(\mbox{\hyperlink{structstate}{state}},firstChar,\textcolor{stringliteral}{"{}float\ literal\ is\ too\ large"{}});}
+\DoxyCodeLine{00214\ \ \ \ \ \}}
+\DoxyCodeLine{00215\ }
+\DoxyCodeLine{00216\ \ \ \ \ \textcolor{keywordflow}{return}\ (Float)\mbox{\hyperlink{namespace_native_types_acc49687873d8ecf0740b2d8ec4e19ca4}{f64}};}
+\DoxyCodeLine{00217\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{_parse_numbers_8cpp_a39b02b99a6006e265e1a0c1868fa2726_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{_parse_numbers_8cpp_a39b02b99a6006e265e1a0c1868fa2726_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{_parse_numbers_8cpp_a9dcfe1739f65f985fb6a5f8fdc6d586a}\index{ParseNumbers.cpp@{ParseNumbers.cpp}!parseInfinity@{parseInfinity}}
+\index{parseInfinity@{parseInfinity}!ParseNumbers.cpp@{ParseNumbers.cpp}}
+\doxysubsubsection{\texorpdfstring{parseInfinity()}{parseInfinity()}}
+{\footnotesize\ttfamily \label{_parse_numbers_8cpp_a9dcfe1739f65f985fb6a5f8fdc6d586a} 
+template$<$typename Float $>$ \\
+Float parse\+Infinity (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{next\+Char}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_numbers_8cpp_source_l00151}{151}} of file \mbox{\hyperlink{_parse_numbers_8cpp_source}{Parse\+Numbers.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00152\ \{}
+\DoxyCodeLine{00153\ \ \ \ \ \textcolor{comment}{//\ Floating\ point\ infinite\ is\ represented\ by\ max\ exponent\ with\ a\ zero\ significand.}}
+\DoxyCodeLine{00154\ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{typename}\ \mbox{\hyperlink{struct_floats_1_1_float_components}{Floats::FloatComponents<Float>}}\ FloatComponents;}
+\DoxyCodeLine{00155\ \ \ \ \ FloatComponents\ resultComponents;}
+\DoxyCodeLine{00156\ \ \ \ \ resultComponents.bits.sign\ =\ parseSign(nextChar)\ ?\ 1\ :\ 0;}
+\DoxyCodeLine{00157\ \ \ \ \ resultComponents.bits.exponent\ =\ FloatComponents::maxExponentBits;}
+\DoxyCodeLine{00158\ \ \ \ \ resultComponents.bits.significand\ =\ 0;}
+\DoxyCodeLine{00159\ \ \ \ \ \textcolor{keywordflow}{return}\ resultComponents.value;}
+\DoxyCodeLine{00160\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{_parse_numbers_8cpp_a9dcfe1739f65f985fb6a5f8fdc6d586a_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{_parse_numbers_8cpp_af58a4ed2c3406b791ad8df78d8d9429e}\index{ParseNumbers.cpp@{ParseNumbers.cpp}!parseNaN@{parseNaN}}
+\index{parseNaN@{parseNaN}!ParseNumbers.cpp@{ParseNumbers.cpp}}
+\doxysubsubsection{\texorpdfstring{parseNaN()}{parseNaN()}}
+{\footnotesize\ttfamily \label{_parse_numbers_8cpp_af58a4ed2c3406b791ad8df78d8d9429e} 
+template$<$typename Float $>$ \\
+Float parse\+NaN (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}\&}]{next\+Char}{, }\item[{\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&}]{state}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_numbers_8cpp_source_l00119}{119}} of file \mbox{\hyperlink{_parse_numbers_8cpp_source}{Parse\+Numbers.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00120\ \{}
+\DoxyCodeLine{00121\ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{typename}\ \mbox{\hyperlink{struct_floats_1_1_float_components}{Floats::FloatComponents<Float>}}\ FloatComponents;}
+\DoxyCodeLine{00122\ \ \ \ \ FloatComponents\ resultComponents;}
+\DoxyCodeLine{00123\ \ \ \ \ resultComponents.bits.sign\ =\ parseSign(nextChar)\ ?\ 1\ :\ 0;}
+\DoxyCodeLine{00124\ \ \ \ \ resultComponents.bits.exponent\ =\ FloatComponents::maxExponentBits;}
+\DoxyCodeLine{00125\ }
+\DoxyCodeLine{00126\ \ \ \ \ \mbox{\hyperlink{_errors_8h_a03bec6af3af0dd492e348b40cbe40a46}{WAVM\_ASSERT\_THROW}}(nextChar[0]\ ==\ \textcolor{charliteral}{'n'}}
+\DoxyCodeLine{00127\ \ \ \ \ \&\&\ nextChar[1]\ ==\ \textcolor{charliteral}{'a'}}
+\DoxyCodeLine{00128\ \ \ \ \ \&\&\ nextChar[2]\ ==\ \textcolor{charliteral}{'n'});}
+\DoxyCodeLine{00129\ \ \ \ \ nextChar\ +=\ 3;}
+\DoxyCodeLine{00130\ \ \ \ \ }
+\DoxyCodeLine{00131\ \ \ \ \ \textcolor{keywordflow}{if}(*nextChar\ ==\ \textcolor{charliteral}{':'})}
+\DoxyCodeLine{00132\ \ \ \ \ \{}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ ++nextChar;}
+\DoxyCodeLine{00134\ }
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}}\ \mbox{\hyperlink{fp128_8h_a726ad4aea754fb8a716f9e9071d908e6}{significandBits}}\ =\ parseHexUnsignedInt(nextChar,\mbox{\hyperlink{structstate}{state}},FloatComponents::maxSignificand);}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ resultComponents.bits.significand\ =\ \textcolor{keyword}{typename}\ FloatComponents::Bits(\mbox{\hyperlink{fp128_8h_a726ad4aea754fb8a716f9e9071d908e6}{significandBits}});}
+\DoxyCodeLine{00137\ \ \ \ \ \}}
+\DoxyCodeLine{00138\ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00139\ \ \ \ \ \{}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ the\ NaN's\ significand\ isn't\ specified,\ just\ set\ the\ top\ bit.}}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ resultComponents.bits.significand\ =\ \textcolor{keyword}{typename}\ FloatComponents::Bits(1)\ <<\ (FloatComponents::numSignificandBits-\/1);}
+\DoxyCodeLine{00142\ \ \ \ \ \}}
+\DoxyCodeLine{00143\ \ \ \ \ }
+\DoxyCodeLine{00144\ \ \ \ \ \textcolor{keywordflow}{return}\ resultComponents.value;}
+\DoxyCodeLine{00145\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{_parse_numbers_8cpp_af58a4ed2c3406b791ad8df78d8d9429e_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{_parse_numbers_8cpp_abd5f32c35fd7b1107c20345aa1f6b2bd}\index{ParseNumbers.cpp@{ParseNumbers.cpp}!tryParseFloat@{tryParseFloat}}
+\index{tryParseFloat@{tryParseFloat}!ParseNumbers.cpp@{ParseNumbers.cpp}}
+\doxysubsubsection{\texorpdfstring{tryParseFloat()}{tryParseFloat()}}
+{\footnotesize\ttfamily \label{_parse_numbers_8cpp_abd5f32c35fd7b1107c20345aa1f6b2bd} 
+template$<$typename Float $>$ \\
+bool try\+Parse\+Float (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&}]{state}{, }\item[{Float \&}]{out\+Float}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_numbers_8cpp_source_l00253}{253}} of file \mbox{\hyperlink{_parse_numbers_8cpp_source}{Parse\+Numbers.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00254\ \{}
+\DoxyCodeLine{00255\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ nextChar\ =\ \mbox{\hyperlink{structstate}{state}}.string\ +\ \mbox{\hyperlink{structstate}{state}}.nextToken-\/>begin;}
+\DoxyCodeLine{00256\ \ \ \ \ \textcolor{keywordflow}{switch}(\mbox{\hyperlink{structstate}{state}}.nextToken-\/>type)}
+\DoxyCodeLine{00257\ \ \ \ \ \{}
+\DoxyCodeLine{00258\ \ \ \ \ \textcolor{keywordflow}{case}\ t\_decimalInt:}
+\DoxyCodeLine{00259\ \ \ \ \ \textcolor{keywordflow}{case}\ t\_decimalFloat:\ outFloat\ =\ \mbox{\hyperlink{_parse_numbers_8cpp_a39b02b99a6006e265e1a0c1868fa2726}{parseFloat<Float>}}(nextChar,\mbox{\hyperlink{structstate}{state}});\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00260\ \ \ \ \ \textcolor{keywordflow}{case}\ t\_hexInt:}
+\DoxyCodeLine{00261\ \ \ \ \ \textcolor{keywordflow}{case}\ t\_hexFloat:\ outFloat\ =\ \mbox{\hyperlink{_parse_numbers_8cpp_a39b02b99a6006e265e1a0c1868fa2726}{parseFloat<Float>}}(nextChar,\mbox{\hyperlink{structstate}{state}});\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00262\ \ \ \ \ \textcolor{keywordflow}{case}\ t\_floatNaN:\ outFloat\ =\ \mbox{\hyperlink{_parse_numbers_8cpp_af58a4ed2c3406b791ad8df78d8d9429e}{parseNaN<Float>}}(nextChar,\mbox{\hyperlink{structstate}{state}});\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00263\ \ \ \ \ \textcolor{keywordflow}{case}\ t\_floatInf:\ outFloat\ =\ \mbox{\hyperlink{_parse_numbers_8cpp_a9dcfe1739f65f985fb6a5f8fdc6d586a}{parseInfinity<Float>}}(nextChar);\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00264\ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00265\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_t_af36d14f42c697d5272a592bf7349d06d}{parseErrorf}}(\mbox{\hyperlink{structstate}{state}},\mbox{\hyperlink{structstate}{state}}.nextToken,\textcolor{stringliteral}{"{}expected\ float\ literal"{}});}
+\DoxyCodeLine{00266\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00267\ \ \ \ \ \};}
+\DoxyCodeLine{00268\ }
+\DoxyCodeLine{00269\ \ \ \ \ ++\mbox{\hyperlink{structstate}{state}}.nextToken;}
+\DoxyCodeLine{00270\ \ \ \ \ \mbox{\hyperlink{_errors_8h_a03bec6af3af0dd492e348b40cbe40a46}{WAVM\_ASSERT\_THROW}}(nextChar\ <=\ state.string\ +\ state.nextToken-\/>begin);}
+\DoxyCodeLine{00271\ }
+\DoxyCodeLine{00272\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00273\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{_parse_numbers_8cpp_abd5f32c35fd7b1107c20345aa1f6b2bd_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=280pt]{_parse_numbers_8cpp_abd5f32c35fd7b1107c20345aa1f6b2bd_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{_parse_numbers_8cpp_af87f5b92805387a61b56acbb2b7d46b7}\index{ParseNumbers.cpp@{ParseNumbers.cpp}!tryParseInt@{tryParseInt}}
+\index{tryParseInt@{tryParseInt}!ParseNumbers.cpp@{ParseNumbers.cpp}}
+\doxysubsubsection{\texorpdfstring{tryParseInt()}{tryParseInt()}}
+{\footnotesize\ttfamily \label{_parse_numbers_8cpp_af87f5b92805387a61b56acbb2b7d46b7} 
+template$<$typename Unsigned\+Int $>$ \\
+bool try\+Parse\+Int (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_w_a_s_t_1_1_parse_state}{Parse\+State}} \&}]{state}{, }\item[{Unsigned\+Int \&}]{out\+Unsigned\+Int}{, }\item[{\mbox{\hyperlink{_basic_types_8h_a416b74ff5b1dc365af5713a3f48fb8b9}{I64}}}]{min\+Signed\+Value}{, }\item[{\mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}}}]{max\+Unsigned\+Value}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_parse_numbers_8cpp_source_l00222}{222}} of file \mbox{\hyperlink{_parse_numbers_8cpp_source}{Parse\+Numbers.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00223\ \{}
+\DoxyCodeLine{00224\ \ \ \ \ \textcolor{keywordtype}{bool}\ isNegative\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00225\ \ \ \ \ \mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}}\ u64\ =\ 0;}
+\DoxyCodeLine{00226\ }
+\DoxyCodeLine{00227\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ nextChar\ =\ \mbox{\hyperlink{structstate}{state}}.string\ +\ \mbox{\hyperlink{structstate}{state}}.nextToken-\/>begin;}
+\DoxyCodeLine{00228\ \ \ \ \ \textcolor{keywordflow}{switch}(\mbox{\hyperlink{structstate}{state}}.nextToken-\/>type)}
+\DoxyCodeLine{00229\ \ \ \ \ \{}
+\DoxyCodeLine{00230\ \ \ \ \ \textcolor{keywordflow}{case}\ t\_decimalInt:}
+\DoxyCodeLine{00231\ \ \ \ \ \ \ \ \ isNegative\ =\ parseSign(nextChar);}
+\DoxyCodeLine{00232\ \ \ \ \ \ \ \ \ u64\ =\ parseDecimalUnsignedInt(nextChar,\mbox{\hyperlink{structstate}{state}},isNegative\ ?\ \mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}}(-\/minSignedValue)\ :\ maxUnsignedValue,\textcolor{stringliteral}{"{}int\ literal"{}});}
+\DoxyCodeLine{00233\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00234\ \ \ \ \ \textcolor{keywordflow}{case}\ t\_hexInt:}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \ \ isNegative\ =\ parseSign(nextChar);}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ u64\ =\ parseHexUnsignedInt(nextChar,\mbox{\hyperlink{structstate}{state}},isNegative\ ?\ \mbox{\hyperlink{_basic_types_8h_a25809e0734a149248fcf5831efa4e33d}{U64}}(-\/minSignedValue)\ :\ maxUnsignedValue);}
+\DoxyCodeLine{00237\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00238\ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00240\ \ \ \ \ \};}
+\DoxyCodeLine{00241\ }
+\DoxyCodeLine{00242\ \ \ \ \ outUnsignedInt\ =\ isNegative\ ?\ UnsignedInt(-\/\mbox{\hyperlink{keccak256_8cpp_a4a234a46224f2c5591a49ebdfa83c70e}{I64}}(u64))\ :\ UnsignedInt(u64);}
+\DoxyCodeLine{00243\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00244\ \ \ \ \ ++\mbox{\hyperlink{structstate}{state}}.nextToken;}
+\DoxyCodeLine{00245\ \ \ \ \ \mbox{\hyperlink{_errors_8h_a03bec6af3af0dd492e348b40cbe40a46}{WAVM\_ASSERT\_THROW}}(nextChar\ <=\ state.string\ +\ state.nextToken-\/>begin);}
+\DoxyCodeLine{00246\ }
+\DoxyCodeLine{00247\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00248\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{_parse_numbers_8cpp_af87f5b92805387a61b56acbb2b7d46b7_icgraph}
+\end{center}
+\end{figure}

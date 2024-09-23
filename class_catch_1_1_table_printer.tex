@@ -1,0 +1,204 @@
+\doxysection{Catch\+::Table\+Printer Class Reference}
+\hypertarget{class_catch_1_1_table_printer}{}\label{class_catch_1_1_table_printer}\index{Catch::TablePrinter@{Catch::TablePrinter}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_catch_1_1_table_printer_a5927152ae95eeefa471ab27c01644980}{Table\+Printer}} (std\+::ostream \&os, std\+::vector$<$ Column\+Info $>$ \mbox{\hyperlink{class_catch_1_1_table_printer_a378f2bdf7f353a13d3a9f683a2c1fa04}{column\+Infos}})
+\item 
+auto \mbox{\hyperlink{class_catch_1_1_table_printer_a378f2bdf7f353a13d3a9f683a2c1fa04}{column\+Infos}} () const -\/$>$ std\+::vector$<$ Column\+Info $>$ const \&
+\item 
+void \mbox{\hyperlink{class_catch_1_1_table_printer_abb4f12add189af81ef29694014cac6df}{open}} ()
+\item 
+void \mbox{\hyperlink{class_catch_1_1_table_printer_aa5936978a607e853ac0346df60e0f6f7}{close}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{class_catch_1_1_table_printer}{Table\+Printer}} \& \mbox{\hyperlink{class_catch_1_1_table_printer_a32b70423caf631aeffe5a48a1971eaac}{operator$<$$<$}} (\mbox{\hyperlink{class_catch_1_1_table_printer}{Table\+Printer}} \&tp, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+\mbox{\hyperlink{class_catch_1_1_table_printer}{Table\+Printer}} \& \mbox{\hyperlink{class_catch_1_1_table_printer_a90580b26094240d55734c7bf1e5e83d0}{operator$<$$<$}} (\mbox{\hyperlink{class_catch_1_1_table_printer}{Table\+Printer}} \&tp, Column\+Break)
+\item 
+\mbox{\hyperlink{class_catch_1_1_table_printer}{Table\+Printer}} \& \mbox{\hyperlink{class_catch_1_1_table_printer_aee6eb4fc24343c7ae86bd64dbbd49cf8}{operator$<$$<$}} (\mbox{\hyperlink{class_catch_1_1_table_printer}{Table\+Printer}} \&tp, Row\+Break)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__console_8cpp_source_l00266}{266}} of file \mbox{\hyperlink{catch__reporter__console_8cpp_source}{catch\+\_\+reporter\+\_\+console.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_catch_1_1_table_printer_a5927152ae95eeefa471ab27c01644980}\index{Catch::TablePrinter@{Catch::TablePrinter}!TablePrinter@{TablePrinter}}
+\index{TablePrinter@{TablePrinter}!Catch::TablePrinter@{Catch::TablePrinter}}
+\doxysubsubsection{\texorpdfstring{TablePrinter()}{TablePrinter()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_table_printer_a5927152ae95eeefa471ab27c01644980} 
+Catch\+::\+Table\+Printer\+::\+Table\+Printer (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{os}{, }\item[{std\+::vector$<$ Column\+Info $>$}]{column\+Infos}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__console_8cpp_source_l00274}{274}} of file \mbox{\hyperlink{catch__reporter__console_8cpp_source}{catch\+\_\+reporter\+\_\+console.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00275\ \ \ \ \ :\ \ \ m\_os(\ os\ ),}
+\DoxyCodeLine{00276\ \ \ \ \ \ \ \ \ m\_columnInfos(\ std::move(\ \mbox{\hyperlink{class_catch_1_1_table_printer_a378f2bdf7f353a13d3a9f683a2c1fa04}{columnInfos}}\ )\ )\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_catch_1_1_table_printer_aa5936978a607e853ac0346df60e0f6f7}\index{Catch::TablePrinter@{Catch::TablePrinter}!close@{close}}
+\index{close@{close}!Catch::TablePrinter@{Catch::TablePrinter}}
+\doxysubsubsection{\texorpdfstring{close()}{close()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_table_printer_aa5936978a607e853ac0346df60e0f6f7} 
+void Catch\+::\+Table\+Printer\+::close (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__console_8cpp_source_l00292}{292}} of file \mbox{\hyperlink{catch__reporter__console_8cpp_source}{catch\+\_\+reporter\+\_\+console.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00292\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00293\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (m\_isOpen)\ \{}
+\DoxyCodeLine{00294\ \ \ \ \ \ \ \ \ \ \ \ \ *\textcolor{keyword}{this}\ <<\ RowBreak();}
+\DoxyCodeLine{00295\ \ \ \ \ \ \ \ \ \ \ \ \ m\_os\ <<\ std::endl;}
+\DoxyCodeLine{00296\ \ \ \ \ \ \ \ \ \ \ \ \ m\_isOpen\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00297\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00298\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_table_printer_a378f2bdf7f353a13d3a9f683a2c1fa04}\index{Catch::TablePrinter@{Catch::TablePrinter}!columnInfos@{columnInfos}}
+\index{columnInfos@{columnInfos}!Catch::TablePrinter@{Catch::TablePrinter}}
+\doxysubsubsection{\texorpdfstring{columnInfos()}{columnInfos()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_table_printer_a378f2bdf7f353a13d3a9f683a2c1fa04} 
+auto Catch\+::\+Table\+Printer\+::column\+Infos (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const -\/$>$ std\+::vector$<$Column\+Info$>$ const\& \hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__console_8cpp_source_l00278}{278}} of file \mbox{\hyperlink{catch__reporter__console_8cpp_source}{catch\+\_\+reporter\+\_\+console.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00278\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00279\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_columnInfos;}
+\DoxyCodeLine{00280\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_table_printer_abb4f12add189af81ef29694014cac6df}\index{Catch::TablePrinter@{Catch::TablePrinter}!open@{open}}
+\index{open@{open}!Catch::TablePrinter@{Catch::TablePrinter}}
+\doxysubsubsection{\texorpdfstring{open()}{open()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_table_printer_abb4f12add189af81ef29694014cac6df} 
+void Catch\+::\+Table\+Printer\+::open (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__console_8cpp_source_l00282}{282}} of file \mbox{\hyperlink{catch__reporter__console_8cpp_source}{catch\+\_\+reporter\+\_\+console.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00282\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00283\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!m\_isOpen)\ \{}
+\DoxyCodeLine{00284\ \ \ \ \ \ \ \ \ \ \ \ \ m\_isOpen\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00285\ \ \ \ \ \ \ \ \ \ \ \ \ *\textcolor{keyword}{this}\ <<\ RowBreak();}
+\DoxyCodeLine{00286\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\ \textcolor{keyword}{const}\&\ info\ :\ m\_columnInfos)}
+\DoxyCodeLine{00287\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *\textcolor{keyword}{this}\ <<\ info.name\ <<\ ColumnBreak();}
+\DoxyCodeLine{00288\ \ \ \ \ \ \ \ \ \ \ \ \ *\textcolor{keyword}{this}\ <<\ RowBreak();}
+\DoxyCodeLine{00289\ \ \ \ \ \ \ \ \ \ \ \ \ m\_os\ <<\ \mbox{\hyperlink{namespace_catch_a15ae9a6c9d9d1a1987a08adac734134e}{Catch::getLineOfChars}}<\textcolor{charliteral}{'-\/'}>()\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{00290\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00291\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=333pt]{class_catch_1_1_table_printer_abb4f12add189af81ef29694014cac6df_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{class_catch_1_1_table_printer_a90580b26094240d55734c7bf1e5e83d0}\index{Catch::TablePrinter@{Catch::TablePrinter}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!Catch::TablePrinter@{Catch::TablePrinter}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$}{operator<<}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_table_printer_a90580b26094240d55734c7bf1e5e83d0} 
+\mbox{\hyperlink{class_catch_1_1_table_printer}{Table\+Printer}} \& operator$<$$<$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_catch_1_1_table_printer}{Table\+Printer}} \&}]{tp}{, }\item[{Column\+Break}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__console_8cpp_source_l00306}{306}} of file \mbox{\hyperlink{catch__reporter__console_8cpp_source}{catch\+\_\+reporter\+\_\+console.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00306\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00307\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ colStr\ =\ tp.m\_oss.str();}
+\DoxyCodeLine{00308\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ This\ takes\ account\ of\ utf8\ encodings}}
+\DoxyCodeLine{00309\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ strSize\ =\ \mbox{\hyperlink{class_catch_1_1_string_ref}{Catch::StringRef}}(colStr).\mbox{\hyperlink{class_catch_1_1_string_ref_a6a6cac7430e626ffdd7550a081e8168f}{numberOfCharacters}}();}
+\DoxyCodeLine{00310\ \ \ \ \ \ \ \ \ tp.m\_oss.str(\textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{00311\ \ \ \ \ \ \ \ \ tp.open();}
+\DoxyCodeLine{00312\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (tp.m\_currentColumn\ ==\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(tp.m\_columnInfos.size()\ -\/\ 1))\ \{}
+\DoxyCodeLine{00313\ \ \ \ \ \ \ \ \ \ \ \ \ tp.m\_currentColumn\ =\ -\/1;}
+\DoxyCodeLine{00314\ \ \ \ \ \ \ \ \ \ \ \ \ tp.m\_os\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{00315\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00316\ \ \ \ \ \ \ \ \ tp.m\_currentColumn++;}
+\DoxyCodeLine{00317\ }
+\DoxyCodeLine{00318\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ colInfo\ =\ tp.m\_columnInfos[tp.m\_currentColumn];}
+\DoxyCodeLine{00319\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ padding\ =\ (strSize\ +\ 2\ <\ \textcolor{keyword}{static\_cast<}std::size\_t\textcolor{keyword}{>}(colInfo.width))}
+\DoxyCodeLine{00320\ \ \ \ \ \ \ \ \ \ \ \ \ ?\ std::string(colInfo.width\ -\/\ (strSize\ +\ 2),\ \textcolor{charliteral}{'\ '})}
+\DoxyCodeLine{00321\ \ \ \ \ \ \ \ \ \ \ \ \ :\ std::string();}
+\DoxyCodeLine{00322\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (colInfo.justification\ ==\ ColumnInfo::Left)}
+\DoxyCodeLine{00323\ \ \ \ \ \ \ \ \ \ \ \ \ tp.m\_os\ <<\ colStr\ <<\ padding\ <<\ \textcolor{stringliteral}{"{}\ "{}};}
+\DoxyCodeLine{00324\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00325\ \ \ \ \ \ \ \ \ \ \ \ \ tp.m\_os\ <<\ padding\ <<\ colStr\ <<\ \textcolor{stringliteral}{"{}\ "{}};}
+\DoxyCodeLine{00326\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ tp;}
+\DoxyCodeLine{00327\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_table_printer_aee6eb4fc24343c7ae86bd64dbbd49cf8}\index{Catch::TablePrinter@{Catch::TablePrinter}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!Catch::TablePrinter@{Catch::TablePrinter}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$}{operator<<}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_table_printer_aee6eb4fc24343c7ae86bd64dbbd49cf8} 
+\mbox{\hyperlink{class_catch_1_1_table_printer}{Table\+Printer}} \& operator$<$$<$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_catch_1_1_table_printer}{Table\+Printer}} \&}]{tp}{, }\item[{Row\+Break}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__console_8cpp_source_l00329}{329}} of file \mbox{\hyperlink{catch__reporter__console_8cpp_source}{catch\+\_\+reporter\+\_\+console.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00329\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00330\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (tp.m\_currentColumn\ >\ 0)\ \{}
+\DoxyCodeLine{00331\ \ \ \ \ \ \ \ \ \ \ \ \ tp.m\_os\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{00332\ \ \ \ \ \ \ \ \ \ \ \ \ tp.m\_currentColumn\ =\ -\/1;}
+\DoxyCodeLine{00333\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00334\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ tp;}
+\DoxyCodeLine{00335\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_table_printer_a32b70423caf631aeffe5a48a1971eaac}\index{Catch::TablePrinter@{Catch::TablePrinter}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!Catch::TablePrinter@{Catch::TablePrinter}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$}{operator<<}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_table_printer_a32b70423caf631aeffe5a48a1971eaac} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{class_catch_1_1_table_printer}{Table\+Printer}} \& operator$<$$<$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_catch_1_1_table_printer}{Table\+Printer}} \&}]{tp}{, }\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const \&}]{value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__reporter__console_8cpp_source_l00301}{301}} of file \mbox{\hyperlink{catch__reporter__console_8cpp_source}{catch\+\_\+reporter\+\_\+console.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00301\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00302\ \ \ \ \ \ \ \ \ tp.m\_oss\ <<\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}};}
+\DoxyCodeLine{00303\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ tp;}
+\DoxyCodeLine{00304\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/include/reporters/\mbox{\hyperlink{catch__reporter__console_8cpp}{catch\+\_\+reporter\+\_\+console.\+cpp}}\end{DoxyCompactItemize}

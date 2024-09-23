@@ -1,0 +1,84 @@
+\doxysection{parsing.\+c}
+\hypertarget{parsing_8c_source}{}\label{parsing_8c_source}\index{libraries/yubihsm/common/parsing.c@{libraries/yubihsm/common/parsing.c}}
+\mbox{\hyperlink{parsing_8c}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ 2015-\/2018\ Yubico\ AB}}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00004}00004\ \textcolor{comment}{\ *\ Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00005}00005\ \textcolor{comment}{\ *\ you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00006}00006\ \textcolor{comment}{\ *\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00008}00008\ \textcolor{comment}{\ *\ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00009}00009\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00010}00010\ \textcolor{comment}{\ *\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00011}00011\ \textcolor{comment}{\ *\ distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00012}00012\ \textcolor{comment}{\ *\ WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00013}00013\ \textcolor{comment}{\ *\ See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00014}00014\ \textcolor{comment}{\ *\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00015}00015\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00017}00017\ \textcolor{preprocessor}{\#include\ <stdio.h>}}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00018}00018\ \textcolor{preprocessor}{\#include\ <string.h>}}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00020}00020\ \textcolor{preprocessor}{\#include\ <openssl/evp.h>}}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00022}00022\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{parsing_8h}{parsing.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00024}\mbox{\hyperlink{parsing_8c_ab06b84c4848a12847ba134dd739fe5f0}{00024}}\ \textcolor{preprocessor}{\#define\ READ\_STR\_PROMPT\_BASE\ "{}Enter\ \%s:\ "{}}}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00026}\mbox{\hyperlink{parsing_8c_a07b9f982e6a2f33addd688340f3bf89e}{00026}}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{parsing_8c_a07b9f982e6a2f33addd688340f3bf89e}{read\_string}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ \textcolor{keywordtype}{char}\ *str\_buf,\ \textcolor{keywordtype}{size\_t}\ str\_buf\_len,}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00027}00027\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ hidden)\ \{}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00029}00029\ \ \ \textcolor{keywordtype}{char}\ prompt[\textcolor{keyword}{sizeof}(\mbox{\hyperlink{parsing_8c_ab06b84c4848a12847ba134dd739fe5f0}{READ\_STR\_PROMPT\_BASE}})\ +\ 32]\ =\ \{0\};}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00030}00030\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00032}00032\ \ \ \textcolor{keywordflow}{if}\ (str\_buf\_len\ <\ 1)\ \{}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00033}00033\ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Unable\ to\ read\ \%s:\ buffer\ too\ small\(\backslash\)n"{}},\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}});}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00034}00034\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00035}00035\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00037}00037\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ snprintf(prompt,\ \textcolor{keyword}{sizeof}(prompt),\ \mbox{\hyperlink{parsing_8c_ab06b84c4848a12847ba134dd739fe5f0}{READ\_STR\_PROMPT\_BASE}},\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}});}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00038}00038\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ <\ 0\ ||\ ((\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int})\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}})\ >\ (\textcolor{keyword}{sizeof}(prompt)\ -\/\ 1))\ \{}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00039}00039\ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Unable\ to\ read\ \%s:\ snprintf\ failed\(\backslash\)n"{}},\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}});}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00040}00040\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00041}00041\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00043}00043\ \ \ \textcolor{keywordflow}{if}\ (hidden\ ==\ \textcolor{keyword}{true})\ \{}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00044}00044\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ EVP\_read\_pw\_string(str\_buf,\ str\_buf\_len,\ prompt,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00045}00045\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ !=\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00046}00046\ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Retrieving\ \%s\ failed\ (\%d)\(\backslash\)n"{}},\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}});}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00047}00047\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00048}00048\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00049}00049\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00050}00050\ \ \ \ \ fprintf(stdout,\ \textcolor{stringliteral}{"{}\%s"{}},\ prompt);}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00051}00051\ \ \ \ \ str\_buf\ =\ fgets(str\_buf,\ str\_buf\_len,\ stdin);}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00052}00052\ \ \ \ \ \textcolor{keywordflow}{if}\ (str\_buf\ ==\ NULL)\ \{}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00053}00053\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00054}00054\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00055}00055\ \ \ \ \ str\_buf[strlen(str\_buf)\ -\/\ 1]\ =\ \textcolor{charliteral}{'\(\backslash\)0'};}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00056}00056\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00058}00058\ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00059}00059\ \}}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00061}\mbox{\hyperlink{parsing_8c_a34eba41924e062e82e7b778f280ac138}{00061}}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{parsing_8c_a34eba41924e062e82e7b778f280ac138}{parse\_pw}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *prompt,\ \textcolor{keywordtype}{char}\ *pw,\ \textcolor{keywordtype}{char}\ *parsed,\ \textcolor{keywordtype}{size\_t}\ *parsed\_len)\ \{}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00062}00062\ \ \ \textcolor{keywordflow}{if}\ (strlen(pw)\ >\ *parsed\_len)\ \{}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00063}00063\ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Unable\ to\ read\ name,\ buffer\ too\ small\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00064}00064\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00065}00065\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00067}00067\ \ \ \textcolor{keywordflow}{if}\ (strlen(pw)\ ==\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00068}00068\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{parsing_8c_a07b9f982e6a2f33addd688340f3bf89e}{read\_string}}(prompt,\ parsed,\ *parsed\_len,\ \textcolor{keyword}{true})\ ==\ \textcolor{keyword}{false})\ \{}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00069}00069\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00070}00070\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00071}00071\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00072}00072\ \ \ \ \ strncpy(parsed,\ pw,\ *parsed\_len);}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00073}00073\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00074}00074\ }
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00075}00075\ \ \ *parsed\_len\ =\ strlen(parsed);}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00076}00076\ }
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00077}00077\ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{parsing_8c_source_l00078}00078\ \}}
+
+\end{DoxyCode}

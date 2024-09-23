@@ -1,0 +1,23 @@
+<map id="validate_reflection.ClassStruct.add_fields" name="validate_reflection.ClassStruct.add_fields">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,169,170,210"/>
+<area shape="rect" id="Node000002" href="$classvalidate__reflection_1_1_class_struct.html#ab8f5f2496752791d2146cb6f0a7c3b36" title=" " alt="" coords="246,112,410,153"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="170,168,231,153,232,158,171,173"/>
+<area shape="rect" id="Node000003" href="$class_catch_1_1clara_1_1_text_flow_1_1_column.html#a8d5fa87d9f25f27e6948965c62b53867" title=" " alt="" coords="521,5,674,46"/>
+<area shape="poly" id="edge9_Node000001_Node000003" title=" " alt="" coords="102,167,149,115,181,89,217,67,289,41,366,26,440,19,505,18,506,23,440,25,367,32,291,47,219,72,184,93,152,119,106,171"/>
+<area shape="rect" id="Node000004" href="$class_catch_1_1clara_1_1_text_flow_1_1_column_1_1iterator.html#ac356587d1b50dc1413bc45fd4d87ad0c" title=" " alt="" coords="515,73,680,114"/>
+<area shape="poly" id="edge10_Node000001_Node000004" title=" " alt="" coords="108,167,155,129,185,111,217,98,289,81,364,74,436,73,500,78,499,83,435,79,364,79,290,86,218,103,187,116,158,134,112,171"/>
+<area shape="rect" id="Node000005" href="$classclara_1_1_text_flow_1_1_column.html#a30a0c51aad3043639a850856867b202d" title=" " alt="" coords="516,144,679,185"/>
+<area shape="poly" id="edge11_Node000001_Node000005" title=" " alt="" coords="170,183,501,166,501,172,170,188"/>
+<area shape="rect" id="Node000006" href="$classclara_1_1_text_flow_1_1_column_1_1iterator.html#a526eb2c4a55e6eb1563d5f3e253017b1" title=" " alt="" coords="516,219,679,259"/>
+<area shape="poly" id="edge12_Node000001_Node000006" title=" " alt="" coords="170,195,501,227,500,232,170,200"/>
+<area shape="rect" id="Node000007" href="$classvalidate__reflection_1_1_class_struct.html#acff446a1aef2e87684d37ca5885a85b6" title=" " alt="" coords="246,277,410,318"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="125,208,219,257,250,269,248,274,217,261,123,213"/>
+<area shape="rect" id="Node000008" href="$classvalidate__reflection_1_1_reflections.html#a6a3a1683c049f943b4d2c4a7ee59000a" title=" " alt="" coords="218,343,439,383"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="105,209,151,268,183,300,219,327,230,333,227,338,216,332,180,304,147,271,100,212"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="371,109,486,59,513,49,515,54,488,64,374,114"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="411,118,499,105,500,110,412,123"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="411,139,501,150,500,155,411,145"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="382,151,488,194,529,210,527,215,486,199,380,156"/>
+<area shape="rect" id="Node000009" href="$classvalidate__reflection_1_1_reflections.html#a1c43c72e38d37ea70f652d9860d7abc3" title=" " alt="" coords="487,343,708,383"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="439,360,472,360,472,366,439,366"/>
+</map>

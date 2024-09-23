@@ -1,0 +1,202 @@
+\doxysection{appbase Namespace Reference}
+\hypertarget{namespaceappbase}{}\label{namespaceappbase}\index{appbase@{appbase}}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespaceappbase_1_1impl}{impl}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classappbase_1_1abstract__plugin}{abstract\+\_\+plugin}}
+\item 
+class \mbox{\hyperlink{classappbase_1_1application}{application}}
+\item 
+class \mbox{\hyperlink{classappbase_1_1application__impl}{application\+\_\+impl}}
+\item 
+class \mbox{\hyperlink{classappbase_1_1channel}{channel}}
+\item 
+struct \mbox{\hyperlink{structappbase_1_1channel__decl}{channel\+\_\+decl}}
+\item 
+struct \mbox{\hyperlink{structappbase_1_1drop__exceptions}{drop\+\_\+exceptions}}
+\item 
+class \mbox{\hyperlink{classappbase_1_1execution__priority__queue}{execution\+\_\+priority\+\_\+queue}}
+\item 
+struct \mbox{\hyperlink{structappbase_1_1first__provider__policy}{first\+\_\+provider\+\_\+policy}}
+\item 
+struct \mbox{\hyperlink{structappbase_1_1first__provider__policy_3_01_ret_07_args_8_8_8_08_4}{first\+\_\+provider\+\_\+policy$<$ Ret(\+Args...)$>$}}
+\item 
+struct \mbox{\hyperlink{structappbase_1_1first__provider__policy_3_01void_07_args_8_8_8_08_4}{first\+\_\+provider\+\_\+policy$<$ void(\+Args...)$>$}}
+\item 
+struct \mbox{\hyperlink{structappbase_1_1first__success__policy}{first\+\_\+success\+\_\+policy}}
+\item 
+struct \mbox{\hyperlink{structappbase_1_1first__success__policy_3_01_ret_07_args_8_8_8_08_4}{first\+\_\+success\+\_\+policy$<$ Ret(\+Args...)$>$}}
+\item 
+struct \mbox{\hyperlink{structappbase_1_1first__success__policy_3_01void_07_args_8_8_8_08_4}{first\+\_\+success\+\_\+policy$<$ void(\+Args...)$>$}}
+\item 
+class \mbox{\hyperlink{classappbase_1_1method}{method}}
+\item 
+struct \mbox{\hyperlink{structappbase_1_1method__decl}{method\+\_\+decl}}
+\item 
+class \mbox{\hyperlink{classappbase_1_1plugin}{plugin}}
+\item 
+struct \mbox{\hyperlink{structappbase_1_1priority}{priority}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{namespaceappbase_aade924f565cf5f8cfca31b35dcc289d9}{any\+\_\+type\+\_\+compare\+\_\+map}} = std\+::unordered\+\_\+map$<$std\+::type\+\_\+index, std\+::function$<$bool(const boost\+::any\& \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, const boost\+::any\& b)$>$$>$
+\item 
+using \mbox{\hyperlink{namespaceappbase_a34fffab26998c1f3c0607cbbda228faa}{config\+\_\+comparison\+\_\+f}} = std\+::function$<$bool(const boost\+::any\& \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, const boost\+::any\& b)$>$
+\item 
+using \mbox{\hyperlink{namespaceappbase_abe439eb2985b17412fc24a7f9f45a79c}{erased\+\_\+channel\+\_\+ptr}} = std\+::unique\+\_\+ptr$<$void, void(\texorpdfstring{$\ast$}{*})(void\texorpdfstring{$\ast$}{*})$>$
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\using \mbox{\hyperlink{namespaceappbase_a8bca2384fc9c0fe6dc0eb2c35038d0cc}{is\+\_\+channel\+\_\+decl}} = decltype(\mbox{\hyperlink{namespaceappbase_a861d9387127f53a940cfd8e449f96c5f}{is\+\_\+channel\+\_\+decl\+\_\+impl}}(std\+::declval$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\texorpdfstring{$\ast$}{*}$>$()))
+\item 
+using \mbox{\hyperlink{namespaceappbase_af7b12aeed8c3ae8f23a8bf8d553f5a04}{erased\+\_\+method\+\_\+ptr}} = std\+::unique\+\_\+ptr$<$void, void(\texorpdfstring{$\ast$}{*})(void\texorpdfstring{$\ast$}{*})$>$
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\using \mbox{\hyperlink{namespaceappbase_af6d8cf2c6f2a52a0016b86ce095f7ede}{is\+\_\+method\+\_\+decl}} = decltype(\mbox{\hyperlink{namespaceappbase_ad5483ef56194bb7ef7943247d3e28326}{is\+\_\+method\+\_\+decl\+\_\+impl}}(std\+::declval$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\texorpdfstring{$\ast$}{*}$>$()))
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classappbase_1_1application}{application}} \& \mbox{\hyperlink{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}{app}} ()
+\item 
+{\footnotesize template$<$typename... Ts$>$ }\\std\+::true\+\_\+type \mbox{\hyperlink{namespaceappbase_a861d9387127f53a940cfd8e449f96c5f}{is\+\_\+channel\+\_\+decl\+\_\+impl}} (const \mbox{\hyperlink{structappbase_1_1channel__decl}{channel\+\_\+decl}}$<$ Ts... $>$ \texorpdfstring{$\ast$}{*})
+\item 
+std\+::false\+\_\+type \mbox{\hyperlink{namespaceappbase_af20e49b41f3f7398d5c7e09577db9b52}{is\+\_\+channel\+\_\+decl\+\_\+impl}} (...)
+\item 
+{\footnotesize template$<$typename Tag , typename Function\+Sig , \mbox{\hyperlink{yubihsm__pkcs11_8c_a53ef06e29c840024a683512c1acd791a}{template}}$<$ typename $>$ \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} Dispatch\+Policy$>$ }\\std\+::true\+\_\+type \mbox{\hyperlink{namespaceappbase_ad5483ef56194bb7ef7943247d3e28326}{is\+\_\+method\+\_\+decl\+\_\+impl}} (const \mbox{\hyperlink{structappbase_1_1method__decl}{method\+\_\+decl}}$<$ Tag, Function\+Sig, Dispatch\+Policy $>$ \texorpdfstring{$\ast$}{*})
+\item 
+std\+::false\+\_\+type \mbox{\hyperlink{namespaceappbase_a796451095dca0b122177cfd7756b5c90}{is\+\_\+method\+\_\+decl\+\_\+impl}} (...)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespaceappbase_a5e40542184adc7d1355d331552e5959d}{appbase\+\_\+version\+\_\+string}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{namespaceappbase_aade924f565cf5f8cfca31b35dcc289d9}\index{appbase@{appbase}!any\_type\_compare\_map@{any\_type\_compare\_map}}
+\index{any\_type\_compare\_map@{any\_type\_compare\_map}!appbase@{appbase}}
+\doxysubsubsection{\texorpdfstring{any\_type\_compare\_map}{any\_type\_compare\_map}}
+{\footnotesize\ttfamily \label{namespaceappbase_aade924f565cf5f8cfca31b35dcc289d9} 
+using \mbox{\hyperlink{namespaceappbase_aade924f565cf5f8cfca31b35dcc289d9}{appbase\+::any\+\_\+type\+\_\+compare\+\_\+map}} = std\+::unordered\+\_\+map$<$std\+::type\+\_\+index, std\+::function$<$bool(const boost\+::any\& \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, const boost\+::any\& b)$>$$>$}
+
+
+
+Definition at line \mbox{\hyperlink{application_8cpp_source_l00025}{25}} of file \mbox{\hyperlink{application_8cpp_source}{application.\+cpp}}.
+
+\Hypertarget{namespaceappbase_a34fffab26998c1f3c0607cbbda228faa}\index{appbase@{appbase}!config\_comparison\_f@{config\_comparison\_f}}
+\index{config\_comparison\_f@{config\_comparison\_f}!appbase@{appbase}}
+\doxysubsubsection{\texorpdfstring{config\_comparison\_f}{config\_comparison\_f}}
+{\footnotesize\ttfamily \label{namespaceappbase_a34fffab26998c1f3c0607cbbda228faa} 
+using \mbox{\hyperlink{namespaceappbase_a34fffab26998c1f3c0607cbbda228faa}{appbase\+::config\+\_\+comparison\+\_\+f}} = std\+::function$<$bool(const boost\+::any\& \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, const boost\+::any\& b)$>$}
+
+
+
+Definition at line \mbox{\hyperlink{application_8hpp_source_l00014}{14}} of file \mbox{\hyperlink{application_8hpp_source}{application.\+hpp}}.
+
+\Hypertarget{namespaceappbase_abe439eb2985b17412fc24a7f9f45a79c}\index{appbase@{appbase}!erased\_channel\_ptr@{erased\_channel\_ptr}}
+\index{erased\_channel\_ptr@{erased\_channel\_ptr}!appbase@{appbase}}
+\doxysubsubsection{\texorpdfstring{erased\_channel\_ptr}{erased\_channel\_ptr}}
+{\footnotesize\ttfamily \label{namespaceappbase_abe439eb2985b17412fc24a7f9f45a79c} 
+using \mbox{\hyperlink{namespaceappbase_abe439eb2985b17412fc24a7f9f45a79c}{appbase\+::erased\+\_\+channel\+\_\+ptr}} = std\+::unique\+\_\+ptr$<$void, void(\texorpdfstring{$\ast$}{*})(void\texorpdfstring{$\ast$}{*})$>$}
+
+
+
+Definition at line \mbox{\hyperlink{channel_8hpp_source_l00013}{13}} of file \mbox{\hyperlink{channel_8hpp_source}{channel.\+hpp}}.
+
+\Hypertarget{namespaceappbase_af7b12aeed8c3ae8f23a8bf8d553f5a04}\index{appbase@{appbase}!erased\_method\_ptr@{erased\_method\_ptr}}
+\index{erased\_method\_ptr@{erased\_method\_ptr}!appbase@{appbase}}
+\doxysubsubsection{\texorpdfstring{erased\_method\_ptr}{erased\_method\_ptr}}
+{\footnotesize\ttfamily \label{namespaceappbase_af7b12aeed8c3ae8f23a8bf8d553f5a04} 
+using \mbox{\hyperlink{namespaceappbase_af7b12aeed8c3ae8f23a8bf8d553f5a04}{appbase\+::erased\+\_\+method\+\_\+ptr}} = std\+::unique\+\_\+ptr$<$void, void(\texorpdfstring{$\ast$}{*})(void\texorpdfstring{$\ast$}{*})$>$}
+
+
+
+Definition at line \mbox{\hyperlink{method_8hpp_source_l00012}{12}} of file \mbox{\hyperlink{method_8hpp_source}{method.\+hpp}}.
+
+\Hypertarget{namespaceappbase_a8bca2384fc9c0fe6dc0eb2c35038d0cc}\index{appbase@{appbase}!is\_channel\_decl@{is\_channel\_decl}}
+\index{is\_channel\_decl@{is\_channel\_decl}!appbase@{appbase}}
+\doxysubsubsection{\texorpdfstring{is\_channel\_decl}{is\_channel\_decl}}
+{\footnotesize\ttfamily \label{namespaceappbase_a8bca2384fc9c0fe6dc0eb2c35038d0cc} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+using \mbox{\hyperlink{namespaceappbase_a8bca2384fc9c0fe6dc0eb2c35038d0cc}{appbase\+::is\+\_\+channel\+\_\+decl}} = decltype(\mbox{\hyperlink{namespaceappbase_a861d9387127f53a940cfd8e449f96c5f}{is\+\_\+channel\+\_\+decl\+\_\+impl}}(std\+::declval$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\texorpdfstring{$\ast$}{*}$>$()))}
+
+
+
+Definition at line \mbox{\hyperlink{channel_8hpp_source_l00194}{194}} of file \mbox{\hyperlink{channel_8hpp_source}{channel.\+hpp}}.
+
+\Hypertarget{namespaceappbase_af6d8cf2c6f2a52a0016b86ce095f7ede}\index{appbase@{appbase}!is\_method\_decl@{is\_method\_decl}}
+\index{is\_method\_decl@{is\_method\_decl}!appbase@{appbase}}
+\doxysubsubsection{\texorpdfstring{is\_method\_decl}{is\_method\_decl}}
+{\footnotesize\ttfamily \label{namespaceappbase_af6d8cf2c6f2a52a0016b86ce095f7ede} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+using \mbox{\hyperlink{namespaceappbase_af6d8cf2c6f2a52a0016b86ce095f7ede}{appbase\+::is\+\_\+method\+\_\+decl}} = decltype(\mbox{\hyperlink{namespaceappbase_ad5483ef56194bb7ef7943247d3e28326}{is\+\_\+method\+\_\+decl\+\_\+impl}}(std\+::declval$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\texorpdfstring{$\ast$}{*}$>$()))}
+
+
+
+Definition at line \mbox{\hyperlink{method_8hpp_source_l00312}{312}} of file \mbox{\hyperlink{method_8hpp_source}{method.\+hpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespaceappbase_a99374dc23934f008a09f2f79be9eae40}\index{appbase@{appbase}!app@{app}}
+\index{app@{app}!appbase@{appbase}}
+\doxysubsubsection{\texorpdfstring{app()}{app()}}
+{\footnotesize\ttfamily \label{namespaceappbase_a99374dc23934f008a09f2f79be9eae40} 
+\mbox{\hyperlink{classappbase_1_1application}{application}} \& appbase\+::app (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{application_8cpp_source_l00210}{210}} of file \mbox{\hyperlink{application_8cpp_source}{application.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00210\ \{\ \textcolor{keywordflow}{return}\ application::instance();\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=296pt]{namespaceappbase_a99374dc23934f008a09f2f79be9eae40_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespaceappbase_af20e49b41f3f7398d5c7e09577db9b52}\index{appbase@{appbase}!is\_channel\_decl\_impl@{is\_channel\_decl\_impl}}
+\index{is\_channel\_decl\_impl@{is\_channel\_decl\_impl}!appbase@{appbase}}
+\doxysubsubsection{\texorpdfstring{is\_channel\_decl\_impl()}{is\_channel\_decl\_impl()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{namespaceappbase_af20e49b41f3f7398d5c7e09577db9b52} 
+std\+::false\+\_\+type appbase\+::is\+\_\+channel\+\_\+decl\+\_\+impl (\begin{DoxyParamCaption}\item[{}]{...}{}\end{DoxyParamCaption})}
+
+\Hypertarget{namespaceappbase_a861d9387127f53a940cfd8e449f96c5f}\index{appbase@{appbase}!is\_channel\_decl\_impl@{is\_channel\_decl\_impl}}
+\index{is\_channel\_decl\_impl@{is\_channel\_decl\_impl}!appbase@{appbase}}
+\doxysubsubsection{\texorpdfstring{is\_channel\_decl\_impl()}{is\_channel\_decl\_impl()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{namespaceappbase_a861d9387127f53a940cfd8e449f96c5f} 
+template$<$typename... Ts$>$ \\
+std\+::true\+\_\+type appbase\+::is\+\_\+channel\+\_\+decl\+\_\+impl (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structappbase_1_1channel__decl}{channel\+\_\+decl}}$<$ Ts... $>$ \texorpdfstring{$\ast$}{*}}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{namespaceappbase_a796451095dca0b122177cfd7756b5c90}\index{appbase@{appbase}!is\_method\_decl\_impl@{is\_method\_decl\_impl}}
+\index{is\_method\_decl\_impl@{is\_method\_decl\_impl}!appbase@{appbase}}
+\doxysubsubsection{\texorpdfstring{is\_method\_decl\_impl()}{is\_method\_decl\_impl()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{namespaceappbase_a796451095dca0b122177cfd7756b5c90} 
+std\+::false\+\_\+type appbase\+::is\+\_\+method\+\_\+decl\+\_\+impl (\begin{DoxyParamCaption}\item[{}]{...}{}\end{DoxyParamCaption})}
+
+\Hypertarget{namespaceappbase_ad5483ef56194bb7ef7943247d3e28326}\index{appbase@{appbase}!is\_method\_decl\_impl@{is\_method\_decl\_impl}}
+\index{is\_method\_decl\_impl@{is\_method\_decl\_impl}!appbase@{appbase}}
+\doxysubsubsection{\texorpdfstring{is\_method\_decl\_impl()}{is\_method\_decl\_impl()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{namespaceappbase_ad5483ef56194bb7ef7943247d3e28326} 
+template$<$typename Tag , typename Function\+Sig , \mbox{\hyperlink{yubihsm__pkcs11_8c_a53ef06e29c840024a683512c1acd791a}{template}}$<$ typename $>$ \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} Dispatch\+Policy$>$ \\
+std\+::true\+\_\+type appbase\+::is\+\_\+method\+\_\+decl\+\_\+impl (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structappbase_1_1method__decl}{method\+\_\+decl}}$<$ Tag, Function\+Sig, Dispatch\+Policy $>$ \texorpdfstring{$\ast$}{*}}]{}{}\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{namespaceappbase_a5e40542184adc7d1355d331552e5959d}\index{appbase@{appbase}!appbase\_version\_string@{appbase\_version\_string}}
+\index{appbase\_version\_string@{appbase\_version\_string}!appbase@{appbase}}
+\doxysubsubsection{\texorpdfstring{appbase\_version\_string}{appbase\_version\_string}}
+{\footnotesize\ttfamily \label{namespaceappbase_a5e40542184adc7d1355d331552e5959d} 
+const char\texorpdfstring{$\ast$}{*} appbase\+::appbase\+\_\+version\+\_\+string\hspace{0.3cm}{\ttfamily [extern]}}
+

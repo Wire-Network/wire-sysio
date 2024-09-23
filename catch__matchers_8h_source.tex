@@ -1,0 +1,169 @@
+\doxysection{catch\+\_\+matchers.\+h}
+\hypertarget{catch__matchers_8h_source}{}\label{catch__matchers_8h_source}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_matchers.h@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_matchers.h}}
+\mbox{\hyperlink{catch__matchers_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00002}00002\ \textcolor{comment}{\ *\ \ Created\ by\ Phil\ Nash\ on\ 04/03/2012.}}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00003}00003\ \textcolor{comment}{\ *\ \ Copyright\ (c)\ 2012\ Two\ Blue\ Cubes\ Ltd.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00004}00004\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00005}00005\ \textcolor{comment}{\ *\ Distributed\ under\ the\ Boost\ Software\ License,\ Version\ 1.0.\ (See\ accompanying}}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00006}00006\ \textcolor{comment}{\ *\ file\ LICENSE\_1\_0.txt\ or\ copy\ at\ http://www.boost.org/LICENSE\_1\_0.txt)}}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00007}00007\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00008}00008\ \textcolor{preprocessor}{\#ifndef\ TWOBLUECUBES\_CATCH\_MATCHERS\_HPP\_INCLUDED}}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00009}00009\ \textcolor{preprocessor}{\#define\ TWOBLUECUBES\_CATCH\_MATCHERS\_HPP\_INCLUDED}}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00011}00011\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__common_8h}{catch\_common.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00013}00013\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00014}00014\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00016}00016\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00017}00017\ \textcolor{keyword}{namespace\ }Matchers\ \{}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00018}00018\ \ \ \ \ \textcolor{keyword}{namespace\ }Impl\ \{}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00020}00020\ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ ArgT>\ \textcolor{keyword}{struct\ }MatchAllOf;}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00021}00021\ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ ArgT>\ \textcolor{keyword}{struct\ }MatchAnyOf;}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00022}00022\ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ ArgT>\ \textcolor{keyword}{struct\ }MatchNotOf;}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00024}00024\ \ \ \ \ \ \ \ \ \textcolor{keyword}{class\ }MatcherUntypedBase\ \{}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00025}00025\ \ \ \ \ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00026}\mbox{\hyperlink{class_catch_1_1_matchers_1_1_impl_1_1_matcher_untyped_base_ab65764dc245d85e2b268d3be870b650a}{00026}}\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_matchers_1_1_impl_1_1_matcher_untyped_base_ab65764dc245d85e2b268d3be870b650a}{MatcherUntypedBase}}()\ =\ \textcolor{keywordflow}{default};}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00027}\mbox{\hyperlink{class_catch_1_1_matchers_1_1_impl_1_1_matcher_untyped_base_a985fd3c3ffcc9f2e8dc7a330130040b0}{00027}}\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_matchers_1_1_impl_1_1_matcher_untyped_base_a985fd3c3ffcc9f2e8dc7a330130040b0}{MatcherUntypedBase}}\ (\ \mbox{\hyperlink{class_catch_1_1_matchers_1_1_impl_1_1_matcher_untyped_base}{MatcherUntypedBase}}\ \textcolor{keyword}{const}\&\ )\ =\ \textcolor{keywordflow}{default};}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00028}\mbox{\hyperlink{class_catch_1_1_matchers_1_1_impl_1_1_matcher_untyped_base_a1d446c018ecedb2ef633d9426d5f7914}{00028}}\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_matchers_1_1_impl_1_1_matcher_untyped_base}{MatcherUntypedBase}}\&\ \mbox{\hyperlink{class_catch_1_1_matchers_1_1_impl_1_1_matcher_untyped_base_a1d446c018ecedb2ef633d9426d5f7914}{operator\ =\ }}(\ \mbox{\hyperlink{class_catch_1_1_matchers_1_1_impl_1_1_matcher_untyped_base}{MatcherUntypedBase}}\ \textcolor{keyword}{const}\&\ )\ =\ \textcolor{keyword}{delete};}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00029}00029\ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ \mbox{\hyperlink{class_catch_1_1_matchers_1_1_impl_1_1_matcher_untyped_base_a5982c7c80ca71dfe2298babadad7a453}{toString}}()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00031}00031\ \ \ \ \ \ \ \ \ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00032}\mbox{\hyperlink{class_catch_1_1_matchers_1_1_impl_1_1_matcher_untyped_base_ab03a608a4c7a98f5543db08174631c3a}{00032}}\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{class_catch_1_1_matchers_1_1_impl_1_1_matcher_untyped_base_ab03a608a4c7a98f5543db08174631c3a}{\string~MatcherUntypedBase}}();}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00033}\mbox{\hyperlink{class_catch_1_1_matchers_1_1_impl_1_1_matcher_untyped_base_a91d3a907dbfcbb596077df24f6e11fe2}{00033}}\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ std::string\ \mbox{\hyperlink{class_catch_1_1_matchers_1_1_impl_1_1_matcher_untyped_base_a91d3a907dbfcbb596077df24f6e11fe2}{describe}}()\ \textcolor{keyword}{const}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00034}\mbox{\hyperlink{class_catch_1_1_matchers_1_1_impl_1_1_matcher_untyped_base_a951095c462657e7097a9a6dc4dde813f}{00034}}\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{mutable}\ std::string\ \mbox{\hyperlink{class_catch_1_1_matchers_1_1_impl_1_1_matcher_untyped_base_a951095c462657e7097a9a6dc4dde813f}{m\_cachedToString}};}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00035}00035\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00037}00037\ \textcolor{preprocessor}{\#ifdef\ \_\_clang\_\_}}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00038}00038\ \textcolor{preprocessor}{\#\ \ \ \ pragma\ clang\ diagnostic\ push}}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00039}00039\ \textcolor{preprocessor}{\#\ \ \ \ pragma\ clang\ diagnostic\ ignored\ "{}-\/Wnon-\/virtual-\/dtor"{}}}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00040}00040\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00042}00042\ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ ObjectT>}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00043}00043\ \ \ \ \ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_matcher_method}{MatcherMethod}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00044}\mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_matcher_method_ae0920ff9e817acf08e1bb0cbcb044e30}{00044}}\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_matcher_method_ae0920ff9e817acf08e1bb0cbcb044e30}{match}}(\ ObjectT\ \textcolor{keyword}{const}\&\ arg\ )\ \textcolor{keyword}{const}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00045}00045\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00047}00047\ \textcolor{preprocessor}{\#ifdef\ \_\_clang\_\_}}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00048}00048\ \textcolor{preprocessor}{\#\ \ \ \ pragma\ clang\ diagnostic\ pop}}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00049}00049\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00051}00051\ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00052}00052\ \ \ \ \ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_matcher_base}{MatcherBase}}\ :\ \mbox{\hyperlink{class_catch_1_1_matchers_1_1_impl_1_1_matcher_untyped_base}{MatcherUntypedBase}},\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_matcher_method}{MatcherMethod}}<T>\ \{}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00054}00054\ }
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00055}\mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_matcher_base_aae4a9827601f6f26a52126e193d012de}{00055}}\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_match_all_of}{MatchAllOf<T>}}\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_matcher_base_aae4a9827601f6f26a52126e193d012de}{operator\ \&\&\ }}(\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_matcher_base}{MatcherBase}}\ \textcolor{keyword}{const}\&\ other\ )\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00056}\mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_matcher_base_a5f8542b8f1567a6f9c65d0a6da7b679b}{00056}}\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_match_any_of}{MatchAnyOf<T>}}\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_matcher_base_a5f8542b8f1567a6f9c65d0a6da7b679b}{operator\ ||\ }}(\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_matcher_base}{MatcherBase}}\ \textcolor{keyword}{const}\&\ other\ )\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00057}\mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_matcher_base_a5bb94bf2ff5c7ef73b7c11eb173bdf3b}{00057}}\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_match_not_of}{MatchNotOf<T>}}\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_matcher_base_a5bb94bf2ff5c7ef73b7c11eb173bdf3b}{operator\ !\ }}()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00058}00058\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00060}00060\ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ ArgT>}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00061}00061\ \ \ \ \ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_match_all_of}{MatchAllOf}}\ :\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_matcher_base}{MatcherBase}}<ArgT>\ \{}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00062}\mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_match_all_of_acfb377bda2c58ae62e6df9c3a8a89f8f}{00062}}\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_match_all_of_acfb377bda2c58ae62e6df9c3a8a89f8f}{match}}(\ ArgT\ \textcolor{keyword}{const}\&\ arg\ )\textcolor{keyword}{\ const\ override\ }\{}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\ matcher\ :\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_match_all_of_a6074fb4674a776c80af0ccad4cc5b6dd}{m\_matchers}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00064}00064\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!matcher-\/>match(arg))}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00065}00065\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00066}00066\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00067}00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00069}\mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_match_all_of_acbb9a083e93b546fd33c9235b644c40f}{00069}}\ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_match_all_of_acbb9a083e93b546fd33c9235b644c40f}{describe}}()\textcolor{keyword}{\ const\ override\ }\{}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ description;}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00071}00071\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ description.reserve(\ 4\ +\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_match_all_of_a6074fb4674a776c80af0ccad4cc5b6dd}{m\_matchers}}.size()*32\ );}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ description\ +=\ \textcolor{stringliteral}{"{}(\ "{}};}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00073}00073\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ first\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00074}00074\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\ matcher\ :\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_match_all_of_a6074fb4674a776c80af0ccad4cc5b6dd}{m\_matchers}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00075}00075\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ first\ )}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ first\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00078}00078\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ description\ +=\ \textcolor{stringliteral}{"{}\ and\ "{}};}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ description\ +=\ matcher-\/>toString();}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00080}00080\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00081}00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ description\ +=\ \textcolor{stringliteral}{"{}\ )"{}};}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00082}00082\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ description;}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00083}00083\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00084}00084\ }
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00085}\mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_match_all_of_a1f38491238aaea4bab2f0152ca87a193}{00085}}\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_match_all_of}{MatchAllOf<ArgT>}}\&\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_match_all_of_a1f38491238aaea4bab2f0152ca87a193}{operator\ \&\&\ }}(\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_matcher_base}{MatcherBase<ArgT>}}\ \textcolor{keyword}{const}\&\ other\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00086}00086\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_match_all_of_a6074fb4674a776c80af0ccad4cc5b6dd}{m\_matchers}}.push\_back(\ \&other\ );}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00087}00087\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00088}00088\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00089}00089\ }
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00090}\mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_match_all_of_a6074fb4674a776c80af0ccad4cc5b6dd}{00090}}\ \ \ \ \ \ \ \ \ \ \ \ \ std::vector<MatcherBase<ArgT>\ \textcolor{keyword}{const}*>\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_match_all_of_a6074fb4674a776c80af0ccad4cc5b6dd}{m\_matchers}};}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00091}00091\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00092}00092\ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ ArgT>}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00093}00093\ \ \ \ \ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_match_any_of}{MatchAnyOf}}\ :\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_matcher_base}{MatcherBase}}<ArgT>\ \{}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00094}00094\ }
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00095}\mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_match_any_of_a8a3e8338f979e56277dcf553efb78dc0}{00095}}\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_match_any_of_a8a3e8338f979e56277dcf553efb78dc0}{match}}(\ ArgT\ \textcolor{keyword}{const}\&\ arg\ )\textcolor{keyword}{\ const\ override\ }\{}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00096}00096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\ matcher\ :\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_match_any_of_a10e9b7a56d6ddf0a76803d4e79357092}{m\_matchers}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00097}00097\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (matcher-\/>match(arg))}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00098}00098\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00099}00099\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00100}00100\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00101}00101\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00102}\mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_match_any_of_a315285204df93d1f8e72f50dd66eb709}{00102}}\ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_match_any_of_a315285204df93d1f8e72f50dd66eb709}{describe}}()\textcolor{keyword}{\ const\ override\ }\{}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00103}00103\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ description;}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00104}00104\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ description.reserve(\ 4\ +\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_match_any_of_a10e9b7a56d6ddf0a76803d4e79357092}{m\_matchers}}.size()*32\ );}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00105}00105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ description\ +=\ \textcolor{stringliteral}{"{}(\ "{}};}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00106}00106\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ first\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00107}00107\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\ matcher\ :\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_match_any_of_a10e9b7a56d6ddf0a76803d4e79357092}{m\_matchers}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00108}00108\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ first\ )}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00109}00109\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ first\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00110}00110\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00111}00111\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ description\ +=\ \textcolor{stringliteral}{"{}\ or\ "{}};}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00112}00112\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ description\ +=\ matcher-\/>toString();}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00113}00113\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00114}00114\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ description\ +=\ \textcolor{stringliteral}{"{}\ )"{}};}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00115}00115\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ description;}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00116}00116\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00117}00117\ }
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00118}\mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_match_any_of_a668c554f8ce4689fbf4d30e7540539de}{00118}}\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_match_any_of}{MatchAnyOf<ArgT>}}\&\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_match_any_of_a668c554f8ce4689fbf4d30e7540539de}{operator\ ||\ }}(\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_matcher_base}{MatcherBase<ArgT>}}\ \textcolor{keyword}{const}\&\ other\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00119}00119\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_match_any_of_a10e9b7a56d6ddf0a76803d4e79357092}{m\_matchers}}.push\_back(\ \&other\ );}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00120}00120\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00121}00121\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00122}00122\ }
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00123}\mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_match_any_of_a10e9b7a56d6ddf0a76803d4e79357092}{00123}}\ \ \ \ \ \ \ \ \ \ \ \ \ std::vector<MatcherBase<ArgT>\ \textcolor{keyword}{const}*>\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_match_any_of_a10e9b7a56d6ddf0a76803d4e79357092}{m\_matchers}};}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00124}00124\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00125}00125\ }
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00126}00126\ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ ArgT>}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00127}00127\ \ \ \ \ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_match_not_of}{MatchNotOf}}\ :\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_matcher_base}{MatcherBase}}<ArgT>\ \{}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00128}00128\ }
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00129}\mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_match_not_of_a47afdd9e4c3354cef85adc3186097ae4}{00129}}\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_match_not_of_a47afdd9e4c3354cef85adc3186097ae4}{MatchNotOf}}(\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_matcher_base}{MatcherBase<ArgT>}}\ \textcolor{keyword}{const}\&\ underlyingMatcher\ )\ :\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_match_not_of_afe6f36822388c0ebe9a11c2826d7bd39}{m\_underlyingMatcher}}(\ underlyingMatcher\ )\ \{\}}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00130}00130\ }
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00131}\mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_match_not_of_a181d693c0258e582d80dc6117a1f2b66}{00131}}\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_match_not_of_a181d693c0258e582d80dc6117a1f2b66}{match}}(\ ArgT\ \textcolor{keyword}{const}\&\ arg\ )\textcolor{keyword}{\ const\ override\ }\{}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00132}00132\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !\mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_match_not_of_afe6f36822388c0ebe9a11c2826d7bd39}{m\_underlyingMatcher}}.\mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_matcher_method_ae0920ff9e817acf08e1bb0cbcb044e30}{match}}(\ arg\ );}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00133}00133\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00134}00134\ }
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00135}\mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_match_not_of_ac5fb4ef6a9069d23a4098c3c818f06b0}{00135}}\ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_match_not_of_ac5fb4ef6a9069d23a4098c3c818f06b0}{describe}}()\textcolor{keyword}{\ const\ override\ }\{}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00136}00136\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}not\ "{}}\ +\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_match_not_of_afe6f36822388c0ebe9a11c2826d7bd39}{m\_underlyingMatcher}}.\mbox{\hyperlink{class_catch_1_1_matchers_1_1_impl_1_1_matcher_untyped_base_a5982c7c80ca71dfe2298babadad7a453}{toString}}();}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00137}00137\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00138}\mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_match_not_of_afe6f36822388c0ebe9a11c2826d7bd39}{00138}}\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_matcher_base}{MatcherBase<ArgT>}}\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_match_not_of_afe6f36822388c0ebe9a11c2826d7bd39}{m\_underlyingMatcher}};}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00139}00139\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00140}00140\ }
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00141}00141\ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00142}\mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_matcher_base_aae4a9827601f6f26a52126e193d012de}{00142}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_match_all_of}{MatchAllOf<T>}}\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_matcher_base_aae4a9827601f6f26a52126e193d012de}{MatcherBase<T>::operator\ \&\&\ }}(\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_matcher_base}{MatcherBase}}\ \textcolor{keyword}{const}\&\ other\ )\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00143}00143\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_match_all_of}{MatchAllOf<T>}}()\ \&\&\ *\textcolor{keyword}{this}\ \&\&\ other;}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00144}00144\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00145}00145\ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00146}\mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_matcher_base_a5f8542b8f1567a6f9c65d0a6da7b679b}{00146}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_match_any_of}{MatchAnyOf<T>}}\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_matcher_base_a5f8542b8f1567a6f9c65d0a6da7b679b}{MatcherBase<T>::operator\ ||\ }}(\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_matcher_base}{MatcherBase}}\ \textcolor{keyword}{const}\&\ other\ )\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00147}00147\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_match_any_of}{MatchAnyOf<T>}}()\ ||\ *\textcolor{keyword}{this}\ ||\ other;}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00148}00148\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00149}00149\ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00150}\mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_matcher_base_a5bb94bf2ff5c7ef73b7c11eb173bdf3b}{00150}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_match_not_of}{MatchNotOf<T>}}\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_matcher_base_a5bb94bf2ff5c7ef73b7c11eb173bdf3b}{MatcherBase<T>::operator\ !\ }}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00151}00151\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_match_not_of}{MatchNotOf<T>}}(\ *\textcolor{keyword}{this}\ );}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00152}00152\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00153}00153\ }
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00154}00154\ \ \ \ \ \}\ \textcolor{comment}{//\ namespace\ Impl}}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00155}00155\ }
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00156}00156\ \}\ \textcolor{comment}{//\ namespace\ Matchers}}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00157}00157\ }
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00158}00158\ \textcolor{keyword}{using\ namespace\ }Matchers;}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00159}00159\ \textcolor{keyword}{using\ }\mbox{\hyperlink{struct_catch_1_1_matchers_1_1_impl_1_1_matcher_base}{Matchers::Impl::MatcherBase}};}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00160}00160\ }
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00161}00161\ \}\ \textcolor{comment}{//\ namespace\ Catch}}
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00162}00162\ }
+\DoxyCodeLine{\Hypertarget{catch__matchers_8h_source_l00163}00163\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ TWOBLUECUBES\_CATCH\_MATCHERS\_HPP\_INCLUDED}}
+
+\end{DoxyCode}

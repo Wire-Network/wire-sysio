@@ -1,0 +1,102 @@
+\doxysection{sysio\+::peer\+\_\+sync\+\_\+state Struct Reference}
+\hypertarget{structsysio_1_1peer__sync__state}{}\label{structsysio_1_1peer__sync__state}\index{sysio::peer\_sync\_state@{sysio::peer\_sync\_state}}
+
+
+Collaboration diagram for sysio\+::peer\+\_\+sync\+\_\+state\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=197pt]{structsysio_1_1peer__sync__state__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1peer__sync__state_a677197df8710df2e5566fb6bebd679c4}{peer\+\_\+sync\+\_\+state}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} start=0, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} end=0, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} last\+\_\+acted=0)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1peer__sync__state_a3d3d6289eb7ece497662126c54f98fdd}{start\+\_\+block}}
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1peer__sync__state_afe01c7bd4bafe31e26fbafb8fdb366a9}{end\+\_\+block}}
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1peer__sync__state_ac795d73531e37a77856eb6d4d55a23de}{last}}
+\begin{DoxyCompactList}\small\item\em last sent or received \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} \mbox{\hyperlink{structsysio_1_1peer__sync__state_a7d7e6d41db2d94998af389859d5d559a}{start\+\_\+time}}
+\begin{DoxyCompactList}\small\item\em time request made or received \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Index by start\+\_\+block\+\_\+num 
+
+Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l00436}{436}} of file \mbox{\hyperlink{net__plugin_8cpp_source}{net\+\_\+plugin.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structsysio_1_1peer__sync__state_a677197df8710df2e5566fb6bebd679c4}\index{sysio::peer\_sync\_state@{sysio::peer\_sync\_state}!peer\_sync\_state@{peer\_sync\_state}}
+\index{peer\_sync\_state@{peer\_sync\_state}!sysio::peer\_sync\_state@{sysio::peer\_sync\_state}}
+\doxysubsubsection{\texorpdfstring{peer\_sync\_state()}{peer\_sync\_state()}}
+{\footnotesize\ttfamily \label{structsysio_1_1peer__sync__state_a677197df8710df2e5566fb6bebd679c4} 
+sysio\+::peer\+\_\+sync\+\_\+state\+::peer\+\_\+sync\+\_\+state (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{start}{ = {\ttfamily 0}, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{end}{ = {\ttfamily 0}, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{last\+\_\+acted}{ = {\ttfamily 0}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l00437}{437}} of file \mbox{\hyperlink{net__plugin_8cpp_source}{net\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00438\ \ \ \ \ \ \ \ \ \ :\mbox{\hyperlink{structsysio_1_1peer__sync__state_a3d3d6289eb7ece497662126c54f98fdd}{start\_block}}(\ start\ ),\ \mbox{\hyperlink{structsysio_1_1peer__sync__state_afe01c7bd4bafe31e26fbafb8fdb366a9}{end\_block}}(\ end\ ),\ \mbox{\hyperlink{structsysio_1_1peer__sync__state_ac795d73531e37a77856eb6d4d55a23de}{last}}(\ last\_acted\ ),}
+\DoxyCodeLine{00439\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1peer__sync__state_a7d7e6d41db2d94998af389859d5d559a}{start\_time}}(\mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{time\_point::now}}())}
+\DoxyCodeLine{00440\ \ \ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1peer__sync__state_afe01c7bd4bafe31e26fbafb8fdb366a9}\index{sysio::peer\_sync\_state@{sysio::peer\_sync\_state}!end\_block@{end\_block}}
+\index{end\_block@{end\_block}!sysio::peer\_sync\_state@{sysio::peer\_sync\_state}}
+\doxysubsubsection{\texorpdfstring{end\_block}{end\_block}}
+{\footnotesize\ttfamily \label{structsysio_1_1peer__sync__state_afe01c7bd4bafe31e26fbafb8fdb366a9} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::peer\+\_\+sync\+\_\+state\+::end\+\_\+block}
+
+
+
+Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l00442}{442}} of file \mbox{\hyperlink{net__plugin_8cpp_source}{net\+\_\+plugin.\+cpp}}.
+
+\Hypertarget{structsysio_1_1peer__sync__state_ac795d73531e37a77856eb6d4d55a23de}\index{sysio::peer\_sync\_state@{sysio::peer\_sync\_state}!last@{last}}
+\index{last@{last}!sysio::peer\_sync\_state@{sysio::peer\_sync\_state}}
+\doxysubsubsection{\texorpdfstring{last}{last}}
+{\footnotesize\ttfamily \label{structsysio_1_1peer__sync__state_ac795d73531e37a77856eb6d4d55a23de} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::peer\+\_\+sync\+\_\+state\+::last}
+
+
+
+Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l00443}{443}} of file \mbox{\hyperlink{net__plugin_8cpp_source}{net\+\_\+plugin.\+cpp}}.
+
+\Hypertarget{structsysio_1_1peer__sync__state_a3d3d6289eb7ece497662126c54f98fdd}\index{sysio::peer\_sync\_state@{sysio::peer\_sync\_state}!start\_block@{start\_block}}
+\index{start\_block@{start\_block}!sysio::peer\_sync\_state@{sysio::peer\_sync\_state}}
+\doxysubsubsection{\texorpdfstring{start\_block}{start\_block}}
+{\footnotesize\ttfamily \label{structsysio_1_1peer__sync__state_a3d3d6289eb7ece497662126c54f98fdd} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::peer\+\_\+sync\+\_\+state\+::start\+\_\+block}
+
+
+
+Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l00441}{441}} of file \mbox{\hyperlink{net__plugin_8cpp_source}{net\+\_\+plugin.\+cpp}}.
+
+\Hypertarget{structsysio_1_1peer__sync__state_a7d7e6d41db2d94998af389859d5d559a}\index{sysio::peer\_sync\_state@{sysio::peer\_sync\_state}!start\_time@{start\_time}}
+\index{start\_time@{start\_time}!sysio::peer\_sync\_state@{sysio::peer\_sync\_state}}
+\doxysubsubsection{\texorpdfstring{start\_time}{start\_time}}
+{\footnotesize\ttfamily \label{structsysio_1_1peer__sync__state_a7d7e6d41db2d94998af389859d5d559a} 
+\mbox{\hyperlink{classfc_1_1time__point}{time\+\_\+point}} sysio\+::peer\+\_\+sync\+\_\+state\+::start\+\_\+time}
+
+
+
+Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l00444}{444}} of file \mbox{\hyperlink{net__plugin_8cpp_source}{net\+\_\+plugin.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+plugins/net\+\_\+plugin/\mbox{\hyperlink{net__plugin_8cpp}{net\+\_\+plugin.\+cpp}}\end{DoxyCompactItemize}

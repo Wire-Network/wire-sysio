@@ -1,0 +1,159 @@
+\doxysection{cpp.\+tokenize.\+Token Class Reference}
+\hypertarget{classcpp_1_1tokenize_1_1_token}{}\label{classcpp_1_1tokenize_1_1_token}\index{cpp.tokenize.Token@{cpp.tokenize.Token}}
+
+
+Inheritance diagram for cpp.\+tokenize.\+Token\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=181pt]{classcpp_1_1tokenize_1_1_token__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for cpp.\+tokenize.\+Token\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=181pt]{classcpp_1_1tokenize_1_1_token__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classcpp_1_1tokenize_1_1_token_a43ca0dcf2b771ff3ace16523d74159d9}{\+\_\+\+\_\+init\+\_\+\+\_\+}} (self, \mbox{\hyperlink{classcpp_1_1tokenize_1_1_token_a60c6e5120f3947885f10788ceb69a660}{token\+\_\+type}}, \mbox{\hyperlink{classcpp_1_1tokenize_1_1_token_a90859dd16bde71bc38f717f5119e63b9}{name}}, \mbox{\hyperlink{classcpp_1_1tokenize_1_1_token_a8ec48e348ff29901857cb21553da464b}{start}}, \mbox{\hyperlink{classcpp_1_1tokenize_1_1_token_a9935738c382352eca19834c2533715db}{end}})
+\item 
+\mbox{\hyperlink{classcpp_1_1tokenize_1_1_token_ad93a4059e9932fa2dea149510f0ef002}{\+\_\+\+\_\+str\+\_\+\+\_\+}} (self)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classcpp_1_1tokenize_1_1_token_a60c6e5120f3947885f10788ceb69a660}{token\+\_\+type}} = token\+\_\+type
+\item 
+\mbox{\hyperlink{classcpp_1_1tokenize_1_1_token_a90859dd16bde71bc38f717f5119e63b9}{name}} = name
+\item 
+\mbox{\hyperlink{classcpp_1_1tokenize_1_1_token_a8ec48e348ff29901857cb21553da464b}{start}} = start
+\item 
+\mbox{\hyperlink{classcpp_1_1tokenize_1_1_token_a9935738c382352eca19834c2533715db}{end}} = end
+\item 
+\mbox{\hyperlink{classcpp_1_1tokenize_1_1_token_a9d3a8011707ede6be85987d74f88848d}{whence}} = \mbox{\hyperlink{namespacecpp_1_1tokenize_a8dd117207e391864f7d9cb656e826a9e}{WHENCE\+\_\+\+STREAM}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\begin{DoxyVerb}Data container to represent a C++ token.
+
+Tokens can be identifiers, syntax char(s), constants, or
+pre-processor directives.
+
+start contains the index of the first char of the token in the source
+end contains the index of the last char of the token in the source
+\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{tokenize_8py_source_l00064}{64}} of file \mbox{\hyperlink{tokenize_8py_source}{tokenize.\+py}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classcpp_1_1tokenize_1_1_token_a43ca0dcf2b771ff3ace16523d74159d9}\index{cpp.tokenize.Token@{cpp.tokenize.Token}!\_\_init\_\_@{\_\_init\_\_}}
+\index{\_\_init\_\_@{\_\_init\_\_}!cpp.tokenize.Token@{cpp.tokenize.Token}}
+\doxysubsubsection{\texorpdfstring{\_\_init\_\_()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily \label{classcpp_1_1tokenize_1_1_token_a43ca0dcf2b771ff3ace16523d74159d9} 
+cpp.\+tokenize.\+Token.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self}{, }\item[{}]{token\+\_\+type}{, }\item[{}]{name}{, }\item[{}]{start}{, }\item[{}]{end}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{tokenize_8py_source_l00074}{74}} of file \mbox{\hyperlink{tokenize_8py_source}{tokenize.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00074\ \ \ \ \ \textcolor{keyword}{def\ }\_\_init\_\_(self,\ token\_type,\ name,\ start,\ end):}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ self.token\_type\ =\ token\_type}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ self.name\ =\ name}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ self.start\ =\ start}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ self.end\ =\ end}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ self.whence\ =\ WHENCE\_STREAM}
+\DoxyCodeLine{00080\ }
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classcpp_1_1tokenize_1_1_token_ad93a4059e9932fa2dea149510f0ef002}\index{cpp.tokenize.Token@{cpp.tokenize.Token}!\_\_str\_\_@{\_\_str\_\_}}
+\index{\_\_str\_\_@{\_\_str\_\_}!cpp.tokenize.Token@{cpp.tokenize.Token}}
+\doxysubsubsection{\texorpdfstring{\_\_str\_\_()}{\_\_str\_\_()}}
+{\footnotesize\ttfamily \label{classcpp_1_1tokenize_1_1_token_ad93a4059e9932fa2dea149510f0ef002} 
+cpp.\+tokenize.\+Token.\+\_\+\+\_\+str\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{tokenize_8py_source_l00081}{81}} of file \mbox{\hyperlink{tokenize_8py_source}{tokenize.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00081\ \ \ \ \ \textcolor{keyword}{def\ }\_\_str\_\_(self):}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keywordflow}{not}\ utils.DEBUG:}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{'Token(\%r)'}\ \%\ self.name}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{'Token(\%r,\ \%s,\ \%s)'}\ \%\ (self.name,\ self.start,\ self.end)}
+\DoxyCodeLine{00085\ }
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classcpp_1_1tokenize_1_1_token_a9935738c382352eca19834c2533715db}\index{cpp.tokenize.Token@{cpp.tokenize.Token}!end@{end}}
+\index{end@{end}!cpp.tokenize.Token@{cpp.tokenize.Token}}
+\doxysubsubsection{\texorpdfstring{end}{end}}
+{\footnotesize\ttfamily \label{classcpp_1_1tokenize_1_1_token_a9935738c382352eca19834c2533715db} 
+cpp.\+tokenize.\+Token.\+end = end}
+
+
+
+Definition at line \mbox{\hyperlink{tokenize_8py_source_l00078}{78}} of file \mbox{\hyperlink{tokenize_8py_source}{tokenize.\+py}}.
+
+\Hypertarget{classcpp_1_1tokenize_1_1_token_a90859dd16bde71bc38f717f5119e63b9}\index{cpp.tokenize.Token@{cpp.tokenize.Token}!name@{name}}
+\index{name@{name}!cpp.tokenize.Token@{cpp.tokenize.Token}}
+\doxysubsubsection{\texorpdfstring{name}{name}}
+{\footnotesize\ttfamily \label{classcpp_1_1tokenize_1_1_token_a90859dd16bde71bc38f717f5119e63b9} 
+cpp.\+tokenize.\+Token.\+name = name}
+
+
+
+Definition at line \mbox{\hyperlink{tokenize_8py_source_l00076}{76}} of file \mbox{\hyperlink{tokenize_8py_source}{tokenize.\+py}}.
+
+\Hypertarget{classcpp_1_1tokenize_1_1_token_a8ec48e348ff29901857cb21553da464b}\index{cpp.tokenize.Token@{cpp.tokenize.Token}!start@{start}}
+\index{start@{start}!cpp.tokenize.Token@{cpp.tokenize.Token}}
+\doxysubsubsection{\texorpdfstring{start}{start}}
+{\footnotesize\ttfamily \label{classcpp_1_1tokenize_1_1_token_a8ec48e348ff29901857cb21553da464b} 
+cpp.\+tokenize.\+Token.\+start = start}
+
+
+
+Definition at line \mbox{\hyperlink{tokenize_8py_source_l00077}{77}} of file \mbox{\hyperlink{tokenize_8py_source}{tokenize.\+py}}.
+
+\Hypertarget{classcpp_1_1tokenize_1_1_token_a60c6e5120f3947885f10788ceb69a660}\index{cpp.tokenize.Token@{cpp.tokenize.Token}!token\_type@{token\_type}}
+\index{token\_type@{token\_type}!cpp.tokenize.Token@{cpp.tokenize.Token}}
+\doxysubsubsection{\texorpdfstring{token\_type}{token\_type}}
+{\footnotesize\ttfamily \label{classcpp_1_1tokenize_1_1_token_a60c6e5120f3947885f10788ceb69a660} 
+cpp.\+tokenize.\+Token.\+token\+\_\+type = token\+\_\+type}
+
+
+
+Definition at line \mbox{\hyperlink{tokenize_8py_source_l00075}{75}} of file \mbox{\hyperlink{tokenize_8py_source}{tokenize.\+py}}.
+
+\Hypertarget{classcpp_1_1tokenize_1_1_token_a9d3a8011707ede6be85987d74f88848d}\index{cpp.tokenize.Token@{cpp.tokenize.Token}!whence@{whence}}
+\index{whence@{whence}!cpp.tokenize.Token@{cpp.tokenize.Token}}
+\doxysubsubsection{\texorpdfstring{whence}{whence}}
+{\footnotesize\ttfamily \label{classcpp_1_1tokenize_1_1_token_a9d3a8011707ede6be85987d74f88848d} 
+cpp.\+tokenize.\+Token.\+whence = \mbox{\hyperlink{namespacecpp_1_1tokenize_a8dd117207e391864f7d9cb656e826a9e}{WHENCE\+\_\+\+STREAM}}}
+
+
+
+Definition at line \mbox{\hyperlink{tokenize_8py_source_l00079}{79}} of file \mbox{\hyperlink{tokenize_8py_source}{tokenize.\+py}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/scripts/generator/cpp/\mbox{\hyperlink{tokenize_8py}{tokenize.\+py}}\end{DoxyCompactItemize}

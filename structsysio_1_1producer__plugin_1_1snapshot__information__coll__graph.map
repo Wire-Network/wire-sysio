@@ -1,0 +1,9 @@
+<map id="sysio::producer_plugin::snapshot_information" name="sysio::producer_plugin::snapshot_information">
+<area shape="rect" id="Node000001" title=" " alt="" coords="87,94,240,135"/>
+<area shape="rect" id="Node000002" href="$classfc_1_1sha256.html" title=" " alt="" coords="5,5,88,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="57,44,73,68,108,91,105,96,70,72,53,46"/>
+<area shape="rect" id="Node000003" href="$classfc_1_1time__point.html" title=" " alt="" coords="114,5,214,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="166,46,166,93,161,93,161,46"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="270,5,324,31"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="289,47,270,72,231,96,228,91,266,68,284,44"/>
+</map>

@@ -1,0 +1,44 @@
+\doxysection{libraries/sys-\/vm/external/\+Catch2/include/internal/catch\+\_\+test\+\_\+case\+\_\+registry\+\_\+impl.cpp File Reference}
+\hypertarget{catch__test__case__registry__impl_8cpp}{}\label{catch__test__case__registry__impl_8cpp}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_test\_case\_registry\_impl.cpp@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_test\_case\_registry\_impl.cpp}}
+{\ttfamily \#include "{}catch\+\_\+test\+\_\+case\+\_\+registry\+\_\+impl.\+h"{}}\newline
+{\ttfamily \#include "{}catch\+\_\+context.\+h"{}}\newline
+{\ttfamily \#include "{}catch\+\_\+enforce.\+h"{}}\newline
+{\ttfamily \#include "{}catch\+\_\+interfaces\+\_\+registry\+\_\+hub.\+h"{}}\newline
+{\ttfamily \#include "{}catch\+\_\+random\+\_\+number\+\_\+generator.\+h"{}}\newline
+{\ttfamily \#include "{}catch\+\_\+string\+\_\+manip.\+h"{}}\newline
+{\ttfamily \#include "{}catch\+\_\+test\+\_\+case\+\_\+info.\+h"{}}\newline
+{\ttfamily \#include $<$sstream$>$}\newline
+Include dependency graph for catch\+\_\+test\+\_\+case\+\_\+registry\+\_\+impl.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{catch__test__case__registry__impl_8cpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=226pt]{catch__test__case__registry__impl_8cpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespace_catch}{Catch}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+std\+::vector$<$ \mbox{\hyperlink{class_catch_1_1_test_case}{Test\+Case}} $>$ \mbox{\hyperlink{namespace_catch_aa94535d4e961ebfefc7f95cf25f949c4}{Catch\+::sort\+Tests}} (\mbox{\hyperlink{struct_catch_1_1_i_config}{IConfig}} const \&\mbox{\hyperlink{classconfig}{config}}, std\+::vector$<$ \mbox{\hyperlink{class_catch_1_1_test_case}{Test\+Case}} $>$ const \&unsorted\+Test\+Cases)
+\item 
+bool \mbox{\hyperlink{namespace_catch_aadef80fbc6bc84589777a462770cef49}{Catch\+::match\+Test}} (\mbox{\hyperlink{class_catch_1_1_test_case}{Test\+Case}} const \&test\+Case, \mbox{\hyperlink{class_catch_1_1_test_spec}{Test\+Spec}} const \&test\+Spec, \mbox{\hyperlink{struct_catch_1_1_i_config}{IConfig}} const \&\mbox{\hyperlink{classconfig}{config}})
+\item 
+void \mbox{\hyperlink{namespace_catch_a71e3432f494f89c9e406cbd6e3baab38}{Catch\+::enforce\+No\+Duplicate\+Test\+Cases}} (std\+::vector$<$ \mbox{\hyperlink{class_catch_1_1_test_case}{Test\+Case}} $>$ const \&functions)
+\item 
+std\+::vector$<$ \mbox{\hyperlink{class_catch_1_1_test_case}{Test\+Case}} $>$ \mbox{\hyperlink{namespace_catch_a105d5acdec8a6b401e12a592557c9dd1}{Catch\+::filter\+Tests}} (std\+::vector$<$ \mbox{\hyperlink{class_catch_1_1_test_case}{Test\+Case}} $>$ const \&test\+Cases, \mbox{\hyperlink{class_catch_1_1_test_spec}{Test\+Spec}} const \&test\+Spec, \mbox{\hyperlink{struct_catch_1_1_i_config}{IConfig}} const \&\mbox{\hyperlink{classconfig}{config}})
+\item 
+std\+::vector$<$ \mbox{\hyperlink{class_catch_1_1_test_case}{Test\+Case}} $>$ const \& \mbox{\hyperlink{namespace_catch_a97039bab95e97f059410f67425f1f2da}{Catch\+::get\+All\+Test\+Cases\+Sorted}} (\mbox{\hyperlink{struct_catch_1_1_i_config}{IConfig}} const \&\mbox{\hyperlink{classconfig}{config}})
+\item 
+std\+::string \mbox{\hyperlink{namespace_catch_a9e1cbffd90354d851c4ba6dff1e09fd7}{Catch\+::extract\+Class\+Name}} (\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} const \&class\+Or\+Qualified\+Method\+Name)
+\end{DoxyCompactItemize}

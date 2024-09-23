@@ -1,0 +1,15 @@
+<map id="TEST" name="TEST">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,70,61,96"/>
+<area shape="rect" id="Node000002" href="$class_generic_string_buffer.html#a42f15c959046d899cb74c3120a6995f9" title=" " alt="" coords="109,5,244,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="60,70,109,50,111,55,62,75"/>
+<area shape="rect" id="Node000003" href="$class_crt_allocator.html#a5043907058d906dcb1291e9491560373" title=" " alt="" coords="114,70,238,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="61,80,98,80,98,86,61,86"/>
+<area shape="rect" id="Node000004" href="$class_generic_string_buffer.html#a42079865bab1deb930c6cff7d491c719" title=" " alt="" coords="109,120,244,161"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="62,91,111,111,109,116,60,96"/>
+<area shape="rect" id="Node000005" href="$class_generic_string_buffer.html#a0038e53ba03c271bc4cbbac403ec4de4" title=" " alt="" coords="292,86,458,112"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="244,124,294,113,295,118,245,129"/>
+<area shape="rect" id="Node000006" href="$class_generic_string_buffer.html#a80af78c43da93126a940a40d1889278a" title=" " alt="" coords="308,160,443,201"/>
+<area shape="poly" id="edge6_Node000004_Node000006" title=" " alt="" coords="245,151,293,161,292,166,244,157"/>
+<area shape="poly" id="edge5_Node000005_Node000005" title=" " alt="" coords="342,87,335,78,339,68,353,62,375,60,400,62,412,69,410,74,398,67,375,65,354,67,343,72,341,77,346,84"/>
+<area shape="poly" id="edge7_Node000006_Node000006" title=" " alt="" coords="337,160,335,150,342,141,355,135,375,133,397,136,410,142,407,147,395,141,375,139,356,141,345,145,341,151,343,159"/>
+</map>

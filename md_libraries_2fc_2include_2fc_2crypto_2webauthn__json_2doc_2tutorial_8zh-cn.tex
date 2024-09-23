@@ -1,0 +1,631 @@
+\chapter{教程}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn}{}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn}\index{教程@{教程}}
+本教程简介文件对象模型（\+Document Object Model, DOM）\+API。
+
+如 \href{../readme.zh-cn.md\#\%E7\%94\%A8\%E6\%B3\%95\%E4\%B8\%80\%E8\%A7\%88}{\texttt{ 用法一览}} 中所示，可以解析一个 JSON 至 DOM，然后就可以轻松查询及修改 DOM，并最终转换回 JSON。\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_ValueDocument}{}\doxysection{\texorpdfstring{Value \& Document}{Value \& Document}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_ValueDocument}
+每个 JSON 值都储存为 {\ttfamily Value} 类，而 {\ttfamily Document} 类则表示整个 DOM，它存储了一个 DOM 树的根 {\ttfamily Value}。\+Rapid\+JSON 的所有公开类型及函数都在 {\ttfamily rapidjson} 命名空间中。\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_QueryValue}{}\doxysection{\texorpdfstring{Query Value}{Query Value}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_QueryValue}
+在本节中，我们会使用到 {\ttfamily \doxylink{tutorial_8cpp}{example/tutorial/tutorial.\+cpp}} 中的代码片段。
+
+假设我们用 C 语言的字符串储存一个 JSON（{\ttfamily const char\texorpdfstring{$\ast$}{*} json}）： 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\{}
+\DoxyCodeLine{\ \ \ \ "{}hello"{}:\ "{}world"{},}
+\DoxyCodeLine{\ \ \ \ "{}t"{}:\ true\ ,}
+\DoxyCodeLine{\ \ \ \ "{}f"{}:\ false,}
+\DoxyCodeLine{\ \ \ \ "{}n"{}:\ null,}
+\DoxyCodeLine{\ \ \ \ "{}i"{}:\ 123,}
+\DoxyCodeLine{\ \ \ \ "{}pi"{}:\ 3.1416,}
+\DoxyCodeLine{\ \ \ \ "{}a"{}:\ [1,\ 2,\ 3,\ 4]}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+把它解析至一个 {\ttfamily Document}： 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{document_8h}{rapidjson/document.h}}"{}}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacerapidjson}{rapidjson}};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ ...}}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_document}{Document}}\ document;}
+\DoxyCodeLine{document.\mbox{\hyperlink{class_generic_document_a901db1678f99a1b550003eed75bc380a}{Parse}}(json);}
+
+\end{DoxyCode}
+
+
+那么现在该 JSON 就会被解析至 {\ttfamily document} 中，成为一棵 \texorpdfstring{$\ast$}{*}\+DOM 树 \texorpdfstring{$\ast$}{*}\+:
+
+
+
+自从 RFC 7159 作出更新，合法 JSON 文件的根可以是任何类型的 JSON 值。而在较早的 RFC 4627 中，根值只允许是 Object 或 Array。而在上述例子中，根是一个 Object。 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assert(document.IsObject());}
+
+\end{DoxyCode}
+
+
+让我们查询一下根 Object 中有没有 {\ttfamily "{}hello"{}} 成员。由于一个 {\ttfamily Value} 可包含不同类型的值，我们可能需要验证它的类型，并使用合适的 API 去获取其值。在此例中，{\ttfamily "{}hello"{}} 成员关联到一个 JSON String。 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assert(document.HasMember(\textcolor{stringliteral}{"{}hello"{}}));}
+\DoxyCodeLine{assert(document[\textcolor{stringliteral}{"{}hello"{}}].IsString());}
+\DoxyCodeLine{\mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}hello\ =\ \%s\(\backslash\)n"{}},\ document[\textcolor{stringliteral}{"{}hello"{}}].GetString());}
+
+\end{DoxyCode}
+
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{world}
+
+\end{DoxyCode}
+
+
+JSON True/\+False 值是以 {\ttfamily bool} 表示的。 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assert(document[\textcolor{stringliteral}{"{}t"{}}].IsBool());}
+\DoxyCodeLine{\mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}t\ =\ \%s\(\backslash\)n"{}},\ document[\textcolor{stringliteral}{"{}t"{}}].GetBool()\ ?\ \textcolor{stringliteral}{"{}true"{}}\ :\ \textcolor{stringliteral}{"{}false"{}});}
+
+\end{DoxyCode}
+
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{true}
+
+\end{DoxyCode}
+
+
+JSON Null 值可用 {\ttfamily Is\+Null()} 查询。 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}n\ =\ \%s\(\backslash\)n"{}},\ document[\textcolor{stringliteral}{"{}n"{}}].IsNull()\ ?\ \textcolor{stringliteral}{"{}null"{}}\ :\ \textcolor{stringliteral}{"{}?"{}});}
+
+\end{DoxyCode}
+
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{null}
+
+\end{DoxyCode}
+
+
+JSON Number 类型表示所有数值。然而，\+C++ 需要使用更专门的类型。
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assert(document[\textcolor{stringliteral}{"{}i"{}}].IsNumber());}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ 在此情况下，IsUint()/IsInt64()/IsUInt64()\ 也会返回\ true}}
+\DoxyCodeLine{assert(document[\textcolor{stringliteral}{"{}i"{}}].IsInt());\ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}i\ =\ \%d\(\backslash\)n"{}},\ document[\textcolor{stringliteral}{"{}i"{}}].GetInt());}
+\DoxyCodeLine{\textcolor{comment}{//\ 另一种用法：\ (int)document["{}i"{}]}}
+\DoxyCodeLine{}
+\DoxyCodeLine{assert(document[\textcolor{stringliteral}{"{}pi"{}}].IsNumber());}
+\DoxyCodeLine{assert(document[\textcolor{stringliteral}{"{}pi"{}}].IsDouble());}
+\DoxyCodeLine{\mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}pi\ =\ \%g\(\backslash\)n"{}},\ document[\textcolor{stringliteral}{"{}pi"{}}].GetDouble());}
+
+\end{DoxyCode}
+
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{i\ =\ 123}
+\DoxyCodeLine{pi\ =\ 3.1416}
+
+\end{DoxyCode}
+
+
+JSON Array 包含一些元素。 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{comment}{//\ 使用引用来连续访问，方便之余还更高效。}}
+\DoxyCodeLine{\textcolor{keyword}{const}\ \mbox{\hyperlink{class_generic_value}{Value}}\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ =\ document[\textcolor{stringliteral}{"{}a"{}}];}
+\DoxyCodeLine{assert(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.IsArray());}
+\DoxyCodeLine{\textcolor{keywordflow}{for}\ (\mbox{\hyperlink{rapidjson_8h_a5ed6e6e67250fadbd041127e6386dcb5}{SizeType}}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.Size();\ i++)\ \textcolor{comment}{//\ 使用\ SizeType\ 而不是\ size\_t}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}a[\%d]\ =\ \%d\(\backslash\)n"{}},\ i,\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}[i].GetInt());}
+
+\end{DoxyCode}
+
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{a[0]\ =\ 1}
+\DoxyCodeLine{a[1]\ =\ 2}
+\DoxyCodeLine{a[2]\ =\ 3}
+\DoxyCodeLine{a[3]\ =\ 4}
+
+\end{DoxyCode}
+
+
+注意，\+Rapid\+JSON 并不自动转换各种 JSON 类型。例如，对一个 String 的 Value 调用 {\ttfamily Get\+Int()} 是非法的。在调试模式下，它会被断言失败。在发布模式下，其行为是未定义的。
+
+以下将会讨论有关查询各类型的细节。\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_QueryArray}{}\doxysubsection{\texorpdfstring{Query Array}{Query Array}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_QueryArray}
+缺省情况下，{\ttfamily Size\+Type} 是 {\ttfamily unsigned} 的 typedef。在多数系统中，\+Array 最多能存储 2\texorpdfstring{$^\wedge$}{\string^}32-\/1 个元素。
+
+你可以用整数字面量访问元素，如 {\ttfamily a\mbox{[}0\mbox{]}}、{\ttfamily a\mbox{[}1\mbox{]}}、{\ttfamily a\mbox{[}2\mbox{]}}。
+
+Array 与 {\ttfamily std\+::vector} 相似，除了使用索引，也可使用迭代器来访问所有元素。 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordflow}{for}\ (\mbox{\hyperlink{class_generic_value}{Value::ConstValueIterator}}\ itr\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.Begin();\ itr\ !=\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.End();\ ++itr)}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\%d\ "{}},\ itr-\/>GetInt());}
+
+\end{DoxyCode}
+
+
+还有一些熟悉的查询函数：
+\begin{DoxyItemize}
+\item {\ttfamily Size\+Type Capacity() const}
+\item {\ttfamily bool Empty() const}
+\end{DoxyItemize}
+
+\doxysubsubsection*{范围 for 循环 (v1.\+1.\+0 中的新功能)}
+
+当使用 C++11 功能时，你可使用范围 for 循环去访问 Array 内的所有元素。
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\&\ v\ :\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.GetArray())}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\%d\ "{}},\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.GetInt());}
+
+\end{DoxyCode}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_QueryObject}{}\doxysubsection{\texorpdfstring{Query Object}{Query Object}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_QueryObject}
+和 Array 相似，我们可以用迭代器去访问所有 Object 成员：
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ kTypeNames[]\ =\ }
+\DoxyCodeLine{\ \ \ \ \{\ \textcolor{stringliteral}{"{}Null"{}},\ \textcolor{stringliteral}{"{}False"{}},\ \textcolor{stringliteral}{"{}True"{}},\ \textcolor{stringliteral}{"{}Object"{}},\ \textcolor{stringliteral}{"{}Array"{}},\ \textcolor{stringliteral}{"{}String"{}},\ \textcolor{stringliteral}{"{}Number"{}}\ \};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keywordflow}{for}\ (\mbox{\hyperlink{class_generic_member_iterator}{Value::ConstMemberIterator}}\ itr\ =\ document.MemberBegin();}
+\DoxyCodeLine{\ \ \ \ itr\ !=\ document.MemberEnd();\ ++itr)}
+\DoxyCodeLine{\{}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Type\ of\ member\ \%s\ is\ \%s\(\backslash\)n"{}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ itr-\/>name.GetString(),\ kTypeNames[itr-\/>value.GetType()]);}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{Type\ of\ member\ hello\ is\ String}
+\DoxyCodeLine{Type\ of\ member\ t\ is\ True}
+\DoxyCodeLine{Type\ of\ member\ f\ is\ False}
+\DoxyCodeLine{Type\ of\ member\ n\ is\ Null}
+\DoxyCodeLine{Type\ of\ member\ i\ is\ Number}
+\DoxyCodeLine{Type\ of\ member\ pi\ is\ Number}
+\DoxyCodeLine{Type\ of\ member\ a\ is\ Array}
+
+\end{DoxyCode}
+
+
+注意，当 {\ttfamily operator\mbox{[}$\,$\mbox{]}(const char\texorpdfstring{$\ast$}{*})} 找不到成员，它会断言失败。
+
+若我们不确定一个成员是否存在，便需要在调用 {\ttfamily operator\mbox{[}$\,$\mbox{]}(const char\texorpdfstring{$\ast$}{*})} 前先调用 {\ttfamily Has\+Member()}。然而，这会导致两次查找。更好的做法是调用 {\ttfamily Find\+Member()}，它能同时检查成员是否存在并返回它的 Value：
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_member_iterator}{Value::ConstMemberIterator}}\ itr\ =\ document.FindMember(\textcolor{stringliteral}{"{}hello"{}});}
+\DoxyCodeLine{\textcolor{keywordflow}{if}\ (itr\ !=\ document.MemberEnd())}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\%s\(\backslash\)n"{}},\ itr-\/>value.GetString());}
+
+\end{DoxyCode}
+
+
+\doxysubsubsection*{范围 for 循环 (v1.\+1.\+0 中的新功能)}
+
+当使用 C++11 功能时，你可使用范围 for 循环去访问 Object 内的所有成员。
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\&\ m\ :\ document.GetObject())}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}Type\ of\ member\ \%s\ is\ \%s\(\backslash\)n"{}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ m.name.GetString(),\ kTypeNames[m.value.GetType()]);}
+
+\end{DoxyCode}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_QueryNumber}{}\doxysubsection{\texorpdfstring{Querying Number}{Querying Number}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_QueryNumber}
+JSON 只提供一种数值类型──\+Number。数字可以是整数或实数。\+RFC 4627 规定数字的范围由解析器指定。
+
+由于 C++ 提供多种整数及浮点数类型，\+DOM 尝试尽量提供最广的范围及良好性能。
+
+当解析一个 Number 时, 它会被存储在 DOM 之中，成为下列其中一个类型：
+
+\tabulinesep=1mm
+\begin{longtabu}spread 0pt [c]{*{2}{|X[-1]}|}
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 类型   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 描述    }\\\cline{1-2}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 类型   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 描述    }\\\cline{1-2}
+\endhead
+{\ttfamily unsigned}   &32 位无号整数    \\\cline{1-2}
+{\ttfamily int}   &32 位有号整数    \\\cline{1-2}
+{\ttfamily uint64\+\_\+t}   &64 位无号整数    \\\cline{1-2}
+{\ttfamily int64\+\_\+t}   &64 位有号整数    \\\cline{1-2}
+{\ttfamily double}   &64 位双精度浮点数   \\\cline{1-2}
+\end{longtabu}
+
+
+当查询一个 Number 时, 你可以检查该数字是否能以目标类型来提取：
+
+\tabulinesep=1mm
+\begin{longtabu}spread 0pt [c]{*{2}{|X[-1]}|}
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 查检   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 提取    }\\\cline{1-2}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 查检   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ 提取    }\\\cline{1-2}
+\endhead
+{\ttfamily bool Is\+Number()}   &不适用    \\\cline{1-2}
+{\ttfamily bool Is\+Uint()}   &{\ttfamily unsigned Get\+Uint()}    \\\cline{1-2}
+{\ttfamily bool Is\+Int()}   &{\ttfamily int Get\+Int()}    \\\cline{1-2}
+{\ttfamily bool Is\+Uint64()}   &{\ttfamily uint64\+\_\+t Get\+Uint64()}    \\\cline{1-2}
+{\ttfamily bool Is\+Int64()}   &{\ttfamily int64\+\_\+t Get\+Int64()}    \\\cline{1-2}
+{\ttfamily bool Is\+Double()}   &{\ttfamily double Get\+Double()}   \\\cline{1-2}
+\end{longtabu}
+
+
+注意，一个整数可能用几种类型来提取，而无需转换。例如，一个名为 {\ttfamily x} 的 Value 包含 123，那么 {\ttfamily x.\+Is\+Int() == x.\+Is\+Uint() == x.\+Is\+Int64() == x.\+Is\+Uint64() == true}。但如果一个名为 {\ttfamily y} 的 Value 包含 -\/3000000000，那么仅会令 {\ttfamily x.\+Is\+Int64() == true}。
+
+当要提取 Number 类型，{\ttfamily Get\+Double()} 是会把内部整数的表示转换成 {\ttfamily double}。注意 {\ttfamily int} 和 {\ttfamily unsigned} 可以安全地转换至 {\ttfamily double}，但 {\ttfamily int64\+\_\+t} 及 {\ttfamily uint64\+\_\+t} 可能会丧失精度（因为 {\ttfamily double} 的尾数只有 52 位）。\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_QueryString}{}\doxysubsection{\texorpdfstring{Query String}{Query String}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_QueryString}
+除了 {\ttfamily Get\+String()}，{\ttfamily Value} 类也有一个 {\ttfamily Get\+String\+Length()}。这里会解释个中原因。
+
+根据 RFC 4627，\+JSON String 可包含 Unicode 字符 {\ttfamily U+0000}，在 JSON 中会表示为 {\ttfamily "{}\textbackslash{}u0000"{}}。问题是，\+C/\+C++ 通常使用空字符结尾字符串（null-\/terminated string），这种字符串把 \`{}`\textbackslash{}0'\`{} 作为结束符号。
+
+为了符合 RFC 4627，\+Rapid\+JSON 支持包含 {\ttfamily U+0000} 的 String。若你需要处理这些 String，便可使用 {\ttfamily Get\+String\+Length()} 去获得正确的字符串长度。
+
+例如，当解析以下的 JSON 至 {\ttfamily Document d} 之后：
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\{\ "{}s"{}\ :\ \ "{}a\(\backslash\)u0000b"{}\ \}}
+
+\end{DoxyCode}
+ {\ttfamily "{}a\textbackslash{}u0000b"{}} 值的正确长度应该是 3。但 {\ttfamily strlen()} 会返回 1。
+
+{\ttfamily Get\+String\+Length()} 也可以提高性能，因为用户可能需要调用 {\ttfamily strlen()} 去分配缓冲。
+
+此外，{\ttfamily std\+::string} 也支持这个构造函数：
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{string(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}});}
+
+\end{DoxyCode}
+
+
+此构造函数接受字符串长度作为参数。它支持在字符串中存储空字符，也应该会有更好的性能。
+
+\doxysubsection*{比较两个 Value}
+
+你可使用 {\ttfamily ==} 及 {\ttfamily !=} 去比较两个 Value。当且仅当两个 Value 的类型及内容相同，它们才当作相等。你也可以比较 Value 和它的原生类型值。以下是一个例子。
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordflow}{if}\ (document[\textcolor{stringliteral}{"{}hello"{}}]\ ==\ document[\textcolor{stringliteral}{"{}n"{}}])\ \textcolor{comment}{/*...*/};\ \ \ \ \textcolor{comment}{//\ 比较两个值}}
+\DoxyCodeLine{\textcolor{keywordflow}{if}\ (document[\textcolor{stringliteral}{"{}hello"{}}]\ ==\ \textcolor{stringliteral}{"{}world"{}})\ \textcolor{comment}{/*...*/};\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ 与字符串字面量作比较}}
+\DoxyCodeLine{\textcolor{keywordflow}{if}\ (document[\textcolor{stringliteral}{"{}i"{}}]\ !=\ 123)\ \textcolor{comment}{/*...*/};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ 与整数作比较}}
+\DoxyCodeLine{\textcolor{keywordflow}{if}\ (document[\textcolor{stringliteral}{"{}pi"{}}]\ !=\ 3.14)\ \textcolor{comment}{/*...*/};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ 与\ double\ 作比较}}
+
+\end{DoxyCode}
+
+
+Array／\+Object 顺序以它们的元素／成员作比较。当且仅当它们的整个子树相等，它们才当作相等。
+
+注意，现时若一个 Object 含有重复命名的成员，它与任何 Object 作比较都总会返回 {\ttfamily false}。\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_CreateModifyValues}{}\doxysection{\texorpdfstring{Create/\+Modify Values}{Create/\+Modify Values}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_CreateModifyValues}
+有多种方法去创建值。 当一个 DOM 树被创建或修改后，可使用 {\ttfamily \doxylink{class_writer}{Writer}} 再次存储为 JSON。\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_ChangeValueType}{}\doxysubsection{\texorpdfstring{Change Value Type}{Change Value Type}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_ChangeValueType}
+当使用默认构造函数创建一个 Value 或 Document，它的类型便会是 Null。要改变其类型，需调用 {\ttfamily Set\+XXX()} 或赋值操作，例如：
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_document}{Document}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}};\ \textcolor{comment}{//\ Null}}
+\DoxyCodeLine{\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.SetObject();}
+\DoxyCodeLine{}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_value}{Value}}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}};\ \ \ \ \textcolor{comment}{//\ Null}}
+\DoxyCodeLine{\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.SetInt(10);}
+\DoxyCodeLine{\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ =\ 10;\ \ \ \ \ \textcolor{comment}{//\ 简写，和上面的相同}}
+
+\end{DoxyCode}
+
+
+\doxysubsubsection*{构造函数的各个重载}
+
+几个类型也有重载构造函数：
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_value}{Value}}\ b(\textcolor{keyword}{true});\ \ \ \ \textcolor{comment}{//\ 调用\ Value(bool)}}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_value}{Value}}\ i(-\/123);\ \ \ \ \textcolor{comment}{//\ 调用\ Value(int)}}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_value}{Value}}\ u(123u);\ \ \ \ \textcolor{comment}{//\ 调用\ Value(unsigned)}}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_value}{Value}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}(1.5);\ \ \ \ \ \textcolor{comment}{//\ 调用\ Value(double)}}
+
+\end{DoxyCode}
+
+
+要重建空 Object 或 Array，可在默认构造函数后使用 {\ttfamily Set\+Object()}/{\ttfamily Set\+Array()}，或一次性使用 {\ttfamily \doxylink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value(\+Type)}}：
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_value}{Value}}\ o(\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7a146f46700e905e8df96a6a90b5c7640f}{kObjectType}});}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_value}{Value}}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}(\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7af41527d6925efa3c5c3dadb23dfef7c8}{kArrayType}});}
+
+\end{DoxyCode}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_MoveSemantics}{}\doxysubsection{\texorpdfstring{Move Semantics}{Move Semantics}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_MoveSemantics}
+在设计 Rapid\+JSON 时有一个非常特别的决定，就是 Value 赋值并不是把来源 Value 复制至目的 Value，而是把来源 Value 转移（move）至目的 Value。例如：
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_value}{Value}}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}(123);}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_value}{Value}}\ b(456);}
+\DoxyCodeLine{b\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}};\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ a\ 变成\ Null，b\ 变成数字\ 123。}}
+
+\end{DoxyCode}
+
+
+
+
+为什么？此语义有何优点？
+
+最简单的答案就是性能。对于固定大小的 JSON 类型（\+Number、\+True、\+False、\+Null），复制它们是简单快捷。然而，对于可变大小的 JSON 类型（\+String、\+Array、\+Object），复制它们会产生大量开销，而且这些开销常常不被察觉。尤其是当我们需要创建临时 Object，把它复制至另一变量，然后再析构它。
+
+例如，若使用正常 \texorpdfstring{$\ast$}{*} 复制 \texorpdfstring{$\ast$}{*} 语义：
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_value}{Value}}\ o(\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7a146f46700e905e8df96a6a90b5c7640f}{kObjectType}});}
+\DoxyCodeLine{\{}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{class_generic_value}{Value}}\ contacts(\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7af41527d6925efa3c5c3dadb23dfef7c8}{kArrayType}});}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ 把元素加进\ contacts\ 数组。}}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ ...}}
+\DoxyCodeLine{\ \ \ \ o.AddMember(\textcolor{stringliteral}{"{}contacts"{}},\ contacts,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.GetAllocator());\ \ \textcolor{comment}{//\ 深度复制\ contacts\ （可能有大量内存分配）}}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ 析构\ contacts。}}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+
+
+那个 {\ttfamily o} Object 需要分配一个和 contacts 相同大小的缓冲区，对 conacts 做深度复制，并最终要析构 contacts。这样会产生大量无必要的内存分配／释放，以及内存复制。
+
+有一些方案可避免实质地复制这些数据，例如引用计数（reference counting）、垃圾回收（garbage collection, GC）。
+
+为了使 Rapid\+JSON 简单及快速，我们选择了对赋值采用 \texorpdfstring{$\ast$}{*} 转移 \texorpdfstring{$\ast$}{*} 语义。这方法与 {\ttfamily std\+::auto\+\_\+ptr} 相似，都是在赋值时转移拥有权。转移快得多简单得多，只需要析构原来的 Value，把来源 {\ttfamily \doxylink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy()}} 至目标，最后把来源设置为 Null 类型。
+
+因此，使用转移语义后，上面的例子变成：
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_value}{Value}}\ o(\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7a146f46700e905e8df96a6a90b5c7640f}{kObjectType}});}
+\DoxyCodeLine{\{}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{class_generic_value}{Value}}\ contacts(\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7af41527d6925efa3c5c3dadb23dfef7c8}{kArrayType}});}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ adding\ elements\ to\ contacts\ array.}}
+\DoxyCodeLine{\ \ \ \ o.AddMember(\textcolor{stringliteral}{"{}contacts"{}},\ contacts,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.GetAllocator());\ \ \textcolor{comment}{//\ 只需\ memcpy()\ contacts\ 本身至新成员的\ Value（16\ 字节）}}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ contacts\ 在这里变成\ Null。它的析构是平凡的。}}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+
+
+在 C++11 中这称为转移赋值操作（move assignment operator）。由于 Rapid\+JSON 支持 C++03，它在赋值操作采用转移语义，其它修改型函数如 {\ttfamily Add\+Member()}, {\ttfamily Push\+Back()} 也采用转移语义。\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_TemporaryValues}{}\doxysubsubsection{\texorpdfstring{Move semantics and temporary values}{Move semantics and temporary values}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_TemporaryValues}
+有时候，我们想直接构造一个 Value 并传递给一个“转移”函数（如 {\ttfamily Push\+Back()}、{\ttfamily Add\+Member()}）。由于临时对象是不能转换为正常的 Value 引用，我们加入了一个方便的 {\ttfamily Move()} 函数：
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_value}{Value}}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}(\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7af41527d6925efa3c5c3dadb23dfef7c8}{kArrayType}});}
+\DoxyCodeLine{\mbox{\hyperlink{class_memory_pool_allocator}{Document::AllocatorType}}\&\ \mbox{\hyperlink{namespacechainbase_add7d4cf66ab3f2808fe613e6b0343b89}{allocator}}\ =\ document.\mbox{\hyperlink{class_generic_document_a1362cbdcce6ca37356744a3a0dbb11d6}{GetAllocator}}();}
+\DoxyCodeLine{\textcolor{comment}{//\ a.PushBack(Value(42),\ allocator);\ \ \ \ \ \ \ //\ 不能通过编译}}
+\DoxyCodeLine{\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.PushBack(\mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}}().SetInt(42),\ allocator);\ \textcolor{comment}{//\ fluent\ API}}
+\DoxyCodeLine{\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.PushBack(\mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}}(42).Move(),\ allocator);\ \ \ \textcolor{comment}{//\ 和上一行相同}}
+
+\end{DoxyCode}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_CreateString}{}\doxysubsection{\texorpdfstring{Create String}{Create String}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_CreateString}
+Rapid\+JSON 提供两个 String 的存储策略。
+
+
+\begin{DoxyEnumerate}
+\item copy-\/string\+: 分配缓冲区，然后把来源数据复制至它。
+\item const-\/string\+: 简单地储存字符串的指针。
+\end{DoxyEnumerate}
+
+Copy-\/string 总是安全的，因为它拥有数据的克隆。\+Const-\/string 可用于存储字符串字面量，以及用于在 DOM 一节中将会提到的 in-\/situ 解析中。
+
+为了让用户自定义内存分配方式，当一个操作可能需要内存分配时，\+Rapid\+JSON 要求用户传递一个 allocator 实例作为 API 参数。此设计避免了在每个 Value 存储 allocator（或 document）的指针。
+
+因此，当我们把一个 copy-\/string 赋值时, 调用含有 allocator 的 {\ttfamily Set\+String()} 重载函数：
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_document}{Document}}\ document;}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_value}{Value}}\ author;}
+\DoxyCodeLine{\textcolor{keywordtype}{char}\ buffer[10];}
+\DoxyCodeLine{\textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ =\ sprintf(buffer,\ \textcolor{stringliteral}{"{}\%s\ \%s"{}},\ \textcolor{stringliteral}{"{}Milo"{}},\ \textcolor{stringliteral}{"{}Yip"{}});\ \textcolor{comment}{//\ 动态创建的字符串。}}
+\DoxyCodeLine{author.SetString(buffer,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}},\ document.\mbox{\hyperlink{class_generic_document_a1362cbdcce6ca37356744a3a0dbb11d6}{GetAllocator}}());}
+\DoxyCodeLine{\mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(buffer,\ 0,\ \textcolor{keyword}{sizeof}(buffer));}
+\DoxyCodeLine{\textcolor{comment}{//\ 清空\ buffer\ 后\ author.GetString()\ 仍然包含\ "{}Milo\ Yip"{}}}
+
+\end{DoxyCode}
+
+
+在此例子中，我们使用 {\ttfamily Document} 实例的 allocator。这是使用 Rapid\+JSON 时常用的惯用法。但你也可以用其他 allocator 实例。
+
+另外，上面的 {\ttfamily Set\+String()} 需要长度参数。这个 API 能处理含有空字符的字符串。另一个 {\ttfamily Set\+String()} 重载函数没有长度参数，它假设输入是空字符结尾的，并会调用类似 {\ttfamily strlen()} 的函数去获取长度。
+
+最后，对于字符串字面量或有安全生命周期的字符串，可以使用 const-\/string 版本的 {\ttfamily Set\+String()}，它没有 allocator 参数。对于字符串字面量（或字符数组常量），只需简单地传递字面量，又安全又高效：
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_value}{Value}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.SetString(\textcolor{stringliteral}{"{}rapidjson"{}});\ \ \ \ \textcolor{comment}{//\ 可包含空字符，长度在编译期推导}}
+\DoxyCodeLine{\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ =\ \textcolor{stringliteral}{"{}rapidjson"{}};\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ 上行的缩写}}
+
+\end{DoxyCode}
+
+
+对于字符指针，\+Rapid\+JSON 需要作一个标记，代表它不复制也是安全的。可以使用 {\ttfamily String\+Ref} 函数：
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\ cstr\ =\ getenv(\textcolor{stringliteral}{"{}USER"{}});}
+\DoxyCodeLine{\textcolor{keywordtype}{size\_t}\ cstr\_len\ =\ ...;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ 如果有长度}}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_value}{Value}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{\textcolor{comment}{//\ s.SetString(cstr);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ //\ 这不能通过编译}}
+\DoxyCodeLine{\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.SetString(\mbox{\hyperlink{document_8h_aa6b9fd9f6aa49405a574c362ba9af6b5}{StringRef}}(cstr));\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ 可以，假设它的生命周期安全，并且是以空字符结尾的}}
+\DoxyCodeLine{\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ =\ \mbox{\hyperlink{document_8h_aa6b9fd9f6aa49405a574c362ba9af6b5}{StringRef}}(cstr);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ 上行的缩写}}
+\DoxyCodeLine{\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.SetString(\mbox{\hyperlink{document_8h_aa6b9fd9f6aa49405a574c362ba9af6b5}{StringRef}}(cstr,\ cstr\_len));\textcolor{comment}{//\ 更快，可处理空字符}}
+\DoxyCodeLine{\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ =\ \mbox{\hyperlink{document_8h_aa6b9fd9f6aa49405a574c362ba9af6b5}{StringRef}}(cstr,\ cstr\_len);\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ 上行的缩写}}
+
+\end{DoxyCode}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_ModifyArray}{}\doxysubsection{\texorpdfstring{Modify Array}{Modify Array}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_ModifyArray}
+Array 类型的 Value 提供与 {\ttfamily std\+::vector} 相似的 API。
+
+
+\begin{DoxyItemize}
+\item {\ttfamily Clear()}
+\item {\ttfamily Reserve(Size\+Type, Allocator\&)}
+\item {\ttfamily Value\& Push\+Back(Value\&, Allocator\&)}
+\item {\ttfamily template \texorpdfstring{$<$}{<}typename T\texorpdfstring{$>$}{>} \doxylink{class_generic_value}{Generic\+Value}\& Push\+Back(T, Allocator\&)}
+\item {\ttfamily Value\& Pop\+Back()}
+\item {\ttfamily Value\+Iterator Erase(\+Const\+Value\+Iterator pos)}
+\item {\ttfamily Value\+Iterator Erase(\+Const\+Value\+Iterator first, Const\+Value\+Iterator last)}
+\end{DoxyItemize}
+
+注意，{\ttfamily Reserve(...)} 及 {\ttfamily Push\+Back(...)} 可能会为数组元素分配内存，所以需要一个 allocator。
+
+以下是 {\ttfamily Push\+Back()} 的例子：
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_value}{Value}}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}(\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7af41527d6925efa3c5c3dadb23dfef7c8}{kArrayType}});}
+\DoxyCodeLine{\mbox{\hyperlink{class_memory_pool_allocator}{Document::AllocatorType}}\&\ \mbox{\hyperlink{namespacechainbase_add7d4cf66ab3f2808fe613e6b0343b89}{allocator}}\ =\ document.\mbox{\hyperlink{class_generic_document_a1362cbdcce6ca37356744a3a0dbb11d6}{GetAllocator}}();}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 5;\ i\ <=\ 10;\ i++)}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.PushBack(i,\ allocator);\ \ \ \textcolor{comment}{//\ 可能需要调用\ realloc()\ 所以需要\ allocator}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ 流畅接口（Fluent\ interface）}}
+\DoxyCodeLine{\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.PushBack(\textcolor{stringliteral}{"{}Lua"{}},\ allocator).PushBack(\textcolor{stringliteral}{"{}Mio"{}},\ allocator);}
+
+\end{DoxyCode}
+
+
+与 STL 不一样的是，{\ttfamily Push\+Back()}/{\ttfamily Pop\+Back()} 返回 Array 本身的引用。这称为流畅接口（\+\_\+fluent interface\+\_\+）。
+
+如果你想在 Array 中加入一个非常量字符串，或是一个没有足够生命周期的字符串（见 \doxysectlink{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_CreateString}{Create String}{2}），你需要使用 copy-\/string API 去创建一个 String。为了避免加入中间变量，可以就地使用一个 \doxysectlink{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_TemporaryValues}{临时值}{3}：
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{comment}{//\ 就地\ Value\ 参数}}
+\DoxyCodeLine{contact.PushBack(\mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}}(\textcolor{stringliteral}{"{}copy"{}},\ document.\mbox{\hyperlink{class_generic_document_a1362cbdcce6ca37356744a3a0dbb11d6}{GetAllocator}}()).Move(),\ \textcolor{comment}{//\ copy\ string}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ document.\mbox{\hyperlink{class_generic_document_a1362cbdcce6ca37356744a3a0dbb11d6}{GetAllocator}}());}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ 显式\ Value\ 参数}}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_value}{Value}}\ val(\textcolor{stringliteral}{"{}key"{}},\ document.\mbox{\hyperlink{class_generic_document_a1362cbdcce6ca37356744a3a0dbb11d6}{GetAllocator}}());\ \textcolor{comment}{//\ copy\ string}}
+\DoxyCodeLine{contact.PushBack(val,\ document.\mbox{\hyperlink{class_generic_document_a1362cbdcce6ca37356744a3a0dbb11d6}{GetAllocator}}());}
+
+\end{DoxyCode}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_ModifyObject}{}\doxysubsection{\texorpdfstring{Modify Object}{Modify Object}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_ModifyObject}
+Object 是键值对的集合。每个键必须为 String。要修改 Object，方法是增加或移除成员。以下的 API 用来增加城员：
+
+
+\begin{DoxyItemize}
+\item {\ttfamily Value\& Add\+Member(Value\&, Value\&, Allocator\& allocator)}
+\item {\ttfamily Value\& Add\+Member(String\+Ref\+Type, Value\&, Allocator\&)}
+\item {\ttfamily template \texorpdfstring{$<$}{<}typename T\texorpdfstring{$>$}{>} Value\& Add\+Member(String\+Ref\+Type, T value, Allocator\&)}
+\end{DoxyItemize}
+
+以下是一个例子。
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_value}{Value}}\ contact(kObject);}
+\DoxyCodeLine{contact.AddMember(\textcolor{stringliteral}{"{}name"{}},\ \textcolor{stringliteral}{"{}Milo"{}},\ document.\mbox{\hyperlink{class_generic_document_a1362cbdcce6ca37356744a3a0dbb11d6}{GetAllocator}}());}
+\DoxyCodeLine{contact.AddMember(\textcolor{stringliteral}{"{}married"{}},\ \textcolor{keyword}{true},\ document.\mbox{\hyperlink{class_generic_document_a1362cbdcce6ca37356744a3a0dbb11d6}{GetAllocator}}());}
+
+\end{DoxyCode}
+
+
+使用 {\ttfamily String\+Ref\+Type} 作为 name 参数的重载版本与字符串的 {\ttfamily Set\+String} 的接口相似。 这些重载是为了避免复制 {\ttfamily name} 字符串，因为 JSON object 中经常会使用常数键名。
+
+如果你需要从非常数字符串或生命周期不足的字符串创建键名（见 \doxysectlink{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_CreateString}{创建 String}{2}），你需要使用 copy-\/string API。为了避免中间变量，可以就地使用 \doxysectlink{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_TemporaryValues}{临时值}{3}：
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{comment}{//\ 就地\ Value\ 参数}}
+\DoxyCodeLine{contact.AddMember(\mbox{\hyperlink{document_8h_a071cf97155ba72ac9a1fc4ad7e63d481}{Value}}(\textcolor{stringliteral}{"{}copy"{}},\ document.\mbox{\hyperlink{class_generic_document_a1362cbdcce6ca37356744a3a0dbb11d6}{GetAllocator}}()).Move(),\ \textcolor{comment}{//\ copy\ string}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_generic_value}{Value}}().Move(),\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ null\ value}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ document.\mbox{\hyperlink{class_generic_document_a1362cbdcce6ca37356744a3a0dbb11d6}{GetAllocator}}());}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ 显式参数}}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_value}{Value}}\ \mbox{\hyperlink{yubico__otp_8c_a9246c20bb98ad2b4c60313c053c70f08}{key}}(\textcolor{stringliteral}{"{}key"{}},\ document.\mbox{\hyperlink{class_generic_document_a1362cbdcce6ca37356744a3a0dbb11d6}{GetAllocator}}());\ \textcolor{comment}{//\ copy\ string\ name}}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_value}{Value}}\ val(42);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ 某\ Value}}
+\DoxyCodeLine{contact.AddMember(key,\ val,\ document.\mbox{\hyperlink{class_generic_document_a1362cbdcce6ca37356744a3a0dbb11d6}{GetAllocator}}());}
+
+\end{DoxyCode}
+
+
+移除成员有几个选择：
+
+
+\begin{DoxyItemize}
+\item {\ttfamily bool Remove\+Member(const Ch\texorpdfstring{$\ast$}{*} name)}：使用键名来移除成员（线性时间复杂度）。
+\item {\ttfamily bool Remove\+Member(const Value\& name)}：除了 {\ttfamily name} 是一个 Value，和上一行相同。
+\item {\ttfamily Member\+Iterator Remove\+Member(\+Member\+Iterator)}：使用迭代器移除成员（\+\_\+ 常数 \+\_\+ 时间复杂度）。
+\item {\ttfamily Member\+Iterator Erase\+Member(\+Member\+Iterator)}：和上行相似但维持成员次序（线性时间复杂度）。
+\item {\ttfamily Member\+Iterator Erase\+Member(\+Member\+Iterator first, Member\+Iterator last)}：移除一个范围内的成员，维持次序（线性时间复杂度）。
+\end{DoxyItemize}
+
+{\ttfamily Member\+Iterator Remove\+Member(\+Member\+Iterator)} 使用了“转移最后”手法来达成常数时间复杂度。基本上就是析构迭代器位置的成员，然后把最后的成员转移至迭代器位置。因此，成员的次序会被改变。\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_DeepCopyValue}{}\doxysubsection{\texorpdfstring{Deep Copy Value}{Deep Copy Value}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_DeepCopyValue}
+若我们真的要复制一个 DOM 树，我们可使用两个 APIs 作深复制：含 allocator 的构造函数及 {\ttfamily Copy\+From()}。
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_document}{Document}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}};}
+\DoxyCodeLine{\mbox{\hyperlink{class_memory_pool_allocator}{Document::AllocatorType}}\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.GetAllocator();}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_value}{Value}}\ v1(\textcolor{stringliteral}{"{}foo"{}});}
+\DoxyCodeLine{\textcolor{comment}{//\ Value\ v2(v1);\ //\ 不容许}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_value}{Value}}\ v2(v1,\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ 制造一个克隆}}
+\DoxyCodeLine{assert(v1.IsString());\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ v1\ 不变}}
+\DoxyCodeLine{\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.SetArray().PushBack(v1,\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}).PushBack(v2,\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{assert(v1.IsNull()\ \&\&\ v2.IsNull());\ \ \ \textcolor{comment}{//\ 两个都转移动\ d}}
+\DoxyCodeLine{}
+\DoxyCodeLine{v2.CopyFrom(d,\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ 把整个\ document\ 复制至\ v2}}
+\DoxyCodeLine{assert(\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.IsArray()\ \&\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.Size()\ ==\ 2);\ \textcolor{comment}{//\ d\ 不变}}
+\DoxyCodeLine{v1.SetObject().AddMember(\textcolor{stringliteral}{"{}array"{}},\ v2,\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}.PushBack(v1,\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+
+\end{DoxyCode}
+\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_SwapValues}{}\doxysubsection{\texorpdfstring{Swap Values}{Swap Values}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_SwapValues}
+Rapid\+JSON 也提供 {\ttfamily Swap()}。
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_value}{Value}}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}(123);}
+\DoxyCodeLine{\mbox{\hyperlink{class_generic_value}{Value}}\ b(\textcolor{stringliteral}{"{}Hello"{}});}
+\DoxyCodeLine{\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.Swap(b);}
+\DoxyCodeLine{assert(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.IsString());}
+\DoxyCodeLine{assert(b.IsInt());}
+
+\end{DoxyCode}
+
+
+无论两棵 DOM 树有多复杂，交换是很快的（常数时间）。\hypertarget{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_WhatsNext}{}\doxysection{\texorpdfstring{What\textquotesingle{}s next}{What\textquotesingle{}s next}}\label{md_libraries_2fc_2include_2fc_2crypto_2webauthn__json_2doc_2tutorial_8zh-cn_WhatsNext}
+本教程展示了如何询查及修改 DOM 树。\+Rapid\+JSON 还有一个重要概念：
+
+
+\begin{DoxyEnumerate}
+\item \doxylink{stream_8zh-cn_8md}{流} 是读写 JSON 的通道。流可以是内存字符串、文件流等。用户也可以自定义流。
+\item \doxylink{encoding_8zh-cn_8md}{编码} 定义在流或内存中使用的字符编码。\+Rapid\+JSON 也在内部提供 Unicode 转换及校验功能。
+\item \doxylink{dom_8zh-cn_8md}{DOM} 的基本功能已在本教程里介绍。还有更高级的功能，如原位（\texorpdfstring{$\ast$}{*}in situ\texorpdfstring{$\ast$}{*}）解析、其他解析选项及高级用法。
+\item \doxylink{sax_8zh-cn_8md}{SAX} 是 Rapid\+JSON 解析／生成功能的基础。学习使用 {\ttfamily Reader}/{\ttfamily \doxylink{class_writer}{Writer}} 去实现更高性能的应用程序。也可以使用 {\ttfamily \doxylink{class_pretty_writer}{Pretty\+Writer}} 去格式化 JSON。
+\item \doxylink{performance_8zh-cn_8md}{性能} 展示一些我们做的及第三方的性能测试。
+\item \doxylink{internals_8md}{技术内幕} 讲述一些 Rapid\+JSON 内部的设计及技术。
+\end{DoxyEnumerate}
+
+你也可以参考 \doxylink{faq_8zh-cn_8md}{常见问题}、\+API 文档、例子及单元测试。 

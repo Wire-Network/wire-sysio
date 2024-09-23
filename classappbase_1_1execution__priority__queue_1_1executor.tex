@@ -1,0 +1,232 @@
+\doxysection{appbase\+::execution\+\_\+priority\+\_\+queue\+::executor Class Reference}
+\hypertarget{classappbase_1_1execution__priority__queue_1_1executor}{}\label{classappbase_1_1execution__priority__queue_1_1executor}\index{appbase::execution\_priority\_queue::executor@{appbase::execution\_priority\_queue::executor}}
+
+
+{\ttfamily \#include $<$execution\+\_\+priority\+\_\+queue.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classappbase_1_1execution__priority__queue_1_1executor_a91b752850fc0963d9f54248cba10f4c1}{executor}} (\mbox{\hyperlink{classappbase_1_1execution__priority__queue}{execution\+\_\+priority\+\_\+queue}} \&q, int \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})
+\item 
+\mbox{\hyperlink{classappbase_1_1execution__priority__queue}{execution\+\_\+priority\+\_\+queue}} \& \mbox{\hyperlink{classappbase_1_1execution__priority__queue_1_1executor_a2fb707abcf23afb0e1bed94e30b96927}{context}} () const noexcept
+\item 
+{\footnotesize template$<$typename Function , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ }\\void \mbox{\hyperlink{classappbase_1_1execution__priority__queue_1_1executor_a93e617b949302e5ba8fc13c0a0e12a08}{dispatch}} (Function \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}, const \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} \&) const
+\item 
+{\footnotesize template$<$typename Function , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ }\\void \mbox{\hyperlink{classappbase_1_1execution__priority__queue_1_1executor_a6187bc264c8d052f0529c202b28f5ae4}{post}} (Function \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}, const \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} \&) const
+\item 
+{\footnotesize template$<$typename Function , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ }\\void \mbox{\hyperlink{classappbase_1_1execution__priority__queue_1_1executor_adecfe2e9d3b3c26580e2c87bad874e2a}{defer}} (Function \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}, const \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} \&) const
+\item 
+void \mbox{\hyperlink{classappbase_1_1execution__priority__queue_1_1executor_a3cce81f8793d8f91d4b117d41db3aa77}{on\+\_\+work\+\_\+started}} () const noexcept
+\item 
+void \mbox{\hyperlink{classappbase_1_1execution__priority__queue_1_1executor_aa5b17ebc2ab80a011002c8e0955ec5c6}{on\+\_\+work\+\_\+finished}} () const noexcept
+\item 
+bool \mbox{\hyperlink{classappbase_1_1execution__priority__queue_1_1executor_a373acfca3c116a45aa939e13451dab03}{operator==}} (const \mbox{\hyperlink{classappbase_1_1execution__priority__queue_1_1executor}{executor}} \&other) const noexcept
+\item 
+bool \mbox{\hyperlink{classappbase_1_1execution__priority__queue_1_1executor_a0d465ea694d058734d4f1e754272ed29}{operator!=}} (const \mbox{\hyperlink{classappbase_1_1execution__priority__queue_1_1executor}{executor}} \&other) const noexcept
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{execution__priority__queue_8hpp_source_l00051}{51}} of file \mbox{\hyperlink{execution__priority__queue_8hpp_source}{execution\+\_\+priority\+\_\+queue.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classappbase_1_1execution__priority__queue_1_1executor_a91b752850fc0963d9f54248cba10f4c1}\index{appbase::execution\_priority\_queue::executor@{appbase::execution\_priority\_queue::executor}!executor@{executor}}
+\index{executor@{executor}!appbase::execution\_priority\_queue::executor@{appbase::execution\_priority\_queue::executor}}
+\doxysubsubsection{\texorpdfstring{executor()}{executor()}}
+{\footnotesize\ttfamily \label{classappbase_1_1execution__priority__queue_1_1executor_a91b752850fc0963d9f54248cba10f4c1} 
+appbase\+::execution\+\_\+priority\+\_\+queue\+::executor\+::executor (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classappbase_1_1execution__priority__queue}{execution\+\_\+priority\+\_\+queue}} \&}]{q}{, }\item[{int}]{p}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{execution__priority__queue_8hpp_source_l00054}{54}} of file \mbox{\hyperlink{execution__priority__queue_8hpp_source}{execution\+\_\+priority\+\_\+queue.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \ \ \ :\ context\_(q),\ priority\_(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classappbase_1_1execution__priority__queue_1_1executor_a2fb707abcf23afb0e1bed94e30b96927}\index{appbase::execution\_priority\_queue::executor@{appbase::execution\_priority\_queue::executor}!context@{context}}
+\index{context@{context}!appbase::execution\_priority\_queue::executor@{appbase::execution\_priority\_queue::executor}}
+\doxysubsubsection{\texorpdfstring{context()}{context()}}
+{\footnotesize\ttfamily \label{classappbase_1_1execution__priority__queue_1_1executor_a2fb707abcf23afb0e1bed94e30b96927} 
+\mbox{\hyperlink{classappbase_1_1execution__priority__queue}{execution\+\_\+priority\+\_\+queue}} \& appbase\+::execution\+\_\+priority\+\_\+queue\+::executor\+::context (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{execution__priority__queue_8hpp_source_l00059}{59}} of file \mbox{\hyperlink{execution__priority__queue_8hpp_source}{execution\+\_\+priority\+\_\+queue.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ context\_;}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classappbase_1_1execution__priority__queue_1_1executor_adecfe2e9d3b3c26580e2c87bad874e2a}\index{appbase::execution\_priority\_queue::executor@{appbase::execution\_priority\_queue::executor}!defer@{defer}}
+\index{defer@{defer}!appbase::execution\_priority\_queue::executor@{appbase::execution\_priority\_queue::executor}}
+\doxysubsubsection{\texorpdfstring{defer()}{defer()}}
+{\footnotesize\ttfamily \label{classappbase_1_1execution__priority__queue_1_1executor_adecfe2e9d3b3c26580e2c87bad874e2a} 
+template$<$typename Function , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+void appbase\+::execution\+\_\+priority\+\_\+queue\+::executor\+::defer (\begin{DoxyParamCaption}\item[{Function}]{f}{, }\item[{const \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} \&}]{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{execution__priority__queue_8hpp_source_l00077}{77}} of file \mbox{\hyperlink{execution__priority__queue_8hpp_source}{execution\+\_\+priority\+\_\+queue.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ context\_.\mbox{\hyperlink{classappbase_1_1execution__priority__queue_a22eb8e2075d65127e8920e8c1089b630}{add}}(priority\_,\ std::move(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}));}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=345pt]{classappbase_1_1execution__priority__queue_1_1executor_adecfe2e9d3b3c26580e2c87bad874e2a_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classappbase_1_1execution__priority__queue_1_1executor_a93e617b949302e5ba8fc13c0a0e12a08}\index{appbase::execution\_priority\_queue::executor@{appbase::execution\_priority\_queue::executor}!dispatch@{dispatch}}
+\index{dispatch@{dispatch}!appbase::execution\_priority\_queue::executor@{appbase::execution\_priority\_queue::executor}}
+\doxysubsubsection{\texorpdfstring{dispatch()}{dispatch()}}
+{\footnotesize\ttfamily \label{classappbase_1_1execution__priority__queue_1_1executor_a93e617b949302e5ba8fc13c0a0e12a08} 
+template$<$typename Function , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+void appbase\+::execution\+\_\+priority\+\_\+queue\+::executor\+::dispatch (\begin{DoxyParamCaption}\item[{Function}]{f}{, }\item[{const \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} \&}]{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{execution__priority__queue_8hpp_source_l00065}{65}} of file \mbox{\hyperlink{execution__priority__queue_8hpp_source}{execution\+\_\+priority\+\_\+queue.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ context\_.\mbox{\hyperlink{classappbase_1_1execution__priority__queue_a22eb8e2075d65127e8920e8c1089b630}{add}}(priority\_,\ std::move(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}));}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=345pt]{classappbase_1_1execution__priority__queue_1_1executor_a93e617b949302e5ba8fc13c0a0e12a08_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classappbase_1_1execution__priority__queue_1_1executor_aa5b17ebc2ab80a011002c8e0955ec5c6}\index{appbase::execution\_priority\_queue::executor@{appbase::execution\_priority\_queue::executor}!on\_work\_finished@{on\_work\_finished}}
+\index{on\_work\_finished@{on\_work\_finished}!appbase::execution\_priority\_queue::executor@{appbase::execution\_priority\_queue::executor}}
+\doxysubsubsection{\texorpdfstring{on\_work\_finished()}{on\_work\_finished()}}
+{\footnotesize\ttfamily \label{classappbase_1_1execution__priority__queue_1_1executor_aa5b17ebc2ab80a011002c8e0955ec5c6} 
+void appbase\+::execution\+\_\+priority\+\_\+queue\+::executor\+::on\+\_\+work\+\_\+finished (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{execution__priority__queue_8hpp_source_l00083}{83}} of file \mbox{\hyperlink{execution__priority__queue_8hpp_source}{execution\+\_\+priority\+\_\+queue.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00083\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classappbase_1_1execution__priority__queue_1_1executor_a3cce81f8793d8f91d4b117d41db3aa77}\index{appbase::execution\_priority\_queue::executor@{appbase::execution\_priority\_queue::executor}!on\_work\_started@{on\_work\_started}}
+\index{on\_work\_started@{on\_work\_started}!appbase::execution\_priority\_queue::executor@{appbase::execution\_priority\_queue::executor}}
+\doxysubsubsection{\texorpdfstring{on\_work\_started()}{on\_work\_started()}}
+{\footnotesize\ttfamily \label{classappbase_1_1execution__priority__queue_1_1executor_a3cce81f8793d8f91d4b117d41db3aa77} 
+void appbase\+::execution\+\_\+priority\+\_\+queue\+::executor\+::on\+\_\+work\+\_\+started (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{execution__priority__queue_8hpp_source_l00082}{82}} of file \mbox{\hyperlink{execution__priority__queue_8hpp_source}{execution\+\_\+priority\+\_\+queue.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00082\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classappbase_1_1execution__priority__queue_1_1executor_a0d465ea694d058734d4f1e754272ed29}\index{appbase::execution\_priority\_queue::executor@{appbase::execution\_priority\_queue::executor}!operator"!=@{operator"!=}}
+\index{operator"!=@{operator"!=}!appbase::execution\_priority\_queue::executor@{appbase::execution\_priority\_queue::executor}}
+\doxysubsubsection{\texorpdfstring{operator"!=()}{operator!=()}}
+{\footnotesize\ttfamily \label{classappbase_1_1execution__priority__queue_1_1executor_a0d465ea694d058734d4f1e754272ed29} 
+bool appbase\+::execution\+\_\+priority\+\_\+queue\+::executor\+::operator!= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classappbase_1_1execution__priority__queue_1_1executor}{executor}} \&}]{other}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{execution__priority__queue_8hpp_source_l00090}{90}} of file \mbox{\hyperlink{execution__priority__queue_8hpp_source}{execution\+\_\+priority\+\_\+queue.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !\mbox{\hyperlink{classappbase_1_1execution__priority__queue_1_1executor_a373acfca3c116a45aa939e13451dab03}{operator==}}(other);}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classappbase_1_1execution__priority__queue_1_1executor_a0d465ea694d058734d4f1e754272ed29_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classappbase_1_1execution__priority__queue_1_1executor_a373acfca3c116a45aa939e13451dab03}\index{appbase::execution\_priority\_queue::executor@{appbase::execution\_priority\_queue::executor}!operator==@{operator==}}
+\index{operator==@{operator==}!appbase::execution\_priority\_queue::executor@{appbase::execution\_priority\_queue::executor}}
+\doxysubsubsection{\texorpdfstring{operator==()}{operator==()}}
+{\footnotesize\ttfamily \label{classappbase_1_1execution__priority__queue_1_1executor_a373acfca3c116a45aa939e13451dab03} 
+bool appbase\+::execution\+\_\+priority\+\_\+queue\+::executor\+::operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classappbase_1_1execution__priority__queue_1_1executor}{executor}} \&}]{other}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{execution__priority__queue_8hpp_source_l00085}{85}} of file \mbox{\hyperlink{execution__priority__queue_8hpp_source}{execution\+\_\+priority\+\_\+queue.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \&context\_\ ==\ \&\mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.context\_\ \&\&\ priority\_\ ==\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.priority\_;}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classappbase_1_1execution__priority__queue_1_1executor_a373acfca3c116a45aa939e13451dab03_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classappbase_1_1execution__priority__queue_1_1executor_a6187bc264c8d052f0529c202b28f5ae4}\index{appbase::execution\_priority\_queue::executor@{appbase::execution\_priority\_queue::executor}!post@{post}}
+\index{post@{post}!appbase::execution\_priority\_queue::executor@{appbase::execution\_priority\_queue::executor}}
+\doxysubsubsection{\texorpdfstring{post()}{post()}}
+{\footnotesize\ttfamily \label{classappbase_1_1execution__priority__queue_1_1executor_a6187bc264c8d052f0529c202b28f5ae4} 
+template$<$typename Function , typename \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} $>$ \\
+void appbase\+::execution\+\_\+priority\+\_\+queue\+::executor\+::post (\begin{DoxyParamCaption}\item[{Function}]{f}{, }\item[{const \mbox{\hyperlink{classrapidjson_1_1_allocator}{Allocator}} \&}]{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{execution__priority__queue_8hpp_source_l00071}{71}} of file \mbox{\hyperlink{execution__priority__queue_8hpp_source}{execution\+\_\+priority\+\_\+queue.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ context\_.\mbox{\hyperlink{classappbase_1_1execution__priority__queue_a22eb8e2075d65127e8920e8c1089b630}{add}}(priority\_,\ std::move(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}));}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classappbase_1_1execution__priority__queue_1_1executor_a6187bc264c8d052f0529c202b28f5ae4_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/appbase/include/appbase/\mbox{\hyperlink{execution__priority__queue_8hpp}{execution\+\_\+priority\+\_\+queue.\+hpp}}\end{DoxyCompactItemize}

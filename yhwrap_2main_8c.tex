@@ -1,0 +1,357 @@
+\doxysection{libraries/yubihsm/yhwrap/main.c File Reference}
+\hypertarget{yhwrap_2main_8c}{}\label{yhwrap_2main_8c}\index{libraries/yubihsm/yhwrap/main.c@{libraries/yubihsm/yhwrap/main.c}}
+{\ttfamily \#include $<$ctype.\+h$>$}\newline
+{\ttfamily \#include $<$errno.\+h$>$}\newline
+{\ttfamily \#include $<$stdbool.\+h$>$}\newline
+{\ttfamily \#include $<$stddef.\+h$>$}\newline
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include $<$arpa/inet.\+h$>$}\newline
+{\ttfamily \#include $<$openssl/evp.\+h$>$}\newline
+{\ttfamily \#include $<$openssl/rand.\+h$>$}\newline
+{\ttfamily \#include "{}cmdline.\+h"{}}\newline
+{\ttfamily \#include "{}parsing.\+h"{}}\newline
+{\ttfamily \#include "{}util.\+h"{}}\newline
+{\ttfamily \#include $<$yubihsm.\+h$>$}\newline
+Include dependency graph for main.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{yhwrap_2main_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{yhwrap_2main_8c_a7ecc0708c24e3bc1c81751cda733aed7}{INPUT\+\_\+\+BUFSIZE}}~4096
+\item 
+\#define \mbox{\hyperlink{yhwrap_2main_8c_a8e3ef26d4d38e4fe623a8566bedb4587}{WRAPKEY\+\_\+\+BUFSIZE}}~32
+\item 
+\#define \mbox{\hyperlink{yhwrap_2main_8c_a527aa11c6cc906de77093e688d0371c2}{OBJECT\+\_\+\+HEADER\+\_\+\+SIZE}}~59
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{yhwrap_2main_8c_a0ddf1224851353fc92bfbff6f499fa97}{main}} (int argc, char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}\mbox{[}$\,$\mbox{]})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{yhwrap_2main_8c_a7ecc0708c24e3bc1c81751cda733aed7}\index{main.c@{main.c}!INPUT\_BUFSIZE@{INPUT\_BUFSIZE}}
+\index{INPUT\_BUFSIZE@{INPUT\_BUFSIZE}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{INPUT\_BUFSIZE}{INPUT\_BUFSIZE}}
+{\footnotesize\ttfamily \label{yhwrap_2main_8c_a7ecc0708c24e3bc1c81751cda733aed7} 
+\#define INPUT\+\_\+\+BUFSIZE~4096}
+
+
+
+Definition at line \mbox{\hyperlink{yhwrap_2main_8c_source_l00041}{41}} of file \mbox{\hyperlink{yhwrap_2main_8c_source}{main.\+c}}.
+
+\Hypertarget{yhwrap_2main_8c_a527aa11c6cc906de77093e688d0371c2}\index{main.c@{main.c}!OBJECT\_HEADER\_SIZE@{OBJECT\_HEADER\_SIZE}}
+\index{OBJECT\_HEADER\_SIZE@{OBJECT\_HEADER\_SIZE}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{OBJECT\_HEADER\_SIZE}{OBJECT\_HEADER\_SIZE}}
+{\footnotesize\ttfamily \label{yhwrap_2main_8c_a527aa11c6cc906de77093e688d0371c2} 
+\#define OBJECT\+\_\+\+HEADER\+\_\+\+SIZE~59}
+
+
+
+Definition at line \mbox{\hyperlink{yhwrap_2main_8c_source_l00044}{44}} of file \mbox{\hyperlink{yhwrap_2main_8c_source}{main.\+c}}.
+
+\Hypertarget{yhwrap_2main_8c_a8e3ef26d4d38e4fe623a8566bedb4587}\index{main.c@{main.c}!WRAPKEY\_BUFSIZE@{WRAPKEY\_BUFSIZE}}
+\index{WRAPKEY\_BUFSIZE@{WRAPKEY\_BUFSIZE}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{WRAPKEY\_BUFSIZE}{WRAPKEY\_BUFSIZE}}
+{\footnotesize\ttfamily \label{yhwrap_2main_8c_a8e3ef26d4d38e4fe623a8566bedb4587} 
+\#define WRAPKEY\+\_\+\+BUFSIZE~32}
+
+
+
+Definition at line \mbox{\hyperlink{yhwrap_2main_8c_source_l00042}{42}} of file \mbox{\hyperlink{yhwrap_2main_8c_source}{main.\+c}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{yhwrap_2main_8c_a0ddf1224851353fc92bfbff6f499fa97}\index{main.c@{main.c}!main@{main}}
+\index{main@{main}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{yhwrap_2main_8c_a0ddf1224851353fc92bfbff6f499fa97} 
+int main (\begin{DoxyParamCaption}\item[{int}]{argc}{, }\item[{char \texorpdfstring{$\ast$}{*}}]{argv}{\mbox{[}$\,$\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{yhwrap_2main_8c_source_l00197}{197}} of file \mbox{\hyperlink{yhwrap_2main_8c_source}{main.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00198\ \ \ \textcolor{keyword}{struct\ }gengetopt\_args\_info\ args\_info;}
+\DoxyCodeLine{00199\ }
+\DoxyCodeLine{00200\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}}\ =\ EXIT\_FAILURE;}
+\DoxyCodeLine{00201\ \ \ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366}{yh\_rc}}\ yhrc;}
+\DoxyCodeLine{00202\ }
+\DoxyCodeLine{00203\ \ \ FILE\ *input\_file\ =\ NULL;}
+\DoxyCodeLine{00204\ \ \ FILE\ *output\_file\ =\ NULL;}
+\DoxyCodeLine{00205\ \ \ FILE\ *wrapkey\_file\ =\ NULL;}
+\DoxyCodeLine{00206\ }
+\DoxyCodeLine{00207\ \textcolor{preprocessor}{\#pragma\ pack(push,\ 1)}}
+\DoxyCodeLine{00208\ \ \ \textcolor{keyword}{union\ }\{}
+\DoxyCodeLine{00209\ \ \ \ \ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ header[\mbox{\hyperlink{yhwrap_2main_8c_a527aa11c6cc906de77093e688d0371c2}{OBJECT\_HEADER\_SIZE}}];}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ body[\mbox{\hyperlink{yhwrap_2main_8c_a7ecc0708c24e3bc1c81751cda733aed7}{INPUT\_BUFSIZE}}];}
+\DoxyCodeLine{00212\ \ \ \ \ \};}
+\DoxyCodeLine{00213\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}[1];}
+\DoxyCodeLine{00214\ \ \ \}\ wrap\_object\ =\ \{\{\{0\},\ \{0\}\}\};}
+\DoxyCodeLine{00215\ \textcolor{preprocessor}{\#pragma\ pack(pop)}}
+\DoxyCodeLine{00216\ \ \ \textcolor{keywordtype}{size\_t}\ wrap\_object\_len\ =\ \textcolor{keyword}{sizeof}(wrap\_object.body);}
+\DoxyCodeLine{00217\ }
+\DoxyCodeLine{00218\ \ \ \textcolor{keywordflow}{if}\ (cmdline\_parser(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \&args\_info)\ !=\ 0)\ \{}
+\DoxyCodeLine{00219\ \ \ \ \ \textcolor{keywordflow}{goto}\ main\_exit;}
+\DoxyCodeLine{00220\ \ \ \}}
+\DoxyCodeLine{00221\ }
+\DoxyCodeLine{00222\ \ \ \mbox{\hyperlink{yubihsm_8h_a498937b5a72accbb0ef21bb1dcdd55ca}{yh\_algorithm}}\ \mbox{\hyperlink{yubihsm_8h_a67bb26eddc39413f8e94c98aedbbd391}{algorithm}};}
+\DoxyCodeLine{00223\ \ \ yhrc\ =\ \mbox{\hyperlink{yubihsm_8c_aad9943d12261cc0f0cada93cbd6d0704}{yh\_string\_to\_algo}}(args\_info.algorithm\_arg,\ \&\mbox{\hyperlink{yubihsm_8h_a67bb26eddc39413f8e94c98aedbbd391}{algorithm}});}
+\DoxyCodeLine{00224\ \ \ \textcolor{keywordflow}{if}\ (yhrc\ !=\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}})\ \{}
+\DoxyCodeLine{00225\ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Unable\ to\ parse\ algorithm:\ \%s\(\backslash\)n"{}},\ \mbox{\hyperlink{lib_2error_8c_a238eedb1e27dbff2a0ab9a3932eb3f8b}{yh\_strerror}}(yhrc));}
+\DoxyCodeLine{00226\ \ \ \ \ \textcolor{keywordflow}{goto}\ main\_exit;}
+\DoxyCodeLine{00227\ \ \ \}}
+\DoxyCodeLine{00228\ }
+\DoxyCodeLine{00229\ \ \ \mbox{\hyperlink{structyh__capabilities}{yh\_capabilities}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a08393519edfd7c59fb01fb8db97514b5}{capabilities}}\ =\ \{\{0\}\};}
+\DoxyCodeLine{00230\ \ \ yhrc\ =\ \mbox{\hyperlink{yubihsm_8c_aab440e1cb671d9ba7a2e7d1243960e42}{yh\_string\_to\_capabilities}}(args\_info.capabilities\_arg,\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a08393519edfd7c59fb01fb8db97514b5}{capabilities}});}
+\DoxyCodeLine{00231\ \ \ \textcolor{keywordflow}{if}\ (yhrc\ !=\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}})\ \{}
+\DoxyCodeLine{00232\ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Unable\ to\ parse\ capabilities:\ \%s\(\backslash\)n"{}},\ \mbox{\hyperlink{lib_2error_8c_a238eedb1e27dbff2a0ab9a3932eb3f8b}{yh\_strerror}}(yhrc));}
+\DoxyCodeLine{00233\ \ \ \ \ \textcolor{keywordflow}{goto}\ main\_exit;}
+\DoxyCodeLine{00234\ \ \ \}}
+\DoxyCodeLine{00235\ }
+\DoxyCodeLine{00236\ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a5420fd4d2f76428942c2716b1cb7e863}{domains}};}
+\DoxyCodeLine{00237\ \ \ yhrc\ =\ \mbox{\hyperlink{yubihsm_8c_a96a4c751a281515d5610adb8fd779438}{yh\_string\_to\_domains}}(args\_info.domains\_arg,\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a5420fd4d2f76428942c2716b1cb7e863}{domains}});}
+\DoxyCodeLine{00238\ \ \ \textcolor{keywordflow}{if}\ (yhrc\ !=\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}})\ \{}
+\DoxyCodeLine{00239\ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Unable\ to\ parse\ domains:\ \%s\(\backslash\)n"{}},\ \mbox{\hyperlink{lib_2error_8c_a238eedb1e27dbff2a0ab9a3932eb3f8b}{yh\_strerror}}(yhrc));}
+\DoxyCodeLine{00240\ \ \ \ \ \textcolor{keywordflow}{goto}\ main\_exit;}
+\DoxyCodeLine{00241\ \ \ \}}
+\DoxyCodeLine{00242\ }
+\DoxyCodeLine{00243\ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ \textcolor{keywordtype}{id}\ =\ args\_info.id\_arg;}
+\DoxyCodeLine{00244\ }
+\DoxyCodeLine{00245\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a22f45a3cb4f074e609f58ebaeef0ecf9}{label}}[\mbox{\hyperlink{yubihsm_8h_a431f8b753552a8b2f5f980e871b6d019}{YH\_OBJ\_LABEL\_LEN}}]\ =\ \{0\};}
+\DoxyCodeLine{00246\ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae76ac4adc41ec92427b4a14cd3385c1b}{label\_len}}\ =\ strlen(args\_info.label\_arg);}
+\DoxyCodeLine{00247\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_ae76ac4adc41ec92427b4a14cd3385c1b}{label\_len}}\ >\ \mbox{\hyperlink{yubihsm_8h_a431f8b753552a8b2f5f980e871b6d019}{YH\_OBJ\_LABEL\_LEN}})\ \{}
+\DoxyCodeLine{00248\ \ \ \ \ fprintf(stderr,}
+\DoxyCodeLine{00249\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Unable\ to\ parse\ label:\ label\ too\ long,\ maximum\ length\ is\ \%d\(\backslash\)n"{}},}
+\DoxyCodeLine{00250\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm_8h_a431f8b753552a8b2f5f980e871b6d019}{YH\_OBJ\_LABEL\_LEN}});}
+\DoxyCodeLine{00251\ \ \ \ \ \textcolor{keywordflow}{goto}\ main\_exit;}
+\DoxyCodeLine{00252\ \ \ \}}
+\DoxyCodeLine{00253\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a22f45a3cb4f074e609f58ebaeef0ecf9}{label}},\ args\_info.label\_arg,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae76ac4adc41ec92427b4a14cd3385c1b}{label\_len}});}
+\DoxyCodeLine{00254\ }
+\DoxyCodeLine{00255\ \ \ \mbox{\hyperlink{yubihsm_8h_a2fe39512cb4df34b270a67dbb8e13583}{yh\_object\_type}}\ \mbox{\hyperlink{yubihsm_8h_a1d127017fb298b889f4ba24752d08b8e}{type}};}
+\DoxyCodeLine{00256\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{util_8c_aa30f7dcd1eecdec3ebccf62bec3ad270}{algo2type}}(\mbox{\hyperlink{yubihsm_8h_a67bb26eddc39413f8e94c98aedbbd391}{algorithm}},\ \&type)\ ==\ \textcolor{keyword}{false})\ \{}
+\DoxyCodeLine{00257\ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Invalid\ algorithm\(\backslash\)n"{}});}
+\DoxyCodeLine{00258\ \ \ \ \ \textcolor{keywordflow}{goto}\ main\_exit;}
+\DoxyCodeLine{00259\ \ \ \}}
+\DoxyCodeLine{00260\ }
+\DoxyCodeLine{00261\ \ \ \mbox{\hyperlink{structyh__capabilities}{yh\_capabilities}}\ delegated\ =\ \{\{0\}\};}
+\DoxyCodeLine{00262\ \ \ \textcolor{keywordtype}{bool}\ has\_delegated\ =}
+\DoxyCodeLine{00263\ \ \ \ \ ((type\ ==\ \mbox{\hyperlink{yubihsm_8h_a2fe39512cb4df34b270a67dbb8e13583acee44b775b3c5b6157f0732699935074}{YH\_AUTHENTICATION\_KEY}}\ ||\ type\ ==\ \mbox{\hyperlink{yubihsm_8h_a2fe39512cb4df34b270a67dbb8e13583a16f0118db1dac3d0732e7d66630e1dba}{YH\_WRAP\_KEY}})\ ?\ true\ :\ \textcolor{keyword}{false});}
+\DoxyCodeLine{00264\ \ \ \textcolor{keywordflow}{if}\ (has\_delegated\ ==\ \textcolor{keyword}{true})\ \{}
+\DoxyCodeLine{00265\ \ \ \ \ \textcolor{keywordflow}{if}\ (!args\_info.delegated\_given)\ \{}
+\DoxyCodeLine{00266\ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Missing\ delegated\ capabilities\ argument\(\backslash\)n"{}});}
+\DoxyCodeLine{00267\ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ main\_exit;}
+\DoxyCodeLine{00268\ \ \ \ \ \}}
+\DoxyCodeLine{00269\ }
+\DoxyCodeLine{00270\ \ \ \ \ yhrc\ =\ \mbox{\hyperlink{yubihsm_8c_aab440e1cb671d9ba7a2e7d1243960e42}{yh\_string\_to\_capabilities}}(args\_info.delegated\_arg,\ \&delegated);}
+\DoxyCodeLine{00271\ \ \ \ \ \textcolor{keywordflow}{if}\ (yhrc\ !=\ \mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366a405155512dc2284dc210ed15be1d0815}{YHR\_SUCCESS}})\ \{}
+\DoxyCodeLine{00272\ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Unable\ to\ parse\ delegated\ capabilities:\ \%s\(\backslash\)n"{}},}
+\DoxyCodeLine{00273\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{lib_2error_8c_a238eedb1e27dbff2a0ab9a3932eb3f8b}{yh\_strerror}}(yhrc));}
+\DoxyCodeLine{00274\ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ main\_exit;}
+\DoxyCodeLine{00275\ \ \ \ \ \}}
+\DoxyCodeLine{00276\ \ \ \}}
+\DoxyCodeLine{00277\ }
+\DoxyCodeLine{00278\ \ \ input\_file\ =\ open\_file(args\_info.in\_arg,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00279\ \ \ \textcolor{keywordflow}{if}\ (input\_file\ ==\ NULL)\ \{}
+\DoxyCodeLine{00280\ \ \ \ \ perror(\textcolor{stringliteral}{"{}Unable\ to\ open\ input\ file"{}});}
+\DoxyCodeLine{00281\ \ \ \ \ \textcolor{keywordflow}{goto}\ main\_exit;}
+\DoxyCodeLine{00282\ \ \ \}}
+\DoxyCodeLine{00283\ }
+\DoxyCodeLine{00284\ \ \ \textcolor{keywordflow}{switch}\ (type)\ \{}
+\DoxyCodeLine{00285\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{yubihsm_8h_a2fe39512cb4df34b270a67dbb8e13583acee44b775b3c5b6157f0732699935074}{YH\_AUTHENTICATION\_KEY}}:\ \{}
+\DoxyCodeLine{00286\ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ password[256]\ =\ \{0\};}
+\DoxyCodeLine{00287\ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ password\_len\ =\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{attest_8c_abd7f8a696584d8ab4b9f4d1e1970be37}{password}});}
+\DoxyCodeLine{00288\ }
+\DoxyCodeLine{00289\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (input\_file\ ==\ stdin)\ \{}
+\DoxyCodeLine{00290\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *prompt\ =\ \textcolor{stringliteral}{"{}Derivation\ Password:\ "{}};}
+\DoxyCodeLine{00291\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (EVP\_read\_pw\_string(password,\ password\_len,\ prompt,\ 1))\ \{}
+\DoxyCodeLine{00292\ \ \ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Unable\ to\ read\ password\ prompt\(\backslash\)n"{}});}
+\DoxyCodeLine{00293\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ main\_exit;}
+\DoxyCodeLine{00294\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00295\ \ \ \ \ \ \ \ \ password\_len\ =\ strlen(password);}
+\DoxyCodeLine{00296\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00297\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{util_8c_ad07cc3629c0f077bad477d9a05c1081b}{read\_file}}(input\_file,\ (\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *)\ password,\ \&password\_len)\ ==}
+\DoxyCodeLine{00298\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{false})\ \{}
+\DoxyCodeLine{00299\ \ \ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Unable\ to\ read\ input\ file\(\backslash\)n"{}});}
+\DoxyCodeLine{00300\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ main\_exit;}
+\DoxyCodeLine{00301\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00302\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (password[password\_len\ -\/\ 1]\ ==\ \textcolor{charliteral}{'\(\backslash\)n'})\ \{}
+\DoxyCodeLine{00303\ \ \ \ \ \ \ \ \ \ \ password\_len-\/-\/;}
+\DoxyCodeLine{00304\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00305\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (password[password\_len\ -\/\ 1]\ ==\ \textcolor{charliteral}{'\(\backslash\)r'})\ \{}
+\DoxyCodeLine{00306\ \ \ \ \ \ \ \ \ \ \ password\_len-\/-\/;}
+\DoxyCodeLine{00307\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00308\ \ \ \ \ \ \ \ \ password[password\_len]\ =\ \textcolor{charliteral}{'\(\backslash\)0'};}
+\DoxyCodeLine{00309\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00310\ }
+\DoxyCodeLine{00311\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ key[\mbox{\hyperlink{yubihsm_8h_ac2737b2a34c26d0258d25e34993df391}{YH\_KEY\_LEN}}\ *\ 2];}
+\DoxyCodeLine{00312\ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =}
+\DoxyCodeLine{00313\ \ \ \ \ \ \ \ \ PKCS5\_PBKDF2\_HMAC((\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *)\ password,\ password\_len,}
+\DoxyCodeLine{00314\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *)\ \mbox{\hyperlink{yubihsm_8h_a73df2dc900a9511ee5d9fd99d75fd0ba}{YH\_DEFAULT\_SALT}},\ strlen(\mbox{\hyperlink{yubihsm_8h_a73df2dc900a9511ee5d9fd99d75fd0ba}{YH\_DEFAULT\_SALT}}),}
+\DoxyCodeLine{00315\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm_8h_a0d85afa29b16c45d7de642c1313278f3}{YH\_DEFAULT\_ITERS}},\ EVP\_sha256(),\ \textcolor{keyword}{sizeof}(key),\ key);}
+\DoxyCodeLine{00316\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ !=\ 1)\ \{}
+\DoxyCodeLine{00317\ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Unable\ to\ derive\ keys\(\backslash\)n"{}});}
+\DoxyCodeLine{00318\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ main\_exit;}
+\DoxyCodeLine{00319\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00320\ }
+\DoxyCodeLine{00321\ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(wrap\_object.body,\ delegated.\mbox{\hyperlink{structyh__capabilities_a5398bad7e61385aa127265ba0a053079}{capabilities}},\ \mbox{\hyperlink{yubihsm_8h_ad3c904849d17cae0a6f426e8007731d7}{YH\_CAPABILITIES\_LEN}});}
+\DoxyCodeLine{00322\ \ \ \ \ \ \ wrap\_object\_len\ -\/=\ \mbox{\hyperlink{yubihsm_8h_ad3c904849d17cae0a6f426e8007731d7}{YH\_CAPABILITIES\_LEN}};}
+\DoxyCodeLine{00323\ }
+\DoxyCodeLine{00324\ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(wrap\_object.body\ +\ \mbox{\hyperlink{yubihsm_8h_ad3c904849d17cae0a6f426e8007731d7}{YH\_CAPABILITIES\_LEN}},\ key,\ \mbox{\hyperlink{yubihsm_8h_ac2737b2a34c26d0258d25e34993df391}{YH\_KEY\_LEN}});}
+\DoxyCodeLine{00325\ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(wrap\_object.body\ +\ \mbox{\hyperlink{yubihsm_8h_ad3c904849d17cae0a6f426e8007731d7}{YH\_CAPABILITIES\_LEN}}\ +\ \mbox{\hyperlink{yubihsm_8h_ac2737b2a34c26d0258d25e34993df391}{YH\_KEY\_LEN}},}
+\DoxyCodeLine{00326\ \ \ \ \ \ \ \ \ \ \ \ \ \ key\ +\ \mbox{\hyperlink{yubihsm_8h_ac2737b2a34c26d0258d25e34993df391}{YH\_KEY\_LEN}},\ \mbox{\hyperlink{yubihsm_8h_ac2737b2a34c26d0258d25e34993df391}{YH\_KEY\_LEN}});}
+\DoxyCodeLine{00327\ \ \ \ \ \ \ wrap\_object\_len\ =\ \mbox{\hyperlink{yubihsm_8h_ad3c904849d17cae0a6f426e8007731d7}{YH\_CAPABILITIES\_LEN}}\ +\ \mbox{\hyperlink{yubihsm_8h_ac2737b2a34c26d0258d25e34993df391}{YH\_KEY\_LEN}}\ *\ 2;}
+\DoxyCodeLine{00328\ \ \ \ \ \}\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00329\ }
+\DoxyCodeLine{00330\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{yubihsm_8h_a2fe39512cb4df34b270a67dbb8e13583a16f0118db1dac3d0732e7d66630e1dba}{YH\_WRAP\_KEY}}:\ \{}
+\DoxyCodeLine{00331\ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(wrap\_object.body,\ delegated.\mbox{\hyperlink{structyh__capabilities_a5398bad7e61385aa127265ba0a053079}{capabilities}},\ \mbox{\hyperlink{yubihsm_8h_ad3c904849d17cae0a6f426e8007731d7}{YH\_CAPABILITIES\_LEN}});}
+\DoxyCodeLine{00332\ \ \ \ \ \ \ wrap\_object\_len\ -\/=\ \mbox{\hyperlink{yubihsm_8h_ad3c904849d17cae0a6f426e8007731d7}{YH\_CAPABILITIES\_LEN}};}
+\DoxyCodeLine{00333\ }
+\DoxyCodeLine{00334\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{util_8c_ad07cc3629c0f077bad477d9a05c1081b}{read\_file}}(input\_file,\ wrap\_object.body\ +\ \mbox{\hyperlink{yubihsm_8h_ad3c904849d17cae0a6f426e8007731d7}{YH\_CAPABILITIES\_LEN}},}
+\DoxyCodeLine{00335\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&wrap\_object\_len)\ ==\ \textcolor{keyword}{false})\ \{}
+\DoxyCodeLine{00336\ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Unable\ to\ read\ input\ file\(\backslash\)n"{}});}
+\DoxyCodeLine{00337\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ main\_exit;}
+\DoxyCodeLine{00338\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00339\ \ \ \ \ \ \ wrap\_object\_len\ +=\ \mbox{\hyperlink{yubihsm_8h_ad3c904849d17cae0a6f426e8007731d7}{YH\_CAPABILITIES\_LEN}};}
+\DoxyCodeLine{00340\ \ \ \ \ \}\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00341\ }
+\DoxyCodeLine{00342\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{yubihsm_8h_a2fe39512cb4df34b270a67dbb8e13583ab71424e16384319d6e6a12f9a3d8ceae}{YH\_ASYMMETRIC\_KEY}}:\ \{}
+\DoxyCodeLine{00343\ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm_8h_a498937b5a72accbb0ef21bb1dcdd55ca}{yh\_algorithm}}\ parsed\_algorithm;}
+\DoxyCodeLine{00344\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{util_8c_ad07cc3629c0f077bad477d9a05c1081b}{read\_file}}(input\_file,\ wrap\_object.body,\ \&wrap\_object\_len)\ ==\ \textcolor{keyword}{false})\ \{}
+\DoxyCodeLine{00345\ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Unable\ to\ read\ input\ file\(\backslash\)n"{}});}
+\DoxyCodeLine{00346\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ main\_exit;}
+\DoxyCodeLine{00347\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00348\ }
+\DoxyCodeLine{00349\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{util_8c_ae88d850a063cdc9ed3c114feab9af651}{read\_private\_key}}(wrap\_object.body,\ wrap\_object\_len,\ \&parsed\_algorithm,}
+\DoxyCodeLine{00350\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ wrap\_object.body,\ \&wrap\_object\_len,\ \textcolor{keyword}{true})\ !=\ \textcolor{keyword}{true})\ \{}
+\DoxyCodeLine{00351\ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Unable\ to\ read\ asymmetric\ private\ key\(\backslash\)n"{}});}
+\DoxyCodeLine{00352\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ main\_exit;}
+\DoxyCodeLine{00353\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00354\ }
+\DoxyCodeLine{00355\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (parsed\_algorithm\ !=\ \mbox{\hyperlink{yubihsm_8h_a67bb26eddc39413f8e94c98aedbbd391}{algorithm}})\ \{}
+\DoxyCodeLine{00356\ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Mismatched\ algorithm\(\backslash\)n"{}});}
+\DoxyCodeLine{00357\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ main\_exit;}
+\DoxyCodeLine{00358\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00359\ \ \ \ \ \}\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00360\ }
+\DoxyCodeLine{00361\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{yubihsm_8h_a2fe39512cb4df34b270a67dbb8e13583a708d85f80fc33743ac26a7c3e43464a9}{YH\_HMAC\_KEY}}:\ \{}
+\DoxyCodeLine{00362\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{util_8c_ad07cc3629c0f077bad477d9a05c1081b}{read\_file}}(input\_file,\ wrap\_object.body,\ \&wrap\_object\_len)\ ==\ \textcolor{keyword}{false})\ \{}
+\DoxyCodeLine{00363\ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Unable\ to\ read\ input\ file\(\backslash\)n"{}});}
+\DoxyCodeLine{00364\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ main\_exit;}
+\DoxyCodeLine{00365\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00366\ }
+\DoxyCodeLine{00367\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{util_8c_a828db4b532a10ac6546b4aaa26d1841a}{split\_hmac\_key}}(\mbox{\hyperlink{yubihsm_8h_a67bb26eddc39413f8e94c98aedbbd391}{algorithm}},\ wrap\_object.body,\ wrap\_object\_len,}
+\DoxyCodeLine{00368\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ wrap\_object.body,\ \&wrap\_object\_len)\ !=\ \textcolor{keyword}{true})\ \{}
+\DoxyCodeLine{00369\ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Unable\ to\ format\ hmac\ key\(\backslash\)n"{}});}
+\DoxyCodeLine{00370\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ main\_exit;}
+\DoxyCodeLine{00371\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00372\ \ \ \ \ \}\ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00373\ }
+\DoxyCodeLine{00374\ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00375\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{util_8c_ad07cc3629c0f077bad477d9a05c1081b}{read\_file}}(input\_file,\ wrap\_object.body,\ \&wrap\_object\_len)\ ==\ \textcolor{keyword}{false})\ \{}
+\DoxyCodeLine{00376\ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Unable\ to\ read\ input\ file\(\backslash\)n"{}});}
+\DoxyCodeLine{00377\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ main\_exit;}
+\DoxyCodeLine{00378\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00379\ \ \ \}}
+\DoxyCodeLine{00380\ }
+\DoxyCodeLine{00381\ \ \ wrapkey\_file\ =\ open\_file(args\_info.wrapkey\_arg,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00382\ \ \ \textcolor{keywordflow}{if}\ (wrapkey\_file\ ==\ NULL)\ \{}
+\DoxyCodeLine{00383\ \ \ \ \ perror(\textcolor{stringliteral}{"{}Unable\ to\ open\ wrapkey\ file"{}});}
+\DoxyCodeLine{00384\ \ \ \ \ \textcolor{keywordflow}{goto}\ main\_exit;}
+\DoxyCodeLine{00385\ \ \ \}}
+\DoxyCodeLine{00386\ }
+\DoxyCodeLine{00387\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ wrapkey\_buf[\mbox{\hyperlink{yhwrap_2main_8c_a8e3ef26d4d38e4fe623a8566bedb4587}{WRAPKEY\_BUFSIZE}}];}
+\DoxyCodeLine{00388\ \ \ \textcolor{keywordtype}{size\_t}\ wrapkey\_buf\_len\ =\ \textcolor{keyword}{sizeof}(wrapkey\_buf);}
+\DoxyCodeLine{00389\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{util_8c_ad07cc3629c0f077bad477d9a05c1081b}{read\_file}}(wrapkey\_file,\ wrapkey\_buf,\ \&wrapkey\_buf\_len)\ ==\ \textcolor{keyword}{false})\ \{}
+\DoxyCodeLine{00390\ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Unable\ to\ read\ wrapkey\ file\(\backslash\)n"{}});}
+\DoxyCodeLine{00391\ \ \ \}}
+\DoxyCodeLine{00392\ }
+\DoxyCodeLine{00393\ \ \ \mbox{\hyperlink{yubihsm_8h_a498937b5a72accbb0ef21bb1dcdd55ca}{yh\_algorithm}}\ wrapkey\_algorithm;}
+\DoxyCodeLine{00394\ \ \ \textcolor{keywordflow}{switch}\ (wrapkey\_buf\_len)\ \{}
+\DoxyCodeLine{00395\ \ \ \ \ \textcolor{keywordflow}{case}\ 16:}
+\DoxyCodeLine{00396\ \ \ \ \ \ \ wrapkey\_algorithm\ =\ \mbox{\hyperlink{yubihsm_8h_a498937b5a72accbb0ef21bb1dcdd55caae22b228e457c9bdccb5a93d81730b1b1}{YH\_ALGO\_AES128\_CCM\_WRAP}};}
+\DoxyCodeLine{00397\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00398\ \ \ \ \ \textcolor{keywordflow}{case}\ 24:}
+\DoxyCodeLine{00399\ \ \ \ \ \ \ wrapkey\_algorithm\ =\ \mbox{\hyperlink{yubihsm_8h_a498937b5a72accbb0ef21bb1dcdd55caab739a1d142dacaf37ba13a73e2d83fab}{YH\_ALGO\_AES192\_CCM\_WRAP}};}
+\DoxyCodeLine{00400\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00401\ \ \ \ \ \textcolor{keywordflow}{case}\ 32:}
+\DoxyCodeLine{00402\ \ \ \ \ \ \ wrapkey\_algorithm\ =\ \mbox{\hyperlink{yubihsm_8h_a498937b5a72accbb0ef21bb1dcdd55caa927e2246e5657f946b4da4b71092b022}{YH\_ALGO\_AES256\_CCM\_WRAP}};}
+\DoxyCodeLine{00403\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00404\ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00405\ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Unable\ to\ parse\ wrapkey:\ invalid\ length\(\backslash\)n"{}});}
+\DoxyCodeLine{00406\ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ main\_exit;}
+\DoxyCodeLine{00407\ \ \ \}}
+\DoxyCodeLine{00408\ }
+\DoxyCodeLine{00409\ \ \ output\_file\ =\ open\_file(args\_info.out\_arg,\ \textcolor{keyword}{false});}
+\DoxyCodeLine{00410\ \ \ \textcolor{keywordflow}{if}\ (output\_file\ ==\ NULL)\ \{}
+\DoxyCodeLine{00411\ \ \ \ \ perror(\textcolor{stringliteral}{"{}Unable\ to\ open\ output\ file"{}});}
+\DoxyCodeLine{00412\ \ \ \ \ \textcolor{keywordflow}{goto}\ main\_exit;}
+\DoxyCodeLine{00413\ \ \ \}}
+\DoxyCodeLine{00414\ }
+\DoxyCodeLine{00415\ \ \ format\_header(wrapkey\_algorithm,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a08393519edfd7c59fb01fb8db97514b5}{capabilities}},\ \textcolor{keywordtype}{id},\ wrap\_object\_len,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a5420fd4d2f76428942c2716b1cb7e863}{domains}},}
+\DoxyCodeLine{00416\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ type,\ \mbox{\hyperlink{yubihsm_8h_a67bb26eddc39413f8e94c98aedbbd391}{algorithm}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a22f45a3cb4f074e609f58ebaeef0ecf9}{label}},\ wrap\_object.header);}
+\DoxyCodeLine{00417\ }
+\DoxyCodeLine{00418\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ wrapped[2048]\ =\ \{0\};}
+\DoxyCodeLine{00419\ \ \ \textcolor{keywordtype}{size\_t}\ wrapped\_len\ =\ \textcolor{keyword}{sizeof}(wrapped);}
+\DoxyCodeLine{00420\ }
+\DoxyCodeLine{00421\ \ \ \textcolor{keywordflow}{if}\ (wrap\_data(wrapkey\_buf,\ wrapkey\_buf\_len,\ wrap\_object.buf,}
+\DoxyCodeLine{00422\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yhwrap_2main_8c_a527aa11c6cc906de77093e688d0371c2}{OBJECT\_HEADER\_SIZE}}\ +\ wrap\_object\_len,\ wrapped,}
+\DoxyCodeLine{00423\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&wrapped\_len)\ ==\ \textcolor{keyword}{false})\ \{}
+\DoxyCodeLine{00424\ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Unable\ to\ wrap\ data\(\backslash\)n"{}});}
+\DoxyCodeLine{00425\ \ \ \ \ \textcolor{keywordflow}{goto}\ main\_exit;}
+\DoxyCodeLine{00426\ \ \ \}}
+\DoxyCodeLine{00427\ }
+\DoxyCodeLine{00428\ \ \ \textcolor{keywordflow}{if}\ (getenv(\textcolor{stringliteral}{"{}DEBUG"{}})\ !=\ NULL)\ \{}
+\DoxyCodeLine{00429\ \ \ \ \ \mbox{\hyperlink{lib_2internal_8h_ab6791ffb401264facac44a8380c7eed4}{dump\_hex}}(wrap\_object.buf,\ \mbox{\hyperlink{yhwrap_2main_8c_a527aa11c6cc906de77093e688d0371c2}{OBJECT\_HEADER\_SIZE}}\ +\ wrap\_object\_len);}
+\DoxyCodeLine{00430\ \ \ \}}
+\DoxyCodeLine{00431\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{util_8c_ad969d220471d10a9f07080b50210f403}{write\_file}}(wrapped,\ wrapped\_len,\ output\_file,\ \mbox{\hyperlink{yubihsm_2common_2util_8h_a7f2d5efe3b72f18c665b57201b20d794a897ecd660d50b4626e3a21879d88e1ee}{\_base64}})\ ==\ \textcolor{keyword}{false}\ ||}
+\DoxyCodeLine{00432\ \ \ \ \ \ \ \mbox{\hyperlink{util_8c_ad969d220471d10a9f07080b50210f403}{write\_file}}((\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ *)\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}},\ 1,\ output\_file,\ \mbox{\hyperlink{yubihsm_2common_2util_8h_a7f2d5efe3b72f18c665b57201b20d794acd899676f78b1547912b37fba7fe34d1}{\_binary}})\ ==\ \textcolor{keyword}{false})\ \{}
+\DoxyCodeLine{00433\ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}Unable\ to\ write\ output\ file\(\backslash\)n"{}});}
+\DoxyCodeLine{00434\ \ \ \ \ \textcolor{keywordflow}{goto}\ main\_exit;}
+\DoxyCodeLine{00435\ \ \ \}}
+\DoxyCodeLine{00436\ }
+\DoxyCodeLine{00437\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}}\ =\ EXIT\_SUCCESS;}
+\DoxyCodeLine{00438\ }
+\DoxyCodeLine{00439\ main\_exit:}
+\DoxyCodeLine{00440\ }
+\DoxyCodeLine{00441\ \ \ cmdline\_parser\_free(\&args\_info);}
+\DoxyCodeLine{00442\ }
+\DoxyCodeLine{00443\ \ \ \textcolor{keywordflow}{if}\ (input\_file\ !=\ NULL)\ \{}
+\DoxyCodeLine{00444\ \ \ \ \ fclose(input\_file);}
+\DoxyCodeLine{00445\ \ \ \ \ input\_file\ =\ NULL;}
+\DoxyCodeLine{00446\ \ \ \}}
+\DoxyCodeLine{00447\ }
+\DoxyCodeLine{00448\ \ \ \textcolor{keywordflow}{if}\ (output\_file\ !=\ NULL)\ \{}
+\DoxyCodeLine{00449\ \ \ \ \ fclose(output\_file);}
+\DoxyCodeLine{00450\ \ \ \ \ output\_file\ =\ NULL;}
+\DoxyCodeLine{00451\ \ \ \}}
+\DoxyCodeLine{00452\ }
+\DoxyCodeLine{00453\ \ \ \textcolor{keywordflow}{if}\ (wrapkey\_file\ !=\ NULL)\ \{}
+\DoxyCodeLine{00454\ \ \ \ \ fclose(wrapkey\_file);}
+\DoxyCodeLine{00455\ \ \ \ \ wrapkey\_file\ =\ NULL;}
+\DoxyCodeLine{00456\ \ \ \}}
+\DoxyCodeLine{00457\ }
+\DoxyCodeLine{00458\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a97917e1d5a9fa5e8b7a4495dc9234ac7}{rc}};}
+\DoxyCodeLine{00459\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{yhwrap_2main_8c_a0ddf1224851353fc92bfbff6f499fa97_cgraph}
+\end{center}
+\end{figure}

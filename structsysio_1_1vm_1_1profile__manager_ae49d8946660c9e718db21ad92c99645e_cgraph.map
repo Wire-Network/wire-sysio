@@ -1,0 +1,11 @@
+<map id="sysio::vm::profile_manager::profile_manager" name="sysio::vm::profile_manager::profile_manager">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,39,184,79"/>
+<area shape="rect" id="Node000002" href="$namespacesysio_1_1vm.html#a069fc506d558bd9390d7989f7866fa0e" title=" " alt="" coords="232,39,385,79"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="184,56,216,56,216,62,184,62"/>
+<area shape="rect" id="Node000003" href="$namespacesysio_1_1vm.html#a54ec5a188f3bccc28c33687d74736bdf" title=" " alt="" coords="440,5,610,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="385,45,424,38,425,44,386,50"/>
+<area shape="rect" id="Node000004" href="$namespacesysio_1_1vm.html#a6122ff8c14e0a69248ee037ef03c28ad" title=" " alt="" coords="433,71,617,111"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="386,68,418,72,417,78,385,73"/>
+<area shape="rect" id="Node000005" href="$namespacesysio_1_1vm.html#a04f2ca5cd59cf8032ca5d8c221e0c64f" title=" " alt="" coords="665,71,787,111"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="617,88,650,88,650,94,617,94"/>
+</map>

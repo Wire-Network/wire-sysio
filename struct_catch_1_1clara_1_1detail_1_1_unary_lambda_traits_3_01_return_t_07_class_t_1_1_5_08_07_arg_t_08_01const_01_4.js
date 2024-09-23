@@ -1,0 +1,5 @@
+var struct_catch_1_1clara_1_1detail_1_1_unary_lambda_traits_3_01_return_t_07_class_t_1_1_5_08_07_arg_t_08_01const_01_4 =
+[
+    [ "ArgType", "struct_catch_1_1clara_1_1detail_1_1_unary_lambda_traits_3_01_return_t_07_class_t_1_1_5_08_07_arg_t_08_01const_01_4.html#af715036a7c3734d08df24fb3e9b45712", null ],
+    [ "ReturnType", "struct_catch_1_1clara_1_1detail_1_1_unary_lambda_traits_3_01_return_t_07_class_t_1_1_5_08_07_arg_t_08_01const_01_4.html#a908a84024dbe93b886de0edf96242204", null ]
+];

@@ -1,0 +1,317 @@
+\doxysection{gtest\+\_\+catch\+\_\+exceptions\+\_\+test\+\_\+.\+cc}
+\hypertarget{gtest__catch__exceptions__test___8cc_source}{}\label{gtest__catch__exceptions__test___8cc_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/test/gtest\_catch\_exceptions\_test\_.cc@{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/test/gtest\_catch\_exceptions\_test\_.cc}}
+\mbox{\hyperlink{gtest__catch__exceptions__test___8cc}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00001}00001\ \textcolor{comment}{//\ Copyright\ 2010,\ Google\ Inc.}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00002}00002\ \textcolor{comment}{//\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00003}00003\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00004}00004\ \textcolor{comment}{//\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00005}00005\ \textcolor{comment}{//\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00006}00006\ \textcolor{comment}{//\ met:}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00007}00007\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00008}00008\ \textcolor{comment}{//\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00009}00009\ \textcolor{comment}{//\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00010}00010\ \textcolor{comment}{//\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00011}00011\ \textcolor{comment}{//\ copyright\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00012}00012\ \textcolor{comment}{//\ in\ the\ documentation\ and/or\ other\ materials\ provided\ with\ the}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00013}00013\ \textcolor{comment}{//\ distribution.}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00014}00014\ \textcolor{comment}{//\ \ \ \ \ *\ Neither\ the\ name\ of\ Google\ Inc.\ nor\ the\ names\ of\ its}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00015}00015\ \textcolor{comment}{//\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products\ derived\ from}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00016}00016\ \textcolor{comment}{//\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00017}00017\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00018}00018\ \textcolor{comment}{//\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00019}00019\ \textcolor{comment}{//\ "{}AS\ IS"{}\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00020}00020\ \textcolor{comment}{//\ LIMITED\ TO,\ THE\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00021}00021\ \textcolor{comment}{//\ A\ PARTICULAR\ PURPOSE\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ THE\ COPYRIGHT}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00022}00022\ \textcolor{comment}{//\ OWNER\ OR\ CONTRIBUTORS\ BE\ LIABLE\ FOR\ ANY\ DIRECT,\ INDIRECT,\ INCIDENTAL,}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00023}00023\ \textcolor{comment}{//\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES\ (INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00024}00024\ \textcolor{comment}{//\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;\ LOSS\ OF\ USE,}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00025}00025\ \textcolor{comment}{//\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND\ ON\ ANY}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00026}00026\ \textcolor{comment}{//\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00027}00027\ \textcolor{comment}{//\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00028}00028\ \textcolor{comment}{//\ OF\ THIS\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00029}00029\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00030}00030\ \textcolor{comment}{//\ Author:\ vladl@google.com\ (Vlad\ Losev)}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00031}00031\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00032}00032\ \textcolor{comment}{//\ Tests\ for\ Google\ Test\ itself.\ Tests\ in\ this\ file\ throw\ C++\ or\ SEH}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00033}00033\ \textcolor{comment}{//\ exceptions,\ and\ the\ output\ is\ verified\ by\ gtest\_catch\_exceptions\_test.py.}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00035}00035\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{gtest_8h}{gtest/gtest.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00037}00037\ \textcolor{preprocessor}{\#include\ <stdio.h>}\ \ \textcolor{comment}{//\ NOLINT}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00038}00038\ \textcolor{preprocessor}{\#include\ <stdlib.h>}\ \ \textcolor{comment}{//\ For\ exit().}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00040}00040\ \textcolor{preprocessor}{\#if\ GTEST\_HAS\_SEH}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00041}00041\ \textcolor{preprocessor}{\#\ include\ <windows.h>}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00042}00042\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00044}00044\ \textcolor{preprocessor}{\#if\ GTEST\_HAS\_EXCEPTIONS}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00045}00045\ \textcolor{preprocessor}{\#\ include\ <exception>}\ \ \textcolor{comment}{//\ For\ set\_terminate().}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00046}00046\ \textcolor{preprocessor}{\#\ include\ <stdexcept>}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00047}00047\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00049}00049\ \textcolor{keyword}{using\ }\mbox{\hyperlink{classtesting_1_1_test}{testing::Test}};}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00051}00051\ \textcolor{preprocessor}{\#if\ GTEST\_HAS\_SEH}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00052}00052\ }
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00053}00053\ \textcolor{keyword}{class\ }SehExceptionInConstructorTest\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1_test}{Test}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00054}00054\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00055}00055\ \ \ SehExceptionInConstructorTest()\ \{\ RaiseException(42,\ 0,\ 0,\ NULL);\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00056}00056\ \};}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00058}00058\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(SehExceptionInConstructorTest,\ ThrowsExceptionInConstructor)\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00060}00060\ \textcolor{keyword}{class\ }SehExceptionInDestructorTest\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1_test}{Test}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00061}00061\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00062}00062\ \ \ \string~SehExceptionInDestructorTest()\ \{\ RaiseException(42,\ 0,\ 0,\ NULL);\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00063}00063\ \};}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00065}00065\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(SehExceptionInDestructorTest,\ ThrowsExceptionInDestructor)\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00067}00067\ \textcolor{keyword}{class\ }SehExceptionInSetUpTestCaseTest\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1_test}{Test}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00068}00068\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00069}00069\ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1_test_a5ccbac42fee8c5b00b0bfe89b6c49d79}{SetUpTestCase}}()\ \{\ RaiseException(42,\ 0,\ 0,\ NULL);\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00070}00070\ \};}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00072}00072\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(SehExceptionInSetUpTestCaseTest,\ ThrowsExceptionInSetUpTestCase)\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00073}00073\ }
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00074}00074\ \textcolor{keyword}{class\ }SehExceptionInTearDownTestCaseTest\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1_test}{Test}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00075}00075\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00076}00076\ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1_test_af374706cbaf0ffc460f4fd04e7c150f1}{TearDownTestCase}}()\ \{\ RaiseException(42,\ 0,\ 0,\ NULL);\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00077}00077\ \};}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00079}00079\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(SehExceptionInTearDownTestCaseTest,\ ThrowsExceptionInTearDownTestCase)\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00080}00080\ }
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00081}00081\ \textcolor{keyword}{class\ }SehExceptionInSetUpTest\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1_test}{Test}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00082}00082\ \ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00083}00083\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1_test_a190315150c303ddf801313fd1a777733}{SetUp}}()\ \{\ RaiseException(42,\ 0,\ 0,\ NULL);\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00084}00084\ \};}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00085}00085\ }
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00086}00086\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(SehExceptionInSetUpTest,\ ThrowsExceptionInSetUp)\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00087}00087\ }
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00088}00088\ \textcolor{keyword}{class\ }SehExceptionInTearDownTest\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1_test}{Test}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00089}00089\ \ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00090}00090\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1_test_a5f0ab439802cbe0ef7552f1a9f791923}{TearDown}}()\ \{\ RaiseException(42,\ 0,\ 0,\ NULL);\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00091}00091\ \};}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00092}00092\ }
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00093}00093\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(SehExceptionInTearDownTest,\ ThrowsExceptionInTearDown)\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00094}00094\ }
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00095}00095\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(SehExceptionTest,\ ThrowsSehException)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00096}00096\ \ \ RaiseException(42,\ 0,\ 0,\ NULL);}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00097}00097\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00098}00098\ }
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00099}00099\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_HAS\_SEH}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00100}00100\ }
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00101}00101\ \textcolor{preprocessor}{\#if\ GTEST\_HAS\_EXCEPTIONS}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00102}00102\ }
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00103}00103\ \textcolor{keyword}{class\ }CxxExceptionInConstructorTest\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1_test}{Test}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00104}00104\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00105}00105\ \ \ CxxExceptionInConstructorTest()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00106}00106\ \ \ \ \ \textcolor{comment}{//\ Without\ this\ macro\ VC++\ complains\ about\ unreachable\ code\ at\ the\ end\ of}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00107}00107\ \ \ \ \ \textcolor{comment}{//\ the\ constructor.}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00108}00108\ \ \ \ \ \mbox{\hyperlink{gtest-internal_8h_a2e66f7dfc5cb87e0fa0289f653173c69}{GTEST\_SUPPRESS\_UNREACHABLE\_CODE\_WARNING\_BELOW\_}}(}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00109}00109\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}Standard\ C++\ exception"{}}));}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00110}00110\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00111}00111\ }
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00112}00112\ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1_test_af374706cbaf0ffc460f4fd04e7c150f1}{TearDownTestCase}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00113}00113\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\%s"{}},}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00114}00114\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}CxxExceptionInConstructorTest::TearDownTestCase()\ "{}}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00115}00115\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}called\ as\ expected.\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00116}00116\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00117}00117\ }
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00118}00118\ \ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00119}00119\ \ \ \string~CxxExceptionInConstructorTest()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00120}00120\ \ \ \ \ \mbox{\hyperlink{gtest_8h_adc16b5b0a740c39084ea5c9e960e3063}{ADD\_FAILURE}}()\ <<\ \textcolor{stringliteral}{"{}CxxExceptionInConstructorTest\ destructor\ "{}}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00121}00121\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}called\ unexpectedly."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00122}00122\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00123}00123\ }
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00124}00124\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1_test_a190315150c303ddf801313fd1a777733}{SetUp}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00125}00125\ \ \ \ \ \mbox{\hyperlink{gtest_8h_adc16b5b0a740c39084ea5c9e960e3063}{ADD\_FAILURE}}()\ <<\ \textcolor{stringliteral}{"{}CxxExceptionInConstructorTest::SetUp()\ "{}}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00126}00126\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}called\ unexpectedly."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00127}00127\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00128}00128\ }
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00129}00129\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1_test_a5f0ab439802cbe0ef7552f1a9f791923}{TearDown}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00130}00130\ \ \ \ \ \mbox{\hyperlink{gtest_8h_adc16b5b0a740c39084ea5c9e960e3063}{ADD\_FAILURE}}()\ <<\ \textcolor{stringliteral}{"{}CxxExceptionInConstructorTest::TearDown()\ "{}}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00131}00131\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}called\ unexpectedly."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00132}00132\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00133}00133\ \};}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00134}00134\ }
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00135}00135\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(CxxExceptionInConstructorTest,\ ThrowsExceptionInConstructor)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00136}00136\ \ \ \mbox{\hyperlink{gtest_8h_adc16b5b0a740c39084ea5c9e960e3063}{ADD\_FAILURE}}()\ <<\ \textcolor{stringliteral}{"{}CxxExceptionInConstructorTest\ test\ body\ "{}}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00137}00137\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}called\ unexpectedly."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00138}00138\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00139}00139\ }
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00140}00140\ \textcolor{comment}{//\ Exceptions\ in\ destructors\ are\ not\ supported\ in\ C++11.}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00141}00141\ \textcolor{preprocessor}{\#if\ !GTEST\_LANG\_CXX11}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00142}00142\ \textcolor{keyword}{class\ }CxxExceptionInDestructorTest\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1_test}{Test}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00143}00143\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00144}00144\ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1_test_af374706cbaf0ffc460f4fd04e7c150f1}{TearDownTestCase}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00145}00145\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\%s"{}},}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00146}00146\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}CxxExceptionInDestructorTest::TearDownTestCase()\ "{}}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00147}00147\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}called\ as\ expected.\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00148}00148\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00149}00149\ }
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00150}00150\ \ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00151}00151\ \ \ \string~CxxExceptionInDestructorTest()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00152}00152\ \ \ \ \ \mbox{\hyperlink{gtest-internal_8h_a2e66f7dfc5cb87e0fa0289f653173c69}{GTEST\_SUPPRESS\_UNREACHABLE\_CODE\_WARNING\_BELOW\_}}(}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00153}00153\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}Standard\ C++\ exception"{}}));}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00154}00154\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00155}00155\ \};}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00156}00156\ }
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00157}00157\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(CxxExceptionInDestructorTest,\ ThrowsExceptionInDestructor)\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00158}00158\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ C++11\ mode}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00159}00159\ }
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00160}00160\ \textcolor{keyword}{class\ }CxxExceptionInSetUpTestCaseTest\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1_test}{Test}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00161}00161\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00162}00162\ \ \ CxxExceptionInSetUpTestCaseTest()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00163}00163\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\%s"{}},}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00164}00164\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}CxxExceptionInSetUpTestCaseTest\ constructor\ "{}}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00165}00165\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}called\ as\ expected.\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00166}00166\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00167}00167\ }
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00168}00168\ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1_test_a5ccbac42fee8c5b00b0bfe89b6c49d79}{SetUpTestCase}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00169}00169\ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}Standard\ C++\ exception"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00170}00170\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00171}00171\ }
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00172}00172\ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1_test_af374706cbaf0ffc460f4fd04e7c150f1}{TearDownTestCase}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00173}00173\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\%s"{}},}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00174}00174\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}CxxExceptionInSetUpTestCaseTest::TearDownTestCase()\ "{}}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00175}00175\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}called\ as\ expected.\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00176}00176\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00177}00177\ }
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00178}00178\ \ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00179}00179\ \ \ \string~CxxExceptionInSetUpTestCaseTest()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00180}00180\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\%s"{}},}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00181}00181\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}CxxExceptionInSetUpTestCaseTest\ destructor\ "{}}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00182}00182\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}called\ as\ expected.\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00183}00183\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00184}00184\ }
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00185}00185\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1_test_a190315150c303ddf801313fd1a777733}{SetUp}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00186}00186\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\%s"{}},}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00187}00187\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}CxxExceptionInSetUpTestCaseTest::SetUp()\ "{}}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00188}00188\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}called\ as\ expected.\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00189}00189\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00190}00190\ }
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00191}00191\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1_test_a5f0ab439802cbe0ef7552f1a9f791923}{TearDown}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00192}00192\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\%s"{}},}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00193}00193\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}CxxExceptionInSetUpTestCaseTest::TearDown()\ "{}}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00194}00194\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}called\ as\ expected.\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00195}00195\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00196}00196\ \};}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00197}00197\ }
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00198}00198\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(CxxExceptionInSetUpTestCaseTest,\ ThrowsExceptionInSetUpTestCase)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00199}00199\ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\%s"{}},}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00200}00200\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}CxxExceptionInSetUpTestCaseTest\ test\ body\ "{}}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00201}00201\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}called\ as\ expected.\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00202}00202\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00203}00203\ }
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00204}00204\ \textcolor{keyword}{class\ }CxxExceptionInTearDownTestCaseTest\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1_test}{Test}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00205}00205\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00206}00206\ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1_test_af374706cbaf0ffc460f4fd04e7c150f1}{TearDownTestCase}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00207}00207\ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}Standard\ C++\ exception"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00208}00208\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00209}00209\ \};}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00210}00210\ }
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00211}00211\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(CxxExceptionInTearDownTestCaseTest,\ ThrowsExceptionInTearDownTestCase)\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00212}00212\ }
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00213}00213\ \textcolor{keyword}{class\ }CxxExceptionInSetUpTest\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1_test}{Test}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00214}00214\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00215}00215\ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1_test_af374706cbaf0ffc460f4fd04e7c150f1}{TearDownTestCase}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00216}00216\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\%s"{}},}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00217}00217\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}CxxExceptionInSetUpTest::TearDownTestCase()\ "{}}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00218}00218\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}called\ as\ expected.\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00219}00219\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00220}00220\ }
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00221}00221\ \ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00222}00222\ \ \ \string~CxxExceptionInSetUpTest()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00223}00223\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\%s"{}},}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00224}00224\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}CxxExceptionInSetUpTest\ destructor\ "{}}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00225}00225\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}called\ as\ expected.\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00226}00226\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00227}00227\ }
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00228}00228\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1_test_a190315150c303ddf801313fd1a777733}{SetUp}}()\ \{\ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}Standard\ C++\ exception"{}});\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00229}00229\ }
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00230}00230\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1_test_a5f0ab439802cbe0ef7552f1a9f791923}{TearDown}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00231}00231\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\%s"{}},}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00232}00232\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}CxxExceptionInSetUpTest::TearDown()\ "{}}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00233}00233\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}called\ as\ expected.\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00234}00234\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00235}00235\ \};}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00236}00236\ }
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00237}00237\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(CxxExceptionInSetUpTest,\ ThrowsExceptionInSetUp)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00238}00238\ \ \ \mbox{\hyperlink{gtest_8h_adc16b5b0a740c39084ea5c9e960e3063}{ADD\_FAILURE}}()\ <<\ \textcolor{stringliteral}{"{}CxxExceptionInSetUpTest\ test\ body\ "{}}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00239}00239\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}called\ unexpectedly."{}};}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00240}00240\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00241}00241\ }
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00242}00242\ \textcolor{keyword}{class\ }CxxExceptionInTearDownTest\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1_test}{Test}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00243}00243\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00244}00244\ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1_test_af374706cbaf0ffc460f4fd04e7c150f1}{TearDownTestCase}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00245}00245\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\%s"{}},}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00246}00246\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}CxxExceptionInTearDownTest::TearDownTestCase()\ "{}}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00247}00247\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}called\ as\ expected.\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00248}00248\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00249}00249\ }
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00250}00250\ \ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00251}00251\ \ \ \string~CxxExceptionInTearDownTest()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00252}00252\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\%s"{}},}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00253}00253\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}CxxExceptionInTearDownTest\ destructor\ "{}}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00254}00254\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}called\ as\ expected.\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00255}00255\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00256}00256\ }
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00257}00257\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1_test_a5f0ab439802cbe0ef7552f1a9f791923}{TearDown}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00258}00258\ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}Standard\ C++\ exception"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00259}00259\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00260}00260\ \};}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00261}00261\ }
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00262}00262\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(CxxExceptionInTearDownTest,\ ThrowsExceptionInTearDown)\ \{\}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00263}00263\ }
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00264}00264\ \textcolor{keyword}{class\ }CxxExceptionInTestBodyTest\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1_test}{Test}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00265}00265\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00266}00266\ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1_test_af374706cbaf0ffc460f4fd04e7c150f1}{TearDownTestCase}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00267}00267\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\%s"{}},}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00268}00268\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}CxxExceptionInTestBodyTest::TearDownTestCase()\ "{}}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00269}00269\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}called\ as\ expected.\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00270}00270\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00271}00271\ }
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00272}00272\ \ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00273}00273\ \ \ \string~CxxExceptionInTestBodyTest()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00274}00274\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\%s"{}},}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00275}00275\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}CxxExceptionInTestBodyTest\ destructor\ "{}}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00276}00276\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}called\ as\ expected.\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00277}00277\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00278}00278\ }
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00279}00279\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1_test_a5f0ab439802cbe0ef7552f1a9f791923}{TearDown}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00280}00280\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\%s"{}},}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00281}00281\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}CxxExceptionInTestBodyTest::TearDown()\ "{}}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00282}00282\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}called\ as\ expected.\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00283}00283\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00284}00284\ \};}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00285}00285\ }
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00286}00286\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(CxxExceptionInTestBodyTest,\ ThrowsStdCxxException)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00287}00287\ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}Standard\ C++\ exception"{}});}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00288}00288\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00289}00289\ }
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00290}00290\ \mbox{\hyperlink{gtest_8h_ad8b332753515c0ab8baada563c2547eb}{TEST}}(CxxExceptionTest,\ ThrowsNonStdCxxException)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00291}00291\ \ \ \textcolor{keywordflow}{throw}\ \textcolor{stringliteral}{"{}C-\/string"{}};}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00292}00292\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00293}00293\ }
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00294}00294\ \textcolor{comment}{//\ This\ terminate\ handler\ aborts\ the\ program\ using\ exit()\ rather\ than\ abort().}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00295}00295\ \textcolor{comment}{//\ This\ avoids\ showing\ pop-\/ups\ on\ Windows\ systems\ and\ core\ dumps\ on\ Unix-\/like}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00296}00296\ \textcolor{comment}{//\ ones.}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00297}00297\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{gtest__throw__on__failure__test___8cc_a478ad0386ef3cac98d230812ed07eeda}{TerminateHandler}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00298}00298\ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}\%s\(\backslash\)n"{}},\ \textcolor{stringliteral}{"{}Unhandled\ C++\ exception\ terminating\ the\ program."{}});}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00299}00299\ \ \ fflush(NULL);}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00300}00300\ \ \ exit(3);}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00301}00301\ \}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00302}00302\ }
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00303}00303\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_HAS\_EXCEPTIONS}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00304}00304\ }
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00305}\mbox{\hyperlink{gtest__catch__exceptions__test___8cc_a3c04138a5bfe5d72780bb7e82a18e627}{00305}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}(\textcolor{keywordtype}{int}\ argc,\ \textcolor{keywordtype}{char}**\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}})\ \{}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00306}00306\ \textcolor{preprocessor}{\#if\ GTEST\_HAS\_EXCEPTIONS}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00307}00307\ \ \ std::set\_terminate(\&\mbox{\hyperlink{struct_terminate_handler}{TerminateHandler}});}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00308}00308\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00309}00309\ \ \ \mbox{\hyperlink{namespacetesting_afd726ae08c9bd16dc52f78c822d9946b}{testing::InitGoogleTest}}(\&argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}});}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00310}00310\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{gtest_8h_a853a3792807489591d3d4a2f2ff9359f}{RUN\_ALL\_TESTS}}();}
+\DoxyCodeLine{\Hypertarget{gtest__catch__exceptions__test___8cc_source_l00311}00311\ \}}
+
+\end{DoxyCode}

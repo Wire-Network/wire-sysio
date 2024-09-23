@@ -1,0 +1,9 @@
+<map id="sysio::chain::wasm_validations::wasm_binary_validation::validate" name="sysio::chain::wasm_validations::wasm_binary_validation::validate">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,85,181,141"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1wasm__ops_1_1_s_y_s_i_o___operator_decoder_stream.html#aa12d4dd63dadb1d67b32171d0865567a" title=" " alt="" coords="229,5,433,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="177,82,231,64,233,69,179,87"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1chain_1_1wasm__ops_1_1_s_y_s_i_o___operator_decoder_stream.html#ae197d6085fac624ce06f616ac76a31eb" title=" " alt="" coords="229,85,433,141"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="181,110,213,110,213,116,181,116"/>
+<area shape="rect" id="Node000004" href="$structsysio_1_1chain_1_1wasm__validations_1_1constraints__validators.html#a5877932790ab481936d86993165e7278" title=" " alt="" coords="250,165,412,221"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="179,139,236,159,234,164,177,144"/>
+</map>

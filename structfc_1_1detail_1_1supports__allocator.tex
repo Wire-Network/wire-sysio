@@ -1,0 +1,65 @@
+\doxysection{fc\+::detail\+::supports\+\_\+allocator\texorpdfstring{$<$}{<} T, A, Args \texorpdfstring{$>$}{>} Struct Template Reference}
+\hypertarget{structfc_1_1detail_1_1supports__allocator}{}\label{structfc_1_1detail_1_1supports__allocator}\index{fc::detail::supports\_allocator$<$ T, A, Args $>$@{fc::detail::supports\_allocator$<$ T, A, Args $>$}}
+
+
+{\ttfamily \#include $<$utility.\+hpp$>$}
+
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static constexpr bool \mbox{\hyperlink{structfc_1_1detail_1_1supports__allocator_ae7adb71f0579543c9b752d9bd6497b67}{value}} = std\+::uses\+\_\+allocator$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{struct_a}{A}}$>$\+::value
+\item 
+static constexpr bool \mbox{\hyperlink{structfc_1_1detail_1_1supports__allocator_a1b4c98a3954fc713cf88bcb3e75e2a82}{leading\+\_\+allocator}} = std\+::is\+\_\+constructible$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, std\+::allocator\+\_\+arg\+\_\+t, \mbox{\hyperlink{struct_a}{A}}, Args... $>$\mbox{\hyperlink{structfc_1_1detail_1_1supports__allocator_ae7adb71f0579543c9b752d9bd6497b67}{\+::value}}
+\item 
+static constexpr bool \mbox{\hyperlink{structfc_1_1detail_1_1supports__allocator_a06b4d0b47a44053236b39cb2d87d0eb6}{trailing\+\_\+allocator}} = std\+::is\+\_\+constructible$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Args..., \mbox{\hyperlink{struct_a}{A}}$>$\mbox{\hyperlink{structfc_1_1detail_1_1supports__allocator_ae7adb71f0579543c9b752d9bd6497b67}{\+::value}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, typename \mbox{\hyperlink{struct_a}{A}}, typename... Args$>$\newline
+struct fc\+::detail\+::supports\+\_\+allocator$<$ T, A, Args $>$}
+
+
+Definition at line \mbox{\hyperlink{utility_8hpp_source_l00052}{52}} of file \mbox{\hyperlink{utility_8hpp_source}{utility.\+hpp}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structfc_1_1detail_1_1supports__allocator_a1b4c98a3954fc713cf88bcb3e75e2a82}\index{fc::detail::supports\_allocator$<$ T, A, Args $>$@{fc::detail::supports\_allocator$<$ T, A, Args $>$}!leading\_allocator@{leading\_allocator}}
+\index{leading\_allocator@{leading\_allocator}!fc::detail::supports\_allocator$<$ T, A, Args $>$@{fc::detail::supports\_allocator$<$ T, A, Args $>$}}
+\doxysubsubsection{\texorpdfstring{leading\_allocator}{leading\_allocator}}
+{\footnotesize\ttfamily \label{structfc_1_1detail_1_1supports__allocator_a1b4c98a3954fc713cf88bcb3e75e2a82} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{struct_a}{A}} , typename... Args$>$ \\
+bool \mbox{\hyperlink{structfc_1_1detail_1_1supports__allocator}{fc\+::detail\+::supports\+\_\+allocator}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{struct_a}{A}}, Args $>$\+::leading\+\_\+allocator = std\+::is\+\_\+constructible$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, std\+::allocator\+\_\+arg\+\_\+t, \mbox{\hyperlink{struct_a}{A}}, Args... $>$\mbox{\hyperlink{structfc_1_1detail_1_1supports__allocator_ae7adb71f0579543c9b752d9bd6497b67}{\+::value}}\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{utility_8hpp_source_l00055}{55}} of file \mbox{\hyperlink{utility_8hpp_source}{utility.\+hpp}}.
+
+\Hypertarget{structfc_1_1detail_1_1supports__allocator_a06b4d0b47a44053236b39cb2d87d0eb6}\index{fc::detail::supports\_allocator$<$ T, A, Args $>$@{fc::detail::supports\_allocator$<$ T, A, Args $>$}!trailing\_allocator@{trailing\_allocator}}
+\index{trailing\_allocator@{trailing\_allocator}!fc::detail::supports\_allocator$<$ T, A, Args $>$@{fc::detail::supports\_allocator$<$ T, A, Args $>$}}
+\doxysubsubsection{\texorpdfstring{trailing\_allocator}{trailing\_allocator}}
+{\footnotesize\ttfamily \label{structfc_1_1detail_1_1supports__allocator_a06b4d0b47a44053236b39cb2d87d0eb6} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{struct_a}{A}} , typename... Args$>$ \\
+bool \mbox{\hyperlink{structfc_1_1detail_1_1supports__allocator}{fc\+::detail\+::supports\+\_\+allocator}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{struct_a}{A}}, Args $>$\+::trailing\+\_\+allocator = std\+::is\+\_\+constructible$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, Args..., \mbox{\hyperlink{struct_a}{A}}$>$\mbox{\hyperlink{structfc_1_1detail_1_1supports__allocator_ae7adb71f0579543c9b752d9bd6497b67}{\+::value}}\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{utility_8hpp_source_l00056}{56}} of file \mbox{\hyperlink{utility_8hpp_source}{utility.\+hpp}}.
+
+\Hypertarget{structfc_1_1detail_1_1supports__allocator_ae7adb71f0579543c9b752d9bd6497b67}\index{fc::detail::supports\_allocator$<$ T, A, Args $>$@{fc::detail::supports\_allocator$<$ T, A, Args $>$}!value@{value}}
+\index{value@{value}!fc::detail::supports\_allocator$<$ T, A, Args $>$@{fc::detail::supports\_allocator$<$ T, A, Args $>$}}
+\doxysubsubsection{\texorpdfstring{value}{value}}
+{\footnotesize\ttfamily \label{structfc_1_1detail_1_1supports__allocator_ae7adb71f0579543c9b752d9bd6497b67} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename \mbox{\hyperlink{struct_a}{A}} , typename... Args$>$ \\
+bool \mbox{\hyperlink{structfc_1_1detail_1_1supports__allocator}{fc\+::detail\+::supports\+\_\+allocator}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{struct_a}{A}}, Args $>$\+::value = std\+::uses\+\_\+allocator$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{struct_a}{A}}$>$\+::value\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{utility_8hpp_source_l00054}{54}} of file \mbox{\hyperlink{utility_8hpp_source}{utility.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/\mbox{\hyperlink{utility_8hpp}{utility.\+hpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,101 @@
+\doxysection{ripemd160.\+hpp}
+\hypertarget{ripemd160_8hpp_source}{}\label{ripemd160_8hpp_source}\index{libraries/fc/include/fc/crypto/ripemd160.hpp@{libraries/fc/include/fc/crypto/ripemd160.hpp}}
+\mbox{\hyperlink{ripemd160_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{fwd_8hpp}{fc/fwd.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{raw__fwd_8hpp}{fc/io/raw\_fwd.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{typename_8hpp}{fc/reflect/typename.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00007}00007\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}\{}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00008}00008\ \textcolor{keyword}{class\ }sha512;}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00009}00009\ \textcolor{keyword}{class\ }\mbox{\hyperlink{namespacesysio_1_1chain__apis_aec57a2129d91283b7cf3b735009cb546}{sha256}};}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00011}\mbox{\hyperlink{classfc_1_1ripemd160}{00011}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}}}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00012}00012\ \{}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00013}00013\ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00014}00014\ \ \ \ \ \mbox{\hyperlink{classfc_1_1ripemd160_aacd9081b859459fa293823c9904f7e6d}{ripemd160}}();}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00015}00015\ \ \ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classfc_1_1ripemd160_aacd9081b859459fa293823c9904f7e6d}{ripemd160}}(\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\&\ hex\_str\ );}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00017}00017\ \ \ \ \ \textcolor{keywordtype}{string}\ \mbox{\hyperlink{classfc_1_1ripemd160_a29a1cf31cf487f8e18447ecde6fef5ca}{str}}()\textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00018}00018\ \ \ \ \ \textcolor{keyword}{explicit}\ \textcolor{keyword}{operator}\ \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}}()\textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00020}00020\ \ \ \ \ \textcolor{keywordtype}{char}*\ \ \ \ \mbox{\hyperlink{classfc_1_1ripemd160_a774d4a3de0048d37778673674b2fd586}{data}}()\textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00021}\mbox{\hyperlink{classfc_1_1ripemd160_a87a0af76c90caff452e3a97414dd09ac}{00021}}\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classfc_1_1ripemd160_a87a0af76c90caff452e3a97414dd09ac}{data\_size}}()\textcolor{keyword}{const\ }\{\ \textcolor{keywordflow}{return}\ 160/8;\ \}}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00023}00023\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}}\ \mbox{\hyperlink{classfc_1_1ripemd160_a7d43ada80e62a7a73ca472365138f863}{hash}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha512}{fc::sha512}}\&\ h\ );}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00024}00024\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}}\ \mbox{\hyperlink{classfc_1_1ripemd160_a7d43ada80e62a7a73ca472365138f863}{hash}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha256}{fc::sha256}}\&\ h\ );}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00025}00025\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}}\ \mbox{\hyperlink{classfc_1_1ripemd160_a7d43ada80e62a7a73ca472365138f863}{hash}}(\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ d,\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ dlen\ );}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00026}00026\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}}\ \mbox{\hyperlink{classfc_1_1ripemd160_a7d43ada80e62a7a73ca472365138f863}{hash}}(\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\&\ );}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00028}00028\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00029}\mbox{\hyperlink{classfc_1_1ripemd160_a0b3145328b23dedde9c34cd44bd99454}{00029}}\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}}\ \mbox{\hyperlink{classfc_1_1ripemd160_a0b3145328b23dedde9c34cd44bd99454}{hash}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ t\ )\ }
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00030}00030\ \ \ \ \ \{\ }
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00031}00031\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1ripemd160_1_1encoder}{ripemd160::encoder}}\ e;\ }
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00032}00032\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(e,t);}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00033}00033\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ e.\mbox{\hyperlink{classfc_1_1ripemd160_1_1encoder_ae9d341abf0f58f68a58a2a00c15af411}{result}}();\ }
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00034}00034\ \ \ \ \ \}\ }
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00036}\mbox{\hyperlink{classfc_1_1ripemd160_1_1encoder}{00036}}\ \ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classfc_1_1ripemd160_1_1encoder}{encoder}}\ }
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00037}00037\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00038}00038\ \ \ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00039}00039\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1ripemd160_1_1encoder_a3391ad574e73a922e123202ab79686a5}{encoder}}();}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00040}00040\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1ripemd160_1_1encoder_a8711a3ebfd6f12a942009514a1d41121}{\string~encoder}}();}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00042}00042\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1ripemd160_1_1encoder_afee34a8345635e33de7815e88d44b8ea}{write}}(\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}},\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ dlen\ );}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00043}\mbox{\hyperlink{classfc_1_1ripemd160_1_1encoder_ab1497be30dbb12cf7f9b0d09b7222fdd}{00043}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1ripemd160_1_1encoder_ab1497be30dbb12cf7f9b0d09b7222fdd}{put}}(\ \textcolor{keywordtype}{char}\ c\ )\ \{\ \mbox{\hyperlink{classfc_1_1ripemd160_1_1encoder_afee34a8345635e33de7815e88d44b8ea}{write}}(\ \&c,\ 1\ );\ \}}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00044}00044\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1ripemd160_1_1encoder_abf2955a65ccd6a6bd943e5fe97c2ca2e}{reset}}();}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00045}00045\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}}\ \mbox{\hyperlink{classfc_1_1ripemd160_1_1encoder_ae9d341abf0f58f68a58a2a00c15af411}{result}}();}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00047}00047\ \ \ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \textcolor{keyword}{struct\ \ \ \ \ \ }impl;}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1fwd}{fc::fwd<impl,96>}}\ my;}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00050}00050\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00052}00052\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00053}\mbox{\hyperlink{classfc_1_1ripemd160_ac481b58ba6001638af1f74ee4cd0b808}{00053}}\ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{friend}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ \mbox{\hyperlink{classfc_1_1ripemd160_ac481b58ba6001638af1f74ee4cd0b808}{operator<<}}(\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ ds,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}}\&\ ep\ )\ \{}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00054}00054\ \ \ \ \ \ \ ds.write(\ ep.\mbox{\hyperlink{classfc_1_1ripemd160_a774d4a3de0048d37778673674b2fd586}{data}}(),\ \textcolor{keyword}{sizeof}(ep)\ );}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00055}00055\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ds;}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00056}00056\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00058}00058\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00059}\mbox{\hyperlink{classfc_1_1ripemd160_a6752245cf8cbaf90965058b887c3de71}{00059}}\ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{friend}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ \mbox{\hyperlink{classfc_1_1ripemd160_a6752245cf8cbaf90965058b887c3de71}{operator>>}}(\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ ds,\ \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}}\&\ ep\ )\ \{}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00060}00060\ \ \ \ \ \ \ ds.read(\ ep.\mbox{\hyperlink{classfc_1_1ripemd160_a774d4a3de0048d37778673674b2fd586}{data}}(),\ \textcolor{keyword}{sizeof}(ep)\ );}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00061}00061\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ds;}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00062}00062\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00063}00063\ \ \ \ \ \textcolor{keyword}{friend}\ \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}}\ \mbox{\hyperlink{classfc_1_1ripemd160_ac481b58ba6001638af1f74ee4cd0b808}{operator\ <<\ }}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}}\&\ h1,\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ i\ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00064}00064\ \ \ \ \ \textcolor{keyword}{friend}\ \textcolor{keywordtype}{bool}\ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1ripemd160_a9ea7160188d70a1495c72fa44e7f29e2}{operator\ ==\ }}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}}\&\ h1,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}}\&\ h2\ );}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00065}00065\ \ \ \ \ \textcolor{keyword}{friend}\ \textcolor{keywordtype}{bool}\ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1ripemd160_a2cb9ea7e7765c6bee46e3ca686faa136}{operator\ !=\ }}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}}\&\ h1,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}}\&\ h2\ );}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00066}00066\ \ \ \ \ \textcolor{keyword}{friend}\ \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}}\ \mbox{\hyperlink{classfc_1_1ripemd160_a57e0a68fee04485bd3e833fdda26104b}{operator\ \string^\ \ }}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}}\&\ h1,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}}\&\ h2\ );}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00067}00067\ \ \ \ \ \textcolor{keyword}{friend}\ \textcolor{keywordtype}{bool}\ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1ripemd160_a3914f7a44533d04fefe88df4020042bc}{operator\ >=\ }}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}}\&\ h1,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}}\&\ h2\ );}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00068}00068\ \ \ \ \ \textcolor{keyword}{friend}\ \textcolor{keywordtype}{bool}\ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1ripemd160_a25b1386a28903dfa8b3ffcf275feb2c1}{operator\ >\ \ }}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}}\&\ h1,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}}\&\ h2\ );}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00069}00069\ \ \ \ \ \textcolor{keyword}{friend}\ \textcolor{keywordtype}{bool}\ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1ripemd160_a3ef6c695d63dd7d636c8540e40f96d08}{operator\ <\ \ }}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}}\&\ h1,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}}\&\ h2\ );}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00071}\mbox{\hyperlink{classfc_1_1ripemd160_a67956103e03592e90d20654798c44f28}{00071}}\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{classfc_1_1ripemd160_a67956103e03592e90d20654798c44f28}{\_hash}}[5];}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00072}00072\ \};}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00073}00073\ }
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00074}00074\ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classfc_1_1variant}{variant}};}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00075}00075\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefc_adea61f2343de94d0fbcb920a32332ad9}{to\_variant}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}}\&\ bi,\ \mbox{\hyperlink{classfc_1_1variant}{variant}}\&\ v\ );}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00076}00076\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefc_accef08adf4ee05c36ccc550d8101b08f}{from\_variant}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1variant}{variant}}\&\ v,\ \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}}\&\ bi\ );}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00077}00077\ }
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00078}\mbox{\hyperlink{namespacefc_a5d143859f1f34b560f2f2f13d9d078d4}{00078}}\ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}}\ \mbox{\hyperlink{namespacefc_a5d143859f1f34b560f2f2f13d9d078d4}{uint160\_t}};}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00079}\mbox{\hyperlink{namespacefc_a617e6e51560e0b0863d3fa56784ec21a}{00079}}\ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classfc_1_1ripemd160}{ripemd160}}\ \mbox{\hyperlink{namespacefc_a617e6e51560e0b0863d3fa56784ec21a}{uint160}};}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00080}00080\ }
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00081}\mbox{\hyperlink{structfc_1_1get__typename_3_01uint160__t_01_4_a5d9525f5d4cb66edf2b23f00881909e6}{00081}}\ \ \ \textcolor{keyword}{template}<>\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structfc_1_1get__typename}{get\_typename}}<\mbox{\hyperlink{classfc_1_1ripemd160}{uint160\_t}}>\ \ \ \ \{\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{structfc_1_1get__typename_3_01uint160__t_01_4_a5d9525f5d4cb66edf2b23f00881909e6}{name}}()\ \ \{\ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}uint160\_t"{}};\ \ \}\ \};}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00083}00083\ \}\ \textcolor{comment}{//\ namespace\ fc}}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00084}00084\ }
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00085}00085\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacestd}{std}}}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00086}00086\ \{}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00087}00087\ \ \ \ \ \textcolor{keyword}{template}<>}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00088}\mbox{\hyperlink{structstd_1_1hash_3_01fc_1_1ripemd160_01_4}{00088}}\ \ \ \ \ \textcolor{keyword}{struct\ }hash<\mbox{\hyperlink{namespacefc}{fc}}::ripemd160>}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00089}00089\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00090}\mbox{\hyperlink{structstd_1_1hash_3_01fc_1_1ripemd160_01_4_acde89667059e1500837a79a0b7c96130}{00090}}\ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{structstd_1_1hash_3_01fc_1_1ripemd160_01_4_acde89667059e1500837a79a0b7c96130}{operator()}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1ripemd160}{fc::ripemd160}}\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ )\textcolor{keyword}{const}}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00091}00091\ \textcolor{keyword}{\ \ \ \ \ \ \ }\{}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00092}00092\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \ *((\textcolor{keywordtype}{size\_t}*)\&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00093}00093\ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00094}00094\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{ripemd160_8hpp_source_l00095}00095\ \}}
+
+\end{DoxyCode}

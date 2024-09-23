@@ -1,0 +1,9 @@
+<map id="MemoryPoolAllocator::Clear" name="MemoryPoolAllocator::Clear">
+<area shape="rect" id="Node000001" title="Deallocates all memory chunks, excluding the user&#45;supplied buffer." alt="" coords="215,47,360,88"/>
+<area shape="rect" id="Node000002" href="$unittest_2schematest_8cpp.html#ad5dcf99ad5149b042298ea200495c701" title=" " alt="" coords="58,5,114,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="199,49,113,27,115,22,200,43"/>
+<area shape="rect" id="Node000003" href="$perftest_2schematest_8cpp.html#a2c5e22c20fbad50bc8a47803b79d552e" title=" " alt="" coords="51,55,121,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="199,70,122,70,122,65,199,65"/>
+<area shape="rect" id="Node000004" href="$class_memory_pool_allocator.html#ad4eee0ef3cfe8cda31034fbce98b7a9b" title="Destructor." alt="" coords="5,104,167,145"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="200,95,161,106,159,101,199,90"/>
+</map>

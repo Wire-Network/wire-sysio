@@ -1,0 +1,4 @@
+var structboost_1_1asio_1_1handler__type_3_01fibers_1_1asio_1_1yield__t_00_01_return_type_07boost_1_1system_1_1error__code_08_01_4 =
+[
+    [ "type", "structboost_1_1asio_1_1handler__type_3_01fibers_1_1asio_1_1yield__t_00_01_return_type_07boost_1_1system_1_1error__code_08_01_4.html#a30e0fe01c05e743db97322bfd833c208", null ]
+];

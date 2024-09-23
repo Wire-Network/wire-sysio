@@ -1,0 +1,316 @@
+\doxysection{Catch\+::Capturer Class Reference}
+\hypertarget{class_catch_1_1_capturer}{}\label{class_catch_1_1_capturer}\index{Catch::Capturer@{Catch::Capturer}}
+
+
+{\ttfamily \#include $<$catch\+\_\+message.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_catch_1_1_capturer_a86b0b27acc803a4e1310c10820f3038f}{Capturer}} (\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} macro\+Name, \mbox{\hyperlink{struct_catch_1_1_source_line_info}{Source\+Line\+Info}} const \&line\+Info, \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef}{Result\+Was\+::\+Of\+Type}} result\+Type, \mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} names)
+\item 
+\mbox{\hyperlink{class_catch_1_1_capturer_aecde85cf69e65565cec91e325a657b82}{\texorpdfstring{$\sim$}{\string~}\+Capturer}} ()
+\item 
+void \mbox{\hyperlink{class_catch_1_1_capturer_a0695ebf77f7cdcb344c73bcb3d9131e4}{capture\+Value}} (size\+\_\+t index, std\+::string const \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{class_catch_1_1_capturer_a60d08e6db2e54740bb2298bbbec3bc0b}{capture\+Values}} (size\+\_\+t index, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename... Ts$>$ }\\void \mbox{\hyperlink{class_catch_1_1_capturer_a76f2a097cfeb3042688300b81eb9bcbc}{capture\+Values}} (size\+\_\+t index, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}, Ts const \&... values)
+\item 
+\mbox{\hyperlink{class_catch_1_1_capturer_a86b0b27acc803a4e1310c10820f3038f}{Capturer}} (\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} macro\+Name, \mbox{\hyperlink{struct_catch_1_1_source_line_info}{Source\+Line\+Info}} const \&line\+Info, \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef}{Result\+Was\+::\+Of\+Type}} result\+Type, \mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} names)
+\item 
+\mbox{\hyperlink{class_catch_1_1_capturer_aecde85cf69e65565cec91e325a657b82}{\texorpdfstring{$\sim$}{\string~}\+Capturer}} ()
+\item 
+void \mbox{\hyperlink{class_catch_1_1_capturer_a0695ebf77f7cdcb344c73bcb3d9131e4}{capture\+Value}} (size\+\_\+t index, std\+::string const \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{class_catch_1_1_capturer_a60d08e6db2e54740bb2298bbbec3bc0b}{capture\+Values}} (size\+\_\+t index, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename... Ts$>$ }\\void \mbox{\hyperlink{class_catch_1_1_capturer_a76f2a097cfeb3042688300b81eb9bcbc}{capture\+Values}} (size\+\_\+t index, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}, Ts const \&... values)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source_l02277}{2277}} of file \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source}{catch.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_catch_1_1_capturer_a86b0b27acc803a4e1310c10820f3038f}\index{Catch::Capturer@{Catch::Capturer}!Capturer@{Capturer}}
+\index{Capturer@{Capturer}!Catch::Capturer@{Catch::Capturer}}
+\doxysubsubsection{\texorpdfstring{Capturer()}{Capturer()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_capturer_a86b0b27acc803a4e1310c10820f3038f} 
+Catch\+::\+Capturer\+::\+Capturer (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}}}]{macro\+Name}{, }\item[{\mbox{\hyperlink{struct_catch_1_1_source_line_info}{Source\+Line\+Info}} const \&}]{line\+Info}{, }\item[{\mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef}{Result\+Was\+::\+Of\+Type}}}]{result\+Type}{, }\item[{\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}}}]{names}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__message_8cpp_source_l00070}{70}} of file \mbox{\hyperlink{catch__message_8cpp_source}{catch\+\_\+message.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ trimmed\ =\ [\&]\ (\textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103aea2b2676c28c0db26d39331a336c6b92}{start}},\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{namespace_catch_ac19253ceb17eee4cf6a10dd39e4a98c6}{end}})\ \{}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (names[start]\ ==\ \textcolor{charliteral}{','}\ ||\ isspace(names[start]))\ \{}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++\mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103aea2b2676c28c0db26d39331a336c6b92}{start}};}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (names[end]\ ==\ \textcolor{charliteral}{','}\ ||\ isspace(names[end]))\ \{}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/-\/\mbox{\hyperlink{namespace_catch_ac19253ceb17eee4cf6a10dd39e4a98c6}{end}};}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ names.substr(start,\ end\ -\/\ start\ +\ 1);}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ skipq\ =\ [\&]\ (\textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103aea2b2676c28c0db26d39331a336c6b92}{start}},\ \textcolor{keywordtype}{char}\ quote)\ \{}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\ i\ =\ start\ +\ 1;\ i\ <\ names.size()\ ;\ ++i)\ \{}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (names[i]\ ==\ quote)}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ i;}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (names[i]\ ==\ \textcolor{charliteral}{'\(\backslash\)\(\backslash\)'})}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++i;}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{catch__enforce_8h_a05b6c8a530fa2e5b397add8966522777}{CATCH\_INTERNAL\_ERROR}}(\textcolor{stringliteral}{"{}CAPTURE\ parsing\ encountered\ unmatched\ parentheses"{}});}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00089\ }
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103aea2b2676c28c0db26d39331a336c6b92}{start}}\ =\ 0;}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ std::stack<char>\ openings;}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ pos\ =\ 0;\ pos\ <\ names.size();\ ++pos)\ \{}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ c\ =\ names[pos];}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (c)\ \{}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'['}:}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\{'}:}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'('}:}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ It\ is\ basically\ impossible\ to\ disambiguate\ between}}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ comparison\ and\ start\ of\ template\ args\ in\ this\ context}}
+\DoxyCodeLine{00100\ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ \ \ case\ '<':}}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ openings.push(c);}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{']'}:}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\}'}:}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{')'}:}
+\DoxyCodeLine{00106\ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ \ case\ '>':}}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ openings.pop();}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'"{}'}:}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'\(\backslash\)''}:}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ pos\ =\ skipq(pos,\ c);}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{','}:}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (start\ !=\ pos\ \&\&\ openings.size()\ ==\ 0)\ \{}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_messages.emplace\_back(macroName,\ lineInfo,\ resultType);}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_messages.back().message\ =\ trimmed(start,\ pos);}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_messages.back().message\ +=\ \textcolor{stringliteral}{"{}\ :=\ "{}};}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_w_a_s_m_a9690a14428419003297ae35f505b5103aea2b2676c28c0db26d39331a336c6b92}{start}}\ =\ pos;}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ assert(openings.size()\ ==\ 0\ \&\&\ \textcolor{stringliteral}{"{}Mismatched\ openings"{}});}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ m\_messages.emplace\_back(macroName,\ lineInfo,\ resultType);}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ m\_messages.back().message\ =\ trimmed(start,\ names.size()\ -\/\ 1);}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ m\_messages.back().message\ +=\ \textcolor{stringliteral}{"{}\ :=\ "{}};}
+\DoxyCodeLine{00126\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_capturer_a86b0b27acc803a4e1310c10820f3038f_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_capturer_aecde85cf69e65565cec91e325a657b82}\index{Catch::Capturer@{Catch::Capturer}!````~Capturer@{\texorpdfstring{$\sim$}{\string~}Capturer}}
+\index{````~Capturer@{\texorpdfstring{$\sim$}{\string~}Capturer}!Catch::Capturer@{Catch::Capturer}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}Capturer()}{\string~Capturer()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_capturer_aecde85cf69e65565cec91e325a657b82} 
+Catch\+::\+Capturer\+::\texorpdfstring{$\sim$}{\string~}\+Capturer (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__message_8cpp_source_l00127}{127}} of file \mbox{\hyperlink{catch__message_8cpp_source}{catch\+\_\+message.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ !\mbox{\hyperlink{namespace_catch_a4b5a2b34a00e65b753185bbc6a4962be}{uncaught\_exceptions}}()\ )\{}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \ \ \ assert(\ m\_captured\ ==\ m\_messages.size()\ );}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ m\_captured;\ ++i\ \ )}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_resultCapture.\mbox{\hyperlink{struct_catch_1_1_i_result_capture_a42bcb13276706bf8c3ce081ce16d37fd}{popScopedMessage}}(\ m\_messages[i]\ );}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00133\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_capturer_aecde85cf69e65565cec91e325a657b82_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_capturer_a86b0b27acc803a4e1310c10820f3038f}\index{Catch::Capturer@{Catch::Capturer}!Capturer@{Capturer}}
+\index{Capturer@{Capturer}!Catch::Capturer@{Catch::Capturer}}
+\doxysubsubsection{\texorpdfstring{Capturer()}{Capturer()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_capturer_a86b0b27acc803a4e1310c10820f3038f} 
+Catch\+::\+Capturer\+::\+Capturer (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}}}]{macro\+Name}{, }\item[{\mbox{\hyperlink{struct_catch_1_1_source_line_info}{Source\+Line\+Info}} const \&}]{line\+Info}{, }\item[{\mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef}{Result\+Was\+::\+Of\+Type}}}]{result\+Type}{, }\item[{\mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}}}]{names}{}\end{DoxyParamCaption})}
+
+\Hypertarget{class_catch_1_1_capturer_aecde85cf69e65565cec91e325a657b82}\index{Catch::Capturer@{Catch::Capturer}!````~Capturer@{\texorpdfstring{$\sim$}{\string~}Capturer}}
+\index{````~Capturer@{\texorpdfstring{$\sim$}{\string~}Capturer}!Catch::Capturer@{Catch::Capturer}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}Capturer()}{\string~Capturer()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_capturer_aecde85cf69e65565cec91e325a657b82} 
+Catch\+::\+Capturer\+::\texorpdfstring{$\sim$}{\string~}\+Capturer (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_catch_1_1_capturer_a0695ebf77f7cdcb344c73bcb3d9131e4}\index{Catch::Capturer@{Catch::Capturer}!captureValue@{captureValue}}
+\index{captureValue@{captureValue}!Catch::Capturer@{Catch::Capturer}}
+\doxysubsubsection{\texorpdfstring{captureValue()}{captureValue()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_capturer_a0695ebf77f7cdcb344c73bcb3d9131e4} 
+void Catch\+::\+Capturer\+::capture\+Value (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{index}{, }\item[{std\+::string const \&}]{value}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__message_8cpp_source_l00135}{135}} of file \mbox{\hyperlink{catch__message_8cpp_source}{catch\+\_\+message.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ assert(\ index\ <\ m\_messages.size()\ );}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ m\_messages[index].message\ +=\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}};}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ m\_resultCapture.\mbox{\hyperlink{struct_catch_1_1_i_result_capture_a91d154c1e087e383dcde5aad95cb6a05}{pushScopedMessage}}(\ m\_messages[index]\ );}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ m\_captured++;}
+\DoxyCodeLine{00140\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_capturer_a0695ebf77f7cdcb344c73bcb3d9131e4_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_capturer_a0695ebf77f7cdcb344c73bcb3d9131e4_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_capturer_a0695ebf77f7cdcb344c73bcb3d9131e4}\index{Catch::Capturer@{Catch::Capturer}!captureValue@{captureValue}}
+\index{captureValue@{captureValue}!Catch::Capturer@{Catch::Capturer}}
+\doxysubsubsection{\texorpdfstring{captureValue()}{captureValue()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_capturer_a0695ebf77f7cdcb344c73bcb3d9131e4} 
+void Catch\+::\+Capturer\+::capture\+Value (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{index}{, }\item[{std\+::string const \&}]{value}{}\end{DoxyParamCaption})}
+
+\Hypertarget{class_catch_1_1_capturer_a60d08e6db2e54740bb2298bbbec3bc0b}\index{Catch::Capturer@{Catch::Capturer}!captureValues@{captureValues}}
+\index{captureValues@{captureValues}!Catch::Capturer@{Catch::Capturer}}
+\doxysubsubsection{\texorpdfstring{captureValues()}{captureValues()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_capturer_a60d08e6db2e54740bb2298bbbec3bc0b} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+void Catch\+::\+Capturer\+::capture\+Values (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{index}{, }\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const \&}]{value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__message_8h_source_l00086}{86}} of file \mbox{\hyperlink{catch__message_8h_source}{catch\+\_\+message.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_capturer_a0695ebf77f7cdcb344c73bcb3d9131e4}{captureValue}}(\ index,\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{Catch::Detail::stringify}}(\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ )\ );}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_capturer_a60d08e6db2e54740bb2298bbbec3bc0b_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_capturer_a60d08e6db2e54740bb2298bbbec3bc0b_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_capturer_a60d08e6db2e54740bb2298bbbec3bc0b}\index{Catch::Capturer@{Catch::Capturer}!captureValues@{captureValues}}
+\index{captureValues@{captureValues}!Catch::Capturer@{Catch::Capturer}}
+\doxysubsubsection{\texorpdfstring{captureValues()}{captureValues()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_capturer_a60d08e6db2e54740bb2298bbbec3bc0b} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+void Catch\+::\+Capturer\+::capture\+Values (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{index}{, }\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const \&}]{value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source_l02288}{2288}} of file \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source}{catch.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02288\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02289\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_capturer_a0695ebf77f7cdcb344c73bcb3d9131e4}{captureValue}}(\ index,\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{Catch::Detail::stringify}}(\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ )\ );}
+\DoxyCodeLine{02290\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_capturer_a60d08e6db2e54740bb2298bbbec3bc0b_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_capturer_a76f2a097cfeb3042688300b81eb9bcbc}\index{Catch::Capturer@{Catch::Capturer}!captureValues@{captureValues}}
+\index{captureValues@{captureValues}!Catch::Capturer@{Catch::Capturer}}
+\doxysubsubsection{\texorpdfstring{captureValues()}{captureValues()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_capturer_a76f2a097cfeb3042688300b81eb9bcbc} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename... Ts$>$ \\
+void Catch\+::\+Capturer\+::capture\+Values (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{index}{, }\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const \&}]{value}{, }\item[{Ts const \&...}]{values}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__message_8h_source_l00091}{91}} of file \mbox{\hyperlink{catch__message_8h_source}{catch\+\_\+message.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_capturer_a0695ebf77f7cdcb344c73bcb3d9131e4}{captureValue}}(\ index,\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{Catch::Detail::stringify}}(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})\ );}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_capturer_a60d08e6db2e54740bb2298bbbec3bc0b}{captureValues}}(\ index+1,\ \mbox{\hyperlink{namespace_catch_1_1_generators_aff55717239311a0e8352a4de5d29967f}{values}}...\ );}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_capturer_a76f2a097cfeb3042688300b81eb9bcbc_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_capturer_a76f2a097cfeb3042688300b81eb9bcbc}\index{Catch::Capturer@{Catch::Capturer}!captureValues@{captureValues}}
+\index{captureValues@{captureValues}!Catch::Capturer@{Catch::Capturer}}
+\doxysubsubsection{\texorpdfstring{captureValues()}{captureValues()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_capturer_a76f2a097cfeb3042688300b81eb9bcbc} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename... Ts$>$ \\
+void Catch\+::\+Capturer\+::capture\+Values (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{index}{, }\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const \&}]{value}{, }\item[{Ts const \&...}]{values}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source_l02293}{2293}} of file \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source}{catch.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02293\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02294\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_capturer_a0695ebf77f7cdcb344c73bcb3d9131e4}{captureValue}}(\ index,\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{Catch::Detail::stringify}}(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})\ );}
+\DoxyCodeLine{02295\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_capturer_a60d08e6db2e54740bb2298bbbec3bc0b}{captureValues}}(\ index+1,\ \mbox{\hyperlink{namespace_catch_1_1_generators_aff55717239311a0e8352a4de5d29967f}{values}}...\ );}
+\DoxyCodeLine{02296\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_capturer_a76f2a097cfeb3042688300b81eb9bcbc_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__message_8h}{catch\+\_\+message.\+h}}\item 
+libraries/sys-\/vm/external/\+Catch2/single\+\_\+include/catch2/\mbox{\hyperlink{single__include_2catch2_2catch_8hpp}{catch.\+hpp}}\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__message_8cpp}{catch\+\_\+message.\+cpp}}\end{DoxyCompactItemize}

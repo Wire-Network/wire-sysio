@@ -1,0 +1,13 @@
+<map id="clara::detail::BoundValueRefBase" name="clara::detail::BoundValueRefBase">
+<area shape="rect" id="Node000001" title=" " alt="" coords="431,55,596,96"/>
+<area shape="rect" id="Node000004" href="$structclara_1_1detail_1_1_bound_lambda.html" title=" " alt="" coords="644,5,854,31"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="611,49,644,41,692,29,694,34,645,46,612,54"/>
+<area shape="rect" id="Node000005" href="$structclara_1_1detail_1_1_bound_value_ref.html" title=" " alt="" coords="666,55,832,96"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="611,73,666,73,666,78,611,78"/>
+<area shape="rect" id="Node000006" href="$structclara_1_1detail_1_1_bound_value_ref_3_01std_1_1vector_3_01_t_01_4_01_4.html" title=" " alt="" coords="666,120,832,161"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="605,98,674,117,672,122,603,103"/>
+<area shape="rect" id="Node000002" href="$structclara_1_1detail_1_1_bound_ref.html" title=" " alt="" coords="229,63,383,88"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="399,73,430,73,430,78,399,78"/>
+<area shape="rect" id="Node000003" href="$structclara_1_1detail_1_1_non_copyable.html" title=" " alt="" coords="5,63,181,88"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="196,73,228,73,228,78,196,78"/>
+</map>

@@ -1,0 +1,81 @@
+\doxysection{Catch\+::Exception\+Translator\+Registrar Class Reference}
+\hypertarget{class_catch_1_1_exception_translator_registrar}{}\label{class_catch_1_1_exception_translator_registrar}\index{Catch::ExceptionTranslatorRegistrar@{Catch::ExceptionTranslatorRegistrar}}
+
+
+{\ttfamily \#include $<$catch\+\_\+interfaces\+\_\+exception.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{class_catch_1_1_exception_translator_registrar_aa73229de911f26b1df6c6c87c4d9e04e}{Exception\+Translator\+Registrar}} (std\+::string(\texorpdfstring{$\ast$}{*}translate\+Function)(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&))
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{class_catch_1_1_exception_translator_registrar_aa73229de911f26b1df6c6c87c4d9e04e}{Exception\+Translator\+Registrar}} (std\+::string(\texorpdfstring{$\ast$}{*}translate\+Function)(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&))
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source_l02687}{2687}} of file \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source}{catch.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_catch_1_1_exception_translator_registrar_aa73229de911f26b1df6c6c87c4d9e04e}\index{Catch::ExceptionTranslatorRegistrar@{Catch::ExceptionTranslatorRegistrar}!ExceptionTranslatorRegistrar@{ExceptionTranslatorRegistrar}}
+\index{ExceptionTranslatorRegistrar@{ExceptionTranslatorRegistrar}!Catch::ExceptionTranslatorRegistrar@{Catch::ExceptionTranslatorRegistrar}}
+\doxysubsubsection{\texorpdfstring{ExceptionTranslatorRegistrar()}{ExceptionTranslatorRegistrar()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_exception_translator_registrar_aa73229de911f26b1df6c6c87c4d9e04e} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+Catch\+::\+Exception\+Translator\+Registrar\+::\+Exception\+Translator\+Registrar (\begin{DoxyParamCaption}\item[{std\+::string(\texorpdfstring{$\ast$}{*}}]{translate\+Function~}{)(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&)}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__interfaces__exception_8h_source_l00066}{66}} of file \mbox{\hyperlink{catch__interfaces__exception_8h_source}{catch\+\_\+interfaces\+\_\+exception.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_catch_a585459763f2c7610e57de2dd22dd1ad8}{getMutableRegistryHub}}().\mbox{\hyperlink{struct_catch_1_1_i_mutable_registry_hub_ae6825365102693cf7707db022a2c2b49}{registerTranslator}}}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\ \textcolor{keyword}{new}\ ExceptionTranslator<T>(\ translateFunction\ )\ );}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_exception_translator_registrar_aa73229de911f26b1df6c6c87c4d9e04e_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_exception_translator_registrar_aa73229de911f26b1df6c6c87c4d9e04e}\index{Catch::ExceptionTranslatorRegistrar@{Catch::ExceptionTranslatorRegistrar}!ExceptionTranslatorRegistrar@{ExceptionTranslatorRegistrar}}
+\index{ExceptionTranslatorRegistrar@{ExceptionTranslatorRegistrar}!Catch::ExceptionTranslatorRegistrar@{Catch::ExceptionTranslatorRegistrar}}
+\doxysubsubsection{\texorpdfstring{ExceptionTranslatorRegistrar()}{ExceptionTranslatorRegistrar()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_exception_translator_registrar_aa73229de911f26b1df6c6c87c4d9e04e} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+Catch\+::\+Exception\+Translator\+Registrar\+::\+Exception\+Translator\+Registrar (\begin{DoxyParamCaption}\item[{std\+::string(\texorpdfstring{$\ast$}{*}}]{translate\+Function~}{)(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&)}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source_l02714}{2714}} of file \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source}{catch.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02714\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{02715\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_catch_a585459763f2c7610e57de2dd22dd1ad8}{getMutableRegistryHub}}().\mbox{\hyperlink{struct_catch_1_1_i_mutable_registry_hub_ae6825365102693cf7707db022a2c2b49}{registerTranslator}}}
+\DoxyCodeLine{02716\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\ \textcolor{keyword}{new}\ ExceptionTranslator<T>(\ translateFunction\ )\ );}
+\DoxyCodeLine{02717\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_exception_translator_registrar_aa73229de911f26b1df6c6c87c4d9e04e_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__interfaces__exception_8h}{catch\+\_\+interfaces\+\_\+exception.\+h}}\item 
+libraries/sys-\/vm/external/\+Catch2/single\+\_\+include/catch2/\mbox{\hyperlink{single__include_2catch2_2catch_8hpp}{catch.\+hpp}}\end{DoxyCompactItemize}

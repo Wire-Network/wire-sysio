@@ -1,0 +1,146 @@
+\doxysection{fc\+::ecc Namespace Reference}
+\hypertarget{namespacefc_1_1ecc}{}\label{namespacefc_1_1ecc}\index{fc::ecc@{fc::ecc}}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacefc_1_1ecc_1_1detail}{detail}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classfc_1_1ecc_1_1private__key}{private\+\_\+key}}
+\begin{DoxyCompactList}\small\item\em an elliptic curve private key. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{structfc_1_1ecc_1_1private__key__shim}{private\+\_\+key\+\_\+shim}}
+\item 
+class \mbox{\hyperlink{classfc_1_1ecc_1_1public__key}{public\+\_\+key}}
+\begin{DoxyCompactList}\small\item\em contains only the public point of an elliptic curve key. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{structfc_1_1ecc_1_1public__key__shim}{public\+\_\+key\+\_\+shim}}
+\item 
+struct \mbox{\hyperlink{structfc_1_1ecc_1_1signature__shim}{signature\+\_\+shim}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{classfc_1_1sha256}{fc\+::sha256}} \mbox{\hyperlink{namespacefc_1_1ecc_a3e4c1ecf3ceb1fb0d3aefa24532d0766}{blind\+\_\+factor\+\_\+type}}
+\item 
+typedef \mbox{\hyperlink{classfc_1_1array}{fc\+::array}}$<$ char, 33 $>$ \mbox{\hyperlink{namespacefc_1_1ecc_a350a39fe464fec56b98702ae1745f9ad}{commitment\+\_\+type}}
+\item 
+typedef \mbox{\hyperlink{classfc_1_1array}{fc\+::array}}$<$ char, 33 $>$ \mbox{\hyperlink{namespacefc_1_1ecc_a86376367df56783963d35795bebddce6}{public\+\_\+key\+\_\+data}}
+\item 
+typedef \mbox{\hyperlink{classfc_1_1sha256}{fc\+::sha256}} \mbox{\hyperlink{namespacefc_1_1ecc_aac05b92a409a08d0d6b06ce2d07eb54b}{private\+\_\+key\+\_\+secret}}
+\item 
+typedef \mbox{\hyperlink{classfc_1_1array}{fc\+::array}}$<$ char, 65 $>$ \mbox{\hyperlink{namespacefc_1_1ecc_a021e8958c600635ce437f74d6d9919d1}{public\+\_\+key\+\_\+point\+\_\+data}}
+\begin{DoxyCompactList}\small\item\em the full non-\/compressed version of the ECC point \end{DoxyCompactList}\item 
+typedef \mbox{\hyperlink{classfc_1_1array}{fc\+::array}}$<$ char, 72 $>$ \mbox{\hyperlink{namespacefc_1_1ecc_a7c10bdf37d2fad7c122133f284e47f3e}{signature}}
+\item 
+typedef \mbox{\hyperlink{classfc_1_1array}{fc\+::array}}$<$ unsigned char, 65 $>$ \mbox{\hyperlink{namespacefc_1_1ecc_a6eacb8ab0952f02d67d5596a088ae347}{compact\+\_\+signature}}
+\item 
+typedef \mbox{\hyperlink{classfc_1_1array}{fc\+::array}}$<$ char, 78 $>$ \mbox{\hyperlink{namespacefc_1_1ecc_a70bb159a02c4723a9cfa0a0b352ed7c0}{extended\+\_\+key\+\_\+data}}
+\item 
+typedef \mbox{\hyperlink{classfc_1_1sha256}{fc\+::sha256}} \mbox{\hyperlink{namespacefc_1_1ecc_a1e3aebd8fa00b4c44abf111d48a2df52}{blinded\+\_\+hash}}
+\item 
+typedef \mbox{\hyperlink{classfc_1_1sha256}{fc\+::sha256}} \mbox{\hyperlink{namespacefc_1_1ecc_a0bae9ce8dda092dc0db239ab1550fadd}{blind\+\_\+signature}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{namespacefc_1_1ecc_a3e4c1ecf3ceb1fb0d3aefa24532d0766}\index{fc::ecc@{fc::ecc}!blind\_factor\_type@{blind\_factor\_type}}
+\index{blind\_factor\_type@{blind\_factor\_type}!fc::ecc@{fc::ecc}}
+\doxysubsubsection{\texorpdfstring{blind\_factor\_type}{blind\_factor\_type}}
+{\footnotesize\ttfamily \label{namespacefc_1_1ecc_a3e4c1ecf3ceb1fb0d3aefa24532d0766} 
+typedef \mbox{\hyperlink{classfc_1_1sha256}{fc\+::sha256}} \mbox{\hyperlink{namespacefc_1_1ecc_a3e4c1ecf3ceb1fb0d3aefa24532d0766}{fc\+::ecc\+::blind\+\_\+factor\+\_\+type}}}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic_8hpp_source_l00020}{20}} of file \mbox{\hyperlink{elliptic_8hpp_source}{elliptic.\+hpp}}.
+
+\Hypertarget{namespacefc_1_1ecc_a0bae9ce8dda092dc0db239ab1550fadd}\index{fc::ecc@{fc::ecc}!blind\_signature@{blind\_signature}}
+\index{blind\_signature@{blind\_signature}!fc::ecc@{fc::ecc}}
+\doxysubsubsection{\texorpdfstring{blind\_signature}{blind\_signature}}
+{\footnotesize\ttfamily \label{namespacefc_1_1ecc_a0bae9ce8dda092dc0db239ab1550fadd} 
+typedef \mbox{\hyperlink{classfc_1_1sha256}{fc\+::sha256}} \mbox{\hyperlink{namespacefc_1_1ecc_a0bae9ce8dda092dc0db239ab1550fadd}{fc\+::ecc\+::blind\+\_\+signature}}}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic_8hpp_source_l00029}{29}} of file \mbox{\hyperlink{elliptic_8hpp_source}{elliptic.\+hpp}}.
+
+\Hypertarget{namespacefc_1_1ecc_a1e3aebd8fa00b4c44abf111d48a2df52}\index{fc::ecc@{fc::ecc}!blinded\_hash@{blinded\_hash}}
+\index{blinded\_hash@{blinded\_hash}!fc::ecc@{fc::ecc}}
+\doxysubsubsection{\texorpdfstring{blinded\_hash}{blinded\_hash}}
+{\footnotesize\ttfamily \label{namespacefc_1_1ecc_a1e3aebd8fa00b4c44abf111d48a2df52} 
+typedef \mbox{\hyperlink{classfc_1_1sha256}{fc\+::sha256}} \mbox{\hyperlink{namespacefc_1_1ecc_a1e3aebd8fa00b4c44abf111d48a2df52}{fc\+::ecc\+::blinded\+\_\+hash}}}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic_8hpp_source_l00028}{28}} of file \mbox{\hyperlink{elliptic_8hpp_source}{elliptic.\+hpp}}.
+
+\Hypertarget{namespacefc_1_1ecc_a350a39fe464fec56b98702ae1745f9ad}\index{fc::ecc@{fc::ecc}!commitment\_type@{commitment\_type}}
+\index{commitment\_type@{commitment\_type}!fc::ecc@{fc::ecc}}
+\doxysubsubsection{\texorpdfstring{commitment\_type}{commitment\_type}}
+{\footnotesize\ttfamily \label{namespacefc_1_1ecc_a350a39fe464fec56b98702ae1745f9ad} 
+typedef \mbox{\hyperlink{classfc_1_1array}{fc\+::array}}$<$char,33$>$ \mbox{\hyperlink{namespacefc_1_1ecc_a350a39fe464fec56b98702ae1745f9ad}{fc\+::ecc\+::commitment\+\_\+type}}}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic_8hpp_source_l00021}{21}} of file \mbox{\hyperlink{elliptic_8hpp_source}{elliptic.\+hpp}}.
+
+\Hypertarget{namespacefc_1_1ecc_a6eacb8ab0952f02d67d5596a088ae347}\index{fc::ecc@{fc::ecc}!compact\_signature@{compact\_signature}}
+\index{compact\_signature@{compact\_signature}!fc::ecc@{fc::ecc}}
+\doxysubsubsection{\texorpdfstring{compact\_signature}{compact\_signature}}
+{\footnotesize\ttfamily \label{namespacefc_1_1ecc_a6eacb8ab0952f02d67d5596a088ae347} 
+typedef \mbox{\hyperlink{classfc_1_1array}{fc\+::array}}$<$unsigned char,65$>$ \mbox{\hyperlink{namespacefc_1_1ecc_a6eacb8ab0952f02d67d5596a088ae347}{fc\+::ecc\+::compact\+\_\+signature}}}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic_8hpp_source_l00026}{26}} of file \mbox{\hyperlink{elliptic_8hpp_source}{elliptic.\+hpp}}.
+
+\Hypertarget{namespacefc_1_1ecc_a70bb159a02c4723a9cfa0a0b352ed7c0}\index{fc::ecc@{fc::ecc}!extended\_key\_data@{extended\_key\_data}}
+\index{extended\_key\_data@{extended\_key\_data}!fc::ecc@{fc::ecc}}
+\doxysubsubsection{\texorpdfstring{extended\_key\_data}{extended\_key\_data}}
+{\footnotesize\ttfamily \label{namespacefc_1_1ecc_a70bb159a02c4723a9cfa0a0b352ed7c0} 
+typedef \mbox{\hyperlink{classfc_1_1array}{fc\+::array}}$<$char,78$>$ \mbox{\hyperlink{namespacefc_1_1ecc_a70bb159a02c4723a9cfa0a0b352ed7c0}{fc\+::ecc\+::extended\+\_\+key\+\_\+data}}}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic_8hpp_source_l00027}{27}} of file \mbox{\hyperlink{elliptic_8hpp_source}{elliptic.\+hpp}}.
+
+\Hypertarget{namespacefc_1_1ecc_aac05b92a409a08d0d6b06ce2d07eb54b}\index{fc::ecc@{fc::ecc}!private\_key\_secret@{private\_key\_secret}}
+\index{private\_key\_secret@{private\_key\_secret}!fc::ecc@{fc::ecc}}
+\doxysubsubsection{\texorpdfstring{private\_key\_secret}{private\_key\_secret}}
+{\footnotesize\ttfamily \label{namespacefc_1_1ecc_aac05b92a409a08d0d6b06ce2d07eb54b} 
+typedef \mbox{\hyperlink{classfc_1_1sha256}{fc\+::sha256}} \mbox{\hyperlink{namespacefc_1_1ecc_aac05b92a409a08d0d6b06ce2d07eb54b}{fc\+::ecc\+::private\+\_\+key\+\_\+secret}}}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic_8hpp_source_l00023}{23}} of file \mbox{\hyperlink{elliptic_8hpp_source}{elliptic.\+hpp}}.
+
+\Hypertarget{namespacefc_1_1ecc_a86376367df56783963d35795bebddce6}\index{fc::ecc@{fc::ecc}!public\_key\_data@{public\_key\_data}}
+\index{public\_key\_data@{public\_key\_data}!fc::ecc@{fc::ecc}}
+\doxysubsubsection{\texorpdfstring{public\_key\_data}{public\_key\_data}}
+{\footnotesize\ttfamily \label{namespacefc_1_1ecc_a86376367df56783963d35795bebddce6} 
+typedef \mbox{\hyperlink{classfc_1_1array}{fc\+::array}}$<$char,33$>$ \mbox{\hyperlink{namespacefc_1_1ecc_a86376367df56783963d35795bebddce6}{fc\+::ecc\+::public\+\_\+key\+\_\+data}}}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic_8hpp_source_l00022}{22}} of file \mbox{\hyperlink{elliptic_8hpp_source}{elliptic.\+hpp}}.
+
+\Hypertarget{namespacefc_1_1ecc_a021e8958c600635ce437f74d6d9919d1}\index{fc::ecc@{fc::ecc}!public\_key\_point\_data@{public\_key\_point\_data}}
+\index{public\_key\_point\_data@{public\_key\_point\_data}!fc::ecc@{fc::ecc}}
+\doxysubsubsection{\texorpdfstring{public\_key\_point\_data}{public\_key\_point\_data}}
+{\footnotesize\ttfamily \label{namespacefc_1_1ecc_a021e8958c600635ce437f74d6d9919d1} 
+typedef \mbox{\hyperlink{classfc_1_1array}{fc\+::array}}$<$char,65$>$ \mbox{\hyperlink{namespacefc_1_1ecc_a021e8958c600635ce437f74d6d9919d1}{fc\+::ecc\+::public\+\_\+key\+\_\+point\+\_\+data}}}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic_8hpp_source_l00024}{24}} of file \mbox{\hyperlink{elliptic_8hpp_source}{elliptic.\+hpp}}.
+
+\Hypertarget{namespacefc_1_1ecc_a7c10bdf37d2fad7c122133f284e47f3e}\index{fc::ecc@{fc::ecc}!signature@{signature}}
+\index{signature@{signature}!fc::ecc@{fc::ecc}}
+\doxysubsubsection{\texorpdfstring{signature}{signature}}
+{\footnotesize\ttfamily \label{namespacefc_1_1ecc_a7c10bdf37d2fad7c122133f284e47f3e} 
+typedef \mbox{\hyperlink{classfc_1_1array}{fc\+::array}}$<$char,72$>$ \mbox{\hyperlink{namespacefc_1_1ecc_a7c10bdf37d2fad7c122133f284e47f3e}{fc\+::ecc\+::signature}}}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic_8hpp_source_l00025}{25}} of file \mbox{\hyperlink{elliptic_8hpp_source}{elliptic.\+hpp}}.
+

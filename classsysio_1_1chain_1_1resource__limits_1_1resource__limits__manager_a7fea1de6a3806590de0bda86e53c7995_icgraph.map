@@ -1,0 +1,17 @@
+<map id="sysio::chain::resource_limits::resource_limits_manager::add_pending_ram_usage" name="sysio::chain::resource_limits::resource_limits_manager::add_pending_ram_usage">
+<area shape="rect" id="Node000001" title=" " alt="" coords="979,77,1209,133"/>
+<area shape="rect" id="Node000002" href="$namespacesysio_1_1chain.html#a97599248411293cb485c399a25bd8988" title=" " alt="" coords="747,5,923,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="976,75,923,60,924,55,978,70"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1chain_1_1controller__impl.html#ae2c30acb1a0557f6c3967c6a154f7b23" title=" " alt="" coords="739,85,931,126"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="963,108,931,108,931,102,963,102"/>
+<area shape="rect" id="Node000007" href="$structsysio_1_1chain_1_1controller__impl.html#a1dac6da3cb5899f6bcd62b9012c75e43" title=" " alt="" coords="750,149,920,205"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="977,140,921,156,919,151,976,135"/>
+<area shape="rect" id="Node000004" href="$structsysio_1_1chain_1_1controller__impl.html#a01cf826f5503f482715ca2b724279cde" title=" " alt="" coords="495,85,662,126"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="724,108,663,108,663,102,724,102"/>
+<area shape="rect" id="Node000005" href="$structsysio_1_1chain_1_1controller__impl.html#a8d08d7c15ecb706c0bd54e992019c30d" title=" " alt="" coords="206,85,418,126"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="480,108,419,108,419,102,480,102"/>
+<area shape="rect" id="Node000006" href="$structsysio_1_1chain_1_1controller__impl.html#a7863870ecde398ac7def54e4814db6bc" title=" " alt="" coords="5,85,158,126"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="190,108,158,108,158,102,190,102"/>
+<area shape="rect" id="Node000008" href="$structsysio_1_1chain_1_1controller__impl.html#a43b89d301b09c599969412d7db819bd3" title=" " alt="" coords="466,157,691,198"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="735,180,692,180,692,174,735,174"/>
+</map>

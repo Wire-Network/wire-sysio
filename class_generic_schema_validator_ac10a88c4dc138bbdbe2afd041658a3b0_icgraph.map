@@ -1,0 +1,11 @@
+<map id="GenericSchemaValidator::GetInvalidDocumentPointer" name="GenericSchemaValidator::GetInvalidDocumentPointer">
+<area shape="rect" id="Node000001" title="Gets the JSON pointer pointed to the invalid value." alt="" coords="221,84,410,125"/>
+<area shape="rect" id="Node000002" href="$schemavalidator_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97" title=" " alt="" coords="64,5,114,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="254,80,172,46,113,27,115,22,174,41,256,75"/>
+<area shape="rect" id="Node000003" href="$class_schema_validating_reader.html#a7135d8d53aacd850fbce2901cca4a4c3" title=" " alt="" coords="5,55,173,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="205,93,173,89,174,84,206,88"/>
+<area shape="rect" id="Node000004" href="$unittest_2schematest_8cpp.html#ac186f00696812780b761e09d26c1dc14" title=" " alt="" coords="61,120,117,146"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="206,121,118,132,117,127,205,116"/>
+<area shape="rect" id="Node000005" href="$unittest_2schematest_8cpp.html#af9a9615be9c5c97cf9cda31f294e1b8e" title=" " alt="" coords="61,169,117,195"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="248,134,174,161,118,177,116,172,172,156,246,129"/>
+</map>

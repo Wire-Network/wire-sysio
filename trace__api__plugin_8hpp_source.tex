@@ -1,0 +1,51 @@
+\doxysection{trace\+\_\+api\+\_\+plugin.\+hpp}
+\hypertarget{trace__api__plugin_8hpp_source}{}\label{trace__api__plugin_8hpp_source}\index{plugins/trace\_api\_plugin/include/sysio/trace\_api/trace\_api\_plugin.hpp@{plugins/trace\_api\_plugin/include/sysio/trace\_api/trace\_api\_plugin.hpp}}
+\mbox{\hyperlink{trace__api__plugin_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{trace__api__plugin_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{trace__api__plugin_8hpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{application_8hpp}{appbase/application.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{trace__api__plugin_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{chain__plugin_8hpp}{sysio/chain\_plugin/chain\_plugin.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{trace__api__plugin_8hpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{http__plugin_8hpp}{sysio/http\_plugin/http\_plugin.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{trace__api__plugin_8hpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{trace__api__plugin_8hpp_source_l00006}00006\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{}
+\DoxyCodeLine{\Hypertarget{trace__api__plugin_8hpp_source_l00010}\mbox{\hyperlink{classsysio_1_1trace__api__plugin}{00010}}\ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1trace__api__plugin}{trace\_api\_plugin}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classappbase_1_1plugin}{appbase::plugin}}<trace\_api\_plugin>\ \{}
+\DoxyCodeLine{\Hypertarget{trace__api__plugin_8hpp_source_l00011}00011\ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{trace__api__plugin_8hpp_source_l00012}\mbox{\hyperlink{classsysio_1_1trace__api__plugin_ae9ad0efa3662acf28762e1546a834b8a}{00012}}\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1trace__api__plugin_ae9ad0efa3662acf28762e1546a834b8a}{APPBASE\_PLUGIN\_REQUIRES}}((\mbox{\hyperlink{classsysio_1_1chain__plugin}{chain\_plugin}})(\mbox{\hyperlink{classsysio_1_1http__plugin}{http\_plugin}}))}
+\DoxyCodeLine{\Hypertarget{trace__api__plugin_8hpp_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{trace__api__plugin_8hpp_source_l00014}00014\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1trace__api__plugin}{trace\_api\_plugin}}();}
+\DoxyCodeLine{\Hypertarget{trace__api__plugin_8hpp_source_l00015}00015\ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classsysio_1_1trace__api__plugin_ac7dba36c1849dd6ef2219df6d500c455}{\string~trace\_api\_plugin}}();}
+\DoxyCodeLine{\Hypertarget{trace__api__plugin_8hpp_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{trace__api__plugin_8hpp_source_l00017}00017\ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1trace__api__plugin_a5a0e7ac1e000477c233406a4dc391083}{set\_program\_options}}(appbase::options\_description\&\ \mbox{\hyperlink{xbyak__mnemonic_8h_a4229a9b84f8b8673326f12bd41acd27c}{cli}},\ appbase::options\_description\&\ cfg)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{trace__api__plugin_8hpp_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{trace__api__plugin_8hpp_source_l00019}00019\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1trace__api__plugin_a4a053fadb8db3ada0d5af210db43a7af}{plugin\_initialize}}(\textcolor{keyword}{const}\ appbase::variables\_map\&\ options);}
+\DoxyCodeLine{\Hypertarget{trace__api__plugin_8hpp_source_l00020}00020\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1trace__api__plugin_a8ddefbdbaf9cb575550afd516985b429}{plugin\_startup}}();}
+\DoxyCodeLine{\Hypertarget{trace__api__plugin_8hpp_source_l00021}00021\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1trace__api__plugin_a6d2466cca98939954a9d47c6e8f42caf}{plugin\_shutdown}}();}
+\DoxyCodeLine{\Hypertarget{trace__api__plugin_8hpp_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{trace__api__plugin_8hpp_source_l00023}00023\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1trace__api__plugin_aca24a14fa319b5bed80374e065c4302f}{handle\_sighup}}()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{trace__api__plugin_8hpp_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{trace__api__plugin_8hpp_source_l00025}00025\ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{trace__api__plugin_8hpp_source_l00026}00026\ \ \ \ \ \ \ std::shared\_ptr<struct\ trace\_api\_plugin\_impl>\ \ \ \ \ my;}
+\DoxyCodeLine{\Hypertarget{trace__api__plugin_8hpp_source_l00027}00027\ \ \ \ \ \ \ std::shared\_ptr<struct\ trace\_api\_rpc\_plugin\_impl>\ rpc;}
+\DoxyCodeLine{\Hypertarget{trace__api__plugin_8hpp_source_l00028}00028\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{trace__api__plugin_8hpp_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{trace__api__plugin_8hpp_source_l00033}\mbox{\hyperlink{classsysio_1_1trace__api__rpc__plugin}{00033}}\ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1trace__api__rpc__plugin}{trace\_api\_rpc\_plugin}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classappbase_1_1plugin}{appbase::plugin}}<trace\_api\_rpc\_plugin>\ \{}
+\DoxyCodeLine{\Hypertarget{trace__api__plugin_8hpp_source_l00034}00034\ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{trace__api__plugin_8hpp_source_l00035}00035\ \ \ \ \ \ \ \mbox{\hyperlink{plugin_8hpp_ae81793dd38463b82491d75a9ccd209e1}{APPBASE\_PLUGIN\_REQUIRES}}((\mbox{\hyperlink{classsysio_1_1http__plugin}{http\_plugin}}))}
+\DoxyCodeLine{\Hypertarget{trace__api__plugin_8hpp_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{trace__api__plugin_8hpp_source_l00037}00037\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1trace__api__rpc__plugin_aa117492866cff62f0f79a55d90c79954}{trace\_api\_rpc\_plugin}}();}
+\DoxyCodeLine{\Hypertarget{trace__api__plugin_8hpp_source_l00038}00038\ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classsysio_1_1trace__api__rpc__plugin_a92e714e98b4eb5fefda243893a13f0ce}{\string~trace\_api\_rpc\_plugin}}();}
+\DoxyCodeLine{\Hypertarget{trace__api__plugin_8hpp_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{trace__api__plugin_8hpp_source_l00040}00040\ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1trace__api__rpc__plugin_aae10da86f4c9735f2965db3792b1a405}{set\_program\_options}}(appbase::options\_description\&\ \mbox{\hyperlink{xbyak__mnemonic_8h_a4229a9b84f8b8673326f12bd41acd27c}{cli}},\ appbase::options\_description\&\ cfg)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{trace__api__plugin_8hpp_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{trace__api__plugin_8hpp_source_l00042}00042\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1trace__api__rpc__plugin_a85a450eb6d8544e76f50c2f30e9a5598}{plugin\_initialize}}(\textcolor{keyword}{const}\ appbase::variables\_map\&\ options);}
+\DoxyCodeLine{\Hypertarget{trace__api__plugin_8hpp_source_l00043}00043\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1trace__api__rpc__plugin_a0f2b0632928ad8c822881ae2091b708b}{plugin\_startup}}();}
+\DoxyCodeLine{\Hypertarget{trace__api__plugin_8hpp_source_l00044}00044\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1trace__api__rpc__plugin_a308692cd1de02a1405f6d9475accafce}{plugin\_shutdown}}();}
+\DoxyCodeLine{\Hypertarget{trace__api__plugin_8hpp_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{trace__api__plugin_8hpp_source_l00046}00046\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1trace__api__rpc__plugin_ae61f78d2d9607ca4ad43e998e8d6600e}{handle\_sighup}}()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{\Hypertarget{trace__api__plugin_8hpp_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{trace__api__plugin_8hpp_source_l00048}00048\ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{trace__api__plugin_8hpp_source_l00049}00049\ \ \ \ \ \ \ std::shared\_ptr<struct\ trace\_api\_rpc\_plugin\_impl>\ rpc;}
+\DoxyCodeLine{\Hypertarget{trace__api__plugin_8hpp_source_l00050}00050\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{trace__api__plugin_8hpp_source_l00051}00051\ \}}
+
+\end{DoxyCode}

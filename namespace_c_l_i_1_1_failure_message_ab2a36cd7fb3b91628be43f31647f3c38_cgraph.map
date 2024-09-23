@@ -1,0 +1,5 @@
+<map id="CLI::FailureMessage::simple" name="CLI::FailureMessage::simple">
+<area shape="rect" id="Node000001" title="Printout a clean, simple message on error (the default in CLI11 1.5+)" alt="" coords="5,5,148,46"/>
+<area shape="rect" id="Node000002" href="$namespace_c_l_i_1_1detail.html#ab351f13ec104e2cba19ec6baf4a552f6" title="Simple function to join a string." alt="" coords="196,13,305,38"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="148,23,180,23,180,28,148,28"/>
+</map>

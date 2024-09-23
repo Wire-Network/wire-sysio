@@ -1,0 +1,7 @@
+<map id="websocketpp::processor::hybi13::process_handshake_key" name="websocketpp::processor::hybi13::process_handshake_key">
+<area shape="rect" id="Node000001" title="Convert a client handshake key into a server response key in place." alt="" coords="5,35,225,75"/>
+<area shape="rect" id="Node000002" href="$namespacewebsocketpp.html#aff36d40583424a2c879df02219133af8" title="Encode a char buffer into a base64 string." alt="" coords="282,5,430,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="225,39,265,34,266,39,226,44"/>
+<area shape="rect" id="Node000003" href="$namespacewebsocketpp_1_1sha1.html#ad75335df7a69d69b3fb8fef3f4594812" title="Calculate a SHA1 hash." alt="" coords="273,70,439,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="226,65,257,69,257,74,225,70"/>
+</map>

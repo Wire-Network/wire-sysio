@@ -1,0 +1,234 @@
+\doxysection{Catch\+::Fatal\+Condition\+Handler Struct Reference}
+\hypertarget{struct_catch_1_1_fatal_condition_handler}{}\label{struct_catch_1_1_fatal_condition_handler}\index{Catch::FatalConditionHandler@{Catch::FatalConditionHandler}}
+
+
+{\ttfamily \#include $<$catch\+\_\+fatal\+\_\+condition.\+h$>$}
+
+
+
+Collaboration diagram for Catch\+::Fatal\+Condition\+Handler\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=225pt]{struct_catch_1_1_fatal_condition_handler__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_catch_1_1_fatal_condition_handler_a4c3eaa6d0ebe8eceb36c71a47f7de060}{Fatal\+Condition\+Handler}} ()
+\item 
+\mbox{\hyperlink{struct_catch_1_1_fatal_condition_handler_ad4092a1121a26c3fae5cac9b7ff24d8c}{\texorpdfstring{$\sim$}{\string~}\+Fatal\+Condition\+Handler}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static void \mbox{\hyperlink{struct_catch_1_1_fatal_condition_handler_a50d4a6e4ecd795db0a255c391ccf0a31}{handle\+Signal}} (int sig)
+\item 
+static void \mbox{\hyperlink{struct_catch_1_1_fatal_condition_handler_a3199da248de3ee47dfbc51aef8859753}{reset}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static bool \mbox{\hyperlink{struct_catch_1_1_fatal_condition_handler_a7d84daeed96b929385745b2562273aa0}{is\+Set}} = false
+\item 
+static struct sigaction \mbox{\hyperlink{struct_catch_1_1_fatal_condition_handler_aae549e51862a794a33c35dd6d5202961}{old\+Sig\+Actions}} \mbox{[}$\,$\mbox{]} = \{\}
+\item 
+static stack\+\_\+t \mbox{\hyperlink{struct_catch_1_1_fatal_condition_handler_a1d9e8f593ef41471f549eb04056988b1}{old\+Sig\+Stack}} = \{\}
+\item 
+static char \mbox{\hyperlink{struct_catch_1_1_fatal_condition_handler_a5df1b82b5255ad4e62716ebbdf3d37fc}{alt\+Stack\+Mem}} \mbox{[}$\,$\mbox{]} = \{\}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{catch__fatal__condition_8h_source_l00042}{42}} of file \mbox{\hyperlink{catch__fatal__condition_8h_source}{catch\+\_\+fatal\+\_\+condition.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{struct_catch_1_1_fatal_condition_handler_a4c3eaa6d0ebe8eceb36c71a47f7de060}\index{Catch::FatalConditionHandler@{Catch::FatalConditionHandler}!FatalConditionHandler@{FatalConditionHandler}}
+\index{FatalConditionHandler@{FatalConditionHandler}!Catch::FatalConditionHandler@{Catch::FatalConditionHandler}}
+\doxysubsubsection{\texorpdfstring{FatalConditionHandler()}{FatalConditionHandler()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_fatal_condition_handler_a4c3eaa6d0ebe8eceb36c71a47f7de060} 
+Catch\+::\+Fatal\+Condition\+Handler\+::\+Fatal\+Condition\+Handler (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__fatal__condition_8cpp_source_l00125}{125}} of file \mbox{\hyperlink{catch__fatal__condition_8cpp_source}{catch\+\_\+fatal\+\_\+condition.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_fatal_condition_handler_a7d84daeed96b929385745b2562273aa0}{isSet}}\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ stack\_t\ sigStack;}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ sigStack.ss\_sp\ =\ \mbox{\hyperlink{struct_catch_1_1_fatal_condition_handler_a5df1b82b5255ad4e62716ebbdf3d37fc}{altStackMem}};}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ sigStack.ss\_size\ =\ sigStackSize;}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ sigStack.ss\_flags\ =\ 0;}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ sigaltstack(\&sigStack,\ \&\mbox{\hyperlink{struct_catch_1_1_fatal_condition_handler_a1d9e8f593ef41471f549eb04056988b1}{oldSigStack}});}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \textcolor{keyword}{struct\ }sigaction\ sa\ =\ \{\ \};}
+\DoxyCodeLine{00133\ }
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ sa.sa\_handler\ =\ \mbox{\hyperlink{struct_catch_1_1_fatal_condition_handler_a50d4a6e4ecd795db0a255c391ccf0a31}{handleSignal}};}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ sa.sa\_flags\ =\ SA\_ONSTACK;}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (std::size\_t\ i\ =\ 0;\ i\ <\ \textcolor{keyword}{sizeof}(signalDefs)/\textcolor{keyword}{sizeof}(SignalDefs);\ ++i)\ \{}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ \ \ \ sigaction(signalDefs[i].\textcolor{keywordtype}{id},\ \&sa,\ \&\mbox{\hyperlink{struct_catch_1_1_fatal_condition_handler_aae549e51862a794a33c35dd6d5202961}{oldSigActions}}[i]);}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00139\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_catch_1_1_fatal_condition_handler_a4c3eaa6d0ebe8eceb36c71a47f7de060_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_catch_1_1_fatal_condition_handler_ad4092a1121a26c3fae5cac9b7ff24d8c}\index{Catch::FatalConditionHandler@{Catch::FatalConditionHandler}!````~FatalConditionHandler@{\texorpdfstring{$\sim$}{\string~}FatalConditionHandler}}
+\index{````~FatalConditionHandler@{\texorpdfstring{$\sim$}{\string~}FatalConditionHandler}!Catch::FatalConditionHandler@{Catch::FatalConditionHandler}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}FatalConditionHandler()}{\string~FatalConditionHandler()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_fatal_condition_handler_ad4092a1121a26c3fae5cac9b7ff24d8c} 
+Catch\+::\+Fatal\+Condition\+Handler\+::\texorpdfstring{$\sim$}{\string~}\+Fatal\+Condition\+Handler (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__fatal__condition_8cpp_source_l00142}{142}} of file \mbox{\hyperlink{catch__fatal__condition_8cpp_source}{catch\+\_\+fatal\+\_\+condition.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_fatal_condition_handler_a3199da248de3ee47dfbc51aef8859753}{reset}}();}
+\DoxyCodeLine{00144\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_catch_1_1_fatal_condition_handler_ad4092a1121a26c3fae5cac9b7ff24d8c_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_catch_1_1_fatal_condition_handler_a50d4a6e4ecd795db0a255c391ccf0a31}\index{Catch::FatalConditionHandler@{Catch::FatalConditionHandler}!handleSignal@{handleSignal}}
+\index{handleSignal@{handleSignal}!Catch::FatalConditionHandler@{Catch::FatalConditionHandler}}
+\doxysubsubsection{\texorpdfstring{handleSignal()}{handleSignal()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_fatal_condition_handler_a50d4a6e4ecd795db0a255c391ccf0a31} 
+void Catch\+::\+Fatal\+Condition\+Handler\+::handle\+Signal (\begin{DoxyParamCaption}\item[{int}]{sig}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__fatal__condition_8cpp_source_l00112}{112}} of file \mbox{\hyperlink{catch__fatal__condition_8cpp_source}{catch\+\_\+fatal\+\_\+condition.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ \textcolor{keyword}{const}\ *\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ =\ \textcolor{stringliteral}{"{}<unknown\ signal>"{}};}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\ \textcolor{keyword}{const}\&\ def\ :\ signalDefs)\ \{}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (sig\ ==\ def.id)\ \{}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ =\ def.name;}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_fatal_condition_handler_a3199da248de3ee47dfbc51aef8859753}{reset}}();}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ reportFatal(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}});}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ raise(\ sig\ );}
+\DoxyCodeLine{00123\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_catch_1_1_fatal_condition_handler_a50d4a6e4ecd795db0a255c391ccf0a31_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_catch_1_1_fatal_condition_handler_a50d4a6e4ecd795db0a255c391ccf0a31_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{struct_catch_1_1_fatal_condition_handler_a3199da248de3ee47dfbc51aef8859753}\index{Catch::FatalConditionHandler@{Catch::FatalConditionHandler}!reset@{reset}}
+\index{reset@{reset}!Catch::FatalConditionHandler@{Catch::FatalConditionHandler}}
+\doxysubsubsection{\texorpdfstring{reset()}{reset()}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_fatal_condition_handler_a3199da248de3ee47dfbc51aef8859753} 
+void Catch\+::\+Fatal\+Condition\+Handler\+::reset (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__fatal__condition_8cpp_source_l00146}{146}} of file \mbox{\hyperlink{catch__fatal__condition_8cpp_source}{catch\+\_\+fatal\+\_\+condition.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{struct_catch_1_1_fatal_condition_handler_a7d84daeed96b929385745b2562273aa0}{isSet}}\ )\ \{}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Set\ signals\ back\ to\ previous\ values\ -\/-\/\ hopefully\ nobody\ overwrote\ them\ in\ the\ meantime}}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ std::size\_t\ i\ =\ 0;\ i\ <\ \textcolor{keyword}{sizeof}(signalDefs)/\textcolor{keyword}{sizeof}(SignalDefs);\ ++i\ )\ \{}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sigaction(signalDefs[i].\textcolor{keywordtype}{id},\ \&\mbox{\hyperlink{struct_catch_1_1_fatal_condition_handler_aae549e51862a794a33c35dd6d5202961}{oldSigActions}}[i],\ \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Return\ the\ old\ stack}}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \ \ \ \ sigaltstack(\&\mbox{\hyperlink{struct_catch_1_1_fatal_condition_handler_a1d9e8f593ef41471f549eb04056988b1}{oldSigStack}},\ \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_fatal_condition_handler_a7d84daeed96b929385745b2562273aa0}{isSet}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00156\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_catch_1_1_fatal_condition_handler_a3199da248de3ee47dfbc51aef8859753_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_catch_1_1_fatal_condition_handler_a5df1b82b5255ad4e62716ebbdf3d37fc}\index{Catch::FatalConditionHandler@{Catch::FatalConditionHandler}!altStackMem@{altStackMem}}
+\index{altStackMem@{altStackMem}!Catch::FatalConditionHandler@{Catch::FatalConditionHandler}}
+\doxysubsubsection{\texorpdfstring{altStackMem}{altStackMem}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_fatal_condition_handler_a5df1b82b5255ad4e62716ebbdf3d37fc} 
+char Catch\+::\+Fatal\+Condition\+Handler\+::alt\+Stack\+Mem = \{\}\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__fatal__condition_8h_source_l00047}{47}} of file \mbox{\hyperlink{catch__fatal__condition_8h_source}{catch\+\_\+fatal\+\_\+condition.\+h}}.
+
+\Hypertarget{struct_catch_1_1_fatal_condition_handler_a7d84daeed96b929385745b2562273aa0}\index{Catch::FatalConditionHandler@{Catch::FatalConditionHandler}!isSet@{isSet}}
+\index{isSet@{isSet}!Catch::FatalConditionHandler@{Catch::FatalConditionHandler}}
+\doxysubsubsection{\texorpdfstring{isSet}{isSet}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_fatal_condition_handler_a7d84daeed96b929385745b2562273aa0} 
+bool Catch\+::\+Fatal\+Condition\+Handler\+::is\+Set = false\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__fatal__condition_8h_source_l00044}{44}} of file \mbox{\hyperlink{catch__fatal__condition_8h_source}{catch\+\_\+fatal\+\_\+condition.\+h}}.
+
+\Hypertarget{struct_catch_1_1_fatal_condition_handler_aae549e51862a794a33c35dd6d5202961}\index{Catch::FatalConditionHandler@{Catch::FatalConditionHandler}!oldSigActions@{oldSigActions}}
+\index{oldSigActions@{oldSigActions}!Catch::FatalConditionHandler@{Catch::FatalConditionHandler}}
+\doxysubsubsection{\texorpdfstring{oldSigActions}{oldSigActions}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_fatal_condition_handler_aae549e51862a794a33c35dd6d5202961} 
+struct sigaction Catch\+::\+Fatal\+Condition\+Handler\+::old\+Sig\+Actions = \{\}\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__fatal__condition_8h_source_l00045}{45}} of file \mbox{\hyperlink{catch__fatal__condition_8h_source}{catch\+\_\+fatal\+\_\+condition.\+h}}.
+
+\Hypertarget{struct_catch_1_1_fatal_condition_handler_a1d9e8f593ef41471f549eb04056988b1}\index{Catch::FatalConditionHandler@{Catch::FatalConditionHandler}!oldSigStack@{oldSigStack}}
+\index{oldSigStack@{oldSigStack}!Catch::FatalConditionHandler@{Catch::FatalConditionHandler}}
+\doxysubsubsection{\texorpdfstring{oldSigStack}{oldSigStack}}
+{\footnotesize\ttfamily \label{struct_catch_1_1_fatal_condition_handler_a1d9e8f593ef41471f549eb04056988b1} 
+stack\+\_\+t Catch\+::\+Fatal\+Condition\+Handler\+::old\+Sig\+Stack = \{\}\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__fatal__condition_8h_source_l00046}{46}} of file \mbox{\hyperlink{catch__fatal__condition_8h_source}{catch\+\_\+fatal\+\_\+condition.\+h}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__fatal__condition_8h}{catch\+\_\+fatal\+\_\+condition.\+h}}\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__fatal__condition_8cpp}{catch\+\_\+fatal\+\_\+condition.\+cpp}}\end{DoxyCompactItemize}

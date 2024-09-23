@@ -1,0 +1,113 @@
+\doxysection{testing\+::internal\+::GTest\+Log Class Reference}
+\hypertarget{classtesting_1_1internal_1_1_g_test_log}{}\label{classtesting_1_1internal_1_1_g_test_log}\index{testing::internal::GTestLog@{testing::internal::GTestLog}}
+
+
+{\ttfamily \#include $<$gtest-\/port.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_g_test_log_a364691bf972983a59cfa2891062a64af}{GTest\+Log}} (\mbox{\hyperlink{namespacetesting_1_1internal_aa6255ef3b023c5b4e1a2198d887fb977}{GTest\+Log\+Severity}} severity, const char \texorpdfstring{$\ast$}{*}file, int line)
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_g_test_log_a978a099703bbaa0f380216e8d7ee03d3}{\texorpdfstring{$\sim$}{\string~}\+GTest\+Log}} ()
+\item 
+\+::std\+::ostream \& \mbox{\hyperlink{classtesting_1_1internal_1_1_g_test_log_a74935e7a0b424c4a6312fb73dafab6b5}{Get\+Stream}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{gtest-port_8h_source_l01326}{1326}} of file \mbox{\hyperlink{gtest-port_8h_source}{gtest-\/port.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_g_test_log_a364691bf972983a59cfa2891062a64af}\index{testing::internal::GTestLog@{testing::internal::GTestLog}!GTestLog@{GTestLog}}
+\index{GTestLog@{GTestLog}!testing::internal::GTestLog@{testing::internal::GTestLog}}
+\doxysubsubsection{\texorpdfstring{GTestLog()}{GTestLog()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_g_test_log_a364691bf972983a59cfa2891062a64af} 
+testing\+::internal\+::\+GTest\+Log\+::\+GTest\+Log (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacetesting_1_1internal_aa6255ef3b023c5b4e1a2198d887fb977}{GTest\+Log\+Severity}}}]{severity}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{file}{, }\item[{int}]{line}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-port_8cc_source_l00924}{924}} of file \mbox{\hyperlink{gtest-port_8cc_source}{gtest-\/port.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00925\ \ \ \ \ :\ severity\_(severity)\ \{}
+\DoxyCodeLine{00926\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \textcolor{keyword}{const}\ marker\ =}
+\DoxyCodeLine{00927\ \ \ \ \ \ \ severity\ ==\ \mbox{\hyperlink{namespacetesting_1_1internal_aa6255ef3b023c5b4e1a2198d887fb977aff315e0913fcda86fe4de882bf5e33e9}{GTEST\_INFO}}\ ?\ \ \ \ \textcolor{stringliteral}{"{}[\ \ INFO\ ]"{}}\ :}
+\DoxyCodeLine{00928\ \ \ \ \ \ \ severity\ ==\ \mbox{\hyperlink{namespacetesting_1_1internal_aa6255ef3b023c5b4e1a2198d887fb977a7a051bc2794f15a4bf0eab40562a304c}{GTEST\_WARNING}}\ ?\ \textcolor{stringliteral}{"{}[WARNING]"{}}\ :}
+\DoxyCodeLine{00929\ \ \ \ \ \ \ severity\ ==\ \mbox{\hyperlink{namespacetesting_1_1internal_aa6255ef3b023c5b4e1a2198d887fb977a651e9cd2a904e0c8210536271b875f75}{GTEST\_ERROR}}\ ?\ \ \ \textcolor{stringliteral}{"{}[\ ERROR\ ]"{}}\ :\ \textcolor{stringliteral}{"{}[\ FATAL\ ]"{}};}
+\DoxyCodeLine{00930\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_g_test_log_a74935e7a0b424c4a6312fb73dafab6b5}{GetStream}}()\ <<\ ::std::endl\ <<\ marker\ <<\ \textcolor{stringliteral}{"{}\ "{}}}
+\DoxyCodeLine{00931\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \mbox{\hyperlink{namespacetesting_1_1internal_a31b7c3abed4a7c395f42c61e993989f4}{FormatFileLocation}}(file,\ line).c\_str()\ <<\ \textcolor{stringliteral}{"{}:\ "{}};}
+\DoxyCodeLine{00932\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=333pt]{classtesting_1_1internal_1_1_g_test_log_a364691bf972983a59cfa2891062a64af_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_g_test_log_a978a099703bbaa0f380216e8d7ee03d3}\index{testing::internal::GTestLog@{testing::internal::GTestLog}!````~GTestLog@{\texorpdfstring{$\sim$}{\string~}GTestLog}}
+\index{````~GTestLog@{\texorpdfstring{$\sim$}{\string~}GTestLog}!testing::internal::GTestLog@{testing::internal::GTestLog}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}GTestLog()}{\string~GTestLog()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_g_test_log_a978a099703bbaa0f380216e8d7ee03d3} 
+testing\+::internal\+::\+GTest\+Log\+::\texorpdfstring{$\sim$}{\string~}\+GTest\+Log (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-port_8cc_source_l00935}{935}} of file \mbox{\hyperlink{gtest-port_8cc_source}{gtest-\/port.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00935\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00936\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_g_test_log_a74935e7a0b424c4a6312fb73dafab6b5}{GetStream}}()\ <<\ ::std::endl;}
+\DoxyCodeLine{00937\ \ \ \textcolor{keywordflow}{if}\ (severity\_\ ==\ \mbox{\hyperlink{namespacetesting_1_1internal_aa6255ef3b023c5b4e1a2198d887fb977a75063567740f6bf7da419b1b9197b12e}{GTEST\_FATAL}})\ \{}
+\DoxyCodeLine{00938\ \ \ \ \ fflush(stderr);}
+\DoxyCodeLine{00939\ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_1_1posix_a69b8278c59359dd6a6f941b4643db9fb}{posix::Abort}}();}
+\DoxyCodeLine{00940\ \ \ \}}
+\DoxyCodeLine{00941\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=339pt]{classtesting_1_1internal_1_1_g_test_log_a978a099703bbaa0f380216e8d7ee03d3_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_g_test_log_a74935e7a0b424c4a6312fb73dafab6b5}\index{testing::internal::GTestLog@{testing::internal::GTestLog}!GetStream@{GetStream}}
+\index{GetStream@{GetStream}!testing::internal::GTestLog@{testing::internal::GTestLog}}
+\doxysubsubsection{\texorpdfstring{GetStream()}{GetStream()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_g_test_log_a74935e7a0b424c4a6312fb73dafab6b5} 
+\+::std\+::ostream \& testing\+::internal\+::\+GTest\+Log\+::\+Get\+Stream (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-port_8h_source_l01333}{1333}} of file \mbox{\hyperlink{gtest-port_8h_source}{gtest-\/port.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01333\ \{\ return\ ::std::cerr;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=339pt]{classtesting_1_1internal_1_1_g_test_log_a74935e7a0b424c4a6312fb73dafab6b5_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/include/gtest/internal/\mbox{\hyperlink{gtest-port_8h}{gtest-\/port.\+h}}\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/src/\mbox{\hyperlink{gtest-port_8cc}{gtest-\/port.\+cc}}\end{DoxyCompactItemize}

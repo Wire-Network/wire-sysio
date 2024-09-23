@@ -1,0 +1,68 @@
+\doxysection{fc\+::crypto\+::base58\+\_\+str\+\_\+parser\+\_\+impl\texorpdfstring{$<$}{<} Result, Prefixes, Position, Key\+Type, Rem... \texorpdfstring{$>$}{>} Struct Template Reference}
+\hypertarget{structfc_1_1crypto_1_1base58__str__parser__impl_3_01_result_00_01_prefixes_00_01_position_00_01_key_type_00_01_rem_8_8_8_01_4}{}\label{structfc_1_1crypto_1_1base58__str__parser__impl_3_01_result_00_01_prefixes_00_01_position_00_01_key_type_00_01_rem_8_8_8_01_4}\index{fc::crypto::base58\_str\_parser\_impl$<$ Result, Prefixes, Position, KeyType, Rem... $>$@{fc::crypto::base58\_str\_parser\_impl$<$ Result, Prefixes, Position, KeyType, Rem... $>$}}
+
+
+{\ttfamily \#include $<$common.\+hpp$>$}
+
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static Result \mbox{\hyperlink{structfc_1_1crypto_1_1base58__str__parser__impl_3_01_result_00_01_prefixes_00_01_position_00_01_key_type_00_01_rem_8_8_8_01_4_aa29f1fbb3d275f2c997bd6fa4c118222}{apply}} (const std\+::string \&prefix\+\_\+str, const std\+::string \&data\+\_\+str)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Result, const char \texorpdfstring{$\ast$}{*}const \texorpdfstring{$\ast$}{*} Prefixes, int Position, typename Key\+Type, typename ... Rem$>$\newline
+struct fc\+::crypto\+::base58\+\_\+str\+\_\+parser\+\_\+impl$<$ Result, Prefixes, Position, Key\+Type, Rem... $>$}
+
+
+Definition at line \mbox{\hyperlink{libraries_2fc_2include_2fc_2crypto_2common_8hpp_source_l00036}{36}} of file \mbox{\hyperlink{libraries_2fc_2include_2fc_2crypto_2common_8hpp_source}{common.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structfc_1_1crypto_1_1base58__str__parser__impl_3_01_result_00_01_prefixes_00_01_position_00_01_key_type_00_01_rem_8_8_8_01_4_aa29f1fbb3d275f2c997bd6fa4c118222}\index{fc::crypto::base58\_str\_parser\_impl$<$ Result, Prefixes, Position, KeyType, Rem... $>$@{fc::crypto::base58\_str\_parser\_impl$<$ Result, Prefixes, Position, KeyType, Rem... $>$}!apply@{apply}}
+\index{apply@{apply}!fc::crypto::base58\_str\_parser\_impl$<$ Result, Prefixes, Position, KeyType, Rem... $>$@{fc::crypto::base58\_str\_parser\_impl$<$ Result, Prefixes, Position, KeyType, Rem... $>$}}
+\doxysubsubsection{\texorpdfstring{apply()}{apply()}}
+{\footnotesize\ttfamily \label{structfc_1_1crypto_1_1base58__str__parser__impl_3_01_result_00_01_prefixes_00_01_position_00_01_key_type_00_01_rem_8_8_8_01_4_aa29f1fbb3d275f2c997bd6fa4c118222} 
+template$<$typename Result , const char \texorpdfstring{$\ast$}{*}const \texorpdfstring{$\ast$}{*} Prefixes, int Position, typename Key\+Type , typename ... Rem$>$ \\
+static Result \mbox{\hyperlink{structfc_1_1crypto_1_1base58__str__parser__impl}{fc\+::crypto\+::base58\+\_\+str\+\_\+parser\+\_\+impl}}$<$ Result, Prefixes, Position, Key\+Type, Rem... $>$\+::apply (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{prefix\+\_\+str}{, }\item[{const std\+::string \&}]{data\+\_\+str}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{libraries_2fc_2include_2fc_2crypto_2common_8hpp_source_l00037}{37}} of file \mbox{\hyperlink{libraries_2fc_2include_2fc_2crypto_2common_8hpp_source}{common.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ }data\_type\ =\ \textcolor{keyword}{typename}\ KeyType::data\_type;}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ }wrapper\ =\ checksummed\_data<data\_type>;}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{constexpr}\ \textcolor{keyword}{auto}\ prefix\ =\ Prefixes[Position];}
+\DoxyCodeLine{00042\ }
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (prefix\ ==\ prefix\_str)\ \{}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ bin\ =\ \mbox{\hyperlink{namespacefc_ab9aa48ceb035b5fc4b0ff9e48b40bc1d}{fc::from\_base58}}(data\_str);}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1datastream}{fc::datastream<const\ char*>}}\ unpacker(bin.data(),\ bin.size());}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \ \ \ wrapper\ wrapped;}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a0b442d98ceb22dd5a6ae84745e43ffab}{fc::raw::unpack}}(unpacker,\ wrapped);}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(!unpacker.remaining(),\ \textcolor{stringliteral}{"{}decoded\ base58\ length\ too\ long"{}});}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ checksum\ =\ wrapper::calculate\_checksum(wrapped.data,\ prefix);}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(checksum\ ==\ wrapped.check);}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Result(KeyType(wrapped.data));}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00053\ }
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ base58\_str\_parser\_impl<Result,\ Prefixes,\ Position\ +\ 1,\ Rem...>::apply(prefix\_str,\ data\_str);}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structfc_1_1crypto_1_1base58__str__parser__impl_3_01_result_00_01_prefixes_00_01_position_00_01_key_type_00_01_rem_8_8_8_01_4_aa29f1fbb3d275f2c997bd6fa4c118222_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/\mbox{\hyperlink{libraries_2fc_2include_2fc_2crypto_2common_8hpp}{common.\+hpp}}\end{DoxyCompactItemize}

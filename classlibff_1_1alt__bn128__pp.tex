@@ -1,0 +1,372 @@
+\doxysection{libff\+::alt\+\_\+bn128\+\_\+pp Class Reference}
+\hypertarget{classlibff_1_1alt__bn128__pp}{}\label{classlibff_1_1alt__bn128__pp}\index{libff::alt\_bn128\_pp@{libff::alt\_bn128\_pp}}
+
+
+{\ttfamily \#include $<$alt\+\_\+bn128\+\_\+pp.\+hpp$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{namespacelibff_ad3bbb141dd55daf8fa63aa71cca63e81}{alt\+\_\+bn128\+\_\+\+Fr}} \mbox{\hyperlink{classlibff_1_1alt__bn128__pp_af4743dd2d96064f50d561628558cc953}{Fp\+\_\+type}}
+\item 
+typedef \mbox{\hyperlink{classlibff_1_1alt__bn128___g1}{alt\+\_\+bn128\+\_\+\+G1}} \mbox{\hyperlink{classlibff_1_1alt__bn128__pp_a8d1e3e3abced9afcb89f1ef8cd3ee9a8}{G1\+\_\+type}}
+\item 
+typedef \mbox{\hyperlink{classlibff_1_1alt__bn128___g2}{alt\+\_\+bn128\+\_\+\+G2}} \mbox{\hyperlink{classlibff_1_1alt__bn128__pp_a52140c101aedea4f04b2ef0c96896a5e}{G2\+\_\+type}}
+\item 
+typedef \mbox{\hyperlink{namespacelibff_a5bec23f8c44ca03585c4a9cbb3ee70a5}{alt\+\_\+bn128\+\_\+\+G1\+\_\+precomp}} \mbox{\hyperlink{classlibff_1_1alt__bn128__pp_abc32e67723384bc6f6b79b5fe4bd0d04}{G1\+\_\+precomp\+\_\+type}}
+\item 
+typedef \mbox{\hyperlink{namespacelibff_aacd9e3d2d6843c8a7e6aa90a3950536f}{alt\+\_\+bn128\+\_\+\+G2\+\_\+precomp}} \mbox{\hyperlink{classlibff_1_1alt__bn128__pp_a857a054b910c76fcf8585e5f0c578cb4}{G2\+\_\+precomp\+\_\+type}}
+\item 
+typedef \mbox{\hyperlink{namespacelibff_a4a54804b59c74fb7022bf34d8b7f482d}{alt\+\_\+bn128\+\_\+\+Fq}} \mbox{\hyperlink{classlibff_1_1alt__bn128__pp_a0e680872df394a0e562c1ce13d330aa2}{Fq\+\_\+type}}
+\item 
+typedef \mbox{\hyperlink{namespacelibff_a436a611ec8e4c5028e8cd4de22311397}{alt\+\_\+bn128\+\_\+\+Fq2}} \mbox{\hyperlink{classlibff_1_1alt__bn128__pp_a2a891aaa91032cb73660518969377465}{Fqe\+\_\+type}}
+\item 
+typedef \mbox{\hyperlink{namespacelibff_a944d3a5afc087dd2778eb547e74a891d}{alt\+\_\+bn128\+\_\+\+Fq12}} \mbox{\hyperlink{classlibff_1_1alt__bn128__pp_aa92f5398d032a4b60db0c07338004820}{Fqk\+\_\+type}}
+\item 
+typedef \mbox{\hyperlink{namespacelibff_afac7b28c9861352c78a65f6fbdffa32c}{alt\+\_\+bn128\+\_\+\+GT}} \mbox{\hyperlink{classlibff_1_1alt__bn128__pp_aa17ce9f1a407d1b01b2a884ce1b116ba}{GT\+\_\+type}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static void \mbox{\hyperlink{classlibff_1_1alt__bn128__pp_a64615d83a91bbc15fab3030a2203f4f4}{init\+\_\+public\+\_\+params}} ()
+\item 
+static \mbox{\hyperlink{namespacelibff_afac7b28c9861352c78a65f6fbdffa32c}{alt\+\_\+bn128\+\_\+\+GT}} \mbox{\hyperlink{classlibff_1_1alt__bn128__pp_a8c6c2062f0983cfec30582cf772d0394}{final\+\_\+exponentiation}} (const \mbox{\hyperlink{namespacelibff_a944d3a5afc087dd2778eb547e74a891d}{alt\+\_\+bn128\+\_\+\+Fq12}} \&elt)
+\item 
+static \mbox{\hyperlink{namespacelibff_a5bec23f8c44ca03585c4a9cbb3ee70a5}{alt\+\_\+bn128\+\_\+\+G1\+\_\+precomp}} \mbox{\hyperlink{classlibff_1_1alt__bn128__pp_a3d46c9233ea76de846e31de87edf1155}{precompute\+\_\+\+G1}} (const \mbox{\hyperlink{classlibff_1_1alt__bn128___g1}{alt\+\_\+bn128\+\_\+\+G1}} \&\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}})
+\item 
+static \mbox{\hyperlink{namespacelibff_aacd9e3d2d6843c8a7e6aa90a3950536f}{alt\+\_\+bn128\+\_\+\+G2\+\_\+precomp}} \mbox{\hyperlink{classlibff_1_1alt__bn128__pp_a49fd1337a59821df7c26748e0830f6a1}{precompute\+\_\+\+G2}} (const \mbox{\hyperlink{classlibff_1_1alt__bn128___g2}{alt\+\_\+bn128\+\_\+\+G2}} \&Q)
+\item 
+static \mbox{\hyperlink{namespacelibff_a944d3a5afc087dd2778eb547e74a891d}{alt\+\_\+bn128\+\_\+\+Fq12}} \mbox{\hyperlink{classlibff_1_1alt__bn128__pp_a54c7d2662b91e2f9a89dbda0064fac51}{miller\+\_\+loop}} (const \mbox{\hyperlink{namespacelibff_a5bec23f8c44ca03585c4a9cbb3ee70a5}{alt\+\_\+bn128\+\_\+\+G1\+\_\+precomp}} \&prec\+\_\+P, const \mbox{\hyperlink{namespacelibff_aacd9e3d2d6843c8a7e6aa90a3950536f}{alt\+\_\+bn128\+\_\+\+G2\+\_\+precomp}} \&prec\+\_\+Q)
+\item 
+static \mbox{\hyperlink{namespacelibff_a944d3a5afc087dd2778eb547e74a891d}{alt\+\_\+bn128\+\_\+\+Fq12}} \mbox{\hyperlink{classlibff_1_1alt__bn128__pp_a6458ac709b277ca66eb5d419613cc8f0}{double\+\_\+miller\+\_\+loop}} (const \mbox{\hyperlink{namespacelibff_a5bec23f8c44ca03585c4a9cbb3ee70a5}{alt\+\_\+bn128\+\_\+\+G1\+\_\+precomp}} \&prec\+\_\+\+P1, const \mbox{\hyperlink{namespacelibff_aacd9e3d2d6843c8a7e6aa90a3950536f}{alt\+\_\+bn128\+\_\+\+G2\+\_\+precomp}} \&prec\+\_\+\+Q1, const \mbox{\hyperlink{namespacelibff_a5bec23f8c44ca03585c4a9cbb3ee70a5}{alt\+\_\+bn128\+\_\+\+G1\+\_\+precomp}} \&prec\+\_\+\+P2, const \mbox{\hyperlink{namespacelibff_aacd9e3d2d6843c8a7e6aa90a3950536f}{alt\+\_\+bn128\+\_\+\+G2\+\_\+precomp}} \&prec\+\_\+\+Q2)
+\item 
+static \mbox{\hyperlink{namespacelibff_a944d3a5afc087dd2778eb547e74a891d}{alt\+\_\+bn128\+\_\+\+Fq12}} \mbox{\hyperlink{classlibff_1_1alt__bn128__pp_a71d1b7ae08e1ab79ec2debd347ef4a4d}{pairing}} (const \mbox{\hyperlink{classlibff_1_1alt__bn128___g1}{alt\+\_\+bn128\+\_\+\+G1}} \&\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}}, const \mbox{\hyperlink{classlibff_1_1alt__bn128___g2}{alt\+\_\+bn128\+\_\+\+G2}} \&Q)
+\item 
+static \mbox{\hyperlink{namespacelibff_a944d3a5afc087dd2778eb547e74a891d}{alt\+\_\+bn128\+\_\+\+Fq12}} \mbox{\hyperlink{classlibff_1_1alt__bn128__pp_a684441c16067dd63f2947d6928f2b460}{reduced\+\_\+pairing}} (const \mbox{\hyperlink{classlibff_1_1alt__bn128___g1}{alt\+\_\+bn128\+\_\+\+G1}} \&\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}}, const \mbox{\hyperlink{classlibff_1_1alt__bn128___g2}{alt\+\_\+bn128\+\_\+\+G2}} \&Q)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static const bool \mbox{\hyperlink{classlibff_1_1alt__bn128__pp_a6d76d602ca58015ba9f636174f878d68}{has\+\_\+affine\+\_\+pairing}} = false
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{alt__bn128__pp_8hpp_source_l00018}{18}} of file \mbox{\hyperlink{alt__bn128__pp_8hpp_source}{alt\+\_\+bn128\+\_\+pp.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classlibff_1_1alt__bn128__pp_af4743dd2d96064f50d561628558cc953}\index{libff::alt\_bn128\_pp@{libff::alt\_bn128\_pp}!Fp\_type@{Fp\_type}}
+\index{Fp\_type@{Fp\_type}!libff::alt\_bn128\_pp@{libff::alt\_bn128\_pp}}
+\doxysubsubsection{\texorpdfstring{Fp\_type}{Fp\_type}}
+{\footnotesize\ttfamily \label{classlibff_1_1alt__bn128__pp_af4743dd2d96064f50d561628558cc953} 
+\mbox{\hyperlink{namespacelibff_ad3bbb141dd55daf8fa63aa71cca63e81}{alt\+\_\+bn128\+\_\+\+Fr}} \mbox{\hyperlink{classlibff_1_1alt__bn128__pp_af4743dd2d96064f50d561628558cc953}{libff\+::alt\+\_\+bn128\+\_\+pp\+::\+Fp\+\_\+type}}}
+
+
+
+Definition at line \mbox{\hyperlink{alt__bn128__pp_8hpp_source_l00020}{20}} of file \mbox{\hyperlink{alt__bn128__pp_8hpp_source}{alt\+\_\+bn128\+\_\+pp.\+hpp}}.
+
+\Hypertarget{classlibff_1_1alt__bn128__pp_a0e680872df394a0e562c1ce13d330aa2}\index{libff::alt\_bn128\_pp@{libff::alt\_bn128\_pp}!Fq\_type@{Fq\_type}}
+\index{Fq\_type@{Fq\_type}!libff::alt\_bn128\_pp@{libff::alt\_bn128\_pp}}
+\doxysubsubsection{\texorpdfstring{Fq\_type}{Fq\_type}}
+{\footnotesize\ttfamily \label{classlibff_1_1alt__bn128__pp_a0e680872df394a0e562c1ce13d330aa2} 
+\mbox{\hyperlink{namespacelibff_a4a54804b59c74fb7022bf34d8b7f482d}{alt\+\_\+bn128\+\_\+\+Fq}} \mbox{\hyperlink{classlibff_1_1alt__bn128__pp_a0e680872df394a0e562c1ce13d330aa2}{libff\+::alt\+\_\+bn128\+\_\+pp\+::\+Fq\+\_\+type}}}
+
+
+
+Definition at line \mbox{\hyperlink{alt__bn128__pp_8hpp_source_l00025}{25}} of file \mbox{\hyperlink{alt__bn128__pp_8hpp_source}{alt\+\_\+bn128\+\_\+pp.\+hpp}}.
+
+\Hypertarget{classlibff_1_1alt__bn128__pp_a2a891aaa91032cb73660518969377465}\index{libff::alt\_bn128\_pp@{libff::alt\_bn128\_pp}!Fqe\_type@{Fqe\_type}}
+\index{Fqe\_type@{Fqe\_type}!libff::alt\_bn128\_pp@{libff::alt\_bn128\_pp}}
+\doxysubsubsection{\texorpdfstring{Fqe\_type}{Fqe\_type}}
+{\footnotesize\ttfamily \label{classlibff_1_1alt__bn128__pp_a2a891aaa91032cb73660518969377465} 
+\mbox{\hyperlink{namespacelibff_a436a611ec8e4c5028e8cd4de22311397}{alt\+\_\+bn128\+\_\+\+Fq2}} \mbox{\hyperlink{classlibff_1_1alt__bn128__pp_a2a891aaa91032cb73660518969377465}{libff\+::alt\+\_\+bn128\+\_\+pp\+::\+Fqe\+\_\+type}}}
+
+
+
+Definition at line \mbox{\hyperlink{alt__bn128__pp_8hpp_source_l00026}{26}} of file \mbox{\hyperlink{alt__bn128__pp_8hpp_source}{alt\+\_\+bn128\+\_\+pp.\+hpp}}.
+
+\Hypertarget{classlibff_1_1alt__bn128__pp_aa92f5398d032a4b60db0c07338004820}\index{libff::alt\_bn128\_pp@{libff::alt\_bn128\_pp}!Fqk\_type@{Fqk\_type}}
+\index{Fqk\_type@{Fqk\_type}!libff::alt\_bn128\_pp@{libff::alt\_bn128\_pp}}
+\doxysubsubsection{\texorpdfstring{Fqk\_type}{Fqk\_type}}
+{\footnotesize\ttfamily \label{classlibff_1_1alt__bn128__pp_aa92f5398d032a4b60db0c07338004820} 
+\mbox{\hyperlink{namespacelibff_a944d3a5afc087dd2778eb547e74a891d}{alt\+\_\+bn128\+\_\+\+Fq12}} \mbox{\hyperlink{classlibff_1_1alt__bn128__pp_aa92f5398d032a4b60db0c07338004820}{libff\+::alt\+\_\+bn128\+\_\+pp\+::\+Fqk\+\_\+type}}}
+
+
+
+Definition at line \mbox{\hyperlink{alt__bn128__pp_8hpp_source_l00027}{27}} of file \mbox{\hyperlink{alt__bn128__pp_8hpp_source}{alt\+\_\+bn128\+\_\+pp.\+hpp}}.
+
+\Hypertarget{classlibff_1_1alt__bn128__pp_abc32e67723384bc6f6b79b5fe4bd0d04}\index{libff::alt\_bn128\_pp@{libff::alt\_bn128\_pp}!G1\_precomp\_type@{G1\_precomp\_type}}
+\index{G1\_precomp\_type@{G1\_precomp\_type}!libff::alt\_bn128\_pp@{libff::alt\_bn128\_pp}}
+\doxysubsubsection{\texorpdfstring{G1\_precomp\_type}{G1\_precomp\_type}}
+{\footnotesize\ttfamily \label{classlibff_1_1alt__bn128__pp_abc32e67723384bc6f6b79b5fe4bd0d04} 
+\mbox{\hyperlink{namespacelibff_a5bec23f8c44ca03585c4a9cbb3ee70a5}{alt\+\_\+bn128\+\_\+\+G1\+\_\+precomp}} \mbox{\hyperlink{classlibff_1_1alt__bn128__pp_abc32e67723384bc6f6b79b5fe4bd0d04}{libff\+::alt\+\_\+bn128\+\_\+pp\+::\+G1\+\_\+precomp\+\_\+type}}}
+
+
+
+Definition at line \mbox{\hyperlink{alt__bn128__pp_8hpp_source_l00023}{23}} of file \mbox{\hyperlink{alt__bn128__pp_8hpp_source}{alt\+\_\+bn128\+\_\+pp.\+hpp}}.
+
+\Hypertarget{classlibff_1_1alt__bn128__pp_a8d1e3e3abced9afcb89f1ef8cd3ee9a8}\index{libff::alt\_bn128\_pp@{libff::alt\_bn128\_pp}!G1\_type@{G1\_type}}
+\index{G1\_type@{G1\_type}!libff::alt\_bn128\_pp@{libff::alt\_bn128\_pp}}
+\doxysubsubsection{\texorpdfstring{G1\_type}{G1\_type}}
+{\footnotesize\ttfamily \label{classlibff_1_1alt__bn128__pp_a8d1e3e3abced9afcb89f1ef8cd3ee9a8} 
+\mbox{\hyperlink{classlibff_1_1alt__bn128___g1}{alt\+\_\+bn128\+\_\+\+G1}} \mbox{\hyperlink{classlibff_1_1alt__bn128__pp_a8d1e3e3abced9afcb89f1ef8cd3ee9a8}{libff\+::alt\+\_\+bn128\+\_\+pp\+::\+G1\+\_\+type}}}
+
+
+
+Definition at line \mbox{\hyperlink{alt__bn128__pp_8hpp_source_l00021}{21}} of file \mbox{\hyperlink{alt__bn128__pp_8hpp_source}{alt\+\_\+bn128\+\_\+pp.\+hpp}}.
+
+\Hypertarget{classlibff_1_1alt__bn128__pp_a857a054b910c76fcf8585e5f0c578cb4}\index{libff::alt\_bn128\_pp@{libff::alt\_bn128\_pp}!G2\_precomp\_type@{G2\_precomp\_type}}
+\index{G2\_precomp\_type@{G2\_precomp\_type}!libff::alt\_bn128\_pp@{libff::alt\_bn128\_pp}}
+\doxysubsubsection{\texorpdfstring{G2\_precomp\_type}{G2\_precomp\_type}}
+{\footnotesize\ttfamily \label{classlibff_1_1alt__bn128__pp_a857a054b910c76fcf8585e5f0c578cb4} 
+\mbox{\hyperlink{namespacelibff_aacd9e3d2d6843c8a7e6aa90a3950536f}{alt\+\_\+bn128\+\_\+\+G2\+\_\+precomp}} \mbox{\hyperlink{classlibff_1_1alt__bn128__pp_a857a054b910c76fcf8585e5f0c578cb4}{libff\+::alt\+\_\+bn128\+\_\+pp\+::\+G2\+\_\+precomp\+\_\+type}}}
+
+
+
+Definition at line \mbox{\hyperlink{alt__bn128__pp_8hpp_source_l00024}{24}} of file \mbox{\hyperlink{alt__bn128__pp_8hpp_source}{alt\+\_\+bn128\+\_\+pp.\+hpp}}.
+
+\Hypertarget{classlibff_1_1alt__bn128__pp_a52140c101aedea4f04b2ef0c96896a5e}\index{libff::alt\_bn128\_pp@{libff::alt\_bn128\_pp}!G2\_type@{G2\_type}}
+\index{G2\_type@{G2\_type}!libff::alt\_bn128\_pp@{libff::alt\_bn128\_pp}}
+\doxysubsubsection{\texorpdfstring{G2\_type}{G2\_type}}
+{\footnotesize\ttfamily \label{classlibff_1_1alt__bn128__pp_a52140c101aedea4f04b2ef0c96896a5e} 
+\mbox{\hyperlink{classlibff_1_1alt__bn128___g2}{alt\+\_\+bn128\+\_\+\+G2}} \mbox{\hyperlink{classlibff_1_1alt__bn128__pp_a52140c101aedea4f04b2ef0c96896a5e}{libff\+::alt\+\_\+bn128\+\_\+pp\+::\+G2\+\_\+type}}}
+
+
+
+Definition at line \mbox{\hyperlink{alt__bn128__pp_8hpp_source_l00022}{22}} of file \mbox{\hyperlink{alt__bn128__pp_8hpp_source}{alt\+\_\+bn128\+\_\+pp.\+hpp}}.
+
+\Hypertarget{classlibff_1_1alt__bn128__pp_aa17ce9f1a407d1b01b2a884ce1b116ba}\index{libff::alt\_bn128\_pp@{libff::alt\_bn128\_pp}!GT\_type@{GT\_type}}
+\index{GT\_type@{GT\_type}!libff::alt\_bn128\_pp@{libff::alt\_bn128\_pp}}
+\doxysubsubsection{\texorpdfstring{GT\_type}{GT\_type}}
+{\footnotesize\ttfamily \label{classlibff_1_1alt__bn128__pp_aa17ce9f1a407d1b01b2a884ce1b116ba} 
+\mbox{\hyperlink{namespacelibff_afac7b28c9861352c78a65f6fbdffa32c}{alt\+\_\+bn128\+\_\+\+GT}} \mbox{\hyperlink{classlibff_1_1alt__bn128__pp_aa17ce9f1a407d1b01b2a884ce1b116ba}{libff\+::alt\+\_\+bn128\+\_\+pp\+::\+GT\+\_\+type}}}
+
+
+
+Definition at line \mbox{\hyperlink{alt__bn128__pp_8hpp_source_l00028}{28}} of file \mbox{\hyperlink{alt__bn128__pp_8hpp_source}{alt\+\_\+bn128\+\_\+pp.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classlibff_1_1alt__bn128__pp_a6458ac709b277ca66eb5d419613cc8f0}\index{libff::alt\_bn128\_pp@{libff::alt\_bn128\_pp}!double\_miller\_loop@{double\_miller\_loop}}
+\index{double\_miller\_loop@{double\_miller\_loop}!libff::alt\_bn128\_pp@{libff::alt\_bn128\_pp}}
+\doxysubsubsection{\texorpdfstring{double\_miller\_loop()}{double\_miller\_loop()}}
+{\footnotesize\ttfamily \label{classlibff_1_1alt__bn128__pp_a6458ac709b277ca66eb5d419613cc8f0} 
+\mbox{\hyperlink{namespacelibff_a944d3a5afc087dd2778eb547e74a891d}{alt\+\_\+bn128\+\_\+\+Fq12}} libff\+::alt\+\_\+bn128\+\_\+pp\+::double\+\_\+miller\+\_\+loop (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacelibff_a5bec23f8c44ca03585c4a9cbb3ee70a5}{alt\+\_\+bn128\+\_\+\+G1\+\_\+precomp}} \&}]{prec\+\_\+\+P1}{, }\item[{const \mbox{\hyperlink{namespacelibff_aacd9e3d2d6843c8a7e6aa90a3950536f}{alt\+\_\+bn128\+\_\+\+G2\+\_\+precomp}} \&}]{prec\+\_\+\+Q1}{, }\item[{const \mbox{\hyperlink{namespacelibff_a5bec23f8c44ca03585c4a9cbb3ee70a5}{alt\+\_\+bn128\+\_\+\+G1\+\_\+precomp}} \&}]{prec\+\_\+\+P2}{, }\item[{const \mbox{\hyperlink{namespacelibff_aacd9e3d2d6843c8a7e6aa90a3950536f}{alt\+\_\+bn128\+\_\+\+G2\+\_\+precomp}} \&}]{prec\+\_\+\+Q2}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{alt__bn128__pp_8cpp_source_l00038}{38}} of file \mbox{\hyperlink{alt__bn128__pp_8cpp_source}{alt\+\_\+bn128\+\_\+pp.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00042\ \{}
+\DoxyCodeLine{00043\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacelibff_aa74dc01d97f7911c58165e962c932ed5}{alt\_bn128\_double\_miller\_loop}}(prec\_P1,\ prec\_Q1,\ prec\_P2,\ prec\_Q2);}
+\DoxyCodeLine{00044\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classlibff_1_1alt__bn128__pp_a6458ac709b277ca66eb5d419613cc8f0_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classlibff_1_1alt__bn128__pp_a8c6c2062f0983cfec30582cf772d0394}\index{libff::alt\_bn128\_pp@{libff::alt\_bn128\_pp}!final\_exponentiation@{final\_exponentiation}}
+\index{final\_exponentiation@{final\_exponentiation}!libff::alt\_bn128\_pp@{libff::alt\_bn128\_pp}}
+\doxysubsubsection{\texorpdfstring{final\_exponentiation()}{final\_exponentiation()}}
+{\footnotesize\ttfamily \label{classlibff_1_1alt__bn128__pp_a8c6c2062f0983cfec30582cf772d0394} 
+\mbox{\hyperlink{namespacelibff_afac7b28c9861352c78a65f6fbdffa32c}{alt\+\_\+bn128\+\_\+\+GT}} libff\+::alt\+\_\+bn128\+\_\+pp\+::final\+\_\+exponentiation (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacelibff_a944d3a5afc087dd2778eb547e74a891d}{alt\+\_\+bn128\+\_\+\+Fq12}} \&}]{elt}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{alt__bn128__pp_8cpp_source_l00017}{17}} of file \mbox{\hyperlink{alt__bn128__pp_8cpp_source}{alt\+\_\+bn128\+\_\+pp.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00018\ \{}
+\DoxyCodeLine{00019\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacelibff_add51b65ee720635bce0b03b339703425}{alt\_bn128\_final\_exponentiation}}(elt);}
+\DoxyCodeLine{00020\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classlibff_1_1alt__bn128__pp_a8c6c2062f0983cfec30582cf772d0394_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classlibff_1_1alt__bn128__pp_a64615d83a91bbc15fab3030a2203f4f4}\index{libff::alt\_bn128\_pp@{libff::alt\_bn128\_pp}!init\_public\_params@{init\_public\_params}}
+\index{init\_public\_params@{init\_public\_params}!libff::alt\_bn128\_pp@{libff::alt\_bn128\_pp}}
+\doxysubsubsection{\texorpdfstring{init\_public\_params()}{init\_public\_params()}}
+{\footnotesize\ttfamily \label{classlibff_1_1alt__bn128__pp_a64615d83a91bbc15fab3030a2203f4f4} 
+void libff\+::alt\+\_\+bn128\+\_\+pp\+::init\+\_\+public\+\_\+params (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{alt__bn128__pp_8cpp_source_l00012}{12}} of file \mbox{\hyperlink{alt__bn128__pp_8cpp_source}{alt\+\_\+bn128\+\_\+pp.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00013\ \{}
+\DoxyCodeLine{00014\ \ \ \ \ \mbox{\hyperlink{namespacelibff_a9bd1b963def6b03da3f6371bcd41117b}{init\_alt\_bn128\_params}}();}
+\DoxyCodeLine{00015\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classlibff_1_1alt__bn128__pp_a64615d83a91bbc15fab3030a2203f4f4_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classlibff_1_1alt__bn128__pp_a64615d83a91bbc15fab3030a2203f4f4_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classlibff_1_1alt__bn128__pp_a54c7d2662b91e2f9a89dbda0064fac51}\index{libff::alt\_bn128\_pp@{libff::alt\_bn128\_pp}!miller\_loop@{miller\_loop}}
+\index{miller\_loop@{miller\_loop}!libff::alt\_bn128\_pp@{libff::alt\_bn128\_pp}}
+\doxysubsubsection{\texorpdfstring{miller\_loop()}{miller\_loop()}}
+{\footnotesize\ttfamily \label{classlibff_1_1alt__bn128__pp_a54c7d2662b91e2f9a89dbda0064fac51} 
+\mbox{\hyperlink{namespacelibff_a944d3a5afc087dd2778eb547e74a891d}{alt\+\_\+bn128\+\_\+\+Fq12}} libff\+::alt\+\_\+bn128\+\_\+pp\+::miller\+\_\+loop (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacelibff_a5bec23f8c44ca03585c4a9cbb3ee70a5}{alt\+\_\+bn128\+\_\+\+G1\+\_\+precomp}} \&}]{prec\+\_\+P}{, }\item[{const \mbox{\hyperlink{namespacelibff_aacd9e3d2d6843c8a7e6aa90a3950536f}{alt\+\_\+bn128\+\_\+\+G2\+\_\+precomp}} \&}]{prec\+\_\+Q}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{alt__bn128__pp_8cpp_source_l00032}{32}} of file \mbox{\hyperlink{alt__bn128__pp_8cpp_source}{alt\+\_\+bn128\+\_\+pp.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00034\ \{}
+\DoxyCodeLine{00035\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacelibff_a57e7bc7a0733b011baf0e0690cd8e179}{alt\_bn128\_miller\_loop}}(prec\_P,\ prec\_Q);}
+\DoxyCodeLine{00036\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classlibff_1_1alt__bn128__pp_a54c7d2662b91e2f9a89dbda0064fac51_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classlibff_1_1alt__bn128__pp_a71d1b7ae08e1ab79ec2debd347ef4a4d}\index{libff::alt\_bn128\_pp@{libff::alt\_bn128\_pp}!pairing@{pairing}}
+\index{pairing@{pairing}!libff::alt\_bn128\_pp@{libff::alt\_bn128\_pp}}
+\doxysubsubsection{\texorpdfstring{pairing()}{pairing()}}
+{\footnotesize\ttfamily \label{classlibff_1_1alt__bn128__pp_a71d1b7ae08e1ab79ec2debd347ef4a4d} 
+\mbox{\hyperlink{namespacelibff_a944d3a5afc087dd2778eb547e74a891d}{alt\+\_\+bn128\+\_\+\+Fq12}} libff\+::alt\+\_\+bn128\+\_\+pp\+::pairing (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classlibff_1_1alt__bn128___g1}{alt\+\_\+bn128\+\_\+\+G1}} \&}]{P}{, }\item[{const \mbox{\hyperlink{classlibff_1_1alt__bn128___g2}{alt\+\_\+bn128\+\_\+\+G2}} \&}]{Q}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{alt__bn128__pp_8cpp_source_l00046}{46}} of file \mbox{\hyperlink{alt__bn128__pp_8cpp_source}{alt\+\_\+bn128\+\_\+pp.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00048\ \{}
+\DoxyCodeLine{00049\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacelibff_a03eb0822828ec4a2889e9ddc469a49c1}{alt\_bn128\_pairing}}(\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}},\ Q);}
+\DoxyCodeLine{00050\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classlibff_1_1alt__bn128__pp_a71d1b7ae08e1ab79ec2debd347ef4a4d_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classlibff_1_1alt__bn128__pp_a3d46c9233ea76de846e31de87edf1155}\index{libff::alt\_bn128\_pp@{libff::alt\_bn128\_pp}!precompute\_G1@{precompute\_G1}}
+\index{precompute\_G1@{precompute\_G1}!libff::alt\_bn128\_pp@{libff::alt\_bn128\_pp}}
+\doxysubsubsection{\texorpdfstring{precompute\_G1()}{precompute\_G1()}}
+{\footnotesize\ttfamily \label{classlibff_1_1alt__bn128__pp_a3d46c9233ea76de846e31de87edf1155} 
+\mbox{\hyperlink{namespacelibff_a5bec23f8c44ca03585c4a9cbb3ee70a5}{alt\+\_\+bn128\+\_\+\+G1\+\_\+precomp}} libff\+::alt\+\_\+bn128\+\_\+pp\+::precompute\+\_\+\+G1 (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classlibff_1_1alt__bn128___g1}{alt\+\_\+bn128\+\_\+\+G1}} \&}]{P}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{alt__bn128__pp_8cpp_source_l00022}{22}} of file \mbox{\hyperlink{alt__bn128__pp_8cpp_source}{alt\+\_\+bn128\+\_\+pp.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00023\ \{}
+\DoxyCodeLine{00024\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacelibff_a91e96b81cf41394720aa8f8b29de53ba}{alt\_bn128\_precompute\_G1}}(\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}});}
+\DoxyCodeLine{00025\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classlibff_1_1alt__bn128__pp_a3d46c9233ea76de846e31de87edf1155_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classlibff_1_1alt__bn128__pp_a49fd1337a59821df7c26748e0830f6a1}\index{libff::alt\_bn128\_pp@{libff::alt\_bn128\_pp}!precompute\_G2@{precompute\_G2}}
+\index{precompute\_G2@{precompute\_G2}!libff::alt\_bn128\_pp@{libff::alt\_bn128\_pp}}
+\doxysubsubsection{\texorpdfstring{precompute\_G2()}{precompute\_G2()}}
+{\footnotesize\ttfamily \label{classlibff_1_1alt__bn128__pp_a49fd1337a59821df7c26748e0830f6a1} 
+\mbox{\hyperlink{namespacelibff_aacd9e3d2d6843c8a7e6aa90a3950536f}{alt\+\_\+bn128\+\_\+\+G2\+\_\+precomp}} libff\+::alt\+\_\+bn128\+\_\+pp\+::precompute\+\_\+\+G2 (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classlibff_1_1alt__bn128___g2}{alt\+\_\+bn128\+\_\+\+G2}} \&}]{Q}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{alt__bn128__pp_8cpp_source_l00027}{27}} of file \mbox{\hyperlink{alt__bn128__pp_8cpp_source}{alt\+\_\+bn128\+\_\+pp.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00028\ \{}
+\DoxyCodeLine{00029\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacelibff_a732504a1d544ec92340318077e535288}{alt\_bn128\_precompute\_G2}}(Q);}
+\DoxyCodeLine{00030\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classlibff_1_1alt__bn128__pp_a49fd1337a59821df7c26748e0830f6a1_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classlibff_1_1alt__bn128__pp_a684441c16067dd63f2947d6928f2b460}\index{libff::alt\_bn128\_pp@{libff::alt\_bn128\_pp}!reduced\_pairing@{reduced\_pairing}}
+\index{reduced\_pairing@{reduced\_pairing}!libff::alt\_bn128\_pp@{libff::alt\_bn128\_pp}}
+\doxysubsubsection{\texorpdfstring{reduced\_pairing()}{reduced\_pairing()}}
+{\footnotesize\ttfamily \label{classlibff_1_1alt__bn128__pp_a684441c16067dd63f2947d6928f2b460} 
+\mbox{\hyperlink{namespacelibff_a944d3a5afc087dd2778eb547e74a891d}{alt\+\_\+bn128\+\_\+\+Fq12}} libff\+::alt\+\_\+bn128\+\_\+pp\+::reduced\+\_\+pairing (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classlibff_1_1alt__bn128___g1}{alt\+\_\+bn128\+\_\+\+G1}} \&}]{P}{, }\item[{const \mbox{\hyperlink{classlibff_1_1alt__bn128___g2}{alt\+\_\+bn128\+\_\+\+G2}} \&}]{Q}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{alt__bn128__pp_8cpp_source_l00052}{52}} of file \mbox{\hyperlink{alt__bn128__pp_8cpp_source}{alt\+\_\+bn128\+\_\+pp.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00054\ \{}
+\DoxyCodeLine{00055\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacelibff_a39a2b42cbf3d7d40f35250b0af14aba8}{alt\_bn128\_reduced\_pairing}}(\mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}},\ Q);}
+\DoxyCodeLine{00056\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classlibff_1_1alt__bn128__pp_a684441c16067dd63f2947d6928f2b460_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classlibff_1_1alt__bn128__pp_a6d76d602ca58015ba9f636174f878d68}\index{libff::alt\_bn128\_pp@{libff::alt\_bn128\_pp}!has\_affine\_pairing@{has\_affine\_pairing}}
+\index{has\_affine\_pairing@{has\_affine\_pairing}!libff::alt\_bn128\_pp@{libff::alt\_bn128\_pp}}
+\doxysubsubsection{\texorpdfstring{has\_affine\_pairing}{has\_affine\_pairing}}
+{\footnotesize\ttfamily \label{classlibff_1_1alt__bn128__pp_a6d76d602ca58015ba9f636174f878d68} 
+const bool libff\+::alt\+\_\+bn128\+\_\+pp\+::has\+\_\+affine\+\_\+pairing = false\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{alt__bn128__pp_8hpp_source_l00030}{30}} of file \mbox{\hyperlink{alt__bn128__pp_8hpp_source}{alt\+\_\+bn128\+\_\+pp.\+hpp}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/libraries/ff/libff/algebra/curves/alt\+\_\+bn128/\mbox{\hyperlink{alt__bn128__pp_8hpp}{alt\+\_\+bn128\+\_\+pp.\+hpp}}\item 
+libraries/fc/libraries/ff/libff/algebra/curves/alt\+\_\+bn128/\mbox{\hyperlink{alt__bn128__pp_8cpp}{alt\+\_\+bn128\+\_\+pp.\+cpp}}\end{DoxyCompactItemize}

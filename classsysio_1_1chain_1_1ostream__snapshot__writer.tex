@@ -1,0 +1,238 @@
+\doxysection{sysio\+::chain\+::ostream\+\_\+snapshot\+\_\+writer Class Reference}
+\hypertarget{classsysio_1_1chain_1_1ostream__snapshot__writer}{}\label{classsysio_1_1chain_1_1ostream__snapshot__writer}\index{sysio::chain::ostream\_snapshot\_writer@{sysio::chain::ostream\_snapshot\_writer}}
+
+
+{\ttfamily \#include $<$snapshot.\+hpp$>$}
+
+
+
+Inheritance diagram for sysio\+::chain\+::ostream\+\_\+snapshot\+\_\+writer\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=203pt]{classsysio_1_1chain_1_1ostream__snapshot__writer__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for sysio\+::chain\+::ostream\+\_\+snapshot\+\_\+writer\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=194pt]{classsysio_1_1chain_1_1ostream__snapshot__writer__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classsysio_1_1chain_1_1ostream__snapshot__writer_af494b72fd2e0fa081d9bcf132c000783}{ostream\+\_\+snapshot\+\_\+writer}} (std\+::ostream \&snapshot)
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1ostream__snapshot__writer_acaef3693ad5a1874f90e95dcd785c48b}{write\+\_\+start\+\_\+section}} (const std\+::string \&section\+\_\+name) override
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1ostream__snapshot__writer_a43c9836b76e5cea6f8ad0dc88927bcc8}{write\+\_\+row}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1detail_1_1abstract__snapshot__row__writer}{detail\+::abstract\+\_\+snapshot\+\_\+row\+\_\+writer}} \&row\+\_\+writer) override
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1ostream__snapshot__writer_a82619c2e196ed6b314e84a94745218d7}{write\+\_\+end\+\_\+section}} () override
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1ostream__snapshot__writer_a4730bfd011414ba5539975806368c16c}{finalize}} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classsysio_1_1chain_1_1snapshot__writer}{sysio\+::chain\+::snapshot\+\_\+writer}}}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename F $>$ }\\void \mbox{\hyperlink{classsysio_1_1chain_1_1snapshot__writer_a8eb110456e3221522be3d095e68d6d43}{write\+\_\+section}} (const std\+::string section\+\_\+name, F \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename F $>$ }\\void \mbox{\hyperlink{classsysio_1_1chain_1_1snapshot__writer_a92884590724e01a98600ed66e2556bee}{write\+\_\+section}} (F \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})
+\item 
+virtual \mbox{\hyperlink{classsysio_1_1chain_1_1snapshot__writer_afb82a81ead45c6b1835e00c5629caa5d}{\texorpdfstring{$\sim$}{\string~}snapshot\+\_\+writer}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classsysio_1_1chain_1_1ostream__snapshot__writer_a2f2f35cd6182a03d8b26f5518f6f2fe6}{magic\+\_\+number}} = 0x30510550
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Protected Member Functions inherited from \mbox{\hyperlink{classsysio_1_1chain_1_1snapshot__writer}{sysio\+::chain\+::snapshot\+\_\+writer}}}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{snapshot_8hpp_source_l00329}{329}} of file \mbox{\hyperlink{snapshot_8hpp_source}{snapshot.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classsysio_1_1chain_1_1ostream__snapshot__writer_af494b72fd2e0fa081d9bcf132c000783}\index{sysio::chain::ostream\_snapshot\_writer@{sysio::chain::ostream\_snapshot\_writer}!ostream\_snapshot\_writer@{ostream\_snapshot\_writer}}
+\index{ostream\_snapshot\_writer@{ostream\_snapshot\_writer}!sysio::chain::ostream\_snapshot\_writer@{sysio::chain::ostream\_snapshot\_writer}}
+\doxysubsubsection{\texorpdfstring{ostream\_snapshot\_writer()}{ostream\_snapshot\_writer()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1ostream__snapshot__writer_af494b72fd2e0fa081d9bcf132c000783} 
+sysio\+::chain\+::ostream\+\_\+snapshot\+\_\+writer\+::ostream\+\_\+snapshot\+\_\+writer (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{snapshot}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{snapshot_8cpp_source_l00122}{122}} of file \mbox{\hyperlink{snapshot_8cpp_source}{snapshot.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00123\ :snapshot(snapshot)}
+\DoxyCodeLine{00124\ ,header\_pos(snapshot.tellp())}
+\DoxyCodeLine{00125\ ,section\_pos(-\/1)}
+\DoxyCodeLine{00126\ ,row\_count(0)}
+\DoxyCodeLine{00127\ \{}
+\DoxyCodeLine{00128\ \ \ \ \textcolor{comment}{//\ write\ magic\ number}}
+\DoxyCodeLine{00129\ \ \ \ \textcolor{keyword}{auto}\ totem\ =\ \mbox{\hyperlink{classsysio_1_1chain_1_1ostream__snapshot__writer_a2f2f35cd6182a03d8b26f5518f6f2fe6}{magic\_number}};}
+\DoxyCodeLine{00130\ \ \ \ snapshot.write((\textcolor{keywordtype}{char}*)\&totem,\ \textcolor{keyword}{sizeof}(totem));}
+\DoxyCodeLine{00131\ }
+\DoxyCodeLine{00132\ \ \ \ \textcolor{comment}{//\ write\ version}}
+\DoxyCodeLine{00133\ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1state_a12f378e0c6dbf373781e7988ee4a0853a08c88a938bc459c7997b48f74248752f}{version}}\ =\ current\_snapshot\_version;}
+\DoxyCodeLine{00134\ \ \ \ snapshot.write((\textcolor{keywordtype}{char}*)\&version,\ \textcolor{keyword}{sizeof}(version));}
+\DoxyCodeLine{00135\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1chain_1_1ostream__snapshot__writer_a4730bfd011414ba5539975806368c16c}\index{sysio::chain::ostream\_snapshot\_writer@{sysio::chain::ostream\_snapshot\_writer}!finalize@{finalize}}
+\index{finalize@{finalize}!sysio::chain::ostream\_snapshot\_writer@{sysio::chain::ostream\_snapshot\_writer}}
+\doxysubsubsection{\texorpdfstring{finalize()}{finalize()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1ostream__snapshot__writer_a4730bfd011414ba5539975806368c16c} 
+void sysio\+::chain\+::ostream\+\_\+snapshot\+\_\+writer\+::finalize (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{snapshot_8cpp_source_l00186}{186}} of file \mbox{\hyperlink{snapshot_8cpp_source}{snapshot.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00187\ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ end\_marker\ =\ std::numeric\_limits<uint64\_t>::max();}
+\DoxyCodeLine{00188\ }
+\DoxyCodeLine{00189\ \ \ \ \textcolor{comment}{//\ write\ a\ placeholder\ for\ the\ section\ size}}
+\DoxyCodeLine{00190\ \ \ \ snapshot.write((\textcolor{keywordtype}{char}*)\&end\_marker,\ \textcolor{keyword}{sizeof}(end\_marker));}
+\DoxyCodeLine{00191\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1ostream__snapshot__writer_a82619c2e196ed6b314e84a94745218d7}\index{sysio::chain::ostream\_snapshot\_writer@{sysio::chain::ostream\_snapshot\_writer}!write\_end\_section@{write\_end\_section}}
+\index{write\_end\_section@{write\_end\_section}!sysio::chain::ostream\_snapshot\_writer@{sysio::chain::ostream\_snapshot\_writer}}
+\doxysubsubsection{\texorpdfstring{write\_end\_section()}{write\_end\_section()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1ostream__snapshot__writer_a82619c2e196ed6b314e84a94745218d7} 
+void sysio\+::chain\+::ostream\+\_\+snapshot\+\_\+writer\+::write\+\_\+end\+\_\+section (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classsysio_1_1chain_1_1snapshot__writer_a63e5c6a3a65227e92e3ba7909ef30ca6}{sysio\+::chain\+::snapshot\+\_\+writer}}.
+
+
+
+Definition at line \mbox{\hyperlink{snapshot_8cpp_source_l00167}{167}} of file \mbox{\hyperlink{snapshot_8cpp_source}{snapshot.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00168\ \ \ \ \textcolor{keyword}{auto}\ restore\ =\ snapshot.tellp();}
+\DoxyCodeLine{00169\ }
+\DoxyCodeLine{00170\ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ section\_size\ =\ restore\ -\/\ section\_pos\ -\/\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}});}
+\DoxyCodeLine{00171\ }
+\DoxyCodeLine{00172\ \ \ \ snapshot.seekp(section\_pos);}
+\DoxyCodeLine{00173\ }
+\DoxyCodeLine{00174\ \ \ \ \textcolor{comment}{//\ write\ a\ the\ section\ size}}
+\DoxyCodeLine{00175\ \ \ \ snapshot.write((\textcolor{keywordtype}{char}*)\&section\_size,\ \textcolor{keyword}{sizeof}(section\_size));}
+\DoxyCodeLine{00176\ }
+\DoxyCodeLine{00177\ \ \ \ \textcolor{comment}{//\ write\ the\ row\ count}}
+\DoxyCodeLine{00178\ \ \ \ snapshot.write((\textcolor{keywordtype}{char}*)\&row\_count,\ \textcolor{keyword}{sizeof}(row\_count));}
+\DoxyCodeLine{00179\ }
+\DoxyCodeLine{00180\ \ \ \ snapshot.seekp(restore);}
+\DoxyCodeLine{00181\ }
+\DoxyCodeLine{00182\ \ \ \ section\_pos\ =\ std::streampos(-\/1);}
+\DoxyCodeLine{00183\ \ \ \ row\_count\ =\ 0;}
+\DoxyCodeLine{00184\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1chain_1_1ostream__snapshot__writer_a43c9836b76e5cea6f8ad0dc88927bcc8}\index{sysio::chain::ostream\_snapshot\_writer@{sysio::chain::ostream\_snapshot\_writer}!write\_row@{write\_row}}
+\index{write\_row@{write\_row}!sysio::chain::ostream\_snapshot\_writer@{sysio::chain::ostream\_snapshot\_writer}}
+\doxysubsubsection{\texorpdfstring{write\_row()}{write\_row()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1ostream__snapshot__writer_a43c9836b76e5cea6f8ad0dc88927bcc8} 
+void sysio\+::chain\+::ostream\+\_\+snapshot\+\_\+writer\+::write\+\_\+row (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1detail_1_1abstract__snapshot__row__writer}{detail\+::abstract\+\_\+snapshot\+\_\+row\+\_\+writer}} \&}]{row\+\_\+writer}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classsysio_1_1chain_1_1snapshot__writer_ace2f9c42dabfd6917245df4ae84a861c}{sysio\+::chain\+::snapshot\+\_\+writer}}.
+
+
+
+Definition at line \mbox{\hyperlink{snapshot_8cpp_source_l00156}{156}} of file \mbox{\hyperlink{snapshot_8cpp_source}{snapshot.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00157\ \ \ \ \textcolor{keyword}{auto}\ restore\ =\ snapshot.tellp();}
+\DoxyCodeLine{00158\ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ row\_writer.write(snapshot);}
+\DoxyCodeLine{00160\ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ snapshot.seekp(restore);}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \textcolor{keywordflow}{throw};}
+\DoxyCodeLine{00163\ \ \ \ \}}
+\DoxyCodeLine{00164\ \ \ \ row\_count++;}
+\DoxyCodeLine{00165\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1ostream__snapshot__writer_a43c9836b76e5cea6f8ad0dc88927bcc8_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1chain_1_1ostream__snapshot__writer_acaef3693ad5a1874f90e95dcd785c48b}\index{sysio::chain::ostream\_snapshot\_writer@{sysio::chain::ostream\_snapshot\_writer}!write\_start\_section@{write\_start\_section}}
+\index{write\_start\_section@{write\_start\_section}!sysio::chain::ostream\_snapshot\_writer@{sysio::chain::ostream\_snapshot\_writer}}
+\doxysubsubsection{\texorpdfstring{write\_start\_section()}{write\_start\_section()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1ostream__snapshot__writer_acaef3693ad5a1874f90e95dcd785c48b} 
+void sysio\+::chain\+::ostream\+\_\+snapshot\+\_\+writer\+::write\+\_\+start\+\_\+section (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{section\+\_\+name}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classsysio_1_1chain_1_1snapshot__writer_a4abda90a8815f5f65b7b2e92f889ed87}{sysio\+::chain\+::snapshot\+\_\+writer}}.
+
+
+
+Definition at line \mbox{\hyperlink{snapshot_8cpp_source_l00137}{137}} of file \mbox{\hyperlink{snapshot_8cpp_source}{snapshot.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00138\ \{}
+\DoxyCodeLine{00139\ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(section\_pos\ ==\ std::streampos(-\/1),\ snapshot\_exception,\ \textcolor{stringliteral}{"{}Attempting\ to\ write\ a\ new\ section\ without\ closing\ the\ previous\ section"{}});}
+\DoxyCodeLine{00140\ \ \ \ section\_pos\ =\ snapshot.tellp();}
+\DoxyCodeLine{00141\ \ \ \ row\_count\ =\ 0;}
+\DoxyCodeLine{00142\ }
+\DoxyCodeLine{00143\ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ placeholder\ =\ std::numeric\_limits<uint64\_t>::max();}
+\DoxyCodeLine{00144\ }
+\DoxyCodeLine{00145\ \ \ \ \textcolor{comment}{//\ write\ a\ placeholder\ for\ the\ section\ size}}
+\DoxyCodeLine{00146\ \ \ \ snapshot.write((\textcolor{keywordtype}{char}*)\&placeholder,\ \textcolor{keyword}{sizeof}(placeholder));}
+\DoxyCodeLine{00147\ }
+\DoxyCodeLine{00148\ \ \ \ \textcolor{comment}{//\ write\ placeholder\ for\ row\ count}}
+\DoxyCodeLine{00149\ \ \ \ snapshot.write((\textcolor{keywordtype}{char}*)\&placeholder,\ \textcolor{keyword}{sizeof}(placeholder));}
+\DoxyCodeLine{00150\ }
+\DoxyCodeLine{00151\ \ \ \ \textcolor{comment}{//\ write\ the\ section\ name\ (null\ terminated)}}
+\DoxyCodeLine{00152\ \ \ \ snapshot.write(section\_name.data(),\ section\_name.size());}
+\DoxyCodeLine{00153\ \ \ \ snapshot.put(0);}
+\DoxyCodeLine{00154\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classsysio_1_1chain_1_1ostream__snapshot__writer_a2f2f35cd6182a03d8b26f5518f6f2fe6}\index{sysio::chain::ostream\_snapshot\_writer@{sysio::chain::ostream\_snapshot\_writer}!magic\_number@{magic\_number}}
+\index{magic\_number@{magic\_number}!sysio::chain::ostream\_snapshot\_writer@{sysio::chain::ostream\_snapshot\_writer}}
+\doxysubsubsection{\texorpdfstring{magic\_number}{magic\_number}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1ostream__snapshot__writer_a2f2f35cd6182a03d8b26f5518f6f2fe6} 
+const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::chain\+::ostream\+\_\+snapshot\+\_\+writer\+::magic\+\_\+number = 0x30510550\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{snapshot_8hpp_source_l00338}{338}} of file \mbox{\hyperlink{snapshot_8hpp_source}{snapshot.\+hpp}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{snapshot_8hpp}{snapshot.\+hpp}}\item 
+libraries/chain/\mbox{\hyperlink{snapshot_8cpp}{snapshot.\+cpp}}\end{DoxyCompactItemize}

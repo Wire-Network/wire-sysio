@@ -1,0 +1,13 @@
+<map id="libraries/sys&#45;vm/external/Catch2/include/internal/catch_fatal_condition.h" name="libraries/sys&#45;vm/external/Catch2/include/internal/catch_fatal_condition.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="140,5,303,61"/>
+<area shape="rect" id="Node000002" href="$catch__platform_8h.html" title=" " alt="" coords="60,183,178,208"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="140,44,105,52,70,65,39,84,13,111,9,120,9,129,19,146,41,161,67,174,65,179,38,166,15,150,3,130,4,119,9,107,35,80,68,60,103,47,139,38"/>
+<area shape="rect" id="Node000003" href="$catch__compiler__capabilities_8h.html" title=" " alt="" coords="23,109,215,135"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="192,63,147,101,143,97,188,59"/>
+<area shape="rect" id="Node000004" href="$catch__windows__h__proxy_8h.html" title=" " alt="" coords="239,109,412,135"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="256,59,301,97,298,101,252,63"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="437,109,503,135"/>
+<area shape="poly" id="edge6_Node000001_Node000005" title=" " alt="" coords="301,59,423,101,421,106,299,64"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="122,135,122,167,116,167,116,135"/>
+<area shape="poly" id="edge5_Node000004_Node000002" title=" " alt="" coords="292,138,169,180,168,175,290,133"/>
+</map>

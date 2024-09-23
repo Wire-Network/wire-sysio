@@ -1,0 +1,11 @@
+<map id="CLI::App::preparse_callback" name="CLI::App::preparse_callback">
+<area shape="rect" id="Node000001" title=" " alt="" coords="162,72,293,113"/>
+<area shape="rect" id="Node000002" href="$namespace_c_l_i.html#ae611995dabf1e7d4a2480f1952ef6ba7" title="Helper function to disable one option group/subcommand when another is used." alt="" coords="5,5,114,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="165,68,89,34,91,29,167,63"/>
+<area shape="rect" id="Node000003" href="$namespace_c_l_i.html#aeb752166e5a0486440b5902f7878ed72" title="Helper function to disable one option group/subcommand when another is used." alt="" coords="5,55,114,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="146,83,114,78,115,73,146,78"/>
+<area shape="rect" id="Node000004" href="$namespace_c_l_i.html#a495f418aefacfdfbe91642a18f60d77c" title="Helper function to enable one option group/subcommand when another is used." alt="" coords="6,104,113,130"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="147,107,114,112,113,107,146,102"/>
+<area shape="rect" id="Node000005" href="$namespace_c_l_i.html#a5feaad2da28dd1b1adac0ebd8382af7d" title="Helper function to enable one option group/subcommand when another is used." alt="" coords="6,153,113,179"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="166,122,92,155,90,150,164,117"/>
+</map>

@@ -1,0 +1,95 @@
+\doxysection{sysio\+::chain\+::wasm\+\_\+validations\+::wasm\+\_\+binary\+\_\+validation Class Reference}
+\hypertarget{classsysio_1_1chain_1_1wasm__validations_1_1wasm__binary__validation}{}\label{classsysio_1_1chain_1_1wasm__validations_1_1wasm__binary__validation}\index{sysio::chain::wasm\_validations::wasm\_binary\_validation@{sysio::chain::wasm\_validations::wasm\_binary\_validation}}
+
+
+{\ttfamily \#include $<$wasm\+\_\+sysio\+\_\+validation.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classsysio_1_1chain_1_1wasm__validations_1_1wasm__binary__validation_ae12bdd721a45b84fa20f773c87ee1e91}{wasm\+\_\+binary\+\_\+validation}} (const \mbox{\hyperlink{classsysio_1_1chain_1_1controller}{sysio\+::chain\+::controller}} \&control, \mbox{\hyperlink{struct_i_r_1_1_module}{IR\+::\+Module}} \&mod)
+\item 
+void \mbox{\hyperlink{classsysio_1_1chain_1_1wasm__validations_1_1wasm__binary__validation_a223aeb74a457949878b0e94813c8d402}{validate}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__validation_8hpp_source_l00325}{325}} of file \mbox{\hyperlink{wasm__sysio__validation_8hpp_source}{wasm\+\_\+sysio\+\_\+validation.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classsysio_1_1chain_1_1wasm__validations_1_1wasm__binary__validation_ae12bdd721a45b84fa20f773c87ee1e91}\index{sysio::chain::wasm\_validations::wasm\_binary\_validation@{sysio::chain::wasm\_validations::wasm\_binary\_validation}!wasm\_binary\_validation@{wasm\_binary\_validation}}
+\index{wasm\_binary\_validation@{wasm\_binary\_validation}!sysio::chain::wasm\_validations::wasm\_binary\_validation@{sysio::chain::wasm\_validations::wasm\_binary\_validation}}
+\doxysubsubsection{\texorpdfstring{wasm\_binary\_validation()}{wasm\_binary\_validation()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1wasm__validations_1_1wasm__binary__validation_ae12bdd721a45b84fa20f773c87ee1e91} 
+sysio\+::chain\+::wasm\+\_\+validations\+::wasm\+\_\+binary\+\_\+validation\+::wasm\+\_\+binary\+\_\+validation (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classsysio_1_1chain_1_1controller}{sysio\+::chain\+::controller}} \&}]{control}{, }\item[{\mbox{\hyperlink{struct_i_r_1_1_module}{IR\+::\+Module}} \&}]{mod}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__validation_8hpp_source_l00333}{333}} of file \mbox{\hyperlink{wasm__sysio__validation_8hpp_source}{wasm\+\_\+sysio\+\_\+validation.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00333\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \_module(\ \&mod\ )\ \{}
+\DoxyCodeLine{00334\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ initialize\ validators\ here}}
+\DoxyCodeLine{00335\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__validations_1_1nested__validator_a1c8367f631b914969a818fef8486e1ab}{nested\_validator::init}}(!control.\mbox{\hyperlink{classsysio_1_1chain_1_1controller_a0fcc85a590581560765686050fe105a8}{is\_producing\_block}}());}
+\DoxyCodeLine{00336\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1wasm__validations_1_1wasm__binary__validation_ae12bdd721a45b84fa20f773c87ee1e91_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1chain_1_1wasm__validations_1_1wasm__binary__validation_a223aeb74a457949878b0e94813c8d402}\index{sysio::chain::wasm\_validations::wasm\_binary\_validation@{sysio::chain::wasm\_validations::wasm\_binary\_validation}!validate@{validate}}
+\index{validate@{validate}!sysio::chain::wasm\_validations::wasm\_binary\_validation@{sysio::chain::wasm\_validations::wasm\_binary\_validation}}
+\doxysubsubsection{\texorpdfstring{validate()}{validate()}}
+{\footnotesize\ttfamily \label{classsysio_1_1chain_1_1wasm__validations_1_1wasm__binary__validation_a223aeb74a457949878b0e94813c8d402} 
+void sysio\+::chain\+::wasm\+\_\+validations\+::wasm\+\_\+binary\+\_\+validation\+::validate (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__validation_8hpp_source_l00338}{338}} of file \mbox{\hyperlink{wasm__sysio__validation_8hpp_source}{wasm\+\_\+sysio\+\_\+validation.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00338\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00339\ \ \ \ \ \ \ \ \ \ \ \ \ \_module\_validators.\mbox{\hyperlink{structsysio_1_1chain_1_1wasm__validations_1_1constraints__validators_a5877932790ab481936d86993165e7278}{validate}}(\ *\_module\ );}
+\DoxyCodeLine{00340\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\ \textcolor{keyword}{auto}\&\ fd\ :\ \_module-\/>\mbox{\hyperlink{struct_i_r_1_1_module_a439e1f32fa3fa9bf47f58ac309bfc50a}{functions}}.defs\ )\ \{}
+\DoxyCodeLine{00341\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ wasm\_ops::SYSIO\_OperatorDecoderStream<op\_constrainers>\ decoder(fd.code);}
+\DoxyCodeLine{00342\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (\ decoder\ )\ \{}
+\DoxyCodeLine{00343\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ wasm\_ops::instruction\_stream\ new\_code(0);}
+\DoxyCodeLine{00344\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{unionop}{op}}\ =\ decoder.decodeOp();}
+\DoxyCodeLine{00345\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{unionop}{op}}-\/>visit(\ \{\ \_module,\ \&new\_code,\ \&fd,\ decoder.index()\ \}\ );}
+\DoxyCodeLine{00346\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00347\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00348\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1wasm__validations_1_1wasm__binary__validation_a223aeb74a457949878b0e94813c8d402_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1chain_1_1wasm__validations_1_1wasm__binary__validation_a223aeb74a457949878b0e94813c8d402_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{wasm__sysio__validation_8hpp}{wasm\+\_\+sysio\+\_\+validation.\+hpp}}\end{DoxyCompactItemize}

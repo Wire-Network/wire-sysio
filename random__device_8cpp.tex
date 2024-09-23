@@ -1,0 +1,68 @@
+\doxysection{libraries/fc/vendor/websocketpp/test/random/random\+\_\+device.cpp File Reference}
+\hypertarget{random__device_8cpp}{}\label{random__device_8cpp}\index{libraries/fc/vendor/websocketpp/test/random/random\_device.cpp@{libraries/fc/vendor/websocketpp/test/random/random\_device.cpp}}
+{\ttfamily \#include $<$boost/test/unit\+\_\+test.\+hpp$>$}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$websocketpp/common/stdint.\+hpp$>$}\newline
+{\ttfamily \#include $<$websocketpp/random/random\+\_\+device.\+hpp$>$}\newline
+{\ttfamily \#include $<$websocketpp/concurrency/none.\+hpp$>$}\newline
+Include dependency graph for random\+\_\+device.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{random__device_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{random__device_8cpp_a6b2a3852db8bb19ab6909bac01859985}{BOOST\+\_\+\+TEST\+\_\+\+MODULE}}~random\+\_\+device
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{random__device_8cpp_a0c4044127417abfa7b965694c74397ef}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (compiles)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{random__device_8cpp_a6b2a3852db8bb19ab6909bac01859985}\index{random\_device.cpp@{random\_device.cpp}!BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}}
+\index{BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}!random\_device.cpp@{random\_device.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_TEST\_MODULE}{BOOST\_TEST\_MODULE}}
+{\footnotesize\ttfamily \label{random__device_8cpp_a6b2a3852db8bb19ab6909bac01859985} 
+\#define BOOST\+\_\+\+TEST\+\_\+\+MODULE~random\+\_\+device}
+
+
+
+Definition at line \mbox{\hyperlink{random__device_8cpp_source_l00028}{28}} of file \mbox{\hyperlink{random__device_8cpp_source}{random\+\_\+device.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{random__device_8cpp_a0c4044127417abfa7b965694c74397ef}\index{random\_device.cpp@{random\_device.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!random\_device.cpp@{random\_device.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}}
+{\footnotesize\ttfamily \label{random__device_8cpp_a0c4044127417abfa7b965694c74397ef} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{compiles}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{random__device_8cpp_source_l00037}{37}} of file \mbox{\hyperlink{random__device_8cpp_source}{random\+\_\+device.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00038\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1random_1_1random__device_1_1int__generator}{websocketpp::random::random\_device::int\_generator<int32\_t,websocketpp::concurrency::none>}}\ \mbox{\hyperlink{namespace_catch_adf13e77187ae9bc5d7cd1bb29c1ba7e9}{rng}};}
+\DoxyCodeLine{00039\ }
+\DoxyCodeLine{00040\ \ \ \ \ \textcolor{keywordtype}{bool}\ e\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00041\ }
+\DoxyCodeLine{00042\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}}\ \mbox{\hyperlink{namespacefoo}{foo}}\ =\ \mbox{\hyperlink{namespace_catch_adf13e77187ae9bc5d7cd1bb29c1ba7e9}{rng}}();}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ std::cout\ <<\ \mbox{\hyperlink{namespacefoo}{foo}}\ <<\ std::endl;}
+\DoxyCodeLine{00045\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ e\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00047\ \ \ \ \ \}}
+\DoxyCodeLine{00048\ }
+\DoxyCodeLine{00049\ \ \ \ \ BOOST\_CHECK(\ e\ ==\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{00050\ \}}
+
+\end{DoxyCode}

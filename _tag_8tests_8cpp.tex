@@ -1,0 +1,98 @@
+\doxysection{libraries/sys-\/vm/external/\+Catch2/projects/\+Self\+Test/\+Introspective\+Tests/\+Tag.tests.\+cpp File Reference}
+\hypertarget{_tag_8tests_8cpp}{}\label{_tag_8tests_8cpp}\index{libraries/sys-\/vm/external/Catch2/projects/SelfTest/IntrospectiveTests/Tag.tests.cpp@{libraries/sys-\/vm/external/Catch2/projects/SelfTest/IntrospectiveTests/Tag.tests.cpp}}
+{\ttfamily \#include "{}catch.\+hpp"{}}\newline
+{\ttfamily \#include "{}internal/catch\+\_\+tag\+\_\+alias\+\_\+registry.\+h"{}}\newline
+Include dependency graph for Tag.\+tests.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{_tag_8tests_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{_tag_8tests_8cpp_a43ab70fddf12722cf416418b1b17c08d}{TEST\+\_\+\+CASE}} ("{}Tag alias can be registered against tag patterns"{})
+\item 
+\mbox{\hyperlink{_tag_8tests_8cpp_a792191b80ed17cee94d26599297b579d}{TEST\+\_\+\+CASE}} ("{}shortened hide tags are split apart"{})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{_tag_8tests_8cpp_a792191b80ed17cee94d26599297b579d}\index{Tag.tests.cpp@{Tag.tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!Tag.tests.cpp@{Tag.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{_tag_8tests_8cpp_a792191b80ed17cee94d26599297b579d} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}shortened hide tags are split apart"{}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_tag_8tests_8cpp_source_l00044}{44}} of file \mbox{\hyperlink{_tag_8tests_8cpp_source}{Tag.\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00045\ \ \ \ \ \textcolor{keyword}{auto}\ testcase\ =\ \mbox{\hyperlink{namespace_catch_a0d7fc9d074bde40c74ce4ffd27fe72b2}{Catch::makeTestCase}}(\textcolor{keyword}{nullptr},\ \textcolor{stringliteral}{"{}"{}},\ \{\textcolor{stringliteral}{"{}fake\ test\ name"{}},\ \textcolor{stringliteral}{"{}[.magic-\/tag]"{}}\},\ \mbox{\hyperlink{catch__common_8h_abc0b2405454c51748a31e0393d9ad5d1}{CATCH\_INTERNAL\_LINEINFO}});}
+\DoxyCodeLine{00046\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ac1354db6f3e9c1e0a8eda0eea7ff1f0a}{REQUIRE\_THAT}}(testcase.tags,\ \mbox{\hyperlink{namespace_catch_1_1_matchers_a8affcb1de92aeae3c3e830786287040b}{Catch::VectorContains}}(std::string(\textcolor{stringliteral}{"{}magic-\/tag"{}}))\ \&\&\ \mbox{\hyperlink{namespace_catch_1_1_matchers_a8affcb1de92aeae3c3e830786287040b}{Catch::VectorContains}}(std::string(\textcolor{stringliteral}{"{}."{}})));}
+\DoxyCodeLine{00047\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{_tag_8tests_8cpp_a792191b80ed17cee94d26599297b579d_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{_tag_8tests_8cpp_a43ab70fddf12722cf416418b1b17c08d}\index{Tag.tests.cpp@{Tag.tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!Tag.tests.cpp@{Tag.tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{_tag_8tests_8cpp_a43ab70fddf12722cf416418b1b17c08d} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Tag alias can be registered against tag patterns"{}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{_tag_8tests_8cpp_source_l00012}{12}} of file \mbox{\hyperlink{_tag_8tests_8cpp_source}{Tag.\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00012\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00013\ }
+\DoxyCodeLine{00014\ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_tag_alias_registry}{Catch::TagAliasRegistry}}\ registry;}
+\DoxyCodeLine{00015\ }
+\DoxyCodeLine{00016\ \ \ \ \ registry.\mbox{\hyperlink{class_catch_1_1_tag_alias_registry_a37ae1fda30de783f563492c3c60ab414}{add}}(\ \textcolor{stringliteral}{"{}[@zzz]"{}},\ \textcolor{stringliteral}{"{}[one][two]"{}},\ \mbox{\hyperlink{struct_catch_1_1_source_line_info}{Catch::SourceLineInfo}}(\ \textcolor{stringliteral}{"{}file"{}},\ 2\ )\ );}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\ \textcolor{stringliteral}{"{}The\ same\ tag\ alias\ can\ only\ be\ registered\ once"{}}\ )\ \{}
+\DoxyCodeLine{00019\ }
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \ \ \ \ registry.\mbox{\hyperlink{class_catch_1_1_tag_alias_registry_a37ae1fda30de783f563492c3c60ab414}{add}}(\ \textcolor{stringliteral}{"{}[@zzz]"{}},\ \textcolor{stringliteral}{"{}[one][two]"{}},\ \mbox{\hyperlink{struct_catch_1_1_source_line_info}{Catch::SourceLineInfo}}(\ \textcolor{stringliteral}{"{}file"{}},\ 10\ )\ );}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gtest_8h_a3e26a8d27caa386ed0ea7ce9d5b7c4ed}{FAIL}}(\ \textcolor{stringliteral}{"{}expected\ exception"{}}\ );}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{catch}(\ std::exception\&\ ex\ )\ \{}
+\DoxyCodeLine{00025\ \textcolor{preprocessor}{\#ifndef\ CATCH\_CONFIG\_DISABLE\_MATCHERS}}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ what\ =\ ex.what();}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespace_catch_1_1_matchers}{Catch::Matchers}};}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a5b8c33c63e0804d4458e2c761370b75d}{CHECK\_THAT}}(\ what,\ Contains(\ \textcolor{stringliteral}{"{}[@zzz]"{}}\ )\ );}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a5b8c33c63e0804d4458e2c761370b75d}{CHECK\_THAT}}(\ what,\ Contains(\ \textcolor{stringliteral}{"{}file"{}}\ )\ );}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a5b8c33c63e0804d4458e2c761370b75d}{CHECK\_THAT}}(\ what,\ Contains(\ \textcolor{stringliteral}{"{}2"{}}\ )\ );}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a5b8c33c63e0804d4458e2c761370b75d}{CHECK\_THAT}}(\ what,\ Contains(\ \textcolor{stringliteral}{"{}10"{}}\ )\ );}
+\DoxyCodeLine{00032\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00034\ \ \ \ \ \}}
+\DoxyCodeLine{00035\ }
+\DoxyCodeLine{00036\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad512fd95a78b95770b9759823f8fbc21}{SECTION}}(\ \textcolor{stringliteral}{"{}Tag\ aliases\ must\ be\ of\ the\ form\ [@name]"{}}\ )\ \{}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a5c646dfe831e596b59073014c1c8b9e5}{CHECK\_THROWS}}(\ registry.\mbox{\hyperlink{class_catch_1_1_tag_alias_registry_a37ae1fda30de783f563492c3c60ab414}{add}}(\ \textcolor{stringliteral}{"{}[no\ ampersat]"{}},\ \textcolor{stringliteral}{"{}"{}},\ \mbox{\hyperlink{struct_catch_1_1_source_line_info}{Catch::SourceLineInfo}}(\ \textcolor{stringliteral}{"{}file"{}},\ 3\ )\ )\ );}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a5c646dfe831e596b59073014c1c8b9e5}{CHECK\_THROWS}}(\ registry.\mbox{\hyperlink{class_catch_1_1_tag_alias_registry_a37ae1fda30de783f563492c3c60ab414}{add}}(\ \textcolor{stringliteral}{"{}[the\ @\ is\ not\ at\ the\ start]"{}},\ \textcolor{stringliteral}{"{}"{}},\ \mbox{\hyperlink{struct_catch_1_1_source_line_info}{Catch::SourceLineInfo}}(\ \textcolor{stringliteral}{"{}file"{}},\ 3\ )\ )\ );}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a5c646dfe831e596b59073014c1c8b9e5}{CHECK\_THROWS}}(\ registry.\mbox{\hyperlink{class_catch_1_1_tag_alias_registry_a37ae1fda30de783f563492c3c60ab414}{add}}(\ \textcolor{stringliteral}{"{}@no\ square\ bracket\ at\ start]"{}},\ \textcolor{stringliteral}{"{}"{}},\ \mbox{\hyperlink{struct_catch_1_1_source_line_info}{Catch::SourceLineInfo}}(\ \textcolor{stringliteral}{"{}file"{}},\ 3\ )\ )\ );}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a5c646dfe831e596b59073014c1c8b9e5}{CHECK\_THROWS}}(\ registry.\mbox{\hyperlink{class_catch_1_1_tag_alias_registry_a37ae1fda30de783f563492c3c60ab414}{add}}(\ \textcolor{stringliteral}{"{}[@no\ square\ bracket\ at\ end"{}},\ \textcolor{stringliteral}{"{}"{}},\ \mbox{\hyperlink{struct_catch_1_1_source_line_info}{Catch::SourceLineInfo}}(\ \textcolor{stringliteral}{"{}file"{}},\ 3\ )\ )\ );}
+\DoxyCodeLine{00041\ \ \ \ \ \}}
+\DoxyCodeLine{00042\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{_tag_8tests_8cpp_a43ab70fddf12722cf416418b1b17c08d_cgraph}
+\end{center}
+\end{figure}

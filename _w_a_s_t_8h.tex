@@ -1,0 +1,56 @@
+\doxysection{libraries/wasm-\/jit/\+Include/\+WAST/\+WAST.h File Reference}
+\hypertarget{_w_a_s_t_8h}{}\label{_w_a_s_t_8h}\index{libraries/wasm-\/jit/Include/WAST/WAST.h@{libraries/wasm-\/jit/Include/WAST/WAST.h}}
+{\ttfamily \#include "{}Inline/\+Basic\+Types.\+h"{}}\newline
+{\ttfamily \#include "{}Runtime/\+Runtime.\+h"{}}\newline
+{\ttfamily \#include "{}WASM/\+WASM.\+h"{}}\newline
+Include dependency graph for WAST.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{_w_a_s_t_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{_w_a_s_t_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_w_a_s_t_1_1_text_file_locus}{WAST\+::\+Text\+File\+Locus}}
+\item 
+struct \mbox{\hyperlink{struct_w_a_s_t_1_1_error}{WAST\+::\+Error}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespace_w_a_s_t}{WAST}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{_w_a_s_t_8h_a4d4cd62fee2b2e181ef87d58fe61064c}{WAST\+\_\+\+API}}~\mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_a14d005bd653c82f4e705b4ded2a4fc07}{DLL\+\_\+\+IMPORT}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{_w_a_s_t_8h_a4d4cd62fee2b2e181ef87d58fe61064c}{WAST\+\_\+\+API}} bool \mbox{\hyperlink{namespace_w_a_s_t_a6d93426db9bd262249b9ce93ddba7c87}{WAST\+::parse\+Module}} (const char \texorpdfstring{$\ast$}{*}string, \mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} string\+Length, \mbox{\hyperlink{struct_i_r_1_1_module}{IR\+::\+Module}} \&out\+Module, std\+::vector$<$ \mbox{\hyperlink{struct_w_a_s_t_1_1_error}{Error}} $>$ \&out\+Errors)
+\item 
+\mbox{\hyperlink{_w_a_s_t_8h_a4d4cd62fee2b2e181ef87d58fe61064c}{WAST\+\_\+\+API}} std\+::string \mbox{\hyperlink{namespace_w_a_s_t_aa6c1fd4b6c7ec43ba7e25dc6138d4899}{WAST\+::print}} (const \mbox{\hyperlink{struct_i_r_1_1_module}{IR\+::\+Module}} \&module)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{_w_a_s_t_8h_a4d4cd62fee2b2e181ef87d58fe61064c}\index{WAST.h@{WAST.h}!WAST\_API@{WAST\_API}}
+\index{WAST\_API@{WAST\_API}!WAST.h@{WAST.h}}
+\doxysubsubsection{\texorpdfstring{WAST\_API}{WAST\_API}}
+{\footnotesize\ttfamily \label{_w_a_s_t_8h_a4d4cd62fee2b2e181ef87d58fe61064c} 
+\#define WAST\+\_\+\+API~\mbox{\hyperlink{wasm-jit_2_include_2_platform_2platform_8h_a14d005bd653c82f4e705b4ded2a4fc07}{DLL\+\_\+\+IMPORT}}}
+
+
+
+Definition at line \mbox{\hyperlink{_w_a_s_t_8h_source_l00004}{4}} of file \mbox{\hyperlink{_w_a_s_t_8h_source}{WAST.\+h}}.
+

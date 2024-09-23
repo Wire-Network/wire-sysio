@@ -1,0 +1,328 @@
+\doxysection{fc\+::api\texorpdfstring{$<$}{<} Interface, Transform \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classfc_1_1api}{}\label{classfc_1_1api}\index{fc::api$<$ Interface, Transform $>$@{fc::api$<$ Interface, Transform $>$}}
+
+
+{\ttfamily \#include $<$api.\+hpp$>$}
+
+
+
+Inheritance diagram for fc\+::api\texorpdfstring{$<$}{<} Interface, Transform \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=173pt]{classfc_1_1api__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for fc\+::api\texorpdfstring{$<$}{<} Interface, Transform \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=173pt]{classfc_1_1api__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{structfc_1_1vtable}{vtable}}$<$ \mbox{\hyperlink{class_interface}{Interface}}, Transform $>$ \mbox{\hyperlink{classfc_1_1api_a3ba64f50365ee99a375f9d7431987b5a}{vtable\+\_\+type}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1api_a255981b8f6e5350f515a81b4ade179cf}{api}} ()
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{classfc_1_1api_aa98da82a201c30c8efd4cad46c878a8b}{api}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})
+\item 
+\mbox{\hyperlink{classfc_1_1api_a6c20ba1caacd7897d0d0579df8a6ba1a}{api}} (const \mbox{\hyperlink{classfc_1_1api}{api}} \&cpy)
+\item 
+virtual \mbox{\hyperlink{classfc_1_1api_a14db4007b51ba85ba8d8e34009997299}{\texorpdfstring{$\sim$}{\string~}api}} ()
+\item 
+virtual \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{classfc_1_1api_a3a8b466e0de4641b7afec6cf846492c5}{get\+\_\+handle}} () const override
+\item 
+virtual \mbox{\hyperlink{namespacefc_a18e9e0bd9c0a52896425ae1172bc4e2b}{api\+\_\+id\+\_\+type}} \mbox{\hyperlink{classfc_1_1api_a0fc48f47c158c42785ac9a7b21bf8788}{register\+\_\+api}} (\mbox{\hyperlink{classfc_1_1api__connection}{api\+\_\+connection}} \&conn) const override
+\item 
+\mbox{\hyperlink{classfc_1_1api_a3ba64f50365ee99a375f9d7431987b5a}{vtable\+\_\+type}} \& \mbox{\hyperlink{classfc_1_1api_a1335009eb090b58f33810cf75dd52e3d}{operator\texorpdfstring{$\ast$}{*}}} () const
+\item 
+\mbox{\hyperlink{classfc_1_1api_a3ba64f50365ee99a375f9d7431987b5a}{vtable\+\_\+type}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classfc_1_1api_a73cfc6782195141e368974f6970f6f61}{operator-\/$>$}} () const
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classfc_1_1api__base}{fc\+::api\+\_\+base}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1api__base_a8defc5c5b610084dcb77e9ddcdef3e2e}{api\+\_\+base}} ()
+\item 
+virtual \mbox{\hyperlink{classfc_1_1api__base_a7191e098deecfd91e0859de0db8440db}{\texorpdfstring{$\sim$}{\string~}api\+\_\+base}} ()
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{classfc_1_1api}{api}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}, \mbox{\hyperlink{structfc_1_1identity__member}{identity\+\_\+member}} $>$ \mbox{\hyperlink{classfc_1_1api__base_a570f3175e653255270219c3613ad7996}{as}} ()
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{classfc_1_1api}{api}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \mbox{\hyperlink{classfc_1_1api__base_acd5bdfb71e2f032cf843b67b6043f063}{as}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classfc_1_1api_a3ba64f50365ee99a375f9d7431987b5a}{vtable\+\_\+type}} $>$ \mbox{\hyperlink{classfc_1_1api_ad1617b790322c5a8e41f2af06c88c0e6}{\+\_\+vtable}}
+\item 
+std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{namespacefc_a8b03fb95276f683bde05b7715d9f0014}{fc\+::any}} $>$ \mbox{\hyperlink{classfc_1_1api_a8f70f7e0e85f5fa0a7ab1f5667f3a88f}{\+\_\+data}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{classfc_1_1api_a200d5382cff45db8633a0fc427650338}{operator==}} (const \mbox{\hyperlink{classfc_1_1api}{api}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, const \mbox{\hyperlink{classfc_1_1api}{api}} \&b)
+\item 
+bool \mbox{\hyperlink{classfc_1_1api_abc65e9cb0c531a4fe0ba91ee2eea6644}{operator!=}} (const \mbox{\hyperlink{classfc_1_1api}{api}} \&\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, const \mbox{\hyperlink{classfc_1_1api}{api}} \&b)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{class_interface}{Interface}}, typename Transform = identity\+\_\+member$>$\newline
+class fc\+::api$<$ Interface, Transform $>$}
+
+
+Definition at line \mbox{\hyperlink{api_8hpp_source_l00067}{67}} of file \mbox{\hyperlink{api_8hpp_source}{api.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classfc_1_1api_a3ba64f50365ee99a375f9d7431987b5a}\index{fc::api$<$ Interface, Transform $>$@{fc::api$<$ Interface, Transform $>$}!vtable\_type@{vtable\_type}}
+\index{vtable\_type@{vtable\_type}!fc::api$<$ Interface, Transform $>$@{fc::api$<$ Interface, Transform $>$}}
+\doxysubsubsection{\texorpdfstring{vtable\_type}{vtable\_type}}
+{\footnotesize\ttfamily \label{classfc_1_1api_a3ba64f50365ee99a375f9d7431987b5a} 
+template$<$typename \mbox{\hyperlink{class_interface}{Interface}} , typename Transform  = identity\+\_\+member$>$ \\
+\mbox{\hyperlink{structfc_1_1vtable}{vtable}}$<$\mbox{\hyperlink{class_interface}{Interface}},Transform$>$ \mbox{\hyperlink{classfc_1_1api}{fc\+::api}}$<$ \mbox{\hyperlink{class_interface}{Interface}}, Transform $>$\+::vtable\+\_\+type}
+
+
+
+Definition at line \mbox{\hyperlink{api_8hpp_source_l00069}{69}} of file \mbox{\hyperlink{api_8hpp_source}{api.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1api_a255981b8f6e5350f515a81b4ade179cf}\index{fc::api$<$ Interface, Transform $>$@{fc::api$<$ Interface, Transform $>$}!api@{api}}
+\index{api@{api}!fc::api$<$ Interface, Transform $>$@{fc::api$<$ Interface, Transform $>$}}
+\doxysubsubsection{\texorpdfstring{api()}{api()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{classfc_1_1api_a255981b8f6e5350f515a81b4ade179cf} 
+template$<$typename \mbox{\hyperlink{class_interface}{Interface}} , typename Transform  = identity\+\_\+member$>$ \\
+\mbox{\hyperlink{classfc_1_1api}{fc\+::api}}$<$ \mbox{\hyperlink{class_interface}{Interface}}, Transform $>$\+::api (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{api_8hpp_source_l00071}{71}} of file \mbox{\hyperlink{api_8hpp_source}{api.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00071\ :\mbox{\hyperlink{classfc_1_1api_ad1617b790322c5a8e41f2af06c88c0e6}{\_vtable}}(\ std::make\_shared<vtable\_type>()\ )\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1api_aa98da82a201c30c8efd4cad46c878a8b}\index{fc::api$<$ Interface, Transform $>$@{fc::api$<$ Interface, Transform $>$}!api@{api}}
+\index{api@{api}!fc::api$<$ Interface, Transform $>$@{fc::api$<$ Interface, Transform $>$}}
+\doxysubsubsection{\texorpdfstring{api()}{api()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{classfc_1_1api_aa98da82a201c30c8efd4cad46c878a8b} 
+template$<$typename \mbox{\hyperlink{class_interface}{Interface}} , typename Transform  = identity\+\_\+member$>$ \\
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{classfc_1_1api}{fc\+::api}}$<$ \mbox{\hyperlink{class_interface}{Interface}}, Transform $>$\+::api (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{p}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+T is anything with pointer semantics 
+
+Definition at line \mbox{\hyperlink{api_8hpp_source_l00075}{75}} of file \mbox{\hyperlink{api_8hpp_source}{api.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ :\mbox{\hyperlink{classfc_1_1api_ad1617b790322c5a8e41f2af06c88c0e6}{\_vtable}}(\ std::make\_shared<vtable\_type>()\ )}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1api_a8f70f7e0e85f5fa0a7ab1f5667f3a88f}{\_data}}\ =\ std::make\_shared<fc::any>(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}});}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ ptr\ =\ boost::any\_cast<T\&>(*\mbox{\hyperlink{classfc_1_1api_a8f70f7e0e85f5fa0a7ab1f5667f3a88f}{\_data}});}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ pointed\_at\ =\ *ptr;}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{typename}\ std::remove\_reference<\textcolor{keyword}{decltype}(pointed\_at)>::type\ source\_vtable\_type;}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1api_ad1617b790322c5a8e41f2af06c88c0e6}{\_vtable}}-\/>FC\_CALL\_MEMBER\_TEMPLATE\_KEYWORD\ visit\_other(\ vtable\_copy\_visitor<source\_vtable\_type>(pointed\_at)\ );}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1api_a6c20ba1caacd7897d0d0579df8a6ba1a}\index{fc::api$<$ Interface, Transform $>$@{fc::api$<$ Interface, Transform $>$}!api@{api}}
+\index{api@{api}!fc::api$<$ Interface, Transform $>$@{fc::api$<$ Interface, Transform $>$}}
+\doxysubsubsection{\texorpdfstring{api()}{api()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{classfc_1_1api_a6c20ba1caacd7897d0d0579df8a6ba1a} 
+template$<$typename \mbox{\hyperlink{class_interface}{Interface}} , typename Transform  = identity\+\_\+member$>$ \\
+\mbox{\hyperlink{classfc_1_1api}{fc\+::api}}$<$ \mbox{\hyperlink{class_interface}{Interface}}, Transform $>$\+::api (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1api}{api}}$<$ \mbox{\hyperlink{class_interface}{Interface}}, Transform $>$ \&}]{cpy}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{api_8hpp_source_l00085}{85}} of file \mbox{\hyperlink{api_8hpp_source}{api.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00085\ :\mbox{\hyperlink{classfc_1_1api_ad1617b790322c5a8e41f2af06c88c0e6}{\_vtable}}(cpy.\_vtable),\mbox{\hyperlink{classfc_1_1api_a8f70f7e0e85f5fa0a7ab1f5667f3a88f}{\_data}}(cpy.\_data)\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1api_a14db4007b51ba85ba8d8e34009997299}\index{fc::api$<$ Interface, Transform $>$@{fc::api$<$ Interface, Transform $>$}!````~api@{\texorpdfstring{$\sim$}{\string~}api}}
+\index{````~api@{\texorpdfstring{$\sim$}{\string~}api}!fc::api$<$ Interface, Transform $>$@{fc::api$<$ Interface, Transform $>$}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}api()}{\string~api()}}
+{\footnotesize\ttfamily \label{classfc_1_1api_a14db4007b51ba85ba8d8e34009997299} 
+template$<$typename \mbox{\hyperlink{class_interface}{Interface}} , typename Transform  = identity\+\_\+member$>$ \\
+virtual \mbox{\hyperlink{classfc_1_1api}{fc\+::api}}$<$ \mbox{\hyperlink{class_interface}{Interface}}, Transform $>$\+::\texorpdfstring{$\sim$}{\string~}\mbox{\hyperlink{classfc_1_1api}{api}} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{api_8hpp_source_l00086}{86}} of file \mbox{\hyperlink{api_8hpp_source}{api.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00086\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1api_a3a8b466e0de4641b7afec6cf846492c5}\index{fc::api$<$ Interface, Transform $>$@{fc::api$<$ Interface, Transform $>$}!get\_handle@{get\_handle}}
+\index{get\_handle@{get\_handle}!fc::api$<$ Interface, Transform $>$@{fc::api$<$ Interface, Transform $>$}}
+\doxysubsubsection{\texorpdfstring{get\_handle()}{get\_handle()}}
+{\footnotesize\ttfamily \label{classfc_1_1api_a3a8b466e0de4641b7afec6cf846492c5} 
+template$<$typename \mbox{\hyperlink{class_interface}{Interface}} , typename Transform  = identity\+\_\+member$>$ \\
+virtual \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{classfc_1_1api}{fc\+::api}}$<$ \mbox{\hyperlink{class_interface}{Interface}}, Transform $>$\+::get\+\_\+handle (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classfc_1_1api__base_a101030d0c1e946040fc8dade7f051309}{fc\+::api\+\_\+base}}.
+
+
+
+Definition at line \mbox{\hyperlink{api_8hpp_source_l00090}{90}} of file \mbox{\hyperlink{api_8hpp_source}{api.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00090\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}(\mbox{\hyperlink{classfc_1_1api_a8f70f7e0e85f5fa0a7ab1f5667f3a88f}{\_data}}.get());\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1api_a1335009eb090b58f33810cf75dd52e3d}\index{fc::api$<$ Interface, Transform $>$@{fc::api$<$ Interface, Transform $>$}!operator\texorpdfstring{$\ast$}{*}@{operator\texorpdfstring{$\ast$}{*}}}
+\index{operator\texorpdfstring{$\ast$}{*}@{operator\texorpdfstring{$\ast$}{*}}!fc::api$<$ Interface, Transform $>$@{fc::api$<$ Interface, Transform $>$}}
+\doxysubsubsection{\texorpdfstring{operator\texorpdfstring{$\ast$}{*}()}{operator*()}}
+{\footnotesize\ttfamily \label{classfc_1_1api_a1335009eb090b58f33810cf75dd52e3d} 
+template$<$typename \mbox{\hyperlink{class_interface}{Interface}} , typename Transform  = identity\+\_\+member$>$ \\
+\mbox{\hyperlink{classfc_1_1api_a3ba64f50365ee99a375f9d7431987b5a}{vtable\+\_\+type}} \& \mbox{\hyperlink{classfc_1_1api}{fc\+::api}}$<$ \mbox{\hyperlink{class_interface}{Interface}}, Transform $>$\+::operator\texorpdfstring{$\ast$}{*} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{api_8hpp_source_l00093}{93}} of file \mbox{\hyperlink{api_8hpp_source}{api.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00093\ \{\ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ \mbox{\hyperlink{classfc_1_1api_ad1617b790322c5a8e41f2af06c88c0e6}{\_vtable}}\ );\ \textcolor{keywordflow}{return}\ *\mbox{\hyperlink{classfc_1_1api_ad1617b790322c5a8e41f2af06c88c0e6}{\_vtable}};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1api_a73cfc6782195141e368974f6970f6f61}\index{fc::api$<$ Interface, Transform $>$@{fc::api$<$ Interface, Transform $>$}!operator-\/$>$@{operator-\/$>$}}
+\index{operator-\/$>$@{operator-\/$>$}!fc::api$<$ Interface, Transform $>$@{fc::api$<$ Interface, Transform $>$}}
+\doxysubsubsection{\texorpdfstring{operator-\/$>$()}{operator->()}}
+{\footnotesize\ttfamily \label{classfc_1_1api_a73cfc6782195141e368974f6970f6f61} 
+template$<$typename \mbox{\hyperlink{class_interface}{Interface}} , typename Transform  = identity\+\_\+member$>$ \\
+\mbox{\hyperlink{classfc_1_1api_a3ba64f50365ee99a375f9d7431987b5a}{vtable\+\_\+type}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classfc_1_1api}{fc\+::api}}$<$ \mbox{\hyperlink{class_interface}{Interface}}, Transform $>$\+::operator-\/$>$ (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{api_8hpp_source_l00094}{94}} of file \mbox{\hyperlink{api_8hpp_source}{api.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00094\ \{\ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\ \mbox{\hyperlink{classfc_1_1api_ad1617b790322c5a8e41f2af06c88c0e6}{\_vtable}}\ );\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1api_ad1617b790322c5a8e41f2af06c88c0e6}{\_vtable}}.get();\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1api_a0fc48f47c158c42785ac9a7b21bf8788}\index{fc::api$<$ Interface, Transform $>$@{fc::api$<$ Interface, Transform $>$}!register\_api@{register\_api}}
+\index{register\_api@{register\_api}!fc::api$<$ Interface, Transform $>$@{fc::api$<$ Interface, Transform $>$}}
+\doxysubsubsection{\texorpdfstring{register\_api()}{register\_api()}}
+{\footnotesize\ttfamily \label{classfc_1_1api_a0fc48f47c158c42785ac9a7b21bf8788} 
+template$<$typename \mbox{\hyperlink{class_interface}{Interface}} , typename Transform $>$ \\
+\mbox{\hyperlink{namespacefc_a18e9e0bd9c0a52896425ae1172bc4e2b}{api\+\_\+id\+\_\+type}} \mbox{\hyperlink{classfc_1_1api}{fc\+::api}}$<$ \mbox{\hyperlink{class_interface}{Interface}}, Transform $>$\+::register\+\_\+api (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1api__connection}{api\+\_\+connection}} \&}]{conn}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+It is slightly unclean tight coupling to have this method in the api class. It breaks encapsulation by requiring an api class method to have a pointer to an \doxylink{classfc_1_1api__connection}{api\+\_\+connection}. The reason this is necessary is we have a goal of being able to call \doxylink{classfc_1_1api_a0fc48f47c158c42785ac9a7b21bf8788}{register\+\_\+api()} on an api$<$\+T$>$ through its base class \doxylink{classfc_1_1api__base}{api\+\_\+base}. But \doxylink{classfc_1_1api_a0fc48f47c158c42785ac9a7b21bf8788}{register\+\_\+api()} must know the template parameters!
+
+The only reasonable way to achieve the goal is to implement \doxylink{classfc_1_1api_a0fc48f47c158c42785ac9a7b21bf8788}{register\+\_\+api()} as a method in api$<$\+T$>$ (which obviously knows the template parameter T), then make the implementation accessible through the base class (by making it a pure virtual method in the base class which is overridden by the subclass\textquotesingle{}s implementation).
+
+It is slightly unclean tight coupling to have this method in the api class. It breaks encapsulation by requiring an api class method to have a pointer to an \doxylink{classfc_1_1binary__api__connection}{binary\+\_\+api\+\_\+connection}. The reason this is necessary is we have a goal of being able to call \doxylink{classfc_1_1api_a0fc48f47c158c42785ac9a7b21bf8788}{register\+\_\+api()} on an api$<$\+T$>$ through its base class \doxylink{classfc_1_1api__base}{api\+\_\+base}. But \doxylink{classfc_1_1api_a0fc48f47c158c42785ac9a7b21bf8788}{register\+\_\+api()} must know the template parameters!
+
+The only reasonable way to achieve the goal is to implement \doxylink{classfc_1_1api_a0fc48f47c158c42785ac9a7b21bf8788}{register\+\_\+api()} as a method in api$<$\+T$>$ (which obviously knows the template parameter T), then make the implementation accessible through the base class (by making it a pure virtual method in the base class which is overridden by the subclass\textquotesingle{}s implementation). 
+
+Implements \mbox{\hyperlink{classfc_1_1api__base_a999476d6eb0dd3a40d40a496c9c1a318}{fc\+::api\+\_\+base}}.
+
+
+
+Definition at line \mbox{\hyperlink{api__connection_8hpp_source_l00459}{459}} of file \mbox{\hyperlink{api__connection_8hpp_source}{api\+\_\+connection.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00460\ \ \ \ \{}
+\DoxyCodeLine{00461\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ conn.register\_api(\ *\textcolor{keyword}{this}\ );}
+\DoxyCodeLine{00462\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=311pt]{classfc_1_1api_a0fc48f47c158c42785ac9a7b21bf8788_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{classfc_1_1api_abc65e9cb0c531a4fe0ba91ee2eea6644}\index{fc::api$<$ Interface, Transform $>$@{fc::api$<$ Interface, Transform $>$}!operator"!=@{operator"!=}}
+\index{operator"!=@{operator"!=}!fc::api$<$ Interface, Transform $>$@{fc::api$<$ Interface, Transform $>$}}
+\doxysubsubsection{\texorpdfstring{operator"!=}{operator!=}}
+{\footnotesize\ttfamily \label{classfc_1_1api_abc65e9cb0c531a4fe0ba91ee2eea6644} 
+template$<$typename \mbox{\hyperlink{class_interface}{Interface}} , typename Transform  = identity\+\_\+member$>$ \\
+bool \mbox{\hyperlink{namespacefc_a40c368ac88294ae47b064cad937fdbf6}{operator!}}= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1api}{api}}$<$ \mbox{\hyperlink{class_interface}{Interface}}, Transform $>$ \&}]{a}{, }\item[{const \mbox{\hyperlink{classfc_1_1api}{api}}$<$ \mbox{\hyperlink{class_interface}{Interface}}, Transform $>$ \&}]{b}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{api_8hpp_source_l00089}{89}} of file \mbox{\hyperlink{api_8hpp_source}{api.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00089\ \{\ \textcolor{keywordflow}{return}\ !(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.\_data\ ==\ b.\_data\ \&\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.\_vtable\ ==\ b.\_vtable);\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1api_a200d5382cff45db8633a0fc427650338}\index{fc::api$<$ Interface, Transform $>$@{fc::api$<$ Interface, Transform $>$}!operator==@{operator==}}
+\index{operator==@{operator==}!fc::api$<$ Interface, Transform $>$@{fc::api$<$ Interface, Transform $>$}}
+\doxysubsubsection{\texorpdfstring{operator==}{operator==}}
+{\footnotesize\ttfamily \label{classfc_1_1api_a200d5382cff45db8633a0fc427650338} 
+template$<$typename \mbox{\hyperlink{class_interface}{Interface}} , typename Transform  = identity\+\_\+member$>$ \\
+bool operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1api}{api}}$<$ \mbox{\hyperlink{class_interface}{Interface}}, Transform $>$ \&}]{a}{, }\item[{const \mbox{\hyperlink{classfc_1_1api}{api}}$<$ \mbox{\hyperlink{class_interface}{Interface}}, Transform $>$ \&}]{b}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{api_8hpp_source_l00088}{88}} of file \mbox{\hyperlink{api_8hpp_source}{api.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00088\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.\_data\ ==\ b.\_data\ \&\&\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.\_vtable\ ==\ b.\_vtable;\ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classfc_1_1api_a8f70f7e0e85f5fa0a7ab1f5667f3a88f}\index{fc::api$<$ Interface, Transform $>$@{fc::api$<$ Interface, Transform $>$}!\_data@{\_data}}
+\index{\_data@{\_data}!fc::api$<$ Interface, Transform $>$@{fc::api$<$ Interface, Transform $>$}}
+\doxysubsubsection{\texorpdfstring{\_data}{\_data}}
+{\footnotesize\ttfamily \label{classfc_1_1api_a8f70f7e0e85f5fa0a7ab1f5667f3a88f} 
+template$<$typename \mbox{\hyperlink{class_interface}{Interface}} , typename Transform  = identity\+\_\+member$>$ \\
+std\+::shared\+\_\+ptr$<$\mbox{\hyperlink{namespacefc_a8b03fb95276f683bde05b7715d9f0014}{fc\+::any}}$>$ \mbox{\hyperlink{classfc_1_1api}{fc\+::api}}$<$ \mbox{\hyperlink{class_interface}{Interface}}, Transform $>$\+::\+\_\+data\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{api_8hpp_source_l00098}{98}} of file \mbox{\hyperlink{api_8hpp_source}{api.\+hpp}}.
+
+\Hypertarget{classfc_1_1api_ad1617b790322c5a8e41f2af06c88c0e6}\index{fc::api$<$ Interface, Transform $>$@{fc::api$<$ Interface, Transform $>$}!\_vtable@{\_vtable}}
+\index{\_vtable@{\_vtable}!fc::api$<$ Interface, Transform $>$@{fc::api$<$ Interface, Transform $>$}}
+\doxysubsubsection{\texorpdfstring{\_vtable}{\_vtable}}
+{\footnotesize\ttfamily \label{classfc_1_1api_ad1617b790322c5a8e41f2af06c88c0e6} 
+template$<$typename \mbox{\hyperlink{class_interface}{Interface}} , typename Transform  = identity\+\_\+member$>$ \\
+std\+::shared\+\_\+ptr$<$\mbox{\hyperlink{classfc_1_1api_a3ba64f50365ee99a375f9d7431987b5a}{vtable\+\_\+type}}$>$ \mbox{\hyperlink{classfc_1_1api}{fc\+::api}}$<$ \mbox{\hyperlink{class_interface}{Interface}}, Transform $>$\+::\+\_\+vtable\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{api_8hpp_source_l00097}{97}} of file \mbox{\hyperlink{api_8hpp_source}{api.\+hpp}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/\mbox{\hyperlink{api_8hpp}{api.\+hpp}}\item 
+libraries/fc/include/fc/rpc/\mbox{\hyperlink{api__connection_8hpp}{api\+\_\+connection.\+hpp}}\item 
+libraries/fc/include/fc/rpc/\mbox{\hyperlink{binary__api__connection_8hpp}{binary\+\_\+api\+\_\+connection.\+hpp}}\end{DoxyCompactItemize}

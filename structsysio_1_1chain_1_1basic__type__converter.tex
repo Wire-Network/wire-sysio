@@ -1,0 +1,421 @@
+\doxysection{sysio\+::chain\+::basic\+\_\+type\+\_\+converter\texorpdfstring{$<$}{<} Interface \texorpdfstring{$>$}{>} Struct Template Reference}
+\hypertarget{structsysio_1_1chain_1_1basic__type__converter}{}\label{structsysio_1_1chain_1_1basic__type__converter}\index{sysio::chain::basic\_type\_converter$<$ Interface $>$@{sysio::chain::basic\_type\_converter$<$ Interface $>$}}
+
+
+{\ttfamily \#include $<$common.\+hpp$>$}
+
+
+
+Inheritance diagram for sysio\+::chain\+::basic\+\_\+type\+\_\+converter\texorpdfstring{$<$}{<} Interface \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=222pt]{structsysio_1_1chain_1_1basic__type__converter__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for sysio\+::chain\+::basic\+\_\+type\+\_\+converter\texorpdfstring{$<$}{<} Interface \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=286pt]{structsysio_1_1chain_1_1basic__type__converter__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1basic__type__converter_a6200649a762e5a0f555da498dae44878}{base\+\_\+type}} = \mbox{\hyperlink{structsysio_1_1vm_1_1type__converter}{sysio\+::vm\+::type\+\_\+converter}}$<$\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface}{webassembly\+::interface}}, \mbox{\hyperlink{class_interface}{Interface}}$>$
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Types inherited from \mbox{\hyperlink{structsysio_1_1vm_1_1type__converter}{sysio\+::vm\+::type\+\_\+converter$<$ webassembly\+::interface, Interface $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{structsysio_1_1vm_1_1type__converter_a8f13ea6cd34d95c3c68a6e7cb59b8332}{base\+\_\+type}}
+\item 
+using \mbox{\hyperlink{structsysio_1_1vm_1_1type__converter_ad26375f01e5397fc5d6a4c56605f907d}{elem\+\_\+type}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Types inherited from \mbox{\hyperlink{structsysio_1_1vm_1_1running__context}{sysio\+::vm\+::running\+\_\+context$<$ webassembly\+::interface, Interface $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a69040f9a8b13c6a7de2df8a9b07fce71}{running\+\_\+context\+\_\+t}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1basic__type__converter_a4675acb049c45c6c1968a78f87cfef7a}{SYS\+\_\+\+VM\+\_\+\+FROM\+\_\+\+WASM}} (bool,(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}))
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1basic__type__converter_ad7384ee3ab576532fc2430c4aaf157c4}{SYS\+\_\+\+VM\+\_\+\+FROM\+\_\+\+WASM}} (\mbox{\hyperlink{structsysio_1_1chain_1_1memcpy__params}{memcpy\+\_\+params}},(\mbox{\hyperlink{namespacesysio_1_1vm_a82e706727e849ccc38e1c8e7888c1609}{vm\+::wasm\+\_\+ptr\+\_\+t}} dst, \mbox{\hyperlink{namespacesysio_1_1vm_a82e706727e849ccc38e1c8e7888c1609}{vm\+::wasm\+\_\+ptr\+\_\+t}} src, \mbox{\hyperlink{namespacesysio_1_1vm_ab7d81f47e123ef4970d3e643196660ea}{vm\+::wasm\+\_\+size\+\_\+t}} size))
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1basic__type__converter_ab6fc05a4f9813edb9b00eec5c4009f08}{SYS\+\_\+\+VM\+\_\+\+FROM\+\_\+\+WASM}} (\mbox{\hyperlink{structsysio_1_1chain_1_1memcmp__params}{memcmp\+\_\+params}},(\mbox{\hyperlink{namespacesysio_1_1vm_a82e706727e849ccc38e1c8e7888c1609}{vm\+::wasm\+\_\+ptr\+\_\+t}} lhs, \mbox{\hyperlink{namespacesysio_1_1vm_a82e706727e849ccc38e1c8e7888c1609}{vm\+::wasm\+\_\+ptr\+\_\+t}} rhs, \mbox{\hyperlink{namespacesysio_1_1vm_ab7d81f47e123ef4970d3e643196660ea}{vm\+::wasm\+\_\+size\+\_\+t}} size))
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1basic__type__converter_a5c1788de23073d732e04dc6b29c7be05}{SYS\+\_\+\+VM\+\_\+\+FROM\+\_\+\+WASM}} (\mbox{\hyperlink{structsysio_1_1chain_1_1memset__params}{memset\+\_\+params}},(\mbox{\hyperlink{namespacesysio_1_1vm_a82e706727e849ccc38e1c8e7888c1609}{vm\+::wasm\+\_\+ptr\+\_\+t}} dst, \mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\+\_\+t}} val, \mbox{\hyperlink{namespacesysio_1_1vm_ab7d81f47e123ef4970d3e643196660ea}{vm\+::wasm\+\_\+size\+\_\+t}} size))
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\auto \mbox{\hyperlink{structsysio_1_1chain_1_1basic__type__converter_a6669247f8d5b1394fd4d7b5527d21a3f}{from\+\_\+wasm}} (\mbox{\hyperlink{namespacesysio_1_1vm_a82e706727e849ccc38e1c8e7888c1609}{vm\+::wasm\+\_\+ptr\+\_\+t}} ptr) const -\/$>$ std\+::enable\+\_\+if\+\_\+t$<$ std\+::is\+\_\+pointer\+\_\+v$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$, \mbox{\hyperlink{structsysio_1_1vm_1_1argument__proxy}{vm\+::argument\+\_\+proxy}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ $>$
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\auto \mbox{\hyperlink{structsysio_1_1chain_1_1basic__type__converter_a4ee155f7d4f75d6a696dec3ba1e8ec0a}{from\+\_\+wasm}} (\mbox{\hyperlink{namespacesysio_1_1vm_a82e706727e849ccc38e1c8e7888c1609}{vm\+::wasm\+\_\+ptr\+\_\+t}} ptr, \mbox{\hyperlink{structsysio_1_1vm_1_1tag}{vm\+::tag}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$=\{\}) const -\/$>$ std\+::enable\+\_\+if\+\_\+t$<$ vm\+::is\+\_\+argument\+\_\+proxy\+\_\+type\+\_\+v$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&\&std\+::is\+\_\+pointer\+\_\+v$<$ typename T\+::proxy\+\_\+type $>$, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1basic__type__converter_a1825adfce344d036246e3b8216d23a22}{SYS\+\_\+\+VM\+\_\+\+FROM\+\_\+\+WASM}} (\mbox{\hyperlink{structsysio_1_1chain_1_1null__terminated__ptr}{null\+\_\+terminated\+\_\+ptr}},(\mbox{\hyperlink{namespacesysio_1_1vm_a82e706727e849ccc38e1c8e7888c1609}{vm\+::wasm\+\_\+ptr\+\_\+t}} ptr))
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1basic__type__converter_aa5dc0a79b3f24cfa9ca4fb5daa09de58}{SYS\+\_\+\+VM\+\_\+\+FROM\+\_\+\+WASM}} (\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}},(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} e))
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1basic__type__converter_ab16970d569a15ea315a5ae6ffe2daa38}{to\+\_\+wasm}} (\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&\&n)
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1basic__type__converter_a0d591b63203187822ce8dd7981322057}{SYS\+\_\+\+VM\+\_\+\+FROM\+\_\+\+WASM}} (\mbox{\hyperlink{structfloat32__t}{float32\+\_\+t}},(float \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}))
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1basic__type__converter_ae305f6e7d176a7b78732b34a14d623d0}{SYS\+\_\+\+VM\+\_\+\+FROM\+\_\+\+WASM}} (\mbox{\hyperlink{structfloat64__t}{float64\+\_\+t}},(double \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}))
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{structsysio_1_1vm_1_1type__converter}{sysio\+::vm\+::type\+\_\+converter$<$ webassembly\+::interface, Interface $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1vm_1_1type__converter_aabdc9e5ad2d99135fdf897eb87f10224}{SYS\+\_\+\+VM\+\_\+\+FROM\+\_\+\+WASM}} (bool,(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}))
+\item 
+\mbox{\hyperlink{structsysio_1_1vm_1_1type__converter_aabdc9e5ad2d99135fdf897eb87f10224}{SYS\+\_\+\+VM\+\_\+\+FROM\+\_\+\+WASM}} (bool,(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}))
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1vm_1_1type__converter_a5018cdf68f67346a2771a2f4d47aa34a}{to\+\_\+wasm}} (bool \&\&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+\mbox{\hyperlink{structsysio_1_1vm_1_1no__match__t}{no\+\_\+match\+\_\+t}} \mbox{\hyperlink{structsysio_1_1vm_1_1type__converter_af168fe768fee3076ccd7018068d34199}{to\+\_\+wasm}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\&)
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1vm_1_1type__converter_a5018cdf68f67346a2771a2f4d47aa34a}{to\+\_\+wasm}} (bool \&\&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+\mbox{\hyperlink{structsysio_1_1vm_1_1no__match__t}{no\+\_\+match\+\_\+t}} \mbox{\hyperlink{structsysio_1_1vm_1_1type__converter_af168fe768fee3076ccd7018068d34199}{to\+\_\+wasm}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\&)
+\item 
+auto \mbox{\hyperlink{structsysio_1_1vm_1_1type__converter_ada8a3fa344cd68a38fba11e2cbe3c867}{from\+\_\+wasm}} (\mbox{\hyperlink{namespacesysio_1_1vm_a82e706727e849ccc38e1c8e7888c1609}{wasm\+\_\+ptr\+\_\+t}} ptr, \mbox{\hyperlink{namespacesysio_1_1vm_ab7d81f47e123ef4970d3e643196660ea}{wasm\+\_\+size\+\_\+t}} \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}, \mbox{\hyperlink{structsysio_1_1vm_1_1tag}{tag}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$=\{\}) const -\/$>$ std\+::enable\+\_\+if\+\_\+t$<$ is\+\_\+span\+\_\+type\+\_\+v$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$
+\item 
+auto \mbox{\hyperlink{structsysio_1_1vm_1_1type__converter_a2ad23cf6c5efbe394b9eafb7ba13ffbf}{from\+\_\+wasm}} (\mbox{\hyperlink{namespacesysio_1_1vm_a82e706727e849ccc38e1c8e7888c1609}{wasm\+\_\+ptr\+\_\+t}} ptr, \mbox{\hyperlink{namespacesysio_1_1vm_ab7d81f47e123ef4970d3e643196660ea}{wasm\+\_\+size\+\_\+t}} \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}, \mbox{\hyperlink{structsysio_1_1vm_1_1tag}{tag}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$=\{\}) const -\/$>$ std\+::enable\+\_\+if\+\_\+t$<$ is\+\_\+argument\+\_\+proxy\+\_\+type\+\_\+v$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&\&is\+\_\+span\+\_\+type\+\_\+v$<$ typename T\+::proxy\+\_\+type $>$, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$
+\item 
+auto \mbox{\hyperlink{structsysio_1_1vm_1_1type__converter_aea72cb382c3aa336177c0651499857da}{from\+\_\+wasm}} (\mbox{\hyperlink{namespacesysio_1_1vm_a82e706727e849ccc38e1c8e7888c1609}{wasm\+\_\+ptr\+\_\+t}} ptr, \mbox{\hyperlink{structsysio_1_1vm_1_1tag}{tag}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$=\{\}) const -\/$>$ std\+::enable\+\_\+if\+\_\+t$<$ is\+\_\+argument\+\_\+proxy\+\_\+type\+\_\+v$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&\&std\+::is\+\_\+pointer\+\_\+v$<$ typename T\+::proxy\+\_\+type $>$, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$
+\item 
+auto \mbox{\hyperlink{structsysio_1_1vm_1_1type__converter_ada8a3fa344cd68a38fba11e2cbe3c867}{from\+\_\+wasm}} (\mbox{\hyperlink{namespacesysio_1_1vm_a82e706727e849ccc38e1c8e7888c1609}{wasm\+\_\+ptr\+\_\+t}} ptr, \mbox{\hyperlink{namespacesysio_1_1vm_ab7d81f47e123ef4970d3e643196660ea}{wasm\+\_\+size\+\_\+t}} \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}, \mbox{\hyperlink{structsysio_1_1vm_1_1tag}{tag}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$=\{\}) const -\/$>$ std\+::enable\+\_\+if\+\_\+t$<$ is\+\_\+span\+\_\+type\+\_\+v$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$
+\item 
+auto \mbox{\hyperlink{structsysio_1_1vm_1_1type__converter_a2ad23cf6c5efbe394b9eafb7ba13ffbf}{from\+\_\+wasm}} (\mbox{\hyperlink{namespacesysio_1_1vm_a82e706727e849ccc38e1c8e7888c1609}{wasm\+\_\+ptr\+\_\+t}} ptr, \mbox{\hyperlink{namespacesysio_1_1vm_ab7d81f47e123ef4970d3e643196660ea}{wasm\+\_\+size\+\_\+t}} \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}, \mbox{\hyperlink{structsysio_1_1vm_1_1tag}{tag}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$=\{\}) const -\/$>$ std\+::enable\+\_\+if\+\_\+t$<$ is\+\_\+argument\+\_\+proxy\+\_\+type\+\_\+v$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&\&is\+\_\+span\+\_\+type\+\_\+v$<$ typename T\+::proxy\+\_\+type $>$, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$
+\item 
+auto \mbox{\hyperlink{structsysio_1_1vm_1_1type__converter_aea72cb382c3aa336177c0651499857da}{from\+\_\+wasm}} (\mbox{\hyperlink{namespacesysio_1_1vm_a82e706727e849ccc38e1c8e7888c1609}{wasm\+\_\+ptr\+\_\+t}} ptr, \mbox{\hyperlink{structsysio_1_1vm_1_1tag}{tag}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$=\{\}) const -\/$>$ std\+::enable\+\_\+if\+\_\+t$<$ is\+\_\+argument\+\_\+proxy\+\_\+type\+\_\+v$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&\&std\+::is\+\_\+pointer\+\_\+v$<$ typename T\+::proxy\+\_\+type $>$, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$
+\item 
+decltype(auto) \mbox{\hyperlink{structsysio_1_1vm_1_1type__converter_ac08fe85cc1024bdf81a7305d951b9f93}{as\+\_\+value}} (const \mbox{\hyperlink{structsysio_1_1vm_1_1type__converter_ad26375f01e5397fc5d6a4c56605f907d}{elem\+\_\+type}} \&val) const
+\item 
+decltype(auto) \mbox{\hyperlink{structsysio_1_1vm_1_1type__converter_ac08fe85cc1024bdf81a7305d951b9f93}{as\+\_\+value}} (const \mbox{\hyperlink{structsysio_1_1vm_1_1type__converter_ad26375f01e5397fc5d6a4c56605f907d}{elem\+\_\+type}} \&val) const
+\item 
+constexpr auto \mbox{\hyperlink{structsysio_1_1vm_1_1type__converter_a040445c2ef3f86a985420ea858f9ba45}{as\+\_\+result}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\&val) const
+\item 
+constexpr auto \mbox{\hyperlink{structsysio_1_1vm_1_1type__converter_a040445c2ef3f86a985420ea858f9ba45}{as\+\_\+result}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&\&val) const
+\item 
+\mbox{\hyperlink{structsysio_1_1vm_1_1type__converter_a7afa36ffbfccf6704e19ad6f374e6821}{running\+\_\+context}} (Host\+\_\+\+Type \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a5a5638571b2406db1f899a039f3eff9d}{host}}, const \mbox{\hyperlink{class_interface}{Interface}} \&ei)
+\item 
+\mbox{\hyperlink{structsysio_1_1vm_1_1type__converter_a4313b6793cb38b4564eb60b1937f4486}{running\+\_\+context}} (Host\+\_\+\+Type \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a5a5638571b2406db1f899a039f3eff9d}{host}}, \mbox{\hyperlink{class_interface}{Interface}} \&\&ei)
+\item 
+decltype(auto) \mbox{\hyperlink{structsysio_1_1vm_1_1type__converter_a4e977f78d30ba3952099aae66b486541}{get\+\_\+host}} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{structsysio_1_1vm_1_1running__context}{sysio\+::vm\+::running\+\_\+context$<$ webassembly\+::interface, Interface $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a7afa36ffbfccf6704e19ad6f374e6821}{running\+\_\+context}} (\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface}{webassembly\+::interface}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a5a5638571b2406db1f899a039f3eff9d}{host}}, const \mbox{\hyperlink{class_interface}{Interface}} \&ei)
+\item 
+\mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a4313b6793cb38b4564eb60b1937f4486}{running\+\_\+context}} (\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface}{webassembly\+::interface}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a5a5638571b2406db1f899a039f3eff9d}{host}}, \mbox{\hyperlink{class_interface}{Interface}} \&\&ei)
+\item 
+\mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a7afa36ffbfccf6704e19ad6f374e6821}{running\+\_\+context}} (\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface}{webassembly\+::interface}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a5a5638571b2406db1f899a039f3eff9d}{host}}, const \mbox{\hyperlink{class_interface}{Interface}} \&ei)
+\item 
+\mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a4313b6793cb38b4564eb60b1937f4486}{running\+\_\+context}} (\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface}{webassembly\+::interface}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a5a5638571b2406db1f899a039f3eff9d}{host}}, \mbox{\hyperlink{class_interface}{Interface}} \&\&ei)
+\item 
+void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_adcf11dcf0561f87d00d970dedd3cc7f1}{access}} (\mbox{\hyperlink{namespacesysio_1_1vm_a82e706727e849ccc38e1c8e7888c1609}{wasm\+\_\+ptr\+\_\+t}} addr=0) const
+\item 
+void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_adcf11dcf0561f87d00d970dedd3cc7f1}{access}} (\mbox{\hyperlink{namespacesysio_1_1vm_a82e706727e849ccc38e1c8e7888c1609}{wasm\+\_\+ptr\+\_\+t}} addr=0) const
+\item 
+\mbox{\hyperlink{class_interface}{Interface}} \& \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a102b607430e70aab298a77980fe775b1}{get\+\_\+interface}} ()
+\item 
+const \mbox{\hyperlink{class_interface}{Interface}} \& \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a499abb110132b4d1d866394eb22f89fb}{get\+\_\+interface}} () const
+\item 
+\mbox{\hyperlink{class_interface}{Interface}} \& \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a102b607430e70aab298a77980fe775b1}{get\+\_\+interface}} ()
+\item 
+const \mbox{\hyperlink{class_interface}{Interface}} \& \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a499abb110132b4d1d866394eb22f89fb}{get\+\_\+interface}} () const
+\item 
+decltype(auto) \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a4e977f78d30ba3952099aae66b486541}{get\+\_\+host}} ()
+\item 
+decltype(auto) \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a4e977f78d30ba3952099aae66b486541}{get\+\_\+host}} ()
+\item 
+auto \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a478b0dc62286dd10788d1a035656b0ed}{validate\+\_\+pointer}} (\mbox{\hyperlink{union_u}{U}} ptr, \mbox{\hyperlink{namespacesysio_1_1vm_ab7d81f47e123ef4970d3e643196660ea}{wasm\+\_\+size\+\_\+t}} \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}) const
+\item 
+auto \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a478b0dc62286dd10788d1a035656b0ed}{validate\+\_\+pointer}} (\mbox{\hyperlink{union_u}{U}} ptr, \mbox{\hyperlink{namespacesysio_1_1vm_ab7d81f47e123ef4970d3e643196660ea}{wasm\+\_\+size\+\_\+t}} \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}) const
+\item 
+auto \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a17c78537d5c2f671c0fec3513e0e4eb3}{validate\+\_\+null\+\_\+terminated\+\_\+pointer}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} ptr) const
+\item 
+auto \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a17c78537d5c2f671c0fec3513e0e4eb3}{validate\+\_\+null\+\_\+terminated\+\_\+pointer}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} ptr) const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Public Attributes inherited from \mbox{\hyperlink{structsysio_1_1vm_1_1running__context}{sysio\+::vm\+::running\+\_\+context$<$ webassembly\+::interface, Interface $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface}{webassembly\+::interface}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a5a5638571b2406db1f899a039f3eff9d}{host}}
+\item 
+\mbox{\hyperlink{class_interface}{Interface}} \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_acb4ee00df8e5719608f1fba32d6d0bed}{interface}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename \mbox{\hyperlink{class_interface}{Interface}}$>$\newline
+struct sysio\+::chain\+::basic\+\_\+type\+\_\+converter$<$ Interface $>$}
+
+
+Definition at line \mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2webassembly_2common_8hpp_source_l00060}{60}} of file \mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2webassembly_2common_8hpp_source}{common.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{structsysio_1_1chain_1_1basic__type__converter_a6200649a762e5a0f555da498dae44878}\index{sysio::chain::basic\_type\_converter$<$ Interface $>$@{sysio::chain::basic\_type\_converter$<$ Interface $>$}!base\_type@{base\_type}}
+\index{base\_type@{base\_type}!sysio::chain::basic\_type\_converter$<$ Interface $>$@{sysio::chain::basic\_type\_converter$<$ Interface $>$}}
+\doxysubsubsection{\texorpdfstring{base\_type}{base\_type}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1basic__type__converter_a6200649a762e5a0f555da498dae44878} 
+template$<$typename \mbox{\hyperlink{class_interface}{Interface}} $>$ \\
+using \mbox{\hyperlink{structsysio_1_1chain_1_1basic__type__converter}{sysio\+::chain\+::basic\+\_\+type\+\_\+converter}}$<$ \mbox{\hyperlink{class_interface}{Interface}} $>$\+::base\+\_\+type = \mbox{\hyperlink{structsysio_1_1vm_1_1type__converter}{sysio\+::vm\+::type\+\_\+converter}}$<$\mbox{\hyperlink{classsysio_1_1chain_1_1webassembly_1_1interface}{webassembly\+::interface}}, \mbox{\hyperlink{class_interface}{Interface}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2webassembly_2common_8hpp_source_l00061}{61}} of file \mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2webassembly_2common_8hpp_source}{common.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1chain_1_1basic__type__converter_a6669247f8d5b1394fd4d7b5527d21a3f}\index{sysio::chain::basic\_type\_converter$<$ Interface $>$@{sysio::chain::basic\_type\_converter$<$ Interface $>$}!from\_wasm@{from\_wasm}}
+\index{from\_wasm@{from\_wasm}!sysio::chain::basic\_type\_converter$<$ Interface $>$@{sysio::chain::basic\_type\_converter$<$ Interface $>$}}
+\doxysubsubsection{\texorpdfstring{from\_wasm()}{from\_wasm()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1basic__type__converter_a6669247f8d5b1394fd4d7b5527d21a3f} 
+template$<$typename \mbox{\hyperlink{class_interface}{Interface}} $>$ \\
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+auto \mbox{\hyperlink{structsysio_1_1chain_1_1basic__type__converter}{sysio\+::chain\+::basic\+\_\+type\+\_\+converter}}$<$ \mbox{\hyperlink{class_interface}{Interface}} $>$\+::from\+\_\+wasm (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacesysio_1_1vm_a82e706727e849ccc38e1c8e7888c1609}{vm\+::wasm\+\_\+ptr\+\_\+t}}}]{ptr}{}\end{DoxyParamCaption}) const -\/$>$ std\+::enable\+\_\+if\+\_\+t$<$ std\+::is\+\_\+pointer\+\_\+v$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$,                               \mbox{\hyperlink{structsysio_1_1vm_1_1argument__proxy}{vm\+::argument\+\_\+proxy}}$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$ $>$ \hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2webassembly_2common_8hpp_source_l00088}{88}} of file \mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2webassembly_2common_8hpp_source}{common.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ this-\/>\textcolor{keyword}{template}\ \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a478b0dc62286dd10788d1a035656b0ed}{validate\_pointer<std::remove\_pointer\_t<T>}}>(ptr,\ 1);}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\};}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1basic__type__converter_a6669247f8d5b1394fd4d7b5527d21a3f_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1basic__type__converter_a4ee155f7d4f75d6a696dec3ba1e8ec0a}\index{sysio::chain::basic\_type\_converter$<$ Interface $>$@{sysio::chain::basic\_type\_converter$<$ Interface $>$}!from\_wasm@{from\_wasm}}
+\index{from\_wasm@{from\_wasm}!sysio::chain::basic\_type\_converter$<$ Interface $>$@{sysio::chain::basic\_type\_converter$<$ Interface $>$}}
+\doxysubsubsection{\texorpdfstring{from\_wasm()}{from\_wasm()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1basic__type__converter_a4ee155f7d4f75d6a696dec3ba1e8ec0a} 
+template$<$typename \mbox{\hyperlink{class_interface}{Interface}} $>$ \\
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+auto \mbox{\hyperlink{structsysio_1_1chain_1_1basic__type__converter}{sysio\+::chain\+::basic\+\_\+type\+\_\+converter}}$<$ \mbox{\hyperlink{class_interface}{Interface}} $>$\+::from\+\_\+wasm (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacesysio_1_1vm_a82e706727e849ccc38e1c8e7888c1609}{vm\+::wasm\+\_\+ptr\+\_\+t}}}]{ptr}{, }\item[{\mbox{\hyperlink{structsysio_1_1vm_1_1tag}{vm\+::tag}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$}]{}{ = {\ttfamily \{\}}}\end{DoxyParamCaption}) const -\/$>$ std\+::enable\+\_\+if\+\_\+t$<$ vm\+::is\+\_\+argument\+\_\+proxy\+\_\+type\+\_\+v$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$ \&\&                               std\+::is\+\_\+pointer\+\_\+v$<$typename T\+::proxy\+\_\+type$>$, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$ \hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2webassembly_2common_8hpp_source_l00096}{96}} of file \mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2webassembly_2common_8hpp_source}{common.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\})\ \textcolor{keyword}{const}}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ -\/>\ std::enable\_if\_t<\ vm::is\_argument\_proxy\_type\_v<T>\ \&\&}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::is\_pointer\_v<typename\ T::proxy\_type>,\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}>\ \{}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keyword}{constexpr}(T::is\_legacy())\ \{}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(ptr\ !=\ 0,\ wasm\_execution\_error,\ \textcolor{stringliteral}{"{}references\ cannot\ be\ created\ for\ null\ pointers"{}});}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ this-\/>\textcolor{keyword}{template}\ \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a478b0dc62286dd10788d1a035656b0ed}{validate\_pointer<typename\ T::pointee\_type>}}(ptr,\ 1);}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\};}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1basic__type__converter_a4675acb049c45c6c1968a78f87cfef7a}\index{sysio::chain::basic\_type\_converter$<$ Interface $>$@{sysio::chain::basic\_type\_converter$<$ Interface $>$}!SYS\_VM\_FROM\_WASM@{SYS\_VM\_FROM\_WASM}}
+\index{SYS\_VM\_FROM\_WASM@{SYS\_VM\_FROM\_WASM}!sysio::chain::basic\_type\_converter$<$ Interface $>$@{sysio::chain::basic\_type\_converter$<$ Interface $>$}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_FROM\_WASM()}{SYS\_VM\_FROM\_WASM()}\hspace{0.1cm}{\footnotesize\ttfamily [1/8]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1basic__type__converter_a4675acb049c45c6c1968a78f87cfef7a} 
+template$<$typename \mbox{\hyperlink{class_interface}{Interface}} $>$ \\
+\mbox{\hyperlink{structsysio_1_1chain_1_1basic__type__converter}{sysio\+::chain\+::basic\+\_\+type\+\_\+converter}}$<$ \mbox{\hyperlink{class_interface}{Interface}} $>$\+::\+SYS\+\_\+\+VM\+\_\+\+FROM\+\_\+\+WASM (\begin{DoxyParamCaption}\item[{bool}]{}{, }\item[{(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2webassembly_2common_8hpp_source_l00066}{66}} of file \mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2webassembly_2common_8hpp_source}{common.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00066\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ ?\ 1\ :\ 0;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1basic__type__converter_a0d591b63203187822ce8dd7981322057}\index{sysio::chain::basic\_type\_converter$<$ Interface $>$@{sysio::chain::basic\_type\_converter$<$ Interface $>$}!SYS\_VM\_FROM\_WASM@{SYS\_VM\_FROM\_WASM}}
+\index{SYS\_VM\_FROM\_WASM@{SYS\_VM\_FROM\_WASM}!sysio::chain::basic\_type\_converter$<$ Interface $>$@{sysio::chain::basic\_type\_converter$<$ Interface $>$}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_FROM\_WASM()}{SYS\_VM\_FROM\_WASM()}\hspace{0.1cm}{\footnotesize\ttfamily [2/8]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1basic__type__converter_a0d591b63203187822ce8dd7981322057} 
+template$<$typename \mbox{\hyperlink{class_interface}{Interface}} $>$ \\
+\mbox{\hyperlink{structsysio_1_1chain_1_1basic__type__converter}{sysio\+::chain\+::basic\+\_\+type\+\_\+converter}}$<$ \mbox{\hyperlink{class_interface}{Interface}} $>$\+::\+SYS\+\_\+\+VM\+\_\+\+FROM\+\_\+\+WASM (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structfloat32__t}{float32\+\_\+t}}}]{}{, }\item[{(float \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2webassembly_2common_8hpp_source_l00112}{112}} of file \mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2webassembly_2common_8hpp_source}{common.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00112\ \{\ return\ ::to\_softfloat32(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}});\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1basic__type__converter_ae305f6e7d176a7b78732b34a14d623d0}\index{sysio::chain::basic\_type\_converter$<$ Interface $>$@{sysio::chain::basic\_type\_converter$<$ Interface $>$}!SYS\_VM\_FROM\_WASM@{SYS\_VM\_FROM\_WASM}}
+\index{SYS\_VM\_FROM\_WASM@{SYS\_VM\_FROM\_WASM}!sysio::chain::basic\_type\_converter$<$ Interface $>$@{sysio::chain::basic\_type\_converter$<$ Interface $>$}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_FROM\_WASM()}{SYS\_VM\_FROM\_WASM()}\hspace{0.1cm}{\footnotesize\ttfamily [3/8]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1basic__type__converter_ae305f6e7d176a7b78732b34a14d623d0} 
+template$<$typename \mbox{\hyperlink{class_interface}{Interface}} $>$ \\
+\mbox{\hyperlink{structsysio_1_1chain_1_1basic__type__converter}{sysio\+::chain\+::basic\+\_\+type\+\_\+converter}}$<$ \mbox{\hyperlink{class_interface}{Interface}} $>$\+::\+SYS\+\_\+\+VM\+\_\+\+FROM\+\_\+\+WASM (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structfloat64__t}{float64\+\_\+t}}}]{}{, }\item[{(double \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2webassembly_2common_8hpp_source_l00113}{113}} of file \mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2webassembly_2common_8hpp_source}{common.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00113\ \{\ return\ ::to\_softfloat64(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}});\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1basic__type__converter_ab6fc05a4f9813edb9b00eec5c4009f08}\index{sysio::chain::basic\_type\_converter$<$ Interface $>$@{sysio::chain::basic\_type\_converter$<$ Interface $>$}!SYS\_VM\_FROM\_WASM@{SYS\_VM\_FROM\_WASM}}
+\index{SYS\_VM\_FROM\_WASM@{SYS\_VM\_FROM\_WASM}!sysio::chain::basic\_type\_converter$<$ Interface $>$@{sysio::chain::basic\_type\_converter$<$ Interface $>$}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_FROM\_WASM()}{SYS\_VM\_FROM\_WASM()}\hspace{0.1cm}{\footnotesize\ttfamily [4/8]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1basic__type__converter_ab6fc05a4f9813edb9b00eec5c4009f08} 
+template$<$typename \mbox{\hyperlink{class_interface}{Interface}} $>$ \\
+\mbox{\hyperlink{structsysio_1_1chain_1_1basic__type__converter}{sysio\+::chain\+::basic\+\_\+type\+\_\+converter}}$<$ \mbox{\hyperlink{class_interface}{Interface}} $>$\+::\+SYS\+\_\+\+VM\+\_\+\+FROM\+\_\+\+WASM (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1memcmp__params}{memcmp\+\_\+params}}}]{}{, }\item[{(\mbox{\hyperlink{namespacesysio_1_1vm_a82e706727e849ccc38e1c8e7888c1609}{vm\+::wasm\+\_\+ptr\+\_\+t}} lhs, \mbox{\hyperlink{namespacesysio_1_1vm_a82e706727e849ccc38e1c8e7888c1609}{vm\+::wasm\+\_\+ptr\+\_\+t}} rhs, \mbox{\hyperlink{namespacesysio_1_1vm_ab7d81f47e123ef4970d3e643196660ea}{vm\+::wasm\+\_\+size\+\_\+t}} size)}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2webassembly_2common_8hpp_source_l00075}{75}} of file \mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2webassembly_2common_8hpp_source}{common.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}\ =\ this-\/>\textcolor{keyword}{template}\ \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a478b0dc62286dd10788d1a035656b0ed}{validate\_pointer<char>}}(lhs,\ size);}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ =\ this-\/>\textcolor{keyword}{template}\ \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a478b0dc62286dd10788d1a035656b0ed}{validate\_pointer<char>}}(rhs,\ size);}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}},\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ size\ \};}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1basic__type__converter_ab6fc05a4f9813edb9b00eec5c4009f08_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1basic__type__converter_ad7384ee3ab576532fc2430c4aaf157c4}\index{sysio::chain::basic\_type\_converter$<$ Interface $>$@{sysio::chain::basic\_type\_converter$<$ Interface $>$}!SYS\_VM\_FROM\_WASM@{SYS\_VM\_FROM\_WASM}}
+\index{SYS\_VM\_FROM\_WASM@{SYS\_VM\_FROM\_WASM}!sysio::chain::basic\_type\_converter$<$ Interface $>$@{sysio::chain::basic\_type\_converter$<$ Interface $>$}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_FROM\_WASM()}{SYS\_VM\_FROM\_WASM()}\hspace{0.1cm}{\footnotesize\ttfamily [5/8]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1basic__type__converter_ad7384ee3ab576532fc2430c4aaf157c4} 
+template$<$typename \mbox{\hyperlink{class_interface}{Interface}} $>$ \\
+\mbox{\hyperlink{structsysio_1_1chain_1_1basic__type__converter}{sysio\+::chain\+::basic\+\_\+type\+\_\+converter}}$<$ \mbox{\hyperlink{class_interface}{Interface}} $>$\+::\+SYS\+\_\+\+VM\+\_\+\+FROM\+\_\+\+WASM (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1memcpy__params}{memcpy\+\_\+params}}}]{}{, }\item[{(\mbox{\hyperlink{namespacesysio_1_1vm_a82e706727e849ccc38e1c8e7888c1609}{vm\+::wasm\+\_\+ptr\+\_\+t}} dst, \mbox{\hyperlink{namespacesysio_1_1vm_a82e706727e849ccc38e1c8e7888c1609}{vm\+::wasm\+\_\+ptr\+\_\+t}} src, \mbox{\hyperlink{namespacesysio_1_1vm_ab7d81f47e123ef4970d3e643196660ea}{vm\+::wasm\+\_\+size\+\_\+t}} size)}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2webassembly_2common_8hpp_source_l00068}{68}} of file \mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2webassembly_2common_8hpp_source}{common.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ =\ this-\/>\textcolor{keyword}{template}\ \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a478b0dc62286dd10788d1a035656b0ed}{validate\_pointer<char>}}(dst,\ size);}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ =\ this-\/>\textcolor{keyword}{template}\ \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a478b0dc62286dd10788d1a035656b0ed}{validate\_pointer<char>}}(src,\ size);}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ this-\/>\textcolor{keyword}{template}\ \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a478b0dc62286dd10788d1a035656b0ed}{validate\_pointer<char>}}(dst,\ 1);}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ size\ \};}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1basic__type__converter_ad7384ee3ab576532fc2430c4aaf157c4_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1basic__type__converter_a5c1788de23073d732e04dc6b29c7be05}\index{sysio::chain::basic\_type\_converter$<$ Interface $>$@{sysio::chain::basic\_type\_converter$<$ Interface $>$}!SYS\_VM\_FROM\_WASM@{SYS\_VM\_FROM\_WASM}}
+\index{SYS\_VM\_FROM\_WASM@{SYS\_VM\_FROM\_WASM}!sysio::chain::basic\_type\_converter$<$ Interface $>$@{sysio::chain::basic\_type\_converter$<$ Interface $>$}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_FROM\_WASM()}{SYS\_VM\_FROM\_WASM()}\hspace{0.1cm}{\footnotesize\ttfamily [6/8]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1basic__type__converter_a5c1788de23073d732e04dc6b29c7be05} 
+template$<$typename \mbox{\hyperlink{class_interface}{Interface}} $>$ \\
+\mbox{\hyperlink{structsysio_1_1chain_1_1basic__type__converter}{sysio\+::chain\+::basic\+\_\+type\+\_\+converter}}$<$ \mbox{\hyperlink{class_interface}{Interface}} $>$\+::\+SYS\+\_\+\+VM\+\_\+\+FROM\+\_\+\+WASM (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1memset__params}{memset\+\_\+params}}}]{}{, }\item[{(\mbox{\hyperlink{namespacesysio_1_1vm_a82e706727e849ccc38e1c8e7888c1609}{vm\+::wasm\+\_\+ptr\+\_\+t}} dst, \mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\+\_\+t}} val, \mbox{\hyperlink{namespacesysio_1_1vm_ab7d81f47e123ef4970d3e643196660ea}{vm\+::wasm\+\_\+size\+\_\+t}} size)}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2webassembly_2common_8hpp_source_l00081}{81}} of file \mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2webassembly_2common_8hpp_source}{common.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ =\ this-\/>\textcolor{keyword}{template}\ \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a478b0dc62286dd10788d1a035656b0ed}{validate\_pointer<char>}}(dst,\ size);}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ this-\/>\textcolor{keyword}{template}\ \mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a478b0dc62286dd10788d1a035656b0ed}{validate\_pointer<char>}}(dst,\ 1);}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}},\ val,\ size\ \};}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1basic__type__converter_a5c1788de23073d732e04dc6b29c7be05_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1basic__type__converter_aa5dc0a79b3f24cfa9ca4fb5daa09de58}\index{sysio::chain::basic\_type\_converter$<$ Interface $>$@{sysio::chain::basic\_type\_converter$<$ Interface $>$}!SYS\_VM\_FROM\_WASM@{SYS\_VM\_FROM\_WASM}}
+\index{SYS\_VM\_FROM\_WASM@{SYS\_VM\_FROM\_WASM}!sysio::chain::basic\_type\_converter$<$ Interface $>$@{sysio::chain::basic\_type\_converter$<$ Interface $>$}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_FROM\_WASM()}{SYS\_VM\_FROM\_WASM()}\hspace{0.1cm}{\footnotesize\ttfamily [7/8]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1basic__type__converter_aa5dc0a79b3f24cfa9ca4fb5daa09de58} 
+template$<$typename \mbox{\hyperlink{class_interface}{Interface}} $>$ \\
+\mbox{\hyperlink{structsysio_1_1chain_1_1basic__type__converter}{sysio\+::chain\+::basic\+\_\+type\+\_\+converter}}$<$ \mbox{\hyperlink{class_interface}{Interface}} $>$\+::\+SYS\+\_\+\+VM\+\_\+\+FROM\+\_\+\+WASM (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}}]{}{, }\item[{(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} e)}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2webassembly_2common_8hpp_source_l00110}{110}} of file \mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2webassembly_2common_8hpp_source}{common.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00110\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\{e\};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{structsysio_1_1chain_1_1basic__type__converter_a1825adfce344d036246e3b8216d23a22}\index{sysio::chain::basic\_type\_converter$<$ Interface $>$@{sysio::chain::basic\_type\_converter$<$ Interface $>$}!SYS\_VM\_FROM\_WASM@{SYS\_VM\_FROM\_WASM}}
+\index{SYS\_VM\_FROM\_WASM@{SYS\_VM\_FROM\_WASM}!sysio::chain::basic\_type\_converter$<$ Interface $>$@{sysio::chain::basic\_type\_converter$<$ Interface $>$}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_FROM\_WASM()}{SYS\_VM\_FROM\_WASM()}\hspace{0.1cm}{\footnotesize\ttfamily [8/8]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1basic__type__converter_a1825adfce344d036246e3b8216d23a22} 
+template$<$typename \mbox{\hyperlink{class_interface}{Interface}} $>$ \\
+\mbox{\hyperlink{structsysio_1_1chain_1_1basic__type__converter}{sysio\+::chain\+::basic\+\_\+type\+\_\+converter}}$<$ \mbox{\hyperlink{class_interface}{Interface}} $>$\+::\+SYS\+\_\+\+VM\+\_\+\+FROM\+\_\+\+WASM (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1null__terminated__ptr}{null\+\_\+terminated\+\_\+ptr}}}]{}{, }\item[{(\mbox{\hyperlink{namespacesysio_1_1vm_a82e706727e849ccc38e1c8e7888c1609}{vm\+::wasm\+\_\+ptr\+\_\+t}} ptr)}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2webassembly_2common_8hpp_source_l00106}{106}} of file \mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2webassembly_2common_8hpp_source}{common.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ this-\/>\mbox{\hyperlink{structsysio_1_1vm_1_1running__context_a17c78537d5c2f671c0fec3513e0e4eb3}{validate\_null\_terminated\_pointer}}(ptr);}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{\textcolor{keyword}{static\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})\};}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1basic__type__converter_a1825adfce344d036246e3b8216d23a22_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1basic__type__converter_ab16970d569a15ea315a5ae6ffe2daa38}\index{sysio::chain::basic\_type\_converter$<$ Interface $>$@{sysio::chain::basic\_type\_converter$<$ Interface $>$}!to\_wasm@{to\_wasm}}
+\index{to\_wasm@{to\_wasm}!sysio::chain::basic\_type\_converter$<$ Interface $>$@{sysio::chain::basic\_type\_converter$<$ Interface $>$}}
+\doxysubsubsection{\texorpdfstring{to\_wasm()}{to\_wasm()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1basic__type__converter_ab16970d569a15ea315a5ae6ffe2daa38} 
+template$<$typename \mbox{\hyperlink{class_interface}{Interface}} $>$ \\
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1basic__type__converter}{sysio\+::chain\+::basic\+\_\+type\+\_\+converter}}$<$ \mbox{\hyperlink{class_interface}{Interface}} $>$\+::to\+\_\+wasm (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&\&}]{n}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2webassembly_2common_8hpp_source_l00111}{111}} of file \mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2webassembly_2common_8hpp_source}{common.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00111\ \{\ \textcolor{keywordflow}{return}\ n.to\_uint64\_t();\ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/webassembly/\mbox{\hyperlink{libraries_2chain_2include_2sysio_2chain_2webassembly_2common_8hpp}{common.\+hpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,17 @@
+<map id="sysio::chain::webassembly::eos_vm_runtime::validate" name="sysio::chain::webassembly::eos_vm_runtime::validate">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,120,185,161"/>
+<area shape="rect" id="Node000002" href="$hello__driver_8cpp.html#a80e74e0649e294630eb0d356133d8c0b" title=" " alt="" coords="286,5,342,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="119,118,169,79,231,41,270,26,272,31,234,46,172,84,122,122"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1vm_1_1exception.html#af86f633419d7c667dc588b16f13f1972" title=" " alt="" coords="243,55,386,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="165,117,228,98,230,103,166,123"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1vm_1_1backend.html#af2bdf6918391f431538eb92100389eab" title=" " alt="" coords="247,120,382,161"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="185,138,232,138,232,144,185,144"/>
+<area shape="rect" id="Node000005" href="$namespacesysio_1_1chain.html#a87c46d5ffb5acbf3cf047af691093a12" title=" " alt="" coords="234,186,395,226"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="166,159,230,178,228,183,165,164"/>
+<area shape="rect" id="Node000007" href="$structsysio_1_1vm_1_1registered__host__functions.html#abb74daf946a6b4a1756a0ba3f08c1c04" title=" " alt="" coords="233,251,396,292"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="123,160,173,197,234,236,245,242,243,247,231,240,170,202,120,164"/>
+<area shape="rect" id="Node000006" href="$namespacesysio_1_1chain.html#a7713bf4dd36535082b854977afddf788" title=" " alt="" coords="486,186,606,226"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="396,204,470,204,470,209,396,209"/>
+<area shape="rect" id="Node000008" href="$structsysio_1_1vm_1_1registered__host__functions_1_1mappings.html#a99a30645a5be92083d777a00c79e4dad" title=" " alt="" coords="444,251,647,292"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="396,269,428,269,428,274,396,274"/>
+</map>

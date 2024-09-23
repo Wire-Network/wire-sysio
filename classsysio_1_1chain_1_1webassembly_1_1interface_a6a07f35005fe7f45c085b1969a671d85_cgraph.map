@@ -1,0 +1,16 @@
+<map id="sysio::chain::webassembly::interface::set_proposed_producers_ex" name="sysio::chain::webassembly::interface::set_proposed_producers_ex">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,57,185,113"/>
+<area shape="rect" id="Node000002" href="$programs_2sysio-launcher_2main_8cpp.html#a6d42fdcc89e90507ee6f095c8e92fa2b" title=" " alt="" coords="736,41,815,67"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="185,59,232,49,359,24,460,7,509,3,561,4,620,9,689,20,733,33,731,38,688,25,619,14,561,9,509,9,461,12,360,29,233,54,186,64"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1chain_1_1webassembly_1_1interface.html#aebd6787969bf07ac25f180a822b54a2b" title=" " alt="" coords="233,89,412,145"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="186,95,217,99,217,105,185,100"/>
+<area shape="rect" id="Node000004" href="$namespacesysio_1_1chain_1_1webassembly.html#a36703bea4b4322951a6be4a908f23299" title=" " alt="" coords="460,34,688,75"/>
+<area shape="poly" id="edge8_Node000001_Node000004" title=" " alt="" coords="185,77,444,60,445,65,185,82"/>
+<area shape="rect" id="Node000005" href="$namespacefc_1_1raw.html#a0b442d98ceb22dd5a6ae84745e43ffab" title=" " alt="" coords="518,173,630,199"/>
+<area shape="poly" id="edge9_Node000001_Node000005" title=" " alt="" coords="141,111,184,135,233,154,304,170,376,180,503,186,503,191,375,185,303,176,232,159,182,140,138,116"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="412,113,543,105,616,97,688,84,729,71,731,76,689,89,617,102,544,111,413,119"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="412,92,474,76,475,81,413,97"/>
+<area shape="poly" id="edge6_Node000003_Node000005" title=" " alt="" coords="413,139,511,166,509,171,412,144"/>
+<area shape="poly" id="edge5_Node000004_Node000002" title=" " alt="" coords="689,52,721,52,721,57,689,57"/>
+<area shape="poly" id="edge7_Node000005_Node000005" title=" " alt="" coords="540,175,534,165,538,155,552,149,574,147,599,149,612,156,609,161,597,155,574,152,553,154,542,159,539,164,545,171"/>
+</map>

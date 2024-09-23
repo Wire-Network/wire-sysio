@@ -1,0 +1,19 @@
+<map id="sysio::chain::abi_serializer::to_log_variant" name="sysio::chain::abi_serializer::to_log_variant">
+<area shape="rect" id="Node000001" title=" " alt="" coords="1129,104,1304,145"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1chain__plugin.html#ae56bb5451f52c447629b2cecbd8d4b58" title=" " alt="" coords="949,71,1081,111"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1113,110,1081,104,1082,99,1114,105"/>
+<area shape="rect" id="Node000009" href="$classsysio_1_1chain__plugin.html#ad8549f01fbc8b47dde7a876c08c83b68" title=" " alt="" coords="949,136,1081,177"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="1114,143,1082,149,1081,143,1113,138"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1producer__plugin__impl.html#a07a7c896dddfa2b6c36cf67248d3599d" title=" " alt="" coords="719,71,901,111"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="933,94,901,94,901,88,933,88"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1producer__plugin__impl.html#a7db63178eda240d671fc6ae4e46bf01e" title=" " alt="" coords="520,71,671,111"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="704,94,672,94,672,88,704,88"/>
+<area shape="rect" id="Node000005" href="$classsysio_1_1producer__plugin__impl.html#ad8895b72aaf8928b54665684ffdb9405" title=" " alt="" coords="262,71,472,111"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="505,94,473,94,473,88,505,88"/>
+<area shape="rect" id="Node000006" href="$classsysio_1_1producer__plugin__impl.html#a230c88a6ed7efbc3588a043fe4915bd9" title=" " alt="" coords="14,5,205,46"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="269,69,192,49,193,44,270,64"/>
+<area shape="rect" id="Node000007" href="$classsysio_1_1producer__plugin__impl.html#a9ce89d0c80f40aeb7df69c5a49beff5a" title=" " alt="" coords="24,71,195,111"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="246,94,196,94,196,88,246,88"/>
+<area shape="rect" id="Node000008" href="$classsysio_1_1producer__plugin__impl.html#ab57089953b20f4eac5adc247b73040ec" title=" " alt="" coords="5,136,214,177"/>
+<area shape="poly" id="edge7_Node000005_Node000008" title=" " alt="" coords="270,118,193,138,192,133,269,113"/>
+</map>

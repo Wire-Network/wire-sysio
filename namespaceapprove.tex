@@ -1,0 +1,78 @@
+\doxysection{approve Namespace Reference}
+\hypertarget{namespaceapprove}{}\label{namespaceapprove}\index{approve@{approve}}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespaceapprove_ad70a08a48c2f7a3fb39757a857a1cb2b}{approve\+File}} (approved\+File, unapproved\+File)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespaceapprove_acbe52ee7a646c2de1c975906e39af81b}{root\+Path}} = os.\+path.\+join( catch\+Path, \textquotesingle{}projects/Self\+Test/Baselines\textquotesingle{} )
+\item 
+list \mbox{\hyperlink{namespaceapprove_ac74141eb5bed2ad90470ab44a35d0a4f}{files}} = \mbox{[}os.\+path.\+join( \mbox{\hyperlink{namespaceapprove_acbe52ee7a646c2de1c975906e39af81b}{root\+Path}}, \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}} ) for \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}} in sys.\+argv\mbox{[}1\+:\mbox{]}\mbox{]}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespaceapprove_ad70a08a48c2f7a3fb39757a857a1cb2b}\index{approve@{approve}!approveFile@{approveFile}}
+\index{approveFile@{approveFile}!approve@{approve}}
+\doxysubsubsection{\texorpdfstring{approveFile()}{approveFile()}}
+{\footnotesize\ttfamily \label{namespaceapprove_ad70a08a48c2f7a3fb39757a857a1cb2b} 
+approve.\+approve\+File (\begin{DoxyParamCaption}\item[{}]{approved\+File}{, }\item[{}]{unapproved\+File}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{approve_8py_source_l00019}{19}} of file \mbox{\hyperlink{approve_8py_source}{approve.\+py}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00019\ \textcolor{keyword}{def\ }approveFile(\ approvedFile,\ unapprovedFile\ ):}
+\DoxyCodeLine{00020\ \ \ \ \ justFilename\ =\ unapprovedFile[\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}(rootPath)+1:]}
+\DoxyCodeLine{00021\ \ \ \ \ \textcolor{keywordflow}{if}\ os.path.exists(\ unapprovedFile\ ):}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ os.path.exists(\ approvedFile\ ):}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \ \ \ \ os.remove(\ approvedFile\ )}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ os.rename(\ unapprovedFile,\ approvedFile\ )}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\ \textcolor{stringliteral}{"{}approved\ "{}}\ +\ justFilename\ )}
+\DoxyCodeLine{00026\ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\ \textcolor{stringliteral}{"{}approval\ file\ "{}}\ +\ justFilename\ +\ \textcolor{stringliteral}{"{}\ does\ not\ exist"{}}\ )}
+\DoxyCodeLine{00028\ }
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=319pt]{namespaceapprove_ad70a08a48c2f7a3fb39757a857a1cb2b_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=184pt]{namespaceapprove_ad70a08a48c2f7a3fb39757a857a1cb2b_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{namespaceapprove_ac74141eb5bed2ad90470ab44a35d0a4f}\index{approve@{approve}!files@{files}}
+\index{files@{files}!approve@{approve}}
+\doxysubsubsection{\texorpdfstring{files}{files}}
+{\footnotesize\ttfamily \label{namespaceapprove_ac74141eb5bed2ad90470ab44a35d0a4f} 
+approve.\+files = \mbox{[}os.\+path.\+join( \mbox{\hyperlink{namespaceapprove_acbe52ee7a646c2de1c975906e39af81b}{root\+Path}}, \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}} ) for \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}} in sys.\+argv\mbox{[}1\+:\mbox{]}\mbox{]}}
+
+
+
+Definition at line \mbox{\hyperlink{approve_8py_source_l00014}{14}} of file \mbox{\hyperlink{approve_8py_source}{approve.\+py}}.
+
+\Hypertarget{namespaceapprove_acbe52ee7a646c2de1c975906e39af81b}\index{approve@{approve}!rootPath@{rootPath}}
+\index{rootPath@{rootPath}!approve@{approve}}
+\doxysubsubsection{\texorpdfstring{rootPath}{rootPath}}
+{\footnotesize\ttfamily \label{namespaceapprove_acbe52ee7a646c2de1c975906e39af81b} 
+approve.\+root\+Path = os.\+path.\+join( catch\+Path, \textquotesingle{}projects/Self\+Test/Baselines\textquotesingle{} )}
+
+
+
+Definition at line \mbox{\hyperlink{approve_8py_source_l00011}{11}} of file \mbox{\hyperlink{approve_8py_source}{approve.\+py}}.
+

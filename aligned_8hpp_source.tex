@@ -1,0 +1,20 @@
+\doxysection{aligned.\+hpp}
+\hypertarget{aligned_8hpp_source}{}\label{aligned_8hpp_source}\index{libraries/fc/include/fc/aligned.hpp@{libraries/fc/include/fc/aligned.hpp}}
+\mbox{\hyperlink{aligned_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{aligned_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{aligned_8hpp_source_l00002}00002\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}\ \{}
+\DoxyCodeLine{\Hypertarget{aligned_8hpp_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{aligned_8hpp_source_l00004}00004\ \ \ \textcolor{keyword}{template}<\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ S,\ \textcolor{keyword}{typename}\ T=\textcolor{keywordtype}{double}>}
+\DoxyCodeLine{\Hypertarget{aligned_8hpp_source_l00005}\mbox{\hyperlink{structfc_1_1aligned}{00005}}\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structfc_1_1aligned}{aligned}}\ \{}
+\DoxyCodeLine{\Hypertarget{aligned_8hpp_source_l00006}00006\ \ \ \ \ \textcolor{keyword}{union\ }\{}
+\DoxyCodeLine{\Hypertarget{aligned_8hpp_source_l00007}\mbox{\hyperlink{structfc_1_1aligned_a05ed4c8bfff0cf5ef67715a4be3e10ea}{00007}}\ \ \ \ \ \ \ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \ \ \ \mbox{\hyperlink{structfc_1_1aligned_a05ed4c8bfff0cf5ef67715a4be3e10ea}{\_align}};}
+\DoxyCodeLine{\Hypertarget{aligned_8hpp_source_l00008}\mbox{\hyperlink{structfc_1_1aligned_a3cca062b36904b61acea520c9d417a52}{00008}}\ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{structfc_1_1aligned_a3cca062b36904b61acea520c9d417a52}{\_data}}[\mbox{\hyperlink{precomputed__ecmult_8c_a36ad60f7189b5fdcb306d9b5f3998e2a}{S}}];}
+\DoxyCodeLine{\Hypertarget{aligned_8hpp_source_l00009}\mbox{\hyperlink{structfc_1_1aligned_ac6895f9f0ad6e8613dfdcfb687504120}{00009}}\ \ \ \ \ \}\ \mbox{\hyperlink{structfc_1_1aligned_ac6895f9f0ad6e8613dfdcfb687504120}{\_store}};}
+\DoxyCodeLine{\Hypertarget{aligned_8hpp_source_l00010}\mbox{\hyperlink{structfc_1_1aligned_abdb26112a6a3eb3817e97e8d3aa5c66c}{00010}}\ \ \ \ \ \textcolor{keyword}{operator}\ \textcolor{keywordtype}{char}*()\ \ \ \ \ \ \ \ \ \ \ \ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structfc_1_1aligned_ac6895f9f0ad6e8613dfdcfb687504120}{\_store}}.\_data;\ \}}
+\DoxyCodeLine{\Hypertarget{aligned_8hpp_source_l00011}\mbox{\hyperlink{structfc_1_1aligned_a4feb204641ac94d6458cd9bfe05cc922}{00011}}\ \ \ \ \ \textcolor{keyword}{operator}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*()\textcolor{keyword}{const}\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structfc_1_1aligned_ac6895f9f0ad6e8613dfdcfb687504120}{\_store}}.\_data;\ \}}
+\DoxyCodeLine{\Hypertarget{aligned_8hpp_source_l00012}00012\ \ \ \};}
+\DoxyCodeLine{\Hypertarget{aligned_8hpp_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{aligned_8hpp_source_l00014}00014\ \}}
+
+\end{DoxyCode}

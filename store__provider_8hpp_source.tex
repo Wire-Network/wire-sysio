@@ -1,0 +1,238 @@
+\doxysection{store\+\_\+provider.\+hpp}
+\hypertarget{store__provider_8hpp_source}{}\label{store__provider_8hpp_source}\index{plugins/trace\_api\_plugin/include/sysio/trace\_api/store\_provider.hpp@{plugins/trace\_api\_plugin/include/sysio/trace\_api/store\_provider.hpp}}
+\mbox{\hyperlink{store__provider_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <ios>}}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <thread>}}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <mutex>}}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <condition\_variable>}}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{cfile_8hpp}{fc/io/cfile.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <boost/filesystem.hpp>}}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{fc_2include_2fc_2variant_8hpp}{fc/variant.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{plugins_2trace__api__plugin_2include_2sysio_2trace__api_2common_8hpp}{sysio/trace\_api/common.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00011}00011\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{metadata__log_8hpp}{sysio/trace\_api/metadata\_log.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00012}00012\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{data__log_8hpp}{sysio/trace\_api/data\_log.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00013}00013\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{compressed__file_8hpp}{sysio/trace\_api/compressed\_file.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00015}00015\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio_1_1trace__api}{sysio::trace\_api}}\ \{}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00016}00016\ \ \ \ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespaceboost_1_1filesystem}{boost::filesystem}};}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00018}\mbox{\hyperlink{classsysio_1_1trace__api_1_1path__does__not__exist}{00018}}\ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1trace__api_1_1path__does__not__exist}{path\_does\_not\_exist}}\ :\ \textcolor{keyword}{public}\ std::runtime\_error\ \{}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00019}00019\ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00020}\mbox{\hyperlink{classsysio_1_1trace__api_1_1path__does__not__exist_a60c0a325b56d8a6300b8c4240991be39}{00020}}\ \ \ \ \ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1path__does__not__exist_a60c0a325b56d8a6300b8c4240991be39}{path\_does\_not\_exist}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ what\_arg)}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00021}00021\ \ \ \ \ \ \ \ \ \ :\mbox{\hyperlink{namespacestd}{std}}::runtime\_error(what\_arg)}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00022}00022\ \ \ \ \ \ \ \{\}}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00023}\mbox{\hyperlink{classsysio_1_1trace__api_1_1path__does__not__exist_a5d103514010f5ea1de27a7965ca77a8d}{00023}}\ \ \ \ \ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1path__does__not__exist_a5d103514010f5ea1de27a7965ca77a8d}{path\_does\_not\_exist}}(\textcolor{keyword}{const}\ std::string\&\ what\_arg)}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00024}00024\ \ \ \ \ \ \ \ \ \ :\mbox{\hyperlink{namespacestd}{std}}::runtime\_error(what\_arg)}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00025}00025\ \ \ \ \ \ \ \{\}}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00026}00026\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00028}\mbox{\hyperlink{classsysio_1_1trace__api_1_1old__slice__version}{00028}}\ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1trace__api_1_1old__slice__version}{old\_slice\_version}}\ :\ \textcolor{keyword}{public}\ std::runtime\_error\ \{}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00029}00029\ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00030}\mbox{\hyperlink{classsysio_1_1trace__api_1_1old__slice__version_a9ab5f263714f0dca7c5f81c29390ee18}{00030}}\ \ \ \ \ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1old__slice__version_a9ab5f263714f0dca7c5f81c29390ee18}{old\_slice\_version}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ what\_arg)}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00031}00031\ \ \ \ \ \ \ \ \ \ :\mbox{\hyperlink{namespacestd}{std}}::runtime\_error(what\_arg)}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00032}00032\ \ \ \ \ \ \ \{\}}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00033}\mbox{\hyperlink{classsysio_1_1trace__api_1_1old__slice__version_a4a0abf391ef77c5501b0e3f73cde4319}{00033}}\ \ \ \ \ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1old__slice__version_a4a0abf391ef77c5501b0e3f73cde4319}{old\_slice\_version}}(\textcolor{keyword}{const}\ std::string\&\ what\_arg)}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00034}00034\ \ \ \ \ \ \ \ \ \ :\mbox{\hyperlink{namespacestd}{std}}::runtime\_error(what\_arg)}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00035}00035\ \ \ \ \ \ \ \{\}}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00036}00036\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00038}\mbox{\hyperlink{classsysio_1_1trace__api_1_1incompatible__slice__files}{00038}}\ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1trace__api_1_1incompatible__slice__files}{incompatible\_slice\_files}}\ :\ \textcolor{keyword}{public}\ std::runtime\_error\ \{}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00039}00039\ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00040}\mbox{\hyperlink{classsysio_1_1trace__api_1_1incompatible__slice__files_a71d300d3e5850157f95d1130a7ec930a}{00040}}\ \ \ \ \ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1incompatible__slice__files_a71d300d3e5850157f95d1130a7ec930a}{incompatible\_slice\_files}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ what\_arg)}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00041}00041\ \ \ \ \ \ \ \ \ \ :\mbox{\hyperlink{namespacestd}{std}}::runtime\_error(what\_arg)}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00042}00042\ \ \ \ \ \ \ \{\}}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00043}\mbox{\hyperlink{classsysio_1_1trace__api_1_1incompatible__slice__files_a1a15253db070cb2f61d71a71c6b7e276}{00043}}\ \ \ \ \ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1incompatible__slice__files_a1a15253db070cb2f61d71a71c6b7e276}{incompatible\_slice\_files}}(\textcolor{keyword}{const}\ std::string\&\ what\_arg)}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00044}00044\ \ \ \ \ \ \ \ \ \ :\mbox{\hyperlink{namespacestd}{std}}::runtime\_error(what\_arg)}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00045}00045\ \ \ \ \ \ \ \{\}}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00046}00046\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00048}\mbox{\hyperlink{classsysio_1_1trace__api_1_1malformed__slice__file}{00048}}\ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1trace__api_1_1malformed__slice__file}{malformed\_slice\_file}}\ :\ \textcolor{keyword}{public}\ std::runtime\_error\ \{}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00049}00049\ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00050}\mbox{\hyperlink{classsysio_1_1trace__api_1_1malformed__slice__file_af11aa95027c70cf44382ef3f09475e38}{00050}}\ \ \ \ \ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1malformed__slice__file_af11aa95027c70cf44382ef3f09475e38}{malformed\_slice\_file}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ what\_arg)}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00051}00051\ \ \ \ \ \ \ \ \ \ :\mbox{\hyperlink{namespacestd}{std}}::runtime\_error(what\_arg)}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00052}00052\ \ \ \ \ \ \ \{\}}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00053}\mbox{\hyperlink{classsysio_1_1trace__api_1_1malformed__slice__file_a5893cdd8705136bf2aa60fd0e672b536}{00053}}\ \ \ \ \ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1malformed__slice__file_a5893cdd8705136bf2aa60fd0e672b536}{malformed\_slice\_file}}(\textcolor{keyword}{const}\ std::string\&\ what\_arg)}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00054}00054\ \ \ \ \ \ \ \ \ \ :\mbox{\hyperlink{namespacestd}{std}}::runtime\_error(what\_arg)}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00055}00055\ \ \ \ \ \ \ \{\}}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00056}00056\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00065}00065\ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ DataEntry,\ \textcolor{keyword}{typename}\ File>}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00066}00066\ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ append\_store(\textcolor{keyword}{const}\ DataEntry\ \&entry,\ File\ \&file)\ \{}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00067}00067\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ data\ =\ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(entry);}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00068}00068\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ offset\ =\ file.tellp();}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00069}00069\ \ \ \ \ \ \ file.write(data.data(),\ data.size());}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00070}00070\ \ \ \ \ \ \ file.flush();}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00071}00071\ \ \ \ \ \ \ file.sync();}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00072}00072\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ offset;}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00073}00073\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00074}00074\ }
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00081}00081\ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ DataEntry,\ \textcolor{keyword}{typename}\ File>}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00082}00082\ \ \ \ \textcolor{keyword}{static}\ DataEntry\ extract\_store(\ File\&\ file\ )\ \{}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00083}00083\ \ \ \ \ \ \ DataEntry\ entry;}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00084}00084\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ ds\ =\ file.create\_datastream();}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00085}00085\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a0b442d98ceb22dd5a6ae84745e43ffab}{fc::raw::unpack}}(ds,\ entry);}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00086}00086\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ entry;}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00087}00087\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00088}00088\ }
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00089}00089\ }
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00090}00090\ \ \ \ \textcolor{keyword}{class\ }store\_provider;}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00091}00091\ }
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00096}\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory}{00096}}\ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory}{slice\_directory}}\ \{}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00097}00097\ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00098}\mbox{\hyperlink{structsysio_1_1trace__api_1_1slice__directory_1_1index__header}{00098}}\ \ \ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structsysio_1_1trace__api_1_1slice__directory_1_1index__header}{index\_header}}\ \{}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00099}\mbox{\hyperlink{structsysio_1_1trace__api_1_1slice__directory_1_1index__header_aa443acfb648df27d08ab8a866d21bff6}{00099}}\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1slice__directory_1_1index__header_aa443acfb648df27d08ab8a866d21bff6}{version}};}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00100}00100\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00101}00101\ }
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00102}\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a532effe653319aa639caa41b48709ae0}{00102}}\ \ \ \ \ \ \ \textcolor{keyword}{enum\ class}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a532effe653319aa639caa41b48709ae0}{open\_state}}\ \{\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a532effe653319aa639caa41b48709ae0aecae13117d6f0584c25a9da6c8f8415e}{read}}\ \textcolor{comment}{/*read\ from\ front\ to\ back*/},\ write\ \textcolor{comment}{/*write\ to\ end\ of\ file*/}\ \};}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00103}00103\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_aa1109759adce42b01b76b9e72a8e8ae8}{slice\_directory}}(\textcolor{keyword}{const}\ boost::filesystem::path\&\ slice\_dir,\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{catch__reporter__console_8cpp_a2474a5474cbff19523a51eb1de01cda4}{width}},\ std::optional<uint32\_t>\ minimum\_irreversible\_history\_blocks,}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00104}00104\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::optional<uint32\_t>\ minimum\_uncompressed\_irreversible\_history\_blocks,\ \textcolor{keywordtype}{size\_t}\ compression\_seek\_point\_stride);}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00105}00105\ }
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00112}\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a47a30741cf28932df1556209da63b227}{00112}}\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a47a30741cf28932df1556209da63b227}{slice\_number}}(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ block\_height)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00113}00113\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ block\_height\ /\ \_width;}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00114}00114\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00115}00115\ }
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00125}00125\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a24faf23a87e249099bea549dbda165b2}{find\_or\_create\_index\_slice}}(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a47a30741cf28932df1556209da63b227}{slice\_number}},\ \mbox{\hyperlink{test__trace__file_8cpp_a198834d0a121ab5b82820ffa8361e521}{open\_state}}\ \mbox{\hyperlink{structstate}{state}},\ \mbox{\hyperlink{classfc_1_1cfile}{fc::cfile}}\&\ index\_file)\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00126}00126\ }
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00138}00138\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_aa8fdc6fcd3d18c76b517d65b6ea56bef}{find\_index\_slice}}(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a47a30741cf28932df1556209da63b227}{slice\_number}},\ \mbox{\hyperlink{test__trace__file_8cpp_a198834d0a121ab5b82820ffa8361e521}{open\_state}}\ \mbox{\hyperlink{structstate}{state}},\ \mbox{\hyperlink{classfc_1_1cfile}{fc::cfile}}\&\ index\_file,\ \textcolor{keywordtype}{bool}\ open\_file\ =\ \textcolor{keyword}{true})\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00139}00139\ }
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00149}00149\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a365023e0ceb97c69aa3ad66c393c2125}{find\_or\_create\_trace\_slice}}(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a47a30741cf28932df1556209da63b227}{slice\_number}},\ \mbox{\hyperlink{test__trace__file_8cpp_a198834d0a121ab5b82820ffa8361e521}{open\_state}}\ \mbox{\hyperlink{structstate}{state}},\ \mbox{\hyperlink{classfc_1_1cfile}{fc::cfile}}\&\ trace\_file)\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00150}00150\ }
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00162}00162\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a314838e3f2122e4bcc7f1279b78f7d0c}{find\_trace\_slice}}(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a47a30741cf28932df1556209da63b227}{slice\_number}},\ \mbox{\hyperlink{test__trace__file_8cpp_a198834d0a121ab5b82820ffa8361e521}{open\_state}}\ \mbox{\hyperlink{structstate}{state}},\ \mbox{\hyperlink{classfc_1_1cfile}{fc::cfile}}\&\ trace\_file,\ \textcolor{keywordtype}{bool}\ open\_file\ =\ \textcolor{keyword}{true})\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00163}00163\ }
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00173}00173\ \ \ \ \ \ \ std::optional<compressed\_file>\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a79cb70775a7aa5e99311529fa6ce30a2}{find\_compressed\_trace\_slice}}(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a47a30741cf28932df1556209da63b227}{slice\_number}},\ \textcolor{keywordtype}{bool}\ open\_file\ =\ \textcolor{keyword}{true})\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00174}00174\ }
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00183}00183\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_ac7433eb9c741feab026859dc4807b174}{find\_or\_create\_slice\_pair}}(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a47a30741cf28932df1556209da63b227}{slice\_number}},\ \mbox{\hyperlink{test__trace__file_8cpp_a198834d0a121ab5b82820ffa8361e521}{open\_state}}\ \mbox{\hyperlink{structstate}{state}},\ \mbox{\hyperlink{classfc_1_1cfile}{fc::cfile}}\&\ trace,\ \mbox{\hyperlink{classfc_1_1cfile}{fc::cfile}}\&\ index);}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00184}00184\ }
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00193}00193\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_aaa86b5afdb3d46491da2af321f6b54bd}{find\_or\_create\_trx\_id\_slice}}(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a47a30741cf28932df1556209da63b227}{slice\_number}},\ \mbox{\hyperlink{test__trace__file_8cpp_a198834d0a121ab5b82820ffa8361e521}{open\_state}}\ \mbox{\hyperlink{structstate}{state}},\ \mbox{\hyperlink{classfc_1_1cfile}{fc::cfile}}\&\ trx\_id\_file)\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00194}00194\ }
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00205}00205\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_afd4f092c1fd16893e6d0a8cc06a40ea4}{find\_trx\_id\_slice}}(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a47a30741cf28932df1556209da63b227}{slice\_number}},\ \mbox{\hyperlink{test__trace__file_8cpp_a198834d0a121ab5b82820ffa8361e521}{open\_state}}\ \mbox{\hyperlink{structstate}{state}},\ \mbox{\hyperlink{classfc_1_1cfile}{fc::cfile}}\&\ trx\_id\_file,\ \textcolor{keywordtype}{bool}\ open\_file\ =\ \textcolor{keyword}{true})\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00206}00206\ }
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00211}00211\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_aca2e44229ad8159ea40397ec974fca22}{set\_lib}}(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ lib);}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00212}00212\ }
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00216}00216\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a7c7ccb0852100b5ab21daef4ac3133cc}{start\_maintenance\_thread}}(\ \mbox{\hyperlink{classfc_1_1optional__delegate}{log\_handler}}\ log\ );}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00217}00217\ }
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00221}00221\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_ad847f59ef5d63042406e109f2fd836a6}{stop\_maintenance\_thread}}();}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00222}00222\ }
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00229}00229\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a8b15d66d020bfc67d541e6cf09404ab9}{run\_maintenance\_tasks}}(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ lib,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1optional__delegate}{log\_handler}}\&\ log);}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00230}00230\ }
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00231}00231\ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00232}00232\ \ \ \ \ \ \ \textcolor{comment}{//\ returns\ true\ if\ slice\ is\ found,\ slice\_file\ will\ always\ be\ set\ to\ the\ appropriate\ path\ for}}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00233}00233\ \ \ \ \ \ \ \textcolor{comment}{//\ the\ slice\_prefix\ and\ slice\_number,\ but\ will\ only\ be\ opened\ if\ found}}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00234}00234\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ find\_slice(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ slice\_prefix,\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a47a30741cf28932df1556209da63b227}{slice\_number}},\ \mbox{\hyperlink{classfc_1_1cfile}{fc::cfile}}\&\ slice\_file,\ \textcolor{keywordtype}{bool}\ open\_file)\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00235}00235\ }
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00236}00236\ \ \ \ \ \ \ \textcolor{comment}{//\ take\ an\ index\ file\ that\ is\ initialized\ to\ a\ file\ and\ open\ it\ and\ write\ its\ header}}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00237}00237\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ create\_new\_index\_slice\_file(\mbox{\hyperlink{classfc_1_1cfile}{fc::cfile}}\&\ index\_file)\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00238}00238\ }
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00239}00239\ \ \ \ \ \ \ \textcolor{comment}{//\ take\ an\ open\ index\ slice\ file\ and\ verify\ its\ header\ is\ valid\ and\ prepare\ the\ file\ to\ be\ appended\ to\ (or\ read\ from)}}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00240}00240\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ validate\_existing\_index\_slice\_file(\mbox{\hyperlink{classfc_1_1cfile}{fc::cfile}}\&\ index\_file,\ \mbox{\hyperlink{test__trace__file_8cpp_a198834d0a121ab5b82820ffa8361e521}{open\_state}}\ \mbox{\hyperlink{structstate}{state}})\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00241}00241\ }
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00242}00242\ \ \ \ \ \ \ \textcolor{comment}{//\ helper\ for\ methods\ that\ process\ irreversible\ slice\ files}}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00243}00243\ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ F>}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00244}00244\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ process\_irreversible\_slice\_range(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ lib,\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ upper\_bound\_block,\ std::optional<uint32\_t>\&\ lower\_bound\_slice,\ F\&\&\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}});}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00245}00245\ }
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00246}00246\ \ \ \ \ \ \ \textcolor{keyword}{const}\ boost::filesystem::path\ \_slice\_dir;}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00247}00247\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \_width;}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00248}00248\ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::optional<uint32\_t>\ \_minimum\_irreversible\_history\_blocks;}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00249}00249\ \ \ \ \ \ \ std::optional<uint32\_t>\ \_last\_cleaned\_up\_slice;}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00250}00250\ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::optional<uint32\_t>\ \_minimum\_uncompressed\_irreversible\_history\_blocks;}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00251}00251\ \ \ \ \ \ \ std::optional<uint32\_t>\ \_last\_compressed\_slice;}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00252}00252\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ \_compression\_seek\_point\_stride;}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00253}00253\ }
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00254}00254\ \ \ \ \ \ \ std::mutex\ \_maintenance\_mtx;}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00255}00255\ \ \ \ \ \ \ std::condition\_variable\ \_maintenance\_condition;}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00256}00256\ \ \ \ \ \ \ std::thread\ \_maintenance\_thread;}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00257}00257\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \_maintenance\_shutdown\{\textcolor{keyword}{false}\};}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00258}00258\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \_best\_known\_lib\{0\};}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00259}00259\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00260}00260\ }
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00264}\mbox{\hyperlink{classsysio_1_1trace__api_1_1store__provider}{00264}}\ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1trace__api_1_1store__provider}{store\_provider}}\ \{}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00265}00265\ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00266}\mbox{\hyperlink{classsysio_1_1trace__api_1_1store__provider_a35ad8cace9660ec3eefb9171898433d9}{00266}}\ \ \ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a532effe653319aa639caa41b48709ae0}{open\_state}}\ =\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a532effe653319aa639caa41b48709ae0}{slice\_directory::open\_state}};}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00267}00267\ }
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00268}00268\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1trace__api_1_1store__provider_a3cc96fc91b74439c3e62e00c7256a1e9}{store\_provider}}(\textcolor{keyword}{const}\ boost::filesystem::path\&\ slice\_dir,\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ stride\_width,\ std::optional<uint32\_t>\ minimum\_irreversible\_history\_blocks,}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00269}00269\ \ \ \ \ \ \ \ \ \ \ \ \ std::optional<uint32\_t>\ minimum\_uncompressed\_irreversible\_history\_blocks,\ \textcolor{keywordtype}{size\_t}\ compression\_seek\_point\_stride);}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00270}00270\ }
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00271}00271\ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ BlockTrace>}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00272}00272\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1store__provider_a2bd4f8dab0dda219044a2032d94a1668}{append}}(\textcolor{keyword}{const}\ BlockTrace\&\ \mbox{\hyperlink{xbyak__mnemonic_8h_a9be923ac9afe48bc98bd22e398415272}{bt}});}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00273}00273\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1store__provider_a34a4fdef03a4b354b005e73e383d7e59}{append\_lib}}(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ lib);}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00274}00274\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1store__provider_a03c9a6e4e79e019651c9a8f8a16ff4bf}{append\_trx\_ids}}(\mbox{\hyperlink{structsysio_1_1trace__api_1_1block__trxs__entry}{block\_trxs\_entry}}\ tt);}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00275}00275\ }
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00282}00282\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1trace__api_a4fe812fd823fbfebfe869a30ef75a248}{get\_block\_t}}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1store__provider_a334e53cb7d09b7a835e1ddf9d8695035}{get\_block}}(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ block\_height,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1optional__delegate}{yield\_function}}\&\ yield=\ \{\});}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00283}00283\ }
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00284}00284\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1trace__api_abd0f429b16506edddbd4a2cc5a8acea0}{get\_block\_n}}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1store__provider_a22f36ae69988e2b50a48dbe604f09bf9}{get\_trx\_block\_number}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1sha256}{chain::transaction\_id\_type}}\&\ trx\_id,\ std::optional<uint32\_t>\ minimum\_irreversible\_history\_blocks,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1optional__delegate}{yield\_function}}\&\ yield=\ \{\});}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00285}00285\ }
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00286}\mbox{\hyperlink{classsysio_1_1trace__api_1_1store__provider_afbe277e7852b60426b1cad9b7fb81c4a}{00286}}\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1store__provider_afbe277e7852b60426b1cad9b7fb81c4a}{start\_maintenance\_thread}}(\ \mbox{\hyperlink{classfc_1_1optional__delegate}{log\_handler}}\ log\ )\ \{}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00287}00287\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1trace__api_1_1store__provider_ae684bf4119be3e3464e2d5bc4183b12b}{\_slice\_directory}}.\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a7c7ccb0852100b5ab21daef4ac3133cc}{start\_maintenance\_thread}}(\ std::move(log)\ );}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00288}00288\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00289}\mbox{\hyperlink{classsysio_1_1trace__api_1_1store__provider_a68fc753ce45ab78178d7c2625a932e42}{00289}}\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1store__provider_a68fc753ce45ab78178d7c2625a932e42}{stop\_maintenance\_thread}}()\ \{}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00290}00290\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1trace__api_1_1store__provider_ae684bf4119be3e3464e2d5bc4183b12b}{\_slice\_directory}}.\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_ad847f59ef5d63042406e109f2fd836a6}{stop\_maintenance\_thread}}();}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00291}00291\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00292}00292\ }
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00293}00293\ \ \ \ \ \ \ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00303}00303\ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ Fn>}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00304}\mbox{\hyperlink{classsysio_1_1trace__api_1_1store__provider_a22d3bc262b20308a93c1e9c8a423a1fa}{00304}}\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1store__provider_a22d3bc262b20308a93c1e9c8a423a1fa}{scan\_metadata\_log\_from}}(\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ block\_height,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ offset,\ Fn\&\&\ fn,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1optional__delegate}{yield\_function}}\&\ yield\ )\ \{}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00305}00305\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ ignoring\ offset}}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00306}00306\ \ \ \ \ \ \ \ \ \ offset\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00307}00307\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1cfile}{fc::cfile}}\ index;}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00308}00308\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ slice\_number\ =\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1store__provider_ae684bf4119be3e3464e2d5bc4183b12b}{\_slice\_directory}}.\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a47a30741cf28932df1556209da63b227}{slice\_number}}(block\_height);}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00309}00309\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ found\ =\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1store__provider_ae684bf4119be3e3464e2d5bc4183b12b}{\_slice\_directory}}.\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_aa8fdc6fcd3d18c76b517d65b6ea56bef}{find\_index\_slice}}(slice\_number,\ open\_state::read,\ index);}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00310}00310\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !found\ )\ \{}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00311}00311\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00312}00312\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00313}00313\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ end\ =\ \mbox{\hyperlink{namespacefc_aae3e907b120751591ca6919ac66c384b}{file\_size}}(index.get\_file\_path());}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00314}00314\ \ \ \ \ \ \ \ \ \ offset\ =\ index.tellp();}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00315}00315\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ last\_read\_offset\ =\ offset;}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00316}00316\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (offset\ <\ end)\ \{}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00317}00317\ \ \ \ \ \ \ \ \ \ \ \ \ yield();}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00318}00318\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ metadata\ =\ extract\_store<metadata\_log\_entry>(index);}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00319}00319\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!\ fn(metadata))\ \{}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00320}00320\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00321}00321\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00322}00322\ \ \ \ \ \ \ \ \ \ \ \ \ last\_read\_offset\ =\ offset;}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00323}00323\ \ \ \ \ \ \ \ \ \ \ \ \ offset\ =\ index.tellp();}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00324}00324\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00325}00325\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ last\_read\_offset;}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00326}00326\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00327}00327\ }
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00336}\mbox{\hyperlink{classsysio_1_1trace__api_1_1store__provider_afcff133b7357a33643a4ae3e7df99284}{00336}}\ \ \ \ \ \ \ std::optional<data\_log\_entry>\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1store__provider_afcff133b7357a33643a4ae3e7df99284}{read\_data\_log}}(\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ block\_height,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ offset\ )\ \{}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00337}00337\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ slice\_number\ =\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1store__provider_ae684bf4119be3e3464e2d5bc4183b12b}{\_slice\_directory}}.\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a47a30741cf28932df1556209da63b227}{slice\_number}}(block\_height);}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00338}00338\ }
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00339}00339\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1cfile}{fc::cfile}}\ trace;}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00340}00340\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !\mbox{\hyperlink{classsysio_1_1trace__api_1_1store__provider_ae684bf4119be3e3464e2d5bc4183b12b}{\_slice\_directory}}.\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a314838e3f2122e4bcc7f1279b78f7d0c}{find\_trace\_slice}}(slice\_number,\ open\_state::read,\ trace)\ )\ \{}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00341}00341\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ attempt\ to\ read\ a\ compressed\ trace\ if\ one\ exists}}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00342}00342\ \ \ \ \ \ \ \ \ \ \ \ \ std::optional<compressed\_file>\ ctrace\ =\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1store__provider_ae684bf4119be3e3464e2d5bc4183b12b}{\_slice\_directory}}.\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a79cb70775a7aa5e99311529fa6ce30a2}{find\_compressed\_trace\_slice}}(slice\_number);}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00343}00343\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ctrace)\ \{}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00344}00344\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ctrace-\/>seek(offset);}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00345}00345\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ extract\_store<data\_log\_entry>(*ctrace);}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00346}00346\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00347}00347\ }
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00348}00348\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::string\ offset\_str\ =\ boost::lexical\_cast<std::string>(offset);}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00349}00349\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::string\ bh\_str\ =\ boost::lexical\_cast<std::string>(block\_height);}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00350}00350\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1malformed__slice__file}{malformed\_slice\_file}}(\textcolor{stringliteral}{"{}Requested\ offset:\ "{}}\ +\ offset\_str\ +\ \textcolor{stringliteral}{"{}\ to\ retrieve\ block\ number:\ "{}}\ +\ bh\_str\ +\ \textcolor{stringliteral}{"{}\ but\ this\ trace\ file\ is\ new,\ so\ there\ are\ no\ traces\ present."{}});}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00351}00351\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00352}00352\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ end\ =\ \mbox{\hyperlink{namespacefc_aae3e907b120751591ca6919ac66c384b}{file\_size}}(trace.\mbox{\hyperlink{classfc_1_1cfile_aba9b5dcf06d12cc653b8eb4224351ff7}{get\_file\_path}}());}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00353}00353\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ offset\ >=\ end\ )\ \{}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00354}00354\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::string\ offset\_str\ =\ boost::lexical\_cast<std::string>(offset);}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00355}00355\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::string\ bh\_str\ =\ boost::lexical\_cast<std::string>(block\_height);}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00356}00356\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::string\ end\_str\ =\ boost::lexical\_cast<std::string>(end);}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00357}00357\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1malformed__slice__file}{malformed\_slice\_file}}(\textcolor{stringliteral}{"{}Requested\ offset:\ "{}}\ +\ offset\_str\ +\ \textcolor{stringliteral}{"{}\ to\ retrieve\ block\ number:\ "{}}\ +\ bh\_str\ +\ \textcolor{stringliteral}{"{}\ but\ this\ trace\ file\ only\ goes\ to\ offset:\ "{}}\ +\ end\_str);}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00358}00358\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00359}00359\ \ \ \ \ \ \ \ \ \ trace.\mbox{\hyperlink{classfc_1_1cfile_a6eb4fe4530480f13c6cf773a7f1e3847}{seek}}(offset);}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00360}00360\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ extract\_store<data\_log\_entry>(trace);}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00361}00361\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00362}00362\ }
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00368}\mbox{\hyperlink{classsysio_1_1trace__api_1_1store__provider_a2de4d3fd42393c8f625f74cd2ffc427b}{00368}}\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1store__provider_a2de4d3fd42393c8f625f74cd2ffc427b}{initialize\_new\_index\_slice\_file}}(\mbox{\hyperlink{classfc_1_1cfile}{fc::cfile}}\&\ index);}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00369}00369\ }
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00376}\mbox{\hyperlink{classsysio_1_1trace__api_1_1store__provider_a838c5cc7c844bc603c538fbdc06e089f}{00376}}\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1store__provider_a838c5cc7c844bc603c538fbdc06e089f}{validate\_existing\_index\_slice\_file}}(\mbox{\hyperlink{classfc_1_1cfile}{fc::cfile}}\&\ index,\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a532effe653319aa639caa41b48709ae0}{open\_state}}\ \mbox{\hyperlink{structstate}{state}});}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00377}00377\ }
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00378}\mbox{\hyperlink{classsysio_1_1trace__api_1_1store__provider_ae684bf4119be3e3464e2d5bc4183b12b}{00378}}\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory}{slice\_directory}}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1store__provider_ae684bf4119be3e3464e2d5bc4183b12b}{\_slice\_directory}};}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00379}00379\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00380}00380\ }
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00381}00381\ \}}
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00382}00382\ }
+\DoxyCodeLine{\Hypertarget{store__provider_8hpp_source_l00383}00383\ \mbox{\hyperlink{reflect_8hpp_a2ace850e636b1ca0b18fe3177e413d99}{FC\_REFLECT}}(\mbox{\hyperlink{structsysio_1_1trace__api_1_1slice__directory_1_1index__header}{sysio::trace\_api::slice\_directory::index\_header}},\ (version))}
+
+\end{DoxyCode}

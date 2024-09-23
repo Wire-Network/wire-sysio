@@ -1,0 +1,70 @@
+\doxysection{instantiation\+\_\+tests.\+cpp}
+\hypertarget{instantiation__tests_8cpp_source}{}\label{instantiation__tests_8cpp_source}\index{libraries/sys-\/vm/tests/instantiation\_tests.cpp@{libraries/sys-\/vm/tests/instantiation\_tests.cpp}}
+\mbox{\hyperlink{instantiation__tests_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <iostream>}}
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <list>}}
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <sysio/vm/backend.hpp>}}
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <sysio/vm/watchdog.hpp>}}
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{sys-vm_2tests_2utils_8hpp}{utils.hpp}}"{}}}
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{single__include_2catch2_2catch_8hpp}{catch2/catch.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00010}00010\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}};}
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00011}00011\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacesysio_1_1vm}{sysio::vm}};}
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00013}00013\ \textcolor{preprocessor}{\#pragma\ GCC\ push\_options}}
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00014}00014\ \textcolor{preprocessor}{\#pragma\ GCC\ optimize\ ("{}O0"{})}}
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00015}\mbox{\hyperlink{instantiation__tests_8cpp_a01db4ea3e98c23d6905c55c2ac5687b9}{00015}}\ \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_a3e5f265967cb6d730cad8ca15e807ac2}{BACKEND\_TEST\_CASE}}(\textcolor{stringliteral}{"{}Test\ instantiating\ multiple\ instances\ of\ sys-\/vm"{}},}
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00016}00016\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}[instantiation\_test]"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00017}00017\ \ \ \ std::vector<uint8\_t>\ test\_wasm\ =\ \{}
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00018}00018\ \ \ \ \ \ 0x00,\ 0x61,\ 0x73,\ 0x6d,\ 0x01,\ 0x00,\ 0x00,\ 0x00,\ 0x01,\ 0x04,\ 0x01,\ 0x60,}
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00019}00019\ \ \ \ \ \ 0x00,\ 0x00,\ 0x03,\ 0x03,\ 0x02,\ 0x00,\ 0x00,\ 0x04,\ 0x05,\ 0x01,\ 0x70,\ 0x01,}
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00020}00020\ \ \ \ \ \ 0x01,\ 0x01,\ 0x05,\ 0x03,\ 0x01,\ 0x00,\ 0x01,\ 0x06,\ 0x15,\ 0x03,\ 0x7f,\ 0x01,}
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00021}00021\ \ \ \ \ \ 0x41,\ 0x90,\ 0xc8,\ 0x00,\ 0x0b,\ 0x7f,\ 0x00,\ 0x41,\ 0x90,\ 0xc8,\ 0x00,\ 0x0b,}
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00022}00022\ \ \ \ \ \ 0x7f,\ 0x00,\ 0x41,\ 0x84,\ 0x08,\ 0x0b,\ 0x07,\ 0x30,\ 0x04,\ 0x06,\ 0x6d,\ 0x65,}
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00023}00023\ \ \ \ \ \ 0x6d,\ 0x6f,\ 0x72,\ 0x79,\ 0x02,\ 0x00,\ 0x0b,\ 0x5f,\ 0x5f,\ 0x68,\ 0x65,\ 0x61,}
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00024}00024\ \ \ \ \ \ 0x70,\ 0x5f,\ 0x62,\ 0x61,\ 0x73,\ 0x65,\ 0x03,\ 0x01,\ 0x0a,\ 0x5f,\ 0x5f,\ 0x64,}
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00025}00025\ \ \ \ \ \ 0x61,\ 0x74,\ 0x61,\ 0x5f,\ 0x65,\ 0x6e,\ 0x64,\ 0x03,\ 0x02,\ 0x08,\ 0x64,\ 0x6f,}
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00026}00026\ \ \ \ \ \ 0x74,\ 0x68,\ 0x65,\ 0x64,\ 0x65,\ 0x77,\ 0x00,\ 0x01,\ 0x0a,\ 0x8c,\ 0x02,\ 0x02,}
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00027}00027\ \ \ \ \ \ 0x02,\ 0x00,\ 0x0b,\ 0x86,\ 0x02,\ 0x06,\ 0x01,\ 0x7f,\ 0x02,\ 0x7e,\ 0x01,\ 0x7f,}
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00028}00028\ \ \ \ \ \ 0x01,\ 0x7c,\ 0x02,\ 0x7f,\ 0x03,\ 0x7e,\ 0x41,\ 0x00,\ 0x28,\ 0x02,\ 0x80,\ 0x88,}
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00029}00029\ \ \ \ \ \ 0x80,\ 0x80,\ 0x00,\ 0x21,\ 0x00,\ 0x42,\ 0x00,\ 0x21,\ 0x01,\ 0x42,\ 0x02,\ 0x21,}
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00030}00030\ \ \ \ \ \ 0x02,\ 0x02,\ 0x40,\ 0x03,\ 0x40,\ 0x02,\ 0x40,\ 0x20,\ 0x02,\ 0x42,\ 0x02,\ 0x51,}
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00031}00031\ \ \ \ \ \ 0x0d,\ 0x00,\ 0x02,\ 0x40,\ 0x20,\ 0x02,\ 0xa7,\ 0x22,\ 0x03,\ 0x41,\ 0x01,\ 0x71,}
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00032}00032\ \ \ \ \ \ 0x45,\ 0x0d,\ 0x00,\ 0x02,\ 0x40,\ 0x02,\ 0x40,\ 0x02,\ 0x40,\ 0x20,\ 0x03,\ 0xb7,}
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00033}00033\ \ \ \ \ \ 0x9f,\ 0x22,\ 0x04,\ 0x99,\ 0x44,\ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0x00,\ 0xe0,}
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00034}00034\ \ \ \ \ \ 0x41,\ 0x63,\ 0x0d,\ 0x00,\ 0x41,\ 0x80,\ 0x80,\ 0x80,\ 0x80,\ 0x78,\ 0x21,\ 0x05,}
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00035}00035\ \ \ \ \ \ 0x41,\ 0x80,\ 0x80,\ 0x80,\ 0x80,\ 0x78,\ 0x41,\ 0x03,\ 0x4e,\ 0x0d,\ 0x01,\ 0x0c,}
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00036}00036\ \ \ \ \ \ 0x02,\ 0x0b,\ 0x20,\ 0x04,\ 0xaa,\ 0x22,\ 0x05,\ 0x41,\ 0x03,\ 0x48,\ 0x0d,\ 0x01,}
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00037}00037\ \ \ \ \ \ 0x0b,\ 0x41,\ 0x03,\ 0x21,\ 0x06,\ 0x03,\ 0x40,\ 0x20,\ 0x03,\ 0x20,\ 0x06,\ 0x70,}
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00038}00038\ \ \ \ \ \ 0x45,\ 0x0d,\ 0x01,\ 0x20,\ 0x06,\ 0x41,\ 0x02,\ 0x6a,\ 0x22,\ 0x06,\ 0x20,\ 0x05,}
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00039}00039\ \ \ \ \ \ 0x4c,\ 0x0d,\ 0x00,\ 0x0b,\ 0x0b,\ 0x20,\ 0x02,\ 0x42,\ 0x03,\ 0x54,\ 0x0d,\ 0x00,}
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00040}00040\ \ \ \ \ \ 0x42,\ 0x7f,\ 0x20,\ 0x02,\ 0x86,\ 0x42,\ 0x7f,\ 0x85,\ 0x21,\ 0x07,\ 0x42,\ 0x04,}
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00041}00041\ \ \ \ \ \ 0x21,\ 0x08,\ 0x20,\ 0x01,\ 0x21,\ 0x09,\ 0x03,\ 0x40,\ 0x20,\ 0x08,\ 0x20,\ 0x08,}
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00042}00042\ \ \ \ \ \ 0x7e,\ 0x42,\ 0x7e,\ 0x7c,\ 0x20,\ 0x07,\ 0x82,\ 0x21,\ 0x08,\ 0x20,\ 0x09,\ 0x42,}
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00043}00043\ \ \ \ \ \ 0x7f,\ 0x7c,\ 0x22,\ 0x09,\ 0x42,\ 0x00,\ 0x52,\ 0x0d,\ 0x00,\ 0x0b,\ 0x20,\ 0x08,}
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00044}00044\ \ \ \ \ \ 0x42,\ 0x00,\ 0x51,\ 0x0d,\ 0x01,\ 0x0b,\ 0x20,\ 0x01,\ 0x42,\ 0x01,\ 0x7c,\ 0x21,}
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00045}00045\ \ \ \ \ \ 0x01,\ 0x20,\ 0x02,\ 0x42,\ 0x01,\ 0x7c,\ 0x22,\ 0x02,\ 0x42,\ 0x80,\ 0x2a,\ 0x52,}
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00046}00046\ \ \ \ \ \ 0x0d,\ 0x01,\ 0x0c,\ 0x02,\ 0x0b,\ 0x20,\ 0x00,\ 0x41,\ 0xef,\ 0xfd,\ 0xb7,\ 0xf5,}
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00047}00047\ \ \ \ \ \ 0x7d,\ 0x36,\ 0x02,\ 0x00,\ 0x20,\ 0x01,\ 0x42,\ 0x01,\ 0x7c,\ 0x21,\ 0x01,\ 0x20,}
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00048}00048\ \ \ \ \ \ 0x02,\ 0x42,\ 0x01,\ 0x7c,\ 0x22,\ 0x02,\ 0x42,\ 0x80,\ 0x2a,\ 0x52,\ 0x0d,\ 0x00,}
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00049}00049\ \ \ \ \ \ 0x0b,\ 0x0b,\ 0x0b,\ 0x0b,\ 0x0b,\ 0x01,\ 0x00,\ 0x41,\ 0x80,\ 0x08,\ 0x0b,\ 0x04,}
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00050}00050\ \ \ \ \ \ 0xfc,\ 0xff,\ 0x00,\ 0x00,\ 0x00,\ 0x25,\ 0x04,\ 0x6e,\ 0x61,\ 0x6d,\ 0x65,\ 0x01,}
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00051}00051\ \ \ \ \ \ 0x1e,\ 0x02,\ 0x00,\ 0x11,\ 0x5f,\ 0x5f,\ 0x77,\ 0x61,\ 0x73,\ 0x6d,\ 0x5f,\ 0x63,}
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00052}00052\ \ \ \ \ \ 0x61,\ 0x6c,\ 0x6c,\ 0x5f,\ 0x63,\ 0x74,\ 0x6f,\ 0x72,\ 0x73,\ 0x01,\ 0x08,\ 0x64,}
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00053}00053\ \ \ \ \ \ 0x6f,\ 0x74,\ 0x68,\ 0x65,\ 0x64,\ 0x65,\ 0x77,\ 0x00,\ 0x25,\ 0x09,\ 0x70,\ 0x72,}
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00054}00054\ \ \ \ \ \ 0x6f,\ 0x64,\ 0x75,\ 0x63,\ 0x65,\ 0x72,\ 0x73,\ 0x01,\ 0x0c,\ 0x70,\ 0x72,\ 0x6f,}
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00055}00055\ \ \ \ \ \ 0x63,\ 0x65,\ 0x73,\ 0x73,\ 0x65,\ 0x64,\ 0x2d,\ 0x62,\ 0x79,\ 0x01,\ 0x05,\ 0x63,}
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00056}00056\ \ \ \ \ \ 0x6c,\ 0x61,\ 0x6e,\ 0x67,\ 0x05,\ 0x39,\ 0x2e,\ 0x30,\ 0x2e,\ 0x30}
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00057}00057\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00059}00059\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<registered\_host\_functions<standalone\_function\_t>}},\ TestType>;}
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00060}00060\ \ \ \ std::list<backend\_t>\ v;}
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00061}00061\ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i=0;\ i\ <\ 8193;\ i++)}
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00062}00062\ \ \ \ \ \ \ v.emplace\_back(test\_wasm,\ \mbox{\hyperlink{sys-vm_2tests_2utils_8hpp_a4c503c4f3ca9f4afce322078d5a33f3e}{get\_wasm\_allocator}}());}
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00063}00063\ \}}
+\DoxyCodeLine{\Hypertarget{instantiation__tests_8cpp_source_l00064}00064\ \textcolor{preprocessor}{\#pragma\ GCC\ pop\_options}}
+
+\end{DoxyCode}

@@ -1,0 +1,113 @@
+\doxysection{libraries/fc/vendor/websocketpp/test/transport/asio/security.cpp File Reference}
+\hypertarget{security_8cpp}{}\label{security_8cpp}\index{libraries/fc/vendor/websocketpp/test/transport/asio/security.cpp@{libraries/fc/vendor/websocketpp/test/transport/asio/security.cpp}}
+{\ttfamily \#include $<$boost/test/unit\+\_\+test.\+hpp$>$}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$websocketpp/common/type\+\_\+traits.\+hpp$>$}\newline
+{\ttfamily \#include $<$websocketpp/transport/asio/security/none.\+hpp$>$}\newline
+{\ttfamily \#include $<$websocketpp/transport/asio/security/tls.\+hpp$>$}\newline
+Include dependency graph for security.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{security_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structdummy__con}{dummy\+\_\+con$<$ base $>$}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{security_8cpp_a6b2a3852db8bb19ab6909bac01859985}{BOOST\+\_\+\+TEST\+\_\+\+MODULE}}~transport\+\_\+asio\+\_\+base
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{security_8cpp_a97b65c98d81d6e4bfabc28a932dd7260}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (translated\+\_\+ec\+\_\+none)
+\item 
+\mbox{\hyperlink{security_8cpp_ac081dcda1da88931c62d3dda523d612d}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (translated\+\_\+ec\+\_\+tls)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{security_8cpp_a6b2a3852db8bb19ab6909bac01859985}\index{security.cpp@{security.cpp}!BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}}
+\index{BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}!security.cpp@{security.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_TEST\_MODULE}{BOOST\_TEST\_MODULE}}
+{\footnotesize\ttfamily \label{security_8cpp_a6b2a3852db8bb19ab6909bac01859985} 
+\#define BOOST\+\_\+\+TEST\+\_\+\+MODULE~transport\+\_\+asio\+\_\+base}
+
+
+
+Definition at line \mbox{\hyperlink{security_8cpp_source_l00028}{28}} of file \mbox{\hyperlink{security_8cpp_source}{security.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{security_8cpp_a97b65c98d81d6e4bfabc28a932dd7260}\index{security.cpp@{security.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!security.cpp@{security.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{security_8cpp_a97b65c98d81d6e4bfabc28a932dd7260} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{translated\+\_\+ec\+\_\+none}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{security_8cpp_source_l00045}{45}} of file \mbox{\hyperlink{security_8cpp_source}{security.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00046\ \ \ \ \ \mbox{\hyperlink{structdummy__con}{dummy\_con<websocketpp::transport::asio::basic\_socket::connection>}}\ tscon;}
+\DoxyCodeLine{00047\ }
+\DoxyCodeLine{00048\ \ \ \ \ \textcolor{comment}{//\ If\ the\ current\ configuration\ settings\ result\ in\ the\ library\ error\ type\ and\ the\ asio}}
+\DoxyCodeLine{00049\ \ \ \ \ \textcolor{comment}{//\ error\ type\ being\ the\ same,\ then\ the\ code\ should\ pass\ through\ natively.\ Otherwise}}
+\DoxyCodeLine{00050\ \ \ \ \ \textcolor{comment}{//\ we\ should\ get\ a\ generic\ pass\ through\ error.}}
+\DoxyCodeLine{00051\ \ \ \ \ \textcolor{keywordflow}{if}(websocketpp::lib::is\_same<websocketpp::lib::error\_code,websocketpp::lib::asio::error\_code>::value)\ \{}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ tscon.\mbox{\hyperlink{structdummy__con_af921f87ae93817faa94cd48085a39ca1}{test}}(),\ websocketpp::lib::error\_code()\ );}
+\DoxyCodeLine{00053\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ tscon.\mbox{\hyperlink{structdummy__con_af921f87ae93817faa94cd48085a39ca1}{test}}(),\ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1error_a7e7e335d77a9007c14af4d941a2baa93}{websocketpp::transport::error::make\_error\_code}}(\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0a6a7cb8ef776c9eabe2324a529e991732}{websocketpp::transport::error::pass\_through}})\ );}
+\DoxyCodeLine{00055\ \ \ \ \ \}}
+\DoxyCodeLine{00056\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{security_8cpp_a97b65c98d81d6e4bfabc28a932dd7260_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{security_8cpp_ac081dcda1da88931c62d3dda523d612d}\index{security.cpp@{security.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!security.cpp@{security.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{security_8cpp_ac081dcda1da88931c62d3dda523d612d} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{translated\+\_\+ec\+\_\+tls}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{security_8cpp_source_l00058}{58}} of file \mbox{\hyperlink{security_8cpp_source}{security.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00059\ \ \ \ \ \mbox{\hyperlink{structdummy__con}{dummy\_con<websocketpp::transport::asio::tls\_socket::connection>}}\ tscon;}
+\DoxyCodeLine{00060\ }
+\DoxyCodeLine{00061\ \ \ \ \ \textcolor{comment}{//\ If\ the\ current\ configuration\ settings\ result\ in\ the\ library\ error\ type\ and\ the\ asio}}
+\DoxyCodeLine{00062\ \ \ \ \ \textcolor{comment}{//\ error\ type\ being\ the\ same,\ then\ the\ code\ should\ pass\ through\ natively.\ Otherwise}}
+\DoxyCodeLine{00063\ \ \ \ \ \textcolor{comment}{//\ we\ should\ get\ a\ generic\ pass\ through\ error.}}
+\DoxyCodeLine{00064\ \ \ \ \ \textcolor{keywordflow}{if}(websocketpp::lib::is\_same<websocketpp::lib::error\_code,websocketpp::lib::asio::error\_code>::value)\ \{}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ tscon.\mbox{\hyperlink{structdummy__con_af921f87ae93817faa94cd48085a39ca1}{test}}(),\ websocketpp::lib::error\_code()\ );}
+\DoxyCodeLine{00066\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\ tscon.\mbox{\hyperlink{structdummy__con_af921f87ae93817faa94cd48085a39ca1}{test}}(),\ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1error_a7e7e335d77a9007c14af4d941a2baa93}{websocketpp::transport::error::make\_error\_code}}(\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1error_a8d371a2562d813e5a2e106e2694d4fb0a6a7cb8ef776c9eabe2324a529e991732}{websocketpp::transport::error::pass\_through}})\ );}
+\DoxyCodeLine{00068\ \ \ \ \ \}}
+\DoxyCodeLine{00069\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{security_8cpp_ac081dcda1da88931c62d3dda523d612d_cgraph}
+\end{center}
+\end{figure}

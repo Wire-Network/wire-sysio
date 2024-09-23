@@ -1,0 +1,10 @@
+<map id="sysio::client::http::connection_param::connection_param" name="sysio::client::http::connection_param::connection_param">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,51,149,107"/>
+<area shape="rect" id="Node000002" href="$namespacesysio_1_1client_1_1http.html#af9d5ab19d85cb83ea8b32e8ccea594b1" title=" " alt="" coords="197,29,318,70"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="149,65,181,59,182,65,149,70"/>
+<area shape="rect" id="Node000004" href="$minitest_8cpp.html#a61de80d82d023076dac637b6a50f0a6e" title=" " alt="" coords="231,94,284,120"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="149,88,216,98,215,103,149,93"/>
+<area shape="poly" id="edge3_Node000002_Node000002" title=" " alt="" coords="228,29,227,19,231,11,242,5,257,3,274,5,284,11,281,16,272,10,257,8,243,10,235,14,232,20,233,28"/>
+<area shape="rect" id="Node000003" href="$classfc_1_1url.html#ad51c6edfcf040bbaac94de66393214ed" title=" " alt="" coords="366,37,450,62"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="319,47,350,47,350,52,319,52"/>
+</map>

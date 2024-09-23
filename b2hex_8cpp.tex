@@ -1,0 +1,46 @@
+\doxysection{libraries/fc/libraries/ff/depends/xbyak/gen/b2hex.cpp File Reference}
+\hypertarget{b2hex_8cpp}{}\label{b2hex_8cpp}\index{libraries/fc/libraries/ff/depends/xbyak/gen/b2hex.cpp@{libraries/fc/libraries/ff/depends/xbyak/gen/b2hex.cpp}}
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+Include dependency graph for b2hex.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=193pt]{b2hex_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{b2hex_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{b2hex_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}\index{b2hex.cpp@{b2hex.cpp}!main@{main}}
+\index{main@{main}!b2hex.cpp@{b2hex.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{b2hex_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4} 
+int main (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{b2hex_8cpp_source_l00003}{3}} of file \mbox{\hyperlink{b2hex_8cpp_source}{b2hex.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00004\ \{}
+\DoxyCodeLine{00005\ \ \ \ \ puts(\textcolor{stringliteral}{"{}enum\ \{"{}});}
+\DoxyCodeLine{00006\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ 256;\ i++)\ \{}
+\DoxyCodeLine{00007\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\ \ B"{}});}
+\DoxyCodeLine{00008\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ =\ 0;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ <\ 8;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}++)\ \{}
+\DoxyCodeLine{00009\ \ \ \ \ \ \ \ \ \ \ \ \ putchar(i\ \&\ (1\ <<\ (7\ -\/\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}))\ ?\ \textcolor{charliteral}{'1'}\ :\ \textcolor{charliteral}{'0'});}
+\DoxyCodeLine{00010\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00011\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}=\ \%d"{}},\ i);}
+\DoxyCodeLine{00012\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (i\ <\ 255)\ putchar(\textcolor{charliteral}{','});}
+\DoxyCodeLine{00013\ \ \ \ \ \ \ \ \ putchar(\textcolor{charliteral}{'\(\backslash\)n'});}
+\DoxyCodeLine{00014\ \ \ \ \ \}}
+\DoxyCodeLine{00015\ \ \ \ \ puts(\textcolor{stringliteral}{"{}\};"{}});}
+\DoxyCodeLine{00016\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00017\ \}}
+
+\end{DoxyCode}

@@ -1,0 +1,30 @@
+\doxysection{raw\+\_\+unpack\+\_\+file.\+hpp}
+\hypertarget{raw__unpack__file_8hpp_source}{}\label{raw__unpack__file_8hpp_source}\index{libraries/fc/include/fc/io/raw\_unpack\_file.hpp@{libraries/fc/include/fc/io/raw\_unpack\_file.hpp}}
+\mbox{\hyperlink{raw__unpack__file_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{raw__unpack__file_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{raw__unpack__file_8hpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{raw_8hpp}{fc/io/raw.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{raw__unpack__file_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{file__mapping_8hpp}{fc/interprocess/file\_mapping.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{raw__unpack__file_8hpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{filesystem_8hpp}{fc/filesystem.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{raw__unpack__file_8hpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{exception_8hpp}{fc/exception/exception.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{raw__unpack__file_8hpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{raw__unpack__file_8hpp_source_l00007}00007\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}}
+\DoxyCodeLine{\Hypertarget{raw__unpack__file_8hpp_source_l00008}00008\ \{}
+\DoxyCodeLine{\Hypertarget{raw__unpack__file_8hpp_source_l00009}00009\ \ \ \ \ \textcolor{keyword}{namespace\ }raw}
+\DoxyCodeLine{\Hypertarget{raw__unpack__file_8hpp_source_l00010}00010\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{raw__unpack__file_8hpp_source_l00011}00011\ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{raw__unpack__file_8hpp_source_l00012}\mbox{\hyperlink{namespacefc_1_1raw_a6de96d3d5084498058deb1cef4139ebe}{00012}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacefc_1_1raw_a6de96d3d5084498058deb1cef4139ebe}{unpack\_file}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1path}{fc::path}}\&\ filename,\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ obj\ )}
+\DoxyCodeLine{\Hypertarget{raw__unpack__file_8hpp_source_l00013}00013\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{raw__unpack__file_8hpp_source_l00014}00014\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{raw__unpack__file_8hpp_source_l00015}00015\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1file__mapping}{fc::file\_mapping}}\ fmap(\ filename.generic\_string().c\_str(),\ \mbox{\hyperlink{namespacefc_a3d8a2be677709cc41f09aa7925f2d55fad6bcd1364809e1b881bb22334d14cd56}{fc::read\_only}});}
+\DoxyCodeLine{\Hypertarget{raw__unpack__file_8hpp_source_l00016}00016\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1mapped__region}{fc::mapped\_region}}\ mapr(\ fmap,\ \mbox{\hyperlink{namespacefc_a3d8a2be677709cc41f09aa7925f2d55fad6bcd1364809e1b881bb22334d14cd56}{fc::read\_only}},\ 0,\ \mbox{\hyperlink{namespacefc_aae3e907b120751591ca6919ac66c384b}{fc::file\_size}}(filename)\ );}
+\DoxyCodeLine{\Hypertarget{raw__unpack__file_8hpp_source_l00017}00017\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ cs\ \ =\ (\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*)mapr.\mbox{\hyperlink{classfc_1_1mapped__region_ae4c454063de929a27170d91e8c332ac6}{get\_address}}();}
+\DoxyCodeLine{\Hypertarget{raw__unpack__file_8hpp_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{raw__unpack__file_8hpp_source_l00019}00019\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1datastream}{fc::datastream<const\ char*>}}\ ds(\ cs,\ mapr.\mbox{\hyperlink{classfc_1_1mapped__region_acecc565e9417b87b1ad8577b02b428cc}{get\_size}}()\ );}
+\DoxyCodeLine{\Hypertarget{raw__unpack__file_8hpp_source_l00020}00020\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a0b442d98ceb22dd5a6ae84745e43ffab}{fc::raw::unpack}}(ds,obj);}
+\DoxyCodeLine{\Hypertarget{raw__unpack__file_8hpp_source_l00021}00021\ \ \ \ \ \ \ \ \ \ \ \ \}\ \mbox{\hyperlink{exception_8hpp_af3731d6e3beb140d9e652adf7a18113b}{FC\_RETHROW\_EXCEPTIONS}}(\ info,\ \textcolor{stringliteral}{"{}unpacking\ file\ \$\{file\}"{}},\ (\textcolor{stringliteral}{"{}file"{}},filename)\ );}
+\DoxyCodeLine{\Hypertarget{raw__unpack__file_8hpp_source_l00022}00022\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{raw__unpack__file_8hpp_source_l00023}00023\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{raw__unpack__file_8hpp_source_l00024}00024\ \}}
+
+\end{DoxyCode}

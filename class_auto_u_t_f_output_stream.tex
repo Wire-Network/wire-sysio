@@ -1,0 +1,264 @@
+\doxysection{Auto\+UTFOutput\+Stream\texorpdfstring{$<$}{<} Char\+Type, Output\+Byte\+Stream \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{class_auto_u_t_f_output_stream}{}\label{class_auto_u_t_f_output_stream}\index{AutoUTFOutputStream$<$ CharType, OutputByteStream $>$@{AutoUTFOutputStream$<$ CharType, OutputByteStream $>$}}
+
+
+Output stream wrapper with dynamically bound encoding and automatic encoding detection.  
+
+
+
+
+{\ttfamily \#include $<$encodedstream.\+h$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef Char\+Type \mbox{\hyperlink{class_auto_u_t_f_output_stream_ad1603abe0887dde2b3e24d7a8d61c280}{Ch}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_auto_u_t_f_output_stream_a2fe7dbc8e43d11295f66df5653148137}{Auto\+UTFOutput\+Stream}} (Output\+Byte\+Stream \&os, \mbox{\hyperlink{encodings_8h_ac9448aedf514a5bb509bae73a9ce4e58}{UTFType}} type, bool put\+BOM)
+\begin{DoxyCompactList}\small\item\em Constructor. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{encodings_8h_ac9448aedf514a5bb509bae73a9ce4e58}{UTFType}} \mbox{\hyperlink{class_auto_u_t_f_output_stream_a62091565a8103d69002be2e2f4f0ba2c}{Get\+Type}} () const
+\item 
+void \mbox{\hyperlink{class_auto_u_t_f_output_stream_ad12b33e48c45bdbf2628fd3d5461041a}{Put}} (\mbox{\hyperlink{class_auto_u_t_f_output_stream_ad1603abe0887dde2b3e24d7a8d61c280}{Ch}} c)
+\item 
+void \mbox{\hyperlink{class_auto_u_t_f_output_stream_a38b54c84ba0c479552256ac092529f47}{Flush}} ()
+\item 
+\mbox{\hyperlink{class_auto_u_t_f_output_stream_ad1603abe0887dde2b3e24d7a8d61c280}{Ch}} \mbox{\hyperlink{class_auto_u_t_f_output_stream_ad706f62fd5d22967e5949f3a05087e4e}{Peek}} () const
+\item 
+\mbox{\hyperlink{class_auto_u_t_f_output_stream_ad1603abe0887dde2b3e24d7a8d61c280}{Ch}} \mbox{\hyperlink{class_auto_u_t_f_output_stream_a44ee7d84ba13fece17574d01b7be574b}{Take}} ()
+\item 
+size\+\_\+t \mbox{\hyperlink{class_auto_u_t_f_output_stream_a81acbe33d84a28b7d5040d576ae22b5a}{Tell}} () const
+\item 
+\mbox{\hyperlink{class_auto_u_t_f_output_stream_ad1603abe0887dde2b3e24d7a8d61c280}{Ch}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_auto_u_t_f_output_stream_aa4ef29e3e57f256402b2cd68507600d8}{Put\+Begin}} ()
+\item 
+size\+\_\+t \mbox{\hyperlink{class_auto_u_t_f_output_stream_a4b16bda191526c894501fce447e95b8d}{Put\+End}} (\mbox{\hyperlink{class_auto_u_t_f_output_stream_ad1603abe0887dde2b3e24d7a8d61c280}{Ch}} \texorpdfstring{$\ast$}{*})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Char\+Type, typename Output\+Byte\+Stream$>$\newline
+class Auto\+UTFOutput\+Stream$<$ Char\+Type, Output\+Byte\+Stream $>$}
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em Char\+Type} & Type of character for writing. \\
+\hline
+{\em Output\+Byte\+Stream} & type of output byte stream to be wrapped. \\
+\hline
+\end{DoxyTemplParams}
+
+
+Definition at line \mbox{\hyperlink{encodedstream_8h_source_l00233}{233}} of file \mbox{\hyperlink{encodedstream_8h_source}{encodedstream.\+h}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{class_auto_u_t_f_output_stream_ad1603abe0887dde2b3e24d7a8d61c280}\index{AutoUTFOutputStream$<$ CharType, OutputByteStream $>$@{AutoUTFOutputStream$<$ CharType, OutputByteStream $>$}!Ch@{Ch}}
+\index{Ch@{Ch}!AutoUTFOutputStream$<$ CharType, OutputByteStream $>$@{AutoUTFOutputStream$<$ CharType, OutputByteStream $>$}}
+\doxysubsubsection{\texorpdfstring{Ch}{Ch}}
+{\footnotesize\ttfamily \label{class_auto_u_t_f_output_stream_ad1603abe0887dde2b3e24d7a8d61c280} 
+template$<$typename Char\+Type , typename Output\+Byte\+Stream $>$ \\
+Char\+Type \mbox{\hyperlink{class_auto_u_t_f_output_stream}{Auto\+UTFOutput\+Stream}}$<$ Char\+Type, Output\+Byte\+Stream $>$\+::\+Ch}
+
+
+
+Definition at line \mbox{\hyperlink{encodedstream_8h_source_l00236}{236}} of file \mbox{\hyperlink{encodedstream_8h_source}{encodedstream.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_auto_u_t_f_output_stream_a2fe7dbc8e43d11295f66df5653148137}\index{AutoUTFOutputStream$<$ CharType, OutputByteStream $>$@{AutoUTFOutputStream$<$ CharType, OutputByteStream $>$}!AutoUTFOutputStream@{AutoUTFOutputStream}}
+\index{AutoUTFOutputStream@{AutoUTFOutputStream}!AutoUTFOutputStream$<$ CharType, OutputByteStream $>$@{AutoUTFOutputStream$<$ CharType, OutputByteStream $>$}}
+\doxysubsubsection{\texorpdfstring{AutoUTFOutputStream()}{AutoUTFOutputStream()}}
+{\footnotesize\ttfamily \label{class_auto_u_t_f_output_stream_a2fe7dbc8e43d11295f66df5653148137} 
+template$<$typename Char\+Type , typename Output\+Byte\+Stream $>$ \\
+\mbox{\hyperlink{class_auto_u_t_f_output_stream}{Auto\+UTFOutput\+Stream}}$<$ Char\+Type, Output\+Byte\+Stream $>$\mbox{\hyperlink{class_auto_u_t_f_output_stream}{\+::\+Auto\+UTFOutput\+Stream}} (\begin{DoxyParamCaption}\item[{Output\+Byte\+Stream \&}]{os}{, }\item[{\mbox{\hyperlink{encodings_8h_ac9448aedf514a5bb509bae73a9ce4e58}{UTFType}}}]{type}{, }\item[{bool}]{put\+BOM}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+\begin{DoxyParams}{Parameters}
+{\em os} & output stream to be wrapped. \\
+\hline
+{\em type} & UTF encoding type. \\
+\hline
+{\em put\+BOM} & Whether to write BOM at the beginning of the stream. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{encodedstream_8h_source_l00244}{244}} of file \mbox{\hyperlink{encodedstream_8h_source}{encodedstream.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00244\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ os\_(\&os),\ type\_(type)\ \{}
+\DoxyCodeLine{00245\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(type\ >=\ \mbox{\hyperlink{encodings_8h_ac9448aedf514a5bb509bae73a9ce4e58a7fd9945f1c494a4a4ee9446017e790f1}{kUTF8}}\ \&\&\ type\ <=\ \mbox{\hyperlink{encodings_8h_ac9448aedf514a5bb509bae73a9ce4e58a14da8da33c9f9aa904bf0d1aac3fa76e}{kUTF32BE}});}
+\DoxyCodeLine{00246\ }
+\DoxyCodeLine{00247\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Runtime\ check\ whether\ the\ size\ of\ character\ type\ is\ sufficient.\ It\ only\ perform\ checks\ with\ assertion.}}
+\DoxyCodeLine{00248\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (type\_\ ==\ \mbox{\hyperlink{encodings_8h_ac9448aedf514a5bb509bae73a9ce4e58ab72f5865db6af4e33757ee52ddad9fda}{kUTF16LE}}\ ||\ type\_\ ==\ \mbox{\hyperlink{encodings_8h_ac9448aedf514a5bb509bae73a9ce4e58a1a455c6e8be641e715de9aa8ffa6cea0}{kUTF16BE}})\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\textcolor{keyword}{sizeof}(\mbox{\hyperlink{class_auto_u_t_f_output_stream_ad1603abe0887dde2b3e24d7a8d61c280}{Ch}})\ >=\ 2);}
+\DoxyCodeLine{00249\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (type\_\ ==\ \mbox{\hyperlink{encodings_8h_ac9448aedf514a5bb509bae73a9ce4e58a885dec757d256c427be6759296d482e0}{kUTF32LE}}\ ||\ type\_\ ==\ \mbox{\hyperlink{encodings_8h_ac9448aedf514a5bb509bae73a9ce4e58a14da8da33c9f9aa904bf0d1aac3fa76e}{kUTF32BE}})\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\textcolor{keyword}{sizeof}(\mbox{\hyperlink{class_auto_u_t_f_output_stream_ad1603abe0887dde2b3e24d7a8d61c280}{Ch}})\ >=\ 4);}
+\DoxyCodeLine{00250\ }
+\DoxyCodeLine{00251\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ PutFunc\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}[]\ =\ \{\ \mbox{\hyperlink{encodedstream_8h_a6530c8834a049a0ff230b56072df6c24}{RAPIDJSON\_ENCODINGS\_FUNC}}(\mbox{\hyperlink{class_auto_u_t_f_output_stream_ad12b33e48c45bdbf2628fd3d5461041a}{Put}})\ \};}
+\DoxyCodeLine{00252\ \ \ \ \ \ \ \ \ putFunc\_\ =\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}[type\_];}
+\DoxyCodeLine{00253\ }
+\DoxyCodeLine{00254\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (putBOM)}
+\DoxyCodeLine{00255\ \ \ \ \ \ \ \ \ \ \ \ \ PutBOM();}
+\DoxyCodeLine{00256\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_auto_u_t_f_output_stream_a2fe7dbc8e43d11295f66df5653148137_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_auto_u_t_f_output_stream_a38b54c84ba0c479552256ac092529f47}\index{AutoUTFOutputStream$<$ CharType, OutputByteStream $>$@{AutoUTFOutputStream$<$ CharType, OutputByteStream $>$}!Flush@{Flush}}
+\index{Flush@{Flush}!AutoUTFOutputStream$<$ CharType, OutputByteStream $>$@{AutoUTFOutputStream$<$ CharType, OutputByteStream $>$}}
+\doxysubsubsection{\texorpdfstring{Flush()}{Flush()}}
+{\footnotesize\ttfamily \label{class_auto_u_t_f_output_stream_a38b54c84ba0c479552256ac092529f47} 
+template$<$typename Char\+Type , typename Output\+Byte\+Stream $>$ \\
+void \mbox{\hyperlink{class_auto_u_t_f_output_stream}{Auto\+UTFOutput\+Stream}}$<$ Char\+Type, Output\+Byte\+Stream $>$\+::\+Flush (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{encodedstream_8h_source_l00261}{261}} of file \mbox{\hyperlink{encodedstream_8h_source}{encodedstream.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00261\ \{\ os\_-\/>Flush();\ \}\ }
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_auto_u_t_f_output_stream_a38b54c84ba0c479552256ac092529f47_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_auto_u_t_f_output_stream_a62091565a8103d69002be2e2f4f0ba2c}\index{AutoUTFOutputStream$<$ CharType, OutputByteStream $>$@{AutoUTFOutputStream$<$ CharType, OutputByteStream $>$}!GetType@{GetType}}
+\index{GetType@{GetType}!AutoUTFOutputStream$<$ CharType, OutputByteStream $>$@{AutoUTFOutputStream$<$ CharType, OutputByteStream $>$}}
+\doxysubsubsection{\texorpdfstring{GetType()}{GetType()}}
+{\footnotesize\ttfamily \label{class_auto_u_t_f_output_stream_a62091565a8103d69002be2e2f4f0ba2c} 
+template$<$typename Char\+Type , typename Output\+Byte\+Stream $>$ \\
+\mbox{\hyperlink{encodings_8h_ac9448aedf514a5bb509bae73a9ce4e58}{UTFType}} \mbox{\hyperlink{class_auto_u_t_f_output_stream}{Auto\+UTFOutput\+Stream}}$<$ Char\+Type, Output\+Byte\+Stream $>$\+::\+Get\+Type (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{encodedstream_8h_source_l00258}{258}} of file \mbox{\hyperlink{encodedstream_8h_source}{encodedstream.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00258\ \{\ \textcolor{keywordflow}{return}\ type\_;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_auto_u_t_f_output_stream_ad706f62fd5d22967e5949f3a05087e4e}\index{AutoUTFOutputStream$<$ CharType, OutputByteStream $>$@{AutoUTFOutputStream$<$ CharType, OutputByteStream $>$}!Peek@{Peek}}
+\index{Peek@{Peek}!AutoUTFOutputStream$<$ CharType, OutputByteStream $>$@{AutoUTFOutputStream$<$ CharType, OutputByteStream $>$}}
+\doxysubsubsection{\texorpdfstring{Peek()}{Peek()}}
+{\footnotesize\ttfamily \label{class_auto_u_t_f_output_stream_ad706f62fd5d22967e5949f3a05087e4e} 
+template$<$typename Char\+Type , typename Output\+Byte\+Stream $>$ \\
+\mbox{\hyperlink{class_auto_u_t_f_output_stream_ad1603abe0887dde2b3e24d7a8d61c280}{Ch}} \mbox{\hyperlink{class_auto_u_t_f_output_stream}{Auto\+UTFOutput\+Stream}}$<$ Char\+Type, Output\+Byte\+Stream $>$\+::\+Peek (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{encodedstream_8h_source_l00264}{264}} of file \mbox{\hyperlink{encodedstream_8h_source}{encodedstream.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00264\ \{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\textcolor{keyword}{false});\ \textcolor{keywordflow}{return}\ 0;\}}
+
+\end{DoxyCode}
+\Hypertarget{class_auto_u_t_f_output_stream_ad12b33e48c45bdbf2628fd3d5461041a}\index{AutoUTFOutputStream$<$ CharType, OutputByteStream $>$@{AutoUTFOutputStream$<$ CharType, OutputByteStream $>$}!Put@{Put}}
+\index{Put@{Put}!AutoUTFOutputStream$<$ CharType, OutputByteStream $>$@{AutoUTFOutputStream$<$ CharType, OutputByteStream $>$}}
+\doxysubsubsection{\texorpdfstring{Put()}{Put()}}
+{\footnotesize\ttfamily \label{class_auto_u_t_f_output_stream_ad12b33e48c45bdbf2628fd3d5461041a} 
+template$<$typename Char\+Type , typename Output\+Byte\+Stream $>$ \\
+void \mbox{\hyperlink{class_auto_u_t_f_output_stream}{Auto\+UTFOutput\+Stream}}$<$ Char\+Type, Output\+Byte\+Stream $>$\+::\+Put (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_auto_u_t_f_output_stream_ad1603abe0887dde2b3e24d7a8d61c280}{Ch}}}]{c}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{encodedstream_8h_source_l00260}{260}} of file \mbox{\hyperlink{encodedstream_8h_source}{encodedstream.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00260\ \{\ putFunc\_(*os\_,\ c);\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_auto_u_t_f_output_stream_ad12b33e48c45bdbf2628fd3d5461041a_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_auto_u_t_f_output_stream_aa4ef29e3e57f256402b2cd68507600d8}\index{AutoUTFOutputStream$<$ CharType, OutputByteStream $>$@{AutoUTFOutputStream$<$ CharType, OutputByteStream $>$}!PutBegin@{PutBegin}}
+\index{PutBegin@{PutBegin}!AutoUTFOutputStream$<$ CharType, OutputByteStream $>$@{AutoUTFOutputStream$<$ CharType, OutputByteStream $>$}}
+\doxysubsubsection{\texorpdfstring{PutBegin()}{PutBegin()}}
+{\footnotesize\ttfamily \label{class_auto_u_t_f_output_stream_aa4ef29e3e57f256402b2cd68507600d8} 
+template$<$typename Char\+Type , typename Output\+Byte\+Stream $>$ \\
+\mbox{\hyperlink{class_auto_u_t_f_output_stream_ad1603abe0887dde2b3e24d7a8d61c280}{Ch}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_auto_u_t_f_output_stream}{Auto\+UTFOutput\+Stream}}$<$ Char\+Type, Output\+Byte\+Stream $>$\+::\+Put\+Begin (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{encodedstream_8h_source_l00267}{267}} of file \mbox{\hyperlink{encodedstream_8h_source}{encodedstream.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00267\ \{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\textcolor{keyword}{false});\ \textcolor{keywordflow}{return}\ 0;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_auto_u_t_f_output_stream_a4b16bda191526c894501fce447e95b8d}\index{AutoUTFOutputStream$<$ CharType, OutputByteStream $>$@{AutoUTFOutputStream$<$ CharType, OutputByteStream $>$}!PutEnd@{PutEnd}}
+\index{PutEnd@{PutEnd}!AutoUTFOutputStream$<$ CharType, OutputByteStream $>$@{AutoUTFOutputStream$<$ CharType, OutputByteStream $>$}}
+\doxysubsubsection{\texorpdfstring{PutEnd()}{PutEnd()}}
+{\footnotesize\ttfamily \label{class_auto_u_t_f_output_stream_a4b16bda191526c894501fce447e95b8d} 
+template$<$typename Char\+Type , typename Output\+Byte\+Stream $>$ \\
+size\+\_\+t \mbox{\hyperlink{class_auto_u_t_f_output_stream}{Auto\+UTFOutput\+Stream}}$<$ Char\+Type, Output\+Byte\+Stream $>$\+::\+Put\+End (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_auto_u_t_f_output_stream_ad1603abe0887dde2b3e24d7a8d61c280}{Ch}} \texorpdfstring{$\ast$}{*}}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{encodedstream_8h_source_l00268}{268}} of file \mbox{\hyperlink{encodedstream_8h_source}{encodedstream.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00268\ \{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\textcolor{keyword}{false});\ \textcolor{keywordflow}{return}\ 0;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_auto_u_t_f_output_stream_a44ee7d84ba13fece17574d01b7be574b}\index{AutoUTFOutputStream$<$ CharType, OutputByteStream $>$@{AutoUTFOutputStream$<$ CharType, OutputByteStream $>$}!Take@{Take}}
+\index{Take@{Take}!AutoUTFOutputStream$<$ CharType, OutputByteStream $>$@{AutoUTFOutputStream$<$ CharType, OutputByteStream $>$}}
+\doxysubsubsection{\texorpdfstring{Take()}{Take()}}
+{\footnotesize\ttfamily \label{class_auto_u_t_f_output_stream_a44ee7d84ba13fece17574d01b7be574b} 
+template$<$typename Char\+Type , typename Output\+Byte\+Stream $>$ \\
+\mbox{\hyperlink{class_auto_u_t_f_output_stream_ad1603abe0887dde2b3e24d7a8d61c280}{Ch}} \mbox{\hyperlink{class_auto_u_t_f_output_stream}{Auto\+UTFOutput\+Stream}}$<$ Char\+Type, Output\+Byte\+Stream $>$\+::\+Take (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{encodedstream_8h_source_l00265}{265}} of file \mbox{\hyperlink{encodedstream_8h_source}{encodedstream.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00265\ \{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\textcolor{keyword}{false});\ \textcolor{keywordflow}{return}\ 0;\}}
+
+\end{DoxyCode}
+\Hypertarget{class_auto_u_t_f_output_stream_a81acbe33d84a28b7d5040d576ae22b5a}\index{AutoUTFOutputStream$<$ CharType, OutputByteStream $>$@{AutoUTFOutputStream$<$ CharType, OutputByteStream $>$}!Tell@{Tell}}
+\index{Tell@{Tell}!AutoUTFOutputStream$<$ CharType, OutputByteStream $>$@{AutoUTFOutputStream$<$ CharType, OutputByteStream $>$}}
+\doxysubsubsection{\texorpdfstring{Tell()}{Tell()}}
+{\footnotesize\ttfamily \label{class_auto_u_t_f_output_stream_a81acbe33d84a28b7d5040d576ae22b5a} 
+template$<$typename Char\+Type , typename Output\+Byte\+Stream $>$ \\
+size\+\_\+t \mbox{\hyperlink{class_auto_u_t_f_output_stream}{Auto\+UTFOutput\+Stream}}$<$ Char\+Type, Output\+Byte\+Stream $>$\+::\+Tell (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{encodedstream_8h_source_l00266}{266}} of file \mbox{\hyperlink{encodedstream_8h_source}{encodedstream.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00266\ \{\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gabeba18d612187bad2ac62aed9276d47c}{RAPIDJSON\_ASSERT}}(\textcolor{keyword}{false});\ \textcolor{keywordflow}{return}\ 0;\ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/include/rapidjson/\mbox{\hyperlink{encodedstream_8h}{encodedstream.\+h}}\end{DoxyCompactItemize}

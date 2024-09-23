@@ -1,0 +1,11 @@
+<map id="CLI::Option::type_name_fn" name="CLI::Option::type_name_fn">
+<area shape="rect" id="Node000001" title="Set the type function to run when displayed on this option." alt="" coords="420,55,598,80"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_option.html#a1fcb3c625eeca46ef953732a71403027" title="Set a custom option typestring." alt="" coords="212,55,372,80"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="405,70,372,70,372,65,405,65"/>
+<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_app.html#a3a1c706fefc81a31f6ccc593bdf05354" title="Add a complex number." alt="" coords="5,5,164,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="219,53,141,34,142,29,221,48"/>
+<area shape="rect" id="Node000004" href="$class_c_l_i_1_1_app.html#a27ca8c7e673f9fdac9a5a80c1a0704ea" title="Add option for assigning to a variable." alt="" coords="12,55,157,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="196,70,157,70,157,65,196,65"/>
+<area shape="rect" id="Node000005" href="$class_c_l_i_1_1_app.html#a199d89ab0bbb8eedaf23bea5ca27a3e1" title="Add option for a callback of a specific type." alt="" coords="12,104,157,145"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="229,88,158,107,156,102,228,82"/>
+</map>

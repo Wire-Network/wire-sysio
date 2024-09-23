@@ -1,0 +1,20 @@
+<map id="websocketpp::http::parser::extract_token" name="websocketpp::http::parser::extract_token">
+<area shape="rect" id="Node000001" title="Read and return the next token in the stream." alt="" coords="923,55,1067,96"/>
+<area shape="rect" id="Node000002" href="$parser_8cpp.html#a077c95881f898ee0dae6222aebc4fd2d" title=" " alt="" coords="678,5,875,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="907,55,874,46,829,34,830,29,875,41,909,50"/>
+<area shape="rect" id="Node000003" href="$namespacewebsocketpp_1_1http_1_1parser.html#ac13fb3aca2101c9e6d2ee14039f1a758" title="Extract HTTP attributes." alt="" coords="693,55,860,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="907,78,860,78,860,73,907,73"/>
+<area shape="rect" id="Node000006" href="$namespacewebsocketpp_1_1http_1_1parser.html#adabfd491d364be43bee4c7cad63e7e08" title="Extract HTTP parameters." alt="" coords="444,112,621,153"/>
+<area shape="poly" id="edge9_Node000001_Node000006" title=" " alt="" coords="911,103,875,110,742,126,622,134,621,128,742,121,874,105,910,97"/>
+<area shape="rect" id="Node000004" href="$parser_8cpp.html#a643a09a7248f9cf7a1c63eba7e27a7fa" title=" " alt="" coords="434,13,630,39"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="677,58,599,42,600,37,678,53"/>
+<area shape="rect" id="Node000005" href="$parser_8cpp.html#aa3430b9bb5f9f4f2b5aed19d0877336d" title=" " alt="" coords="434,63,630,88"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="677,78,631,78,631,73,677,73"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="679,101,622,115,621,109,677,96"/>
+<area shape="rect" id="Node000007" href="$parser_8cpp.html#a64c6535ab9b7008bfe06cc6f9b32c677" title=" " alt="" coords="190,87,386,112"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="428,121,386,116,387,110,428,116"/>
+<area shape="rect" id="Node000008" href="$classwebsocketpp_1_1http_1_1parser_1_1parser.html#af903e5538e362d9ac0aeaea3064aed0c" title="Extract an HTTP parameter list from a string." alt="" coords="217,137,358,193"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="428,149,359,158,359,153,427,144"/>
+<area shape="rect" id="Node000009" href="$classwebsocketpp_1_1http_1_1parser_1_1parser.html#a42ab85c14bef2028d1e6f050af1140ce" title="Extract an HTTP parameter list from a parser header." alt="" coords="5,137,142,193"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="202,168,142,168,142,162,202,162"/>
+</map>

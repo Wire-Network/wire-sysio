@@ -1,0 +1,394 @@
+\doxysection{pinnable\+\_\+mapped\+\_\+file.\+cpp}
+\hypertarget{pinnable__mapped__file_8cpp_source}{}\label{pinnable__mapped__file_8cpp_source}\index{libraries/chainbase/src/pinnable\_mapped\_file.cpp@{libraries/chainbase/src/pinnable\_mapped\_file.cpp}}
+\mbox{\hyperlink{pinnable__mapped__file_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{pinnable__mapped__file_8hpp}{chainbase/pinnable\_mapped\_file.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{environment_8hpp}{chainbase/environment.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <boost/interprocess/managed\_external\_buffer.hpp>}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <boost/interprocess/anonymous\_shared\_memory.hpp>}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <boost/asio/signal\_set.hpp>}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <iostream>}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <fstream>}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00009}00009\ \textcolor{preprocessor}{\#ifdef\ \_\_linux\_\_}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <linux/mman.h>}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00011}00011\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00013}00013\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacechainbase}{chainbase}}\ \{}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00015}\mbox{\hyperlink{classchainbase_1_1chainbase__error__category_ad6858349be570a439d3e90cf39b40042}{00015}}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{classchainbase_1_1chainbase__error__category_ad6858349be570a439d3e90cf39b40042}{chainbase\_error\_category::name}}()\ const\ noexcept\ \{}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00016}00016\ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}chainbase"{}};}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00017}00017\ \}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00019}\mbox{\hyperlink{classchainbase_1_1chainbase__error__category_a1c89d2a1e1c8b74a1dbac52f4b07eae7}{00019}}\ std::string\ \mbox{\hyperlink{classchainbase_1_1chainbase__error__category_a1c89d2a1e1c8b74a1dbac52f4b07eae7}{chainbase\_error\_category::message}}(\textcolor{keywordtype}{int}\ ev)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00020}00020\ \ \ \ \textcolor{keywordflow}{switch}(ev)\ \{}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00021}00021\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3ac3fdc8e4e3df74b216721e3ae1fd4945}{db\_error\_code::ok}}:\ }
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00022}00022\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Ok"{}};}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00023}00023\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3a8251c5ee6c4498d42adb2b1a0aa286af}{db\_error\_code::dirty}}:}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00024}00024\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Database\ dirty\ flag\ set"{}};}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00025}00025\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3a5930c2c995a1d73d95f81298c603a1f6}{db\_error\_code::incompatible}}:}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00026}00026\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Database\ incompatible;\ All\ environment\ parameters\ must\ match"{}};}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00027}00027\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3a6bfa63b7b57c5c68e76f9f172d60146d}{db\_error\_code::incorrect\_db\_version}}:}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00028}00028\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Database\ format\ not\ compatible\ with\ this\ version\ of\ chainbase"{}};}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00029}00029\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3a38fedd2f0ecf76dcc0d1757f8d45ab41}{db\_error\_code::not\_found}}:}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00030}00030\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Database\ file\ not\ found"{}};}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00031}00031\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3a879ce3cfde213e7781b0af14bc8f5882}{db\_error\_code::bad\_size}}:}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00032}00032\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Bad\ size"{}};}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00033}00033\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3ad93329bc939212e26c7aa54ff55b9738}{db\_error\_code::unsupported\_win32\_mode}}:}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00034}00034\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Heap\ and\ locked\ mode\ are\ not\ supported\ on\ win32"{}};}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00035}00035\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3a337ee0b30f7db83f8837cbb7fb17e4c2}{db\_error\_code::bad\_header}}:}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00036}00036\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Failed\ to\ read\ DB\ header"{}};}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00037}00037\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3ad55e98bcfae349c5f8896278142b755c}{db\_error\_code::no\_access}}:}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00038}00038\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Could\ not\ gain\ write\ access\ to\ the\ shared\ memory\ file"{}};}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00039}00039\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3ac065ca1b36da471ff7499ebeed558fb6}{db\_error\_code::aborted}}:}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00040}00040\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Database\ load\ aborted"{}};}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00041}00041\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3a4672b7d7aeb6cc7e8c973ef5e0fbc698}{db\_error\_code::no\_mlock}}:}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00042}00042\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Failed\ to\ mlock\ database"{}};}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00043}00043\ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00044}00044\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Unrecognized\ error\ code"{}};}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00045}00045\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00046}00046\ \}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00048}\mbox{\hyperlink{namespacechainbase_ae09d7fc4436a627f73b16fde609ddb91}{00048}}\ \textcolor{keyword}{const}\ std::error\_category\&\ \mbox{\hyperlink{namespacechainbase_ae09d7fc4436a627f73b16fde609ddb91}{chainbase\_error\_category}}()\ \{}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00049}00049\ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classchainbase_1_1chainbase__error__category}{chainbase\_error\_category}}\ the\_category;}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00050}00050\ \ \ \ \textcolor{keywordflow}{return}\ the\_category;}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00051}00051\ \}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00052}00052\ }
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00053}\mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_af3f5524555ffab24ef09cba1fea5908d}{00053}}\ \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_af3f5524555ffab24ef09cba1fea5908d}{pinnable\_mapped\_file::pinnable\_mapped\_file}}(\textcolor{keyword}{const}\ bfs::path\&\ dir,\ \textcolor{keywordtype}{bool}\ writable,\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ shared\_file\_size,\ \textcolor{keywordtype}{bool}\ allow\_dirty,\ \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a7fe6684b11f441d2e971fe65166d7d5f}{map\_mode}}\ mode)\ :}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00054}00054\ \ \ \ \_data\_file\_path(\mbox{\hyperlink{namespaceboost_1_1filesystem}{bfs}}::absolute(dir/\textcolor{stringliteral}{"{}shared\_memory.bin"{}})),}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00055}00055\ \ \ \ \_database\_name(dir.filename().string()),}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00056}00056\ \ \ \ \_writable(writable)}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00057}00057\ \{}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00058}00058\ \ \ \ \textcolor{keywordflow}{if}(shared\_file\_size\ \%\ \_db\_size\_multiple\_requirement)\ \{}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00059}00059\ \ \ \ \ \ \ std::string\ what\_str(\textcolor{stringliteral}{"{}Database\ must\ be\ mulitple\ of\ "{}}\ +\ std::to\_string(\_db\_size\_multiple\_requirement)\ +\ \textcolor{stringliteral}{"{}\ bytes"{}});}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00060}00060\ \ \ \ \ \ \ BOOST\_THROW\_EXCEPTION(std::system\_error(\mbox{\hyperlink{namespacechainbase_a0e543f894d75318b5f34a661e9b6b7c8}{make\_error\_code}}(\mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3a879ce3cfde213e7781b0af14bc8f5882}{db\_error\_code::bad\_size}}),\ what\_str));}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00061}00061\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00062}00062\ \textcolor{preprocessor}{\#ifdef\ \_WIN32}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00063}00063\ \ \ \ \textcolor{keywordflow}{if}(mode\ !=\ \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a7fe6684b11f441d2e971fe65166d7d5fa65d636fa5a7029aaa40f1d93a52748b7}{mapped}})}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00064}00064\ \ \ \ \ \ \ BOOST\_THROW\_EXCEPTION(std::system\_error(\mbox{\hyperlink{namespacechainbase_a0e543f894d75318b5f34a661e9b6b7c8}{make\_error\_code}}(\mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3ad93329bc939212e26c7aa54ff55b9738}{db\_error\_code::unsupported\_win32\_mode}})));}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00065}00065\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00066}00066\ \ \ \ \textcolor{keywordflow}{if}(!\_writable\ \&\&\ !bfs::exists(\_data\_file\_path))\{}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00067}00067\ \ \ \ \ \ \ std::string\ what\_str(\textcolor{stringliteral}{"{}database\ file\ not\ found\ at\ "{}}\ +\ \_data\_file\_path.string());}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00068}00068\ \ \ \ \ \ \ BOOST\_THROW\_EXCEPTION(std::system\_error(\mbox{\hyperlink{namespacechainbase_a0e543f894d75318b5f34a661e9b6b7c8}{make\_error\_code}}(\mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3a38fedd2f0ecf76dcc0d1757f8d45ab41}{db\_error\_code::not\_found}}),\ what\_str));}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00069}00069\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00071}00071\ \ \ \ bfs::create\_directories(dir);}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00073}00073\ \ \ \ \textcolor{keywordflow}{if}(bfs::exists(\_data\_file\_path))\ \{}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00074}00074\ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ header[\mbox{\hyperlink{namespacechainbase_a3553db3334a3279bf83b5951ab9be322}{header\_size}}];}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00075}00075\ \ \ \ \ \ \ std::ifstream\ hs(\_data\_file\_path.generic\_string(),\ std::ifstream::binary);}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00076}00076\ \ \ \ \ \ \ hs.read(header,\ \mbox{\hyperlink{namespacechainbase_a3553db3334a3279bf83b5951ab9be322}{header\_size}});}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00077}00077\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(hs.fail())}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00078}00078\ \ \ \ \ \ \ \ \ \ BOOST\_THROW\_EXCEPTION(std::system\_error(\mbox{\hyperlink{namespacechainbase_a0e543f894d75318b5f34a661e9b6b7c8}{make\_error\_code}}(\mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3a337ee0b30f7db83f8837cbb7fb17e4c2}{db\_error\_code::bad\_header}})));}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00080}00080\ \ \ \ \ \ \ \mbox{\hyperlink{structchainbase_1_1db__header}{db\_header}}*\ dbheader\ =\ \textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{structchainbase_1_1db__header}{db\_header}}*\textcolor{keyword}{>}(header);}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00081}00081\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(dbheader-\/>\mbox{\hyperlink{structchainbase_1_1db__header_a33a0e29c48beec81d6f09849870637e6}{id}}\ !=\ \mbox{\hyperlink{namespacechainbase_a390fbf5c3ed14d5389ea5ee4f92eb1b6}{header\_id}})\ \{}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00082}00082\ \ \ \ \ \ \ \ \ \ std::string\ what\_str(\textcolor{stringliteral}{"{}\(\backslash\)"{}"{}}\ +\ \_database\_name\ +\ \textcolor{stringliteral}{"{}\(\backslash\)"{}\ database\ format\ not\ compatible\ with\ this\ version\ of\ chainbase."{}});}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00083}00083\ \ \ \ \ \ \ \ \ \ BOOST\_THROW\_EXCEPTION(std::system\_error(\mbox{\hyperlink{namespacechainbase_a0e543f894d75318b5f34a661e9b6b7c8}{make\_error\_code}}(\mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3a6bfa63b7b57c5c68e76f9f172d60146d}{db\_error\_code::incorrect\_db\_version}}),\ what\_str));}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00084}00084\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00085}00085\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!allow\_dirty\ \&\&\ dbheader-\/>\mbox{\hyperlink{structchainbase_1_1db__header_a67ba3bb80fdbadc89e69fb12030ccf61}{dirty}})\ \{}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00086}00086\ \ \ \ \ \ \ \ \ \ std::string\ what\_str(\textcolor{stringliteral}{"{}\(\backslash\)"{}"{}}\ +\ \_database\_name\ +\ \textcolor{stringliteral}{"{}\(\backslash\)"{}\ database\ dirty\ flag\ set"{}});}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00087}00087\ \ \ \ \ \ \ \ \ \ BOOST\_THROW\_EXCEPTION(std::system\_error(\mbox{\hyperlink{namespacechainbase_a0e543f894d75318b5f34a661e9b6b7c8}{make\_error\_code}}(\mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3a8251c5ee6c4498d42adb2b1a0aa286af}{db\_error\_code::dirty}})));}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00088}00088\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00089}00089\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(dbheader-\/>\mbox{\hyperlink{structchainbase_1_1db__header_ae06cc9a3463f5923e2402f0460f7517f}{dbenviron}}\ !=\ \mbox{\hyperlink{structchainbase_1_1environment}{environment}}())\ \{}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00090}00090\ \ \ \ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}CHAINBASE:\ \(\backslash\)"{}"{}}\ <<\ \_database\_name\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)"{}\ database\ was\ created\ with\ a\ chainbase\ from\ a\ different\ environment"{}}\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00091}00091\ \ \ \ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}Current\ compiler\ environment:"{}}\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00092}00092\ \ \ \ \ \ \ \ \ \ std::cerr\ <<\ \mbox{\hyperlink{environment_8hpp_a962d8de627af2d0ded4f7f8ec45bd6b1}{environment}}();}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00093}00093\ \ \ \ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}DB\ created\ with\ compiler\ environment:"{}}\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00094}00094\ \ \ \ \ \ \ \ \ \ std::cerr\ <<\ dbheader-\/>\mbox{\hyperlink{structchainbase_1_1db__header_ae06cc9a3463f5923e2402f0460f7517f}{dbenviron}};}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00095}00095\ \ \ \ \ \ \ \ \ \ BOOST\_THROW\_EXCEPTION(std::system\_error(\mbox{\hyperlink{namespacechainbase_a0e543f894d75318b5f34a661e9b6b7c8}{make\_error\_code}}(\mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3a5930c2c995a1d73d95f81298c603a1f6}{db\_error\_code::incompatible}})));}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00096}00096\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00097}00097\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00098}00098\ }
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00099}00099\ \ \ \ \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a550aa643b3bd7335e48afd94f1089d2b}{segment\_manager}}*\ file\_mapped\_segment\_manager\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00100}00100\ \ \ \ \textcolor{keywordflow}{if}(!bfs::exists(\_data\_file\_path))\ \{}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00101}00101\ \ \ \ \ \ \ std::ofstream\ ofs(\_data\_file\_path.generic\_string(),\ std::ofstream::trunc);}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00102}00102\ \ \ \ \ \ \ \textcolor{comment}{//win32\ impl\ of\ bfs::resize\_file()\ doesn't\ like\ the\ file\ being\ open}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00103}00103\ \ \ \ \ \ \ ofs.close();}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00104}00104\ \ \ \ \ \ \ bfs::resize\_file(\_data\_file\_path,\ shared\_file\_size);}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00105}00105\ \ \ \ \ \ \ \_file\_mapping\ =\ bip::file\_mapping(\_data\_file\_path.generic\_string().c\_str(),\ bip::read\_write);}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00106}00106\ \ \ \ \ \ \ \_file\_mapped\_region\ =\ bip::mapped\_region(\_file\_mapping,\ bip::read\_write);}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00107}00107\ \ \ \ \ \ \ file\_mapped\_segment\_manager\ =\ \textcolor{keyword}{new}\ ((\textcolor{keywordtype}{char}*)\_file\_mapped\_region.get\_address()+\mbox{\hyperlink{namespacechainbase_a3553db3334a3279bf83b5951ab9be322}{header\_size}})\ \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a550aa643b3bd7335e48afd94f1089d2b}{segment\_manager}}(shared\_file\_size-\/\mbox{\hyperlink{namespacechainbase_a3553db3334a3279bf83b5951ab9be322}{header\_size}});}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00108}00108\ \ \ \ \ \ \ \textcolor{keyword}{new}\ (\_file\_mapped\_region.get\_address())\ \mbox{\hyperlink{structchainbase_1_1db__header}{db\_header}};}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00109}00109\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00110}00110\ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(\_writable)\ \{}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00111}00111\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ existing\_file\_size\ =\ bfs::file\_size(\_data\_file\_path);}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00112}00112\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ grow\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00113}00113\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(shared\_file\_size\ >\ existing\_file\_size)\ \{}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00114}00114\ \ \ \ \ \ \ \ \ \ \ \ \ grow\ =\ shared\_file\_size\ -\/\ existing\_file\_size;}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00115}00115\ \ \ \ \ \ \ \ \ \ \ \ \ bfs::resize\_file(\_data\_file\_path,\ shared\_file\_size);}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00116}00116\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00117}00117\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(shared\_file\_size\ <\ existing\_file\_size)\ \{}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00118}00118\ \ \ \ \ \ \ \ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}CHAINBASE:\ \(\backslash\)"{}"{}}\ <<\ \_database\_name\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)"{}\ requested\ size\ of\ "{}}\ <<\ shared\_file\_size\ <<\ \textcolor{stringliteral}{"{}\ is\ less\ than\ "{}}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00119}00119\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}existing\ size\ of\ "{}}\ <<\ existing\_file\_size\ <<\ \textcolor{stringliteral}{"{}.\ This\ database\ will\ not\ be\ shrunk\ and\ will\ "{}}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00120}00120\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}remain\ at\ "{}}\ <<\ existing\_file\_size\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00121}00121\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00122}00122\ \ \ \ \ \ \ \ \ \ \_file\_mapping\ =\ bip::file\_mapping(\_data\_file\_path.generic\_string().c\_str(),\ bip::read\_write);}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00123}00123\ \ \ \ \ \ \ \ \ \ \_file\_mapped\_region\ =\ bip::mapped\_region(\_file\_mapping,\ bip::read\_write);}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00124}00124\ \ \ \ \ \ \ \ \ \ file\_mapped\_segment\_manager\ =\ \textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a550aa643b3bd7335e48afd94f1089d2b}{segment\_manager}}*\textcolor{keyword}{>}((\textcolor{keywordtype}{char}*)\_file\_mapped\_region.get\_address()+\mbox{\hyperlink{namespacechainbase_a3553db3334a3279bf83b5951ab9be322}{header\_size}});}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00125}00125\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(grow)}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00126}00126\ \ \ \ \ \ \ \ \ \ \ \ \ file\_mapped\_segment\_manager-\/>grow(grow);}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00127}00127\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00128}00128\ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00129}00129\ \ \ \ \ \ \ \ \ \ \_file\_mapping\ =\ bip::file\_mapping(\_data\_file\_path.generic\_string().c\_str(),\ bip::read\_only);}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00130}00130\ \ \ \ \ \ \ \ \ \ \_file\_mapped\_region\ =\ bip::mapped\_region(\_file\_mapping,\ bip::read\_only);}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00131}00131\ \ \ \ \ \ \ \ \ \ file\_mapped\_segment\_manager\ =\ \textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a550aa643b3bd7335e48afd94f1089d2b}{segment\_manager}}*\textcolor{keyword}{>}((\textcolor{keywordtype}{char}*)\_file\_mapped\_region.get\_address()+\mbox{\hyperlink{namespacechainbase_a3553db3334a3279bf83b5951ab9be322}{header\_size}});}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00132}00132\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00133}00133\ }
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00134}00134\ \ \ \ \textcolor{keywordflow}{if}(\_writable)\ \{}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00135}00135\ \ \ \ \ \ \ \textcolor{comment}{//remove\ meta\ file\ created\ in\ earlier\ versions}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00136}00136\ \ \ \ \ \ \ boost::system::error\_code\ ec;}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00137}00137\ \ \ \ \ \ \ bfs::remove(bfs::absolute(dir/\textcolor{stringliteral}{"{}shared\_memory.meta"{}}),\ ec);}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00138}00138\ }
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00139}00139\ \ \ \ \ \ \ \_mapped\_file\_lock\ =\ bip::file\_lock(\_data\_file\_path.generic\_string().c\_str());}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00140}00140\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!\_mapped\_file\_lock.try\_lock())}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00141}00141\ \ \ \ \ \ \ \ \ \ BOOST\_THROW\_EXCEPTION(std::system\_error(\mbox{\hyperlink{namespacechainbase_a0e543f894d75318b5f34a661e9b6b7c8}{make\_error\_code}}(\mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3ad55e98bcfae349c5f8896278142b755c}{db\_error\_code::no\_access}})));}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00142}00142\ }
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00143}00143\ \ \ \ \ \ \ set\_mapped\_file\_db\_dirty(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00144}00144\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00145}00145\ }
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00146}00146\ \ \ \ \textcolor{keywordflow}{if}(mode\ ==\ \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a7fe6684b11f441d2e971fe65166d7d5fa65d636fa5a7029aaa40f1d93a52748b7}{mapped}})\ \{}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00147}00147\ \ \ \ \ \ \ \_segment\_manager\ =\ file\_mapped\_segment\_manager;}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00148}00148\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00149}00149\ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00150}00150\ \ \ \ \ \ \ boost::asio::io\_service\ sig\_ios;}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00151}00151\ \ \ \ \ \ \ boost::asio::signal\_set\ sig\_set(sig\_ios,\ SIGINT,\ SIGTERM);}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00152}00152\ \textcolor{preprocessor}{\#ifdef\ SIGPIPE}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00153}00153\ \ \ \ \ \ \ sig\_set.add(SIGPIPE);}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00154}00154\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00155}00155\ \ \ \ \ \ \ sig\_set.async\_wait([](\textcolor{keyword}{const}\ boost::system::error\_code\&,\ \textcolor{keywordtype}{int})\ \{}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00156}00156\ \ \ \ \ \ \ \ \ \ BOOST\_THROW\_EXCEPTION(std::system\_error(\mbox{\hyperlink{namespacechainbase_a0e543f894d75318b5f34a661e9b6b7c8}{make\_error\_code}}(\mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3ac065ca1b36da471ff7499ebeed558fb6}{db\_error\_code::aborted}})));}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00157}00157\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00158}00158\ }
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00159}00159\ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00160}00160\ \ \ \ \ \ \ \ \ \ setup\_non\_file\_mapping();}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00161}00161\ \ \ \ \ \ \ \ \ \ load\_database\_file(sig\_ios);}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00162}00162\ }
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00163}00163\ \textcolor{preprocessor}{\#ifndef\ \_WIN32}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00164}00164\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(mode\ ==\ \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a7fe6684b11f441d2e971fe65166d7d5fae7ae9465d4fba7a1863b28855ec055e8}{locked}})\ \{}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00165}00165\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(mlock(\_non\_file\_mapped\_mapping,\ \_non\_file\_mapped\_mapping\_size))\ \{}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00166}00166\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ what\_str(\textcolor{stringliteral}{"{}Failed\ to\ mlock\ database\ \(\backslash\)"{}"{}}\ +\ \_database\_name\ +\ \textcolor{stringliteral}{"{}\(\backslash\)"{}"{}});}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00167}00167\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BOOST\_THROW\_EXCEPTION(std::system\_error(\mbox{\hyperlink{namespacechainbase_a0e543f894d75318b5f34a661e9b6b7c8}{make\_error\_code}}(\mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3a4672b7d7aeb6cc7e8c973ef5e0fbc698}{db\_error\_code::no\_mlock}}),\ what\_str));}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00168}00168\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00169}00169\ \ \ \ \ \ \ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}CHAINBASE:\ Database\ \(\backslash\)"{}"{}}\ <<\ \_database\_name\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)"{}\ has\ been\ successfully\ locked\ in\ memory"{}}\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00170}00170\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00171}00171\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00172}00172\ }
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00173}00173\ \ \ \ \ \ \ \ \ \ \_file\_mapped\_region\ =\ bip::mapped\_region();}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00174}00174\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00175}00175\ \ \ \ \ \ \ \textcolor{keywordflow}{catch}(...)\ \{}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00176}00176\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\_writable)}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00177}00177\ \ \ \ \ \ \ \ \ \ \ \ \ set\_mapped\_file\_db\_dirty(\textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00178}00178\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw};}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00179}00179\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00180}00180\ }
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00181}00181\ \ \ \ \ \ \ \_segment\_manager\ =\ \textcolor{keyword}{reinterpret\_cast<}\mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a550aa643b3bd7335e48afd94f1089d2b}{segment\_manager}}*\textcolor{keyword}{>}((\textcolor{keywordtype}{char}*)\_non\_file\_mapped\_mapping+\mbox{\hyperlink{namespacechainbase_a3553db3334a3279bf83b5951ab9be322}{header\_size}});}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00182}00182\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00183}00183\ \}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00184}00184\ }
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00185}00185\ \textcolor{keywordtype}{void}\ pinnable\_mapped\_file::setup\_non\_file\_mapping()\ \{}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00186}00186\ \ \ \ \textcolor{keywordtype}{int}\ common\_map\_opts\ =\ MAP\_PRIVATE|MAP\_ANONYMOUS;}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00187}00187\ }
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00188}00188\ \ \ \ \_non\_file\_mapped\_mapping\_size\ =\ \_file\_mapped\_region.get\_size();}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00189}00189\ \ \ \ \textcolor{keyword}{auto}\ round\_up\_mmaped\_size\ =\ [\textcolor{keyword}{this}](\textcolor{keywordtype}{unsigned}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}})\ \{}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00190}00190\ \ \ \ \ \ \ \_non\_file\_mapped\_mapping\_size\ =\ (\_non\_file\_mapped\_mapping\_size\ +\ (\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}-\/1u))/\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}*\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00191}00191\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00192}00192\ }
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00193}00193\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \_1gb\ =\ 1u<<30u;}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00194}00194\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \_2mb\ =\ 1u<<21u;}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00195}00195\ }
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00196}00196\ \textcolor{preprocessor}{\#if\ defined(MAP\_HUGETLB)\ \&\&\ defined(MAP\_HUGE\_1GB)}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00197}00197\ \ \ \ \_non\_file\_mapped\_mapping\ =\ mmap(NULL,\ \_non\_file\_mapped\_mapping\_size,\ PROT\_READ|PROT\_WRITE,\ common\_map\_opts|MAP\_HUGETLB|MAP\_HUGE\_1GB,\ -\/1,\ 0);}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00198}00198\ \ \ \ \textcolor{keywordflow}{if}(\_non\_file\_mapped\_mapping\ !=\ MAP\_FAILED)\ \{}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00199}00199\ \ \ \ \ \ \ round\_up\_mmaped\_size(\_1gb);}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00200}00200\ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}CHAINBASE:\ Database\ \(\backslash\)"{}"{}}\ <<\ \_database\_name\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)"{}\ using\ 1GB\ pages"{}}\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00201}00201\ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00202}00202\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00203}00203\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00204}00204\ }
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00205}00205\ \textcolor{preprocessor}{\#if\ defined(MAP\_HUGETLB)\ \&\&\ defined(MAP\_HUGE\_2MB)}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00206}00206\ \ \ \ \textcolor{comment}{//in\ the\ future\ as\ we\ expand\ to\ support\ other\ platforms,\ consider\ not\ specifying\ any\ size\ here\ so\ we\ get\ the\ default\ size.\ However}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00207}00207\ \ \ \ \textcolor{comment}{//\ when\ mapping\ the\ default\ hugepage\ size,\ we'll\ need\ to\ go\ figure\ out\ that\ size\ so\ that\ the\ munmap()\ can\ be\ specified\ correctly}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00208}00208\ \ \ \ \_non\_file\_mapped\_mapping\ =\ mmap(NULL,\ \_non\_file\_mapped\_mapping\_size,\ PROT\_READ|PROT\_WRITE,\ common\_map\_opts|MAP\_HUGETLB|MAP\_HUGE\_2MB,\ -\/1,\ 0);}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00209}00209\ \ \ \ \textcolor{keywordflow}{if}(\_non\_file\_mapped\_mapping\ !=\ MAP\_FAILED)\ \{}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00210}00210\ \ \ \ \ \ \ round\_up\_mmaped\_size(\_2mb);}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00211}00211\ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}CHAINBASE:\ Database\ \(\backslash\)"{}"{}}\ <<\ \_database\_name\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)"{}\ using\ 2MB\ pages"{}}\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00212}00212\ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00213}00213\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00214}00214\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00215}00215\ }
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00216}00216\ \textcolor{preprocessor}{\#if\ defined(VM\_FLAGS\_SUPERPAGE\_SIZE\_2MB)}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00217}00217\ \ \ \ round\_up\_mmaped\_size(\_2mb);}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00218}00218\ \ \ \ \_non\_file\_mapped\_mapping\ =\ mmap(NULL,\ \_non\_file\_mapped\_mapping\_size,\ PROT\_READ|PROT\_WRITE,\ common\_map\_opts,\ VM\_FLAGS\_SUPERPAGE\_SIZE\_2MB,\ 0);}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00219}00219\ \ \ \ \textcolor{keywordflow}{if}(\_non\_file\_mapped\_mapping\ !=\ MAP\_FAILED)\ \{}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00220}00220\ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}CHAINBASE:\ Database\ \(\backslash\)"{}"{}}\ <<\ \_database\_name\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)"{}\ using\ 2MB\ pages"{}}\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00221}00221\ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00222}00222\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00223}00223\ \ \ \ \_non\_file\_mapped\_mapping\_size\ =\ \_file\_mapped\_region.get\_size();\ \ \textcolor{comment}{//restore\ to\ non\ 2MB\ rounded\ size}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00224}00224\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00225}00225\ }
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00226}00226\ \textcolor{preprocessor}{\#ifndef\ \_WIN32}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00227}00227\ \ \ \ \_non\_file\_mapped\_mapping\ =\ mmap(NULL,\ \_non\_file\_mapped\_mapping\_size,\ PROT\_READ|PROT\_WRITE,\ common\_map\_opts,\ -\/1,\ 0);}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00228}00228\ \ \ \ \textcolor{keywordflow}{if}(\_non\_file\_mapped\_mapping\ ==\ MAP\_FAILED)}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00229}00229\ \ \ \ \ \ \ BOOST\_THROW\_EXCEPTION(std::runtime\_error(std::string(\textcolor{stringliteral}{"{}Failed\ to\ map\ database\ "{}})\ +\ \_database\_name\ +\ \textcolor{stringliteral}{"{}:\ "{}}\ +\ strerror(errno)));}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00230}00230\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00231}00231\ \}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00232}00232\ }
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00233}00233\ \textcolor{keywordtype}{void}\ pinnable\_mapped\_file::load\_database\_file(boost::asio::io\_service\&\ sig\_ios)\ \{}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00234}00234\ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}CHAINBASE:\ Preloading\ \(\backslash\)"{}"{}}\ <<\ \_database\_name\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)"{}\ database\ file,\ this\ could\ take\ a\ moment..."{}}\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00235}00235\ \ \ \ \textcolor{keywordtype}{char}*\ \textcolor{keyword}{const}\ src\ =\ (\textcolor{keywordtype}{char}*)\_file\_mapped\_region.get\_address();}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00236}00236\ \ \ \ \textcolor{keywordtype}{char}*\ \textcolor{keyword}{const}\ dst\ =\ (\textcolor{keywordtype}{char}*)\_non\_file\_mapped\_mapping;}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00237}00237\ \ \ \ \textcolor{keywordtype}{size\_t}\ offset\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00238}00238\ \ \ \ time\_t\ t\ =\ time(\textcolor{keyword}{nullptr});}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00239}00239\ \ \ \ \textcolor{keywordflow}{while}(offset\ !=\ \_file\_mapped\_region.get\_size())\ \{}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00240}00240\ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(dst+offset,\ src+offset,\ \_db\_size\_multiple\_requirement);}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00241}00241\ \ \ \ \ \ \ offset\ +=\ \_db\_size\_multiple\_requirement;}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00242}00242\ }
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00243}00243\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(time(\textcolor{keyword}{nullptr})\ !=\ t)\ \{}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00244}00244\ \ \ \ \ \ \ \ \ \ t\ =\ time(\textcolor{keyword}{nullptr});}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00245}00245\ \ \ \ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ \ \ \ \ \ \ \ "{}}\ <<\ offset/(\_file\_mapped\_region.get\_size()/100)\ <<\ \textcolor{stringliteral}{"{}\%\ complete..."{}}\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00246}00246\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00247}00247\ \ \ \ \ \ \ sig\_ios.poll();}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00248}00248\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00249}00249\ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ \ \ \ \ Complete"{}}\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00250}00250\ \}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00251}00251\ }
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00252}00252\ \textcolor{keywordtype}{bool}\ pinnable\_mapped\_file::all\_zeros(\textcolor{keywordtype}{char}*\ data,\ \textcolor{keywordtype}{size\_t}\ sz)\ \{}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00253}00253\ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}*\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}*)data;}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00254}00254\ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}*\ end\ =\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}+sz/\textcolor{keyword}{sizeof}(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}});}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00255}00255\ \ \ \ \textcolor{keywordflow}{while}(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ !=\ end)\ \{}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00256}00256\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(*\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}++\ !=\ 0)}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00257}00257\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00258}00258\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00259}00259\ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00260}00260\ \}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00261}00261\ }
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00262}00262\ \textcolor{keywordtype}{void}\ pinnable\_mapped\_file::save\_database\_file()\ \{}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00263}00263\ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}CHAINBASE:\ Writing\ \(\backslash\)"{}"{}}\ <<\ \_database\_name\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)"{}\ database\ file,\ this\ could\ take\ a\ moment..."{}}\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00264}00264\ \ \ \ \textcolor{keywordtype}{char}*\ src\ =\ (\textcolor{keywordtype}{char}*)\_non\_file\_mapped\_mapping;}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00265}00265\ \ \ \ \textcolor{keywordtype}{char}*\ dst\ =\ (\textcolor{keywordtype}{char}*)\_file\_mapped\_region.get\_address();}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00266}00266\ \ \ \ \textcolor{keywordtype}{size\_t}\ offset\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00267}00267\ \ \ \ time\_t\ t\ =\ time(\textcolor{keyword}{nullptr});}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00268}00268\ \ \ \ \textcolor{keywordflow}{while}(offset\ !=\ \_file\_mapped\_region.get\_size())\ \{}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00269}00269\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!all\_zeros(src+offset,\ \_db\_size\_multiple\_requirement))}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00270}00270\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(dst+offset,\ src+offset,\ \_db\_size\_multiple\_requirement);}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00271}00271\ \ \ \ \ \ \ offset\ +=\ \_db\_size\_multiple\_requirement;}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00272}00272\ }
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00273}00273\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(time(\textcolor{keyword}{nullptr})\ !=\ t)\ \{}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00274}00274\ \ \ \ \ \ \ \ \ \ t\ =\ time(\textcolor{keyword}{nullptr});}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00275}00275\ \ \ \ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ \ \ \ \ \ \ \ "{}}\ <<\ offset/(\_file\_mapped\_region.get\_size()/100)\ <<\ \textcolor{stringliteral}{"{}\%\ complete..."{}}\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00276}00276\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00277}00277\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00278}00278\ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ \ \ \ \ Syncing\ buffers..."{}}\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00279}00279\ \ \ \ \textcolor{keywordflow}{if}(\_file\_mapped\_region.flush(0,\ 0,\ \textcolor{keyword}{false})\ ==\ \textcolor{keyword}{false})}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00280}00280\ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}CHAINBASE:\ ERROR:\ syncing\ buffers\ failed"{}}\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00281}00281\ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ \ \ \ \ Complete"{}}\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00282}00282\ \}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00283}00283\ }
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00284}\mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_acca214bb376d395b00705556f9c02f58}{00284}}\ \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_af3f5524555ffab24ef09cba1fea5908d}{pinnable\_mapped\_file::pinnable\_mapped\_file}}(\mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file}{pinnable\_mapped\_file}}\&\&\ o)\ :}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00285}00285\ \ \ \ \_mapped\_file\_lock(\mbox{\hyperlink{namespacestd}{std}}::move(o.\_mapped\_file\_lock)),}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00286}00286\ \ \ \ \_data\_file\_path(\mbox{\hyperlink{namespacestd}{std}}::move(o.\_data\_file\_path)),}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00287}00287\ \ \ \ \_database\_name(\mbox{\hyperlink{namespacestd}{std}}::move(o.\_database\_name)),}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00288}00288\ \ \ \ \_file\_mapped\_region(\mbox{\hyperlink{namespacestd}{std}}::move(o.\_file\_mapped\_region))}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00289}00289\ \{}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00290}00290\ \ \ \ \_segment\_manager\ =\ o.\_segment\_manager;}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00291}00291\ \ \ \ \_writable\ =\ o.\_writable;}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00292}00292\ \ \ \ \_non\_file\_mapped\_mapping\ =\ o.\_non\_file\_mapped\_mapping;}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00293}00293\ \ \ \ o.\_non\_file\_mapped\_mapping\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00294}00294\ \ \ \ o.\_writable\ =\ \textcolor{keyword}{false};\ \textcolor{comment}{//prevent\ dtor\ from\ doing\ anything\ interesting}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00295}00295\ \}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00296}00296\ }
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00297}\mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a66e9bfcddcf4ac57b613d07120d7fa8d}{00297}}\ \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file}{pinnable\_mapped\_file}}\&\ \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a66e9bfcddcf4ac57b613d07120d7fa8d}{pinnable\_mapped\_file::operator=}}(\mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file}{pinnable\_mapped\_file}}\&\&\ o)\ \{}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00298}00298\ \ \ \ \_mapped\_file\_lock\ =\ std::move(o.\_mapped\_file\_lock);}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00299}00299\ \ \ \ \_data\_file\_path\ =\ std::move(o.\_data\_file\_path);}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00300}00300\ \ \ \ \_database\_name\ =\ std::move(o.\_database\_name);}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00301}00301\ \ \ \ \_file\_mapped\_region\ =\ std::move(o.\_file\_mapped\_region);}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00302}00302\ \ \ \ \_non\_file\_mapped\_mapping\ =\ o.\_non\_file\_mapped\_mapping;}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00303}00303\ \ \ \ o.\_non\_file\_mapped\_mapping\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00304}00304\ \ \ \ \_segment\_manager\ =\ o.\_segment\_manager;}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00305}00305\ \ \ \ \_writable\ =\ o.\_writable;}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00306}00306\ \ \ \ o.\_writable\ =\ \textcolor{keyword}{false};\ \textcolor{comment}{//prevent\ dtor\ from\ doing\ anything\ interesting}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00307}00307\ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00308}00308\ \}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00309}00309\ }
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00310}\mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_afaa394bb719ec7f967b5479dfe98870b}{00310}}\ \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_afaa394bb719ec7f967b5479dfe98870b}{pinnable\_mapped\_file::\string~pinnable\_mapped\_file}}()\ \{}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00311}00311\ \ \ \ \textcolor{keywordflow}{if}(\_writable)\ \{}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00312}00312\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\_non\_file\_mapped\_mapping)\ \{\ \textcolor{comment}{//in\ heap\ or\ locked\ mode}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00313}00313\ \ \ \ \ \ \ \ \ \ \_file\_mapped\_region\ =\ bip::mapped\_region(\_file\_mapping,\ bip::read\_write);}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00314}00314\ \ \ \ \ \ \ \ \ \ save\_database\_file();}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00315}00315\ \textcolor{preprocessor}{\#ifndef\ \_WIN32}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00316}00316\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(munmap(\_non\_file\_mapped\_mapping,\ \_non\_file\_mapped\_mapping\_size))}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00317}00317\ \ \ \ \ \ \ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}CHAINBASE:\ ERROR:\ unmapping\ failed:\ "{}}\ <<\ strerror(errno)\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00318}00318\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00319}00319\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00320}00320\ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00321}00321\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\_file\_mapped\_region.flush(0,\ 0,\ \textcolor{keyword}{false})\ ==\ \textcolor{keyword}{false})}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00322}00322\ \ \ \ \ \ \ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}CHAINBASE:\ ERROR:\ syncing\ buffers\ failed"{}}\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00323}00323\ \ \ \ \ \ \ set\_mapped\_file\_db\_dirty(\textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00324}00324\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00325}00325\ \}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00326}00326\ }
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00327}00327\ \textcolor{keywordtype}{void}\ pinnable\_mapped\_file::set\_mapped\_file\_db\_dirty(\textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3a8251c5ee6c4498d42adb2b1a0aa286af}{dirty}})\ \{}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00328}00328\ \ \ \ *((\textcolor{keywordtype}{char}*)\_file\_mapped\_region.get\_address()+\mbox{\hyperlink{namespacechainbase_a281dadbe1ae02170ae8922387c134875}{header\_dirty\_bit\_offset}})\ =\ \mbox{\hyperlink{namespacechainbase_abb4bd31323d8b6ab74b536e87de8aca3a8251c5ee6c4498d42adb2b1a0aa286af}{dirty}};}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00329}00329\ \ \ \ \textcolor{keywordflow}{if}(\_file\_mapped\_region.flush(0,\ 0,\ \textcolor{keyword}{false})\ ==\ \textcolor{keyword}{false})}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00330}00330\ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}CHAINBASE:\ ERROR:\ syncing\ buffers\ failed"{}}\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00331}00331\ \}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00332}00332\ }
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00333}\mbox{\hyperlink{namespacechainbase_a5abe58c7240700d6a137700b6b1aa22b}{00333}}\ std::istream\&\ \mbox{\hyperlink{namespacechainbase_af11f5eb228d3b92726e394e54660e34a}{operator>>}}(std::istream\&\ in,\ \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a7fe6684b11f441d2e971fe65166d7d5f}{pinnable\_mapped\_file::map\_mode}}\&\ runtime)\ \{}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00334}00334\ \ \ \ std::string\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00335}00335\ \ \ \ in\ >>\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00336}00336\ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ ==\ \textcolor{stringliteral}{"{}mapped"{}})}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00337}00337\ \ \ \ \ \ \ runtime\ =\ \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a7fe6684b11f441d2e971fe65166d7d5fa65d636fa5a7029aaa40f1d93a52748b7}{pinnable\_mapped\_file::map\_mode::mapped}};}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00338}00338\ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ ==\ \textcolor{stringliteral}{"{}heap"{}})}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00339}00339\ \ \ \ \ \ \ runtime\ =\ \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a7fe6684b11f441d2e971fe65166d7d5fa79d37d9e763679dc5f43e08613760d27}{pinnable\_mapped\_file::map\_mode::heap}};}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00340}00340\ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ ==\ \textcolor{stringliteral}{"{}locked"{}})}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00341}00341\ \ \ \ \ \ \ runtime\ =\ \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a7fe6684b11f441d2e971fe65166d7d5fae7ae9465d4fba7a1863b28855ec055e8}{pinnable\_mapped\_file::map\_mode::locked}};}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00342}00342\ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00343}00343\ \ \ \ \ \ \ in.setstate(std::ios\_base::failbit);}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00344}00344\ \ \ \ \textcolor{keywordflow}{return}\ in;}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00345}00345\ \}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00346}00346\ }
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00347}\mbox{\hyperlink{namespacechainbase_a2f58c82416f5b05b25b45f825f47904f}{00347}}\ std::ostream\&\ \mbox{\hyperlink{namespacechainbase_a31de493974b1fdcfe8e90c6b0bdb3c48}{operator<<}}(std::ostream\&\ osm,\ \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a7fe6684b11f441d2e971fe65166d7d5f}{pinnable\_mapped\_file::map\_mode}}\ m)\ \{}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00348}00348\ \ \ \ \textcolor{keywordflow}{if}(m\ ==\ \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a7fe6684b11f441d2e971fe65166d7d5fa65d636fa5a7029aaa40f1d93a52748b7}{pinnable\_mapped\_file::map\_mode::mapped}})}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00349}00349\ \ \ \ \ \ \ osm\ <<\ \textcolor{stringliteral}{"{}mapped"{}};}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00350}00350\ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (m\ ==\ \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a7fe6684b11f441d2e971fe65166d7d5fa79d37d9e763679dc5f43e08613760d27}{pinnable\_mapped\_file::map\_mode::heap}})}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00351}00351\ \ \ \ \ \ \ osm\ <<\ \textcolor{stringliteral}{"{}heap"{}};}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00352}00352\ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (m\ ==\ \mbox{\hyperlink{classchainbase_1_1pinnable__mapped__file_a7fe6684b11f441d2e971fe65166d7d5fae7ae9465d4fba7a1863b28855ec055e8}{pinnable\_mapped\_file::map\_mode::locked}})}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00353}00353\ \ \ \ \ \ \ osm\ <<\ \textcolor{stringliteral}{"{}locked"{}};}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00354}00354\ }
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00355}00355\ \ \ \ \textcolor{keywordflow}{return}\ osm;}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00356}00356\ \}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00357}00357\ }
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00358}00358\ \textcolor{keyword}{static}\ std::string\ print\_os(\mbox{\hyperlink{structchainbase_1_1environment_a5230c250a35c7d13c3c059e117c54395}{environment::os\_t}}\ os)\ \{}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00359}00359\ \ \ \ \textcolor{keywordflow}{switch}(os)\ \{}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00360}00360\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structchainbase_1_1environment_a5230c250a35c7d13c3c059e117c54395a4e8ce2a96ea0b535b8fe12d92c04b0c4}{environment::OS\_LINUX}}:\ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Linux"{}};}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00361}00361\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structchainbase_1_1environment_a5230c250a35c7d13c3c059e117c54395a022d1acb0c856766ce1cdc6814d96057}{environment::OS\_MACOS}}:\ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}macOS"{}};}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00362}00362\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structchainbase_1_1environment_a5230c250a35c7d13c3c059e117c54395a2bda405992008383e3c311255aabb3c9}{environment::OS\_WINDOWS}}:\ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Windows"{}};}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00363}00363\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structchainbase_1_1environment_a5230c250a35c7d13c3c059e117c54395a49bf53029b517339b7d000b5006238a4}{environment::OS\_OTHER}}:\ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Unknown"{}};}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00364}00364\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00365}00365\ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}error"{}};}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00366}00366\ \}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00367}00367\ \textcolor{keyword}{static}\ std::string\ print\_arch(\mbox{\hyperlink{structchainbase_1_1environment_ad49d26e72b1a5ad85a8d2ccdc85b7fa8}{environment::arch\_t}}\ \mbox{\hyperlink{environment_8hpp_aa0e431d4d0a75d1ecbdf0c31893c77aa}{arch}})\ \{}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00368}00368\ \ \ \ \textcolor{keywordflow}{switch}(\mbox{\hyperlink{environment_8hpp_aa0e431d4d0a75d1ecbdf0c31893c77aa}{arch}})\ \{}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00369}00369\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structchainbase_1_1environment_ad49d26e72b1a5ad85a8d2ccdc85b7fa8ada45144844701756f5757aee0f929a7b}{environment::ARCH\_X86\_64}}:\ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}x86\_64"{}};}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00370}00370\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structchainbase_1_1environment_ad49d26e72b1a5ad85a8d2ccdc85b7fa8af374c3b01e0ba23a75eedf0c38a43450}{environment::ARCH\_ARM}}:\ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}ARM"{}};}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00371}00371\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structchainbase_1_1environment_ad49d26e72b1a5ad85a8d2ccdc85b7fa8a2f0968d6b82358cb65f4f1fe65d374c0}{environment::ARCH\_RISCV}}:\ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}RISC-\/v"{}};}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00372}00372\ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structchainbase_1_1environment_ad49d26e72b1a5ad85a8d2ccdc85b7fa8a27b93f887db652b34583ae3d61e061ab}{environment::ARCH\_OTHER}}:\ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Unknown"{}};}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00373}00373\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00374}00374\ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}error"{}};}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00375}00375\ \}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00376}00376\ }
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00377}\mbox{\hyperlink{namespacechainbase_a95429aafa8b5bf2fda83a052e67d71c7}{00377}}\ std::ostream\&\ \mbox{\hyperlink{namespacechainbase_a31de493974b1fdcfe8e90c6b0bdb3c48}{operator<<}}(std::ostream\&\ os,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structchainbase_1_1environment}{chainbase::environment}}\&\ dt)\ \{}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00378}00378\ \ \ \ os\ <<\ std::right\ <<\ std::setw(17)\ <<\ \textcolor{stringliteral}{"{}Compiler:\ "{}}\ <<\ dt.\mbox{\hyperlink{structchainbase_1_1environment_a5877d3a8ae187320facd1c7935ae40fc}{compiler}}\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00379}00379\ \ \ \ os\ <<\ std::right\ <<\ std::setw(17)\ <<\ \textcolor{stringliteral}{"{}Debug:\ "{}}\ <<\ (dt.\mbox{\hyperlink{structchainbase_1_1environment_a328120bb740176a5215fb32d641800b8}{debug}}\ ?\ \textcolor{stringliteral}{"{}Yes"{}}\ :\ \textcolor{stringliteral}{"{}No"{}})\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00380}00380\ \ \ \ os\ <<\ std::right\ <<\ std::setw(17)\ <<\ \textcolor{stringliteral}{"{}OS:\ "{}}\ <<\ print\_os(dt.\mbox{\hyperlink{structchainbase_1_1environment_a29626f3d5a8c2e741807d4818800455d}{os}})\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00381}00381\ \ \ \ os\ <<\ std::right\ <<\ std::setw(17)\ <<\ \textcolor{stringliteral}{"{}Arch:\ "{}}\ <<\ print\_arch(dt.\mbox{\hyperlink{structchainbase_1_1environment_ab83a258982dca21a9bbe652773295e30}{arch}})\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00382}00382\ \ \ \ os\ <<\ std::right\ <<\ std::setw(17)\ <<\ \textcolor{stringliteral}{"{}Boost:\ "{}}\ <<\ dt.\mbox{\hyperlink{structchainbase_1_1environment_a4244eac72c418fa7d07f97cc1e3bdfd4}{boost\_version}}/100000\ <<\ \textcolor{stringliteral}{"{}."{}}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00383}00383\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ dt.\mbox{\hyperlink{structchainbase_1_1environment_a4244eac72c418fa7d07f97cc1e3bdfd4}{boost\_version}}/100\%1000\ <<\ \textcolor{stringliteral}{"{}."{}}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00384}00384\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ dt.\mbox{\hyperlink{structchainbase_1_1environment_a4244eac72c418fa7d07f97cc1e3bdfd4}{boost\_version}}\%100\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00385}00385\ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}};}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00386}00386\ \}}
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00387}00387\ }
+\DoxyCodeLine{\Hypertarget{pinnable__mapped__file_8cpp_source_l00388}00388\ \}}
+
+\end{DoxyCode}

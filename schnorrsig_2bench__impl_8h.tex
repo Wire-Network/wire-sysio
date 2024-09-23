@@ -1,0 +1,204 @@
+\doxysection{libraries/fc/secp256k1/secp256k1/src/modules/schnorrsig/bench\+\_\+impl.h File Reference}
+\hypertarget{schnorrsig_2bench__impl_8h}{}\label{schnorrsig_2bench__impl_8h}\index{libraries/fc/secp256k1/secp256k1/src/modules/schnorrsig/bench\_impl.h@{libraries/fc/secp256k1/secp256k1/src/modules/schnorrsig/bench\_impl.h}}
+{\ttfamily \#include "{}../../../include/secp256k1\+\_\+schnorrsig.\+h"{}}\newline
+Include dependency graph for bench\+\_\+impl.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=246pt]{schnorrsig_2bench__impl_8h__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structbench__schnorrsig__data}{bench\+\_\+schnorrsig\+\_\+data}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{schnorrsig_2bench__impl_8h_a60b84cf1ae45d653820b885f1131b2de}{MSGLEN}}~32
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{schnorrsig_2bench__impl_8h_a6195d286e02f462b28abf8c10d149800}{bench\+\_\+schnorrsig\+\_\+sign}} (void \texorpdfstring{$\ast$}{*}arg, int iters)
+\item 
+void \mbox{\hyperlink{schnorrsig_2bench__impl_8h_aea3512ac27e2d636d3004a9507dc2ff9}{bench\+\_\+schnorrsig\+\_\+verify}} (void \texorpdfstring{$\ast$}{*}arg, int iters)
+\item 
+void \mbox{\hyperlink{schnorrsig_2bench__impl_8h_af4b484aa697df8bb3e5dff5c5b12f06b}{run\+\_\+schnorrsig\+\_\+bench}} (int iters, int argc, char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{schnorrsig_2bench__impl_8h_a60b84cf1ae45d653820b885f1131b2de}\index{bench\_impl.h@{bench\_impl.h}!MSGLEN@{MSGLEN}}
+\index{MSGLEN@{MSGLEN}!bench\_impl.h@{bench\_impl.h}}
+\doxysubsubsection{\texorpdfstring{MSGLEN}{MSGLEN}}
+{\footnotesize\ttfamily \label{schnorrsig_2bench__impl_8h_a60b84cf1ae45d653820b885f1131b2de} 
+\#define MSGLEN~32}
+
+
+
+Definition at line \mbox{\hyperlink{schnorrsig_2bench__impl_8h_source_l00012}{12}} of file \mbox{\hyperlink{schnorrsig_2bench__impl_8h_source}{bench\+\_\+impl.\+h}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{schnorrsig_2bench__impl_8h_a6195d286e02f462b28abf8c10d149800}\index{bench\_impl.h@{bench\_impl.h}!bench\_schnorrsig\_sign@{bench\_schnorrsig\_sign}}
+\index{bench\_schnorrsig\_sign@{bench\_schnorrsig\_sign}!bench\_impl.h@{bench\_impl.h}}
+\doxysubsubsection{\texorpdfstring{bench\_schnorrsig\_sign()}{bench\_schnorrsig\_sign()}}
+{\footnotesize\ttfamily \label{schnorrsig_2bench__impl_8h_a6195d286e02f462b28abf8c10d149800} 
+void bench\+\_\+schnorrsig\+\_\+sign (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{arg}{, }\item[{int}]{iters}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{schnorrsig_2bench__impl_8h_source_l00024}{24}} of file \mbox{\hyperlink{schnorrsig_2bench__impl_8h_source}{bench\+\_\+impl.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00025\ \ \ \ \ \mbox{\hyperlink{structbench__schnorrsig__data}{bench\_schnorrsig\_data}}\ *data\ =\ (\mbox{\hyperlink{structbench__schnorrsig__data}{bench\_schnorrsig\_data}}\ *)arg;}
+\DoxyCodeLine{00026\ \ \ \ \ \textcolor{keywordtype}{int}\ i;}
+\DoxyCodeLine{00027\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ msg[\mbox{\hyperlink{schnorrsig_2bench__impl_8h_a60b84cf1ae45d653820b885f1131b2de}{MSGLEN}}]\ =\ \{0\};}
+\DoxyCodeLine{00028\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ sig[64];}
+\DoxyCodeLine{00029\ }
+\DoxyCodeLine{00030\ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ iters;\ i++)\ \{}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ msg[0]\ =\ i;}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ msg[1]\ =\ i\ >>\ 8;}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{secp256k1__schnorrsig_8h_ad76edec4d42f65e4bc85ce445f1672fd}{secp256k1\_schnorrsig\_sign\_custom}}(data-\/>ctx,\ sig,\ msg,\ \mbox{\hyperlink{schnorrsig_2bench__impl_8h_a60b84cf1ae45d653820b885f1131b2de}{MSGLEN}},\ data-\/>keypairs[i],\ NULL));}
+\DoxyCodeLine{00034\ \ \ \ \ \}}
+\DoxyCodeLine{00035\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=345pt]{schnorrsig_2bench__impl_8h_a6195d286e02f462b28abf8c10d149800_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{schnorrsig_2bench__impl_8h_a6195d286e02f462b28abf8c10d149800_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{schnorrsig_2bench__impl_8h_aea3512ac27e2d636d3004a9507dc2ff9}\index{bench\_impl.h@{bench\_impl.h}!bench\_schnorrsig\_verify@{bench\_schnorrsig\_verify}}
+\index{bench\_schnorrsig\_verify@{bench\_schnorrsig\_verify}!bench\_impl.h@{bench\_impl.h}}
+\doxysubsubsection{\texorpdfstring{bench\_schnorrsig\_verify()}{bench\_schnorrsig\_verify()}}
+{\footnotesize\ttfamily \label{schnorrsig_2bench__impl_8h_aea3512ac27e2d636d3004a9507dc2ff9} 
+void bench\+\_\+schnorrsig\+\_\+verify (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{arg}{, }\item[{int}]{iters}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{schnorrsig_2bench__impl_8h_source_l00037}{37}} of file \mbox{\hyperlink{schnorrsig_2bench__impl_8h_source}{bench\+\_\+impl.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00038\ \ \ \ \ \mbox{\hyperlink{structbench__schnorrsig__data}{bench\_schnorrsig\_data}}\ *data\ =\ (\mbox{\hyperlink{structbench__schnorrsig__data}{bench\_schnorrsig\_data}}\ *)arg;}
+\DoxyCodeLine{00039\ \ \ \ \ \textcolor{keywordtype}{int}\ i;}
+\DoxyCodeLine{00040\ }
+\DoxyCodeLine{00041\ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ iters;\ i++)\ \{}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsecp256k1__xonly__pubkey}{secp256k1\_xonly\_pubkey}}\ pk;}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{secp256k1__extrakeys_8h_ad9e5f1dae6a1e3e03d0093aa17e6c21c}{secp256k1\_xonly\_pubkey\_parse}}(data-\/>ctx,\ \&pk,\ data-\/>pk[i])\ ==\ 1);}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{secp256k1__schnorrsig_8h_ad8c9ecde1b1b561bb0a864ef307a48cb}{secp256k1\_schnorrsig\_verify}}(data-\/>ctx,\ data-\/>sigs[i],\ data-\/>msgs[i],\ \mbox{\hyperlink{schnorrsig_2bench__impl_8h_a60b84cf1ae45d653820b885f1131b2de}{MSGLEN}},\ \&pk));}
+\DoxyCodeLine{00045\ \ \ \ \ \}}
+\DoxyCodeLine{00046\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{schnorrsig_2bench__impl_8h_aea3512ac27e2d636d3004a9507dc2ff9_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{schnorrsig_2bench__impl_8h_aea3512ac27e2d636d3004a9507dc2ff9_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{schnorrsig_2bench__impl_8h_af4b484aa697df8bb3e5dff5c5b12f06b}\index{bench\_impl.h@{bench\_impl.h}!run\_schnorrsig\_bench@{run\_schnorrsig\_bench}}
+\index{run\_schnorrsig\_bench@{run\_schnorrsig\_bench}!bench\_impl.h@{bench\_impl.h}}
+\doxysubsubsection{\texorpdfstring{run\_schnorrsig\_bench()}{run\_schnorrsig\_bench()}}
+{\footnotesize\ttfamily \label{schnorrsig_2bench__impl_8h_af4b484aa697df8bb3e5dff5c5b12f06b} 
+void run\+\_\+schnorrsig\+\_\+bench (\begin{DoxyParamCaption}\item[{int}]{iters}{, }\item[{int}]{argc}{, }\item[{char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{argv}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{schnorrsig_2bench__impl_8h_source_l00048}{48}} of file \mbox{\hyperlink{schnorrsig_2bench__impl_8h_source}{bench\+\_\+impl.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00049\ \ \ \ \ \textcolor{keywordtype}{int}\ i;}
+\DoxyCodeLine{00050\ \ \ \ \ \mbox{\hyperlink{structbench__schnorrsig__data}{bench\_schnorrsig\_data}}\ data;}
+\DoxyCodeLine{00051\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ =\ argc\ ==\ 1;}
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ \ \ \ \ data.ctx\ =\ \mbox{\hyperlink{secp256k1_8h_a3aaa9fcc3ab67bc8f841779a049069c5}{secp256k1\_context\_create}}(\mbox{\hyperlink{secp256k1_8h_add20a6c320e247ca7bd524cbc4259d64}{SECP256K1\_CONTEXT\_VERIFY}}\ |\ \mbox{\hyperlink{secp256k1_8h_a0d34fe6baa73d3145f2e376e43de0b15}{SECP256K1\_CONTEXT\_SIGN}});}
+\DoxyCodeLine{00054\ \ \ \ \ data.keypairs\ =\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{structsecp256k1__keypair}{secp256k1\_keypair}}\ **)malloc(iters\ *\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{structsecp256k1__keypair}{secp256k1\_keypair}}\ *));}
+\DoxyCodeLine{00055\ \ \ \ \ data.pk\ =\ (\textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ **)malloc(iters\ *\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *));}
+\DoxyCodeLine{00056\ \ \ \ \ data.msgs\ =\ (\textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ **)malloc(iters\ *\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *));}
+\DoxyCodeLine{00057\ \ \ \ \ data.sigs\ =\ (\textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ **)malloc(iters\ *\ \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *));}
+\DoxyCodeLine{00058\ }
+\DoxyCodeLine{00059\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{schnorrsig_2bench__impl_8h_a60b84cf1ae45d653820b885f1131b2de}{MSGLEN}}\ >=\ 4);}
+\DoxyCodeLine{00060\ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ iters;\ i++)\ \{}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ sk[32];}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *msg\ =\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)malloc(\mbox{\hyperlink{schnorrsig_2bench__impl_8h_a60b84cf1ae45d653820b885f1131b2de}{MSGLEN}});}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *sig\ =\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)malloc(64);}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsecp256k1__keypair}{secp256k1\_keypair}}\ *keypair\ =\ (\mbox{\hyperlink{structsecp256k1__keypair}{secp256k1\_keypair}}\ *)malloc(\textcolor{keyword}{sizeof}(*keypair));}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *pk\_char\ =\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)malloc(32);}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsecp256k1__xonly__pubkey}{secp256k1\_xonly\_pubkey}}\ pk;}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ msg[0]\ =\ sk[0]\ =\ i;}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ msg[1]\ =\ sk[1]\ =\ i\ >>\ 8;}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ msg[2]\ =\ sk[2]\ =\ i\ >>\ 16;}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ msg[3]\ =\ sk[3]\ =\ i\ >>\ 24;}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(\&msg[4],\ \textcolor{charliteral}{'m'},\ \mbox{\hyperlink{schnorrsig_2bench__impl_8h_a60b84cf1ae45d653820b885f1131b2de}{MSGLEN}}\ -\/\ 4);}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(\&sk[4],\ \textcolor{charliteral}{'s'},\ 28);}
+\DoxyCodeLine{00073\ }
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ data.keypairs[i]\ =\ keypair;}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ data.pk[i]\ =\ pk\_char;}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ data.msgs[i]\ =\ msg;}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ data.sigs[i]\ =\ sig;}
+\DoxyCodeLine{00078\ }
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{secp256k1__extrakeys_8h_a61b1362ada2435ab10240e52ff738476}{secp256k1\_keypair\_create}}(data.ctx,\ keypair,\ sk));}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{secp256k1__schnorrsig_8h_ad76edec4d42f65e4bc85ce445f1672fd}{secp256k1\_schnorrsig\_sign\_custom}}(data.ctx,\ sig,\ msg,\ \mbox{\hyperlink{schnorrsig_2bench__impl_8h_a60b84cf1ae45d653820b885f1131b2de}{MSGLEN}},\ keypair,\ NULL));}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{secp256k1__extrakeys_8h_ab0383c461b3790fdcfcaef0f89deb709}{secp256k1\_keypair\_xonly\_pub}}(data.ctx,\ \&pk,\ NULL,\ keypair));}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\mbox{\hyperlink{secp256k1__extrakeys_8h_a455e86be0f18f4313ba8ea73e34a25a6}{secp256k1\_xonly\_pubkey\_serialize}}(data.ctx,\ pk\_char,\ \&pk)\ ==\ 1);}
+\DoxyCodeLine{00083\ \ \ \ \ \}}
+\DoxyCodeLine{00084\ }
+\DoxyCodeLine{00085\ \ \ \ \ \textcolor{keywordflow}{if}\ (d\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}schnorrsig"{}})\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}sign"{}})\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}schnorrsig\_sign"{}}))\ \mbox{\hyperlink{bench_8h_aabcd2ce2b43c96bd396b30f8ecb79a17}{run\_benchmark}}(\textcolor{stringliteral}{"{}schnorrsig\_sign"{}},\ \mbox{\hyperlink{schnorrsig_2bench__impl_8h_a6195d286e02f462b28abf8c10d149800}{bench\_schnorrsig\_sign}},\ NULL,\ NULL,\ (\textcolor{keywordtype}{void}\ *)\ \&data,\ 10,\ iters);}
+\DoxyCodeLine{00086\ \ \ \ \ \textcolor{keywordflow}{if}\ (d\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}schnorrsig"{}})\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}verify"{}})\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}schnorrsig\_verify"{}}))\ \mbox{\hyperlink{bench_8h_aabcd2ce2b43c96bd396b30f8ecb79a17}{run\_benchmark}}(\textcolor{stringliteral}{"{}schnorrsig\_verify"{}},\ \mbox{\hyperlink{schnorrsig_2bench__impl_8h_aea3512ac27e2d636d3004a9507dc2ff9}{bench\_schnorrsig\_verify}},\ NULL,\ NULL,\ (\textcolor{keywordtype}{void}\ *)\ \&data,\ 10,\ iters);}
+\DoxyCodeLine{00087\ }
+\DoxyCodeLine{00088\ \ \ \ \ \textcolor{keywordflow}{for}\ (i\ =\ 0;\ i\ <\ iters;\ i++)\ \{}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ free((\textcolor{keywordtype}{void}\ *)data.keypairs[i]);}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ free((\textcolor{keywordtype}{void}\ *)data.pk[i]);}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ free((\textcolor{keywordtype}{void}\ *)data.msgs[i]);}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ free((\textcolor{keywordtype}{void}\ *)data.sigs[i]);}
+\DoxyCodeLine{00093\ \ \ \ \ \}}
+\DoxyCodeLine{00094\ \ \ \ \ free(data.keypairs);}
+\DoxyCodeLine{00095\ \ \ \ \ free(data.pk);}
+\DoxyCodeLine{00096\ \ \ \ \ free(data.msgs);}
+\DoxyCodeLine{00097\ \ \ \ \ free(data.sigs);}
+\DoxyCodeLine{00098\ }
+\DoxyCodeLine{00099\ \ \ \ \ \mbox{\hyperlink{secp256k1_8h_a026db914e3723531825ecf25a0cbd699}{secp256k1\_context\_destroy}}(data.ctx);}
+\DoxyCodeLine{00100\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{schnorrsig_2bench__impl_8h_af4b484aa697df8bb3e5dff5c5b12f06b_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=264pt]{schnorrsig_2bench__impl_8h_af4b484aa697df8bb3e5dff5c5b12f06b_icgraph}
+\end{center}
+\end{figure}

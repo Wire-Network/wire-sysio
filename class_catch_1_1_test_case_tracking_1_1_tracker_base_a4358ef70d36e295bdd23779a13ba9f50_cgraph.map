@@ -1,0 +1,9 @@
+<map id="Catch::TestCaseTracking::TrackerBase::close" name="Catch::TestCaseTracking::TrackerBase::close">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,71,176,111"/>
+<area shape="rect" id="Node000002" href="$struct_catch_1_1_test_case_tracking_1_1_i_tracker.html#a64d18c92b66ff001fcbdb1c3d839b2c5" title=" " alt="" coords="246,5,416,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="167,68,238,48,239,53,168,73"/>
+<area shape="rect" id="Node000003" href="$class_catch_1_1_test_case_tracking_1_1_tracker_context.html#a37cd0cd086c5e87f5a60b5fc834d7482" title=" " alt="" coords="224,71,438,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="176,88,208,88,208,94,176,94"/>
+<area shape="rect" id="Node000004" href="$class_catch_1_1_test_case_tracking_1_1_tracker_context.html#a9294627e8f7cb5774cc17579f3558d0d" title=" " alt="" coords="225,136,436,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="168,109,239,129,238,134,167,114"/>
+</map>

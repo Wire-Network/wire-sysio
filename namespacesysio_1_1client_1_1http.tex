@@ -1,0 +1,1133 @@
+\doxysection{sysio\+::client\+::http Namespace Reference}
+\hypertarget{namespacesysio_1_1client_1_1http}{}\label{namespacesysio_1_1client_1_1http}\index{sysio::client::http@{sysio::client::http}}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1client_1_1http_1_1detail}{detail}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1client_1_1http_1_1connection__param}{connection\+\_\+param}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1client_1_1http_1_1parsed__url}{parsed\+\_\+url}}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1client_1_1http_1_1resolved__url}{resolved\+\_\+url}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a4cb0cf6309fe359235a03d3964524b22}{http\+\_\+context}} = std\+::unique\+\_\+ptr$<$\mbox{\hyperlink{classsysio_1_1client_1_1http_1_1detail_1_1http__context__impl}{detail\+::http\+\_\+context\+\_\+impl}}, \mbox{\hyperlink{structsysio_1_1client_1_1http_1_1detail_1_1http__context__deleter}{detail\+::http\+\_\+context\+\_\+deleter}}$>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacesysio_1_1client_1_1http_a4cb0cf6309fe359235a03d3964524b22}{http\+\_\+context}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a787b918b0b4400f958bc44011a2bd226}{create\+\_\+http\+\_\+context}} ()
+\item 
+void \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a4d32eca0ecac32376ce5478f3d8f9f98}{do\+\_\+connect}} (tcp\+::socket \&sock, const \mbox{\hyperlink{structsysio_1_1client_1_1http_1_1resolved__url}{resolved\+\_\+url}} \&\mbox{\hyperlink{classfc_1_1url}{url}})
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\std\+::string \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a162de4256c3fbe69ad6a62bc40b444b2}{do\+\_\+txrx}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&socket, boost\+::asio\+::streambuf \&request\+\_\+buff, unsigned int \&status\+\_\+code)
+\item 
+\mbox{\hyperlink{structsysio_1_1client_1_1http_1_1parsed__url}{parsed\+\_\+url}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_aa22792d25e080a60a880b433d1ef8933}{parse\+\_\+url}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&server\+\_\+url)
+\item 
+\mbox{\hyperlink{structsysio_1_1client_1_1http_1_1resolved__url}{resolved\+\_\+url}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_af9d5ab19d85cb83ea8b32e8ccea594b1}{resolve\+\_\+url}} (const \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a4cb0cf6309fe359235a03d3964524b22}{http\+\_\+context}} \&\mbox{\hyperlink{structcontext}{context}}, const \mbox{\hyperlink{structsysio_1_1client_1_1http_1_1parsed__url}{parsed\+\_\+url}} \&\mbox{\hyperlink{classfc_1_1url}{url}})
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_ad1b87692ec6218b59d58a092106040f9}{format\+\_\+host\+\_\+header}} (const \mbox{\hyperlink{structsysio_1_1client_1_1http_1_1resolved__url}{resolved\+\_\+url}} \&\mbox{\hyperlink{classfc_1_1url}{url}})
+\item 
+\mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a1f247437c0bb15fa7286d76c8139d41c}{do\+\_\+http\+\_\+call}} (const \mbox{\hyperlink{structsysio_1_1client_1_1http_1_1connection__param}{connection\+\_\+param}} \&cp, const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&postdata, bool \mbox{\hyperlink{programs_2clio_2main_8cpp_a6b5337ce19efcf252e2018f54d37f435}{print\+\_\+request}}, bool \mbox{\hyperlink{programs_2clio_2main_8cpp_ad75d20d7df265e3aca3c2003476caa61}{print\+\_\+response}})
+\item 
+\mbox{\hyperlink{namespacesysio_1_1client_1_1http_a394c79af39689d7a9a011291e3ec9f96}{FC\+\_\+\+DECLARE\+\_\+\+EXCEPTION}} (connection\+\_\+exception, 1100000, "{}Connection Exception"{})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a5f8551ac3deb3b140ee85223b03d84c1}{chain\+\_\+func\+\_\+base}} = "{}/v1/chain"{}
+\item 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a2ce3d91848a2d7171e278279e80da5db}{get\+\_\+info\+\_\+func}} = chain\+\_\+func\+\_\+base + "{}/get\+\_\+info"{}
+\item 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a02c7f59fb0a01a256b1970bef8e1651b}{get\+\_\+transaction\+\_\+status\+\_\+func}} = chain\+\_\+func\+\_\+base + "{}/get\+\_\+transaction\+\_\+status"{}
+\item 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a10e42ac984f01842e01b98d864d81260}{send\+\_\+txn\+\_\+func}} = chain\+\_\+func\+\_\+base + "{}/send\+\_\+transaction"{}
+\item 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a7f896434cc67a3effd14ef2616ae83ce}{push\+\_\+txn\+\_\+func}} = chain\+\_\+func\+\_\+base + "{}/push\+\_\+transaction"{}
+\item 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a9b78bb2c52d8a5b28a76e04db0e8bd21}{send2\+\_\+txn\+\_\+func}} = chain\+\_\+func\+\_\+base + "{}/send\+\_\+transaction2"{}
+\item 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_ad602c2c22ca30cd5cc4f819457c3c799}{compute\+\_\+txn\+\_\+func}} = chain\+\_\+func\+\_\+base + "{}/compute\+\_\+transaction"{}
+\item 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a9c9ae4b057913a4913b54d060ee8a9b5}{push\+\_\+txns\+\_\+func}} = chain\+\_\+func\+\_\+base + "{}/push\+\_\+transactions"{}
+\item 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_ae45c5e319acf2676ecd093aca9eaec95}{json\+\_\+to\+\_\+bin\+\_\+func}} = chain\+\_\+func\+\_\+base + "{}/abi\+\_\+json\+\_\+to\+\_\+bin"{}
+\item 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_af6febaf9e62fdbc601121454845246c2}{get\+\_\+block\+\_\+func}} = chain\+\_\+func\+\_\+base + "{}/get\+\_\+block"{}
+\item 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_aa3319d3c290880c072cdfc1cd0129be5}{get\+\_\+block\+\_\+info\+\_\+func}} = chain\+\_\+func\+\_\+base + "{}/get\+\_\+block\+\_\+info"{}
+\item 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a81a8836bf63bede3a567fa785b657f7d}{get\+\_\+block\+\_\+header\+\_\+state\+\_\+func}} = chain\+\_\+func\+\_\+base + "{}/get\+\_\+block\+\_\+header\+\_\+state"{}
+\item 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a497de9c2d0b48ace77babd28f3797dd5}{get\+\_\+account\+\_\+func}} = chain\+\_\+func\+\_\+base + "{}/get\+\_\+account"{}
+\item 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a74c28475d2f7d2cb4c99cb361c2279a0}{get\+\_\+table\+\_\+func}} = chain\+\_\+func\+\_\+base + "{}/get\+\_\+table\+\_\+rows"{}
+\item 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_ac07425080a07294cc0c4c9fc530f5035}{get\+\_\+table\+\_\+by\+\_\+scope\+\_\+func}} = chain\+\_\+func\+\_\+base + "{}/get\+\_\+table\+\_\+by\+\_\+scope"{}
+\item 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a543233ec6c5224c60ed1b247ebf5a1cb}{get\+\_\+code\+\_\+func}} = chain\+\_\+func\+\_\+base + "{}/get\+\_\+code"{}
+\item 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a2a031e6796de80e542e2d7ae6595e031}{get\+\_\+code\+\_\+hash\+\_\+func}} = chain\+\_\+func\+\_\+base + "{}/get\+\_\+code\+\_\+hash"{}
+\item 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a5f438e664007e77988b89f2ddfb505e8}{get\+\_\+abi\+\_\+func}} = chain\+\_\+func\+\_\+base + "{}/get\+\_\+abi"{}
+\item 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_ad7856c823d6f2ea34188d0363294b625}{get\+\_\+raw\+\_\+abi\+\_\+func}} = chain\+\_\+func\+\_\+base + "{}/get\+\_\+raw\+\_\+abi"{}
+\item 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a011ab51afedc4a61a0c31d596ef9dedf}{get\+\_\+raw\+\_\+code\+\_\+and\+\_\+abi\+\_\+func}} = chain\+\_\+func\+\_\+base + "{}/get\+\_\+raw\+\_\+code\+\_\+and\+\_\+abi"{}
+\item 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a75f09dad13b384035926b95d8ffd1256}{get\+\_\+currency\+\_\+balance\+\_\+func}} = chain\+\_\+func\+\_\+base + "{}/get\+\_\+currency\+\_\+balance"{}
+\item 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a207f04f69a3ea92c822f260f17bf3283}{get\+\_\+currency\+\_\+stats\+\_\+func}} = chain\+\_\+func\+\_\+base + "{}/get\+\_\+currency\+\_\+stats"{}
+\item 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a088028e1ea02b9b17bb45826d1828917}{get\+\_\+producers\+\_\+func}} = chain\+\_\+func\+\_\+base + "{}/get\+\_\+producers"{}
+\item 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a0846b8cd52178faf5ffc1656b79528ff}{get\+\_\+schedule\+\_\+func}} = chain\+\_\+func\+\_\+base + "{}/get\+\_\+producer\+\_\+schedule"{}
+\item 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_aff019190d6e55fe0c11da06c0f7f4584}{get\+\_\+required\+\_\+keys}} = chain\+\_\+func\+\_\+base + "{}/get\+\_\+required\+\_\+keys"{}
+\item 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_aef5798a3297cd0746689ff6c67ab2e34}{history\+\_\+func\+\_\+base}} = "{}/v1/history"{}
+\item 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a29552db68fc586bddf012299ec58917d}{trace\+\_\+api\+\_\+func\+\_\+base}} = "{}/v1/trace\+\_\+api"{}
+\item 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a62306daa50af435c0b167b01fd1d31f7}{get\+\_\+actions\+\_\+func}} = history\+\_\+func\+\_\+base + "{}/get\+\_\+actions"{}
+\item 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a944fa2924ffa5465a1ebec7b7d294b09}{get\+\_\+transaction\+\_\+trace\+\_\+func}} = trace\+\_\+api\+\_\+func\+\_\+base + "{}/get\+\_\+transaction\+\_\+trace"{}
+\item 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a388c06df072a1869f8c3ff199d04475f}{get\+\_\+block\+\_\+trace\+\_\+func}} = trace\+\_\+api\+\_\+func\+\_\+base + "{}/get\+\_\+block"{}
+\item 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a84383cd6f08ee43d4d5b161f2605d865}{get\+\_\+transaction\+\_\+func}} = history\+\_\+func\+\_\+base + "{}/get\+\_\+transaction"{}
+\item 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a0bf2f9ae92f19e58086a9610db248cab}{get\+\_\+key\+\_\+accounts\+\_\+func}} = history\+\_\+func\+\_\+base + "{}/get\+\_\+key\+\_\+accounts"{}
+\item 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a022de17352257dfcdbf255c9eda2f6ee}{get\+\_\+controlled\+\_\+accounts\+\_\+func}} = history\+\_\+func\+\_\+base + "{}/get\+\_\+controlled\+\_\+accounts"{}
+\item 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_aef40a2603c3dfd089fb26b663ef1b9e7}{net\+\_\+func\+\_\+base}} = "{}/v1/net"{}
+\item 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a28f03e0f6a7bb7f036324e1e78688592}{net\+\_\+connect}} = net\+\_\+func\+\_\+base + "{}/connect"{}
+\item 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a9769b04fddea98da42388ddd7b1a1b04}{net\+\_\+disconnect}} = net\+\_\+func\+\_\+base + "{}/disconnect"{}
+\item 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_af4f10ec8ec3f34bf22826a0e8979f715}{net\+\_\+status}} = net\+\_\+func\+\_\+base + "{}/status"{}
+\item 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a554b556b524227b08454391ee37ab403}{net\+\_\+connections}} = net\+\_\+func\+\_\+base + "{}/connections"{}
+\item 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_ab164f41095b2cb6a96b9c9316200bdf5}{wallet\+\_\+func\+\_\+base}} = "{}/v1/wallet"{}
+\item 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_ad9f14ba11ccc84d5a11cb863b3c8be14}{wallet\+\_\+create}} = wallet\+\_\+func\+\_\+base + "{}/create"{}
+\item 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a79908fbcca17945321269ac64528609d}{wallet\+\_\+open}} = wallet\+\_\+func\+\_\+base + "{}/open"{}
+\item 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a6282d742bf373082ce92cda18f7c65de}{wallet\+\_\+list}} = wallet\+\_\+func\+\_\+base + "{}/list\+\_\+wallets"{}
+\item 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a9630d69791bc1e4ba500caa8b73489eb}{wallet\+\_\+list\+\_\+keys}} = wallet\+\_\+func\+\_\+base + "{}/list\+\_\+keys"{}
+\item 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a3280c0a8d84c975181b53d3a43c2e642}{wallet\+\_\+public\+\_\+keys}} = wallet\+\_\+func\+\_\+base + "{}/get\+\_\+public\+\_\+keys"{}
+\item 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a039501cdb75746c55c8beea798971f76}{wallet\+\_\+lock}} = wallet\+\_\+func\+\_\+base + "{}/lock"{}
+\item 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_af4aa87af4b47b207a5df3e757eb1246e}{wallet\+\_\+lock\+\_\+all}} = wallet\+\_\+func\+\_\+base + "{}/lock\+\_\+all"{}
+\item 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a84c12a5d138e8f42fad5b0d66fc26e70}{wallet\+\_\+unlock}} = wallet\+\_\+func\+\_\+base + "{}/unlock"{}
+\item 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a73d78b9b91d9868c7b54185aae22e44e}{wallet\+\_\+import\+\_\+key}} = wallet\+\_\+func\+\_\+base + "{}/import\+\_\+key"{}
+\item 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a385d76657d4fe1015920ac519e3c5e4c}{wallet\+\_\+remove\+\_\+key}} = wallet\+\_\+func\+\_\+base + "{}/remove\+\_\+key"{}
+\item 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a727b9cbcbc890a53ad6c673e433b24c1}{wallet\+\_\+create\+\_\+key}} = wallet\+\_\+func\+\_\+base + "{}/create\+\_\+key"{}
+\item 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a03f77bc9849073cee0f4ff86f6e25aea}{wallet\+\_\+sign\+\_\+trx}} = wallet\+\_\+func\+\_\+base + "{}/sign\+\_\+transaction"{}
+\item 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{namespacesysio_1_1client_1_1http_ad0908a7106763c92f137cd0a139f1365}{kiod\+\_\+stop}} = "{}/v1/"{} + string(client\+::config\+::key\+\_\+store\+\_\+executable\+\_\+name) + "{}/stop"{}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{namespacesysio_1_1client_1_1http_a4cb0cf6309fe359235a03d3964524b22}\index{sysio::client::http@{sysio::client::http}!http\_context@{http\_context}}
+\index{http\_context@{http\_context}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{http\_context}{http\_context}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_a4cb0cf6309fe359235a03d3964524b22} 
+using sysio\+::client\+::http\+::http\+\_\+context = std\+::unique\+\_\+ptr$<$\mbox{\hyperlink{classsysio_1_1client_1_1http_1_1detail_1_1http__context__impl}{detail\+::http\+\_\+context\+\_\+impl}}, \mbox{\hyperlink{structsysio_1_1client_1_1http_1_1detail_1_1http__context__deleter}{detail\+::http\+\_\+context\+\_\+deleter}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{httpc_8hpp_source_l00015}{15}} of file \mbox{\hyperlink{httpc_8hpp_source}{httpc.\+hpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacesysio_1_1client_1_1http_a787b918b0b4400f958bc44011a2bd226}\index{sysio::client::http@{sysio::client::http}!create\_http\_context@{create\_http\_context}}
+\index{create\_http\_context@{create\_http\_context}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{create\_http\_context()}{create\_http\_context()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_a787b918b0b4400f958bc44011a2bd226} 
+\mbox{\hyperlink{namespacesysio_1_1client_1_1http_a4cb0cf6309fe359235a03d3964524b22}{http\+\_\+context}} sysio\+::client\+::http\+::create\+\_\+http\+\_\+context (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{httpc_8cpp_source_l00043}{43}} of file \mbox{\hyperlink{httpc_8cpp_source}{httpc.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a4cb0cf6309fe359235a03d3964524b22}{http\_context}}(\textcolor{keyword}{new}\ \mbox{\hyperlink{classsysio_1_1client_1_1http_1_1detail_1_1http__context__impl}{detail::http\_context\_impl}},\ \mbox{\hyperlink{structsysio_1_1client_1_1http_1_1detail_1_1http__context__deleter}{detail::http\_context\_deleter}}());}
+\DoxyCodeLine{00045\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=188pt]{namespacesysio_1_1client_1_1http_a787b918b0b4400f958bc44011a2bd226_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=261pt]{namespacesysio_1_1client_1_1http_a787b918b0b4400f958bc44011a2bd226_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacesysio_1_1client_1_1http_a4d32eca0ecac32376ce5478f3d8f9f98}\index{sysio::client::http@{sysio::client::http}!do\_connect@{do\_connect}}
+\index{do\_connect@{do\_connect}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{do\_connect()}{do\_connect()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_a4d32eca0ecac32376ce5478f3d8f9f98} 
+void sysio\+::client\+::http\+::do\+\_\+connect (\begin{DoxyParamCaption}\item[{tcp\+::socket \&}]{sock}{, }\item[{const \mbox{\hyperlink{structsysio_1_1client_1_1http_1_1resolved__url}{resolved\+\_\+url}} \&}]{url}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{httpc_8cpp_source_l00047}{47}} of file \mbox{\hyperlink{httpc_8cpp_source}{httpc.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \textcolor{comment}{//\ Get\ a\ list\ of\ endpoints\ corresponding\ to\ the\ server\ name.}}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1vector}{vector<tcp::endpoint>}}\ endpoints;}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ endpoints.reserve(\mbox{\hyperlink{classfc_1_1url}{url}}.resolved\_addresses.size());}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ addr:\ \mbox{\hyperlink{classfc_1_1url}{url}}.resolved\_addresses)\ \{}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ endpoints.emplace\_back(boost::asio::ip::make\_address(addr),\ \mbox{\hyperlink{classfc_1_1url}{url}}.resolved\_port);}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ boost::asio::connect(sock,\ endpoints);}
+\DoxyCodeLine{00055\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=171pt]{namespacesysio_1_1client_1_1http_a4d32eca0ecac32376ce5478f3d8f9f98_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1client_1_1http_a4d32eca0ecac32376ce5478f3d8f9f98_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacesysio_1_1client_1_1http_a1f247437c0bb15fa7286d76c8139d41c}\index{sysio::client::http@{sysio::client::http}!do\_http\_call@{do\_http\_call}}
+\index{do\_http\_call@{do\_http\_call}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{do\_http\_call()}{do\_http\_call()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_a1f247437c0bb15fa7286d76c8139d41c} 
+\mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} sysio\+::client\+::http\+::do\+\_\+http\+\_\+call (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1client_1_1http_1_1connection__param}{connection\+\_\+param}} \&}]{cp}{, }\item[{const \mbox{\hyperlink{classfc_1_1variant}{fc\+::variant}} \&}]{postdata}{, }\item[{bool}]{print\+\_\+request}{, }\item[{bool}]{print\+\_\+response}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{httpc_8cpp_source_l00184}{184}} of file \mbox{\hyperlink{httpc_8cpp_source}{httpc.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00188\ \ \ \ std::string\ postjson;}
+\DoxyCodeLine{00189\ \ \ \ \textcolor{keywordflow}{if}(\ !postdata.\mbox{\hyperlink{classfc_1_1variant_a531450deac912ee3e1bc606422714a68}{is\_null}}()\ )\ \{}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ postjson\ =\ \mbox{\hyperlink{programs_2clio_2main_8cpp_a6b5337ce19efcf252e2018f54d37f435}{print\_request}}\ ?\ \mbox{\hyperlink{classfc_1_1json_ae6c022ab581a9552ae2c97ff5d73aaf8}{fc::json::to\_pretty\_string}}(\ postdata\ )\ :\ \mbox{\hyperlink{namespacefc}{fc}}::\mbox{\hyperlink{classfc_1_1json}{json}}::to\_string(\ postdata,\ \mbox{\hyperlink{namespacefc}{fc}}::\mbox{\hyperlink{classfc_1_1time__point}{time\_point}}::maximum()\ );}
+\DoxyCodeLine{00191\ \ \ \ \}}
+\DoxyCodeLine{00192\ }
+\DoxyCodeLine{00193\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{classfc_1_1url}{url}}\ =\ cp.\mbox{\hyperlink{structsysio_1_1client_1_1http_1_1connection__param_ab7f6b92944f0d49a26c332b5d11aedfb}{url}};}
+\DoxyCodeLine{00194\ }
+\DoxyCodeLine{00195\ \ \ \ boost::asio::streambuf\ request;}
+\DoxyCodeLine{00196\ \ \ \ std::ostream\ request\_stream(\&request);}
+\DoxyCodeLine{00197\ \ \ \ \textcolor{keyword}{auto}\ host\_header\_value\ =\ format\_host\_header(\mbox{\hyperlink{classfc_1_1url}{url}});}
+\DoxyCodeLine{00198\ \ \ \ request\_stream\ <<\ \textcolor{stringliteral}{"{}POST\ "{}}\ <<\ \mbox{\hyperlink{classfc_1_1url}{url}}.\mbox{\hyperlink{classfc_1_1url_a10ff9ce7fa8d6bfb6eec81652c4f0df9}{path}}\ <<\ \textcolor{stringliteral}{"{}\ HTTP/1.0\(\backslash\)r\(\backslash\)n"{}};}
+\DoxyCodeLine{00199\ \ \ \ request\_stream\ <<\ \textcolor{stringliteral}{"{}Host:\ "{}}\ <<\ host\_header\_value\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)r\(\backslash\)n"{}};}
+\DoxyCodeLine{00200\ \ \ \ request\_stream\ <<\ \textcolor{stringliteral}{"{}content-\/length:\ "{}}\ <<\ postjson.size()\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)r\(\backslash\)n"{}};}
+\DoxyCodeLine{00201\ \ \ \ request\_stream\ <<\ \textcolor{stringliteral}{"{}Accept:\ */*\(\backslash\)r\(\backslash\)n"{}};}
+\DoxyCodeLine{00202\ \ \ \ request\_stream\ <<\ \textcolor{stringliteral}{"{}Connection:\ close\(\backslash\)r\(\backslash\)n"{}};}
+\DoxyCodeLine{00203\ \ \ \ \textcolor{comment}{//\ append\ more\ customized\ headers}}
+\DoxyCodeLine{00204\ \ \ \ std::vector<string>::iterator\ itr;}
+\DoxyCodeLine{00205\ \ \ \ \textcolor{keywordflow}{for}\ (itr\ =\ cp.\mbox{\hyperlink{structsysio_1_1client_1_1http_1_1connection__param_abd76cc41b1f809966dfbf900b370f3a7}{headers}}.begin();\ itr\ !=\ cp.\mbox{\hyperlink{structsysio_1_1client_1_1http_1_1connection__param_abd76cc41b1f809966dfbf900b370f3a7}{headers}}.end();\ itr++)\ \{}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ request\_stream\ <<\ *itr\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)r\(\backslash\)n"{}};}
+\DoxyCodeLine{00207\ \ \ \ \}}
+\DoxyCodeLine{00208\ \ \ \ request\_stream\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)r\(\backslash\)n"{}};}
+\DoxyCodeLine{00209\ \ \ \ request\_stream\ <<\ postjson;}
+\DoxyCodeLine{00210\ }
+\DoxyCodeLine{00211\ \ \ \ \textcolor{keywordflow}{if}\ (\ \mbox{\hyperlink{programs_2clio_2main_8cpp_a6b5337ce19efcf252e2018f54d37f435}{print\_request}}\ )\ \{}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}(request.size(),\ \textcolor{charliteral}{'\(\backslash\)0'});}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ buffer\_copy(boost::asio::buffer(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}),\ request.data());}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}REQUEST:"{}}\ <<\ std::endl}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/"{}}\ <<\ std::endl}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ <<\ std::endl}
+\DoxyCodeLine{00217\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/"{}}\ <<\ std::endl;}
+\DoxyCodeLine{00218\ \ \ \ \}}
+\DoxyCodeLine{00219\ }
+\DoxyCodeLine{00220\ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ status\_code;}
+\DoxyCodeLine{00221\ \ \ \ std::string\ re;}
+\DoxyCodeLine{00222\ }
+\DoxyCodeLine{00223\ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{classfc_1_1url}{url}}.scheme\ ==\ \textcolor{stringliteral}{"{}unix"{}})\ \{}
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \ \ \ boost::asio::local::stream\_protocol::socket\ unix\_socket(cp.\mbox{\hyperlink{structsysio_1_1client_1_1http_1_1connection__param_ad03d61e756db857262de7656156207cf}{context}}-\/>ios);}
+\DoxyCodeLine{00226\ \ \ \ \ \ \ \ \ \ unix\_socket.connect(boost::asio::local::stream\_protocol::endpoint(\mbox{\hyperlink{classfc_1_1url}{url}}.server));}
+\DoxyCodeLine{00227\ \ \ \ \ \ \ \ \ \ re\ =\ do\_txrx(unix\_socket,\ request,\ status\_code);}
+\DoxyCodeLine{00228\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00229\ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(\mbox{\hyperlink{classfc_1_1url}{url}}.scheme\ ==\ \textcolor{stringliteral}{"{}http"{}})\ \{}
+\DoxyCodeLine{00230\ \ \ \ \ \ \ \ \ \ tcp::socket\ socket(cp.\mbox{\hyperlink{structsysio_1_1client_1_1http_1_1connection__param_ad03d61e756db857262de7656156207cf}{context}}-\/>ios);}
+\DoxyCodeLine{00231\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a4d32eca0ecac32376ce5478f3d8f9f98}{do\_connect}}(socket,\ \mbox{\hyperlink{classfc_1_1url}{url}});}
+\DoxyCodeLine{00232\ \ \ \ \ \ \ \ \ \ re\ =\ \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a162de4256c3fbe69ad6a62bc40b444b2}{do\_txrx}}(socket,\ request,\ status\_code);}
+\DoxyCodeLine{00233\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00234\ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{\ \textcolor{comment}{//https}}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \ \ \ boost::asio::ssl::context\ ssl\_context(boost::asio::ssl::context::sslv23\_client);}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_af7aa87352b9164f6299f4300a2c85b05}{fc::add\_platform\_root\_cas\_to\_context}}(ssl\_context);}
+\DoxyCodeLine{00237\ }
+\DoxyCodeLine{00238\ \ \ \ \ \ \ \ \ \ boost::asio::ssl::stream<boost::asio::ip::tcp::socket>\ socket(cp.\mbox{\hyperlink{structsysio_1_1client_1_1http_1_1connection__param_ad03d61e756db857262de7656156207cf}{context}}-\/>ios,\ ssl\_context);}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \ SSL\_set\_tlsext\_host\_name(socket.native\_handle(),\ \mbox{\hyperlink{classfc_1_1url}{url}}.server.c\_str());}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(cp.\mbox{\hyperlink{structsysio_1_1client_1_1http_1_1connection__param_a6ecee51e3d44bb243beaf2e6eff43057}{verify\_cert}})\ \{}
+\DoxyCodeLine{00241\ \ \ \ \ \ \ \ \ \ \ \ \ socket.set\_verify\_mode(boost::asio::ssl::verify\_peer);}
+\DoxyCodeLine{00242\ \ \ \ \ \ \ \ \ \ \ \ \ socket.set\_verify\_callback(boost::asio::ssl::rfc2818\_verification(\mbox{\hyperlink{classfc_1_1url}{url}}.server));}
+\DoxyCodeLine{00243\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00244\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a4d32eca0ecac32376ce5478f3d8f9f98}{do\_connect}}(socket.next\_layer(),\ \mbox{\hyperlink{classfc_1_1url}{url}});}
+\DoxyCodeLine{00245\ \ \ \ \ \ \ \ \ \ socket.handshake(boost::asio::ssl::stream\_base::client);}
+\DoxyCodeLine{00246\ \ \ \ \ \ \ \ \ \ re\ =\ \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a162de4256c3fbe69ad6a62bc40b444b2}{do\_txrx}}(socket,\ request,\ status\_code);}
+\DoxyCodeLine{00247\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//try\ and\ do\ a\ clean\ shutdown;\ but\ swallow\ if\ this\ fails\ (other\ side\ could\ have\ already\ gave\ TCP\ the\ ax)}}
+\DoxyCodeLine{00248\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{socket.shutdown();\}\ \textcolor{keywordflow}{catch}(...)\ \{\}}
+\DoxyCodeLine{00249\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00250\ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\ invalid\_http\_request\&\ e\ )\ \{}
+\DoxyCodeLine{00251\ \ \ \ \ \ \ e.append\_log(\ \mbox{\hyperlink{log__message_8hpp_a4a4df4bb5cffbe07aadf7d29fd44c75e}{FC\_LOG\_MESSAGE}}(\ info,\ \textcolor{stringliteral}{"{}Please\ verify\ this\ url\ is\ valid:\ \$\{url\}"{}},\ (\textcolor{stringliteral}{"{}url"{}},\ \mbox{\hyperlink{classfc_1_1url}{url}}.scheme\ +\ \textcolor{stringliteral}{"{}://"{}}\ +\ \mbox{\hyperlink{classfc_1_1url}{url}}.server\ +\ \textcolor{stringliteral}{"{}:"{}}\ +\ \mbox{\hyperlink{classfc_1_1url}{url}}.\mbox{\hyperlink{classfc_1_1url_ad51c6edfcf040bbaac94de66393214ed}{port}}\ +\ \mbox{\hyperlink{classfc_1_1url}{url}}.\mbox{\hyperlink{classfc_1_1url_a10ff9ce7fa8d6bfb6eec81652c4f0df9}{path}})\ )\ );}
+\DoxyCodeLine{00252\ \ \ \ \ \ \ e.append\_log(\ \mbox{\hyperlink{log__message_8hpp_a4a4df4bb5cffbe07aadf7d29fd44c75e}{FC\_LOG\_MESSAGE}}(\ info,\ \textcolor{stringliteral}{"{}If\ the\ condition\ persists,\ please\ contact\ the\ RPC\ server\ administrator\ for\ \$\{server\}!"{}},\ (\textcolor{stringliteral}{"{}server"{}},\ \mbox{\hyperlink{classfc_1_1url}{url}}.server)\ )\ );}
+\DoxyCodeLine{00253\ \ \ \ \ \ \ \textcolor{keywordflow}{throw};}
+\DoxyCodeLine{00254\ \ \ \ \}}
+\DoxyCodeLine{00255\ }
+\DoxyCodeLine{00256\ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ response\_result\ =\ \mbox{\hyperlink{classfc_1_1json_afad69f9f9c2a9f0105aae99f532f90cb}{fc::json::from\_string}}(re);}
+\DoxyCodeLine{00257\ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{programs_2clio_2main_8cpp_ad75d20d7df265e3aca3c2003476caa61}{print\_response}}\ )\ \{}
+\DoxyCodeLine{00258\ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}RESPONSE:"{}}\ <<\ std::endl}
+\DoxyCodeLine{00259\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/"{}}\ <<\ std::endl}
+\DoxyCodeLine{00260\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \mbox{\hyperlink{classfc_1_1json_ae6c022ab581a9552ae2c97ff5d73aaf8}{fc::json::to\_pretty\_string}}(\ response\_result\ )\ <<\ std::endl}
+\DoxyCodeLine{00261\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/"{}}\ <<\ std::endl;}
+\DoxyCodeLine{00262\ \ \ \ \}}
+\DoxyCodeLine{00263\ \ \ \ \textcolor{keywordflow}{if}(\ status\_code\ ==\ 200\ ||\ status\_code\ ==\ 201\ ||\ status\_code\ ==\ 202\ )\ \{}
+\DoxyCodeLine{00264\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ response\_result;}
+\DoxyCodeLine{00265\ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(\ status\_code\ ==\ 404\ )\ \{}
+\DoxyCodeLine{00266\ \ \ \ \ \ \ \textcolor{comment}{//\ Unknown\ endpoint}}
+\DoxyCodeLine{00267\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classfc_1_1url}{url}}.\mbox{\hyperlink{classfc_1_1url_a10ff9ce7fa8d6bfb6eec81652c4f0df9}{path}}.compare(0,\ \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a5f8551ac3deb3b140ee85223b03d84c1}{chain\_func\_base}}.size(),\ chain\_func\_base)\ ==\ 0)\ \{}
+\DoxyCodeLine{00268\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ chain::missing\_chain\_api\_plugin\_exception(\mbox{\hyperlink{log__message_8hpp_a4a4df4bb5cffbe07aadf7d29fd44c75e}{FC\_LOG\_MESSAGE}}(error,\ \textcolor{stringliteral}{"{}Chain\ API\ plugin\ is\ not\ enabled"{}}));}
+\DoxyCodeLine{00269\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classfc_1_1url}{url}}.\mbox{\hyperlink{classfc_1_1url_a10ff9ce7fa8d6bfb6eec81652c4f0df9}{path}}.compare(0,\ \mbox{\hyperlink{namespacesysio_1_1client_1_1http_ab164f41095b2cb6a96b9c9316200bdf5}{wallet\_func\_base}}.size(),\ wallet\_func\_base)\ ==\ 0)\ \{}
+\DoxyCodeLine{00270\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ chain::missing\_wallet\_api\_plugin\_exception(\mbox{\hyperlink{log__message_8hpp_a4a4df4bb5cffbe07aadf7d29fd44c75e}{FC\_LOG\_MESSAGE}}(error,\ \textcolor{stringliteral}{"{}Wallet\ is\ not\ available"{}}));}
+\DoxyCodeLine{00271\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classfc_1_1url}{url}}.\mbox{\hyperlink{classfc_1_1url_a10ff9ce7fa8d6bfb6eec81652c4f0df9}{path}}.compare(0,\ \mbox{\hyperlink{namespacesysio_1_1client_1_1http_aef5798a3297cd0746689ff6c67ab2e34}{history\_func\_base}}.size(),\ history\_func\_base)\ ==\ 0)\ \{}
+\DoxyCodeLine{00272\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ chain::missing\_history\_api\_plugin\_exception(\mbox{\hyperlink{log__message_8hpp_a4a4df4bb5cffbe07aadf7d29fd44c75e}{FC\_LOG\_MESSAGE}}(error,\ \textcolor{stringliteral}{"{}History\ API\ plugin\ is\ not\ enabled"{}}));}
+\DoxyCodeLine{00273\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classfc_1_1url}{url}}.\mbox{\hyperlink{classfc_1_1url_a10ff9ce7fa8d6bfb6eec81652c4f0df9}{path}}.compare(0,\ \mbox{\hyperlink{namespacesysio_1_1client_1_1http_aef40a2603c3dfd089fb26b663ef1b9e7}{net\_func\_base}}.size(),\ net\_func\_base)\ ==\ 0)\ \{}
+\DoxyCodeLine{00274\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ chain::missing\_net\_api\_plugin\_exception(\mbox{\hyperlink{log__message_8hpp_a4a4df4bb5cffbe07aadf7d29fd44c75e}{FC\_LOG\_MESSAGE}}(error,\ \textcolor{stringliteral}{"{}Net\ API\ plugin\ is\ not\ enabled"{}}));}
+\DoxyCodeLine{00275\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classfc_1_1url}{url}}.\mbox{\hyperlink{classfc_1_1url_a10ff9ce7fa8d6bfb6eec81652c4f0df9}{path}}.compare(0,\ \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a29552db68fc586bddf012299ec58917d}{trace\_api\_func\_base}}.size(),\ trace\_api\_func\_base)\ ==\ 0)\ \{}
+\DoxyCodeLine{00276\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ re.find(\textcolor{stringliteral}{"{}Trace\ API:"{}})\ ==\ string::npos\ )\ \{}
+\DoxyCodeLine{00277\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ chain::missing\_trace\_api\_plugin\_exception(\mbox{\hyperlink{log__message_8hpp_a4a4df4bb5cffbe07aadf7d29fd44c75e}{FC\_LOG\_MESSAGE}}(error,\ \textcolor{stringliteral}{"{}Trace\ API\ plugin\ is\ not\ enabled"{}}));}
+\DoxyCodeLine{00278\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00279\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00280\ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00281\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \&\&error\_info\ =\ response\_result.as<\mbox{\hyperlink{structsysio_1_1error__results}{sysio::error\_results}}>().error;}
+\DoxyCodeLine{00282\ \ \ \ \ \ \ \textcolor{comment}{//\ Construct\ fc\ exception\ from\ error}}
+\DoxyCodeLine{00283\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ \&error\_details\ =\ error\_info.details;}
+\DoxyCodeLine{00284\ }
+\DoxyCodeLine{00285\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a54370140f7c964a12e90393d525605d1}{fc::log\_messages}}\ logs;}
+\DoxyCodeLine{00286\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\ itr\ =\ error\_details.begin();\ itr\ !=\ error\_details.end();\ itr++)\ \{}
+\DoxyCodeLine{00287\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{structcontext}{context}}\ =\ \mbox{\hyperlink{classfc_1_1log__context}{fc::log\_context}}(\mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4a836fc8bbd6f9c9445879679eb512df49}{fc::log\_level::error}},\ itr-\/>file.data(),\ itr-\/>line\_number,\ itr-\/>method.data());}
+\DoxyCodeLine{00288\ \ \ \ \ \ \ \ \ \ logs.emplace\_back(\mbox{\hyperlink{classfc_1_1log__message}{fc::log\_message}}(\mbox{\hyperlink{structcontext}{context}},\ itr-\/>message));}
+\DoxyCodeLine{00289\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00290\ }
+\DoxyCodeLine{00291\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{classfc_1_1exception}{fc::exception}}(logs,\ error\_info.code,\ error\_info.name,\ error\_info.what);}
+\DoxyCodeLine{00292\ \ \ \ \}}
+\DoxyCodeLine{00293\ }
+\DoxyCodeLine{00294\ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ status\_code\ ==\ 200,\ http\_request\_fail,\ \textcolor{stringliteral}{"{}Error\ code\ \$\{c\}\(\backslash\)n:\ \$\{msg\}\(\backslash\)n"{}},\ (\textcolor{stringliteral}{"{}c"{}},\ status\_code)(\textcolor{stringliteral}{"{}msg"{}},\ re)\ );}
+\DoxyCodeLine{00295\ \ \ \ \textcolor{keywordflow}{return}\ response\_result;}
+\DoxyCodeLine{00296\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1client_1_1http_a1f247437c0bb15fa7286d76c8139d41c_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1client_1_1http_a1f247437c0bb15fa7286d76c8139d41c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacesysio_1_1client_1_1http_a162de4256c3fbe69ad6a62bc40b444b2}\index{sysio::client::http@{sysio::client::http}!do\_txrx@{do\_txrx}}
+\index{do\_txrx@{do\_txrx}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{do\_txrx()}{do\_txrx()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_a162de4256c3fbe69ad6a62bc40b444b2} 
+template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+std\+::string sysio\+::client\+::http\+::do\+\_\+txrx (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{socket}{, }\item[{boost\+::asio\+::streambuf \&}]{request\+\_\+buff}{, }\item[{unsigned int \&}]{status\+\_\+code}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{httpc_8cpp_source_l00058}{58}} of file \mbox{\hyperlink{httpc_8cpp_source}{httpc.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \textcolor{comment}{//\ Send\ the\ request.}}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ boost::asio::write(socket,\ request\_buff);}
+\DoxyCodeLine{00061\ }
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \textcolor{comment}{//\ Read\ the\ response\ status\ line.\ The\ response\ streambuf\ will\ automatically}}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \textcolor{comment}{//\ grow\ to\ accommodate\ the\ entire\ line.\ The\ growth\ may\ be\ limited\ by\ passing}}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \textcolor{comment}{//\ a\ maximum\ size\ to\ the\ streambuf\ constructor.}}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ boost::asio::streambuf\ response;}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ boost::asio::read\_until(socket,\ response,\ \textcolor{stringliteral}{"{}\(\backslash\)r\(\backslash\)n"{}});}
+\DoxyCodeLine{00067\ }
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \textcolor{comment}{//\ Check\ that\ response\ is\ OK.}}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ std::istream\ response\_stream(\&response);}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ std::string\ http\_version;}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ response\_stream\ >>\ http\_version;}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ response\_stream\ >>\ status\_code;}
+\DoxyCodeLine{00073\ }
+\DoxyCodeLine{00074\ \ \ \ \ \ \ std::string\ status\_message;}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ std::getline(response\_stream,\ status\_message);}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ !(!response\_stream\ ||\ http\_version.substr(0,\ 5)\ !=\ \textcolor{stringliteral}{"{}HTTP/"{}}),\ invalid\_http\_response,\ \textcolor{stringliteral}{"{}Invalid\ Response"{}}\ );}
+\DoxyCodeLine{00077\ }
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \textcolor{comment}{//\ Read\ the\ response\ headers,\ which\ are\ terminated\ by\ a\ blank\ line.}}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ boost::asio::read\_until(socket,\ response,\ \textcolor{stringliteral}{"{}\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)n"{}});}
+\DoxyCodeLine{00080\ }
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \textcolor{comment}{//\ Process\ the\ response\ headers.}}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ std::string\ header;}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ response\_content\_length\ =\ -\/1;}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ std::regex\ clregex(R\textcolor{stringliteral}{"{}xx(\string^content-\/length:\(\backslash\)s+(\(\backslash\)d+))xx"{},\ std::regex\_constants::icase);}}
+\DoxyCodeLine{00085\ \textcolor{stringliteral}{\ \ \ \ \ \ }\textcolor{keywordflow}{while}\ (std::getline(response\_stream,\ header)\ \&\&\ header\ !=\ \textcolor{stringliteral}{"{}\(\backslash\)r"{}})\ \{}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \ std::smatch\ match;}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(std::regex\_search(header,\ match,\ clregex))}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \ \ \ response\_content\_length\ =\ std::stoi(match[1]);}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00090\ }
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \textcolor{comment}{//\ Attempt\ to\ read\ the\ response\ body\ using\ the\ length\ indicated\ by\ the}}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \textcolor{comment}{//\ Content-\/length\ header.\ If\ the\ header\ was\ not\ present\ just\ read\ all\ available\ bytes.}}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ response\_content\_length\ !=\ -\/1\ )\ \{}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ response\_content\_length\ -\/=\ response.size();}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ response\_content\_length\ >\ 0\ )}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \ \ \ boost::asio::read(socket,\ response,\ boost::asio::transfer\_exactly(response\_content\_length));}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ boost::system::error\_code\ ec;}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ boost::asio::read(socket,\ response,\ boost::asio::transfer\_all(),\ ec);}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(!ec\ ||\ ec\ ==\ boost::asio::ssl::error::stream\_truncated,\ http\_exception,\ \textcolor{stringliteral}{"{}Unable\ to\ read\ http\ response:\ \$\{err\}"{}},\ (\textcolor{stringliteral}{"{}err"{}},ec.message()));}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00102\ }
+\DoxyCodeLine{00103\ \ \ \ \ \ \ std::stringstream\ re;}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ re\ <<\ \&response;}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ re.str();}
+\DoxyCodeLine{00106\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=171pt]{namespacesysio_1_1client_1_1http_a162de4256c3fbe69ad6a62bc40b444b2_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1client_1_1http_a162de4256c3fbe69ad6a62bc40b444b2_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacesysio_1_1client_1_1http_a394c79af39689d7a9a011291e3ec9f96}\index{sysio::client::http@{sysio::client::http}!FC\_DECLARE\_EXCEPTION@{FC\_DECLARE\_EXCEPTION}}
+\index{FC\_DECLARE\_EXCEPTION@{FC\_DECLARE\_EXCEPTION}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{FC\_DECLARE\_EXCEPTION()}{FC\_DECLARE\_EXCEPTION()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_a394c79af39689d7a9a011291e3ec9f96} 
+sysio\+::client\+::http\+::\+FC\+\_\+\+DECLARE\+\_\+\+EXCEPTION (\begin{DoxyParamCaption}\item[{connection\+\_\+exception}]{}{, }\item[{1100000}]{}{, }\item[{"{}Connection Exception"{}}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{namespacesysio_1_1client_1_1http_ad1b87692ec6218b59d58a092106040f9}\index{sysio::client::http@{sysio::client::http}!format\_host\_header@{format\_host\_header}}
+\index{format\_host\_header@{format\_host\_header}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{format\_host\_header()}{format\_host\_header()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_ad1b87692ec6218b59d58a092106040f9} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::client\+::http\+::format\+\_\+host\+\_\+header (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1client_1_1http_1_1resolved__url}{resolved\+\_\+url}} \&}]{url}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{httpc_8cpp_source_l00172}{172}} of file \mbox{\hyperlink{httpc_8cpp_source}{httpc.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \textcolor{comment}{//\ common\ practice\ is\ to\ only\ make\ the\ port\ explicit\ when\ it\ is\ the\ non-\/default\ port}}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{classfc_1_1url}{url}}.scheme\ ==\ \textcolor{stringliteral}{"{}https"{}}\ \&\&\ \mbox{\hyperlink{classfc_1_1url}{url}}.resolved\_port\ ==\ 443)\ ||}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{classfc_1_1url}{url}}.scheme\ ==\ \textcolor{stringliteral}{"{}http"{}}\ \&\&\ \mbox{\hyperlink{classfc_1_1url}{url}}.resolved\_port\ ==\ 80)}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ )\ \{}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1url}{url}}.server;}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1url}{url}}.server\ +\ \textcolor{stringliteral}{"{}:"{}}\ +\ \mbox{\hyperlink{classfc_1_1url}{url}}.\mbox{\hyperlink{classfc_1_1url_ad51c6edfcf040bbaac94de66393214ed}{port}};}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00182\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=288pt]{namespacesysio_1_1client_1_1http_ad1b87692ec6218b59d58a092106040f9_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1client_1_1http_ad1b87692ec6218b59d58a092106040f9_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacesysio_1_1client_1_1http_aa22792d25e080a60a880b433d1ef8933}\index{sysio::client::http@{sysio::client::http}!parse\_url@{parse\_url}}
+\index{parse\_url@{parse\_url}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{parse\_url()}{parse\_url()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_aa22792d25e080a60a880b433d1ef8933} 
+\mbox{\hyperlink{structsysio_1_1client_1_1http_1_1parsed__url}{parsed\+\_\+url}} sysio\+::client\+::http\+::parse\+\_\+url (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&}]{server\+\_\+url}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{httpc_8cpp_source_l00108}{108}} of file \mbox{\hyperlink{httpc_8cpp_source}{httpc.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1client_1_1http_1_1parsed__url}{parsed\_url}}\ res;}
+\DoxyCodeLine{00110\ }
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \textcolor{comment}{//unix\ socket\ doesn't\ quite\ follow\ classical\ "{}URL"{}\ rules\ so\ deal\ with\ it\ manually}}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(boost::algorithm::starts\_with(server\_url,\ \textcolor{stringliteral}{"{}unix://"{}}))\ \{}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \ res.\mbox{\hyperlink{structsysio_1_1client_1_1http_1_1parsed__url_a19842d829e1fcf79ac811f0b831ce057}{scheme}}\ =\ \textcolor{stringliteral}{"{}unix"{}};}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \ res.\mbox{\hyperlink{structsysio_1_1client_1_1http_1_1parsed__url_a22cd359bb31967c2c18cab06f91e598f}{server}}\ =\ server\_url.substr(strlen(\textcolor{stringliteral}{"{}unix://"{}}));}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ res;}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00117\ }
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \textcolor{comment}{//via\ rfc3986\ and\ modified\ a\ bit\ to\ suck\ out\ the\ port\ number}}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \textcolor{comment}{//Sadly\ this\ doesn't\ work\ for\ ipv6\ addresses}}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ std::regex\ rgx(R\textcolor{stringliteral}{"{}xx(\string^(([\string^:/?\#]+):)?(//([\string^:/?\#]*)(:(\(\backslash\)d+))?)?([\string^?\#]*)(\(\backslash\)?([\string^\#]*))?(\#(.*))?)xx"{});}}
+\DoxyCodeLine{00121\ \textcolor{stringliteral}{\ \ \ \ \ \ std::smatch\ match;}}
+\DoxyCodeLine{00122\ \textcolor{stringliteral}{\ \ \ \ \ \ }\textcolor{keywordflow}{if}(std::regex\_search(server\_url.begin(),\ server\_url.end(),\ match,\ rgx))\ \{}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \ res.\mbox{\hyperlink{structsysio_1_1client_1_1http_1_1parsed__url_a19842d829e1fcf79ac811f0b831ce057}{scheme}}\ =\ match[2];}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \ res.\mbox{\hyperlink{structsysio_1_1client_1_1http_1_1parsed__url_a22cd359bb31967c2c18cab06f91e598f}{server}}\ =\ match[4];}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \ res.\mbox{\hyperlink{structsysio_1_1client_1_1http_1_1parsed__url_ac89717e77063cbb9160b440198f80ab0}{port}}\ =\ match[6];}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ res.\mbox{\hyperlink{structsysio_1_1client_1_1http_1_1parsed__url_accb5f745501d19d707fab8df1d9cf28f}{path}}\ =\ match[7];}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(res.\mbox{\hyperlink{structsysio_1_1client_1_1http_1_1parsed__url_a19842d829e1fcf79ac811f0b831ce057}{scheme}}\ !=\ \textcolor{stringliteral}{"{}http"{}}\ \&\&\ res.\mbox{\hyperlink{structsysio_1_1client_1_1http_1_1parsed__url_a19842d829e1fcf79ac811f0b831ce057}{scheme}}\ !=\ \textcolor{stringliteral}{"{}https"{}})}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a1bfa656552ea0534b2c91ee0fe33f850}{SYS\_THROW}}(fail\_to\_resolve\_host,\ \textcolor{stringliteral}{"{}Unrecognized\ URL\ scheme\ (\$\{s\})\ in\ URL\ \(\backslash\)"{}\$\{u\}\(\backslash\)"{}"{}},\ (\textcolor{stringliteral}{"{}s"{}},\ res.\mbox{\hyperlink{structsysio_1_1client_1_1http_1_1parsed__url_a19842d829e1fcf79ac811f0b831ce057}{scheme}})(\textcolor{stringliteral}{"{}u"{}},\ server\_url));}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(res.\mbox{\hyperlink{structsysio_1_1client_1_1http_1_1parsed__url_a22cd359bb31967c2c18cab06f91e598f}{server}}.empty())}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a1bfa656552ea0534b2c91ee0fe33f850}{SYS\_THROW}}(fail\_to\_resolve\_host,\ \textcolor{stringliteral}{"{}No\ server\ parsed\ from\ URL\ \(\backslash\)"{}\$\{u\}\(\backslash\)"{}"{}},\ (\textcolor{stringliteral}{"{}u"{}},\ server\_url));}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(res.\mbox{\hyperlink{structsysio_1_1client_1_1http_1_1parsed__url_ac89717e77063cbb9160b440198f80ab0}{port}}.empty())}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \ res.\mbox{\hyperlink{structsysio_1_1client_1_1http_1_1parsed__url_ac89717e77063cbb9160b440198f80ab0}{port}}\ =\ res.\mbox{\hyperlink{structsysio_1_1client_1_1http_1_1parsed__url_a19842d829e1fcf79ac811f0b831ce057}{scheme}}\ ==\ \textcolor{stringliteral}{"{}http"{}}\ ?\ \textcolor{stringliteral}{"{}80"{}}\ :\ \textcolor{stringliteral}{"{}443"{}};}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ boost::trim\_right\_if(res.\mbox{\hyperlink{structsysio_1_1client_1_1http_1_1parsed__url_accb5f745501d19d707fab8df1d9cf28f}{path}},\ boost::is\_any\_of(\textcolor{stringliteral}{"{}/"{}}));}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ res;}
+\DoxyCodeLine{00136\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=171pt]{namespacesysio_1_1client_1_1http_aa22792d25e080a60a880b433d1ef8933_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesysio_1_1client_1_1http_aa22792d25e080a60a880b433d1ef8933_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacesysio_1_1client_1_1http_af9d5ab19d85cb83ea8b32e8ccea594b1}\index{sysio::client::http@{sysio::client::http}!resolve\_url@{resolve\_url}}
+\index{resolve\_url@{resolve\_url}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{resolve\_url()}{resolve\_url()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_af9d5ab19d85cb83ea8b32e8ccea594b1} 
+\mbox{\hyperlink{structsysio_1_1client_1_1http_1_1resolved__url}{resolved\+\_\+url}} sysio\+::client\+::http\+::resolve\+\_\+url (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacesysio_1_1client_1_1http_a4cb0cf6309fe359235a03d3964524b22}{http\+\_\+context}} \&}]{context}{, }\item[{const \mbox{\hyperlink{structsysio_1_1client_1_1http_1_1parsed__url}{parsed\+\_\+url}} \&}]{url}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{httpc_8cpp_source_l00138}{138}} of file \mbox{\hyperlink{httpc_8cpp_source}{httpc.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{classfc_1_1url}{url}}.scheme\ ==\ \textcolor{stringliteral}{"{}unix"{}})}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1client_1_1http_1_1resolved__url}{resolved\_url}}(\mbox{\hyperlink{classfc_1_1url}{url}});}
+\DoxyCodeLine{00141\ }
+\DoxyCodeLine{00142\ \ \ \ \ \ \ tcp::resolver\ resolver(\mbox{\hyperlink{structcontext}{context}}-\/>ios);}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ boost::system::error\_code\ ec;}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ result\ =\ resolver.resolve(tcp::v4(),\ \mbox{\hyperlink{classfc_1_1url}{url}}.server,\ \mbox{\hyperlink{classfc_1_1url}{url}}.\mbox{\hyperlink{classfc_1_1url_ad51c6edfcf040bbaac94de66393214ed}{port}},\ ec);}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ec)\ \{}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a1bfa656552ea0534b2c91ee0fe33f850}{SYS\_THROW}}(fail\_to\_resolve\_host,\ \textcolor{stringliteral}{"{}Error\ resolving\ \(\backslash\)"{}\$\{server\}:\$\{port\}\(\backslash\)"{}\ :\ \$\{m\}"{}},\ (\textcolor{stringliteral}{"{}server"{}},\ \mbox{\hyperlink{classfc_1_1url}{url}}.server)(\textcolor{stringliteral}{"{}port"{}},\mbox{\hyperlink{classfc_1_1url}{url}}.\mbox{\hyperlink{classfc_1_1url_ad51c6edfcf040bbaac94de66393214ed}{port}})(\textcolor{stringliteral}{"{}m"{}},ec.message()));}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00148\ }
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \textcolor{comment}{//\ non\ error\ results\ are\ guaranteed\ to\ return\ a\ non-\/empty\ range}}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1vector}{vector<string>}}\ resolved\_addresses;}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ resolved\_addresses.reserve(result.size());}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ std::optional<uint16\_t>\ resolved\_port;}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ is\_loopback\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00154\ }
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ :\ result)\ \{}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ addr\ =\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.endpoint().address();}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (addr.is\_v6())\ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ port\ =\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.endpoint().port();}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \ resolved\_addresses.emplace\_back(addr.to\_string());}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \ is\_loopback\ =\ is\_loopback\ \&\&\ addr.is\_loopback();}
+\DoxyCodeLine{00161\ }
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (resolved\_port)\ \{}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(*resolved\_port\ ==\ port,\ resolved\_to\_multiple\_ports,\ \textcolor{stringliteral}{"{}Service\ name\ \(\backslash\)"{}\$\{port\}\(\backslash\)"{}\ resolved\ to\ multiple\ ports\ and\ this\ is\ not\ supported!"{}},\ (\textcolor{stringliteral}{"{}port"{}},\mbox{\hyperlink{classfc_1_1url}{url}}.\mbox{\hyperlink{classfc_1_1url_ad51c6edfcf040bbaac94de66393214ed}{port}}));}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \ \ \ \ resolved\_port\ =\ port;}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00168\ }
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ resolved\_url(\mbox{\hyperlink{classfc_1_1url}{url}},\ std::move(resolved\_addresses),\ *resolved\_port,\ is\_loopback);}
+\DoxyCodeLine{00170\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=270pt]{namespacesysio_1_1client_1_1http_af9d5ab19d85cb83ea8b32e8ccea594b1_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=315pt]{namespacesysio_1_1client_1_1http_af9d5ab19d85cb83ea8b32e8ccea594b1_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{namespacesysio_1_1client_1_1http_a5f8551ac3deb3b140ee85223b03d84c1}\index{sysio::client::http@{sysio::client::http}!chain\_func\_base@{chain\_func\_base}}
+\index{chain\_func\_base@{chain\_func\_base}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{chain\_func\_base}{chain\_func\_base}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_a5f8551ac3deb3b140ee85223b03d84c1} 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::client\+::http\+::chain\+\_\+func\+\_\+base = "{}/v1/chain"{}}
+
+
+
+Definition at line \mbox{\hyperlink{httpc_8hpp_source_l00081}{81}} of file \mbox{\hyperlink{httpc_8hpp_source}{httpc.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1client_1_1http_ad602c2c22ca30cd5cc4f819457c3c799}\index{sysio::client::http@{sysio::client::http}!compute\_txn\_func@{compute\_txn\_func}}
+\index{compute\_txn\_func@{compute\_txn\_func}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{compute\_txn\_func}{compute\_txn\_func}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_ad602c2c22ca30cd5cc4f819457c3c799} 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::client\+::http\+::compute\+\_\+txn\+\_\+func = chain\+\_\+func\+\_\+base + "{}/compute\+\_\+transaction"{}}
+
+
+
+Definition at line \mbox{\hyperlink{httpc_8hpp_source_l00087}{87}} of file \mbox{\hyperlink{httpc_8hpp_source}{httpc.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1client_1_1http_a5f438e664007e77988b89f2ddfb505e8}\index{sysio::client::http@{sysio::client::http}!get\_abi\_func@{get\_abi\_func}}
+\index{get\_abi\_func@{get\_abi\_func}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{get\_abi\_func}{get\_abi\_func}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_a5f438e664007e77988b89f2ddfb505e8} 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::client\+::http\+::get\+\_\+abi\+\_\+func = chain\+\_\+func\+\_\+base + "{}/get\+\_\+abi"{}}
+
+
+
+Definition at line \mbox{\hyperlink{httpc_8hpp_source_l00098}{98}} of file \mbox{\hyperlink{httpc_8hpp_source}{httpc.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1client_1_1http_a497de9c2d0b48ace77babd28f3797dd5}\index{sysio::client::http@{sysio::client::http}!get\_account\_func@{get\_account\_func}}
+\index{get\_account\_func@{get\_account\_func}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{get\_account\_func}{get\_account\_func}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_a497de9c2d0b48ace77babd28f3797dd5} 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::client\+::http\+::get\+\_\+account\+\_\+func = chain\+\_\+func\+\_\+base + "{}/get\+\_\+account"{}}
+
+
+
+Definition at line \mbox{\hyperlink{httpc_8hpp_source_l00093}{93}} of file \mbox{\hyperlink{httpc_8hpp_source}{httpc.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1client_1_1http_a62306daa50af435c0b167b01fd1d31f7}\index{sysio::client::http@{sysio::client::http}!get\_actions\_func@{get\_actions\_func}}
+\index{get\_actions\_func@{get\_actions\_func}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{get\_actions\_func}{get\_actions\_func}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_a62306daa50af435c0b167b01fd1d31f7} 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::client\+::http\+::get\+\_\+actions\+\_\+func = history\+\_\+func\+\_\+base + "{}/get\+\_\+actions"{}}
+
+
+
+Definition at line \mbox{\hyperlink{httpc_8hpp_source_l00109}{109}} of file \mbox{\hyperlink{httpc_8hpp_source}{httpc.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1client_1_1http_af6febaf9e62fdbc601121454845246c2}\index{sysio::client::http@{sysio::client::http}!get\_block\_func@{get\_block\_func}}
+\index{get\_block\_func@{get\_block\_func}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{get\_block\_func}{get\_block\_func}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_af6febaf9e62fdbc601121454845246c2} 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::client\+::http\+::get\+\_\+block\+\_\+func = chain\+\_\+func\+\_\+base + "{}/get\+\_\+block"{}}
+
+
+
+Definition at line \mbox{\hyperlink{httpc_8hpp_source_l00090}{90}} of file \mbox{\hyperlink{httpc_8hpp_source}{httpc.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1client_1_1http_a81a8836bf63bede3a567fa785b657f7d}\index{sysio::client::http@{sysio::client::http}!get\_block\_header\_state\_func@{get\_block\_header\_state\_func}}
+\index{get\_block\_header\_state\_func@{get\_block\_header\_state\_func}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{get\_block\_header\_state\_func}{get\_block\_header\_state\_func}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_a81a8836bf63bede3a567fa785b657f7d} 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::client\+::http\+::get\+\_\+block\+\_\+header\+\_\+state\+\_\+func = chain\+\_\+func\+\_\+base + "{}/get\+\_\+block\+\_\+header\+\_\+state"{}}
+
+
+
+Definition at line \mbox{\hyperlink{httpc_8hpp_source_l00092}{92}} of file \mbox{\hyperlink{httpc_8hpp_source}{httpc.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1client_1_1http_aa3319d3c290880c072cdfc1cd0129be5}\index{sysio::client::http@{sysio::client::http}!get\_block\_info\_func@{get\_block\_info\_func}}
+\index{get\_block\_info\_func@{get\_block\_info\_func}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{get\_block\_info\_func}{get\_block\_info\_func}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_aa3319d3c290880c072cdfc1cd0129be5} 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::client\+::http\+::get\+\_\+block\+\_\+info\+\_\+func = chain\+\_\+func\+\_\+base + "{}/get\+\_\+block\+\_\+info"{}}
+
+
+
+Definition at line \mbox{\hyperlink{httpc_8hpp_source_l00091}{91}} of file \mbox{\hyperlink{httpc_8hpp_source}{httpc.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1client_1_1http_a388c06df072a1869f8c3ff199d04475f}\index{sysio::client::http@{sysio::client::http}!get\_block\_trace\_func@{get\_block\_trace\_func}}
+\index{get\_block\_trace\_func@{get\_block\_trace\_func}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{get\_block\_trace\_func}{get\_block\_trace\_func}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_a388c06df072a1869f8c3ff199d04475f} 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::client\+::http\+::get\+\_\+block\+\_\+trace\+\_\+func = trace\+\_\+api\+\_\+func\+\_\+base + "{}/get\+\_\+block"{}}
+
+
+
+Definition at line \mbox{\hyperlink{httpc_8hpp_source_l00111}{111}} of file \mbox{\hyperlink{httpc_8hpp_source}{httpc.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1client_1_1http_a543233ec6c5224c60ed1b247ebf5a1cb}\index{sysio::client::http@{sysio::client::http}!get\_code\_func@{get\_code\_func}}
+\index{get\_code\_func@{get\_code\_func}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{get\_code\_func}{get\_code\_func}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_a543233ec6c5224c60ed1b247ebf5a1cb} 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::client\+::http\+::get\+\_\+code\+\_\+func = chain\+\_\+func\+\_\+base + "{}/get\+\_\+code"{}}
+
+
+
+Definition at line \mbox{\hyperlink{httpc_8hpp_source_l00096}{96}} of file \mbox{\hyperlink{httpc_8hpp_source}{httpc.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1client_1_1http_a2a031e6796de80e542e2d7ae6595e031}\index{sysio::client::http@{sysio::client::http}!get\_code\_hash\_func@{get\_code\_hash\_func}}
+\index{get\_code\_hash\_func@{get\_code\_hash\_func}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{get\_code\_hash\_func}{get\_code\_hash\_func}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_a2a031e6796de80e542e2d7ae6595e031} 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::client\+::http\+::get\+\_\+code\+\_\+hash\+\_\+func = chain\+\_\+func\+\_\+base + "{}/get\+\_\+code\+\_\+hash"{}}
+
+
+
+Definition at line \mbox{\hyperlink{httpc_8hpp_source_l00097}{97}} of file \mbox{\hyperlink{httpc_8hpp_source}{httpc.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1client_1_1http_a022de17352257dfcdbf255c9eda2f6ee}\index{sysio::client::http@{sysio::client::http}!get\_controlled\_accounts\_func@{get\_controlled\_accounts\_func}}
+\index{get\_controlled\_accounts\_func@{get\_controlled\_accounts\_func}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{get\_controlled\_accounts\_func}{get\_controlled\_accounts\_func}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_a022de17352257dfcdbf255c9eda2f6ee} 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::client\+::http\+::get\+\_\+controlled\+\_\+accounts\+\_\+func = history\+\_\+func\+\_\+base + "{}/get\+\_\+controlled\+\_\+accounts"{}}
+
+
+
+Definition at line \mbox{\hyperlink{httpc_8hpp_source_l00114}{114}} of file \mbox{\hyperlink{httpc_8hpp_source}{httpc.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1client_1_1http_a75f09dad13b384035926b95d8ffd1256}\index{sysio::client::http@{sysio::client::http}!get\_currency\_balance\_func@{get\_currency\_balance\_func}}
+\index{get\_currency\_balance\_func@{get\_currency\_balance\_func}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{get\_currency\_balance\_func}{get\_currency\_balance\_func}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_a75f09dad13b384035926b95d8ffd1256} 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::client\+::http\+::get\+\_\+currency\+\_\+balance\+\_\+func = chain\+\_\+func\+\_\+base + "{}/get\+\_\+currency\+\_\+balance"{}}
+
+
+
+Definition at line \mbox{\hyperlink{httpc_8hpp_source_l00101}{101}} of file \mbox{\hyperlink{httpc_8hpp_source}{httpc.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1client_1_1http_a207f04f69a3ea92c822f260f17bf3283}\index{sysio::client::http@{sysio::client::http}!get\_currency\_stats\_func@{get\_currency\_stats\_func}}
+\index{get\_currency\_stats\_func@{get\_currency\_stats\_func}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{get\_currency\_stats\_func}{get\_currency\_stats\_func}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_a207f04f69a3ea92c822f260f17bf3283} 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::client\+::http\+::get\+\_\+currency\+\_\+stats\+\_\+func = chain\+\_\+func\+\_\+base + "{}/get\+\_\+currency\+\_\+stats"{}}
+
+
+
+Definition at line \mbox{\hyperlink{httpc_8hpp_source_l00102}{102}} of file \mbox{\hyperlink{httpc_8hpp_source}{httpc.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1client_1_1http_a2ce3d91848a2d7171e278279e80da5db}\index{sysio::client::http@{sysio::client::http}!get\_info\_func@{get\_info\_func}}
+\index{get\_info\_func@{get\_info\_func}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{get\_info\_func}{get\_info\_func}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_a2ce3d91848a2d7171e278279e80da5db} 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::client\+::http\+::get\+\_\+info\+\_\+func = chain\+\_\+func\+\_\+base + "{}/get\+\_\+info"{}}
+
+
+
+Definition at line \mbox{\hyperlink{httpc_8hpp_source_l00082}{82}} of file \mbox{\hyperlink{httpc_8hpp_source}{httpc.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1client_1_1http_a0bf2f9ae92f19e58086a9610db248cab}\index{sysio::client::http@{sysio::client::http}!get\_key\_accounts\_func@{get\_key\_accounts\_func}}
+\index{get\_key\_accounts\_func@{get\_key\_accounts\_func}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{get\_key\_accounts\_func}{get\_key\_accounts\_func}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_a0bf2f9ae92f19e58086a9610db248cab} 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::client\+::http\+::get\+\_\+key\+\_\+accounts\+\_\+func = history\+\_\+func\+\_\+base + "{}/get\+\_\+key\+\_\+accounts"{}}
+
+
+
+Definition at line \mbox{\hyperlink{httpc_8hpp_source_l00113}{113}} of file \mbox{\hyperlink{httpc_8hpp_source}{httpc.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1client_1_1http_a088028e1ea02b9b17bb45826d1828917}\index{sysio::client::http@{sysio::client::http}!get\_producers\_func@{get\_producers\_func}}
+\index{get\_producers\_func@{get\_producers\_func}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{get\_producers\_func}{get\_producers\_func}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_a088028e1ea02b9b17bb45826d1828917} 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::client\+::http\+::get\+\_\+producers\+\_\+func = chain\+\_\+func\+\_\+base + "{}/get\+\_\+producers"{}}
+
+
+
+Definition at line \mbox{\hyperlink{httpc_8hpp_source_l00103}{103}} of file \mbox{\hyperlink{httpc_8hpp_source}{httpc.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1client_1_1http_ad7856c823d6f2ea34188d0363294b625}\index{sysio::client::http@{sysio::client::http}!get\_raw\_abi\_func@{get\_raw\_abi\_func}}
+\index{get\_raw\_abi\_func@{get\_raw\_abi\_func}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{get\_raw\_abi\_func}{get\_raw\_abi\_func}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_ad7856c823d6f2ea34188d0363294b625} 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::client\+::http\+::get\+\_\+raw\+\_\+abi\+\_\+func = chain\+\_\+func\+\_\+base + "{}/get\+\_\+raw\+\_\+abi"{}}
+
+
+
+Definition at line \mbox{\hyperlink{httpc_8hpp_source_l00099}{99}} of file \mbox{\hyperlink{httpc_8hpp_source}{httpc.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1client_1_1http_a011ab51afedc4a61a0c31d596ef9dedf}\index{sysio::client::http@{sysio::client::http}!get\_raw\_code\_and\_abi\_func@{get\_raw\_code\_and\_abi\_func}}
+\index{get\_raw\_code\_and\_abi\_func@{get\_raw\_code\_and\_abi\_func}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{get\_raw\_code\_and\_abi\_func}{get\_raw\_code\_and\_abi\_func}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_a011ab51afedc4a61a0c31d596ef9dedf} 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::client\+::http\+::get\+\_\+raw\+\_\+code\+\_\+and\+\_\+abi\+\_\+func = chain\+\_\+func\+\_\+base + "{}/get\+\_\+raw\+\_\+code\+\_\+and\+\_\+abi"{}}
+
+
+
+Definition at line \mbox{\hyperlink{httpc_8hpp_source_l00100}{100}} of file \mbox{\hyperlink{httpc_8hpp_source}{httpc.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1client_1_1http_aff019190d6e55fe0c11da06c0f7f4584}\index{sysio::client::http@{sysio::client::http}!get\_required\_keys@{get\_required\_keys}}
+\index{get\_required\_keys@{get\_required\_keys}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{get\_required\_keys}{get\_required\_keys}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_aff019190d6e55fe0c11da06c0f7f4584} 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::client\+::http\+::get\+\_\+required\+\_\+keys = chain\+\_\+func\+\_\+base + "{}/get\+\_\+required\+\_\+keys"{}}
+
+
+
+Definition at line \mbox{\hyperlink{httpc_8hpp_source_l00105}{105}} of file \mbox{\hyperlink{httpc_8hpp_source}{httpc.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1client_1_1http_a0846b8cd52178faf5ffc1656b79528ff}\index{sysio::client::http@{sysio::client::http}!get\_schedule\_func@{get\_schedule\_func}}
+\index{get\_schedule\_func@{get\_schedule\_func}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{get\_schedule\_func}{get\_schedule\_func}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_a0846b8cd52178faf5ffc1656b79528ff} 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::client\+::http\+::get\+\_\+schedule\+\_\+func = chain\+\_\+func\+\_\+base + "{}/get\+\_\+producer\+\_\+schedule"{}}
+
+
+
+Definition at line \mbox{\hyperlink{httpc_8hpp_source_l00104}{104}} of file \mbox{\hyperlink{httpc_8hpp_source}{httpc.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1client_1_1http_ac07425080a07294cc0c4c9fc530f5035}\index{sysio::client::http@{sysio::client::http}!get\_table\_by\_scope\_func@{get\_table\_by\_scope\_func}}
+\index{get\_table\_by\_scope\_func@{get\_table\_by\_scope\_func}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{get\_table\_by\_scope\_func}{get\_table\_by\_scope\_func}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_ac07425080a07294cc0c4c9fc530f5035} 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::client\+::http\+::get\+\_\+table\+\_\+by\+\_\+scope\+\_\+func = chain\+\_\+func\+\_\+base + "{}/get\+\_\+table\+\_\+by\+\_\+scope"{}}
+
+
+
+Definition at line \mbox{\hyperlink{httpc_8hpp_source_l00095}{95}} of file \mbox{\hyperlink{httpc_8hpp_source}{httpc.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1client_1_1http_a74c28475d2f7d2cb4c99cb361c2279a0}\index{sysio::client::http@{sysio::client::http}!get\_table\_func@{get\_table\_func}}
+\index{get\_table\_func@{get\_table\_func}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{get\_table\_func}{get\_table\_func}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_a74c28475d2f7d2cb4c99cb361c2279a0} 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::client\+::http\+::get\+\_\+table\+\_\+func = chain\+\_\+func\+\_\+base + "{}/get\+\_\+table\+\_\+rows"{}}
+
+
+
+Definition at line \mbox{\hyperlink{httpc_8hpp_source_l00094}{94}} of file \mbox{\hyperlink{httpc_8hpp_source}{httpc.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1client_1_1http_a84383cd6f08ee43d4d5b161f2605d865}\index{sysio::client::http@{sysio::client::http}!get\_transaction\_func@{get\_transaction\_func}}
+\index{get\_transaction\_func@{get\_transaction\_func}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{get\_transaction\_func}{get\_transaction\_func}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_a84383cd6f08ee43d4d5b161f2605d865} 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::client\+::http\+::get\+\_\+transaction\+\_\+func = history\+\_\+func\+\_\+base + "{}/get\+\_\+transaction"{}}
+
+
+
+Definition at line \mbox{\hyperlink{httpc_8hpp_source_l00112}{112}} of file \mbox{\hyperlink{httpc_8hpp_source}{httpc.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1client_1_1http_a02c7f59fb0a01a256b1970bef8e1651b}\index{sysio::client::http@{sysio::client::http}!get\_transaction\_status\_func@{get\_transaction\_status\_func}}
+\index{get\_transaction\_status\_func@{get\_transaction\_status\_func}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{get\_transaction\_status\_func}{get\_transaction\_status\_func}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_a02c7f59fb0a01a256b1970bef8e1651b} 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::client\+::http\+::get\+\_\+transaction\+\_\+status\+\_\+func = chain\+\_\+func\+\_\+base + "{}/get\+\_\+transaction\+\_\+status"{}}
+
+
+
+Definition at line \mbox{\hyperlink{httpc_8hpp_source_l00083}{83}} of file \mbox{\hyperlink{httpc_8hpp_source}{httpc.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1client_1_1http_a944fa2924ffa5465a1ebec7b7d294b09}\index{sysio::client::http@{sysio::client::http}!get\_transaction\_trace\_func@{get\_transaction\_trace\_func}}
+\index{get\_transaction\_trace\_func@{get\_transaction\_trace\_func}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{get\_transaction\_trace\_func}{get\_transaction\_trace\_func}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_a944fa2924ffa5465a1ebec7b7d294b09} 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::client\+::http\+::get\+\_\+transaction\+\_\+trace\+\_\+func = trace\+\_\+api\+\_\+func\+\_\+base + "{}/get\+\_\+transaction\+\_\+trace"{}}
+
+
+
+Definition at line \mbox{\hyperlink{httpc_8hpp_source_l00110}{110}} of file \mbox{\hyperlink{httpc_8hpp_source}{httpc.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1client_1_1http_aef5798a3297cd0746689ff6c67ab2e34}\index{sysio::client::http@{sysio::client::http}!history\_func\_base@{history\_func\_base}}
+\index{history\_func\_base@{history\_func\_base}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{history\_func\_base}{history\_func\_base}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_aef5798a3297cd0746689ff6c67ab2e34} 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::client\+::http\+::history\+\_\+func\+\_\+base = "{}/v1/history"{}}
+
+
+
+Definition at line \mbox{\hyperlink{httpc_8hpp_source_l00107}{107}} of file \mbox{\hyperlink{httpc_8hpp_source}{httpc.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1client_1_1http_ae45c5e319acf2676ecd093aca9eaec95}\index{sysio::client::http@{sysio::client::http}!json\_to\_bin\_func@{json\_to\_bin\_func}}
+\index{json\_to\_bin\_func@{json\_to\_bin\_func}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{json\_to\_bin\_func}{json\_to\_bin\_func}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_ae45c5e319acf2676ecd093aca9eaec95} 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::client\+::http\+::json\+\_\+to\+\_\+bin\+\_\+func = chain\+\_\+func\+\_\+base + "{}/abi\+\_\+json\+\_\+to\+\_\+bin"{}}
+
+
+
+Definition at line \mbox{\hyperlink{httpc_8hpp_source_l00089}{89}} of file \mbox{\hyperlink{httpc_8hpp_source}{httpc.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1client_1_1http_ad0908a7106763c92f137cd0a139f1365}\index{sysio::client::http@{sysio::client::http}!kiod\_stop@{kiod\_stop}}
+\index{kiod\_stop@{kiod\_stop}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{kiod\_stop}{kiod\_stop}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_ad0908a7106763c92f137cd0a139f1365} 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::client\+::http\+::kiod\+\_\+stop = "{}/v1/"{} + string(client\+::config\+::key\+\_\+store\+\_\+executable\+\_\+name) + "{}/stop"{}}
+
+
+
+Definition at line \mbox{\hyperlink{httpc_8hpp_source_l00136}{136}} of file \mbox{\hyperlink{httpc_8hpp_source}{httpc.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1client_1_1http_a28f03e0f6a7bb7f036324e1e78688592}\index{sysio::client::http@{sysio::client::http}!net\_connect@{net\_connect}}
+\index{net\_connect@{net\_connect}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{net\_connect}{net\_connect}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_a28f03e0f6a7bb7f036324e1e78688592} 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::client\+::http\+::net\+\_\+connect = net\+\_\+func\+\_\+base + "{}/connect"{}}
+
+
+
+Definition at line \mbox{\hyperlink{httpc_8hpp_source_l00117}{117}} of file \mbox{\hyperlink{httpc_8hpp_source}{httpc.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1client_1_1http_a554b556b524227b08454391ee37ab403}\index{sysio::client::http@{sysio::client::http}!net\_connections@{net\_connections}}
+\index{net\_connections@{net\_connections}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{net\_connections}{net\_connections}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_a554b556b524227b08454391ee37ab403} 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::client\+::http\+::net\+\_\+connections = net\+\_\+func\+\_\+base + "{}/connections"{}}
+
+
+
+Definition at line \mbox{\hyperlink{httpc_8hpp_source_l00120}{120}} of file \mbox{\hyperlink{httpc_8hpp_source}{httpc.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1client_1_1http_a9769b04fddea98da42388ddd7b1a1b04}\index{sysio::client::http@{sysio::client::http}!net\_disconnect@{net\_disconnect}}
+\index{net\_disconnect@{net\_disconnect}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{net\_disconnect}{net\_disconnect}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_a9769b04fddea98da42388ddd7b1a1b04} 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::client\+::http\+::net\+\_\+disconnect = net\+\_\+func\+\_\+base + "{}/disconnect"{}}
+
+
+
+Definition at line \mbox{\hyperlink{httpc_8hpp_source_l00118}{118}} of file \mbox{\hyperlink{httpc_8hpp_source}{httpc.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1client_1_1http_aef40a2603c3dfd089fb26b663ef1b9e7}\index{sysio::client::http@{sysio::client::http}!net\_func\_base@{net\_func\_base}}
+\index{net\_func\_base@{net\_func\_base}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{net\_func\_base}{net\_func\_base}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_aef40a2603c3dfd089fb26b663ef1b9e7} 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::client\+::http\+::net\+\_\+func\+\_\+base = "{}/v1/net"{}}
+
+
+
+Definition at line \mbox{\hyperlink{httpc_8hpp_source_l00116}{116}} of file \mbox{\hyperlink{httpc_8hpp_source}{httpc.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1client_1_1http_af4f10ec8ec3f34bf22826a0e8979f715}\index{sysio::client::http@{sysio::client::http}!net\_status@{net\_status}}
+\index{net\_status@{net\_status}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{net\_status}{net\_status}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_af4f10ec8ec3f34bf22826a0e8979f715} 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::client\+::http\+::net\+\_\+status = net\+\_\+func\+\_\+base + "{}/status"{}}
+
+
+
+Definition at line \mbox{\hyperlink{httpc_8hpp_source_l00119}{119}} of file \mbox{\hyperlink{httpc_8hpp_source}{httpc.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1client_1_1http_a7f896434cc67a3effd14ef2616ae83ce}\index{sysio::client::http@{sysio::client::http}!push\_txn\_func@{push\_txn\_func}}
+\index{push\_txn\_func@{push\_txn\_func}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{push\_txn\_func}{push\_txn\_func}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_a7f896434cc67a3effd14ef2616ae83ce} 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::client\+::http\+::push\+\_\+txn\+\_\+func = chain\+\_\+func\+\_\+base + "{}/push\+\_\+transaction"{}}
+
+
+
+Definition at line \mbox{\hyperlink{httpc_8hpp_source_l00085}{85}} of file \mbox{\hyperlink{httpc_8hpp_source}{httpc.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1client_1_1http_a9c9ae4b057913a4913b54d060ee8a9b5}\index{sysio::client::http@{sysio::client::http}!push\_txns\_func@{push\_txns\_func}}
+\index{push\_txns\_func@{push\_txns\_func}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{push\_txns\_func}{push\_txns\_func}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_a9c9ae4b057913a4913b54d060ee8a9b5} 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::client\+::http\+::push\+\_\+txns\+\_\+func = chain\+\_\+func\+\_\+base + "{}/push\+\_\+transactions"{}}
+
+
+
+Definition at line \mbox{\hyperlink{httpc_8hpp_source_l00088}{88}} of file \mbox{\hyperlink{httpc_8hpp_source}{httpc.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1client_1_1http_a9b78bb2c52d8a5b28a76e04db0e8bd21}\index{sysio::client::http@{sysio::client::http}!send2\_txn\_func@{send2\_txn\_func}}
+\index{send2\_txn\_func@{send2\_txn\_func}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{send2\_txn\_func}{send2\_txn\_func}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_a9b78bb2c52d8a5b28a76e04db0e8bd21} 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::client\+::http\+::send2\+\_\+txn\+\_\+func = chain\+\_\+func\+\_\+base + "{}/send\+\_\+transaction2"{}}
+
+
+
+Definition at line \mbox{\hyperlink{httpc_8hpp_source_l00086}{86}} of file \mbox{\hyperlink{httpc_8hpp_source}{httpc.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1client_1_1http_a10e42ac984f01842e01b98d864d81260}\index{sysio::client::http@{sysio::client::http}!send\_txn\_func@{send\_txn\_func}}
+\index{send\_txn\_func@{send\_txn\_func}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{send\_txn\_func}{send\_txn\_func}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_a10e42ac984f01842e01b98d864d81260} 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::client\+::http\+::send\+\_\+txn\+\_\+func = chain\+\_\+func\+\_\+base + "{}/send\+\_\+transaction"{}}
+
+
+
+Definition at line \mbox{\hyperlink{httpc_8hpp_source_l00084}{84}} of file \mbox{\hyperlink{httpc_8hpp_source}{httpc.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1client_1_1http_a29552db68fc586bddf012299ec58917d}\index{sysio::client::http@{sysio::client::http}!trace\_api\_func\_base@{trace\_api\_func\_base}}
+\index{trace\_api\_func\_base@{trace\_api\_func\_base}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{trace\_api\_func\_base}{trace\_api\_func\_base}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_a29552db68fc586bddf012299ec58917d} 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::client\+::http\+::trace\+\_\+api\+\_\+func\+\_\+base = "{}/v1/trace\+\_\+api"{}}
+
+
+
+Definition at line \mbox{\hyperlink{httpc_8hpp_source_l00108}{108}} of file \mbox{\hyperlink{httpc_8hpp_source}{httpc.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1client_1_1http_ad9f14ba11ccc84d5a11cb863b3c8be14}\index{sysio::client::http@{sysio::client::http}!wallet\_create@{wallet\_create}}
+\index{wallet\_create@{wallet\_create}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{wallet\_create}{wallet\_create}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_ad9f14ba11ccc84d5a11cb863b3c8be14} 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::client\+::http\+::wallet\+\_\+create = wallet\+\_\+func\+\_\+base + "{}/create"{}}
+
+
+
+Definition at line \mbox{\hyperlink{httpc_8hpp_source_l00124}{124}} of file \mbox{\hyperlink{httpc_8hpp_source}{httpc.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1client_1_1http_a727b9cbcbc890a53ad6c673e433b24c1}\index{sysio::client::http@{sysio::client::http}!wallet\_create\_key@{wallet\_create\_key}}
+\index{wallet\_create\_key@{wallet\_create\_key}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{wallet\_create\_key}{wallet\_create\_key}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_a727b9cbcbc890a53ad6c673e433b24c1} 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::client\+::http\+::wallet\+\_\+create\+\_\+key = wallet\+\_\+func\+\_\+base + "{}/create\+\_\+key"{}}
+
+
+
+Definition at line \mbox{\hyperlink{httpc_8hpp_source_l00134}{134}} of file \mbox{\hyperlink{httpc_8hpp_source}{httpc.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1client_1_1http_ab164f41095b2cb6a96b9c9316200bdf5}\index{sysio::client::http@{sysio::client::http}!wallet\_func\_base@{wallet\_func\_base}}
+\index{wallet\_func\_base@{wallet\_func\_base}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{wallet\_func\_base}{wallet\_func\_base}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_ab164f41095b2cb6a96b9c9316200bdf5} 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::client\+::http\+::wallet\+\_\+func\+\_\+base = "{}/v1/wallet"{}}
+
+
+
+Definition at line \mbox{\hyperlink{httpc_8hpp_source_l00123}{123}} of file \mbox{\hyperlink{httpc_8hpp_source}{httpc.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1client_1_1http_a73d78b9b91d9868c7b54185aae22e44e}\index{sysio::client::http@{sysio::client::http}!wallet\_import\_key@{wallet\_import\_key}}
+\index{wallet\_import\_key@{wallet\_import\_key}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{wallet\_import\_key}{wallet\_import\_key}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_a73d78b9b91d9868c7b54185aae22e44e} 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::client\+::http\+::wallet\+\_\+import\+\_\+key = wallet\+\_\+func\+\_\+base + "{}/import\+\_\+key"{}}
+
+
+
+Definition at line \mbox{\hyperlink{httpc_8hpp_source_l00132}{132}} of file \mbox{\hyperlink{httpc_8hpp_source}{httpc.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1client_1_1http_a6282d742bf373082ce92cda18f7c65de}\index{sysio::client::http@{sysio::client::http}!wallet\_list@{wallet\_list}}
+\index{wallet\_list@{wallet\_list}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{wallet\_list}{wallet\_list}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_a6282d742bf373082ce92cda18f7c65de} 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::client\+::http\+::wallet\+\_\+list = wallet\+\_\+func\+\_\+base + "{}/list\+\_\+wallets"{}}
+
+
+
+Definition at line \mbox{\hyperlink{httpc_8hpp_source_l00126}{126}} of file \mbox{\hyperlink{httpc_8hpp_source}{httpc.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1client_1_1http_a9630d69791bc1e4ba500caa8b73489eb}\index{sysio::client::http@{sysio::client::http}!wallet\_list\_keys@{wallet\_list\_keys}}
+\index{wallet\_list\_keys@{wallet\_list\_keys}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{wallet\_list\_keys}{wallet\_list\_keys}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_a9630d69791bc1e4ba500caa8b73489eb} 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::client\+::http\+::wallet\+\_\+list\+\_\+keys = wallet\+\_\+func\+\_\+base + "{}/list\+\_\+keys"{}}
+
+
+
+Definition at line \mbox{\hyperlink{httpc_8hpp_source_l00127}{127}} of file \mbox{\hyperlink{httpc_8hpp_source}{httpc.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1client_1_1http_a039501cdb75746c55c8beea798971f76}\index{sysio::client::http@{sysio::client::http}!wallet\_lock@{wallet\_lock}}
+\index{wallet\_lock@{wallet\_lock}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{wallet\_lock}{wallet\_lock}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_a039501cdb75746c55c8beea798971f76} 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::client\+::http\+::wallet\+\_\+lock = wallet\+\_\+func\+\_\+base + "{}/lock"{}}
+
+
+
+Definition at line \mbox{\hyperlink{httpc_8hpp_source_l00129}{129}} of file \mbox{\hyperlink{httpc_8hpp_source}{httpc.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1client_1_1http_af4aa87af4b47b207a5df3e757eb1246e}\index{sysio::client::http@{sysio::client::http}!wallet\_lock\_all@{wallet\_lock\_all}}
+\index{wallet\_lock\_all@{wallet\_lock\_all}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{wallet\_lock\_all}{wallet\_lock\_all}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_af4aa87af4b47b207a5df3e757eb1246e} 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::client\+::http\+::wallet\+\_\+lock\+\_\+all = wallet\+\_\+func\+\_\+base + "{}/lock\+\_\+all"{}}
+
+
+
+Definition at line \mbox{\hyperlink{httpc_8hpp_source_l00130}{130}} of file \mbox{\hyperlink{httpc_8hpp_source}{httpc.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1client_1_1http_a79908fbcca17945321269ac64528609d}\index{sysio::client::http@{sysio::client::http}!wallet\_open@{wallet\_open}}
+\index{wallet\_open@{wallet\_open}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{wallet\_open}{wallet\_open}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_a79908fbcca17945321269ac64528609d} 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::client\+::http\+::wallet\+\_\+open = wallet\+\_\+func\+\_\+base + "{}/open"{}}
+
+
+
+Definition at line \mbox{\hyperlink{httpc_8hpp_source_l00125}{125}} of file \mbox{\hyperlink{httpc_8hpp_source}{httpc.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1client_1_1http_a3280c0a8d84c975181b53d3a43c2e642}\index{sysio::client::http@{sysio::client::http}!wallet\_public\_keys@{wallet\_public\_keys}}
+\index{wallet\_public\_keys@{wallet\_public\_keys}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{wallet\_public\_keys}{wallet\_public\_keys}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_a3280c0a8d84c975181b53d3a43c2e642} 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::client\+::http\+::wallet\+\_\+public\+\_\+keys = wallet\+\_\+func\+\_\+base + "{}/get\+\_\+public\+\_\+keys"{}}
+
+
+
+Definition at line \mbox{\hyperlink{httpc_8hpp_source_l00128}{128}} of file \mbox{\hyperlink{httpc_8hpp_source}{httpc.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1client_1_1http_a385d76657d4fe1015920ac519e3c5e4c}\index{sysio::client::http@{sysio::client::http}!wallet\_remove\_key@{wallet\_remove\_key}}
+\index{wallet\_remove\_key@{wallet\_remove\_key}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{wallet\_remove\_key}{wallet\_remove\_key}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_a385d76657d4fe1015920ac519e3c5e4c} 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::client\+::http\+::wallet\+\_\+remove\+\_\+key = wallet\+\_\+func\+\_\+base + "{}/remove\+\_\+key"{}}
+
+
+
+Definition at line \mbox{\hyperlink{httpc_8hpp_source_l00133}{133}} of file \mbox{\hyperlink{httpc_8hpp_source}{httpc.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1client_1_1http_a03f77bc9849073cee0f4ff86f6e25aea}\index{sysio::client::http@{sysio::client::http}!wallet\_sign\_trx@{wallet\_sign\_trx}}
+\index{wallet\_sign\_trx@{wallet\_sign\_trx}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{wallet\_sign\_trx}{wallet\_sign\_trx}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_a03f77bc9849073cee0f4ff86f6e25aea} 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::client\+::http\+::wallet\+\_\+sign\+\_\+trx = wallet\+\_\+func\+\_\+base + "{}/sign\+\_\+transaction"{}}
+
+
+
+Definition at line \mbox{\hyperlink{httpc_8hpp_source_l00135}{135}} of file \mbox{\hyperlink{httpc_8hpp_source}{httpc.\+hpp}}.
+
+\Hypertarget{namespacesysio_1_1client_1_1http_a84c12a5d138e8f42fad5b0d66fc26e70}\index{sysio::client::http@{sysio::client::http}!wallet\_unlock@{wallet\_unlock}}
+\index{wallet\_unlock@{wallet\_unlock}!sysio::client::http@{sysio::client::http}}
+\doxysubsubsection{\texorpdfstring{wallet\_unlock}{wallet\_unlock}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1client_1_1http_a84c12a5d138e8f42fad5b0d66fc26e70} 
+const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} sysio\+::client\+::http\+::wallet\+\_\+unlock = wallet\+\_\+func\+\_\+base + "{}/unlock"{}}
+
+
+
+Definition at line \mbox{\hyperlink{httpc_8hpp_source_l00131}{131}} of file \mbox{\hyperlink{httpc_8hpp_source}{httpc.\+hpp}}.
+

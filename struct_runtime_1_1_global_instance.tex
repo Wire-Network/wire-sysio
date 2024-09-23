@@ -1,0 +1,120 @@
+\doxysection{Runtime\+::Global\+Instance Struct Reference}
+\hypertarget{struct_runtime_1_1_global_instance}{}\label{struct_runtime_1_1_global_instance}\index{Runtime::GlobalInstance@{Runtime::GlobalInstance}}
+
+
+{\ttfamily \#include $<$Runtime\+Private.\+h$>$}
+
+
+
+Inheritance diagram for Runtime\+::Global\+Instance\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=205pt]{struct_runtime_1_1_global_instance__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Runtime\+::Global\+Instance\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_runtime_1_1_global_instance__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_runtime_1_1_global_instance_a28074a9a2af4d40dbf0af9f086c4b46b}{Global\+Instance}} (\mbox{\hyperlink{struct_i_r_1_1_global_type}{Global\+Type}} in\+Type, \mbox{\hyperlink{struct_runtime_1_1_untagged_value}{Untagged\+Value}} in\+Value)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{struct_runtime_1_1_g_c_object}{Runtime\+::\+GCObject}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_runtime_1_1_g_c_object_ad61fa15a80d09b18aa1e8f80b1338467}{GCObject}} (\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908}{Object\+Kind}} in\+Kind)
+\item 
+\mbox{\hyperlink{struct_runtime_1_1_g_c_object_a87fe6580879c9e158d151219dfe6999e}{\texorpdfstring{$\sim$}{\string~}\+GCObject}} () override
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{struct_runtime_1_1_object_instance}{Runtime\+::\+Object\+Instance}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_runtime_1_1_object_instance_af7231f91092e2c8d8f65491f648504b5}{Object\+Instance}} (\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908}{IR\+::\+Object\+Kind}} in\+Kind)
+\item 
+virtual \mbox{\hyperlink{struct_runtime_1_1_object_instance_a67bf2d4a743aff39354b04a65108f383}{\texorpdfstring{$\sim$}{\string~}\+Object\+Instance}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_i_r_1_1_global_type}{Global\+Type}} \mbox{\hyperlink{struct_runtime_1_1_global_instance_a46919f37063d827462fcc6e48f4b196b}{type}}
+\item 
+\mbox{\hyperlink{struct_runtime_1_1_untagged_value}{Untagged\+Value}} \mbox{\hyperlink{struct_runtime_1_1_global_instance_a1e9e2bec9cfb4f5e36dd9cf86bb0ffd9}{value}}
+\item 
+\mbox{\hyperlink{struct_runtime_1_1_untagged_value}{Untagged\+Value}} \mbox{\hyperlink{struct_runtime_1_1_global_instance_acce7627dec7f4f9a78118433a2286a76}{initial\+Value}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes inherited from \mbox{\hyperlink{struct_runtime_1_1_object_instance}{Runtime\+::\+Object\+Instance}}}
+\begin{DoxyCompactItemize}
+\item 
+const \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908}{IR\+::\+Object\+Kind}} \mbox{\hyperlink{struct_runtime_1_1_object_instance_a0d77f442a8f7418381f356c31795d8db}{kind}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{_runtime_private_8h_source_l00098}{98}} of file \mbox{\hyperlink{_runtime_private_8h_source}{Runtime\+Private.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{struct_runtime_1_1_global_instance_a28074a9a2af4d40dbf0af9f086c4b46b}\index{Runtime::GlobalInstance@{Runtime::GlobalInstance}!GlobalInstance@{GlobalInstance}}
+\index{GlobalInstance@{GlobalInstance}!Runtime::GlobalInstance@{Runtime::GlobalInstance}}
+\doxysubsubsection{\texorpdfstring{GlobalInstance()}{GlobalInstance()}}
+{\footnotesize\ttfamily \label{struct_runtime_1_1_global_instance_a28074a9a2af4d40dbf0af9f086c4b46b} 
+Runtime\+::\+Global\+Instance\+::\+Global\+Instance (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_i_r_1_1_global_type}{Global\+Type}}}]{in\+Type}{, }\item[{\mbox{\hyperlink{struct_runtime_1_1_untagged_value}{Untagged\+Value}}}]{in\+Value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_runtime_private_8h_source_l00104}{104}} of file \mbox{\hyperlink{_runtime_private_8h_source}{Runtime\+Private.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00104\ :\ \mbox{\hyperlink{struct_runtime_1_1_g_c_object_ad61fa15a80d09b18aa1e8f80b1338467}{GCObject}}(ObjectKind::global),\ \mbox{\hyperlink{struct_runtime_1_1_global_instance_a46919f37063d827462fcc6e48f4b196b}{type}}(inType),\ \mbox{\hyperlink{struct_runtime_1_1_global_instance_a1e9e2bec9cfb4f5e36dd9cf86bb0ffd9}{value}}(inValue),\ \mbox{\hyperlink{struct_runtime_1_1_global_instance_acce7627dec7f4f9a78118433a2286a76}{initialValue}}(\mbox{\hyperlink{struct_runtime_1_1_global_instance_a1e9e2bec9cfb4f5e36dd9cf86bb0ffd9}{value}})\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_runtime_1_1_global_instance_acce7627dec7f4f9a78118433a2286a76}\index{Runtime::GlobalInstance@{Runtime::GlobalInstance}!initialValue@{initialValue}}
+\index{initialValue@{initialValue}!Runtime::GlobalInstance@{Runtime::GlobalInstance}}
+\doxysubsubsection{\texorpdfstring{initialValue}{initialValue}}
+{\footnotesize\ttfamily \label{struct_runtime_1_1_global_instance_acce7627dec7f4f9a78118433a2286a76} 
+\mbox{\hyperlink{struct_runtime_1_1_untagged_value}{Untagged\+Value}} Runtime\+::\+Global\+Instance\+::initial\+Value}
+
+
+
+Definition at line \mbox{\hyperlink{_runtime_private_8h_source_l00102}{102}} of file \mbox{\hyperlink{_runtime_private_8h_source}{Runtime\+Private.\+h}}.
+
+\Hypertarget{struct_runtime_1_1_global_instance_a46919f37063d827462fcc6e48f4b196b}\index{Runtime::GlobalInstance@{Runtime::GlobalInstance}!type@{type}}
+\index{type@{type}!Runtime::GlobalInstance@{Runtime::GlobalInstance}}
+\doxysubsubsection{\texorpdfstring{type}{type}}
+{\footnotesize\ttfamily \label{struct_runtime_1_1_global_instance_a46919f37063d827462fcc6e48f4b196b} 
+\mbox{\hyperlink{struct_i_r_1_1_global_type}{Global\+Type}} Runtime\+::\+Global\+Instance\+::type}
+
+
+
+Definition at line \mbox{\hyperlink{_runtime_private_8h_source_l00100}{100}} of file \mbox{\hyperlink{_runtime_private_8h_source}{Runtime\+Private.\+h}}.
+
+\Hypertarget{struct_runtime_1_1_global_instance_a1e9e2bec9cfb4f5e36dd9cf86bb0ffd9}\index{Runtime::GlobalInstance@{Runtime::GlobalInstance}!value@{value}}
+\index{value@{value}!Runtime::GlobalInstance@{Runtime::GlobalInstance}}
+\doxysubsubsection{\texorpdfstring{value}{value}}
+{\footnotesize\ttfamily \label{struct_runtime_1_1_global_instance_a1e9e2bec9cfb4f5e36dd9cf86bb0ffd9} 
+\mbox{\hyperlink{struct_runtime_1_1_untagged_value}{Untagged\+Value}} Runtime\+::\+Global\+Instance\+::value}
+
+
+
+Definition at line \mbox{\hyperlink{_runtime_private_8h_source_l00101}{101}} of file \mbox{\hyperlink{_runtime_private_8h_source}{Runtime\+Private.\+h}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/wasm-\/jit/\+Source/\+Runtime/\mbox{\hyperlink{_runtime_private_8h}{Runtime\+Private.\+h}}\end{DoxyCompactItemize}

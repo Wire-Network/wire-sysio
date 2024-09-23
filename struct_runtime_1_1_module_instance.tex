@@ -1,0 +1,220 @@
+\doxysection{Runtime\+::Module\+Instance Struct Reference}
+\hypertarget{struct_runtime_1_1_module_instance}{}\label{struct_runtime_1_1_module_instance}\index{Runtime::ModuleInstance@{Runtime::ModuleInstance}}
+
+
+{\ttfamily \#include $<$Runtime\+Private.\+h$>$}
+
+
+
+Inheritance diagram for Runtime\+::Module\+Instance\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=208pt]{struct_runtime_1_1_module_instance__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Runtime\+::Module\+Instance\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{struct_runtime_1_1_module_instance__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_runtime_1_1_module_instance_a522c7107b6cabc7e7809e909ba761d18}{Module\+Instance}} (std\+::vector$<$ \mbox{\hyperlink{struct_runtime_1_1_function_instance}{Function\+Instance}} \texorpdfstring{$\ast$}{*} $>$ \&\&in\+Function\+Imports, std\+::vector$<$ \mbox{\hyperlink{struct_runtime_1_1_table_instance}{Table\+Instance}} \texorpdfstring{$\ast$}{*} $>$ \&\&in\+Table\+Imports, std\+::vector$<$ \mbox{\hyperlink{struct_runtime_1_1_memory_instance}{Memory\+Instance}} \texorpdfstring{$\ast$}{*} $>$ \&\&in\+Memory\+Imports, std\+::vector$<$ \mbox{\hyperlink{struct_runtime_1_1_global_instance}{Global\+Instance}} \texorpdfstring{$\ast$}{*} $>$ \&\&in\+Global\+Imports)
+\item 
+\mbox{\hyperlink{struct_runtime_1_1_module_instance_a5049cc224aba40ddf0a22a156d5522f9}{\texorpdfstring{$\sim$}{\string~}\+Module\+Instance}} () override
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{struct_runtime_1_1_g_c_object}{Runtime\+::\+GCObject}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_runtime_1_1_g_c_object_ad61fa15a80d09b18aa1e8f80b1338467}{GCObject}} (\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908}{Object\+Kind}} in\+Kind)
+\item 
+\mbox{\hyperlink{struct_runtime_1_1_g_c_object_a87fe6580879c9e158d151219dfe6999e}{\texorpdfstring{$\sim$}{\string~}\+GCObject}} () override
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{struct_runtime_1_1_object_instance}{Runtime\+::\+Object\+Instance}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_runtime_1_1_object_instance_af7231f91092e2c8d8f65491f648504b5}{Object\+Instance}} (\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908}{IR\+::\+Object\+Kind}} in\+Kind)
+\item 
+virtual \mbox{\hyperlink{struct_runtime_1_1_object_instance_a67bf2d4a743aff39354b04a65108f383}{\texorpdfstring{$\sim$}{\string~}\+Object\+Instance}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::map$<$ std\+::string, \mbox{\hyperlink{struct_runtime_1_1_object_instance}{Object\+Instance}} \texorpdfstring{$\ast$}{*} $>$ \mbox{\hyperlink{struct_runtime_1_1_module_instance_a02c25c91eddcab9aff39166226575adb}{export\+Map}}
+\item 
+std\+::vector$<$ \mbox{\hyperlink{struct_runtime_1_1_function_instance}{Function\+Instance}} \texorpdfstring{$\ast$}{*} $>$ \mbox{\hyperlink{struct_runtime_1_1_module_instance_a72a475ad0c17e2c9db9fa7f77beb45c0}{function\+Defs}}
+\item 
+std\+::vector$<$ \mbox{\hyperlink{struct_runtime_1_1_function_instance}{Function\+Instance}} \texorpdfstring{$\ast$}{*} $>$ \mbox{\hyperlink{struct_runtime_1_1_module_instance_ad512509190e4e88f6d57fbdd72ab61d0}{functions}}
+\item 
+std\+::vector$<$ \mbox{\hyperlink{struct_runtime_1_1_table_instance}{Table\+Instance}} \texorpdfstring{$\ast$}{*} $>$ \mbox{\hyperlink{struct_runtime_1_1_module_instance_ad145f5d94690827d27cf4a650f70391c}{tables}}
+\item 
+std\+::vector$<$ \mbox{\hyperlink{struct_runtime_1_1_memory_instance}{Memory\+Instance}} \texorpdfstring{$\ast$}{*} $>$ \mbox{\hyperlink{struct_runtime_1_1_module_instance_af3a1eaa936f73428d469498b96fd3181}{memories}}
+\item 
+std\+::vector$<$ \mbox{\hyperlink{struct_runtime_1_1_global_instance}{Global\+Instance}} \texorpdfstring{$\ast$}{*} $>$ \mbox{\hyperlink{struct_runtime_1_1_module_instance_ac750c8329d19563f2852733369cefc4c}{globals}}
+\item 
+\mbox{\hyperlink{struct_runtime_1_1_memory_instance}{Memory\+Instance}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{struct_runtime_1_1_module_instance_a388111c993baac2ec030e41db773a8aa}{default\+Memory}}
+\item 
+\mbox{\hyperlink{struct_runtime_1_1_table_instance}{Table\+Instance}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{struct_runtime_1_1_module_instance_a4b9cbe3016774341330e36d099934dd1}{default\+Table}}
+\item 
+\mbox{\hyperlink{struct_l_l_v_m_j_i_t_1_1_j_i_t_module_base}{LLVMJIT\+::\+JITModule\+Base}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{struct_runtime_1_1_module_instance_acb678c002fd8db66a7b610a4188094b5}{jit\+Module}}
+\item 
+\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} \mbox{\hyperlink{struct_runtime_1_1_module_instance_a9758d1d7c64ccc35f19aeb4032fa0fd9}{start\+Function\+Index}} = \mbox{\hyperlink{stdint_8h_ab2355300ea19395357e62d780f4dd073}{UINTPTR\+\_\+\+MAX}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes inherited from \mbox{\hyperlink{struct_runtime_1_1_object_instance}{Runtime\+::\+Object\+Instance}}}
+\begin{DoxyCompactItemize}
+\item 
+const \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908}{IR\+::\+Object\+Kind}} \mbox{\hyperlink{struct_runtime_1_1_object_instance_a0d77f442a8f7418381f356c31795d8db}{kind}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{_runtime_private_8h_source_l00108}{108}} of file \mbox{\hyperlink{_runtime_private_8h_source}{Runtime\+Private.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{struct_runtime_1_1_module_instance_a522c7107b6cabc7e7809e909ba761d18}\index{Runtime::ModuleInstance@{Runtime::ModuleInstance}!ModuleInstance@{ModuleInstance}}
+\index{ModuleInstance@{ModuleInstance}!Runtime::ModuleInstance@{Runtime::ModuleInstance}}
+\doxysubsubsection{\texorpdfstring{ModuleInstance()}{ModuleInstance()}}
+{\footnotesize\ttfamily \label{struct_runtime_1_1_module_instance_a522c7107b6cabc7e7809e909ba761d18} 
+Runtime\+::\+Module\+Instance\+::\+Module\+Instance (\begin{DoxyParamCaption}\item[{std\+::vector$<$ \mbox{\hyperlink{struct_runtime_1_1_function_instance}{Function\+Instance}} \texorpdfstring{$\ast$}{*} $>$ \&\&}]{in\+Function\+Imports}{, }\item[{std\+::vector$<$ \mbox{\hyperlink{struct_runtime_1_1_table_instance}{Table\+Instance}} \texorpdfstring{$\ast$}{*} $>$ \&\&}]{in\+Table\+Imports}{, }\item[{std\+::vector$<$ \mbox{\hyperlink{struct_runtime_1_1_memory_instance}{Memory\+Instance}} \texorpdfstring{$\ast$}{*} $>$ \&\&}]{in\+Memory\+Imports}{, }\item[{std\+::vector$<$ \mbox{\hyperlink{struct_runtime_1_1_global_instance}{Global\+Instance}} \texorpdfstring{$\ast$}{*} $>$ \&\&}]{in\+Global\+Imports}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{_runtime_private_8h_source_l00126}{126}} of file \mbox{\hyperlink{_runtime_private_8h_source}{Runtime\+Private.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{struct_runtime_1_1_g_c_object_ad61fa15a80d09b18aa1e8f80b1338467}{GCObject}}(ObjectKind::module)}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ ,\ \mbox{\hyperlink{struct_runtime_1_1_module_instance_ad512509190e4e88f6d57fbdd72ab61d0}{functions}}(inFunctionImports)}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ ,\ \mbox{\hyperlink{struct_runtime_1_1_module_instance_ad145f5d94690827d27cf4a650f70391c}{tables}}(inTableImports)}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ ,\ \mbox{\hyperlink{struct_runtime_1_1_module_instance_af3a1eaa936f73428d469498b96fd3181}{memories}}(inMemoryImports)}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ ,\ \mbox{\hyperlink{struct_runtime_1_1_module_instance_ac750c8329d19563f2852733369cefc4c}{globals}}(inGlobalImports)}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ ,\ \mbox{\hyperlink{struct_runtime_1_1_module_instance_a388111c993baac2ec030e41db773a8aa}{defaultMemory}}(\textcolor{keyword}{nullptr})}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ ,\ \mbox{\hyperlink{struct_runtime_1_1_module_instance_a4b9cbe3016774341330e36d099934dd1}{defaultTable}}(\textcolor{keyword}{nullptr})}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ ,\ \mbox{\hyperlink{struct_runtime_1_1_module_instance_acb678c002fd8db66a7b610a4188094b5}{jitModule}}(\textcolor{keyword}{nullptr})}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{struct_runtime_1_1_module_instance_a5049cc224aba40ddf0a22a156d5522f9}\index{Runtime::ModuleInstance@{Runtime::ModuleInstance}!````~ModuleInstance@{\texorpdfstring{$\sim$}{\string~}ModuleInstance}}
+\index{````~ModuleInstance@{\texorpdfstring{$\sim$}{\string~}ModuleInstance}!Runtime::ModuleInstance@{Runtime::ModuleInstance}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}ModuleInstance()}{\string~ModuleInstance()}}
+{\footnotesize\ttfamily \label{struct_runtime_1_1_module_instance_a5049cc224aba40ddf0a22a156d5522f9} 
+Runtime\+::\+Module\+Instance\+::\texorpdfstring{$\sim$}{\string~}\+Module\+Instance (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_runtime_1_1_module_instance_a388111c993baac2ec030e41db773a8aa}\index{Runtime::ModuleInstance@{Runtime::ModuleInstance}!defaultMemory@{defaultMemory}}
+\index{defaultMemory@{defaultMemory}!Runtime::ModuleInstance@{Runtime::ModuleInstance}}
+\doxysubsubsection{\texorpdfstring{defaultMemory}{defaultMemory}}
+{\footnotesize\ttfamily \label{struct_runtime_1_1_module_instance_a388111c993baac2ec030e41db773a8aa} 
+\mbox{\hyperlink{struct_runtime_1_1_memory_instance}{Memory\+Instance}}\texorpdfstring{$\ast$}{*} Runtime\+::\+Module\+Instance\+::default\+Memory}
+
+
+
+Definition at line \mbox{\hyperlink{_runtime_private_8h_source_l00119}{119}} of file \mbox{\hyperlink{_runtime_private_8h_source}{Runtime\+Private.\+h}}.
+
+\Hypertarget{struct_runtime_1_1_module_instance_a4b9cbe3016774341330e36d099934dd1}\index{Runtime::ModuleInstance@{Runtime::ModuleInstance}!defaultTable@{defaultTable}}
+\index{defaultTable@{defaultTable}!Runtime::ModuleInstance@{Runtime::ModuleInstance}}
+\doxysubsubsection{\texorpdfstring{defaultTable}{defaultTable}}
+{\footnotesize\ttfamily \label{struct_runtime_1_1_module_instance_a4b9cbe3016774341330e36d099934dd1} 
+\mbox{\hyperlink{struct_runtime_1_1_table_instance}{Table\+Instance}}\texorpdfstring{$\ast$}{*} Runtime\+::\+Module\+Instance\+::default\+Table}
+
+
+
+Definition at line \mbox{\hyperlink{_runtime_private_8h_source_l00120}{120}} of file \mbox{\hyperlink{_runtime_private_8h_source}{Runtime\+Private.\+h}}.
+
+\Hypertarget{struct_runtime_1_1_module_instance_a02c25c91eddcab9aff39166226575adb}\index{Runtime::ModuleInstance@{Runtime::ModuleInstance}!exportMap@{exportMap}}
+\index{exportMap@{exportMap}!Runtime::ModuleInstance@{Runtime::ModuleInstance}}
+\doxysubsubsection{\texorpdfstring{exportMap}{exportMap}}
+{\footnotesize\ttfamily \label{struct_runtime_1_1_module_instance_a02c25c91eddcab9aff39166226575adb} 
+std\+::map$<$std\+::string,\mbox{\hyperlink{struct_runtime_1_1_object_instance}{Object\+Instance}}\texorpdfstring{$\ast$}{*}$>$ Runtime\+::\+Module\+Instance\+::export\+Map}
+
+
+
+Definition at line \mbox{\hyperlink{_runtime_private_8h_source_l00110}{110}} of file \mbox{\hyperlink{_runtime_private_8h_source}{Runtime\+Private.\+h}}.
+
+\Hypertarget{struct_runtime_1_1_module_instance_a72a475ad0c17e2c9db9fa7f77beb45c0}\index{Runtime::ModuleInstance@{Runtime::ModuleInstance}!functionDefs@{functionDefs}}
+\index{functionDefs@{functionDefs}!Runtime::ModuleInstance@{Runtime::ModuleInstance}}
+\doxysubsubsection{\texorpdfstring{functionDefs}{functionDefs}}
+{\footnotesize\ttfamily \label{struct_runtime_1_1_module_instance_a72a475ad0c17e2c9db9fa7f77beb45c0} 
+std\+::vector$<$\mbox{\hyperlink{struct_runtime_1_1_function_instance}{Function\+Instance}}\texorpdfstring{$\ast$}{*}$>$ Runtime\+::\+Module\+Instance\+::function\+Defs}
+
+
+
+Definition at line \mbox{\hyperlink{_runtime_private_8h_source_l00112}{112}} of file \mbox{\hyperlink{_runtime_private_8h_source}{Runtime\+Private.\+h}}.
+
+\Hypertarget{struct_runtime_1_1_module_instance_ad512509190e4e88f6d57fbdd72ab61d0}\index{Runtime::ModuleInstance@{Runtime::ModuleInstance}!functions@{functions}}
+\index{functions@{functions}!Runtime::ModuleInstance@{Runtime::ModuleInstance}}
+\doxysubsubsection{\texorpdfstring{functions}{functions}}
+{\footnotesize\ttfamily \label{struct_runtime_1_1_module_instance_ad512509190e4e88f6d57fbdd72ab61d0} 
+std\+::vector$<$\mbox{\hyperlink{struct_runtime_1_1_function_instance}{Function\+Instance}}\texorpdfstring{$\ast$}{*}$>$ Runtime\+::\+Module\+Instance\+::functions}
+
+
+
+Definition at line \mbox{\hyperlink{_runtime_private_8h_source_l00114}{114}} of file \mbox{\hyperlink{_runtime_private_8h_source}{Runtime\+Private.\+h}}.
+
+\Hypertarget{struct_runtime_1_1_module_instance_ac750c8329d19563f2852733369cefc4c}\index{Runtime::ModuleInstance@{Runtime::ModuleInstance}!globals@{globals}}
+\index{globals@{globals}!Runtime::ModuleInstance@{Runtime::ModuleInstance}}
+\doxysubsubsection{\texorpdfstring{globals}{globals}}
+{\footnotesize\ttfamily \label{struct_runtime_1_1_module_instance_ac750c8329d19563f2852733369cefc4c} 
+std\+::vector$<$\mbox{\hyperlink{struct_runtime_1_1_global_instance}{Global\+Instance}}\texorpdfstring{$\ast$}{*}$>$ Runtime\+::\+Module\+Instance\+::globals}
+
+
+
+Definition at line \mbox{\hyperlink{_runtime_private_8h_source_l00117}{117}} of file \mbox{\hyperlink{_runtime_private_8h_source}{Runtime\+Private.\+h}}.
+
+\Hypertarget{struct_runtime_1_1_module_instance_acb678c002fd8db66a7b610a4188094b5}\index{Runtime::ModuleInstance@{Runtime::ModuleInstance}!jitModule@{jitModule}}
+\index{jitModule@{jitModule}!Runtime::ModuleInstance@{Runtime::ModuleInstance}}
+\doxysubsubsection{\texorpdfstring{jitModule}{jitModule}}
+{\footnotesize\ttfamily \label{struct_runtime_1_1_module_instance_acb678c002fd8db66a7b610a4188094b5} 
+\mbox{\hyperlink{struct_l_l_v_m_j_i_t_1_1_j_i_t_module_base}{LLVMJIT\+::\+JITModule\+Base}}\texorpdfstring{$\ast$}{*} Runtime\+::\+Module\+Instance\+::jit\+Module}
+
+
+
+Definition at line \mbox{\hyperlink{_runtime_private_8h_source_l00122}{122}} of file \mbox{\hyperlink{_runtime_private_8h_source}{Runtime\+Private.\+h}}.
+
+\Hypertarget{struct_runtime_1_1_module_instance_af3a1eaa936f73428d469498b96fd3181}\index{Runtime::ModuleInstance@{Runtime::ModuleInstance}!memories@{memories}}
+\index{memories@{memories}!Runtime::ModuleInstance@{Runtime::ModuleInstance}}
+\doxysubsubsection{\texorpdfstring{memories}{memories}}
+{\footnotesize\ttfamily \label{struct_runtime_1_1_module_instance_af3a1eaa936f73428d469498b96fd3181} 
+std\+::vector$<$\mbox{\hyperlink{struct_runtime_1_1_memory_instance}{Memory\+Instance}}\texorpdfstring{$\ast$}{*}$>$ Runtime\+::\+Module\+Instance\+::memories}
+
+
+
+Definition at line \mbox{\hyperlink{_runtime_private_8h_source_l00116}{116}} of file \mbox{\hyperlink{_runtime_private_8h_source}{Runtime\+Private.\+h}}.
+
+\Hypertarget{struct_runtime_1_1_module_instance_a9758d1d7c64ccc35f19aeb4032fa0fd9}\index{Runtime::ModuleInstance@{Runtime::ModuleInstance}!startFunctionIndex@{startFunctionIndex}}
+\index{startFunctionIndex@{startFunctionIndex}!Runtime::ModuleInstance@{Runtime::ModuleInstance}}
+\doxysubsubsection{\texorpdfstring{startFunctionIndex}{startFunctionIndex}}
+{\footnotesize\ttfamily \label{struct_runtime_1_1_module_instance_a9758d1d7c64ccc35f19aeb4032fa0fd9} 
+\mbox{\hyperlink{_basic_types_8h_af4b74e6229378a16db5de05834273c54}{Uptr}} Runtime\+::\+Module\+Instance\+::start\+Function\+Index = \mbox{\hyperlink{stdint_8h_ab2355300ea19395357e62d780f4dd073}{UINTPTR\+\_\+\+MAX}}}
+
+
+
+Definition at line \mbox{\hyperlink{_runtime_private_8h_source_l00124}{124}} of file \mbox{\hyperlink{_runtime_private_8h_source}{Runtime\+Private.\+h}}.
+
+\Hypertarget{struct_runtime_1_1_module_instance_ad145f5d94690827d27cf4a650f70391c}\index{Runtime::ModuleInstance@{Runtime::ModuleInstance}!tables@{tables}}
+\index{tables@{tables}!Runtime::ModuleInstance@{Runtime::ModuleInstance}}
+\doxysubsubsection{\texorpdfstring{tables}{tables}}
+{\footnotesize\ttfamily \label{struct_runtime_1_1_module_instance_ad145f5d94690827d27cf4a650f70391c} 
+std\+::vector$<$\mbox{\hyperlink{struct_runtime_1_1_table_instance}{Table\+Instance}}\texorpdfstring{$\ast$}{*}$>$ Runtime\+::\+Module\+Instance\+::tables}
+
+
+
+Definition at line \mbox{\hyperlink{_runtime_private_8h_source_l00115}{115}} of file \mbox{\hyperlink{_runtime_private_8h_source}{Runtime\+Private.\+h}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/wasm-\/jit/\+Source/\+Runtime/\mbox{\hyperlink{_runtime_private_8h}{Runtime\+Private.\+h}}\end{DoxyCompactItemize}

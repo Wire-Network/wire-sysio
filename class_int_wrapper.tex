@@ -1,0 +1,151 @@
+\doxysection{Int\+Wrapper Class Reference}
+\hypertarget{class_int_wrapper}{}\label{class_int_wrapper}\index{IntWrapper@{IntWrapper}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_int_wrapper_a1d35e0d0b9c0fc109a8d2a2118ae6010}{Int\+Wrapper}} (int a\+\_\+value)
+\item 
+\mbox{\hyperlink{class_int_wrapper_af23efe3c8d8bf176948922b41e8f253e}{Int\+Wrapper}} (const \mbox{\hyperlink{class_int_wrapper}{Int\+Wrapper}} \&other)
+\item 
+\mbox{\hyperlink{class_int_wrapper}{Int\+Wrapper}} \mbox{\hyperlink{class_int_wrapper_a39077b3c0eb1dd8a296a81bfb0a047b3}{operator=}} (const \mbox{\hyperlink{class_int_wrapper}{Int\+Wrapper}} \&other)
+\item 
+\mbox{\hyperlink{class_int_wrapper}{Int\+Wrapper}} \mbox{\hyperlink{class_int_wrapper_abf97bd11dd2825f3cb9e4d9f48152b56}{operator+}} (int other) const
+\item 
+bool \mbox{\hyperlink{class_int_wrapper_a940fd2978cdf7849281f11b32df94163}{operator$<$}} (const \mbox{\hyperlink{class_int_wrapper}{Int\+Wrapper}} \&other) const
+\item 
+int \mbox{\hyperlink{class_int_wrapper_a6103e9dc5eb94678985e3c2ac481b508}{value}} () const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{gtest-param-test__test_8cc_source_l00297}{297}} of file \mbox{\hyperlink{gtest-param-test__test_8cc_source}{gtest-\/param-\/test\+\_\+test.\+cc}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_int_wrapper_a1d35e0d0b9c0fc109a8d2a2118ae6010}\index{IntWrapper@{IntWrapper}!IntWrapper@{IntWrapper}}
+\index{IntWrapper@{IntWrapper}!IntWrapper@{IntWrapper}}
+\doxysubsubsection{\texorpdfstring{IntWrapper()}{IntWrapper()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_int_wrapper_a1d35e0d0b9c0fc109a8d2a2118ae6010} 
+Int\+Wrapper\+::\+Int\+Wrapper (\begin{DoxyParamCaption}\item[{int}]{a\+\_\+value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-param-test__test_8cc_source_l00299}{299}} of file \mbox{\hyperlink{gtest-param-test__test_8cc_source}{gtest-\/param-\/test\+\_\+test.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00299\ :\ value\_(a\_value)\ \{\}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=343pt]{class_int_wrapper_a1d35e0d0b9c0fc109a8d2a2118ae6010_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_int_wrapper_af23efe3c8d8bf176948922b41e8f253e}\index{IntWrapper@{IntWrapper}!IntWrapper@{IntWrapper}}
+\index{IntWrapper@{IntWrapper}!IntWrapper@{IntWrapper}}
+\doxysubsubsection{\texorpdfstring{IntWrapper()}{IntWrapper()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_int_wrapper_af23efe3c8d8bf176948922b41e8f253e} 
+Int\+Wrapper\+::\+Int\+Wrapper (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_int_wrapper}{Int\+Wrapper}} \&}]{other}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-param-test__test_8cc_source_l00300}{300}} of file \mbox{\hyperlink{gtest-param-test__test_8cc_source}{gtest-\/param-\/test\+\_\+test.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00300\ :\ value\_(\mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.value\_)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_int_wrapper_abf97bd11dd2825f3cb9e4d9f48152b56}\index{IntWrapper@{IntWrapper}!operator+@{operator+}}
+\index{operator+@{operator+}!IntWrapper@{IntWrapper}}
+\doxysubsubsection{\texorpdfstring{operator+()}{operator+()}}
+{\footnotesize\ttfamily \label{class_int_wrapper_abf97bd11dd2825f3cb9e4d9f48152b56} 
+\mbox{\hyperlink{class_int_wrapper}{Int\+Wrapper}} Int\+Wrapper\+::operator+ (\begin{DoxyParamCaption}\item[{int}]{other}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-param-test__test_8cc_source_l00307}{307}} of file \mbox{\hyperlink{gtest-param-test__test_8cc_source}{gtest-\/param-\/test\+\_\+test.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00307\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_int_wrapper_a1d35e0d0b9c0fc109a8d2a2118ae6010}{IntWrapper}}(value\_\ +\ other);\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=343pt]{class_int_wrapper_abf97bd11dd2825f3cb9e4d9f48152b56_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_int_wrapper_a940fd2978cdf7849281f11b32df94163}\index{IntWrapper@{IntWrapper}!operator$<$@{operator$<$}}
+\index{operator$<$@{operator$<$}!IntWrapper@{IntWrapper}}
+\doxysubsubsection{\texorpdfstring{operator$<$()}{operator<()}}
+{\footnotesize\ttfamily \label{class_int_wrapper_a940fd2978cdf7849281f11b32df94163} 
+bool Int\+Wrapper\+::operator$<$ (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_int_wrapper}{Int\+Wrapper}} \&}]{other}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-param-test__test_8cc_source_l00308}{308}} of file \mbox{\hyperlink{gtest-param-test__test_8cc_source}{gtest-\/param-\/test\+\_\+test.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00308\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00309\ \ \ \ \ \textcolor{keywordflow}{return}\ value\_\ <\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.value\_;}
+\DoxyCodeLine{00310\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_int_wrapper_a39077b3c0eb1dd8a296a81bfb0a047b3}\index{IntWrapper@{IntWrapper}!operator=@{operator=}}
+\index{operator=@{operator=}!IntWrapper@{IntWrapper}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}}
+{\footnotesize\ttfamily \label{class_int_wrapper_a39077b3c0eb1dd8a296a81bfb0a047b3} 
+\mbox{\hyperlink{class_int_wrapper}{Int\+Wrapper}} Int\+Wrapper\+::operator= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_int_wrapper}{Int\+Wrapper}} \&}]{other}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-param-test__test_8cc_source_l00302}{302}} of file \mbox{\hyperlink{gtest-param-test__test_8cc_source}{gtest-\/param-\/test\+\_\+test.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00302\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00303\ \ \ \ \ value\_\ =\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.value\_;}
+\DoxyCodeLine{00304\ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{00305\ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_int_wrapper_a6103e9dc5eb94678985e3c2ac481b508}\index{IntWrapper@{IntWrapper}!value@{value}}
+\index{value@{value}!IntWrapper@{IntWrapper}}
+\doxysubsubsection{\texorpdfstring{value()}{value()}}
+{\footnotesize\ttfamily \label{class_int_wrapper_a6103e9dc5eb94678985e3c2ac481b508} 
+int Int\+Wrapper\+::value (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-param-test__test_8cc_source_l00311}{311}} of file \mbox{\hyperlink{gtest-param-test__test_8cc_source}{gtest-\/param-\/test\+\_\+test.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00311\ \{\ \textcolor{keywordflow}{return}\ value\_;\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=313pt]{class_int_wrapper_a6103e9dc5eb94678985e3c2ac481b508_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/test/\mbox{\hyperlink{gtest-param-test__test_8cc}{gtest-\/param-\/test\+\_\+test.\+cc}}\end{DoxyCompactItemize}

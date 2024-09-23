@@ -1,0 +1,11 @@
+<map id="Catch::translateActiveException" name="Catch::translateActiveException">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,70,215,96"/>
+<area shape="rect" id="Node000002" href="$struct_catch_1_1_i_registry_hub.html#aa97defa756fe28dd6249b19c12bbbec1" title=" " alt="" coords="268,5,480,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="172,67,262,47,263,53,173,72"/>
+<area shape="rect" id="Node000003" href="$namespace_catch.html#a5d328566cb8da87b48f1fac3f319ac7a" title=" " alt="" coords="297,70,452,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="215,80,281,80,281,86,215,86"/>
+<area shape="rect" id="Node000005" href="$struct_catch_1_1_i_exception_translator_registry.html#af76ae8c331a17f2a94c9720bc0d686bb" title=" " alt="" coords="263,120,486,161"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="173,94,263,113,262,119,172,99"/>
+<area shape="rect" id="Node000004" href="$class_catch_1_1_singleton.html#aa1b2bb002acd8838489a225dbbaf2865" title=" " alt="" coords="534,70,678,96"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="453,80,519,80,519,86,453,86"/>
+</map>

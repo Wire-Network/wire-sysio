@@ -1,0 +1,809 @@
+\doxysection{sysio\+::trace\+\_\+api\+::slice\+\_\+directory Class Reference}
+\hypertarget{classsysio_1_1trace__api_1_1slice__directory}{}\label{classsysio_1_1trace__api_1_1slice__directory}\index{sysio::trace\_api::slice\_directory@{sysio::trace\_api::slice\_directory}}
+
+
+{\ttfamily \#include $<$store\+\_\+provider.\+hpp$>$}
+
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1trace__api_1_1slice__directory_1_1index__header}{index\+\_\+header}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum class \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a532effe653319aa639caa41b48709ae0}{open\+\_\+state}} \{ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a532effe653319aa639caa41b48709ae0aecae13117d6f0584c25a9da6c8f8415e}{read}}
+, \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a532effe653319aa639caa41b48709ae0aefb2a684e4afb7d55e6147fbe5a332ee}{write}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_aa1109759adce42b01b76b9e72a8e8ae8}{slice\+\_\+directory}} (const boost\+::filesystem\+::path \&slice\+\_\+dir, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{catch__reporter__console_8cpp_a2474a5474cbff19523a51eb1de01cda4}{width}}, std\+::optional$<$ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} $>$ minimum\+\_\+irreversible\+\_\+history\+\_\+blocks, std\+::optional$<$ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} $>$ minimum\+\_\+uncompressed\+\_\+irreversible\+\_\+history\+\_\+blocks, size\+\_\+t compression\+\_\+seek\+\_\+point\+\_\+stride)
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a47a30741cf28932df1556209da63b227}{slice\+\_\+number}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} block\+\_\+height) const
+\item 
+bool \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a24faf23a87e249099bea549dbda165b2}{find\+\_\+or\+\_\+create\+\_\+index\+\_\+slice}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a47a30741cf28932df1556209da63b227}{slice\+\_\+number}}, \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a532effe653319aa639caa41b48709ae0}{open\+\_\+state}} \mbox{\hyperlink{structstate}{state}}, \mbox{\hyperlink{classfc_1_1cfile}{fc\+::cfile}} \&index\+\_\+file) const
+\item 
+bool \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_aa8fdc6fcd3d18c76b517d65b6ea56bef}{find\+\_\+index\+\_\+slice}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a47a30741cf28932df1556209da63b227}{slice\+\_\+number}}, \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a532effe653319aa639caa41b48709ae0}{open\+\_\+state}} \mbox{\hyperlink{structstate}{state}}, \mbox{\hyperlink{classfc_1_1cfile}{fc\+::cfile}} \&index\+\_\+file, bool open\+\_\+file=true) const
+\item 
+bool \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a365023e0ceb97c69aa3ad66c393c2125}{find\+\_\+or\+\_\+create\+\_\+trace\+\_\+slice}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a47a30741cf28932df1556209da63b227}{slice\+\_\+number}}, \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a532effe653319aa639caa41b48709ae0}{open\+\_\+state}} \mbox{\hyperlink{structstate}{state}}, \mbox{\hyperlink{classfc_1_1cfile}{fc\+::cfile}} \&trace\+\_\+file) const
+\item 
+bool \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a314838e3f2122e4bcc7f1279b78f7d0c}{find\+\_\+trace\+\_\+slice}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a47a30741cf28932df1556209da63b227}{slice\+\_\+number}}, \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a532effe653319aa639caa41b48709ae0}{open\+\_\+state}} \mbox{\hyperlink{structstate}{state}}, \mbox{\hyperlink{classfc_1_1cfile}{fc\+::cfile}} \&trace\+\_\+file, bool open\+\_\+file=true) const
+\item 
+std\+::optional$<$ \mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file}{compressed\+\_\+file}} $>$ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a79cb70775a7aa5e99311529fa6ce30a2}{find\+\_\+compressed\+\_\+trace\+\_\+slice}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a47a30741cf28932df1556209da63b227}{slice\+\_\+number}}, bool open\+\_\+file=true) const
+\item 
+void \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_ac7433eb9c741feab026859dc4807b174}{find\+\_\+or\+\_\+create\+\_\+slice\+\_\+pair}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a47a30741cf28932df1556209da63b227}{slice\+\_\+number}}, \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a532effe653319aa639caa41b48709ae0}{open\+\_\+state}} \mbox{\hyperlink{structstate}{state}}, \mbox{\hyperlink{classfc_1_1cfile}{fc\+::cfile}} \&trace, \mbox{\hyperlink{classfc_1_1cfile}{fc\+::cfile}} \&index)
+\item 
+bool \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_aaa86b5afdb3d46491da2af321f6b54bd}{find\+\_\+or\+\_\+create\+\_\+trx\+\_\+id\+\_\+slice}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a47a30741cf28932df1556209da63b227}{slice\+\_\+number}}, \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a532effe653319aa639caa41b48709ae0}{open\+\_\+state}} \mbox{\hyperlink{structstate}{state}}, \mbox{\hyperlink{classfc_1_1cfile}{fc\+::cfile}} \&trx\+\_\+id\+\_\+file) const
+\item 
+bool \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_afd4f092c1fd16893e6d0a8cc06a40ea4}{find\+\_\+trx\+\_\+id\+\_\+slice}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a47a30741cf28932df1556209da63b227}{slice\+\_\+number}}, \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a532effe653319aa639caa41b48709ae0}{open\+\_\+state}} \mbox{\hyperlink{structstate}{state}}, \mbox{\hyperlink{classfc_1_1cfile}{fc\+::cfile}} \&trx\+\_\+id\+\_\+file, bool open\+\_\+file=true) const
+\item 
+void \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_aca2e44229ad8159ea40397ec974fca22}{set\+\_\+lib}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} lib)
+\item 
+void \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a7c7ccb0852100b5ab21daef4ac3133cc}{start\+\_\+maintenance\+\_\+thread}} (\mbox{\hyperlink{namespacesysio_1_1trace__api_ac599662bf2df3135abffd5ff3adbca19}{log\+\_\+handler}} log)
+\item 
+void \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_ad847f59ef5d63042406e109f2fd836a6}{stop\+\_\+maintenance\+\_\+thread}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a8b15d66d020bfc67d541e6cf09404ab9}{run\+\_\+maintenance\+\_\+tasks}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} lib, const \mbox{\hyperlink{namespacesysio_1_1trace__api_ac599662bf2df3135abffd5ff3adbca19}{log\+\_\+handler}} \&log)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Provides access to the slice directory. It is only intended to be used by \doxylink{classsysio_1_1trace__api_1_1store__provider}{store\+\_\+provider} and unit tests. 
+
+Definition at line \mbox{\hyperlink{store__provider_8hpp_source_l00096}{96}} of file \mbox{\hyperlink{store__provider_8hpp_source}{store\+\_\+provider.\+hpp}}.
+
+
+
+\doxysubsection{Member Enumeration Documentation}
+\Hypertarget{classsysio_1_1trace__api_1_1slice__directory_a532effe653319aa639caa41b48709ae0}\index{sysio::trace\_api::slice\_directory@{sysio::trace\_api::slice\_directory}!open\_state@{open\_state}}
+\index{open\_state@{open\_state}!sysio::trace\_api::slice\_directory@{sysio::trace\_api::slice\_directory}}
+\doxysubsubsection{\texorpdfstring{open\_state}{open\_state}}
+{\footnotesize\ttfamily \label{classsysio_1_1trace__api_1_1slice__directory_a532effe653319aa639caa41b48709ae0} 
+enum \mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a532effe653319aa639caa41b48709ae0}{sysio\+::trace\+\_\+api\+::slice\+\_\+directory\+::open\+\_\+state}}\hspace{0.3cm}{\ttfamily [strong]}}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{read@{read}!sysio::trace\_api::slice\_directory@{sysio::trace\_api::slice\_directory}}\index{sysio::trace\_api::slice\_directory@{sysio::trace\_api::slice\_directory}!read@{read}}}\Hypertarget{classsysio_1_1trace__api_1_1slice__directory_a532effe653319aa639caa41b48709ae0aecae13117d6f0584c25a9da6c8f8415e}\label{classsysio_1_1trace__api_1_1slice__directory_a532effe653319aa639caa41b48709ae0} 
+read&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{write@{write}!sysio::trace\_api::slice\_directory@{sysio::trace\_api::slice\_directory}}\index{sysio::trace\_api::slice\_directory@{sysio::trace\_api::slice\_directory}!write@{write}}}\Hypertarget{classsysio_1_1trace__api_1_1slice__directory_a532effe653319aa639caa41b48709ae0aefb2a684e4afb7d55e6147fbe5a332ee}\label{classsysio_1_1trace__api_1_1slice__directory_a532effe653319aa639caa41b48709ae0} 
+write&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{store__provider_8hpp_source_l00102}{102}} of file \mbox{\hyperlink{store__provider_8hpp_source}{store\+\_\+provider.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00102\ \{\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a532effe653319aa639caa41b48709ae0aecae13117d6f0584c25a9da6c8f8415e}{read}}\ \textcolor{comment}{/*read\ from\ front\ to\ back*/},\ write\ \textcolor{comment}{/*write\ to\ end\ of\ file*/}\ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classsysio_1_1trace__api_1_1slice__directory_aa1109759adce42b01b76b9e72a8e8ae8}\index{sysio::trace\_api::slice\_directory@{sysio::trace\_api::slice\_directory}!slice\_directory@{slice\_directory}}
+\index{slice\_directory@{slice\_directory}!sysio::trace\_api::slice\_directory@{sysio::trace\_api::slice\_directory}}
+\doxysubsubsection{\texorpdfstring{slice\_directory()}{slice\_directory()}}
+{\footnotesize\ttfamily \label{classsysio_1_1trace__api_1_1slice__directory_aa1109759adce42b01b76b9e72a8e8ae8} 
+sysio\+::trace\+\_\+api\+::slice\+\_\+directory\+::slice\+\_\+directory (\begin{DoxyParamCaption}\item[{const boost\+::filesystem\+::path \&}]{slice\+\_\+dir}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{width}{, }\item[{std\+::optional$<$ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} $>$}]{minimum\+\_\+irreversible\+\_\+history\+\_\+blocks}{, }\item[{std\+::optional$<$ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} $>$}]{minimum\+\_\+uncompressed\+\_\+irreversible\+\_\+history\+\_\+blocks}{, }\item[{size\+\_\+t}]{compression\+\_\+seek\+\_\+point\+\_\+stride}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{store__provider_8cpp_source_l00153}{153}} of file \mbox{\hyperlink{store__provider_8cpp_source}{store\+\_\+provider.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00154\ \ \ \ :\ \_slice\_dir(slice\_dir)}
+\DoxyCodeLine{00155\ \ \ \ ,\ \_width(\mbox{\hyperlink{catch__reporter__console_8cpp_a2474a5474cbff19523a51eb1de01cda4}{width}})}
+\DoxyCodeLine{00156\ \ \ \ ,\ \_minimum\_irreversible\_history\_blocks(minimum\_irreversible\_history\_blocks)}
+\DoxyCodeLine{00157\ \ \ \ ,\ \_minimum\_uncompressed\_irreversible\_history\_blocks(minimum\_uncompressed\_irreversible\_history\_blocks)}
+\DoxyCodeLine{00158\ \ \ \ ,\ \_compression\_seek\_point\_stride(compression\_seek\_point\_stride)}
+\DoxyCodeLine{00159\ \ \ \ ,\ \_best\_known\_lib(0)\ \{}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{namespacefc_a3fcf0d920aea28014aacae50a51d8485}{exists}}(\_slice\_dir))\ \{}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \ bfs::create\_directories(slice\_dir);}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00163\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=300pt]{classsysio_1_1trace__api_1_1slice__directory_aa1109759adce42b01b76b9e72a8e8ae8_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1trace__api_1_1slice__directory_a79cb70775a7aa5e99311529fa6ce30a2}\index{sysio::trace\_api::slice\_directory@{sysio::trace\_api::slice\_directory}!find\_compressed\_trace\_slice@{find\_compressed\_trace\_slice}}
+\index{find\_compressed\_trace\_slice@{find\_compressed\_trace\_slice}!sysio::trace\_api::slice\_directory@{sysio::trace\_api::slice\_directory}}
+\doxysubsubsection{\texorpdfstring{find\_compressed\_trace\_slice()}{find\_compressed\_trace\_slice()}}
+{\footnotesize\ttfamily \label{classsysio_1_1trace__api_1_1slice__directory_a79cb70775a7aa5e99311529fa6ce30a2} 
+std\+::optional$<$ \mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file}{compressed\+\_\+file}} $>$ sysio\+::trace\+\_\+api\+::slice\+\_\+directory\+::find\+\_\+compressed\+\_\+trace\+\_\+slice (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{slice\+\_\+number}{, }\item[{bool}]{open\+\_\+file}{ = {\ttfamily true}}\end{DoxyParamCaption}) const}
+
+Find the read-\/only compressed trace file associated with the indicated slice\+\_\+number
+
+
+\begin{DoxyParams}{Parameters}
+{\em slice\+\_\+number} & \+: slice number of the requested slice file \\
+\hline
+{\em open\+\_\+file} & \+: indicate if the file should be opened (if found) or not \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+if file was found (i.\+e. already existed) returns an optional containing a \doxylink{classsysio_1_1trace__api_1_1compressed__file}{compressed\+\_\+file} which is open (or not) depending on the {\ttfamily open\+\_\+file} paraneter, Otherwise, the returned optional is empty 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{store__provider_8cpp_source_l00227}{227}} of file \mbox{\hyperlink{store__provider_8cpp_source}{store\+\_\+provider.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00227\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00228\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespaceembed_clara_a1e1bd594f85f58f5dca6c41c0ac720fb}{filename}}\ =\ make\_filename(\_trace\_prefix,\ \_compressed\_trace\_ext,\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a47a30741cf28932df1556209da63b227}{slice\_number}},\ \_width);}
+\DoxyCodeLine{00229\ \ \ \ \ \ \ \textcolor{keyword}{const}\ path\ slice\_path\ =\ \_slice\_dir\ /\ \mbox{\hyperlink{namespaceembed_clara_a1e1bd594f85f58f5dca6c41c0ac720fb}{filename}};}
+\DoxyCodeLine{00230\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ file\_exists\ =\ \mbox{\hyperlink{namespacefc_a3fcf0d920aea28014aacae50a51d8485}{exists}}(slice\_path);}
+\DoxyCodeLine{00231\ }
+\DoxyCodeLine{00232\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (file\_exists)\ \{}
+\DoxyCodeLine{00233\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ result\ =\ compressed\_file(slice\_path);}
+\DoxyCodeLine{00234\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (open\_file)\ \{}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \ \ \ \ \ \ result.open();}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00237\ }
+\DoxyCodeLine{00238\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::move(result);}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{\};}
+\DoxyCodeLine{00241\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00242\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1trace__api_1_1slice__directory_a79cb70775a7aa5e99311529fa6ce30a2_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1trace__api_1_1slice__directory_a79cb70775a7aa5e99311529fa6ce30a2_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1trace__api_1_1slice__directory_aa8fdc6fcd3d18c76b517d65b6ea56bef}\index{sysio::trace\_api::slice\_directory@{sysio::trace\_api::slice\_directory}!find\_index\_slice@{find\_index\_slice}}
+\index{find\_index\_slice@{find\_index\_slice}!sysio::trace\_api::slice\_directory@{sysio::trace\_api::slice\_directory}}
+\doxysubsubsection{\texorpdfstring{find\_index\_slice()}{find\_index\_slice()}}
+{\footnotesize\ttfamily \label{classsysio_1_1trace__api_1_1slice__directory_aa8fdc6fcd3d18c76b517d65b6ea56bef} 
+bool sysio\+::trace\+\_\+api\+::slice\+\_\+directory\+::find\+\_\+index\+\_\+slice (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{slice\+\_\+number}{, }\item[{\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a532effe653319aa639caa41b48709ae0}{open\+\_\+state}}}]{state}{, }\item[{\mbox{\hyperlink{classfc_1_1cfile}{fc\+::cfile}} \&}]{index\+\_\+file}{, }\item[{bool}]{open\+\_\+file}{ = {\ttfamily true}}\end{DoxyParamCaption}) const}
+
+Find the index file associated with the indicated slice\+\_\+number
+
+
+\begin{DoxyParams}{Parameters}
+{\em slice\+\_\+number} & \+: slice number of the requested slice file \\
+\hline
+{\em state} & \+: indicate if the file is going to be written to (appended) or read \\
+\hline
+{\em index\+\_\+file} & \+: the cfile that will be set to the appropriate slice filename (always) and opened to that file (if it was found) \\
+\hline
+{\em open\+\_\+file} & \+: indicate if the file should be opened (if found) or not \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the true if file was found (i.\+e. already existed), if not found index\+\_\+file is set to the appropriate file, but not open 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{store__provider_8cpp_source_l00173}{173}} of file \mbox{\hyperlink{store__provider_8cpp_source}{store\+\_\+provider.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ found\ =\ find\_slice(\_trace\_index\_prefix,\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a47a30741cf28932df1556209da63b227}{slice\_number}},\ index\_file,\ open\_file);}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !found\ ||\ !open\_file\ )\ \{}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ found;}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00178\ }
+\DoxyCodeLine{00179\ \ \ \ \ \ \ validate\_existing\_index\_slice\_file(index\_file,\ \mbox{\hyperlink{structstate}{state}});}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00181\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1trace__api_1_1slice__directory_aa8fdc6fcd3d18c76b517d65b6ea56bef_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1trace__api_1_1slice__directory_aa8fdc6fcd3d18c76b517d65b6ea56bef_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1trace__api_1_1slice__directory_a24faf23a87e249099bea549dbda165b2}\index{sysio::trace\_api::slice\_directory@{sysio::trace\_api::slice\_directory}!find\_or\_create\_index\_slice@{find\_or\_create\_index\_slice}}
+\index{find\_or\_create\_index\_slice@{find\_or\_create\_index\_slice}!sysio::trace\_api::slice\_directory@{sysio::trace\_api::slice\_directory}}
+\doxysubsubsection{\texorpdfstring{find\_or\_create\_index\_slice()}{find\_or\_create\_index\_slice()}}
+{\footnotesize\ttfamily \label{classsysio_1_1trace__api_1_1slice__directory_a24faf23a87e249099bea549dbda165b2} 
+bool sysio\+::trace\+\_\+api\+::slice\+\_\+directory\+::find\+\_\+or\+\_\+create\+\_\+index\+\_\+slice (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{slice\+\_\+number}{, }\item[{\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a532effe653319aa639caa41b48709ae0}{open\+\_\+state}}}]{state}{, }\item[{\mbox{\hyperlink{classfc_1_1cfile}{fc\+::cfile}} \&}]{index\+\_\+file}{}\end{DoxyParamCaption}) const}
+
+Find or create the index file associated with the indicated slice\+\_\+number
+
+
+\begin{DoxyParams}{Parameters}
+{\em slice\+\_\+number} & \+: slice number of the requested slice file \\
+\hline
+{\em state} & \+: indicate if the file is going to be written to (appended) or read \\
+\hline
+{\em index\+\_\+file} & \+: the cfile that will be set to the appropriate slice filename and opened to that file \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the true if file was found (i.\+e. already existed) 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{store__provider_8cpp_source_l00165}{165}} of file \mbox{\hyperlink{store__provider_8cpp_source}{store\+\_\+provider.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ found\ =\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_aa8fdc6fcd3d18c76b517d65b6ea56bef}{find\_index\_slice}}(\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a47a30741cf28932df1556209da63b227}{slice\_number}},\ \mbox{\hyperlink{structstate}{state}},\ index\_file);}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !found\ )\ \{}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \ create\_new\_index\_slice\_file(index\_file);}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ found;}
+\DoxyCodeLine{00171\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1trace__api_1_1slice__directory_a24faf23a87e249099bea549dbda165b2_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1trace__api_1_1slice__directory_a24faf23a87e249099bea549dbda165b2_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1trace__api_1_1slice__directory_ac7433eb9c741feab026859dc4807b174}\index{sysio::trace\_api::slice\_directory@{sysio::trace\_api::slice\_directory}!find\_or\_create\_slice\_pair@{find\_or\_create\_slice\_pair}}
+\index{find\_or\_create\_slice\_pair@{find\_or\_create\_slice\_pair}!sysio::trace\_api::slice\_directory@{sysio::trace\_api::slice\_directory}}
+\doxysubsubsection{\texorpdfstring{find\_or\_create\_slice\_pair()}{find\_or\_create\_slice\_pair()}}
+{\footnotesize\ttfamily \label{classsysio_1_1trace__api_1_1slice__directory_ac7433eb9c741feab026859dc4807b174} 
+void sysio\+::trace\+\_\+api\+::slice\+\_\+directory\+::find\+\_\+or\+\_\+create\+\_\+slice\+\_\+pair (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{slice\+\_\+number}{, }\item[{\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a532effe653319aa639caa41b48709ae0}{open\+\_\+state}}}]{state}{, }\item[{\mbox{\hyperlink{classfc_1_1cfile}{fc\+::cfile}} \&}]{trace}{, }\item[{\mbox{\hyperlink{classfc_1_1cfile}{fc\+::cfile}} \&}]{index}{}\end{DoxyParamCaption})}
+
+Find or create a trace and index file pair
+
+
+\begin{DoxyParams}{Parameters}
+{\em slice\+\_\+number} & \+: slice number of the requested slice file \\
+\hline
+{\em state} & \+: indicate if the file is going to be written to (appended) or read \\
+\hline
+{\em trace} & \+: the cfile that will be set to the appropriate slice filename and opened to that file \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{store__provider_8cpp_source_l00262}{262}} of file \mbox{\hyperlink{store__provider_8cpp_source}{store\+\_\+provider.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00262\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00263\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ trace\_found\ =\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a365023e0ceb97c69aa3ad66c393c2125}{find\_or\_create\_trace\_slice}}(\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a47a30741cf28932df1556209da63b227}{slice\_number}},\ \mbox{\hyperlink{structstate}{state}},\ trace);}
+\DoxyCodeLine{00264\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ index\_found\ =\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a24faf23a87e249099bea549dbda165b2}{find\_or\_create\_index\_slice}}(\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a47a30741cf28932df1556209da63b227}{slice\_number}},\ \mbox{\hyperlink{structstate}{state}},\ index);}
+\DoxyCodeLine{00265\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (trace\_found\ !=\ index\_found)\ \{}
+\DoxyCodeLine{00266\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::string\ trace\_status\ =\ trace\_found\ ?\ \textcolor{stringliteral}{"{}existing"{}}\ :\ \textcolor{stringliteral}{"{}new"{}};}
+\DoxyCodeLine{00267\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::string\ index\_status\ =\ index\_found\ ?\ \textcolor{stringliteral}{"{}existing"{}}\ :\ \textcolor{stringliteral}{"{}new"{}};}
+\DoxyCodeLine{00268\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}}(\textcolor{stringliteral}{"{}Trace\ file\ is\ \$\{ts\},\ but\ it's\ metadata\ file\ is\ \$\{is\}.\ This\ means\ the\ files\ are\ not\ consistent."{}},\ (\textcolor{stringliteral}{"{}ts"{}},\ trace\_status)(\textcolor{stringliteral}{"{}is"{}},\ index\_status));}
+\DoxyCodeLine{00269\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00270\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1trace__api_1_1slice__directory_ac7433eb9c741feab026859dc4807b174_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1trace__api_1_1slice__directory_ac7433eb9c741feab026859dc4807b174_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1trace__api_1_1slice__directory_a365023e0ceb97c69aa3ad66c393c2125}\index{sysio::trace\_api::slice\_directory@{sysio::trace\_api::slice\_directory}!find\_or\_create\_trace\_slice@{find\_or\_create\_trace\_slice}}
+\index{find\_or\_create\_trace\_slice@{find\_or\_create\_trace\_slice}!sysio::trace\_api::slice\_directory@{sysio::trace\_api::slice\_directory}}
+\doxysubsubsection{\texorpdfstring{find\_or\_create\_trace\_slice()}{find\_or\_create\_trace\_slice()}}
+{\footnotesize\ttfamily \label{classsysio_1_1trace__api_1_1slice__directory_a365023e0ceb97c69aa3ad66c393c2125} 
+bool sysio\+::trace\+\_\+api\+::slice\+\_\+directory\+::find\+\_\+or\+\_\+create\+\_\+trace\+\_\+slice (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{slice\+\_\+number}{, }\item[{\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a532effe653319aa639caa41b48709ae0}{open\+\_\+state}}}]{state}{, }\item[{\mbox{\hyperlink{classfc_1_1cfile}{fc\+::cfile}} \&}]{trace\+\_\+file}{}\end{DoxyParamCaption}) const}
+
+Find or create the trace file associated with the indicated slice\+\_\+number
+
+
+\begin{DoxyParams}{Parameters}
+{\em slice\+\_\+number} & \+: slice number of the requested slice file \\
+\hline
+{\em state} & \+: indicate if the file is going to be written to (appended) or read \\
+\hline
+{\em trace\+\_\+file} & \+: the cfile that will be set to the appropriate slice filename and opened to that file \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the true if file was found (i.\+e. already existed) 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{store__provider_8cpp_source_l00201}{201}} of file \mbox{\hyperlink{store__provider_8cpp_source}{store\+\_\+provider.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ found\ =\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a314838e3f2122e4bcc7f1279b78f7d0c}{find\_trace\_slice}}(\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a47a30741cf28932df1556209da63b227}{slice\_number}},\ \mbox{\hyperlink{structstate}{state}},\ trace\_file);}
+\DoxyCodeLine{00203\ }
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !found\ )\ \{}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ \ trace\_file.\mbox{\hyperlink{classfc_1_1cfile_a9e01adaeee108420312ed271133a2d7d}{open}}(\mbox{\hyperlink{classfc_1_1cfile_a7a3023c63962b85efb8129379442234b}{fc::cfile::create\_or\_update\_rw\_mode}});}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00207\ }
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ found;}
+\DoxyCodeLine{00209\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1trace__api_1_1slice__directory_a365023e0ceb97c69aa3ad66c393c2125_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1trace__api_1_1slice__directory_a365023e0ceb97c69aa3ad66c393c2125_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1trace__api_1_1slice__directory_aaa86b5afdb3d46491da2af321f6b54bd}\index{sysio::trace\_api::slice\_directory@{sysio::trace\_api::slice\_directory}!find\_or\_create\_trx\_id\_slice@{find\_or\_create\_trx\_id\_slice}}
+\index{find\_or\_create\_trx\_id\_slice@{find\_or\_create\_trx\_id\_slice}!sysio::trace\_api::slice\_directory@{sysio::trace\_api::slice\_directory}}
+\doxysubsubsection{\texorpdfstring{find\_or\_create\_trx\_id\_slice()}{find\_or\_create\_trx\_id\_slice()}}
+{\footnotesize\ttfamily \label{classsysio_1_1trace__api_1_1slice__directory_aaa86b5afdb3d46491da2af321f6b54bd} 
+bool sysio\+::trace\+\_\+api\+::slice\+\_\+directory\+::find\+\_\+or\+\_\+create\+\_\+trx\+\_\+id\+\_\+slice (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{slice\+\_\+number}{, }\item[{\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a532effe653319aa639caa41b48709ae0}{open\+\_\+state}}}]{state}{, }\item[{\mbox{\hyperlink{classfc_1_1cfile}{fc\+::cfile}} \&}]{trx\+\_\+id\+\_\+file}{}\end{DoxyParamCaption}) const}
+
+Find or create a trx id file that contains all the transaction ids and associated block numbers
+
+
+\begin{DoxyParams}{Parameters}
+{\em slice\+\_\+number} & \+: slice number of the requested slice file \\
+\hline
+{\em state} & \+: indicate if the file is going to be written to (appended) or read \\
+\hline
+{\em trx\+\_\+id\+\_\+file} & \+: the cfile \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true if file was found (i.\+e. already existed) 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{store__provider_8cpp_source_l00272}{272}} of file \mbox{\hyperlink{store__provider_8cpp_source}{store\+\_\+provider.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00272\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00273\ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ found\ =\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_afd4f092c1fd16893e6d0a8cc06a40ea4}{find\_trx\_id\_slice}}(\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a47a30741cf28932df1556209da63b227}{slice\_number}},\ \mbox{\hyperlink{structstate}{state}},\ trx\_id\_file);}
+\DoxyCodeLine{00274\ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !found\ )\ \{}
+\DoxyCodeLine{00275\ \ \ \ \ \ \ \ \ \ \ \ trx\_id\_file.\mbox{\hyperlink{classfc_1_1cfile_a9e01adaeee108420312ed271133a2d7d}{open}}(\mbox{\hyperlink{classfc_1_1cfile_a7a3023c63962b85efb8129379442234b}{fc::cfile::create\_or\_update\_rw\_mode}});}
+\DoxyCodeLine{00276\ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00277\ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ found;}
+\DoxyCodeLine{00278\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1trace__api_1_1slice__directory_aaa86b5afdb3d46491da2af321f6b54bd_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1trace__api_1_1slice__directory_aaa86b5afdb3d46491da2af321f6b54bd_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1trace__api_1_1slice__directory_a314838e3f2122e4bcc7f1279b78f7d0c}\index{sysio::trace\_api::slice\_directory@{sysio::trace\_api::slice\_directory}!find\_trace\_slice@{find\_trace\_slice}}
+\index{find\_trace\_slice@{find\_trace\_slice}!sysio::trace\_api::slice\_directory@{sysio::trace\_api::slice\_directory}}
+\doxysubsubsection{\texorpdfstring{find\_trace\_slice()}{find\_trace\_slice()}}
+{\footnotesize\ttfamily \label{classsysio_1_1trace__api_1_1slice__directory_a314838e3f2122e4bcc7f1279b78f7d0c} 
+bool sysio\+::trace\+\_\+api\+::slice\+\_\+directory\+::find\+\_\+trace\+\_\+slice (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{slice\+\_\+number}{, }\item[{\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a532effe653319aa639caa41b48709ae0}{open\+\_\+state}}}]{state}{, }\item[{\mbox{\hyperlink{classfc_1_1cfile}{fc\+::cfile}} \&}]{trace\+\_\+file}{, }\item[{bool}]{open\+\_\+file}{ = {\ttfamily true}}\end{DoxyParamCaption}) const}
+
+Find the trace file associated with the indicated slice\+\_\+number
+
+
+\begin{DoxyParams}{Parameters}
+{\em slice\+\_\+number} & \+: slice number of the requested slice file \\
+\hline
+{\em state} & \+: indicate if the file is going to be written to (appended) or read \\
+\hline
+{\em trace\+\_\+file} & \+: the cfile that will be set to the appropriate slice filename (always) and opened to that file (if it was found) \\
+\hline
+{\em open\+\_\+file} & \+: indicate if the file should be opened (if found) or not \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the true if file was found (i.\+e. already existed), if not found index\+\_\+file is set to the appropriate file, but not open 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{store__provider_8cpp_source_l00211}{211}} of file \mbox{\hyperlink{store__provider_8cpp_source}{store\+\_\+provider.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ found\ =\ find\_slice(\_trace\_prefix,\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a47a30741cf28932df1556209da63b227}{slice\_number}},\ trace\_file,\ open\_file);}
+\DoxyCodeLine{00213\ }
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !found\ ||\ !open\_file\ )\ \{}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ found;}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00217\ }
+\DoxyCodeLine{00218\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{structstate}{state}}\ ==\ open\_state::write\ )\ \{}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \ \ \ trace\_file.\mbox{\hyperlink{classfc_1_1cfile_a29badc2b6c1f589d0c79b20ce31cacf0}{seek\_end}}(0);}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \ \ \ trace\_file.\mbox{\hyperlink{classfc_1_1cfile_a6eb4fe4530480f13c6cf773a7f1e3847}{seek}}(0);\ \textcolor{comment}{//\ ensure\ we\ are\ at\ the\ start\ of\ the\ file}}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00225\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1trace__api_1_1slice__directory_a314838e3f2122e4bcc7f1279b78f7d0c_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1trace__api_1_1slice__directory_a314838e3f2122e4bcc7f1279b78f7d0c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1trace__api_1_1slice__directory_afd4f092c1fd16893e6d0a8cc06a40ea4}\index{sysio::trace\_api::slice\_directory@{sysio::trace\_api::slice\_directory}!find\_trx\_id\_slice@{find\_trx\_id\_slice}}
+\index{find\_trx\_id\_slice@{find\_trx\_id\_slice}!sysio::trace\_api::slice\_directory@{sysio::trace\_api::slice\_directory}}
+\doxysubsubsection{\texorpdfstring{find\_trx\_id\_slice()}{find\_trx\_id\_slice()}}
+{\footnotesize\ttfamily \label{classsysio_1_1trace__api_1_1slice__directory_afd4f092c1fd16893e6d0a8cc06a40ea4} 
+bool sysio\+::trace\+\_\+api\+::slice\+\_\+directory\+::find\+\_\+trx\+\_\+id\+\_\+slice (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{slice\+\_\+number}{, }\item[{\mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a532effe653319aa639caa41b48709ae0}{open\+\_\+state}}}]{state}{, }\item[{\mbox{\hyperlink{classfc_1_1cfile}{fc\+::cfile}} \&}]{trx\+\_\+id\+\_\+file}{, }\item[{bool}]{open\+\_\+file}{ = {\ttfamily true}}\end{DoxyParamCaption}) const}
+
+Find the trx id file
+
+
+\begin{DoxyParams}{Parameters}
+{\em slice\+\_\+number} & \+: slice number of the requested slice file \\
+\hline
+{\em state} & \+: indicate if the file is going to be written to (appended) or read \\
+\hline
+{\em trx\+\_\+id\+\_\+file} & \+: the cfile \\
+\hline
+{\em open\+\_\+file} & \+: indicate if the file should be opened (if found) or not \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true if file was found (i.\+e. already existed), if not found trx\+\_\+id\+\_\+file is set to the appropriate file, but not opened 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{store__provider_8cpp_source_l00280}{280}} of file \mbox{\hyperlink{store__provider_8cpp_source}{store\+\_\+provider.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00280\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00281\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ found\ =\ find\_slice(\_trace\_trx\_id\_prefix,\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a47a30741cf28932df1556209da63b227}{slice\_number}},\ trx\_id\_file,\ open\_file);}
+\DoxyCodeLine{00282\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !found\ ||\ !open\_file\ )\ \{}
+\DoxyCodeLine{00283\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ found;}
+\DoxyCodeLine{00284\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00285\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{structstate}{state}}\ ==\ open\_state::write\ )\ \{}
+\DoxyCodeLine{00286\ \ \ \ \ \ \ \ \ \ \ trx\_id\_file.\mbox{\hyperlink{classfc_1_1cfile_a29badc2b6c1f589d0c79b20ce31cacf0}{seek\_end}}(0);}
+\DoxyCodeLine{00287\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00288\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00289\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1trace__api_1_1slice__directory_afd4f092c1fd16893e6d0a8cc06a40ea4_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1trace__api_1_1slice__directory_afd4f092c1fd16893e6d0a8cc06a40ea4_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1trace__api_1_1slice__directory_a8b15d66d020bfc67d541e6cf09404ab9}\index{sysio::trace\_api::slice\_directory@{sysio::trace\_api::slice\_directory}!run\_maintenance\_tasks@{run\_maintenance\_tasks}}
+\index{run\_maintenance\_tasks@{run\_maintenance\_tasks}!sysio::trace\_api::slice\_directory@{sysio::trace\_api::slice\_directory}}
+\doxysubsubsection{\texorpdfstring{run\_maintenance\_tasks()}{run\_maintenance\_tasks()}}
+{\footnotesize\ttfamily \label{classsysio_1_1trace__api_1_1slice__directory_a8b15d66d020bfc67d541e6cf09404ab9} 
+void sysio\+::trace\+\_\+api\+::slice\+\_\+directory\+::run\+\_\+maintenance\+\_\+tasks (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{lib}{, }\item[{const \mbox{\hyperlink{namespacesysio_1_1trace__api_ac599662bf2df3135abffd5ff3adbca19}{log\+\_\+handler}} \&}]{log}{}\end{DoxyParamCaption})}
+
+Cleans up all slices that are no longer needed to maintain the minimum number of blocks past lib Compresses up all slices that can be compressed
+
+
+\begin{DoxyParams}{Parameters}
+{\em lib} & \+: block number of the current lib \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{store__provider_8cpp_source_l00355}{355}} of file \mbox{\hyperlink{store__provider_8cpp_source}{store\+\_\+provider.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00355\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00356\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\_minimum\_irreversible\_history\_blocks)\ \{}
+\DoxyCodeLine{00357\ \ \ \ \ \ \ \ \ \ process\_irreversible\_slice\_range(lib,\ *\_minimum\_irreversible\_history\_blocks,\ \_last\_cleaned\_up\_slice,\ [\textcolor{keyword}{this},\ \&log](\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ slice\_to\_clean)\{}
+\DoxyCodeLine{00358\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1cfile}{fc::cfile}}\ trace;}
+\DoxyCodeLine{00359\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1cfile}{fc::cfile}}\ index;}
+\DoxyCodeLine{00360\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1cfile}{fc::cfile}}\ trx\_id;}
+\DoxyCodeLine{00361\ }
+\DoxyCodeLine{00362\ \ \ \ \ \ \ \ \ \ \ \ \ log(std::string(\textcolor{stringliteral}{"{}Attempting\ Prune\ of\ slice:\ "{}})\ +\ std::to\_string(slice\_to\_clean));}
+\DoxyCodeLine{00363\ }
+\DoxyCodeLine{00364\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ cleanup\ index\ first\ to\ reduce\ the\ likelihood\ of\ reader\ finding\ index,\ but\ not\ finding\ trace}}
+\DoxyCodeLine{00365\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ dont\_open\_file\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00366\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ index\_found\ =\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_aa8fdc6fcd3d18c76b517d65b6ea56bef}{find\_index\_slice}}(slice\_to\_clean,\ open\_state::read,\ index,\ dont\_open\_file);}
+\DoxyCodeLine{00367\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (index\_found)\ \{}
+\DoxyCodeLine{00368\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ log(std::string(\textcolor{stringliteral}{"{}Removing:\ "{}})\ +\ index.get\_file\_path().generic\_string());}
+\DoxyCodeLine{00369\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ bfs::remove(index.get\_file\_path());}
+\DoxyCodeLine{00370\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00371\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ trace\_found\ =\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a314838e3f2122e4bcc7f1279b78f7d0c}{find\_trace\_slice}}(slice\_to\_clean,\ open\_state::read,\ trace,\ dont\_open\_file);}
+\DoxyCodeLine{00372\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (trace\_found)\ \{}
+\DoxyCodeLine{00373\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ log(std::string(\textcolor{stringliteral}{"{}Removing:\ "{}})\ +\ trace.\mbox{\hyperlink{classfc_1_1cfile_aba9b5dcf06d12cc653b8eb4224351ff7}{get\_file\_path}}().\mbox{\hyperlink{classfc_1_1path_ab1eae2062df4ea01435348ec52fb3784}{generic\_string}}());}
+\DoxyCodeLine{00374\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ bfs::remove(trace.\mbox{\hyperlink{classfc_1_1cfile_aba9b5dcf06d12cc653b8eb4224351ff7}{get\_file\_path}}());}
+\DoxyCodeLine{00375\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00376\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ trx\_id\_found\ =\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_afd4f092c1fd16893e6d0a8cc06a40ea4}{find\_trx\_id\_slice}}(slice\_to\_clean,\ open\_state::read,\ trx\_id,\ dont\_open\_file);}
+\DoxyCodeLine{00377\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (trx\_id\_found)\ \{}
+\DoxyCodeLine{00378\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ log(std::string(\textcolor{stringliteral}{"{}Removing:\ "{}})\ +\ trx\_id.\mbox{\hyperlink{classfc_1_1cfile_aba9b5dcf06d12cc653b8eb4224351ff7}{get\_file\_path}}().\mbox{\hyperlink{classfc_1_1path_ab1eae2062df4ea01435348ec52fb3784}{generic\_string}}());}
+\DoxyCodeLine{00379\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ bfs::remove(trx\_id.\mbox{\hyperlink{classfc_1_1cfile_aba9b5dcf06d12cc653b8eb4224351ff7}{get\_file\_path}}());}
+\DoxyCodeLine{00380\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00381\ }
+\DoxyCodeLine{00382\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ ctrace\ =\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a79cb70775a7aa5e99311529fa6ce30a2}{find\_compressed\_trace\_slice}}(slice\_to\_clean,\ dont\_open\_file);}
+\DoxyCodeLine{00383\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ctrace)\ \{}
+\DoxyCodeLine{00384\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ log(std::string(\textcolor{stringliteral}{"{}Removing:\ "{}})\ +\ ctrace-\/>get\_file\_path().generic\_string());}
+\DoxyCodeLine{00385\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ bfs::remove(ctrace-\/>get\_file\_path());}
+\DoxyCodeLine{00386\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00387\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00388\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00389\ }
+\DoxyCodeLine{00390\ \ \ \ \ \ \ \textcolor{comment}{//\ Only\ process\ compression\ if\ its\ configured\ AND\ there\ is\ a\ range\ of\ irreversible\ blocks\ which\ would\ not\ also}}
+\DoxyCodeLine{00391\ \ \ \ \ \ \ \textcolor{comment}{//\ be\ deleted}}
+\DoxyCodeLine{00392\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\_minimum\_uncompressed\_irreversible\_history\_blocks\ \&\&}
+\DoxyCodeLine{00393\ \ \ \ \ \ \ \ \ \ \ (!\_minimum\_irreversible\_history\_blocks\ ||\ *\_minimum\_uncompressed\_irreversible\_history\_blocks\ <\ *\_minimum\_irreversible\_history\_blocks)\ )}
+\DoxyCodeLine{00394\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00395\ \ \ \ \ \ \ \ \ \ process\_irreversible\_slice\_range(lib,\ *\_minimum\_uncompressed\_irreversible\_history\_blocks,\ \_last\_compressed\_slice,\ [\textcolor{keyword}{this},\ \&log](\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ slice\_to\_compress)\{}
+\DoxyCodeLine{00396\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1cfile}{fc::cfile}}\ trace;}
+\DoxyCodeLine{00397\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ dont\_open\_file\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00398\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ trace\_found\ =\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a314838e3f2122e4bcc7f1279b78f7d0c}{find\_trace\_slice}}(slice\_to\_compress,\ open\_state::read,\ trace,\ dont\_open\_file);}
+\DoxyCodeLine{00399\ }
+\DoxyCodeLine{00400\ \ \ \ \ \ \ \ \ \ \ \ \ log(std::string(\textcolor{stringliteral}{"{}Attempting\ compression\ of\ slice:\ "{}})\ +\ std::to\_string(slice\_to\_compress));}
+\DoxyCodeLine{00401\ }
+\DoxyCodeLine{00402\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (trace\_found)\ \{}
+\DoxyCodeLine{00403\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ compressed\_path\ =\ trace.\mbox{\hyperlink{classfc_1_1cfile_aba9b5dcf06d12cc653b8eb4224351ff7}{get\_file\_path}}();}
+\DoxyCodeLine{00404\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ compressed\_path.\mbox{\hyperlink{classfc_1_1path_af7de3b21cee1e93c7496e480181e7af2}{replace\_extension}}(\_compressed\_trace\_ext);}
+\DoxyCodeLine{00405\ }
+\DoxyCodeLine{00406\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ log(std::string(\textcolor{stringliteral}{"{}Compressing:\ "{}})\ +\ trace.\mbox{\hyperlink{classfc_1_1cfile_aba9b5dcf06d12cc653b8eb4224351ff7}{get\_file\_path}}().\mbox{\hyperlink{classfc_1_1path_ab1eae2062df4ea01435348ec52fb3784}{generic\_string}}());}
+\DoxyCodeLine{00407\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1trace__api_1_1compressed__file_ab13021e139e2ee1be1e38e84499810e2}{compressed\_file::process}}(trace.\mbox{\hyperlink{classfc_1_1cfile_aba9b5dcf06d12cc653b8eb4224351ff7}{get\_file\_path}}(),\ compressed\_path.\mbox{\hyperlink{classfc_1_1path_ab1eae2062df4ea01435348ec52fb3784}{generic\_string}}(),\ \_compression\_seek\_point\_stride);}
+\DoxyCodeLine{00408\ }
+\DoxyCodeLine{00409\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ after\ compression\ is\ complete,\ delete\ the\ old\ uncompressed\ file}}
+\DoxyCodeLine{00410\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ log(std::string(\textcolor{stringliteral}{"{}Removing:\ "{}})\ +\ trace.\mbox{\hyperlink{classfc_1_1cfile_aba9b5dcf06d12cc653b8eb4224351ff7}{get\_file\_path}}().\mbox{\hyperlink{classfc_1_1path_ab1eae2062df4ea01435348ec52fb3784}{generic\_string}}());}
+\DoxyCodeLine{00411\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ bfs::remove(trace.\mbox{\hyperlink{classfc_1_1cfile_aba9b5dcf06d12cc653b8eb4224351ff7}{get\_file\_path}}());}
+\DoxyCodeLine{00412\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00413\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00414\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00415\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1trace__api_1_1slice__directory_a8b15d66d020bfc67d541e6cf09404ab9_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1trace__api_1_1slice__directory_a8b15d66d020bfc67d541e6cf09404ab9_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1trace__api_1_1slice__directory_aca2e44229ad8159ea40397ec974fca22}\index{sysio::trace\_api::slice\_directory@{sysio::trace\_api::slice\_directory}!set\_lib@{set\_lib}}
+\index{set\_lib@{set\_lib}!sysio::trace\_api::slice\_directory@{sysio::trace\_api::slice\_directory}}
+\doxysubsubsection{\texorpdfstring{set\_lib()}{set\_lib()}}
+{\footnotesize\ttfamily \label{classsysio_1_1trace__api_1_1slice__directory_aca2e44229ad8159ea40397ec974fca22} 
+void sysio\+::trace\+\_\+api\+::slice\+\_\+directory\+::set\+\_\+lib (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{lib}{}\end{DoxyParamCaption})}
+
+set the LIB for maintenance 
+\begin{DoxyParams}{Parameters}
+{\em lib} & \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{store__provider_8cpp_source_l00291}{291}} of file \mbox{\hyperlink{store__provider_8cpp_source}{store\+\_\+provider.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00291\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00292\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00293\ \ \ \ \ \ \ \ \ \ std::scoped\_lock\ \mbox{\hyperlink{xbyak__mnemonic_8h_aa81aed607133209dade63a226818224d}{lock}}(\_maintenance\_mtx);}
+\DoxyCodeLine{00294\ \ \ \ \ \ \ \ \ \ \_best\_known\_lib\ =\ lib;}
+\DoxyCodeLine{00295\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00296\ \ \ \ \ \ \ \_maintenance\_condition.notify\_one();}
+\DoxyCodeLine{00297\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=261pt]{classsysio_1_1trace__api_1_1slice__directory_aca2e44229ad8159ea40397ec974fca22_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=340pt]{classsysio_1_1trace__api_1_1slice__directory_aca2e44229ad8159ea40397ec974fca22_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1trace__api_1_1slice__directory_a47a30741cf28932df1556209da63b227}\index{sysio::trace\_api::slice\_directory@{sysio::trace\_api::slice\_directory}!slice\_number@{slice\_number}}
+\index{slice\_number@{slice\_number}!sysio::trace\_api::slice\_directory@{sysio::trace\_api::slice\_directory}}
+\doxysubsubsection{\texorpdfstring{slice\_number()}{slice\_number()}}
+{\footnotesize\ttfamily \label{classsysio_1_1trace__api_1_1slice__directory_a47a30741cf28932df1556209da63b227} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::trace\+\_\+api\+::slice\+\_\+directory\+::slice\+\_\+number (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{block\+\_\+height}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+Return the slice number that would include the passed in block\+\_\+height
+
+
+\begin{DoxyParams}{Parameters}
+{\em block\+\_\+height} & \+: height of the requested data \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the slice number for the block\+\_\+height 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{store__provider_8hpp_source_l00112}{112}} of file \mbox{\hyperlink{store__provider_8hpp_source}{store\+\_\+provider.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ block\_height\ /\ \_width;}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1trace__api_1_1slice__directory_a47a30741cf28932df1556209da63b227_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1trace__api_1_1slice__directory_a7c7ccb0852100b5ab21daef4ac3133cc}\index{sysio::trace\_api::slice\_directory@{sysio::trace\_api::slice\_directory}!start\_maintenance\_thread@{start\_maintenance\_thread}}
+\index{start\_maintenance\_thread@{start\_maintenance\_thread}!sysio::trace\_api::slice\_directory@{sysio::trace\_api::slice\_directory}}
+\doxysubsubsection{\texorpdfstring{start\_maintenance\_thread()}{start\_maintenance\_thread()}}
+{\footnotesize\ttfamily \label{classsysio_1_1trace__api_1_1slice__directory_a7c7ccb0852100b5ab21daef4ac3133cc} 
+void sysio\+::trace\+\_\+api\+::slice\+\_\+directory\+::start\+\_\+maintenance\+\_\+thread (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacesysio_1_1trace__api_ac599662bf2df3135abffd5ff3adbca19}{log\+\_\+handler}}}]{log}{}\end{DoxyParamCaption})}
+
+Start a thread which does background maintenance 
+
+Definition at line \mbox{\hyperlink{store__provider_8cpp_source_l00299}{299}} of file \mbox{\hyperlink{store__provider_8cpp_source}{store\+\_\+provider.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00299\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00300\ \ \ \ \ \ \ \_maintenance\_thread\ =\ std::thread([\textcolor{keyword}{this},\ log=std::move(log)]()\{}
+\DoxyCodeLine{00301\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_ab58a7f71e88d7d4d5761bbd24837c595}{fc::set\_os\_thread\_name}}(\ \textcolor{stringliteral}{"{}trace-\/mx"{}}\ );}
+\DoxyCodeLine{00302\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ last\_lib\ =\ 0;}
+\DoxyCodeLine{00303\ }
+\DoxyCodeLine{00304\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\textcolor{keyword}{true})\ \{}
+\DoxyCodeLine{00305\ \ \ \ \ \ \ \ \ \ \ \ \ std::unique\_lock<std::mutex>\ \mbox{\hyperlink{xbyak__mnemonic_8h_aa81aed607133209dade63a226818224d}{lock}}(\_maintenance\_mtx);}
+\DoxyCodeLine{00306\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (\ last\_lib\ >=\ \_best\_known\_lib\ \&\&\ !\_maintenance\_shutdown\ )\ \{}
+\DoxyCodeLine{00307\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_maintenance\_condition.wait(lock);}
+\DoxyCodeLine{00308\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00309\ }
+\DoxyCodeLine{00310\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\_maintenance\_shutdown)\ \{}
+\DoxyCodeLine{00311\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00312\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00313\ }
+\DoxyCodeLine{00314\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ best\_known\_lib\ =\ \_best\_known\_lib;}
+\DoxyCodeLine{00315\ \ \ \ \ \ \ \ \ \ \ \ \ lock.unlock();}
+\DoxyCodeLine{00316\ }
+\DoxyCodeLine{00317\ \ \ \ \ \ \ \ \ \ \ \ \ log(std::string(\textcolor{stringliteral}{"{}Waking\ up\ to\ handle\ lib:\ "{}})\ +\ std::to\_string(best\_known\_lib));}
+\DoxyCodeLine{00318\ }
+\DoxyCodeLine{00319\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (last\_lib\ <\ best\_known\_lib)\ \{}
+\DoxyCodeLine{00320\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00321\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1trace__api_1_1slice__directory_a8b15d66d020bfc67d541e6cf09404ab9}{run\_maintenance\_tasks}}(best\_known\_lib,\ log);}
+\DoxyCodeLine{00322\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ last\_lib\ =\ best\_known\_lib;}
+\DoxyCodeLine{00323\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \mbox{\hyperlink{exception_8hpp_aed56aa2593b6f6fc6a839b7cb5c6e8e3}{FC\_LOG\_AND\_DROP}}();}
+\DoxyCodeLine{00324\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00325\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00326\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00327\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1trace__api_1_1slice__directory_a7c7ccb0852100b5ab21daef4ac3133cc_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1trace__api_1_1slice__directory_a7c7ccb0852100b5ab21daef4ac3133cc_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1trace__api_1_1slice__directory_ad847f59ef5d63042406e109f2fd836a6}\index{sysio::trace\_api::slice\_directory@{sysio::trace\_api::slice\_directory}!stop\_maintenance\_thread@{stop\_maintenance\_thread}}
+\index{stop\_maintenance\_thread@{stop\_maintenance\_thread}!sysio::trace\_api::slice\_directory@{sysio::trace\_api::slice\_directory}}
+\doxysubsubsection{\texorpdfstring{stop\_maintenance\_thread()}{stop\_maintenance\_thread()}}
+{\footnotesize\ttfamily \label{classsysio_1_1trace__api_1_1slice__directory_ad847f59ef5d63042406e109f2fd836a6} 
+void sysio\+::trace\+\_\+api\+::slice\+\_\+directory\+::stop\+\_\+maintenance\+\_\+thread (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+Stop and join the thread doing background maintenance 
+
+Definition at line \mbox{\hyperlink{store__provider_8cpp_source_l00329}{329}} of file \mbox{\hyperlink{store__provider_8cpp_source}{store\+\_\+provider.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00329\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00330\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00331\ \ \ \ \ \ \ \ \ \ std::scoped\_lock\ \mbox{\hyperlink{xbyak__mnemonic_8h_aa81aed607133209dade63a226818224d}{lock}}(\_maintenance\_mtx);}
+\DoxyCodeLine{00332\ \ \ \ \ \ \ \ \ \ \_maintenance\_shutdown\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00333\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00334\ \ \ \ \ \ \ \_maintenance\_condition.notify\_one();}
+\DoxyCodeLine{00335\ \ \ \ \ \ \ \_maintenance\_thread.join();}
+\DoxyCodeLine{00336\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=294pt]{classsysio_1_1trace__api_1_1slice__directory_ad847f59ef5d63042406e109f2fd836a6_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1trace__api_1_1slice__directory_ad847f59ef5d63042406e109f2fd836a6_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+plugins/trace\+\_\+api\+\_\+plugin/include/sysio/trace\+\_\+api/\mbox{\hyperlink{store__provider_8hpp}{store\+\_\+provider.\+hpp}}\item 
+plugins/trace\+\_\+api\+\_\+plugin/\mbox{\hyperlink{store__provider_8cpp}{store\+\_\+provider.\+cpp}}\end{DoxyCompactItemize}

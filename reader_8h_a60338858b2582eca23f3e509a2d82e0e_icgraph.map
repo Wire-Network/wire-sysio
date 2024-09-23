@@ -1,0 +1,11 @@
+<map id="SkipWhitespace" name="SkipWhitespace">
+<area shape="rect" id="Node000001" title="Skip the JSON white spaces in a stream." alt="" coords="298,55,414,80"/>
+<area shape="rect" id="Node000002" href="$readertest_8cpp.html#abfa886640a194ac6dbdd83d87d6d6501" title=" " alt="" coords="152,5,207,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="292,53,207,28,208,23,294,47"/>
+<area shape="rect" id="Node000003" href="$simdtest_8cpp.html#ae7f0aedb98729c597500fa9df393dd15" title=" " alt="" coords="152,55,207,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="282,70,208,70,208,65,282,65"/>
+<area shape="rect" id="Node000004" href="$simdtest_8cpp.html#acffa70e0843e659bf15f93b26438bd38" title=" " alt="" coords="109,104,250,130"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="294,88,229,106,227,101,292,82"/>
+<area shape="rect" id="Node000005" href="$simdtest_8cpp.html#a69700a632cac6acde801291ebe1b29c9" title=" " alt="" coords="5,104,61,130"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="93,120,61,120,61,114,93,114"/>
+</map>

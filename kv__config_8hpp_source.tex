@@ -1,0 +1,29 @@
+\doxysection{kv\+\_\+config.\+hpp}
+\hypertarget{kv__config_8hpp_source}{}\label{kv__config_8hpp_source}\index{libraries/chain/include/sysio/chain/kv\_config.hpp@{libraries/chain/include/sysio/chain/kv\_config.hpp}}
+\mbox{\hyperlink{kv__config_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{kv__config_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{kv__config_8hpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{kv__config_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{reflect_8hpp}{fc/reflect/reflect.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{kv__config_8hpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <cstdint>}}
+\DoxyCodeLine{\Hypertarget{kv__config_8hpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{kv__config_8hpp_source_l00006}00006\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{\ \textcolor{keyword}{namespace\ }chain\ \{}
+\DoxyCodeLine{\Hypertarget{kv__config_8hpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{kv__config_8hpp_source_l00015}\mbox{\hyperlink{structsysio_1_1chain_1_1kv__database__config}{00015}}\ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structsysio_1_1chain_1_1kv__database__config}{kv\_database\_config}}\ \{}
+\DoxyCodeLine{\Hypertarget{kv__config_8hpp_source_l00016}\mbox{\hyperlink{structsysio_1_1chain_1_1kv__database__config_a8501ae8ee2b0d235b250133bca3e3d2f}{00016}}\ \ \ \ \ \ \ std::uint32\_t\ \mbox{\hyperlink{structsysio_1_1chain_1_1kv__database__config_a8501ae8ee2b0d235b250133bca3e3d2f}{max\_key\_size}}\ \ \ =\ 0;\ }
+\DoxyCodeLine{\Hypertarget{kv__config_8hpp_source_l00017}\mbox{\hyperlink{structsysio_1_1chain_1_1kv__database__config_a13c830c9b0249f9127918fdcf626dd95}{00017}}\ \ \ \ \ \ \ std::uint32\_t\ \mbox{\hyperlink{structsysio_1_1chain_1_1kv__database__config_a13c830c9b0249f9127918fdcf626dd95}{max\_value\_size}}\ =\ 0;\ }
+\DoxyCodeLine{\Hypertarget{kv__config_8hpp_source_l00018}\mbox{\hyperlink{structsysio_1_1chain_1_1kv__database__config_aa10bf18baff6ccd94808a719088d2010}{00018}}\ \ \ \ \ \ \ std::uint32\_t\ \mbox{\hyperlink{structsysio_1_1chain_1_1kv__database__config_aa10bf18baff6ccd94808a719088d2010}{max\_iterators}}\ \ =\ 0;\ }
+\DoxyCodeLine{\Hypertarget{kv__config_8hpp_source_l00019}00019\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{kv__config_8hpp_source_l00020}\mbox{\hyperlink{namespacesysio_1_1chain_a76b3459775f352ccbd46eb5bfaf468c2}{00020}}\ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacesysio_1_1chain_a0fc6c75576d3bf4645b51dfd6855890c}{operator==}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1kv__database__config}{kv\_database\_config}}\&\ lhs,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1kv__database__config}{kv\_database\_config}}\&\ rhs)\ \{}
+\DoxyCodeLine{\Hypertarget{kv__config_8hpp_source_l00021}00021\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::tie(lhs.\mbox{\hyperlink{structsysio_1_1chain_1_1kv__database__config_a8501ae8ee2b0d235b250133bca3e3d2f}{max\_key\_size}},\ lhs.\mbox{\hyperlink{structsysio_1_1chain_1_1kv__database__config_a13c830c9b0249f9127918fdcf626dd95}{max\_value\_size}},\ lhs.\mbox{\hyperlink{structsysio_1_1chain_1_1kv__database__config_aa10bf18baff6ccd94808a719088d2010}{max\_iterators}})}
+\DoxyCodeLine{\Hypertarget{kv__config_8hpp_source_l00022}00022\ \ \ \ \ \ \ \ \ \ \ ==\ std::tie(rhs.\mbox{\hyperlink{structsysio_1_1chain_1_1kv__database__config_a8501ae8ee2b0d235b250133bca3e3d2f}{max\_key\_size}},\ rhs.\mbox{\hyperlink{structsysio_1_1chain_1_1kv__database__config_a13c830c9b0249f9127918fdcf626dd95}{max\_value\_size}},\ rhs.\mbox{\hyperlink{structsysio_1_1chain_1_1kv__database__config_aa10bf18baff6ccd94808a719088d2010}{max\_iterators}});}
+\DoxyCodeLine{\Hypertarget{kv__config_8hpp_source_l00023}00023\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{kv__config_8hpp_source_l00024}\mbox{\hyperlink{namespacesysio_1_1chain_a32af6e9f7eece8abdc32616e6754ee34}{00024}}\ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacesysio_1_1chain_a5a450a5c1c452d22fea6e156bf083739}{operator!=}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1kv__database__config}{kv\_database\_config}}\&\ lhs,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1kv__database__config}{kv\_database\_config}}\&\ rhs)\ \{}
+\DoxyCodeLine{\Hypertarget{kv__config_8hpp_source_l00025}00025\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !(lhs\ ==\ rhs);}
+\DoxyCodeLine{\Hypertarget{kv__config_8hpp_source_l00026}00026\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{kv__config_8hpp_source_l00027}00027\ \}\}}
+\DoxyCodeLine{\Hypertarget{kv__config_8hpp_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{kv__config_8hpp_source_l00029}00029\ \mbox{\hyperlink{reflect_8hpp_a2ace850e636b1ca0b18fe3177e413d99}{FC\_REFLECT}}(\mbox{\hyperlink{structsysio_1_1chain_1_1kv__database__config}{sysio::chain::kv\_database\_config}},\ (\mbox{\hyperlink{pkcs11_8h_ad31f34494369c93f3d637df9d9bfde4e}{max\_key\_size}})(max\_value\_size)(max\_iterators))}
+\DoxyCodeLine{\Hypertarget{kv__config_8hpp_source_l00030}00030\ }
+
+\end{DoxyCode}

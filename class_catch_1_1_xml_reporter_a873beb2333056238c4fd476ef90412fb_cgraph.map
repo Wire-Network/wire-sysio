@@ -1,0 +1,11 @@
+<map id="Catch::XmlReporter::testGroupStarting" name="Catch::XmlReporter::testGroupStarting">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,63,143,103"/>
+<area shape="rect" id="Node000002" href="$class_catch_1_1_xml_writer.html#a6114b9d8038cd4f159ccd016f12d4992" title=" " alt="" coords="192,13,396,38"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="142,61,190,48,222,40,224,45,191,54,144,66"/>
+<area shape="rect" id="Node000004" href="$struct_catch_1_1_streaming_reporter_base.html#a6961a1cbf0d4bffed14cb04f80aaf318" title=" " alt="" coords="207,63,380,103"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="143,80,192,80,192,86,143,86"/>
+<area shape="rect" id="Node000005" href="$class_catch_1_1_xml_writer.html#ad433310b59d30e0fedc7130dc11c563b" title=" " alt="" coords="191,128,397,153"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="144,100,191,112,224,121,222,126,190,118,142,105"/>
+<area shape="rect" id="Node000003" href="$class_catch_1_1_xml_writer.html#aba98703d9852416e237de82aed4a9c4f" title=" " alt="" coords="445,5,613,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="396,23,429,23,429,28,396,28"/>
+</map>

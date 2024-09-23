@@ -1,0 +1,277 @@
+\doxysection{sysio\+::chain\+::wasm\+\_\+injections\+::injector\+\_\+utils Struct Reference}
+\hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils}{}\label{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils}\index{sysio::chain::wasm\_injections::injector\_utils@{sysio::chain::wasm\_injections::injector\_utils}}
+
+
+{\ttfamily \#include $<$wasm\+\_\+sysio\+\_\+injection.\+hpp$>$}
+
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static void \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils_aa54efb47489b00e59912f16fc18de8e8}{init}} (\mbox{\hyperlink{struct_i_r_1_1_module}{Module}} \&mod)
+\item 
+static void \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils_a1029b064f8e46e53de4313e390850fbd}{build\+\_\+type\+\_\+slots}} (\mbox{\hyperlink{struct_i_r_1_1_module}{Module}} \&mod)
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{namespace_i_r_ac56fb5355b338ad4a167c48ec539b90b}{Result\+Type}} Result, Value\+Type... Params$>$ }\\static void \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils_afe8d7cdc3f5fc984126d03eabd7de22f}{add\+\_\+type\+\_\+slot}} (\mbox{\hyperlink{struct_i_r_1_1_module}{Module}} \&mod)
+\item 
+static void \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils_a5b13b15469c686992fbbff91ce74b51c}{get\+\_\+next\+\_\+indices}} (\mbox{\hyperlink{struct_i_r_1_1_module}{Module}} \&\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}, int \&next\+\_\+function\+\_\+index, int \&next\+\_\+actual\+\_\+index)
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{namespace_i_r_ac56fb5355b338ad4a167c48ec539b90b}{Result\+Type}} Result, Value\+Type... Params$>$ }\\static void \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils_a0d64aed18f7e4000e625f7d069316b28}{add\+\_\+import}} (\mbox{\hyperlink{struct_i_r_1_1_module}{Module}} \&\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}, const char \texorpdfstring{$\ast$}{*}func\+\_\+name, \mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\+\_\+t}} \&index)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static std\+::map$<$ std\+::vector$<$ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} $>$, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} $>$ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils_a3ccb7a28f38a9bc62d464af51cf5cc03}{type\+\_\+slots}}
+\item 
+static std\+::map$<$ std\+::string, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} $>$ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils_ab51a2714c385bed8dee37b943617c8ef}{registered\+\_\+injected}}
+\item 
+static std\+::map$<$ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} $>$ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils_a888f19e36551e2c70561101dc4f62fa7}{injected\+\_\+index\+\_\+mapping}}
+\item 
+static \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils_ac81989991223785170f6c53e762041c6}{next\+\_\+injected\+\_\+index}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00024}{24}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils_a0d64aed18f7e4000e625f7d069316b28}\index{sysio::chain::wasm\_injections::injector\_utils@{sysio::chain::wasm\_injections::injector\_utils}!add\_import@{add\_import}}
+\index{add\_import@{add\_import}!sysio::chain::wasm\_injections::injector\_utils@{sysio::chain::wasm\_injections::injector\_utils}}
+\doxysubsubsection{\texorpdfstring{add\_import()}{add\_import()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils_a0d64aed18f7e4000e625f7d069316b28} 
+template$<$\mbox{\hyperlink{namespace_i_r_ac56fb5355b338ad4a167c48ec539b90b}{Result\+Type}} Result, Value\+Type... Params$>$ \\
+static void sysio\+::chain\+::wasm\+\_\+injections\+::injector\+\_\+utils\+::add\+\_\+import (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_i_r_1_1_module}{Module}} \&}]{module}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{func\+\_\+name}{, }\item[{\mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\+\_\+t}} \&}]{index}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00063}{63}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.functions.imports.size()\ ==\ 0\ ||\ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils_ab51a2714c385bed8dee37b943617c8ef}{registered\_injected}}.find(func\_name)\ ==\ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils_ab51a2714c385bed8dee37b943617c8ef}{registered\_injected}}.end()\ )\ \{}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils_afe8d7cdc3f5fc984126d03eabd7de22f}{add\_type\_slot}}<Result,\ Params...>(\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}\ );}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ func\_type\_index\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils_a3ccb7a28f38a9bc62d464af51cf5cc03}{type\_slots}}[\{\ FromResultType<Result>::value,\ FromValueType<Params>::value...\ \}];}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ actual\_index;}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils_a5b13b15469c686992fbbff91ce74b51c}{get\_next\_indices}}(\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}},\ index,\ actual\_index\ );}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils_ab51a2714c385bed8dee37b943617c8ef}{registered\_injected}}.emplace(\ func\_name,\ index\ );}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{decltype}(\textcolor{keyword}{module}.functions.imports)\ new\_import\ =\ \{\ \{\{func\_type\_index\},\ sysio\_injected\_module\_name,\ std::move(func\_name)\}\ \};}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ prepend\ to\ the\ head\ of\ the\ imports}}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{module}.functions.imports.insert(\ module.functions.imports.begin()+(registered\_injected.size()-\/1),\ new\_import.begin(),\ new\_import.end()\ );}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils_a888f19e36551e2c70561101dc4f62fa7}{injected\_index\_mapping}}.emplace(\ index,\ actual\_index\ );}
+\DoxyCodeLine{00074\ }
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ shift\ all\ exported\ functions\ by\ 1}}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\ \textcolor{keywordtype}{size\_t}\ i=0;\ i\ <\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.exports.size();\ i++\ )\ \{}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.exports[i].kind\ ==\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908ac1c425268e68385d1ab5074c17a94f14}{IR::ObjectKind::function}}\ )\ \{}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{module}.exports[i].index++;}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00081\ }
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ update\ the\ start\ function}}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.startFunctionIndex\ !=\ \mbox{\hyperlink{stdint_8h_ab2355300ea19395357e62d780f4dd073}{UINTPTR\_MAX}}\ )\ \{}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ module.startFunctionIndex++;}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00086\ }
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ shift\ all\ table\ entries\ for\ call\ indirect}}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(TableSegment\&\ ts\ :\ \mbox{\hyperlink{namespace_i_r_a5aed837d1ca89c12d0762ab19f1e3908a22884db148f0ffb0d830ba431102b0b5}{module}}.tableSegments)\ \{}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ for(auto\&\ idx\ :\ ts.indices)}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ idx++;}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \ \ \ index\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils_ab51a2714c385bed8dee37b943617c8ef}{registered\_injected}}[func\_name];}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils_a0d64aed18f7e4000e625f7d069316b28_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils_a0d64aed18f7e4000e625f7d069316b28_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils_afe8d7cdc3f5fc984126d03eabd7de22f}\index{sysio::chain::wasm\_injections::injector\_utils@{sysio::chain::wasm\_injections::injector\_utils}!add\_type\_slot@{add\_type\_slot}}
+\index{add\_type\_slot@{add\_type\_slot}!sysio::chain::wasm\_injections::injector\_utils@{sysio::chain::wasm\_injections::injector\_utils}}
+\doxysubsubsection{\texorpdfstring{add\_type\_slot()}{add\_type\_slot()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils_afe8d7cdc3f5fc984126d03eabd7de22f} 
+template$<$\mbox{\hyperlink{namespace_i_r_ac56fb5355b338ad4a167c48ec539b90b}{Result\+Type}} Result, Value\+Type... Params$>$ \\
+static void sysio\+::chain\+::wasm\+\_\+injections\+::injector\+\_\+utils\+::add\+\_\+type\+\_\+slot (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_i_r_1_1_module}{Module}} \&}]{mod}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00049}{49}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils_a3ccb7a28f38a9bc62d464af51cf5cc03}{type\_slots}}.find(\{FromResultType<Result>::value,\ FromValueType<Params>::value...\})\ ==\ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils_a3ccb7a28f38a9bc62d464af51cf5cc03}{type\_slots}}.end()\ )\ \{}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils_a3ccb7a28f38a9bc62d464af51cf5cc03}{type\_slots}}.emplace(\ std::vector<uint16\_t>\{FromResultType<Result>::value,\ FromValueType<Params>::value...\},\ mod.types.size()\ );}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \ \ mod.types.push\_back(\ \mbox{\hyperlink{struct_i_r_1_1_function_type_a97cbdf384d97c3a5203a1310c9af0822}{FunctionType::get}}(\ Result,\ \{\ Params...\ \}\ )\ );}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils_afe8d7cdc3f5fc984126d03eabd7de22f_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils_afe8d7cdc3f5fc984126d03eabd7de22f_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils_a1029b064f8e46e53de4313e390850fbd}\index{sysio::chain::wasm\_injections::injector\_utils@{sysio::chain::wasm\_injections::injector\_utils}!build\_type\_slots@{build\_type\_slots}}
+\index{build\_type\_slots@{build\_type\_slots}!sysio::chain::wasm\_injections::injector\_utils@{sysio::chain::wasm\_injections::injector\_utils}}
+\doxysubsubsection{\texorpdfstring{build\_type\_slots()}{build\_type\_slots()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils_a1029b064f8e46e53de4313e390850fbd} 
+static void sysio\+::chain\+::wasm\+\_\+injections\+::injector\+\_\+utils\+::build\+\_\+type\+\_\+slots (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_i_r_1_1_module}{Module}} \&}]{mod}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00038}{38}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ add\ the\ module\ types\ to\ the\ type\_slots\ map}}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\ \textcolor{keywordtype}{size\_t}\ i=0;\ i\ <\ mod.types.size();\ i++\ )\ \{}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \ \ \ std::vector<uint16\_t>\ type\_slot\_list\ =\ \{\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\textcolor{keyword}{>}(mod.types[i]-\/>ret)\ \};}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\ \textcolor{keyword}{auto}\ param\ :\ mod.types[i]-\/>parameters\ )}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ type\_slot\_list.push\_back(\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\textcolor{keyword}{>}(param)\ );}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils_a3ccb7a28f38a9bc62d464af51cf5cc03}{type\_slots}}.emplace(\ type\_slot\_list,\ i\ );}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils_a1029b064f8e46e53de4313e390850fbd_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils_a5b13b15469c686992fbbff91ce74b51c}\index{sysio::chain::wasm\_injections::injector\_utils@{sysio::chain::wasm\_injections::injector\_utils}!get\_next\_indices@{get\_next\_indices}}
+\index{get\_next\_indices@{get\_next\_indices}!sysio::chain::wasm\_injections::injector\_utils@{sysio::chain::wasm\_injections::injector\_utils}}
+\doxysubsubsection{\texorpdfstring{get\_next\_indices()}{get\_next\_indices()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils_a5b13b15469c686992fbbff91ce74b51c} 
+static void sysio\+::chain\+::wasm\+\_\+injections\+::injector\+\_\+utils\+::get\+\_\+next\+\_\+indices (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_i_r_1_1_module}{Module}} \&}]{module}{, }\item[{int \&}]{next\+\_\+function\+\_\+index}{, }\item[{int \&}]{next\+\_\+actual\+\_\+index}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00057}{57}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ next\_function\_index\ =\ \textcolor{keyword}{module}.functions.imports.size()\ +\ module.functions.defs.size()\ +\ registered\_injected.size();}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ next\_actual\_index\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils_ac81989991223785170f6c53e762041c6}{next\_injected\_index}}++;}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils_a5b13b15469c686992fbbff91ce74b51c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils_aa54efb47489b00e59912f16fc18de8e8}\index{sysio::chain::wasm\_injections::injector\_utils@{sysio::chain::wasm\_injections::injector\_utils}!init@{init}}
+\index{init@{init}!sysio::chain::wasm\_injections::injector\_utils@{sysio::chain::wasm\_injections::injector\_utils}}
+\doxysubsubsection{\texorpdfstring{init()}{init()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils_aa54efb47489b00e59912f16fc18de8e8} 
+static void sysio\+::chain\+::wasm\+\_\+injections\+::injector\+\_\+utils\+::init (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_i_r_1_1_module}{Module}} \&}]{mod}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00030}{30}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils_a3ccb7a28f38a9bc62d464af51cf5cc03}{type\_slots}}.clear();}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils_ab51a2714c385bed8dee37b943617c8ef}{registered\_injected}}.clear();}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils_a888f19e36551e2c70561101dc4f62fa7}{injected\_index\_mapping}}.clear();}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils_a1029b064f8e46e53de4313e390850fbd}{build\_type\_slots}}(\ mod\ );}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils_ac81989991223785170f6c53e762041c6}{next\_injected\_index}}\ =\ 0;}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=333pt]{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils_aa54efb47489b00e59912f16fc18de8e8_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=343pt]{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils_aa54efb47489b00e59912f16fc18de8e8_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils_a888f19e36551e2c70561101dc4f62fa7}\index{sysio::chain::wasm\_injections::injector\_utils@{sysio::chain::wasm\_injections::injector\_utils}!injected\_index\_mapping@{injected\_index\_mapping}}
+\index{injected\_index\_mapping@{injected\_index\_mapping}!sysio::chain::wasm\_injections::injector\_utils@{sysio::chain::wasm\_injections::injector\_utils}}
+\doxysubsubsection{\texorpdfstring{injected\_index\_mapping}{injected\_index\_mapping}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils_a888f19e36551e2c70561101dc4f62fa7} 
+std\+::map$<$ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} $>$ sysio\+::chain\+::wasm\+\_\+injections\+::injector\+\_\+utils\+::injected\+\_\+index\+\_\+mapping\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00027}{27}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils_ac81989991223785170f6c53e762041c6}\index{sysio::chain::wasm\_injections::injector\_utils@{sysio::chain::wasm\_injections::injector\_utils}!next\_injected\_index@{next\_injected\_index}}
+\index{next\_injected\_index@{next\_injected\_index}!sysio::chain::wasm\_injections::injector\_utils@{sysio::chain::wasm\_injections::injector\_utils}}
+\doxysubsubsection{\texorpdfstring{next\_injected\_index}{next\_injected\_index}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils_ac81989991223785170f6c53e762041c6} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::chain\+::wasm\+\_\+injections\+::injector\+\_\+utils\+::next\+\_\+injected\+\_\+index\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00028}{28}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils_ab51a2714c385bed8dee37b943617c8ef}\index{sysio::chain::wasm\_injections::injector\_utils@{sysio::chain::wasm\_injections::injector\_utils}!registered\_injected@{registered\_injected}}
+\index{registered\_injected@{registered\_injected}!sysio::chain::wasm\_injections::injector\_utils@{sysio::chain::wasm\_injections::injector\_utils}}
+\doxysubsubsection{\texorpdfstring{registered\_injected}{registered\_injected}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils_ab51a2714c385bed8dee37b943617c8ef} 
+std\+::map$<$ std\+::string, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} $>$ sysio\+::chain\+::wasm\+\_\+injections\+::injector\+\_\+utils\+::registered\+\_\+injected\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00026}{26}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils_a3ccb7a28f38a9bc62d464af51cf5cc03}\index{sysio::chain::wasm\_injections::injector\_utils@{sysio::chain::wasm\_injections::injector\_utils}!type\_slots@{type\_slots}}
+\index{type\_slots@{type\_slots}!sysio::chain::wasm\_injections::injector\_utils@{sysio::chain::wasm\_injections::injector\_utils}}
+\doxysubsubsection{\texorpdfstring{type\_slots}{type\_slots}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1wasm__injections_1_1injector__utils_a3ccb7a28f38a9bc62d464af51cf5cc03} 
+std\+::map$<$ std\+::vector$<$ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} $>$, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} $>$ sysio\+::chain\+::wasm\+\_\+injections\+::injector\+\_\+utils\+::type\+\_\+slots\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{wasm__sysio__injection_8hpp_source_l00025}{25}} of file \mbox{\hyperlink{wasm__sysio__injection_8hpp_source}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{wasm__sysio__injection_8hpp}{wasm\+\_\+sysio\+\_\+injection.\+hpp}}\item 
+libraries/chain/\mbox{\hyperlink{wasm__sysio__injection_8cpp}{wasm\+\_\+sysio\+\_\+injection.\+cpp}}\end{DoxyCompactItemize}

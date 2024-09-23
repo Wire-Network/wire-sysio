@@ -1,0 +1,155 @@
+\doxysection{testing\+::internal\+::Has\+New\+Fatal\+Failure\+Helper Class Reference}
+\hypertarget{classtesting_1_1internal_1_1_has_new_fatal_failure_helper}{}\label{classtesting_1_1internal_1_1_has_new_fatal_failure_helper}\index{testing::internal::HasNewFatalFailureHelper@{testing::internal::HasNewFatalFailureHelper}}
+
+
+{\ttfamily \#include $<$gtest-\/test-\/part.\+h$>$}
+
+
+
+Inheritance diagram for testing\+::internal\+::Has\+New\+Fatal\+Failure\+Helper\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=234pt]{classtesting_1_1internal_1_1_has_new_fatal_failure_helper__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for testing\+::internal\+::Has\+New\+Fatal\+Failure\+Helper\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=234pt]{classtesting_1_1internal_1_1_has_new_fatal_failure_helper__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_has_new_fatal_failure_helper_a59190a7188db558c00b4c6bf9251859a}{Has\+New\+Fatal\+Failure\+Helper}} ()
+\item 
+virtual \mbox{\hyperlink{classtesting_1_1internal_1_1_has_new_fatal_failure_helper_a913b1bc7c372868c9b2dbb009044ee97}{\texorpdfstring{$\sim$}{\string~}\+Has\+New\+Fatal\+Failure\+Helper}} ()
+\item 
+virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_has_new_fatal_failure_helper_a2d2e1faa1f3669b82810df97ac678a27}{Report\+Test\+Part\+Result}} (const \mbox{\hyperlink{classtesting_1_1_test_part_result}{Test\+Part\+Result}} \&result)
+\item 
+bool \mbox{\hyperlink{classtesting_1_1internal_1_1_has_new_fatal_failure_helper_a91b7bac47f09076db4be0304a2110a9e}{has\+\_\+new\+\_\+fatal\+\_\+failure}} () const
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classtesting_1_1_test_part_result_reporter_interface}{testing\+::\+Test\+Part\+Result\+Reporter\+Interface}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{classtesting_1_1_test_part_result_reporter_interface_a338b51591ed654f84dc0feaaf2b66917}{\texorpdfstring{$\sim$}{\string~}\+Test\+Part\+Result\+Reporter\+Interface}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{gtest-test-part_8h_source_l00161}{161}} of file \mbox{\hyperlink{gtest-test-part_8h_source}{gtest-\/test-\/part.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_has_new_fatal_failure_helper_a59190a7188db558c00b4c6bf9251859a}\index{testing::internal::HasNewFatalFailureHelper@{testing::internal::HasNewFatalFailureHelper}!HasNewFatalFailureHelper@{HasNewFatalFailureHelper}}
+\index{HasNewFatalFailureHelper@{HasNewFatalFailureHelper}!testing::internal::HasNewFatalFailureHelper@{testing::internal::HasNewFatalFailureHelper}}
+\doxysubsubsection{\texorpdfstring{HasNewFatalFailureHelper()}{HasNewFatalFailureHelper()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_has_new_fatal_failure_helper_a59190a7188db558c00b4c6bf9251859a} 
+testing\+::internal\+::\+Has\+New\+Fatal\+Failure\+Helper\+::\+Has\+New\+Fatal\+Failure\+Helper (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-test-part_8cc_source_l00081}{81}} of file \mbox{\hyperlink{gtest-test-part_8cc_source}{gtest-\/test-\/part.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00082\ \ \ \ \ :\ has\_new\_fatal\_failure\_(\textcolor{keyword}{false}),}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ original\_reporter\_(\mbox{\hyperlink{namespacetesting_1_1internal_a9bd0caf5d16512de38b39599c13ee634}{GetUnitTestImpl}}()-\/>}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ GetTestPartResultReporterForCurrentThread())\ \{}
+\DoxyCodeLine{00085\ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a9bd0caf5d16512de38b39599c13ee634}{GetUnitTestImpl}}()-\/>\mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl_a1403fc10aebcc64479c5ee980c9b4eb4}{SetTestPartResultReporterForCurrentThread}}(\textcolor{keyword}{this});}
+\DoxyCodeLine{00086\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_has_new_fatal_failure_helper_a59190a7188db558c00b4c6bf9251859a_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_has_new_fatal_failure_helper_a913b1bc7c372868c9b2dbb009044ee97}\index{testing::internal::HasNewFatalFailureHelper@{testing::internal::HasNewFatalFailureHelper}!````~HasNewFatalFailureHelper@{\texorpdfstring{$\sim$}{\string~}HasNewFatalFailureHelper}}
+\index{````~HasNewFatalFailureHelper@{\texorpdfstring{$\sim$}{\string~}HasNewFatalFailureHelper}!testing::internal::HasNewFatalFailureHelper@{testing::internal::HasNewFatalFailureHelper}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}HasNewFatalFailureHelper()}{\string~HasNewFatalFailureHelper()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_has_new_fatal_failure_helper_a913b1bc7c372868c9b2dbb009044ee97} 
+testing\+::internal\+::\+Has\+New\+Fatal\+Failure\+Helper\+::\texorpdfstring{$\sim$}{\string~}\+Has\+New\+Fatal\+Failure\+Helper (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-test-part_8cc_source_l00088}{88}} of file \mbox{\hyperlink{gtest-test-part_8cc_source}{gtest-\/test-\/part.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00089\ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a9bd0caf5d16512de38b39599c13ee634}{GetUnitTestImpl}}()-\/>\mbox{\hyperlink{classtesting_1_1internal_1_1_unit_test_impl_a1403fc10aebcc64479c5ee980c9b4eb4}{SetTestPartResultReporterForCurrentThread}}(}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ original\_reporter\_);}
+\DoxyCodeLine{00091\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_has_new_fatal_failure_helper_a913b1bc7c372868c9b2dbb009044ee97_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_has_new_fatal_failure_helper_a91b7bac47f09076db4be0304a2110a9e}\index{testing::internal::HasNewFatalFailureHelper@{testing::internal::HasNewFatalFailureHelper}!has\_new\_fatal\_failure@{has\_new\_fatal\_failure}}
+\index{has\_new\_fatal\_failure@{has\_new\_fatal\_failure}!testing::internal::HasNewFatalFailureHelper@{testing::internal::HasNewFatalFailureHelper}}
+\doxysubsubsection{\texorpdfstring{has\_new\_fatal\_failure()}{has\_new\_fatal\_failure()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_has_new_fatal_failure_helper_a91b7bac47f09076db4be0304a2110a9e} 
+bool testing\+::internal\+::\+Has\+New\+Fatal\+Failure\+Helper\+::has\+\_\+new\+\_\+fatal\+\_\+failure (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-test-part_8h_source_l00167}{167}} of file \mbox{\hyperlink{gtest-test-part_8h_source}{gtest-\/test-\/part.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00167\ \{\ \textcolor{keywordflow}{return}\ has\_new\_fatal\_failure\_;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classtesting_1_1internal_1_1_has_new_fatal_failure_helper_a2d2e1faa1f3669b82810df97ac678a27}\index{testing::internal::HasNewFatalFailureHelper@{testing::internal::HasNewFatalFailureHelper}!ReportTestPartResult@{ReportTestPartResult}}
+\index{ReportTestPartResult@{ReportTestPartResult}!testing::internal::HasNewFatalFailureHelper@{testing::internal::HasNewFatalFailureHelper}}
+\doxysubsubsection{\texorpdfstring{ReportTestPartResult()}{ReportTestPartResult()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_has_new_fatal_failure_helper_a2d2e1faa1f3669b82810df97ac678a27} 
+void testing\+::internal\+::\+Has\+New\+Fatal\+Failure\+Helper\+::\+Report\+Test\+Part\+Result (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classtesting_1_1_test_part_result}{Test\+Part\+Result}} \&}]{result}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classtesting_1_1_test_part_result_reporter_interface_aa2f920e7a5a0a6d0faf19e3727928c22}{testing\+::\+Test\+Part\+Result\+Reporter\+Interface}}.
+
+
+
+Definition at line \mbox{\hyperlink{gtest-test-part_8cc_source_l00093}{93}} of file \mbox{\hyperlink{gtest-test-part_8cc_source}{gtest-\/test-\/part.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00095\ \ \ \textcolor{keywordflow}{if}\ (result.fatally\_failed())}
+\DoxyCodeLine{00096\ \ \ \ \ has\_new\_fatal\_failure\_\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00097\ \ \ original\_reporter\_-\/>\mbox{\hyperlink{classtesting_1_1_test_part_result_reporter_interface_aa2f920e7a5a0a6d0faf19e3727928c22}{ReportTestPartResult}}(result);}
+\DoxyCodeLine{00098\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_has_new_fatal_failure_helper_a2d2e1faa1f3669b82810df97ac678a27_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/include/gtest/\mbox{\hyperlink{gtest-test-part_8h}{gtest-\/test-\/part.\+h}}\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/src/\mbox{\hyperlink{gtest-test-part_8cc}{gtest-\/test-\/part.\+cc}}\end{DoxyCompactItemize}

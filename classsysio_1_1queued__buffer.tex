@@ -1,0 +1,268 @@
+\doxysection{sysio\+::queued\+\_\+buffer Class Reference}
+\hypertarget{classsysio_1_1queued__buffer}{}\label{classsysio_1_1queued__buffer}\index{sysio::queued\_buffer@{sysio::queued\_buffer}}
+
+
+Inheritance diagram for sysio\+::queued\+\_\+buffer\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=187pt]{classsysio_1_1queued__buffer__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for sysio\+::queued\+\_\+buffer\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=187pt]{classsysio_1_1queued__buffer__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{classsysio_1_1queued__buffer_ad5cee9e3bed9ece107058fc422298e6e}{clear\+\_\+write\+\_\+queue}} ()
+\item 
+void \mbox{\hyperlink{classsysio_1_1queued__buffer_a6a5614c85ba08a707d94f8303b561940}{clear\+\_\+out\+\_\+queue}} ()
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classsysio_1_1queued__buffer_a6175551ba72684aede34883da1ca00fe}{write\+\_\+queue\+\_\+size}} () const
+\item 
+bool \mbox{\hyperlink{classsysio_1_1queued__buffer_a96274727f41d0b20787b016bb2797185}{is\+\_\+out\+\_\+queue\+\_\+empty}} () const
+\item 
+bool \mbox{\hyperlink{classsysio_1_1queued__buffer_a17b570f0d6ec495cd2823c84110cab79}{ready\+\_\+to\+\_\+send}} () const
+\item 
+bool \mbox{\hyperlink{classsysio_1_1queued__buffer_a48f2885d0e38c6e2b7c9037b449a2f3a}{add\+\_\+write\+\_\+queue}} (const std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classfc_1_1vector}{vector}}$<$ char $>$ $>$ \&buff, std\+::function$<$ void(boost\+::system\+::error\+\_\+code, std\+::size\+\_\+t)$>$ callback, bool to\+\_\+sync\+\_\+queue)
+\item 
+void \mbox{\hyperlink{classsysio_1_1queued__buffer_a382e1e4ae7f849e775c04e051400a5dc}{fill\+\_\+out\+\_\+buffer}} (std\+::vector$<$ boost\+::asio\+::const\+\_\+buffer $>$ \&bufs)
+\item 
+void \mbox{\hyperlink{classsysio_1_1queued__buffer_a5f4a0b7158a2749c49a2f49e6a9a5573}{out\+\_\+callback}} (boost\+::system\+::error\+\_\+code ec, std\+::size\+\_\+t w)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l00448}{448}} of file \mbox{\hyperlink{net__plugin_8cpp_source}{net\+\_\+plugin.\+cpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1queued__buffer_a48f2885d0e38c6e2b7c9037b449a2f3a}\index{sysio::queued\_buffer@{sysio::queued\_buffer}!add\_write\_queue@{add\_write\_queue}}
+\index{add\_write\_queue@{add\_write\_queue}!sysio::queued\_buffer@{sysio::queued\_buffer}}
+\doxysubsubsection{\texorpdfstring{add\_write\_queue()}{add\_write\_queue()}}
+{\footnotesize\ttfamily \label{classsysio_1_1queued__buffer_a48f2885d0e38c6e2b7c9037b449a2f3a} 
+bool sysio\+::queued\+\_\+buffer\+::add\+\_\+write\+\_\+queue (\begin{DoxyParamCaption}\item[{const std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classfc_1_1vector}{vector}}$<$ char $>$ $>$ \&}]{buff}{, }\item[{std\+::function$<$ void(boost\+::system\+::error\+\_\+code, std\+::size\+\_\+t)$>$}]{callback}{, }\item[{bool}]{to\+\_\+sync\+\_\+queue}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l00481}{481}} of file \mbox{\hyperlink{net__plugin_8cpp_source}{net\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00483\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00484\ \ \ \ \ \ \ \ \ \ std::lock\_guard<std::mutex>\ g(\ \_mtx\ );}
+\DoxyCodeLine{00485\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ to\_sync\_queue\ )\ \{}
+\DoxyCodeLine{00486\ \ \ \ \ \ \ \ \ \ \ \ \ \_sync\_write\_queue.push\_back(\ \{buff,\ callback\}\ );}
+\DoxyCodeLine{00487\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00488\ \ \ \ \ \ \ \ \ \ \ \ \ \_write\_queue.push\_back(\ \{buff,\ callback\}\ );}
+\DoxyCodeLine{00489\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00490\ \ \ \ \ \ \ \ \ \ \_write\_queue\_size\ +=\ buff-\/>size();}
+\DoxyCodeLine{00491\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \_write\_queue\_size\ >\ 2\ *\ \mbox{\hyperlink{namespacesysio_abb93a5792d3705e475c32a3d63c459ce}{def\_max\_write\_queue\_size}}\ )\ \{}
+\DoxyCodeLine{00492\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00493\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00494\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00495\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=321pt]{classsysio_1_1queued__buffer_a48f2885d0e38c6e2b7c9037b449a2f3a_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1queued__buffer_a6a5614c85ba08a707d94f8303b561940}\index{sysio::queued\_buffer@{sysio::queued\_buffer}!clear\_out\_queue@{clear\_out\_queue}}
+\index{clear\_out\_queue@{clear\_out\_queue}!sysio::queued\_buffer@{sysio::queued\_buffer}}
+\doxysubsubsection{\texorpdfstring{clear\_out\_queue()}{clear\_out\_queue()}}
+{\footnotesize\ttfamily \label{classsysio_1_1queued__buffer_a6a5614c85ba08a707d94f8303b561940} 
+void sysio\+::queued\+\_\+buffer\+::clear\+\_\+out\+\_\+queue (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l00457}{457}} of file \mbox{\hyperlink{net__plugin_8cpp_source}{net\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00457\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00458\ \ \ \ \ \ \ \ \ \ std::lock\_guard<std::mutex>\ g(\ \_mtx\ );}
+\DoxyCodeLine{00459\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (\ \_out\_queue.size()\ >\ 0\ )\ \{}
+\DoxyCodeLine{00460\ \ \ \ \ \ \ \ \ \ \ \ \ \_out\_queue.pop\_front();}
+\DoxyCodeLine{00461\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00462\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=321pt]{classsysio_1_1queued__buffer_a6a5614c85ba08a707d94f8303b561940_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1queued__buffer_ad5cee9e3bed9ece107058fc422298e6e}\index{sysio::queued\_buffer@{sysio::queued\_buffer}!clear\_write\_queue@{clear\_write\_queue}}
+\index{clear\_write\_queue@{clear\_write\_queue}!sysio::queued\_buffer@{sysio::queued\_buffer}}
+\doxysubsubsection{\texorpdfstring{clear\_write\_queue()}{clear\_write\_queue()}}
+{\footnotesize\ttfamily \label{classsysio_1_1queued__buffer_ad5cee9e3bed9ece107058fc422298e6e} 
+void sysio\+::queued\+\_\+buffer\+::clear\+\_\+write\+\_\+queue (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l00450}{450}} of file \mbox{\hyperlink{net__plugin_8cpp_source}{net\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00450\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00451\ \ \ \ \ \ \ \ \ \ std::lock\_guard<std::mutex>\ g(\ \_mtx\ );}
+\DoxyCodeLine{00452\ \ \ \ \ \ \ \ \ \ \_write\_queue.clear();}
+\DoxyCodeLine{00453\ \ \ \ \ \ \ \ \ \ \_sync\_write\_queue.clear();}
+\DoxyCodeLine{00454\ \ \ \ \ \ \ \ \ \ \_write\_queue\_size\ =\ 0;}
+\DoxyCodeLine{00455\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1queued__buffer_ad5cee9e3bed9ece107058fc422298e6e_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1queued__buffer_a382e1e4ae7f849e775c04e051400a5dc}\index{sysio::queued\_buffer@{sysio::queued\_buffer}!fill\_out\_buffer@{fill\_out\_buffer}}
+\index{fill\_out\_buffer@{fill\_out\_buffer}!sysio::queued\_buffer@{sysio::queued\_buffer}}
+\doxysubsubsection{\texorpdfstring{fill\_out\_buffer()}{fill\_out\_buffer()}}
+{\footnotesize\ttfamily \label{classsysio_1_1queued__buffer_a382e1e4ae7f849e775c04e051400a5dc} 
+void sysio\+::queued\+\_\+buffer\+::fill\+\_\+out\+\_\+buffer (\begin{DoxyParamCaption}\item[{std\+::vector$<$ boost\+::asio\+::const\+\_\+buffer $>$ \&}]{bufs}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l00497}{497}} of file \mbox{\hyperlink{net__plugin_8cpp_source}{net\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00497\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00498\ \ \ \ \ \ \ \ \ \ std::lock\_guard<std::mutex>\ g(\ \_mtx\ );}
+\DoxyCodeLine{00499\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \_sync\_write\_queue.size()\ >\ 0\ )\ \{\ \textcolor{comment}{//\ always\ send\ msgs\ from\ sync\_write\_queue\ first}}
+\DoxyCodeLine{00500\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1queued__buffer_a382e1e4ae7f849e775c04e051400a5dc}{fill\_out\_buffer}}(\ bufs,\ \_sync\_write\_queue\ );}
+\DoxyCodeLine{00501\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{\ \textcolor{comment}{//\ postpone\ real\_time\ write\_queue\ if\ sync\ queue\ is\ not\ empty}}
+\DoxyCodeLine{00502\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1queued__buffer_a382e1e4ae7f849e775c04e051400a5dc}{fill\_out\_buffer}}(\ bufs,\ \_write\_queue\ );}
+\DoxyCodeLine{00503\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ \_write\_queue\_size\ ==\ 0,\ plugin\_exception,\ \textcolor{stringliteral}{"{}write\ queue\ size\ expected\ to\ be\ zero"{}}\ );}
+\DoxyCodeLine{00504\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00505\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=187pt]{classsysio_1_1queued__buffer_a382e1e4ae7f849e775c04e051400a5dc_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1queued__buffer_a382e1e4ae7f849e775c04e051400a5dc_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1queued__buffer_a96274727f41d0b20787b016bb2797185}\index{sysio::queued\_buffer@{sysio::queued\_buffer}!is\_out\_queue\_empty@{is\_out\_queue\_empty}}
+\index{is\_out\_queue\_empty@{is\_out\_queue\_empty}!sysio::queued\_buffer@{sysio::queued\_buffer}}
+\doxysubsubsection{\texorpdfstring{is\_out\_queue\_empty()}{is\_out\_queue\_empty()}}
+{\footnotesize\ttfamily \label{classsysio_1_1queued__buffer_a96274727f41d0b20787b016bb2797185} 
+bool sysio\+::queued\+\_\+buffer\+::is\+\_\+out\+\_\+queue\+\_\+empty (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l00469}{469}} of file \mbox{\hyperlink{net__plugin_8cpp_source}{net\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00469\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00470\ \ \ \ \ \ \ \ \ \ std::lock\_guard<std::mutex>\ g(\ \_mtx\ );}
+\DoxyCodeLine{00471\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \_out\_queue.empty();}
+\DoxyCodeLine{00472\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1queued__buffer_a5f4a0b7158a2749c49a2f49e6a9a5573}\index{sysio::queued\_buffer@{sysio::queued\_buffer}!out\_callback@{out\_callback}}
+\index{out\_callback@{out\_callback}!sysio::queued\_buffer@{sysio::queued\_buffer}}
+\doxysubsubsection{\texorpdfstring{out\_callback()}{out\_callback()}}
+{\footnotesize\ttfamily \label{classsysio_1_1queued__buffer_a5f4a0b7158a2749c49a2f49e6a9a5573} 
+void sysio\+::queued\+\_\+buffer\+::out\+\_\+callback (\begin{DoxyParamCaption}\item[{boost\+::system\+::error\+\_\+code}]{ec}{, }\item[{std\+::size\+\_\+t}]{w}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l00507}{507}} of file \mbox{\hyperlink{net__plugin_8cpp_source}{net\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00507\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00508\ \ \ \ \ \ \ \ \ \ std::lock\_guard<std::mutex>\ g(\ \_mtx\ );}
+\DoxyCodeLine{00509\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\&\ m\ :\ \_out\_queue\ )\ \{}
+\DoxyCodeLine{00510\ \ \ \ \ \ \ \ \ \ \ \ \ m.callback(\ ec,\ w\ );}
+\DoxyCodeLine{00511\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00512\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1queued__buffer_a17b570f0d6ec495cd2823c84110cab79}\index{sysio::queued\_buffer@{sysio::queued\_buffer}!ready\_to\_send@{ready\_to\_send}}
+\index{ready\_to\_send@{ready\_to\_send}!sysio::queued\_buffer@{sysio::queued\_buffer}}
+\doxysubsubsection{\texorpdfstring{ready\_to\_send()}{ready\_to\_send()}}
+{\footnotesize\ttfamily \label{classsysio_1_1queued__buffer_a17b570f0d6ec495cd2823c84110cab79} 
+bool sysio\+::queued\+\_\+buffer\+::ready\+\_\+to\+\_\+send (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l00474}{474}} of file \mbox{\hyperlink{net__plugin_8cpp_source}{net\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00474\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00475\ \ \ \ \ \ \ \ \ \ std::lock\_guard<std::mutex>\ g(\ \_mtx\ );}
+\DoxyCodeLine{00476\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ if\ out\_queue\ is\ not\ empty\ then\ async\_write\ is\ in\ progress}}
+\DoxyCodeLine{00477\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ((!\_sync\_write\_queue.empty()\ ||\ !\_write\_queue.empty())\ \&\&\ \_out\_queue.empty());}
+\DoxyCodeLine{00478\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1queued__buffer_a17b570f0d6ec495cd2823c84110cab79_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1queued__buffer_a6175551ba72684aede34883da1ca00fe}\index{sysio::queued\_buffer@{sysio::queued\_buffer}!write\_queue\_size@{write\_queue\_size}}
+\index{write\_queue\_size@{write\_queue\_size}!sysio::queued\_buffer@{sysio::queued\_buffer}}
+\doxysubsubsection{\texorpdfstring{write\_queue\_size()}{write\_queue\_size()}}
+{\footnotesize\ttfamily \label{classsysio_1_1queued__buffer_a6175551ba72684aede34883da1ca00fe} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::queued\+\_\+buffer\+::write\+\_\+queue\+\_\+size (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{net__plugin_8cpp_source_l00464}{464}} of file \mbox{\hyperlink{net__plugin_8cpp_source}{net\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00464\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00465\ \ \ \ \ \ \ \ \ \ std::lock\_guard<std::mutex>\ g(\ \_mtx\ );}
+\DoxyCodeLine{00466\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \_write\_queue\_size;}
+\DoxyCodeLine{00467\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1queued__buffer_a6175551ba72684aede34883da1ca00fe_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+plugins/net\+\_\+plugin/\mbox{\hyperlink{net__plugin_8cpp}{net\+\_\+plugin.\+cpp}}\end{DoxyCompactItemize}

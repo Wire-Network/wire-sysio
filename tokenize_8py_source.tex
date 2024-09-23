@@ -1,0 +1,293 @@
+\doxysection{tokenize.\+py}
+\hypertarget{tokenize_8py_source}{}\label{tokenize_8py_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googlemock/scripts/generator/cpp/tokenize.py@{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googlemock/scripts/generator/cpp/tokenize.py}}
+\mbox{\hyperlink{tokenize_8py}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00001}\mbox{\hyperlink{namespacecpp_1_1tokenize}{00001}}\ \textcolor{comment}{\#!/usr/bin/env\ python}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00002}00002\ \textcolor{comment}{\#}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00003}00003\ \textcolor{comment}{\#\ Copyright\ 2007\ Neal\ Norwitz}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00004}00004\ \textcolor{comment}{\#\ Portions\ Copyright\ 2007\ Google\ Inc.}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00005}00005\ \textcolor{comment}{\#}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00006}00006\ \textcolor{comment}{\#\ Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00007}00007\ \textcolor{comment}{\#\ you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00008}00008\ \textcolor{comment}{\#\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00009}00009\ \textcolor{comment}{\#}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00010}00010\ \textcolor{comment}{\#\ \ \ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00011}00011\ \textcolor{comment}{\#}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00012}00012\ \textcolor{comment}{\#\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00013}00013\ \textcolor{comment}{\#\ distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00014}00014\ \textcolor{comment}{\#\ WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00015}00015\ \textcolor{comment}{\#\ See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00016}00016\ \textcolor{comment}{\#\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00018}00018\ \textcolor{stringliteral}{"{}"{}"{}Tokenize\ C++\ source\ code."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00020}00020\ \_\_author\_\_\ =\ \textcolor{stringliteral}{'nnorwitz@google.com\ (Neal\ Norwitz)'}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00023}00023\ \textcolor{keywordflow}{try}:}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00024}00024\ \ \ \ \ \textcolor{comment}{\#\ Python\ 3.x}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00025}00025\ \ \ \ \ \textcolor{keyword}{import}\ builtins}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00026}00026\ \textcolor{keywordflow}{except}\ ImportError:}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00027}00027\ \ \ \ \ \textcolor{comment}{\#\ Python\ 2.x}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00028}00028\ \ \ \ \ \textcolor{keyword}{import}\ \_\_builtin\_\_\ \textcolor{keyword}{as}\ builtins}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00031}00031\ \textcolor{keyword}{import}\ sys}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00033}00033\ \textcolor{keyword}{from}\ cpp\ \textcolor{keyword}{import}\ utils}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00036}00036\ \textcolor{keywordflow}{if}\ \textcolor{keywordflow}{not}\ hasattr(builtins,\ \textcolor{stringliteral}{'set'}):}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00037}00037\ \ \ \ \ \textcolor{comment}{\#\ Nominal\ support\ for\ Python\ 2.3.}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00038}00038\ \ \ \ \ \textcolor{keyword}{from}\ sets\ \textcolor{keyword}{import}\ Set\ \textcolor{keyword}{as}\ set}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00041}00041\ \textcolor{comment}{\#\ Add\ \$\ as\ a\ valid\ identifier\ char\ since\ so\ much\ code\ uses\ it.}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00042}\mbox{\hyperlink{namespacecpp_1_1tokenize_a7184d66b4221a018ce89a3bdc5be462a}{00042}}\ \_letters\ =\ \textcolor{stringliteral}{'abcdefghijklmnopqrstuvwxyz'}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00043}\mbox{\hyperlink{namespacecpp_1_1tokenize_a733f1cf605b1630fb6a0a7f30aaefbec}{00043}}\ VALID\_IDENTIFIER\_CHARS\ =\ set(\_letters\ +\ \_letters.upper()\ +\ \textcolor{stringliteral}{'\_0123456789\$'})}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00044}\mbox{\hyperlink{namespacecpp_1_1tokenize_a8b45b0f0f2b504757e9ede9c342b2c36}{00044}}\ HEX\_DIGITS\ =\ set(\textcolor{stringliteral}{'0123456789abcdefABCDEF'})}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00045}\mbox{\hyperlink{namespacecpp_1_1tokenize_ad8c6dd06d4e6ef2e24e9186acb0aff43}{00045}}\ INT\_OR\_FLOAT\_DIGITS\ =\ set(\textcolor{stringliteral}{'01234567890eE-\/+'})}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00048}00048\ \textcolor{comment}{\#\ C++0x\ string\ preffixes.}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00049}\mbox{\hyperlink{namespacecpp_1_1tokenize_aef952930004258aec982a51c8875e82a}{00049}}\ \_STR\_PREFIXES\ =\ set((\textcolor{stringliteral}{'R'},\ \textcolor{stringliteral}{'u8'},\ \textcolor{stringliteral}{'u8R'},\ \textcolor{stringliteral}{'u'},\ \textcolor{stringliteral}{'uR'},\ \textcolor{stringliteral}{'U'},\ \textcolor{stringliteral}{'UR'},\ \textcolor{stringliteral}{'L'},\ \textcolor{stringliteral}{'LR'}))}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00052}00052\ \textcolor{comment}{\#\ Token\ types.}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00053}\mbox{\hyperlink{namespacecpp_1_1tokenize_a31fe52b9a13f1a1f917cd73f74912487}{00053}}\ UNKNOWN\ =\ \textcolor{stringliteral}{'UNKNOWN'}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00054}\mbox{\hyperlink{namespacecpp_1_1tokenize_a7631742d15d2fc4fa38971890756ea38}{00054}}\ SYNTAX\ =\ \textcolor{stringliteral}{'SYNTAX'}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00055}\mbox{\hyperlink{namespacecpp_1_1tokenize_a9b6f0ba84066474fbe0efe3e1054fbb6}{00055}}\ CONSTANT\ =\ \textcolor{stringliteral}{'CONSTANT'}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00056}\mbox{\hyperlink{namespacecpp_1_1tokenize_a208259db0db4d57d5ba342822d1d9047}{00056}}\ NAME\ =\ \textcolor{stringliteral}{'NAME'}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00057}\mbox{\hyperlink{namespacecpp_1_1tokenize_a498a39725ded32f55fb18b9b3a8e473f}{00057}}\ PREPROCESSOR\ =\ \textcolor{stringliteral}{'PREPROCESSOR'}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00059}00059\ \textcolor{comment}{\#\ Where\ the\ token\ originated\ from.\ \ This\ can\ be\ used\ for\ backtracking.}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00060}00060\ \textcolor{comment}{\#\ It\ is\ always\ set\ to\ WHENCE\_STREAM\ in\ this\ code.}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00061}\mbox{\hyperlink{namespacecpp_1_1tokenize_ad02466a473c5e9c2ac256e18209f0967}{00061}}\ WHENCE\_STREAM,\ WHENCE\_QUEUE\ =\ range(2)}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00062}00062\ }
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00064}\mbox{\hyperlink{classcpp_1_1tokenize_1_1_token}{00064}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classcpp_1_1tokenize_1_1_token}{Token}}(object):}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00065}00065\ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Data\ container\ to\ represent\ a\ C++\ token.}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00066}00066\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00067}00067\ \textcolor{stringliteral}{\ \ \ \ Tokens\ can\ be\ identifiers,\ syntax\ char(s),\ constants,\ or}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00068}00068\ \textcolor{stringliteral}{\ \ \ \ pre-\/processor\ directives.}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00069}00069\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00070}00070\ \textcolor{stringliteral}{\ \ \ \ start\ contains\ the\ index\ of\ the\ first\ char\ of\ the\ token\ in\ the\ source}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00071}00071\ \textcolor{stringliteral}{\ \ \ \ end\ contains\ the\ index\ of\ the\ last\ char\ of\ the\ token\ in\ the\ source}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00072}00072\ \textcolor{stringliteral}{\ \ \ \ "{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00073}00073\ }
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00074}\mbox{\hyperlink{classcpp_1_1tokenize_1_1_token_a43ca0dcf2b771ff3ace16523d74159d9}{00074}}\ \ \ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classcpp_1_1tokenize_1_1_token_a43ca0dcf2b771ff3ace16523d74159d9}{\_\_init\_\_}}(self,\ token\_type,\ name,\ start,\ end):}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00075}\mbox{\hyperlink{classcpp_1_1tokenize_1_1_token_a60c6e5120f3947885f10788ceb69a660}{00075}}\ \ \ \ \ \ \ \ \ self.\mbox{\hyperlink{classcpp_1_1tokenize_1_1_token_a60c6e5120f3947885f10788ceb69a660}{token\_type}}\ =\ token\_type}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00076}\mbox{\hyperlink{classcpp_1_1tokenize_1_1_token_a90859dd16bde71bc38f717f5119e63b9}{00076}}\ \ \ \ \ \ \ \ \ self.\mbox{\hyperlink{classcpp_1_1tokenize_1_1_token_a90859dd16bde71bc38f717f5119e63b9}{name}}\ =\ name}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00077}\mbox{\hyperlink{classcpp_1_1tokenize_1_1_token_a8ec48e348ff29901857cb21553da464b}{00077}}\ \ \ \ \ \ \ \ \ self.\mbox{\hyperlink{classcpp_1_1tokenize_1_1_token_a8ec48e348ff29901857cb21553da464b}{start}}\ =\ start}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00078}\mbox{\hyperlink{classcpp_1_1tokenize_1_1_token_a9935738c382352eca19834c2533715db}{00078}}\ \ \ \ \ \ \ \ \ self.\mbox{\hyperlink{classcpp_1_1tokenize_1_1_token_a9935738c382352eca19834c2533715db}{end}}\ =\ end}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00079}\mbox{\hyperlink{classcpp_1_1tokenize_1_1_token_a9d3a8011707ede6be85987d74f88848d}{00079}}\ \ \ \ \ \ \ \ \ self.\mbox{\hyperlink{classcpp_1_1tokenize_1_1_token_a9d3a8011707ede6be85987d74f88848d}{whence}}\ =\ WHENCE\_STREAM}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00080}00080\ }
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00081}\mbox{\hyperlink{classcpp_1_1tokenize_1_1_token_ad93a4059e9932fa2dea149510f0ef002}{00081}}\ \ \ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classcpp_1_1tokenize_1_1_token_ad93a4059e9932fa2dea149510f0ef002}{\_\_str\_\_}}(self):}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00082}00082\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keywordflow}{not}\ utils.DEBUG:}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00083}00083\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{'Token(\%r)'}\ \%\ self.\mbox{\hyperlink{classcpp_1_1tokenize_1_1_token_a90859dd16bde71bc38f717f5119e63b9}{name}}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00084}00084\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{'Token(\%r,\ \%s,\ \%s)'}\ \%\ (self.\mbox{\hyperlink{classcpp_1_1tokenize_1_1_token_a90859dd16bde71bc38f717f5119e63b9}{name}},\ self.\mbox{\hyperlink{classcpp_1_1tokenize_1_1_token_a8ec48e348ff29901857cb21553da464b}{start}},\ self.\mbox{\hyperlink{classcpp_1_1tokenize_1_1_token_a9935738c382352eca19834c2533715db}{end}})}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00085}00085\ }
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00086}00086\ \ \ \ \ \_\_repr\_\_\ =\ \_\_str\_\_}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00087}00087\ }
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00088}00088\ }
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00089}\mbox{\hyperlink{namespacecpp_1_1tokenize_afa711895958f5f4d05c456be765b6f10}{00089}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacecpp_1_1tokenize_afa711895958f5f4d05c456be765b6f10}{\_GetString}}(source,\ start,\ i):}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00090}00090\ \ \ \ \ i\ =\ source.find(\textcolor{stringliteral}{'"{}'},\ i+1)}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00091}00091\ \ \ \ \ \textcolor{keywordflow}{while}\ source[i-\/1]\ ==\ \textcolor{stringliteral}{'\(\backslash\)\(\backslash\)'}:}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00092}00092\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Count\ the\ trailing\ backslashes.}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00093}00093\ \ \ \ \ \ \ \ \ backslash\_count\ =\ 1}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00094}00094\ \ \ \ \ \ \ \ \ j\ =\ i\ -\/\ 2}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00095}00095\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ source[j]\ ==\ \textcolor{stringliteral}{'\(\backslash\)\(\backslash\)'}:}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00096}00096\ \ \ \ \ \ \ \ \ \ \ \ \ backslash\_count\ +=\ 1}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00097}00097\ \ \ \ \ \ \ \ \ \ \ \ \ j\ -\/=\ 1}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00098}00098\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ When\ trailing\ backslashes\ are\ even,\ they\ escape\ each\ other.}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00099}00099\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (backslash\_count\ \%\ 2)\ ==\ 0:}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00100}00100\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00101}00101\ \ \ \ \ \ \ \ \ i\ =\ source.find(\textcolor{stringliteral}{'"{}'},\ i+1)}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00102}00102\ \ \ \ \ \textcolor{keywordflow}{return}\ i\ +\ 1}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00103}00103\ }
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00104}00104\ }
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00105}\mbox{\hyperlink{namespacecpp_1_1tokenize_acd467b0bde12e7f818ae2961364b3a3d}{00105}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacecpp_1_1tokenize_acd467b0bde12e7f818ae2961364b3a3d}{\_GetChar}}(source,\ start,\ i):}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00106}00106\ \ \ \ \ \textcolor{comment}{\#\ NOTE(nnorwitz):\ may\ not\ be\ quite\ correct,\ should\ be\ good\ enough.}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00107}00107\ \ \ \ \ i\ =\ source.find(\textcolor{stringliteral}{"{}'"{}},\ i+1)}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00108}00108\ \ \ \ \ \textcolor{keywordflow}{while}\ source[i-\/1]\ ==\ \textcolor{stringliteral}{'\(\backslash\)\(\backslash\)'}:}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00109}00109\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Need\ to\ special\ case\ '\(\backslash\)\(\backslash\)'.}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00110}00110\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (i\ -\/\ 2)\ >\ start\ \textcolor{keywordflow}{and}\ source[i-\/2]\ ==\ \textcolor{stringliteral}{'\(\backslash\)\(\backslash\)'}:}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00111}00111\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00112}00112\ \ \ \ \ \ \ \ \ i\ =\ source.find(\textcolor{stringliteral}{"{}'"{}},\ i+1)}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00113}00113\ \ \ \ \ \textcolor{comment}{\#\ Try\ to\ handle\ unterminated\ single\ quotes\ (in\ a\ \#if\ 0\ block).}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00114}00114\ \ \ \ \ \textcolor{keywordflow}{if}\ i\ <\ 0:}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00115}00115\ \ \ \ \ \ \ \ \ i\ =\ start}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00116}00116\ \ \ \ \ \textcolor{keywordflow}{return}\ i\ +\ 1}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00117}00117\ }
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00118}00118\ }
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00119}\mbox{\hyperlink{namespacecpp_1_1tokenize_abdc89f5b08e972e7404e9b9ac1dd17ff}{00119}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacecpp_1_1tokenize_abdc89f5b08e972e7404e9b9ac1dd17ff}{GetTokens}}(source):}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00120}00120\ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Returns\ a\ sequence\ of\ Tokens.}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00121}00121\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00122}00122\ \textcolor{stringliteral}{\ \ \ \ Args:}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00123}00123\ \textcolor{stringliteral}{\ \ \ \ \ \ source:\ string\ of\ C++\ source\ code.}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00124}00124\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00125}00125\ \textcolor{stringliteral}{\ \ \ \ Yields:}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00126}00126\ \textcolor{stringliteral}{\ \ \ \ \ \ Token\ that\ represents\ the\ next\ token\ in\ the\ source.}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00127}00127\ \textcolor{stringliteral}{\ \ \ \ "{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00128}00128\ \ \ \ \ \textcolor{comment}{\#\ Cache\ various\ valid\ character\ sets\ for\ speed.}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00129}00129\ \ \ \ \ valid\_identifier\_chars\ =\ VALID\_IDENTIFIER\_CHARS}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00130}00130\ \ \ \ \ hex\_digits\ =\ HEX\_DIGITS}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00131}00131\ \ \ \ \ int\_or\_float\_digits\ =\ INT\_OR\_FLOAT\_DIGITS}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00132}00132\ \ \ \ \ int\_or\_float\_digits2\ =\ int\_or\_float\_digits\ |\ set(\textcolor{stringliteral}{'.'})}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00133}00133\ }
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00134}00134\ \ \ \ \ \textcolor{comment}{\#\ Only\ ignore\ errors\ while\ in\ a\ \#if\ 0\ block.}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00135}00135\ \ \ \ \ ignore\_errors\ =\ \textcolor{keyword}{False}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00136}00136\ \ \ \ \ count\_ifs\ =\ 0}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00137}00137\ }
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00138}00138\ \ \ \ \ i\ =\ 0}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00139}00139\ \ \ \ \ end\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}(source)}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00140}00140\ \ \ \ \ \textcolor{keywordflow}{while}\ i\ <\ end:}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00141}00141\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Skip\ whitespace.}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00142}00142\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ i\ <\ end\ \textcolor{keywordflow}{and}\ source[i].isspace():}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00143}00143\ \ \ \ \ \ \ \ \ \ \ \ \ i\ +=\ 1}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00144}00144\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ i\ >=\ end:}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00145}00145\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00146}00146\ }
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00147}00147\ \ \ \ \ \ \ \ \ token\_type\ =\ UNKNOWN}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00148}00148\ \ \ \ \ \ \ \ \ start\ =\ i}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00149}00149\ \ \ \ \ \ \ \ \ c\ =\ source[i]}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00150}00150\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ c.isalpha()\ \textcolor{keywordflow}{or}\ c\ ==\ \textcolor{stringliteral}{'\_'}:\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Find\ a\ string\ token.}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00151}00151\ \ \ \ \ \ \ \ \ \ \ \ \ token\_type\ =\ NAME}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00152}00152\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ source[i]\ \textcolor{keywordflow}{in}\ valid\_identifier\_chars:}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00153}00153\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i\ +=\ 1}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00154}00154\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ String\ and\ character\ constants\ can\ look\ like\ a\ name\ if}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00155}00155\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ they\ are\ something\ like\ L"{}"{}.}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00156}00156\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (source[i]\ ==\ \textcolor{stringliteral}{"{}'"{}}\ \textcolor{keywordflow}{and}\ (i\ -\/\ start)\ ==\ 1\ \textcolor{keywordflow}{and}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00157}00157\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ source[start:i]\ \textcolor{keywordflow}{in}\ \textcolor{stringliteral}{'uUL'}):}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00158}00158\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ u,\ U,\ and\ L\ are\ valid\ C++0x\ character\ preffixes.}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00159}00159\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ token\_type\ =\ CONSTANT}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00160}00160\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i\ =\ \mbox{\hyperlink{namespacecpp_1_1tokenize_acd467b0bde12e7f818ae2961364b3a3d}{\_GetChar}}(source,\ start,\ i)}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00161}00161\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{elif}\ source[i]\ ==\ \textcolor{stringliteral}{"{}'"{}}\ \textcolor{keywordflow}{and}\ source[start:i]\ \textcolor{keywordflow}{in}\ \_STR\_PREFIXES:}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00162}00162\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ token\_type\ =\ CONSTANT}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00163}00163\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i\ =\ \mbox{\hyperlink{namespacecpp_1_1tokenize_afa711895958f5f4d05c456be765b6f10}{\_GetString}}(source,\ start,\ i)}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00164}00164\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{elif}\ c\ ==\ \textcolor{stringliteral}{'/'}\ \textcolor{keywordflow}{and}\ source[i+1]\ ==\ \textcolor{stringliteral}{'/'}:\ \ \ \ \textcolor{comment}{\#\ Find\ //\ comments.}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00165}00165\ \ \ \ \ \ \ \ \ \ \ \ \ i\ =\ source.find(\textcolor{stringliteral}{'\(\backslash\)n'},\ i)}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00166}00166\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ i\ ==\ -\/1:\ \ \textcolor{comment}{\#\ Handle\ EOF.}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00167}00167\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i\ =\ end}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00168}00168\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00169}00169\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{elif}\ c\ ==\ \textcolor{stringliteral}{'/'}\ \textcolor{keywordflow}{and}\ source[i+1]\ ==\ \textcolor{stringliteral}{'*'}:\ \ \ \ \textcolor{comment}{\#\ Find\ /*\ comments.\ */}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00170}00170\ \ \ \ \ \ \ \ \ \ \ \ \ i\ =\ source.find(\textcolor{stringliteral}{'*/'},\ i)\ +\ 2}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00171}00171\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00172}00172\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{elif}\ c\ \textcolor{keywordflow}{in}\ \textcolor{stringliteral}{':+-\/<>\&|*='}:\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ :\ or\ ::\ (plus\ other\ chars).}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00173}00173\ \ \ \ \ \ \ \ \ \ \ \ \ token\_type\ =\ SYNTAX}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00174}00174\ \ \ \ \ \ \ \ \ \ \ \ \ i\ +=\ 1}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00175}00175\ \ \ \ \ \ \ \ \ \ \ \ \ new\_ch\ =\ source[i]}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00176}00176\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ new\_ch\ ==\ c\ \textcolor{keywordflow}{and}\ c\ !=\ \textcolor{stringliteral}{'>'}:\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Treat\ "{}>>"{}\ as\ two\ tokens.}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00177}00177\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i\ +=\ 1}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00178}00178\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{elif}\ c\ ==\ \textcolor{stringliteral}{'-\/'}\ \textcolor{keywordflow}{and}\ new\_ch\ ==\ \textcolor{stringliteral}{'>'}:}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00179}00179\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i\ +=\ 1}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00180}00180\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{elif}\ new\_ch\ ==\ \textcolor{stringliteral}{'='}:}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00181}00181\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i\ +=\ 1}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00182}00182\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{elif}\ c\ \textcolor{keywordflow}{in}\ \textcolor{stringliteral}{'()[]\{\}\string~!?\string^\%;/.,'}:\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Handle\ single\ char\ tokens.}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00183}00183\ \ \ \ \ \ \ \ \ \ \ \ \ token\_type\ =\ SYNTAX}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00184}00184\ \ \ \ \ \ \ \ \ \ \ \ \ i\ +=\ 1}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00185}00185\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ c\ ==\ \textcolor{stringliteral}{'.'}\ \textcolor{keywordflow}{and}\ source[i].isdigit():}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00186}00186\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ token\_type\ =\ CONSTANT}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00187}00187\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i\ +=\ 1}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00188}00188\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ source[i]\ \textcolor{keywordflow}{in}\ int\_or\_float\_digits:}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00189}00189\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i\ +=\ 1}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00190}00190\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Handle\ float\ suffixes.}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00191}00191\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ suffix\ \textcolor{keywordflow}{in}\ (\textcolor{stringliteral}{'l'},\ \textcolor{stringliteral}{'f'}):}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00192}00192\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ suffix\ ==\ source[i:i+1].lower():}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00193}00193\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i\ +=\ 1}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00194}00194\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00195}00195\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{elif}\ c.isdigit():\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Find\ integer.}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00196}00196\ \ \ \ \ \ \ \ \ \ \ \ \ token\_type\ =\ CONSTANT}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00197}00197\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ c\ ==\ \textcolor{stringliteral}{'0'}\ \textcolor{keywordflow}{and}\ source[i+1]\ \textcolor{keywordflow}{in}\ \textcolor{stringliteral}{'xX'}:}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00198}00198\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Handle\ hex\ digits.}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00199}00199\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i\ +=\ 2}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00200}00200\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ source[i]\ \textcolor{keywordflow}{in}\ hex\_digits:}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00201}00201\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i\ +=\ 1}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00202}00202\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00203}00203\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ source[i]\ \textcolor{keywordflow}{in}\ int\_or\_float\_digits2:}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00204}00204\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i\ +=\ 1}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00205}00205\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Handle\ integer\ (and\ float)\ suffixes.}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00206}00206\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ suffix\ \textcolor{keywordflow}{in}\ (\textcolor{stringliteral}{'ull'},\ \textcolor{stringliteral}{'ll'},\ \textcolor{stringliteral}{'ul'},\ \textcolor{stringliteral}{'l'},\ \textcolor{stringliteral}{'f'},\ \textcolor{stringliteral}{'u'}):}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00207}00207\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ size\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}(suffix)}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00208}00208\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ suffix\ ==\ source[i:i+size].lower():}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00209}00209\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i\ +=\ size}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00210}00210\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00211}00211\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{elif}\ c\ ==\ \textcolor{stringliteral}{'"{}'}:\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Find\ string.}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00212}00212\ \ \ \ \ \ \ \ \ \ \ \ \ token\_type\ =\ CONSTANT}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00213}00213\ \ \ \ \ \ \ \ \ \ \ \ \ i\ =\ \mbox{\hyperlink{namespacecpp_1_1tokenize_afa711895958f5f4d05c456be765b6f10}{\_GetString}}(source,\ start,\ i)}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00214}00214\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{elif}\ c\ ==\ \textcolor{stringliteral}{"{}'"{}}:\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Find\ char.}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00215}00215\ \ \ \ \ \ \ \ \ \ \ \ \ token\_type\ =\ CONSTANT}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00216}00216\ \ \ \ \ \ \ \ \ \ \ \ \ i\ =\ \mbox{\hyperlink{namespacecpp_1_1tokenize_acd467b0bde12e7f818ae2961364b3a3d}{\_GetChar}}(source,\ start,\ i)}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00217}00217\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{elif}\ c\ ==\ \textcolor{stringliteral}{'\#'}:\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Find\ pre-\/processor\ command.}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00218}00218\ \ \ \ \ \ \ \ \ \ \ \ \ token\_type\ =\ PREPROCESSOR}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00219}00219\ \ \ \ \ \ \ \ \ \ \ \ \ got\_if\ =\ source[i:i+3]\ ==\ \textcolor{stringliteral}{'\#if'}\ \textcolor{keywordflow}{and}\ source[i+3:i+4].isspace()}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00220}00220\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ got\_if:}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00221}00221\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ count\_ifs\ +=\ 1}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00222}00222\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{elif}\ source[i:i+6]\ ==\ \textcolor{stringliteral}{'\#endif'}:}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00223}00223\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ count\_ifs\ -\/=\ 1}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00224}00224\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ count\_ifs\ ==\ 0:}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00225}00225\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ignore\_errors\ =\ \textcolor{keyword}{False}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00226}00226\ }
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00227}00227\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ TODO(nnorwitz):\ handle\ preprocessor\ statements\ (\(\backslash\)\ continuations).}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00228}00228\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ 1:}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00229}00229\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i1\ =\ source.find(\textcolor{stringliteral}{'\(\backslash\)n'},\ i)}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00230}00230\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i2\ =\ source.find(\textcolor{stringliteral}{'//'},\ i)}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00231}00231\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i3\ =\ source.find(\textcolor{stringliteral}{'/*'},\ i)}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00232}00232\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i4\ =\ source.find(\textcolor{stringliteral}{'"{}'},\ i)}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00233}00233\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ NOTE(nnorwitz):\ doesn't\ handle\ comments\ in\ \#define\ macros.}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00234}00234\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Get\ the\ first\ important\ symbol\ (newline,\ comment,\ EOF/end).}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00235}00235\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i\ =\ min([x\ \textcolor{keywordflow}{for}\ x\ \textcolor{keywordflow}{in}\ (i1,\ i2,\ i3,\ i4,\ end)\ \textcolor{keywordflow}{if}\ x\ !=\ -\/1])}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00236}00236\ }
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00237}00237\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Handle\ \#include\ "{}dir//foo.h"{}\ properly.}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00238}00238\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ source[i]\ ==\ \textcolor{stringliteral}{'"{}'}:}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00239}00239\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i\ =\ source.find(\textcolor{stringliteral}{'"{}'},\ i+1)\ +\ 1}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00240}00240\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{assert}\ i\ >\ 0}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00241}00241\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00242}00242\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Keep\ going\ if\ end\ of\ the\ line\ and\ the\ line\ ends\ with\ \(\backslash\).}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00243}00243\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keywordflow}{not}\ (i\ ==\ i1\ \textcolor{keywordflow}{and}\ source[i-\/1]\ ==\ \textcolor{stringliteral}{'\(\backslash\)\(\backslash\)'}):}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00244}00244\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ got\_if:}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00245}00245\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ condition\ =\ source[start+4:i].lstrip()}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00246}00246\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (condition.startswith(\textcolor{stringliteral}{'0'})\ \textcolor{keywordflow}{or}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00247}00247\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ condition.startswith(\textcolor{stringliteral}{'(0)'})):}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00248}00248\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ignore\_errors\ =\ \textcolor{keyword}{True}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00249}00249\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00250}00250\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i\ +=\ 1}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00251}00251\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{elif}\ c\ ==\ \textcolor{stringliteral}{'\(\backslash\)\(\backslash\)'}:\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Handle\ \(\backslash\)\ in\ code.}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00252}00252\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ This\ is\ different\ from\ the\ pre-\/processor\ \(\backslash\)\ handling.}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00253}00253\ \ \ \ \ \ \ \ \ \ \ \ \ i\ +=\ 1}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00254}00254\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00255}00255\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{elif}\ ignore\_errors:}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00256}00256\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ The\ tokenizer\ seems\ to\ be\ in\ pretty\ good\ shape.\ \ This}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00257}00257\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ raise\ is\ conditionally\ disabled\ so\ that\ bogus\ code}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00258}00258\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ in\ an\ \#if\ 0\ block\ can\ be\ handled.\ \ Since\ we\ will\ ignore}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00259}00259\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ it\ anyways,\ this\ is\ probably\ fine.\ \ So\ disable\ the}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00260}00260\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ exception\ and\ \ return\ the\ bogus\ char.}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00261}00261\ \ \ \ \ \ \ \ \ \ \ \ \ i\ +=\ 1}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00262}00262\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00263}00263\ \ \ \ \ \ \ \ \ \ \ \ \ sys.stderr.write(\textcolor{stringliteral}{'Got\ invalid\ token\ in\ \%s\ @\ \%d\ token:\%s:\ \%r\(\backslash\)n'}\ \%}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00264}00264\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{'?'},\ i,\ c,\ source[i-\/10:i+10]))}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00265}00265\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{raise}\ RuntimeError(\textcolor{stringliteral}{'unexpected\ token'})}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00266}00266\ }
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00267}00267\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ i\ <=\ 0:}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00268}00268\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\textcolor{stringliteral}{'Invalid\ index,\ exiting\ now.'})}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00269}00269\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00270}00270\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{yield}\ \mbox{\hyperlink{classcpp_1_1tokenize_1_1_token}{Token}}(token\_type,\ source[start:i],\ start,\ i)}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00271}00271\ }
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00272}00272\ }
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00273}00273\ \textcolor{keywordflow}{if}\ \_\_name\_\_\ ==\ \textcolor{stringliteral}{'\_\_main\_\_'}:}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00274}\mbox{\hyperlink{namespacecpp_1_1tokenize_a28ff7996105f9b03b22335c579838769}{00274}}\ \ \ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}(argv):}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00275}00275\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}Driver\ mostly\ for\ testing\ purposes."{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00276}00276\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ filename\ \textcolor{keywordflow}{in}\ argv[1:]:}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00277}00277\ \ \ \ \ \ \ \ \ \ \ \ \ source\ =\ utils.ReadFile(filename)}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00278}00278\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ source\ \textcolor{keywordflow}{is}\ \textcolor{keywordtype}{None}:}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00279}00279\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00280}00280\ }
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00281}00281\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ token\ \textcolor{keywordflow}{in}\ \mbox{\hyperlink{namespacecpp_1_1tokenize_abdc89f5b08e972e7404e9b9ac1dd17ff}{GetTokens}}(source):}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00282}00282\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{210-_evt-_event_listeners_8cpp_a91b9457094088a57b7ba14d485a8771e}{print}}(\textcolor{stringliteral}{'\%-\/12s:\ \%s'}\ \%\ (token.token\_type,\ token.name))}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00283}00283\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ print('\(\backslash\)r\%6.2f\%\%'\ \%\ (100.0\ *\ index\ /\ token.end),)}}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00284}00284\ \ \ \ \ \ \ \ \ \ \ \ \ sys.stdout.write(\textcolor{stringliteral}{'\(\backslash\)n'})}
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00285}00285\ }
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00286}00286\ }
+\DoxyCodeLine{\Hypertarget{tokenize_8py_source_l00287}00287\ \ \ \ \ \mbox{\hyperlink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}(sys.argv)}
+
+\end{DoxyCode}

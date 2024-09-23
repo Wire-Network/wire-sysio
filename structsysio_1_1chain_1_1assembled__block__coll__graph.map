@@ -1,0 +1,32 @@
+<map id="sysio::chain::assembled_block" name="sysio::chain::assembled_block">
+<area shape="rect" id="Node000001" title=" " alt="" coords="1425,122,1587,162"/>
+<area shape="rect" id="Node000002" href="$classfc_1_1sha256.html" title=" " alt="" coords="374,18,456,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="471,20,534,13,612,11,690,13,793,11,897,15,1040,30,1151,46,1261,69,1401,103,1450,118,1449,124,1400,109,1260,74,1150,51,1039,35,896,21,793,16,690,18,612,16,534,18,472,25"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1chain_1_1pending__block__header__state.html" title=" " alt="" coords="1088,122,1233,162"/>
+<area shape="poly" id="edge13_Node000003_Node000002" title=" " alt="" coords="472,28,582,29,730,37,896,58,980,73,1061,94,1122,119,1120,124,1060,99,979,79,895,63,729,43,582,34,472,33"/>
+<area shape="rect" id="Node000011" href="$structsysio_1_1chain_1_1detail_1_1schedule__info.html" title=" " alt="" coords="740,86,870,126"/>
+<area shape="poly" id="edge11_Node000011_Node000002" title=" " alt="" coords="472,46,535,62,643,82,740,96,739,101,642,88,533,68,471,51"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="1248,139,1424,139,1424,145,1248,145"/>
+<area shape="rect" id="Node000004" href="$structsysio_1_1chain_1_1detail_1_1block__header__state__common.html" title=" " alt="" coords="734,150,876,206"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="892,167,1088,147,1088,152,892,172"/>
+<area shape="rect" id="Node000005" href="$structsysio_1_1chain_1_1producer__authority__schedule.html" title=" " alt="" coords="341,104,490,145"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="506,134,734,166,733,171,505,139"/>
+<area shape="poly" id="edge12_Node000011_Node000005" title=" " alt="" coords="506,118,739,106,739,112,506,123"/>
+<area shape="rect" id="Node000006" href="$classfc_1_1vector.html" title=" " alt="" coords="5,104,185,145"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="200,122,340,122,340,127,200,127"/>
+<area shape="rect" id="Node000007" href="$classsysio_1_1chain_1_1incremental__merkle__impl.html" title=" " alt="" coords="321,182,510,222"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="526,204,606,203,690,198,733,192,734,197,690,204,607,209,526,209"/>
+<area shape="rect" id="Node000008" href="$classfc_1_1vector.html" title=" " alt="" coords="33,182,157,222"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="172,199,320,199,320,205,172,205"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="339,258,492,298"/>
+<area shape="poly" id="edge8_Node000004_Node000009" title=" " alt="" coords="508,289,552,290,599,286,646,275,688,255,697,247,700,238,704,227,712,216,732,202,735,206,716,220,709,230,705,240,701,250,692,260,647,280,600,291,552,295,508,294"/>
+<area shape="rect" id="Node000010" href="$classfc_1_1vector.html" title=" " alt="" coords="346,322,485,348"/>
+<area shape="poly" id="edge9_Node000004_Node000010" title=" " alt="" coords="492,348,541,352,593,349,644,337,667,326,688,311,697,301,701,290,701,267,700,243,704,229,712,216,732,199,735,203,716,220,709,231,706,243,707,267,706,291,702,304,692,315,670,330,646,342,594,355,541,357,492,354"/>
+<area shape="poly" id="edge10_Node000003_Node000011" title=" " alt="" coords="886,111,1088,132,1088,137,885,117"/>
+<area shape="rect" id="Node000012" href="$structsysio_1_1chain_1_1name.html" title="Immutable except for fc::from_variant." alt="" coords="740,230,871,256"/>
+<area shape="poly" id="edge14_Node000003_Node000012" title=" " alt="" coords="885,227,970,209,1059,184,1083,173,1111,160,1113,165,1085,178,1061,189,971,214,886,233"/>
+<area shape="rect" id="Node000013" href="$classsysio_1_1chain_1_1block__timestamp.html" title=" " alt="" coords="714,280,896,351"/>
+<area shape="poly" id="edge15_Node000003_Node000013" title=" " alt="" coords="911,305,949,296,989,283,1026,265,1058,240,1068,225,1070,209,1072,192,1082,174,1098,161,1101,165,1086,177,1077,193,1076,210,1073,227,1062,244,1029,269,991,288,951,301,912,310"/>
+<area shape="rect" id="Node000014" href="$classfc_1_1vector.html" title=" " alt="" coords="1084,187,1237,228"/>
+<area shape="poly" id="edge16_Node000001_Node000014" title=" " alt="" coords="1251,188,1400,160,1424,155,1425,160,1401,165,1252,193"/>
+</map>

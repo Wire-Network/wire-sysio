@@ -1,0 +1,270 @@
+\doxysection{ntp.\+cpp}
+\hypertarget{ntp_8cpp_source}{}\label{ntp_8cpp_source}\index{libraries/fc/src/network/ntp.cpp@{libraries/fc/src/network/ntp.cpp}}
+\mbox{\hyperlink{ntp_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <fc/network/ntp.hpp>}}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{udp__socket_8hpp}{fc/network/udp\_socket.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{resolve_8hpp}{fc/network/resolve.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{ip_8hpp}{fc/network/ip.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <fc/thread/thread.hpp>}}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{stdint_8h}{stdint.h}}>}}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{byteswap_8hpp}{../byteswap.hpp}}"{}}}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <atomic>}}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00011}00011\ \textcolor{preprocessor}{\#include\ <array>}}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00013}00013\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00014}00014\ \{}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00015}00015\ \ \ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacedetail}{detail}}\ \{}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00016}00016\ \ \ \textcolor{keyword}{using\ }boost::fibers::future;}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00018}\mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl}{00018}}\ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl}{ntp\_impl}}}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00019}00019\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00020}00020\ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00022}\mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_ad6bd75c34d45ab832c5bf5ab7aab0cca}{00022}}\ \ \ \ \ \ \ fc::thread\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_ad6bd75c34d45ab832c5bf5ab7aab0cca}{\_ntp\_thread}};}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00023}\mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a492fb7af84f8442b90b4f73901adbe61}{00023}}\ \ \ \ \ \ \ std::vector<\ std::pair<\ std::string,\ uint16\_t>\ >\ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a492fb7af84f8442b90b4f73901adbe61}{\_ntp\_hosts}};}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00024}\mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a75bfd3d5ce6037a7bfae89da0a9f73ba}{00024}}\ \ \ \ \ \ \ future<void>\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a75bfd3d5ce6037a7bfae89da0a9f73ba}{\_read\_loop\_done}};}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00025}\mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a3192be9a4c6cb1b17c692a0e1d7ef61c}{00025}}\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1udp__socket}{udp\_socket}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a3192be9a4c6cb1b17c692a0e1d7ef61c}{\_sock}};}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00026}\mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a0154039055094fd24c5f156b4252cc6b}{00026}}\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a0154039055094fd24c5f156b4252cc6b}{\_request\_interval\_sec}};}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00027}\mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_aab50f7060faf962cfc6967d4089f0381}{00027}}\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_aab50f7060faf962cfc6967d4089f0381}{\_retry\_failed\_request\_interval\_sec}};}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00028}\mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a4f00346f22b4b815bf4c3c6cdb9ab3ed}{00028}}\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1time__point}{fc::time\_point}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a4f00346f22b4b815bf4c3c6cdb9ab3ed}{\_last\_valid\_ntp\_reply\_received\_time}};}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00030}\mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a6e0753611dff46a52e93a1d5a0566347}{00030}}\ \ \ \ \ \ \ std::atomic\_bool\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a6e0753611dff46a52e93a1d5a0566347}{\_last\_ntp\_delta\_initialized}};}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00031}\mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a0fb88b0eac88e8a384236d3e54f8e71c}{00031}}\ \ \ \ \ \ \ std::atomic<int64\_t>\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a0fb88b0eac88e8a384236d3e54f8e71c}{\_last\_ntp\_delta\_microseconds}};}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00033}\mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a2dfc9c9e2546e2674577e26be8cc98a5}{00033}}\ \ \ \ \ \ \ future<void>\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a2dfc9c9e2546e2674577e26be8cc98a5}{\_request\_time\_task\_done}};}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00035}\mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_ae84a47c5d0b6670eec22cef7e3095f1c}{00035}}\ \ \ \ \ \ \ std::shared\_ptr<scheduled\_task\_impl<void>>\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_ae84a47c5d0b6670eec22cef7e3095f1c}{\_scheduled\_request\_time}};}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00037}\mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a9ca5c9b4750236fb58d3c07640515d1b}{00037}}\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a9ca5c9b4750236fb58d3c07640515d1b}{ntp\_impl}}()\ :}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00038}00038\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_ad6bd75c34d45ab832c5bf5ab7aab0cca}{\_ntp\_thread}}(\textcolor{stringliteral}{"{}ntp"{}}),}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00039}00039\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a0154039055094fd24c5f156b4252cc6b}{\_request\_interval\_sec}}(\ 60*60\ \textcolor{comment}{/*\ 1\ hr\ */}),}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00040}00040\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_aab50f7060faf962cfc6967d4089f0381}{\_retry\_failed\_request\_interval\_sec}}(60\ *\ 5),}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00041}00041\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a0fb88b0eac88e8a384236d3e54f8e71c}{\_last\_ntp\_delta\_microseconds}}(0)}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00042}00042\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00043}00043\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a6e0753611dff46a52e93a1d5a0566347}{\_last\_ntp\_delta\_initialized}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00044}00044\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a492fb7af84f8442b90b4f73901adbe61}{\_ntp\_hosts}}.push\_back(\ std::make\_pair(\ \textcolor{stringliteral}{"{}pool.ntp.org"{}},123\ )\ );}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00045}00045\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00047}\mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_aaaf544e45298bd043067424a81e28ea1}{00047}}\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_aaaf544e45298bd043067424a81e28ea1}{\string~ntp\_impl}}()}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00048}00048\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a3192be9a4c6cb1b17c692a0e1d7ef61c}{\_sock}}.\mbox{\hyperlink{classfc_1_1udp__socket_a7be64e6fda2524b07192ca354559bbcd}{close}}();}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00050}00050\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_ae84a47c5d0b6670eec22cef7e3095f1c}{\_scheduled\_request\_time}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00051}00051\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_ae84a47c5d0b6670eec22cef7e3095f1c}{\_scheduled\_request\_time}}-\/>cancel();}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_ae84a47c5d0b6670eec22cef7e3095f1c}{\_scheduled\_request\_time}}-\/>get\_future().wait();}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_ae84a47c5d0b6670eec22cef7e3095f1c}{\_scheduled\_request\_time}}.reset();}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00055}00055\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00057}\mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a4109156bd9378f4234f3d5601577086f}{00057}}\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1time__point}{fc::time\_point}}\ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a4109156bd9378f4234f3d5601577086f}{ntp\_timestamp\_to\_fc\_time\_point}}(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ ntp\_timestamp\_net\_order)}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00058}00058\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00059}00059\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ ntp\_timestamp\_host\ =\ bswap\_64(ntp\_timestamp\_net\_order);}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00060}00060\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ fractional\_seconds\ =\ ntp\_timestamp\_host\ \&\ 0xffffffff;}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00061}00061\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{classfc_1_1microseconds}{microseconds}}\ =\ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})((((\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})fractional\_seconds\ *\ 1000000)\ +\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}(1)\ <<\ 31))\ >>\ 32);}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00062}00062\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ seconds\_since\_1900\ =\ ntp\_timestamp\_host\ >>\ 32;}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00063}00063\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ seconds\_since\_epoch\ =\ seconds\_since\_1900\ -\/\ 2208988800;}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00064}00064\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1time__point}{fc::time\_point}}()\ +\ \mbox{\hyperlink{namespacefc_a9623b8cae3f48bbed6aa1fc2afe9b174}{fc::seconds}}(seconds\_since\_epoch)\ +\ \mbox{\hyperlink{classfc_1_1microseconds}{fc::microseconds}}(\mbox{\hyperlink{classfc_1_1microseconds}{microseconds}});}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00065}00065\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00067}\mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_ab9d9f99d97d36f87dca4c0444d395502}{00067}}\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_ab9d9f99d97d36f87dca4c0444d395502}{fc\_time\_point\_to\_ntp\_timestamp}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1time__point}{fc::time\_point}}\&\ fc\_timestamp)}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00068}00068\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00069}00069\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ microseconds\_since\_epoch\ =\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})fc\_timestamp.\mbox{\hyperlink{classfc_1_1time__point_abfea5efbe9ef58024cda814395ee9945}{time\_since\_epoch}}().\mbox{\hyperlink{classfc_1_1microseconds_a20fba59ec7e1f50c6b8f2c9443cc9b92}{count}}();}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00070}00070\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ seconds\_since\_epoch\ =\ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})(microseconds\_since\_epoch\ /\ 1000000);}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00071}00071\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ seconds\_since\_1900\ =\ seconds\_since\_epoch\ +\ 2208988800;}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00072}00072\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{classfc_1_1microseconds}{microseconds}}\ =\ microseconds\_since\_epoch\ \%\ 1000000;}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00073}00073\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ fractional\_seconds\ =\ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})((((\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})\mbox{\hyperlink{classfc_1_1microseconds}{microseconds}}\ <<\ 32)\ +\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}(1)\ <<\ 31))\ /\ 1000000);}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00074}00074\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ ntp\_timestamp\_net\_order\ =\ ((\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})seconds\_since\_1900\ <<\ 32)\ +\ fractional\_seconds;}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00075}00075\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ bswap\_64(ntp\_timestamp\_net\_order);}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00076}00076\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00077}00077\ }
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00078}\mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_aabb55b1b1ca4de17db3d2b7f3f3ab56a}{00078}}\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_aabb55b1b1ca4de17db3d2b7f3f3ab56a}{request\_now}}()}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00079}00079\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00080}00080\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_ad6bd75c34d45ab832c5bf5ab7aab0cca}{\_ntp\_thread}}.is\_current());}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00081}00081\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\ item\ :\ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a492fb7af84f8442b90b4f73901adbe61}{\_ntp\_hosts}}\ )}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00082}00082\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00083}00083\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00084}00084\ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00085}00085\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a1759e5c9691d8ad754bdf5eff8bb23ac}{wlog}}(\ \textcolor{stringliteral}{"{}resolving...\ \$\{r\}"{}},\ (\textcolor{stringliteral}{"{}r"{}},\ item)\ );}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00086}00086\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ eps\ =\ \mbox{\hyperlink{namespacefc_ab306ee2beea98abbf390068aa881ca42}{resolve}}(\ item.first,\ item.second\ );}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00087}00087\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\ ep\ :\ eps\ )}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00088}00088\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00089}00089\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a1759e5c9691d8ad754bdf5eff8bb23ac}{wlog}}(\ \textcolor{stringliteral}{"{}sending\ request\ to\ \$\{ep\}"{}},\ (\textcolor{stringliteral}{"{}ep"{}},ep)\ );}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00090}00090\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::shared\_ptr<char>\ send\_buffer(\textcolor{keyword}{new}\ \textcolor{keywordtype}{char}[48],\ [](\textcolor{keywordtype}{char}*\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})\{\ \textcolor{keyword}{delete}[]\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}};\ \});}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00091}00091\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::array<unsigned\ char,\ 48>\ packet\_to\_send\ \{\ \{010,0,0,0,0,0,0,0,0\}\ \};}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00092}00092\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(send\_buffer.get(),\ packet\_to\_send.data(),\ packet\_to\_send.size());}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00093}00093\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}*\ send\_buf\_as\_64\_array\ =\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}*)send\_buffer.get();}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00094}00094\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ send\_buf\_as\_64\_array[5]\ =\ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_ab9d9f99d97d36f87dca4c0444d395502}{fc\_time\_point\_to\_ntp\_timestamp}}(\mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{fc::time\_point::now}}());\ \textcolor{comment}{//\ 5\ =\ Transmit\ Timestamp}}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00095}00095\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a3192be9a4c6cb1b17c692a0e1d7ef61c}{\_sock}}.\mbox{\hyperlink{classfc_1_1udp__socket_a99f7b46a3566de47d7977ce10b674fe1}{send\_to}}(send\_buffer,\ packet\_to\_send.size(),\ ep);}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00096}00096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00097}00097\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00098}00098\ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00099}00099\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{catch}\ (\textcolor{keyword}{const}\ fc::canceled\_exception\&)}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00100}00100\ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00101}00101\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw};}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00102}00102\ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00103}00103\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{catch}\ (\ \textcolor{keyword}{const}\ std::bad\_alloc\&\ )\ }
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00104}00104\ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00105}00105\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw};}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00106}00106\ \ \ \ \ \ \ \ \ \ \ \}\ }
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00107}00107\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{catch}\ (\ \textcolor{keyword}{const}\ boost::interprocess::bad\_alloc\&\ )\ }
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00108}00108\ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00109}00109\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw};}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00110}00110\ \ \ \ \ \ \ \ \ \ \ \}\ }
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00111}00111\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ this\ could\ fail\ to\ resolve\ but\ we\ want\ to\ go\ on\ to\ other\ hosts..}}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00112}00112\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{catch}\ (\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1exception}{fc::exception}}\&\ e\ )}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00113}00113\ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00114}00114\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}}(\ \textcolor{stringliteral}{"{}\$\{e\}"{}},\ (\textcolor{stringliteral}{"{}e"{}},e.\mbox{\hyperlink{classfc_1_1exception_a7611ea8fbe25dde56649b685c2298a37}{to\_detail\_string}}()\ )\ );}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00115}00115\ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00116}00116\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{catch}\ (\ \textcolor{keyword}{const}\ std::exception\&\ e\ )}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00117}00117\ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00118}00118\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}}(\ \textcolor{stringliteral}{"{}\$\{e\}"{}},\ (\textcolor{stringliteral}{"{}e"{}},e.\mbox{\hyperlink{classfc_1_1exception_ab1104818bf0d9b6a29f0dfe036cf97f6}{what}}()\ )\ );}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00119}00119\ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00120}00120\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00121}00121\ \ \ \ \ \ \ \}\ \textcolor{comment}{//\ request\_now}}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00122}00122\ }
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00123}00123\ \ \ \ \ \ \ \textcolor{comment}{//\ started\ for\ first\ time\ in\ ntp()\ constructor,\ canceled\ in\ \string~ntp()\ destructor}}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00124}00124\ \ \ \ \ \ \ \textcolor{comment}{//\ this\ task\ gets\ invoked\ every\ \_retry\_failed\_request\_interval\_sec\ (currently\ 5\ min),\ and\ if}}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00125}00125\ \ \ \ \ \ \ \textcolor{comment}{//\ \_request\_interval\_sec\ (currently\ 1\ hour)\ has\ passed\ since\ the\ last\ successful\ update,}}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00126}00126\ \ \ \ \ \ \ \textcolor{comment}{//\ it\ sends\ a\ new\ request}}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00127}\mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_ab2beecf0f92d0bad2bdd8047f45ab599}{00127}}\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_ab2beecf0f92d0bad2bdd8047f45ab599}{request\_time\_task}}()}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00128}00128\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00129}00129\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_aabb55b1b1ca4de17db3d2b7f3f3ab56a}{request\_now}}();}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00130}00130\ \ \ \ \ \ \ \}\ \textcolor{comment}{//\ request\_loop}}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00131}00131\ }
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00132}\mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a70d5cd30257c17171bc81e7dba288664}{00132}}\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a70d5cd30257c17171bc81e7dba288664}{start\_read\_loop}}()}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00133}00133\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00134}00134\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a75bfd3d5ce6037a7bfae89da0a9f73ba}{\_read\_loop\_done}}\ =\ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_ad6bd75c34d45ab832c5bf5ab7aab0cca}{\_ntp\_thread}}.async(\ [\textcolor{keyword}{this}]()\{\ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a5b3a58d9010e8ca23ee3e287595b8967}{read\_loop}}();\ \}\ );}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00135}00135\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00136}00136\ }
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00137}\mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a5b3a58d9010e8ca23ee3e287595b8967}{00137}}\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a5b3a58d9010e8ca23ee3e287595b8967}{read\_loop}}()}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00138}00138\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00139}00139\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(\mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_ad6bd75c34d45ab832c5bf5ab7aab0cca}{\_ntp\_thread}}.is\_current());}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00140}00140\ }
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00141}00141\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ receive\_buffer\_size\ =\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})\ *\ 1024;}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00142}00142\ \ \ \ \ \ \ \ \ std::shared\_ptr<char>\ receive\_buffer(\textcolor{keyword}{new}\ \textcolor{keywordtype}{char}[receive\_buffer\_size],\ [](\textcolor{keywordtype}{char}*\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})\{\ \textcolor{keyword}{delete}[]\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}};\ \});}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00143}00143\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}*\ recv\_buf\ =\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}*)receive\_buffer.get();}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00144}00144\ }
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00145}00145\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ if\ you\ start\ the\ read\ while\ loop\ here,\ the\ recieve\_from\ call\ will\ throw\ "{}invalid\ argument"{}\ on\ win32,}}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00146}00146\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ so\ instead\ we\ start\ the\ loop\ after\ making\ our\ first\ request}}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00147}00147\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a3192be9a4c6cb1b17c692a0e1d7ef61c}{\_sock}}.\mbox{\hyperlink{classfc_1_1udp__socket_ae38731361b74a2841f4691066ac31d86}{open}}();}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00148}00148\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a2dfc9c9e2546e2674577e26be8cc98a5}{\_request\_time\_task\_done}}\ =\ fc::async(\ [\&]()\{\ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_ab2beecf0f92d0bad2bdd8047f45ab599}{request\_time\_task}}();\ \}\ );}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00149}00149\ }
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00150}00150\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\ \textcolor{keyword}{true}\ )}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00151}00151\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00152}00152\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1ip_1_1endpoint}{fc::ip::endpoint}}\ from;}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00153}00153\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00154}00154\ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00155}00155\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a3192be9a4c6cb1b17c692a0e1d7ef61c}{\_sock}}.receive\_from(\ receive\_buffer,\ receive\_buffer\_size,\ from\ );}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00156}00156\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ \ wlog("{}received\ ntp\ reply\ from\ \$\{from\}"{},("{}from"{},from)\ );}}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00157}00157\ \ \ \ \ \ \ \ \ \ \ \}\ \mbox{\hyperlink{exception_8hpp_af3731d6e3beb140d9e652adf7a18113b}{FC\_RETHROW\_EXCEPTIONS}}(error,\ \textcolor{stringliteral}{"{}Error\ reading\ from\ NTP\ socket"{}});}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00158}00158\ }
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00159}00159\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1time__point}{fc::time\_point}}\ receive\_time\ =\ \mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{fc::time\_point::now}}();}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00160}00160\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1time__point}{fc::time\_point}}\ origin\_time\ =\ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a4109156bd9378f4234f3d5601577086f}{ntp\_timestamp\_to\_fc\_time\_point}}(recv\_buf[3]);}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00161}00161\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1time__point}{fc::time\_point}}\ server\_receive\_time\ =\ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a4109156bd9378f4234f3d5601577086f}{ntp\_timestamp\_to\_fc\_time\_point}}(recv\_buf[4]);}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00162}00162\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1time__point}{fc::time\_point}}\ server\_transmit\_time\ =\ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a4109156bd9378f4234f3d5601577086f}{ntp\_timestamp\_to\_fc\_time\_point}}(recv\_buf[5]);}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00163}00163\ }
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00164}00164\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1microseconds}{fc::microseconds}}\ offset(((server\_receive\_time\ -\/\ origin\_time)\ +}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00165}00165\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (server\_transmit\_time\ -\/\ receive\_time)).\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}()\ /\ 2);}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00166}00166\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1microseconds}{fc::microseconds}}\ round\_trip\_delay((receive\_time\ -\/\ origin\_time)\ -\/}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00167}00167\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (server\_transmit\_time\ -\/\ server\_receive\_time));}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00168}00168\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//wlog("{}origin\_time\ =\ \$\{origin\_time\},\ server\_receive\_time\ =\ \$\{server\_receive\_time\},\ server\_transmit\_time\ =\ \$\{server\_transmit\_time\},\ receive\_time\ =\ \$\{receive\_time\}"{},}}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00169}00169\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ \ \ \ \ ("{}origin\_time"{},\ origin\_time)("{}server\_receive\_time"{},\ server\_receive\_time)("{}server\_transmit\_time"{},\ server\_transmit\_time)("{}receive\_time"{},\ receive\_time));}}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00170}00170\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ wlog("{}ntp\ offset:\ \$\{offset\},\ round\_trip\_delay\ \$\{delay\}"{},\ ("{}offset"{},\ offset)("{}delay"{},\ round\_trip\_delay));}}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00171}00171\ }
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00172}00172\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//if\ the\ reply\ we\ just\ received\ has\ occurred\ more\ than\ a\ second\ after\ our\ last\ time\ request\ (it\ was\ more\ than\ a\ second\ ago\ since\ our\ last\ request)}}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00173}00173\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ round\_trip\_delay\ >\ \mbox{\hyperlink{classfc_1_1microseconds}{fc::microseconds}}(300000)\ )}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00174}00174\ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00175}00175\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a1759e5c9691d8ad754bdf5eff8bb23ac}{wlog}}(\textcolor{stringliteral}{"{}received\ stale\ ntp\ reply\ requested\ at\ \$\{request\_time\},\ send\ a\ new\ time\ request"{}},\ (\textcolor{stringliteral}{"{}request\_time"{}},\ origin\_time));}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00176}00176\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_aabb55b1b1ca4de17db3d2b7f3f3ab56a}{request\_now}}();\ \textcolor{comment}{//request\ another\ reply\ and\ ignore\ this\ one}}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00177}00177\ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00178}00178\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{comment}{//we\ think\ we\ have\ a\ timely\ reply,\ process\ it}}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00179}00179\ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00180}00180\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ offset\ <\ \mbox{\hyperlink{namespacefc_a9623b8cae3f48bbed6aa1fc2afe9b174}{fc::seconds}}(60*60*24)\ \&\&\ offset\ >\ \mbox{\hyperlink{namespacefc_a9623b8cae3f48bbed6aa1fc2afe9b174}{fc::seconds}}(-\/60*60*24)\ )}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00181}00181\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00182}00182\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a0fb88b0eac88e8a384236d3e54f8e71c}{\_last\_ntp\_delta\_microseconds}}\ =\ offset.\mbox{\hyperlink{classfc_1_1microseconds_a20fba59ec7e1f50c6b8f2c9443cc9b92}{count}}();}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00183}00183\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a6e0753611dff46a52e93a1d5a0566347}{\_last\_ntp\_delta\_initialized}}\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00184}00184\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1microseconds}{fc::microseconds}}\ ntp\_delta\_time\ =\ \mbox{\hyperlink{classfc_1_1microseconds}{fc::microseconds}}(\mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a0fb88b0eac88e8a384236d3e54f8e71c}{\_last\_ntp\_delta\_microseconds}});}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00185}00185\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a4f00346f22b4b815bf4c3c6cdb9ab3ed}{\_last\_valid\_ntp\_reply\_received\_time}}\ =\ receive\_time;}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00186}00186\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a1759e5c9691d8ad754bdf5eff8bb23ac}{wlog}}(\textcolor{stringliteral}{"{}ntp\_delta\_time\ updated\ to\ \$\{delta\_time\}\ us"{}},\ (\textcolor{stringliteral}{"{}delta\_time"{}},ntp\_delta\_time)\ );}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00187}00187\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00188}00188\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00189}00189\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a9e3cdbaecd5a34b42956e888f7326fad}{elog}}(\ \textcolor{stringliteral}{"{}NTP\ time\ and\ local\ time\ vary\ by\ more\ than\ a\ day!\ ntp:\$\{ntp\_time\}\ local:\$\{local\}"{}},}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00190}00190\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}ntp\_time"{}},\ receive\_time\ +\ offset)(\textcolor{stringliteral}{"{}local"{}},\ \mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{fc::time\_point::now}}())\ );}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00191}00191\ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00192}00192\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00193}00193\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a1759e5c9691d8ad754bdf5eff8bb23ac}{wlog}}(\textcolor{stringliteral}{"{}exiting\ ntp\ read\_loop"{}});}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00194}00194\ \ \ \ \ \ \ \}\ \textcolor{comment}{//end\ read\_loop()}}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00195}00195\ }
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00196}\mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a3ee1de6f11e03bf63ac439e5bddec0b7}{00196}}\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a3ee1de6f11e03bf63ac439e5bddec0b7}{reschedule}}()\ \{}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00197}00197\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_ae84a47c5d0b6670eec22cef7e3095f1c}{\_scheduled\_request\_time}}\ )}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00198}00198\ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_ae84a47c5d0b6670eec22cef7e3095f1c}{\_scheduled\_request\_time}}-\/>cancel();}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00199}00199\ }
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00200}00200\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_ae84a47c5d0b6670eec22cef7e3095f1c}{\_scheduled\_request\_time}}\ =\ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_ad6bd75c34d45ab832c5bf5ab7aab0cca}{\_ntp\_thread}}.schedule(}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00201}00201\ \ \ \ \ \ \ \ \ \ \ \ \ [\&]()\{}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00202}00202\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_aabb55b1b1ca4de17db3d2b7f3f3ab56a}{request\_now}}();}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00203}00203\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a3ee1de6f11e03bf63ac439e5bddec0b7}{reschedule}}();}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00204}00204\ \ \ \ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00205}00205\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{fc::time\_point::now}}()\ +\ \mbox{\hyperlink{namespacefc_a9623b8cae3f48bbed6aa1fc2afe9b174}{fc::seconds}}(\mbox{\hyperlink{classfc_1_1detail_1_1ntp__impl_a0154039055094fd24c5f156b4252cc6b}{\_request\_interval\_sec}})\ );}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00206}00206\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00207}00207\ \ \ \ \ \};\ \textcolor{comment}{//ntp\_impl}}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00208}00208\ }
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00209}00209\ \ \ \}\ \textcolor{comment}{//\ namespace\ detail}}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00210}00210\ }
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00211}00211\ }
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00212}00212\ }
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00213}00213\ \ \ ntp::ntp()}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00214}00214\ \ \ :my(\ new\ \mbox{\hyperlink{namespacedetail}{detail}}::ntp\_impl()\ )}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00215}00215\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00216}00216\ \ \ \ \ my-\/>start\_read\_loop();}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00217}00217\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00218}00218\ }
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00219}00219\ \ \ ntp::\string~ntp()}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00220}00220\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00221}00221\ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\ \textcolor{stringliteral}{"{}shutting\ down\ ntp"{}}\ );}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00222}00222\ \ \ \ \ my-\/>\_ntp\_thread.async([=]()\{}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00223}00223\ \ \ \ \ \ \ my-\/>\_sock.close();}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00224}00224\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ my-\/>\_scheduled\_request\_time\ )\ \{}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00225}00225\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\ \textcolor{stringliteral}{"{}wait\ cancel\ scheduled\ request\ "{}}\ );}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00226}00226\ \ \ \ \ \ \ \ \ \ my-\/>\_scheduled\_request\_time-\/>cancel();}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00227}00227\ \ \ \ \ \ \ \ \ \ my-\/>\_scheduled\_request\_time-\/>get\_future().wait();}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00228}00228\ \ \ \ \ \ \ \ \ \ my-\/>\_scheduled\_request\_time.reset();}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00229}00229\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00230}00230\ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\ \textcolor{stringliteral}{"{}wait\ request\ time\ task\ "{}}\ );}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00231}00231\ \ \ \ \ \ \ my-\/>\_request\_time\_task\_done.wait();}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00232}00232\ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\ \textcolor{stringliteral}{"{}wait\ read\ loop\ "{}}\ );}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00233}00233\ \ \ \ \ \ \ my-\/>\_read\_loop\_done.wait();}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00234}00234\ \ \ \ \ \}).\mbox{\hyperlink{xbyak__mnemonic_8h_aa3b21853f890838c88d047d6c2786917}{wait}}();}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00235}00235\ \ \ \ \ my-\/>\_ntp\_thread.quit();}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00236}00236\ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a831cf08dc63704c11fd154132c6e8bdb}{ilog}}(\ \textcolor{stringliteral}{"{}joining\ ntp"{}}\ );}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00237}00237\ \ \ \ \ my-\/>\_ntp\_thread.join();}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00238}00238\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00239}00239\ }
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00240}00240\ }
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00241}00241\ \ \ \textcolor{keywordtype}{void}\ ntp::add\_server(\ \textcolor{keyword}{const}\ std::string\&\ hostname,\ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ port)}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00242}00242\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00243}00243\ \ \ \ \ my-\/>\_ntp\_thread.async(\ [=]()\{\ my-\/>\_ntp\_hosts.push\_back(\ std::make\_pair(hostname,port)\ );\ \}).\mbox{\hyperlink{xbyak__mnemonic_8h_aa3b21853f890838c88d047d6c2786917}{wait}}();}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00244}00244\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00245}00245\ }
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00246}00246\ \ \ \textcolor{keywordtype}{void}\ ntp::set\_request\_interval(\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ interval\_sec\ )}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00247}00247\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00248}00248\ \ \ \ \ my-\/>\_request\_interval\_sec\ =\ interval\_sec;}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00249}00249\ \ \ \ \ my-\/>\_retry\_failed\_request\_interval\_sec\ =\ std::min(my-\/>\_retry\_failed\_request\_interval\_sec,\ interval\_sec);}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00250}00250\ \ \ \ \ my-\/>reschedule();}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00251}00251\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00252}00252\ }
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00253}00253\ \ \ \textcolor{keywordtype}{void}\ ntp::request\_now()}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00254}00254\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00255}00255\ \ \ \ \ my-\/>\_ntp\_thread.async(\ [=]()\{\ my-\/>request\_now();\ \}\ ).get();}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00256}00256\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00257}00257\ }
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00258}00258\ \ \ std::optional<time\_point>\ ntp::get\_time()\textcolor{keyword}{const}}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00259}00259\ \textcolor{keyword}{\ \ }\{}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00260}00260\ \ \ \ \ \textcolor{keywordflow}{if}(\ my-\/>\_last\_ntp\_delta\_initialized\ )}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00261}00261\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{fc::time\_point::now}}()\ +\ \mbox{\hyperlink{classfc_1_1microseconds}{fc::microseconds}}(my-\/>\_last\_ntp\_delta\_microseconds);}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00262}00262\ \ \ \ \ \textcolor{keywordflow}{return}\ std::optional<time\_point>();}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00263}00263\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00264}00264\ }
+\DoxyCodeLine{\Hypertarget{ntp_8cpp_source_l00265}00265\ \}\ \textcolor{comment}{//namespace\ fc}}
+
+\end{DoxyCode}

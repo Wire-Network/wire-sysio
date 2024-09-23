@@ -1,0 +1,1476 @@
+\doxysection{libraries/sys-\/vm/include/sysio/vm/opcodes\+\_\+def.hpp File Reference}
+\hypertarget{vm_2opcodes__def_8hpp}{}\label{vm_2opcodes__def_8hpp}\index{libraries/sys-\/vm/include/sysio/vm/opcodes\_def.hpp@{libraries/sys-\/vm/include/sysio/vm/opcodes\_def.hpp}}
+{\ttfamily \#include $<$cstdint$>$}\newline
+Include dependency graph for opcodes\+\_\+def.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=216pt]{vm_2opcodes__def_8hpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{vm_2opcodes__def_8hpp_abd8782a549085609074c6c69d5cd2d97}{SYS\+\_\+\+VM\+\_\+\+CONTROL\+\_\+\+FLOW\+\_\+\+OPS}}(opcode\+\_\+macro)
+\item 
+\#define \mbox{\hyperlink{vm_2opcodes__def_8hpp_af21f9de2ba8e3f679648a5191da27fce}{SYS\+\_\+\+VM\+\_\+\+BR\+\_\+\+TABLE\+\_\+\+OP}}(opcode\+\_\+macro)
+\item 
+\#define \mbox{\hyperlink{vm_2opcodes__def_8hpp_a121d0950383bd19f2ab3f9c002c34e6c}{SYS\+\_\+\+VM\+\_\+\+RETURN\+\_\+\+OP}}(opcode\+\_\+macro)
+\item 
+\#define \mbox{\hyperlink{vm_2opcodes__def_8hpp_a812b692aafa5c80483c442f0d71722b1}{SYS\+\_\+\+VM\+\_\+\+CALL\+\_\+\+OPS}}(opcode\+\_\+macro)
+\item 
+\#define \mbox{\hyperlink{vm_2opcodes__def_8hpp_a9f06c54d449604fad73a9455c8812858}{SYS\+\_\+\+VM\+\_\+\+CALL\+\_\+\+IMM\+\_\+\+OPS}}(opcode\+\_\+macro)
+\item 
+\#define \mbox{\hyperlink{vm_2opcodes__def_8hpp_adadc0f4760d5b1b861978f94bf779883}{SYS\+\_\+\+VM\+\_\+\+PARAMETRIC\+\_\+\+OPS}}(opcode\+\_\+macro)
+\item 
+\#define \mbox{\hyperlink{vm_2opcodes__def_8hpp_a95de92951ac0d980e13f9efb273bd051}{SYS\+\_\+\+VM\+\_\+\+VARIABLE\+\_\+\+ACCESS\+\_\+\+OPS}}(opcode\+\_\+macro)
+\item 
+\#define \mbox{\hyperlink{vm_2opcodes__def_8hpp_a60304cb9f34cbee69d483a705f5a6b1f}{SYS\+\_\+\+VM\+\_\+\+MEMORY\+\_\+\+OPS}}(opcode\+\_\+macro)
+\item 
+\#define \mbox{\hyperlink{vm_2opcodes__def_8hpp_a69e0d988cd91bed33d70534bda2008d1}{SYS\+\_\+\+VM\+\_\+\+I32\+\_\+\+CONSTANT\+\_\+\+OPS}}(opcode\+\_\+macro)
+\item 
+\#define \mbox{\hyperlink{vm_2opcodes__def_8hpp_a694e09ce604f561df1e40fcdd8b25577}{SYS\+\_\+\+VM\+\_\+\+I64\+\_\+\+CONSTANT\+\_\+\+OPS}}(opcode\+\_\+macro)
+\item 
+\#define \mbox{\hyperlink{vm_2opcodes__def_8hpp_ae110cbdd36b1d9cdbfa5beccdc1b65f8}{SYS\+\_\+\+VM\+\_\+\+F32\+\_\+\+CONSTANT\+\_\+\+OPS}}(opcode\+\_\+macro)
+\item 
+\#define \mbox{\hyperlink{vm_2opcodes__def_8hpp_a0df979b9770c5056d0f795034ddabb7c}{SYS\+\_\+\+VM\+\_\+\+F64\+\_\+\+CONSTANT\+\_\+\+OPS}}(opcode\+\_\+macro)
+\item 
+\#define \mbox{\hyperlink{vm_2opcodes__def_8hpp_a204578ac1952c2df161a909f4375f693}{SYS\+\_\+\+VM\+\_\+\+COMPARISON\+\_\+\+OPS}}(opcode\+\_\+macro)
+\item 
+\#define \mbox{\hyperlink{vm_2opcodes__def_8hpp_a881d40db151cbe2320f29027b7e14fe0}{SYS\+\_\+\+VM\+\_\+\+NUMERIC\+\_\+\+OPS}}(opcode\+\_\+macro)
+\item 
+\#define \mbox{\hyperlink{vm_2opcodes__def_8hpp_a91c11ea5280d9861ae565b494fa494e1}{SYS\+\_\+\+VM\+\_\+\+CONVERSION\+\_\+\+OPS}}(opcode\+\_\+macro)
+\item 
+\#define \mbox{\hyperlink{vm_2opcodes__def_8hpp_a1efd77b1bfac80757916bc1638a39c4b}{SYS\+\_\+\+VM\+\_\+\+EXIT\+\_\+\+OP}}(opcode\+\_\+macro)
+\item 
+\#define \mbox{\hyperlink{vm_2opcodes__def_8hpp_a9e39407aa4f7cf22d622726763af293e}{SYS\+\_\+\+VM\+\_\+\+EMPTY\+\_\+\+OPS}}(opcode\+\_\+macro)
+\item 
+\#define \mbox{\hyperlink{vm_2opcodes__def_8hpp_abe9234baee521deb37d406026bd82971}{SYS\+\_\+\+VM\+\_\+\+ERROR\+\_\+\+OPS}}(opcode\+\_\+macro)
+\item 
+\#define \mbox{\hyperlink{vm_2opcodes__def_8hpp_ad91774e46560173a3fd3c1cb3a0b0347}{SYS\+\_\+\+VM\+\_\+\+CREATE\+\_\+\+ENUM}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  code)
+\item 
+\#define \mbox{\hyperlink{vm_2opcodes__def_8hpp_a7737f4774ea7e212c343dee23f4f4ad6}{SYS\+\_\+\+VM\+\_\+\+CREATE\+\_\+\+STRINGS}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  code)
+\item 
+\#define \mbox{\hyperlink{vm_2opcodes__def_8hpp_ad54f4a1268cfeb285bddffcfeeff4644}{SYS\+\_\+\+VM\+\_\+\+CREATE\+\_\+\+MAP}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  code)
+\item 
+\#define \mbox{\hyperlink{vm_2opcodes__def_8hpp_aa42adbcc3d74c7c09fdedc64a0bf0792}{SYS\+\_\+\+VM\+\_\+\+OPCODE\+\_\+\+NAME\+\_\+if\+\_\+}}
+\item 
+\#define \mbox{\hyperlink{vm_2opcodes__def_8hpp_a40e818e63459b4e529201ac03f551be5}{SYS\+\_\+\+VM\+\_\+\+OPCODE\+\_\+\+NAME\+\_\+else\+\_\+}}
+\item 
+\#define \mbox{\hyperlink{vm_2opcodes__def_8hpp_ad5482004ea3d6f09e808baaef202edcb}{SYS\+\_\+\+VM\+\_\+\+OPCODE\+\_\+\+NAME\+\_\+return\+\_\+}}
+\item 
+\#define \mbox{\hyperlink{vm_2opcodes__def_8hpp_addd92722a31b2302f35e84238cec1515}{SYS\+\_\+\+VM\+\_\+\+OPCODE\+\_\+\+NAME\+\_\+\+TEST}}()
+\item 
+\#define \mbox{\hyperlink{vm_2opcodes__def_8hpp_ab6227b6cd71297dd11eaf01be9630c60}{SYS\+\_\+\+VM\+\_\+\+OPCODE\+\_\+\+NAME\+\_\+\+TEST\+\_\+\+SYS\+\_\+\+VM\+\_\+\+OPCODE\+\_\+\+NAME\+\_\+\+TEST}}~0,
+\item 
+\#define \mbox{\hyperlink{vm_2opcodes__def_8hpp_ae59575061609408546cc7afcec3fce30}{SYS\+\_\+\+VM\+\_\+\+OPCODE\+\_\+\+NAME\+\_\+\+TEST\+\_\+1}}~1, ignore
+\item 
+\#define \mbox{\hyperlink{vm_2opcodes__def_8hpp_ad2491e63328dd7e45597d694635f6f0c}{SYS\+\_\+\+VM\+\_\+\+EXPAND}}(x)
+\item 
+\#define \mbox{\hyperlink{vm_2opcodes__def_8hpp_af77496a86d0dd970cfa68b3b035ba789}{SYS\+\_\+\+VM\+\_\+\+CAT2}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{vm_2opcodes__def_8hpp_a5df29569b50589a080c5fd1ce7c0491e}{SYS\+\_\+\+VM\+\_\+\+CAT}}(x,  y)
+\item 
+\#define \mbox{\hyperlink{vm_2opcodes__def_8hpp_a924c26991b360b26f6b2bd091fdcd106}{SYS\+\_\+\+VM\+\_\+\+APPLY}}(\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}},  args)
+\item 
+\#define \mbox{\hyperlink{vm_2opcodes__def_8hpp_a9680f623aed77c66143c3a2ee80124b6}{SYS\+\_\+\+VM\+\_\+\+FIX\+\_\+\+OPCODE\+\_\+\+NAME\+\_\+0}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})
+\item 
+\#define \mbox{\hyperlink{vm_2opcodes__def_8hpp_a5ad767df542e655f39560927beb82c55}{SYS\+\_\+\+VM\+\_\+\+FIX\+\_\+\+OPCODE\+\_\+\+NAME\+\_\+1}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})
+\item 
+\#define \mbox{\hyperlink{vm_2opcodes__def_8hpp_ad2c6366de1b1bb571a4c78bb547930e2}{SYS\+\_\+\+VM\+\_\+\+FIX\+\_\+\+OPCODE\+\_\+\+NAME}}(iskeyword,  garbage)
+\item 
+\#define \mbox{\hyperlink{vm_2opcodes__def_8hpp_a01adfe88e6a9fb9241c97eb1fb4fdb14}{SYS\+\_\+\+VM\+\_\+\+OPCODE\+\_\+T}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})
+\item 
+\#define \mbox{\hyperlink{vm_2opcodes__def_8hpp_aad54c2988b268d5c3cb6ca472d7b01c3}{SYS\+\_\+\+VM\+\_\+\+CREATE\+\_\+\+EXIT\+\_\+\+TYPE}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  code)
+\item 
+\#define \mbox{\hyperlink{vm_2opcodes__def_8hpp_a1872405616f7c3db4ac45a2abad4d49c}{SYS\+\_\+\+VM\+\_\+\+CREATE\+\_\+\+CONTROL\+\_\+\+FLOW\+\_\+\+TYPES}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  code)
+\item 
+\#define \mbox{\hyperlink{vm_2opcodes__def_8hpp_a4047ef28371bbecfc5a20f3ca0c3288b}{SYS\+\_\+\+VM\+\_\+\+CREATE\+\_\+\+BR\+\_\+\+TABLE\+\_\+\+TYPE}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  code)
+\item 
+\#define \mbox{\hyperlink{vm_2opcodes__def_8hpp_a21327df6dfc64d2bebad7554c7f0bf6c}{SYS\+\_\+\+VM\+\_\+\+CREATE\+\_\+\+TYPES}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  code)
+\item 
+\#define \mbox{\hyperlink{vm_2opcodes__def_8hpp_a23f79c13a9806e381daa3293455a55de}{SYS\+\_\+\+VM\+\_\+\+CREATE\+\_\+\+CALL\+\_\+\+TYPES}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  code)
+\item 
+\#define \mbox{\hyperlink{vm_2opcodes__def_8hpp_a270521ca28979c180fd1dd7667f53c2e}{SYS\+\_\+\+VM\+\_\+\+CREATE\+\_\+\+CALL\+\_\+\+IMM\+\_\+\+TYPES}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  code)
+\item 
+\#define \mbox{\hyperlink{vm_2opcodes__def_8hpp_a259b10ca4f5a47da8723c8b207a0d0f9}{SYS\+\_\+\+VM\+\_\+\+CREATE\+\_\+\+VARIABLE\+\_\+\+ACCESS\+\_\+\+TYPES}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  code)
+\item 
+\#define \mbox{\hyperlink{vm_2opcodes__def_8hpp_aa3fdacc6e0911278c77e05d5af5dae54}{SYS\+\_\+\+VM\+\_\+\+CREATE\+\_\+\+MEMORY\+\_\+\+TYPES}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  code)
+\item 
+\#define \mbox{\hyperlink{vm_2opcodes__def_8hpp_a6d504500c8c779309c8f141a30474d5b}{SYS\+\_\+\+VM\+\_\+\+CREATE\+\_\+\+I32\+\_\+\+CONSTANT\+\_\+\+TYPE}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  code)
+\item 
+\#define \mbox{\hyperlink{vm_2opcodes__def_8hpp_a09865a40b4b9a97f16132fc808eb5e86}{SYS\+\_\+\+VM\+\_\+\+CREATE\+\_\+\+I64\+\_\+\+CONSTANT\+\_\+\+TYPE}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  code)
+\item 
+\#define \mbox{\hyperlink{vm_2opcodes__def_8hpp_a12bdc66614c00a06f6c9f86821d1be87}{SYS\+\_\+\+VM\+\_\+\+CREATE\+\_\+\+F32\+\_\+\+CONSTANT\+\_\+\+TYPE}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  code)
+\item 
+\#define \mbox{\hyperlink{vm_2opcodes__def_8hpp_a4a8151ccc0b1e541fb9aa2a125cb24b1}{SYS\+\_\+\+VM\+\_\+\+CREATE\+\_\+\+F64\+\_\+\+CONSTANT\+\_\+\+TYPE}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  code)
+\item 
+\#define \mbox{\hyperlink{vm_2opcodes__def_8hpp_a106992b326ee536ca96ba6bb3adbf733}{SYS\+\_\+\+VM\+\_\+\+IDENTITY}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  code)
+\item 
+\#define \mbox{\hyperlink{vm_2opcodes__def_8hpp_a402622452cc1d0fe9aedf301af9f0054}{SYS\+\_\+\+VM\+\_\+\+IDENTITY\+\_\+\+END}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  code)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{vm_2opcodes__def_8hpp_a924c26991b360b26f6b2bd091fdcd106}\index{opcodes\_def.hpp@{opcodes\_def.hpp}!SYS\_VM\_APPLY@{SYS\_VM\_APPLY}}
+\index{SYS\_VM\_APPLY@{SYS\_VM\_APPLY}!opcodes\_def.hpp@{opcodes\_def.hpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_APPLY}{SYS\_VM\_APPLY}}
+{\footnotesize\ttfamily \label{vm_2opcodes__def_8hpp_a924c26991b360b26f6b2bd091fdcd106} 
+\#define SYS\+\_\+\+VM\+\_\+\+APPLY(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}}{, }\item[{}]{args}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}\ args}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{vm_2opcodes__def_8hpp_source_l00299}{299}} of file \mbox{\hyperlink{vm_2opcodes__def_8hpp_source}{opcodes\+\_\+def.\+hpp}}.
+
+\Hypertarget{vm_2opcodes__def_8hpp_af21f9de2ba8e3f679648a5191da27fce}\index{opcodes\_def.hpp@{opcodes\_def.hpp}!SYS\_VM\_BR\_TABLE\_OP@{SYS\_VM\_BR\_TABLE\_OP}}
+\index{SYS\_VM\_BR\_TABLE\_OP@{SYS\_VM\_BR\_TABLE\_OP}!opcodes\_def.hpp@{opcodes\_def.hpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_BR\_TABLE\_OP}{SYS\_VM\_BR\_TABLE\_OP}}
+{\footnotesize\ttfamily \label{vm_2opcodes__def_8hpp_af21f9de2ba8e3f679648a5191da27fce} 
+\#define SYS\+\_\+\+VM\+\_\+\+BR\+\_\+\+TABLE\+\_\+\+OP(\begin{DoxyParamCaption}\item[{}]{opcode\+\_\+macro}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ opcode\_macro(br\_table,\ 0x0E)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{vm_2opcodes__def_8hpp_source_l00021}{21}} of file \mbox{\hyperlink{vm_2opcodes__def_8hpp_source}{opcodes\+\_\+def.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#define\ SYS\_VM\_BR\_TABLE\_OP(opcode\_macro)\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\ \ \ opcode\_macro(br\_table,\ 0x0E)}}
+
+\end{DoxyCode}
+\Hypertarget{vm_2opcodes__def_8hpp_a9f06c54d449604fad73a9455c8812858}\index{opcodes\_def.hpp@{opcodes\_def.hpp}!SYS\_VM\_CALL\_IMM\_OPS@{SYS\_VM\_CALL\_IMM\_OPS}}
+\index{SYS\_VM\_CALL\_IMM\_OPS@{SYS\_VM\_CALL\_IMM\_OPS}!opcodes\_def.hpp@{opcodes\_def.hpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_CALL\_IMM\_OPS}{SYS\_VM\_CALL\_IMM\_OPS}}
+{\footnotesize\ttfamily \label{vm_2opcodes__def_8hpp_a9f06c54d449604fad73a9455c8812858} 
+\#define SYS\+\_\+\+VM\+\_\+\+CALL\+\_\+\+IMM\+\_\+\+OPS(\begin{DoxyParamCaption}\item[{}]{opcode\+\_\+macro}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ opcode\_macro(call\_imm,\ 0x13)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(call\_indirect\_imm,\ 0x14)\ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(padding\_call\_1,\ 0x15)\ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(padding\_call\_2,\ 0x16)\ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(padding\_call\_3,\ 0x17)\ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(padding\_call\_4,\ 0x18)\ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(padding\_call\_5,\ 0x19)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{vm_2opcodes__def_8hpp_source_l00029}{29}} of file \mbox{\hyperlink{vm_2opcodes__def_8hpp_source}{opcodes\+\_\+def.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00029\ \textcolor{preprocessor}{\#define\ SYS\_VM\_CALL\_IMM\_OPS(opcode\_macro)\ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00030\ \textcolor{preprocessor}{\ \ \ opcode\_macro(call\_imm,\ 0x13)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00031\ \textcolor{preprocessor}{\ \ \ opcode\_macro(call\_indirect\_imm,\ 0x14)\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00032\ \textcolor{preprocessor}{\ \ \ opcode\_macro(padding\_call\_1,\ 0x15)\ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00033\ \textcolor{preprocessor}{\ \ \ opcode\_macro(padding\_call\_2,\ 0x16)\ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00034\ \textcolor{preprocessor}{\ \ \ opcode\_macro(padding\_call\_3,\ 0x17)\ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00035\ \textcolor{preprocessor}{\ \ \ opcode\_macro(padding\_call\_4,\ 0x18)\ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00036\ \textcolor{preprocessor}{\ \ \ opcode\_macro(padding\_call\_5,\ 0x19)}}
+
+\end{DoxyCode}
+\Hypertarget{vm_2opcodes__def_8hpp_a812b692aafa5c80483c442f0d71722b1}\index{opcodes\_def.hpp@{opcodes\_def.hpp}!SYS\_VM\_CALL\_OPS@{SYS\_VM\_CALL\_OPS}}
+\index{SYS\_VM\_CALL\_OPS@{SYS\_VM\_CALL\_OPS}!opcodes\_def.hpp@{opcodes\_def.hpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_CALL\_OPS}{SYS\_VM\_CALL\_OPS}}
+{\footnotesize\ttfamily \label{vm_2opcodes__def_8hpp_a812b692aafa5c80483c442f0d71722b1} 
+\#define SYS\+\_\+\+VM\+\_\+\+CALL\+\_\+\+OPS(\begin{DoxyParamCaption}\item[{}]{opcode\+\_\+macro}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ opcode\_macro(\mbox{\hyperlink{programs_2clio_2main_8cpp_af931af8e9f099860a2670931f8d3ad2c}{call}},\ 0x10)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(call\_indirect,\ 0x11)\ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(br\_table\_data,\ 0x12)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{vm_2opcodes__def_8hpp_source_l00025}{25}} of file \mbox{\hyperlink{vm_2opcodes__def_8hpp_source}{opcodes\+\_\+def.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00025\ \textcolor{preprocessor}{\#define\ SYS\_VM\_CALL\_OPS(opcode\_macro)\ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00026\ \textcolor{preprocessor}{\ \ \ opcode\_macro(call,\ 0x10)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00027\ \textcolor{preprocessor}{\ \ \ opcode\_macro(call\_indirect,\ 0x11)\ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00028\ \textcolor{preprocessor}{\ \ \ opcode\_macro(br\_table\_data,\ 0x12)}}
+
+\end{DoxyCode}
+\Hypertarget{vm_2opcodes__def_8hpp_a5df29569b50589a080c5fd1ce7c0491e}\index{opcodes\_def.hpp@{opcodes\_def.hpp}!SYS\_VM\_CAT@{SYS\_VM\_CAT}}
+\index{SYS\_VM\_CAT@{SYS\_VM\_CAT}!opcodes\_def.hpp@{opcodes\_def.hpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_CAT}{SYS\_VM\_CAT}}
+{\footnotesize\ttfamily \label{vm_2opcodes__def_8hpp_a5df29569b50589a080c5fd1ce7c0491e} 
+\#define SYS\+\_\+\+VM\+\_\+\+CAT(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{sysio_2vm_2opcodes__def_8hpp_af77496a86d0dd970cfa68b3b035ba789}{SYS\_VM\_CAT2}}(x,\ y)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{vm_2opcodes__def_8hpp_source_l00298}{298}} of file \mbox{\hyperlink{vm_2opcodes__def_8hpp_source}{opcodes\+\_\+def.\+hpp}}.
+
+\Hypertarget{vm_2opcodes__def_8hpp_af77496a86d0dd970cfa68b3b035ba789}\index{opcodes\_def.hpp@{opcodes\_def.hpp}!SYS\_VM\_CAT2@{SYS\_VM\_CAT2}}
+\index{SYS\_VM\_CAT2@{SYS\_VM\_CAT2}!opcodes\_def.hpp@{opcodes\_def.hpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_CAT2}{SYS\_VM\_CAT2}}
+{\footnotesize\ttfamily \label{vm_2opcodes__def_8hpp_af77496a86d0dd970cfa68b3b035ba789} 
+\#define SYS\+\_\+\+VM\+\_\+\+CAT2(\begin{DoxyParamCaption}\item[{}]{x}{, }\item[{}]{y}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{x\ \#\#\ y}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{vm_2opcodes__def_8hpp_source_l00297}{297}} of file \mbox{\hyperlink{vm_2opcodes__def_8hpp_source}{opcodes\+\_\+def.\+hpp}}.
+
+\Hypertarget{vm_2opcodes__def_8hpp_a204578ac1952c2df161a909f4375f693}\index{opcodes\_def.hpp@{opcodes\_def.hpp}!SYS\_VM\_COMPARISON\_OPS@{SYS\_VM\_COMPARISON\_OPS}}
+\index{SYS\_VM\_COMPARISON\_OPS@{SYS\_VM\_COMPARISON\_OPS}!opcodes\_def.hpp@{opcodes\_def.hpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_COMPARISON\_OPS}{SYS\_VM\_COMPARISON\_OPS}}
+{\footnotesize\ttfamily \label{vm_2opcodes__def_8hpp_a204578ac1952c2df161a909f4375f693} 
+\#define SYS\+\_\+\+VM\+\_\+\+COMPARISON\+\_\+\+OPS(\begin{DoxyParamCaption}\item[{}]{opcode\+\_\+macro}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2opcodes__def_8hpp_source_l00087}{87}} of file \mbox{\hyperlink{vm_2opcodes__def_8hpp_source}{opcodes\+\_\+def.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00087\ \textcolor{preprocessor}{\#define\ SYS\_VM\_COMPARISON\_OPS(opcode\_macro)\ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00088\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i32\_eqz,\ 0x45)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00089\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i32\_eq,\ 0x46)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00090\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i32\_ne,\ 0x47)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00091\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i32\_lt\_s,\ 0x48)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00092\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i32\_lt\_u,\ 0x49)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00093\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i32\_gt\_s,\ 0x4A)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00094\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i32\_gt\_u,\ 0x4B)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00095\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i32\_le\_s,\ 0x4C)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00096\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i32\_le\_u,\ 0x4D)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00097\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i32\_ge\_s,\ 0x4E)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00098\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i32\_ge\_u,\ 0x4F)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00099\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i64\_eqz,\ 0x50)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00100\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i64\_eq,\ 0x51)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00101\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i64\_ne,\ 0x52)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00102\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i64\_lt\_s,\ 0x53)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00103\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i64\_lt\_u,\ 0x54)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00104\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i64\_gt\_s,\ 0x55)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00105\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i64\_gt\_u,\ 0x56)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00106\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i64\_le\_s,\ 0x57)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00107\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i64\_le\_u,\ 0x58)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00108\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i64\_ge\_s,\ 0x59)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00109\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i64\_ge\_u,\ 0x5A)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00110\ \textcolor{preprocessor}{\ \ \ opcode\_macro(f32\_eq,\ 0x5B)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00111\ \textcolor{preprocessor}{\ \ \ opcode\_macro(f32\_ne,\ 0x5C)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00112\ \textcolor{preprocessor}{\ \ \ opcode\_macro(f32\_lt,\ 0x5D)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00113\ \textcolor{preprocessor}{\ \ \ opcode\_macro(f32\_gt,\ 0x5E)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00114\ \textcolor{preprocessor}{\ \ \ opcode\_macro(f32\_le,\ 0x5F)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00115\ \textcolor{preprocessor}{\ \ \ opcode\_macro(f32\_ge,\ 0x60)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00116\ \textcolor{preprocessor}{\ \ \ opcode\_macro(f64\_eq,\ 0x61)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00117\ \textcolor{preprocessor}{\ \ \ opcode\_macro(f64\_ne,\ 0x62)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00118\ \textcolor{preprocessor}{\ \ \ opcode\_macro(f64\_lt,\ 0x63)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00119\ \textcolor{preprocessor}{\ \ \ opcode\_macro(f64\_gt,\ 0x64)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00120\ \textcolor{preprocessor}{\ \ \ opcode\_macro(f64\_le,\ 0x65)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00121\ \textcolor{preprocessor}{\ \ \ opcode\_macro(f64\_ge,\ 0x66)}}
+
+\end{DoxyCode}
+\Hypertarget{vm_2opcodes__def_8hpp_abd8782a549085609074c6c69d5cd2d97}\index{opcodes\_def.hpp@{opcodes\_def.hpp}!SYS\_VM\_CONTROL\_FLOW\_OPS@{SYS\_VM\_CONTROL\_FLOW\_OPS}}
+\index{SYS\_VM\_CONTROL\_FLOW\_OPS@{SYS\_VM\_CONTROL\_FLOW\_OPS}!opcodes\_def.hpp@{opcodes\_def.hpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_CONTROL\_FLOW\_OPS}{SYS\_VM\_CONTROL\_FLOW\_OPS}}
+{\footnotesize\ttfamily \label{vm_2opcodes__def_8hpp_abd8782a549085609074c6c69d5cd2d97} 
+\#define SYS\+\_\+\+VM\+\_\+\+CONTROL\+\_\+\+FLOW\+\_\+\+OPS(\begin{DoxyParamCaption}\item[{}]{opcode\+\_\+macro}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ opcode\_macro(unreachable,\ 0x00)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(nop,\ 0x01)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(block,\ 0x02)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(loop,\ 0x03)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(if\_,\ 0x04)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(else\_,\ 0x05)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(padding\_cf\_0,\ 0x06)\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(padding\_cf\_1,\ 0x07)\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(padding\_cf\_2,\ 0x08)\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(padding\_cf\_3,\ 0x09)\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(padding\_cf\_4,\ 0x0A)\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(end,\ 0x0B)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(br,\ 0x0C)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(br\_if,\ 0x0D)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{vm_2opcodes__def_8hpp_source_l00006}{6}} of file \mbox{\hyperlink{vm_2opcodes__def_8hpp_source}{opcodes\+\_\+def.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00006\ \textcolor{preprocessor}{\#define\ SYS\_VM\_CONTROL\_FLOW\_OPS(opcode\_macro)\ \ \ \(\backslash\)}}
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\ \ \ opcode\_macro(unreachable,\ 0x00)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00008\ \textcolor{preprocessor}{\ \ \ opcode\_macro(nop,\ 0x01)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00009\ \textcolor{preprocessor}{\ \ \ opcode\_macro(block,\ 0x02)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00010\ \textcolor{preprocessor}{\ \ \ opcode\_macro(loop,\ 0x03)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00011\ \textcolor{preprocessor}{\ \ \ opcode\_macro(if\_,\ 0x04)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00012\ \textcolor{preprocessor}{\ \ \ opcode\_macro(else\_,\ 0x05)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00013\ \textcolor{preprocessor}{\ \ \ opcode\_macro(padding\_cf\_0,\ 0x06)\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00014\ \textcolor{preprocessor}{\ \ \ opcode\_macro(padding\_cf\_1,\ 0x07)\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\ \ \ opcode\_macro(padding\_cf\_2,\ 0x08)\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\ \ \ opcode\_macro(padding\_cf\_3,\ 0x09)\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\ \ \ opcode\_macro(padding\_cf\_4,\ 0x0A)\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\ \ \ opcode\_macro(end,\ 0x0B)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\ \ \ opcode\_macro(br,\ 0x0C)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\ \ \ opcode\_macro(br\_if,\ 0x0D)}}
+
+\end{DoxyCode}
+\Hypertarget{vm_2opcodes__def_8hpp_a91c11ea5280d9861ae565b494fa494e1}\index{opcodes\_def.hpp@{opcodes\_def.hpp}!SYS\_VM\_CONVERSION\_OPS@{SYS\_VM\_CONVERSION\_OPS}}
+\index{SYS\_VM\_CONVERSION\_OPS@{SYS\_VM\_CONVERSION\_OPS}!opcodes\_def.hpp@{opcodes\_def.hpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_CONVERSION\_OPS}{SYS\_VM\_CONVERSION\_OPS}}
+{\footnotesize\ttfamily \label{vm_2opcodes__def_8hpp_a91c11ea5280d9861ae565b494fa494e1} 
+\#define SYS\+\_\+\+VM\+\_\+\+CONVERSION\+\_\+\+OPS(\begin{DoxyParamCaption}\item[{}]{opcode\+\_\+macro}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ opcode\_macro(i32\_wrap\_i64,\ 0xA7)\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(i32\_trunc\_s\_f32,\ 0xA8)\ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(i32\_trunc\_u\_f32,\ 0xA9)\ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(i32\_trunc\_s\_f64,\ 0xAA)\ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(i32\_trunc\_u\_f64,\ 0xAB)\ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(i64\_extend\_s\_i32,\ 0xAC)\ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(i64\_extend\_u\_i32,\ 0xAD)\ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(i64\_trunc\_s\_f32,\ 0xAE)\ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(i64\_trunc\_u\_f32,\ 0xAF)\ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(i64\_trunc\_s\_f64,\ 0xB0)\ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(i64\_trunc\_u\_f64,\ 0xB1)\ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(f32\_convert\_s\_i32,\ 0xB2)\ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(f32\_convert\_u\_i32,\ 0xB3)\ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(f32\_convert\_s\_i64,\ 0xB4)\ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(f32\_convert\_u\_i64,\ 0xB5)\ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(f32\_demote\_f64,\ 0xB6)\ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(f64\_convert\_s\_i32,\ 0xB7)\ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(f64\_convert\_u\_i32,\ 0xB8)\ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(f64\_convert\_s\_i64,\ 0xB9)\ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(f64\_convert\_u\_i64,\ 0xBA)\ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(f64\_promote\_f32,\ 0xBB)\ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(i32\_reinterpret\_f32,\ 0xBC)\ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(i64\_reinterpret\_f64,\ 0xBD)\ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(f32\_reinterpret\_i32,\ 0xBE)\ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(f64\_reinterpret\_i64,\ 0xBF)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{vm_2opcodes__def_8hpp_source_l00187}{187}} of file \mbox{\hyperlink{vm_2opcodes__def_8hpp_source}{opcodes\+\_\+def.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00187\ \textcolor{preprocessor}{\#define\ SYS\_VM\_CONVERSION\_OPS(opcode\_macro)\ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00188\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i32\_wrap\_i64,\ 0xA7)\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00189\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i32\_trunc\_s\_f32,\ 0xA8)\ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00190\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i32\_trunc\_u\_f32,\ 0xA9)\ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00191\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i32\_trunc\_s\_f64,\ 0xAA)\ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00192\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i32\_trunc\_u\_f64,\ 0xAB)\ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00193\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i64\_extend\_s\_i32,\ 0xAC)\ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00194\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i64\_extend\_u\_i32,\ 0xAD)\ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00195\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i64\_trunc\_s\_f32,\ 0xAE)\ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00196\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i64\_trunc\_u\_f32,\ 0xAF)\ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00197\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i64\_trunc\_s\_f64,\ 0xB0)\ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00198\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i64\_trunc\_u\_f64,\ 0xB1)\ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00199\ \textcolor{preprocessor}{\ \ \ opcode\_macro(f32\_convert\_s\_i32,\ 0xB2)\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00200\ \textcolor{preprocessor}{\ \ \ opcode\_macro(f32\_convert\_u\_i32,\ 0xB3)\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00201\ \textcolor{preprocessor}{\ \ \ opcode\_macro(f32\_convert\_s\_i64,\ 0xB4)\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00202\ \textcolor{preprocessor}{\ \ \ opcode\_macro(f32\_convert\_u\_i64,\ 0xB5)\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00203\ \textcolor{preprocessor}{\ \ \ opcode\_macro(f32\_demote\_f64,\ 0xB6)\ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00204\ \textcolor{preprocessor}{\ \ \ opcode\_macro(f64\_convert\_s\_i32,\ 0xB7)\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00205\ \textcolor{preprocessor}{\ \ \ opcode\_macro(f64\_convert\_u\_i32,\ 0xB8)\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00206\ \textcolor{preprocessor}{\ \ \ opcode\_macro(f64\_convert\_s\_i64,\ 0xB9)\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00207\ \textcolor{preprocessor}{\ \ \ opcode\_macro(f64\_convert\_u\_i64,\ 0xBA)\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00208\ \textcolor{preprocessor}{\ \ \ opcode\_macro(f64\_promote\_f32,\ 0xBB)\ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00209\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i32\_reinterpret\_f32,\ 0xBC)\ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00210\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i64\_reinterpret\_f64,\ 0xBD)\ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00211\ \textcolor{preprocessor}{\ \ \ opcode\_macro(f32\_reinterpret\_i32,\ 0xBE)\ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00212\ \textcolor{preprocessor}{\ \ \ opcode\_macro(f64\_reinterpret\_i64,\ 0xBF)}}
+
+\end{DoxyCode}
+\Hypertarget{vm_2opcodes__def_8hpp_a4047ef28371bbecfc5a20f3ca0c3288b}\index{opcodes\_def.hpp@{opcodes\_def.hpp}!SYS\_VM\_CREATE\_BR\_TABLE\_TYPE@{SYS\_VM\_CREATE\_BR\_TABLE\_TYPE}}
+\index{SYS\_VM\_CREATE\_BR\_TABLE\_TYPE@{SYS\_VM\_CREATE\_BR\_TABLE\_TYPE}!opcodes\_def.hpp@{opcodes\_def.hpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_CREATE\_BR\_TABLE\_TYPE}{SYS\_VM\_CREATE\_BR\_TABLE\_TYPE}}
+{\footnotesize\ttfamily \label{vm_2opcodes__def_8hpp_a4047ef28371bbecfc5a20f3ca0c3288b} 
+\#define SYS\+\_\+\+VM\+\_\+\+CREATE\+\_\+\+BR\+\_\+\+TABLE\+\_\+\+TYPE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{code}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \textcolor{keyword}{struct\ }SYS\_VM\_OPCODE\_T(name)\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ SYS\_VM\_OPCODE\_T(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})()\ =\ \textcolor{keywordflow}{default};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keyword}{struct\ }elem\_t\ \{\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ pc;\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ stack\_pop;\ \};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ elem\_t*\ table;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \ size;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \ offset;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ opcode\ =\ code;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \};}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{vm_2opcodes__def_8hpp_source_l00329}{329}} of file \mbox{\hyperlink{vm_2opcodes__def_8hpp_source}{opcodes\+\_\+def.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00329\ \textcolor{preprocessor}{\#define\ SYS\_VM\_CREATE\_BR\_TABLE\_TYPE(name,\ code)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00330\ \textcolor{preprocessor}{\ \ \ struct\ SYS\_VM\_OPCODE\_T(name)\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00331\ \textcolor{preprocessor}{\ \ \ \ \ \ SYS\_VM\_OPCODE\_T(name)()\ =\ default;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00332\ \textcolor{preprocessor}{\ \ \ \ \ \ struct\ elem\_t\ \{\ uint32\_t\ pc;\ uint32\_t\ stack\_pop;\ \};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00333\ \textcolor{preprocessor}{\ \ \ \ \ \ elem\_t*\ table;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00334\ \textcolor{preprocessor}{\ \ \ \ \ \ uint32\_t\ \ size;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00335\ \textcolor{preprocessor}{\ \ \ \ \ \ uint32\_t\ \ offset;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00336\ \textcolor{preprocessor}{\ \ \ \ \ \ static\ constexpr\ uint8\_t\ opcode\ =\ code;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00337\ \textcolor{preprocessor}{\ \ \ \};}}
+
+\end{DoxyCode}
+\Hypertarget{vm_2opcodes__def_8hpp_a270521ca28979c180fd1dd7667f53c2e}\index{opcodes\_def.hpp@{opcodes\_def.hpp}!SYS\_VM\_CREATE\_CALL\_IMM\_TYPES@{SYS\_VM\_CREATE\_CALL\_IMM\_TYPES}}
+\index{SYS\_VM\_CREATE\_CALL\_IMM\_TYPES@{SYS\_VM\_CREATE\_CALL\_IMM\_TYPES}!opcodes\_def.hpp@{opcodes\_def.hpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_CREATE\_CALL\_IMM\_TYPES}{SYS\_VM\_CREATE\_CALL\_IMM\_TYPES}}
+{\footnotesize\ttfamily \label{vm_2opcodes__def_8hpp_a270521ca28979c180fd1dd7667f53c2e} 
+\#define SYS\+\_\+\+VM\+\_\+\+CREATE\+\_\+\+CALL\+\_\+\+IMM\+\_\+\+TYPES(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{code}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \textcolor{keyword}{struct\ }SYS\_VM\_OPCODE\_T(name)\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ SYS\_VM\_OPCODE\_T(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})()\ =\ \textcolor{keywordflow}{default};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ index;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ locals;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ return\_type;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ opcode\ =\ code;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \};}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{vm_2opcodes__def_8hpp_source_l00352}{352}} of file \mbox{\hyperlink{vm_2opcodes__def_8hpp_source}{opcodes\+\_\+def.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00352\ \textcolor{preprocessor}{\#define\ SYS\_VM\_CREATE\_CALL\_IMM\_TYPES(name,\ code)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00353\ \textcolor{preprocessor}{\ \ \ struct\ SYS\_VM\_OPCODE\_T(name)\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00354\ \textcolor{preprocessor}{\ \ \ \ \ \ SYS\_VM\_OPCODE\_T(name)()\ =\ default;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00355\ \textcolor{preprocessor}{\ \ \ \ \ \ uint32\_t\ index;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00356\ \textcolor{preprocessor}{\ \ \ \ \ \ uint16\_t\ locals;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00357\ \textcolor{preprocessor}{\ \ \ \ \ \ uint16\_t\ return\_type;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00358\ \textcolor{preprocessor}{\ \ \ \ \ \ static\ constexpr\ uint8\_t\ opcode\ =\ code;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00359\ \textcolor{preprocessor}{\ \ \ \};}}
+
+\end{DoxyCode}
+\Hypertarget{vm_2opcodes__def_8hpp_a23f79c13a9806e381daa3293455a55de}\index{opcodes\_def.hpp@{opcodes\_def.hpp}!SYS\_VM\_CREATE\_CALL\_TYPES@{SYS\_VM\_CREATE\_CALL\_TYPES}}
+\index{SYS\_VM\_CREATE\_CALL\_TYPES@{SYS\_VM\_CREATE\_CALL\_TYPES}!opcodes\_def.hpp@{opcodes\_def.hpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_CREATE\_CALL\_TYPES}{SYS\_VM\_CREATE\_CALL\_TYPES}}
+{\footnotesize\ttfamily \label{vm_2opcodes__def_8hpp_a23f79c13a9806e381daa3293455a55de} 
+\#define SYS\+\_\+\+VM\+\_\+\+CREATE\+\_\+\+CALL\+\_\+\+TYPES(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{code}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \textcolor{keyword}{struct\ }SYS\_VM\_OPCODE\_T(name)\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ SYS\_VM\_OPCODE\_T(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})()\ =\ \textcolor{keywordflow}{default};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ index;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ opcode\ =\ code;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \};}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{vm_2opcodes__def_8hpp_source_l00345}{345}} of file \mbox{\hyperlink{vm_2opcodes__def_8hpp_source}{opcodes\+\_\+def.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00345\ \textcolor{preprocessor}{\#define\ SYS\_VM\_CREATE\_CALL\_TYPES(name,\ code)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00346\ \textcolor{preprocessor}{\ \ \ struct\ SYS\_VM\_OPCODE\_T(name)\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00347\ \textcolor{preprocessor}{\ \ \ \ \ \ SYS\_VM\_OPCODE\_T(name)()\ =\ default;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00348\ \textcolor{preprocessor}{\ \ \ \ \ \ uint32\_t\ index;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00349\ \textcolor{preprocessor}{\ \ \ \ \ \ static\ constexpr\ uint8\_t\ opcode\ =\ code;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00350\ \textcolor{preprocessor}{\ \ \ \};}}
+
+\end{DoxyCode}
+\Hypertarget{vm_2opcodes__def_8hpp_a1872405616f7c3db4ac45a2abad4d49c}\index{opcodes\_def.hpp@{opcodes\_def.hpp}!SYS\_VM\_CREATE\_CONTROL\_FLOW\_TYPES@{SYS\_VM\_CREATE\_CONTROL\_FLOW\_TYPES}}
+\index{SYS\_VM\_CREATE\_CONTROL\_FLOW\_TYPES@{SYS\_VM\_CREATE\_CONTROL\_FLOW\_TYPES}!opcodes\_def.hpp@{opcodes\_def.hpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_CREATE\_CONTROL\_FLOW\_TYPES}{SYS\_VM\_CREATE\_CONTROL\_FLOW\_TYPES}}
+{\footnotesize\ttfamily \label{vm_2opcodes__def_8hpp_a1872405616f7c3db4ac45a2abad4d49c} 
+\#define SYS\+\_\+\+VM\+\_\+\+CREATE\+\_\+\+CONTROL\+\_\+\+FLOW\+\_\+\+TYPES(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{code}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \textcolor{keyword}{struct\ }SYS\_VM\_OPCODE\_T(name)\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ SYS\_VM\_OPCODE\_T(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})()\ \{\}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ SYS\_VM\_OPCODE\_T(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ data)\ :\ data(data)\ \{\}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ SYS\_VM\_OPCODE\_T(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}},\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ pc,\ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ i,\ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ oi)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ :\ data(\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}),\ pc(pc),\ index(i),\ op\_index(oi)\ \{\}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ data\ \ \ \ \ =\ 0;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ pc\ \ \ \ \ \ \ =\ 0;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ index\ \ \ \ =\ 0;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ op\_index\ =\ 0;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \mbox{\hyperlink{namespacesysio_1_1vm_af1bb7d8ae2889df51b65eaef31f1ea74}{opcode}}\ =\ code;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \};}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{vm_2opcodes__def_8hpp_source_l00316}{316}} of file \mbox{\hyperlink{vm_2opcodes__def_8hpp_source}{opcodes\+\_\+def.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00316\ \textcolor{preprocessor}{\#define\ SYS\_VM\_CREATE\_CONTROL\_FLOW\_TYPES(name,\ code)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00317\ \textcolor{preprocessor}{\ \ \ struct\ SYS\_VM\_OPCODE\_T(name)\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00318\ \textcolor{preprocessor}{\ \ \ \ \ \ SYS\_VM\_OPCODE\_T(name)()\ \{\}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00319\ \textcolor{preprocessor}{\ \ \ \ \ \ SYS\_VM\_OPCODE\_T(name)(uint32\_t\ data)\ :\ data(data)\ \{\}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00320\ \textcolor{preprocessor}{\ \ \ \ \ \ SYS\_VM\_OPCODE\_T(name)(uint32\_t\ d,\ uint32\_t\ pc,\ uint16\_t\ i,\ uint16\_t\ oi)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00321\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ :\ data(d),\ pc(pc),\ index(i),\ op\_index(oi)\ \{\}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00322\ \textcolor{preprocessor}{\ \ \ \ \ \ uint32\_t\ data\ \ \ \ \ =\ 0;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00323\ \textcolor{preprocessor}{\ \ \ \ \ \ uint32\_t\ pc\ \ \ \ \ \ \ =\ 0;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00324\ \textcolor{preprocessor}{\ \ \ \ \ \ uint16\_t\ index\ \ \ \ =\ 0;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00325\ \textcolor{preprocessor}{\ \ \ \ \ \ uint16\_t\ op\_index\ =\ 0;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00326\ \textcolor{preprocessor}{\ \ \ \ \ \ static\ constexpr\ uint8\_t\ opcode\ =\ code;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00327\ \textcolor{preprocessor}{\ \ \ \};}}
+
+\end{DoxyCode}
+\Hypertarget{vm_2opcodes__def_8hpp_ad91774e46560173a3fd3c1cb3a0b0347}\index{opcodes\_def.hpp@{opcodes\_def.hpp}!SYS\_VM\_CREATE\_ENUM@{SYS\_VM\_CREATE\_ENUM}}
+\index{SYS\_VM\_CREATE\_ENUM@{SYS\_VM\_CREATE\_ENUM}!opcodes\_def.hpp@{opcodes\_def.hpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_CREATE\_ENUM}{SYS\_VM\_CREATE\_ENUM}}
+{\footnotesize\ttfamily \label{vm_2opcodes__def_8hpp_ad91774e46560173a3fd3c1cb3a0b0347} 
+\#define SYS\+\_\+\+VM\+\_\+\+CREATE\+\_\+\+ENUM(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{code}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ =\ code,}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{vm_2opcodes__def_8hpp_source_l00283}{283}} of file \mbox{\hyperlink{vm_2opcodes__def_8hpp_source}{opcodes\+\_\+def.\+hpp}}.
+
+\Hypertarget{vm_2opcodes__def_8hpp_aad54c2988b268d5c3cb6ca472d7b01c3}\index{opcodes\_def.hpp@{opcodes\_def.hpp}!SYS\_VM\_CREATE\_EXIT\_TYPE@{SYS\_VM\_CREATE\_EXIT\_TYPE}}
+\index{SYS\_VM\_CREATE\_EXIT\_TYPE@{SYS\_VM\_CREATE\_EXIT\_TYPE}!opcodes\_def.hpp@{opcodes\_def.hpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_CREATE\_EXIT\_TYPE}{SYS\_VM\_CREATE\_EXIT\_TYPE}}
+{\footnotesize\ttfamily \label{vm_2opcodes__def_8hpp_aad54c2988b268d5c3cb6ca472d7b01c3} 
+\#define SYS\+\_\+\+VM\+\_\+\+CREATE\+\_\+\+EXIT\+\_\+\+TYPE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{code}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \textcolor{keyword}{struct\ }SYS\_VM\_OPCODE\_T(name)\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ SYS\_VM\_OPCODE\_T(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})()\ =\ \textcolor{keywordflow}{default};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ pc;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ opcode\ =\ code;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \};}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{vm_2opcodes__def_8hpp_source_l00309}{309}} of file \mbox{\hyperlink{vm_2opcodes__def_8hpp_source}{opcodes\+\_\+def.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00309\ \textcolor{preprocessor}{\#define\ SYS\_VM\_CREATE\_EXIT\_TYPE(name,\ code)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00310\ \textcolor{preprocessor}{\ \ \ struct\ SYS\_VM\_OPCODE\_T(name)\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00311\ \textcolor{preprocessor}{\ \ \ \ \ \ SYS\_VM\_OPCODE\_T(name)()\ =\ default;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00312\ \textcolor{preprocessor}{\ \ \ \ \ \ uint32\_t\ pc;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00313\ \textcolor{preprocessor}{\ \ \ \ \ \ static\ constexpr\ uint8\_t\ opcode\ =\ code;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00314\ \textcolor{preprocessor}{\ \ \ \};}}
+
+\end{DoxyCode}
+\Hypertarget{vm_2opcodes__def_8hpp_a12bdc66614c00a06f6c9f86821d1be87}\index{opcodes\_def.hpp@{opcodes\_def.hpp}!SYS\_VM\_CREATE\_F32\_CONSTANT\_TYPE@{SYS\_VM\_CREATE\_F32\_CONSTANT\_TYPE}}
+\index{SYS\_VM\_CREATE\_F32\_CONSTANT\_TYPE@{SYS\_VM\_CREATE\_F32\_CONSTANT\_TYPE}!opcodes\_def.hpp@{opcodes\_def.hpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_CREATE\_F32\_CONSTANT\_TYPE}{SYS\_VM\_CREATE\_F32\_CONSTANT\_TYPE}}
+{\footnotesize\ttfamily \label{vm_2opcodes__def_8hpp_a12bdc66614c00a06f6c9f86821d1be87} 
+\#define SYS\+\_\+\+VM\+\_\+\+CREATE\+\_\+\+F32\+\_\+\+CONSTANT\+\_\+\+TYPE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{code}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \textcolor{keyword}{struct\ }SYS\_VM\_OPCODE\_T(name)\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ SYS\_VM\_OPCODE\_T(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})()\ =\ \textcolor{keywordflow}{default};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{sysio_2vm_2opcodes__def_8hpp_a01adfe88e6a9fb9241c97eb1fb4fdb14}{SYS\_VM\_OPCODE\_T}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ n)\ \{\ data.ui\ =\ n;\ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{sysio_2vm_2opcodes__def_8hpp_a01adfe88e6a9fb9241c97eb1fb4fdb14}{SYS\_VM\_OPCODE\_T}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})(\textcolor{keywordtype}{float}\ n)\ \{\ data.f\ =\ n;\ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keyword}{union\ }\{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ ui;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ \ \ \ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \}\ data;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \mbox{\hyperlink{namespacesysio_1_1vm_af1bb7d8ae2889df51b65eaef31f1ea74}{opcode}}\ =\ code;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \};}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{vm_2opcodes__def_8hpp_source_l00400}{400}} of file \mbox{\hyperlink{vm_2opcodes__def_8hpp_source}{opcodes\+\_\+def.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00400\ \textcolor{preprocessor}{\#define\ SYS\_VM\_CREATE\_F32\_CONSTANT\_TYPE(name,\ code)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00401\ \textcolor{preprocessor}{\ \ \ struct\ SYS\_VM\_OPCODE\_T(name)\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00402\ \textcolor{preprocessor}{\ \ \ \ \ \ SYS\_VM\_OPCODE\_T(name)()\ =\ default;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00403\ \textcolor{preprocessor}{\ \ \ \ \ \ explicit\ SYS\_VM\_OPCODE\_T(name)(uint32\_t\ n)\ \{\ data.ui\ =\ n;\ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00404\ \textcolor{preprocessor}{\ \ \ \ \ \ explicit\ SYS\_VM\_OPCODE\_T(name)(float\ n)\ \{\ data.f\ =\ n;\ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00405\ \textcolor{preprocessor}{\ \ \ \ \ \ union\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00406\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ uint32\_t\ ui;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00407\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ float\ \ \ \ f;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00408\ \textcolor{preprocessor}{\ \ \ \ \ \ \}\ data;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00409\ \textcolor{preprocessor}{\ \ \ \ \ \ static\ constexpr\ uint8\_t\ opcode\ =\ code;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00410\ \textcolor{preprocessor}{\ \ \ \};}}
+
+\end{DoxyCode}
+\Hypertarget{vm_2opcodes__def_8hpp_a4a8151ccc0b1e541fb9aa2a125cb24b1}\index{opcodes\_def.hpp@{opcodes\_def.hpp}!SYS\_VM\_CREATE\_F64\_CONSTANT\_TYPE@{SYS\_VM\_CREATE\_F64\_CONSTANT\_TYPE}}
+\index{SYS\_VM\_CREATE\_F64\_CONSTANT\_TYPE@{SYS\_VM\_CREATE\_F64\_CONSTANT\_TYPE}!opcodes\_def.hpp@{opcodes\_def.hpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_CREATE\_F64\_CONSTANT\_TYPE}{SYS\_VM\_CREATE\_F64\_CONSTANT\_TYPE}}
+{\footnotesize\ttfamily \label{vm_2opcodes__def_8hpp_a4a8151ccc0b1e541fb9aa2a125cb24b1} 
+\#define SYS\+\_\+\+VM\+\_\+\+CREATE\+\_\+\+F64\+\_\+\+CONSTANT\+\_\+\+TYPE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{code}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \textcolor{keyword}{struct\ }SYS\_VM\_OPCODE\_T(name)\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ SYS\_VM\_OPCODE\_T(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})()\ =\ \textcolor{keywordflow}{default};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{sysio_2vm_2opcodes__def_8hpp_a01adfe88e6a9fb9241c97eb1fb4fdb14}{SYS\_VM\_OPCODE\_T}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ n)\ \{\ data.ui\ =\ n;\ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{sysio_2vm_2opcodes__def_8hpp_a01adfe88e6a9fb9241c97eb1fb4fdb14}{SYS\_VM\_OPCODE\_T}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})(\textcolor{keywordtype}{double}\ n)\ \{\ data.f\ =\ n;\ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keyword}{union\ }\{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ ui;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ \ \ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \}\ data;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \mbox{\hyperlink{namespacesysio_1_1vm_af1bb7d8ae2889df51b65eaef31f1ea74}{opcode}}\ =\ code;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \};}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{vm_2opcodes__def_8hpp_source_l00412}{412}} of file \mbox{\hyperlink{vm_2opcodes__def_8hpp_source}{opcodes\+\_\+def.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00412\ \textcolor{preprocessor}{\#define\ SYS\_VM\_CREATE\_F64\_CONSTANT\_TYPE(name,\ code)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00413\ \textcolor{preprocessor}{\ \ \ struct\ SYS\_VM\_OPCODE\_T(name)\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00414\ \textcolor{preprocessor}{\ \ \ \ \ \ SYS\_VM\_OPCODE\_T(name)()\ =\ default;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00415\ \textcolor{preprocessor}{\ \ \ \ \ \ explicit\ SYS\_VM\_OPCODE\_T(name)(uint64\_t\ n)\ \{\ data.ui\ =\ n;\ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00416\ \textcolor{preprocessor}{\ \ \ \ \ \ explicit\ SYS\_VM\_OPCODE\_T(name)(double\ n)\ \{\ data.f\ =\ n;\ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00417\ \textcolor{preprocessor}{\ \ \ \ \ \ union\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00418\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ uint64\_t\ ui;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00419\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ double\ \ \ f;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00420\ \textcolor{preprocessor}{\ \ \ \ \ \ \}\ data;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00421\ \textcolor{preprocessor}{\ \ \ \ \ \ static\ constexpr\ uint8\_t\ opcode\ =\ code;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00422\ \textcolor{preprocessor}{\ \ \ \};}}
+
+\end{DoxyCode}
+\Hypertarget{vm_2opcodes__def_8hpp_a6d504500c8c779309c8f141a30474d5b}\index{opcodes\_def.hpp@{opcodes\_def.hpp}!SYS\_VM\_CREATE\_I32\_CONSTANT\_TYPE@{SYS\_VM\_CREATE\_I32\_CONSTANT\_TYPE}}
+\index{SYS\_VM\_CREATE\_I32\_CONSTANT\_TYPE@{SYS\_VM\_CREATE\_I32\_CONSTANT\_TYPE}!opcodes\_def.hpp@{opcodes\_def.hpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_CREATE\_I32\_CONSTANT\_TYPE}{SYS\_VM\_CREATE\_I32\_CONSTANT\_TYPE}}
+{\footnotesize\ttfamily \label{vm_2opcodes__def_8hpp_a6d504500c8c779309c8f141a30474d5b} 
+\#define SYS\+\_\+\+VM\+\_\+\+CREATE\+\_\+\+I32\+\_\+\+CONSTANT\+\_\+\+TYPE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{code}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \textcolor{keyword}{struct\ }SYS\_VM\_OPCODE\_T(name)\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ SYS\_VM\_OPCODE\_T(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})()\ =\ \textcolor{keywordflow}{default};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{sysio_2vm_2opcodes__def_8hpp_a01adfe88e6a9fb9241c97eb1fb4fdb14}{SYS\_VM\_OPCODE\_T}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ n)\ \{\ data.ui\ =\ n;\ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{sysio_2vm_2opcodes__def_8hpp_a01adfe88e6a9fb9241c97eb1fb4fdb14}{SYS\_VM\_OPCODE\_T}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})(\mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}}\ n)\ \{\ data.i\ =\ n;\ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keyword}{union\ }\{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ ui;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}}\ \ i;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \}\ data;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \mbox{\hyperlink{namespacesysio_1_1vm_af1bb7d8ae2889df51b65eaef31f1ea74}{opcode}}\ =\ code;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \};}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{vm_2opcodes__def_8hpp_source_l00376}{376}} of file \mbox{\hyperlink{vm_2opcodes__def_8hpp_source}{opcodes\+\_\+def.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00376\ \textcolor{preprocessor}{\#define\ SYS\_VM\_CREATE\_I32\_CONSTANT\_TYPE(name,\ code)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00377\ \textcolor{preprocessor}{\ \ \ struct\ SYS\_VM\_OPCODE\_T(name)\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00378\ \textcolor{preprocessor}{\ \ \ \ \ \ SYS\_VM\_OPCODE\_T(name)()\ =\ default;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00379\ \textcolor{preprocessor}{\ \ \ \ \ \ explicit\ SYS\_VM\_OPCODE\_T(name)(uint32\_t\ n)\ \{\ data.ui\ =\ n;\ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00380\ \textcolor{preprocessor}{\ \ \ \ \ \ explicit\ SYS\_VM\_OPCODE\_T(name)(int32\_t\ n)\ \{\ data.i\ =\ n;\ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00381\ \textcolor{preprocessor}{\ \ \ \ \ \ union\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00382\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ uint32\_t\ ui;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00383\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ int32\_t\ \ i;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00384\ \textcolor{preprocessor}{\ \ \ \ \ \ \}\ data;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00385\ \textcolor{preprocessor}{\ \ \ \ \ \ static\ constexpr\ uint8\_t\ opcode\ =\ code;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00386\ \textcolor{preprocessor}{\ \ \ \};}}
+
+\end{DoxyCode}
+\Hypertarget{vm_2opcodes__def_8hpp_a09865a40b4b9a97f16132fc808eb5e86}\index{opcodes\_def.hpp@{opcodes\_def.hpp}!SYS\_VM\_CREATE\_I64\_CONSTANT\_TYPE@{SYS\_VM\_CREATE\_I64\_CONSTANT\_TYPE}}
+\index{SYS\_VM\_CREATE\_I64\_CONSTANT\_TYPE@{SYS\_VM\_CREATE\_I64\_CONSTANT\_TYPE}!opcodes\_def.hpp@{opcodes\_def.hpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_CREATE\_I64\_CONSTANT\_TYPE}{SYS\_VM\_CREATE\_I64\_CONSTANT\_TYPE}}
+{\footnotesize\ttfamily \label{vm_2opcodes__def_8hpp_a09865a40b4b9a97f16132fc808eb5e86} 
+\#define SYS\+\_\+\+VM\+\_\+\+CREATE\+\_\+\+I64\+\_\+\+CONSTANT\+\_\+\+TYPE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{code}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \textcolor{keyword}{struct\ }SYS\_VM\_OPCODE\_T(name)\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ SYS\_VM\_OPCODE\_T(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})()\ =\ \textcolor{keywordflow}{default};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{sysio_2vm_2opcodes__def_8hpp_a01adfe88e6a9fb9241c97eb1fb4fdb14}{SYS\_VM\_OPCODE\_T}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ n)\ \{\ data.ui\ =\ n;\ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{sysio_2vm_2opcodes__def_8hpp_a01adfe88e6a9fb9241c97eb1fb4fdb14}{SYS\_VM\_OPCODE\_T}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})(\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ n)\ \{\ data.i\ =\ n;\ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keyword}{union\ }\{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ ui;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ \ i;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \}\ data;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \mbox{\hyperlink{namespacesysio_1_1vm_af1bb7d8ae2889df51b65eaef31f1ea74}{opcode}}\ =\ code;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \};}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{vm_2opcodes__def_8hpp_source_l00388}{388}} of file \mbox{\hyperlink{vm_2opcodes__def_8hpp_source}{opcodes\+\_\+def.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00388\ \textcolor{preprocessor}{\#define\ SYS\_VM\_CREATE\_I64\_CONSTANT\_TYPE(name,\ code)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00389\ \textcolor{preprocessor}{\ \ \ struct\ SYS\_VM\_OPCODE\_T(name)\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00390\ \textcolor{preprocessor}{\ \ \ \ \ \ SYS\_VM\_OPCODE\_T(name)()\ =\ default;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00391\ \textcolor{preprocessor}{\ \ \ \ \ \ explicit\ SYS\_VM\_OPCODE\_T(name)(uint64\_t\ n)\ \{\ data.ui\ =\ n;\ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00392\ \textcolor{preprocessor}{\ \ \ \ \ \ explicit\ SYS\_VM\_OPCODE\_T(name)(int64\_t\ n)\ \{\ data.i\ =\ n;\ \}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00393\ \textcolor{preprocessor}{\ \ \ \ \ \ union\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00394\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ uint64\_t\ ui;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00395\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ int64\_t\ \ i;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00396\ \textcolor{preprocessor}{\ \ \ \ \ \ \}\ data;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00397\ \textcolor{preprocessor}{\ \ \ \ \ \ static\ constexpr\ uint8\_t\ opcode\ =\ code;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00398\ \textcolor{preprocessor}{\ \ \ \};}}
+
+\end{DoxyCode}
+\Hypertarget{vm_2opcodes__def_8hpp_ad54f4a1268cfeb285bddffcfeeff4644}\index{opcodes\_def.hpp@{opcodes\_def.hpp}!SYS\_VM\_CREATE\_MAP@{SYS\_VM\_CREATE\_MAP}}
+\index{SYS\_VM\_CREATE\_MAP@{SYS\_VM\_CREATE\_MAP}!opcodes\_def.hpp@{opcodes\_def.hpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_CREATE\_MAP}{SYS\_VM\_CREATE\_MAP}}
+{\footnotesize\ttfamily \label{vm_2opcodes__def_8hpp_ad54f4a1268cfeb285bddffcfeeff4644} 
+\#define SYS\+\_\+\+VM\+\_\+\+CREATE\+\_\+\+MAP(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{code}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\{\ code,\ \#\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ \},}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{vm_2opcodes__def_8hpp_source_l00287}{287}} of file \mbox{\hyperlink{vm_2opcodes__def_8hpp_source}{opcodes\+\_\+def.\+hpp}}.
+
+\Hypertarget{vm_2opcodes__def_8hpp_aa3fdacc6e0911278c77e05d5af5dae54}\index{opcodes\_def.hpp@{opcodes\_def.hpp}!SYS\_VM\_CREATE\_MEMORY\_TYPES@{SYS\_VM\_CREATE\_MEMORY\_TYPES}}
+\index{SYS\_VM\_CREATE\_MEMORY\_TYPES@{SYS\_VM\_CREATE\_MEMORY\_TYPES}!opcodes\_def.hpp@{opcodes\_def.hpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_CREATE\_MEMORY\_TYPES}{SYS\_VM\_CREATE\_MEMORY\_TYPES}}
+{\footnotesize\ttfamily \label{vm_2opcodes__def_8hpp_aa3fdacc6e0911278c77e05d5af5dae54} 
+\#define SYS\+\_\+\+VM\+\_\+\+CREATE\+\_\+\+MEMORY\+\_\+\+TYPES(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{code}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \textcolor{keyword}{struct\ }SYS\_VM\_OPCODE\_T(name)\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ SYS\_VM\_OPCODE\_T(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})()\ =\ \textcolor{keywordflow}{default};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ flags\_align;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ offset;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ opcode\ =\ code;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \};}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{vm_2opcodes__def_8hpp_source_l00368}{368}} of file \mbox{\hyperlink{vm_2opcodes__def_8hpp_source}{opcodes\+\_\+def.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00368\ \textcolor{preprocessor}{\#define\ SYS\_VM\_CREATE\_MEMORY\_TYPES(name,\ code)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00369\ \textcolor{preprocessor}{\ \ \ struct\ SYS\_VM\_OPCODE\_T(name)\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00370\ \textcolor{preprocessor}{\ \ \ \ \ \ SYS\_VM\_OPCODE\_T(name)()\ =\ default;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00371\ \textcolor{preprocessor}{\ \ \ \ \ \ uint32\_t\ flags\_align;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00372\ \textcolor{preprocessor}{\ \ \ \ \ \ uint32\_t\ offset;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00373\ \textcolor{preprocessor}{\ \ \ \ \ \ static\ constexpr\ uint8\_t\ opcode\ =\ code;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00374\ \textcolor{preprocessor}{\ \ \ \};}}
+
+\end{DoxyCode}
+\Hypertarget{vm_2opcodes__def_8hpp_a7737f4774ea7e212c343dee23f4f4ad6}\index{opcodes\_def.hpp@{opcodes\_def.hpp}!SYS\_VM\_CREATE\_STRINGS@{SYS\_VM\_CREATE\_STRINGS}}
+\index{SYS\_VM\_CREATE\_STRINGS@{SYS\_VM\_CREATE\_STRINGS}!opcodes\_def.hpp@{opcodes\_def.hpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_CREATE\_STRINGS}{SYS\_VM\_CREATE\_STRINGS}}
+{\footnotesize\ttfamily \label{vm_2opcodes__def_8hpp_a7737f4774ea7e212c343dee23f4f4ad6} 
+\#define SYS\+\_\+\+VM\+\_\+\+CREATE\+\_\+\+STRINGS(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{code}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{preprocessor}{\#name,}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{vm_2opcodes__def_8hpp_source_l00285}{285}} of file \mbox{\hyperlink{vm_2opcodes__def_8hpp_source}{opcodes\+\_\+def.\+hpp}}.
+
+\Hypertarget{vm_2opcodes__def_8hpp_a21327df6dfc64d2bebad7554c7f0bf6c}\index{opcodes\_def.hpp@{opcodes\_def.hpp}!SYS\_VM\_CREATE\_TYPES@{SYS\_VM\_CREATE\_TYPES}}
+\index{SYS\_VM\_CREATE\_TYPES@{SYS\_VM\_CREATE\_TYPES}!opcodes\_def.hpp@{opcodes\_def.hpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_CREATE\_TYPES}{SYS\_VM\_CREATE\_TYPES}}
+{\footnotesize\ttfamily \label{vm_2opcodes__def_8hpp_a21327df6dfc64d2bebad7554c7f0bf6c} 
+\#define SYS\+\_\+\+VM\+\_\+\+CREATE\+\_\+\+TYPES(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{code}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \textcolor{keyword}{struct\ }SYS\_VM\_OPCODE\_T(name)\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ SYS\_VM\_OPCODE\_T(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})()\ =\ \textcolor{keywordflow}{default};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ opcode\ =\ code;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \};}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{vm_2opcodes__def_8hpp_source_l00339}{339}} of file \mbox{\hyperlink{vm_2opcodes__def_8hpp_source}{opcodes\+\_\+def.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00339\ \textcolor{preprocessor}{\#define\ SYS\_VM\_CREATE\_TYPES(name,\ code)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00340\ \textcolor{preprocessor}{\ \ \ struct\ SYS\_VM\_OPCODE\_T(name)\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00341\ \textcolor{preprocessor}{\ \ \ \ \ \ SYS\_VM\_OPCODE\_T(name)()\ =\ default;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00342\ \textcolor{preprocessor}{\ \ \ \ \ \ static\ constexpr\ uint8\_t\ opcode\ =\ code;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00343\ \textcolor{preprocessor}{\ \ \ \};}}
+
+\end{DoxyCode}
+\Hypertarget{vm_2opcodes__def_8hpp_a259b10ca4f5a47da8723c8b207a0d0f9}\index{opcodes\_def.hpp@{opcodes\_def.hpp}!SYS\_VM\_CREATE\_VARIABLE\_ACCESS\_TYPES@{SYS\_VM\_CREATE\_VARIABLE\_ACCESS\_TYPES}}
+\index{SYS\_VM\_CREATE\_VARIABLE\_ACCESS\_TYPES@{SYS\_VM\_CREATE\_VARIABLE\_ACCESS\_TYPES}!opcodes\_def.hpp@{opcodes\_def.hpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_CREATE\_VARIABLE\_ACCESS\_TYPES}{SYS\_VM\_CREATE\_VARIABLE\_ACCESS\_TYPES}}
+{\footnotesize\ttfamily \label{vm_2opcodes__def_8hpp_a259b10ca4f5a47da8723c8b207a0d0f9} 
+\#define SYS\+\_\+\+VM\+\_\+\+CREATE\+\_\+\+VARIABLE\+\_\+\+ACCESS\+\_\+\+TYPES(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{code}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \textcolor{keyword}{struct\ }SYS\_VM\_OPCODE\_T(name)\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ SYS\_VM\_OPCODE\_T(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})()\ =\ \textcolor{keywordflow}{default};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ index;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ opcode\ =\ code;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \};}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{vm_2opcodes__def_8hpp_source_l00361}{361}} of file \mbox{\hyperlink{vm_2opcodes__def_8hpp_source}{opcodes\+\_\+def.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00361\ \textcolor{preprocessor}{\#define\ SYS\_VM\_CREATE\_VARIABLE\_ACCESS\_TYPES(name,\ code)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00362\ \textcolor{preprocessor}{\ \ \ struct\ SYS\_VM\_OPCODE\_T(name)\ \{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00363\ \textcolor{preprocessor}{\ \ \ \ \ \ SYS\_VM\_OPCODE\_T(name)()\ =\ default;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00364\ \textcolor{preprocessor}{\ \ \ \ \ \ uint32\_t\ index;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00365\ \textcolor{preprocessor}{\ \ \ \ \ \ static\ constexpr\ uint8\_t\ opcode\ =\ code;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00366\ \textcolor{preprocessor}{\ \ \ \};}}
+
+\end{DoxyCode}
+\Hypertarget{vm_2opcodes__def_8hpp_a9e39407aa4f7cf22d622726763af293e}\index{opcodes\_def.hpp@{opcodes\_def.hpp}!SYS\_VM\_EMPTY\_OPS@{SYS\_VM\_EMPTY\_OPS}}
+\index{SYS\_VM\_EMPTY\_OPS@{SYS\_VM\_EMPTY\_OPS}!opcodes\_def.hpp@{opcodes\_def.hpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_EMPTY\_OPS}{SYS\_VM\_EMPTY\_OPS}}
+{\footnotesize\ttfamily \label{vm_2opcodes__def_8hpp_a9e39407aa4f7cf22d622726763af293e} 
+\#define SYS\+\_\+\+VM\+\_\+\+EMPTY\+\_\+\+OPS(\begin{DoxyParamCaption}\item[{}]{opcode\+\_\+macro}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2opcodes__def_8hpp_source_l00215}{215}} of file \mbox{\hyperlink{vm_2opcodes__def_8hpp_source}{opcodes\+\_\+def.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00215\ \textcolor{preprocessor}{\#define\ SYS\_VM\_EMPTY\_OPS(opcode\_macro)\ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00216\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xC1,\ 0xC1)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00217\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xC2,\ 0xC2)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00218\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xC3,\ 0xC3)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00219\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xC4,\ 0xC4)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00220\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xC5,\ 0xC5)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00221\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xC6,\ 0xC6)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00222\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xC7,\ 0xC7)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00223\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xC8,\ 0xC8)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00224\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xC9,\ 0xC9)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00225\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xCA,\ 0xCA)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00226\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xCB,\ 0xCB)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00227\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xCC,\ 0xCC)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00228\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xCD,\ 0xCD)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00229\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xCE,\ 0xCE)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00230\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xCF,\ 0xCF)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00231\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xD0,\ 0xD0)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00232\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xD1,\ 0xD1)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00233\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xD2,\ 0xD2)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00234\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xD3,\ 0xD3)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00235\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xD4,\ 0xD4)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00236\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xD5,\ 0xD5)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00237\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xD6,\ 0xD6)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00238\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xD7,\ 0xD7)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00239\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xD8,\ 0xD8)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00240\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xD9,\ 0xD9)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00241\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xDA,\ 0xDA)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00242\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xDB,\ 0xDB)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00243\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xDC,\ 0xDC)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00244\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xDD,\ 0xDD)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00245\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xDE,\ 0xDE)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00246\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xDF,\ 0xDF)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00247\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xE0,\ 0xE0)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00248\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xE1,\ 0xE1)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00249\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xE2,\ 0xE2)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00250\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xE3,\ 0xE3)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00251\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xE4,\ 0xE4)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00252\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xE5,\ 0xE5)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00253\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xE6,\ 0xE6)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00254\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xE7,\ 0xE7)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00255\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xE8,\ 0xE8)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00256\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xE9,\ 0xE9)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00257\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xEA,\ 0xEA)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00258\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xEB,\ 0xEB)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00259\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xEC,\ 0xEC)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00260\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xED,\ 0xED)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00261\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xEE,\ 0xEE)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00262\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xEF,\ 0xEF)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00263\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xF0,\ 0xF0)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00264\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xF1,\ 0xF1)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00265\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xF2,\ 0xF2)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00266\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xF3,\ 0xF3)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00267\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xF4,\ 0xF4)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00268\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xF5,\ 0xF5)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00269\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xF6,\ 0xF6)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00270\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xF7,\ 0xF7)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00271\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xF8,\ 0xF8)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00272\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xF9,\ 0xF9)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00273\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xFA,\ 0xFA)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00274\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xFB,\ 0xFB)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00275\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xFC,\ 0xFC)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00276\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xFD,\ 0xFD)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00277\ \textcolor{preprocessor}{\ \ \ opcode\_macro(empty0xFE,\ 0xFE)}}
+
+\end{DoxyCode}
+\Hypertarget{vm_2opcodes__def_8hpp_abe9234baee521deb37d406026bd82971}\index{opcodes\_def.hpp@{opcodes\_def.hpp}!SYS\_VM\_ERROR\_OPS@{SYS\_VM\_ERROR\_OPS}}
+\index{SYS\_VM\_ERROR\_OPS@{SYS\_VM\_ERROR\_OPS}!opcodes\_def.hpp@{opcodes\_def.hpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_ERROR\_OPS}{SYS\_VM\_ERROR\_OPS}}
+{\footnotesize\ttfamily \label{vm_2opcodes__def_8hpp_abe9234baee521deb37d406026bd82971} 
+\#define SYS\+\_\+\+VM\+\_\+\+ERROR\+\_\+\+OPS(\begin{DoxyParamCaption}\item[{}]{opcode\+\_\+macro}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ opcode\_macro(error,\ 0xFF)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{vm_2opcodes__def_8hpp_source_l00278}{278}} of file \mbox{\hyperlink{vm_2opcodes__def_8hpp_source}{opcodes\+\_\+def.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00278\ \textcolor{preprocessor}{\#define\ SYS\_VM\_ERROR\_OPS(opcode\_macro)\ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00279\ \textcolor{preprocessor}{\ \ \ opcode\_macro(error,\ 0xFF)}}
+
+\end{DoxyCode}
+\Hypertarget{vm_2opcodes__def_8hpp_a1efd77b1bfac80757916bc1638a39c4b}\index{opcodes\_def.hpp@{opcodes\_def.hpp}!SYS\_VM\_EXIT\_OP@{SYS\_VM\_EXIT\_OP}}
+\index{SYS\_VM\_EXIT\_OP@{SYS\_VM\_EXIT\_OP}!opcodes\_def.hpp@{opcodes\_def.hpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_EXIT\_OP}{SYS\_VM\_EXIT\_OP}}
+{\footnotesize\ttfamily \label{vm_2opcodes__def_8hpp_a1efd77b1bfac80757916bc1638a39c4b} 
+\#define SYS\+\_\+\+VM\+\_\+\+EXIT\+\_\+\+OP(\begin{DoxyParamCaption}\item[{}]{opcode\+\_\+macro}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ opcode\_macro(exit,\ 0xC0)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{vm_2opcodes__def_8hpp_source_l00213}{213}} of file \mbox{\hyperlink{vm_2opcodes__def_8hpp_source}{opcodes\+\_\+def.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00213\ \textcolor{preprocessor}{\#define\ SYS\_VM\_EXIT\_OP(opcode\_macro)\ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00214\ \textcolor{preprocessor}{\ \ \ opcode\_macro(exit,\ 0xC0)}}
+
+\end{DoxyCode}
+\Hypertarget{vm_2opcodes__def_8hpp_ad2491e63328dd7e45597d694635f6f0c}\index{opcodes\_def.hpp@{opcodes\_def.hpp}!SYS\_VM\_EXPAND@{SYS\_VM\_EXPAND}}
+\index{SYS\_VM\_EXPAND@{SYS\_VM\_EXPAND}!opcodes\_def.hpp@{opcodes\_def.hpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_EXPAND}{SYS\_VM\_EXPAND}}
+{\footnotesize\ttfamily \label{vm_2opcodes__def_8hpp_ad2491e63328dd7e45597d694635f6f0c} 
+\#define SYS\+\_\+\+VM\+\_\+\+EXPAND(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{x}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{vm_2opcodes__def_8hpp_source_l00296}{296}} of file \mbox{\hyperlink{vm_2opcodes__def_8hpp_source}{opcodes\+\_\+def.\+hpp}}.
+
+\Hypertarget{vm_2opcodes__def_8hpp_ae110cbdd36b1d9cdbfa5beccdc1b65f8}\index{opcodes\_def.hpp@{opcodes\_def.hpp}!SYS\_VM\_F32\_CONSTANT\_OPS@{SYS\_VM\_F32\_CONSTANT\_OPS}}
+\index{SYS\_VM\_F32\_CONSTANT\_OPS@{SYS\_VM\_F32\_CONSTANT\_OPS}!opcodes\_def.hpp@{opcodes\_def.hpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_F32\_CONSTANT\_OPS}{SYS\_VM\_F32\_CONSTANT\_OPS}}
+{\footnotesize\ttfamily \label{vm_2opcodes__def_8hpp_ae110cbdd36b1d9cdbfa5beccdc1b65f8} 
+\#define SYS\+\_\+\+VM\+\_\+\+F32\+\_\+\+CONSTANT\+\_\+\+OPS(\begin{DoxyParamCaption}\item[{}]{opcode\+\_\+macro}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ opcode\_macro(f32\_const,\ 0x43)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{vm_2opcodes__def_8hpp_source_l00083}{83}} of file \mbox{\hyperlink{vm_2opcodes__def_8hpp_source}{opcodes\+\_\+def.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00083\ \textcolor{preprocessor}{\#define\ SYS\_VM\_F32\_CONSTANT\_OPS(opcode\_macro)\ \ \ \(\backslash\)}}
+\DoxyCodeLine{00084\ \textcolor{preprocessor}{\ \ \ opcode\_macro(f32\_const,\ 0x43)}}
+
+\end{DoxyCode}
+\Hypertarget{vm_2opcodes__def_8hpp_a0df979b9770c5056d0f795034ddabb7c}\index{opcodes\_def.hpp@{opcodes\_def.hpp}!SYS\_VM\_F64\_CONSTANT\_OPS@{SYS\_VM\_F64\_CONSTANT\_OPS}}
+\index{SYS\_VM\_F64\_CONSTANT\_OPS@{SYS\_VM\_F64\_CONSTANT\_OPS}!opcodes\_def.hpp@{opcodes\_def.hpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_F64\_CONSTANT\_OPS}{SYS\_VM\_F64\_CONSTANT\_OPS}}
+{\footnotesize\ttfamily \label{vm_2opcodes__def_8hpp_a0df979b9770c5056d0f795034ddabb7c} 
+\#define SYS\+\_\+\+VM\+\_\+\+F64\+\_\+\+CONSTANT\+\_\+\+OPS(\begin{DoxyParamCaption}\item[{}]{opcode\+\_\+macro}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ opcode\_macro(f64\_const,\ 0x44)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{vm_2opcodes__def_8hpp_source_l00085}{85}} of file \mbox{\hyperlink{vm_2opcodes__def_8hpp_source}{opcodes\+\_\+def.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00085\ \textcolor{preprocessor}{\#define\ SYS\_VM\_F64\_CONSTANT\_OPS(opcode\_macro)\ \ \ \(\backslash\)}}
+\DoxyCodeLine{00086\ \textcolor{preprocessor}{\ \ \ opcode\_macro(f64\_const,\ 0x44)}}
+
+\end{DoxyCode}
+\Hypertarget{vm_2opcodes__def_8hpp_ad2c6366de1b1bb571a4c78bb547930e2}\index{opcodes\_def.hpp@{opcodes\_def.hpp}!SYS\_VM\_FIX\_OPCODE\_NAME@{SYS\_VM\_FIX\_OPCODE\_NAME}}
+\index{SYS\_VM\_FIX\_OPCODE\_NAME@{SYS\_VM\_FIX\_OPCODE\_NAME}!opcodes\_def.hpp@{opcodes\_def.hpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_FIX\_OPCODE\_NAME}{SYS\_VM\_FIX\_OPCODE\_NAME}}
+{\footnotesize\ttfamily \label{vm_2opcodes__def_8hpp_ad2c6366de1b1bb571a4c78bb547930e2} 
+\#define SYS\+\_\+\+VM\+\_\+\+FIX\+\_\+\+OPCODE\+\_\+\+NAME(\begin{DoxyParamCaption}\item[{}]{iskeyword}{, }\item[{}]{garbage}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{SYS\_VM\_FIX\_OPCODE\_NAME\_\ \#\#\ iskeyword}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{vm_2opcodes__def_8hpp_source_l00302}{302}} of file \mbox{\hyperlink{vm_2opcodes__def_8hpp_source}{opcodes\+\_\+def.\+hpp}}.
+
+\Hypertarget{vm_2opcodes__def_8hpp_a9680f623aed77c66143c3a2ee80124b6}\index{opcodes\_def.hpp@{opcodes\_def.hpp}!SYS\_VM\_FIX\_OPCODE\_NAME\_0@{SYS\_VM\_FIX\_OPCODE\_NAME\_0}}
+\index{SYS\_VM\_FIX\_OPCODE\_NAME\_0@{SYS\_VM\_FIX\_OPCODE\_NAME\_0}!opcodes\_def.hpp@{opcodes\_def.hpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_FIX\_OPCODE\_NAME\_0}{SYS\_VM\_FIX\_OPCODE\_NAME\_0}}
+{\footnotesize\ttfamily \label{vm_2opcodes__def_8hpp_a9680f623aed77c66143c3a2ee80124b6} 
+\#define SYS\+\_\+\+VM\+\_\+\+FIX\+\_\+\+OPCODE\+\_\+\+NAME\+\_\+0(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ \#\#\ \_t}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{vm_2opcodes__def_8hpp_source_l00300}{300}} of file \mbox{\hyperlink{vm_2opcodes__def_8hpp_source}{opcodes\+\_\+def.\+hpp}}.
+
+\Hypertarget{vm_2opcodes__def_8hpp_a5ad767df542e655f39560927beb82c55}\index{opcodes\_def.hpp@{opcodes\_def.hpp}!SYS\_VM\_FIX\_OPCODE\_NAME\_1@{SYS\_VM\_FIX\_OPCODE\_NAME\_1}}
+\index{SYS\_VM\_FIX\_OPCODE\_NAME\_1@{SYS\_VM\_FIX\_OPCODE\_NAME\_1}!opcodes\_def.hpp@{opcodes\_def.hpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_FIX\_OPCODE\_NAME\_1}{SYS\_VM\_FIX\_OPCODE\_NAME\_1}}
+{\footnotesize\ttfamily \label{vm_2opcodes__def_8hpp_a5ad767df542e655f39560927beb82c55} 
+\#define SYS\+\_\+\+VM\+\_\+\+FIX\+\_\+\+OPCODE\+\_\+\+NAME\+\_\+1(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ \#\#\ t}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{vm_2opcodes__def_8hpp_source_l00301}{301}} of file \mbox{\hyperlink{vm_2opcodes__def_8hpp_source}{opcodes\+\_\+def.\+hpp}}.
+
+\Hypertarget{vm_2opcodes__def_8hpp_a69e0d988cd91bed33d70534bda2008d1}\index{opcodes\_def.hpp@{opcodes\_def.hpp}!SYS\_VM\_I32\_CONSTANT\_OPS@{SYS\_VM\_I32\_CONSTANT\_OPS}}
+\index{SYS\_VM\_I32\_CONSTANT\_OPS@{SYS\_VM\_I32\_CONSTANT\_OPS}!opcodes\_def.hpp@{opcodes\_def.hpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_I32\_CONSTANT\_OPS}{SYS\_VM\_I32\_CONSTANT\_OPS}}
+{\footnotesize\ttfamily \label{vm_2opcodes__def_8hpp_a69e0d988cd91bed33d70534bda2008d1} 
+\#define SYS\+\_\+\+VM\+\_\+\+I32\+\_\+\+CONSTANT\+\_\+\+OPS(\begin{DoxyParamCaption}\item[{}]{opcode\+\_\+macro}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ opcode\_macro(i32\_const,\ 0x41)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{vm_2opcodes__def_8hpp_source_l00079}{79}} of file \mbox{\hyperlink{vm_2opcodes__def_8hpp_source}{opcodes\+\_\+def.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00079\ \textcolor{preprocessor}{\#define\ SYS\_VM\_I32\_CONSTANT\_OPS(opcode\_macro)\ \ \ \(\backslash\)}}
+\DoxyCodeLine{00080\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i32\_const,\ 0x41)}}
+
+\end{DoxyCode}
+\Hypertarget{vm_2opcodes__def_8hpp_a694e09ce604f561df1e40fcdd8b25577}\index{opcodes\_def.hpp@{opcodes\_def.hpp}!SYS\_VM\_I64\_CONSTANT\_OPS@{SYS\_VM\_I64\_CONSTANT\_OPS}}
+\index{SYS\_VM\_I64\_CONSTANT\_OPS@{SYS\_VM\_I64\_CONSTANT\_OPS}!opcodes\_def.hpp@{opcodes\_def.hpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_I64\_CONSTANT\_OPS}{SYS\_VM\_I64\_CONSTANT\_OPS}}
+{\footnotesize\ttfamily \label{vm_2opcodes__def_8hpp_a694e09ce604f561df1e40fcdd8b25577} 
+\#define SYS\+\_\+\+VM\+\_\+\+I64\+\_\+\+CONSTANT\+\_\+\+OPS(\begin{DoxyParamCaption}\item[{}]{opcode\+\_\+macro}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ opcode\_macro(i64\_const,\ 0x42)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{vm_2opcodes__def_8hpp_source_l00081}{81}} of file \mbox{\hyperlink{vm_2opcodes__def_8hpp_source}{opcodes\+\_\+def.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00081\ \textcolor{preprocessor}{\#define\ SYS\_VM\_I64\_CONSTANT\_OPS(opcode\_macro)\ \ \ \(\backslash\)}}
+\DoxyCodeLine{00082\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i64\_const,\ 0x42)}}
+
+\end{DoxyCode}
+\Hypertarget{vm_2opcodes__def_8hpp_a106992b326ee536ca96ba6bb3adbf733}\index{opcodes\_def.hpp@{opcodes\_def.hpp}!SYS\_VM\_IDENTITY@{SYS\_VM\_IDENTITY}}
+\index{SYS\_VM\_IDENTITY@{SYS\_VM\_IDENTITY}!opcodes\_def.hpp@{opcodes\_def.hpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_IDENTITY}{SYS\_VM\_IDENTITY}}
+{\footnotesize\ttfamily \label{vm_2opcodes__def_8hpp_a106992b326ee536ca96ba6bb3adbf733} 
+\#define SYS\+\_\+\+VM\+\_\+\+IDENTITY(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{code}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{sysio::vm::SYS\_VM\_OPCODE\_T(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}),}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{vm_2opcodes__def_8hpp_source_l00424}{424}} of file \mbox{\hyperlink{vm_2opcodes__def_8hpp_source}{opcodes\+\_\+def.\+hpp}}.
+
+\Hypertarget{vm_2opcodes__def_8hpp_a402622452cc1d0fe9aedf301af9f0054}\index{opcodes\_def.hpp@{opcodes\_def.hpp}!SYS\_VM\_IDENTITY\_END@{SYS\_VM\_IDENTITY\_END}}
+\index{SYS\_VM\_IDENTITY\_END@{SYS\_VM\_IDENTITY\_END}!opcodes\_def.hpp@{opcodes\_def.hpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_IDENTITY\_END}{SYS\_VM\_IDENTITY\_END}}
+{\footnotesize\ttfamily \label{vm_2opcodes__def_8hpp_a402622452cc1d0fe9aedf301af9f0054} 
+\#define SYS\+\_\+\+VM\+\_\+\+IDENTITY\+\_\+\+END(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{code}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{sysio::vm::SYS\_VM\_OPCODE\_T(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{vm_2opcodes__def_8hpp_source_l00425}{425}} of file \mbox{\hyperlink{vm_2opcodes__def_8hpp_source}{opcodes\+\_\+def.\+hpp}}.
+
+\Hypertarget{vm_2opcodes__def_8hpp_a60304cb9f34cbee69d483a705f5a6b1f}\index{opcodes\_def.hpp@{opcodes\_def.hpp}!SYS\_VM\_MEMORY\_OPS@{SYS\_VM\_MEMORY\_OPS}}
+\index{SYS\_VM\_MEMORY\_OPS@{SYS\_VM\_MEMORY\_OPS}!opcodes\_def.hpp@{opcodes\_def.hpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_MEMORY\_OPS}{SYS\_VM\_MEMORY\_OPS}}
+{\footnotesize\ttfamily \label{vm_2opcodes__def_8hpp_a60304cb9f34cbee69d483a705f5a6b1f} 
+\#define SYS\+\_\+\+VM\+\_\+\+MEMORY\+\_\+\+OPS(\begin{DoxyParamCaption}\item[{}]{opcode\+\_\+macro}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ opcode\_macro(i32\_load,\ 0x28)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(i64\_load,\ 0x29)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(f32\_load,\ 0x2A)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(f64\_load,\ 0x2B)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(i32\_load8\_s,\ 0x2C)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(i32\_load8\_u,\ 0x2D)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(i32\_load16\_s,\ 0x2E)\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(i32\_load16\_u,\ 0x2F)\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(i64\_load8\_s,\ 0x30)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(i64\_load8\_u,\ 0x31)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(i64\_load16\_s,\ 0x32)\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(i64\_load16\_u,\ 0x33)\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(i64\_load32\_s,\ 0x34)\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(i64\_load32\_u,\ 0x35)\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(i32\_store,\ 0x36)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(i64\_store,\ 0x37)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(f32\_store,\ 0x38)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(f64\_store,\ 0x39)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(i32\_store8,\ 0x3A)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(i32\_store16,\ 0x3B)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(i64\_store8,\ 0x3C)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(i64\_store16,\ 0x3D)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(i64\_store32,\ 0x3E)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(current\_memory,\ 0x3F)\ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(grow\_memory,\ 0x40)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{vm_2opcodes__def_8hpp_source_l00053}{53}} of file \mbox{\hyperlink{vm_2opcodes__def_8hpp_source}{opcodes\+\_\+def.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00053\ \textcolor{preprocessor}{\#define\ SYS\_VM\_MEMORY\_OPS(opcode\_macro)\ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00054\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i32\_load,\ 0x28)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00055\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i64\_load,\ 0x29)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00056\ \textcolor{preprocessor}{\ \ \ opcode\_macro(f32\_load,\ 0x2A)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00057\ \textcolor{preprocessor}{\ \ \ opcode\_macro(f64\_load,\ 0x2B)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00058\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i32\_load8\_s,\ 0x2C)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00059\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i32\_load8\_u,\ 0x2D)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00060\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i32\_load16\_s,\ 0x2E)\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00061\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i32\_load16\_u,\ 0x2F)\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00062\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i64\_load8\_s,\ 0x30)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00063\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i64\_load8\_u,\ 0x31)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00064\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i64\_load16\_s,\ 0x32)\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00065\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i64\_load16\_u,\ 0x33)\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00066\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i64\_load32\_s,\ 0x34)\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00067\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i64\_load32\_u,\ 0x35)\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00068\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i32\_store,\ 0x36)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00069\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i64\_store,\ 0x37)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00070\ \textcolor{preprocessor}{\ \ \ opcode\_macro(f32\_store,\ 0x38)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00071\ \textcolor{preprocessor}{\ \ \ opcode\_macro(f64\_store,\ 0x39)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00072\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i32\_store8,\ 0x3A)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00073\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i32\_store16,\ 0x3B)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00074\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i64\_store8,\ 0x3C)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00075\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i64\_store16,\ 0x3D)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00076\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i64\_store32,\ 0x3E)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00077\ \textcolor{preprocessor}{\ \ \ opcode\_macro(current\_memory,\ 0x3F)\ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00078\ \textcolor{preprocessor}{\ \ \ opcode\_macro(grow\_memory,\ 0x40)}}
+
+\end{DoxyCode}
+\Hypertarget{vm_2opcodes__def_8hpp_a881d40db151cbe2320f29027b7e14fe0}\index{opcodes\_def.hpp@{opcodes\_def.hpp}!SYS\_VM\_NUMERIC\_OPS@{SYS\_VM\_NUMERIC\_OPS}}
+\index{SYS\_VM\_NUMERIC\_OPS@{SYS\_VM\_NUMERIC\_OPS}!opcodes\_def.hpp@{opcodes\_def.hpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_NUMERIC\_OPS}{SYS\_VM\_NUMERIC\_OPS}}
+{\footnotesize\ttfamily \label{vm_2opcodes__def_8hpp_a881d40db151cbe2320f29027b7e14fe0} 
+\#define SYS\+\_\+\+VM\+\_\+\+NUMERIC\+\_\+\+OPS(\begin{DoxyParamCaption}\item[{}]{opcode\+\_\+macro}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2opcodes__def_8hpp_source_l00122}{122}} of file \mbox{\hyperlink{vm_2opcodes__def_8hpp_source}{opcodes\+\_\+def.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00122\ \textcolor{preprocessor}{\#define\ SYS\_VM\_NUMERIC\_OPS(opcode\_macro)\ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00123\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i32\_clz,\ 0x67)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00124\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i32\_ctz,\ 0x68)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00125\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i32\_popcnt,\ 0x69)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00126\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i32\_add,\ 0x6A)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00127\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i32\_sub,\ 0x6B)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00128\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i32\_mul,\ 0x6C)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00129\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i32\_div\_s,\ 0x6D)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00130\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i32\_div\_u,\ 0x6E)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00131\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i32\_rem\_s,\ 0x6F)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00132\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i32\_rem\_u,\ 0x70)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00133\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i32\_and,\ 0x71)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00134\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i32\_or,\ 0x72)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00135\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i32\_xor,\ 0x73)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00136\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i32\_shl,\ 0x74)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00137\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i32\_shr\_s,\ 0x75)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00138\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i32\_shr\_u,\ 0x76)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00139\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i32\_rotl,\ 0x77)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00140\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i32\_rotr,\ 0x78)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00141\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i64\_clz,\ 0x79)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00142\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i64\_ctz,\ 0x7A)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00143\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i64\_popcnt,\ 0x7B)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00144\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i64\_add,\ 0x7C)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00145\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i64\_sub,\ 0x7D)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00146\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i64\_mul,\ 0x7E)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00147\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i64\_div\_s,\ 0x7F)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00148\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i64\_div\_u,\ 0x80)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00149\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i64\_rem\_s,\ 0x81)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00150\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i64\_rem\_u,\ 0x82)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00151\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i64\_and,\ 0x83)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00152\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i64\_or,\ 0x84)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00153\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i64\_xor,\ 0x85)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00154\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i64\_shl,\ 0x86)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00155\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i64\_shr\_s,\ 0x87)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00156\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i64\_shr\_u,\ 0x88)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00157\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i64\_rotl,\ 0x89)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00158\ \textcolor{preprocessor}{\ \ \ opcode\_macro(i64\_rotr,\ 0x8A)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00159\ \textcolor{preprocessor}{\ \ \ opcode\_macro(f32\_abs,\ 0x8B)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00160\ \textcolor{preprocessor}{\ \ \ opcode\_macro(f32\_neg,\ 0x8C)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00161\ \textcolor{preprocessor}{\ \ \ opcode\_macro(f32\_ceil,\ 0x8D)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00162\ \textcolor{preprocessor}{\ \ \ opcode\_macro(f32\_floor,\ 0x8E)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00163\ \textcolor{preprocessor}{\ \ \ opcode\_macro(f32\_trunc,\ 0x8F)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00164\ \textcolor{preprocessor}{\ \ \ opcode\_macro(f32\_nearest,\ 0x90)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00165\ \textcolor{preprocessor}{\ \ \ opcode\_macro(f32\_sqrt,\ 0x91)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00166\ \textcolor{preprocessor}{\ \ \ opcode\_macro(f32\_add,\ 0x92)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00167\ \textcolor{preprocessor}{\ \ \ opcode\_macro(f32\_sub,\ 0x93)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00168\ \textcolor{preprocessor}{\ \ \ opcode\_macro(f32\_mul,\ 0x94)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00169\ \textcolor{preprocessor}{\ \ \ opcode\_macro(f32\_div,\ 0x95)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00170\ \textcolor{preprocessor}{\ \ \ opcode\_macro(f32\_min,\ 0x96)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00171\ \textcolor{preprocessor}{\ \ \ opcode\_macro(f32\_max,\ 0x97)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00172\ \textcolor{preprocessor}{\ \ \ opcode\_macro(f32\_copysign,\ 0x98)\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00173\ \textcolor{preprocessor}{\ \ \ opcode\_macro(f64\_abs,\ 0x99)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00174\ \textcolor{preprocessor}{\ \ \ opcode\_macro(f64\_neg,\ 0x9A)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00175\ \textcolor{preprocessor}{\ \ \ opcode\_macro(f64\_ceil,\ 0x9B)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00176\ \textcolor{preprocessor}{\ \ \ opcode\_macro(f64\_floor,\ 0x9C)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00177\ \textcolor{preprocessor}{\ \ \ opcode\_macro(f64\_trunc,\ 0x9D)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00178\ \textcolor{preprocessor}{\ \ \ opcode\_macro(f64\_nearest,\ 0x9E)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00179\ \textcolor{preprocessor}{\ \ \ opcode\_macro(f64\_sqrt,\ 0x9F)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00180\ \textcolor{preprocessor}{\ \ \ opcode\_macro(f64\_add,\ 0xA0)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00181\ \textcolor{preprocessor}{\ \ \ opcode\_macro(f64\_sub,\ 0xA1)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00182\ \textcolor{preprocessor}{\ \ \ opcode\_macro(f64\_mul,\ 0xA2)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00183\ \textcolor{preprocessor}{\ \ \ opcode\_macro(f64\_div,\ 0xA3)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00184\ \textcolor{preprocessor}{\ \ \ opcode\_macro(f64\_min,\ 0xA4)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00185\ \textcolor{preprocessor}{\ \ \ opcode\_macro(f64\_max,\ 0xA5)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00186\ \textcolor{preprocessor}{\ \ \ opcode\_macro(f64\_copysign,\ 0xA6)}}
+
+\end{DoxyCode}
+\Hypertarget{vm_2opcodes__def_8hpp_a40e818e63459b4e529201ac03f551be5}\index{opcodes\_def.hpp@{opcodes\_def.hpp}!SYS\_VM\_OPCODE\_NAME\_else\_@{SYS\_VM\_OPCODE\_NAME\_else\_}}
+\index{SYS\_VM\_OPCODE\_NAME\_else\_@{SYS\_VM\_OPCODE\_NAME\_else\_}!opcodes\_def.hpp@{opcodes\_def.hpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_OPCODE\_NAME\_else\_}{SYS\_VM\_OPCODE\_NAME\_else\_}}
+{\footnotesize\ttfamily \label{vm_2opcodes__def_8hpp_a40e818e63459b4e529201ac03f551be5} 
+\#define SYS\+\_\+\+VM\+\_\+\+OPCODE\+\_\+\+NAME\+\_\+else\+\_\+}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2opcodes__def_8hpp_source_l00290}{290}} of file \mbox{\hyperlink{vm_2opcodes__def_8hpp_source}{opcodes\+\_\+def.\+hpp}}.
+
+\Hypertarget{vm_2opcodes__def_8hpp_aa42adbcc3d74c7c09fdedc64a0bf0792}\index{opcodes\_def.hpp@{opcodes\_def.hpp}!SYS\_VM\_OPCODE\_NAME\_if\_@{SYS\_VM\_OPCODE\_NAME\_if\_}}
+\index{SYS\_VM\_OPCODE\_NAME\_if\_@{SYS\_VM\_OPCODE\_NAME\_if\_}!opcodes\_def.hpp@{opcodes\_def.hpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_OPCODE\_NAME\_if\_}{SYS\_VM\_OPCODE\_NAME\_if\_}}
+{\footnotesize\ttfamily \label{vm_2opcodes__def_8hpp_aa42adbcc3d74c7c09fdedc64a0bf0792} 
+\#define SYS\+\_\+\+VM\+\_\+\+OPCODE\+\_\+\+NAME\+\_\+if\+\_\+}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2opcodes__def_8hpp_source_l00289}{289}} of file \mbox{\hyperlink{vm_2opcodes__def_8hpp_source}{opcodes\+\_\+def.\+hpp}}.
+
+\Hypertarget{vm_2opcodes__def_8hpp_ad5482004ea3d6f09e808baaef202edcb}\index{opcodes\_def.hpp@{opcodes\_def.hpp}!SYS\_VM\_OPCODE\_NAME\_return\_@{SYS\_VM\_OPCODE\_NAME\_return\_}}
+\index{SYS\_VM\_OPCODE\_NAME\_return\_@{SYS\_VM\_OPCODE\_NAME\_return\_}!opcodes\_def.hpp@{opcodes\_def.hpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_OPCODE\_NAME\_return\_}{SYS\_VM\_OPCODE\_NAME\_return\_}}
+{\footnotesize\ttfamily \label{vm_2opcodes__def_8hpp_ad5482004ea3d6f09e808baaef202edcb} 
+\#define SYS\+\_\+\+VM\+\_\+\+OPCODE\+\_\+\+NAME\+\_\+return\+\_\+}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2opcodes__def_8hpp_source_l00291}{291}} of file \mbox{\hyperlink{vm_2opcodes__def_8hpp_source}{opcodes\+\_\+def.\+hpp}}.
+
+\Hypertarget{vm_2opcodes__def_8hpp_addd92722a31b2302f35e84238cec1515}\index{opcodes\_def.hpp@{opcodes\_def.hpp}!SYS\_VM\_OPCODE\_NAME\_TEST@{SYS\_VM\_OPCODE\_NAME\_TEST}}
+\index{SYS\_VM\_OPCODE\_NAME\_TEST@{SYS\_VM\_OPCODE\_NAME\_TEST}!opcodes\_def.hpp@{opcodes\_def.hpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_OPCODE\_NAME\_TEST}{SYS\_VM\_OPCODE\_NAME\_TEST}}
+{\footnotesize\ttfamily \label{vm_2opcodes__def_8hpp_addd92722a31b2302f35e84238cec1515} 
+\#define SYS\+\_\+\+VM\+\_\+\+OPCODE\+\_\+\+NAME\+\_\+\+TEST(\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{vm_2opcodes__def_8hpp_source_l00293}{293}} of file \mbox{\hyperlink{vm_2opcodes__def_8hpp_source}{opcodes\+\_\+def.\+hpp}}.
+
+\Hypertarget{vm_2opcodes__def_8hpp_ae59575061609408546cc7afcec3fce30}\index{opcodes\_def.hpp@{opcodes\_def.hpp}!SYS\_VM\_OPCODE\_NAME\_TEST\_1@{SYS\_VM\_OPCODE\_NAME\_TEST\_1}}
+\index{SYS\_VM\_OPCODE\_NAME\_TEST\_1@{SYS\_VM\_OPCODE\_NAME\_TEST\_1}!opcodes\_def.hpp@{opcodes\_def.hpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_OPCODE\_NAME\_TEST\_1}{SYS\_VM\_OPCODE\_NAME\_TEST\_1}}
+{\footnotesize\ttfamily \label{vm_2opcodes__def_8hpp_ae59575061609408546cc7afcec3fce30} 
+\#define SYS\+\_\+\+VM\+\_\+\+OPCODE\+\_\+\+NAME\+\_\+\+TEST\+\_\+1~1, ignore}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2opcodes__def_8hpp_source_l00295}{295}} of file \mbox{\hyperlink{vm_2opcodes__def_8hpp_source}{opcodes\+\_\+def.\+hpp}}.
+
+\Hypertarget{vm_2opcodes__def_8hpp_ab6227b6cd71297dd11eaf01be9630c60}\index{opcodes\_def.hpp@{opcodes\_def.hpp}!SYS\_VM\_OPCODE\_NAME\_TEST\_SYS\_VM\_OPCODE\_NAME\_TEST@{SYS\_VM\_OPCODE\_NAME\_TEST\_SYS\_VM\_OPCODE\_NAME\_TEST}}
+\index{SYS\_VM\_OPCODE\_NAME\_TEST\_SYS\_VM\_OPCODE\_NAME\_TEST@{SYS\_VM\_OPCODE\_NAME\_TEST\_SYS\_VM\_OPCODE\_NAME\_TEST}!opcodes\_def.hpp@{opcodes\_def.hpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_OPCODE\_NAME\_TEST\_SYS\_VM\_OPCODE\_NAME\_TEST}{SYS\_VM\_OPCODE\_NAME\_TEST\_SYS\_VM\_OPCODE\_NAME\_TEST}}
+{\footnotesize\ttfamily \label{vm_2opcodes__def_8hpp_ab6227b6cd71297dd11eaf01be9630c60} 
+\#define SYS\+\_\+\+VM\+\_\+\+OPCODE\+\_\+\+NAME\+\_\+\+TEST\+\_\+\+SYS\+\_\+\+VM\+\_\+\+OPCODE\+\_\+\+NAME\+\_\+\+TEST~0,}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2opcodes__def_8hpp_source_l00294}{294}} of file \mbox{\hyperlink{vm_2opcodes__def_8hpp_source}{opcodes\+\_\+def.\+hpp}}.
+
+\Hypertarget{vm_2opcodes__def_8hpp_a01adfe88e6a9fb9241c97eb1fb4fdb14}\index{opcodes\_def.hpp@{opcodes\_def.hpp}!SYS\_VM\_OPCODE\_T@{SYS\_VM\_OPCODE\_T}}
+\index{SYS\_VM\_OPCODE\_T@{SYS\_VM\_OPCODE\_T}!opcodes\_def.hpp@{opcodes\_def.hpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_OPCODE\_T}{SYS\_VM\_OPCODE\_T}}
+{\footnotesize\ttfamily \label{vm_2opcodes__def_8hpp_a01adfe88e6a9fb9241c97eb1fb4fdb14} 
+\#define SYS\+\_\+\+VM\+\_\+\+OPCODE\+\_\+T(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \mbox{\hyperlink{sysio_2vm_2opcodes__def_8hpp_a924c26991b360b26f6b2bd091fdcd106}{SYS\_VM\_APPLY}}(\mbox{\hyperlink{sysio_2vm_2opcodes__def_8hpp_ad2c6366de1b1bb571a4c78bb547930e2}{SYS\_VM\_FIX\_OPCODE\_NAME}},\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ (\mbox{\hyperlink{sysio_2vm_2opcodes__def_8hpp_a5df29569b50589a080c5fd1ce7c0491e}{SYS\_VM\_CAT}}(SYS\_VM\_OPCODE\_NAME\_TEST\_,\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sysio_2vm_2opcodes__def_8hpp_ad2491e63328dd7e45597d694635f6f0c}{SYS\_VM\_EXPAND}}(\mbox{\hyperlink{sysio_2vm_2opcodes__def_8hpp_addd92722a31b2302f35e84238cec1515}{SYS\_VM\_OPCODE\_NAME\_TEST}}\ SYS\_VM\_OPCODE\_NAME\_\ \#\#\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\ ()))))(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{vm_2opcodes__def_8hpp_source_l00304}{304}} of file \mbox{\hyperlink{vm_2opcodes__def_8hpp_source}{opcodes\+\_\+def.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00304\ \textcolor{preprocessor}{\#define\ SYS\_VM\_OPCODE\_T(name)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00305\ \textcolor{preprocessor}{\ \ \ SYS\_VM\_APPLY(SYS\_VM\_FIX\_OPCODE\_NAME,\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00306\ \textcolor{preprocessor}{\ \ \ \ \ \ (SYS\_VM\_CAT(SYS\_VM\_OPCODE\_NAME\_TEST\_,\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00307\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ SYS\_VM\_EXPAND(SYS\_VM\_OPCODE\_NAME\_TEST\ SYS\_VM\_OPCODE\_NAME\_\ \#\#\ name\ ()))))(name)}}
+
+\end{DoxyCode}
+\Hypertarget{vm_2opcodes__def_8hpp_adadc0f4760d5b1b861978f94bf779883}\index{opcodes\_def.hpp@{opcodes\_def.hpp}!SYS\_VM\_PARAMETRIC\_OPS@{SYS\_VM\_PARAMETRIC\_OPS}}
+\index{SYS\_VM\_PARAMETRIC\_OPS@{SYS\_VM\_PARAMETRIC\_OPS}!opcodes\_def.hpp@{opcodes\_def.hpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_PARAMETRIC\_OPS}{SYS\_VM\_PARAMETRIC\_OPS}}
+{\footnotesize\ttfamily \label{vm_2opcodes__def_8hpp_adadc0f4760d5b1b861978f94bf779883} 
+\#define SYS\+\_\+\+VM\+\_\+\+PARAMETRIC\+\_\+\+OPS(\begin{DoxyParamCaption}\item[{}]{opcode\+\_\+macro}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ opcode\_macro(drop,\ 0x1A)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(select,\ 0x1B)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(padding\_param\_0,\ 0x1C)\ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(padding\_param\_1,\ 0x1D)\ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(padding\_param\_2,\ 0x1E)\ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(padding\_param\_3,\ 0x1F)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{vm_2opcodes__def_8hpp_source_l00037}{37}} of file \mbox{\hyperlink{vm_2opcodes__def_8hpp_source}{opcodes\+\_\+def.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00037\ \textcolor{preprocessor}{\#define\ SYS\_VM\_PARAMETRIC\_OPS(opcode\_macro)\ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00038\ \textcolor{preprocessor}{\ \ \ opcode\_macro(drop,\ 0x1A)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00039\ \textcolor{preprocessor}{\ \ \ opcode\_macro(select,\ 0x1B)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00040\ \textcolor{preprocessor}{\ \ \ opcode\_macro(padding\_param\_0,\ 0x1C)\ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00041\ \textcolor{preprocessor}{\ \ \ opcode\_macro(padding\_param\_1,\ 0x1D)\ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00042\ \textcolor{preprocessor}{\ \ \ opcode\_macro(padding\_param\_2,\ 0x1E)\ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00043\ \textcolor{preprocessor}{\ \ \ opcode\_macro(padding\_param\_3,\ 0x1F)}}
+
+\end{DoxyCode}
+\Hypertarget{vm_2opcodes__def_8hpp_a121d0950383bd19f2ab3f9c002c34e6c}\index{opcodes\_def.hpp@{opcodes\_def.hpp}!SYS\_VM\_RETURN\_OP@{SYS\_VM\_RETURN\_OP}}
+\index{SYS\_VM\_RETURN\_OP@{SYS\_VM\_RETURN\_OP}!opcodes\_def.hpp@{opcodes\_def.hpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_RETURN\_OP}{SYS\_VM\_RETURN\_OP}}
+{\footnotesize\ttfamily \label{vm_2opcodes__def_8hpp_a121d0950383bd19f2ab3f9c002c34e6c} 
+\#define SYS\+\_\+\+VM\+\_\+\+RETURN\+\_\+\+OP(\begin{DoxyParamCaption}\item[{}]{opcode\+\_\+macro}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ opcode\_macro(return\_,\ 0x0F)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{vm_2opcodes__def_8hpp_source_l00023}{23}} of file \mbox{\hyperlink{vm_2opcodes__def_8hpp_source}{opcodes\+\_\+def.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#define\ SYS\_VM\_RETURN\_OP(opcode\_macro)\ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\ \ \ opcode\_macro(return\_,\ 0x0F)}}
+
+\end{DoxyCode}
+\Hypertarget{vm_2opcodes__def_8hpp_a95de92951ac0d980e13f9efb273bd051}\index{opcodes\_def.hpp@{opcodes\_def.hpp}!SYS\_VM\_VARIABLE\_ACCESS\_OPS@{SYS\_VM\_VARIABLE\_ACCESS\_OPS}}
+\index{SYS\_VM\_VARIABLE\_ACCESS\_OPS@{SYS\_VM\_VARIABLE\_ACCESS\_OPS}!opcodes\_def.hpp@{opcodes\_def.hpp}}
+\doxysubsubsection{\texorpdfstring{SYS\_VM\_VARIABLE\_ACCESS\_OPS}{SYS\_VM\_VARIABLE\_ACCESS\_OPS}}
+{\footnotesize\ttfamily \label{vm_2opcodes__def_8hpp_a95de92951ac0d980e13f9efb273bd051} 
+\#define SYS\+\_\+\+VM\+\_\+\+VARIABLE\+\_\+\+ACCESS\+\_\+\+OPS(\begin{DoxyParamCaption}\item[{}]{opcode\+\_\+macro}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ opcode\_macro(get\_local,\ 0x20)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(set\_local,\ 0x21)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(tee\_local,\ 0x22)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(get\_global,\ 0x23)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(set\_global,\ 0x24)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(padding\_va\_0,\ 0x25)\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(padding\_va\_1,\ 0x26)\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ opcode\_macro(padding\_va\_2,\ 0x27)}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{vm_2opcodes__def_8hpp_source_l00044}{44}} of file \mbox{\hyperlink{vm_2opcodes__def_8hpp_source}{opcodes\+\_\+def.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00044\ \textcolor{preprocessor}{\#define\ SYS\_VM\_VARIABLE\_ACCESS\_OPS(opcode\_macro)\(\backslash\)}}
+\DoxyCodeLine{00045\ \textcolor{preprocessor}{\ \ \ opcode\_macro(get\_local,\ 0x20)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00046\ \textcolor{preprocessor}{\ \ \ opcode\_macro(set\_local,\ 0x21)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00047\ \textcolor{preprocessor}{\ \ \ opcode\_macro(tee\_local,\ 0x22)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00048\ \textcolor{preprocessor}{\ \ \ opcode\_macro(get\_global,\ 0x23)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00049\ \textcolor{preprocessor}{\ \ \ opcode\_macro(set\_global,\ 0x24)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00050\ \textcolor{preprocessor}{\ \ \ opcode\_macro(padding\_va\_0,\ 0x25)\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00051\ \textcolor{preprocessor}{\ \ \ opcode\_macro(padding\_va\_1,\ 0x26)\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00052\ \textcolor{preprocessor}{\ \ \ opcode\_macro(padding\_va\_2,\ 0x27)}}
+
+\end{DoxyCode}

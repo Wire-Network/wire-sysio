@@ -1,0 +1,105 @@
+\doxysection{catch\+\_\+message.\+h}
+\hypertarget{catch__message_8h_source}{}\label{catch__message_8h_source}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_message.h@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_message.h}}
+\mbox{\hyperlink{catch__message_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00002}00002\ \textcolor{comment}{\ *\ \ Created\ by\ Phil\ Nash\ on\ 1/2/2013.}}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00003}00003\ \textcolor{comment}{\ *\ \ Copyright\ 2013\ Two\ Blue\ Cubes\ Ltd.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00004}00004\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00005}00005\ \textcolor{comment}{\ *\ \ Distributed\ under\ the\ Boost\ Software\ License,\ Version\ 1.0.\ (See\ accompanying}}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00006}00006\ \textcolor{comment}{\ *\ \ file\ LICENSE\_1\_0.txt\ or\ copy\ at\ http://www.boost.org/LICENSE\_1\_0.txt)}}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00007}00007\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00008}00008\ \textcolor{preprocessor}{\#ifndef\ TWOBLUECUBES\_CATCH\_MESSAGE\_H\_INCLUDED}}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00009}00009\ \textcolor{preprocessor}{\#define\ TWOBLUECUBES\_CATCH\_MESSAGE\_H\_INCLUDED}}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00011}00011\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__result__type_8h}{catch\_result\_type.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00012}00012\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__common_8h}{catch\_common.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00013}00013\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__stream_8h}{catch\_stream.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00014}00014\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__interfaces__capture_8h}{catch\_interfaces\_capture.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00015}00015\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__tostring_8h}{catch\_tostring.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00017}00017\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00018}00018\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00020}00020\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00022}00022\ \ \ \ \ \textcolor{keyword}{struct\ }MessageInfo\ \{}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00023}00023\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_message_info_afac7a84a9e8655428035a3c5418044f0}{MessageInfo}}(\ \ \ \ \mbox{\hyperlink{document_8h_aa6b9fd9f6aa49405a574c362ba9af6b5}{StringRef}}\ \textcolor{keyword}{const}\&\ \_macroName,}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00024}00024\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ SourceLineInfo\ \textcolor{keyword}{const}\&\ \_lineInfo,}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00025}00025\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef}{ResultWas::OfType}}\ \_type\ );}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00027}\mbox{\hyperlink{struct_catch_1_1_message_info_a3ee7cd41def0989d2193bad7101436a0}{00027}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_string_ref}{StringRef}}\ \mbox{\hyperlink{struct_catch_1_1_message_info_a3ee7cd41def0989d2193bad7101436a0}{macroName}};}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00028}\mbox{\hyperlink{struct_catch_1_1_message_info_ab6cd06e050bf426c6577502a5c50e256}{00028}}\ \ \ \ \ \ \ \ \ std::string\ \mbox{\hyperlink{struct_catch_1_1_message_info_ab6cd06e050bf426c6577502a5c50e256}{message}};}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00029}\mbox{\hyperlink{struct_catch_1_1_message_info_a985165328723e599696ebd8e43195cc5}{00029}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_source_line_info}{SourceLineInfo}}\ \mbox{\hyperlink{struct_catch_1_1_message_info_a985165328723e599696ebd8e43195cc5}{lineInfo}};}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00030}\mbox{\hyperlink{struct_catch_1_1_message_info_ae928b9117465c696e45951d9d0284e78}{00030}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef}{ResultWas::OfType}}\ \mbox{\hyperlink{struct_catch_1_1_message_info_ae928b9117465c696e45951d9d0284e78}{type}};}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00031}\mbox{\hyperlink{struct_catch_1_1_message_info_a7f4f57ea21e50160adefce7b68a781d6}{00031}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{struct_catch_1_1_message_info_a7f4f57ea21e50160adefce7b68a781d6}{sequence}};}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00033}00033\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_catch_1_1_message_info_af4b37f2172ba55395813b4bb6bbbde1a}{operator\ ==\ }}(\ \mbox{\hyperlink{struct_catch_1_1_message_info}{MessageInfo}}\ \textcolor{keyword}{const}\&\ other\ )\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00034}00034\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{struct_catch_1_1_message_info_a8254cb8fca2da02a29a9843cdcb79df1}{operator\ <\ }}(\ \mbox{\hyperlink{struct_catch_1_1_message_info}{MessageInfo}}\ \textcolor{keyword}{const}\&\ other\ )\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00035}00035\ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00036}00036\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ globalCount;}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00037}00037\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00039}00039\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_catch_1_1_message_stream}{MessageStream}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00041}00041\ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00042}\mbox{\hyperlink{struct_catch_1_1_message_stream_a7c052042fb31ed74d97df99ae14ebd46}{00042}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_message_stream}{MessageStream}}\&\ \mbox{\hyperlink{struct_catch_1_1_message_stream_a7c052042fb31ed74d97df99ae14ebd46}{operator\ <<\ }}(\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00043}00043\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_message_stream_a9202520faed8882ef469db9f353ec578}{m\_stream}}\ <<\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}};}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00044}00044\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00045}00045\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00047}\mbox{\hyperlink{struct_catch_1_1_message_stream_a9202520faed8882ef469db9f353ec578}{00047}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_reusable_string_stream}{ReusableStringStream}}\ \mbox{\hyperlink{struct_catch_1_1_message_stream_a9202520faed8882ef469db9f353ec578}{m\_stream}};}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00048}00048\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00050}00050\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_catch_1_1_message_builder}{MessageBuilder}}\ :\ \mbox{\hyperlink{struct_catch_1_1_message_stream}{MessageStream}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00051}00051\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_message_builder_ac34832ca527a758f000ac233d32dd068}{MessageBuilder}}(\ \mbox{\hyperlink{class_catch_1_1_string_ref}{StringRef}}\ \textcolor{keyword}{const}\&\ macroName,}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_source_line_info}{SourceLineInfo}}\ \textcolor{keyword}{const}\&\ lineInfo,}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef}{ResultWas::OfType}}\ type\ );}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00054}00054\ }
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00055}00055\ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00056}\mbox{\hyperlink{struct_catch_1_1_message_builder_af65f5f1a92c52b81bc68f4a47fc9aaa4}{00056}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_message_builder}{MessageBuilder}}\&\ \mbox{\hyperlink{struct_catch_1_1_message_builder_af65f5f1a92c52b81bc68f4a47fc9aaa4}{operator\ <<\ }}(\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_message_stream_a9202520faed8882ef469db9f353ec578}{m\_stream}}\ <<\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}};}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00059}00059\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00061}\mbox{\hyperlink{struct_catch_1_1_message_builder_a979f1c2b36d78f80ee275bfa5ba0209f}{00061}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_message_info}{MessageInfo}}\ \mbox{\hyperlink{struct_catch_1_1_message_builder_a979f1c2b36d78f80ee275bfa5ba0209f}{m\_info}};}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00062}00062\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00064}00064\ \ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_catch_1_1_scoped_message}{ScopedMessage}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00065}00065\ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00066}00066\ \ \ \ \ \ \ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{class_catch_1_1_scoped_message_a5cc59f0f2ebe840e6607f83004d49a17}{ScopedMessage}}(\ \mbox{\hyperlink{struct_catch_1_1_message_builder}{MessageBuilder}}\ \textcolor{keyword}{const}\&\ builder\ );}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00067}\mbox{\hyperlink{class_catch_1_1_scoped_message_a5fe2e79afdfd737818c15edfc49f378e}{00067}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_scoped_message_a5fe2e79afdfd737818c15edfc49f378e}{ScopedMessage}}(\ \mbox{\hyperlink{class_catch_1_1_scoped_message}{ScopedMessage}}\&\ duplicate\ )\ =\ \textcolor{keyword}{delete};}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00068}00068\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_scoped_message_a5cc59f0f2ebe840e6607f83004d49a17}{ScopedMessage}}(\ \mbox{\hyperlink{class_catch_1_1_scoped_message}{ScopedMessage}}\&\&\ old\ );}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00069}00069\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_scoped_message_a43190843f9eeb84a0b42b0bc95fdf93a}{\string~ScopedMessage}}();}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00071}\mbox{\hyperlink{class_catch_1_1_scoped_message_ae6e1476f389cc6e1586f033b3747b27b}{00071}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_message_info}{MessageInfo}}\ \mbox{\hyperlink{class_catch_1_1_scoped_message_ae6e1476f389cc6e1586f033b3747b27b}{m\_info}};}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00072}\mbox{\hyperlink{class_catch_1_1_scoped_message_a4fe5607c1f7407240a0da8405b1c12e7}{00072}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_catch_1_1_scoped_message_a4fe5607c1f7407240a0da8405b1c12e7}{m\_moved}};}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00073}00073\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00074}00074\ }
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00075}00075\ \ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_catch_1_1_capturer}{Capturer}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00076}00076\ \ \ \ \ \ \ \ \ std::vector<MessageInfo>\ m\_messages;}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00077}00077\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_i_result_capture}{IResultCapture}}\&\ m\_resultCapture\ =\ \mbox{\hyperlink{namespace_catch_af718eeab870712f292ed8dc6ee3f6488}{getResultCapture}}();}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00078}00078\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ m\_captured\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00079}00079\ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00080}00080\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_capturer_a86b0b27acc803a4e1310c10820f3038f}{Capturer}}(\ \mbox{\hyperlink{class_catch_1_1_string_ref}{StringRef}}\ macroName,\ \mbox{\hyperlink{struct_catch_1_1_source_line_info}{SourceLineInfo}}\ \textcolor{keyword}{const}\&\ lineInfo,\ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef}{ResultWas::OfType}}\ resultType,\ \mbox{\hyperlink{class_catch_1_1_string_ref}{StringRef}}\ names\ );}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00081}00081\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_capturer_aecde85cf69e65565cec91e325a657b82}{\string~Capturer}}();}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00083}00083\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_capturer_a0695ebf77f7cdcb344c73bcb3d9131e4}{captureValue}}(\ \textcolor{keywordtype}{size\_t}\ index,\ std::string\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ );}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00084}00084\ }
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00085}00085\ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00086}\mbox{\hyperlink{class_catch_1_1_capturer_a60d08e6db2e54740bb2298bbbec3bc0b}{00086}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_capturer_a60d08e6db2e54740bb2298bbbec3bc0b}{captureValues}}(\ \textcolor{keywordtype}{size\_t}\ index,\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00087}00087\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_capturer_a0695ebf77f7cdcb344c73bcb3d9131e4}{captureValue}}(\ index,\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{Catch::Detail::stringify}}(\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}\ )\ );}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00088}00088\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00089}00089\ }
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00090}00090\ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}},\ \textcolor{keyword}{typename}...\ Ts>}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00091}\mbox{\hyperlink{class_catch_1_1_capturer_a76f2a097cfeb3042688300b81eb9bcbc}{00091}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_capturer_a76f2a097cfeb3042688300b81eb9bcbc}{captureValues}}(\ \textcolor{keywordtype}{size\_t}\ index,\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \textcolor{keyword}{const}\&\ \mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}},\ Ts\ \textcolor{keyword}{const}\&...\ values\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00092}00092\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_capturer_a0695ebf77f7cdcb344c73bcb3d9131e4}{captureValue}}(\ index,\ \mbox{\hyperlink{namespace_catch_1_1_detail_af0ad48344ffd3f92f3568465248a9880}{Catch::Detail::stringify}}(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})\ );}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00093}00093\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_capturer_a60d08e6db2e54740bb2298bbbec3bc0b}{captureValues}}(\ index+1,\ values...\ );}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00094}00094\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00095}00095\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00096}00096\ }
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00097}00097\ \}\ \textcolor{comment}{//\ end\ namespace\ Catch}}
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00098}00098\ }
+\DoxyCodeLine{\Hypertarget{catch__message_8h_source_l00099}00099\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ TWOBLUECUBES\_CATCH\_MESSAGE\_H\_INCLUDED}}
+
+\end{DoxyCode}

@@ -1,0 +1,110 @@
+\doxysection{fc\+::crypto\+::recovery\+\_\+visitor Struct Reference}
+\hypertarget{structfc_1_1crypto_1_1recovery__visitor}{}\label{structfc_1_1crypto_1_1recovery__visitor}\index{fc::crypto::recovery\_visitor@{fc::crypto::recovery\_visitor}}
+
+
+Inheritance diagram for fc\+::crypto\+::recovery\+\_\+visitor\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=188pt]{structfc_1_1crypto_1_1recovery__visitor__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for fc\+::crypto\+::recovery\+\_\+visitor\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=268pt]{structfc_1_1crypto_1_1recovery__visitor__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structfc_1_1crypto_1_1recovery__visitor_a49b89582876d1cec42cc8783b48b5e30}{recovery\+\_\+visitor}} (const \mbox{\hyperlink{classfc_1_1sha256}{sha256}} \&\mbox{\hyperlink{namespacefc_a150ca4cd9c0318ca45dc0dc7df5d58b9}{digest}}, bool check\+\_\+canonical)
+\item 
+{\footnotesize template$<$typename Signature\+Type $>$ }\\\mbox{\hyperlink{classfc_1_1crypto_1_1public__key_a93cbc81075607bd957e94e5d098e1863}{public\+\_\+key\+::storage\+\_\+type}} \mbox{\hyperlink{structfc_1_1crypto_1_1recovery__visitor_adb077ad59be06f22bb8fe528635e004d}{operator()}} (const Signature\+Type \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}) const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+const \mbox{\hyperlink{classfc_1_1sha256}{sha256}} \& \mbox{\hyperlink{structfc_1_1crypto_1_1recovery__visitor_a4c62df08e278eeed6ebf064093d829b1}{\+\_\+digest}}
+\item 
+bool \mbox{\hyperlink{structfc_1_1crypto_1_1recovery__visitor_ab2caa9e08974fb6bae9e21dd2c82e112}{\+\_\+check\+\_\+canonical}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{public__key_8cpp_source_l00007}{7}} of file \mbox{\hyperlink{public__key_8cpp_source}{public\+\_\+key.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structfc_1_1crypto_1_1recovery__visitor_a49b89582876d1cec42cc8783b48b5e30}\index{fc::crypto::recovery\_visitor@{fc::crypto::recovery\_visitor}!recovery\_visitor@{recovery\_visitor}}
+\index{recovery\_visitor@{recovery\_visitor}!fc::crypto::recovery\_visitor@{fc::crypto::recovery\_visitor}}
+\doxysubsubsection{\texorpdfstring{recovery\_visitor()}{recovery\_visitor()}}
+{\footnotesize\ttfamily \label{structfc_1_1crypto_1_1recovery__visitor_a49b89582876d1cec42cc8783b48b5e30} 
+fc\+::crypto\+::recovery\+\_\+visitor\+::recovery\+\_\+visitor (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1sha256}{sha256}} \&}]{digest}{, }\item[{bool}]{check\+\_\+canonical}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{public__key_8cpp_source_l00008}{8}} of file \mbox{\hyperlink{public__key_8cpp_source}{public\+\_\+key.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00009\ \ \ \ \ \ \ :\mbox{\hyperlink{structfc_1_1crypto_1_1recovery__visitor_a4c62df08e278eeed6ebf064093d829b1}{\_digest}}(\mbox{\hyperlink{namespacefc_a150ca4cd9c0318ca45dc0dc7df5d58b9}{digest}})}
+\DoxyCodeLine{00010\ \ \ \ \ \ \ ,\mbox{\hyperlink{structfc_1_1crypto_1_1recovery__visitor_ab2caa9e08974fb6bae9e21dd2c82e112}{\_check\_canonical}}(check\_canonical)}
+\DoxyCodeLine{00011\ \ \ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structfc_1_1crypto_1_1recovery__visitor_adb077ad59be06f22bb8fe528635e004d}\index{fc::crypto::recovery\_visitor@{fc::crypto::recovery\_visitor}!operator()@{operator()}}
+\index{operator()@{operator()}!fc::crypto::recovery\_visitor@{fc::crypto::recovery\_visitor}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}}
+{\footnotesize\ttfamily \label{structfc_1_1crypto_1_1recovery__visitor_adb077ad59be06f22bb8fe528635e004d} 
+template$<$typename Signature\+Type $>$ \\
+\mbox{\hyperlink{classfc_1_1crypto_1_1public__key_a93cbc81075607bd957e94e5d098e1863}{public\+\_\+key\+::storage\+\_\+type}} fc\+::crypto\+::recovery\+\_\+visitor\+::operator() (\begin{DoxyParamCaption}\item[{const Signature\+Type \&}]{s}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{public__key_8cpp_source_l00014}{14}} of file \mbox{\hyperlink{public__key_8cpp_source}{public\+\_\+key.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00014\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1crypto_1_1public__key_a93cbc81075607bd957e94e5d098e1863}{public\_key::storage\_type}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.recover(\mbox{\hyperlink{structfc_1_1crypto_1_1recovery__visitor_a4c62df08e278eeed6ebf064093d829b1}{\_digest}},\ \mbox{\hyperlink{structfc_1_1crypto_1_1recovery__visitor_ab2caa9e08974fb6bae9e21dd2c82e112}{\_check\_canonical}}));}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structfc_1_1crypto_1_1recovery__visitor_ab2caa9e08974fb6bae9e21dd2c82e112}\index{fc::crypto::recovery\_visitor@{fc::crypto::recovery\_visitor}!\_check\_canonical@{\_check\_canonical}}
+\index{\_check\_canonical@{\_check\_canonical}!fc::crypto::recovery\_visitor@{fc::crypto::recovery\_visitor}}
+\doxysubsubsection{\texorpdfstring{\_check\_canonical}{\_check\_canonical}}
+{\footnotesize\ttfamily \label{structfc_1_1crypto_1_1recovery__visitor_ab2caa9e08974fb6bae9e21dd2c82e112} 
+bool fc\+::crypto\+::recovery\+\_\+visitor\+::\+\_\+check\+\_\+canonical}
+
+
+
+Definition at line \mbox{\hyperlink{public__key_8cpp_source_l00019}{19}} of file \mbox{\hyperlink{public__key_8cpp_source}{public\+\_\+key.\+cpp}}.
+
+\Hypertarget{structfc_1_1crypto_1_1recovery__visitor_a4c62df08e278eeed6ebf064093d829b1}\index{fc::crypto::recovery\_visitor@{fc::crypto::recovery\_visitor}!\_digest@{\_digest}}
+\index{\_digest@{\_digest}!fc::crypto::recovery\_visitor@{fc::crypto::recovery\_visitor}}
+\doxysubsubsection{\texorpdfstring{\_digest}{\_digest}}
+{\footnotesize\ttfamily \label{structfc_1_1crypto_1_1recovery__visitor_a4c62df08e278eeed6ebf064093d829b1} 
+const \mbox{\hyperlink{classfc_1_1sha256}{sha256}}\& fc\+::crypto\+::recovery\+\_\+visitor\+::\+\_\+digest}
+
+
+
+Definition at line \mbox{\hyperlink{public__key_8cpp_source_l00018}{18}} of file \mbox{\hyperlink{public__key_8cpp_source}{public\+\_\+key.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/src/crypto/\mbox{\hyperlink{public__key_8cpp}{public\+\_\+key.\+cpp}}\end{DoxyCompactItemize}

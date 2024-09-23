@@ -1,0 +1,974 @@
+\doxysection{libraries/fc/libraries/ff/depends/xbyak/test/make\+\_\+512.cpp File Reference}
+\hypertarget{make__512_8cpp}{}\label{make__512_8cpp}\index{libraries/fc/libraries/ff/depends/xbyak/test/make\_512.cpp@{libraries/fc/libraries/ff/depends/xbyak/test/make\_512.cpp}}
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include "{}xbyak/xbyak.\+h"{}}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include "{}cybozu/inttype.\+hpp"{}}\newline
+Include dependency graph for make\+\_\+512.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{make__512_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{class_test}{Test}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{make__512_8cpp_a21ff7c588b94b603f37cc3cb3f21cb6a}{NUM\+\_\+\+OF\+\_\+\+ARRAY}}(x)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{make__512_8cpp_a67d21eafe9fc3853004ccc3dbd3d9b19}{main}} (int argc, char \texorpdfstring{$\ast$}{*}\mbox{[}$\,$\mbox{]})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+const int \mbox{\hyperlink{make__512_8cpp_af65441349f4c896c2339c147088a2639}{bit\+End}} = 64
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_a47fc28f28b313528526c668d6ec7a2c1}{YMM\+\_\+\+SAE}} = 1ULL $<$$<$ 0
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_addaeb42855eb7715c61462dcab8af637}{\+\_\+\+XMM}} = 1ULL $<$$<$ 1
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_a5849811bfdfc8d178d0f8b83e975ced1}{\+\_\+\+MEM}} = 1ULL $<$$<$ 2
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_aed40d649ebe713f55934c9aa50c4ba29}{\+\_\+\+REG32}} = 1ULL $<$$<$ 3
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_a36d2623c3e8461c0caa06e0e41a6f47b}{EAX}} = 1ULL $<$$<$ 4
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_add4dc8d11a24088bc4925cf783c3499e}{IMM32}} = 1ULL $<$$<$ 5
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_a2b4868e2f8191cf92e23b481266c6d30}{IMM8}} = 1ULL $<$$<$ 6
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_a9eaef7072ae974e768b8edc3fb99b82c}{\+\_\+\+REG8}} = 1ULL $<$$<$ 7
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_ab3f43a4e99d5ad9e3a8bd9f4a40e2e7f}{\+\_\+\+REG16}} = 1ULL $<$$<$ 8
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_ace421c8c46208bed331592b49bc0ae56}{XMM\+\_\+K}} = 1ULL $<$$<$ 9
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_aeac09571536abd8d24af68a99a9bc76c}{YMM\+\_\+K}} = 1ULL $<$$<$ 10
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_a4f0331a3abe3afd6248863e8d48e707a}{ZMM\+\_\+K}} = 1ULL $<$$<$ 11
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_ab2aada0634933ddd593ffd8d1e91efcb}{AX}} = 1ULL $<$$<$ 12
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_a76cf95ff5d6afdfd68727c32bda2f95f}{AL}} = 1ULL $<$$<$ 13
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_ae84cab68d9a97a267659c4714a19eefe}{IMM\+\_\+1}} = 1ULL $<$$<$ 14
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_a6c6a6e61115a9100809d15da426618cd}{MEM8}} = 1ULL $<$$<$ 15
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_afdf739d8d24705250a6825e14897f535}{MEM16}} = 1ULL $<$$<$ 16
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_ae63769778e61cb70aa5fabdc4380e92f}{MEM32}} = 1ULL $<$$<$ 17
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_aedcbb97d96296a283a09e17e34f270cb}{VM32Z}} = 1ULL $<$$<$ 19
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_ab53eab209011771d9b78fedf1e2397f9}{K\+\_\+K}} = 1ULL $<$$<$ 20
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_a206a506ca7b4d39ec2431915576bdefb}{MEM\+\_\+\+ONLY\+\_\+\+DISP}} = 1ULL $<$$<$ 21
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_aca902ec409e81f647c83054b037f7975}{VM32\+X\+\_\+K}} = 1ULL $<$$<$ 23
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_ad16f7241d8cccbd25f6d16db95c6129f}{\+\_\+\+YMM}} = 1ULL $<$$<$ 24
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_aaabdf2a4896f464c957c49f53153ce0d}{VM32\+X\+\_\+32}} = 1ULL $<$$<$ 39
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_a004780f607b590db8013f6d884cadd68}{VM32\+X\+\_\+64}} = 1ULL $<$$<$ 40
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_a72b32f434d7407fd7bdbe9c5e8d298bd}{VM32\+Y\+\_\+32}} = 1ULL $<$$<$ 41
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_a01004d1707569ffbbe59595e77f5191d}{VM32\+Y\+\_\+64}} = 1ULL $<$$<$ 42
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_a5af152c47c8fad4c66131ec1841bfc14}{VM32\+Z\+\_\+K}} = 1ULL $<$$<$ 32
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_a1dd386681c40ba005f91a22a1e9ba0a5}{\+\_\+\+MEMe}} = 0
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_a6734f9d8ce26dced76cdc7e23f896c3e}{REG32\+\_\+2}} = 0
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_a07a35b08853959f305524abd05ebd2c5}{REG16\+\_\+2}} = 0
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_ab8be7cbacce8a6014ec06aac9b93c804}{REG8\+\_\+2}} = 0
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_a7b0571d1353cf1acd73010b7739d60cf}{REG8\+\_\+3}} = 0
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_a376870f8ad170d98e98b084630397119}{\+\_\+\+REG64}} = 0
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_a5742baa03ee43c22c3047fa582fa5887}{\+\_\+\+REG64\+\_\+2}} = 0
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_a5f0a56f8df75ad89c3960efc6351f2dc}{\+\_\+\+XMM2}} = 0
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_ac8294b254053eb3cfa9e5a50f31e7a4b}{\+\_\+\+YMM2}} = 0
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_a9f0321038873714eef4abc67cc2a125b}{VM32X}} = \mbox{\hyperlink{make__512_8cpp_aaabdf2a4896f464c957c49f53153ce0d}{VM32\+X\+\_\+32}}
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_ac79ccea5668ca71baecc92baa1f6cd53}{VM32Y}} = \mbox{\hyperlink{make__512_8cpp_a72b32f434d7407fd7bdbe9c5e8d298bd}{VM32\+Y\+\_\+32}}
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_a7c976946f227c6278006b91ba4035474}{REG64}} = \mbox{\hyperlink{make__512_8cpp_a376870f8ad170d98e98b084630397119}{\+\_\+\+REG64}} \texorpdfstring{$\vert$}{|} \mbox{\hyperlink{make__512_8cpp_a5742baa03ee43c22c3047fa582fa5887}{\+\_\+\+REG64\+\_\+2}}
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_a06846babe3e3fc9551a4621ddf4f18c8}{REG32}} = \mbox{\hyperlink{make__512_8cpp_aed40d649ebe713f55934c9aa50c4ba29}{\+\_\+\+REG32}} \texorpdfstring{$\vert$}{|} \mbox{\hyperlink{make__512_8cpp_a6734f9d8ce26dced76cdc7e23f896c3e}{REG32\+\_\+2}} \texorpdfstring{$\vert$}{|} \mbox{\hyperlink{make__512_8cpp_a36d2623c3e8461c0caa06e0e41a6f47b}{EAX}}
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_a9ef38f5c427cd04fcb9efba15e75acca}{REG16}} = \mbox{\hyperlink{make__512_8cpp_ab3f43a4e99d5ad9e3a8bd9f4a40e2e7f}{\+\_\+\+REG16}} \texorpdfstring{$\vert$}{|} \mbox{\hyperlink{make__512_8cpp_a07a35b08853959f305524abd05ebd2c5}{REG16\+\_\+2}} \texorpdfstring{$\vert$}{|} \mbox{\hyperlink{make__512_8cpp_ab2aada0634933ddd593ffd8d1e91efcb}{AX}}
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_a1dd3301e5f846fe3e2305dd88debbe26}{REG32e}} = \mbox{\hyperlink{make__512_8cpp_a06846babe3e3fc9551a4621ddf4f18c8}{REG32}} \texorpdfstring{$\vert$}{|} \mbox{\hyperlink{make__512_8cpp_a7c976946f227c6278006b91ba4035474}{REG64}}
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_aa69483d697ae1fe5935022b3ed3e8e15}{REG8}} = \mbox{\hyperlink{make__512_8cpp_a9eaef7072ae974e768b8edc3fb99b82c}{\+\_\+\+REG8}} \texorpdfstring{$\vert$}{|} \mbox{\hyperlink{make__512_8cpp_ab8be7cbacce8a6014ec06aac9b93c804}{REG8\+\_\+2}}\texorpdfstring{$\vert$}{|}\mbox{\hyperlink{make__512_8cpp_a76cf95ff5d6afdfd68727c32bda2f95f}{AL}}
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_a369bd513d8f099cacf62d8d9ceb6c3a3}{MEM}} = \mbox{\hyperlink{make__512_8cpp_a5849811bfdfc8d178d0f8b83e975ced1}{\+\_\+\+MEM}} \texorpdfstring{$\vert$}{|} \mbox{\hyperlink{make__512_8cpp_a1dd386681c40ba005f91a22a1e9ba0a5}{\+\_\+\+MEMe}}
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_a6b0dd7f2d2d8c438811cb3b6e588edb2}{MEM64}} = 1ULL $<$$<$ 35
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_abe5396c542df16d0a6dc566d1b21ae7e}{YMM\+\_\+\+ER}} = 1ULL $<$$<$ 36
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_a3ae13d9e77e54e465251160f319cb3f9}{VM32\+Y\+\_\+K}} = 1ULL $<$$<$ 37
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_a43cc8b74c4169725b3e0ce3bcd32d314}{IMM\+\_\+2}} = 1ULL $<$$<$ 38
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_a6803b5d33d78b712ee13d3bffe269e04}{IMM}} = \mbox{\hyperlink{make__512_8cpp_ae84cab68d9a97a267659c4714a19eefe}{IMM\+\_\+1}} \texorpdfstring{$\vert$}{|} \mbox{\hyperlink{make__512_8cpp_a43cc8b74c4169725b3e0ce3bcd32d314}{IMM\+\_\+2}}
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_a124b7b218ce6e3a6103fe2d4425bda63}{XMM}} = \mbox{\hyperlink{make__512_8cpp_addaeb42855eb7715c61462dcab8af637}{\+\_\+\+XMM}} \texorpdfstring{$\vert$}{|} \mbox{\hyperlink{make__512_8cpp_a5f0a56f8df75ad89c3960efc6351f2dc}{\+\_\+\+XMM2}}
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_a14532b5c5f49b261c1a01546e5f4cd7b}{YMM}} = \mbox{\hyperlink{make__512_8cpp_ad16f7241d8cccbd25f6d16db95c6129f}{\+\_\+\+YMM}} \texorpdfstring{$\vert$}{|} \mbox{\hyperlink{make__512_8cpp_ac8294b254053eb3cfa9e5a50f31e7a4b}{\+\_\+\+YMM2}}
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_a3d4e997ddc51e0c06c306fe4862826c0}{K}} = 1ULL $<$$<$ 43
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_a71f1202a95724848188dca4b4aa75194}{\+\_\+\+ZMM}} = 1ULL $<$$<$ 44
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_aba9e3283fe1de549fe3760b8c225b185}{\+\_\+\+ZMM2}} = 1ULL $<$$<$ 45
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_a2454b04f76aa72d11326da75d8ecbbd2}{ZMM}} = \mbox{\hyperlink{make__512_8cpp_a71f1202a95724848188dca4b4aa75194}{\+\_\+\+ZMM}}
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_aeec26b1c836b940dbed0ca153cfa7951}{\+\_\+\+YMM3}} = 0
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_a8e1c8a6213bc503303cdc34600289543}{K2}} = 1ULL $<$$<$ 47
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_af6efa3579d889fdfdb0f9f6d993b2175}{ZMM\+\_\+\+SAE}} = 1ULL $<$$<$ 48
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_aa1f3e6f2d81f171dad7e6effb984e213}{ZMM\+\_\+\+ER}} = 1ULL $<$$<$ 49
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_a0a271e853075ef429f44471f1679eb21}{XMM\+\_\+\+SAE}} = 1ULL $<$$<$ 51
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_a1a5a52b2f4c19708e1b1ac34294a69bf}{XMM\+\_\+\+KZ}} = 0
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_aedcae6bb9fa10a2e7162a582c82419ac}{YMM\+\_\+\+KZ}} = 0
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_a91698d6fed8286b828607f80e62741ea}{ZMM\+\_\+\+KZ}} = 0
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_aedd68b1ef234faa6ae1d6b74a1ce74fc}{MEM\+\_\+K}} = 1ULL $<$$<$ 55
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_a85b1dcdc366488760a6896fc85bc5379}{M\+\_\+1to2}} = 1ULL $<$$<$ 56
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_afd4fe980c3daf5c6ae4c43ff0627c4fe}{M\+\_\+1to4}} = 1ULL $<$$<$ 57
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_a559d60367404c37728bfb48818a8c73c}{M\+\_\+1to8}} = 1ULL $<$$<$ 58
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_adc41888d35d95006b889944e0ed246ed}{M\+\_\+1to16}} = 1ULL $<$$<$ 59
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_af15701b93e8c6344f1851ac8b6a6fda1}{XMM\+\_\+\+ER}} = 1ULL $<$$<$ 60
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_a164a1ec729336a6d9304f6fdc634ef5a}{M\+\_\+xword}} = 1ULL $<$$<$ 61
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_a3945f9ae79732a03c79d1ee9c3dadd35}{M\+\_\+yword}} = 1ULL $<$$<$ 62
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_ab3903f1b3a295eeb66a7835f85162653}{MY\+\_\+1to4}} = 1ULL $<$$<$ 18
+\item 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \mbox{\hyperlink{make__512_8cpp_a0ebd0c2ea793eb9964a485f3e0183276}{NOPARA}} = 1ULL $<$$<$ (\mbox{\hyperlink{make__512_8cpp_af65441349f4c896c2339c147088a2639}{bit\+End}} -\/ 1)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{make__512_8cpp_a21ff7c588b94b603f37cc3cb3f21cb6a}\index{make\_512.cpp@{make\_512.cpp}!NUM\_OF\_ARRAY@{NUM\_OF\_ARRAY}}
+\index{NUM\_OF\_ARRAY@{NUM\_OF\_ARRAY}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{NUM\_OF\_ARRAY}{NUM\_OF\_ARRAY}}
+{\footnotesize\ttfamily \label{make__512_8cpp_a21ff7c588b94b603f37cc3cb3f21cb6a} 
+\#define NUM\+\_\+\+OF\+\_\+\+ARRAY(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(\textcolor{keyword}{sizeof}(x)\ /\ \textcolor{keyword}{sizeof}(x[0]))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00006}{6}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{make__512_8cpp_a67d21eafe9fc3853004ccc3dbd3d9b19}\index{make\_512.cpp@{make\_512.cpp}!main@{main}}
+\index{main@{main}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{make__512_8cpp_a67d21eafe9fc3853004ccc3dbd3d9b19} 
+int main (\begin{DoxyParamCaption}\item[{int}]{argc}{, }\item[{char \texorpdfstring{$\ast$}{*}}]{}{\mbox{[}$\,$\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l02186}{2186}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02187\ \{}
+\DoxyCodeLine{02188\ \ \ \ \ \mbox{\hyperlink{class_test}{Test}}\ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68daee5b74d2be31ca48e104578d6c2b7425}{test}}(argc\ >\ 1);}
+\DoxyCodeLine{02189\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68daee5b74d2be31ca48e104578d6c2b7425}{test}}.put();}
+\DoxyCodeLine{02190\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{make__512_8cpp_a5849811bfdfc8d178d0f8b83e975ced1}\index{make\_512.cpp@{make\_512.cpp}!\_MEM@{\_MEM}}
+\index{\_MEM@{\_MEM}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{\_MEM}{\_MEM}}
+{\footnotesize\ttfamily \label{make__512_8cpp_a5849811bfdfc8d178d0f8b83e975ced1} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \+\_\+\+MEM = 1ULL $<$$<$ 2}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00014}{14}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_a1dd386681c40ba005f91a22a1e9ba0a5}\index{make\_512.cpp@{make\_512.cpp}!\_MEMe@{\_MEMe}}
+\index{\_MEMe@{\_MEMe}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{\_MEMe}{\_MEMe}}
+{\footnotesize\ttfamily \label{make__512_8cpp_a1dd386681c40ba005f91a22a1e9ba0a5} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \+\_\+\+MEMe = 0}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00053}{53}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_ab3f43a4e99d5ad9e3a8bd9f4a40e2e7f}\index{make\_512.cpp@{make\_512.cpp}!\_REG16@{\_REG16}}
+\index{\_REG16@{\_REG16}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{\_REG16}{\_REG16}}
+{\footnotesize\ttfamily \label{make__512_8cpp_ab3f43a4e99d5ad9e3a8bd9f4a40e2e7f} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \+\_\+\+REG16 = 1ULL $<$$<$ 8}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00020}{20}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_aed40d649ebe713f55934c9aa50c4ba29}\index{make\_512.cpp@{make\_512.cpp}!\_REG32@{\_REG32}}
+\index{\_REG32@{\_REG32}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{\_REG32}{\_REG32}}
+{\footnotesize\ttfamily \label{make__512_8cpp_aed40d649ebe713f55934c9aa50c4ba29} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \+\_\+\+REG32 = 1ULL $<$$<$ 3}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00015}{15}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_a376870f8ad170d98e98b084630397119}\index{make\_512.cpp@{make\_512.cpp}!\_REG64@{\_REG64}}
+\index{\_REG64@{\_REG64}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{\_REG64}{\_REG64}}
+{\footnotesize\ttfamily \label{make__512_8cpp_a376870f8ad170d98e98b084630397119} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \+\_\+\+REG64 = 0}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00058}{58}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_a5742baa03ee43c22c3047fa582fa5887}\index{make\_512.cpp@{make\_512.cpp}!\_REG64\_2@{\_REG64\_2}}
+\index{\_REG64\_2@{\_REG64\_2}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{\_REG64\_2}{\_REG64\_2}}
+{\footnotesize\ttfamily \label{make__512_8cpp_a5742baa03ee43c22c3047fa582fa5887} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \+\_\+\+REG64\+\_\+2 = 0}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00059}{59}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_a9eaef7072ae974e768b8edc3fb99b82c}\index{make\_512.cpp@{make\_512.cpp}!\_REG8@{\_REG8}}
+\index{\_REG8@{\_REG8}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{\_REG8}{\_REG8}}
+{\footnotesize\ttfamily \label{make__512_8cpp_a9eaef7072ae974e768b8edc3fb99b82c} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \+\_\+\+REG8 = 1ULL $<$$<$ 7}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00019}{19}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_addaeb42855eb7715c61462dcab8af637}\index{make\_512.cpp@{make\_512.cpp}!\_XMM@{\_XMM}}
+\index{\_XMM@{\_XMM}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{\_XMM}{\_XMM}}
+{\footnotesize\ttfamily \label{make__512_8cpp_addaeb42855eb7715c61462dcab8af637} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \+\_\+\+XMM = 1ULL $<$$<$ 1}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00013}{13}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_a5f0a56f8df75ad89c3960efc6351f2dc}\index{make\_512.cpp@{make\_512.cpp}!\_XMM2@{\_XMM2}}
+\index{\_XMM2@{\_XMM2}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{\_XMM2}{\_XMM2}}
+{\footnotesize\ttfamily \label{make__512_8cpp_a5f0a56f8df75ad89c3960efc6351f2dc} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \+\_\+\+XMM2 = 0}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00060}{60}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_ad16f7241d8cccbd25f6d16db95c6129f}\index{make\_512.cpp@{make\_512.cpp}!\_YMM@{\_YMM}}
+\index{\_YMM@{\_YMM}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{\_YMM}{\_YMM}}
+{\footnotesize\ttfamily \label{make__512_8cpp_ad16f7241d8cccbd25f6d16db95c6129f} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \+\_\+\+YMM = 1ULL $<$$<$ 24}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00034}{34}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_ac8294b254053eb3cfa9e5a50f31e7a4b}\index{make\_512.cpp@{make\_512.cpp}!\_YMM2@{\_YMM2}}
+\index{\_YMM2@{\_YMM2}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{\_YMM2}{\_YMM2}}
+{\footnotesize\ttfamily \label{make__512_8cpp_ac8294b254053eb3cfa9e5a50f31e7a4b} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \+\_\+\+YMM2 = 0}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00061}{61}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_aeec26b1c836b940dbed0ca153cfa7951}\index{make\_512.cpp@{make\_512.cpp}!\_YMM3@{\_YMM3}}
+\index{\_YMM3@{\_YMM3}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{\_YMM3}{\_YMM3}}
+{\footnotesize\ttfamily \label{make__512_8cpp_aeec26b1c836b940dbed0ca153cfa7951} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \+\_\+\+YMM3 = 0}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00086}{86}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_a71f1202a95724848188dca4b4aa75194}\index{make\_512.cpp@{make\_512.cpp}!\_ZMM@{\_ZMM}}
+\index{\_ZMM@{\_ZMM}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{\_ZMM}{\_ZMM}}
+{\footnotesize\ttfamily \label{make__512_8cpp_a71f1202a95724848188dca4b4aa75194} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \+\_\+\+ZMM = 1ULL $<$$<$ 44}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00079}{79}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_aba9e3283fe1de549fe3760b8c225b185}\index{make\_512.cpp@{make\_512.cpp}!\_ZMM2@{\_ZMM2}}
+\index{\_ZMM2@{\_ZMM2}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{\_ZMM2}{\_ZMM2}}
+{\footnotesize\ttfamily \label{make__512_8cpp_aba9e3283fe1de549fe3760b8c225b185} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} \+\_\+\+ZMM2 = 1ULL $<$$<$ 45}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00080}{80}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_a76cf95ff5d6afdfd68727c32bda2f95f}\index{make\_512.cpp@{make\_512.cpp}!AL@{AL}}
+\index{AL@{AL}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{AL}{AL}}
+{\footnotesize\ttfamily \label{make__512_8cpp_a76cf95ff5d6afdfd68727c32bda2f95f} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} AL = 1ULL $<$$<$ 13}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00025}{25}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_ab2aada0634933ddd593ffd8d1e91efcb}\index{make\_512.cpp@{make\_512.cpp}!AX@{AX}}
+\index{AX@{AX}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{AX}{AX}}
+{\footnotesize\ttfamily \label{make__512_8cpp_ab2aada0634933ddd593ffd8d1e91efcb} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} AX = 1ULL $<$$<$ 12}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00024}{24}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_af65441349f4c896c2339c147088a2639}\index{make\_512.cpp@{make\_512.cpp}!bitEnd@{bitEnd}}
+\index{bitEnd@{bitEnd}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{bitEnd}{bitEnd}}
+{\footnotesize\ttfamily \label{make__512_8cpp_af65441349f4c896c2339c147088a2639} 
+const int bit\+End = 64}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00010}{10}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_a36d2623c3e8461c0caa06e0e41a6f47b}\index{make\_512.cpp@{make\_512.cpp}!EAX@{EAX}}
+\index{EAX@{EAX}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{EAX}{EAX}}
+{\footnotesize\ttfamily \label{make__512_8cpp_a36d2623c3e8461c0caa06e0e41a6f47b} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} EAX = 1ULL $<$$<$ 4}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00016}{16}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_a6803b5d33d78b712ee13d3bffe269e04}\index{make\_512.cpp@{make\_512.cpp}!IMM@{IMM}}
+\index{IMM@{IMM}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{IMM}{IMM}}
+{\footnotesize\ttfamily \label{make__512_8cpp_a6803b5d33d78b712ee13d3bffe269e04} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} IMM = \mbox{\hyperlink{make__512_8cpp_ae84cab68d9a97a267659c4714a19eefe}{IMM\+\_\+1}} \texorpdfstring{$\vert$}{|} \mbox{\hyperlink{make__512_8cpp_a43cc8b74c4169725b3e0ce3bcd32d314}{IMM\+\_\+2}}}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00075}{75}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_add4dc8d11a24088bc4925cf783c3499e}\index{make\_512.cpp@{make\_512.cpp}!IMM32@{IMM32}}
+\index{IMM32@{IMM32}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{IMM32}{IMM32}}
+{\footnotesize\ttfamily \label{make__512_8cpp_add4dc8d11a24088bc4925cf783c3499e} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} IMM32 = 1ULL $<$$<$ 5}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00017}{17}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_a2b4868e2f8191cf92e23b481266c6d30}\index{make\_512.cpp@{make\_512.cpp}!IMM8@{IMM8}}
+\index{IMM8@{IMM8}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{IMM8}{IMM8}}
+{\footnotesize\ttfamily \label{make__512_8cpp_a2b4868e2f8191cf92e23b481266c6d30} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} IMM8 = 1ULL $<$$<$ 6}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00018}{18}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_ae84cab68d9a97a267659c4714a19eefe}\index{make\_512.cpp@{make\_512.cpp}!IMM\_1@{IMM\_1}}
+\index{IMM\_1@{IMM\_1}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{IMM\_1}{IMM\_1}}
+{\footnotesize\ttfamily \label{make__512_8cpp_ae84cab68d9a97a267659c4714a19eefe} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} IMM\+\_\+1 = 1ULL $<$$<$ 14}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00026}{26}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_a43cc8b74c4169725b3e0ce3bcd32d314}\index{make\_512.cpp@{make\_512.cpp}!IMM\_2@{IMM\_2}}
+\index{IMM\_2@{IMM\_2}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{IMM\_2}{IMM\_2}}
+{\footnotesize\ttfamily \label{make__512_8cpp_a43cc8b74c4169725b3e0ce3bcd32d314} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} IMM\+\_\+2 = 1ULL $<$$<$ 38}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00074}{74}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_a3d4e997ddc51e0c06c306fe4862826c0}\index{make\_512.cpp@{make\_512.cpp}!K@{K}}
+\index{K@{K}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{K}{K}}
+{\footnotesize\ttfamily \label{make__512_8cpp_a3d4e997ddc51e0c06c306fe4862826c0} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} K = 1ULL $<$$<$ 43}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00078}{78}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_a8e1c8a6213bc503303cdc34600289543}\index{make\_512.cpp@{make\_512.cpp}!K2@{K2}}
+\index{K2@{K2}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{K2}{K2}}
+{\footnotesize\ttfamily \label{make__512_8cpp_a8e1c8a6213bc503303cdc34600289543} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} K2 = 1ULL $<$$<$ 47}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00088}{88}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_ab53eab209011771d9b78fedf1e2397f9}\index{make\_512.cpp@{make\_512.cpp}!K\_K@{K\_K}}
+\index{K\_K@{K\_K}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{K\_K}{K\_K}}
+{\footnotesize\ttfamily \label{make__512_8cpp_ab53eab209011771d9b78fedf1e2397f9} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} K\+\_\+K = 1ULL $<$$<$ 20}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00031}{31}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_adc41888d35d95006b889944e0ed246ed}\index{make\_512.cpp@{make\_512.cpp}!M\_1to16@{M\_1to16}}
+\index{M\_1to16@{M\_1to16}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{M\_1to16}{M\_1to16}}
+{\footnotesize\ttfamily \label{make__512_8cpp_adc41888d35d95006b889944e0ed246ed} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} M\+\_\+1to16 = 1ULL $<$$<$ 59}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00108}{108}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_a85b1dcdc366488760a6896fc85bc5379}\index{make\_512.cpp@{make\_512.cpp}!M\_1to2@{M\_1to2}}
+\index{M\_1to2@{M\_1to2}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{M\_1to2}{M\_1to2}}
+{\footnotesize\ttfamily \label{make__512_8cpp_a85b1dcdc366488760a6896fc85bc5379} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} M\+\_\+1to2 = 1ULL $<$$<$ 56}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00105}{105}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_afd4fe980c3daf5c6ae4c43ff0627c4fe}\index{make\_512.cpp@{make\_512.cpp}!M\_1to4@{M\_1to4}}
+\index{M\_1to4@{M\_1to4}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{M\_1to4}{M\_1to4}}
+{\footnotesize\ttfamily \label{make__512_8cpp_afd4fe980c3daf5c6ae4c43ff0627c4fe} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} M\+\_\+1to4 = 1ULL $<$$<$ 57}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00106}{106}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_a559d60367404c37728bfb48818a8c73c}\index{make\_512.cpp@{make\_512.cpp}!M\_1to8@{M\_1to8}}
+\index{M\_1to8@{M\_1to8}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{M\_1to8}{M\_1to8}}
+{\footnotesize\ttfamily \label{make__512_8cpp_a559d60367404c37728bfb48818a8c73c} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} M\+\_\+1to8 = 1ULL $<$$<$ 58}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00107}{107}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_a164a1ec729336a6d9304f6fdc634ef5a}\index{make\_512.cpp@{make\_512.cpp}!M\_xword@{M\_xword}}
+\index{M\_xword@{M\_xword}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{M\_xword}{M\_xword}}
+{\footnotesize\ttfamily \label{make__512_8cpp_a164a1ec729336a6d9304f6fdc634ef5a} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} M\+\_\+xword = 1ULL $<$$<$ 61}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00110}{110}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_a3945f9ae79732a03c79d1ee9c3dadd35}\index{make\_512.cpp@{make\_512.cpp}!M\_yword@{M\_yword}}
+\index{M\_yword@{M\_yword}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{M\_yword}{M\_yword}}
+{\footnotesize\ttfamily \label{make__512_8cpp_a3945f9ae79732a03c79d1ee9c3dadd35} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} M\+\_\+yword = 1ULL $<$$<$ 62}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00111}{111}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_a369bd513d8f099cacf62d8d9ceb6c3a3}\index{make\_512.cpp@{make\_512.cpp}!MEM@{MEM}}
+\index{MEM@{MEM}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{MEM}{MEM}}
+{\footnotesize\ttfamily \label{make__512_8cpp_a369bd513d8f099cacf62d8d9ceb6c3a3} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} MEM = \mbox{\hyperlink{make__512_8cpp_a5849811bfdfc8d178d0f8b83e975ced1}{\+\_\+\+MEM}} \texorpdfstring{$\vert$}{|} \mbox{\hyperlink{make__512_8cpp_a1dd386681c40ba005f91a22a1e9ba0a5}{\+\_\+\+MEMe}}}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00070}{70}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_afdf739d8d24705250a6825e14897f535}\index{make\_512.cpp@{make\_512.cpp}!MEM16@{MEM16}}
+\index{MEM16@{MEM16}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{MEM16}{MEM16}}
+{\footnotesize\ttfamily \label{make__512_8cpp_afdf739d8d24705250a6825e14897f535} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} MEM16 = 1ULL $<$$<$ 16}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00028}{28}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_ae63769778e61cb70aa5fabdc4380e92f}\index{make\_512.cpp@{make\_512.cpp}!MEM32@{MEM32}}
+\index{MEM32@{MEM32}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{MEM32}{MEM32}}
+{\footnotesize\ttfamily \label{make__512_8cpp_ae63769778e61cb70aa5fabdc4380e92f} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} MEM32 = 1ULL $<$$<$ 17}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00029}{29}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_a6b0dd7f2d2d8c438811cb3b6e588edb2}\index{make\_512.cpp@{make\_512.cpp}!MEM64@{MEM64}}
+\index{MEM64@{MEM64}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{MEM64}{MEM64}}
+{\footnotesize\ttfamily \label{make__512_8cpp_a6b0dd7f2d2d8c438811cb3b6e588edb2} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} MEM64 = 1ULL $<$$<$ 35}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00071}{71}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_a6c6a6e61115a9100809d15da426618cd}\index{make\_512.cpp@{make\_512.cpp}!MEM8@{MEM8}}
+\index{MEM8@{MEM8}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{MEM8}{MEM8}}
+{\footnotesize\ttfamily \label{make__512_8cpp_a6c6a6e61115a9100809d15da426618cd} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} MEM8 = 1ULL $<$$<$ 15}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00027}{27}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_aedd68b1ef234faa6ae1d6b74a1ce74fc}\index{make\_512.cpp@{make\_512.cpp}!MEM\_K@{MEM\_K}}
+\index{MEM\_K@{MEM\_K}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{MEM\_K}{MEM\_K}}
+{\footnotesize\ttfamily \label{make__512_8cpp_aedd68b1ef234faa6ae1d6b74a1ce74fc} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} MEM\+\_\+K = 1ULL $<$$<$ 55}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00104}{104}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_a206a506ca7b4d39ec2431915576bdefb}\index{make\_512.cpp@{make\_512.cpp}!MEM\_ONLY\_DISP@{MEM\_ONLY\_DISP}}
+\index{MEM\_ONLY\_DISP@{MEM\_ONLY\_DISP}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{MEM\_ONLY\_DISP}{MEM\_ONLY\_DISP}}
+{\footnotesize\ttfamily \label{make__512_8cpp_a206a506ca7b4d39ec2431915576bdefb} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} MEM\+\_\+\+ONLY\+\_\+\+DISP = 1ULL $<$$<$ 21}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00032}{32}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_ab3903f1b3a295eeb66a7835f85162653}\index{make\_512.cpp@{make\_512.cpp}!MY\_1to4@{MY\_1to4}}
+\index{MY\_1to4@{MY\_1to4}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{MY\_1to4}{MY\_1to4}}
+{\footnotesize\ttfamily \label{make__512_8cpp_ab3903f1b3a295eeb66a7835f85162653} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} MY\+\_\+1to4 = 1ULL $<$$<$ 18}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00112}{112}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_a0ebd0c2ea793eb9964a485f3e0183276}\index{make\_512.cpp@{make\_512.cpp}!NOPARA@{NOPARA}}
+\index{NOPARA@{NOPARA}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{NOPARA}{NOPARA}}
+{\footnotesize\ttfamily \label{make__512_8cpp_a0ebd0c2ea793eb9964a485f3e0183276} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} NOPARA = 1ULL $<$$<$ (\mbox{\hyperlink{make__512_8cpp_af65441349f4c896c2339c147088a2639}{bit\+End}} -\/ 1)}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00114}{114}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_a9ef38f5c427cd04fcb9efba15e75acca}\index{make\_512.cpp@{make\_512.cpp}!REG16@{REG16}}
+\index{REG16@{REG16}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{REG16}{REG16}}
+{\footnotesize\ttfamily \label{make__512_8cpp_a9ef38f5c427cd04fcb9efba15e75acca} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} REG16 = \mbox{\hyperlink{make__512_8cpp_ab3f43a4e99d5ad9e3a8bd9f4a40e2e7f}{\+\_\+\+REG16}} \texorpdfstring{$\vert$}{|} \mbox{\hyperlink{make__512_8cpp_a07a35b08853959f305524abd05ebd2c5}{REG16\+\_\+2}} \texorpdfstring{$\vert$}{|} \mbox{\hyperlink{make__512_8cpp_ab2aada0634933ddd593ffd8d1e91efcb}{AX}}}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00067}{67}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_a07a35b08853959f305524abd05ebd2c5}\index{make\_512.cpp@{make\_512.cpp}!REG16\_2@{REG16\_2}}
+\index{REG16\_2@{REG16\_2}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{REG16\_2}{REG16\_2}}
+{\footnotesize\ttfamily \label{make__512_8cpp_a07a35b08853959f305524abd05ebd2c5} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} REG16\+\_\+2 = 0}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00055}{55}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_a06846babe3e3fc9551a4621ddf4f18c8}\index{make\_512.cpp@{make\_512.cpp}!REG32@{REG32}}
+\index{REG32@{REG32}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{REG32}{REG32}}
+{\footnotesize\ttfamily \label{make__512_8cpp_a06846babe3e3fc9551a4621ddf4f18c8} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} REG32 = \mbox{\hyperlink{make__512_8cpp_aed40d649ebe713f55934c9aa50c4ba29}{\+\_\+\+REG32}} \texorpdfstring{$\vert$}{|} \mbox{\hyperlink{make__512_8cpp_a6734f9d8ce26dced76cdc7e23f896c3e}{REG32\+\_\+2}} \texorpdfstring{$\vert$}{|} \mbox{\hyperlink{make__512_8cpp_a36d2623c3e8461c0caa06e0e41a6f47b}{EAX}}}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00066}{66}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_a6734f9d8ce26dced76cdc7e23f896c3e}\index{make\_512.cpp@{make\_512.cpp}!REG32\_2@{REG32\_2}}
+\index{REG32\_2@{REG32\_2}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{REG32\_2}{REG32\_2}}
+{\footnotesize\ttfamily \label{make__512_8cpp_a6734f9d8ce26dced76cdc7e23f896c3e} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} REG32\+\_\+2 = 0}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00054}{54}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_a1dd3301e5f846fe3e2305dd88debbe26}\index{make\_512.cpp@{make\_512.cpp}!REG32e@{REG32e}}
+\index{REG32e@{REG32e}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{REG32e}{REG32e}}
+{\footnotesize\ttfamily \label{make__512_8cpp_a1dd3301e5f846fe3e2305dd88debbe26} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} REG32e = \mbox{\hyperlink{make__512_8cpp_a06846babe3e3fc9551a4621ddf4f18c8}{REG32}} \texorpdfstring{$\vert$}{|} \mbox{\hyperlink{make__512_8cpp_a7c976946f227c6278006b91ba4035474}{REG64}}}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00068}{68}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_a7c976946f227c6278006b91ba4035474}\index{make\_512.cpp@{make\_512.cpp}!REG64@{REG64}}
+\index{REG64@{REG64}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{REG64}{REG64}}
+{\footnotesize\ttfamily \label{make__512_8cpp_a7c976946f227c6278006b91ba4035474} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} REG64 = \mbox{\hyperlink{make__512_8cpp_a376870f8ad170d98e98b084630397119}{\+\_\+\+REG64}} \texorpdfstring{$\vert$}{|} \mbox{\hyperlink{make__512_8cpp_a5742baa03ee43c22c3047fa582fa5887}{\+\_\+\+REG64\+\_\+2}}}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00065}{65}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_aa69483d697ae1fe5935022b3ed3e8e15}\index{make\_512.cpp@{make\_512.cpp}!REG8@{REG8}}
+\index{REG8@{REG8}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{REG8}{REG8}}
+{\footnotesize\ttfamily \label{make__512_8cpp_aa69483d697ae1fe5935022b3ed3e8e15} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} REG8 = \mbox{\hyperlink{make__512_8cpp_a9eaef7072ae974e768b8edc3fb99b82c}{\+\_\+\+REG8}} \texorpdfstring{$\vert$}{|} \mbox{\hyperlink{make__512_8cpp_ab8be7cbacce8a6014ec06aac9b93c804}{REG8\+\_\+2}}\texorpdfstring{$\vert$}{|}\mbox{\hyperlink{make__512_8cpp_a76cf95ff5d6afdfd68727c32bda2f95f}{AL}}}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00069}{69}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_ab8be7cbacce8a6014ec06aac9b93c804}\index{make\_512.cpp@{make\_512.cpp}!REG8\_2@{REG8\_2}}
+\index{REG8\_2@{REG8\_2}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{REG8\_2}{REG8\_2}}
+{\footnotesize\ttfamily \label{make__512_8cpp_ab8be7cbacce8a6014ec06aac9b93c804} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} REG8\+\_\+2 = 0}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00056}{56}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_a7b0571d1353cf1acd73010b7739d60cf}\index{make\_512.cpp@{make\_512.cpp}!REG8\_3@{REG8\_3}}
+\index{REG8\_3@{REG8\_3}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{REG8\_3}{REG8\_3}}
+{\footnotesize\ttfamily \label{make__512_8cpp_a7b0571d1353cf1acd73010b7739d60cf} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} REG8\+\_\+3 = 0}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00057}{57}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_a9f0321038873714eef4abc67cc2a125b}\index{make\_512.cpp@{make\_512.cpp}!VM32X@{VM32X}}
+\index{VM32X@{VM32X}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{VM32X}{VM32X}}
+{\footnotesize\ttfamily \label{make__512_8cpp_a9f0321038873714eef4abc67cc2a125b} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} VM32X = \mbox{\hyperlink{make__512_8cpp_aaabdf2a4896f464c957c49f53153ce0d}{VM32\+X\+\_\+32}}}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00062}{62}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_aaabdf2a4896f464c957c49f53153ce0d}\index{make\_512.cpp@{make\_512.cpp}!VM32X\_32@{VM32X\_32}}
+\index{VM32X\_32@{VM32X\_32}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{VM32X\_32}{VM32X\_32}}
+{\footnotesize\ttfamily \label{make__512_8cpp_aaabdf2a4896f464c957c49f53153ce0d} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} VM32\+X\+\_\+32 = 1ULL $<$$<$ 39}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00035}{35}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_a004780f607b590db8013f6d884cadd68}\index{make\_512.cpp@{make\_512.cpp}!VM32X\_64@{VM32X\_64}}
+\index{VM32X\_64@{VM32X\_64}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{VM32X\_64}{VM32X\_64}}
+{\footnotesize\ttfamily \label{make__512_8cpp_a004780f607b590db8013f6d884cadd68} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} VM32\+X\+\_\+64 = 1ULL $<$$<$ 40}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00036}{36}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_aca902ec409e81f647c83054b037f7975}\index{make\_512.cpp@{make\_512.cpp}!VM32X\_K@{VM32X\_K}}
+\index{VM32X\_K@{VM32X\_K}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{VM32X\_K}{VM32X\_K}}
+{\footnotesize\ttfamily \label{make__512_8cpp_aca902ec409e81f647c83054b037f7975} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} VM32\+X\+\_\+K = 1ULL $<$$<$ 23}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00033}{33}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_ac79ccea5668ca71baecc92baa1f6cd53}\index{make\_512.cpp@{make\_512.cpp}!VM32Y@{VM32Y}}
+\index{VM32Y@{VM32Y}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{VM32Y}{VM32Y}}
+{\footnotesize\ttfamily \label{make__512_8cpp_ac79ccea5668ca71baecc92baa1f6cd53} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} VM32Y = \mbox{\hyperlink{make__512_8cpp_a72b32f434d7407fd7bdbe9c5e8d298bd}{VM32\+Y\+\_\+32}}}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00063}{63}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_a72b32f434d7407fd7bdbe9c5e8d298bd}\index{make\_512.cpp@{make\_512.cpp}!VM32Y\_32@{VM32Y\_32}}
+\index{VM32Y\_32@{VM32Y\_32}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{VM32Y\_32}{VM32Y\_32}}
+{\footnotesize\ttfamily \label{make__512_8cpp_a72b32f434d7407fd7bdbe9c5e8d298bd} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} VM32\+Y\+\_\+32 = 1ULL $<$$<$ 41}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00037}{37}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_a01004d1707569ffbbe59595e77f5191d}\index{make\_512.cpp@{make\_512.cpp}!VM32Y\_64@{VM32Y\_64}}
+\index{VM32Y\_64@{VM32Y\_64}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{VM32Y\_64}{VM32Y\_64}}
+{\footnotesize\ttfamily \label{make__512_8cpp_a01004d1707569ffbbe59595e77f5191d} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} VM32\+Y\+\_\+64 = 1ULL $<$$<$ 42}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00038}{38}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_a3ae13d9e77e54e465251160f319cb3f9}\index{make\_512.cpp@{make\_512.cpp}!VM32Y\_K@{VM32Y\_K}}
+\index{VM32Y\_K@{VM32Y\_K}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{VM32Y\_K}{VM32Y\_K}}
+{\footnotesize\ttfamily \label{make__512_8cpp_a3ae13d9e77e54e465251160f319cb3f9} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} VM32\+Y\+\_\+K = 1ULL $<$$<$ 37}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00073}{73}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_aedcbb97d96296a283a09e17e34f270cb}\index{make\_512.cpp@{make\_512.cpp}!VM32Z@{VM32Z}}
+\index{VM32Z@{VM32Z}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{VM32Z}{VM32Z}}
+{\footnotesize\ttfamily \label{make__512_8cpp_aedcbb97d96296a283a09e17e34f270cb} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} VM32Z = 1ULL $<$$<$ 19}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00030}{30}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_a5af152c47c8fad4c66131ec1841bfc14}\index{make\_512.cpp@{make\_512.cpp}!VM32Z\_K@{VM32Z\_K}}
+\index{VM32Z\_K@{VM32Z\_K}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{VM32Z\_K}{VM32Z\_K}}
+{\footnotesize\ttfamily \label{make__512_8cpp_a5af152c47c8fad4c66131ec1841bfc14} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} VM32\+Z\+\_\+K = 1ULL $<$$<$ 32}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00039}{39}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_a124b7b218ce6e3a6103fe2d4425bda63}\index{make\_512.cpp@{make\_512.cpp}!XMM@{XMM}}
+\index{XMM@{XMM}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{XMM}{XMM}}
+{\footnotesize\ttfamily \label{make__512_8cpp_a124b7b218ce6e3a6103fe2d4425bda63} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} XMM = \mbox{\hyperlink{make__512_8cpp_addaeb42855eb7715c61462dcab8af637}{\+\_\+\+XMM}} \texorpdfstring{$\vert$}{|} \mbox{\hyperlink{make__512_8cpp_a5f0a56f8df75ad89c3960efc6351f2dc}{\+\_\+\+XMM2}}}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00076}{76}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_af15701b93e8c6344f1851ac8b6a6fda1}\index{make\_512.cpp@{make\_512.cpp}!XMM\_ER@{XMM\_ER}}
+\index{XMM\_ER@{XMM\_ER}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{XMM\_ER}{XMM\_ER}}
+{\footnotesize\ttfamily \label{make__512_8cpp_af15701b93e8c6344f1851ac8b6a6fda1} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} XMM\+\_\+\+ER = 1ULL $<$$<$ 60}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00109}{109}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_ace421c8c46208bed331592b49bc0ae56}\index{make\_512.cpp@{make\_512.cpp}!XMM\_K@{XMM\_K}}
+\index{XMM\_K@{XMM\_K}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{XMM\_K}{XMM\_K}}
+{\footnotesize\ttfamily \label{make__512_8cpp_ace421c8c46208bed331592b49bc0ae56} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} XMM\+\_\+K = 1ULL $<$$<$ 9}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00021}{21}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_a1a5a52b2f4c19708e1b1ac34294a69bf}\index{make\_512.cpp@{make\_512.cpp}!XMM\_KZ@{XMM\_KZ}}
+\index{XMM\_KZ@{XMM\_KZ}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{XMM\_KZ}{XMM\_KZ}}
+{\footnotesize\ttfamily \label{make__512_8cpp_a1a5a52b2f4c19708e1b1ac34294a69bf} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} XMM\+\_\+\+KZ = 0}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00100}{100}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_a0a271e853075ef429f44471f1679eb21}\index{make\_512.cpp@{make\_512.cpp}!XMM\_SAE@{XMM\_SAE}}
+\index{XMM\_SAE@{XMM\_SAE}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{XMM\_SAE}{XMM\_SAE}}
+{\footnotesize\ttfamily \label{make__512_8cpp_a0a271e853075ef429f44471f1679eb21} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} XMM\+\_\+\+SAE = 1ULL $<$$<$ 51}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00094}{94}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_a14532b5c5f49b261c1a01546e5f4cd7b}\index{make\_512.cpp@{make\_512.cpp}!YMM@{YMM}}
+\index{YMM@{YMM}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{YMM}{YMM}}
+{\footnotesize\ttfamily \label{make__512_8cpp_a14532b5c5f49b261c1a01546e5f4cd7b} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} YMM = \mbox{\hyperlink{make__512_8cpp_ad16f7241d8cccbd25f6d16db95c6129f}{\+\_\+\+YMM}} \texorpdfstring{$\vert$}{|} \mbox{\hyperlink{make__512_8cpp_ac8294b254053eb3cfa9e5a50f31e7a4b}{\+\_\+\+YMM2}}}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00077}{77}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_abe5396c542df16d0a6dc566d1b21ae7e}\index{make\_512.cpp@{make\_512.cpp}!YMM\_ER@{YMM\_ER}}
+\index{YMM\_ER@{YMM\_ER}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{YMM\_ER}{YMM\_ER}}
+{\footnotesize\ttfamily \label{make__512_8cpp_abe5396c542df16d0a6dc566d1b21ae7e} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} YMM\+\_\+\+ER = 1ULL $<$$<$ 36}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00072}{72}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_aeac09571536abd8d24af68a99a9bc76c}\index{make\_512.cpp@{make\_512.cpp}!YMM\_K@{YMM\_K}}
+\index{YMM\_K@{YMM\_K}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{YMM\_K}{YMM\_K}}
+{\footnotesize\ttfamily \label{make__512_8cpp_aeac09571536abd8d24af68a99a9bc76c} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} YMM\+\_\+K = 1ULL $<$$<$ 10}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00022}{22}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_aedcae6bb9fa10a2e7162a582c82419ac}\index{make\_512.cpp@{make\_512.cpp}!YMM\_KZ@{YMM\_KZ}}
+\index{YMM\_KZ@{YMM\_KZ}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{YMM\_KZ}{YMM\_KZ}}
+{\footnotesize\ttfamily \label{make__512_8cpp_aedcae6bb9fa10a2e7162a582c82419ac} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} YMM\+\_\+\+KZ = 0}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00101}{101}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_a47fc28f28b313528526c668d6ec7a2c1}\index{make\_512.cpp@{make\_512.cpp}!YMM\_SAE@{YMM\_SAE}}
+\index{YMM\_SAE@{YMM\_SAE}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{YMM\_SAE}{YMM\_SAE}}
+{\footnotesize\ttfamily \label{make__512_8cpp_a47fc28f28b313528526c668d6ec7a2c1} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} YMM\+\_\+\+SAE = 1ULL $<$$<$ 0}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00012}{12}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_a2454b04f76aa72d11326da75d8ecbbd2}\index{make\_512.cpp@{make\_512.cpp}!ZMM@{ZMM}}
+\index{ZMM@{ZMM}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{ZMM}{ZMM}}
+{\footnotesize\ttfamily \label{make__512_8cpp_a2454b04f76aa72d11326da75d8ecbbd2} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} ZMM = \mbox{\hyperlink{make__512_8cpp_a71f1202a95724848188dca4b4aa75194}{\+\_\+\+ZMM}}}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00085}{85}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_aa1f3e6f2d81f171dad7e6effb984e213}\index{make\_512.cpp@{make\_512.cpp}!ZMM\_ER@{ZMM\_ER}}
+\index{ZMM\_ER@{ZMM\_ER}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{ZMM\_ER}{ZMM\_ER}}
+{\footnotesize\ttfamily \label{make__512_8cpp_aa1f3e6f2d81f171dad7e6effb984e213} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} ZMM\+\_\+\+ER = 1ULL $<$$<$ 49}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00090}{90}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_a4f0331a3abe3afd6248863e8d48e707a}\index{make\_512.cpp@{make\_512.cpp}!ZMM\_K@{ZMM\_K}}
+\index{ZMM\_K@{ZMM\_K}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{ZMM\_K}{ZMM\_K}}
+{\footnotesize\ttfamily \label{make__512_8cpp_a4f0331a3abe3afd6248863e8d48e707a} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} ZMM\+\_\+K = 1ULL $<$$<$ 11}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00023}{23}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_a91698d6fed8286b828607f80e62741ea}\index{make\_512.cpp@{make\_512.cpp}!ZMM\_KZ@{ZMM\_KZ}}
+\index{ZMM\_KZ@{ZMM\_KZ}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{ZMM\_KZ}{ZMM\_KZ}}
+{\footnotesize\ttfamily \label{make__512_8cpp_a91698d6fed8286b828607f80e62741ea} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} ZMM\+\_\+\+KZ = 0}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00102}{102}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+
+\Hypertarget{make__512_8cpp_af6efa3579d889fdfdb0f9f6d993b2175}\index{make\_512.cpp@{make\_512.cpp}!ZMM\_SAE@{ZMM\_SAE}}
+\index{ZMM\_SAE@{ZMM\_SAE}!make\_512.cpp@{make\_512.cpp}}
+\doxysubsubsection{\texorpdfstring{ZMM\_SAE}{ZMM\_SAE}}
+{\footnotesize\ttfamily \label{make__512_8cpp_af6efa3579d889fdfdb0f9f6d993b2175} 
+const \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}} ZMM\+\_\+\+SAE = 1ULL $<$$<$ 48}
+
+
+
+Definition at line \mbox{\hyperlink{make__512_8cpp_source_l00089}{89}} of file \mbox{\hyperlink{make__512_8cpp_source}{make\+\_\+512.\+cpp}}.
+

@@ -1,0 +1,61 @@
+\doxysection{libraries/fc/include/fc/crypto/webauthn\+\_\+json/test/unittest/unittest.cpp File Reference}
+\hypertarget{unittest_8cpp}{}\label{unittest_8cpp}\index{libraries/fc/include/fc/crypto/webauthn\_json/test/unittest/unittest.cpp@{libraries/fc/include/fc/crypto/webauthn\_json/test/unittest/unittest.cpp}}
+{\ttfamily \#include "{}unittest.\+h"{}}\newline
+{\ttfamily \#include "{}rapidjson/rapidjson.\+h"{}}\newline
+Include dependency graph for unittest.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{unittest_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{unittest_8cpp_a3c04138a5bfe5d72780bb7e82a18e627}{main}} (int argc, char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{unittest_8cpp_a3c04138a5bfe5d72780bb7e82a18e627}\index{unittest.cpp@{unittest.cpp}!main@{main}}
+\index{main@{main}!unittest.cpp@{unittest.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{unittest_8cpp_a3c04138a5bfe5d72780bb7e82a18e627} 
+int main (\begin{DoxyParamCaption}\item[{int}]{argc}{, }\item[{char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{argv}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{unittest_8cpp_source_l00031}{31}} of file \mbox{\hyperlink{unittest_8cpp_source}{unittest.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00032\ \ \ \ \ \mbox{\hyperlink{namespacetesting_afd726ae08c9bd16dc52f78c822d9946b}{::testing::InitGoogleTest}}(\&argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}});}
+\DoxyCodeLine{00033\ }
+\DoxyCodeLine{00034\ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}RapidJSON\ v"{}}\ <<\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gad283cfde97d9a32b7d8e8107b11f70a6}{RAPIDJSON\_VERSION\_STRING}}\ <<\ std::endl;}
+\DoxyCodeLine{00035\ }
+\DoxyCodeLine{00036\ \textcolor{preprocessor}{\#ifdef\ \_MSC\_VER}}
+\DoxyCodeLine{00037\ \ \ \ \ \_CrtMemState\ memoryState\ =\ \{\ 0\ \};}
+\DoxyCodeLine{00038\ \ \ \ \ (void)memoryState;}
+\DoxyCodeLine{00039\ \ \ \ \ \_CrtMemCheckpoint(\&memoryState);}
+\DoxyCodeLine{00040\ \ \ \ \ \textcolor{comment}{//\_CrtSetBreakAlloc(X);}}
+\DoxyCodeLine{00041\ \ \ \ \ \textcolor{comment}{//void\ *testWhetherMemoryLeakDetectionWorks\ =\ malloc(1);}}
+\DoxyCodeLine{00042\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00043\ }
+\DoxyCodeLine{00044\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ \mbox{\hyperlink{gtest_8h_a853a3792807489591d3d4a2f2ff9359f}{RUN\_ALL\_TESTS}}();}
+\DoxyCodeLine{00045\ }
+\DoxyCodeLine{00046\ \textcolor{preprocessor}{\#ifdef\ \_MSC\_VER}}
+\DoxyCodeLine{00047\ \ \ \ \ \textcolor{comment}{//\ Current\ gtest\ constantly\ leak\ 2\ blocks\ at\ exit}}
+\DoxyCodeLine{00048\ \ \ \ \ \_CrtMemDumpAllObjectsSince(\&memoryState);}
+\DoxyCodeLine{00049\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00050\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{00051\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{unittest_8cpp_a3c04138a5bfe5d72780bb7e82a18e627_cgraph}
+\end{center}
+\end{figure}

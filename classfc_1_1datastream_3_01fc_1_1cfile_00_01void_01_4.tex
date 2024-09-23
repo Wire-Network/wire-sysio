@@ -1,0 +1,173 @@
+\doxysection{fc\+::datastream\texorpdfstring{$<$}{<} fc\+::cfile, void \texorpdfstring{$>$}{>} Class Reference}
+\hypertarget{classfc_1_1datastream_3_01fc_1_1cfile_00_01void_01_4}{}\label{classfc_1_1datastream_3_01fc_1_1cfile_00_01void_01_4}\index{fc::datastream$<$ fc::cfile, void $>$@{fc::datastream$<$ fc::cfile, void $>$}}
+
+
+{\ttfamily \#include $<$cfile.\+hpp$>$}
+
+
+
+Inheritance diagram for fc\+::datastream\texorpdfstring{$<$}{<} fc\+::cfile, void \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=176pt]{classfc_1_1datastream_3_01fc_1_1cfile_00_01void_01_4__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for fc\+::datastream\texorpdfstring{$<$}{<} fc\+::cfile, void \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=176pt]{classfc_1_1datastream_3_01fc_1_1cfile_00_01void_01_4__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{classfc_1_1datastream_3_01fc_1_1cfile_00_01void_01_4_a793a75072225e716b1140b60bd2c5164}{seekp}} (size\+\_\+t pos)
+\item 
+bool \mbox{\hyperlink{classfc_1_1datastream_3_01fc_1_1cfile_00_01void_01_4_ac7de562eef11d557787a4851b132a5e4}{get}} (char \&c)
+\item 
+\mbox{\hyperlink{classfc_1_1cfile}{fc\+::cfile}} \& \mbox{\hyperlink{classfc_1_1datastream_3_01fc_1_1cfile_00_01void_01_4_ab5324fb71b5924a64e832c081b112d2d}{storage}} ()
+\item 
+const \mbox{\hyperlink{classfc_1_1cfile}{fc\+::cfile}} \& \mbox{\hyperlink{classfc_1_1datastream_3_01fc_1_1cfile_00_01void_01_4_a15405b2b534f410b1f2d3074def1d260}{storage}} () const
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classfc_1_1cfile}{fc\+::cfile}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1cfile_a4d2f8675ed5ebbe367d25ad685acfe7c}{cfile}} ()
+\item 
+void \mbox{\hyperlink{classfc_1_1cfile_ac4a0191d7846c07a907d3c7eb35e848d}{set\+\_\+file\+\_\+path}} (\mbox{\hyperlink{classfc_1_1path}{fc\+::path}} file\+\_\+path)
+\item 
+\mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \mbox{\hyperlink{classfc_1_1cfile_aba9b5dcf06d12cc653b8eb4224351ff7}{get\+\_\+file\+\_\+path}} () const
+\item 
+bool \mbox{\hyperlink{classfc_1_1cfile_ae5cdb4f43248d08842f7420b48534863}{is\+\_\+open}} () const
+\item 
+auto \mbox{\hyperlink{classfc_1_1cfile_a3b11f29f74860527a8bba66e4ae0317d}{fileno}} () const
+\item 
+void \mbox{\hyperlink{classfc_1_1cfile_a9e01adaeee108420312ed271133a2d7d}{open}} (const char \texorpdfstring{$\ast$}{*}mode)
+\item 
+size\+\_\+t \mbox{\hyperlink{classfc_1_1cfile_abc92fc8d64550b772a69ca1b63f75bfb}{tellp}} () const
+\item 
+void \mbox{\hyperlink{classfc_1_1cfile_a6eb4fe4530480f13c6cf773a7f1e3847}{seek}} (long loc)
+\item 
+void \mbox{\hyperlink{classfc_1_1cfile_a29badc2b6c1f589d0c79b20ce31cacf0}{seek\+\_\+end}} (long loc)
+\item 
+void \mbox{\hyperlink{classfc_1_1cfile_a960bb1297aecf2300137c29dcc4f1150}{skip}} (long loc)
+\item 
+void \mbox{\hyperlink{classfc_1_1cfile_a247250a28d17544a57dfafe07012d27b}{read}} (char \texorpdfstring{$\ast$}{*}d, size\+\_\+t n)
+\item 
+void \mbox{\hyperlink{classfc_1_1cfile_af6ad44b8179f355db75a9d01de931235}{write}} (const char \texorpdfstring{$\ast$}{*}d, size\+\_\+t n)
+\item 
+void \mbox{\hyperlink{classfc_1_1cfile_a2e03001fc7d98a010f98c56fb7c62a69}{flush}} ()
+\item 
+void \mbox{\hyperlink{classfc_1_1cfile_a28af656923422919ab5e1edcd7be51c2}{sync}} ()
+\item 
+void \mbox{\hyperlink{classfc_1_1cfile_a9727290ea0b449e34d6978a60ec22698}{punch\+\_\+hole}} (size\+\_\+t begin, size\+\_\+t end)
+\item 
+size\+\_\+t \mbox{\hyperlink{classfc_1_1cfile_a1a7fc670fbc0e24ac58d5ee341ad0182}{filesystem\+\_\+block\+\_\+size}} () const
+\item 
+bool \mbox{\hyperlink{classfc_1_1cfile_a4220f191fda28a149727bc15c34c8bc5}{eof}} () const
+\item 
+int \mbox{\hyperlink{classfc_1_1cfile_afcd3bdfce810b9ceb7e5a09396a68ed2}{getc}} ()
+\item 
+void \mbox{\hyperlink{classfc_1_1cfile_a25b3bbb8ed2f690b750a197380153985}{close}} ()
+\item 
+boost\+::interprocess\+::mapping\+\_\+handle\+\_\+t \mbox{\hyperlink{classfc_1_1cfile_a5f9754e5897232c67f8f7fd6fe744371}{get\+\_\+mapping\+\_\+handle}} () const
+\item 
+\mbox{\hyperlink{classfc_1_1cfile__datastream}{cfile\+\_\+datastream}} \mbox{\hyperlink{classfc_1_1cfile_a801dd3c493741ff16ef5cf609cc5f9c5}{create\+\_\+datastream}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Static Public Member Functions inherited from \mbox{\hyperlink{classfc_1_1cfile}{fc\+::cfile}}}
+\begin{DoxyCompactItemize}
+\item 
+static bool \mbox{\hyperlink{classfc_1_1cfile_a36ffef39be181b5580952817617ccf24}{supports\+\_\+hole\+\_\+punching}} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Static Public Attributes inherited from \mbox{\hyperlink{classfc_1_1cfile}{fc\+::cfile}}}
+\begin{DoxyCompactItemize}
+\item 
+static constexpr const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classfc_1_1cfile_a7a3023c63962b85efb8129379442234b}{create\+\_\+or\+\_\+update\+\_\+rw\+\_\+mode}} = "{}ab+"{}
+\item 
+static constexpr const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classfc_1_1cfile_a486ef6e86b5b889d2ebb2e4ed34ddd78}{update\+\_\+rw\+\_\+mode}} = "{}rb+"{}
+\item 
+static constexpr const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classfc_1_1cfile_a2dbf3113db83934d8036cd6e2245cb75}{truncate\+\_\+rw\+\_\+mode}} = "{}wb+"{}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{cfile_8hpp_source_l00254}{254}} of file \mbox{\hyperlink{cfile_8hpp_source}{cfile.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1datastream_3_01fc_1_1cfile_00_01void_01_4_ac7de562eef11d557787a4851b132a5e4}\index{fc::datastream$<$ fc::cfile, void $>$@{fc::datastream$<$ fc::cfile, void $>$}!get@{get}}
+\index{get@{get}!fc::datastream$<$ fc::cfile, void $>$@{fc::datastream$<$ fc::cfile, void $>$}}
+\doxysubsubsection{\texorpdfstring{get()}{get()}}
+{\footnotesize\ttfamily \label{classfc_1_1datastream_3_01fc_1_1cfile_00_01void_01_4_ac7de562eef11d557787a4851b132a5e4} 
+bool \mbox{\hyperlink{classfc_1_1datastream}{fc\+::datastream}}$<$ \mbox{\hyperlink{classfc_1_1cfile}{fc\+::cfile}}, void $>$\+::get (\begin{DoxyParamCaption}\item[{char \&}]{c}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{cfile_8hpp_source_l00260}{260}} of file \mbox{\hyperlink{cfile_8hpp_source}{cfile.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00260\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00261\ \ \ \ \ \ \ c\ =\ this-\/>\mbox{\hyperlink{classfc_1_1cfile_afcd3bdfce810b9ceb7e5a09396a68ed2}{getc}}();}
+\DoxyCodeLine{00262\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00263\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1datastream_3_01fc_1_1cfile_00_01void_01_4_a793a75072225e716b1140b60bd2c5164}\index{fc::datastream$<$ fc::cfile, void $>$@{fc::datastream$<$ fc::cfile, void $>$}!seekp@{seekp}}
+\index{seekp@{seekp}!fc::datastream$<$ fc::cfile, void $>$@{fc::datastream$<$ fc::cfile, void $>$}}
+\doxysubsubsection{\texorpdfstring{seekp()}{seekp()}}
+{\footnotesize\ttfamily \label{classfc_1_1datastream_3_01fc_1_1cfile_00_01void_01_4_a793a75072225e716b1140b60bd2c5164} 
+bool \mbox{\hyperlink{classfc_1_1datastream}{fc\+::datastream}}$<$ \mbox{\hyperlink{classfc_1_1cfile}{fc\+::cfile}}, void $>$\+::seekp (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{pos}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{cfile_8hpp_source_l00258}{258}} of file \mbox{\hyperlink{cfile_8hpp_source}{cfile.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00258\ \{\ \textcolor{keywordflow}{return}\ this-\/>\mbox{\hyperlink{classfc_1_1cfile_a6eb4fe4530480f13c6cf773a7f1e3847}{seek}}(pos),\ \textcolor{keyword}{true};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1datastream_3_01fc_1_1cfile_00_01void_01_4_ab5324fb71b5924a64e832c081b112d2d}\index{fc::datastream$<$ fc::cfile, void $>$@{fc::datastream$<$ fc::cfile, void $>$}!storage@{storage}}
+\index{storage@{storage}!fc::datastream$<$ fc::cfile, void $>$@{fc::datastream$<$ fc::cfile, void $>$}}
+\doxysubsubsection{\texorpdfstring{storage()}{storage()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1datastream_3_01fc_1_1cfile_00_01void_01_4_ab5324fb71b5924a64e832c081b112d2d} 
+\mbox{\hyperlink{classfc_1_1cfile}{fc\+::cfile}} \& \mbox{\hyperlink{classfc_1_1datastream}{fc\+::datastream}}$<$ \mbox{\hyperlink{classfc_1_1cfile}{fc\+::cfile}}, void $>$\+::storage (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{cfile_8hpp_source_l00265}{265}} of file \mbox{\hyperlink{cfile_8hpp_source}{cfile.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00265\ \{\ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1datastream_3_01fc_1_1cfile_00_01void_01_4_a15405b2b534f410b1f2d3074def1d260}\index{fc::datastream$<$ fc::cfile, void $>$@{fc::datastream$<$ fc::cfile, void $>$}!storage@{storage}}
+\index{storage@{storage}!fc::datastream$<$ fc::cfile, void $>$@{fc::datastream$<$ fc::cfile, void $>$}}
+\doxysubsubsection{\texorpdfstring{storage()}{storage()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1datastream_3_01fc_1_1cfile_00_01void_01_4_a15405b2b534f410b1f2d3074def1d260} 
+const \mbox{\hyperlink{classfc_1_1cfile}{fc\+::cfile}} \& \mbox{\hyperlink{classfc_1_1datastream}{fc\+::datastream}}$<$ \mbox{\hyperlink{classfc_1_1cfile}{fc\+::cfile}}, void $>$\+::storage (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{cfile_8hpp_source_l00266}{266}} of file \mbox{\hyperlink{cfile_8hpp_source}{cfile.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00266\ \{\ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};\ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/io/\mbox{\hyperlink{cfile_8hpp}{cfile.\+hpp}}\end{DoxyCompactItemize}

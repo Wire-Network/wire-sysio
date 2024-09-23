@@ -1,0 +1,76 @@
+\doxysection{test\+\_\+hash\+\_\+functions.\+cpp}
+\hypertarget{test__hash__functions_8cpp_source}{}\label{test__hash__functions_8cpp_source}\index{libraries/fc/test/crypto/test\_hash\_functions.cpp@{libraries/fc/test/crypto/test\_hash\_functions.cpp}}
+\mbox{\hyperlink{test__hash__functions_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00001}\mbox{\hyperlink{test__hash__functions_8cpp_a6b2a3852db8bb19ab6909bac01859985}{00001}}\ \textcolor{preprocessor}{\#define\ BOOST\_TEST\_MODULE\ hash\_functions}}
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <boost/test/included/unit\_test.hpp>}}
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{hex_8hpp}{fc/crypto/hex.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{sha3_8hpp}{fc/crypto/sha3.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{utility_8hpp}{fc/utility.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00008}00008\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacefc}{fc}};}
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00010}00010\ BOOST\_AUTO\_TEST\_SUITE(hash\_functions)}
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00011}\mbox{\hyperlink{test__hash__functions_8cpp_a56ee90c0ea6250d1e3d878409eaa5250}{00011}}\ \mbox{\hyperlink{test__hash__functions_8cpp_a56ee90c0ea6250d1e3d878409eaa5250}{BOOST\_AUTO\_TEST\_CASE}}(\mbox{\hyperlink{classfc_1_1sha3}{sha3}})\ \mbox{\hyperlink{hello__driver_8cpp_abe4cc9788f52e49485473dc699537388}{try}}\ \{}
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00013}00013\ \ \ \ \textcolor{keyword}{using\ }test\_sha3\ =\ std::tuple<std::string,\ std::string>;}
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00014}00014\ \ \ \ \textcolor{keyword}{const}\ std::vector<test\_sha3>\ tests\ \{}
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00015}00015\ \ \ \ \ \ \ \textcolor{comment}{//test}}
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00016}00016\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00017}00017\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}"{}},}
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00018}00018\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}a7ffc6f8bf1ed76651c14756a061d662f580ff4de43b49fa82d80a4b80f8434a"{}},}
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00019}00019\ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00021}00021\ \ \ \ \ \ \ \textcolor{comment}{//test}}
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00022}00022\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00023}00023\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}abc"{}},}
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00024}00024\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}3a985da74fe225b2045c172d6bd390bd855f086e3e9d525b46bfe24511431532"{}},}
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00025}00025\ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00027}00027\ \ \ \ \ \ \ \textcolor{comment}{//test}}
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00028}00028\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00029}00029\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq"{}},}
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00030}00030\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}41c0dba2a9d6240849100376a8235e2c82e1b9998a999e21db32dd97496d3376"{}},}
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00031}00031\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00032}00032\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00034}00034\ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ test\ :\ tests)\ \{}
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00035}00035\ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\mbox{\hyperlink{classfc_1_1sha3_ab47e22ec4bb69f566052b99c74f4056a}{fc::sha3::hash}}(std::get<0>(test),\ \textcolor{keyword}{true}).str(),\ std::get<1>(test));}
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00036}00036\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00038}\mbox{\hyperlink{test__hash__functions_8cpp_ae70bfa24f5a3bc0917382b3c17fc033c}{00038}}\ \}\ \mbox{\hyperlink{test__hash__functions_8cpp_ae70bfa24f5a3bc0917382b3c17fc033c}{FC\_LOG\_AND\_RETHROW}}();}
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00041}\mbox{\hyperlink{test__hash__functions_8cpp_a413970cea58f207c9ab5a37e67cc7438}{00041}}\ \mbox{\hyperlink{test__hash__functions_8cpp_a56ee90c0ea6250d1e3d878409eaa5250}{BOOST\_AUTO\_TEST\_CASE}}(keccak256)\ \textcolor{keyword}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00043}00043\ \ \ \ \textcolor{keyword}{using\ }test\_keccak256\ =\ std::tuple<std::string,\ std::string>;}
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00044}00044\ \ \ \ \textcolor{keyword}{const}\ std::vector<test\_keccak256>\ tests\ \{}
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00045}00045\ \ \ \ \ \ \ \textcolor{comment}{//test}}
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00046}00046\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00047}00047\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}"{}},}
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470"{}},}
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00049}00049\ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00051}00051\ \ \ \ \ \ \ \textcolor{comment}{//test}}
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00052}00052\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}abc"{}},}
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}4e03657aea45a94fc7d47ba826c8d667c0d1e6e33a64a036ec44f58fa12d6c45"{}},}
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00055}00055\ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00057}00057\ \ \ \ \ \ \ \textcolor{comment}{//test}}
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00058}00058\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00059}00059\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq"{}},}
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}45d3b367a6904e6e8d502ee04999a7c27647f91fa845d456525fd352ae3d7371"{}},}
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00061}00061\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00062}00062\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00064}00064\ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ test\ :\ tests)\ \{}
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00065}00065\ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\mbox{\hyperlink{classfc_1_1sha3_ab47e22ec4bb69f566052b99c74f4056a}{fc::sha3::hash}}(std::get<0>(test),\ \textcolor{keyword}{false}).str(),\ std::get<1>(test));}
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00066}00066\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00067}00067\ }
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00068}00068\ \}\ \mbox{\hyperlink{test__hash__functions_8cpp_ae70bfa24f5a3bc0917382b3c17fc033c}{FC\_LOG\_AND\_RETHROW}}();}
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00069}00069\ }
+\DoxyCodeLine{\Hypertarget{test__hash__functions_8cpp_source_l00070}00070\ BOOST\_AUTO\_TEST\_SUITE\_END()}
+
+\end{DoxyCode}

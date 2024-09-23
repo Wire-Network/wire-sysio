@@ -1,0 +1,69 @@
+\doxysection{testing\+::internal\+::Set\+Argument\+Pointee\+Action\texorpdfstring{$<$}{<} N, A, k\+Is\+Proto \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classtesting_1_1internal_1_1_set_argument_pointee_action}{}\label{classtesting_1_1internal_1_1_set_argument_pointee_action}\index{testing::internal::SetArgumentPointeeAction$<$ N, A, kIsProto $>$@{testing::internal::SetArgumentPointeeAction$<$ N, A, kIsProto $>$}}
+
+
+{\ttfamily \#include $<$gmock-\/actions.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_set_argument_pointee_action_a5a4119ed113667bd4a003ab0bec2cdff}{Set\+Argument\+Pointee\+Action}} (const \mbox{\hyperlink{struct_a}{A}} \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})
+\item 
+{\footnotesize template$<$typename Result , typename Argument\+Tuple $>$ }\\void \mbox{\hyperlink{classtesting_1_1internal_1_1_set_argument_pointee_action_a128320dcf991ff7f1a0087dab38b4014}{Perform}} (const Argument\+Tuple \&args) const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$size\+\_\+t N, typename \mbox{\hyperlink{struct_a}{A}}, bool k\+Is\+Proto$>$\newline
+class testing\+::internal\+::\+Set\+Argument\+Pointee\+Action$<$ N, A, k\+Is\+Proto $>$}
+
+
+Definition at line \mbox{\hyperlink{gmock-actions_8h_source_l00833}{833}} of file \mbox{\hyperlink{gmock-actions_8h_source}{gmock-\/actions.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_set_argument_pointee_action_a5a4119ed113667bd4a003ab0bec2cdff}\index{testing::internal::SetArgumentPointeeAction$<$ N, A, kIsProto $>$@{testing::internal::SetArgumentPointeeAction$<$ N, A, kIsProto $>$}!SetArgumentPointeeAction@{SetArgumentPointeeAction}}
+\index{SetArgumentPointeeAction@{SetArgumentPointeeAction}!testing::internal::SetArgumentPointeeAction$<$ N, A, kIsProto $>$@{testing::internal::SetArgumentPointeeAction$<$ N, A, kIsProto $>$}}
+\doxysubsubsection{\texorpdfstring{SetArgumentPointeeAction()}{SetArgumentPointeeAction()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_set_argument_pointee_action_a5a4119ed113667bd4a003ab0bec2cdff} 
+template$<$size\+\_\+t N, typename \mbox{\hyperlink{struct_a}{A}} , bool k\+Is\+Proto$>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_set_argument_pointee_action}{testing\+::internal\+::\+Set\+Argument\+Pointee\+Action}}$<$ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}, \mbox{\hyperlink{struct_a}{A}}, k\+Is\+Proto $>$\+::\+Set\+Argument\+Pointee\+Action (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct_a}{A}} \&}]{value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-actions_8h_source_l00837}{837}} of file \mbox{\hyperlink{gmock-actions_8h_source}{gmock-\/actions.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00837\ :\ value\_(\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}})\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_set_argument_pointee_action_a128320dcf991ff7f1a0087dab38b4014}\index{testing::internal::SetArgumentPointeeAction$<$ N, A, kIsProto $>$@{testing::internal::SetArgumentPointeeAction$<$ N, A, kIsProto $>$}!Perform@{Perform}}
+\index{Perform@{Perform}!testing::internal::SetArgumentPointeeAction$<$ N, A, kIsProto $>$@{testing::internal::SetArgumentPointeeAction$<$ N, A, kIsProto $>$}}
+\doxysubsubsection{\texorpdfstring{Perform()}{Perform()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_set_argument_pointee_action_a128320dcf991ff7f1a0087dab38b4014} 
+template$<$size\+\_\+t N, typename \mbox{\hyperlink{struct_a}{A}} , bool k\+Is\+Proto$>$ \\
+template$<$typename Result , typename Argument\+Tuple $>$ \\
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_set_argument_pointee_action}{testing\+::internal\+::\+Set\+Argument\+Pointee\+Action}}$<$ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}, \mbox{\hyperlink{struct_a}{A}}, k\+Is\+Proto $>$\+::\+Perform (\begin{DoxyParamCaption}\item[{const Argument\+Tuple \&}]{args}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-actions_8h_source_l00840}{840}} of file \mbox{\hyperlink{gmock-actions_8h_source}{gmock-\/actions.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00840\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00841\ \ \ \ \ CompileAssertTypesEqual<void,\ Result>();}
+\DoxyCodeLine{00842\ \ \ \ \ *::testing::get<N>(args)\ =\ value\_;}
+\DoxyCodeLine{00843\ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/include/gmock/\mbox{\hyperlink{gmock-actions_8h}{gmock-\/actions.\+h}}\end{DoxyCompactItemize}

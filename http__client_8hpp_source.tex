@@ -1,0 +1,39 @@
+\doxysection{http\+\_\+client.\+hpp}
+\hypertarget{http__client_8hpp_source}{}\label{http__client_8hpp_source}\index{libraries/fc/include/fc/network/http/http\_client.hpp@{libraries/fc/include/fc/network/http/http\_client.hpp}}
+\mbox{\hyperlink{http__client_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{http__client_8hpp_source_l00001}00001\ }
+\DoxyCodeLine{\Hypertarget{http__client_8hpp_source_l00005}00005\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{http__client_8hpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{http__client_8hpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{static__variant_8hpp}{fc/static\_variant.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{http__client_8hpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{include_2fc_2time_8hpp}{fc/time.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{http__client_8hpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{fc_2include_2fc_2variant_8hpp}{fc/variant.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{http__client_8hpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{exception_8hpp}{fc/exception/exception.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{http__client_8hpp_source_l00011}00011\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{url_8hpp}{fc/network/url.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{http__client_8hpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{http__client_8hpp_source_l00013}00013\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8hpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{http__client_8hpp_source_l00015}\mbox{\hyperlink{classfc_1_1http__client}{00015}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classfc_1_1http__client}{http\_client}}\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8hpp_source_l00016}00016\ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{http__client_8hpp_source_l00017}00017\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1http__client_ae8bd9f4a127653e1e874239354f48fee}{http\_client}}();}
+\DoxyCodeLine{\Hypertarget{http__client_8hpp_source_l00018}00018\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1http__client_a156a26b1214829a2b973fb1f7d91eb79}{\string~http\_client}}();}
+\DoxyCodeLine{\Hypertarget{http__client_8hpp_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{http__client_8hpp_source_l00020}00020\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{variant}}\ \mbox{\hyperlink{classfc_1_1http__client_a17c7f208e97d47e1b8e17f9f07c9821d}{post\_sync}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1url}{url}}\&\ dest,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1variant}{variant}}\&\ payload,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1time__point}{time\_point}}\&\ deadline\ =\ \mbox{\hyperlink{classfc_1_1time__point_aeccf1b70aa34b132c5269313b8a50573}{time\_point::maximum}}());}
+\DoxyCodeLine{\Hypertarget{http__client_8hpp_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{http__client_8hpp_source_l00022}00022\ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{http__client_8hpp_source_l00023}\mbox{\hyperlink{classfc_1_1http__client_a93331c2706ae276fad2daee42cafac58}{00023}}\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{variant}}\ \mbox{\hyperlink{classfc_1_1http__client_a93331c2706ae276fad2daee42cafac58}{post\_sync}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1url}{url}}\&\ dest,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\&\ payload,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1time__point}{time\_point}}\&\ deadline\ =\ \mbox{\hyperlink{classfc_1_1time__point_aeccf1b70aa34b132c5269313b8a50573}{time\_point::maximum}}())\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8hpp_source_l00024}00024\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{variant}}\ payload\_v;}
+\DoxyCodeLine{\Hypertarget{http__client_8hpp_source_l00025}00025\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_adea61f2343de94d0fbcb920a32332ad9}{to\_variant}}(payload,\ payload\_v);}
+\DoxyCodeLine{\Hypertarget{http__client_8hpp_source_l00026}00026\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1http__client_a17c7f208e97d47e1b8e17f9f07c9821d}{post\_sync}}(dest,\ payload\_v,\ deadline);}
+\DoxyCodeLine{\Hypertarget{http__client_8hpp_source_l00027}00027\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{http__client_8hpp_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{http__client_8hpp_source_l00029}00029\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1http__client_a7be49c9a7578612da641aa1be766e8e2}{add\_cert}}(\textcolor{keyword}{const}\ std::string\&\ cert\_pem\_string);}
+\DoxyCodeLine{\Hypertarget{http__client_8hpp_source_l00030}00030\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1http__client_a4f7481e8e58038bd9c362453012fa4c9}{set\_verify\_peers}}(\textcolor{keywordtype}{bool}\ enabled);}
+\DoxyCodeLine{\Hypertarget{http__client_8hpp_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{http__client_8hpp_source_l00032}00032\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{http__client_8hpp_source_l00033}00033\ \ \ \ std::unique\_ptr<class\ http\_client\_impl>\ \_my;}
+\DoxyCodeLine{\Hypertarget{http__client_8hpp_source_l00034}00034\ \};}
+\DoxyCodeLine{\Hypertarget{http__client_8hpp_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{http__client_8hpp_source_l00036}00036\ \}}
+
+\end{DoxyCode}

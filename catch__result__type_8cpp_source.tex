@@ -1,0 +1,33 @@
+\doxysection{catch\+\_\+result\+\_\+type.\+cpp}
+\hypertarget{catch__result__type_8cpp_source}{}\label{catch__result__type_8cpp_source}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_result\_type.cpp@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_result\_type.cpp}}
+\mbox{\hyperlink{catch__result__type_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{catch__result__type_8cpp_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{catch__result__type_8cpp_source_l00002}00002\ \textcolor{comment}{\ *\ \ Created\ by\ Phil\ on\ 07/01/2011.}}
+\DoxyCodeLine{\Hypertarget{catch__result__type_8cpp_source_l00003}00003\ \textcolor{comment}{\ *\ \ Copyright\ 2011\ Two\ Blue\ Cubes\ Ltd.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{catch__result__type_8cpp_source_l00004}00004\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{catch__result__type_8cpp_source_l00005}00005\ \textcolor{comment}{\ *\ \ Distributed\ under\ the\ Boost\ Software\ License,\ Version\ 1.0.\ (See\ accompanying}}
+\DoxyCodeLine{\Hypertarget{catch__result__type_8cpp_source_l00006}00006\ \textcolor{comment}{\ *\ \ file\ LICENSE\_1\_0.txt\ or\ copy\ at\ http://www.boost.org/LICENSE\_1\_0.txt)}}
+\DoxyCodeLine{\Hypertarget{catch__result__type_8cpp_source_l00007}00007\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{catch__result__type_8cpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{catch__result__type_8cpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__result__type_8h}{catch\_result\_type.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__result__type_8cpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{catch__result__type_8cpp_source_l00011}00011\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__result__type_8cpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{catch__result__type_8cpp_source_l00013}\mbox{\hyperlink{namespace_catch_a5205869c81c06d3460759cb86676ae68}{00013}}\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespace_catch_a5205869c81c06d3460759cb86676ae68}{isOk}}(\ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601ef}{ResultWas::OfType}}\ resultType\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__result__type_8cpp_source_l00014}00014\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (\ resultType\ \&\ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efadbb05c8a5a093c8ca0926c22ba34a6cc}{ResultWas::FailureBit}}\ )\ ==\ 0;}
+\DoxyCodeLine{\Hypertarget{catch__result__type_8cpp_source_l00015}00015\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__result__type_8cpp_source_l00016}\mbox{\hyperlink{namespace_catch_a54b01af61673a3e1f21f31713639b180}{00016}}\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespace_catch_a54b01af61673a3e1f21f31713639b180}{isJustInfo}}(\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae0ed371842ace71a7886a6134ecbcb62}{flags}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__result__type_8cpp_source_l00017}00017\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae0ed371842ace71a7886a6134ecbcb62}{flags}}\ ==\ \mbox{\hyperlink{struct_catch_1_1_result_was_a624e1ee3661fcf6094ceef1f654601efae8d83c08b4e070286dd95134ad2152bb}{ResultWas::Info}};}
+\DoxyCodeLine{\Hypertarget{catch__result__type_8cpp_source_l00018}00018\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__result__type_8cpp_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{catch__result__type_8cpp_source_l00020}\mbox{\hyperlink{namespace_catch_ab32a083e442cc09f736327d2e2865999}{00020}}\ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_result_disposition_a3396cad6e2259af326b3aae93e23e9d8}{ResultDisposition::Flags}}\ \mbox{\hyperlink{namespace_catch_ab32a083e442cc09f736327d2e2865999}{operator\ |\ }}(\ \mbox{\hyperlink{struct_catch_1_1_result_disposition_a3396cad6e2259af326b3aae93e23e9d8}{ResultDisposition::Flags}}\ lhs,\ \mbox{\hyperlink{struct_catch_1_1_result_disposition_a3396cad6e2259af326b3aae93e23e9d8}{ResultDisposition::Flags}}\ rhs\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__result__type_8cpp_source_l00021}00021\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{struct_catch_1_1_result_disposition_a3396cad6e2259af326b3aae93e23e9d8}{ResultDisposition::Flags}}\textcolor{keyword}{>}(\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(\ lhs\ )\ |\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(\ rhs\ )\ );}
+\DoxyCodeLine{\Hypertarget{catch__result__type_8cpp_source_l00022}00022\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__result__type_8cpp_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{catch__result__type_8cpp_source_l00024}\mbox{\hyperlink{namespace_catch_a7f7480b15d74965459c844f0d393ed87}{00024}}\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespace_catch_a7f7480b15d74965459c844f0d393ed87}{shouldContinueOnFailure}}(\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae0ed371842ace71a7886a6134ecbcb62}{flags}}\ )\ \ \ \ \{\ \textcolor{keywordflow}{return}\ (\ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae0ed371842ace71a7886a6134ecbcb62}{flags}}\ \&\ \mbox{\hyperlink{struct_catch_1_1_result_disposition_a3396cad6e2259af326b3aae93e23e9d8a5adbb8bdfe4bf14bf37cb297d8b18b64}{ResultDisposition::ContinueOnFailure}}\ )\ !=\ 0;\ \}}
+\DoxyCodeLine{\Hypertarget{catch__result__type_8cpp_source_l00025}\mbox{\hyperlink{namespace_catch_ab91eb13081203d634fe48d3d2ab386d7}{00025}}\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespace_catch_ab91eb13081203d634fe48d3d2ab386d7}{shouldSuppressFailure}}(\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae0ed371842ace71a7886a6134ecbcb62}{flags}}\ )\ \ \ \ \ \ \{\ \textcolor{keywordflow}{return}\ (\ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae0ed371842ace71a7886a6134ecbcb62}{flags}}\ \&\ \mbox{\hyperlink{struct_catch_1_1_result_disposition_a3396cad6e2259af326b3aae93e23e9d8ac6212775ec7a943e9c49e451f5ff5467}{ResultDisposition::SuppressFail}}\ )\ !=\ 0;\ \}}
+\DoxyCodeLine{\Hypertarget{catch__result__type_8cpp_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{catch__result__type_8cpp_source_l00027}00027\ \}\ \textcolor{comment}{//\ end\ namespace\ Catch}}
+
+\end{DoxyCode}

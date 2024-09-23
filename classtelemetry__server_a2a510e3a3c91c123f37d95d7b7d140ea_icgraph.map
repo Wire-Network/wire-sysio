@@ -1,0 +1,10 @@
+<map id="telemetry_server::set_timer" name="telemetry_server::set_timer">
+<area shape="rect" id="Node000001" title=" " alt="" coords="295,5,439,46"/>
+<area shape="rect" id="Node000002" href="$classtelemetry__server.html#acc29e40bd4262e42b3d16e4fcd79ec22" title=" " alt="" coords="105,5,245,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="280,37,245,37,245,32,280,32"/>
+<area shape="rect" id="Node000003" href="$classtelemetry__server.html#a8c09eba40e8993079859e9f1974254ab" title=" " alt="" coords="103,70,247,96"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="283,53,221,72,220,67,282,48"/>
+<area shape="poly" id="edge2_Node000002_Node000001" title=" " alt="" coords="261,14,295,14,295,20,261,19"/>
+<area shape="rect" id="Node000004" href="$telemetry__server_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97" title=" " alt="" coords="5,70,55,96"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="87,86,55,86,55,80,87,80"/>
+</map>

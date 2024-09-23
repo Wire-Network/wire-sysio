@@ -1,0 +1,76 @@
+\doxysection{Catch\+::Redirected\+Std\+Out Class Reference}
+\hypertarget{class_catch_1_1_redirected_std_out}{}\label{class_catch_1_1_redirected_std_out}\index{Catch::RedirectedStdOut@{Catch::RedirectedStdOut}}
+
+
+{\ttfamily \#include $<$catch\+\_\+output\+\_\+redirect.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_catch_1_1_redirected_std_out_a5c9651c5bbc920c3da670069cb6201b4}{Redirected\+Std\+Out}} ()
+\item 
+auto \mbox{\hyperlink{class_catch_1_1_redirected_std_out_afd46da9836223d033c031fb08a9efb1c}{str}} () const -\/$>$ std\+::string
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{catch__output__redirect_8h_source_l00029}{29}} of file \mbox{\hyperlink{catch__output__redirect_8h_source}{catch\+\_\+output\+\_\+redirect.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_catch_1_1_redirected_std_out_a5c9651c5bbc920c3da670069cb6201b4}\index{Catch::RedirectedStdOut@{Catch::RedirectedStdOut}!RedirectedStdOut@{RedirectedStdOut}}
+\index{RedirectedStdOut@{RedirectedStdOut}!Catch::RedirectedStdOut@{Catch::RedirectedStdOut}}
+\doxysubsubsection{\texorpdfstring{RedirectedStdOut()}{RedirectedStdOut()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_redirected_std_out_a5c9651c5bbc920c3da670069cb6201b4} 
+Catch\+::\+Redirected\+Std\+Out\+::\+Redirected\+Std\+Out (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__output__redirect_8cpp_source_l00043}{43}} of file \mbox{\hyperlink{catch__output__redirect_8cpp_source}{catch\+\_\+output\+\_\+redirect.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00043\ :\ m\_cout(\ \mbox{\hyperlink{namespace_catch_a0179d453617ba2296f2baa99a49e7264}{Catch::cout}}(),\ m\_rss.\mbox{\hyperlink{class_catch_1_1_reusable_string_stream_a6881808c60a080d4e24a0b81c94cbf67}{get}}()\ )\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_catch_1_1_redirected_std_out_afd46da9836223d033c031fb08a9efb1c}\index{Catch::RedirectedStdOut@{Catch::RedirectedStdOut}!str@{str}}
+\index{str@{str}!Catch::RedirectedStdOut@{Catch::RedirectedStdOut}}
+\doxysubsubsection{\texorpdfstring{str()}{str()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_redirected_std_out_afd46da9836223d033c031fb08a9efb1c} 
+auto Catch\+::\+Redirected\+Std\+Out\+::str (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const -\/$>$ std\+::string}
+
+
+
+Definition at line \mbox{\hyperlink{catch__output__redirect_8cpp_source_l00044}{44}} of file \mbox{\hyperlink{catch__output__redirect_8cpp_source}{catch\+\_\+output\+\_\+redirect.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00044\ \{\ \textcolor{keywordflow}{return}\ m\_rss.\mbox{\hyperlink{class_catch_1_1_reusable_string_stream_a0e9ecf260b2a5d35f4886ef0d51f6270}{str}}();\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_redirected_std_out_afd46da9836223d033c031fb08a9efb1c_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_redirected_std_out_afd46da9836223d033c031fb08a9efb1c_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__output__redirect_8h}{catch\+\_\+output\+\_\+redirect.\+h}}\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__output__redirect_8cpp}{catch\+\_\+output\+\_\+redirect.\+cpp}}\end{DoxyCompactItemize}

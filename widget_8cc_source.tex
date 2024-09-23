@@ -1,0 +1,69 @@
+\doxysection{widget.\+cc}
+\hypertarget{widget_8cc_source}{}\label{widget_8cc_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/xcode/Samples/FrameworkSample/widget.cc@{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/xcode/Samples/FrameworkSample/widget.cc}}
+\mbox{\hyperlink{widget_8cc}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00001}00001\ \textcolor{comment}{//\ Copyright\ 2008,\ Google\ Inc.}}
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00002}00002\ \textcolor{comment}{//\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00003}00003\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00004}00004\ \textcolor{comment}{//\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00005}00005\ \textcolor{comment}{//\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are}}
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00006}00006\ \textcolor{comment}{//\ met:}}
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00007}00007\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00008}00008\ \textcolor{comment}{//\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00009}00009\ \textcolor{comment}{//\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00010}00010\ \textcolor{comment}{//\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above}}
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00011}00011\ \textcolor{comment}{//\ copyright\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer}}
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00012}00012\ \textcolor{comment}{//\ in\ the\ documentation\ and/or\ other\ materials\ provided\ with\ the}}
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00013}00013\ \textcolor{comment}{//\ distribution.}}
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00014}00014\ \textcolor{comment}{//\ \ \ \ \ *\ Neither\ the\ name\ of\ Google\ Inc.\ nor\ the\ names\ of\ its}}
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00015}00015\ \textcolor{comment}{//\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products\ derived\ from}}
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00016}00016\ \textcolor{comment}{//\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00017}00017\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00018}00018\ \textcolor{comment}{//\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS}}
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00019}00019\ \textcolor{comment}{//\ "{}AS\ IS"{}\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00020}00020\ \textcolor{comment}{//\ LIMITED\ TO,\ THE\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR}}
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00021}00021\ \textcolor{comment}{//\ A\ PARTICULAR\ PURPOSE\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ THE\ COPYRIGHT}}
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00022}00022\ \textcolor{comment}{//\ OWNER\ OR\ CONTRIBUTORS\ BE\ LIABLE\ FOR\ ANY\ DIRECT,\ INDIRECT,\ INCIDENTAL,}}
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00023}00023\ \textcolor{comment}{//\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES\ (INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00024}00024\ \textcolor{comment}{//\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;\ LOSS\ OF\ USE,}}
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00025}00025\ \textcolor{comment}{//\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND\ ON\ ANY}}
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00026}00026\ \textcolor{comment}{//\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00027}00027\ \textcolor{comment}{//\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE}}
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00028}00028\ \textcolor{comment}{//\ OF\ THIS\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00029}00029\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00030}00030\ \textcolor{comment}{//\ Author:\ preston.a.jackson@gmail.com\ (Preston\ Jackson)}}
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00031}00031\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00032}00032\ \textcolor{comment}{//\ Google\ Test\ -\/\ FrameworkSample}}
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00033}00033\ \textcolor{comment}{//\ widget.cc}}
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00034}00034\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00036}00036\ \textcolor{comment}{//\ Widget\ is\ a\ very\ simple\ class\ used\ for\ demonstrating\ the\ use\ of\ gtest}}
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00038}00038\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{widget_8h}{widget.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00040}\mbox{\hyperlink{class_widget_ab573b75a8a69d29c298af2485fb9cda9}{00040}}\ \mbox{\hyperlink{class_widget_ab573b75a8a69d29c298af2485fb9cda9}{Widget::Widget}}(\textcolor{keywordtype}{int}\ number,\ \textcolor{keyword}{const}\ std::string\&\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})}
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00041}00041\ \ \ \ \ :\ number\_(number),}
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00042}00042\ \ \ \ \ \ \ name\_(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})\ \{\}}
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00044}\mbox{\hyperlink{class_widget_aa24f66bcbaaec6d458b0980e8c8eae65}{00044}}\ \mbox{\hyperlink{class_widget_aa24f66bcbaaec6d458b0980e8c8eae65}{Widget::\string~Widget}}()\ \{\}}
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00046}\mbox{\hyperlink{class_widget_abf639d975e02cabda8132873aca1a333}{00046}}\ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{class_widget_abf639d975e02cabda8132873aca1a333}{Widget::GetFloatValue}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00047}00047\ \ \ \textcolor{keywordflow}{return}\ number\_;}
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00048}00048\ \}}
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00050}\mbox{\hyperlink{class_widget_a15e7d0423020a7a98063a749fb97bdd3}{00050}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{class_widget_a15e7d0423020a7a98063a749fb97bdd3}{Widget::GetIntValue}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00051}00051\ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(number\_);}
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00052}00052\ \}}
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00054}\mbox{\hyperlink{class_widget_a7a6e3a7fca3a9373f631c94dc1494d22}{00054}}\ std::string\ \mbox{\hyperlink{class_widget_a7a6e3a7fca3a9373f631c94dc1494d22}{Widget::GetStringValue}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00055}00055\ \ \ \textcolor{keywordflow}{return}\ name\_;}
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00056}00056\ \}}
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00058}\mbox{\hyperlink{class_widget_a50791a556979f22f5593383143c7f815}{00058}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_widget_a50791a556979f22f5593383143c7f815}{Widget::GetCharPtrValue}}(\textcolor{keywordtype}{char}*\ buffer,\ \textcolor{keywordtype}{size\_t}\ max\_size)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00059}00059\ \ \ \textcolor{comment}{//\ Copy\ the\ char*\ representation\ of\ name\_\ into\ buffer,\ up\ to\ max\_size.}}
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00060}00060\ \ \ strncpy(buffer,\ name\_.c\_str(),\ max\_size-\/1);}
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00061}00061\ \ \ buffer[max\_size-\/1]\ =\ \textcolor{charliteral}{'\(\backslash\)0'};}
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00062}00062\ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{widget_8cc_source_l00063}00063\ \}}
+
+\end{DoxyCode}

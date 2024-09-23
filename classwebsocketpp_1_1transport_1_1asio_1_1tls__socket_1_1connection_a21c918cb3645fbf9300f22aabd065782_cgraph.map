@@ -1,0 +1,7 @@
+<map id="websocketpp::transport::asio::tls_socket::connection::get_remote_endpoint" name="websocketpp::transport::asio::tls_socket::connection::get_remote_endpoint">
+<area shape="rect" id="Node000001" title="Get the remote endpoint address." alt="" coords="5,5,198,61"/>
+<area shape="rect" id="Node000002" href="$namespacewebsocketpp_1_1transport_1_1asio_1_1error.html#ae47ed03449a199118bd7413c48203820" title="Create an error code with the given value and the asio transport category." alt="" coords="246,13,441,54"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="198,30,230,30,230,36,198,36"/>
+<area shape="rect" id="Node000003" href="$namespacewebsocketpp_1_1transport_1_1asio_1_1error.html#a832186c0c8529855b1fd4a4fc62da2c5" title="Get a reference to a static copy of the asio transport error category." alt="" coords="489,13,659,54"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="441,30,473,30,473,36,441,36"/>
+</map>

@@ -1,0 +1,82 @@
+\doxysection{Catch\+::Startup\+Exception\+Registry Class Reference}
+\hypertarget{class_catch_1_1_startup_exception_registry}{}\label{class_catch_1_1_startup_exception_registry}\index{Catch::StartupExceptionRegistry@{Catch::StartupExceptionRegistry}}
+
+
+{\ttfamily \#include $<$catch\+\_\+startup\+\_\+exception\+\_\+registry.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{class_catch_1_1_startup_exception_registry_afafe7382002cd04e42a07068480683e7}{add}} (std\+::exception\+\_\+ptr const \&exception) noexcept
+\item 
+std\+::vector$<$ std\+::exception\+\_\+ptr $>$ const \& \mbox{\hyperlink{class_catch_1_1_startup_exception_registry_a5d4829d60703104982205616e930b3e6}{get\+Exceptions}} () const noexcept
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{catch__startup__exception__registry_8h_source_l00017}{17}} of file \mbox{\hyperlink{catch__startup__exception__registry_8h_source}{catch\+\_\+startup\+\_\+exception\+\_\+registry.\+h}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_catch_1_1_startup_exception_registry_afafe7382002cd04e42a07068480683e7}\index{Catch::StartupExceptionRegistry@{Catch::StartupExceptionRegistry}!add@{add}}
+\index{add@{add}!Catch::StartupExceptionRegistry@{Catch::StartupExceptionRegistry}}
+\doxysubsubsection{\texorpdfstring{add()}{add()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_startup_exception_registry_afafe7382002cd04e42a07068480683e7} 
+void Catch\+::\+Startup\+Exception\+Registry\+::add (\begin{DoxyParamCaption}\item[{std\+::exception\+\_\+ptr const \&}]{exception}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__startup__exception__registry_8cpp_source_l00013}{13}} of file \mbox{\hyperlink{catch__startup__exception__registry_8cpp_source}{catch\+\_\+startup\+\_\+exception\+\_\+registry.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00013\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00014\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{catch__compiler__capabilities_8h_ab76c2d22e571ab1a828f5c60d2f485a6}{CATCH\_TRY}}\ \{}
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \ \ \ \ \ \ m\_exceptions.push\_back(exception);}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \ \ \}\ \mbox{\hyperlink{catch__compiler__capabilities_8h_afa0ae14e70806dca4f8bf06d06645fa9}{CATCH\_CATCH\_ALL}}\ \{}
+\DoxyCodeLine{00017\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ we\ run\ out\ of\ memory\ during\ start-\/up\ there's\ really\ not\ a\ lot\ more\ we\ can\ do\ about\ it}}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ \ \ \ \ std::terminate();}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00020\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_startup_exception_registry_afafe7382002cd04e42a07068480683e7_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{class_catch_1_1_startup_exception_registry_a5d4829d60703104982205616e930b3e6}\index{Catch::StartupExceptionRegistry@{Catch::StartupExceptionRegistry}!getExceptions@{getExceptions}}
+\index{getExceptions@{getExceptions}!Catch::StartupExceptionRegistry@{Catch::StartupExceptionRegistry}}
+\doxysubsubsection{\texorpdfstring{getExceptions()}{getExceptions()}}
+{\footnotesize\ttfamily \label{class_catch_1_1_startup_exception_registry_a5d4829d60703104982205616e930b3e6} 
+std\+::vector$<$ std\+::exception\+\_\+ptr $>$ const  \& Catch\+::\+Startup\+Exception\+Registry\+::get\+Exceptions (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__startup__exception__registry_8cpp_source_l00022}{22}} of file \mbox{\hyperlink{catch__startup__exception__registry_8cpp_source}{catch\+\_\+startup\+\_\+exception\+\_\+registry.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_exceptions;}
+\DoxyCodeLine{00024\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{class_catch_1_1_startup_exception_registry_a5d4829d60703104982205616e930b3e6_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__startup__exception__registry_8h}{catch\+\_\+startup\+\_\+exception\+\_\+registry.\+h}}\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__startup__exception__registry_8cpp}{catch\+\_\+startup\+\_\+exception\+\_\+registry.\+cpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,11 @@
+<map id="sysio::trace_api_plugin::set_program_options" name="sysio::trace_api_plugin::set_program_options">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,88,160,129"/>
+<area shape="rect" id="Node000002" href="$xbyak__mnemonic_8h.html#a4229a9b84f8b8673326f12bd41acd27c" title=" " alt="" coords="279,5,318,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="117,86,159,63,207,41,263,23,265,28,209,46,162,68,120,90"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1trace__api__common__impl.html#a84ce804ca16e921b4448537fd0d2e0b7" title=" " alt="" coords="208,55,389,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="160,94,192,89,192,95,161,100"/>
+<area shape="rect" id="Node000004" href="$structsysio_1_1trace__api__plugin__impl.html#a7d8787f635f0dcf2b2824199f8171903" title=" " alt="" coords="208,120,389,161"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="161,118,192,122,192,128,160,123"/>
+<area shape="rect" id="Node000005" href="$structsysio_1_1trace__api__rpc__plugin__impl.html#a47813f526ec1792c77fba7bba237c231" title=" " alt="" coords="212,185,385,241"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="124,127,209,170,220,176,218,180,206,175,121,132"/>
+</map>

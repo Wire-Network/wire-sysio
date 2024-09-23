@@ -1,0 +1,12 @@
+<map id="test_ecmult_accumulate" name="test_ecmult_accumulate">
+<area shape="rect" id="Node000001" title=" " alt="" coords="529,31,693,56"/>
+<area shape="rect" id="Node000002" href="$tests_8c.html#a446a6e0f03b6b52a0ee0c74d98dcdee5" title=" " alt="" coords="300,5,481,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="514,35,481,31,482,26,514,30"/>
+<area shape="rect" id="Node000005" href="$tests_8c.html#ad9eaf7a77e8e046f54571c4cabe70803" title=" " alt="" coords="300,55,481,80"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="514,57,482,60,481,55,514,51"/>
+<area shape="rect" id="Node000003" href="$tests_8c.html#a93c275726298d7a59a4f027996a958b4" title=" " alt="" coords="103,31,252,56"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="285,33,253,37,252,32,284,28"/>
+<area shape="rect" id="Node000004" href="$tests_8c.html#a3c04138a5bfe5d72780bb7e82a18e627" title=" " alt="" coords="5,31,55,56"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="87,46,55,46,55,41,87,41"/>
+<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="284,58,252,55,253,49,285,53"/>
+</map>

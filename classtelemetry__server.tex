@@ -1,0 +1,369 @@
+\doxysection{telemetry\+\_\+server Class Reference}
+\hypertarget{classtelemetry__server}{}\label{classtelemetry__server}\index{telemetry\_server@{telemetry\_server}}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{websocketpp\+::connection\+\_\+hdl}} \mbox{\hyperlink{classtelemetry__server_a7669dfa11403917607a7762d37068ee7}{connection\+\_\+hdl}}
+\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1server}{websocketpp\+::server}}$<$ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio}{websocketpp\+::config\+::asio}} $>$ \mbox{\hyperlink{classtelemetry__server_a9aabb9eacd8d1e864be07c8985063fc8}{server}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtelemetry__server_a21b54be193d9f54f34a91f429b227870}{telemetry\+\_\+server}} ()
+\item 
+void \mbox{\hyperlink{classtelemetry__server_a8c09eba40e8993079859e9f1974254ab}{run}} (std\+::string docroot, \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} port)
+\item 
+void \mbox{\hyperlink{classtelemetry__server_a2a510e3a3c91c123f37d95d7b7d140ea}{set\+\_\+timer}} ()
+\item 
+void \mbox{\hyperlink{classtelemetry__server_acc29e40bd4262e42b3d16e4fcd79ec22}{on\+\_\+timer}} (websocketpp\+::lib\+::error\+\_\+code const \&ec)
+\item 
+void \mbox{\hyperlink{classtelemetry__server_abab5c8572db5f87e745b862e59867bc8}{on\+\_\+http}} (\mbox{\hyperlink{classtelemetry__server_a7669dfa11403917607a7762d37068ee7}{connection\+\_\+hdl}} hdl)
+\item 
+void \mbox{\hyperlink{classtelemetry__server_a3f0a1ba79c9d32843a4acca8a187bf17}{on\+\_\+open}} (\mbox{\hyperlink{classtelemetry__server_a7669dfa11403917607a7762d37068ee7}{connection\+\_\+hdl}} hdl)
+\item 
+void \mbox{\hyperlink{classtelemetry__server_aab83aa8df38767bd2271dd775e6c3f0e}{on\+\_\+close}} (\mbox{\hyperlink{classtelemetry__server_a7669dfa11403917607a7762d37068ee7}{connection\+\_\+hdl}} hdl)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+The telemetry server accepts connections and sends a message every second to each client containing an integer count. This example can be used as the basis for programs that expose a stream of telemetry data for logging, dashboards, etc.
+
+This example uses the timer based concurrency method and is self contained and singled threaded. Refer to telemetry client for an example of a similar telemetry setup using threads rather than timers.
+
+This example also includes an example simple HTTP server that serves a web dashboard displaying the count. This simple design is suitable for use delivering a small number of files to a small number of clients. It is ideal for cases like embedded dashboards that don\textquotesingle{}t want the complexity of an extra HTTP server to serve static files.
+
+This design {\itshape will} fall over under high traffic or DoS conditions. In such cases you are much better off proxying to a real HTTP server for the http requests. 
+
+Definition at line \mbox{\hyperlink{telemetry__server_8cpp_source_l00031}{31}} of file \mbox{\hyperlink{telemetry__server_8cpp_source}{telemetry\+\_\+server.\+cpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classtelemetry__server_a7669dfa11403917607a7762d37068ee7}\index{telemetry\_server@{telemetry\_server}!connection\_hdl@{connection\_hdl}}
+\index{connection\_hdl@{connection\_hdl}!telemetry\_server@{telemetry\_server}}
+\doxysubsubsection{\texorpdfstring{connection\_hdl}{connection\_hdl}}
+{\footnotesize\ttfamily \label{classtelemetry__server_a7669dfa11403917607a7762d37068ee7} 
+\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{websocketpp\+::connection\+\_\+hdl}} \mbox{\hyperlink{classtelemetry__server_a7669dfa11403917607a7762d37068ee7}{telemetry\+\_\+server\+::connection\+\_\+hdl}}}
+
+
+
+Definition at line \mbox{\hyperlink{telemetry__server_8cpp_source_l00033}{33}} of file \mbox{\hyperlink{telemetry__server_8cpp_source}{telemetry\+\_\+server.\+cpp}}.
+
+\Hypertarget{classtelemetry__server_a9aabb9eacd8d1e864be07c8985063fc8}\index{telemetry\_server@{telemetry\_server}!server@{server}}
+\index{server@{server}!telemetry\_server@{telemetry\_server}}
+\doxysubsubsection{\texorpdfstring{server}{server}}
+{\footnotesize\ttfamily \label{classtelemetry__server_a9aabb9eacd8d1e864be07c8985063fc8} 
+\mbox{\hyperlink{classwebsocketpp_1_1server}{websocketpp\+::server}}$<$\mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio}{websocketpp\+::config\+::asio}}$>$ \mbox{\hyperlink{classtelemetry__server_a9aabb9eacd8d1e864be07c8985063fc8}{telemetry\+\_\+server\+::server}}}
+
+
+
+Definition at line \mbox{\hyperlink{telemetry__server_8cpp_source_l00034}{34}} of file \mbox{\hyperlink{telemetry__server_8cpp_source}{telemetry\+\_\+server.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtelemetry__server_a21b54be193d9f54f34a91f429b227870}\index{telemetry\_server@{telemetry\_server}!telemetry\_server@{telemetry\_server}}
+\index{telemetry\_server@{telemetry\_server}!telemetry\_server@{telemetry\_server}}
+\doxysubsubsection{\texorpdfstring{telemetry\_server()}{telemetry\_server()}}
+{\footnotesize\ttfamily \label{classtelemetry__server_a21b54be193d9f54f34a91f429b227870} 
+telemetry\+\_\+server\+::telemetry\+\_\+server (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{telemetry__server_8cpp_source_l00036}{36}} of file \mbox{\hyperlink{telemetry__server_8cpp_source}{telemetry\+\_\+server.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ m\_count(0)\ \{}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ set\ up\ access\ channels\ to\ only\ log\ interesting\ things}}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ m\_endpoint.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a3fe357b3c6434273a9965eb52902575d}{clear\_access\_channels}}(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a853aa0b8976e53f3181af3bc398d493e}{websocketpp::log::alevel::all}});}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ m\_endpoint.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a5d7da609ebd2f797e5e67b6d050ebc59}{set\_access\_channels}}(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_af5fdb4de43a77cacb4c3a5b01b816750}{websocketpp::log::alevel::access\_core}});}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ m\_endpoint.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a5d7da609ebd2f797e5e67b6d050ebc59}{set\_access\_channels}}(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_aaf67c94a68502c49308489ff01d8d0a8}{websocketpp::log::alevel::app}});}
+\DoxyCodeLine{00041\ }
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Initialize\ the\ Asio\ transport\ policy}}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ m\_endpoint.init\_asio();}
+\DoxyCodeLine{00044\ }
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Bind\ the\ handlers\ we\ are\ using}}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ }websocketpp::lib::placeholders::\_1;}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ }websocketpp::lib::bind;}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ m\_endpoint.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a5753d9848aefc04ee91da401c0cc65b8}{set\_open\_handler}}(bind(\&\mbox{\hyperlink{classtelemetry__server_a3f0a1ba79c9d32843a4acca8a187bf17}{telemetry\_server::on\_open}},\textcolor{keyword}{this},\_1));}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ m\_endpoint.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a8d7d95bebc154879655211e2b0b5e069}{set\_close\_handler}}(bind(\&\mbox{\hyperlink{classtelemetry__server_aab83aa8df38767bd2271dd775e6c3f0e}{telemetry\_server::on\_close}},\textcolor{keyword}{this},\_1));}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ m\_endpoint.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a511874384b71238b042968cf736bc510}{set\_http\_handler}}(bind(\&\mbox{\hyperlink{classtelemetry__server_abab5c8572db5f87e745b862e59867bc8}{telemetry\_server::on\_http}},\textcolor{keyword}{this},\_1));}
+\DoxyCodeLine{00051\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtelemetry__server_a21b54be193d9f54f34a91f429b227870_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtelemetry__server_aab83aa8df38767bd2271dd775e6c3f0e}\index{telemetry\_server@{telemetry\_server}!on\_close@{on\_close}}
+\index{on\_close@{on\_close}!telemetry\_server@{telemetry\_server}}
+\doxysubsubsection{\texorpdfstring{on\_close()}{on\_close()}}
+{\footnotesize\ttfamily \label{classtelemetry__server_aab83aa8df38767bd2271dd775e6c3f0e} 
+void telemetry\+\_\+server\+::on\+\_\+close (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classtelemetry__server_a7669dfa11403917607a7762d37068ee7}{connection\+\_\+hdl}}}]{hdl}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{telemetry__server_8cpp_source_l00160}{160}} of file \mbox{\hyperlink{telemetry__server_8cpp_source}{telemetry\+\_\+server.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ m\_connections.erase(hdl);}
+\DoxyCodeLine{00162\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtelemetry__server_aab83aa8df38767bd2271dd775e6c3f0e_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtelemetry__server_abab5c8572db5f87e745b862e59867bc8}\index{telemetry\_server@{telemetry\_server}!on\_http@{on\_http}}
+\index{on\_http@{on\_http}!telemetry\_server@{telemetry\_server}}
+\doxysubsubsection{\texorpdfstring{on\_http()}{on\_http()}}
+{\footnotesize\ttfamily \label{classtelemetry__server_abab5c8572db5f87e745b862e59867bc8} 
+void telemetry\+\_\+server\+::on\+\_\+http (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classtelemetry__server_a7669dfa11403917607a7762d37068ee7}{connection\+\_\+hdl}}}]{hdl}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{telemetry__server_8cpp_source_l00109}{109}} of file \mbox{\hyperlink{telemetry__server_8cpp_source}{telemetry\+\_\+server.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Upgrade\ our\ connection\ handle\ to\ a\ full\ connection\_ptr}}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1server_abb895563dddafdc1426997d245cbd7cb}{server::connection\_ptr}}\ con\ =\ m\_endpoint.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a0fe4457427d4124abe7ca022ba7afbb4}{get\_con\_from\_hdl}}(hdl);}
+\DoxyCodeLine{00112\ \ \ \ \ }
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ std::ifstream\ file;}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ std::string\ \mbox{\hyperlink{namespaceembed_clara_a1e1bd594f85f58f5dca6c41c0ac720fb}{filename}}\ =\ con-\/>get\_resource();}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ std::string\ response;}
+\DoxyCodeLine{00116\ \ \ \ \ }
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ m\_endpoint.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a1d9163813aa02ed32100f443b4ddbd8e}{get\_alog}}().write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_aaf67c94a68502c49308489ff01d8d0a8}{websocketpp::log::alevel::app}},}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}http\ request1:\ "{}}+filename);}
+\DoxyCodeLine{00119\ \ \ \ \ }
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (filename\ ==\ \textcolor{stringliteral}{"{}/"{}})\ \{}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceembed_clara_a1e1bd594f85f58f5dca6c41c0ac720fb}{filename}}\ =\ m\_docroot+\textcolor{stringliteral}{"{}index.html"{}};}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespaceembed_clara_a1e1bd594f85f58f5dca6c41c0ac720fb}{filename}}\ =\ m\_docroot+\mbox{\hyperlink{namespaceembed_clara_a1e1bd594f85f58f5dca6c41c0ac720fb}{filename}}.substr(1);}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ m\_endpoint.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a1d9163813aa02ed32100f443b4ddbd8e}{get\_alog}}().write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_aaf67c94a68502c49308489ff01d8d0a8}{websocketpp::log::alevel::app}},}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}http\ request2:\ "{}}+filename);}
+\DoxyCodeLine{00128\ \ \ \ \ }
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ file.open(\mbox{\hyperlink{namespaceembed_clara_a1e1bd594f85f58f5dca6c41c0ac720fb}{filename}}.c\_str(),\ std::ios::in);}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!file)\ \{}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ 404\ error}}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \ \ \ std::stringstream\ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}};}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}\ <<\ \textcolor{stringliteral}{"{}<!doctype\ html><html><head>"{}}}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}<title>Error\ 404\ (Resource\ not\ found)</title><body>"{}}}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}<h1>Error\ 404</h1>"{}}}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}<p>The\ requested\ URL\ "{}}\ <<\ \mbox{\hyperlink{namespaceembed_clara_a1e1bd594f85f58f5dca6c41c0ac720fb}{filename}}\ <<\ \textcolor{stringliteral}{"{}\ was\ not\ found\ on\ this\ server.</p>"{}}}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}</body></head></html>"{}};}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \ \ \ \ con-\/>set\_body(\mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}.str());}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \ \ \ \ con-\/>set\_status(\mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1status__code_ae0d61c309e053ee5673517b54e2886c6a33f0060510af28d5d220dc4523c3b3e2}{websocketpp::http::status\_code::not\_found}});}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00144\ \ \ \ \ }
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ file.seekg(0,\ std::ios::end);}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ response.reserve(file.tellg());}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ file.seekg(0,\ std::ios::beg);}
+\DoxyCodeLine{00148\ \ \ \ \ }
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ response.assign((std::istreambuf\_iterator<char>(file)),}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::istreambuf\_iterator<char>());}
+\DoxyCodeLine{00151\ \ \ \ \ }
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ con-\/>set\_body(response);}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ con-\/>set\_status(\mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1status__code_ae0d61c309e053ee5673517b54e2886c6a289caa931313b2f373b33032e3661733}{websocketpp::http::status\_code::ok}});}
+\DoxyCodeLine{00154\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtelemetry__server_abab5c8572db5f87e745b862e59867bc8_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtelemetry__server_abab5c8572db5f87e745b862e59867bc8_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtelemetry__server_a3f0a1ba79c9d32843a4acca8a187bf17}\index{telemetry\_server@{telemetry\_server}!on\_open@{on\_open}}
+\index{on\_open@{on\_open}!telemetry\_server@{telemetry\_server}}
+\doxysubsubsection{\texorpdfstring{on\_open()}{on\_open()}}
+{\footnotesize\ttfamily \label{classtelemetry__server_a3f0a1ba79c9d32843a4acca8a187bf17} 
+void telemetry\+\_\+server\+::on\+\_\+open (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classtelemetry__server_a7669dfa11403917607a7762d37068ee7}{connection\+\_\+hdl}}}]{hdl}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{telemetry__server_8cpp_source_l00156}{156}} of file \mbox{\hyperlink{telemetry__server_8cpp_source}{telemetry\+\_\+server.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ m\_connections.insert(hdl);}
+\DoxyCodeLine{00158\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtelemetry__server_a3f0a1ba79c9d32843a4acca8a187bf17_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtelemetry__server_acc29e40bd4262e42b3d16e4fcd79ec22}\index{telemetry\_server@{telemetry\_server}!on\_timer@{on\_timer}}
+\index{on\_timer@{on\_timer}!telemetry\_server@{telemetry\_server}}
+\doxysubsubsection{\texorpdfstring{on\_timer()}{on\_timer()}}
+{\footnotesize\ttfamily \label{classtelemetry__server_acc29e40bd4262e42b3d16e4fcd79ec22} 
+void telemetry\+\_\+server\+::on\+\_\+timer (\begin{DoxyParamCaption}\item[{websocketpp\+::lib\+::error\+\_\+code const \&}]{ec}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{telemetry__server_8cpp_source_l00088}{88}} of file \mbox{\hyperlink{telemetry__server_8cpp_source}{telemetry\+\_\+server.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ec)\ \{}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ there\ was\ an\ error,\ stop\ telemetry}}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ \ \ m\_endpoint.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a1d9163813aa02ed32100f443b4ddbd8e}{get\_alog}}().write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_aaf67c94a68502c49308489ff01d8d0a8}{websocketpp::log::alevel::app}},}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Timer\ Error:\ "{}}+ec.message());}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ std::stringstream\ val;}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ val\ <<\ \textcolor{stringliteral}{"{}count\ is\ "{}}\ <<\ m\_count++;}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Broadcast\ count\ to\ all\ connections}}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ con\_list::iterator\ it;}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (it\ =\ m\_connections.begin();\ it\ !=\ m\_connections.end();\ ++it)\ \{}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \ \ \ m\_endpoint.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a5341f59de7ef1a565a2fd93daba212d5}{send}}(*it,val.str(),\mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea6b65f28626b19b2eef447744c564e727}{websocketpp::frame::opcode::text}});}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ set\ timer\ for\ next\ telemetry\ check}}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtelemetry__server_a2a510e3a3c91c123f37d95d7b7d140ea}{set\_timer}}();}
+\DoxyCodeLine{00107\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=338pt]{classtelemetry__server_acc29e40bd4262e42b3d16e4fcd79ec22_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtelemetry__server_acc29e40bd4262e42b3d16e4fcd79ec22_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtelemetry__server_a8c09eba40e8993079859e9f1974254ab}\index{telemetry\_server@{telemetry\_server}!run@{run}}
+\index{run@{run}!telemetry\_server@{telemetry\_server}}
+\doxysubsubsection{\texorpdfstring{run()}{run()}}
+{\footnotesize\ttfamily \label{classtelemetry__server_a8c09eba40e8993079859e9f1974254ab} 
+void telemetry\+\_\+server\+::run (\begin{DoxyParamCaption}\item[{std\+::string}]{docroot}{, }\item[{\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}}}]{port}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{telemetry__server_8cpp_source_l00053}{53}} of file \mbox{\hyperlink{telemetry__server_8cpp_source}{telemetry\+\_\+server.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ std::stringstream\ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}};}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}\ <<\ \textcolor{stringliteral}{"{}Running\ telemetry\ server\ on\ port\ "{}}<<\ port\ <<\textcolor{stringliteral}{"{}\ using\ docroot="{}}\ <<\ docroot;}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ m\_endpoint.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a1d9163813aa02ed32100f443b4ddbd8e}{get\_alog}}().write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_aaf67c94a68502c49308489ff01d8d0a8}{websocketpp::log::alevel::app}},\mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}.str());}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ m\_docroot\ =\ docroot;}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ listen\ on\ specified\ port}}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ m\_endpoint.listen(port);}
+\DoxyCodeLine{00062\ }
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Start\ the\ server\ accept\ loop}}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ m\_endpoint.\mbox{\hyperlink{classwebsocketpp_1_1server_a0204a7d444144f7ea5b8bbcf14689fc1}{start\_accept}}();}
+\DoxyCodeLine{00065\ }
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Set\ the\ initial\ timer\ to\ start\ telemetry}}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtelemetry__server_a2a510e3a3c91c123f37d95d7b7d140ea}{set\_timer}}();}
+\DoxyCodeLine{00068\ }
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Start\ the\ ASIO\ io\_service\ run\ loop}}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \ \ \ m\_endpoint.run();}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\mbox{\hyperlink{classwebsocketpp_1_1exception}{websocketpp::exception}}\ \textcolor{keyword}{const}\ \&\ e)\ \{}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ e.\mbox{\hyperlink{classwebsocketpp_1_1exception_a62dabd977bc59faaca6dc268744a6089}{what}}()\ <<\ std::endl;}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00075\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtelemetry__server_a8c09eba40e8993079859e9f1974254ab_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=261pt]{classtelemetry__server_a8c09eba40e8993079859e9f1974254ab_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtelemetry__server_a2a510e3a3c91c123f37d95d7b7d140ea}\index{telemetry\_server@{telemetry\_server}!set\_timer@{set\_timer}}
+\index{set\_timer@{set\_timer}!telemetry\_server@{telemetry\_server}}
+\doxysubsubsection{\texorpdfstring{set\_timer()}{set\_timer()}}
+{\footnotesize\ttfamily \label{classtelemetry__server_a2a510e3a3c91c123f37d95d7b7d140ea} 
+void telemetry\+\_\+server\+::set\+\_\+timer (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{telemetry__server_8cpp_source_l00077}{77}} of file \mbox{\hyperlink{telemetry__server_8cpp_source}{telemetry\+\_\+server.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ m\_timer\ =\ m\_endpoint.set\_timer(}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ \ \ \ 1000,}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \ \ \ \ websocketpp::lib::bind(}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{classtelemetry__server_acc29e40bd4262e42b3d16e4fcd79ec22}{telemetry\_server::on\_timer}},}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{this},}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ websocketpp::lib::placeholders::\_1}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00086\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtelemetry__server_a2a510e3a3c91c123f37d95d7b7d140ea_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtelemetry__server_a2a510e3a3c91c123f37d95d7b7d140ea_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/vendor/websocketpp/examples/telemetry\+\_\+server/\mbox{\hyperlink{telemetry__server_8cpp}{telemetry\+\_\+server.\+cpp}}\end{DoxyCompactItemize}

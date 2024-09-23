@@ -1,0 +1,493 @@
+\doxysection{libraries/fc/libraries/ff/libff/algebra/fields/tests/test\+\_\+fields.cpp File Reference}
+\hypertarget{test__fields_8cpp}{}\label{test__fields_8cpp}\index{libraries/fc/libraries/ff/libff/algebra/fields/tests/test\_fields.cpp@{libraries/fc/libraries/ff/libff/algebra/fields/tests/test\_fields.cpp}}
+{\ttfamily \#include $<$libff/algebra/curves/edwards/edwards\+\_\+pp.\+hpp$>$}\newline
+{\ttfamily \#include $<$libff/algebra/curves/mnt/mnt4/mnt4\+\_\+pp.\+hpp$>$}\newline
+{\ttfamily \#include $<$libff/algebra/curves/mnt/mnt6/mnt6\+\_\+pp.\+hpp$>$}\newline
+{\ttfamily \#include $<$libff/common/profiling.\+hpp$>$}\newline
+{\ttfamily \#include $<$libff/algebra/curves/alt\+\_\+bn128/alt\+\_\+bn128\+\_\+pp.\+hpp$>$}\newline
+{\ttfamily \#include $<$libff/algebra/fields/fp12\+\_\+2over3over2.\+hpp$>$}\newline
+{\ttfamily \#include $<$libff/algebra/fields/fp6\+\_\+3over2.\+hpp$>$}\newline
+Include dependency graph for test\+\_\+fields.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__fields_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename FieldT $>$ }\\void \mbox{\hyperlink{test__fields_8cpp_a20593f32b7dfaa4513e45b05e3d991f5}{test\+\_\+field}} ()
+\item 
+{\footnotesize template$<$typename FieldT $>$ }\\void \mbox{\hyperlink{test__fields_8cpp_ac0703dc0ce3823d34e6d18710615f75b}{test\+\_\+sqrt}} ()
+\item 
+{\footnotesize template$<$typename FieldT $>$ }\\void \mbox{\hyperlink{test__fields_8cpp_abaab3dc2944304cc1218b90514126700}{test\+\_\+two\+\_\+squarings}} ()
+\item 
+{\footnotesize template$<$typename FieldT $>$ }\\void \mbox{\hyperlink{test__fields_8cpp_a7b91d385ad670e4debdfafc76562f66f}{test\+\_\+\+Frobenius}} ()
+\item 
+{\footnotesize template$<$typename FieldT $>$ }\\void \mbox{\hyperlink{test__fields_8cpp_a9e98f9c7032f7f21cad0d55c53fb4502}{test\+\_\+unitary\+\_\+inverse}} ()
+\item 
+{\footnotesize template$<$typename FieldT $>$ }\\void \mbox{\hyperlink{test__fields_8cpp_ae6ec3be5c9cb04274b20b19120640f22}{test\+\_\+cyclotomic\+\_\+squaring}} ()
+\item 
+template$<$$>$ void \mbox{\hyperlink{test__fields_8cpp_ad3538081ace0624f3fd607ce18e4bcac}{test\+\_\+cyclotomic\+\_\+squaring$<$ Fqk$<$ edwards\+\_\+pp $>$ $>$}} ()
+\item 
+template$<$$>$ void \mbox{\hyperlink{test__fields_8cpp_a2d9705a0f1bf6c90de551695d04e2cac}{test\+\_\+cyclotomic\+\_\+squaring$<$ Fqk$<$ mnt4\+\_\+pp $>$ $>$}} ()
+\item 
+template$<$$>$ void \mbox{\hyperlink{test__fields_8cpp_a118036c30261a4b90e06e37383ed8db7}{test\+\_\+cyclotomic\+\_\+squaring$<$ Fqk$<$ mnt6\+\_\+pp $>$ $>$}} ()
+\item 
+{\footnotesize template$<$typename ppT $>$ }\\void \mbox{\hyperlink{test__fields_8cpp_a3ba3b8a676f9d02abce9384c67de3dac}{test\+\_\+all\+\_\+fields}} ()
+\item 
+{\footnotesize template$<$typename Fp4T $>$ }\\void \mbox{\hyperlink{test__fields_8cpp_a04fc751a2410794b055e8f1680812134}{test\+\_\+\+Fp4\+\_\+tom\+\_\+cook}} ()
+\item 
+int \mbox{\hyperlink{test__fields_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{test__fields_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}\index{test\_fields.cpp@{test\_fields.cpp}!main@{main}}
+\index{main@{main}!test\_fields.cpp@{test\_fields.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{test__fields_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4} 
+int main (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__fields_8cpp_source_l00220}{220}} of file \mbox{\hyperlink{test__fields_8cpp_source}{test\+\_\+fields.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00221\ \{}
+\DoxyCodeLine{00222\ \ \ \ \ \mbox{\hyperlink{classlibff_1_1edwards__pp_a32abdda668a29bbc32de1ac0fbe977e1}{edwards\_pp::init\_public\_params}}();}
+\DoxyCodeLine{00223\ \ \ \ \ \mbox{\hyperlink{test__fields_8cpp_a3ba3b8a676f9d02abce9384c67de3dac}{test\_all\_fields<edwards\_pp>}}();}
+\DoxyCodeLine{00224\ \ \ \ \ \mbox{\hyperlink{test__fields_8cpp_ae6ec3be5c9cb04274b20b19120640f22}{test\_cyclotomic\_squaring<Fqk<edwards\_pp>}}\ >();}
+\DoxyCodeLine{00225\ }
+\DoxyCodeLine{00226\ \ \ \ \ \mbox{\hyperlink{classlibff_1_1mnt4__pp_ac29b037b6aaf60603967653177f57f47}{mnt4\_pp::init\_public\_params}}();}
+\DoxyCodeLine{00227\ \ \ \ \ \mbox{\hyperlink{test__fields_8cpp_a3ba3b8a676f9d02abce9384c67de3dac}{test\_all\_fields<mnt4\_pp>}}();}
+\DoxyCodeLine{00228\ \ \ \ \ \mbox{\hyperlink{test__fields_8cpp_a04fc751a2410794b055e8f1680812134}{test\_Fp4\_tom\_cook<mnt4\_Fq4>}}();}
+\DoxyCodeLine{00229\ \ \ \ \ \mbox{\hyperlink{test__fields_8cpp_abaab3dc2944304cc1218b90514126700}{test\_two\_squarings<Fqe<mnt4\_pp>}}\ >();}
+\DoxyCodeLine{00230\ \ \ \ \ \mbox{\hyperlink{test__fields_8cpp_ae6ec3be5c9cb04274b20b19120640f22}{test\_cyclotomic\_squaring<Fqk<mnt4\_pp>}}\ >();}
+\DoxyCodeLine{00231\ }
+\DoxyCodeLine{00232\ \ \ \ \ \mbox{\hyperlink{classlibff_1_1mnt6__pp_ac101aa5559dbece66f5730200d8e34ee}{mnt6\_pp::init\_public\_params}}();}
+\DoxyCodeLine{00233\ \ \ \ \ \mbox{\hyperlink{test__fields_8cpp_a3ba3b8a676f9d02abce9384c67de3dac}{test\_all\_fields<mnt6\_pp>}}();}
+\DoxyCodeLine{00234\ \ \ \ \ \mbox{\hyperlink{test__fields_8cpp_ae6ec3be5c9cb04274b20b19120640f22}{test\_cyclotomic\_squaring<Fqk<mnt6\_pp>}}\ >();}
+\DoxyCodeLine{00235\ }
+\DoxyCodeLine{00236\ \ \ \ \ \mbox{\hyperlink{classlibff_1_1alt__bn128__pp_a64615d83a91bbc15fab3030a2203f4f4}{alt\_bn128\_pp::init\_public\_params}}();}
+\DoxyCodeLine{00237\ \ \ \ \ \mbox{\hyperlink{test__fields_8cpp_a20593f32b7dfaa4513e45b05e3d991f5}{test\_field<alt\_bn128\_Fq6>}}();}
+\DoxyCodeLine{00238\ \ \ \ \ \mbox{\hyperlink{test__fields_8cpp_a7b91d385ad670e4debdfafc76562f66f}{test\_Frobenius<alt\_bn128\_Fq6>}}();}
+\DoxyCodeLine{00239\ \ \ \ \ \mbox{\hyperlink{test__fields_8cpp_a3ba3b8a676f9d02abce9384c67de3dac}{test\_all\_fields<alt\_bn128\_pp>}}();}
+\DoxyCodeLine{00240\ }
+\DoxyCodeLine{00241\ \textcolor{preprocessor}{\#ifdef\ CURVE\_BN128\ \ \ \ \ \ \ }\textcolor{comment}{//\ BN128\ has\ fancy\ dependencies\ so\ it\ may\ be\ disabled}}
+\DoxyCodeLine{00242\ \ \ \ \ \mbox{\hyperlink{classlibff_1_1bn128__pp_ae44372429d5c8f7d85e87d6ddeb10a19}{bn128\_pp::init\_public\_params}}();}
+\DoxyCodeLine{00243\ \ \ \ \ \mbox{\hyperlink{test__fields_8cpp_a20593f32b7dfaa4513e45b05e3d991f5}{test\_field<Fr<bn128\_pp>}}\ >();}
+\DoxyCodeLine{00244\ \ \ \ \ \mbox{\hyperlink{test__fields_8cpp_a20593f32b7dfaa4513e45b05e3d991f5}{test\_field<Fq<bn128\_pp>}}\ >();}
+\DoxyCodeLine{00245\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00246\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__fields_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__fields_8cpp_a3ba3b8a676f9d02abce9384c67de3dac}\index{test\_fields.cpp@{test\_fields.cpp}!test\_all\_fields@{test\_all\_fields}}
+\index{test\_all\_fields@{test\_all\_fields}!test\_fields.cpp@{test\_fields.cpp}}
+\doxysubsubsection{\texorpdfstring{test\_all\_fields()}{test\_all\_fields()}}
+{\footnotesize\ttfamily \label{test__fields_8cpp_a3ba3b8a676f9d02abce9384c67de3dac} 
+template$<$typename ppT $>$ \\
+void test\+\_\+all\+\_\+fields (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__fields_8cpp_source_l00139}{139}} of file \mbox{\hyperlink{test__fields_8cpp_source}{test\+\_\+fields.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00140\ \{}
+\DoxyCodeLine{00141\ \ \ \ \ \mbox{\hyperlink{test__fields_8cpp_a20593f32b7dfaa4513e45b05e3d991f5}{test\_field<Fr<ppT>}}\ >();}
+\DoxyCodeLine{00142\ \ \ \ \ \mbox{\hyperlink{test__fields_8cpp_a20593f32b7dfaa4513e45b05e3d991f5}{test\_field<Fq<ppT>}}\ >();}
+\DoxyCodeLine{00143\ \ \ \ \ \mbox{\hyperlink{test__fields_8cpp_a20593f32b7dfaa4513e45b05e3d991f5}{test\_field<Fqe<ppT>}}\ >();}
+\DoxyCodeLine{00144\ \ \ \ \ \mbox{\hyperlink{test__fields_8cpp_a20593f32b7dfaa4513e45b05e3d991f5}{test\_field<Fqk<ppT>}}\ >();}
+\DoxyCodeLine{00145\ }
+\DoxyCodeLine{00146\ \ \ \ \ \mbox{\hyperlink{test__fields_8cpp_ac0703dc0ce3823d34e6d18710615f75b}{test\_sqrt<Fr<ppT>}}\ >();}
+\DoxyCodeLine{00147\ \ \ \ \ \mbox{\hyperlink{test__fields_8cpp_ac0703dc0ce3823d34e6d18710615f75b}{test\_sqrt<Fq<ppT>}}\ >();}
+\DoxyCodeLine{00148\ \ \ \ \ \mbox{\hyperlink{test__fields_8cpp_ac0703dc0ce3823d34e6d18710615f75b}{test\_sqrt<Fqe<ppT>}}\ >();}
+\DoxyCodeLine{00149\ }
+\DoxyCodeLine{00150\ \ \ \ \ \mbox{\hyperlink{test__fields_8cpp_a7b91d385ad670e4debdfafc76562f66f}{test\_Frobenius<Fqe<ppT>}}\ >();}
+\DoxyCodeLine{00151\ \ \ \ \ \mbox{\hyperlink{test__fields_8cpp_a7b91d385ad670e4debdfafc76562f66f}{test\_Frobenius<Fqk<ppT>}}\ >();}
+\DoxyCodeLine{00152\ }
+\DoxyCodeLine{00153\ \ \ \ \ \mbox{\hyperlink{test__fields_8cpp_a9e98f9c7032f7f21cad0d55c53fb4502}{test\_unitary\_inverse<Fqk<ppT>}}\ >();}
+\DoxyCodeLine{00154\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__fields_8cpp_a3ba3b8a676f9d02abce9384c67de3dac_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=229pt]{test__fields_8cpp_a3ba3b8a676f9d02abce9384c67de3dac_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__fields_8cpp_ae6ec3be5c9cb04274b20b19120640f22}\index{test\_fields.cpp@{test\_fields.cpp}!test\_cyclotomic\_squaring@{test\_cyclotomic\_squaring}}
+\index{test\_cyclotomic\_squaring@{test\_cyclotomic\_squaring}!test\_fields.cpp@{test\_fields.cpp}}
+\doxysubsubsection{\texorpdfstring{test\_cyclotomic\_squaring()}{test\_cyclotomic\_squaring()}}
+{\footnotesize\ttfamily \label{test__fields_8cpp_ae6ec3be5c9cb04274b20b19120640f22} 
+template$<$typename FieldT $>$ \\
+void test\+\_\+cyclotomic\+\_\+squaring (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=280pt]{test__fields_8cpp_ae6ec3be5c9cb04274b20b19120640f22_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__fields_8cpp_ad3538081ace0624f3fd607ce18e4bcac}\index{test\_fields.cpp@{test\_fields.cpp}!test\_cyclotomic\_squaring$<$ Fqk$<$ edwards\_pp $>$ $>$@{test\_cyclotomic\_squaring$<$ Fqk$<$ edwards\_pp $>$ $>$}}
+\index{test\_cyclotomic\_squaring$<$ Fqk$<$ edwards\_pp $>$ $>$@{test\_cyclotomic\_squaring$<$ Fqk$<$ edwards\_pp $>$ $>$}!test\_fields.cpp@{test\_fields.cpp}}
+\doxysubsubsection{\texorpdfstring{test\_cyclotomic\_squaring$<$ Fqk$<$ edwards\_pp $>$ $>$()}{test\_cyclotomic\_squaring< Fqk< edwards\_pp > >()}}
+{\footnotesize\ttfamily \label{test__fields_8cpp_ad3538081ace0624f3fd607ce18e4bcac} 
+template$<$$>$ \\
+void \mbox{\hyperlink{test__fields_8cpp_ae6ec3be5c9cb04274b20b19120640f22}{test\+\_\+cyclotomic\+\_\+squaring}}$<$ \mbox{\hyperlink{namespacelibff_a1cbc314a52017a7089a0e845293e3d9f}{Fqk}}$<$ \mbox{\hyperlink{classlibff_1_1edwards__pp}{edwards\+\_\+pp}} $>$ $>$ (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__fields_8cpp_source_l00103}{103}} of file \mbox{\hyperlink{test__fields_8cpp_source}{test\+\_\+fields.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00104\ \{}
+\DoxyCodeLine{00105\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{namespacelibff_a1cbc314a52017a7089a0e845293e3d9f}{Fqk<edwards\_pp>}}\ FieldT;}
+\DoxyCodeLine{00106\ \ \ \ \ assert(FieldT::extension\_degree()\ \%\ 2\ ==\ 0);}
+\DoxyCodeLine{00107\ \ \ \ \ FieldT\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ =\ FieldT::random\_element();}
+\DoxyCodeLine{00108\ \ \ \ \ FieldT\ a\_unitary\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.Frobenius\_map(FieldT::extension\_degree()/2)\ *\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.inverse();}
+\DoxyCodeLine{00109\ \ \ \ \ \textcolor{comment}{//\ beta\ =\ a\string^((q\string^(k/2)-\/1)*(q+1))}}
+\DoxyCodeLine{00110\ \ \ \ \ FieldT\ beta\ =\ a\_unitary.Frobenius\_map(1)\ *\ a\_unitary;}
+\DoxyCodeLine{00111\ \ \ \ \ assert(beta.cyclotomic\_squared()\ ==\ beta.squared());}
+\DoxyCodeLine{00112\ \}}
+
+\end{DoxyCode}
+\Hypertarget{test__fields_8cpp_a2d9705a0f1bf6c90de551695d04e2cac}\index{test\_fields.cpp@{test\_fields.cpp}!test\_cyclotomic\_squaring$<$ Fqk$<$ mnt4\_pp $>$ $>$@{test\_cyclotomic\_squaring$<$ Fqk$<$ mnt4\_pp $>$ $>$}}
+\index{test\_cyclotomic\_squaring$<$ Fqk$<$ mnt4\_pp $>$ $>$@{test\_cyclotomic\_squaring$<$ Fqk$<$ mnt4\_pp $>$ $>$}!test\_fields.cpp@{test\_fields.cpp}}
+\doxysubsubsection{\texorpdfstring{test\_cyclotomic\_squaring$<$ Fqk$<$ mnt4\_pp $>$ $>$()}{test\_cyclotomic\_squaring< Fqk< mnt4\_pp > >()}}
+{\footnotesize\ttfamily \label{test__fields_8cpp_a2d9705a0f1bf6c90de551695d04e2cac} 
+template$<$$>$ \\
+void \mbox{\hyperlink{test__fields_8cpp_ae6ec3be5c9cb04274b20b19120640f22}{test\+\_\+cyclotomic\+\_\+squaring}}$<$ \mbox{\hyperlink{namespacelibff_a1cbc314a52017a7089a0e845293e3d9f}{Fqk}}$<$ \mbox{\hyperlink{classlibff_1_1mnt4__pp}{mnt4\+\_\+pp}} $>$ $>$ (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__fields_8cpp_source_l00115}{115}} of file \mbox{\hyperlink{test__fields_8cpp_source}{test\+\_\+fields.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00116\ \{}
+\DoxyCodeLine{00117\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{namespacelibff_a1cbc314a52017a7089a0e845293e3d9f}{Fqk<mnt4\_pp>}}\ FieldT;}
+\DoxyCodeLine{00118\ \ \ \ \ assert(FieldT::extension\_degree()\ \%\ 2\ ==\ 0);}
+\DoxyCodeLine{00119\ \ \ \ \ FieldT\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ =\ FieldT::random\_element();}
+\DoxyCodeLine{00120\ \ \ \ \ FieldT\ a\_unitary\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.Frobenius\_map(FieldT::extension\_degree()/2)\ *\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.inverse();}
+\DoxyCodeLine{00121\ \ \ \ \ \textcolor{comment}{//\ beta\ =\ a\string^(q\string^(k/2)-\/1)}}
+\DoxyCodeLine{00122\ \ \ \ \ FieldT\ beta\ =\ a\_unitary;}
+\DoxyCodeLine{00123\ \ \ \ \ assert(beta.cyclotomic\_squared()\ ==\ beta.squared());}
+\DoxyCodeLine{00124\ \}}
+
+\end{DoxyCode}
+\Hypertarget{test__fields_8cpp_a118036c30261a4b90e06e37383ed8db7}\index{test\_fields.cpp@{test\_fields.cpp}!test\_cyclotomic\_squaring$<$ Fqk$<$ mnt6\_pp $>$ $>$@{test\_cyclotomic\_squaring$<$ Fqk$<$ mnt6\_pp $>$ $>$}}
+\index{test\_cyclotomic\_squaring$<$ Fqk$<$ mnt6\_pp $>$ $>$@{test\_cyclotomic\_squaring$<$ Fqk$<$ mnt6\_pp $>$ $>$}!test\_fields.cpp@{test\_fields.cpp}}
+\doxysubsubsection{\texorpdfstring{test\_cyclotomic\_squaring$<$ Fqk$<$ mnt6\_pp $>$ $>$()}{test\_cyclotomic\_squaring< Fqk< mnt6\_pp > >()}}
+{\footnotesize\ttfamily \label{test__fields_8cpp_a118036c30261a4b90e06e37383ed8db7} 
+template$<$$>$ \\
+void \mbox{\hyperlink{test__fields_8cpp_ae6ec3be5c9cb04274b20b19120640f22}{test\+\_\+cyclotomic\+\_\+squaring}}$<$ \mbox{\hyperlink{namespacelibff_a1cbc314a52017a7089a0e845293e3d9f}{Fqk}}$<$ \mbox{\hyperlink{classlibff_1_1mnt6__pp}{mnt6\+\_\+pp}} $>$ $>$ (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__fields_8cpp_source_l00127}{127}} of file \mbox{\hyperlink{test__fields_8cpp_source}{test\+\_\+fields.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00128\ \{}
+\DoxyCodeLine{00129\ \ \ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{namespacelibff_a1cbc314a52017a7089a0e845293e3d9f}{Fqk<mnt6\_pp>}}\ FieldT;}
+\DoxyCodeLine{00130\ \ \ \ \ assert(FieldT::extension\_degree()\ \%\ 2\ ==\ 0);}
+\DoxyCodeLine{00131\ \ \ \ \ FieldT\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ =\ FieldT::random\_element();}
+\DoxyCodeLine{00132\ \ \ \ \ FieldT\ a\_unitary\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.Frobenius\_map(FieldT::extension\_degree()/2)\ *\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.inverse();}
+\DoxyCodeLine{00133\ \ \ \ \ \textcolor{comment}{//\ beta\ =\ a\string^((q\string^(k/2)-\/1)*(q+1))}}
+\DoxyCodeLine{00134\ \ \ \ \ FieldT\ beta\ =\ a\_unitary.Frobenius\_map(1)\ *\ a\_unitary;}
+\DoxyCodeLine{00135\ \ \ \ \ assert(beta.cyclotomic\_squared()\ ==\ beta.squared());}
+\DoxyCodeLine{00136\ \}}
+
+\end{DoxyCode}
+\Hypertarget{test__fields_8cpp_a20593f32b7dfaa4513e45b05e3d991f5}\index{test\_fields.cpp@{test\_fields.cpp}!test\_field@{test\_field}}
+\index{test\_field@{test\_field}!test\_fields.cpp@{test\_fields.cpp}}
+\doxysubsubsection{\texorpdfstring{test\_field()}{test\_field()}}
+{\footnotesize\ttfamily \label{test__fields_8cpp_a20593f32b7dfaa4513e45b05e3d991f5} 
+template$<$typename FieldT $>$ \\
+void test\+\_\+field (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__fields_8cpp_source_l00022}{22}} of file \mbox{\hyperlink{test__fields_8cpp_source}{test\+\_\+fields.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00023\ \{}
+\DoxyCodeLine{00024\ \ \ \ \ \mbox{\hyperlink{classlibff_1_1bigint}{bigint<1>}}\ rand1\ =\ \mbox{\hyperlink{classlibff_1_1bigint}{bigint<1>}}(\textcolor{stringliteral}{"{}76749407"{}});}
+\DoxyCodeLine{00025\ \ \ \ \ \mbox{\hyperlink{classlibff_1_1bigint}{bigint<1>}}\ rand2\ =\ \mbox{\hyperlink{classlibff_1_1bigint}{bigint<1>}}(\textcolor{stringliteral}{"{}44410867"{}});}
+\DoxyCodeLine{00026\ \ \ \ \ \mbox{\hyperlink{classlibff_1_1bigint}{bigint<1>}}\ randsum\ =\ \mbox{\hyperlink{classlibff_1_1bigint}{bigint<1>}}(\textcolor{stringliteral}{"{}121160274"{}});}
+\DoxyCodeLine{00027\ }
+\DoxyCodeLine{00028\ \ \ \ \ FieldT\ zero\ =\ FieldT::zero();}
+\DoxyCodeLine{00029\ \ \ \ \ FieldT\ \mbox{\hyperlink{030-_asn-_require-_check_8cpp_a94c3399fbf75a3c798e148d5238ad242}{one}}\ =\ FieldT::one();}
+\DoxyCodeLine{00030\ \ \ \ \ FieldT\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ =\ FieldT::random\_element();}
+\DoxyCodeLine{00031\ \ \ \ \ FieldT\ a\_ser;}
+\DoxyCodeLine{00032\ \ \ \ \ a\_ser\ =\ \mbox{\hyperlink{namespacelibff_a0a19876fdeb681006eed9c4da061a22d}{reserialize<FieldT>}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{00033\ \ \ \ \ assert(a\_ser\ ==\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{00034\ }
+\DoxyCodeLine{00035\ \ \ \ \ FieldT\ b\ =\ FieldT::random\_element();}
+\DoxyCodeLine{00036\ \ \ \ \ FieldT\ c\ =\ FieldT::random\_element();}
+\DoxyCodeLine{00037\ \ \ \ \ FieldT\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ =\ FieldT::random\_element();}
+\DoxyCodeLine{00038\ }
+\DoxyCodeLine{00039\ \ \ \ \ assert(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ !=\ zero);}
+\DoxyCodeLine{00040\ \ \ \ \ assert(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ !=\ \mbox{\hyperlink{030-_asn-_require-_check_8cpp_a94c3399fbf75a3c798e148d5238ad242}{one}});}
+\DoxyCodeLine{00041\ }
+\DoxyCodeLine{00042\ \ \ \ \ assert(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ *\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ ==\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.squared());}
+\DoxyCodeLine{00043\ \ \ \ \ assert((\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ +\ b).squared()\ ==\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.squared()\ +\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}*b\ +\ b*\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ +\ b.squared());}
+\DoxyCodeLine{00044\ \ \ \ \ assert((\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ +\ b)*(c\ +\ d)\ ==\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}*c\ +\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}*d\ +\ b*c\ +\ b*d);}
+\DoxyCodeLine{00045\ \ \ \ \ assert(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ -\/\ b\ ==\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ +\ (-\/b));}
+\DoxyCodeLine{00046\ \ \ \ \ assert(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ -\/\ b\ ==\ (-\/b)\ +\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{00047\ }
+\DoxyCodeLine{00048\ \ \ \ \ assert((\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ \string^\ rand1)\ *\ (\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ \string^\ rand2)\ ==\ (\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\string^randsum));}
+\DoxyCodeLine{00049\ }
+\DoxyCodeLine{00050\ \ \ \ \ assert(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ *\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.inverse()\ ==\ \mbox{\hyperlink{030-_asn-_require-_check_8cpp_a94c3399fbf75a3c798e148d5238ad242}{one}});}
+\DoxyCodeLine{00051\ \ \ \ \ assert((\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ +\ b)\ *\ c.inverse()\ ==\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ *\ c.inverse()\ +\ (b.inverse()\ *\ c).inverse());}
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=254pt]{test__fields_8cpp_a20593f32b7dfaa4513e45b05e3d991f5_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=321pt]{test__fields_8cpp_a20593f32b7dfaa4513e45b05e3d991f5_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__fields_8cpp_a04fc751a2410794b055e8f1680812134}\index{test\_fields.cpp@{test\_fields.cpp}!test\_Fp4\_tom\_cook@{test\_Fp4\_tom\_cook}}
+\index{test\_Fp4\_tom\_cook@{test\_Fp4\_tom\_cook}!test\_fields.cpp@{test\_fields.cpp}}
+\doxysubsubsection{\texorpdfstring{test\_Fp4\_tom\_cook()}{test\_Fp4\_tom\_cook()}}
+{\footnotesize\ttfamily \label{test__fields_8cpp_a04fc751a2410794b055e8f1680812134} 
+template$<$typename Fp4T $>$ \\
+void test\+\_\+\+Fp4\+\_\+tom\+\_\+cook (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__fields_8cpp_source_l00157}{157}} of file \mbox{\hyperlink{test__fields_8cpp_source}{test\+\_\+fields.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00158\ \{}
+\DoxyCodeLine{00159\ \ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{typename}\ Fp4T::my\_Fp\ FieldT;}
+\DoxyCodeLine{00160\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ 100;\ ++i)}
+\DoxyCodeLine{00161\ \ \ \ \ \{}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ Fp4T\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ =\ Fp4T::random\_element();}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ Fp4T\ b\ =\ Fp4T::random\_element();}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ Fp4T\ correct\_res\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ *\ b;}
+\DoxyCodeLine{00165\ }
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ Fp4T\ res;}
+\DoxyCodeLine{00167\ }
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ FieldT}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \ \ \ \ \&a0\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.c0.c0,}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \ \ \ \ \&a1\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.c1.c0,}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \ \ \ \ \&a2\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.c0.c1,}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \ \ \ \ \&a3\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.c1.c1;}
+\DoxyCodeLine{00173\ }
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ FieldT}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \ \ \ \ \&b0\ =\ b.c0.c0,}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \ \ \ \ \&b1\ =\ b.c1.c0,}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \ \ \ \ \&b2\ =\ b.c0.c1,}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \ \ \ \ \&b3\ =\ b.c1.c1;}
+\DoxyCodeLine{00179\ }
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ FieldT}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ \ \ \ \ \&c0\ =\ res.c0.c0,}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \ \ \ \ \&c1\ =\ res.c1.c0,}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \ \ \ \ \ \ \&c2\ =\ res.c0.c1,}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ \ \ \ \ \&c3\ =\ res.c1.c1;}
+\DoxyCodeLine{00185\ }
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ FieldT\ v0\ =\ a0\ *\ b0;}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ FieldT\ v1\ =\ (a0\ +\ a1\ +\ a2\ +\ a3)\ *\ (b0\ +\ b1\ +\ b2\ +\ b3);}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ FieldT\ v2\ =\ (a0\ -\/\ a1\ +\ a2\ -\/\ a3)\ *\ (b0\ -\/\ b1\ +\ b2\ -\/\ b3);}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ FieldT\ v3\ =\ (a0\ +\ FieldT(2)*a1\ +\ FieldT(4)*a2\ +\ FieldT(8)*a3)\ *\ (b0\ +\ FieldT(2)*b1\ +\ FieldT(4)*b2\ +\ FieldT(8)*b3);}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ FieldT\ v4\ =\ (a0\ -\/\ FieldT(2)*a1\ +\ FieldT(4)*a2\ -\/\ FieldT(8)*a3)\ *\ (b0\ -\/\ FieldT(2)*b1\ +\ FieldT(4)*b2\ -\/\ FieldT(8)*b3);}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ FieldT\ v5\ =\ (a0\ +\ FieldT(3)*a1\ +\ FieldT(9)*a2\ +\ FieldT(27)*a3)\ *\ (b0\ +\ FieldT(3)*b1\ +\ FieldT(9)*b2\ +\ FieldT(27)*b3);}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ FieldT\ v6\ =\ a3\ *\ b3;}
+\DoxyCodeLine{00193\ }
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ FieldT\ beta\ =\ Fp4T::non\_residue;}
+\DoxyCodeLine{00195\ }
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ c0\ =\ v0\ +\ beta*(FieldT(4).inverse()*v0\ -\/\ FieldT(6).inverse()*(v1\ +\ v2)\ +\ FieldT(24).inverse()\ *\ (v3\ +\ v4)\ -\/\ FieldT(5)\ *\ v6);}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ c1\ =\ -\/\ FieldT(3).inverse()*v0\ +\ v1\ -\/\ FieldT(2).inverse()*v2\ -\/\ FieldT(4).inverse()*v3\ +\ FieldT(20).inverse()\ *\ v4\ +\ FieldT(30).inverse()\ *\ v5\ -\/\ FieldT(12)\ *\ v6\ +\ beta\ *\ (\ -\/\ FieldT(12).inverse()\ *\ (v0\ -\/\ v1)\ +\ FieldT(24).inverse()*(v2\ -\/\ v3)\ -\/\ FieldT(120).inverse()\ *\ (v4\ -\/\ v5)\ -\/\ FieldT(3)\ *\ v6);}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ c2\ =\ -\/\ (FieldT(5)*(FieldT(4).inverse()))*\ v0\ +\ (FieldT(2)*(FieldT(3).inverse()))*(v1\ +\ v2)\ -\/\ FieldT(24).inverse()*(v3\ +\ v4)\ +\ FieldT(4)*v6\ +\ beta*v6;}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ c3\ =\ FieldT(12).inverse()\ *\ (FieldT(5)*v0\ -\/\ FieldT(7)*v1)\ -\/\ FieldT(24).inverse()*(v2\ -\/\ FieldT(7)*v3\ +\ v4\ +\ v5)\ +\ FieldT(15)*v6;}
+\DoxyCodeLine{00200\ }
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \ \ assert(res\ ==\ correct\_res);}
+\DoxyCodeLine{00202\ }
+\DoxyCodeLine{00203\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ \{v0,\ v3,\ v4,\ v5\}}}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ FieldT\ u\ =\ (FieldT::one()\ -\/\ beta).inverse();}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ assert(v0\ ==\ u\ *\ c0\ +\ beta\ *\ u\ *\ c2\ -\/\ beta\ *\ u\ *\ FieldT(2).inverse()\ *\ v1\ -\/\ beta\ *\ u\ *\ FieldT(2).inverse()\ *\ v2\ +\ beta\ *\ v6);}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ assert(v3\ ==\ -\/\ FieldT(15)\ *\ u\ *\ c0\ -\/\ FieldT(30)\ *\ u\ *\ c1\ -\/\ FieldT(3)\ *\ (FieldT(4)\ +\ beta)\ *\ u\ *\ c2\ -\/\ FieldT(6)\ *\ (FieldT(4)\ +\ beta)\ *\ u\ *\ c3\ +\ (FieldT(24)\ -\/\ FieldT(3)\ *\ beta\ *\ FieldT(2).inverse())\ *\ u\ *\ v1\ +\ (-\/FieldT(8)\ +\ beta\ *\ FieldT(2).inverse())\ *\ u\ *\ v2}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/\ FieldT(3)\ *\ (-\/FieldT(16)\ +\ beta)\ *\ v6);}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \ \ assert(v4\ ==\ -\/\ FieldT(15)\ *\ u\ *\ c0\ +\ FieldT(30)\ *\ u\ *\ c1\ -\/\ FieldT(3)\ *\ (FieldT(4)\ +\ beta)\ *\ u\ *\ c2\ +\ FieldT(6)\ *\ (FieldT(4)\ +\ beta)\ *\ u\ *\ c3\ +\ (FieldT(24)\ -\/\ FieldT(3)\ *\ beta\ *\ FieldT(2).inverse())\ *\ u\ *\ v2\ +\ (-\/FieldT(8)\ +\ beta\ *\ FieldT(2).inverse())\ *\ u\ *\ v1}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/\ FieldT(3)\ *\ (-\/FieldT(16)\ +\ beta)\ *\ v6);}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ \ \ assert(v5\ ==\ -\/\ FieldT(80)\ *\ u\ *\ c0\ -\/\ FieldT(240)\ *\ u\ *\ c1\ -\/\ FieldT(8)\ *\ (FieldT(9)\ +\ beta)\ *\ u\ *\ c2\ -\/\ FieldT(24)\ *\ (FieldT(9)\ +\ beta)\ *\ u\ *\ c3\ -\/\ FieldT(2)\ *\ (-\/FieldT(81)\ +\ beta)\ *\ u\ *\ v1\ +\ (-\/FieldT(81)\ +\ beta)\ *\ u\ *\ v2}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/\ FieldT(8)\ *\ (-\/FieldT(81)\ +\ beta)\ *\ v6);}
+\DoxyCodeLine{00212\ }
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ c0\ +\ beta\ c2\ -\/\ (beta\ v1)/2\ -\/\ (beta\ v2)/\ 2\ -\/\ (-\/1\ +\ beta)\ beta\ v6,}}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ -\/15\ c0\ -\/\ 30\ c1\ -\/\ 3\ (4\ +\ beta)\ c2\ -\/\ 6\ (4\ +\ beta)\ c3\ +\ (24\ -\/\ (3\ beta)/2)\ v1\ +\ (-\/8\ +\ beta/2)\ v2\ +\ 3\ (-\/16\ +\ beta)\ (-\/1\ +\ beta)\ v6,}}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ -\/15\ c0\ +\ 30\ c1\ -\/\ 3\ (4\ +\ beta)\ c2\ +\ 6\ (4\ +\ beta)\ c3\ +\ (-\/8\ +\ beta/2)\ v1\ +\ (24\ -\/\ (3\ beta)/2)\ v2\ +\ 3\ (-\/16\ +\ beta)\ (-\/1\ +\ beta)\ v6,}}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ -\/80\ c0\ -\/\ 240\ c1\ -\/\ 8\ (9\ +\ beta)\ c2\ -\/\ 24\ (9\ +\ beta)\ c3\ -\/\ 2\ (-\/81\ +\ beta)\ v1\ +\ (-\/81\ +\ beta)\ v2\ +\ 8\ (-\/81\ +\ beta)\ (-\/1\ +\ beta)\ v6}}
+\DoxyCodeLine{00217\ \ \ \ \ \}}
+\DoxyCodeLine{00218\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=255pt]{test__fields_8cpp_a04fc751a2410794b055e8f1680812134_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__fields_8cpp_a7b91d385ad670e4debdfafc76562f66f}\index{test\_fields.cpp@{test\_fields.cpp}!test\_Frobenius@{test\_Frobenius}}
+\index{test\_Frobenius@{test\_Frobenius}!test\_fields.cpp@{test\_fields.cpp}}
+\doxysubsubsection{\texorpdfstring{test\_Frobenius()}{test\_Frobenius()}}
+{\footnotesize\ttfamily \label{test__fields_8cpp_a7b91d385ad670e4debdfafc76562f66f} 
+template$<$typename FieldT $>$ \\
+void test\+\_\+\+Frobenius (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__fields_8cpp_source_l00076}{76}} of file \mbox{\hyperlink{test__fields_8cpp_source}{test\+\_\+fields.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00077\ \{}
+\DoxyCodeLine{00078\ \ \ \ \ FieldT\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ =\ FieldT::random\_element();}
+\DoxyCodeLine{00079\ \ \ \ \ assert(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.Frobenius\_map(0)\ ==\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{00080\ \ \ \ \ FieldT\ a\_q\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ \string^\ FieldT::base\_field\_char();}
+\DoxyCodeLine{00081\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{namespacelibff_a86814103d6c6fc995f11b507cacb64c0}{power}}\ =\ 1;\ \mbox{\hyperlink{namespacelibff_a86814103d6c6fc995f11b507cacb64c0}{power}}\ <\ 10;\ ++\mbox{\hyperlink{namespacelibff_a86814103d6c6fc995f11b507cacb64c0}{power}})}
+\DoxyCodeLine{00082\ \ \ \ \ \{}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ FieldT\ a\_qi\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.Frobenius\_map(\mbox{\hyperlink{namespacelibff_a86814103d6c6fc995f11b507cacb64c0}{power}});}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ assert(a\_qi\ ==\ a\_q);}
+\DoxyCodeLine{00085\ }
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ a\_q\ =\ a\_q\ \string^\ FieldT::base\_field\_char();}
+\DoxyCodeLine{00087\ \ \ \ \ \}}
+\DoxyCodeLine{00088\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=261pt]{test__fields_8cpp_a7b91d385ad670e4debdfafc76562f66f_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=346pt]{test__fields_8cpp_a7b91d385ad670e4debdfafc76562f66f_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__fields_8cpp_ac0703dc0ce3823d34e6d18710615f75b}\index{test\_fields.cpp@{test\_fields.cpp}!test\_sqrt@{test\_sqrt}}
+\index{test\_sqrt@{test\_sqrt}!test\_fields.cpp@{test\_fields.cpp}}
+\doxysubsubsection{\texorpdfstring{test\_sqrt()}{test\_sqrt()}}
+{\footnotesize\ttfamily \label{test__fields_8cpp_ac0703dc0ce3823d34e6d18710615f75b} 
+template$<$typename FieldT $>$ \\
+void test\+\_\+sqrt (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__fields_8cpp_source_l00056}{56}} of file \mbox{\hyperlink{test__fields_8cpp_source}{test\+\_\+fields.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00057\ \{}
+\DoxyCodeLine{00058\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ 100;\ ++i)}
+\DoxyCodeLine{00059\ \ \ \ \ \{}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ FieldT\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ =\ FieldT::random\_element();}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ FieldT\ asq\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.squared();}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ assert(asq.sqrt()\ ==\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ ||\ asq.sqrt()\ ==\ -\/\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{00063\ \ \ \ \ \}}
+\DoxyCodeLine{00064\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=319pt]{test__fields_8cpp_ac0703dc0ce3823d34e6d18710615f75b_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__fields_8cpp_abaab3dc2944304cc1218b90514126700}\index{test\_fields.cpp@{test\_fields.cpp}!test\_two\_squarings@{test\_two\_squarings}}
+\index{test\_two\_squarings@{test\_two\_squarings}!test\_fields.cpp@{test\_fields.cpp}}
+\doxysubsubsection{\texorpdfstring{test\_two\_squarings()}{test\_two\_squarings()}}
+{\footnotesize\ttfamily \label{test__fields_8cpp_abaab3dc2944304cc1218b90514126700} 
+template$<$typename FieldT $>$ \\
+void test\+\_\+two\+\_\+squarings (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__fields_8cpp_source_l00067}{67}} of file \mbox{\hyperlink{test__fields_8cpp_source}{test\+\_\+fields.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00068\ \{}
+\DoxyCodeLine{00069\ \ \ \ \ FieldT\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ =\ FieldT::random\_element();}
+\DoxyCodeLine{00070\ \ \ \ \ assert(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.squared()\ ==\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ *\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}});}
+\DoxyCodeLine{00071\ \ \ \ \ assert(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.squared()\ ==\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.squared\_complex());}
+\DoxyCodeLine{00072\ \ \ \ \ assert(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.squared()\ ==\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.squared\_karatsuba());}
+\DoxyCodeLine{00073\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=254pt]{test__fields_8cpp_abaab3dc2944304cc1218b90514126700_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__fields_8cpp_a9e98f9c7032f7f21cad0d55c53fb4502}\index{test\_fields.cpp@{test\_fields.cpp}!test\_unitary\_inverse@{test\_unitary\_inverse}}
+\index{test\_unitary\_inverse@{test\_unitary\_inverse}!test\_fields.cpp@{test\_fields.cpp}}
+\doxysubsubsection{\texorpdfstring{test\_unitary\_inverse()}{test\_unitary\_inverse()}}
+{\footnotesize\ttfamily \label{test__fields_8cpp_a9e98f9c7032f7f21cad0d55c53fb4502} 
+template$<$typename FieldT $>$ \\
+void test\+\_\+unitary\+\_\+inverse (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__fields_8cpp_source_l00091}{91}} of file \mbox{\hyperlink{test__fields_8cpp_source}{test\+\_\+fields.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00092\ \{}
+\DoxyCodeLine{00093\ \ \ \ \ assert(FieldT::extension\_degree()\ \%\ 2\ ==\ 0);}
+\DoxyCodeLine{00094\ \ \ \ \ FieldT\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ =\ FieldT::random\_element();}
+\DoxyCodeLine{00095\ \ \ \ \ FieldT\ aqcubed\_minus1\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.Frobenius\_map(FieldT::extension\_degree()/2)\ *\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}.inverse();}
+\DoxyCodeLine{00096\ \ \ \ \ assert(aqcubed\_minus1.inverse()\ ==\ aqcubed\_minus1.unitary\_inverse());}
+\DoxyCodeLine{00097\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__fields_8cpp_a9e98f9c7032f7f21cad0d55c53fb4502_icgraph}
+\end{center}
+\end{figure}

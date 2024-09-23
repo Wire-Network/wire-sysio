@@ -1,0 +1,5 @@
+<map id="CLI::Range" name="CLI::Range">
+<area shape="rect" id="Node000001" title="Produce a range (factory). Min and max are inclusive." alt="" coords="11,79,100,105"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_validator.html" title="Some validators that are provided." alt="" coords="5,5,106,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="58,46,58,79,53,79,53,46"/>
+</map>

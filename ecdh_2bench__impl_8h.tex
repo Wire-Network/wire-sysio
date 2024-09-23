@@ -1,0 +1,62 @@
+\doxysection{libraries/fc/secp256k1/secp256k1/src/modules/ecdh/bench\+\_\+impl.h File Reference}
+\hypertarget{ecdh_2bench__impl_8h}{}\label{ecdh_2bench__impl_8h}\index{libraries/fc/secp256k1/secp256k1/src/modules/ecdh/bench\_impl.h@{libraries/fc/secp256k1/secp256k1/src/modules/ecdh/bench\_impl.h}}
+{\ttfamily \#include "{}../include/secp256k1\+\_\+ecdh.\+h"{}}\newline
+Include dependency graph for bench\+\_\+impl.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=203pt]{ecdh_2bench__impl_8h__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structbench__ecdh__data}{bench\+\_\+ecdh\+\_\+data}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{ecdh_2bench__impl_8h_a1eef60b8d94696b31bdaea3e0469e687}{run\+\_\+ecdh\+\_\+bench}} (int iters, int argc, char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{ecdh_2bench__impl_8h_a1eef60b8d94696b31bdaea3e0469e687}\index{bench\_impl.h@{bench\_impl.h}!run\_ecdh\_bench@{run\_ecdh\_bench}}
+\index{run\_ecdh\_bench@{run\_ecdh\_bench}!bench\_impl.h@{bench\_impl.h}}
+\doxysubsubsection{\texorpdfstring{run\_ecdh\_bench()}{run\_ecdh\_bench()}}
+{\footnotesize\ttfamily \label{ecdh_2bench__impl_8h_a1eef60b8d94696b31bdaea3e0469e687} 
+void run\+\_\+ecdh\+\_\+bench (\begin{DoxyParamCaption}\item[{int}]{iters}{, }\item[{int}]{argc}{, }\item[{char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{argv}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{ecdh_2bench__impl_8h_source_l00045}{45}} of file \mbox{\hyperlink{ecdh_2bench__impl_8h_source}{bench\+\_\+impl.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00046\ \ \ \ \ \mbox{\hyperlink{structbench__ecdh__data}{bench\_ecdh\_data}}\ data;}
+\DoxyCodeLine{00047\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ =\ argc\ ==\ 1;}
+\DoxyCodeLine{00048\ }
+\DoxyCodeLine{00049\ \ \ \ \ \textcolor{comment}{/*\ create\ a\ context\ with\ no\ capabilities\ */}}
+\DoxyCodeLine{00050\ \ \ \ \ data.ctx\ =\ \mbox{\hyperlink{secp256k1_8h_a3aaa9fcc3ab67bc8f841779a049069c5}{secp256k1\_context\_create}}(\mbox{\hyperlink{secp256k1_8h_ad96f13de52c4c94f5d11d53fd04c529f}{SECP256K1\_FLAGS\_TYPE\_CONTEXT}});}
+\DoxyCodeLine{00051\ }
+\DoxyCodeLine{00052\ \ \ \ \ \textcolor{keywordflow}{if}\ (d\ ||\ \mbox{\hyperlink{bench_8h_a11ad6602b2858a905ba935d8002639db}{have\_flag}}(argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}},\ \textcolor{stringliteral}{"{}ecdh"{}}))\ \mbox{\hyperlink{bench_8h_aabcd2ce2b43c96bd396b30f8ecb79a17}{run\_benchmark}}(\textcolor{stringliteral}{"{}ecdh"{}},\ bench\_ecdh,\ bench\_ecdh\_setup,\ NULL,\ \&data,\ 10,\ iters);}
+\DoxyCodeLine{00053\ }
+\DoxyCodeLine{00054\ \ \ \ \ \mbox{\hyperlink{secp256k1_8h_a026db914e3723531825ecf25a0cbd699}{secp256k1\_context\_destroy}}(data.ctx);}
+\DoxyCodeLine{00055\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{ecdh_2bench__impl_8h_a1eef60b8d94696b31bdaea3e0469e687_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=240pt]{ecdh_2bench__impl_8h_a1eef60b8d94696b31bdaea3e0469e687_icgraph}
+\end{center}
+\end{figure}

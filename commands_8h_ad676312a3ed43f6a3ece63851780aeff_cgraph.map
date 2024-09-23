@@ -1,0 +1,26 @@
+<map id="yh_com_otp_decrypt" name="yh_com_otp_decrypt">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,56,148,82"/>
+<area shape="rect" id="Node000002" href="$util_8c.html#af201e18e3fc54c17b855a6354251247e" title=" " alt="" coords="217,5,308,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="126,53,202,32,203,37,127,58"/>
+<area shape="rect" id="Node000003" href="$lib_2error_8c.html#a238eedb1e27dbff2a0ab9a3932eb3f8b" title=" " alt="" coords="798,108,881,134"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="148,69,409,84,740,108,782,112,782,117,739,113,408,89,148,75"/>
+<area shape="rect" id="Node000004" href="$yubihsm_8c.html#a3677afe2209a1cae31f70a304e260e28" title=" " alt="" coords="196,132,330,158"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="111,80,217,123,215,128,109,85"/>
+<area shape="poly" id="edge14_Node000004_Node000003" title=" " alt="" coords="330,139,782,120,783,126,331,145"/>
+<area shape="rect" id="Node000005" href="$yubihsm__pkcs11_8c.html#ae785d5badbf1f08b491af31f32a135a1" title=" " alt="" coords="804,207,875,232"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="292,156,379,193,477,226,556,245,637,251,739,242,789,232,790,237,740,247,637,256,556,250,476,231,377,198,290,161"/>
+<area shape="rect" id="Node000006" href="$yubihsm_8c.html#a4c26f003b72e800e9c934bca922a404a" title=" " alt="" coords="378,157,526,183"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="331,151,363,156,362,161,330,156"/>
+<area shape="rect" id="Node000007" href="$yubihsm_8c.html#a77870209747d5ccd90f9da3aae2bdfa8" title=" " alt="" coords="574,157,740,183"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="526,168,559,168,559,173,526,173"/>
+<area shape="rect" id="Node000009" href="$yubihsm_8c.html#a0e96ea59c5f32def80843fec5a3c2142" title=" " alt="" coords="592,207,722,232"/>
+<area shape="poly" id="edge10_Node000006_Node000009" title=" " alt="" coords="509,181,586,200,585,205,508,186"/>
+<area shape="poly" id="edge9_Node000007_Node000003" title=" " alt="" coords="707,154,782,133,783,139,708,159"/>
+<area shape="poly" id="edge7_Node000007_Node000005" title=" " alt="" coords="708,181,789,203,788,209,707,186"/>
+<area shape="rect" id="Node000008" href="$yubihsm__pkcs11_8c.html#adc4bd59a60361844aa0e852efa210105" title=" " alt="" coords="805,157,874,183"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="740,168,790,168,790,173,740,173"/>
+<area shape="poly" id="edge13_Node000009_Node000003" title=" " alt="" coords="717,204,738,193,753,181,762,169,771,156,786,143,791,139,794,144,789,147,775,160,766,173,757,185,741,198,719,208"/>
+<area shape="poly" id="edge11_Node000009_Node000005" title=" " alt="" coords="723,217,789,217,789,222,723,222"/>
+<area shape="rect" id="Node000010" href="$rand_8c.html#a2d3d1e86f4093fbe0a1b2a7eede4cd75" title=" " alt="" coords="788,256,891,282"/>
+<area shape="poly" id="edge12_Node000009_Node000010" title=" " alt="" coords="708,230,775,249,773,254,707,236"/>
+</map>

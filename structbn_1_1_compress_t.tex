@@ -1,0 +1,551 @@
+\doxysection{bn\+::CompressT\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>} Struct Template Reference}
+\hypertarget{structbn_1_1_compress_t}{}\label{structbn_1_1_compress_t}\index{bn::CompressT$<$ T $>$@{bn::CompressT$<$ T $>$}}
+
+
+{\ttfamily \#include $<$bn.\+h$>$}
+
+
+
+Collaboration diagram for bn\+::CompressT\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>}\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=231pt]{structbn_1_1_compress_t__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \{ \mbox{\hyperlink{structbn_1_1_compress_t_ad01a84ff160eebb88c9eba3ec2284936ab8a45b76682040094f6be2724df2cb20}{N}} = 4
+ \}
+\item 
+typedef \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{structbn_1_1_compress_t_a264f0e6508b176788da5e77a53ce63f6}{Fp2}}
+\item 
+typedef \mbox{\hyperlink{structbn_1_1_fp2_t_ae20ee4f2d6e5b0c507ec9fd9b4978e93}{Fp2\+::\+Fp}} \mbox{\hyperlink{structbn_1_1_compress_t_aa135a8cfb86e23f12f88e5d2d23d57cc}{Fp}}
+\item 
+typedef \mbox{\hyperlink{structbn_1_1_param_t}{ParamT}}$<$ \mbox{\hyperlink{structbn_1_1_compress_t_a264f0e6508b176788da5e77a53ce63f6}{Fp2}} $>$ \mbox{\hyperlink{structbn_1_1_compress_t_afa48588a0926642318d5ba47d788b435}{Param}}
+\item 
+typedef \mbox{\hyperlink{structbn_1_1_fp2_t_1_1_dbl}{Fp2\+::\+Dbl}} \mbox{\hyperlink{structbn_1_1_compress_t_a0e7bf06bedbd5315f6de5a09f98f7dcf}{Fp2\+Dbl}}
+\item 
+typedef \mbox{\hyperlink{structbn_1_1_fp6_t}{Fp6T}}$<$ \mbox{\hyperlink{structbn_1_1_compress_t_a264f0e6508b176788da5e77a53ce63f6}{Fp2}} $>$ \mbox{\hyperlink{structbn_1_1_compress_t_a3b1aa109d0d04e1c649891af524062aa}{Fp6}}
+\item 
+typedef \mbox{\hyperlink{structbn_1_1_fp12_t}{Fp12T}}$<$ \mbox{\hyperlink{structbn_1_1_compress_t_a3b1aa109d0d04e1c649891af524062aa}{Fp6}} $>$ \mbox{\hyperlink{structbn_1_1_compress_t_af035ffe21100d809ab0bc671108c72b9}{Fp12}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structbn_1_1_compress_t_a41def4a2833c395406d436dec9af896a}{CompressT}} (\mbox{\hyperlink{structbn_1_1_compress_t_af035ffe21100d809ab0bc671108c72b9}{Fp12}} \&z, const \mbox{\hyperlink{structbn_1_1_compress_t_af035ffe21100d809ab0bc671108c72b9}{Fp12}} \&x)
+\item 
+\mbox{\hyperlink{structbn_1_1_compress_t_a0eb61bfbcdbd02976239d9426ff6022e}{CompressT}} (\mbox{\hyperlink{structbn_1_1_compress_t_af035ffe21100d809ab0bc671108c72b9}{Fp12}} \&z, const \mbox{\hyperlink{structbn_1_1_compress_t}{CompressT}} \&c)
+\item 
+void \mbox{\hyperlink{structbn_1_1_compress_t_ab4dabcd4bdc27b53726ed1fbcadbe19a}{decompress}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static void \mbox{\hyperlink{structbn_1_1_compress_t_a0e05ba7f65822deab6582683aea17621}{squareC}} (\mbox{\hyperlink{structbn_1_1_compress_t}{CompressT}} \&z)
+\item 
+static void \mbox{\hyperlink{structbn_1_1_compress_t_ac07bf21de7589787e0e77da6ea926610}{square\+\_\+nC}} (\mbox{\hyperlink{structbn_1_1_compress_t}{CompressT}} \&z, int n)
+\item 
+static void \mbox{\hyperlink{structbn_1_1_compress_t_a44774926a694f9755914e494f974dc71}{fixed\+\_\+power}} (\mbox{\hyperlink{structbn_1_1_compress_t_af035ffe21100d809ab0bc671108c72b9}{Fp12}} \&z, const \mbox{\hyperlink{structbn_1_1_compress_t_af035ffe21100d809ab0bc671108c72b9}{Fp12}} \&x)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structbn_1_1_compress_t_af035ffe21100d809ab0bc671108c72b9}{Fp12}} \& \mbox{\hyperlink{structbn_1_1_compress_t_a5d5faca79d58e23c727c7aeda801665e}{z\+\_\+}}
+\item 
+\mbox{\hyperlink{structbn_1_1_compress_t_a264f0e6508b176788da5e77a53ce63f6}{Fp2}} \& \mbox{\hyperlink{structbn_1_1_compress_t_aa899ba4151cfdae177bf7f17b444f10f}{g1\+\_\+}}
+\item 
+\mbox{\hyperlink{structbn_1_1_compress_t_a264f0e6508b176788da5e77a53ce63f6}{Fp2}} \& \mbox{\hyperlink{structbn_1_1_compress_t_a24deef79cc5a1d9868336bc6fa60e26c}{g2\+\_\+}}
+\item 
+\mbox{\hyperlink{structbn_1_1_compress_t_a264f0e6508b176788da5e77a53ce63f6}{Fp2}} \& \mbox{\hyperlink{structbn_1_1_compress_t_abdd225bd556ac28dcca61ba96a467957}{g3\+\_\+}}
+\item 
+\mbox{\hyperlink{structbn_1_1_compress_t_a264f0e6508b176788da5e77a53ce63f6}{Fp2}} \& \mbox{\hyperlink{structbn_1_1_compress_t_aac8428f0d92ba85f4b6d8c2374d661ae}{g4\+\_\+}}
+\item 
+\mbox{\hyperlink{structbn_1_1_compress_t_a264f0e6508b176788da5e77a53ce63f6}{Fp2}} \& \mbox{\hyperlink{structbn_1_1_compress_t_aa4ec823ed70076abf2542b008f6c0e5c}{g5\+\_\+}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static void(\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structbn_1_1_compress_t_a4e3e135a9f3eea40bfc150f547625207}{square\+\_\+n}} )(\mbox{\hyperlink{structbn_1_1_compress_t}{CompressT}} \&z, int n)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+std\+::ostream \& \mbox{\hyperlink{structbn_1_1_compress_t_ad80b344ba54d53e0fa9d8f5ff720664f}{operator$<$$<$}} (std\+::ostream \&os, const \mbox{\hyperlink{structbn_1_1_compress_t}{CompressT}} \&x)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$\newline
+struct bn\+::\+Compress\+T$<$ T $>$}
+
+
+Definition at line \mbox{\hyperlink{bn_8h_source_l02128}{2128}} of file \mbox{\hyperlink{bn_8h_source}{bn.\+h}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{structbn_1_1_compress_t_aa135a8cfb86e23f12f88e5d2d23d57cc}\index{bn::CompressT$<$ T $>$@{bn::CompressT$<$ T $>$}!Fp@{Fp}}
+\index{Fp@{Fp}!bn::CompressT$<$ T $>$@{bn::CompressT$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{Fp}{Fp}}
+{\footnotesize\ttfamily \label{structbn_1_1_compress_t_aa135a8cfb86e23f12f88e5d2d23d57cc} 
+template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{structbn_1_1_fp2_t_ae20ee4f2d6e5b0c507ec9fd9b4978e93}{Fp2\+::\+Fp}} \mbox{\hyperlink{structbn_1_1_compress_t}{bn\+::\+CompressT}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\mbox{\hyperlink{class_fp}{\+::\+Fp}}}
+
+
+
+Definition at line \mbox{\hyperlink{bn_8h_source_l02130}{2130}} of file \mbox{\hyperlink{bn_8h_source}{bn.\+h}}.
+
+\Hypertarget{structbn_1_1_compress_t_af035ffe21100d809ab0bc671108c72b9}\index{bn::CompressT$<$ T $>$@{bn::CompressT$<$ T $>$}!Fp12@{Fp12}}
+\index{Fp12@{Fp12}!bn::CompressT$<$ T $>$@{bn::CompressT$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{Fp12}{Fp12}}
+{\footnotesize\ttfamily \label{structbn_1_1_compress_t_af035ffe21100d809ab0bc671108c72b9} 
+template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{structbn_1_1_fp12_t}{Fp12T}}$<$\mbox{\hyperlink{structbn_1_1_compress_t_a3b1aa109d0d04e1c649891af524062aa}{Fp6}}$>$ \mbox{\hyperlink{structbn_1_1_compress_t}{bn\+::\+CompressT}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\mbox{\hyperlink{class_fp12}{\+::\+Fp12}}}
+
+
+
+Definition at line \mbox{\hyperlink{bn_8h_source_l02134}{2134}} of file \mbox{\hyperlink{bn_8h_source}{bn.\+h}}.
+
+\Hypertarget{structbn_1_1_compress_t_a264f0e6508b176788da5e77a53ce63f6}\index{bn::CompressT$<$ T $>$@{bn::CompressT$<$ T $>$}!Fp2@{Fp2}}
+\index{Fp2@{Fp2}!bn::CompressT$<$ T $>$@{bn::CompressT$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{Fp2}{Fp2}}
+{\footnotesize\ttfamily \label{structbn_1_1_compress_t_a264f0e6508b176788da5e77a53ce63f6} 
+template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{structbn_1_1_compress_t}{bn\+::\+CompressT}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\mbox{\hyperlink{class_fp2}{\+::\+Fp2}}}
+
+
+
+Definition at line \mbox{\hyperlink{bn_8h_source_l02129}{2129}} of file \mbox{\hyperlink{bn_8h_source}{bn.\+h}}.
+
+\Hypertarget{structbn_1_1_compress_t_a0e7bf06bedbd5315f6de5a09f98f7dcf}\index{bn::CompressT$<$ T $>$@{bn::CompressT$<$ T $>$}!Fp2Dbl@{Fp2Dbl}}
+\index{Fp2Dbl@{Fp2Dbl}!bn::CompressT$<$ T $>$@{bn::CompressT$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{Fp2Dbl}{Fp2Dbl}}
+{\footnotesize\ttfamily \label{structbn_1_1_compress_t_a0e7bf06bedbd5315f6de5a09f98f7dcf} 
+template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{structbn_1_1_fp2_t_1_1_dbl}{Fp2\+::\+Dbl}} \mbox{\hyperlink{structbn_1_1_compress_t}{bn\+::\+CompressT}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::\+Fp2\+Dbl}
+
+
+
+Definition at line \mbox{\hyperlink{bn_8h_source_l02132}{2132}} of file \mbox{\hyperlink{bn_8h_source}{bn.\+h}}.
+
+\Hypertarget{structbn_1_1_compress_t_a3b1aa109d0d04e1c649891af524062aa}\index{bn::CompressT$<$ T $>$@{bn::CompressT$<$ T $>$}!Fp6@{Fp6}}
+\index{Fp6@{Fp6}!bn::CompressT$<$ T $>$@{bn::CompressT$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{Fp6}{Fp6}}
+{\footnotesize\ttfamily \label{structbn_1_1_compress_t_a3b1aa109d0d04e1c649891af524062aa} 
+template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{structbn_1_1_fp6_t}{Fp6T}}$<$\mbox{\hyperlink{structbn_1_1_compress_t_a264f0e6508b176788da5e77a53ce63f6}{Fp2}}$>$ \mbox{\hyperlink{structbn_1_1_compress_t}{bn\+::\+CompressT}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::\+Fp6}
+
+
+
+Definition at line \mbox{\hyperlink{bn_8h_source_l02133}{2133}} of file \mbox{\hyperlink{bn_8h_source}{bn.\+h}}.
+
+\Hypertarget{structbn_1_1_compress_t_afa48588a0926642318d5ba47d788b435}\index{bn::CompressT$<$ T $>$@{bn::CompressT$<$ T $>$}!Param@{Param}}
+\index{Param@{Param}!bn::CompressT$<$ T $>$@{bn::CompressT$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{Param}{Param}}
+{\footnotesize\ttfamily \label{structbn_1_1_compress_t_afa48588a0926642318d5ba47d788b435} 
+template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{structbn_1_1_param_t}{ParamT}}$<$\mbox{\hyperlink{structbn_1_1_compress_t_a264f0e6508b176788da5e77a53ce63f6}{Fp2}}$>$ \mbox{\hyperlink{structbn_1_1_compress_t}{bn\+::\+CompressT}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::\+Param}
+
+
+
+Definition at line \mbox{\hyperlink{bn_8h_source_l02131}{2131}} of file \mbox{\hyperlink{bn_8h_source}{bn.\+h}}.
+
+
+
+\doxysubsection{Member Enumeration Documentation}
+\Hypertarget{structbn_1_1_compress_t_ad01a84ff160eebb88c9eba3ec2284936}\doxysubsubsection{\texorpdfstring{anonymous enum}{anonymous enum}}
+{\footnotesize\ttfamily \label{structbn_1_1_compress_t_ad01a84ff160eebb88c9eba3ec2284936} 
+template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+anonymous enum}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{N@{N}!bn::CompressT$<$ T $>$@{bn::CompressT$<$ T $>$}}\index{bn::CompressT$<$ T $>$@{bn::CompressT$<$ T $>$}!N@{N}}}\Hypertarget{structbn_1_1_compress_t_ad01a84ff160eebb88c9eba3ec2284936ab8a45b76682040094f6be2724df2cb20}\label{structbn_1_1_compress_t_ad01a84ff160eebb88c9eba3ec2284936} 
+N&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{bn_8h_source_l02135}{2135}} of file \mbox{\hyperlink{bn_8h_source}{bn.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02135\ \{\ \mbox{\hyperlink{structbn_1_1_compress_t_ad01a84ff160eebb88c9eba3ec2284936ab8a45b76682040094f6be2724df2cb20}{N}}\ =\ 4\ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structbn_1_1_compress_t_a41def4a2833c395406d436dec9af896a}\index{bn::CompressT$<$ T $>$@{bn::CompressT$<$ T $>$}!CompressT@{CompressT}}
+\index{CompressT@{CompressT}!bn::CompressT$<$ T $>$@{bn::CompressT$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{CompressT()}{CompressT()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structbn_1_1_compress_t_a41def4a2833c395406d436dec9af896a} 
+template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{structbn_1_1_compress_t}{bn\+::\+CompressT}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::\+CompressT (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structbn_1_1_compress_t_af035ffe21100d809ab0bc671108c72b9}{Fp12}} \&}]{z}{, }\item[{const \mbox{\hyperlink{structbn_1_1_compress_t_af035ffe21100d809ab0bc671108c72b9}{Fp12}} \&}]{x}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn_8h_source_l02145}{2145}} of file \mbox{\hyperlink{bn_8h_source}{bn.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02146\ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{structbn_1_1_compress_t_a5d5faca79d58e23c727c7aeda801665e}{z\_}}(z)}
+\DoxyCodeLine{02147\ \ \ \ \ \ \ \ \ ,\ \mbox{\hyperlink{structbn_1_1_compress_t_aa899ba4151cfdae177bf7f17b444f10f}{g1\_}}(z.getFp2()[4])}
+\DoxyCodeLine{02148\ \ \ \ \ \ \ \ \ ,\ \mbox{\hyperlink{structbn_1_1_compress_t_a24deef79cc5a1d9868336bc6fa60e26c}{g2\_}}(z.getFp2()[3])}
+\DoxyCodeLine{02149\ \ \ \ \ \ \ \ \ ,\ \mbox{\hyperlink{structbn_1_1_compress_t_abdd225bd556ac28dcca61ba96a467957}{g3\_}}(z.getFp2()[2])}
+\DoxyCodeLine{02150\ \ \ \ \ \ \ \ \ ,\ \mbox{\hyperlink{structbn_1_1_compress_t_aac8428f0d92ba85f4b6d8c2374d661ae}{g4\_}}(z.getFp2()[1])}
+\DoxyCodeLine{02151\ \ \ \ \ \ \ \ \ ,\ \mbox{\hyperlink{structbn_1_1_compress_t_aa4ec823ed70076abf2542b008f6c0e5c}{g5\_}}(z.getFp2()[5])}
+\DoxyCodeLine{02152\ \ \ \ \ \{}
+\DoxyCodeLine{02153\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structbn_1_1_compress_t_a24deef79cc5a1d9868336bc6fa60e26c}{g2\_}}\ =\ x.getFp2()[3];}
+\DoxyCodeLine{02154\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structbn_1_1_compress_t_abdd225bd556ac28dcca61ba96a467957}{g3\_}}\ =\ x.getFp2()[2];}
+\DoxyCodeLine{02155\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structbn_1_1_compress_t_aac8428f0d92ba85f4b6d8c2374d661ae}{g4\_}}\ =\ x.getFp2()[1];}
+\DoxyCodeLine{02156\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structbn_1_1_compress_t_aa4ec823ed70076abf2542b008f6c0e5c}{g5\_}}\ =\ x.getFp2()[5];}
+\DoxyCodeLine{02157\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structbn_1_1_compress_t_a41def4a2833c395406d436dec9af896a_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structbn_1_1_compress_t_a0eb61bfbcdbd02976239d9426ff6022e}\index{bn::CompressT$<$ T $>$@{bn::CompressT$<$ T $>$}!CompressT@{CompressT}}
+\index{CompressT@{CompressT}!bn::CompressT$<$ T $>$@{bn::CompressT$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{CompressT()}{CompressT()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structbn_1_1_compress_t_a0eb61bfbcdbd02976239d9426ff6022e} 
+template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{structbn_1_1_compress_t}{bn\+::\+CompressT}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::\+CompressT (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structbn_1_1_compress_t_af035ffe21100d809ab0bc671108c72b9}{Fp12}} \&}]{z}{, }\item[{const \mbox{\hyperlink{structbn_1_1_compress_t}{CompressT}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&}]{c}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn_8h_source_l02158}{2158}} of file \mbox{\hyperlink{bn_8h_source}{bn.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02159\ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{structbn_1_1_compress_t_a5d5faca79d58e23c727c7aeda801665e}{z\_}}(z)}
+\DoxyCodeLine{02160\ \ \ \ \ \ \ \ \ ,\ \mbox{\hyperlink{structbn_1_1_compress_t_aa899ba4151cfdae177bf7f17b444f10f}{g1\_}}(z.getFp2()[4])}
+\DoxyCodeLine{02161\ \ \ \ \ \ \ \ \ ,\ \mbox{\hyperlink{structbn_1_1_compress_t_a24deef79cc5a1d9868336bc6fa60e26c}{g2\_}}(z.getFp2()[3])}
+\DoxyCodeLine{02162\ \ \ \ \ \ \ \ \ ,\ \mbox{\hyperlink{structbn_1_1_compress_t_abdd225bd556ac28dcca61ba96a467957}{g3\_}}(z.getFp2()[2])}
+\DoxyCodeLine{02163\ \ \ \ \ \ \ \ \ ,\ \mbox{\hyperlink{structbn_1_1_compress_t_aac8428f0d92ba85f4b6d8c2374d661ae}{g4\_}}(z.getFp2()[1])}
+\DoxyCodeLine{02164\ \ \ \ \ \ \ \ \ ,\ \mbox{\hyperlink{structbn_1_1_compress_t_aa4ec823ed70076abf2542b008f6c0e5c}{g5\_}}(z.getFp2()[5])}
+\DoxyCodeLine{02165\ \ \ \ \ \{}
+\DoxyCodeLine{02166\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structbn_1_1_compress_t_a24deef79cc5a1d9868336bc6fa60e26c}{g2\_}}\ =\ c.g2\_;}
+\DoxyCodeLine{02167\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structbn_1_1_compress_t_abdd225bd556ac28dcca61ba96a467957}{g3\_}}\ =\ c.g3\_;}
+\DoxyCodeLine{02168\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structbn_1_1_compress_t_aac8428f0d92ba85f4b6d8c2374d661ae}{g4\_}}\ =\ c.g4\_;}
+\DoxyCodeLine{02169\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structbn_1_1_compress_t_aa4ec823ed70076abf2542b008f6c0e5c}{g5\_}}\ =\ c.g5\_;}
+\DoxyCodeLine{02170\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structbn_1_1_compress_t_ab4dabcd4bdc27b53726ed1fbcadbe19a}\index{bn::CompressT$<$ T $>$@{bn::CompressT$<$ T $>$}!decompress@{decompress}}
+\index{decompress@{decompress}!bn::CompressT$<$ T $>$@{bn::CompressT$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{decompress()}{decompress()}}
+{\footnotesize\ttfamily \label{structbn_1_1_compress_t_ab4dabcd4bdc27b53726ed1fbcadbe19a} 
+template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+void \mbox{\hyperlink{structbn_1_1_compress_t}{bn\+::\+CompressT}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::decompress (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn_8h_source_l02220}{2220}} of file \mbox{\hyperlink{bn_8h_source}{bn.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02221\ \ \ \ \ \{}
+\DoxyCodeLine{02222\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_fp2}{Fp2}}\ nume,\ denomi;}
+\DoxyCodeLine{02223\ \ \ \ \ \ \ \ \ decompressBeforeInv(nume,\ denomi);}
+\DoxyCodeLine{02224\ \ \ \ \ \ \ \ \ denomi.inverse();}
+\DoxyCodeLine{02225\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structbn_1_1_compress_t_aa899ba4151cfdae177bf7f17b444f10f}{g1\_}}\ =\ nume\ *\ denomi;\ \textcolor{comment}{//\ g1\ is\ recoverd.}}
+\DoxyCodeLine{02226\ \ \ \ \ \ \ \ \ decompressAfterInv();}
+\DoxyCodeLine{02227\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structbn_1_1_compress_t_ab4dabcd4bdc27b53726ed1fbcadbe19a_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structbn_1_1_compress_t_a44774926a694f9755914e494f974dc71}\index{bn::CompressT$<$ T $>$@{bn::CompressT$<$ T $>$}!fixed\_power@{fixed\_power}}
+\index{fixed\_power@{fixed\_power}!bn::CompressT$<$ T $>$@{bn::CompressT$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{fixed\_power()}{fixed\_power()}}
+{\footnotesize\ttfamily \label{structbn_1_1_compress_t_a44774926a694f9755914e494f974dc71} 
+template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+static void \mbox{\hyperlink{structbn_1_1_compress_t}{bn\+::\+CompressT}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::fixed\+\_\+power (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structbn_1_1_compress_t_af035ffe21100d809ab0bc671108c72b9}{Fp12}} \&}]{z}{, }\item[{const \mbox{\hyperlink{structbn_1_1_compress_t_af035ffe21100d809ab0bc671108c72b9}{Fp12}} \&}]{x}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn_8h_source_l02310}{2310}} of file \mbox{\hyperlink{bn_8h_source}{bn.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02311\ \ \ \ \ \{}
+\DoxyCodeLine{02312\ \textcolor{preprocessor}{\#if\ 0}}
+\DoxyCodeLine{02313\ \ \ \ \ \ \ \ \ z\ =\ \mbox{\hyperlink{namespacemie_a595f193249b72c666b84e42439a60817}{power}}(x,\ \mbox{\hyperlink{structbn_1_1_param_t_a923fb465e7dc9bd7c558fdbc10a98b89}{Param::z}}.abs());}
+\DoxyCodeLine{02314\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{02315\ \ \ \ \ \ \ \ \ assert(\&z\ !=\ \&x);}
+\DoxyCodeLine{02316\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_fp12}{Fp12}}\ d62;}
+\DoxyCodeLine{02317\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_fp2}{Fp2}}\ c55nume,\ c55denomi,\ c62nume,\ c62denomi;}
+\DoxyCodeLine{02318\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacebn_a33e475aa5b74853f41d5f83b6a964386}{CompressT}}\ c55(z,\ x);}
+\DoxyCodeLine{02319\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structbn_1_1_compress_t_a4e3e135a9f3eea40bfc150f547625207}{CompressT::square\_n}}(c55,\ 55);\ \textcolor{comment}{//\ 106k}}
+\DoxyCodeLine{02320\ \ \ \ \ \ \ \ \ c55.decompressBeforeInv(c55nume,\ c55denomi);}
+\DoxyCodeLine{02321\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacebn_a33e475aa5b74853f41d5f83b6a964386}{CompressT}}\ c62(d62,\ c55);}
+\DoxyCodeLine{02322\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structbn_1_1_compress_t_a4e3e135a9f3eea40bfc150f547625207}{CompressT::square\_n}}(c62,\ 62\ -\/\ 55);\ \textcolor{comment}{//\ 13.6k}}
+\DoxyCodeLine{02323\ \ \ \ \ \ \ \ \ c62.decompressBeforeInv(c62nume,\ c62denomi);}
+\DoxyCodeLine{02324\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_fp2}{Fp2}}\ acc;}
+\DoxyCodeLine{02325\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structbn_1_1_fp2_t_aee2bbc244ad8927550477987f842e26b}{Fp2::mul}}(acc,\ c55denomi,\ c62denomi);}
+\DoxyCodeLine{02326\ \ \ \ \ \ \ \ \ acc.inverse();}
+\DoxyCodeLine{02327\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_fp2}{Fp2}}\ t;}
+\DoxyCodeLine{02328\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structbn_1_1_fp2_t_aee2bbc244ad8927550477987f842e26b}{Fp2::mul}}(t,\ acc,\ c62denomi);}
+\DoxyCodeLine{02329\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structbn_1_1_fp2_t_aee2bbc244ad8927550477987f842e26b}{Fp2::mul}}(c55.g1\_,\ c55nume,\ t);}
+\DoxyCodeLine{02330\ \ \ \ \ \ \ \ \ c55.decompressAfterInv();\ \textcolor{comment}{//\ 1.1k}}
+\DoxyCodeLine{02331\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structbn_1_1_fp2_t_aee2bbc244ad8927550477987f842e26b}{Fp2::mul}}(t,\ acc,\ c55denomi);}
+\DoxyCodeLine{02332\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structbn_1_1_fp2_t_aee2bbc244ad8927550477987f842e26b}{Fp2::mul}}(c62.g1\_,\ c62nume,\ t);}
+\DoxyCodeLine{02333\ \ \ \ \ \ \ \ \ c62.decompressAfterInv();}
+\DoxyCodeLine{02334\ \ \ \ \ \ \ \ \ z\ *=\ x;\ \textcolor{comment}{//\ 6.5k}}
+\DoxyCodeLine{02335\ \ \ \ \ \ \ \ \ z\ *=\ d62;}
+\DoxyCodeLine{02336\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{02337\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structbn_1_1_compress_t_a44774926a694f9755914e494f974dc71_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structbn_1_1_compress_t_ac07bf21de7589787e0e77da6ea926610}\index{bn::CompressT$<$ T $>$@{bn::CompressT$<$ T $>$}!square\_nC@{square\_nC}}
+\index{square\_nC@{square\_nC}!bn::CompressT$<$ T $>$@{bn::CompressT$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{square\_nC()}{square\_nC()}}
+{\footnotesize\ttfamily \label{structbn_1_1_compress_t_ac07bf21de7589787e0e77da6ea926610} 
+template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+static void \mbox{\hyperlink{structbn_1_1_compress_t}{bn\+::\+CompressT}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::square\+\_\+nC (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structbn_1_1_compress_t}{CompressT}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&}]{z}{, }\item[{int}]{n}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn_8h_source_l02299}{2299}} of file \mbox{\hyperlink{bn_8h_source}{bn.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02300\ \ \ \ \ \{}
+\DoxyCodeLine{02301\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ n;\ i++)\ \{}
+\DoxyCodeLine{02302\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structbn_1_1_compress_t_a0e05ba7f65822deab6582683aea17621}{squareC}}(z);}
+\DoxyCodeLine{02303\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{02304\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structbn_1_1_compress_t_ac07bf21de7589787e0e77da6ea926610_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structbn_1_1_compress_t_a0e05ba7f65822deab6582683aea17621}\index{bn::CompressT$<$ T $>$@{bn::CompressT$<$ T $>$}!squareC@{squareC}}
+\index{squareC@{squareC}!bn::CompressT$<$ T $>$@{bn::CompressT$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{squareC()}{squareC()}}
+{\footnotesize\ttfamily \label{structbn_1_1_compress_t_a0e05ba7f65822deab6582683aea17621} 
+template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+static void \mbox{\hyperlink{structbn_1_1_compress_t}{bn\+::\+CompressT}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::squareC (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structbn_1_1_compress_t}{CompressT}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&}]{z}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn_8h_source_l02232}{2232}} of file \mbox{\hyperlink{bn_8h_source}{bn.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02233\ \ \ \ \ \{}
+\DoxyCodeLine{02234\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_fp2}{Fp2}}\ t0,\ t1,\ t2;}
+\DoxyCodeLine{02235\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structbn_1_1_compress_t_a0e7bf06bedbd5315f6de5a09f98f7dcf}{Fp2Dbl}}\ T0,\ T1,\ T2,\ T3;}
+\DoxyCodeLine{02236\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structbn_1_1_fp2_t_1_1_dbl_a65bf936baedc447dfe9adb735b36045e}{Fp2Dbl::square}}(T0,\ z.g4\_);}
+\DoxyCodeLine{02237\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structbn_1_1_fp2_t_1_1_dbl_a65bf936baedc447dfe9adb735b36045e}{Fp2Dbl::square}}(T1,\ z.g5\_);}
+\DoxyCodeLine{02238\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ \#\ 7}}
+\DoxyCodeLine{02239\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structbn_1_1_fp2_t_1_1_dbl_a401001ae0242bb18d7d710e1558c41bf}{Fp2Dbl::mul\_xi}}(T2,\ T1);}
+\DoxyCodeLine{02240\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ \#\ 8}}
+\DoxyCodeLine{02241\ \ \ \ \ \ \ \ \ T2\ +=\ T0;}
+\DoxyCodeLine{02242\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ \#\ 9}}
+\DoxyCodeLine{02243\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structbn_1_1_fp2_t_1_1_dbl_a03da592d35ae3d26330f55ac9ee94d42}{Fp2Dbl::mod}}(t2,\ T2);}
+\DoxyCodeLine{02244\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ \#\ 1}}
+\DoxyCodeLine{02245\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structbn_1_1_fp2_t_ad51346f0de3fe8e247bb8d43d312cd2e}{Fp2::add}}(t0,\ z.g4\_,\ z.g5\_);}
+\DoxyCodeLine{02246\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structbn_1_1_fp2_t_1_1_dbl_a65bf936baedc447dfe9adb735b36045e}{Fp2Dbl::square}}(T2,\ t0);}
+\DoxyCodeLine{02247\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ \#\ 2}}
+\DoxyCodeLine{02248\ \ \ \ \ \ \ \ \ T0\ +=\ T1;}
+\DoxyCodeLine{02249\ \textcolor{comment}{//\ \ \ \ \ \ Fp2Dbl::addNC(T0,\ T0,\ T1);\ //\ QQQ\ :\ OK?}}
+\DoxyCodeLine{02250\ \ \ \ \ \ \ \ \ T2\ -\/=\ T0;}
+\DoxyCodeLine{02251\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ \#\ 3}}
+\DoxyCodeLine{02252\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structbn_1_1_fp2_t_1_1_dbl_a03da592d35ae3d26330f55ac9ee94d42}{Fp2Dbl::mod}}(t0,\ T2);}
+\DoxyCodeLine{02253\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structbn_1_1_fp2_t_ad51346f0de3fe8e247bb8d43d312cd2e}{Fp2::add}}(t1,\ z.g2\_,\ z.g3\_);}
+\DoxyCodeLine{02254\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structbn_1_1_fp2_t_1_1_dbl_a65bf936baedc447dfe9adb735b36045e}{Fp2Dbl::square}}(T3,\ t1);}
+\DoxyCodeLine{02255\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structbn_1_1_fp2_t_1_1_dbl_a65bf936baedc447dfe9adb735b36045e}{Fp2Dbl::square}}(T2,\ z.g2\_);}
+\DoxyCodeLine{02256\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ \#\ 4}}
+\DoxyCodeLine{02257\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structbn_1_1_fp2_t_ad0533deb0538e489fcd2489f22192211}{Fp2::mul\_xi}}(t1,\ t0);}
+\DoxyCodeLine{02258\ \textcolor{preprocessor}{\#if\ 1\ }\textcolor{comment}{//\ RRR}}
+\DoxyCodeLine{02259\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classmie_1_1_fp_a8548c2278d027af9c2f9e595d4b3ed1d}{Fp::\_3z\_add\_2xC}}(z.g2\_.a\_,\ t1.a\_);}
+\DoxyCodeLine{02260\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classmie_1_1_fp_a8548c2278d027af9c2f9e595d4b3ed1d}{Fp::\_3z\_add\_2xC}}(z.g2\_.b\_,\ t1.b\_);}
+\DoxyCodeLine{02261\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{02262\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ \#\ 5}}
+\DoxyCodeLine{02263\ \ \ \ \ \ \ \ \ z.g2\_\ +=\ t1;}
+\DoxyCodeLine{02264\ \ \ \ \ \ \ \ \ z.g2\_\ +=\ z.g2\_;}
+\DoxyCodeLine{02265\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ \#\ 6}}
+\DoxyCodeLine{02266\ \ \ \ \ \ \ \ \ z.g2\_\ +=\ t1;}
+\DoxyCodeLine{02267\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{02268\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structbn_1_1_fp2_t_aada91f88919732fea224520ebd7cf523}{Fp2::sub}}(t1,\ t2,\ z.g3\_);}
+\DoxyCodeLine{02269\ \ \ \ \ \ \ \ \ t1\ +=\ t1;}
+\DoxyCodeLine{02270\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ \#\ 11\ !!!!}}
+\DoxyCodeLine{02271\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structbn_1_1_fp2_t_1_1_dbl_a65bf936baedc447dfe9adb735b36045e}{Fp2Dbl::square}}(T1,\ z.g3\_);}
+\DoxyCodeLine{02272\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ \#\ 10\ !!!!}}
+\DoxyCodeLine{02273\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structbn_1_1_fp2_t_ad51346f0de3fe8e247bb8d43d312cd2e}{Fp2::add}}(z.g3\_,\ t1,\ t2);}
+\DoxyCodeLine{02274\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ \#\ 12}}
+\DoxyCodeLine{02275\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structbn_1_1_fp2_t_1_1_dbl_a401001ae0242bb18d7d710e1558c41bf}{Fp2Dbl::mul\_xi}}(T0,\ T1);}
+\DoxyCodeLine{02276\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ \#\ 13}}
+\DoxyCodeLine{02277\ \ \ \ \ \ \ \ \ T0\ +=\ T2;}
+\DoxyCodeLine{02278\ \textcolor{comment}{//\ \ \ \ \ \ Fp2Dbl::addNC(T0,\ T0,\ T2);\ //\ QQQ\ :\ OK?}}
+\DoxyCodeLine{02279\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ \#\ 14}}
+\DoxyCodeLine{02280\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structbn_1_1_fp2_t_1_1_dbl_a03da592d35ae3d26330f55ac9ee94d42}{Fp2Dbl::mod}}(t0,\ T0);}
+\DoxyCodeLine{02281\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structbn_1_1_fp2_t_aada91f88919732fea224520ebd7cf523}{Fp2::sub}}(z.g4\_,\ t0,\ z.g4\_);}
+\DoxyCodeLine{02282\ \ \ \ \ \ \ \ \ z.g4\_\ +=\ z.g4\_;}
+\DoxyCodeLine{02283\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ \#\ 15}}
+\DoxyCodeLine{02284\ \ \ \ \ \ \ \ \ z.g4\_\ +=\ t0;}
+\DoxyCodeLine{02285\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ \#\ 16}}
+\DoxyCodeLine{02286\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structbn_1_1_fp2_t_1_1_dbl_a2f0a52803a731c03c42f8c51727eb87c}{Fp2Dbl::addNC}}(T2,\ T2,\ T1);}
+\DoxyCodeLine{02287\ \ \ \ \ \ \ \ \ T3\ -\/=\ T2;}
+\DoxyCodeLine{02288\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ \#\ 17}}
+\DoxyCodeLine{02289\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structbn_1_1_fp2_t_1_1_dbl_a03da592d35ae3d26330f55ac9ee94d42}{Fp2Dbl::mod}}(t0,\ T3);}
+\DoxyCodeLine{02290\ \textcolor{preprocessor}{\#if\ 1\ }\textcolor{comment}{//\ RRR}}
+\DoxyCodeLine{02291\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classmie_1_1_fp_a8548c2278d027af9c2f9e595d4b3ed1d}{Fp::\_3z\_add\_2xC}}(z.g5\_.a\_,\ t0.a\_);}
+\DoxyCodeLine{02292\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classmie_1_1_fp_a8548c2278d027af9c2f9e595d4b3ed1d}{Fp::\_3z\_add\_2xC}}(z.g5\_.b\_,\ t0.b\_);}
+\DoxyCodeLine{02293\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{02294\ \ \ \ \ \ \ \ \ z.g5\_\ +=\ t0;}
+\DoxyCodeLine{02295\ \ \ \ \ \ \ \ \ z.g5\_\ +=\ z.g5\_;}
+\DoxyCodeLine{02296\ \ \ \ \ \ \ \ \ z.g5\_\ +=\ t0;\ \textcolor{comment}{//\ \#\ 18}}
+\DoxyCodeLine{02297\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{02298\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structbn_1_1_compress_t_a0e05ba7f65822deab6582683aea17621_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structbn_1_1_compress_t_a0e05ba7f65822deab6582683aea17621_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{structbn_1_1_compress_t_ad80b344ba54d53e0fa9d8f5ff720664f}\index{bn::CompressT$<$ T $>$@{bn::CompressT$<$ T $>$}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!bn::CompressT$<$ T $>$@{bn::CompressT$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$}{operator<<}}
+{\footnotesize\ttfamily \label{structbn_1_1_compress_t_ad80b344ba54d53e0fa9d8f5ff720664f} 
+template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+std\+::ostream \& operator$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{os}{, }\item[{const \mbox{\hyperlink{structbn_1_1_compress_t}{CompressT}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&}]{x}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn_8h_source_l02172}{2172}} of file \mbox{\hyperlink{bn_8h_source}{bn.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{02173\ \ \ \ \ \{}
+\DoxyCodeLine{02174\ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}C["{}}\ <<\ x.g2\_\ <<\ \textcolor{stringliteral}{"{},\(\backslash\)n"{}}\ <<\ x.g3\_\ <<\ \textcolor{stringliteral}{"{},\(\backslash\)n"{}}\ <<\ x.g4\_\ <<\ \textcolor{stringliteral}{"{},\(\backslash\)n"{}}\ <<\ x.g5\_\ <<\ \textcolor{stringliteral}{"{},\(\backslash\)n"{}}\ <<\ \textcolor{stringliteral}{"{}]"{}};}
+\DoxyCodeLine{02175\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}};}
+\DoxyCodeLine{02176\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structbn_1_1_compress_t_aa899ba4151cfdae177bf7f17b444f10f}\index{bn::CompressT$<$ T $>$@{bn::CompressT$<$ T $>$}!g1\_@{g1\_}}
+\index{g1\_@{g1\_}!bn::CompressT$<$ T $>$@{bn::CompressT$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{g1\_}{g1\_}}
+{\footnotesize\ttfamily \label{structbn_1_1_compress_t_aa899ba4151cfdae177bf7f17b444f10f} 
+template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{structbn_1_1_compress_t_a264f0e6508b176788da5e77a53ce63f6}{Fp2}}\& \mbox{\hyperlink{structbn_1_1_compress_t}{bn\+::\+CompressT}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::g1\+\_\+}
+
+
+
+Definition at line \mbox{\hyperlink{bn_8h_source_l02138}{2138}} of file \mbox{\hyperlink{bn_8h_source}{bn.\+h}}.
+
+\Hypertarget{structbn_1_1_compress_t_a24deef79cc5a1d9868336bc6fa60e26c}\index{bn::CompressT$<$ T $>$@{bn::CompressT$<$ T $>$}!g2\_@{g2\_}}
+\index{g2\_@{g2\_}!bn::CompressT$<$ T $>$@{bn::CompressT$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{g2\_}{g2\_}}
+{\footnotesize\ttfamily \label{structbn_1_1_compress_t_a24deef79cc5a1d9868336bc6fa60e26c} 
+template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{structbn_1_1_compress_t_a264f0e6508b176788da5e77a53ce63f6}{Fp2}}\& \mbox{\hyperlink{structbn_1_1_compress_t}{bn\+::\+CompressT}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::g2\+\_\+}
+
+
+
+Definition at line \mbox{\hyperlink{bn_8h_source_l02139}{2139}} of file \mbox{\hyperlink{bn_8h_source}{bn.\+h}}.
+
+\Hypertarget{structbn_1_1_compress_t_abdd225bd556ac28dcca61ba96a467957}\index{bn::CompressT$<$ T $>$@{bn::CompressT$<$ T $>$}!g3\_@{g3\_}}
+\index{g3\_@{g3\_}!bn::CompressT$<$ T $>$@{bn::CompressT$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{g3\_}{g3\_}}
+{\footnotesize\ttfamily \label{structbn_1_1_compress_t_abdd225bd556ac28dcca61ba96a467957} 
+template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{structbn_1_1_compress_t_a264f0e6508b176788da5e77a53ce63f6}{Fp2}}\& \mbox{\hyperlink{structbn_1_1_compress_t}{bn\+::\+CompressT}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::g3\+\_\+}
+
+
+
+Definition at line \mbox{\hyperlink{bn_8h_source_l02140}{2140}} of file \mbox{\hyperlink{bn_8h_source}{bn.\+h}}.
+
+\Hypertarget{structbn_1_1_compress_t_aac8428f0d92ba85f4b6d8c2374d661ae}\index{bn::CompressT$<$ T $>$@{bn::CompressT$<$ T $>$}!g4\_@{g4\_}}
+\index{g4\_@{g4\_}!bn::CompressT$<$ T $>$@{bn::CompressT$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{g4\_}{g4\_}}
+{\footnotesize\ttfamily \label{structbn_1_1_compress_t_aac8428f0d92ba85f4b6d8c2374d661ae} 
+template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{structbn_1_1_compress_t_a264f0e6508b176788da5e77a53ce63f6}{Fp2}}\& \mbox{\hyperlink{structbn_1_1_compress_t}{bn\+::\+CompressT}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::g4\+\_\+}
+
+
+
+Definition at line \mbox{\hyperlink{bn_8h_source_l02141}{2141}} of file \mbox{\hyperlink{bn_8h_source}{bn.\+h}}.
+
+\Hypertarget{structbn_1_1_compress_t_aa4ec823ed70076abf2542b008f6c0e5c}\index{bn::CompressT$<$ T $>$@{bn::CompressT$<$ T $>$}!g5\_@{g5\_}}
+\index{g5\_@{g5\_}!bn::CompressT$<$ T $>$@{bn::CompressT$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{g5\_}{g5\_}}
+{\footnotesize\ttfamily \label{structbn_1_1_compress_t_aa4ec823ed70076abf2542b008f6c0e5c} 
+template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{structbn_1_1_compress_t_a264f0e6508b176788da5e77a53ce63f6}{Fp2}}\& \mbox{\hyperlink{structbn_1_1_compress_t}{bn\+::\+CompressT}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::g5\+\_\+}
+
+
+
+Definition at line \mbox{\hyperlink{bn_8h_source_l02142}{2142}} of file \mbox{\hyperlink{bn_8h_source}{bn.\+h}}.
+
+\Hypertarget{structbn_1_1_compress_t_a4e3e135a9f3eea40bfc150f547625207}\index{bn::CompressT$<$ T $>$@{bn::CompressT$<$ T $>$}!square\_n@{square\_n}}
+\index{square\_n@{square\_n}!bn::CompressT$<$ T $>$@{bn::CompressT$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{square\_n}{square\_n}}
+{\footnotesize\ttfamily \label{structbn_1_1_compress_t_a4e3e135a9f3eea40bfc150f547625207} 
+template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+void(\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structbn_1_1_compress_t}{bn\+::\+CompressT}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::square\+\_\+n) (\mbox{\hyperlink{structbn_1_1_compress_t}{CompressT}} \&z, int n)\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{bn_8h_source_l02338}{2338}} of file \mbox{\hyperlink{bn_8h_source}{bn.\+h}}.
+
+\Hypertarget{structbn_1_1_compress_t_a5d5faca79d58e23c727c7aeda801665e}\index{bn::CompressT$<$ T $>$@{bn::CompressT$<$ T $>$}!z\_@{z\_}}
+\index{z\_@{z\_}!bn::CompressT$<$ T $>$@{bn::CompressT$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{z\_}{z\_}}
+{\footnotesize\ttfamily \label{structbn_1_1_compress_t_a5d5faca79d58e23c727c7aeda801665e} 
+template$<$\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{structbn_1_1_compress_t_af035ffe21100d809ab0bc671108c72b9}{Fp12}}\& \mbox{\hyperlink{structbn_1_1_compress_t}{bn\+::\+CompressT}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::z\+\_\+}
+
+
+
+Definition at line \mbox{\hyperlink{bn_8h_source_l02137}{2137}} of file \mbox{\hyperlink{bn_8h_source}{bn.\+h}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/libraries/ff/depends/ate-\/pairing/include/\mbox{\hyperlink{bn_8h}{bn.\+h}}\end{DoxyCompactItemize}

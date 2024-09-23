@@ -1,0 +1,144 @@
+\doxysection{libraries/sys-\/vm/tests/stack\+\_\+restriction\+\_\+tests.cpp File Reference}
+\hypertarget{stack__restriction__tests_8cpp}{}\label{stack__restriction__tests_8cpp}\index{libraries/sys-\/vm/tests/stack\_restriction\_tests.cpp@{libraries/sys-\/vm/tests/stack\_restriction\_tests.cpp}}
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$vector$>$}\newline
+{\ttfamily \#include $<$sysio/vm/backend.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/vm/watchdog.\+hpp$>$}\newline
+{\ttfamily \#include "{}utils.\+hpp"{}}\newline
+{\ttfamily \#include $<$catch2/catch.\+hpp$>$}\newline
+Include dependency graph for stack\+\_\+restriction\+\_\+tests.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{stack__restriction__tests_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stack__restriction__tests_8cpp_a5f5e8780739db8c1be99e219bdf27f05}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Test that we can load and run \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}} wasm that uses 8191 \mbox{\hyperlink{classsysio_1_1vm_1_1stack}{stack}} elements"{}, "{}\mbox{[}8k\+\_\+minus\+\_\+1\+\_\+stack\+\_\+elems\+\_\+test\mbox{]}"{})
+\item 
+\mbox{\hyperlink{stack__restriction__tests_8cpp_ad672359c128f05e1c41df9728ee0e3d9}{BACKEND\+\_\+\+TEST\+\_\+\+CASE}} ("{}Test that we can load and run \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}} wasm that uses 8192 \mbox{\hyperlink{classsysio_1_1vm_1_1stack}{stack}} elements"{}, "{}\mbox{[}8k\+\_\+stack\+\_\+elems\+\_\+test\mbox{]}"{})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+wasm\+\_\+allocator \mbox{\hyperlink{stack__restriction__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{stack__restriction__tests_8cpp_a5f5e8780739db8c1be99e219bdf27f05}\index{stack\_restriction\_tests.cpp@{stack\_restriction\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!stack\_restriction\_tests.cpp@{stack\_restriction\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{stack__restriction__tests_8cpp_a5f5e8780739db8c1be99e219bdf27f05} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Test that we can load and run \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}} wasm that uses 8191 \mbox{\hyperlink{classsysio_1_1vm_1_1stack}{stack}} elements"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}8k\+\_\+minus\+\_\+1\+\_\+stack\+\_\+elems\+\_\+test\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{stack__restriction__tests_8cpp_source_l00015}{15}} of file \mbox{\hyperlink{stack__restriction__tests_8cpp_source}{stack\+\_\+restriction\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00017\ \ \ \ \textcolor{comment}{//\ comes\ from\ the\ wasm}}
+\DoxyCodeLine{00018\ \ \ \ \textcolor{comment}{/*}}
+\DoxyCodeLine{00019\ \textcolor{comment}{\ \ \ (module}}
+\DoxyCodeLine{00020\ \textcolor{comment}{\ \ \ \ \ (type\ (;0;)\ (func))}}
+\DoxyCodeLine{00021\ \textcolor{comment}{\ \ \ \ \ (type\ (;1;)\ (func\ (param\ i32)))}}
+\DoxyCodeLine{00022\ \textcolor{comment}{\ \ \ \ \ (func\ (;0;)\ (type\ 1)\ (param\ i32)}}
+\DoxyCodeLine{00023\ \textcolor{comment}{\ \ \ \ \ \ \ (local\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64}}
+\DoxyCodeLine{00024\ \textcolor{comment}{\ \ \ i64\ i64\ i64\ i64\ i64)\ get\_local\ 0\ i32.const\ 249\ i32.eq\ br\_if\ 0\ (;@0;)\ get\_local\ 0\ i32.const\ 1\ i32.add\ call\ 0)\ (func}}
+\DoxyCodeLine{00025\ \textcolor{comment}{\ \ \ (;1;)\ (type\ 0)\ (local\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64}}
+\DoxyCodeLine{00026\ \textcolor{comment}{\ \ \ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64}}
+\DoxyCodeLine{00027\ \textcolor{comment}{\ \ \ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64}}
+\DoxyCodeLine{00028\ \textcolor{comment}{\ \ \ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64}}
+\DoxyCodeLine{00029\ \textcolor{comment}{\ \ \ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64}}
+\DoxyCodeLine{00030\ \textcolor{comment}{\ \ \ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64}}
+\DoxyCodeLine{00031\ \textcolor{comment}{\ \ \ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64)\ i32.const\ 0\ call\ 0)\ (memory}}
+\DoxyCodeLine{00032\ \textcolor{comment}{\ \ \ (;0;)\ 0)\ (export\ "{}fun"{}\ (func\ 1)))}}
+\DoxyCodeLine{00033\ \textcolor{comment}{\ \ \ */}}
+\DoxyCodeLine{00034\ \ \ \ std::vector<uint8\_t>\ \_8k\_stack\_size\_1\_under\_wasm\ =\ \{}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ 0x00,\ 0x61,\ 0x73,\ 0x6d,\ 0x01,\ 0x00,\ 0x00,\ 0x00,\ 0x01,\ 0x08,\ 0x02,\ 0x60,\ 0x00,\ 0x00,\ 0x60,\ 0x01,\ 0x7f,\ 0x00,}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ 0x03,\ 0x03,\ 0x02,\ 0x01,\ 0x00,\ 0x05,\ 0x03,\ 0x01,\ 0x00,\ 0x00,\ 0x07,\ 0x07,\ 0x01,\ 0x03,\ 0x66,\ 0x75,\ 0x6e,\ 0x00,}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ 0x01,\ 0x0a,\ 0x1f,\ 0x02,\ 0x13,\ 0x01,\ 0x1f,\ 0x7e,\ 0x20,\ 0x00,\ 0x41,\ 0xf9,\ 0x01,\ 0x46,\ 0x0d,\ 0x00,\ 0x20,\ 0x00,}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ 0x41,\ 0x01,\ 0x6a,\ 0x10,\ 0x00,\ 0x0b,\ 0x09,\ 0x01,\ 0xbe,\ 0x01,\ 0x7e,\ 0x41,\ 0x00,\ 0x10,\ 0x00,\ 0x0b}
+\DoxyCodeLine{00039\ \ \ \ \};}
+\DoxyCodeLine{00040\ }
+\DoxyCodeLine{00041\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<nullptr\_t>}};}
+\DoxyCodeLine{00042\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ \mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}(\_8k\_stack\_size\_1\_under\_wasm,\ \&\mbox{\hyperlink{stack__restriction__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00043\ \ \ \ \mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_a6a3fbbc16a719762e15001d75ed3a6d0}{execute\_all}}(\mbox{\hyperlink{classsysio_1_1vm_1_1null__watchdog}{null\_watchdog}}());}
+\DoxyCodeLine{00044\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{stack__restriction__tests_8cpp_a5f5e8780739db8c1be99e219bdf27f05_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{stack__restriction__tests_8cpp_ad672359c128f05e1c41df9728ee0e3d9}\index{stack\_restriction\_tests.cpp@{stack\_restriction\_tests.cpp}!BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}}
+\index{BACKEND\_TEST\_CASE@{BACKEND\_TEST\_CASE}!stack\_restriction\_tests.cpp@{stack\_restriction\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{BACKEND\_TEST\_CASE()}{BACKEND\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{stack__restriction__tests_8cpp_ad672359c128f05e1c41df9728ee0e3d9} 
+BACKEND\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Test that we can load and run \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}} wasm that uses 8192 \mbox{\hyperlink{classsysio_1_1vm_1_1stack}{stack}} elements"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}8k\+\_\+stack\+\_\+elems\+\_\+test\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{stack__restriction__tests_8cpp_source_l00046}{46}} of file \mbox{\hyperlink{stack__restriction__tests_8cpp_source}{stack\+\_\+restriction\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00047\ \ \ \ \textcolor{comment}{//\ comes\ from\ the\ wasm}}
+\DoxyCodeLine{00048\ \ \ \ \textcolor{comment}{/*}}
+\DoxyCodeLine{00049\ \textcolor{comment}{\ \ \ (module}}
+\DoxyCodeLine{00050\ \textcolor{comment}{\ \ \ \ \ (type\ (;0;)\ (func))}}
+\DoxyCodeLine{00051\ \textcolor{comment}{\ \ \ \ \ (type\ (;1;)\ (func\ (param\ i32)))}}
+\DoxyCodeLine{00052\ \textcolor{comment}{\ \ \ \ \ (func\ (;0;)\ (type\ 1)\ (param\ i32)}}
+\DoxyCodeLine{00053\ \textcolor{comment}{\ \ \ \ \ \ \ (local\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64}}
+\DoxyCodeLine{00054\ \textcolor{comment}{\ \ \ i64\ i64\ i64\ i64\ i64)\ get\_local\ 0\ i32.const\ 249\ i32.eq\ br\_if\ 0\ (;@0;)\ get\_local\ 0\ i32.const\ 1\ i32.add\ call\ 0)\ (func}}
+\DoxyCodeLine{00055\ \textcolor{comment}{\ \ \ (;1;)\ (type\ 0)\ (local\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64}}
+\DoxyCodeLine{00056\ \textcolor{comment}{\ \ \ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64}}
+\DoxyCodeLine{00057\ \textcolor{comment}{\ \ \ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64}}
+\DoxyCodeLine{00058\ \textcolor{comment}{\ \ \ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64}}
+\DoxyCodeLine{00059\ \textcolor{comment}{\ \ \ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64}}
+\DoxyCodeLine{00060\ \textcolor{comment}{\ \ \ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64}}
+\DoxyCodeLine{00061\ \textcolor{comment}{\ \ \ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64\ i64)\ i32.const\ 0\ call\ 0)\ (memory}}
+\DoxyCodeLine{00062\ \textcolor{comment}{\ \ \ (;0;)\ 0)\ (export\ "{}fun"{}\ (func\ 1)))}}
+\DoxyCodeLine{00063\ \textcolor{comment}{\ \ \ */}}
+\DoxyCodeLine{00064\ }
+\DoxyCodeLine{00065\ \ \ \ std::vector<uint8\_t>\ \_8k\_stack\_size\_wasm\ =\ \{\ 0x00,\ 0x61,\ 0x73,\ 0x6d,\ 0x01,\ 0x00,\ 0x00,\ 0x00,\ 0x01,\ 0x08,\ 0x02,\ 0x60,}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x00,\ 0x00,\ 0x60,\ 0x01,\ 0x7f,\ 0x00,\ 0x03,\ 0x03,\ 0x02,\ 0x01,\ 0x00,\ 0x05,}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x03,\ 0x01,\ 0x00,\ 0x00,\ 0x07,\ 0x07,\ 0x01,\ 0x03,\ 0x66,\ 0x75,\ 0x6e,\ 0x00,}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x01,\ 0x0a,\ 0x1f,\ 0x02,\ 0x13,\ 0x01,\ 0x9d,\ 0x03,\ 0x7e,\ 0x20,\ 0x00,\ 0x41,}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x14,\ 0x46,\ 0x0d,\ 0x00,\ 0x20,\ 0x00,\ 0x41,\ 0x01,\ 0x6a,\ 0x10,\ 0x00,\ 0x0b,}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x09,\ 0x01,\ 0xfe,\ 0x02,\ 0x7e,\ 0x41,\ 0x00,\ 0x10,\ 0x00,\ 0x0b\ \};}
+\DoxyCodeLine{00071\ }
+\DoxyCodeLine{00072\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ =\ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend<nullptr\_t>}};}
+\DoxyCodeLine{00073\ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1backend}{backend\_t}}\ \mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}(\_8k\_stack\_size\_wasm,\ \&\mbox{\hyperlink{stack__restriction__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}{wa}});}
+\DoxyCodeLine{00074\ \ \ \ \mbox{\hyperlink{hello__driver_8cpp_a80e74e0649e294630eb0d356133d8c0b}{bkend}}.\mbox{\hyperlink{classsysio_1_1vm_1_1backend_a6a3fbbc16a719762e15001d75ed3a6d0}{execute\_all}}(\mbox{\hyperlink{classsysio_1_1vm_1_1null__watchdog}{null\_watchdog}}());}
+\DoxyCodeLine{00075\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{stack__restriction__tests_8cpp_ad672359c128f05e1c41df9728ee0e3d9_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{stack__restriction__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89}\index{stack\_restriction\_tests.cpp@{stack\_restriction\_tests.cpp}!wa@{wa}}
+\index{wa@{wa}!stack\_restriction\_tests.cpp@{stack\_restriction\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{wa}{wa}}
+{\footnotesize\ttfamily \label{stack__restriction__tests_8cpp_a5cb24351621ddfcd03aa81eb1ae71a89} 
+wasm\+\_\+allocator wa\hspace{0.3cm}{\ttfamily [extern]}}
+
+
+
+Definition at line \mbox{\hyperlink{libraries_2sys-vm_2tests_2main_8cpp_source_l00010}{10}} of file \mbox{\hyperlink{libraries_2sys-vm_2tests_2main_8cpp_source}{main.\+cpp}}.
+

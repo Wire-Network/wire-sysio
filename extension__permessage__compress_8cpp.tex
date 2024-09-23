@@ -1,0 +1,203 @@
+\doxysection{libraries/fc/vendor/websocketpp/test/processors/extension\+\_\+permessage\+\_\+compress.cpp File Reference}
+\hypertarget{extension__permessage__compress_8cpp}{}\label{extension__permessage__compress_8cpp}\index{libraries/fc/vendor/websocketpp/test/processors/extension\_permessage\_compress.cpp@{libraries/fc/vendor/websocketpp/test/processors/extension\_permessage\_compress.cpp}}
+{\ttfamily \#include $<$boost/test/unit\+\_\+test.\+hpp$>$}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$string$>$}\newline
+{\ttfamily \#include $<$websocketpp/common/memory.\+hpp$>$}\newline
+{\ttfamily \#include $<$websocketpp/http/request.\+hpp$>$}\newline
+{\ttfamily \#include $<$websocketpp/extensions/permessage\+\_\+deflate/enabled.\+hpp$>$}\newline
+Include dependency graph for extension\+\_\+permessage\+\_\+compress.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{extension__permessage__compress_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{classconfig}{config}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{extension__permessage__compress_8cpp_a6b2a3852db8bb19ab6909bac01859985}{BOOST\+\_\+\+TEST\+\_\+\+MODULE}}~extension\+\_\+permessage\+\_\+deflate
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled}{websocketpp\+::extensions\+::permessage\+\_\+deflate\+::enabled}}$<$ \mbox{\hyperlink{classconfig}{config}} $>$ \mbox{\hyperlink{extension__permessage__compress_8cpp_ab4a7586703d46c4d88ba27e6653bce6b}{compressor\+\_\+type}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{extension__permessage__compress_8cpp_a41709f6c6475994832943e0b9d8d2c4f}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (deflate\+\_\+init)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{extension__permessage__compress_8cpp_a6b2a3852db8bb19ab6909bac01859985}\index{extension\_permessage\_compress.cpp@{extension\_permessage\_compress.cpp}!BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}}
+\index{BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}!extension\_permessage\_compress.cpp@{extension\_permessage\_compress.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_TEST\_MODULE}{BOOST\_TEST\_MODULE}}
+{\footnotesize\ttfamily \label{extension__permessage__compress_8cpp_a6b2a3852db8bb19ab6909bac01859985} 
+\#define BOOST\+\_\+\+TEST\+\_\+\+MODULE~extension\+\_\+permessage\+\_\+deflate}
+
+
+
+Definition at line \mbox{\hyperlink{extension__permessage__compress_8cpp_source_l00028}{28}} of file \mbox{\hyperlink{extension__permessage__compress_8cpp_source}{extension\+\_\+permessage\+\_\+compress.\+cpp}}.
+
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{extension__permessage__compress_8cpp_ab4a7586703d46c4d88ba27e6653bce6b}\index{extension\_permessage\_compress.cpp@{extension\_permessage\_compress.cpp}!compressor\_type@{compressor\_type}}
+\index{compressor\_type@{compressor\_type}!extension\_permessage\_compress.cpp@{extension\_permessage\_compress.cpp}}
+\doxysubsubsection{\texorpdfstring{compressor\_type}{compressor\_type}}
+{\footnotesize\ttfamily \label{extension__permessage__compress_8cpp_ab4a7586703d46c4d88ba27e6653bce6b} 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1extensions_1_1permessage__deflate_1_1enabled}{websocketpp\+::extensions\+::permessage\+\_\+deflate\+::enabled}}$<$\mbox{\hyperlink{classconfig}{config}}$>$ \mbox{\hyperlink{extension__permessage__compress_8cpp_ab4a7586703d46c4d88ba27e6653bce6b}{compressor\+\_\+type}}}
+
+
+
+Definition at line \mbox{\hyperlink{extension__permessage__compress_8cpp_source_l00042}{42}} of file \mbox{\hyperlink{extension__permessage__compress_8cpp_source}{extension\+\_\+permessage\+\_\+compress.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{extension__permessage__compress_8cpp_a41709f6c6475994832943e0b9d8d2c4f}\index{extension\_permessage\_compress.cpp@{extension\_permessage\_compress.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!extension\_permessage\_compress.cpp@{extension\_permessage\_compress.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}}
+{\footnotesize\ttfamily \label{extension__permessage__compress_8cpp_a41709f6c6475994832943e0b9d8d2c4f} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{deflate\+\_\+init}]{}{}\end{DoxyParamCaption})}
+
+Window size is primarily controlled by the writer. \doxylink{struct_a}{A} stream can only be read by a window size equal to or greater than the one use to compress it initially. The default windows size is also the maximum window size. Thus\+:
+
+Outbound window size can be limited unilaterally under the assumption that the opposite end will be using the default (maximum size which can read anything)
+
+Inbound window size must be limited by asking the remote endpoint to do so and it agreeing.
+
+Context takeover is also primarily controlled by the writer. If the compressor does not clear its context between messages then the reader can\textquotesingle{}t either.
+
+Outbound messages may clear context between messages unilaterally. Inbound messages must retain state unless the remote endpoint signals otherwise.
+
+Negotiation options\+: Client must choose from the following options\+:
+\begin{DoxyItemize}
+\item whether or not to request an inbound window limit
+\item whether or not to signal that it will honor an outbound window limit
+\item whether or not to request that the server disallow context takeover
+\end{DoxyItemize}
+
+Server must answer in the following ways
+\begin{DoxyItemize}
+\item If client requested a window size limit, is the window size limit acceptable?
+\item If client allows window limit requests, should we send one?
+\item If client requested no context takeover, should we accept?
+\end{DoxyItemize}
+
+All Defaults Req\+: permessage-\/compress; method=deflate Ans\+: permessage-\/compress; method=deflate
+
+\doxysubsection*{Client wants to limit the size of inbound windows from server}
+
+permessage-\/compress; method="{}deflate; s2c\+\_\+max\+\_\+window\+\_\+bits=8, deflate"{} Ans\+: permessage-\/compress; method="{}deflate; s2c\+\_\+max\+\_\+window\+\_\+bits=8"{} OR Ans\+: permessage-\/compress; method=deflate
+
+\doxysubsection*{Server wants to limit the size of inbound windows from client}
+
+Client\+: permessage-\/compress; method="{}deflate; c2s\+\_\+max\+\_\+window\+\_\+bits, deflate"{}
+
+Server\+: permessage-\/compress; method="{}deflate; c2s\+\_\+max\+\_\+window\+\_\+bits=8"{}
+
+\doxysubsection*{Client wants to}
+
+Definition at line \mbox{\hyperlink{extension__permessage__compress_8cpp_source_l00046}{46}} of file \mbox{\hyperlink{extension__permessage__compress_8cpp_source}{extension\+\_\+permessage\+\_\+compress.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00047\ \ \ \ \ \textcolor{comment}{/*compressor\_type\ compressor;}}
+\DoxyCodeLine{00048\ \textcolor{comment}{\ \ \ \ websocketpp::http::parser::attribute\_list\ attributes;}}
+\DoxyCodeLine{00049\ \textcolor{comment}{\ \ \ \ std::pair<lib::error\_code,std::string>\ neg\_ret;}}
+\DoxyCodeLine{00050\ \textcolor{comment}{}}
+\DoxyCodeLine{00051\ \textcolor{comment}{\ \ \ \ neg\_ret\ =\ compressor.negotiate(attributes);}}
+\DoxyCodeLine{00052\ \textcolor{comment}{}}
+\DoxyCodeLine{00053\ \textcolor{comment}{\ \ \ \ BOOST\_CHECK\_EQUAL(\ neg\_ret.first,}}
+\DoxyCodeLine{00054\ \textcolor{comment}{\ \ \ \ \ \ \ \ extensions::permessage\_deflate::error::invalid\_parameters\ );*/}}
+\DoxyCodeLine{00055\ }
+\DoxyCodeLine{00120\ \ \ \ \textcolor{comment}{/*\ processor::extensions::deflate\_method\ d(true);}}
+\DoxyCodeLine{00121\ \textcolor{comment}{\ \ \ \ http::parser::attribute\_list\ attributes;}}
+\DoxyCodeLine{00122\ \textcolor{comment}{\ \ \ \ lib::error\_code\ ec;}}
+\DoxyCodeLine{00123\ \textcolor{comment}{}}
+\DoxyCodeLine{00124\ \textcolor{comment}{\ \ \ \ attributes.push\_back(http::parser::attribute("{}foo"{},"{}bar"{}));}}
+\DoxyCodeLine{00125\ \textcolor{comment}{\ \ \ \ ec\ =\ d.init(attributes);}}
+\DoxyCodeLine{00126\ \textcolor{comment}{\ \ \ \ BOOST\_CHECK(ec\ ==\ processor::extensions::error::unknown\_method\_parameter);}}
+\DoxyCodeLine{00127\ \textcolor{comment}{}}
+\DoxyCodeLine{00128\ \textcolor{comment}{\ \ \ \ attributes.clear();}}
+\DoxyCodeLine{00129\ \textcolor{comment}{\ \ \ \ attributes.push\_back(http::parser::attribute("{}s2c\_max\_window\_bits"{},"{}bar"{}));}}
+\DoxyCodeLine{00130\ \textcolor{comment}{\ \ \ \ ec\ =\ d.init(attributes);}}
+\DoxyCodeLine{00131\ \textcolor{comment}{\ \ \ \ BOOST\_CHECK(ec\ ==\ processor::extensions::error::invalid\_algorithm\_settings);}}
+\DoxyCodeLine{00132\ \textcolor{comment}{}}
+\DoxyCodeLine{00133\ \textcolor{comment}{\ \ \ \ attributes.clear();}}
+\DoxyCodeLine{00134\ \textcolor{comment}{\ \ \ \ attributes.push\_back(http::parser::attribute("{}s2c\_max\_window\_bits"{},"{}7"{}));}}
+\DoxyCodeLine{00135\ \textcolor{comment}{\ \ \ \ ec\ =\ d.init(attributes);}}
+\DoxyCodeLine{00136\ \textcolor{comment}{\ \ \ \ BOOST\_CHECK(ec\ ==\ processor::extensions::error::invalid\_algorithm\_settings);}}
+\DoxyCodeLine{00137\ \textcolor{comment}{}}
+\DoxyCodeLine{00138\ \textcolor{comment}{\ \ \ \ attributes.clear();}}
+\DoxyCodeLine{00139\ \textcolor{comment}{\ \ \ \ attributes.push\_back(http::parser::attribute("{}s2c\_max\_window\_bits"{},"{}16"{}));}}
+\DoxyCodeLine{00140\ \textcolor{comment}{\ \ \ \ ec\ =\ d.init(attributes);}}
+\DoxyCodeLine{00141\ \textcolor{comment}{\ \ \ \ BOOST\_CHECK(ec\ ==\ processor::extensions::error::invalid\_algorithm\_settings);}}
+\DoxyCodeLine{00142\ \textcolor{comment}{}}
+\DoxyCodeLine{00143\ \textcolor{comment}{\ \ \ \ attributes.clear();}}
+\DoxyCodeLine{00144\ \textcolor{comment}{\ \ \ \ attributes.push\_back(http::parser::attribute("{}s2c\_max\_window\_bits"{},"{}9"{}));}}
+\DoxyCodeLine{00145\ \textcolor{comment}{\ \ \ \ ec\ =\ d.init(attributes);}}
+\DoxyCodeLine{00146\ \textcolor{comment}{\ \ \ \ BOOST\_CHECK(\ !ec);}}
+\DoxyCodeLine{00147\ \textcolor{comment}{}}
+\DoxyCodeLine{00148\ \textcolor{comment}{\ \ \ \ attributes.clear();}}
+\DoxyCodeLine{00149\ \textcolor{comment}{\ \ \ \ ec\ =\ d.init(attributes);}}
+\DoxyCodeLine{00150\ \textcolor{comment}{\ \ \ \ BOOST\_CHECK(\ !ec);}}
+\DoxyCodeLine{00151\ \textcolor{comment}{}}
+\DoxyCodeLine{00152\ \textcolor{comment}{\ \ \ \ processor::extensions::deflate\_engine\ de;}}
+\DoxyCodeLine{00153\ \textcolor{comment}{}}
+\DoxyCodeLine{00154\ \textcolor{comment}{\ \ \ \ unsigned\ char\ test\_in[]\ =\ "{}HelloHelloHelloHello"{};}}
+\DoxyCodeLine{00155\ \textcolor{comment}{\ \ \ \ unsigned\ char\ test\_out[30];}}
+\DoxyCodeLine{00156\ \textcolor{comment}{}}
+\DoxyCodeLine{00157\ \textcolor{comment}{\ \ \ \ uLongf\ test\_out\_size\ =\ 30;}}
+\DoxyCodeLine{00158\ \textcolor{comment}{}}
+\DoxyCodeLine{00159\ \textcolor{comment}{\ \ \ \ int\ ret;}}
+\DoxyCodeLine{00160\ \textcolor{comment}{}}
+\DoxyCodeLine{00161\ \textcolor{comment}{\ \ \ \ ret\ =\ compress(test\_out,\ \&test\_out\_size,\ test\_in,\ 20);}}
+\DoxyCodeLine{00162\ \textcolor{comment}{}}
+\DoxyCodeLine{00163\ \textcolor{comment}{\ \ \ \ std::cout\ <<\ ret\ <<\ std::endl}}
+\DoxyCodeLine{00164\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ websocketpp::utility::to\_hex(test\_in,20)\ <<\ std::endl}}
+\DoxyCodeLine{00165\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ websocketpp::utility::to\_hex(test\_out,test\_out\_size)\ <<\ std::endl;}}
+\DoxyCodeLine{00166\ \textcolor{comment}{}}
+\DoxyCodeLine{00167\ \textcolor{comment}{\ \ \ \ std::string\ input\ =\ "{}Hello"{};}}
+\DoxyCodeLine{00168\ \textcolor{comment}{\ \ \ \ std::string\ output;}}
+\DoxyCodeLine{00169\ \textcolor{comment}{\ \ \ \ ec\ =\ de.compress(input,output);}}
+\DoxyCodeLine{00170\ \textcolor{comment}{}}
+\DoxyCodeLine{00171\ \textcolor{comment}{\ \ \ \ BOOST\_CHECK(\ ec\ ==\ processor::extensions::error::uninitialized\ );}}
+\DoxyCodeLine{00172\ \textcolor{comment}{}}
+\DoxyCodeLine{00173\ \textcolor{comment}{\ \ \ \ //std::cout\ <<\ ec.message()\ <<\ websocketpp::utility::to\_hex(output)\ <<\ std::endl;}}
+\DoxyCodeLine{00174\ \textcolor{comment}{}}
+\DoxyCodeLine{00175\ \textcolor{comment}{\ \ \ \ ec\ =\ de.init(15,15,Z\_DEFAULT\_COMPRESSION,8,Z\_FIXED);}}
+\DoxyCodeLine{00176\ \textcolor{comment}{\ \ \ \ //ec\ =\ de.init();}}
+\DoxyCodeLine{00177\ \textcolor{comment}{\ \ \ \ BOOST\_CHECK(\ !ec\ );}}
+\DoxyCodeLine{00178\ \textcolor{comment}{}}
+\DoxyCodeLine{00179\ \textcolor{comment}{\ \ \ \ ec\ =\ de.compress(input,output);}}
+\DoxyCodeLine{00180\ \textcolor{comment}{\ \ \ \ std::cout\ <<\ ec.message()\ <<\ std::endl}}
+\DoxyCodeLine{00181\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ websocketpp::utility::to\_hex(input)\ <<\ std::endl}}
+\DoxyCodeLine{00182\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ websocketpp::utility::to\_hex(output)\ <<\ std::endl;}}
+\DoxyCodeLine{00183\ \textcolor{comment}{}}
+\DoxyCodeLine{00184\ \textcolor{comment}{\ \ \ \ output.clear();}}
+\DoxyCodeLine{00185\ \textcolor{comment}{}}
+\DoxyCodeLine{00186\ \textcolor{comment}{\ \ \ \ ec\ =\ de.compress(input,output);}}
+\DoxyCodeLine{00187\ \textcolor{comment}{\ \ \ \ std::cout\ <<\ ec.message()\ <<\ std::endl}}
+\DoxyCodeLine{00188\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ websocketpp::utility::to\_hex(input)\ <<\ std::endl}}
+\DoxyCodeLine{00189\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ websocketpp::utility::to\_hex(output)\ <<\ std::endl;}}
+\DoxyCodeLine{00190\ \textcolor{comment}{}}
+\DoxyCodeLine{00191\ \textcolor{comment}{\ \ \ \ input\ =\ output;}}
+\DoxyCodeLine{00192\ \textcolor{comment}{\ \ \ \ output.clear();}}
+\DoxyCodeLine{00193\ \textcolor{comment}{\ \ \ \ ec\ =\ de.decompress(input,output);}}
+\DoxyCodeLine{00194\ \textcolor{comment}{\ \ \ \ std::cout\ <<\ ec.message()\ <<\ std::endl}}
+\DoxyCodeLine{00195\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ websocketpp::utility::to\_hex(input)\ <<\ std::endl}}
+\DoxyCodeLine{00196\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ websocketpp::utility::to\_hex(output)\ <<\ std::endl;}}
+\DoxyCodeLine{00197\ \textcolor{comment}{\ \ \ \ */}}
+\DoxyCodeLine{00198\ \}}
+
+\end{DoxyCode}

@@ -1,0 +1,148 @@
+\doxysection{testing\+::internal\+::Json\+Unit\+Test\+Result\+Printer Class Reference}
+\hypertarget{classtesting_1_1internal_1_1_json_unit_test_result_printer}{}\label{classtesting_1_1internal_1_1_json_unit_test_result_printer}\index{testing::internal::JsonUnitTestResultPrinter@{testing::internal::JsonUnitTestResultPrinter}}
+
+
+Inheritance diagram for testing\+::internal\+::Json\+Unit\+Test\+Result\+Printer\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=239pt]{classtesting_1_1internal_1_1_json_unit_test_result_printer__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for testing\+::internal\+::Json\+Unit\+Test\+Result\+Printer\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=239pt]{classtesting_1_1internal_1_1_json_unit_test_result_printer__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_json_unit_test_result_printer_a273623decde1be18db45e95594f9d501}{Json\+Unit\+Test\+Result\+Printer}} (const char \texorpdfstring{$\ast$}{*}output\+\_\+file)
+\item 
+virtual void \mbox{\hyperlink{classtesting_1_1internal_1_1_json_unit_test_result_printer_a44edb54cf1ab8cdcd56bda5058b8f1d6}{On\+Test\+Iteration\+End}} (const \mbox{\hyperlink{classtesting_1_1_unit_test}{Unit\+Test}} \&unit\+\_\+test, int iteration)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classtesting_1_1_empty_test_event_listener}{testing\+::\+Empty\+Test\+Event\+Listener}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual void \mbox{\hyperlink{classtesting_1_1_empty_test_event_listener_aa3847c8a3c22d8d69a6006dfdd6589fc}{On\+Test\+Program\+Start}} (const \mbox{\hyperlink{classtesting_1_1_unit_test}{Unit\+Test}} \&)
+\item 
+virtual void \mbox{\hyperlink{classtesting_1_1_empty_test_event_listener_a836f05829855dc60d13ba99ad712c0dd}{On\+Test\+Iteration\+Start}} (const \mbox{\hyperlink{classtesting_1_1_unit_test}{Unit\+Test}} \&, int)
+\item 
+virtual void \mbox{\hyperlink{classtesting_1_1_empty_test_event_listener_a156d1965248fbdced6aabacadfa2d63f}{On\+Environments\+Set\+Up\+Start}} (const \mbox{\hyperlink{classtesting_1_1_unit_test}{Unit\+Test}} \&)
+\item 
+virtual void \mbox{\hyperlink{classtesting_1_1_empty_test_event_listener_abc481c6648d15d4242245195a06f5aa0}{On\+Environments\+Set\+Up\+End}} (const \mbox{\hyperlink{classtesting_1_1_unit_test}{Unit\+Test}} \&)
+\item 
+virtual void \mbox{\hyperlink{classtesting_1_1_empty_test_event_listener_ae4707ed9cc7ace5241bc8ccc4051209b}{On\+Test\+Case\+Start}} (const \mbox{\hyperlink{classtesting_1_1_test_case}{Test\+Case}} \&)
+\item 
+virtual void \mbox{\hyperlink{classtesting_1_1_empty_test_event_listener_a84fa74cc9ba742f9f847ea405ca84e5e}{On\+Test\+Start}} (const \mbox{\hyperlink{classtesting_1_1_test_info}{Test\+Info}} \&)
+\item 
+virtual void \mbox{\hyperlink{classtesting_1_1_empty_test_event_listener_a59e7f7d9f2e2d089a6e8c1e2577f4718}{On\+Test\+Part\+Result}} (const \mbox{\hyperlink{classtesting_1_1_test_part_result}{Test\+Part\+Result}} \&)
+\item 
+virtual void \mbox{\hyperlink{classtesting_1_1_empty_test_event_listener_afd58d21005f0d0d0399fb114627545d3}{On\+Test\+End}} (const \mbox{\hyperlink{classtesting_1_1_test_info}{Test\+Info}} \&)
+\item 
+virtual void \mbox{\hyperlink{classtesting_1_1_empty_test_event_listener_a6bec703158283104c4298f7d8a528515}{On\+Test\+Case\+End}} (const \mbox{\hyperlink{classtesting_1_1_test_case}{Test\+Case}} \&)
+\item 
+virtual void \mbox{\hyperlink{classtesting_1_1_empty_test_event_listener_a00fa1a4ea5831e20746188414268e7c6}{On\+Environments\+Tear\+Down\+Start}} (const \mbox{\hyperlink{classtesting_1_1_unit_test}{Unit\+Test}} \&)
+\item 
+virtual void \mbox{\hyperlink{classtesting_1_1_empty_test_event_listener_aea64c83c415b33a4c0b0239bafd1438d}{On\+Environments\+Tear\+Down\+End}} (const \mbox{\hyperlink{classtesting_1_1_unit_test}{Unit\+Test}} \&)
+\item 
+virtual void \mbox{\hyperlink{classtesting_1_1_empty_test_event_listener_a0abcc02bd2331a2e29ad6f4d9daf2a32}{On\+Test\+Program\+End}} (const \mbox{\hyperlink{classtesting_1_1_unit_test}{Unit\+Test}} \&)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classtesting_1_1_test_event_listener}{testing\+::\+Test\+Event\+Listener}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{classtesting_1_1_test_event_listener_a4512d19e7a108ec4926239ec1ea85d63}{\texorpdfstring{$\sim$}{\string~}\+Test\+Event\+Listener}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{gtest_8cc_source_l03827}{3827}} of file \mbox{\hyperlink{gtest_8cc_source}{gtest.\+cc}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_json_unit_test_result_printer_a273623decde1be18db45e95594f9d501}\index{testing::internal::JsonUnitTestResultPrinter@{testing::internal::JsonUnitTestResultPrinter}!JsonUnitTestResultPrinter@{JsonUnitTestResultPrinter}}
+\index{JsonUnitTestResultPrinter@{JsonUnitTestResultPrinter}!testing::internal::JsonUnitTestResultPrinter@{testing::internal::JsonUnitTestResultPrinter}}
+\doxysubsubsection{\texorpdfstring{JsonUnitTestResultPrinter()}{JsonUnitTestResultPrinter()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_json_unit_test_result_printer_a273623decde1be18db45e95594f9d501} 
+testing\+::internal\+::\+Json\+Unit\+Test\+Result\+Printer\+::\+Json\+Unit\+Test\+Result\+Printer (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{output\+\_\+file}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8cc_source_l03877}{3877}} of file \mbox{\hyperlink{gtest_8cc_source}{gtest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03878\ \ \ \ \ :\ output\_file\_(output\_file)\ \{}
+\DoxyCodeLine{03879\ \ \ \textcolor{keywordflow}{if}\ (output\_file\_.empty())\ \{}
+\DoxyCodeLine{03880\ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_a8ef4cb4c465db8c15464aecc6d9510ef}{GTEST\_LOG\_}}(FATAL)\ <<\ \textcolor{stringliteral}{"{}JSON\ output\ file\ may\ not\ be\ null"{}};}
+\DoxyCodeLine{03881\ \ \ \}}
+\DoxyCodeLine{03882\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_json_unit_test_result_printer_a44edb54cf1ab8cdcd56bda5058b8f1d6}\index{testing::internal::JsonUnitTestResultPrinter@{testing::internal::JsonUnitTestResultPrinter}!OnTestIterationEnd@{OnTestIterationEnd}}
+\index{OnTestIterationEnd@{OnTestIterationEnd}!testing::internal::JsonUnitTestResultPrinter@{testing::internal::JsonUnitTestResultPrinter}}
+\doxysubsubsection{\texorpdfstring{OnTestIterationEnd()}{OnTestIterationEnd()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_json_unit_test_result_printer_a44edb54cf1ab8cdcd56bda5058b8f1d6} 
+void testing\+::internal\+::\+Json\+Unit\+Test\+Result\+Printer\+::\+On\+Test\+Iteration\+End (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classtesting_1_1_unit_test}{Unit\+Test}} \&}]{unit\+\_\+test}{, }\item[{int}]{iteration}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classtesting_1_1_empty_test_event_listener_a2253e5a18b3cf7bccd349567a252209d}{testing\+::\+Empty\+Test\+Event\+Listener}}.
+
+
+
+Definition at line \mbox{\hyperlink{gtest_8cc_source_l03884}{3884}} of file \mbox{\hyperlink{gtest_8cc_source}{gtest.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03885\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{03886\ \ \ FILE*\ jsonout\ =\ NULL;}
+\DoxyCodeLine{03887\ \ \ FilePath\ output\_file(output\_file\_);}
+\DoxyCodeLine{03888\ \ \ FilePath\ \mbox{\hyperlink{namespaceversiongenerate_aab714e0aa9036025ba7c83eb7422c567}{output\_dir}}(output\_file.RemoveFileName());}
+\DoxyCodeLine{03889\ }
+\DoxyCodeLine{03890\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespaceversiongenerate_aab714e0aa9036025ba7c83eb7422c567}{output\_dir}}.CreateDirectoriesRecursively())\ \{}
+\DoxyCodeLine{03891\ \ \ \ \ jsonout\ =\ \mbox{\hyperlink{namespacetesting_1_1internal_1_1posix_affa05d06d3e3b1ce975935cb0eac4fa7}{posix::FOpen}}(output\_file\_.c\_str(),\ \textcolor{stringliteral}{"{}w"{}});}
+\DoxyCodeLine{03892\ \ \ \}}
+\DoxyCodeLine{03893\ \ \ \textcolor{keywordflow}{if}\ (jsonout\ ==\ NULL)\ \{}
+\DoxyCodeLine{03894\ \ \ \ \ \textcolor{comment}{//\ TODO(phosek):\ report\ the\ reason\ of\ the\ failure.}}
+\DoxyCodeLine{03895\ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{03896\ \ \ \ \ \textcolor{comment}{//\ We\ don't\ do\ it\ for\ now\ as:}}
+\DoxyCodeLine{03897\ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{03898\ \ \ \ \ \textcolor{comment}{//\ \ \ 1.\ There\ is\ no\ urgent\ need\ for\ it.}}
+\DoxyCodeLine{03899\ \ \ \ \ \textcolor{comment}{//\ \ \ 2.\ It's\ a\ bit\ involved\ to\ make\ the\ errno\ variable\ thread-\/safe\ on}}
+\DoxyCodeLine{03900\ \ \ \ \ \textcolor{comment}{//\ \ \ \ \ \ all\ three\ operating\ systems\ (Linux,\ Windows,\ and\ Mac\ OS).}}
+\DoxyCodeLine{03901\ \ \ \ \ \textcolor{comment}{//\ \ \ 3.\ To\ interpret\ the\ meaning\ of\ errno\ in\ a\ thread-\/safe\ way,}}
+\DoxyCodeLine{03902\ \ \ \ \ \textcolor{comment}{//\ \ \ \ \ \ we\ need\ the\ strerror\_r()\ function,\ which\ is\ not\ available\ on}}
+\DoxyCodeLine{03903\ \ \ \ \ \textcolor{comment}{//\ \ \ \ \ \ Windows.}}
+\DoxyCodeLine{03904\ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_a8ef4cb4c465db8c15464aecc6d9510ef}{GTEST\_LOG\_}}(FATAL)\ <<\ \textcolor{stringliteral}{"{}Unable\ to\ open\ file\ \(\backslash\)"{}"{}}}
+\DoxyCodeLine{03905\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ output\_file\_\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)"{}"{}};}
+\DoxyCodeLine{03906\ \ \ \}}
+\DoxyCodeLine{03907\ \ \ std::stringstream\ stream;}
+\DoxyCodeLine{03908\ \ \ PrintJsonUnitTest(\&stream,\ unit\_test);}
+\DoxyCodeLine{03909\ \ \ fprintf(jsonout,\ \textcolor{stringliteral}{"{}\%s"{}},\ \mbox{\hyperlink{namespacetesting_1_1internal_ac0a2b7f69fc829d80a39e925b6417e39}{StringStreamToString}}(\&stream).c\_str());}
+\DoxyCodeLine{03910\ \ \ fclose(jsonout);}
+\DoxyCodeLine{03911\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtesting_1_1internal_1_1_json_unit_test_result_printer_a44edb54cf1ab8cdcd56bda5058b8f1d6_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/src/\mbox{\hyperlink{gtest_8cc}{gtest.\+cc}}\end{DoxyCompactItemize}

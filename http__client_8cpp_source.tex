@@ -1,0 +1,457 @@
+\doxysection{http\+\_\+client.\+cpp}
+\hypertarget{http__client_8cpp_source}{}\label{http__client_8cpp_source}\index{libraries/fc/src/network/http/http\_client.cpp@{libraries/fc/src/network/http/http\_client.cpp}}
+\mbox{\hyperlink{http__client_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{http__client_8hpp}{fc/network/http/http\_client.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{json_8hpp}{fc/io/json.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{scoped__exit_8hpp}{fc/scoped\_exit.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{static__variant_8hpp}{fc/static\_variant.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <boost/beast/core.hpp>}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <boost/beast/http.hpp>}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <boost/beast/version.hpp>}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ <boost/asio/connect.hpp>}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <boost/asio/ip/tcp.hpp>}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00011}00011\ \textcolor{preprocessor}{\#include\ <boost/asio/ssl/error.hpp>}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00012}00012\ \textcolor{preprocessor}{\#include\ <boost/asio/ssl/stream.hpp>}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00013}00013\ \textcolor{preprocessor}{\#include\ <boost/asio/local/stream\_protocol.hpp>}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00014}00014\ \textcolor{preprocessor}{\#include\ <boost/asio/ssl/rfc2818\_verification.hpp>}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00015}00015\ \textcolor{preprocessor}{\#include\ <boost/filesystem.hpp>}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00017}\mbox{\hyperlink{http__client_8cpp_a2671c4a124c39d4d993506b36d8c59b6}{00017}}\ \textcolor{keyword}{using\ }\mbox{\hyperlink{http__client_8cpp_a2671c4a124c39d4d993506b36d8c59b6}{tcp}}\ =\ boost::asio::ip::tcp;\ \ \ \ \ \ \ \textcolor{comment}{//\ from\ <boost/asio/ip/tcp.hpp>}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00018}00018\ \textcolor{keyword}{namespace\ }http\ =\ boost::beast::http;\ \ \ \ \textcolor{comment}{//\ from\ <boost/beast/http.hpp>}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00019}00019\ \textcolor{keyword}{namespace\ }ssl\ =\ boost::asio::ssl;\ \ \ \ \ \ \ \textcolor{comment}{//\ from\ <boost/asio/ssl.hpp>}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00020}00020\ \textcolor{keyword}{namespace\ }local\ =\ boost::asio::local;}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00022}00022\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00027}00027\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ std::map<string,uint16\_t>\ default\_proto\_ports\ =\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00028}00028\ \ \ \ \{\textcolor{stringliteral}{"{}http"{}},\ 80\},}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00029}00029\ \ \ \ \{\textcolor{stringliteral}{"{}https"{}},\ 443\}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00030}00030\ \};}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00032}\mbox{\hyperlink{classfc_1_1http__client__impl}{00032}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classfc_1_1http__client__impl}{http\_client\_impl}}\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00033}00033\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00034}\mbox{\hyperlink{classfc_1_1http__client__impl_a86fdb87af7820fc1a6ceca3e8583214b}{00034}}\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classfc_1_1http__client__impl_a86fdb87af7820fc1a6ceca3e8583214b}{host\_key}}\ =\ std::tuple<std::string,\ std::string,\ uint16\_t>;}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00035}\mbox{\hyperlink{classfc_1_1http__client__impl_adc95a13334ceb3ff477fc1ddcb561996}{00035}}\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classfc_1_1http__client__impl_adc95a13334ceb3ff477fc1ddcb561996}{raw\_socket\_ptr}}\ =\ std::unique\_ptr<tcp::socket>;}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00036}\mbox{\hyperlink{classfc_1_1http__client__impl_aa89e365027f58b6fa923d70c8d773006}{00036}}\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classfc_1_1http__client__impl_aa89e365027f58b6fa923d70c8d773006}{ssl\_socket\_ptr}}\ =\ std::unique\_ptr<ssl::stream<tcp::socket>>;}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00037}\mbox{\hyperlink{classfc_1_1http__client__impl_a26f75c9818c40ea19196406944151e3f}{00037}}\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classfc_1_1http__client__impl_a26f75c9818c40ea19196406944151e3f}{unix\_socket\_ptr}}\ =\ std::unique\_ptr<local::stream\_protocol::socket>;}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00038}\mbox{\hyperlink{classfc_1_1http__client__impl_a79319bdfbd7be6a2e381dd597dd3443a}{00038}}\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classfc_1_1http__client__impl_a79319bdfbd7be6a2e381dd597dd3443a}{connection}}\ =\ std::variant<raw\_socket\_ptr,\ ssl\_socket\_ptr,\ unix\_socket\_ptr>;}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00039}\mbox{\hyperlink{classfc_1_1http__client__impl_a72d1baab7c0912164b747d2e68b0b7d2}{00039}}\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classfc_1_1http__client__impl_a72d1baab7c0912164b747d2e68b0b7d2}{connection\_map}}\ =\ std::map<host\_key,\ connection>;}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00040}\mbox{\hyperlink{classfc_1_1http__client__impl_a90b1248f236291d74c7cfb96ce6eaf0f}{00040}}\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classfc_1_1http__client__impl_a90b1248f236291d74c7cfb96ce6eaf0f}{unix\_url\_split\_map}}\ =\ std::map<string,\ fc::url>;}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00041}\mbox{\hyperlink{classfc_1_1http__client__impl_a06886c03bf859f221215ef510f5485ab}{00041}}\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classfc_1_1http__client__impl_a06886c03bf859f221215ef510f5485ab}{error\_code}}\ =\ boost::system::error\_code;}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00042}\mbox{\hyperlink{classfc_1_1http__client__impl_abeb49b911fe34bce2e6491ca68304f12}{00042}}\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classfc_1_1http__client__impl_abeb49b911fe34bce2e6491ca68304f12}{deadline\_type}}\ =\ boost::posix\_time::ptime;}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00044}\mbox{\hyperlink{classfc_1_1http__client__impl_a9cb51eb0187090b1663ae297df974327}{00044}}\ \ \ \ \mbox{\hyperlink{classfc_1_1http__client__impl_a9cb51eb0187090b1663ae297df974327}{http\_client\_impl}}()}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00045}00045\ \ \ \ :\mbox{\hyperlink{classfc_1_1http__client__impl_a44a03d199abd9d82b45859a240932605}{\_ioc}}()}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00046}00046\ \ \ \ ,\mbox{\hyperlink{classfc_1_1http__client__impl_aa0162152ec93d9dbf957a6031b3d7498}{\_sslc}}(ssl::\mbox{\hyperlink{structcontext}{context}}::sslv23\_client)}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00047}00047\ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00048}00048\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1http__client__impl_a0fd9bdb8e9376f8400985b7f387c4933}{set\_verify\_peers}}(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00049}00049\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00051}\mbox{\hyperlink{classfc_1_1http__client__impl_a455b1c80bc85a84f7d51df81c779c141}{00051}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1http__client__impl_a455b1c80bc85a84f7d51df81c779c141}{add\_cert}}(\textcolor{keyword}{const}\ std::string\&\ cert\_pem\_string)\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00052}00052\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1http__client__impl_a06886c03bf859f221215ef510f5485ab}{error\_code}}\ ec;}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00053}00053\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1http__client__impl_aa0162152ec93d9dbf957a6031b3d7498}{\_sslc}}.add\_certificate\_authority(boost::asio::buffer(cert\_pem\_string.data(),\ cert\_pem\_string.size()),\ ec);}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00054}00054\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(!ec,\ \textcolor{stringliteral}{"{}Failed\ to\ add\ cert:\ \$\{msg\}"{}},\ (\textcolor{stringliteral}{"{}msg"{}},\ ec.message()));}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00055}00055\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00057}\mbox{\hyperlink{classfc_1_1http__client__impl_a0fd9bdb8e9376f8400985b7f387c4933}{00057}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1http__client__impl_a0fd9bdb8e9376f8400985b7f387c4933}{set\_verify\_peers}}(\textcolor{keywordtype}{bool}\ enabled)\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00058}00058\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (enabled)\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00059}00059\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1http__client__impl_aa0162152ec93d9dbf957a6031b3d7498}{\_sslc}}.set\_verify\_mode(ssl::verify\_peer);}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00060}00060\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00061}00061\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1http__client__impl_aa0162152ec93d9dbf957a6031b3d7498}{\_sslc}}.set\_verify\_mode(ssl::verify\_none);}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00062}00062\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00063}00063\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00065}00065\ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ SyncReadStream,\ \textcolor{keyword}{typename}\ Fn,\ \textcolor{keyword}{typename}\ CancelFn>}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00066}\mbox{\hyperlink{classfc_1_1http__client__impl_a4bc83c5379c9fe7aad1e094e52704b3d}{00066}}\ \ \ \ \mbox{\hyperlink{classfc_1_1http__client__impl_a06886c03bf859f221215ef510f5485ab}{error\_code}}\ \mbox{\hyperlink{classfc_1_1http__client__impl_a4bc83c5379c9fe7aad1e094e52704b3d}{sync\_do\_with\_deadline}}(\ SyncReadStream\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ \mbox{\hyperlink{classfc_1_1http__client__impl_abeb49b911fe34bce2e6491ca68304f12}{deadline\_type}}\ deadline,\ Fn\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}},\ CancelFn\ cf\ )\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00067}00067\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ timer\_expired\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00068}00068\ \ \ \ \ \ \ boost::asio::deadline\_timer\ timer(\mbox{\hyperlink{classfc_1_1http__client__impl_a44a03d199abd9d82b45859a240932605}{\_ioc}});}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00069}00069\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00070}00070\ \ \ \ \ \ \ timer.expires\_at(deadline);}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00071}00071\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ timer\_cancelled\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00072}00072\ \ \ \ \ \ \ timer.async\_wait([\&timer\_expired,\ \&timer\_cancelled]\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1http__client__impl_a06886c03bf859f221215ef510f5485ab}{error\_code}}\&)\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00073}00073\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ the\ only\ non-\/success\ error\_code\ this\ is\ called\ with\ is\ operation\_aborted\ but\ since}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00074}00074\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ we\ could\ have\ queued\ "{}success"{}\ when\ we\ cancelled\ the\ timer,\ we\ set\ a\ flag\ at\ the}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00075}00075\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ safer\ scope\ and\ only\ respect\ that.}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!timer\_cancelled)\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ timer\_expired\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00078}00078\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00079}00079\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00080}00080\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00081}00081\ \ \ \ \ \ \ std::optional<error\_code>\ f\_result;}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00082}00082\ \ \ \ \ \ \ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}(f\_result);}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00083}00083\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00084}00084\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1http__client__impl_a44a03d199abd9d82b45859a240932605}{\_ioc}}.restart();}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00085}00085\ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (\mbox{\hyperlink{classfc_1_1http__client__impl_a44a03d199abd9d82b45859a240932605}{\_ioc}}.run\_one())}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00086}00086\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00087}00087\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (f\_result)\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00088}00088\ \ \ \ \ \ \ \ \ \ \ \ \ timer\_cancelled\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00089}00089\ \ \ \ \ \ \ \ \ \ \ \ \ timer.cancel();}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00090}00090\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (timer\_expired)\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00091}00091\ \ \ \ \ \ \ \ \ \ \ \ \ cf();}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00092}00092\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00093}00093\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00094}00094\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00095}00095\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!timer\_expired)\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00096}00096\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *f\_result;}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00097}00097\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00098}00098\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1http__client__impl_a06886c03bf859f221215ef510f5485ab}{error\_code}}(boost::system::errc::timed\_out,\ boost::system::system\_category());}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00099}00099\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00100}00100\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00101}00101\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00102}00102\ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ SyncReadStream,\ \textcolor{keyword}{typename}\ Fn>}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00103}\mbox{\hyperlink{classfc_1_1http__client__impl_a0b963f33b391a29426742c46c4ff60da}{00103}}\ \ \ \ \mbox{\hyperlink{classfc_1_1http__client__impl_a06886c03bf859f221215ef510f5485ab}{error\_code}}\ \mbox{\hyperlink{classfc_1_1http__client__impl_a0b963f33b391a29426742c46c4ff60da}{sync\_do\_with\_deadline}}(\ SyncReadStream\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ \mbox{\hyperlink{classfc_1_1http__client__impl_abeb49b911fe34bce2e6491ca68304f12}{deadline\_type}}\ deadline,\ Fn\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00104}00104\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1http__client__impl_a4bc83c5379c9fe7aad1e094e52704b3d}{sync\_do\_with\_deadline}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ deadline,\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}},\ [\&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}]()\{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00105}00105\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.lowest\_layer().cancel();}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00106}00106\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00107}00107\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00108}00108\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00109}00109\ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ SyncReadStream>}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00110}\mbox{\hyperlink{classfc_1_1http__client__impl_ae3cda026c82494cd7221856a99b1fb7c}{00110}}\ \ \ \ \mbox{\hyperlink{classfc_1_1http__client__impl_a06886c03bf859f221215ef510f5485ab}{error\_code}}\ \mbox{\hyperlink{classfc_1_1http__client__impl_ae3cda026c82494cd7221856a99b1fb7c}{sync\_connect\_with\_timeout}}(\ SyncReadStream\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ \textcolor{keyword}{const}\ std::string\&\ host,\ \textcolor{keyword}{const}\ std::string\&\ port,\ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1http__client__impl_abeb49b911fe34bce2e6491ca68304f12}{deadline\_type}}\&\ deadline\ )\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00111}00111\ \ \ \ \ \ \ tcp::resolver\ local\_resolver(\mbox{\hyperlink{classfc_1_1http__client__impl_a44a03d199abd9d82b45859a240932605}{\_ioc}});}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00112}00112\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ cancelled\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00113}00113\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00114}00114\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ res\ =\ \mbox{\hyperlink{classfc_1_1http__client__impl_a4bc83c5379c9fe7aad1e094e52704b3d}{sync\_do\_with\_deadline}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ deadline,\ [\&local\_resolver,\ \&cancelled,\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ \&host,\ \&port](std::optional<error\_code>\&\ final\_ec)\{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00115}00115\ \ \ \ \ \ \ \ \ \ local\_resolver.async\_resolve(host,\ port,\ [\&cancelled,\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ \&final\_ec](\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1http__client__impl_a06886c03bf859f221215ef510f5485ab}{error\_code}}\&\ ec,\ tcp::resolver::results\_type\ resolved\ )\{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00116}00116\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ec)\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00117}00117\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ final\_ec.emplace(ec);}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00118}00118\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00119}00119\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00120}00120\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00121}00121\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!cancelled)\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00122}00122\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ boost::asio::async\_connect(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ resolved.begin(),\ resolved.end(),\ [\&final\_ec](\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1http__client__impl_a06886c03bf859f221215ef510f5485ab}{error\_code}}\&\ ec,\ tcp::resolver::iterator\ )\{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00123}00123\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ final\_ec.emplace(ec);}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00124}00124\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00125}00125\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00126}00126\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00127}00127\ \ \ \ \ \ \ \},[\&local\_resolver,\ \&cancelled]()\{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00128}00128\ \ \ \ \ \ \ \ \ \ cancelled\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00129}00129\ \ \ \ \ \ \ \ \ \ local\_resolver.cancel();}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00130}00130\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00131}00131\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00132}00132\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ res;}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00133}00133\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00134}00134\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00135}00135\ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ SyncReadStream>}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00136}\mbox{\hyperlink{classfc_1_1http__client__impl_ad2f97cd5cf126fdd4b476916bfe33e94}{00136}}\ \ \ \ \mbox{\hyperlink{classfc_1_1http__client__impl_a06886c03bf859f221215ef510f5485ab}{error\_code}}\ \mbox{\hyperlink{classfc_1_1http__client__impl_ad2f97cd5cf126fdd4b476916bfe33e94}{sync\_write\_with\_timeout}}(SyncReadStream\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ http::request<http::string\_body>\&\ req,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1http__client__impl_abeb49b911fe34bce2e6491ca68304f12}{deadline\_type}}\&\ deadline\ )\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00137}00137\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1http__client__impl_a4bc83c5379c9fe7aad1e094e52704b3d}{sync\_do\_with\_deadline}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ deadline,\ [\&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ \&req](std::optional<error\_code>\&\ final\_ec)\{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00138}00138\ \ \ \ \ \ \ \ \ \ http::async\_write(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ req,\ [\&final\_ec](\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1http__client__impl_a06886c03bf859f221215ef510f5485ab}{error\_code}}\&\ ec,\ std::size\_t\ )\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00139}00139\ \ \ \ \ \ \ \ \ \ \ \ \ final\_ec.emplace(ec);}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00140}00140\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00141}00141\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00142}00142\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00143}00143\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00144}00144\ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ SyncReadStream>}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00145}\mbox{\hyperlink{classfc_1_1http__client__impl_aabd91dd95b80eccaf3d0cb2bdce94e23}{00145}}\ \ \ \ \mbox{\hyperlink{classfc_1_1http__client__impl_a06886c03bf859f221215ef510f5485ab}{error\_code}}\ \mbox{\hyperlink{classfc_1_1http__client__impl_aabd91dd95b80eccaf3d0cb2bdce94e23}{sync\_read\_with\_timeout}}(SyncReadStream\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ boost::beast::flat\_buffer\&\ buffer,\ http::response<http::string\_body>\&\ res,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1http__client__impl_abeb49b911fe34bce2e6491ca68304f12}{deadline\_type}}\&\ deadline\ )\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00146}00146\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classfc_1_1http__client__impl_a4bc83c5379c9fe7aad1e094e52704b3d}{sync\_do\_with\_deadline}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ deadline,\ [\&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ \&buffer,\ \&res](std::optional<error\_code>\&\ final\_ec)\{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00147}00147\ \ \ \ \ \ \ \ \ \ http::async\_read(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ buffer,\ res,\ [\&final\_ec](\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1http__client__impl_a06886c03bf859f221215ef510f5485ab}{error\_code}}\&\ ec,\ std::size\_t\ )\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00148}00148\ \ \ \ \ \ \ \ \ \ \ \ \ final\_ec.emplace(ec);}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00149}00149\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00150}00150\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00151}00151\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00152}00152\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00153}\mbox{\hyperlink{classfc_1_1http__client__impl_af43fb0056658ca9e9973ba62bdafd539}{00153}}\ \ \ \ \mbox{\hyperlink{classfc_1_1http__client__impl_a86fdb87af7820fc1a6ceca3e8583214b}{host\_key}}\ \mbox{\hyperlink{classfc_1_1http__client__impl_af43fb0056658ca9e9973ba62bdafd539}{url\_to\_host\_key}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1url}{url}}\&\ dest\ )\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00154}00154\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(dest.host(),\ \textcolor{stringliteral}{"{}Provided\ URL\ has\ no\ host"{}});}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00155}00155\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ port\ =\ 80;}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00156}00156\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (dest.port())\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00157}00157\ \ \ \ \ \ \ \ \ \ port\ =\ *dest.port();}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00158}00158\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00159}00159\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00160}00160\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::make\_tuple(dest.proto(),\ *dest.host(),\ port);}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00161}00161\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00162}00162\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00163}\mbox{\hyperlink{classfc_1_1http__client__impl_ad1a65614cb55eebb7aa11b27920fcb02}{00163}}\ \ \ \ connection\_map::iterator\ \mbox{\hyperlink{classfc_1_1http__client__impl_ad1a65614cb55eebb7aa11b27920fcb02}{create\_unix\_connection}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1url}{url}}\&\ dest,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1http__client__impl_abeb49b911fe34bce2e6491ca68304f12}{deadline\_type}}\&\ deadline)\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00164}00164\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ key\ =\ \mbox{\hyperlink{classfc_1_1http__client__impl_af43fb0056658ca9e9973ba62bdafd539}{url\_to\_host\_key}}(dest);}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00165}00165\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ socket\ =\ std::make\_unique<local::stream\_protocol::socket>(\mbox{\hyperlink{classfc_1_1http__client__impl_a44a03d199abd9d82b45859a240932605}{\_ioc}});}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00166}00166\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00167}00167\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1http__client__impl_a06886c03bf859f221215ef510f5485ab}{error\_code}}\ ec;}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00168}00168\ \ \ \ \ \ \ socket-\/>connect(local::stream\_protocol::endpoint(*dest.host()),\ ec);}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00169}00169\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(!ec,\ \textcolor{stringliteral}{"{}Failed\ to\ connect:\ \$\{message\}"{}},\ (\textcolor{stringliteral}{"{}message"{}},ec.message()));}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00170}00170\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00171}00171\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ res\ =\ \mbox{\hyperlink{classfc_1_1http__client__impl_a6510a6dfdc36dbbf803a64bf3acdff23}{\_connections}}.emplace(std::piecewise\_construct,}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00172}00172\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::forward\_as\_tuple(key),}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00173}00173\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::forward\_as\_tuple(std::move(socket)));}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00174}00174\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00175}00175\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ res.first;}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00176}00176\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00177}00177\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00178}\mbox{\hyperlink{classfc_1_1http__client__impl_a990909375a32476953646359fa655bfe}{00178}}\ \ \ \ connection\_map::iterator\ \mbox{\hyperlink{classfc_1_1http__client__impl_a990909375a32476953646359fa655bfe}{create\_raw\_connection}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1url}{url}}\&\ dest,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1http__client__impl_abeb49b911fe34bce2e6491ca68304f12}{deadline\_type}}\&\ deadline\ )\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00179}00179\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ key\ =\ \mbox{\hyperlink{classfc_1_1http__client__impl_af43fb0056658ca9e9973ba62bdafd539}{url\_to\_host\_key}}(dest);}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00180}00180\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ socket\ =\ std::make\_unique<tcp::socket>(\mbox{\hyperlink{classfc_1_1http__client__impl_a44a03d199abd9d82b45859a240932605}{\_ioc}});}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00181}00181\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00182}00182\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1http__client__impl_a06886c03bf859f221215ef510f5485ab}{error\_code}}\ ec\ =\ \mbox{\hyperlink{classfc_1_1http__client__impl_ae3cda026c82494cd7221856a99b1fb7c}{sync\_connect\_with\_timeout}}(*socket,\ *dest.host(),\ dest.port()\ ?\ std::to\_string(*dest.port())\ :\ \textcolor{stringliteral}{"{}80"{}},\ deadline);}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00183}00183\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(!ec,\ \textcolor{stringliteral}{"{}Failed\ to\ connect:\ \$\{message\}"{}},\ (\textcolor{stringliteral}{"{}message"{}},ec.message()));}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00184}00184\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00185}00185\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ res\ =\ \mbox{\hyperlink{classfc_1_1http__client__impl_a6510a6dfdc36dbbf803a64bf3acdff23}{\_connections}}.emplace(std::piecewise\_construct,}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00186}00186\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::forward\_as\_tuple(key),}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00187}00187\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::forward\_as\_tuple(std::move(socket)));}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00188}00188\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00189}00189\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ res.first;}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00190}00190\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00191}00191\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00192}\mbox{\hyperlink{classfc_1_1http__client__impl_ace025982e925427f7cf0d922752cf5f6}{00192}}\ \ \ \ connection\_map::iterator\ \mbox{\hyperlink{classfc_1_1http__client__impl_ace025982e925427f7cf0d922752cf5f6}{create\_ssl\_connection}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1url}{url}}\&\ dest,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1http__client__impl_abeb49b911fe34bce2e6491ca68304f12}{deadline\_type}}\&\ deadline\ )\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00193}00193\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ key\ =\ \mbox{\hyperlink{classfc_1_1http__client__impl_af43fb0056658ca9e9973ba62bdafd539}{url\_to\_host\_key}}(dest);}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00194}00194\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ ssl\_socket\ =\ std::make\_unique<ssl::stream<tcp::socket>>(\mbox{\hyperlink{classfc_1_1http__client__impl_a44a03d199abd9d82b45859a240932605}{\_ioc}},\ \mbox{\hyperlink{classfc_1_1http__client__impl_aa0162152ec93d9dbf957a6031b3d7498}{\_sslc}});}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00195}00195\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00196}00196\ \ \ \ \ \ \ \textcolor{comment}{//\ Set\ SNI\ Hostname\ (many\ hosts\ need\ this\ to\ handshake\ successfully)}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00197}00197\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!SSL\_set\_tlsext\_host\_name(ssl\_socket-\/>native\_handle(),\ dest.host()-\/>c\_str()))}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00198}00198\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00199}00199\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1http__client__impl_a06886c03bf859f221215ef510f5485ab}{error\_code}}\ ec\{\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(::ERR\_get\_error()),\ boost::asio::error::get\_ssl\_category()\};}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00200}00200\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a3a1fa84768603c99866fe61af96c9f36}{FC\_THROW}}(\textcolor{stringliteral}{"{}Unable\ to\ set\ SNI\ Host\ Name:\ \$\{msg\}"{}},\ (\textcolor{stringliteral}{"{}msg"{}},\ ec.message()));}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00201}00201\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00202}00202\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00203}00203\ \ \ \ \ \ \ ssl\_socket-\/>set\_verify\_callback(boost::asio::ssl::rfc2818\_verification(*dest.host()));}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00204}00204\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00205}00205\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1http__client__impl_a06886c03bf859f221215ef510f5485ab}{error\_code}}\ ec\ =\ \mbox{\hyperlink{classfc_1_1http__client__impl_ae3cda026c82494cd7221856a99b1fb7c}{sync\_connect\_with\_timeout}}(ssl\_socket-\/>next\_layer(),\ *dest.host(),\ dest.port()\ ?\ std::to\_string(*dest.port())\ :\ \textcolor{stringliteral}{"{}443"{}},\ deadline);}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00206}00206\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!ec)\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00207}00207\ \ \ \ \ \ \ \ \ \ ec\ =\ \mbox{\hyperlink{classfc_1_1http__client__impl_a4bc83c5379c9fe7aad1e094e52704b3d}{sync\_do\_with\_deadline}}(ssl\_socket-\/>next\_layer(),\ deadline,\ [\&ssl\_socket](std::optional<error\_code>\&\ final\_ec)\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00208}00208\ \ \ \ \ \ \ \ \ \ \ \ \ ssl\_socket-\/>async\_handshake(ssl::stream\_base::client,\ [\&final\_ec](const\ error\_code\&\ ec)\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00209}00209\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ final\_ec.emplace(ec);}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00210}00210\ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00211}00211\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00212}00212\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00213}00213\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(!ec,\ \textcolor{stringliteral}{"{}Failed\ to\ connect:\ \$\{message\}"{}},\ (\textcolor{stringliteral}{"{}message"{}},ec.message()));}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00214}00214\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00215}00215\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ res\ =\ \mbox{\hyperlink{classfc_1_1http__client__impl_a6510a6dfdc36dbbf803a64bf3acdff23}{\_connections}}.emplace(std::piecewise\_construct,}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00216}00216\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::forward\_as\_tuple(key),}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00217}00217\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::forward\_as\_tuple(std::move(ssl\_socket)));}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00218}00218\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00219}00219\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ res.first;}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00220}00220\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00221}00221\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00222}\mbox{\hyperlink{classfc_1_1http__client__impl_adc5e459fa78e580e283ce34ed1fc8a01}{00222}}\ \ \ \ connection\_map::iterator\ \mbox{\hyperlink{classfc_1_1http__client__impl_adc5e459fa78e580e283ce34ed1fc8a01}{create\_connection}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1url}{url}}\&\ dest,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1http__client__impl_abeb49b911fe34bce2e6491ca68304f12}{deadline\_type}}\&\ deadline\ )\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00223}00223\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (dest.proto()\ ==\ \textcolor{stringliteral}{"{}http"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00224}00224\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ create\_raw\_connection(dest,\ deadline);}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00225}00225\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (dest.proto()\ ==\ \textcolor{stringliteral}{"{}https"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00226}00226\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ create\_ssl\_connection(dest,\ deadline);}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00227}00227\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (dest.proto()\ ==\ \textcolor{stringliteral}{"{}unix"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00228}00228\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ create\_unix\_connection(dest,\ deadline);}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00229}00229\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00230}00230\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a3a1fa84768603c99866fe61af96c9f36}{FC\_THROW}}(\textcolor{stringliteral}{"{}Unknown\ protocol\ \$\{proto\}"{}},\ (\textcolor{stringliteral}{"{}proto"{}},\ dest.proto()));}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00231}00231\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00232}00232\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00233}00233\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00234}\mbox{\hyperlink{structfc_1_1http__client__impl_1_1check__closed__visitor}{00234}}\ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structfc_1_1http__client__impl_1_1check__closed__visitor}{check\_closed\_visitor}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{structfc_1_1visitor}{visitor}}<bool>\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00235}\mbox{\hyperlink{structfc_1_1http__client__impl_1_1check__closed__visitor_ae24da416afbd24afc0e92f2a2339cc4d}{00235}}\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ operator()\ (\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1http__client__impl_adc95a13334ceb3ff477fc1ddcb561996}{raw\_socket\_ptr}}\&\ ptr\ )\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00236}00236\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !ptr-\/>is\_open();}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00237}00237\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00238}00238\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00239}\mbox{\hyperlink{structfc_1_1http__client__impl_1_1check__closed__visitor_a72c99c7b3c926f345fca8c721979a21b}{00239}}\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ operator()\ (\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1http__client__impl_aa89e365027f58b6fa923d70c8d773006}{ssl\_socket\_ptr}}\&\ ptr\ )\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00240}00240\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !ptr-\/>lowest\_layer().is\_open();}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00241}00241\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00242}00242\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00243}\mbox{\hyperlink{structfc_1_1http__client__impl_1_1check__closed__visitor_aabaaecd5a909ca08f63cb3be7327007f}{00243}}\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ operator()\ (\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1http__client__impl_a26f75c9818c40ea19196406944151e3f}{unix\_socket\_ptr}}\&\ ptr)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00244}00244\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !ptr-\/>is\_open();}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00245}00245\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00246}00246\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00247}00247\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00248}\mbox{\hyperlink{classfc_1_1http__client__impl_ac970385d8906d72f28b1fd6485a515a5}{00248}}\ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classfc_1_1http__client__impl_ac970385d8906d72f28b1fd6485a515a5}{check\_closed}}(\ \textcolor{keyword}{const}\ connection\_map::iterator\&\ conn\_itr\ )\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00249}00249\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (std::visit(\mbox{\hyperlink{structfc_1_1http__client__impl_1_1check__closed__visitor}{check\_closed\_visitor}}(),\ conn\_itr-\/>second))\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00250}00250\ \ \ \ \ \ \ \ \ \ \_connections.erase(conn\_itr);}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00251}00251\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00252}00252\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00253}00253\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00254}00254\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00255}00255\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00256}00256\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00257}\mbox{\hyperlink{classfc_1_1http__client__impl_a764b1e3131ad81b70f4adea624d63591}{00257}}\ \ \ \ connection\_map::iterator\ \mbox{\hyperlink{classfc_1_1http__client__impl_a764b1e3131ad81b70f4adea624d63591}{get\_connection}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1url}{url}}\&\ dest,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1http__client__impl_abeb49b911fe34bce2e6491ca68304f12}{deadline\_type}}\&\ deadline\ )\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00258}00258\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ key\ =\ url\_to\_host\_key(dest);}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00259}00259\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ conn\_itr\ =\ \_connections.find(key);}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00260}00260\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (conn\_itr\ ==\ \_connections.end()\ ||\ check\_closed(conn\_itr))\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00261}00261\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ create\_connection(dest,\ deadline);}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00262}00262\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00263}00263\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ conn\_itr;}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00264}00264\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00265}00265\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00266}00266\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00267}\mbox{\hyperlink{structfc_1_1http__client__impl_1_1write__request__visitor}{00267}}\ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structfc_1_1http__client__impl_1_1write__request__visitor}{write\_request\_visitor}}\ :\ \mbox{\hyperlink{structfc_1_1visitor}{visitor}}<error\_code>\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00268}\mbox{\hyperlink{structfc_1_1http__client__impl_1_1write__request__visitor_a82d08cf23659afa58a6582d25387ce5d}{00268}}\ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1http__client__impl_1_1write__request__visitor_a82d08cf23659afa58a6582d25387ce5d}{write\_request\_visitor}}(\mbox{\hyperlink{classfc_1_1http__client__impl}{http\_client\_impl}}*\ that,\ http::request<http::string\_body>\&\ req,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1http__client__impl_abeb49b911fe34bce2e6491ca68304f12}{deadline\_type}}\&\ deadline)}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00269}00269\ \ \ \ \ \ \ :that(that)}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00270}00270\ \ \ \ \ \ \ ,req(req)}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00271}00271\ \ \ \ \ \ \ ,deadline(deadline)}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00272}00272\ \ \ \ \ \ \ \{\}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00273}00273\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00274}00274\ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ S>}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00275}\mbox{\hyperlink{structfc_1_1http__client__impl_1_1write__request__visitor_a76d43277c3e9151a0f1cff727e0b67f9}{00275}}\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1http__client__impl_a06886c03bf859f221215ef510f5485ab}{error\_code}}\ operator()\ (\ \mbox{\hyperlink{struct_s}{S}}\&\ stream\ )\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00276}00276\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ that-\/>sync\_write\_with\_timeout(*stream,\ req,\ deadline);}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00277}00277\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00278}00278\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00279}\mbox{\hyperlink{structfc_1_1http__client__impl_1_1write__request__visitor_ad94ff9c31bad653e56a67b2481213ef7}{00279}}\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1http__client__impl}{http\_client\_impl}}*\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1http__client__impl_1_1write__request__visitor_ad94ff9c31bad653e56a67b2481213ef7}{that}};}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00280}\mbox{\hyperlink{structfc_1_1http__client__impl_1_1write__request__visitor_ae93eff78cb1770784611e4cb38ddcd6d}{00280}}\ \ \ \ \ \ \ http::request<http::string\_body>\&\ \mbox{\hyperlink{structfc_1_1http__client__impl_1_1write__request__visitor_ae93eff78cb1770784611e4cb38ddcd6d}{req}};}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00281}\mbox{\hyperlink{structfc_1_1http__client__impl_1_1write__request__visitor_ac53ff253af42798b6ed9b56e6782bfb8}{00281}}\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1http__client__impl_abeb49b911fe34bce2e6491ca68304f12}{deadline\_type}}\&\ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1http__client__impl_1_1write__request__visitor_ac53ff253af42798b6ed9b56e6782bfb8}{deadline}};}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00282}00282\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00283}00283\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00284}\mbox{\hyperlink{structfc_1_1http__client__impl_1_1read__response__visitor}{00284}}\ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structfc_1_1http__client__impl_1_1read__response__visitor}{read\_response\_visitor}}\ :\ \mbox{\hyperlink{structfc_1_1visitor}{visitor}}<error\_code>\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00285}\mbox{\hyperlink{structfc_1_1http__client__impl_1_1read__response__visitor_aaf62acf206d59c2abe807b0dfdd3edc1}{00285}}\ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1http__client__impl_1_1read__response__visitor_aaf62acf206d59c2abe807b0dfdd3edc1}{read\_response\_visitor}}(\mbox{\hyperlink{classfc_1_1http__client__impl}{http\_client\_impl}}*\ that,\ boost::beast::flat\_buffer\&\ buffer,\ http::response<http::string\_body>\&\ res,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1http__client__impl_abeb49b911fe34bce2e6491ca68304f12}{deadline\_type}}\&\ deadline)}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00286}00286\ \ \ \ \ \ \ :that(that)}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00287}00287\ \ \ \ \ \ \ ,buffer(buffer)}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00288}00288\ \ \ \ \ \ \ ,res(res)}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00289}00289\ \ \ \ \ \ \ ,deadline(deadline)}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00290}00290\ \ \ \ \ \ \ \{\}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00291}00291\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00292}00292\ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ S>}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00293}\mbox{\hyperlink{structfc_1_1http__client__impl_1_1read__response__visitor_a6c07363180d6994ac1a99fa7d7ff49a9}{00293}}\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1http__client__impl_a06886c03bf859f221215ef510f5485ab}{error\_code}}\ operator()\ (\ \mbox{\hyperlink{struct_s}{S}}\&\ stream\ )\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00294}00294\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ that-\/>sync\_read\_with\_timeout(*stream,\ buffer,\ res,\ deadline);}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00295}00295\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00296}00296\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00297}\mbox{\hyperlink{structfc_1_1http__client__impl_1_1read__response__visitor_a1ac167eb705a56f3f6cc7a65e3866c1b}{00297}}\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1http__client__impl}{http\_client\_impl}}*\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1http__client__impl_1_1read__response__visitor_a1ac167eb705a56f3f6cc7a65e3866c1b}{that}};}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00298}\mbox{\hyperlink{structfc_1_1http__client__impl_1_1read__response__visitor_ab4acbe836e7974b7486d6ef15267926d}{00298}}\ \ \ \ \ \ \ boost::beast::flat\_buffer\&\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1http__client__impl_1_1read__response__visitor_ab4acbe836e7974b7486d6ef15267926d}{buffer}};}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00299}\mbox{\hyperlink{structfc_1_1http__client__impl_1_1read__response__visitor_a4df65088d5bd04a86bbee6bf2150c549}{00299}}\ \ \ \ \ \ \ http::response<http::string\_body>\&\ \mbox{\hyperlink{structfc_1_1http__client__impl_1_1read__response__visitor_a4df65088d5bd04a86bbee6bf2150c549}{res}};}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00300}\mbox{\hyperlink{structfc_1_1http__client__impl_1_1read__response__visitor_a38002cadf3ef24839be67eebf9f9ddc1}{00300}}\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1http__client__impl_abeb49b911fe34bce2e6491ca68304f12}{deadline\_type}}\&\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1http__client__impl_1_1read__response__visitor_a38002cadf3ef24839be67eebf9f9ddc1}{deadline}};}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00301}00301\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00302}00302\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00303}\mbox{\hyperlink{classfc_1_1http__client__impl_a4e3995e626a8cec198c1ecd0790252bf}{00303}}\ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{variant}}\ \mbox{\hyperlink{classfc_1_1http__client__impl_a4e3995e626a8cec198c1ecd0790252bf}{post\_sync}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1url}{url}}\&\ dest,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1variant}{variant}}\&\ payload,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1time__point}{fc::time\_point}}\&\ \_deadline)\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00304}00304\ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1http__client__impl_abeb49b911fe34bce2e6491ca68304f12}{deadline\_type}}\ epoch(boost::gregorian::date(1970,\ 1,\ 1));}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00305}00305\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ deadline\ =\ epoch\ +\ boost::posix\_time::microseconds(\_deadline.\mbox{\hyperlink{classfc_1_1time__point_abfea5efbe9ef58024cda814395ee9945}{time\_since\_epoch}}().\mbox{\hyperlink{classfc_1_1microseconds_a20fba59ec7e1f50c6b8f2c9443cc9b92}{count}}());}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00306}00306\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(dest.host(),\ \textcolor{stringliteral}{"{}No\ host\ set\ on\ URL"{}});}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00307}00307\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00308}00308\ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ \mbox{\hyperlink{classfc_1_1path}{path}}\ =\ dest.path()\ ?\ dest.path()-\/>generic\_string()\ :\ \textcolor{stringliteral}{"{}/"{}};}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00309}00309\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (dest.query())\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00310}00310\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1path}{path}}\ =\ \mbox{\hyperlink{classfc_1_1path}{path}}\ +\ \textcolor{stringliteral}{"{}?"{}}\ +\ *dest.query();}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00311}00311\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00312}00312\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00313}00313\ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ host\_str\ =\ *dest.host();}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00314}00314\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (dest.port())\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00315}00315\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ port\ =\ *dest.port();}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00316}00316\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ proto\_iter\ =\ default\_proto\_ports.find(dest.proto());}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00317}00317\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (proto\_iter\ !=\ default\_proto\_ports.end()\ \&\&\ proto\_iter-\/>second\ !=\ port)\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00318}00318\ \ \ \ \ \ \ \ \ \ \ \ \ host\_str\ =\ host\_str\ +\ \textcolor{stringliteral}{"{}:"{}}\ +\ std::to\_string(port);}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00319}00319\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00320}00320\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00321}00321\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00322}00322\ \ \ \ \ \ \ http::request<http::string\_body>\ req\{http::verb::post,\ \mbox{\hyperlink{classfc_1_1path}{path}},\ 11\};}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00323}00323\ \ \ \ \ \ \ req.set(http::field::host,\ host\_str);}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00324}00324\ \ \ \ \ \ \ req.set(http::field::user\_agent,\ BOOST\_BEAST\_VERSION\_STRING);}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00325}00325\ \ \ \ \ \ \ req.set(http::field::content\_type,\ \textcolor{stringliteral}{"{}application/json"{}});}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00326}00326\ \ \ \ \ \ \ req.keep\_alive(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00327}00327\ \ \ \ \ \ \ req.body()\ =\ \mbox{\hyperlink{classfc_1_1json_aa6541960d7f05567559b866cfaf88dfa}{json::to\_string}}(payload,\ \_deadline);}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00328}00328\ \ \ \ \ \ \ req.prepare\_payload();}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00329}00329\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00330}00330\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ conn\_iter\ =\ get\_connection(dest,\ deadline);}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00331}00331\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ eraser\ =\ \mbox{\hyperlink{namespacefc_a23d89b54a8ffd84f7e7efeb21747d846}{make\_scoped\_exit}}([\textcolor{keyword}{this},\ \&conn\_iter]()\{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00332}00332\ \ \ \ \ \ \ \ \ \ \_connections.erase(conn\_iter);}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00333}00333\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00334}00334\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00335}00335\ \ \ \ \ \ \ \textcolor{comment}{//\ Send\ the\ HTTP\ request\ to\ the\ remote\ host}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00336}00336\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1http__client__impl_a06886c03bf859f221215ef510f5485ab}{error\_code}}\ ec\ =\ std::visit(\mbox{\hyperlink{structfc_1_1http__client__impl_1_1write__request__visitor}{write\_request\_visitor}}(\textcolor{keyword}{this},\ req,\ deadline),\ conn\_iter-\/>second);}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00337}00337\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(!ec,\ \textcolor{stringliteral}{"{}Failed\ to\ send\ request:\ \$\{message\}"{}},\ (\textcolor{stringliteral}{"{}message"{}},ec.message()));}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00338}00338\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00339}00339\ \ \ \ \ \ \ \textcolor{comment}{//\ This\ buffer\ is\ used\ for\ reading\ and\ must\ be\ persisted}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00340}00340\ \ \ \ \ \ \ boost::beast::flat\_buffer\ buffer;}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00341}00341\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00342}00342\ \ \ \ \ \ \ \textcolor{comment}{//\ Declare\ a\ container\ to\ hold\ the\ response}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00343}00343\ \ \ \ \ \ \ http::response<http::string\_body>\ res;}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00344}00344\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00345}00345\ \ \ \ \ \ \ \textcolor{comment}{//\ Receive\ the\ HTTP\ response}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00346}00346\ \ \ \ \ \ \ ec\ =\ std::visit(\mbox{\hyperlink{structfc_1_1http__client__impl_1_1read__response__visitor}{read\_response\_visitor}}(\textcolor{keyword}{this},\ buffer,\ res,\ deadline),\ conn\_iter-\/>second);}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00347}00347\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(!ec,\ \textcolor{stringliteral}{"{}Failed\ to\ read\ response:\ \$\{message\}"{}},\ (\textcolor{stringliteral}{"{}message"{}},ec.message()));}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00348}00348\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00349}00349\ \ \ \ \ \ \ \textcolor{comment}{//\ if\ the\ connection\ can\ be\ kept\ open,\ keep\ it\ open}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00350}00350\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (res.keep\_alive())\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00351}00351\ \ \ \ \ \ \ \ \ \ eraser.cancel();}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00352}00352\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00353}00353\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00354}00354\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}\ result;}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00355}00355\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !res.body().empty()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00356}00356\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00357}00357\ \ \ \ \ \ \ \ \ \ \ \ \ result\ =\ \mbox{\hyperlink{classfc_1_1json_afad69f9f9c2a9f0105aae99f532f90cb}{json::from\_string}}(\ res.body()\ );}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00358}00358\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}(\ ...\ )\ \{\}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00359}00359\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00360}00360\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (res.result()\ ==\ http::status::internal\_server\_error)\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00361}00361\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a15170d1be1e682691dfe6ae09790edce}{fc::exception\_ptr}}\ excp;}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00362}00362\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00363}00363\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ err\_var\ =\ result.get\_object()[\textcolor{stringliteral}{"{}error"{}}].get\_object();}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00364}00364\ \ \ \ \ \ \ \ \ \ \ \ \ excp\ =\ std::make\_shared<fc::exception>(err\_var[\textcolor{stringliteral}{"{}code"{}}].as\_int64(),\ err\_var[\textcolor{stringliteral}{"{}name"{}}].as\_string(),\ err\_var[\textcolor{stringliteral}{"{}what"{}}].as\_string());}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00365}00365\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00366}00366\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (err\_var.contains(\textcolor{stringliteral}{"{}details"{}}))\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00367}00367\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ dvar\ :\ err\_var[\textcolor{stringliteral}{"{}details"{}}].get\_array())\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00368}00368\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ excp-\/>append\_log(\mbox{\hyperlink{log__message_8hpp_a4a4df4bb5cffbe07aadf7d29fd44c75e}{FC\_LOG\_MESSAGE}}(error,\ dvar.get\_object()[\textcolor{stringliteral}{"{}message"{}}].as\_string()));}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00369}00369\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00370}00370\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00371}00371\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}(\ ...\ )\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00372}00372\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00373}00373\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00374}00374\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00375}00375\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (excp)\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00376}00376\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ *excp;}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00377}00377\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00378}00378\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a3a1fa84768603c99866fe61af96c9f36}{FC\_THROW}}(\textcolor{stringliteral}{"{}Request\ failed\ with\ 500\ response,\ but\ response\ was\ not\ parseable"{}});}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00379}00379\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00380}00380\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (res.result()\ ==\ http::status::not\_found)\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00381}00381\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a3a1fa84768603c99866fe61af96c9f36}{FC\_THROW}}(\textcolor{stringliteral}{"{}URL\ not\ found:\ \$\{url\}"{}},\ (\textcolor{stringliteral}{"{}url"{}},\ (std::string)dest));}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00382}00382\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00383}00383\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00384}00384\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00385}00385\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00386}00386\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00387}00387\ \ \ \ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00388}00388\ \textcolor{comment}{\ \ \ \ \ \ Unix\ URLs\ work\ a\ little\ special\ here.\ They'll\ originally\ be\ in\ the\ format\ of}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00389}00389\ \textcolor{comment}{\ \ \ \ \ \ unix:///home/username/sysio-\/wallet/kiod.sock/v1/wallet/sign\_digest}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00390}00390\ \textcolor{comment}{\ \ \ \ \ \ for\ example.\ When\ the\ fc::url\ is\ given\ to\ http\_client\ in\ post\_sync(),\ this\ will}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00391}00391\ \textcolor{comment}{\ \ \ \ \ \ have\ proto=unix\ and\ host=/home/username/sysio-\/wallet/kiod.sock/v1/wallet/sign\_digest}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00392}00392\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00393}00393\ \textcolor{comment}{\ \ \ \ \ \ At\ this\ point\ we\ still\ don't\ know\ what\ part\ of\ the\ above\ string\ is\ the\ unix\ socket\ path}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00394}00394\ \textcolor{comment}{\ \ \ \ \ \ and\ which\ part\ is\ the\ path\ to\ access\ on\ the\ server.\ This\ function\ discovers\ that}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00395}00395\ \textcolor{comment}{\ \ \ \ \ \ host=/home/username/sysio-\/wallet/kiod.sock\ and\ path=/v1/wallet/sign\_digest}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00396}00396\ \textcolor{comment}{\ \ \ \ \ \ and\ creates\ another\ fc::url\ that\ will\ be\ used\ downstream\ of\ the\ http\_client::post\_sync()}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00397}00397\ \textcolor{comment}{\ \ \ \ \ \ call.}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00398}00398\ \textcolor{comment}{\ \ \ */}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00399}\mbox{\hyperlink{classfc_1_1http__client__impl_a55ca211e9f8c7ad7dacf0cd047ecca58}{00399}}\ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1url}{fc::url}}\&\ \mbox{\hyperlink{classfc_1_1http__client__impl_a55ca211e9f8c7ad7dacf0cd047ecca58}{get\_unix\_url}}(\textcolor{keyword}{const}\ std::string\&\ full\_url)\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00400}00400\ \ \ \ \ \ \ unix\_url\_split\_map::const\_iterator\ found\ =\ \_unix\_url\_paths.find(full\_url);}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00401}00401\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(found\ !=\ \_unix\_url\_paths.end())}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00402}00402\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ found-\/>second;}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00403}00403\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00404}00404\ \ \ \ \ \ \ boost::filesystem::path\ socket\_file(full\_url);}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00405}00405\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(socket\_file.is\_relative())}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00406}00406\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}socket\ url\ cannot\ be\ relative\ (\$\{url\})"{}},\ (\textcolor{stringliteral}{"{}url"{}},\ socket\_file.string()));}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00407}00407\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(socket\_file.empty())}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00408}00408\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}missing\ socket\ url"{}});}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00409}00409\ \ \ \ \ \ \ boost::filesystem::path\ url\_path;}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00410}00410\ \ \ \ \ \ \ \textcolor{keywordflow}{do}\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00411}00411\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(boost::filesystem::status(socket\_file).\mbox{\hyperlink{yubihsm_8h_a1d127017fb298b889f4ba24752d08b8e}{type}}()\ ==\ boost::filesystem::socket\_file)}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00412}00412\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00413}00413\ \ \ \ \ \ \ \ \ \ url\_path\ =\ socket\_file.filename()\ /\ url\_path;}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00414}00414\ \ \ \ \ \ \ \ \ \ socket\_file\ =\ socket\_file.remove\_filename();}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00415}00415\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{while}(!socket\_file.empty());}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00416}00416\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(socket\_file.empty())}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00417}00417\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(\ parse\_error\_exception,\ \textcolor{stringliteral}{"{}couldn't\ discover\ socket\ path"{}});}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00418}00418\ \ \ \ \ \ \ url\_path\ =\ \textcolor{stringliteral}{"{}/"{}}\ /\ url\_path;}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00419}00419\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \_unix\_url\_paths.emplace(full\_url,\ \mbox{\hyperlink{classfc_1_1url}{fc::url}}(\textcolor{stringliteral}{"{}unix"{}},\ socket\_file.string(),\ \mbox{\hyperlink{namespacefc_a219cf01fcfa97b5eac3acb755e8177e0}{ostring}}(),\ \mbox{\hyperlink{namespacefc_a219cf01fcfa97b5eac3acb755e8177e0}{ostring}}(),\ url\_path.string(),\ \mbox{\hyperlink{namespacefc_a219cf01fcfa97b5eac3acb755e8177e0}{ostring}}(),\ \mbox{\hyperlink{namespacefc_a97da71aef0dc7bf1196351036e688886}{ovariant\_object}}(),\ std::optional<uint16\_t>())).first-\/>second;}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00420}00420\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00421}00421\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00422}\mbox{\hyperlink{classfc_1_1http__client__impl_a44a03d199abd9d82b45859a240932605}{00422}}\ \ \ \ boost::asio::io\_context\ \ \mbox{\hyperlink{classfc_1_1http__client__impl_a44a03d199abd9d82b45859a240932605}{\_ioc}};}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00423}\mbox{\hyperlink{classfc_1_1http__client__impl_aa0162152ec93d9dbf957a6031b3d7498}{00423}}\ \ \ \ ssl::context\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1http__client__impl_aa0162152ec93d9dbf957a6031b3d7498}{\_sslc}};}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00424}\mbox{\hyperlink{classfc_1_1http__client__impl_a6510a6dfdc36dbbf803a64bf3acdff23}{00424}}\ \ \ \ \mbox{\hyperlink{classfc_1_1http__client__impl_a72d1baab7c0912164b747d2e68b0b7d2}{connection\_map}}\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1http__client__impl_a6510a6dfdc36dbbf803a64bf3acdff23}{\_connections}};}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00425}\mbox{\hyperlink{classfc_1_1http__client__impl_a671b2f8acfd241ca03008037dce5e97f}{00425}}\ \ \ \ \mbox{\hyperlink{classfc_1_1http__client__impl_a90b1248f236291d74c7cfb96ce6eaf0f}{unix\_url\_split\_map}}\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1http__client__impl_a671b2f8acfd241ca03008037dce5e97f}{\_unix\_url\_paths}};}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00426}00426\ \};}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00427}00427\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00428}00428\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00429}\mbox{\hyperlink{classfc_1_1http__client_ae8bd9f4a127653e1e874239354f48fee}{00429}}\ http\_client::http\_client()}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00430}00430\ :\_my(new\ \mbox{\hyperlink{classfc_1_1http__client__impl}{http\_client\_impl}}())}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00431}00431\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00432}00432\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00433}00433\ \}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00434}00434\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00435}\mbox{\hyperlink{classfc_1_1http__client_a17c7f208e97d47e1b8e17f9f07c9821d}{00435}}\ \mbox{\hyperlink{classfc_1_1variant}{variant}}\ \mbox{\hyperlink{classfc_1_1http__client_a17c7f208e97d47e1b8e17f9f07c9821d}{http\_client::post\_sync}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1url}{url}}\&\ dest,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1variant}{variant}}\&\ payload,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1time__point}{fc::time\_point}}\&\ deadline)\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00436}00436\ \ \ \ \textcolor{keywordflow}{if}(dest.proto()\ ==\ \textcolor{stringliteral}{"{}unix"{}})}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00437}00437\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \_my-\/>post\_sync(\_my-\/>get\_unix\_url(*dest.host()),\ payload,\ deadline);}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00438}00438\ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00439}00439\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \_my-\/>post\_sync(dest,\ payload,\ deadline);}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00440}00440\ \}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00441}00441\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00442}\mbox{\hyperlink{classfc_1_1http__client_a7be49c9a7578612da641aa1be766e8e2}{00442}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1http__client_a7be49c9a7578612da641aa1be766e8e2}{http\_client::add\_cert}}(\textcolor{keyword}{const}\ std::string\&\ cert\_pem\_string)\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00443}00443\ \ \ \ \_my-\/>add\_cert(cert\_pem\_string);}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00444}00444\ \}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00445}00445\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00446}\mbox{\hyperlink{classfc_1_1http__client_a4f7481e8e58038bd9c362453012fa4c9}{00446}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classfc_1_1http__client_a4f7481e8e58038bd9c362453012fa4c9}{http\_client::set\_verify\_peers}}(\textcolor{keywordtype}{bool}\ enabled)\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00447}00447\ \ \ \ \_my-\/>set\_verify\_peers(enabled);}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00448}00448\ \}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00449}00449\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00450}\mbox{\hyperlink{classfc_1_1http__client_a156a26b1214829a2b973fb1f7d91eb79}{00450}}\ \mbox{\hyperlink{classfc_1_1http__client_a156a26b1214829a2b973fb1f7d91eb79}{http\_client::\string~http\_client}}()\ \{}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00451}00451\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00452}00452\ \}}
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00453}00453\ }
+\DoxyCodeLine{\Hypertarget{http__client_8cpp_source_l00454}00454\ \}}
+
+\end{DoxyCode}

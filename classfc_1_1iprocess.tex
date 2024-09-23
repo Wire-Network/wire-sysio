@@ -1,0 +1,200 @@
+\doxysection{fc\+::iprocess Class Reference}
+\hypertarget{classfc_1_1iprocess}{}\label{classfc_1_1iprocess}\index{fc::iprocess@{fc::iprocess}}
+
+
+abstract interface for interacting with external processes  
+
+
+
+
+{\ttfamily \#include $<$iprocess.\+hpp$>$}
+
+
+
+Inheritance diagram for fc\+::iprocess\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=147pt]{classfc_1_1iprocess__inherit__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{classfc_1_1iprocess_a5c8a22e5daa2e344574cf9b98ebbc7c0}{exec\+\_\+opts}} \{ \newline
+\mbox{\hyperlink{classfc_1_1iprocess_a5c8a22e5daa2e344574cf9b98ebbc7c0ad076e53f7735973b8fa84b1963cb4e77}{open\+\_\+none}} = 0
+, \mbox{\hyperlink{classfc_1_1iprocess_a5c8a22e5daa2e344574cf9b98ebbc7c0a1ae4c54b9b2b285e1ab8b3562d14200c}{open\+\_\+stdin}} = 0x01
+, \mbox{\hyperlink{classfc_1_1iprocess_a5c8a22e5daa2e344574cf9b98ebbc7c0a7b8800fa43953d78083d86327a0a604e}{open\+\_\+stdout}} = 0x02
+, \mbox{\hyperlink{classfc_1_1iprocess_a5c8a22e5daa2e344574cf9b98ebbc7c0aad069fbbfabfc66f12f66a6270baa92d}{open\+\_\+stderr}} = 0x04
+, \newline
+\mbox{\hyperlink{classfc_1_1iprocess_a5c8a22e5daa2e344574cf9b98ebbc7c0a765323ccde44d093fafdfd35af17519f}{open\+\_\+all}} = open\+\_\+stdin\texorpdfstring{$\vert$}{|}open\+\_\+stdout\texorpdfstring{$\vert$}{|}open\+\_\+stderr
+, \mbox{\hyperlink{classfc_1_1iprocess_a5c8a22e5daa2e344574cf9b98ebbc7c0ac57cedf7ffea9ae46e072a5ff3deae1a}{suppress\+\_\+console}} = 0x08
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{classfc_1_1iprocess_a4635e0cfff93eac7e9f1a9c7ac6cbce5}{\texorpdfstring{$\sim$}{\string~}iprocess}} ()
+\item 
+virtual \mbox{\hyperlink{classfc_1_1iprocess}{iprocess}} \& \mbox{\hyperlink{classfc_1_1iprocess_a7aae40c5a0120f75745caa14a77cc350}{exec}} (const \mbox{\hyperlink{classfc_1_1path}{path}} \&exe, std\+::vector$<$ std\+::string $>$ args, const \mbox{\hyperlink{classfc_1_1path}{path}} \&work\+\_\+dir=\mbox{\hyperlink{classfc_1_1path}{path}}(), int opts=\mbox{\hyperlink{classfc_1_1iprocess_a5c8a22e5daa2e344574cf9b98ebbc7c0a765323ccde44d093fafdfd35af17519f}{open\+\_\+all}})=0
+\item 
+virtual int \mbox{\hyperlink{classfc_1_1iprocess_abe1c8fb231fe682868561a1193361ce9}{result}} (const \mbox{\hyperlink{classfc_1_1microseconds}{microseconds}} \&timeout=\mbox{\hyperlink{classfc_1_1microseconds_afc3eb0bfd792c7b1cda062e559e30c2e}{microseconds\+::maximum}}())=0
+\item 
+virtual void \mbox{\hyperlink{classfc_1_1iprocess_ab8f2c418018f1722ae821334bfd6c0f8}{kill}} ()=0
+\item 
+virtual \mbox{\hyperlink{namespacefc_a95f13893819c9b7254bd8dc1f906c497}{buffered\+\_\+ostream\+\_\+ptr}} \mbox{\hyperlink{classfc_1_1iprocess_a89bdbe5f0ec7a46dcdd1a24121f4e876}{in\+\_\+stream}} ()=0
+\begin{DoxyCompactList}\small\item\em returns a stream that writes to the process\textquotesingle{} stdin \end{DoxyCompactList}\item 
+virtual \mbox{\hyperlink{namespacefc_a1de1d095ba3c29dc0ced564bc8f45123}{buffered\+\_\+istream\+\_\+ptr}} \mbox{\hyperlink{classfc_1_1iprocess_a44d94c426ed7402470f6ad0a969e1a7e}{out\+\_\+stream}} ()=0
+\begin{DoxyCompactList}\small\item\em returns a stream that reads from the process\textquotesingle{} stdout \end{DoxyCompactList}\item 
+virtual \mbox{\hyperlink{namespacefc_a1de1d095ba3c29dc0ced564bc8f45123}{buffered\+\_\+istream\+\_\+ptr}} \mbox{\hyperlink{classfc_1_1iprocess_a4a4c3a21dd58acae5cb1dca26bae0a4f}{err\+\_\+stream}} ()=0
+\begin{DoxyCompactList}\small\item\em returns a stream that reads from the process\textquotesingle{} stderr \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+At the very least we have ssh\+::process and direct child processes, and there may be other processes that need to implement this protocol. 
+
+Definition at line \mbox{\hyperlink{iprocess_8hpp_source_l00016}{16}} of file \mbox{\hyperlink{iprocess_8hpp_source}{iprocess.\+hpp}}.
+
+
+
+\doxysubsection{Member Enumeration Documentation}
+\Hypertarget{classfc_1_1iprocess_a5c8a22e5daa2e344574cf9b98ebbc7c0}\index{fc::iprocess@{fc::iprocess}!exec\_opts@{exec\_opts}}
+\index{exec\_opts@{exec\_opts}!fc::iprocess@{fc::iprocess}}
+\doxysubsubsection{\texorpdfstring{exec\_opts}{exec\_opts}}
+{\footnotesize\ttfamily \label{classfc_1_1iprocess_a5c8a22e5daa2e344574cf9b98ebbc7c0} 
+enum \mbox{\hyperlink{classfc_1_1iprocess_a5c8a22e5daa2e344574cf9b98ebbc7c0}{fc\+::iprocess\+::exec\+\_\+opts}}}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{open\_none@{open\_none}!fc::iprocess@{fc::iprocess}}\index{fc::iprocess@{fc::iprocess}!open\_none@{open\_none}}}\Hypertarget{classfc_1_1iprocess_a5c8a22e5daa2e344574cf9b98ebbc7c0ad076e53f7735973b8fa84b1963cb4e77}\label{classfc_1_1iprocess_a5c8a22e5daa2e344574cf9b98ebbc7c0} 
+open\+\_\+none&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{open\_stdin@{open\_stdin}!fc::iprocess@{fc::iprocess}}\index{fc::iprocess@{fc::iprocess}!open\_stdin@{open\_stdin}}}\Hypertarget{classfc_1_1iprocess_a5c8a22e5daa2e344574cf9b98ebbc7c0a1ae4c54b9b2b285e1ab8b3562d14200c}\label{classfc_1_1iprocess_a5c8a22e5daa2e344574cf9b98ebbc7c0} 
+open\+\_\+stdin&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{open\_stdout@{open\_stdout}!fc::iprocess@{fc::iprocess}}\index{fc::iprocess@{fc::iprocess}!open\_stdout@{open\_stdout}}}\Hypertarget{classfc_1_1iprocess_a5c8a22e5daa2e344574cf9b98ebbc7c0a7b8800fa43953d78083d86327a0a604e}\label{classfc_1_1iprocess_a5c8a22e5daa2e344574cf9b98ebbc7c0} 
+open\+\_\+stdout&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{open\_stderr@{open\_stderr}!fc::iprocess@{fc::iprocess}}\index{fc::iprocess@{fc::iprocess}!open\_stderr@{open\_stderr}}}\Hypertarget{classfc_1_1iprocess_a5c8a22e5daa2e344574cf9b98ebbc7c0aad069fbbfabfc66f12f66a6270baa92d}\label{classfc_1_1iprocess_a5c8a22e5daa2e344574cf9b98ebbc7c0} 
+open\+\_\+stderr&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{open\_all@{open\_all}!fc::iprocess@{fc::iprocess}}\index{fc::iprocess@{fc::iprocess}!open\_all@{open\_all}}}\Hypertarget{classfc_1_1iprocess_a5c8a22e5daa2e344574cf9b98ebbc7c0a765323ccde44d093fafdfd35af17519f}\label{classfc_1_1iprocess_a5c8a22e5daa2e344574cf9b98ebbc7c0} 
+open\+\_\+all&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{suppress\_console@{suppress\_console}!fc::iprocess@{fc::iprocess}}\index{fc::iprocess@{fc::iprocess}!suppress\_console@{suppress\_console}}}\Hypertarget{classfc_1_1iprocess_a5c8a22e5daa2e344574cf9b98ebbc7c0ac57cedf7ffea9ae46e072a5ff3deae1a}\label{classfc_1_1iprocess_a5c8a22e5daa2e344574cf9b98ebbc7c0} 
+suppress\+\_\+console&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{iprocess_8hpp_source_l00019}{19}} of file \mbox{\hyperlink{iprocess_8hpp_source}{iprocess.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1iprocess_a5c8a22e5daa2e344574cf9b98ebbc7c0ad076e53f7735973b8fa84b1963cb4e77}{open\_none}}\ \ \ =\ 0,}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1iprocess_a5c8a22e5daa2e344574cf9b98ebbc7c0a1ae4c54b9b2b285e1ab8b3562d14200c}{open\_stdin}}\ \ =\ 0x01,\ }
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1iprocess_a5c8a22e5daa2e344574cf9b98ebbc7c0a7b8800fa43953d78083d86327a0a604e}{open\_stdout}}\ =\ 0x02,\ }
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1iprocess_a5c8a22e5daa2e344574cf9b98ebbc7c0aad069fbbfabfc66f12f66a6270baa92d}{open\_stderr}}\ =\ 0x04,}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1iprocess_a5c8a22e5daa2e344574cf9b98ebbc7c0a765323ccde44d093fafdfd35af17519f}{open\_all}}\ \ \ \ =\ \mbox{\hyperlink{classfc_1_1iprocess_a5c8a22e5daa2e344574cf9b98ebbc7c0a1ae4c54b9b2b285e1ab8b3562d14200c}{open\_stdin}}|\mbox{\hyperlink{classfc_1_1iprocess_a5c8a22e5daa2e344574cf9b98ebbc7c0a7b8800fa43953d78083d86327a0a604e}{open\_stdout}}|\mbox{\hyperlink{classfc_1_1iprocess_a5c8a22e5daa2e344574cf9b98ebbc7c0aad069fbbfabfc66f12f66a6270baa92d}{open\_stderr}},}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1iprocess_a5c8a22e5daa2e344574cf9b98ebbc7c0ac57cedf7ffea9ae46e072a5ff3deae1a}{suppress\_console}}\ =\ 0x08}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1iprocess_a4635e0cfff93eac7e9f1a9c7ac6cbce5}\index{fc::iprocess@{fc::iprocess}!````~iprocess@{\texorpdfstring{$\sim$}{\string~}iprocess}}
+\index{````~iprocess@{\texorpdfstring{$\sim$}{\string~}iprocess}!fc::iprocess@{fc::iprocess}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}iprocess()}{\string~iprocess()}}
+{\footnotesize\ttfamily \label{classfc_1_1iprocess_a4635e0cfff93eac7e9f1a9c7ac6cbce5} 
+virtual fc\+::iprocess\+::\texorpdfstring{$\sim$}{\string~}iprocess (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{iprocess_8hpp_source_l00028}{28}} of file \mbox{\hyperlink{iprocess_8hpp_source}{iprocess.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00028\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1iprocess_a4a4c3a21dd58acae5cb1dca26bae0a4f}\index{fc::iprocess@{fc::iprocess}!err\_stream@{err\_stream}}
+\index{err\_stream@{err\_stream}!fc::iprocess@{fc::iprocess}}
+\doxysubsubsection{\texorpdfstring{err\_stream()}{err\_stream()}}
+{\footnotesize\ttfamily \label{classfc_1_1iprocess_a4a4c3a21dd58acae5cb1dca26bae0a4f} 
+virtual \mbox{\hyperlink{namespacefc_a1de1d095ba3c29dc0ced564bc8f45123}{buffered\+\_\+istream\+\_\+ptr}} fc\+::iprocess\+::err\+\_\+stream (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{classfc_1_1process_ae2939ac9bd82790db5f386b13b365549}{fc\+::process}}.
+
+\Hypertarget{classfc_1_1iprocess_a7aae40c5a0120f75745caa14a77cc350}\index{fc::iprocess@{fc::iprocess}!exec@{exec}}
+\index{exec@{exec}!fc::iprocess@{fc::iprocess}}
+\doxysubsubsection{\texorpdfstring{exec()}{exec()}}
+{\footnotesize\ttfamily \label{classfc_1_1iprocess_a7aae40c5a0120f75745caa14a77cc350} 
+virtual \mbox{\hyperlink{classfc_1_1iprocess}{iprocess}} \& fc\+::iprocess\+::exec (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1path}{path}} \&}]{exe}{, }\item[{std\+::vector$<$ std\+::string $>$}]{args}{, }\item[{const \mbox{\hyperlink{classfc_1_1path}{path}} \&}]{work\+\_\+dir}{ = {\ttfamily \mbox{\hyperlink{classfc_1_1path}{path}}()}, }\item[{int}]{opts}{ = {\ttfamily \mbox{\hyperlink{classfc_1_1iprocess_a5c8a22e5daa2e344574cf9b98ebbc7c0a765323ccde44d093fafdfd35af17519f}{open\+\_\+all}}}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+\begin{DoxyReturn}{Returns}
+\texorpdfstring{$\ast$}{*}this 
+\end{DoxyReturn}
+
+
+Implemented in \mbox{\hyperlink{classfc_1_1process_aa663b2fe8d58228224d0c1a954554a46}{fc\+::process}}.
+
+\Hypertarget{classfc_1_1iprocess_a89bdbe5f0ec7a46dcdd1a24121f4e876}\index{fc::iprocess@{fc::iprocess}!in\_stream@{in\_stream}}
+\index{in\_stream@{in\_stream}!fc::iprocess@{fc::iprocess}}
+\doxysubsubsection{\texorpdfstring{in\_stream()}{in\_stream()}}
+{\footnotesize\ttfamily \label{classfc_1_1iprocess_a89bdbe5f0ec7a46dcdd1a24121f4e876} 
+virtual \mbox{\hyperlink{namespacefc_a95f13893819c9b7254bd8dc1f906c497}{buffered\+\_\+ostream\+\_\+ptr}} fc\+::iprocess\+::in\+\_\+stream (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{classfc_1_1process_a87f8951f9911b85a30947ad641ae959a}{fc\+::process}}.
+
+\Hypertarget{classfc_1_1iprocess_ab8f2c418018f1722ae821334bfd6c0f8}\index{fc::iprocess@{fc::iprocess}!kill@{kill}}
+\index{kill@{kill}!fc::iprocess@{fc::iprocess}}
+\doxysubsubsection{\texorpdfstring{kill()}{kill()}}
+{\footnotesize\ttfamily \label{classfc_1_1iprocess_ab8f2c418018f1722ae821334bfd6c0f8} 
+virtual void fc\+::iprocess\+::kill (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+Forcefully kills the process. 
+
+Implemented in \mbox{\hyperlink{classfc_1_1process_a159c67b1fcff5dffb6678d15090ab335}{fc\+::process}}.
+
+\Hypertarget{classfc_1_1iprocess_a44d94c426ed7402470f6ad0a969e1a7e}\index{fc::iprocess@{fc::iprocess}!out\_stream@{out\_stream}}
+\index{out\_stream@{out\_stream}!fc::iprocess@{fc::iprocess}}
+\doxysubsubsection{\texorpdfstring{out\_stream()}{out\_stream()}}
+{\footnotesize\ttfamily \label{classfc_1_1iprocess_a44d94c426ed7402470f6ad0a969e1a7e} 
+virtual \mbox{\hyperlink{namespacefc_a1de1d095ba3c29dc0ced564bc8f45123}{buffered\+\_\+istream\+\_\+ptr}} fc\+::iprocess\+::out\+\_\+stream (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{classfc_1_1process_a9cda12fc9cb8b8f8181af7603395c384}{fc\+::process}}.
+
+\Hypertarget{classfc_1_1iprocess_abe1c8fb231fe682868561a1193361ce9}\index{fc::iprocess@{fc::iprocess}!result@{result}}
+\index{result@{result}!fc::iprocess@{fc::iprocess}}
+\doxysubsubsection{\texorpdfstring{result()}{result()}}
+{\footnotesize\ttfamily \label{classfc_1_1iprocess_abe1c8fb231fe682868561a1193361ce9} 
+virtual int fc\+::iprocess\+::result (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1microseconds}{microseconds}} \&}]{timeout}{ = {\ttfamily \mbox{\hyperlink{classfc_1_1microseconds_afc3eb0bfd792c7b1cda062e559e30c2e}{microseconds\+::maximum}}()}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+\begin{DoxyReturn}{Returns}
+blocks until the process exits 
+\end{DoxyReturn}
+
+
+Implemented in \mbox{\hyperlink{classfc_1_1process_a58711b1b058e41f8139a971d3cc9b0a4}{fc\+::process}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/interprocess/\mbox{\hyperlink{iprocess_8hpp}{iprocess.\+hpp}}\end{DoxyCompactItemize}

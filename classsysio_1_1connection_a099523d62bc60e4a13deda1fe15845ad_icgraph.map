@@ -1,0 +1,7 @@
+<map id="sysio::connection::enqueue_sync_block" name="sysio::connection::enqueue_sync_block">
+<area shape="rect" id="Node000001" title=" " alt="" coords="204,39,347,79"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1connection.html#a97f2f3f3cbd12528d708c86e7568e282" title=" " alt="" coords="5,5,156,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="188,47,156,41,157,36,189,42"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1connection.html#a21ed2c2f522d3a525417073d7548a4b5" title=" " alt="" coords="15,71,146,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="189,76,147,83,146,78,188,71"/>
+</map>

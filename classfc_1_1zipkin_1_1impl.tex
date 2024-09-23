@@ -1,0 +1,364 @@
+\doxysection{fc\+::zipkin\+::impl Class Reference}
+\hypertarget{classfc_1_1zipkin_1_1impl}{}\label{classfc_1_1zipkin_1_1impl}\index{fc::zipkin::impl@{fc::zipkin::impl}}
+
+
+Collaboration diagram for fc\+::zipkin\+::impl\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=160pt]{classfc_1_1zipkin_1_1impl__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1zipkin_1_1impl_a21d912a49a851958b81d7199e8727007}{impl}} (std\+::string \mbox{\hyperlink{classfc_1_1url}{url}}, std\+::string \mbox{\hyperlink{classfc_1_1zipkin_1_1impl_a2e178767ac2d7dd0a4c6810566bdbaf9}{service\+\_\+name}}, \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classfc_1_1zipkin_1_1impl_a12e350904c8280b886c787a28665f320}{timeout\+\_\+us}})
+\item 
+void \mbox{\hyperlink{classfc_1_1zipkin_1_1impl_a5e8f2cb25258af6f392ccd8226457856}{init}} ()
+\item 
+void \mbox{\hyperlink{classfc_1_1zipkin_1_1impl_a8c6b3ad41eb01b7092465c2bb427bbad}{shutdown}} ()
+\item 
+void \mbox{\hyperlink{classfc_1_1zipkin_1_1impl_a15b9c59b7c6d0e08cd958dbf31ff3ee5}{log}} (\mbox{\hyperlink{structfc_1_1zipkin__span_1_1span__data}{zipkin\+\_\+span\+::span\+\_\+data}} \&\&span)
+\item 
+\mbox{\hyperlink{classfc_1_1zipkin_1_1impl_a2b2b0354c53e967d428480eca92f6a2b}{\texorpdfstring{$\sim$}{\string~}impl}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+const std\+::string \mbox{\hyperlink{classfc_1_1zipkin_1_1impl_a96bc61eab436b9ec8e6a39150741e574}{zipkin\+\_\+url}}
+\item 
+const std\+::string \mbox{\hyperlink{classfc_1_1zipkin_1_1impl_a2e178767ac2d7dd0a4c6810566bdbaf9}{service\+\_\+name}}
+\item 
+const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classfc_1_1zipkin_1_1impl_a12e350904c8280b886c787a28665f320}{timeout\+\_\+us}}
+\item 
+std\+::mutex \mbox{\hyperlink{classfc_1_1zipkin_1_1impl_a661725a819134efd4e439859a46c1bcd}{mtx}}
+\item 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \mbox{\hyperlink{classfc_1_1zipkin_1_1impl_aec2af768c43ffd4820b65a0f864c6853}{next\+\_\+id}} = 0
+\item 
+\mbox{\hyperlink{classfc_1_1http__client}{http\+\_\+client}} \mbox{\hyperlink{classfc_1_1zipkin_1_1impl_a1f3e4a3239b44f62c22a5e1bbb7df77f}{http}}
+\item 
+std\+::atomic$<$ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} $>$ \mbox{\hyperlink{classfc_1_1zipkin_1_1impl_a606ff48e0af7cd8e85d314172e944c18}{consecutive\+\_\+errors}} = 0
+\item 
+std\+::atomic$<$ unsigned char $>$ \mbox{\hyperlink{classfc_1_1zipkin_1_1impl_a30b1dc2a804ca57cb6d6f6a6449d3ce5}{stopped}} = 0
+\item 
+std\+::optional$<$ \mbox{\hyperlink{classfc_1_1url}{url}} $>$ \mbox{\hyperlink{classfc_1_1zipkin_1_1impl_a0c4b5b473605a3bb39db309ae8bdf209}{endpoint}}
+\item 
+std\+::thread \mbox{\hyperlink{classfc_1_1zipkin_1_1impl_ad34c3e8a516559da6bf5bf786be84424}{thread}}
+\item 
+boost\+::asio\+::io\+\_\+context \mbox{\hyperlink{classfc_1_1zipkin_1_1impl_a1b7e9b480213afbaf5d435fb4d6ca56a}{ctx}}
+\item 
+boost\+::asio\+::io\+\_\+context\+::strand \mbox{\hyperlink{classfc_1_1zipkin_1_1impl_adb5a96149480a83c933c367e4dc064a0}{work\+\_\+strand}} \{\mbox{\hyperlink{classfc_1_1zipkin_1_1impl_a1b7e9b480213afbaf5d435fb4d6ca56a}{ctx}}\}
+\item 
+boost\+::asio\+::executor\+\_\+work\+\_\+guard$<$ boost\+::asio\+::io\+\_\+context\+::executor\+\_\+type $>$ \mbox{\hyperlink{classfc_1_1zipkin_1_1impl_a87c73fb3b14896bb1846c563e2c90024}{work\+\_\+guard}} = boost\+::asio\+::make\+\_\+work\+\_\+guard(\mbox{\hyperlink{classfc_1_1zipkin_1_1impl_a1b7e9b480213afbaf5d435fb4d6ca56a}{ctx}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static constexpr \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classfc_1_1zipkin_1_1impl_a588b262356616e2bdafd91dea21a2ad8}{max\+\_\+consecutive\+\_\+errors}} = 9
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{zipkin_8cpp_source_l00046}{46}} of file \mbox{\hyperlink{zipkin_8cpp_source}{zipkin.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1zipkin_1_1impl_a21d912a49a851958b81d7199e8727007}\index{fc::zipkin::impl@{fc::zipkin::impl}!impl@{impl}}
+\index{impl@{impl}!fc::zipkin::impl@{fc::zipkin::impl}}
+\doxysubsubsection{\texorpdfstring{impl()}{impl()}}
+{\footnotesize\ttfamily \label{classfc_1_1zipkin_1_1impl_a21d912a49a851958b81d7199e8727007} 
+fc\+::zipkin\+::impl\+::impl (\begin{DoxyParamCaption}\item[{std\+::string}]{url}{, }\item[{std\+::string}]{service\+\_\+name}{, }\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{timeout\+\_\+us}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zipkin_8cpp_source_l00064}{64}} of file \mbox{\hyperlink{zipkin_8cpp_source}{zipkin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{classfc_1_1zipkin_1_1impl_a96bc61eab436b9ec8e6a39150741e574}{zipkin\_url}}(\ std::move(\mbox{\hyperlink{programs_2clio_2main_8cpp_aa03c1ef4c41f36b048cf58d5aade7653}{url}})\ )}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ ,\ \mbox{\hyperlink{classfc_1_1zipkin_1_1impl_a2e178767ac2d7dd0a4c6810566bdbaf9}{service\_name}}(\ std::move(\mbox{\hyperlink{classfc_1_1zipkin_1_1impl_a2e178767ac2d7dd0a4c6810566bdbaf9}{service\_name}})\ )}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ ,\ \mbox{\hyperlink{classfc_1_1zipkin_1_1impl_a12e350904c8280b886c787a28665f320}{timeout\_us}}(\ \mbox{\hyperlink{classfc_1_1zipkin_1_1impl_a12e350904c8280b886c787a28665f320}{timeout\_us}}\ )\ \{}
+\DoxyCodeLine{00068\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1zipkin_1_1impl_a2b2b0354c53e967d428480eca92f6a2b}\index{fc::zipkin::impl@{fc::zipkin::impl}!````~impl@{\texorpdfstring{$\sim$}{\string~}impl}}
+\index{````~impl@{\texorpdfstring{$\sim$}{\string~}impl}!fc::zipkin::impl@{fc::zipkin::impl}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}impl()}{\string~impl()}}
+{\footnotesize\ttfamily \label{classfc_1_1zipkin_1_1impl_a2b2b0354c53e967d428480eca92f6a2b} 
+fc\+::zipkin\+::impl\+::\texorpdfstring{$\sim$}{\string~}impl (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zipkin_8cpp_source_l00090}{90}} of file \mbox{\hyperlink{zipkin_8cpp_source}{zipkin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00091\ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1zipkin_1_1impl_a8c6b3ad41eb01b7092465c2bb427bbad}{shutdown}}();}
+\DoxyCodeLine{00093\ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{\}}
+\DoxyCodeLine{00094\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=330pt]{classfc_1_1zipkin_1_1impl_a2b2b0354c53e967d428480eca92f6a2b_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1zipkin_1_1impl_a5e8f2cb25258af6f392ccd8226457856}\index{fc::zipkin::impl@{fc::zipkin::impl}!init@{init}}
+\index{init@{init}!fc::zipkin::impl@{fc::zipkin::impl}}
+\doxysubsubsection{\texorpdfstring{init()}{init()}}
+{\footnotesize\ttfamily \label{classfc_1_1zipkin_1_1impl_a5e8f2cb25258af6f392ccd8226457856} 
+void fc\+::zipkin\+::impl\+::init (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zipkin_8cpp_source_l00078}{78}} of file \mbox{\hyperlink{zipkin_8cpp_source}{zipkin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00079\ \ \ \ thread\ =\ std::thread(\ [\textcolor{keyword}{this}]()\ \{}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_ab58a7f71e88d7d4d5761bbd24837c595}{fc::set\_os\_thread\_name}}(\ \textcolor{stringliteral}{"{}zipkin"{}}\ );}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \textcolor{keywordflow}{while}(\ \textcolor{keyword}{true}\ )\ \{}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1zipkin_1_1impl_a1b7e9b480213afbaf5d435fb4d6ca56a}{ctx}}.run();}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \ \}\ \mbox{\hyperlink{exception_8hpp_aed56aa2593b6f6fc6a839b7cb5c6e8e3}{FC\_LOG\_AND\_DROP}}();}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00087\ \ \ \ \}\ );}
+\DoxyCodeLine{00088\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=336pt]{classfc_1_1zipkin_1_1impl_a5e8f2cb25258af6f392ccd8226457856_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1zipkin_1_1impl_a15b9c59b7c6d0e08cd958dbf31ff3ee5}\index{fc::zipkin::impl@{fc::zipkin::impl}!log@{log}}
+\index{log@{log}!fc::zipkin::impl@{fc::zipkin::impl}}
+\doxysubsubsection{\texorpdfstring{log()}{log()}}
+{\footnotesize\ttfamily \label{classfc_1_1zipkin_1_1impl_a15b9c59b7c6d0e08cd958dbf31ff3ee5} 
+void fc\+::zipkin\+::impl\+::log (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structfc_1_1zipkin__span_1_1span__data}{zipkin\+\_\+span\+::span\+\_\+data}} \&\&}]{span}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zipkin_8cpp_source_l00167}{167}} of file \mbox{\hyperlink{zipkin_8cpp_source}{zipkin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00168\ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{classfc_1_1zipkin_1_1impl_a606ff48e0af7cd8e85d314172e944c18}{consecutive\_errors}}\ >\ \mbox{\hyperlink{classfc_1_1zipkin_1_1impl_a588b262356616e2bdafd91dea21a2ad8}{max\_consecutive\_errors}}\ )}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00170\ }
+\DoxyCodeLine{00171\ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ deadline\ =\ \mbox{\hyperlink{classfc_1_1time__point_aa164ff1268a16d4b32afcff181f6100e}{fc::time\_point::now}}()\ +\ \mbox{\hyperlink{classfc_1_1microseconds}{fc::microseconds}}(\ \mbox{\hyperlink{classfc_1_1zipkin_1_1impl_a12e350904c8280b886c787a28665f320}{timeout\_us}}\ );}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !\mbox{\hyperlink{classfc_1_1zipkin_1_1impl_a0c4b5b473605a3bb39db309ae8bdf209}{endpoint}}\ )\ \{}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1zipkin_1_1impl_a0c4b5b473605a3bb39db309ae8bdf209}{endpoint}}\ =\ \mbox{\hyperlink{programs_2clio_2main_8cpp_aa03c1ef4c41f36b048cf58d5aade7653}{url}}(\ \mbox{\hyperlink{classfc_1_1zipkin_1_1impl_a96bc61eab436b9ec8e6a39150741e574}{zipkin\_url}}\ );}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a3da1571bad6ca6c94df9a3660b2115ee}{dlog}}(\ \textcolor{stringliteral}{"{}connecting\ to\ zipkin:\ \$\{p\}"{}},\ (\textcolor{stringliteral}{"{}p"{}},\ *\mbox{\hyperlink{classfc_1_1zipkin_1_1impl_a0c4b5b473605a3bb39db309ae8bdf209}{endpoint}})\ );}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00177\ }
+\DoxyCodeLine{00178\ \ \ \ \ \ \ http.post\_sync(\ *\mbox{\hyperlink{classfc_1_1zipkin_1_1impl_a0c4b5b473605a3bb39db309ae8bdf209}{endpoint}},\ \mbox{\hyperlink{namespacefc_a25b099f3f046ce5ea9b41a9e26086d71}{create\_zipkin\_variant}}(\ std::move(\ span\ ),\ \mbox{\hyperlink{classfc_1_1zipkin_1_1impl_a2e178767ac2d7dd0a4c6810566bdbaf9}{service\_name}}\ ),\ deadline\ );}
+\DoxyCodeLine{00179\ }
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1zipkin_1_1impl_a606ff48e0af7cd8e85d314172e944c18}{consecutive\_errors}}\ =\ 0;}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00182\ \ \ \ \}\ \textcolor{keywordflow}{catch}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1exception}{fc::exception}}\&\ e\ )\ \{}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a1759e5c9691d8ad754bdf5eff8bb23ac}{wlog}}(\ \textcolor{stringliteral}{"{}unable\ to\ connect\ to\ zipkin:\ \$\{u\},\ error:\ \$\{e\}"{}},\ (\textcolor{stringliteral}{"{}u"{}},\ \mbox{\hyperlink{classfc_1_1zipkin_1_1impl_a96bc61eab436b9ec8e6a39150741e574}{zipkin\_url}})(\textcolor{stringliteral}{"{}e"{}},\ e.\mbox{\hyperlink{classfc_1_1exception_a7611ea8fbe25dde56649b685c2298a37}{to\_detail\_string}}())\ );}
+\DoxyCodeLine{00184\ \ \ \ \}\ \textcolor{keywordflow}{catch}(\ \textcolor{keyword}{const}\ std::exception\&\ e\ )\ \{}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a1759e5c9691d8ad754bdf5eff8bb23ac}{wlog}}(\ \textcolor{stringliteral}{"{}unable\ to\ connect\ to\ zipkin:\ \$\{u\},\ error:\ \$\{e\}"{}},\ (\textcolor{stringliteral}{"{}u"{}},\ \mbox{\hyperlink{classfc_1_1zipkin_1_1impl_a96bc61eab436b9ec8e6a39150741e574}{zipkin\_url}})(\textcolor{stringliteral}{"{}e"{}},\ e.what())\ );}
+\DoxyCodeLine{00186\ \ \ \ \}\ \textcolor{keywordflow}{catch}(\ ...\ )\ \{}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a1759e5c9691d8ad754bdf5eff8bb23ac}{wlog}}(\ \textcolor{stringliteral}{"{}unable\ to\ connect\ to\ zipkin:\ \$\{u\},\ error:\ unknown"{}},\ (\textcolor{stringliteral}{"{}u"{}},\ \mbox{\hyperlink{classfc_1_1zipkin_1_1impl_a96bc61eab436b9ec8e6a39150741e574}{zipkin\_url}})\ );}
+\DoxyCodeLine{00188\ \ \ \ \}}
+\DoxyCodeLine{00189\ \ \ \ ++\mbox{\hyperlink{classfc_1_1zipkin_1_1impl_a606ff48e0af7cd8e85d314172e944c18}{consecutive\_errors}};}
+\DoxyCodeLine{00190\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classfc_1_1zipkin_1_1impl_a15b9c59b7c6d0e08cd958dbf31ff3ee5_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classfc_1_1zipkin_1_1impl_a8c6b3ad41eb01b7092465c2bb427bbad}\index{fc::zipkin::impl@{fc::zipkin::impl}!shutdown@{shutdown}}
+\index{shutdown@{shutdown}!fc::zipkin::impl@{fc::zipkin::impl}}
+\doxysubsubsection{\texorpdfstring{shutdown()}{shutdown()}}
+{\footnotesize\ttfamily \label{classfc_1_1zipkin_1_1impl_a8c6b3ad41eb01b7092465c2bb427bbad} 
+void fc\+::zipkin\+::impl\+::shutdown (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zipkin_8cpp_source_l00096}{96}} of file \mbox{\hyperlink{zipkin_8cpp_source}{zipkin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00097\ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{classfc_1_1zipkin_1_1impl_a30b1dc2a804ca57cb6d6f6a6449d3ce5}{stopped}}\ \string^=\ 1\ )\ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00098\ \ \ \ \mbox{\hyperlink{classfc_1_1zipkin_1_1impl_a87c73fb3b14896bb1846c563e2c90024}{work\_guard}}.reset();\ \textcolor{comment}{//\ drain\ the\ queue}}
+\DoxyCodeLine{00099\ \ \ \ thread.join();}
+\DoxyCodeLine{00100\ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classfc_1_1zipkin_1_1impl_a606ff48e0af7cd8e85d314172e944c18}\index{fc::zipkin::impl@{fc::zipkin::impl}!consecutive\_errors@{consecutive\_errors}}
+\index{consecutive\_errors@{consecutive\_errors}!fc::zipkin::impl@{fc::zipkin::impl}}
+\doxysubsubsection{\texorpdfstring{consecutive\_errors}{consecutive\_errors}}
+{\footnotesize\ttfamily \label{classfc_1_1zipkin_1_1impl_a606ff48e0af7cd8e85d314172e944c18} 
+std\+::atomic$<$\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}$>$ fc\+::zipkin\+::impl\+::consecutive\+\_\+errors = 0}
+
+
+
+Definition at line \mbox{\hyperlink{zipkin_8cpp_source_l00056}{56}} of file \mbox{\hyperlink{zipkin_8cpp_source}{zipkin.\+cpp}}.
+
+\Hypertarget{classfc_1_1zipkin_1_1impl_a1b7e9b480213afbaf5d435fb4d6ca56a}\index{fc::zipkin::impl@{fc::zipkin::impl}!ctx@{ctx}}
+\index{ctx@{ctx}!fc::zipkin::impl@{fc::zipkin::impl}}
+\doxysubsubsection{\texorpdfstring{ctx}{ctx}}
+{\footnotesize\ttfamily \label{classfc_1_1zipkin_1_1impl_a1b7e9b480213afbaf5d435fb4d6ca56a} 
+boost\+::asio\+::io\+\_\+context fc\+::zipkin\+::impl\+::ctx}
+
+
+
+Definition at line \mbox{\hyperlink{zipkin_8cpp_source_l00060}{60}} of file \mbox{\hyperlink{zipkin_8cpp_source}{zipkin.\+cpp}}.
+
+\Hypertarget{classfc_1_1zipkin_1_1impl_a0c4b5b473605a3bb39db309ae8bdf209}\index{fc::zipkin::impl@{fc::zipkin::impl}!endpoint@{endpoint}}
+\index{endpoint@{endpoint}!fc::zipkin::impl@{fc::zipkin::impl}}
+\doxysubsubsection{\texorpdfstring{endpoint}{endpoint}}
+{\footnotesize\ttfamily \label{classfc_1_1zipkin_1_1impl_a0c4b5b473605a3bb39db309ae8bdf209} 
+std\+::optional$<$\mbox{\hyperlink{classfc_1_1url}{url}}$>$ fc\+::zipkin\+::impl\+::endpoint}
+
+
+
+Definition at line \mbox{\hyperlink{zipkin_8cpp_source_l00058}{58}} of file \mbox{\hyperlink{zipkin_8cpp_source}{zipkin.\+cpp}}.
+
+\Hypertarget{classfc_1_1zipkin_1_1impl_a1f3e4a3239b44f62c22a5e1bbb7df77f}\index{fc::zipkin::impl@{fc::zipkin::impl}!http@{http}}
+\index{http@{http}!fc::zipkin::impl@{fc::zipkin::impl}}
+\doxysubsubsection{\texorpdfstring{http}{http}}
+{\footnotesize\ttfamily \label{classfc_1_1zipkin_1_1impl_a1f3e4a3239b44f62c22a5e1bbb7df77f} 
+\mbox{\hyperlink{classfc_1_1http__client}{http\+\_\+client}} fc\+::zipkin\+::impl\+::http}
+
+
+
+Definition at line \mbox{\hyperlink{zipkin_8cpp_source_l00055}{55}} of file \mbox{\hyperlink{zipkin_8cpp_source}{zipkin.\+cpp}}.
+
+\Hypertarget{classfc_1_1zipkin_1_1impl_a588b262356616e2bdafd91dea21a2ad8}\index{fc::zipkin::impl@{fc::zipkin::impl}!max\_consecutive\_errors@{max\_consecutive\_errors}}
+\index{max\_consecutive\_errors@{max\_consecutive\_errors}!fc::zipkin::impl@{fc::zipkin::impl}}
+\doxysubsubsection{\texorpdfstring{max\_consecutive\_errors}{max\_consecutive\_errors}}
+{\footnotesize\ttfamily \label{classfc_1_1zipkin_1_1impl_a588b262356616e2bdafd91dea21a2ad8} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} fc\+::zipkin\+::impl\+::max\+\_\+consecutive\+\_\+errors = 9\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{zipkin_8cpp_source_l00048}{48}} of file \mbox{\hyperlink{zipkin_8cpp_source}{zipkin.\+cpp}}.
+
+\Hypertarget{classfc_1_1zipkin_1_1impl_a661725a819134efd4e439859a46c1bcd}\index{fc::zipkin::impl@{fc::zipkin::impl}!mtx@{mtx}}
+\index{mtx@{mtx}!fc::zipkin::impl@{fc::zipkin::impl}}
+\doxysubsubsection{\texorpdfstring{mtx}{mtx}}
+{\footnotesize\ttfamily \label{classfc_1_1zipkin_1_1impl_a661725a819134efd4e439859a46c1bcd} 
+std\+::mutex fc\+::zipkin\+::impl\+::mtx}
+
+
+
+Definition at line \mbox{\hyperlink{zipkin_8cpp_source_l00053}{53}} of file \mbox{\hyperlink{zipkin_8cpp_source}{zipkin.\+cpp}}.
+
+\Hypertarget{classfc_1_1zipkin_1_1impl_aec2af768c43ffd4820b65a0f864c6853}\index{fc::zipkin::impl@{fc::zipkin::impl}!next\_id@{next\_id}}
+\index{next\_id@{next\_id}!fc::zipkin::impl@{fc::zipkin::impl}}
+\doxysubsubsection{\texorpdfstring{next\_id}{next\_id}}
+{\footnotesize\ttfamily \label{classfc_1_1zipkin_1_1impl_aec2af768c43ffd4820b65a0f864c6853} 
+\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} fc\+::zipkin\+::impl\+::next\+\_\+id = 0}
+
+
+
+Definition at line \mbox{\hyperlink{zipkin_8cpp_source_l00054}{54}} of file \mbox{\hyperlink{zipkin_8cpp_source}{zipkin.\+cpp}}.
+
+\Hypertarget{classfc_1_1zipkin_1_1impl_a2e178767ac2d7dd0a4c6810566bdbaf9}\index{fc::zipkin::impl@{fc::zipkin::impl}!service\_name@{service\_name}}
+\index{service\_name@{service\_name}!fc::zipkin::impl@{fc::zipkin::impl}}
+\doxysubsubsection{\texorpdfstring{service\_name}{service\_name}}
+{\footnotesize\ttfamily \label{classfc_1_1zipkin_1_1impl_a2e178767ac2d7dd0a4c6810566bdbaf9} 
+const std\+::string fc\+::zipkin\+::impl\+::service\+\_\+name}
+
+
+
+Definition at line \mbox{\hyperlink{zipkin_8cpp_source_l00051}{51}} of file \mbox{\hyperlink{zipkin_8cpp_source}{zipkin.\+cpp}}.
+
+\Hypertarget{classfc_1_1zipkin_1_1impl_a30b1dc2a804ca57cb6d6f6a6449d3ce5}\index{fc::zipkin::impl@{fc::zipkin::impl}!stopped@{stopped}}
+\index{stopped@{stopped}!fc::zipkin::impl@{fc::zipkin::impl}}
+\doxysubsubsection{\texorpdfstring{stopped}{stopped}}
+{\footnotesize\ttfamily \label{classfc_1_1zipkin_1_1impl_a30b1dc2a804ca57cb6d6f6a6449d3ce5} 
+std\+::atomic$<$unsigned char$>$ fc\+::zipkin\+::impl\+::stopped = 0}
+
+
+
+Definition at line \mbox{\hyperlink{zipkin_8cpp_source_l00057}{57}} of file \mbox{\hyperlink{zipkin_8cpp_source}{zipkin.\+cpp}}.
+
+\Hypertarget{classfc_1_1zipkin_1_1impl_ad34c3e8a516559da6bf5bf786be84424}\index{fc::zipkin::impl@{fc::zipkin::impl}!thread@{thread}}
+\index{thread@{thread}!fc::zipkin::impl@{fc::zipkin::impl}}
+\doxysubsubsection{\texorpdfstring{thread}{thread}}
+{\footnotesize\ttfamily \label{classfc_1_1zipkin_1_1impl_ad34c3e8a516559da6bf5bf786be84424} 
+std\+::thread fc\+::zipkin\+::impl\+::thread}
+
+
+
+Definition at line \mbox{\hyperlink{zipkin_8cpp_source_l00059}{59}} of file \mbox{\hyperlink{zipkin_8cpp_source}{zipkin.\+cpp}}.
+
+\Hypertarget{classfc_1_1zipkin_1_1impl_a12e350904c8280b886c787a28665f320}\index{fc::zipkin::impl@{fc::zipkin::impl}!timeout\_us@{timeout\_us}}
+\index{timeout\_us@{timeout\_us}!fc::zipkin::impl@{fc::zipkin::impl}}
+\doxysubsubsection{\texorpdfstring{timeout\_us}{timeout\_us}}
+{\footnotesize\ttfamily \label{classfc_1_1zipkin_1_1impl_a12e350904c8280b886c787a28665f320} 
+const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} fc\+::zipkin\+::impl\+::timeout\+\_\+us}
+
+
+
+Definition at line \mbox{\hyperlink{zipkin_8cpp_source_l00052}{52}} of file \mbox{\hyperlink{zipkin_8cpp_source}{zipkin.\+cpp}}.
+
+\Hypertarget{classfc_1_1zipkin_1_1impl_a87c73fb3b14896bb1846c563e2c90024}\index{fc::zipkin::impl@{fc::zipkin::impl}!work\_guard@{work\_guard}}
+\index{work\_guard@{work\_guard}!fc::zipkin::impl@{fc::zipkin::impl}}
+\doxysubsubsection{\texorpdfstring{work\_guard}{work\_guard}}
+{\footnotesize\ttfamily \label{classfc_1_1zipkin_1_1impl_a87c73fb3b14896bb1846c563e2c90024} 
+boost\+::asio\+::executor\+\_\+work\+\_\+guard$<$boost\+::asio\+::io\+\_\+context\+::executor\+\_\+type$>$ fc\+::zipkin\+::impl\+::work\+\_\+guard = boost\+::asio\+::make\+\_\+work\+\_\+guard(\mbox{\hyperlink{classfc_1_1zipkin_1_1impl_a1b7e9b480213afbaf5d435fb4d6ca56a}{ctx}})}
+
+
+
+Definition at line \mbox{\hyperlink{zipkin_8cpp_source_l00062}{62}} of file \mbox{\hyperlink{zipkin_8cpp_source}{zipkin.\+cpp}}.
+
+\Hypertarget{classfc_1_1zipkin_1_1impl_adb5a96149480a83c933c367e4dc064a0}\index{fc::zipkin::impl@{fc::zipkin::impl}!work\_strand@{work\_strand}}
+\index{work\_strand@{work\_strand}!fc::zipkin::impl@{fc::zipkin::impl}}
+\doxysubsubsection{\texorpdfstring{work\_strand}{work\_strand}}
+{\footnotesize\ttfamily \label{classfc_1_1zipkin_1_1impl_adb5a96149480a83c933c367e4dc064a0} 
+boost\+::asio\+::io\+\_\+context\+::strand fc\+::zipkin\+::impl\+::work\+\_\+strand \{\mbox{\hyperlink{classfc_1_1zipkin_1_1impl_a1b7e9b480213afbaf5d435fb4d6ca56a}{ctx}}\}}
+
+
+
+Definition at line \mbox{\hyperlink{zipkin_8cpp_source_l00061}{61}} of file \mbox{\hyperlink{zipkin_8cpp_source}{zipkin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00061\ \{\mbox{\hyperlink{classfc_1_1zipkin_1_1impl_a1b7e9b480213afbaf5d435fb4d6ca56a}{ctx}}\};}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1zipkin_1_1impl_a96bc61eab436b9ec8e6a39150741e574}\index{fc::zipkin::impl@{fc::zipkin::impl}!zipkin\_url@{zipkin\_url}}
+\index{zipkin\_url@{zipkin\_url}!fc::zipkin::impl@{fc::zipkin::impl}}
+\doxysubsubsection{\texorpdfstring{zipkin\_url}{zipkin\_url}}
+{\footnotesize\ttfamily \label{classfc_1_1zipkin_1_1impl_a96bc61eab436b9ec8e6a39150741e574} 
+const std\+::string fc\+::zipkin\+::impl\+::zipkin\+\_\+url}
+
+
+
+Definition at line \mbox{\hyperlink{zipkin_8cpp_source_l00050}{50}} of file \mbox{\hyperlink{zipkin_8cpp_source}{zipkin.\+cpp}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/src/log/\mbox{\hyperlink{zipkin_8cpp}{zipkin.\+cpp}}\end{DoxyCompactItemize}

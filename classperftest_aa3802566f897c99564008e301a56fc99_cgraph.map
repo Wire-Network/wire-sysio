@@ -1,0 +1,9 @@
+<map id="perftest::on_fail" name="perftest::on_fail">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,13,117,38"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1endpoint.html#a0fe4457427d4124abe7ca022ba7afbb4" title="Retrieves a connection_ptr from a connection_hdl (exception free)" alt="" coords="165,5,320,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="117,23,149,23,149,28,117,28"/>
+<area shape="rect" id="Node000003" href="$namespacewebsocketpp_1_1error.html#a3344622df8c36e8ae03c59164e7b5e89" title=" " alt="" coords="368,5,500,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="321,23,352,23,352,28,321,28"/>
+<area shape="rect" id="Node000004" href="$namespacewebsocketpp_1_1error.html#ac1acac2bfb24bbd2b1791db80993b0c2" title=" " alt="" coords="548,5,681,46"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="501,23,533,23,533,28,501,28"/>
+</map>

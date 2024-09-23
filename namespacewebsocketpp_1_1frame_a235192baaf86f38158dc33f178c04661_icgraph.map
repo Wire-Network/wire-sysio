@@ -1,0 +1,15 @@
+<map id="websocketpp::frame::get_opcode" name="websocketpp::frame::get_opcode">
+<area shape="rect" id="Node000001" title="Extract opcode from basic header." alt="" coords="461,98,600,138"/>
+<area shape="rect" id="Node000002" href="$frame_8cpp.html#a3cd85981c179494497755165261dde64" title=" " alt="" coords="217,5,413,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="490,91,453,66,412,45,382,34,384,29,414,40,456,62,493,86"/>
+<area shape="rect" id="Node000003" href="$frame_8cpp.html#ac89e9959cc8f8a4a50329762575fcae7" title=" " alt="" coords="217,55,413,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="446,101,372,84,374,78,447,96"/>
+<area shape="rect" id="Node000004" href="$classwebsocketpp_1_1processor_1_1hybi13.html#a5c5e3234a0067c7f14fe0ceb4e647659" title="Process new websocket connection bytes." alt="" coords="5,155,169,196"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="446,124,337,131,217,146,164,157,163,152,216,141,336,126,445,119"/>
+<area shape="rect" id="Node000005" href="$classwebsocketpp_1_1processor_1_1hybi13.html#a906398e2c23370de53d4f3572657ad05" title="Perform any finalization actions on an incoming message." alt="" coords="227,155,403,196"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="447,143,395,157,393,152,445,138"/>
+<area shape="rect" id="Node000006" href="$classwebsocketpp_1_1processor_1_1hybi13.html#a0c549a5e2766288fb625c03e507cc9ad" title="Validate an incoming basic header." alt="" coords="225,220,404,275"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="496,151,458,181,414,210,392,221,389,217,412,205,455,177,493,147"/>
+<area shape="poly" id="edge5_Node000005_Node000004" title=" " alt="" coords="211,178,169,178,169,173,211,173"/>
+<area shape="poly" id="edge7_Node000006_Node000004" title=" " alt="" coords="209,217,153,199,155,194,211,212"/>
+</map>

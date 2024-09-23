@@ -1,0 +1,67 @@
+\doxysection{actor.\+hpp}
+\hypertarget{actor_8hpp_source}{}\label{actor_8hpp_source}\index{libraries/fc/include/fc/actor.hpp@{libraries/fc/include/fc/actor.hpp}}
+\mbox{\hyperlink{actor_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{api_8hpp}{fc/api.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <fc/thread/thread.hpp>}}
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00005}00005\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}\ \{}
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00007}\mbox{\hyperlink{namespacefc_1_1detail}{00007}}\ \ \ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacedetail}{detail}}\ \{}
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00008}\mbox{\hyperlink{structfc_1_1detail_1_1actor__member}{00008}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structfc_1_1detail_1_1actor__member}{actor\_member}}\ \{\ }
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00009}00009\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \#if\ 1\ }\textcolor{comment}{//\ BOOST\_NO\_VARIADIC\_TEMPLATES}}
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00010}\mbox{\hyperlink{actor_8hpp_ab5c875ea5a4415d2f9fc5ce042c621cc}{00010}}\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \#define\ RPC\_MEMBER\_FUNCTOR(z,n,IS\_CONST)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00011}00011\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ template<typename\ R,\ typename\ C,\ typename\ P\ BOOST\_PP\_ENUM\_TRAILING\_PARAMS(\ n,\ typename\ A)>\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00012}00012\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ static\ std::function<fc::future<R>(\ BOOST\_PP\_ENUM\_PARAMS(n,A)\ )\ >\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00013}00013\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ functor(\ P\ p,\ R\ (C::*mem\_func)(BOOST\_PP\_ENUM\_PARAMS(n,A))\ IS\_CONST,\ fc::thread*\ c\ =\ 0)\ \ \{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00014}00014\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ return\ [=](BOOST\_PP\_ENUM\_BINARY\_PARAMS(n,A,a))-\/>fc::future<R>\{\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00015}00015\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ return\ c-\/>async(\ [=]()\{\ return\ (p-\/>*mem\_func)(BOOST\_PP\_ENUM\_PARAMS(n,a));\ \}\ );\ \};\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00016}00016\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \}\ }}
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00017}00017\ \ \ \ \ \ \ \ \ \ BOOST\_PP\_REPEAT(\ 8,\ \mbox{\hyperlink{actor_8hpp_ab5c875ea5a4415d2f9fc5ce042c621cc}{RPC\_MEMBER\_FUNCTOR}},\ \textcolor{keyword}{const}\ )}
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00018}00018\ \ \ \ \ \ \ \ \ \ BOOST\_PP\_REPEAT(\ 8,\ \mbox{\hyperlink{actor_8hpp_ab5c875ea5a4415d2f9fc5ce042c621cc}{RPC\_MEMBER\_FUNCTOR}},\ BOOST\_PP\_EMPTY()\ )}
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00019}00019\ \ \ \ \ \ \ \ \ \ \textcolor{preprocessor}{\#undef\ RPC\_MEMBER\_FUNCTOR}}
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00021}00021\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \#else\ \ }\textcolor{comment}{//\ g++\ has\ a\ bug\ that\ prevents\ lambdas\ and\ varidic\ templates\ from\ working\ together\ (G++\ Bug\ 41933)}}
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00023}00023\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}},\ \textcolor{keyword}{typename}\ C,\ \textcolor{keyword}{typename}\ \mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}},\ \textcolor{keyword}{typename}...\ Args>}
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00024}00024\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ std::function<fc::future<R>(Args...)>\ functor(\ \mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}}\&\&\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}\ (C::*mem\_func)(Args...),\ fc::thread*\ c\ )\ \{}
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00025}00025\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [=](Args...\ args)-\/>fc::future<R>\{\ \ c-\/>async(\ [=]()-\/>\mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}-\/>*mem\_func(\ fc::forward<Args>(args)...\ );\ \}\ )\ \};}
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00026}00026\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00027}00027\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}},\ \textcolor{keyword}{typename}\ C,\ \textcolor{keyword}{typename}\ \mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}},\ \textcolor{keyword}{typename}...\ Args>}
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00028}00028\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ std::function<fc::future<R>(Args...)>\ functor(\ \mbox{\hyperlink{dtoa_8c_a2748566f4c443ee77aa831e63dbb5ebe}{P}}\&\&\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}\ (C::*mem\_func)(Args...)const,\ fc::thread*\ c\ )\{}
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00029}00029\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [=](Args...\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}})-\/>fc::future<R>\{\ \ c-\/>async(\ [=]()-\/>\mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}-\/>*mem\_func(\ fc::forward<Args>(args)...\ );\ \}\ )\ \};}
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00030}00030\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00031}00031\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \#endif}}
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00032}00032\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00034}00034\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ ThisPtr>}
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00035}\mbox{\hyperlink{structfc_1_1detail_1_1actor__vtable__visitor}{00035}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structfc_1_1detail_1_1actor__vtable__visitor}{actor\_vtable\_visitor}}\ \{}
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00036}00036\ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ U>}
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00037}\mbox{\hyperlink{structfc_1_1detail_1_1actor__vtable__visitor_a9a55fc5c21e4d994d7839db4b2095bb7}{00037}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structfc_1_1detail_1_1actor__vtable__visitor_a9a55fc5c21e4d994d7839db4b2095bb7}{actor\_vtable\_visitor}}(\ fc::thread*\ t,\ \mbox{\hyperlink{union_u}{U}}\&\&\ u\ ):\mbox{\hyperlink{structfc_1_1detail_1_1actor__vtable__visitor_abcd3fa0772477177db2d689dc819a9f5}{\_thread}}(t),\mbox{\hyperlink{structfc_1_1detail_1_1actor__vtable__visitor_a845f7dc3fb69779853797d73c8b66227}{\_this}}(\ \mbox{\hyperlink{namespacefc}{fc}}::forward<\mbox{\hyperlink{union_u}{U}}>(u)\ )\{\}}
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00039}00039\ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ Function,\ \textcolor{keyword}{typename}\ MemberPtr>}
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00040}\mbox{\hyperlink{structfc_1_1detail_1_1actor__vtable__visitor_a69b200fad555a154df4bbb758144a478}{00040}}\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structfc_1_1detail_1_1actor__vtable__visitor_a69b200fad555a154df4bbb758144a478}{operator()}}(\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ Function\&\ memb,\ MemberPtr\ m\ )\textcolor{keyword}{const\ }\{}
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00041}00041\ \ \ \ \ \ \ \ \ \ \ memb\ =\ actor\_member::functor(\ \mbox{\hyperlink{structfc_1_1detail_1_1actor__vtable__visitor_a845f7dc3fb69779853797d73c8b66227}{\_this}},\ m,\ \mbox{\hyperlink{structfc_1_1detail_1_1actor__vtable__visitor_abcd3fa0772477177db2d689dc819a9f5}{\_thread}}\ );}
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00042}00042\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00043}\mbox{\hyperlink{structfc_1_1detail_1_1actor__vtable__visitor_abcd3fa0772477177db2d689dc819a9f5}{00043}}\ \ \ \ \ \ \ \ \ fc::thread*\ \mbox{\hyperlink{structfc_1_1detail_1_1actor__vtable__visitor_abcd3fa0772477177db2d689dc819a9f5}{\_thread}};}
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00044}\mbox{\hyperlink{structfc_1_1detail_1_1actor__vtable__visitor_a845f7dc3fb69779853797d73c8b66227}{00044}}\ \ \ \ \ \ \ \ \ ThisPtr\ \mbox{\hyperlink{structfc_1_1detail_1_1actor__vtable__visitor_a845f7dc3fb69779853797d73c8b66227}{\_this}};}
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00045}00045\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00046}00046\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00052}00052\ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ Interface>}
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00053}\mbox{\hyperlink{classfc_1_1actor}{00053}}\ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classfc_1_1actor}{actor}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classfc_1_1api}{api}}<Interface,\ detail::actor\_member>\ \{}
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00054}00054\ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00055}\mbox{\hyperlink{classfc_1_1actor_af935b84687a97d41ad23d93a737738df}{00055}}\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1actor_af935b84687a97d41ad23d93a737738df}{actor}}()\{\}}
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00057}00057\ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ InterfaceType>}
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00058}\mbox{\hyperlink{classfc_1_1actor_a0fde6af44005847adc6ffd5e39cb0bcf}{00058}}\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1actor_a0fde6af44005847adc6ffd5e39cb0bcf}{actor}}(\ InterfaceType*\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\ fc::thread*\ t\ =\ \&fc::thread::current()\ )}
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00059}00059\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \ this-\/>\mbox{\hyperlink{classfc_1_1api_ad1617b790322c5a8e41f2af06c88c0e6}{\_vtable}}.reset(\textcolor{keyword}{new}\ detail::vtable<Interface,detail::actor\_member>()\ );}
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00061}00061\ \ \ \ \ \ \ \ \ \ \ this-\/>\mbox{\hyperlink{classfc_1_1api_ad1617b790322c5a8e41f2af06c88c0e6}{\_vtable}}-\/>template\ visit<InterfaceType>(\ \mbox{\hyperlink{structfc_1_1detail_1_1actor__vtable__visitor}{detail::actor\_vtable\_visitor<InterfaceType*>}}(t,\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})\ );}
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00062}00062\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00063}00063\ \ \ \};}
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{actor_8hpp_source_l00065}00065\ \}\ \textcolor{comment}{//\ namespace\ fc}}
+
+\end{DoxyCode}

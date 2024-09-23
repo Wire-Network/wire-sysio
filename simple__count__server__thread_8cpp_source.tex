@@ -1,0 +1,71 @@
+\doxysection{simple\+\_\+count\+\_\+server\+\_\+thread.\+cpp}
+\hypertarget{simple__count__server__thread_8cpp_source}{}\label{simple__count__server__thread_8cpp_source}\index{libraries/fc/vendor/websocketpp/docs/simple\_count\_server\_thread.cpp@{libraries/fc/vendor/websocketpp/docs/simple\_count\_server\_thread.cpp}}
+\mbox{\hyperlink{simple__count__server__thread_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <functional>}}
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <mutex>}}
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <set>}}
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <thread>}}
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{asio__no__tls_8hpp}{websocketpp/config/asio\_no\_tls.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{server_8hpp}{websocketpp/server.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00009}\mbox{\hyperlink{simple__count__server__thread_8cpp_afc38239e3eef2a4200e324bff14d91d1}{00009}}\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1server}{websocketpp::server<websocketpp::config::asio>}}\ \mbox{\hyperlink{simple__count__server__thread_8cpp_afc38239e3eef2a4200e324bff14d91d1}{server}};}
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00011}00011\ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{websocketpp::connection\_hdl}};}
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00013}\mbox{\hyperlink{classcount__server}{00013}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classcount__server}{count\_server}}\ \{}
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00014}00014\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00015}\mbox{\hyperlink{classcount__server_a0c6f358959e184c7cf321743d90afb9d}{00015}}\ \ \ \ \ \mbox{\hyperlink{classcount__server_a0c6f358959e184c7cf321743d90afb9d}{count\_server}}()\ :\ m\_count(0)\ \{}
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00016}00016\ \ \ \ \ \ \ \ \ m\_server.init\_asio();}
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00017}00017\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00018}00018\ \ \ \ \ \ \ \ \ m\_server.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a5753d9848aefc04ee91da401c0cc65b8}{set\_open\_handler}}(bind(\&\mbox{\hyperlink{classcount__server_a1362726d44346611d3feebc4cb1ea5e5}{count\_server::on\_open}},\textcolor{keyword}{this},\_1));}
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00019}00019\ \ \ \ \ \ \ \ \ m\_server.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a8d7d95bebc154879655211e2b0b5e069}{set\_close\_handler}}(bind(\&\mbox{\hyperlink{classcount__server_a347af2b96482796cb5c0c7ac85141cc3}{count\_server::on\_close}},\textcolor{keyword}{this},\_1));}
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00020}00020\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00021}00021\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00022}\mbox{\hyperlink{classcount__server_a1362726d44346611d3feebc4cb1ea5e5}{00022}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classcount__server_a1362726d44346611d3feebc4cb1ea5e5}{on\_open}}(\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\_hdl}}\ hdl)\ \{}
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00023}00023\ \ \ \ \ \ \ \ \ std::lock\_guard<std::mutex>\ \mbox{\hyperlink{xbyak__mnemonic_8h_aa81aed607133209dade63a226818224d}{lock}}(m\_mutex);}
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00024}00024\ \ \ \ \ \ \ \ \ m\_connections.insert(hdl);}
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00025}00025\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00026}00026\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00027}\mbox{\hyperlink{classcount__server_a347af2b96482796cb5c0c7ac85141cc3}{00027}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classcount__server_a347af2b96482796cb5c0c7ac85141cc3}{on\_close}}(\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{connection\_hdl}}\ hdl)\ \{}
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00028}00028\ \ \ \ \ \ \ \ \ std::lock\_guard<std::mutex>\ \mbox{\hyperlink{xbyak__mnemonic_8h_aa81aed607133209dade63a226818224d}{lock}}(m\_mutex);}
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00029}00029\ \ \ \ \ \ \ \ \ m\_connections.erase(hdl);}
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00030}00030\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00031}00031\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00032}\mbox{\hyperlink{classcount__server_a06a8dba8a9a887972faefab77a95ca0c}{00032}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classcount__server_a06a8dba8a9a887972faefab77a95ca0c}{count}}()\ \{}
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00033}00033\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (1)\ \{}
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00034}00034\ \ \ \ \ \ \ \ \ \ \ \ \ sleep(1);}
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00035}00035\ \ \ \ \ \ \ \ \ \ \ \ \ m\_count++;}
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00036}00036\ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00037}00037\ \ \ \ \ \ \ \ \ \ \ \ \ std::stringstream\ ss;}
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00038}00038\ \ \ \ \ \ \ \ \ \ \ \ \ ss\ <<\ m\_count;}
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00039}00039\ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00040}00040\ \ \ \ \ \ \ \ \ \ \ \ \ std::lock\_guard<std::mutex>\ \mbox{\hyperlink{xbyak__mnemonic_8h_aa81aed607133209dade63a226818224d}{lock}}(m\_mutex);\ \ \ \ }
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00041}00041\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\ it\ :\ m\_connections)\ \{}
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00042}00042\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_server.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a5341f59de7ef1a565a2fd93daba212d5}{send}}(it,ss.str(),\mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea6b65f28626b19b2eef447744c564e727}{websocketpp::frame::opcode::text}});}
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00043}00043\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00044}00044\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00045}00045\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00046}00046\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00047}\mbox{\hyperlink{classcount__server_a60a93e888b63c87badb9c7b9f74a8985}{00047}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classcount__server_a60a93e888b63c87badb9c7b9f74a8985}{run}}(\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ port)\ \{}
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00048}00048\ \ \ \ \ \ \ \ \ m\_server.listen(port);}
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00049}00049\ \ \ \ \ \ \ \ \ m\_server.\mbox{\hyperlink{classwebsocketpp_1_1server_a0204a7d444144f7ea5b8bbcf14689fc1}{start\_accept}}();}
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00050}00050\ \ \ \ \ \ \ \ \ m\_server.run();}
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00051}00051\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00052}00052\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00053}00053\ \ \ \ \ \textcolor{keyword}{typedef}\ std::set<connection\_hdl,std::owner\_less<connection\_hdl>>\ con\_list;}
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00054}00054\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00055}00055\ \ \ \ \ \textcolor{keywordtype}{int}\ m\_count;}
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00056}00056\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1server}{server}}\ m\_server;}
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00057}00057\ \ \ \ \ con\_list\ m\_connections;}
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00058}00058\ \ \ \ \ std::mutex\ m\_mutex;}
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00059}00059\ \};}
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00061}\mbox{\hyperlink{simple__count__server__thread_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{00061}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{simple__count__server__thread_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}()\ \{}
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00062}00062\ \ \ \ \ \mbox{\hyperlink{classcount__server}{count\_server}}\ \mbox{\hyperlink{simple__count__server__thread_8cpp_afc38239e3eef2a4200e324bff14d91d1}{server}};}
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00063}00063\ \ \ \ \ std::thread\ t(std::bind(\&\mbox{\hyperlink{classcount__server_a06a8dba8a9a887972faefab77a95ca0c}{count\_server::count}},\&\mbox{\hyperlink{classwebsocketpp_1_1server}{server}}));}
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00064}00064\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1server}{server}}.run(9002);}
+\DoxyCodeLine{\Hypertarget{simple__count__server__thread_8cpp_source_l00065}00065\ \}}
+
+\end{DoxyCode}

@@ -1,0 +1,5 @@
+<map id="rentcpu_subcommand" name="rentcpu_subcommand">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,94,155,120"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1name.html" title="Immutable except for fc::from_variant." alt="" coords="14,5,146,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="83,47,83,94,77,94,77,47"/>
+</map>

@@ -1,0 +1,98 @@
+\doxysection{libraries/fc/vendor/websocketpp/examples/print\+\_\+server/print\+\_\+server.cpp File Reference}
+\hypertarget{print__server_8cpp}{}\label{print__server_8cpp}\index{libraries/fc/vendor/websocketpp/examples/print\_server/print\_server.cpp@{libraries/fc/vendor/websocketpp/examples/print\_server/print\_server.cpp}}
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$websocketpp/config/asio\+\_\+no\+\_\+tls.\+hpp$>$}\newline
+{\ttfamily \#include $<$websocketpp/server.\+hpp$>$}\newline
+Include dependency graph for print\+\_\+server.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{print__server_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1server}{websocketpp\+::server}}$<$ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio}{websocketpp\+::config\+::asio}} $>$ \mbox{\hyperlink{print__server_8cpp_afc38239e3eef2a4200e324bff14d91d1}{server}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{print__server_8cpp_a9144902cfb7b566fbe5ac9ea87a119ba}{on\+\_\+message}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{websocketpp\+::connection\+\_\+hdl}}, \mbox{\hyperlink{classwebsocketpp_1_1endpoint_a8097edab4feb0c36a69601c3786f0062}{server\+::message\+\_\+ptr}} msg)
+\item 
+int \mbox{\hyperlink{print__server_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{print__server_8cpp_afc38239e3eef2a4200e324bff14d91d1}\index{print\_server.cpp@{print\_server.cpp}!server@{server}}
+\index{server@{server}!print\_server.cpp@{print\_server.cpp}}
+\doxysubsubsection{\texorpdfstring{server}{server}}
+{\footnotesize\ttfamily \label{print__server_8cpp_afc38239e3eef2a4200e324bff14d91d1} 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1server}{websocketpp\+::server}}$<$\mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio}{websocketpp\+::config\+::asio}}$>$ \mbox{\hyperlink{docs_2simple__broadcast__server_8cpp_afc38239e3eef2a4200e324bff14d91d1}{server}}}
+
+
+
+Definition at line \mbox{\hyperlink{print__server_8cpp_source_l00006}{6}} of file \mbox{\hyperlink{print__server_8cpp_source}{print\+\_\+server.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{print__server_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}\index{print\_server.cpp@{print\_server.cpp}!main@{main}}
+\index{main@{main}!print\_server.cpp@{print\_server.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{print__server_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4} 
+int main (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{print__server_8cpp_source_l00012}{12}} of file \mbox{\hyperlink{print__server_8cpp_source}{print\+\_\+server.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00012\ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00013\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1server}{server}}\ \mbox{\hyperlink{classprint__server}{print\_server}};}
+\DoxyCodeLine{00014\ }
+\DoxyCodeLine{00015\ \ \ \ \ \mbox{\hyperlink{classprint__server}{print\_server}}.set\_message\_handler(\&\mbox{\hyperlink{print__server_8cpp_a9144902cfb7b566fbe5ac9ea87a119ba}{on\_message}});}
+\DoxyCodeLine{00016\ \ \ \ \ \mbox{\hyperlink{classprint__server}{print\_server}}.set\_access\_channels(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a853aa0b8976e53f3181af3bc398d493e}{websocketpp::log::alevel::all}});}
+\DoxyCodeLine{00017\ \ \ \ \ \mbox{\hyperlink{classprint__server}{print\_server}}.set\_error\_channels(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1elevel_a9b31ff708c221d314f9f4eb3ff2b1ad7}{websocketpp::log::elevel::all}});}
+\DoxyCodeLine{00018\ }
+\DoxyCodeLine{00019\ \ \ \ \ \mbox{\hyperlink{classprint__server}{print\_server}}.init\_asio();}
+\DoxyCodeLine{00020\ \ \ \ \ \mbox{\hyperlink{classprint__server}{print\_server}}.listen(9002);}
+\DoxyCodeLine{00021\ \ \ \ \ \mbox{\hyperlink{classprint__server}{print\_server}}.start\_accept();}
+\DoxyCodeLine{00022\ }
+\DoxyCodeLine{00023\ \ \ \ \ \mbox{\hyperlink{classprint__server}{print\_server}}.\mbox{\hyperlink{classprint__server_a724db97a6c441b5db090f6274c6112d8}{run}}();}
+\DoxyCodeLine{00024\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{print__server_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{print__server_8cpp_a9144902cfb7b566fbe5ac9ea87a119ba}\index{print\_server.cpp@{print\_server.cpp}!on\_message@{on\_message}}
+\index{on\_message@{on\_message}!print\_server.cpp@{print\_server.cpp}}
+\doxysubsubsection{\texorpdfstring{on\_message()}{on\_message()}}
+{\footnotesize\ttfamily \label{print__server_8cpp_a9144902cfb7b566fbe5ac9ea87a119ba} 
+void on\+\_\+message (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{websocketpp\+::connection\+\_\+hdl}}}]{}{, }\item[{\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a8097edab4feb0c36a69601c3786f0062}{server\+::message\+\_\+ptr}}}]{msg}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{print__server_8cpp_source_l00008}{8}} of file \mbox{\hyperlink{print__server_8cpp_source}{print\+\_\+server.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00008\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00009\ \ \ \ \ \ \ \ \ std::cout\ <<\ msg-\/>get\_payload()\ <<\ std::endl;}
+\DoxyCodeLine{00010\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=225pt]{print__server_8cpp_a9144902cfb7b566fbe5ac9ea87a119ba_icgraph}
+\end{center}
+\end{figure}

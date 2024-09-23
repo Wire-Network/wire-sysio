@@ -1,0 +1,33 @@
+<map id="BOOST_AUTO_TEST_CASE" name="BOOST_AUTO_TEST_CASE">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,202,202,228"/>
+<area shape="rect" id="Node000002" href="$integration_8cpp.html#accdcf80436014c39d5175d79f946a4a0" title=" " alt="" coords="259,78,396,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="119,199,174,157,248,113,261,107,263,112,251,117,177,162,122,204"/>
+<area shape="rect" id="Node000003" href="$integration_8cpp.html#af5b66d867a040d002fb57d645cae3fb4" title=" " alt="" coords="301,128,354,153"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="141,199,249,162,285,150,287,155,251,167,143,204"/>
+<area shape="rect" id="Node000004" href="$integration_8cpp.html#a1760540297e826705b66ff082a0b5e30" title=" " alt="" coords="289,177,366,202"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="202,201,273,193,274,198,202,207"/>
+<area shape="rect" id="Node000014" href="$integration_8cpp.html#a8bb1e8b8f1d24c072527e1ff52d73f66" title=" " alt="" coords="286,226,368,252"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="202,223,271,230,270,236,202,228"/>
+<area shape="rect" id="Node000015" href="$integration_8cpp.html#a1bf8ac77e31c334f7241e82557a6722c" title=" " alt="" coords="275,276,380,301"/>
+<area shape="poly" id="edge14_Node000001_Node000015" title=" " alt="" coords="144,226,251,262,269,268,267,273,249,267,143,231"/>
+<area shape="rect" id="Node000016" href="$classwebsocketpp_1_1endpoint.html#a5753d9848aefc04ee91da401c0cc65b8" title=" " alt="" coords="250,325,405,366"/>
+<area shape="poly" id="edge15_Node000001_Node000016" title=" " alt="" coords="124,226,179,266,251,311,260,316,257,321,248,316,176,271,120,231"/>
+<area shape="rect" id="Node000005" href="$classwebsocketpp_1_1endpoint.html#a3fe357b3c6434273a9965eb52902575d" title="Clear Access logging channels." alt="" coords="453,5,618,46"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="366,182,386,175,403,164,415,151,421,139,427,112,433,85,440,71,451,57,456,53,459,57,455,61,444,74,438,87,432,113,426,140,419,154,407,168,388,180,367,187"/>
+<area shape="rect" id="Node000006" href="$classwebsocketpp_1_1endpoint.html#a8cefa4fc37c0df4eb6ed0bcf04bb0da5" title="Clear Error logging channels." alt="" coords="458,71,613,111"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="365,179,404,163,427,143,451,122,462,116,464,121,455,127,431,147,406,168,367,184"/>
+<area shape="rect" id="Node000007" href="$classwebsocketpp_1_1client.html#a818c30343180123bf1fee6dc21524bae" title="Begin the connection process for the given connection." alt="" coords="467,136,604,177"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="366,181,451,167,452,172,367,186"/>
+<area shape="rect" id="Node000008" href="$classwebsocketpp_1_1client.html#aa95cec974921e32bc37a61c683ae240d" title="Get a new connection." alt="" coords="467,201,604,242"/>
+<area shape="poly" id="edge7_Node000004_Node000008" title=" " alt="" coords="367,193,452,206,451,211,366,198"/>
+<area shape="rect" id="Node000012" href="$classwebsocketpp_1_1endpoint.html#a5d7da609ebd2f797e5e67b6d050ebc59" title="Set Access logging channel." alt="" coords="458,267,613,307"/>
+<area shape="poly" id="edge11_Node000004_Node000012" title=" " alt="" coords="367,196,406,211,431,231,455,251,464,257,462,262,451,256,428,235,404,216,365,201"/>
+<area shape="rect" id="Node000013" href="$classwebsocketpp_1_1endpoint.html#a8292bcdca9344b57af1b0964ff7fc778" title="Set Error logging channel." alt="" coords="458,332,613,373"/>
+<area shape="poly" id="edge12_Node000004_Node000013" title=" " alt="" coords="367,192,388,200,407,212,419,225,426,239,432,265,438,291,444,304,455,317,459,321,456,325,451,321,440,307,433,293,427,266,421,240,414,228,403,216,386,204,366,198"/>
+<area shape="rect" id="Node000009" href="$classwebsocketpp_1_1endpoint.html#abfbee4cb244700560ef80594a913cd95" title=" " alt="" coords="666,169,822,210"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="605,208,651,201,652,207,605,214"/>
+<area shape="rect" id="Node000010" href="$namespacewebsocketpp_1_1error.html#a3344622df8c36e8ae03c59164e7b5e89" title=" " alt="" coords="678,235,810,275"/>
+<area shape="poly" id="edge9_Node000008_Node000010" title=" " alt="" coords="605,230,663,239,662,245,604,235"/>
+<area shape="rect" id="Node000011" href="$namespacewebsocketpp_1_1error.html#ac1acac2bfb24bbd2b1791db80993b0c2" title=" " alt="" coords="870,235,1002,275"/>
+<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="810,252,854,252,854,258,810,258"/>
+</map>

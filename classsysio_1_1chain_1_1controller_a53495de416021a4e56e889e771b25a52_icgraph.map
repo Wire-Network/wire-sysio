@@ -1,0 +1,30 @@
+<map id="sysio::chain::controller::last_irreversible_block_num" name="sysio::chain::controller::last_irreversible_block_num">
+<area shape="rect" id="Node000001" title=" " alt="" coords="698,200,889,240"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain__apis_1_1account__query__db__impl.html#a9e19a7f902401bfa1de26cb0924c380f" title=" " alt="" coords="217,5,397,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="771,187,750,155,722,120,688,87,649,61,587,38,521,26,456,23,397,25,397,19,456,17,522,21,588,33,652,56,692,83,726,116,754,152,776,184"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1chain__apis_1_1account__query__db__impl.html#a2789aac6391a10191d5aeb728fbe6410" title=" " alt="" coords="471,71,629,142"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="733,195,626,145,629,140,736,190"/>
+<area shape="rect" id="Node000006" href="$classsysio_1_1producer__plugin.html#abf34033a4e4a5564fd2098ee7a1b733b" title=" " alt="" coords="474,166,626,207"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="682,207,626,200,627,194,683,202"/>
+<area shape="rect" id="Node000007" href="$classsysio_1_1producer__plugin__impl.html#a336a35581aedb4308f8fc7f4eb44f152" title=" " alt="" coords="474,232,626,272"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="683,237,627,245,626,239,682,232"/>
+<area shape="rect" id="Node000009" href="$structsysio_1_1txn__test__gen__plugin__impl.html#a4942fac5a692f0634a7545a61efe721e" title=" " alt="" coords="450,297,650,338"/>
+<area shape="poly" id="edge9_Node000001_Node000009" title=" " alt="" coords="737,249,651,286,618,299,616,294,649,281,734,245"/>
+<area shape="rect" id="Node000010" href="$classsysio_1_1net__plugin__impl.html#a00b5cfe0a24a0f3e67aab8a3d5952f7d" title=" " alt="" coords="475,362,625,403"/>
+<area shape="poly" id="edge10_Node000001_Node000010" title=" " alt="" coords="766,254,716,303,685,329,652,351,626,364,624,359,649,347,682,325,712,299,763,250"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="455,81,397,63,398,58,457,76"/>
+<area shape="rect" id="Node000004" href="$structsysio_1_1chain__apis_1_1account__query__db__impl.html#a55b5594b7d59cd2c7c38207cb988a44c" title=" " alt="" coords="228,85,386,141"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="456,112,386,114,386,108,456,106"/>
+<area shape="rect" id="Node000005" href="$structsysio_1_1chain__apis_1_1account__query__db__impl.html#aa184af1bc686f0c89bb5837f05ef30fb" title=" " alt="" coords="5,85,164,141"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="212,116,164,116,164,110,212,110"/>
+<area shape="rect" id="Node000008" href="$classsysio_1_1producer__plugin__impl.html#a230c88a6ed7efbc3588a043fe4915bd9" title=" " alt="" coords="212,232,402,272"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="459,254,402,254,402,249,459,249"/>
+<area shape="rect" id="Node000011" href="$classsysio_1_1net__plugin__impl.html#ab46c73d14b91feecb4ace2aafba45a1c" title=" " alt="" coords="232,297,382,338"/>
+<area shape="poly" id="edge11_Node000010_Node000011" title=" " alt="" coords="459,361,382,340,383,335,461,356"/>
+<area shape="rect" id="Node000012" href="$classsysio_1_1net__plugin__impl.html#a822b599f0072017aaa53edaa3c381896" title=" " alt="" coords="231,362,382,403"/>
+<area shape="poly" id="edge12_Node000010_Node000012" title=" " alt="" coords="460,385,383,385,383,380,460,380"/>
+<area shape="rect" id="Node000013" href="$classsysio_1_1net__plugin__impl.html#a64d690dbcd0e9773f2f966e3de3caa75" title=" " alt="" coords="224,428,390,468"/>
+<area shape="poly" id="edge13_Node000010_Node000013" title=" " alt="" coords="461,409,386,429,385,424,459,404"/>
+<area shape="rect" id="Node000014" href="$classsysio_1_1connection.html#a6f592c3d4516eababd8ecbfac04c4b7e" title=" " alt="" coords="232,493,382,534"/>
+<area shape="poly" id="edge14_Node000010_Node000014" title=" " alt="" coords="511,415,461,449,403,482,375,495,373,490,401,477,458,444,508,410"/>
+</map>

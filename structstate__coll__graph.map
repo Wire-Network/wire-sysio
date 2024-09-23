@@ -1,0 +1,11 @@
+<map id="state" name="state">
+<area shape="rect" id="Node000001" title=" " alt="" coords="78,94,128,120"/>
+<area shape="rect" id="Node000003" href="$structyh__connector.html" title=" " alt="" coords="5,183,105,208"/>
+<area shape="poly" id="edge4_Node000003_Node000001" title=" " alt="" coords="121,133,123,147,120,160,108,174,92,184,89,180,104,170,115,157,118,146,116,134"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="110,5,155,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="126,47,110,95,105,93,121,45"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="49,167,54,143,65,129,78,118,81,122,69,132,59,145,54,168"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="6,5,61,31"/>
+<area shape="poly" id="edge5_Node000001_Node000004" title=" " alt="" coords="49,43,66,68,90,92,86,96,62,72,44,46"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="38,46,50,158,55,182,49,183,44,159,33,47"/>
+</map>

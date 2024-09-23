@@ -1,0 +1,158 @@
+\doxysection{libraries/fc/libraries/ff/depends/xbyak/sample/toyvm.cpp File Reference}
+\hypertarget{toyvm_8cpp}{}\label{toyvm_8cpp}\index{libraries/fc/libraries/ff/depends/xbyak/sample/toyvm.cpp@{libraries/fc/libraries/ff/depends/xbyak/sample/toyvm.cpp}}
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$memory.\+h$>$}\newline
+{\ttfamily \#include $<$vector$>$}\newline
+{\ttfamily \#include "{}xbyak/xbyak.\+h"{}}\newline
+{\ttfamily \#include "{}xbyak/xbyak\+\_\+util.\+h"{}}\newline
+Include dependency graph for toyvm.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{toyvm_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{class_toy_vm}{Toy\+Vm}}
+\item 
+class \mbox{\hyperlink{class_fib}{Fib}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{toyvm_8cpp_a3ede98665532cce0e33f614fac5150f9}{XBYAK\+\_\+\+NO\+\_\+\+OP\+\_\+\+NAMES}}
+\item 
+\#define \mbox{\hyperlink{toyvm_8cpp_a21ff7c588b94b603f37cc3cb3f21cb6a}{NUM\+\_\+\+OF\+\_\+\+ARRAY}}(x)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{toyvm_8cpp_a1f19fecd453206ffb486573bb0080ac8}{fibC}} (\mbox{\hyperlink{quantize_8cpp_adc6d195cb6337a3d1d86db3f0947a3b8}{uint32}} n)
+\item 
+int \mbox{\hyperlink{toyvm_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{toyvm_8cpp_a21ff7c588b94b603f37cc3cb3f21cb6a}\index{toyvm.cpp@{toyvm.cpp}!NUM\_OF\_ARRAY@{NUM\_OF\_ARRAY}}
+\index{NUM\_OF\_ARRAY@{NUM\_OF\_ARRAY}!toyvm.cpp@{toyvm.cpp}}
+\doxysubsubsection{\texorpdfstring{NUM\_OF\_ARRAY}{NUM\_OF\_ARRAY}}
+{\footnotesize\ttfamily \label{toyvm_8cpp_a21ff7c588b94b603f37cc3cb3f21cb6a} 
+\#define NUM\+\_\+\+OF\+\_\+\+ARRAY(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(\textcolor{keyword}{sizeof}(x)\ /\ \textcolor{keyword}{sizeof}(x[0]))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{toyvm_8cpp_source_l00033}{33}} of file \mbox{\hyperlink{toyvm_8cpp_source}{toyvm.\+cpp}}.
+
+\Hypertarget{toyvm_8cpp_a3ede98665532cce0e33f614fac5150f9}\index{toyvm.cpp@{toyvm.cpp}!XBYAK\_NO\_OP\_NAMES@{XBYAK\_NO\_OP\_NAMES}}
+\index{XBYAK\_NO\_OP\_NAMES@{XBYAK\_NO\_OP\_NAMES}!toyvm.cpp@{toyvm.cpp}}
+\doxysubsubsection{\texorpdfstring{XBYAK\_NO\_OP\_NAMES}{XBYAK\_NO\_OP\_NAMES}}
+{\footnotesize\ttfamily \label{toyvm_8cpp_a3ede98665532cce0e33f614fac5150f9} 
+\#define XBYAK\+\_\+\+NO\+\_\+\+OP\+\_\+\+NAMES}
+
+
+
+Definition at line \mbox{\hyperlink{toyvm_8cpp_source_l00030}{30}} of file \mbox{\hyperlink{toyvm_8cpp_source}{toyvm.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{toyvm_8cpp_a1f19fecd453206ffb486573bb0080ac8}\index{toyvm.cpp@{toyvm.cpp}!fibC@{fibC}}
+\index{fibC@{fibC}!toyvm.cpp@{toyvm.cpp}}
+\doxysubsubsection{\texorpdfstring{fibC()}{fibC()}}
+{\footnotesize\ttfamily \label{toyvm_8cpp_a1f19fecd453206ffb486573bb0080ac8} 
+void fibC (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{quantize_8cpp_adc6d195cb6337a3d1d86db3f0947a3b8}{uint32}}}]{n}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{toyvm_8cpp_source_l00286}{286}} of file \mbox{\hyperlink{toyvm_8cpp_source}{toyvm.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00287\ \{}
+\DoxyCodeLine{00288\ \ \ \ \ \mbox{\hyperlink{quantize_8cpp_adc6d195cb6337a3d1d86db3f0947a3b8}{uint32}}\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}},\ c,\ t;}
+\DoxyCodeLine{00289\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ 1;}
+\DoxyCodeLine{00290\ \ \ \ \ c\ =\ 1;}
+\DoxyCodeLine{00291\ lp:}
+\DoxyCodeLine{00292\ \ \ \ \ t\ =\ c;}
+\DoxyCodeLine{00293\ \ \ \ \ c\ +=\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}};}
+\DoxyCodeLine{00294\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ t;}
+\DoxyCodeLine{00295\ \ \ \ \ n-\/-\/;}
+\DoxyCodeLine{00296\ \ \ \ \ \textcolor{keywordflow}{if}\ (n\ !=\ 0)\ \textcolor{keywordflow}{goto}\ lp;}
+\DoxyCodeLine{00297\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}c=\%d(0x\%08x)\(\backslash\)n"{}},\ c,\ c);}
+\DoxyCodeLine{00298\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=187pt]{toyvm_8cpp_a1f19fecd453206ffb486573bb0080ac8_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{toyvm_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}\index{toyvm.cpp@{toyvm.cpp}!main@{main}}
+\index{main@{main}!toyvm.cpp@{toyvm.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{toyvm_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4} 
+int main (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{toyvm_8cpp_source_l00300}{300}} of file \mbox{\hyperlink{toyvm_8cpp_source}{toyvm.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00301\ \{}
+\DoxyCodeLine{00302\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00303\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ n\ =\ 10000;}
+\DoxyCodeLine{00304\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_fib}{Fib}}\ fib(n);}
+\DoxyCodeLine{00305\ }
+\DoxyCodeLine{00306\ \ \ \ \ \ \ \ \ fib.recompile();}
+\DoxyCodeLine{00307\ }
+\DoxyCodeLine{00308\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00309\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1util_1_1_clock}{Xbyak::util::Clock}}\ clk;}
+\DoxyCodeLine{00310\ \ \ \ \ \ \ \ \ \ \ \ \ clk.\mbox{\hyperlink{class_xbyak_1_1util_1_1_clock_aae54b05acf245bbffcb48c82864e84c0}{begin}}();}
+\DoxyCodeLine{00311\ \ \ \ \ \ \ \ \ \ \ \ \ fib.run();}
+\DoxyCodeLine{00312\ \ \ \ \ \ \ \ \ \ \ \ \ clk.\mbox{\hyperlink{class_xbyak_1_1util_1_1_clock_a5f18bdb8e80de1a30482fc08dfe0a8e6}{end}}();}
+\DoxyCodeLine{00313\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}vm\ \ \ \ \ \ \ \%.2fKclk\(\backslash\)n"{}},\ clk.\mbox{\hyperlink{class_xbyak_1_1util_1_1_clock_ad12d8f28828f10e625616f4a8d824745}{getClock}}()\ *\ 1e-\/3);}
+\DoxyCodeLine{00314\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00315\ }
+\DoxyCodeLine{00316\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00317\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1util_1_1_clock}{Xbyak::util::Clock}}\ clk;}
+\DoxyCodeLine{00318\ \ \ \ \ \ \ \ \ \ \ \ \ clk.\mbox{\hyperlink{class_xbyak_1_1util_1_1_clock_aae54b05acf245bbffcb48c82864e84c0}{begin}}();}
+\DoxyCodeLine{00319\ \ \ \ \ \ \ \ \ \ \ \ \ fib.runByJIT();}
+\DoxyCodeLine{00320\ \ \ \ \ \ \ \ \ \ \ \ \ clk.\mbox{\hyperlink{class_xbyak_1_1util_1_1_clock_a5f18bdb8e80de1a30482fc08dfe0a8e6}{end}}();}
+\DoxyCodeLine{00321\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}jit\ \ \ \ \ \ \%.2fKclk\(\backslash\)n"{}},\ clk.\mbox{\hyperlink{class_xbyak_1_1util_1_1_clock_ad12d8f28828f10e625616f4a8d824745}{getClock}}()\ *\ 1e-\/3);}
+\DoxyCodeLine{00322\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00323\ }
+\DoxyCodeLine{00324\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00325\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1util_1_1_clock}{Xbyak::util::Clock}}\ clk;}
+\DoxyCodeLine{00326\ \ \ \ \ \ \ \ \ \ \ \ \ clk.\mbox{\hyperlink{class_xbyak_1_1util_1_1_clock_aae54b05acf245bbffcb48c82864e84c0}{begin}}();}
+\DoxyCodeLine{00327\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{toyvm_8cpp_a1f19fecd453206ffb486573bb0080ac8}{fibC}}(n);}
+\DoxyCodeLine{00328\ \ \ \ \ \ \ \ \ \ \ \ \ clk.\mbox{\hyperlink{class_xbyak_1_1util_1_1_clock_a5f18bdb8e80de1a30482fc08dfe0a8e6}{end}}();}
+\DoxyCodeLine{00329\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}native\ C\ \%.2fKclk\(\backslash\)n"{}},\ clk.\mbox{\hyperlink{class_xbyak_1_1util_1_1_clock_ad12d8f28828f10e625616f4a8d824745}{getClock}}()\ *\ 1e-\/3);}
+\DoxyCodeLine{00330\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00331\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (std::exception\&\ e)\ \{}
+\DoxyCodeLine{00332\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}ERR:\%s\(\backslash\)n"{}},\ e.what());}
+\DoxyCodeLine{00333\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{}
+\DoxyCodeLine{00334\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}unknown\ error\(\backslash\)n"{}});}
+\DoxyCodeLine{00335\ \ \ \ \ \}}
+\DoxyCodeLine{00336\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00337\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{toyvm_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4_cgraph}
+\end{center}
+\end{figure}

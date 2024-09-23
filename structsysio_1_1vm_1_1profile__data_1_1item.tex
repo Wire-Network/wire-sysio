@@ -1,0 +1,203 @@
+\doxysection{sysio\+::vm\+::profile\+\_\+data\+::item Struct Reference}
+\hypertarget{structsysio_1_1vm_1_1profile__data_1_1item}{}\label{structsysio_1_1vm_1_1profile__data_1_1item}\index{sysio::vm::profile\_data::item@{sysio::vm::profile\_data::item}}
+
+
+{\ttfamily \#include $<$profile.\+hpp$>$}
+
+
+
+Collaboration diagram for sysio\+::vm\+::profile\+\_\+data\+::item\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=213pt]{structsysio_1_1vm_1_1profile__data_1_1item__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+std\+::size\+\_\+t \mbox{\hyperlink{structsysio_1_1vm_1_1profile__data_1_1item_aa96f10dec62734b1a598330f9458b7b7}{hash}} () const
+\item 
+std\+::size\+\_\+t \mbox{\hyperlink{structsysio_1_1vm_1_1profile__data_1_1item_aa96f10dec62734b1a598330f9458b7b7}{hash}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1vm_1_1profile__data_1_1list__header}{list\+\_\+header}} \mbox{\hyperlink{structsysio_1_1vm_1_1profile__data_1_1item_a81ca52972715f1e7db8b3e26963105ac}{mru}}
+\item 
+\mbox{\hyperlink{structsysio_1_1vm_1_1profile__data_1_1item}{item}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structsysio_1_1vm_1_1profile__data_1_1item_ae50001fee04fa8675da7424ec338ddaa}{next}}
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1vm_1_1profile__data_1_1item_a815cdac8021f3267386ac70c86fdd194}{bucket}} = 0x\+FFFFFFFF
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1vm_1_1profile__data_1_1item_a3e683048bc34de48e7e91175b8562aa0}{count}} = 0
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1vm_1_1profile__data_1_1item_a77551f3615d720208c0e93790ab09055}{len}}
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1vm_1_1profile__data_1_1item_a2ece6ae41912278c5f6a1b230c5014a4}{frames}} \mbox{[}\mbox{\hyperlink{structsysio_1_1vm_1_1profile__data_aa5d30fbdf36035c2f9884284a8a61c05}{max\+\_\+frames}}\mbox{]}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{vm_2profile_8hpp_source_l00104}{104}} of file \mbox{\hyperlink{vm_2profile_8hpp_source}{profile.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1vm_1_1profile__data_1_1item_aa96f10dec62734b1a598330f9458b7b7}\index{sysio::vm::profile\_data::item@{sysio::vm::profile\_data::item}!hash@{hash}}
+\index{hash@{hash}!sysio::vm::profile\_data::item@{sysio::vm::profile\_data::item}}
+\doxysubsubsection{\texorpdfstring{hash()}{hash()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1profile__data_1_1item_aa96f10dec62734b1a598330f9458b7b7} 
+std\+::size\+\_\+t sysio\+::vm\+::profile\+\_\+data\+::item\+::hash (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2profile_8hpp_source_l00112}{112}} of file \mbox{\hyperlink{sysio_2vm_2profile_8hpp_source}{profile.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ MurmurHash64A}}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Including\ len\ gives\ a\ multiple\ of\ 2.}}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_assert}(\mbox{\hyperlink{structsysio_1_1vm_1_1profile__data_aa5d30fbdf36035c2f9884284a8a61c05}{max\_frames}}\ \%\ 2\ ==\ 1);}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Not\ strictly\ necessary\ for\ correctness,\ but\ avoids\ unaligned\ loads}}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_assert}(offsetof(item,\ \mbox{\hyperlink{structsysio_1_1vm_1_1profile__data_1_1item_a77551f3615d720208c0e93790ab09055}{len}})\ \%\ 8\ ==\ 0);}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{constexpr}\ std::uint64\_t\ \mbox{\hyperlink{xbyak__mnemonic_8h_a03724df049ae719e015d50f3716f83e7}{mul}}\ =\ 0xc6a4a7935bd1e995ull;}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{constexpr}\ std::uint64\_t\ seed\ =\ 0xbadd00d00ull;}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{constexpr}\ \textcolor{keyword}{auto}\ shift\_mix\ =\ [](std::uint64\_t\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}})\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ \string^\ (\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ >>\ 47);\ \};}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ word\_len\ =\ \mbox{\hyperlink{structsysio_1_1vm_1_1profile__data_1_1item_a77551f3615d720208c0e93790ab09055}{len}}/2+1;\ \textcolor{comment}{//\ if\ len\ is\ even,\ add\ an\ extra\ 0\ word.}}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ hash\ =\ seed\ \string^\ (word\_len\ *\ 8\ *\ \mbox{\hyperlink{xbyak__mnemonic_8h_a03724df049ae719e015d50f3716f83e7}{mul}});}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ base\_addr\ =\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(\&\mbox{\hyperlink{structsysio_1_1vm_1_1profile__data_1_1item_a77551f3615d720208c0e93790ab09055}{len}});}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ word\_len;\ ++i)\ \{}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \ \ \ \ std::uint64\_t\ val;}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(\&val,\ base\_addr\ +\ 8*i,\ 8);}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \ \ \ \ hash\ =\ (hash\ \string^\ shift\_mix(val\ *\ \mbox{\hyperlink{xbyak__mnemonic_8h_a03724df049ae719e015d50f3716f83e7}{mul}})\ *\ \mbox{\hyperlink{xbyak__mnemonic_8h_a03724df049ae719e015d50f3716f83e7}{mul}})\ *\ \mbox{\hyperlink{xbyak__mnemonic_8h_a03724df049ae719e015d50f3716f83e7}{mul}};}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ shift\_mix(shift\_mix(hash)\ *\ \mbox{\hyperlink{xbyak__mnemonic_8h_a03724df049ae719e015d50f3716f83e7}{mul}});}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=261pt]{structsysio_1_1vm_1_1profile__data_1_1item_aa96f10dec62734b1a598330f9458b7b7_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=304pt]{structsysio_1_1vm_1_1profile__data_1_1item_aa96f10dec62734b1a598330f9458b7b7_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1vm_1_1profile__data_1_1item_aa96f10dec62734b1a598330f9458b7b7}\index{sysio::vm::profile\_data::item@{sysio::vm::profile\_data::item}!hash@{hash}}
+\index{hash@{hash}!sysio::vm::profile\_data::item@{sysio::vm::profile\_data::item}}
+\doxysubsubsection{\texorpdfstring{hash()}{hash()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1profile__data_1_1item_aa96f10dec62734b1a598330f9458b7b7} 
+std\+::size\+\_\+t sysio\+::vm\+::profile\+\_\+data\+::item\+::hash (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2profile_8hpp_source_l00112}{112}} of file \mbox{\hyperlink{vm_2profile_8hpp_source}{profile.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ MurmurHash64A}}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Including\ len\ gives\ a\ multiple\ of\ 2.}}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_assert}(\mbox{\hyperlink{structsysio_1_1vm_1_1profile__data_aa5d30fbdf36035c2f9884284a8a61c05}{max\_frames}}\ \%\ 2\ ==\ 1);}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Not\ strictly\ necessary\ for\ correctness,\ but\ avoids\ unaligned\ loads}}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_assert}(offsetof(item,\ \mbox{\hyperlink{structsysio_1_1vm_1_1profile__data_1_1item_a77551f3615d720208c0e93790ab09055}{len}})\ \%\ 8\ ==\ 0);}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{constexpr}\ std::uint64\_t\ \mbox{\hyperlink{xbyak__mnemonic_8h_a03724df049ae719e015d50f3716f83e7}{mul}}\ =\ 0xc6a4a7935bd1e995ull;}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{constexpr}\ std::uint64\_t\ seed\ =\ 0xbadd00d00ull;}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{constexpr}\ \textcolor{keyword}{auto}\ shift\_mix\ =\ [](std::uint64\_t\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}})\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ \string^\ (\mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}\ >>\ 47);\ \};}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ word\_len\ =\ \mbox{\hyperlink{structsysio_1_1vm_1_1profile__data_1_1item_a77551f3615d720208c0e93790ab09055}{len}}/2+1;\ \textcolor{comment}{//\ if\ len\ is\ even,\ add\ an\ extra\ 0\ word.}}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ hash\ =\ seed\ \string^\ (word\_len\ *\ 8\ *\ \mbox{\hyperlink{xbyak__mnemonic_8h_a03724df049ae719e015d50f3716f83e7}{mul}});}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ base\_addr\ =\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(\&\mbox{\hyperlink{structsysio_1_1vm_1_1profile__data_1_1item_a77551f3615d720208c0e93790ab09055}{len}});}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ word\_len;\ ++i)\ \{}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \ \ \ \ std::uint64\_t\ val;}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(\&val,\ base\_addr\ +\ 8*i,\ 8);}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \ \ \ \ hash\ =\ (hash\ \string^\ shift\_mix(val\ *\ \mbox{\hyperlink{xbyak__mnemonic_8h_a03724df049ae719e015d50f3716f83e7}{mul}})\ *\ \mbox{\hyperlink{xbyak__mnemonic_8h_a03724df049ae719e015d50f3716f83e7}{mul}})\ *\ \mbox{\hyperlink{xbyak__mnemonic_8h_a03724df049ae719e015d50f3716f83e7}{mul}};}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ shift\_mix(shift\_mix(hash)\ *\ \mbox{\hyperlink{xbyak__mnemonic_8h_a03724df049ae719e015d50f3716f83e7}{mul}});}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=261pt]{structsysio_1_1vm_1_1profile__data_1_1item_aa96f10dec62734b1a598330f9458b7b7_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1vm_1_1profile__data_1_1item_a815cdac8021f3267386ac70c86fdd194}\index{sysio::vm::profile\_data::item@{sysio::vm::profile\_data::item}!bucket@{bucket}}
+\index{bucket@{bucket}!sysio::vm::profile\_data::item@{sysio::vm::profile\_data::item}}
+\doxysubsubsection{\texorpdfstring{bucket}{bucket}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1profile__data_1_1item_a815cdac8021f3267386ac70c86fdd194} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::vm\+::profile\+\_\+data\+::item\+::bucket = 0x\+FFFFFFFF}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2profile_8hpp_source_l00107}{107}} of file \mbox{\hyperlink{sysio_2vm_2profile_8hpp_source}{profile.\+hpp}}.
+
+\Hypertarget{structsysio_1_1vm_1_1profile__data_1_1item_a3e683048bc34de48e7e91175b8562aa0}\index{sysio::vm::profile\_data::item@{sysio::vm::profile\_data::item}!count@{count}}
+\index{count@{count}!sysio::vm::profile\_data::item@{sysio::vm::profile\_data::item}}
+\doxysubsubsection{\texorpdfstring{count}{count}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1profile__data_1_1item_a3e683048bc34de48e7e91175b8562aa0} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::vm\+::profile\+\_\+data\+::item\+::count = 0}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2profile_8hpp_source_l00108}{108}} of file \mbox{\hyperlink{sysio_2vm_2profile_8hpp_source}{profile.\+hpp}}.
+
+\Hypertarget{structsysio_1_1vm_1_1profile__data_1_1item_a2ece6ae41912278c5f6a1b230c5014a4}\index{sysio::vm::profile\_data::item@{sysio::vm::profile\_data::item}!frames@{frames}}
+\index{frames@{frames}!sysio::vm::profile\_data::item@{sysio::vm::profile\_data::item}}
+\doxysubsubsection{\texorpdfstring{frames}{frames}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1profile__data_1_1item_a2ece6ae41912278c5f6a1b230c5014a4} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::vm\+::profile\+\_\+data\+::item\+::frames}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2profile_8hpp_source_l00110}{110}} of file \mbox{\hyperlink{sysio_2vm_2profile_8hpp_source}{profile.\+hpp}}.
+
+\Hypertarget{structsysio_1_1vm_1_1profile__data_1_1item_a77551f3615d720208c0e93790ab09055}\index{sysio::vm::profile\_data::item@{sysio::vm::profile\_data::item}!len@{len}}
+\index{len@{len}!sysio::vm::profile\_data::item@{sysio::vm::profile\_data::item}}
+\doxysubsubsection{\texorpdfstring{len}{len}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1profile__data_1_1item_a77551f3615d720208c0e93790ab09055} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::vm\+::profile\+\_\+data\+::item\+::len}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2profile_8hpp_source_l00109}{109}} of file \mbox{\hyperlink{sysio_2vm_2profile_8hpp_source}{profile.\+hpp}}.
+
+\Hypertarget{structsysio_1_1vm_1_1profile__data_1_1item_a81ca52972715f1e7db8b3e26963105ac}\index{sysio::vm::profile\_data::item@{sysio::vm::profile\_data::item}!mru@{mru}}
+\index{mru@{mru}!sysio::vm::profile\_data::item@{sysio::vm::profile\_data::item}}
+\doxysubsubsection{\texorpdfstring{mru}{mru}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1profile__data_1_1item_a81ca52972715f1e7db8b3e26963105ac} 
+\mbox{\hyperlink{structsysio_1_1vm_1_1profile__data_1_1list__header}{list\+\_\+header}} sysio\+::vm\+::profile\+\_\+data\+::item\+::mru}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2profile_8hpp_source_l00105}{105}} of file \mbox{\hyperlink{sysio_2vm_2profile_8hpp_source}{profile.\+hpp}}.
+
+\Hypertarget{structsysio_1_1vm_1_1profile__data_1_1item_ae50001fee04fa8675da7424ec338ddaa}\index{sysio::vm::profile\_data::item@{sysio::vm::profile\_data::item}!next@{next}}
+\index{next@{next}!sysio::vm::profile\_data::item@{sysio::vm::profile\_data::item}}
+\doxysubsubsection{\texorpdfstring{next}{next}}
+{\footnotesize\ttfamily \label{structsysio_1_1vm_1_1profile__data_1_1item_ae50001fee04fa8675da7424ec338ddaa} 
+\mbox{\hyperlink{structsysio_1_1vm_1_1profile__data_1_1item}{item}} \texorpdfstring{$\ast$}{*} sysio\+::vm\+::profile\+\_\+data\+::item\+::next}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2profile_8hpp_source_l00106}{106}} of file \mbox{\hyperlink{sysio_2vm_2profile_8hpp_source}{profile.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/include/sysio/sysio/vm/\mbox{\hyperlink{sysio_2vm_2profile_8hpp}{profile.\+hpp}}\item 
+libraries/sys-\/vm/include/sysio/vm/\mbox{\hyperlink{vm_2profile_8hpp}{profile.\+hpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,15 @@
+<map id="TEST" name="TEST">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,61,56"/>
+<area shape="rect" id="Node000002" href="$class_generic_reader.html#a0c450620d14ff1824e58bb7bd9b42099" title="Parse JSON text." alt="" coords="109,5,259,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="61,36,93,31,94,36,62,42"/>
+<area shape="rect" id="Node000005" href="$unittest_8h.html#a0b8e1bafb97ad4a272c5cc4469a13687" title=" " alt="" coords="153,55,215,80"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="62,45,138,58,137,63,61,50"/>
+<area shape="rect" id="Node000003" href="$struct_parse_result.html#a88b6d44f052a19e6436ae6aadc2c40b4" title="Reset error code." alt="" coords="307,5,439,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="259,16,291,16,291,21,259,21"/>
+<area shape="rect" id="Node000004" href="$struct_parse_result.html#aa81b4a7b776b77216cb752385203a8c1" title="Update error code and offset." alt="" coords="487,5,609,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="440,16,472,16,472,21,440,21"/>
+<area shape="rect" id="Node000006" href="$yubihsm__pkcs11_8c.html#ae785d5badbf1f08b491af31f32a135a1" title=" " alt="" coords="338,55,409,80"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="216,65,322,65,322,70,216,70"/>
+<area shape="rect" id="Node000007" href="$unittest_8h.html#a158bf1a4953297866644112d81a7a3e7" title=" " alt="" coords="344,104,403,130"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="216,73,330,103,328,108,215,78"/>
+</map>

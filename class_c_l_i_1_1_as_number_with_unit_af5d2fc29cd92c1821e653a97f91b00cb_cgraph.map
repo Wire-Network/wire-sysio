@@ -1,0 +1,29 @@
+<map id="CLI::AsNumberWithUnit::AsNumberWithUnit" name="CLI::AsNumberWithUnit::AsNumberWithUnit">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,188,169,229"/>
+<area shape="rect" id="Node000002" href="$namespace_c_l_i_1_1detail.html#a58ce723daebf6cd298565eb365d1b157" title="Performs a *= b; if it doesn&#39;t cause integer overflow. Returns false otherwise." alt="" coords="233,5,372,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="99,186,145,122,178,87,215,56,221,52,224,56,218,60,182,91,149,126,103,189"/>
+<area shape="rect" id="Node000004" href="$class_c_l_i_1_1_validator.html#a35930c9b193bb0f7c5b7597dfe002e1f" title="Specify the type string." alt="" coords="217,70,388,96"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="107,186,155,145,215,105,227,99,229,104,218,109,158,149,111,190"/>
+<area shape="rect" id="Node000005" href="$namespace_c_l_i_1_1detail.html#a320e031a5eb12297a140d2d6fc73362a" title="Generate a string representation of a map." alt="" coords="217,120,388,145"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="146,185,248,148,250,153,148,190"/>
+<area shape="rect" id="Node000008" href="$namespace_c_l_i_1_1detail.html#a0e94052d485636fc9f18c21009026577" title="Convert an object to a string (directly forward if this can become a string)" alt="" coords="454,177,594,202"/>
+<area shape="poly" id="edge10_Node000001_Node000008" title=" " alt="" coords="169,202,439,191,439,196,169,208"/>
+<area shape="rect" id="Node000009" href="$namespace_c_l_i_1_1detail.html#a32d84ce1a65de779e88fdf4aa3b54ea6" title="Trim whitespace from right of string." alt="" coords="466,249,582,274"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="169,216,452,250,451,256,169,221"/>
+<area shape="rect" id="Node000010" href="$namespace_c_l_i_1_1detail.html#ae83709ec148057ec53df4383645727e9" title="Return a lower case version of a string." alt="" coords="233,272,372,297"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="148,227,250,263,248,268,146,232"/>
+<area shape="rect" id="Node000011" href="$namespace_c_l_i_1_1detail.html#a621323632158048f6168deacc432b838" title="Trim whitespace from string." alt="" coords="247,321,358,346"/>
+<area shape="poly" id="edge11_Node000001_Node000011" title=" " alt="" coords="111,227,158,268,218,307,233,314,231,319,215,312,155,272,107,231"/>
+<area shape="rect" id="Node000013" href="$namespace_c_l_i_1_1detail.html#a0505c3528178408b76390be64bd452d4" title="Print name for enumeration types." alt="" coords="226,370,379,396"/>
+<area shape="poly" id="edge14_Node000001_Node000013" title=" " alt="" coords="103,228,148,292,181,327,218,357,226,361,223,366,215,361,177,331,144,295,98,231"/>
+<area shape="rect" id="Node000003" href="$namespace_c_l_i_1_1detail.html#a569135c6e266940a5f914698b9deef66" title="Do a check for overflow on signed numbers." alt="" coords="436,13,612,38"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="372,23,420,23,420,28,372,28"/>
+<area shape="rect" id="Node000006" href="$namespace_c_l_i_1_1detail.html#ab351f13ec104e2cba19ec6baf4a552f6" title="Simple function to join a string." alt="" coords="470,62,579,88"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="354,116,456,90,458,95,356,121"/>
+<area shape="rect" id="Node000007" href="$namespace_c_l_i_1_1detail.html#a0c6cf48feae9d909d52e7b4c346cba29" title=" " alt="" coords="463,112,585,153"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="388,130,448,130,448,135,388,135"/>
+<area shape="poly" id="edge7_Node000005_Node000008" title=" " alt="" coords="356,143,458,170,456,175,354,148"/>
+<area shape="poly" id="edge13_Node000011_Node000009" title=" " alt="" coords="352,318,387,307,472,278,474,283,389,312,354,323"/>
+<area shape="rect" id="Node000012" href="$namespace_c_l_i_1_1detail.html#aa06bf54cb3fb347d68d23d31384af42f" title="Trim whitespace from left of string." alt="" coords="467,321,581,346"/>
+<area shape="poly" id="edge12_Node000011_Node000012" title=" " alt="" coords="358,331,451,331,451,336,358,336"/>
+</map>

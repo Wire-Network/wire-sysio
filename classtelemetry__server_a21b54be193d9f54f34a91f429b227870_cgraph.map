@@ -1,0 +1,27 @@
+<map id="telemetry_server::telemetry_server" name="telemetry_server::telemetry_server">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,207,186,247"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1endpoint.html#a3fe357b3c6434273a9965eb52902575d" title="Clear Access logging channels." alt="" coords="239,5,404,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="106,205,155,134,191,93,232,57,240,51,243,56,235,61,195,97,160,137,111,208"/>
+<area shape="rect" id="Node000003" href="$classtelemetry__server.html#aab83aa8df38767bd2271dd775e6c3f0e" title=" " alt="" coords="251,71,392,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="118,204,169,163,232,121,242,116,244,121,235,125,172,167,121,208"/>
+<area shape="rect" id="Node000004" href="$classtelemetry__server.html#abab5c8572db5f87e745b862e59867bc8" title=" " alt="" coords="237,136,406,161"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="144,204,233,170,253,163,254,169,235,175,146,209"/>
+<area shape="rect" id="Node000009" href="$classtelemetry__server.html#a3f0a1ba79c9d32843a4acca8a187bf17" title=" " alt="" coords="234,185,409,210"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="186,213,218,208,218,214,187,218"/>
+<area shape="rect" id="Node000010" href="$classwebsocketpp_1_1endpoint.html#a5d7da609ebd2f797e5e67b6d050ebc59" title="Set Access logging channel." alt="" coords="244,235,399,275"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="187,236,229,241,228,246,186,241"/>
+<area shape="rect" id="Node000011" href="$classwebsocketpp_1_1endpoint.html#a8d7d95bebc154879655211e2b0b5e069" title=" " alt="" coords="244,300,399,341"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="144,245,235,285,251,291,249,296,233,289,142,250"/>
+<area shape="rect" id="Node000012" href="$classwebsocketpp_1_1endpoint.html#a511874384b71238b042968cf736bc510" title=" " alt="" coords="244,365,399,406"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="117,246,167,297,200,325,235,350,245,356,242,360,232,355,197,329,164,301,113,250"/>
+<area shape="rect" id="Node000013" href="$classwebsocketpp_1_1endpoint.html#a5753d9848aefc04ee91da401c0cc65b8" title=" " alt="" coords="244,431,399,471"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="109,247,128,283,156,328,192,375,235,416,242,421,239,425,232,420,188,378,152,331,124,285,104,249"/>
+<area shape="rect" id="Node000005" href="$classwebsocketpp_1_1endpoint.html#a1d9163813aa02ed32100f443b4ddbd8e" title="Get reference to access logger." alt="" coords="457,96,612,137"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="406,133,441,128,442,133,407,138"/>
+<area shape="rect" id="Node000006" href="$classwebsocketpp_1_1endpoint.html#a0fe4457427d4124abe7ca022ba7afbb4" title="Retrieves a connection_ptr from a connection_hdl (exception free)" alt="" coords="457,161,612,202"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="407,159,442,165,441,170,406,164"/>
+<area shape="rect" id="Node000007" href="$namespacewebsocketpp_1_1error.html#a3344622df8c36e8ae03c59164e7b5e89" title=" " alt="" coords="660,161,793,202"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="613,179,645,179,645,184,613,184"/>
+<area shape="rect" id="Node000008" href="$namespacewebsocketpp_1_1error.html#ac1acac2bfb24bbd2b1791db80993b0c2" title=" " alt="" coords="841,161,973,202"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="793,179,825,179,825,184,793,184"/>
+</map>

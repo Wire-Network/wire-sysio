@@ -1,0 +1,186 @@
+\doxysection{meta.\+h}
+\hypertarget{meta_8h_source}{}\label{meta_8h_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/include/rapidjson/internal/meta.h@{libraries/fc/include/fc/crypto/webauthn\_json/include/rapidjson/internal/meta.h}}
+\mbox{\hyperlink{meta_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00001}00001\ \textcolor{comment}{//\ Tencent\ is\ pleased\ to\ support\ the\ open\ source\ community\ by\ making\ RapidJSON\ available.}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00002}00002\ \textcolor{comment}{//\ }}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00003}00003\ \textcolor{comment}{//\ Copyright\ (C)\ 2015\ THL\ A29\ Limited,\ a\ Tencent\ company,\ and\ Milo\ Yip.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00004}00004\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00005}00005\ \textcolor{comment}{//\ Licensed\ under\ the\ MIT\ License\ (the\ "{}License"{});\ you\ may\ not\ use\ this\ file\ except}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00006}00006\ \textcolor{comment}{//\ in\ compliance\ with\ the\ License.\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00007}00007\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00008}00008\ \textcolor{comment}{//\ http://opensource.org/licenses/MIT}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00009}00009\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00010}00010\ \textcolor{comment}{//\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software\ distributed\ }}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00011}00011\ \textcolor{comment}{//\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,\ WITHOUT\ WARRANTIES\ OR\ }}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00012}00012\ \textcolor{comment}{//\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.\ See\ the\ License\ for\ the\ }}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00013}00013\ \textcolor{comment}{//\ specific\ language\ governing\ permissions\ and\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00015}00015\ \textcolor{preprocessor}{\#ifndef\ RAPIDJSON\_INTERNAL\_META\_H\_}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00016}00016\ \textcolor{preprocessor}{\#define\ RAPIDJSON\_INTERNAL\_META\_H\_}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00018}00018\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{rapidjson_8h}{../rapidjson.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00020}00020\ \textcolor{preprocessor}{\#ifdef\ \_\_GNUC\_\_}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00021}00021\ RAPIDJSON\_DIAG\_PUSH}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00022}00022\ RAPIDJSON\_DIAG\_OFF(effc++)}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00023}00023\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00025}00025\ \textcolor{preprocessor}{\#if\ defined(\_MSC\_VER)\ \&\&\ !defined(\_\_clang\_\_)}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00026}00026\ RAPIDJSON\_DIAG\_PUSH}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00027}00027\ RAPIDJSON\_DIAG\_OFF(6334)}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00028}00028\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00030}00030\ \textcolor{preprocessor}{\#if\ RAPIDJSON\_HAS\_CXX11\_TYPETRAITS}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00031}00031\ \textcolor{preprocessor}{\#include\ <type\_traits>}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00032}00032\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00034}00034\ \textcolor{comment}{//@cond\ RAPIDJSON\_INTERNAL}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00035}00035\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gad3806c8251fdc7da9618b7e922674ffc}{RAPIDJSON\_NAMESPACE\_BEGIN}}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00036}00036\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceinternal}{internal}}\ \{}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00038}00038\ \textcolor{comment}{//\ Helper\ to\ wrap/convert\ arbitrary\ types\ to\ void,\ useful\ for\ arbitrary\ type\ matching}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00039}00039\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>\ \textcolor{keyword}{struct\ }Void\ \{\ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}};\ \};}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00042}00042\ \textcolor{comment}{//\ BoolType,\ TrueType,\ FalseType}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00043}00043\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00044}00044\ \textcolor{keyword}{template}\ <\textcolor{keywordtype}{bool}\ Cond>\ \textcolor{keyword}{struct\ }BoolType\ \{}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00045}00045\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_generic_value}{Value}}\ =\ Cond;}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00046}00046\ \ \ \ \ \textcolor{keyword}{typedef}\ BoolType\ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}};}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00047}00047\ \};}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00048}00048\ \textcolor{keyword}{typedef}\ BoolType<true>\ TrueType;}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00049}00049\ \textcolor{keyword}{typedef}\ BoolType<false>\ FalseType;}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00053}00053\ \textcolor{comment}{//\ SelectIf,\ BoolExpr,\ NotExpr,\ AndExpr,\ OrExpr}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00054}00054\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00056}00056\ \textcolor{keyword}{template}\ <\textcolor{keywordtype}{bool}\ C>\ \textcolor{keyword}{struct\ }SelectIfImpl\ \{\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T1,\ \textcolor{keyword}{typename}\ T2>\ \textcolor{keyword}{struct\ }Apply\ \{\ \textcolor{keyword}{typedef}\ T1\ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}};\ \};\ \};}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00057}00057\ \textcolor{keyword}{template}\ <>\ \textcolor{keyword}{struct\ }SelectIfImpl<false>\ \{\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T1,\ \textcolor{keyword}{typename}\ T2>\ \textcolor{keyword}{struct\ }Apply\ \{\ \textcolor{keyword}{typedef}\ T2\ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}};\ \};\ \};}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00058}00058\ \textcolor{keyword}{template}\ <\textcolor{keywordtype}{bool}\ C,\ \textcolor{keyword}{typename}\ T1,\ \textcolor{keyword}{typename}\ T2>\ \textcolor{keyword}{struct\ }SelectIfCond\ :\ SelectIfImpl<C>\mbox{\hyperlink{yubihsm__pkcs11_8c_a53ef06e29c840024a683512c1acd791a}{::template}}\ Apply<T1,T2>\ \{\};}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00059}00059\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ C,\ \textcolor{keyword}{typename}\ T1,\ \textcolor{keyword}{typename}\ T2>\ \textcolor{keyword}{struct\ }SelectIf\ :\ SelectIfCond<C::Value,\ T1,\ T2>\ \{\};}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00061}00061\ \textcolor{keyword}{template}\ <\textcolor{keywordtype}{bool}\ Cond1,\ \textcolor{keywordtype}{bool}\ Cond2>\ \textcolor{keyword}{struct\ }AndExprCond\ :\ FalseType\ \{\};}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00062}00062\ \textcolor{keyword}{template}\ <>\ \textcolor{keyword}{struct\ }AndExprCond<true,\ true>\ :\ TrueType\ \{\};}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00063}00063\ \textcolor{keyword}{template}\ <\textcolor{keywordtype}{bool}\ Cond1,\ \textcolor{keywordtype}{bool}\ Cond2>\ \textcolor{keyword}{struct\ }OrExprCond\ :\ TrueType\ \{\};}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00064}00064\ \textcolor{keyword}{template}\ <>\ \textcolor{keyword}{struct\ }OrExprCond<false,\ false>\ :\ FalseType\ \{\};}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00066}00066\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ C>\ \textcolor{keyword}{struct\ }BoolExpr\ :\ SelectIf<C,TrueType,FalseType>\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{::Type}}\ \{\};}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00067}00067\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ C>\ \textcolor{keyword}{struct\ }NotExpr\ \ :\ SelectIf<C,FalseType,TrueType>\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{::Type}}\ \{\};}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00068}00068\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ C1,\ \textcolor{keyword}{typename}\ C2>\ \textcolor{keyword}{struct\ }AndExpr\ :\ AndExprCond<C1::Value,\ C2::Value>\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{::Type}}\ \{\};}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00069}00069\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ C1,\ \textcolor{keyword}{typename}\ C2>\ \textcolor{keyword}{struct\ }OrExpr\ \ :\ OrExprCond<C1::Value,\ C2::Value>\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{::Type}}\ \{\};}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00073}00073\ \textcolor{comment}{//\ AddConst,\ MaybeAddConst,\ RemoveConst}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00074}00074\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>\ \textcolor{keyword}{struct\ }AddConst\ \{\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}};\ \};}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00075}00075\ \textcolor{keyword}{template}\ <\textcolor{keywordtype}{bool}\ Constify,\ \textcolor{keyword}{typename}\ T>\ \textcolor{keyword}{struct\ }MaybeAddConst\ :\ SelectIfCond<Constify,\ const\ T,\ T>\ \{\};}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00076}00076\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>\ \textcolor{keyword}{struct\ }RemoveConst\ \{\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}};\ \};}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00077}00077\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>\ \textcolor{keyword}{struct\ }RemoveConst<\mbox{\hyperlink{namespaceupload_a985aa9a71de3eb507344df65700c696d}{const}}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}>\ \{\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}};\ \};}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00081}00081\ \textcolor{comment}{//\ IsSame,\ IsConst,\ IsMoreConst,\ IsPointer}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00082}00082\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00083}00083\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T,\ \textcolor{keyword}{typename}\ U>\ \textcolor{keyword}{struct\ }IsSame\ :\ FalseType\ \{\};}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00084}00084\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>\ \textcolor{keyword}{struct\ }IsSame<\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}},\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}>\ :\ TrueType\ \{\};}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00085}00085\ }
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00086}00086\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>\ \textcolor{keyword}{struct\ }IsConst\ :\ FalseType\ \{\};}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00087}00087\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>\ \textcolor{keyword}{struct\ }IsConst<\mbox{\hyperlink{namespaceupload_a985aa9a71de3eb507344df65700c696d}{const}}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}>\ :\ TrueType\ \{\};}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00088}00088\ }
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00089}00089\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ CT,\ \textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00090}00090\ \textcolor{keyword}{struct\ }IsMoreConst}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00091}00091\ \ \ \ \ :\ AndExpr<IsSame<typename\ RemoveConst<CT>::Type,\ typename\ RemoveConst<T>::Type>,}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00092}00092\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BoolType<IsConst<CT>::Value\ >=\ IsConst<T>::Value>\ >\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{::Type}}\ \{\};}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00093}00093\ }
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00094}00094\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>\ \textcolor{keyword}{struct\ }IsPointer\ :\ FalseType\ \{\};}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00095}00095\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>\ \textcolor{keyword}{struct\ }IsPointer<\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*>\ :\ TrueType\ \{\};}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00096}00096\ }
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00098}00098\ \textcolor{comment}{//\ IsBaseOf}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00099}00099\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00100}00100\ \textcolor{preprocessor}{\#if\ RAPIDJSON\_HAS\_CXX11\_TYPETRAITS}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00101}00101\ }
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00102}00102\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ B,\ \textcolor{keyword}{typename}\ D>\ \textcolor{keyword}{struct\ }IsBaseOf}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00103}00103\ \ \ \ \ :\ BoolType<\ ::std::is\_base\_of<B,D>::value>\ \{\};}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00104}00104\ }
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00105}00105\ \textcolor{preprocessor}{\#else\ }\textcolor{comment}{//\ simplified\ version\ adopted\ from\ Boost}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00106}00106\ }
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00107}00107\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ B,\ \textcolor{keyword}{typename}\ D>\ \textcolor{keyword}{struct\ }IsBaseOfImpl\ \{}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00108}00108\ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_af95188da1d8eb6d4b148fe9ce71cd7c4}{RAPIDJSON\_STATIC\_ASSERT}}(\textcolor{keyword}{sizeof}(\mbox{\hyperlink{namespace_b}{B}})\ !=\ 0);}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00109}00109\ \ \ \ \ \mbox{\hyperlink{rapidjson_8h_af95188da1d8eb6d4b148fe9ce71cd7c4}{RAPIDJSON\_STATIC\_ASSERT}}(\textcolor{keyword}{sizeof}(\mbox{\hyperlink{debug_8h_a6a96826afbc53984fc8331e32328fb3b}{D}})\ !=\ 0);}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00110}00110\ }
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00111}00111\ \ \ \ \ \textcolor{keyword}{typedef}\ char\ (\&Yes)[1];}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00112}00112\ \ \ \ \ \textcolor{keyword}{typedef}\ char\ (\&No)\ [2];}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00113}00113\ }
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00114}00114\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00115}00115\ \ \ \ \ \textcolor{keyword}{static}\ Yes\ Check(\textcolor{keyword}{const}\ \mbox{\hyperlink{debug_8h_a6a96826afbc53984fc8331e32328fb3b}{D}}*,\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}});}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00116}00116\ \ \ \ \ \textcolor{keyword}{static}\ No\ \ Check(\textcolor{keyword}{const}\ \mbox{\hyperlink{namespace_b}{B}}*,\ \textcolor{keywordtype}{int});}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00117}00117\ }
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00118}00118\ \ \ \ \ \textcolor{keyword}{struct\ }Host\ \{}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00119}00119\ \ \ \ \ \ \ \ \ \textcolor{keyword}{operator}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespace_b}{B}}*()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00120}00120\ \ \ \ \ \ \ \ \ \textcolor{keyword}{operator}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{debug_8h_a6a96826afbc53984fc8331e32328fb3b}{D}}*();}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00121}00121\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00122}00122\ }
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00123}00123\ \ \ \ \ \textcolor{keyword}{enum}\ \{\ \mbox{\hyperlink{class_generic_value}{Value}}\ =\ (\textcolor{keyword}{sizeof}(Check(Host(),\ 0))\ ==\ \textcolor{keyword}{sizeof}(Yes))\ \};}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00124}00124\ \};}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00125}00125\ }
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00126}00126\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ B,\ \textcolor{keyword}{typename}\ D>\ \textcolor{keyword}{struct\ }IsBaseOf}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00127}00127\ \ \ \ \ :\ OrExpr<IsSame<B,\ D>,\ BoolExpr<IsBaseOfImpl<B,\ D>\ >\ >\mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{::Type}}\ \{\};}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00128}00128\ }
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00129}00129\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ RAPIDJSON\_HAS\_CXX11\_TYPETRAITS}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00130}00130\ }
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00131}00131\ }
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00133}00133\ \textcolor{comment}{//\ EnableIf\ /\ DisableIf}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00134}00134\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00135}00135\ \textcolor{keyword}{template}\ <\textcolor{keywordtype}{bool}\ Condition,\ \textcolor{keyword}{typename}\ T\ =\ \textcolor{keywordtype}{void}>\ \textcolor{keyword}{struct\ }EnableIfCond\ \ \{\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}};\ \};}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00136}00136\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>\ \textcolor{keyword}{struct\ }EnableIfCond<false,\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}>\ \{\ \textcolor{comment}{/*\ empty\ */}\ \};}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00137}00137\ }
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00138}00138\ \textcolor{keyword}{template}\ <\textcolor{keywordtype}{bool}\ Condition,\ \textcolor{keyword}{typename}\ T\ =\ \textcolor{keywordtype}{void}>\ \textcolor{keyword}{struct\ }DisableIfCond\ \{\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}};\ \};}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00139}00139\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>\ \textcolor{keyword}{struct\ }DisableIfCond<true,\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}>\ \{\ \textcolor{comment}{/*\ empty\ */}\ \};}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00140}00140\ }
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00141}00141\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ Condition,\ \textcolor{keyword}{typename}\ T\ =\ \textcolor{keywordtype}{void}>}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00142}00142\ \textcolor{keyword}{struct\ }EnableIf\ :\ EnableIfCond<Condition::Value,\ T>\ \{\};}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00143}00143\ }
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00144}00144\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ Condition,\ \textcolor{keyword}{typename}\ T\ =\ \textcolor{keywordtype}{void}>}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00145}00145\ \textcolor{keyword}{struct\ }DisableIf\ :\ DisableIfCond<Condition::Value,\ T>\ \{\};}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00146}00146\ }
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00147}00147\ \textcolor{comment}{//\ SFINAE\ helpers}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00148}00148\ \textcolor{keyword}{struct\ }SfinaeTag\ \{\};}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00149}00149\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>\ \textcolor{keyword}{struct\ }RemoveSfinaeTag;}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00150}00150\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>\ \textcolor{keyword}{struct\ }RemoveSfinaeTag<SfinaeTag\&(*)(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}})>\ \{\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \mbox{\hyperlink{rapidjson_8h_a1d1cfd8ffb84e947f82999c682b666a7}{Type}};\ \};}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00151}00151\ }
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00152}00152\ \textcolor{preprocessor}{\#define\ RAPIDJSON\_REMOVEFPTR\_(type)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00153}00153\ \textcolor{preprocessor}{\ \ \ \ typename\ ::RAPIDJSON\_NAMESPACE::internal::RemoveSfinaeTag\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00154}00154\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ <\ ::RAPIDJSON\_NAMESPACE::internal::SfinaeTag\&(*)\ type>::Type}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00155}00155\ }
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00156}00156\ \textcolor{preprocessor}{\#define\ RAPIDJSON\_ENABLEIF(cond)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00157}00157\ \textcolor{preprocessor}{\ \ \ \ typename\ ::RAPIDJSON\_NAMESPACE::internal::EnableIf\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00158}00158\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ <RAPIDJSON\_REMOVEFPTR\_(cond)>::Type\ *\ =\ NULL}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00159}00159\ }
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00160}00160\ \textcolor{preprocessor}{\#define\ RAPIDJSON\_DISABLEIF(cond)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00161}00161\ \textcolor{preprocessor}{\ \ \ \ typename\ ::RAPIDJSON\_NAMESPACE::internal::DisableIf\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00162}00162\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ <RAPIDJSON\_REMOVEFPTR\_(cond)>::Type\ *\ =\ NULL}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00163}00163\ }
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00164}00164\ \textcolor{preprocessor}{\#define\ RAPIDJSON\_ENABLEIF\_RETURN(cond,returntype)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00165}00165\ \textcolor{preprocessor}{\ \ \ \ typename\ ::RAPIDJSON\_NAMESPACE::internal::EnableIf\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00166}00166\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ <RAPIDJSON\_REMOVEFPTR\_(cond),\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00167}00167\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ RAPIDJSON\_REMOVEFPTR\_(returntype)>::Type}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00168}00168\ }
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00169}00169\ \textcolor{preprocessor}{\#define\ RAPIDJSON\_DISABLEIF\_RETURN(cond,returntype)\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00170}00170\ \textcolor{preprocessor}{\ \ \ \ typename\ ::RAPIDJSON\_NAMESPACE::internal::DisableIf\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00171}00171\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ <RAPIDJSON\_REMOVEFPTR\_(cond),\ \(\backslash\)}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00172}00172\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ RAPIDJSON\_REMOVEFPTR\_(returntype)>::Type}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00173}00173\ }
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00174}00174\ \}\ \textcolor{comment}{//\ namespace\ internal}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00175}00175\ \mbox{\hyperlink{group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_gaf18f052a98b9f5df5448d39484b743c1}{RAPIDJSON\_NAMESPACE\_END}}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00176}00176\ \textcolor{comment}{//@endcond}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00177}00177\ }
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00178}00178\ \textcolor{preprocessor}{\#if\ defined(\_MSC\_VER)\ \&\&\ !defined(\_\_clang\_\_)}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00179}00179\ RAPIDJSON\_DIAG\_POP}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00180}00180\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00181}00181\ }
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00182}00182\ \textcolor{preprocessor}{\#ifdef\ \_\_GNUC\_\_}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00183}00183\ RAPIDJSON\_DIAG\_POP}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00184}00184\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00185}00185\ }
+\DoxyCodeLine{\Hypertarget{meta_8h_source_l00186}00186\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ RAPIDJSON\_INTERNAL\_META\_H\_}}
+
+\end{DoxyCode}

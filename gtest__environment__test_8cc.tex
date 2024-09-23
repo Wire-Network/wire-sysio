@@ -1,0 +1,105 @@
+\doxysection{libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/test/gtest\+\_\+environment\+\_\+test.cc File Reference}
+\hypertarget{gtest__environment__test_8cc}{}\label{gtest__environment__test_8cc}\index{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/test/gtest\_environment\_test.cc@{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/test/gtest\_environment\_test.cc}}
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include "{}gtest/gtest.\+h"{}}\newline
+{\ttfamily \#include "{}src/gtest-\/internal-\/inl.\+h"{}}\newline
+Include dependency graph for gtest\+\_\+environment\+\_\+test.\+cc\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{gtest__environment__test_8cc__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacetesting}{testing}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacetesting_a20d69860ce843142c7f740262e6b0c9a}{testing\+::\+GTEST\+\_\+\+DECLARE\+\_\+string\+\_\+}} (filter)
+\item 
+int \mbox{\hyperlink{gtest__environment__test_8cc_a3c04138a5bfe5d72780bb7e82a18e627}{main}} (int argc, char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{gtest__environment__test_8cc_a3c04138a5bfe5d72780bb7e82a18e627}\index{gtest\_environment\_test.cc@{gtest\_environment\_test.cc}!main@{main}}
+\index{main@{main}!gtest\_environment\_test.cc@{gtest\_environment\_test.cc}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{gtest__environment__test_8cc_a3c04138a5bfe5d72780bb7e82a18e627} 
+int main (\begin{DoxyParamCaption}\item[{int}]{argc}{, }\item[{char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{argv}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{gtest__environment__test_8cc_source_l00134}{134}} of file \mbox{\hyperlink{gtest__environment__test_8cc_source}{gtest\+\_\+environment\+\_\+test.\+cc}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00135\ \ \ \mbox{\hyperlink{namespacetesting_afd726ae08c9bd16dc52f78c822d9946b}{testing::InitGoogleTest}}(\&argc,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}});}
+\DoxyCodeLine{00136\ }
+\DoxyCodeLine{00137\ \ \ \textcolor{comment}{//\ Registers\ a\ global\ test\ environment,\ and\ verifies\ that\ the}}
+\DoxyCodeLine{00138\ \ \ \textcolor{comment}{//\ registration\ function\ returns\ its\ argument.}}
+\DoxyCodeLine{00139\ \ \ MyEnvironment*\ \textcolor{keyword}{const}\ env\ =\ \textcolor{keyword}{new}\ MyEnvironment;}
+\DoxyCodeLine{00140\ \ \ Check(\mbox{\hyperlink{namespacetesting_a224caeebdb6586b728d204367fea1087}{testing::AddGlobalTestEnvironment}}(env)\ ==\ env,}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}AddGlobalTestEnvironment()\ should\ return\ its\ argument."{}});}
+\DoxyCodeLine{00142\ }
+\DoxyCodeLine{00143\ \ \ \textcolor{comment}{//\ Verifies\ that\ RUN\_ALL\_TESTS()\ runs\ the\ tests\ when\ the\ global}}
+\DoxyCodeLine{00144\ \ \ \textcolor{comment}{//\ set-\/up\ is\ successful.}}
+\DoxyCodeLine{00145\ \ \ Check(\mbox{\hyperlink{gtest__output__test___8cc_ae0ca194f6b730e168850ce3179ad4f63}{RunAllTests}}(env,\ NO\_FAILURE)\ !=\ 0,}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}RUN\_ALL\_TESTS()\ should\ return\ non-\/zero,\ as\ the\ global\ tear-\/down\ "{}}}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}should\ generate\ a\ failure."{}});}
+\DoxyCodeLine{00148\ \ \ Check(test\_was\_run,}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}The\ tests\ should\ run,\ as\ the\ global\ set-\/up\ should\ generate\ no\ "{}}}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}failure"{}});}
+\DoxyCodeLine{00151\ \ \ Check(env-\/>tear\_down\_was\_run(),}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}The\ global\ tear-\/down\ should\ run,\ as\ the\ global\ set-\/up\ was\ run."{}});}
+\DoxyCodeLine{00153\ }
+\DoxyCodeLine{00154\ \ \ \textcolor{comment}{//\ Verifies\ that\ RUN\_ALL\_TESTS()\ runs\ the\ tests\ when\ the\ global}}
+\DoxyCodeLine{00155\ \ \ \textcolor{comment}{//\ set-\/up\ generates\ no\ fatal\ failure.}}
+\DoxyCodeLine{00156\ \ \ Check(\mbox{\hyperlink{gtest__output__test___8cc_ae0ca194f6b730e168850ce3179ad4f63}{RunAllTests}}(env,\ NON\_FATAL\_FAILURE)\ !=\ 0,}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}RUN\_ALL\_TESTS()\ should\ return\ non-\/zero,\ as\ both\ the\ global\ set-\/up\ "{}}}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}and\ the\ global\ tear-\/down\ should\ generate\ a\ non-\/fatal\ failure."{}});}
+\DoxyCodeLine{00159\ \ \ Check(test\_was\_run,}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}The\ tests\ should\ run,\ as\ the\ global\ set-\/up\ should\ generate\ no\ "{}}}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}fatal\ failure."{}});}
+\DoxyCodeLine{00162\ \ \ Check(env-\/>tear\_down\_was\_run(),}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}The\ global\ tear-\/down\ should\ run,\ as\ the\ global\ set-\/up\ was\ run."{}});}
+\DoxyCodeLine{00164\ }
+\DoxyCodeLine{00165\ \ \ \textcolor{comment}{//\ Verifies\ that\ RUN\_ALL\_TESTS()\ runs\ no\ test\ when\ the\ global\ set-\/up}}
+\DoxyCodeLine{00166\ \ \ \textcolor{comment}{//\ generates\ a\ fatal\ failure.}}
+\DoxyCodeLine{00167\ \ \ Check(\mbox{\hyperlink{gtest__output__test___8cc_ae0ca194f6b730e168850ce3179ad4f63}{RunAllTests}}(env,\ FATAL\_FAILURE)\ !=\ 0,}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}RUN\_ALL\_TESTS()\ should\ return\ non-\/zero,\ as\ the\ global\ set-\/up\ "{}}}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}should\ generate\ a\ fatal\ failure."{}});}
+\DoxyCodeLine{00170\ \ \ Check(!test\_was\_run,}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}The\ tests\ should\ not\ run,\ as\ the\ global\ set-\/up\ should\ generate\ "{}}}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}a\ fatal\ failure."{}});}
+\DoxyCodeLine{00173\ \ \ Check(env-\/>tear\_down\_was\_run(),}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}The\ global\ tear-\/down\ should\ run,\ as\ the\ global\ set-\/up\ was\ run."{}});}
+\DoxyCodeLine{00175\ }
+\DoxyCodeLine{00176\ \ \ \textcolor{comment}{//\ Verifies\ that\ RUN\_ALL\_TESTS()\ doesn't\ do\ global\ set-\/up\ or}}
+\DoxyCodeLine{00177\ \ \ \textcolor{comment}{//\ tear-\/down\ when\ there\ is\ no\ test\ to\ run.}}
+\DoxyCodeLine{00178\ \ \ testing::GTEST\_FLAG(filter)\ =\ \textcolor{stringliteral}{"{}-\/*"{}};}
+\DoxyCodeLine{00179\ \ \ Check(\mbox{\hyperlink{gtest__output__test___8cc_ae0ca194f6b730e168850ce3179ad4f63}{RunAllTests}}(env,\ NO\_FAILURE)\ ==\ 0,}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}RUN\_ALL\_TESTS()\ should\ return\ zero,\ as\ there\ is\ no\ test\ to\ run."{}});}
+\DoxyCodeLine{00181\ \ \ Check(!env-\/>set\_up\_was\_run(),}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}The\ global\ set-\/up\ should\ not\ run,\ as\ there\ is\ no\ test\ to\ run."{}});}
+\DoxyCodeLine{00183\ \ \ Check(!env-\/>tear\_down\_was\_run(),}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}The\ global\ tear-\/down\ should\ not\ run,\ "{}}}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}as\ the\ global\ set-\/up\ was\ not\ run."{}});}
+\DoxyCodeLine{00186\ }
+\DoxyCodeLine{00187\ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}PASS\(\backslash\)n"{}});}
+\DoxyCodeLine{00188\ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00189\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{gtest__environment__test_8cc_a3c04138a5bfe5d72780bb7e82a18e627_cgraph}
+\end{center}
+\end{figure}

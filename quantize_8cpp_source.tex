@@ -1,0 +1,235 @@
+\doxysection{quantize.\+cpp}
+\hypertarget{quantize_8cpp_source}{}\label{quantize_8cpp_source}\index{libraries/fc/libraries/ff/depends/xbyak/sample/quantize.cpp@{libraries/fc/libraries/ff/depends/xbyak/sample/quantize.cpp}}
+\mbox{\hyperlink{quantize_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00002}00002\ \textcolor{comment}{\ \ \ \ @author\ herumi}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00003}00003\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00004}00004\ \textcolor{comment}{\ \ \ \ JPEG\ quantize\ sample}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00005}00005\ \textcolor{comment}{\ \ \ \ This\ program\ generates\ a\ quantization\ routine\ by\ using\ fast\ division\ algorithm\ in\ run-\/time.}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00006}00006\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00007}00007\ \textcolor{comment}{\ \ \ \ time(sec)}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00008}00008\ \textcolor{comment}{\ \ \ \ quality\ \ 1(low)\ 10\ \ \ \ \ 50\ \ \ 100(high)}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00009}00009\ \textcolor{comment}{\ \ \ \ VC2005\ \ \ 8.0\ \ \ \ \ 8.0\ \ \ 8.0\ \ 8.0}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00010}00010\ \textcolor{comment}{\ \ \ \ Xbyak\ \ \ \ 1.6\ \ \ \ \ 0.8\ \ \ 0.5\ \ 0.5}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00011}00011\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00012}00012\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00013}00013\ \textcolor{comment}{;\ generated\ code\ at\ q\ =\ 100}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00014}00014\ \textcolor{comment}{\ \ \ \ push\ \ \ \ \ \ \ \ esi}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00015}00015\ \textcolor{comment}{\ \ \ \ push\ \ \ \ \ \ \ \ edi}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00016}00016\ \textcolor{comment}{\ \ \ \ mov\ \ \ \ \ \ \ \ \ edi,dword\ ptr\ [esp+0Ch]}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00017}00017\ \textcolor{comment}{\ \ \ \ mov\ \ \ \ \ \ \ \ \ esi,dword\ ptr\ [esp+10h]}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00018}00018\ \textcolor{comment}{\ \ \ \ mov\ \ \ \ \ \ \ \ \ eax,dword\ ptr\ [esi]}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00019}00019\ \textcolor{comment}{\ \ \ \ shr\ \ \ \ \ \ \ \ \ eax,4}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00020}00020\ \textcolor{comment}{\ \ \ \ mov\ \ \ \ \ \ \ \ \ dword\ ptr\ [edi],eax}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00021}00021\ \textcolor{comment}{\ \ \ \ mov\ \ \ \ \ \ \ \ \ eax,dword\ ptr\ [esi+4]}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00022}00022\ \textcolor{comment}{\ \ \ \ mov\ \ \ \ \ \ \ \ \ edx,0BA2E8BA3h}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00023}00023\ \textcolor{comment}{\ \ \ \ mul\ \ \ \ \ \ \ \ \ eax,edx}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00024}00024\ \textcolor{comment}{\ \ \ \ shr\ \ \ \ \ \ \ \ \ edx,3}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00025}00025\ \textcolor{comment}{\ \ \ \ ...}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00026}00026\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00027}00027\ \textcolor{comment}{;\ generated\ code\ at\ q\ =\ 100}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00028}00028\ \textcolor{comment}{\ \ \ \ \ push\ \ \ \ \ \ \ \ esi}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00029}00029\ \textcolor{comment}{\ \ \ \ \ push\ \ \ \ \ \ \ \ edi}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00030}00030\ \textcolor{comment}{\ \ \ \ \ mov\ \ \ \ \ \ \ \ \ edi,dword\ ptr\ [esp+0Ch]}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00031}00031\ \textcolor{comment}{\ \ \ \ \ mov\ \ \ \ \ \ \ \ \ esi,dword\ ptr\ [esp+10h]}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00032}00032\ \textcolor{comment}{\ \ \ \ \ mov\ \ \ \ \ \ \ \ \ eax,dword\ ptr\ [esi]}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00033}00033\ \textcolor{comment}{\ \ \ \ \ mov\ \ \ \ \ \ \ \ \ dword\ ptr\ [edi],eax}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00034}00034\ \textcolor{comment}{\ \ \ \ \ mov\ \ \ \ \ \ \ \ \ eax,dword\ ptr\ [esi+4]}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00035}00035\ \textcolor{comment}{\ \ \ \ \ mov\ \ \ \ \ \ \ \ \ dword\ ptr\ [edi+4],eax}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00036}00036\ \textcolor{comment}{\ \ \ \ \ mov\ \ \ \ \ \ \ \ \ eax,dword\ ptr\ [esi+8]}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00037}00037\ \textcolor{comment}{\ \ \ \ \ mov\ \ \ \ \ \ \ \ \ dword\ ptr\ [edi+8],eax}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00038}00038\ \textcolor{comment}{\ \ \ \ \ mov\ \ \ \ \ \ \ \ \ eax,dword\ ptr\ [esi+0Ch]}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00039}00039\ \textcolor{comment}{\ \ \ \ \ ...}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00040}00040\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00041}00041\ \textcolor{comment}{*/}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00042}00042\ \textcolor{preprocessor}{\#include\ <stdio.h>}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00043}00043\ \textcolor{preprocessor}{\#include\ <stdlib.h>}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00044}00044\ \textcolor{preprocessor}{\#include\ <time.h>}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00045}\mbox{\hyperlink{quantize_8cpp_a3ede98665532cce0e33f614fac5150f9}{00045}}\ \textcolor{preprocessor}{\#define\ XBYAK\_NO\_OP\_NAMES}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00046}00046\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{xbyak_8h}{xbyak/xbyak.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00047}00047\ \textcolor{preprocessor}{\#ifdef\ \_MSC\_VER}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00048}00048\ \textcolor{preprocessor}{\ \ \ \ \#pragma\ warning(disable\ :\ 4996)\ }\textcolor{comment}{//\ scanf}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00049}00049\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00051}\mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{00051}}\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{namespace_xbyak_a5ea59b56f14f1cebf4144f0ed49fcdad}{Xbyak::uint64}}\ \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}};}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00052}\mbox{\hyperlink{quantize_8cpp_adc6d195cb6337a3d1d86db3f0947a3b8}{00052}}\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{namespace_xbyak_a880d0e902046fa68ba57ae3fbc4acdf3}{Xbyak::uint32}}\ \mbox{\hyperlink{quantize_8cpp_adc6d195cb6337a3d1d86db3f0947a3b8}{uint32}};}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00054}\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{00054}}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\ =\ 64;}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00056}\mbox{\hyperlink{class_quantize}{00056}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_quantize}{Quantize}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{class_xbyak_1_1_code_generator}{Xbyak::CodeGenerator}}\ \{}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00057}00057\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ ilog2(\textcolor{keywordtype}{int}\ x)}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00058}00058\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00059}00059\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ shift\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00060}00060\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ ((1\ <<\ shift)\ <=\ x)\ shift++;}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00061}00061\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ shift\ -\/\ 1;}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00062}00062\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00063}00063\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00064}00064\ \ \ \ \ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00065}00065\ \textcolor{comment}{\ \ \ \ \ \ \ \ input\ :\ esi}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00066}00066\ \textcolor{comment}{\ \ \ \ \ \ \ \ output\ :\ eax\ =\ [esi+offset]\ /\ dividend}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00067}00067\ \textcolor{comment}{\ \ \ \ \ \ \ \ destroy\ :\ edx}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00068}00068\ \textcolor{comment}{\ \ \ \ */}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00069}\mbox{\hyperlink{class_quantize_af8194a122fe9a4914845110e25207f9e}{00069}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_quantize_af8194a122fe9a4914845110e25207f9e}{udiv}}(\mbox{\hyperlink{quantize_8cpp_adc6d195cb6337a3d1d86db3f0947a3b8}{uint32}}\ dividend,\ \textcolor{keywordtype}{int}\ offset)}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00070}00070\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00071}00071\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_code_generator_ac01f285f4da251eb2fa144d5c49c9e3e}{mov}}(\mbox{\hyperlink{class_xbyak_1_1_code_generator_a682bca64626bf98c33660e1e245392d1}{eax}},\ \mbox{\hyperlink{class_xbyak_1_1_code_generator_afed7c06309f882ffc109dd9136eb3ee1}{ptr}}[\mbox{\hyperlink{class_xbyak_1_1_code_generator_ac8e01e4935949b4f0eefc2d9ea358039}{esi}}\ +\ offset]);}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00073}00073\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ dividend\ =\ odd\ x\ 2\string^exponent\ */}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00074}00074\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ exponent\ =\ 0,\ odd\ =\ dividend;}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00075}00075\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ ((odd\ \&\ 1)\ ==\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \ \ \ odd\ >>=\ 1;\ exponent++;}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00077}00077\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00079}00079\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (odd\ ==\ 1)\ \{\ \textcolor{comment}{//\ trivial\ case}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00080}00080\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (exponent)\ \{}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00081}00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_code_generator_a011edc965ef0d25802ddcd32f8c93f0c}{shr}}(\mbox{\hyperlink{class_xbyak_1_1_code_generator_a682bca64626bf98c33660e1e245392d1}{eax}},\ exponent);}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00082}00082\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00083}00083\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00084}00084\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00085}00085\ }
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00086}00086\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}}\ mLow,\ mHigh;}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00087}00087\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ =\ ilog2(odd)\ +\ 1;}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00088}00088\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00089}00089\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}}\ roundUp\ =\ \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}}(1)\ <<\ (32\ +\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}});}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00090}00090\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}}\ k\ =\ roundUp\ /\ (0xFFFFFFFFL\ -\/\ (0xFFFFFFFFL\ \%\ odd));}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00091}00091\ \ \ \ \ \ \ \ \ \ \ \ \ mLow\ =\ roundUp\ /\ odd;}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00092}00092\ \ \ \ \ \ \ \ \ \ \ \ \ mHigh\ =\ (roundUp\ +\ k)\ /\ odd;}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00093}00093\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00094}00094\ }
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00095}00095\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (((mLow\ >>\ 1)\ <\ (mHigh\ >>\ 1))\ \&\&\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ >\ 0))\ \{}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00096}00096\ \ \ \ \ \ \ \ \ \ \ \ \ mLow\ >>=\ 1;\ mHigh\ >>=\ 1;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}-\/-\/;}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00097}00097\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00098}00098\ }
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00099}00099\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}}\ m;\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}};}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00100}00100\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((mHigh\ >>\ 32)\ ==\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00101}00101\ \ \ \ \ \ \ \ \ \ \ \ \ m\ =\ mHigh;\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00102}00102\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00103}00103\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ =\ ilog2(odd);}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00104}00104\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}}\ roundDown\ =\ \mbox{\hyperlink{quantize_8cpp_a4c385e9e70ea96103bb1140a3a855f88}{uint64}}(1)\ <<\ (32\ +\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}});}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00105}00105\ \ \ \ \ \ \ \ \ \ \ \ \ mLow\ =\ roundDown\ /\ odd;}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00106}00106\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ =\ (int)(roundDown\ \%\ odd);}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00107}00107\ \ \ \ \ \ \ \ \ \ \ \ \ m\ =\ (\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ <=\ (odd\ >>\ 1))\ ?\ mLow\ :\ mLow\ +\ 1;}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00108}00108\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00109}00109\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00110}00110\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ ((m\ \&\ 1)\ ==\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00111}00111\ \ \ \ \ \ \ \ \ \ \ \ \ m\ >>=\ 1;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}-\/-\/;}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00112}00112\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00113}00113\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}\ +=\ exponent;}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00114}00114\ }
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00115}00115\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_code_generator_ac01f285f4da251eb2fa144d5c49c9e3e}{mov}}(\mbox{\hyperlink{class_xbyak_1_1_code_generator_ab442b30a131a655e6a8b3d47a80935a6}{edx}},\ \textcolor{keywordtype}{int}(m));}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00116}00116\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_code_generator_ac3b0ab2f00e1ad6dc56dc8f71c700f2e}{mul}}(\mbox{\hyperlink{class_xbyak_1_1_code_generator_ab442b30a131a655e6a8b3d47a80935a6}{edx}});}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00117}00117\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})\ \{}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00118}00118\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_code_generator_a85fe10a4f726797de78179d535bcb626}{add}}(\mbox{\hyperlink{class_xbyak_1_1_code_generator_a682bca64626bf98c33660e1e245392d1}{eax}},\ \textcolor{keywordtype}{int}(m));}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00119}00119\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_code_generator_aa850d76e3477ca7a5f5cf6398a5bc059}{adc}}(\mbox{\hyperlink{class_xbyak_1_1_code_generator_ab442b30a131a655e6a8b3d47a80935a6}{edx}},\ 0);}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00120}00120\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00121}00121\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}})\ \{}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00122}00122\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_code_generator_a011edc965ef0d25802ddcd32f8c93f0c}{shr}}(\mbox{\hyperlink{class_xbyak_1_1_code_generator_ab442b30a131a655e6a8b3d47a80935a6}{edx}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}});}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00123}00123\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00124}00124\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_code_generator_ac01f285f4da251eb2fa144d5c49c9e3e}{mov}}(\mbox{\hyperlink{class_xbyak_1_1_code_generator_a682bca64626bf98c33660e1e245392d1}{eax}},\ \mbox{\hyperlink{class_xbyak_1_1_code_generator_ab442b30a131a655e6a8b3d47a80935a6}{edx}});}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00125}00125\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00126}00126\ \ \ \ \ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00127}00127\ \textcolor{comment}{\ \ \ \ \ \ \ \ quantize(uint32\ dest[64],\ const\ uint32\ src[64]);}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00128}00128\ \textcolor{comment}{\ \ \ \ */}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00129}\mbox{\hyperlink{class_quantize_a1b8d2785e8999436c540b62c0017ffa4}{00129}}\ \ \ \ \ \mbox{\hyperlink{class_quantize_a1b8d2785e8999436c540b62c0017ffa4}{Quantize}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{quantize_8cpp_adc6d195cb6337a3d1d86db3f0947a3b8}{uint32}}\ qTbl[64])}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00130}00130\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00131}00131\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_code_generator_ae513f3d12caeb0efc2cbd4eac7c5bb58}{push}}(\mbox{\hyperlink{class_xbyak_1_1_code_generator_ac8e01e4935949b4f0eefc2d9ea358039}{esi}});}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00132}00132\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_code_generator_ae513f3d12caeb0efc2cbd4eac7c5bb58}{push}}(\mbox{\hyperlink{class_xbyak_1_1_code_generator_aa208bc8a6eb35d5906103ffbbf1b3b6e}{edi}});}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00133}00133\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ P\_\ =\ 4\ *\ 2;}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00134}00134\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_code_generator_ac01f285f4da251eb2fa144d5c49c9e3e}{mov}}(\mbox{\hyperlink{class_xbyak_1_1_code_generator_aa208bc8a6eb35d5906103ffbbf1b3b6e}{edi}},\ \mbox{\hyperlink{class_xbyak_1_1_code_generator_afed7c06309f882ffc109dd9136eb3ee1}{ptr}}\ [\mbox{\hyperlink{class_xbyak_1_1_code_generator_a677a65f34079fe5e53c397f0fb00e018}{esp}}+P\_+4]);\ \textcolor{comment}{//\ dest}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00135}00135\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_code_generator_ac01f285f4da251eb2fa144d5c49c9e3e}{mov}}(\mbox{\hyperlink{class_xbyak_1_1_code_generator_ac8e01e4935949b4f0eefc2d9ea358039}{esi}},\ \mbox{\hyperlink{class_xbyak_1_1_code_generator_afed7c06309f882ffc109dd9136eb3ee1}{ptr}}\ [\mbox{\hyperlink{class_xbyak_1_1_code_generator_a677a65f34079fe5e53c397f0fb00e018}{esp}}+P\_+8]);\ \textcolor{comment}{//\ src}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00136}00136\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}};\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00137}00137\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_quantize_af8194a122fe9a4914845110e25207f9e}{udiv}}(qTbl[i],\ i\ *\ 4);}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00138}00138\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_code_generator_ac01f285f4da251eb2fa144d5c49c9e3e}{mov}}(\mbox{\hyperlink{class_xbyak_1_1_code_generator_afed7c06309f882ffc109dd9136eb3ee1}{ptr}}[\mbox{\hyperlink{class_xbyak_1_1_code_generator_aa208bc8a6eb35d5906103ffbbf1b3b6e}{edi}}+i*4],\ \mbox{\hyperlink{class_xbyak_1_1_code_generator_a682bca64626bf98c33660e1e245392d1}{eax}});}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00139}00139\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00140}00140\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_code_generator_ac1b0566b3d5caa1fc1c5275d9b85081b}{pop}}(\mbox{\hyperlink{class_xbyak_1_1_code_generator_aa208bc8a6eb35d5906103ffbbf1b3b6e}{edi}});}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00141}00141\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1_code_generator_ac1b0566b3d5caa1fc1c5275d9b85081b}{pop}}(\mbox{\hyperlink{class_xbyak_1_1_code_generator_ac8e01e4935949b4f0eefc2d9ea358039}{esi}});}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00142}00142\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}();}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00143}00143\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00144}00144\ \};}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00145}00145\ }
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00146}\mbox{\hyperlink{quantize_8cpp_a94a8660c2acc75eab65b9b8ee501901c}{00146}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{quantize_8cpp_a94a8660c2acc75eab65b9b8ee501901c}{quantize}}(\mbox{\hyperlink{quantize_8cpp_adc6d195cb6337a3d1d86db3f0947a3b8}{uint32}}\ dest[64],\ \textcolor{keyword}{const}\ \mbox{\hyperlink{quantize_8cpp_adc6d195cb6337a3d1d86db3f0947a3b8}{uint32}}\ src[64],\ \textcolor{keyword}{const}\ \mbox{\hyperlink{quantize_8cpp_adc6d195cb6337a3d1d86db3f0947a3b8}{uint32}}\ qTbl[64])}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00147}00147\ \{}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00148}00148\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}};\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00149}00149\ \ \ \ \ \ \ \ \ dest[i]\ =\ src[i]\ /\ qTbl[i];}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00150}00150\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00151}00151\ \}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00152}00152\ }
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00153}00153\ \textcolor{preprocessor}{\#ifdef\ XBYAK64}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00154}00154\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}()}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00155}00155\ \{}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00156}00156\ \ \ \ \ puts(\textcolor{stringliteral}{"{}not\ implemented\ for\ 64bit"{}});}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00157}00157\ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00158}00158\ \}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00159}00159\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00160}\mbox{\hyperlink{quantize_8cpp_a0ddf1224851353fc92bfbff6f499fa97}{00160}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}(\textcolor{keywordtype}{int}\ argc,\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[])}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00161}00161\ \{}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00162}00162\ \ \ \ \ \textcolor{keywordtype}{int}\ q;}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00163}00163\ \ \ \ \ \textcolor{keywordflow}{if}\ (argc\ >\ 1)\ \{}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00164}00164\ \ \ \ \ \ \ \ \ q\ =\ atoi(\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[1]);}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00165}00165\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00166}00166\ \ \ \ \ \ \ \ \ printf(\textcolor{stringliteral}{"{}input\ quantize="{}});}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00167}00167\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (scanf(\textcolor{stringliteral}{"{}\%d"{}},\ \&q)\ !=\ 1)\ \{}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00168}00168\ \ \ \ \ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}bad\ number\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00169}00169\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00170}00170\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00171}00171\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00172}00172\ \ \ \ \ printf(\textcolor{stringliteral}{"{}q=\%d\(\backslash\)n"{}},\ q);}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00173}00173\ \ \ \ \ \mbox{\hyperlink{quantize_8cpp_adc6d195cb6337a3d1d86db3f0947a3b8}{uint32}}\ qTbl[]\ =\ \{}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00174}00174\ \ \ \ \ \ \ \ \ 16,\ 11,\ 10,\ 16,\ 24,\ 40,\ 51,\ 61,}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00175}00175\ \ \ \ \ \ \ \ \ 12,\ 12,\ 14,\ 19,\ 26,\ 58,\ 60,\ 55,}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00176}00176\ \ \ \ \ \ \ \ \ 14,\ 13,\ 16,\ 24,\ 40,\ 57,\ 69,\ 56,}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00177}00177\ \ \ \ \ \ \ \ \ 14,\ 17,\ 22,\ 29,\ 51,\ 87,\ 80,\ 62,}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00178}00178\ \ \ \ \ \ \ \ \ 18,\ 22,\ 37,\ 56,\ 68,\ 109,\ 103,\ 77,}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00179}00179\ \ \ \ \ \ \ \ \ 24,\ 35,\ 55,\ 64,\ 81,\ 104,\ 113,\ 92,}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00180}00180\ \ \ \ \ \ \ \ \ 49,\ 64,\ 78,\ 87,\ 103,\ 121,\ 120,\ 101,}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00181}00181\ \ \ \ \ \ \ \ \ 72,\ 92,\ 95,\ 98,\ 112,\ 100,\ 103,\ 99}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00182}00182\ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00183}00183\ }
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00184}00184\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}};\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00185}00185\ \ \ \ \ \ \ \ \ qTbl[i]\ /=\ q;}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00186}00186\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (qTbl[i]\ ==\ 0)\ qTbl[i]\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00187}00187\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00188}00188\ }
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00189}00189\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00190}00190\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{quantize_8cpp_adc6d195cb6337a3d1d86db3f0947a3b8}{uint32}}\ src[\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}];}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00191}00191\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{quantize_8cpp_adc6d195cb6337a3d1d86db3f0947a3b8}{uint32}}\ dest[\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}];}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00192}00192\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{quantize_8cpp_adc6d195cb6337a3d1d86db3f0947a3b8}{uint32}}\ dest2[\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}];}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00193}00193\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}};\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00194}00194\ \ \ \ \ \ \ \ \ \ \ \ \ src[i]\ =\ rand()\ \%\ 2048;}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00195}00195\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00196}00196\ }
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00197}00197\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_quantize}{Quantize}}\ jit(qTbl);}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00198}00198\ \textcolor{comment}{//printf("{}jit\ size=\%d,\ ptr=\%p\(\backslash\)n"{},\ jit.getSize(),\ jit.getCode());}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00199}00199\ \ \ \ \ \ \ \ \ void\ (*quantize2)(\mbox{\hyperlink{quantize_8cpp_adc6d195cb6337a3d1d86db3f0947a3b8}{uint32}}*,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{quantize_8cpp_adc6d195cb6337a3d1d86db3f0947a3b8}{uint32}}*,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{quantize_8cpp_adc6d195cb6337a3d1d86db3f0947a3b8}{uint32}}\ *)\ =\ jit.\mbox{\hyperlink{class_xbyak_1_1_code_array_a9ad8a38842d1e0de9045338e460f58ce}{getCode}}<void\ (*)(\mbox{\hyperlink{quantize_8cpp_adc6d195cb6337a3d1d86db3f0947a3b8}{uint32}}*,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{quantize_8cpp_adc6d195cb6337a3d1d86db3f0947a3b8}{uint32}}*,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{quantize_8cpp_adc6d195cb6337a3d1d86db3f0947a3b8}{uint32}}\ *)>();}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00200}00200\ }
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00201}00201\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{quantize_8cpp_a94a8660c2acc75eab65b9b8ee501901c}{quantize}}(dest,\ src,\ qTbl);}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00202}00202\ \ \ \ \ \ \ \ \ quantize2(dest2,\ src,\ qTbl);}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00203}00203\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}};\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00204}00204\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (dest[i]\ !=\ dest2[i])\ \{}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00205}00205\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ printf(\textcolor{stringliteral}{"{}err[\%d]\ \%d\ \%d\(\backslash\)n"{}},\ i,\ dest[i],\ dest2[i]);}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00206}00206\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00207}00207\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00208}00208\ }
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00209}00209\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ =\ 10000000;}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00210}00210\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ begin;}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00211}00211\ }
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00212}00212\ \ \ \ \ \ \ \ \ begin\ =\ clock();}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00213}00213\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}};\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00214}00214\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{quantize_8cpp_a94a8660c2acc75eab65b9b8ee501901c}{quantize}}(dest,\ src,\ qTbl);}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00215}00215\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00216}00216\ \ \ \ \ \ \ \ \ printf(\textcolor{stringliteral}{"{}time=\%.1fsec\(\backslash\)n"{}},\ (clock()\ -\/\ begin)\ /\ \textcolor{keywordtype}{double}(CLOCKS\_PER\_SEC));}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00217}00217\ }
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00218}00218\ \ \ \ \ \ \ \ \ begin\ =\ clock();}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00219}00219\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}};\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00220}00220\ \ \ \ \ \ \ \ \ \ \ \ \ quantize2(dest,\ src,\ qTbl);}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00221}00221\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00222}00222\ \ \ \ \ \ \ \ \ printf(\textcolor{stringliteral}{"{}time=\%.1fsec\(\backslash\)n"{}},\ (clock()\ -\/\ begin)\ /\ \textcolor{keywordtype}{double}(CLOCKS\_PER\_SEC));}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00223}00223\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (std::exception\&\ e)\ \{}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00224}00224\ \ \ \ \ \ \ \ \ printf(\textcolor{stringliteral}{"{}ERR:\%s\(\backslash\)n"{}},\ e.what());}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00225}00225\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00226}00226\ \ \ \ \ \ \ \ \ printf(\textcolor{stringliteral}{"{}unknown\ error\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00227}00227\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00228}00228\ \}}
+\DoxyCodeLine{\Hypertarget{quantize_8cpp_source_l00229}00229\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

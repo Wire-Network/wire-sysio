@@ -1,0 +1,28 @@
+<map id="extF80M_div" name="extF80M_div">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,181,102,207"/>
+<area shape="rect" id="Node000002" href="$sys-vm_2external_2softfloat_2source_2s__approx_recip32__1_8c.html#ab7bc940e25571ca395a242b7d66a84d1" title=" " alt="" coords="169,5,346,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="57,180,68,150,87,112,114,73,148,40,155,36,158,40,151,44,118,77,92,115,73,153,62,182"/>
+<area shape="rect" id="Node000003" href="$sys-vm_2external_2softfloat_2source_2s__compare96_m_8c.html#a203c16f1346caf73f16d115d9b8f35a9" title=" " alt="" coords="182,55,332,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="63,179,97,139,121,116,148,97,178,83,180,88,151,102,125,121,101,143,67,183"/>
+<area shape="rect" id="Node000004" href="$sys-vm_2external_2softfloat_2source_2s__invalid_ext_f80_m_8c.html#a51f71a27584700f84c2ede116f7054e0" title=" " alt="" coords="436,105,602,131"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="77,178,110,162,149,148,219,133,291,123,421,115,421,120,291,128,220,138,150,153,112,167,79,183"/>
+<area shape="rect" id="Node000005" href="$softfloat_2source_28086-_s_s_e_2softfloat__raise_flags_8c.html#ac16bbf09eca0fe8ff91301d82c5a667f" title=" " alt="" coords="690,181,826,207"/>
+<area shape="poly" id="edge6_Node000001_Node000005" title=" " alt="" coords="102,192,675,192,675,197,102,197"/>
+<area shape="rect" id="Node000006" href="$sys-vm_2external_2softfloat_2source_2s__norm_ext_f80_sig_m_8c.html#ab73bb43a318bc3d5545a502f56021396" title=" " alt="" coords="169,207,346,232"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="102,197,154,204,153,209,102,203"/>
+<area shape="rect" id="Node000007" href="$sys-vm_2external_2softfloat_2source_2s__round_pack_m_to_ext_f80_m_8c.html#a8802bf23c23a2c61013bff6f58327adf" title=" " alt="" coords="150,256,365,282"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="77,205,111,224,151,242,171,249,169,254,149,247,109,229,75,210"/>
+<area shape="rect" id="Node000009" href="$sys-vm_2external_2softfloat_2source_2s__short_shift_left64_to96_m_8c.html#ab1211fd0fdca9812ad95810294163f46" title=" " alt="" coords="174,306,341,346"/>
+<area shape="poly" id="edge10_Node000001_Node000009" title=" " alt="" coords="66,206,100,248,124,272,151,292,161,297,158,302,148,296,121,276,96,252,62,209"/>
+<area shape="rect" id="Node000010" href="$sys-vm_2external_2softfloat_2source_2s__try_propagate_na_n_ext_f80_m_8c.html#a5da15212eaf2079cda13b971a0e5af37" title=" " alt="" coords="174,371,340,412"/>
+<area shape="poly" id="edge11_Node000001_Node000010" title=" " alt="" coords="61,207,72,237,91,278,117,320,151,356,162,363,159,368,148,360,113,323,86,280,67,239,56,208"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="566,129,626,148,704,173,702,178,625,153,565,134"/>
+<area shape="poly" id="edge8_Node000007_Node000005" title=" " alt="" coords="344,253,413,242,675,203,676,209,413,247,345,258"/>
+<area shape="rect" id="Node000008" href="$sys-vm_2external_2softfloat_2source_2s__shift_right_jam64_8c.html#ae2ed4d70d1f8a6da983a01ecc027280f" title=" " alt="" coords="434,257,604,283"/>
+<area shape="poly" id="edge9_Node000007_Node000008" title=" " alt="" coords="366,267,419,267,419,272,366,272"/>
+<area shape="rect" id="Node000011" href="$softfloat_2source_28086-_s_s_e_2s__propagate_na_n_ext_f80_m_8c.html#a6d1fff7785c3407c872c7c2147223b5a" title=" " alt="" coords="413,343,625,368"/>
+<area shape="poly" id="edge12_Node000010_Node000011" title=" " alt="" coords="341,377,405,368,406,374,341,383"/>
+<area shape="poly" id="edge14_Node000011_Node000005" title=" " alt="" coords="545,340,624,293,728,215,731,219,627,298,547,344"/>
+<area shape="rect" id="Node000012" href="$softfloat_2source_28086-_s_s_e_2ext_f80_m__is_signaling_na_n_8c.html#ace8e5230b332cd22bdf612d80da1a3de" title=" " alt="" coords="673,343,843,368"/>
+<area shape="poly" id="edge13_Node000011_Node000012" title=" " alt="" coords="626,353,658,353,658,358,626,358"/>
+</map>

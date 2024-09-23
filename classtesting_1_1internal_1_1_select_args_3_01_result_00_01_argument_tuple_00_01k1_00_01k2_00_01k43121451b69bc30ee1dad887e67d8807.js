@@ -1,0 +1,5 @@
+var classtesting_1_1internal_1_1_select_args_3_01_result_00_01_argument_tuple_00_01k1_00_01k2_00_01k43121451b69bc30ee1dad887e67d8807 =
+[
+    [ "SelectedArgs", "classtesting_1_1internal_1_1_select_args_3_01_result_00_01_argument_tuple_00_01k1_00_01k2_00_01k43121451b69bc30ee1dad887e67d8807.html#a1762d24ce9db406d53143fc96343826f", null ],
+    [ "type", "classtesting_1_1internal_1_1_select_args_3_01_result_00_01_argument_tuple_00_01k1_00_01k2_00_01k43121451b69bc30ee1dad887e67d8807.html#a9b49d725a4a015877d422e16cbe52f6f", null ]
+];

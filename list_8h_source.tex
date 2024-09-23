@@ -1,0 +1,60 @@
+\doxysection{list.\+h}
+\hypertarget{list_8h_source}{}\label{list_8h_source}\index{libraries/yubihsm/pkcs11/list.h@{libraries/yubihsm/pkcs11/list.h}}
+\mbox{\hyperlink{list_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{list_8h_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{list_8h_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ 2015-\/2018\ Yubico\ AB}}
+\DoxyCodeLine{\Hypertarget{list_8h_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{list_8h_source_l00004}00004\ \textcolor{comment}{\ *\ Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{\Hypertarget{list_8h_source_l00005}00005\ \textcolor{comment}{\ *\ you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{list_8h_source_l00006}00006\ \textcolor{comment}{\ *\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{\Hypertarget{list_8h_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{list_8h_source_l00008}00008\ \textcolor{comment}{\ *\ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{\Hypertarget{list_8h_source_l00009}00009\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{list_8h_source_l00010}00010\ \textcolor{comment}{\ *\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{\Hypertarget{list_8h_source_l00011}00011\ \textcolor{comment}{\ *\ distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{\Hypertarget{list_8h_source_l00012}00012\ \textcolor{comment}{\ *\ WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{\Hypertarget{list_8h_source_l00013}00013\ \textcolor{comment}{\ *\ See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{\Hypertarget{list_8h_source_l00014}00014\ \textcolor{comment}{\ *\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{list_8h_source_l00015}00015\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{list_8h_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{list_8h_source_l00017}00017\ \textcolor{preprocessor}{\#ifndef\ LIST\_H}}
+\DoxyCodeLine{\Hypertarget{list_8h_source_l00018}00018\ \textcolor{preprocessor}{\#define\ LIST\_H}}
+\DoxyCodeLine{\Hypertarget{list_8h_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{list_8h_source_l00020}00020\ \textcolor{preprocessor}{\#include\ <stdbool.h>}}
+\DoxyCodeLine{\Hypertarget{list_8h_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{list_8h_source_l00022}\mbox{\hyperlink{list_8h_ae856885a41f62731ba0e1132eb3f4f4e}{00022}}\ \textcolor{keyword}{typedef}\ void\ (*\mbox{\hyperlink{list_8h_ae856885a41f62731ba0e1132eb3f4f4e}{FreeItemFn}})(\textcolor{keywordtype}{void}\ *);}
+\DoxyCodeLine{\Hypertarget{list_8h_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{list_8h_source_l00024}\mbox{\hyperlink{list_8h_a6cea168a41c3aeb28ea306a576af3fd2}{00024}}\ \textcolor{keyword}{typedef}\ bool\ (*\mbox{\hyperlink{list_8h_a6cea168a41c3aeb28ea306a576af3fd2}{CompareItemFn}})(\textcolor{keywordtype}{void}\ *,\ \textcolor{keywordtype}{void}\ *);}
+\DoxyCodeLine{\Hypertarget{list_8h_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{list_8h_source_l00026}\mbox{\hyperlink{list_8h_a98ef66a6f61018b20bd706b19f4d9be6}{00026}}\ \textcolor{keyword}{typedef}\ void\ (*\mbox{\hyperlink{list_8h_a98ef66a6f61018b20bd706b19f4d9be6}{IteratorFn}})(\textcolor{keywordtype}{void}\ *);}
+\DoxyCodeLine{\Hypertarget{list_8h_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{list_8h_source_l00028}\mbox{\hyperlink{list_8h_a02e13bf283b917663439262e144cff2b}{00028}}\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_list_item}{ListItem}}\ \mbox{\hyperlink{struct_list_item}{ListItem}};}
+\DoxyCodeLine{\Hypertarget{list_8h_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{list_8h_source_l00030}\mbox{\hyperlink{struct_list_item}{00030}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_list_item}{ListItem}}\ \{}
+\DoxyCodeLine{\Hypertarget{list_8h_source_l00031}\mbox{\hyperlink{struct_list_item_a788104e1ae9d59a384497766e5203f20}{00031}}\ \ \ \textcolor{keywordtype}{void}\ *\mbox{\hyperlink{struct_list_item_a788104e1ae9d59a384497766e5203f20}{data}};}
+\DoxyCodeLine{\Hypertarget{list_8h_source_l00032}\mbox{\hyperlink{struct_list_item_aa282658801fc98fce55976f17c5903ca}{00032}}\ \ \ \mbox{\hyperlink{struct_list_item}{ListItem}}\ *\mbox{\hyperlink{struct_list_item_aa282658801fc98fce55976f17c5903ca}{next}};}
+\DoxyCodeLine{\Hypertarget{list_8h_source_l00033}00033\ \};}
+\DoxyCodeLine{\Hypertarget{list_8h_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{list_8h_source_l00035}\mbox{\hyperlink{struct_list}{00035}}\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{\Hypertarget{list_8h_source_l00036}\mbox{\hyperlink{struct_list_a27209fb8022bf00b3e90ffdfc91fda18}{00036}}\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{struct_list_a27209fb8022bf00b3e90ffdfc91fda18}{length}};}
+\DoxyCodeLine{\Hypertarget{list_8h_source_l00037}\mbox{\hyperlink{struct_list_a8a1d35f38f786a008fbcaf17d51fbbcb}{00037}}\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{struct_list_a8a1d35f38f786a008fbcaf17d51fbbcb}{item\_size}};}
+\DoxyCodeLine{\Hypertarget{list_8h_source_l00038}\mbox{\hyperlink{struct_list_ab1a74efd973a8efd990b05788152fd95}{00038}}\ \ \ \mbox{\hyperlink{struct_list_item}{ListItem}}\ *\mbox{\hyperlink{struct_list_ab1a74efd973a8efd990b05788152fd95}{head}};}
+\DoxyCodeLine{\Hypertarget{list_8h_source_l00039}\mbox{\hyperlink{struct_list_a4ca93c444feb001ed7ef30b0199cdf1b}{00039}}\ \ \ \mbox{\hyperlink{struct_list_item}{ListItem}}\ *\mbox{\hyperlink{struct_list_a4ca93c444feb001ed7ef30b0199cdf1b}{tail}};}
+\DoxyCodeLine{\Hypertarget{list_8h_source_l00040}\mbox{\hyperlink{struct_list_ae322a77cc34736490515275a892af737}{00040}}\ \ \ \mbox{\hyperlink{list_8h_ae856885a41f62731ba0e1132eb3f4f4e}{FreeItemFn}}\ \mbox{\hyperlink{struct_list_ae322a77cc34736490515275a892af737}{free\_item\_fn}};}
+\DoxyCodeLine{\Hypertarget{list_8h_source_l00041}00041\ \}\ \mbox{\hyperlink{struct_list}{List}};}
+\DoxyCodeLine{\Hypertarget{list_8h_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{list_8h_source_l00043}00043\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{list_8h_ac6c8b33b4100dfc73c933f3e936f86a1}{list\_create}}(\mbox{\hyperlink{struct_list}{List}}\ *list,\ \textcolor{keywordtype}{int}\ item\_size,\ \mbox{\hyperlink{list_8h_ae856885a41f62731ba0e1132eb3f4f4e}{FreeItemFn}}\ free\_item\_fn);}
+\DoxyCodeLine{\Hypertarget{list_8h_source_l00044}00044\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{list_8h_ad720671a4abc61ed689060cacc592565}{list\_destroy}}(\mbox{\hyperlink{struct_list}{List}}\ *list);}
+\DoxyCodeLine{\Hypertarget{list_8h_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{list_8h_source_l00046}00046\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{list_8h_a0f0e6235cbec8ae662d493095ed66db3}{list\_prepend}}(\mbox{\hyperlink{struct_list}{List}}\ *list,\ \textcolor{keywordtype}{void}\ *item);}
+\DoxyCodeLine{\Hypertarget{list_8h_source_l00047}00047\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{list_8h_a06a2b45f704182a7d152c88d0507700c}{list\_append}}(\mbox{\hyperlink{struct_list}{List}}\ *list,\ \textcolor{keywordtype}{void}\ *item);}
+\DoxyCodeLine{\Hypertarget{list_8h_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{list_8h_source_l00049}00049\ \mbox{\hyperlink{struct_list_item}{ListItem}}\ *\mbox{\hyperlink{list_8h_ac048645b0cd40b78c89aad9e770d4aab}{list\_get}}(\mbox{\hyperlink{struct_list}{List}}\ *list,\ \textcolor{keywordtype}{void}\ *data,\ \mbox{\hyperlink{list_8h_a6cea168a41c3aeb28ea306a576af3fd2}{CompareItemFn}}\ compare\_item\_fn);}
+\DoxyCodeLine{\Hypertarget{list_8h_source_l00050}00050\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{list_8h_a2c9f1765436e9a3631f048b71f17f33c}{list\_delete}}(\mbox{\hyperlink{struct_list}{List}}\ *list,\ \mbox{\hyperlink{struct_list_item}{ListItem}}\ *item);}
+\DoxyCodeLine{\Hypertarget{list_8h_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{list_8h_source_l00052}00052\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{list_8h_a9e35506bfe9666bbce134a4131254172}{list\_iterate}}(\mbox{\hyperlink{struct_list}{List}}\ *list,\ \mbox{\hyperlink{list_8h_a98ef66a6f61018b20bd706b19f4d9be6}{IteratorFn}}\ iterator\_fn);}
+\DoxyCodeLine{\Hypertarget{list_8h_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{list_8h_source_l00054}00054\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

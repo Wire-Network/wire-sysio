@@ -1,0 +1,12 @@
+<map id="sysio::chain::transaction::validate_and_extract_extensions" name="sysio::chain::transaction::validate_and_extract_extensions">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,44,169,99"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1transaction.html#aef240445de0470ccc990493a1bb3afec" title=" " alt="" coords="217,59,398,84"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="169,69,201,69,201,74,169,74"/>
+<area shape="rect" id="Node000003" href="$namespacefc_1_1raw.html#a3a18d8161aa5b4f4f02b6fcfdff5e5d1" title=" " alt="" coords="466,29,563,55"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="398,56,449,49,450,54,399,61"/>
+<area shape="rect" id="Node000004" href="$classfc_1_1sha256_1_1encoder.html#a4d8b8181e912194cf98a56164671adf8" title=" " alt="" coords="446,79,582,120"/>
+<area shape="poly" id="edge4_Node000002_Node000004" title=" " alt="" coords="399,81,431,86,430,91,398,86"/>
+<area shape="poly" id="edge3_Node000003_Node000003" title=" " alt="" coords="485,30,479,21,482,11,495,5,514,3,535,5,546,12,544,16,534,10,514,8,496,10,486,15,484,20,489,28"/>
+<area shape="rect" id="Node000005" href="$classfc_1_1sha256.html#ab897537f6c524085b28049be51ed370d" title=" " alt="" coords="630,87,746,112"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="583,97,614,97,614,102,583,102"/>
+</map>

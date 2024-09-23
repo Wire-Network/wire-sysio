@@ -1,0 +1,119 @@
+\doxysection{unapprove\+\_\+producer\+\_\+subcommand Struct Reference}
+\hypertarget{structunapprove__producer__subcommand}{}\label{structunapprove__producer__subcommand}\index{unapprove\_producer\_subcommand@{unapprove\_producer\_subcommand}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structunapprove__producer__subcommand_ac184906416dda7600bbcd5163e0a3071}{unapprove\+\_\+producer\+\_\+subcommand}} (\mbox{\hyperlink{class_c_l_i_1_1_app}{CLI\+::\+App}} \texorpdfstring{$\ast$}{*}action\+Root)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structunapprove__producer__subcommand_af916ae4e35c75adac1c4cb3158ededf2}{voter}}
+\item 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \mbox{\hyperlink{structunapprove__producer__subcommand_ac0b5062a6d1f07690de6a9e8b597b2b3}{producer\+\_\+name}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01331}{1331}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structunapprove__producer__subcommand_ac184906416dda7600bbcd5163e0a3071}\index{unapprove\_producer\_subcommand@{unapprove\_producer\_subcommand}!unapprove\_producer\_subcommand@{unapprove\_producer\_subcommand}}
+\index{unapprove\_producer\_subcommand@{unapprove\_producer\_subcommand}!unapprove\_producer\_subcommand@{unapprove\_producer\_subcommand}}
+\doxysubsubsection{\texorpdfstring{unapprove\_producer\_subcommand()}{unapprove\_producer\_subcommand()}}
+{\footnotesize\ttfamily \label{structunapprove__producer__subcommand_ac184906416dda7600bbcd5163e0a3071} 
+unapprove\+\_\+producer\+\_\+subcommand\+::unapprove\+\_\+producer\+\_\+subcommand (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_c_l_i_1_1_app}{CLI\+::\+App}} \texorpdfstring{$\ast$}{*}}]{action\+Root}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01335}{1335}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{01335\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{01336\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ approve\_producer\ =\ actionRoot-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_a8b461d2233ec4121259011b5ed24b336}{add\_subcommand}}(\textcolor{stringliteral}{"{}unapprove"{}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}Remove\ one\ producer\ from\ list\ of\ voted\ producers"{}}));}
+\DoxyCodeLine{01337\ \ \ \ \ \ \ approve\_producer-\/>\mbox{\hyperlink{class_c_l_i_1_1_app_a8c812d42c7720ecb5cd0aec41b5aa941}{add\_option}}(\textcolor{stringliteral}{"{}voter"{}},\ voter,\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}The\ voting\ account"{}}))-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a}{required}}();}
+\DoxyCodeLine{01338\ \ \ \ \ \ \ approve\_producer-\/>add\_option(\textcolor{stringliteral}{"{}producer"{}},\ \mbox{\hyperlink{structunapprove__producer__subcommand_ac0b5062a6d1f07690de6a9e8b597b2b3}{producer\_name}},\ \mbox{\hyperlink{localize_8hpp_ab3bfcc0fee2852c8db4ea283c4dd9d99}{localized}}(\textcolor{stringliteral}{"{}The\ account\ to\ remove\ from\ voted\ producers"{}}))-\/>\mbox{\hyperlink{class_c_l_i_1_1_option_base_af18d4c8d8c2392b6947db9179110289a}{required}}();}
+\DoxyCodeLine{01339\ \ \ \ \ \ \ \mbox{\hyperlink{programs_2clio_2main_8cpp_aa5d53f41b83b5323c73622fbbb15e9cd}{add\_standard\_transaction\_options}}(approve\_producer,\ \textcolor{stringliteral}{"{}voter@active"{}});}
+\DoxyCodeLine{01340\ }
+\DoxyCodeLine{01341\ \ \ \ \ \ \ approve\_producer-\/>callback([\textcolor{keyword}{this}]\ \{}
+\DoxyCodeLine{01342\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ result\ =\ \mbox{\hyperlink{programs_2clio_2main_8cpp_af931af8e9f099860a2670931f8d3ad2c}{call}}(\mbox{\hyperlink{namespacesysio_1_1client_1_1http_a74c28475d2f7d2cb4c99cb361c2279a0}{get\_table\_func}},\ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}(\textcolor{stringliteral}{"{}json"{}},\ \textcolor{keyword}{true})}
+\DoxyCodeLine{01343\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}code"{}},\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(config::system\_account\_name).\mbox{\hyperlink{namespacefc_a4e07b3870aa72f8c38bdd5f78044dad1}{to\_string}}())}
+\DoxyCodeLine{01344\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}scope"{}},\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(config::system\_account\_name).\mbox{\hyperlink{namespacefc_a4e07b3870aa72f8c38bdd5f78044dad1}{to\_string}}())}
+\DoxyCodeLine{01345\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}table"{}},\ \textcolor{stringliteral}{"{}voters"{}})}
+\DoxyCodeLine{01346\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}table\_key"{}},\ \textcolor{stringliteral}{"{}owner"{}})}
+\DoxyCodeLine{01347\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}lower\_bound"{}},\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(voter).to\_uint64\_t())}
+\DoxyCodeLine{01348\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}upper\_bound"{}},\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(voter).to\_uint64\_t()\ +\ 1)}
+\DoxyCodeLine{01349\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Less\ than\ ideal\ upper\_bound\ usage\ preserved\ so\ clio\ can\ still\ work\ with\ old\ buggy\ nodeop\ versions}}
+\DoxyCodeLine{01350\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Change\ to\ voter.value\ when\ clio\ no\ longer\ needs\ to\ support\ nodeop\ versions\ older\ than\ 1.5.0}}
+\DoxyCodeLine{01351\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}limit"{}},\ 1)}
+\DoxyCodeLine{01352\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{01353\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ res\ =\ result.as<\mbox{\hyperlink{structsysio_1_1chain__apis_1_1read__only_1_1get__table__rows__result}{sysio::chain\_apis::read\_only::get\_table\_rows\_result}}>();}
+\DoxyCodeLine{01354\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Condition\ in\ if\ statement\ below\ can\ simply\ be\ res.rows.empty()\ when\ clio\ no\ longer\ needs\ to\ support\ nodeop\ versions\ older\ than\ 1.5.0}}
+\DoxyCodeLine{01355\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Although\ since\ this\ subcommand\ will\ actually\ change\ the\ voter's\ vote,\ it\ is\ probably\ better\ to\ just\ keep\ this\ check\ to\ protect}}
+\DoxyCodeLine{01356\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ \ against\ future\ potential\ chain\_plugin\ bugs.}}
+\DoxyCodeLine{01357\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ res.rows.empty()\ ||\ res.rows[0].get\_object()[\textcolor{stringliteral}{"{}owner"{}}].as\_string()\ !=\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}(voter).\mbox{\hyperlink{namespacefc_a4e07b3870aa72f8c38bdd5f78044dad1}{to\_string}}()\ )\ \{}
+\DoxyCodeLine{01358\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}Voter\ info\ not\ found\ for\ account\ "{}}\ <<\ voter\ <<\ std::endl;}
+\DoxyCodeLine{01359\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{01360\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01361\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\ 1\ ==\ res.rows.size(),\ multiple\_voter\_info,\ \textcolor{stringliteral}{"{}More\ than\ one\ voter\_info\ for\ account"{}}\ );}
+\DoxyCodeLine{01362\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ prod\_vars\ =\ res.rows[0][\textcolor{stringliteral}{"{}producers"{}}].get\_array();}
+\DoxyCodeLine{01363\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1vector}{vector<sysio::name>}}\ prods;}
+\DoxyCodeLine{01364\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\ \textcolor{keyword}{auto}\&\ x\ :\ prod\_vars\ )\ \{}
+\DoxyCodeLine{01365\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ prods.push\_back(\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(x.as\_string())\ );}
+\DoxyCodeLine{01366\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01367\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ it\ =\ std::remove(\ prods.begin(),\ prods.end(),\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}(\mbox{\hyperlink{structunapprove__producer__subcommand_ac0b5062a6d1f07690de6a9e8b597b2b3}{producer\_name}})\ );}
+\DoxyCodeLine{01368\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (it\ ==\ prods.end()\ )\ \{}
+\DoxyCodeLine{01369\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}Cannot\ remove:\ producer\ \(\backslash\)"{}"{}}\ <<\ \mbox{\hyperlink{structunapprove__producer__subcommand_ac0b5062a6d1f07690de6a9e8b597b2b3}{producer\_name}}\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)"{}\ is\ not\ on\ the\ list."{}}\ <<\ std::endl;}
+\DoxyCodeLine{01370\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{01371\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{01372\ \ \ \ \ \ \ \ \ \ \ \ \ prods.erase(\ it,\ prods.end()\ );\ \textcolor{comment}{//should\ always\ delete\ only\ one\ element}}
+\DoxyCodeLine{01373\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}\ act\_payload\ =\ \mbox{\hyperlink{classfc_1_1mutable__variant__object}{fc::mutable\_variant\_object}}()}
+\DoxyCodeLine{01374\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}voter"{}},\ \mbox{\hyperlink{structunapprove__producer__subcommand_af916ae4e35c75adac1c4cb3158ededf2}{voter}})}
+\DoxyCodeLine{01375\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}proxy"{}},\ \textcolor{stringliteral}{"{}"{}})}
+\DoxyCodeLine{01376\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}producers"{}},\ prods);}
+\DoxyCodeLine{01377\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ accountPermissions\ =\ \mbox{\hyperlink{programs_2clio_2main_8cpp_a2b91ca5dbe7cc4ab287d0e44c3037552}{get\_account\_permissions}}(\mbox{\hyperlink{programs_2clio_2main_8cpp_ad552924cb151dcd5b60c73856d1ff706}{tx\_permission}},\ \{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(voter),\ config::active\_name\});}
+\DoxyCodeLine{01378\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{programs_2clio_2main_8cpp_aaf784434864a29e4835be7465173d1ab}{send\_actions}}(\{\mbox{\hyperlink{programs_2clio_2main_8cpp_a067e20df5f65333b0c3cf5840bc37dea}{create\_action}}(accountPermissions,\ config::system\_account\_name,\ \textcolor{stringliteral}{"{}voteproducer"{}}\_n,\ act\_payload)\});}
+\DoxyCodeLine{01379\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{01380\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structunapprove__producer__subcommand_ac184906416dda7600bbcd5163e0a3071_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structunapprove__producer__subcommand_ac0b5062a6d1f07690de6a9e8b597b2b3}\index{unapprove\_producer\_subcommand@{unapprove\_producer\_subcommand}!producer\_name@{producer\_name}}
+\index{producer\_name@{producer\_name}!unapprove\_producer\_subcommand@{unapprove\_producer\_subcommand}}
+\doxysubsubsection{\texorpdfstring{producer\_name}{producer\_name}}
+{\footnotesize\ttfamily \label{structunapprove__producer__subcommand_ac0b5062a6d1f07690de6a9e8b597b2b3} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} unapprove\+\_\+producer\+\_\+subcommand\+::producer\+\_\+name}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01333}{1333}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+\Hypertarget{structunapprove__producer__subcommand_af916ae4e35c75adac1c4cb3158ededf2}\index{unapprove\_producer\_subcommand@{unapprove\_producer\_subcommand}!voter@{voter}}
+\index{voter@{voter}!unapprove\_producer\_subcommand@{unapprove\_producer\_subcommand}}
+\doxysubsubsection{\texorpdfstring{voter}{voter}}
+{\footnotesize\ttfamily \label{structunapprove__producer__subcommand_af916ae4e35c75adac1c4cb3158ededf2} 
+\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} unapprove\+\_\+producer\+\_\+subcommand\+::voter}
+
+
+
+Definition at line \mbox{\hyperlink{programs_2clio_2main_8cpp_source_l01332}{1332}} of file \mbox{\hyperlink{programs_2clio_2main_8cpp_source}{main.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+programs/clio/\mbox{\hyperlink{programs_2clio_2main_8cpp}{main.\+cpp}}\end{DoxyCompactItemize}

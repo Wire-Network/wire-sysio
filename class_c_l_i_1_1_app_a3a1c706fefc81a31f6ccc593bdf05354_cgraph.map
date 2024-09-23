@@ -1,0 +1,19 @@
+<map id="CLI::App::add_complex" name="CLI::App::add_complex">
+<area shape="rect" id="Node000001" title="Add a complex number." alt="" coords="5,149,164,175"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_app.html#a8c812d42c7720ecb5cd0aec41b5aa941" title=" " alt="" coords="227,5,372,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="94,147,141,96,174,67,210,41,223,35,225,40,213,46,177,71,144,100,98,151"/>
+<area shape="rect" id="Node000003" href="$namespace_c_l_i_1_1detail.html#a1bcb244a7701fc68da3a863b58daf615" title="special template overload" alt="" coords="230,55,368,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="115,146,211,105,225,99,227,104,213,110,117,151"/>
+<area shape="rect" id="Node000005" href="$class_c_l_i_1_1_option_base.html#a620c2f57aca00ad2ad1fe8870143fcc1" title="Allow in a configuration file." alt="" coords="212,120,387,146"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="164,149,196,144,197,150,165,154"/>
+<area shape="rect" id="Node000006" href="$class_c_l_i_1_1_option.html#a81a26e9320e4ec616fbbd6fa3ad60ef7" title=" " alt="" coords="215,170,384,210"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="165,170,200,175,199,180,164,175"/>
+<area shape="rect" id="Node000007" href="$class_c_l_i_1_1_option.html#a1fcb3c625eeca46ef953732a71403027" title="Set a custom option typestring." alt="" coords="219,235,380,260"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="112,173,213,220,234,227,232,232,211,225,110,178"/>
+<area shape="rect" id="Node000009" href="$class_c_l_i_1_1_option.html#a8914e4810b213c5e23359d61a70c5ac1" title="Set a custom option size." alt="" coords="223,284,376,310"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="99,174,146,221,178,248,213,271,223,276,221,280,210,275,175,252,142,225,95,177"/>
+<area shape="rect" id="Node000004" href="$namespace_c_l_i_1_1detail.html#a0e94052d485636fc9f18c21009026577" title="Convert an object to a string (directly forward if this can become a string)" alt="" coords="454,63,594,88"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="369,73,439,73,439,78,369,78"/>
+<area shape="rect" id="Node000008" href="$class_c_l_i_1_1_option.html#ad4ff97f7911d552972c10771bcf488d7" title="Set the type function to run when displayed on this option." alt="" coords="435,235,613,260"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="380,245,420,245,420,250,380,250"/>
+</map>

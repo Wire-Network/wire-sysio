@@ -1,0 +1,131 @@
+\doxysection{channel.\+hpp}
+\hypertarget{channel_8hpp_source}{}\label{channel_8hpp_source}\index{libraries/appbase/include/appbase/channel.hpp@{libraries/appbase/include/appbase/channel.hpp}}
+\mbox{\hyperlink{channel_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00003}00003\ \textcolor{comment}{//clashes\ with\ BOOST\ PP\ and\ Some\ Applications}}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00004}00004\ \textcolor{preprocessor}{\#pragma\ push\_macro("{}N"{})}}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00005}00005\ \textcolor{preprocessor}{\#undef\ N}}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <boost/asio.hpp>}}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <boost/signals2.hpp>}}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ <boost/exception/diagnostic\_information.hpp>}}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00011}00011\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceappbase}{appbase}}\ \{}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00013}\mbox{\hyperlink{namespaceappbase_abe439eb2985b17412fc24a7f9f45a79c}{00013}}\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespaceappbase_abe439eb2985b17412fc24a7f9f45a79c}{erased\_channel\_ptr}}\ =\ std::unique\_ptr<void,\ void(*)(\textcolor{keywordtype}{void}*)>;}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00019}\mbox{\hyperlink{structappbase_1_1drop__exceptions}{00019}}\ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structappbase_1_1drop__exceptions}{drop\_exceptions}}\ \{}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00020}\mbox{\hyperlink{structappbase_1_1drop__exceptions_ac34b2d6c56912836f817b8d8f1971e54}{00020}}\ \ \ \ \ \ \ \mbox{\hyperlink{structappbase_1_1drop__exceptions_ac34b2d6c56912836f817b8d8f1971e54}{drop\_exceptions}}()\ =\ \textcolor{keywordflow}{default};}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00021}\mbox{\hyperlink{structappbase_1_1drop__exceptions_a6554c981395a5ec01d56ade306a1f153}{00021}}\ \ \ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{structappbase_1_1drop__exceptions_a6554c981395a5ec01d56ade306a1f153}{result\_type}}\ =\ void;}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00023}00023\ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ InputIterator>}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00024}\mbox{\hyperlink{structappbase_1_1drop__exceptions_a22925e1ace190d37a35bebcdfd573288}{00024}}\ \ \ \ \ \ \ \mbox{\hyperlink{structappbase_1_1drop__exceptions_a6554c981395a5ec01d56ade306a1f153}{result\_type}}\ \mbox{\hyperlink{structappbase_1_1drop__exceptions_a22925e1ace190d37a35bebcdfd573288}{operator()}}(InputIterator\ first,\ InputIterator\ last)\ \{}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00025}00025\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (first\ !=\ last)\ \{}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00026}00026\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00027}00027\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *first;}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00028}00028\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00029}00029\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ drop}}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00030}00030\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00031}00031\ \ \ \ \ \ \ \ \ \ \ \ \ ++first;}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00032}00032\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00033}00033\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00034}00034\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00046}00046\ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ Data,\ \textcolor{keyword}{typename}\ DispatchPolicy>}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00047}\mbox{\hyperlink{classappbase_1_1channel}{00047}}\ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classappbase_1_1channel}{channel}}\ final\ \{}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00048}00048\ \ \ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00053}\mbox{\hyperlink{classappbase_1_1channel_1_1handle}{00053}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classappbase_1_1channel_1_1handle}{handle}}\ \{}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00055}\mbox{\hyperlink{classappbase_1_1channel_1_1handle_a16f5e8b07996ca8c37047e711ac8f97d}{00055}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classappbase_1_1channel_1_1handle_a16f5e8b07996ca8c37047e711ac8f97d}{\string~handle}}()\ \{}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classappbase_1_1channel_1_1handle_a02f4c4830503f572d5bc3ae916aa282a}{unsubscribe}}();}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00063}\mbox{\hyperlink{classappbase_1_1channel_1_1handle_a02f4c4830503f572d5bc3ae916aa282a}{00063}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classappbase_1_1channel_1_1handle_a02f4c4830503f572d5bc3ae916aa282a}{unsubscribe}}()\ \{}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00064}00064\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\_handle.connected())\ \{}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00065}00065\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_handle.disconnect();}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00066}00066\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00067}00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ This\ handle\ can\ be\ constructed\ and\ moved}}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00070}\mbox{\hyperlink{classappbase_1_1channel_1_1handle_a8cf464f7c1c7435bdf2e80933c9da31d}{00070}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classappbase_1_1channel_1_1handle_a8cf464f7c1c7435bdf2e80933c9da31d}{handle}}()\ =\ \textcolor{keywordflow}{default};}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00071}\mbox{\hyperlink{classappbase_1_1channel_1_1handle_a631fc37d4069e1f080aa2467a484f4af}{00071}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classappbase_1_1channel_1_1handle_a631fc37d4069e1f080aa2467a484f4af}{handle}}(\mbox{\hyperlink{classappbase_1_1channel_1_1handle}{handle}}\&\&)\ =\ \textcolor{keywordflow}{default};}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00072}\mbox{\hyperlink{classappbase_1_1channel_1_1handle_ab08c2a487803ee7b591f986f59a20021}{00072}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classappbase_1_1channel_1_1handle}{handle}}\&\ \mbox{\hyperlink{classappbase_1_1channel_1_1handle_ab08c2a487803ee7b591f986f59a20021}{operator=\ }}(\mbox{\hyperlink{classappbase_1_1channel_1_1handle}{handle}}\&\&\ rhs)\ =\ \textcolor{keywordflow}{default};}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00073}00073\ }
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00074}00074\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ dont\ allow\ copying\ since\ this\ protects\ the\ resource}}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00075}\mbox{\hyperlink{classappbase_1_1channel_1_1handle_af1bf360c60eb11e7ac24b143eccf2e92}{00075}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classappbase_1_1channel_1_1handle_af1bf360c60eb11e7ac24b143eccf2e92}{handle}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classappbase_1_1channel_1_1handle}{handle}}\&\ )\ =\ \textcolor{keyword}{delete};}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00076}\mbox{\hyperlink{classappbase_1_1channel_1_1handle_af072c8d63cc220df3c6afe18eabe53e5}{00076}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classappbase_1_1channel_1_1handle}{handle}}\&\ \mbox{\hyperlink{classappbase_1_1channel_1_1handle_ab08c2a487803ee7b591f986f59a20021}{operator=\ }}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classappbase_1_1channel_1_1handle}{handle}}\&\ )\ =\ \textcolor{keyword}{delete};}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00077}00077\ }
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00078}00078\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ }handle\_type\ =\ boost::signals2::connection;}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00080}00080\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ handle\_type\ \_handle;}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00081}00081\ }
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00088}00088\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classappbase_1_1channel_1_1handle_a8cf464f7c1c7435bdf2e80933c9da31d}{handle}}(handle\_type\&\&\ \_handle)}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00089}00089\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\_handle(\mbox{\hyperlink{namespacestd}{std}}::move(\_handle))}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00090}00090\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\}}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00091}00091\ }
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00092}\mbox{\hyperlink{classappbase_1_1channel_1_1handle_a4cc6de7554512d923e180085bb97fa94}{00092}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{friend}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classappbase_1_1channel}{channel}};}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00093}00093\ \ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00094}00094\ }
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00100}00100\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classappbase_1_1channel_ab30c2df14ba63cb006d8c52b48d19e3b}{publish}}(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{structappbase_1_1priority}{priority}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{struct_data}{Data}}\&\ data);}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00101}00101\ }
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00108}00108\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ Callback>}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00109}\mbox{\hyperlink{classappbase_1_1channel_a99ecd001a45a00bb653f8b07df55967f}{00109}}\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classappbase_1_1channel_1_1handle}{handle}}\ \mbox{\hyperlink{classappbase_1_1channel_a99ecd001a45a00bb653f8b07df55967f}{subscribe}}(Callback\ cb)\ \{}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00110}00110\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classappbase_1_1channel_1_1handle}{handle}}(\_signal.connect(cb));}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00111}00111\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00112}00112\ }
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00121}\mbox{\hyperlink{classappbase_1_1channel_ae24745e03b784f9e625443962f1f04c5}{00121}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{classappbase_1_1channel_ae24745e03b784f9e625443962f1f04c5}{set\_dispatcher}}(\textcolor{keyword}{const}\ DispatchPolicy\&\ policy\ )\ -\/>\ std::enable\_if\_t<std::is\_copy\_constructible<DispatchPolicy>::value,\textcolor{keywordtype}{void}>}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00122}00122\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00123}00123\ \ \ \ \ \ \ \ \ \ \ \ \ \_signal.set\_combiner(policy);}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00124}00124\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00125}00125\ }
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00129}\mbox{\hyperlink{classappbase_1_1channel_acb8faa0856a32c8b9e04a864544696ed}{00129}}\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classappbase_1_1channel_acb8faa0856a32c8b9e04a864544696ed}{has\_subscribers}}()\ \{}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00130}00130\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ connections\ =\ \_signal.num\_slots();}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00131}00131\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ connections\ >\ 0;}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00132}00132\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00133}00133\ }
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00134}00134\ \ \ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00135}00135\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classappbase_1_1channel}{channel}}()}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00136}00136\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00137}00137\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00138}00138\ }
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00139}00139\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \string~channel()\ =\ \textcolor{keywordflow}{default};}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00140}00140\ }
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00147}00147\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ deleter(\textcolor{keywordtype}{void}*\ \mbox{\hyperlink{namespaceappbase_abe439eb2985b17412fc24a7f9f45a79c}{erased\_channel\_ptr}})\ \{}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00148}00148\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ ptr\ =\ \textcolor{keyword}{reinterpret\_cast<}channel*\textcolor{keyword}{>}(\mbox{\hyperlink{namespaceappbase_abe439eb2985b17412fc24a7f9f45a79c}{erased\_channel\_ptr}});}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00149}00149\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{delete}\ ptr;}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00150}00150\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00151}00151\ }
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00158}00158\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ channel*\ get\_channel(\mbox{\hyperlink{namespaceappbase_abe439eb2985b17412fc24a7f9f45a79c}{erased\_channel\_ptr}}\&\ ptr)\ \{}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00159}00159\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{reinterpret\_cast<}channel*\textcolor{keyword}{>}(ptr.get());}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00160}00160\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00161}00161\ }
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00166}00166\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{namespaceappbase_abe439eb2985b17412fc24a7f9f45a79c}{erased\_channel\_ptr}}\ make\_unique()}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00167}00167\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00168}00168\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespaceappbase_abe439eb2985b17412fc24a7f9f45a79c}{erased\_channel\_ptr}}(\textcolor{keyword}{new}\ channel(),\ \&deleter);}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00169}00169\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00170}00170\ }
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00171}00171\ \ \ \ \ \ \ \ \ \ boost::signals2::signal<void(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_data}{Data}}\&),\ DispatchPolicy>\ \_signal;}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00172}00172\ }
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00173}\mbox{\hyperlink{classappbase_1_1channel_a9e2f411dc2cf5784cc01a89c488b4056}{00173}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{friend}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classappbase_1_1application}{appbase::application}};}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00174}00174\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00175}00175\ }
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00182}00182\ \ \ \ \textcolor{keyword}{template}<\ \textcolor{keyword}{typename}\ Tag,\ \textcolor{keyword}{typename}\ Data,\ \textcolor{keyword}{typename}\ DispatchPolicy\ =\ drop\_exceptions\ >}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00183}\mbox{\hyperlink{structappbase_1_1channel__decl}{00183}}\ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structappbase_1_1channel__decl}{channel\_decl}}\ \{}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00184}\mbox{\hyperlink{structappbase_1_1channel__decl_aa309e47583ff1b9d37d1d1eef8d00c33}{00184}}\ \ \ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{classappbase_1_1channel}{channel\_type}}\ =\ \mbox{\hyperlink{classappbase_1_1channel}{channel<Data,\ DispatchPolicy>}};}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00185}\mbox{\hyperlink{structappbase_1_1channel__decl_a43b9f11da52bba91c78f48f6265b47d5}{00185}}\ \ \ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{structappbase_1_1channel__decl_a43b9f11da52bba91c78f48f6265b47d5}{tag\_type}}\ =\ Tag;}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00186}00186\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00187}00187\ }
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00188}00188\ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}...Ts>}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00189}\mbox{\hyperlink{namespaceappbase_a861d9387127f53a940cfd8e449f96c5f}{00189}}\ \ \ \ std::true\_type\ \mbox{\hyperlink{namespaceappbase_a861d9387127f53a940cfd8e449f96c5f}{is\_channel\_decl\_impl}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structappbase_1_1channel__decl}{channel\_decl<Ts...>}}*);}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00190}00190\ }
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00191}\mbox{\hyperlink{namespaceappbase_af20e49b41f3f7398d5c7e09577db9b52}{00191}}\ \ \ \ std::false\_type\ \mbox{\hyperlink{namespaceappbase_a861d9387127f53a940cfd8e449f96c5f}{is\_channel\_decl\_impl}}(...);}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00192}00192\ }
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00193}00193\ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00194}\mbox{\hyperlink{namespaceappbase_a8bca2384fc9c0fe6dc0eb2c35038d0cc}{00194}}\ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespaceappbase_a8bca2384fc9c0fe6dc0eb2c35038d0cc}{is\_channel\_decl}}\ =\ \textcolor{keyword}{decltype}(\mbox{\hyperlink{namespaceappbase_a861d9387127f53a940cfd8e449f96c5f}{is\_channel\_decl\_impl}}(std::declval<T*>()));}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00195}00195\ \}}
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00196}00196\ }
+\DoxyCodeLine{\Hypertarget{channel_8hpp_source_l00197}00197\ \textcolor{preprocessor}{\#pragma\ pop\_macro("{}N"{})}}
+
+\end{DoxyCode}

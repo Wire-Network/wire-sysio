@@ -1,0 +1,44 @@
+<map id="CLI::Option::get_positional" name="CLI::Option::get_positional">
+<area shape="rect" id="Node000001" title="True if the argument can be given directly." alt="" coords="1275,209,1452,235"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_app.html#a6e3eedf148351dabd1868bd7e63d24bc" title="Count the required remaining positional arguments." alt="" coords="1044,79,1227,120"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1325,204,1226,149,1177,123,1179,118,1229,144,1327,199"/>
+<area shape="rect" id="Node000009" href="$class_c_l_i_1_1_app.html#a3b564aa8c90f25152f5379c661ab82b1" title=" " alt="" coords="814,155,996,180"/>
+<area shape="poly" id="edge17_Node000001_Node000009" title=" " alt="" coords="1299,208,1227,193,1107,179,996,173,997,167,1107,174,1228,188,1300,202"/>
+<area shape="rect" id="Node000011" href="$class_c_l_i_1_1_app.html#af15231547d53a51458059588a1c34a0b" title="Count the required remaining positional arguments." alt="" coords="1050,202,1222,242"/>
+<area shape="poly" id="edge15_Node000001_Node000011" title=" " alt="" coords="1260,225,1222,225,1222,220,1260,220"/>
+<area shape="rect" id="Node000012" href="$class_c_l_i_1_1_formatter.html#aab5f07a6d3154ace0be4d9dbf85f795b" title="This prints out just the positionals &quot;group&quot;." alt="" coords="1062,267,1209,308"/>
+<area shape="poly" id="edge18_Node000001_Node000012" title=" " alt="" coords="1302,242,1210,269,1208,264,1301,237"/>
+<area shape="rect" id="Node000016" href="$class_c_l_i_1_1_formatter.html#a3aac4a7ce4ca139704e632915892024c" title="This displays the usage line." alt="" coords="590,420,736,461"/>
+<area shape="poly" id="edge25_Node000001_Node000016" title=" " alt="" coords="1338,248,1290,286,1229,322,1164,348,1097,370,961,403,837,425,737,437,736,432,836,420,960,398,1095,365,1162,343,1226,317,1287,282,1335,243"/>
+<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_app.html#a73c9decd5eb2b0c7eeda63cc4bd5048e" title=" " alt="" coords="832,29,978,55"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="1036,78,959,58,960,53,1037,72"/>
+<area shape="poly" id="edge9_Node000002_Node000009" title=" " alt="" coords="1050,127,952,157,951,151,1049,122"/>
+<area shape="rect" id="Node000010" href="$class_c_l_i_1_1_app.html#af20c05b97b9de2a4543a2de9bcc0993d" title=" " alt="" coords="560,104,766,130"/>
+<area shape="poly" id="edge14_Node000002_Node000010" title=" " alt="" coords="1029,106,766,116,766,110,1028,101"/>
+<area shape="poly" id="edge3_Node000003_Node000003" title=" " alt="" coords="945,17,932,10,905,8,880,10,867,15,864,20,871,27,867,31,859,21,864,11,879,5,905,3,933,5,947,12"/>
+<area shape="rect" id="Node000004" href="$class_c_l_i_1_1_app.html#a02368e2fe89470ab9b4131c7e3288349" title=" " alt="" coords="343,129,504,155"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="817,52,695,68,561,94,505,112,456,131,454,126,503,107,560,89,694,62,816,47"/>
+<area shape="rect" id="Node000005" href="$class_c_l_i_1_1_app.html#a26a92886a7d7f10a9afbd39b6535f42b" title="Internal parse function." alt="" coords="167,105,287,131"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="328,133,287,128,288,123,328,128"/>
+<area shape="rect" id="Node000006" href="$class_c_l_i_1_1_app.html#a241ba75a6c98b36349ae2f71a9137291" title="Internal parse function." alt="" coords="167,155,287,180"/>
+<area shape="poly" id="edge6_Node000004_Node000006" title=" " alt="" coords="328,157,288,162,287,157,328,152"/>
+<area shape="rect" id="Node000007" href="$class_c_l_i_1_1_app.html#a8ffb155a1153ee23d442c5bfed21225c" title="The real work is done here. Expects a reversed vector." alt="" coords="5,129,119,155"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="151,158,119,154,119,148,151,153"/>
+<area shape="rect" id="Node000008" href="$class_c_l_i_1_1_app.html#a878c1067ade7145aa11478d64f5173ed" title=" " alt="" coords="5,179,119,204"/>
+<area shape="poly" id="edge8_Node000006_Node000008" title=" " alt="" coords="151,181,119,186,119,181,151,176"/>
+<area shape="poly" id="edge11_Node000009_Node000004" title=" " alt="" coords="798,165,505,149,505,144,799,159"/>
+<area shape="poly" id="edge10_Node000009_Node000009" title=" " alt="" coords="945,142,932,136,905,133,880,135,867,140,864,145,871,153,867,156,859,146,864,136,879,130,905,128,933,131,947,138"/>
+<area shape="poly" id="edge12_Node000009_Node000010" title=" " alt="" coords="825,154,727,133,728,128,826,148"/>
+<area shape="poly" id="edge13_Node000010_Node000004" title=" " alt="" coords="545,132,505,136,505,131,544,127"/>
+<area shape="poly" id="edge16_Node000011_Node000004" title=" " alt="" coords="1034,217,816,197,560,167,500,158,501,153,561,162,816,192,1034,212"/>
+<area shape="rect" id="Node000013" href="$class_c_l_i_1_1_formatter.html#ade54fd392e2c9f5364744dca82408e60" title="This prints out a subcommand in help&#45;all." alt="" coords="832,306,978,346"/>
+<area shape="poly" id="edge19_Node000012_Node000013" title=" " alt="" coords="1048,305,979,317,978,311,1047,300"/>
+<area shape="rect" id="Node000014" href="$class_c_l_i_1_1_formatter.html#a838e0f47efa4fbd1b738eedb156887b9" title="This puts everything together." alt="" coords="335,341,512,367"/>
+<area shape="poly" id="edge24_Node000012_Node000014" title=" " alt="" coords="1047,280,947,273,825,271,692,277,626,285,561,297,499,318,449,343,446,338,497,313,560,292,625,280,692,272,825,266,947,268,1047,275"/>
+<area shape="poly" id="edge20_Node000013_Node000014" title=" " alt="" coords="817,352,766,361,700,366,633,368,513,364,513,359,633,362,700,361,765,356,816,347"/>
+<area shape="rect" id="Node000015" href="$class_c_l_i_1_1_formatter.html#a9e6b7c4c6eee50b11fe1ca785002db04" title="This prints out all the subcommands." alt="" coords="590,306,736,346"/>
+<area shape="poly" id="edge21_Node000013_Node000015" title=" " alt="" coords="816,338,736,337,737,332,816,332"/>
+<area shape="poly" id="edge22_Node000015_Node000013" title=" " alt="" coords="752,315,831,315,831,320,752,320"/>
+<area shape="poly" id="edge23_Node000015_Node000014" title=" " alt="" coords="575,339,513,346,512,341,574,334"/>
+<area shape="poly" id="edge26_Node000016_Node000014" title=" " alt="" coords="589,417,461,370,462,365,591,412"/>
+</map>

@@ -1,0 +1,153 @@
+\doxysection{catch\+\_\+output\+\_\+redirect.\+cpp}
+\hypertarget{catch__output__redirect_8cpp_source}{}\label{catch__output__redirect_8cpp_source}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_output\_redirect.cpp@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_output\_redirect.cpp}}
+\mbox{\hyperlink{catch__output__redirect_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00002}00002\ \textcolor{comment}{\ *\ \ Created\ by\ Martin\ on\ 28/04/2018.}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00004}00004\ \textcolor{comment}{\ *\ \ Distributed\ under\ the\ Boost\ Software\ License,\ Version\ 1.0.\ (See\ accompanying}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00005}00005\ \textcolor{comment}{\ *\ \ file\ LICENSE\_1\_0.txt\ or\ copy\ at\ http://www.boost.org/LICENSE\_1\_0.txt)}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00006}00006\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__output__redirect_8h}{catch\_output\_redirect.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__enforce_8h}{catch\_enforce.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00011}00011\ \textcolor{preprocessor}{\#include\ <cstdio>}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00012}00012\ \textcolor{preprocessor}{\#include\ <cstring>}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00013}00013\ \textcolor{preprocessor}{\#include\ <fstream>}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00014}00014\ \textcolor{preprocessor}{\#include\ <sstream>}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00015}00015\ \textcolor{preprocessor}{\#include\ <stdexcept>}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00017}00017\ \textcolor{preprocessor}{\#if\ defined(CATCH\_CONFIG\_NEW\_CAPTURE)}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00018}00018\ \textcolor{preprocessor}{\ \ \ \ \#if\ defined(\_MSC\_VER)}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00019}00019\ \textcolor{preprocessor}{\ \ \ \ \#include\ <io.h>}\ \ \ \ \ \ \textcolor{comment}{//\_dup\ and\ \_dup2}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00020}00020\ \textcolor{preprocessor}{\ \ \ \ \#define\ dup\ \_dup}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00021}00021\ \textcolor{preprocessor}{\ \ \ \ \#define\ dup2\ \_dup2}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00022}00022\ \textcolor{preprocessor}{\ \ \ \ \#define\ fileno\ \_fileno}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00023}00023\ \textcolor{preprocessor}{\ \ \ \ \#else}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00024}00024\ \textcolor{preprocessor}{\ \ \ \ \#include\ <unistd.h>}\ \ \textcolor{comment}{//\ dup\ and\ dup2}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00025}00025\ \textcolor{preprocessor}{\ \ \ \ \#endif}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00026}00026\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00029}00029\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00031}\mbox{\hyperlink{class_catch_1_1_redirected_stream_af71b305daa0eae351db5c26bca67b11e}{00031}}\ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_redirected_stream_af71b305daa0eae351db5c26bca67b11e}{RedirectedStream::RedirectedStream}}(\ std::ostream\&\ originalStream,\ std::ostream\&\ redirectionStream\ )}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00032}00032\ \ \ \ \ :\ \ \ m\_originalStream(\ originalStream\ ),}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00033}00033\ \ \ \ \ \ \ \ \ m\_redirectionStream(\ redirectionStream\ ),}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00034}00034\ \ \ \ \ \ \ \ \ m\_prevBuf(\ m\_originalStream.rdbuf()\ )}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00035}00035\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00036}00036\ \ \ \ \ \ \ \ \ m\_originalStream.rdbuf(\ m\_redirectionStream.rdbuf()\ );}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00037}00037\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00039}\mbox{\hyperlink{class_catch_1_1_redirected_stream_a48ccdbd48da7edc540d4a4b672430ab8}{00039}}\ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_redirected_stream_a48ccdbd48da7edc540d4a4b672430ab8}{RedirectedStream::\string~RedirectedStream}}()\ \{}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00040}00040\ \ \ \ \ \ \ \ \ m\_originalStream.rdbuf(\ m\_prevBuf\ );}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00041}00041\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00043}\mbox{\hyperlink{class_catch_1_1_redirected_std_out_a5c9651c5bbc920c3da670069cb6201b4}{00043}}\ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_redirected_std_out_a5c9651c5bbc920c3da670069cb6201b4}{RedirectedStdOut::RedirectedStdOut}}()\ :\ m\_cout(\ \mbox{\hyperlink{namespace_catch}{Catch}}::cout(),\ m\_rss.get()\ )\ \{\}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00044}\mbox{\hyperlink{class_catch_1_1_redirected_std_out_afd46da9836223d033c031fb08a9efb1c}{00044}}\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{class_catch_1_1_redirected_std_out_afd46da9836223d033c031fb08a9efb1c}{RedirectedStdOut::str}}()\ const\ -\/>\ \mbox{\hyperlink{namespacestd}{std}}::\textcolor{keywordtype}{string}\ \{\ \textcolor{keywordflow}{return}\ m\_rss.\mbox{\hyperlink{class_catch_1_1_reusable_string_stream_a0e9ecf260b2a5d35f4886ef0d51f6270}{str}}();\ \}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00046}\mbox{\hyperlink{class_catch_1_1_redirected_std_err_aaa28441aca551e10686708db7c3bfa52}{00046}}\ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_redirected_std_err_aaa28441aca551e10686708db7c3bfa52}{RedirectedStdErr::RedirectedStdErr}}()}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00047}00047\ \ \ \ \ :\ \ \ m\_cerr(\ \mbox{\hyperlink{namespace_catch}{Catch}}::\mbox{\hyperlink{namespace_catch_a54c1ce08041448d684ae8edc14162cd2}{cerr}}(),\ m\_rss.get()\ ),}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00048}00048\ \ \ \ \ \ \ \ \ m\_clog(\ \mbox{\hyperlink{namespace_catch}{Catch}}::\mbox{\hyperlink{namespace_catch_a1b2213f54e4d31a659db49827e81856b}{clog}}(),\ m\_rss.get()\ )}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00049}00049\ \ \ \ \ \{\}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00050}\mbox{\hyperlink{class_catch_1_1_redirected_std_err_a35176680e723b9b4cb0f5e1290bd75e2}{00050}}\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{class_catch_1_1_redirected_std_err_a35176680e723b9b4cb0f5e1290bd75e2}{RedirectedStdErr::str}}()\ const\ -\/>\ \mbox{\hyperlink{namespacestd}{std}}::\textcolor{keywordtype}{string}\ \{\ \textcolor{keywordflow}{return}\ m\_rss.\mbox{\hyperlink{class_catch_1_1_reusable_string_stream_a0e9ecf260b2a5d35f4886ef0d51f6270}{str}}();\ \}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00052}\mbox{\hyperlink{class_catch_1_1_redirected_streams_a5fca51e2717d9533b97c973da9f2bed2}{00052}}\ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_redirected_streams_a5db6af3c2a9607da2fd6cdd9bb5ff0eb}{RedirectedStreams::RedirectedStreams}}(std::string\&\ redirectedCout,\ std::string\&\ redirectedCerr)}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00053}00053\ \ \ \ \ :\ \ \ m\_redirectedCout(redirectedCout),}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00054}00054\ \ \ \ \ \ \ \ \ m\_redirectedCerr(redirectedCerr)}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00055}00055\ \ \ \ \ \{\}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00057}\mbox{\hyperlink{class_catch_1_1_redirected_streams_a6dd8e93490a905cedfa9c1556baf3743}{00057}}\ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_redirected_streams_a6dd8e93490a905cedfa9c1556baf3743}{RedirectedStreams::\string~RedirectedStreams}}()\ \{}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00058}00058\ \ \ \ \ \ \ \ \ m\_redirectedCout\ +=\ m\_redirectedStdOut.\mbox{\hyperlink{class_catch_1_1_redirected_std_out_afd46da9836223d033c031fb08a9efb1c}{str}}();}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00059}00059\ \ \ \ \ \ \ \ \ m\_redirectedCerr\ +=\ m\_redirectedStdErr.\mbox{\hyperlink{class_catch_1_1_redirected_std_err_a35176680e723b9b4cb0f5e1290bd75e2}{str}}();}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00060}00060\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00062}00062\ \textcolor{preprocessor}{\#if\ defined(CATCH\_CONFIG\_NEW\_CAPTURE)}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00064}00064\ \textcolor{preprocessor}{\#if\ defined(\_MSC\_VER)}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00065}00065\ \ \ \ \ TempFile::TempFile()\ \{}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00066}00066\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (tmpnam\_s(m\_buffer))\ \{}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00067}00067\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{catch__enforce_8h_a6274a54d9b6da60d7c6e9033b310d8b2}{CATCH\_RUNTIME\_ERROR}}(\textcolor{stringliteral}{"{}Could\ not\ get\ a\ temp\ filename"{}});}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00068}00068\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00069}00069\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (fopen\_s(\&m\_file,\ m\_buffer,\ \textcolor{stringliteral}{"{}w"{}}))\ \{}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ buffer[100];}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00071}00071\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (strerror\_s(buffer,\ errno))\ \{}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{catch__enforce_8h_a6274a54d9b6da60d7c6e9033b310d8b2}{CATCH\_RUNTIME\_ERROR}}(\textcolor{stringliteral}{"{}Could\ not\ translate\ errno\ to\ a\ string"{}});}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00073}00073\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00074}00074\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{catch__enforce_8h_a6274a54d9b6da60d7c6e9033b310d8b2}{CATCH\_RUNTIME\_ERROR}}(\textcolor{stringliteral}{"{}Could\ not\ open\ the\ temp\ file:\ '"{}}\ <<\ m\_buffer\ <<\ \textcolor{stringliteral}{"{}'\ because:\ "{}}\ <<\ buffer);}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00075}00075\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00076}00076\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00077}00077\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00078}00078\ \ \ \ \ TempFile::TempFile()\ \{}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00079}00079\ \ \ \ \ \ \ \ \ m\_file\ =\ std::tmpfile();}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00080}00080\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!m\_file)\ \{}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00081}00081\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{catch__enforce_8h_a6274a54d9b6da60d7c6e9033b310d8b2}{CATCH\_RUNTIME\_ERROR}}(\textcolor{stringliteral}{"{}Could\ not\ create\ a\ temp\ file."{}});}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00082}00082\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00083}00083\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00084}00084\ }
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00085}00085\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00086}00086\ }
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00087}00087\ \ \ \ \ TempFile::\string~TempFile()\ \{}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00088}00088\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ TBD:\ What\ to\ do\ about\ errors\ here?}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00089}00089\ \ \ \ \ \ \ \ \ \ std::fclose(m\_file);}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00090}00090\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ We\ manually\ create\ the\ file\ on\ Windows\ only,\ on\ Linux}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00091}00091\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ it\ will\ be\ autodeleted}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00092}00092\ \textcolor{preprocessor}{\#if\ defined(\_MSC\_VER)}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00093}00093\ \ \ \ \ \ \ \ \ \ std::remove(m\_buffer);}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00094}00094\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00095}00095\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00096}00096\ }
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00097}00097\ }
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00098}00098\ \ \ \ \ FILE*\ TempFile::getFile()\ \{}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00099}00099\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_file;}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00100}00100\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00101}00101\ }
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00102}00102\ \ \ \ \ std::string\ TempFile::getContents()\ \{}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00103}00103\ \ \ \ \ \ \ \ \ std::stringstream\ sstr;}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00104}00104\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ buffer[100]\ =\ \{\};}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00105}00105\ \ \ \ \ \ \ \ \ std::rewind(m\_file);}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00106}00106\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (std::fgets(buffer,\ \textcolor{keyword}{sizeof}(buffer),\ m\_file))\ \{}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00107}00107\ \ \ \ \ \ \ \ \ \ \ \ \ sstr\ <<\ buffer;}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00108}00108\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00109}00109\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ sstr.str();}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00110}00110\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00111}00111\ }
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00112}00112\ \ \ \ \ OutputRedirect::OutputRedirect(std::string\&\ stdout\_dest,\ std::string\&\ stderr\_dest)\ :}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00113}00113\ \ \ \ \ \ \ \ \ m\_originalStdout(dup(1)),}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00114}00114\ \ \ \ \ \ \ \ \ m\_originalStderr(dup(2)),}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00115}00115\ \ \ \ \ \ \ \ \ m\_stdoutDest(stdout\_dest),}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00116}00116\ \ \ \ \ \ \ \ \ m\_stderrDest(stderr\_dest)\ \{}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00117}00117\ \ \ \ \ \ \ \ \ dup2(fileno(m\_stdoutFile.getFile()),\ 1);}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00118}00118\ \ \ \ \ \ \ \ \ dup2(fileno(m\_stderrFile.getFile()),\ 2);}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00119}00119\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00120}00120\ }
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00121}00121\ \ \ \ \ OutputRedirect::\string~OutputRedirect()\ \{}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00122}00122\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_catch_a0179d453617ba2296f2baa99a49e7264}{Catch::cout}}()\ <<\ std::flush;}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00123}00123\ \ \ \ \ \ \ \ \ fflush(stdout);}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00124}00124\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Since\ we\ support\ overriding\ these\ streams,\ we\ flush\ cerr}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00125}00125\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ even\ though\ std::cerr\ is\ unbuffered}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00126}00126\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_catch_a54c1ce08041448d684ae8edc14162cd2}{Catch::cerr}}()\ <<\ std::flush;}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00127}00127\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_catch_a1b2213f54e4d31a659db49827e81856b}{Catch::clog}}()\ <<\ std::flush;}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00128}00128\ \ \ \ \ \ \ \ \ fflush(stderr);}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00129}00129\ }
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00130}00130\ \ \ \ \ \ \ \ \ dup2(m\_originalStdout,\ 1);}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00131}00131\ \ \ \ \ \ \ \ \ dup2(m\_originalStderr,\ 2);}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00132}00132\ }
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00133}00133\ \ \ \ \ \ \ \ \ m\_stdoutDest\ +=\ m\_stdoutFile.getContents();}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00134}00134\ \ \ \ \ \ \ \ \ m\_stderrDest\ +=\ m\_stderrFile.getContents();}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00135}00135\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00136}00136\ }
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00137}00137\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ CATCH\_CONFIG\_NEW\_CAPTURE}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00138}00138\ }
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00139}00139\ \}\ \textcolor{comment}{//\ namespace\ Catch}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00140}00140\ }
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00141}00141\ \textcolor{preprocessor}{\#if\ defined(CATCH\_CONFIG\_NEW\_CAPTURE)}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00142}00142\ \textcolor{preprocessor}{\ \ \ \ \#if\ defined(\_MSC\_VER)}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00143}00143\ \textcolor{preprocessor}{\ \ \ \ \#undef\ dup}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00144}00144\ \textcolor{preprocessor}{\ \ \ \ \#undef\ dup2}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00145}00145\ \textcolor{preprocessor}{\ \ \ \ \#undef\ fileno}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00146}00146\ \textcolor{preprocessor}{\ \ \ \ \#endif}}
+\DoxyCodeLine{\Hypertarget{catch__output__redirect_8cpp_source_l00147}00147\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

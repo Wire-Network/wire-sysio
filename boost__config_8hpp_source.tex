@@ -1,0 +1,78 @@
+\doxysection{boost\+\_\+config.\+hpp}
+\hypertarget{boost__config_8hpp_source}{}\label{boost__config_8hpp_source}\index{libraries/fc/vendor/websocketpp/websocketpp/config/boost\_config.hpp@{libraries/fc/vendor/websocketpp/websocketpp/config/boost\_config.hpp}}
+\mbox{\hyperlink{boost__config_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2014,\ Peter\ Thorson.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00004}00004\ \textcolor{comment}{\ *\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00005}00005\ \textcolor{comment}{\ *\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are\ met:}}
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00006}00006\ \textcolor{comment}{\ *\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00007}00007\ \textcolor{comment}{\ *\ \ \ \ \ \ \ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00008}00008\ \textcolor{comment}{\ *\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00009}00009\ \textcolor{comment}{\ *\ \ \ \ \ \ \ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer\ in\ the}}
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00010}00010\ \textcolor{comment}{\ *\ \ \ \ \ \ \ documentation\ and/or\ other\ materials\ provided\ with\ the\ distribution.}}
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00011}00011\ \textcolor{comment}{\ *\ \ \ \ \ *\ Neither\ the\ name\ of\ the\ WebSocket++\ Project\ nor\ the}}
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00012}00012\ \textcolor{comment}{\ *\ \ \ \ \ \ \ names\ of\ its\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products}}
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00013}00013\ \textcolor{comment}{\ *\ \ \ \ \ \ \ derived\ from\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00014}00014\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00015}00015\ \textcolor{comment}{\ *\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS\ "{}AS\ IS"{}}}
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00016}00016\ \textcolor{comment}{\ *\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ THE}}
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00017}00017\ \textcolor{comment}{\ *\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR\ A\ PARTICULAR\ PURPOSE}}
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00018}00018\ \textcolor{comment}{\ *\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ PETER\ THORSON\ BE\ LIABLE\ FOR\ ANY}}
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00019}00019\ \textcolor{comment}{\ *\ DIRECT,\ INDIRECT,\ INCIDENTAL,\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES}}
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00020}00020\ \textcolor{comment}{\ *\ (INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;}}
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00021}00021\ \textcolor{comment}{\ *\ LOSS\ OF\ USE,\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND}}
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00022}00022\ \textcolor{comment}{\ *\ ON\ ANY\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00023}00023\ \textcolor{comment}{\ *\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE\ OF\ THIS}}
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00024}00024\ \textcolor{comment}{\ *\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00025}00025\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00026}00026\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00028}00028\ \ \textcolor{comment}{//\ This\ header\ defines\ WebSocket++\ macros\ for\ C++11\ compatibility\ based\ on\ the\ }}
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00029}00029\ \ \textcolor{comment}{//\ Boost.Config\ library.\ This\ will\ correctly\ configure\ most\ target\ platforms}}
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00030}00030\ \ \textcolor{comment}{//\ simply\ by\ including\ this\ header\ before\ any\ other\ WebSocket++\ header.}}
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00032}00032\ \textcolor{preprocessor}{\#ifndef\ WEBSOCKETPP\_CONFIG\_BOOST\_CONFIG\_HPP}}
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00033}00033\ \textcolor{preprocessor}{\#define\ WEBSOCKETPP\_CONFIG\_BOOST\_CONFIG\_HPP}}
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00035}00035\ \textcolor{preprocessor}{\#include\ <boost/config.hpp>}}
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00037}00037\ \textcolor{comment}{//\ \ \_WEBSOCKETPP\_CPP11\_MEMORY\_\ and\ \_WEBSOCKETPP\_CPP11\_FUNCTIONAL\_\ presently}}
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00038}00038\ \textcolor{comment}{//\ \ only\ work\ if\ either\ both\ or\ neither\ is\ defined.}}
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00039}00039\ \textcolor{preprocessor}{\#if\ !defined\ BOOST\_NO\_CXX11\_SMART\_PTR\ \&\&\ !defined\ BOOST\_NO\_CXX11\_HDR\_FUNCTIONAL}}
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00040}\mbox{\hyperlink{boost__config_8hpp_a947707712fbeefb01690b1506d1f49ac}{00040}}\ \textcolor{preprocessor}{\ \ \ \ \#define\ \_WEBSOCKETPP\_CPP11\_MEMORY\_}}
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00041}\mbox{\hyperlink{boost__config_8hpp_a41268ccadfe942ca3d7f6bfcd363149a}{00041}}\ \textcolor{preprocessor}{\ \ \ \ \#define\ \_WEBSOCKETPP\_CPP11\_FUNCTIONAL\_}}
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00042}00042\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00044}00044\ \textcolor{preprocessor}{\#ifdef\ BOOST\_ASIO\_HAS\_STD\_CHRONO}}
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00045}00045\ \textcolor{preprocessor}{\ \ \ \ \#define\ \_WEBSOCKETPP\_CPP11\_CHRONO\_}}
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00046}00046\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00048}00048\ \textcolor{preprocessor}{\#ifndef\ BOOST\_NO\_CXX11\_HDR\_RANDOM}}
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00049}\mbox{\hyperlink{boost__config_8hpp_ab3e79573735c842d9fee23cbda8dd1a7}{00049}}\ \textcolor{preprocessor}{\ \ \ \ \#define\ \_WEBSOCKETPP\_CPP11\_RANDOM\_DEVICE\_}}
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00050}00050\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00052}00052\ \textcolor{preprocessor}{\#ifndef\ BOOST\_NO\_CXX11\_HDR\_REGEX}}
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00053}\mbox{\hyperlink{boost__config_8hpp_ade6e10fc9b57a5012518098fb2758097}{00053}}\ \textcolor{preprocessor}{\ \ \ \ \#define\ \_WEBSOCKETPP\_CPP11\_REGEX\_}}
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00054}00054\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00056}00056\ \textcolor{preprocessor}{\#ifndef\ BOOST\_NO\_CXX11\_HDR\_SYSTEM\_ERROR}}
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00057}\mbox{\hyperlink{boost__config_8hpp_a9fe9b9754a2edeb7489a5f14032cf34c}{00057}}\ \textcolor{preprocessor}{\ \ \ \ \#define\ \_WEBSOCKETPP\_CPP11\_SYSTEM\_ERROR\_}}
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00058}00058\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00060}00060\ \textcolor{preprocessor}{\#ifndef\ BOOST\_NO\_CXX11\_HDR\_THREAD}}
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00061}\mbox{\hyperlink{boost__config_8hpp_a6b071d3fc2db622da3f026de9edfd99f}{00061}}\ \textcolor{preprocessor}{\ \ \ \ \#define\ \_WEBSOCKETPP\_CPP11\_THREAD\_}}
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00062}00062\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00064}00064\ \textcolor{preprocessor}{\#ifndef\ BOOST\_NO\_CXX11\_HDR\_INITIALIZER\_LIST}}
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00065}\mbox{\hyperlink{boost__config_8hpp_aae01f81736ba5f546a21cde7535aee0b}{00065}}\ \textcolor{preprocessor}{\ \ \ \ \#define\ \_WEBSOCKETPP\_INITIALIZER\_LISTS\_}}
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00066}00066\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00067}00067\ }
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00068}\mbox{\hyperlink{boost__config_8hpp_aa19747404a5f2fe9c9eb9e9d2e48f26c}{00068}}\ \textcolor{preprocessor}{\#define\ \_WEBSOCKETPP\_NOEXCEPT\_TOKEN\_\ \ BOOST\_NOEXCEPT}}
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00069}\mbox{\hyperlink{boost__config_8hpp_a3dc3ece336a6149d2fe208a9daf66043}{00069}}\ \textcolor{preprocessor}{\#define\ \_WEBSOCKETPP\_CONSTEXPR\_TOKEN\_\ \ BOOST\_CONSTEXPR}}
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00070}00070\ \textcolor{comment}{//\ TODO:\ nullptr\ support}}
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{boost__config_8hpp_source_l00072}00072\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ WEBSOCKETPP\_CONFIG\_BOOST\_CONFIG\_HPP}}
+
+\end{DoxyCode}

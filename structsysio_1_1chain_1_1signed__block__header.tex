@@ -1,0 +1,99 @@
+\doxysection{sysio\+::chain\+::signed\+\_\+block\+\_\+header Struct Reference}
+\hypertarget{structsysio_1_1chain_1_1signed__block__header}{}\label{structsysio_1_1chain_1_1signed__block__header}\index{sysio::chain::signed\_block\_header@{sysio::chain::signed\_block\_header}}
+
+
+{\ttfamily \#include $<$block\+\_\+header.\+hpp$>$}
+
+
+
+Inheritance diagram for sysio\+::chain\+::signed\+\_\+block\+\_\+header\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=183pt]{structsysio_1_1chain_1_1signed__block__header__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for sysio\+::chain\+::signed\+\_\+block\+\_\+header\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1signed__block__header__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_af141a69eb789b86fa0eb93c2d263f0df}{signature\+\_\+type}} \mbox{\hyperlink{structsysio_1_1chain_1_1signed__block__header_aa04816706c5578bf702120d27b9c0a9a}{producer\+\_\+signature}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes inherited from \mbox{\hyperlink{structsysio_1_1chain_1_1block__header}{sysio\+::chain\+::block\+\_\+header}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_a11965fc424809ea1802175f8b36ae4e5}{block\+\_\+timestamp\+\_\+type}} \mbox{\hyperlink{structsysio_1_1chain_1_1block__header_a0fe1e5860e2b78b0a14da6565e2294bb}{timestamp}}
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_ac32ce8e75243f2b3f76aff0c1984f11b}{account\+\_\+name}} \mbox{\hyperlink{structsysio_1_1chain_1_1block__header_ab73cce40ff45b968f3d9283d7ce1fcbd}{producer}}
+\item 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1block__header_a2d039a5279169467dd1b3dae80ff2be3}{confirmed}} = 1
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{block\+\_\+id\+\_\+type}} \mbox{\hyperlink{structsysio_1_1chain_1_1block__header_a449ed3d87648accf54bd0eae4424a3df}{previous}}
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_a9c3cb5131331ed8d52a589437ccfb03e}{checksum256\+\_\+type}} \mbox{\hyperlink{structsysio_1_1chain_1_1block__header_a2e1b24b48c9bbbe2d56ba6db5666673d}{transaction\+\_\+mroot}}
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_a9c3cb5131331ed8d52a589437ccfb03e}{checksum256\+\_\+type}} \mbox{\hyperlink{structsysio_1_1chain_1_1block__header_a4096ec8f931ab9180ae80f6e06332103}{action\+\_\+mroot}}
+\begin{DoxyCompactList}\small\item\em mroot of cycles\+\_\+summary \end{DoxyCompactList}\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1block__header_a8529628ed392b72693f23a636814172f}{schedule\+\_\+version}} = 0
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1block__header_a09559dcefcfa11f62793d1cefabd5ad4}{new\+\_\+producers\+\_\+type}} \mbox{\hyperlink{structsysio_1_1chain_1_1block__header_afbddec026595d42b3a280f8c0fddf336}{new\+\_\+producers}}
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_a73874b5910498c8a58def7defc7eaee8}{extensions\+\_\+type}} \mbox{\hyperlink{structsysio_1_1chain_1_1block__header_a8b87aa5950dbd992025ff7c213b1858a}{header\+\_\+extensions}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Public Types inherited from \mbox{\hyperlink{structsysio_1_1chain_1_1block__header}{sysio\+::chain\+::block\+\_\+header}}}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{structsysio_1_1chain_1_1block__header_a09559dcefcfa11f62793d1cefabd5ad4}{new\+\_\+producers\+\_\+type}} = std\+::optional$<$\mbox{\hyperlink{structsysio_1_1chain_1_1legacy_1_1producer__schedule__type}{legacy\+::producer\+\_\+schedule\+\_\+type}}$>$
+\begin{DoxyCompactList}\small\item\em mroot of all delivered action receipts \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{structsysio_1_1chain_1_1block__header}{sysio\+::chain\+::block\+\_\+header}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1block__header_a30b575d6e4e1c849e3f11f172a6a8708}{block\+\_\+header}} ()=default
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_a357fd9478475457e5bb386a3143079b6}{digest\+\_\+type}} \mbox{\hyperlink{structsysio_1_1chain_1_1block__header_a71165691e3205b1f4dd847b5c6bc5b22}{digest}} () const
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{block\+\_\+id\+\_\+type}} \mbox{\hyperlink{structsysio_1_1chain_1_1block__header_ab1f18a64cbf39c54da83f75c9632f9cd}{calculate\+\_\+id}} () const
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1block__header_a84daf28c790313cfaffff12e2a962cdb}{block\+\_\+num}} () const
+\item 
+flat\+\_\+multimap$<$ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}}, \mbox{\hyperlink{namespacesysio_1_1chain_a9bc7e3417f8d4ae5aa0f9604f335323e}{block\+\_\+header\+\_\+extension}} $>$ \mbox{\hyperlink{structsysio_1_1chain_1_1block__header_ad1f785fbd31eb3bd5b02835c33408886}{validate\+\_\+and\+\_\+extract\+\_\+header\+\_\+extensions}} () const
+\end{DoxyCompactItemize}
+\doxysubsection*{Static Public Member Functions inherited from \mbox{\hyperlink{structsysio_1_1chain_1_1block__header}{sysio\+::chain\+::block\+\_\+header}}}
+\begin{DoxyCompactItemize}
+\item 
+static \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{structsysio_1_1chain_1_1block__header_a39d57e33ef8d3f6ba59b4c458f0ae375}{num\+\_\+from\+\_\+id}} (const \mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{block\+\_\+id\+\_\+type}} \&\mbox{\hyperlink{code__cache_8cpp_aa0efefe21f4700d78692edc823e763be}{id}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{block__header_8hpp_source_l00075}{75}} of file \mbox{\hyperlink{block__header_8hpp_source}{block\+\_\+header.\+hpp}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1chain_1_1signed__block__header_aa04816706c5578bf702120d27b9c0a9a}\index{sysio::chain::signed\_block\_header@{sysio::chain::signed\_block\_header}!producer\_signature@{producer\_signature}}
+\index{producer\_signature@{producer\_signature}!sysio::chain::signed\_block\_header@{sysio::chain::signed\_block\_header}}
+\doxysubsubsection{\texorpdfstring{producer\_signature}{producer\_signature}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1signed__block__header_aa04816706c5578bf702120d27b9c0a9a} 
+\mbox{\hyperlink{namespacesysio_1_1chain_af141a69eb789b86fa0eb93c2d263f0df}{signature\+\_\+type}} sysio\+::chain\+::signed\+\_\+block\+\_\+header\+::producer\+\_\+signature}
+
+
+
+Definition at line \mbox{\hyperlink{block__header_8hpp_source_l00077}{77}} of file \mbox{\hyperlink{block__header_8hpp_source}{block\+\_\+header.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/\mbox{\hyperlink{block__header_8hpp}{block\+\_\+header.\+hpp}}\end{DoxyCompactItemize}

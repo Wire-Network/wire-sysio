@@ -1,0 +1,204 @@
+\doxysection{fc\+::process\+::impl Class Reference}
+\hypertarget{classfc_1_1process_1_1impl}{}\label{classfc_1_1process_1_1impl}\index{fc::process::impl@{fc::process::impl}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1process_1_1impl_a7cc655f7f7b118e849f01baa74fc7ebe}{impl}} ()
+\item 
+\mbox{\hyperlink{classfc_1_1process_1_1impl_aea59482a7b5df894a163a0b6b7f6a7e7}{\texorpdfstring{$\sim$}{\string~}impl}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::shared\+\_\+ptr$<$ bp\+::child $>$ \mbox{\hyperlink{classfc_1_1process_1_1impl_afb0bf380d0ab71fc5c4c176dc8c04d9d}{child}}
+\item 
+std\+::shared\+\_\+ptr$<$ bp\+::pipe $>$ \mbox{\hyperlink{classfc_1_1process_1_1impl_a6cd566d0eaa70107701d90f8f9696c42}{\+\_\+inp}}
+\item 
+std\+::shared\+\_\+ptr$<$ bp\+::pipe $>$ \mbox{\hyperlink{classfc_1_1process_1_1impl_a3f9df0eef8bbd4fcc8faac1e35b772cb}{\+\_\+outp}}
+\item 
+std\+::shared\+\_\+ptr$<$ bp\+::pipe $>$ \mbox{\hyperlink{classfc_1_1process_1_1impl_a9576ff72b2aa4832df23c8e3a9efc5f8}{\+\_\+errp}}
+\item 
+\mbox{\hyperlink{namespacefc_a1de1d095ba3c29dc0ced564bc8f45123}{buffered\+\_\+istream\+\_\+ptr}} \mbox{\hyperlink{classfc_1_1process_1_1impl_a13075131159d821d4ec121ac8a45a5c3}{\+\_\+out}}
+\item 
+\mbox{\hyperlink{namespacefc_a1de1d095ba3c29dc0ced564bc8f45123}{buffered\+\_\+istream\+\_\+ptr}} \mbox{\hyperlink{classfc_1_1process_1_1impl_ab36db23be72e25723681678f10ffac4e}{\+\_\+err}}
+\item 
+\mbox{\hyperlink{namespacefc_a95f13893819c9b7254bd8dc1f906c497}{buffered\+\_\+ostream\+\_\+ptr}} \mbox{\hyperlink{classfc_1_1process_1_1impl_ad30de389f313b795cba873cea4954a4d}{\+\_\+in}}
+\item 
+bp\+::status \mbox{\hyperlink{classfc_1_1process_1_1impl_aaaedc39e5aa96be4ec8e676aeab7db7b}{stat}}
+\item 
+bp\+::context \mbox{\hyperlink{classfc_1_1process_1_1impl_a19790cdb8fcf5b620ab532702c9728d8}{pctx}}
+\item 
+fc\+::future$<$ int $>$ \mbox{\hyperlink{classfc_1_1process_1_1impl_a5721dbb0ab23faadaab56847f50166a9}{\+\_\+exited}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{process_8cpp_source_l00029}{29}} of file \mbox{\hyperlink{process_8cpp_source}{process.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1process_1_1impl_a7cc655f7f7b118e849f01baa74fc7ebe}\index{fc::process::impl@{fc::process::impl}!impl@{impl}}
+\index{impl@{impl}!fc::process::impl@{fc::process::impl}}
+\doxysubsubsection{\texorpdfstring{impl()}{impl()}}
+{\footnotesize\ttfamily \label{classfc_1_1process_1_1impl_a7cc655f7f7b118e849f01baa74fc7ebe} 
+fc\+::process\+::impl\+::impl (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{process_8cpp_source_l00032}{32}} of file \mbox{\hyperlink{process_8cpp_source}{process.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00033\ \ \ :\mbox{\hyperlink{classfc_1_1process_1_1impl_aaaedc39e5aa96be4ec8e676aeab7db7b}{stat}}(\ fc::asio::default\_io\_service()\ )\{\}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1process_1_1impl_aea59482a7b5df894a163a0b6b7f6a7e7}\index{fc::process::impl@{fc::process::impl}!````~impl@{\texorpdfstring{$\sim$}{\string~}impl}}
+\index{````~impl@{\texorpdfstring{$\sim$}{\string~}impl}!fc::process::impl@{fc::process::impl}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}impl()}{\string~impl()}}
+{\footnotesize\ttfamily \label{classfc_1_1process_1_1impl_aea59482a7b5df894a163a0b6b7f6a7e7} 
+fc\+::process\+::impl\+::\texorpdfstring{$\sim$}{\string~}impl (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{process_8cpp_source_l00035}{35}} of file \mbox{\hyperlink{process_8cpp_source}{process.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00036\ \ \ \{}
+\DoxyCodeLine{00037\ \ \ \ \ \textcolor{keywordflow}{try}\ }
+\DoxyCodeLine{00038\ \ \ \ \ \{}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{classfc_1_1process_1_1impl_ad30de389f313b795cba873cea4954a4d}{\_in}}\ )}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1process_1_1impl_ad30de389f313b795cba873cea4954a4d}{\_in}}-\/>close();}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{classfc_1_1process_1_1impl_a5721dbb0ab23faadaab56847f50166a9}{\_exited}}.valid()\ \&\&\ !\mbox{\hyperlink{classfc_1_1process_1_1impl_a5721dbb0ab23faadaab56847f50166a9}{\_exited}}.ready())\ }
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//child-\/>terminate();}}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1process_1_1impl_a5721dbb0ab23faadaab56847f50166a9}{\_exited}}.wait();}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00048\ \ \ \ \ \}}
+\DoxyCodeLine{00049\ \ \ \ \ \textcolor{keywordflow}{catch}(...)\ }
+\DoxyCodeLine{00050\ \ \ \ \ \{}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \mbox{\hyperlink{logger_8hpp_a1759e5c9691d8ad754bdf5eff8bb23ac}{wlog}}(\ \textcolor{stringliteral}{"{}caught\ exception\ cleaning\ up\ process:\ \$\{except\_str\}"{}},\ (\textcolor{stringliteral}{"{}except\_str"{}},\mbox{\hyperlink{namespacefc_a2bbff129626558fab1e343fcd5ad8bc5}{fc::except\_str}}())\ );}
+\DoxyCodeLine{00052\ \ \ \ \ \}}
+\DoxyCodeLine{00053\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=287pt]{classfc_1_1process_1_1impl_aea59482a7b5df894a163a0b6b7f6a7e7_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classfc_1_1process_1_1impl_ab36db23be72e25723681678f10ffac4e}\index{fc::process::impl@{fc::process::impl}!\_err@{\_err}}
+\index{\_err@{\_err}!fc::process::impl@{fc::process::impl}}
+\doxysubsubsection{\texorpdfstring{\_err}{\_err}}
+{\footnotesize\ttfamily \label{classfc_1_1process_1_1impl_ab36db23be72e25723681678f10ffac4e} 
+\mbox{\hyperlink{namespacefc_a1de1d095ba3c29dc0ced564bc8f45123}{buffered\+\_\+istream\+\_\+ptr}} fc\+::process\+::impl\+::\+\_\+err}
+
+
+
+Definition at line \mbox{\hyperlink{process_8cpp_source_l00062}{62}} of file \mbox{\hyperlink{process_8cpp_source}{process.\+cpp}}.
+
+\Hypertarget{classfc_1_1process_1_1impl_a9576ff72b2aa4832df23c8e3a9efc5f8}\index{fc::process::impl@{fc::process::impl}!\_errp@{\_errp}}
+\index{\_errp@{\_errp}!fc::process::impl@{fc::process::impl}}
+\doxysubsubsection{\texorpdfstring{\_errp}{\_errp}}
+{\footnotesize\ttfamily \label{classfc_1_1process_1_1impl_a9576ff72b2aa4832df23c8e3a9efc5f8} 
+std\+::shared\+\_\+ptr$<$bp\+::pipe$>$ fc\+::process\+::impl\+::\+\_\+errp}
+
+
+
+Definition at line \mbox{\hyperlink{process_8cpp_source_l00059}{59}} of file \mbox{\hyperlink{process_8cpp_source}{process.\+cpp}}.
+
+\Hypertarget{classfc_1_1process_1_1impl_a5721dbb0ab23faadaab56847f50166a9}\index{fc::process::impl@{fc::process::impl}!\_exited@{\_exited}}
+\index{\_exited@{\_exited}!fc::process::impl@{fc::process::impl}}
+\doxysubsubsection{\texorpdfstring{\_exited}{\_exited}}
+{\footnotesize\ttfamily \label{classfc_1_1process_1_1impl_a5721dbb0ab23faadaab56847f50166a9} 
+fc\+::future$<$int$>$ fc\+::process\+::impl\+::\+\_\+exited}
+
+
+
+Definition at line \mbox{\hyperlink{process_8cpp_source_l00068}{68}} of file \mbox{\hyperlink{process_8cpp_source}{process.\+cpp}}.
+
+\Hypertarget{classfc_1_1process_1_1impl_ad30de389f313b795cba873cea4954a4d}\index{fc::process::impl@{fc::process::impl}!\_in@{\_in}}
+\index{\_in@{\_in}!fc::process::impl@{fc::process::impl}}
+\doxysubsubsection{\texorpdfstring{\_in}{\_in}}
+{\footnotesize\ttfamily \label{classfc_1_1process_1_1impl_ad30de389f313b795cba873cea4954a4d} 
+\mbox{\hyperlink{namespacefc_a95f13893819c9b7254bd8dc1f906c497}{buffered\+\_\+ostream\+\_\+ptr}} fc\+::process\+::impl\+::\+\_\+in}
+
+
+
+Definition at line \mbox{\hyperlink{process_8cpp_source_l00063}{63}} of file \mbox{\hyperlink{process_8cpp_source}{process.\+cpp}}.
+
+\Hypertarget{classfc_1_1process_1_1impl_a6cd566d0eaa70107701d90f8f9696c42}\index{fc::process::impl@{fc::process::impl}!\_inp@{\_inp}}
+\index{\_inp@{\_inp}!fc::process::impl@{fc::process::impl}}
+\doxysubsubsection{\texorpdfstring{\_inp}{\_inp}}
+{\footnotesize\ttfamily \label{classfc_1_1process_1_1impl_a6cd566d0eaa70107701d90f8f9696c42} 
+std\+::shared\+\_\+ptr$<$bp\+::pipe$>$ fc\+::process\+::impl\+::\+\_\+inp}
+
+
+
+Definition at line \mbox{\hyperlink{process_8cpp_source_l00057}{57}} of file \mbox{\hyperlink{process_8cpp_source}{process.\+cpp}}.
+
+\Hypertarget{classfc_1_1process_1_1impl_a13075131159d821d4ec121ac8a45a5c3}\index{fc::process::impl@{fc::process::impl}!\_out@{\_out}}
+\index{\_out@{\_out}!fc::process::impl@{fc::process::impl}}
+\doxysubsubsection{\texorpdfstring{\_out}{\_out}}
+{\footnotesize\ttfamily \label{classfc_1_1process_1_1impl_a13075131159d821d4ec121ac8a45a5c3} 
+\mbox{\hyperlink{namespacefc_a1de1d095ba3c29dc0ced564bc8f45123}{buffered\+\_\+istream\+\_\+ptr}} fc\+::process\+::impl\+::\+\_\+out}
+
+
+
+Definition at line \mbox{\hyperlink{process_8cpp_source_l00061}{61}} of file \mbox{\hyperlink{process_8cpp_source}{process.\+cpp}}.
+
+\Hypertarget{classfc_1_1process_1_1impl_a3f9df0eef8bbd4fcc8faac1e35b772cb}\index{fc::process::impl@{fc::process::impl}!\_outp@{\_outp}}
+\index{\_outp@{\_outp}!fc::process::impl@{fc::process::impl}}
+\doxysubsubsection{\texorpdfstring{\_outp}{\_outp}}
+{\footnotesize\ttfamily \label{classfc_1_1process_1_1impl_a3f9df0eef8bbd4fcc8faac1e35b772cb} 
+std\+::shared\+\_\+ptr$<$bp\+::pipe$>$ fc\+::process\+::impl\+::\+\_\+outp}
+
+
+
+Definition at line \mbox{\hyperlink{process_8cpp_source_l00058}{58}} of file \mbox{\hyperlink{process_8cpp_source}{process.\+cpp}}.
+
+\Hypertarget{classfc_1_1process_1_1impl_afb0bf380d0ab71fc5c4c176dc8c04d9d}\index{fc::process::impl@{fc::process::impl}!child@{child}}
+\index{child@{child}!fc::process::impl@{fc::process::impl}}
+\doxysubsubsection{\texorpdfstring{child}{child}}
+{\footnotesize\ttfamily \label{classfc_1_1process_1_1impl_afb0bf380d0ab71fc5c4c176dc8c04d9d} 
+std\+::shared\+\_\+ptr$<$bp\+::child$>$ fc\+::process\+::impl\+::child}
+
+
+
+Definition at line \mbox{\hyperlink{process_8cpp_source_l00055}{55}} of file \mbox{\hyperlink{process_8cpp_source}{process.\+cpp}}.
+
+\Hypertarget{classfc_1_1process_1_1impl_a19790cdb8fcf5b620ab532702c9728d8}\index{fc::process::impl@{fc::process::impl}!pctx@{pctx}}
+\index{pctx@{pctx}!fc::process::impl@{fc::process::impl}}
+\doxysubsubsection{\texorpdfstring{pctx}{pctx}}
+{\footnotesize\ttfamily \label{classfc_1_1process_1_1impl_a19790cdb8fcf5b620ab532702c9728d8} 
+bp\+::context fc\+::process\+::impl\+::pctx}
+
+
+
+Definition at line \mbox{\hyperlink{process_8cpp_source_l00066}{66}} of file \mbox{\hyperlink{process_8cpp_source}{process.\+cpp}}.
+
+\Hypertarget{classfc_1_1process_1_1impl_aaaedc39e5aa96be4ec8e676aeab7db7b}\index{fc::process::impl@{fc::process::impl}!stat@{stat}}
+\index{stat@{stat}!fc::process::impl@{fc::process::impl}}
+\doxysubsubsection{\texorpdfstring{stat}{stat}}
+{\footnotesize\ttfamily \label{classfc_1_1process_1_1impl_aaaedc39e5aa96be4ec8e676aeab7db7b} 
+bp\+::status fc\+::process\+::impl\+::stat}
+
+
+
+Definition at line \mbox{\hyperlink{process_8cpp_source_l00065}{65}} of file \mbox{\hyperlink{process_8cpp_source}{process.\+cpp}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/src/interprocess/\mbox{\hyperlink{process_8cpp}{process.\+cpp}}\end{DoxyCompactItemize}

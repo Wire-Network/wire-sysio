@@ -1,0 +1,185 @@
+\doxysection{libraries/chainbase/test/test.cpp File Reference}
+\hypertarget{test_8cpp}{}\label{test_8cpp}\index{libraries/chainbase/test/test.cpp@{libraries/chainbase/test/test.cpp}}
+{\ttfamily \#include $<$boost/test/unit\+\_\+test.\+hpp$>$}\newline
+{\ttfamily \#include $<$chainbase/chainbase.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/multi\+\_\+index\+\_\+container.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/multi\+\_\+index/ordered\+\_\+index.\+hpp$>$}\newline
+{\ttfamily \#include $<$boost/multi\+\_\+index/member.\+hpp$>$}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+Include dependency graph for test.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structbook}{book}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{test_8cpp_a6b2a3852db8bb19ab6909bac01859985}{BOOST\+\_\+\+TEST\+\_\+\+MODULE}}~chainbase test
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef multi\+\_\+index\+\_\+container$<$ \mbox{\hyperlink{structbook}{book}}, indexed\+\_\+by$<$ ordered\+\_\+unique$<$ member$<$ \mbox{\hyperlink{structbook}{book}}, \mbox{\hyperlink{structchainbase_1_1object_a7c6a0efb95ee67d538a976cfa5be9df9}{book\+::id\+\_\+type}},\&\mbox{\hyperlink{structbook_acc37660e6c336aaa48aefd654f5fe04a}{book\+::id}} $>$ $>$, ordered\+\_\+unique$<$ BOOST\+\_\+\+MULTI\+\_\+\+INDEX\+\_\+\+MEMBER(\mbox{\hyperlink{structbook}{book}}, int, \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}) $>$, ordered\+\_\+unique$<$ BOOST\+\_\+\+MULTI\+\_\+\+INDEX\+\_\+\+MEMBER(\mbox{\hyperlink{structbook}{book}}, int, b) $>$ $>$, \mbox{\hyperlink{namespacechainbase_a5235419f9dd4d8333aa4b5a2aa8f6125}{chainbase\+::node\+\_\+allocator}}$<$ \mbox{\hyperlink{structbook}{book}} $>$ $>$ \mbox{\hyperlink{test_8cpp_a943890c2cbccfeea3b499c742901185d}{book\+\_\+index}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{test_8cpp_a17ad3362b7befd62662dc155abc23919}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (open\+\_\+and\+\_\+create)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{test_8cpp_a6b2a3852db8bb19ab6909bac01859985}\index{test.cpp@{test.cpp}!BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}}
+\index{BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}!test.cpp@{test.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_TEST\_MODULE}{BOOST\_TEST\_MODULE}}
+{\footnotesize\ttfamily \label{test_8cpp_a6b2a3852db8bb19ab6909bac01859985} 
+\#define BOOST\+\_\+\+TEST\+\_\+\+MODULE~chainbase test}
+
+
+
+Definition at line \mbox{\hyperlink{test_8cpp_source_l00001}{1}} of file \mbox{\hyperlink{test_8cpp_source}{test.\+cpp}}.
+
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{test_8cpp_a943890c2cbccfeea3b499c742901185d}\index{test.cpp@{test.cpp}!book\_index@{book\_index}}
+\index{book\_index@{book\_index}!test.cpp@{test.cpp}}
+\doxysubsubsection{\texorpdfstring{book\_index}{book\_index}}
+{\footnotesize\ttfamily \label{test_8cpp_a943890c2cbccfeea3b499c742901185d} 
+typedef multi\+\_\+index\+\_\+container$<$ \mbox{\hyperlink{structbook}{book}}, indexed\+\_\+by$<$ ordered\+\_\+unique$<$ member$<$\mbox{\hyperlink{structbook}{book}},\mbox{\hyperlink{structchainbase_1_1object_a7c6a0efb95ee67d538a976cfa5be9df9}{book\+::id\+\_\+type}},\&\mbox{\hyperlink{structbook_acc37660e6c336aaa48aefd654f5fe04a}{book\+::id}}$>$ $>$, ordered\+\_\+unique$<$ BOOST\+\_\+\+MULTI\+\_\+\+INDEX\+\_\+\+MEMBER(\mbox{\hyperlink{structbook}{book}},int,\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}) $>$, ordered\+\_\+unique$<$ BOOST\+\_\+\+MULTI\+\_\+\+INDEX\+\_\+\+MEMBER(\mbox{\hyperlink{structbook}{book}},int,b) $>$ $>$, \mbox{\hyperlink{namespacechainbase_a5235419f9dd4d8333aa4b5a2aa8f6125}{chainbase\+::node\+\_\+allocator}}$<$\mbox{\hyperlink{structbook}{book}}$>$$>$ \mbox{\hyperlink{test_8cpp_a943890c2cbccfeea3b499c742901185d}{book\+\_\+index}}}
+
+
+
+Definition at line \mbox{\hyperlink{test_8cpp_source_l00037}{37}} of file \mbox{\hyperlink{test_8cpp_source}{test.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{test_8cpp_a17ad3362b7befd62662dc155abc23919}\index{test.cpp@{test.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!test.cpp@{test.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}}
+{\footnotesize\ttfamily \label{test_8cpp_a17ad3362b7befd62662dc155abc23919} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{open\+\_\+and\+\_\+create}]{}{}\end{DoxyParamCaption})}
+
+open an already created db
+
+index does not exist in read only database
+
+cannot add same index twice
+
+index should exist now
+
+\texorpdfstring{$<$}{<} these are mapped to different address ranges
+
+Definition at line \mbox{\hyperlink{test_8cpp_source_l00042}{42}} of file \mbox{\hyperlink{test_8cpp_source}{test.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00043\ \ \ \ boost::filesystem::path\ temp\ =\ boost::filesystem::temp\_directory\_path()\ /\ boost::filesystem::unique\_path();}
+\DoxyCodeLine{00044\ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ std::cerr\ <<\ temp\ <<\ \textcolor{stringliteral}{"{}\ \(\backslash\)n"{}};}
+\DoxyCodeLine{00046\ }
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \mbox{\hyperlink{classchainbase_1_1database}{chainbase::database}}\ db(temp,\ database::read\_write,\ 1024*1024*8);}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \mbox{\hyperlink{classchainbase_1_1database}{chainbase::database}}\ db2(temp,\ database::read\_only,\ 0,\ \textcolor{keyword}{true});\ }
+\DoxyCodeLine{00049\ \ \ \ \ \ \ BOOST\_CHECK\_THROW(\ db2.add\_index<\ \mbox{\hyperlink{test_8cpp_a943890c2cbccfeea3b499c742901185d}{book\_index}}\ >(),\ std::runtime\_error\ );\ }
+\DoxyCodeLine{00050\ }
+\DoxyCodeLine{00051\ \ \ \ \ \ \ db.add\_index<\ \mbox{\hyperlink{test_8cpp_a943890c2cbccfeea3b499c742901185d}{book\_index}}\ >();}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ BOOST\_CHECK\_THROW(\ db.add\_index<\mbox{\hyperlink{test_8cpp_a943890c2cbccfeea3b499c742901185d}{book\_index}}>(),\ std::logic\_error\ );\ }
+\DoxyCodeLine{00053\ }
+\DoxyCodeLine{00054\ }
+\DoxyCodeLine{00055\ \ \ \ \ \ \ db2.add\_index<\ \mbox{\hyperlink{test_8cpp_a943890c2cbccfeea3b499c742901185d}{book\_index}}\ >();\ }
+\DoxyCodeLine{00056\ }
+\DoxyCodeLine{00057\ }
+\DoxyCodeLine{00058\ \ \ \ \ \ \ BOOST\_TEST\_MESSAGE(\ \textcolor{stringliteral}{"{}Creating\ book"{}}\ );}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ new\_book\ =\ db.create<\mbox{\hyperlink{structbook}{book}}>(\ [](\ \mbox{\hyperlink{structbook}{book}}\&\ b\ )\ \{}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \ \ b.a\ =\ 3;}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \ \ b.b\ =\ 4;}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \}\ );}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ copy\_new\_book\ =\ db2.get(\ \mbox{\hyperlink{classchainbase_1_1oid}{book::id\_type}}(0)\ );}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ BOOST\_REQUIRE(\ \&new\_book\ !=\ \&copy\_new\_book\ );\ }
+\DoxyCodeLine{00065\ }
+\DoxyCodeLine{00066\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(\ new\_book.a,\ copy\_new\_book.\mbox{\hyperlink{structbook_a65565986ed9d713d8a888c008e446d52}{a}}\ );}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(\ new\_book.b,\ copy\_new\_book.\mbox{\hyperlink{structbook_a03b5e022845367e4a56d3edf751ad59b}{b}}\ );}
+\DoxyCodeLine{00068\ }
+\DoxyCodeLine{00069\ \ \ \ \ \ \ db.modify(\ new\_book,\ [\&](\ \mbox{\hyperlink{structbook}{book}}\&\ b\ )\ \{}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \ b.\mbox{\hyperlink{structbook_a65565986ed9d713d8a888c008e446d52}{a}}\ =\ 5;}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \ b.\mbox{\hyperlink{structbook_a03b5e022845367e4a56d3edf751ad59b}{b}}\ =\ 6;}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(\ new\_book.a,\ 5\ );}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(\ new\_book.b,\ 6\ );}
+\DoxyCodeLine{00075\ }
+\DoxyCodeLine{00076\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(\ new\_book.a,\ copy\_new\_book.\mbox{\hyperlink{structbook_a65565986ed9d713d8a888c008e446d52}{a}}\ );}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(\ new\_book.b,\ copy\_new\_book.\mbox{\hyperlink{structbook_a03b5e022845367e4a56d3edf751ad59b}{b}}\ );}
+\DoxyCodeLine{00078\ }
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}}\ =\ db.start\_undo\_session(\textcolor{keyword}{true});}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \ db.modify(\ new\_book,\ [\&](\ \mbox{\hyperlink{structbook}{book}}\&\ b\ )\ \{}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ b.\mbox{\hyperlink{structbook_a65565986ed9d713d8a888c008e446d52}{a}}\ =\ 7;}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ b.\mbox{\hyperlink{structbook_a03b5e022845367e4a56d3edf751ad59b}{b}}\ =\ 8;}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00085\ }
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(\ new\_book.a,\ 7\ );}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(\ new\_book.b,\ 8\ );}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(\ new\_book.a,\ 5\ );}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(\ new\_book.b,\ 6\ );}
+\DoxyCodeLine{00091\ }
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}}\ =\ db.start\_undo\_session(\textcolor{keyword}{true});}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ book2\ =\ db.create<\mbox{\hyperlink{structbook}{book}}>(\ [\&](\ \mbox{\hyperlink{structbook}{book}}\&\ b\ )\ \{}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ b.\mbox{\hyperlink{structbook_a65565986ed9d713d8a888c008e446d52}{a}}\ =\ 9;}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ b.\mbox{\hyperlink{structbook_a03b5e022845367e4a56d3edf751ad59b}{b}}\ =\ 10;}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00098\ }
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(\ new\_book.a,\ 5\ );}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(\ new\_book.b,\ 6\ );}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(\ book2.a,\ 9\ );}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(\ book2.b,\ 10\ );}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ BOOST\_CHECK\_THROW(\ db2.get(\ \mbox{\hyperlink{classchainbase_1_1oid}{book::id\_type}}(1)\ ),\ std::out\_of\_range\ );}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(\ new\_book.a,\ 5\ );}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(\ new\_book.b,\ 6\ );}
+\DoxyCodeLine{00107\ }
+\DoxyCodeLine{00108\ }
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}}\ =\ db.start\_undo\_session(\textcolor{keyword}{true});}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \ \ db.modify(\ new\_book,\ [\&](\ \mbox{\hyperlink{structbook}{book}}\&\ b\ )\ \{}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ b.\mbox{\hyperlink{structbook_a65565986ed9d713d8a888c008e446d52}{a}}\ =\ 7;}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ b.\mbox{\hyperlink{structbook_a03b5e022845367e4a56d3edf751ad59b}{b}}\ =\ 8;}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00115\ }
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(\ new\_book.a,\ 7\ );}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(\ new\_book.b,\ 8\ );}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{ecdh__derive__test_8c_a0a2c7706d971796d7dc84fee36d6c84f}{session}}.push();}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(\ new\_book.a,\ 7\ );}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(\ new\_book.b,\ 8\ );}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ db.undo();}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(\ new\_book.a,\ 5\ );}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(\ new\_book.b,\ 6\ );}
+\DoxyCodeLine{00125\ }
+\DoxyCodeLine{00126\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(\ new\_book.a,\ copy\_new\_book.\mbox{\hyperlink{structbook_a65565986ed9d713d8a888c008e446d52}{a}}\ );}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ BOOST\_REQUIRE\_EQUAL(\ new\_book.b,\ copy\_new\_book.\mbox{\hyperlink{structbook_a03b5e022845367e4a56d3edf751ad59b}{b}}\ );}
+\DoxyCodeLine{00128\ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\ ...\ )\ \{}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ bfs::remove\_all(\ temp\ );}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \textcolor{keywordflow}{throw};}
+\DoxyCodeLine{00131\ \ \ \ \}}
+\DoxyCodeLine{00132\ \ \ \ bfs::remove\_all(\ temp\ );}
+\DoxyCodeLine{00133\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test_8cpp_a17ad3362b7befd62662dc155abc23919_cgraph}
+\end{center}
+\end{figure}

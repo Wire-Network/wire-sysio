@@ -1,0 +1,74 @@
+\doxysection{libraries/fc/libraries/ff/libff/algebra/scalar\+\_\+multiplication/multiexp.hpp File Reference}
+\hypertarget{multiexp_8hpp}{}\label{multiexp_8hpp}\index{libraries/fc/libraries/ff/libff/algebra/scalar\_multiplication/multiexp.hpp@{libraries/fc/libraries/ff/libff/algebra/scalar\_multiplication/multiexp.hpp}}
+{\ttfamily \#include $<$cstddef$>$}\newline
+{\ttfamily \#include $<$vector$>$}\newline
+{\ttfamily \#include $<$libff/algebra/scalar\+\_\+multiplication/multiexp.\+tcc$>$}\newline
+Include dependency graph for multiexp.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=342pt]{multiexp_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=217pt]{multiexp_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacelibff}{libff}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\using \mbox{\hyperlink{namespacelibff_ae2da5078a791e479288d45840951d2c1}{libff\+::window\+\_\+table}} = std\+::vector$<$std\+::vector$<$\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}$>$ $>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{namespacelibff_a8b13cbb28debbfc9b15e779d932e6709}{libff\+::multi\+\_\+exp\+\_\+method}} \{ \mbox{\hyperlink{namespacelibff_a8b13cbb28debbfc9b15e779d932e6709a5d2a4bc1e1ab45b4ffa5c6a20d58aa00}{libff\+::multi\+\_\+exp\+\_\+method\+\_\+naive}}
+, \mbox{\hyperlink{namespacelibff_a8b13cbb28debbfc9b15e779d932e6709a4c2c60a6b4df4c8f25b6e52ea14d6af7}{libff\+::multi\+\_\+exp\+\_\+method\+\_\+naive\+\_\+plain}}
+, \mbox{\hyperlink{namespacelibff_a8b13cbb28debbfc9b15e779d932e6709a75e268760f0d304913ac248cc9140b99}{libff\+::multi\+\_\+exp\+\_\+method\+\_\+bos\+\_\+coster}}
+, \mbox{\hyperlink{namespacelibff_a8b13cbb28debbfc9b15e779d932e6709a6e49f3c8c08e9f085c84e965193e2678}{libff\+::multi\+\_\+exp\+\_\+method\+\_\+\+BDLO12}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename FieldT , \mbox{\hyperlink{namespacelibff_a8b13cbb28debbfc9b15e779d932e6709}{multi\+\_\+exp\+\_\+method}} Method$>$ }\\\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{namespacelibff_a909c5131f90d7c9c35b61ca332f08f3a}{libff\+::multi\+\_\+exp}} (typename std\+::vector$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::const\+\_\+iterator vec\+\_\+start, typename std\+::vector$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::const\+\_\+iterator vec\+\_\+end, typename std\+::vector$<$ FieldT $>$\+::const\+\_\+iterator scalar\+\_\+start, typename std\+::vector$<$ FieldT $>$\+::const\+\_\+iterator scalar\+\_\+end, const size\+\_\+t chunks)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename FieldT , \mbox{\hyperlink{namespacelibff_a8b13cbb28debbfc9b15e779d932e6709}{multi\+\_\+exp\+\_\+method}} Method$>$ }\\\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{namespacelibff_a59cfa5c66864b8df6629463fa3204ad9}{libff\+::multi\+\_\+exp\+\_\+with\+\_\+mixed\+\_\+addition}} (typename std\+::vector$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::const\+\_\+iterator vec\+\_\+start, typename std\+::vector$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::const\+\_\+iterator vec\+\_\+end, typename std\+::vector$<$ FieldT $>$\+::const\+\_\+iterator scalar\+\_\+start, typename std\+::vector$<$ FieldT $>$\+::const\+\_\+iterator scalar\+\_\+end, const size\+\_\+t chunks)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{namespacelibff_acc3b299d0acfbd0b749d384653d038ca}{libff\+::inner\+\_\+product}} (typename std\+::vector$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::const\+\_\+iterator a\+\_\+start, typename std\+::vector$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::const\+\_\+iterator a\+\_\+end, typename std\+::vector$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::const\+\_\+iterator b\+\_\+start, typename std\+::vector$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$\+::const\+\_\+iterator b\+\_\+end)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\size\+\_\+t \mbox{\hyperlink{namespacelibff_a6ef00b911649f5afe44043edb12bbcc5}{libff\+::get\+\_\+exp\+\_\+window\+\_\+size}} (const size\+\_\+t num\+\_\+scalars)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{namespacelibff_ae2da5078a791e479288d45840951d2c1}{window\+\_\+table}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \mbox{\hyperlink{namespacelibff_ab6cfc931e0f4fc09167d495fcec13fc1}{libff\+::get\+\_\+window\+\_\+table}} (const size\+\_\+t scalar\+\_\+size, const size\+\_\+t window, const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&g)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename FieldT $>$ }\\\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \mbox{\hyperlink{namespacelibff_aca693a14a7bfc9ca7aecb07b1eca191e}{libff\+::windowed\+\_\+exp}} (const size\+\_\+t scalar\+\_\+size, const size\+\_\+t window, const \mbox{\hyperlink{namespacelibff_ae2da5078a791e479288d45840951d2c1}{window\+\_\+table}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&powers\+\_\+of\+\_\+g, const FieldT \&pow)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename FieldT $>$ }\\std\+::vector$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \mbox{\hyperlink{namespacelibff_a10b991f0b9a5a182c3406da710152edf}{libff\+::batch\+\_\+exp}} (const size\+\_\+t scalar\+\_\+size, const size\+\_\+t window, const \mbox{\hyperlink{namespacelibff_ae2da5078a791e479288d45840951d2c1}{window\+\_\+table}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&table, const std\+::vector$<$ FieldT $>$ \&v)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , typename FieldT $>$ }\\std\+::vector$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \mbox{\hyperlink{namespacelibff_a44c6faf7a967b6b4acf6fe3f8d9242e5}{libff\+::batch\+\_\+exp\+\_\+with\+\_\+coeff}} (const size\+\_\+t scalar\+\_\+size, const size\+\_\+t window, const \mbox{\hyperlink{namespacelibff_ae2da5078a791e479288d45840951d2c1}{window\+\_\+table}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&table, const FieldT \&coeff, const std\+::vector$<$ FieldT $>$ \&v)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{namespacelibff_ad81731c8656ecf3757bddb5be46ef979}{libff\+::batch\+\_\+to\+\_\+special}} (std\+::vector$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \&vec)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Declaration of interfaces for multi-\/exponentiation routines.
+
+\begin{DoxyAuthor}{Author}
+This file is part of libff, developed by SCIPR Lab and contributors (see AUTHORS). 
+\end{DoxyAuthor}
+\begin{DoxyCopyright}{Copyright}
+MIT license (see LICENSE file) 
+\end{DoxyCopyright}
+
+
+Definition in file \mbox{\hyperlink{multiexp_8hpp_source}{multiexp.\+hpp}}.
+

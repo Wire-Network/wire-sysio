@@ -1,0 +1,16 @@
+<map id="plugins/trace_api_plugin/utils/trace_api_util.cpp" name="plugins/trace_api_plugin/utils/trace_api_util.cpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="257,5,418,46"/>
+<area shape="rect" id="Node000002" href="$cmd__registration_8hpp.html" title=" " alt="" coords="144,94,282,135"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="311,49,255,87,252,83,308,44"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="266,183,444,208"/>
+<area shape="poly" id="edge7_Node000001_Node000006" title=" " alt="" coords="342,46,355,167,349,168,337,46"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="375,102,446,127"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="356,45,393,88,389,92,352,48"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,183,59,208"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="169,138,74,179,72,174,167,133"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="83,183,160,208"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="192,137,149,174,145,170,189,133"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="185,183,242,208"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="216,135,216,167,211,167,211,135"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="250,133,321,172,318,177,247,138"/>
+</map>

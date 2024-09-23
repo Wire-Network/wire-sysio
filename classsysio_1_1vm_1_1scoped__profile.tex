@@ -1,0 +1,137 @@
+\doxysection{sysio\+::vm\+::scoped\+\_\+profile Class Reference}
+\hypertarget{classsysio_1_1vm_1_1scoped__profile}{}\label{classsysio_1_1vm_1_1scoped__profile}\index{sysio::vm::scoped\_profile@{sysio::vm::scoped\_profile}}
+
+
+{\ttfamily \#include $<$profile.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classsysio_1_1vm_1_1scoped__profile_a12d7ce3c88a925684a749a0bd7f55f86}{scoped\+\_\+profile}} (\mbox{\hyperlink{structsysio_1_1vm_1_1profile__data}{profile\+\_\+data}} \texorpdfstring{$\ast$}{*}data)
+\item 
+\mbox{\hyperlink{classsysio_1_1vm_1_1scoped__profile_adc5c77ace9aba2df7cc3480871757d76}{\texorpdfstring{$\sim$}{\string~}scoped\+\_\+profile}} ()
+\item 
+\mbox{\hyperlink{classsysio_1_1vm_1_1scoped__profile_a12d7ce3c88a925684a749a0bd7f55f86}{scoped\+\_\+profile}} (\mbox{\hyperlink{structsysio_1_1vm_1_1profile__data}{profile\+\_\+data}} \texorpdfstring{$\ast$}{*}data)
+\item 
+\mbox{\hyperlink{classsysio_1_1vm_1_1scoped__profile_adc5c77ace9aba2df7cc3480871757d76}{\texorpdfstring{$\sim$}{\string~}scoped\+\_\+profile}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{vm_2profile_8hpp_source_l00401}{401}} of file \mbox{\hyperlink{vm_2profile_8hpp_source}{profile.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classsysio_1_1vm_1_1scoped__profile_a12d7ce3c88a925684a749a0bd7f55f86}\index{sysio::vm::scoped\_profile@{sysio::vm::scoped\_profile}!scoped\_profile@{scoped\_profile}}
+\index{scoped\_profile@{scoped\_profile}!sysio::vm::scoped\_profile@{sysio::vm::scoped\_profile}}
+\doxysubsubsection{\texorpdfstring{scoped\_profile()}{scoped\_profile()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1scoped__profile_a12d7ce3c88a925684a749a0bd7f55f86} 
+sysio\+::vm\+::scoped\+\_\+profile\+::scoped\+\_\+profile (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1vm_1_1profile__data}{profile\+\_\+data}} \texorpdfstring{$\ast$}{*}}]{data}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2profile_8hpp_source_l00403}{403}} of file \mbox{\hyperlink{sysio_2vm_2profile_8hpp_source}{profile.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00403\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ data(data)\ \{}
+\DoxyCodeLine{00404\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(data)\ \{}
+\DoxyCodeLine{00405\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1profile__manager_a56c43b1e1c1409a595f12317c215b5ad}{profile\_manager::instance}}().\mbox{\hyperlink{structsysio_1_1vm_1_1profile__manager_a9a9d98246e875fc4625ebc77ffa6b7ad}{start}}(data);}
+\DoxyCodeLine{00406\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00407\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=345pt]{classsysio_1_1vm_1_1scoped__profile_a12d7ce3c88a925684a749a0bd7f55f86_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1scoped__profile_adc5c77ace9aba2df7cc3480871757d76}\index{sysio::vm::scoped\_profile@{sysio::vm::scoped\_profile}!````~scoped\_profile@{\texorpdfstring{$\sim$}{\string~}scoped\_profile}}
+\index{````~scoped\_profile@{\texorpdfstring{$\sim$}{\string~}scoped\_profile}!sysio::vm::scoped\_profile@{sysio::vm::scoped\_profile}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}scoped\_profile()}{\string~scoped\_profile()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1scoped__profile_adc5c77ace9aba2df7cc3480871757d76} 
+sysio\+::vm\+::scoped\+\_\+profile\+::\texorpdfstring{$\sim$}{\string~}scoped\+\_\+profile (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sysio_2vm_2profile_8hpp_source_l00408}{408}} of file \mbox{\hyperlink{sysio_2vm_2profile_8hpp_source}{profile.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00408\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00409\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(data)\ \{}
+\DoxyCodeLine{00410\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1profile__manager_a56c43b1e1c1409a595f12317c215b5ad}{profile\_manager::instance}}().\mbox{\hyperlink{structsysio_1_1vm_1_1profile__manager_a102313b029113734dcbc6ecf0f525e2f}{stop}}();}
+\DoxyCodeLine{00411\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00412\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=345pt]{classsysio_1_1vm_1_1scoped__profile_adc5c77ace9aba2df7cc3480871757d76_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1scoped__profile_a12d7ce3c88a925684a749a0bd7f55f86}\index{sysio::vm::scoped\_profile@{sysio::vm::scoped\_profile}!scoped\_profile@{scoped\_profile}}
+\index{scoped\_profile@{scoped\_profile}!sysio::vm::scoped\_profile@{sysio::vm::scoped\_profile}}
+\doxysubsubsection{\texorpdfstring{scoped\_profile()}{scoped\_profile()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1scoped__profile_a12d7ce3c88a925684a749a0bd7f55f86} 
+sysio\+::vm\+::scoped\+\_\+profile\+::scoped\+\_\+profile (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1vm_1_1profile__data}{profile\+\_\+data}} \texorpdfstring{$\ast$}{*}}]{data}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2profile_8hpp_source_l00403}{403}} of file \mbox{\hyperlink{vm_2profile_8hpp_source}{profile.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00403\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ data(data)\ \{}
+\DoxyCodeLine{00404\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(data)\ \{}
+\DoxyCodeLine{00405\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1profile__manager_a56c43b1e1c1409a595f12317c215b5ad}{profile\_manager::instance}}().\mbox{\hyperlink{structsysio_1_1vm_1_1profile__manager_a9a9d98246e875fc4625ebc77ffa6b7ad}{start}}(data);}
+\DoxyCodeLine{00406\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00407\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=345pt]{classsysio_1_1vm_1_1scoped__profile_a12d7ce3c88a925684a749a0bd7f55f86_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1vm_1_1scoped__profile_adc5c77ace9aba2df7cc3480871757d76}\index{sysio::vm::scoped\_profile@{sysio::vm::scoped\_profile}!````~scoped\_profile@{\texorpdfstring{$\sim$}{\string~}scoped\_profile}}
+\index{````~scoped\_profile@{\texorpdfstring{$\sim$}{\string~}scoped\_profile}!sysio::vm::scoped\_profile@{sysio::vm::scoped\_profile}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}scoped\_profile()}{\string~scoped\_profile()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classsysio_1_1vm_1_1scoped__profile_adc5c77ace9aba2df7cc3480871757d76} 
+sysio\+::vm\+::scoped\+\_\+profile\+::\texorpdfstring{$\sim$}{\string~}scoped\+\_\+profile (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{vm_2profile_8hpp_source_l00408}{408}} of file \mbox{\hyperlink{vm_2profile_8hpp_source}{profile.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00408\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00409\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(data)\ \{}
+\DoxyCodeLine{00410\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1profile__manager_a56c43b1e1c1409a595f12317c215b5ad}{profile\_manager::instance}}().\mbox{\hyperlink{structsysio_1_1vm_1_1profile__manager_a102313b029113734dcbc6ecf0f525e2f}{stop}}();}
+\DoxyCodeLine{00411\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00412\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=345pt]{classsysio_1_1vm_1_1scoped__profile_adc5c77ace9aba2df7cc3480871757d76_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/include/sysio/sysio/vm/\mbox{\hyperlink{sysio_2vm_2profile_8hpp}{profile.\+hpp}}\item 
+libraries/sys-\/vm/include/sysio/vm/\mbox{\hyperlink{vm_2profile_8hpp}{profile.\+hpp}}\end{DoxyCompactItemize}

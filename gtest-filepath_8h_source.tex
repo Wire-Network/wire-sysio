@@ -1,0 +1,211 @@
+\doxysection{gtest-\/filepath.h}
+\hypertarget{gtest-filepath_8h_source}{}\label{gtest-filepath_8h_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/include/gtest/internal/gtest-\/filepath.h@{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/include/gtest/internal/gtest-\/filepath.h}}
+\mbox{\hyperlink{gtest-filepath_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00001}00001\ \textcolor{comment}{//\ Copyright\ 2008,\ Google\ Inc.}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00002}00002\ \textcolor{comment}{//\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00003}00003\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00004}00004\ \textcolor{comment}{//\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00005}00005\ \textcolor{comment}{//\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00006}00006\ \textcolor{comment}{//\ met:}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00007}00007\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00008}00008\ \textcolor{comment}{//\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00009}00009\ \textcolor{comment}{//\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00010}00010\ \textcolor{comment}{//\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00011}00011\ \textcolor{comment}{//\ copyright\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00012}00012\ \textcolor{comment}{//\ in\ the\ documentation\ and/or\ other\ materials\ provided\ with\ the}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00013}00013\ \textcolor{comment}{//\ distribution.}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00014}00014\ \textcolor{comment}{//\ \ \ \ \ *\ Neither\ the\ name\ of\ Google\ Inc.\ nor\ the\ names\ of\ its}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00015}00015\ \textcolor{comment}{//\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products\ derived\ from}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00016}00016\ \textcolor{comment}{//\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00017}00017\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00018}00018\ \textcolor{comment}{//\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00019}00019\ \textcolor{comment}{//\ "{}AS\ IS"{}\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00020}00020\ \textcolor{comment}{//\ LIMITED\ TO,\ THE\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00021}00021\ \textcolor{comment}{//\ A\ PARTICULAR\ PURPOSE\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ THE\ COPYRIGHT}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00022}00022\ \textcolor{comment}{//\ OWNER\ OR\ CONTRIBUTORS\ BE\ LIABLE\ FOR\ ANY\ DIRECT,\ INDIRECT,\ INCIDENTAL,}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00023}00023\ \textcolor{comment}{//\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES\ (INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00024}00024\ \textcolor{comment}{//\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;\ LOSS\ OF\ USE,}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00025}00025\ \textcolor{comment}{//\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND\ ON\ ANY}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00026}00026\ \textcolor{comment}{//\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00027}00027\ \textcolor{comment}{//\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00028}00028\ \textcolor{comment}{//\ OF\ THIS\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00029}00029\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00030}00030\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00031}00031\ \textcolor{comment}{//\ Google\ Test\ filepath\ utilities}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00032}00032\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00033}00033\ \textcolor{comment}{//\ This\ header\ file\ declares\ classes\ and\ functions\ used\ internally\ by}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00034}00034\ \textcolor{comment}{//\ Google\ Test.\ \ They\ are\ subject\ to\ change\ without\ notice.}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00035}00035\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00036}00036\ \textcolor{comment}{//\ This\ file\ is\ \#included\ in\ gtest/internal/gtest-\/internal.h.}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00037}00037\ \textcolor{comment}{//\ Do\ not\ include\ this\ header\ file\ separately!}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00039}00039\ \textcolor{preprocessor}{\#ifndef\ GTEST\_INCLUDE\_GTEST\_INTERNAL\_GTEST\_FILEPATH\_H\_}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00040}00040\ \textcolor{preprocessor}{\#define\ GTEST\_INCLUDE\_GTEST\_INTERNAL\_GTEST\_FILEPATH\_H\_}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00042}00042\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{gtest-string_8h}{gtest/internal/gtest-\/string.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00044}00044\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetesting}{testing}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00045}00045\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceinternal}{internal}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00047}00047\ \textcolor{comment}{//\ FilePath\ -\/\ a\ class\ for\ file\ and\ directory\ pathname\ manipulation\ which}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00048}00048\ \textcolor{comment}{//\ handles\ platform-\/specific\ conventions\ (like\ the\ pathname\ separator).}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00049}00049\ \textcolor{comment}{//\ Used\ for\ helper\ functions\ for\ naming\ files\ in\ a\ directory\ for\ xml\ output.}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00050}00050\ \textcolor{comment}{//\ Except\ for\ Set\ methods,\ all\ methods\ are\ const\ or\ static,\ which\ provides\ an}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00051}00051\ \textcolor{comment}{//\ "{}immutable\ value\ object"{}\ -\/-\/\ useful\ for\ peace\ of\ mind.}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00052}00052\ \textcolor{comment}{//\ A\ FilePath\ with\ a\ value\ ending\ in\ a\ path\ separator\ ("{}like/this/"{})\ represents}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00053}00053\ \textcolor{comment}{//\ a\ directory,\ otherwise\ it\ is\ assumed\ to\ represent\ a\ file.\ In\ either\ case,}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00054}00054\ \textcolor{comment}{//\ it\ may\ or\ may\ not\ represent\ an\ actual\ file\ or\ directory\ in\ the\ file\ system.}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00055}00055\ \textcolor{comment}{//\ Names\ are\ NOT\ checked\ for\ syntax\ correctness\ -\/-\/\ no\ checking\ for\ illegal}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00056}00056\ \textcolor{comment}{//\ characters,\ malformed\ paths,\ etc.}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00058}\mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{00058}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{gtest-port_8h_aa73be6f0ba4a7456180a94904ce17790}{GTEST\_API\_}}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{FilePath}}\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00059}00059\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00060}\mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a3504a51accbca78a52fe586133ea5499}{00060}}\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a3504a51accbca78a52fe586133ea5499}{FilePath}}()\ :\ pathname\_(\textcolor{stringliteral}{"{}"{}})\ \{\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00061}\mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_ae9efd0fee56c6e3e2d659b464250b112}{00061}}\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_ae9efd0fee56c6e3e2d659b464250b112}{FilePath}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{FilePath}}\&\ rhs)\ :\ pathname\_(rhs.pathname\_)\ \{\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00062}00062\ }
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00063}\mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a9fc072b140aa0652a7022fb809fe3abe}{00063}}\ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a9fc072b140aa0652a7022fb809fe3abe}{FilePath}}(\textcolor{keyword}{const}\ std::string\&\ pathname)\ :\ pathname\_(pathname)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00064}00064\ \ \ \ \ Normalize();}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00065}00065\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00067}\mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a941c80c76954e0103d865aba35a10a1b}{00067}}\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{FilePath}}\&\ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a941c80c76954e0103d865aba35a10a1b}{operator=}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{FilePath}}\&\ rhs)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00068}00068\ \ \ \ \ Set(rhs);}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00069}00069\ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00070}00070\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00072}\mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a15a42de7518e89254e0640dd9317d5f7}{00072}}\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a15a42de7518e89254e0640dd9317d5f7}{Set}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{FilePath}}\&\ rhs)\ \{}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00073}00073\ \ \ \ \ pathname\_\ =\ rhs.pathname\_;}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00074}00074\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00075}00075\ }
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00076}\mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a44649e2fb65454648a9494a89a970d85}{00076}}\ \ \ \textcolor{keyword}{const}\ std::string\&\ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a44649e2fb65454648a9494a89a970d85}{string}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ pathname\_;\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00077}\mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a60a30c518a0298affcc262f5904cf308}{00077}}\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a60a30c518a0298affcc262f5904cf308}{c\_str}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ pathname\_.c\_str();\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00079}00079\ \ \ \textcolor{comment}{//\ Returns\ the\ current\ working\ directory,\ or\ "{}"{}\ if\ unsuccessful.}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00080}00080\ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{FilePath}}\ GetCurrentDir();}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00081}00081\ }
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00082}00082\ \ \ \textcolor{comment}{//\ Given\ directory\ =\ "{}dir"{},\ base\_name\ =\ "{}test"{},\ number\ =\ 0,}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00083}00083\ \ \ \textcolor{comment}{//\ extension\ =\ "{}xml"{},\ returns\ "{}dir/test.xml"{}.\ If\ number\ is\ greater}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00084}00084\ \ \ \textcolor{comment}{//\ than\ zero\ (e.g.,\ 12),\ returns\ "{}dir/test\_12.xml"{}.}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00085}00085\ \ \ \textcolor{comment}{//\ On\ Windows\ platform,\ uses\ \(\backslash\)\ as\ the\ separator\ rather\ than\ /.}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00086}00086\ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{FilePath}}\ MakeFileName(\textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{FilePath}}\&\ directory,}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00087}00087\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{FilePath}}\&\ base\_name,}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00088}00088\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ number,}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00089}00089\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ extension);}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00090}00090\ }
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00091}00091\ \ \ \textcolor{comment}{//\ Given\ directory\ =\ "{}dir"{},\ relative\_path\ =\ "{}test.xml"{},}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00092}00092\ \ \ \textcolor{comment}{//\ returns\ "{}dir/test.xml"{}.}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00093}00093\ \ \ \textcolor{comment}{//\ On\ Windows,\ uses\ \(\backslash\)\ as\ the\ separator\ rather\ than\ /.}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00094}00094\ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{FilePath}}\ ConcatPaths(\textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{FilePath}}\&\ directory,}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00095}00095\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{FilePath}}\&\ relative\_path);}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00096}00096\ }
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00097}00097\ \ \ \textcolor{comment}{//\ Returns\ a\ pathname\ for\ a\ file\ that\ does\ not\ currently\ exist.\ The\ pathname}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00098}00098\ \ \ \textcolor{comment}{//\ will\ be\ directory/base\_name.extension\ or}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00099}00099\ \ \ \textcolor{comment}{//\ directory/base\_name\_<number>.extension\ if\ directory/base\_name.extension}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00100}00100\ \ \ \textcolor{comment}{//\ already\ exists.\ The\ number\ will\ be\ incremented\ until\ a\ pathname\ is\ found}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00101}00101\ \ \ \textcolor{comment}{//\ that\ does\ not\ already\ exist.}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00102}00102\ \ \ \textcolor{comment}{//\ Examples:\ 'dir/foo\_test.xml'\ or\ 'dir/foo\_test\_1.xml'.}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00103}00103\ \ \ \textcolor{comment}{//\ There\ could\ be\ a\ race\ condition\ if\ two\ or\ more\ processes\ are\ calling\ this}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00104}00104\ \ \ \textcolor{comment}{//\ function\ at\ the\ same\ time\ -\/-\/\ they\ could\ both\ pick\ the\ same\ filename.}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00105}00105\ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{FilePath}}\ GenerateUniqueFileName(\textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{FilePath}}\&\ directory,}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00106}00106\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{FilePath}}\&\ base\_name,}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00107}00107\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ extension);}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00108}00108\ }
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00109}00109\ \ \ \textcolor{comment}{//\ Returns\ true\ iff\ the\ path\ is\ "{}"{}.}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00110}\mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a2c165c5510e8705ade547849a9234a6e}{00110}}\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path_a2c165c5510e8705ade547849a9234a6e}{IsEmpty}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ pathname\_.empty();\ \}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00111}00111\ }
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00112}00112\ \ \ \textcolor{comment}{//\ If\ input\ name\ has\ a\ trailing\ separator\ character,\ removes\ it\ and\ returns}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00113}00113\ \ \ \textcolor{comment}{//\ the\ name,\ otherwise\ return\ the\ name\ string\ unmodified.}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00114}00114\ \ \ \textcolor{comment}{//\ On\ Windows\ platform,\ uses\ \(\backslash\)\ as\ the\ separator,\ other\ platforms\ use\ /.}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00115}00115\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{FilePath}}\ RemoveTrailingPathSeparator()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00116}00116\ }
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00117}00117\ \ \ \textcolor{comment}{//\ Returns\ a\ copy\ of\ the\ FilePath\ with\ the\ directory\ part\ removed.}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00118}00118\ \ \ \textcolor{comment}{//\ Example:\ FilePath("{}path/to/file"{}).RemoveDirectoryName()\ returns}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00119}00119\ \ \ \textcolor{comment}{//\ FilePath("{}file"{}).\ If\ there\ is\ no\ directory\ part\ ("{}just\_a\_file"{}),\ it\ returns}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00120}00120\ \ \ \textcolor{comment}{//\ the\ FilePath\ unmodified.\ If\ there\ is\ no\ file\ part\ ("{}just\_a\_dir/"{})\ it}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00121}00121\ \ \ \textcolor{comment}{//\ returns\ an\ empty\ FilePath\ ("{}"{}).}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00122}00122\ \ \ \textcolor{comment}{//\ On\ Windows\ platform,\ '\(\backslash\)'\ is\ the\ path\ separator,\ otherwise\ it\ is\ '/'.}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00123}00123\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{FilePath}}\ RemoveDirectoryName()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00124}00124\ }
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00125}00125\ \ \ \textcolor{comment}{//\ RemoveFileName\ returns\ the\ directory\ path\ with\ the\ filename\ removed.}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00126}00126\ \ \ \textcolor{comment}{//\ Example:\ FilePath("{}path/to/file"{}).RemoveFileName()\ returns\ "{}path/to/"{}.}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00127}00127\ \ \ \textcolor{comment}{//\ If\ the\ FilePath\ is\ "{}a\_file"{}\ or\ "{}/a\_file"{},\ RemoveFileName\ returns}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00128}00128\ \ \ \textcolor{comment}{//\ FilePath("{}./"{})\ or,\ on\ Windows,\ FilePath("{}.\(\backslash\)\(\backslash\)"{}).\ If\ the\ filepath\ does}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00129}00129\ \ \ \textcolor{comment}{//\ not\ have\ a\ file,\ like\ "{}just/a/dir/"{},\ it\ returns\ the\ FilePath\ unmodified.}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00130}00130\ \ \ \textcolor{comment}{//\ On\ Windows\ platform,\ '\(\backslash\)'\ is\ the\ path\ separator,\ otherwise\ it\ is\ '/'.}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00131}00131\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{FilePath}}\ RemoveFileName()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00132}00132\ }
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00133}00133\ \ \ \textcolor{comment}{//\ Returns\ a\ copy\ of\ the\ FilePath\ with\ the\ case-\/insensitive\ extension\ removed.}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00134}00134\ \ \ \textcolor{comment}{//\ Example:\ FilePath("{}dir/file.exe"{}).RemoveExtension("{}EXE"{})\ returns}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00135}00135\ \ \ \textcolor{comment}{//\ FilePath("{}dir/file"{}).\ If\ a\ case-\/insensitive\ extension\ is\ not}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00136}00136\ \ \ \textcolor{comment}{//\ found,\ returns\ a\ copy\ of\ the\ original\ FilePath.}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00137}00137\ \ \ \mbox{\hyperlink{classtesting_1_1internal_1_1_file_path}{FilePath}}\ RemoveExtension(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ extension)\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00138}00138\ }
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00139}00139\ \ \ \textcolor{comment}{//\ Creates\ directories\ so\ that\ path\ exists.\ Returns\ true\ if\ successful\ or\ if}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00140}00140\ \ \ \textcolor{comment}{//\ the\ directories\ already\ exist;\ returns\ false\ if\ unable\ to\ create}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00141}00141\ \ \ \textcolor{comment}{//\ directories\ for\ any\ reason.\ Will\ also\ return\ false\ if\ the\ FilePath\ does}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00142}00142\ \ \ \textcolor{comment}{//\ not\ represent\ a\ directory\ (that\ is,\ it\ doesn't\ end\ with\ a\ path\ separator).}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00143}00143\ \ \ \textcolor{keywordtype}{bool}\ CreateDirectoriesRecursively()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00144}00144\ }
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00145}00145\ \ \ \textcolor{comment}{//\ Create\ the\ directory\ so\ that\ path\ exists.\ Returns\ true\ if\ successful\ or}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00146}00146\ \ \ \textcolor{comment}{//\ if\ the\ directory\ already\ exists;\ returns\ false\ if\ unable\ to\ create\ the}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00147}00147\ \ \ \textcolor{comment}{//\ directory\ for\ any\ reason,\ including\ if\ the\ parent\ directory\ does\ not}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00148}00148\ \ \ \textcolor{comment}{//\ exist.\ Not\ named\ "{}CreateDirectory"{}\ because\ that's\ a\ macro\ on\ Windows.}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00149}00149\ \ \ \textcolor{keywordtype}{bool}\ CreateFolder()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00150}00150\ }
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00151}00151\ \ \ \textcolor{comment}{//\ Returns\ true\ if\ FilePath\ describes\ something\ in\ the\ file-\/system,}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00152}00152\ \ \ \textcolor{comment}{//\ either\ a\ file,\ directory,\ or\ whatever,\ and\ that\ something\ exists.}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00153}00153\ \ \ \textcolor{keywordtype}{bool}\ FileOrDirectoryExists()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00154}00154\ }
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00155}00155\ \ \ \textcolor{comment}{//\ Returns\ true\ if\ pathname\ describes\ a\ directory\ in\ the\ file-\/system}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00156}00156\ \ \ \textcolor{comment}{//\ that\ exists.}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00157}00157\ \ \ \textcolor{keywordtype}{bool}\ DirectoryExists()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00158}00158\ }
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00159}00159\ \ \ \textcolor{comment}{//\ Returns\ true\ if\ FilePath\ ends\ with\ a\ path\ separator,\ which\ indicates\ that}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00160}00160\ \ \ \textcolor{comment}{//\ it\ is\ intended\ to\ represent\ a\ directory.\ Returns\ false\ otherwise.}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00161}00161\ \ \ \textcolor{comment}{//\ This\ does\ NOT\ check\ that\ a\ directory\ (or\ file)\ actually\ exists.}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00162}00162\ \ \ \textcolor{keywordtype}{bool}\ IsDirectory()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00163}00163\ }
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00164}00164\ \ \ \textcolor{comment}{//\ Returns\ true\ if\ pathname\ describes\ a\ root\ directory.\ (Windows\ has\ one}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00165}00165\ \ \ \textcolor{comment}{//\ root\ directory\ per\ disk\ drive.)}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00166}00166\ \ \ \textcolor{keywordtype}{bool}\ IsRootDirectory()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00167}00167\ }
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00168}00168\ \ \ \textcolor{comment}{//\ Returns\ true\ if\ pathname\ describes\ an\ absolute\ path.}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00169}00169\ \ \ \textcolor{keywordtype}{bool}\ IsAbsolutePath()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00170}00170\ }
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00171}00171\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00172}00172\ \ \ \textcolor{comment}{//\ Replaces\ multiple\ consecutive\ separators\ with\ a\ single\ separator.}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00173}00173\ \ \ \textcolor{comment}{//\ For\ example,\ "{}bar///foo"{}\ becomes\ "{}bar/foo"{}.\ Does\ not\ eliminate\ other}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00174}00174\ \ \ \textcolor{comment}{//\ redundancies\ that\ might\ be\ in\ a\ pathname\ involving\ "{}."{}\ or\ "{}.."{}.}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00175}00175\ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00176}00176\ \ \ \textcolor{comment}{//\ A\ pathname\ with\ multiple\ consecutive\ separators\ may\ occur\ either\ through}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00177}00177\ \ \ \textcolor{comment}{//\ user\ error\ or\ as\ a\ result\ of\ some\ scripts\ or\ APIs\ that\ generate\ a\ pathname}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00178}00178\ \ \ \textcolor{comment}{//\ with\ a\ trailing\ separator.\ On\ other\ platforms\ the\ same\ API\ or\ script}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00179}00179\ \ \ \textcolor{comment}{//\ may\ NOT\ generate\ a\ pathname\ with\ a\ trailing\ "{}/"{}.\ Then\ elsewhere\ that}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00180}00180\ \ \ \textcolor{comment}{//\ pathname\ may\ have\ another\ "{}/"{}\ and\ pathname\ components\ added\ to\ it,}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00181}00181\ \ \ \textcolor{comment}{//\ without\ checking\ for\ the\ separator\ already\ being\ there.}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00182}00182\ \ \ \textcolor{comment}{//\ The\ script\ language\ and\ operating\ system\ may\ allow\ paths\ like\ "{}foo//bar"{}}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00183}00183\ \ \ \textcolor{comment}{//\ but\ some\ of\ the\ functions\ in\ FilePath\ will\ not\ handle\ that\ correctly.\ In}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00184}00184\ \ \ \textcolor{comment}{//\ particular,\ RemoveTrailingPathSeparator()\ only\ removes\ one\ separator,\ and}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00185}00185\ \ \ \textcolor{comment}{//\ it\ is\ called\ in\ CreateDirectoriesRecursively()\ assuming\ that\ it\ will\ change}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00186}00186\ \ \ \textcolor{comment}{//\ a\ pathname\ from\ directory\ syntax\ (trailing\ separator)\ to\ filename\ syntax.}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00187}00187\ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00188}00188\ \ \ \textcolor{comment}{//\ On\ Windows\ this\ method\ also\ replaces\ the\ alternate\ path\ separator\ '/'\ with}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00189}00189\ \ \ \textcolor{comment}{//\ the\ primary\ path\ separator\ '\(\backslash\)\(\backslash\)',\ so\ that\ for\ example\ "{}bar\(\backslash\)\(\backslash\)/\(\backslash\)\(\backslash\)foo"{}\ becomes}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00190}00190\ \ \ \textcolor{comment}{//\ "{}bar\(\backslash\)\(\backslash\)foo"{}.}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00191}00191\ }
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00192}00192\ \ \ \textcolor{keywordtype}{void}\ Normalize();}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00193}00193\ }
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00194}00194\ \ \ \textcolor{comment}{//\ Returns\ a\ pointer\ to\ the\ last\ occurence\ of\ a\ valid\ path\ separator\ in}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00195}00195\ \ \ \textcolor{comment}{//\ the\ FilePath.\ On\ Windows,\ for\ example,\ both\ '/'\ and\ '\(\backslash\)'\ are\ valid\ path}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00196}00196\ \ \ \textcolor{comment}{//\ separators.\ Returns\ NULL\ if\ no\ path\ separator\ was\ found.}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00197}00197\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ FindLastPathSeparator()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00198}00198\ }
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00199}00199\ \ \ std::string\ pathname\_;}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00200}00200\ \};\ \ \textcolor{comment}{//\ class\ FilePath}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00201}00201\ }
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00202}00202\ \}\ \ \textcolor{comment}{//\ namespace\ internal}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00203}00203\ \}\ \ \textcolor{comment}{//\ namespace\ testing}}
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00204}00204\ }
+\DoxyCodeLine{\Hypertarget{gtest-filepath_8h_source_l00205}00205\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_INCLUDE\_GTEST\_INTERNAL\_GTEST\_FILEPATH\_H\_}}
+
+\end{DoxyCode}

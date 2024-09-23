@@ -1,0 +1,373 @@
+\doxysection{sysio\+::state\+\_\+history\+\_\+log Class Reference}
+\hypertarget{classsysio_1_1state__history__log}{}\label{classsysio_1_1state__history__log}\index{sysio::state\_history\_log@{sysio::state\_history\_log}}
+
+
+{\ttfamily \#include $<$log.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classsysio_1_1state__history__log_a6d85c85a918a3a0a987ab3e25bb6b44c}{state\+\_\+history\+\_\+log}} (const char \texorpdfstring{$\ast$}{*}const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}, std\+::string log\+\_\+filename, std\+::string index\+\_\+filename, std\+::optional$<$ \mbox{\hyperlink{structsysio_1_1state__history__log__prune__config}{state\+\_\+history\+\_\+log\+\_\+prune\+\_\+config}} $>$ prune\+\_\+conf=std\+::optional$<$ \mbox{\hyperlink{structsysio_1_1state__history__log__prune__config}{state\+\_\+history\+\_\+log\+\_\+prune\+\_\+config}} $>$())
+\item 
+\mbox{\hyperlink{classsysio_1_1state__history__log_a5aec589a09633460802cf8917ea31567}{\texorpdfstring{$\sim$}{\string~}state\+\_\+history\+\_\+log}} ()
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classsysio_1_1state__history__log_aaeee4e808940aa12749bcf18c3db45cb}{begin\+\_\+block}} () const
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{classsysio_1_1state__history__log_a50803d742fa959ef761b29460ea9484f}{end\+\_\+block}} () const
+\item 
+void \mbox{\hyperlink{classsysio_1_1state__history__log_a5d675a425819171a8166885ea6cf754c}{read\+\_\+header}} (\mbox{\hyperlink{structsysio_1_1state__history__log__header}{state\+\_\+history\+\_\+log\+\_\+header}} \&header, bool assert\+\_\+version=true)
+\item 
+void \mbox{\hyperlink{classsysio_1_1state__history__log_a8a9d01c10388402d39b48b5e875dd89e}{write\+\_\+header}} (const \mbox{\hyperlink{structsysio_1_1state__history__log__header}{state\+\_\+history\+\_\+log\+\_\+header}} \&header)
+\item 
+{\footnotesize template$<$typename F $>$ }\\void \mbox{\hyperlink{classsysio_1_1state__history__log_a8753293c4782af4d456ecfdc84808dff}{write\+\_\+entry}} (\mbox{\hyperlink{structsysio_1_1state__history__log__header}{state\+\_\+history\+\_\+log\+\_\+header}} header, const \mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{chain\+::block\+\_\+id\+\_\+type}} \&prev\+\_\+id, F write\+\_\+payload)
+\item 
+\mbox{\hyperlink{classfc_1_1cfile}{fc\+::cfile}} \& \mbox{\hyperlink{classsysio_1_1state__history__log_ad889160690ba1789472f6a4a29dee5d5}{get\+\_\+entry}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} block\+\_\+num, \mbox{\hyperlink{structsysio_1_1state__history__log__header}{state\+\_\+history\+\_\+log\+\_\+header}} \&header)
+\item 
+\mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{chain\+::block\+\_\+id\+\_\+type}} \mbox{\hyperlink{classsysio_1_1state__history__log_a59a8402aa5b18c7a78537acf11e0815d}{get\+\_\+block\+\_\+id}} (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} block\+\_\+num)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{log_8hpp_source_l00068}{68}} of file \mbox{\hyperlink{log_8hpp_source}{log.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classsysio_1_1state__history__log_a6d85c85a918a3a0a987ab3e25bb6b44c}\index{sysio::state\_history\_log@{sysio::state\_history\_log}!state\_history\_log@{state\_history\_log}}
+\index{state\_history\_log@{state\_history\_log}!sysio::state\_history\_log@{sysio::state\_history\_log}}
+\doxysubsubsection{\texorpdfstring{state\_history\_log()}{state\_history\_log()}}
+{\footnotesize\ttfamily \label{classsysio_1_1state__history__log_a6d85c85a918a3a0a987ab3e25bb6b44c} 
+sysio\+::state\+\_\+history\+\_\+log\+::state\+\_\+history\+\_\+log (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}const}]{name}{, }\item[{std\+::string}]{log\+\_\+filename}{, }\item[{std\+::string}]{index\+\_\+filename}{, }\item[{std\+::optional$<$ \mbox{\hyperlink{structsysio_1_1state__history__log__prune__config}{state\+\_\+history\+\_\+log\+\_\+prune\+\_\+config}} $>$}]{prune\+\_\+conf}{ = {\ttfamily std\+:\+:optional$<$\mbox{\hyperlink{structsysio_1_1state__history__log__prune__config}{state\+\_\+history\+\_\+log\+\_\+prune\+\_\+config}}$>$()}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{log_8hpp_source_l00082}{82}} of file \mbox{\hyperlink{log_8hpp_source}{log.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ :\ name(name)}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ ,\ log\_filename(std::move(log\_filename))}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ ,\ index\_filename(std::move(index\_filename))}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ ,\ prune\_config(prune\_conf)\ \{}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ open\_log();}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ open\_index();}
+\DoxyCodeLine{00090\ }
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(prune\_config)\ \{}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(prune\_config-\/>prune\_blocks,\ chain::plugin\_exception,\ \textcolor{stringliteral}{"{}state\ history\ log\ prune\ configuration\ requires\ at\ least\ one\ block"{}});}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\_\_builtin\_popcount(prune\_config-\/>prune\_threshold)\ ==\ 1,\ chain::plugin\_exception,\ \textcolor{stringliteral}{"{}state\ history\ prune\ threshold\ must\ be\ power\ of\ 2"{}});}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//switch\ this\ over\ to\ the\ mask\ that\ will\ be\ used}}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ prune\_config-\/>prune\_threshold\ =\ \string~(prune\_config-\/>prune\_threshold-\/1);}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00097\ }
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \textcolor{comment}{//check\ for\ conversions\ to/from\ pruned\ log,\ as\ long\ as\ log\ contains\ something}}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\_begin\_block\ !=\ \_end\_block)\ \{}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ state\_history\_log\_header\ first\_header;}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ log.seek(0);}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1state__history__log_a5d675a425819171a8166885ea6cf754c}{read\_header}}(first\_header);}
+\DoxyCodeLine{00103\ }
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}((\mbox{\hyperlink{namespacesysio_a967f7bd318ee315bed33e22f2abb1bc2}{is\_ship\_log\_pruned}}(first\_header.magic)\ ==\ \textcolor{keyword}{false})\ \&\&\ prune\_config)\ \{}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//need\ to\ convert\ non-\/pruned\ to\ pruned;\ first\ prune\ any\ ranges\ we\ can\ (might\ be\ none)}}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \ \ \ \ prune(\mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4afe6da1f3a75c3911b0b59bffaea070e1}{fc::log\_level::info}});}
+\DoxyCodeLine{00107\ }
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//update\ first\ header\ to\ indicate\ prune\ feature\ is\ enabled}}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \ \ \ \ log.seek(0);}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \ \ \ \ first\_header.magic\ =\ \mbox{\hyperlink{namespacesysio_adcbaf3936df79b161164e2cd54530f9c}{ship\_magic}}(\mbox{\hyperlink{namespacesysio_a40e4963425695bd282c6dc9a7d53cc3e}{get\_ship\_version}}(first\_header.magic),\ ship\_feature\_pruned\_log);}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1state__history__log_a8a9d01c10388402d39b48b5e875dd89e}{write\_header}}(first\_header);}
+\DoxyCodeLine{00112\ }
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//write\ trailer\ on\ log\ with\ num\ blocks}}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \ \ \ \ log.seek\_end(0);}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ num\_blocks\_in\_log\ =\ \_end\_block\ -\/\ \_begin\_block;}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(log,\ num\_blocks\_in\_log);}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(\mbox{\hyperlink{namespacesysio_a967f7bd318ee315bed33e22f2abb1bc2}{is\_ship\_log\_pruned}}(first\_header.magic)\ \&\&\ !prune\_config)\ \{}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ \ \ \ vacuum();}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00122\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1state__history__log_a6d85c85a918a3a0a987ab3e25bb6b44c_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1state__history__log_a5aec589a09633460802cf8917ea31567}\index{sysio::state\_history\_log@{sysio::state\_history\_log}!````~state\_history\_log@{\texorpdfstring{$\sim$}{\string~}state\_history\_log}}
+\index{````~state\_history\_log@{\texorpdfstring{$\sim$}{\string~}state\_history\_log}!sysio::state\_history\_log@{sysio::state\_history\_log}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}state\_history\_log()}{\string~state\_history\_log()}}
+{\footnotesize\ttfamily \label{classsysio_1_1state__history__log_a5aec589a09633460802cf8917ea31567} 
+sysio\+::state\+\_\+history\+\_\+log\+::\texorpdfstring{$\sim$}{\string~}state\+\_\+history\+\_\+log (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{log_8hpp_source_l00124}{124}} of file \mbox{\hyperlink{log_8hpp_source}{log.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \textcolor{comment}{//nothing\ to\ do\ if\ log\ is\ empty\ or\ we\ aren't\ pruning}}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\_begin\_block\ ==\ \_end\_block)}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(!prune\_config\ ||\ !prune\_config-\/>vacuum\_on\_close)}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00130\ }
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ first\_data\_pos\ =\ get\_pos(\_begin\_block);}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ last\_data\_pos\ =\ \mbox{\hyperlink{namespacefc_aae3e907b120751591ca6919ac66c384b}{fc::file\_size}}(log.get\_file\_path());}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(last\_data\_pos\ -\/\ first\_data\_pos\ <\ *prune\_config-\/>vacuum\_on\_close)}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \ vacuum();}
+\DoxyCodeLine{00135\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=303pt]{classsysio_1_1state__history__log_a5aec589a09633460802cf8917ea31567_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysio_1_1state__history__log_aaeee4e808940aa12749bcf18c3db45cb}\index{sysio::state\_history\_log@{sysio::state\_history\_log}!begin\_block@{begin\_block}}
+\index{begin\_block@{begin\_block}!sysio::state\_history\_log@{sysio::state\_history\_log}}
+\doxysubsubsection{\texorpdfstring{begin\_block()}{begin\_block()}}
+{\footnotesize\ttfamily \label{classsysio_1_1state__history__log_aaeee4e808940aa12749bcf18c3db45cb} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::state\+\_\+history\+\_\+log\+::begin\+\_\+block (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{log_8hpp_source_l00137}{137}} of file \mbox{\hyperlink{log_8hpp_source}{log.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00137\ \{\ \textcolor{keywordflow}{return}\ \_begin\_block;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1state__history__log_a50803d742fa959ef761b29460ea9484f}\index{sysio::state\_history\_log@{sysio::state\_history\_log}!end\_block@{end\_block}}
+\index{end\_block@{end\_block}!sysio::state\_history\_log@{sysio::state\_history\_log}}
+\doxysubsubsection{\texorpdfstring{end\_block()}{end\_block()}}
+{\footnotesize\ttfamily \label{classsysio_1_1state__history__log_a50803d742fa959ef761b29460ea9484f} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} sysio\+::state\+\_\+history\+\_\+log\+::end\+\_\+block (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{log_8hpp_source_l00138}{138}} of file \mbox{\hyperlink{log_8hpp_source}{log.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00138\ \{\ \textcolor{keywordflow}{return}\ \_end\_block;\ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysio_1_1state__history__log_a59a8402aa5b18c7a78537acf11e0815d}\index{sysio::state\_history\_log@{sysio::state\_history\_log}!get\_block\_id@{get\_block\_id}}
+\index{get\_block\_id@{get\_block\_id}!sysio::state\_history\_log@{sysio::state\_history\_log}}
+\doxysubsubsection{\texorpdfstring{get\_block\_id()}{get\_block\_id()}}
+{\footnotesize\ttfamily \label{classsysio_1_1state__history__log_a59a8402aa5b18c7a78537acf11e0815d} 
+\mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{chain\+::block\+\_\+id\+\_\+type}} sysio\+::state\+\_\+history\+\_\+log\+::get\+\_\+block\+\_\+id (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{block\+\_\+num}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{log_8hpp_source_l00219}{219}} of file \mbox{\hyperlink{log_8hpp_source}{log.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ state\_history\_log\_header\ header;}
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1state__history__log_ad889160690ba1789472f6a4a29dee5d5}{get\_entry}}(block\_num,\ header);}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ header.block\_id;}
+\DoxyCodeLine{00223\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1state__history__log_a59a8402aa5b18c7a78537acf11e0815d_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1state__history__log_ad889160690ba1789472f6a4a29dee5d5}\index{sysio::state\_history\_log@{sysio::state\_history\_log}!get\_entry@{get\_entry}}
+\index{get\_entry@{get\_entry}!sysio::state\_history\_log@{sysio::state\_history\_log}}
+\doxysubsubsection{\texorpdfstring{get\_entry()}{get\_entry()}}
+{\footnotesize\ttfamily \label{classsysio_1_1state__history__log_ad889160690ba1789472f6a4a29dee5d5} 
+\mbox{\hyperlink{classfc_1_1cfile}{fc\+::cfile}} \& sysio\+::state\+\_\+history\+\_\+log\+::get\+\_\+entry (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{block\+\_\+num}{, }\item[{\mbox{\hyperlink{structsysio_1_1state__history__log__header}{state\+\_\+history\+\_\+log\+\_\+header}} \&}]{header}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{log_8hpp_source_l00211}{211}} of file \mbox{\hyperlink{log_8hpp_source}{log.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(block\_num\ >=\ \_begin\_block\ \&\&\ block\_num\ <\ \_end\_block,\ chain::plugin\_exception,}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}read\ non-\/existing\ block\ in\ \$\{name\}.log"{}},\ (\textcolor{stringliteral}{"{}name"{}},\ name));}
+\DoxyCodeLine{00214\ \ \ \ \ \ \ log.seek(get\_pos(block\_num));}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1state__history__log_a5d675a425819171a8166885ea6cf754c}{read\_header}}(header);}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ log;}
+\DoxyCodeLine{00217\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1state__history__log_ad889160690ba1789472f6a4a29dee5d5_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=319pt]{classsysio_1_1state__history__log_ad889160690ba1789472f6a4a29dee5d5_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1state__history__log_a5d675a425819171a8166885ea6cf754c}\index{sysio::state\_history\_log@{sysio::state\_history\_log}!read\_header@{read\_header}}
+\index{read\_header@{read\_header}!sysio::state\_history\_log@{sysio::state\_history\_log}}
+\doxysubsubsection{\texorpdfstring{read\_header()}{read\_header()}}
+{\footnotesize\ttfamily \label{classsysio_1_1state__history__log_a5d675a425819171a8166885ea6cf754c} 
+void sysio\+::state\+\_\+history\+\_\+log\+::read\+\_\+header (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1state__history__log__header}{state\+\_\+history\+\_\+log\+\_\+header}} \&}]{header}{, }\item[{bool}]{assert\+\_\+version}{ = {\ttfamily true}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{log_8hpp_source_l00140}{140}} of file \mbox{\hyperlink{log_8hpp_source}{log.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{namespacesysio_1_1chain_ac6f5a1f1e061f000983f5d5f3ac25dfa}{bytes}}[state\_history\_log\_header\_serial\_size];}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ log.read(\mbox{\hyperlink{namespacesysio_1_1chain_ac6f5a1f1e061f000983f5d5f3ac25dfa}{bytes}},\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{namespacesysio_1_1chain_ac6f5a1f1e061f000983f5d5f3ac25dfa}{bytes}}));}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1datastream}{fc::datastream<const\ char*>}}\ \mbox{\hyperlink{namespace_xbyak_1_1util_a4b2aef26182d21706896022467868f7c}{ds}}(\mbox{\hyperlink{namespacesysio_1_1chain_ac6f5a1f1e061f000983f5d5f3ac25dfa}{bytes}},\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{namespacesysio_1_1chain_ac6f5a1f1e061f000983f5d5f3ac25dfa}{bytes}}));}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a0b442d98ceb22dd5a6ae84745e43ffab}{fc::raw::unpack}}(ds,\ header);}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(!\mbox{\hyperlink{namespace_xbyak_1_1util_a4b2aef26182d21706896022467868f7c}{ds}}.remaining(),\ chain::plugin\_exception,\ \textcolor{stringliteral}{"{}state\_history\_log\_header\_serial\_size\ mismatch"{}});}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (assert\_version)}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\mbox{\hyperlink{namespacesysio_aa035ebab1a4243e9ea978e0c77c22db2}{is\_ship}}(header.magic)\ \&\&\ \mbox{\hyperlink{namespacesysio_a7e66082bb7477dd8ee41a5145d604ee2}{is\_ship\_supported\_version}}(header.magic),\ chain::plugin\_exception,}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}corrupt\ \$\{name\}.log\ (0)"{}},\ (\textcolor{stringliteral}{"{}name"{}},\ name));}
+\DoxyCodeLine{00149\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1state__history__log_a5d675a425819171a8166885ea6cf754c_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1state__history__log_a5d675a425819171a8166885ea6cf754c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1state__history__log_a8753293c4782af4d456ecfdc84808dff}\index{sysio::state\_history\_log@{sysio::state\_history\_log}!write\_entry@{write\_entry}}
+\index{write\_entry@{write\_entry}!sysio::state\_history\_log@{sysio::state\_history\_log}}
+\doxysubsubsection{\texorpdfstring{write\_entry()}{write\_entry()}}
+{\footnotesize\ttfamily \label{classsysio_1_1state__history__log_a8753293c4782af4d456ecfdc84808dff} 
+template$<$typename F $>$ \\
+void sysio\+::state\+\_\+history\+\_\+log\+::write\+\_\+entry (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1state__history__log__header}{state\+\_\+history\+\_\+log\+\_\+header}}}]{header}{, }\item[{const \mbox{\hyperlink{namespacesysio_1_1chain_a4b8e4b7ed9dcd18ee75d0de62e88aa17}{chain\+::block\+\_\+id\+\_\+type}} \&}]{prev\+\_\+id}{, }\item[{F}]{write\+\_\+payload}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{log_8hpp_source_l00160}{160}} of file \mbox{\hyperlink{log_8hpp_source}{log.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ block\_num\ =\ \mbox{\hyperlink{structsysio_1_1chain_1_1block__header_a39d57e33ef8d3f6ba59b4c458f0ae375}{chain::block\_header::num\_from\_id}}(header.block\_id);}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(\_begin\_block\ ==\ \_end\_block\ ||\ block\_num\ <=\ \_end\_block,\ chain::plugin\_exception,}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}missed\ a\ block\ in\ \$\{name\}.log"{}},\ (\textcolor{stringliteral}{"{}name"{}},\ name));}
+\DoxyCodeLine{00164\ }
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\_begin\_block\ !=\ \_end\_block\ \&\&\ block\_num\ >\ \_begin\_block)\ \{}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (block\_num\ ==\ \_end\_block)\ \{}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(prev\_id\ ==\ last\_block\_id,\ chain::plugin\_exception,\ \textcolor{stringliteral}{"{}missed\ a\ fork\ change\ in\ \$\{name\}.log"{}},}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}name"{}},\ name));}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00170\ \ \ \ \ \ \ \ \ \ \ \ \ state\_history\_log\_header\ prev;}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1state__history__log_ad889160690ba1789472f6a4a29dee5d5}{get\_entry}}(block\_num\ -\/\ 1,\ prev);}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(prev\_id\ ==\ prev.block\_id,\ chain::plugin\_exception,\ \textcolor{stringliteral}{"{}missed\ a\ fork\ change\ in\ \$\{name\}.log"{}},}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}name"{}},\ name));}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00176\ }
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (block\_num\ <\ \_end\_block)}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \ truncate(block\_num);\ \textcolor{comment}{//truncate\ is\ expected\ to\ always\ leave\ file\ pointer\ at\ the\ end}}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (!prune\_config)}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \ log.seek\_end(0);}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (prune\_config\ \&\&\ \_begin\_block\ !=\ \_end\_block)}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ \ log.seek\_end(-\/\textcolor{keyword}{sizeof}(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}));\ \ \textcolor{comment}{//overwrite\ the\ trailing\ block\ count\ marker\ on\ this\ write}}
+\DoxyCodeLine{00183\ }
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \textcolor{comment}{//if\ we're\ operating\ on\ a\ pruned\ block\ log\ and\ this\ is\ the\ first\ entry\ in\ the\ log,\ make\ note\ of\ the\ feature\ in\ the\ header}}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(prune\_config\ \&\&\ \_begin\_block\ ==\ \_end\_block)}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ \ header.magic\ =\ \mbox{\hyperlink{namespacesysio_adcbaf3936df79b161164e2cd54530f9c}{ship\_magic}}(\mbox{\hyperlink{namespacesysio_a40e4963425695bd282c6dc9a7d53cc3e}{get\_ship\_version}}(header.magic),\ ship\_feature\_pruned\_log);}
+\DoxyCodeLine{00187\ }
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ pos\ =\ log.tellp();}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \mbox{\hyperlink{classsysio_1_1state__history__log_a8a9d01c10388402d39b48b5e875dd89e}{write\_header}}(header);}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ write\_payload(log);}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(log.tellp()\ ==\ pos\ +\ state\_history\_log\_header\_serial\_size\ +\ header.payload\_size,\ chain::plugin\_exception,}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}wrote\ payload\ with\ incorrect\ size\ to\ \$\{name\}.log"{}},\ (\textcolor{stringliteral}{"{}name"{}},\ name));}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(log,\ pos);}
+\DoxyCodeLine{00194\ }
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(index,\ pos);}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\_begin\_block\ ==\ \_end\_block)}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \ \_index\_begin\_block\ =\ \_begin\_block\ =\ block\_num;}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \_end\_block\ \ \ \ =\ block\_num\ +\ 1;}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ last\_block\_id\ =\ header.block\_id;}
+\DoxyCodeLine{00200\ }
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(prune\_config)\ \{}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}((pos\&prune\_config-\/>prune\_threshold)\ !=\ (log.tellp()\&prune\_config-\/>prune\_threshold))}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ \ \ \ \ \ \ prune(\mbox{\hyperlink{classfc_1_1log__level_a5a5e31c4c1f38d9115ecbe44927fb2e4a30d2de77e71beb8d09d530cac04efa25}{fc::log\_level::debug}});}
+\DoxyCodeLine{00204\ }
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ num\_blocks\_in\_log\ =\ \_end\_block\ -\/\ \_begin\_block;}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(log,\ num\_blocks\_in\_log);}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00208\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsysio_1_1state__history__log_a8753293c4782af4d456ecfdc84808dff_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysio_1_1state__history__log_a8a9d01c10388402d39b48b5e875dd89e}\index{sysio::state\_history\_log@{sysio::state\_history\_log}!write\_header@{write\_header}}
+\index{write\_header@{write\_header}!sysio::state\_history\_log@{sysio::state\_history\_log}}
+\doxysubsubsection{\texorpdfstring{write\_header()}{write\_header()}}
+{\footnotesize\ttfamily \label{classsysio_1_1state__history__log_a8a9d01c10388402d39b48b5e875dd89e} 
+void sysio\+::state\+\_\+history\+\_\+log\+::write\+\_\+header (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1state__history__log__header}{state\+\_\+history\+\_\+log\+\_\+header}} \&}]{header}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{log_8hpp_source_l00151}{151}} of file \mbox{\hyperlink{log_8hpp_source}{log.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_ac6f5a1f1e061f000983f5d5f3ac25dfa}{bytes}}[state\_history\_log\_header\_serial\_size];}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1datastream}{fc::datastream<char*>}}\ \mbox{\hyperlink{namespace_xbyak_1_1util_a4b2aef26182d21706896022467868f7c}{ds}}(\mbox{\hyperlink{namespacesysio_1_1chain_ac6f5a1f1e061f000983f5d5f3ac25dfa}{bytes}},\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{namespacesysio_1_1chain_ac6f5a1f1e061f000983f5d5f3ac25dfa}{bytes}}));}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a3a18d8161aa5b4f4f02b6fcfdff5e5d1}{fc::raw::pack}}(ds,\ header);}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \mbox{\hyperlink{chain_2include_2sysio_2chain_2exceptions_8hpp_a40c2826a6fba35c1ffbf912bdf559792}{SYS\_ASSERT}}(!\mbox{\hyperlink{namespace_xbyak_1_1util_a4b2aef26182d21706896022467868f7c}{ds}}.remaining(),\ chain::plugin\_exception,\ \textcolor{stringliteral}{"{}state\_history\_log\_header\_serial\_size\ mismatch"{}});}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ log.write(\mbox{\hyperlink{namespacesysio_1_1chain_ac6f5a1f1e061f000983f5d5f3ac25dfa}{bytes}},\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{namespacesysio_1_1chain_ac6f5a1f1e061f000983f5d5f3ac25dfa}{bytes}}));}
+\DoxyCodeLine{00157\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=291pt]{classsysio_1_1state__history__log_a8a9d01c10388402d39b48b5e875dd89e_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=332pt]{classsysio_1_1state__history__log_a8a9d01c10388402d39b48b5e875dd89e_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/state\+\_\+history/include/sysio/state\+\_\+history/\mbox{\hyperlink{log_8hpp}{log.\+hpp}}\end{DoxyCompactItemize}

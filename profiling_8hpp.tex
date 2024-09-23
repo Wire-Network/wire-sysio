@@ -1,0 +1,71 @@
+\doxysection{libraries/fc/libraries/ff/libff/common/profiling.hpp File Reference}
+\hypertarget{profiling_8hpp}{}\label{profiling_8hpp}\index{libraries/fc/libraries/ff/libff/common/profiling.hpp@{libraries/fc/libraries/ff/libff/common/profiling.hpp}}
+{\ttfamily \#include $<$cstddef$>$}\newline
+{\ttfamily \#include $<$map$>$}\newline
+{\ttfamily \#include $<$string$>$}\newline
+{\ttfamily \#include $<$vector$>$}\newline
+Include dependency graph for profiling.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=301pt]{profiling_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{profiling_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacelibff}{libff}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{namespacelibff_a4bcbacbbf8d028be4c4b2a863d21f4c6}{libff\+::start\+\_\+profiling}} ()
+\item 
+long long \mbox{\hyperlink{namespacelibff_a81e225ed671a1a00f2dfe5753f89b6cf}{libff\+::get\+\_\+nsec\+\_\+time}} ()
+\item 
+void \mbox{\hyperlink{namespacelibff_a5c3a5ae8d92ef971f647fd95b7fc756a}{libff\+::print\+\_\+time}} (const char \texorpdfstring{$\ast$}{*}msg)
+\item 
+void \mbox{\hyperlink{namespacelibff_a6314933e7708a41140279a9c1a5c25c8}{libff\+::print\+\_\+header}} (const char \texorpdfstring{$\ast$}{*}msg)
+\item 
+void \mbox{\hyperlink{namespacelibff_af9fc78aab25c3773ef01a337a404e159}{libff\+::print\+\_\+indent}} ()
+\item 
+void \mbox{\hyperlink{namespacelibff_a0c1ab4936e58a7a6736e8b372e13cb9a}{libff\+::clear\+\_\+profiling\+\_\+counters}} ()
+\item 
+void \mbox{\hyperlink{namespacelibff_a695d8da263c9ea66d57a62209bc5181d}{libff\+::print\+\_\+cumulative\+\_\+time\+\_\+entry}} (const std\+::string \&key, const long long factor)
+\item 
+void \mbox{\hyperlink{namespacelibff_a9c31079c49ebd33090e944ba3b5e4b3b}{libff\+::print\+\_\+cumulative\+\_\+times}} (const long long factor)
+\item 
+void \mbox{\hyperlink{namespacelibff_a55df5d0f12f359bed1088011015bc205}{libff\+::print\+\_\+cumulative\+\_\+op\+\_\+counts}} (const bool only\+\_\+fq)
+\item 
+void \mbox{\hyperlink{namespacelibff_a64168e59c1ced7a22a49f7d819c02794}{libff\+::enter\+\_\+block}} (const std\+::string \&msg, const bool indent)
+\item 
+void \mbox{\hyperlink{namespacelibff_ac68d4feb3f7413e9e7de86e06fe6ef1f}{libff\+::leave\+\_\+block}} (const std\+::string \&msg, const bool indent)
+\item 
+void \mbox{\hyperlink{namespacelibff_a342ad9a9ee415ba99e1cc3f56b739894}{libff\+::print\+\_\+mem}} (const std\+::string \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})
+\item 
+void \mbox{\hyperlink{namespacelibff_ae2b657d337cbf53d4ce21b530b76efc5}{libff\+::print\+\_\+compilation\+\_\+info}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Declaration of functions for profiling code blocks.
+
+Reports time, operation counts, memory usage, and others.
+
+\begin{DoxyAuthor}{Author}
+This file is part of libff, developed by SCIPR Lab and contributors (see AUTHORS). 
+\end{DoxyAuthor}
+\begin{DoxyCopyright}{Copyright}
+MIT license (see LICENSE file) 
+\end{DoxyCopyright}
+
+
+Definition in file \mbox{\hyperlink{profiling_8hpp_source}{profiling.\+hpp}}.
+

@@ -1,0 +1,11 @@
+<map id="Catch::clara::detail::Opt" name="Catch::clara::detail::Opt">
+<area shape="rect" id="Node000001" title=" " alt="" coords="108,319,268,345"/>
+<area shape="rect" id="Node000002" href="$class_catch_1_1clara_1_1detail_1_1_parser_ref_impl.html" title=" " alt="" coords="109,229,267,270"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="191,285,191,319,185,319,185,285"/>
+<area shape="rect" id="Node000003" href="$class_catch_1_1clara_1_1detail_1_1_composable_parser_impl.html" title=" " alt="" coords="5,95,171,151"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="121,161,174,227,170,230,117,165"/>
+<area shape="rect" id="Node000004" href="$class_catch_1_1clara_1_1detail_1_1_parser_base.html" title=" " alt="" coords="22,5,154,46"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="91,62,91,95,85,95,85,62"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="195,110,248,136"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="217,152,196,229,191,228,212,150"/>
+</map>

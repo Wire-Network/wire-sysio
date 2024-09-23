@@ -1,0 +1,133 @@
+\doxysection{websocketpp\+::transport\+::iostream\+::error Namespace Reference}
+\hypertarget{namespacewebsocketpp_1_1transport_1_1iostream_1_1error}{}\label{namespacewebsocketpp_1_1transport_1_1iostream_1_1error}\index{websocketpp::transport::iostream::error@{websocketpp::transport::iostream::error}}
+
+
+iostream transport errors  
+
+
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1error_1_1category}{category}}
+\begin{DoxyCompactList}\small\item\em iostream transport error category \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1iostream_1_1error_a647b428e260748d7606c92255e1e9737}{value}} \{ \newline
+\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1iostream_1_1error_a647b428e260748d7606c92255e1e9737a509b29b678dabf2fa2776636b3ba3c98}{general}} = 1
+, \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1iostream_1_1error_a647b428e260748d7606c92255e1e9737aa185b313b5353e821c3fce4bf62f50a6}{invalid\+\_\+num\+\_\+bytes}}
+, \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1iostream_1_1error_a647b428e260748d7606c92255e1e9737ac1ae213118c53b4d7eceb10876d88266}{double\+\_\+read}}
+, \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1iostream_1_1error_a647b428e260748d7606c92255e1e9737a92341254bd27c7cb97fb5e1aca5310f3}{output\+\_\+stream\+\_\+required}}
+, \newline
+\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1iostream_1_1error_a647b428e260748d7606c92255e1e9737ad46c640654d1d96c517444d95d24da45}{bad\+\_\+stream}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+lib\+::error\+\_\+category const \& \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1iostream_1_1error_aa502cd242c13ee0710f7ac980e7ac499}{get\+\_\+category}} ()
+\begin{DoxyCompactList}\small\item\em Get a reference to a static copy of the iostream transport error category. \end{DoxyCompactList}\item 
+lib\+::error\+\_\+code \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1iostream_1_1error_a6b208c9eb4b1b76090e564e6e462fbcf}{make\+\_\+error\+\_\+code}} (\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1iostream_1_1error_a647b428e260748d7606c92255e1e9737}{error\+::value}} e)
+\begin{DoxyCompactList}\small\item\em Get an error code with the given value and the iostream transport category. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{namespacewebsocketpp_1_1transport_1_1iostream_1_1error_a647b428e260748d7606c92255e1e9737}\index{websocketpp::transport::iostream::error@{websocketpp::transport::iostream::error}!value@{value}}
+\index{value@{value}!websocketpp::transport::iostream::error@{websocketpp::transport::iostream::error}}
+\doxysubsubsection{\texorpdfstring{value}{value}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1transport_1_1iostream_1_1error_a647b428e260748d7606c92255e1e9737} 
+enum \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1iostream_1_1error_a647b428e260748d7606c92255e1e9737}{websocketpp\+::transport\+::iostream\+::error\+::value}}}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{general@{general}!websocketpp::transport::iostream::error@{websocketpp::transport::iostream::error}}\index{websocketpp::transport::iostream::error@{websocketpp::transport::iostream::error}!general@{general}}}\Hypertarget{namespacewebsocketpp_1_1transport_1_1iostream_1_1error_a647b428e260748d7606c92255e1e9737a509b29b678dabf2fa2776636b3ba3c98}\label{namespacewebsocketpp_1_1transport_1_1iostream_1_1error_a647b428e260748d7606c92255e1e9737} 
+general&Catch-\/all error for transport policy errors that don\textquotesingle{}t fit in other categories \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{invalid\_num\_bytes@{invalid\_num\_bytes}!websocketpp::transport::iostream::error@{websocketpp::transport::iostream::error}}\index{websocketpp::transport::iostream::error@{websocketpp::transport::iostream::error}!invalid\_num\_bytes@{invalid\_num\_bytes}}}\Hypertarget{namespacewebsocketpp_1_1transport_1_1iostream_1_1error_a647b428e260748d7606c92255e1e9737aa185b313b5353e821c3fce4bf62f50a6}\label{namespacewebsocketpp_1_1transport_1_1iostream_1_1error_a647b428e260748d7606c92255e1e9737} 
+invalid\+\_\+num\+\_\+bytes&async\+\_\+read\+\_\+at\+\_\+least call requested more bytes than buffer can store \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{double\_read@{double\_read}!websocketpp::transport::iostream::error@{websocketpp::transport::iostream::error}}\index{websocketpp::transport::iostream::error@{websocketpp::transport::iostream::error}!double\_read@{double\_read}}}\Hypertarget{namespacewebsocketpp_1_1transport_1_1iostream_1_1error_a647b428e260748d7606c92255e1e9737ac1ae213118c53b4d7eceb10876d88266}\label{namespacewebsocketpp_1_1transport_1_1iostream_1_1error_a647b428e260748d7606c92255e1e9737} 
+double\+\_\+read&async\+\_\+read called while another async\+\_\+read was in progress \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{output\_stream\_required@{output\_stream\_required}!websocketpp::transport::iostream::error@{websocketpp::transport::iostream::error}}\index{websocketpp::transport::iostream::error@{websocketpp::transport::iostream::error}!output\_stream\_required@{output\_stream\_required}}}\Hypertarget{namespacewebsocketpp_1_1transport_1_1iostream_1_1error_a647b428e260748d7606c92255e1e9737a92341254bd27c7cb97fb5e1aca5310f3}\label{namespacewebsocketpp_1_1transport_1_1iostream_1_1error_a647b428e260748d7606c92255e1e9737} 
+output\+\_\+stream\+\_\+required&An operation that requires an output stream was attempted before setting one. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{bad\_stream@{bad\_stream}!websocketpp::transport::iostream::error@{websocketpp::transport::iostream::error}}\index{websocketpp::transport::iostream::error@{websocketpp::transport::iostream::error}!bad\_stream@{bad\_stream}}}\Hypertarget{namespacewebsocketpp_1_1transport_1_1iostream_1_1error_a647b428e260748d7606c92255e1e9737ad46c640654d1d96c517444d95d24da45}\label{namespacewebsocketpp_1_1transport_1_1iostream_1_1error_a647b428e260748d7606c92255e1e9737} 
+bad\+\_\+stream&stream error \\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2base_8hpp_source_l00065}{65}} of file \mbox{\hyperlink{transport_2iostream_2base_8hpp_source}{base.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00068\ \ \ \ \ general\ =\ 1,}
+\DoxyCodeLine{00069\ }
+\DoxyCodeLine{00071\ \ \ \ \ invalid\_num\_bytes,}
+\DoxyCodeLine{00072\ }
+\DoxyCodeLine{00074\ \ \ \ \ double\_read,}
+\DoxyCodeLine{00075\ }
+\DoxyCodeLine{00078\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1iostream_1_1error_a647b428e260748d7606c92255e1e9737a92341254bd27c7cb97fb5e1aca5310f3}{output\_stream\_required}},}
+\DoxyCodeLine{00079\ }
+\DoxyCodeLine{00081\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1iostream_1_1error_a647b428e260748d7606c92255e1e9737ad46c640654d1d96c517444d95d24da45}{bad\_stream}}}
+\DoxyCodeLine{00082\ \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacewebsocketpp_1_1transport_1_1iostream_1_1error_aa502cd242c13ee0710f7ac980e7ac499}\index{websocketpp::transport::iostream::error@{websocketpp::transport::iostream::error}!get\_category@{get\_category}}
+\index{get\_category@{get\_category}!websocketpp::transport::iostream::error@{websocketpp::transport::iostream::error}}
+\doxysubsubsection{\texorpdfstring{get\_category()}{get\_category()}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1transport_1_1iostream_1_1error_aa502cd242c13ee0710f7ac980e7ac499} 
+lib\+::error\+\_\+category const  \& websocketpp\+::transport\+::iostream\+::error\+::get\+\_\+category (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2base_8hpp_source_l00112}{112}} of file \mbox{\hyperlink{transport_2iostream_2base_8hpp_source}{base.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00113\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classwebsocketpp_1_1transport_1_1iostream_1_1error_1_1category}{category}}\ instance;}
+\DoxyCodeLine{00114\ \ \ \ \ \textcolor{keywordflow}{return}\ instance;}
+\DoxyCodeLine{00115\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacewebsocketpp_1_1transport_1_1iostream_1_1error_aa502cd242c13ee0710f7ac980e7ac499_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacewebsocketpp_1_1transport_1_1iostream_1_1error_a6b208c9eb4b1b76090e564e6e462fbcf}\index{websocketpp::transport::iostream::error@{websocketpp::transport::iostream::error}!make\_error\_code@{make\_error\_code}}
+\index{make\_error\_code@{make\_error\_code}!websocketpp::transport::iostream::error@{websocketpp::transport::iostream::error}}
+\doxysubsubsection{\texorpdfstring{make\_error\_code()}{make\_error\_code()}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1transport_1_1iostream_1_1error_a6b208c9eb4b1b76090e564e6e462fbcf} 
+lib\+::error\+\_\+code websocketpp\+::transport\+::iostream\+::error\+::make\+\_\+error\+\_\+code (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1transport_1_1iostream_1_1error_a647b428e260748d7606c92255e1e9737}{error\+::value}}}]{e}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{transport_2iostream_2base_8hpp_source_l00118}{118}} of file \mbox{\hyperlink{transport_2iostream_2base_8hpp_source}{base.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00119\ \ \ \ \ \textcolor{keywordflow}{return}\ lib::error\_code(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(e),\ get\_category());}
+\DoxyCodeLine{00120\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacewebsocketpp_1_1transport_1_1iostream_1_1error_a6b208c9eb4b1b76090e564e6e462fbcf_cgraph}
+\end{center}
+\end{figure}

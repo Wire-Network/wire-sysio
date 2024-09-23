@@ -1,0 +1,12 @@
+<map id="WAST::ModulePrintContext::printInitializerExpression" name="WAST::ModulePrintContext::printInitializerExpression">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,23,186,64"/>
+<area shape="rect" id="Node000002" href="$namespace_floats.html#a910e7e5ea7e4d10bf994fc3fcd2fe52b" title=" " alt="" coords="234,5,347,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="186,29,218,25,219,30,187,34"/>
+<area shape="rect" id="Node000005" href="$namespace_errors.html#a6959930ad6159fe3eb2e04ebf87c1b84" title=" " alt="" coords="395,56,529,82"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="186,47,379,60,379,66,186,52"/>
+<area shape="rect" id="Node000003" href="$namespace_errors.html#aee5daf469584435300f91503f83b09fe" title=" " alt="" coords="418,7,507,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="348,16,402,16,402,22,348,21"/>
+<area shape="rect" id="Node000004" href="$namespace_errors.html#a719a329951edb01e45afe1443dfa2a92" title=" " alt="" coords="577,32,671,58"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="508,24,562,33,561,38,507,29"/>
+<area shape="poly" id="edge5_Node000005_Node000004" title=" " alt="" coords="529,56,561,51,562,57,530,62"/>
+</map>

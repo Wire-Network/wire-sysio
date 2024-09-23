@@ -1,0 +1,84 @@
+\doxysection{CLI\+::detail\+::has\+\_\+find\texorpdfstring{$<$}{<} C, V \texorpdfstring{$>$}{>} Struct Template Reference}
+\hypertarget{struct_c_l_i_1_1detail_1_1has__find}{}\label{struct_c_l_i_1_1detail_1_1has__find}\index{CLI::detail::has\_find$<$ C, V $>$@{CLI::detail::has\_find$<$ C, V $>$}}
+
+
+{\ttfamily \#include $<$CLI11.\+hpp$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1has__find_a453fd5f3c5816cc70946495654204d3c}{type}} = std\+::integral\+\_\+constant$<$bool, \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1has__find_a22add4e672034bd326b73ef63e62207c}{value}}$>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename CC , typename VV $>$ }\\static auto \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1has__find_a62e84140bfe93fad60da822a970cce47}{test}} (int) -\/$>$ decltype(std\+::declval$<$ CC $>$().find(std\+::declval$<$ VV $>$()), std\+::true\+\_\+type())
+\item 
+{\footnotesize template$<$typename , typename $>$ }\\static auto \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1has__find_aff116fc3bdbae044461d782682f7177a}{test}} (...) -\/$>$ decltype(std\+::false\+\_\+type())
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static const auto \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1has__find_a22add4e672034bd326b73ef63e62207c}{value}} = decltype(\mbox{\hyperlink{struct_c_l_i_1_1detail_1_1has__find_a62e84140bfe93fad60da822a970cce47}{test}}$<$C, \mbox{\hyperlink{struct_v}{V}}$>$(0))\+::value
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename C, typename \mbox{\hyperlink{struct_v}{V}}$>$\newline
+struct CLI\+::detail\+::has\+\_\+find$<$ C, V $>$}
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l02617}{2617}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{struct_c_l_i_1_1detail_1_1has__find_a453fd5f3c5816cc70946495654204d3c}\index{CLI::detail::has\_find$<$ C, V $>$@{CLI::detail::has\_find$<$ C, V $>$}!type@{type}}
+\index{type@{type}!CLI::detail::has\_find$<$ C, V $>$@{CLI::detail::has\_find$<$ C, V $>$}}
+\doxysubsubsection{\texorpdfstring{type}{type}}
+{\footnotesize\ttfamily \label{struct_c_l_i_1_1detail_1_1has__find_a453fd5f3c5816cc70946495654204d3c} 
+template$<$typename C , typename \mbox{\hyperlink{struct_v}{V}} $>$ \\
+using \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1has__find}{CLI\+::detail\+::has\+\_\+find}}$<$ C, \mbox{\hyperlink{struct_v}{V}} $>$\+::type = std\+::integral\+\_\+constant$<$bool, \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1has__find_a22add4e672034bd326b73ef63e62207c}{value}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l02623}{2623}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_c_l_i_1_1detail_1_1has__find_aff116fc3bdbae044461d782682f7177a}\index{CLI::detail::has\_find$<$ C, V $>$@{CLI::detail::has\_find$<$ C, V $>$}!test@{test}}
+\index{test@{test}!CLI::detail::has\_find$<$ C, V $>$@{CLI::detail::has\_find$<$ C, V $>$}}
+\doxysubsubsection{\texorpdfstring{test()}{test()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{struct_c_l_i_1_1detail_1_1has__find_aff116fc3bdbae044461d782682f7177a} 
+template$<$typename C , typename \mbox{\hyperlink{struct_v}{V}} $>$ \\
+template$<$typename , typename $>$ \\
+static auto \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1has__find}{CLI\+::detail\+::has\+\_\+find}}$<$ C, \mbox{\hyperlink{struct_v}{V}} $>$\+::test (\begin{DoxyParamCaption}\item[{}]{...}{}\end{DoxyParamCaption}) -\/$>$  decltype(std\+::false\+\_\+type())\hspace{0.3cm}{\ttfamily [static]}}
+
+\Hypertarget{struct_c_l_i_1_1detail_1_1has__find_a62e84140bfe93fad60da822a970cce47}\index{CLI::detail::has\_find$<$ C, V $>$@{CLI::detail::has\_find$<$ C, V $>$}!test@{test}}
+\index{test@{test}!CLI::detail::has\_find$<$ C, V $>$@{CLI::detail::has\_find$<$ C, V $>$}}
+\doxysubsubsection{\texorpdfstring{test()}{test()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{struct_c_l_i_1_1detail_1_1has__find_a62e84140bfe93fad60da822a970cce47} 
+template$<$typename C , typename \mbox{\hyperlink{struct_v}{V}} $>$ \\
+template$<$typename CC , typename VV $>$ \\
+static auto \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1has__find}{CLI\+::detail\+::has\+\_\+find}}$<$ C, \mbox{\hyperlink{struct_v}{V}} $>$\+::test (\begin{DoxyParamCaption}\item[{int}]{}{}\end{DoxyParamCaption}) -\/$>$  decltype(std\+::declval$<$ CC $>$().find(std\+::declval$<$ VV $>$()), std\+::true\+\_\+type())\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_c_l_i_1_1detail_1_1has__find_a22add4e672034bd326b73ef63e62207c}\index{CLI::detail::has\_find$<$ C, V $>$@{CLI::detail::has\_find$<$ C, V $>$}!value@{value}}
+\index{value@{value}!CLI::detail::has\_find$<$ C, V $>$@{CLI::detail::has\_find$<$ C, V $>$}}
+\doxysubsubsection{\texorpdfstring{value}{value}}
+{\footnotesize\ttfamily \label{struct_c_l_i_1_1detail_1_1has__find_a22add4e672034bd326b73ef63e62207c} 
+template$<$typename C , typename \mbox{\hyperlink{struct_v}{V}} $>$ \\
+const auto \mbox{\hyperlink{struct_c_l_i_1_1detail_1_1has__find}{CLI\+::detail\+::has\+\_\+find}}$<$ C, \mbox{\hyperlink{struct_v}{V}} $>$\+::value = decltype(\mbox{\hyperlink{struct_c_l_i_1_1detail_1_1has__find_a62e84140bfe93fad60da822a970cce47}{test}}$<$C, \mbox{\hyperlink{struct_v}{V}}$>$(0))\+::value\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l02622}{2622}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+programs/clio/\mbox{\hyperlink{_c_l_i11_8hpp}{CLI11.\+hpp}}\end{DoxyCompactItemize}

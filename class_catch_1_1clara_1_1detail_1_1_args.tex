@@ -1,0 +1,83 @@
+\doxysection{Catch\+::clara\+::detail\+::Args Class Reference}
+\hypertarget{class_catch_1_1clara_1_1detail_1_1_args}{}\label{class_catch_1_1clara_1_1detail_1_1_args}\index{Catch::clara::detail::Args@{Catch::clara::detail::Args}}
+
+
+{\ttfamily \#include $<$clara.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_args_a0e59873d7db240217ffef0cf073785fd}{Args}} (int argc, char const \texorpdfstring{$\ast$}{*}const \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}})
+\item 
+\mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_args_ae5c184e90d0c13c04e439b297f9aa7c0}{Args}} (std\+::initializer\+\_\+list$<$ std\+::string $>$ args)
+\item 
+auto \mbox{\hyperlink{class_catch_1_1clara_1_1detail_1_1_args_a7e1bb59b9b8de8bbfcf8049d899b8e16}{exe\+Name}} () const -\/$>$ std\+::string
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{include_2external_2clara_8hpp_source_l00408}{408}} of file \mbox{\hyperlink{include_2external_2clara_8hpp_source}{clara.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_catch_1_1clara_1_1detail_1_1_args_a0e59873d7db240217ffef0cf073785fd}\index{Catch::clara::detail::Args@{Catch::clara::detail::Args}!Args@{Args}}
+\index{Args@{Args}!Catch::clara::detail::Args@{Catch::clara::detail::Args}}
+\doxysubsubsection{\texorpdfstring{Args()}{Args()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1clara_1_1detail_1_1_args_a0e59873d7db240217ffef0cf073785fd} 
+Catch\+::clara\+::detail\+::\+Args\+::\+Args (\begin{DoxyParamCaption}\item[{int}]{argc}{, }\item[{char const \texorpdfstring{$\ast$}{*}const \texorpdfstring{$\ast$}{*}}]{argv}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{include_2external_2clara_8hpp_source_l00414}{414}} of file \mbox{\hyperlink{include_2external_2clara_8hpp_source}{clara.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00415\ \ \ \ \ \ \ \ \ \ \ \ \ :\ m\_exeName(\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}[0]),}
+\DoxyCodeLine{00416\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_args(\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}\ +\ 1,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}\ +\ argc)\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1clara_1_1detail_1_1_args_ae5c184e90d0c13c04e439b297f9aa7c0}\index{Catch::clara::detail::Args@{Catch::clara::detail::Args}!Args@{Args}}
+\index{Args@{Args}!Catch::clara::detail::Args@{Catch::clara::detail::Args}}
+\doxysubsubsection{\texorpdfstring{Args()}{Args()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1clara_1_1detail_1_1_args_ae5c184e90d0c13c04e439b297f9aa7c0} 
+Catch\+::clara\+::detail\+::\+Args\+::\+Args (\begin{DoxyParamCaption}\item[{std\+::initializer\+\_\+list$<$ std\+::string $>$}]{args}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{include_2external_2clara_8hpp_source_l00418}{418}} of file \mbox{\hyperlink{include_2external_2clara_8hpp_source}{clara.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00419\ \ \ \ \ \ \ \ \ :\ \ \ m\_exeName(\ *\mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.begin()\ ),}
+\DoxyCodeLine{00420\ \ \ \ \ \ \ \ \ \ \ \ \ m\_args(\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.begin()+1,\ \mbox{\hyperlink{namespacebenchmark_compile_ad0ed96ae1454e4347ca61ac3887c379e}{args}}.end()\ )}
+\DoxyCodeLine{00421\ \ \ \ \ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_catch_1_1clara_1_1detail_1_1_args_a7e1bb59b9b8de8bbfcf8049d899b8e16}\index{Catch::clara::detail::Args@{Catch::clara::detail::Args}!exeName@{exeName}}
+\index{exeName@{exeName}!Catch::clara::detail::Args@{Catch::clara::detail::Args}}
+\doxysubsubsection{\texorpdfstring{exeName()}{exeName()}}
+{\footnotesize\ttfamily \label{class_catch_1_1clara_1_1detail_1_1_args_a7e1bb59b9b8de8bbfcf8049d899b8e16} 
+auto Catch\+::clara\+::detail\+::\+Args\+::exe\+Name (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const -\/$>$ std\+::string \hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{include_2external_2clara_8hpp_source_l00423}{423}} of file \mbox{\hyperlink{include_2external_2clara_8hpp_source}{clara.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00423\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00424\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_exeName;}
+\DoxyCodeLine{00425\ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/include/external/\mbox{\hyperlink{include_2external_2clara_8hpp}{clara.\+hpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,196 @@
+\doxysection{libraries/fc/libraries/ff/depends/ate-\/pairing/test/bench.cpp File Reference}
+\hypertarget{bench_8cpp}{}\label{bench_8cpp}\index{libraries/fc/libraries/ff/depends/ate-\/pairing/test/bench.cpp@{libraries/fc/libraries/ff/depends/ate-\/pairing/test/bench.cpp}}
+{\ttfamily \#include "{}zm.\+h"{}}\newline
+{\ttfamily \#include $<$xbyak/xbyak.\+h$>$}\newline
+{\ttfamily \#include $<$xbyak/xbyak\+\_\+util.\+h$>$}\newline
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$memory.\+h$>$}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+Include dependency graph for bench.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{bench_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_code}{Code}}
+\item 
+struct \mbox{\hyperlink{struct_call}{Call}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{bench_8cpp_a3ede98665532cce0e33f614fac5150f9}{XBYAK\+\_\+\+NO\+\_\+\+OP\+\_\+\+NAMES}}
+\item 
+\#define \mbox{\hyperlink{bench_8cpp_a21ff7c588b94b603f37cc3cb3f21cb6a}{NUM\+\_\+\+OF\+\_\+\+ARRAY}}(x)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespacemie_ac62ddfee233ba71d08dc91a1924d4b74}{mie\+::\+Vuint}} \mbox{\hyperlink{bench_8cpp_a8496465558c5f8a68e4583295fb89c7d}{Put}} (const \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \texorpdfstring{$\ast$}{*}x, size\+\_\+t n)
+\item 
+void \mbox{\hyperlink{bench_8cpp_ac0f1a6507d9e3fe38263deafce9d7c08}{bench}} (int mode)
+\item 
+int \mbox{\hyperlink{bench_8cpp_a0ddf1224851353fc92bfbff6f499fa97}{main}} (int argc, char \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}\mbox{[}$\,$\mbox{]})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+const int \mbox{\hyperlink{bench_8cpp_abe7e6b719f28302f7ffe5281f947228b}{innerN}} = 1
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{bench_8cpp_a21ff7c588b94b603f37cc3cb3f21cb6a}\index{bench.cpp@{bench.cpp}!NUM\_OF\_ARRAY@{NUM\_OF\_ARRAY}}
+\index{NUM\_OF\_ARRAY@{NUM\_OF\_ARRAY}!bench.cpp@{bench.cpp}}
+\doxysubsubsection{\texorpdfstring{NUM\_OF\_ARRAY}{NUM\_OF\_ARRAY}}
+{\footnotesize\ttfamily \label{bench_8cpp_a21ff7c588b94b603f37cc3cb3f21cb6a} 
+\#define NUM\+\_\+\+OF\+\_\+\+ARRAY(\begin{DoxyParamCaption}\item[{}]{x}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(\textcolor{keyword}{sizeof}(x)\ /\ \textcolor{keyword}{sizeof}(*x))}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{bench_8cpp_source_l00012}{12}} of file \mbox{\hyperlink{bench_8cpp_source}{bench.\+cpp}}.
+
+\Hypertarget{bench_8cpp_a3ede98665532cce0e33f614fac5150f9}\index{bench.cpp@{bench.cpp}!XBYAK\_NO\_OP\_NAMES@{XBYAK\_NO\_OP\_NAMES}}
+\index{XBYAK\_NO\_OP\_NAMES@{XBYAK\_NO\_OP\_NAMES}!bench.cpp@{bench.cpp}}
+\doxysubsubsection{\texorpdfstring{XBYAK\_NO\_OP\_NAMES}{XBYAK\_NO\_OP\_NAMES}}
+{\footnotesize\ttfamily \label{bench_8cpp_a3ede98665532cce0e33f614fac5150f9} 
+\#define XBYAK\+\_\+\+NO\+\_\+\+OP\+\_\+\+NAMES}
+
+
+
+Definition at line \mbox{\hyperlink{bench_8cpp_source_l00003}{3}} of file \mbox{\hyperlink{bench_8cpp_source}{bench.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{bench_8cpp_ac0f1a6507d9e3fe38263deafce9d7c08}\index{bench.cpp@{bench.cpp}!bench@{bench}}
+\index{bench@{bench}!bench.cpp@{bench.cpp}}
+\doxysubsubsection{\texorpdfstring{bench()}{bench()}}
+{\footnotesize\ttfamily \label{bench_8cpp_ac0f1a6507d9e3fe38263deafce9d7c08} 
+void bench (\begin{DoxyParamCaption}\item[{int}]{mode}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bench_8cpp_source_l00104}{104}} of file \mbox{\hyperlink{bench_8cpp_source}{bench.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00105\ \{}
+\DoxyCodeLine{00106\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\ =\ 100000;}
+\DoxyCodeLine{00107\ \ \ \ \ \mbox{\hyperlink{struct_code}{Code}}\ code;}
+\DoxyCodeLine{00108\ \ \ \ \ code.\mbox{\hyperlink{struct_code_a6db77f43e7652a48ee6f26f2233ba587}{makeBench}}(\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}},\ mode);}
+\DoxyCodeLine{00109\ \ \ \ \ int\ (*\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}*,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}*,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}*)\ =\ code.getCode<int\ (*)(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}*,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}*,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}*)>();}
+\DoxyCodeLine{00110\ }
+\DoxyCodeLine{00111\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}[4]\ =\ \{\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}(-\/1),\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}(-\/2),\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}(-\/3),\ 544443221\ \};}
+\DoxyCodeLine{00112\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ b[4]\ =\ \{\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}(-\/123),\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}(-\/3),\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}(-\/4),\ 222222222\ \};}
+\DoxyCodeLine{00113\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ c[5]\ =\ \{\ 0,\ 0,\ 0,\ 0,\ 0\ \};}
+\DoxyCodeLine{00114\ }
+\DoxyCodeLine{00115\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ M\ =\ 100;}
+\DoxyCodeLine{00116\ \ \ \ \ \mbox{\hyperlink{class_xbyak_1_1util_1_1_clock}{Xbyak::util::Clock}}\ clk;}
+\DoxyCodeLine{00117\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ M;\ i++)\ \{}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ clk.\mbox{\hyperlink{class_xbyak_1_1util_1_1_clock_aae54b05acf245bbffcb48c82864e84c0}{begin}}();}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}(c,\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ b);}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ clk.\mbox{\hyperlink{class_xbyak_1_1util_1_1_clock_a5f18bdb8e80de1a30482fc08dfe0a8e6}{end}}();}
+\DoxyCodeLine{00121\ \ \ \ \ \}}
+\DoxyCodeLine{00122\ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\%.2fclk\(\backslash\)n"{}},\ clk.\mbox{\hyperlink{class_xbyak_1_1util_1_1_clock_ad12d8f28828f10e625616f4a8d824745}{getClock}}()\ /\ \textcolor{keywordtype}{double}(M)\ /\ \textcolor{keywordtype}{double}(\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}})\ /\ \mbox{\hyperlink{bench_8cpp_abe7e6b719f28302f7ffe5281f947228b}{innerN}});}
+\DoxyCodeLine{00123\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{bench_8cpp_ac0f1a6507d9e3fe38263deafce9d7c08_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{bench_8cpp_a0ddf1224851353fc92bfbff6f499fa97}\index{bench.cpp@{bench.cpp}!main@{main}}
+\index{main@{main}!bench.cpp@{bench.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{bench_8cpp_a0ddf1224851353fc92bfbff6f499fa97} 
+int main (\begin{DoxyParamCaption}\item[{int}]{argc}{, }\item[{char \texorpdfstring{$\ast$}{*}}]{argv}{\mbox{[}$\,$\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bench_8cpp_source_l00143}{143}} of file \mbox{\hyperlink{bench_8cpp_source}{bench.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00144\ \{}
+\DoxyCodeLine{00145\ \ \ \ \ argc-\/-\/,\ \mbox{\hyperlink{hello__driver_8cpp_af2efa898e9eed6fe6715279cb1ec35b0}{argv}}++;}
+\DoxyCodeLine{00146\ \ \ \ \ \textcolor{comment}{/*}}
+\DoxyCodeLine{00147\ \textcolor{comment}{\ \ \ \ \ \ \ \ Core\ i7}}
+\DoxyCodeLine{00148\ \textcolor{comment}{\ \ \ \ \ \ \ \ add\ :\ \ 8.0clk}}
+\DoxyCodeLine{00149\ \textcolor{comment}{\ \ \ \ \ \ \ \ mul1:\ 10.7clk}}
+\DoxyCodeLine{00150\ \textcolor{comment}{\ \ \ \ \ \ \ \ mul2:\ 17.5clk}}
+\DoxyCodeLine{00151\ \textcolor{comment}{\ \ \ \ */}}
+\DoxyCodeLine{00152\ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ puts(\textcolor{stringliteral}{"{}test0"{}});}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{test__zm_8cpp_a0bc6544304acdfadd94773c4042700ab}{bench}}(0);}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ puts(\textcolor{stringliteral}{"{}test1"{}});}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{test__zm_8cpp_a0bc6544304acdfadd94773c4042700ab}{bench}}(1);}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ int\ (*\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})();}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{struct_call}{Call}}\ \mbox{\hyperlink{programs_2clio_2main_8cpp_af931af8e9f099860a2670931f8d3ad2c}{call}}((\textcolor{keyword}{const}\ \textcolor{keywordtype}{void}**)\&\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}});}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_log_a83926634a3916d0927abca4aca58a60a}{printf}}(\textcolor{stringliteral}{"{}\%d\(\backslash\)n"{}},\ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}());}
+\DoxyCodeLine{00160\ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (std::exception\&\ e)\ \{}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}ExpCode\ ERR:\%s\(\backslash\)n"{}},\ e.what());}
+\DoxyCodeLine{00162\ \ \ \ \ \}}
+\DoxyCodeLine{00163\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{bench_8cpp_a0ddf1224851353fc92bfbff6f499fa97_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{bench_8cpp_a8496465558c5f8a68e4583295fb89c7d}\index{bench.cpp@{bench.cpp}!Put@{Put}}
+\index{Put@{Put}!bench.cpp@{bench.cpp}}
+\doxysubsubsection{\texorpdfstring{Put()}{Put()}}
+{\footnotesize\ttfamily \label{bench_8cpp_a8496465558c5f8a68e4583295fb89c7d} 
+\mbox{\hyperlink{namespacemie_ac62ddfee233ba71d08dc91a1924d4b74}{mie\+::\+Vuint}} Put (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{x}{, }\item[{size\+\_\+t}]{n}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{bench_8cpp_source_l00096}{96}} of file \mbox{\hyperlink{bench_8cpp_source}{bench.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00097\ \{}
+\DoxyCodeLine{00098\ \ \ \ \ \mbox{\hyperlink{structmie_1_1_vuint_t}{mie::Vuint}}\ t;}
+\DoxyCodeLine{00099\ \ \ \ \ t.\mbox{\hyperlink{structmie_1_1_vuint_t_a9b13f3a0e184b1983fd68d07c081e0a6}{set}}(x,\ n);}
+\DoxyCodeLine{00100\ \ \ \ \ std::cout\ <<\ t\ <<\ std::endl;}
+\DoxyCodeLine{00101\ \ \ \ \ \textcolor{keywordflow}{return}\ t;}
+\DoxyCodeLine{00102\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=231pt]{bench_8cpp_a8496465558c5f8a68e4583295fb89c7d_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{bench_8cpp_abe7e6b719f28302f7ffe5281f947228b}\index{bench.cpp@{bench.cpp}!innerN@{innerN}}
+\index{innerN@{innerN}!bench.cpp@{bench.cpp}}
+\doxysubsubsection{\texorpdfstring{innerN}{innerN}}
+{\footnotesize\ttfamily \label{bench_8cpp_abe7e6b719f28302f7ffe5281f947228b} 
+const int innerN = 1}
+
+
+
+Definition at line \mbox{\hyperlink{bench_8cpp_source_l00016}{16}} of file \mbox{\hyperlink{bench_8cpp_source}{bench.\+cpp}}.
+

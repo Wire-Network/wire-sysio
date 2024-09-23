@@ -1,0 +1,223 @@
+\doxysection{keccak256.\+cpp}
+\hypertarget{keccak256_8cpp_source}{}\label{keccak256_8cpp_source}\index{libraries/fc/src/crypto/keccak256.cpp@{libraries/fc/src/crypto/keccak256.cpp}}
+\mbox{\hyperlink{keccak256_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00001}00001\ \textcolor{comment}{/*\ sha3\ -\/\ an\ implementation\ of\ Secure\ Hash\ Algorithm\ 3\ (Keccak).}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00002}00002\ \textcolor{comment}{\ *\ based\ on\ the}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00003}00003\ \textcolor{comment}{\ *\ The\ Keccak\ SHA-\/3\ submission.\ Submission\ to\ NIST\ (Round\ 3),\ 2011}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00004}00004\ \textcolor{comment}{\ *\ by\ Guido\ Bertoni,\ Joan\ Daemen,\ Michaël\ Peeters\ and\ Gilles\ Van\ Assche}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00005}00005\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00006}00006\ \textcolor{comment}{\ *\ Copyright:\ 2013\ Aleksey\ Kravchenko\ <rhash.admin@gmail.com>}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00008}00008\ \textcolor{comment}{\ *\ Permission\ is\ hereby\ granted,\ \ free\ of\ charge,\ \ to\ any\ person\ \ obtaining\ a}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00009}00009\ \textcolor{comment}{\ *\ copy\ of\ this\ software\ and\ associated\ documentation\ files\ (the\ "{}Software"{}),}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00010}00010\ \textcolor{comment}{\ *\ to\ deal\ in\ the\ Software\ without\ restriction,\ \ including\ without\ limitation}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00011}00011\ \textcolor{comment}{\ *\ the\ rights\ to\ \ use,\ copy,\ modify,\ \ merge,\ publish,\ distribute,\ sublicense,}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00012}00012\ \textcolor{comment}{\ *\ and/or\ sell\ copies\ \ of\ \ the\ Software,\ \ and\ to\ permit\ \ persons\ \ to\ whom\ the}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00013}00013\ \textcolor{comment}{\ *\ Software\ is\ furnished\ to\ do\ so.}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00014}00014\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00015}00015\ \textcolor{comment}{\ *\ This\ program\ \ is\ \ distributed\ \ in\ \ the\ \ hope\ \ that\ it\ will\ be\ useful,\ \ but}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00016}00016\ \textcolor{comment}{\ *\ WITHOUT\ ANY\ WARRANTY;\ without\ even\ the\ implied\ warranty\ of\ MERCHANTABILITY}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00017}00017\ \textcolor{comment}{\ *\ or\ FITNESS\ FOR\ A\ PARTICULAR\ PURPOSE.\ \ Use\ this\ program\ \ at\ \ your\ own\ risk!}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00018}00018\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00020}00020\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{keccak256_8hpp}{fc/crypto/keccak256.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00021}00021\ \textcolor{preprocessor}{\#include\ <cstring>}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00023}\mbox{\hyperlink{keccak256_8cpp_ad51ded0bbd705f02f73fc60c0b721ced}{00023}}\ \textcolor{preprocessor}{\#define\ BLOCK\_SIZE\ \ \ \ \ ((1600\ -\/\ 256\ *\ 2)\ /\ 8)}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00025}\mbox{\hyperlink{keccak256_8cpp_a4a234a46224f2c5591a49ebdfa83c70e}{00025}}\ \textcolor{preprocessor}{\#define\ I64(x)\ x\#\#LL}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00026}\mbox{\hyperlink{keccak256_8cpp_ae00c5ae6aafcda79ec237f2731ba3fd6}{00026}}\ \textcolor{preprocessor}{\#define\ ROTL64(qword,\ n)\ ((qword)\ <<\ (n)\ \string^\ ((qword)\ >>\ (64\ -\/\ (n))))}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00027}\mbox{\hyperlink{keccak256_8cpp_a6650c9ab9b3325086fc7a91c3675cf03}{00027}}\ \textcolor{preprocessor}{\#define\ le2me\_64(x)\ (x)}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00028}\mbox{\hyperlink{keccak256_8cpp_a2f82bf392f983fcf9a7c3d8b86d52aeb}{00028}}\ \textcolor{preprocessor}{\#define\ IS\_ALIGNED\_64(p)\ (0\ ==\ (7\ \&\ ((const\ char*)(p)\ -\/\ (const\ char*)0)))}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00029}\mbox{\hyperlink{keccak256_8cpp_a3890097089ffb7fd62e6b218500fb27d}{00029}}\ \textcolor{preprocessor}{\#define\ me64\_to\_le\_str(to,\ from,\ length)\ memcpy((to),\ (from),\ (length))}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00031}00031\ \textcolor{comment}{/*\ constants\ */}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00033}00033\ \textcolor{comment}{//const\ uint8\_t\ round\_constant\_info[]\ PROGMEM\ =\ \{}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00034}00034\ \textcolor{comment}{//const\ uint8\_t\ constants[]\ PROGMEM\ =\ \{}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00035}\mbox{\hyperlink{keccak256_8cpp_a59d5e3b2dd5df825d618e6994924cd00}{00035}}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \mbox{\hyperlink{keccak256_8cpp_a59d5e3b2dd5df825d618e6994924cd00}{constants}}[]\ \ =\ \{}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00037}00037\ \ \ \ \ 1,\ 26,\ 94,\ 112,\ 31,\ 33,\ 121,\ 85,\ 14,\ 12,\ 53,\ 38,\ 63,\ 79,\ 93,\ 83,\ 82,\ 72,\ 22,\ 102,\ 121,\ 88,\ 33,\ 116,}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00038}00038\ \textcolor{comment}{//\};}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00040}00040\ \textcolor{comment}{//const\ uint8\_t\ pi\_transform[]\ PROGMEM\ =\ \{}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00041}00041\ \ \ \ \ 1,\ 6,\ 9,\ 22,\ 14,\ 20,\ 2,\ 12,\ 13,\ 19,\ 23,\ 15,\ 4,\ 24,\ 21,\ 8,\ 16,\ 5,\ 3,\ 18,\ 17,\ 11,\ 7,\ 10,}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00042}00042\ \textcolor{comment}{//\};}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00044}00044\ \textcolor{comment}{//const\ uint8\_t\ rhoTransforms[]\ PROGMEM\ =\ \{}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00045}00045\ \ \ \ \ 1,\ 62,\ 28,\ 27,\ 36,\ 44,\ 6,\ 55,\ 20,\ 3,\ 10,\ 43,\ 25,\ 39,\ 41,\ 45,\ 15,\ 21,\ 8,\ 18,\ 2,\ 61,\ 56,\ 14,}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00046}00046\ \};}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00048}\mbox{\hyperlink{keccak256_8cpp_a552a8a4eee596cc63b55da207f1f99f4}{00048}}\ \textcolor{preprocessor}{\#define\ TYPE\_ROUND\_INFO\ \ \ \ \ \ 0}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00049}\mbox{\hyperlink{keccak256_8cpp_abfec8a80dd4c99ca8e368072360457af}{00049}}\ \textcolor{preprocessor}{\#define\ TYPE\_PI\_TRANSFORM\ \ \ 24}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00050}\mbox{\hyperlink{keccak256_8cpp_ac63c941b8650dc5db94f31ffff9ef370}{00050}}\ \textcolor{preprocessor}{\#define\ TYPE\_RHO\_TRANSFORM\ \ 48}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00052}\mbox{\hyperlink{keccak256_8cpp_ab42d9d958e143399ad7d3fce6139c8f1}{00052}}\ \textcolor{keyword}{inline}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \mbox{\hyperlink{keccak256_8cpp_ab42d9d958e143399ad7d3fce6139c8f1}{getConstant}}(\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ type,\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ index)\ \{}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00053}00053\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{keccak256_8cpp_a59d5e3b2dd5df825d618e6994924cd00}{constants}}[type\ +\ index];}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00054}00054\ \ \ \ \ \textcolor{comment}{//return\ pgm\_read\_byte(\&constants[type\ +\ index]);}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00055}00055\ \}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00057}00057\ \textcolor{keyword}{static}\ \textcolor{keyword}{inline}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ get\_round\_constant(\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ round)\ \{}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00058}00058\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ result\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00060}00060\ \ \ \ \ \textcolor{comment}{//uint8\_t\ roundInfo\ =\ pgm\_read\_byte(\&round\_constant\_info[round]);}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00061}00061\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ roundInfo\ =\ \mbox{\hyperlink{keccak256_8cpp_ab42d9d958e143399ad7d3fce6139c8f1}{getConstant}}(\mbox{\hyperlink{keccak256_8cpp_a552a8a4eee596cc63b55da207f1f99f4}{TYPE\_ROUND\_INFO}},\ round);}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00062}00062\ \ \ \ \ \textcolor{keywordflow}{if}\ (roundInfo\ \&\ (1\ <<\ 6))\ \{\ result\ |=\ ((\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})1\ <<\ 63);\ \}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00063}00063\ \ \ \ \ \textcolor{keywordflow}{if}\ (roundInfo\ \&\ (1\ <<\ 5))\ \{\ result\ |=\ ((\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})1\ <<\ 31);\ \}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00064}00064\ \ \ \ \ \textcolor{keywordflow}{if}\ (roundInfo\ \&\ (1\ <<\ 4))\ \{\ result\ |=\ ((\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})1\ <<\ 15);\ \}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00065}00065\ \ \ \ \ \textcolor{keywordflow}{if}\ (roundInfo\ \&\ (1\ <<\ 3))\ \{\ result\ |=\ ((\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})1\ <<\ 7);\ \}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00066}00066\ \ \ \ \ \textcolor{keywordflow}{if}\ (roundInfo\ \&\ (1\ <<\ 2))\ \{\ result\ |=\ ((\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})1\ <<\ 3);\ \}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00067}00067\ \ \ \ \ \textcolor{keywordflow}{if}\ (roundInfo\ \&\ (1\ <<\ 1))\ \{\ result\ |=\ ((\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})1\ <<\ 1);\ \}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00068}00068\ \ \ \ \ \textcolor{keywordflow}{if}\ (roundInfo\ \&\ (1\ <<\ 0))\ \{\ result\ |=\ ((\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})1\ <<\ 0);\ \}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00069}00069\ }
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00070}00070\ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00071}00071\ \}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00073}00073\ }
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00074}00074\ \textcolor{comment}{/*\ Initializing\ a\ sha3\ context\ for\ given\ number\ of\ output\ bits\ */}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00075}\mbox{\hyperlink{keccak256_8hpp_a11facd9a5ba2fa670b8adac99c9b885c}{00075}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{keccak256_8cpp_a11facd9a5ba2fa670b8adac99c9b885c}{keccak\_init}}(\mbox{\hyperlink{struct_s_h_a3___c_t_x}{SHA3\_CTX}}\ *ctx)\ \{}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00076}00076\ \ \ \ \ \textcolor{comment}{/*\ NB:\ The\ Keccak\ capacity\ parameter\ =\ bits\ *\ 2\ */}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00077}00077\ }
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00078}00078\ \ \ \ \ std::memset(ctx,\ 0,\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{struct_s_h_a3___c_t_x}{SHA3\_CTX}}));}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00079}00079\ \}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00080}00080\ }
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00081}00081\ \textcolor{comment}{/*\ Keccak\ theta()\ transformation\ */}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00082}00082\ \textcolor{keyword}{inline}\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ keccak\_theta(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ *\mbox{\hyperlink{namespace_a}{A}})\ \{}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00083}00083\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ C[5],\ \mbox{\hyperlink{debug_8h_a6a96826afbc53984fc8331e32328fb3b}{D}}[5];}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00084}00084\ }
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00085}00085\ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ i\ =\ 0;\ i\ <\ 5;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00086}00086\ \ \ \ \ \ \ \ \ C[i]\ =\ \mbox{\hyperlink{namespace_a}{A}}[i];}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00087}00087\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ =\ 5;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ <\ 25;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ +=\ 5)\ \{\ C[i]\ \string^=\ \mbox{\hyperlink{namespace_a}{A}}[i\ +\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}];\ \}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00088}00088\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00089}00089\ }
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00090}00090\ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ i\ =\ 0;\ i\ <\ 5;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00091}00091\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{debug_8h_a6a96826afbc53984fc8331e32328fb3b}{D}}[i]\ =\ \mbox{\hyperlink{keccak256_8cpp_ae00c5ae6aafcda79ec237f2731ba3fd6}{ROTL64}}(C[(i\ +\ 1)\ \%\ 5],\ 1)\ \string^\ C[(i\ +\ 4)\ \%\ 5];}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00092}00092\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00093}00093\ }
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00094}00094\ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ i\ =\ 0;\ i\ <\ 5;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00095}00095\ \ \ \ \ \ \ \ \ \textcolor{comment}{//for\ (uint8\_t\ j\ =\ 0;\ j\ <\ 25;\ j\ +=\ 5)\ \{}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00096}00096\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ =\ 0;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ <\ 25;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ +=\ 5)\ \{\ \mbox{\hyperlink{namespace_a}{A}}[i\ +\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}]\ \string^=\ \mbox{\hyperlink{debug_8h_a6a96826afbc53984fc8331e32328fb3b}{D}}[i];\ \}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00097}00097\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00098}00098\ \}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00099}00099\ }
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00100}00100\ }
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00101}00101\ \textcolor{comment}{/*\ Keccak\ pi()\ transformation\ */}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00102}00102\ \textcolor{keyword}{inline}\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ keccak\_pi(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ *\mbox{\hyperlink{namespace_a}{A}})\ \{}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00103}00103\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ A1\ =\ \mbox{\hyperlink{namespace_a}{A}}[1];}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00104}00104\ \ \ \ \ \textcolor{comment}{//for\ (uint8\_t\ i\ =\ 1;\ i\ <\ sizeof(pi\_transform);\ i++)\ \{}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00105}00105\ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ i\ =\ 1;\ i\ <\ 24;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00106}00106\ \ \ \ \ \ \ \ \ \textcolor{comment}{//A[pgm\_read\_byte(\&pi\_transform[i\ -\/\ 1])]\ =\ A[pgm\_read\_byte(\&pi\_transform[i])];}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00107}00107\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_a}{A}}[\mbox{\hyperlink{keccak256_8cpp_ab42d9d958e143399ad7d3fce6139c8f1}{getConstant}}(\mbox{\hyperlink{keccak256_8cpp_abfec8a80dd4c99ca8e368072360457af}{TYPE\_PI\_TRANSFORM}},\ i\ -\/\ 1)]\ =\ \mbox{\hyperlink{namespace_a}{A}}[\mbox{\hyperlink{keccak256_8cpp_ab42d9d958e143399ad7d3fce6139c8f1}{getConstant}}(\mbox{\hyperlink{keccak256_8cpp_abfec8a80dd4c99ca8e368072360457af}{TYPE\_PI\_TRANSFORM}},\ i)];}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00108}00108\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00109}00109\ \ \ \ \ \mbox{\hyperlink{namespace_a}{A}}[10]\ =\ A1;}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00110}00110\ \ \ \ \ \textcolor{comment}{/*\ note:\ A[\ 0]\ is\ left\ as\ is\ */}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00111}00111\ \}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00112}00112\ }
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00113}00113\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00114}00114\ \textcolor{comment}{ketch\ uses\ 30084\ bytes\ (93\%)\ of\ program\ storage\ space.\ Maximum\ is\ 32256\ bytes.}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00115}00115\ \textcolor{comment}{Global\ variables\ use\ 743\ bytes\ (36\%)\ of\ dynamic\ memory,\ leaving\ 1305\ bytes\ for\ local\ variables.\ Maximum\ is\ 2048\ bytes.}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00116}00116\ \textcolor{comment}{*/}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00117}00117\ \textcolor{comment}{/*\ Keccak\ chi()\ transformation\ */}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00118}00118\ \textcolor{keyword}{inline}\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ keccak\_chi(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ *\mbox{\hyperlink{namespace_a}{A}})\ \{}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00119}00119\ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ i\ =\ 0;\ i\ <\ 25;\ i\ +=\ 5)\ \{}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00120}00120\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ A0\ =\ \mbox{\hyperlink{namespace_a}{A}}[0\ +\ i],\ A1\ =\ \mbox{\hyperlink{namespace_a}{A}}[1\ +\ i];}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00121}00121\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_a}{A}}[0\ +\ i]\ \string^=\ \string~A1\ \&\ \mbox{\hyperlink{namespace_a}{A}}[2\ +\ i];}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00122}00122\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_a}{A}}[1\ +\ i]\ \string^=\ \mbox{\hyperlink{namespace_a}{\string~A}}[2\ +\ i]\ \&\ \mbox{\hyperlink{namespace_a}{A}}[3\ +\ i];}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00123}00123\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_a}{A}}[2\ +\ i]\ \string^=\ \mbox{\hyperlink{namespace_a}{\string~A}}[3\ +\ i]\ \&\ \mbox{\hyperlink{namespace_a}{A}}[4\ +\ i];}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00124}00124\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_a}{A}}[3\ +\ i]\ \string^=\ \mbox{\hyperlink{namespace_a}{\string~A}}[4\ +\ i]\ \&\ A0;}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00125}00125\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_a}{A}}[4\ +\ i]\ \string^=\ \string~A0\ \&\ A1;}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00126}00126\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00127}00127\ \}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00128}00128\ }
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00129}00129\ \textcolor{keyword}{inline}\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ sha3\_permutation(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ *\mbox{\hyperlink{structstate}{state}})\ \{}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00130}00130\ \ \ \ \ \textcolor{comment}{//for\ (uint8\_t\ round\ =\ 0;\ round\ <\ sizeof(round\_constant\_info);\ round++)\ \{}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00131}00131\ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ round\ =\ 0;\ round\ <\ 24;\ round++)\ \{}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00132}00132\ \ \ \ \ \ \ \ \ keccak\_theta(\mbox{\hyperlink{structstate}{state}});}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00133}00133\ }
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00134}00134\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ apply\ Keccak\ rho()\ transformation\ */}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00135}00135\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ i\ =\ 1;\ i\ <\ 25;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00136}00136\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//state[i]\ =\ ROTL64(state[i],\ pgm\_read\_byte(\&rhoTransforms[i\ -\/\ 1]));}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00137}00137\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}[i]\ =\ \mbox{\hyperlink{keccak256_8cpp_ae00c5ae6aafcda79ec237f2731ba3fd6}{ROTL64}}(\mbox{\hyperlink{structstate}{state}}[i],\ \mbox{\hyperlink{keccak256_8cpp_ab42d9d958e143399ad7d3fce6139c8f1}{getConstant}}(\mbox{\hyperlink{keccak256_8cpp_ac63c941b8650dc5db94f31ffff9ef370}{TYPE\_RHO\_TRANSFORM}},\ i\ -\/\ 1));}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00138}00138\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00139}00139\ }
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00140}00140\ \ \ \ \ \ \ \ \ keccak\_pi(\mbox{\hyperlink{structstate}{state}});}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00141}00141\ \ \ \ \ \ \ \ \ keccak\_chi(\mbox{\hyperlink{structstate}{state}});}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00142}00142\ }
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00143}00143\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ apply\ iota(state,\ round)\ */}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00144}00144\ \ \ \ \ \ \ \ \ *\mbox{\hyperlink{structstate}{state}}\ \string^=\ get\_round\_constant(round);}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00145}00145\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00146}00146\ \}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00147}00147\ }
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00155}00155\ \textcolor{keyword}{inline}\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ sha3\_process\_block(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ hash[25],\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ *block)\ \{}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00156}00156\ \ \ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ i\ =\ 0;\ i\ <\ 17;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00157}00157\ \ \ \ \ \ \ \ \ hash[i]\ \string^=\ \mbox{\hyperlink{keccak256_8cpp_a6650c9ab9b3325086fc7a91c3675cf03}{le2me\_64}}(block[i]);}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00158}00158\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00159}00159\ }
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00160}00160\ \ \ \ \ \textcolor{comment}{/*\ make\ a\ permutation\ of\ the\ hash\ */}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00161}00161\ \ \ \ \ sha3\_permutation(hash);}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00162}00162\ \}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00163}00163\ }
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00164}00164\ \textcolor{comment}{//\#define\ SHA3\_FINALIZED\ 0x80000000}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00165}00165\ \textcolor{comment}{//\#define\ SHA3\_FINALIZED\ 0x8000}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00166}00166\ }
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00175}\mbox{\hyperlink{keccak256_8hpp_a3a3c3f80dd9847bffcaa8e638aefef12}{00175}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{keccak256_8cpp_a3a3c3f80dd9847bffcaa8e638aefef12}{keccak\_update}}(\mbox{\hyperlink{struct_s_h_a3___c_t_x}{SHA3\_CTX}}\ *ctx,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *msg,\ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ size)}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00176}00176\ \{}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00177}00177\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ idx\ =\ (\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}})ctx-\/>\mbox{\hyperlink{struct_s_h_a3___c_t_x_a206aeef34e8cabe7390884ef5c131999}{rest}};}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00178}00178\ }
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00179}00179\ \ \ \ \ \textcolor{comment}{//if\ (ctx-\/>rest\ \&\ SHA3\_FINALIZED)\ return;\ /*\ too\ late\ for\ additional\ input\ */}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00180}00180\ \ \ \ \ ctx-\/>\mbox{\hyperlink{struct_s_h_a3___c_t_x_a206aeef34e8cabe7390884ef5c131999}{rest}}\ =\ (unsigned)((ctx-\/>\mbox{\hyperlink{struct_s_h_a3___c_t_x_a206aeef34e8cabe7390884ef5c131999}{rest}}\ +\ size)\ \%\ \mbox{\hyperlink{keccak256_8cpp_ad51ded0bbd705f02f73fc60c0b721ced}{BLOCK\_SIZE}});}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00181}00181\ }
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00182}00182\ \ \ \ \ \textcolor{comment}{/*\ fill\ partial\ block\ */}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00183}00183\ \ \ \ \ \textcolor{keywordflow}{if}\ (idx)\ \{}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00184}00184\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ left\ =\ \mbox{\hyperlink{keccak256_8cpp_ad51ded0bbd705f02f73fc60c0b721ced}{BLOCK\_SIZE}}\ -\/\ idx;}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00185}00185\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}((\textcolor{keywordtype}{char}*)ctx-\/>\mbox{\hyperlink{struct_s_h_a3___c_t_x_a37957cb14d1f29d6e3c8b86c13baf86c}{message}}\ +\ idx,\ msg,\ (size\ <\ left\ ?\ size\ :\ left));}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00186}00186\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (size\ <\ left)\ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00187}00187\ }
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00188}00188\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ process\ partial\ block\ */}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00189}00189\ \ \ \ \ \ \ \ \ sha3\_process\_block(ctx-\/>\mbox{\hyperlink{struct_s_h_a3___c_t_x_a7fcec2ce062e8a73ec6db44d20e86b1f}{hash}},\ ctx-\/>\mbox{\hyperlink{struct_s_h_a3___c_t_x_a37957cb14d1f29d6e3c8b86c13baf86c}{message}});}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00190}00190\ \ \ \ \ \ \ \ \ msg\ \ +=\ left;}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00191}00191\ \ \ \ \ \ \ \ \ size\ -\/=\ left;}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00192}00192\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00193}00193\ }
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00194}00194\ \ \ \ \ \textcolor{keywordflow}{while}\ (size\ >=\ \mbox{\hyperlink{keccak256_8cpp_ad51ded0bbd705f02f73fc60c0b721ced}{BLOCK\_SIZE}})\ \{}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00195}00195\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}*\ aligned\_message\_block;}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00196}00196\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{keccak256_8cpp_a2f82bf392f983fcf9a7c3d8b86d52aeb}{IS\_ALIGNED\_64}}(msg))\ \{}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00197}00197\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ the\ most\ common\ case\ is\ processing\ of\ an\ already\ aligned\ message\ without\ copying\ it}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00198}00198\ \ \ \ \ \ \ \ \ \ \ \ \ aligned\_message\_block\ =\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}*)(\textcolor{keywordtype}{void}*)msg;}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00199}00199\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00200}00200\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(ctx-\/>\mbox{\hyperlink{struct_s_h_a3___c_t_x_a37957cb14d1f29d6e3c8b86c13baf86c}{message}},\ msg,\ \mbox{\hyperlink{keccak256_8cpp_ad51ded0bbd705f02f73fc60c0b721ced}{BLOCK\_SIZE}});}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00201}00201\ \ \ \ \ \ \ \ \ \ \ \ \ aligned\_message\_block\ =\ ctx-\/>\mbox{\hyperlink{struct_s_h_a3___c_t_x_a37957cb14d1f29d6e3c8b86c13baf86c}{message}};}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00202}00202\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00203}00203\ }
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00204}00204\ \ \ \ \ \ \ \ \ sha3\_process\_block(ctx-\/>\mbox{\hyperlink{struct_s_h_a3___c_t_x_a7fcec2ce062e8a73ec6db44d20e86b1f}{hash}},\ aligned\_message\_block);}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00205}00205\ \ \ \ \ \ \ \ \ msg\ \ +=\ \mbox{\hyperlink{keccak256_8cpp_ad51ded0bbd705f02f73fc60c0b721ced}{BLOCK\_SIZE}};}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00206}00206\ \ \ \ \ \ \ \ \ size\ -\/=\ \mbox{\hyperlink{keccak256_8cpp_ad51ded0bbd705f02f73fc60c0b721ced}{BLOCK\_SIZE}};}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00207}00207\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00208}00208\ }
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00209}00209\ \ \ \ \ \textcolor{keywordflow}{if}\ (size)\ \{}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00210}00210\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_ae785d5badbf1f08b491af31f32a135a1}{memcpy}}(ctx-\/>\mbox{\hyperlink{struct_s_h_a3___c_t_x_a37957cb14d1f29d6e3c8b86c13baf86c}{message}},\ msg,\ size);\ \textcolor{comment}{/*\ save\ leftovers\ */}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00211}00211\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00212}00212\ \}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00213}00213\ }
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00220}\mbox{\hyperlink{keccak256_8hpp_ab3d065f3af63d47a27d94d60a38422b5}{00220}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{keccak256_8cpp_ab3d065f3af63d47a27d94d60a38422b5}{keccak\_final}}(\mbox{\hyperlink{struct_s_h_a3___c_t_x}{SHA3\_CTX}}\ *ctx,\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*\ result)}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00221}00221\ \{}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00222}00222\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a66a5beeab221445b2b3142a490574638}{digest\_length}}\ =\ 100\ -\/\ \mbox{\hyperlink{keccak256_8cpp_ad51ded0bbd705f02f73fc60c0b721ced}{BLOCK\_SIZE}}\ /\ 2;}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00223}00223\ }
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00224}00224\ \textcolor{comment}{//\ \ \ \ if\ (!(ctx-\/>rest\ \&\ SHA3\_FINALIZED))\ \{}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00225}00225\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ clear\ the\ rest\ of\ the\ data\ queue\ */}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00226}00226\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}((\textcolor{keywordtype}{char}*)ctx-\/>\mbox{\hyperlink{struct_s_h_a3___c_t_x_a37957cb14d1f29d6e3c8b86c13baf86c}{message}}\ +\ ctx-\/>\mbox{\hyperlink{struct_s_h_a3___c_t_x_a206aeef34e8cabe7390884ef5c131999}{rest}},\ 0,\ \mbox{\hyperlink{keccak256_8cpp_ad51ded0bbd705f02f73fc60c0b721ced}{BLOCK\_SIZE}}\ -\/\ ctx-\/>\mbox{\hyperlink{struct_s_h_a3___c_t_x_a206aeef34e8cabe7390884ef5c131999}{rest}});}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00227}00227\ \ \ \ \ \ \ \ \ ((\textcolor{keywordtype}{char}*)ctx-\/>\mbox{\hyperlink{struct_s_h_a3___c_t_x_a37957cb14d1f29d6e3c8b86c13baf86c}{message}})[ctx-\/>\mbox{\hyperlink{struct_s_h_a3___c_t_x_a206aeef34e8cabe7390884ef5c131999}{rest}}]\ |=\ 0x01;}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00228}00228\ \ \ \ \ \ \ \ \ ((\textcolor{keywordtype}{char}*)ctx-\/>\mbox{\hyperlink{struct_s_h_a3___c_t_x_a37957cb14d1f29d6e3c8b86c13baf86c}{message}})[\mbox{\hyperlink{keccak256_8cpp_ad51ded0bbd705f02f73fc60c0b721ced}{BLOCK\_SIZE}}\ -\/\ 1]\ |=\ 0x80;}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00229}00229\ }
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00230}00230\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ process\ final\ block\ */}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00231}00231\ \ \ \ \ \ \ \ \ sha3\_process\_block(ctx-\/>\mbox{\hyperlink{struct_s_h_a3___c_t_x_a7fcec2ce062e8a73ec6db44d20e86b1f}{hash}},\ ctx-\/>\mbox{\hyperlink{struct_s_h_a3___c_t_x_a37957cb14d1f29d6e3c8b86c13baf86c}{message}});}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00232}00232\ \textcolor{comment}{//\ \ \ \ \ \ \ \ ctx-\/>rest\ =\ SHA3\_FINALIZED;\ /*\ mark\ context\ as\ finalized\ */}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00233}00233\ \textcolor{comment}{//\ \ \ \ \}}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00234}00234\ }
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00235}00235\ \ \ \ \ \textcolor{keywordflow}{if}\ (result)\ \{}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00236}00236\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{keccak256_8cpp_a3890097089ffb7fd62e6b218500fb27d}{me64\_to\_le\_str}}(result,\ ctx-\/>\mbox{\hyperlink{struct_s_h_a3___c_t_x_a7fcec2ce062e8a73ec6db44d20e86b1f}{hash}},\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a66a5beeab221445b2b3142a490574638}{digest\_length}});}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00237}00237\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{keccak256_8cpp_source_l00238}00238\ \}}
+
+\end{DoxyCode}

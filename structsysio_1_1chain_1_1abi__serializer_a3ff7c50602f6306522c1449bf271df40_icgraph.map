@@ -1,0 +1,13 @@
+<map id="sysio::chain::abi_serializer::set_abi" name="sysio::chain::abi_serializer::set_abi">
+<area shape="rect" id="Node000001" title=" " alt="" coords="229,143,404,183"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1abi__serializer.html#aa52bc676bb91332bab31de4fbb2438eb" title=" " alt="" coords="5,5,181,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="280,134,233,97,179,61,154,49,156,44,182,57,237,93,283,130"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1chain_1_1abi__serializer.html#a67d429a9f0c6a3babbd6c6d65bea3cda" title=" " alt="" coords="5,71,181,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="236,140,158,114,159,109,238,135"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1chain__apis_1_1read__only.html#a12edb6f951732f73cb6b2b1c549a442d" title=" " alt="" coords="24,135,162,191"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="213,166,163,166,163,160,213,160"/>
+<area shape="rect" id="Node000005" href="$classsysio_1_1chain__apis_1_1read__only.html#ad4fd4d4518a599c4ca6f2c3cbb25cfbe" title=" " alt="" coords="24,215,162,271"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="244,192,164,221,162,216,242,187"/>
+<area shape="rect" id="Node000006" href="$structsysio_1_1chain_1_1abi__serializer.html#a8645ff2e5b2dcbc0397ee0afe11a7352" title=" " alt="" coords="5,295,181,335"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="288,197,241,242,182,285,160,297,158,292,179,281,237,238,284,193"/>
+</map>

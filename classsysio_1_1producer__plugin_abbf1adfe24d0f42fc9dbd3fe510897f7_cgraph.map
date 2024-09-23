@@ -1,0 +1,9 @@
+<map id="sysio::producer_plugin::schedule_protocol_feature_activations" name="sysio::producer_plugin::schedule_protocol_feature_activations">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,85,187,141"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1chain_1_1controller.html#a67876c4bcb4b26fa679d347472ff14ee" title=" " alt="" coords="249,5,402,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="177,82,234,62,235,67,179,87"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1chain_1_1protocol__feature__manager.html#a9e6c1310749c4fd04035aa2c01310ce4" title=" " alt="" coords="250,85,401,141"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="187,110,234,110,234,116,187,116"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1chain_1_1controller.html#abf042d0e964b46d1a401119d3575ff82" title=" " alt="" coords="235,165,416,206"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="188,139,245,157,243,162,186,144"/>
+</map>

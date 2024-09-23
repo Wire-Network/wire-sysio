@@ -1,0 +1,4 @@
+var classtesting_1_1internal_1_1_tuple_fields_3_01_tuple_00_01k0_00_01k1_00_01_1_00_01_1_00_01_1_00_bfbbbfc9cc03949b0b1ff3620709d8ff =
+[
+    [ "type", "classtesting_1_1internal_1_1_tuple_fields_3_01_tuple_00_01k0_00_01k1_00_01-1_00_01-1_00_01-1_00_bfbbbfc9cc03949b0b1ff3620709d8ff.html#a20b1499de785c72f65a1a935adb2e288", null ]
+];

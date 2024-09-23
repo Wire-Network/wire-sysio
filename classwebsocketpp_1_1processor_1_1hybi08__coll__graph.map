@@ -1,0 +1,29 @@
+<map id="websocketpp::processor::hybi08&lt; config &gt;" name="websocketpp::processor::hybi08&lt; config &gt;">
+<area shape="rect" id="Node000001" title="Processor for Hybi Draft version 08." alt="" coords="921,187,1084,227"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1processor_1_1hybi13.html" title="Processor for Hybi version 13 (RFC6455)" alt="" coords="708,187,871,227"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="887,204,920,204,920,210,887,210"/>
+<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1processor_1_1processor.html" title="WebSocket protocol processor abstract base class." alt="" coords="376,5,539,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="555,33,621,50,654,63,685,79,716,103,742,132,779,185,775,188,738,135,712,107,683,84,652,68,620,55,554,38"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="69,88,126,113"/>
+<area shape="poly" id="edge5_Node000002_Node000004" title=" " alt="" coords="141,97,239,97,375,104,530,123,609,138,685,158,749,184,747,189,683,163,608,143,529,128,375,110,239,103,141,102"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="141,89,375,40,376,45,142,94"/>
+<area shape="rect" id="Node000006" href="$structwebsocketpp_1_1processor_1_1hybi13_1_1msg__metadata.html" title=" " alt="" coords="376,212,539,268"/>
+<area shape="poly" id="edge7_Node000006_Node000004" title=" " alt="" coords="141,114,385,209,383,214,139,119"/>
+<area shape="rect" id="Node000005" href="$structwebsocketpp_1_1frame_1_1basic__header.html" title="The constant size component of a WebSocket frame header." alt="" coords="388,148,527,189"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="542,175,708,195,707,200,542,181"/>
+<area shape="poly" id="edge6_Node000002_Node000006" title=" " alt="" coords="555,246,618,246,684,240,738,225,739,230,684,245,619,252,555,251"/>
+<area shape="rect" id="Node000007" href="$classwebsocketpp_1_1utf8__validator_1_1validator.html" title="Provides streaming UTF8 validation functionality." alt="" coords="5,220,190,261"/>
+<area shape="poly" id="edge8_Node000006_Node000007" title=" " alt="" coords="205,238,375,238,375,243,205,243"/>
+<area shape="rect" id="Node000008" href="$structwebsocketpp_1_1frame_1_1extended__header.html" title="The variable size component of a WebSocket frame header." alt="" coords="388,292,527,333"/>
+<area shape="poly" id="edge9_Node000002_Node000008" title=" " alt="" coords="542,301,612,288,683,268,723,248,759,226,762,230,726,253,685,272,613,294,543,306"/>
+<area shape="rect" id="Node000009" href="$structstate.html" title=" " alt="" coords="432,378,482,404"/>
+<area shape="poly" id="edge10_Node000002_Node000009" title=" " alt="" coords="497,383,586,361,636,343,683,318,710,297,735,273,772,226,777,229,739,276,714,301,685,323,638,348,587,366,498,388"/>
+<area shape="rect" id="Node000011" href="$structyh__connector.html" title=" " alt="" coords="740,424,839,449"/>
+<area shape="poly" id="edge14_Node000011_Node000009" title=" " alt="" coords="498,393,684,418,740,426,739,431,684,423,498,399"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="75,378,120,404"/>
+<area shape="poly" id="edge11_Node000009_Node000010" title=" " alt="" coords="136,388,432,388,432,394,136,394"/>
+<area shape="poly" id="edge12_Node000009_Node000011" title=" " alt="" coords="725,445,647,447,562,438,519,424,482,407,484,402,521,419,564,433,647,442,725,440"/>
+<area shape="rect" id="Node000012" title=" " alt="" coords="70,448,125,473"/>
+<area shape="poly" id="edge15_Node000009_Node000012" title=" " alt="" coords="139,450,351,409,431,393,432,398,352,414,140,455"/>
+<area shape="poly" id="edge13_Node000011_Node000012" title=" " alt="" coords="140,458,372,459,527,455,684,447,739,441,740,446,684,452,527,461,372,464,140,464"/>
+</map>

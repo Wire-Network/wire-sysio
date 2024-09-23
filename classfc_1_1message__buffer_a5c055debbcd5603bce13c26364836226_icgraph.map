@@ -1,0 +1,11 @@
+<map id="fc::message_buffer::advance_write_ptr" name="fc::message_buffer::advance_write_ptr">
+<area shape="rect" id="Node000001" title=" " alt="" coords="250,72,385,113"/>
+<area shape="rect" id="Node000002" href="$test__message__buffer_8cpp.html#ac64fd5998672b472a05dead509a6e008" title="Test buffer growth and shrinking." alt="" coords="5,5,202,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="259,68,201,45,165,34,166,29,203,40,261,63"/>
+<area shape="rect" id="Node000003" href="$test__message__buffer_8cpp.html#ae9f66dfac041e0941e63b810d0cb5315" title="Test peek and read across multiple buffers." alt="" coords="5,55,202,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="234,86,202,82,202,77,234,80"/>
+<area shape="rect" id="Node000004" href="$test__message__buffer_8cpp.html#a51213da5fa9bc94beae58bc546fe060c" title="Test automatic allocation when advancing the read_ptr to the end." alt="" coords="5,104,202,130"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="234,105,202,108,202,103,234,99"/>
+<area shape="rect" id="Node000005" href="$test__message__buffer_8cpp.html#a6687d4ea18cd8c8a2244e87202a36dfe" title=" " alt="" coords="5,153,202,179"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="259,122,203,145,166,155,165,150,201,140,257,117"/>
+</map>

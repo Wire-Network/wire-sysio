@@ -1,0 +1,8 @@
+<map id="BOOST_AUTO_TEST_CASE" name="BOOST_AUTO_TEST_CASE">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,202,31"/>
+<area shape="rect" id="Node000002" href="$xbyak__mnemonic_8h.html#aa81aed607133209dade63a226818224d" title=" " alt="" coords="439,5,484,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="202,16,423,16,423,21,202,21"/>
+<area shape="rect" id="Node000003" href="$integration_8cpp.html#addb975fa892d543b9508b420cd81e63f" title=" " alt="" coords="250,31,391,56"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="202,27,234,31,234,36,202,32"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="391,28,423,22,424,27,392,33"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="sysio::chain::block_summary_object" name="sysio::chain::block_summary_object">
+<area shape="rect" id="Node000001" title="tracks minimal information about past blocks to implement TaPOS" alt="" coords="44,109,174,150"/>
+<area shape="rect" id="Node000002" href="$structchainbase_1_1object.html" title=" " alt="" coords="5,5,213,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="112,77,112,109,106,109,106,77"/>
+</map>

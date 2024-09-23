@@ -1,0 +1,11 @@
+<map id="CLI::detail::trim_copy" name="CLI::detail::trim_copy">
+<area shape="rect" id="Node000001" title="Make a copy of the string and then trim it." alt="" coords="407,46,553,72"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_config_base.html#a1395eecde5af65b73e3670529df0e17b" title="Convert a configuration into an app." alt="" coords="207,5,359,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="391,47,359,41,360,36,392,41"/>
+<area shape="rect" id="Node000003" href="$namespace_c_l_i_1_1detail.html#a001565020c65971162bae8cc2ba7d3e1" title=" " alt="" coords="226,71,340,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="392,76,340,85,339,79,391,71"/>
+<area shape="rect" id="Node000004" href="$namespace_c_l_i_1_1detail.html#aef5e2e24cdf5eb20ac37c5fdabec8f62" title="extract default flag values either {def} or starting with a !" alt="" coords="5,41,159,82"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="210,83,159,76,159,70,211,78"/>
+<area shape="rect" id="Node000005" href="$class_c_l_i_1_1_option.html#a35e90f0fc810ccca676f7fa39bf4cc27" title="Making an option by hand is not defined, it must be made by the App class." alt="" coords="15,106,149,132"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="211,104,150,112,149,107,211,98"/>
+</map>

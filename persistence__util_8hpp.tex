@@ -1,0 +1,36 @@
+\doxysection{libraries/fc/include/fc/io/persistence\+\_\+util.hpp File Reference}
+\hypertarget{persistence__util_8hpp}{}\label{persistence__util_8hpp}\index{libraries/fc/include/fc/io/persistence\_util.hpp@{libraries/fc/include/fc/io/persistence\_util.hpp}}
+{\ttfamily \#include $<$fc/io/cfile.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/io/raw.\+hpp$>$}\newline
+Include dependency graph for persistence\+\_\+util.\+hpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{persistence__util_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=209pt]{persistence__util_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacefc}{fc}}
+\begin{DoxyCompactList}\small\item\em namespace \doxylink{namespacesysio_1_1chain}{sysio\+::chain} \end{DoxyCompactList}\item 
+namespace \mbox{\hyperlink{namespacefc_1_1persistence__util}{fc\+::persistence\+\_\+util}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1cfile}{cfile}} \mbox{\hyperlink{namespacefc_1_1persistence__util_ae4c6e4c1f79832e4471d9c01057bdc8c}{fc\+::persistence\+\_\+util\+::open\+\_\+cfile\+\_\+for\+\_\+read}} (const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&dir, const std\+::string \&filename)
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{namespacefc_1_1persistence__util_abe5388b79b2e70ad07e183f45bf76901}{fc\+::persistence\+\_\+util\+::read\+\_\+persistence\+\_\+header}} (\mbox{\hyperlink{classfc_1_1cfile}{cfile}} \&dat\+\_\+content, const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} magic\+\_\+number, const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} min\+\_\+supported\+\_\+version, const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} max\+\_\+supported\+\_\+version)
+\item 
+\mbox{\hyperlink{classfc_1_1cfile}{cfile}} \mbox{\hyperlink{namespacefc_1_1persistence__util_a794e9ae3b32ccdc322b436cf97ea0b9e}{fc\+::persistence\+\_\+util\+::open\+\_\+cfile\+\_\+for\+\_\+write}} (const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&dir, const std\+::string \&filename)
+\item 
+void \mbox{\hyperlink{namespacefc_1_1persistence__util_a979e339f3c85c4e3a0ca7fdffd526dc8}{fc\+::persistence\+\_\+util\+::write\+\_\+persistence\+\_\+header}} (\mbox{\hyperlink{classfc_1_1cfile}{cfile}} \&dat\+\_\+content, const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} magic\+\_\+number, const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} current\+\_\+version)
+\end{DoxyCompactItemize}

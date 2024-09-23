@@ -1,0 +1,29 @@
+\doxysection{sysio\+::chain\+::literals Namespace Reference}
+\hypertarget{namespacesysio_1_1chain_1_1literals}{}\label{namespacesysio_1_1chain_1_1literals}\index{sysio::chain::literals@{sysio::chain::literals}}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , T... Str$>$ }\\constexpr \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \mbox{\hyperlink{namespacesysio_1_1chain_1_1literals_aab0ffa0d42ad0c5a3a9c2d999d2877df}{operator"{}"{}\+\_\+n}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacesysio_1_1chain_1_1literals_aab0ffa0d42ad0c5a3a9c2d999d2877df}\index{sysio::chain::literals@{sysio::chain::literals}!operator"{}"{}\_n@{operator""""\_n}}
+\index{operator"{}"{}\_n@{operator""""\_n}!sysio::chain::literals@{sysio::chain::literals}}
+\doxysubsubsection{\texorpdfstring{operator""""\_n()}{operator""\_n()}}
+{\footnotesize\ttfamily \label{namespacesysio_1_1chain_1_1literals_aab0ffa0d42ad0c5a3a9c2d999d2877df} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} , T... Str$>$ \\
+\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} sysio\+::chain\+::literals\+::operator"{}"{}\+\_\+n (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{name_8hpp_source_l00095}{95}} of file \mbox{\hyperlink{name_8hpp_source}{name.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{constexpr}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}}[]\ =\ \{Str...\};}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\{std::integral\_constant<\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}},\ \mbox{\hyperlink{namespacesysio_1_1chain_a32dc169c7162ed3509c4ecdc8d4c843c}{string\_to\_uint64\_t}}(std::string\_view\{\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}},\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a855e99b645b13e7905d074d02fe0bff5}{buf}})\})>\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{::value}}\};}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}

@@ -1,0 +1,257 @@
+\doxysection{libraries/yubihsm/aes\+\_\+cmac/tests/aes\+\_\+cmac\+\_\+tests.c File Reference}
+\hypertarget{aes__cmac__tests_8c}{}\label{aes__cmac__tests_8c}\index{libraries/yubihsm/aes\_cmac/tests/aes\_cmac\_tests.c@{libraries/yubihsm/aes\_cmac/tests/aes\_cmac\_tests.c}}
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include "{}../aes\+\_\+cmac.\+h"{}}\newline
+Include dependency graph for aes\+\_\+cmac\+\_\+tests.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{aes__cmac__tests_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(c,  e,  m)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{aes__cmac__tests_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}\index{aes\_cmac\_tests.c@{aes\_cmac\_tests.c}!asrt@{asrt}}
+\index{asrt@{asrt}!aes\_cmac\_tests.c@{aes\_cmac\_tests.c}}
+\doxysubsubsection{\texorpdfstring{asrt}{asrt}}
+{\footnotesize\ttfamily \label{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722} 
+\#define asrt(\begin{DoxyParamCaption}\item[{}]{c}{, }\item[{}]{e}{, }\item[{}]{m}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\_asrt(\_\_LINE\_\_,\ c,\ e,\ m);}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{aes__cmac__tests_8c_source_l00023}{23}} of file \mbox{\hyperlink{aes__cmac__tests_8c_source}{aes\+\_\+cmac\+\_\+tests.\+c}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{aes__cmac__tests_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}\index{aes\_cmac\_tests.c@{aes\_cmac\_tests.c}!main@{main}}
+\index{main@{main}!aes\_cmac\_tests.c@{aes\_cmac\_tests.c}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{aes__cmac__tests_8c_ae66f6b31b5ad750f1fe042a706a4e3d4} 
+int main (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{aes__cmac__tests_8c_source_l00037}{37}} of file \mbox{\hyperlink{aes__cmac__tests_8c_source}{aes\+\_\+cmac\+\_\+tests.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00038\ \ \ \mbox{\hyperlink{structaes__cmac__context__t}{aes\_cmac\_context\_t}}\ ctx;}
+\DoxyCodeLine{00039\ }
+\DoxyCodeLine{00040\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ mac[\mbox{\hyperlink{aes_8h_af19ab913a847ad1e91c5291215116de1}{AES\_BLOCK\_SIZE}}];}
+\DoxyCodeLine{00041\ }
+\DoxyCodeLine{00042\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ m[]\ =\ \{0x6b,\ 0xc1,\ 0xbe,\ 0xe2,\ 0x2e,\ 0x40,\ 0x9f,\ 0x96,\ 0xe9,\ 0x3d,}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x7e,\ 0x11,\ 0x73,\ 0x93,\ 0x17,\ 0x2a,\ 0xae,\ 0x2d,\ 0x8a,\ 0x57,}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x1e,\ 0x03,\ 0xac,\ 0x9c,\ 0x9e,\ 0xb7,\ 0x6f,\ 0xac,\ 0x45,\ 0xaf,}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x8e,\ 0x51,\ 0x30,\ 0xc8,\ 0x1c,\ 0x46,\ 0xa3,\ 0x5c,\ 0xe4,\ 0x11,}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0xe5,\ 0xfb,\ 0xc1,\ 0x19,\ 0x1a,\ 0x0a,\ 0x52,\ 0xef,\ 0xf6,\ 0x9f,}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x24,\ 0x45,\ 0xdf,\ 0x4f,\ 0x9b,\ 0x17,\ 0xad,\ 0x2b,\ 0x41,\ 0x7b,}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0xe6,\ 0x6c,\ 0x37,\ 0x10\};}
+\DoxyCodeLine{00049\ }
+\DoxyCodeLine{00050\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ k\_128[]\ =\ \{0x2b,\ 0x7e,\ 0x15,\ 0x16,\ 0x28,\ 0xae,\ 0xd2,\ 0xa6,}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0xab,\ 0xf7,\ 0x15,\ 0x88,\ 0x09,\ 0xcf,\ 0x4f,\ 0x3c\};}
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ k\_192[]\ =\ \{0x8e,\ 0x73,\ 0xb0,\ 0xf7,\ 0xda,\ 0x0e,\ 0x64,\ 0x52,}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0xc8,\ 0x10,\ 0xf3,\ 0x2b,\ 0x80,\ 0x90,\ 0x79,\ 0xe5,}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x62,\ 0xf8,\ 0xea,\ 0xd2,\ 0x52,\ 0x2c,\ 0x6b,\ 0x7b\};}
+\DoxyCodeLine{00056\ }
+\DoxyCodeLine{00057\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ k\_256[]\ =\ \{0x60,\ 0x3d,\ 0xeb,\ 0x10,\ 0x15,\ 0xca,\ 0x71,\ 0xbe,}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x2b,\ 0x73,\ 0xae,\ 0xf0,\ 0x85,\ 0x7d,\ 0x77,\ 0x81,}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x1f,\ 0x35,\ 0x2c,\ 0x07,\ 0x3b,\ 0x61,\ 0x08,\ 0xd7,}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x2d,\ 0x98,\ 0x10,\ 0xa3,\ 0x09,\ 0x14,\ 0xdf,\ 0xf4\};}
+\DoxyCodeLine{00061\ }
+\DoxyCodeLine{00062\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ mac1[]\ =\ \{0xbb,\ 0x1d,\ 0x69,\ 0x29,\ 0xe9,\ 0x59,\ 0x37,\ 0x28,}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x7f,\ 0xa3,\ 0x7d,\ 0x12,\ 0x9b,\ 0x75,\ 0x67,\ 0x46\};}
+\DoxyCodeLine{00064\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ mac2[]\ =\ \{0x07,\ 0x0a,\ 0x16,\ 0xb4,\ 0x6b,\ 0x4d,\ 0x41,\ 0x44,}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0xf7,\ 0x9b,\ 0xdd,\ 0x9d,\ 0xd0,\ 0x4a,\ 0x28,\ 0x7c\};}
+\DoxyCodeLine{00066\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ mac3[]\ =\ \{0xdf,\ 0xa6,\ 0x67,\ 0x47,\ 0xde,\ 0x9a,\ 0xe6,\ 0x30,}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x30,\ 0xca,\ 0x32,\ 0x61,\ 0x14,\ 0x97,\ 0xc8,\ 0x27\};}
+\DoxyCodeLine{00068\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ mac4[]\ =\ \{0x51,\ 0xf0,\ 0xbe,\ 0xbf,\ 0x7e,\ 0x3b,\ 0x9d,\ 0x92,}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0xfc,\ 0x49,\ 0x74,\ 0x17,\ 0x79,\ 0x36,\ 0x3c,\ 0xfe\};}
+\DoxyCodeLine{00070\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ mac5[]\ =\ \{0xd1,\ 0x7d,\ 0xdf,\ 0x46,\ 0xad,\ 0xaa,\ 0xcd,\ 0xe5,}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x31,\ 0xca,\ 0xc4,\ 0x83,\ 0xde,\ 0x7a,\ 0x93,\ 0x67\};}
+\DoxyCodeLine{00072\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ mac6[]\ =\ \{0x9e,\ 0x99,\ 0xa7,\ 0xbf,\ 0x31,\ 0xe7,\ 0x10,\ 0x90,}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x06,\ 0x62,\ 0xf6,\ 0x5e,\ 0x61,\ 0x7c,\ 0x51,\ 0x84\};}
+\DoxyCodeLine{00074\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ mac7[]\ =\ \{0x8a,\ 0x1d,\ 0xe5,\ 0xbe,\ 0x2e,\ 0xb3,\ 0x1a,\ 0xad,}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x08,\ 0x9a,\ 0x82,\ 0xe6,\ 0xee,\ 0x90,\ 0x8b,\ 0x0e\};}
+\DoxyCodeLine{00076\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ mac8[]\ =\ \{0xa1,\ 0xd5,\ 0xdf,\ 0x0e,\ 0xed,\ 0x79,\ 0x0f,\ 0x79,}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x4d,\ 0x77,\ 0x58,\ 0x96,\ 0x59,\ 0xf3,\ 0x9a,\ 0x11\};}
+\DoxyCodeLine{00078\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ mac9[]\ =\ \{0x02,\ 0x89,\ 0x62,\ 0xf6,\ 0x1b,\ 0x7b,\ 0xf8,\ 0x9e,}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0xfc,\ 0x6b,\ 0x55,\ 0x1f,\ 0x46,\ 0x67,\ 0xd9,\ 0x83\};}
+\DoxyCodeLine{00080\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ mac10[]\ =\ \{0x28,\ 0xa7,\ 0x02,\ 0x3f,\ 0x45,\ 0x2e,\ 0x8f,\ 0x82,}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0xbd,\ 0x4b,\ 0xf2,\ 0x8d,\ 0x8c,\ 0x37,\ 0xc3,\ 0x5c\};}
+\DoxyCodeLine{00082\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ mac11[]\ =\ \{0xaa,\ 0xf3,\ 0xd8,\ 0xf1,\ 0xde,\ 0x56,\ 0x40,\ 0xc2,}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x32,\ 0xf5,\ 0xb1,\ 0x69,\ 0xb9,\ 0xc9,\ 0x11,\ 0xe6\};}
+\DoxyCodeLine{00084\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ mac12[]\ =\ \{0xe1,\ 0x99,\ 0x21,\ 0x90,\ 0x54,\ 0x9f,\ 0x6e,\ 0xd5,}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x69,\ 0x6a,\ 0x2c,\ 0x05,\ 0x6c,\ 0x31,\ 0x54,\ 0x10\};}
+\DoxyCodeLine{00086\ }
+\DoxyCodeLine{00087\ \ \ \mbox{\hyperlink{aes__cmac_8c_a014254770fc9e75faf1fce96d23c6bb3}{aes\_cmac\_init}}(k\_128,\ \textcolor{keyword}{sizeof}(k\_128),\ \&ctx);}
+\DoxyCodeLine{00088\ \ \ \mbox{\hyperlink{aes__cmac_8c_a8ec41de97a9e100769dcd45529860540}{aes\_cmac\_encrypt}}(\&ctx,\ m,\ 0,\ mac);}
+\DoxyCodeLine{00089\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(memcmp(mac,\ mac1,\ 16),\ 0,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}MAC1"{}});}
+\DoxyCodeLine{00090\ \ \ \mbox{\hyperlink{aes__cmac_8c_a8ec41de97a9e100769dcd45529860540}{aes\_cmac\_encrypt}}(\&ctx,\ m,\ 16,\ mac);}
+\DoxyCodeLine{00091\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(memcmp(mac,\ mac2,\ 16),\ 0,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}MAC2"{}});}
+\DoxyCodeLine{00092\ \ \ \mbox{\hyperlink{aes__cmac_8c_a8ec41de97a9e100769dcd45529860540}{aes\_cmac\_encrypt}}(\&ctx,\ m,\ 40,\ mac);}
+\DoxyCodeLine{00093\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(memcmp(mac,\ mac3,\ 16),\ 0,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}MAC3"{}});}
+\DoxyCodeLine{00094\ \ \ \mbox{\hyperlink{aes__cmac_8c_a8ec41de97a9e100769dcd45529860540}{aes\_cmac\_encrypt}}(\&ctx,\ m,\ 64,\ mac);}
+\DoxyCodeLine{00095\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(memcmp(mac,\ mac4,\ 16),\ 0,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}MAC4"{}});}
+\DoxyCodeLine{00096\ }
+\DoxyCodeLine{00097\ \ \ \mbox{\hyperlink{aes__cmac_8c_a014254770fc9e75faf1fce96d23c6bb3}{aes\_cmac\_init}}(k\_192,\ \textcolor{keyword}{sizeof}(k\_192),\ \&ctx);}
+\DoxyCodeLine{00098\ \ \ \mbox{\hyperlink{aes__cmac_8c_a8ec41de97a9e100769dcd45529860540}{aes\_cmac\_encrypt}}(\&ctx,\ m,\ 0,\ mac);}
+\DoxyCodeLine{00099\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(memcmp(mac,\ mac5,\ 16),\ 0,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}MAC5"{}});}
+\DoxyCodeLine{00100\ \ \ \mbox{\hyperlink{aes__cmac_8c_a8ec41de97a9e100769dcd45529860540}{aes\_cmac\_encrypt}}(\&ctx,\ m,\ 16,\ mac);}
+\DoxyCodeLine{00101\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(memcmp(mac,\ mac6,\ 16),\ 0,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}MAC6"{}});}
+\DoxyCodeLine{00102\ \ \ \mbox{\hyperlink{aes__cmac_8c_a8ec41de97a9e100769dcd45529860540}{aes\_cmac\_encrypt}}(\&ctx,\ m,\ 40,\ mac);}
+\DoxyCodeLine{00103\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(memcmp(mac,\ mac7,\ 16),\ 0,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}MAC7"{}});}
+\DoxyCodeLine{00104\ \ \ \mbox{\hyperlink{aes__cmac_8c_a8ec41de97a9e100769dcd45529860540}{aes\_cmac\_encrypt}}(\&ctx,\ m,\ 64,\ mac);}
+\DoxyCodeLine{00105\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(memcmp(mac,\ mac8,\ 16),\ 0,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}MAC8"{}});}
+\DoxyCodeLine{00106\ }
+\DoxyCodeLine{00107\ \ \ \mbox{\hyperlink{aes__cmac_8c_a014254770fc9e75faf1fce96d23c6bb3}{aes\_cmac\_init}}(k\_256,\ \textcolor{keyword}{sizeof}(k\_256),\ \&ctx);}
+\DoxyCodeLine{00108\ \ \ \mbox{\hyperlink{aes__cmac_8c_a8ec41de97a9e100769dcd45529860540}{aes\_cmac\_encrypt}}(\&ctx,\ m,\ 0,\ mac);}
+\DoxyCodeLine{00109\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(memcmp(mac,\ mac9,\ 16),\ 0,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}MAC9"{}});}
+\DoxyCodeLine{00110\ \ \ \mbox{\hyperlink{aes__cmac_8c_a8ec41de97a9e100769dcd45529860540}{aes\_cmac\_encrypt}}(\&ctx,\ m,\ 16,\ mac);}
+\DoxyCodeLine{00111\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(memcmp(mac,\ mac10,\ 16),\ 0,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}MAC10"{}});}
+\DoxyCodeLine{00112\ \ \ \mbox{\hyperlink{aes__cmac_8c_a8ec41de97a9e100769dcd45529860540}{aes\_cmac\_encrypt}}(\&ctx,\ m,\ 40,\ mac);}
+\DoxyCodeLine{00113\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(memcmp(mac,\ mac11,\ 16),\ 0,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}MAC11"{}});}
+\DoxyCodeLine{00114\ \ \ \mbox{\hyperlink{aes__cmac_8c_a8ec41de97a9e100769dcd45529860540}{aes\_cmac\_encrypt}}(\&ctx,\ m,\ 64,\ mac);}
+\DoxyCodeLine{00115\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(memcmp(mac,\ mac12,\ 16),\ 0,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}MAC12"{}});}
+\DoxyCodeLine{00116\ }
+\DoxyCodeLine{00117\ \ \ \textcolor{comment}{//\ Padding\ tests}}
+\DoxyCodeLine{00118\ }
+\DoxyCodeLine{00119\ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}[48];}
+\DoxyCodeLine{00120\ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}};}
+\DoxyCodeLine{00121\ }
+\DoxyCodeLine{00122\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}\ =\ 3;}
+\DoxyCodeLine{00123\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ 0xab,\ 48);}
+\DoxyCodeLine{00124\ \ \ \mbox{\hyperlink{aes_8c_aaa9af377bef3418182bbb3b75dfc0652}{aes\_add\_padding}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}});}
+\DoxyCodeLine{00125\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(memcmp(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)x80\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00"{}}}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)x00"{}},}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 16),}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ 0,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}PADDING\ 1a"{}});}
+\DoxyCodeLine{00130\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}},\ 16,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}PADDING\ 1b"{}});}
+\DoxyCodeLine{00131\ \ \ \mbox{\hyperlink{aes_8c_a05f228376c0bbe57dd19a6300aca1731}{aes\_remove\_padding}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}});}
+\DoxyCodeLine{00132\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(memcmp(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \textcolor{stringliteral}{"{}\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab"{}},\ 3),\ 0,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}PADDING\ 1c"{}});}
+\DoxyCodeLine{00133\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}},\ 3,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}PADDING\ 1d"{}});}
+\DoxyCodeLine{00134\ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{00135\ }
+\DoxyCodeLine{00136\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}\ =\ 15;}
+\DoxyCodeLine{00137\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ 0xab,\ 48);}
+\DoxyCodeLine{00138\ \ \ \mbox{\hyperlink{aes_8c_aaa9af377bef3418182bbb3b75dfc0652}{aes\_add\_padding}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}});}
+\DoxyCodeLine{00139\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(memcmp(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab"{}}}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)x80"{}},}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 16),}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ 0,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}PADDING\ 2a"{}});}
+\DoxyCodeLine{00144\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}},\ 16,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}PADDING\ 2b"{}});}
+\DoxyCodeLine{00145\ \ \ \mbox{\hyperlink{aes_8c_a05f228376c0bbe57dd19a6300aca1731}{aes\_remove\_padding}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}});}
+\DoxyCodeLine{00146\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(memcmp(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab"{}}}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)xab"{}},}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 15),}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ 0,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}PADDING\ 2c"{}});}
+\DoxyCodeLine{00151\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}},\ 15,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}PADDING\ 2d"{}});}
+\DoxyCodeLine{00152\ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{00153\ }
+\DoxyCodeLine{00154\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}\ =\ 16;}
+\DoxyCodeLine{00155\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ 0xab,\ 48);}
+\DoxyCodeLine{00156\ \ \ \mbox{\hyperlink{aes_8c_aaa9af377bef3418182bbb3b75dfc0652}{aes\_add\_padding}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}});}
+\DoxyCodeLine{00157\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(memcmp(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab"{}}}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)xab\(\backslash\)x80\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00"{}}}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)x00\(\backslash\)x00"{}},}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 32),}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \ 0,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}PADDING\ 3a"{}});}
+\DoxyCodeLine{00163\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}},\ 32,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}PADDING\ 3b"{}});}
+\DoxyCodeLine{00164\ \ \ \mbox{\hyperlink{aes_8c_a05f228376c0bbe57dd19a6300aca1731}{aes\_remove\_padding}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}});}
+\DoxyCodeLine{00165\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(memcmp(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab"{}}}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)xab"{}},}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 16),}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ 0,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}PADDING\ 3c"{}});}
+\DoxyCodeLine{00170\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}},\ 16,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}PADDING\ 3d"{}});}
+\DoxyCodeLine{00171\ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{00172\ }
+\DoxyCodeLine{00173\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}\ =\ 19;}
+\DoxyCodeLine{00174\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ 0xab,\ 48);}
+\DoxyCodeLine{00175\ \ \ \mbox{\hyperlink{aes_8c_aaa9af377bef3418182bbb3b75dfc0652}{aes\_add\_padding}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}});}
+\DoxyCodeLine{00176\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(memcmp(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab"{}}}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)x80\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00"{}}}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)x00\(\backslash\)x00"{}},}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 32),}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ 0,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}PADDING\ 4a"{}});}
+\DoxyCodeLine{00182\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}},\ 32,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}PADDING\ 4b"{}});}
+\DoxyCodeLine{00183\ \ \ \mbox{\hyperlink{aes_8c_a05f228376c0bbe57dd19a6300aca1731}{aes\_remove\_padding}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}});}
+\DoxyCodeLine{00184\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(memcmp(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab"{}}}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab"{}},}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 19),}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \ 0,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}PADDING\ 4c"{}});}
+\DoxyCodeLine{00189\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}},\ 19,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}PADDING\ 4d"{}});}
+\DoxyCodeLine{00190\ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{00191\ }
+\DoxyCodeLine{00192\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}\ =\ 32;}
+\DoxyCodeLine{00193\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ 0xab,\ 48);}
+\DoxyCodeLine{00194\ \ \ \mbox{\hyperlink{aes_8c_aaa9af377bef3418182bbb3b75dfc0652}{aes\_add\_padding}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}});}
+\DoxyCodeLine{00195\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(memcmp(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab"{}}}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab"{}}}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)xab\(\backslash\)xab\(\backslash\)x80\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00"{}}}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00"{}},}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 48),}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \ 0,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}PADDING\ 5a"{}});}
+\DoxyCodeLine{00202\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}},\ 48,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}PADDING\ 5b"{}});}
+\DoxyCodeLine{00203\ \ \ \mbox{\hyperlink{aes_8c_a05f228376c0bbe57dd19a6300aca1731}{aes\_remove\_padding}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}});}
+\DoxyCodeLine{00204\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(memcmp(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab"{}}}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab\(\backslash\)xab"{}}}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)xab\(\backslash\)xab"{}},}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 32),}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \ 0,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}PADDING\ 5c"{}});}
+\DoxyCodeLine{00210\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}},\ 32,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}PADDING\ 5d"{}});}
+\DoxyCodeLine{00211\ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{00212\ }
+\DoxyCodeLine{00213\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}}\ =\ 0;}
+\DoxyCodeLine{00214\ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ 0xab,\ 48);}
+\DoxyCodeLine{00215\ \ \ \mbox{\hyperlink{aes_8c_aaa9af377bef3418182bbb3b75dfc0652}{aes\_add\_padding}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}});}
+\DoxyCodeLine{00216\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(memcmp(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},}
+\DoxyCodeLine{00217\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)x80\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00\(\backslash\)x00"{}}}
+\DoxyCodeLine{00218\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)x00"{}},}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 16),}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \ 0,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}PADDING\ 6a"{}});}
+\DoxyCodeLine{00221\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}},\ 16,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}PADDING\ 6b"{}});}
+\DoxyCodeLine{00222\ \ \ \mbox{\hyperlink{aes_8c_a05f228376c0bbe57dd19a6300aca1731}{aes\_remove\_padding}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}});}
+\DoxyCodeLine{00223\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(memcmp(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \textcolor{stringliteral}{"{}"{}},\ 0),\ 0,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}PADDING\ 6c"{}});}
+\DoxyCodeLine{00224\ \ \ \mbox{\hyperlink{aes__cmac__tests_8c_a64ba225aca3df21193c8028dbc827722}{asrt}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a89606eca6b563ec68d2da2e84657736f}{l}},\ 0,\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *)\ \textcolor{stringliteral}{"{}PADDING\ 6d"{}});}
+\DoxyCodeLine{00225\ \ \ fprintf(stderr,\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{00226\ }
+\DoxyCodeLine{00227\ \ \ \textcolor{keywordflow}{return}\ EXIT\_SUCCESS;}
+\DoxyCodeLine{00228\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{aes__cmac__tests_8c_ae66f6b31b5ad750f1fe042a706a4e3d4_cgraph}
+\end{center}
+\end{figure}

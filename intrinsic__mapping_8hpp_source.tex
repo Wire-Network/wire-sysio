@@ -1,0 +1,290 @@
+\doxysection{intrinsic\+\_\+mapping.\+hpp}
+\hypertarget{intrinsic__mapping_8hpp_source}{}\label{intrinsic__mapping_8hpp_source}\index{libraries/chain/include/sysio/chain/webassembly/sys-\/vm-\/oc/intrinsic\_mapping.hpp@{libraries/chain/include/sysio/chain/webassembly/sys-\/vm-\/oc/intrinsic\_mapping.hpp}}
+\mbox{\hyperlink{intrinsic__mapping_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <array>}}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <limits>}}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <string\_view>}}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00007}00007\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{\ \textcolor{keyword}{namespace\ }chain\ \{\ \textcolor{keyword}{namespace\ }eosvmoc\ \{}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00008}00008\ \textcolor{comment}{//NEVER\ reorder\ or\ remove\ indexes;\ the\ PIC\ uses\ the\ indexes\ in\ this\ table\ as\ an\ offset\ in\ to\ a\ jump}}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00009}00009\ \textcolor{comment}{//\ table.\ Adding\ on\ the\ bottom\ is\ fine\ and\ requires\ no\ other\ updates\ elsewhere}}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00010}\mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1detail}{00010}}\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacedetail}{detail}}\ \{}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00011}00011\ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}...\ Args>}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00012}\mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1detail_ac025d056b200fb2a6da4210e7ba6edb5}{00012}}\ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{constexpr}\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1detail_ac025d056b200fb2a6da4210e7ba6edb5}{generate\_table}}(\ Args\&\&...\ args\ )\ \{}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00013}00013\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::array<std::string\_view,\ \textcolor{keyword}{sizeof}...(Args)>\ \{\ args...\ \};}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00014}00014\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00015}00015\ \}\ \textcolor{comment}{//\ ns\ sysio::chain::eosvmoc::detail}}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00017}\mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_ad649cd6b28056e1ed27e70d4a42e8530}{00017}}\ \textcolor{keyword}{inline}\ \textcolor{keyword}{constexpr}\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_ad649cd6b28056e1ed27e70d4a42e8530}{get\_intrinsic\_table}}()\ \{}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00018}00018\ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_1_1detail_ac025d056b200fb2a6da4210e7ba6edb5}{detail::generate\_table}}(}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00019}00019\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}eosvmoc\_internal.unreachable"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00020}00020\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}eosvmoc\_internal.grow\_memory"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00021}00021\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}eosvmoc\_internal.div0\_or\_overflow"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00022}00022\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}eosvmoc\_internal.indirect\_call\_mismatch"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00023}00023\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}eosvmoc\_internal.indirect\_call\_oob"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00024}00024\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}eosvmoc\_internal.depth\_assert"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00025}00025\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.call\_depth\_assert"{}},\ \ \textcolor{comment}{//now\ unused;\ left\ for\ purposes\ of\ not\ upsetting\ existing\ code\ mappings}}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00026}00026\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.checktime"{}},\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//now\ unused;\ left\ for\ purposes\ of\ not\ upsetting\ existing\ code\ mappings}}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00027}00027\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_ashlti3"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00028}00028\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_ashrti3"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00029}00029\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_lshlti3"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00030}00030\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_lshrti3"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00031}00031\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_divti3"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00032}00032\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_udivti3"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00033}00033\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_modti3"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00034}00034\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_umodti3"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00035}00035\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_multi3"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00036}00036\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_addtf3"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00037}00037\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_subtf3"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00038}00038\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_multf3"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00039}00039\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_divtf3"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00040}00040\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_eqtf2"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00041}00041\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_netf2"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00042}00042\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_getf2"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00043}00043\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_gttf2"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00044}00044\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_lttf2"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00045}00045\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_letf2"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00046}00046\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_cmptf2"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00047}00047\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_unordtf2"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00048}00048\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_negtf2"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00049}00049\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_floatsitf"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00050}00050\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_floatunsitf"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00051}00051\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_floatditf"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00052}00052\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_floatunditf"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00053}00053\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_floattidf"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00054}00054\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_floatuntidf"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00055}00055\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_floatsidf"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00056}00056\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_extendsftf2"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00057}00057\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_extenddftf2"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00058}00058\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_fixtfti"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00059}00059\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_fixtfdi"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00060}00060\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_fixtfsi"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00061}00061\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_fixunstfti"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00062}00062\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_fixunstfdi"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00063}00063\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_fixunstfsi"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00064}00064\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_fixsfti"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00065}00065\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_fixdfti"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00066}00066\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_fixunssfti"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00067}00067\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_fixunsdfti"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00068}00068\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_trunctfdf2"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00069}00069\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.\_\_trunctfsf2"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00070}00070\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.is\_feature\_active"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00071}00071\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.activate\_feature"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00072}00072\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.get\_resource\_limits"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00073}00073\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.set\_resource\_limits"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00074}00074\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.set\_proposed\_producers"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00075}00075\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.set\_proposed\_producers\_ex"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00076}00076\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.get\_blockchain\_parameters\_packed"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00077}00077\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.set\_blockchain\_parameters\_packed"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00078}00078\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.is\_privileged"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00079}00079\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.set\_privileged"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00080}00080\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.preactivate\_feature"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00081}00081\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.get\_active\_producers"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00082}00082\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_store\_i64"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00083}00083\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_update\_i64"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00084}00084\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_remove\_i64"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00085}00085\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_get\_i64"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00086}00086\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_next\_i64"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00087}00087\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_previous\_i64"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00088}00088\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_find\_i64"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00089}00089\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_lowerbound\_i64"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00090}00090\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_upperbound\_i64"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00091}00091\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_end\_i64"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00092}00092\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx64\_store"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00093}00093\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx64\_remove"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00094}00094\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx64\_update"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00095}00095\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx64\_find\_primary"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00096}00096\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx64\_find\_secondary"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00097}00097\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx64\_lowerbound"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00098}00098\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx64\_upperbound"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00099}00099\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx64\_end"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00100}00100\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx64\_next"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00101}00101\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx64\_previous"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00102}00102\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx128\_store"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00103}00103\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx128\_remove"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00104}00104\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx128\_update"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00105}00105\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx128\_find\_primary"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00106}00106\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx128\_find\_secondary"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00107}00107\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx128\_lowerbound"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00108}00108\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx128\_upperbound"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00109}00109\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx128\_end"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00110}00110\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx128\_next"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00111}00111\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx128\_previous"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00112}00112\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx\_double\_store"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00113}00113\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx\_double\_remove"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00114}00114\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx\_double\_update"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00115}00115\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx\_double\_find\_primary"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00116}00116\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx\_double\_find\_secondary"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00117}00117\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx\_double\_lowerbound"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00118}00118\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx\_double\_upperbound"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00119}00119\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx\_double\_end"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00120}00120\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx\_double\_next"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00121}00121\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx\_double\_previous"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00122}00122\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx\_long\_double\_store"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00123}00123\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx\_long\_double\_remove"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00124}00124\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx\_long\_double\_update"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00125}00125\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx\_long\_double\_find\_primary"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00126}00126\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx\_long\_double\_find\_secondary"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00127}00127\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx\_long\_double\_lowerbound"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00128}00128\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx\_long\_double\_upperbound"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00129}00129\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx\_long\_double\_end"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00130}00130\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx\_long\_double\_next"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00131}00131\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx\_long\_double\_previous"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00132}00132\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx256\_store"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00133}00133\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx256\_remove"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00134}00134\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx256\_update"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00135}00135\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx256\_find\_primary"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00136}00136\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx256\_find\_secondary"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00137}00137\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx256\_lowerbound"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00138}00138\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx256\_upperbound"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00139}00139\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx256\_end"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00140}00140\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx256\_next"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00141}00141\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.db\_idx256\_previous"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00142}00142\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.assert\_recover\_key"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00143}00143\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.recover\_key"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00144}00144\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.assert\_sha256"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00145}00145\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.assert\_sha1"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00146}00146\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.assert\_sha512"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00147}00147\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.assert\_ripemd160"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00148}00148\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.sha1"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00149}00149\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.sha256"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00150}00150\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.sha512"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00151}00151\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.ripemd160"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00152}00152\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.check\_transaction\_authorization"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00153}00153\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.check\_permission\_authorization"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00154}00154\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.get\_permission\_last\_used"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00155}00155\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.get\_account\_creation\_time"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00156}00156\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.current\_time"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00157}00157\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.publication\_time"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00158}00158\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.is\_feature\_activated"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00159}00159\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.get\_sender"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00160}00160\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.abort"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00161}00161\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.sysio\_assert"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00162}00162\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.sysio\_assert\_message"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00163}00163\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.sysio\_assert\_code"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00164}00164\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.sysio\_exit"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00165}00165\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.read\_action\_data"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00166}00166\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.action\_data\_size"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00167}00167\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.current\_receiver"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00168}00168\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.require\_recipient"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00169}00169\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.require\_auth"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00170}00170\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.require\_auth2"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00171}00171\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.has\_auth"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00172}00172\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.is\_account"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00173}00173\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.prints"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00174}00174\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.prints\_l"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00175}00175\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.printi"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00176}00176\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.printui"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00177}00177\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.printi128"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00178}00178\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.printui128"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00179}00179\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.printsf"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00180}00180\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.printdf"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00181}00181\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.printqf"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00182}00182\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.printn"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00183}00183\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.printhex"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00184}00184\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.read\_transaction"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00185}00185\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.transaction\_size"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00186}00186\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.expiration"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00187}00187\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.tapos\_block\_prefix"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00188}00188\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.tapos\_block\_num"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00189}00189\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.get\_action"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00190}00190\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.send\_inline"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00191}00191\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.send\_context\_free\_inline"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00192}00192\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.send\_deferred"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00193}00193\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.cancel\_deferred"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00194}00194\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.get\_context\_free\_data"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00195}00195\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.memcpy"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00196}00196\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.memmove"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00197}00197\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.memcmp"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00198}00198\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.memset"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00199}00199\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f32\_add"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00200}00200\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f32\_sub"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00201}00201\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f32\_mul"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00202}00202\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f32\_div"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00203}00203\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f32\_min"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00204}00204\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f32\_max"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00205}00205\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f32\_copysign"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00206}00206\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f32\_abs"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00207}00207\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f32\_neg"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00208}00208\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f32\_sqrt"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00209}00209\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f32\_ceil"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00210}00210\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f32\_floor"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00211}00211\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f32\_trunc"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00212}00212\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f32\_nearest"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00213}00213\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f32\_eq"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00214}00214\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f32\_ne"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00215}00215\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f32\_lt"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00216}00216\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f32\_le"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00217}00217\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f32\_gt"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00218}00218\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f32\_ge"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00219}00219\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f64\_add"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00220}00220\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f64\_sub"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00221}00221\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f64\_mul"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00222}00222\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f64\_div"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00223}00223\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f64\_min"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00224}00224\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f64\_max"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00225}00225\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f64\_copysign"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00226}00226\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f64\_abs"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00227}00227\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f64\_neg"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00228}00228\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f64\_sqrt"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00229}00229\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f64\_ceil"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00230}00230\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f64\_floor"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00231}00231\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f64\_trunc"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00232}00232\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f64\_nearest"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00233}00233\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f64\_eq"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00234}00234\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f64\_ne"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00235}00235\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f64\_lt"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00236}00236\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f64\_le"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00237}00237\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f64\_gt"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00238}00238\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f64\_ge"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00239}00239\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f32\_promote"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00240}00240\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f64\_demote"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00241}00241\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f32\_trunc\_i32s"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00242}00242\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f64\_trunc\_i32s"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00243}00243\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f32\_trunc\_i32u"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00244}00244\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f64\_trunc\_i32u"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00245}00245\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f32\_trunc\_i64s"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00246}00246\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f64\_trunc\_i64s"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00247}00247\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f32\_trunc\_i64u"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00248}00248\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_f64\_trunc\_i64u"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00249}00249\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_i32\_to\_f32"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00250}00250\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_i64\_to\_f32"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00251}00251\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_ui32\_to\_f32"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00252}00252\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_ui64\_to\_f32"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00253}00253\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_i32\_to\_f64"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00254}00254\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_i64\_to\_f64"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00255}00255\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_ui32\_to\_f64"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00256}00256\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sysio\_injection.\_sysio\_ui64\_to\_f64"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00257}00257\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.set\_action\_return\_value"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00258}00258\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.get\_wasm\_parameters\_packed"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00259}00259\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.set\_wasm\_parameters\_packed"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00260}00260\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.get\_parameters\_packed"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00261}00261\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.set\_parameters\_packed"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00262}00262\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.get\_code\_hash"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00263}00263\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.alt\_bn128\_add"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00264}00264\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.alt\_bn128\_mul"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00265}00265\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.alt\_bn128\_pair"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00266}00266\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.mod\_exp"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00267}00267\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.sha3"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00268}00268\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.blake2\_f"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00269}00269\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.k1\_recover"{}},}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00270}00270\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env.get\_block\_num"{}}}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00271}00271\ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00272}00272\ \}}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00273}\mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a45477b2def754b987f33a693e9b9102b}{00273}}\ \textcolor{keyword}{inline}\ \textcolor{keyword}{constexpr}\ std::size\_t\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a45477b2def754b987f33a693e9b9102b}{find\_intrinsic\_index}}(std::string\_view\ hf)\ \{}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00274}00274\ \ \ \ \textcolor{keyword}{constexpr}\ \textcolor{keyword}{auto}\ hosts\ =\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_ad649cd6b28056e1ed27e70d4a42e8530}{get\_intrinsic\_table}}();}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00275}00275\ \ \ \ \textcolor{keywordflow}{for}\ (\ \ std::size\_t\ i\ =\ 0;\ i\ <\ hosts.size();\ ++i\ )}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00276}00276\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ hosts[i]\ ==\ hf\ )}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00277}00277\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ i;}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00278}00278\ \ \ \ \textcolor{keywordflow}{return}\ std::numeric\_limits<std::size\_t>::max();}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00279}00279\ \}}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00280}00280\ }
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00281}\mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_af6cfcdcf0b52adb8f98540df0b6bf82a}{00281}}\ \textcolor{keyword}{inline}\ \textcolor{keyword}{constexpr}\ std::size\_t\ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_af6cfcdcf0b52adb8f98540df0b6bf82a}{intrinsic\_table\_size}}()\ \{}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00282}00282\ \ \ \ \ \textcolor{keywordflow}{return}\ std::tuple\_size<\textcolor{keyword}{decltype}(\mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_ad649cd6b28056e1ed27e70d4a42e8530}{get\_intrinsic\_table}}())>\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{::value}};}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00283}00283\ \}}
+\DoxyCodeLine{\Hypertarget{intrinsic__mapping_8hpp_source_l00284}00284\ \}\}\}}
+
+\end{DoxyCode}

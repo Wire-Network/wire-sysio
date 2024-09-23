@@ -1,0 +1,14 @@
+<map id="stub_con::async_read_indef" name="stub_con::async_read_indef">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,104,155,144"/>
+<area shape="rect" id="Node000002" href="$structstub__con.html#a122900a3be17dcbd6cc693ef8c025358" title=" " alt="" coords="203,111,345,137"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="155,121,188,121,188,126,155,126"/>
+<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1transport_1_1iostream_1_1connection.html#ad66fa146a7cdc19bfca3e32da23b9c60" title="Initiate an async_read for at least num_bytes bytes into buf." alt="" coords="393,5,550,61"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="303,108,394,66,396,70,305,113"/>
+<area shape="rect" id="Node000004" href="$structstub__con.html#adc3b613da536874da64369433eceaf19" title="Get a shared pointer to this component." alt="" coords="398,86,545,111"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="345,112,383,107,383,112,346,117"/>
+<area shape="rect" id="Node000006" href="$structstub__con.html#a054f8943e3032fe19b3d9bf48bdf0039" title=" " alt="" coords="394,135,549,161"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="322,135,379,143,378,148,321,140"/>
+<area shape="rect" id="Node000005" href="$classwebsocketpp_1_1transport_1_1iostream_1_1connection.html#afab9454b5af00a8edb494fdd2e32a41e" title="Get a shared pointer to this component." alt="" coords="598,71,756,126"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="545,96,582,96,582,101,545,101"/>
+<area shape="poly" id="edge6_Node000006_Node000002" title=" " alt="" coords="424,137,360,128,361,123,425,132"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="sysio::finality_status_object" name="sysio::finality_status_object">
+<area shape="rect" id="Node000001" title="tracks status related to a transaction in the blockchain" alt="" coords="339,65,480,105"/>
+<area shape="rect" id="Node000002" href="$classfc_1_1sha256.html" title=" " alt="" coords="55,11,138,37"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="153,26,230,35,315,51,353,62,352,67,314,56,230,40,153,31"/>
+<area shape="rect" id="Node000003" href="$classfc_1_1time__point.html" title=" " alt="" coords="46,72,147,98"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="163,82,338,82,338,88,163,88"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1chain_1_1block__timestamp.html" title=" " alt="" coords="5,122,188,192"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="202,130,338,99,339,104,203,135"/>
+</map>

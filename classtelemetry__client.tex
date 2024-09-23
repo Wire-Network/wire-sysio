@@ -1,0 +1,335 @@
+\doxysection{telemetry\+\_\+client Class Reference}
+\hypertarget{classtelemetry__client}{}\label{classtelemetry__client}\index{telemetry\_client@{telemetry\_client}}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1client}{websocketpp\+::client}}$<$ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio__client}{websocketpp\+::config\+::asio\+\_\+client}} $>$ \mbox{\hyperlink{classtelemetry__client_a80369ca2bfee5b29469e39e3d486c2a2}{client}}
+\item 
+typedef websocketpp\+::lib\+::lock\+\_\+guard$<$ websocketpp\+::lib\+::mutex $>$ \mbox{\hyperlink{classtelemetry__client_ae127291d168fe7b40ebadfcbc09145a7}{scoped\+\_\+lock}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtelemetry__client_a402130e09282e6416bcacb806f217cce}{telemetry\+\_\+client}} ()
+\item 
+void \mbox{\hyperlink{classtelemetry__client_aa5765b95b628b04bbe403cf022d0f014}{run}} (const std\+::string \&uri)
+\item 
+void \mbox{\hyperlink{classtelemetry__client_a0174e58d0e5417888581372e452a62c2}{on\+\_\+open}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{websocketpp\+::connection\+\_\+hdl}})
+\item 
+void \mbox{\hyperlink{classtelemetry__client_a0181996f0d5d519c09aee2878ab2b0c3}{on\+\_\+close}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{websocketpp\+::connection\+\_\+hdl}})
+\item 
+void \mbox{\hyperlink{classtelemetry__client_ae63630bbc931ce9d5e7047e65eac19db}{on\+\_\+fail}} (\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{websocketpp\+::connection\+\_\+hdl}})
+\item 
+void \mbox{\hyperlink{classtelemetry__client_acc925f9ef40b46fdfb040b9325c67ae2}{telemetry\+\_\+loop}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+The telemetry client connects to a Web\+Socket server and sends a message every second containing an integer count. This example can be used as the basis for programs where a client connects and pushes data for logging, stress/load testing, etc. 
+
+Definition at line \mbox{\hyperlink{telemetry__client_8cpp_source_l00015}{15}} of file \mbox{\hyperlink{telemetry__client_8cpp_source}{telemetry\+\_\+client.\+cpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classtelemetry__client_a80369ca2bfee5b29469e39e3d486c2a2}\index{telemetry\_client@{telemetry\_client}!client@{client}}
+\index{client@{client}!telemetry\_client@{telemetry\_client}}
+\doxysubsubsection{\texorpdfstring{client}{client}}
+{\footnotesize\ttfamily \label{classtelemetry__client_a80369ca2bfee5b29469e39e3d486c2a2} 
+\mbox{\hyperlink{classwebsocketpp_1_1client}{websocketpp\+::client}}$<$\mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio__client}{websocketpp\+::config\+::asio\+\_\+client}}$>$ \mbox{\hyperlink{classtelemetry__client_a80369ca2bfee5b29469e39e3d486c2a2}{telemetry\+\_\+client\+::client}}}
+
+
+
+Definition at line \mbox{\hyperlink{telemetry__client_8cpp_source_l00017}{17}} of file \mbox{\hyperlink{telemetry__client_8cpp_source}{telemetry\+\_\+client.\+cpp}}.
+
+\Hypertarget{classtelemetry__client_ae127291d168fe7b40ebadfcbc09145a7}\index{telemetry\_client@{telemetry\_client}!scoped\_lock@{scoped\_lock}}
+\index{scoped\_lock@{scoped\_lock}!telemetry\_client@{telemetry\_client}}
+\doxysubsubsection{\texorpdfstring{scoped\_lock}{scoped\_lock}}
+{\footnotesize\ttfamily \label{classtelemetry__client_ae127291d168fe7b40ebadfcbc09145a7} 
+websocketpp\+::lib\+::lock\+\_\+guard$<$websocketpp\+::lib\+::mutex$>$ \mbox{\hyperlink{classtelemetry__client_ae127291d168fe7b40ebadfcbc09145a7}{telemetry\+\_\+client\+::scoped\+\_\+lock}}}
+
+
+
+Definition at line \mbox{\hyperlink{telemetry__client_8cpp_source_l00018}{18}} of file \mbox{\hyperlink{telemetry__client_8cpp_source}{telemetry\+\_\+client.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtelemetry__client_a402130e09282e6416bcacb806f217cce}\index{telemetry\_client@{telemetry\_client}!telemetry\_client@{telemetry\_client}}
+\index{telemetry\_client@{telemetry\_client}!telemetry\_client@{telemetry\_client}}
+\doxysubsubsection{\texorpdfstring{telemetry\_client()}{telemetry\_client()}}
+{\footnotesize\ttfamily \label{classtelemetry__client_a402130e09282e6416bcacb806f217cce} 
+telemetry\+\_\+client\+::telemetry\+\_\+client (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{telemetry__client_8cpp_source_l00020}{20}} of file \mbox{\hyperlink{telemetry__client_8cpp_source}{telemetry\+\_\+client.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ m\_open(\textcolor{keyword}{false}),m\_done(\textcolor{keyword}{false})\ \{}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ set\ up\ access\ channels\ to\ only\ log\ interesting\ things}}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ m\_client.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a3fe357b3c6434273a9965eb52902575d}{clear\_access\_channels}}(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a853aa0b8976e53f3181af3bc398d493e}{websocketpp::log::alevel::all}});}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ m\_client.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a5d7da609ebd2f797e5e67b6d050ebc59}{set\_access\_channels}}(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_aac3e16b6df297567ba2533233d477d57}{websocketpp::log::alevel::connect}});}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ m\_client.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a5d7da609ebd2f797e5e67b6d050ebc59}{set\_access\_channels}}(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_af19681d3edb28e0407688eeda8f0005c}{websocketpp::log::alevel::disconnect}});}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ m\_client.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a5d7da609ebd2f797e5e67b6d050ebc59}{set\_access\_channels}}(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_aaf67c94a68502c49308489ff01d8d0a8}{websocketpp::log::alevel::app}});}
+\DoxyCodeLine{00026\ }
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Initialize\ the\ Asio\ transport\ policy}}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ m\_client.init\_asio();}
+\DoxyCodeLine{00029\ }
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Bind\ the\ handlers\ we\ are\ using}}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ }websocketpp::lib::placeholders::\_1;}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ }websocketpp::lib::bind;}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ m\_client.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a5753d9848aefc04ee91da401c0cc65b8}{set\_open\_handler}}(bind(\&\mbox{\hyperlink{classtelemetry__client_a0174e58d0e5417888581372e452a62c2}{telemetry\_client::on\_open}},\textcolor{keyword}{this},\_1));}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ m\_client.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a8d7d95bebc154879655211e2b0b5e069}{set\_close\_handler}}(bind(\&\mbox{\hyperlink{classtelemetry__client_a0181996f0d5d519c09aee2878ab2b0c3}{telemetry\_client::on\_close}},\textcolor{keyword}{this},\_1));}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ m\_client.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a073540365f5c810f5a45e5fc76f52f87}{set\_fail\_handler}}(bind(\&\mbox{\hyperlink{classtelemetry__client_ae63630bbc931ce9d5e7047e65eac19db}{telemetry\_client::on\_fail}},\textcolor{keyword}{this},\_1));}
+\DoxyCodeLine{00036\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtelemetry__client_a402130e09282e6416bcacb806f217cce_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtelemetry__client_a0181996f0d5d519c09aee2878ab2b0c3}\index{telemetry\_client@{telemetry\_client}!on\_close@{on\_close}}
+\index{on\_close@{on\_close}!telemetry\_client@{telemetry\_client}}
+\doxysubsubsection{\texorpdfstring{on\_close()}{on\_close()}}
+{\footnotesize\ttfamily \label{classtelemetry__client_a0181996f0d5d519c09aee2878ab2b0c3} 
+void telemetry\+\_\+client\+::on\+\_\+close (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{websocketpp\+::connection\+\_\+hdl}}}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{telemetry__client_8cpp_source_l00077}{77}} of file \mbox{\hyperlink{telemetry__client_8cpp_source}{telemetry\+\_\+client.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ m\_client.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a1d9163813aa02ed32100f443b4ddbd8e}{get\_alog}}().write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_aaf67c94a68502c49308489ff01d8d0a8}{websocketpp::log::alevel::app}},}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Connection\ closed,\ stopping\ telemetry!"{}});}
+\DoxyCodeLine{00080\ }
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtelemetry__client_ae127291d168fe7b40ebadfcbc09145a7}{scoped\_lock}}\ guard(m\_lock);}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ m\_done\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00083\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=334pt]{classtelemetry__client_a0181996f0d5d519c09aee2878ab2b0c3_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=349pt]{classtelemetry__client_a0181996f0d5d519c09aee2878ab2b0c3_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtelemetry__client_ae63630bbc931ce9d5e7047e65eac19db}\index{telemetry\_client@{telemetry\_client}!on\_fail@{on\_fail}}
+\index{on\_fail@{on\_fail}!telemetry\_client@{telemetry\_client}}
+\doxysubsubsection{\texorpdfstring{on\_fail()}{on\_fail()}}
+{\footnotesize\ttfamily \label{classtelemetry__client_ae63630bbc931ce9d5e7047e65eac19db} 
+void telemetry\+\_\+client\+::on\+\_\+fail (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{websocketpp\+::connection\+\_\+hdl}}}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{telemetry__client_8cpp_source_l00086}{86}} of file \mbox{\hyperlink{telemetry__client_8cpp_source}{telemetry\+\_\+client.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ m\_client.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a1d9163813aa02ed32100f443b4ddbd8e}{get\_alog}}().write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_aaf67c94a68502c49308489ff01d8d0a8}{websocketpp::log::alevel::app}},}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Connection\ failed,\ stopping\ telemetry!"{}});}
+\DoxyCodeLine{00089\ }
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtelemetry__client_ae127291d168fe7b40ebadfcbc09145a7}{scoped\_lock}}\ guard(m\_lock);}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ m\_done\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00092\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtelemetry__client_ae63630bbc931ce9d5e7047e65eac19db_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtelemetry__client_ae63630bbc931ce9d5e7047e65eac19db_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtelemetry__client_a0174e58d0e5417888581372e452a62c2}\index{telemetry\_client@{telemetry\_client}!on\_open@{on\_open}}
+\index{on\_open@{on\_open}!telemetry\_client@{telemetry\_client}}
+\doxysubsubsection{\texorpdfstring{on\_open()}{on\_open()}}
+{\footnotesize\ttfamily \label{classtelemetry__client_a0174e58d0e5417888581372e452a62c2} 
+void telemetry\+\_\+client\+::on\+\_\+open (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{websocketpp\+::connection\+\_\+hdl}}}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{telemetry__client_8cpp_source_l00068}{68}} of file \mbox{\hyperlink{telemetry__client_8cpp_source}{telemetry\+\_\+client.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ m\_client.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a1d9163813aa02ed32100f443b4ddbd8e}{get\_alog}}().write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_aaf67c94a68502c49308489ff01d8d0a8}{websocketpp::log::alevel::app}},}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Connection\ opened,\ starting\ telemetry!"{}});}
+\DoxyCodeLine{00071\ }
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtelemetry__client_ae127291d168fe7b40ebadfcbc09145a7}{scoped\_lock}}\ guard(m\_lock);}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ m\_open\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00074\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtelemetry__client_a0174e58d0e5417888581372e452a62c2_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtelemetry__client_a0174e58d0e5417888581372e452a62c2_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtelemetry__client_aa5765b95b628b04bbe403cf022d0f014}\index{telemetry\_client@{telemetry\_client}!run@{run}}
+\index{run@{run}!telemetry\_client@{telemetry\_client}}
+\doxysubsubsection{\texorpdfstring{run()}{run()}}
+{\footnotesize\ttfamily \label{classtelemetry__client_aa5765b95b628b04bbe403cf022d0f014} 
+void telemetry\+\_\+client\+::run (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{uri}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{telemetry__client_8cpp_source_l00039}{39}} of file \mbox{\hyperlink{telemetry__client_8cpp_source}{telemetry\+\_\+client.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Create\ a\ new\ connection\ to\ the\ given\ URI}}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ websocketpp::lib::error\_code\ ec;}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1client_ad9e541a43023d33d5cd5669d62a13edc}{client::connection\_ptr}}\ con\ =\ m\_client.\mbox{\hyperlink{classwebsocketpp_1_1client_aa95cec974921e32bc37a61c683ae240d}{get\_connection}}(uri,\ ec);}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ec)\ \{}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \ \ \ m\_client.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a1d9163813aa02ed32100f443b4ddbd8e}{get\_alog}}().write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_aaf67c94a68502c49308489ff01d8d0a8}{websocketpp::log::alevel::app}},}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Get\ Connection\ Error:\ "{}}+ec.message());}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00048\ }
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Grab\ a\ handle\ for\ this\ connection\ so\ we\ can\ talk\ to\ it\ in\ a\ thread}}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ safe\ manor\ after\ the\ event\ loop\ starts.}}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ m\_hdl\ =\ con-\/>get\_handle();}
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Queue\ the\ connection.\ No\ DNS\ queries\ or\ network\ connections\ will\ be}}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ made\ until\ the\ io\_service\ event\ loop\ is\ run.}}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ m\_client.\mbox{\hyperlink{classwebsocketpp_1_1client_a818c30343180123bf1fee6dc21524bae}{connect}}(con);}
+\DoxyCodeLine{00056\ }
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Create\ a\ thread\ to\ run\ the\ ASIO\ io\_service\ event\ loop}}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ websocketpp::lib::thread\ asio\_thread(\&client::run,\ \&m\_client);}
+\DoxyCodeLine{00059\ }
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Create\ a\ thread\ to\ run\ the\ telemetry\ loop}}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ websocketpp::lib::thread\ telemetry\_thread(\&\mbox{\hyperlink{classtelemetry__client_acc925f9ef40b46fdfb040b9325c67ae2}{telemetry\_client::telemetry\_loop}},\textcolor{keyword}{this});}
+\DoxyCodeLine{00062\ }
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ asio\_thread.join();}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ telemetry\_thread.join();}
+\DoxyCodeLine{00065\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtelemetry__client_aa5765b95b628b04bbe403cf022d0f014_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=258pt]{classtelemetry__client_aa5765b95b628b04bbe403cf022d0f014_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtelemetry__client_acc925f9ef40b46fdfb040b9325c67ae2}\index{telemetry\_client@{telemetry\_client}!telemetry\_loop@{telemetry\_loop}}
+\index{telemetry\_loop@{telemetry\_loop}!telemetry\_client@{telemetry\_client}}
+\doxysubsubsection{\texorpdfstring{telemetry\_loop()}{telemetry\_loop()}}
+{\footnotesize\ttfamily \label{classtelemetry__client_acc925f9ef40b46fdfb040b9325c67ae2} 
+void telemetry\+\_\+client\+::telemetry\+\_\+loop (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{telemetry__client_8cpp_source_l00094}{94}} of file \mbox{\hyperlink{telemetry__client_8cpp_source}{telemetry\+\_\+client.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}\ =\ 0;}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ std::stringstream\ val;}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ websocketpp::lib::error\_code\ ec;}
+\DoxyCodeLine{00098\ }
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}(1)\ \{}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{xbyak__mnemonic_8h_aa3b21853f890838c88d047d6c2786917}{wait}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00101\ }
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classtelemetry__client_ae127291d168fe7b40ebadfcbc09145a7}{scoped\_lock}}\ guard(m\_lock);}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ the\ connection\ has\ been\ closed,\ stop\ generating\ telemetry}}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (m\_done)\ \{\textcolor{keywordflow}{break};\}}
+\DoxyCodeLine{00106\ }
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ the\ connection\ hasn't\ been\ opened\ yet\ wait\ a\ bit\ and\ retry}}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!m\_open)\ \{}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{xbyak__mnemonic_8h_aa3b21853f890838c88d047d6c2786917}{wait}}\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00112\ }
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{xbyak__mnemonic_8h_aa3b21853f890838c88d047d6c2786917}{wait}})\ \{}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sleep(1);}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00117\ }
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ val.str(\textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ \ \ \ val\ <<\ \textcolor{stringliteral}{"{}count\ is\ "{}}\ <<\ \mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}++;}
+\DoxyCodeLine{00120\ }
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \ \ \ \ m\_client.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a1d9163813aa02ed32100f443b4ddbd8e}{get\_alog}}().write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_aaf67c94a68502c49308489ff01d8d0a8}{websocketpp::log::alevel::app}},\ val.str());}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \ \ \ \ m\_client.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a5341f59de7ef1a565a2fd93daba212d5}{send}}(m\_hdl,val.str(),\mbox{\hyperlink{namespacewebsocketpp_1_1frame_1_1opcode_ae68711643096dfc4af6d66ade3f9fd5ea6b65f28626b19b2eef447744c564e727}{websocketpp::frame::opcode::text}},ec);}
+\DoxyCodeLine{00123\ }
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ The\ most\ likely\ error\ that\ we\ will\ get\ is\ that\ the\ connection\ is}}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ not\ in\ the\ right\ state.\ Usually\ this\ means\ we\ tried\ to\ send\ a}}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ message\ to\ a\ connection\ that\ was\ closed\ or\ in\ the\ process\ of}}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ closing.\ While\ many\ errors\ here\ can\ be\ easily\ recovered\ from,}}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ in\ this\ simple\ example,\ we'll\ stop\ the\ telemetry\ loop.}}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ec)\ \{}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_client.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a1d9163813aa02ed32100f443b4ddbd8e}{get\_alog}}().write(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_aaf67c94a68502c49308489ff01d8d0a8}{websocketpp::log::alevel::app}},}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Send\ Error:\ "{}}+ec.message());}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00134\ }
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \ \ \ \ sleep(1);}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00137\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtelemetry__client_acc925f9ef40b46fdfb040b9325c67ae2_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classtelemetry__client_acc925f9ef40b46fdfb040b9325c67ae2_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/vendor/websocketpp/examples/telemetry\+\_\+client/\mbox{\hyperlink{telemetry__client_8cpp}{telemetry\+\_\+client.\+cpp}}\end{DoxyCompactItemize}

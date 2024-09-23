@@ -1,0 +1,335 @@
+\doxysection{websocketpp\+::error Namespace Reference}
+\hypertarget{namespacewebsocketpp_1_1error}{}\label{namespacewebsocketpp_1_1error}\index{websocketpp::error@{websocketpp::error}}
+
+
+Library level error codes.  
+
+
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classwebsocketpp_1_1error_1_1category}{category}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68d}{value}} \{ \newline
+\mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da0cd3808919f43e5fbeee42fbcb808d66}{general}} = 1
+, \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68daebde17ef225c3b7e9638fbd40b13ce91}{send\+\_\+queue\+\_\+full}}
+, \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68daa2abe6fda013270792213b0f0ff8eaaf}{payload\+\_\+violation}}
+, \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68dab60d2206b38a89602d316dd029c33c1b}{endpoint\+\_\+not\+\_\+secure}}
+, \newline
+\mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da472f65367504b2e11e63682cca469be4}{endpoint\+\_\+unavailable}}
+, \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68daf80643edf3b27c30fc83be7b489a418c}{invalid\+\_\+uri}}
+, \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da55cc9da6c40e8dc3f8df1e9e3f7b989f}{no\+\_\+outgoing\+\_\+buffers}}
+, \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da6081f5914dabed34d55d3e12325f329d}{no\+\_\+incoming\+\_\+buffers}}
+, \newline
+\mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da7566c083efb2833cbe99e6f4bda75882}{invalid\+\_\+state}}
+, \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68dad002d8a5b5667c6b117805b368cd7853}{bad\+\_\+close\+\_\+code}}
+, \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da58cb6e9202b34339bf0602c997de4f4c}{reserved\+\_\+close\+\_\+code}}
+, \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68daa864a4ce65c5f0fe910567fe33a984c0}{invalid\+\_\+close\+\_\+code}}
+, \newline
+\mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da942738932384d65a5156ca03863587e1}{invalid\+\_\+utf8}}
+, \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68dabdba1165334e583188795c7fda926dc3}{invalid\+\_\+subprotocol}}
+, \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da9d05e6c7355920beb025ef1034941841}{bad\+\_\+connection}}
+, \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68daee5b74d2be31ca48e104578d6c2b7425}{test}}
+, \newline
+\mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da5e907c1c8fb01b9122f590513916c1e8}{con\+\_\+creation\+\_\+failed}}
+, \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da1c2d766aa9dc1b43d4af8dac9d7de2e0}{unrequested\+\_\+subprotocol}}
+, \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da34e082b99518716e9755d3ac0436ccf3}{client\+\_\+only}}
+, \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68daab6790e91c53a767498f7939e8fc734e}{server\+\_\+only}}
+, \newline
+\mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da378e4b84397008e32d03d0fea4f15326}{http\+\_\+connection\+\_\+ended}}
+, \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68dad2d508dc214d70b4bd6249a85987bfd6}{open\+\_\+handshake\+\_\+timeout}}
+, \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68dabd195839148da73c7dbef46688635f77}{close\+\_\+handshake\+\_\+timeout}}
+, \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da1eec17fbd4329fad248a4688ce736c40}{invalid\+\_\+port}}
+, \newline
+\mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da3a15d734910438b77e8f1919e6dac9e6}{async\+\_\+accept\+\_\+not\+\_\+listening}}
+, \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da3b58b6bfba3dcc3dbdf828c07bb040f4}{operation\+\_\+canceled}}
+, \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da84dc4660cd164a5e27d8c2f816f3593b}{rejected}}
+, \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68dad50a56da7a0355b9075f98c7567523a5}{upgrade\+\_\+required}}
+, \newline
+\mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68daddbb433d0d194d25e7bc72a7611a9e47}{invalid\+\_\+version}}
+, \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da93459fd7c7609d8ebf110bb0f6754073}{unsupported\+\_\+version}}
+, \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da589164fe7382c7355310fc92ff0d53d7}{http\+\_\+parse\+\_\+error}}
+, \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da7ab039563d30f7760c3cd34f1fd680b1}{extension\+\_\+neg\+\_\+failed}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+const lib\+::error\+\_\+category \& \mbox{\hyperlink{namespacewebsocketpp_1_1error_ac1acac2bfb24bbd2b1791db80993b0c2}{get\+\_\+category}} ()
+\item 
+lib\+::error\+\_\+code \mbox{\hyperlink{namespacewebsocketpp_1_1error_a3344622df8c36e8ae03c59164e7b5e89}{make\+\_\+error\+\_\+code}} (\mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68d}{error\+::value}} e)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68d}\index{websocketpp::error@{websocketpp::error}!value@{value}}
+\index{value@{value}!websocketpp::error@{websocketpp::error}}
+\doxysubsubsection{\texorpdfstring{value}{value}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68d} 
+enum \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68d}{websocketpp\+::error\+::value}}}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{general@{general}!websocketpp::error@{websocketpp::error}}\index{websocketpp::error@{websocketpp::error}!general@{general}}}\Hypertarget{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da0cd3808919f43e5fbeee42fbcb808d66}\label{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68d} 
+general&Catch-\/all library error. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{send\_queue\_full@{send\_queue\_full}!websocketpp::error@{websocketpp::error}}\index{websocketpp::error@{websocketpp::error}!send\_queue\_full@{send\_queue\_full}}}\Hypertarget{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68daebde17ef225c3b7e9638fbd40b13ce91}\label{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68d} 
+send\+\_\+queue\+\_\+full&send attempted when endpoint write queue was full \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{payload\_violation@{payload\_violation}!websocketpp::error@{websocketpp::error}}\index{websocketpp::error@{websocketpp::error}!payload\_violation@{payload\_violation}}}\Hypertarget{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68daa2abe6fda013270792213b0f0ff8eaaf}\label{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68d} 
+payload\+\_\+violation&Attempted an operation using a payload that was improperly formatted ex\+: invalid \doxylink{struct_u_t_f8}{UTF8} encoding on a text message. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{endpoint\_not\_secure@{endpoint\_not\_secure}!websocketpp::error@{websocketpp::error}}\index{websocketpp::error@{websocketpp::error}!endpoint\_not\_secure@{endpoint\_not\_secure}}}\Hypertarget{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68dab60d2206b38a89602d316dd029c33c1b}\label{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68d} 
+endpoint\+\_\+not\+\_\+secure&Attempted to open a secure connection with an insecure endpoint. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{endpoint\_unavailable@{endpoint\_unavailable}!websocketpp::error@{websocketpp::error}}\index{websocketpp::error@{websocketpp::error}!endpoint\_unavailable@{endpoint\_unavailable}}}\Hypertarget{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da472f65367504b2e11e63682cca469be4}\label{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68d} 
+endpoint\+\_\+unavailable&Attempted an operation that required an endpoint that is no longer available. This is usually because the endpoint went out of scope before a connection that it created. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{invalid\_uri@{invalid\_uri}!websocketpp::error@{websocketpp::error}}\index{websocketpp::error@{websocketpp::error}!invalid\_uri@{invalid\_uri}}}\Hypertarget{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68daf80643edf3b27c30fc83be7b489a418c}\label{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68d} 
+invalid\+\_\+uri&An invalid uri was supplied. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{no\_outgoing\_buffers@{no\_outgoing\_buffers}!websocketpp::error@{websocketpp::error}}\index{websocketpp::error@{websocketpp::error}!no\_outgoing\_buffers@{no\_outgoing\_buffers}}}\Hypertarget{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da55cc9da6c40e8dc3f8df1e9e3f7b989f}\label{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68d} 
+no\+\_\+outgoing\+\_\+buffers&The endpoint is out of outgoing message buffers. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{no\_incoming\_buffers@{no\_incoming\_buffers}!websocketpp::error@{websocketpp::error}}\index{websocketpp::error@{websocketpp::error}!no\_incoming\_buffers@{no\_incoming\_buffers}}}\Hypertarget{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da6081f5914dabed34d55d3e12325f329d}\label{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68d} 
+no\+\_\+incoming\+\_\+buffers&The endpoint is out of incoming message buffers. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{invalid\_state@{invalid\_state}!websocketpp::error@{websocketpp::error}}\index{websocketpp::error@{websocketpp::error}!invalid\_state@{invalid\_state}}}\Hypertarget{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da7566c083efb2833cbe99e6f4bda75882}\label{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68d} 
+invalid\+\_\+state&The connection was in the wrong state for this operation. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{bad\_close\_code@{bad\_close\_code}!websocketpp::error@{websocketpp::error}}\index{websocketpp::error@{websocketpp::error}!bad\_close\_code@{bad\_close\_code}}}\Hypertarget{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68dad002d8a5b5667c6b117805b368cd7853}\label{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68d} 
+bad\+\_\+close\+\_\+code&Unable to parse close code. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{reserved\_close\_code@{reserved\_close\_code}!websocketpp::error@{websocketpp::error}}\index{websocketpp::error@{websocketpp::error}!reserved\_close\_code@{reserved\_close\_code}}}\Hypertarget{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da58cb6e9202b34339bf0602c997de4f4c}\label{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68d} 
+reserved\+\_\+close\+\_\+code&Close code is in a reserved range. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{invalid\_close\_code@{invalid\_close\_code}!websocketpp::error@{websocketpp::error}}\index{websocketpp::error@{websocketpp::error}!invalid\_close\_code@{invalid\_close\_code}}}\Hypertarget{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68daa864a4ce65c5f0fe910567fe33a984c0}\label{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68d} 
+invalid\+\_\+close\+\_\+code&Close code is invalid. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{invalid\_utf8@{invalid\_utf8}!websocketpp::error@{websocketpp::error}}\index{websocketpp::error@{websocketpp::error}!invalid\_utf8@{invalid\_utf8}}}\Hypertarget{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da942738932384d65a5156ca03863587e1}\label{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68d} 
+invalid\+\_\+utf8&Invalid UTF-\/8. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{invalid\_subprotocol@{invalid\_subprotocol}!websocketpp::error@{websocketpp::error}}\index{websocketpp::error@{websocketpp::error}!invalid\_subprotocol@{invalid\_subprotocol}}}\Hypertarget{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68dabdba1165334e583188795c7fda926dc3}\label{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68d} 
+invalid\+\_\+subprotocol&Invalid subprotocol. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{bad\_connection@{bad\_connection}!websocketpp::error@{websocketpp::error}}\index{websocketpp::error@{websocketpp::error}!bad\_connection@{bad\_connection}}}\Hypertarget{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da9d05e6c7355920beb025ef1034941841}\label{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68d} 
+bad\+\_\+connection&An operation was attempted on a connection that did not exist or was already deleted. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{test@{test}!websocketpp::error@{websocketpp::error}}\index{websocketpp::error@{websocketpp::error}!test@{test}}}\Hypertarget{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68daee5b74d2be31ca48e104578d6c2b7425}\label{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68d} 
+test&Unit testing utility error code. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{con\_creation\_failed@{con\_creation\_failed}!websocketpp::error@{websocketpp::error}}\index{websocketpp::error@{websocketpp::error}!con\_creation\_failed@{con\_creation\_failed}}}\Hypertarget{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da5e907c1c8fb01b9122f590513916c1e8}\label{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68d} 
+con\+\_\+creation\+\_\+failed&Connection creation attempted failed. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{unrequested\_subprotocol@{unrequested\_subprotocol}!websocketpp::error@{websocketpp::error}}\index{websocketpp::error@{websocketpp::error}!unrequested\_subprotocol@{unrequested\_subprotocol}}}\Hypertarget{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da1c2d766aa9dc1b43d4af8dac9d7de2e0}\label{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68d} 
+unrequested\+\_\+subprotocol&Selected subprotocol was not requested by the client. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{client\_only@{client\_only}!websocketpp::error@{websocketpp::error}}\index{websocketpp::error@{websocketpp::error}!client\_only@{client\_only}}}\Hypertarget{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da34e082b99518716e9755d3ac0436ccf3}\label{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68d} 
+client\+\_\+only&Attempted to use a client specific feature on a server endpoint. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{server\_only@{server\_only}!websocketpp::error@{websocketpp::error}}\index{websocketpp::error@{websocketpp::error}!server\_only@{server\_only}}}\Hypertarget{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68daab6790e91c53a767498f7939e8fc734e}\label{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68d} 
+server\+\_\+only&Attempted to use a server specific feature on a client endpoint. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{http\_connection\_ended@{http\_connection\_ended}!websocketpp::error@{websocketpp::error}}\index{websocketpp::error@{websocketpp::error}!http\_connection\_ended@{http\_connection\_ended}}}\Hypertarget{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da378e4b84397008e32d03d0fea4f15326}\label{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68d} 
+http\+\_\+connection\+\_\+ended&HTTP connection ended. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{open\_handshake\_timeout@{open\_handshake\_timeout}!websocketpp::error@{websocketpp::error}}\index{websocketpp::error@{websocketpp::error}!open\_handshake\_timeout@{open\_handshake\_timeout}}}\Hypertarget{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68dad2d508dc214d70b4bd6249a85987bfd6}\label{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68d} 
+open\+\_\+handshake\+\_\+timeout&Web\+Socket opening handshake timed out. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{close\_handshake\_timeout@{close\_handshake\_timeout}!websocketpp::error@{websocketpp::error}}\index{websocketpp::error@{websocketpp::error}!close\_handshake\_timeout@{close\_handshake\_timeout}}}\Hypertarget{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68dabd195839148da73c7dbef46688635f77}\label{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68d} 
+close\+\_\+handshake\+\_\+timeout&Web\+Socket close handshake timed out. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{invalid\_port@{invalid\_port}!websocketpp::error@{websocketpp::error}}\index{websocketpp::error@{websocketpp::error}!invalid\_port@{invalid\_port}}}\Hypertarget{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da1eec17fbd4329fad248a4688ce736c40}\label{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68d} 
+invalid\+\_\+port&Invalid port in URI. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{async\_accept\_not\_listening@{async\_accept\_not\_listening}!websocketpp::error@{websocketpp::error}}\index{websocketpp::error@{websocketpp::error}!async\_accept\_not\_listening@{async\_accept\_not\_listening}}}\Hypertarget{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da3a15d734910438b77e8f1919e6dac9e6}\label{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68d} 
+async\+\_\+accept\+\_\+not\+\_\+listening&An async accept operation failed because the underlying transport has been requested to not listen for new connections anymore. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{operation\_canceled@{operation\_canceled}!websocketpp::error@{websocketpp::error}}\index{websocketpp::error@{websocketpp::error}!operation\_canceled@{operation\_canceled}}}\Hypertarget{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da3b58b6bfba3dcc3dbdf828c07bb040f4}\label{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68d} 
+operation\+\_\+canceled&The requested operation was canceled. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{rejected@{rejected}!websocketpp::error@{websocketpp::error}}\index{websocketpp::error@{websocketpp::error}!rejected@{rejected}}}\Hypertarget{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da84dc4660cd164a5e27d8c2f816f3593b}\label{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68d} 
+rejected&Connection rejected. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{upgrade\_required@{upgrade\_required}!websocketpp::error@{websocketpp::error}}\index{websocketpp::error@{websocketpp::error}!upgrade\_required@{upgrade\_required}}}\Hypertarget{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68dad50a56da7a0355b9075f98c7567523a5}\label{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68d} 
+upgrade\+\_\+required&Upgrade Required. This happens if an HTTP request is made to a Web\+Socket++ server that doesn\textquotesingle{}t implement an http handler \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{invalid\_version@{invalid\_version}!websocketpp::error@{websocketpp::error}}\index{websocketpp::error@{websocketpp::error}!invalid\_version@{invalid\_version}}}\Hypertarget{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68daddbb433d0d194d25e7bc72a7611a9e47}\label{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68d} 
+invalid\+\_\+version&Invalid Web\+Socket protocol version. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{unsupported\_version@{unsupported\_version}!websocketpp::error@{websocketpp::error}}\index{websocketpp::error@{websocketpp::error}!unsupported\_version@{unsupported\_version}}}\Hypertarget{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da93459fd7c7609d8ebf110bb0f6754073}\label{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68d} 
+unsupported\+\_\+version&Unsupported Web\+Socket protocol version. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{http\_parse\_error@{http\_parse\_error}!websocketpp::error@{websocketpp::error}}\index{websocketpp::error@{websocketpp::error}!http\_parse\_error@{http\_parse\_error}}}\Hypertarget{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da589164fe7382c7355310fc92ff0d53d7}\label{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68d} 
+http\+\_\+parse\+\_\+error&HTTP parse error. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{extension\_neg\_failed@{extension\_neg\_failed}!websocketpp::error@{websocketpp::error}}\index{websocketpp::error@{websocketpp::error}!extension\_neg\_failed@{extension\_neg\_failed}}}\Hypertarget{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da7ab039563d30f7760c3cd34f1fd680b1}\label{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68d} 
+extension\+\_\+neg\+\_\+failed&Extension negotiation failed. \\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{error_8hpp_source_l00045}{45}} of file \mbox{\hyperlink{error_8hpp_source}{error.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00047\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da0cd3808919f43e5fbeee42fbcb808d66}{general}}\ =\ 1,}
+\DoxyCodeLine{00048\ }
+\DoxyCodeLine{00050\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68daebde17ef225c3b7e9638fbd40b13ce91}{send\_queue\_full}},}
+\DoxyCodeLine{00051\ }
+\DoxyCodeLine{00054\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68daa2abe6fda013270792213b0f0ff8eaaf}{payload\_violation}},}
+\DoxyCodeLine{00055\ }
+\DoxyCodeLine{00057\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68dab60d2206b38a89602d316dd029c33c1b}{endpoint\_not\_secure}},}
+\DoxyCodeLine{00058\ }
+\DoxyCodeLine{00062\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da472f65367504b2e11e63682cca469be4}{endpoint\_unavailable}},}
+\DoxyCodeLine{00063\ }
+\DoxyCodeLine{00065\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68daf80643edf3b27c30fc83be7b489a418c}{invalid\_uri}},}
+\DoxyCodeLine{00066\ }
+\DoxyCodeLine{00068\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da55cc9da6c40e8dc3f8df1e9e3f7b989f}{no\_outgoing\_buffers}},}
+\DoxyCodeLine{00069\ }
+\DoxyCodeLine{00071\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da6081f5914dabed34d55d3e12325f329d}{no\_incoming\_buffers}},}
+\DoxyCodeLine{00072\ }
+\DoxyCodeLine{00074\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da7566c083efb2833cbe99e6f4bda75882}{invalid\_state}},}
+\DoxyCodeLine{00075\ }
+\DoxyCodeLine{00077\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68dad002d8a5b5667c6b117805b368cd7853}{bad\_close\_code}},}
+\DoxyCodeLine{00078\ }
+\DoxyCodeLine{00080\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da58cb6e9202b34339bf0602c997de4f4c}{reserved\_close\_code}},}
+\DoxyCodeLine{00081\ }
+\DoxyCodeLine{00083\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68daa864a4ce65c5f0fe910567fe33a984c0}{invalid\_close\_code}},}
+\DoxyCodeLine{00084\ }
+\DoxyCodeLine{00086\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da942738932384d65a5156ca03863587e1}{invalid\_utf8}},}
+\DoxyCodeLine{00087\ }
+\DoxyCodeLine{00089\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68dabdba1165334e583188795c7fda926dc3}{invalid\_subprotocol}},}
+\DoxyCodeLine{00090\ }
+\DoxyCodeLine{00093\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da9d05e6c7355920beb025ef1034941841}{bad\_connection}},}
+\DoxyCodeLine{00094\ }
+\DoxyCodeLine{00096\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68daee5b74d2be31ca48e104578d6c2b7425}{test}},}
+\DoxyCodeLine{00097\ }
+\DoxyCodeLine{00099\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da5e907c1c8fb01b9122f590513916c1e8}{con\_creation\_failed}},}
+\DoxyCodeLine{00100\ }
+\DoxyCodeLine{00102\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da1c2d766aa9dc1b43d4af8dac9d7de2e0}{unrequested\_subprotocol}},}
+\DoxyCodeLine{00103\ }
+\DoxyCodeLine{00105\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da34e082b99518716e9755d3ac0436ccf3}{client\_only}},}
+\DoxyCodeLine{00106\ }
+\DoxyCodeLine{00108\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68daab6790e91c53a767498f7939e8fc734e}{server\_only}},}
+\DoxyCodeLine{00109\ }
+\DoxyCodeLine{00111\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da378e4b84397008e32d03d0fea4f15326}{http\_connection\_ended}},}
+\DoxyCodeLine{00112\ }
+\DoxyCodeLine{00114\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68dad2d508dc214d70b4bd6249a85987bfd6}{open\_handshake\_timeout}},}
+\DoxyCodeLine{00115\ }
+\DoxyCodeLine{00117\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68dabd195839148da73c7dbef46688635f77}{close\_handshake\_timeout}},}
+\DoxyCodeLine{00118\ }
+\DoxyCodeLine{00120\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da1eec17fbd4329fad248a4688ce736c40}{invalid\_port}},}
+\DoxyCodeLine{00121\ }
+\DoxyCodeLine{00124\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da3a15d734910438b77e8f1919e6dac9e6}{async\_accept\_not\_listening}},}
+\DoxyCodeLine{00125\ }
+\DoxyCodeLine{00127\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da3b58b6bfba3dcc3dbdf828c07bb040f4}{operation\_canceled}},}
+\DoxyCodeLine{00128\ }
+\DoxyCodeLine{00130\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da84dc4660cd164a5e27d8c2f816f3593b}{rejected}},}
+\DoxyCodeLine{00131\ }
+\DoxyCodeLine{00134\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68dad50a56da7a0355b9075f98c7567523a5}{upgrade\_required}},}
+\DoxyCodeLine{00135\ }
+\DoxyCodeLine{00137\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68daddbb433d0d194d25e7bc72a7611a9e47}{invalid\_version}},}
+\DoxyCodeLine{00138\ }
+\DoxyCodeLine{00140\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da93459fd7c7609d8ebf110bb0f6754073}{unsupported\_version}},}
+\DoxyCodeLine{00141\ }
+\DoxyCodeLine{00143\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da589164fe7382c7355310fc92ff0d53d7}{http\_parse\_error}},}
+\DoxyCodeLine{00144\ \ \ \ \ }
+\DoxyCodeLine{00146\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68da7ab039563d30f7760c3cd34f1fd680b1}{extension\_neg\_failed}}}
+\DoxyCodeLine{00147\ \};\ \textcolor{comment}{//\ enum\ value}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacewebsocketpp_1_1error_ac1acac2bfb24bbd2b1791db80993b0c2}\index{websocketpp::error@{websocketpp::error}!get\_category@{get\_category}}
+\index{get\_category@{get\_category}!websocketpp::error@{websocketpp::error}}
+\doxysubsubsection{\texorpdfstring{get\_category()}{get\_category()}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1error_ac1acac2bfb24bbd2b1791db80993b0c2} 
+const lib\+::error\+\_\+category \& websocketpp\+::error\+::get\+\_\+category (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{error_8hpp_source_l00230}{230}} of file \mbox{\hyperlink{error_8hpp_source}{error.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00230\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00231\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classwebsocketpp_1_1error_1_1category}{category}}\ instance;}
+\DoxyCodeLine{00232\ \ \ \ \ \textcolor{keywordflow}{return}\ instance;}
+\DoxyCodeLine{00233\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{namespacewebsocketpp_1_1error_ac1acac2bfb24bbd2b1791db80993b0c2_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacewebsocketpp_1_1error_a3344622df8c36e8ae03c59164e7b5e89}\index{websocketpp::error@{websocketpp::error}!make\_error\_code@{make\_error\_code}}
+\index{make\_error\_code@{make\_error\_code}!websocketpp::error@{websocketpp::error}}
+\doxysubsubsection{\texorpdfstring{make\_error\_code()}{make\_error\_code()}}
+{\footnotesize\ttfamily \label{namespacewebsocketpp_1_1error_a3344622df8c36e8ae03c59164e7b5e89} 
+lib\+::error\+\_\+code websocketpp\+::error\+::make\+\_\+error\+\_\+code (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68d}{error\+::value}}}]{e}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{error_8hpp_source_l00235}{235}} of file \mbox{\hyperlink{error_8hpp_source}{error.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00236\ \ \ \ \ \textcolor{keywordflow}{return}\ lib::error\_code(\textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{int}\textcolor{keyword}{>}(e),\ \mbox{\hyperlink{namespacewebsocketpp_1_1error_ac1acac2bfb24bbd2b1791db80993b0c2}{get\_category}}());}
+\DoxyCodeLine{00237\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=315pt]{namespacewebsocketpp_1_1error_a3344622df8c36e8ae03c59164e7b5e89_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{namespacewebsocketpp_1_1error_a3344622df8c36e8ae03c59164e7b5e89_icgraph}
+\end{center}
+\end{figure}

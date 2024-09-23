@@ -1,0 +1,69 @@
+\doxysection{110-\/Fix-\/\+Class\+Fixture.cpp}
+\hypertarget{110-_fix-_class_fixture_8cpp_source}{}\label{110-_fix-_class_fixture_8cpp_source}\index{libraries/sys-\/vm/external/Catch2/examples/110-\/Fix-\/ClassFixture.cpp@{libraries/sys-\/vm/external/Catch2/examples/110-\/Fix-\/ClassFixture.cpp}}
+\mbox{\hyperlink{110-_fix-_class_fixture_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00001}00001\ \textcolor{comment}{//\ 110-\/Fix-\/ClassFixture.cpp}}
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00003}00003\ \textcolor{comment}{//\ Catch\ has\ two\ ways\ to\ express\ fixtures:}}
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00004}00004\ \textcolor{comment}{//\ -\/\ Sections}}
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00005}00005\ \textcolor{comment}{//\ -\/\ Traditional\ class-\/based\ fixtures\ (this\ file)}}
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00007}00007\ \textcolor{comment}{//\ main()\ provided\ in\ 000-\/CatchMain.cpp}}
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{single__include_2catch2_2catch_8hpp}{catch2/catch.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00011}\mbox{\hyperlink{class_d_b_connection}{00011}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_d_b_connection}{DBConnection}}}
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00012}00012\ \{}
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00013}00013\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00014}\mbox{\hyperlink{class_d_b_connection_a39977c08d5ef2abb24d6f3d9e6d3d12d}{00014}}\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{class_d_b_connection}{DBConnection}}\ \mbox{\hyperlink{class_d_b_connection_a39977c08d5ef2abb24d6f3d9e6d3d12d}{createConnection}}(\ std::string\ \textcolor{keyword}{const}\ \&\ \textcolor{comment}{/*dbName*/}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00015}00015\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_d_b_connection}{DBConnection}}();}
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00016}00016\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00018}\mbox{\hyperlink{class_d_b_connection_a59666c3e7dcb888c2460e5ecde1e8bcb}{00018}}\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_d_b_connection_a59666c3e7dcb888c2460e5ecde1e8bcb}{executeSQL}}(\ std::string\ \textcolor{keyword}{const}\ \&\ \textcolor{comment}{/*query*/},\ \textcolor{keywordtype}{int}\ \textcolor{keyword}{const}\ \textcolor{comment}{/*id*/},\ std::string\ \textcolor{keyword}{const}\ \&\ arg\ )\ \{}
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00019}00019\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ arg.length()\ ==\ 0\ )\ \{}
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00020}00020\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::logic\_error(\textcolor{stringliteral}{"{}empty\ SQL\ query\ argument"{}});}
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00021}00021\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00022}00022\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \textcolor{comment}{//\ ok}}
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00023}00023\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00024}00024\ \};}
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00026}\mbox{\hyperlink{class_unique_tests_fixture}{00026}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_unique_tests_fixture}{UniqueTestsFixture}}}
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00027}00027\ \{}
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00028}00028\ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00029}\mbox{\hyperlink{class_unique_tests_fixture_a7769fdf9704ce07346805bcce2f4edd3}{00029}}\ \ \ \ \ \mbox{\hyperlink{class_unique_tests_fixture_a7769fdf9704ce07346805bcce2f4edd3}{UniqueTestsFixture}}()}
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00030}00030\ \ \ \ \ :\ \mbox{\hyperlink{class_unique_tests_fixture_af0b83657315f31035cc886b245dd9542}{conn}}(\ \mbox{\hyperlink{class_d_b_connection}{DBConnection}}::createConnection(\ \textcolor{stringliteral}{"{}myDB"{}}\ )\ )}
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00031}00031\ \ \ \ \ \{\}}
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00033}\mbox{\hyperlink{class_unique_tests_fixture_a568a055498dd4bc33cb677cb5a4554ac}{00033}}\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{class_unique_tests_fixture_a568a055498dd4bc33cb677cb5a4554ac}{getID}}()\ \{}
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00034}00034\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ++uniqueID;}
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00035}00035\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00037}00037\ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00038}\mbox{\hyperlink{class_unique_tests_fixture_af0b83657315f31035cc886b245dd9542}{00038}}\ \ \ \ \ \mbox{\hyperlink{class_d_b_connection}{DBConnection}}\ \mbox{\hyperlink{class_unique_tests_fixture_af0b83657315f31035cc886b245dd9542}{conn}};}
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00040}00040\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00041}00041\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ uniqueID;}
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00042}00042\ \};}
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00044}00044\ \textcolor{keywordtype}{int}\ UniqueTestsFixture::uniqueID\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00046}\mbox{\hyperlink{110-_fix-_class_fixture_8cpp_ac298230ebdc08f7e595c8fdb674dceb2}{00046}}\ \mbox{\hyperlink{include_2catch_8hpp_adf06142f54a9e271590fa0e270bc41d2}{TEST\_CASE\_METHOD}}(\ \mbox{\hyperlink{class_unique_tests_fixture}{UniqueTestsFixture}},\ \textcolor{stringliteral}{"{}Create\ Employee/No\ Name"{}},\ \textcolor{stringliteral}{"{}[create]"{}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00047}00047\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ae3c33faa1d31a2bb0811dac74b994e3e}{REQUIRE\_THROWS}}(\ conn.executeSQL(\ \textcolor{stringliteral}{"{}INSERT\ INTO\ employee\ (id,\ name)\ VALUES\ (?,\ ?)"{}},\ getID(),\ \textcolor{stringliteral}{"{}"{}})\ );}
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00048}00048\ \}}
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00050}\mbox{\hyperlink{110-_fix-_class_fixture_8cpp_a183479b94806e65e39a9c0c3f57776ab}{00050}}\ \mbox{\hyperlink{include_2catch_8hpp_adf06142f54a9e271590fa0e270bc41d2}{TEST\_CASE\_METHOD}}(\ \mbox{\hyperlink{class_unique_tests_fixture}{UniqueTestsFixture}},\ \textcolor{stringliteral}{"{}Create\ Employee/Normal"{}},\ \textcolor{stringliteral}{"{}[create]"{}}\ )\ \{}
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00051}00051\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ conn.executeSQL(\ \textcolor{stringliteral}{"{}INSERT\ INTO\ employee\ (id,\ name)\ VALUES\ (?,\ ?)"{}},\ getID(),\ \textcolor{stringliteral}{"{}Joe\ Bloggs"{}}\ )\ );}
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00052}00052\ \}}
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00054}00054\ \textcolor{comment}{//\ Compile\ \&\ run:}}
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00055}00055\ \textcolor{comment}{//\ -\/\ g++\ -\/std=c++11\ -\/Wall\ -\/I\$(CATCH\_SINGLE\_INCLUDE)\ -\/o\ 110-\/Fix-\/ClassFixture\ 110-\/Fix-\/ClassFixture.cpp\ 000-\/CatchMain.o\ \&\&\ 110-\/Fix-\/ClassFixture\ -\/-\/success}}
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00056}00056\ \textcolor{comment}{//\ -\/\ cl\ -\/EHsc\ -\/I\%CATCH\_SINGLE\_INCLUDE\%\ 110-\/Fix-\/ClassFixture.cpp\ 000-\/CatchMain.obj\ \&\&\ 110-\/Fix-\/ClassFixture\ -\/-\/success}}
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00058}00058\ \textcolor{comment}{//\ Expected\ compact\ output\ (all\ assertions):}}
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00059}00059\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00060}00060\ \textcolor{comment}{//\ prompt>\ 110-\/Fix-\/ClassFixture.exe\ -\/-\/reporter\ compact\ -\/-\/success}}
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00061}00061\ \textcolor{comment}{//\ 110-\/Fix-\/ClassFixture.cpp:47:\ passed:\ conn.executeSQL(\ "{}INSERT\ INTO\ employee\ (id,\ name)\ VALUES\ (?,\ ?)"{},\ getID(),\ "{}"{})}}
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00062}00062\ \textcolor{comment}{//\ 110-\/Fix-\/ClassFixture.cpp:51:\ passed:\ conn.executeSQL(\ "{}INSERT\ INTO\ employee\ (id,\ name)\ VALUES\ (?,\ ?)"{},\ getID(),\ "{}Joe\ Bloggs"{}\ )\ for:\ true}}
+\DoxyCodeLine{\Hypertarget{110-_fix-_class_fixture_8cpp_source_l00063}00063\ \textcolor{comment}{//\ Passed\ both\ 2\ test\ cases\ with\ 2\ assertions.}}
+
+\end{DoxyCode}

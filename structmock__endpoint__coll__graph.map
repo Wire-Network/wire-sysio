@@ -1,0 +1,11 @@
+<map id="mock_endpoint" name="mock_endpoint">
+<area shape="rect" id="Node000001" title=" " alt="" coords="185,199,294,225"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1transport_1_1asio_1_1endpoint.html" title="Asio based endpoint transport component." alt="" coords="5,80,175,121"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="131,128,224,196,221,201,128,133"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="22,5,158,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="93,47,93,80,87,80,87,47"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="198,88,280,114"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="242,129,242,199,237,199,237,129"/>
+<area shape="rect" id="Node000005" href="$classwebsocketpp_1_1log_1_1stub.html" title="Stub logger that ignores all input." alt="" coords="305,88,462,114"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="357,125,289,177,257,201,254,196,286,173,354,121"/>
+</map>

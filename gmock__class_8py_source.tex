@@ -1,0 +1,233 @@
+\doxysection{gmock\+\_\+class.\+py}
+\hypertarget{gmock__class_8py_source}{}\label{gmock__class_8py_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googlemock/scripts/generator/cpp/gmock\_class.py@{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googlemock/scripts/generator/cpp/gmock\_class.py}}
+\mbox{\hyperlink{gmock__class_8py}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00001}\mbox{\hyperlink{namespacecpp_1_1gmock__class}{00001}}\ \textcolor{comment}{\#!/usr/bin/env\ python}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00002}00002\ \textcolor{comment}{\#}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00003}00003\ \textcolor{comment}{\#\ Copyright\ 2008\ Google\ Inc.\ \ All\ Rights\ Reserved.}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00004}00004\ \textcolor{comment}{\#}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00005}00005\ \textcolor{comment}{\#\ Licensed\ under\ the\ Apache\ License,\ Version\ 2.0\ (the\ "{}License"{});}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00006}00006\ \textcolor{comment}{\#\ you\ may\ not\ use\ this\ file\ except\ in\ compliance\ with\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00007}00007\ \textcolor{comment}{\#\ You\ may\ obtain\ a\ copy\ of\ the\ License\ at}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00008}00008\ \textcolor{comment}{\#}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00009}00009\ \textcolor{comment}{\#\ \ \ \ \ \ http://www.apache.org/licenses/LICENSE-\/2.0}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00010}00010\ \textcolor{comment}{\#}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00011}00011\ \textcolor{comment}{\#\ Unless\ required\ by\ applicable\ law\ or\ agreed\ to\ in\ writing,\ software}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00012}00012\ \textcolor{comment}{\#\ distributed\ under\ the\ License\ is\ distributed\ on\ an\ "{}AS\ IS"{}\ BASIS,}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00013}00013\ \textcolor{comment}{\#\ WITHOUT\ WARRANTIES\ OR\ CONDITIONS\ OF\ ANY\ KIND,\ either\ express\ or\ implied.}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00014}00014\ \textcolor{comment}{\#\ See\ the\ License\ for\ the\ specific\ language\ governing\ permissions\ and}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00015}00015\ \textcolor{comment}{\#\ limitations\ under\ the\ License.}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00017}00017\ \textcolor{stringliteral}{"{}"{}"{}Generate\ Google\ Mock\ classes\ from\ base\ classes.}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00018}00018\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00019}00019\ \textcolor{stringliteral}{This\ program\ will\ read\ in\ a\ C++\ source\ file\ and\ output\ the\ Google\ Mock}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00020}00020\ \textcolor{stringliteral}{classes\ for\ the\ specified\ classes.\ \ If\ no\ class\ is\ specified,\ all}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00021}00021\ \textcolor{stringliteral}{classes\ in\ the\ source\ file\ are\ emitted.}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00022}00022\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00023}00023\ \textcolor{stringliteral}{Usage:}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00024}00024\ \textcolor{stringliteral}{\ \ gmock\_class.py\ header-\/file.h\ [ClassName]...}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00025}00025\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00026}00026\ \textcolor{stringliteral}{Output\ is\ sent\ to\ stdout.}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00027}00027\ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00029}00029\ \_\_author\_\_\ =\ \textcolor{stringliteral}{'nnorwitz@google.com\ (Neal\ Norwitz)'}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00032}00032\ \textcolor{keyword}{import}\ os}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00033}00033\ \textcolor{keyword}{import}\ re}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00034}00034\ \textcolor{keyword}{import}\ sys}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00036}00036\ \textcolor{keyword}{from}\ cpp\ \textcolor{keyword}{import}\ ast}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00037}00037\ \textcolor{keyword}{from}\ cpp\ \textcolor{keyword}{import}\ utils}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00039}00039\ \textcolor{comment}{\#\ Preserve\ compatibility\ with\ Python\ 2.3.}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00040}00040\ \textcolor{keywordflow}{try}:}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00041}\mbox{\hyperlink{namespacecpp_1_1gmock__class_ab4128a969856897356b7956c5ba4fc01}{00041}}\ \ \ \_dummy\ =\ set}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00042}00042\ \textcolor{keywordflow}{except}\ NameError:}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00043}00043\ \ \ \textcolor{keyword}{import}\ sets}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00044}\mbox{\hyperlink{namespacecpp_1_1gmock__class_a2157e96eee0b4bf9ca6d195ab76f59c2}{00044}}\ \ \ set\ =\ sets.Set}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00046}\mbox{\hyperlink{namespacecpp_1_1gmock__class_ae5d7185c5f485142460e91de1394283c}{00046}}\ \_VERSION\ =\ (1,\ 0,\ 1)\ \ \textcolor{comment}{\#\ The\ version\ of\ this\ script.}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00047}00047\ \textcolor{comment}{\#\ How\ many\ spaces\ to\ indent.\ \ Can\ set\ me\ with\ the\ INDENT\ environment\ variable.}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00048}\mbox{\hyperlink{namespacecpp_1_1gmock__class_aa09d38d618dd2e76366852c660a832e8}{00048}}\ \_INDENT\ =\ 2}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00051}\mbox{\hyperlink{namespacecpp_1_1gmock__class_ab7951ac071cce54c62f7eca4262820a1}{00051}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacecpp_1_1gmock__class_ab7951ac071cce54c62f7eca4262820a1}{\_GenerateMethods}}(output\_lines,\ source,\ class\_node):}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00052}00052\ \ \ function\_type\ =\ (ast.FUNCTION\_VIRTUAL\ |\ ast.FUNCTION\_PURE\_VIRTUAL\ |}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ast.FUNCTION\_OVERRIDE)}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00054}00054\ \ \ ctor\_or\_dtor\ =\ ast.FUNCTION\_CTOR\ |\ ast.FUNCTION\_DTOR}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00055}00055\ \ \ indent\ =\ \textcolor{stringliteral}{'\ '}\ *\ \_INDENT}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00057}00057\ \ \ \textcolor{keywordflow}{for}\ node\ \textcolor{keywordflow}{in}\ class\_node.body:}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00058}00058\ \ \ \ \ \textcolor{comment}{\#\ We\ only\ care\ about\ virtual\ functions.}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00059}00059\ \ \ \ \ \textcolor{keywordflow}{if}\ (isinstance(node,\ \mbox{\hyperlink{classcpp_1_1ast_1_1_function}{ast.Function}})\ \textcolor{keywordflow}{and}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00060}00060\ \ \ \ \ \ \ \ \ node.modifiers\ \&\ function\_type\ \textcolor{keywordflow}{and}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00061}00061\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{not}\ node.modifiers\ \&\ ctor\_or\_dtor):}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00062}00062\ \ \ \ \ \ \ \textcolor{comment}{\#\ Pick\ out\ all\ the\ elements\ we\ need\ from\ the\ original\ function.}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00063}00063\ \ \ \ \ \ \ const\ =\ \textcolor{stringliteral}{''}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00064}00064\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ node.modifiers\ \&\ ast.FUNCTION\_CONST:}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00065}00065\ \ \ \ \ \ \ \ \ const\ =\ \textcolor{stringliteral}{'CONST\_'}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00066}00066\ \ \ \ \ \ \ return\_type\ =\ \textcolor{stringliteral}{'void'}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00067}00067\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ node.return\_type:}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00068}00068\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Add\ modifiers\ like\ 'const'.}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00069}00069\ \ \ \ \ \ \ \ \ modifiers\ =\ \textcolor{stringliteral}{''}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00070}00070\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ node.return\_type.modifiers:}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00071}00071\ \ \ \ \ \ \ \ \ \ \ modifiers\ =\ \textcolor{stringliteral}{'\ '}.join(node.return\_type.modifiers)\ +\ \textcolor{stringliteral}{'\ '}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00072}00072\ \ \ \ \ \ \ \ \ return\_type\ =\ modifiers\ +\ node.return\_type.name}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00073}00073\ \ \ \ \ \ \ \ \ template\_args\ =\ [arg.name\ \textcolor{keywordflow}{for}\ arg\ \textcolor{keywordflow}{in}\ node.return\_type.templated\_types]}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00074}00074\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ template\_args:}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00075}00075\ \ \ \ \ \ \ \ \ \ \ return\_type\ +=\ \textcolor{stringliteral}{'<'}\ +\ \textcolor{stringliteral}{',\ '}.join(template\_args)\ +\ \textcolor{stringliteral}{'>'}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}(template\_args)\ >\ 1:}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ line\ \textcolor{keywordflow}{in}\ [}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00078}00078\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'//\ The\ following\ line\ won\(\backslash\)'t\ really\ compile,\ as\ the\ return'},}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'//\ type\ has\ multiple\ template\ arguments.\ \ To\ fix\ it,\ use\ a'},}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00080}00080\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'//\ typedef\ for\ the\ return\ type.'}]:}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00081}00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ output\_lines.append(indent\ +\ line)}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00082}00082\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ node.return\_type.pointer:}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00083}00083\ \ \ \ \ \ \ \ \ \ \ return\_type\ +=\ \textcolor{stringliteral}{'*'}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00084}00084\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ node.return\_type.reference:}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00085}00085\ \ \ \ \ \ \ \ \ \ \ return\_type\ +=\ \textcolor{stringliteral}{'\&'}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00086}00086\ \ \ \ \ \ \ \ \ num\_parameters\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}(node.parameters)}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00087}00087\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}(node.parameters)\ ==\ 1:}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00088}00088\ \ \ \ \ \ \ \ \ \ \ first\_param\ =\ node.parameters[0]}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00089}00089\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ source[first\_param.start:first\_param.end].strip()\ ==\ \textcolor{stringliteral}{'void'}:}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00090}00090\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ We\ must\ treat\ T(void)\ as\ a\ function\ with\ no\ parameters.}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00091}00091\ \ \ \ \ \ \ \ \ \ \ \ \ num\_parameters\ =\ 0}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00092}00092\ \ \ \ \ \ \ tmpl\ =\ \textcolor{stringliteral}{''}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00093}00093\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ class\_node.templated\_types:}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00094}00094\ \ \ \ \ \ \ \ \ tmpl\ =\ \textcolor{stringliteral}{'\_T'}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00095}00095\ \ \ \ \ \ \ mock\_method\_macro\ =\ \textcolor{stringliteral}{'MOCK\_\%sMETHOD\%d\%s'}\ \%\ (const,\ num\_parameters,\ tmpl)}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00096}00096\ }
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00097}00097\ \ \ \ \ \ \ args\ =\ \textcolor{stringliteral}{''}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00098}00098\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ node.parameters:}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00099}00099\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Due\ to\ the\ parser\ limitations,\ it\ is\ impossible\ to\ keep\ comments}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00100}00100\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ while\ stripping\ the\ default\ parameters.\ \ When\ defaults\ are}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00101}00101\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ present,\ we\ choose\ to\ strip\ them\ and\ comments\ (and\ produce}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00102}00102\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ compilable\ code).}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00103}00103\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ TODO(nnorwitz@google.com):\ Investigate\ whether\ it\ is\ possible\ to}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00104}00104\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ preserve\ parameter\ name\ when\ reconstructing\ parameter\ text\ from}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00105}00105\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ the\ AST.}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00106}00106\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}([param\ \textcolor{keywordflow}{for}\ param\ \textcolor{keywordflow}{in}\ node.parameters\ \textcolor{keywordflow}{if}\ param.default])\ >\ 0:}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00107}00107\ \ \ \ \ \ \ \ \ \ \ args\ =\ \textcolor{stringliteral}{',\ '}.join(param.type.name\ \textcolor{keywordflow}{for}\ param\ \textcolor{keywordflow}{in}\ node.parameters)}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00108}00108\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00109}00109\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Get\ the\ full\ text\ of\ the\ parameters\ from\ the\ start}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00110}00110\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ of\ the\ first\ parameter\ to\ the\ end\ of\ the\ last\ parameter.}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00111}00111\ \ \ \ \ \ \ \ \ \ \ start\ =\ node.parameters[0].start}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00112}00112\ \ \ \ \ \ \ \ \ \ \ end\ =\ node.parameters[-\/1].end}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00113}00113\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Remove\ //\ comments.}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00114}00114\ \ \ \ \ \ \ \ \ \ \ args\_strings\ =\ re.sub(\textcolor{stringliteral}{r'//.*'},\ \textcolor{stringliteral}{''},\ source[start:end])}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00115}00115\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Condense\ multiple\ spaces\ and\ eliminate\ newlines\ putting\ the}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00116}00116\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ parameters\ together\ on\ a\ single\ line.\ \ Ensure\ there\ is\ a}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00117}00117\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ space\ in\ an\ argument\ which\ is\ split\ by\ a\ newline\ without}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00118}00118\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ intervening\ whitespace,\ e.g.:\ int\(\backslash\)nBar}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00119}00119\ \ \ \ \ \ \ \ \ \ \ args\ =\ re.sub(\textcolor{stringliteral}{'\ \ +'},\ \textcolor{stringliteral}{'\ '},\ args\_strings.replace(\textcolor{stringliteral}{'\(\backslash\)n'},\ \textcolor{stringliteral}{'\ '}))}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00120}00120\ }
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00121}00121\ \ \ \ \ \ \ \textcolor{comment}{\#\ Create\ the\ mock\ method\ definition.}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00122}00122\ \ \ \ \ \ \ output\_lines.extend([\textcolor{stringliteral}{'\%s\%s(\%s,'}\ \%\ (indent,\ mock\_method\_macro,\ node.name),}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00123}00123\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'\%s\%s(\%s));'}\ \%\ (indent*3,\ return\_type,\ args)])}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00124}00124\ }
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00125}00125\ }
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00126}\mbox{\hyperlink{namespacecpp_1_1gmock__class_aab4e7f3244efb6cead21f4a51fc9ca5e}{00126}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacecpp_1_1gmock__class_aab4e7f3244efb6cead21f4a51fc9ca5e}{\_GenerateMocks}}(filename,\ source,\ ast\_list,\ desired\_class\_names):}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00127}00127\ \ \ processed\_class\_names\ =\ set()}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00128}00128\ \ \ lines\ =\ []}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00129}00129\ \ \ \textcolor{keywordflow}{for}\ node\ \textcolor{keywordflow}{in}\ ast\_list:}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00130}00130\ \ \ \ \ \textcolor{keywordflow}{if}\ (isinstance(node,\ \mbox{\hyperlink{classcpp_1_1ast_1_1_class}{ast.Class}})\ \textcolor{keywordflow}{and}\ node.body\ \textcolor{keywordflow}{and}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00131}00131\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ desired\_class\_names\ being\ None\ means\ that\ all\ classes\ are\ selected.}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00132}00132\ \ \ \ \ \ \ \ \ (\textcolor{keywordflow}{not}\ desired\_class\_names\ \textcolor{keywordflow}{or}\ node.name\ \textcolor{keywordflow}{in}\ desired\_class\_names)):}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00133}00133\ \ \ \ \ \ \ class\_name\ =\ node.name}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00134}00134\ \ \ \ \ \ \ parent\_name\ =\ class\_name}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00135}00135\ \ \ \ \ \ \ processed\_class\_names.add(class\_name)}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00136}00136\ \ \ \ \ \ \ class\_node\ =\ node}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00137}00137\ \ \ \ \ \ \ \textcolor{comment}{\#\ Add\ namespace\ before\ the\ class.}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00138}00138\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ class\_node.namespace:}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00139}00139\ \ \ \ \ \ \ \ \ lines.extend([\textcolor{stringliteral}{'namespace\ \%s\ \{'}\ \%\ n\ \textcolor{keywordflow}{for}\ n\ \textcolor{keywordflow}{in}\ class\_node.namespace])\ \ \textcolor{comment}{\#\ \}}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00140}00140\ \ \ \ \ \ \ \ \ lines.append(\textcolor{stringliteral}{''})}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00141}00141\ }
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00142}00142\ \ \ \ \ \ \ \textcolor{comment}{\#\ Add\ template\ args\ for\ templated\ classes.}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00143}00143\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ class\_node.templated\_types:}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00144}00144\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ TODO(paulchang):\ The\ AST\ doesn't\ preserve\ template\ argument\ order,}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00145}00145\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ so\ we\ have\ to\ make\ up\ names\ here.}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00146}00146\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ TODO(paulchang):\ Handle\ non-\/type\ template\ arguments\ (e.g.}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00147}00147\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ template<typename\ T,\ int\ N>).}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00148}00148\ \ \ \ \ \ \ \ \ template\_arg\_count\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}(class\_node.templated\_types.keys())}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00149}00149\ \ \ \ \ \ \ \ \ template\_args\ =\ [\textcolor{stringliteral}{'T\%d'}\ \%\ n\ \textcolor{keywordflow}{for}\ n\ \textcolor{keywordflow}{in}\ range(template\_arg\_count)]}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00150}00150\ \ \ \ \ \ \ \ \ template\_decls\ =\ [\textcolor{stringliteral}{'typename\ '}\ +\ arg\ \textcolor{keywordflow}{for}\ arg\ \textcolor{keywordflow}{in}\ template\_args]}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00151}00151\ \ \ \ \ \ \ \ \ lines.append(\textcolor{stringliteral}{'template\ <'}\ +\ \textcolor{stringliteral}{',\ '}.join(template\_decls)\ +\ \textcolor{stringliteral}{'>'})}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00152}00152\ \ \ \ \ \ \ \ \ parent\_name\ +=\ \textcolor{stringliteral}{'<'}\ +\ \textcolor{stringliteral}{',\ '}.join(template\_args)\ +\ \textcolor{stringliteral}{'>'}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00153}00153\ }
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00154}00154\ \ \ \ \ \ \ \textcolor{comment}{\#\ Add\ the\ class\ prolog.}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00155}00155\ \ \ \ \ \ \ lines.append(\textcolor{stringliteral}{'class\ Mock\%s\ :\ public\ \%s\ \{'}\ \ \textcolor{comment}{\#\ \}}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00156}00156\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \%\ (class\_name,\ parent\_name))}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00157}00157\ \ \ \ \ \ \ lines.append(\textcolor{stringliteral}{'\%spublic:'}\ \%\ (\textcolor{stringliteral}{'\ '}\ *\ (\_INDENT\ //\ 2)))}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00158}00158\ }
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00159}00159\ \ \ \ \ \ \ \textcolor{comment}{\#\ Add\ all\ the\ methods.}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00160}00160\ \ \ \ \ \ \ \mbox{\hyperlink{namespacecpp_1_1gmock__class_ab7951ac071cce54c62f7eca4262820a1}{\_GenerateMethods}}(lines,\ source,\ class\_node)}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00161}00161\ }
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00162}00162\ \ \ \ \ \ \ \textcolor{comment}{\#\ Close\ the\ class.}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00163}00163\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ lines:}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00164}00164\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ If\ there\ are\ no\ virtual\ methods,\ no\ need\ for\ a\ public\ label.}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00165}00165\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}(lines)\ ==\ 2:}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00166}00166\ \ \ \ \ \ \ \ \ \ \ del\ lines[-\/1]}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00167}00167\ }
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00168}00168\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Only\ close\ the\ class\ if\ there\ really\ is\ a\ class.}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00169}00169\ \ \ \ \ \ \ \ \ lines.append(\textcolor{stringliteral}{'\};'})}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00170}00170\ \ \ \ \ \ \ \ \ lines.append(\textcolor{stringliteral}{''})\ \ \textcolor{comment}{\#\ Add\ an\ extra\ newline.}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00171}00171\ }
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00172}00172\ \ \ \ \ \ \ \textcolor{comment}{\#\ Close\ the\ namespace.}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00173}00173\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ class\_node.namespace:}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00174}00174\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ i\ \textcolor{keywordflow}{in}\ range(\mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}(class\_node.namespace)-\/1,\ -\/1,\ -\/1):}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00175}00175\ \ \ \ \ \ \ \ \ \ \ lines.append(\textcolor{stringliteral}{'\}\ \ //\ namespace\ \%s'}\ \%\ class\_node.namespace[i])}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00176}00176\ \ \ \ \ \ \ \ \ lines.append(\textcolor{stringliteral}{''})\ \ \textcolor{comment}{\#\ Add\ an\ extra\ newline.}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00177}00177\ }
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00178}00178\ \ \ \textcolor{keywordflow}{if}\ desired\_class\_names:}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00179}00179\ \ \ \ \ missing\_class\_name\_list\ =\ list(desired\_class\_names\ -\/\ processed\_class\_names)}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00180}00180\ \ \ \ \ \textcolor{keywordflow}{if}\ missing\_class\_name\_list:}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00181}00181\ \ \ \ \ \ \ missing\_class\_name\_list.sort()}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00182}00182\ \ \ \ \ \ \ sys.stderr.write(\textcolor{stringliteral}{'Class(es)\ not\ found\ in\ \%s:\ \%s\(\backslash\)n'}\ \%}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00183}00183\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (filename,\ \textcolor{stringliteral}{',\ '}.join(missing\_class\_name\_list)))}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00184}00184\ \ \ \textcolor{keywordflow}{elif}\ \textcolor{keywordflow}{not}\ processed\_class\_names:}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00185}00185\ \ \ \ \ sys.stderr.write(\textcolor{stringliteral}{'No\ class\ found\ in\ \%s\(\backslash\)n'}\ \%\ filename)}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00186}00186\ }
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00187}00187\ \ \ \textcolor{keywordflow}{return}\ lines}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00188}00188\ }
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00189}00189\ }
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00190}\mbox{\hyperlink{namespacecpp_1_1gmock__class_a3d6f1153474842c967c17ff866e1af88}{00190}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}(argv=sys.argv):}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00191}00191\ \ \ \textcolor{keywordflow}{if}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}(argv)\ <\ 2:}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00192}00192\ \ \ \ \ sys.stderr.write(\textcolor{stringliteral}{'Google\ Mock\ Class\ Generator\ v\%s\(\backslash\)n\(\backslash\)n'}\ \%}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00193}00193\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'.'}.join(map(str,\ \_VERSION)))}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00194}00194\ \ \ \ \ sys.stderr.write(\_\_doc\_\_)}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00195}00195\ \ \ \ \ \textcolor{keywordflow}{return}\ 1}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00196}00196\ }
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00197}00197\ \ \ \textcolor{keyword}{global}\ \_INDENT}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00198}00198\ \ \ \textcolor{keywordflow}{try}:}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00199}00199\ \ \ \ \ \_INDENT\ =\ int(os.environ[\textcolor{stringliteral}{'INDENT'}])}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00200}00200\ \ \ \textcolor{keywordflow}{except}\ KeyError:}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00201}00201\ \ \ \ \ \textcolor{keywordflow}{pass}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00202}00202\ \ \ \textcolor{keywordflow}{except}:}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00203}00203\ \ \ \ \ sys.stderr.write(\textcolor{stringliteral}{'Unable\ to\ use\ indent\ of\ \%s\(\backslash\)n'}\ \%\ os.environ.get(\textcolor{stringliteral}{'INDENT'}))}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00204}00204\ }
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00205}00205\ \ \ filename\ =\ argv[1]}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00206}00206\ \ \ desired\_class\_names\ =\ \textcolor{keywordtype}{None}\ \ \textcolor{comment}{\#\ None\ means\ all\ classes\ in\ the\ source\ file.}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00207}00207\ \ \ \textcolor{keywordflow}{if}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a7360b55975153b822efc5217b7734e6a}{len}}(argv)\ >=\ 3:}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00208}00208\ \ \ \ \ desired\_class\_names\ =\ set(argv[2:])}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00209}00209\ \ \ source\ =\ utils.ReadFile(filename)}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00210}00210\ \ \ \textcolor{keywordflow}{if}\ source\ \textcolor{keywordflow}{is}\ \textcolor{keywordtype}{None}:}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00211}00211\ \ \ \ \ \textcolor{keywordflow}{return}\ 1}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00212}00212\ }
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00213}00213\ \ \ builder\ =\ ast.BuilderFromSource(source,\ filename)}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00214}00214\ \ \ \textcolor{keywordflow}{try}:}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00215}00215\ \ \ \ \ entire\_ast\ =\ filter(\textcolor{keywordtype}{None},\ builder.Generate())}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00216}00216\ \ \ \textcolor{keywordflow}{except}\ KeyboardInterrupt:}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00217}00217\ \ \ \ \ \textcolor{keywordflow}{return}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00218}00218\ \ \ \textcolor{keywordflow}{except}:}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00219}00219\ \ \ \ \ \textcolor{comment}{\#\ An\ error\ message\ was\ already\ printed\ since\ we\ couldn't\ parse.}}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00220}00220\ \ \ \ \ sys.exit(1)}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00221}00221\ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00222}00222\ \ \ \ \ lines\ =\ \mbox{\hyperlink{namespacecpp_1_1gmock__class_aab4e7f3244efb6cead21f4a51fc9ca5e}{\_GenerateMocks}}(filename,\ source,\ entire\_ast,\ desired\_class\_names)}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00223}00223\ \ \ \ \ sys.stdout.write(\textcolor{stringliteral}{'\(\backslash\)n'}.join(lines))}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00224}00224\ }
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00225}00225\ }
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00226}00226\ \textcolor{keywordflow}{if}\ \_\_name\_\_\ ==\ \textcolor{stringliteral}{'\_\_main\_\_'}:}
+\DoxyCodeLine{\Hypertarget{gmock__class_8py_source_l00227}00227\ \ \ \mbox{\hyperlink{platform__timer__posix__test_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}(sys.argv)}
+
+\end{DoxyCode}

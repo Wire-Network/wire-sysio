@@ -1,0 +1,70 @@
+\doxysection{libraries/fc/include/fc/crypto/webauthn\+\_\+json/example/simplewriter/simplewriter.cpp File Reference}
+\hypertarget{simplewriter_8cpp}{}\label{simplewriter_8cpp}\index{libraries/fc/include/fc/crypto/webauthn\_json/example/simplewriter/simplewriter.cpp@{libraries/fc/include/fc/crypto/webauthn\_json/example/simplewriter/simplewriter.cpp}}
+{\ttfamily \#include "{}rapidjson/writer.\+h"{}}\newline
+{\ttfamily \#include "{}rapidjson/stringbuffer.\+h"{}}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+Include dependency graph for simplewriter.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{simplewriter_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{simplewriter_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{simplewriter_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}\index{simplewriter.cpp@{simplewriter.cpp}!main@{main}}
+\index{main@{main}!simplewriter.cpp@{simplewriter.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{simplewriter_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4} 
+int main (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{simplewriter_8cpp_source_l00008}{8}} of file \mbox{\hyperlink{simplewriter_8cpp_source}{simplewriter.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00008\ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00009\ \ \ \ \ \mbox{\hyperlink{class_generic_string_buffer}{StringBuffer}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{00010\ \ \ \ \ \mbox{\hyperlink{class_writer}{Writer<StringBuffer>}}\ writer(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{00011\ \ \ \ \ }
+\DoxyCodeLine{00012\ \ \ \ \ writer.StartObject();\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Between\ StartObject()/EndObject(),\ }}
+\DoxyCodeLine{00013\ \ \ \ \ writer.Key(\textcolor{stringliteral}{"{}hello"{}});\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ output\ a\ key,}}
+\DoxyCodeLine{00014\ \ \ \ \ writer.String(\textcolor{stringliteral}{"{}world"{}});\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ follow\ by\ a\ value.}}
+\DoxyCodeLine{00015\ \ \ \ \ writer.Key(\textcolor{stringliteral}{"{}t"{}});}
+\DoxyCodeLine{00016\ \ \ \ \ writer.Bool(\textcolor{keyword}{true});}
+\DoxyCodeLine{00017\ \ \ \ \ writer.Key(\textcolor{stringliteral}{"{}f"{}});}
+\DoxyCodeLine{00018\ \ \ \ \ writer.Bool(\textcolor{keyword}{false});}
+\DoxyCodeLine{00019\ \ \ \ \ writer.Key(\textcolor{stringliteral}{"{}n"{}});}
+\DoxyCodeLine{00020\ \ \ \ \ writer.Null();}
+\DoxyCodeLine{00021\ \ \ \ \ writer.Key(\textcolor{stringliteral}{"{}i"{}});}
+\DoxyCodeLine{00022\ \ \ \ \ writer.Uint(123);}
+\DoxyCodeLine{00023\ \ \ \ \ writer.Key(\textcolor{stringliteral}{"{}pi"{}});}
+\DoxyCodeLine{00024\ \ \ \ \ writer.Double(3.1416);}
+\DoxyCodeLine{00025\ \ \ \ \ writer.Key(\textcolor{stringliteral}{"{}a"{}});}
+\DoxyCodeLine{00026\ \ \ \ \ writer.StartArray();\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Between\ StartArray()/EndArray(),}}
+\DoxyCodeLine{00027\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{unsigned}\ i\ =\ 0;\ i\ <\ 4;\ i++)}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ writer.Uint(i);\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ all\ values\ are\ elements\ of\ the\ array.}}
+\DoxyCodeLine{00029\ \ \ \ \ writer.EndArray();}
+\DoxyCodeLine{00030\ \ \ \ \ writer.EndObject();}
+\DoxyCodeLine{00031\ }
+\DoxyCodeLine{00032\ \ \ \ \ \textcolor{comment}{//\ \{"{}hello"{}:"{}world"{},"{}t"{}:true,"{}f"{}:false,"{}n"{}:null,"{}i"{}:123,"{}pi"{}:3.1416,"{}a"{}:[0,1,2,3]\}}}
+\DoxyCodeLine{00033\ \ \ \ \ cout\ <<\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.GetString()\ <<\ endl;}
+\DoxyCodeLine{00034\ }
+\DoxyCodeLine{00035\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00036\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{simplewriter_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4_cgraph}
+\end{center}
+\end{figure}

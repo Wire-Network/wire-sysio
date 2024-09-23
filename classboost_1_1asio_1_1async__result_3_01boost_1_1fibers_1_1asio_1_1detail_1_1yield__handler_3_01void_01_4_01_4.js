@@ -1,0 +1,5 @@
+var classboost_1_1asio_1_1async__result_3_01boost_1_1fibers_1_1asio_1_1detail_1_1yield__handler_3_01void_01_4_01_4 =
+[
+    [ "type", "classboost_1_1asio_1_1async__result_3_01boost_1_1fibers_1_1asio_1_1detail_1_1yield__handler_3_01void_01_4_01_4.html#a71c3da2d678225b2111bd6dc7d8ada80", null ],
+    [ "async_result", "classboost_1_1asio_1_1async__result_3_01boost_1_1fibers_1_1asio_1_1detail_1_1yield__handler_3_01void_01_4_01_4.html#a1d0ee4594c562f6954c7bca460201588", null ]
+];

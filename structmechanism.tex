@@ -1,0 +1,116 @@
+\doxysection{mechanism Struct Reference}
+\hypertarget{structmechanism}{}\label{structmechanism}\index{mechanism@{mechanism}}
+
+
+{\ttfamily \#include $<$yubihsm\+\_\+pkcs11.\+h$>$}
+
+
+
+Collaboration diagram for mechanism\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=146pt]{structmechanism__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+CK\+\_\+\+MECHANISM\+\_\+\+TYPE \mbox{\hyperlink{structmechanism_afeb8198b0f33f94f4520c0ffbc584a9a}{mechanism}}
+\item 
+\begin{tabbing}
+xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=\kill
+union \{\\
+\>struct \{\\
+\>\>\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}} \mbox{\hyperlink{structmechanism_a7ddb0c39d30bea3ae28c3742f3d01122}{label}} \mbox{[}64\mbox{]}\\
+\>\>unsigned int \mbox{\hyperlink{structmechanism_a824f3ed2615633688d6e17a86e95e1ae}{label\_len}}\\
+\>\>\mbox{\hyperlink{yubihsm_8h_a498937b5a72accbb0ef21bb1dcdd55ca}{yh\_algorithm}} \mbox{\hyperlink{structmechanism_a7244b47e8effdec21840a1d417693465}{mgf1Algo}}\\
+\>\} \mbox{\hyperlink{structmechanism_a8b470fe3b4b86e373f85264f1d2df962}{oaep}}\\
+\>struct \{\\
+\>\>\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}} \mbox{\hyperlink{structmechanism_a66be26d1b817a2709f3d2bd87e8422b9}{salt\_len}}\\
+\>\>\mbox{\hyperlink{yubihsm_8h_a498937b5a72accbb0ef21bb1dcdd55ca}{yh\_algorithm}} \mbox{\hyperlink{structmechanism_a7244b47e8effdec21840a1d417693465}{mgf1Algo}}\\
+\>\} \mbox{\hyperlink{structmechanism_ac8e33c4d8b2b2ec42e7a942f3c157328}{pss}}\\
+\}; \\
+
+\end{tabbing}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8h_source_l00107}{107}} of file \mbox{\hyperlink{yubihsm__pkcs11_8h_source}{yubihsm\+\_\+pkcs11.\+h}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structmechanism_a9a49cbcf35a87e836a148fd8443f0bcc}\doxysubsubsection{\texorpdfstring{[union]}{[union]}}
+{\footnotesize\ttfamily \label{structmechanism_a9a49cbcf35a87e836a148fd8443f0bcc} 
+union  \{ ... \}  \mbox{\hyperlink{structmechanism}{mechanism}}}
+
+\Hypertarget{structmechanism_a7ddb0c39d30bea3ae28c3742f3d01122}\index{mechanism@{mechanism}!label@{label}}
+\index{label@{label}!mechanism@{mechanism}}
+\doxysubsubsection{\texorpdfstring{label}{label}}
+{\footnotesize\ttfamily \label{structmechanism_a7ddb0c39d30bea3ae28c3742f3d01122} 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} mechanism\+::label\mbox{[}64\mbox{]}}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8h_source_l00111}{111}} of file \mbox{\hyperlink{yubihsm__pkcs11_8h_source}{yubihsm\+\_\+pkcs11.\+h}}.
+
+\Hypertarget{structmechanism_a824f3ed2615633688d6e17a86e95e1ae}\index{mechanism@{mechanism}!label\_len@{label\_len}}
+\index{label\_len@{label\_len}!mechanism@{mechanism}}
+\doxysubsubsection{\texorpdfstring{label\_len}{label\_len}}
+{\footnotesize\ttfamily \label{structmechanism_a824f3ed2615633688d6e17a86e95e1ae} 
+unsigned int mechanism\+::label\+\_\+len}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8h_source_l00112}{112}} of file \mbox{\hyperlink{yubihsm__pkcs11_8h_source}{yubihsm\+\_\+pkcs11.\+h}}.
+
+\Hypertarget{structmechanism_afeb8198b0f33f94f4520c0ffbc584a9a}\index{mechanism@{mechanism}!mechanism@{mechanism}}
+\index{mechanism@{mechanism}!mechanism@{mechanism}}
+\doxysubsubsection{\texorpdfstring{mechanism}{mechanism}}
+{\footnotesize\ttfamily \label{structmechanism_afeb8198b0f33f94f4520c0ffbc584a9a} 
+CK\+\_\+\+MECHANISM\+\_\+\+TYPE mechanism\+::mechanism}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8h_source_l00108}{108}} of file \mbox{\hyperlink{yubihsm__pkcs11_8h_source}{yubihsm\+\_\+pkcs11.\+h}}.
+
+\Hypertarget{structmechanism_a7244b47e8effdec21840a1d417693465}\index{mechanism@{mechanism}!mgf1Algo@{mgf1Algo}}
+\index{mgf1Algo@{mgf1Algo}!mechanism@{mechanism}}
+\doxysubsubsection{\texorpdfstring{mgf1Algo}{mgf1Algo}}
+{\footnotesize\ttfamily \label{structmechanism_a7244b47e8effdec21840a1d417693465} 
+\mbox{\hyperlink{yubihsm_8h_a498937b5a72accbb0ef21bb1dcdd55ca}{yh\+\_\+algorithm}} mechanism\+::mgf1\+Algo}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8h_source_l00113}{113}} of file \mbox{\hyperlink{yubihsm__pkcs11_8h_source}{yubihsm\+\_\+pkcs11.\+h}}.
+
+\Hypertarget{structmechanism_a8b470fe3b4b86e373f85264f1d2df962}\index{mechanism@{mechanism}!oaep@{oaep}}
+\index{oaep@{oaep}!mechanism@{mechanism}}
+\doxysubsubsection{\texorpdfstring{[struct]}{[struct]}}
+{\footnotesize\ttfamily \label{structmechanism_a8b470fe3b4b86e373f85264f1d2df962} 
+struct  \{ ... \}  mechanism\+::oaep}
+
+\Hypertarget{structmechanism_ac8e33c4d8b2b2ec42e7a942f3c157328}\index{mechanism@{mechanism}!pss@{pss}}
+\index{pss@{pss}!mechanism@{mechanism}}
+\doxysubsubsection{\texorpdfstring{[struct]}{[struct]}}
+{\footnotesize\ttfamily \label{structmechanism_ac8e33c4d8b2b2ec42e7a942f3c157328} 
+struct  \{ ... \}  mechanism\+::pss}
+
+\Hypertarget{structmechanism_a66be26d1b817a2709f3d2bd87e8422b9}\index{mechanism@{mechanism}!salt\_len@{salt\_len}}
+\index{salt\_len@{salt\_len}!mechanism@{mechanism}}
+\doxysubsubsection{\texorpdfstring{salt\_len}{salt\_len}}
+{\footnotesize\ttfamily \label{structmechanism_a66be26d1b817a2709f3d2bd87e8422b9} 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} mechanism\+::salt\+\_\+len}
+
+
+
+Definition at line \mbox{\hyperlink{yubihsm__pkcs11_8h_source_l00116}{116}} of file \mbox{\hyperlink{yubihsm__pkcs11_8h_source}{yubihsm\+\_\+pkcs11.\+h}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/yubihsm/pkcs11/\mbox{\hyperlink{yubihsm__pkcs11_8h}{yubihsm\+\_\+pkcs11.\+h}}\end{DoxyCompactItemize}

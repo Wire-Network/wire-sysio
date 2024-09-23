@@ -1,0 +1,162 @@
+\doxysection{sysio\+::chain\+::building\+\_\+block Struct Reference}
+\hypertarget{structsysio_1_1chain_1_1building__block}{}\label{structsysio_1_1chain_1_1building__block}\index{sysio::chain::building\_block@{sysio::chain::building\_block}}
+
+
+Collaboration diagram for sysio\+::chain\+::building\+\_\+block\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1building__block__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1building__block_ad1a55d886f919432dd2cf5a2179ad697}{building\+\_\+block}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1block__header__state}{block\+\_\+header\+\_\+state}} \&prev, \mbox{\hyperlink{namespacesysio_1_1chain_a11965fc424809ea1802175f8b36ae4e5}{block\+\_\+timestamp\+\_\+type}} when, \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} num\+\_\+prev\+\_\+blocks\+\_\+to\+\_\+confirm, const \mbox{\hyperlink{classfc_1_1vector}{vector}}$<$ \mbox{\hyperlink{namespacesysio_1_1chain_a357fd9478475457e5bb386a3143079b6}{digest\+\_\+type}} $>$ \&new\+\_\+protocol\+\_\+feature\+\_\+activations)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1pending__block__header__state}{pending\+\_\+block\+\_\+header\+\_\+state}} \mbox{\hyperlink{structsysio_1_1chain_1_1building__block_a6f4c847bd9e684175c5c2dd9a293bcce}{\+\_\+pending\+\_\+block\+\_\+header\+\_\+state}}
+\item 
+std\+::optional$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority__schedule}{producer\+\_\+authority\+\_\+schedule}} $>$ \mbox{\hyperlink{structsysio_1_1chain_1_1building__block_ad23c5b9aff9e1e2033ee5ff0e0b38a13}{\+\_\+new\+\_\+pending\+\_\+producer\+\_\+schedule}}
+\item 
+\mbox{\hyperlink{classfc_1_1vector}{vector}}$<$ \mbox{\hyperlink{namespacesysio_1_1chain_a357fd9478475457e5bb386a3143079b6}{digest\+\_\+type}} $>$ \mbox{\hyperlink{structsysio_1_1chain_1_1building__block_a505d69cba19e3830b35a7794d7c4adca}{\+\_\+new\+\_\+protocol\+\_\+feature\+\_\+activations}}
+\item 
+size\+\_\+t \mbox{\hyperlink{structsysio_1_1chain_1_1building__block_a185ab69ca6d476247057e18672aed3ad}{\+\_\+num\+\_\+new\+\_\+protocol\+\_\+features\+\_\+that\+\_\+have\+\_\+activated}} = 0
+\item 
+\mbox{\hyperlink{classfc_1_1vector}{vector}}$<$ \mbox{\hyperlink{namespacesysio_1_1chain_ad795329e0af850251f4f47cc32e8d770}{transaction\+\_\+metadata\+\_\+ptr}} $>$ \mbox{\hyperlink{structsysio_1_1chain_1_1building__block_a44bbb13d65743e9b5370f928cd57fa0c}{\+\_\+pending\+\_\+trx\+\_\+metas}}
+\item 
+\mbox{\hyperlink{classfc_1_1vector}{vector}}$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__receipt}{transaction\+\_\+receipt}} $>$ \mbox{\hyperlink{structsysio_1_1chain_1_1building__block_af666a80cf6adc295cc63a81e1ab421bf}{\+\_\+pending\+\_\+trx\+\_\+receipts}}
+\item 
+\mbox{\hyperlink{classfc_1_1vector}{vector}}$<$ \mbox{\hyperlink{namespacesysio_1_1chain_a357fd9478475457e5bb386a3143079b6}{digest\+\_\+type}} $>$ \mbox{\hyperlink{structsysio_1_1chain_1_1building__block_a798382d177c089494b584b5a9b3f1af1}{\+\_\+action\+\_\+receipt\+\_\+digests}}
+\item 
+std\+::optional$<$ \mbox{\hyperlink{namespacesysio_1_1chain_a9c3cb5131331ed8d52a589437ccfb03e}{checksum256\+\_\+type}} $>$ \mbox{\hyperlink{structsysio_1_1chain_1_1building__block_a0f41d6d213209b2c8c73acb198b44d31}{\+\_\+transaction\+\_\+mroot}}
+\item 
+std\+::optional$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1s__header}{s\+\_\+header}} $>$ \mbox{\hyperlink{structsysio_1_1chain_1_1building__block_a431e096b0d1fe2977a905f332bc67fe3}{\+\_\+s\+\_\+header}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{controller_8cpp_source_l00111}{111}} of file \mbox{\hyperlink{controller_8cpp_source}{controller.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structsysio_1_1chain_1_1building__block_ad1a55d886f919432dd2cf5a2179ad697}\index{sysio::chain::building\_block@{sysio::chain::building\_block}!building\_block@{building\_block}}
+\index{building\_block@{building\_block}!sysio::chain::building\_block@{sysio::chain::building\_block}}
+\doxysubsubsection{\texorpdfstring{building\_block()}{building\_block()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1building__block_ad1a55d886f919432dd2cf5a2179ad697} 
+sysio\+::chain\+::building\+\_\+block\+::building\+\_\+block (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1block__header__state}{block\+\_\+header\+\_\+state}} \&}]{prev}{, }\item[{\mbox{\hyperlink{namespacesysio_1_1chain_a11965fc424809ea1802175f8b36ae4e5}{block\+\_\+timestamp\+\_\+type}}}]{when}{, }\item[{\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}}}]{num\+\_\+prev\+\_\+blocks\+\_\+to\+\_\+confirm}{, }\item[{const \mbox{\hyperlink{classfc_1_1vector}{vector}}$<$ \mbox{\hyperlink{namespacesysio_1_1chain_a357fd9478475457e5bb386a3143079b6}{digest\+\_\+type}} $>$ \&}]{new\+\_\+protocol\+\_\+feature\+\_\+activations}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{controller_8cpp_source_l00112}{112}} of file \mbox{\hyperlink{controller_8cpp_source}{controller.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00116\ \ \ \ :\mbox{\hyperlink{structsysio_1_1chain_1_1building__block_a6f4c847bd9e684175c5c2dd9a293bcce}{\_pending\_block\_header\_state}}(\ prev.next(\ when,\ num\_prev\_blocks\_to\_confirm\ )\ )}
+\DoxyCodeLine{00117\ \ \ \ ,\mbox{\hyperlink{structsysio_1_1chain_1_1building__block_a505d69cba19e3830b35a7794d7c4adca}{\_new\_protocol\_feature\_activations}}(\ new\_protocol\_feature\_activations\ )}
+\DoxyCodeLine{00118\ \ \ \ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1chain_1_1building__block_a798382d177c089494b584b5a9b3f1af1}\index{sysio::chain::building\_block@{sysio::chain::building\_block}!\_action\_receipt\_digests@{\_action\_receipt\_digests}}
+\index{\_action\_receipt\_digests@{\_action\_receipt\_digests}!sysio::chain::building\_block@{sysio::chain::building\_block}}
+\doxysubsubsection{\texorpdfstring{\_action\_receipt\_digests}{\_action\_receipt\_digests}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1building__block_a798382d177c089494b584b5a9b3f1af1} 
+\mbox{\hyperlink{classfc_1_1vector}{vector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_a357fd9478475457e5bb386a3143079b6}{digest\+\_\+type}}$>$ sysio\+::chain\+::building\+\_\+block\+::\+\_\+action\+\_\+receipt\+\_\+digests}
+
+
+
+Definition at line \mbox{\hyperlink{controller_8cpp_source_l00126}{126}} of file \mbox{\hyperlink{controller_8cpp_source}{controller.\+cpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1building__block_ad23c5b9aff9e1e2033ee5ff0e0b38a13}\index{sysio::chain::building\_block@{sysio::chain::building\_block}!\_new\_pending\_producer\_schedule@{\_new\_pending\_producer\_schedule}}
+\index{\_new\_pending\_producer\_schedule@{\_new\_pending\_producer\_schedule}!sysio::chain::building\_block@{sysio::chain::building\_block}}
+\doxysubsubsection{\texorpdfstring{\_new\_pending\_producer\_schedule}{\_new\_pending\_producer\_schedule}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1building__block_ad23c5b9aff9e1e2033ee5ff0e0b38a13} 
+std\+::optional$<$\mbox{\hyperlink{structsysio_1_1chain_1_1producer__authority__schedule}{producer\+\_\+authority\+\_\+schedule}}$>$ sysio\+::chain\+::building\+\_\+block\+::\+\_\+new\+\_\+pending\+\_\+producer\+\_\+schedule}
+
+
+
+Definition at line \mbox{\hyperlink{controller_8cpp_source_l00121}{121}} of file \mbox{\hyperlink{controller_8cpp_source}{controller.\+cpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1building__block_a505d69cba19e3830b35a7794d7c4adca}\index{sysio::chain::building\_block@{sysio::chain::building\_block}!\_new\_protocol\_feature\_activations@{\_new\_protocol\_feature\_activations}}
+\index{\_new\_protocol\_feature\_activations@{\_new\_protocol\_feature\_activations}!sysio::chain::building\_block@{sysio::chain::building\_block}}
+\doxysubsubsection{\texorpdfstring{\_new\_protocol\_feature\_activations}{\_new\_protocol\_feature\_activations}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1building__block_a505d69cba19e3830b35a7794d7c4adca} 
+\mbox{\hyperlink{classfc_1_1vector}{vector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_a357fd9478475457e5bb386a3143079b6}{digest\+\_\+type}}$>$ sysio\+::chain\+::building\+\_\+block\+::\+\_\+new\+\_\+protocol\+\_\+feature\+\_\+activations}
+
+
+
+Definition at line \mbox{\hyperlink{controller_8cpp_source_l00122}{122}} of file \mbox{\hyperlink{controller_8cpp_source}{controller.\+cpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1building__block_a185ab69ca6d476247057e18672aed3ad}\index{sysio::chain::building\_block@{sysio::chain::building\_block}!\_num\_new\_protocol\_features\_that\_have\_activated@{\_num\_new\_protocol\_features\_that\_have\_activated}}
+\index{\_num\_new\_protocol\_features\_that\_have\_activated@{\_num\_new\_protocol\_features\_that\_have\_activated}!sysio::chain::building\_block@{sysio::chain::building\_block}}
+\doxysubsubsection{\texorpdfstring{\_num\_new\_protocol\_features\_that\_have\_activated}{\_num\_new\_protocol\_features\_that\_have\_activated}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1building__block_a185ab69ca6d476247057e18672aed3ad} 
+size\+\_\+t sysio\+::chain\+::building\+\_\+block\+::\+\_\+num\+\_\+new\+\_\+protocol\+\_\+features\+\_\+that\+\_\+have\+\_\+activated = 0}
+
+
+
+Definition at line \mbox{\hyperlink{controller_8cpp_source_l00123}{123}} of file \mbox{\hyperlink{controller_8cpp_source}{controller.\+cpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1building__block_a6f4c847bd9e684175c5c2dd9a293bcce}\index{sysio::chain::building\_block@{sysio::chain::building\_block}!\_pending\_block\_header\_state@{\_pending\_block\_header\_state}}
+\index{\_pending\_block\_header\_state@{\_pending\_block\_header\_state}!sysio::chain::building\_block@{sysio::chain::building\_block}}
+\doxysubsubsection{\texorpdfstring{\_pending\_block\_header\_state}{\_pending\_block\_header\_state}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1building__block_a6f4c847bd9e684175c5c2dd9a293bcce} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1pending__block__header__state}{pending\+\_\+block\+\_\+header\+\_\+state}} sysio\+::chain\+::building\+\_\+block\+::\+\_\+pending\+\_\+block\+\_\+header\+\_\+state}
+
+
+
+Definition at line \mbox{\hyperlink{controller_8cpp_source_l00120}{120}} of file \mbox{\hyperlink{controller_8cpp_source}{controller.\+cpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1building__block_a44bbb13d65743e9b5370f928cd57fa0c}\index{sysio::chain::building\_block@{sysio::chain::building\_block}!\_pending\_trx\_metas@{\_pending\_trx\_metas}}
+\index{\_pending\_trx\_metas@{\_pending\_trx\_metas}!sysio::chain::building\_block@{sysio::chain::building\_block}}
+\doxysubsubsection{\texorpdfstring{\_pending\_trx\_metas}{\_pending\_trx\_metas}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1building__block_a44bbb13d65743e9b5370f928cd57fa0c} 
+\mbox{\hyperlink{classfc_1_1vector}{vector}}$<$\mbox{\hyperlink{namespacesysio_1_1chain_ad795329e0af850251f4f47cc32e8d770}{transaction\+\_\+metadata\+\_\+ptr}}$>$ sysio\+::chain\+::building\+\_\+block\+::\+\_\+pending\+\_\+trx\+\_\+metas}
+
+
+
+Definition at line \mbox{\hyperlink{controller_8cpp_source_l00124}{124}} of file \mbox{\hyperlink{controller_8cpp_source}{controller.\+cpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1building__block_af666a80cf6adc295cc63a81e1ab421bf}\index{sysio::chain::building\_block@{sysio::chain::building\_block}!\_pending\_trx\_receipts@{\_pending\_trx\_receipts}}
+\index{\_pending\_trx\_receipts@{\_pending\_trx\_receipts}!sysio::chain::building\_block@{sysio::chain::building\_block}}
+\doxysubsubsection{\texorpdfstring{\_pending\_trx\_receipts}{\_pending\_trx\_receipts}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1building__block_af666a80cf6adc295cc63a81e1ab421bf} 
+\mbox{\hyperlink{classfc_1_1vector}{vector}}$<$\mbox{\hyperlink{structsysio_1_1chain_1_1transaction__receipt}{transaction\+\_\+receipt}}$>$ sysio\+::chain\+::building\+\_\+block\+::\+\_\+pending\+\_\+trx\+\_\+receipts}
+
+
+
+Definition at line \mbox{\hyperlink{controller_8cpp_source_l00125}{125}} of file \mbox{\hyperlink{controller_8cpp_source}{controller.\+cpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1building__block_a431e096b0d1fe2977a905f332bc67fe3}\index{sysio::chain::building\_block@{sysio::chain::building\_block}!\_s\_header@{\_s\_header}}
+\index{\_s\_header@{\_s\_header}!sysio::chain::building\_block@{sysio::chain::building\_block}}
+\doxysubsubsection{\texorpdfstring{\_s\_header}{\_s\_header}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1building__block_a431e096b0d1fe2977a905f332bc67fe3} 
+std\+::optional$<$\mbox{\hyperlink{structsysio_1_1chain_1_1s__header}{s\+\_\+header}}$>$ sysio\+::chain\+::building\+\_\+block\+::\+\_\+s\+\_\+header}
+
+
+
+Definition at line \mbox{\hyperlink{controller_8cpp_source_l00128}{128}} of file \mbox{\hyperlink{controller_8cpp_source}{controller.\+cpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1building__block_a0f41d6d213209b2c8c73acb198b44d31}\index{sysio::chain::building\_block@{sysio::chain::building\_block}!\_transaction\_mroot@{\_transaction\_mroot}}
+\index{\_transaction\_mroot@{\_transaction\_mroot}!sysio::chain::building\_block@{sysio::chain::building\_block}}
+\doxysubsubsection{\texorpdfstring{\_transaction\_mroot}{\_transaction\_mroot}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1building__block_a0f41d6d213209b2c8c73acb198b44d31} 
+std\+::optional$<$\mbox{\hyperlink{namespacesysio_1_1chain_a9c3cb5131331ed8d52a589437ccfb03e}{checksum256\+\_\+type}}$>$ sysio\+::chain\+::building\+\_\+block\+::\+\_\+transaction\+\_\+mroot}
+
+
+
+Definition at line \mbox{\hyperlink{controller_8cpp_source_l00127}{127}} of file \mbox{\hyperlink{controller_8cpp_source}{controller.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/\mbox{\hyperlink{controller_8cpp}{controller.\+cpp}}\end{DoxyCompactItemize}

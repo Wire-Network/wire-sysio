@@ -1,0 +1,579 @@
+\doxysection{gmock-\/matchers.cc}
+\hypertarget{gmock-matchers_8cc_source}{}\label{gmock-matchers_8cc_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googlemock/src/gmock-\/matchers.cc@{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googlemock/src/gmock-\/matchers.cc}}
+\mbox{\hyperlink{gmock-matchers_8cc}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00001}00001\ \textcolor{comment}{//\ Copyright\ 2007,\ Google\ Inc.}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00002}00002\ \textcolor{comment}{//\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00003}00003\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00004}00004\ \textcolor{comment}{//\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00005}00005\ \textcolor{comment}{//\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00006}00006\ \textcolor{comment}{//\ met:}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00007}00007\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00008}00008\ \textcolor{comment}{//\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00009}00009\ \textcolor{comment}{//\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00010}00010\ \textcolor{comment}{//\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00011}00011\ \textcolor{comment}{//\ copyright\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00012}00012\ \textcolor{comment}{//\ in\ the\ documentation\ and/or\ other\ materials\ provided\ with\ the}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00013}00013\ \textcolor{comment}{//\ distribution.}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00014}00014\ \textcolor{comment}{//\ \ \ \ \ *\ Neither\ the\ name\ of\ Google\ Inc.\ nor\ the\ names\ of\ its}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00015}00015\ \textcolor{comment}{//\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products\ derived\ from}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00016}00016\ \textcolor{comment}{//\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00017}00017\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00018}00018\ \textcolor{comment}{//\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00019}00019\ \textcolor{comment}{//\ "{}AS\ IS"{}\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00020}00020\ \textcolor{comment}{//\ LIMITED\ TO,\ THE\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00021}00021\ \textcolor{comment}{//\ A\ PARTICULAR\ PURPOSE\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ THE\ COPYRIGHT}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00022}00022\ \textcolor{comment}{//\ OWNER\ OR\ CONTRIBUTORS\ BE\ LIABLE\ FOR\ ANY\ DIRECT,\ INDIRECT,\ INCIDENTAL,}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00023}00023\ \textcolor{comment}{//\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES\ (INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00024}00024\ \textcolor{comment}{//\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;\ LOSS\ OF\ USE,}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00025}00025\ \textcolor{comment}{//\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND\ ON\ ANY}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00026}00026\ \textcolor{comment}{//\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00027}00027\ \textcolor{comment}{//\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00028}00028\ \textcolor{comment}{//\ OF\ THIS\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00029}00029\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00030}00030\ \textcolor{comment}{//\ Author:\ wan@google.com\ (Zhanyong\ Wan)}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00032}00032\ \textcolor{comment}{//\ Google\ Mock\ -\/\ a\ framework\ for\ writing\ C++\ mock\ classes.}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00033}00033\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00034}00034\ \textcolor{comment}{//\ This\ file\ implements\ Matcher<const\ string\&>,\ Matcher<string>,\ and}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00035}00035\ \textcolor{comment}{//\ utilities\ for\ defining\ matchers.}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00037}00037\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{gmock-matchers_8h}{gmock/gmock-\/matchers.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00038}00038\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{gmock-generated-matchers_8h}{gmock/gmock-\/generated-\/matchers.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00040}00040\ \textcolor{preprocessor}{\#include\ <string.h>}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00041}00041\ \textcolor{preprocessor}{\#include\ <iostream>}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00042}00042\ \textcolor{preprocessor}{\#include\ <sstream>}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00043}00043\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00045}00045\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacetesting}{testing}}\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00047}00047\ \textcolor{comment}{//\ Constructs\ a\ matcher\ that\ matches\ a\ const\ std::string\&\ whose\ value\ is}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00048}00048\ \textcolor{comment}{//\ equal\ to\ s.}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00049}00049\ \mbox{\hyperlink{classtesting_1_1_matcher_a57bfc9e62d7f6acfee5ad88d1077931c}{Matcher<const\ std::string\&>::Matcher}}(\textcolor{keyword}{const}\ std::string\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})\ \{\ *\textcolor{keyword}{this}\ =\ \mbox{\hyperlink{namespacetesting_aa7771a34f092fd6f1dca2c82fb2a36a1}{Eq}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});\ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00051}00051\ \textcolor{preprocessor}{\#if\ GTEST\_HAS\_GLOBAL\_STRING}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00052}00052\ \textcolor{comment}{//\ Constructs\ a\ matcher\ that\ matches\ a\ const\ std::string\&\ whose\ value\ is}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00053}00053\ \textcolor{comment}{//\ equal\ to\ s.}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00054}00054\ \mbox{\hyperlink{classtesting_1_1_matcher_a57bfc9e62d7f6acfee5ad88d1077931c}{Matcher<const\ std::string\&>::Matcher}}(const\ ::string\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00055}00055\ \ \ *\textcolor{keyword}{this}\ =\ \mbox{\hyperlink{namespacetesting_aa7771a34f092fd6f1dca2c82fb2a36a1}{Eq}}(\textcolor{keyword}{static\_cast<}std::string\textcolor{keyword}{>}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}));}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00056}00056\ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00057}00057\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_HAS\_GLOBAL\_STRING}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00059}00059\ \textcolor{comment}{//\ Constructs\ a\ matcher\ that\ matches\ a\ const\ std::string\&\ whose\ value\ is}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00060}00060\ \textcolor{comment}{//\ equal\ to\ s.}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00061}00061\ \mbox{\hyperlink{classtesting_1_1_matcher_a57bfc9e62d7f6acfee5ad88d1077931c}{Matcher<const\ std::string\&>::Matcher}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00062}00062\ \ \ *\textcolor{keyword}{this}\ =\ \mbox{\hyperlink{namespacetesting_aa7771a34f092fd6f1dca2c82fb2a36a1}{Eq}}(std::string(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}));}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00063}00063\ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00065}00065\ \textcolor{comment}{//\ Constructs\ a\ matcher\ that\ matches\ a\ std::string\ whose\ value\ is\ equal\ to}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00066}00066\ \textcolor{comment}{//\ s.}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00067}\mbox{\hyperlink{classtesting_1_1_matcher_3_01std_1_1string_01_4_af2ccd9d3dd8a6359bc2386feaf5d7d64}{00067}}\ \mbox{\hyperlink{classtesting_1_1_matcher_a57bfc9e62d7f6acfee5ad88d1077931c}{Matcher<std::string>::Matcher}}(\textcolor{keyword}{const}\ std::string\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})\ \{\ *\textcolor{keyword}{this}\ =\ \mbox{\hyperlink{namespacetesting_aa7771a34f092fd6f1dca2c82fb2a36a1}{Eq}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});\ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00069}00069\ \textcolor{preprocessor}{\#if\ GTEST\_HAS\_GLOBAL\_STRING}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00070}00070\ \textcolor{comment}{//\ Constructs\ a\ matcher\ that\ matches\ a\ std::string\ whose\ value\ is\ equal\ to}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00071}00071\ \textcolor{comment}{//\ s.}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00072}00072\ \mbox{\hyperlink{classtesting_1_1_matcher_a57bfc9e62d7f6acfee5ad88d1077931c}{Matcher<std::string>::Matcher}}(const\ ::string\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00073}00073\ \ \ *\textcolor{keyword}{this}\ =\ \mbox{\hyperlink{namespacetesting_aa7771a34f092fd6f1dca2c82fb2a36a1}{Eq}}(\textcolor{keyword}{static\_cast<}std::string\textcolor{keyword}{>}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}));}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00074}00074\ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00075}00075\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_HAS\_GLOBAL\_STRING}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00076}00076\ }
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00077}00077\ \textcolor{comment}{//\ Constructs\ a\ matcher\ that\ matches\ a\ std::string\ whose\ value\ is\ equal\ to}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00078}00078\ \textcolor{comment}{//\ s.}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00079}\mbox{\hyperlink{classtesting_1_1_matcher_3_01std_1_1string_01_4_add173d60cde7b6811c7df1d5f76f38b7}{00079}}\ \mbox{\hyperlink{classtesting_1_1_matcher_a57bfc9e62d7f6acfee5ad88d1077931c}{Matcher<std::string>::Matcher}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})\ \{\ *\textcolor{keyword}{this}\ =\ \mbox{\hyperlink{namespacetesting_aa7771a34f092fd6f1dca2c82fb2a36a1}{Eq}}(std::string(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}));\ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00080}00080\ }
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00081}00081\ \textcolor{preprocessor}{\#if\ GTEST\_HAS\_GLOBAL\_STRING}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00082}00082\ \textcolor{comment}{//\ Constructs\ a\ matcher\ that\ matches\ a\ const\ ::string\&\ whose\ value\ is}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00083}00083\ \textcolor{comment}{//\ equal\ to\ s.}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00084}00084\ \mbox{\hyperlink{classtesting_1_1_matcher_a57bfc9e62d7f6acfee5ad88d1077931c}{Matcher<const\ ::string\&>::Matcher}}(\textcolor{keyword}{const}\ std::string\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00085}00085\ \ \ *\textcolor{keyword}{this}\ =\ \mbox{\hyperlink{namespacetesting_aa7771a34f092fd6f1dca2c82fb2a36a1}{Eq}}(\textcolor{keyword}{static\_cast<}::\textcolor{keywordtype}{string}\textcolor{keyword}{>}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}));}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00086}00086\ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00087}00087\ }
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00088}00088\ \textcolor{comment}{//\ Constructs\ a\ matcher\ that\ matches\ a\ const\ ::string\&\ whose\ value\ is}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00089}00089\ \textcolor{comment}{//\ equal\ to\ s.}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00090}00090\ \mbox{\hyperlink{classtesting_1_1_matcher_a57bfc9e62d7f6acfee5ad88d1077931c}{Matcher<const\ ::string\&>::Matcher}}(const\ ::string\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})\ \{\ *\textcolor{keyword}{this}\ =\ \mbox{\hyperlink{namespacetesting_aa7771a34f092fd6f1dca2c82fb2a36a1}{Eq}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});\ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00091}00091\ }
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00092}00092\ \textcolor{comment}{//\ Constructs\ a\ matcher\ that\ matches\ a\ const\ ::string\&\ whose\ value\ is}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00093}00093\ \textcolor{comment}{//\ equal\ to\ s.}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00094}00094\ \mbox{\hyperlink{classtesting_1_1_matcher_a57bfc9e62d7f6acfee5ad88d1077931c}{Matcher<const\ ::string\&>::Matcher}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})\ \{\ *\textcolor{keyword}{this}\ =\ \mbox{\hyperlink{namespacetesting_aa7771a34f092fd6f1dca2c82fb2a36a1}{Eq}}(::string(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}));\ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00095}00095\ }
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00096}00096\ \textcolor{comment}{//\ Constructs\ a\ matcher\ that\ matches\ a\ ::string\ whose\ value\ is\ equal\ to\ s.}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00097}00097\ \mbox{\hyperlink{classtesting_1_1_matcher_a57bfc9e62d7f6acfee5ad88d1077931c}{Matcher<::string>::Matcher}}(\textcolor{keyword}{const}\ std::string\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00098}00098\ \ \ *\textcolor{keyword}{this}\ =\ \mbox{\hyperlink{namespacetesting_aa7771a34f092fd6f1dca2c82fb2a36a1}{Eq}}(\textcolor{keyword}{static\_cast<}::\textcolor{keywordtype}{string}\textcolor{keyword}{>}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}));}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00099}00099\ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00100}00100\ }
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00101}00101\ \textcolor{comment}{//\ Constructs\ a\ matcher\ that\ matches\ a\ ::string\ whose\ value\ is\ equal\ to\ s.}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00102}00102\ \mbox{\hyperlink{classtesting_1_1_matcher_a57bfc9e62d7f6acfee5ad88d1077931c}{Matcher<::string>::Matcher}}(const\ ::string\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})\ \{\ *\textcolor{keyword}{this}\ =\ \mbox{\hyperlink{namespacetesting_aa7771a34f092fd6f1dca2c82fb2a36a1}{Eq}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});\ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00103}00103\ }
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00104}00104\ \textcolor{comment}{//\ Constructs\ a\ matcher\ that\ matches\ a\ string\ whose\ value\ is\ equal\ to\ s.}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00105}00105\ \mbox{\hyperlink{classtesting_1_1_matcher_a57bfc9e62d7f6acfee5ad88d1077931c}{Matcher<::string>::Matcher}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})\ \{\ *\textcolor{keyword}{this}\ =\ \mbox{\hyperlink{namespacetesting_aa7771a34f092fd6f1dca2c82fb2a36a1}{Eq}}(::string(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}));\ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00106}00106\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_HAS\_GLOBAL\_STRING}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00107}00107\ }
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00108}00108\ \textcolor{preprocessor}{\#if\ GTEST\_HAS\_ABSL}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00109}00109\ \textcolor{comment}{//\ Constructs\ a\ matcher\ that\ matches\ a\ const\ absl::string\_view\&\ whose\ value\ is}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00110}00110\ \textcolor{comment}{//\ equal\ to\ s.}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00111}00111\ \mbox{\hyperlink{classtesting_1_1_matcher_a57bfc9e62d7f6acfee5ad88d1077931c}{Matcher<const\ absl::string\_view\&>::Matcher}}(\textcolor{keyword}{const}\ std::string\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00112}00112\ \ \ *\textcolor{keyword}{this}\ =\ \mbox{\hyperlink{namespacetesting_aa7771a34f092fd6f1dca2c82fb2a36a1}{Eq}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00113}00113\ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00114}00114\ }
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00115}00115\ \textcolor{preprocessor}{\#if\ GTEST\_HAS\_GLOBAL\_STRING}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00116}00116\ \textcolor{comment}{//\ Constructs\ a\ matcher\ that\ matches\ a\ const\ absl::string\_view\&\ whose\ value\ is}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00117}00117\ \textcolor{comment}{//\ equal\ to\ s.}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00118}00118\ \mbox{\hyperlink{classtesting_1_1_matcher_a57bfc9e62d7f6acfee5ad88d1077931c}{Matcher<const\ absl::string\_view\&>::Matcher}}(const\ ::string\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})\ \{\ *\textcolor{keyword}{this}\ =\ \mbox{\hyperlink{namespacetesting_aa7771a34f092fd6f1dca2c82fb2a36a1}{Eq}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});\ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00119}00119\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_HAS\_GLOBAL\_STRING}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00120}00120\ }
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00121}00121\ \textcolor{comment}{//\ Constructs\ a\ matcher\ that\ matches\ a\ const\ absl::string\_view\&\ whose\ value\ is}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00122}00122\ \textcolor{comment}{//\ equal\ to\ s.}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00123}00123\ \mbox{\hyperlink{classtesting_1_1_matcher_a57bfc9e62d7f6acfee5ad88d1077931c}{Matcher<const\ absl::string\_view\&>::Matcher}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00124}00124\ \ \ *\textcolor{keyword}{this}\ =\ \mbox{\hyperlink{namespacetesting_aa7771a34f092fd6f1dca2c82fb2a36a1}{Eq}}(std::string(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}));}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00125}00125\ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00126}00126\ }
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00127}00127\ \textcolor{comment}{//\ Constructs\ a\ matcher\ that\ matches\ a\ const\ absl::string\_view\&\ whose\ value\ is}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00128}00128\ \textcolor{comment}{//\ equal\ to\ s.}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00129}00129\ \mbox{\hyperlink{classtesting_1_1_matcher_a57bfc9e62d7f6acfee5ad88d1077931c}{Matcher<const\ absl::string\_view\&>::Matcher}}(absl::string\_view\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00130}00130\ \ \ *\textcolor{keyword}{this}\ =\ \mbox{\hyperlink{namespacetesting_aa7771a34f092fd6f1dca2c82fb2a36a1}{Eq}}(std::string(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}));}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00131}00131\ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00132}00132\ }
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00133}00133\ \textcolor{comment}{//\ Constructs\ a\ matcher\ that\ matches\ a\ absl::string\_view\ whose\ value\ is\ equal\ to}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00134}00134\ \textcolor{comment}{//\ s.}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00135}00135\ \mbox{\hyperlink{classtesting_1_1_matcher_a57bfc9e62d7f6acfee5ad88d1077931c}{Matcher<absl::string\_view>::Matcher}}(\textcolor{keyword}{const}\ std::string\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})\ \{\ *\textcolor{keyword}{this}\ =\ \mbox{\hyperlink{namespacetesting_aa7771a34f092fd6f1dca2c82fb2a36a1}{Eq}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});\ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00136}00136\ }
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00137}00137\ \textcolor{preprocessor}{\#if\ GTEST\_HAS\_GLOBAL\_STRING}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00138}00138\ \textcolor{comment}{//\ Constructs\ a\ matcher\ that\ matches\ a\ absl::string\_view\ whose\ value\ is\ equal\ to}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00139}00139\ \textcolor{comment}{//\ s.}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00140}00140\ \mbox{\hyperlink{classtesting_1_1_matcher_a57bfc9e62d7f6acfee5ad88d1077931c}{Matcher<absl::string\_view>::Matcher}}(const\ ::string\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})\ \{\ *\textcolor{keyword}{this}\ =\ \mbox{\hyperlink{namespacetesting_aa7771a34f092fd6f1dca2c82fb2a36a1}{Eq}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});\ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00141}00141\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_HAS\_GLOBAL\_STRING}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00142}00142\ }
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00143}00143\ \textcolor{comment}{//\ Constructs\ a\ matcher\ that\ matches\ a\ absl::string\_view\ whose\ value\ is\ equal\ to}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00144}00144\ \textcolor{comment}{//\ s.}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00145}00145\ \mbox{\hyperlink{classtesting_1_1_matcher_a57bfc9e62d7f6acfee5ad88d1077931c}{Matcher<absl::string\_view>::Matcher}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00146}00146\ \ \ *\textcolor{keyword}{this}\ =\ \mbox{\hyperlink{namespacetesting_aa7771a34f092fd6f1dca2c82fb2a36a1}{Eq}}(std::string(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}));}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00147}00147\ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00148}00148\ }
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00149}00149\ \textcolor{comment}{//\ Constructs\ a\ matcher\ that\ matches\ a\ absl::string\_view\ whose\ value\ is\ equal\ to}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00150}00150\ \textcolor{comment}{//\ s.}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00151}00151\ \mbox{\hyperlink{classtesting_1_1_matcher_a57bfc9e62d7f6acfee5ad88d1077931c}{Matcher<absl::string\_view>::Matcher}}(absl::string\_view\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}})\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00152}00152\ \ \ *\textcolor{keyword}{this}\ =\ \mbox{\hyperlink{namespacetesting_aa7771a34f092fd6f1dca2c82fb2a36a1}{Eq}}(std::string(\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}));}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00153}00153\ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00154}00154\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{//\ GTEST\_HAS\_ABSL}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00155}00155\ }
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00156}00156\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceinternal}{internal}}\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00157}00157\ }
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00158}00158\ \textcolor{comment}{//\ Returns\ the\ description\ for\ a\ matcher\ defined\ using\ the\ MATCHER*()}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00159}00159\ \textcolor{comment}{//\ macro\ where\ the\ user-\/supplied\ description\ string\ is\ "{}"{},\ if}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00160}00160\ \textcolor{comment}{//\ 'negation'\ is\ false;\ otherwise\ returns\ the\ description\ of\ the}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00161}00161\ \textcolor{comment}{//\ negation\ of\ the\ matcher.\ \ 'param\_values'\ contains\ a\ list\ of\ strings}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00162}00162\ \textcolor{comment}{//\ that\ are\ the\ print-\/out\ of\ the\ matcher's\ parameters.}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00163}\mbox{\hyperlink{namespacetesting_1_1internal_ace0ed89106e622e9b5da449ae269616d}{00163}}\ \mbox{\hyperlink{gtest-port_8h_aa73be6f0ba4a7456180a94904ce17790}{GTEST\_API\_}}\ std::string\ \mbox{\hyperlink{namespacetesting_1_1internal_ace0ed89106e622e9b5da449ae269616d}{FormatMatcherDescription}}(\textcolor{keywordtype}{bool}\ negation,}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00164}00164\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ matcher\_name,}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00165}00165\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacetesting_1_1internal_a50003bb76ec2934be1062be11efba8bf}{Strings}}\&\ param\_values)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00166}00166\ \ \ std::string\ result\ =\ \mbox{\hyperlink{namespacetesting_1_1internal_a0b375abcf3081393e6c420194a541b29}{ConvertIdentifierNameToWords}}(matcher\_name);}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00167}00167\ \ \ \textcolor{keywordflow}{if}\ (param\_values.size()\ >=\ 1)\ result\ +=\ \textcolor{stringliteral}{"{}\ "{}}\ +\ \mbox{\hyperlink{namespacetesting_1_1internal_a4ffe5309bf49f08145ed010a6d244e41}{JoinAsTuple}}(param\_values);}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00168}00168\ \ \ \textcolor{keywordflow}{return}\ negation\ ?\ \textcolor{stringliteral}{"{}not\ ("{}}\ +\ result\ +\ \textcolor{stringliteral}{"{})"{}}\ :\ result;}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00169}00169\ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00170}00170\ }
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00171}00171\ \textcolor{comment}{//\ FindMaxBipartiteMatching\ and\ its\ helper\ class.}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00172}00172\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00173}00173\ \textcolor{comment}{//\ Uses\ the\ well-\/known\ Ford-\/Fulkerson\ max\ flow\ method\ to\ find\ a\ maximum}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00174}00174\ \textcolor{comment}{//\ bipartite\ matching.\ Flow\ is\ considered\ to\ be\ from\ left\ to\ right.}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00175}00175\ \textcolor{comment}{//\ There\ is\ an\ implicit\ source\ node\ that\ is\ connected\ to\ all\ of\ the\ left}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00176}00176\ \textcolor{comment}{//\ nodes,\ and\ an\ implicit\ sink\ node\ that\ is\ connected\ to\ all\ of\ the}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00177}00177\ \textcolor{comment}{//\ right\ nodes.\ All\ edges\ have\ unit\ capacity.}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00178}00178\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00179}00179\ \textcolor{comment}{//\ Neither\ the\ flow\ graph\ nor\ the\ residual\ flow\ graph\ are\ represented}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00180}00180\ \textcolor{comment}{//\ explicitly.\ Instead,\ they\ are\ implied\ by\ the\ information\ in\ 'graph'\ and}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00181}00181\ \textcolor{comment}{//\ a\ vector<int>\ called\ 'left\_'\ whose\ elements\ are\ initialized\ to\ the}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00182}00182\ \textcolor{comment}{//\ value\ kUnused.\ This\ represents\ the\ initial\ state\ of\ the\ algorithm,}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00183}00183\ \textcolor{comment}{//\ where\ the\ flow\ graph\ is\ empty,\ and\ the\ residual\ flow\ graph\ has\ the}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00184}00184\ \textcolor{comment}{//\ following\ edges:}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00185}00185\ \textcolor{comment}{//\ \ \ -\/\ An\ edge\ from\ source\ to\ each\ left\_\ node}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00186}00186\ \textcolor{comment}{//\ \ \ -\/\ An\ edge\ from\ each\ right\_\ node\ to\ sink}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00187}00187\ \textcolor{comment}{//\ \ \ -\/\ An\ edge\ from\ each\ left\_\ node\ to\ each\ right\_\ node,\ if\ the}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00188}00188\ \textcolor{comment}{//\ \ \ \ \ corresponding\ edge\ exists\ in\ 'graph'.}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00189}00189\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00190}00190\ \textcolor{comment}{//\ When\ the\ TryAugment()\ method\ adds\ a\ flow,\ it\ sets\ left\_[l]\ =\ r\ for\ some}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00191}00191\ \textcolor{comment}{//\ nodes\ l\ and\ r.\ This\ induces\ the\ following\ changes:}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00192}00192\ \textcolor{comment}{//\ \ \ -\/\ The\ edges\ (source,\ l),\ (l,\ r),\ and\ (r,\ sink)\ are\ added\ to\ the}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00193}00193\ \textcolor{comment}{//\ \ \ \ \ flow\ graph.}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00194}00194\ \textcolor{comment}{//\ \ \ -\/\ The\ same\ three\ edges\ are\ removed\ from\ the\ residual\ flow\ graph.}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00195}00195\ \textcolor{comment}{//\ \ \ -\/\ The\ reverse\ edges\ (l,\ source),\ (r,\ l),\ and\ (sink,\ r)\ are\ added}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00196}00196\ \textcolor{comment}{//\ \ \ \ \ to\ the\ residual\ flow\ graph,\ which\ is\ a\ directional\ graph}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00197}00197\ \textcolor{comment}{//\ \ \ \ \ representing\ unused\ flow\ capacity.}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00198}00198\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00199}00199\ \textcolor{comment}{//\ When\ the\ method\ augments\ a\ flow\ (moving\ left\_[l]\ from\ some\ r1\ to\ some}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00200}00200\ \textcolor{comment}{//\ other\ r2),\ this\ can\ be\ thought\ of\ as\ "{}undoing"{}\ the\ above\ steps\ with}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00201}00201\ \textcolor{comment}{//\ respect\ to\ r1\ and\ "{}redoing"{}\ them\ with\ respect\ to\ r2.}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00202}00202\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00203}00203\ \textcolor{comment}{//\ It\ bears\ repeating\ that\ the\ flow\ graph\ and\ residual\ flow\ graph\ are}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00204}00204\ \textcolor{comment}{//\ never\ represented\ explicitly,\ but\ can\ be\ derived\ by\ looking\ at\ the}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00205}00205\ \textcolor{comment}{//\ information\ in\ 'graph'\ and\ in\ left\_.}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00206}00206\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00207}00207\ \textcolor{comment}{//\ As\ an\ optimization,\ there\ is\ a\ second\ vector<int>\ called\ right\_\ which}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00208}00208\ \textcolor{comment}{//\ does\ not\ provide\ any\ new\ information.\ Instead,\ it\ enables\ more}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00209}00209\ \textcolor{comment}{//\ efficient\ queries\ about\ edges\ entering\ or\ leaving\ the\ right-\/side\ nodes}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00210}00210\ \textcolor{comment}{//\ of\ the\ flow\ or\ residual\ flow\ graphs.\ The\ following\ invariants\ are}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00211}00211\ \textcolor{comment}{//\ maintained:}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00212}00212\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00213}00213\ \textcolor{comment}{//\ left[l]\ ==\ kUnused\ or\ right[left[l]]\ ==\ l}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00214}00214\ \textcolor{comment}{//\ right[r]\ ==\ kUnused\ or\ left[right[r]]\ ==\ r}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00215}00215\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00216}00216\ \textcolor{comment}{//\ .\ [\ source\ ]\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00217}00217\ \textcolor{comment}{//\ .\ \ \ |||\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00218}00218\ \textcolor{comment}{//\ .\ \ \ |||\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00219}00219\ \textcolor{comment}{//\ .\ \ \ ||\(\backslash\)-\/-\/>\ left[0]=1\ \ -\/-\/-\/\(\backslash\)\ \ \ \ right[0]=-\/1\ -\/-\/-\/-\/\(\backslash\)\ \ \ \ \ .}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00220}00220\ \textcolor{comment}{//\ .\ \ \ ||\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ \ \ \ \ .}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00221}00221\ \textcolor{comment}{//\ .\ \ \ |\(\backslash\)-\/-\/-\/>\ left[1]=-\/1\ \ \ \ \(\backslash\)-\/-\/>\ right[1]=0\ \ -\/-\/-\/\(\backslash\)|\ \ \ \ \ .}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00222}00222\ \textcolor{comment}{//\ .\ \ \ |\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ||\ \ \ \ \ .}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00223}00223\ \textcolor{comment}{//\ .\ \ \ \(\backslash\)-\/-\/-\/-\/>\ left[2]=2\ \ -\/-\/-\/-\/-\/-\/>\ right[2]=2\ \ -\/-\/\(\backslash\)||\ \ \ \ \ .}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00224}00224\ \textcolor{comment}{//\ .\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |||\ \ \ \ \ .}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00225}00225\ \textcolor{comment}{//\ .\ \ \ \ \ \ \ \ \ elements\ \ \ \ \ \ \ \ \ \ \ matchers\ \ \ \ \ \ \ vvv\ \ \ \ \ .}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00226}00226\ \textcolor{comment}{//\ .\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [\ sink\ ]\ \ .}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00227}00227\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00228}00228\ \textcolor{comment}{//\ See\ Also:}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00229}00229\ \textcolor{comment}{//\ \ \ [1]\ Cormen,\ et\ al\ (2001).\ "{}Section\ 26.2:\ The\ Ford-\/Fulkerson\ method"{}.}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00230}00230\ \textcolor{comment}{//\ \ \ \ \ \ \ "{}Introduction\ to\ Algorithms\ (Second\ ed.)"{},\ pp.\ 651-\/664.}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00231}00231\ \textcolor{comment}{//\ \ \ [2]\ "{}Ford-\/Fulkerson\ algorithm"{},\ Wikipedia,}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00232}00232\ \textcolor{comment}{//\ \ \ \ \ \ \ 'http://en.wikipedia.org/wiki/Ford\%E2\%80\%93Fulkerson\_algorithm'}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00233}\mbox{\hyperlink{classtesting_1_1internal_1_1_max_bipartite_match_state}{00233}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classtesting_1_1internal_1_1_max_bipartite_match_state}{MaxBipartiteMatchState}}\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00234}00234\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00235}\mbox{\hyperlink{classtesting_1_1internal_1_1_max_bipartite_match_state_a9d0166d5cc7afd1b741f6c312df72b54}{00235}}\ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_max_bipartite_match_state_a9d0166d5cc7afd1b741f6c312df72b54}{MaxBipartiteMatchState}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_match_matrix}{MatchMatrix}}\&\ graph)}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00236}00236\ \ \ \ \ \ \ :\ graph\_(\&graph),}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00237}00237\ \ \ \ \ \ \ \ \ left\_(graph\_-\/>LhsSize(),\ kUnused),}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00238}00238\ \ \ \ \ \ \ \ \ right\_(graph\_-\/>RhsSize(),\ kUnused)\ \{\}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00239}00239\ }
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00240}00240\ \ \ \textcolor{comment}{//\ Returns\ the\ edges\ of\ a\ maximal\ match,\ each\ in\ the\ form\ \{left,\ right\}.}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00241}\mbox{\hyperlink{classtesting_1_1internal_1_1_max_bipartite_match_state_af6efab664ee390925b24d023f1368192}{00241}}\ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a0038618710c01a71150887dc7cfb0a29}{ElementMatcherPairs}}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_max_bipartite_match_state_af6efab664ee390925b24d023f1368192}{Compute}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00242}00242\ \ \ \ \ \textcolor{comment}{//\ 'seen'\ is\ used\ for\ path\ finding\ \{\ 0:\ unseen,\ 1:\ seen\ \}.}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00243}00243\ \ \ \ \ ::std::vector<char>\ seen;}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00244}00244\ \ \ \ \ \textcolor{comment}{//\ Searches\ the\ residual\ flow\ graph\ for\ a\ path\ from\ each\ left\ node\ to}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00245}00245\ \ \ \ \ \textcolor{comment}{//\ the\ sink\ in\ the\ residual\ flow\ graph,\ and\ if\ one\ is\ found,\ add\ flow}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00246}00246\ \ \ \ \ \textcolor{comment}{//\ to\ the\ graph.\ It's\ okay\ to\ search\ through\ the\ left\ nodes\ once.\ The}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00247}00247\ \ \ \ \ \textcolor{comment}{//\ edge\ from\ the\ implicit\ source\ node\ to\ each\ previously-\/visited\ left}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00248}00248\ \ \ \ \ \textcolor{comment}{//\ node\ will\ have\ flow\ if\ that\ left\ node\ has\ any\ path\ to\ the\ sink}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00249}00249\ \ \ \ \ \textcolor{comment}{//\ whatsoever.\ Subsequent\ augmentations\ can\ only\ add\ flow\ to\ the}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00250}00250\ \ \ \ \ \textcolor{comment}{//\ network,\ and\ cannot\ take\ away\ that\ previous\ flow\ unit\ from\ the\ source.}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00251}00251\ \ \ \ \ \textcolor{comment}{//\ Since\ the\ source-\/to-\/left\ edge\ can\ only\ carry\ one\ flow\ unit\ (or,}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00252}00252\ \ \ \ \ \textcolor{comment}{//\ each\ element\ can\ be\ matched\ to\ only\ one\ matcher),\ there\ is\ no\ need}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00253}00253\ \ \ \ \ \textcolor{comment}{//\ to\ visit\ the\ left\ nodes\ more\ than\ once\ looking\ for\ augmented\ paths.}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00254}00254\ \ \ \ \ \textcolor{comment}{//\ The\ flow\ is\ known\ to\ be\ possible\ or\ impossible\ by\ looking\ at\ the}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00255}00255\ \ \ \ \ \textcolor{comment}{//\ node\ once.}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00256}00256\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ ilhs\ =\ 0;\ ilhs\ <\ graph\_-\/>\mbox{\hyperlink{classtesting_1_1internal_1_1_match_matrix_a337d9793c61d985dbc1be166e34eed61}{LhsSize}}();\ ++ilhs)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00257}00257\ \ \ \ \ \ \ \textcolor{comment}{//\ Reset\ the\ path-\/marking\ vector\ and\ try\ to\ find\ a\ path\ from}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00258}00258\ \ \ \ \ \ \ \textcolor{comment}{//\ source\ to\ sink\ starting\ at\ the\ left\_[ilhs]\ node.}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00259}00259\ \ \ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_ab54343f0a36dc4cb0ce8a478dd7847b8}{GTEST\_CHECK\_}}(left\_[ilhs]\ ==\ kUnused)}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00260}00260\ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}ilhs:\ "{}}\ <<\ ilhs\ <<\ \textcolor{stringliteral}{"{},\ left\_[ilhs]:\ "{}}\ <<\ left\_[ilhs];}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00261}00261\ \ \ \ \ \ \ \textcolor{comment}{//\ 'seen'\ initialized\ to\ 'graph\_-\/>RhsSize()'\ copies\ of\ 0.}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00262}00262\ \ \ \ \ \ \ seen.assign(graph\_-\/>\mbox{\hyperlink{classtesting_1_1internal_1_1_match_matrix_aff068e9fed3a42466c5da8766ac43134}{RhsSize}}(),\ 0);}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00263}00263\ \ \ \ \ \ \ TryAugment(ilhs,\ \&seen);}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00264}00264\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00265}00265\ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a0038618710c01a71150887dc7cfb0a29}{ElementMatcherPairs}}\ result;}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00266}00266\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ ilhs\ =\ 0;\ ilhs\ <\ left\_.size();\ ++ilhs)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00267}00267\ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ irhs\ =\ left\_[ilhs];}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00268}00268\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (irhs\ ==\ kUnused)\ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00269}00269\ \ \ \ \ \ \ result.push\_back(\mbox{\hyperlink{namespacetesting_1_1internal_a109863545f08651178bf0f520aebd33b}{ElementMatcherPair}}(ilhs,\ irhs));}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00270}00270\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00271}00271\ \ \ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00272}00272\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00273}00273\ }
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00274}00274\ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00275}00275\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ kUnused\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(-\/1);}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00276}00276\ }
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00277}00277\ \ \ \textcolor{comment}{//\ Perform\ a\ depth-\/first\ search\ from\ left\ node\ ilhs\ to\ the\ sink.\ \ If\ a}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00278}00278\ \ \ \textcolor{comment}{//\ path\ is\ found,\ flow\ is\ added\ to\ the\ network\ by\ linking\ the\ left\ and}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00279}00279\ \ \ \textcolor{comment}{//\ right\ vector\ elements\ corresponding\ each\ segment\ of\ the\ path.}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00280}00280\ \ \ \textcolor{comment}{//\ Returns\ true\ if\ a\ path\ to\ sink\ was\ found,\ which\ means\ that\ a\ unit\ of}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00281}00281\ \ \ \textcolor{comment}{//\ flow\ was\ added\ to\ the\ network.\ The\ 'seen'\ vector\ elements\ correspond}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00282}00282\ \ \ \textcolor{comment}{//\ to\ right\ nodes\ and\ are\ marked\ to\ eliminate\ cycles\ from\ the\ search.}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00283}00283\ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00284}00284\ \ \ \textcolor{comment}{//\ Left\ nodes\ will\ only\ be\ explored\ at\ most\ once\ because\ they}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00285}00285\ \ \ \textcolor{comment}{//\ are\ accessible\ from\ at\ most\ one\ right\ node\ in\ the\ residual\ flow}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00286}00286\ \ \ \textcolor{comment}{//\ graph.}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00287}00287\ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00288}00288\ \ \ \textcolor{comment}{//\ Note\ that\ left\_[ilhs]\ is\ the\ only\ element\ of\ left\_\ that\ TryAugment\ will}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00289}00289\ \ \ \textcolor{comment}{//\ potentially\ transition\ from\ kUnused\ to\ another\ value.\ Any\ other}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00290}00290\ \ \ \textcolor{comment}{//\ left\_\ element\ holding\ kUnused\ before\ TryAugment\ will\ be\ holding\ it}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00291}00291\ \ \ \textcolor{comment}{//\ when\ TryAugment\ returns.}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00292}00292\ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00293}00293\ \ \ \textcolor{keywordtype}{bool}\ TryAugment(\textcolor{keywordtype}{size\_t}\ ilhs,\ ::std::vector<char>*\ seen)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00294}00294\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ irhs\ =\ 0;\ irhs\ <\ graph\_-\/>\mbox{\hyperlink{classtesting_1_1internal_1_1_match_matrix_aff068e9fed3a42466c5da8766ac43134}{RhsSize}}();\ ++irhs)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00295}00295\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((*seen)[irhs])\ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00296}00296\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!graph\_-\/>\mbox{\hyperlink{classtesting_1_1internal_1_1_match_matrix_a94c7641a932739734cb2207b1bca4036}{HasEdge}}(ilhs,\ irhs))\ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00297}00297\ \ \ \ \ \ \ \textcolor{comment}{//\ There's\ an\ available\ edge\ from\ ilhs\ to\ irhs.}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00298}00298\ \ \ \ \ \ \ (*seen)[irhs]\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00299}00299\ \ \ \ \ \ \ \textcolor{comment}{//\ Next\ a\ search\ is\ performed\ to\ determine\ whether}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00300}00300\ \ \ \ \ \ \ \textcolor{comment}{//\ this\ edge\ is\ a\ dead\ end\ or\ leads\ to\ the\ sink.}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00301}00301\ \ \ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00302}00302\ \ \ \ \ \ \ \textcolor{comment}{//\ right\_[irhs]\ ==\ kUnused\ means\ that\ there\ is\ residual\ flow\ from}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00303}00303\ \ \ \ \ \ \ \textcolor{comment}{//\ right\ node\ irhs\ to\ the\ sink,\ so\ we\ can\ use\ that\ to\ finish\ this}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00304}00304\ \ \ \ \ \ \ \textcolor{comment}{//\ flow\ path\ and\ return\ success.}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00305}00305\ \ \ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00306}00306\ \ \ \ \ \ \ \textcolor{comment}{//\ Otherwise\ there\ is\ residual\ flow\ to\ some\ ilhs.\ We\ push\ flow}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00307}00307\ \ \ \ \ \ \ \textcolor{comment}{//\ along\ that\ path\ and\ call\ ourselves\ recursively\ to\ see\ if\ this}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00308}00308\ \ \ \ \ \ \ \textcolor{comment}{//\ ultimately\ leads\ to\ sink.}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00309}00309\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (right\_[irhs]\ ==\ kUnused\ ||\ TryAugment(right\_[irhs],\ seen))\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00310}00310\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Add\ flow\ from\ left\_[ilhs]\ to\ right\_[irhs].}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00311}00311\ \ \ \ \ \ \ \ \ left\_[ilhs]\ =\ irhs;}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00312}00312\ \ \ \ \ \ \ \ \ right\_[irhs]\ =\ ilhs;}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00313}00313\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00314}00314\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00315}00315\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00316}00316\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00317}00317\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00318}00318\ }
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00319}00319\ \ \ \textcolor{keyword}{const}\ MatchMatrix*\ graph\_;\ \ \textcolor{comment}{//\ not\ owned}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00320}00320\ \ \ \textcolor{comment}{//\ Each\ element\ of\ the\ left\_\ vector\ represents\ a\ left\ hand\ side\ node}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00321}00321\ \ \ \textcolor{comment}{//\ (i.e.\ an\ element)\ and\ each\ element\ of\ right\_\ is\ a\ right\ hand\ side}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00322}00322\ \ \ \textcolor{comment}{//\ node\ (i.e.\ a\ matcher).\ The\ values\ in\ the\ left\_\ vector\ indicate}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00323}00323\ \ \ \textcolor{comment}{//\ outflow\ from\ that\ node\ to\ a\ node\ on\ the\ right\_\ side.\ The\ values}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00324}00324\ \ \ \textcolor{comment}{//\ in\ the\ right\_\ indicate\ inflow,\ and\ specify\ which\ left\_\ node\ is}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00325}00325\ \ \ \textcolor{comment}{//\ feeding\ that\ right\_\ node,\ if\ any.\ For\ example,\ left\_[3]\ ==\ 1\ means}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00326}00326\ \ \ \textcolor{comment}{//\ there's\ a\ flow\ from\ element\ \#3\ to\ matcher\ \#1.\ Such\ a\ flow\ would\ also}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00327}00327\ \ \ \textcolor{comment}{//\ be\ redundantly\ represented\ in\ the\ right\_\ vector\ as\ right\_[1]\ ==\ 3.}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00328}00328\ \ \ \textcolor{comment}{//\ Elements\ of\ left\_\ and\ right\_\ are\ either\ kUnused\ or\ mutually}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00329}00329\ \ \ \textcolor{comment}{//\ referent.\ Mutually\ referent\ means\ that\ left\_[right\_[i]]\ =\ i\ and}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00330}00330\ \ \ \textcolor{comment}{//\ right\_[left\_[i]]\ =\ i.}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00331}00331\ \ \ ::std::vector<size\_t>\ left\_;}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00332}00332\ \ \ ::std::vector<size\_t>\ right\_;}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00333}00333\ }
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00334}00334\ \ \ \mbox{\hyperlink{gtest-port_8h_ac593b50ce24257d5b6aa84845c344c9e}{GTEST\_DISALLOW\_ASSIGN\_}}(\mbox{\hyperlink{classtesting_1_1internal_1_1_max_bipartite_match_state_a9d0166d5cc7afd1b741f6c312df72b54}{MaxBipartiteMatchState}});}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00335}00335\ \};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00336}00336\ }
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00337}00337\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ MaxBipartiteMatchState::kUnused;}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00338}00338\ }
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00339}\mbox{\hyperlink{namespacetesting_1_1internal_ae30bd8357c179334b2b09b0d689efccc}{00339}}\ \mbox{\hyperlink{gtest-port_8h_aa73be6f0ba4a7456180a94904ce17790}{GTEST\_API\_}}\ \mbox{\hyperlink{namespacetesting_1_1internal_a0038618710c01a71150887dc7cfb0a29}{ElementMatcherPairs}}\ \mbox{\hyperlink{namespacetesting_1_1internal_ae30bd8357c179334b2b09b0d689efccc}{FindMaxBipartiteMatching}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_match_matrix}{MatchMatrix}}\&\ g)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00340}00340\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_max_bipartite_match_state}{MaxBipartiteMatchState}}(g).\mbox{\hyperlink{classtesting_1_1internal_1_1_max_bipartite_match_state_af6efab664ee390925b24d023f1368192}{Compute}}();}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00341}00341\ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00342}00342\ }
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00343}00343\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ LogElementMatcherPairVec(\textcolor{keyword}{const}\ \mbox{\hyperlink{namespacetesting_1_1internal_a0038618710c01a71150887dc7cfb0a29}{ElementMatcherPairs}}\&\ pairs,}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00344}00344\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ::std::ostream*\ stream)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00345}00345\ \ \ \textcolor{keyword}{typedef}\ ElementMatcherPairs::const\_iterator\ Iter;}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00346}00346\ \ \ ::std::ostream\&\ os\ =\ *stream;}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00347}00347\ \ \ os\ <<\ \textcolor{stringliteral}{"{}\{"{}};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00348}00348\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ sep\ =\ \textcolor{stringliteral}{"{}"{}};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00349}00349\ \ \ \textcolor{keywordflow}{for}\ (Iter\ it\ =\ pairs.begin();\ it\ !=\ pairs.end();\ ++it)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00350}00350\ \ \ \ \ os\ <<\ sep\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n\ \ ("{}}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00351}00351\ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}element\ \#"{}}\ <<\ it-\/>first\ <<\ \textcolor{stringliteral}{"{},\ "{}}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00352}00352\ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}matcher\ \#"{}}\ <<\ it-\/>second\ <<\ \textcolor{stringliteral}{"{})"{}};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00353}00353\ \ \ \ \ sep\ =\ \textcolor{stringliteral}{"{},"{}};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00354}00354\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00355}00355\ \ \ os\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n\}"{}};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00356}00356\ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00357}00357\ }
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00358}\mbox{\hyperlink{classtesting_1_1internal_1_1_match_matrix_a3a35e2d6107c225537d7e776465a7893}{00358}}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_match_matrix_a3a35e2d6107c225537d7e776465a7893}{MatchMatrix::NextGraph}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00359}00359\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ ilhs\ =\ 0;\ ilhs\ <\ \mbox{\hyperlink{classtesting_1_1internal_1_1_match_matrix_a337d9793c61d985dbc1be166e34eed61}{LhsSize}}();\ ++ilhs)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00360}00360\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ irhs\ =\ 0;\ irhs\ <\ \mbox{\hyperlink{classtesting_1_1internal_1_1_match_matrix_aff068e9fed3a42466c5da8766ac43134}{RhsSize}}();\ ++irhs)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00361}00361\ \ \ \ \ \ \ \textcolor{keywordtype}{char}\&\ b\ =\ matched\_[SpaceIndex(ilhs,\ irhs)];}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00362}00362\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!b)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00363}00363\ \ \ \ \ \ \ \ \ b\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00364}00364\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00365}00365\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00366}00366\ \ \ \ \ \ \ b\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00367}00367\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00368}00368\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00369}00369\ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00370}00370\ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00371}00371\ }
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00372}\mbox{\hyperlink{classtesting_1_1internal_1_1_match_matrix_aff1f0ae748f4a5c96117c0f27b493ac6}{00372}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_match_matrix_aff1f0ae748f4a5c96117c0f27b493ac6}{MatchMatrix::Randomize}}()\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00373}00373\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ ilhs\ =\ 0;\ ilhs\ <\ \mbox{\hyperlink{classtesting_1_1internal_1_1_match_matrix_a337d9793c61d985dbc1be166e34eed61}{LhsSize}}();\ ++ilhs)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00374}00374\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ irhs\ =\ 0;\ irhs\ <\ \mbox{\hyperlink{classtesting_1_1internal_1_1_match_matrix_aff068e9fed3a42466c5da8766ac43134}{RhsSize}}();\ ++irhs)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00375}00375\ \ \ \ \ \ \ \textcolor{keywordtype}{char}\&\ b\ =\ matched\_[SpaceIndex(ilhs,\ irhs)];}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00376}00376\ \ \ \ \ \ \ b\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{char}\textcolor{keyword}{>}(rand()\ \&\ 1);\ \ \textcolor{comment}{//\ NOLINT}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00377}00377\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00378}00378\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00379}00379\ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00380}00380\ }
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00381}\mbox{\hyperlink{classtesting_1_1internal_1_1_match_matrix_a37c7a88ac2e9d5012a1ecf1b19869c6c}{00381}}\ std::string\ \mbox{\hyperlink{classtesting_1_1internal_1_1_match_matrix_a37c7a88ac2e9d5012a1ecf1b19869c6c}{MatchMatrix::DebugString}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00382}00382\ \ \ ::std::stringstream\ ss;}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00383}00383\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ sep\ =\ \textcolor{stringliteral}{"{}"{}};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00384}00384\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ <\ \mbox{\hyperlink{classtesting_1_1internal_1_1_match_matrix_a337d9793c61d985dbc1be166e34eed61}{LhsSize}}();\ ++i)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00385}00385\ \ \ \ \ ss\ <<\ sep;}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00386}00386\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ =\ 0;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}}\ <\ \mbox{\hyperlink{classtesting_1_1internal_1_1_match_matrix_aff068e9fed3a42466c5da8766ac43134}{RhsSize}}();\ ++\mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}})\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00387}00387\ \ \ \ \ \ \ ss\ <<\ \mbox{\hyperlink{classtesting_1_1internal_1_1_match_matrix_a94c7641a932739734cb2207b1bca4036}{HasEdge}}(i,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a538d097420e725c4dad63c3caa9e55bd}{j}});}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00388}00388\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00389}00389\ \ \ \ \ sep\ =\ \textcolor{stringliteral}{"{};"{}};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00390}00390\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00391}00391\ \ \ \textcolor{keywordflow}{return}\ ss.str();}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00392}00392\ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00393}00393\ }
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00394}\mbox{\hyperlink{classtesting_1_1internal_1_1_unordered_elements_are_matcher_impl_base_a40318adf9a89d830a26a96b2eb06b4e3}{00394}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_unordered_elements_are_matcher_impl_base_a40318adf9a89d830a26a96b2eb06b4e3}{UnorderedElementsAreMatcherImplBase::DescribeToImpl}}(}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00395}00395\ \ \ \ \ ::std::ostream*\ os)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00396}00396\ \ \ \textcolor{keywordflow}{switch}\ (\mbox{\hyperlink{classtesting_1_1internal_1_1_unordered_elements_are_matcher_impl_base_ac410af5f63726dfbf9a4f63cfd893eb9}{match\_flags}}())\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00397}00397\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structtesting_1_1internal_1_1_unordered_matcher_require_ac393ce539a8090501b5ea3dbd541444caff31503b584408bbb15972c232d3377f}{UnorderedMatcherRequire::ExactMatch}}:}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00398}00398\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (matcher\_describers\_.empty())\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00399}00399\ \ \ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}is\ empty"{}};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00400}00400\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00401}00401\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00402}00402\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (matcher\_describers\_.size()\ ==\ 1)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00403}00403\ \ \ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}has\ "{}}\ <<\ \mbox{\hyperlink{classtesting_1_1internal_1_1_unordered_elements_are_matcher_impl_base_ab6d5a2342e07730b913f419cf662d16a}{Elements}}(1)\ <<\ \textcolor{stringliteral}{"{}\ and\ that\ element\ "{}};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00404}00404\ \ \ \ \ \ \ \ \ matcher\_describers\_[0]-\/>DescribeTo(os);}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00405}00405\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00406}00406\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00407}00407\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}has\ "{}}\ <<\ \mbox{\hyperlink{classtesting_1_1internal_1_1_unordered_elements_are_matcher_impl_base_ab6d5a2342e07730b913f419cf662d16a}{Elements}}(matcher\_describers\_.size())}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00408}00408\ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\ and\ there\ exists\ some\ permutation\ of\ elements\ such\ that:\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00409}00409\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00410}00410\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structtesting_1_1internal_1_1_unordered_matcher_require_ac393ce539a8090501b5ea3dbd541444ca4f993da76b70d97af98384a3dbf5e33c}{UnorderedMatcherRequire::Superset}}:}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00411}00411\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}a\ surjection\ from\ elements\ to\ requirements\ exists\ such\ that:\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00412}00412\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00413}00413\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structtesting_1_1internal_1_1_unordered_matcher_require_ac393ce539a8090501b5ea3dbd541444caccf1a25f8fb7283319497bc59c8bb8a6}{UnorderedMatcherRequire::Subset}}:}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00414}00414\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}an\ injection\ from\ elements\ to\ requirements\ exists\ such\ that:\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00415}00415\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00416}00416\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00417}00417\ }
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00418}00418\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ sep\ =\ \textcolor{stringliteral}{"{}"{}};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00419}00419\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ !=\ matcher\_describers\_.size();\ ++i)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00420}00420\ \ \ \ \ *os\ <<\ sep;}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00421}00421\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classtesting_1_1internal_1_1_unordered_elements_are_matcher_impl_base_ac410af5f63726dfbf9a4f63cfd893eb9}{match\_flags}}()\ ==\ \mbox{\hyperlink{structtesting_1_1internal_1_1_unordered_matcher_require_ac393ce539a8090501b5ea3dbd541444caff31503b584408bbb15972c232d3377f}{UnorderedMatcherRequire::ExactMatch}})\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00422}00422\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}\ -\/\ element\ \#"{}}\ <<\ i\ <<\ \textcolor{stringliteral}{"{}\ "{}};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00423}00423\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00424}00424\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}\ -\/\ an\ element\ "{}};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00425}00425\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00426}00426\ \ \ \ \ matcher\_describers\_[i]-\/>DescribeTo(os);}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00427}00427\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classtesting_1_1internal_1_1_unordered_elements_are_matcher_impl_base_ac410af5f63726dfbf9a4f63cfd893eb9}{match\_flags}}()\ ==\ \mbox{\hyperlink{structtesting_1_1internal_1_1_unordered_matcher_require_ac393ce539a8090501b5ea3dbd541444caff31503b584408bbb15972c232d3377f}{UnorderedMatcherRequire::ExactMatch}})\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00428}00428\ \ \ \ \ \ \ sep\ =\ \textcolor{stringliteral}{"{},\ and\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00429}00429\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00430}00430\ \ \ \ \ \ \ sep\ =\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00431}00431\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00432}00432\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00433}00433\ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00434}00434\ }
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00435}\mbox{\hyperlink{classtesting_1_1internal_1_1_unordered_elements_are_matcher_impl_base_ab3ca5ae4aef146b093a3fb35f53d1a38}{00435}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_unordered_elements_are_matcher_impl_base_ab3ca5ae4aef146b093a3fb35f53d1a38}{UnorderedElementsAreMatcherImplBase::DescribeNegationToImpl}}(}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00436}00436\ \ \ \ \ ::std::ostream*\ os)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00437}00437\ \ \ \textcolor{keywordflow}{switch}\ (\mbox{\hyperlink{classtesting_1_1internal_1_1_unordered_elements_are_matcher_impl_base_ac410af5f63726dfbf9a4f63cfd893eb9}{match\_flags}}())\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00438}00438\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structtesting_1_1internal_1_1_unordered_matcher_require_ac393ce539a8090501b5ea3dbd541444caff31503b584408bbb15972c232d3377f}{UnorderedMatcherRequire::ExactMatch}}:}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00439}00439\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (matcher\_describers\_.empty())\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00440}00440\ \ \ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}isn't\ empty"{}};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00441}00441\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00442}00442\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00443}00443\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (matcher\_describers\_.size()\ ==\ 1)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00444}00444\ \ \ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}doesn't\ have\ "{}}\ <<\ \mbox{\hyperlink{classtesting_1_1internal_1_1_unordered_elements_are_matcher_impl_base_ab6d5a2342e07730b913f419cf662d16a}{Elements}}(1)\ <<\ \textcolor{stringliteral}{"{},\ or\ has\ "{}}\ <<\ \mbox{\hyperlink{classtesting_1_1internal_1_1_unordered_elements_are_matcher_impl_base_ab6d5a2342e07730b913f419cf662d16a}{Elements}}(1)}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00445}00445\ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\ that\ "{}};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00446}00446\ \ \ \ \ \ \ \ \ matcher\_describers\_[0]-\/>DescribeNegationTo(os);}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00447}00447\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00448}00448\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00449}00449\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}doesn't\ have\ "{}}\ <<\ \mbox{\hyperlink{classtesting_1_1internal_1_1_unordered_elements_are_matcher_impl_base_ab6d5a2342e07730b913f419cf662d16a}{Elements}}(matcher\_describers\_.size())}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00450}00450\ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{},\ or\ there\ exists\ no\ permutation\ of\ elements\ such\ that:\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00451}00451\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00452}00452\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structtesting_1_1internal_1_1_unordered_matcher_require_ac393ce539a8090501b5ea3dbd541444ca4f993da76b70d97af98384a3dbf5e33c}{UnorderedMatcherRequire::Superset}}:}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00453}00453\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}no\ surjection\ from\ elements\ to\ requirements\ exists\ such\ that:\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00454}00454\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00455}00455\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{structtesting_1_1internal_1_1_unordered_matcher_require_ac393ce539a8090501b5ea3dbd541444caccf1a25f8fb7283319497bc59c8bb8a6}{UnorderedMatcherRequire::Subset}}:}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00456}00456\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}no\ injection\ from\ elements\ to\ requirements\ exists\ such\ that:\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00457}00457\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00458}00458\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00459}00459\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ sep\ =\ \textcolor{stringliteral}{"{}"{}};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00460}00460\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ i\ =\ 0;\ i\ !=\ matcher\_describers\_.size();\ ++i)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00461}00461\ \ \ \ \ *os\ <<\ sep;}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00462}00462\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classtesting_1_1internal_1_1_unordered_elements_are_matcher_impl_base_ac410af5f63726dfbf9a4f63cfd893eb9}{match\_flags}}()\ ==\ \mbox{\hyperlink{structtesting_1_1internal_1_1_unordered_matcher_require_ac393ce539a8090501b5ea3dbd541444caff31503b584408bbb15972c232d3377f}{UnorderedMatcherRequire::ExactMatch}})\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00463}00463\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}\ -\/\ element\ \#"{}}\ <<\ i\ <<\ \textcolor{stringliteral}{"{}\ "{}};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00464}00464\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00465}00465\ \ \ \ \ \ \ *os\ <<\ \textcolor{stringliteral}{"{}\ -\/\ an\ element\ "{}};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00466}00466\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00467}00467\ \ \ \ \ matcher\_describers\_[i]-\/>DescribeTo(os);}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00468}00468\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classtesting_1_1internal_1_1_unordered_elements_are_matcher_impl_base_ac410af5f63726dfbf9a4f63cfd893eb9}{match\_flags}}()\ ==\ \mbox{\hyperlink{structtesting_1_1internal_1_1_unordered_matcher_require_ac393ce539a8090501b5ea3dbd541444caff31503b584408bbb15972c232d3377f}{UnorderedMatcherRequire::ExactMatch}})\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00469}00469\ \ \ \ \ \ \ sep\ =\ \textcolor{stringliteral}{"{},\ and\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00470}00470\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00471}00471\ \ \ \ \ \ \ sep\ =\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00472}00472\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00473}00473\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00474}00474\ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00475}00475\ }
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00476}00476\ \textcolor{comment}{//\ Checks\ that\ all\ matchers\ match\ at\ least\ one\ element,\ and\ that\ all}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00477}00477\ \textcolor{comment}{//\ elements\ match\ at\ least\ one\ matcher.\ This\ enables\ faster\ matching}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00478}00478\ \textcolor{comment}{//\ and\ better\ error\ reporting.}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00479}00479\ \textcolor{comment}{//\ Returns\ false,\ writing\ an\ explanation\ to\ 'listener',\ if\ and\ only}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00480}00480\ \textcolor{comment}{//\ if\ the\ success\ criteria\ are\ not\ met.}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00481}\mbox{\hyperlink{classtesting_1_1internal_1_1_unordered_elements_are_matcher_impl_base_a6b3fcd5efa2a234c8ce67bfd04282b05}{00481}}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_unordered_elements_are_matcher_impl_base_a6b3fcd5efa2a234c8ce67bfd04282b05}{UnorderedElementsAreMatcherImplBase::VerifyMatchMatrix}}(}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00482}00482\ \ \ \ \ const\ ::std::vector<std::string>\&\ element\_printouts,}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00483}00483\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_match_matrix}{MatchMatrix}}\&\ matrix,\ \mbox{\hyperlink{classtesting_1_1_match_result_listener}{MatchResultListener}}*\ listener)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00484}00484\ \ \ \textcolor{keywordtype}{bool}\ result\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00485}00485\ \ \ ::std::vector<char>\ element\_matched(matrix.\mbox{\hyperlink{classtesting_1_1internal_1_1_match_matrix_a337d9793c61d985dbc1be166e34eed61}{LhsSize}}(),\ 0);}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00486}00486\ \ \ ::std::vector<char>\ matcher\_matched(matrix.\mbox{\hyperlink{classtesting_1_1internal_1_1_match_matrix_aff068e9fed3a42466c5da8766ac43134}{RhsSize}}(),\ 0);}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00487}00487\ }
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00488}00488\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ ilhs\ =\ 0;\ ilhs\ <\ matrix.\mbox{\hyperlink{classtesting_1_1internal_1_1_match_matrix_a337d9793c61d985dbc1be166e34eed61}{LhsSize}}();\ ilhs++)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00489}00489\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ irhs\ =\ 0;\ irhs\ <\ matrix.\mbox{\hyperlink{classtesting_1_1internal_1_1_match_matrix_aff068e9fed3a42466c5da8766ac43134}{RhsSize}}();\ irhs++)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00490}00490\ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ matched\ =\ matrix.\mbox{\hyperlink{classtesting_1_1internal_1_1_match_matrix_a94c7641a932739734cb2207b1bca4036}{HasEdge}}(ilhs,\ irhs);}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00491}00491\ \ \ \ \ \ \ element\_matched[ilhs]\ |=\ matched;}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00492}00492\ \ \ \ \ \ \ matcher\_matched[irhs]\ |=\ matched;}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00493}00493\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00494}00494\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00495}00495\ }
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00496}00496\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classtesting_1_1internal_1_1_unordered_elements_are_matcher_impl_base_ac410af5f63726dfbf9a4f63cfd893eb9}{match\_flags}}()\ \&\ \mbox{\hyperlink{structtesting_1_1internal_1_1_unordered_matcher_require_ac393ce539a8090501b5ea3dbd541444ca4f993da76b70d97af98384a3dbf5e33c}{UnorderedMatcherRequire::Superset}})\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00497}00497\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ sep\ =}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00498}00498\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}where\ the\ following\ matchers\ don't\ match\ any\ elements:\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00499}00499\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ mi\ =\ 0;\ mi\ <\ matcher\_matched.size();\ ++mi)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00500}00500\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (matcher\_matched[mi])\ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00501}00501\ \ \ \ \ \ \ result\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00502}00502\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (listener-\/>\mbox{\hyperlink{classtesting_1_1_match_result_listener_ac34f9771f2ba6128cd6a1348b3aebda3}{IsInterested}}())\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00503}00503\ \ \ \ \ \ \ \ \ *listener\ <<\ sep\ <<\ \textcolor{stringliteral}{"{}matcher\ \#"{}}\ <<\ mi\ <<\ \textcolor{stringliteral}{"{}:\ "{}};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00504}00504\ \ \ \ \ \ \ \ \ matcher\_describers\_[mi]-\/>DescribeTo(listener-\/>\mbox{\hyperlink{classtesting_1_1_match_result_listener_a7f0e5cffd6983499e99546c759aee2f8}{stream}}());}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00505}00505\ \ \ \ \ \ \ \ \ sep\ =\ \textcolor{stringliteral}{"{},\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00506}00506\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00507}00507\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00508}00508\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00509}00509\ }
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00510}00510\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classtesting_1_1internal_1_1_unordered_elements_are_matcher_impl_base_ac410af5f63726dfbf9a4f63cfd893eb9}{match\_flags}}()\ \&\ \mbox{\hyperlink{structtesting_1_1internal_1_1_unordered_matcher_require_ac393ce539a8090501b5ea3dbd541444caccf1a25f8fb7283319497bc59c8bb8a6}{UnorderedMatcherRequire::Subset}})\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00511}00511\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ sep\ =}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00512}00512\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}where\ the\ following\ elements\ don't\ match\ any\ matchers:\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00513}00513\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ outer\_sep\ =\ \textcolor{stringliteral}{"{}"{}};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00514}00514\ \ \ \ \ \textcolor{keywordflow}{if}\ (!result)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00515}00515\ \ \ \ \ \ \ outer\_sep\ =\ \textcolor{stringliteral}{"{}\(\backslash\)nand\ "{}};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00516}00516\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00517}00517\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ ei\ =\ 0;\ ei\ <\ element\_matched.size();\ ++ei)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00518}00518\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (element\_matched[ei])\ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00519}00519\ \ \ \ \ \ \ result\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00520}00520\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (listener-\/>\mbox{\hyperlink{classtesting_1_1_match_result_listener_ac34f9771f2ba6128cd6a1348b3aebda3}{IsInterested}}())\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00521}00521\ \ \ \ \ \ \ \ \ *listener\ <<\ outer\_sep\ <<\ sep\ <<\ \textcolor{stringliteral}{"{}element\ \#"{}}\ <<\ ei\ <<\ \textcolor{stringliteral}{"{}:\ "{}}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00522}00522\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ element\_printouts[ei];}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00523}00523\ \ \ \ \ \ \ \ \ sep\ =\ \textcolor{stringliteral}{"{},\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00524}00524\ \ \ \ \ \ \ \ \ outer\_sep\ =\ \textcolor{stringliteral}{"{}"{}};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00525}00525\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00526}00526\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00527}00527\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00528}00528\ \ \ \textcolor{keywordflow}{return}\ result;}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00529}00529\ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00530}00530\ }
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00531}\mbox{\hyperlink{classtesting_1_1internal_1_1_unordered_elements_are_matcher_impl_base_a4855d62932e1e2a268c05f0edf6d86a5}{00531}}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_unordered_elements_are_matcher_impl_base_a4855d62932e1e2a268c05f0edf6d86a5}{UnorderedElementsAreMatcherImplBase::FindPairing}}(}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00532}00532\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classtesting_1_1internal_1_1_match_matrix}{MatchMatrix}}\&\ matrix,\ \mbox{\hyperlink{classtesting_1_1_match_result_listener}{MatchResultListener}}*\ listener)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00533}00533\ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a0038618710c01a71150887dc7cfb0a29}{ElementMatcherPairs}}\ matches\ =\ \mbox{\hyperlink{namespacetesting_1_1internal_ae30bd8357c179334b2b09b0d689efccc}{FindMaxBipartiteMatching}}(matrix);}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00534}00534\ }
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00535}00535\ \ \ \textcolor{keywordtype}{size\_t}\ max\_flow\ =\ matches.size();}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00536}00536\ \ \ \textcolor{keywordflow}{if}\ ((\mbox{\hyperlink{classtesting_1_1internal_1_1_unordered_elements_are_matcher_impl_base_ac410af5f63726dfbf9a4f63cfd893eb9}{match\_flags}}()\ \&\ \mbox{\hyperlink{structtesting_1_1internal_1_1_unordered_matcher_require_ac393ce539a8090501b5ea3dbd541444ca4f993da76b70d97af98384a3dbf5e33c}{UnorderedMatcherRequire::Superset}})\ \&\&}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00537}00537\ \ \ \ \ \ \ max\_flow\ <\ matrix.\mbox{\hyperlink{classtesting_1_1internal_1_1_match_matrix_aff068e9fed3a42466c5da8766ac43134}{RhsSize}}())\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00538}00538\ \ \ \ \ \textcolor{keywordflow}{if}\ (listener-\/>\mbox{\hyperlink{classtesting_1_1_match_result_listener_ac34f9771f2ba6128cd6a1348b3aebda3}{IsInterested}}())\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00539}00539\ \ \ \ \ \ \ *listener\ <<\ \textcolor{stringliteral}{"{}where\ no\ permutation\ of\ the\ elements\ can\ satisfy\ all\ "{}}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00540}00540\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}matchers,\ and\ the\ closest\ match\ is\ "{}}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00541}00541\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ max\_flow\ <<\ \textcolor{stringliteral}{"{}\ of\ "{}}\ <<\ matrix.\mbox{\hyperlink{classtesting_1_1internal_1_1_match_matrix_aff068e9fed3a42466c5da8766ac43134}{RhsSize}}()}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00542}00542\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\ matchers\ with\ the\ pairings:\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00543}00543\ \ \ \ \ \ \ LogElementMatcherPairVec(matches,\ listener-\/>\mbox{\hyperlink{classtesting_1_1_match_result_listener_a7f0e5cffd6983499e99546c759aee2f8}{stream}}());}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00544}00544\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00545}00545\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00546}00546\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00547}00547\ \ \ \textcolor{keywordflow}{if}\ ((\mbox{\hyperlink{classtesting_1_1internal_1_1_unordered_elements_are_matcher_impl_base_ac410af5f63726dfbf9a4f63cfd893eb9}{match\_flags}}()\ \&\ \mbox{\hyperlink{structtesting_1_1internal_1_1_unordered_matcher_require_ac393ce539a8090501b5ea3dbd541444caccf1a25f8fb7283319497bc59c8bb8a6}{UnorderedMatcherRequire::Subset}})\ \&\&}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00548}00548\ \ \ \ \ \ \ max\_flow\ <\ matrix.\mbox{\hyperlink{classtesting_1_1internal_1_1_match_matrix_a337d9793c61d985dbc1be166e34eed61}{LhsSize}}())\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00549}00549\ \ \ \ \ \textcolor{keywordflow}{if}\ (listener-\/>\mbox{\hyperlink{classtesting_1_1_match_result_listener_ac34f9771f2ba6128cd6a1348b3aebda3}{IsInterested}}())\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00550}00550\ \ \ \ \ \ \ *listener}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00551}00551\ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}where\ not\ all\ elements\ can\ be\ matched,\ and\ the\ closest\ match\ is\ "{}}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00552}00552\ \ \ \ \ \ \ \ \ \ \ <<\ max\_flow\ <<\ \textcolor{stringliteral}{"{}\ of\ "{}}\ <<\ matrix.\mbox{\hyperlink{classtesting_1_1internal_1_1_match_matrix_aff068e9fed3a42466c5da8766ac43134}{RhsSize}}()}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00553}00553\ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\ matchers\ with\ the\ pairings:\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00554}00554\ \ \ \ \ \ \ LogElementMatcherPairVec(matches,\ listener-\/>\mbox{\hyperlink{classtesting_1_1_match_result_listener_a7f0e5cffd6983499e99546c759aee2f8}{stream}}());}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00555}00555\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00556}00556\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00557}00557\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00558}00558\ }
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00559}00559\ \ \ \textcolor{keywordflow}{if}\ (matches.size()\ >\ 1)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00560}00560\ \ \ \ \ \textcolor{keywordflow}{if}\ (listener-\/>\mbox{\hyperlink{classtesting_1_1_match_result_listener_ac34f9771f2ba6128cd6a1348b3aebda3}{IsInterested}}())\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00561}00561\ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ sep\ =\ \textcolor{stringliteral}{"{}where:\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00562}00562\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{size\_t}\ mi\ =\ 0;\ mi\ <\ matches.size();\ ++mi)\ \{}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00563}00563\ \ \ \ \ \ \ \ \ *listener\ <<\ sep\ <<\ \textcolor{stringliteral}{"{}\ -\/\ element\ \#"{}}\ <<\ matches[mi].first}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00564}00564\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\ is\ matched\ by\ matcher\ \#"{}}\ <<\ matches[mi].second;}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00565}00565\ \ \ \ \ \ \ \ \ sep\ =\ \textcolor{stringliteral}{"{},\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00566}00566\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00567}00567\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00568}00568\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00569}00569\ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00570}00570\ \}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00571}00571\ }
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00572}00572\ \}\ \ \textcolor{comment}{//\ namespace\ internal}}
+\DoxyCodeLine{\Hypertarget{gmock-matchers_8cc_source_l00573}00573\ \}\ \ \textcolor{comment}{//\ namespace\ testing}}
+
+\end{DoxyCode}

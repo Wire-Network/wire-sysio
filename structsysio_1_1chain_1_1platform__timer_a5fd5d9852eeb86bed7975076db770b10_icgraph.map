@@ -1,0 +1,7 @@
+<map id="sysio::chain::platform_timer::set_expiration_callback" name="sysio::chain::platform_timer::set_expiration_callback">
+<area shape="rect" id="Node000001" title=" " alt="" coords="267,45,413,101"/>
+<area shape="rect" id="Node000002" href="$structsysio_1_1chain_1_1transaction__checktime__timer.html#a8d521e32027600dda6369c50f01a10c9" title=" " alt="" coords="5,5,219,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="251,60,219,55,220,49,251,55"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1chain_1_1transaction__checktime__timer.html#a05ca36147adfd661c6a20101244bc16f" title=" " alt="" coords="10,85,214,141"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="252,91,215,98,214,93,251,86"/>
+</map>

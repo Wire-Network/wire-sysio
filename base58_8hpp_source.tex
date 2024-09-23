@@ -1,0 +1,17 @@
+\doxysection{base58.\+hpp}
+\hypertarget{base58_8hpp_source}{}\label{base58_8hpp_source}\index{libraries/fc/include/fc/crypto/base58.hpp@{libraries/fc/include/fc/crypto/base58.hpp}}
+\mbox{\hyperlink{base58_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{base58_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{base58_8hpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{string_8hpp}{fc/string.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{base58_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{include_2fc_2time_8hpp}{fc/time.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{base58_8hpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{\Hypertarget{base58_8hpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{base58_8hpp_source_l00006}00006\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacefc}{fc}}\ \{}
+\DoxyCodeLine{\Hypertarget{base58_8hpp_source_l00007}00007\ \ \ \ \ std::string\ \mbox{\hyperlink{namespacefc_a0dd6c1e5792e0823aa1987e06513a4ce}{to\_base58}}(\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ d,\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1optional__delegate}{fc::yield\_function\_t}}\&\ yield\ );}
+\DoxyCodeLine{\Hypertarget{base58_8hpp_source_l00008}00008\ \ \ \ \ std::string\ \mbox{\hyperlink{namespacefc_a0dd6c1e5792e0823aa1987e06513a4ce}{to\_base58}}(\ \textcolor{keyword}{const}\ std::vector<char>\&\ data,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1optional__delegate}{fc::yield\_function\_t}}\&\ yield\ );}
+\DoxyCodeLine{\Hypertarget{base58_8hpp_source_l00009}00009\ \ \ \ \ std::vector<char>\ \mbox{\hyperlink{namespacefc_ab9aa48ceb035b5fc4b0ff9e48b40bc1d}{from\_base58}}(\ \textcolor{keyword}{const}\ std::string\&\ base58\_str\ );}
+\DoxyCodeLine{\Hypertarget{base58_8hpp_source_l00010}00010\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{namespacefc_ab9aa48ceb035b5fc4b0ff9e48b40bc1d}{from\_base58}}(\ \textcolor{keyword}{const}\ std::string\&\ base58\_str,\ \textcolor{keywordtype}{char}*\ out\_data,\ \textcolor{keywordtype}{size\_t}\ out\_data\_len\ );}
+\DoxyCodeLine{\Hypertarget{base58_8hpp_source_l00011}00011\ \}}
+
+\end{DoxyCode}

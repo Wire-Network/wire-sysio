@@ -1,0 +1,161 @@
+\doxysection{fc\+::variant\+::visitor Class Reference}
+\hypertarget{classfc_1_1variant_1_1visitor}{}\label{classfc_1_1variant_1_1visitor}\index{fc::variant::visitor@{fc::variant::visitor}}
+
+
+{\ttfamily \#include $<$variant.\+hpp$>$}
+
+
+
+Inheritance diagram for fc\+::variant\+::visitor\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=196pt]{classfc_1_1variant_1_1visitor__inherit__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{classfc_1_1variant_1_1visitor_a087dd1082ef046936a28fc3dc99fd586}{\texorpdfstring{$\sim$}{\string~}visitor}} ()
+\item 
+virtual void \mbox{\hyperlink{classfc_1_1variant_1_1visitor_a7916c02372821c928e8ba73e00c34a8b}{handle}} () const =0
+\begin{DoxyCompactList}\small\item\em handles null\+\_\+type variants \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classfc_1_1variant_1_1visitor_a3de444674517c39351b838d5c97b6084}{handle}} (const \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \&v) const =0
+\item 
+virtual void \mbox{\hyperlink{classfc_1_1variant_1_1visitor_aeed35785901d79365f39ff2fc7ed9986}{handle}} (const \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \&v) const =0
+\item 
+virtual void \mbox{\hyperlink{classfc_1_1variant_1_1visitor_aa41b4356703ef582cd8241fe1127f1eb}{handle}} (const double \&v) const =0
+\item 
+virtual void \mbox{\hyperlink{classfc_1_1variant_1_1visitor_a654ab380b7f9e8e21189a153ae7968a1}{handle}} (const bool \&v) const =0
+\item 
+virtual void \mbox{\hyperlink{classfc_1_1variant_1_1visitor_a62933d8fcd63a7da7a13923d18715731}{handle}} (const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&v) const =0
+\item 
+virtual void \mbox{\hyperlink{classfc_1_1variant_1_1visitor_ac6c3149af76d47971353bd495f6f6087}{handle}} (const \mbox{\hyperlink{classfc_1_1variant__object}{variant\+\_\+object}} \&v) const =0
+\item 
+virtual void \mbox{\hyperlink{classfc_1_1variant_1_1visitor_af98ef42aa795f1e00de108e5759f813a}{handle}} (const \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}} \&v) const =0
+\item 
+virtual void \mbox{\hyperlink{classfc_1_1variant_1_1visitor_a1eb3515903fd5531590ea6c3789f15bb}{handle}} (const \mbox{\hyperlink{structfc_1_1blob}{blob}} \&v) const =0
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Read-\/only access to the content of the variant. 
+
+Definition at line \mbox{\hyperlink{fc_2include_2fc_2variant_8hpp_source_l00239}{239}} of file \mbox{\hyperlink{fc_2include_2fc_2variant_8hpp_source}{variant.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1variant_1_1visitor_a087dd1082ef046936a28fc3dc99fd586}\index{fc::variant::visitor@{fc::variant::visitor}!````~visitor@{\texorpdfstring{$\sim$}{\string~}visitor}}
+\index{````~visitor@{\texorpdfstring{$\sim$}{\string~}visitor}!fc::variant::visitor@{fc::variant::visitor}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}visitor()}{\string~visitor()}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_1_1visitor_a087dd1082ef046936a28fc3dc99fd586} 
+virtual fc\+::variant\+::visitor\+::\texorpdfstring{$\sim$}{\string~}visitor (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line \mbox{\hyperlink{fc_2include_2fc_2variant_8hpp_source_l00242}{242}} of file \mbox{\hyperlink{fc_2include_2fc_2variant_8hpp_source}{variant.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00242\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classfc_1_1variant_1_1visitor_a7916c02372821c928e8ba73e00c34a8b}\index{fc::variant::visitor@{fc::variant::visitor}!handle@{handle}}
+\index{handle@{handle}!fc::variant::visitor@{fc::variant::visitor}}
+\doxysubsubsection{\texorpdfstring{handle()}{handle()}\hspace{0.1cm}{\footnotesize\ttfamily [1/9]}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_1_1visitor_a7916c02372821c928e8ba73e00c34a8b} 
+virtual void fc\+::variant\+::visitor\+::handle (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{classfc_1_1raw_1_1variant__packer_a4c9c58d6ba6cbf9b8f4c9465ce3a3342}{fc\+::raw\+::variant\+\_\+packer$<$ Stream $>$}}.
+
+\Hypertarget{classfc_1_1variant_1_1visitor_a1eb3515903fd5531590ea6c3789f15bb}\index{fc::variant::visitor@{fc::variant::visitor}!handle@{handle}}
+\index{handle@{handle}!fc::variant::visitor@{fc::variant::visitor}}
+\doxysubsubsection{\texorpdfstring{handle()}{handle()}\hspace{0.1cm}{\footnotesize\ttfamily [2/9]}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_1_1visitor_a1eb3515903fd5531590ea6c3789f15bb} 
+virtual void fc\+::variant\+::visitor\+::handle (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structfc_1_1blob}{blob}} \&}]{v}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{classfc_1_1raw_1_1variant__packer_acf060c3998e5675593b60570cbdd3dac}{fc\+::raw\+::variant\+\_\+packer$<$ Stream $>$}}.
+
+\Hypertarget{classfc_1_1variant_1_1visitor_a654ab380b7f9e8e21189a153ae7968a1}\index{fc::variant::visitor@{fc::variant::visitor}!handle@{handle}}
+\index{handle@{handle}!fc::variant::visitor@{fc::variant::visitor}}
+\doxysubsubsection{\texorpdfstring{handle()}{handle()}\hspace{0.1cm}{\footnotesize\ttfamily [3/9]}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_1_1visitor_a654ab380b7f9e8e21189a153ae7968a1} 
+virtual void fc\+::variant\+::visitor\+::handle (\begin{DoxyParamCaption}\item[{const bool \&}]{v}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{classfc_1_1raw_1_1variant__packer_a35d4b90be09ab21026f47031eef7f9b8}{fc\+::raw\+::variant\+\_\+packer$<$ Stream $>$}}.
+
+\Hypertarget{classfc_1_1variant_1_1visitor_aa41b4356703ef582cd8241fe1127f1eb}\index{fc::variant::visitor@{fc::variant::visitor}!handle@{handle}}
+\index{handle@{handle}!fc::variant::visitor@{fc::variant::visitor}}
+\doxysubsubsection{\texorpdfstring{handle()}{handle()}\hspace{0.1cm}{\footnotesize\ttfamily [4/9]}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_1_1visitor_aa41b4356703ef582cd8241fe1127f1eb} 
+virtual void fc\+::variant\+::visitor\+::handle (\begin{DoxyParamCaption}\item[{const double \&}]{v}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{classfc_1_1raw_1_1variant__packer_a4df0e946d5fd560c9cb88be561a0c829}{fc\+::raw\+::variant\+\_\+packer$<$ Stream $>$}}.
+
+\Hypertarget{classfc_1_1variant_1_1visitor_a3de444674517c39351b838d5c97b6084}\index{fc::variant::visitor@{fc::variant::visitor}!handle@{handle}}
+\index{handle@{handle}!fc::variant::visitor@{fc::variant::visitor}}
+\doxysubsubsection{\texorpdfstring{handle()}{handle()}\hspace{0.1cm}{\footnotesize\ttfamily [5/9]}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_1_1visitor_a3de444674517c39351b838d5c97b6084} 
+virtual void fc\+::variant\+::visitor\+::handle (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\+\_\+t}} \&}]{v}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{classfc_1_1raw_1_1variant__packer_a09e285593821d4aa8e70fa901a7e63df}{fc\+::raw\+::variant\+\_\+packer$<$ Stream $>$}}.
+
+\Hypertarget{classfc_1_1variant_1_1visitor_a62933d8fcd63a7da7a13923d18715731}\index{fc::variant::visitor@{fc::variant::visitor}!handle@{handle}}
+\index{handle@{handle}!fc::variant::visitor@{fc::variant::visitor}}
+\doxysubsubsection{\texorpdfstring{handle()}{handle()}\hspace{0.1cm}{\footnotesize\ttfamily [6/9]}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_1_1visitor_a62933d8fcd63a7da7a13923d18715731} 
+virtual void fc\+::variant\+::visitor\+::handle (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}} \&}]{v}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{classfc_1_1raw_1_1variant__packer_acb5bab9696050ea04d27e9379c2231cd}{fc\+::raw\+::variant\+\_\+packer$<$ Stream $>$}}.
+
+\Hypertarget{classfc_1_1variant_1_1visitor_aeed35785901d79365f39ff2fc7ed9986}\index{fc::variant::visitor@{fc::variant::visitor}!handle@{handle}}
+\index{handle@{handle}!fc::variant::visitor@{fc::variant::visitor}}
+\doxysubsubsection{\texorpdfstring{handle()}{handle()}\hspace{0.1cm}{\footnotesize\ttfamily [7/9]}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_1_1visitor_aeed35785901d79365f39ff2fc7ed9986} 
+virtual void fc\+::variant\+::visitor\+::handle (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\+\_\+t}} \&}]{v}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{classfc_1_1raw_1_1variant__packer_abb124fd4e0cdfc13b63ffd4c6fae123a}{fc\+::raw\+::variant\+\_\+packer$<$ Stream $>$}}.
+
+\Hypertarget{classfc_1_1variant_1_1visitor_ac6c3149af76d47971353bd495f6f6087}\index{fc::variant::visitor@{fc::variant::visitor}!handle@{handle}}
+\index{handle@{handle}!fc::variant::visitor@{fc::variant::visitor}}
+\doxysubsubsection{\texorpdfstring{handle()}{handle()}\hspace{0.1cm}{\footnotesize\ttfamily [8/9]}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_1_1visitor_ac6c3149af76d47971353bd495f6f6087} 
+virtual void fc\+::variant\+::visitor\+::handle (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1variant__object}{variant\+\_\+object}} \&}]{v}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{classfc_1_1raw_1_1variant__packer_a34d50d78bddd262fd99ffc269e821766}{fc\+::raw\+::variant\+\_\+packer$<$ Stream $>$}}.
+
+\Hypertarget{classfc_1_1variant_1_1visitor_af98ef42aa795f1e00de108e5759f813a}\index{fc::variant::visitor@{fc::variant::visitor}!handle@{handle}}
+\index{handle@{handle}!fc::variant::visitor@{fc::variant::visitor}}
+\doxysubsubsection{\texorpdfstring{handle()}{handle()}\hspace{0.1cm}{\footnotesize\ttfamily [9/9]}}
+{\footnotesize\ttfamily \label{classfc_1_1variant_1_1visitor_af98ef42aa795f1e00de108e5759f813a} 
+virtual void fc\+::variant\+::visitor\+::handle (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{namespacefc_a9148361f6aaa3d739990a75ac557fe59}{variants}} \&}]{v}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{classfc_1_1raw_1_1variant__packer_ad34a5dc17569814ad23b7e69f4b8b694}{fc\+::raw\+::variant\+\_\+packer$<$ Stream $>$}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/\mbox{\hyperlink{fc_2include_2fc_2variant_8hpp}{variant.\+hpp}}\end{DoxyCompactItemize}

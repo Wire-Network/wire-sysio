@@ -1,0 +1,38 @@
+<map id="CLI::Option::results" name="CLI::Option::results">
+<area shape="rect" id="Node000001" title="Get the results as a specified type." alt="" coords="5,323,141,348"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_option.html#ab84751fbf9037efaed5b64fed17fe57f" title="Gets a comma separated list of names. Will include / prefer the positional name if positional is true..." alt="" coords="189,204,342,230"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="94,320,229,236,232,240,97,324"/>
+<area shape="rect" id="Node000015" href="$namespace_c_l_i_1_1detail.html#a9e56362b2b589534c179de55f6444ed8" title="Conversion for tuples." alt="" coords="202,315,328,356"/>
+<area shape="poly" id="edge17_Node000001_Node000015" title=" " alt="" coords="141,333,186,333,186,338,141,338"/>
+<area shape="rect" id="Node000017" href="$class_c_l_i_1_1_option.html#a35ae96199e3704c2b4be44bae9be28fa" title="Get a copy of the results." alt="" coords="194,380,336,421"/>
+<area shape="poly" id="edge19_Node000001_Node000017" title=" " alt="" coords="114,346,190,372,188,378,112,351"/>
+<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_option.html#a4d2329268bae134aa58e704fa61f4b57" title="Requires &quot;&#45;&#45;&quot; to be removed from string." alt="" coords="408,16,540,57"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="272,202,316,138,350,100,388,67,394,63,397,67,392,71,354,104,321,142,277,205"/>
+<area shape="rect" id="Node000009" href="$class_c_l_i_1_1_option.html#af5677ee4a55c2a85784f64198db6b452" title="True if the option was not passed." alt="" coords="408,81,540,107"/>
+<area shape="poly" id="edge10_Node000002_Node000009" title=" " alt="" coords="278,202,325,160,356,137,389,117,403,110,406,115,391,122,359,142,328,165,282,206"/>
+<area shape="rect" id="Node000010" href="$class_c_l_i_1_1_option.html#a4eb6212ac30a0b139da52d258a3a1790" title=" " alt="" coords="403,131,545,172"/>
+<area shape="poly" id="edge11_Node000002_Node000010" title=" " alt="" coords="308,201,391,175,393,180,310,206"/>
+<area shape="rect" id="Node000011" href="$class_c_l_i_1_1_option_base.html#ad824d0f4f973675beece17d6b5ad9d00" title=" " alt="" coords="390,196,558,237"/>
+<area shape="poly" id="edge13_Node000002_Node000011" title=" " alt="" coords="342,214,374,214,374,220,342,220"/>
+<area shape="rect" id="Node000012" href="$class_c_l_i_1_1_option.html#afe31a608506cbe75d40d6cced342be11" title="The total min number of expected string values to be used." alt="" coords="398,262,551,302"/>
+<area shape="poly" id="edge14_Node000002_Node000012" title=" " alt="" coords="310,228,393,254,391,259,308,233"/>
+<area shape="rect" id="Node000014" href="$namespace_c_l_i_1_1detail.html#ab351f13ec104e2cba19ec6baf4a552f6" title="Simple function to join a string." alt="" coords="420,327,529,352"/>
+<area shape="poly" id="edge16_Node000002_Node000014" title=" " alt="" coords="282,228,328,269,359,292,391,312,406,319,404,324,389,317,356,296,325,273,278,232"/>
+<area shape="rect" id="Node000004" href="$namespace_c_l_i_1_1detail.html#a356b9c9cc904af2b0a918fd55e86cd9c" title="Check if a string is a member of a list of strings and optionally ignore case or ignore underscores." alt="" coords="606,81,771,107"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="541,52,624,74,622,79,539,57"/>
+<area shape="rect" id="Node000005" href="$namespace_c_l_i.html#a0c52326d2681814c22aa1a93ce43375e" title="Helper function to allow ignore_case to be passed to IsMember or Transform." alt="" coords="837,5,957,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="725,78,844,34,846,39,727,83"/>
+<area shape="rect" id="Node000006" href="$namespace_c_l_i_1_1detail.html#ae83709ec148057ec53df4383645727e9" title="Return a lower case version of a string." alt="" coords="1023,43,1161,68"/>
+<area shape="poly" id="edge9_Node000004_Node000006" title=" " alt="" coords="771,84,1007,61,1008,66,771,89"/>
+<area shape="rect" id="Node000007" href="$namespace_c_l_i.html#a111b6f05d21b9b84e7ba933ade79884c" title="Helper function to allow ignore_underscore to be passed to IsMember or Transform." alt="" coords="819,107,975,132"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="771,102,804,105,803,111,771,107"/>
+<area shape="rect" id="Node000008" href="$namespace_c_l_i_1_1detail.html#a5359a7a0e33366a12e15523b100f591a" title="remove underscores from a string" alt="" coords="1026,114,1158,154"/>
+<area shape="poly" id="edge8_Node000004_Node000008" title=" " alt="" coords="717,105,764,126,819,142,868,148,918,150,1010,144,1011,149,918,155,868,154,818,147,762,131,715,110"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="958,27,1008,37,1007,42,957,32"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="976,123,1011,125,1011,131,975,128"/>
+<area shape="poly" id="edge12_Node000010_Node000004" title=" " alt="" coords="545,130,622,109,624,114,547,135"/>
+<area shape="rect" id="Node000013" href="$class_c_l_i_1_1_option.html#af87dffed2cb245673312c993e563710e" title="The total min number of expected string values to be used." alt="" coords="612,262,765,302"/>
+<area shape="poly" id="edge15_Node000012_Node000013" title=" " alt="" coords="551,280,597,280,597,285,551,285"/>
+<area shape="rect" id="Node000016" href="$namespace_c_l_i_1_1detail.html#ab51a37d8073a381cabf33bff8e4bce00" title=" " alt="" coords="416,376,533,417"/>
+<area shape="poly" id="edge18_Node000015_Node000016" title=" " alt="" coords="330,352,401,373,400,378,328,357"/>
+</map>

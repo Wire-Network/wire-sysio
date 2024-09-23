@@ -1,0 +1,22 @@
+\doxysection{sysio.\+wrap.\+cpp}
+\hypertarget{sysio_8wrap_8cpp_source}{}\label{sysio_8wrap_8cpp_source}\index{/Users/svetlasyrimis/Desktop/wire-\/network/WN-\/org/wire-\/system-\/contracts/contracts/sysio.wrap/src/sysio.wrap.cpp@{/Users/svetlasyrimis/Desktop/wire-\/network/WN-\/org/wire-\/system-\/contracts/contracts/sysio.wrap/src/sysio.wrap.cpp}}
+\mbox{\hyperlink{sysio_8wrap_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{sysio_8wrap_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{sysio_8wrap_8hpp}{sysio.wrap/sysio.wrap.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{sysio_8wrap_8cpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{sysio_8wrap_8cpp_source_l00003}00003\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_8wrap_8cpp_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{sysio_8wrap_8cpp_source_l00005}\mbox{\hyperlink{classsysio_1_1wrap_a1b2aa35e1b8cfae8f43afb9e8c3b9eae}{00005}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1wrap_a1b2aa35e1b8cfae8f43afb9e8c3b9eae}{wrap::exec}}(\ ignore<name>,\ ignore<transaction>\ )\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_8wrap_8cpp_source_l00006}00006\ \ \ \ require\_auth(\ get\_self()\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8wrap_8cpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{sysio_8wrap_8cpp_source_l00008}00008\ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}\ executer;}
+\DoxyCodeLine{\Hypertarget{sysio_8wrap_8cpp_source_l00009}00009\ \ \ \ \_ds\ >>\ executer;}
+\DoxyCodeLine{\Hypertarget{sysio_8wrap_8cpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{sysio_8wrap_8cpp_source_l00011}00011\ \ \ \ require\_auth(\ executer\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8wrap_8cpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{sysio_8wrap_8cpp_source_l00013}00013\ \ \ \ send\_deferred(\ (\mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a376f631fcb770bd4b2e8349a33e52f8a}{uint128\_t}}(executer.value)\ <<\ 64)\ |\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})current\_time\_point().time\_since\_epoch().\mbox{\hyperlink{gmock__stress__test_8cc_afd9db40e3361ae09188795e8cbe19752}{count}}(),\ executer,\ \_ds.pos(),\ \_ds.remaining()\ );}
+\DoxyCodeLine{\Hypertarget{sysio_8wrap_8cpp_source_l00014}00014\ \}}
+\DoxyCodeLine{\Hypertarget{sysio_8wrap_8cpp_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{sysio_8wrap_8cpp_source_l00016}00016\ \}\ }
+
+\end{DoxyCode}

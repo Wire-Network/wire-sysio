@@ -1,0 +1,331 @@
+\doxysection{sysio\+::trace\+\_\+api\+::compressed\+\_\+file\+\_\+impl Struct Reference}
+\hypertarget{structsysio_1_1trace__api_1_1compressed__file__impl}{}\label{structsysio_1_1trace__api_1_1compressed__file__impl}\index{sysio::trace\_api::compressed\_file\_impl@{sysio::trace\_api::compressed\_file\_impl}}
+
+
+Collaboration diagram for sysio\+::trace\+\_\+api\+::compressed\+\_\+file\+\_\+impl\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=262pt]{structsysio_1_1trace__api_1_1compressed__file__impl__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_ad61ee1df25f1d2d2d969b8437638ca66}{\texorpdfstring{$\sim$}{\string~}compressed\+\_\+file\+\_\+impl}} ()
+\item 
+void \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_a84d50de8a686907ee4eddad83d497834}{read}} (char \texorpdfstring{$\ast$}{*}d, size\+\_\+t n, \mbox{\hyperlink{classfc_1_1cfile}{fc\+::cfile}} \&file)
+\item 
+void \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_ad5485cb0fa283cf7ddebe48e95a48819}{seek}} (long loc, \mbox{\hyperlink{classfc_1_1cfile}{fc\+::cfile}} \&file)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+z\+\_\+stream \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_af2a587dc20d03dcd59467fd8d4d61d51}{strm}}
+\item 
+std\+::vector$<$ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} $>$ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_a1a5e5e7e4f40935cb25d79f88086864b}{compressed\+\_\+buffer}} = std\+::vector$<$\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}}$>$(\mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_ae466972520e5a8f727c36ec5cf1f2556}{compressed\+\_\+buffer\+\_\+size}})
+\item 
+std\+::vector$<$ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} $>$ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_a490e9fb6f4e48df0d98cda7939e96325}{read\+\_\+buffer}} = std\+::vector$<$\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}}$>$(\mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_a8d236309beb23779cb11f78ecb33aa14}{read\+\_\+buffer\+\_\+size}})
+\item 
+size\+\_\+t \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_a28a22f20c576b62bba8bbd85ef239d4a}{remaining\+\_\+read\+\_\+buffer}} = 0
+\item 
+bool \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_aa9f80ef0d517d554fd1c6e8237695012}{initialized}} = false
+\item 
+size\+\_\+t \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_ac9a0848b88856e3b55cd7b6a73c05184}{file\+\_\+size}} = 0
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static constexpr size\+\_\+t \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_a8d236309beb23779cb11f78ecb33aa14}{read\+\_\+buffer\+\_\+size}} = 4\texorpdfstring{$\ast$}{*}1024
+\item 
+static constexpr size\+\_\+t \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_ae466972520e5a8f727c36ec5cf1f2556}{compressed\+\_\+buffer\+\_\+size}} = 4\texorpdfstring{$\ast$}{*}1024
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{compressed__file_8cpp_source_l00022}{22}} of file \mbox{\hyperlink{compressed__file_8cpp_source}{compressed\+\_\+file.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structsysio_1_1trace__api_1_1compressed__file__impl_ad61ee1df25f1d2d2d969b8437638ca66}\index{sysio::trace\_api::compressed\_file\_impl@{sysio::trace\_api::compressed\_file\_impl}!````~compressed\_file\_impl@{\texorpdfstring{$\sim$}{\string~}compressed\_file\_impl}}
+\index{````~compressed\_file\_impl@{\texorpdfstring{$\sim$}{\string~}compressed\_file\_impl}!sysio::trace\_api::compressed\_file\_impl@{sysio::trace\_api::compressed\_file\_impl}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}compressed\_file\_impl()}{\string~compressed\_file\_impl()}}
+{\footnotesize\ttfamily \label{structsysio_1_1trace__api_1_1compressed__file__impl_ad61ee1df25f1d2d2d969b8437638ca66} 
+sysio\+::trace\+\_\+api\+::compressed\+\_\+file\+\_\+impl\+::\texorpdfstring{$\sim$}{\string~}compressed\+\_\+file\+\_\+impl (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{compressed__file_8cpp_source_l00026}{26}} of file \mbox{\hyperlink{compressed__file_8cpp_source}{compressed\+\_\+file.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00027\ \ \ \ \{}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_aa9f80ef0d517d554fd1c6e8237695012}{initialized}})\ \{}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ inflateEnd(\&\mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_af2a587dc20d03dcd59467fd8d4d61d51}{strm}});}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_aa9f80ef0d517d554fd1c6e8237695012}{initialized}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00032\ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1trace__api_1_1compressed__file__impl_a84d50de8a686907ee4eddad83d497834}\index{sysio::trace\_api::compressed\_file\_impl@{sysio::trace\_api::compressed\_file\_impl}!read@{read}}
+\index{read@{read}!sysio::trace\_api::compressed\_file\_impl@{sysio::trace\_api::compressed\_file\_impl}}
+\doxysubsubsection{\texorpdfstring{read()}{read()}}
+{\footnotesize\ttfamily \label{structsysio_1_1trace__api_1_1compressed__file__impl_a84d50de8a686907ee4eddad83d497834} 
+void sysio\+::trace\+\_\+api\+::compressed\+\_\+file\+\_\+impl\+::read (\begin{DoxyParamCaption}\item[{char \texorpdfstring{$\ast$}{*}}]{d}{, }\item[{size\+\_\+t}]{n}{, }\item[{\mbox{\hyperlink{classfc_1_1cfile}{fc\+::cfile}} \&}]{file}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{compressed__file_8cpp_source_l00034}{34}} of file \mbox{\hyperlink{compressed__file_8cpp_source}{compressed\+\_\+file.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00035\ \ \ \ \{}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_aa9f80ef0d517d554fd1c6e8237695012}{initialized}})\ \{}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (Z\_OK\ !=\ inflateInit2(\&\mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_af2a587dc20d03dcd59467fd8d4d61d51}{strm}},\ raw\_zlib\_window\_bits))\ \{}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}failed\ to\ initialize\ decompression"{}});}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00040\ }
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_a28a22f20c576b62bba8bbd85ef239d4a}{remaining\_read\_buffer}}\ =\ 0;}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_af2a587dc20d03dcd59467fd8d4d61d51}{strm}}.avail\_in\ =\ 0;}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_aa9f80ef0d517d554fd1c6e8237695012}{initialized}}\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00045\ }
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ written\ =\ 0;}
+\DoxyCodeLine{00047\ }
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \textcolor{comment}{//\ consume\ the\ left\ over\ from\ the\ last\ read\ if\ there\ is\ any}}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_a28a22f20c576b62bba8bbd85ef239d4a}{remaining\_read\_buffer}}\ >\ 0)\ \{}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ to\_read\ =\ std::min(\mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_a28a22f20c576b62bba8bbd85ef239d4a}{remaining\_read\_buffer}},\ n);}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ std::memcpy(d,\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_a490e9fb6f4e48df0d98cda7939e96325}{read\_buffer}}.data(),\ to\_read\ );}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_a28a22f20c576b62bba8bbd85ef239d4a}{remaining\_read\_buffer}}\ -\/=\ to\_read;}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ written\ +=\ to\_read;}
+\DoxyCodeLine{00054\ }
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_a28a22f20c576b62bba8bbd85ef239d4a}{remaining\_read\_buffer}}\ >\ 0\ )\ \{}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ \ \ \ std::memmove(\mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_a490e9fb6f4e48df0d98cda7939e96325}{read\_buffer}}.data(),\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_a490e9fb6f4e48df0d98cda7939e96325}{read\_buffer}}.data()\ +\ to\_read,\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_a28a22f20c576b62bba8bbd85ef239d4a}{remaining\_read\_buffer}});}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00060\ }
+\DoxyCodeLine{00061\ }
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \textcolor{comment}{//\ decompress\ more\ chunks}}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (written\ <\ n)\ \{}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_af2a587dc20d03dcd59467fd8d4d61d51}{strm}}.avail\_in\ ==\ 0\ )\ \{}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ remaining\ =\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_ac9a0848b88856e3b55cd7b6a73c05184}{file\_size}}\ -\/\ file.tellp();}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ to\_read\ =\ std::min((\textcolor{keywordtype}{size\_t})\mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_a1a5e5e7e4f40935cb25d79f88086864b}{compressed\_buffer}}.size(),\ remaining);}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \ \ \ file.read(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(\mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_a1a5e5e7e4f40935cb25d79f88086864b}{compressed\_buffer}}.data()),\ to\_read);}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_af2a587dc20d03dcd59467fd8d4d61d51}{strm}}.avail\_in\ =\ to\_read;}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_af2a587dc20d03dcd59467fd8d4d61d51}{strm}}.next\_in\ =\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_a1a5e5e7e4f40935cb25d79f88086864b}{compressed\_buffer}}.data();}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00071\ }
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{do}\ \{}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_af2a587dc20d03dcd59467fd8d4d61d51}{strm}}.avail\_out\ =\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_a490e9fb6f4e48df0d98cda7939e96325}{read\_buffer}}.size();}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_af2a587dc20d03dcd59467fd8d4d61d51}{strm}}.next\_out\ =\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_a490e9fb6f4e48df0d98cda7939e96325}{read\_buffer}}.data();}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ inflate(\&\mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_af2a587dc20d03dcd59467fd8d4d61d51}{strm}},\ Z\_NO\_FLUSH);}
+\DoxyCodeLine{00076\ }
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ ==\ Z\_NEED\_DICT\ ||\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ ==\ Z\_DATA\_ERROR\ ||\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ ==\ Z\_MEM\_ERROR)\ \{}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ compressed\_file\_error(\textcolor{stringliteral}{"{}Error\ decompressing:\ "{}}\ +\ std::string(\mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_af2a587dc20d03dcd59467fd8d4d61d51}{strm}}.msg));}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00080\ }
+\DoxyCodeLine{00081\ }
+\DoxyCodeLine{00082\ }
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ bytes\_decompressed\ =\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_a490e9fb6f4e48df0d98cda7939e96325}{read\_buffer}}.size()\ -\/\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_af2a587dc20d03dcd59467fd8d4d61d51}{strm}}.avail\_out;}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (bytes\_decompressed\ >\ 0)\ \{}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ to\_copy\ =\ std::min(bytes\_decompressed,\ n\ -\/\ written);}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::memcpy(d\ +\ written,\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_a490e9fb6f4e48df0d98cda7939e96325}{read\_buffer}}.data(),\ to\_copy);}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ written\ +=\ to\_copy;}
+\DoxyCodeLine{00088\ }
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (bytes\_decompressed\ >\ to\_copy)\ \{}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ move\ remaining\ to\ the\ front\ of\ the\ buffer}}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::memmove(\mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_a490e9fb6f4e48df0d98cda7939e96325}{read\_buffer}}.data(),\ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_a490e9fb6f4e48df0d98cda7939e96325}{read\_buffer}}.data()\ +\ to\_copy,\ bytes\_decompressed\ -\/\ to\_copy);}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_a28a22f20c576b62bba8bbd85ef239d4a}{remaining\_read\_buffer}}\ =\ bytes\_decompressed\ -\/\ to\_copy;}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00095\ }
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (written\ <\ n\ \&\&\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ ==\ Z\_STREAM\_END)\ \{}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::ios\_base::failure(\textcolor{stringliteral}{"{}Attempting\ to\ read\ past\ the\ end\ of\ a\ compressed\ file"{}});}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00099\ }
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ ==\ Z\_BUF\_ERROR)\ \{}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ need\ more\ input}}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_af2a587dc20d03dcd59467fd8d4d61d51}{strm}}.avail\_in\ !=\ 0)\ \{}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ compressed\_file\_error(\textcolor{stringliteral}{"{}Error\ decompressing\ cannot\ continue\ processing\ input"{}});}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00107\ }
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{while}\ (\mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_af2a587dc20d03dcd59467fd8d4d61d51}{strm}}.avail\_out\ ==\ 0\ \&\&\ written\ <\ n);}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00110\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1trace__api_1_1compressed__file__impl_a84d50de8a686907ee4eddad83d497834_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1trace__api_1_1compressed__file__impl_ad5485cb0fa283cf7ddebe48e95a48819}\index{sysio::trace\_api::compressed\_file\_impl@{sysio::trace\_api::compressed\_file\_impl}!seek@{seek}}
+\index{seek@{seek}!sysio::trace\_api::compressed\_file\_impl@{sysio::trace\_api::compressed\_file\_impl}}
+\doxysubsubsection{\texorpdfstring{seek()}{seek()}}
+{\footnotesize\ttfamily \label{structsysio_1_1trace__api_1_1compressed__file__impl_ad5485cb0fa283cf7ddebe48e95a48819} 
+void sysio\+::trace\+\_\+api\+::compressed\+\_\+file\+\_\+impl\+::seek (\begin{DoxyParamCaption}\item[{long}]{loc}{, }\item[{\mbox{\hyperlink{classfc_1_1cfile}{fc\+::cfile}} \&}]{file}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{compressed__file_8cpp_source_l00112}{112}} of file \mbox{\hyperlink{compressed__file_8cpp_source}{compressed\+\_\+file.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_aa9f80ef0d517d554fd1c6e8237695012}{initialized}})\ \{}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \ inflateEnd(\&\mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_af2a587dc20d03dcd59467fd8d4d61d51}{strm}});}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_aa9f80ef0d517d554fd1c6e8237695012}{initialized}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00117\ }
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \textcolor{keywordtype}{long}\ remaining\ =\ loc;}
+\DoxyCodeLine{00119\ }
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \textcolor{comment}{//\ read\ in\ the\ seek\ point\ map}}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ file.seek\_end(-\/expected\_seek\_point\_count\_size);}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ seek\_point\_count\_type\ seek\_point\_count\ =\ 0;}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ file.read(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(\&seek\_point\_count),\ \textcolor{keyword}{sizeof}(seek\_point\_count));}
+\DoxyCodeLine{00124\ }
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (seek\_point\_count\ >\ 0)\ \{}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ seek\_map\_size\ =\ \textcolor{keyword}{sizeof}(seek\_point\_entry)\ *\ seek\_point\_count;}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \ file.seek\_end(-\/expected\_seek\_point\_count\_size\ -\/\ seek\_map\_size);}
+\DoxyCodeLine{00128\ }
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ std::vector<seek\_point\_entry>\ seek\_point\_map(seek\_point\_count);}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ file.read(\textcolor{keyword}{reinterpret\_cast<}\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(seek\_point\_map.data()),\ seek\_point\_map.size()\ *\ \textcolor{keyword}{sizeof}(seek\_point\_entry));}
+\DoxyCodeLine{00131\ }
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ seek\ to\ the\ neareast\ seek\ point}}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ iter\ =\ std::lower\_bound(seek\_point\_map.begin(),\ seek\_point\_map.end(),\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})loc,\ [](\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ lhs,\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ rhs\ )\{}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \ \ \ \ return\ std::get<0>(lhs)\ <\ rhs;}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00136\ }
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ special\ case\ when\ there\ is\ a\ seek\ point\ that\ is\ exact}}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ iter\ !=\ seek\_point\_map.end()\ \&\&\ std::get<0>(*iter)\ ==\ loc\ )\ \{}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \ \ \ \ file.seek(std::get<1>(*iter));}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00142\ }
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ special\ case\ when\ this\ is\ before\ the\ first\ seek\ point}}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ iter\ ==\ seek\_point\_map.begin()\ )\ \{}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \ \ \ \ file.seek(0);}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ if\ lower\ bound\ wasn't\ exact\ iter\ will\ be\ one\ past\ the\ seek\ point\ we\ need}}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ seek\_pt\ =\ *(iter\ -\/\ 1);}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \ \ \ \ file.seek(std::get<1>(seek\_pt));}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \ \ \ \ remaining\ -\/=\ std::get<0>(seek\_pt);}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \ file.seek(0);}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00155\ }
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \textcolor{comment}{//\ read\ up\ to\ the\ expected\ offset}}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (remaining\ >\ 0)\ \{}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ pre\_read\_buffer\ =\ std::vector<char>(remaining);}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_a84d50de8a686907ee4eddad83d497834}{read}}(pre\_read\_buffer.data(),\ pre\_read\_buffer.size(),\ file);}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00161\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1trace__api_1_1compressed__file__impl_ad5485cb0fa283cf7ddebe48e95a48819_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1trace__api_1_1compressed__file__impl_a1a5e5e7e4f40935cb25d79f88086864b}\index{sysio::trace\_api::compressed\_file\_impl@{sysio::trace\_api::compressed\_file\_impl}!compressed\_buffer@{compressed\_buffer}}
+\index{compressed\_buffer@{compressed\_buffer}!sysio::trace\_api::compressed\_file\_impl@{sysio::trace\_api::compressed\_file\_impl}}
+\doxysubsubsection{\texorpdfstring{compressed\_buffer}{compressed\_buffer}}
+{\footnotesize\ttfamily \label{structsysio_1_1trace__api_1_1compressed__file__impl_a1a5e5e7e4f40935cb25d79f88086864b} 
+std\+::vector$<$\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}}$>$ sysio\+::trace\+\_\+api\+::compressed\+\_\+file\+\_\+impl\+::compressed\+\_\+buffer = std\+::vector$<$\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}}$>$(\mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_ae466972520e5a8f727c36ec5cf1f2556}{compressed\+\_\+buffer\+\_\+size}})}
+
+
+
+Definition at line \mbox{\hyperlink{compressed__file_8cpp_source_l00164}{164}} of file \mbox{\hyperlink{compressed__file_8cpp_source}{compressed\+\_\+file.\+cpp}}.
+
+\Hypertarget{structsysio_1_1trace__api_1_1compressed__file__impl_ae466972520e5a8f727c36ec5cf1f2556}\index{sysio::trace\_api::compressed\_file\_impl@{sysio::trace\_api::compressed\_file\_impl}!compressed\_buffer\_size@{compressed\_buffer\_size}}
+\index{compressed\_buffer\_size@{compressed\_buffer\_size}!sysio::trace\_api::compressed\_file\_impl@{sysio::trace\_api::compressed\_file\_impl}}
+\doxysubsubsection{\texorpdfstring{compressed\_buffer\_size}{compressed\_buffer\_size}}
+{\footnotesize\ttfamily \label{structsysio_1_1trace__api_1_1compressed__file__impl_ae466972520e5a8f727c36ec5cf1f2556} 
+size\+\_\+t sysio\+::trace\+\_\+api\+::compressed\+\_\+file\+\_\+impl\+::compressed\+\_\+buffer\+\_\+size = 4\texorpdfstring{$\ast$}{*}1024\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{compressed__file_8cpp_source_l00024}{24}} of file \mbox{\hyperlink{compressed__file_8cpp_source}{compressed\+\_\+file.\+cpp}}.
+
+\Hypertarget{structsysio_1_1trace__api_1_1compressed__file__impl_ac9a0848b88856e3b55cd7b6a73c05184}\index{sysio::trace\_api::compressed\_file\_impl@{sysio::trace\_api::compressed\_file\_impl}!file\_size@{file\_size}}
+\index{file\_size@{file\_size}!sysio::trace\_api::compressed\_file\_impl@{sysio::trace\_api::compressed\_file\_impl}}
+\doxysubsubsection{\texorpdfstring{file\_size}{file\_size}}
+{\footnotesize\ttfamily \label{structsysio_1_1trace__api_1_1compressed__file__impl_ac9a0848b88856e3b55cd7b6a73c05184} 
+size\+\_\+t sysio\+::trace\+\_\+api\+::compressed\+\_\+file\+\_\+impl\+::file\+\_\+size = 0}
+
+
+
+Definition at line \mbox{\hyperlink{compressed__file_8cpp_source_l00168}{168}} of file \mbox{\hyperlink{compressed__file_8cpp_source}{compressed\+\_\+file.\+cpp}}.
+
+\Hypertarget{structsysio_1_1trace__api_1_1compressed__file__impl_aa9f80ef0d517d554fd1c6e8237695012}\index{sysio::trace\_api::compressed\_file\_impl@{sysio::trace\_api::compressed\_file\_impl}!initialized@{initialized}}
+\index{initialized@{initialized}!sysio::trace\_api::compressed\_file\_impl@{sysio::trace\_api::compressed\_file\_impl}}
+\doxysubsubsection{\texorpdfstring{initialized}{initialized}}
+{\footnotesize\ttfamily \label{structsysio_1_1trace__api_1_1compressed__file__impl_aa9f80ef0d517d554fd1c6e8237695012} 
+bool sysio\+::trace\+\_\+api\+::compressed\+\_\+file\+\_\+impl\+::initialized = false}
+
+
+
+Definition at line \mbox{\hyperlink{compressed__file_8cpp_source_l00167}{167}} of file \mbox{\hyperlink{compressed__file_8cpp_source}{compressed\+\_\+file.\+cpp}}.
+
+\Hypertarget{structsysio_1_1trace__api_1_1compressed__file__impl_a490e9fb6f4e48df0d98cda7939e96325}\index{sysio::trace\_api::compressed\_file\_impl@{sysio::trace\_api::compressed\_file\_impl}!read\_buffer@{read\_buffer}}
+\index{read\_buffer@{read\_buffer}!sysio::trace\_api::compressed\_file\_impl@{sysio::trace\_api::compressed\_file\_impl}}
+\doxysubsubsection{\texorpdfstring{read\_buffer}{read\_buffer}}
+{\footnotesize\ttfamily \label{structsysio_1_1trace__api_1_1compressed__file__impl_a490e9fb6f4e48df0d98cda7939e96325} 
+std\+::vector$<$\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}}$>$ sysio\+::trace\+\_\+api\+::compressed\+\_\+file\+\_\+impl\+::read\+\_\+buffer = std\+::vector$<$\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}}$>$(\mbox{\hyperlink{structsysio_1_1trace__api_1_1compressed__file__impl_a8d236309beb23779cb11f78ecb33aa14}{read\+\_\+buffer\+\_\+size}})}
+
+
+
+Definition at line \mbox{\hyperlink{compressed__file_8cpp_source_l00165}{165}} of file \mbox{\hyperlink{compressed__file_8cpp_source}{compressed\+\_\+file.\+cpp}}.
+
+\Hypertarget{structsysio_1_1trace__api_1_1compressed__file__impl_a8d236309beb23779cb11f78ecb33aa14}\index{sysio::trace\_api::compressed\_file\_impl@{sysio::trace\_api::compressed\_file\_impl}!read\_buffer\_size@{read\_buffer\_size}}
+\index{read\_buffer\_size@{read\_buffer\_size}!sysio::trace\_api::compressed\_file\_impl@{sysio::trace\_api::compressed\_file\_impl}}
+\doxysubsubsection{\texorpdfstring{read\_buffer\_size}{read\_buffer\_size}}
+{\footnotesize\ttfamily \label{structsysio_1_1trace__api_1_1compressed__file__impl_a8d236309beb23779cb11f78ecb33aa14} 
+size\+\_\+t sysio\+::trace\+\_\+api\+::compressed\+\_\+file\+\_\+impl\+::read\+\_\+buffer\+\_\+size = 4\texorpdfstring{$\ast$}{*}1024\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{compressed__file_8cpp_source_l00023}{23}} of file \mbox{\hyperlink{compressed__file_8cpp_source}{compressed\+\_\+file.\+cpp}}.
+
+\Hypertarget{structsysio_1_1trace__api_1_1compressed__file__impl_a28a22f20c576b62bba8bbd85ef239d4a}\index{sysio::trace\_api::compressed\_file\_impl@{sysio::trace\_api::compressed\_file\_impl}!remaining\_read\_buffer@{remaining\_read\_buffer}}
+\index{remaining\_read\_buffer@{remaining\_read\_buffer}!sysio::trace\_api::compressed\_file\_impl@{sysio::trace\_api::compressed\_file\_impl}}
+\doxysubsubsection{\texorpdfstring{remaining\_read\_buffer}{remaining\_read\_buffer}}
+{\footnotesize\ttfamily \label{structsysio_1_1trace__api_1_1compressed__file__impl_a28a22f20c576b62bba8bbd85ef239d4a} 
+size\+\_\+t sysio\+::trace\+\_\+api\+::compressed\+\_\+file\+\_\+impl\+::remaining\+\_\+read\+\_\+buffer = 0}
+
+
+
+Definition at line \mbox{\hyperlink{compressed__file_8cpp_source_l00166}{166}} of file \mbox{\hyperlink{compressed__file_8cpp_source}{compressed\+\_\+file.\+cpp}}.
+
+\Hypertarget{structsysio_1_1trace__api_1_1compressed__file__impl_af2a587dc20d03dcd59467fd8d4d61d51}\index{sysio::trace\_api::compressed\_file\_impl@{sysio::trace\_api::compressed\_file\_impl}!strm@{strm}}
+\index{strm@{strm}!sysio::trace\_api::compressed\_file\_impl@{sysio::trace\_api::compressed\_file\_impl}}
+\doxysubsubsection{\texorpdfstring{strm}{strm}}
+{\footnotesize\ttfamily \label{structsysio_1_1trace__api_1_1compressed__file__impl_af2a587dc20d03dcd59467fd8d4d61d51} 
+z\+\_\+stream sysio\+::trace\+\_\+api\+::compressed\+\_\+file\+\_\+impl\+::strm}
+
+
+
+Definition at line \mbox{\hyperlink{compressed__file_8cpp_source_l00163}{163}} of file \mbox{\hyperlink{compressed__file_8cpp_source}{compressed\+\_\+file.\+cpp}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+plugins/trace\+\_\+api\+\_\+plugin/\mbox{\hyperlink{compressed__file_8cpp}{compressed\+\_\+file.\+cpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,7 @@
+<map id="create_empty_file" name="create_empty_file">
+<area shape="rect" id="Node000001" title=" " alt="" coords="277,5,401,31"/>
+<area shape="rect" id="Node000002" href="$coverage-helper_8cpp.html#ac7219d6c8bed061556e207e21c0b9a75" title=" " alt="" coords="103,5,229,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="262,21,230,21,230,16,262,16"/>
+<area shape="rect" id="Node000003" href="$coverage-helper_8cpp.html#a3c04138a5bfe5d72780bb7e82a18e627" title=" " alt="" coords="5,5,55,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="87,21,55,21,55,16,87,16"/>
+</map>

@@ -1,0 +1,58 @@
+\chapter{release-\/process}
+\hypertarget{md_libraries_2sys-vm_2external_2_catch2_2docs_2release-process}{}\label{md_libraries_2sys-vm_2external_2_catch2_2docs_2release-process}\index{release-\/process@{release-\/process}}
+\label{_top}%
+ \doxysection*{How to release}
+
+When enough changes have accumulated, it is time to release new version of \doxylink{namespace_catch}{Catch}. This document describes the process in doing so, that no steps are forgotten. Note that all referenced scripts can be found in the {\ttfamily scripts/} directory.
+
+\doxysubsection*{Necessary steps}
+
+These steps are necessary and have to be performed before each new release. They serve to make sure that the new release is correct and linked-\/to from the standard places.
+
+\doxysubsubsection*{Testing}
+
+All of the tests are currently run in our CI setup based on Travis\+CI and App\+Veyor. As long as the last commit tested green, the release can proceed.
+
+\doxysubsubsection*{Incrementing version number}
+
+\doxylink{namespace_catch}{Catch} uses a variant of \href{http://semver.org/}{\texttt{ semantic versioning}}, with breaking API changes (and thus major version increments) being very rare. Thus, the release will usually increment the patch version, when it only contains couple of bugfixes, or minor version, when it contains new functionality, or larger changes in implementation of current functionality.
+
+After deciding which part of version number should be incremented, you can use one of the {\ttfamily \texorpdfstring{$\ast$}{*}\+Release.py} scripts to perform the required changes to \doxylink{namespace_catch}{Catch}.
+
+This will take care of generating the single include header, updating version numbers everywhere and pushing the new version to Wandbox.
+
+\doxysubsubsection*{Release notes}
+
+Once a release is ready, release notes need to be written. They should summarize changes done since last release. For rough idea of expected notes see previous releases. Once written, release notes should be added to {\ttfamily \doxylink{release-notes_8md}{docs/release-\/notes.\+md}}.
+
+\doxysubsubsection*{Commit and push update to Git\+Hub}
+
+After version number is incremented, single-\/include header is regenerated and release notes are updated, changes should be committed and pushed to Git\+Hub.
+
+\doxysubsubsection*{Release on Git\+Hub}
+
+After pushing changes to Git\+Hub, Git\+Hub release {\itshape needs} to be created. Tag version and release title should be same as the new version, description should contain the release notes for the current release. Single header version of {\ttfamily catch.\+hpp} {\itshape needs} to be attached as a binary, as that is where the official download link links to. Preferably it should use linux line endings. All non-\/bundled reporters (Automake, TAP, Team\+City) should also be attached as binaries, as they might be dependent on a specific version of the single-\/include header.
+
+Since 2.\+5.\+0, the release tag and the "{}binaries"{} (headers) should be PGP signed.
+
+\doxysubsubsubsection*{Signing a tag}
+
+To create a signed tag, use {\ttfamily git tag -\/s \texorpdfstring{$<$}{<}VERSION\texorpdfstring{$>$}{>}}, where {\ttfamily \texorpdfstring{$<$}{<}VERSION\texorpdfstring{$>$}{>}} is the version being released, e.\+g. {\ttfamily git tag -\/s v2.\+6.\+0}.
+
+Use the version name as the short message and the release notes as the body (long) message.
+
+\doxysubsubsubsection*{Signing the headers}
+
+This will create ASCII-\/armored signatures for the headers that are uploaded to the Git\+Hub release\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$\ gpg2\ -\/-\/armor\ -\/-\/output\ catch.hpp.asc\ -\/-\/detach-\/sig\ catch.hpp}
+\DoxyCodeLine{\$\ gpg2\ -\/-\/armor\ -\/-\/output\ catch\_reporter\_automake.hpp.asc\ -\/-\/detach-\/sig\ catch\_reporter\_automake.hpp}
+\DoxyCodeLine{\$\ gpg2\ -\/-\/armor\ -\/-\/output\ catch\_reporter\_teamcity.hpp.asc\ -\/-\/detach-\/sig\ catch\_reporter\_teamcity.hpp}
+\DoxyCodeLine{\$\ gpg2\ -\/-\/armor\ -\/-\/output\ catch\_reporter\_tap.hpp.asc\ -\/-\/detach-\/sig\ catch\_reporter\_tap.hpp}
+
+\end{DoxyCode}
+
+
+{\itshape GPG does not support signing multiple files in single invocation.} 

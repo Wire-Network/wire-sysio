@@ -1,0 +1,11 @@
+<map id="Xbyak::Reg::changeBit" name="Xbyak::Reg::changeBit">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,80,162,106"/>
+<area shape="rect" id="Node000002" href="$class_xbyak_1_1_operand.html#a9722a98c75928e06e3be3198b7aaa426" title=" " alt="" coords="217,5,376,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="114,77,209,40,229,33,230,38,211,45,116,82"/>
+<area shape="rect" id="Node000003" href="$class_xbyak_1_1_operand.html#a209c322fcecff9f02e62462ec754fa6f" title=" " alt="" coords="213,55,380,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="162,81,197,77,198,82,162,86"/>
+<area shape="rect" id="Node000004" href="$class_xbyak_1_1_operand.html#a0fd53f9394841224652bf009be2173b3" title=" " alt="" coords="210,104,384,130"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="162,99,194,103,194,108,162,104"/>
+<area shape="rect" id="Node000005" href="$class_xbyak_1_1_reg.html#a724d9790244821816e475dba7e2db492" title=" " alt="" coords="236,153,358,179"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="117,104,211,140,230,146,229,151,209,145,115,109"/>
+</map>

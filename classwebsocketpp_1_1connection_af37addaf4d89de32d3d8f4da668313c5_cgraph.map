@@ -1,0 +1,9 @@
+<map id="websocketpp::connection::handle_send_http_request" name="websocketpp::connection::handle_send_http_request">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,27,187,68"/>
+<area shape="rect" id="Node000002" href="$xbyak__mnemonic_8h.html#aa81aed607133209dade63a226818224d" title=" " alt="" coords="278,5,324,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="187,32,263,21,263,26,188,37"/>
+<area shape="rect" id="Node000003" href="$namespacewebsocketpp_1_1error.html#a3344622df8c36e8ae03c59164e7b5e89" title=" " alt="" coords="235,55,367,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="188,57,219,62,219,67,187,63"/>
+<area shape="rect" id="Node000004" href="$namespacewebsocketpp_1_1error.html#ac1acac2bfb24bbd2b1791db80993b0c2" title=" " alt="" coords="415,55,547,96"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="367,73,400,73,400,78,367,78"/>
+</map>

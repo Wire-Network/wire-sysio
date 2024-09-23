@@ -1,0 +1,107 @@
+<map id="CLI::Option::check_fname" name="CLI::Option::check_fname">
+<area shape="rect" id="Node000001" title="Requires &quot;&#45;&#45;&quot; to be removed from string." alt="" coords="1296,863,1428,903"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_option.html#ab84751fbf9037efaed5b64fed17fe57f" title="Gets a comma separated list of names. Will include / prefer the positional name if positional is true..." alt="" coords="1095,870,1248,896"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1281,886,1249,886,1249,880,1281,880"/>
+<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_app.html#aaabfb31d7fb10ee7465716b948b376dc" title="function that could be used by subclasses of App to shift options around into subcommands" alt="" coords="881,128,1044,153"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="1163,856,1121,642,1087,494,1044,345,1003,234,967,155,972,152,1008,232,1050,344,1092,493,1126,641,1168,855"/>
+<area shape="rect" id="Node000007" href="$class_c_l_i_1_1_app.html#a4e0c00ce18bbfca1ae890a653bbd2b93" title="Verify required options and cross requirements. Subcommands too (only if selected)." alt="" coords="669,163,803,203"/>
+<area shape="poly" id="edge7_Node000002_Node000007" title=" " alt="" coords="1160,856,1125,744,1096,665,1059,578,1013,486,960,394,898,307,828,229,794,206,797,202,831,225,902,304,965,392,1018,484,1063,576,1101,663,1130,742,1165,855"/>
+<area shape="rect" id="Node000016" href="$class_c_l_i_1_1_app.html#aaa53fda3b6aa477158ea8b1768342cc0" title="Special private constructor for subcommand." alt="" coords="910,845,1014,870"/>
+<area shape="poly" id="edge16_Node000002_Node000016" title=" " alt="" coords="1079,875,1015,867,1015,861,1080,869"/>
+<area shape="rect" id="Node000061" href="$namespace_c_l_i.html#a6cb6f8bfff8c49385fb24f6f23a23c21" title="Helper function to mark an option as deprecated." alt="" coords="888,894,1037,920"/>
+<area shape="poly" id="edge39_Node000002_Node000061" title=" " alt="" coords="1080,896,1038,901,1037,896,1079,891"/>
+<area shape="rect" id="Node000064" href="$class_c_l_i_1_1_formatter.html#ad29eb726bf961560f0c6419fd74332d0" title="This is the name part of an option, Default: left column." alt="" coords="889,969,1036,1010"/>
+<area shape="poly" id="edge42_Node000002_Node000064" title=" " alt="" coords="1132,906,1005,971,1003,966,1130,901"/>
+<area shape="rect" id="Node000073" href="$class_c_l_i_1_1_option.html#a251a3c10c556855c236fddbd419709b1" title="Get the results as a specified type." alt="" coords="895,1034,1030,1060"/>
+<area shape="poly" id="edge45_Node000002_Node000073" title=" " alt="" coords="1156,911,1112,968,1082,998,1048,1024,1024,1036,1021,1031,1046,1019,1079,994,1108,964,1152,907"/>
+<area shape="rect" id="Node000074" href="$namespace_c_l_i.html#a36cfe4a6a80bf143735c0b80960bc252" title="Helper function to mark an option as retired." alt="" coords="902,1148,1023,1173"/>
+<area shape="poly" id="edge46_Node000002_Node000074" title=" " alt="" coords="1157,911,1111,986,1049,1074,1012,1116,979,1149,976,1145,1008,1112,1045,1071,1107,983,1153,908"/>
+<area shape="rect" id="Node000078" href="$class_c_l_i_1_1_option.html#ab06eb6c31666a4a003aeb2cf3e5cdcd9" title="Process the callback." alt="" coords="878,686,1047,712"/>
+<area shape="poly" id="edge50_Node000002_Node000078" title=" " alt="" coords="1143,862,977,714,980,710,1146,858"/>
+<area shape="rect" id="Node000004" href="$class_c_l_i_1_1_option__group.html#a29c346abf87173bccd860d3a9813a5c5" title="Add an existing option to the Option_group." alt="" coords="668,33,804,74"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="912,124,790,77,792,72,914,119"/>
+<area shape="rect" id="Node000005" href="$class_c_l_i_1_1_option__group.html#afdc8b0b76fcc2ef4df8fbf2218edfd20" title="Add an existing option to the Option_group." alt="" coords="418,33,553,74"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="653,56,554,56,554,51,653,51"/>
+<area shape="rect" id="Node000006" href="$class_c_l_i_1_1_option__group.html#a449fcf469561e36a9276707097fd9935" title="Add a bunch of options to the group." alt="" coords="180,5,316,46"/>
+<area shape="poly" id="edge6_Node000004_Node000006" title=" " alt="" coords="652,34,594,24,520,19,445,18,316,23,315,17,445,12,520,13,595,19,653,29"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="402,47,316,36,316,31,403,41"/>
+<area shape="rect" id="Node000008" href="$class_c_l_i_1_1_app.html#a241ba75a6c98b36349ae2f71a9137291" title="Internal parse function." alt="" coords="188,174,308,200"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="670,160,594,139,533,129,485,124,437,127,378,139,354,151,330,165,301,176,299,171,328,161,351,146,376,134,437,121,485,119,534,124,595,134,671,154"/>
+<area shape="rect" id="Node000011" href="$class_c_l_i_1_1_app.html#a1f7a70f4bc4c375a7de10073a5de709d" title="Fill in a single config option." alt="" coords="405,249,566,290"/>
+<area shape="poly" id="edge11_Node000007_Node000011" title=" " alt="" coords="662,211,548,251,546,246,660,206"/>
+<area shape="rect" id="Node000014" href="$class_c_l_i_1_1_app.html#a0fec24c804daf5b458bb5762e4e75a73" title="Process callbacks and such." alt="" coords="418,149,553,174"/>
+<area shape="poly" id="edge13_Node000007_Node000014" title=" " alt="" coords="653,179,553,170,553,165,653,173"/>
+<area shape="rect" id="Node000009" href="$class_c_l_i_1_1_app.html#a8ffb155a1153ee23d442c5bfed21225c" title="The real work is done here. Expects a reversed vector." alt="" coords="5,150,119,176"/>
+<area shape="poly" id="edge9_Node000008_Node000009" title=" " alt="" coords="172,180,118,173,119,168,173,175"/>
+<area shape="rect" id="Node000010" href="$class_c_l_i_1_1_app.html#a878c1067ade7145aa11478d64f5173ed" title=" " alt="" coords="5,200,119,225"/>
+<area shape="poly" id="edge10_Node000008_Node000010" title=" " alt="" coords="173,200,119,207,118,202,172,195"/>
+<area shape="rect" id="Node000012" href="$class_c_l_i_1_1_app.html#aee09795046c3b47948e6c2fa45349eca" title=" " alt="" coords="167,257,329,282"/>
+<area shape="poly" id="edge12_Node000011_Node000012" title=" " alt="" coords="390,272,330,272,330,267,390,267"/>
+<area shape="poly" id="edge15_Node000014_Node000008" title=" " alt="" coords="404,173,309,183,308,178,403,168"/>
+<area shape="rect" id="Node000015" href="$class_c_l_i_1_1_app.html#a26a92886a7d7f10a9afbd39b6535f42b" title="Internal parse function." alt="" coords="188,125,308,150"/>
+<area shape="poly" id="edge14_Node000014_Node000015" title=" " alt="" coords="403,156,308,146,309,141,404,151"/>
+<area shape="rect" id="Node000017" href="$class_c_l_i_1_1_app.html#a8b461d2233ec4121259011b5ed24b336" title="Add a subcommand. Inherits INHERITABLE and OptionDefaults, and help flag." alt="" coords="642,845,830,870"/>
+<area shape="poly" id="edge17_Node000016_Node000017" title=" " alt="" coords="895,860,830,860,830,855,895,855"/>
+<area shape="poly" id="edge19_Node000017_Node000017" title=" " alt="" coords="775,832,762,826,736,823,712,826,699,830,696,836,703,843,698,846,691,836,695,826,711,820,736,818,764,821,778,828"/>
+<area shape="rect" id="Node000018" href="$class_c_l_i_1_1_app.html#a5e114076a7cfa20a5895e9f6e8fd7dd5" title="creates an option group as part of the given app" alt="" coords="414,1517,558,1558"/>
+<area shape="poly" id="edge18_Node000017_Node000018" title=" " alt="" coords="645,883,644,883,630,906,621,935,612,1009,614,1097,620,1193,627,1289,629,1378,620,1453,611,1483,596,1507,580,1522,560,1532,557,1527,577,1518,592,1504,606,1481,615,1452,623,1377,622,1289,615,1193,608,1098,607,1009,616,934,626,904,640,880,641,879"/>
+<area shape="rect" id="Node000019" href="$structapprove__producer__subcommand.html#a2ffa44603ef049ae06c005814bbb8993" title=" " alt="" coords="377,1583,594,1623"/>
+<area shape="poly" id="edge20_Node000017_Node000019" title=" " alt="" coords="645,883,644,883,629,909,619,941,612,979,610,1022,612,1119,620,1225,628,1330,631,1428,628,1472,622,1511,612,1545,596,1571,583,1584,579,1580,592,1568,607,1542,617,1510,623,1471,626,1428,623,1330,615,1225,607,1120,604,1022,607,978,613,940,624,906,640,880,641,879"/>
+<area shape="rect" id="Node000020" href="$structbidname__info__subcommand.html#a573adc6b3decc158bbf05cab12c81c31" title=" " alt="" coords="390,315,581,355"/>
+<area shape="poly" id="edge21_Node000017_Node000020" title=" " alt="" coords="710,835,673,787,655,757,640,725,625,672,622,623,626,578,633,536,637,495,635,455,621,414,592,370,579,358,582,354,596,367,626,411,640,454,642,495,638,537,632,579,628,623,631,671,645,723,659,754,677,784,714,832"/>
+<area shape="rect" id="Node000021" href="$structbidname__subcommand.html#ac60c6a6ace11634a66cb10938608df50" title=" " alt="" coords="404,380,567,421"/>
+<area shape="poly" id="edge22_Node000017_Node000021" title=" " alt="" coords="710,835,674,786,655,757,640,725,627,682,624,642,630,570,632,537,629,504,617,471,592,436,566,416,569,412,596,432,621,468,634,503,637,537,635,571,629,642,632,681,645,723,660,754,678,783,715,831"/>
+<area shape="rect" id="Node000022" href="$structbuyram__subcommand.html#aefe28771c949401bedb6bc69b1596421" title=" " alt="" coords="407,445,564,486"/>
+<area shape="poly" id="edge23_Node000017_Node000022" title=" " alt="" coords="711,835,674,786,640,725,629,691,625,660,626,605,626,579,623,554,612,528,592,501,579,490,564,481,566,477,582,485,596,497,617,525,628,552,632,579,632,605,630,660,634,690,645,723,679,783,715,831"/>
+<area shape="rect" id="Node000023" href="$structbuyrex__subcommand.html#aa87f0055fbcc4f2b0335dd0c69326b63" title=" " alt="" coords="409,511,562,551"/>
+<area shape="poly" id="edge24_Node000017_Node000023" title=" " alt="" coords="712,834,675,786,640,725,631,701,626,679,623,639,617,603,608,585,592,566,578,555,562,547,564,542,581,550,596,562,612,582,622,601,628,639,631,678,636,700,645,723,680,783,716,831"/>
+<area shape="rect" id="Node000024" href="$structcanceldelay__subcommand.html#aebb722eed1632dbbb6db7d96735699b8" title=" " alt="" coords="394,576,577,617"/>
+<area shape="poly" id="edge25_Node000017_Node000024" title=" " alt="" coords="713,834,640,726,627,698,620,674,611,653,593,632,574,619,577,615,596,628,616,650,625,672,632,696,645,723,718,831"/>
+<area shape="rect" id="Node000025" href="$structcancelrexorder__subcommand.html#ac3c562f0fa605397d2b24607511e05fc" title=" " alt="" coords="386,641,585,682"/>
+<area shape="poly" id="edge26_Node000017_Node000025" title=" " alt="" coords="717,833,667,765,632,729,593,697,569,685,572,680,596,693,636,725,671,762,721,830"/>
+<area shape="rect" id="Node000026" href="$structclaimrewards__subcommand.html#aaa0699c33989e1a9091cc65a959e34fa" title=" " alt="" coords="390,707,581,747"/>
+<area shape="poly" id="edge27_Node000017_Node000026" title=" " alt="" coords="706,837,655,799,593,763,563,750,565,745,596,758,658,795,709,833"/>
+<area shape="rect" id="Node000027" href="$structcloserex__subcommand.html#aab82e19b7105ffb1781489583287d8b9" title=" " alt="" coords="404,772,567,813"/>
+<area shape="poly" id="edge28_Node000017_Node000027" title=" " alt="" coords="669,843,566,816,567,811,670,838"/>
+<area shape="rect" id="Node000028" href="$structconsolidate__subcommand.html#a19ff3aa2c9fe725226233f1e67af5c8c" title=" " alt="" coords="396,837,576,878"/>
+<area shape="poly" id="edge29_Node000017_Node000028" title=" " alt="" coords="627,860,576,860,576,855,627,855"/>
+<area shape="rect" id="Node000029" href="$structcreate__account__subcommand.html#a46440dab55b6a8b52d22e14901e48e9e" title=" " alt="" coords="384,903,587,943"/>
+<area shape="poly" id="edge30_Node000017_Node000029" title=" " alt="" coords="669,877,643,884,566,905,565,900,642,879,668,872"/>
+<area shape="rect" id="Node000030" href="$structdefcpuloan__subcommand.html#af3ca37158ea5b590376e1ecad6f6332f" title=" " alt="" coords="397,968,574,1009"/>
+<area shape="poly" id="edge31_Node000017_Node000030" title=" " alt="" coords="650,880,644,884,628,901,621,919,613,938,596,957,575,970,572,965,593,953,608,935,616,917,624,898,641,880,647,876"/>
+<area shape="rect" id="Node000031" href="$structdefnetloan__subcommand.html#a841dc655658bacc75eba67f3302fa1c2" title=" " alt="" coords="398,1033,573,1074"/>
+<area shape="poly" id="edge32_Node000017_Node000031" title=" " alt="" coords="647,881,644,884,631,900,624,916,621,951,617,986,610,1005,596,1022,575,1037,572,1033,592,1018,606,1002,612,985,615,950,619,915,626,897,640,880,644,877"/>
+<area shape="rect" id="Node000032" href="$structdelegate__bandwidth__subcommand.html#a7ef09be51fd71407ca8206b70eae3816" title=" " alt="" coords="400,1098,572,1154"/>
+<area shape="poly" id="edge33_Node000017_Node000032" title=" " alt="" coords="646,882,644,883,626,908,619,932,617,957,620,982,622,1008,621,1034,614,1061,596,1087,574,1105,571,1101,592,1084,609,1058,616,1033,617,1008,614,983,612,957,613,931,622,905,640,880,642,878"/>
+<area shape="rect" id="Node000033" href="$structdeposit__subcommand.html#ade8abe5318a565cdfc8408b7285bc9ff" title=" " alt="" coords="408,1177,564,1218"/>
+<area shape="poly" id="edge34_Node000017_Node000033" title=" " alt="" coords="645,882,644,883,621,918,613,953,614,987,620,1023,627,1058,628,1094,620,1131,596,1167,582,1180,565,1189,563,1184,579,1175,592,1164,615,1129,623,1094,621,1059,615,1024,609,988,608,952,616,916,640,880,641,879"/>
+<area shape="rect" id="Node000034" href="$structfundcpuloan__subcommand.html#a85fa3c7201b07e36a619381f688b12d5" title=" " alt="" coords="394,1243,578,1283"/>
+<area shape="poly" id="edge35_Node000017_Node000034" title=" " alt="" coords="645,882,644,883,628,905,617,926,608,969,611,1011,620,1054,629,1098,633,1142,624,1186,613,1209,596,1231,580,1245,577,1241,592,1228,608,1206,619,1184,627,1141,624,1098,615,1055,606,1012,603,968,612,924,624,902,640,880,641,879"/>
+<area shape="rect" id="Node000035" href="$structfundnetloan__subcommand.html#ac97f567b337e95ad71f1c5ebaeee1aa3" title=" " alt="" coords="395,1308,576,1349"/>
+<area shape="poly" id="edge36_Node000017_Node000035" title=" " alt="" coords="645,882,644,883,625,909,613,935,606,960,603,985,608,1036,620,1087,632,1138,637,1190,635,1216,628,1243,615,1270,596,1297,578,1312,575,1308,592,1293,611,1267,623,1241,630,1215,632,1190,627,1139,615,1088,602,1037,598,985,600,959,608,933,621,906,640,880,641,879"/>
+<area shape="rect" id="Node000036" href="$structget__schedule__subcommand.html#add73f1d1dcb885a95244088f9955c17e" title=" " alt="" coords="390,1373,581,1414"/>
+<area shape="poly" id="edge37_Node000017_Node000036" title=" " alt="" coords="645,883,644,883,623,913,608,943,600,972,598,1002,604,1060,619,1119,635,1178,642,1238,640,1269,632,1300,618,1331,596,1362,582,1375,579,1371,592,1359,613,1328,627,1298,634,1268,637,1239,630,1179,614,1120,599,1061,593,1002,595,971,603,941,618,911,640,880,641,879"/>
+<area shape="rect" id="Node000037" href="$structget__transaction__id__subcommand.html#a92055028cd9a74a28b7ff52a270492e7" title=" " alt="" coords="384,1438,587,1494"/>
+<area shape="poly" id="edge38_Node000017_Node000037" title=" " alt="" coords="645,883,644,883,632,903,623,928,615,992,615,1069,619,1152,624,1235,624,1313,617,1379,609,1406,596,1427,585,1439,581,1436,592,1424,604,1404,612,1378,619,1313,619,1236,614,1152,609,1069,609,992,618,927,627,901,640,880,641,879"/>
+<area shape="rect" id="Node000062" href="$namespace_c_l_i.html#a5e83d92a6ec271c2439141feaede1136" title="Helper function to mark an option as deprecated." alt="" coords="661,894,811,920"/>
+<area shape="poly" id="edge40_Node000061_Node000062" title=" " alt="" coords="872,910,811,910,811,904,872,904"/>
+<area shape="rect" id="Node000063" href="$namespace_c_l_i.html#ad6d89b5d1aba2ebdca5f94534d658cab" title="Helper function to mark an option as deprecated." alt="" coords="661,944,811,969"/>
+<area shape="poly" id="edge41_Node000061_Node000063" title=" " alt="" coords="886,926,799,945,798,940,884,921"/>
+<area shape="rect" id="Node000065" href="$class_c_l_i_1_1_formatter.html#a1503e498cef1cab66a01d84bac59b5d8" title="This prints out an option help line, either positional or optional form." alt="" coords="663,993,809,1034"/>
+<area shape="poly" id="edge43_Node000064_Node000065" title=" " alt="" coords="874,1002,810,1009,809,1003,874,996"/>
+<area shape="rect" id="Node000072" href="$class_c_l_i_1_1_formatter.html#afd69c393a40e9b1212f3552a1f48a414" title="This is used to print the name on the USAGE line." alt="" coords="663,1059,809,1099"/>
+<area shape="poly" id="edge44_Node000064_Node000072" title=" " alt="" coords="891,1019,879,1024,831,1048,799,1061,797,1056,829,1043,877,1019,889,1014"/>
+<area shape="rect" id="Node000075" href="$namespace_c_l_i.html#a77cd1a3639a91dea33a7d144ea476df6" title="Helper function to mark an option as retired." alt="" coords="675,1124,797,1149"/>
+<area shape="poly" id="edge47_Node000074_Node000075" title=" " alt="" coords="886,1155,797,1145,797,1140,886,1150"/>
+<area shape="rect" id="Node000076" href="$namespace_c_l_i.html#a52390f850f663cf38a27e134c1a39b61" title="Helper function to mark an option as retired." alt="" coords="675,1173,797,1198"/>
+<area shape="poly" id="edge48_Node000074_Node000076" title=" " alt="" coords="886,1171,797,1182,797,1176,886,1166"/>
+<area shape="rect" id="Node000077" href="$namespace_c_l_i.html#ad9ac23b01e2ef840ec123f5a115302ab" title="Helper function to mark an option as retired." alt="" coords="675,1222,797,1248"/>
+<area shape="poly" id="edge49_Node000074_Node000077" title=" " alt="" coords="917,1182,830,1214,794,1224,793,1219,829,1208,915,1177"/>
+<area shape="rect" id="Node000079" href="$class_c_l_i_1_1_app.html#ad9e5d41a1efd28da92235b72682cbf74" title="Process callbacks. Runs on all subcommands." alt="" coords="669,239,803,279"/>
+<area shape="poly" id="edge51_Node000078_Node000079" title=" " alt="" coords="945,674,746,281,750,279,950,671"/>
+<area shape="rect" id="Node000080" href="$class_c_l_i_1_1_option.html#ad54a6c2a78d84970977f84212a7a6a7b" title=" " alt="" coords="656,686,816,712"/>
+<area shape="poly" id="edge55_Node000078_Node000080" title=" " alt="" coords="862,702,816,702,816,696,862,696"/>
+<area shape="poly" id="edge52_Node000079_Node000008" title=" " alt="" coords="653,249,594,240,308,198,309,193,595,235,654,244"/>
+<area shape="poly" id="edge53_Node000079_Node000011" title=" " alt="" coords="653,265,567,269,567,264,653,260"/>
+<area shape="poly" id="edge54_Node000079_Node000014" title=" " alt="" coords="676,234,593,196,537,178,539,173,595,191,678,229"/>
+</map>

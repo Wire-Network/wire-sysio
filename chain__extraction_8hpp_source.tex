@@ -1,0 +1,133 @@
+\doxysection{chain\+\_\+extraction.\+hpp}
+\hypertarget{chain__extraction_8hpp_source}{}\label{chain__extraction_8hpp_source}\index{plugins/trace\_api\_plugin/include/sysio/trace\_api/chain\_extraction.hpp@{plugins/trace\_api\_plugin/include/sysio/trace\_api/chain\_extraction.hpp}}
+\mbox{\hyperlink{chain__extraction_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{plugins_2trace__api__plugin_2include_2sysio_2trace__api_2common_8hpp}{sysio/trace\_api/common.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{plugins_2trace__api__plugin_2include_2sysio_2trace__api_2trace_8hpp}{sysio/trace\_api/trace.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{extract__util_8hpp}{sysio/trace\_api/extract\_util.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <exception>}}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <functional>}}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <map>}}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00010}00010\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{\ \textcolor{keyword}{namespace\ }trace\_api\ \{}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00012}00012\ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacesysio_1_1chain_aa85a3b49b3b219d1e3840567579e7e63}{chain::transaction\_id\_type}};}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00013}00013\ \textcolor{keyword}{using\ }chain::packed\_transaction;}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00015}00015\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ StoreProv\textcolor{keywordtype}{id}er>}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00016}\mbox{\hyperlink{classsysio_1_1trace__api_1_1chain__extraction__impl__type}{00016}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1trace__api_1_1chain__extraction__impl__type}{chain\_extraction\_impl\_type}}\ \{}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00017}00017\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00023}\mbox{\hyperlink{classsysio_1_1trace__api_1_1chain__extraction__impl__type_a0254e80f0fbd52a370f26a93ff1e8c63}{00023}}\ \ \ \ \mbox{\hyperlink{classsysio_1_1trace__api_1_1chain__extraction__impl__type_a0254e80f0fbd52a370f26a93ff1e8c63}{chain\_extraction\_impl\_type}}(\ StoreProvider\ store,\ \mbox{\hyperlink{classfc_1_1optional__delegate}{exception\_handler}}\ except\_handler\ )}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00024}00024\ \ \ \ :\ store(\mbox{\hyperlink{namespacestd}{std}}::move(store))}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00025}00025\ \ \ \ ,\ except\_handler(\mbox{\hyperlink{namespacestd}{std}}::move(except\_handler))}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00026}00026\ \ \ \ \{\}}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00029}\mbox{\hyperlink{classsysio_1_1trace__api_1_1chain__extraction__impl__type_adb77ac33f05a4a8be51b45baaac52286}{00029}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1chain__extraction__impl__type_adb77ac33f05a4a8be51b45baaac52286}{signal\_applied\_transaction}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_a4ee2867a6bec961c7a78b203cfd76be9}{chain::transaction\_trace\_ptr}}\&\ trace,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_a7041c0316bd294d0866609ab3e0cc7a7}{chain::packed\_transaction\_ptr}}\&\ ptrx\ )\ \{}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00030}00030\ \ \ \ \ \ \ on\_applied\_transaction(\ trace,\ ptrx\ );}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00031}00031\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00034}\mbox{\hyperlink{classsysio_1_1trace__api_1_1chain__extraction__impl__type_aac293171a1575c4343ebbdc3f7c3f3e5}{00034}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1chain__extraction__impl__type_aac293171a1575c4343ebbdc3f7c3f3e5}{signal\_accepted\_block}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{chain::block\_state\_ptr}}\&\ bsp\ )\ \{}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00035}00035\ \ \ \ \ \ \ on\_accepted\_block(\ bsp\ );}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00036}00036\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00039}\mbox{\hyperlink{classsysio_1_1trace__api_1_1chain__extraction__impl__type_a3ebf5547ca63fa58c654fe8ac1c8a19c}{00039}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1chain__extraction__impl__type_a3ebf5547ca63fa58c654fe8ac1c8a19c}{signal\_irreversible\_block}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{chain::block\_state\_ptr}}\&\ bsp\ )\ \{}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00040}00040\ \ \ \ \ \ \ on\_irreversible\_block(\ bsp\ );}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00041}00041\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00044}\mbox{\hyperlink{classsysio_1_1trace__api_1_1chain__extraction__impl__type_a171e5c5e783a6a569e2f0e0989a41711}{00044}}\ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1chain__extraction__impl__type_a171e5c5e783a6a569e2f0e0989a41711}{signal\_block\_start}}(\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ block\_num\ )\ \{}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00045}00045\ \ \ \ \ \ \ on\_block\_start(\ block\_num\ );}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00046}00046\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00048}00048\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00050}00050\ \ \ \ \textcolor{keywordtype}{void}\ on\_applied\_transaction(\textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_a4ee2867a6bec961c7a78b203cfd76be9}{chain::transaction\_trace\_ptr}}\&\ trace,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_a7041c0316bd294d0866609ab3e0cc7a7}{chain::packed\_transaction\_ptr}}\&\ t)\ \{}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00051}00051\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ !trace-\/>receipt\ )\ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00052}00052\ \ \ \ \ \ \ \textcolor{comment}{//\ include\ only\ executed\ transactions;\ soft\_fail\ included\ so\ that\ onerror\ (and\ any\ inlines\ via\ onerror)\ are\ included}}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00053}00053\ \ \ \ \ \ \ \textcolor{keywordflow}{if}((trace-\/>receipt-\/>status\ !=\ \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__receipt__header_a2bb00bac16048e6f624c2ded867ebf55a7a6de58f1f84063a5f85bbfb59b43608}{chain::transaction\_receipt\_header::executed}}\ \&\&}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \ trace-\/>receipt-\/>status\ !=\ \mbox{\hyperlink{structsysio_1_1chain_1_1transaction__receipt__header_a2bb00bac16048e6f624c2ded867ebf55a98d0df834b74445e549f5d2123443b4e}{chain::transaction\_receipt\_header::soft\_fail}}))\ \{}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00056}00056\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00057}00057\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{namespacesysio_1_1chain_a9a9946a27c3832394b9b2b3911e0733c}{chain::is\_onblock}}(\ *trace\ ))\ \{}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00058}00058\ \ \ \ \ \ \ \ \ \ onblock\_trace.emplace(\ cache\_trace\{trace,\ t\}\ );}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00059}00059\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(\ trace-\/>failed\_dtrx\_trace\ )\ \{}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00060}00060\ \ \ \ \ \ \ \ \ \ cached\_traces[trace-\/>failed\_dtrx\_trace-\/>id]\ =\ \{trace,\ t\};}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00061}00061\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00062}00062\ \ \ \ \ \ \ \ \ \ cached\_traces[trace-\/>id]\ =\ \{trace,\ t\};}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00063}00063\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00064}00064\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00066}00066\ \ \ \ \textcolor{keywordtype}{void}\ on\_accepted\_block(\textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{chain::block\_state\_ptr}}\&\ block\_state)\ \{}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00067}00067\ \ \ \ \ \ \ store\_block\_trace(\ block\_state\ );}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00068}00068\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00069}00069\ }
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00070}00070\ \ \ \ \textcolor{keywordtype}{void}\ on\_irreversible\_block(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{chain::block\_state\_ptr}}\&\ block\_state\ )\ \{}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00071}00071\ \ \ \ \ \ \ store\_lib(\ block\_state\ );}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00072}00072\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00073}00073\ }
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00074}00074\ \ \ \ \textcolor{keywordtype}{void}\ on\_block\_start(\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ block\_num\ )\ \{}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00075}00075\ \ \ \ \ \ \ clear\_caches();}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00076}00076\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00077}00077\ }
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00078}00078\ \ \ \ \textcolor{keywordtype}{void}\ clear\_caches()\ \{}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00079}00079\ \ \ \ \ \ \ cached\_traces.clear();}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00080}00080\ \ \ \ \ \ \ onblock\_trace.reset();}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00081}00081\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00083}00083\ \ \ \ \textcolor{keywordtype}{void}\ store\_block\_trace(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{chain::block\_state\_ptr}}\&\ block\_state\ )\ \{}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00084}00084\ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00085}00085\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ }transaction\_trace\_t\ =\ transaction\_trace\_v3;}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00086}00086\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{xbyak__mnemonic_8h_a9be923ac9afe48bc98bd22e398415272}{bt}}\ =\ \mbox{\hyperlink{namespacesysio_1_1trace__api_a2300801ca419da50462b08e5c734df86}{create\_block\_trace}}(\ block\_state\ );}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00087}00087\ }
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00088}00088\ \ \ \ \ \ \ \ \ \ std::vector<transaction\_trace\_t>\ traces;}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00089}00089\ \ \ \ \ \ \ \ \ \ traces.reserve(\ block\_state-\/>block-\/>transactions.size()\ +\ 1\ );}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00090}00090\ \ \ \ \ \ \ \ \ \ block\_trxs\_entry\ tt;}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00091}00091\ \ \ \ \ \ \ \ \ \ tt.ids.reserve(block\_state-\/>block-\/>transactions.size()\ +\ 1);}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00092}00092\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ onblock\_trace\ )}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00093}00093\ \ \ \ \ \ \ \ \ \ \ \ \ traces.emplace\_back(\ \mbox{\hyperlink{namespacesysio_1_1trace__api_a77e241ca7a60463486e2da3fc908d3f8}{to\_transaction\_trace<transaction\_trace\_t>}}(\ *onblock\_trace\ ));}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00094}00094\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ :\ block\_state-\/>block-\/>transactions\ )\ \{}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00095}00095\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_aa85a3b49b3b219d1e3840567579e7e63}{transaction\_id\_type}}\ \mbox{\hyperlink{code__cache_8cpp_aa0efefe21f4700d78692edc823e763be}{id}};}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00096}00096\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ std::holds\_alternative<transaction\_id\_type>(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.trx))\ \{}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00097}00097\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{id}\ =\ std::get<transaction\_id\_type>(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.trx);}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00098}00098\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00099}00099\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{id}\ =\ std::get<packed\_transaction>(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.trx).id();}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00100}00100\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00101}00101\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ it\ =\ cached\_traces.find(\ \textcolor{keywordtype}{id}\ );}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00102}00102\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ it\ !=\ cached\_traces.end()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00103}00103\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ traces.emplace\_back(\ \mbox{\hyperlink{namespacesysio_1_1trace__api_a77e241ca7a60463486e2da3fc908d3f8}{to\_transaction\_trace<transaction\_trace\_t>}}(\ it-\/>second\ ));}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00104}00104\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00105}00105\ \ \ \ \ \ \ \ \ \ \ \ \ tt.ids.emplace\_back(\textcolor{keywordtype}{id});}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00106}00106\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00107}00107\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{xbyak__mnemonic_8h_a9be923ac9afe48bc98bd22e398415272}{bt}}.transactions\ =\ std::move(\ traces\ );}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00108}00108\ \ \ \ \ \ \ \ \ \ clear\_caches();}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00109}00109\ }
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00110}00110\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ tt\ entry\ acts\ as\ a\ placeholder\ in\ a\ trx\ id\ slice\ if\ this\ block\ has\ no\ transaction}}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00111}00111\ \ \ \ \ \ \ \ \ \ tt.block\_num\ =\ \mbox{\hyperlink{xbyak__mnemonic_8h_a9be923ac9afe48bc98bd22e398415272}{bt}}.number;}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00112}00112\ \ \ \ \ \ \ \ \ \ store.append\_trx\_ids(\ std::move(tt)\ );}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00113}00113\ }
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00114}00114\ \ \ \ \ \ \ \ \ \ store.append(\ std::move(\ \mbox{\hyperlink{xbyak__mnemonic_8h_a9be923ac9afe48bc98bd22e398415272}{bt}}\ )\ );}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00115}00115\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}(\ ...\ )\ \{}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00116}00116\ \ \ \ \ \ \ \ \ \ except\_handler(\ \mbox{\hyperlink{plugins_2trace__api__plugin_2include_2sysio_2trace__api_2common_8hpp_acf999535bf43beecf0513ac65ae0c813}{MAKE\_EXCEPTION\_WITH\_CONTEXT}}(\ std::current\_exception()\ )\ );}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00117}00117\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00118}00118\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00119}00119\ }
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00120}00120\ \ \ \ \textcolor{keywordtype}{void}\ store\_lib(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacesysio_1_1chain_ab9b14f4554cc4a0da2c361e9757b1662}{chain::block\_state\_ptr}}\&\ bsp\ )\ \{}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00121}00121\ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00122}00122\ \ \ \ \ \ \ \ \ \ store.append\_lib(\ bsp-\/>block\_num\ );}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00123}00123\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}(\ ...\ )\ \{}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00124}00124\ \ \ \ \ \ \ \ \ \ except\_handler(\ \mbox{\hyperlink{plugins_2trace__api__plugin_2include_2sysio_2trace__api_2common_8hpp_acf999535bf43beecf0513ac65ae0c813}{MAKE\_EXCEPTION\_WITH\_CONTEXT}}(\ std::current\_exception()\ )\ );}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00125}00125\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00126}00126\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00127}00127\ }
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00128}00128\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00129}00129\ \ \ \ StoreProvider\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ store;}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00130}00130\ \ \ \ \mbox{\hyperlink{namespacesysio_1_1trace__api_abe71d6f34a01119df1abb45e75c65a0f}{exception\_handler}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ except\_handler;}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00131}00131\ \ \ \ std::map<transaction\_id\_type,\ cache\_trace>\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ cached\_traces;}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00132}00132\ \ \ \ std::optional<cache\_trace>\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ onblock\_trace;}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00133}00133\ }
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00134}00134\ \};}
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00135}00135\ }
+\DoxyCodeLine{\Hypertarget{chain__extraction_8hpp_source_l00136}00136\ \}\}}
+
+\end{DoxyCode}

@@ -1,0 +1,9 @@
+<map id="sysio::chain::apply_context::has_authorization" name="sysio::chain::apply_context::has_authorization">
+<area shape="rect" id="Node000001" title=" " alt="" coords="417,41,598,82"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1chain_1_1apply__context.html#a3d55f08ae8c014eb7cca9d36b43e8220" title="Execution methods:" alt="" coords="209,5,344,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="401,48,344,39,345,34,402,43"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1chain_1_1apply__context.html#ac09c8f3118154bb22b0bd50526e138fa" title=" " alt="" coords="184,70,369,126"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="402,81,370,86,369,81,401,76"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1chain_1_1apply__context.html#aac87c3bc66a6e05318bfd25c3373fee5" title=" " alt="" coords="5,5,136,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="193,28,136,28,136,23,193,23"/>
+</map>

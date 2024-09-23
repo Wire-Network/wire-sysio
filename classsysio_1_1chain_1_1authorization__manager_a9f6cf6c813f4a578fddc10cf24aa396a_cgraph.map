@@ -1,0 +1,27 @@
+<map id="sysio::chain::authorization_manager::check_authorization" name="sysio::chain::authorization_manager::check_authorization">
+<area shape="rect" id="Node000001" title="Check authorizations of a permission with provided keys, permission levels, and delay." alt="" coords="5,154,208,194"/>
+<area shape="rect" id="Node000002" href="$classfc_1_1microseconds.html#a20fba59ec7e1f50c6b8f2c9443cc9b92" title=" " alt="" coords="268,5,430,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="124,151,178,96,215,67,254,41,269,34,271,39,257,46,218,71,182,100,128,155"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1chain_1_1controller.html#a0bb11e832a05b6437c79bf81758b1b7d" title=" " alt="" coords="273,55,425,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="152,151,255,106,273,99,275,104,257,111,154,156"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1chain_1_1authorization__manager.html#a96924f6aca32a602e24d991d12278a69" title=" " alt="" coords="262,120,436,161"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="208,158,246,152,247,158,208,163"/>
+<area shape="rect" id="Node000008" href="$namespacesysio_1_1chain.html#a9935b13f160accddca2509476a2cad8b" title="authority_checker" alt="" coords="283,186,414,226"/>
+<area shape="poly" id="edge9_Node000001_Node000008" title=" " alt="" coords="208,185,268,193,267,198,208,190"/>
+<area shape="rect" id="Node000010" href="$classfc_1_1microseconds.html#afc3eb0bfd792c7b1cda062e559e30c2e" title=" " alt="" coords="256,251,442,276"/>
+<area shape="poly" id="edge11_Node000001_Node000010" title=" " alt="" coords="153,193,257,236,280,243,279,248,255,241,151,198"/>
+<area shape="rect" id="Node000012" href="$namespacefc.html#a9623b8cae3f48bbed6aa1fc2afe9b174" title=" " alt="" coords="304,300,394,326"/>
+<area shape="poly" id="edge13_Node000001_Node000012" title=" " alt="" coords="131,193,185,240,220,265,257,286,290,299,288,304,255,291,217,270,182,244,127,197"/>
+<area shape="rect" id="Node000005" href="$classchainbase_1_1database.html#afcfe00f81a526c1376d4f51197dd3a9a" title=" " alt="" coords="512,128,679,154"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="436,138,496,138,496,144,436,144"/>
+<area shape="rect" id="Node000006" href="$classchainbase_1_1database.html#aa5a2ca0da0092693ac49b36b7ec6817a" title=" " alt="" coords="748,120,890,161"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="679,147,733,147,733,152,679,152"/>
+<area shape="poly" id="edge6_Node000006_Node000005" title=" " alt="" coords="748,135,694,135,695,129,748,130"/>
+<area shape="rect" id="Node000007" href="$classchainbase_1_1database.html#a4d5297635dcf70be481d9b600da9bc13" title=" " alt="" coords="938,150,1079,190"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="890,149,923,154,922,160,889,154"/>
+<area shape="poly" id="edge8_Node000007_Node000005" title=" " alt="" coords="938,175,890,175,819,178,748,175,662,160,663,155,749,170,819,173,890,170,937,169"/>
+<area shape="rect" id="Node000009" href="$namespacesysio_1_1chain.html#a057ec53a1f8d23b2fb89de6c19b41c32" title=" " alt="" coords="532,186,659,226"/>
+<area shape="poly" id="edge10_Node000008_Node000009" title=" " alt="" coords="415,204,516,204,516,209,415,209"/>
+<area shape="rect" id="Node000011" href="$classfc_1_1microseconds.html#a0c79856cd3ab96153901a64961bf216f" title=" " alt="" coords="490,251,700,276"/>
+<area shape="poly" id="edge12_Node000010_Node000011" title=" " alt="" coords="443,261,475,261,475,266,443,266"/>
+</map>

@@ -1,0 +1,92 @@
+\doxysection{libraries/yubihsm/lib/error.c File Reference}
+\hypertarget{lib_2error_8c}{}\label{lib_2error_8c}\index{libraries/yubihsm/lib/error.c@{libraries/yubihsm/lib/error.c}}
+{\ttfamily \#include $<$yubihsm.\+h$>$}\newline
+{\ttfamily \#include $<$stddef.\+h$>$}\newline
+Include dependency graph for error.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{lib_2error_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structerr__t}{err\+\_\+t}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{lib_2error_8c_a9031fdea07a95f7cc4b194bce387e0a2}{ERR}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  desc)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{lib_2error_8c_a238eedb1e27dbff2a0ab9a3932eb3f8b}{yh\+\_\+strerror}} (\mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366}{yh\+\_\+rc}} err)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{lib_2error_8c_a9031fdea07a95f7cc4b194bce387e0a2}\index{error.c@{error.c}!ERR@{ERR}}
+\index{ERR@{ERR}!error.c@{error.c}}
+\doxysubsubsection{\texorpdfstring{ERR}{ERR}}
+{\footnotesize\ttfamily \label{lib_2error_8c_a9031fdea07a95f7cc4b194bce387e0a2} 
+\#define ERR(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{desc}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \{\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ desc\ \}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{lib_2error_8c_source_l00021}{21}} of file \mbox{\hyperlink{lib_2error_8c_source}{error.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#define\ ERR(name,\ desc)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\ \ \{\ name,\ desc\ \}}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{lib_2error_8c_a238eedb1e27dbff2a0ab9a3932eb3f8b}\index{error.c@{error.c}!yh\_strerror@{yh\_strerror}}
+\index{yh\_strerror@{yh\_strerror}!error.c@{error.c}}
+\doxysubsubsection{\texorpdfstring{yh\_strerror()}{yh\_strerror()}}
+{\footnotesize\ttfamily \label{lib_2error_8c_a238eedb1e27dbff2a0ab9a3932eb3f8b} 
+const char \texorpdfstring{$\ast$}{*} yh\+\_\+strerror (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366}{yh\+\_\+rc}}}]{err}{}\end{DoxyParamCaption})}
+
+Return a string describing an error condition
+
+
+\begin{DoxyParams}{Parameters}
+{\em err} & \doxylink{yubihsm_8h_ae4f602d2343d01b1727dfd633169d366}{yh\+\_\+rc} error code\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+String with descriptive error 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{lib_2error_8c_source_l00065}{65}} of file \mbox{\hyperlink{lib_2error_8c_source}{error.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00066\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{yubihsm__pkcs11_8c_ac160cc61da581bdcf075273493b9f156}{unknown}}\ =\ \textcolor{stringliteral}{"{}Unknown\ yubihsm\ error"{}};}
+\DoxyCodeLine{00067\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}};}
+\DoxyCodeLine{00068\ }
+\DoxyCodeLine{00069\ \ \ \textcolor{keywordflow}{if}\ (-\/err\ <\ 0\ ||\ -\/err\ >=\ (\textcolor{keywordtype}{int})\ (\textcolor{keyword}{sizeof}(errors)\ /\ \textcolor{keyword}{sizeof}(errors[0])))\ \{}
+\DoxyCodeLine{00070\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_ac160cc61da581bdcf075273493b9f156}{unknown}};}
+\DoxyCodeLine{00071\ \ \ \}}
+\DoxyCodeLine{00072\ }
+\DoxyCodeLine{00073\ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ errors[-\/err].\mbox{\hyperlink{structerr__t_a5443ed757b35a94fdb06a5dccaa2c427}{description}};}
+\DoxyCodeLine{00074\ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}})\ \{}
+\DoxyCodeLine{00075\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_ac160cc61da581bdcf075273493b9f156}{unknown}};}
+\DoxyCodeLine{00076\ \ \ \}}
+\DoxyCodeLine{00077\ }
+\DoxyCodeLine{00078\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}};}
+\DoxyCodeLine{00079\ \}}
+
+\end{DoxyCode}

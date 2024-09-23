@@ -1,0 +1,38 @@
+\doxysection{fc\+::tracked Namespace Reference}
+\hypertarget{namespacefc_1_1tracked}{}\label{namespacefc_1_1tracked}\index{fc::tracked@{fc::tracked}}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\size\+\_\+t \mbox{\hyperlink{namespacefc_1_1tracked_a7a874ea77f5afa2de8f3d5fb6d19a241}{memory\+\_\+size}} (const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&obj)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Specialize \doxylink{namespacefc_1_1tracked_a7a874ea77f5afa2de8f3d5fb6d19a241}{tracked\+::memory\+\_\+size()} if obj does not provide a \doxylink{namespacefc_1_1tracked_a7a874ea77f5afa2de8f3d5fb6d19a241}{memory\+\_\+size()} method that represents memory size. 
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacefc_1_1tracked_a7a874ea77f5afa2de8f3d5fb6d19a241}\index{fc::tracked@{fc::tracked}!memory\_size@{memory\_size}}
+\index{memory\_size@{memory\_size}!fc::tracked@{fc::tracked}}
+\doxysubsubsection{\texorpdfstring{memory\_size()}{memory\_size()}}
+{\footnotesize\ttfamily \label{namespacefc_1_1tracked_a7a874ea77f5afa2de8f3d5fb6d19a241} 
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+size\+\_\+t fc\+::tracked\+::memory\+\_\+size (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \&}]{obj}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{tracked__storage_8hpp_source_l00016}{16}} of file \mbox{\hyperlink{tracked__storage_8hpp_source}{tracked\+\_\+storage.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00017\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ obj.memory\_size();}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacefc_1_1tracked_a7a874ea77f5afa2de8f3d5fb6d19a241_icgraph}
+\end{center}
+\end{figure}

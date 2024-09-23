@@ -1,0 +1,319 @@
+\doxysection{plugins/wallet\+\_\+api\+\_\+plugin/wallet\+\_\+api\+\_\+plugin.cpp File Reference}
+\hypertarget{wallet__api__plugin_8cpp}{}\label{wallet__api__plugin_8cpp}\index{plugins/wallet\_api\_plugin/wallet\_api\_plugin.cpp@{plugins/wallet\_api\_plugin/wallet\_api\_plugin.cpp}}
+{\ttfamily \#include $<$sysio/wallet\+\_\+api\+\_\+plugin/wallet\+\_\+api\+\_\+plugin.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/wallet\+\_\+plugin/wallet\+\_\+manager.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/exceptions.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/chain/transaction.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/variant.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/io/json.\+hpp$>$}\newline
+{\ttfamily \#include $<$chrono$>$}\newline
+Include dependency graph for wallet\+\_\+api\+\_\+plugin.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{wallet__api__plugin_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structsysio_1_1detail_1_1wallet__api__plugin__empty}{sysio\+::detail\+::wallet\+\_\+api\+\_\+plugin\+\_\+empty}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacesysio}{sysio}}
+\item 
+namespace \mbox{\hyperlink{namespacesysio_1_1detail}{sysio\+::detail}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{wallet__api__plugin_8cpp_afb00f07822ae80766057c9439f2d8118}{CALL\+\_\+\+WITH\+\_\+400}}(api\+\_\+name,  api\+\_\+handle,  call\+\_\+name,  INVOKE,  http\+\_\+response\+\_\+code)
+\item 
+\#define \mbox{\hyperlink{wallet__api__plugin_8cpp_afab796843c5c67526de271f4207fcd37}{INVOKE\+\_\+\+R\+\_\+R}}(api\+\_\+handle,  call\+\_\+name,  in\+\_\+param)
+\item 
+\#define \mbox{\hyperlink{wallet__api__plugin_8cpp_a3169252a7a000e497d9cfbac32461c2e}{INVOKE\+\_\+\+R\+\_\+\+R\+\_\+R}}(api\+\_\+handle,  call\+\_\+name,  in\+\_\+param0,  in\+\_\+param1)
+\item 
+\#define \mbox{\hyperlink{wallet__api__plugin_8cpp_a13ce85c1c960b23c926f782666868b0a}{INVOKE\+\_\+\+R\+\_\+\+R\+\_\+\+R\+\_\+R}}(api\+\_\+handle,  call\+\_\+name,  in\+\_\+param0,  in\+\_\+param1,  in\+\_\+param2)
+\item 
+\#define \mbox{\hyperlink{wallet__api__plugin_8cpp_a57be4224a1ade2bd8b3923d6a344d98b}{INVOKE\+\_\+\+R\+\_\+V}}(api\+\_\+handle,  call\+\_\+name)
+\item 
+\#define \mbox{\hyperlink{wallet__api__plugin_8cpp_a4dc31462f24aaa120af888e8e9358800}{INVOKE\+\_\+\+V\+\_\+R}}(api\+\_\+handle,  call\+\_\+name,  in\+\_\+param)
+\item 
+\#define \mbox{\hyperlink{wallet__api__plugin_8cpp_a653b6a13b0cc13bed8565f0d19aa8e03}{INVOKE\+\_\+\+V\+\_\+\+R\+\_\+R}}(api\+\_\+handle,  call\+\_\+name,  in\+\_\+param0,  in\+\_\+param1)
+\item 
+\#define \mbox{\hyperlink{wallet__api__plugin_8cpp_a0e00cd8085030cd38c1fd93a92ea8e7a}{INVOKE\+\_\+\+V\+\_\+\+R\+\_\+\+R\+\_\+R}}(api\+\_\+handle,  call\+\_\+name,  in\+\_\+param0,  in\+\_\+param1,  in\+\_\+param2)
+\item 
+\#define \mbox{\hyperlink{wallet__api__plugin_8cpp_a54f8b56aff9e470dbebbddd544256b8f}{INVOKE\+\_\+\+V\+\_\+V}}(api\+\_\+handle,  call\+\_\+name)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{wallet__api__plugin_8cpp_a7ba6b01b2e12a455ca90219af6634101}{FC\+\_\+\+REFLECT}} (\mbox{\hyperlink{structsysio_1_1detail_1_1wallet__api__plugin__empty}{sysio\+::detail\+::wallet\+\_\+api\+\_\+plugin\+\_\+empty}},)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{wallet__api__plugin_8cpp_afb00f07822ae80766057c9439f2d8118}\index{wallet\_api\_plugin.cpp@{wallet\_api\_plugin.cpp}!CALL\_WITH\_400@{CALL\_WITH\_400}}
+\index{CALL\_WITH\_400@{CALL\_WITH\_400}!wallet\_api\_plugin.cpp@{wallet\_api\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{CALL\_WITH\_400}{CALL\_WITH\_400}}
+{\footnotesize\ttfamily \label{wallet__api__plugin_8cpp_afb00f07822ae80766057c9439f2d8118} 
+\#define CALL\+\_\+\+WITH\+\_\+400(\begin{DoxyParamCaption}\item[{}]{api\+\_\+name}{, }\item[{}]{api\+\_\+handle}{, }\item[{}]{call\+\_\+name}{, }\item[{}]{INVOKE}{, }\item[{}]{http\+\_\+response\+\_\+code}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\{std::string(\textcolor{stringliteral}{"{}/v1/"{}}\ \#api\_name\ \textcolor{stringliteral}{"{}/"{}}\ \#call\_name),\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ [\&api\_handle](\mbox{\hyperlink{namespacefc_a0f3d84fe9e7adcd2d1e0bb7b60b49aa0}{string}},\ \textcolor{keywordtype}{string}\ body,\ url\_response\_callback\ cb)\ \textcolor{keyword}{mutable}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ INVOKE\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ cb(http\_response\_code,\ \mbox{\hyperlink{classfc_1_1variant}{fc::variant}}(result));\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (...)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ http\_plugin::handle\_exception(\#api\_name,\ \#call\_name,\ body,\ cb);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \}\}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{wallet__api__plugin_8cpp_source_l00023}{23}} of file \mbox{\hyperlink{wallet__api__plugin_8cpp_source}{wallet\+\_\+api\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#define\ CALL\_WITH\_400(api\_name,\ api\_handle,\ call\_name,\ INVOKE,\ http\_response\_code)\ \(\backslash\)}}
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\{std::string("{}/v1/"{}\ \#api\_name\ "{}/"{}\ \#call\_name),\ \(\backslash\)}}
+\DoxyCodeLine{00025\ \textcolor{preprocessor}{\ \ \ [\&api\_handle](string,\ string\ body,\ url\_response\_callback\ cb)\ mutable\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00026\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ try\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00027\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ INVOKE\ \(\backslash\)}}
+\DoxyCodeLine{00028\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ cb(http\_response\_code,\ fc::variant(result));\ \(\backslash\)}}
+\DoxyCodeLine{00029\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \}\ catch\ (...)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00030\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \ \ \ http\_plugin::handle\_exception(\#api\_name,\ \#call\_name,\ body,\ cb);\ \(\backslash\)}}
+\DoxyCodeLine{00031\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00032\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \}\}}}
+
+\end{DoxyCode}
+\Hypertarget{wallet__api__plugin_8cpp_afab796843c5c67526de271f4207fcd37}\index{wallet\_api\_plugin.cpp@{wallet\_api\_plugin.cpp}!INVOKE\_R\_R@{INVOKE\_R\_R}}
+\index{INVOKE\_R\_R@{INVOKE\_R\_R}!wallet\_api\_plugin.cpp@{wallet\_api\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{INVOKE\_R\_R}{INVOKE\_R\_R}}
+{\footnotesize\ttfamily \label{wallet__api__plugin_8cpp_afab796843c5c67526de271f4207fcd37} 
+\#define INVOKE\+\_\+\+R\+\_\+R(\begin{DoxyParamCaption}\item[{}]{api\+\_\+handle}{, }\item[{}]{call\+\_\+name}{, }\item[{}]{in\+\_\+param}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params}{params}}\ =\ parse\_params<in\_param,\ http\_params\_types::params\_required>(body);\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \textcolor{keyword}{auto}\ result\ =\ api\_handle.call\_name(\ std::move(\mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params}{params}})\ );}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{wallet__api__plugin_8cpp_source_l00034}{34}} of file \mbox{\hyperlink{wallet__api__plugin_8cpp_source}{wallet\+\_\+api\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00034\ \textcolor{preprocessor}{\#define\ INVOKE\_R\_R(api\_handle,\ call\_name,\ in\_param)\ \(\backslash\)}}
+\DoxyCodeLine{00035\ \textcolor{preprocessor}{\ \ \ \ \ auto\ params\ =\ parse\_params<in\_param,\ http\_params\_types::params\_required>(body);\(\backslash\)}}
+\DoxyCodeLine{00036\ \textcolor{preprocessor}{\ \ \ \ \ auto\ result\ =\ api\_handle.call\_name(\ std::move(params)\ );}}
+
+\end{DoxyCode}
+\Hypertarget{wallet__api__plugin_8cpp_a3169252a7a000e497d9cfbac32461c2e}\index{wallet\_api\_plugin.cpp@{wallet\_api\_plugin.cpp}!INVOKE\_R\_R\_R@{INVOKE\_R\_R\_R}}
+\index{INVOKE\_R\_R\_R@{INVOKE\_R\_R\_R}!wallet\_api\_plugin.cpp@{wallet\_api\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{INVOKE\_R\_R\_R}{INVOKE\_R\_R\_R}}
+{\footnotesize\ttfamily \label{wallet__api__plugin_8cpp_a3169252a7a000e497d9cfbac32461c2e} 
+\#define INVOKE\+\_\+\+R\+\_\+\+R\+\_\+R(\begin{DoxyParamCaption}\item[{}]{api\+\_\+handle}{, }\item[{}]{call\+\_\+name}{, }\item[{}]{in\+\_\+param0}{, }\item[{}]{in\+\_\+param1}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params}{params}}\ =\ parse\_params<fc::variants,\ http\_params\_types::params\_required>(body);\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ if\ (\mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params}{params}}.size()\ !=\ 2)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ SYS\_THROW(chain::invalid\_http\_request,\ \textcolor{stringliteral}{"{}Missing\ valid\ input\ from\ POST\ body"{}});\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \textcolor{keyword}{auto}\ result\ =\ api\_handle.call\_name(\mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params}{params}}.at(0).as<in\_param0>(),\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params}{params}}.at(1).as<in\_param1>());}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{wallet__api__plugin_8cpp_source_l00038}{38}} of file \mbox{\hyperlink{wallet__api__plugin_8cpp_source}{wallet\+\_\+api\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00038\ \textcolor{preprocessor}{\#define\ INVOKE\_R\_R\_R(api\_handle,\ call\_name,\ in\_param0,\ in\_param1)\ \(\backslash\)}}
+\DoxyCodeLine{00039\ \textcolor{preprocessor}{\ \ \ \ \ const\ auto\&\ params\ =\ parse\_params<fc::variants,\ http\_params\_types::params\_required>(body);\(\backslash\)}}
+\DoxyCodeLine{00040\ \textcolor{preprocessor}{\ \ \ \ \ if\ (params.size()\ !=\ 2)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00041\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ SYS\_THROW(chain::invalid\_http\_request,\ "{}Missing\ valid\ input\ from\ POST\ body"{});\ \(\backslash\)}}
+\DoxyCodeLine{00042\ \textcolor{preprocessor}{\ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00043\ \textcolor{preprocessor}{\ \ \ \ \ auto\ result\ =\ api\_handle.call\_name(params.at(0).as<in\_param0>(),\ params.at(1).as<in\_param1>());}}
+
+\end{DoxyCode}
+\Hypertarget{wallet__api__plugin_8cpp_a13ce85c1c960b23c926f782666868b0a}\index{wallet\_api\_plugin.cpp@{wallet\_api\_plugin.cpp}!INVOKE\_R\_R\_R\_R@{INVOKE\_R\_R\_R\_R}}
+\index{INVOKE\_R\_R\_R\_R@{INVOKE\_R\_R\_R\_R}!wallet\_api\_plugin.cpp@{wallet\_api\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{INVOKE\_R\_R\_R\_R}{INVOKE\_R\_R\_R\_R}}
+{\footnotesize\ttfamily \label{wallet__api__plugin_8cpp_a13ce85c1c960b23c926f782666868b0a} 
+\#define INVOKE\+\_\+\+R\+\_\+\+R\+\_\+\+R\+\_\+R(\begin{DoxyParamCaption}\item[{}]{api\+\_\+handle}{, }\item[{}]{call\+\_\+name}{, }\item[{}]{in\+\_\+param0}{, }\item[{}]{in\+\_\+param1}{, }\item[{}]{in\+\_\+param2}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params}{params}}\ =\ parse\_params<fc::variants,\ http\_params\_types::params\_required>(body);\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ if\ (\mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params}{params}}.size()\ !=\ 3)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ SYS\_THROW(chain::invalid\_http\_request,\ \textcolor{stringliteral}{"{}Missing\ valid\ input\ from\ POST\ body"{}});\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \textcolor{keyword}{auto}\ result\ =\ api\_handle.call\_name(\mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params}{params}}.at(0).as<in\_param0>(),\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params}{params}}.at(1).as<in\_param1>(),\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params}{params}}.at(2).as<in\_param2>());}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{wallet__api__plugin_8cpp_source_l00046}{46}} of file \mbox{\hyperlink{wallet__api__plugin_8cpp_source}{wallet\+\_\+api\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00046\ \textcolor{preprocessor}{\#define\ INVOKE\_R\_R\_R\_R(api\_handle,\ call\_name,\ in\_param0,\ in\_param1,\ in\_param2)\ \(\backslash\)}}
+\DoxyCodeLine{00047\ \textcolor{preprocessor}{\ \ \ \ \ const\ auto\&\ params\ =\ parse\_params<fc::variants,\ http\_params\_types::params\_required>(body);\(\backslash\)}}
+\DoxyCodeLine{00048\ \textcolor{preprocessor}{\ \ \ \ \ if\ (params.size()\ !=\ 3)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00049\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ SYS\_THROW(chain::invalid\_http\_request,\ "{}Missing\ valid\ input\ from\ POST\ body"{});\ \(\backslash\)}}
+\DoxyCodeLine{00050\ \textcolor{preprocessor}{\ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00051\ \textcolor{preprocessor}{\ \ \ \ \ auto\ result\ =\ api\_handle.call\_name(params.at(0).as<in\_param0>(),\ params.at(1).as<in\_param1>(),\ params.at(2).as<in\_param2>());}}
+
+\end{DoxyCode}
+\Hypertarget{wallet__api__plugin_8cpp_a57be4224a1ade2bd8b3923d6a344d98b}\index{wallet\_api\_plugin.cpp@{wallet\_api\_plugin.cpp}!INVOKE\_R\_V@{INVOKE\_R\_V}}
+\index{INVOKE\_R\_V@{INVOKE\_R\_V}!wallet\_api\_plugin.cpp@{wallet\_api\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{INVOKE\_R\_V}{INVOKE\_R\_V}}
+{\footnotesize\ttfamily \label{wallet__api__plugin_8cpp_a57be4224a1ade2bd8b3923d6a344d98b} 
+\#define INVOKE\+\_\+\+R\+\_\+V(\begin{DoxyParamCaption}\item[{}]{api\+\_\+handle}{, }\item[{}]{call\+\_\+name}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ body\ =\ parse\_params<std::string,\ http\_params\_types::no\_params>(body);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \textcolor{keyword}{auto}\ result\ =\ api\_handle.call\_name();}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{wallet__api__plugin_8cpp_source_l00053}{53}} of file \mbox{\hyperlink{wallet__api__plugin_8cpp_source}{wallet\+\_\+api\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00053\ \textcolor{preprocessor}{\#define\ INVOKE\_R\_V(api\_handle,\ call\_name)\ \(\backslash\)}}
+\DoxyCodeLine{00054\ \textcolor{preprocessor}{\ \ \ \ \ body\ =\ parse\_params<std::string,\ http\_params\_types::no\_params>(body);\ \(\backslash\)}}
+\DoxyCodeLine{00055\ \textcolor{preprocessor}{\ \ \ \ \ auto\ result\ =\ api\_handle.call\_name();}}
+
+\end{DoxyCode}
+\Hypertarget{wallet__api__plugin_8cpp_a4dc31462f24aaa120af888e8e9358800}\index{wallet\_api\_plugin.cpp@{wallet\_api\_plugin.cpp}!INVOKE\_V\_R@{INVOKE\_V\_R}}
+\index{INVOKE\_V\_R@{INVOKE\_V\_R}!wallet\_api\_plugin.cpp@{wallet\_api\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{INVOKE\_V\_R}{INVOKE\_V\_R}}
+{\footnotesize\ttfamily \label{wallet__api__plugin_8cpp_a4dc31462f24aaa120af888e8e9358800} 
+\#define INVOKE\+\_\+\+V\+\_\+R(\begin{DoxyParamCaption}\item[{}]{api\+\_\+handle}{, }\item[{}]{call\+\_\+name}{, }\item[{}]{in\+\_\+param}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params}{params}}\ =\ parse\_params<in\_param,\ http\_params\_types::params\_required>(body);\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ api\_handle.call\_name(\ std::move(\mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params}{params}})\ );\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \mbox{\hyperlink{structsysio_1_1detail_1_1wallet__api__plugin__empty}{sysio::detail::wallet\_api\_plugin\_empty}}\ result;}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{wallet__api__plugin_8cpp_source_l00057}{57}} of file \mbox{\hyperlink{wallet__api__plugin_8cpp_source}{wallet\+\_\+api\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00057\ \textcolor{preprocessor}{\#define\ INVOKE\_V\_R(api\_handle,\ call\_name,\ in\_param)\ \(\backslash\)}}
+\DoxyCodeLine{00058\ \textcolor{preprocessor}{\ \ \ \ \ auto\ params\ =\ parse\_params<in\_param,\ http\_params\_types::params\_required>(body);\(\backslash\)}}
+\DoxyCodeLine{00059\ \textcolor{preprocessor}{\ \ \ \ \ api\_handle.call\_name(\ std::move(params)\ );\ \(\backslash\)}}
+\DoxyCodeLine{00060\ \textcolor{preprocessor}{\ \ \ \ \ sysio::detail::wallet\_api\_plugin\_empty\ result;}}
+
+\end{DoxyCode}
+\Hypertarget{wallet__api__plugin_8cpp_a653b6a13b0cc13bed8565f0d19aa8e03}\index{wallet\_api\_plugin.cpp@{wallet\_api\_plugin.cpp}!INVOKE\_V\_R\_R@{INVOKE\_V\_R\_R}}
+\index{INVOKE\_V\_R\_R@{INVOKE\_V\_R\_R}!wallet\_api\_plugin.cpp@{wallet\_api\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{INVOKE\_V\_R\_R}{INVOKE\_V\_R\_R}}
+{\footnotesize\ttfamily \label{wallet__api__plugin_8cpp_a653b6a13b0cc13bed8565f0d19aa8e03} 
+\#define INVOKE\+\_\+\+V\+\_\+\+R\+\_\+R(\begin{DoxyParamCaption}\item[{}]{api\+\_\+handle}{, }\item[{}]{call\+\_\+name}{, }\item[{}]{in\+\_\+param0}{, }\item[{}]{in\+\_\+param1}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params}{params}}\ =\ parse\_params<fc::variants,\ http\_params\_types::params\_required>(body);\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ if\ (\mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params}{params}}.size()\ !=\ 2)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ SYS\_THROW(chain::invalid\_http\_request,\ \textcolor{stringliteral}{"{}Missing\ valid\ input\ from\ POST\ body"{}});\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ api\_handle.call\_name(\mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params}{params}}.at(0).as<in\_param0>(),\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params}{params}}.at(1).as<in\_param1>());\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \mbox{\hyperlink{structsysio_1_1detail_1_1wallet__api__plugin__empty}{sysio::detail::wallet\_api\_plugin\_empty}}\ result;}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{wallet__api__plugin_8cpp_source_l00062}{62}} of file \mbox{\hyperlink{wallet__api__plugin_8cpp_source}{wallet\+\_\+api\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00062\ \textcolor{preprocessor}{\#define\ INVOKE\_V\_R\_R(api\_handle,\ call\_name,\ in\_param0,\ in\_param1)\ \(\backslash\)}}
+\DoxyCodeLine{00063\ \textcolor{preprocessor}{\ \ \ \ \ const\ auto\&\ params\ =\ parse\_params<fc::variants,\ http\_params\_types::params\_required>(body);\(\backslash\)}}
+\DoxyCodeLine{00064\ \textcolor{preprocessor}{\ \ \ \ \ if\ (params.size()\ !=\ 2)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00065\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ SYS\_THROW(chain::invalid\_http\_request,\ "{}Missing\ valid\ input\ from\ POST\ body"{});\ \(\backslash\)}}
+\DoxyCodeLine{00066\ \textcolor{preprocessor}{\ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00067\ \textcolor{preprocessor}{\ \ \ \ \ api\_handle.call\_name(params.at(0).as<in\_param0>(),\ params.at(1).as<in\_param1>());\ \(\backslash\)}}
+\DoxyCodeLine{00068\ \textcolor{preprocessor}{\ \ \ \ \ sysio::detail::wallet\_api\_plugin\_empty\ result;}}
+
+\end{DoxyCode}
+\Hypertarget{wallet__api__plugin_8cpp_a0e00cd8085030cd38c1fd93a92ea8e7a}\index{wallet\_api\_plugin.cpp@{wallet\_api\_plugin.cpp}!INVOKE\_V\_R\_R\_R@{INVOKE\_V\_R\_R\_R}}
+\index{INVOKE\_V\_R\_R\_R@{INVOKE\_V\_R\_R\_R}!wallet\_api\_plugin.cpp@{wallet\_api\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{INVOKE\_V\_R\_R\_R}{INVOKE\_V\_R\_R\_R}}
+{\footnotesize\ttfamily \label{wallet__api__plugin_8cpp_a0e00cd8085030cd38c1fd93a92ea8e7a} 
+\#define INVOKE\+\_\+\+V\+\_\+\+R\+\_\+\+R\+\_\+R(\begin{DoxyParamCaption}\item[{}]{api\+\_\+handle}{, }\item[{}]{call\+\_\+name}{, }\item[{}]{in\+\_\+param0}{, }\item[{}]{in\+\_\+param1}{, }\item[{}]{in\+\_\+param2}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params}{params}}\ =\ parse\_params<fc::variants,\ http\_params\_types::params\_required>(body);\(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ if\ (\mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params}{params}}.size()\ !=\ 3)\ \{\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ SYS\_THROW(chain::invalid\_http\_request,\ \textcolor{stringliteral}{"{}Missing\ valid\ input\ from\ POST\ body"{}});\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \}\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ api\_handle.call\_name(\mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params}{params}}.at(0).as<in\_param0>(),\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params}{params}}.at(1).as<in\_param1>(),\ \mbox{\hyperlink{structsysio_1_1chain__apis_1_1account__query__db_1_1get__accounts__by__authorizers__params}{params}}.at(2).as<in\_param2>());\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \mbox{\hyperlink{structsysio_1_1detail_1_1wallet__api__plugin__empty}{sysio::detail::wallet\_api\_plugin\_empty}}\ result;}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{wallet__api__plugin_8cpp_source_l00070}{70}} of file \mbox{\hyperlink{wallet__api__plugin_8cpp_source}{wallet\+\_\+api\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00070\ \textcolor{preprocessor}{\#define\ INVOKE\_V\_R\_R\_R(api\_handle,\ call\_name,\ in\_param0,\ in\_param1,\ in\_param2)\ \(\backslash\)}}
+\DoxyCodeLine{00071\ \textcolor{preprocessor}{\ \ \ \ \ const\ auto\&\ params\ =\ parse\_params<fc::variants,\ http\_params\_types::params\_required>(body);\(\backslash\)}}
+\DoxyCodeLine{00072\ \textcolor{preprocessor}{\ \ \ \ \ if\ (params.size()\ !=\ 3)\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00073\ \textcolor{preprocessor}{\ \ \ \ \ \ \ \ SYS\_THROW(chain::invalid\_http\_request,\ "{}Missing\ valid\ input\ from\ POST\ body"{});\ \(\backslash\)}}
+\DoxyCodeLine{00074\ \textcolor{preprocessor}{\ \ \ \ \ \}\ \(\backslash\)}}
+\DoxyCodeLine{00075\ \textcolor{preprocessor}{\ \ \ \ \ api\_handle.call\_name(params.at(0).as<in\_param0>(),\ params.at(1).as<in\_param1>(),\ params.at(2).as<in\_param2>());\ \(\backslash\)}}
+\DoxyCodeLine{00076\ \textcolor{preprocessor}{\ \ \ \ \ sysio::detail::wallet\_api\_plugin\_empty\ result;}}
+
+\end{DoxyCode}
+\Hypertarget{wallet__api__plugin_8cpp_a54f8b56aff9e470dbebbddd544256b8f}\index{wallet\_api\_plugin.cpp@{wallet\_api\_plugin.cpp}!INVOKE\_V\_V@{INVOKE\_V\_V}}
+\index{INVOKE\_V\_V@{INVOKE\_V\_V}!wallet\_api\_plugin.cpp@{wallet\_api\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{INVOKE\_V\_V}{INVOKE\_V\_V}}
+{\footnotesize\ttfamily \label{wallet__api__plugin_8cpp_a54f8b56aff9e470dbebbddd544256b8f} 
+\#define INVOKE\+\_\+\+V\+\_\+V(\begin{DoxyParamCaption}\item[{}]{api\+\_\+handle}{, }\item[{}]{call\+\_\+name}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ body\ =\ parse\_params<std::string,\ http\_params\_types::no\_params>(body);\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ api\_handle.call\_name();\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \mbox{\hyperlink{structsysio_1_1detail_1_1wallet__api__plugin__empty}{sysio::detail::wallet\_api\_plugin\_empty}}\ result;}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{wallet__api__plugin_8cpp_source_l00078}{78}} of file \mbox{\hyperlink{wallet__api__plugin_8cpp_source}{wallet\+\_\+api\+\_\+plugin.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00078\ \textcolor{preprocessor}{\#define\ INVOKE\_V\_V(api\_handle,\ call\_name)\ \(\backslash\)}}
+\DoxyCodeLine{00079\ \textcolor{preprocessor}{\ \ \ \ \ body\ =\ parse\_params<std::string,\ http\_params\_types::no\_params>(body);\ \(\backslash\)}}
+\DoxyCodeLine{00080\ \textcolor{preprocessor}{\ \ \ \ \ api\_handle.call\_name();\ \(\backslash\)}}
+\DoxyCodeLine{00081\ \textcolor{preprocessor}{\ \ \ \ \ sysio::detail::wallet\_api\_plugin\_empty\ result;}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{wallet__api__plugin_8cpp_a7ba6b01b2e12a455ca90219af6634101}\index{wallet\_api\_plugin.cpp@{wallet\_api\_plugin.cpp}!FC\_REFLECT@{FC\_REFLECT}}
+\index{FC\_REFLECT@{FC\_REFLECT}!wallet\_api\_plugin.cpp@{wallet\_api\_plugin.cpp}}
+\doxysubsubsection{\texorpdfstring{FC\_REFLECT()}{FC\_REFLECT()}}
+{\footnotesize\ttfamily \label{wallet__api__plugin_8cpp_a7ba6b01b2e12a455ca90219af6634101} 
+FC\+\_\+\+REFLECT (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1detail_1_1wallet__api__plugin__empty}{sysio\+::detail\+::wallet\+\_\+api\+\_\+plugin\+\_\+empty}}}]{}{}\end{DoxyParamCaption})}
+

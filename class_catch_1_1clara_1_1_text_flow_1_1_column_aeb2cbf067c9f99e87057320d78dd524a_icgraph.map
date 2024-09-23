@@ -1,0 +1,13 @@
+<map id="Catch::clara::TextFlow::Column::initialIndent" name="Catch::clara::TextFlow::Column::initialIndent">
+<area shape="rect" id="Node000001" title=" " alt="" coords="321,47,474,88"/>
+<area shape="rect" id="Node000002" href="$namespace_catch.html#a372777bee6b529124e0cae35748bb79c" title=" " alt="" coords="135,5,273,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="305,47,257,34,258,29,307,42"/>
+<area shape="rect" id="Node000004" href="$namespace_catch.html#a2226866b4114853fb3ff63dbecc8b0c9" title=" " alt="" coords="149,55,258,80"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="306,70,259,70,259,65,306,65"/>
+<area shape="rect" id="Node000005" href="$namespace_catch.html#ac2542a1569e5b9dc72206347368a921e" title=" " alt="" coords="147,104,260,130"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="307,93,258,106,257,101,305,88"/>
+<area shape="rect" id="Node000003" href="$namespace_catch.html#a8267f077fd7ddf88bb182e8b9ead85d3" title=" " alt="" coords="5,55,87,80"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="146,39,88,57,86,52,145,34"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="134,70,87,70,87,65,134,65"/>
+<area shape="poly" id="edge6_Node000005_Node000003" title=" " alt="" coords="145,101,86,83,88,78,146,96"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="GenericReader::IterativeParseInit" name="GenericReader::IterativeParseInit">
+<area shape="rect" id="Node000001" title="Initialize JSON text token&#45;by&#45;token parsing." alt="" coords="5,5,169,46"/>
+<area shape="rect" id="Node000002" href="$struct_parse_result.html#a88b6d44f052a19e6436ae6aadc2c40b4" title="Reset error code." alt="" coords="217,13,349,38"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="169,23,201,23,201,28,169,28"/>
+<area shape="rect" id="Node000003" href="$struct_parse_result.html#aa81b4a7b776b77216cb752385203a8c1" title="Update error code and offset." alt="" coords="397,13,518,38"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="349,23,382,23,382,28,349,28"/>
+</map>

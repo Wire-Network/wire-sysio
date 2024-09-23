@@ -1,0 +1,34 @@
+\doxysection{catch\+\_\+to\+\_\+string.\+hpp}
+\hypertarget{catch__to__string_8hpp_source}{}\label{catch__to__string_8hpp_source}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_to\_string.hpp@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_to\_string.hpp}}
+\mbox{\hyperlink{catch__to__string_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{catch__to__string_8hpp_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{catch__to__string_8hpp_source_l00002}00002\ \textcolor{comment}{\ *\ \ Created\ by\ Martin\ on\ 9/5/2018.}}
+\DoxyCodeLine{\Hypertarget{catch__to__string_8hpp_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{catch__to__string_8hpp_source_l00004}00004\ \textcolor{comment}{\ *\ \ Distributed\ under\ the\ Boost\ Software\ License,\ Version\ 1.0.\ (See\ accompanying}}
+\DoxyCodeLine{\Hypertarget{catch__to__string_8hpp_source_l00005}00005\ \textcolor{comment}{\ *\ \ file\ LICENSE\_1\_0.txt\ or\ copy\ at\ http://www.boost.org/LICENSE\_1\_0.txt)}}
+\DoxyCodeLine{\Hypertarget{catch__to__string_8hpp_source_l00006}00006\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{catch__to__string_8hpp_source_l00007}00007\ \textcolor{preprocessor}{\#ifndef\ TWOBLUECUBES\_CATCH\_TO\_STRING\_H\_INCLUDED}}
+\DoxyCodeLine{\Hypertarget{catch__to__string_8hpp_source_l00008}00008\ \textcolor{preprocessor}{\#define\ TWOBLUECUBES\_CATCH\_TO\_STRING\_H\_INCLUDED}}
+\DoxyCodeLine{\Hypertarget{catch__to__string_8hpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{catch__to__string_8hpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{\Hypertarget{catch__to__string_8hpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{catch__to__string_8hpp_source_l00012}00012\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__compiler__capabilities_8h}{catch\_compiler\_capabilities.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__to__string_8hpp_source_l00013}00013\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{catch__stream_8h}{catch\_stream.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__to__string_8hpp_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{catch__to__string_8hpp_source_l00015}00015\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__to__string_8hpp_source_l00016}00016\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{catch__to__string_8hpp_source_l00017}\mbox{\hyperlink{namespace_catch_a800dd11d86d4ee3e86f9b83336b94b08}{00017}}\ \ \ \ \ std::string\ \mbox{\hyperlink{namespace_catch_a800dd11d86d4ee3e86f9b83336b94b08}{to\_string}}(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \textcolor{keyword}{const}\&\ t)\ \{}
+\DoxyCodeLine{\Hypertarget{catch__to__string_8hpp_source_l00018}00018\ \textcolor{preprocessor}{\#if\ defined(CATCH\_CONFIG\_CPP11\_TO\_STRING)}}
+\DoxyCodeLine{\Hypertarget{catch__to__string_8hpp_source_l00019}00019\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::to\_string(t);}
+\DoxyCodeLine{\Hypertarget{catch__to__string_8hpp_source_l00020}00020\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{catch__to__string_8hpp_source_l00021}00021\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_reusable_string_stream}{ReusableStringStream}}\ rss;}
+\DoxyCodeLine{\Hypertarget{catch__to__string_8hpp_source_l00022}00022\ \ \ \ \ \ \ \ \ rss\ <<\ t;}
+\DoxyCodeLine{\Hypertarget{catch__to__string_8hpp_source_l00023}00023\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ rss.\mbox{\hyperlink{class_catch_1_1_reusable_string_stream_a0e9ecf260b2a5d35f4886ef0d51f6270}{str}}();}
+\DoxyCodeLine{\Hypertarget{catch__to__string_8hpp_source_l00024}00024\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{catch__to__string_8hpp_source_l00025}00025\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__to__string_8hpp_source_l00026}00026\ \}\ \textcolor{comment}{//\ end\ namespace\ Catch}}
+\DoxyCodeLine{\Hypertarget{catch__to__string_8hpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{catch__to__string_8hpp_source_l00028}00028\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ TWOBLUECUBES\_CATCH\_TO\_STRING\_H\_INCLUDED}}
+
+\end{DoxyCode}

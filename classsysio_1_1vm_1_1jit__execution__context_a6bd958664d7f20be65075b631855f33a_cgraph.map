@@ -1,0 +1,16 @@
+<map id="sysio::vm::jit_execution_context::call_host_function" name="sysio::vm::jit_execution_context::call_host_function">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,104,190,145"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1vm_1_1operand__stack__elem.html#ac732a8ec4c0bc0fa1dd4c457446449f0" title=" " alt="" coords="241,5,380,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="142,101,237,57,249,51,252,55,239,61,144,106"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1vm_1_1operand__stack__elem.html#ade755b1588a330ee6ee73917fbf37114" title=" " alt="" coords="241,71,380,111"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="189,107,225,102,226,107,190,113"/>
+<area shape="rect" id="Node000005" href="$classsysio_1_1vm_1_1operand__stack__elem.html#a0d0c392cd07bda5183839422f259a175" title=" " alt="" coords="238,136,383,177"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="190,136,223,141,222,146,189,141"/>
+<area shape="rect" id="Node000006" href="$classsysio_1_1vm_1_1operand__stack__elem.html#a88dd4f14ccf18f1b49328e8e37ebe49c" title=" " alt="" coords="238,201,383,242"/>
+<area shape="poly" id="edge7_Node000001_Node000006" title=" " alt="" coords="145,143,251,192,249,197,143,148"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1vm_1_1variant.html#a103670098d49aaf3b2f5dffdc29d4635" title=" " alt="" coords="431,89,604,160"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="358,44,384,57,431,79,429,84,382,61,355,49"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="381,100,416,105,415,111,380,105"/>
+<area shape="poly" id="edge6_Node000005_Node000003" title=" " alt="" coords="383,143,415,137,416,143,384,148"/>
+<area shape="poly" id="edge8_Node000006_Node000003" title=" " alt="" coords="355,198,382,186,427,164,429,169,384,191,358,203"/>
+</map>

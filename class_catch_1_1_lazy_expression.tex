@@ -1,0 +1,227 @@
+\doxysection{Catch\+::Lazy\+Expression Class Reference}
+\hypertarget{class_catch_1_1_lazy_expression}{}\label{class_catch_1_1_lazy_expression}\index{Catch::LazyExpression@{Catch::LazyExpression}}
+
+
+{\ttfamily \#include $<$catch\+\_\+assertionhandler.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_catch_1_1_lazy_expression_a47186c2487bd4bf871e870ba8048553a}{Lazy\+Expression}} (bool is\+Negated)
+\item 
+\mbox{\hyperlink{class_catch_1_1_lazy_expression_ab82d5e94df0e159b018fbde0170e46f8}{Lazy\+Expression}} (\mbox{\hyperlink{class_catch_1_1_lazy_expression}{Lazy\+Expression}} const \&other)
+\item 
+\mbox{\hyperlink{class_catch_1_1_lazy_expression}{Lazy\+Expression}} \& \mbox{\hyperlink{class_catch_1_1_lazy_expression_a1b080e25fdfdecbc3e475d0e96cf0fd4}{operator=}} (\mbox{\hyperlink{class_catch_1_1_lazy_expression}{Lazy\+Expression}} const \&)=delete
+\item 
+\mbox{\hyperlink{class_catch_1_1_lazy_expression_acdb846cb230cecfc6aca7a925b31fbca}{operator bool}} () const
+\item 
+\mbox{\hyperlink{class_catch_1_1_lazy_expression_a47186c2487bd4bf871e870ba8048553a}{Lazy\+Expression}} (bool is\+Negated)
+\item 
+\mbox{\hyperlink{class_catch_1_1_lazy_expression_ab82d5e94df0e159b018fbde0170e46f8}{Lazy\+Expression}} (\mbox{\hyperlink{class_catch_1_1_lazy_expression}{Lazy\+Expression}} const \&other)
+\item 
+\mbox{\hyperlink{class_catch_1_1_lazy_expression}{Lazy\+Expression}} \& \mbox{\hyperlink{class_catch_1_1_lazy_expression_a1b080e25fdfdecbc3e475d0e96cf0fd4}{operator=}} (\mbox{\hyperlink{class_catch_1_1_lazy_expression}{Lazy\+Expression}} const \&)=delete
+\item 
+\mbox{\hyperlink{class_catch_1_1_lazy_expression_acdb846cb230cecfc6aca7a925b31fbca}{operator bool}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{class_catch_1_1_lazy_expression_aff20a67b8485fd4382191e638360c907}{Assertion\+Handler}}
+\item 
+struct \mbox{\hyperlink{class_catch_1_1_lazy_expression_aaebeae6c9db91b5c4f066e2681a8fd04}{Assertion\+Stats}}
+\item 
+\mbox{\hyperlink{yubihsm__pkcs11_8c_a5c230edcb923568000cb7982cf84dfce}{class}} \mbox{\hyperlink{class_catch_1_1_lazy_expression_a8ddee68e111eb70d3e0ab0ae81087022}{Run\+Context}}
+\item 
+auto \mbox{\hyperlink{class_catch_1_1_lazy_expression_aa01086581cab2fcd2d4580b8fa787dfc}{operator$<$$<$}} (std\+::ostream \&os, \mbox{\hyperlink{class_catch_1_1_lazy_expression}{Lazy\+Expression}} const \&lazy\+Expr) -\/$>$ std\+::ostream \&
+\item 
+auto \mbox{\hyperlink{class_catch_1_1_lazy_expression_aa01086581cab2fcd2d4580b8fa787dfc}{operator$<$$<$}} (std\+::ostream \&os, \mbox{\hyperlink{class_catch_1_1_lazy_expression}{Lazy\+Expression}} const \&lazy\+Expr) -\/$>$ std\+::ostream \&
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source_l02151}{2151}} of file \mbox{\hyperlink{single__include_2catch2_2catch_8hpp_source}{catch.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_catch_1_1_lazy_expression_a47186c2487bd4bf871e870ba8048553a}\index{Catch::LazyExpression@{Catch::LazyExpression}!LazyExpression@{LazyExpression}}
+\index{LazyExpression@{LazyExpression}!Catch::LazyExpression@{Catch::LazyExpression}}
+\doxysubsubsection{\texorpdfstring{LazyExpression()}{LazyExpression()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_lazy_expression_a47186c2487bd4bf871e870ba8048553a} 
+Catch\+::\+Lazy\+Expression\+::\+Lazy\+Expression (\begin{DoxyParamCaption}\item[{bool}]{is\+Negated}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__assertionhandler_8cpp_source_l00028}{28}} of file \mbox{\hyperlink{catch__assertionhandler_8cpp_source}{catch\+\_\+assertionhandler.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00029\ \ \ \ \ :\ \ \ m\_isNegated(\ isNegated\ )}
+\DoxyCodeLine{00030\ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_lazy_expression_ab82d5e94df0e159b018fbde0170e46f8}\index{Catch::LazyExpression@{Catch::LazyExpression}!LazyExpression@{LazyExpression}}
+\index{LazyExpression@{LazyExpression}!Catch::LazyExpression@{Catch::LazyExpression}}
+\doxysubsubsection{\texorpdfstring{LazyExpression()}{LazyExpression()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_lazy_expression_ab82d5e94df0e159b018fbde0170e46f8} 
+Catch\+::\+Lazy\+Expression\+::\+Lazy\+Expression (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_catch_1_1_lazy_expression}{Lazy\+Expression}} const \&}]{other}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{catch__assertionhandler_8cpp_source_l00032}{32}} of file \mbox{\hyperlink{catch__assertionhandler_8cpp_source}{catch\+\_\+assertionhandler.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00032\ :\ m\_isNegated(\ \mbox{\hyperlink{namespace_c_l_i_1_1detail_ad707439590ee4ceafd3f41e0b5390617a795f3202b17cb6bc3d4b771d8c6c9eaf}{other}}.m\_isNegated\ )\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_lazy_expression_a47186c2487bd4bf871e870ba8048553a}\index{Catch::LazyExpression@{Catch::LazyExpression}!LazyExpression@{LazyExpression}}
+\index{LazyExpression@{LazyExpression}!Catch::LazyExpression@{Catch::LazyExpression}}
+\doxysubsubsection{\texorpdfstring{LazyExpression()}{LazyExpression()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_lazy_expression_a47186c2487bd4bf871e870ba8048553a} 
+Catch\+::\+Lazy\+Expression\+::\+Lazy\+Expression (\begin{DoxyParamCaption}\item[{bool}]{is\+Negated}{}\end{DoxyParamCaption})}
+
+\Hypertarget{class_catch_1_1_lazy_expression_ab82d5e94df0e159b018fbde0170e46f8}\index{Catch::LazyExpression@{Catch::LazyExpression}!LazyExpression@{LazyExpression}}
+\index{LazyExpression@{LazyExpression}!Catch::LazyExpression@{Catch::LazyExpression}}
+\doxysubsubsection{\texorpdfstring{LazyExpression()}{LazyExpression()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_lazy_expression_ab82d5e94df0e159b018fbde0170e46f8} 
+Catch\+::\+Lazy\+Expression\+::\+Lazy\+Expression (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_catch_1_1_lazy_expression}{Lazy\+Expression}} const \&}]{other}{}\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_catch_1_1_lazy_expression_acdb846cb230cecfc6aca7a925b31fbca}\index{Catch::LazyExpression@{Catch::LazyExpression}!operator bool@{operator bool}}
+\index{operator bool@{operator bool}!Catch::LazyExpression@{Catch::LazyExpression}}
+\doxysubsubsection{\texorpdfstring{operator bool()}{operator bool()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_lazy_expression_acdb846cb230cecfc6aca7a925b31fbca} 
+Catch\+::\+Lazy\+Expression\+::operator bool (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__assertionhandler_8cpp_source_l00034}{34}} of file \mbox{\hyperlink{catch__assertionhandler_8cpp_source}{catch\+\_\+assertionhandler.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_transientExpression\ !=\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00036\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_lazy_expression_acdb846cb230cecfc6aca7a925b31fbca}\index{Catch::LazyExpression@{Catch::LazyExpression}!operator bool@{operator bool}}
+\index{operator bool@{operator bool}!Catch::LazyExpression@{Catch::LazyExpression}}
+\doxysubsubsection{\texorpdfstring{operator bool()}{operator bool()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_lazy_expression_acdb846cb230cecfc6aca7a925b31fbca} 
+Catch\+::\+Lazy\+Expression\+::operator bool (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [explicit]}}
+
+\Hypertarget{class_catch_1_1_lazy_expression_a1b080e25fdfdecbc3e475d0e96cf0fd4}\index{Catch::LazyExpression@{Catch::LazyExpression}!operator=@{operator=}}
+\index{operator=@{operator=}!Catch::LazyExpression@{Catch::LazyExpression}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_lazy_expression_a1b080e25fdfdecbc3e475d0e96cf0fd4} 
+\mbox{\hyperlink{class_catch_1_1_lazy_expression}{Lazy\+Expression}} \& Catch\+::\+Lazy\+Expression\+::operator= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_catch_1_1_lazy_expression}{Lazy\+Expression}} const \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [delete]}}
+
+\Hypertarget{class_catch_1_1_lazy_expression_a1b080e25fdfdecbc3e475d0e96cf0fd4}\index{Catch::LazyExpression@{Catch::LazyExpression}!operator=@{operator=}}
+\index{operator=@{operator=}!Catch::LazyExpression@{Catch::LazyExpression}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_lazy_expression_a1b080e25fdfdecbc3e475d0e96cf0fd4} 
+\mbox{\hyperlink{class_catch_1_1_lazy_expression}{Lazy\+Expression}} \& Catch\+::\+Lazy\+Expression\+::operator= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_catch_1_1_lazy_expression}{Lazy\+Expression}} const \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [delete]}}
+
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{class_catch_1_1_lazy_expression_aff20a67b8485fd4382191e638360c907}\index{Catch::LazyExpression@{Catch::LazyExpression}!AssertionHandler@{AssertionHandler}}
+\index{AssertionHandler@{AssertionHandler}!Catch::LazyExpression@{Catch::LazyExpression}}
+\doxysubsubsection{\texorpdfstring{AssertionHandler}{AssertionHandler}}
+{\footnotesize\ttfamily \label{class_catch_1_1_lazy_expression_aff20a67b8485fd4382191e638360c907} 
+\mbox{\hyperlink{class_catch_1_1_assertion_handler}{Assertion\+Handler}}\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__assertionhandler_8h_source_l00023}{23}} of file \mbox{\hyperlink{catch__assertionhandler_8h_source}{catch\+\_\+assertionhandler.\+h}}.
+
+\Hypertarget{class_catch_1_1_lazy_expression_aaebeae6c9db91b5c4f066e2681a8fd04}\index{Catch::LazyExpression@{Catch::LazyExpression}!AssertionStats@{AssertionStats}}
+\index{AssertionStats@{AssertionStats}!Catch::LazyExpression@{Catch::LazyExpression}}
+\doxysubsubsection{\texorpdfstring{AssertionStats}{AssertionStats}}
+{\footnotesize\ttfamily \label{class_catch_1_1_lazy_expression_aaebeae6c9db91b5c4f066e2681a8fd04} 
+\mbox{\hyperlink{struct_catch_1_1_assertion_stats}{Assertion\+Stats}}\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__assertionhandler_8h_source_l00024}{24}} of file \mbox{\hyperlink{catch__assertionhandler_8h_source}{catch\+\_\+assertionhandler.\+h}}.
+
+\Hypertarget{class_catch_1_1_lazy_expression_aa01086581cab2fcd2d4580b8fa787dfc}\index{Catch::LazyExpression@{Catch::LazyExpression}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!Catch::LazyExpression@{Catch::LazyExpression}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$}{operator<<}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_lazy_expression_aa01086581cab2fcd2d4580b8fa787dfc} 
+auto operator$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{os}{, }\item[{\mbox{\hyperlink{class_catch_1_1_lazy_expression}{Lazy\+Expression}} const \&}]{lazy\+Expr}{}\end{DoxyParamCaption}) -\/$>$ std\+::ostream\&\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__assertionhandler_8cpp_source_l00038}{38}} of file \mbox{\hyperlink{catch__assertionhandler_8cpp_source}{catch\+\_\+assertionhandler.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ lazyExpr.m\_isNegated\ )}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}!"{}};}
+\DoxyCodeLine{00041\ }
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ lazyExpr\ )\ \{}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ lazyExpr.m\_isNegated\ \&\&\ lazyExpr.m\_transientExpression-\/>isBinaryExpression()\ )}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}("{}}\ <<\ *lazyExpr.m\_transientExpression\ <<\ \textcolor{stringliteral}{"{})"{}};}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ *lazyExpr.m\_transientExpression;}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}\{**\ error\ -\/\ unchecked\ empty\ expression\ requested\ **\}"{}};}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}};}
+\DoxyCodeLine{00052\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_lazy_expression_aa01086581cab2fcd2d4580b8fa787dfc}\index{Catch::LazyExpression@{Catch::LazyExpression}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!Catch::LazyExpression@{Catch::LazyExpression}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$}{operator<<}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{class_catch_1_1_lazy_expression_aa01086581cab2fcd2d4580b8fa787dfc} 
+auto operator$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{os}{, }\item[{\mbox{\hyperlink{class_catch_1_1_lazy_expression}{Lazy\+Expression}} const \&}]{lazy\+Expr}{}\end{DoxyParamCaption}) -\/$>$ std\+::ostream\&\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__assertionhandler_8cpp_source_l00038}{38}} of file \mbox{\hyperlink{catch__assertionhandler_8cpp_source}{catch\+\_\+assertionhandler.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ lazyExpr.m\_isNegated\ )}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}!"{}};}
+\DoxyCodeLine{00041\ }
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ lazyExpr\ )\ \{}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ lazyExpr.m\_isNegated\ \&\&\ lazyExpr.m\_transientExpression-\/>isBinaryExpression()\ )}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}("{}}\ <<\ *lazyExpr.m\_transientExpression\ <<\ \textcolor{stringliteral}{"{})"{}};}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ *lazyExpr.m\_transientExpression;}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}\{**\ error\ -\/\ unchecked\ empty\ expression\ requested\ **\}"{}};}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{environment_8hpp_a3951483d0b31c29ca95336206cd35238}{os}};}
+\DoxyCodeLine{00052\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{class_catch_1_1_lazy_expression_a8ddee68e111eb70d3e0ab0ae81087022}\index{Catch::LazyExpression@{Catch::LazyExpression}!RunContext@{RunContext}}
+\index{RunContext@{RunContext}!Catch::LazyExpression@{Catch::LazyExpression}}
+\doxysubsubsection{\texorpdfstring{RunContext}{RunContext}}
+{\footnotesize\ttfamily \label{class_catch_1_1_lazy_expression_a8ddee68e111eb70d3e0ab0ae81087022} 
+\mbox{\hyperlink{class_catch_1_1_run_context}{Run\+Context}}\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{catch__assertionhandler_8h_source_l00025}{25}} of file \mbox{\hyperlink{catch__assertionhandler_8h_source}{catch\+\_\+assertionhandler.\+h}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__assertionhandler_8h}{catch\+\_\+assertionhandler.\+h}}\item 
+libraries/sys-\/vm/external/\+Catch2/single\+\_\+include/catch2/\mbox{\hyperlink{single__include_2catch2_2catch_8hpp}{catch.\+hpp}}\item 
+libraries/sys-\/vm/external/\+Catch2/include/internal/\mbox{\hyperlink{catch__assertionhandler_8cpp}{catch\+\_\+assertionhandler.\+cpp}}\end{DoxyCompactItemize}

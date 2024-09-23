@@ -1,0 +1,9 @@
+<map id="list_delete" name="list_delete">
+<area shape="rect" id="Node000001" title=" " alt="" coords="384,31,464,56"/>
+<area shape="rect" id="Node000002" href="$util__pkcs11_8c.html#a85ea84ffb047281f34a733572f67b254" title=" " alt="" coords="228,5,336,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="368,36,336,30,337,25,369,31"/>
+<area shape="rect" id="Node000004" href="$yubihsm__pkcs11_8c.html#afe745723604228fbab835b32501ca4ee" title=" " alt="" coords="263,55,301,80"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="369,55,302,67,301,62,368,50"/>
+<area shape="rect" id="Node000003" href="$yubihsm__pkcs11_8c.html#ae42be1463b17c635f1d1db61afc0db16" title=" " alt="" coords="5,5,180,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="212,21,180,21,180,16,212,16"/>
+</map>

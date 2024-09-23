@@ -1,0 +1,86 @@
+\doxysection{assumptions.\+h}
+\hypertarget{assumptions_8h_source}{}\label{assumptions_8h_source}\index{libraries/fc/secp256k1/secp256k1/src/assumptions.h@{libraries/fc/secp256k1/secp256k1/src/assumptions.h}}
+\mbox{\hyperlink{assumptions_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00001}00001\ \textcolor{comment}{/***********************************************************************}}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2020\ Pieter\ Wuille\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00003}00003\ \textcolor{comment}{\ *\ Distributed\ under\ the\ MIT\ software\ license,\ see\ the\ accompanying\ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00004}00004\ \textcolor{comment}{\ *\ file\ COPYING\ or\ https://www.opensource.org/licenses/mit-\/license.php.*}}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00005}00005\ \textcolor{comment}{\ ***********************************************************************/}}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00007}00007\ \textcolor{preprocessor}{\#ifndef\ SECP256K1\_ASSUMPTIONS\_H}}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00008}00008\ \textcolor{preprocessor}{\#define\ SECP256K1\_ASSUMPTIONS\_H}}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <limits.h>}}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00012}00012\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h}{util.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00014}00014\ \textcolor{comment}{/*\ This\ library,\ like\ most\ software,\ relies\ on\ a\ number\ of\ compiler\ implementation\ defined\ (but\ not\ undefined)}}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00015}00015\ \textcolor{comment}{\ \ \ behaviours.\ Although\ the\ behaviours\ we\ require\ are\ essentially\ universal\ we\ test\ them\ specifically\ here\ to}}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00016}00016\ \textcolor{comment}{\ \ \ reduce\ the\ odds\ of\ experiencing\ an\ unwelcome\ surprise.}}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00017}00017\ \textcolor{comment}{*/}}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00019}\mbox{\hyperlink{structsecp256k1__assumption__checker}{00019}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structsecp256k1__assumption__checker}{secp256k1\_assumption\_checker}}\ \{}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00020}00020\ \ \ \ \ \textcolor{comment}{/*\ This\ uses\ a\ trick\ to\ implement\ a\ static\ assertion\ in\ C89:\ a\ type\ with\ an\ array\ of\ negative\ size\ is\ not}}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00021}00021\ \textcolor{comment}{\ \ \ \ \ \ \ allowed.\ */}}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00022}\mbox{\hyperlink{structsecp256k1__assumption__checker_a7492fa368c3a25692698f7bb8613cd2d}{00022}}\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{structsecp256k1__assumption__checker_a7492fa368c3a25692698f7bb8613cd2d}{dummy\_array}}[(}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00023}00023\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ Bytes\ are\ 8\ bits.\ */}}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00024}00024\ \ \ \ \ \ \ \ \ (CHAR\_BIT\ ==\ 8)\ \&\&}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00026}00026\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ No\ integer\ promotion\ for\ uint32\_t.\ This\ ensures\ that\ we\ can\ multiply\ uintXX\_t\ values\ where\ XX\ >=\ 32}}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00027}00027\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ without\ signed\ overflow,\ which\ would\ be\ undefined\ behaviour.\ */}}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00028}00028\ \ \ \ \ \ \ \ \ (UINT\_MAX\ <=\ \mbox{\hyperlink{stdint_8h_ab5eb23180f7cc12b7d6c04a8ec067fdd}{UINT32\_MAX}})\ \&\&}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00030}00030\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ Conversions\ from\ unsigned\ to\ signed\ outside\ of\ the\ bounds\ of\ the\ signed\ type\ are}}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00031}00031\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ implementation-\/defined.\ Verify\ that\ they\ function\ as\ reinterpreting\ the\ lower}}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00032}00032\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ bits\ of\ the\ input\ in\ two's\ complement\ notation.\ Do\ this\ for\ conversions:}}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00033}00033\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ -\/\ from\ uint(N)\_t\ to\ int(N)\_t\ with\ negative\ result}}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00034}00034\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ -\/\ from\ uint(2N)\_t\ to\ int(N)\_t\ with\ negative\ result}}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00035}00035\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ -\/\ from\ int(2N)\_t\ to\ int(N)\_t\ with\ negative\ result}}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00036}00036\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ -\/\ from\ int(2N)\_t\ to\ int(N)\_t\ with\ positive\ result\ */}}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00038}00038\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ To\ int8\_t.\ */}}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00039}00039\ \ \ \ \ \ \ \ \ ((\mbox{\hyperlink{stdint_8h_aef44329758059c91c76d334e8fc09700}{int8\_t}})(\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}})0xAB\ ==\ (\mbox{\hyperlink{stdint_8h_aef44329758059c91c76d334e8fc09700}{int8\_t}})-\/(\mbox{\hyperlink{stdint_8h_aef44329758059c91c76d334e8fc09700}{int8\_t}})0x55)\ \&\&}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00040}00040\ \ \ \ \ \ \ \ \ ((\mbox{\hyperlink{stdint_8h_aef44329758059c91c76d334e8fc09700}{int8\_t}})(\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}})0xABCD\ ==\ (\mbox{\hyperlink{stdint_8h_aef44329758059c91c76d334e8fc09700}{int8\_t}})-\/(\mbox{\hyperlink{stdint_8h_aef44329758059c91c76d334e8fc09700}{int8\_t}})0x33)\ \&\&}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00041}00041\ \ \ \ \ \ \ \ \ ((\mbox{\hyperlink{stdint_8h_aef44329758059c91c76d334e8fc09700}{int8\_t}})(\mbox{\hyperlink{stdint_8h_a269259c924dce846340ddbb810db2e3c}{int16\_t}})(\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}})0xCDEF\ ==\ (\mbox{\hyperlink{stdint_8h_aef44329758059c91c76d334e8fc09700}{int8\_t}})(\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}})0xEF)\ \&\&}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00042}00042\ \ \ \ \ \ \ \ \ ((\mbox{\hyperlink{stdint_8h_aef44329758059c91c76d334e8fc09700}{int8\_t}})(\mbox{\hyperlink{stdint_8h_a269259c924dce846340ddbb810db2e3c}{int16\_t}})(\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}})0x9234\ ==\ (\mbox{\hyperlink{stdint_8h_aef44329758059c91c76d334e8fc09700}{int8\_t}})(\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}})0x34)\ \&\&}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00044}00044\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ To\ int16\_t.\ */}}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00045}00045\ \ \ \ \ \ \ \ \ ((\mbox{\hyperlink{stdint_8h_a269259c924dce846340ddbb810db2e3c}{int16\_t}})(\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}})0xBCDE\ ==\ (\mbox{\hyperlink{stdint_8h_a269259c924dce846340ddbb810db2e3c}{int16\_t}})-\/(\mbox{\hyperlink{stdint_8h_a269259c924dce846340ddbb810db2e3c}{int16\_t}})0x4322)\ \&\&}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00046}00046\ \ \ \ \ \ \ \ \ ((\mbox{\hyperlink{stdint_8h_a269259c924dce846340ddbb810db2e3c}{int16\_t}})(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})0xA1B2C3D4\ ==\ (\mbox{\hyperlink{stdint_8h_a269259c924dce846340ddbb810db2e3c}{int16\_t}})-\/(\mbox{\hyperlink{stdint_8h_a269259c924dce846340ddbb810db2e3c}{int16\_t}})0x3C2C)\ \&\&}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00047}00047\ \ \ \ \ \ \ \ \ ((\mbox{\hyperlink{stdint_8h_a269259c924dce846340ddbb810db2e3c}{int16\_t}})(\mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}})(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})0xC1D2E3F4\ ==\ (\mbox{\hyperlink{stdint_8h_a269259c924dce846340ddbb810db2e3c}{int16\_t}})(\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}})0xE3F4)\ \&\&}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00048}00048\ \ \ \ \ \ \ \ \ ((\mbox{\hyperlink{stdint_8h_a269259c924dce846340ddbb810db2e3c}{int16\_t}})(\mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}})(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})0x92345678\ ==\ (\mbox{\hyperlink{stdint_8h_a269259c924dce846340ddbb810db2e3c}{int16\_t}})(\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}})0x5678)\ \&\&}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00050}00050\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ To\ int32\_t.\ */}}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00051}00051\ \ \ \ \ \ \ \ \ ((\mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}})(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})0xB2C3D4E5\ ==\ (\mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}})-\/(\mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}})0x4D3C2B1B)\ \&\&}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00052}00052\ \ \ \ \ \ \ \ \ ((\mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}})(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})0xA123B456C789D012ULL\ ==\ (\mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}})-\/(\mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}})0x38762FEE)\ \&\&}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00053}00053\ \ \ \ \ \ \ \ \ ((\mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}})(\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}})(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})0xC1D2E3F4A5B6C7D8ULL\ ==\ (\mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}})(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})0xA5B6C7D8)\ \&\&}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00054}00054\ \ \ \ \ \ \ \ \ ((\mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}})(\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}})(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})0xABCDEF0123456789ULL\ ==\ (\mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}})(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})0x23456789)\ \&\&}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00056}00056\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ To\ int64\_t.\ */}}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00057}00057\ \ \ \ \ \ \ \ \ ((\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}})(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})0xB123C456D789E012ULL\ ==\ (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}})-\/(\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}})0x4EDC3BA928761FEEULL)\ \&\&}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00058}00058\ \textcolor{preprocessor}{\#if\ defined(SECP256K1\_WIDEMUL\_INT128)}}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00059}00059\ \ \ \ \ \ \ \ \ ((\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}})(((uint128\_t)0xA1234567B8901234ULL\ <<\ 64)\ +\ 0xC5678901D2345678ULL)\ ==\ (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}})-\/(\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}})0x3A9876FE2DCBA988ULL)\ \&\&}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00060}00060\ \ \ \ \ \ \ \ \ (((\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}})(int128\_t)(((uint128\_t)0xB1C2D3E4F5A6B7C8ULL\ <<\ 64)\ +\ 0xD9E0F1A2B3C4D5E6ULL))\ ==\ (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}})(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})0xD9E0F1A2B3C4D5E6ULL)\ \&\&}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00061}00061\ \ \ \ \ \ \ \ \ (((\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}})(int128\_t)(((uint128\_t)0xABCDEF0123456789ULL\ <<\ 64)\ +\ 0x0123456789ABCDEFULL))\ ==\ (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}})(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})0x0123456789ABCDEFULL)\ \&\&}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00062}00062\ }
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00063}00063\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ To\ int128\_t.\ */}}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00064}00064\ \ \ \ \ \ \ \ \ ((int128\_t)(((uint128\_t)0xB1234567C8901234ULL\ <<\ 64)\ +\ 0xD5678901E2345678ULL)\ ==\ (int128\_t)(-\/(int128\_t)0x8E1648B3F50E80DCULL\ *\ 0x8E1648B3F50E80DDULL\ +\ 0x5EA688D5482F9464ULL))\ \&\&}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00065}00065\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00067}00067\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ Right\ shift\ on\ negative\ signed\ values\ is\ implementation\ defined.\ Verify\ that\ it}}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00068}00068\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ acts\ as\ a\ right\ shift\ in\ two's\ complement\ with\ sign\ extension\ (i.e\ duplicating}}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00069}00069\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ the\ top\ bit\ into\ newly\ added\ bits).\ */}}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00070}00070\ \ \ \ \ \ \ \ \ ((((\mbox{\hyperlink{stdint_8h_aef44329758059c91c76d334e8fc09700}{int8\_t}})0xE8)\ >>\ 2)\ ==\ (\mbox{\hyperlink{stdint_8h_aef44329758059c91c76d334e8fc09700}{int8\_t}})(\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}})0xFA)\ \&\&}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00071}00071\ \ \ \ \ \ \ \ \ ((((\mbox{\hyperlink{stdint_8h_a269259c924dce846340ddbb810db2e3c}{int16\_t}})0xE9AC)\ >>\ 4)\ ==\ (\mbox{\hyperlink{stdint_8h_a269259c924dce846340ddbb810db2e3c}{int16\_t}})(\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}})0xFE9A)\ \&\&}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00072}00072\ \ \ \ \ \ \ \ \ ((((\mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}})0x937C918A)\ >>\ 9)\ ==\ (\mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}})(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})0xFFC9BE48)\ \&\&}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00073}00073\ \ \ \ \ \ \ \ \ ((((\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}})0xA8B72231DF9CF4B9ULL)\ >>\ 19)\ ==\ (\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}})(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})0xFFFFF516E4463BF3ULL)\ \&\&}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00074}00074\ \textcolor{preprocessor}{\#if\ defined(SECP256K1\_WIDEMUL\_INT128)}}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00075}00075\ \ \ \ \ \ \ \ \ ((((int128\_t)(((uint128\_t)0xCD833A65684A0DBCULL\ <<\ 64)\ +\ 0xB349312F71EA7637ULL))\ >>\ 39)\ ==\ (int128\_t)(((uint128\_t)0xFFFFFFFFFF9B0674ULL\ <<\ 64)\ +\ 0xCAD0941B79669262ULL))\ \&\&}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00076}00076\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00077}00077\ \ \ \ \ 1)\ *\ 2\ -\/\ 1];}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00078}00078\ \};}
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{assumptions_8h_source_l00080}00080\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{/*\ SECP256K1\_ASSUMPTIONS\_H\ */}\textcolor{preprocessor}{}}
+
+\end{DoxyCode}

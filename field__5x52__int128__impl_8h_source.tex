@@ -1,0 +1,279 @@
+\doxysection{field\+\_\+5x52\+\_\+int128\+\_\+impl.\+h}
+\hypertarget{field__5x52__int128__impl_8h_source}{}\label{field__5x52__int128__impl_8h_source}\index{libraries/fc/secp256k1/secp256k1/src/field\_5x52\_int128\_impl.h@{libraries/fc/secp256k1/secp256k1/src/field\_5x52\_int128\_impl.h}}
+\mbox{\hyperlink{field__5x52__int128__impl_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00001}00001\ \textcolor{comment}{/***********************************************************************}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2013,\ 2014\ Pieter\ Wuille\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00003}00003\ \textcolor{comment}{\ *\ Distributed\ under\ the\ MIT\ software\ license,\ see\ the\ accompanying\ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00004}00004\ \textcolor{comment}{\ *\ file\ COPYING\ or\ https://www.opensource.org/licenses/mit-\/license.php.*}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00005}00005\ \textcolor{comment}{\ ***********************************************************************/}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00007}00007\ \textcolor{preprocessor}{\#ifndef\ SECP256K1\_FIELD\_INNER5X52\_IMPL\_H}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00008}00008\ \textcolor{preprocessor}{\#define\ SECP256K1\_FIELD\_INNER5X52\_IMPL\_H}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{stdint_8h}{stdint.h}}>}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00012}00012\ \textcolor{preprocessor}{\#ifdef\ VERIFY}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00013}00013\ \textcolor{preprocessor}{\#define\ VERIFY\_BITS(x,\ n)\ VERIFY\_CHECK(((x)\ >>\ (n))\ ==\ 0)}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00014}00014\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00015}\mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{00015}}\ \textcolor{preprocessor}{\#define\ VERIFY\_BITS(x,\ n)\ do\ \{\ \}\ while(0)}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00016}00016\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00018}00018\ \mbox{\hyperlink{secp256k1_8h_a7ddc487fd46aee88f21cabedb7268b1e}{SECP256K1\_INLINE}}\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_fe\_mul\_inner(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ *\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ *\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ *\ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_ad3e284f8cb00286e85a753265f6b17b8}{SECP256K1\_RESTRICT}}\ b)\ \{}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00019}00019\ \ \ \ \ uint128\_t\ c,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}};}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00020}00020\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ t3,\ t4,\ tx,\ u0;}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00021}00021\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ a0\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}[0],\ a1\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}[1],\ a2\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}[2],\ a3\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}[3],\ a4\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}[4];}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00022}00022\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ M\ =\ 0xFFFFFFFFFFFFFULL,\ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}\ =\ 0x1000003D10ULL;}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00024}00024\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}[0],\ 56);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00025}00025\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}[1],\ 56);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00026}00026\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}[2],\ 56);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00027}00027\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}[3],\ 56);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00028}00028\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}[4],\ 52);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00029}00029\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(b[0],\ 56);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00030}00030\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(b[1],\ 56);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00031}00031\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(b[2],\ 56);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00032}00032\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(b[3],\ 56);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00033}00033\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(b[4],\ 52);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00034}00034\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}\ !=\ b);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00035}00035\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}\ !=\ b);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00037}00037\ \ \ \ \ \textcolor{comment}{/*\ \ [...\ a\ b\ c]\ is\ a\ shorthand\ for\ ...\ +\ a<<104\ +\ b<<52\ +\ c<<0\ mod\ n.}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00038}00038\ \textcolor{comment}{\ \ \ \ \ *\ \ for\ 0\ <=\ x\ <=\ 4,\ px\ is\ a\ shorthand\ for\ sum(a[i]*b[x-\/i],\ i=0..x).}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00039}00039\ \textcolor{comment}{\ \ \ \ \ *\ \ for\ 4\ <=\ x\ <=\ 8,\ px\ is\ a\ shorthand\ for\ sum(a[i]*b[x-\/i],\ i=(x-\/4)..4)}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00040}00040\ \textcolor{comment}{\ \ \ \ \ *\ \ Note\ that\ [x\ 0\ 0\ 0\ 0\ 0]\ =\ [x*R].}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00041}00041\ \textcolor{comment}{\ \ \ \ \ */}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00043}00043\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ \ =\ (uint128\_t)a0\ *\ b[3]}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00044}00044\ \ \ \ \ \ \ \ +\ (uint128\_t)a1\ *\ b[2]}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00045}00045\ \ \ \ \ \ \ \ +\ (uint128\_t)a2\ *\ b[1]}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00046}00046\ \ \ \ \ \ \ \ +\ (uint128\_t)a3\ *\ b[0];}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00047}00047\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}},\ 114);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00048}00048\ \ \ \ \ \textcolor{comment}{/*\ [d\ 0\ 0\ 0]\ =\ [p3\ 0\ 0\ 0]\ */}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00049}00049\ \ \ \ \ c\ \ =\ (uint128\_t)a4\ *\ b[4];}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00050}00050\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(c,\ 112);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00051}00051\ \ \ \ \ \textcolor{comment}{/*\ [c\ 0\ 0\ 0\ 0\ d\ 0\ 0\ 0]\ =\ [p8\ 0\ 0\ 0\ 0\ p3\ 0\ 0\ 0]\ */}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00052}00052\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ +=\ (uint128\_t)\mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}\ *\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})c;\ c\ >>=\ 64;}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00053}00053\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}},\ 115);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00054}00054\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(c,\ 48);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00055}00055\ \ \ \ \ \textcolor{comment}{/*\ [(c<<12)\ 0\ 0\ 0\ 0\ 0\ d\ 0\ 0\ 0]\ =\ [p8\ 0\ 0\ 0\ 0\ p3\ 0\ 0\ 0]\ */}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00056}00056\ \ \ \ \ t3\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ \&\ M;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ >>=\ 52;}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00057}00057\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(t3,\ 52);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00058}00058\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}},\ 63);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00059}00059\ \ \ \ \ \textcolor{comment}{/*\ [(c<<12)\ 0\ 0\ 0\ 0\ d\ t3\ 0\ 0\ 0]\ =\ [p8\ 0\ 0\ 0\ 0\ p3\ 0\ 0\ 0]\ */}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00061}00061\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ +=\ (uint128\_t)a0\ *\ b[4]}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00062}00062\ \ \ \ \ \ \ \ +\ (uint128\_t)a1\ *\ b[3]}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00063}00063\ \ \ \ \ \ \ \ +\ (uint128\_t)a2\ *\ b[2]}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00064}00064\ \ \ \ \ \ \ \ +\ (uint128\_t)a3\ *\ b[1]}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00065}00065\ \ \ \ \ \ \ \ +\ (uint128\_t)a4\ *\ b[0];}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00066}00066\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}},\ 115);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00067}00067\ \ \ \ \ \textcolor{comment}{/*\ [(c<<12)\ 0\ 0\ 0\ 0\ d\ t3\ 0\ 0\ 0]\ =\ [p8\ 0\ 0\ 0\ p4\ p3\ 0\ 0\ 0]\ */}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00068}00068\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ +=\ (uint128\_t)(\mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}\ <<\ 12)\ *\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})c;}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00069}00069\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}},\ 116);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00070}00070\ \ \ \ \ \textcolor{comment}{/*\ [d\ t3\ 0\ 0\ 0]\ =\ [p8\ 0\ 0\ 0\ p4\ p3\ 0\ 0\ 0]\ */}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00071}00071\ \ \ \ \ t4\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ \&\ M;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ >>=\ 52;}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00072}00072\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(t4,\ 52);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00073}00073\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}},\ 64);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00074}00074\ \ \ \ \ \textcolor{comment}{/*\ [d\ t4\ t3\ 0\ 0\ 0]\ =\ [p8\ 0\ 0\ 0\ p4\ p3\ 0\ 0\ 0]\ */}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00075}00075\ \ \ \ \ tx\ =\ (t4\ >>\ 48);\ t4\ \&=\ (M\ >>\ 4);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00076}00076\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(tx,\ 4);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00077}00077\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(t4,\ 48);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00078}00078\ \ \ \ \ \textcolor{comment}{/*\ [d\ t4+(tx<<48)\ t3\ 0\ 0\ 0]\ =\ [p8\ 0\ 0\ 0\ p4\ p3\ 0\ 0\ 0]\ */}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00080}00080\ \ \ \ \ c\ \ =\ (uint128\_t)a0\ *\ b[0];}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00081}00081\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(c,\ 112);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00082}00082\ \ \ \ \ \textcolor{comment}{/*\ [d\ t4+(tx<<48)\ t3\ 0\ 0\ c]\ =\ [p8\ 0\ 0\ 0\ p4\ p3\ 0\ 0\ p0]\ */}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00083}00083\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ +=\ (uint128\_t)a1\ *\ b[4]}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00084}00084\ \ \ \ \ \ \ \ +\ (uint128\_t)a2\ *\ b[3]}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00085}00085\ \ \ \ \ \ \ \ +\ (uint128\_t)a3\ *\ b[2]}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00086}00086\ \ \ \ \ \ \ \ +\ (uint128\_t)a4\ *\ b[1];}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00087}00087\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}},\ 115);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00088}00088\ \ \ \ \ \textcolor{comment}{/*\ [d\ t4+(tx<<48)\ t3\ 0\ 0\ c]\ =\ [p8\ 0\ 0\ p5\ p4\ p3\ 0\ 0\ p0]\ */}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00089}00089\ \ \ \ \ u0\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ \&\ M;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ >>=\ 52;}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00090}00090\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(u0,\ 52);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00091}00091\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}},\ 63);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00092}00092\ \ \ \ \ \textcolor{comment}{/*\ [d\ u0\ t4+(tx<<48)\ t3\ 0\ 0\ c]\ =\ [p8\ 0\ 0\ p5\ p4\ p3\ 0\ 0\ p0]\ */}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00093}00093\ \ \ \ \ \textcolor{comment}{/*\ [d\ 0\ t4+(tx<<48)+(u0<<52)\ t3\ 0\ 0\ c]\ =\ [p8\ 0\ 0\ p5\ p4\ p3\ 0\ 0\ p0]\ */}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00094}00094\ \ \ \ \ u0\ =\ (u0\ <<\ 4)\ |\ tx;}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00095}00095\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(u0,\ 56);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00096}00096\ \ \ \ \ \textcolor{comment}{/*\ [d\ 0\ t4+(u0<<48)\ t3\ 0\ 0\ c]\ =\ [p8\ 0\ 0\ p5\ p4\ p3\ 0\ 0\ p0]\ */}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00097}00097\ \ \ \ \ c\ +=\ (uint128\_t)u0\ *\ (\mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}\ >>\ 4);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00098}00098\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(c,\ 115);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00099}00099\ \ \ \ \ \textcolor{comment}{/*\ [d\ 0\ t4\ t3\ 0\ 0\ c]\ =\ [p8\ 0\ 0\ p5\ p4\ p3\ 0\ 0\ p0]\ */}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00100}00100\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}[0]\ =\ c\ \&\ M;\ c\ >>=\ 52;}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00101}00101\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}[0],\ 52);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00102}00102\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(c,\ 61);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00103}00103\ \ \ \ \ \textcolor{comment}{/*\ [d\ 0\ t4\ t3\ 0\ c\ r0]\ =\ [p8\ 0\ 0\ p5\ p4\ p3\ 0\ 0\ p0]\ */}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00104}00104\ }
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00105}00105\ \ \ \ \ c\ +=\ (uint128\_t)a0\ *\ b[1]}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00106}00106\ \ \ \ \ \ \ \ +\ (uint128\_t)a1\ *\ b[0];}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00107}00107\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(c,\ 114);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00108}00108\ \ \ \ \ \textcolor{comment}{/*\ [d\ 0\ t4\ t3\ 0\ c\ r0]\ =\ [p8\ 0\ 0\ p5\ p4\ p3\ 0\ p1\ p0]\ */}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00109}00109\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ +=\ (uint128\_t)a2\ *\ b[4]}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00110}00110\ \ \ \ \ \ \ \ +\ (uint128\_t)a3\ *\ b[3]}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00111}00111\ \ \ \ \ \ \ \ +\ (uint128\_t)a4\ *\ b[2];}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00112}00112\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}},\ 114);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00113}00113\ \ \ \ \ \textcolor{comment}{/*\ [d\ 0\ t4\ t3\ 0\ c\ r0]\ =\ [p8\ 0\ p6\ p5\ p4\ p3\ 0\ p1\ p0]\ */}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00114}00114\ \ \ \ \ c\ +=\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ \&\ M)\ *\ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}};\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ >>=\ 52;}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00115}00115\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(c,\ 115);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00116}00116\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}},\ 62);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00117}00117\ \ \ \ \ \textcolor{comment}{/*\ [d\ 0\ 0\ t4\ t3\ 0\ c\ r0]\ =\ [p8\ 0\ p6\ p5\ p4\ p3\ 0\ p1\ p0]\ */}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00118}00118\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}[1]\ =\ c\ \&\ M;\ c\ >>=\ 52;}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00119}00119\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}[1],\ 52);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00120}00120\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(c,\ 63);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00121}00121\ \ \ \ \ \textcolor{comment}{/*\ [d\ 0\ 0\ t4\ t3\ c\ r1\ r0]\ =\ [p8\ 0\ p6\ p5\ p4\ p3\ 0\ p1\ p0]\ */}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00122}00122\ }
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00123}00123\ \ \ \ \ c\ +=\ (uint128\_t)a0\ *\ b[2]}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00124}00124\ \ \ \ \ \ \ \ +\ (uint128\_t)a1\ *\ b[1]}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00125}00125\ \ \ \ \ \ \ \ +\ (uint128\_t)a2\ *\ b[0];}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00126}00126\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(c,\ 114);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00127}00127\ \ \ \ \ \textcolor{comment}{/*\ [d\ 0\ 0\ t4\ t3\ c\ r1\ r0]\ =\ [p8\ 0\ p6\ p5\ p4\ p3\ p2\ p1\ p0]\ */}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00128}00128\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ +=\ (uint128\_t)a3\ *\ b[4]}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00129}00129\ \ \ \ \ \ \ \ +\ (uint128\_t)a4\ *\ b[3];}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00130}00130\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}},\ 114);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00131}00131\ \ \ \ \ \textcolor{comment}{/*\ [d\ 0\ 0\ t4\ t3\ c\ t1\ r0]\ =\ [p8\ p7\ p6\ p5\ p4\ p3\ p2\ p1\ p0]\ */}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00132}00132\ \ \ \ \ c\ +=\ (uint128\_t)\mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}\ *\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}};\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ >>=\ 64;}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00133}00133\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(c,\ 115);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00134}00134\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}},\ 50);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00135}00135\ \ \ \ \ \textcolor{comment}{/*\ [(d<<12)\ 0\ 0\ 0\ t4\ t3\ c\ r1\ r0]\ =\ [p8\ p7\ p6\ p5\ p4\ p3\ p2\ p1\ p0]\ */}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00136}00136\ }
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00137}00137\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}[2]\ =\ c\ \&\ M;\ c\ >>=\ 52;}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00138}00138\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}[2],\ 52);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00139}00139\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(c,\ 63);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00140}00140\ \ \ \ \ \textcolor{comment}{/*\ [(d<<12)\ 0\ 0\ 0\ t4\ t3+c\ r2\ r1\ r0]\ =\ [p8\ p7\ p6\ p5\ p4\ p3\ p2\ p1\ p0]\ */}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00141}00141\ \ \ \ \ c\ \ \ +=\ (uint128\_t)(\mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}\ <<\ 12)\ *\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ +\ t3;}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00142}00142\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(c,\ 100);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00143}00143\ \ \ \ \ \textcolor{comment}{/*\ [t4\ c\ r2\ r1\ r0]\ =\ [p8\ p7\ p6\ p5\ p4\ p3\ p2\ p1\ p0]\ */}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00144}00144\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}[3]\ =\ c\ \&\ M;\ c\ >>=\ 52;}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00145}00145\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}[3],\ 52);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00146}00146\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(c,\ 48);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00147}00147\ \ \ \ \ \textcolor{comment}{/*\ [t4+c\ r3\ r2\ r1\ r0]\ =\ [p8\ p7\ p6\ p5\ p4\ p3\ p2\ p1\ p0]\ */}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00148}00148\ \ \ \ \ c\ \ \ +=\ t4;}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00149}00149\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(c,\ 49);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00150}00150\ \ \ \ \ \textcolor{comment}{/*\ [c\ r3\ r2\ r1\ r0]\ =\ [p8\ p7\ p6\ p5\ p4\ p3\ p2\ p1\ p0]\ */}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00151}00151\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}[4]\ =\ c;}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00152}00152\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}[4],\ 49);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00153}00153\ \ \ \ \ \textcolor{comment}{/*\ [r4\ r3\ r2\ r1\ r0]\ =\ [p8\ p7\ p6\ p5\ p4\ p3\ p2\ p1\ p0]\ */}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00154}00154\ \}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00155}00155\ }
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00156}00156\ \mbox{\hyperlink{secp256k1_8h_a7ddc487fd46aee88f21cabedb7268b1e}{SECP256K1\_INLINE}}\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ secp256k1\_fe\_sqr\_inner(\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ *\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ *\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}})\ \{}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00157}00157\ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a376f631fcb770bd4b2e8349a33e52f8a}{uint128\_t}}\ c,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}};}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00158}00158\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ a0\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}[0],\ a1\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}[1],\ a2\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}[2],\ a3\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}[3],\ a4\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}[4];}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00159}00159\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ t3,\ t4,\ tx,\ u0;}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00160}00160\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ M\ =\ 0xFFFFFFFFFFFFFULL,\ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}\ =\ 0x1000003D10ULL;}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00161}00161\ }
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00162}00162\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}[0],\ 56);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00163}00163\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}[1],\ 56);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00164}00164\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}[2],\ 56);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00165}00165\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}[3],\ 56);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00166}00166\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(\mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}[4],\ 52);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00167}00167\ }
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00173}00173\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ \ =\ (\mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a376f631fcb770bd4b2e8349a33e52f8a}{uint128\_t}})(a0*2)\ *\ a3}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00174}00174\ \ \ \ \ \ \ \ +\ (\mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a376f631fcb770bd4b2e8349a33e52f8a}{uint128\_t}})(a1*2)\ *\ a2;}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00175}00175\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(d,\ 114);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00176}00176\ \ \ \ \ \textcolor{comment}{/*\ [d\ 0\ 0\ 0]\ =\ [p3\ 0\ 0\ 0]\ */}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00177}00177\ \ \ \ \ c\ \ =\ (\mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a376f631fcb770bd4b2e8349a33e52f8a}{uint128\_t}})a4\ *\ a4;}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00178}00178\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(c,\ 112);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00179}00179\ \ \ \ \ \textcolor{comment}{/*\ [c\ 0\ 0\ 0\ 0\ d\ 0\ 0\ 0]\ =\ [p8\ 0\ 0\ 0\ 0\ p3\ 0\ 0\ 0]\ */}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00180}00180\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ +=\ (\mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a376f631fcb770bd4b2e8349a33e52f8a}{uint128\_t}})\mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}\ *\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})c;\ c\ >>=\ 64;}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00181}00181\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(d,\ 115);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00182}00182\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(c,\ 48);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00183}00183\ \ \ \ \ \textcolor{comment}{/*\ [(c<<12)\ 0\ 0\ 0\ 0\ 0\ d\ 0\ 0\ 0]\ =\ [p8\ 0\ 0\ 0\ 0\ p3\ 0\ 0\ 0]\ */}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00184}00184\ \ \ \ \ t3\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ \&\ M;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ >>=\ 52;}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00185}00185\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(t3,\ 52);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00186}00186\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(d,\ 63);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00187}00187\ \ \ \ \ \textcolor{comment}{/*\ [(c<<12)\ 0\ 0\ 0\ 0\ d\ t3\ 0\ 0\ 0]\ =\ [p8\ 0\ 0\ 0\ 0\ p3\ 0\ 0\ 0]\ */}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00188}00188\ }
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00189}00189\ \ \ \ \ a4\ *=\ 2;}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00190}00190\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ +=\ (\mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a376f631fcb770bd4b2e8349a33e52f8a}{uint128\_t}})a0\ *\ a4}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00191}00191\ \ \ \ \ \ \ \ +\ (uint128\_t)(a1*2)\ *\ a3}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00192}00192\ \ \ \ \ \ \ \ +\ (uint128\_t)a2\ *\ a2;}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00193}00193\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(d,\ 115);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00194}00194\ \ \ \ \ \textcolor{comment}{/*\ [(c<<12)\ 0\ 0\ 0\ 0\ d\ t3\ 0\ 0\ 0]\ =\ [p8\ 0\ 0\ 0\ p4\ p3\ 0\ 0\ 0]\ */}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00195}00195\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ +=\ (\mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a376f631fcb770bd4b2e8349a33e52f8a}{uint128\_t}})(\mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}\ <<\ 12)\ *\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})c;}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00196}00196\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(d,\ 116);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00197}00197\ \ \ \ \ \textcolor{comment}{/*\ [d\ t3\ 0\ 0\ 0]\ =\ [p8\ 0\ 0\ 0\ p4\ p3\ 0\ 0\ 0]\ */}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00198}00198\ \ \ \ \ t4\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ \&\ M;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ >>=\ 52;}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00199}00199\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(t4,\ 52);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00200}00200\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(d,\ 64);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00201}00201\ \ \ \ \ \textcolor{comment}{/*\ [d\ t4\ t3\ 0\ 0\ 0]\ =\ [p8\ 0\ 0\ 0\ p4\ p3\ 0\ 0\ 0]\ */}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00202}00202\ \ \ \ \ tx\ =\ (t4\ >>\ 48);\ t4\ \&=\ (M\ >>\ 4);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00203}00203\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(tx,\ 4);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00204}00204\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(t4,\ 48);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00205}00205\ \ \ \ \ \textcolor{comment}{/*\ [d\ t4+(tx<<48)\ t3\ 0\ 0\ 0]\ =\ [p8\ 0\ 0\ 0\ p4\ p3\ 0\ 0\ 0]\ */}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00206}00206\ }
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00207}00207\ \ \ \ \ c\ \ =\ (\mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a376f631fcb770bd4b2e8349a33e52f8a}{uint128\_t}})a0\ *\ a0;}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00208}00208\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(c,\ 112);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00209}00209\ \ \ \ \ \textcolor{comment}{/*\ [d\ t4+(tx<<48)\ t3\ 0\ 0\ c]\ =\ [p8\ 0\ 0\ 0\ p4\ p3\ 0\ 0\ p0]\ */}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00210}00210\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ +=\ (\mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a376f631fcb770bd4b2e8349a33e52f8a}{uint128\_t}})a1\ *\ a4}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00211}00211\ \ \ \ \ \ \ \ +\ (uint128\_t)(a2*2)\ *\ a3;}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00212}00212\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(d,\ 114);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00213}00213\ \ \ \ \ \textcolor{comment}{/*\ [d\ t4+(tx<<48)\ t3\ 0\ 0\ c]\ =\ [p8\ 0\ 0\ p5\ p4\ p3\ 0\ 0\ p0]\ */}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00214}00214\ \ \ \ \ u0\ =\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ \&\ M;\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ >>=\ 52;}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00215}00215\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(u0,\ 52);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00216}00216\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(d,\ 62);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00217}00217\ \ \ \ \ \textcolor{comment}{/*\ [d\ u0\ t4+(tx<<48)\ t3\ 0\ 0\ c]\ =\ [p8\ 0\ 0\ p5\ p4\ p3\ 0\ 0\ p0]\ */}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00218}00218\ \ \ \ \ \textcolor{comment}{/*\ [d\ 0\ t4+(tx<<48)+(u0<<52)\ t3\ 0\ 0\ c]\ =\ [p8\ 0\ 0\ p5\ p4\ p3\ 0\ 0\ p0]\ */}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00219}00219\ \ \ \ \ u0\ =\ (u0\ <<\ 4)\ |\ tx;}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00220}00220\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(u0,\ 56);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00221}00221\ \ \ \ \ \textcolor{comment}{/*\ [d\ 0\ t4+(u0<<48)\ t3\ 0\ 0\ c]\ =\ [p8\ 0\ 0\ p5\ p4\ p3\ 0\ 0\ p0]\ */}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00222}00222\ \ \ \ \ c\ +=\ (\mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a376f631fcb770bd4b2e8349a33e52f8a}{uint128\_t}})u0\ *\ (\mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}\ >>\ 4);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00223}00223\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(c,\ 113);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00224}00224\ \ \ \ \ \textcolor{comment}{/*\ [d\ 0\ t4\ t3\ 0\ 0\ c]\ =\ [p8\ 0\ 0\ p5\ p4\ p3\ 0\ 0\ p0]\ */}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00225}00225\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}[0]\ =\ c\ \&\ M;\ c\ >>=\ 52;}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00226}00226\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}[0],\ 52);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00227}00227\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(c,\ 61);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00228}00228\ \ \ \ \ \textcolor{comment}{/*\ [d\ 0\ t4\ t3\ 0\ c\ r0]\ =\ [p8\ 0\ 0\ p5\ p4\ p3\ 0\ 0\ p0]\ */}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00229}00229\ }
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00230}00230\ \ \ \ \ a0\ *=\ 2;}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00231}00231\ \ \ \ \ c\ +=\ (\mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a376f631fcb770bd4b2e8349a33e52f8a}{uint128\_t}})a0\ *\ a1;}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00232}00232\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(c,\ 114);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00233}00233\ \ \ \ \ \textcolor{comment}{/*\ [d\ 0\ t4\ t3\ 0\ c\ r0]\ =\ [p8\ 0\ 0\ p5\ p4\ p3\ 0\ p1\ p0]\ */}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00234}00234\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ +=\ (\mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a376f631fcb770bd4b2e8349a33e52f8a}{uint128\_t}})a2\ *\ a4}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00235}00235\ \ \ \ \ \ \ \ +\ (uint128\_t)a3\ *\ a3;}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00236}00236\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(d,\ 114);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00237}00237\ \ \ \ \ \textcolor{comment}{/*\ [d\ 0\ t4\ t3\ 0\ c\ r0]\ =\ [p8\ 0\ p6\ p5\ p4\ p3\ 0\ p1\ p0]\ */}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00238}00238\ \ \ \ \ c\ +=\ (\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ \&\ M)\ *\ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}};\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ >>=\ 52;}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00239}00239\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(c,\ 115);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00240}00240\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(d,\ 62);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00241}00241\ \ \ \ \ \textcolor{comment}{/*\ [d\ 0\ 0\ t4\ t3\ 0\ c\ r0]\ =\ [p8\ 0\ p6\ p5\ p4\ p3\ 0\ p1\ p0]\ */}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00242}00242\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}[1]\ =\ c\ \&\ M;\ c\ >>=\ 52;}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00243}00243\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}[1],\ 52);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00244}00244\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(c,\ 63);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00245}00245\ \ \ \ \ \textcolor{comment}{/*\ [d\ 0\ 0\ t4\ t3\ c\ r1\ r0]\ =\ [p8\ 0\ p6\ p5\ p4\ p3\ 0\ p1\ p0]\ */}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00246}00246\ }
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00247}00247\ \ \ \ \ c\ +=\ (\mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a376f631fcb770bd4b2e8349a33e52f8a}{uint128\_t}})a0\ *\ a2}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00248}00248\ \ \ \ \ \ \ \ +\ (uint128\_t)a1\ *\ a1;}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00249}00249\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(c,\ 114);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00250}00250\ \ \ \ \ \textcolor{comment}{/*\ [d\ 0\ 0\ t4\ t3\ c\ r1\ r0]\ =\ [p8\ 0\ p6\ p5\ p4\ p3\ p2\ p1\ p0]\ */}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00251}00251\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ +=\ (\mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a376f631fcb770bd4b2e8349a33e52f8a}{uint128\_t}})a3\ *\ a4;}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00252}00252\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(d,\ 114);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00253}00253\ \ \ \ \ \textcolor{comment}{/*\ [d\ 0\ 0\ t4\ t3\ c\ r1\ r0]\ =\ [p8\ p7\ p6\ p5\ p4\ p3\ p2\ p1\ p0]\ */}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00254}00254\ \ \ \ \ c\ +=\ (\mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a376f631fcb770bd4b2e8349a33e52f8a}{uint128\_t}})\mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}\ *\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})\mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}};\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a107648633008a7f2d872b4b3d98c2f96}{d}}\ >>=\ 64;}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00255}00255\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(c,\ 115);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00256}00256\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(d,\ 50);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00257}00257\ \ \ \ \ \textcolor{comment}{/*\ [(d<<12)\ 0\ 0\ 0\ t4\ t3\ c\ r1\ r0]\ =\ [p8\ p7\ p6\ p5\ p4\ p3\ p2\ p1\ p0]\ */}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00258}00258\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}[2]\ =\ c\ \&\ M;\ c\ >>=\ 52;}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00259}00259\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}[2],\ 52);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00260}00260\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(c,\ 63);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00261}00261\ \ \ \ \ \textcolor{comment}{/*\ [(d<<12)\ 0\ 0\ 0\ t4\ t3+c\ r2\ r1\ r0]\ =\ [p8\ p7\ p6\ p5\ p4\ p3\ p2\ p1\ p0]\ */}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00262}00262\ }
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00263}00263\ \ \ \ \ c\ \ \ +=\ (\mbox{\hyperlink{namespacesysio_1_1chain_1_1config_a376f631fcb770bd4b2e8349a33e52f8a}{uint128\_t}})(\mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2parser_8hpp_a5c71a5e59a53413cd6c270266d63b031}{R}}\ <<\ 12)\ *\ (\mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}})d\ +\ t3;}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00264}00264\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(c,\ 100);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00265}00265\ \ \ \ \ \textcolor{comment}{/*\ [t4\ c\ r2\ r1\ r0]\ =\ [p8\ p7\ p6\ p5\ p4\ p3\ p2\ p1\ p0]\ */}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00266}00266\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}[3]\ =\ c\ \&\ M;\ c\ >>=\ 52;}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00267}00267\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}[3],\ 52);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00268}00268\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(c,\ 48);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00269}00269\ \ \ \ \ \textcolor{comment}{/*\ [t4+c\ r3\ r2\ r1\ r0]\ =\ [p8\ p7\ p6\ p5\ p4\ p3\ p2\ p1\ p0]\ */}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00270}00270\ \ \ \ \ c\ \ \ +=\ t4;}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00271}00271\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(c,\ 49);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00272}00272\ \ \ \ \ \textcolor{comment}{/*\ [c\ r3\ r2\ r1\ r0]\ =\ [p8\ p7\ p6\ p5\ p4\ p3\ p2\ p1\ p0]\ */}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00273}00273\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}[4]\ =\ c;}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00274}00274\ \ \ \ \ \mbox{\hyperlink{field__5x52__int128__impl_8h_a914e09387f8e1b9775deec092d463632}{VERIFY\_BITS}}(\mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}[4],\ 49);}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00275}00275\ \ \ \ \ \textcolor{comment}{/*\ [r4\ r3\ r2\ r1\ r0]\ =\ [p8\ p7\ p6\ p5\ p4\ p3\ p2\ p1\ p0]\ */}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00276}00276\ \}}
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00277}00277\ }
+\DoxyCodeLine{\Hypertarget{field__5x52__int128__impl_8h_source_l00278}00278\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{/*\ SECP256K1\_FIELD\_INNER5X52\_IMPL\_H\ */}\textcolor{preprocessor}{}}
+
+\end{DoxyCode}

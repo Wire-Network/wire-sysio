@@ -1,0 +1,148 @@
+\doxysection{catch\+\_\+reporter\+\_\+listening.\+cpp}
+\hypertarget{catch__reporter__listening_8cpp_source}{}\label{catch__reporter__listening_8cpp_source}\index{libraries/sys-\/vm/external/Catch2/include/reporters/catch\_reporter\_listening.cpp@{libraries/sys-\/vm/external/Catch2/include/reporters/catch\_reporter\_listening.cpp}}
+\mbox{\hyperlink{catch__reporter__listening_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00002}00002\ \textcolor{comment}{\ *\ \ Created\ by\ Phil\ on\ 5/08/2015.}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00003}00003\ \textcolor{comment}{\ *\ \ Copyright\ 2015\ Two\ Blue\ Cubes\ Ltd.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00004}00004\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00005}00005\ \textcolor{comment}{\ *\ \ Distributed\ under\ the\ Boost\ Software\ License,\ Version\ 1.0.\ (See\ accompanying}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00006}00006\ \textcolor{comment}{\ *\ \ file\ LICENSE\_1\_0.txt\ or\ copy\ at\ http://www.boost.org/LICENSE\_1\_0.txt)}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00007}00007\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00009}00009\ \textcolor{preprocessor}{\ \#include\ "{}\mbox{\hyperlink{catch__reporter__listening_8h}{catch\_reporter\_listening.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <cassert>}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00012}00012\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_catch}{Catch}}\ \{}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00014}\mbox{\hyperlink{class_catch_1_1_listening_reporter_aa8ea7fd773d44d45aea0925d67169325}{00014}}\ \ \ \ \ \mbox{\hyperlink{class_catch_1_1_listening_reporter_aa8ea7fd773d44d45aea0925d67169325}{ListeningReporter::ListeningReporter}}()\ \{}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00015}00015\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ We\ will\ assume\ that\ listeners\ will\ always\ want\ all\ assertions}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00016}00016\ \ \ \ \ \ \ \ \ m\_preferences.\mbox{\hyperlink{struct_catch_1_1_reporter_preferences_a10e13e10dfdc9a97dde0a72c573d7419}{shouldReportAllAssertions}}\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00017}00017\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00019}\mbox{\hyperlink{class_catch_1_1_listening_reporter_af0651069faf2a2f8442a7f456cb648e3}{00019}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_listening_reporter_af0651069faf2a2f8442a7f456cb648e3}{ListeningReporter::addListener}}(\ \mbox{\hyperlink{namespace_catch_a1f5555abfc248b3dca63e0c46e55002d}{IStreamingReporterPtr}}\&\&\ listener\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00020}00020\ \ \ \ \ \ \ \ \ m\_listeners.push\_back(\ std::move(\ listener\ )\ );}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00021}00021\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00023}\mbox{\hyperlink{class_catch_1_1_listening_reporter_a133cee99cffbaa1bb4b82e4c8df757ce}{00023}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_listening_reporter_a133cee99cffbaa1bb4b82e4c8df757ce}{ListeningReporter::addReporter}}(\mbox{\hyperlink{namespace_catch_a1f5555abfc248b3dca63e0c46e55002d}{IStreamingReporterPtr}}\&\&\ reporter)\ \{}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00024}00024\ \ \ \ \ \ \ \ \ assert(!m\_reporter\ \&\&\ \textcolor{stringliteral}{"{}Listening\ reporter\ can\ wrap\ only\ 1\ real\ reporter"{}});}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00025}00025\ \ \ \ \ \ \ \ \ m\_reporter\ =\ std::move(\ reporter\ );}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00026}00026\ \ \ \ \ \ \ \ \ m\_preferences.\mbox{\hyperlink{struct_catch_1_1_reporter_preferences_a434511c4080edbbc12e0d1c31ea14769}{shouldRedirectStdOut}}\ =\ m\_reporter-\/>getPreferences().shouldRedirectStdOut;}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00027}00027\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00029}\mbox{\hyperlink{class_catch_1_1_listening_reporter_aba18a06b704eca4aec42eb8869f8a92c}{00029}}\ \ \ \ \ \mbox{\hyperlink{struct_catch_1_1_reporter_preferences}{ReporterPreferences}}\ \mbox{\hyperlink{class_catch_1_1_listening_reporter_aba18a06b704eca4aec42eb8869f8a92c}{ListeningReporter::getPreferences}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00030}00030\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_preferences;}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00031}00031\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00033}\mbox{\hyperlink{class_catch_1_1_listening_reporter_ada5661109a24e986b70ed4a7e6d78d46}{00033}}\ \ \ \ \ std::set<Verbosity>\ \mbox{\hyperlink{class_catch_1_1_listening_reporter_ada5661109a24e986b70ed4a7e6d78d46}{ListeningReporter::getSupportedVerbosities}}()\ \{}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00034}00034\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::set<Verbosity>\{\ \};}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00035}00035\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00038}\mbox{\hyperlink{class_catch_1_1_listening_reporter_a9f2dd7fd9ad465474d0991de5e8a8022}{00038}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_listening_reporter_a9f2dd7fd9ad465474d0991de5e8a8022}{ListeningReporter::noMatchingTestCases}}(\ std::string\ \textcolor{keyword}{const}\&\ spec\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00039}00039\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\ \textcolor{keyword}{auto}\ \textcolor{keyword}{const}\&\ listener\ :\ m\_listeners\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00040}00040\ \ \ \ \ \ \ \ \ \ \ \ \ listener-\/>noMatchingTestCases(\ spec\ );}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00041}00041\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00042}00042\ \ \ \ \ \ \ \ \ m\_reporter-\/>noMatchingTestCases(\ spec\ );}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00043}00043\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00045}\mbox{\hyperlink{class_catch_1_1_listening_reporter_a5f0115018b42c6424fcd887c04545920}{00045}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_listening_reporter_a5f0115018b42c6424fcd887c04545920}{ListeningReporter::benchmarkStarting}}(\ \mbox{\hyperlink{struct_catch_1_1_benchmark_info}{BenchmarkInfo}}\ \textcolor{keyword}{const}\&\ benchmarkInfo\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00046}00046\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\ \textcolor{keyword}{auto}\ \textcolor{keyword}{const}\&\ listener\ :\ m\_listeners\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00047}00047\ \ \ \ \ \ \ \ \ \ \ \ \ listener-\/>benchmarkStarting(\ benchmarkInfo\ );}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00049}00049\ \ \ \ \ \ \ \ \ m\_reporter-\/>benchmarkStarting(\ benchmarkInfo\ );}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00050}00050\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00051}\mbox{\hyperlink{class_catch_1_1_listening_reporter_af344f128ba1d336b35036eacba3bf516}{00051}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_listening_reporter_af344f128ba1d336b35036eacba3bf516}{ListeningReporter::benchmarkEnded}}(\ \mbox{\hyperlink{struct_catch_1_1_benchmark_stats}{BenchmarkStats}}\ \textcolor{keyword}{const}\&\ benchmarkStats\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00052}00052\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\ \textcolor{keyword}{auto}\ \textcolor{keyword}{const}\&\ listener\ :\ m\_listeners\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \ \ \ listener-\/>benchmarkEnded(\ benchmarkStats\ );}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00054}00054\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00055}00055\ \ \ \ \ \ \ \ \ m\_reporter-\/>benchmarkEnded(\ benchmarkStats\ );}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00056}00056\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00058}\mbox{\hyperlink{class_catch_1_1_listening_reporter_a5681779111a3f8c0827000d04f7de199}{00058}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_listening_reporter_a5681779111a3f8c0827000d04f7de199}{ListeningReporter::testRunStarting}}(\ \mbox{\hyperlink{struct_catch_1_1_test_run_info}{TestRunInfo}}\ \textcolor{keyword}{const}\&\ testRunInfo\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00059}00059\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\ \textcolor{keyword}{auto}\ \textcolor{keyword}{const}\&\ listener\ :\ m\_listeners\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \ \ \ listener-\/>testRunStarting(\ testRunInfo\ );}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00061}00061\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00062}00062\ \ \ \ \ \ \ \ \ m\_reporter-\/>testRunStarting(\ testRunInfo\ );}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00063}00063\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00065}\mbox{\hyperlink{class_catch_1_1_listening_reporter_a3d2ffe4c24a7877657bc3e5e0e9ae7d2}{00065}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_listening_reporter_a3d2ffe4c24a7877657bc3e5e0e9ae7d2}{ListeningReporter::testGroupStarting}}(\ \mbox{\hyperlink{struct_catch_1_1_group_info}{GroupInfo}}\ \textcolor{keyword}{const}\&\ groupInfo\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00066}00066\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\ \textcolor{keyword}{auto}\ \textcolor{keyword}{const}\&\ listener\ :\ m\_listeners\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00067}00067\ \ \ \ \ \ \ \ \ \ \ \ \ listener-\/>testGroupStarting(\ groupInfo\ );}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00068}00068\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00069}00069\ \ \ \ \ \ \ \ \ m\_reporter-\/>testGroupStarting(\ groupInfo\ );}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00070}00070\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00073}\mbox{\hyperlink{class_catch_1_1_listening_reporter_a41a88ece54222d8a5fd629e58ed2b676}{00073}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_listening_reporter_a41a88ece54222d8a5fd629e58ed2b676}{ListeningReporter::testCaseStarting}}(\ \mbox{\hyperlink{struct_catch_1_1_test_case_info}{TestCaseInfo}}\ \textcolor{keyword}{const}\&\ testInfo\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00074}00074\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\ \textcolor{keyword}{auto}\ \textcolor{keyword}{const}\&\ listener\ :\ m\_listeners\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00075}00075\ \ \ \ \ \ \ \ \ \ \ \ \ listener-\/>testCaseStarting(\ testInfo\ );}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00076}00076\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00077}00077\ \ \ \ \ \ \ \ \ m\_reporter-\/>testCaseStarting(\ testInfo\ );}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00078}00078\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00080}\mbox{\hyperlink{class_catch_1_1_listening_reporter_af1df5628b89d61db63b4d9d4d5bd3bf2}{00080}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_listening_reporter_af1df5628b89d61db63b4d9d4d5bd3bf2}{ListeningReporter::sectionStarting}}(\ \mbox{\hyperlink{struct_catch_1_1_section_info}{SectionInfo}}\ \textcolor{keyword}{const}\&\ sectionInfo\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00081}00081\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\ \textcolor{keyword}{auto}\ \textcolor{keyword}{const}\&\ listener\ :\ m\_listeners\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00082}00082\ \ \ \ \ \ \ \ \ \ \ \ \ listener-\/>sectionStarting(\ sectionInfo\ );}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00083}00083\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00084}00084\ \ \ \ \ \ \ \ \ m\_reporter-\/>sectionStarting(\ sectionInfo\ );}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00085}00085\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00086}00086\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00087}\mbox{\hyperlink{class_catch_1_1_listening_reporter_ac54f461297eca221a06425ed5edc2129}{00087}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_listening_reporter_ac54f461297eca221a06425ed5edc2129}{ListeningReporter::assertionStarting}}(\ \mbox{\hyperlink{struct_catch_1_1_assertion_info}{AssertionInfo}}\ \textcolor{keyword}{const}\&\ assertionInfo\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00088}00088\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\ \textcolor{keyword}{auto}\ \textcolor{keyword}{const}\&\ listener\ :\ m\_listeners\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00089}00089\ \ \ \ \ \ \ \ \ \ \ \ \ listener-\/>assertionStarting(\ assertionInfo\ );}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00090}00090\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00091}00091\ \ \ \ \ \ \ \ \ m\_reporter-\/>assertionStarting(\ assertionInfo\ );}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00092}00092\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00093}00093\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00094}00094\ \ \ \ \ \textcolor{comment}{//\ The\ return\ value\ indicates\ if\ the\ messages\ buffer\ should\ be\ cleared:}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00095}\mbox{\hyperlink{class_catch_1_1_listening_reporter_a2c47aa9e99eba2ba5fe60c76d81b3660}{00095}}\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_catch_1_1_listening_reporter_a2c47aa9e99eba2ba5fe60c76d81b3660}{ListeningReporter::assertionEnded}}(\ \mbox{\hyperlink{struct_catch_1_1_assertion_stats}{AssertionStats}}\ \textcolor{keyword}{const}\&\ assertionStats\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00096}00096\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \textcolor{keyword}{auto}\ \textcolor{keyword}{const}\&\ listener\ :\ m\_listeners\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00097}00097\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{void}\textcolor{keyword}{>}(\ listener-\/>assertionEnded(\ assertionStats\ )\ );}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00098}00098\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00099}00099\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_reporter-\/>assertionEnded(\ assertionStats\ );}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00100}00100\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00101}00101\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00102}\mbox{\hyperlink{class_catch_1_1_listening_reporter_a6e85b5d61a9e5c894288086e52449c2e}{00102}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_listening_reporter_a6e85b5d61a9e5c894288086e52449c2e}{ListeningReporter::sectionEnded}}(\ \mbox{\hyperlink{struct_catch_1_1_section_stats}{SectionStats}}\ \textcolor{keyword}{const}\&\ sectionStats\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00103}00103\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\ \textcolor{keyword}{auto}\ \textcolor{keyword}{const}\&\ listener\ :\ m\_listeners\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00104}00104\ \ \ \ \ \ \ \ \ \ \ \ \ listener-\/>sectionEnded(\ sectionStats\ );}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00105}00105\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00106}00106\ \ \ \ \ \ \ \ \ m\_reporter-\/>sectionEnded(\ sectionStats\ );}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00107}00107\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00108}00108\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00109}\mbox{\hyperlink{class_catch_1_1_listening_reporter_a81969997dee722a6eed64a81dda6a9d1}{00109}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_listening_reporter_a81969997dee722a6eed64a81dda6a9d1}{ListeningReporter::testCaseEnded}}(\ \mbox{\hyperlink{struct_catch_1_1_test_case_stats}{TestCaseStats}}\ \textcolor{keyword}{const}\&\ testCaseStats\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00110}00110\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\ \textcolor{keyword}{auto}\ \textcolor{keyword}{const}\&\ listener\ :\ m\_listeners\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00111}00111\ \ \ \ \ \ \ \ \ \ \ \ \ listener-\/>testCaseEnded(\ testCaseStats\ );}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00112}00112\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00113}00113\ \ \ \ \ \ \ \ \ m\_reporter-\/>testCaseEnded(\ testCaseStats\ );}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00114}00114\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00115}00115\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00116}\mbox{\hyperlink{class_catch_1_1_listening_reporter_a8bb6e2d75f76be7c4b2012e9b8659d57}{00116}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_listening_reporter_a8bb6e2d75f76be7c4b2012e9b8659d57}{ListeningReporter::testGroupEnded}}(\ \mbox{\hyperlink{struct_catch_1_1_test_group_stats}{TestGroupStats}}\ \textcolor{keyword}{const}\&\ testGroupStats\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00117}00117\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\ \textcolor{keyword}{auto}\ \textcolor{keyword}{const}\&\ listener\ :\ m\_listeners\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00118}00118\ \ \ \ \ \ \ \ \ \ \ \ \ listener-\/>testGroupEnded(\ testGroupStats\ );}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00119}00119\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00120}00120\ \ \ \ \ \ \ \ \ m\_reporter-\/>testGroupEnded(\ testGroupStats\ );}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00121}00121\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00122}00122\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00123}\mbox{\hyperlink{class_catch_1_1_listening_reporter_ae07e52e85111d49886059403c02b9347}{00123}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_listening_reporter_ae07e52e85111d49886059403c02b9347}{ListeningReporter::testRunEnded}}(\ \mbox{\hyperlink{struct_catch_1_1_test_run_stats}{TestRunStats}}\ \textcolor{keyword}{const}\&\ testRunStats\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00124}00124\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\ \textcolor{keyword}{auto}\ \textcolor{keyword}{const}\&\ listener\ :\ m\_listeners\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00125}00125\ \ \ \ \ \ \ \ \ \ \ \ \ listener-\/>testRunEnded(\ testRunStats\ );}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00126}00126\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00127}00127\ \ \ \ \ \ \ \ \ m\_reporter-\/>testRunEnded(\ testRunStats\ );}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00128}00128\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00129}00129\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00130}00130\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00131}\mbox{\hyperlink{class_catch_1_1_listening_reporter_a61c6d70973c7bc21414007c9c7497241}{00131}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_catch_1_1_listening_reporter_a61c6d70973c7bc21414007c9c7497241}{ListeningReporter::skipTest}}(\ \mbox{\hyperlink{struct_catch_1_1_test_case_info}{TestCaseInfo}}\ \textcolor{keyword}{const}\&\ testInfo\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00132}00132\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\ \textcolor{keyword}{auto}\ \textcolor{keyword}{const}\&\ listener\ :\ m\_listeners\ )\ \{}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00133}00133\ \ \ \ \ \ \ \ \ \ \ \ \ listener-\/>skipTest(\ testInfo\ );}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00134}00134\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00135}00135\ \ \ \ \ \ \ \ \ m\_reporter-\/>skipTest(\ testInfo\ );}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00136}00136\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00137}00137\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00138}\mbox{\hyperlink{class_catch_1_1_listening_reporter_a7e162ceca38f3fa2416b323cc4eb03ab}{00138}}\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_catch_1_1_listening_reporter_a7e162ceca38f3fa2416b323cc4eb03ab}{ListeningReporter::isMulti}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00139}00139\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00140}00140\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00141}00141\ }
+\DoxyCodeLine{\Hypertarget{catch__reporter__listening_8cpp_source_l00142}00142\ \}\ \textcolor{comment}{//\ end\ namespace\ Catch}}
+
+\end{DoxyCode}

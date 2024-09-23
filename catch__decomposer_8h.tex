@@ -1,0 +1,67 @@
+\doxysection{libraries/sys-\/vm/external/\+Catch2/include/internal/catch\+\_\+decomposer.h File Reference}
+\hypertarget{catch__decomposer_8h}{}\label{catch__decomposer_8h}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_decomposer.h@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_decomposer.h}}
+{\ttfamily \#include "{}catch\+\_\+tostring.\+h"{}}\newline
+{\ttfamily \#include "{}catch\+\_\+stringref.\+h"{}}\newline
+{\ttfamily \#include "{}catch\+\_\+meta.\+hpp"{}}\newline
+{\ttfamily \#include $<$iosfwd$>$}\newline
+Include dependency graph for catch\+\_\+decomposer.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{catch__decomposer_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{catch__decomposer_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_catch_1_1_i_transient_expression}{Catch\+::\+ITransient\+Expression}}
+\item 
+class \mbox{\hyperlink{class_catch_1_1_binary_expr}{Catch\+::\+Binary\+Expr$<$ Lhs\+T, Rhs\+T $>$}}
+\item 
+class \mbox{\hyperlink{class_catch_1_1_unary_expr}{Catch\+::\+Unary\+Expr$<$ Lhs\+T $>$}}
+\item 
+class \mbox{\hyperlink{class_catch_1_1_expr_lhs}{Catch\+::\+Expr\+Lhs$<$ Lhs\+T $>$}}
+\item 
+struct \mbox{\hyperlink{struct_catch_1_1_decomposer}{Catch\+::\+Decomposer}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespace_catch}{Catch}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{namespace_catch_a520110c31f26cf9892595772ab814fc0}{Catch\+::format\+Reconstructed\+Expression}} (std\+::ostream \&os, std\+::string const \&lhs, \mbox{\hyperlink{class_catch_1_1_string_ref}{String\+Ref}} \mbox{\hyperlink{unionop}{op}}, std\+::string const \&rhs)
+\item 
+{\footnotesize template$<$typename LhsT , typename RhsT $>$ }\\auto \mbox{\hyperlink{namespace_catch_af89b8df30cfaf09abd048c6ff67359ee}{Catch\+::compare\+Equal}} (LhsT const \&lhs, RhsT const \&rhs) -\/$>$ bool
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\auto \mbox{\hyperlink{namespace_catch_a68f451c45e65f242dde5f21c19a4cf7a}{Catch\+::compare\+Equal}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*}const \&lhs, int rhs) -\/$>$ bool
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\auto \mbox{\hyperlink{namespace_catch_afca4a005e1053c542462dc7a603b41b3}{Catch\+::compare\+Equal}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*}const \&lhs, long rhs) -\/$>$ bool
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\auto \mbox{\hyperlink{namespace_catch_a6af99378569fc6f68270b6af669f1c3b}{Catch\+::compare\+Equal}} (int lhs, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*}const \&rhs) -\/$>$ bool
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\auto \mbox{\hyperlink{namespace_catch_a72f10ec2cad6db16029d48c8c1d9df2f}{Catch\+::compare\+Equal}} (long lhs, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*}const \&rhs) -\/$>$ bool
+\item 
+{\footnotesize template$<$typename LhsT , typename RhsT $>$ }\\auto \mbox{\hyperlink{namespace_catch_a8bec217f5ef5f09c17074c311c958f3c}{Catch\+::compare\+Not\+Equal}} (LhsT const \&lhs, RhsT \&\&rhs) -\/$>$ bool
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\auto \mbox{\hyperlink{namespace_catch_aa81c95898f22dce1f61d7710e495d1ee}{Catch\+::compare\+Not\+Equal}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*}const \&lhs, int rhs) -\/$>$ bool
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\auto \mbox{\hyperlink{namespace_catch_adad6539b3780b9a8953221efd038e2e4}{Catch\+::compare\+Not\+Equal}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*}const \&lhs, long rhs) -\/$>$ bool
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\auto \mbox{\hyperlink{namespace_catch_adb4b3e912b89a987025ca28cf0c92ba8}{Catch\+::compare\+Not\+Equal}} (int lhs, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*}const \&rhs) -\/$>$ bool
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\auto \mbox{\hyperlink{namespace_catch_a3db634a0adf44a1148767ba149ccf34d}{Catch\+::compare\+Not\+Equal}} (long lhs, \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} \texorpdfstring{$\ast$}{*}const \&rhs) -\/$>$ bool
+\item 
+void \mbox{\hyperlink{namespace_catch_a65af25091f2ab61056e166765963e525}{Catch\+::handle\+Expression}} (\mbox{\hyperlink{struct_catch_1_1_i_transient_expression}{ITransient\+Expression}} const \&expr)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\void \mbox{\hyperlink{namespace_catch_af2c93db76668a981e75ae835699efce7}{Catch\+::handle\+Expression}} (\mbox{\hyperlink{class_catch_1_1_expr_lhs}{Expr\+Lhs}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ const \&expr)
+\end{DoxyCompactItemize}

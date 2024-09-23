@@ -1,0 +1,138 @@
+\doxysection{CLI\+::Formatter\+Lambda Class Reference}
+\hypertarget{class_c_l_i_1_1_formatter_lambda}{}\label{class_c_l_i_1_1_formatter_lambda}\index{CLI::FormatterLambda@{CLI::FormatterLambda}}
+
+
+This is a specialty override for lambda functions.  
+
+
+
+
+{\ttfamily \#include $<$CLI11.\+hpp$>$}
+
+
+
+Inheritance diagram for CLI\+::Formatter\+Lambda\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=194pt]{class_c_l_i_1_1_formatter_lambda__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for CLI\+::Formatter\+Lambda\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=205pt]{class_c_l_i_1_1_formatter_lambda__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_c_l_i_1_1_formatter_lambda_aca398f0ed80cb70f742ffaf48355e42c}{Formatter\+Lambda}} (funct\+\_\+t funct)
+\begin{DoxyCompactList}\small\item\em Create a \doxylink{class_c_l_i_1_1_formatter_lambda}{Formatter\+Lambda} with a lambda function. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_c_l_i_1_1_formatter_lambda_ab8bb1862cb970b170e95b11db08d6d83}{\texorpdfstring{$\sim$}{\string~}\+Formatter\+Lambda}} () noexcept override
+\begin{DoxyCompactList}\small\item\em Adding a destructor (mostly to make GCC 4.\+7 happy) \end{DoxyCompactList}\item 
+std\+::string \mbox{\hyperlink{class_c_l_i_1_1_formatter_lambda_a5eca71447c56251c67b97187e4a888e6}{make\+\_\+help}} (const \mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \texorpdfstring{$\ast$}{*}app, std\+::string \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}, \mbox{\hyperlink{namespace_c_l_i_a97e7d97131e3889f32b721570eca119c}{App\+Format\+Mode}} mode) const override
+\begin{DoxyCompactList}\small\item\em This will simply call the lambda function. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{class_c_l_i_1_1_formatter_base}{CLI\+::\+Formatter\+Base}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_c_l_i_1_1_formatter_base_a85811a9afbc33d19fb1d8d1a0553f2b1}{Formatter\+Base}} ()=default
+\item 
+\mbox{\hyperlink{class_c_l_i_1_1_formatter_base_abd363023789788a8242d2c8ccf394c48}{Formatter\+Base}} (const \mbox{\hyperlink{class_c_l_i_1_1_formatter_base}{Formatter\+Base}} \&)=default
+\item 
+\mbox{\hyperlink{class_c_l_i_1_1_formatter_base_a5552e960c2f477a570ee67541e15e8ea}{Formatter\+Base}} (\mbox{\hyperlink{class_c_l_i_1_1_formatter_base}{Formatter\+Base}} \&\&)=default
+\item 
+virtual \mbox{\hyperlink{class_c_l_i_1_1_formatter_base_ac634fe340a7679a3f4add85c969e4d98}{\texorpdfstring{$\sim$}{\string~}\+Formatter\+Base}} () noexcept
+\begin{DoxyCompactList}\small\item\em Adding a destructor in this form to work around bug in GCC 4.\+7. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{class_c_l_i_1_1_formatter_base_a73a17d81d04f5ee02a2cab32a59a8551}{label}} (std\+::string key, std\+::string val)
+\begin{DoxyCompactList}\small\item\em Set the "{}\+REQUIRED"{} label. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_c_l_i_1_1_formatter_base_acd8c03570a48e5937ab748bf6103ca2d}{column\+\_\+width}} (std\+::size\+\_\+t val)
+\begin{DoxyCompactList}\small\item\em Set the column width. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\begin{DoxyCompactItemize}
+\item 
+std\+::string \mbox{\hyperlink{class_c_l_i_1_1_formatter_base_a7e8f9d7896c599f7befd84a9947d4cab}{get\+\_\+label}} (std\+::string key) const
+\begin{DoxyCompactList}\small\item\em Get the current value of a name (REQUIRED, etc.) \end{DoxyCompactList}\item 
+std\+::size\+\_\+t \mbox{\hyperlink{class_c_l_i_1_1_formatter_base_a41e32517e27b98dcf85acfb0fd169c97}{get\+\_\+column\+\_\+width}} () const
+\begin{DoxyCompactList}\small\item\em Get the current column width. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Protected Attributes inherited from \mbox{\hyperlink{class_c_l_i_1_1_formatter_base}{CLI\+::\+Formatter\+Base}}}
+\begin{DoxyCompactItemize}
+\item 
+std\+::size\+\_\+t \mbox{\hyperlink{class_c_l_i_1_1_formatter_base_a2427b2199dd9654b050d00c89d764332}{column\+\_\+width\+\_\+}} \{30\}
+\begin{DoxyCompactList}\small\item\em The width of the first column. \end{DoxyCompactList}\item 
+std\+::map$<$ std\+::string, std\+::string $>$ \mbox{\hyperlink{class_c_l_i_1_1_formatter_base_a2ee79421fa339b227d6cb9ca1bce4ad1}{labels\+\_\+}} \{\}
+\begin{DoxyCompactList}\small\item\em The required help printout labels (user changeable) Values are Needs, Excludes, etc. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l03233}{3233}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_c_l_i_1_1_formatter_lambda_aca398f0ed80cb70f742ffaf48355e42c}\index{CLI::FormatterLambda@{CLI::FormatterLambda}!FormatterLambda@{FormatterLambda}}
+\index{FormatterLambda@{FormatterLambda}!CLI::FormatterLambda@{CLI::FormatterLambda}}
+\doxysubsubsection{\texorpdfstring{FormatterLambda()}{FormatterLambda()}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_formatter_lambda_aca398f0ed80cb70f742ffaf48355e42c} 
+CLI\+::\+Formatter\+Lambda\+::\+Formatter\+Lambda (\begin{DoxyParamCaption}\item[{funct\+\_\+t}]{funct}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l03241}{3241}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03241\ :\ lambda\_(std::move(funct))\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{class_c_l_i_1_1_formatter_lambda_ab8bb1862cb970b170e95b11db08d6d83}\index{CLI::FormatterLambda@{CLI::FormatterLambda}!````~FormatterLambda@{\texorpdfstring{$\sim$}{\string~}FormatterLambda}}
+\index{````~FormatterLambda@{\texorpdfstring{$\sim$}{\string~}FormatterLambda}!CLI::FormatterLambda@{CLI::FormatterLambda}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}FormatterLambda()}{\string~FormatterLambda()}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_formatter_lambda_ab8bb1862cb970b170e95b11db08d6d83} 
+CLI\+::\+Formatter\+Lambda\+::\texorpdfstring{$\sim$}{\string~}\+Formatter\+Lambda (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [noexcept]}}
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l03244}{3244}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03244\ \{\}\ \textcolor{comment}{//\ NOLINT(modernize-\/use-\/equals-\/default)}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_c_l_i_1_1_formatter_lambda_a5eca71447c56251c67b97187e4a888e6}\index{CLI::FormatterLambda@{CLI::FormatterLambda}!make\_help@{make\_help}}
+\index{make\_help@{make\_help}!CLI::FormatterLambda@{CLI::FormatterLambda}}
+\doxysubsubsection{\texorpdfstring{make\_help()}{make\_help()}}
+{\footnotesize\ttfamily \label{class_c_l_i_1_1_formatter_lambda_a5eca71447c56251c67b97187e4a888e6} 
+std\+::string CLI\+::\+Formatter\+Lambda\+::make\+\_\+help (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_c_l_i_1_1_app}{App}} \texorpdfstring{$\ast$}{*}}]{app}{, }\item[{std\+::string}]{name}{, }\item[{\mbox{\hyperlink{namespace_c_l_i_a97e7d97131e3889f32b721570eca119c}{App\+Format\+Mode}}}]{mode}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{class_c_l_i_1_1_formatter_base_ac8ab93655a645352634709e15087080b}{CLI\+::\+Formatter\+Base}}.
+
+
+
+Definition at line \mbox{\hyperlink{_c_l_i11_8hpp_source_l03247}{3247}} of file \mbox{\hyperlink{_c_l_i11_8hpp_source}{CLI11.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03247\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{03248\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ lambda\_(app,\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ mode);}
+\DoxyCodeLine{03249\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+programs/clio/\mbox{\hyperlink{_c_l_i11_8hpp}{CLI11.\+hpp}}\end{DoxyCompactItemize}

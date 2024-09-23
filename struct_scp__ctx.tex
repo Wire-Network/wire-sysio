@@ -1,0 +1,120 @@
+\doxysection{Scp\+\_\+ctx Struct Reference}
+\hypertarget{struct_scp__ctx}{}\label{struct_scp__ctx}\index{Scp\_ctx@{Scp\_ctx}}
+
+
+{\ttfamily \#include $<$scp.\+h$>$}
+
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{struct_scp__ctx_af58bb8b1e7185c27de7c8a2df94de1f5}{sid}}
+\item 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{struct_scp__ctx_af74beebd17620c5ff6fc1bd48fd017bf}{s\+\_\+enc}} \mbox{[}\mbox{\hyperlink{scp_8h_a25905234f13446437b28c85d0504216d}{SCP\+\_\+\+KEY\+\_\+\+LEN}}\mbox{]}
+\item 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{struct_scp__ctx_a5c1e57aa4641ea9404201193367bfd37}{s\+\_\+mac}} \mbox{[}\mbox{\hyperlink{scp_8h_a25905234f13446437b28c85d0504216d}{SCP\+\_\+\+KEY\+\_\+\+LEN}}\mbox{]}
+\item 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{struct_scp__ctx_a6d4e08d26c9ab0e28d75a3976d16967c}{s\+\_\+rmac}} \mbox{[}\mbox{\hyperlink{scp_8h_a25905234f13446437b28c85d0504216d}{SCP\+\_\+\+KEY\+\_\+\+LEN}}\mbox{]}
+\item 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{struct_scp__ctx_add310cda0e0781e2aab63e521419cf55}{mac\+\_\+chaining\+\_\+value}} \mbox{[}\mbox{\hyperlink{scp_8h_a8f01665a0470dd4125b6518bd77e3328}{SCP\+\_\+\+PRF\+\_\+\+LEN}}\mbox{]}
+\item 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} \mbox{\hyperlink{struct_scp__ctx_a7050b98c881eeb82bb6b07d4b63dc12e}{ctr}} \mbox{[}\mbox{\hyperlink{scp_8h_a8f01665a0470dd4125b6518bd77e3328}{SCP\+\_\+\+PRF\+\_\+\+LEN}}\mbox{]}
+\item 
+bool \mbox{\hyperlink{struct_scp__ctx_a4f2c4b796d6b78ca3fc1ec4571aa46ed}{in\+\_\+use}}
+\item 
+bool \mbox{\hyperlink{struct_scp__ctx_ad7df361dae029f1254024bbaceb1a8fe}{authenticated}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{scp_8h_source_l00068}{68}} of file \mbox{\hyperlink{scp_8h_source}{scp.\+h}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_scp__ctx_ad7df361dae029f1254024bbaceb1a8fe}\index{Scp\_ctx@{Scp\_ctx}!authenticated@{authenticated}}
+\index{authenticated@{authenticated}!Scp\_ctx@{Scp\_ctx}}
+\doxysubsubsection{\texorpdfstring{authenticated}{authenticated}}
+{\footnotesize\ttfamily \label{struct_scp__ctx_ad7df361dae029f1254024bbaceb1a8fe} 
+bool Scp\+\_\+ctx\+::authenticated}
+
+
+
+Definition at line \mbox{\hyperlink{scp_8h_source_l00076}{76}} of file \mbox{\hyperlink{scp_8h_source}{scp.\+h}}.
+
+\Hypertarget{struct_scp__ctx_a7050b98c881eeb82bb6b07d4b63dc12e}\index{Scp\_ctx@{Scp\_ctx}!ctr@{ctr}}
+\index{ctr@{ctr}!Scp\_ctx@{Scp\_ctx}}
+\doxysubsubsection{\texorpdfstring{ctr}{ctr}}
+{\footnotesize\ttfamily \label{struct_scp__ctx_a7050b98c881eeb82bb6b07d4b63dc12e} 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} Scp\+\_\+ctx\+::ctr\mbox{[}\mbox{\hyperlink{scp_8h_a8f01665a0470dd4125b6518bd77e3328}{SCP\+\_\+\+PRF\+\_\+\+LEN}}\mbox{]}}
+
+
+
+Definition at line \mbox{\hyperlink{scp_8h_source_l00074}{74}} of file \mbox{\hyperlink{scp_8h_source}{scp.\+h}}.
+
+\Hypertarget{struct_scp__ctx_a4f2c4b796d6b78ca3fc1ec4571aa46ed}\index{Scp\_ctx@{Scp\_ctx}!in\_use@{in\_use}}
+\index{in\_use@{in\_use}!Scp\_ctx@{Scp\_ctx}}
+\doxysubsubsection{\texorpdfstring{in\_use}{in\_use}}
+{\footnotesize\ttfamily \label{struct_scp__ctx_a4f2c4b796d6b78ca3fc1ec4571aa46ed} 
+bool Scp\+\_\+ctx\+::in\+\_\+use}
+
+
+
+Definition at line \mbox{\hyperlink{scp_8h_source_l00075}{75}} of file \mbox{\hyperlink{scp_8h_source}{scp.\+h}}.
+
+\Hypertarget{struct_scp__ctx_add310cda0e0781e2aab63e521419cf55}\index{Scp\_ctx@{Scp\_ctx}!mac\_chaining\_value@{mac\_chaining\_value}}
+\index{mac\_chaining\_value@{mac\_chaining\_value}!Scp\_ctx@{Scp\_ctx}}
+\doxysubsubsection{\texorpdfstring{mac\_chaining\_value}{mac\_chaining\_value}}
+{\footnotesize\ttfamily \label{struct_scp__ctx_add310cda0e0781e2aab63e521419cf55} 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} Scp\+\_\+ctx\+::mac\+\_\+chaining\+\_\+value\mbox{[}\mbox{\hyperlink{scp_8h_a8f01665a0470dd4125b6518bd77e3328}{SCP\+\_\+\+PRF\+\_\+\+LEN}}\mbox{]}}
+
+
+
+Definition at line \mbox{\hyperlink{scp_8h_source_l00073}{73}} of file \mbox{\hyperlink{scp_8h_source}{scp.\+h}}.
+
+\Hypertarget{struct_scp__ctx_af74beebd17620c5ff6fc1bd48fd017bf}\index{Scp\_ctx@{Scp\_ctx}!s\_enc@{s\_enc}}
+\index{s\_enc@{s\_enc}!Scp\_ctx@{Scp\_ctx}}
+\doxysubsubsection{\texorpdfstring{s\_enc}{s\_enc}}
+{\footnotesize\ttfamily \label{struct_scp__ctx_af74beebd17620c5ff6fc1bd48fd017bf} 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} Scp\+\_\+ctx\+::s\+\_\+enc\mbox{[}\mbox{\hyperlink{scp_8h_a25905234f13446437b28c85d0504216d}{SCP\+\_\+\+KEY\+\_\+\+LEN}}\mbox{]}}
+
+
+
+Definition at line \mbox{\hyperlink{scp_8h_source_l00070}{70}} of file \mbox{\hyperlink{scp_8h_source}{scp.\+h}}.
+
+\Hypertarget{struct_scp__ctx_a5c1e57aa4641ea9404201193367bfd37}\index{Scp\_ctx@{Scp\_ctx}!s\_mac@{s\_mac}}
+\index{s\_mac@{s\_mac}!Scp\_ctx@{Scp\_ctx}}
+\doxysubsubsection{\texorpdfstring{s\_mac}{s\_mac}}
+{\footnotesize\ttfamily \label{struct_scp__ctx_a5c1e57aa4641ea9404201193367bfd37} 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} Scp\+\_\+ctx\+::s\+\_\+mac\mbox{[}\mbox{\hyperlink{scp_8h_a25905234f13446437b28c85d0504216d}{SCP\+\_\+\+KEY\+\_\+\+LEN}}\mbox{]}}
+
+
+
+Definition at line \mbox{\hyperlink{scp_8h_source_l00071}{71}} of file \mbox{\hyperlink{scp_8h_source}{scp.\+h}}.
+
+\Hypertarget{struct_scp__ctx_a6d4e08d26c9ab0e28d75a3976d16967c}\index{Scp\_ctx@{Scp\_ctx}!s\_rmac@{s\_rmac}}
+\index{s\_rmac@{s\_rmac}!Scp\_ctx@{Scp\_ctx}}
+\doxysubsubsection{\texorpdfstring{s\_rmac}{s\_rmac}}
+{\footnotesize\ttfamily \label{struct_scp__ctx_a6d4e08d26c9ab0e28d75a3976d16967c} 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} Scp\+\_\+ctx\+::s\+\_\+rmac\mbox{[}\mbox{\hyperlink{scp_8h_a25905234f13446437b28c85d0504216d}{SCP\+\_\+\+KEY\+\_\+\+LEN}}\mbox{]}}
+
+
+
+Definition at line \mbox{\hyperlink{scp_8h_source_l00072}{72}} of file \mbox{\hyperlink{scp_8h_source}{scp.\+h}}.
+
+\Hypertarget{struct_scp__ctx_af58bb8b1e7185c27de7c8a2df94de1f5}\index{Scp\_ctx@{Scp\_ctx}!sid@{sid}}
+\index{sid@{sid}!Scp\_ctx@{Scp\_ctx}}
+\doxysubsubsection{\texorpdfstring{sid}{sid}}
+{\footnotesize\ttfamily \label{struct_scp__ctx_af58bb8b1e7185c27de7c8a2df94de1f5} 
+\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} Scp\+\_\+ctx\+::sid}
+
+
+
+Definition at line \mbox{\hyperlink{scp_8h_source_l00069}{69}} of file \mbox{\hyperlink{scp_8h_source}{scp.\+h}}.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/yubihsm/lib/\mbox{\hyperlink{scp_8h}{scp.\+h}}\end{DoxyCompactItemize}

@@ -1,0 +1,229 @@
+\doxysection{leb128.\+hpp}
+\hypertarget{sysio_2vm_2leb128_8hpp_source}{}\label{sysio_2vm_2leb128_8hpp_source}\index{libraries/sys-\/vm/include/sysio/sysio/vm/leb128.hpp@{libraries/sys-\/vm/include/sysio/sysio/vm/leb128.hpp}}
+\mbox{\hyperlink{sysio_2vm_2leb128_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <sysio/vm/exceptions.hpp>}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <sysio/vm/guarded\_ptr.hpp>}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <array>}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <cstddef>}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <cstdint>}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ <iostream>}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <type\_traits>}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00012}00012\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{\ \textcolor{keyword}{namespace\ }vm\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00013}00013\ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keywordtype}{size\_t}\ N>}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00014}\mbox{\hyperlink{namespacesysio_1_1vm_a836821829022696c9f88e2d83f44cdaa}{00014}}\ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{size\_t}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{namespacesysio_1_1vm_a836821829022696c9f88e2d83f44cdaa}{bytes\_needed}}()\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00015}00015\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keyword}{constexpr}\ (\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\ ==\ 1\ ||\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\ ==\ 7)}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00016}00016\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00017}00017\ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ \textcolor{keyword}{constexpr}\ (\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\ ==\ 32)}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00018}00018\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 5;}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00019}00019\ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00020}00020\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 10;}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00021}00021\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00023}00023\ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keywordtype}{size\_t}\ N>}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00024}00024\ \ \ \ \textcolor{keyword}{class\ }varuint\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00025}00025\ \ \ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00026}00026\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_assert}(\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\ ==\ 1\ \ ||\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\ ==\ 7\ ||\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\ ==\ 32,\ \textcolor{stringliteral}{"{}N\ not\ valid"{}});}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00028}\mbox{\hyperlink{classsysio_1_1vm_1_1varuint_a037b93cadcd2b95571fc359b3884adc4}{00028}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{constexpr}\ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classsysio_1_1vm_1_1varuint_a037b93cadcd2b95571fc359b3884adc4}{varuint}}(\textcolor{keywordtype}{bool}\ v)\ \{\ \mbox{\hyperlink{classsysio_1_1vm_1_1varuint_a1997c95c0e97998f2bff1841ff7c07e1}{from}}(v);\ \}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00029}\mbox{\hyperlink{classsysio_1_1vm_1_1varuint_aba1b5952d7788c440f8b5c32f0b0c380}{00029}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{constexpr}\ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classsysio_1_1vm_1_1varuint_aba1b5952d7788c440f8b5c32f0b0c380}{varuint}}(\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ v)\ \{\ \mbox{\hyperlink{classsysio_1_1vm_1_1varuint_a1997c95c0e97998f2bff1841ff7c07e1}{from}}(v);\ \}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00030}\mbox{\hyperlink{classsysio_1_1vm_1_1varuint_a7ab95006da6a95568c09f39ad47e1ab6}{00030}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{constexpr}\ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classsysio_1_1vm_1_1varuint_a7ab95006da6a95568c09f39ad47e1ab6}{varuint}}(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ v)\ \{\ \mbox{\hyperlink{classsysio_1_1vm_1_1varuint_a1997c95c0e97998f2bff1841ff7c07e1}{from}}(v);\ \}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00031}\mbox{\hyperlink{classsysio_1_1vm_1_1varuint_ab4f80243678276e830156db4f24711b7}{00031}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{classsysio_1_1vm_1_1varuint_ab4f80243678276e830156db4f24711b7}{varuint}}(\ \mbox{\hyperlink{structsysio_1_1vm_1_1guarded__ptr}{guarded\_ptr<uint8\_t>}}\&\ code\ )\ \{\ \mbox{\hyperlink{classsysio_1_1vm_1_1varuint_a1997c95c0e97998f2bff1841ff7c07e1}{from}}(code);\ \}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00033}\mbox{\hyperlink{classsysio_1_1vm_1_1varuint_a1997c95c0e97998f2bff1841ff7c07e1}{00033}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1vm_1_1varuint_a1997c95c0e97998f2bff1841ff7c07e1}{from}}(\textcolor{keywordtype}{bool}\ v)\ \{\ storage[0]\ =\ v;\ \}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00034}\mbox{\hyperlink{classsysio_1_1vm_1_1varuint_afa629da05c5c6ac7e58554fd880573fb}{00034}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1vm_1_1varuint_afa629da05c5c6ac7e58554fd880573fb}{from}}(\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ v)\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00035}00035\ \ \ \ \ \ \ \ \ \ \ \ \ storage[0]\ =\ v\ \&\ 0x7f;}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00036}00036\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00037}\mbox{\hyperlink{classsysio_1_1vm_1_1varuint_a452a53f3198dd32429b6428e3335afa6}{00037}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1vm_1_1varuint_a452a53f3198dd32429b6428e3335afa6}{from}}(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ v)\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00038}00038\ \ \ \ \ \ \ \ \ \ \ \ \ \ bytes\_used\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00040}00040\ \textcolor{preprocessor}{\#ifdef\ \_\_clang\_\_}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00041}00041\ \textcolor{preprocessor}{\#pragma\ unroll}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00042}00042\ \textcolor{preprocessor}{\#elif\ defined(\_\_GNUC\_\_)}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00043}00043\ \textcolor{preprocessor}{\#pragma\ GCC\ unroll\ 5}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00044}00044\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00045}00045\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (;\ bytes\_used\ <\ bytes\_needed<N>();\ bytes\_used++)\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00046}00046\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ storage[bytes\_used]\ =\ v\ \&\ 0x7f;}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00047}00047\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ v\ >>=\ 7;}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (v!=\ 0)}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ storage[bytes\_used]\ |=\ 0x80;}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00050}00050\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00051}00051\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \ \ \ bytes\_used++;}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00056}\mbox{\hyperlink{classsysio_1_1vm_1_1varuint_aed48f6f2267b3634e8911c76b9c69e1b}{00056}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1vm_1_1varuint_aed48f6f2267b3634e8911c76b9c69e1b}{from}}(\ \mbox{\hyperlink{structsysio_1_1vm_1_1guarded__ptr}{guarded\_ptr<uint8\_t>}}\&\ code\ )\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ cnt\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (;;\ cnt++)\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00059}00059\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(\ cnt\ <\ \mbox{\hyperlink{namespacesysio_1_1vm_a836821829022696c9f88e2d83f44cdaa}{bytes\_needed<N>}}(),\ wasm\_interpreter\_exception,\ \textcolor{stringliteral}{"{}incorrect\ leb128\ encoding"{}}\ );}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(\ code.offset()+cnt\ <\ code.bounds(),\ wasm\_interpreter\_exception,\ \textcolor{stringliteral}{"{}pointer\ out\ of\ bounds"{}}\ );}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00061}00061\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ storage[cnt]\ =\ code[cnt];}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00062}00062\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((storage[cnt]\ \&\ 0x80)\ ==\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(cnt\ +\ 1)\ \ ==\ \mbox{\hyperlink{namespacesysio_1_1vm_a836821829022696c9f88e2d83f44cdaa}{bytes\_needed<N>}}()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00064}00064\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ mask\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\textcolor{keyword}{>}(\string~(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})0\ <<\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}(\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\ -\/\ 7*(\mbox{\hyperlink{namespacesysio_1_1vm_a836821829022696c9f88e2d83f44cdaa}{bytes\_needed<N>}}()-\/1)))\ \&\ 0x7F;}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00065}00065\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}((mask\ \&\ storage[cnt])\ ==\ 0,\ wasm\_parse\_exception,\ \textcolor{stringliteral}{"{}unused\ bits\ of\ unsigned\ leb128\ must\ be\ 0"{}});}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00066}00066\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00067}00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \ \ \ code\ +=\ cnt+1;}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00071}00071\ \ \ \ \ \ \ \ \ \ \ \ \ bytes\_used\ =\ cnt+1;}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00073}00073\ }
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00074}\mbox{\hyperlink{classsysio_1_1vm_1_1varuint_ac2d78b2bff48b7c9e41132a769d1c689}{00074}}\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classsysio_1_1vm_1_1varuint_ac2d78b2bff48b7c9e41132a769d1c689}{size}}()\textcolor{keyword}{const\ }\{\ \textcolor{keywordflow}{return}\ bytes\_used;\ \}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00075}00075\ }
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keywordtype}{size\_t}\ M=N,\ \textcolor{keyword}{typename}\ =\ \textcolor{keyword}{typename}\ std::enable\_if\_t<M\ ==\ 1,\ \textcolor{keywordtype}{int}>>}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00077}\mbox{\hyperlink{classsysio_1_1vm_1_1varuint_a091ebca18a0b21b0c2380bd977394ff4}{00077}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classsysio_1_1vm_1_1varuint_a091ebca18a0b21b0c2380bd977394ff4}{to}}()\ \{\ \textcolor{keywordflow}{return}\ storage[0];\ \}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keywordtype}{size\_t}\ M=N,\ \textcolor{keyword}{typename}\ =\ \textcolor{keyword}{typename}\ std::enable\_if\_t<M\ ==\ 7,\ \textcolor{keywordtype}{int}>>}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00080}\mbox{\hyperlink{classsysio_1_1vm_1_1varuint_a75f491a3b069ae43d753b1b2d7df871b}{00080}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ \mbox{\hyperlink{classsysio_1_1vm_1_1varuint_a75f491a3b069ae43d753b1b2d7df871b}{to}}()\ \{\ \textcolor{keywordflow}{return}\ storage[0]\ \&\ 0x7f;\ \}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00081}00081\ }
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00082}00082\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keywordtype}{size\_t}\ M=N,\ \textcolor{keyword}{typename}\ =\ \textcolor{keyword}{typename}\ std::enable\_if\_t<M\ ==\ 32,\ \textcolor{keywordtype}{int}>>}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00083}\mbox{\hyperlink{classsysio_1_1vm_1_1varuint_abf6610601e4c45741051648e01e3d52e}{00083}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{classsysio_1_1vm_1_1varuint_abf6610601e4c45741051648e01e3d52e}{to}}()\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00084}00084\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00085}00085\ }
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00086}00086\ \textcolor{preprocessor}{\#ifdef\ \_\_clang\_\_}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00087}00087\ \textcolor{preprocessor}{\#pragma\ unroll}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00088}00088\ \textcolor{preprocessor}{\#elif\ defined(\_\_GNUC\_\_)}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00089}00089\ \textcolor{preprocessor}{\#pragma\ GCC\ unroll\ 5}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00090}00090\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00091}00091\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i=bytes\_used-\/1;\ i\ >=\ 0;\ i-\/-\/)\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00092}00092\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ <<=\ 7;}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00093}00093\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ |=\ storage[i]\ \&\ 0x7f;}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00094}00094\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00095}00095\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00096}00096\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00097}00097\ }
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00098}\mbox{\hyperlink{classsysio_1_1vm_1_1varuint_a37c8a00678d25fcf843780cce257d943}{00098}}\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1vm_1_1varuint_a37c8a00678d25fcf843780cce257d943}{print}}()\textcolor{keyword}{const\ }\{}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00099}00099\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i=0;\ i\ <\ bytes\_used;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00100}00100\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ std::hex\ <<\ \textcolor{stringliteral}{"{}0x"{}}\ <<\ (int)storage[i]\ <<\ \textcolor{charliteral}{'\ '};}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00101}00101\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00102}00102\ \ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00103}00103\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00104}00104\ }
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00105}00105\ \ \ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00106}00106\ \ \ \ \ \ \ \ \ \ std::array<uint8\_t,\ bytes\_needed<N>()>\ storage;}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00107}00107\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ bytes\_used\ =\ \mbox{\hyperlink{namespacesysio_1_1vm_a836821829022696c9f88e2d83f44cdaa}{bytes\_needed<N>}}();}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00108}00108\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00109}00109\ }
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00110}00110\ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keywordtype}{size\_t}\ N>}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00111}00111\ \ \ \ \textcolor{keyword}{class\ }varint\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00112}00112\ \ \ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00113}00113\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_assert}(\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\ ==\ 7\ ||\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\ ==\ 32\ ||\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\ ==\ 64,\ \textcolor{stringliteral}{"{}N\ not\ valid"{}});}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00114}00114\ }
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00115}\mbox{\hyperlink{classsysio_1_1vm_1_1varint_a787a826635bebed8111c6486dfd372a3}{00115}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{constexpr}\ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classsysio_1_1vm_1_1varint_a787a826635bebed8111c6486dfd372a3}{varint}}(\mbox{\hyperlink{stdint_8h_aef44329758059c91c76d334e8fc09700}{int8\_t}}\ v)\ \{\ \mbox{\hyperlink{classsysio_1_1vm_1_1varint_a081d2e6d21f853bac765193b8defb4fd}{from}}(v);\ \}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00116}\mbox{\hyperlink{classsysio_1_1vm_1_1varint_a9352372c85728df48cc45c0b6015d691}{00116}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{constexpr}\ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classsysio_1_1vm_1_1varint_a9352372c85728df48cc45c0b6015d691}{varint}}(\mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}}\ v)\ \{\ \mbox{\hyperlink{classsysio_1_1vm_1_1varint_a081d2e6d21f853bac765193b8defb4fd}{from}}(v);\ \}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00117}\mbox{\hyperlink{classsysio_1_1vm_1_1varint_a39fd48cdfeef6adb870501823f6d5883}{00117}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{constexpr}\ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classsysio_1_1vm_1_1varint_a39fd48cdfeef6adb870501823f6d5883}{varint}}(\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ v)\ \{\ \mbox{\hyperlink{classsysio_1_1vm_1_1varint_a081d2e6d21f853bac765193b8defb4fd}{from}}(v);\ \}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00118}\mbox{\hyperlink{classsysio_1_1vm_1_1varint_a06d4e73b03c0ecf61f29313189c7ec38}{00118}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{classsysio_1_1vm_1_1varint_a06d4e73b03c0ecf61f29313189c7ec38}{varint}}(\ \mbox{\hyperlink{structsysio_1_1vm_1_1guarded__ptr}{guarded\_ptr<uint8\_t>}}\&\ code\ )\ \{\ \mbox{\hyperlink{classsysio_1_1vm_1_1varint_a081d2e6d21f853bac765193b8defb4fd}{from}}(code);\ \}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00119}00119\ }
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00120}\mbox{\hyperlink{classsysio_1_1vm_1_1varint_a081d2e6d21f853bac765193b8defb4fd}{00120}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1vm_1_1varint_a081d2e6d21f853bac765193b8defb4fd}{from}}(\mbox{\hyperlink{stdint_8h_aef44329758059c91c76d334e8fc09700}{int8\_t}}\ v)\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00121}00121\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_assert}(\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\ >=\ 7,\ \textcolor{stringliteral}{"{}cant\ use\ this\ constructor\ with\ N\ <\ 7"{}});}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00122}00122\ \ \ \ \ \ \ \ \ \ \ \ \ storage[0]\ =\ v\ \&\ 0x7f;}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00123}00123\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00124}\mbox{\hyperlink{classsysio_1_1vm_1_1varint_a912f2dd1d941058cbf80f1a5df46e7a1}{00124}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1vm_1_1varint_a912f2dd1d941058cbf80f1a5df46e7a1}{from}}(\mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}}\ v)\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00125}00125\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_assert}(\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\ >=\ 32,\ \textcolor{stringliteral}{"{}cant\ use\ this\ constructor\ with\ N\ <\ 32"{}});}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00126}00126\ \ \ \ \ \ \ \ \ \ \ \ \ \_from(v);}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00127}00127\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00128}\mbox{\hyperlink{classsysio_1_1vm_1_1varint_a273336bd6d84ac551fa63c00d08eea4c}{00128}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1vm_1_1varint_a273336bd6d84ac551fa63c00d08eea4c}{from}}(\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ v)\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00129}00129\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static\_assert}(\mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\ >=\ 64,\ \textcolor{stringliteral}{"{}cant\ use\ this\ constructor\ with\ N\ <\ 32"{}});}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00130}00130\ \ \ \ \ \ \ \ \ \ \ \ \ \_from(v);}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00131}00131\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00132}00132\ }
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00133}\mbox{\hyperlink{classsysio_1_1vm_1_1varint_ac70ac563f03dee80a0a4e8f94c5062bf}{00133}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1vm_1_1varint_ac70ac563f03dee80a0a4e8f94c5062bf}{from}}(\ \mbox{\hyperlink{structsysio_1_1vm_1_1guarded__ptr}{guarded\_ptr<uint8\_t>}}\&\ code\ )\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00134}00134\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ cnt\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00135}00135\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (;;\ cnt++)\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00136}00136\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(\ cnt\ <\ \mbox{\hyperlink{namespacesysio_1_1vm_a836821829022696c9f88e2d83f44cdaa}{bytes\_needed<N>}}(),\ wasm\_interpreter\_exception,\ \textcolor{stringliteral}{"{}incorrect\ leb128\ encoding"{}}\ );}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00137}00137\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}(\ code.offset()+cnt\ <\ code.bounds(),\ wasm\_interpreter\_exception,\ \textcolor{stringliteral}{"{}pointer\ out\ of\ bounds"{}}\ );}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00138}00138\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ storage[cnt]\ =\ code[cnt];}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00139}00139\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((storage[cnt]\ \&\ 0x80)\ ==\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00140}00140\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(cnt\ +\ 1)\ ==\ \mbox{\hyperlink{namespacesysio_1_1vm_a836821829022696c9f88e2d83f44cdaa}{bytes\_needed<N>}}()\ )\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00141}00141\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ offset\ =\ \mbox{\hyperlink{quantize_8cpp_ab2b6b0c222cd1ce70d6a831f57241e59}{N}}\ -\/\ 7*(\mbox{\hyperlink{namespacesysio_1_1vm_a836821829022696c9f88e2d83f44cdaa}{bytes\_needed<N>}}()-\/1);}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00142}00142\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ mask\ =\ \textcolor{keyword}{static\_cast<}\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\textcolor{keyword}{>}(\string~(\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})0\ <<\ offset)\ \&\ 0x7F;}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00143}00143\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ expected\ =\ (storage[cnt]\ \&\ (\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}(1)\ <<\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}(offset\ -\/\ 1)))?\ mask\ :\ 0;}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00144}00144\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{sys-vm_2include_2sysio_2sysio_2vm_2exceptions_8hpp_a2b63f5625ff6dcb6dedeb3ae08c4584a}{SYS\_VM\_ASSERT}}((mask\ \&\ storage[cnt])\ ==\ expected,\ wasm\_parse\_exception,\ \textcolor{stringliteral}{"{}unused\ bits\ of\ signed\ leb128\ must\ be\ the\ same\ as\ the\ sign\ bit"{}});}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00145}00145\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00146}00146\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00147}00147\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00148}00148\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00149}00149\ \ \ \ \ \ \ \ \ \ \ \ \ code\ +=\ cnt+1;}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00150}00150\ \ \ \ \ \ \ \ \ \ \ \ \ bytes\_used\ =\ cnt+1;}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00151}00151\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00152}00152\ }
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00153}\mbox{\hyperlink{classsysio_1_1vm_1_1varint_a0f9a05cada8e6850407dde79cee63c93}{00153}}\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classsysio_1_1vm_1_1varint_a0f9a05cada8e6850407dde79cee63c93}{size}}()\textcolor{keyword}{const\ }\{\ \textcolor{keywordflow}{return}\ bytes\_used;\ \}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00154}00154\ }
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00155}00155\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keywordtype}{size\_t}\ M=N,\ \textcolor{keyword}{typename}\ =\ \textcolor{keyword}{typename}\ std::enable\_if\_t<M\ ==\ 1,\ \textcolor{keywordtype}{int}>>}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00156}\mbox{\hyperlink{classsysio_1_1vm_1_1varint_a5adcfe78d10e95709781ebb6296a8a34}{00156}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classsysio_1_1vm_1_1varint_a5adcfe78d10e95709781ebb6296a8a34}{to}}()\ \{\ \textcolor{keywordflow}{return}\ storage[0];\ \}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00157}00157\ }
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00158}00158\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keywordtype}{size\_t}\ M=N,\ \textcolor{keyword}{typename}\ =\ \textcolor{keyword}{typename}\ std::enable\_if\_t<M\ ==\ 7,\ \textcolor{keywordtype}{int}>>}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00159}\mbox{\hyperlink{classsysio_1_1vm_1_1varint_ab8e65bedaac5784397ee4c7d44e31ffa}{00159}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{stdint_8h_aef44329758059c91c76d334e8fc09700}{int8\_t}}\ \mbox{\hyperlink{classsysio_1_1vm_1_1varint_ab8e65bedaac5784397ee4c7d44e31ffa}{to}}()\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00160}00160\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (storage[0]\ \&\ 0x40)}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00161}00161\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ storage[0]\ |\ (\string~0u\ <<\ 7);}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00162}00162\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ storage[0];}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00163}00163\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00164}00164\ }
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00165}00165\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keywordtype}{size\_t}\ M=N,\ \textcolor{keyword}{typename}\ =\ \textcolor{keyword}{typename}\ std::enable\_if\_t<M\ ==\ 32,\ \textcolor{keywordtype}{int}>>}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00166}\mbox{\hyperlink{classsysio_1_1vm_1_1varint_a024bfda7e7d14587751b5d2206cef3ec}{00166}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}}\ \mbox{\hyperlink{classsysio_1_1vm_1_1varint_a024bfda7e7d14587751b5d2206cef3ec}{to}}()\ \{\ \textcolor{keywordflow}{return}\ \_to<int32\_t>();\ \}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00167}00167\ }
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00168}00168\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keywordtype}{size\_t}\ M=N,\ \textcolor{keyword}{typename}\ =\ \textcolor{keyword}{typename}\ std::enable\_if\_t<M\ ==\ 64,\ \textcolor{keywordtype}{int}>>}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00169}\mbox{\hyperlink{classsysio_1_1vm_1_1varint_aca4d0fd6c8f6a8f5988d1e5370eecc25}{00169}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}}\ \mbox{\hyperlink{classsysio_1_1vm_1_1varint_aca4d0fd6c8f6a8f5988d1e5370eecc25}{to}}()\ \{\ \textcolor{keywordflow}{return}\ \_to<int64\_t>();\ \}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00170}00170\ }
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00171}\mbox{\hyperlink{classsysio_1_1vm_1_1varint_a5b35edd3f8b8f9f4773b79eb3f4f074e}{00171}}\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1vm_1_1varint_a5b35edd3f8b8f9f4773b79eb3f4f074e}{print}}()\textcolor{keyword}{const\ }\{}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00172}00172\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i=0;\ i\ <\ bytes\_used;\ i++)\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00173}00173\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ std::hex\ <<\ \textcolor{stringliteral}{"{}0x"{}}\ <<\ (int)storage[i]\ <<\ \textcolor{charliteral}{'\ '};}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00174}00174\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00175}00175\ \ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00176}00176\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00177}00177\ }
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00178}00178\ \ \ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00179}00179\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00180}00180\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{void}\ \_from(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ v)\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00181}00181\ \ \ \ \ \ \ \ \ \ \ \ \ bytes\_used\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00182}00182\ }
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00183}00183\ \textcolor{preprocessor}{\#ifdef\ \_\_clang\_\_}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00184}00184\ \textcolor{preprocessor}{\#pragma\ unroll}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00185}00185\ \textcolor{preprocessor}{\#elif\ defined(\_\_GNUC\_\_)}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00186}00186\ \textcolor{preprocessor}{\#pragma\ GCC\ unroll\ 5}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00187}00187\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00188}00188\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (;\ bytes\_used\ <\ bytes\_needed<N>();\ bytes\_used++)\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00189}00189\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ storage[bytes\_used]\ =\ v\ \&\ 0x7f;}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00190}00190\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ v\ >>=\ 7;}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00191}00191\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((v\ ==\ -\/1\ \&\&\ (storage[bytes\_used]\ \&\ 0x40))\ ||\ (v\ ==\ 0\ \&\&\ !(storage[bytes\_used]\ \&\ 0x40)))}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00192}00192\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00193}00193\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ storage[bytes\_used]\ |=\ 0x80;}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00194}00194\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00195}00195\ \ \ \ \ \ \ \ \ \ \ \ \ bytes\_used++;}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00196}00196\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00197}00197\ }
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00198}00198\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00199}00199\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}\ \_to()\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00200}00200\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{typename}\ std::make\_unsigned<T>::type\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00201}00201\ }
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00202}00202\ \textcolor{preprocessor}{\#ifdef\ \_\_clang\_\_}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00203}00203\ \textcolor{preprocessor}{\#pragma\ unroll}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00204}00204\ \textcolor{preprocessor}{\#elif\ defined(\_\_GNUC\_\_)}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00205}00205\ \textcolor{preprocessor}{\#pragma\ GCC\ unroll\ 5}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00206}00206\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00207}00207\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i=bytes\_used-\/1;\ i\ >=\ 0;\ i-\/-\/)\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00208}00208\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ <<=\ 7;}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00209}00209\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ |=\ storage[i]\ \&\ 0x7f;}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00210}00210\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00211}00211\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (bytes\_used\ >=\ 1\ \&\&\ bytes\_used\ <\ \mbox{\hyperlink{namespacesysio_1_1vm_a836821829022696c9f88e2d83f44cdaa}{bytes\_needed<N>}}())\ \{}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00212}00212\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ shift\ =\ ((bytes\_used)\ *\ 7);}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00213}00213\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (storage[bytes\_used-\/1]\ \&\ 0x40)}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00214}00214\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ |=\ (-\/1ull)\ <<\ shift;}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00215}00215\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00216}00216\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ *(\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}}*)\&\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}};}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00217}00217\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00218}00218\ }
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00219}00219\ \ \ \ \ \ \ \ \ \ std::array<uint8\_t,\ bytes\_needed<N>()>\ storage;}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00220}00220\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\_t}}\ bytes\_used\ =\ \mbox{\hyperlink{namespacesysio_1_1vm_a836821829022696c9f88e2d83f44cdaa}{bytes\_needed<N>}}();}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00221}00221\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00222}00222\ }
+\DoxyCodeLine{\Hypertarget{sysio_2vm_2leb128_8hpp_source_l00223}00223\ \}\}\ \textcolor{comment}{//\ ns\ sysio::vm}}
+
+\end{DoxyCode}

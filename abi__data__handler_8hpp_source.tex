@@ -1,0 +1,48 @@
+\doxysection{abi\+\_\+data\+\_\+handler.\+hpp}
+\hypertarget{abi__data__handler_8hpp_source}{}\label{abi__data__handler_8hpp_source}\index{plugins/trace\_api\_plugin/include/sysio/trace\_api/abi\_data\_handler.hpp@{plugins/trace\_api\_plugin/include/sysio/trace\_api/abi\_data\_handler.hpp}}
+\mbox{\hyperlink{abi__data__handler_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{abi__data__handler_8hpp_source_l00001}00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{abi__data__handler_8hpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{abi__data__handler_8hpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{abi__def_8hpp}{sysio/chain/abi\_def.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{abi__data__handler_8hpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{plugins_2trace__api__plugin_2include_2sysio_2trace__api_2trace_8hpp}{sysio/trace\_api/trace.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{abi__data__handler_8hpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{plugins_2trace__api__plugin_2include_2sysio_2trace__api_2common_8hpp}{sysio/trace\_api/common.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{abi__data__handler_8hpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{abi__data__handler_8hpp_source_l00007}00007\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacesysio}{sysio}}\ \{}
+\DoxyCodeLine{\Hypertarget{abi__data__handler_8hpp_source_l00008}00008\ \ \ \ \textcolor{keyword}{namespace\ }chain\ \{}
+\DoxyCodeLine{\Hypertarget{abi__data__handler_8hpp_source_l00009}00009\ \ \ \ \ \ \ \textcolor{keyword}{struct\ }abi\_serializer;}
+\DoxyCodeLine{\Hypertarget{abi__data__handler_8hpp_source_l00010}00010\ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{abi__data__handler_8hpp_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{abi__data__handler_8hpp_source_l00012}00012\ \ \ \ \textcolor{keyword}{namespace\ }trace\_api\ \{}
+\DoxyCodeLine{\Hypertarget{abi__data__handler_8hpp_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{abi__data__handler_8hpp_source_l00019}\mbox{\hyperlink{classsysio_1_1trace__api_1_1abi__data__handler}{00019}}\ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1trace__api_1_1abi__data__handler}{abi\_data\_handler}}\ \{}
+\DoxyCodeLine{\Hypertarget{abi__data__handler_8hpp_source_l00020}00020\ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{abi__data__handler_8hpp_source_l00021}\mbox{\hyperlink{classsysio_1_1trace__api_1_1abi__data__handler_a3d44ab86339f97c8483c8beb5f8b46fc}{00021}}\ \ \ \ \ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1abi__data__handler_a3d44ab86339f97c8483c8beb5f8b46fc}{abi\_data\_handler}}(\ \mbox{\hyperlink{classfc_1_1optional__delegate}{exception\_handler}}\ except\_handler\ )}
+\DoxyCodeLine{\Hypertarget{abi__data__handler_8hpp_source_l00022}00022\ \ \ \ \ \ \ :except\_handler(\ \mbox{\hyperlink{namespacestd}{std}}::move(\ except\_handler\ )\ )}
+\DoxyCodeLine{\Hypertarget{abi__data__handler_8hpp_source_l00023}00023\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{abi__data__handler_8hpp_source_l00024}00024\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{abi__data__handler_8hpp_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{abi__data__handler_8hpp_source_l00031}00031\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1abi__data__handler_a45fdfd7e086c2f51e3d1da63c4c5ef36}{add\_abi}}(\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{chain::name}}\&\ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structsysio_1_1chain_1_1abi__def}{chain::abi\_def}}\&\ abi\ );}
+\DoxyCodeLine{\Hypertarget{abi__data__handler_8hpp_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{abi__data__handler_8hpp_source_l00040}00040\ \ \ \ \ \ \ std::tuple<fc::variant,\ std::optional<fc::variant>>\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1abi__data__handler_a71b5e1285cd06e8e0aef49f35b5f31c2}{serialize\_to\_variant}}(\textcolor{keyword}{const}\ std::variant<action\_trace\_v0,\ action\_trace\_v1>\ \&\ \mbox{\hyperlink{structsysio_1_1chain_1_1action}{action}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1optional__delegate}{yield\_function}}\&\ yield\ );}
+\DoxyCodeLine{\Hypertarget{abi__data__handler_8hpp_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{abi__data__handler_8hpp_source_l00045}\mbox{\hyperlink{classsysio_1_1trace__api_1_1abi__data__handler_1_1shared__provider}{00045}}\ \ \ \ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classsysio_1_1trace__api_1_1abi__data__handler_1_1shared__provider}{shared\_provider}}\ \{}
+\DoxyCodeLine{\Hypertarget{abi__data__handler_8hpp_source_l00046}00046\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{abi__data__handler_8hpp_source_l00047}\mbox{\hyperlink{classsysio_1_1trace__api_1_1abi__data__handler_1_1shared__provider_a426acc75cda2ffda884a1713ccb70c5d}{00047}}\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1abi__data__handler_1_1shared__provider_a426acc75cda2ffda884a1713ccb70c5d}{shared\_provider}}(\textcolor{keyword}{const}\ std::shared\_ptr<abi\_data\_handler>\&\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1abi__data__handler_1_1shared__provider_a077357e4dbd918fd98024e765f06f631}{handler}})}
+\DoxyCodeLine{\Hypertarget{abi__data__handler_8hpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \ :\mbox{\hyperlink{classsysio_1_1trace__api_1_1abi__data__handler_1_1shared__provider_a077357e4dbd918fd98024e765f06f631}{handler}}(\mbox{\hyperlink{classsysio_1_1trace__api_1_1abi__data__handler_1_1shared__provider_a077357e4dbd918fd98024e765f06f631}{handler}})}
+\DoxyCodeLine{\Hypertarget{abi__data__handler_8hpp_source_l00049}00049\ \ \ \ \ \ \ \ \ \ \{\}}
+\DoxyCodeLine{\Hypertarget{abi__data__handler_8hpp_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{abi__data__handler_8hpp_source_l00051}\mbox{\hyperlink{classsysio_1_1trace__api_1_1abi__data__handler_1_1shared__provider_a8800a9e549b58d73a981e200110afef4}{00051}}\ \ \ \ \ \ \ \ \ \ std::tuple<fc::variant,\ std::optional<fc::variant>>\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1abi__data__handler_1_1shared__provider_a8800a9e549b58d73a981e200110afef4}{serialize\_to\_variant}}(\ \textcolor{keyword}{const}\ std::variant<action\_trace\_v0,\ action\_trace\_v1>\ \&\ \mbox{\hyperlink{structsysio_1_1chain_1_1action}{action}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classfc_1_1optional__delegate}{yield\_function}}\&\ yield\ )\ \{}
+\DoxyCodeLine{\Hypertarget{abi__data__handler_8hpp_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1abi__data__handler_1_1shared__provider_a077357e4dbd918fd98024e765f06f631}{handler}}-\/>serialize\_to\_variant(\mbox{\hyperlink{structsysio_1_1chain_1_1action}{action}},\ yield);}
+\DoxyCodeLine{\Hypertarget{abi__data__handler_8hpp_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{abi__data__handler_8hpp_source_l00054}00054\ }
+\DoxyCodeLine{\Hypertarget{abi__data__handler_8hpp_source_l00055}\mbox{\hyperlink{classsysio_1_1trace__api_1_1abi__data__handler_1_1shared__provider_a077357e4dbd918fd98024e765f06f631}{00055}}\ \ \ \ \ \ \ \ \ \ std::shared\_ptr<abi\_data\_handler>\ \mbox{\hyperlink{classsysio_1_1trace__api_1_1abi__data__handler_1_1shared__provider_a077357e4dbd918fd98024e765f06f631}{handler}};}
+\DoxyCodeLine{\Hypertarget{abi__data__handler_8hpp_source_l00056}00056\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{abi__data__handler_8hpp_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{abi__data__handler_8hpp_source_l00058}00058\ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{abi__data__handler_8hpp_source_l00059}00059\ \ \ \ \ \ \ std::map<chain::name,\ std::shared\_ptr<chain::abi\_serializer>>\ abi\_serializer\_by\_account;}
+\DoxyCodeLine{\Hypertarget{abi__data__handler_8hpp_source_l00060}00060\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1optional__delegate}{exception\_handler}}\ except\_handler;}
+\DoxyCodeLine{\Hypertarget{abi__data__handler_8hpp_source_l00061}00061\ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{abi__data__handler_8hpp_source_l00062}00062\ \}\ \}}
+
+\end{DoxyCode}

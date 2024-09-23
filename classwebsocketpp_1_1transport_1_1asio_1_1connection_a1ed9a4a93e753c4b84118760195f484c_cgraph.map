@@ -1,0 +1,9 @@
+<map id="websocketpp::transport::asio::connection::async_read_at_least" name="websocketpp::transport::asio::connection::async_read_at_least">
+<area shape="rect" id="Node000001" title="read at least num_bytes bytes into buf and then call handler." alt="" coords="5,85,173,141"/>
+<area shape="rect" id="Node000002" href="$classwebsocketpp_1_1transport_1_1asio_1_1connection.html#ac190efbc8cfd2654bc07b5b9382c36cc" title="Get a shared pointer to this component." alt="" coords="231,5,388,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="167,82,216,64,217,69,169,87"/>
+<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1transport_1_1asio_1_1connection.html#a0f3c75498e3ff2246b6842fc8cb4711b" title=" " alt="" coords="224,85,394,141"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="173,110,208,110,208,116,173,116"/>
+<area shape="rect" id="Node000004" href="$namespacewebsocketpp_1_1transport_1_1asio.html#ae1d60a52c0f07b90a75d36a3dcaac589" title=" " alt="" coords="221,165,398,221"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="169,139,217,157,216,162,167,144"/>
+</map>

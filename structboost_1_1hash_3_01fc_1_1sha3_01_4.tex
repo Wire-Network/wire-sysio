@@ -1,0 +1,43 @@
+\doxysection{boost\+::hash\texorpdfstring{$<$}{<} fc\+::sha3 \texorpdfstring{$>$}{>} Struct Reference}
+\hypertarget{structboost_1_1hash_3_01fc_1_1sha3_01_4}{}\label{structboost_1_1hash_3_01fc_1_1sha3_01_4}\index{boost::hash$<$ fc::sha3 $>$@{boost::hash$<$ fc::sha3 $>$}}
+
+
+{\ttfamily \#include $<$sha3.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+size\+\_\+t \mbox{\hyperlink{structboost_1_1hash_3_01fc_1_1sha3_01_4_a32f18bc252957afe5790a410ada15a45}{operator()}} (const \mbox{\hyperlink{classfc_1_1sha3}{fc\+::sha3}} \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}) const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{sha3_8hpp_source_l00105}{105}} of file \mbox{\hyperlink{sha3_8hpp_source}{sha3.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structboost_1_1hash_3_01fc_1_1sha3_01_4_a32f18bc252957afe5790a410ada15a45}\index{boost::hash$<$ fc::sha3 $>$@{boost::hash$<$ fc::sha3 $>$}!operator()@{operator()}}
+\index{operator()@{operator()}!boost::hash$<$ fc::sha3 $>$@{boost::hash$<$ fc::sha3 $>$}}
+\doxysubsubsection{\texorpdfstring{operator()()}{operator()()}}
+{\footnotesize\ttfamily \label{structboost_1_1hash_3_01fc_1_1sha3_01_4_a32f18bc252957afe5790a410ada15a45} 
+size\+\_\+t boost\+::hash$<$ \mbox{\hyperlink{classfc_1_1sha3}{fc\+::sha3}} $>$\+::operator() (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1sha3}{fc\+::sha3}} \&}]{s}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{sha3_8hpp_source_l00107}{107}} of file \mbox{\hyperlink{sha3_8hpp_source}{sha3.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00108\ \ \ \ \ \{}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.\_hash[3];\ \textcolor{comment}{//*((size\_t*)\&s);}}
+\DoxyCodeLine{00110\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/\mbox{\hyperlink{sha3_8hpp}{sha3.\+hpp}}\end{DoxyCompactItemize}

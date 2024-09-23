@@ -1,0 +1,32 @@
+<map id="CLI::Formatter::make_option_name" name="CLI::Formatter::make_option_name">
+<area shape="rect" id="Node000001" title="This is the name part of an option, Default: left column." alt="" coords="5,164,152,205"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_option.html#ab84751fbf9037efaed5b64fed17fe57f" title="Gets a comma separated list of names. Will include / prefer the positional name if positional is true..." alt="" coords="200,172,353,198"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="152,182,184,182,184,188,152,188"/>
+<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_option.html#a4d2329268bae134aa58e704fa61f4b57" title="Requires &quot;&#45;&#45;&quot; to be removed from string." alt="" coords="420,16,551,57"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="287,170,333,121,365,92,400,67,407,62,410,67,402,71,368,96,336,124,291,173"/>
+<area shape="rect" id="Node000009" href="$class_c_l_i_1_1_option.html#af5677ee4a55c2a85784f64198db6b452" title="True if the option was not passed." alt="" coords="419,81,551,107"/>
+<area shape="poly" id="edge10_Node000002_Node000009" title=" " alt="" coords="298,169,344,143,400,117,419,110,421,115,402,122,347,148,301,174"/>
+<area shape="rect" id="Node000010" href="$class_c_l_i_1_1_option.html#a4eb6212ac30a0b139da52d258a3a1790" title=" " alt="" coords="414,131,556,172"/>
+<area shape="poly" id="edge11_Node000002_Node000010" title=" " alt="" coords="353,170,398,163,399,168,354,175"/>
+<area shape="rect" id="Node000011" href="$class_c_l_i_1_1_option_base.html#ad824d0f4f973675beece17d6b5ad9d00" title=" " alt="" coords="401,196,569,237"/>
+<area shape="poly" id="edge13_Node000002_Node000011" title=" " alt="" coords="354,194,386,199,385,204,353,199"/>
+<area shape="rect" id="Node000012" href="$class_c_l_i_1_1_option.html#afe31a608506cbe75d40d6cced342be11" title="The total min number of expected string values to be used." alt="" coords="408,262,562,302"/>
+<area shape="poly" id="edge14_Node000002_Node000012" title=" " alt="" coords="303,196,402,246,417,253,415,258,400,251,301,201"/>
+<area shape="rect" id="Node000014" href="$namespace_c_l_i_1_1detail.html#ab351f13ec104e2cba19ec6baf4a552f6" title="Simple function to join a string." alt="" coords="430,327,540,352"/>
+<area shape="poly" id="edge16_Node000002_Node000014" title=" " alt="" coords="289,196,333,252,366,284,402,312,417,320,415,324,400,316,362,288,329,256,284,200"/>
+<area shape="rect" id="Node000004" href="$namespace_c_l_i_1_1detail.html#a356b9c9cc904af2b0a918fd55e86cd9c" title="Check if a string is a member of a list of strings and optionally ignore case or ignore underscores." alt="" coords="617,81,782,107"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="552,52,635,74,633,79,550,57"/>
+<area shape="rect" id="Node000005" href="$namespace_c_l_i.html#a0c52326d2681814c22aa1a93ce43375e" title="Helper function to allow ignore_case to be passed to IsMember or Transform." alt="" coords="848,5,968,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="736,78,855,34,857,39,738,83"/>
+<area shape="rect" id="Node000006" href="$namespace_c_l_i_1_1detail.html#ae83709ec148057ec53df4383645727e9" title="Return a lower case version of a string." alt="" coords="1034,43,1172,68"/>
+<area shape="poly" id="edge9_Node000004_Node000006" title=" " alt="" coords="782,84,1018,61,1019,66,782,89"/>
+<area shape="rect" id="Node000007" href="$namespace_c_l_i.html#a111b6f05d21b9b84e7ba933ade79884c" title="Helper function to allow ignore_underscore to be passed to IsMember or Transform." alt="" coords="830,107,986,132"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="782,102,815,105,814,111,782,107"/>
+<area shape="rect" id="Node000008" href="$namespace_c_l_i_1_1detail.html#a5359a7a0e33366a12e15523b100f591a" title="remove underscores from a string" alt="" coords="1037,114,1169,154"/>
+<area shape="poly" id="edge8_Node000004_Node000008" title=" " alt="" coords="728,105,775,126,830,142,879,148,929,150,1021,144,1022,149,929,155,879,154,829,147,773,131,726,110"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="969,27,1019,37,1018,42,968,32"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="987,123,1022,125,1022,131,986,128"/>
+<area shape="poly" id="edge12_Node000010_Node000004" title=" " alt="" coords="556,130,633,109,635,114,558,135"/>
+<area shape="rect" id="Node000013" href="$class_c_l_i_1_1_option.html#af87dffed2cb245673312c993e563710e" title="The total min number of expected string values to be used." alt="" coords="623,262,776,302"/>
+<area shape="poly" id="edge15_Node000012_Node000013" title=" " alt="" coords="562,280,608,280,608,285,562,285"/>
+</map>

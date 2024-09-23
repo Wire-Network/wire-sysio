@@ -1,0 +1,9 @@
+<map id="sysio::chain::apply_context::require_recipient" name="sysio::chain::apply_context::require_recipient">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,71,180,111"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1chain_1_1controller.html#a4f6404b355a3a4bf7fb60c92e85443d1" title=" " alt="" coords="235,5,394,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="163,68,227,48,229,54,165,73"/>
+<area shape="rect" id="Node000003" href="$classsysio_1_1chain_1_1apply__context.html#adecf61df18e643021f05df3cdfb97127" title=" " alt="" coords="236,71,392,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="180,88,221,88,221,94,180,94"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1chain_1_1apply__context.html#a15f2962cf55ed75da1cae67309e844d5" title=" " alt="" coords="228,136,401,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="165,109,229,128,227,134,163,114"/>
+</map>

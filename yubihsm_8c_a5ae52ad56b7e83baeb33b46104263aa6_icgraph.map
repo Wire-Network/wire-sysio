@@ -1,0 +1,12 @@
+<map id="yh_util_get_log_entries" name="yh_util_get_log_entries">
+<area shape="rect" id="Node000001" title=" " alt="" coords="446,31,601,56"/>
+<area shape="rect" id="Node000002" href="$logs_8c.html#a840291bc02cba5474a4cb46a9b9566fe" title=" " alt="" coords="322,5,372,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="431,33,372,24,373,19,431,28"/>
+<area shape="rect" id="Node000003" href="$commands_8c.html#a3c600843ccdac7af506983bc67cb0bc3" title=" " alt="" coords="296,55,398,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="431,59,399,63,398,58,431,53"/>
+<area shape="rect" id="Node000004" href="$src_2main_8c.html#a34a9e8c400dcf19e771e884636316060" title=" " alt="" coords="103,29,248,55"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="280,60,248,56,249,50,281,55"/>
+<area shape="rect" id="Node000005" href="$src_2main_8c.html#a0ddf1224851353fc92bfbff6f499fa97" title=" " alt="" coords="5,55,55,80"/>
+<area shape="poly" id="edge5_Node000003_Node000005" title=" " alt="" coords="280,70,55,70,55,65,280,65"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="88,60,55,66,54,61,87,55"/>
+</map>

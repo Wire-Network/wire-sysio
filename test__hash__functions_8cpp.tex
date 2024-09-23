@@ -1,0 +1,147 @@
+\doxysection{libraries/fc/test/crypto/test\+\_\+hash\+\_\+functions.cpp File Reference}
+\hypertarget{test__hash__functions_8cpp}{}\label{test__hash__functions_8cpp}\index{libraries/fc/test/crypto/test\_hash\_functions.cpp@{libraries/fc/test/crypto/test\_hash\_functions.cpp}}
+{\ttfamily \#include $<$boost/test/included/unit\+\_\+test.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/crypto/hex.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/crypto/sha3.\+hpp$>$}\newline
+{\ttfamily \#include $<$fc/utility.\+hpp$>$}\newline
+Include dependency graph for test\+\_\+hash\+\_\+functions.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__hash__functions_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{test__hash__functions_8cpp_a6b2a3852db8bb19ab6909bac01859985}{BOOST\+\_\+\+TEST\+\_\+\+MODULE}}~hash\+\_\+functions
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{test__hash__functions_8cpp_a56ee90c0ea6250d1e3d878409eaa5250}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (\mbox{\hyperlink{classfc_1_1sha3}{sha3}})
+\item 
+\mbox{\hyperlink{test__hash__functions_8cpp_ae70bfa24f5a3bc0917382b3c17fc033c}{FC\+\_\+\+LOG\+\_\+\+AND\+\_\+\+RETHROW}} ()
+\item 
+\mbox{\hyperlink{test__hash__functions_8cpp_a413970cea58f207c9ab5a37e67cc7438}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (keccak256)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{test__hash__functions_8cpp_a6b2a3852db8bb19ab6909bac01859985}\index{test\_hash\_functions.cpp@{test\_hash\_functions.cpp}!BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}}
+\index{BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}!test\_hash\_functions.cpp@{test\_hash\_functions.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_TEST\_MODULE}{BOOST\_TEST\_MODULE}}
+{\footnotesize\ttfamily \label{test__hash__functions_8cpp_a6b2a3852db8bb19ab6909bac01859985} 
+\#define BOOST\+\_\+\+TEST\+\_\+\+MODULE~hash\+\_\+functions}
+
+
+
+Definition at line \mbox{\hyperlink{test__hash__functions_8cpp_source_l00001}{1}} of file \mbox{\hyperlink{test__hash__functions_8cpp_source}{test\+\_\+hash\+\_\+functions.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{test__hash__functions_8cpp_a413970cea58f207c9ab5a37e67cc7438}\index{test\_hash\_functions.cpp@{test\_hash\_functions.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!test\_hash\_functions.cpp@{test\_hash\_functions.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{test__hash__functions_8cpp_a413970cea58f207c9ab5a37e67cc7438} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{keccak256}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__hash__functions_8cpp_source_l00041}{41}} of file \mbox{\hyperlink{test__hash__functions_8cpp_source}{test\+\_\+hash\+\_\+functions.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00042\ }
+\DoxyCodeLine{00043\ \ \ \ \textcolor{keyword}{using\ }test\_keccak256\ =\ std::tuple<std::string,\ std::string>;}
+\DoxyCodeLine{00044\ \ \ \ \textcolor{keyword}{const}\ std::vector<test\_keccak256>\ tests\ \{}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \textcolor{comment}{//test}}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}"{}},}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470"{}},}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \},}
+\DoxyCodeLine{00050\ }
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \textcolor{comment}{//test}}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}abc"{}},}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}4e03657aea45a94fc7d47ba826c8d667c0d1e6e33a64a036ec44f58fa12d6c45"{}},}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \},}
+\DoxyCodeLine{00056\ }
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \textcolor{comment}{//test}}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq"{}},}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}45d3b367a6904e6e8d502ee04999a7c27647f91fa845d456525fd352ae3d7371"{}},}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00062\ \ \ \ \};}
+\DoxyCodeLine{00063\ }
+\DoxyCodeLine{00064\ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ test\ :\ tests)\ \{}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\mbox{\hyperlink{classfc_1_1sha3_ab47e22ec4bb69f566052b99c74f4056a}{fc::sha3::hash}}(std::get<0>(test),\ \textcolor{keyword}{false}).\mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}(),\ std::get<1>(test));}
+\DoxyCodeLine{00066\ \ \ \ \}}
+\DoxyCodeLine{00067\ }
+\DoxyCodeLine{00068\ \}\ \mbox{\hyperlink{test__hash__functions_8cpp_ae70bfa24f5a3bc0917382b3c17fc033c}{FC\_LOG\_AND\_RETHROW}}();}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__hash__functions_8cpp_a413970cea58f207c9ab5a37e67cc7438_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__hash__functions_8cpp_a56ee90c0ea6250d1e3d878409eaa5250}\index{test\_hash\_functions.cpp@{test\_hash\_functions.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!test\_hash\_functions.cpp@{test\_hash\_functions.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{test__hash__functions_8cpp_a56ee90c0ea6250d1e3d878409eaa5250} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1sha3}{sha3}}}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{test__hash__functions_8cpp_source_l00011}{11}} of file \mbox{\hyperlink{test__hash__functions_8cpp_source}{test\+\_\+hash\+\_\+functions.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00011\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00012\ }
+\DoxyCodeLine{00013\ \ \ \ \textcolor{keyword}{using\ }test\_sha3\ =\ std::tuple<std::string,\ std::string>;}
+\DoxyCodeLine{00014\ \ \ \ \textcolor{keyword}{const}\ std::vector<test\_sha3>\ tests\ \{}
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \textcolor{comment}{//test}}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00017\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}"{}},}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}a7ffc6f8bf1ed76651c14756a061d662f580ff4de43b49fa82d80a4b80f8434a"{}},}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \},}
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \textcolor{comment}{//test}}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}abc"{}},}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}3a985da74fe225b2045c172d6bd390bd855f086e3e9d525b46bfe24511431532"{}},}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \},}
+\DoxyCodeLine{00026\ }
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \textcolor{comment}{//test}}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq"{}},}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}41c0dba2a9d6240849100376a8235e2c82e1b9998a999e21db32dd97496d3376"{}},}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00032\ \ \ \ \};}
+\DoxyCodeLine{00033\ }
+\DoxyCodeLine{00034\ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ test\ :\ tests)\ \{}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ BOOST\_CHECK\_EQUAL(\mbox{\hyperlink{classfc_1_1sha3_ab47e22ec4bb69f566052b99c74f4056a}{fc::sha3::hash}}(std::get<0>(test),\ \textcolor{keyword}{true}).\mbox{\hyperlink{namespace_c_l_i_1_1detail_ab4542375c903302c3876ce0403d55596}{str}}(),\ std::get<1>(test));}
+\DoxyCodeLine{00036\ \ \ \ \}}
+\DoxyCodeLine{00037\ }
+\DoxyCodeLine{00038\ \}\ \mbox{\hyperlink{test__hash__functions_8cpp_ae70bfa24f5a3bc0917382b3c17fc033c}{FC\_LOG\_AND\_RETHROW}}();}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__hash__functions_8cpp_a56ee90c0ea6250d1e3d878409eaa5250_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{test__hash__functions_8cpp_ae70bfa24f5a3bc0917382b3c17fc033c}\index{test\_hash\_functions.cpp@{test\_hash\_functions.cpp}!FC\_LOG\_AND\_RETHROW@{FC\_LOG\_AND\_RETHROW}}
+\index{FC\_LOG\_AND\_RETHROW@{FC\_LOG\_AND\_RETHROW}!test\_hash\_functions.cpp@{test\_hash\_functions.cpp}}
+\doxysubsubsection{\texorpdfstring{FC\_LOG\_AND\_RETHROW()}{FC\_LOG\_AND\_RETHROW()}}
+{\footnotesize\ttfamily \label{test__hash__functions_8cpp_ae70bfa24f5a3bc0917382b3c17fc033c} 
+FC\+\_\+\+LOG\+\_\+\+AND\+\_\+\+RETHROW (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+

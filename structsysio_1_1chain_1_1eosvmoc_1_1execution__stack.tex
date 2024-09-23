@@ -1,0 +1,248 @@
+\doxysection{sysio\+::chain\+::eosvmoc\+::execution\+\_\+stack Struct Reference}
+\hypertarget{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack}{}\label{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack}\index{sysio::chain::eosvmoc::execution\_stack@{sysio::chain::eosvmoc::execution\_stack}}
+
+
+{\ttfamily \#include $<$stack.\+hpp$>$}
+
+
+
+Collaboration diagram for sysio\+::chain\+::eosvmoc\+::execution\+\_\+stack\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=208pt]{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack_ab2af09eb332480d6df5a16da39cbb741}{execution\+\_\+stack}} ()=default
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack_ab96b7cf38e5d04644cd455e86f29dbb4}{execution\+\_\+stack}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack}{execution\+\_\+stack}} \&)=delete
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack}{execution\+\_\+stack}} \& \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack_acd6a1f058fd15cf73ec06abfc9c0caa9}{operator=}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack}{execution\+\_\+stack}} \&)=delete
+\item 
+void \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack_af69753f37c77d1bd9cd4420a0acacd65}{reset}} (std\+::size\+\_\+t max\+\_\+call\+\_\+depth)
+\item 
+void \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack_a3217be8e5d6a12c986bed6a0f3cd07cd}{reset}} ()
+\item 
+{\footnotesize template$<$typename F $>$ }\\void \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack_a92c542ea17b7cf3c51a2dc9cc507b2f7}{run}} (F \&\&\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}})
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack_ae5ffefc77c9d2b24bb8b11a78fbc98a3}{\texorpdfstring{$\sim$}{\string~}execution\+\_\+stack}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack_af43042bb976d6c06edc3ed08dec2a361}{stack\+\_\+top}} = nullptr
+\item 
+std\+::size\+\_\+t \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack_aba7bf0665aa509c8caa4f1612a005500}{stack\+\_\+size}} = 0
+\item 
+std\+::size\+\_\+t \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack_a015b438965e2decec08521ec952b8ad7}{call\+\_\+depth\+\_\+limit}} = 4\texorpdfstring{$\ast$}{*}1024\texorpdfstring{$\ast$}{*}1024 / \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack_ae40786885d68cb5ccdbf3df72b34e936}{max\+\_\+bytes\+\_\+per\+\_\+frame}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static constexpr std\+::size\+\_\+t \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack_ae40786885d68cb5ccdbf3df72b34e936}{max\+\_\+bytes\+\_\+per\+\_\+frame}} = 16\texorpdfstring{$\ast$}{*}1024
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{stack_8hpp_source_l00012}{12}} of file \mbox{\hyperlink{stack_8hpp_source}{stack.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack_ab2af09eb332480d6df5a16da39cbb741}\index{sysio::chain::eosvmoc::execution\_stack@{sysio::chain::eosvmoc::execution\_stack}!execution\_stack@{execution\_stack}}
+\index{execution\_stack@{execution\_stack}!sysio::chain::eosvmoc::execution\_stack@{sysio::chain::eosvmoc::execution\_stack}}
+\doxysubsubsection{\texorpdfstring{execution\_stack()}{execution\_stack()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack_ab2af09eb332480d6df5a16da39cbb741} 
+sysio\+::chain\+::eosvmoc\+::execution\+\_\+stack\+::execution\+\_\+stack (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [default]}}
+
+\Hypertarget{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack_ab96b7cf38e5d04644cd455e86f29dbb4}\index{sysio::chain::eosvmoc::execution\_stack@{sysio::chain::eosvmoc::execution\_stack}!execution\_stack@{execution\_stack}}
+\index{execution\_stack@{execution\_stack}!sysio::chain::eosvmoc::execution\_stack@{sysio::chain::eosvmoc::execution\_stack}}
+\doxysubsubsection{\texorpdfstring{execution\_stack()}{execution\_stack()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack_ab96b7cf38e5d04644cd455e86f29dbb4} 
+sysio\+::chain\+::eosvmoc\+::execution\+\_\+stack\+::execution\+\_\+stack (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack}{execution\+\_\+stack}} \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [delete]}}
+
+\Hypertarget{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack_ae5ffefc77c9d2b24bb8b11a78fbc98a3}\index{sysio::chain::eosvmoc::execution\_stack@{sysio::chain::eosvmoc::execution\_stack}!````~execution\_stack@{\texorpdfstring{$\sim$}{\string~}execution\_stack}}
+\index{````~execution\_stack@{\texorpdfstring{$\sim$}{\string~}execution\_stack}!sysio::chain::eosvmoc::execution\_stack@{sysio::chain::eosvmoc::execution\_stack}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}execution\_stack()}{\string~execution\_stack()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack_ae5ffefc77c9d2b24bb8b11a78fbc98a3} 
+sysio\+::chain\+::eosvmoc\+::execution\+\_\+stack\+::\texorpdfstring{$\sim$}{\string~}execution\+\_\+stack (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{stack_8hpp_source_l00037}{37}} of file \mbox{\hyperlink{stack_8hpp_source}{stack.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack_a3217be8e5d6a12c986bed6a0f3cd07cd}{reset}}();}
+\DoxyCodeLine{00039\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack_ae5ffefc77c9d2b24bb8b11a78fbc98a3_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack_acd6a1f058fd15cf73ec06abfc9c0caa9}\index{sysio::chain::eosvmoc::execution\_stack@{sysio::chain::eosvmoc::execution\_stack}!operator=@{operator=}}
+\index{operator=@{operator=}!sysio::chain::eosvmoc::execution\_stack@{sysio::chain::eosvmoc::execution\_stack}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack_acd6a1f058fd15cf73ec06abfc9c0caa9} 
+\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack}{execution\+\_\+stack}} \& sysio\+::chain\+::eosvmoc\+::execution\+\_\+stack\+::operator= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack}{execution\+\_\+stack}} \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [delete]}}
+
+\Hypertarget{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack_a3217be8e5d6a12c986bed6a0f3cd07cd}\index{sysio::chain::eosvmoc::execution\_stack@{sysio::chain::eosvmoc::execution\_stack}!reset@{reset}}
+\index{reset@{reset}!sysio::chain::eosvmoc::execution\_stack@{sysio::chain::eosvmoc::execution\_stack}}
+\doxysubsubsection{\texorpdfstring{reset()}{reset()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack_a3217be8e5d6a12c986bed6a0f3cd07cd} 
+void execution\+\_\+stack\+::reset (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{stack_8cpp_source_l00020}{20}} of file \mbox{\hyperlink{stack_8cpp_source}{stack.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00021\ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack_af43042bb976d6c06edc3ed08dec2a361}{stack\_top}})\ \{}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ munmap((\textcolor{keywordtype}{char}*)\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack_af43042bb976d6c06edc3ed08dec2a361}{stack\_top}}\ -\/\ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack_aba7bf0665aa509c8caa4f1612a005500}{stack\_size}},\ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack_aba7bf0665aa509c8caa4f1612a005500}{stack\_size}});}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack_af43042bb976d6c06edc3ed08dec2a361}{stack\_top}}\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack_aba7bf0665aa509c8caa4f1612a005500}{stack\_size}}\ =\ 0;}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack_a015b438965e2decec08521ec952b8ad7}{call\_depth\_limit}}\ =\ 4*1024*1024\ /\ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack_ae40786885d68cb5ccdbf3df72b34e936}{max\_bytes\_per\_frame}};}
+\DoxyCodeLine{00026\ \ \ \ \}}
+\DoxyCodeLine{00027\ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack_a3217be8e5d6a12c986bed6a0f3cd07cd_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack_af69753f37c77d1bd9cd4420a0acacd65}\index{sysio::chain::eosvmoc::execution\_stack@{sysio::chain::eosvmoc::execution\_stack}!reset@{reset}}
+\index{reset@{reset}!sysio::chain::eosvmoc::execution\_stack@{sysio::chain::eosvmoc::execution\_stack}}
+\doxysubsubsection{\texorpdfstring{reset()}{reset()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack_af69753f37c77d1bd9cd4420a0acacd65} 
+void execution\+\_\+stack\+::reset (\begin{DoxyParamCaption}\item[{std\+::size\+\_\+t}]{max\+\_\+call\+\_\+depth}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{stack_8cpp_source_l00007}{7}} of file \mbox{\hyperlink{stack_8cpp_source}{stack.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00007\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00008\ \ \ \ \textcolor{keywordflow}{if}(max\_call\_depth\ >\ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack_a015b438965e2decec08521ec952b8ad7}{call\_depth\_limit}})\ \{}
+\DoxyCodeLine{00009\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack_a3217be8e5d6a12c986bed6a0f3cd07cd}{reset}}();}
+\DoxyCodeLine{00010\ \ \ \ \ \ \ std::size\_t\ new\_stack\_size\ =\ \mbox{\hyperlink{namespacesysio_1_1vm_a0ae6751a77293216df4656dee5081eb2a2b205b0f9a2199e9e6bf7d96d768f15a}{max\_call\_depth}}\ *\ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack_ae40786885d68cb5ccdbf3df72b34e936}{max\_bytes\_per\_frame}}\ +\ 4*1024*1024;}
+\DoxyCodeLine{00011\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ *\ ptr\ =\ mmap(\textcolor{keyword}{nullptr},\ new\_stack\_size,\ PROT\_READ|PROT\_WRITE,\ MAP\_PRIVATE|MAP\_ANON,\ 0,\ 0);}
+\DoxyCodeLine{00012\ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_abed525eeff3ae581be7e4e2fcd3b7bf4}{FC\_ASSERT}}(ptr\ !=\ MAP\_FAILED,\ \textcolor{stringliteral}{"{}Failed\ to\ allocate\ wasm\ stack"{}});}
+\DoxyCodeLine{00013\ \ \ \ \ \ \ mprotect(ptr,\ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack_ae40786885d68cb5ccdbf3df72b34e936}{max\_bytes\_per\_frame}},\ PROT\_NONE);}
+\DoxyCodeLine{00014\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack_af43042bb976d6c06edc3ed08dec2a361}{stack\_top}}\ =\ (\textcolor{keywordtype}{char}*)ptr\ +\ new\_stack\_size;}
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack_aba7bf0665aa509c8caa4f1612a005500}{stack\_size}}\ =\ new\_stack\_size;}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack_a015b438965e2decec08521ec952b8ad7}{call\_depth\_limit}}\ =\ \mbox{\hyperlink{namespacesysio_1_1vm_a0ae6751a77293216df4656dee5081eb2a2b205b0f9a2199e9e6bf7d96d768f15a}{max\_call\_depth}};}
+\DoxyCodeLine{00017\ \ \ \ \}}
+\DoxyCodeLine{00018\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack_af69753f37c77d1bd9cd4420a0acacd65_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack_af69753f37c77d1bd9cd4420a0acacd65_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack_a92c542ea17b7cf3c51a2dc9cc507b2f7}\index{sysio::chain::eosvmoc::execution\_stack@{sysio::chain::eosvmoc::execution\_stack}!run@{run}}
+\index{run@{run}!sysio::chain::eosvmoc::execution\_stack@{sysio::chain::eosvmoc::execution\_stack}}
+\doxysubsubsection{\texorpdfstring{run()}{run()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack_a92c542ea17b7cf3c51a2dc9cc507b2f7} 
+template$<$typename F $>$ \\
+void sysio\+::chain\+::eosvmoc\+::execution\+\_\+stack\+::run (\begin{DoxyParamCaption}\item[{F \&\&}]{f}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{stack_8hpp_source_l00029}{29}} of file \mbox{\hyperlink{stack_8hpp_source}{stack.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack_af43042bb976d6c06edc3ed08dec2a361}{stack\_top}})\ \{}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysio_1_1chain_1_1eosvmoc_a01d6b5863fb04efe338371a7adabc227}{eosvmoc\_switch\_stack}}(\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack_af43042bb976d6c06edc3ed08dec2a361}{stack\_top}},\ [](\textcolor{keywordtype}{void}*\ data)\ \{\ (*\textcolor{keyword}{static\_cast<}F*\textcolor{keyword}{>}(data))();\ \},\ \&\mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}});}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{_x02-_disabled_macros_8cpp_ae28240b98d91d6eb7da702b770490f39}{f}}();}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00035\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack_a92c542ea17b7cf3c51a2dc9cc507b2f7_cgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack_a015b438965e2decec08521ec952b8ad7}\index{sysio::chain::eosvmoc::execution\_stack@{sysio::chain::eosvmoc::execution\_stack}!call\_depth\_limit@{call\_depth\_limit}}
+\index{call\_depth\_limit@{call\_depth\_limit}!sysio::chain::eosvmoc::execution\_stack@{sysio::chain::eosvmoc::execution\_stack}}
+\doxysubsubsection{\texorpdfstring{call\_depth\_limit}{call\_depth\_limit}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack_a015b438965e2decec08521ec952b8ad7} 
+std\+::size\+\_\+t sysio\+::chain\+::eosvmoc\+::execution\+\_\+stack\+::call\+\_\+depth\+\_\+limit = 4\texorpdfstring{$\ast$}{*}1024\texorpdfstring{$\ast$}{*}1024 / \mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack_ae40786885d68cb5ccdbf3df72b34e936}{max\+\_\+bytes\+\_\+per\+\_\+frame}}}
+
+
+
+Definition at line \mbox{\hyperlink{stack_8hpp_source_l00019}{19}} of file \mbox{\hyperlink{stack_8hpp_source}{stack.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack_ae40786885d68cb5ccdbf3df72b34e936}\index{sysio::chain::eosvmoc::execution\_stack@{sysio::chain::eosvmoc::execution\_stack}!max\_bytes\_per\_frame@{max\_bytes\_per\_frame}}
+\index{max\_bytes\_per\_frame@{max\_bytes\_per\_frame}!sysio::chain::eosvmoc::execution\_stack@{sysio::chain::eosvmoc::execution\_stack}}
+\doxysubsubsection{\texorpdfstring{max\_bytes\_per\_frame}{max\_bytes\_per\_frame}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack_ae40786885d68cb5ccdbf3df72b34e936} 
+std\+::size\+\_\+t sysio\+::chain\+::eosvmoc\+::execution\+\_\+stack\+::max\+\_\+bytes\+\_\+per\+\_\+frame = 16\texorpdfstring{$\ast$}{*}1024\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+Definition at line \mbox{\hyperlink{stack_8hpp_source_l00014}{14}} of file \mbox{\hyperlink{stack_8hpp_source}{stack.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack_aba7bf0665aa509c8caa4f1612a005500}\index{sysio::chain::eosvmoc::execution\_stack@{sysio::chain::eosvmoc::execution\_stack}!stack\_size@{stack\_size}}
+\index{stack\_size@{stack\_size}!sysio::chain::eosvmoc::execution\_stack@{sysio::chain::eosvmoc::execution\_stack}}
+\doxysubsubsection{\texorpdfstring{stack\_size}{stack\_size}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack_aba7bf0665aa509c8caa4f1612a005500} 
+std\+::size\+\_\+t sysio\+::chain\+::eosvmoc\+::execution\+\_\+stack\+::stack\+\_\+size = 0}
+
+
+
+Definition at line \mbox{\hyperlink{stack_8hpp_source_l00017}{17}} of file \mbox{\hyperlink{stack_8hpp_source}{stack.\+hpp}}.
+
+\Hypertarget{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack_af43042bb976d6c06edc3ed08dec2a361}\index{sysio::chain::eosvmoc::execution\_stack@{sysio::chain::eosvmoc::execution\_stack}!stack\_top@{stack\_top}}
+\index{stack\_top@{stack\_top}!sysio::chain::eosvmoc::execution\_stack@{sysio::chain::eosvmoc::execution\_stack}}
+\doxysubsubsection{\texorpdfstring{stack\_top}{stack\_top}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1eosvmoc_1_1execution__stack_af43042bb976d6c06edc3ed08dec2a361} 
+void\texorpdfstring{$\ast$}{*} sysio\+::chain\+::eosvmoc\+::execution\+\_\+stack\+::stack\+\_\+top = nullptr}
+
+
+
+Definition at line \mbox{\hyperlink{stack_8hpp_source_l00016}{16}} of file \mbox{\hyperlink{stack_8hpp_source}{stack.\+hpp}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/include/sysio/chain/webassembly/sys-\/vm-\/oc/\mbox{\hyperlink{stack_8hpp}{stack.\+hpp}}\item 
+libraries/chain/webassembly/runtimes/sys-\/vm-\/oc/\mbox{\hyperlink{stack_8cpp}{stack.\+cpp}}\end{DoxyCompactItemize}

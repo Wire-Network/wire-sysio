@@ -1,0 +1,10 @@
+<map id="CLI::detail::search" name="CLI::detail::search">
+<area shape="rect" id="Node000001" title="A search function with a filter function." alt="" coords="5,70,134,96"/>
+<area shape="rect" id="Node000002" href="$struct_c_l_i_1_1detail_1_1pair__adaptor.html#ab46a8b1544ac182fe15948fe94a75bd6" title="Get the first value (really just the underlying value)" alt="" coords="182,5,342,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="115,67,176,48,177,54,116,72"/>
+<area shape="rect" id="Node000003" href="$namespace_c_l_i_1_1detail.html#aa4b4a0a97c9b07110595765887647385" title="A search function." alt="" coords="198,70,326,96"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="134,80,182,80,182,86,134,86"/>
+<area shape="rect" id="Node000004" href="$namespace_c_l_i_1_1detail.html#a0c6cf48feae9d909d52e7b4c346cba29" title=" " alt="" coords="390,88,512,129"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="119,94,182,106,282,111,374,110,374,116,282,117,181,111,118,99"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="327,89,375,96,374,101,326,94"/>
+</map>

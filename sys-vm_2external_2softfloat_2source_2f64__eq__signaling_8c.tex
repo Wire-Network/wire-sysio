@@ -1,0 +1,60 @@
+\doxysection{libraries/sys-\/vm/external/softfloat/source/f64\+\_\+eq\+\_\+signaling.c File Reference}
+\hypertarget{sys-vm_2external_2softfloat_2source_2f64__eq__signaling_8c}{}\label{sys-vm_2external_2softfloat_2source_2f64__eq__signaling_8c}\index{libraries/sys-\/vm/external/softfloat/source/f64\_eq\_signaling.c@{libraries/sys-\/vm/external/softfloat/source/f64\_eq\_signaling.c}}
+{\ttfamily \#include $<$stdbool.\+h$>$}\newline
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include "{}platform.\+h"{}}\newline
+{\ttfamily \#include "{}internals.\+h"{}}\newline
+{\ttfamily \#include "{}softfloat.\+h"{}}\newline
+Include dependency graph for f64\+\_\+eq\+\_\+signaling.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sys-vm_2external_2softfloat_2source_2f64__eq__signaling_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2f64__eq__signaling_8c_a7cc78f385992042256cdaf3f0be5152b}{f64\+\_\+eq\+\_\+signaling}} (\mbox{\hyperlink{structfloat64__t}{float64\+\_\+t}} \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}}, \mbox{\hyperlink{structfloat64__t}{float64\+\_\+t}} b)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{sys-vm_2external_2softfloat_2source_2f64__eq__signaling_8c_a7cc78f385992042256cdaf3f0be5152b}\index{f64\_eq\_signaling.c@{f64\_eq\_signaling.c}!f64\_eq\_signaling@{f64\_eq\_signaling}}
+\index{f64\_eq\_signaling@{f64\_eq\_signaling}!f64\_eq\_signaling.c@{f64\_eq\_signaling.c}}
+\doxysubsubsection{\texorpdfstring{f64\_eq\_signaling()}{f64\_eq\_signaling()}}
+{\footnotesize\ttfamily \label{sys-vm_2external_2softfloat_2source_2f64__eq__signaling_8c_a7cc78f385992042256cdaf3f0be5152b} 
+bool f64\+\_\+eq\+\_\+signaling (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structfloat64__t}{float64\+\_\+t}}}]{a}{, }\item[{\mbox{\hyperlink{structfloat64__t}{float64\+\_\+t}}}]{b}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2f64__eq__signaling_8c_source_l00043}{43}} of file \mbox{\hyperlink{sys-vm_2external_2softfloat_2source_2f64__eq__signaling_8c_source}{f64\+\_\+eq\+\_\+signaling.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00044\ \{}
+\DoxyCodeLine{00045\ \ \ \ \ \textcolor{keyword}{union\ }\mbox{\hyperlink{unionui64__f64}{ui64\_f64}}\ uA;}
+\DoxyCodeLine{00046\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\_fast64\_t}}\ uiA;}
+\DoxyCodeLine{00047\ \ \ \ \ \textcolor{keyword}{union\ }\mbox{\hyperlink{unionui64__f64}{ui64\_f64}}\ uB;}
+\DoxyCodeLine{00048\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a6fd055dddb7d91fab0635146851af8d5}{uint\_fast64\_t}}\ uiB;}
+\DoxyCodeLine{00049\ }
+\DoxyCodeLine{00050\ \ \ \ \ uA.\mbox{\hyperlink{unionui64__f64_a6c3253c08850759ca3c64dd956c6b4dd}{f}}\ =\ \mbox{\hyperlink{pointer_8h_aeeddce917cf130d62c370b8f216026dd}{a}};}
+\DoxyCodeLine{00051\ \ \ \ \ uiA\ =\ uA.ui;}
+\DoxyCodeLine{00052\ \ \ \ \ uB.f\ =\ b;}
+\DoxyCodeLine{00053\ \ \ \ \ uiB\ =\ uB.ui;}
+\DoxyCodeLine{00054\ \ \ \ \ \textcolor{keywordflow}{if}\ (\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a54cf847b77be110d616ac7048c1cc0cf}{isNaNF64UI}}(\ uiA\ )\ ||\ \mbox{\hyperlink{softfloat_2source_2include_2internals_8h_a54cf847b77be110d616ac7048c1cc0cf}{isNaNF64UI}}(\ uiB\ )\ )\ \{}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{softfloat_2source_28086-_s_s_e_2softfloat__raise_flags_8c_ac16bbf09eca0fe8ff91301d82c5a667f}{softfloat\_raiseFlags}}(\ \mbox{\hyperlink{softfloat_2source_2include_2softfloat_8h_a56a0f36da7f9eaaf54bd05cc2bf49173a191f069090c3d33752fb728272d9a4a9}{softfloat\_flag\_invalid}}\ );}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00057\ \ \ \ \ \}}
+\DoxyCodeLine{00058\ \ \ \ \ \textcolor{keywordflow}{return}\ (uiA\ ==\ uiB)\ ||\ !\ ((uiA\ |\ uiB)\ \&\ \mbox{\hyperlink{stdint_8h_a8da5373e041921aa34c2b6172ac3babc}{UINT64\_C}}(\ 0x7FFFFFFFFFFFFFFF\ ));}
+\DoxyCodeLine{00059\ }
+\DoxyCodeLine{00060\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=306pt]{sys-vm_2external_2softfloat_2source_2f64__eq__signaling_8c_a7cc78f385992042256cdaf3f0be5152b_cgraph}
+\end{center}
+\end{figure}

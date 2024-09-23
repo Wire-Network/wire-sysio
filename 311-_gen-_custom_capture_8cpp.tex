@@ -1,0 +1,63 @@
+\doxysection{libraries/sys-\/vm/external/\+Catch2/examples/311-\/\+Gen-\/\+Custom\+Capture.cpp File Reference}
+\hypertarget{311-_gen-_custom_capture_8cpp}{}\label{311-_gen-_custom_capture_8cpp}\index{libraries/sys-\/vm/external/Catch2/examples/311-\/Gen-\/CustomCapture.cpp@{libraries/sys-\/vm/external/Catch2/examples/311-\/Gen-\/CustomCapture.cpp}}
+{\ttfamily \#include $<$catch2/catch.\+hpp$>$}\newline
+Include dependency graph for 311-\/Gen-\/\+Custom\+Capture.cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{311-_gen-_custom_capture_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{311-_gen-_custom_capture_8cpp_ad15ab98094325b13ef69551880d32d08}{TEST\+\_\+\+CASE}} ("{}Generate \mbox{\hyperlink{yubico__otp_8c_a7ba1784f91d04c32f9b3139bc6fd8137}{random}} doubles across different ranges"{}, "{}\mbox{[}generator\mbox{]}\mbox{[}example\mbox{]}\mbox{[}advanced\mbox{]}"{})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{311-_gen-_custom_capture_8cpp_ad15ab98094325b13ef69551880d32d08}\index{311-\/Gen-\/CustomCapture.cpp@{311-\/Gen-\/CustomCapture.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!311-\/Gen-\/CustomCapture.cpp@{311-\/Gen-\/CustomCapture.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}}
+{\footnotesize\ttfamily \label{311-_gen-_custom_capture_8cpp_ad15ab98094325b13ef69551880d32d08} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Generate \mbox{\hyperlink{yubico__otp_8c_a7ba1784f91d04c32f9b3139bc6fd8137}{random}} doubles across different ranges"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}generator\mbox{]}\mbox{[}example\mbox{]}\mbox{[}advanced\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{311-_gen-_custom_capture_8cpp_source_l00014}{14}} of file \mbox{\hyperlink{311-_gen-_custom_capture_8cpp_source}{311-\/\+Gen-\/\+Custom\+Capture.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00016\ \ \ \ \ \textcolor{comment}{//\ Workaround\ for\ old\ libstdc++}}
+\DoxyCodeLine{00017\ \ \ \ \ \textcolor{keyword}{using\ }record\ =\ std::tuple<double,\ double>;}
+\DoxyCodeLine{00018\ \ \ \ \ \textcolor{comment}{//\ Set\ up\ 3\ ranges\ to\ generate\ numbers\ from}}
+\DoxyCodeLine{00019\ \ \ \ \ \textcolor{keyword}{auto}\ r1\ =\ \mbox{\hyperlink{catch__generators_8hpp_a4941c6427cfa36ee7c52d734e460f9df}{GENERATE}}(table<double,\ double>(\{}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ record\{3,\ 4\},}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ record\{-\/4,\ -\/3\},}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ record\{10,\ 1000\}}
+\DoxyCodeLine{00023\ \ \ \ \ \}));}
+\DoxyCodeLine{00024\ }
+\DoxyCodeLine{00025\ \ \ \ \ \textcolor{keyword}{auto}\ r2(r1);}
+\DoxyCodeLine{00026\ \ \ \ \ }
+\DoxyCodeLine{00027\ \ \ \ \ \textcolor{comment}{//\ This\ will\ take\ r1\ by\ reference\ and\ r2\ by\ value.}}
+\DoxyCodeLine{00028\ \ \ \ \ \textcolor{comment}{//\ Note\ that\ there\ are\ no\ advantages\ for\ doing\ so\ in\ this\ example,}}
+\DoxyCodeLine{00029\ \ \ \ \ \textcolor{comment}{//\ it\ is\ done\ only\ for\ expository\ purposes.}}
+\DoxyCodeLine{00030\ \ \ \ \ \textcolor{keyword}{auto}\ number\ =\ \mbox{\hyperlink{namespace_catch_1_1_generators_adbda9e2d18cd3e4dbb124c7d8830c97b}{Catch::Generators::generate}}(\ \mbox{\hyperlink{catch__common_8h_abc0b2405454c51748a31e0393d9ad5d1}{CATCH\_INTERNAL\_LINEINFO}},}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ [\&r1,\ r2]\{}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespace_catch_1_1_generators}{Catch::Generators}};}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_catch_1_1_generators_adabbca9c7049bd8b5dd0474240108485}{makeGenerators}}(\mbox{\hyperlink{namespace_catch_1_1_generators_adedfdb318219078ce9107690745d2f2f}{take}}(50,\ \mbox{\hyperlink{yubico__otp_8c_a7ba1784f91d04c32f9b3139bc6fd8137}{random}}(std::get<0>(r1),\ std::get<1>(r2))));}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00035\ \ \ \ \ );}
+\DoxyCodeLine{00036\ }
+\DoxyCodeLine{00037\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(std::abs(number)\ >\ 0);}
+\DoxyCodeLine{00038\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{311-_gen-_custom_capture_8cpp_ad15ab98094325b13ef69551880d32d08_cgraph}
+\end{center}
+\end{figure}

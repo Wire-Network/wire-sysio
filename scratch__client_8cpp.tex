@@ -1,0 +1,149 @@
+\doxysection{libraries/fc/vendor/websocketpp/examples/scratch\+\_\+client/scratch\+\_\+client.cpp File Reference}
+\hypertarget{scratch__client_8cpp}{}\label{scratch__client_8cpp}\index{libraries/fc/vendor/websocketpp/examples/scratch\_client/scratch\_client.cpp@{libraries/fc/vendor/websocketpp/examples/scratch\_client/scratch\_client.cpp}}
+{\ttfamily \#include $<$websocketpp/config/asio\+\_\+no\+\_\+tls\+\_\+client.\+hpp$>$}\newline
+{\ttfamily \#include $<$websocketpp/client.\+hpp$>$}\newline
+{\ttfamily \#include $<$websocketpp/common/thread.\+hpp$>$}\newline
+{\ttfamily \#include $<$websocketpp/common/memory.\+hpp$>$}\newline
+{\ttfamily \#include $<$cstdlib$>$}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$map$>$}\newline
+{\ttfamily \#include $<$string$>$}\newline
+{\ttfamily \#include $<$sstream$>$}\newline
+Include dependency graph for scratch\+\_\+client.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{scratch__client_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classconnection__metadata}{connection\+\_\+metadata}}
+\item 
+class \mbox{\hyperlink{classwebsocket__endpoint}{websocket\+\_\+endpoint}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1client}{websocketpp\+::client}}$<$ \mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio__client}{websocketpp\+::config\+::asio\+\_\+client}} $>$ \mbox{\hyperlink{scratch__client_8cpp_aff8c62b83a9c8aefc476f96166656b76}{client}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+std\+::ostream \& \mbox{\hyperlink{scratch__client_8cpp_a2aec4aeb2bb18764b4be4e1cfb033fb6}{operator$<$$<$}} (std\+::ostream \&out, \mbox{\hyperlink{classconnection__metadata}{connection\+\_\+metadata}} const \&data)
+\item 
+int \mbox{\hyperlink{scratch__client_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{scratch__client_8cpp_aff8c62b83a9c8aefc476f96166656b76}\index{scratch\_client.cpp@{scratch\_client.cpp}!client@{client}}
+\index{client@{client}!scratch\_client.cpp@{scratch\_client.cpp}}
+\doxysubsubsection{\texorpdfstring{client}{client}}
+{\footnotesize\ttfamily \label{scratch__client_8cpp_aff8c62b83a9c8aefc476f96166656b76} 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1client}{websocketpp\+::client}}$<$\mbox{\hyperlink{structwebsocketpp_1_1config_1_1asio__client}{websocketpp\+::config\+::asio\+\_\+client}}$>$ \mbox{\hyperlink{debug__client_8cpp_aff8c62b83a9c8aefc476f96166656b76}{client}}}
+
+
+
+Definition at line \mbox{\hyperlink{scratch__client_8cpp_source_l00043}{43}} of file \mbox{\hyperlink{scratch__client_8cpp_source}{scratch\+\_\+client.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{scratch__client_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}\index{scratch\_client.cpp@{scratch\_client.cpp}!main@{main}}
+\index{main@{main}!scratch\_client.cpp@{scratch\_client.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{scratch__client_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4} 
+int main (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{scratch__client_8cpp_source_l00218}{218}} of file \mbox{\hyperlink{scratch__client_8cpp_source}{scratch\+\_\+client.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00218\ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00219\ \ \ \ \ \textcolor{keywordtype}{bool}\ done\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00220\ \ \ \ \ std::string\ input;}
+\DoxyCodeLine{00221\ \ \ \ \ \mbox{\hyperlink{classwebsocket__endpoint}{websocket\_endpoint}}\ endpoint;}
+\DoxyCodeLine{00222\ }
+\DoxyCodeLine{00223\ \ \ \ \ \textcolor{keywordflow}{while}\ (!done)\ \{}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}Enter\ Command:\ "{}};}
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \ \ std::getline(std::cin,\ input);}
+\DoxyCodeLine{00226\ }
+\DoxyCodeLine{00227\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (input\ ==\ \textcolor{stringliteral}{"{}quit"{}})\ \{}
+\DoxyCodeLine{00228\ \ \ \ \ \ \ \ \ \ \ \ \ done\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00229\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (input\ ==\ \textcolor{stringliteral}{"{}help"{}})\ \{}
+\DoxyCodeLine{00230\ \ \ \ \ \ \ \ \ \ \ \ \ std::cout}
+\DoxyCodeLine{00231\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\(\backslash\)nCommand\ List:\(\backslash\)n"{}}}
+\DoxyCodeLine{00232\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}connect\ <ws\ uri>\(\backslash\)n"{}}}
+\DoxyCodeLine{00233\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}close\ <connection\ id>\ [<close\ code:default=1000>]\ [<close\ reason>]\(\backslash\)n"{}}}
+\DoxyCodeLine{00234\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}show\ <connection\ id>\(\backslash\)n"{}}}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}help:\ Display\ this\ help\ text\(\backslash\)n"{}}}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}quit:\ Exit\ the\ program\(\backslash\)n"{}}}
+\DoxyCodeLine{00237\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ std::endl;}
+\DoxyCodeLine{00238\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (input.substr(0,7)\ ==\ \textcolor{stringliteral}{"{}connect"{}})\ \{}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \textcolor{keywordtype}{id}\ =\ endpoint.\mbox{\hyperlink{classwebsocket__endpoint_a5850523b829e145793d42e137d5eb8c0}{connect}}(input.substr(8));}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keywordtype}{id}\ !=\ -\/1)\ \{}
+\DoxyCodeLine{00241\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}>\ Created\ connection\ with\ id\ "{}}\ <<\ \textcolor{keywordtype}{id}\ <<\ std::endl;}
+\DoxyCodeLine{00242\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00243\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (input.substr(0,5)\ ==\ \textcolor{stringliteral}{"{}close"{}})\ \{}
+\DoxyCodeLine{00244\ \ \ \ \ \ \ \ \ \ \ \ \ std::stringstream\ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}(input);}
+\DoxyCodeLine{00245\ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00246\ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ cmd;}
+\DoxyCodeLine{00247\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{code__cache_8cpp_aa0efefe21f4700d78692edc823e763be}{id}};}
+\DoxyCodeLine{00248\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ close\_code\ =\ websocketpp::close::status::normal;}
+\DoxyCodeLine{00249\ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ reason;}
+\DoxyCodeLine{00250\ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00251\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_xbyak_1_1util_a67cd5471fb751b186b53fdab6da7d3f7}{ss}}\ >>\ cmd\ >>\ \textcolor{keywordtype}{id}\ >>\ close\_code;}
+\DoxyCodeLine{00252\ \ \ \ \ \ \ \ \ \ \ \ \ std::getline(ss,reason);}
+\DoxyCodeLine{00253\ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00254\ \ \ \ \ \ \ \ \ \ \ \ \ endpoint.\mbox{\hyperlink{classwebsocket__endpoint_ac18bcc30c3894c74c9ad028b47c299f9}{close}}(\textcolor{keywordtype}{id},\ close\_code,\ reason);}
+\DoxyCodeLine{00255\ \ \ \ \ \ \ \ \ \}\ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (input.substr(0,4)\ ==\ \textcolor{stringliteral}{"{}show"{}})\ \{}
+\DoxyCodeLine{00256\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \textcolor{keywordtype}{id}\ =\ atoi(input.substr(5).c\_str());}
+\DoxyCodeLine{00257\ }
+\DoxyCodeLine{00258\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classconnection__metadata_ada3ee69cbbc88df3cc5a74e8840671ac}{connection\_metadata::ptr}}\ metadata\ =\ endpoint.\mbox{\hyperlink{classwebsocket__endpoint_a5896c27213953d2d33b88e117b1971f6}{get\_metadata}}(\textcolor{keywordtype}{id});}
+\DoxyCodeLine{00259\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (metadata)\ \{}
+\DoxyCodeLine{00260\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ *metadata\ <<\ std::endl;}
+\DoxyCodeLine{00261\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00262\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}>\ Unknown\ connection\ id\ "{}}\ <<\ \textcolor{keywordtype}{id}\ <<\ std::endl;}
+\DoxyCodeLine{00263\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00264\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00265\ \ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}>\ Unrecognized\ Command"{}}\ <<\ std::endl;}
+\DoxyCodeLine{00266\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00267\ \ \ \ \ \}}
+\DoxyCodeLine{00268\ }
+\DoxyCodeLine{00269\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{00270\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{scratch__client_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{scratch__client_8cpp_a2aec4aeb2bb18764b4be4e1cfb033fb6}\index{scratch\_client.cpp@{scratch\_client.cpp}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!scratch\_client.cpp@{scratch\_client.cpp}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}}
+{\footnotesize\ttfamily \label{scratch__client_8cpp_a2aec4aeb2bb18764b4be4e1cfb033fb6} 
+std\+::ostream \& operator$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{out}{, }\item[{\mbox{\hyperlink{classconnection__metadata}{connection\+\_\+metadata}} const \&}]{data}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{scratch__client_8cpp_source_l00104}{104}} of file \mbox{\hyperlink{scratch__client_8cpp_source}{scratch\+\_\+client.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00105\ \ \ \ \ out\ <<\ \textcolor{stringliteral}{"{}>\ URI:\ "{}}\ <<\ data.m\_uri\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}>\ Status:\ "{}}\ <<\ data.m\_status\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}>\ Remote\ Server:\ "{}}\ <<\ (data.m\_server.empty()\ ?\ \textcolor{stringliteral}{"{}None\ Specified"{}}\ :\ data.m\_server)\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}>\ Error/close\ reason:\ "{}}\ <<\ (data.m\_error\_reason.empty()\ ?\ \textcolor{stringliteral}{"{}N/A"{}}\ :\ data.m\_error\_reason);}
+\DoxyCodeLine{00109\ }
+\DoxyCodeLine{00110\ \ \ \ \ \textcolor{keywordflow}{return}\ out;}
+\DoxyCodeLine{00111\ \}}
+
+\end{DoxyCode}

@@ -1,0 +1,47 @@
+\doxysection{sysio\+::chain\+::eosvmoc\+::executor\+\_\+signal\+\_\+init Struct Reference}
+\hypertarget{structsysio_1_1chain_1_1eosvmoc_1_1executor__signal__init}{}\label{structsysio_1_1chain_1_1eosvmoc_1_1executor__signal__init}\index{sysio::chain::eosvmoc::executor\_signal\_init@{sysio::chain::eosvmoc::executor\_signal\_init}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsysio_1_1chain_1_1eosvmoc_1_1executor__signal__init_a9cff08da8876345d4487d40a415c775b}{executor\+\_\+signal\+\_\+init}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{executor_8cpp_source_l00122}{122}} of file \mbox{\hyperlink{executor_8cpp_source}{executor.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structsysio_1_1chain_1_1eosvmoc_1_1executor__signal__init_a9cff08da8876345d4487d40a415c775b}\index{sysio::chain::eosvmoc::executor\_signal\_init@{sysio::chain::eosvmoc::executor\_signal\_init}!executor\_signal\_init@{executor\_signal\_init}}
+\index{executor\_signal\_init@{executor\_signal\_init}!sysio::chain::eosvmoc::executor\_signal\_init@{sysio::chain::eosvmoc::executor\_signal\_init}}
+\doxysubsubsection{\texorpdfstring{executor\_signal\_init()}{executor\_signal\_init()}}
+{\footnotesize\ttfamily \label{structsysio_1_1chain_1_1eosvmoc_1_1executor__signal__init_a9cff08da8876345d4487d40a415c775b} 
+sysio\+::chain\+::eosvmoc\+::executor\+\_\+signal\+\_\+init\+::executor\+\_\+signal\+\_\+init (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{executor_8cpp_source_l00123}{123}} of file \mbox{\hyperlink{executor_8cpp_source}{executor.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \textcolor{keyword}{struct\ }sigaction\ sig\_action,\ old\_sig\_action;}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ sig\_action.sa\_sigaction\ =\ segv\_handler;}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ sigemptyset(\&sig\_action.sa\_mask);}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ sig\_action.sa\_flags\ =\ SA\_SIGINFO\ |\ SA\_NODEFER;}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ sigaction(SIGSEGV,\ \&sig\_action,\ \&old\_sig\_action);}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(old\_sig\_action.sa\_flags\ \&\ SA\_SIGINFO)}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ chained\_handler\ =\ old\_sig\_action.sa\_sigaction;}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}(old\_sig\_action.sa\_handler\ !=\ SIG\_IGN\ \&\&\ old\_sig\_action.sa\_handler\ !=\ SIG\_DFL)}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ chained\_handler\ =\ (void\ (*)(int,siginfo\_t*,\textcolor{keywordtype}{void}*))old\_sig\_action.sa\_handler;}
+\DoxyCodeLine{00133\ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/chain/webassembly/runtimes/sys-\/vm-\/oc/\mbox{\hyperlink{executor_8cpp}{executor.\+cpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,600 @@
+\doxysection{websocketpp\+::uri Class Reference}
+\hypertarget{classwebsocketpp_1_1uri}{}\label{classwebsocketpp_1_1uri}\index{websocketpp::uri@{websocketpp::uri}}
+
+
+{\ttfamily \#include $<$uri.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classwebsocketpp_1_1uri_a8cb22ae92e3e49c4351a3f873a9b279d}{uri}} (std\+::string const \&uri\+\_\+string)
+\item 
+\mbox{\hyperlink{classwebsocketpp_1_1uri_a3c133d45cf2ebb1859e7113b2b9d44b3}{uri}} (bool secure, std\+::string const \&host, \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} port, std\+::string const \&resource)
+\item 
+\mbox{\hyperlink{classwebsocketpp_1_1uri_ae7bfd18657c73695a4ff58318e02066a}{uri}} (bool secure, std\+::string const \&host, std\+::string const \&resource)
+\item 
+\mbox{\hyperlink{classwebsocketpp_1_1uri_a0d1197614a15afedca9fdfd1bfef3d85}{uri}} (bool secure, std\+::string const \&host, std\+::string const \&port, std\+::string const \&resource)
+\item 
+\mbox{\hyperlink{classwebsocketpp_1_1uri_a9019b4a2e3de42a822f2e37baa332c9e}{uri}} (std\+::string const \&scheme, std\+::string const \&host, \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} port, std\+::string const \&resource)
+\item 
+\mbox{\hyperlink{classwebsocketpp_1_1uri_a2cf8998d357854ed3ce5fd8cb38742a5}{uri}} (std\+::string scheme, std\+::string const \&host, std\+::string const \&resource)
+\item 
+\mbox{\hyperlink{classwebsocketpp_1_1uri_a162349184bbc29a4d30f6fc50969e6e6}{uri}} (std\+::string const \&scheme, std\+::string const \&host, std\+::string const \&port, std\+::string const \&resource)
+\item 
+bool \mbox{\hyperlink{classwebsocketpp_1_1uri_a4a3490cc37fe77c74dcc1e2023a94ee8}{get\+\_\+valid}} () const
+\item 
+bool \mbox{\hyperlink{classwebsocketpp_1_1uri_ac1580a9bc41d2f0258359be018f74e05}{get\+\_\+secure}} () const
+\item 
+std\+::string const \& \mbox{\hyperlink{classwebsocketpp_1_1uri_a81ac0f5746f295ea84ee30133017b1ab}{get\+\_\+scheme}} () const
+\item 
+std\+::string const \& \mbox{\hyperlink{classwebsocketpp_1_1uri_a4bf63600e62674f145a81b0663639941}{get\+\_\+host}} () const
+\item 
+std\+::string \mbox{\hyperlink{classwebsocketpp_1_1uri_adf24841d8eef4d7cd8e9687ce23dc5d4}{get\+\_\+host\+\_\+port}} () const
+\item 
+std\+::string \mbox{\hyperlink{classwebsocketpp_1_1uri_a6d6a43a1f16f50b67316f0ddb5ba638a}{get\+\_\+authority}} () const
+\item 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} \mbox{\hyperlink{classwebsocketpp_1_1uri_a0e076cf37744e52bfc559eaeacba6714}{get\+\_\+port}} () const
+\item 
+std\+::string \mbox{\hyperlink{classwebsocketpp_1_1uri_acd48cd7f186231327bfd9fcfe5f4864f}{get\+\_\+port\+\_\+str}} () const
+\item 
+std\+::string const \& \mbox{\hyperlink{classwebsocketpp_1_1uri_a2e05b160973cfd8c0d5d47faf89202ae}{get\+\_\+resource}} () const
+\item 
+std\+::string \mbox{\hyperlink{classwebsocketpp_1_1uri_ad684773687e2b92f2c0d0c9bcad48a17}{str}} () const
+\item 
+std\+::string \mbox{\hyperlink{classwebsocketpp_1_1uri_a74950872d4c2a4c18df2ec5c9fca1877}{get\+\_\+query}} () const
+\begin{DoxyCompactList}\small\item\em Return the query portion. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{uri_8hpp_source_l00048}{48}} of file \mbox{\hyperlink{uri_8hpp_source}{uri.\+hpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classwebsocketpp_1_1uri_a8cb22ae92e3e49c4351a3f873a9b279d}\index{websocketpp::uri@{websocketpp::uri}!uri@{uri}}
+\index{uri@{uri}!websocketpp::uri@{websocketpp::uri}}
+\doxysubsubsection{\texorpdfstring{uri()}{uri()}\hspace{0.1cm}{\footnotesize\ttfamily [1/7]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1uri_a8cb22ae92e3e49c4351a3f873a9b279d} 
+websocketpp\+::uri\+::uri (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{uri\+\_\+string}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{uri_8hpp_source_l00050}{50}} of file \mbox{\hyperlink{uri_8hpp_source}{uri.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ m\_valid(\textcolor{keyword}{false})\ \{}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ std::string::const\_iterator\ it;}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ std::string::const\_iterator\ temp;}
+\DoxyCodeLine{00053\ }
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{structstate}{state}}\ =\ 0;}
+\DoxyCodeLine{00055\ }
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ it\ =\ uri\_string.begin();}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ uri\_len\ =\ uri\_string.length();}
+\DoxyCodeLine{00058\ }
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (uri\_len\ >=\ 7\ \&\&\ std::equal(it,it+6,\textcolor{stringliteral}{"{}wss://"{}}))\ \{}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \ \ \ \ m\_secure\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \ \ \ \ m\_scheme\ =\ \textcolor{stringliteral}{"{}wss"{}};}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \ \ \ it\ +=\ 6;}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (uri\_len\ >=\ 6\ \&\&\ std::equal(it,it+5,\textcolor{stringliteral}{"{}ws://"{}}))\ \{}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \ \ \ m\_secure\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ m\_scheme\ =\ \textcolor{stringliteral}{"{}ws"{}};}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ \ \ it\ +=\ 5;}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (uri\_len\ >=\ 8\ \&\&\ std::equal(it,it+7,\textcolor{stringliteral}{"{}http://"{}}))\ \{}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \ \ \ m\_secure\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ m\_scheme\ =\ \textcolor{stringliteral}{"{}http"{}};}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \ \ \ it\ +=\ 7;}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (uri\_len\ >=\ 9\ \&\&\ std::equal(it,it+8,\textcolor{stringliteral}{"{}https://"{}}))\ \{}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ \ \ \ m\_secure\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \ \ \ m\_scheme\ =\ \textcolor{stringliteral}{"{}https"{}};}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \ \ \ it\ +=\ 8;}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00078\ }
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ extract\ host.}}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ either\ a\ host\ string}}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ an\ IPv4\ address}}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ or\ an\ IPv6\ address}}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (*it\ ==\ \textcolor{charliteral}{'['})\ \{}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \ \ \ ++it;}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ IPv6\ literal}}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ extract\ IPv6\ digits\ until\ ]}}
+\DoxyCodeLine{00087\ }
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ TODO:\ this\ doesn't\ work\ on\ g++...\ not\ sure\ why}}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//temp\ =\ std::find(it,it2,']');}}
+\DoxyCodeLine{00090\ }
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ \ \ temp\ =\ it;}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (temp\ !=\ uri\_string.end())\ \{}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (*temp\ ==\ \textcolor{charliteral}{']'})\ \{}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++temp;}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00098\ }
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (temp\ ==\ uri\_string.end())\ \{}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ validate\ IPv6\ literal\ parts}}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ can\ contain\ numbers,\ a-\/f\ and\ A-\/F}}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_host.append(it,temp);}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \ \ \ \ it\ =\ temp+1;}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (it\ ==\ uri\_string.end())\ \{}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}\ =\ 2;}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (*it\ ==\ \textcolor{charliteral}{'/'})\ \{}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}\ =\ 2;}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++it;}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (*it\ ==\ \textcolor{charliteral}{':'})\ \{}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}\ =\ 1;}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++it;}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ problem}}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ IPv4\ or\ hostname}}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ extract\ until\ :\ or\ /}}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (\mbox{\hyperlink{structstate}{state}}\ ==\ 0)\ \{}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (it\ ==\ uri\_string.end())\ \{}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}\ =\ 2;}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (*it\ ==\ \textcolor{charliteral}{'/'})\ \{}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}\ =\ 2;}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (*it\ ==\ \textcolor{charliteral}{':'})\ \{}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ end\ hostname\ start\ port}}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}\ =\ 1;}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_host\ +=\ *it;}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++it;}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00137\ }
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ parse\ port}}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ std::string\ port;}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (\mbox{\hyperlink{structstate}{state}}\ ==\ 1)\ \{}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (it\ ==\ uri\_string.end())\ \{}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ state\ is\ not\ used\ after\ this\ point\ presently.}}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ this\ should\ be\ re-\/enabled\ if\ it\ ever\ is\ needed\ in\ a\ future}}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ refactoring}}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//state\ =\ 3;}}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (*it\ ==\ \textcolor{charliteral}{'/'})\ \{}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structstate}{state}}\ =\ 3;}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ port\ +=\ *it;}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ \ \ \ \ ++it;}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00154\ }
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ lib::error\_code\ ec;}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ m\_port\ =\ get\_port\_from\_string(port,\ ec);}
+\DoxyCodeLine{00157\ }
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ec)\ \{}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00161\ }
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \ \ m\_resource\ =\ \textcolor{stringliteral}{"{}/"{}};}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ m\_resource.append(it,uri\_string.end());}
+\DoxyCodeLine{00164\ }
+\DoxyCodeLine{00165\ }
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ m\_valid\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00167\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1uri_a3c133d45cf2ebb1859e7113b2b9d44b3}\index{websocketpp::uri@{websocketpp::uri}!uri@{uri}}
+\index{uri@{uri}!websocketpp::uri@{websocketpp::uri}}
+\doxysubsubsection{\texorpdfstring{uri()}{uri()}\hspace{0.1cm}{\footnotesize\ttfamily [2/7]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1uri_a3c133d45cf2ebb1859e7113b2b9d44b3} 
+websocketpp\+::uri\+::uri (\begin{DoxyParamCaption}\item[{bool}]{secure}{, }\item[{std\+::string const \&}]{host}{, }\item[{\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}}}]{port}{, }\item[{std\+::string const \&}]{resource}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{uri_8hpp_source_l00169}{169}} of file \mbox{\hyperlink{uri_8hpp_source}{uri.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ :\ m\_scheme(secure\ ?\ \textcolor{stringliteral}{"{}wss"{}}\ :\ \textcolor{stringliteral}{"{}ws"{}})}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ ,\ m\_host(host)}
+\DoxyCodeLine{00173\ \ \ \ \ \ \ ,\ m\_resource(\mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1state_a12f378e0c6dbf373781e7988ee4a0853a2d924502c35c713b76e006eed381b5f9}{resource}}.empty()\ ?\ \textcolor{stringliteral}{"{}/"{}}\ :\ resource)}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ ,\ m\_port(port)}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ ,\ m\_secure(secure)}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ ,\ m\_valid(\textcolor{keyword}{true})\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1uri_ae7bfd18657c73695a4ff58318e02066a}\index{websocketpp::uri@{websocketpp::uri}!uri@{uri}}
+\index{uri@{uri}!websocketpp::uri@{websocketpp::uri}}
+\doxysubsubsection{\texorpdfstring{uri()}{uri()}\hspace{0.1cm}{\footnotesize\ttfamily [3/7]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1uri_ae7bfd18657c73695a4ff58318e02066a} 
+websocketpp\+::uri\+::uri (\begin{DoxyParamCaption}\item[{bool}]{secure}{, }\item[{std\+::string const \&}]{host}{, }\item[{std\+::string const \&}]{resource}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{uri_8hpp_source_l00178}{178}} of file \mbox{\hyperlink{uri_8hpp_source}{uri.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ :\ m\_scheme(secure\ ?\ \textcolor{stringliteral}{"{}wss"{}}\ :\ \textcolor{stringliteral}{"{}ws"{}})}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ ,\ m\_host(host)}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ ,\ m\_resource(\mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1state_a12f378e0c6dbf373781e7988ee4a0853a2d924502c35c713b76e006eed381b5f9}{resource}}.empty()\ ?\ \textcolor{stringliteral}{"{}/"{}}\ :\ resource)}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ ,\ m\_port(secure\ ?\ uri\_default\_secure\_port\ :\ uri\_default\_port)}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ ,\ m\_secure(secure)}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ ,\ m\_valid(\textcolor{keyword}{true})\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1uri_a0d1197614a15afedca9fdfd1bfef3d85}\index{websocketpp::uri@{websocketpp::uri}!uri@{uri}}
+\index{uri@{uri}!websocketpp::uri@{websocketpp::uri}}
+\doxysubsubsection{\texorpdfstring{uri()}{uri()}\hspace{0.1cm}{\footnotesize\ttfamily [4/7]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1uri_a0d1197614a15afedca9fdfd1bfef3d85} 
+websocketpp\+::uri\+::uri (\begin{DoxyParamCaption}\item[{bool}]{secure}{, }\item[{std\+::string const \&}]{host}{, }\item[{std\+::string const \&}]{port}{, }\item[{std\+::string const \&}]{resource}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{uri_8hpp_source_l00186}{186}} of file \mbox{\hyperlink{uri_8hpp_source}{uri.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ :\ m\_scheme(secure\ ?\ \textcolor{stringliteral}{"{}wss"{}}\ :\ \textcolor{stringliteral}{"{}ws"{}})}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ ,\ m\_host(host)}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ ,\ m\_resource(\mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1state_a12f378e0c6dbf373781e7988ee4a0853a2d924502c35c713b76e006eed381b5f9}{resource}}.empty()\ ?\ \textcolor{stringliteral}{"{}/"{}}\ :\ resource)}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ ,\ m\_secure(secure)}
+\DoxyCodeLine{00192\ \ \ \ \ \{}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \ \ lib::error\_code\ ec;}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ m\_port\ =\ get\_port\_from\_string(port,ec);}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ m\_valid\ =\ !ec;}
+\DoxyCodeLine{00196\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1uri_a9019b4a2e3de42a822f2e37baa332c9e}\index{websocketpp::uri@{websocketpp::uri}!uri@{uri}}
+\index{uri@{uri}!websocketpp::uri@{websocketpp::uri}}
+\doxysubsubsection{\texorpdfstring{uri()}{uri()}\hspace{0.1cm}{\footnotesize\ttfamily [5/7]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1uri_a9019b4a2e3de42a822f2e37baa332c9e} 
+websocketpp\+::uri\+::uri (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{scheme}{, }\item[{std\+::string const \&}]{host}{, }\item[{\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}}}]{port}{, }\item[{std\+::string const \&}]{resource}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{uri_8hpp_source_l00198}{198}} of file \mbox{\hyperlink{uri_8hpp_source}{uri.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ :\ m\_scheme(scheme)}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ ,\ m\_host(host)}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ ,\ m\_resource(\mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1state_a12f378e0c6dbf373781e7988ee4a0853a2d924502c35c713b76e006eed381b5f9}{resource}}.empty()\ ?\ \textcolor{stringliteral}{"{}/"{}}\ :\ resource)}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ ,\ m\_port(port)}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ ,\ m\_secure(scheme\ ==\ \textcolor{stringliteral}{"{}wss"{}}\ ||\ scheme\ ==\ \textcolor{stringliteral}{"{}https"{}})}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ ,\ m\_valid(\textcolor{keyword}{true})\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1uri_a2cf8998d357854ed3ce5fd8cb38742a5}\index{websocketpp::uri@{websocketpp::uri}!uri@{uri}}
+\index{uri@{uri}!websocketpp::uri@{websocketpp::uri}}
+\doxysubsubsection{\texorpdfstring{uri()}{uri()}\hspace{0.1cm}{\footnotesize\ttfamily [6/7]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1uri_a2cf8998d357854ed3ce5fd8cb38742a5} 
+websocketpp\+::uri\+::uri (\begin{DoxyParamCaption}\item[{std\+::string}]{scheme}{, }\item[{std\+::string const \&}]{host}{, }\item[{std\+::string const \&}]{resource}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{uri_8hpp_source_l00207}{207}} of file \mbox{\hyperlink{uri_8hpp_source}{uri.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ :\ m\_scheme(scheme)}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ ,\ m\_host(host)}
+\DoxyCodeLine{00210\ \ \ \ \ \ \ ,\ m\_resource(\mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1state_a12f378e0c6dbf373781e7988ee4a0853a2d924502c35c713b76e006eed381b5f9}{resource}}.empty()\ ?\ \textcolor{stringliteral}{"{}/"{}}\ :\ resource)}
+\DoxyCodeLine{00211\ \ \ \ \ \ \ ,\ m\_port((scheme\ ==\ \textcolor{stringliteral}{"{}wss"{}}\ ||\ scheme\ ==\ \textcolor{stringliteral}{"{}https"{}})\ ?\ uri\_default\_secure\_port\ :\ uri\_default\_port)}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ ,\ m\_secure(scheme\ ==\ \textcolor{stringliteral}{"{}wss"{}}\ ||\ scheme\ ==\ \textcolor{stringliteral}{"{}https"{}})}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ ,\ m\_valid(\textcolor{keyword}{true})\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1uri_a162349184bbc29a4d30f6fc50969e6e6}\index{websocketpp::uri@{websocketpp::uri}!uri@{uri}}
+\index{uri@{uri}!websocketpp::uri@{websocketpp::uri}}
+\doxysubsubsection{\texorpdfstring{uri()}{uri()}\hspace{0.1cm}{\footnotesize\ttfamily [7/7]}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1uri_a162349184bbc29a4d30f6fc50969e6e6} 
+websocketpp\+::uri\+::uri (\begin{DoxyParamCaption}\item[{std\+::string const \&}]{scheme}{, }\item[{std\+::string const \&}]{host}{, }\item[{std\+::string const \&}]{port}{, }\item[{std\+::string const \&}]{resource}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{uri_8hpp_source_l00215}{215}} of file \mbox{\hyperlink{uri_8hpp_source}{uri.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00217\ \ \ \ \ \ \ :\ m\_scheme(scheme)}
+\DoxyCodeLine{00218\ \ \ \ \ \ \ ,\ m\_host(host)}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ ,\ m\_resource(\mbox{\hyperlink{namespacewebsocketpp_1_1http_1_1parser_1_1state_a12f378e0c6dbf373781e7988ee4a0853a2d924502c35c713b76e006eed381b5f9}{resource}}.empty()\ ?\ \textcolor{stringliteral}{"{}/"{}}\ :\ resource)}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ ,\ m\_secure(scheme\ ==\ \textcolor{stringliteral}{"{}wss"{}}\ ||\ scheme\ ==\ \textcolor{stringliteral}{"{}https"{}})}
+\DoxyCodeLine{00221\ \ \ \ \ \{}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \ \ lib::error\_code\ ec;}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \ \ m\_port\ =\ get\_port\_from\_string(port,ec);}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \ \ m\_valid\ =\ !ec;}
+\DoxyCodeLine{00225\ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classwebsocketpp_1_1uri_a6d6a43a1f16f50b67316f0ddb5ba638a}\index{websocketpp::uri@{websocketpp::uri}!get\_authority@{get\_authority}}
+\index{get\_authority@{get\_authority}!websocketpp::uri@{websocketpp::uri}}
+\doxysubsubsection{\texorpdfstring{get\_authority()}{get\_authority()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1uri_a6d6a43a1f16f50b67316f0ddb5ba638a} 
+std\+::string websocketpp\+::uri\+::get\+\_\+authority (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{uri_8hpp_source_l00253}{253}} of file \mbox{\hyperlink{uri_8hpp_source}{uri.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00253\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00254\ \ \ \ \ \ \ \ \ std::stringstream\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}};}
+\DoxyCodeLine{00255\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ <<\ m\_host\ <<\ \textcolor{stringliteral}{"{}:"{}}\ <<\ m\_port;}
+\DoxyCodeLine{00256\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.str();}
+\DoxyCodeLine{00257\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1uri_a4bf63600e62674f145a81b0663639941}\index{websocketpp::uri@{websocketpp::uri}!get\_host@{get\_host}}
+\index{get\_host@{get\_host}!websocketpp::uri@{websocketpp::uri}}
+\doxysubsubsection{\texorpdfstring{get\_host()}{get\_host()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1uri_a4bf63600e62674f145a81b0663639941} 
+std\+::string const  \& websocketpp\+::uri\+::get\+\_\+host (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{uri_8hpp_source_l00239}{239}} of file \mbox{\hyperlink{uri_8hpp_source}{uri.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_host;}
+\DoxyCodeLine{00241\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1uri_a4bf63600e62674f145a81b0663639941_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1uri_adf24841d8eef4d7cd8e9687ce23dc5d4}\index{websocketpp::uri@{websocketpp::uri}!get\_host\_port@{get\_host\_port}}
+\index{get\_host\_port@{get\_host\_port}!websocketpp::uri@{websocketpp::uri}}
+\doxysubsubsection{\texorpdfstring{get\_host\_port()}{get\_host\_port()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1uri_adf24841d8eef4d7cd8e9687ce23dc5d4} 
+std\+::string websocketpp\+::uri\+::get\+\_\+host\+\_\+port (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{uri_8hpp_source_l00243}{243}} of file \mbox{\hyperlink{uri_8hpp_source}{uri.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00243\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00244\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (m\_port\ ==\ (m\_secure\ ?\ uri\_default\_secure\_port\ :\ uri\_default\_port))\ \{}
+\DoxyCodeLine{00245\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_host;}
+\DoxyCodeLine{00246\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00247\ \ \ \ \ \ \ \ \ \ \ \ \ std::stringstream\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}};}
+\DoxyCodeLine{00248\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ <<\ m\_host\ <<\ \textcolor{stringliteral}{"{}:"{}}\ <<\ m\_port;}
+\DoxyCodeLine{00249\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.str();}
+\DoxyCodeLine{00250\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00251\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1uri_adf24841d8eef4d7cd8e9687ce23dc5d4_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1uri_a0e076cf37744e52bfc559eaeacba6714}\index{websocketpp::uri@{websocketpp::uri}!get\_port@{get\_port}}
+\index{get\_port@{get\_port}!websocketpp::uri@{websocketpp::uri}}
+\doxysubsubsection{\texorpdfstring{get\_port()}{get\_port()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1uri_a0e076cf37744e52bfc559eaeacba6714} 
+\mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\+\_\+t}} websocketpp\+::uri\+::get\+\_\+port (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{uri_8hpp_source_l00259}{259}} of file \mbox{\hyperlink{uri_8hpp_source}{uri.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00259\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00260\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_port;}
+\DoxyCodeLine{00261\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1uri_a0e076cf37744e52bfc559eaeacba6714_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1uri_acd48cd7f186231327bfd9fcfe5f4864f}\index{websocketpp::uri@{websocketpp::uri}!get\_port\_str@{get\_port\_str}}
+\index{get\_port\_str@{get\_port\_str}!websocketpp::uri@{websocketpp::uri}}
+\doxysubsubsection{\texorpdfstring{get\_port\_str()}{get\_port\_str()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1uri_acd48cd7f186231327bfd9fcfe5f4864f} 
+std\+::string websocketpp\+::uri\+::get\+\_\+port\+\_\+str (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{uri_8hpp_source_l00263}{263}} of file \mbox{\hyperlink{uri_8hpp_source}{uri.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00263\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00264\ \ \ \ \ \ \ \ \ std::stringstream\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}};}
+\DoxyCodeLine{00265\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ <<\ m\_port;}
+\DoxyCodeLine{00266\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}.str();}
+\DoxyCodeLine{00267\ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classwebsocketpp_1_1uri_a74950872d4c2a4c18df2ec5c9fca1877}\index{websocketpp::uri@{websocketpp::uri}!get\_query@{get\_query}}
+\index{get\_query@{get\_query}!websocketpp::uri@{websocketpp::uri}}
+\doxysubsubsection{\texorpdfstring{get\_query()}{get\_query()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1uri_a74950872d4c2a4c18df2ec5c9fca1877} 
+std\+::string websocketpp\+::uri\+::get\+\_\+query (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+Returns the query portion (after the ?) of the URI or an empty string if there is none.
+
+\begin{DoxyReturn}{Returns}
+query portion of the URI. 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{uri_8hpp_source_l00293}{293}} of file \mbox{\hyperlink{uri_8hpp_source}{uri.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00293\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00294\ \ \ \ \ \ \ \ \ std::size\_t\ found\ =\ m\_resource.find(\textcolor{charliteral}{'?'});}
+\DoxyCodeLine{00295\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (found\ !=\ std::string::npos)\ \{}
+\DoxyCodeLine{00296\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_resource.substr(found\ +\ 1);}
+\DoxyCodeLine{00297\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00298\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}"{}};}
+\DoxyCodeLine{00299\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00300\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1uri_a74950872d4c2a4c18df2ec5c9fca1877_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1uri_a2e05b160973cfd8c0d5d47faf89202ae}\index{websocketpp::uri@{websocketpp::uri}!get\_resource@{get\_resource}}
+\index{get\_resource@{get\_resource}!websocketpp::uri@{websocketpp::uri}}
+\doxysubsubsection{\texorpdfstring{get\_resource()}{get\_resource()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1uri_a2e05b160973cfd8c0d5d47faf89202ae} 
+std\+::string const  \& websocketpp\+::uri\+::get\+\_\+resource (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{uri_8hpp_source_l00269}{269}} of file \mbox{\hyperlink{uri_8hpp_source}{uri.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00269\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00270\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_resource;}
+\DoxyCodeLine{00271\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1uri_a2e05b160973cfd8c0d5d47faf89202ae_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1uri_a81ac0f5746f295ea84ee30133017b1ab}\index{websocketpp::uri@{websocketpp::uri}!get\_scheme@{get\_scheme}}
+\index{get\_scheme@{get\_scheme}!websocketpp::uri@{websocketpp::uri}}
+\doxysubsubsection{\texorpdfstring{get\_scheme()}{get\_scheme()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1uri_a81ac0f5746f295ea84ee30133017b1ab} 
+std\+::string const  \& websocketpp\+::uri\+::get\+\_\+scheme (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{uri_8hpp_source_l00235}{235}} of file \mbox{\hyperlink{uri_8hpp_source}{uri.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_scheme;}
+\DoxyCodeLine{00237\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1uri_a81ac0f5746f295ea84ee30133017b1ab_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1uri_ac1580a9bc41d2f0258359be018f74e05}\index{websocketpp::uri@{websocketpp::uri}!get\_secure@{get\_secure}}
+\index{get\_secure@{get\_secure}!websocketpp::uri@{websocketpp::uri}}
+\doxysubsubsection{\texorpdfstring{get\_secure()}{get\_secure()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1uri_ac1580a9bc41d2f0258359be018f74e05} 
+bool websocketpp\+::uri\+::get\+\_\+secure (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{uri_8hpp_source_l00231}{231}} of file \mbox{\hyperlink{uri_8hpp_source}{uri.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00231\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00232\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_secure;}
+\DoxyCodeLine{00233\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1uri_ac1580a9bc41d2f0258359be018f74e05_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1uri_a4a3490cc37fe77c74dcc1e2023a94ee8}\index{websocketpp::uri@{websocketpp::uri}!get\_valid@{get\_valid}}
+\index{get\_valid@{get\_valid}!websocketpp::uri@{websocketpp::uri}}
+\doxysubsubsection{\texorpdfstring{get\_valid()}{get\_valid()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1uri_a4a3490cc37fe77c74dcc1e2023a94ee8} 
+bool websocketpp\+::uri\+::get\+\_\+valid (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{uri_8hpp_source_l00227}{227}} of file \mbox{\hyperlink{uri_8hpp_source}{uri.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00227\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00228\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_valid;}
+\DoxyCodeLine{00229\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{classwebsocketpp_1_1uri_a4a3490cc37fe77c74dcc1e2023a94ee8_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classwebsocketpp_1_1uri_ad684773687e2b92f2c0d0c9bcad48a17}\index{websocketpp::uri@{websocketpp::uri}!str@{str}}
+\index{str@{str}!websocketpp::uri@{websocketpp::uri}}
+\doxysubsubsection{\texorpdfstring{str()}{str()}}
+{\footnotesize\ttfamily \label{classwebsocketpp_1_1uri_ad684773687e2b92f2c0d0c9bcad48a17} 
+std\+::string websocketpp\+::uri\+::str (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{uri_8hpp_source_l00273}{273}} of file \mbox{\hyperlink{uri_8hpp_source}{uri.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00273\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00274\ \ \ \ \ \ \ \ \ std::stringstream\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{00275\ }
+\DoxyCodeLine{00276\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ <<\ m\_scheme\ <<\ \textcolor{stringliteral}{"{}://"{}}\ <<\ m\_host;}
+\DoxyCodeLine{00277\ }
+\DoxyCodeLine{00278\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (m\_port\ !=\ (m\_secure\ ?\ uri\_default\_secure\_port\ :\ uri\_default\_port))\ \{}
+\DoxyCodeLine{00279\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ <<\ \textcolor{stringliteral}{"{}:"{}}\ <<\ m\_port;}
+\DoxyCodeLine{00280\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00281\ }
+\DoxyCodeLine{00282\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}\ <<\ m\_resource;}
+\DoxyCodeLine{00283\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}}.str();}
+\DoxyCodeLine{00284\ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classwebsocketpp_1_1uri_ad684773687e2b92f2c0d0c9bcad48a17_icgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/vendor/websocketpp/websocketpp/\mbox{\hyperlink{uri_8hpp}{uri.\+hpp}}\end{DoxyCompactItemize}

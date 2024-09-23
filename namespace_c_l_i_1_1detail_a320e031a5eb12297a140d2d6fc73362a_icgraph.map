@@ -1,0 +1,9 @@
+<map id="CLI::detail::generate_map" name="CLI::detail::generate_map">
+<area shape="rect" id="Node000001" title="Generate a string representation of a map." alt="" coords="252,78,423,104"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_as_number_with_unit.html#af5d2fc29cd92c1821e653a97f91b00cb" title=" " alt="" coords="23,5,186,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="273,76,179,49,180,44,275,71"/>
+<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_checked_transformer.html#af11e8936b4c0707ff94338908622e111" title=" " alt="" coords="18,71,191,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="237,94,191,94,191,88,237,88"/>
+<area shape="rect" id="Node000004" href="$class_c_l_i_1_1_transformer.html#aef311ee89c54f64e3e78651bd2db826c" title=" " alt="" coords="5,136,204,161"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="268,111,161,137,159,132,267,106"/>
+</map>

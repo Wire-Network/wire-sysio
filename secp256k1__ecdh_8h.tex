@@ -1,0 +1,146 @@
+\doxysection{libraries/fc/secp256k1/secp256k1/include/secp256k1\+\_\+ecdh.h File Reference}
+\hypertarget{secp256k1__ecdh_8h}{}\label{secp256k1__ecdh_8h}\index{libraries/fc/secp256k1/secp256k1/include/secp256k1\_ecdh.h@{libraries/fc/secp256k1/secp256k1/include/secp256k1\_ecdh.h}}
+{\ttfamily \#include "{}secp256k1.\+h"{}}\newline
+Include dependency graph for secp256k1\+\_\+ecdh.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=230pt]{secp256k1__ecdh_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{secp256k1__ecdh_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef int(\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{secp256k1__ecdh_8h_aa22ea0782e37a6cda1f3ffa74211c290}{secp256k1\+\_\+ecdh\+\_\+hash\+\_\+function}}) (unsigned char \texorpdfstring{$\ast$}{*}output, const unsigned char \texorpdfstring{$\ast$}{*}x32, const unsigned char \texorpdfstring{$\ast$}{*}y32, void \texorpdfstring{$\ast$}{*}data)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{secp256k1_8h_a3f1967acd0fe26283877c61b3f2694a5}{SECP256\+K1\+\_\+\+API}} \mbox{\hyperlink{secp256k1_8h_aebd5ca8fbfcbb0ba0754a46115143c2c}{SECP256\+K1\+\_\+\+WARN\+\_\+\+UNUSED\+\_\+\+RESULT}} int \mbox{\hyperlink{secp256k1__ecdh_8h_a4386914d0dce8b04f056ce3fae9a37a8}{secp256k1\+\_\+ecdh}} (const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}ctx, unsigned char \texorpdfstring{$\ast$}{*}output, const \mbox{\hyperlink{structsecp256k1__pubkey}{secp256k1\+\_\+pubkey}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{yubihsm__pkcs11_8c_a931987c85fd408a620505ee9a1aa6f58}{pubkey}}, const unsigned char \texorpdfstring{$\ast$}{*}seckey, \mbox{\hyperlink{secp256k1__ecdh_8h_aa22ea0782e37a6cda1f3ffa74211c290}{secp256k1\+\_\+ecdh\+\_\+hash\+\_\+function}} hashfp, void \texorpdfstring{$\ast$}{*}data) \mbox{\hyperlink{secp256k1_8h_a03c194d8fa91b9b66758b36c91e0b5cb}{SECP256\+K1\+\_\+\+ARG\+\_\+\+NONNULL}}(1) \mbox{\hyperlink{secp256k1_8h_a03c194d8fa91b9b66758b36c91e0b5cb}{SECP256\+K1\+\_\+\+ARG\+\_\+\+NONNULL}}(2) \mbox{\hyperlink{secp256k1_8h_a03c194d8fa91b9b66758b36c91e0b5cb}{SECP256\+K1\+\_\+\+ARG\+\_\+\+NONNULL}}(3) \mbox{\hyperlink{secp256k1_8h_a03c194d8fa91b9b66758b36c91e0b5cb}{SECP256\+K1\+\_\+\+ARG\+\_\+\+NONNULL}}(4)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{secp256k1_8h_a3f1967acd0fe26283877c61b3f2694a5}{SECP256\+K1\+\_\+\+API}} const \mbox{\hyperlink{secp256k1__ecdh_8h_aa22ea0782e37a6cda1f3ffa74211c290}{secp256k1\+\_\+ecdh\+\_\+hash\+\_\+function}} \mbox{\hyperlink{secp256k1__ecdh_8h_a92ca39ac1d95deeb184f3724bb545478}{secp256k1\+\_\+ecdh\+\_\+hash\+\_\+function\+\_\+sha256}}
+\item 
+\mbox{\hyperlink{secp256k1_8h_a3f1967acd0fe26283877c61b3f2694a5}{SECP256\+K1\+\_\+\+API}} const \mbox{\hyperlink{secp256k1__ecdh_8h_aa22ea0782e37a6cda1f3ffa74211c290}{secp256k1\+\_\+ecdh\+\_\+hash\+\_\+function}} \mbox{\hyperlink{secp256k1__ecdh_8h_ad43ae0060c16051c590360952052d087}{secp256k1\+\_\+ecdh\+\_\+hash\+\_\+function\+\_\+default}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{secp256k1__ecdh_8h_aa22ea0782e37a6cda1f3ffa74211c290}\index{secp256k1\_ecdh.h@{secp256k1\_ecdh.h}!secp256k1\_ecdh\_hash\_function@{secp256k1\_ecdh\_hash\_function}}
+\index{secp256k1\_ecdh\_hash\_function@{secp256k1\_ecdh\_hash\_function}!secp256k1\_ecdh.h@{secp256k1\_ecdh.h}}
+\doxysubsubsection{\texorpdfstring{secp256k1\_ecdh\_hash\_function}{secp256k1\_ecdh\_hash\_function}}
+{\footnotesize\ttfamily \label{secp256k1__ecdh_8h_aa22ea0782e37a6cda1f3ffa74211c290} 
+typedef int(\texorpdfstring{$\ast$}{*} secp256k1\+\_\+ecdh\+\_\+hash\+\_\+function) (unsigned char \texorpdfstring{$\ast$}{*}output, const unsigned char \texorpdfstring{$\ast$}{*}x32, const unsigned char \texorpdfstring{$\ast$}{*}y32, void \texorpdfstring{$\ast$}{*}data)}
+
+\doxylink{struct_a}{A} pointer to a function that hashes an EC point to obtain an ECDH secret
+
+Returns\+: 1 if the point was successfully hashed. 0 will cause secp256k1\+\_\+ecdh to fail and return 0. Other return values are not allowed, and the behaviour of secp256k1\+\_\+ecdh is undefined for other return values. Out\+: output\+: pointer to an array to be filled by the function In\+: x32\+: pointer to a 32-\/byte x coordinate y32\+: pointer to a 32-\/byte y coordinate data\+: arbitrary data pointer that is passed through 
+
+Definition at line \mbox{\hyperlink{secp256k1__ecdh_8h_source_l00021}{21}} of file \mbox{\hyperlink{secp256k1__ecdh_8h_source}{secp256k1\+\_\+ecdh.\+h}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{secp256k1__ecdh_8h_a4386914d0dce8b04f056ce3fae9a37a8}\index{secp256k1\_ecdh.h@{secp256k1\_ecdh.h}!secp256k1\_ecdh@{secp256k1\_ecdh}}
+\index{secp256k1\_ecdh@{secp256k1\_ecdh}!secp256k1\_ecdh.h@{secp256k1\_ecdh.h}}
+\doxysubsubsection{\texorpdfstring{secp256k1\_ecdh()}{secp256k1\_ecdh()}}
+{\footnotesize\ttfamily \label{secp256k1__ecdh_8h_a4386914d0dce8b04f056ce3fae9a37a8} 
+\mbox{\hyperlink{secp256k1_8h_a3f1967acd0fe26283877c61b3f2694a5}{SECP256\+K1\+\_\+\+API}} \mbox{\hyperlink{secp256k1_8h_aebd5ca8fbfcbb0ba0754a46115143c2c}{SECP256\+K1\+\_\+\+WARN\+\_\+\+UNUSED\+\_\+\+RESULT}} int secp256k1\+\_\+ecdh (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{secp256k1_8h_a282ec9e6dfec8c35955c3eb2f7476e5e}{secp256k1\+\_\+context}} \texorpdfstring{$\ast$}{*}}]{ctx}{, }\item[{unsigned char \texorpdfstring{$\ast$}{*}}]{output}{, }\item[{const \mbox{\hyperlink{structsecp256k1__pubkey}{secp256k1\+\_\+pubkey}} \texorpdfstring{$\ast$}{*}}]{pubkey}{, }\item[{const unsigned char \texorpdfstring{$\ast$}{*}}]{seckey}{, }\item[{\mbox{\hyperlink{secp256k1__ecdh_8h_aa22ea0782e37a6cda1f3ffa74211c290}{secp256k1\+\_\+ecdh\+\_\+hash\+\_\+function}}}]{hashfp}{, }\item[{void \texorpdfstring{$\ast$}{*}}]{data}{}\end{DoxyParamCaption})}
+
+Compute an EC Diffie-\/\+Hellman secret in constant time
+
+Returns\+: 1\+: exponentiation was successful 0\+: scalar was invalid (zero or overflow) or hashfp returned 0 Args\+: ctx\+: pointer to a context object. Out\+: output\+: pointer to an array to be filled by hashfp. In\+: pubkey\+: a pointer to a \doxylink{structsecp256k1__pubkey}{secp256k1\+\_\+pubkey} containing an initialized public key. seckey\+: a 32-\/byte scalar with which to multiply the point. hashfp\+: pointer to a hash function. If NULL, secp256k1\+\_\+ecdh\+\_\+hash\+\_\+function\+\_\+sha256 is used (in which case, 32 bytes will be written to output). data\+: arbitrary data pointer that is passed through to hashfp (can be NULL for secp256k1\+\_\+ecdh\+\_\+hash\+\_\+function\+\_\+sha256). 
+
+Definition at line \mbox{\hyperlink{ecdh_2main__impl_8h_source_l00029}{29}} of file \mbox{\hyperlink{ecdh_2main__impl_8h_source}{main\+\_\+impl.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00030\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ 0;}
+\DoxyCodeLine{00031\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a49aa97067a36875627e1380c3fb3833d}{overflow}}\ =\ 0;}
+\DoxyCodeLine{00032\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__gej}{secp256k1\_gej}}\ res;}
+\DoxyCodeLine{00033\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__ge}{secp256k1\_ge}}\ pt;}
+\DoxyCodeLine{00034\ \ \ \ \ \mbox{\hyperlink{structsecp256k1__scalar}{secp256k1\_scalar}}\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}};}
+\DoxyCodeLine{00035\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ x[32];}
+\DoxyCodeLine{00036\ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{namespacefc_ab199a7c94624123911206db59ebe45da}{y}}[32];}
+\DoxyCodeLine{00037\ }
+\DoxyCodeLine{00038\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aca8ac5ae73fd966db106de59160a178b}{VERIFY\_CHECK}}(ctx\ !=\ NULL);}
+\DoxyCodeLine{00039\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(output\ !=\ NULL);}
+\DoxyCodeLine{00040\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(\mbox{\hyperlink{structpoint}{point}}\ !=\ NULL);}
+\DoxyCodeLine{00041\ \ \ \ \ \mbox{\hyperlink{secp256k1_8c_a6e1f88c6ce07376501097b42a2b40727}{ARG\_CHECK}}(scalar\ !=\ NULL);}
+\DoxyCodeLine{00042\ }
+\DoxyCodeLine{00043\ \ \ \ \ \textcolor{keywordflow}{if}\ (hashfp\ ==\ NULL)\ \{}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ hashfp\ =\ \mbox{\hyperlink{ecdh_2main__impl_8h_a9ea4abe3608aef5337787f22f0e9d42b}{secp256k1\_ecdh\_hash\_function\_default}};}
+\DoxyCodeLine{00045\ \ \ \ \ \}}
+\DoxyCodeLine{00046\ }
+\DoxyCodeLine{00047\ \ \ \ \ secp256k1\_pubkey\_load(ctx,\ \&pt,\ \mbox{\hyperlink{structpoint}{point}});}
+\DoxyCodeLine{00048\ \ \ \ \ secp256k1\_scalar\_set\_b32(\&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ scalar,\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a49aa97067a36875627e1380c3fb3833d}{overflow}});}
+\DoxyCodeLine{00049\ }
+\DoxyCodeLine{00050\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a49aa97067a36875627e1380c3fb3833d}{overflow}}\ |=\ secp256k1\_scalar\_is\_zero(\&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{00051\ \ \ \ \ secp256k1\_scalar\_cmov(\&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ \&secp256k1\_scalar\_one,\ \mbox{\hyperlink{yubihsm__pkcs11_8c_a49aa97067a36875627e1380c3fb3833d}{overflow}});}
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ \ \ \ \ secp256k1\_ecmult\_const(\&res,\ \&pt,\ \&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}},\ 256);}
+\DoxyCodeLine{00054\ \ \ \ \ secp256k1\_ge\_set\_gej(\&pt,\ \&res);}
+\DoxyCodeLine{00055\ }
+\DoxyCodeLine{00056\ \ \ \ \ \textcolor{comment}{/*\ Compute\ a\ hash\ of\ the\ point\ */}}
+\DoxyCodeLine{00057\ \ \ \ \ secp256k1\_fe\_normalize(\&pt.\mbox{\hyperlink{structsecp256k1__ge_a3c04a97b606c82ea87e55d4a06f06b6e}{x}});}
+\DoxyCodeLine{00058\ \ \ \ \ secp256k1\_fe\_normalize(\&pt.\mbox{\hyperlink{structsecp256k1__ge_a604295983a1f4aa6e8b5b0f1e46f9ee0}{y}});}
+\DoxyCodeLine{00059\ \ \ \ \ secp256k1\_fe\_get\_b32(x,\ \&pt.\mbox{\hyperlink{structsecp256k1__ge_a3c04a97b606c82ea87e55d4a06f06b6e}{x}});}
+\DoxyCodeLine{00060\ \ \ \ \ secp256k1\_fe\_get\_b32(y,\ \&pt.\mbox{\hyperlink{structsecp256k1__ge_a604295983a1f4aa6e8b5b0f1e46f9ee0}{y}});}
+\DoxyCodeLine{00061\ }
+\DoxyCodeLine{00062\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ =\ hashfp(output,\ x,\ y,\ data);}
+\DoxyCodeLine{00063\ }
+\DoxyCodeLine{00064\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(x,\ 0,\ 32);}
+\DoxyCodeLine{00065\ \ \ \ \ \mbox{\hyperlink{yubihsm__pkcs11_8c_adc4bd59a60361844aa0e852efa210105}{memset}}(y,\ 0,\ 32);}
+\DoxyCodeLine{00066\ \ \ \ \ secp256k1\_scalar\_clear(\&\mbox{\hyperlink{yubihsm__pkcs11_8c_a506da415c9307c897ca9be93acfe1d0f}{s}});}
+\DoxyCodeLine{00067\ }
+\DoxyCodeLine{00068\ \ \ \ \ \textcolor{keywordflow}{return}\ !!\mbox{\hyperlink{yubihsm__pkcs11_8c_a3d854b6efad16a16e4d7b4539d4fc71f}{ret}}\ \&\ !\mbox{\hyperlink{yubihsm__pkcs11_8c_a49aa97067a36875627e1380c3fb3833d}{overflow}};}
+\DoxyCodeLine{00069\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=257pt]{secp256k1__ecdh_8h_a4386914d0dce8b04f056ce3fae9a37a8_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{secp256k1__ecdh_8h_a4386914d0dce8b04f056ce3fae9a37a8_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{secp256k1__ecdh_8h_ad43ae0060c16051c590360952052d087}\index{secp256k1\_ecdh.h@{secp256k1\_ecdh.h}!secp256k1\_ecdh\_hash\_function\_default@{secp256k1\_ecdh\_hash\_function\_default}}
+\index{secp256k1\_ecdh\_hash\_function\_default@{secp256k1\_ecdh\_hash\_function\_default}!secp256k1\_ecdh.h@{secp256k1\_ecdh.h}}
+\doxysubsubsection{\texorpdfstring{secp256k1\_ecdh\_hash\_function\_default}{secp256k1\_ecdh\_hash\_function\_default}}
+{\footnotesize\ttfamily \label{secp256k1__ecdh_8h_ad43ae0060c16051c590360952052d087} 
+\mbox{\hyperlink{secp256k1_8h_a3f1967acd0fe26283877c61b3f2694a5}{SECP256\+K1\+\_\+\+API}} const \mbox{\hyperlink{secp256k1__ecdh_8h_aa22ea0782e37a6cda1f3ffa74211c290}{secp256k1\+\_\+ecdh\+\_\+hash\+\_\+function}} secp256k1\+\_\+ecdh\+\_\+hash\+\_\+function\+\_\+default\hspace{0.3cm}{\ttfamily [extern]}}
+
+\doxylink{struct_a}{A} default ECDH hash function (currently equal to secp256k1\+\_\+ecdh\+\_\+hash\+\_\+function\+\_\+sha256). Populates the output parameter with 32 bytes. 
+
+Definition at line \mbox{\hyperlink{ecdh_2main__impl_8h_source_l00027}{27}} of file \mbox{\hyperlink{ecdh_2main__impl_8h_source}{main\+\_\+impl.\+h}}.
+
+\Hypertarget{secp256k1__ecdh_8h_a92ca39ac1d95deeb184f3724bb545478}\index{secp256k1\_ecdh.h@{secp256k1\_ecdh.h}!secp256k1\_ecdh\_hash\_function\_sha256@{secp256k1\_ecdh\_hash\_function\_sha256}}
+\index{secp256k1\_ecdh\_hash\_function\_sha256@{secp256k1\_ecdh\_hash\_function\_sha256}!secp256k1\_ecdh.h@{secp256k1\_ecdh.h}}
+\doxysubsubsection{\texorpdfstring{secp256k1\_ecdh\_hash\_function\_sha256}{secp256k1\_ecdh\_hash\_function\_sha256}}
+{\footnotesize\ttfamily \label{secp256k1__ecdh_8h_a92ca39ac1d95deeb184f3724bb545478} 
+\mbox{\hyperlink{secp256k1_8h_a3f1967acd0fe26283877c61b3f2694a5}{SECP256\+K1\+\_\+\+API}} const \mbox{\hyperlink{secp256k1__ecdh_8h_aa22ea0782e37a6cda1f3ffa74211c290}{secp256k1\+\_\+ecdh\+\_\+hash\+\_\+function}} secp256k1\+\_\+ecdh\+\_\+hash\+\_\+function\+\_\+sha256\hspace{0.3cm}{\ttfamily [extern]}}
+
+An implementation of SHA256 hash function that applies to compressed public key. Populates the output parameter with 32 bytes. 
+
+Definition at line \mbox{\hyperlink{ecdh_2main__impl_8h_source_l00026}{26}} of file \mbox{\hyperlink{ecdh_2main__impl_8h_source}{main\+\_\+impl.\+h}}.
+

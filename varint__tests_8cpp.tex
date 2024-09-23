@@ -1,0 +1,219 @@
+\doxysection{libraries/sys-\/vm/tests/varint\+\_\+tests.cpp File Reference}
+\hypertarget{varint__tests_8cpp}{}\label{varint__tests_8cpp}\index{libraries/sys-\/vm/tests/varint\_tests.cpp@{libraries/sys-\/vm/tests/varint\_tests.cpp}}
+{\ttfamily \#include $<$algorithm$>$}\newline
+{\ttfamily \#include $<$cstdlib$>$}\newline
+{\ttfamily \#include $<$limits$>$}\newline
+{\ttfamily \#include $<$vector$>$}\newline
+{\ttfamily \#include $<$catch2/catch.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/vm/leb128.\+hpp$>$}\newline
+{\ttfamily \#include $<$sysio/vm/types.\+hpp$>$}\newline
+Include dependency graph for varint\+\_\+tests.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{varint__tests_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{varint__tests_8cpp_aadf48e513d13aa68e0ea56d6105ecbda}{TEST\+\_\+\+CASE}} ("{}Testing varuint"{}, "{}\mbox{[}varuint\+\_\+tests\mbox{]}"{})
+\item 
+\mbox{\hyperlink{varint__tests_8cpp_a2878f6846c10420badd4897bdc1639ed}{TEST\+\_\+\+CASE}} ("{}Testing varint"{}, "{}\mbox{[}varint\+\_\+tests\mbox{]}"{})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{varint__tests_8cpp_a2878f6846c10420badd4897bdc1639ed}\index{varint\_tests.cpp@{varint\_tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!varint\_tests.cpp@{varint\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{varint__tests_8cpp_a2878f6846c10420badd4897bdc1639ed} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Testing varint"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}varint\+\_\+tests\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{varint__tests_8cpp_source_l00091}{91}} of file \mbox{\hyperlink{varint__tests_8cpp_source}{varint\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00092\ \ \ \ \{}
+\DoxyCodeLine{00093\ \ \ \ \ std::vector<uint8\_t>\ tv0\ =\ \{0x0\};}
+\DoxyCodeLine{00094\ \ \ \ \ std::vector<uint8\_t>\ tv1\ =\ \{0x1\};}
+\DoxyCodeLine{00095\ \ \ \ \ std::vector<uint8\_t>\ tv2\ =\ \{0x7f\};}
+\DoxyCodeLine{00096\ \ \ }
+\DoxyCodeLine{00097\ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1guarded__ptr}{guarded\_ptr<uint8\_t>}}\ gp0(tv0.data(),\ 5);}
+\DoxyCodeLine{00098\ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1guarded__ptr}{guarded\_ptr<uint8\_t>}}\ gp1(tv1.data(),\ 5);}
+\DoxyCodeLine{00099\ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1guarded__ptr}{guarded\_ptr<uint8\_t>}}\ gp2(tv2.data(),\ 5);}
+\DoxyCodeLine{00100\ \ \ \ }
+\DoxyCodeLine{00101\ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1varint}{varint<7>}}\ v0(gp0);}
+\DoxyCodeLine{00102\ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1varint}{varint<7>}}\ v1(gp1);}
+\DoxyCodeLine{00103\ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1varint}{varint<7>}}\ v2(gp2);}
+\DoxyCodeLine{00104\ \ \ \ }
+\DoxyCodeLine{00105\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ v0.to()\ ==\ 0\ );}
+\DoxyCodeLine{00106\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ v1.to()\ ==\ 1\ );}
+\DoxyCodeLine{00107\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ (\mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}})v2.to()\ ==\ -\/1\ );}
+\DoxyCodeLine{00108\ \ \ \ \}}
+\DoxyCodeLine{00109\ \ \ \ }
+\DoxyCodeLine{00110\ \ \ \ \{}
+\DoxyCodeLine{00111\ \ \ \ \ std::vector<uint8\_t>\ tv0\ =\ \{0x0\};}
+\DoxyCodeLine{00112\ \ \ \ \ std::vector<uint8\_t>\ tv1\ =\ \{0x1\};}
+\DoxyCodeLine{00113\ \ \ \ \ std::vector<uint8\_t>\ tv2\ =\ \{0x7f\};}
+\DoxyCodeLine{00114\ \ \ \ \ std::vector<uint8\_t>\ tv3\ =\ \{0x80,\ 0x7f\};}
+\DoxyCodeLine{00115\ \ \ \ }
+\DoxyCodeLine{00116\ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1guarded__ptr}{guarded\_ptr<uint8\_t>}}\ gp0(tv0.data(),\ 5);}
+\DoxyCodeLine{00117\ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1guarded__ptr}{guarded\_ptr<uint8\_t>}}\ gp1(tv1.data(),\ 5);}
+\DoxyCodeLine{00118\ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1guarded__ptr}{guarded\_ptr<uint8\_t>}}\ gp2(tv2.data(),\ 5);}
+\DoxyCodeLine{00119\ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1guarded__ptr}{guarded\_ptr<uint8\_t>}}\ gp3(tv3.data(),\ 5);}
+\DoxyCodeLine{00120\ \ \ \ }
+\DoxyCodeLine{00121\ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1varint}{varint<32>}}\ v0(gp0);}
+\DoxyCodeLine{00122\ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1varint}{varint<32>}}\ v1(gp1);}
+\DoxyCodeLine{00123\ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1varint}{varint<32>}}\ v2(gp2);}
+\DoxyCodeLine{00124\ \ \ \ }
+\DoxyCodeLine{00125\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ v0.to()\ ==\ 0\ );}
+\DoxyCodeLine{00126\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ v1.to()\ ==\ 1\ );}
+\DoxyCodeLine{00127\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ v2.to()\ ==\ -\/1\ );}
+\DoxyCodeLine{00128\ \ \ \ \}}
+\DoxyCodeLine{00129\ \ \ \ }
+\DoxyCodeLine{00130\ \ \ \ \{}
+\DoxyCodeLine{00131\ \ \ \ \ std::vector<uint8\_t>\ tv0\ =\ \{0x0\};}
+\DoxyCodeLine{00132\ \ \ \ \ std::vector<uint8\_t>\ tv1\ =\ \{0x1\};}
+\DoxyCodeLine{00133\ \ \ \ \ std::vector<uint8\_t>\ tv2\ =\ \{0x7f\};}
+\DoxyCodeLine{00134\ \ \ \ }
+\DoxyCodeLine{00135\ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1guarded__ptr}{guarded\_ptr<uint8\_t>}}\ gp0(tv0.data(),\ 5);}
+\DoxyCodeLine{00136\ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1guarded__ptr}{guarded\_ptr<uint8\_t>}}\ gp1(tv1.data(),\ 5);}
+\DoxyCodeLine{00137\ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1guarded__ptr}{guarded\_ptr<uint8\_t>}}\ gp2(tv2.data(),\ 5);}
+\DoxyCodeLine{00138\ \ \ \ }
+\DoxyCodeLine{00139\ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1varint}{varint<64>}}\ v0(gp0);}
+\DoxyCodeLine{00140\ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1varint}{varint<64>}}\ v1(gp1);}
+\DoxyCodeLine{00141\ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1varint}{varint<64>}}\ v2(gp2);}
+\DoxyCodeLine{00142\ \ \ \ }
+\DoxyCodeLine{00143\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ v0.to()\ ==\ 0\ );}
+\DoxyCodeLine{00144\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ v1.to()\ ==\ 1\ );}
+\DoxyCodeLine{00145\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ v2.to()\ ==\ -\/1\ );}
+\DoxyCodeLine{00146\ \ \ \ \}}
+\DoxyCodeLine{00147\ \ \ \ }
+\DoxyCodeLine{00148\ \ \ \ \{}
+\DoxyCodeLine{00149\ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1varint}{varint<32>}}\ v0((\mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}})0);}
+\DoxyCodeLine{00150\ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1varint}{varint<32>}}\ v1((\mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}})std::numeric\_limits<int32\_t>::min());}
+\DoxyCodeLine{00151\ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1varint}{varint<32>}}\ v2((\mbox{\hyperlink{stdint_8h_ab1967d8591af1a4e48c37fd2b0f184d0}{int32\_t}})std::numeric\_limits<int32\_t>::max());}
+\DoxyCodeLine{00152\ }
+\DoxyCodeLine{00153\ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1varint}{varint<64>}}\ v3((\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}})0);}
+\DoxyCodeLine{00154\ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1varint}{varint<64>}}\ v4((\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}})std::numeric\_limits<int64\_t>::min());}
+\DoxyCodeLine{00155\ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1varint}{varint<64>}}\ v5((\mbox{\hyperlink{stdint_8h_a414156feea104f8f75b4ed9e3121b2f6}{int64\_t}})std::numeric\_limits<int64\_t>::max());}
+\DoxyCodeLine{00156\ }
+\DoxyCodeLine{00157\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ v0.to()\ ==\ 0\ );}
+\DoxyCodeLine{00158\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ v1.to()\ ==\ std::numeric\_limits<int32\_t>::min()\ );}
+\DoxyCodeLine{00159\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ v2.to()\ ==\ std::numeric\_limits<int32\_t>::max()\ );}
+\DoxyCodeLine{00160\ }
+\DoxyCodeLine{00161\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ v3.to()\ ==\ 0\ );}
+\DoxyCodeLine{00162\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ v4.to()\ ==\ std::numeric\_limits<int64\_t>::min()\ );}
+\DoxyCodeLine{00163\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ v5.to()\ ==\ std::numeric\_limits<int64\_t>::max()\ );}
+\DoxyCodeLine{00164\ \ \ \ \}}
+\DoxyCodeLine{00165\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=294pt]{varint__tests_8cpp_a2878f6846c10420badd4897bdc1639ed_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{varint__tests_8cpp_aadf48e513d13aa68e0ea56d6105ecbda}\index{varint\_tests.cpp@{varint\_tests.cpp}!TEST\_CASE@{TEST\_CASE}}
+\index{TEST\_CASE@{TEST\_CASE}!varint\_tests.cpp@{varint\_tests.cpp}}
+\doxysubsubsection{\texorpdfstring{TEST\_CASE()}{TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{varint__tests_8cpp_aadf48e513d13aa68e0ea56d6105ecbda} 
+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{"{}Testing varuint"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}varuint\+\_\+tests\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{varint__tests_8cpp_source_l00014}{14}} of file \mbox{\hyperlink{varint__tests_8cpp_source}{varint\+\_\+tests.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00014\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\ }
+\DoxyCodeLine{00015\ \ \ \ \{}
+\DoxyCodeLine{00016\ \ \ \ \ std::vector<uint8\_t>\ tv\ =\ \{0\};}
+\DoxyCodeLine{00017\ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1guarded__ptr}{guarded\_ptr<uint8\_t>}}\ gp1\_0(tv.data(),\ 5);}
+\DoxyCodeLine{00018\ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1guarded__ptr}{guarded\_ptr<uint8\_t>}}\ gp7\_0(tv.data(),\ 5);}
+\DoxyCodeLine{00019\ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1guarded__ptr}{guarded\_ptr<uint8\_t>}}\ gp32\_0(tv.data(),\ 5);}
+\DoxyCodeLine{00020\ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1varuint}{varuint<1>}}\ v1(gp1\_0);\ }
+\DoxyCodeLine{00021\ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1varuint}{varuint<7>}}\ v7(gp7\_0);\ }
+\DoxyCodeLine{00022\ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1varuint}{varuint<32>}}\ v32(gp32\_0);\ }
+\DoxyCodeLine{00023\ \ \ \ }
+\DoxyCodeLine{00024\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ v1.to()\ ==\ 0\ );}
+\DoxyCodeLine{00025\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ v7.to()\ ==\ 0\ );}
+\DoxyCodeLine{00026\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ v32.to()\ ==\ 0\ );}
+\DoxyCodeLine{00027\ \ \ \ }
+\DoxyCodeLine{00028\ \ \ \ \ tv[0]\ =\ 1;}
+\DoxyCodeLine{00029\ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1guarded__ptr}{guarded\_ptr<uint8\_t>}}\ gp1\_1(tv.data(),\ 5);}
+\DoxyCodeLine{00030\ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1guarded__ptr}{guarded\_ptr<uint8\_t>}}\ gp7\_1(tv.data(),\ 5);}
+\DoxyCodeLine{00031\ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1guarded__ptr}{guarded\_ptr<uint8\_t>}}\ gp32\_1(tv.data(),\ 5);}
+\DoxyCodeLine{00032\ \ \ \ }
+\DoxyCodeLine{00033\ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1varuint}{varuint<1>}}\ v1\_1(gp1\_1);\ }
+\DoxyCodeLine{00034\ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1varuint}{varuint<7>}}\ v7\_1(gp7\_1);\ }
+\DoxyCodeLine{00035\ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1varuint}{varuint<32>}}\ v32\_1(gp32\_1);\ }
+\DoxyCodeLine{00036\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ v1\_1.to()\ ==\ 1\ );}
+\DoxyCodeLine{00037\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ v7\_1.to()\ ==\ 1\ );}
+\DoxyCodeLine{00038\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ v32\_1.to()\ ==\ 1\ );}
+\DoxyCodeLine{00039\ \ \ \ \}}
+\DoxyCodeLine{00040\ \ \ \ }
+\DoxyCodeLine{00041\ \ \ \ \{}
+\DoxyCodeLine{00042\ \ \ \ \ std::vector<uint8\_t>\ tv\ =\ \{0x7f\};}
+\DoxyCodeLine{00043\ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1guarded__ptr}{guarded\_ptr<uint8\_t>}}\ gp7\_0(tv.data(),\ 5);}
+\DoxyCodeLine{00044\ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1guarded__ptr}{guarded\_ptr<uint8\_t>}}\ gp32\_0(tv.data(),\ 5);}
+\DoxyCodeLine{00045\ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1varuint}{varuint<7>}}\ v7(gp7\_0);\ }
+\DoxyCodeLine{00046\ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1varuint}{varuint<32>}}\ v32(gp32\_0);\ }
+\DoxyCodeLine{00047\ \ \ \ }
+\DoxyCodeLine{00048\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ v7.to()\ ==\ \ 127\ );}
+\DoxyCodeLine{00049\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ v32.to()\ ==\ 127\ );}
+\DoxyCodeLine{00050\ \ \ \ }
+\DoxyCodeLine{00051\ \ \ \ \ tv[0]\ =\ 1;}
+\DoxyCodeLine{00052\ \ \ \ \ std::vector<uint8\_t>\ tv2\ =\ \{0x80,\ 0x7f\};}
+\DoxyCodeLine{00053\ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1guarded__ptr}{guarded\_ptr<uint8\_t>}}\ gp7\_1(tv2.data(),\ 5);}
+\DoxyCodeLine{00054\ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1guarded__ptr}{guarded\_ptr<uint8\_t>}}\ gp32\_1(tv2.data(),\ 5);}
+\DoxyCodeLine{00055\ }
+\DoxyCodeLine{00056\ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1varuint}{varuint<32>}}\ v32\_1(gp32\_1);\ }
+\DoxyCodeLine{00057\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ v32\_1.to()\ ==\ 16256\ );}
+\DoxyCodeLine{00058\ \ \ \ \}}
+\DoxyCodeLine{00059\ \ \ \ }
+\DoxyCodeLine{00060\ \ \ \ \{}
+\DoxyCodeLine{00061\ \ \ \ \ std::vector<uint8\_t>\ tv0\ =\ \{0xb4,\ 0x7\};}
+\DoxyCodeLine{00062\ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1guarded__ptr}{guarded\_ptr<uint8\_t>}}\ gp32\_0(tv0.data(),\ 5);}
+\DoxyCodeLine{00063\ \ \ \ }
+\DoxyCodeLine{00064\ \ \ \ \ std::vector<uint8\_t>\ tv1\ =\ \{0x8c,\ 0x8\};}
+\DoxyCodeLine{00065\ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1guarded__ptr}{guarded\_ptr<uint8\_t>}}\ gp32\_1(tv1.data(),\ 5);}
+\DoxyCodeLine{00066\ \ \ \ }
+\DoxyCodeLine{00067\ \ \ \ \ std::vector<uint8\_t>\ tv2\ =\ \{0xff,\ 0xff,\ 0xff,\ 0xff,\ 0xf\};}
+\DoxyCodeLine{00068\ \ \ \ \ \mbox{\hyperlink{structsysio_1_1vm_1_1guarded__ptr}{guarded\_ptr<uint8\_t>}}\ gp32\_2(tv2.data(),\ 5);}
+\DoxyCodeLine{00069\ \ \ \ }
+\DoxyCodeLine{00070\ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1varuint}{varuint<32>}}\ v32\_0(gp32\_0);\ }
+\DoxyCodeLine{00071\ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1varuint}{varuint<32>}}\ v32\_1(gp32\_1);\ }
+\DoxyCodeLine{00072\ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1varuint}{varuint<32>}}\ v32\_2(gp32\_2);\ }
+\DoxyCodeLine{00073\ \ \ \ }
+\DoxyCodeLine{00074\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ v32\_0.to()\ ==\ 0x3b4\ );}
+\DoxyCodeLine{00075\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ v32\_1.to()\ ==\ 0x40c\ );}
+\DoxyCodeLine{00076\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ v32\_2.to()\ ==\ 0xffffffff\ );}
+\DoxyCodeLine{00077\ \ \ \ \}}
+\DoxyCodeLine{00078\ }
+\DoxyCodeLine{00079\ \ \ \ \{}
+\DoxyCodeLine{00080\ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1varuint}{varuint<32>}}\ v0((\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})0);}
+\DoxyCodeLine{00081\ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1varuint}{varuint<32>}}\ v1((\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})2147483647);}
+\DoxyCodeLine{00082\ \ \ \ \ \mbox{\hyperlink{classsysio_1_1vm_1_1varuint}{varuint<32>}}\ v2((\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}})4294967295);}
+\DoxyCodeLine{00083\ }
+\DoxyCodeLine{00084\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ v0.to()\ ==\ 0\ );}
+\DoxyCodeLine{00085\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ v1.to()\ ==\ 2147483647\ );}
+\DoxyCodeLine{00086\ \ \ \ \ \mbox{\hyperlink{fc_2secp256k1_2secp256k1_2src_2util_8h_aba1590ff86288c886c47dc8a27b30467}{CHECK}}(\ v2.to()\ ==\ 4294967295\ );}
+\DoxyCodeLine{00087\ \ \ \ \}}
+\DoxyCodeLine{00088\ }
+\DoxyCodeLine{00089\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=299pt]{varint__tests_8cpp_aadf48e513d13aa68e0ea56d6105ecbda_cgraph}
+\end{center}
+\end{figure}

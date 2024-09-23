@@ -1,0 +1,95 @@
+\doxysection{testing\+::internal\+::Bound\+Second\+Matcher\texorpdfstring{$<$}{<} Tuple2\+Matcher, Second \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classtesting_1_1internal_1_1_bound_second_matcher}{}\label{classtesting_1_1internal_1_1_bound_second_matcher}\index{testing::internal::BoundSecondMatcher$<$ Tuple2Matcher, Second $>$@{testing::internal::BoundSecondMatcher$<$ Tuple2Matcher, Second $>$}}
+
+
+{\ttfamily \#include $<$gmock-\/matchers.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classtesting_1_1internal_1_1_bound_second_matcher_af9d0d4b50a3b9883ff26312922b9f639}{Bound\+Second\+Matcher}} (const Tuple2\+Matcher \&tm, const Second \&second)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{classtesting_1_1internal_1_1_bound_second_matcher_abc5264ca86c2440b663036dcfb5403de}{operator Matcher$<$ T $>$}} () const
+\item 
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_bound_second_matcher_a62f714cb2c7388cb582aaae0110bfe49}{operator=}} (const \mbox{\hyperlink{classtesting_1_1internal_1_1_bound_second_matcher}{Bound\+Second\+Matcher}} \&)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Tuple2\+Matcher, typename Second$>$\newline
+class testing\+::internal\+::\+Bound\+Second\+Matcher$<$ Tuple2\+Matcher, Second $>$}
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l03925}{3925}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_bound_second_matcher_af9d0d4b50a3b9883ff26312922b9f639}\index{testing::internal::BoundSecondMatcher$<$ Tuple2Matcher, Second $>$@{testing::internal::BoundSecondMatcher$<$ Tuple2Matcher, Second $>$}!BoundSecondMatcher@{BoundSecondMatcher}}
+\index{BoundSecondMatcher@{BoundSecondMatcher}!testing::internal::BoundSecondMatcher$<$ Tuple2Matcher, Second $>$@{testing::internal::BoundSecondMatcher$<$ Tuple2Matcher, Second $>$}}
+\doxysubsubsection{\texorpdfstring{BoundSecondMatcher()}{BoundSecondMatcher()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_bound_second_matcher_af9d0d4b50a3b9883ff26312922b9f639} 
+template$<$typename Tuple2\+Matcher , typename Second $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_bound_second_matcher}{testing\+::internal\+::\+Bound\+Second\+Matcher}}$<$ Tuple2\+Matcher, Second $>$\+::\+Bound\+Second\+Matcher (\begin{DoxyParamCaption}\item[{const Tuple2\+Matcher \&}]{tm}{, }\item[{const Second \&}]{second}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l03927}{3927}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03928\ \ \ \ \ \ \ :\ tuple2\_matcher\_(tm),\ second\_value\_(second)\ \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1_bound_second_matcher_abc5264ca86c2440b663036dcfb5403de}\index{testing::internal::BoundSecondMatcher$<$ Tuple2Matcher, Second $>$@{testing::internal::BoundSecondMatcher$<$ Tuple2Matcher, Second $>$}!operator Matcher$<$ T $>$@{operator Matcher$<$ T $>$}}
+\index{operator Matcher$<$ T $>$@{operator Matcher$<$ T $>$}!testing::internal::BoundSecondMatcher$<$ Tuple2Matcher, Second $>$@{testing::internal::BoundSecondMatcher$<$ Tuple2Matcher, Second $>$}}
+\doxysubsubsection{\texorpdfstring{operator Matcher$<$ T $>$()}{operator Matcher< T >()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_bound_second_matcher_abc5264ca86c2440b663036dcfb5403de} 
+template$<$typename Tuple2\+Matcher , typename Second $>$ \\
+template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ \\
+\mbox{\hyperlink{classtesting_1_1internal_1_1_bound_second_matcher}{testing\+::internal\+::\+Bound\+Second\+Matcher}}$<$ Tuple2\+Matcher, Second $>$\+::operator \mbox{\hyperlink{classtesting_1_1_matcher}{Matcher}}$<$ \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l03931}{3931}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03931\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{03932\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespacetesting_aca6c4c4fdf7fb7257ea4fc76971cb82c}{MakeMatcher}}(\textcolor{keyword}{new}\ Impl<T>(tuple2\_matcher\_,\ second\_value\_));}
+\DoxyCodeLine{03933\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=345pt]{classtesting_1_1internal_1_1_bound_second_matcher_abc5264ca86c2440b663036dcfb5403de_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1_bound_second_matcher_a62f714cb2c7388cb582aaae0110bfe49}\index{testing::internal::BoundSecondMatcher$<$ Tuple2Matcher, Second $>$@{testing::internal::BoundSecondMatcher$<$ Tuple2Matcher, Second $>$}!operator=@{operator=}}
+\index{operator=@{operator=}!testing::internal::BoundSecondMatcher$<$ Tuple2Matcher, Second $>$@{testing::internal::BoundSecondMatcher$<$ Tuple2Matcher, Second $>$}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1_bound_second_matcher_a62f714cb2c7388cb582aaae0110bfe49} 
+template$<$typename Tuple2\+Matcher , typename Second $>$ \\
+void \mbox{\hyperlink{classtesting_1_1internal_1_1_bound_second_matcher}{testing\+::internal\+::\+Bound\+Second\+Matcher}}$<$ Tuple2\+Matcher, Second $>$\+::operator= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classtesting_1_1internal_1_1_bound_second_matcher}{Bound\+Second\+Matcher}}$<$ Tuple2\+Matcher, Second $>$ \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gmock-matchers_8h_source_l03943}{3943}} of file \mbox{\hyperlink{gmock-matchers_8h_source}{gmock-\/matchers.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{03943\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{03944\ \ \ \ \ \mbox{\hyperlink{gtest-port_8h_a8ef4cb4c465db8c15464aecc6d9510ef}{GTEST\_LOG\_}}(FATAL)\ <<\ \textcolor{stringliteral}{"{}BoundSecondMatcher\ should\ never\ be\ assigned."{}};}
+\DoxyCodeLine{03945\ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googlemock/include/gmock/\mbox{\hyperlink{gmock-matchers_8h}{gmock-\/matchers.\+h}}\end{DoxyCompactItemize}

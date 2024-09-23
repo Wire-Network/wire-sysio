@@ -1,0 +1,57 @@
+\doxysection{yield.\+hpp}
+\hypertarget{yield_8hpp_source}{}\label{yield_8hpp_source}\index{libraries/fc/src/thread/asio/yield.hpp@{libraries/fc/src/thread/asio/yield.hpp}}
+\mbox{\hyperlink{yield_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{yield_8hpp_source_l00001}00001\ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ Copyright\ 2003-\/2013\ Christopher\ M.\ Kohlhoff}}
+\DoxyCodeLine{\Hypertarget{yield_8hpp_source_l00002}00002\ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ Copyright\ Oliver\ Kowalke,\ Nat\ Goodspeed\ 2015.}}
+\DoxyCodeLine{\Hypertarget{yield_8hpp_source_l00003}00003\ \textcolor{comment}{//\ Distributed\ under\ the\ Boost\ Software\ License,\ Version\ 1.0.}}
+\DoxyCodeLine{\Hypertarget{yield_8hpp_source_l00004}00004\ \textcolor{comment}{//\ \ \ \ (See\ accompanying\ file\ LICENSE\_1\_0.txt\ or\ copy\ at}}
+\DoxyCodeLine{\Hypertarget{yield_8hpp_source_l00005}00005\ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ http://www.boost.org/LICENSE\_1\_0.txt)}}
+\DoxyCodeLine{\Hypertarget{yield_8hpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{yield_8hpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{yield_8hpp_source_l00008}00008\ \textcolor{preprocessor}{\#ifndef\ BOOST\_FIBERS\_ASIO\_YIELD\_HPP}}
+\DoxyCodeLine{\Hypertarget{yield_8hpp_source_l00009}00009\ \textcolor{preprocessor}{\#define\ BOOST\_FIBERS\_ASIO\_YIELD\_HPP}}
+\DoxyCodeLine{\Hypertarget{yield_8hpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{yield_8hpp_source_l00011}00011\ \textcolor{preprocessor}{\#include\ <boost/config.hpp>}}
+\DoxyCodeLine{\Hypertarget{yield_8hpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{yield_8hpp_source_l00013}00013\ \textcolor{preprocessor}{\#ifdef\ BOOST\_HAS\_ABI\_HEADERS}}
+\DoxyCodeLine{\Hypertarget{yield_8hpp_source_l00014}00014\ \textcolor{preprocessor}{\#\ \ include\ BOOST\_ABI\_PREFIX}}
+\DoxyCodeLine{\Hypertarget{yield_8hpp_source_l00015}00015\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{yield_8hpp_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{yield_8hpp_source_l00017}00017\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceboost}{boost}}\ \{}
+\DoxyCodeLine{\Hypertarget{yield_8hpp_source_l00018}00018\ \textcolor{keyword}{namespace\ }fibers\ \{}
+\DoxyCodeLine{\Hypertarget{yield_8hpp_source_l00019}00019\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacewebsocketpp_1_1lib_1_1asio}{asio}}\ \{}
+\DoxyCodeLine{\Hypertarget{yield_8hpp_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{yield_8hpp_source_l00021}00021\ \textcolor{comment}{//[fibers\_asio\_yield\_t}}
+\DoxyCodeLine{\Hypertarget{yield_8hpp_source_l00022}\mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1yield__t}{00022}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1yield__t}{yield\_t}}\ \{}
+\DoxyCodeLine{\Hypertarget{yield_8hpp_source_l00023}00023\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{yield_8hpp_source_l00024}\mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1yield__t_a7e6087ec984afa58b77416ccb4d139bb}{00024}}\ \ \ \ \ \mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1yield__t_a7e6087ec984afa58b77416ccb4d139bb}{yield\_t}}()\ =\ \textcolor{keywordflow}{default};}
+\DoxyCodeLine{\Hypertarget{yield_8hpp_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{yield_8hpp_source_l00038}\mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1yield__t_ad4a1463b1c817b2d8ebe9658d09be002}{00038}}\ \ \ \ \ \mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1yield__t}{yield\_t}}\ \mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1yield__t_ad4a1463b1c817b2d8ebe9658d09be002}{operator[]}}(\ boost::system::error\_code\ \&\ ec)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{yield_8hpp_source_l00039}00039\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1yield__t}{yield\_t}}\ tmp;}
+\DoxyCodeLine{\Hypertarget{yield_8hpp_source_l00040}00040\ \ \ \ \ \ \ \ \ tmp.\mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1yield__t_a4908b45c6c123136bfbc1093ba963a0b}{ec\_}}\ =\ \&\ ec;}
+\DoxyCodeLine{\Hypertarget{yield_8hpp_source_l00041}00041\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ tmp;}
+\DoxyCodeLine{\Hypertarget{yield_8hpp_source_l00042}00042\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{yield_8hpp_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{yield_8hpp_source_l00044}00044\ \textcolor{comment}{//private:}}
+\DoxyCodeLine{\Hypertarget{yield_8hpp_source_l00045}00045\ \ \ \ \ \textcolor{comment}{//\ ptr\ to\ bound\ error\_code\ instance\ if\ any}}
+\DoxyCodeLine{\Hypertarget{yield_8hpp_source_l00046}\mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1yield__t_a4908b45c6c123136bfbc1093ba963a0b}{00046}}\ \ \ \ \ boost::system::error\_code\ \ \ *\ \ \ \mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1yield__t_a4908b45c6c123136bfbc1093ba963a0b}{ec\_}}\{\ \textcolor{keyword}{nullptr}\ \};}
+\DoxyCodeLine{\Hypertarget{yield_8hpp_source_l00047}00047\ \};}
+\DoxyCodeLine{\Hypertarget{yield_8hpp_source_l00048}00048\ \textcolor{comment}{//]}}
+\DoxyCodeLine{\Hypertarget{yield_8hpp_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{yield_8hpp_source_l00050}00050\ \textcolor{comment}{//[fibers\_asio\_yield}}
+\DoxyCodeLine{\Hypertarget{yield_8hpp_source_l00051}00051\ \textcolor{comment}{//\ canonical\ instance}}
+\DoxyCodeLine{\Hypertarget{yield_8hpp_source_l00052}\mbox{\hyperlink{namespaceboost_1_1fibers_1_1asio_a65142b77539b20ba6d2abb35a0d4f5d2}{00052}}\ \textcolor{keyword}{thread\_local}\ \mbox{\hyperlink{classboost_1_1fibers_1_1asio_1_1yield__t}{yield\_t}}\ \mbox{\hyperlink{namespaceboost_1_1fibers_1_1asio_a65142b77539b20ba6d2abb35a0d4f5d2}{yield}}\{\};}
+\DoxyCodeLine{\Hypertarget{yield_8hpp_source_l00053}00053\ \textcolor{comment}{//]}}
+\DoxyCodeLine{\Hypertarget{yield_8hpp_source_l00054}00054\ }
+\DoxyCodeLine{\Hypertarget{yield_8hpp_source_l00055}00055\ \}\}\}}
+\DoxyCodeLine{\Hypertarget{yield_8hpp_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{yield_8hpp_source_l00057}00057\ \textcolor{preprocessor}{\#ifdef\ BOOST\_HAS\_ABI\_HEADERS}}
+\DoxyCodeLine{\Hypertarget{yield_8hpp_source_l00058}00058\ \textcolor{preprocessor}{\#\ \ include\ BOOST\_ABI\_SUFFIX}}
+\DoxyCodeLine{\Hypertarget{yield_8hpp_source_l00059}00059\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{yield_8hpp_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{yield_8hpp_source_l00061}00061\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{detail_2yield_8hpp}{detail/yield.hpp}}"{}}}
+\DoxyCodeLine{\Hypertarget{yield_8hpp_source_l00062}00062\ }
+\DoxyCodeLine{\Hypertarget{yield_8hpp_source_l00063}00063\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ BOOST\_FIBERS\_ASIO\_YIELD\_HPP}}
+
+\end{DoxyCode}

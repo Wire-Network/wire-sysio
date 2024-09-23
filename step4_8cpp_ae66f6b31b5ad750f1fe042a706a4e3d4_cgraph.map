@@ -1,0 +1,30 @@
+<map id="main" name="main">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,177,55,202"/>
+<area shape="rect" id="Node000002" href="$classwebsocket__endpoint.html#a5850523b829e145793d42e137d5eb8c0" title=" " alt="" coords="103,136,243,177"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="54,181,87,174,88,179,56,187"/>
+<area shape="rect" id="Node000013" href="$classwebsocket__endpoint.html#a5896c27213953d2d33b88e117b1971f6" title=" " alt="" coords="103,201,243,242"/>
+<area shape="poly" id="edge15_Node000001_Node000013" title=" " alt="" coords="56,192,88,200,87,205,55,198"/>
+<area shape="rect" id="Node000003" href="$classwebsocketpp_1_1client.html#a818c30343180123bf1fee6dc21524bae" title="Begin the connection process for the given connection." alt="" coords="295,5,432,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="194,133,237,96,290,57,298,51,301,56,292,61,240,100,197,137"/>
+<area shape="rect" id="Node000004" href="$classwebsocketpp_1_1client.html#aa95cec974921e32bc37a61c683ae240d" title="Get a new connection." alt="" coords="295,71,432,111"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="233,133,287,114,289,119,235,138"/>
+<area shape="rect" id="Node000008" href="$classconnection__metadata.html#ac297cf7710d8d510ef383b7395222ce5" title=" " alt="" coords="291,267,436,307"/>
+<area shape="poly" id="edge7_Node000002_Node000008" title=" " alt="" coords="226,175,245,188,260,204,269,220,278,236,293,252,299,256,296,260,289,256,274,239,265,223,256,208,241,192,223,180"/>
+<area shape="rect" id="Node000011" href="$classconnection__metadata.html#a1c2e652001b8306207beafe17b1a52ed" title=" " alt="" coords="291,136,436,177"/>
+<area shape="poly" id="edge11_Node000002_Node000011" title=" " alt="" coords="243,154,276,154,276,159,243,159"/>
+<area shape="rect" id="Node000012" href="$classconnection__metadata.html#ab10d997bd75d9e98b235b7e97b84b85a" title=" " alt="" coords="291,201,436,242"/>
+<area shape="poly" id="edge13_Node000002_Node000012" title=" " alt="" coords="235,175,289,193,287,198,233,180"/>
+<area shape="rect" id="Node000005" href="$classwebsocketpp_1_1endpoint.html#abfbee4cb244700560ef80594a913cd95" title=" " alt="" coords="484,71,640,111"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="433,88,469,88,469,94,433,94"/>
+<area shape="rect" id="Node000006" href="$namespacewebsocketpp_1_1error.html#a3344622df8c36e8ae03c59164e7b5e89" title=" " alt="" coords="688,165,820,206"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="433,107,485,120,673,165,672,170,484,126,432,112"/>
+<area shape="rect" id="Node000007" href="$namespacewebsocketpp_1_1error.html#ac1acac2bfb24bbd2b1791db80993b0c2" title=" " alt="" coords="868,165,1000,206"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="820,183,853,183,853,188,820,188"/>
+<area shape="rect" id="Node000009" href="$classwebsocketpp_1_1endpoint.html#a0fe4457427d4124abe7ca022ba7afbb4" title="Retrieves a connection_ptr from a connection_hdl (exception free)" alt="" coords="484,197,640,238"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="423,263,487,241,488,246,425,269"/>
+<area shape="rect" id="Node000010" href="$namespacewebsocketpp_1_1close_1_1status.html#a4bf4987c79165b134ed1207a567ce209" title="Return a human readable interpretation of a WebSocket close code." alt="" coords="493,267,631,307"/>
+<area shape="poly" id="edge10_Node000008_Node000010" title=" " alt="" coords="437,284,478,284,478,290,437,290"/>
+<area shape="poly" id="edge9_Node000009_Node000006" title=" " alt="" coords="640,202,672,197,673,202,641,207"/>
+<area shape="poly" id="edge12_Node000011_Node000009" title=" " alt="" coords="433,175,481,190,479,195,431,180"/>
+<area shape="poly" id="edge14_Node000012_Node000009" title=" " alt="" coords="437,218,469,217,469,222,437,223"/>
+</map>

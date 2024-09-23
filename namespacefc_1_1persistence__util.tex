@@ -1,0 +1,186 @@
+\doxysection{fc\+::persistence\+\_\+util Namespace Reference}
+\hypertarget{namespacefc_1_1persistence__util}{}\label{namespacefc_1_1persistence__util}\index{fc::persistence\_util@{fc::persistence\_util}}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1cfile}{cfile}} \mbox{\hyperlink{namespacefc_1_1persistence__util_ae4c6e4c1f79832e4471d9c01057bdc8c}{open\+\_\+cfile\+\_\+for\+\_\+read}} (const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&dir, const std\+::string \&filename)
+\item 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} \mbox{\hyperlink{namespacefc_1_1persistence__util_abe5388b79b2e70ad07e183f45bf76901}{read\+\_\+persistence\+\_\+header}} (\mbox{\hyperlink{classfc_1_1cfile}{cfile}} \&dat\+\_\+content, const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} magic\+\_\+number, const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} min\+\_\+supported\+\_\+version, const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} max\+\_\+supported\+\_\+version)
+\item 
+\mbox{\hyperlink{classfc_1_1cfile}{cfile}} \mbox{\hyperlink{namespacefc_1_1persistence__util_a794e9ae3b32ccdc322b436cf97ea0b9e}{open\+\_\+cfile\+\_\+for\+\_\+write}} (const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&dir, const std\+::string \&filename)
+\item 
+void \mbox{\hyperlink{namespacefc_1_1persistence__util_a979e339f3c85c4e3a0ca7fdffd526dc8}{write\+\_\+persistence\+\_\+header}} (\mbox{\hyperlink{classfc_1_1cfile}{cfile}} \&dat\+\_\+content, const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} magic\+\_\+number, const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} current\+\_\+version)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+This namespace provides functions related to reading and writing a persistence file with a header delineating the type of file and version. 
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacefc_1_1persistence__util_ae4c6e4c1f79832e4471d9c01057bdc8c}\index{fc::persistence\_util@{fc::persistence\_util}!open\_cfile\_for\_read@{open\_cfile\_for\_read}}
+\index{open\_cfile\_for\_read@{open\_cfile\_for\_read}!fc::persistence\_util@{fc::persistence\_util}}
+\doxysubsubsection{\texorpdfstring{open\_cfile\_for\_read()}{open\_cfile\_for\_read()}}
+{\footnotesize\ttfamily \label{namespacefc_1_1persistence__util_ae4c6e4c1f79832e4471d9c01057bdc8c} 
+\mbox{\hyperlink{classfc_1_1cfile}{cfile}} fc\+::persistence\+\_\+util\+::open\+\_\+cfile\+\_\+for\+\_\+read (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&}]{dir}{, }\item[{const std\+::string \&}]{filename}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{persistence__util_8hpp_source_l00014}{14}} of file \mbox{\hyperlink{persistence__util_8hpp_source}{persistence\+\_\+util.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00014\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{namespacefc_ab123bfeadf918cc293ecad88bca7c499}{fc::is\_directory}}(dir))}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a76b0787468a9f403087b71a894c07ce2}{fc::create\_directories}}(dir);}
+\DoxyCodeLine{00017\ \ \ \ \ \ \ }
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ dat\_file\ =\ dir\ /\ filename;}
+\DoxyCodeLine{00019\ }
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1cfile}{cfile}}\ dat\_content;}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ dat\_content.\mbox{\hyperlink{classfc_1_1cfile_ac4a0191d7846c07a907d3c7eb35e848d}{set\_file\_path}}(dat\_file);}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{namespacefc_a3fcf0d920aea28014aacae50a51d8485}{fc::exists}}(\ dat\_file\ )\ )\ \{}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \ dat\_content.\mbox{\hyperlink{classfc_1_1cfile_a9e01adaeee108420312ed271133a2d7d}{open}}(cfile::create\_or\_update\_rw\_mode);}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ dat\_content;}
+\DoxyCodeLine{00026\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacefc_1_1persistence__util_ae4c6e4c1f79832e4471d9c01057bdc8c_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacefc_1_1persistence__util_ae4c6e4c1f79832e4471d9c01057bdc8c_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacefc_1_1persistence__util_a794e9ae3b32ccdc322b436cf97ea0b9e}\index{fc::persistence\_util@{fc::persistence\_util}!open\_cfile\_for\_write@{open\_cfile\_for\_write}}
+\index{open\_cfile\_for\_write@{open\_cfile\_for\_write}!fc::persistence\_util@{fc::persistence\_util}}
+\doxysubsubsection{\texorpdfstring{open\_cfile\_for\_write()}{open\_cfile\_for\_write()}}
+{\footnotesize\ttfamily \label{namespacefc_1_1persistence__util_a794e9ae3b32ccdc322b436cf97ea0b9e} 
+\mbox{\hyperlink{classfc_1_1cfile}{cfile}} fc\+::persistence\+\_\+util\+::open\+\_\+cfile\+\_\+for\+\_\+write (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1path}{fc\+::path}} \&}]{dir}{, }\item[{const std\+::string \&}]{filename}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{persistence__util_8hpp_source_l00058}{58}} of file \mbox{\hyperlink{persistence__util_8hpp_source}{persistence\+\_\+util.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{namespacefc_ab123bfeadf918cc293ecad88bca7c499}{fc::is\_directory}}(dir))}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_a76b0787468a9f403087b71a894c07ce2}{fc::create\_directories}}(dir);}
+\DoxyCodeLine{00061\ }
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ dat\_file\ =\ dir\ /\ filename;}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1cfile}{cfile}}\ dat\_content;}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ dat\_content.\mbox{\hyperlink{classfc_1_1cfile_ac4a0191d7846c07a907d3c7eb35e848d}{set\_file\_path}}(dat\_file.generic\_string().c\_str());}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ dat\_content.\mbox{\hyperlink{classfc_1_1cfile_a9e01adaeee108420312ed271133a2d7d}{open}}(\ cfile::truncate\_rw\_mode\ );}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ dat\_content;}
+\DoxyCodeLine{00067\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacefc_1_1persistence__util_a794e9ae3b32ccdc322b436cf97ea0b9e_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacefc_1_1persistence__util_a794e9ae3b32ccdc322b436cf97ea0b9e_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacefc_1_1persistence__util_abe5388b79b2e70ad07e183f45bf76901}\index{fc::persistence\_util@{fc::persistence\_util}!read\_persistence\_header@{read\_persistence\_header}}
+\index{read\_persistence\_header@{read\_persistence\_header}!fc::persistence\_util@{fc::persistence\_util}}
+\doxysubsubsection{\texorpdfstring{read\_persistence\_header()}{read\_persistence\_header()}}
+{\footnotesize\ttfamily \label{namespacefc_1_1persistence__util_abe5388b79b2e70ad07e183f45bf76901} 
+\mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}} fc\+::persistence\+\_\+util\+::read\+\_\+persistence\+\_\+header (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1cfile}{cfile}} \&}]{dat\+\_\+content}{, }\item[{const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{magic\+\_\+number}{, }\item[{const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{min\+\_\+supported\+\_\+version}{, }\item[{const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{max\+\_\+supported\+\_\+version}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{persistence__util_8hpp_source_l00028}{28}} of file \mbox{\hyperlink{persistence__util_8hpp_source}{persistence\+\_\+util.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ dat\_content.\mbox{\hyperlink{classfc_1_1cfile_a6eb4fe4530480f13c6cf773a7f1e3847}{seek}}(0);\ \textcolor{comment}{//\ needed\ on\ mac}}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ ds\ =\ dat\_content.\mbox{\hyperlink{classfc_1_1cfile_a801dd3c493741ff16ef5cf609cc5f9c5}{create\_datastream}}();}
+\DoxyCodeLine{00032\ }
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \textcolor{comment}{//\ validate\ totem}}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ totem\ =\ 0;}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a0b442d98ceb22dd5a6ae84745e43ffab}{fc::raw::unpack}}(\ ds,\ totem\ );}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ totem\ !=\ magic\_number)\ \{}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(fc::parse\_error\_exception,}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}File\ has\ unexpected\ magic\ number:\ \$\{actual\_totem\}.\ Expected\ \$\{expected\_totem\}"{}},}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}actual\_totem"{}},\ totem)}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}expected\_totem"{}},\ magic\_number));}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00042\ }
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \textcolor{comment}{//\ validate\ version}}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ version\ =\ 0;}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \mbox{\hyperlink{namespacefc_1_1raw_a0b442d98ceb22dd5a6ae84745e43ffab}{fc::raw::unpack}}(\ ds,\ version\ );}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ version\ <\ min\_supported\_version\ ||\ version\ >\ max\_supported\_version)\ \{}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8hpp_a7590ddac4f181b661c3eeaf5feccc6ac}{FC\_THROW\_EXCEPTION}}(fc::parse\_error\_exception,}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Unsupported\ version\ for\ file.\ "{}}}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Version\ is\ \$\{version\}\ while\ code\ supports\ version(s)\ [\$\{min\},\$\{max\}]"{}},}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}version"{}},\ version)}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}min"{}},\ min\_supported\_version)}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{stringliteral}{"{}max"{}},\ max\_supported\_version));}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00054\ }
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ version;}
+\DoxyCodeLine{00056\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacefc_1_1persistence__util_abe5388b79b2e70ad07e183f45bf76901_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacefc_1_1persistence__util_abe5388b79b2e70ad07e183f45bf76901_icgraph}
+\end{center}
+\end{figure}
+\Hypertarget{namespacefc_1_1persistence__util_a979e339f3c85c4e3a0ca7fdffd526dc8}\index{fc::persistence\_util@{fc::persistence\_util}!write\_persistence\_header@{write\_persistence\_header}}
+\index{write\_persistence\_header@{write\_persistence\_header}!fc::persistence\_util@{fc::persistence\_util}}
+\doxysubsubsection{\texorpdfstring{write\_persistence\_header()}{write\_persistence\_header()}}
+{\footnotesize\ttfamily \label{namespacefc_1_1persistence__util_a979e339f3c85c4e3a0ca7fdffd526dc8} 
+void fc\+::persistence\+\_\+util\+::write\+\_\+persistence\+\_\+header (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classfc_1_1cfile}{cfile}} \&}]{dat\+\_\+content}{, }\item[{const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{magic\+\_\+number}{, }\item[{const \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\+\_\+t}}}]{current\+\_\+version}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{persistence__util_8hpp_source_l00069}{69}} of file \mbox{\hyperlink{persistence__util_8hpp_source}{persistence\+\_\+util.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ dat\_content.\mbox{\hyperlink{classfc_1_1cfile_af6ad44b8179f355db75a9d01de931235}{write}}(\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(\&magic\_number),\ \textcolor{keyword}{sizeof}(magic\_number)\ );}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ dat\_content.\mbox{\hyperlink{classfc_1_1cfile_af6ad44b8179f355db75a9d01de931235}{write}}(\ \textcolor{keyword}{reinterpret\_cast<}\textcolor{keyword}{const\ }\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(\&current\_version),\ \textcolor{keyword}{sizeof}(current\_version)\ );}
+\DoxyCodeLine{00072\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacefc_1_1persistence__util_a979e339f3c85c4e3a0ca7fdffd526dc8_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacefc_1_1persistence__util_a979e339f3c85c4e3a0ca7fdffd526dc8_icgraph}
+\end{center}
+\end{figure}

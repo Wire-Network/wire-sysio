@@ -1,0 +1,10 @@
+<map id="sysio::chain::variant_snapshot_reader::validate" name="sysio::chain::variant_snapshot_reader::validate">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,39,183,80"/>
+<area shape="rect" id="Node000002" href="$classfc_1_1variant__object.html#ae4ed31b7cb6bc6e1d2873f9121049589" title=" " alt="" coords="231,39,352,80"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="183,57,215,57,215,62,183,62"/>
+<area shape="rect" id="Node000003" href="$classfc_1_1variant__object.html#a804706455398e249f6272b3ff19cef5d" title=" " alt="" coords="400,5,550,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="352,43,399,32,400,38,353,48"/>
+<area shape="rect" id="Node000004" href="$classfc_1_1variant__object.html#acfef67913fd3c24ea8017b3a5ad49144" title=" " alt="" coords="414,79,536,120"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="353,70,400,80,399,86,352,75"/>
+<area shape="poly" id="edge4_Node000004_Node000004" title=" " alt="" coords="440,79,438,69,444,60,456,55,475,53,495,55,507,61,505,66,494,60,475,58,458,60,447,64,444,70,445,78"/>
+</map>

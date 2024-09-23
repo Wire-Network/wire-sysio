@@ -1,0 +1,205 @@
+\doxysection{sample5\+\_\+unittest.\+cc}
+\hypertarget{sample5__unittest_8cc_source}{}\label{sample5__unittest_8cc_source}\index{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/samples/sample5\_unittest.cc@{libraries/fc/include/fc/crypto/webauthn\_json/thirdparty/gtest/googletest/samples/sample5\_unittest.cc}}
+\mbox{\hyperlink{sample5__unittest_8cc}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00001}00001\ \textcolor{comment}{//\ Copyright\ 2005,\ Google\ Inc.}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00002}00002\ \textcolor{comment}{//\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00003}00003\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00004}00004\ \textcolor{comment}{//\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00005}00005\ \textcolor{comment}{//\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00006}00006\ \textcolor{comment}{//\ met:}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00007}00007\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00008}00008\ \textcolor{comment}{//\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00009}00009\ \textcolor{comment}{//\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00010}00010\ \textcolor{comment}{//\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00011}00011\ \textcolor{comment}{//\ copyright\ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00012}00012\ \textcolor{comment}{//\ in\ the\ documentation\ and/or\ other\ materials\ provided\ with\ the}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00013}00013\ \textcolor{comment}{//\ distribution.}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00014}00014\ \textcolor{comment}{//\ \ \ \ \ *\ Neither\ the\ name\ of\ Google\ Inc.\ nor\ the\ names\ of\ its}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00015}00015\ \textcolor{comment}{//\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products\ derived\ from}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00016}00016\ \textcolor{comment}{//\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00017}00017\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00018}00018\ \textcolor{comment}{//\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00019}00019\ \textcolor{comment}{//\ "{}AS\ IS"{}\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00020}00020\ \textcolor{comment}{//\ LIMITED\ TO,\ THE\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00021}00021\ \textcolor{comment}{//\ A\ PARTICULAR\ PURPOSE\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ THE\ COPYRIGHT}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00022}00022\ \textcolor{comment}{//\ OWNER\ OR\ CONTRIBUTORS\ BE\ LIABLE\ FOR\ ANY\ DIRECT,\ INDIRECT,\ INCIDENTAL,}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00023}00023\ \textcolor{comment}{//\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES\ (INCLUDING,\ BUT\ NOT}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00024}00024\ \textcolor{comment}{//\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;\ LOSS\ OF\ USE,}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00025}00025\ \textcolor{comment}{//\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND\ ON\ ANY}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00026}00026\ \textcolor{comment}{//\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00027}00027\ \textcolor{comment}{//\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00028}00028\ \textcolor{comment}{//\ OF\ THIS\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00029}00029\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00030}00030\ \textcolor{comment}{//\ Author:\ wan@google.com\ (Zhanyong\ Wan)}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00032}00032\ \textcolor{comment}{//\ This\ sample\ teaches\ how\ to\ reuse\ a\ test\ fixture\ in\ multiple\ test}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00033}00033\ \textcolor{comment}{//\ cases\ by\ deriving\ sub-\/fixtures\ from\ it.}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00034}00034\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00035}00035\ \textcolor{comment}{//\ When\ you\ define\ a\ test\ fixture,\ you\ specify\ the\ name\ of\ the\ test}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00036}00036\ \textcolor{comment}{//\ case\ that\ will\ use\ this\ fixture.\ \ Therefore,\ a\ test\ fixture\ can}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00037}00037\ \textcolor{comment}{//\ be\ used\ by\ only\ one\ test\ case.}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00038}00038\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00039}00039\ \textcolor{comment}{//\ Sometimes,\ more\ than\ one\ test\ cases\ may\ want\ to\ use\ the\ same\ or}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00040}00040\ \textcolor{comment}{//\ slightly\ different\ test\ fixtures.\ \ For\ example,\ you\ may\ want\ to}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00041}00041\ \textcolor{comment}{//\ make\ sure\ that\ all\ tests\ for\ a\ GUI\ library\ don't\ leak\ important}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00042}00042\ \textcolor{comment}{//\ system\ resources\ like\ fonts\ and\ brushes.\ \ In\ Google\ Test,\ you\ do}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00043}00043\ \textcolor{comment}{//\ this\ by\ putting\ the\ shared\ logic\ in\ a\ super\ (as\ in\ "{}super\ class"{})}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00044}00044\ \textcolor{comment}{//\ test\ fixture,\ and\ then\ have\ each\ test\ case\ use\ a\ fixture\ derived}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00045}00045\ \textcolor{comment}{//\ from\ this\ super\ fixture.}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00047}00047\ \textcolor{preprocessor}{\#include\ <limits.h>}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00048}00048\ \textcolor{preprocessor}{\#include\ <time.h>}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00049}00049\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{gtest_8h}{gtest/gtest.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00050}00050\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{sample1_8h}{sample1.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00051}00051\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{sample3-inl_8h}{sample3-\/inl.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00052}00052\ \textcolor{keyword}{namespace\ }\{}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00053}00053\ \textcolor{comment}{//\ In\ this\ sample,\ we\ want\ to\ ensure\ that\ every\ test\ finishes\ within}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00054}00054\ \textcolor{comment}{//\ \string~5\ seconds.\ \ If\ a\ test\ takes\ longer\ to\ run,\ we\ consider\ it\ a}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00055}00055\ \textcolor{comment}{//\ failure.}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00056}00056\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00057}00057\ \textcolor{comment}{//\ We\ put\ the\ code\ for\ timing\ a\ test\ in\ a\ test\ fixture\ called}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00058}00058\ \textcolor{comment}{//\ "{}QuickTest"{}.\ \ QuickTest\ is\ intended\ to\ be\ the\ super\ fixture\ that}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00059}00059\ \textcolor{comment}{//\ other\ fixtures\ derive\ from,\ therefore\ there\ is\ no\ test\ case\ with}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00060}00060\ \textcolor{comment}{//\ the\ name\ "{}QuickTest"{}.\ \ This\ is\ OK.}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00061}00061\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00062}00062\ \textcolor{comment}{//\ Later,\ we\ will\ derive\ multiple\ test\ fixtures\ from\ QuickTest.}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00063}00063\ \textcolor{keyword}{class\ }QuickTest\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classtesting_1_1_test}{testing::Test}}\ \{}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00064}00064\ \ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00065}00065\ \ \ \textcolor{comment}{//\ Remember\ that\ SetUp()\ is\ run\ immediately\ before\ a\ test\ starts.}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00066}00066\ \ \ \textcolor{comment}{//\ This\ is\ a\ good\ place\ to\ record\ the\ start\ time.}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00067}00067\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ SetUp()\ \{}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00068}00068\ \ \ \ \ start\_time\_\ =\ time(NULL);}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00069}00069\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00071}00071\ \ \ \textcolor{comment}{//\ TearDown()\ is\ invoked\ immediately\ after\ a\ test\ finishes.\ \ Here\ we}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00072}00072\ \ \ \textcolor{comment}{//\ check\ if\ the\ test\ was\ too\ slow.}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00073}00073\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ TearDown()\ \{}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00074}00074\ \ \ \ \ \textcolor{comment}{//\ Gets\ the\ time\ when\ the\ test\ finishes}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00075}00075\ \ \ \ \ \textcolor{keyword}{const}\ time\_t\ end\_time\ =\ time(NULL);}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00076}00076\ }
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00077}00077\ \ \ \ \ \textcolor{comment}{//\ Asserts\ that\ the\ test\ took\ no\ more\ than\ \string~5\ seconds.\ \ Did\ you}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00078}00078\ \ \ \ \ \textcolor{comment}{//\ know\ that\ you\ can\ use\ assertions\ in\ SetUp()\ and\ TearDown()\ as}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00079}00079\ \ \ \ \ \textcolor{comment}{//\ well?}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00080}00080\ \ \ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(end\_time\ -\/\ start\_time\_\ <=\ 5)\ <<\ \textcolor{stringliteral}{"{}The\ test\ took\ too\ long."{}};}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00081}00081\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00083}00083\ \ \ \textcolor{comment}{//\ The\ UTC\ time\ (in\ seconds)\ when\ the\ test\ starts}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00084}00084\ \ \ time\_t\ start\_time\_;}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00085}00085\ \};}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00086}00086\ }
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00087}00087\ }
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00088}00088\ \textcolor{comment}{//\ We\ derive\ a\ fixture\ named\ IntegerFunctionTest\ from\ the\ QuickTest}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00089}00089\ \textcolor{comment}{//\ fixture.\ \ All\ tests\ using\ this\ fixture\ will\ be\ automatically}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00090}00090\ \textcolor{comment}{//\ required\ to\ be\ quick.}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00091}00091\ \textcolor{keyword}{class\ }IntegerFunctionTest\ :\ \textcolor{keyword}{public}\ QuickTest\ \{}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00092}00092\ \ \ \textcolor{comment}{//\ We\ don't\ need\ any\ more\ logic\ than\ already\ in\ the\ QuickTest\ fixture.}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00093}00093\ \ \ \textcolor{comment}{//\ Therefore\ the\ body\ is\ empty.}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00094}00094\ \};}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00095}00095\ }
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00096}00096\ }
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00097}00097\ \textcolor{comment}{//\ Now\ we\ can\ write\ tests\ in\ the\ IntegerFunctionTest\ test\ case.}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00098}00098\ }
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00099}00099\ \textcolor{comment}{//\ Tests\ Factorial()}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00100}00100\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(IntegerFunctionTest,\ \mbox{\hyperlink{sample1_8cc_a0e7da4d7a69c5b5afb707807aa177017}{Factorial}})\ \{}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00101}00101\ \ \ \textcolor{comment}{//\ Tests\ factorial\ of\ negative\ numbers.}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00102}00102\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(1,\ \mbox{\hyperlink{sample1_8cc_a0e7da4d7a69c5b5afb707807aa177017}{Factorial}}(-\/5));}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00103}00103\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(1,\ \mbox{\hyperlink{sample1_8cc_a0e7da4d7a69c5b5afb707807aa177017}{Factorial}}(-\/1));}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00104}00104\ \ \ \mbox{\hyperlink{gtest_8h_aa8bc8320813e1abb0016129b636e3b27}{EXPECT\_GT}}(\mbox{\hyperlink{sample1_8cc_a0e7da4d7a69c5b5afb707807aa177017}{Factorial}}(-\/10),\ 0);}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00105}00105\ }
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00106}00106\ \ \ \textcolor{comment}{//\ Tests\ factorial\ of\ 0.}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00107}00107\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(1,\ \mbox{\hyperlink{sample1_8cc_a0e7da4d7a69c5b5afb707807aa177017}{Factorial}}(0));}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00108}00108\ }
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00109}00109\ \ \ \textcolor{comment}{//\ Tests\ factorial\ of\ positive\ numbers.}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00110}00110\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(1,\ \mbox{\hyperlink{sample1_8cc_a0e7da4d7a69c5b5afb707807aa177017}{Factorial}}(1));}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00111}00111\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(2,\ \mbox{\hyperlink{sample1_8cc_a0e7da4d7a69c5b5afb707807aa177017}{Factorial}}(2));}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00112}00112\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(6,\ \mbox{\hyperlink{sample1_8cc_a0e7da4d7a69c5b5afb707807aa177017}{Factorial}}(3));}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00113}00113\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(40320,\ \mbox{\hyperlink{sample1_8cc_a0e7da4d7a69c5b5afb707807aa177017}{Factorial}}(8));}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00114}00114\ \}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00115}00115\ }
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00116}00116\ }
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00117}00117\ \textcolor{comment}{//\ Tests\ IsPrime()}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00118}00118\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(IntegerFunctionTest,\ \mbox{\hyperlink{sample1_8cc_a7093217f5edc11fe277d03bd064e5f11}{IsPrime}})\ \{}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00119}00119\ \ \ \textcolor{comment}{//\ Tests\ negative\ input.}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00120}00120\ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(\mbox{\hyperlink{sample1_8cc_a7093217f5edc11fe277d03bd064e5f11}{IsPrime}}(-\/1));}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00121}00121\ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(\mbox{\hyperlink{sample1_8cc_a7093217f5edc11fe277d03bd064e5f11}{IsPrime}}(-\/2));}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00122}00122\ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(\mbox{\hyperlink{sample1_8cc_a7093217f5edc11fe277d03bd064e5f11}{IsPrime}}(INT\_MIN));}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00123}00123\ }
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00124}00124\ \ \ \textcolor{comment}{//\ Tests\ some\ trivial\ cases.}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00125}00125\ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(\mbox{\hyperlink{sample1_8cc_a7093217f5edc11fe277d03bd064e5f11}{IsPrime}}(0));}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00126}00126\ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(\mbox{\hyperlink{sample1_8cc_a7093217f5edc11fe277d03bd064e5f11}{IsPrime}}(1));}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00127}00127\ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{sample1_8cc_a7093217f5edc11fe277d03bd064e5f11}{IsPrime}}(2));}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00128}00128\ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{sample1_8cc_a7093217f5edc11fe277d03bd064e5f11}{IsPrime}}(3));}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00129}00129\ }
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00130}00130\ \ \ \textcolor{comment}{//\ Tests\ positive\ input.}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00131}00131\ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(\mbox{\hyperlink{sample1_8cc_a7093217f5edc11fe277d03bd064e5f11}{IsPrime}}(4));}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00132}00132\ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{sample1_8cc_a7093217f5edc11fe277d03bd064e5f11}{IsPrime}}(5));}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00133}00133\ \ \ \mbox{\hyperlink{gtest_8h_aeb6c7ae89f440c90c1a1815951c836da}{EXPECT\_FALSE}}(\mbox{\hyperlink{sample1_8cc_a7093217f5edc11fe277d03bd064e5f11}{IsPrime}}(6));}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00134}00134\ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(\mbox{\hyperlink{sample1_8cc_a7093217f5edc11fe277d03bd064e5f11}{IsPrime}}(23));}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00135}00135\ \}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00136}00136\ }
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00137}00137\ }
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00138}00138\ \textcolor{comment}{//\ The\ next\ test\ case\ (named\ "{}QueueTest"{})\ also\ needs\ to\ be\ quick,\ so}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00139}00139\ \textcolor{comment}{//\ we\ derive\ another\ fixture\ from\ QuickTest.}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00140}00140\ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00141}00141\ \textcolor{comment}{//\ The\ QueueTest\ test\ fixture\ has\ some\ logic\ and\ shared\ objects\ in}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00142}00142\ \textcolor{comment}{//\ addition\ to\ what's\ in\ QuickTest\ already.\ \ We\ define\ the\ additional}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00143}00143\ \textcolor{comment}{//\ stuff\ inside\ the\ body\ of\ the\ test\ fixture,\ as\ usual.}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00144}00144\ \textcolor{keyword}{class\ }QueueTest\ :\ \textcolor{keyword}{public}\ QuickTest\ \{}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00145}00145\ \ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00146}00146\ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ SetUp()\ \{}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00147}00147\ \ \ \ \ \textcolor{comment}{//\ First,\ we\ need\ to\ set\ up\ the\ super\ fixture\ (QuickTest).}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00148}00148\ \ \ \ \ QuickTest::SetUp();}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00149}00149\ }
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00150}00150\ \ \ \ \ \textcolor{comment}{//\ Second,\ some\ additional\ setup\ for\ this\ fixture.}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00151}00151\ \ \ \ \ q1\_.Enqueue(1);}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00152}00152\ \ \ \ \ q2\_.Enqueue(2);}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00153}00153\ \ \ \ \ q2\_.Enqueue(3);}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00154}00154\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00155}00155\ }
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00156}00156\ \ \ \textcolor{comment}{//\ By\ default,\ TearDown()\ inherits\ the\ behavior\ of}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00157}00157\ \ \ \textcolor{comment}{//\ QuickTest::TearDown().\ \ As\ we\ have\ no\ additional\ cleaning\ work}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00158}00158\ \ \ \textcolor{comment}{//\ for\ QueueTest,\ we\ omit\ it\ here.}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00159}00159\ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00160}00160\ \ \ \textcolor{comment}{//\ virtual\ void\ TearDown()\ \{}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00161}00161\ \ \ \textcolor{comment}{//\ \ \ QuickTest::TearDown();}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00162}00162\ \ \ \textcolor{comment}{//\ \}}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00163}00163\ }
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00164}00164\ \ \ \mbox{\hyperlink{class_queue}{Queue<int>}}\ q0\_;}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00165}00165\ \ \ \mbox{\hyperlink{class_queue}{Queue<int>}}\ q1\_;}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00166}00166\ \ \ \mbox{\hyperlink{class_queue}{Queue<int>}}\ q2\_;}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00167}00167\ \};}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00168}00168\ }
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00169}00169\ }
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00170}00170\ \textcolor{comment}{//\ Now,\ let's\ write\ tests\ using\ the\ QueueTest\ fixture.}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00171}00171\ }
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00172}00172\ \textcolor{comment}{//\ Tests\ the\ default\ constructor.}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00173}00173\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(QueueTest,\ DefaultConstructor)\ \{}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00174}00174\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0u,\ q0\_.Size());}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00175}00175\ \}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00176}00176\ }
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00177}00177\ \textcolor{comment}{//\ Tests\ Dequeue().}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00178}00178\ \mbox{\hyperlink{gtest_8h_a0ee66d464d1a06c20c1929cae09d8758}{TEST\_F}}(QueueTest,\ Dequeue)\ \{}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00179}00179\ \ \ \textcolor{keywordtype}{int}*\ n\ =\ q0\_.Dequeue();}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00180}00180\ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(n\ ==\ NULL);}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00181}00181\ }
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00182}00182\ \ \ n\ =\ q1\_.Dequeue();}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00183}00183\ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(n\ !=\ NULL);}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00184}00184\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(1,\ *n);}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00185}00185\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(0u,\ q1\_.Size());}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00186}00186\ \ \ \textcolor{keyword}{delete}\ n;}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00187}00187\ }
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00188}00188\ \ \ n\ =\ q2\_.Dequeue();}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00189}00189\ \ \ \mbox{\hyperlink{gtest_8h_ac33e7cdfb5d44a7a0f0ab552eb5c3c6a}{EXPECT\_TRUE}}(n\ !=\ NULL);}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00190}00190\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(2,\ *n);}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00191}00191\ \ \ \mbox{\hyperlink{gtest_8h_a4159019abda84f5366acdb7604ff220a}{EXPECT\_EQ}}(1u,\ q2\_.Size());}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00192}00192\ \ \ \textcolor{keyword}{delete}\ n;}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00193}00193\ \}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00194}00194\ \}\ \ \textcolor{comment}{//\ namespace}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00195}00195\ \textcolor{comment}{//\ If\ necessary,\ you\ can\ derive\ further\ test\ fixtures\ from\ a\ derived}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00196}00196\ \textcolor{comment}{//\ fixture\ itself.\ \ For\ example,\ you\ can\ derive\ another\ fixture\ from}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00197}00197\ \textcolor{comment}{//\ QueueTest.\ \ Google\ Test\ imposes\ no\ limit\ on\ how\ deep\ the\ hierarchy}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00198}00198\ \textcolor{comment}{//\ can\ be.\ \ In\ practice,\ however,\ you\ probably\ don't\ want\ it\ to\ be\ too}}
+\DoxyCodeLine{\Hypertarget{sample5__unittest_8cc_source_l00199}00199\ \textcolor{comment}{//\ deep\ as\ to\ be\ confusing.}}
+
+\end{DoxyCode}

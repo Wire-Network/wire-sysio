@@ -1,0 +1,120 @@
+\doxysection{libraries/yubihsm/pkcs11/debug\+\_\+p11.c File Reference}
+\hypertarget{debug__p11_8c}{}\label{debug__p11_8c}\index{libraries/yubihsm/pkcs11/debug\_p11.c@{libraries/yubihsm/pkcs11/debug\_p11.c}}
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include "{}debug\+\_\+p11.\+h"{}}\newline
+{\ttfamily \#include "{}yubihsm.\+h"{}}\newline
+Include dependency graph for debug\+\_\+p11.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{debug__p11_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{debug__p11_8c_a561f643ac8a24b9d62f61117cd0a1bb4}{yh\+\_\+dbg\+\_\+init}} (int dbg, int dinout, int libdbg, const char \texorpdfstring{$\ast$}{*}debug\+\_\+file)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{debug__p11_8c_a4f2b00e9d2103c45be137b3396c200bc}{\+\_\+\+YHP11\+\_\+\+DBG}} = 0
+\item 
+int \mbox{\hyperlink{debug__p11_8c_aa7859d8d2b3c49143732bfd6c2702669}{\+\_\+\+YHP11\+\_\+\+DINOUT}} = 0
+\item 
+FILE \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{debug__p11_8c_a18be458b4a8773f2e02c8547ec0ca584}{\+\_\+\+YHP11\+\_\+\+OUTPUT}} = NULL
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{debug__p11_8c_a561f643ac8a24b9d62f61117cd0a1bb4}\index{debug\_p11.c@{debug\_p11.c}!yh\_dbg\_init@{yh\_dbg\_init}}
+\index{yh\_dbg\_init@{yh\_dbg\_init}!debug\_p11.c@{debug\_p11.c}}
+\doxysubsubsection{\texorpdfstring{yh\_dbg\_init()}{yh\_dbg\_init()}}
+{\footnotesize\ttfamily \label{debug__p11_8c_a561f643ac8a24b9d62f61117cd0a1bb4} 
+void yh\+\_\+dbg\+\_\+init (\begin{DoxyParamCaption}\item[{int}]{dbg}{, }\item[{int}]{dinout}{, }\item[{int}]{libdbg}{, }\item[{const char \texorpdfstring{$\ast$}{*}}]{debug\+\_\+file}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{debug__p11_8c_source_l00027}{27}} of file \mbox{\hyperlink{debug__p11_8c_source}{debug\+\_\+p11.\+c}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00028\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{debug__p11_8c_a18be458b4a8773f2e02c8547ec0ca584}{\_YHP11\_OUTPUT}}\ !=\ stderr\ \&\&\ \mbox{\hyperlink{debug__p11_8c_a18be458b4a8773f2e02c8547ec0ca584}{\_YHP11\_OUTPUT}}\ !=\ stdout\ \&\&}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \mbox{\hyperlink{debug__p11_8c_a18be458b4a8773f2e02c8547ec0ca584}{\_YHP11\_OUTPUT}}\ !=\ NULL)\ \{}
+\DoxyCodeLine{00030\ \ \ \ \ fclose(\mbox{\hyperlink{debug__p11_8c_a18be458b4a8773f2e02c8547ec0ca584}{\_YHP11\_OUTPUT}});}
+\DoxyCodeLine{00031\ \ \ \ \ \mbox{\hyperlink{debug__p11_8c_a18be458b4a8773f2e02c8547ec0ca584}{\_YHP11\_OUTPUT}}\ =\ stderr;}
+\DoxyCodeLine{00032\ \ \ \}}
+\DoxyCodeLine{00033\ \ \ \textcolor{keywordflow}{if}\ (strcmp(debug\_file,\ \textcolor{stringliteral}{"{}stderr"{}})\ ==\ 0)\ \{}
+\DoxyCodeLine{00034\ \ \ \ \ \mbox{\hyperlink{debug__p11_8c_a18be458b4a8773f2e02c8547ec0ca584}{\_YHP11\_OUTPUT}}\ =\ stderr;}
+\DoxyCodeLine{00035\ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (strcmp(debug\_file,\ \textcolor{stringliteral}{"{}stdout"{}})\ ==\ 0)\ \{}
+\DoxyCodeLine{00036\ \ \ \ \ \mbox{\hyperlink{debug__p11_8c_a18be458b4a8773f2e02c8547ec0ca584}{\_YHP11\_OUTPUT}}\ =\ stdout;}
+\DoxyCodeLine{00037\ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00038\ \ \ \ \ FILE\ *file\ =\ fopen(debug\_file,\ \textcolor{stringliteral}{"{}ab"{}});}
+\DoxyCodeLine{00039\ \ \ \ \ \textcolor{keywordflow}{if}\ (file)\ \{}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \mbox{\hyperlink{debug__p11_8c_a18be458b4a8773f2e02c8547ec0ca584}{\_YHP11\_OUTPUT}}\ =\ file;}
+\DoxyCodeLine{00041\ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \mbox{\hyperlink{debug__p11_8c_a18be458b4a8773f2e02c8547ec0ca584}{\_YHP11\_OUTPUT}}\ =\ stderr;}
+\DoxyCodeLine{00043\ \ \ \ \ \}}
+\DoxyCodeLine{00044\ \ \ \}}
+\DoxyCodeLine{00045\ \ \ \mbox{\hyperlink{yubihsm_8c_a7d223fd4ee6ae3f578307d72aba37a19}{yh\_set\_debug\_output}}(NULL,\ \mbox{\hyperlink{debug__p11_8c_a18be458b4a8773f2e02c8547ec0ca584}{\_YHP11\_OUTPUT}});}
+\DoxyCodeLine{00046\ \ \ \textcolor{keywordflow}{if}\ (dbg\ ||\ getenv(\textcolor{stringliteral}{"{}YUBIHSM\_PKCS11\_DBG"{}}))\ \{}
+\DoxyCodeLine{00047\ \ \ \ \ \mbox{\hyperlink{debug__p11_8c_a4f2b00e9d2103c45be137b3396c200bc}{\_YHP11\_DBG}}\ =\ 1;}
+\DoxyCodeLine{00048\ \ \ \}}
+\DoxyCodeLine{00049\ \ \ \textcolor{keywordflow}{if}\ (dinout\ ||\ getenv(\textcolor{stringliteral}{"{}YUBIHSM\_PKCS11\_DINOUT"{}}))\ \{}
+\DoxyCodeLine{00050\ \ \ \ \ \mbox{\hyperlink{debug__p11_8c_aa7859d8d2b3c49143732bfd6c2702669}{\_YHP11\_DINOUT}}\ =\ 1;}
+\DoxyCodeLine{00051\ \ \ \}}
+\DoxyCodeLine{00052\ \ \ \textcolor{keywordflow}{if}\ (libdbg\ ||\ getenv(\textcolor{stringliteral}{"{}YUBIHSM\_LIB\_DBG"{}}))\ \{}
+\DoxyCodeLine{00053\ \ \ \ \ \mbox{\hyperlink{yubihsm_8c_a24c3146e51242256af505961e763f417}{yh\_set\_verbosity}}(NULL,\ \mbox{\hyperlink{yubihsm_8h_a15dbe0ac973691939ca6e9148b181ccd}{YH\_VERB\_ALL}});}
+\DoxyCodeLine{00054\ \ \ \}}
+\DoxyCodeLine{00055\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=291pt]{debug__p11_8c_a561f643ac8a24b9d62f61117cd0a1bb4_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=312pt]{debug__p11_8c_a561f643ac8a24b9d62f61117cd0a1bb4_icgraph}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{debug__p11_8c_a4f2b00e9d2103c45be137b3396c200bc}\index{debug\_p11.c@{debug\_p11.c}!\_YHP11\_DBG@{\_YHP11\_DBG}}
+\index{\_YHP11\_DBG@{\_YHP11\_DBG}!debug\_p11.c@{debug\_p11.c}}
+\doxysubsubsection{\texorpdfstring{\_YHP11\_DBG}{\_YHP11\_DBG}}
+{\footnotesize\ttfamily \label{debug__p11_8c_a4f2b00e9d2103c45be137b3396c200bc} 
+int \+\_\+\+YHP11\+\_\+\+DBG = 0}
+
+
+
+Definition at line \mbox{\hyperlink{debug__p11_8c_source_l00023}{23}} of file \mbox{\hyperlink{debug__p11_8c_source}{debug\+\_\+p11.\+c}}.
+
+\Hypertarget{debug__p11_8c_aa7859d8d2b3c49143732bfd6c2702669}\index{debug\_p11.c@{debug\_p11.c}!\_YHP11\_DINOUT@{\_YHP11\_DINOUT}}
+\index{\_YHP11\_DINOUT@{\_YHP11\_DINOUT}!debug\_p11.c@{debug\_p11.c}}
+\doxysubsubsection{\texorpdfstring{\_YHP11\_DINOUT}{\_YHP11\_DINOUT}}
+{\footnotesize\ttfamily \label{debug__p11_8c_aa7859d8d2b3c49143732bfd6c2702669} 
+int \+\_\+\+YHP11\+\_\+\+DINOUT = 0}
+
+
+
+Definition at line \mbox{\hyperlink{debug__p11_8c_source_l00024}{24}} of file \mbox{\hyperlink{debug__p11_8c_source}{debug\+\_\+p11.\+c}}.
+
+\Hypertarget{debug__p11_8c_a18be458b4a8773f2e02c8547ec0ca584}\index{debug\_p11.c@{debug\_p11.c}!\_YHP11\_OUTPUT@{\_YHP11\_OUTPUT}}
+\index{\_YHP11\_OUTPUT@{\_YHP11\_OUTPUT}!debug\_p11.c@{debug\_p11.c}}
+\doxysubsubsection{\texorpdfstring{\_YHP11\_OUTPUT}{\_YHP11\_OUTPUT}}
+{\footnotesize\ttfamily \label{debug__p11_8c_a18be458b4a8773f2e02c8547ec0ca584} 
+FILE\texorpdfstring{$\ast$}{*} \+\_\+\+YHP11\+\_\+\+OUTPUT = NULL}
+
+
+
+Definition at line \mbox{\hyperlink{debug__p11_8c_source_l00025}{25}} of file \mbox{\hyperlink{debug__p11_8c_source}{debug\+\_\+p11.\+c}}.
+

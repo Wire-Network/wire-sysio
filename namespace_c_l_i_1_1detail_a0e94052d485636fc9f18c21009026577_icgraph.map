@@ -1,0 +1,25 @@
+<map id="CLI::detail::to_string" name="CLI::detail::to_string">
+<area shape="rect" id="Node000001" title="Convert an object to a string (directly forward if this can become a string)" alt="" coords="471,188,610,214"/>
+<area shape="rect" id="Node000002" href="$class_c_l_i_1_1_as_number_with_unit.html#af5d2fc29cd92c1821e653a97f91b00cb" title=" " alt="" coords="23,130,186,170"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="470,187,423,178,299,164,186,156,187,151,299,159,423,173,471,182"/>
+<area shape="rect" id="Node000003" href="$class_c_l_i_1_1_bound.html#ad8963dee44fa7484a9d28df994cf722c" title=" " alt="" coords="271,87,404,112"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="506,182,422,134,377,115,379,110,424,129,508,177"/>
+<area shape="rect" id="Node000004" href="$namespace_c_l_i_1_1detail.html#a1bcb244a7701fc68da3a863b58daf615" title="special template overload" alt="" coords="268,22,406,62"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="519,177,478,126,451,100,422,76,402,65,405,61,424,72,455,96,482,123,524,173"/>
+<area shape="rect" id="Node000007" href="$class_c_l_i_1_1_checked_transformer.html#af11e8936b4c0707ff94338908622e111" title=" " alt="" coords="18,262,191,302"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="514,226,474,255,424,278,364,291,303,297,244,298,191,295,191,290,244,293,303,292,364,286,422,273,471,250,511,222"/>
+<area shape="rect" id="Node000008" href="$class_c_l_i_1_1_option.html#ad54a6c2a78d84970977f84212a7a6a7b" title=" " alt="" coords="258,237,417,263"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="470,221,394,239,393,234,469,215"/>
+<area shape="rect" id="Node000009" href="$namespace_c_l_i_1_1detail.html#a320e031a5eb12297a140d2d6fc73362a" title="Generate a string representation of a map." alt="" coords="252,188,423,214"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="456,204,424,204,424,198,456,198"/>
+<area shape="rect" id="Node000011" href="$namespace_c_l_i_1_1detail.html#a130e048f492ea4619246e2f4cabaf4ac" title="for other types just use the regular to_string function" alt="" coords="277,338,398,378"/>
+<area shape="poly" id="edge12_Node000001_Node000011" title=" " alt="" coords="521,228,479,274,425,322,393,340,391,335,421,317,476,270,518,224"/>
+<area shape="rect" id="Node000005" href="$class_c_l_i_1_1_app.html#a3a1c706fefc81a31f6ccc593bdf05354" title="Add a complex number." alt="" coords="25,55,184,80"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="253,54,184,62,184,56,252,49"/>
+<area shape="rect" id="Node000006" href="$class_c_l_i_1_1_app.html#a27ca8c7e673f9fdac9a5a80c1a0704ea" title="Add option for assigning to a variable." alt="" coords="32,5,177,31"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="252,36,177,28,177,23,253,31"/>
+<area shape="poly" id="edge9_Node000009_Node000002" title=" " alt="" coords="260,187,186,171,187,165,261,182"/>
+<area shape="poly" id="edge10_Node000009_Node000007" title=" " alt="" coords="272,221,253,227,157,264,155,259,251,222,270,216"/>
+<area shape="rect" id="Node000010" href="$class_c_l_i_1_1_transformer.html#aef311ee89c54f64e3e78651bd2db826c" title=" " alt="" coords="5,195,204,220"/>
+<area shape="poly" id="edge11_Node000009_Node000010" title=" " alt="" coords="237,206,204,207,204,202,237,201"/>
+</map>

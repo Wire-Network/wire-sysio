@@ -1,0 +1,9 @@
+<map id="TEST" name="TEST">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,78,61,104"/>
+<area shape="rect" id="Node000002" href="$class_memory_pool_allocator.html#a57bbc80e570db6110901b9a7e36dbda0" title="Deallocates all memory chunks, excluding the user&#45;supplied buffer." alt="" coords="118,5,264,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="60,77,108,57,123,50,125,55,110,61,62,82"/>
+<area shape="rect" id="Node000003" href="$class_memory_pool_allocator.html#a6b180eb150451b4df8b70d827cd1191c" title="Frees a memory block (concept Allocator)" alt="" coords="118,71,264,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="61,88,103,88,103,94,61,94"/>
+<area shape="rect" id="Node000004" href="$class_generic_schema_validator.html#a49efbbe098cb77728be3d48cafed17e4" title="Reset the internal states." alt="" coords="109,136,273,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="62,100,110,121,125,127,123,132,108,125,60,105"/>
+</map>

@@ -1,0 +1,13 @@
+<map id="sysio::dispatch_manager::bcast_block" name="sysio::dispatch_manager::bcast_block">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,71,172,111"/>
+<area shape="rect" id="Node000002" href="$classsysio_1_1dispatch__manager.html#ae028489706c095d3590cfeb80440252d" title=" " alt="" coords="221,5,388,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="157,68,220,48,221,54,159,73"/>
+<area shape="rect" id="Node000005" href="$namespacesysio.html#a0369be74f29dbab1c8afd88c3f6d2858" title=" " alt="" coords="230,71,378,111"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="172,88,215,88,215,94,172,94"/>
+<area shape="rect" id="Node000006" href="$structsysio_1_1block__buffer__factory.html#a50be7bedd192d3ea21c30bc893eb22f2" title="caches result for subsequent calls, only provide same signed_block_ptr instance for each invocation." alt="" coords="220,136,389,177"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="159,109,221,128,220,134,157,114"/>
+<area shape="rect" id="Node000003" href="$structsysio_1_1chain_1_1block__header.html#a39d57e33ef8d3f6ba59b4c458f0ae375" title=" " alt="" coords="437,5,587,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="388,23,421,23,421,28,388,28"/>
+<area shape="rect" id="Node000004" href="$namespacefc.html#afb668c55fd6ee73e1fcd67e77d8f6009" title=" " alt="" coords="635,13,792,38"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="587,23,620,23,620,28,587,28"/>
+</map>

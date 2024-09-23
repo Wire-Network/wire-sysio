@@ -1,0 +1,535 @@
+\doxysection{sysiosystem\+::native Class Reference}
+\hypertarget{classsysiosystem_1_1native}{}\label{classsysiosystem_1_1native}\index{sysiosystem::native@{sysiosystem::native}}
+
+
+{\ttfamily \#include $<$native.\+hpp$>$}
+
+
+
+Inheritance diagram for sysiosystem\+::native\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=190pt]{classsysiosystem_1_1native__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for sysiosystem\+::native\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=184pt]{classsysiosystem_1_1native__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+using \mbox{\hyperlink{classsysiosystem_1_1native_ae7e8b4b669992be9ca38f0b107d7e70a}{newaccount\+\_\+action}} = sysio\+::action\+\_\+wrapper$<$"{}newaccount"{}\+\_\+n, \&\mbox{\hyperlink{classsysiosystem_1_1native_abfb28fdfbc472504fc0c53302c00a296}{native\+::newaccount}}$>$
+\item 
+using \mbox{\hyperlink{classsysiosystem_1_1native_a268d023a7b1974de5fa5869d6794ef6b}{updateauth\+\_\+action}} = sysio\+::action\+\_\+wrapper$<$"{}updateauth"{}\+\_\+n, \&\mbox{\hyperlink{classsysiosystem_1_1native_ac8dad9f9df4430ece4a000e74fc883b5}{native\+::updateauth}}$>$
+\item 
+using \mbox{\hyperlink{classsysiosystem_1_1native_a599443037bd2d568c43bc56af4d3d02d}{deleteauth\+\_\+action}} = sysio\+::action\+\_\+wrapper$<$"{}deleteauth"{}\+\_\+n, \&\mbox{\hyperlink{classsysiosystem_1_1native_a9e63da1bb1a0372145122a6baaeb8c30}{native\+::deleteauth}}$>$
+\item 
+using \mbox{\hyperlink{classsysiosystem_1_1native_ad8a9747496e33a7fb870c56d63ac0938}{linkauth\+\_\+action}} = sysio\+::action\+\_\+wrapper$<$"{}linkauth"{}\+\_\+n, \&\mbox{\hyperlink{classsysiosystem_1_1native_a7eb91d9dbbbd546077121caa7b150542}{native\+::linkauth}}$>$
+\item 
+using \mbox{\hyperlink{classsysiosystem_1_1native_a31061738bbe4a413e8a32e35170f514d}{unlinkauth\+\_\+action}} = sysio\+::action\+\_\+wrapper$<$"{}unlinkauth"{}\+\_\+n, \&\mbox{\hyperlink{classsysiosystem_1_1native_a64d5696e7c45f178647ad59f76a2f785}{native\+::unlinkauth}}$>$
+\item 
+using \mbox{\hyperlink{classsysiosystem_1_1native_a26b615bf6ae6a9aed0f6da6ddd85aff5}{canceldelay\+\_\+action}} = sysio\+::action\+\_\+wrapper$<$"{}canceldelay"{}\+\_\+n, \&\mbox{\hyperlink{classsysiosystem_1_1native_aa7f7232d8fad74765e1e51fd3230a747}{native\+::canceldelay}}$>$
+\item 
+using \mbox{\hyperlink{classsysiosystem_1_1native_a78f632dbfce5f1509545bf3047852bbe}{setcode\+\_\+action}} = sysio\+::action\+\_\+wrapper$<$"{}setcode"{}\+\_\+n, \&\mbox{\hyperlink{classsysiosystem_1_1native_a265da49cbda19c73392f6adb8edcd2ad}{native\+::setcode}}$>$
+\item 
+using \mbox{\hyperlink{classsysiosystem_1_1native_a85bae5f11882cdc7359ebda0551d3946}{setabi\+\_\+action}} = sysio\+::action\+\_\+wrapper$<$"{}setabi"{}\+\_\+n, \&\mbox{\hyperlink{classsysiosystem_1_1native_a08f620afa821cb11e6d7ba2912353da8}{native\+::setabi}}$>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{classsysiosystem_1_1native_abfb28fdfbc472504fc0c53302c00a296}{newaccount}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&creator, const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}, ignore$<$ \mbox{\hyperlink{structsysiosystem_1_1authority}{authority}} $>$ owner, ignore$<$ \mbox{\hyperlink{structsysiosystem_1_1authority}{authority}} $>$ active)
+\item 
+void \mbox{\hyperlink{classsysiosystem_1_1native_ac8dad9f9df4430ece4a000e74fc883b5}{updateauth}} (\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} account, \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} permission, \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} parent, \mbox{\hyperlink{structsysiosystem_1_1authority}{authority}} auth, binary\+\_\+extension$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$ authorized\+\_\+by)
+\item 
+void \mbox{\hyperlink{classsysiosystem_1_1native_a9e63da1bb1a0372145122a6baaeb8c30}{deleteauth}} (\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} account, \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} permission, binary\+\_\+extension$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$ authorized\+\_\+by)
+\item 
+void \mbox{\hyperlink{classsysiosystem_1_1native_a7eb91d9dbbbd546077121caa7b150542}{linkauth}} (\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} account, \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} code, \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} type, \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} requirement, binary\+\_\+extension$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$ authorized\+\_\+by)
+\item 
+void \mbox{\hyperlink{classsysiosystem_1_1native_a64d5696e7c45f178647ad59f76a2f785}{unlinkauth}} (\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} account, \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} code, \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} type, binary\+\_\+extension$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$ authorized\+\_\+by)
+\item 
+void \mbox{\hyperlink{classsysiosystem_1_1native_aa7f7232d8fad74765e1e51fd3230a747}{canceldelay}} (ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1permission__level}{permission\+\_\+level}} $>$ canceling\+\_\+auth, ignore$<$ checksum256 $>$ trx\+\_\+id)
+\item 
+void \mbox{\hyperlink{classsysiosystem_1_1native_ad04e0ab2416499200bfda9d8869e9131}{onerror}} (ignore$<$ uint128\+\_\+t $>$ sender\+\_\+id, ignore$<$ std\+::vector$<$ char $>$ $>$ sent\+\_\+trx)
+\item 
+void \mbox{\hyperlink{classsysiosystem_1_1native_a08f620afa821cb11e6d7ba2912353da8}{setabi}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&account, const std\+::vector$<$ char $>$ \&abi, const binary\+\_\+extension$<$ std\+::string $>$ \&memo)
+\item 
+void \mbox{\hyperlink{classsysiosystem_1_1native_a265da49cbda19c73392f6adb8edcd2ad}{setcode}} (const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&account, \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} vmtype, \mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}} vmversion, const std\+::vector$<$ char $>$ \&code, const binary\+\_\+extension$<$ std\+::string $>$ \&memo)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+The EOSIO core {\ttfamily native} contract that governs authorization and contracts\textquotesingle{} abi. 
+
+Definition at line \mbox{\hyperlink{native_8hpp_source_l00128}{128}} of file \mbox{\hyperlink{native_8hpp_source}{native.\+hpp}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{classsysiosystem_1_1native_a26b615bf6ae6a9aed0f6da6ddd85aff5}\index{sysiosystem::native@{sysiosystem::native}!canceldelay\_action@{canceldelay\_action}}
+\index{canceldelay\_action@{canceldelay\_action}!sysiosystem::native@{sysiosystem::native}}
+\doxysubsubsection{\texorpdfstring{canceldelay\_action}{canceldelay\_action}}
+{\footnotesize\ttfamily \label{classsysiosystem_1_1native_a26b615bf6ae6a9aed0f6da6ddd85aff5} 
+using \mbox{\hyperlink{classsysiosystem_1_1native_a26b615bf6ae6a9aed0f6da6ddd85aff5}{sysiosystem\+::native\+::canceldelay\+\_\+action}} = sysio\+::action\+\_\+wrapper$<$"{}canceldelay"{}\+\_\+n, \&\mbox{\hyperlink{classsysiosystem_1_1native_aa7f7232d8fad74765e1e51fd3230a747}{native\+::canceldelay}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{native_8hpp_source_l00318}{318}} of file \mbox{\hyperlink{native_8hpp_source}{native.\+hpp}}.
+
+\Hypertarget{classsysiosystem_1_1native_a599443037bd2d568c43bc56af4d3d02d}\index{sysiosystem::native@{sysiosystem::native}!deleteauth\_action@{deleteauth\_action}}
+\index{deleteauth\_action@{deleteauth\_action}!sysiosystem::native@{sysiosystem::native}}
+\doxysubsubsection{\texorpdfstring{deleteauth\_action}{deleteauth\_action}}
+{\footnotesize\ttfamily \label{classsysiosystem_1_1native_a599443037bd2d568c43bc56af4d3d02d} 
+using \mbox{\hyperlink{classsysiosystem_1_1native_a599443037bd2d568c43bc56af4d3d02d}{sysiosystem\+::native\+::deleteauth\+\_\+action}} = sysio\+::action\+\_\+wrapper$<$"{}deleteauth"{}\+\_\+n, \&\mbox{\hyperlink{classsysiosystem_1_1native_a9e63da1bb1a0372145122a6baaeb8c30}{native\+::deleteauth}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{native_8hpp_source_l00315}{315}} of file \mbox{\hyperlink{native_8hpp_source}{native.\+hpp}}.
+
+\Hypertarget{classsysiosystem_1_1native_ad8a9747496e33a7fb870c56d63ac0938}\index{sysiosystem::native@{sysiosystem::native}!linkauth\_action@{linkauth\_action}}
+\index{linkauth\_action@{linkauth\_action}!sysiosystem::native@{sysiosystem::native}}
+\doxysubsubsection{\texorpdfstring{linkauth\_action}{linkauth\_action}}
+{\footnotesize\ttfamily \label{classsysiosystem_1_1native_ad8a9747496e33a7fb870c56d63ac0938} 
+using \mbox{\hyperlink{classsysiosystem_1_1native_ad8a9747496e33a7fb870c56d63ac0938}{sysiosystem\+::native\+::linkauth\+\_\+action}} = sysio\+::action\+\_\+wrapper$<$"{}linkauth"{}\+\_\+n, \&\mbox{\hyperlink{classsysiosystem_1_1native_a7eb91d9dbbbd546077121caa7b150542}{native\+::linkauth}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{native_8hpp_source_l00316}{316}} of file \mbox{\hyperlink{native_8hpp_source}{native.\+hpp}}.
+
+\Hypertarget{classsysiosystem_1_1native_ae7e8b4b669992be9ca38f0b107d7e70a}\index{sysiosystem::native@{sysiosystem::native}!newaccount\_action@{newaccount\_action}}
+\index{newaccount\_action@{newaccount\_action}!sysiosystem::native@{sysiosystem::native}}
+\doxysubsubsection{\texorpdfstring{newaccount\_action}{newaccount\_action}}
+{\footnotesize\ttfamily \label{classsysiosystem_1_1native_ae7e8b4b669992be9ca38f0b107d7e70a} 
+using \mbox{\hyperlink{classsysiosystem_1_1native_ae7e8b4b669992be9ca38f0b107d7e70a}{sysiosystem\+::native\+::newaccount\+\_\+action}} = sysio\+::action\+\_\+wrapper$<$"{}newaccount"{}\+\_\+n, \&\mbox{\hyperlink{classsysiosystem_1_1native_abfb28fdfbc472504fc0c53302c00a296}{native\+::newaccount}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{native_8hpp_source_l00313}{313}} of file \mbox{\hyperlink{native_8hpp_source}{native.\+hpp}}.
+
+\Hypertarget{classsysiosystem_1_1native_a85bae5f11882cdc7359ebda0551d3946}\index{sysiosystem::native@{sysiosystem::native}!setabi\_action@{setabi\_action}}
+\index{setabi\_action@{setabi\_action}!sysiosystem::native@{sysiosystem::native}}
+\doxysubsubsection{\texorpdfstring{setabi\_action}{setabi\_action}}
+{\footnotesize\ttfamily \label{classsysiosystem_1_1native_a85bae5f11882cdc7359ebda0551d3946} 
+using \mbox{\hyperlink{classsysiosystem_1_1native_a85bae5f11882cdc7359ebda0551d3946}{sysiosystem\+::native\+::setabi\+\_\+action}} = sysio\+::action\+\_\+wrapper$<$"{}setabi"{}\+\_\+n, \&\mbox{\hyperlink{classsysiosystem_1_1native_a08f620afa821cb11e6d7ba2912353da8}{native\+::setabi}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{native_8hpp_source_l00320}{320}} of file \mbox{\hyperlink{native_8hpp_source}{native.\+hpp}}.
+
+\Hypertarget{classsysiosystem_1_1native_a78f632dbfce5f1509545bf3047852bbe}\index{sysiosystem::native@{sysiosystem::native}!setcode\_action@{setcode\_action}}
+\index{setcode\_action@{setcode\_action}!sysiosystem::native@{sysiosystem::native}}
+\doxysubsubsection{\texorpdfstring{setcode\_action}{setcode\_action}}
+{\footnotesize\ttfamily \label{classsysiosystem_1_1native_a78f632dbfce5f1509545bf3047852bbe} 
+using \mbox{\hyperlink{classsysiosystem_1_1native_a78f632dbfce5f1509545bf3047852bbe}{sysiosystem\+::native\+::setcode\+\_\+action}} = sysio\+::action\+\_\+wrapper$<$"{}setcode"{}\+\_\+n, \&\mbox{\hyperlink{classsysiosystem_1_1native_a265da49cbda19c73392f6adb8edcd2ad}{native\+::setcode}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{native_8hpp_source_l00319}{319}} of file \mbox{\hyperlink{native_8hpp_source}{native.\+hpp}}.
+
+\Hypertarget{classsysiosystem_1_1native_a31061738bbe4a413e8a32e35170f514d}\index{sysiosystem::native@{sysiosystem::native}!unlinkauth\_action@{unlinkauth\_action}}
+\index{unlinkauth\_action@{unlinkauth\_action}!sysiosystem::native@{sysiosystem::native}}
+\doxysubsubsection{\texorpdfstring{unlinkauth\_action}{unlinkauth\_action}}
+{\footnotesize\ttfamily \label{classsysiosystem_1_1native_a31061738bbe4a413e8a32e35170f514d} 
+using \mbox{\hyperlink{classsysiosystem_1_1native_a31061738bbe4a413e8a32e35170f514d}{sysiosystem\+::native\+::unlinkauth\+\_\+action}} = sysio\+::action\+\_\+wrapper$<$"{}unlinkauth"{}\+\_\+n, \&\mbox{\hyperlink{classsysiosystem_1_1native_a64d5696e7c45f178647ad59f76a2f785}{native\+::unlinkauth}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{native_8hpp_source_l00317}{317}} of file \mbox{\hyperlink{native_8hpp_source}{native.\+hpp}}.
+
+\Hypertarget{classsysiosystem_1_1native_a268d023a7b1974de5fa5869d6794ef6b}\index{sysiosystem::native@{sysiosystem::native}!updateauth\_action@{updateauth\_action}}
+\index{updateauth\_action@{updateauth\_action}!sysiosystem::native@{sysiosystem::native}}
+\doxysubsubsection{\texorpdfstring{updateauth\_action}{updateauth\_action}}
+{\footnotesize\ttfamily \label{classsysiosystem_1_1native_a268d023a7b1974de5fa5869d6794ef6b} 
+using \mbox{\hyperlink{classsysiosystem_1_1native_a268d023a7b1974de5fa5869d6794ef6b}{sysiosystem\+::native\+::updateauth\+\_\+action}} = sysio\+::action\+\_\+wrapper$<$"{}updateauth"{}\+\_\+n, \&\mbox{\hyperlink{classsysiosystem_1_1native_ac8dad9f9df4430ece4a000e74fc883b5}{native\+::updateauth}}$>$}
+
+
+
+Definition at line \mbox{\hyperlink{native_8hpp_source_l00314}{314}} of file \mbox{\hyperlink{native_8hpp_source}{native.\+hpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classsysiosystem_1_1native_aa7f7232d8fad74765e1e51fd3230a747}\index{sysiosystem::native@{sysiosystem::native}!canceldelay@{canceldelay}}
+\index{canceldelay@{canceldelay}!sysiosystem::native@{sysiosystem::native}}
+\doxysubsubsection{\texorpdfstring{canceldelay()}{canceldelay()}}
+{\footnotesize\ttfamily \label{classsysiosystem_1_1native_aa7f7232d8fad74765e1e51fd3230a747} 
+void sysiosystem\+::native\+::canceldelay (\begin{DoxyParamCaption}\item[{ignore$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1permission__level}{permission\+\_\+level}} $>$}]{canceling\+\_\+auth}{, }\item[{ignore$<$ checksum256 $>$}]{trx\+\_\+id}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Cancel delay action cancels a deferred transaction.
+
+
+\begin{DoxyParams}{Parameters}
+{\em canceling\+\_\+auth} & -\/ the permission that authorizes this action, \\
+\hline
+{\em trx\+\_\+id} & -\/ the deferred transaction id to be cancelled. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{native_8hpp_source_l00277}{277}} of file \mbox{\hyperlink{native_8hpp_source}{native.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00277\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classsysiosystem_1_1native_a9e63da1bb1a0372145122a6baaeb8c30}\index{sysiosystem::native@{sysiosystem::native}!deleteauth@{deleteauth}}
+\index{deleteauth@{deleteauth}!sysiosystem::native@{sysiosystem::native}}
+\doxysubsubsection{\texorpdfstring{deleteauth()}{deleteauth()}}
+{\footnotesize\ttfamily \label{classsysiosystem_1_1native_a9e63da1bb1a0372145122a6baaeb8c30} 
+void sysiosystem\+::native\+::deleteauth (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}}]{account}{, }\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}}]{permission}{, }\item[{binary\+\_\+extension$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$}]{authorized\+\_\+by}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Delete authorization action deletes the authorization for an account\textquotesingle{}s permission.
+
+This contract enforces additional rules\+:
+
+
+\begin{DoxyEnumerate}
+\item If authorized\+\_\+by is present and not "{}"{}, then the contract does a require\+\_\+auth2(account, authorized\+\_\+by).
+\item If the account has opted into limitauthchg, then authorized\+\_\+by must be present and not "{}"{}.
+\item If the account has opted into limitauthchg, and allow\+\_\+perms is not empty, then authorized\+\_\+by must be in the array.
+\item If the account has opted into limitauthchg, and disallow\+\_\+perms is not empty, then authorized\+\_\+by must not be in the array.
+\end{DoxyEnumerate}
+
+
+\begin{DoxyParams}{Parameters}
+{\em account} & -\/ the account for which the permission authorization is deleted, \\
+\hline
+{\em permission} & -\/ the permission name been deleted. \\
+\hline
+{\em authorized\+\_\+by} & -\/ the permission which is authorizing this change \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{native_8hpp_source_l00199}{199}} of file \mbox{\hyperlink{native_8hpp_source}{native.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00202\ }
+\DoxyCodeLine{00203\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (permission\ ==\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(\textcolor{stringliteral}{"{}auth.ext"{}}))\ require\_recipient(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}(\textcolor{stringliteral}{"{}auth.msg"{}}));\ \textcolor{comment}{//\ Sig\ EM\ auth.ext\ catch:\ only\ auth.msg\ can\ remove\ auth.ext\ permission}}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \mbox{\hyperlink{namespacesysiosystem_a5de3a548ea8323b8a776a119bd5bb724}{check\_auth\_change}}(get\_self(),\ account,\ authorized\_by);}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=324pt]{classsysiosystem_1_1native_a9e63da1bb1a0372145122a6baaeb8c30_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysiosystem_1_1native_a7eb91d9dbbbd546077121caa7b150542}\index{sysiosystem::native@{sysiosystem::native}!linkauth@{linkauth}}
+\index{linkauth@{linkauth}!sysiosystem::native@{sysiosystem::native}}
+\doxysubsubsection{\texorpdfstring{linkauth()}{linkauth()}}
+{\footnotesize\ttfamily \label{classsysiosystem_1_1native_a7eb91d9dbbbd546077121caa7b150542} 
+void sysiosystem\+::native\+::linkauth (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}}]{account}{, }\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}}]{code}{, }\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}}]{type}{, }\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}}]{requirement}{, }\item[{binary\+\_\+extension$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$}]{authorized\+\_\+by}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Link authorization action assigns a specific action from a contract to a permission you have created. Five system actions can not be linked {\ttfamily updateauth}, {\ttfamily deleteauth}, {\ttfamily linkauth}, {\ttfamily unlinkauth}, and {\ttfamily canceldelay}. This is useful because when doing authorization checks, the EOSIO based blockchain starts with the action needed to be authorized (and the contract belonging to), and looks up which permission is needed to pass authorization validation. If a link is set, that permission is used for authorization validation otherwise then active is the default, with the exception of {\ttfamily \doxylink{namespacefc_a8b03fb95276f683bde05b7715d9f0014}{sysio.\+any}}. {\ttfamily \doxylink{namespacefc_a8b03fb95276f683bde05b7715d9f0014}{sysio.\+any}} is an implicit permission which exists on every account; you can link actions to {\ttfamily \doxylink{namespacefc_a8b03fb95276f683bde05b7715d9f0014}{sysio.\+any}} and that will make it so linked actions are accessible to any permissions defined for the account.
+
+This contract enforces additional rules\+:
+
+
+\begin{DoxyEnumerate}
+\item If authorized\+\_\+by is present and not "{}"{}, then the contract does a require\+\_\+auth2(account, authorized\+\_\+by).
+\item If the account has opted into limitauthchg, then authorized\+\_\+by must be present and not "{}"{}.
+\item If the account has opted into limitauthchg, and allow\+\_\+perms is not empty, then authorized\+\_\+by must be in the array.
+\item If the account has opted into limitauthchg, and disallow\+\_\+perms is not empty, then authorized\+\_\+by must not be in the array.
+\end{DoxyEnumerate}
+
+
+\begin{DoxyParams}{Parameters}
+{\em account} & -\/ the permission\textquotesingle{}s owner to be linked and the payer of the RAM needed to store this link, \\
+\hline
+{\em code} & -\/ the owner of the action to be linked, \\
+\hline
+{\em type} & -\/ the action to be linked, \\
+\hline
+{\em requirement} & -\/ the permission to be linked. \\
+\hline
+{\em authorized\+\_\+by} & -\/ the permission which is authorizing this change \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{native_8hpp_source_l00235}{235}} of file \mbox{\hyperlink{native_8hpp_source}{native.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysiosystem_a5de3a548ea8323b8a776a119bd5bb724}{check\_auth\_change}}(get\_self(),\ account,\ authorized\_by);}
+\DoxyCodeLine{00241\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=324pt]{classsysiosystem_1_1native_a7eb91d9dbbbd546077121caa7b150542_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysiosystem_1_1native_abfb28fdfbc472504fc0c53302c00a296}\index{sysiosystem::native@{sysiosystem::native}!newaccount@{newaccount}}
+\index{newaccount@{newaccount}!sysiosystem::native@{sysiosystem::native}}
+\doxysubsubsection{\texorpdfstring{newaccount()}{newaccount()}}
+{\footnotesize\ttfamily \label{classsysiosystem_1_1native_abfb28fdfbc472504fc0c53302c00a296} 
+void sysiosystem\+::native\+::newaccount (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&}]{creator}{, }\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&}]{new\+\_\+account\+\_\+name}{, }\item[{ignore$<$ \mbox{\hyperlink{structsysiosystem_1_1authority}{authority}} $>$}]{owner}{, }\item[{ignore$<$ \mbox{\hyperlink{structsysiosystem_1_1authority}{authority}} $>$}]{active}{}\end{DoxyParamCaption})}
+
+These actions map one-\/on-\/one with the ones defined in core layer of EOSIO, that\textquotesingle{}s where their implementation actually is done. They are present here only so they can show up in the abi file and thus user can send them to this contract, but they have no specific implementation at this contract level, they will execute the implementation at the core layer and nothing else. New account action is called after a new account is created. This code enforces resource-\/limits rules for new accounts as well as new account naming conventions.
+
+Called after a new account is created. This code enforces resource-\/limits rules for new accounts as well as new account naming conventions.
+
+Account names containing \textquotesingle{}.\textquotesingle{} symbols must have a suffix equal to the name of the creator. This allows users who buy a premium name (shorter than 12 characters with no dots) to be the only ones who can create accounts with the creator\textquotesingle{}s name as a suffix. 
+
+Definition at line \mbox{\hyperlink{sysio_8system_8cpp_source_l00435}{435}} of file \mbox{\hyperlink{sysio_8system_8cpp_source}{sysio.\+system.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00438\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00439\ }
+\DoxyCodeLine{00440\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ creator\ !=\ get\_self()\ )\ \{}
+\DoxyCodeLine{00441\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ tmp\ =\ new\_account\_name.value\ >>\ 4;}
+\DoxyCodeLine{00442\ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ has\_dot\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00443\ }
+\DoxyCodeLine{00444\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\ \mbox{\hyperlink{stdint_8h_a435d1572bf3f880d55459d9805097f62}{uint32\_t}}\ i\ =\ 0;\ i\ <\ 12;\ ++i\ )\ \{}
+\DoxyCodeLine{00445\ \ \ \ \ \ \ \ \ \ \ \ has\_dot\ |=\ !(tmp\ \&\ 0x1f);}
+\DoxyCodeLine{00446\ \ \ \ \ \ \ \ \ \ \ \ tmp\ >>=\ 5;}
+\DoxyCodeLine{00447\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00448\ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ has\_dot\ )\ \{\ \textcolor{comment}{//\ or\ is\ less\ than\ 12\ characters}}
+\DoxyCodeLine{00449\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ suffix\ =\ new\_account\_name.suffix();}
+\DoxyCodeLine{00450\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ suffix\ ==\ new\_account\_name\ )\ \{}
+\DoxyCodeLine{00451\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysiosystem_a3e1fecc8ab83c8e8f634cbdc1073e484}{name\_bid\_table}}\ bids(get\_self(),\ get\_self().\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}});}
+\DoxyCodeLine{00452\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ current\ =\ bids.find(\ new\_account\_name.value\ );}
+\DoxyCodeLine{00453\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ check(\ current\ !=\ bids.end(),\ \textcolor{stringliteral}{"{}no\ active\ bid\ for\ name"{}}\ );}
+\DoxyCodeLine{00454\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ check(\ current-\/>high\_bidder\ ==\ creator,\ \textcolor{stringliteral}{"{}only\ highest\ bidder\ can\ claim"{}}\ );}
+\DoxyCodeLine{00455\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ check(\ current-\/>high\_bid\ <\ 0,\ \textcolor{stringliteral}{"{}auction\ for\ name\ is\ not\ closed\ yet"{}}\ );}
+\DoxyCodeLine{00456\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ bids.erase(\ current\ );}
+\DoxyCodeLine{00457\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00458\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ check(\ creator\ ==\ suffix,\ \textcolor{stringliteral}{"{}only\ suffix\ may\ create\ this\ account"{}}\ );}
+\DoxyCodeLine{00459\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00460\ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00461\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00462\ }
+\DoxyCodeLine{00463\ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysiosystem_aeda3aa12065ee04f138f8538184b8e54}{user\_resources\_table}}\ \ userres(\ get\_self(),\ new\_account\_name.value\ );}
+\DoxyCodeLine{00464\ }
+\DoxyCodeLine{00465\ \ \ \ \ \ \ userres.emplace(\ new\_account\_name,\ [\&](\ \textcolor{keyword}{auto}\&\ res\ )\ \{}
+\DoxyCodeLine{00466\ \ \ \ \ \ \ \ \ res.owner\ =\ new\_account\_name;}
+\DoxyCodeLine{00467\ \ \ \ \ \ \ \ \ res.net\_weight\ =\ asset(\ 0,\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_a7489c7a72a5cd39876940701c66d5d19}{system\_contract::get\_core\_symbol}}()\ );}
+\DoxyCodeLine{00468\ \ \ \ \ \ \ \ \ res.cpu\_weight\ =\ asset(\ 0,\ \mbox{\hyperlink{classsysiosystem_1_1system__contract_a7489c7a72a5cd39876940701c66d5d19}{system\_contract::get\_core\_symbol}}()\ );}
+\DoxyCodeLine{00469\ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00470\ }
+\DoxyCodeLine{00471\ \ \ \ \ \ \ set\_resource\_limits(\ new\_account\_name,\ 0,\ 0,\ 0\ );}
+\DoxyCodeLine{00472\ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=330pt]{classsysiosystem_1_1native_abfb28fdfbc472504fc0c53302c00a296_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysiosystem_1_1native_ad04e0ab2416499200bfda9d8869e9131}\index{sysiosystem::native@{sysiosystem::native}!onerror@{onerror}}
+\index{onerror@{onerror}!sysiosystem::native@{sysiosystem::native}}
+\doxysubsubsection{\texorpdfstring{onerror()}{onerror()}}
+{\footnotesize\ttfamily \label{classsysiosystem_1_1native_ad04e0ab2416499200bfda9d8869e9131} 
+void sysiosystem\+::native\+::onerror (\begin{DoxyParamCaption}\item[{ignore$<$ uint128\+\_\+t $>$}]{sender\+\_\+id}{, }\item[{ignore$<$ std\+::vector$<$ char $>$ $>$}]{sent\+\_\+trx}{}\end{DoxyParamCaption})}
+
+On error action, notification of this action is delivered to the sender of a deferred transaction when an objective error occurs while executing the deferred transaction. This action is not meant to be called directly.
+
+
+\begin{DoxyParams}{Parameters}
+{\em sender\+\_\+id} & -\/ the id for the deferred transaction chosen by the sender, \\
+\hline
+{\em sent\+\_\+trx} & -\/ the deferred transaction that failed. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{native_8cpp_source_l00007}{7}} of file \mbox{\hyperlink{native_8cpp_source}{native.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00007\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00008\ \ \ \ \ \ \ sysio::check(\ \textcolor{keyword}{false},\ \textcolor{stringliteral}{"{}the\ onerror\ action\ cannot\ be\ called\ directly"{}}\ );}
+\DoxyCodeLine{00009\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysiosystem_1_1native_a08f620afa821cb11e6d7ba2912353da8}\index{sysiosystem::native@{sysiosystem::native}!setabi@{setabi}}
+\index{setabi@{setabi}!sysiosystem::native@{sysiosystem::native}}
+\doxysubsubsection{\texorpdfstring{setabi()}{setabi()}}
+{\footnotesize\ttfamily \label{classsysiosystem_1_1native_a08f620afa821cb11e6d7ba2912353da8} 
+void sysiosystem\+::native\+::setabi (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&}]{account}{, }\item[{const std\+::vector$<$ char $>$ \&}]{abi}{, }\item[{const binary\+\_\+extension$<$ std\+::string $>$ \&}]{memo}{}\end{DoxyParamCaption})}
+
+Set abi action sets the contract abi for an account.
+
+
+\begin{DoxyParams}{Parameters}
+{\em account} & -\/ the account for which to set the contract abi. \\
+\hline
+{\em abi} & -\/ the abi content to be set, in the form of a blob binary. \\
+\hline
+{\em memo} & -\/ may be omitted \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{sysio_8system_8cpp_source_l00474}{474}} of file \mbox{\hyperlink{sysio_8system_8cpp_source}{sysio.\+system.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00475\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00476\ \ \ \ \ \ \ sysio::multi\_index<\ \textcolor{stringliteral}{"{}abihash"{}}\_n,\ abi\_hash\ >\ \ table(get\_self(),\ get\_self().\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}});}
+\DoxyCodeLine{00477\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ itr\ =\ table.find(\ acnt.value\ );}
+\DoxyCodeLine{00478\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ itr\ ==\ table.end()\ )\ \{}
+\DoxyCodeLine{00479\ \ \ \ \ \ \ \ \ \ table.emplace(\ acnt,\ [\&](\ \textcolor{keyword}{auto}\&\ row\ )\ \{}
+\DoxyCodeLine{00480\ \ \ \ \ \ \ \ \ \ \ \ \ row.owner\ =\ acnt;}
+\DoxyCodeLine{00481\ \ \ \ \ \ \ \ \ \ \ \ \ row.hash\ =\ \mbox{\hyperlink{classfc_1_1sha256}{sysio::sha256}}(\textcolor{keyword}{const\_cast<}\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(abi.data()),\ abi.size());}
+\DoxyCodeLine{00482\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00483\ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00484\ \ \ \ \ \ \ \ \ \ table.modify(\ itr,\ same\_payer,\ [\&](\ \textcolor{keyword}{auto}\&\ row\ )\ \{}
+\DoxyCodeLine{00485\ \ \ \ \ \ \ \ \ \ \ \ \ row.hash\ =\ \mbox{\hyperlink{classfc_1_1sha256}{sysio::sha256}}(\textcolor{keyword}{const\_cast<}\textcolor{keywordtype}{char}*\textcolor{keyword}{>}(abi.data()),\ abi.size());}
+\DoxyCodeLine{00486\ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{00487\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00488\ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classsysiosystem_1_1native_a265da49cbda19c73392f6adb8edcd2ad}\index{sysiosystem::native@{sysiosystem::native}!setcode@{setcode}}
+\index{setcode@{setcode}!sysiosystem::native@{sysiosystem::native}}
+\doxysubsubsection{\texorpdfstring{setcode()}{setcode()}}
+{\footnotesize\ttfamily \label{classsysiosystem_1_1native_a265da49cbda19c73392f6adb8edcd2ad} 
+void sysiosystem\+::native\+::setcode (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} \&}]{account}{, }\item[{\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}}}]{vmtype}{, }\item[{\mbox{\hyperlink{stdint_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\+\_\+t}}}]{vmversion}{, }\item[{const std\+::vector$<$ char $>$ \&}]{code}{, }\item[{const binary\+\_\+extension$<$ std\+::string $>$ \&}]{memo}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Set code action sets the contract code for an account.
+
+
+\begin{DoxyParams}{Parameters}
+{\em account} & -\/ the account for which to set the contract code. \\
+\hline
+{\em vmtype} & -\/ reserved, set it to zero. \\
+\hline
+{\em vmversion} & -\/ reserved, set it to zero. \\
+\hline
+{\em code} & -\/ the code content to be set, in the form of a blob binary.. \\
+\hline
+{\em memo} & -\/ may be omitted \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{native_8hpp_source_l00310}{310}} of file \mbox{\hyperlink{native_8hpp_source}{native.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00311\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classsysiosystem_1_1native_a64d5696e7c45f178647ad59f76a2f785}\index{sysiosystem::native@{sysiosystem::native}!unlinkauth@{unlinkauth}}
+\index{unlinkauth@{unlinkauth}!sysiosystem::native@{sysiosystem::native}}
+\doxysubsubsection{\texorpdfstring{unlinkauth()}{unlinkauth()}}
+{\footnotesize\ttfamily \label{classsysiosystem_1_1native_a64d5696e7c45f178647ad59f76a2f785} 
+void sysiosystem\+::native\+::unlinkauth (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}}]{account}{, }\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}}]{code}{, }\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}}]{type}{, }\item[{binary\+\_\+extension$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$}]{authorized\+\_\+by}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Unlink authorization action it\textquotesingle{}s doing the reverse of linkauth action, by unlinking the given action.
+
+This contract enforces additional rules\+:
+
+
+\begin{DoxyEnumerate}
+\item If authorized\+\_\+by is present and not "{}"{}, then the contract does a require\+\_\+auth2(account, authorized\+\_\+by).
+\item If the account has opted into limitauthchg, then authorized\+\_\+by must be present and not "{}"{}.
+\item If the account has opted into limitauthchg, and allow\+\_\+perms is not empty, then authorized\+\_\+by must be in the array.
+\item If the account has opted into limitauthchg, and disallow\+\_\+perms is not empty, then authorized\+\_\+by must not be in the array.
+\end{DoxyEnumerate}
+
+
+\begin{DoxyParams}{Parameters}
+{\em account} & -\/ the owner of the permission to be unlinked and the receiver of the freed RAM, \\
+\hline
+{\em code} & -\/ the owner of the action to be unlinked, \\
+\hline
+{\em type} & -\/ the action to be unlinked. \\
+\hline
+{\em authorized\+\_\+by} & -\/ the permission which is authorizing this change \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{native_8hpp_source_l00263}{263}} of file \mbox{\hyperlink{native_8hpp_source}{native.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00266\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00267\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysiosystem_a5de3a548ea8323b8a776a119bd5bb724}{check\_auth\_change}}(get\_self(),\ account,\ authorized\_by);}
+\DoxyCodeLine{00268\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=324pt]{classsysiosystem_1_1native_a64d5696e7c45f178647ad59f76a2f785_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classsysiosystem_1_1native_ac8dad9f9df4430ece4a000e74fc883b5}\index{sysiosystem::native@{sysiosystem::native}!updateauth@{updateauth}}
+\index{updateauth@{updateauth}!sysiosystem::native@{sysiosystem::native}}
+\doxysubsubsection{\texorpdfstring{updateauth()}{updateauth()}}
+{\footnotesize\ttfamily \label{classsysiosystem_1_1native_ac8dad9f9df4430ece4a000e74fc883b5} 
+void sysiosystem\+::native\+::updateauth (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}}]{account}{, }\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}}]{permission}{, }\item[{\mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}}}]{parent}{, }\item[{\mbox{\hyperlink{structsysiosystem_1_1authority}{authority}}}]{auth}{, }\item[{binary\+\_\+extension$<$ \mbox{\hyperlink{structsysio_1_1chain_1_1name}{name}} $>$}]{authorized\+\_\+by}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Update authorization action updates permission for an account.
+
+This contract enforces additional rules\+:
+
+
+\begin{DoxyEnumerate}
+\item If authorized\+\_\+by is present and not "{}"{}, then the contract does a require\+\_\+auth2(account, authorized\+\_\+by).
+\item If the account has opted into limitauthchg, then authorized\+\_\+by must be present and not "{}"{}.
+\item If the account has opted into limitauthchg, and allow\+\_\+perms is not empty, then authorized\+\_\+by must be in the array.
+\item If the account has opted into limitauthchg, and disallow\+\_\+perms is not empty, then authorized\+\_\+by must not be in the array.
+\end{DoxyEnumerate}
+
+
+\begin{DoxyParams}{Parameters}
+{\em account} & -\/ the account for which the permission is updated \\
+\hline
+{\em permission} & -\/ the permission name which is updated \\
+\hline
+{\em parent} & -\/ the parent of the permission which is updated \\
+\hline
+{\em auth} & -\/ the json describing the permission authorization \\
+\hline
+{\em authorized\+\_\+by} & -\/ the permission which is authorizing this change \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{native_8hpp_source_l00172}{172}} of file \mbox{\hyperlink{native_8hpp_source}{native.\+hpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacesysiosystem_a5de3a548ea8323b8a776a119bd5bb724}{check\_auth\_change}}(get\_self(),\ account,\ authorized\_by);}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=324pt]{classsysiosystem_1_1native_ac8dad9f9df4430ece4a000e74fc883b5_cgraph}
+\end{center}
+\end{figure}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/svetlasyrimis/\+Desktop/wire-\/network/\+WN-\/org/wire-\/system-\/contracts/contracts/sysio.\+system/include/sysio.\+system/\mbox{\hyperlink{native_8hpp}{native.\+hpp}}\item 
+/\+Users/svetlasyrimis/\+Desktop/wire-\/network/\+WN-\/org/wire-\/system-\/contracts/contracts/sysio.\+system/src/\mbox{\hyperlink{native_8cpp}{native.\+cpp}}\item 
+/\+Users/svetlasyrimis/\+Desktop/wire-\/network/\+WN-\/org/wire-\/system-\/contracts/contracts/sysio.\+system/src/\mbox{\hyperlink{sysio_8system_8cpp}{sysio.\+system.\+cpp}}\end{DoxyCompactItemize}

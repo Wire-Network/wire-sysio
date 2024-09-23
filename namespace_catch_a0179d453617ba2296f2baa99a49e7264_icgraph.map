@@ -1,0 +1,32 @@
+<map id="Catch::cout" name="Catch::cout">
+<area shape="rect" id="Node000001" title=" " alt="" coords="811,179,900,204"/>
+<area shape="rect" id="Node000002" href="$class_catch_1_1_session.html#ac28e293014007bbd9f6383c2d5daa1e4" title=" " alt="" coords="579,5,754,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="842,165,812,104,789,71,761,44,743,34,745,29,764,40,793,68,817,101,847,163"/>
+<area shape="rect" id="Node000006" href="$namespace_catch.html#a372777bee6b529124e0cae35748bb79c" title=" " alt="" coords="597,104,736,130"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="819,172,762,143,730,133,732,128,764,138,822,168"/>
+<area shape="rect" id="Node000008" href="$namespace_catch.html#a2226866b4114853fb3ff63dbecc8b0c9" title=" " alt="" coords="612,153,721,179"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="795,186,721,176,722,171,796,181"/>
+<area shape="rect" id="Node000009" href="$namespace_catch.html#ac2542a1569e5b9dc72206347368a921e" title=" " alt="" coords="610,203,723,228"/>
+<area shape="poly" id="edge9_Node000001_Node000009" title=" " alt="" coords="796,202,724,211,723,206,795,196"/>
+<area shape="rect" id="Node000010" href="$namespace_catch.html#a7f2d0f82056a4b9adc4204b9a1fbd117" title=" " alt="" coords="575,252,758,278"/>
+<area shape="poly" id="edge11_Node000001_Node000010" title=" " alt="" coords="821,215,764,243,731,254,729,249,762,238,819,210"/>
+<area shape="rect" id="Node000011" href="$class_catch_1_1_session.html#a0232a6c37ad5b5064a2462eedf13a9be" title=" " alt="" coords="336,253,474,279"/>
+<area shape="poly" id="edge13_Node000001_Node000011" title=" " alt="" coords="841,219,809,259,788,278,764,293,721,307,677,314,632,316,588,313,506,300,443,282,445,277,507,294,588,308,632,311,676,309,720,302,762,288,785,274,805,256,837,216"/>
+<area shape="rect" id="Node000012" href="$class_catch_1_1_session.html#a4286263c17b16c3ea9d0632bd4f8eaee" title=" " alt="" coords="578,55,755,80"/>
+<area shape="poly" id="edge15_Node000001_Node000012" title=" " alt="" coords="835,168,804,129,784,110,761,94,739,83,741,79,764,89,787,106,808,125,839,164"/>
+<area shape="rect" id="Node000013" href="$namespace_catch.html#aa5dcf4750ce9a854f4b74d3c952d13cc" title=" " alt="" coords="570,353,763,379"/>
+<area shape="poly" id="edge17_Node000001_Node000013" title=" " alt="" coords="846,220,815,278,792,309,764,336,729,355,726,350,761,332,788,306,810,275,841,217"/>
+<area shape="rect" id="Node000003" href="$class_catch_1_1_session.html#af890db02c69e36356ac9f8be4084c464" title=" " alt="" coords="288,55,522,80"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="580,37,478,57,477,51,579,32"/>
+<area shape="rect" id="Node000004" href="$class_catch_1_1_session.html#a8c82b89613ebd99f1ba1a3f7b634e571" title=" " alt="" coords="103,155,240,180"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="360,89,205,157,203,152,358,85"/>
+<area shape="rect" id="Node000005" href="$catch__default__main_8hpp.html#a0ddf1224851353fc92bfbff6f499fa97" title=" " alt="" coords="5,155,55,180"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="87,170,55,170,55,165,87,165"/>
+<area shape="rect" id="Node000007" href="$namespace_catch.html#a8267f077fd7ddf88bb182e8b9ead85d3" title=" " alt="" coords="364,179,446,204"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="596,137,571,143,447,181,445,176,570,138,595,131"/>
+<area shape="poly" id="edge8_Node000008_Node000007" title=" " alt="" coords="597,176,446,190,446,185,596,170"/>
+<area shape="poly" id="edge10_Node000009_Node000007" title=" " alt="" coords="594,212,446,198,447,193,595,206"/>
+<area shape="poly" id="edge12_Node000010_Node000007" title=" " alt="" coords="595,250,570,243,445,207,447,201,571,238,597,245"/>
+<area shape="poly" id="edge14_Node000011_Node000004" title=" " alt="" coords="357,249,287,219,203,183,205,178,289,214,359,244"/>
+<area shape="poly" id="edge16_Node000012_Node000003" title=" " alt="" coords="562,70,523,70,523,65,562,65"/>
+</map>

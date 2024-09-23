@@ -1,0 +1,74 @@
+\doxysection{libraries/sys-\/vm/external/\+Catch2/examples/120-\/\+Bdd-\/\+Scenario\+Given\+When\+Then.cpp File Reference}
+\hypertarget{120-_bdd-_scenario_given_when_then_8cpp}{}\label{120-_bdd-_scenario_given_when_then_8cpp}\index{libraries/sys-\/vm/external/Catch2/examples/120-\/Bdd-\/ScenarioGivenWhenThen.cpp@{libraries/sys-\/vm/external/Catch2/examples/120-\/Bdd-\/ScenarioGivenWhenThen.cpp}}
+{\ttfamily \#include $<$catch2/catch.\+hpp$>$}\newline
+Include dependency graph for 120-\/Bdd-\/\+Scenario\+Given\+When\+Then.cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{120-_bdd-_scenario_given_when_then_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{120-_bdd-_scenario_given_when_then_8cpp_a8b87b3b81943ffacdda33f2b0204bdbb}{SCENARIO}} ("{}vectors can be sized and resized"{}, "{}\mbox{[}vector\mbox{]}"{})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{120-_bdd-_scenario_given_when_then_8cpp_a8b87b3b81943ffacdda33f2b0204bdbb}\index{120-\/Bdd-\/ScenarioGivenWhenThen.cpp@{120-\/Bdd-\/ScenarioGivenWhenThen.cpp}!SCENARIO@{SCENARIO}}
+\index{SCENARIO@{SCENARIO}!120-\/Bdd-\/ScenarioGivenWhenThen.cpp@{120-\/Bdd-\/ScenarioGivenWhenThen.cpp}}
+\doxysubsubsection{\texorpdfstring{SCENARIO()}{SCENARIO()}}
+{\footnotesize\ttfamily \label{120-_bdd-_scenario_given_when_then_8cpp_a8b87b3b81943ffacdda33f2b0204bdbb} 
+SCENARIO (\begin{DoxyParamCaption}\item[{"{}vectors can be sized and resized"{}}]{}{, }\item[{"{}"{}}]{}{\mbox{[}vector\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{120-_bdd-_scenario_given_when_then_8cpp_source_l00007}{7}} of file \mbox{\hyperlink{120-_bdd-_scenario_given_when_then_8cpp_source}{120-\/\+Bdd-\/\+Scenario\+Given\+When\+Then.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00007\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00008\ }
+\DoxyCodeLine{00009\ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a2b70c603786d759242856d883dbe93bd}{GIVEN}}(\ \textcolor{stringliteral}{"{}A\ vector\ with\ some\ items"{}}\ )\ \{}
+\DoxyCodeLine{00010\ \ \ \ \ \ \ \ \ std::vector<int>\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}(\ 5\ );}
+\DoxyCodeLine{00011\ }
+\DoxyCodeLine{00012\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.size()\ ==\ 5\ );}
+\DoxyCodeLine{00013\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.capacity()\ >=\ 5\ );}
+\DoxyCodeLine{00014\ }
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ab09e9b8186233f676ce6a23aebe89d6e}{WHEN}}(\ \textcolor{stringliteral}{"{}the\ size\ is\ increased"{}}\ )\ \{}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.resize(\ 10\ );}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a27987092139727fd7a471b5f74dc62de}{THEN}}(\ \textcolor{stringliteral}{"{}the\ size\ and\ capacity\ change"{}}\ )\ \{}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.size()\ ==\ 10\ );}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.capacity()\ >=\ 10\ );}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ab09e9b8186233f676ce6a23aebe89d6e}{WHEN}}(\ \textcolor{stringliteral}{"{}the\ size\ is\ reduced"{}}\ )\ \{}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.resize(\ 0\ );}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a27987092139727fd7a471b5f74dc62de}{THEN}}(\ \textcolor{stringliteral}{"{}the\ size\ changes\ but\ not\ capacity"{}}\ )\ \{}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.size()\ ==\ 0\ );}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.capacity()\ >=\ 5\ );}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ab09e9b8186233f676ce6a23aebe89d6e}{WHEN}}(\ \textcolor{stringliteral}{"{}more\ capacity\ is\ reserved"{}}\ )\ \{}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.reserve(\ 10\ );}
+\DoxyCodeLine{00033\ }
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a27987092139727fd7a471b5f74dc62de}{THEN}}(\ \textcolor{stringliteral}{"{}the\ capacity\ changes\ but\ not\ the\ size"{}}\ )\ \{}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.size()\ ==\ 5\ );}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.capacity()\ >=\ 10\ );}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ab09e9b8186233f676ce6a23aebe89d6e}{WHEN}}(\ \textcolor{stringliteral}{"{}less\ capacity\ is\ reserved"{}}\ )\ \{}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.reserve(\ 0\ );}
+\DoxyCodeLine{00041\ }
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_a27987092139727fd7a471b5f74dc62de}{THEN}}(\ \textcolor{stringliteral}{"{}neither\ size\ nor\ capacity\ are\ changed"{}}\ )\ \{}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.size()\ ==\ 5\ );}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{include_2catch_8hpp_ad57835ba8f1bb419a865ada6bd011a85}{REQUIRE}}(\ \mbox{\hyperlink{namespacedevelop_build_ade64cd34608f9442ef3049116a2da428}{v}}.capacity()\ >=\ 5\ );}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00047\ \ \ \ \ \}}
+\DoxyCodeLine{00048\ \}}
+
+\end{DoxyCode}

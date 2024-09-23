@@ -1,0 +1,9 @@
+<map id="chainbase::undo_index::commit" name="chainbase::undo_index::commit">
+<area shape="rect" id="Node000001" title=" " alt="" coords="238,47,392,88"/>
+<area shape="rect" id="Node000002" href="$undo__index_8cpp.html#a49037050068737ab7140aef6994b491a" title=" " alt="" coords="5,5,190,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="222,49,157,34,158,29,223,44"/>
+<area shape="rect" id="Node000003" href="$undo__index_8cpp.html#ab9c902ca2f9b11f45ebac16840d11c1b" title=" " alt="" coords="5,55,190,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="222,70,190,70,190,65,222,65"/>
+<area shape="rect" id="Node000004" href="$undo__index_8cpp.html#acd92c7ff5fb095b161dfd57f50458253" title=" " alt="" coords="5,104,190,130"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="223,91,158,106,157,101,222,86"/>
+</map>

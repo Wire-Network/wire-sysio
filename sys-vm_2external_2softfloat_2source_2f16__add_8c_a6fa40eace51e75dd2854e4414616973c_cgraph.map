@@ -1,0 +1,20 @@
+<map id="f16_add" name="f16_add">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,50,73,75"/>
+<area shape="rect" id="Node000002" href="$sys-vm_2external_2softfloat_2source_2s__add_mags_f16_8c.html#a00b44e915d776c79e367951f5bb5a401" title=" " alt="" coords="121,74,271,99"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="73,65,106,70,105,75,73,70"/>
+<area shape="rect" id="Node000007" href="$sys-vm_2external_2softfloat_2source_2s__sub_mags_f16_8c.html#a8c92507f7907632a4c650cb72d17c9f3" title=" " alt="" coords="121,24,271,50"/>
+<area shape="poly" id="edge8_Node000001_Node000007" title=" " alt="" coords="73,54,105,49,106,54,73,60"/>
+<area shape="rect" id="Node000003" href="$softfloat_2source_28086-_s_s_e_2s__propagate_na_n_f16_u_i_8c.html#a0a28af9eb929cdc41f022223db9cf25b" title=" " alt="" coords="319,24,514,50"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="256,70,340,51,342,57,257,76"/>
+<area shape="rect" id="Node000004" href="$softfloat_2source_28086-_s_s_e_2softfloat__raise_flags_8c.html#ac16bbf09eca0fe8ff91301d82c5a667f" title=" " alt="" coords="580,24,715,50"/>
+<area shape="poly" id="edge4_Node000002_Node000004" title=" " alt="" coords="234,97,290,114,361,126,400,129,439,127,477,121,513,109,528,99,537,86,546,72,561,59,569,54,572,59,564,63,550,76,541,89,532,103,516,114,478,126,439,133,400,134,361,131,289,119,232,102"/>
+<area shape="rect" id="Node000005" href="$sys-vm_2external_2softfloat_2source_2s__round_pack_to_f16_8c.html#afd51b76ca556750a2bb12e0b240a857a" title=" " alt="" coords="330,74,503,99"/>
+<area shape="poly" id="edge5_Node000002_Node000005" title=" " alt="" coords="272,84,315,84,315,89,272,89"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="515,34,564,34,564,40,515,40"/>
+<area shape="poly" id="edge6_Node000005_Node000004" title=" " alt="" coords="480,70,569,51,570,56,481,76"/>
+<area shape="rect" id="Node000006" href="$sys-vm_2external_2softfloat_2source_2s__shift_right_jam32_8c.html#a6b119a74cc6fd0a60fd3d85448b24bc6" title=" " alt="" coords="562,74,733,99"/>
+<area shape="poly" id="edge7_Node000005_Node000006" title=" " alt="" coords="504,84,547,84,547,89,504,89"/>
+<area shape="poly" id="edge9_Node000007_Node000003" title=" " alt="" coords="272,34,303,34,303,40,272,40"/>
+<area shape="poly" id="edge10_Node000007_Node000004" title=" " alt="" coords="250,21,319,9,417,3,515,9,574,18,573,23,514,14,417,8,319,14,251,26"/>
+<area shape="poly" id="edge11_Node000007_Node000005" title=" " alt="" coords="257,48,342,67,340,72,256,53"/>
+</map>

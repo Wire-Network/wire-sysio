@@ -1,0 +1,116 @@
+\doxysection{testing\+::internal\+::linked\+\_\+ptr\+\_\+internal Class Reference}
+\hypertarget{classtesting_1_1internal_1_1linked__ptr__internal}{}\label{classtesting_1_1internal_1_1linked__ptr__internal}\index{testing::internal::linked\_ptr\_internal@{testing::internal::linked\_ptr\_internal}}
+
+
+{\ttfamily \#include $<$gtest-\/linked\+\_\+ptr.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr__internal_a742af1f65df2d5e2b7198a1b74264a83}{join\+\_\+new}} ()
+\item 
+void \mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr__internal_acd5a341459f7e81b10b4112d8c764e2a}{join}} (\mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr__internal}{linked\+\_\+ptr\+\_\+internal}} const \texorpdfstring{$\ast$}{*}ptr) \mbox{\hyperlink{gtest-port_8h_a69abff5a4efdd07bd5faebe3dd318d06}{GTEST\+\_\+\+LOCK\+\_\+\+EXCLUDED\+\_\+}}(g\+\_\+linked\+\_\+ptr\+\_\+mutex)
+\item 
+bool \mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr__internal_a8699e539d9702d363ef0351012d1b3ca}{depart}} () \mbox{\hyperlink{gtest-port_8h_a69abff5a4efdd07bd5faebe3dd318d06}{GTEST\+\_\+\+LOCK\+\_\+\+EXCLUDED\+\_\+}}(g\+\_\+linked\+\_\+ptr\+\_\+mutex)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{gtest-linked__ptr_8h_source_l00089}{89}} of file \mbox{\hyperlink{gtest-linked__ptr_8h_source}{gtest-\/linked\+\_\+ptr.\+h}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classtesting_1_1internal_1_1linked__ptr__internal_a8699e539d9702d363ef0351012d1b3ca}\index{testing::internal::linked\_ptr\_internal@{testing::internal::linked\_ptr\_internal}!depart@{depart}}
+\index{depart@{depart}!testing::internal::linked\_ptr\_internal@{testing::internal::linked\_ptr\_internal}}
+\doxysubsubsection{\texorpdfstring{depart()}{depart()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1linked__ptr__internal_a8699e539d9702d363ef0351012d1b3ca} 
+bool testing\+::internal\+::linked\+\_\+ptr\+\_\+internal\+::depart (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-linked__ptr_8h_source_l00125}{125}} of file \mbox{\hyperlink{gtest-linked__ptr_8h_source}{gtest-\/linked\+\_\+ptr.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00127\ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a08b187c6cc4e28400aadf9a32fccc8de}{MutexLock}}\ \mbox{\hyperlink{xbyak__mnemonic_8h_aa81aed607133209dade63a226818224d}{lock}}(\&g\_linked\_ptr\_mutex);}
+\DoxyCodeLine{00128\ }
+\DoxyCodeLine{00129\ \ \ \ \ \textcolor{keywordflow}{if}\ (next\_\ ==\ \textcolor{keyword}{this})\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00130\ \ \ \ \ linked\_ptr\_internal\ \textcolor{keyword}{const}*\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ next\_;}
+\DoxyCodeLine{00131\ \ \ \ \ \textcolor{keywordflow}{while}\ (\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}-\/>next\_\ !=\ \textcolor{keyword}{this})\ \{}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ assert(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}-\/>next\_\ !=\ next\_\ \&\&}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Trying\ to\ depart()\ a\ linked\ ring\ we\ are\ not\ in.\ "{}}}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Is\ GMock\ thread\ safety\ enabled?"{}});}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}-\/>next\_;}
+\DoxyCodeLine{00136\ \ \ \ \ \}}
+\DoxyCodeLine{00137\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}-\/>next\_\ =\ next\_;}
+\DoxyCodeLine{00138\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00139\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=245pt]{classtesting_1_1internal_1_1linked__ptr__internal_a8699e539d9702d363ef0351012d1b3ca_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1linked__ptr__internal_acd5a341459f7e81b10b4112d8c764e2a}\index{testing::internal::linked\_ptr\_internal@{testing::internal::linked\_ptr\_internal}!join@{join}}
+\index{join@{join}!testing::internal::linked\_ptr\_internal@{testing::internal::linked\_ptr\_internal}}
+\doxysubsubsection{\texorpdfstring{join()}{join()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1linked__ptr__internal_acd5a341459f7e81b10b4112d8c764e2a} 
+void testing\+::internal\+::linked\+\_\+ptr\+\_\+internal\+::join (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classtesting_1_1internal_1_1linked__ptr__internal}{linked\+\_\+ptr\+\_\+internal}} const \texorpdfstring{$\ast$}{*}}]{ptr}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-linked__ptr_8h_source_l00108}{108}} of file \mbox{\hyperlink{gtest-linked__ptr_8h_source}{gtest-\/linked\+\_\+ptr.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00110\ \ \ \ \ \mbox{\hyperlink{namespacetesting_1_1internal_a08b187c6cc4e28400aadf9a32fccc8de}{MutexLock}}\ \mbox{\hyperlink{xbyak__mnemonic_8h_aa81aed607133209dade63a226818224d}{lock}}(\&g\_linked\_ptr\_mutex);}
+\DoxyCodeLine{00111\ }
+\DoxyCodeLine{00112\ \ \ \ \ linked\_ptr\_internal\ \textcolor{keyword}{const}*\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ ptr;}
+\DoxyCodeLine{00113\ \ \ \ \ \textcolor{keywordflow}{while}\ (\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}-\/>next\_\ !=\ ptr)\ \{}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ assert(\mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}-\/>next\_\ !=\ \textcolor{keyword}{this}\ \&\&}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Trying\ to\ join()\ a\ linked\ ring\ we\ are\ already\ in.\ "{}}}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Is\ GMock\ thread\ safety\ enabled?"{}});}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}\ =\ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}-\/>next\_;}
+\DoxyCodeLine{00118\ \ \ \ \ \}}
+\DoxyCodeLine{00119\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_a8b0eadcc506862e9d751ab45185053aa}{p}}-\/>next\_\ =\ \textcolor{keyword}{this};}
+\DoxyCodeLine{00120\ \ \ \ \ next\_\ =\ ptr;}
+\DoxyCodeLine{00121\ \ \ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=266pt]{classtesting_1_1internal_1_1linked__ptr__internal_acd5a341459f7e81b10b4112d8c764e2a_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{classtesting_1_1internal_1_1linked__ptr__internal_a742af1f65df2d5e2b7198a1b74264a83}\index{testing::internal::linked\_ptr\_internal@{testing::internal::linked\_ptr\_internal}!join\_new@{join\_new}}
+\index{join\_new@{join\_new}!testing::internal::linked\_ptr\_internal@{testing::internal::linked\_ptr\_internal}}
+\doxysubsubsection{\texorpdfstring{join\_new()}{join\_new()}}
+{\footnotesize\ttfamily \label{classtesting_1_1internal_1_1linked__ptr__internal_a742af1f65df2d5e2b7198a1b74264a83} 
+void testing\+::internal\+::linked\+\_\+ptr\+\_\+internal\+::join\+\_\+new (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{gtest-linked__ptr_8h_source_l00092}{92}} of file \mbox{\hyperlink{gtest-linked__ptr_8h_source}{gtest-\/linked\+\_\+ptr.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00093\ \ \ \ \ next\_\ =\ \textcolor{keyword}{this};}
+\DoxyCodeLine{00094\ \ \ \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/include/fc/crypto/webauthn\+\_\+json/thirdparty/gtest/googletest/include/gtest/internal/\mbox{\hyperlink{gtest-linked__ptr_8h}{gtest-\/linked\+\_\+ptr.\+h}}\end{DoxyCompactItemize}

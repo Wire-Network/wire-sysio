@@ -1,0 +1,19 @@
+<map id="sysio::get_ship_version" name="sysio::get_ship_version">
+<area shape="rect" id="Node000001" title=" " alt="" coords="786,100,944,125"/>
+<area shape="rect" id="Node000002" href="$namespacesysio.html#a18132f8f1084f1195249e432f1d9329e" title=" " alt="" coords="583,5,727,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="817,96,705,49,707,44,819,91"/>
+<area shape="rect" id="Node000003" href="$namespacesysio.html#a7e66082bb7477dd8ee41a5145d604ee2" title=" " alt="" coords="572,120,738,161"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="771,128,739,132,738,127,770,122"/>
+<area shape="rect" id="Node000007" href="$classsysio_1_1state__history__log.html#a8753293c4782af4d456ecfdc84808dff" title=" " alt="" coords="5,63,141,103"/>
+<area shape="poly" id="edge9_Node000001_Node000007" title=" " alt="" coords="770,112,141,88,141,83,770,106"/>
+<area shape="rect" id="Node000008" href="$classsysio_1_1state__history__log.html#a6d85c85a918a3a0a987ab3e25bb6b44c" title=" " alt="" coords="189,185,341,226"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="830,136,787,157,738,175,632,196,524,208,424,212,341,212,341,206,424,206,524,202,631,191,737,170,785,152,827,131"/>
+<area shape="rect" id="Node000004" href="$classsysio_1_1state__history__log.html#a5d675a425819171a8166885ea6cf754c" title=" " alt="" coords="389,120,524,161"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="557,143,525,143,525,138,557,138"/>
+<area shape="rect" id="Node000005" href="$classsysio_1_1state__history__log.html#ad889160690ba1789472f6a4a29dee5d5" title=" " alt="" coords="197,120,332,161"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="374,143,333,143,333,138,374,138"/>
+<area shape="poly" id="edge7_Node000004_Node000008" title=" " alt="" coords="382,169,327,187,326,182,380,164"/>
+<area shape="rect" id="Node000006" href="$classsysio_1_1state__history__log.html#a59a8402aa5b18c7a78537acf11e0815d" title=" " alt="" coords="5,128,141,169"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="182,146,141,148,141,143,182,141"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="181,118,140,106,142,101,183,113"/>
+</map>

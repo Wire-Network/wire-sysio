@@ -1,0 +1,15 @@
+<map id="test_ecdsa_recovery_edge_cases" name="test_ecdsa_recovery_edge_cases">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,88,148,129"/>
+<area shape="rect" id="Node000002" href="$recovery_2main__impl_8h.html#aa87f5523141f798e963300ccd975141d" title=" " alt="" coords="208,5,384,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="109,86,149,63,195,41,217,33,218,38,197,46,152,67,112,90"/>
+<area shape="rect" id="Node000004" href="$recovery_2main__impl_8h.html#a37101568f72e98d7b29de6c6a825a289" title=" " alt="" coords="196,55,396,96"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="148,95,180,90,181,96,149,101"/>
+<area shape="rect" id="Node000005" href="$secp256k1_8c.html#a7bd08fb7f758494d5011849b6ca0ef13" title=" " alt="" coords="203,120,389,161"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="149,117,188,122,187,128,148,122"/>
+<area shape="rect" id="Node000006" href="$secp256k1_8c.html#abd11af3da8d88984e87ec8f06fb0087a" title=" " alt="" coords="213,185,378,211"/>
+<area shape="poly" id="edge7_Node000001_Node000006" title=" " alt="" coords="112,127,152,150,197,170,219,178,217,183,195,175,149,154,109,132"/>
+<area shape="rect" id="Node000003" href="$yubihsm__pkcs11_8c.html#adc4bd59a60361844aa0e852efa210105" title=" " alt="" coords="444,63,512,88"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="355,29,397,41,433,54,431,59,395,46,354,34"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="396,73,429,73,429,78,396,78"/>
+<area shape="poly" id="edge6_Node000005_Node000003" title=" " alt="" coords="360,117,395,105,429,92,431,97,397,110,361,122"/>
+</map>

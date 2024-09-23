@@ -1,0 +1,208 @@
+\doxysection{step4.\+cpp}
+\hypertarget{step4_8cpp_source}{}\label{step4_8cpp_source}\index{libraries/fc/vendor/websocketpp/tutorials/utility\_client/step4.cpp@{libraries/fc/vendor/websocketpp/tutorials/utility\_client/step4.cpp}}
+\mbox{\hyperlink{step4_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00001}00001\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00002}00002\ \textcolor{comment}{\ *\ Copyright\ (c)\ 2014,\ Peter\ Thorson.\ All\ rights\ reserved.}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00003}00003\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00004}00004\ \textcolor{comment}{\ *\ Redistribution\ and\ use\ in\ source\ and\ binary\ forms,\ with\ or\ without}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00005}00005\ \textcolor{comment}{\ *\ modification,\ are\ permitted\ provided\ that\ the\ following\ conditions\ are\ met:}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00006}00006\ \textcolor{comment}{\ *\ \ \ \ \ *\ Redistributions\ of\ source\ code\ must\ retain\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00007}00007\ \textcolor{comment}{\ *\ \ \ \ \ \ \ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer.}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00008}00008\ \textcolor{comment}{\ *\ \ \ \ \ *\ Redistributions\ in\ binary\ form\ must\ reproduce\ the\ above\ copyright}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00009}00009\ \textcolor{comment}{\ *\ \ \ \ \ \ \ notice,\ this\ list\ of\ conditions\ and\ the\ following\ disclaimer\ in\ the}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00010}00010\ \textcolor{comment}{\ *\ \ \ \ \ \ \ documentation\ and/or\ other\ materials\ provided\ with\ the\ distribution.}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00011}00011\ \textcolor{comment}{\ *\ \ \ \ \ *\ Neither\ the\ name\ of\ the\ WebSocket++\ Project\ nor\ the}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00012}00012\ \textcolor{comment}{\ *\ \ \ \ \ \ \ names\ of\ its\ contributors\ may\ be\ used\ to\ endorse\ or\ promote\ products}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00013}00013\ \textcolor{comment}{\ *\ \ \ \ \ \ \ derived\ from\ this\ software\ without\ specific\ prior\ written\ permission.}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00014}00014\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00015}00015\ \textcolor{comment}{\ *\ THIS\ SOFTWARE\ IS\ PROVIDED\ BY\ THE\ COPYRIGHT\ HOLDERS\ AND\ CONTRIBUTORS\ "{}AS\ IS"{}}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00016}00016\ \textcolor{comment}{\ *\ AND\ ANY\ EXPRESS\ OR\ IMPLIED\ WARRANTIES,\ INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ THE}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00017}00017\ \textcolor{comment}{\ *\ IMPLIED\ WARRANTIES\ OF\ MERCHANTABILITY\ AND\ FITNESS\ FOR\ A\ PARTICULAR\ PURPOSE}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00018}00018\ \textcolor{comment}{\ *\ ARE\ DISCLAIMED.\ IN\ NO\ EVENT\ SHALL\ PETER\ THORSON\ BE\ LIABLE\ FOR\ ANY}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00019}00019\ \textcolor{comment}{\ *\ DIRECT,\ INDIRECT,\ INCIDENTAL,\ SPECIAL,\ EXEMPLARY,\ OR\ CONSEQUENTIAL\ DAMAGES}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00020}00020\ \textcolor{comment}{\ *\ (INCLUDING,\ BUT\ NOT\ LIMITED\ TO,\ PROCUREMENT\ OF\ SUBSTITUTE\ GOODS\ OR\ SERVICES;}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00021}00021\ \textcolor{comment}{\ *\ LOSS\ OF\ USE,\ DATA,\ OR\ PROFITS;\ OR\ BUSINESS\ INTERRUPTION)\ HOWEVER\ CAUSED\ AND}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00022}00022\ \textcolor{comment}{\ *\ ON\ ANY\ THEORY\ OF\ LIABILITY,\ WHETHER\ IN\ CONTRACT,\ STRICT\ LIABILITY,\ OR\ TORT}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00023}00023\ \textcolor{comment}{\ *\ (INCLUDING\ NEGLIGENCE\ OR\ OTHERWISE)\ ARISING\ IN\ ANY\ WAY\ OUT\ OF\ THE\ USE\ OF\ THIS}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00024}00024\ \textcolor{comment}{\ *\ SOFTWARE,\ EVEN\ IF\ ADVISED\ OF\ THE\ POSSIBILITY\ OF\ SUCH\ DAMAGE.}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00025}00025\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00027}00027\ \textcolor{comment}{//\ **NOTE:**\ This\ file\ is\ a\ snapshot\ of\ the\ WebSocket++\ utility\ client\ tutorial.}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00028}00028\ \textcolor{comment}{//\ Additional\ related\ material\ can\ be\ found\ in\ the\ tutorials/utility\_client}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00029}00029\ \textcolor{comment}{//\ directory\ of\ the\ WebSocket++\ repository.}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00031}00031\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{asio__no__tls__client_8hpp}{websocketpp/config/asio\_no\_tls\_client.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00032}00032\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{client_8hpp}{websocketpp/client.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00034}00034\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{thread_8hpp}{websocketpp/common/thread.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00035}00035\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{fc_2vendor_2websocketpp_2websocketpp_2common_2memory_8hpp}{websocketpp/common/memory.hpp}}>}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00037}00037\ \textcolor{preprocessor}{\#include\ <cstdlib>}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00038}00038\ \textcolor{preprocessor}{\#include\ <iostream>}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00039}00039\ \textcolor{preprocessor}{\#include\ <map>}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00040}00040\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00041}00041\ \textcolor{preprocessor}{\#include\ <sstream>}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00043}\mbox{\hyperlink{step4_8cpp_aff8c62b83a9c8aefc476f96166656b76}{00043}}\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classwebsocketpp_1_1client}{websocketpp::client<websocketpp::config::asio\_client>}}\ \mbox{\hyperlink{step4_8cpp_aff8c62b83a9c8aefc476f96166656b76}{client}};}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00045}00045\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classconnection__metadata}{connection\_metadata}}\ \{}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00046}00046\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00047}00047\ \ \ \ \ \textcolor{keyword}{typedef}\ websocketpp::lib::shared\_ptr<connection\_metadata>\ \mbox{\hyperlink{classconnection__metadata_ada3ee69cbbc88df3cc5a74e8840671ac}{ptr}};}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00049}\mbox{\hyperlink{classconnection__metadata_ab73db2e336676ec4efa4d4dc5051958f}{00049}}\ \ \ \ \ \mbox{\hyperlink{classconnection__metadata_ab73db2e336676ec4efa4d4dc5051958f}{connection\_metadata}}(\textcolor{keywordtype}{int}\ \textcolor{keywordtype}{id},\ \mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{websocketpp::connection\_hdl}}\ hdl,\ std::string\ uri)}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00050}00050\ \ \ \ \ \ \ :\ m\_id(\mbox{\hyperlink{code__cache_8cpp_aa0efefe21f4700d78692edc823e763be}{id}})}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00051}00051\ \ \ \ \ \ \ ,\ m\_hdl(hdl)}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00052}00052\ \ \ \ \ \ \ ,\ m\_status(\textcolor{stringliteral}{"{}Connecting"{}})}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00053}00053\ \ \ \ \ \ \ ,\ m\_uri(uri)}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00054}00054\ \ \ \ \ \ \ ,\ m\_server(\textcolor{stringliteral}{"{}N/A"{}})}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00055}00055\ \ \ \ \ \{\}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00057}\mbox{\hyperlink{classconnection__metadata_ab10d997bd75d9e98b235b7e97b84b85a}{00057}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classconnection__metadata_ab10d997bd75d9e98b235b7e97b84b85a}{on\_open}}(\mbox{\hyperlink{classwebsocketpp_1_1client}{client}}\ *\ c,\ \mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{websocketpp::connection\_hdl}}\ hdl)\ \{}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00058}00058\ \ \ \ \ \ \ \ \ m\_status\ =\ \textcolor{stringliteral}{"{}Open"{}};}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00060}00060\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1client_ad9e541a43023d33d5cd5669d62a13edc}{client::connection\_ptr}}\ con\ =\ c-\/>\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a0fe4457427d4124abe7ca022ba7afbb4}{get\_con\_from\_hdl}}(hdl);}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00061}00061\ \ \ \ \ \ \ \ \ m\_server\ =\ con-\/>get\_response\_header(\textcolor{stringliteral}{"{}Server"{}});}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00062}00062\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00064}\mbox{\hyperlink{classconnection__metadata_a1c2e652001b8306207beafe17b1a52ed}{00064}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classconnection__metadata_a1c2e652001b8306207beafe17b1a52ed}{on\_fail}}(\mbox{\hyperlink{classwebsocketpp_1_1client}{client}}\ *\ c,\ \mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{websocketpp::connection\_hdl}}\ hdl)\ \{}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00065}00065\ \ \ \ \ \ \ \ \ m\_status\ =\ \textcolor{stringliteral}{"{}Failed"{}};}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00067}00067\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1client_ad9e541a43023d33d5cd5669d62a13edc}{client::connection\_ptr}}\ con\ =\ c-\/>\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a0fe4457427d4124abe7ca022ba7afbb4}{get\_con\_from\_hdl}}(hdl);}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00068}00068\ \ \ \ \ \ \ \ \ m\_server\ =\ con-\/>get\_response\_header(\textcolor{stringliteral}{"{}Server"{}});}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00069}00069\ \ \ \ \ \ \ \ \ m\_error\_reason\ =\ con-\/>get\_ec().message();}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00070}00070\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00072}00072\ \ \ \ \ \textcolor{keyword}{friend}\ std::ostream\ \&\ \mbox{\hyperlink{classconnection__metadata_a2aec4aeb2bb18764b4be4e1cfb033fb6}{operator<<\ }}(std::ostream\ \&\ out,\ \mbox{\hyperlink{classconnection__metadata}{connection\_metadata}}\ \textcolor{keyword}{const}\ \&\ data);}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00073}00073\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00074}00074\ \ \ \ \ \textcolor{keywordtype}{int}\ m\_id;}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00075}00075\ \ \ \ \ \mbox{\hyperlink{namespacewebsocketpp_a6b3d26a10ee7229b84b776786332631d}{websocketpp::connection\_hdl}}\ m\_hdl;}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00076}00076\ \ \ \ \ std::string\ m\_status;}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00077}00077\ \ \ \ \ std::string\ m\_uri;}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00078}00078\ \ \ \ \ std::string\ m\_server;}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00079}00079\ \ \ \ \ std::string\ m\_error\_reason;}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00080}00080\ \};}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00081}00081\ }
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00082}\mbox{\hyperlink{step4_8cpp_a2aec4aeb2bb18764b4be4e1cfb033fb6}{00082}}\ std::ostream\ \&\ \mbox{\hyperlink{step4_8cpp_a2aec4aeb2bb18764b4be4e1cfb033fb6}{operator<<\ }}(std::ostream\ \&\ out,\ \mbox{\hyperlink{classconnection__metadata}{connection\_metadata}}\ \textcolor{keyword}{const}\ \&\ data)\ \{}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00083}00083\ \ \ \ \ out\ <<\ \textcolor{stringliteral}{"{}>\ URI:\ "{}}\ <<\ data.m\_uri\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00084}00084\ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}>\ Status:\ "{}}\ <<\ data.m\_status\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00085}00085\ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}>\ Remote\ Server:\ "{}}\ <<\ (data.m\_server.empty()\ ?\ \textcolor{stringliteral}{"{}None\ Specified"{}}\ :\ data.m\_server)\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00086}00086\ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}>\ Error/close\ reason:\ "{}}\ <<\ (data.m\_error\_reason.empty()\ ?\ \textcolor{stringliteral}{"{}N/A"{}}\ :\ data.m\_error\_reason);}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00087}00087\ }
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00088}00088\ \ \ \ \ \textcolor{keywordflow}{return}\ out;}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00089}00089\ \}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00090}00090\ }
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00091}00091\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classwebsocket__endpoint}{websocket\_endpoint}}\ \{}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00092}00092\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00093}\mbox{\hyperlink{classwebsocket__endpoint_a67c36b27ce42577e7bc03e6d746f673c}{00093}}\ \ \ \ \ \mbox{\hyperlink{classwebsocket__endpoint_a67c36b27ce42577e7bc03e6d746f673c}{websocket\_endpoint}}\ ()\ :\ m\_next\_id(0)\ \{}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00094}00094\ \ \ \ \ \ \ \ \ m\_endpoint.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a3fe357b3c6434273a9965eb52902575d}{clear\_access\_channels}}(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1alevel_a853aa0b8976e53f3181af3bc398d493e}{websocketpp::log::alevel::all}});}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00095}00095\ \ \ \ \ \ \ \ \ m\_endpoint.\mbox{\hyperlink{classwebsocketpp_1_1endpoint_a8cefa4fc37c0df4eb6ed0bcf04bb0da5}{clear\_error\_channels}}(\mbox{\hyperlink{structwebsocketpp_1_1log_1_1elevel_a9b31ff708c221d314f9f4eb3ff2b1ad7}{websocketpp::log::elevel::all}});}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00096}00096\ }
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00097}00097\ \ \ \ \ \ \ \ \ m\_endpoint.init\_asio();}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00098}00098\ \ \ \ \ \ \ \ \ m\_endpoint.start\_perpetual();}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00099}00099\ }
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00100}00100\ \ \ \ \ \ \ \ \ m\_thread\ =\ websocketpp::lib::make\_shared<websocketpp::lib::thread>(\&client::run,\ \&m\_endpoint);}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00101}00101\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00102}00102\ }
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00103}\mbox{\hyperlink{classwebsocket__endpoint_a5850523b829e145793d42e137d5eb8c0}{00103}}\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classwebsocket__endpoint_a5850523b829e145793d42e137d5eb8c0}{connect}}(std::string\ \textcolor{keyword}{const}\ \&\ uri)\ \{}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00104}00104\ \ \ \ \ \ \ \ \ websocketpp::lib::error\_code\ ec;}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00105}00105\ }
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00106}00106\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1client_ad9e541a43023d33d5cd5669d62a13edc}{client::connection\_ptr}}\ con\ =\ m\_endpoint.\mbox{\hyperlink{classwebsocketpp_1_1client_aa95cec974921e32bc37a61c683ae240d}{get\_connection}}(uri,\ ec);}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00107}00107\ }
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00108}00108\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ec)\ \{}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00109}00109\ \ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}>\ Connect\ initialization\ error:\ "{}}\ <<\ ec.message()\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00110}00110\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ -\/1;}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00111}00111\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00112}00112\ }
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00113}00113\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ new\_id\ =\ m\_next\_id++;}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00114}00114\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classconnection__metadata_ada3ee69cbbc88df3cc5a74e8840671ac}{connection\_metadata::ptr}}\ metadata\_ptr\ =\ websocketpp::lib::make\_shared<connection\_metadata>(new\_id,\ con-\/>get\_handle(),\ uri);}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00115}00115\ \ \ \ \ \ \ \ \ m\_connection\_list[new\_id]\ =\ metadata\_ptr;}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00116}00116\ }
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00117}00117\ \ \ \ \ \ \ \ \ con-\/>set\_open\_handler(websocketpp::lib::bind(}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00118}00118\ \ \ \ \ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{classconnection__metadata_ab10d997bd75d9e98b235b7e97b84b85a}{connection\_metadata::on\_open}},}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00119}00119\ \ \ \ \ \ \ \ \ \ \ \ \ metadata\_ptr,}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00120}00120\ \ \ \ \ \ \ \ \ \ \ \ \ \&m\_endpoint,}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00121}00121\ \ \ \ \ \ \ \ \ \ \ \ \ websocketpp::lib::placeholders::\_1}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00122}00122\ \ \ \ \ \ \ \ \ ));}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00123}00123\ \ \ \ \ \ \ \ \ con-\/>set\_fail\_handler(websocketpp::lib::bind(}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00124}00124\ \ \ \ \ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{classconnection__metadata_a1c2e652001b8306207beafe17b1a52ed}{connection\_metadata::on\_fail}},}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00125}00125\ \ \ \ \ \ \ \ \ \ \ \ \ metadata\_ptr,}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00126}00126\ \ \ \ \ \ \ \ \ \ \ \ \ \&m\_endpoint,}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00127}00127\ \ \ \ \ \ \ \ \ \ \ \ \ websocketpp::lib::placeholders::\_1}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00128}00128\ \ \ \ \ \ \ \ \ ));}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00129}00129\ }
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00130}00130\ \ \ \ \ \ \ \ \ m\_endpoint.\mbox{\hyperlink{classwebsocketpp_1_1client_a818c30343180123bf1fee6dc21524bae}{connect}}(con);}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00131}00131\ }
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00132}00132\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ new\_id;}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00133}00133\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00134}00134\ }
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00135}\mbox{\hyperlink{classwebsocket__endpoint_a5896c27213953d2d33b88e117b1971f6}{00135}}\ \ \ \ \ \mbox{\hyperlink{classconnection__metadata_ada3ee69cbbc88df3cc5a74e8840671ac}{connection\_metadata::ptr}}\ \mbox{\hyperlink{classwebsocket__endpoint_a5896c27213953d2d33b88e117b1971f6}{get\_metadata}}(\textcolor{keywordtype}{int}\ \textcolor{keywordtype}{id})\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00136}00136\ \ \ \ \ \ \ \ \ con\_list::const\_iterator\ metadata\_it\ =\ m\_connection\_list.find(\textcolor{keywordtype}{id});}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00137}00137\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (metadata\_it\ ==\ m\_connection\_list.end())\ \{}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00138}00138\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classconnection__metadata_ada3ee69cbbc88df3cc5a74e8840671ac}{connection\_metadata::ptr}}();}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00139}00139\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00140}00140\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ metadata\_it-\/>second;}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00141}00141\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00142}00142\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00143}00143\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00144}00144\ \ \ \ \ \textcolor{keyword}{typedef}\ std::map<int,connection\_metadata::ptr>\ con\_list;}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00145}00145\ }
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00146}00146\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1client}{client}}\ m\_endpoint;}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00147}00147\ \ \ \ \ websocketpp::lib::shared\_ptr<websocketpp::lib::thread>\ m\_thread;}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00148}00148\ }
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00149}00149\ \ \ \ \ con\_list\ m\_connection\_list;}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00150}00150\ \ \ \ \ \textcolor{keywordtype}{int}\ m\_next\_id;}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00151}00151\ \};}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00152}00152\ }
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00153}\mbox{\hyperlink{step4_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{00153}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{step4_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}}()\ \{}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00154}00154\ \ \ \ \ \textcolor{keywordtype}{bool}\ done\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00155}00155\ \ \ \ \ std::string\ input;}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00156}00156\ \ \ \ \ \mbox{\hyperlink{classwebsocket__endpoint}{websocket\_endpoint}}\ endpoint;}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00157}00157\ }
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00158}00158\ \ \ \ \ \textcolor{keywordflow}{while}\ (!done)\ \{}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00159}00159\ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}Enter\ Command:\ "{}};}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00160}00160\ \ \ \ \ \ \ \ \ std::getline(std::cin,\ input);}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00161}00161\ }
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00162}00162\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (input\ ==\ \textcolor{stringliteral}{"{}quit"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00163}00163\ \ \ \ \ \ \ \ \ \ \ \ \ done\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00164}00164\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (input\ ==\ \textcolor{stringliteral}{"{}help"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00165}00165\ \ \ \ \ \ \ \ \ \ \ \ \ std::cout}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00166}00166\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}\(\backslash\)nCommand\ List:\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00167}00167\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}connect\ <ws\ uri>\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00168}00168\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}show\ <connection\ id>\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00169}00169\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}help:\ Display\ this\ help\ text\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00170}00170\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{}quit:\ Exit\ the\ program\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00171}00171\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00172}00172\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (input.substr(0,7)\ ==\ \textcolor{stringliteral}{"{}connect"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00173}00173\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \textcolor{keywordtype}{id}\ =\ endpoint.\mbox{\hyperlink{classwebsocket__endpoint_a5850523b829e145793d42e137d5eb8c0}{connect}}(input.substr(8));}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00174}00174\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keywordtype}{id}\ !=\ -\/1)\ \{}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00175}00175\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}>\ Created\ connection\ with\ id\ "{}}\ <<\ \textcolor{keywordtype}{id}\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00176}00176\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00177}00177\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (input.substr(0,4)\ ==\ \textcolor{stringliteral}{"{}show"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00178}00178\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \textcolor{keywordtype}{id}\ =\ atoi(input.substr(5).c\_str());}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00179}00179\ }
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00180}00180\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classconnection__metadata_ada3ee69cbbc88df3cc5a74e8840671ac}{connection\_metadata::ptr}}\ metadata\ =\ endpoint.\mbox{\hyperlink{classwebsocket__endpoint_a5896c27213953d2d33b88e117b1971f6}{get\_metadata}}(\textcolor{keywordtype}{id});}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00181}00181\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (metadata)\ \{}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00182}00182\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ *metadata\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00183}00183\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00184}00184\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}>\ Unknown\ connection\ id\ "{}}\ <<\ \textcolor{keywordtype}{id}\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00185}00185\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00186}00186\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00187}00187\ \ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}>\ Unrecognized\ Command"{}}\ <<\ std::endl;}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00188}00188\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00189}00189\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00190}00190\ }
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00191}00191\ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00192}00192\ \}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00193}00193\ }
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00194}00194\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00195}00195\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00196}00196\ \textcolor{comment}{clang++\ -\/std=c++11\ -\/stdlib=libc++\ -\/I/Users/zaphoyd/software/websocketpp/\ -\/I/Users/zaphoyd/software/boost\_1\_55\_0/\ -\/D\_WEBSOCKETPP\_CPP11\_STL\_\ step4.cpp\ /Users/zaphoyd/software/boost\_1\_55\_0/stage/lib/libboost\_system.a}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00197}00197\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00198}00198\ \textcolor{comment}{clang++\ -\/I/Users/zaphoyd/software/websocketpp/\ -\/I/Users/zaphoyd/software/boost\_1\_55\_0/\ step4.cpp\ /Users/zaphoyd/software/boost\_1\_55\_0/stage/lib/libboost\_system.a\ /Users/zaphoyd/software/boost\_1\_55\_0/stage/lib/libboost\_thread.a\ /Users/zaphoyd/software/boost\_1\_55\_0/stage/lib/libboost\_random.a}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00199}00199\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00200}00200\ \textcolor{comment}{clang++\ -\/std=c++11\ -\/stdlib=libc++\ -\/I/Users/zaphoyd/Documents/websocketpp/\ -\/I/Users/zaphoyd/Documents/boost\_1\_53\_0\_libcpp/\ -\/D\_WEBSOCKETPP\_CPP11\_STL\_\ step4.cpp\ /Users/zaphoyd/Documents/boost\_1\_53\_0\_libcpp/stage/lib/libboost\_system.a}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00201}00201\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{step4_8cpp_source_l00202}00202\ \textcolor{comment}{*/}}
+
+\end{DoxyCode}

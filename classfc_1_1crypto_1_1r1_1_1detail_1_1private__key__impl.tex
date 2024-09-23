@@ -1,0 +1,96 @@
+\doxysection{fc\+::crypto\+::r1\+::detail\+::private\+\_\+key\+\_\+impl Class Reference}
+\hypertarget{classfc_1_1crypto_1_1r1_1_1detail_1_1private__key__impl}{}\label{classfc_1_1crypto_1_1r1_1_1detail_1_1private__key__impl}\index{fc::crypto::r1::detail::private\_key\_impl@{fc::crypto::r1::detail::private\_key\_impl}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classfc_1_1crypto_1_1r1_1_1detail_1_1private__key__impl_a64efd96077be462188b8c9a73180da1d}{private\+\_\+key\+\_\+impl}} ()
+\item 
+\mbox{\hyperlink{classfc_1_1crypto_1_1r1_1_1detail_1_1private__key__impl_a5123334c7d93856f348eb4715369b56f}{\texorpdfstring{$\sim$}{\string~}private\+\_\+key\+\_\+impl}} ()
+\item 
+\mbox{\hyperlink{classfc_1_1crypto_1_1r1_1_1detail_1_1private__key__impl_a8749ec686a527d3e6355ba67df7d0b9a}{private\+\_\+key\+\_\+impl}} (const \mbox{\hyperlink{classfc_1_1crypto_1_1r1_1_1detail_1_1private__key__impl}{private\+\_\+key\+\_\+impl}} \&cpy)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+EC\+\_\+\+KEY \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classfc_1_1crypto_1_1r1_1_1detail_1_1private__key__impl_a546d2e6177cd1435c6ba5ae13e32f5cb}{\+\_\+key}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{elliptic__r1_8cpp_source_l00031}{31}} of file \mbox{\hyperlink{elliptic__r1_8cpp_source}{elliptic\+\_\+r1.\+cpp}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classfc_1_1crypto_1_1r1_1_1detail_1_1private__key__impl_a64efd96077be462188b8c9a73180da1d}\index{fc::crypto::r1::detail::private\_key\_impl@{fc::crypto::r1::detail::private\_key\_impl}!private\_key\_impl@{private\_key\_impl}}
+\index{private\_key\_impl@{private\_key\_impl}!fc::crypto::r1::detail::private\_key\_impl@{fc::crypto::r1::detail::private\_key\_impl}}
+\doxysubsubsection{\texorpdfstring{private\_key\_impl()}{private\_key\_impl()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1crypto_1_1r1_1_1detail_1_1private__key__impl_a64efd96077be462188b8c9a73180da1d} 
+fc\+::crypto\+::r1\+::detail\+::private\+\_\+key\+\_\+impl\+::private\+\_\+key\+\_\+impl (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic__r1_8cpp_source_l00034}{34}} of file \mbox{\hyperlink{elliptic__r1_8cpp_source}{elliptic\+\_\+r1.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00034\ :\ \mbox{\hyperlink{classfc_1_1crypto_1_1r1_1_1detail_1_1private__key__impl_a546d2e6177cd1435c6ba5ae13e32f5cb}{\_key}}(\textcolor{keyword}{nullptr})\ \{\}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1crypto_1_1r1_1_1detail_1_1private__key__impl_a5123334c7d93856f348eb4715369b56f}\index{fc::crypto::r1::detail::private\_key\_impl@{fc::crypto::r1::detail::private\_key\_impl}!````~private\_key\_impl@{\texorpdfstring{$\sim$}{\string~}private\_key\_impl}}
+\index{````~private\_key\_impl@{\texorpdfstring{$\sim$}{\string~}private\_key\_impl}!fc::crypto::r1::detail::private\_key\_impl@{fc::crypto::r1::detail::private\_key\_impl}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}private\_key\_impl()}{\string~private\_key\_impl()}}
+{\footnotesize\ttfamily \label{classfc_1_1crypto_1_1r1_1_1detail_1_1private__key__impl_a5123334c7d93856f348eb4715369b56f} 
+fc\+::crypto\+::r1\+::detail\+::private\+\_\+key\+\_\+impl\+::\texorpdfstring{$\sim$}{\string~}private\+\_\+key\+\_\+impl (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic__r1_8cpp_source_l00036}{36}} of file \mbox{\hyperlink{elliptic__r1_8cpp_source}{elliptic\+\_\+r1.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\ \mbox{\hyperlink{classfc_1_1crypto_1_1r1_1_1detail_1_1private__key__impl_a546d2e6177cd1435c6ba5ae13e32f5cb}{\_key}}\ !=\ \textcolor{keyword}{nullptr}\ )}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ EC\_KEY\_free(\mbox{\hyperlink{classfc_1_1crypto_1_1r1_1_1detail_1_1private__key__impl_a546d2e6177cd1435c6ba5ae13e32f5cb}{\_key}});}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\Hypertarget{classfc_1_1crypto_1_1r1_1_1detail_1_1private__key__impl_a8749ec686a527d3e6355ba67df7d0b9a}\index{fc::crypto::r1::detail::private\_key\_impl@{fc::crypto::r1::detail::private\_key\_impl}!private\_key\_impl@{private\_key\_impl}}
+\index{private\_key\_impl@{private\_key\_impl}!fc::crypto::r1::detail::private\_key\_impl@{fc::crypto::r1::detail::private\_key\_impl}}
+\doxysubsubsection{\texorpdfstring{private\_key\_impl()}{private\_key\_impl()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classfc_1_1crypto_1_1r1_1_1detail_1_1private__key__impl_a8749ec686a527d3e6355ba67df7d0b9a} 
+fc\+::crypto\+::r1\+::detail\+::private\+\_\+key\+\_\+impl\+::private\+\_\+key\+\_\+impl (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classfc_1_1crypto_1_1r1_1_1detail_1_1private__key__impl}{private\+\_\+key\+\_\+impl}} \&}]{cpy}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic__r1_8cpp_source_l00043}{43}} of file \mbox{\hyperlink{elliptic__r1_8cpp_source}{elliptic\+\_\+r1.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classfc_1_1crypto_1_1r1_1_1detail_1_1private__key__impl_a546d2e6177cd1435c6ba5ae13e32f5cb}{\_key}}\ =\ cpy.\_key\ ?\ EC\_KEY\_dup(\ cpy.\_key\ )\ :\ nullptr;}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classfc_1_1crypto_1_1r1_1_1detail_1_1private__key__impl_a546d2e6177cd1435c6ba5ae13e32f5cb}\index{fc::crypto::r1::detail::private\_key\_impl@{fc::crypto::r1::detail::private\_key\_impl}!\_key@{\_key}}
+\index{\_key@{\_key}!fc::crypto::r1::detail::private\_key\_impl@{fc::crypto::r1::detail::private\_key\_impl}}
+\doxysubsubsection{\texorpdfstring{\_key}{\_key}}
+{\footnotesize\ttfamily \label{classfc_1_1crypto_1_1r1_1_1detail_1_1private__key__impl_a546d2e6177cd1435c6ba5ae13e32f5cb} 
+EC\+\_\+\+KEY\texorpdfstring{$\ast$}{*} fc\+::crypto\+::r1\+::detail\+::private\+\_\+key\+\_\+impl\+::\+\_\+key}
+
+
+
+Definition at line \mbox{\hyperlink{elliptic__r1_8cpp_source_l00047}{47}} of file \mbox{\hyperlink{elliptic__r1_8cpp_source}{elliptic\+\_\+r1.\+cpp}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+libraries/fc/src/crypto/\mbox{\hyperlink{elliptic__r1_8cpp}{elliptic\+\_\+r1.\+cpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,343 @@
+\doxysection{libraries/fc/vendor/websocketpp/test/roles/client.cpp File Reference}
+\hypertarget{client_8cpp}{}\label{client_8cpp}\index{libraries/fc/vendor/websocketpp/test/roles/client.cpp@{libraries/fc/vendor/websocketpp/test/roles/client.cpp}}
+{\ttfamily \#include $<$boost/test/unit\+\_\+test.\+hpp$>$}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$websocketpp/random/random\+\_\+device.\+hpp$>$}\newline
+{\ttfamily \#include $<$websocketpp/config/core.\+hpp$>$}\newline
+{\ttfamily \#include $<$websocketpp/client.\+hpp$>$}\newline
+{\ttfamily \#include $<$websocketpp/http/request.\+hpp$>$}\newline
+Include dependency graph for client.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{client_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structstub__config}{stub\+\_\+config}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{client_8cpp_a6b2a3852db8bb19ab6909bac01859985}{BOOST\+\_\+\+TEST\+\_\+\+MODULE}}~\mbox{\hyperlink{debug__client_8cpp_aff8c62b83a9c8aefc476f96166656b76}{client}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1client}{websocketpp\+::client}}$<$ \mbox{\hyperlink{structstub__config}{stub\+\_\+config}} $>$ \mbox{\hyperlink{client_8cpp_aedcb62d053869d112cd73a37e21e9d92}{client}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{client_8cpp_ad0d95e161d21844a1b153f32bb7c8b25}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (invalid\+\_\+uri)
+\item 
+\mbox{\hyperlink{client_8cpp_a41e311e12e084d8674be2797f3c46584}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (unsecure\+\_\+endpoint)
+\item 
+\mbox{\hyperlink{client_8cpp_a63b15c51191506df16ba2f039a3b5b7f}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (get\+\_\+connection)
+\item 
+\mbox{\hyperlink{client_8cpp_ab23ea6fcf36193e0edc77a7789abdea1}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (connect\+\_\+con)
+\item 
+\mbox{\hyperlink{client_8cpp_ad9891a26e22f7c311043357d8cbb15b5}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (select\+\_\+subprotocol)
+\item 
+\mbox{\hyperlink{client_8cpp_a2ffad6e98e1c94bc63b85ca8b350500d}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (add\+\_\+subprotocols\+\_\+invalid)
+\item 
+\mbox{\hyperlink{client_8cpp_a624f764d38085bac3666df118420981f}{BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE}} (add\+\_\+subprotocols)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{client_8cpp_a6b2a3852db8bb19ab6909bac01859985}\index{client.cpp@{client.cpp}!BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}}
+\index{BOOST\_TEST\_MODULE@{BOOST\_TEST\_MODULE}!client.cpp@{client.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_TEST\_MODULE}{BOOST\_TEST\_MODULE}}
+{\footnotesize\ttfamily \label{client_8cpp_a6b2a3852db8bb19ab6909bac01859985} 
+\#define BOOST\+\_\+\+TEST\+\_\+\+MODULE~\mbox{\hyperlink{debug__client_8cpp_aff8c62b83a9c8aefc476f96166656b76}{client}}}
+
+
+
+Definition at line \mbox{\hyperlink{client_8cpp_source_l00028}{28}} of file \mbox{\hyperlink{client_8cpp_source}{client.\+cpp}}.
+
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{client_8cpp_aedcb62d053869d112cd73a37e21e9d92}\index{client.cpp@{client.cpp}!client@{client}}
+\index{client@{client}!client.cpp@{client.cpp}}
+\doxysubsubsection{\texorpdfstring{client}{client}}
+{\footnotesize\ttfamily \label{client_8cpp_aedcb62d053869d112cd73a37e21e9d92} 
+typedef \mbox{\hyperlink{classwebsocketpp_1_1client}{websocketpp\+::client}}$<$\mbox{\hyperlink{structstub__config}{stub\+\_\+config}}$>$ \mbox{\hyperlink{debug__client_8cpp_aff8c62b83a9c8aefc476f96166656b76}{client}}}
+
+
+
+Definition at line \mbox{\hyperlink{client_8cpp_source_l00064}{64}} of file \mbox{\hyperlink{client_8cpp_source}{client.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{client_8cpp_a624f764d38085bac3666df118420981f}\index{client.cpp@{client.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!client.cpp@{client.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [1/7]}}
+{\footnotesize\ttfamily \label{client_8cpp_a624f764d38085bac3666df118420981f} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{add\+\_\+subprotocols}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{client_8cpp_source_l00168}{168}} of file \mbox{\hyperlink{client_8cpp_source}{client.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00169\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1client}{client}}\ c;}
+\DoxyCodeLine{00170\ \ \ \ \ websocketpp::lib::error\_code\ ec;}
+\DoxyCodeLine{00171\ \ \ \ \ std::stringstream\ out;}
+\DoxyCodeLine{00172\ \ \ \ \ std::string\ o;}
+\DoxyCodeLine{00173\ }
+\DoxyCodeLine{00174\ \ \ \ \ c.register\_ostream(\&out);}
+\DoxyCodeLine{00175\ }
+\DoxyCodeLine{00176\ \ \ \ \ \mbox{\hyperlink{debug__client_8cpp_ae9c9779aea742ab80689add7e553df0d}{connection\_ptr}}\ con\ =\ c.\mbox{\hyperlink{classwebsocketpp_1_1client_aa95cec974921e32bc37a61c683ae240d}{get\_connection}}(\textcolor{stringliteral}{"{}ws://localhost/"{}},\ ec);}
+\DoxyCodeLine{00177\ \ \ \ \ BOOST\_CHECK(\ con\ );}
+\DoxyCodeLine{00178\ }
+\DoxyCodeLine{00179\ \ \ \ \ con-\/>add\_subprotocol(\textcolor{stringliteral}{"{}foo"{}},ec);}
+\DoxyCodeLine{00180\ \ \ \ \ BOOST\_CHECK(\ !ec\ );}
+\DoxyCodeLine{00181\ }
+\DoxyCodeLine{00182\ \ \ \ \ BOOST\_CHECK\_NO\_THROW(\ con-\/>add\_subprotocol(\textcolor{stringliteral}{"{}bar"{}})\ );}
+\DoxyCodeLine{00183\ }
+\DoxyCodeLine{00184\ \ \ \ \ c.\mbox{\hyperlink{classwebsocketpp_1_1client_a818c30343180123bf1fee6dc21524bae}{connect}}(con);}
+\DoxyCodeLine{00185\ }
+\DoxyCodeLine{00186\ \ \ \ \ o\ =\ out.str();}
+\DoxyCodeLine{00187\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1request}{websocketpp::http::parser::request}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};}
+\DoxyCodeLine{00188\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.consume(o.data(),o.size());}
+\DoxyCodeLine{00189\ }
+\DoxyCodeLine{00190\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.ready()\ );}
+\DoxyCodeLine{00191\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}Sec-\/WebSocket-\/Protocol"{}}),\ \textcolor{stringliteral}{"{}foo,\ bar"{}});}
+\DoxyCodeLine{00192\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{client_8cpp_a624f764d38085bac3666df118420981f_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{client_8cpp_a2ffad6e98e1c94bc63b85ca8b350500d}\index{client.cpp@{client.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!client.cpp@{client.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [2/7]}}
+{\footnotesize\ttfamily \label{client_8cpp_a2ffad6e98e1c94bc63b85ca8b350500d} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{add\+\_\+subprotocols\+\_\+invalid}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{client_8cpp_source_l00151}{151}} of file \mbox{\hyperlink{client_8cpp_source}{client.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00152\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1client}{client}}\ c;}
+\DoxyCodeLine{00153\ \ \ \ \ websocketpp::lib::error\_code\ ec;}
+\DoxyCodeLine{00154\ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacewebsocketpp_1_1error_a3344622df8c36e8ae03c59164e7b5e89}{websocketpp::error::make\_error\_code}};}
+\DoxyCodeLine{00155\ }
+\DoxyCodeLine{00156\ \ \ \ \ \mbox{\hyperlink{debug__client_8cpp_ae9c9779aea742ab80689add7e553df0d}{connection\_ptr}}\ con\ =\ c.\mbox{\hyperlink{classwebsocketpp_1_1client_aa95cec974921e32bc37a61c683ae240d}{get\_connection}}(\textcolor{stringliteral}{"{}ws://localhost/"{}},\ ec);}
+\DoxyCodeLine{00157\ \ \ \ \ BOOST\_CHECK(\ con\ );}
+\DoxyCodeLine{00158\ }
+\DoxyCodeLine{00159\ \ \ \ \ con-\/>add\_subprotocol(\textcolor{stringliteral}{"{}"{}},ec);}
+\DoxyCodeLine{00160\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ ec\ ,\ make\_error\_code(\mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68dabdba1165334e583188795c7fda926dc3}{websocketpp::error::invalid\_subprotocol}})\ );}
+\DoxyCodeLine{00161\ \ \ \ \ BOOST\_CHECK\_THROW(\ con-\/>add\_subprotocol(\textcolor{stringliteral}{"{}"{}})\ ,\ \mbox{\hyperlink{classwebsocketpp_1_1exception}{websocketpp::exception}}\ );}
+\DoxyCodeLine{00162\ }
+\DoxyCodeLine{00163\ \ \ \ \ con-\/>add\_subprotocol(\textcolor{stringliteral}{"{}foo,bar"{}},ec);}
+\DoxyCodeLine{00164\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ ec\ ,\ make\_error\_code(\mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68dabdba1165334e583188795c7fda926dc3}{websocketpp::error::invalid\_subprotocol}})\ );}
+\DoxyCodeLine{00165\ \ \ \ \ BOOST\_CHECK\_THROW(\ con-\/>add\_subprotocol(\textcolor{stringliteral}{"{}foo,bar"{}})\ ,\ \mbox{\hyperlink{classwebsocketpp_1_1exception}{websocketpp::exception}}\ );}
+\DoxyCodeLine{00166\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{client_8cpp_a2ffad6e98e1c94bc63b85ca8b350500d_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{client_8cpp_ab23ea6fcf36193e0edc77a7789abdea1}\index{client.cpp@{client.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!client.cpp@{client.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [3/7]}}
+{\footnotesize\ttfamily \label{client_8cpp_ab23ea6fcf36193e0edc77a7789abdea1} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{connect\+\_\+con}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{client_8cpp_source_l00098}{98}} of file \mbox{\hyperlink{client_8cpp_source}{client.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00099\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1client}{client}}\ c;}
+\DoxyCodeLine{00100\ \ \ \ \ websocketpp::lib::error\_code\ ec;}
+\DoxyCodeLine{00101\ \ \ \ \ std::stringstream\ out;}
+\DoxyCodeLine{00102\ \ \ \ \ std::string\ o;}
+\DoxyCodeLine{00103\ }
+\DoxyCodeLine{00104\ \ \ \ \ c.register\_ostream(\&out);}
+\DoxyCodeLine{00105\ }
+\DoxyCodeLine{00106\ \ \ \ \ \mbox{\hyperlink{debug__client_8cpp_ae9c9779aea742ab80689add7e553df0d}{connection\_ptr}}\ con\ =\ c.\mbox{\hyperlink{classwebsocketpp_1_1client_aa95cec974921e32bc37a61c683ae240d}{get\_connection}}(\textcolor{stringliteral}{"{}ws://localhost/"{}},\ ec);}
+\DoxyCodeLine{00107\ \ \ \ \ c.\mbox{\hyperlink{classwebsocketpp_1_1client_a818c30343180123bf1fee6dc21524bae}{connect}}(con);}
+\DoxyCodeLine{00108\ }
+\DoxyCodeLine{00109\ \ \ \ \ o\ =\ out.str();}
+\DoxyCodeLine{00110\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1http_1_1parser_1_1request}{websocketpp::http::parser::request}}\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}};}
+\DoxyCodeLine{00111\ \ \ \ \ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.consume(o.data(),o.size());}
+\DoxyCodeLine{00112\ }
+\DoxyCodeLine{00113\ \ \ \ \ BOOST\_CHECK(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.ready()\ );}
+\DoxyCodeLine{00114\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_method(),\ \textcolor{stringliteral}{"{}GET"{}});}
+\DoxyCodeLine{00115\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_version(),\ \textcolor{stringliteral}{"{}HTTP/1.1"{}});}
+\DoxyCodeLine{00116\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_uri(),\ \textcolor{stringliteral}{"{}/"{}});}
+\DoxyCodeLine{00117\ }
+\DoxyCodeLine{00118\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}Host"{}}),\ \textcolor{stringliteral}{"{}localhost"{}});}
+\DoxyCodeLine{00119\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}Sec-\/WebSocket-\/Version"{}}),\ \textcolor{stringliteral}{"{}13"{}});}
+\DoxyCodeLine{00120\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}Connection"{}}),\ \textcolor{stringliteral}{"{}Upgrade"{}});}
+\DoxyCodeLine{00121\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}Upgrade"{}}),\ \textcolor{stringliteral}{"{}websocket"{}});}
+\DoxyCodeLine{00122\ }
+\DoxyCodeLine{00123\ \ \ \ \ \textcolor{comment}{//\ Key\ is\ randomly\ generated\ \&\ User-\/Agent\ will\ change\ so\ just\ check\ that}}
+\DoxyCodeLine{00124\ \ \ \ \ \textcolor{comment}{//\ they\ are\ not\ empty.}}
+\DoxyCodeLine{00125\ \ \ \ \ BOOST\_CHECK\_NE(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}Sec-\/WebSocket-\/Key"{}}),\ \textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{00126\ \ \ \ \ BOOST\_CHECK\_NE(\ \mbox{\hyperlink{bn_8cpp_af0a5201ca8846f05f25435b41d7f39f7}{r}}.get\_header(\textcolor{stringliteral}{"{}User-\/Agent"{}}),\ \textcolor{stringliteral}{"{}"{}}\ );}
+\DoxyCodeLine{00127\ }
+\DoxyCodeLine{00128\ \ \ \ \ \textcolor{comment}{//\ connection\ should\ have\ written\ out\ an\ opening\ handshake\ request\ and\ be\ in}}
+\DoxyCodeLine{00129\ \ \ \ \ \textcolor{comment}{//\ the\ read\ response\ internal\ state}}
+\DoxyCodeLine{00130\ }
+\DoxyCodeLine{00131\ \ \ \ \ \textcolor{comment}{//\ TODO:\ more\ tests\ related\ to\ reading\ the\ HTTP\ response}}
+\DoxyCodeLine{00132\ \ \ \ \ std::stringstream\ channel2;}
+\DoxyCodeLine{00133\ \ \ \ \ channel2\ <<\ \textcolor{stringliteral}{"{}e\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)n"{}};}
+\DoxyCodeLine{00134\ \ \ \ \ channel2\ >>\ *con;}
+\DoxyCodeLine{00135\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{client_8cpp_ab23ea6fcf36193e0edc77a7789abdea1_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{client_8cpp_a63b15c51191506df16ba2f039a3b5b7f}\index{client.cpp@{client.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!client.cpp@{client.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [4/7]}}
+{\footnotesize\ttfamily \label{client_8cpp_a63b15c51191506df16ba2f039a3b5b7f} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{get\+\_\+connection}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{client_8cpp_source_l00085}{85}} of file \mbox{\hyperlink{client_8cpp_source}{client.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00086\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1client}{client}}\ c;}
+\DoxyCodeLine{00087\ \ \ \ \ websocketpp::lib::error\_code\ ec;}
+\DoxyCodeLine{00088\ }
+\DoxyCodeLine{00089\ \ \ \ \ \mbox{\hyperlink{debug__client_8cpp_ae9c9779aea742ab80689add7e553df0d}{connection\_ptr}}\ con\ =\ c.\mbox{\hyperlink{classwebsocketpp_1_1client_aa95cec974921e32bc37a61c683ae240d}{get\_connection}}(\textcolor{stringliteral}{"{}ws://localhost/"{}},\ ec);}
+\DoxyCodeLine{00090\ }
+\DoxyCodeLine{00091\ \ \ \ \ BOOST\_CHECK(\ con\ );}
+\DoxyCodeLine{00092\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ con-\/>get\_host()\ ,\ \textcolor{stringliteral}{"{}localhost"{}}\ );}
+\DoxyCodeLine{00093\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ con-\/>get\_port()\ ,\ 80\ );}
+\DoxyCodeLine{00094\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ con-\/>get\_secure()\ ,\ \textcolor{keyword}{false}\ );}
+\DoxyCodeLine{00095\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ con-\/>get\_resource()\ ,\ \textcolor{stringliteral}{"{}/"{}}\ );}
+\DoxyCodeLine{00096\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{client_8cpp_a63b15c51191506df16ba2f039a3b5b7f_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{client_8cpp_ad0d95e161d21844a1b153f32bb7c8b25}\index{client.cpp@{client.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!client.cpp@{client.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [5/7]}}
+{\footnotesize\ttfamily \label{client_8cpp_ad0d95e161d21844a1b153f32bb7c8b25} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{invalid\+\_\+uri}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{client_8cpp_source_l00067}{67}} of file \mbox{\hyperlink{client_8cpp_source}{client.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00068\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1client}{client}}\ c;}
+\DoxyCodeLine{00069\ \ \ \ \ websocketpp::lib::error\_code\ ec;}
+\DoxyCodeLine{00070\ }
+\DoxyCodeLine{00071\ \ \ \ \ \mbox{\hyperlink{debug__client_8cpp_ae9c9779aea742ab80689add7e553df0d}{connection\_ptr}}\ con\ =\ c.\mbox{\hyperlink{classwebsocketpp_1_1client_aa95cec974921e32bc37a61c683ae240d}{get\_connection}}(\textcolor{stringliteral}{"{}foo"{}},\ ec);}
+\DoxyCodeLine{00072\ }
+\DoxyCodeLine{00073\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ ec\ ,\ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a3344622df8c36e8ae03c59164e7b5e89}{websocketpp::error::make\_error\_code}}(\mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68daf80643edf3b27c30fc83be7b489a418c}{websocketpp::error::invalid\_uri}})\ );}
+\DoxyCodeLine{00074\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{client_8cpp_ad0d95e161d21844a1b153f32bb7c8b25_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{client_8cpp_ad9891a26e22f7c311043357d8cbb15b5}\index{client.cpp@{client.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!client.cpp@{client.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [6/7]}}
+{\footnotesize\ttfamily \label{client_8cpp_ad9891a26e22f7c311043357d8cbb15b5} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{select\+\_\+subprotocol}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{client_8cpp_source_l00137}{137}} of file \mbox{\hyperlink{client_8cpp_source}{client.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00138\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1client}{client}}\ c;}
+\DoxyCodeLine{00139\ \ \ \ \ websocketpp::lib::error\_code\ ec;}
+\DoxyCodeLine{00140\ \ \ \ \ \textcolor{keyword}{using\ }\mbox{\hyperlink{namespacewebsocketpp_1_1error_a3344622df8c36e8ae03c59164e7b5e89}{websocketpp::error::make\_error\_code}};}
+\DoxyCodeLine{00141\ }
+\DoxyCodeLine{00142\ \ \ \ \ \mbox{\hyperlink{debug__client_8cpp_ae9c9779aea742ab80689add7e553df0d}{connection\_ptr}}\ con\ =\ c.\mbox{\hyperlink{classwebsocketpp_1_1client_aa95cec974921e32bc37a61c683ae240d}{get\_connection}}(\textcolor{stringliteral}{"{}ws://localhost/"{}},\ ec);}
+\DoxyCodeLine{00143\ }
+\DoxyCodeLine{00144\ \ \ \ \ BOOST\_CHECK(\ con\ );}
+\DoxyCodeLine{00145\ }
+\DoxyCodeLine{00146\ \ \ \ \ con-\/>select\_subprotocol(\textcolor{stringliteral}{"{}foo"{}},ec);}
+\DoxyCodeLine{00147\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ ec\ ,\ make\_error\_code(\mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68daab6790e91c53a767498f7939e8fc734e}{websocketpp::error::server\_only}})\ );}
+\DoxyCodeLine{00148\ \ \ \ \ BOOST\_CHECK\_THROW(\ con-\/>select\_subprotocol(\textcolor{stringliteral}{"{}foo"{}})\ ,\ \mbox{\hyperlink{classwebsocketpp_1_1exception}{websocketpp::exception}}\ );}
+\DoxyCodeLine{00149\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{client_8cpp_ad9891a26e22f7c311043357d8cbb15b5_cgraph}
+\end{center}
+\end{figure}
+\Hypertarget{client_8cpp_a41e311e12e084d8674be2797f3c46584}\index{client.cpp@{client.cpp}!BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}}
+\index{BOOST\_AUTO\_TEST\_CASE@{BOOST\_AUTO\_TEST\_CASE}!client.cpp@{client.cpp}}
+\doxysubsubsection{\texorpdfstring{BOOST\_AUTO\_TEST\_CASE()}{BOOST\_AUTO\_TEST\_CASE()}\hspace{0.1cm}{\footnotesize\ttfamily [7/7]}}
+{\footnotesize\ttfamily \label{client_8cpp_a41e311e12e084d8674be2797f3c46584} 
+BOOST\+\_\+\+AUTO\+\_\+\+TEST\+\_\+\+CASE (\begin{DoxyParamCaption}\item[{unsecure\+\_\+endpoint}]{}{}\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{client_8cpp_source_l00076}{76}} of file \mbox{\hyperlink{client_8cpp_source}{client.\+cpp}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{00077\ \ \ \ \ \mbox{\hyperlink{classwebsocketpp_1_1client}{client}}\ c;}
+\DoxyCodeLine{00078\ \ \ \ \ websocketpp::lib::error\_code\ ec;}
+\DoxyCodeLine{00079\ }
+\DoxyCodeLine{00080\ \ \ \ \ \mbox{\hyperlink{debug__client_8cpp_ae9c9779aea742ab80689add7e553df0d}{connection\_ptr}}\ con\ =\ c.\mbox{\hyperlink{classwebsocketpp_1_1client_aa95cec974921e32bc37a61c683ae240d}{get\_connection}}(\textcolor{stringliteral}{"{}wss://localhost/"{}},\ ec);}
+\DoxyCodeLine{00081\ }
+\DoxyCodeLine{00082\ \ \ \ \ BOOST\_CHECK\_EQUAL(\ ec\ ,\ \mbox{\hyperlink{namespacewebsocketpp_1_1error_a3344622df8c36e8ae03c59164e7b5e89}{websocketpp::error::make\_error\_code}}(\mbox{\hyperlink{namespacewebsocketpp_1_1error_a0558d884e44e79146ad4947aea63f68dab60d2206b38a89602d316dd029c33c1b}{websocketpp::error::endpoint\_not\_secure}})\ );}
+\DoxyCodeLine{00083\ \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{client_8cpp_a41e311e12e084d8674be2797f3c46584_cgraph}
+\end{center}
+\end{figure}

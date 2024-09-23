@@ -1,0 +1,205 @@
+\doxysection{libraries/builtins/fp128.h File Reference}
+\hypertarget{fp128_8h}{}\label{fp128_8h}\index{libraries/builtins/fp128.h@{libraries/builtins/fp128.h}}
+{\ttfamily \#include $<$limits.\+h$>$}\newline
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include "{}../softfloat/source/include/softfloat.\+h"{}}\newline
+Include dependency graph for fp128.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{fp128_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=266pt]{fp128_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{fp128_8h_a0b5d8aaef32f260a5b7fcfc34ee8ac9a}{REP\+\_\+C}}~(\+\_\+\+\_\+uint128\+\_\+t)
+\item 
+\#define \mbox{\hyperlink{fp128_8h_a726ad4aea754fb8a716f9e9071d908e6}{significand\+Bits}}~112
+\item 
+\#define \mbox{\hyperlink{fp128_8h_af26995200adcf0a975c99d7e72d1cb8c}{type\+Width}}~(\mbox{\hyperlink{yubihsm__pkcs11_8c_af82555d15fc1c126f72a5c0566b5389a}{sizeof}}(\+\_\+\+\_\+int128)\texorpdfstring{$\ast$}{*}CHAR\+\_\+\+BIT)
+\item 
+\#define \mbox{\hyperlink{fp128_8h_a623eb8ef235a561790479ba7f27afd14}{exponent\+Bits}}~(\mbox{\hyperlink{fp128_8h_af26995200adcf0a975c99d7e72d1cb8c}{type\+Width}} -\/ \mbox{\hyperlink{fp128_8h_a726ad4aea754fb8a716f9e9071d908e6}{significand\+Bits}} -\/ 1)
+\item 
+\#define \mbox{\hyperlink{fp128_8h_abcccff748819628edc26a9af3ea99e90}{max\+Exponent}}~((1 $<$$<$ \mbox{\hyperlink{fp128_8h_a623eb8ef235a561790479ba7f27afd14}{exponent\+Bits}}) -\/ 1)
+\item 
+\#define \mbox{\hyperlink{fp128_8h_a27dcfb4c2f9f888ad75b26c2cc4e0ace}{exponent\+Bias}}~(\mbox{\hyperlink{fp128_8h_abcccff748819628edc26a9af3ea99e90}{max\+Exponent}} $>$$>$ 1)
+\item 
+\#define \mbox{\hyperlink{fp128_8h_a0ad3d8cdc9ca3d2f03786e592d7c01af}{implicit\+Bit}}~(\mbox{\hyperlink{fp128_8h_a0b5d8aaef32f260a5b7fcfc34ee8ac9a}{REP\+\_\+C}}(1) $<$$<$ \mbox{\hyperlink{fp128_8h_a726ad4aea754fb8a716f9e9071d908e6}{significand\+Bits}})
+\item 
+\#define \mbox{\hyperlink{fp128_8h_a83ac658944510a105f99f0d48a3ccc0d}{significand\+Mask}}~(\mbox{\hyperlink{fp128_8h_a0ad3d8cdc9ca3d2f03786e592d7c01af}{implicit\+Bit}} -\/ 1\mbox{\hyperlink{union_u}{U}})
+\item 
+\#define \mbox{\hyperlink{fp128_8h_a24a207bac48041c7a290ab7b276a3b8b}{sign\+Bit}}~(\mbox{\hyperlink{fp128_8h_a0b5d8aaef32f260a5b7fcfc34ee8ac9a}{REP\+\_\+C}}(1) $<$$<$ (\mbox{\hyperlink{fp128_8h_a726ad4aea754fb8a716f9e9071d908e6}{significand\+Bits}} + \mbox{\hyperlink{fp128_8h_a623eb8ef235a561790479ba7f27afd14}{exponent\+Bits}}))
+\item 
+\#define \mbox{\hyperlink{fp128_8h_ab5203388c0b3fa56667e16d1bbd1e7a7}{abs\+Mask}}~(\mbox{\hyperlink{fp128_8h_a24a207bac48041c7a290ab7b276a3b8b}{sign\+Bit}} -\/ 1\mbox{\hyperlink{union_u}{U}})
+\item 
+\#define \mbox{\hyperlink{fp128_8h_aedd14ba6deb690341a3f33aeb98ef13e}{exponent\+Mask}}~(\mbox{\hyperlink{fp128_8h_ab5203388c0b3fa56667e16d1bbd1e7a7}{abs\+Mask}} \texorpdfstring{$^\wedge$}{\string^} \mbox{\hyperlink{fp128_8h_a83ac658944510a105f99f0d48a3ccc0d}{significand\+Mask}})
+\item 
+\#define \mbox{\hyperlink{fp128_8h_ac240b721536cc947345101d3376085ea}{one\+Rep}}~((\mbox{\hyperlink{fixunstfti_8c_a77567b82b597749858d42ee163339696}{rep\+\_\+t}})\mbox{\hyperlink{fp128_8h_a27dcfb4c2f9f888ad75b26c2cc4e0ace}{exponent\+Bias}} $<$$<$ \mbox{\hyperlink{fp128_8h_a726ad4aea754fb8a716f9e9071d908e6}{significand\+Bits}})
+\item 
+\#define \mbox{\hyperlink{fp128_8h_a6203c9e0b325fb3a237b499c31b1c4f7}{inf\+Rep}}~\mbox{\hyperlink{fp128_8h_aedd14ba6deb690341a3f33aeb98ef13e}{exponent\+Mask}}
+\item 
+\#define \mbox{\hyperlink{fp128_8h_aa19d36dbef4d3b2b856c8ddefafa5b1d}{quiet\+Bit}}~(\mbox{\hyperlink{fp128_8h_a0ad3d8cdc9ca3d2f03786e592d7c01af}{implicit\+Bit}} $>$$>$ 1)
+\item 
+\#define \mbox{\hyperlink{fp128_8h_ade2aac31b6844608e16878e5c319c81b}{qnan\+Rep}}~(\mbox{\hyperlink{fp128_8h_aedd14ba6deb690341a3f33aeb98ef13e}{exponent\+Mask}} \texorpdfstring{$\vert$}{|} \mbox{\hyperlink{fp128_8h_aa19d36dbef4d3b2b856c8ddefafa5b1d}{quiet\+Bit}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{fp128_8h_ab5203388c0b3fa56667e16d1bbd1e7a7}\index{fp128.h@{fp128.h}!absMask@{absMask}}
+\index{absMask@{absMask}!fp128.h@{fp128.h}}
+\doxysubsubsection{\texorpdfstring{absMask}{absMask}}
+{\footnotesize\ttfamily \label{fp128_8h_ab5203388c0b3fa56667e16d1bbd1e7a7} 
+\#define abs\+Mask~(\mbox{\hyperlink{fp128_8h_a24a207bac48041c7a290ab7b276a3b8b}{sign\+Bit}} -\/ 1\mbox{\hyperlink{union_u}{U}})}
+
+
+
+Definition at line \mbox{\hyperlink{fp128_8h_source_l00018}{18}} of file \mbox{\hyperlink{fp128_8h_source}{fp128.\+h}}.
+
+\Hypertarget{fp128_8h_a27dcfb4c2f9f888ad75b26c2cc4e0ace}\index{fp128.h@{fp128.h}!exponentBias@{exponentBias}}
+\index{exponentBias@{exponentBias}!fp128.h@{fp128.h}}
+\doxysubsubsection{\texorpdfstring{exponentBias}{exponentBias}}
+{\footnotesize\ttfamily \label{fp128_8h_a27dcfb4c2f9f888ad75b26c2cc4e0ace} 
+\#define exponent\+Bias~(\mbox{\hyperlink{fp128_8h_abcccff748819628edc26a9af3ea99e90}{max\+Exponent}} $>$$>$ 1)}
+
+
+
+Definition at line \mbox{\hyperlink{fp128_8h_source_l00013}{13}} of file \mbox{\hyperlink{fp128_8h_source}{fp128.\+h}}.
+
+\Hypertarget{fp128_8h_a623eb8ef235a561790479ba7f27afd14}\index{fp128.h@{fp128.h}!exponentBits@{exponentBits}}
+\index{exponentBits@{exponentBits}!fp128.h@{fp128.h}}
+\doxysubsubsection{\texorpdfstring{exponentBits}{exponentBits}}
+{\footnotesize\ttfamily \label{fp128_8h_a623eb8ef235a561790479ba7f27afd14} 
+\#define exponent\+Bits~(\mbox{\hyperlink{fp128_8h_af26995200adcf0a975c99d7e72d1cb8c}{type\+Width}} -\/ \mbox{\hyperlink{fp128_8h_a726ad4aea754fb8a716f9e9071d908e6}{significand\+Bits}} -\/ 1)}
+
+
+
+Definition at line \mbox{\hyperlink{fp128_8h_source_l00011}{11}} of file \mbox{\hyperlink{fp128_8h_source}{fp128.\+h}}.
+
+\Hypertarget{fp128_8h_aedd14ba6deb690341a3f33aeb98ef13e}\index{fp128.h@{fp128.h}!exponentMask@{exponentMask}}
+\index{exponentMask@{exponentMask}!fp128.h@{fp128.h}}
+\doxysubsubsection{\texorpdfstring{exponentMask}{exponentMask}}
+{\footnotesize\ttfamily \label{fp128_8h_aedd14ba6deb690341a3f33aeb98ef13e} 
+\#define exponent\+Mask~(\mbox{\hyperlink{fp128_8h_ab5203388c0b3fa56667e16d1bbd1e7a7}{abs\+Mask}} \texorpdfstring{$^\wedge$}{\string^} \mbox{\hyperlink{fp128_8h_a83ac658944510a105f99f0d48a3ccc0d}{significand\+Mask}})}
+
+
+
+Definition at line \mbox{\hyperlink{fp128_8h_source_l00019}{19}} of file \mbox{\hyperlink{fp128_8h_source}{fp128.\+h}}.
+
+\Hypertarget{fp128_8h_a0ad3d8cdc9ca3d2f03786e592d7c01af}\index{fp128.h@{fp128.h}!implicitBit@{implicitBit}}
+\index{implicitBit@{implicitBit}!fp128.h@{fp128.h}}
+\doxysubsubsection{\texorpdfstring{implicitBit}{implicitBit}}
+{\footnotesize\ttfamily \label{fp128_8h_a0ad3d8cdc9ca3d2f03786e592d7c01af} 
+\#define implicit\+Bit~(\mbox{\hyperlink{fp128_8h_a0b5d8aaef32f260a5b7fcfc34ee8ac9a}{REP\+\_\+C}}(1) $<$$<$ \mbox{\hyperlink{fp128_8h_a726ad4aea754fb8a716f9e9071d908e6}{significand\+Bits}})}
+
+
+
+Definition at line \mbox{\hyperlink{fp128_8h_source_l00015}{15}} of file \mbox{\hyperlink{fp128_8h_source}{fp128.\+h}}.
+
+\Hypertarget{fp128_8h_a6203c9e0b325fb3a237b499c31b1c4f7}\index{fp128.h@{fp128.h}!infRep@{infRep}}
+\index{infRep@{infRep}!fp128.h@{fp128.h}}
+\doxysubsubsection{\texorpdfstring{infRep}{infRep}}
+{\footnotesize\ttfamily \label{fp128_8h_a6203c9e0b325fb3a237b499c31b1c4f7} 
+\#define inf\+Rep~\mbox{\hyperlink{fp128_8h_aedd14ba6deb690341a3f33aeb98ef13e}{exponent\+Mask}}}
+
+
+
+Definition at line \mbox{\hyperlink{fp128_8h_source_l00021}{21}} of file \mbox{\hyperlink{fp128_8h_source}{fp128.\+h}}.
+
+\Hypertarget{fp128_8h_abcccff748819628edc26a9af3ea99e90}\index{fp128.h@{fp128.h}!maxExponent@{maxExponent}}
+\index{maxExponent@{maxExponent}!fp128.h@{fp128.h}}
+\doxysubsubsection{\texorpdfstring{maxExponent}{maxExponent}}
+{\footnotesize\ttfamily \label{fp128_8h_abcccff748819628edc26a9af3ea99e90} 
+\#define max\+Exponent~((1 $<$$<$ \mbox{\hyperlink{fp128_8h_a623eb8ef235a561790479ba7f27afd14}{exponent\+Bits}}) -\/ 1)}
+
+
+
+Definition at line \mbox{\hyperlink{fp128_8h_source_l00012}{12}} of file \mbox{\hyperlink{fp128_8h_source}{fp128.\+h}}.
+
+\Hypertarget{fp128_8h_ac240b721536cc947345101d3376085ea}\index{fp128.h@{fp128.h}!oneRep@{oneRep}}
+\index{oneRep@{oneRep}!fp128.h@{fp128.h}}
+\doxysubsubsection{\texorpdfstring{oneRep}{oneRep}}
+{\footnotesize\ttfamily \label{fp128_8h_ac240b721536cc947345101d3376085ea} 
+\#define one\+Rep~((\mbox{\hyperlink{fixunstfti_8c_a77567b82b597749858d42ee163339696}{rep\+\_\+t}})\mbox{\hyperlink{fp128_8h_a27dcfb4c2f9f888ad75b26c2cc4e0ace}{exponent\+Bias}} $<$$<$ \mbox{\hyperlink{fp128_8h_a726ad4aea754fb8a716f9e9071d908e6}{significand\+Bits}})}
+
+
+
+Definition at line \mbox{\hyperlink{fp128_8h_source_l00020}{20}} of file \mbox{\hyperlink{fp128_8h_source}{fp128.\+h}}.
+
+\Hypertarget{fp128_8h_ade2aac31b6844608e16878e5c319c81b}\index{fp128.h@{fp128.h}!qnanRep@{qnanRep}}
+\index{qnanRep@{qnanRep}!fp128.h@{fp128.h}}
+\doxysubsubsection{\texorpdfstring{qnanRep}{qnanRep}}
+{\footnotesize\ttfamily \label{fp128_8h_ade2aac31b6844608e16878e5c319c81b} 
+\#define qnan\+Rep~(\mbox{\hyperlink{fp128_8h_aedd14ba6deb690341a3f33aeb98ef13e}{exponent\+Mask}} \texorpdfstring{$\vert$}{|} \mbox{\hyperlink{fp128_8h_aa19d36dbef4d3b2b856c8ddefafa5b1d}{quiet\+Bit}})}
+
+
+
+Definition at line \mbox{\hyperlink{fp128_8h_source_l00023}{23}} of file \mbox{\hyperlink{fp128_8h_source}{fp128.\+h}}.
+
+\Hypertarget{fp128_8h_aa19d36dbef4d3b2b856c8ddefafa5b1d}\index{fp128.h@{fp128.h}!quietBit@{quietBit}}
+\index{quietBit@{quietBit}!fp128.h@{fp128.h}}
+\doxysubsubsection{\texorpdfstring{quietBit}{quietBit}}
+{\footnotesize\ttfamily \label{fp128_8h_aa19d36dbef4d3b2b856c8ddefafa5b1d} 
+\#define quiet\+Bit~(\mbox{\hyperlink{fp128_8h_a0ad3d8cdc9ca3d2f03786e592d7c01af}{implicit\+Bit}} $>$$>$ 1)}
+
+
+
+Definition at line \mbox{\hyperlink{fp128_8h_source_l00022}{22}} of file \mbox{\hyperlink{fp128_8h_source}{fp128.\+h}}.
+
+\Hypertarget{fp128_8h_a0b5d8aaef32f260a5b7fcfc34ee8ac9a}\index{fp128.h@{fp128.h}!REP\_C@{REP\_C}}
+\index{REP\_C@{REP\_C}!fp128.h@{fp128.h}}
+\doxysubsubsection{\texorpdfstring{REP\_C}{REP\_C}}
+{\footnotesize\ttfamily \label{fp128_8h_a0b5d8aaef32f260a5b7fcfc34ee8ac9a} 
+\#define REP\+\_\+C~(\+\_\+\+\_\+uint128\+\_\+t)}
+
+
+
+Definition at line \mbox{\hyperlink{fp128_8h_source_l00008}{8}} of file \mbox{\hyperlink{fp128_8h_source}{fp128.\+h}}.
+
+\Hypertarget{fp128_8h_a24a207bac48041c7a290ab7b276a3b8b}\index{fp128.h@{fp128.h}!signBit@{signBit}}
+\index{signBit@{signBit}!fp128.h@{fp128.h}}
+\doxysubsubsection{\texorpdfstring{signBit}{signBit}}
+{\footnotesize\ttfamily \label{fp128_8h_a24a207bac48041c7a290ab7b276a3b8b} 
+\#define sign\+Bit~(\mbox{\hyperlink{fp128_8h_a0b5d8aaef32f260a5b7fcfc34ee8ac9a}{REP\+\_\+C}}(1) $<$$<$ (\mbox{\hyperlink{fp128_8h_a726ad4aea754fb8a716f9e9071d908e6}{significand\+Bits}} + \mbox{\hyperlink{fp128_8h_a623eb8ef235a561790479ba7f27afd14}{exponent\+Bits}}))}
+
+
+
+Definition at line \mbox{\hyperlink{fp128_8h_source_l00017}{17}} of file \mbox{\hyperlink{fp128_8h_source}{fp128.\+h}}.
+
+\Hypertarget{fp128_8h_a726ad4aea754fb8a716f9e9071d908e6}\index{fp128.h@{fp128.h}!significandBits@{significandBits}}
+\index{significandBits@{significandBits}!fp128.h@{fp128.h}}
+\doxysubsubsection{\texorpdfstring{significandBits}{significandBits}}
+{\footnotesize\ttfamily \label{fp128_8h_a726ad4aea754fb8a716f9e9071d908e6} 
+\#define significand\+Bits~112}
+
+
+
+Definition at line \mbox{\hyperlink{fp128_8h_source_l00009}{9}} of file \mbox{\hyperlink{fp128_8h_source}{fp128.\+h}}.
+
+\Hypertarget{fp128_8h_a83ac658944510a105f99f0d48a3ccc0d}\index{fp128.h@{fp128.h}!significandMask@{significandMask}}
+\index{significandMask@{significandMask}!fp128.h@{fp128.h}}
+\doxysubsubsection{\texorpdfstring{significandMask}{significandMask}}
+{\footnotesize\ttfamily \label{fp128_8h_a83ac658944510a105f99f0d48a3ccc0d} 
+\#define significand\+Mask~(\mbox{\hyperlink{fp128_8h_a0ad3d8cdc9ca3d2f03786e592d7c01af}{implicit\+Bit}} -\/ 1\mbox{\hyperlink{union_u}{U}})}
+
+
+
+Definition at line \mbox{\hyperlink{fp128_8h_source_l00016}{16}} of file \mbox{\hyperlink{fp128_8h_source}{fp128.\+h}}.
+
+\Hypertarget{fp128_8h_af26995200adcf0a975c99d7e72d1cb8c}\index{fp128.h@{fp128.h}!typeWidth@{typeWidth}}
+\index{typeWidth@{typeWidth}!fp128.h@{fp128.h}}
+\doxysubsubsection{\texorpdfstring{typeWidth}{typeWidth}}
+{\footnotesize\ttfamily \label{fp128_8h_af26995200adcf0a975c99d7e72d1cb8c} 
+\#define type\+Width~(\mbox{\hyperlink{yubihsm__pkcs11_8c_af82555d15fc1c126f72a5c0566b5389a}{sizeof}}(\+\_\+\+\_\+int128)\texorpdfstring{$\ast$}{*}CHAR\+\_\+\+BIT)}
+
+
+
+Definition at line \mbox{\hyperlink{fp128_8h_source_l00010}{10}} of file \mbox{\hyperlink{fp128_8h_source}{fp128.\+h}}.
+

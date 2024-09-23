@@ -1,0 +1,19 @@
+<map id="libraries/yubihsm/common/insecure_memzero.h" name="libraries/yubihsm/common/insecure_memzero.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="628,5,802,46"/>
+<area shape="rect" id="Node000002" href="$aes_8c.html" title=" " alt="" coords="5,94,150,135"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="613,39,404,62,162,97,151,99,150,93,161,91,404,56,612,34"/>
+<area shape="rect" id="Node000003" href="$aes__cmac_8c.html" title=" " alt="" coords="173,94,318,135"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="613,46,330,97,319,99,318,94,329,91,612,41"/>
+<area shape="rect" id="Node000004" href="$hash_8c.html" title=" " alt="" coords="342,94,515,135"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="636,53,494,96,493,91,635,48"/>
+<area shape="rect" id="Node000005" href="$util_8c.html" title=" " alt="" coords="539,94,712,135"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="685,59,648,95,644,92,682,55"/>
+<area shape="rect" id="Node000006" href="$yubihsm_8c.html" title=" " alt="" coords="736,94,872,135"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="748,55,786,92,782,95,744,59"/>
+<area shape="rect" id="Node000007" href="$list_8c.html" title=" " alt="" coords="896,94,1062,135"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="790,49,920,91,918,96,788,54"/>
+<area shape="rect" id="Node000008" href="$yubihsm__pkcs11_8c.html" title=" " alt="" coords="1086,94,1251,135"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="817,43,1074,91,1086,94,1085,99,1073,97,816,48"/>
+<area shape="rect" id="Node000009" href="$commands_8c.html" title=" " alt="" coords="1275,94,1416,135"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="817,34,1024,56,1263,91,1275,94,1274,99,1262,97,1023,62,817,39"/>
+</map>

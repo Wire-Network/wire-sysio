@@ -1,0 +1,19 @@
+<map id="sysio::vm::backend::get_module" name="sysio::vm::backend::get_module">
+<area shape="rect" id="Node000001" title=" " alt="" coords="602,140,738,181"/>
+<area shape="rect" id="Node000002" href="$implementation__limits__tests_8cpp.html#a62a8ae4b1a8ab3f4a7d74bc1d458965d" title=" " alt="" coords="374,5,546,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="644,130,604,85,580,63,553,44,530,34,532,29,556,40,583,59,608,81,648,127"/>
+<area shape="rect" id="Node000003" href="$implementation__limits__tests_8cpp.html#a75852f164664918221f13dc5b1cd4ee7" title=" " alt="" coords="374,55,546,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="625,134,553,95,519,83,521,78,555,90,628,130"/>
+<area shape="rect" id="Node000004" href="$structinit__backend.html#a9da328f02fa0e296421ca3bdb357e584" title=" " alt="" coords="400,104,520,145"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="586,149,520,138,521,132,587,144"/>
+<area shape="rect" id="Node000005" href="$classsysio_1_1chain_1_1webassembly_1_1eos__vm__runtime_1_1eos__vm__runtime.html#abd9f9c14ce5a8ffc2dc66457bd3f2d39" title=" " alt="" coords="366,169,554,225"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="587,178,555,183,554,178,586,172"/>
+<area shape="rect" id="Node000006" href="$namespacesysio_1_1chain_1_1webassembly_1_1eos__vm__runtime.html#a9cd22b0e9d05f910358f809fcd29ffec" title=" " alt="" coords="370,248,550,289"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="631,192,595,217,556,239,530,250,528,245,553,234,593,212,628,188"/>
+<area shape="rect" id="Node000007" href="$namespacesysio_1_1chain_1_1webassembly_1_1eos__vm__runtime.html#a78d9d364a9ab60de8d18b4660f592d5f" title=" " alt="" coords="370,314,550,354"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="651,196,611,250,585,278,556,303,534,316,531,311,553,299,581,275,607,247,647,193"/>
+<area shape="rect" id="Node000008" href="$classsysio_1_1chain_1_1wasm__interface.html#a0748761343232176fe57ede67dd254ae" title=" " alt="" coords="184,314,318,354"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="355,337,318,337,318,332,355,332"/>
+<area shape="rect" id="Node000009" href="$group__native__action__handlers.html#ga88394625fa30b19cd99bb0e89cda07dd" title=" " alt="" coords="5,314,136,354"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="168,337,136,337,136,332,168,332"/>
+</map>

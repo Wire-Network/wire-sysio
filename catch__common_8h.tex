@@ -1,0 +1,131 @@
+\doxysection{libraries/sys-\/vm/external/\+Catch2/include/internal/catch\+\_\+common.h File Reference}
+\hypertarget{catch__common_8h}{}\label{catch__common_8h}\index{libraries/sys-\/vm/external/Catch2/include/internal/catch\_common.h@{libraries/sys-\/vm/external/Catch2/include/internal/catch\_common.h}}
+{\ttfamily \#include "{}catch\+\_\+compiler\+\_\+capabilities.\+h"{}}\newline
+{\ttfamily \#include $<$iosfwd$>$}\newline
+{\ttfamily \#include $<$string$>$}\newline
+{\ttfamily \#include $<$cstdint$>$}\newline
+Include dependency graph for catch\+\_\+common.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{catch__common_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{catch__common_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_catch__global__namespace__dummy}{Catch\+\_\+global\+\_\+namespace\+\_\+dummy}}
+\item 
+struct \mbox{\hyperlink{struct_catch_1_1_case_sensitive}{Catch\+::\+Case\+Sensitive}}
+\item 
+class \mbox{\hyperlink{class_catch_1_1_non_copyable}{Catch\+::\+Non\+Copyable}}
+\item 
+struct \mbox{\hyperlink{struct_catch_1_1_source_line_info}{Catch\+::\+Source\+Line\+Info}}
+\item 
+struct \mbox{\hyperlink{struct_catch_1_1_stream_end_stop}{Catch\+::\+Stream\+End\+Stop}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespace_catch}{Catch}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{catch__common_8h_a7c21e89d8b7727757ce9ca2b848f1cda}{INTERNAL\+\_\+\+CATCH\+\_\+\+UNIQUE\+\_\+\+NAME\+\_\+\+LINE2}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  line)
+\item 
+\#define \mbox{\hyperlink{catch__common_8h_a1b51a086ea21a750bd306ac0ed4d2a95}{INTERNAL\+\_\+\+CATCH\+\_\+\+UNIQUE\+\_\+\+NAME\+\_\+\+LINE}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},  line)
+\item 
+\#define \mbox{\hyperlink{catch__common_8h_afe320ceec108fc8c160f9ac3938f1bc8}{INTERNAL\+\_\+\+CATCH\+\_\+\+UNIQUE\+\_\+\+NAME}}(\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}})
+\item 
+\#define \mbox{\hyperlink{catch__common_8h_abc0b2405454c51748a31e0393d9ad5d1}{CATCH\+\_\+\+INTERNAL\+\_\+\+LINEINFO}}~    \mbox{\hyperlink{struct_catch_1_1_source_line_info}{\+::\+Catch\+::\+Source\+Line\+Info}}( \+\_\+\+\_\+\+FILE\+\_\+\+\_\+, static\+\_\+cast$<$std\+::size\+\_\+t$>$( \+\_\+\+\_\+\+LINE\+\_\+\+\_\+ ) )
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+std\+::ostream \& \mbox{\hyperlink{catch__common_8h_aae0cdd5d2f0ac242b9ab18b0f66ba26e}{operator$<$$<$}} (std\+::ostream \&, \mbox{\hyperlink{struct_catch__global__namespace__dummy}{Catch\+\_\+global\+\_\+namespace\+\_\+dummy}})
+\item 
+std\+::ostream \& \mbox{\hyperlink{namespace_catch_a8c8ea1f66bc1cdc3e1254ed7fa57c06d}{Catch\+::operator$<$$<$}} (std\+::ostream \&os, \mbox{\hyperlink{struct_catch_1_1_source_line_info}{Source\+Line\+Info}} const \&info)
+\item 
+{\footnotesize template$<$typename \mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} $>$ }\\\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const \& \mbox{\hyperlink{namespace_catch_a074287bb202b5f53de64b5b63c16b23c}{Catch\+::operator+}} (\mbox{\hyperlink{prettywritertest_8cpp_a6283df8c4e365cc8a01727e2d7ad44bf}{T}} const \&\mbox{\hyperlink{pkcs11_8h_a32aff7c6c4cd253fdf6563677afab5ce}{value}}, \mbox{\hyperlink{struct_catch_1_1_stream_end_stop}{Stream\+End\+Stop}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{catch__common_8h_abc0b2405454c51748a31e0393d9ad5d1}\index{catch\_common.h@{catch\_common.h}!CATCH\_INTERNAL\_LINEINFO@{CATCH\_INTERNAL\_LINEINFO}}
+\index{CATCH\_INTERNAL\_LINEINFO@{CATCH\_INTERNAL\_LINEINFO}!catch\_common.h@{catch\_common.h}}
+\doxysubsubsection{\texorpdfstring{CATCH\_INTERNAL\_LINEINFO}{CATCH\_INTERNAL\_LINEINFO}}
+{\footnotesize\ttfamily \label{catch__common_8h_abc0b2405454c51748a31e0393d9ad5d1} 
+\#define CATCH\+\_\+\+INTERNAL\+\_\+\+LINEINFO~    \mbox{\hyperlink{struct_catch_1_1_source_line_info}{\+::\+Catch\+::\+Source\+Line\+Info}}( \+\_\+\+\_\+\+FILE\+\_\+\+\_\+, static\+\_\+cast$<$std\+::size\+\_\+t$>$( \+\_\+\+\_\+\+LINE\+\_\+\+\_\+ ) )}
+
+
+
+Definition at line \mbox{\hyperlink{catch__common_8h_source_l00088}{88}} of file \mbox{\hyperlink{catch__common_8h_source}{catch\+\_\+common.\+h}}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00088\ \textcolor{preprocessor}{\#define\ CATCH\_INTERNAL\_LINEINFO\ \(\backslash\)}}
+\DoxyCodeLine{00089\ \textcolor{preprocessor}{\ \ \ \ ::Catch::SourceLineInfo(\ \_\_FILE\_\_,\ static\_cast<std::size\_t>(\ \_\_LINE\_\_\ )\ )}}
+
+\end{DoxyCode}
+\Hypertarget{catch__common_8h_afe320ceec108fc8c160f9ac3938f1bc8}\index{catch\_common.h@{catch\_common.h}!INTERNAL\_CATCH\_UNIQUE\_NAME@{INTERNAL\_CATCH\_UNIQUE\_NAME}}
+\index{INTERNAL\_CATCH\_UNIQUE\_NAME@{INTERNAL\_CATCH\_UNIQUE\_NAME}!catch\_common.h@{catch\_common.h}}
+\doxysubsubsection{\texorpdfstring{INTERNAL\_CATCH\_UNIQUE\_NAME}{INTERNAL\_CATCH\_UNIQUE\_NAME}}
+{\footnotesize\ttfamily \label{catch__common_8h_afe320ceec108fc8c160f9ac3938f1bc8} 
+\#define INTERNAL\+\_\+\+CATCH\+\_\+\+UNIQUE\+\_\+\+NAME(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__common_8h_a1b51a086ea21a750bd306ac0ed4d2a95}{INTERNAL\_CATCH\_UNIQUE\_NAME\_LINE}}(\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ \_\_COUNTER\_\_\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__common_8h_source_l00016}{16}} of file \mbox{\hyperlink{catch__common_8h_source}{catch\+\_\+common.\+h}}.
+
+\Hypertarget{catch__common_8h_a1b51a086ea21a750bd306ac0ed4d2a95}\index{catch\_common.h@{catch\_common.h}!INTERNAL\_CATCH\_UNIQUE\_NAME\_LINE@{INTERNAL\_CATCH\_UNIQUE\_NAME\_LINE}}
+\index{INTERNAL\_CATCH\_UNIQUE\_NAME\_LINE@{INTERNAL\_CATCH\_UNIQUE\_NAME\_LINE}!catch\_common.h@{catch\_common.h}}
+\doxysubsubsection{\texorpdfstring{INTERNAL\_CATCH\_UNIQUE\_NAME\_LINE}{INTERNAL\_CATCH\_UNIQUE\_NAME\_LINE}}
+{\footnotesize\ttfamily \label{catch__common_8h_a1b51a086ea21a750bd306ac0ed4d2a95} 
+\#define INTERNAL\+\_\+\+CATCH\+\_\+\+UNIQUE\+\_\+\+NAME\+\_\+\+LINE(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{line}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__common_8h_a7c21e89d8b7727757ce9ca2b848f1cda}{INTERNAL\_CATCH\_UNIQUE\_NAME\_LINE2}}(\ \mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}},\ line\ )}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__common_8h_source_l00014}{14}} of file \mbox{\hyperlink{catch__common_8h_source}{catch\+\_\+common.\+h}}.
+
+\Hypertarget{catch__common_8h_a7c21e89d8b7727757ce9ca2b848f1cda}\index{catch\_common.h@{catch\_common.h}!INTERNAL\_CATCH\_UNIQUE\_NAME\_LINE2@{INTERNAL\_CATCH\_UNIQUE\_NAME\_LINE2}}
+\index{INTERNAL\_CATCH\_UNIQUE\_NAME\_LINE2@{INTERNAL\_CATCH\_UNIQUE\_NAME\_LINE2}!catch\_common.h@{catch\_common.h}}
+\doxysubsubsection{\texorpdfstring{INTERNAL\_CATCH\_UNIQUE\_NAME\_LINE2}{INTERNAL\_CATCH\_UNIQUE\_NAME\_LINE2}}
+{\footnotesize\ttfamily \label{catch__common_8h_a7c21e89d8b7727757ce9ca2b848f1cda} 
+\#define INTERNAL\+\_\+\+CATCH\+\_\+\+UNIQUE\+\_\+\+NAME\+\_\+\+LINE2(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}}{, }\item[{}]{line}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{catch__reporter__console_8cpp_a9b45b3e13bd9167aab02e17e08916231}{name}}\#\#line}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{catch__common_8h_source_l00013}{13}} of file \mbox{\hyperlink{catch__common_8h_source}{catch\+\_\+common.\+h}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{catch__common_8h_aae0cdd5d2f0ac242b9ab18b0f66ba26e}\index{catch\_common.h@{catch\_common.h}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!catch\_common.h@{catch\_common.h}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}}
+{\footnotesize\ttfamily \label{catch__common_8h_aae0cdd5d2f0ac242b9ab18b0f66ba26e} 
+std\+::ostream \& operator$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{}{, }\item[{\mbox{\hyperlink{struct_catch__global__namespace__dummy}{Catch\+\_\+global\+\_\+namespace\+\_\+dummy}}}]{}{}\end{DoxyParamCaption})}
+

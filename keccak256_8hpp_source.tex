@@ -1,0 +1,64 @@
+\doxysection{keccak256.\+hpp}
+\hypertarget{keccak256_8hpp_source}{}\label{keccak256_8hpp_source}\index{libraries/fc/include/fc/crypto/keccak256.hpp@{libraries/fc/include/fc/crypto/keccak256.hpp}}
+\mbox{\hyperlink{keccak256_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{keccak256_8hpp_source_l00001}00001\ \textcolor{comment}{/*\ sha3\ -\/\ an\ implementation\ of\ Secure\ Hash\ Algorithm\ 3\ (Keccak).}}
+\DoxyCodeLine{\Hypertarget{keccak256_8hpp_source_l00002}00002\ \textcolor{comment}{\ *\ based\ on\ the}}
+\DoxyCodeLine{\Hypertarget{keccak256_8hpp_source_l00003}00003\ \textcolor{comment}{\ *\ The\ Keccak\ SHA-\/3\ submission.\ Submission\ to\ NIST\ (Round\ 3),\ 2011}}
+\DoxyCodeLine{\Hypertarget{keccak256_8hpp_source_l00004}00004\ \textcolor{comment}{\ *\ by\ Guido\ Bertoni,\ Joan\ Daemen,\ Michaël\ Peeters\ and\ Gilles\ Van\ Assche}}
+\DoxyCodeLine{\Hypertarget{keccak256_8hpp_source_l00005}00005\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{keccak256_8hpp_source_l00006}00006\ \textcolor{comment}{\ *\ Copyright:\ 2013\ Aleksey\ Kravchenko\ <rhash.admin@gmail.com>}}
+\DoxyCodeLine{\Hypertarget{keccak256_8hpp_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{keccak256_8hpp_source_l00008}00008\ \textcolor{comment}{\ *\ Permission\ is\ hereby\ granted,\ \ free\ of\ charge,\ \ to\ any\ person\ \ obtaining\ a}}
+\DoxyCodeLine{\Hypertarget{keccak256_8hpp_source_l00009}00009\ \textcolor{comment}{\ *\ copy\ of\ this\ software\ and\ associated\ documentation\ files\ (the\ "{}Software"{}),}}
+\DoxyCodeLine{\Hypertarget{keccak256_8hpp_source_l00010}00010\ \textcolor{comment}{\ *\ to\ deal\ in\ the\ Software\ without\ restriction,\ \ including\ without\ limitation}}
+\DoxyCodeLine{\Hypertarget{keccak256_8hpp_source_l00011}00011\ \textcolor{comment}{\ *\ the\ rights\ to\ \ use,\ copy,\ modify,\ \ merge,\ publish,\ distribute,\ sublicense,}}
+\DoxyCodeLine{\Hypertarget{keccak256_8hpp_source_l00012}00012\ \textcolor{comment}{\ *\ and/or\ sell\ copies\ \ of\ \ the\ Software,\ \ and\ to\ permit\ \ persons\ \ to\ whom\ the}}
+\DoxyCodeLine{\Hypertarget{keccak256_8hpp_source_l00013}00013\ \textcolor{comment}{\ *\ Software\ is\ furnished\ to\ do\ so.}}
+\DoxyCodeLine{\Hypertarget{keccak256_8hpp_source_l00014}00014\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{keccak256_8hpp_source_l00015}00015\ \textcolor{comment}{\ *\ This\ program\ \ is\ \ distributed\ \ in\ \ the\ \ hope\ \ that\ it\ will\ be\ useful,\ \ but}}
+\DoxyCodeLine{\Hypertarget{keccak256_8hpp_source_l00016}00016\ \textcolor{comment}{\ *\ WITHOUT\ ANY\ WARRANTY;\ without\ even\ the\ implied\ warranty\ of\ MERCHANTABILITY}}
+\DoxyCodeLine{\Hypertarget{keccak256_8hpp_source_l00017}00017\ \textcolor{comment}{\ *\ or\ FITNESS\ FOR\ A\ PARTICULAR\ PURPOSE.\ \ Use\ this\ program\ \ at\ \ your\ own\ risk!}}
+\DoxyCodeLine{\Hypertarget{keccak256_8hpp_source_l00018}00018\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{keccak256_8hpp_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{keccak256_8hpp_source_l00020}00020\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{\Hypertarget{keccak256_8hpp_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{keccak256_8hpp_source_l00022}00022\ \textcolor{preprocessor}{\#include\ <cstdint>}\ \textcolor{comment}{//\ Include\ for\ std::uint64\_t}}
+\DoxyCodeLine{\Hypertarget{keccak256_8hpp_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{keccak256_8hpp_source_l00024}00024\ \textcolor{preprocessor}{\#ifndef\ \_\_KECCAK256\_HPP\_}}
+\DoxyCodeLine{\Hypertarget{keccak256_8hpp_source_l00025}\mbox{\hyperlink{keccak256_8hpp_ae3783949296691c530f589cfbf5ee78e}{00025}}\ \textcolor{preprocessor}{\#define\ \_\_KECCAK256\_HPP\_}}
+\DoxyCodeLine{\Hypertarget{keccak256_8hpp_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{keccak256_8hpp_source_l00027}\mbox{\hyperlink{keccak256_8hpp_adb7d0dfadf407bc9372b1636f4cd62e3}{00027}}\ \textcolor{preprocessor}{\#define\ sha3\_max\_permutation\_size\ 25}}
+\DoxyCodeLine{\Hypertarget{keccak256_8hpp_source_l00028}\mbox{\hyperlink{keccak256_8hpp_a2a57db99c99b73eee9196f401c15b807}{00028}}\ \textcolor{preprocessor}{\#define\ sha3\_max\_rate\_in\_qwords\ 24}}
+\DoxyCodeLine{\Hypertarget{keccak256_8hpp_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{keccak256_8hpp_source_l00030}00030\ \ \ \ \ }
+\DoxyCodeLine{\Hypertarget{keccak256_8hpp_source_l00031}\mbox{\hyperlink{struct_s_h_a3___c_t_x}{00031}}\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_s_h_a3___c_t_x}{SHA3\_CTX}}\ \{}
+\DoxyCodeLine{\Hypertarget{keccak256_8hpp_source_l00032}00032\ \ \ \ \ \textcolor{comment}{/*\ 1600\ bits\ algorithm\ hashing\ state\ */}}
+\DoxyCodeLine{\Hypertarget{keccak256_8hpp_source_l00033}\mbox{\hyperlink{struct_s_h_a3___c_t_x_a7fcec2ce062e8a73ec6db44d20e86b1f}{00033}}\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ hash[\mbox{\hyperlink{keccak256_8hpp_adb7d0dfadf407bc9372b1636f4cd62e3}{sha3\_max\_permutation\_size}}];}
+\DoxyCodeLine{\Hypertarget{keccak256_8hpp_source_l00034}00034\ \ \ \ \ \textcolor{comment}{/*\ 1536-\/bit\ buffer\ for\ leftovers\ */}}
+\DoxyCodeLine{\Hypertarget{keccak256_8hpp_source_l00035}\mbox{\hyperlink{struct_s_h_a3___c_t_x_a37957cb14d1f29d6e3c8b86c13baf86c}{00035}}\ \ \ \ \ \mbox{\hyperlink{stdint_8h_aec6fcb673ff035718c238c8c9d544c47}{uint64\_t}}\ message[\mbox{\hyperlink{keccak256_8hpp_a2a57db99c99b73eee9196f401c15b807}{sha3\_max\_rate\_in\_qwords}}];}
+\DoxyCodeLine{\Hypertarget{keccak256_8hpp_source_l00036}00036\ \ \ \ \ \textcolor{comment}{/*\ count\ of\ bytes\ in\ the\ message[]\ buffer\ */}}
+\DoxyCodeLine{\Hypertarget{keccak256_8hpp_source_l00037}\mbox{\hyperlink{struct_s_h_a3___c_t_x_a206aeef34e8cabe7390884ef5c131999}{00037}}\ \ \ \ \ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ \mbox{\hyperlink{struct_s_h_a3___c_t_x_a206aeef34e8cabe7390884ef5c131999}{rest}};}
+\DoxyCodeLine{\Hypertarget{keccak256_8hpp_source_l00038}00038\ \ \ \ \ \textcolor{comment}{/*\ size\ of\ a\ message\ block\ processed\ at\ once\ */}}
+\DoxyCodeLine{\Hypertarget{keccak256_8hpp_source_l00039}00039\ \ \ \ \ \textcolor{comment}{//unsigned\ block\_size;}}
+\DoxyCodeLine{\Hypertarget{keccak256_8hpp_source_l00040}\mbox{\hyperlink{keccak256_8hpp_ae5c989c3bd6a8f2d2abf7b33f430b996}{00040}}\ \}\ \mbox{\hyperlink{keccak256_8hpp_ae5c989c3bd6a8f2d2abf7b33f430b996}{SHA3\_CTX}};}
+\DoxyCodeLine{\Hypertarget{keccak256_8hpp_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{keccak256_8hpp_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{keccak256_8hpp_source_l00043}00043\ \textcolor{preprocessor}{\#ifdef\ \_\_cplusplus}}
+\DoxyCodeLine{\Hypertarget{keccak256_8hpp_source_l00044}00044\ \textcolor{keyword}{extern}\ \textcolor{stringliteral}{"{}C"{}}\ \{}
+\DoxyCodeLine{\Hypertarget{keccak256_8hpp_source_l00045}00045\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{/*\ \_\_cplusplus\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{\Hypertarget{keccak256_8hpp_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{keccak256_8hpp_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{keccak256_8hpp_source_l00048}00048\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{keccak256_8hpp_a11facd9a5ba2fa670b8adac99c9b885c}{keccak\_init}}(\mbox{\hyperlink{struct_s_h_a3___c_t_x}{SHA3\_CTX}}\ *ctx);}
+\DoxyCodeLine{\Hypertarget{keccak256_8hpp_source_l00049}00049\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{keccak256_8hpp_a3a3c3f80dd9847bffcaa8e638aefef12}{keccak\_update}}(\mbox{\hyperlink{struct_s_h_a3___c_t_x}{SHA3\_CTX}}\ *ctx,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *msg,\ \mbox{\hyperlink{stdint_8h_a273cf69d639a59973b6019625df33e30}{uint16\_t}}\ size);}
+\DoxyCodeLine{\Hypertarget{keccak256_8hpp_source_l00050}00050\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{keccak256_8hpp_ab3d065f3af63d47a27d94d60a38422b5}{keccak\_final}}(\mbox{\hyperlink{struct_s_h_a3___c_t_x}{SHA3\_CTX}}\ *ctx,\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*\ result);}
+\DoxyCodeLine{\Hypertarget{keccak256_8hpp_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{keccak256_8hpp_source_l00052}00052\ }
+\DoxyCodeLine{\Hypertarget{keccak256_8hpp_source_l00053}00053\ \textcolor{preprocessor}{\#ifdef\ \_\_cplusplus}}
+\DoxyCodeLine{\Hypertarget{keccak256_8hpp_source_l00054}00054\ \}}
+\DoxyCodeLine{\Hypertarget{keccak256_8hpp_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{keccak256_8hpp_source_l00056}00056\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{/*\ \_\_cplusplus\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{\Hypertarget{keccak256_8hpp_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{keccak256_8hpp_source_l00058}00058\ \textcolor{preprocessor}{\#endif\ \ }\textcolor{comment}{/*\ \_\_KECCAK256\_HPP\_\ */}\textcolor{preprocessor}{}}
+
+\end{DoxyCode}
